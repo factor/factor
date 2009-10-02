@@ -6,24 +6,32 @@ ARTICLE: "sets" "Set-theoretic operations on sequences"
 "Set-theoretic operations on sequences are defined on the " { $vocab-link "sets" } " vocabulary. All of these operations use hashtables internally to achieve linear running time."
 $nl
 "Remove duplicates:"
-{ $subsection prune }
+{ $subsections prune }
 "Test for duplicates:"
-{ $subsection all-unique? }
-{ $subsection duplicates }
+{ $subsections
+    all-unique?
+    duplicates
+}
 "Set operations on sequences:"
-{ $subsection diff }
-{ $subsection intersect }
-{ $subsection union }
+{ $subsections
+    diff
+    intersect
+    union
+}
 "Set-theoretic predicates:"
-{ $subsection intersects? }
-{ $subsection subset? }
-{ $subsection set= }
+{ $subsections
+    intersects?
+    subset?
+    set=
+}
 "A word used to implement the above:"
-{ $subsection unique }
+{ $subsections unique }
 "Adding elements to sets:"
-{ $subsection adjoin }
-{ $subsection conjoin }
-{ $subsection conjoin-at }
+{ $subsections
+    adjoin
+    conjoin
+    conjoin-at
+}
 { $see-also member? memq? any? all? "assocs-sets" } ;
 
 ABOUT: "sets"

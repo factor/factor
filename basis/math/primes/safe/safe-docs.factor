@@ -30,9 +30,11 @@ ARTICLE: "math.primes.safe" "Safe prime numbers"
 "The " { $vocab-link "math.primes.safe" } " vocabulary implements words to calculate safe prime numbers. Safe primes are of the form p = 2q + 1, where p,q are prime. Safe primes have desirable qualities for cryptographic applications." $nl
 
 "Testing if a number is a safe prime:"
-{ $subsection safe-prime? }
+{ $subsections safe-prime? }
 "Generating safe prime numbers:"
-{ $subsection next-safe-prime }
-{ $subsection random-safe-prime } ;
+{ $subsections
+    next-safe-prime
+    random-safe-prime
+} ;
 
 ABOUT: "math.primes.safe"

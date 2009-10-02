@@ -4,12 +4,14 @@ IN: tools.deploy
 
 ARTICLE: "prepare-deploy" "Preparing to deploy an application"
 "In order to deploy an application as a stand-alone image, the application's vocabulary must first be given a " { $link POSTPONE: MAIN: } " hook. Then, a " { $emphasis "deployment configuration" } " must be created."
-{ $subsection "deploy-config" }
-{ $subsection "deploy-flags" } ;
+{ $subsections
+    "deploy-config"
+    "deploy-flags"
+} ;
 
 ARTICLE: "tools.deploy.usage" "Deploy tool usage"
 "Once the necessary deployment flags have been set, the application can be deployed:"
-{ $subsection deploy }
+{ $subsections deploy }
 "For example, you can deploy the " { $vocab-link "hello-ui" } " demo which comes with Factor. Note that this demo already has a deployment configuration, so nothing needs to be configured:"
 { $code "\"hello-ui\" deploy" }
 { $list
@@ -42,10 +44,12 @@ $nl
 "Most of the time, the words in the " { $vocab-link "tools.deploy" } " vocabulary should not be used directly; instead, use " { $link "ui.tools.deploy" } "."
 $nl
 "You must explicitly specify major subsystems which are required, as well as the level of reflection support needed. This is done by modifying the deployment configuration prior to deployment."
-{ $subsection "prepare-deploy" }
-{ $subsection "tools.deploy.usage" }
-{ $subsection "tools.deploy.impl" }
-{ $subsection "tools.deploy.caveats" } ;
+{ $subsections
+    "prepare-deploy"
+    "tools.deploy.usage"
+    "tools.deploy.impl"
+    "tools.deploy.caveats"
+} ;
 
 ABOUT: "tools.deploy"
 

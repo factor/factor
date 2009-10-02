@@ -51,18 +51,24 @@ HELP: n||
 ARTICLE: "combinators.short-circuit" "Short-circuit combinators"
 "The " { $vocab-link "combinators.short-circuit" } " vocabulary stops a computation early once a condition is met." $nl
 "AND combinators:"
-{ $subsection 0&& }
-{ $subsection 1&& }
-{ $subsection 2&& }
-{ $subsection 3&& }
+{ $subsections
+    0&&
+    1&&
+    2&&
+    3&&
+}
 "OR combinators:"
-{ $subsection 0|| }
-{ $subsection 1|| }
-{ $subsection 2|| }
-{ $subsection 3|| }
+{ $subsections
+    0||
+    1||
+    2||
+    3||
+}
 "Generalized combinators:"
-{ $subsection n&& }
-{ $subsection n|| }
+{ $subsections
+    n&&
+    n||
+}
 ;
 
 ABOUT: "combinators.short-circuit"

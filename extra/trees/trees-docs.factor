@@ -19,9 +19,11 @@ HELP: tree
 
 ARTICLE: "trees" "Binary search trees"
 "This is a library for unbalanced binary search trees. It is not intended to be used directly in most situations but rather as a base class for new trees, because performance can degrade to linear time storage/retrieval by the number of keys. These binary search trees conform to the assoc protocol."
-{ $subsection tree }
-{ $subsection <tree> }
-{ $subsection >tree }
-{ $subsection POSTPONE: TREE{ } ;
+{ $subsections
+    tree
+    <tree>
+    >tree
+    POSTPONE: TREE{
+} ;
 
 ABOUT: "trees"

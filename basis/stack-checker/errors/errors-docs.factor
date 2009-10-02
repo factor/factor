@@ -119,21 +119,27 @@ ARTICLE: "inference-errors" "Stack checker errors"
     { "The " { $link "compiler" } " reports them via " { $link "tools.errors" } }
 }
 "Errors thrown when insufficient information is available to calculate the stack effect of a call to a combinator or macro (see " { $link "inference-combinators" } "):"
-{ $subsection do-not-compile }
-{ $subsection literal-expected }
+{ $subsections
+    do-not-compile
+    literal-expected
+}
 "Error thrown when a word's stack effect declaration does not match the composition of the stack effects of its factors:"
-{ $subsection effect-error }
+{ $subsections effect-error }
 "Error thrown when branches have incompatible stack effects (see " { $link "inference-branches" } "):"
-{ $subsection unbalanced-branches-error }
+{ $subsections unbalanced-branches-error }
 "Inference errors for inline recursive words (see " { $link "inference-recursive-combinators" } "):"
-{ $subsection undeclared-recursion-error }
-{ $subsection diverging-recursion-error }
-{ $subsection unbalanced-recursion-error }
-{ $subsection inconsistent-recursive-call-error }
+{ $subsections
+    undeclared-recursion-error
+    diverging-recursion-error
+    unbalanced-recursion-error
+    inconsistent-recursive-call-error
+}
 "More obscure errors that are unlikely to arise in ordinary code:"
-{ $subsection recursive-quotation-error }
-{ $subsection too-many->r }
-{ $subsection too-many-r> }
-{ $subsection missing-effect } ;
+{ $subsections
+    recursive-quotation-error
+    too-many->r
+    too-many-r>
+    missing-effect
+} ;
 
 ABOUT: "inference-errors"

@@ -9,15 +9,17 @@ ARTICLE: "io.launcher.command" "Specifying a command"
 
 ARTICLE: "io.launcher.detached" "Running processes in the background"
 "By default, " { $link run-process } " waits for the process to complete. To run a process without waiting for it to finish, set the " { $snippet "detached" } " slot of a " { $link process } ", or use the following word:"
-{ $subsection run-detached } ;
+{ $subsections run-detached } ;
 
 ARTICLE: "io.launcher.environment" "Setting environment variables"
 "The " { $snippet "environment" } " slot of a " { $link process } " contains an association mapping environment variable names to values. The interpretation of environment variables is operating system-specific."
 $nl
 "The " { $snippet "environment-mode" } " slot controls how the environment of the current Factor instance is composed with the value of the " { $snippet "environment" } " slot:"
-{ $subsection +prepend-environment+ }
-{ $subsection +replace-environment+ }
-{ $subsection +append-environment+ }
+{ $subsections
+    +prepend-environment+
+    +replace-environment+
+    +append-environment+
+}
 "The default value is " { $link +append-environment+ } "." ;
 
 ARTICLE: "io.launcher.redirection" "Input/output redirection"
@@ -195,30 +197,38 @@ $nl
 
 ARTICLE: "io.launcher.lifecycle" "The process lifecycle"
 "A freshly instantiated " { $link process } " represents a set of launch parameters."
-{ $subsection process }
-{ $subsection <process> }
+{ $subsections
+    process
+    <process>
+}
 "Words for launching processes take a fresh process which has never been started before as input, and output a copy as output."
-{ $subsection process-started? }
+{ $subsections process-started? }
 "The " { $link process } " instance output by launching words contains all original slot values in addition to the " { $snippet "handle" } " slot, which indicates the process is currently running."
-{ $subsection process-running? }
+{ $subsections process-running? }
 "It is possible to wait for a process to exit:"
-{ $subsection wait-for-process }
+{ $subsections wait-for-process }
 "A running process can also be killed:"
-{ $subsection kill-process } ;
+{ $subsections kill-process } ;
 
 ARTICLE: "io.launcher.launch" "Launching processes"
 "Launching processes:"
-{ $subsection run-process }
-{ $subsection try-process }
-{ $subsection run-detached }
+{ $subsections
+    run-process
+    try-process
+    run-detached
+}
 "Redirecting standard input and output to a pipe:"
-{ $subsection <process-reader> }
-{ $subsection <process-writer> }
-{ $subsection <process-stream> }
+{ $subsections
+    <process-reader>
+    <process-writer>
+    <process-stream>
+}
 "Combinators built on top of the above:"
-{ $subsection with-process-reader }
-{ $subsection with-process-writer }
-{ $subsection with-process-stream } ;
+{ $subsections
+    with-process-reader
+    with-process-writer
+    with-process-stream
+} ;
 
 ARTICLE: "io.launcher.examples" "Launcher examples"
 "Starting a command and waiting for it to finish:"
@@ -260,16 +270,20 @@ ARTICLE: "io.launcher.examples" "Launcher examples"
 
 ARTICLE: "io.launcher" "Operating system processes"
 "The " { $vocab-link "io.launcher" } " vocabulary implements cross-platform process launching."
-{ $subsection "io.launcher.examples" }
-{ $subsection "io.launcher.descriptors" }
-{ $subsection "io.launcher.launch" }
+{ $subsections
+    "io.launcher.examples"
+    "io.launcher.descriptors"
+    "io.launcher.launch"
+}
 "Advanced topics:"
-{ $subsection "io.launcher.lifecycle" }
-{ $subsection "io.launcher.command" }
-{ $subsection "io.launcher.detached" }
-{ $subsection "io.launcher.environment" }
-{ $subsection "io.launcher.redirection" }
-{ $subsection "io.launcher.priority" }
-{ $subsection "io.launcher.timeouts" } ;
+{ $subsections
+    "io.launcher.lifecycle"
+    "io.launcher.command"
+    "io.launcher.detached"
+    "io.launcher.environment"
+    "io.launcher.redirection"
+    "io.launcher.priority"
+    "io.launcher.timeouts"
+} ;
 
 ABOUT: "io.launcher"

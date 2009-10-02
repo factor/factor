@@ -18,16 +18,22 @@ HELP: selection
 
 ARTICLE: "clipboard-protocol" "Clipboard protocol"
 "Custom gadgets that wish to interact with the clipboard must use the following two generic words to read and write clipboard contents:"
-{ $subsection paste-clipboard }
-{ $subsection copy-clipboard }
+{ $subsections
+    paste-clipboard
+    copy-clipboard
+}
 "UI backends can either implement the above two words in the case of an asynchronous clipboard model (for example, X11). If direct access to the clipboard is provided (Windows, Mac OS X), the following two generic words may be implemented instead:"
-{ $subsection clipboard-contents }
-{ $subsection set-clipboard-contents }
+{ $subsections
+    clipboard-contents
+    set-clipboard-contents
+}
 "However, gadgets should not call these words, since they will fail if only the asynchronous method of clipboard access is supported by the backend in use."
 $nl
 "Access to two clipboards is provided:"
-{ $subsection clipboard }
-{ $subsection selection }
+{ $subsections
+    clipboard
+    selection
+}
 "These variables may contain clipboard protocol implementations which transfer data to and from the native system clipboard. However an UI backend may leave one or both of these variables in their default state, which is a trivial clipboard implementation internal to the Factor UI." ;
 
 ABOUT: "clipboard-protocol"

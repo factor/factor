@@ -108,17 +108,21 @@ HELP: define-command
 
 ARTICLE: "ui-commands" "Commands"
 "Commands are an abstraction layered on top of gestures. Their main advantage is that they are identified by words and can be organized into " { $emphasis "command maps" } ". This allows easy construction of buttons and tool bars for invoking commands."
-{ $subsection define-command }
+{ $subsections define-command }
 "Command groups are defined on gadget classes:"
-{ $subsection define-command-map }
+{ $subsections define-command-map }
 "Commands can be introspected and invoked:"
-{ $subsection commands }
-{ $subsection command-map }
-{ $subsection invoke-command }
+{ $subsections
+    commands
+    command-map
+    invoke-command
+}
 "Gadgets for invoking commands are documented in " { $link "ui.gadgets.buttons" } "."
 $nl
 "When documenting gadgets, command documentation can be automatically generated:"
-{ $subsection $command-map }
-{ $subsection $command } ;
+{ $subsections
+    $command-map
+    $command
+} ;
 
 ABOUT: "ui-commands"

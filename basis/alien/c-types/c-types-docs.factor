@@ -136,33 +136,37 @@ ARTICLE: "c-out-params" "Output parameters in C"
 "A frequently-occurring idiom in C code is the \"out parameter\". If a C function returns more than one value, the caller passes pointers of the correct type, and the C function writes its return values to those locations."
 $nl
 "Each numerical C type, together with " { $snippet "void*" } ", has an associated " { $emphasis "out parameter constructor" } " word which takes a Factor object as input, constructs a byte array of the correct size, and converts the Factor object to a C value stored into the byte array:"
-{ $subsection <char> }
-{ $subsection <uchar> }
-{ $subsection <short> }
-{ $subsection <ushort> }
-{ $subsection <int> }
-{ $subsection <uint> }
-{ $subsection <long> }
-{ $subsection <ulong> }
-{ $subsection <longlong> }
-{ $subsection <ulonglong> }
-{ $subsection <float> }
-{ $subsection <double> }
-{ $subsection <void*> }
+{ $subsections
+    <char>
+    <uchar>
+    <short>
+    <ushort>
+    <int>
+    <uint>
+    <long>
+    <ulong>
+    <longlong>
+    <ulonglong>
+    <float>
+    <double>
+    <void*>
+}
 "You call the out parameter constructor with the required initial value, then pass the byte array to the C function, which receives a pointer to the start of the byte array's data area. The C function then returns, leaving the result in the byte array; you read it back using the next set of words:"
-{ $subsection *char }
-{ $subsection *uchar }
-{ $subsection *short }
-{ $subsection *ushort }
-{ $subsection *int }
-{ $subsection *uint }
-{ $subsection *long }
-{ $subsection *ulong }
-{ $subsection *longlong }
-{ $subsection *ulonglong }
-{ $subsection *float }
-{ $subsection *double }
-{ $subsection *void* }
+{ $subsections
+    *char
+    *uchar
+    *short
+    *ushort
+    *int
+    *uint
+    *long
+    *ulong
+    *longlong
+    *ulonglong
+    *float
+    *double
+    *void*
+}
 "Note that while structure and union types do not get these words defined for them, there is no loss of generality since " { $link <void*> } " and " { $link *void* } " may be used." ;
 
 ARTICLE: "c-types.primitives" "Primitive C types"
@@ -227,11 +231,22 @@ ARTICLE: "c-types.structs" "Struct and union types"
 "Struct and union types are identified by their class word. See " { $link "classes.struct" } "." ;
 
 ARTICLE: "c-types-specs" "C type specifiers"
-"C types are identified by special words, and type names occur as parameters to the " { $link alien-invoke } ", " { $link alien-indirect } " and " { $link alien-callback } " words. New C types can be defined by the words " { $link POSTPONE: STRUCT: } ", " { $link POSTPONE: UNION-STRUCT: } ", " { $link POSTPONE: CALLBACK: } ", and " { $link POSTPONE: TYPEDEF: } "."
-{ $subsection "c-types.primitives" }
-{ $subsection "c-types.pointers" }
-{ $subsection "c-types.ambiguity" }
-{ $subsection "c-types.structs" }
+"C types are identified by special words, and type names occur as parameters to the " { $link alien-invoke } ", " { $link alien-indirect } " and " { $link alien-callback } " words."
+$nl
+"Defining new C types:"
+{ $subsections
+    POSTPONE: STRUCT:
+    POSTPONE: UNION-STRUCT:
+    POSTPONE: CALLBACK:
+    POSTPONE: TYPEDEF:
+}
+{ $heading "Related articles" }
+{ $subsections
+    "c-types.primitives"
+    "c-types.pointers"
+    "c-types.ambiguity"
+    "c-types.structs"
+}
 ;
 
 ABOUT: "c-types-specs"

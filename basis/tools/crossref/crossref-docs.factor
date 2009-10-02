@@ -4,16 +4,20 @@ IN: tools.crossref
 
 ARTICLE: "tools.crossref" "Definition cross referencing"
 "Definitions can answer a sequence of definitions they directly depend on:"
-{ $subsection uses }
+{ $subsections uses }
 "An inverted index of the above:"
-{ $subsection get-crossref }
+{ $subsections get-crossref }
 "Words to access it:"
-{ $subsection usage }
-{ $subsection smart-usage }
+{ $subsections
+    usage
+    smart-usage
+}
 "Tools for interactive use:"
-{ $subsection usage. }
-{ $subsection vocab-uses. }
-{ $subsection vocab-usage. }
+{ $subsections
+    usage.
+    vocab-uses.
+    vocab-usage.
+}
 { $see-also "definitions" "words" "see" } ;
 
 ABOUT: "tools.crossref"

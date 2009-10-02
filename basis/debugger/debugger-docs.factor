@@ -6,23 +6,29 @@ IN: debugger
 
 ARTICLE: "debugger" "The debugger"
 "Caught errors can be logged in human-readable form:"
-{ $subsection print-error }
-{ $subsection try }
+{ $subsections
+    print-error
+    try
+}
 "User-defined errors can have customized printed representation by implementing a generic word:"
-{ $subsection error. }
+{ $subsections error. }
 "A number of words facilitate interactive debugging of errors:"
-{ $subsection :error }
-{ $subsection :s }
-{ $subsection :r }
-{ $subsection :c }
-{ $subsection :get }
+{ $subsections
+    :error
+    :s
+    :r
+    :c
+    :get
+}
 "Most types of errors are documented, and the documentation is instantly accessible:"
-{ $subsection :help }
+{ $subsections :help }
 "If the error was restartable, a list of restarts is also printed, and a numbered restart can be invoked:"
-{ $subsection :1 }
-{ $subsection :2 }
-{ $subsection :3 }
-{ $subsection :res }
+{ $subsections
+    :1
+    :2
+    :3
+    :res
+}
 "You can read more about error handling in " { $link "errors" } "."
 $nl
 "Note that in Factor, the debugger is a tool for printing and inspecting errors, not for walking through code. For the latter, see " { $link "ui-walker" } "." ;

@@ -53,9 +53,11 @@ HELP: product-each
 
 ARTICLE: "sequences.product" "Product sequences"
 "The " { $vocab-link "sequences.product" } " vocabulary provides a virtual sequence and combinators for manipulating the cartesian product of a set of sequences."
-{ $subsection product-sequence }
-{ $subsection <product-sequence> }
-{ $subsection product-map }
-{ $subsection product-each } ;
+{ $subsections
+    product-sequence
+    <product-sequence>
+    product-map
+    product-each
+} ;
 
 ABOUT: "sequences.product"

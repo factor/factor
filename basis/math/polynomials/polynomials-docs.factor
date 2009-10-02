@@ -5,20 +5,22 @@ ARTICLE: "polynomials" "Polynomials"
 "A polynomial is a vector with the highest powers on the right:"
 { $code "{ 1 1 0 1 } -> 1 + x + x^3" "{ } -> 0" }
 "Numerous words are defined to help with polynomial arithmetic:"
-{ $subsection p= }
-{ $subsection p+ }
-{ $subsection p- }
-{ $subsection p* }
-{ $subsection p-sq }
-{ $subsection powers }
-{ $subsection n*p }
-{ $subsection p/mod }
-{ $subsection pgcd }
-{ $subsection polyval }
-{ $subsection pdiff }
-{ $subsection pextend-conv }
-{ $subsection ptrim }
-{ $subsection 2ptrim } ;
+{ $subsections
+    p=
+    p+
+    p-
+    p*
+    p-sq
+    powers
+    n*p
+    p/mod
+    pgcd
+    polyval
+    pdiff
+    pextend-conv
+    ptrim
+    2ptrim
+} ;
 
 ABOUT: "polynomials"
 

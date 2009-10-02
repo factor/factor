@@ -41,8 +41,10 @@ HELP: [infix|
 
 ARTICLE: "infix" "Infix notation"
 "The " { $vocab-link "infix" } " vocabulary implements support for infix notation in Factor source code."
-{ $subsection POSTPONE: [infix }
-{ $subsection POSTPONE: [infix| }
+{ $subsections
+    POSTPONE: [infix
+    POSTPONE: [infix|
+}
 $nl
 "The usual infix math operators are supported:"
 { $list

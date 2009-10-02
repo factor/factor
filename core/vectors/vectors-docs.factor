@@ -13,13 +13,17 @@ $nl
 "Vectors are intended to be used with " { $link "sequences-destructive" } ". Code that does not modify sequences in-place can use fixed-size arrays without loss of generality; see " { $link "arrays" } "."
 $nl
 "Vectors form a class of objects:"
-{ $subsection vector }
-{ $subsection vector? }
+{ $subsections
+    vector
+    vector?
+}
 "Creating new vectors:"
-{ $subsection >vector }
-{ $subsection <vector> }
+{ $subsections
+    >vector
+    <vector>
+}
 "Creating a vector from a single element:"
-{ $subsection 1vector }
+{ $subsections 1vector }
 "If you don't care about initial capacity, an elegant way to create a new vector is to write:"
 { $code "V{ } clone" } ;
 

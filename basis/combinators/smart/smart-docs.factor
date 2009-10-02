@@ -119,20 +119,26 @@ HELP: keep-inputs
 ARTICLE: "combinators.smart" "Smart combinators"
 "A " { $emphasis "smart combinator" } " is a macro which reflects on the stack effect of an input quotation. The " { $vocab-link "combinators.smart" } " vocabulary implements a few simple smart combinators which look at the static stack effects of input quotations and generate code which produces or consumes the relevant number of stack values." $nl
 "Call a quotation and discard all output values or preserve all input values:"
-{ $subsection drop-outputs }
-{ $subsection keep-inputs }
+{ $subsections
+    drop-outputs
+    keep-inputs
+}
 "Take all input values from a sequence:"
-{ $subsection input<sequence }
+{ $subsections input<sequence }
 "Store all output values to a sequence:"
-{ $subsection output>sequence }
-{ $subsection output>array }
+{ $subsections
+    output>sequence
+    output>array
+}
 "Reducing the set of output values:"
-{ $subsection reduce-outputs }
+{ $subsections reduce-outputs }
 "Summing output values:"
-{ $subsection sum-outputs }
+{ $subsections sum-outputs }
 "Concatenating output values:"
-{ $subsection append-outputs }
-{ $subsection append-outputs-as }
+{ $subsections
+    append-outputs
+    append-outputs-as
+}
 "New smart combinators can be created by defining " { $link "macros" } " which call " { $link infer } "." ;
 
 ABOUT: "combinators.smart"

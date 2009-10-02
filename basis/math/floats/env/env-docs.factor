@@ -117,21 +117,29 @@ ARTICLE: "math.floats.env" "Controlling the floating-point environment"
 "The " { $vocab-link "math.floats.env" } " vocabulary contains words for querying and controlling the floating-point environment."
 $nl
 "Querying and setting exception flags:"
-{ $subsection fp-exception-flags }
-{ $subsection set-fp-exception-flags }
-{ $subsection clear-fp-exception-flags }
-{ $subsection collect-fp-exceptions }
+{ $subsections
+    fp-exception-flags
+    set-fp-exception-flags
+    clear-fp-exception-flags
+    collect-fp-exceptions
+}
 "Querying and controlling processor traps for floating-point exceptions:"
-{ $subsection fp-traps }
-{ $subsection with-fp-traps }
-{ $subsection without-fp-traps }
+{ $subsections
+    fp-traps
+    with-fp-traps
+    without-fp-traps
+}
 "Getting the floating-point exception state from errors raised by enabled traps:"
-{ $subsection vm-error>exception-flags }
-{ $subsection vm-error-exception-flag? }
+{ $subsections
+    vm-error>exception-flags
+    vm-error-exception-flag?
+}
 "Querying and controlling the rounding mode and treatment of denormals:"
-{ $subsection rounding-mode }
-{ $subsection with-rounding-mode }
-{ $subsection denormal-mode }
-{ $subsection with-denormal-mode } ;
+{ $subsections
+    rounding-mode
+    with-rounding-mode
+    denormal-mode
+    with-denormal-mode
+} ;
 
 ABOUT: "math.floats.env"

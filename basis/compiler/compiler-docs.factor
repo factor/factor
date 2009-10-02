@@ -12,19 +12,21 @@ HELP: disable-optimizer
 
 ARTICLE: "compiler-usage" "Calling the optimizing compiler"
 "Normally, new word definitions are recompiled automatically. This can be changed:"
-{ $subsection disable-optimizer }
-{ $subsection enable-optimizer }
+{ $subsections
+    disable-optimizer
+    enable-optimizer
+}
 "Removing a word's optimized definition:"
-{ $subsection decompile }
+{ $subsections decompile }
 "Compiling a single quotation:"
-{ $subsection compile-call }
+{ $subsections compile-call }
 "Higher-level words can be found in " { $link "compilation-units" } "." ;
 
 ARTICLE: "compiler-impl" "Compiler implementation"
 "The " { $vocab-link "compiler" } "vocabulary, in addition to providing the user-visible words of the compiler, implements the main compilation loop."
 $nl
 "Words are added to the " { $link compile-queue } " variable as needed and compiled."
-{ $subsection compile-queue }
+{ $subsections compile-queue }
 "Once compiled, a word is added to the assoc stored in the " { $link compiled } " variable. When compilation is complete, this assoc is passed to " { $link modify-code-heap } "."
 $nl
 "The " { $link compile-word } " word performs the actual task of compiling an individual word. The process proceeds as follows:"
@@ -49,10 +51,12 @@ $nl
 "The optimizing compiler also trades off compile time for performance of generated code, so loading certain vocabularies might take a while. Saving the image after loading vocabularies can save you a lot of time that you would spend waiting for the same code to load in every coding session; see " { $link "images" } " for information."
 $nl
 "Most code you write will run with the optimizing compiler. Sometimes, the non-optimizing compiler is used, for example for listener interactions, or for running the quotation passed to " { $link POSTPONE: call( } "."
-{ $subsection "compiler-errors" }
-{ $subsection "hints" }
-{ $subsection "compiler-usage" }
-{ $subsection "compiler-impl" } ;
+{ $subsections
+    "compiler-errors"
+    "hints"
+    "compiler-usage"
+    "compiler-impl"
+} ;
 
 ABOUT: "compiler"
 

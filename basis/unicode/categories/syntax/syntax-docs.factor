@@ -7,8 +7,10 @@ ABOUT: "unicode.categories.syntax"
 
 ARTICLE: "unicode.categories.syntax" "Unicode category syntax"
 "There is special syntax sugar for making predicate classes which are unions of Unicode general categories, plus some other code."
-{ $subsection POSTPONE: CATEGORY: }
-{ $subsection POSTPONE: CATEGORY-NOT: } ;
+{ $subsections
+    POSTPONE: CATEGORY:
+    POSTPONE: CATEGORY-NOT:
+} ;
 
 HELP: CATEGORY:
 { $syntax "CATEGORY: foo Nl Pd Lu | \"Diacritic\" property? ;" }

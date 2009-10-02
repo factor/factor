@@ -14,9 +14,11 @@ HELP: mouse-location
 { $description "Outputs the current mouse location." } ;
 
 ARTICLE: "cocoa-view-utils" "Cocoa view utilities"
-{ $subsection <GLView> }
-{ $subsection view-dim }
-{ $subsection mouse-location } ;
+{ $subsections
+    <GLView>
+    view-dim
+    mouse-location
+} ;
 
 IN: cocoa.views
 ABOUT: "cocoa-view-utils"
