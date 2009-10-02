@@ -45,7 +45,7 @@ typedef char symbol_char;
 typedef pthread_t THREADHANDLE;
 
 THREADHANDLE start_thread(void *(*start_routine)(void *),void *args);
-pthread_t thread_id();
+inline static THREADHANDLE thread_id() { return pthread_self(); }
 
 void unix_init_signals();
 void signal_handler(int signal, siginfo_t* siginfo, void* uap);

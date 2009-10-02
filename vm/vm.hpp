@@ -796,4 +796,6 @@ struct factor_vm
   #define SIGNAL_VM_PTR() tls_vm()
 #endif
 
+extern unordered_map<THREADHANDLE, factor_vm*> thread_vms;
+
 }
