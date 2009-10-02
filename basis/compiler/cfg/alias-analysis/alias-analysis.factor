@@ -278,7 +278,7 @@ M: ##copy analyze-aliases*
 : useless-compare? ( insn -- ? )
     {
         [ cc>> cc= eq? ]
-        [ [ src1>> vreg>ac ] [ src2>> vreg>ac ] bi = not ]
+        [ [ src1>> ] [ src2>> ] bi [ resolve vreg>ac ] bi@ = not ]
     } 1&& ; inline
 
 M: ##compare analyze-aliases*
