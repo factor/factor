@@ -51,7 +51,7 @@ M:: vector-rep emit-box ( dst src rep -- )
     dst byte-array-offset src rep ##set-alien-vector ;
 
 M: vector-rep emit-unbox
-    byte-array-offset ##alien-vector ;
+    [ byte-array-offset ] dip ##alien-vector ;
 
 M:: scalar-rep emit-box ( dst src rep -- )
     int-rep next-vreg-rep :> temp
@@ -152,6 +152,9 @@ SYMBOL: costs
 ! Insert conversions. This introduces new temporaries, so we need
 ! to rename opearands too.
 
+! Mapping from vreg,rep pairs to vregs
+SYMBOL: alternatives
+
 :: emit-def-conversion ( dst preferred required -- new-dst' )
     ! If an instruction defines a register with representation 'required',
     ! but the register has preferred representation 'preferred', then
@@ -164,7 +167,13 @@ SYMBOL: costs
     ! but the register has preferred representation 'preferred', then
     ! we rename the instruction's input to a new register, which
     ! becomes the output of a conversion instruction.
-    required next-vreg-rep [ src required preferred emit-conversion ] keep ;
+    preferred required eq? [ src ] [
+        src required alternatives get [
+            required next-vreg-rep :> new-src
+            [ new-src ] 2dip preferred emit-conversion
+            new-src
+        ] 2cache
+    ] if ;
 
 SYMBOLS: renaming-set needs-renaming? ;
 
@@ -245,6 +254,7 @@ M: insn conversions-for-insn , ;
     dup kill-block? [ drop ] [
         [
             [
+                H{ } clone alternatives set
                 [ conversions-for-insn ] each
             ] V{ } make
         ] change-instructions drop
