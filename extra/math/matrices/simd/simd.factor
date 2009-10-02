@@ -95,6 +95,17 @@ TYPED:: m4. ( a: matrix4 b: matrix4 -- c: matrix4 )
 
     c set-rows ;
 
+TYPED:: v.m4 ( a: float-4 b: matrix4 -- c: float-4 )
+    b rows :> b4 :> b3 :> b2 :> b1
+    
+    a first  b1 n*v
+    a second b2 n*v v+
+    a third  b3 n*v v+
+    a fourth b4 n*v v+ ;
+
+TYPED:: m4.v ( a: matrix4 b: float-4 -- c: float-4 )
+    a rows [ b v. ] 4 napply float-4-boa ;
+
 CONSTANT: identity-matrix4
     S{ matrix4 f
         float-4-array{
@@ -121,7 +132,7 @@ TYPED:: m4^n ( m: matrix4 n: fixnum -- m^n: matrix4 )
 TYPED:: scale-matrix4 ( factors: float-4 -- matrix: matrix4 )
     matrix4 (struct) :> c
 
-    factors { t t t f } vmask :> factors'
+    factors float-4{ t t t f } vbitand :> factors'
 
     factors' { 0 3 3 3 } vshuffle
     factors' { 3 1 3 3 } vshuffle
@@ -137,11 +148,11 @@ TYPED:: translation-matrix4 ( offset: float-4 -- matrix: matrix4 )
     matrix4 (struct) :> c
 
     float-4{ 0.0 0.0 0.0 1.0 } :> c4
-    { t t t f } offset c4 v? :> offset'
+    float-4{ t t t f } offset c4 v? :> offset'
 
-    offset' { 3 3 3 0 } vshuffle { t f f t } vmask
-    offset' { 3 3 3 1 } vshuffle { f t f t } vmask
-    offset' { 3 3 3 2 } vshuffle { f f t t } vmask
+    offset' { 3 3 3 0 } vshuffle float-4{ t f f t } vbitand
+    offset' { 3 3 3 1 } vshuffle float-4{ f t f t } vbitand
+    offset' { 3 3 3 2 } vshuffle float-4{ f f t t } vbitand
     c4
 
     c set-rows ;
@@ -165,17 +176,17 @@ TYPED:: rotation-matrix4 ( axis: float-4 theta: float -- matrix: matrix4 )
 
     axis2 cc ones axis2 v- v* v+ :> diagonal
 
-    axis { 0 0 1 3 } vshuffle axis { 1 2 2 3 } vshuffle v* 1-c v*
-    { t t t f } vmask :> triangle-a
-    ss { 2 1 0 3 } vshuffle triangle-sign v* :> triangle-b
+    axis { 1 0 0 3 } vshuffle axis { 2 2 1 3 } vshuffle v* 1-c v*
+    float-4{ t t t f } vbitand :> triangle-a
+    ss axis v* triangle-sign v* :> triangle-b
     triangle-a triangle-b v+ :> triangle-lo
     triangle-a triangle-b v- :> triangle-hi
 
     diagonal scale-matrix4 :> diagonal-m
 
-    triangle-hi { 3 0 1 3 } vshuffle
-    triangle-hi { 3 3 2 3 } vshuffle triangle-lo { 0 3 3 3 } vshuffle v+
-    triangle-lo { 1 2 3 3 } vshuffle
+    triangle-hi { 3 2 1 3 } vshuffle
+    triangle-hi { 3 3 0 3 } vshuffle triangle-lo { 2 3 3 3 } vshuffle v+
+    triangle-lo { 1 0 3 3 } vshuffle
     float-4 new
 
     triangle-m set-rows drop
@@ -186,12 +197,12 @@ TYPED:: frustum-matrix4 ( xy: float-4 near: float far: float -- matrix: matrix4 
     matrix4 (struct) :> c
 
     near near near far + 2 near far * * float-4-boa :> num
-    { t t f f } xy near far - float-4-with v? :> denom
+    float-4{ t t f f } xy near far - float-4-with v? :> denom
     num denom v/ :> fov
 
-    fov { 0 0 0 0 } vshuffle { t f f f } vmask
-    fov { 1 1 1 1 } vshuffle { f t f f } vmask
-    fov { 2 2 2 3 } vshuffle { f f t t } vmask
+    fov { 0 0 0 0 } vshuffle float-4{ t f f f } vbitand
+    fov { 1 1 1 1 } vshuffle float-4{ f t f f } vbitand
+    fov { 2 2 2 3 } vshuffle float-4{ f f t t } vbitand
     float-4{ 0.0 0.0 -1.0 0.0 }
 
     c set-rows ;

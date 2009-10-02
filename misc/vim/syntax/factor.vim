@@ -23,7 +23,7 @@ else
     set iskeyword=!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255
 endif
 
-syn cluster factorCluster contains=factorComment,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorCompileDirective,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorCharErr,factorBackslash,@factorWordOps,factorAlien,factorTuple,factorStruct
+syn cluster factorCluster contains=factorComment,factorFryDirective,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorCompileDirective,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorCharErr,factorBackslash,@factorWordOps,factorAlien,factorTuple,factorStruct
 
 syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
 syn match factorComment /\<#!\>.*/ contains=factorTodo
@@ -44,9 +44,11 @@ syn region factorPGenericN matchgroup=factorPGenericNDelims start=/\<GENERIC#\s\
 syn region None matchgroup=factorPrivate start=/\<<PRIVATE\>/ end=/\<PRIVATE>\>/ contains=@factorDefnContents,factorPrivateDefn,factorPrivateMethod,factorPGeneric,factorPGenericN
 
 
-syn keyword factorBoolean boolean f general-t t
+syn keyword factorBoolean f t
+syn match factorFryDirective /\<\(@\|_\)\>/ contained
 syn keyword factorCompileDirective inline foldable recursive
 
+syn keyword factorKeyword boolean
 syn keyword factorKeyword or tuck 2bi 2tri while wrapper nip 4dip wrapper? bi* callstack>array both? hashcode die dupd callstack callstack? 3dup tri@ pick curry build ?execute 3bi prepose >boolean ?if clone eq? tri* ? = swapd call-clear 2over 2keep 3keep clear 2dup when not tuple? dup 2bi* 2tri* call tri-curry object bi@ do unless* if* loop bi-curry* drop when* assert= retainstack assert? -rot execute 2bi@ 2tri@ boa with either? 3drop bi curry? datastack until 3dip over 3curry roll tri-curry* swap tri-curry@ 2nip and throw set-retainstack bi-curry (clone) hashcode* compose spin 2dip if 3tri unless compose? tuple keep 2curry equal? set-datastack assert tri 2drop most <wrapper> boolean? identity-tuple? null new set-callstack dip bi-curry@ rot -roll xor identity-tuple boolean
 syn keyword factorKeyword ?at assoc? assoc-clone-like assoc= delete-at* assoc-partition extract-keys new-assoc value? assoc-size map>assoc push-at assoc-like key? assoc-intersect assoc-refine update assoc-union assoc-combine at* assoc-empty? at+ set-at assoc-all? assoc-subset? assoc-hashcode change-at assoc-each assoc-diff zip values value-at rename-at inc-at enum? at cache assoc>map <enum> assoc assoc-map enum value-at* remove-all assoc-map-as >alist assoc-filter-as substitute-here clear-assoc assoc-stack maybe-set-at substitute assoc-filter 2cache delete-at assoc-find keys assoc-any? unzip
 syn keyword factorKeyword case execute-effect no-cond no-case? 3cleave>quot 2cleave cond>quot wrong-values? no-cond? cleave>quot no-case case>quot 3cleave wrong-values to-fixed-point alist>quot case-find cond cleave call-effect 2cleave>quot recursive-hashcode linear-case-quot spread spread>quot
@@ -190,6 +192,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorConditional            Conditional
     HiLink factorKeyword                Keyword
     HiLink factorOperator               Operator
+    HiLink factorFryDirective           Operator
     HiLink factorBoolean                Boolean
     HiLink factorDefnDelims             Typedef
     HiLink factorMethodDelims           Typedef

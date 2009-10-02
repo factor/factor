@@ -163,6 +163,8 @@ CODEGEN: ##zero-vector %zero-vector
 CODEGEN: ##gather-vector-2 %gather-vector-2
 CODEGEN: ##gather-vector-4 %gather-vector-4
 CODEGEN: ##shuffle-vector %shuffle-vector
+CODEGEN: ##compare-vector %compare-vector
+CODEGEN: ##test-vector %test-vector
 CODEGEN: ##add-vector %add-vector
 CODEGEN: ##saturated-add-vector %saturated-add-vector
 CODEGEN: ##add-sub-vector %add-sub-vector
@@ -229,6 +231,7 @@ CODEGEN: _compare-branch %compare-branch
 CODEGEN: _compare-imm-branch %compare-imm-branch
 CODEGEN: _compare-float-ordered-branch %compare-float-ordered-branch
 CODEGEN: _compare-float-unordered-branch %compare-float-unordered-branch
+CODEGEN: _test-vector-branch %test-vector-branch
 CODEGEN: _dispatch %dispatch
 CODEGEN: _spill %spill
 CODEGEN: _reload %reload

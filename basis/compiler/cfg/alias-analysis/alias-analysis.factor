@@ -1,10 +1,17 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces assocs hashtables sequences arrays
-accessors vectors combinators sets classes cpu.architecture
-compiler.cfg compiler.cfg.registers compiler.cfg.instructions
-compiler.cfg.def-use compiler.cfg.copy-prop compiler.cfg.rpo
-compiler.cfg.liveness ;
+accessors words vectors combinators combinators.short-circuit
+sets classes layouts cpu.architecture
+compiler.cfg
+compiler.cfg.rpo
+compiler.cfg.def-use
+compiler.cfg.liveness
+compiler.cfg.copy-prop
+compiler.cfg.registers
+compiler.cfg.comparisons
+compiler.cfg.instructions
+compiler.cfg.representations.preferred ;
 IN: compiler.cfg.alias-analysis
 
 ! We try to eliminate redundant slot operations using some simple heuristics.
@@ -77,9 +84,14 @@ SYMBOL: acs>vregs
 
 : ac>vregs ( ac -- vregs ) acs>vregs get at ;
 
-: aliases ( vreg -- vregs )
+GENERIC: aliases ( vreg -- vregs )
+
+M: integer aliases
     #! All vregs which may contain the same value as vreg.
     vreg>ac ac>vregs ;
+
+M: word aliases
+    1array ;
 
 : each-alias ( vreg quot -- )
     [ aliases ] dip each ; inline
@@ -181,7 +193,6 @@ SYMBOL: constants
     #! assigned by an ##load-immediate.
     resolve constants get at ;
 
-! We treat slot accessors and stack traffic alike
 GENERIC: insn-slot# ( insn -- slot#/f )
 GENERIC: insn-object ( insn -- vreg )
 
@@ -190,7 +201,7 @@ M: ##slot-imm insn-slot# slot>> ;
 M: ##set-slot insn-slot# slot>> constant ;
 M: ##set-slot-imm insn-slot# slot>> ;
 M: ##alien-global insn-slot# [ library>> ] [ symbol>> ] bi 2array ;
-M: ##vm-field-ptr insn-slot# field-name>> ;  ! is this right?
+M: ##vm-field-ptr insn-slot# field-name>> ;
 
 M: ##slot insn-object obj>> resolve ;
 M: ##slot-imm insn-object obj>> resolve ;
@@ -206,18 +217,33 @@ M: ##vm-field-ptr insn-object drop \ ##vm-field-ptr ;
     H{ } clone live-slots set
     H{ } clone constants set
     H{ } clone copies set
-    
+
     0 ac-counter set
     next-ac heap-ac set
+
+    \ ##vm-field-ptr set-new-ac
+    \ ##alien-global set-new-ac
 
     dup local-live-in [ set-heap-ac ] each ;
 
 GENERIC: analyze-aliases* ( insn -- insn' )
 
 M: insn analyze-aliases*
-    dup defs-vreg [ set-heap-ac ] when* ;
+    ! If an instruction defines a value with a non-integer
+    ! representation it means that the value will be boxed
+    ! anywhere its used as a tagged pointer. Boxing allocates
+    ! a new value, except boxing instructions haven't been
+    ! inserted yet.
+    dup defs-vreg [
+        over defs-vreg-rep int-rep eq?
+        [ set-heap-ac ] [ set-new-ac ] if
+    ] when* ;
+
+M: ##phi analyze-aliases*
+    dup defs-vreg set-heap-ac ;
 
 M: ##load-immediate analyze-aliases*
+    call-next-method
     dup [ val>> ] [ dst>> ] bi constants get set-at ;
 
 M: ##allocation analyze-aliases*
@@ -248,6 +274,19 @@ M: ##copy analyze-aliases*
     #! The output vreg gets the same alias class as the input
     #! vreg, since they both contain the same value.
     dup record-copy ;
+
+: useless-compare? ( insn -- ? )
+    {
+        [ cc>> cc= eq? ]
+        [ [ src1>> ] [ src2>> ] bi [ resolve vreg>ac ] bi@ = not ]
+    } 1&& ; inline
+
+M: ##compare analyze-aliases*
+    call-next-method
+    dup useless-compare? [
+        dst>> \ f tag-number \ ##load-immediate new-insn
+        analyze-aliases*
+    ] when ;
 
 : analyze-aliases ( insns -- insns' )
     [ insn# set analyze-aliases* ] map-index sift ;
