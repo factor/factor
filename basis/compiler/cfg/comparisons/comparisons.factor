@@ -10,7 +10,7 @@ SYMBOLS:
     cc/< cc/<= cc/= cc/> cc/>= cc/<> cc/<>= ;
 
 SYMBOLS:
-    vcc-all vcc-any vcc-none ;
+    vcc-all vcc-notall vcc-any vcc-none ;
 
 : negate-cc ( cc -- cc' )
     H{
@@ -28,6 +28,14 @@ SYMBOLS:
         { cc/=   cc=    } 
         { cc/<>  cc<>   } 
         { cc/<>= cc<>=  }
+    } at ;
+
+: negate-vcc ( cc -- cc' )
+    H{
+        { vcc-all vcc-notall }
+        { vcc-any vcc-none }
+        { vcc-none vcc-any }
+        { vcc-notall vcc-all }
     } at ;
 
 : swap-cc ( cc -- cc' )

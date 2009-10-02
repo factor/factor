@@ -40,6 +40,7 @@ M: insn rewrite drop f ;
         [ compare-imm-expr? ]
         [ compare-float-unordered-expr? ]
         [ compare-float-ordered-expr? ]
+        [ test-vector-expr? ]
     } 1|| ;
 
 : rewrite-boolean-comparison? ( insn -- ? )
@@ -53,12 +54,21 @@ M: insn rewrite drop f ;
 : >compare-imm-expr< ( expr -- in1 in2 cc )
     [ src1>> vn>vreg ] [ src2>> vn>constant ] [ cc>> ] tri ; inline
 
+: >test-vector-expr< ( expr -- src1 temp rep vcc )
+    {
+        [ src1>> vn>vreg ]
+        [ drop next-vreg ]
+        [ rep>> ]
+        [ vcc>> ]
+    } cleave ; inline
+
 : rewrite-boolean-comparison ( expr -- insn )
     src1>> vreg>expr {
         { [ dup compare-expr? ] [ >compare-expr< \ ##compare-branch new-insn ] }
         { [ dup compare-imm-expr? ] [ >compare-imm-expr< \ ##compare-imm-branch new-insn ] }
         { [ dup compare-float-unordered-expr? ] [ >compare-expr< \ ##compare-float-unordered-branch new-insn ] }
         { [ dup compare-float-ordered-expr? ] [ >compare-expr< \ ##compare-float-ordered-branch new-insn ] }
+        { [ dup test-vector-expr? ] [ >test-vector-expr< \ ##test-vector-branch new-insn ] }
     } cond ;
 
 : tag-fixnum-expr? ( expr -- ? )

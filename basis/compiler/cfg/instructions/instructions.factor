@@ -304,7 +304,18 @@ literal: rep cc ;
 
 PURE-INSN: ##test-vector
 def: dst/int-rep
-use: src
+use: src1
+temp: temp/int-rep
+literal: rep vcc ;
+
+INSN: ##test-vector-branch
+use: src1
+temp: temp/int-rep
+literal: rep vcc ;
+
+INSN: _test-vector-branch
+literal: label
+use: src1
 temp: temp/int-rep
 literal: rep vcc ;
 
