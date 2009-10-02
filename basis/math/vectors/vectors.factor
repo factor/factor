@@ -92,16 +92,19 @@ PRIVATE>
 : vxor ( u v -- w ) [ xor ] 2map ;
 : vnot ( u -- w )   [ not ] map ;
 
-: v<  ( u v -- w ) [ <   ] { } 2map-as ;
-: v<= ( u v -- w ) [ <=  ] { } 2map-as ;
-: v>= ( u v -- w ) [ >=  ] { } 2map-as ;
-: v>  ( u v -- w ) [ >   ] { } 2map-as ;
-: vunordered? ( u v -- w ) [ unordered? ] { } 2map-as ;
-: v=  ( u v -- w ) [ =   ] { } 2map-as ;
+: vall? ( v -- ? ) [ ] all? ;
+: vany? ( v -- ? ) [ ] any? ;
+: vnone? ( v -- ? ) [ not ] all? ;
 
-: v?   ( ? true false -- w ) [ ? ] pick 3map-as ;
+: v<  ( u v -- w ) [ <   ] 2map ;
+: v<= ( u v -- w ) [ <=  ] 2map ;
+: v>= ( u v -- w ) [ >=  ] 2map ;
+: v>  ( u v -- w ) [ >   ] 2map ;
+: vunordered? ( u v -- w ) [ unordered? ] 2map ;
+: v=  ( u v -- w ) [ =   ] 2map ;
 
-: vmask ( u ? -- u' ) swap dup dup vbitxor v? ;
+: v? ( mask true false -- w )
+    [ vbitand ] [ vbitandn ] bi-curry* bi vbitor ; inline
 
 : vfloor    ( u -- v ) [ floor ] map ;
 : vceiling  ( u -- v ) [ ceiling ] map ;

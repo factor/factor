@@ -708,6 +708,65 @@ M: x86 %shuffle-vector-reps
         { sse2? { double-2-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
+: %compare-vector-equal ( dst src rep -- )
+    unsign-rep {
+        { double-2-rep   [ CMPEQPD ] }
+        { float-4-rep    [ CMPEQPS ] }
+        { longlong-2-rep [ PCMPEQQ ] }
+        { int-4-rep      [ PCMPEQD ] }
+        { short-8-rep    [ PCMPEQW ] }
+        { char-16-rep    [ PCMPEQB ] }
+    } case ;
+
+M: x86 %compare-vector ( dst src1 src2 rep cc -- )
+    [ [ two-operand ] keep ] dip {
+        { cc= [ %compare-vector-equal ] }
+    } case ;
+
+M: x86 %compare-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
+        { sse4.1? { longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+:: %test-vector-mask ( dst temp mask vcc -- )
+    vcc {
+        { vcc-any    [ dst dst TEST dst temp \ CMOVNE %boolean ] }
+        { vcc-none   [ dst dst TEST dst temp \ CMOVE  %boolean ] }
+        { vcc-all    [ dst mask CMP dst temp \ CMOVE  %boolean ] }
+        { vcc-notall [ dst mask CMP dst temp \ CMOVNE %boolean ] }
+    } case ;
+
+: %move-vector-mask ( dst src rep -- mask )
+    {
+        { double-2-rep [ MOVMSKPD HEX: 3 ] }
+        { float-4-rep  [ MOVMSKPS HEX: f ] }
+        [ drop PMOVMSKB HEX: ffff ]
+    } case ;
+
+M:: x86 %test-vector ( dst src temp rep vcc -- )
+    dst src rep %move-vector-mask :> mask
+    dst temp mask vcc %test-vector-mask ;
+
+:: %test-vector-mask-branch ( label temp mask vcc -- )
+    vcc {
+        { vcc-any    [ temp temp TEST label JNE ] }
+        { vcc-none   [ temp temp TEST label JE ] }
+        { vcc-all    [ temp mask CMP label JE ] }
+        { vcc-notall [ temp mask CMP label JNE ] }
+    } case ;
+
+M:: x86 %test-vector-branch ( label src temp rep vcc -- )
+    temp src rep %move-vector-mask :> mask
+    label temp mask vcc %test-vector-mask-branch ;
+
+M: x86 %test-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
 M: x86 %add-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
     {
