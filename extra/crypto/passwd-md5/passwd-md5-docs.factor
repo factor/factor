@@ -25,10 +25,10 @@ ARTICLE: "crypto.passwd-md5" "MD5 shadow passwords"
 "The " { $vocab-link "crypto.passwd-md5" } " vocabulary can encode passwords for use in an MD5 shadow password file." $nl
 
 "Encoding a password:"
-{ $subsection passwd-md5 }
+{ $subsections passwd-md5 }
 "Parsing a shadowed password entry:"
-{ $subsection parse-shadow-password }
+{ $subsections parse-shadow-password }
 "Authenticating against a shadowed password:"
-{ $subsection authenticate-password } ;
+{ $subsections authenticate-password } ;
 
 ABOUT: "crypto.passwd-md5"

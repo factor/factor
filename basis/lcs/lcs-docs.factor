@@ -24,12 +24,16 @@ HELP: insert
 
 ARTICLE: "lcs" "LCS, diffing and distance"
 "This vocabulary provides words for three apparently unrelated but in fact very similar problems: finding a longest common subsequence between two sequences, getting a minimal edit script (diff) between two sequences, and calculating the Levenshtein distance between two sequences. The implementations of these algorithms are very closely related, and all running times are O(nm), where n and m are the lengths of the input sequences."
-{ $subsection lcs }
-{ $subsection diff }
-{ $subsection levenshtein }
+{ $subsections
+    lcs
+    diff
+    levenshtein
+}
 "The " { $link diff } " word returns a sequence of tuples of the following classes. They all hold their contents in the 'item' slot."
-{ $subsection insert }
-{ $subsection delete }
-{ $subsection retain } ;
+{ $subsections
+    insert
+    delete
+    retain
+} ;
 
 ABOUT: "lcs"

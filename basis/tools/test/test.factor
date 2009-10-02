@@ -27,6 +27,9 @@ T{ error-type
    { quot [ test-failures get ] }
 } define-error-type
 
+SYMBOL: verbose-tests?
+t verbose-tests? set-global
+
 <PRIVATE
 
 : <test-failure> ( error experiment file line# -- triple )
@@ -78,9 +81,6 @@ MACRO: <experiment> ( word -- )
     [ stack-effect in>> length dup ]
     [ name>> experiment-title ] bi
     '[ _ ndup _ narray _ prefix ] ;
-
-SYMBOL: verbose-tests?
-t verbose-tests? set-global
 
 : experiment. ( seq -- )
     [ first write ": " write ]

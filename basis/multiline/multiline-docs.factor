@@ -50,13 +50,15 @@ HELP: parse-multiline-string
 
 ARTICLE: "multiline" "Multiline"
 "Multiline strings:"
-{ $subsection POSTPONE: STRING: }
-{ $subsection POSTPONE: HEREDOC: }
-{ $subsection POSTPONE: DELIMITED: }
+{ $subsections
+    POSTPONE: STRING:
+    POSTPONE: HEREDOC:
+    POSTPONE: DELIMITED:
+}
 "Multiline comments:"
-{ $subsection POSTPONE: /* }
+{ $subsections POSTPONE: /* }
 "Writing new multiline parsing words:"
-{ $subsection parse-multiline-string }
+{ $subsections parse-multiline-string }
 ;
 
 ABOUT: "multiline"

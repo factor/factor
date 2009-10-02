@@ -37,17 +37,21 @@ $nl
 "Conversation scope is used by form validation to pass validation errors between requests."
 $nl
 "To use conversation scope, wrap your responder in an conversation responder:"
-{ $subsection <conversations> }
+{ $subsections <conversations> }
 "The conversations responder must be wrapped inside a session responder (" { $link <sessions> } "), which in turn must be wrapped inside a database persistence responder (" { $link <db-persistence> } "). The " { $vocab-link "furnace.alloy" } " vocabulary combines all of these responders into one."
 $nl
 "Managing conversation scopes:"
-{ $subsection begin-conversation }
-{ $subsection end-conversation }
-{ $subsection <continue-conversation> }
+{ $subsections
+    begin-conversation
+    end-conversation
+    <continue-conversation>
+}
 "Reading and writing conversation variables:"
-{ $subsection cget }
-{ $subsection cset }
-{ $subsection cchange }
+{ $subsections
+    cget
+    cset
+    cchange
+}
 "Note that conversation scope is serialized as part of the session, which means that only serializable objects can be stored there. See " { $link "furnace.sessions.serialize" } " for details." ;
 
 ABOUT: "furnace.conversations"

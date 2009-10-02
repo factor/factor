@@ -81,12 +81,14 @@ ARTICLE: "furnace.actions.page.example" "Furnace page action example"
 
 ARTICLE: "furnace.actions.page" "Furnace page actions"
 "Page actions implement the common case of an action that simply serves a Chloe template in response to a GET request."
-{ $subsection page-action }
-{ $subsection <page-action> }
+{ $subsections
+    page-action
+    <page-action>
+}
 "When using a page action, instead of setting the " { $slot "display" } " slot, the " { $slot "template" } " slot is set instead. The " { $slot "init" } ", " { $slot "authorize" } ", " { $slot "validate" } " and " { $slot "submit" } " slots can still be set as usual."
 $nl
 "The " { $slot "template" } " slot of a " { $link page-action } " contains a pair with shape " { $snippet "{ responder name }" } ", where " { $snippet "responder" } " is a responder class, usually a subclass of " { $link dispatcher } ", and " { $snippet "name" } " is the name of a template file, without the " { $snippet ".xml" } " extension, relative to the directory containing the responder's vocabulary source file."
-{ $subsection "furnace.actions.page.example" } ;
+{ $subsections "furnace.actions.page.example" } ;
 
 ARTICLE: "furnace.actions.config" "Furnace action configuration"
 "Actions have the following slots:"
@@ -104,10 +106,10 @@ ARTICLE: "furnace.actions.validation" "Form validation with actions"
 "The action code is set up so that the " { $slot "init" } " quotation can validate query parameters, and the " { $slot "validate" } " quotation can validate POST parameters."
 $nl
 "A word to validate parameters and make them available as HTML form values (see " { $link "html.forms.values" } "); typically this word is invoked from the " { $slot "init" } " and " { $slot "validate" } " quotations:"
-{ $subsection validate-params }
+{ $subsections validate-params }
 "The above word expects an association list mapping parameter names to validator quotations; validator quotations can use the words in the " 
 "Custom validation logic can invoke a word when validation fails; " { $link validate-params } " invokes this word for you:"
-{ $subsection validation-failed }
+{ $subsections validation-failed }
 "If validation fails, no more action code is executed, and the client is redirected back to the originating page, where validation errors can be displayed. Note that validation errors are rendered automatically by the " { $link "html.components" } " words, and in particular, " { $link "html.templates.chloe" } " use these words." ;
 
 ARTICLE: "furnace.actions.lifecycle" "Furnace action lifecycle"
@@ -133,7 +135,7 @@ ARTICLE: "furnace.actions.lifecycle" "Furnace action lifecycle"
 
 ARTICLE: "furnace.actions.impl" "Furnace actions implementation"
 "The following parametrized constructor should be called from constructors for subclasses of " { $link action } ":"
-{ $subsection new-action } ;
+{ $subsections new-action } ;
 
 ARTICLE: "furnace.actions" "Furnace actions"
 "The " { $vocab-link "furnace.actions" } " vocabulary implements a type of responder, called an " { $emphasis "action" } ", which handles the form validation lifecycle."
@@ -141,18 +143,18 @@ $nl
 "Other than form validation capability, actions are also often simpler to use than implementing new responders directly, since creating a new class is not required, and the action dispatches on the request type (GET, HEAD, or POST)."
 $nl
 "The class of actions:"
-{ $subsection action }
+{ $subsections action }
 "Creating a new action:"
-{ $subsection <action> }
+{ $subsections <action> }
 "Once created, an action needs to be configured; typically the creation and configuration of an action is encapsulated into a single word:"
-{ $subsection "furnace.actions.config" }
+{ $subsections "furnace.actions.config" }
 "Validating forms with actions:"
-{ $subsection "furnace.actions.validation" }
+{ $subsections "furnace.actions.validation" }
 "More about the form validation lifecycle:"
-{ $subsection "furnace.actions.lifecycle" }
+{ $subsections "furnace.actions.lifecycle" }
 "A convenience class:"
-{ $subsection "furnace.actions.page" }
+{ $subsections "furnace.actions.page" }
 "Low-level features:"
-{ $subsection "furnace.actions.impl" } ;
+{ $subsections "furnace.actions.impl" } ;
 
 ABOUT: "furnace.actions"

@@ -5,11 +5,15 @@ IN: classes.predicate
 
 ARTICLE: "predicates" "Predicate classes"
 "Predicate classes allow fine-grained control over method dispatch."
-{ $subsection POSTPONE: PREDICATE: }
-{ $subsection define-predicate-class }
+{ $subsections
+    POSTPONE: PREDICATE:
+    define-predicate-class
+}
 "The set of predicate classes is a class:"
-{ $subsection predicate-class }
-{ $subsection predicate-class? } ;
+{ $subsections
+    predicate-class
+    predicate-class?
+} ;
 
 ABOUT: "predicates"
 

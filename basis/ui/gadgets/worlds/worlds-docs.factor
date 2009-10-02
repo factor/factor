@@ -99,22 +99,26 @@ HELP: draw-world*
 
 ARTICLE: "ui.gadgets.worlds-subclassing" "Subclassing worlds"
 "The " { $link world } " gadget can be subclassed, giving Factor code full control of the window's OpenGL context. The following generic words can be overridden to replace standard UI behavior:"
-{ $subsection begin-world }
-{ $subsection end-world }
-{ $subsection resize-world }
-{ $subsection draw-world* }
+{ $subsections
+    begin-world
+    end-world
+    resize-world
+    draw-world*
+}
 "See the " { $vocab-link "spheres" } " and " { $vocab-link "bunny" } " demos for examples." ;
 
 ARTICLE: "ui-paint-custom" "Implementing custom drawing logic"
 "The UI uses OpenGL to render gadgets. Custom rendering logic can be plugged in with the " { $link "ui-pen-protocol" } ", or by implementing a generic word:"
-{ $subsection draw-gadget* }
+{ $subsections draw-gadget* }
 "Custom drawing code has access to the full OpenGL API in the " { $vocab-link "opengl" } " vocabulary."
 $nl
 "Gadgets which need to allocate and deallocate OpenGL resources such as textures, display lists, and so on, should perform the allocation in the " { $link graft* } " method, and the deallocation in the " { $link ungraft* } " method. Since those words are not necessarily called with the gadget's OpenGL context active, a utility word can be used to find and make the correct OpenGL context current:"
-{ $subsection find-gl-context }
+{ $subsections find-gl-context }
 "OpenGL state must not be altered as a result of drawing a gadget, so any flags which were enabled should be disabled, and vice versa. To take full control of the OpenGL context, see " { $link "ui.gadgets.worlds-subclassing" } "."
-{ $subsection "ui-paint-coord" }
-{ $subsection "ui.gadgets.worlds-subclassing" }
-{ $subsection "gl-utilities" }
-{ $subsection "text-rendering" } ;
+{ $subsections
+    "ui-paint-coord"
+    "ui.gadgets.worlds-subclassing"
+    "gl-utilities"
+    "text-rendering"
+} ;
 

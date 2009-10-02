@@ -50,14 +50,16 @@ HELP: +rename-file+
 
 ARTICLE: "io.monitors.descriptors" "File system change descriptors"
 "The " { $link next-change } " word outputs instances of a class:"
-{ $subsection file-change }
+{ $subsections file-change }
 "The " { $slot "changed" } " slot holds a sequence which may contain any of the following symbols:"
-{ $subsection +add-file+ }
-{ $subsection +remove-file+ }
-{ $subsection +modify-file+ }
-{ $subsection +rename-file-old+ }
-{ $subsection +rename-file-new+ }
-{ $subsection +rename-file+ } ;
+{ $subsections
+    +add-file+
+    +remove-file+
+    +modify-file+
+    +rename-file-old+
+    +rename-file-new+
+    +rename-file+
+} ;
 
 ARTICLE: "io.monitors.platforms" "Monitors on different platforms"
 "Whether the " { $slot "path" } " slot of a " { $link file-change } " contains an absolute path or a path relative to the path given to " { $link <monitor> } " is unspecified, and may even vary on the same platform. User code should not assume either case."
@@ -96,16 +98,20 @@ ARTICLE: "io.monitors" "File system change monitors"
 "File system change monitors listen for changes to file names, attributes and contents under a specified directory. They can optionally be recursive, in which case subdirectories are also monitored."
 $nl
 "Monitoring operations must be wrapped in a combinator:"
-{ $subsection with-monitors }
+{ $subsections with-monitors }
 "Creating a file system change monitor and listening for changes:"
-{ $subsection <monitor> }
-{ $subsection next-change }
+{ $subsections
+    <monitor>
+    next-change
+}
 "An alternative programming style is where instead of having a thread listen for changes on a monitor, change notifications are posted to a mailbox:"
-{ $subsection (monitor) }
-{ $subsection "io.monitors.descriptors" }
-{ $subsection "io.monitors.platforms" } 
+{ $subsections
+    (monitor)
+    "io.monitors.descriptors"
+    "io.monitors.platforms"
+}
 "Monitors are closed by calling " { $link dispose } " or " { $link with-disposal } ". An easy way to pair construction with disposal is to use a combinator:"
-{ $subsection with-monitor }
+{ $subsections with-monitor }
 "Monitors support the " { $link "io.timeouts" } "."
 $nl
 "An example which watches a directory for changes:"

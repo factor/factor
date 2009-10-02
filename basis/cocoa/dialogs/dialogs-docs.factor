@@ -19,11 +19,15 @@ HELP: save-panel
 
 ARTICLE: "cocoa-dialogs" "Cocoa file dialogs"
 "Open dialogs:"
-{ $subsection <NSOpenPanel> }
-{ $subsection open-panel }
+{ $subsections
+    <NSOpenPanel>
+    open-panel
+}
 "Save dialogs:"
-{ $subsection <NSSavePanel> }
-{ $subsection save-panel } ;
+{ $subsections
+    <NSSavePanel>
+    save-panel
+} ;
 
 IN: cocoa.dialogs
 ABOUT: "cocoa-dialogs"

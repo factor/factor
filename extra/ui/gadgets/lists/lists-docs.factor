@@ -25,8 +25,10 @@ HELP: list-value
 
 ARTICLE: "ui.gadgets.lists" "List gadgets"
 "The " { $vocab-link "ui.gadgets.lists" } " vocabulary implements lists, which displays a list of presentations (see " { $link "ui.gadgets.presentations" } ")."
-{ $subsection list }
-{ $subsection <list> }
-{ $subsection list-value } ;
+{ $subsections
+    list
+    <list>
+    list-value
+} ;
 
 ABOUT: "ui.gadgets.lists"

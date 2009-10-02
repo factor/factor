@@ -5,66 +5,82 @@ IN: help
 
 ARTICLE: "printing-elements" "Printing markup elements"
 "When writing documentation, it is useful to be able to print markup elements for testing purposes. Markup elements which are strings or arrays of elements are printed in the obvious way. Markup elements of the form " { $snippet "{ $directive content... }" } " are printed by executing the " { $snippet "$directive" } " word with the element content on the stack."
-{ $subsection print-element }
-{ $subsection print-content } ;
+{ $subsections
+    print-element
+    print-content
+} ;
 
 ARTICLE: "span-elements" "Span elements"
-{ $subsection $emphasis }
-{ $subsection $strong }
-{ $subsection $link }
-{ $subsection $vocab-link }
-{ $subsection $snippet }
-{ $subsection $slot }
-{ $subsection $url } ;
+{ $subsections
+    $emphasis
+    $strong
+    $link
+    $vocab-link
+    $snippet
+    $slot
+    $url
+} ;
 
 ARTICLE: "block-elements" "Block elements"
 "Paragraph break:"
-{ $subsection $nl }
+{ $subsections $nl }
 "Standard headings for word documentation:"
-{ $subsection $values }
-{ $subsection $description }
-{ $subsection $class-description }
-{ $subsection $error-description }
-{ $subsection $var-description }
-{ $subsection $contract }
-{ $subsection $examples }
-{ $subsection $warning }
-{ $subsection $notes }
-{ $subsection $side-effects }
-{ $subsection $errors }
-{ $subsection $see-also }
+{ $subsections
+    $values
+    $description
+    $class-description
+    $error-description
+    $var-description
+    $contract
+    $examples
+    $warning
+    $notes
+    $side-effects
+    $errors
+    $see-also
+}
 "Elements used in " { $link $values } " forms:"
-{ $subsection $instance }
-{ $subsection $maybe }
-{ $subsection $or }
-{ $subsection $quotation }
+{ $subsections
+    $instance
+    $maybe
+    $or
+    $quotation
+}
 "Boilerplate paragraphs:"
-{ $subsection $low-level-note }
-{ $subsection $io-error }
+{ $subsections
+    $low-level-note
+    $io-error
+}
 "Some additional elements:"
-{ $subsection $code }
-{ $subsection $curious }
-{ $subsection $example }
-{ $subsection $heading }
-{ $subsection $links }
-{ $subsection $list }
-{ $subsection $markup-example }
-{ $subsection $references }
-{ $subsection $see }
-{ $subsection $subsection }
-{ $subsection $table } ;
+{ $subsections
+    $code
+    $curious
+    $example
+    $heading
+    $links
+    $list
+    $markup-example
+    $references
+    $see
+    $subsection
+    $table
+} ;
 
 ARTICLE: "markup-utils" "Markup element utilities"
 "Utility words to assist in defining new elements:"
-{ $subsection simple-element }
-{ $subsection ($span) }
-{ $subsection ($block) } ;
+{ $subsections
+    simple-element
+    ($span)
+    ($block)
+} ;
 
 ARTICLE: "element-types" "Element types"
 "Markup elements can be classified into two broad categories, block elements and span elements. Block elements are inset with newlines before and after, whereas span elements flow with the paragraph text."
-{ $subsection "span-elements" }
-{ $subsection "block-elements" }
-{ $subsection "markup-utils" } ;
+{ $subsections
+    "span-elements"
+    "block-elements"
+    "markup-utils"
+} ;
 
 IN: help.markup
 ABOUT: "element-types"
@@ -73,10 +89,12 @@ ARTICLE: "writing-help" "Writing documentation"
 "By convention, documentation is written in files whose names end with " { $snippet "-docs.factor" } ". Vocabulary documentation should be placed in the same directory as the vocabulary source code; see " { $link "vocabs.loader" } "."
 $nl
 "A pair of parsing words are used to define free-standing articles and to associate documentation with words:"
-{ $subsection POSTPONE: ARTICLE: }
-{ $subsection POSTPONE: HELP: }
+{ $subsections
+    POSTPONE: ARTICLE:
+    POSTPONE: HELP:
+}
 "A parsing word defines the main help article for a vocabulary:"
-{ $subsection POSTPONE: ABOUT: }
+{ $subsections POSTPONE: ABOUT: }
 "The " { $emphasis "content" } " in both cases is a " { $emphasis "markup element" } ", a recursive structure taking one of the following forms:"
 { $list
     { "a string," }
@@ -89,40 +107,54 @@ $nl
 "<simple-element> ::== { <element>* }"
 "<fancy-element> ::== { <type> <element> }"
 }
-{ $subsection "element-types" }
-{ $subsection "printing-elements" }
+{ $subsections
+    "element-types"
+    "printing-elements"
+}
 "Related words can be cross-referenced:"
-{ $subsection related-words }
+{ $subsections related-words }
 { $see-also "help.lint" } ;
 
 ARTICLE: "help-impl" "Help system implementation"
 "Help topic protocol:"
-{ $subsection article-name }
-{ $subsection article-title }
-{ $subsection article-content }
-{ $subsection article-parent }
-{ $subsection set-article-parent }
+{ $subsections
+    article-name
+    article-title
+    article-content
+    article-parent
+    set-article-parent
+}
 "Boilerplate word help can be automatically generated (for example, slot accessor help):"
-{ $subsection word-help }
-{ $subsection word-help* }
+{ $subsections
+    word-help
+    word-help*
+}
 "Help article implementation:"
-{ $subsection article }
-{ $subsection articles }
+{ $subsections
+    article
+    articles
+}
 "Links:"
-{ $subsection link }
-{ $subsection >link }
+{ $subsections
+    link
+    >link
+}
 "Utilities for traversing markup element trees:"
-{ $subsection elements }
-{ $subsection collect-elements }
+{ $subsections
+    elements
+    collect-elements
+}
 "Links and " { $link article } " instances implement the definition protocol; refer to " { $link "definitions" } "." ;
 
 ARTICLE: "help" "Help system"
 "The help system maintains documentation written in a simple markup language, along with cross-referencing and search. Documentation can either exist as free-standing " { $emphasis "articles" } " or be associated with words."
-{ $subsection "browsing-help" }
-{ $subsection "writing-help" }
-{ $subsection "help.lint" }
-{ $subsection "tips-of-the-day" }
-{ $subsection "help-impl" } ;
+{ $subsections
+    "browsing-help"
+    "writing-help"
+    "help.lint"
+    "tips-of-the-day"
+    "help-impl"
+} ;
 
 IN: help
 ABOUT: "help"
@@ -150,9 +182,9 @@ HELP: $subsection
 { $values { "element" "a markup element of the form " { $snippet "{ topic }" } } }
 { $description "Prints a large clickable link to the help topic named by the first item in " { $snippet "element" } ". The link is printed along with its associated definition icon." }
 { $examples
-    { $markup-example { $subsection "sequences" } }
-    { $markup-example { $subsection nth } }
-    { $markup-example { $subsection each } }
+    { $markup-example { $subsections "sequences" } }
+    { $markup-example { $subsections nth } }
+    { $markup-example { $subsections each } }
 } ;
 
 HELP: $subsections

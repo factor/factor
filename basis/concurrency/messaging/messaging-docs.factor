@@ -38,19 +38,21 @@ $nl
 "The messages that are sent from thread to thread are any Factor value. Factor tuples are ideal for this sort of thing as you can send a tuple to a thread and the generic word dispatch mechanism can be used to perform actions depending on what the type of the tuple is."
 $nl
 "The " { $link spawn } " word pushes the newly-created thread on the calling thread's stack; this thread object can then be sent messages:"
-{ $subsection send }
+{ $subsections send }
 "A thread can get a message from its queue:"
-{ $subsection receive }
-{ $subsection receive-timeout }
-{ $subsection receive-if }
-{ $subsection receive-if-timeout }
+{ $subsections
+    receive
+    receive-timeout
+    receive-if
+    receive-if-timeout
+}
 { $see-also "concurrency.mailboxes" } ;
 
 ARTICLE: { "concurrency" "synchronous-sends" } "Synchronous sends"
 "The " { $link send } " word sends a message asynchronously, and the sending thread continues immediately. It is also possible to send a message to a thread and block until a response is received:"
-{ $subsection send-synchronous }
+{ $subsections send-synchronous }
 "To reply to a synchronous message:"
-{ $subsection reply-synchronous }
+{ $subsections reply-synchronous }
 "An example:"
 { $example
     "USING: concurrency.messaging threads ;"
@@ -66,7 +68,7 @@ ARTICLE: { "concurrency" "exceptions" } "Linked exceptions"
 "A thread can handle exceptions using the standard Factor exception handling mechanism. If an exception is uncaught the thread will terminate. For example:" 
 { $code "[ 1 0 / \"This will not print\" print ] \"division-by-zero\" spawn" } 
 "Processes can be linked so that a parent thread can receive the exception that caused the child thread to terminate. In this way 'supervisor' threads can be created that are notified when child threads terminate and possibly restart them."
-{ $subsection spawn-linked }
+{ $subsections spawn-linked }
 "This will create a unidirectional link, such that if an uncaught exception causes the child to terminate, the parent thread can catch it:"
 { $code "["
 "  [ 1 0 / \"This will not print\" print ] \"linked-division\" spawn-linked drop"
@@ -80,8 +82,10 @@ $nl
 "A concurrency-oriented program is one in which multiple threads run simultaneously in a single Factor image or across multiple running Factor instances. The threads can communicate with each other by asynchronous message sends."
 $nl
 "Although threads can share data via Factor's mutable data structures it is not recommended to mix shared state with message passing as it can lead to confusing code."
-{ $subsection { "concurrency" "messaging" } }
-{ $subsection { "concurrency" "synchronous-sends" } } 
-{ $subsection { "concurrency" "exceptions" } } ;
+{ $subsections
+    { "concurrency" "messaging" }
+    { "concurrency" "synchronous-sends" }
+    { "concurrency" "exceptions" }
+} ;
 
 ABOUT: "concurrency.messaging"

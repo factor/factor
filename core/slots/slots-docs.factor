@@ -80,7 +80,7 @@ $nl
     { "Otherwise, a " { $link no-initial-value } " error is thrown. In this case, an initial value must be specified explicitly using " { $link initial: } "." }
 }
 "A word can be used to check if a class has an initial value or not:"
-{ $subsection initial-value } ;
+{ $subsections initial-value } ;
 
 ARTICLE: "slots" "Low-level slot operations"
 "The " { $vocab-link "slots" } " vocabulary contains words for introspecting the slots of an object. A " { $emphasis "slot" } " is a component of an object which can store a value."
@@ -88,24 +88,30 @@ $nl
 { $link "tuples" } " are composed entirely of slots, and instances of " { $link "builtin-classes" } " consist of slots together with intrinsic data."
 $nl
 "The " { $snippet "\"slots\"" } " word property of built-in and tuple classes holds an array of " { $emphasis "slot specifiers" } " describing the slot layout of each instance."
-{ $subsection slot-spec }
+{ $subsections slot-spec }
 "The four words associated with a slot can be looked up in the " { $vocab-link "accessors" } " vocabulary:"
-{ $subsection reader-word }
-{ $subsection writer-word }
-{ $subsection setter-word }
-{ $subsection changer-word }
+{ $subsections
+    reader-word
+    writer-word
+    setter-word
+    changer-word
+}
 "Looking up a slot by name:"
-{ $subsection slot-named }
+{ $subsections slot-named }
 "Defining slots dynamically:"
-{ $subsection define-reader }
-{ $subsection define-writer }
-{ $subsection define-setter }
-{ $subsection define-changer }
-{ $subsection define-slot-methods }
-{ $subsection define-accessors }
+{ $subsections
+    define-reader
+    define-writer
+    define-setter
+    define-changer
+    define-slot-methods
+    define-accessors
+}
 "Unsafe slot access:"
-{ $subsection slot }
-{ $subsection set-slot }
+{ $subsections
+    slot
+    set-slot
+}
 { $see-also "accessors" "mirrors" } ;
 
 ABOUT: "slots"

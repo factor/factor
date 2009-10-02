@@ -7,49 +7,61 @@ ABOUT: "lists"
 
 ARTICLE: "lists" "Lists"
 "The " { $vocab-link "lists" } " vocabulary implements linked lists. There are simple strict linked lists, but a generic list protocol allows the implementation of lazy lists as well."
-{ $subsection { "lists" "protocol" } }
-{ $subsection { "lists" "strict" } }
-{ $subsection { "lists" "manipulation" } }
-{ $subsection { "lists" "combinators" } }
+{ $subsections
+    { "lists" "protocol" }
+    { "lists" "strict" }
+    { "lists" "manipulation" }
+    { "lists" "combinators" }
+}
 { $vocab-subsection "Lazy lists" "lists.lazy" } ;
 
 ARTICLE: { "lists" "protocol" } "The list protocol"
 "Lists are instances of a mixin class:"
-{ $subsection list }
+{ $subsections list }
 "Instances of the mixin must implement the following words:"
-{ $subsection car }
-{ $subsection cdr }
-{ $subsection nil? } ;
+{ $subsections
+    car
+    cdr
+    nil?
+} ;
 
 ARTICLE: { "lists" "strict" } "Constructing strict lists"
 "Strict lists are simply cons cells where the car and cdr have already been evaluated. These are the lists of Lisp. To construct a strict list, the following words are provided:"
-{ $subsection cons }
-{ $subsection swons }
-{ $subsection sequence>list }
-{ $subsection 1list }
-{ $subsection 2list }
-{ $subsection 3list } ;
+{ $subsections
+    cons
+    swons
+    sequence>list
+    1list
+    2list
+    3list
+} ;
 
 ARTICLE: { "lists" "combinators" } "Combinators for lists"
 "Several combinators exist for list traversal."
-{ $subsection leach }
-{ $subsection lmap }
-{ $subsection foldl }
-{ $subsection foldr }
-{ $subsection lmap>array }
-{ $subsection traverse } ;
+{ $subsections
+    leach
+    lmap
+    foldl
+    foldr
+    lmap>array
+    traverse
+} ;
 
 ARTICLE: { "lists" "manipulation" } "Manipulating lists"
 "To get at the contents of a list:"
-{ $subsection uncons }
-{ $subsection unswons }
-{ $subsection lnth }
-{ $subsection cadr }
-{ $subsection llength }
+{ $subsections
+    uncons
+    unswons
+    lnth
+    cadr
+    llength
+}
 "To get a new list from an old one:"
-{ $subsection lreverse }
-{ $subsection lappend }
-{ $subsection lcut } ;
+{ $subsections
+    lreverse
+    lappend
+    lcut
+} ;
 
 HELP: cons 
 { $values { "car" "the head of the list cell" } { "cdr" "the tail of the list cell" } { "cons" list } }

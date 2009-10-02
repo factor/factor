@@ -5,16 +5,20 @@ IN: continuations
 
 ARTICLE: "errors-restartable" "Restartable errors"
 "Support for restartable errors is built on top of the basic error handling facility. The following words signals recoverable errors:"
-{ $subsection throw-restarts }
-{ $subsection rethrow-restarts }
+{ $subsections
+    throw-restarts
+    rethrow-restarts
+}
 "The list of restarts from the most recently-thrown error is stored in a global variable:"
-{ $subsection restarts }
+{ $subsections restarts }
 "To invoke restarts, see " { $link "debugger" } "." ;
 
 ARTICLE: "errors-post-mortem" "Post-mortem error inspection"
 "The most recently thrown error, together with the continuation at that point, are stored in a pair of global variables:"
-{ $subsection error }
-{ $subsection error-continuation }
+{ $subsections
+    error
+    error-continuation
+}
 "Developer tools for inspecting these values are found in " { $link "debugger" } "." ;
 
 ARTICLE: "errors-anti-examples" "Common error handling pitfalls"
@@ -34,37 +38,47 @@ ARTICLE: "errors" "Exception handling"
 "Support for handling exceptional situations such as bad user input, implementation bugs, and input/output errors is provided by a set of words built using continuations."
 $nl
 "Two words raise an error in the innermost error handler for the current dynamic extent:"
-{ $subsection throw }
-{ $subsection rethrow }
+{ $subsections
+    throw
+    rethrow
+}
 "Words for establishing an error handler:"
-{ $subsection cleanup }
-{ $subsection recover }
-{ $subsection ignore-errors }
+{ $subsections
+    cleanup
+    recover
+    ignore-errors
+}
 "Syntax sugar for defining errors:"
-{ $subsection POSTPONE: ERROR: }
+{ $subsections POSTPONE: ERROR: }
 "Unhandled errors are reported in the listener and can be debugged using various tools. See " { $link "debugger" } "."
-{ $subsection "errors-restartable" }
-{ $subsection "debugger" }
-{ $subsection "errors-post-mortem" }
-{ $subsection "errors-anti-examples" }
+{ $subsections
+    "errors-restartable"
+    "debugger"
+    "errors-post-mortem"
+    "errors-anti-examples"
+}
 "When Factor encouters a critical error, it calls the following word:"
-{ $subsection die } ;
+{ $subsections die } ;
 
 ARTICLE: "continuations.private" "Continuation implementation details"
 "A continuation is simply a tuple holding the contents of the five stacks:"
-{ $subsection continuation }
-{ $subsection >continuation< }
+{ $subsections
+    continuation
+    >continuation<
+}
 "The five stacks can be read and written:"
-{ $subsection datastack }
-{ $subsection set-datastack }
-{ $subsection retainstack }
-{ $subsection set-retainstack }
-{ $subsection callstack }
-{ $subsection set-callstack }
-{ $subsection namestack }
-{ $subsection set-namestack }
-{ $subsection catchstack }
-{ $subsection set-catchstack } ;
+{ $subsections
+    datastack
+    set-datastack
+    retainstack
+    set-retainstack
+    callstack
+    set-callstack
+    namestack
+    set-namestack
+    catchstack
+    set-catchstack
+} ;
 
 ARTICLE: "continuations" "Continuations"
 "At any point in the execution of a program, the " { $emphasis "current continuation" } " represents the future of the computation."
@@ -72,16 +86,22 @@ $nl
 "Words for working with continuations are found in the " { $vocab-link "continuations" } " vocabulary; implementation details are in " { $vocab-link "continuations.private" } "."
 $nl
 "Continuations can be reified with the following two words:"
-{ $subsection callcc0 }
-{ $subsection callcc1 }
+{ $subsections
+    callcc0
+    callcc1
+}
 "Another two words resume continuations:"
-{ $subsection continue }
-{ $subsection continue-with }
+{ $subsections
+    continue
+    continue-with
+}
 "Continuations as control-flow:"
-{ $subsection attempt-all }
-{ $subsection with-return }
+{ $subsections
+    attempt-all
+    with-return
+}
 "Continuations serve as the building block for a number of higher-level abstractions, such as " { $link "errors" } " and " { $link "threads" } "."
-{ $subsection "continuations.private" } ;
+{ $subsections "continuations.private" } ;
 
 ABOUT: "continuations"
 

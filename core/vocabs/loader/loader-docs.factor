@@ -10,13 +10,13 @@ $nl
 "The first way is to use an environment variable. Factor looks at the " { $snippet "FACTOR_ROOTS" } " environment variable for a list of " { $snippet ":" } "-separated paths (on Unix) or a list of " { $snippet ";" } "-separated paths (on Windows)."
 $nl
 "The second way is to create a configuration file. You can list additional vocabulary roots in a file that Factor reads at startup:"
-{ $subsection "factor-roots" }
+{ $subsections "factor-roots" }
 "Finally, you can add vocabulary roots dynamically using a word:"
-{ $subsection add-vocab-root } ;
+{ $subsections add-vocab-root } ;
 
 ARTICLE: "vocabs.roots" "Vocabulary roots"
 "The vocabulary loader searches for it in one of the root directories:"
-{ $subsection vocab-roots }
+{ $subsections vocab-roots }
 "The default set of roots includes the following directories in the Factor source directory:"
 { $list
     { { $snippet "core" } " - essential system vocabularies such as " { $vocab-link "parser" } " and " { $vocab-link "sequences" } ". The vocabularies in this root constitute the boot image; see " { $link "bootstrap.image" } "." }
@@ -25,13 +25,13 @@ ARTICLE: "vocabs.roots" "Vocabulary roots"
     { { $snippet "work" } " - a root for vocabularies which are not intended to be contributed back to Factor." }
 }
 "You can store your own vocabularies in the " { $snippet "work" } " directory."
-{ $subsection "add-vocab-roots" } ;
+{ $subsections "add-vocab-roots" } ;
 
 ARTICLE: "vocabs.loader" "Vocabulary loader"
 "The vocabulary loader is defined in the " { $vocab-link "vocabs.loader" } " vocabulary."
 $nl
 "Vocabularies are searched for in vocabulary roots."
-{ $subsection "vocabs.roots" }
+{ $subsections "vocabs.roots" }
 "Vocabulary names map directly to source files. A vocabulary named " { $snippet "foo.bar" } " must be defined in a " { $snippet "bar" } " directory nested inside a " { $snippet "foo" } " directory of a vocabulary root. Any level of vocabulary nesting is permitted."
 $nl
 "The vocabulary directory - " { $snippet "bar" } " in our example - contains a source file:"
@@ -50,13 +50,15 @@ $nl
     { { $snippet "foo/bar/tags.txt" } " - a whitespace-separated list of tags which classify the vocabulary. Consult " { $link "vocab-tags" } " for a list of existing tags you can re-use" }
 }
 "While " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " load vocabularies which have not been loaded before adding them to the search path, it is also possible to load a vocabulary without adding it to the search path:"
-{ $subsection require }
+{ $subsections require }
 "Forcing a reload of a vocabulary, even if it has already been loaded:"
-{ $subsection reload }
+{ $subsections reload }
 "Application vocabularies can define a main entry point, giving the user a convenient way to run the application:"
-{ $subsection POSTPONE: MAIN: }
-{ $subsection run }
-{ $subsection runnable-vocab }
+{ $subsections
+    POSTPONE: MAIN:
+    run
+    runnable-vocab
+}
 { $see-also "vocabularies" "parser-files" "source-files" } ;
 
 ABOUT: "vocabs.loader"

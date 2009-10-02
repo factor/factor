@@ -4,19 +4,25 @@ IN: io.streams.c
 
 ARTICLE: "io.streams.c" "ANSI C streams"
 "C streams are found in the " { $vocab-link "io.streams.c" } " vocabulary; they are " { $link "stream-protocol" } " implementations which read and write C " { $snippet "FILE*" } " handles."
-{ $subsection <c-reader> }
-{ $subsection <c-writer> }
+{ $subsections
+    <c-reader>
+    <c-writer>
+}
 "Underlying primitives used to implement the above:"
-{ $subsection fopen }
-{ $subsection fwrite }
-{ $subsection fflush }
-{ $subsection fclose }
-{ $subsection fgetc }
-{ $subsection fread }
+{ $subsections
+    fopen
+    fwrite
+    fflush
+    fclose
+    fgetc
+    fread
+}
 "The three standard file handles:"
-{ $subsection stdin-handle }
-{ $subsection stdout-handle }
-{ $subsection stderr-handle } ;
+{ $subsections
+    stdin-handle
+    stdout-handle
+    stderr-handle
+} ;
 
 ABOUT: "io.streams.c"
 

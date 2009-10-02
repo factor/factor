@@ -12,10 +12,12 @@ ARTICLE: "help.lint" "Help lint tool"
 "The " { $vocab-link "help.lint" } " vocabulary implements a tool to check documentation in an automated fashion. You should use this tool to check any documentation that you write."
 $nl
 "To run help lint, use one of the following two words:"
-{ $subsection help-lint }
-{ $subsection help-lint-all }
+{ $subsections
+    help-lint
+    help-lint-all
+}
 "Once a help lint run completes, failures can be listed:"
-{ $subsection :lint-failures }
+{ $subsections :lint-failures }
 "Help lint failures are also shown in the " { $link "ui.tools.error-list" } "."
 $nl
 "Help lint performs the following checks:"

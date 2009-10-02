@@ -12,6 +12,6 @@ HELP: threads.
 
 ARTICLE: "tools.threads" "Listing threads"
 "Printing a list of running threads:"
-{ $subsection threads. } ;
+{ $subsections threads. } ;
 
 ABOUT: "tools.threads"

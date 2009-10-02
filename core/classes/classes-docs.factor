@@ -15,8 +15,10 @@ $nl
     { { $link null } { $snippet "[ drop f ]" } { "No object is an instance of " { $link null } } }
 }
 "The set of class predicate words is a class:"
-{ $subsection predicate }
-{ $subsection predicate? }
+{ $subsections
+    predicate
+    predicate?
+}
 "A predicate word holds a reference to the class it is predicating over in the " { $snippet "\"predicating\"" } " word property." ;
 
 ARTICLE: "classes" "Classes"
@@ -27,34 +29,42 @@ $nl
 "Words for working with classes are found in the " { $vocab-link "classes" } " vocabulary."
 $nl
 "Classes themselves form a class:"
-{ $subsection class? }
+{ $subsections class? }
 "You can ask an object for its class:"
-{ $subsection class }
+{ $subsections class }
 "Testing if an object is an instance of a class:"
-{ $subsection instance? }
+{ $subsections instance? }
 "You can ask a class for its superclass:"
-{ $subsection superclass }
-{ $subsection superclasses }
-{ $subsection subclass-of? }
+{ $subsections
+    superclass
+    superclasses
+    subclass-of?
+}
 "Class predicates can be used to test instances directly:"
-{ $subsection "class-predicates" }
+{ $subsections "class-predicates" }
 "There is a universal class which all objects are an instance of, and an empty class with no instances:"
-{ $subsection object }
-{ $subsection null }
+{ $subsections
+    object
+    null
+}
 "Obtaining a list of all defined classes:"
-{ $subsection classes }
+{ $subsections classes }
 "There are several sorts of classes:"
-{ $subsection "builtin-classes" }
-{ $subsection "unions" }
-{ $subsection "intersections" }
-{ $subsection "mixins" }
-{ $subsection "predicates" }
-{ $subsection "singletons" }
+{ $subsections
+    "builtin-classes"
+    "unions"
+    "intersections"
+    "mixins"
+    "predicates"
+    "singletons"
+}
 { $link "tuples" } " are documented in their own section."
 $nl
 "Classes can be inspected and operated upon:"
-{ $subsection "class-operations" }
-{ $subsection "class-linearization" }
+{ $subsections
+    "class-operations"
+    "class-linearization"
+}
 { $see-also "class-index" } ;
 
 ABOUT: "classes"

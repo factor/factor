@@ -25,6 +25,6 @@ HELP: DESTRUCTOR:
 
 ARTICLE: "alien.destructors" "Alien destructors"
 "The " { $vocab-link "alien.destructors" } " vocabulary defines a utility parsing word for defining new disposable classes."
-{ $subsection POSTPONE: DESTRUCTOR: } ;
+{ $subsections POSTPONE: DESTRUCTOR: } ;
 
 ABOUT: "alien.destructors"

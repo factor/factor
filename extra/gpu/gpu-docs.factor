@@ -22,22 +22,26 @@ HELP: reset-gpu
 
 ARTICLE: "gpu" "Graphics context management"
 "Preparing the GPU library:"
-{ $subsection init-gpu }
+{ $subsections init-gpu }
 "Forcing execution of queued commands:"
-{ $subsection flush-gpu }
-{ $subsection finish-gpu }
+{ $subsections
+    flush-gpu
+    finish-gpu
+}
 "Resetting OpenGL state:"
-{ $subsection reset-gpu } ;
+{ $subsections reset-gpu } ;
 
 ARTICLE: "gpu-summary" "GPU-accelerated rendering"
 "The " { $vocab-link "gpu" } " library is a set of vocabularies that work together to provide a convenient interface to creating, managing, and using GPU resources."
-{ $subsection "gpu" }
-{ $subsection "gpu.state" }
-{ $subsection "gpu.buffers" }
-{ $subsection "gpu.textures" }
-{ $subsection "gpu.framebuffers" }
-{ $subsection "gpu.shaders" }
-{ $subsection "gpu.render" }
+{ $subsections
+    "gpu"
+    "gpu.state"
+    "gpu.buffers"
+    "gpu.textures"
+    "gpu.framebuffers"
+    "gpu.shaders"
+    "gpu.render"
+}
 "The library is built on top of the OpenGL API, but it aims to be complete enough that raw OpenGL calls are never needed. OpenGL 2.0 with the vertex array object extension (" { $snippet "GL_APPLE_vertex_array_object" } " or " { $snippet "GL_ARB_vertex_array_object" } ") is required. Some features require later OpenGL versions or additional extensions; these requirements are documented alongside individual words. To make full use of the library, an OpenGL 3.1 or later implementation is recommended." ;
 
 ABOUT: "gpu-summary"

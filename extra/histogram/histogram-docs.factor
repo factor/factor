@@ -73,11 +73,15 @@ HELP: sequence>hashtable
 
 ARTICLE: "histogram" "Computing histograms"
 "Counting elements in a sequence:"
-{ $subsection histogram }
-{ $subsection histogram* }
+{ $subsections
+    histogram
+    histogram*
+}
 "Combinators for implementing histogram:"
-{ $subsection sequence>assoc }
-{ $subsection sequence>assoc* }
-{ $subsection sequence>hashtable } ;
+{ $subsections
+    sequence>assoc
+    sequence>assoc*
+    sequence>hashtable
+} ;
 
 ABOUT: "histogram"
