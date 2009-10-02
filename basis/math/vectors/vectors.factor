@@ -96,12 +96,12 @@ PRIVATE>
 : vany? ( v -- ? ) [ ] any? ;
 : vnone? ( v -- ? ) [ not ] all? ;
 
-: v<  ( u v -- w ) [ <   ] { } 2map-as ;
-: v<= ( u v -- w ) [ <=  ] { } 2map-as ;
-: v>= ( u v -- w ) [ >=  ] { } 2map-as ;
-: v>  ( u v -- w ) [ >   ] { } 2map-as ;
-: vunordered? ( u v -- w ) [ unordered? ] { } 2map-as ;
-: v=  ( u v -- w ) [ =   ] { } 2map-as ;
+: v<  ( u v -- w ) [ <   ] 2map ;
+: v<= ( u v -- w ) [ <=  ] 2map ;
+: v>= ( u v -- w ) [ >=  ] 2map ;
+: v>  ( u v -- w ) [ >   ] 2map ;
+: vunordered? ( u v -- w ) [ unordered? ] 2map ;
+: v=  ( u v -- w ) [ =   ] 2map ;
 
 : v? ( mask true false -- w )
     [ vbitand ] [ vbitandn ] bi-curry* bi vbitor ; inline
