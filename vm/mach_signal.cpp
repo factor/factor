@@ -29,8 +29,8 @@ http://www.wodeveloper.com/omniLists/macosx-dev/2000/June/msg00137.html */
 executing, the call frame of the current C primitive (if any) is rewound, and
 the appropriate Factor error is thrown from the top-most Factor frame. */
 void factor_vm::call_fault_handler(
-    exception_type_t exception,
-    exception_data_type_t code,
+	exception_type_t exception,
+	exception_data_type_t code,
 	MACH_EXC_STATE_TYPE *exc_state,
 	MACH_THREAD_STATE_TYPE *thread_state,
         MACH_FLOAT_STATE_TYPE *float_state)
@@ -69,10 +69,10 @@ void factor_vm::call_fault_handler(
 }
 
 static void call_fault_handler(exception_type_t exception,
-							   exception_data_type_t code,
-							   MACH_EXC_STATE_TYPE *exc_state,
-							   MACH_THREAD_STATE_TYPE *thread_state,
-							   MACH_FLOAT_STATE_TYPE *float_state)
+	exception_data_type_t code,
+	MACH_EXC_STATE_TYPE *exc_state,
+	MACH_THREAD_STATE_TYPE *thread_state,
+	MACH_FLOAT_STATE_TYPE *float_state)
 {
 	SIGNAL_VM_PTR()->call_fault_handler(exception,code,exc_state,thread_state,float_state);
 }
