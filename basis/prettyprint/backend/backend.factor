@@ -169,11 +169,10 @@ M: tuple pprint*
 : do-length-limit ( seq -- trimmed n/f )
     length-limit get dup [
         over length over [-]
-        dup zero? [ 2drop f ] [ [ head ] dip ] if
+        dup zero? [ 2drop f ] [ [ head-slice ] dip ] if
     ] when ;
 
 : pprint-elements ( seq -- )
-    >array
     do-length-limit
     [ [ pprint* ] each ] dip
     [ "~" swap number>string " more~" 3append text ] when* ;
