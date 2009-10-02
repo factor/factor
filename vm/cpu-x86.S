@@ -41,7 +41,8 @@ multiply_overflow:
 
 DEF(F_FASTCALL void,c_to_factor,(CELL quot, void *vm)):
 	PUSH_NONVOLATILE
-	mov ARG0,NV_TEMP_REG
+	mov ARG0,NV0
+	mov ARG1,NV1
 	
 	/* Create register shadow area for Win64 */
 	sub $32,STACK_REG
@@ -51,7 +52,8 @@ DEF(F_FASTCALL void,c_to_factor,(CELL quot, void *vm)):
 	call MANGLE(save_callstack_bottom)
 	
 	/* Call quot-xt */
-	mov NV_TEMP_REG,ARG0
+	mov NV0,ARG0
+	mov NV1,ARG1
 	call *QUOT_XT_OFFSET(ARG0)
 
 	/* Tear down register shadow area */
