@@ -33,7 +33,9 @@ void register_vm_with_thread(factor_vm *vm)
 
 factor_vm *tls_vm()
 {
-	return (factor_vm*)pthread_getspecific(tlsKey);
+	factor_vm *vm = (factor_vm*)pthread_getspecific(tlsKey);
+	assert(vm != NULL);
+	return vm;
 }
 
 static void *null_dll;
