@@ -50,8 +50,20 @@ ARTICLE: "math-vectors-arithmetic" "Vector arithmetic"
     v~
 } ;
 
-ARTICLE: "math-vectors-logic" "Vector componentwise logic"
+ARTICLE: "math-vectors-shuffle" "Vector shuffling, packing, and unpacking"
+{ $notes
+"These operations are primarily meant to be used with " { $vocab-link "math.vectors.simd" } " types. The software fallbacks for types not supported by hardware will not perform well."
+}
+$nl
+{ $subsection vshuffle }
+{ $subsection vbroadcast }
+{ $subsection hlshift } 
+{ $subsection hrshift } ;
+
+ARTICLE: "math-vectors-logic" "Vector component- and bit-wise logic"
+{ $notes
 "See " { $link "math-vectors-simd-logic" } " for notes about using comparison and logical operations with SIMD vector types."
+}
 $nl
 "Element comparisons:"
 { $subsections
@@ -77,6 +89,7 @@ $nl
     vrshift
 }
 "Element logical operations:"
+<<<<<<< HEAD:basis/math/vectors/vectors-docs.factor
 { $subsections
     vand
     vandn
@@ -93,6 +106,18 @@ $nl
 }
 "Element shuffling:"
 { $subsections vshuffle } ;
+=======
+{ $subsection vand }
+{ $subsection vandn }
+{ $subsection vor }
+{ $subsection vxor }
+{ $subsection vnot }
+{ $subsection v? }
+"Vector tests:"
+{ $subsection vall? }
+{ $subsection vany? }
+{ $subsection vnone? } ;
+>>>>>>> 271e6ddde513aa3de68337c67127a2a6da5ef6f4:basis/math/vectors/vectors-docs.factor
 
 ARTICLE: "math-vectors-misc" "Miscellaneous vector functions"
 { $subsections
@@ -163,11 +188,18 @@ $nl
 
 ARTICLE: "math-vectors" "Vector operations"
 "Any Factor sequence can be used to represent a mathematical vector, however for best performance, the sequences defined by the " { $vocab-link "specialized-arrays" } " and " { $vocab-link "math.vectors.simd" } " vocabularies should be used."
+<<<<<<< HEAD:basis/math/vectors/vectors-docs.factor
 { $subsections
     "math-vectors-arithmetic"
     "math-vectors-logic"
     "math-vectors-misc"
 } ;
+=======
+{ $subsection "math-vectors-arithmetic" }
+{ $subsection "math-vectors-logic" }
+{ $subsection "math-vectors-shuffle" }
+{ $subsection "math-vectors-misc" } ;
+>>>>>>> 271e6ddde513aa3de68337c67127a2a6da5ef6f4:basis/math/vectors/vectors-docs.factor
 
 ABOUT: "math-vectors"
 
@@ -336,11 +368,11 @@ HELP: vrshift
 
 HELP: hlshift
 { $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "w" "a SIMD array" } }
-{ $description "Shifts the entire SIMD array to the left by " { $snippet "n" } " bytes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
+{ $description "Shifts the entire SIMD array to the left by " { $snippet "n" } " bytes, filling the vacated right-hand bits with zeroes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
 
 HELP: hrshift
 { $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "w" "a SIMD array" } }
-{ $description "Shifts the entire SIMD array to the right by " { $snippet "n" } " bytes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
+{ $description "Shifts the entire SIMD array to the right by " { $snippet "n" } " bytes, filling the vacated left-hand bits with zeroes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
 
 HELP: vbroadcast
 { $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "v" "a SIMD array" } }
