@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types kernel locals math math.ranges
 math.bitwise math.vectors math.vectors.simd random
-sequences specialized-arrays ;
+sequences specialized-arrays sequences.private ;
 IN: random.sfmt
 
 SIMD: uint
@@ -16,7 +16,8 @@ CONSTANT: state-multiplier 1812433253
 
 TUPLE: sfmt
 sl1 sl2 sr1 sr2 mask parity
-{ seed integer } { n fixnum } { m fixnum }
+{ r1 uint-4 } { r2 uint-4 }
+{ seed fixnum } { n fixnum } { m fixnum }
 { m-n fixnum } { ix fixnum } { state uint-4-array } ;
 
 : init-state ( sfmt -- sfmt' )
@@ -51,36 +52,32 @@ sl1 sl2 sr1 sr2 mask parity
 GENERIC: generate ( sfmt -- sfmt' )
 
 M:: sfmt generate ( sfmt -- sfmt' )
-    sfmt n>> 2 - sfmt state>> nth :> r1!
-    sfmt n>> 1 - sfmt state>> nth :> r2!
-    0 :> r!
-    0 :> i!
+    sfmt state>> :> state
+    sfmt n>> 2 - state nth-unsafe sfmt (>>r1)
+    sfmt n>> 1 - state nth-unsafe sfmt (>>r2)
     sfmt m>> :> m 
     sfmt n>> :> n 
     sfmt m-n>> :> m-n
     sfmt mask>> :> mask
-    sfmt state>> :> state
 
-    n m - iota [
-        i!
-        i state nth 
-        i m + state nth
-        mask r1 r2 formula r!
+    n m - iota [| i |
+        i state nth-unsafe 
+        i m + state nth-unsafe
+        mask sfmt r1>> sfmt r2>> formula :> r
 
-        r i state set-nth
-        r2 r1!
-        r r2!
+        r i state set-nth-unsafe
+        sfmt r2>> sfmt (>>r1)
+        r sfmt (>>r2)
     ] each
 
-    n m - 1 + n [a,b) [
-        i!
-        i state nth 
-        m-n i + state nth
-        mask r1 r2 formula r!
+    n m - 1 + n [a,b) [| i |
+        i state nth-unsafe
+        m-n i + state nth-unsafe
+        mask sfmt r1>> sfmt r2>> formula :> r
 
-        r i state set-nth
-        r2 r1!
-        r r2!
+        r i state set-nth-unsafe
+        sfmt r2>> sfmt (>>r1)
+        r sfmt (>>r2)
     ] each
     
     sfmt 0 >>ix ;
