@@ -14,6 +14,8 @@ IN: compiler.cfg.value-numbering.tests
             [ ##compare-imm? ]
             [ ##compare-float-unordered? ]
             [ ##compare-float-ordered? ]
+            [ ##test-vector? ]
+            [ ##test-vector-branch? ]
         } 1|| [ f >>temp ] when
     ] map ;
 
@@ -134,6 +136,22 @@ IN: compiler.cfg.value-numbering.tests
         T{ ##peek f 30 D -2 }
         T{ ##compare f 33 29 30 cc<= }
         T{ ##compare-imm-branch f 33 5 cc/= }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##peek f 1 D -1 }
+        T{ ##unbox-vector f 1111 1 float-4-rep }
+        T{ ##test-vector f 1 1111 f float-4-rep vcc-any }
+        T{ ##test-vector-branch f 1111 f float-4-rep vcc-any }
+    }
+] [
+    {
+        T{ ##peek f 1 D -1 }
+        T{ ##unbox-vector f 1111 1 float-4-rep }
+        T{ ##test-vector f 1 1111 2 float-4-rep vcc-any }
+        T{ ##compare-imm-branch f 1 5 cc/= }
     } value-numbering-step trim-temps
 ] unit-test
 
