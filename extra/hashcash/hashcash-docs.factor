@@ -14,15 +14,19 @@ $nl
 "This library provide basic utilities for hashcash creation and validation."
 $nl
 "Creating stamps:"
-{ $subsection mint }
-{ $subsection mint* }
+{ $subsections
+    mint
+    mint*
+}
 "Validation:"
-{ $subsection check-stamp }
+{ $subsections check-stamp }
 "Hashcash tuple and constructor:"
-{ $subsection hashcash }
-{ $subsection <hashcash> }
+{ $subsections
+    hashcash
+    <hashcash>
+}
 "Utilities:"
-{ $subsection salt } ;
+{ $subsections salt } ;
 
 { mint mint* <hashcash> check-stamp salt } related-words
 

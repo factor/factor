@@ -82,17 +82,23 @@ ARTICLE: "unix.groups" "Unix groups"
 "The " { $vocab-link "unix.groups" } " vocabulary contains words that return information about Unix groups."
 $nl
 "Listing all groups:"
-{ $subsection all-groups }
+{ $subsections all-groups }
 "Real groups:"
-{ $subsection real-group-name }
-{ $subsection real-group-id }
-{ $subsection set-real-group }
+{ $subsections
+    real-group-name
+    real-group-id
+    set-real-group
+}
 "Effective groups:"
-{ $subsection effective-group-name }
-{ $subsection effective-group-id }
-{ $subsection set-effective-group }
+{ $subsections
+    effective-group-name
+    effective-group-id
+    set-effective-group
+}
 "Combinators to change groups:"
-{ $subsection with-real-group }
-{ $subsection with-effective-group } ;
+{ $subsections
+    with-real-group
+    with-effective-group
+} ;
 
 ABOUT: "unix.groups"

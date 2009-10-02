@@ -132,9 +132,7 @@ HELP: clear-bit
 } ;
 
 HELP: flags
-{ $values
-     { "values" sequence }
-}
+{ $values { "values" sequence } }
 { $description "Constructs a constant flag value from a sequence of integers or words that output integers. The resulting constant is computed at compile-time, which makes this word as efficient as using a literal integer." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
@@ -344,38 +342,50 @@ HELP: wrap
 
 ARTICLE: "math-bitfields" "Constructing bit fields"
 "Some applications, such as binary communication protocols and assemblers, need to construct integers from elaborate bit field specifications. Hand-coding this using " { $link shift } " and " { $link bitor } " results in repetitive code. A higher-level facility exists to factor out this repetition:"
-{ $subsection bitfield } ;
+{ $subsections bitfield } ;
 
 ARTICLE: "math.bitwise" "Additional bitwise arithmetic"
 "The " { $vocab-link "math.bitwise" } " vocabulary provides bitwise arithmetic words extending " { $link "bitwise-arithmetic" } ". They are useful for efficiency, low-level programming, and interfacing with C libraries."
 $nl
 "Setting and clearing bits:"
-{ $subsection set-bit }
-{ $subsection clear-bit }
+{ $subsections
+    set-bit
+    clear-bit
+}
 "Testing if bits are set or clear:"
-{ $subsection bit? }
-{ $subsection bit-clear? }
+{ $subsections
+    bit?
+    bit-clear?
+}
 "Operations with bitmasks:"
-{ $subsection mask }
-{ $subsection unmask }
-{ $subsection mask? }
-{ $subsection unmask? }
+{ $subsections
+    mask
+    unmask
+    mask?
+    unmask?
+}
 "Generating an integer with n set bits:"
-{ $subsection on-bits }
+{ $subsections on-bits }
 "Counting the number of set bits:"
-{ $subsection bit-count }
+{ $subsections bit-count }
 "More efficient modding by powers of two:"
-{ $subsection wrap }
+{ $subsections wrap }
 "Bit-rolling:"
-{ $subsection bitroll }
-{ $subsection bitroll-32 }
-{ $subsection bitroll-64 }
+{ $subsections
+    bitroll
+    bitroll-32
+    bitroll-64
+}
 "32-bit arithmetic:"
-{ $subsection w+ }
-{ $subsection w- }
-{ $subsection w* }
+{ $subsections
+    w+
+    w-
+    w*
+}
 "Bitfields:"
-{ $subsection flags }
-{ $subsection "math-bitfields" } ;
+{ $subsections
+    flags
+    "math-bitfields"
+} ;
 
 ABOUT: "math.bitwise"

@@ -18,12 +18,14 @@ HELP: <trivial-response>
 
 ARTICLE: "http.server.responses" "Canned HTTP responses"
 "The " { $vocab-link "http.server.responses" } " vocabulary provides constructors for a few useful " { $link response } " objects."
-{ $subsection <content> }
-{ $subsection <304> }
-{ $subsection <403> }
-{ $subsection <400> }
-{ $subsection <404> }
+{ $subsections
+    <content>
+    <304>
+    <403>
+    <400>
+    <404>
+}
 "New error responses like the above can be created for other error codes too:"
-{ $subsection <trivial-response> } ;
+{ $subsections <trivial-response> } ;
 
 ABOUT: "http.server.responses"

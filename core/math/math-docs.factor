@@ -451,50 +451,62 @@ $nl
 { $example "USE: classes" "3 >fixnum 6 >bignum * class ." "bignum" }
 { $example "1/2 2.0 + ." "2.5" }
 "The following usual operations are supported by all numbers."
-{ $subsection + }
-{ $subsection - }
-{ $subsection * }
-{ $subsection / }
+{ $subsections
+    +
+    -
+    *
+    /
+}
 "Non-commutative operations take operands from the stack in the natural order; " { $snippet "6 2 /" } " divides 6 by 2."
-{ $subsection "division-by-zero" }
+{ $subsections "division-by-zero" }
 "Real numbers (but not complex numbers) can be ordered:"
-{ $subsection < }
-{ $subsection <= }
-{ $subsection > }
-{ $subsection >= }
+{ $subsections
+    <
+    <=
+    >
+    >=
+}
 "Numbers can be compared for equality using " { $link = } ", or a less precise test which disregards types:"
-{ $subsection number= }
+{ $subsections number= }
 { $see-also "math.floats.compare" } ;
 
 ARTICLE: "modular-arithmetic" "Modular arithmetic"
-{ $subsection mod }
-{ $subsection rem }
-{ $subsection /mod }
-{ $subsection /i }
+{ $subsections
+    mod
+    rem
+    /mod
+    /i
+}
 { $see-also "integer-functions" } ;
 
 ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
 "There are two ways of looking at an integer -- as an abstract mathematical entity, or as a string of bits. The latter representation motivates " { $emphasis "bitwise operations" } "."
-{ $subsection bitand }
-{ $subsection bitor }
-{ $subsection bitxor }
-{ $subsection bitnot }
-{ $subsection shift }
-{ $subsection 2/ }
-{ $subsection 2^ }
-{ $subsection bit? }
+{ $subsections
+    bitand
+    bitor
+    bitxor
+    bitnot
+    shift
+    2/
+    2^
+    bit?
+}
 "Advanced topics:"
-{ $subsection "math.bitwise" }
-{ $subsection "math.bits" }
+{ $subsections
+    "math.bitwise"
+    "math.bits"
+}
 { $see-also "booleans" } ;
 
 ARTICLE: "arithmetic" "Arithmetic"
 "Factor attempts to preserve natural mathematical semantics for numbers. Multiplying two large integers never results in overflow, and dividing two integers yields an exact ratio. Floating point numbers are also supported, along with complex numbers."
 $nl
 "Math words are in the " { $vocab-link "math" } " vocabulary. Implementation details are in the " { $vocab-link "math.private" } " vocabulary."
-{ $subsection "number-protocol" }
-{ $subsection "modular-arithmetic" }
-{ $subsection "bitwise-arithmetic" }
+{ $subsections
+    "number-protocol"
+    "modular-arithmetic"
+    "bitwise-arithmetic"
+}
 { $see-also "integers" "rationals" "floats" "complex-numbers" } ;
 
 ABOUT: "arithmetic"

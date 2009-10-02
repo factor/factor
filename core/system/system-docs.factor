@@ -5,44 +5,56 @@ IN: system
 ABOUT: "system"
 
 ARTICLE: "system" "System interface"
-{ $subsection "cpu" }
-{ $subsection "os" }
+{ $subsections
+    "cpu"
+    "os"
+}
 "Getting the path to the Factor VM and image:"
-{ $subsection vm }
-{ $subsection image }
+{ $subsections
+    vm
+    image
+}
 "Getting the current time:"
-{ $subsection micros }
-{ $subsection millis }
+{ $subsections
+    micros
+    millis
+}
 "Exiting the Factor VM:"
-{ $subsection exit } ;
+{ $subsections exit } ;
 
 ARTICLE: "cpu" "Processor detection"
 "Processor detection:"
-{ $subsection cpu }
+{ $subsections cpu }
 "Supported processors:"
-{ $subsection x86.32 }
-{ $subsection x86.64 }
-{ $subsection ppc }
-{ $subsection arm }
+{ $subsections
+    x86.32
+    x86.64
+    ppc
+    arm
+}
 "Processor families:"
-{ $subsection x86 } ;
+{ $subsections x86 } ;
 
 ARTICLE: "os" "Operating system detection"
 "Operating system detection:"
-{ $subsection os }
+{ $subsections os }
 "Supported operating systems:"
-{ $subsection freebsd }
-{ $subsection linux }
-{ $subsection macosx }
-{ $subsection openbsd }
-{ $subsection netbsd }
-{ $subsection solaris }
-{ $subsection wince }
-{ $subsection winnt }
+{ $subsections
+    freebsd
+    linux
+    macosx
+    openbsd
+    netbsd
+    solaris
+    wince
+    winnt
+}
 "Operating system families:"
-{ $subsection bsd }
-{ $subsection unix }
-{ $subsection windows } ;
+{ $subsections
+    bsd
+    unix
+    windows
+} ;
 
 
 HELP: cpu

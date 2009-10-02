@@ -19,34 +19,40 @@ HELP: (write-farkup)
 
 ARTICLE: "farkup-ast" "Farkup syntax tree nodes"
 "The " { $link parse-farkup } " word outputs a tree of nodes corresponding to the Farkup syntax of the input string. This tree can be programatically traversed and mutated before being passed on to " { $link write-farkup } "."
-{ $subsection heading1 }
-{ $subsection heading2 }
-{ $subsection heading3 }
-{ $subsection heading4 }
-{ $subsection strong }
-{ $subsection emphasis }
-{ $subsection superscript }
-{ $subsection subscript }
-{ $subsection inline-code }
-{ $subsection paragraph }
-{ $subsection list-item }
-{ $subsection unordered-list }
-{ $subsection ordered-list }
-{ $subsection table }
-{ $subsection table-row }
-{ $subsection link }
-{ $subsection image }
-{ $subsection code } ;
+{ $subsections
+    heading1
+    heading2
+    heading3
+    heading4
+    strong
+    emphasis
+    superscript
+    subscript
+    inline-code
+    paragraph
+    list-item
+    unordered-list
+    ordered-list
+    table
+    table-row
+    link
+    image
+    code
+} ;
 
 ARTICLE: "farkup" "Farkup"
 "The " { $vocab-link "farkup" } " vocabulary implements Farkup (Factor mARKUP), a simple markup language. Farkup was loosely based on the markup languages employed by MediaWiki and " { $url "http://reddit.com" } "."
 $nl
 "The main entry points for converting Farkup to HTML:"
-{ $subsection convert-farkup }
-{ $subsection write-farkup }
+{ $subsections
+    convert-farkup
+    write-farkup
+}
 "The syntax tree of a piece of Farkup can also be inspected and modified:"
-{ $subsection parse-farkup }
-{ $subsection (write-farkup) }
-{ $subsection "farkup-ast" } ;
+{ $subsections
+    parse-farkup
+    (write-farkup)
+    "farkup-ast"
+} ;
 
 ABOUT: "farkup"

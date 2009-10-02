@@ -62,27 +62,33 @@ ARTICLE: "html.templates.boilerplate" "Boilerplate support"
 "The following words define the interface between a templating engine and the " { $vocab-link "furnace.boilerplate" } " vocabulary."
 $nl
 "The master/child template interface follows a pattern where for each concept there is a word called by the child to store an entity, and another word to write the entity out; this solves the problem where certain HTML tags, such as " { $snippet "<title>" } " and " { $snippet "<link>" } " must appear inside the " { $snippet "<head>" } " tag, even though those tags are usually precisely those that the child template will want to set."
-{ $subsection set-title }
-{ $subsection write-title }
-{ $subsection add-style }
-{ $subsection write-style }
-{ $subsection add-atom-feed }
-{ $subsection write-atom-feeds }
+{ $subsections
+    set-title
+    write-title
+    add-style
+    write-style
+    add-atom-feed
+    write-atom-feeds
+}
 "Processing a master template with a child:"
-{ $subsection with-boilerplate }
-{ $subsection call-next-template } ;
+{ $subsections
+    with-boilerplate
+    call-next-template
+} ;
 
 ARTICLE: "html.templates" "HTML template interface"
 "The " { $vocab-link "html.templates" } " vocabulary implements an abstract interface to HTML templating engines. The " { $vocab-link "html.templates.fhtml" } " and " { $vocab-link "html.templates.chloe" } " vocabularies are two implementations of this."
 $nl
 "An HTML template is an instance of a mixin:"
-{ $subsection template }
+{ $subsections template }
 "HTML templates must also implement a method on a generic word:"
-{ $subsection call-template* }
+{ $subsections call-template* }
 "Calling an HTML template:"
-{ $subsection call-template }
+{ $subsections call-template }
 "Usually HTML templates are invoked dynamically by the Furnace web framework and HTTP server. They can also be used in static HTML generation tools:"
-{ $subsection template-convert }
-{ $subsection "html.templates.boilerplate" } ;
+{ $subsections
+    template-convert
+    "html.templates.boilerplate"
+} ;
 
 ABOUT: "html.templates"

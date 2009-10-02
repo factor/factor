@@ -10,8 +10,10 @@ HELP: <ViewWindow>
 { $description "Creates a new " { $snippet "NSWindow" } " with the specified dimensions, containing the given view." } ;
 
 ARTICLE: "cocoa-window-utils" "Cocoa window utilities"
-{ $subsection <NSWindow> }
-{ $subsection <ViewWindow> } ;
+{ $subsections
+    <NSWindow>
+    <ViewWindow>
+} ;
 
 IN: cocoa.windows
 ABOUT: "cocoa-window-utils"

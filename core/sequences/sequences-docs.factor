@@ -1520,8 +1520,10 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
     all?
 }
 { $heading "Related Articles" }
-{ $subsection "sequence-2combinators" }
-{ $subsection "sequence-3combinators" } ;
+{ $subsections
+    "sequence-2combinators"
+    "sequence-3combinators"
+} ;
 
 ARTICLE: "sequence-2combinators" "Pair-wise sequence combinators"
 "There is a set of combinators which traverse two sequences pairwise. If one sequence is shorter than the other, then only the prefix having the length of the minimum of the two is examined."
@@ -1616,8 +1618,10 @@ ARTICLE: "sequences-destructive" "Destructive operations"
     { { $link filter } { $link filter-here } }
 }
 { $heading "Related Articles" }
-{ $subsection "sequences-destructive-discussion" }
-{ $subsection "sequences-stacks" }
+{ $subsections
+    "sequences-destructive-discussion"
+    "sequences-stacks"
+}
 { $see-also set-nth push pop } ;
 
 ARTICLE: "sequences-stacks" "Treating sequences as stacks"

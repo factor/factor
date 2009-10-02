@@ -53,20 +53,28 @@ HELP: mailbox-get?
 
 ARTICLE: "concurrency.mailboxes" "Mailboxes"
 "A " { $emphasis "mailbox" } " is a first-in-first-out queue where the operation of removing an element blocks if the queue is empty. Mailboxes are implemented in the " { $vocab-link "concurrency.mailboxes" } " vocabulary."
-{ $subsection mailbox }
-{ $subsection <mailbox> }
+{ $subsections
+    mailbox
+    <mailbox>
+}
 "Removing the first element:"
-{ $subsection mailbox-get }
-{ $subsection mailbox-get-timeout }
+{ $subsections
+    mailbox-get
+    mailbox-get-timeout
+}
 "Removing the first element matching a predicate:"
-{ $subsection mailbox-get? }
-{ $subsection mailbox-get-timeout? }
+{ $subsections
+    mailbox-get?
+    mailbox-get-timeout?
+}
 "Emptying out a mailbox:"
-{ $subsection mailbox-get-all }
+{ $subsections mailbox-get-all }
 "Adding an element:"
-{ $subsection mailbox-put }
+{ $subsections mailbox-put }
 "Testing if a mailbox is empty:"
-{ $subsection mailbox-empty? }
-{ $subsection while-mailbox-empty } ;
+{ $subsections
+    mailbox-empty?
+    while-mailbox-empty
+} ;
 
 ABOUT: "concurrency.mailboxes"

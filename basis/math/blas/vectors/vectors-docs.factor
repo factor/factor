@@ -3,32 +3,42 @@ IN: math.blas.vectors
 
 ARTICLE: "math.blas.vectors" "BLAS interface vector operations"
 "Slicing vectors:"
-{ $subsection Vsub }
+{ $subsections Vsub }
 "Taking the norm (magnitude) of a vector:"
-{ $subsection Vnorm }
+{ $subsections Vnorm }
 "Summing and taking the maximum of elements:"
-{ $subsection Vasum }
-{ $subsection Viamax }
-{ $subsection Vamax }
+{ $subsections
+    Vasum
+    Viamax
+    Vamax
+}
 "Scalar-vector products:"
-{ $subsection n*V! }
-{ $subsection n*V }
-{ $subsection V*n }
-{ $subsection V/n }
-{ $subsection Vneg }
+{ $subsections
+    n*V!
+    n*V
+    V*n
+    V/n
+    Vneg
+}
 "Vector addition:" 
-{ $subsection n*V+V! }
-{ $subsection n*V+V }
-{ $subsection V+ }
-{ $subsection V- }
+{ $subsections
+    n*V+V!
+    n*V+V
+    V+
+    V-
+}
 "Vector inner products:"
-{ $subsection V. }
-{ $subsection V.conj }
+{ $subsections
+    V.
+    V.conj
+}
 "Literal syntax:"
-{ $subsection POSTPONE: svector{ }
-{ $subsection POSTPONE: dvector{ }
-{ $subsection POSTPONE: cvector{ }
-{ $subsection POSTPONE: zvector{ } ;
+{ $subsections
+    POSTPONE: svector{
+    POSTPONE: dvector{
+    POSTPONE: cvector{
+    POSTPONE: zvector{
+} ;
 
 ABOUT: "math.blas.vectors"
 

@@ -3,7 +3,7 @@ USING: help.markup help.syntax kernel strings ;
 
 ARTICLE: "present" "Converting objects to human-readable strings"
 "A word for converting an object into a human-readable string:"
-{ $subsection present } ;
+{ $subsections present } ;
 
 HELP: present
 { $values { "object" object } { "string" string } }

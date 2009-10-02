@@ -15,7 +15,9 @@ HELP: json-print
 
 ARTICLE: "json.writer" "JSON writer"
 "The " { $vocab-link "json.writer" } " vocabulary defines words for converting objects to JSON format."
-{ $subsection >json }
-{ $subsection json-print } ;
+{ $subsections
+    >json
+    json-print
+} ;
 
 ABOUT: "json.writer"

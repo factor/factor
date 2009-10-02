@@ -14,12 +14,12 @@ ARTICLE: "ui-inspector" "UI inspector"
 "The graphical inspector provides functionality similar to the terminal inspector (see " { $link "inspector" } "), adding in-place editing of slot values."
 $nl
 "To display an object in the UI inspector, right-click a presentation and choose " { $strong "Inspector" } " from the menu that appears. The inspector can also be opened from the listener using a word:"
-{ $subsection inspector }
+{ $subsections inspector }
 "The inspector embeds a table gadget, which supports keyboard navigation; see " { $link "ui.gadgets.tables" } ". It also provides a few other commands:"
 { $command-map inspector-gadget "toolbar" }
 { $command-map inspector-gadget "multi-touch" }
 "The UI inspector is an instance of " { $link inspector-gadget } "."
-{ $subsection "ui-inspector-edit" } ;
+{ $subsections "ui-inspector-edit" } ;
 
 HELP: inspector
 { $values { "obj" object } }

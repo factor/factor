@@ -3,82 +3,104 @@ IN: math.blas.matrices
 
 ARTICLE: "math.blas-summary" "Basic Linear Algebra Subroutines (BLAS) interface"
 "Factor provides an interface to high-performance vector and matrix math routines available in implementations of the BLAS math library. A set of specialized types are provided for handling packed, unboxed vector data:"
-{ $subsection "math.blas-types" }
+{ $subsections "math.blas-types" }
 "Scalar-vector and vector-vector operations are available in the " { $vocab-link "math.blas.vectors" } " vocabulary:"
-{ $subsection "math.blas.vectors" }
+{ $subsections "math.blas.vectors" }
 "Vector-matrix and matrix-matrix operations are available in the " { $vocab-link "math.blas.matrices" } " vocabulary:"
-{ $subsection "math.blas.matrices" }
+{ $subsections "math.blas.matrices" }
 "The low-level BLAS Fortran interface can be accessed directly through the " { $vocab-link "math.blas.ffi" } " vocabulary. The BLAS interface can be configured to use different underlying BLAS implementations:"
-{ $subsection "math.blas.config" } ;
+{ $subsections "math.blas.config" } ;
 
 ARTICLE: "math.blas-types" "BLAS interface types"
 "BLAS vectors come in single- and double-precision, real and complex flavors:"
-{ $subsection float-blas-vector }
-{ $subsection double-blas-vector }
-{ $subsection complex-float-blas-vector }
-{ $subsection complex-double-blas-vector }
+{ $subsections
+    float-blas-vector
+    double-blas-vector
+    complex-float-blas-vector
+    complex-double-blas-vector
+}
 "These vector types all follow the " { $link sequence } " protocol. In addition, there are corresponding types for matrix data:"
-{ $subsection float-blas-matrix }
-{ $subsection double-blas-matrix }
-{ $subsection complex-float-blas-matrix }
-{ $subsection complex-double-blas-matrix } 
+{ $subsections
+    float-blas-matrix
+    double-blas-matrix
+    complex-float-blas-matrix
+    complex-double-blas-matrix
+} 
 "There are BOA constructors for all vector and matrix types, which provide the most flexibility in specifying memory layout:"
-{ $subsection <float-blas-vector> }
-{ $subsection <double-blas-vector> }
-{ $subsection <complex-float-blas-vector> }
-{ $subsection <complex-double-blas-vector> }
-{ $subsection <float-blas-matrix> }
-{ $subsection <double-blas-matrix> }
-{ $subsection <complex-float-blas-matrix> }
-{ $subsection <complex-double-blas-matrix> }
+{ $subsections
+    <float-blas-vector>
+    <double-blas-vector>
+    <complex-float-blas-vector>
+    <complex-double-blas-vector>
+    <float-blas-matrix>
+    <double-blas-matrix>
+    <complex-float-blas-matrix>
+    <complex-double-blas-matrix>
+}
 "For the simple case of creating a dense, zero-filled vector or matrix, simple empty object constructors are provided:"
-{ $subsection <empty-vector> }
-{ $subsection <empty-matrix> }
+{ $subsections
+    <empty-vector>
+    <empty-matrix>
+}
 "BLAS vectors and matrices can also be constructed from other Factor sequences:"
-{ $subsection >float-blas-vector }
-{ $subsection >double-blas-vector }
-{ $subsection >complex-float-blas-vector }
-{ $subsection >complex-double-blas-vector }
-{ $subsection >float-blas-matrix }
-{ $subsection >double-blas-matrix }
-{ $subsection >complex-float-blas-matrix }
-{ $subsection >complex-double-blas-matrix } ;
+{ $subsections
+    >float-blas-vector
+    >double-blas-vector
+    >complex-float-blas-vector
+    >complex-double-blas-vector
+    >float-blas-matrix
+    >double-blas-matrix
+    >complex-float-blas-matrix
+    >complex-double-blas-matrix
+} ;
 
 ARTICLE: "math.blas.matrices" "BLAS interface matrix operations"
 "Transposing and slicing matrices:"
-{ $subsection Mtranspose }
-{ $subsection Mrows }
-{ $subsection Mcols }
-{ $subsection Msub }
+{ $subsections
+    Mtranspose
+    Mrows
+    Mcols
+    Msub
+}
 "Matrix-vector products:"
-{ $subsection n*M.V+n*V! }
-{ $subsection n*M.V+n*V }
-{ $subsection n*M.V }
-{ $subsection M.V }
+{ $subsections
+    n*M.V+n*V!
+    n*M.V+n*V
+    n*M.V
+    M.V
+}
 "Vector outer products:"
-{ $subsection n*V(*)V+M! }
-{ $subsection n*V(*)Vconj+M! }
-{ $subsection n*V(*)V+M }
-{ $subsection n*V(*)Vconj+M }
-{ $subsection n*V(*)V }
-{ $subsection n*V(*)Vconj }
-{ $subsection V(*) }
-{ $subsection V(*)conj }
+{ $subsections
+    n*V(*)V+M!
+    n*V(*)Vconj+M!
+    n*V(*)V+M
+    n*V(*)Vconj+M
+    n*V(*)V
+    n*V(*)Vconj
+    V(*)
+    V(*)conj
+}
 "Matrix products:"
-{ $subsection n*M.M+n*M! }
-{ $subsection n*M.M+n*M }
-{ $subsection n*M.M }
-{ $subsection M. }
+{ $subsections
+    n*M.M+n*M!
+    n*M.M+n*M
+    n*M.M
+    M.
+}
 "Scalar-matrix products:"
-{ $subsection n*M! }
-{ $subsection n*M }
-{ $subsection M*n }
-{ $subsection M/n }
+{ $subsections
+    n*M!
+    n*M
+    M*n
+    M/n
+}
 "Literal syntax:"
-{ $subsection POSTPONE: smatrix{ }
-{ $subsection POSTPONE: dmatrix{ }
-{ $subsection POSTPONE: cmatrix{ }
-{ $subsection POSTPONE: zmatrix{ } ;
+{ $subsections
+    POSTPONE: smatrix{
+    POSTPONE: dmatrix{
+    POSTPONE: cmatrix{
+    POSTPONE: zmatrix{
+} ;
 
 
 ABOUT: "math.blas.matrices"

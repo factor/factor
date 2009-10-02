@@ -8,6 +8,6 @@ HELP: euc-kr
 { $see-also "encodings-introduction" } ;
 
 ARTICLE: "io.encodings.euc-kr" "EUC-KR encoding"
-{ $subsection euc-kr } ;
+{ $subsections euc-kr } ;
 
 ABOUT: "io.encodings.euc-kr"

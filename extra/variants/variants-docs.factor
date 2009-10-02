@@ -56,8 +56,10 @@ HELP: variant-class
 
 ARTICLE: "variants" "Algebraic data types"
 "The " { $vocab-link "variants" } " vocabulary provides syntax and combinators for defining and manipulating algebraic data types."
-{ $subsection POSTPONE: VARIANT: }
-{ $subsection variant-class }
-{ $subsection match } ;
+{ $subsections
+    POSTPONE: VARIANT:
+    variant-class
+    match
+} ;
 
 ABOUT: "variants"

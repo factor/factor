@@ -12,6 +12,6 @@ HELP: directory.
 ARTICLE: "tools.files" "Files tools"
 "The " { $vocab-link "tools.files" } " vocabulary implements directory files and file-systems listing in a cross-platform way." $nl
 "Listing a directory:"
-{ $subsection directory. } ;
+{ $subsections directory. } ;
 
 ABOUT: "tools.files"

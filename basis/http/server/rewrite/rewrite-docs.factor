@@ -61,12 +61,16 @@ $nl
 
 ARTICLE: "http.server.rewrite" "URL rewrite responders"
 "The " { $vocab-link "http.server.rewrite" } " vocabulary defines two responder types which can help make website URLs more human-friendly."
-{ $subsection "http.server.rewrite.overview" }
+{ $subsections "http.server.rewrite.overview" }
 "Directory rewrite responders:"
-{ $subsection rewrite }
-{ $subsection <rewrite> }
+{ $subsections
+    rewrite
+    <rewrite>
+}
 "Virtual host rewrite responders -- these chop off the value in the " { $snippet "suffix" } " slot from the tail of the host name, and use the rest as the parameter value:"
-{ $subsection vhost-rewrite }
-{ $subsection <vhost-rewrite> } ;
+{ $subsections
+    vhost-rewrite
+    <vhost-rewrite>
+} ;
 
 ABOUT: "http.server.rewrite"

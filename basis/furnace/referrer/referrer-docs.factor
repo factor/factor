@@ -11,9 +11,11 @@ HELP: <check-form-submissions>
 
 ARTICLE: "furnace.referrer" "Form submission referrer checking"
 "The " { $vocab-link "furnace.referrer" } " implements a simple security measure which can be used to thwart cross-site scripting attacks."
-{ $subsection <check-form-submissions> }
+{ $subsections <check-form-submissions> }
 "Explicit referrer checking:"
-{ $subsection referrer }
-{ $subsection same-host? } ;
+{ $subsections
+    referrer
+    same-host?
+} ;
 
 ABOUT: "furnace.referrer"

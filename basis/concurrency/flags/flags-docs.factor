@@ -28,11 +28,15 @@ $nl
 "The flag can be raised at any time; raising a raised flag does nothing. Lowering a flag if it has not been raised yet will wait for another thread to raise the flag."
 $nl
 "Essentially, a flag can be thought of as a counting semaphore where the count never goes above one."
-{ $subsection flag }
-{ $subsection flag? }
+{ $subsections
+    flag
+    flag?
+}
 "Waiting for a flag to be raised:"
-{ $subsection raise-flag }
-{ $subsection wait-for-flag }
-{ $subsection lower-flag } ;
+{ $subsections
+    raise-flag
+    wait-for-flag
+    lower-flag
+} ;
 
 ABOUT: "concurrency.flags"
