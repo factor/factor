@@ -721,7 +721,7 @@ UNION: ##allocation
 ##box-displaced-alien ;
 
 ! For alias analysis
-UNION: ##read ##slot ##slot-imm ;
+UNION: ##read ##slot ##slot-imm ##vm-field-ptr ##alien-global ;
 UNION: ##write ##set-slot ##set-slot-imm ;
 
 ! Instructions that kill all live vregs but cannot trigger GC
