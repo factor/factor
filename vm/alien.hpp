@@ -1,43 +1,6 @@
 namespace factor
 {
 
-PRIMITIVE(displaced_alien);
-PRIMITIVE(alien_address);
-
-PRIMITIVE(alien_signed_cell);
-PRIMITIVE(set_alien_signed_cell);
-PRIMITIVE(alien_unsigned_cell);
-PRIMITIVE(set_alien_unsigned_cell);
-PRIMITIVE(alien_signed_8);
-PRIMITIVE(set_alien_signed_8);
-PRIMITIVE(alien_unsigned_8);
-PRIMITIVE(set_alien_unsigned_8);
-PRIMITIVE(alien_signed_4);
-PRIMITIVE(set_alien_signed_4);
-PRIMITIVE(alien_unsigned_4);
-PRIMITIVE(set_alien_unsigned_4);
-PRIMITIVE(alien_signed_2);
-PRIMITIVE(set_alien_signed_2);
-PRIMITIVE(alien_unsigned_2);
-PRIMITIVE(set_alien_unsigned_2);
-PRIMITIVE(alien_signed_1);
-PRIMITIVE(set_alien_signed_1);
-PRIMITIVE(alien_unsigned_1);
-PRIMITIVE(set_alien_unsigned_1);
-PRIMITIVE(alien_float);
-PRIMITIVE(set_alien_float);
-PRIMITIVE(alien_double);
-PRIMITIVE(set_alien_double);
-PRIMITIVE(alien_cell);
-PRIMITIVE(set_alien_cell);
-
-PRIMITIVE(dlopen);
-PRIMITIVE(dlsym);
-PRIMITIVE(dlclose);
-PRIMITIVE(dll_validp);
-
-PRIMITIVE(vm_ptr);
-
 VM_C_API char *alien_offset(cell object, factor_vm *vm);
 VM_C_API char *unbox_alien(factor_vm *vm);
 VM_C_API void box_alien(void *ptr, factor_vm *vm);

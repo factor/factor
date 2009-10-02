@@ -263,7 +263,6 @@ void factor_vm::dump_objects(cell type)
 	end_scan();
 }
 
-
 void factor_vm::find_data_references_step(cell *scan)
 {
 	if(look_for == *scan)
@@ -477,13 +476,11 @@ void factor_vm::factorbug()
 	}
 }
 
-inline void factor_vm::primitive_die()
+void factor_vm::primitive_die()
 {
 	print_string("The die word was called by the library. Unless you called it yourself,\n");
 	print_string("you have triggered a bug in Factor. Please report.\n");
 	factorbug();
 }
-
-PRIMITIVE_FORWARD(die)
 
 }
