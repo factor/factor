@@ -186,6 +186,9 @@ M: A clone underlying>> clone \ A boa ; inline
 
 M: A length drop N ; inline
 
+M: A equal?
+    over \ A instance? [ v= vall? ] [ 2drop f ] if ;
+
 M: A nth-unsafe underlying>> A-rep simd-nth ; inline
 
 M: A set-nth-unsafe
@@ -203,8 +206,6 @@ M: A new-sequence
     [ drop 16 <byte-array> \ A boa ]
     [ N bad-length ]
     if ; inline
-
-M: A equal? over \ A instance? [ sequence= ] [ 2drop f ] if ;
 
 M: A c:byte-length underlying>> length ; inline
 
@@ -340,6 +341,9 @@ M: A clone
 
 M: A length drop N ; inline
 
+M: A equal?
+    over \ A instance? [ v= vall? ] [ 2drop f ] if ;
+
 : A-deref ( n seq -- n' seq' )
     over N/2 < [ underlying1>> ] [ [ N/2 - ] dip underlying2>> ] if \ A/2 boa ; inline
 
@@ -356,8 +360,6 @@ M: A new-sequence
     [ drop 16 <byte-array> 16 <byte-array> \ A boa ]
     [ N bad-length ]
     if ; inline
-
-M: A equal? over \ A instance? [ sequence= ] [ 2drop f ] if ;
 
 M: A c:byte-length drop 32 ; inline
 
