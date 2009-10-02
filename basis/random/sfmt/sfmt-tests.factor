@@ -11,3 +11,10 @@ IN: random.sfmt.tests
 
 [ 2556114782 ]
 [ 100 <sfmt-19937> random-32* ] unit-test
+
+[ t ]
+[
+    100 <sfmt-19937>
+    [ random-32* ]
+    [ 100 seed-random random-32* ] bi =
+] unit-test
