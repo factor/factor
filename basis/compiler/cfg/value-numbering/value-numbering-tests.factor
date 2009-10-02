@@ -142,16 +142,14 @@ IN: compiler.cfg.value-numbering.tests
 [
     {
         T{ ##peek f 1 D -1 }
-        T{ ##unbox-vector f 1111 1 float-4-rep }
-        T{ ##test-vector f 1 1111 f float-4-rep vcc-any }
-        T{ ##test-vector-branch f 1111 f float-4-rep vcc-any }
+        T{ ##test-vector f 2 1 f float-4-rep vcc-any }
+        T{ ##test-vector-branch f 1 f float-4-rep vcc-any }
     }
 ] [
     {
         T{ ##peek f 1 D -1 }
-        T{ ##unbox-vector f 1111 1 float-4-rep }
-        T{ ##test-vector f 1 1111 2 float-4-rep vcc-any }
-        T{ ##compare-imm-branch f 1 5 cc/= }
+        T{ ##test-vector f 2 1 f float-4-rep vcc-any }
+        T{ ##compare-imm-branch f 2 5 cc/= }
     } value-numbering-step trim-temps
 ] unit-test
 
