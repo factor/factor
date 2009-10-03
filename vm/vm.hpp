@@ -550,7 +550,7 @@ struct factor_vm
 	inline void check_code_pointer(cell ptr);
 
 	/* Apply a function to every code block */
-	template<typename Iterator> void factor_vm::iterate_code_heap(Iterator &iter)
+	template<typename Iterator> void iterate_code_heap(Iterator &iter)
 	{
 		heap_block *scan = code->first_block();
 	
