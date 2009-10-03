@@ -1,7 +1,8 @@
-USING: io io.streams.limited io.encodings io.encodings.string
-io.encodings.ascii io.encodings.binary io.streams.byte-array
-namespaces tools.test strings kernel io.streams.string accessors
-io.encodings.utf8 io.files destructors ;
+USING: accessors continuations destructors io io.encodings
+io.encodings.8-bit io.encodings.ascii io.encodings.binary
+io.encodings.string io.encodings.utf8 io.files io.pipes
+io.streams.byte-array io.streams.limited io.streams.string
+kernel namespaces strings tools.test ;
 IN: io.streams.limited.tests
 
 [ ] [
@@ -88,4 +89,114 @@ IN: io.streams.limited.tests
     "asdf" <string-reader> 2 stream-eofs <limited-stream> [
         unlimited-input contents
     ] with-input-stream
+] unit-test
+
+[ 4 ] [
+    "abcdefgh" <string-reader> 4 stream-throws <limited-stream> [
+        4 seek-relative seek-input tell-input
+    ] with-input-stream
+] unit-test
+
+[
+    "abcdefgh" <string-reader> 4 stream-throws <limited-stream> [
+        4 seek-relative seek-input
+        4 read
+    ] with-input-stream
+] [
+    limit-exceeded?
+] must-fail-with
+
+[
+    "abcdefgh" <string-reader> 4 stream-throws <limited-stream> [
+        4 seek-relative seek-input
+        -2 seek-relative
+        2 read
+    ] with-input-stream
+] [
+    limit-exceeded?
+] must-fail-with
+
+[
+    "abcdefgh" <string-reader> [
+        4 seek-relative seek-input
+        2 stream-throws limit-input
+        -2 seek-relative seek-input
+        2 read
+    ] with-input-stream
+] [
+    limit-exceeded?
+] must-fail-with
+
+[ "ef" ] [
+    "abcdefgh" <string-reader> [
+        4 seek-relative seek-input
+        2 stream-throws limit-input
+        4 seek-absolute seek-input
+        2 read
+    ] with-input-stream
+] unit-test
+
+[ "ef" ] [
+    "abcdefgh" <string-reader> [
+        4 seek-absolute seek-input
+        2 stream-throws limit-input
+        2 seek-absolute seek-input
+        4 seek-absolute seek-input
+        2 read
+    ] with-input-stream
+] unit-test
+
+! stream-throws, pipes are duplex and not seekable
+[ "as" ] [
+    latin1 <pipe> [ 2 stream-throws <limited-stream> ] change-in
+    "asdf" over stream-write dup stream-flush
+    2 swap stream-read
+] unit-test
+
+[
+    latin1 <pipe> [ 2 stream-throws <limited-stream> ] change-in
+    "asdf" over stream-write dup stream-flush
+    3 swap stream-read
+] [
+    limit-exceeded?
+] must-fail-with
+
+! stream-eofs, pipes are duplex and not seekable
+[ "as" ] [
+    latin1 <pipe> [ 2 stream-eofs <limited-stream> ] change-in
+    "asdf" over stream-write dup stream-flush
+    2 swap stream-read
+] unit-test
+
+[ "as" ] [
+    latin1 <pipe> [ 2 stream-eofs <limited-stream> ] change-in
+    "asdf" over stream-write dup stream-flush
+    3 swap stream-read
+] unit-test
+
+! test seeking on limited unseekable streams
+[ "as" ] [
+    latin1 <pipe> [ 2 stream-eofs <limited-stream> ] change-in
+    "asdf" over stream-write dup stream-flush
+    2 swap stream-read
+] unit-test
+
+[ "as" ] [
+    latin1 <pipe> [ 2 stream-eofs <limited-stream> ] change-in
+    "asdf" over stream-write dup stream-flush
+    3 swap stream-read
+] unit-test
+
+[
+    latin1 <pipe> [ 2 stream-throws <limited-stream> ] change-in
+    2 seek-absolute rot in>> stream-seek
+] must-fail
+
+[
+    "as"
+] [
+    latin1 <pipe> [ 2 stream-throws <limited-stream> ] change-in
+    "asdf" over stream-write dup stream-flush
+    [ 2 seek-absolute rot in>> stream-seek ] [ drop ] recover
+    2 swap stream-read
 ] unit-test

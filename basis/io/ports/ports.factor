@@ -124,7 +124,12 @@ M: output-port stream-write
 
 HOOK: (wait-to-write) io-backend ( port -- )
 
+HOOK: tell-handle os ( handle -- n )
 HOOK: seek-handle os ( n seek-type handle -- )
+
+M: buffered-port stream-tell ( stream -- n )
+    [ check-disposed ]
+    [ handle>> tell-handle ] bi ;
 
 M: input-port stream-seek ( n seek-type stream -- )
     [ check-disposed ]
