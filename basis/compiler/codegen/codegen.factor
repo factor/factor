@@ -186,6 +186,7 @@ CODEGEN: ##and-vector %and-vector
 CODEGEN: ##andn-vector %andn-vector
 CODEGEN: ##or-vector %or-vector
 CODEGEN: ##xor-vector %xor-vector
+CODEGEN: ##not-vector %not-vector
 CODEGEN: ##shl-vector %shl-vector
 CODEGEN: ##shr-vector %shr-vector
 CODEGEN: ##integer>scalar %integer>scalar
