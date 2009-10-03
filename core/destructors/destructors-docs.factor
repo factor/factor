@@ -81,31 +81,35 @@ ARTICLE: "destructors-anti-patterns" "Resource disposal anti-patterns"
 
 ARTICLE: "destructors-using" "Using destructors"
 "Disposing of an object:"
-{ $subsection dispose }
+{ $subsections dispose }
 "Utility word for scoped disposal:"
-{ $subsection with-disposal }
+{ $subsections with-disposal }
 "Utility word for disposing multiple objects:"
-{ $subsection dispose-each }
+{ $subsections dispose-each }
 "Utility words for more complex disposal patterns:"
-{ $subsection with-destructors }
-{ $subsection &dispose }
-{ $subsection |dispose } ;
+{ $subsections
+    with-destructors
+    &dispose
+    |dispose
+} ;
 
 ARTICLE: "destructors-extending" "Writing new destructors"
 "Superclass for disposable objects:"
-{ $subsection disposable }
+{ $subsections disposable }
 "Parametrized constructor for disposable objects:"
-{ $subsection new-disposable }
+{ $subsections new-disposable }
 "Generic disposal word:"
-{ $subsection dispose* }
+{ $subsections dispose* }
 "Global set of disposable objects:"
-{ $subsection disposables } ;
+{ $subsections disposables } ;
 
 ARTICLE: "destructors" "Deterministic resource disposal"
 "Operating system resources such as streams, memory mapped files, and so on are not managed by Factor's garbage collector and must be released when you are done with them. Failing to release a resource can lead to reduced performance and instability."
-{ $subsection "destructors-using" }
-{ $subsection "destructors-extending" }
-{ $subsection "destructors-anti-patterns" }
+{ $subsections
+    "destructors-using"
+    "destructors-extending"
+    "destructors-anti-patterns"
+}
 { $see-also "tools.destructors" } ;
 
 ABOUT: "destructors"

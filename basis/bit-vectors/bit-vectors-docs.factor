@@ -6,13 +6,17 @@ ARTICLE: "bit-vectors" "Bit vectors"
 "A bit vector is a resizable mutable sequence of bits. Bit vector words are found in the " { $vocab-link "bit-vectors" } " vocabulary."
 $nl
 "Bit vectors form a class:"
-{ $subsection bit-vector }
-{ $subsection bit-vector? }
+{ $subsections
+    bit-vector
+    bit-vector?
+}
 "Creating bit vectors:"
-{ $subsection >bit-vector }
-{ $subsection <bit-vector> }
+{ $subsections
+    >bit-vector
+    <bit-vector>
+}
 "Literal syntax:"
-{ $subsection POSTPONE: ?V{ }
+{ $subsections POSTPONE: ?V{ }
 "If you don't care about initial capacity, a more elegant way to create a new bit vector is to write:"
 { $code "?V{ } clone" } ;
 

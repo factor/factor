@@ -59,8 +59,10 @@ IN: scratchpad
 
 ARTICLE: "sequences.n-based" "N-based sequences"
 "The " { $vocab-link "sequences.n-based" } " vocabulary provides a sequence adaptor that allows a sequence to be treated as an assoc with non-zero-based keys."
-{ $subsection n-based-assoc }
-{ $subsection <n-based-assoc> }
+{ $subsections
+    n-based-assoc
+    <n-based-assoc>
+}
 ;
 
 ABOUT: "sequences.n-based"

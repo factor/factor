@@ -292,10 +292,12 @@ HELP: vertex-indexes
 
 ARTICLE: "gpu.render" "Rendering"
 "The " { $vocab-link "gpu.render" } " vocabulary contains words for organizing and submitting data to the GPU for rendering."
-{ $subsection render }
-{ $subsection render-set }
+{ $subsections
+    render
+    render-set
+}
 { $link uniform-tuple } "s provide Factor types for containing and submitting shader uniform parameters:"
-{ $subsection POSTPONE: UNIFORM-TUPLE: }
+{ $subsections POSTPONE: UNIFORM-TUPLE: }
 ;
 
 ABOUT: "gpu.render"

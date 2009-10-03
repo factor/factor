@@ -149,9 +149,11 @@ ARTICLE: "first-program" "Your first program"
 "In this tutorial, we will write a simple Factor program which prompts the user to enter a word, and tests if it is a palindrome (that is, the word is spelled the same backwards and forwards)."
 $nl
 "In this tutorial, you will learn about basic Factor development tools."
-{ $subsection "first-program-start" }
-{ $subsection "first-program-logic" }
-{ $subsection "first-program-test" }
-{ $subsection "first-program-extend" } ;
+{ $subsections
+    "first-program-start"
+    "first-program-logic"
+    "first-program-test"
+    "first-program-extend"
+} ;
 
 ABOUT: "first-program"

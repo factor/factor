@@ -6,27 +6,39 @@ ARTICLE: "network-addressing" "Address specifiers"
 "The networking words are quite general and work with " { $emphasis "address specifiers" } " rather than concrete concepts such as host names. There are four types of address specifiers."
 $nl
 "Unix domain sockets:"
-{ $subsection local }
-{ $subsection <local> }
+{ $subsections
+    local
+    <local>
+}
 "Internet host name/port number pairs; the host name is resolved to an IPv4 or IPv6 address using the operating system's resolver:"
-{ $subsection inet }
-{ $subsection <inet> }
+{ $subsections
+    inet
+    <inet>
+}
 "IPv4 addresses, with no host name resolution:"
-{ $subsection inet4 }
-{ $subsection <inet4> }
+{ $subsections
+    inet4
+    <inet4>
+}
 "IPv6 addresses, with no host name resolution:"
-{ $subsection inet6 }
-{ $subsection <inet6> }
+{ $subsections
+    inet6
+    <inet6>
+}
 "While the " { $link inet } " addressing specifier is capable of performing name lookups when passed to " { $link <client> } ", sometimes it is necessary to look up a host name without making a connection:"
-{ $subsection resolve-host } ;
+{ $subsections resolve-host } ;
 
 ARTICLE: "network-connection" "Connection-oriented networking"
 "Network connections can be established with this word:"
-{ $subsection <client> }
-{ $subsection with-client }
+{ $subsections
+    <client>
+    with-client
+}
 "Connection-oriented network servers are implemented by first opening a server socket, then waiting for connections:"
-{ $subsection <server> }
-{ $subsection accept }
+{ $subsections
+    <server>
+    accept
+}
 "Server sockets are closed by calling " { $link dispose } "."
 $nl
 "Address specifiers have the following interpretation with connection-oriented networking words:"
@@ -42,10 +54,12 @@ $nl
 
 ARTICLE: "network-packet" "Packet-oriented networking"
 "A packet-oriented socket can be opened with this word:"
-{ $subsection <datagram> }
+{ $subsections <datagram> }
 "Packets can be sent and received with a pair of words:"
-{ $subsection send }
-{ $subsection receive }
+{ $subsections
+    send
+    receive
+}
 "Packet-oriented sockets are closed by calling " { $link dispose } "."
 $nl
 "Address specifiers have the following interpretation with packet-oriented networking words:"
@@ -72,10 +86,12 @@ ARTICLE: "network-streams" "Networking"
     "TCP/IP and UDP/IP, over IPv4 and IPv6"
     "Unix domain sockets (Unix only)"
 }
-{ $subsection "network-examples" }
-{ $subsection "network-addressing" }
-{ $subsection "network-connection" }
-{ $subsection "network-packet" }
+{ $subsections
+    "network-examples"
+    "network-addressing"
+    "network-connection"
+    "network-packet"
+}
 { $vocab-subsection "Secure sockets (SSL, TLS)" "io.sockets.secure" }
 { $see-also "io.pipes" } ;
 

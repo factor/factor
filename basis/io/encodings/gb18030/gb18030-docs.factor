@@ -5,7 +5,7 @@ IN: io.encodings.gb18030
 
 ARTICLE: "io.encodings.gb18030" "GB 18030"
 "The " { $vocab-link "io.encodings.gb18030" } " vocabulary implements GB18030, a commonly used encoding for Chinese text besides the standard UTF encodings for Unicode strings."
-{ $subsection gb18030 } ;
+{ $subsections gb18030 } ;
 
 ABOUT: "io.encodings.gb18030"
 

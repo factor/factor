@@ -76,11 +76,13 @@ HELP: bootstrap-cell-bits
 
 ARTICLE: "layouts-types" "Type numbers"
 "Corresponding to every built-in class is a built-in type number. An object can be asked for its built-in type number:"
-{ $subsection hi-tag }
+{ $subsections hi-tag }
 "Built-in type numbers can be converted to classes, and vice versa:"
-{ $subsection type>class }
-{ $subsection type-number }
-{ $subsection num-types }
+{ $subsections
+    type>class
+    type-number
+    num-types
+}
 { $see-also "builtin-classes" } ;
 
 ARTICLE: "layouts-tags" "Tagged pointers"
@@ -89,39 +91,51 @@ $nl
 "Getting the tag of an object:"
 { $link tag }
 "Words for working with tagged pointers:"
-{ $subsection tag-bits }
-{ $subsection num-tags }
-{ $subsection tag-mask }
-{ $subsection tag-number }
+{ $subsections
+    tag-bits
+    num-tags
+    tag-mask
+    tag-number
+}
 "The Factor VM does not actually expose any words for working with tagged pointers directly. The above words operate on integers; they are used in the bootstrap image generator and the optimizing compiler." ;
 
 ARTICLE: "layouts-limits" "Sizes and limits"
 "Processor cell size:"
-{ $subsection cell }
-{ $subsection cells }
-{ $subsection cell-bits }
+{ $subsections
+    cell
+    cells
+    cell-bits
+}
 "Range of integers representable by " { $link fixnum } "s:"
-{ $subsection most-negative-fixnum }
-{ $subsection most-positive-fixnum }
+{ $subsections
+    most-negative-fixnum
+    most-positive-fixnum
+}
 "Maximum array size:"
-{ $subsection max-array-capacity } ;
+{ $subsections max-array-capacity } ;
 
 ARTICLE: "layouts-bootstrap" "Bootstrap support"
 "Processor cell size for the target architecture:"
-{ $subsection bootstrap-cell }
-{ $subsection bootstrap-cells }
-{ $subsection bootstrap-cell-bits }
+{ $subsections
+    bootstrap-cell
+    bootstrap-cells
+    bootstrap-cell-bits
+}
 "Range of integers representable by " { $link fixnum } "s of the target architecture:"
-{ $subsection bootstrap-most-negative-fixnum }
-{ $subsection bootstrap-most-positive-fixnum }
+{ $subsections
+    bootstrap-most-negative-fixnum
+    bootstrap-most-positive-fixnum
+}
 "Maximum array size for the target architecture:"
-{ $subsection bootstrap-max-array-capacity } ;
+{ $subsections bootstrap-max-array-capacity } ;
 
 ARTICLE: "layouts" "VM memory layouts"
 "The words documented in this section do not ever need to be called by user code. They are documented for the benefit of those wishing to explore the internals of Factor's implementation."
-{ $subsection "layouts-types" }
-{ $subsection "layouts-tags" }
-{ $subsection "layouts-limits" }
-{ $subsection "layouts-bootstrap" } ;
+{ $subsections
+    "layouts-types"
+    "layouts-tags"
+    "layouts-limits"
+    "layouts-bootstrap"
+} ;
 
 ABOUT: "layouts"

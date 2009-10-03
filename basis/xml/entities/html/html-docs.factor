@@ -5,8 +5,10 @@ IN: xml.entities.html
 
 ARTICLE: "xml.entities.html" "HTML entities"
 { $vocab-link "xml.entities.html" } " defines words for using entities defined in HTML/XHTML."
-{ $subsection html-entities }
-{ $subsection with-html-entities } ;
+{ $subsections
+    html-entities
+    with-html-entities
+} ;
 
 HELP: html-entities
 { $description "A hash table from HTML entity names to their character values." }

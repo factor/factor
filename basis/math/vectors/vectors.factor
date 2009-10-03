@@ -7,6 +7,7 @@ QUALIFIED-WITH: alien.c-types c
 IN: math.vectors
 
 GENERIC: element-type ( obj -- c-type )
+M: object element-type drop f ; inline
 
 : vneg ( u -- v ) [ neg ] map ;
 
@@ -52,7 +53,7 @@ PRIVATE>
 : fp-bitwise-op ( x y seq quot -- z )
     swap element-type {
         { c:double [ [ [ double>bits ] bi@ ] dip call bits>double ] }
-        { c:float [ [ [ float>bits ] bi@ ] dip call bits>float ] }
+        { c:float  [ [ [ float>bits ] bi@ ] dip call bits>float   ] }
         [ drop call ]
     } case ; inline
 
@@ -62,6 +63,9 @@ PRIVATE>
         { c:float  [ [ float>bits  ] dip call bits>float  ] }
         [ drop call ]
     } case ; inline
+
+: element>bool ( x seq -- ? )
+    element-type [ zero? not ] when ; inline
 
 : bitandn ( x y -- z ) [ bitnot ] dip bitand ; inline
 
@@ -87,21 +91,25 @@ PRIVATE>
 : hlshift ( u n -- w ) '[ _ <byte-array> prepend 16 head ] change-underlying ;
 : hrshift ( u n -- w ) '[ _ <byte-array> append 16 tail* ] change-underlying ;
 
-: vand ( u v -- w ) [ and ] 2map ;
-: vor  ( u v -- w ) [ or  ] 2map ;
-: vxor ( u v -- w ) [ xor ] 2map ;
-: vnot ( u -- w )   [ not ] map ;
+: vand ( u v -- w )  over '[ [ _ element>bool ] bi@ and ] 2map ;
+: vandn ( u v -- w ) over '[ [ _ element>bool ] bi@ [ not ] dip and ] 2map ;
+: vor  ( u v -- w )  over '[ [ _ element>bool ] bi@ or  ] 2map ;
+: vxor ( u v -- w )  over '[ [ _ element>bool ] bi@ xor ] 2map ;
+: vnot ( u -- w )    dup '[ _ element>bool not ] map ;
 
-: v<  ( u v -- w ) [ <   ] { } 2map-as ;
-: v<= ( u v -- w ) [ <=  ] { } 2map-as ;
-: v>= ( u v -- w ) [ >=  ] { } 2map-as ;
-: v>  ( u v -- w ) [ >   ] { } 2map-as ;
-: vunordered? ( u v -- w ) [ unordered? ] { } 2map-as ;
-: v=  ( u v -- w ) [ =   ] { } 2map-as ;
+: vall? ( v -- ? ) [ ] all? ;
+: vany? ( v -- ? ) [ ] any? ;
+: vnone? ( v -- ? ) [ not ] all? ;
 
-: v?   ( ? true false -- w ) [ ? ] pick 3map-as ;
+: v<  ( u v -- w ) [ <   ] 2map ;
+: v<= ( u v -- w ) [ <=  ] 2map ;
+: v>= ( u v -- w ) [ >=  ] 2map ;
+: v>  ( u v -- w ) [ >   ] 2map ;
+: vunordered? ( u v -- w ) [ unordered? ] 2map ;
+: v=  ( u v -- w ) [ =   ] 2map ;
 
-: vmask ( u ? -- u' ) swap dup dup vbitxor v? ;
+: v? ( mask true false -- w )
+    [ vand ] [ vandn ] bi-curry* bi vor ; inline
 
 : vfloor    ( u -- v ) [ floor ] map ;
 : vceiling  ( u -- v ) [ ceiling ] map ;

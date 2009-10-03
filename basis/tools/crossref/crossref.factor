@@ -50,7 +50,7 @@ M: callable uses ( quot -- assoc )
 
 M: word uses def>> uses ;
 
-M: link uses { $subsection $link $see-also } article-links ;
+M: link uses { $subsection $subsections $link $see-also } article-links ;
 
 M: pathname uses string>> source-file top-level-form>> [ uses ] [ { } ] if* ;
 

@@ -100,10 +100,12 @@ HELP: delete-random
 
 ARTICLE: "random-protocol" "Random protocol"
 "A random number generator must implement one of these two words:"
-{ $subsection random-32* }
-{ $subsection random-bytes* }
+{ $subsections
+    random-32*
+    random-bytes*
+}
 "Optional, to seed a random number generator:"
-{ $subsection seed-random } ;
+{ $subsections seed-random } ;
 
 ARTICLE: "random" "Generating random integers"
 "The " { $vocab-link "random" } " vocabulary contains a protocol for generating random or pseudorandom numbers."
@@ -111,23 +113,27 @@ $nl
 "The “Mersenne Twister” pseudorandom number generator algorithm is the default generator stored in " { $link random-generator } "."
 $nl
 "Generate a random object:"
-{ $subsection random }
+{ $subsections random }
 "Efficient 32-bit random numbers:"
-{ $subsection random-32 }
+{ $subsections random-32 }
 "Combinators to change the random number generator:"
-{ $subsection with-random }
-{ $subsection with-system-random }
-{ $subsection with-secure-random }
+{ $subsections
+    with-random
+    with-system-random
+    with-secure-random
+}
 "Implementation:"
-{ $subsection "random-protocol" }
+{ $subsections "random-protocol" }
 "Randomizing a sequence:"
-{ $subsection randomize }
+{ $subsections randomize }
 "Sampling a sequences:"
-{ $subsection sample }
+{ $subsections sample }
 "Deleting a random element from a sequence:"
-{ $subsection delete-random }
+{ $subsections delete-random }
 "Random numbers with " { $snippet "n" } " bits:"
-{ $subsection random-bits }
-{ $subsection random-bits* } ;
+{ $subsections
+    random-bits
+    random-bits*
+} ;
 
 ABOUT: "random"

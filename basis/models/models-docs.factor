@@ -119,29 +119,33 @@ ARTICLE: "models" "Models"
 "The " { $vocab-link "models" } " vocabulary provides basic support for dataflow programming. A model is an observable value. Changing a model's value notifies other objects which depend on the model automatically, and models may depend on each other's values."
 $nl
 "The class of models:"
-{ $subsection model }
+{ $subsections model }
 "Creating models:"
-{ $subsection <model> }
+{ $subsections <model> }
 "Adding and removing connections:"
-{ $subsection add-connection }
-{ $subsection remove-connection }
+{ $subsections
+    add-connection
+    remove-connection
+}
 "Generic word called on model connections when the model value changes:"
-{ $subsection model-changed }
+{ $subsections model-changed }
 "When using models which are not associated with controls (or when unit testing controls), you must activate and deactivate models manually:"
-{ $subsection activate-model }
-{ $subsection deactivate-model }
-{ $subsection "models-impl" }
-{ $subsection "models.arrow" }
-{ $subsection "models.product" }
-{ $subsection "models-range" }
-{ $subsection "models-delay" } ;
+{ $subsections
+    activate-model
+    deactivate-model
+    "models-impl"
+    "models.arrow"
+    "models.product"
+    "models-range"
+    "models-delay"
+} ;
 
 ARTICLE: "models-impl" "Implementing models"
 "New types of models can be defined, for example see " { $vocab-link "models.arrow" } "."
 $nl
 "Models can execute hooks when activated:"
-{ $subsection model-activated }
+{ $subsections model-activated }
 "Models can override requests to change their value, for example to perform validation:"
-{ $subsection set-model } ;
+{ $subsections set-model } ;
 
 ABOUT: "models"

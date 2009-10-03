@@ -13,7 +13,7 @@ Used under BSD license with permission from Paolo Bonzini and Bruno Haible,
 http://sourceforge.net/mailarchive/message.php?msg_name=200503102200.32002.bruno%40clisp.org
 
 Modified for Factor by Slava Pestov */
-#define FRAME_RETURN_ADDRESS(frame) *((void **)(frame_successor(frame) + 1) + 2)
+#define FRAME_RETURN_ADDRESS(frame,vm) *((void **)(vm->frame_successor(frame) + 1) + 2)
 
 #define MACH_EXC_STATE_TYPE ppc_exception_state_t
 #define MACH_EXC_STATE_FLAVOR PPC_EXCEPTION_STATE

@@ -601,12 +601,12 @@ ARTICLE: "alien.marshall" "C marshalling"
 "automatic marshalling and unmarshalling of C function arguments, return values, and output parameters."
 
 { $subheading "Important words" }
-"Wrap an alien:" { $subsection alien-wrapper }
-"Wrap a struct:" { $subsection struct-wrapper }
-"Get the marshaller for a C type:" { $subsection marshaller }
-"Get the unmarshaller for a C type:" { $subsection unmarshaller }
-"Get the unmarshaller for an output parameter:" { $subsection out-arg-unmarshaller }
-"Get the unmarshaller for a struct field:" { $subsection struct-field-unmarshaller }
+"Wrap an alien:" { $subsections alien-wrapper }
+"Wrap a struct:" { $subsections struct-wrapper }
+"Get the marshaller for a C type:" { $subsections marshaller }
+"Get the unmarshaller for a C type:" { $subsections unmarshaller }
+"Get the unmarshaller for an output parameter:" { $subsections out-arg-unmarshaller }
+"Get the unmarshaller for a struct field:" { $subsections struct-field-unmarshaller }
 $nl
 "Other marshalling and unmarshalling words in this vocabulary are not intended to be "
 "invoked directly."
@@ -614,22 +614,22 @@ $nl
 "Most marshalling words allow non false c-ptrs to pass through unchanged."
 
 { $subheading "Primitive marshallers" }
-{ $subsection marshall-primitive } "for marshalling primitive values."
-{ $subsection marshall-int* }
+{ $subsections marshall-primitive } "for marshalling primitive values."
+{ $subsections marshall-int* }
   "marshalls a number or sequence of numbers. If argument is a sequence, returns a pointer "
   "to a C array, otherwise returns a pointer to a single value."
-{ $subsection marshall-int** }
+{ $subsections marshall-int** }
 "marshalls a 1D or 2D array of numbers. Returns an array of pointers to arrays."
 
 { $subheading "Primitive unmarshallers" }
 { $snippet "unmarshall-<prim>*" } " and " { $snippet "unmarshall-<prim>*-free" }
 " for all values of " { $snippet "<prim>" } " in " { $link primitive-types } "."
-{ $subsection unmarshall-int* }
+{ $subsections unmarshall-int* }
 "unmarshalls a pointer to primitive. Returns a number. "
 "Assumes the pointer is not an array (if it is, only the first value is returned). "
 "C functions that return arrays are not handled correctly by " { $snippet "alien.marshall" }
 " and must be unmarshalled by hand."
-{ $subsection unmarshall-int*-free }
+{ $subsections unmarshall-int*-free }
 "unmarshalls a pointer to primitive, and then frees the pointer."
 $nl
 "Primitive values require no unmarshalling. The factor FFI already does this."

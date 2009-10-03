@@ -8,11 +8,15 @@ $nl
 "String buffers implement the " { $link "sequence-protocol" } " and thus all " { $link "sequences" } " can be used with them. String buffers can be used to construct new strings by accumilating substrings and characters, however usually they are only used indirectly, since the sequence construction words are more convenient to use in most cases (see " { $link "namespaces-make" } ")."
 $nl
 "String buffers form a class of objects:"
-{ $subsection sbuf }
-{ $subsection sbuf? }
+{ $subsections
+    sbuf
+    sbuf?
+}
 "Words for creating string buffers:"
-{ $subsection >sbuf }
-{ $subsection <sbuf> }
+{ $subsections
+    >sbuf
+    <sbuf>
+}
 "If you don't care about initial capacity, a more elegant way to create a new string buffer is to write:"
 { $code "SBUF\" \" clone" } ;
 

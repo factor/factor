@@ -9,18 +9,22 @@ $nl
 "This vocabulary provides a deque implementation which is persistent and purely functional: old versions of deques are not modified by operations. Instead, each push and pop operation creates a new deque based off the old one."
 $nl
 "The class of persistent deques:"
-{ $subsection deque }
+{ $subsections deque }
 "To create a deque:"
-{ $subsection <deque> }
-{ $subsection sequence>deque }
+{ $subsections
+    <deque>
+    sequence>deque
+}
 "To test if a deque is empty:"
-{ $subsection deque-empty? }
+{ $subsections deque-empty? }
 "To manipulate deques:"
-{ $subsection push-front }
-{ $subsection push-back }
-{ $subsection pop-front }
-{ $subsection pop-back }
-{ $subsection deque>sequence } ;
+{ $subsections
+    push-front
+    push-back
+    pop-front
+    pop-back
+    deque>sequence
+} ;
 
 HELP: deque
 { $class-description "This is the class of persistent (functional) double-ended queues. All deque operations can be done in O(1) amortized time for single-threaded access while maintaining the old version. For more information, see " { $link "persistent.deques" } "." } ;

@@ -474,13 +474,6 @@ M: x86 %double>single-float CVTSD2SS ;
 M: x86 %integer>float CVTSI2SD ;
 M: x86 %float>integer CVTTSD2SI ;
 
-M: x86 %unbox-float ( dst src -- )
-    float-offset [+] MOVSD ;
-
-M:: x86 %box-float ( dst src temp -- )
-    dst 16 float temp %allot
-    dst float-offset [+] src MOVSD ;
-
 : %cmov-float= ( dst src -- )
     [
         "no-move" define-label
@@ -561,16 +554,6 @@ M: x86 %compare-float-ordered-branch ( label src1 src2 cc -- )
 M: x86 %compare-float-unordered-branch ( label src1 src2 cc -- )
     \ UCOMISD (%compare-float-branch) ;
 
-M:: x86 %box-vector ( dst src rep temp -- )
-    dst rep rep-size 2 cells + byte-array temp %allot
-    16 tag-fixnum dst 1 byte-array tag-number %set-slot-imm
-    dst byte-array-offset [+]
-    src rep %copy ;
-
-M:: x86 %unbox-vector ( dst src rep -- )
-    dst src byte-array-offset [+]
-    rep %copy ;
-
 MACRO: available-reps ( alist -- )
     ! Each SSE version adds new representations and supports
     ! all old ones
@@ -587,6 +570,19 @@ M: x86 %zero-vector
     } case ;
 
 M: x86 %zero-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+M: x86 %fill-vector
+    {
+        { double-2-rep [ dup [ XORPD ] [ CMPEQPD ] 2bi ] }
+        { float-4-rep  [ dup [ XORPS ] [ CMPEQPS ] 2bi ] }
+        [ drop dup PCMPEQB ]
+    } case ;
+
+M: x86 %fill-vector-reps
     {
         { sse? { float-4-rep } }
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
@@ -723,6 +719,117 @@ M: x86 %shuffle-vector-reps
     {
         { sse? { float-4-rep } }
         { sse2? { double-2-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+:: compare-float-v-operands ( dst src1 src2 temp rep cc -- dst' src' rep cc' )
+    cc { cc> cc>= cc/> cc/>= } member?
+    [ dst src2 src1 rep two-operand rep cc swap-cc ]
+    [ dst src1 src2 rep two-operand rep cc         ] if ;
+: (%compare-float-vector) ( dst src rep double single -- )
+    [ double-2-rep eq? ] 2dip if ; inline
+: %compare-float-vector ( dst src1 src2 temp rep cc -- )
+    compare-float-v-operands {
+        { cc<    [ [ CMPLTPD    ] [ CMPLTPS    ] (%compare-float-vector) ] }
+        { cc<=   [ [ CMPLEPD    ] [ CMPLEPS    ] (%compare-float-vector) ] }
+        { cc=    [ [ CMPEQPD    ] [ CMPEQPS    ] (%compare-float-vector) ] }
+        { cc<>=  [ [ CMPORDPD   ] [ CMPORDPS   ] (%compare-float-vector) ] }
+        { cc/<   [ [ CMPNLTPD   ] [ CMPNLTPS   ] (%compare-float-vector) ] }
+        { cc/<=  [ [ CMPNLEPD   ] [ CMPNLEPS   ] (%compare-float-vector) ] }
+        { cc/=   [ [ CMPNEQPD   ] [ CMPNEQPS   ] (%compare-float-vector) ] }
+        { cc/<>= [ [ CMPUNORDPD ] [ CMPUNORDPS ] (%compare-float-vector) ] }
+    } case ;
+
+:: compare-int-v-operands ( dst src1 src2 temp rep cc -- not-dst/f cmp-dst src' rep cc' )
+    cc order-cc :> occ
+    occ {
+        { cc=  [ f   dst  src1 src2 rep two-operand rep cc= ] }
+        { cc/= [ dst temp src1 src2 rep two-operand rep cc= ] }
+        { cc<= [ dst temp src1 src2 rep two-operand rep cc> ] }
+        { cc<  [ f   dst  src2 src1 rep two-operand rep cc> ] }
+        { cc>  [ f   dst  src1 src2 rep two-operand rep cc> ] }
+        { cc>= [ dst temp src2 src1 rep two-operand rep cc> ] }
+    } case ;
+:: (%compare-int-vector) ( dst src rep int64 int32 int16 int8 -- )
+    rep unsign-rep :> rep'
+    dst src rep' {
+        { longlong-2-rep [ int64 call ] }
+        { int-4-rep      [ int32 call ] }
+        { short-8-rep    [ int16 call ] }
+        { char-16-rep    [ int8  call ] }
+    } case ; inline
+:: %compare-int-vector ( dst src1 src2 temp rep cc -- )
+    dst src1 src2 temp rep cc compare-int-v-operands :> cc' :> rep :> src' :> cmp-dst :> not-dst
+    cmp-dst src' rep cc' {
+        { cc= [ [ PCMPEQQ ] [ PCMPEQD ] [ PCMPEQW ] [ PCMPEQB ] (%compare-int-vector) ] }
+        { cc> [ [ PCMPGTQ ] [ PCMPGTD ] [ PCMPGTW ] [ PCMPGTB ] (%compare-int-vector) ] }
+    } case
+    not-dst [ cmp-dst rep %not-vector ] when* ;
+
+M: x86 %compare-vector ( dst src1 src2 temp rep cc -- )
+    over float-vector-rep?
+    [ %compare-float-vector ]
+    [ %compare-int-vector ] if ;
+
+: %compare-vector-eq-reps ( -- reps )
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
+        { sse4.1? { longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+: %compare-vector-unord-reps ( -- reps )
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep } }
+    } available-reps ;
+: %compare-vector-ord-reps ( -- reps )
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep short-8-rep int-4-rep } }
+        { sse4.1? { longlong-2-rep } }
+    } available-reps ;
+
+M: x86 %compare-vector-reps
+    {
+        { [ dup { cc= cc/= } memq? ] [ drop %compare-vector-eq-reps ] }
+        { [ dup { cc<>= cc/<>= } memq? ] [ drop %compare-vector-unord-reps ] }
+        [ drop %compare-vector-ord-reps ]
+    } cond ;
+
+:: %test-vector-mask ( dst temp mask vcc -- )
+    vcc {
+        { vcc-any    [ dst dst TEST dst temp \ CMOVNE %boolean ] }
+        { vcc-none   [ dst dst TEST dst temp \ CMOVE  %boolean ] }
+        { vcc-all    [ dst mask CMP dst temp \ CMOVE  %boolean ] }
+        { vcc-notall [ dst mask CMP dst temp \ CMOVNE %boolean ] }
+    } case ;
+
+: %move-vector-mask ( dst src rep -- mask )
+    {
+        { double-2-rep [ MOVMSKPD HEX: 3 ] }
+        { float-4-rep  [ MOVMSKPS HEX: f ] }
+        [ drop PMOVMSKB HEX: ffff ]
+    } case ;
+
+M:: x86 %test-vector ( dst src temp rep vcc -- )
+    dst src rep %move-vector-mask :> mask
+    dst temp mask vcc %test-vector-mask ;
+
+:: %test-vector-mask-branch ( label temp mask vcc -- )
+    vcc {
+        { vcc-any    [ temp temp TEST label JNE ] }
+        { vcc-none   [ temp temp TEST label JE ] }
+        { vcc-all    [ temp mask CMP label JE ] }
+        { vcc-notall [ temp mask CMP label JNE ] }
+    } case ;
+
+M:: x86 %test-vector-branch ( label src temp rep vcc -- )
+    temp src rep %move-vector-mask :> mask
+    label temp mask vcc %test-vector-mask-branch ;
+
+M: x86 %test-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
 M: x86 %add-vector ( dst src1 src2 rep -- )
@@ -1006,6 +1113,16 @@ M: x86 %xor-vector ( dst src1 src2 rep -- )
     } case ;
 
 M: x86 %xor-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+M:: x86 %not-vector ( dst src rep -- )
+    dst rep %fill-vector
+    dst dst src rep %xor-vector ;
+
+M: x86 %not-vector-reps
     {
         { sse? { float-4-rep } }
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }

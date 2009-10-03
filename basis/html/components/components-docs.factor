@@ -41,10 +41,12 @@ HELP: link-href
 
 ARTICLE: "html.components.links" "Link components"
 "Link components render a link to an object."
-{ $subsection link }
+{ $subsections link }
 "The link title and URL are determined by passing the object to a pair of generic words:"
-{ $subsection link-title }
-{ $subsection link-href }
+{ $subsections
+    link-title
+    link-href
+}
 "The generic words provide methods on the " { $link string } " and " { $link url } " classes which treat the object as a URL. New methods can be defined for rendering links to custom data types." ;
 
 HELP: comparison
@@ -82,28 +84,32 @@ $nl
 "Most web applications can use the " { $vocab-link "html.templates.chloe" } " templating framework instead of using this vocabulary directly. Where maximum flexibility is required, this vocabulary can be used together with the " { $vocab-link "html.templates.fhtml" } " templating framework."
 $nl
 "Rendering components:"
-{ $subsection render }
+{ $subsections render }
 "Components render a named value, and the name of the value is passed in every time the component is rendered, rather than being associated with the component itself. Named values are taken from the current HTML form (see " { $link "html.forms" } ")."
 $nl
 "Component come in two varieties: singletons and tuples. Components with no configuration are singletons; they do not have to instantiated, rather the class word represents the component. Tuple components have to be instantiated and offer configuration options."
 $nl
 "Singleton components:"
-{ $subsection hidden }
-{ $subsection link }
-{ $subsection inspector }
-{ $subsection comparison }
-{ $subsection html }
-{ $subsection xml }
+{ $subsections
+    hidden
+    link
+    inspector
+    comparison
+    html
+    xml
+}
 "Tuple components:"
-{ $subsection field }
-{ $subsection password }
-{ $subsection textarea }
-{ $subsection choice }
-{ $subsection checkbox }
-{ $subsection code }
-{ $subsection farkup }
+{ $subsections
+    field
+    password
+    textarea
+    choice
+    checkbox
+    code
+    farkup
+}
 "Creating custom components:"
-{ $subsection render* }
+{ $subsections render* }
 "Custom components can emit HTML using the " { $vocab-link "xml.syntax" } " vocabulary." ;
 
 ABOUT: "html.components"

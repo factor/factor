@@ -118,7 +118,7 @@ bool factor_vm::save_image(const vm_char *filename)
 	return ok;
 }
 
-inline void factor_vm::primitive_save_image()
+void factor_vm::primitive_save_image()
 {
 	/* do a full GC to push everything into tenured space */
 	gc();
@@ -128,9 +128,7 @@ inline void factor_vm::primitive_save_image()
 	save_image((vm_char *)(path.untagged() + 1));
 }
 
-PRIMITIVE_FORWARD(save_image)
-
-inline void factor_vm::primitive_save_image_and_exit()
+void factor_vm::primitive_save_image_and_exit()
 {
 	/* We unbox this before doing anything else. This is the only point
 	where we might throw an error, so we have to throw an error here since
@@ -145,9 +143,7 @@ inline void factor_vm::primitive_save_image_and_exit()
 	}
 
 	/* do a full GC + code heap compaction */
-	performing_compaction = true;
 	compact_code_heap();
-	performing_compaction = false;
 
 	/* Save the image */
 	if(save_image((vm_char *)(path.untagged() + 1)))
@@ -155,8 +151,6 @@ inline void factor_vm::primitive_save_image_and_exit()
 	else
 		exit(1);
 }
-
-PRIMITIVE_FORWARD(save_image_and_exit)
 
 void factor_vm::data_fixup(cell *cell)
 {
@@ -167,15 +161,10 @@ void factor_vm::data_fixup(cell *cell)
 	*cell += (tenured->start - data_relocation_base);
 }
 
-void data_fixup(cell *cell, factor_vm *myvm)
+template<typename Type> void factor_vm::code_fixup(Type **handle)
 {
-	return myvm->data_fixup(cell);
-}
-
-template <typename TYPE> void factor_vm::code_fixup(TYPE **handle)
-{
-	TYPE *ptr = *handle;
-	TYPE *new_ptr = (TYPE *)(((cell)ptr) + (code->seg->start - code_relocation_base));
+	Type *ptr = *handle;
+	Type *new_ptr = (Type *)(((cell)ptr) + (code->seg->start - code_relocation_base));
 	*handle = new_ptr;
 }
 
@@ -204,21 +193,33 @@ void factor_vm::fixup_alien(alien *d)
 	d->expired = T;
 }
 
-void factor_vm::fixup_stack_frame(stack_frame *frame)
-{
-	code_fixup(&frame->xt);
-	code_fixup(&FRAME_RETURN_ADDRESS(frame));
-}
+struct stack_frame_fixupper {
+	factor_vm *myvm;
 
-void fixup_stack_frame(stack_frame *frame, factor_vm *myvm)
-{
-	return myvm->fixup_stack_frame(frame);
-}
+	explicit stack_frame_fixupper(factor_vm *myvm_) : myvm(myvm_) {}
+	void operator()(stack_frame *frame)
+	{
+		myvm->code_fixup(&frame->xt);
+		myvm->code_fixup(&FRAME_RETURN_ADDRESS(frame,myvm));
+	}
+};
 
 void factor_vm::fixup_callstack_object(callstack *stack)
 {
-	iterate_callstack_object(stack,factor::fixup_stack_frame);
+	stack_frame_fixupper fixupper(this);
+	iterate_callstack_object(stack,fixupper);
 }
+
+struct object_fixupper {
+	factor_vm *myvm;
+
+	explicit object_fixupper(factor_vm *myvm_) : myvm(myvm_) { }
+
+	void operator()(cell *scan)
+	{
+		myvm->data_fixup(scan);
+	}
+};
 
 /* Initialize an object in a newly-loaded image */
 void factor_vm::relocate_object(object *object)
@@ -241,7 +242,8 @@ void factor_vm::relocate_object(object *object)
 	}
 	else
 	{
-		do_slots((cell)object,factor::data_fixup);
+		object_fixupper fixupper(this);
+		do_slots((cell)object,fixupper);
 
 		switch(hi_tag)
 		{
@@ -300,14 +302,21 @@ void factor_vm::fixup_code_block(code_block *compiled)
 	relocate_code_block(compiled);
 }
 
-void fixup_code_block(code_block *compiled, factor_vm *myvm)
-{
-	return myvm->fixup_code_block(compiled);
-}
+struct code_block_fixupper {
+	factor_vm *myvm;
+
+	code_block_fixupper(factor_vm *myvm_) : myvm(myvm_) { }
+
+	void operator()(code_block *compiled)
+	{
+		myvm->fixup_code_block(compiled);
+	}
+};
 
 void factor_vm::relocate_code()
 {
-	iterate_code_heap(factor::fixup_code_block);
+	code_block_fixupper fixupper(this);
+	iterate_code_heap(fixupper);
 }
 
 /* Read an image file from disk, only done once during startup */

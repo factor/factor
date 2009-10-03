@@ -4,34 +4,44 @@ math.parser math words.symbol assocs ;
 IN: namespaces
 
 ARTICLE: "namespaces-combinators" "Namespace combinators"
-{ $subsection make-assoc }
-{ $subsection with-scope }
-{ $subsection with-variable }
-{ $subsection bind } ;
+{ $subsections
+    make-assoc
+    with-scope
+    with-variable
+    bind
+} ;
 
 ARTICLE: "namespaces-change" "Changing variable values"
-{ $subsection on }
-{ $subsection off }
-{ $subsection inc }
-{ $subsection dec }
-{ $subsection change }
-{ $subsection change-global } ;
+{ $subsections
+    on
+    off
+    inc
+    dec
+    change
+    change-global
+} ;
 
 ARTICLE: "namespaces-global" "Global variables"
-{ $subsection namespace }
-{ $subsection global }
-{ $subsection get-global }
-{ $subsection set-global }
-{ $subsection initialize } ;
+{ $subsections
+    namespace
+    global
+    get-global
+    set-global
+    initialize
+} ;
 
 ARTICLE: "namespaces.private" "Namespace implementation details"
 "The namestack holds namespaces."
-{ $subsection namestack }
-{ $subsection set-namestack }
-{ $subsection namespace }
+{ $subsections
+    namestack
+    set-namestack
+    namespace
+}
 "A pair of words push and pop namespaces on the namestack."
-{ $subsection >n }
-{ $subsection ndrop } ;
+{ $subsections
+    >n
+    ndrop
+} ;
 
 ARTICLE: "namespaces" "Dynamic variables and namespaces"
 "The " { $vocab-link "namespaces" } " vocabulary implements simple dynamically-scoped variables."
@@ -39,13 +49,17 @@ $nl
 "A variable is an entry in an assoc of bindings, where the assoc is implicit rather than passed on the stack. These assocs are termed " { $emphasis "namespaces" } ". Nesting of scopes is implemented with a search order on namespaces, defined by a " { $emphasis "namestack" } ". Since namespaces are just assoc, any object can be used as a variable, however by convention, variables are keyed by symbols (see " { $link "words.symbol" } ")."
 $nl
 "The " { $link get } " and " { $link set } " words read and write variable values. The " { $link get } " word searches up the chain of nested namespaces, while " { $link set } " always sets variable values in the current namespace only. Namespaces are dynamically scoped; when a quotation is called from a nested scope, any words called by the quotation also execute in that scope."
-{ $subsection get }
-{ $subsection set }
+{ $subsections
+    get
+    set
+}
 "Various utility words abstract away common variable access patterns:"
-{ $subsection "namespaces-change" }
-{ $subsection "namespaces-combinators" }
+{ $subsections
+    "namespaces-change"
+    "namespaces-combinators"
+}
 "Implementation details your code probably does not care about:"
-{ $subsection "namespaces.private" }
+{ $subsections "namespaces.private" }
 "An alternative to dynamic scope is lexical scope. Lexically-scoped values and closures are implemented in the " { $vocab-link "locals" } " vocabulary." ;
 
 ABOUT: "namespaces"

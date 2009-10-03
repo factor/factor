@@ -29,9 +29,9 @@ FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe);
 typedef HANDLE THREADHANDLE;
 
 THREADHANDLE start_thread(void *(*start_routine)(void *),void *args);
+inline static THREADHANDLE thread_id() { return GetCurrentThread(); }
 
 void init_platform_globals();
-struct factor_vm;
 void register_vm_with_thread(factor_vm *vm);
 factor_vm *tls_vm();
 

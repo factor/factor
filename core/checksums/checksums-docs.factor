@@ -58,18 +58,22 @@ ARTICLE: "checksums" "Checksums"
 "A " { $emphasis "checksum" } " is a function mapping sequences of bytes to fixed-length strings. While checksums are not one-to-one, a good checksum should have a low probability of collision. Additionally, some checksum algorithms are designed to be hard to reverse, in the sense that finding an input string which hashes to a given checksum string requires a brute-force search."
 $nl
 "Checksums are instances of a class:"
-{ $subsection checksum }
+{ $subsections checksum }
 "Operations on checksums:"
-{ $subsection checksum-bytes }
-{ $subsection checksum-stream }
-{ $subsection checksum-lines }
+{ $subsections
+    checksum-bytes
+    checksum-stream
+    checksum-lines
+}
 "Checksums should implement at least one of " { $link checksum-bytes } " and " { $link checksum-stream } ". Implementing " { $link checksum-lines } " is optional."
 $nl
 "Utilities:"
-{ $subsection checksum-file }
-{ $subsection hex-string }
+{ $subsections
+    checksum-file
+    hex-string
+}
 "Checksum implementations:"
-{ $subsection "checksums.crc32" }
+{ $subsections "checksums.crc32" }
 { $vocab-subsection "MD5 checksum" "checksums.md5" }
 { $vocab-subsection "SHA checksums" "checksums.sha" }
 { $vocab-subsection "Adler-32 checksum" "checksums.adler-32" }

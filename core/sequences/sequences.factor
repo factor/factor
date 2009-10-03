@@ -432,8 +432,11 @@ PRIVATE>
 : change-each ( seq quot -- )
     over map-into ; inline
 
+: accumulate-as ( seq identity quot exemplar -- final newseq )
+    [ [ swap ] dip [ curry keep ] curry ] dip map-as ; inline
+
 : accumulate ( seq identity quot -- final newseq )
-    swapd [ [ call ] [ 2drop ] 3bi ] curry { } map-as ; inline
+    { } accumulate-as ; inline
 
 : 2each ( seq1 seq2 quot -- )
     (2each) each-integer ; inline

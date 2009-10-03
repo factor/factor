@@ -19,12 +19,14 @@ HELP: with-timeout
 
 ARTICLE: "io.timeouts" "I/O timeout protocol"
 "Streams, processes and monitors support optional timeouts, which impose an upper bound on the length of time for which an operation on these objects can block. Timeouts are used in network servers to prevent malicious clients from holding onto connections forever, and to ensure that runaway processes get killed."
-{ $subsection timeout }
-{ $subsection set-timeout }
+{ $subsections
+    timeout
+    set-timeout
+}
 "The I/O timeout protocol can be implemented by any class wishing to support timeouts on blocking operations."
-{ $subsection cancel-operation }
+{ $subsections cancel-operation }
 "A combinator to be used in operations which can time out:"
-{ $subsection with-timeout }
+{ $subsections with-timeout }
 { $see-also "stream-protocol" "io.launcher" "io.monitors" } ;
 
 ABOUT: "io.timeouts"

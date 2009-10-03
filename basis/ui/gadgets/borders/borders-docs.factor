@@ -10,7 +10,9 @@ HELP: <border>
 
 ARTICLE: "ui.gadgets.borders" "Border gadgets"
 "The " { $vocab-link "ui.gadgets.borders" } " vocabulary implements border gadgets, which add empty space around a child gadget."
-{ $subsection border }
-{ $subsection <border> } ;
+{ $subsections
+    border
+    <border>
+} ;
 
 ABOUT: "ui.gadgets.borders"

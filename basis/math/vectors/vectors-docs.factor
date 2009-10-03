@@ -3,82 +3,184 @@ IN: math.vectors
 
 ARTICLE: "math-vectors-arithmetic" "Vector arithmetic"
 "Vector/vector binary operations:"
-{ $subsection v+ }
-{ $subsection v- }
-{ $subsection v+- }
-{ $subsection v* }
-{ $subsection v/ }
+{ $subsections
+    v+
+    v-
+    v+-
+    v*
+    v/
+}
 "Vector unary operations:"
-{ $subsection vneg }
-{ $subsection vabs }
-{ $subsection vsqrt }
-{ $subsection vfloor }
-{ $subsection vceiling }
-{ $subsection vtruncate }
+{ $subsections
+    vneg
+    vabs
+    vsqrt
+    vfloor
+    vceiling
+    vtruncate
+}
 "Vector/scalar and scalar/vector binary operations:"
-{ $subsection vneg }
-{ $subsection v*n }
-{ $subsection n*v }
-{ $subsection v/n }
-{ $subsection n/v }
-{ $subsection v+n }
-{ $subsection n+v }
-{ $subsection v-n }
-{ $subsection n-v }
+{ $subsections
+    vneg
+    v*n
+    n*v
+    v/n
+    n/v
+    v+n
+    n+v
+    v-n
+    n-v
+}
 "Saturated arithmetic (only on " { $link "specialized-arrays" } "):"
-{ $subsection vs+ }
-{ $subsection vs- }
-{ $subsection vs* }
+{ $subsections
+    vs+
+    vs-
+    vs*
+}
 "Inner product and norm:"
-{ $subsection v. }
-{ $subsection norm }
-{ $subsection norm-sq }
-{ $subsection normalize }
+{ $subsections
+    v.
+    norm
+    norm-sq
+    normalize
+}
 "Comparing entire vectors:"
-{ $subsection distance }
-{ $subsection v~ } ;
+{ $subsections
+    distance
+    v~
+} ;
 
-ARTICLE: "math-vectors-logic" "Vector componentwise logic"
+ARTICLE: "math-vectors-shuffle" "Vector shuffling, packing, and unpacking"
+{ $notes
+"These operations are primarily meant to be used with " { $vocab-link "math.vectors.simd" } " types. The software fallbacks for types not supported by hardware will not perform well."
+}
+$nl
+{ $subsection vshuffle }
+{ $subsection vbroadcast }
+{ $subsection hlshift } 
+{ $subsection hrshift } ;
+
+ARTICLE: "math-vectors-logic" "Vector component- and bit-wise logic"
+{ $notes
+"See " { $link "math-vectors-simd-logic" } " for notes about using comparison and logical operations with SIMD vector types."
+}
+$nl
 "Element comparisons:"
-{ $subsection v< }
-{ $subsection v<= }
-{ $subsection v= }
-{ $subsection v>= }
-{ $subsection v> }
-{ $subsection vunordered? }
-{ $subsection vmax }
-{ $subsection vmin }
-{ $subsection vsupremum }
-{ $subsection vinfimum }
+{ $subsections
+    v<
+    v<=
+    v=
+    v>=
+    v>
+    vunordered?
+    vmax
+    vmin
+    vsupremum
+    vinfimum
+}
 "Bitwise operations:"
-{ $subsection vbitand }
-{ $subsection vbitandn }
-{ $subsection vbitor }
-{ $subsection vbitxor }
-{ $subsection vlshift }
-{ $subsection vrshift }
+{ $subsections
+    vbitand
+    vbitandn
+    vbitor
+    vbitxor
+    vbitnot
+    vlshift
+    vrshift
+}
 "Element logical operations:"
-{ $subsection vand }
-{ $subsection vor }
-{ $subsection vxor }
-{ $subsection vmask }
-{ $subsection v? }
+{ $subsections
+    vand
+    vandn
+    vor
+    vxor
+    vnot
+    v?
+}
+"Entire vector tests:"
+{ $subsections
+    vall?
+    vany?
+    vnone?
+}
 "Element shuffling:"
-{ $subsection vshuffle } ;
+{ $subsections vshuffle } ;
 
 ARTICLE: "math-vectors-misc" "Miscellaneous vector functions"
-{ $subsection trilerp }
-{ $subsection bilerp }
-{ $subsection vlerp }
-{ $subsection vnlerp }
-{ $subsection vbilerp } ;
+{ $subsections
+    trilerp
+    bilerp
+    vlerp
+    vnlerp
+    vbilerp
+} ;
 
+ARTICLE: "math-vectors-simd-logic" "Componentwise logic with SIMD vectors"
+"Processor SIMD units supported by the " { $vocab-link "math.vectors.simd" } " vocabulary represent boolean values as bitmasks, where a true result's binary representation is all ones and a false representation is all zeroes. This is the format in which results from comparison words such as " { $link v= } " return their results and in which logic and test words such as " { $link vand } " and " { $link vall? } " take their inputs when working with SIMD types. For a float vector, false will manifest itself as " { $snippet "0.0" } " and true as a " { $link POSTPONE: NAN: } " literal with a string of set bits in its payload:"
+{ $example
+"""USING: math.vectors math.vectors.simd prettyprint ;
+FROM: alien.c-types => float ;
+SIMD: float
+
+float-4{ 1.0 2.0 3.0 0/0. } float-4{ 1.0 -2.0 3.0 0/0. } v= ."""
+"""float-4{ NAN: fffffe0000000 0.0 NAN: fffffe0000000 0.0 }"""
+}
+"For an integer vector, false will manifest as " { $snippet "0" } " and true as " { $snippet "-1" } " (for signed vectors) or the largest representable value of the element type (for unsigned vectors):"
+{ $example
+"""USING: math.vectors math.vectors.simd prettyprint alien.c-types ;
+SIMD: int
+SIMD: uchar
+
+int-4{ 1 2 3 0 } int-4{ 1 -2 3 4 } v=
+uchar-16{  0  1  2  3  4  5 6 7 8 9 10 11 12 13 14 15 }
+uchar-16{ 15 14 13 12 11 10 9 8 7 6  5  4  3  2  1  0 } v<
+[ . ] bi@"""
+"""int-4{ -1 0 -1 0 }
+uchar-16{ 255 255 255 255 255 255 255 255 0 0 0 0 0 0 0 0 }"""
+}
+"This differs from Factor's native representation of boolean values, where " { $link f } " is false and every other value (including " { $snippet "0" } " and " { $snippet "0.0" } ") is true. To make it easy to construct literal SIMD masks, " { $link t } " and " { $link f } " are accepted inside SIMD literal syntax and expand to the proper true or false representation for the underlying type:"
+{ $example
+"""USING: math.vectors math.vectors.simd prettyprint alien.c-types ;
+SIMD: int
+
+int-4{ f f t f } ."""
+"""int-4{ 0 0 -1 0 }""" }
+"However, extracting an element from a boolean SIMD vector with " { $link nth } " will not yield a valid Factor boolean. This is not generally a problem, since the results of vector comparisons are meant to be consumed by subsequent vector logical and test operations, which will accept SIMD values in the native boolean format."
+$nl
+"Providing a SIMD boolean vector with element values other than the proper true and false representations as an input to the vector logical or test operations is undefined. Do not count on operations such as " { $link vall? } " or " { $link v? } " using bitwise operations to construct their results."
+$nl
+"This applies to the output of the following element comparison words: "
+{ $list
+{ $link v< }
+{ $link v<= }
+{ $link v= }
+{ $link v>= }
+{ $link v> }
+{ $link vunordered? }
+}
+"This likewise applies to the " { $snippet "mask" } " argument of " { $link v? } " and to the inputs and outputs of the following element logic words:"
+{ $list
+{ $link vand }
+{ $link vandn }
+{ $link vor }
+{ $link vxor }
+{ $link vnot }
+}
+"Finally, this applies to the inputs of these vector test words:"
+{ $list
+{ $link vall? }
+{ $link vany? }
+{ $link vnone? }
+} ;
 
 ARTICLE: "math-vectors" "Vector operations"
 "Any Factor sequence can be used to represent a mathematical vector, however for best performance, the sequences defined by the " { $vocab-link "specialized-arrays" } " and " { $vocab-link "math.vectors.simd" } " vocabularies should be used."
-{ $subsection "math-vectors-arithmetic" }
-{ $subsection "math-vectors-logic" }
-{ $subsection "math-vectors-misc" } ;
+{ $subsections
+    "math-vectors-arithmetic"
+    "math-vectors-logic"
+    "math-vectors-shuffle"
+    "math-vectors-misc"
+} ;
 
 ABOUT: "math-vectors"
 
@@ -247,11 +349,11 @@ HELP: vrshift
 
 HELP: hlshift
 { $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "w" "a SIMD array" } }
-{ $description "Shifts the entire SIMD array to the left by " { $snippet "n" } " bytes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
+{ $description "Shifts the entire SIMD array to the left by " { $snippet "n" } " bytes, filling the vacated right-hand bits with zeroes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
 
 HELP: hrshift
 { $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "w" "a SIMD array" } }
-{ $description "Shifts the entire SIMD array to the right by " { $snippet "n" } " bytes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
+{ $description "Shifts the entire SIMD array to the right by " { $snippet "n" } " bytes, filling the vacated left-hand bits with zeroes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
 
 HELP: vbroadcast
 { $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "v" "a SIMD array" } }
@@ -300,51 +402,78 @@ HELP: set-axis
 
 HELP: v<
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
-{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when the former is less than the latter or " { $link f } " otherwise." } ;
+{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when the former is less than the latter or " { $link f } " otherwise." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean results when using SIMD types." } ;
 
 HELP: v<=
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
-{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when the former is less than or equal to the latter or " { $link f } " otherwise." } ;
+{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when the former is less than or equal to the latter or " { $link f } " otherwise." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean results when using SIMD types." } ;
 
 HELP: v=
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
-{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when they are equal or " { $link f } " otherwise." } ;
+{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when they are equal or " { $link f } " otherwise." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean results when using SIMD types." } ;
 
 HELP: v>
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
-{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when the former is greater than the latter or " { $link f } " otherwise." } ;
+{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when the former is greater than the latter or " { $link f } " otherwise." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean results when using SIMD types." } ;
 
 HELP: v>=
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
-{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when the former is greater than or equal to the latter or " { $link f } " otherwise." } ;
+{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when the former is greater than or equal to the latter or " { $link f } " otherwise." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean results when using SIMD types." } ;
 
 HELP: vunordered?
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
-{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when either value is Not-a-Number or " { $link f } " otherwise." } ;
+{ $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when either value is Not-a-Number or " { $link f } " otherwise." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean results when using SIMD types." } ;
 
 HELP: vand
 { $values { "u" "a sequence of booleans" } { "v" "a sequence of booleans" } { "w" "a sequence of booleans" } }
-{ $description "Takes the logical AND of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } "." } ;
+{ $description "Takes the logical AND of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } "." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
+
+HELP: vandn
+{ $values { "u" "a sequence of booleans" } { "v" "a sequence of booleans" } { "w" "a sequence of booleans" } }
+{ $description "Takes the logical AND-NOT of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", where " { $snippet "x AND-NOT y" } " is defined as " { $snippet "NOT(x) AND y" } "." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: vor
 { $values { "u" "a sequence of booleans" } { "v" "a sequence of booleans" } { "w" "a sequence of booleans" } }
-{ $description "Takes the logical OR of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } "." } ;
+{ $description "Takes the logical OR of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } "." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: vxor
 { $values { "u" "a sequence of booleans" } { "v" "a sequence of booleans" } { "w" "a sequence of booleans" } }
-{ $description "Takes the logical XOR of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } "." } ;
+{ $description "Takes the logical XOR of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } "." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: vnot
 { $values { "u" "a sequence of booleans" } { "w" "a sequence of booleans" } }
-{ $description "Takes the logical NOT of each element of " { $snippet "u" } "." } ;
-
-HELP: vmask
-{ $values { "u" "a sequence of numbers" } { "?" "a sequence of booleans" } { "u'" "a sequence of numbers" } }
-{ $description "Returns a copy of " { $snippet "u" } " with the elements for which the corresponding element of " { $snippet "?" } " is false replaced by zero." } ;
+{ $description "Takes the logical NOT of each element of " { $snippet "u" } "." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: v?
-{ $values { "?" "a sequence of booleans" } { "true" "a sequence of numbers" } { "false" "a sequence of numbers" } { "w" "a sequence of numbers" } }
-{ $description "Creates a new sequence by selecting elements from the " { $snippet "true" } " and " { $snippet "false" } " sequences based on whether the corresponding element of the " { $snippet "?" } " sequence is true or false." } ;
+{ $values { "mask" "a sequence of booleans" } { "true" "a sequence of numbers" } { "false" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $description "Creates a new sequence by selecting elements from the " { $snippet "true" } " and " { $snippet "false" } " sequences based on whether the corresponding bits of the " { $snippet "mask" } " sequence are set or not." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
+
+HELP: vany?
+{ $values { "v" "a sequence of booleans" } { "?" "a boolean" } }
+{ $description "Returns true if any element of " { $snippet "v" } " is true." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs when using SIMD types." } ;
+
+HELP: vall?
+{ $values { "v" "a sequence of booleans" } { "?" "a boolean" } }
+{ $description "Returns true if every element of " { $snippet "v" } " is true." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs when using SIMD types." } ;
+
+HELP: vnone?
+{ $values { "v" "a sequence of booleans" } { "?" "a boolean" } }
+{ $description "Returns true if every element of " { $snippet "v" } " is false." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs when using SIMD types." } ;
 
 { 2map v+ v- v* v/ } related-words
 
@@ -352,6 +481,6 @@ HELP: v?
 
 { vs+ vs- vs* } related-words
 
-{ v< v<= v= v> v>= vunordered? vand vor vxor vnot vmask v? } related-words
+{ v< v<= v= v> v>= vunordered? vand vor vxor vnot vany? vall? vnone? v? } related-words
 
 { vbitand vbitandn vbitor vbitxor vbitnot } related-words

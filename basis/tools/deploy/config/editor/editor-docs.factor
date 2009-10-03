@@ -4,12 +4,14 @@ IN: tools.deploy.config.editor
 
 ARTICLE: "deploy-config" "Deployment configuration"
 "The deployment configuration is a key/value mapping stored in the " { $snippet "deploy.factor" } " file in the vocabulary's directory. If this file does not exist, the default deployment configuration is used:"
-{ $subsection default-config }
+{ $subsections default-config }
 "The deployment configuration can be read and written with a pair of words:"
-{ $subsection deploy-config }
-{ $subsection set-deploy-config }
+{ $subsections
+    deploy-config
+    set-deploy-config
+}
 "A utility word is provided to load the configuration, change a flag, and store it back to disk:"
-{ $subsection set-deploy-flag }
+{ $subsections set-deploy-flag }
 "The " { $link "ui.tools.deploy" } " provides a graphical way of editing the configuration." ;
 
 HELP: deploy-config

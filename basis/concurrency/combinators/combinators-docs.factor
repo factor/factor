@@ -30,14 +30,18 @@ ARTICLE: "concurrency.combinators" "Concurrent combinators"
 "The " { $vocab-link "concurrency.combinators" } " vocabulary provides concurrent variants of various combinators."
 $nl
 "Concurrent sequence combinators:"
-{ $subsection parallel-each }
-{ $subsection 2parallel-each }
-{ $subsection parallel-map }
-{ $subsection 2parallel-map }
-{ $subsection parallel-filter }
+{ $subsections
+    parallel-each
+    2parallel-each
+    parallel-map
+    2parallel-map
+    parallel-filter
+}
 "Concurrent cleave combinators:"
-{ $subsection parallel-cleave }
-{ $subsection parallel-spread }
-{ $subsection parallel-napply } ;
+{ $subsections
+    parallel-cleave
+    parallel-spread
+    parallel-napply
+} ;
 
 ABOUT: "concurrency.combinators"

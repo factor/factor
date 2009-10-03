@@ -13,13 +13,17 @@ $nl
 "Since strings implement the " { $link "sequence-protocol" } ", basic string manipulation can be performed with " { $link "sequences" } " in the " { $vocab-link "sequences" } " vocabulary. More text processing functionality can be found in vocabularies carrying the " { $link T{ vocab-tag { name "text" } } } " tag."
 $nl
 "Strings form a class:"
-{ $subsection string }
-{ $subsection string? }
+{ $subsections
+    string
+    string?
+}
 "Creating new strings:"
-{ $subsection >string }
-{ $subsection <string> }
+{ $subsections
+    >string
+    <string>
+}
 "Creating a string from a single character:"
-{ $subsection 1string } ;
+{ $subsections 1string } ;
 
 ABOUT: "strings"
 

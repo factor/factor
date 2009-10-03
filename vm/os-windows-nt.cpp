@@ -23,7 +23,9 @@ void register_vm_with_thread(factor_vm *vm)
 
 factor_vm *tls_vm()
 {
-	return (factor_vm*)TlsGetValue(dwTlsIndex);
+	factor_vm *vm = (factor_vm*)TlsGetValue(dwTlsIndex);
+	assert(vm != NULL);
+	return vm;
 }
 
 s64 current_micros()

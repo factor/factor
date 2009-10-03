@@ -30,7 +30,9 @@ HELP: <product>
 
 ARTICLE: "models.product" "Product models"
 "Product model values are computed by collecting the values from a sequence of underlying models into a new sequence."
-{ $subsection product }
-{ $subsection <product> } ;
+{ $subsections
+    product
+    <product>
+} ;
 
 ABOUT: "models.product"

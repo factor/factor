@@ -80,12 +80,14 @@ ARTICLE: "specialized-arrays" "Specialized arrays"
 "The " { $vocab-link "specialized-arrays" } " vocabulary implements fixed-length sequence types for storing machine values in a space-efficient manner without boxing."
 $nl
 "A specialized array type needs to be generated for each element type. This is done with a parsing word:"
-{ $subsection POSTPONE: SPECIALIZED-ARRAY: }
+{ $subsections POSTPONE: SPECIALIZED-ARRAY: }
 "This parsing word adds new words to the search path, documented in the next section."
-{ $subsection "specialized-array-words" }
-{ $subsection "specialized-array-c" }
-{ $subsection "specialized-array-math" }
-{ $subsection "specialized-array-examples" }
+{ $subsections
+    "specialized-array-words"
+    "specialized-array-c"
+    "specialized-array-math"
+    "specialized-array-examples"
+}
 "The " { $vocab-link "specialized-vectors" } " vocabulary provides a resizable version of this abstraction." ;
 
 ABOUT: "specialized-arrays"

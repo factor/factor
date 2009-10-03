@@ -8,8 +8,10 @@ ARTICLE: "vocab-authors" "Vocabulary authors"
 { $all-authors } ;
 
 ARTICLE: "vocab-index" "Vocabulary index"
-{ $subsection "vocab-tags" }
-{ $subsection "vocab-authors" }
+{ $subsections
+    "vocab-tags"
+    "vocab-authors"
+}
 { $vocab "" } ;
 
 HELP: words.
@@ -24,13 +26,13 @@ HELP: about
 
 ARTICLE: "browsing-help" "Browsing documentation"
 "Help topics are instances of a mixin:"
-{ $subsection topic }
+{ $subsections topic }
 "Most commonly, topics are article name strings, or words. You can display a specific help topic:"
-{ $subsection help }
+{ $subsections help }
 "You can also display the help for a vocabulary:"
-{ $subsection about }
+{ $subsections about }
 "To list a vocabulary's words only:"
-{ $subsection words. }
+{ $subsections words. }
 { $examples
   { $code "\"evaluator\" help" }
   { $code "\\ + help" }

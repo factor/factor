@@ -6,25 +6,27 @@ IN: io.encodings.8-bit
 
 ARTICLE: "io.encodings.8-bit" "Legacy 8-bit encodings"
 "Many encodings are a simple mapping of bytes onto characters. The " { $vocab-link "io.encodings.8-bit" } " vocabulary implements these generically using existing resource files. These encodings should be used with extreme caution, as fully general Unicode encodings like UTF-8 are nearly always more appropriate. The following 8-bit encodings are already defined:"
-{ $subsection latin1 }
-{ $subsection latin2 }
-{ $subsection latin3 }
-{ $subsection latin4 }
-{ $subsection latin/cyrillic }
-{ $subsection latin/arabic }
-{ $subsection latin/greek }
-{ $subsection latin/hebrew }
-{ $subsection latin5 }
-{ $subsection latin6 }
-{ $subsection latin/thai }
-{ $subsection latin7 }
-{ $subsection latin8 }
-{ $subsection latin9 }
-{ $subsection latin10 }
-{ $subsection koi8-r }
-{ $subsection windows-1252 }
-{ $subsection ebcdic }
-{ $subsection mac-roman } ;
+{ $subsections
+    latin1
+    latin2
+    latin3
+    latin4
+    latin/cyrillic
+    latin/arabic
+    latin/greek
+    latin/hebrew
+    latin5
+    latin6
+    latin/thai
+    latin7
+    latin8
+    latin9
+    latin10
+    koi8-r
+    windows-1252
+    ebcdic
+    mac-roman
+} ;
 
 ABOUT: "io.encodings.8-bit"
 

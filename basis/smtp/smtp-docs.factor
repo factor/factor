@@ -93,20 +93,26 @@ ARTICLE: "smtp" "SMTP client library"
 "The " { $vocab-link "smtp" } " vocabulary sends e-mail via an SMTP server."
 $nl
 "This library is configured by a set of dynamically-scoped variables:"
-{ $subsection smtp-server }
-{ $subsection smtp-tls? }
-{ $subsection smtp-read-timeout }
-{ $subsection smtp-domain }
-{ $subsection smtp-auth }
+{ $subsections
+    smtp-server
+    smtp-tls?
+    smtp-read-timeout
+    smtp-domain
+    smtp-auth
+}
 "The latter is set to an instance of one of the following:"
-{ $subsection no-auth }
-{ $subsection plain-auth }
+{ $subsections
+    no-auth
+    plain-auth
+}
 "Constructing an e-mail:"
-{ $subsection email }
-{ $subsection <email> }
+{ $subsections
+    email
+    <email>
+}
 "Sending an email:"
-{ $subsection send-email }
+{ $subsections send-email }
 "More topics:"
-{ $subsection "smtp-gmail" } ;
+{ $subsections "smtp-gmail" } ;
 
 ABOUT: "smtp"

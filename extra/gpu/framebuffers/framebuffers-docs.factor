@@ -296,21 +296,29 @@ HELP: texture-layer-attachment
 
 ARTICLE: "gpu.framebuffers" "Framebuffer objects"
 "The " { $vocab-link "gpu.framebuffers" } " vocabulary provides words for creating, allocating, and reading from framebuffer objects. Framebuffer objects are used as rendering targets; the " { $link system-framebuffer } " is supplied by the window system and contains the contents of the window on screen. User-created " { $link framebuffer } " objects can also be created to direct rendering output to offscreen " { $link texture } "s or " { $link renderbuffer } "s."
-{ $subsection system-framebuffer }
-{ $subsection framebuffer }
-{ $subsection renderbuffer }
+{ $subsections
+    system-framebuffer
+    framebuffer
+    renderbuffer
+}
 "The contents of a framebuffer can be cleared to known values before rendering a scene:"
-{ $subsection clear-framebuffer }
-{ $subsection clear-framebuffer-attachment }
+{ $subsections
+    clear-framebuffer
+    clear-framebuffer-attachment
+}
 "The image memory for a renderbuffer can be resized, or the full set of textures and renderbuffers attached to a framebuffer can be resized to the same dimensions together:"
-{ $subsection allocate-renderbuffer }
-{ $subsection resize-framebuffer }
+{ $subsections
+    allocate-renderbuffer
+    resize-framebuffer
+}
 "Rectangular regions of framebuffers can be read into memory, read into GPU " { $link buffer } "s, and copied between framebuffers:"
-{ $subsection framebuffer-rect }
-{ $subsection attachment-ref }
-{ $subsection read-framebuffer }
-{ $subsection read-framebuffer-to }
-{ $subsection read-framebuffer-image }
-{ $subsection copy-framebuffer } ;
+{ $subsections
+    framebuffer-rect
+    attachment-ref
+    read-framebuffer
+    read-framebuffer-to
+    read-framebuffer-image
+    copy-framebuffer
+} ;
 
 ABOUT: "gpu.framebuffers"

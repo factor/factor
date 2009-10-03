@@ -6,16 +6,22 @@ IN: xml.writer
 ABOUT: "xml.writer"
 
 ARTICLE: "xml.writer" "Writing XML"
-    "These words are used to print XML preserving whitespace in text nodes"
-    { $subsection write-xml }
-    { $subsection xml>string }
-    "These words are used to prettyprint XML"
-    { $subsection pprint-xml>string }
-    { $subsection pprint-xml }
-    "Certain variables can be changed to mainpulate prettyprinting"
-    { $subsection sensitive-tags }
-    { $subsection indenter }
-    "All of these words operate on arbitrary pieces of XML: they can take, as in put, XML documents, comments, tags, strings (text nodes), XML chunks, etc." ;
+"These words are used to print XML preserving whitespace in text nodes"
+{ $subsections
+    write-xml
+    xml>string
+}
+"These words are used to prettyprint XML"
+{ $subsections
+    pprint-xml>string
+    pprint-xml
+}
+"Certain variables can be changed to mainpulate prettyprinting"
+{ $subsections
+    sensitive-tags
+    indenter
+}
+"All of these words operate on arbitrary pieces of XML: they can take, as in put, XML documents, comments, tags, strings (text nodes), XML chunks, etc." ;
 
 HELP: xml>string
 { $values { "xml" "an XML document" } { "string" "a string" } }

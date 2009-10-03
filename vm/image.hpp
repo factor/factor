@@ -41,7 +41,4 @@ struct vm_parameters {
 	cell max_pic_size;
 };
 
-PRIMITIVE(save_image);
-PRIMITIVE(save_image_and_exit);
-
 }

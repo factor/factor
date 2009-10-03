@@ -5,19 +5,29 @@ namespace factor
 
 void factor_vm::init_data_gc()
 {
-	performing_gc = false;
 	last_code_heap_scan = data->nursery();
-	collecting_aging_again = false;
 }
+
+gc_state::gc_state(data_heap *data_, bool growing_data_heap_, cell collecting_gen_) :
+	data(data_),
+	growing_data_heap(growing_data_heap_),
+	collecting_gen(collecting_gen_),
+	start_time(current_micros()) { }
+
+gc_state::~gc_state() { }
+
+/* If a generation fills up, throw this error. It is caught in garbage_collection() */
+struct generation_full_condition { };
 
 /* Given a pointer to oldspace, copy it to newspace */
 object *factor_vm::copy_untagged_object_impl(object *pointer, cell size)
 {
-	if(newspace->here + size >= newspace->end)
-		longjmp(gc_jmp,1);
-	object *newpointer = allot_zone(newspace,size);
+	if(current_gc->newspace->here + size >= current_gc->newspace->end)
+		throw generation_full_condition();
 
-	gc_stats *s = &stats[collecting_gen];
+	object *newpointer = allot_zone(current_gc->newspace,size);
+
+	gc_stats *s = &stats[current_gc->collecting_gen];
 	s->object_count++;
 	s->bytes_copied += size;
 
@@ -34,13 +44,13 @@ object *factor_vm::copy_object_impl(object *untagged)
 
 bool factor_vm::should_copy_p(object *untagged)
 {
-	if(in_zone(newspace,untagged))
+	if(in_zone(current_gc->newspace,untagged))
 		return false;
-	if(collecting_gen == data->tenured())
+	if(current_gc->collecting_tenured_p())
 		return true;
-	else if(data->have_aging_p() && collecting_gen == data->aging())
+	else if(data->have_aging_p() && current_gc->collecting_gen == data->aging())
 		return !in_zone(&data->generations[data->tenured()],untagged);
-	else if(collecting_gen == data->nursery())
+	else if(current_gc->collecting_nursery_p())
 		return in_zone(&nursery,untagged);
 	else
 	{
@@ -68,16 +78,16 @@ object *factor_vm::resolve_forwarding(object *untagged)
 	}
 }
 
-template <typename TYPE> TYPE *factor_vm::copy_untagged_object(TYPE *untagged)
+template<typename Type> Type *factor_vm::copy_untagged_object(Type *untagged)
 {
 	check_data_pointer(untagged);
 
 	if(untagged->h.forwarding_pointer_p())
-		untagged = (TYPE *)resolve_forwarding(untagged->h.forwarding_pointer());
+		untagged = (Type *)resolve_forwarding(untagged->h.forwarding_pointer());
 	else
 	{
 		untagged->h.check_header();
-		untagged = (TYPE *)copy_object_impl(untagged);
+		untagged = (Type *)copy_object_impl(untagged);
 	}
 
 	return untagged;
@@ -88,7 +98,7 @@ cell factor_vm::copy_object(cell pointer)
 	return RETAG(copy_untagged_object(untag<object>(pointer)),TAG(pointer));
 }
 
-void factor_vm::copy_handle(cell *handle)
+void factor_vm::trace_handle(cell *handle)
 {
 	cell pointer = *handle;
 
@@ -102,7 +112,7 @@ void factor_vm::copy_handle(cell *handle)
 }
 
 /* Scan all the objects in the card */
-void factor_vm::copy_card(card *ptr, cell gen, cell here)
+void factor_vm::trace_card(card *ptr, cell gen, cell here)
 {
 	cell card_scan = card_to_addr(ptr) + card_offset(ptr);
 	cell card_end = card_to_addr(ptr + 1);
@@ -115,7 +125,7 @@ void factor_vm::copy_card(card *ptr, cell gen, cell here)
 	cards_scanned++;
 }
 
-void factor_vm::copy_card_deck(card_deck *deck, cell gen, card mask, card unmask)
+void factor_vm::trace_card_deck(card_deck *deck, cell gen, card mask, card unmask)
 {
 	card *first_card = deck_to_card(deck);
 	card *last_card = deck_to_card(deck + 1);
@@ -136,7 +146,7 @@ void factor_vm::copy_card_deck(card_deck *deck, cell gen, card mask, card unmask
 			{
 				if(ptr[card] & mask)
 				{
-					copy_card(&ptr[card],gen,here);
+					trace_card(&ptr[card],gen,here);
 					ptr[card] &= ~unmask;
 				}
 			}
@@ -147,7 +157,7 @@ void factor_vm::copy_card_deck(card_deck *deck, cell gen, card mask, card unmask
 }
 
 /* Copy all newspace objects referenced from marked cards to the destination */
-void factor_vm::copy_gen_cards(cell gen)
+void factor_vm::trace_generation_cards(cell gen)
 {
 	card_deck *first_deck = addr_to_deck(data->generations[gen].start);
 	card_deck *last_deck = addr_to_deck(data->generations[gen].end);
@@ -156,7 +166,7 @@ void factor_vm::copy_gen_cards(cell gen)
 
 	/* if we are collecting the nursery, we care about old->nursery pointers
 	but not old->aging pointers */
-	if(collecting_gen == data->nursery())
+	if(current_gc->collecting_nursery_p())
 	{
 		mask = card_points_to_nursery;
 
@@ -171,16 +181,16 @@ void factor_vm::copy_gen_cards(cell gen)
 			unmask = card_mark_mask;
 		else
 		{
-			critical_error("bug in copy_gen_cards",gen);
+			critical_error("bug in trace_generation_cards",gen);
 			return;
 		}
 	}
 	/* if we are collecting aging space into tenured space, we care about
 	all old->nursery and old->aging pointers. no old->aging pointers can
 	remain */
-	else if(data->have_aging_p() && collecting_gen == data->aging())
+	else if(data->have_aging_p() && current_gc->collecting_gen == data->aging())
 	{
-		if(collecting_aging_again)
+		if(current_gc->collecting_aging_again)
 		{
 			mask = card_points_to_aging;
 			unmask = card_mark_mask;
@@ -196,7 +206,7 @@ void factor_vm::copy_gen_cards(cell gen)
 	}
 	else
 	{
-		critical_error("bug in copy_gen_cards",gen);
+		critical_error("bug in trace_generation_cards",gen);
 		return;
 	}
 
@@ -206,7 +216,7 @@ void factor_vm::copy_gen_cards(cell gen)
 	{
 		if(*ptr & mask)
 		{
-			copy_card_deck(ptr,gen,mask,unmask);
+			trace_card_deck(ptr,gen,mask,unmask);
 			*ptr &= ~unmask;
 		}
 	}
@@ -214,36 +224,36 @@ void factor_vm::copy_gen_cards(cell gen)
 
 /* Scan cards in all generations older than the one being collected, copying
 old->new references */
-void factor_vm::copy_cards()
+void factor_vm::trace_cards()
 {
 	u64 start = current_micros();
 
 	cell i;
-	for(i = collecting_gen + 1; i < data->gen_count; i++)
-		copy_gen_cards(i);
+	for(i = current_gc->collecting_gen + 1; i < data->gen_count; i++)
+		trace_generation_cards(i);
 
 	card_scan_time += (current_micros() - start);
 }
 
 /* Copy all tagged pointers in a range of memory */
-void factor_vm::copy_stack_elements(segment *region, cell top)
+void factor_vm::trace_stack_elements(segment *region, cell top)
 {
 	cell ptr = region->start;
 
 	for(; ptr <= top; ptr += sizeof(cell))
-		copy_handle((cell*)ptr);
+		trace_handle((cell*)ptr);
 }
 
-void factor_vm::copy_registered_locals()
+void factor_vm::trace_registered_locals()
 {
 	std::vector<cell>::const_iterator iter = gc_locals.begin();
 	std::vector<cell>::const_iterator end = gc_locals.end();
 
 	for(; iter < end; iter++)
-		copy_handle((cell *)(*iter));
+		trace_handle((cell *)(*iter));
 }
 
-void factor_vm::copy_registered_bignums()
+void factor_vm::trace_registered_bignums()
 {
 	std::vector<cell>::const_iterator iter = gc_bignums.begin();
 	std::vector<cell>::const_iterator end = gc_bignums.end();
@@ -267,38 +277,38 @@ void factor_vm::copy_registered_bignums()
 
 /* Copy roots over at the start of GC, namely various constants, stacks,
 the user environment and extra roots registered by local_roots.hpp */
-void factor_vm::copy_roots()
+void factor_vm::trace_roots()
 {
-	copy_handle(&T);
-	copy_handle(&bignum_zero);
-	copy_handle(&bignum_pos_one);
-	copy_handle(&bignum_neg_one);
+	trace_handle(&T);
+	trace_handle(&bignum_zero);
+	trace_handle(&bignum_pos_one);
+	trace_handle(&bignum_neg_one);
 
-	copy_registered_locals();
-	copy_registered_bignums();
-
-	if(!performing_compaction)
-	{
-		save_stacks();
-		context *stacks = stack_chain;
-
-		while(stacks)
-		{
-			copy_stack_elements(stacks->datastack_region,stacks->datastack);
-			copy_stack_elements(stacks->retainstack_region,stacks->retainstack);
-
-			copy_handle(&stacks->catchstack_save);
-			copy_handle(&stacks->current_callback_save);
-
-			mark_active_blocks(stacks);
-
-			stacks = stacks->next;
-		}
-	}
+	trace_registered_locals();
+	trace_registered_bignums();
 
 	int i;
 	for(i = 0; i < USER_ENV; i++)
-		copy_handle(&userenv[i]);
+		trace_handle(&userenv[i]);
+}
+
+void factor_vm::trace_contexts()
+{
+	save_stacks();
+	context *stacks = stack_chain;
+
+	while(stacks)
+	{
+		trace_stack_elements(stacks->datastack_region,stacks->datastack);
+		trace_stack_elements(stacks->retainstack_region,stacks->retainstack);
+
+		trace_handle(&stacks->catchstack_save);
+		trace_handle(&stacks->current_callback_save);
+
+		mark_active_blocks(stacks);
+
+		stacks = stacks->next;
+	}
 }
 
 cell factor_vm::copy_next_from_nursery(cell scan)
@@ -341,8 +351,8 @@ cell factor_vm::copy_next_from_aging(cell scan)
 		cell tenured_start = data->generations[data->tenured()].start;
 		cell tenured_end = data->generations[data->tenured()].end;
 
-		cell newspace_start = newspace->start;
-		cell newspace_end = newspace->end;
+		cell newspace_start = current_gc->newspace->start;
+		cell newspace_end = current_gc->newspace->end;
 
 		for(; obj < end; obj++)
 		{
@@ -370,8 +380,8 @@ cell factor_vm::copy_next_from_tenured(cell scan)
 	{
 		obj++;
 
-		cell newspace_start = newspace->start;
-		cell newspace_end = newspace->end;
+		cell newspace_start = current_gc->newspace->start;
+		cell newspace_end = current_gc->newspace->end;
 
 		for(; obj < end; obj++)
 		{
@@ -393,189 +403,236 @@ cell factor_vm::copy_next_from_tenured(cell scan)
 
 void factor_vm::copy_reachable_objects(cell scan, cell *end)
 {
-	if(collecting_gen == data->nursery())
+	if(current_gc->collecting_nursery_p())
 	{
 		while(scan < *end)
 			scan = copy_next_from_nursery(scan);
 	}
-	else if(data->have_aging_p() && collecting_gen == data->aging())
+	else if(data->have_aging_p() && current_gc->collecting_gen == data->aging())
 	{
 		while(scan < *end)
 			scan = copy_next_from_aging(scan);
 	}
-	else if(collecting_gen == data->tenured())
+	else if(current_gc->collecting_tenured_p())
 	{
 		while(scan < *end)
 			scan = copy_next_from_tenured(scan);
 	}
 }
 
+void factor_vm::update_code_heap_roots()
+{
+	if(current_gc->collecting_gen >= last_code_heap_scan)
+	{
+		code_heap_scans++;
+
+		trace_code_heap_roots();
+
+		if(current_gc->collecting_accumulation_gen_p())
+			last_code_heap_scan = current_gc->collecting_gen;
+		else
+			last_code_heap_scan = current_gc->collecting_gen + 1;
+	}
+}
+
+struct literal_and_word_reference_updater {
+	factor_vm *myvm;
+
+	literal_and_word_reference_updater(factor_vm *myvm_) : myvm(myvm_) {}
+
+	void operator()(heap_block *block)
+	{
+		code_block *compiled = (code_block *)block;
+		myvm->update_literal_references(compiled);
+		myvm->update_word_references(compiled);
+	}
+};
+
+void factor_vm::free_unmarked_code_blocks()
+{
+	literal_and_word_reference_updater updater(this);
+	code->free_unmarked(updater);
+	last_code_heap_scan = current_gc->collecting_gen;
+}
+
+void factor_vm::update_dirty_code_blocks()
+{
+	std::set<code_block *> dirty_code_blocks = current_gc->dirty_code_blocks;
+	std::set<code_block *>::const_iterator iter = dirty_code_blocks.begin();
+	std::set<code_block *>::const_iterator end = dirty_code_blocks.end();
+
+	for(; iter != end; iter++)
+		update_literal_references(*iter);
+
+	dirty_code_blocks.clear();
+}
+
 /* Prepare to start copying reachable objects into an unused zone */
 void factor_vm::begin_gc(cell requested_bytes)
 {
-	if(growing_data_heap)
+	if(current_gc->growing_data_heap)
 	{
-		if(collecting_gen != data->tenured())
-			critical_error("Invalid parameters to begin_gc",0);
+		assert(current_gc->collecting_tenured_p());
 
-		old_data_heap = data;
-		set_data_heap(grow_data_heap(old_data_heap,requested_bytes));
-		newspace = &data->generations[data->tenured()];
+		current_gc->old_data_heap = data;
+		set_data_heap(grow_data_heap(current_gc->old_data_heap,requested_bytes));
+		current_gc->newspace = &data->generations[data->tenured()];
 	}
-	else if(collecting_accumulation_gen_p())
+	else if(current_gc->collecting_accumulation_gen_p())
 	{
 		/* when collecting one of these generations, rotate it
 		with the semispace */
-		zone z = data->generations[collecting_gen];
-		data->generations[collecting_gen] = data->semispaces[collecting_gen];
-		data->semispaces[collecting_gen] = z;
-		reset_generation(collecting_gen);
-		newspace = &data->generations[collecting_gen];
-		clear_cards(collecting_gen,collecting_gen);
-		clear_decks(collecting_gen,collecting_gen);
-		clear_allot_markers(collecting_gen,collecting_gen);
+		zone z = data->generations[current_gc->collecting_gen];
+		data->generations[current_gc->collecting_gen] = data->semispaces[current_gc->collecting_gen];
+		data->semispaces[current_gc->collecting_gen] = z;
+		reset_generation(current_gc->collecting_gen);
+		current_gc->newspace = &data->generations[current_gc->collecting_gen];
+		clear_cards(current_gc->collecting_gen,current_gc->collecting_gen);
+		clear_decks(current_gc->collecting_gen,current_gc->collecting_gen);
+		clear_allot_markers(current_gc->collecting_gen,current_gc->collecting_gen);
 	}
 	else
 	{
 		/* when collecting a younger generation, we copy
 		reachable objects to the next oldest generation,
 		so we set the newspace so the next generation. */
-		newspace = &data->generations[collecting_gen + 1];
+		current_gc->newspace = &data->generations[current_gc->collecting_gen + 1];
 	}
 }
 
-void factor_vm::end_gc(cell gc_elapsed)
+void factor_vm::end_gc()
 {
-	gc_stats *s = &stats[collecting_gen];
 
+	gc_stats *s = &stats[current_gc->collecting_gen];
+
+	cell gc_elapsed = (current_micros() - current_gc->start_time);
 	s->collections++;
 	s->gc_time += gc_elapsed;
 	if(s->max_gc_time < gc_elapsed)
 		s->max_gc_time = gc_elapsed;
 
-	if(growing_data_heap)
-	{
-		delete old_data_heap;
-		old_data_heap = NULL;
-		growing_data_heap = false;
-	}
+	if(current_gc->growing_data_heap)
+		delete current_gc->old_data_heap;
 
-	if(collecting_accumulation_gen_p())
-	{
-		/* all younger generations except are now empty.
-		if collecting_gen == data->nursery() here, we only have 1 generation;
-		old-school Cheney collector */
-		if(collecting_gen != data->nursery())
-			reset_generations(data->nursery(),collecting_gen - 1);
-	}
-	else if(collecting_gen == data->nursery())
+	if(current_gc->collecting_nursery_p())
 	{
 		nursery.here = nursery.start;
+	}
+	else if(current_gc->collecting_accumulation_gen_p())
+	{
+		reset_generations(data->nursery(),current_gc->collecting_gen - 1);
 	}
 	else
 	{
 		/* all generations up to and including the one
 		collected are now empty */
-		reset_generations(data->nursery(),collecting_gen);
+		reset_generations(data->nursery(),current_gc->collecting_gen);
 	}
-
-	collecting_aging_again = false;
 }
 
 /* Collect gen and all younger generations.
 If growing_data_heap_ is true, we must grow the data heap to such a size that
 an allocation of requested_bytes won't fail */
-void factor_vm::garbage_collection(cell gen,bool growing_data_heap_,cell requested_bytes)
+void factor_vm::garbage_collection(cell collecting_gen_, bool growing_data_heap_, bool trace_contexts_, cell requested_bytes)
 {
 	if(gc_off)
 	{
-		critical_error("GC disabled",gen);
+		critical_error("GC disabled",collecting_gen_);
 		return;
 	}
 
-	u64 start = current_micros();
+	current_gc = new gc_state(data,growing_data_heap_,collecting_gen_);
 
-	performing_gc = true;
-	growing_data_heap = growing_data_heap_;
-	collecting_gen = gen;
-
-	/* we come back here if a generation is full */
-	if(setjmp(gc_jmp))
+	/* Keep trying to GC higher and higher generations until we don't run out
+	of space */
+	for(;;)
 	{
-		/* We have no older generations we can try collecting, so we
-		resort to growing the data heap */
-		if(collecting_gen == data->tenured())
+		try
 		{
-			growing_data_heap = true;
+			begin_gc(requested_bytes);
 
-			/* see the comment in unmark_marked() */
-			code->unmark_marked();
+			/* Initialize chase pointer */
+			cell scan = current_gc->newspace->here;
+
+			/* Trace objects referenced from global environment */
+			trace_roots();
+
+			/* Trace objects referenced from stacks, unless we're doing
+			save-image-and-exit in which case stack objects are irrelevant */
+			if(trace_contexts_) trace_contexts();
+
+			/* Trace objects referenced from older generations */
+			trace_cards();
+
+			/* On minor GC, trace code heap roots if it has pointers
+			to this generation or younger. Otherwise, tracing data heap objects
+			will mark all reachable code blocks, and we free the unmarked ones
+			after. */
+			if(!current_gc->collecting_tenured_p() && current_gc->collecting_gen >= last_code_heap_scan)
+			{
+				update_code_heap_roots();
+			}
+
+			/* do some copying -- this is where most of the work is done */
+			copy_reachable_objects(scan,&current_gc->newspace->here);
+
+			/* On minor GC, update literal references in code blocks, now that all
+			data heap objects are in their final location. On a major GC,
+			free all code blocks that did not get marked during tracing. */
+			if(current_gc->collecting_tenured_p())
+				free_unmarked_code_blocks();
+			else
+				update_dirty_code_blocks();
+
+			/* GC completed without any generations filling up; finish up */
+			break;
 		}
-		/* we try collecting aging space twice before going on to
-		collect tenured */
-		else if(data->have_aging_p()
-			&& collecting_gen == data->aging()
-			&& !collecting_aging_again)
+		catch(const generation_full_condition &c)
 		{
-			collecting_aging_again = true;
-		}
-		/* Collect the next oldest generation */
-		else
-		{
-			collecting_gen++;
+			/* We come back here if a generation is full */
+
+			/* We have no older generations we can try collecting, so we
+			resort to growing the data heap */
+			if(current_gc->collecting_tenured_p())
+			{
+				current_gc->growing_data_heap = true;
+
+				/* see the comment in unmark_marked() */
+				code->unmark_marked();
+			}
+			/* we try collecting aging space twice before going on to
+			collect tenured */
+			else if(data->have_aging_p()
+				&& current_gc->collecting_gen == data->aging()
+				&& !current_gc->collecting_aging_again)
+			{
+				current_gc->collecting_aging_again = true;
+			}
+			/* Collect the next oldest generation */
+			else
+			{
+				current_gc->collecting_gen++;
+			}
 		}
 	}
 
-	begin_gc(requested_bytes);
+	end_gc();
 
-	/* initialize chase pointer */
-	cell scan = newspace->here;
-
-	/* collect objects referenced from stacks and environment */
-	copy_roots();
-	/* collect objects referenced from older generations */
-	copy_cards();
-
-	/* do some tracing */
-	copy_reachable_objects(scan,&newspace->here);
-
-	/* don't scan code heap unless it has pointers to this
-	generation or younger */
-	if(collecting_gen >= last_code_heap_scan)
-	{
-		code_heap_scans++;
-
-		if(collecting_gen == data->tenured())
-			code->free_unmarked((heap_iterator)factor::update_literal_and_word_references);
-		else
-			copy_code_heap_roots();
-
-		if(collecting_accumulation_gen_p())
-			last_code_heap_scan = collecting_gen;
-		else
-			last_code_heap_scan = collecting_gen + 1;
-	}
-
-	cell gc_elapsed = (current_micros() - start);
-
-	end_gc(gc_elapsed);
-
-	performing_gc = false;
+	delete current_gc;
+	current_gc = NULL;
 }
 
 void factor_vm::gc()
 {
-	garbage_collection(data->tenured(),false,0);
+	garbage_collection(data->tenured(),false,true,0);
 }
 
-inline void factor_vm::primitive_gc()
+void factor_vm::primitive_gc()
 {
 	gc();
 }
 
-PRIMITIVE_FORWARD(gc)
-
-inline void factor_vm::primitive_gc_stats()
+void factor_vm::primitive_gc_stats()
 {
 	growable_array result(this);
 
@@ -605,8 +662,6 @@ inline void factor_vm::primitive_gc_stats()
 	dpush(result.elements.value());
 }
 
-PRIMITIVE_FORWARD(gc_stats)
-
 void factor_vm::clear_gc_stats()
 {
 	for(cell i = 0; i < max_gen_count; i++)
@@ -618,16 +673,14 @@ void factor_vm::clear_gc_stats()
 	code_heap_scans = 0;
 }
 
-inline void factor_vm::primitive_clear_gc_stats()
+void factor_vm::primitive_clear_gc_stats()
 {
 	clear_gc_stats();
 }
 
-PRIMITIVE_FORWARD(clear_gc_stats)
-
 /* classes.tuple uses this to reshape tuples; tools.deploy.shaker uses this
    to coalesce equal but distinct quotations and wrappers. */
-inline void factor_vm::primitive_become()
+void factor_vm::primitive_become()
 {
 	array *new_objects = untag_check<array>(dpop());
 	array *old_objects = untag_check<array>(dpop());
@@ -656,14 +709,12 @@ inline void factor_vm::primitive_become()
 	compile_all_words();
 }
 
-PRIMITIVE_FORWARD(become)
-
 void factor_vm::inline_gc(cell *gc_roots_base, cell gc_roots_size)
 {
 	for(cell i = 0; i < gc_roots_size; i++)
 		gc_locals.push_back((cell)&gc_roots_base[i]);
 
-	garbage_collection(data->nursery(),false,0);
+	garbage_collection(data->nursery(),false,true,0);
 
 	for(cell i = 0; i < gc_roots_size; i++)
 		gc_locals.pop_back();
@@ -673,6 +724,70 @@ VM_C_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *myvm
 {
 	ASSERTVM();
 	VM_PTR->inline_gc(gc_roots_base,gc_roots_size);
+}
+
+inline object *factor_vm::allot_zone(zone *z, cell a)
+{
+	cell h = z->here;
+	z->here = h + align8(a);
+	object *obj = (object *)h;
+	allot_barrier(obj);
+	return obj;
+}
+
+/*
+ * It is up to the caller to fill in the object's fields in a meaningful
+ * fashion!
+ */
+object *factor_vm::allot_object(header header, cell size)
+{
+#ifdef GC_DEBUG
+	if(!gc_off)
+		gc();
+#endif
+
+	object *obj;
+
+	if(nursery.size - allot_buffer_zone > size)
+	{
+		/* If there is insufficient room, collect the nursery */
+		if(nursery.here + allot_buffer_zone + size > nursery.end)
+			garbage_collection(data->nursery(),false,true,0);
+
+		cell h = nursery.here;
+		nursery.here = h + align8(size);
+		obj = (object *)h;
+	}
+	/* If the object is bigger than the nursery, allocate it in
+	tenured space */
+	else
+	{
+		zone *tenured = &data->generations[data->tenured()];
+
+		/* If tenured space does not have enough room, collect */
+		if(tenured->here + size > tenured->end)
+		{
+			gc();
+			tenured = &data->generations[data->tenured()];
+		}
+
+		/* If it still won't fit, grow the heap */
+		if(tenured->here + size > tenured->end)
+		{
+			garbage_collection(data->tenured(),true,true,size);
+			tenured = &data->generations[data->tenured()];
+		}
+
+		obj = allot_zone(tenured,size);
+
+		/* Allows initialization code to store old->new pointers
+		without hitting the write barrier in the common case of
+		a nursery allocation */
+		write_barrier(obj);
+	}
+
+	obj->h = header;
+	return obj;
 }
 
 }

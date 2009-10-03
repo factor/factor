@@ -140,21 +140,17 @@ bool factor_vm::stack_to_array(cell bottom, cell top)
 	}
 }
 
-inline void factor_vm::primitive_datastack()
+void factor_vm::primitive_datastack()
 {
 	if(!stack_to_array(ds_bot,ds))
 		general_error(ERROR_DS_UNDERFLOW,F,F,NULL);
 }
 
-PRIMITIVE_FORWARD(datastack)
-
-inline void factor_vm::primitive_retainstack()
+void factor_vm::primitive_retainstack()
 {
 	if(!stack_to_array(rs_bot,rs))
 		general_error(ERROR_RS_UNDERFLOW,F,F,NULL);
 }
-
-PRIMITIVE_FORWARD(retainstack)
 
 /* returns pointer to top of stack */
 cell factor_vm::array_to_stack(array *array, cell bottom)
@@ -164,22 +160,18 @@ cell factor_vm::array_to_stack(array *array, cell bottom)
 	return bottom + depth - sizeof(cell);
 }
 
-inline void factor_vm::primitive_set_datastack()
+void factor_vm::primitive_set_datastack()
 {
 	ds = array_to_stack(untag_check<array>(dpop()),ds_bot);
 }
 
-PRIMITIVE_FORWARD(set_datastack)
-
-inline void factor_vm::primitive_set_retainstack()
+void factor_vm::primitive_set_retainstack()
 {
 	rs = array_to_stack(untag_check<array>(dpop()),rs_bot);
 }
 
-PRIMITIVE_FORWARD(set_retainstack)
-
 /* Used to implement call( */
-inline void factor_vm::primitive_check_datastack()
+void factor_vm::primitive_check_datastack()
 {
 	fixnum out = to_fixnum(dpop());
 	fixnum in = to_fixnum(dpop());
@@ -203,7 +195,5 @@ inline void factor_vm::primitive_check_datastack()
 		dpush(T);
 	}
 }
-
-PRIMITIVE_FORWARD(check_datastack)
 
 }
