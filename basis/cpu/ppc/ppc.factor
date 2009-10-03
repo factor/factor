@@ -230,12 +230,6 @@ M: ppc %copy ( dst src rep -- )
         } case
     ] if ;
 
-M: ppc %unbox-float ( dst src -- ) float-offset LFD ;
-
-M:: ppc %box-float ( dst src temp -- )
-    dst 16 float temp %allot
-    src dst float-offset STFD ;
-
 GENERIC: float-function-param* ( dst src -- )
 
 M: spill-slot float-function-param* [ 1 ] dip n>> spill@ LFD ;
@@ -264,9 +258,12 @@ M: ppc %double>single-float double-rep %copy ;
 
 ! VMX/AltiVec not supported yet
 M: ppc %zero-vector-reps { } ;
+M: ppc %fill-vector-reps { } ;
 M: ppc %gather-vector-2-reps { } ;
 M: ppc %gather-vector-4-reps { } ;
 M: ppc %shuffle-vector-reps { } ;
+M: ppc %compare-vector-reps drop { } ;
+M: ppc %test-vector-reps { } ;
 M: ppc %add-vector-reps { } ;
 M: ppc %saturated-add-vector-reps { } ;
 M: ppc %add-sub-vector-reps { } ;
@@ -286,6 +283,7 @@ M: ppc %and-vector-reps { } ;
 M: ppc %andn-vector-reps { } ;
 M: ppc %or-vector-reps { } ;
 M: ppc %xor-vector-reps { } ;
+M: ppc %not-vector-reps { } ;
 M: ppc %shl-vector-reps { } ;
 M: ppc %shr-vector-reps { } ;
 M: ppc %horizontal-shl-vector-reps { } ;
@@ -397,13 +395,13 @@ M: ppc %alien-cell LWZ ;
 M: ppc %alien-float LFS ;
 M: ppc %alien-double LFD ;
 
-M: ppc %set-alien-integer-1 swapd STB ;
-M: ppc %set-alien-integer-2 swapd STH ;
+M: ppc %set-alien-integer-1 -rot STB ;
+M: ppc %set-alien-integer-2 -rot STH ;
 
-M: ppc %set-alien-cell swapd STW ;
+M: ppc %set-alien-cell -rot STW ;
 
-M: ppc %set-alien-float swapd STFS ;
-M: ppc %set-alien-double swapd STFD ;
+M: ppc %set-alien-float -rot STFS ;
+M: ppc %set-alien-double -rot STFD ;
 
 : load-zone-ptr ( reg -- )
     "nursery" %load-vm-field-addr ;
@@ -466,6 +464,7 @@ M:: ppc %load-gc-root ( gc-root register -- )
 M:: ppc %call-gc ( gc-root-count temp -- )
     3 1 gc-root-base local@ ADDI
     gc-root-count 4 LI
+    5 %load-vm-addr
     "inline_gc" f %alien-invoke ;
 
 M: ppc %prologue ( n -- )
@@ -614,13 +613,14 @@ M: ppc %prepare-unbox ( -- )
 
 M: ppc %unbox ( n rep func -- )
     ! Value must be in r3
+    4 %load-vm-addr
     ! Call the unboxer
     f %alien-invoke
     ! Store the return value on the C stack
     over [ [ reg-class-of return-reg ] keep %save-param-reg ] [ 2drop ] if ;
 
 M: ppc %unbox-long-long ( n func -- )
-    ! Value must be in r3:r4
+    4 %load-vm-addr
     ! Call the unboxer
     f %alien-invoke
     ! Store the return value on the C stack
@@ -633,15 +633,17 @@ M: ppc %unbox-large-struct ( n c-type -- )
     ! Value must be in r3
     ! Compute destination address and load struct size
     [ [ 4 1 ] dip local@ ADDI ] [ heap-size 5 LI ] bi*
+    6 %load-vm-addr
     ! Call the function
     "to_value_struct" f %alien-invoke ;
 
-M: ppc %box ( n rep func -- )
+M:: ppc %box ( n rep func -- )
     ! If the source is a stack location, load it into freg #0.
     ! If the source is f, then we assume the value is already in
     ! freg #0.
-    [ over [ 0 over reg-class-of param-reg swap %load-param-reg ] [ 2drop ] if ] dip
-    f %alien-invoke ;
+    n [ 0 rep reg-class-of param-reg rep %load-param-reg ] when*
+    rep double-rep? 5 4 ? %load-vm-addr
+    func f %alien-invoke ;
 
 M: ppc %box-long-long ( n func -- )
     [
@@ -649,6 +651,7 @@ M: ppc %box-long-long ( n func -- )
             [ [ 3 1 ] dip local@ LWZ ]
             [ [ 4 1 ] dip cell + local@ LWZ ] bi
         ] when*
+        5 %load-vm-addr
     ] dip f %alien-invoke ;
 
 : struct-return@ ( n -- n )
@@ -663,6 +666,7 @@ M: ppc %box-large-struct ( n c-type -- )
     ! If n = f, then we're boxing a returned struct
     ! Compute destination address and load struct size
     [ [ 3 1 ] dip struct-return@ ADDI ] [ heap-size 4 LI ] bi*
+    5 %load-vm-addr
     ! Call the function
     "box_value_struct" f %alien-invoke ;
 
@@ -682,9 +686,12 @@ M: ppc %alien-invoke ( symbol dll -- )
     [ 11 ] 2dip %alien-global 11 MTLR BLRL ;
 
 M: ppc %alien-callback ( quot -- )
-    3 swap %load-reference "c_to_factor" f %alien-invoke ;
+    3 swap %load-reference
+    4 %load-vm-addr
+    "c_to_factor" f %alien-invoke ;
 
 M: ppc %prepare-alien-indirect ( -- )
+    3 %load-vm-addr
     "unbox_alien" f %alien-invoke
     15 3 MR ;
 
@@ -695,6 +702,7 @@ M: ppc %callback-value ( ctype -- )
     ! Save top of data stack
     3 ds-reg 0 LWZ
     3 1 0 local@ STW
+    3 %load-vm-addr
     ! Restore data/call/retain stacks
     "unnest_stacks" f %alien-invoke
     ! Restore top of data stack
@@ -710,21 +718,25 @@ M: ppc return-struct-in-registers? ( c-type -- ? )
 M: ppc %box-small-struct ( c-type -- )
     #! Box a <= 16-byte struct returned in r3:r4:r5:r6
     heap-size 7 LI
+    8 %load-vm-addr
     "box_medium_struct" f %alien-invoke ;
 
 : %unbox-struct-1 ( -- )
     ! Alien must be in r3.
+    4 %load-vm-addr
     "alien_offset" f %alien-invoke
     3 3 0 LWZ ;
 
 : %unbox-struct-2 ( -- )
     ! Alien must be in r3.
+    4 %load-vm-addr
     "alien_offset" f %alien-invoke
     4 3 4 LWZ
     3 3 0 LWZ ;
 
 : %unbox-struct-4 ( -- )
     ! Alien must be in r3.
+    4 %load-vm-addr
     "alien_offset" f %alien-invoke
     6 3 12 LWZ
     5 3 8 LWZ
@@ -732,9 +744,11 @@ M: ppc %box-small-struct ( c-type -- )
     3 3 0 LWZ ;
 
 M: ppc %nest-stacks ( -- )
+    3 %load-vm-addr
     "nest_stacks" f %alien-invoke ;
 
 M: ppc %unnest-stacks ( -- )
+    3 %load-vm-addr
     "unnest_stacks" f %alien-invoke ;
 
 M: ppc %unbox-small-struct ( size -- )

@@ -1,8 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel fry accessors sequences assocs sets namespaces
-arrays combinators combinators.short-circuit make locals deques
-dlists layouts cpu.architecture compiler.utilities
+arrays combinators combinators.short-circuit math make locals
+deques dlists layouts byte-arrays cpu.architecture
+compiler.utilities
+compiler.constants
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.hats
@@ -25,24 +27,31 @@ GENERIC: emit-unbox ( dst src rep -- )
 M:: float-rep emit-box ( dst src rep -- )
     double-rep next-vreg-rep :> temp
     temp src ##single>double-float
-    dst temp int-rep next-vreg-rep ##box-float ;
+    dst temp double-rep emit-box ;
 
 M:: float-rep emit-unbox ( dst src rep -- )
     double-rep next-vreg-rep :> temp
-    temp src ##unbox-float
+    temp src double-rep emit-unbox
     dst temp ##double>single-float ;
 
 M: double-rep emit-box
-    drop int-rep next-vreg-rep ##box-float ;
+    drop
+    [ drop 16 float int-rep next-vreg-rep ##allot ]
+    [ float-offset swap ##set-alien-double ]
+    2bi ;
 
 M: double-rep emit-unbox
-    drop ##unbox-float ;
+    drop float-offset ##alien-double ;
 
-M: vector-rep emit-box
-    int-rep next-vreg-rep ##box-vector ;
+M:: vector-rep emit-box ( dst src rep -- )
+    int-rep next-vreg-rep :> temp
+    dst 16 2 cells + byte-array int-rep next-vreg-rep ##allot
+    temp 16 tag-fixnum ##load-immediate
+    temp dst 1 byte-array tag-number ##set-slot-imm
+    dst byte-array-offset src rep ##set-alien-vector ;
 
 M: vector-rep emit-unbox
-    ##unbox-vector ;
+    [ byte-array-offset ] dip ##alien-vector ;
 
 M:: scalar-rep emit-box ( dst src rep -- )
     int-rep next-vreg-rep :> temp
@@ -143,6 +152,9 @@ SYMBOL: costs
 ! Insert conversions. This introduces new temporaries, so we need
 ! to rename opearands too.
 
+! Mapping from vreg,rep pairs to vregs
+SYMBOL: alternatives
+
 :: emit-def-conversion ( dst preferred required -- new-dst' )
     ! If an instruction defines a register with representation 'required',
     ! but the register has preferred representation 'preferred', then
@@ -155,7 +167,13 @@ SYMBOL: costs
     ! but the register has preferred representation 'preferred', then
     ! we rename the instruction's input to a new register, which
     ! becomes the output of a conversion instruction.
-    required next-vreg-rep [ src required preferred emit-conversion ] keep ;
+    preferred required eq? [ src ] [
+        src required alternatives get [
+            required next-vreg-rep :> new-src
+            [ new-src ] 2dip preferred emit-conversion
+            new-src
+        ] 2cache
+    ] if ;
 
 SYMBOLS: renaming-set needs-renaming? ;
 
@@ -236,6 +254,7 @@ M: insn conversions-for-insn , ;
     dup kill-block? [ drop ] [
         [
             [
+                H{ } clone alternatives set
                 [ conversions-for-insn ] each
             ] V{ } make
         ] change-instructions drop

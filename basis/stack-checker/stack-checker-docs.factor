@@ -93,19 +93,25 @@ $nl
 
 ARTICLE: "tools.inference" "Stack effect tools"
 { $link "inference" } " can be used interactively to print stack effects of quotations without running them. It can also be used from " { $link "combinators.smart" } "."
-{ $subsection infer }
-{ $subsection infer. }
+{ $subsections
+    infer
+    infer.
+}
 "There are also some words for working with " { $link effect } " instances. Getting a word's declared stack effect:"
-{ $subsection stack-effect }
+{ $subsections stack-effect }
 "Converting a stack effect to a string form:"
-{ $subsection effect>string }
+{ $subsections effect>string }
 "Comparing effects:"
-{ $subsection effect-height }
-{ $subsection effect<= }
-{ $subsection effect= }
+{ $subsections
+    effect-height
+    effect<=
+    effect=
+}
 "The class of stack effects:"
-{ $subsection effect }
-{ $subsection effect? } ;
+{ $subsections
+    effect
+    effect?
+} ;
 
 ARTICLE: "inference-escape" "Stack effect checking escape hatches"
 "In a static checking regime, sometimes it is necessary to step outside the boundaries and run some code which cannot be statically checked; perhaps this code is constructed at run-time. There are two ways to get around the static stack checker."
@@ -113,7 +119,7 @@ $nl
 "If the stack effect of a word or quotation is known, but the word or quotation itself is not, " { $link POSTPONE: execute( } " or " { $link POSTPONE: call( } " can be used. See " { $link "call" } " for details."
 $nl
 "If the stack effect is not known, the code being called cannot manipulate the datastack directly. Instead, it must reflect the datastack into an array:"
-{ $subsection with-datastack }
+{ $subsections with-datastack }
 "The surrounding code has a static stack effect since " { $link with-datastack } " has one. However, the array passed in as input may be transformed arbitrarily by calling this combinator." ;
 
 ARTICLE: "inference" "Stack effect checking"
@@ -124,14 +130,16 @@ $nl
 "If a word's stack effect cannot be inferred, a compile error is reported. See " { $link "compiler-errors" } "."
 $nl
 "The following articles describe how different control structures are handled by the stack checker."
-{ $subsection "inference-simple" }
-{ $subsection "inference-combinators" }
-{ $subsection "inference-recursive-combinators" }
-{ $subsection "inference-branches" }
+{ $subsections
+    "inference-simple"
+    "inference-combinators"
+    "inference-recursive-combinators"
+    "inference-branches"
+}
 "Stack checking catches several classes of errors."
-{ $subsection "inference-errors" }
+{ $subsections "inference-errors" }
 "Sometimes code with a dynamic stack effect has to be run."
-{ $subsection "inference-escape" }
+{ $subsections "inference-escape" }
 { $see-also "effects" "tools.inference" "tools.errors" } ;
 
 ABOUT: "inference"

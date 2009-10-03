@@ -5,11 +5,15 @@ ABOUT: "io.streams.byte-array"
 
 ARTICLE: "io.streams.byte-array" "Byte-array streams"
 "Byte array streams:"
-{ $subsection <byte-reader> }
-{ $subsection <byte-writer> }
+{ $subsections
+    <byte-reader>
+    <byte-writer>
+}
 "Utility combinators:"
-{ $subsection with-byte-reader }
-{ $subsection with-byte-writer } ;
+{ $subsections
+    with-byte-reader
+    with-byte-writer
+} ;
 
 HELP: <byte-reader>
 { $values { "byte-array" byte-array }

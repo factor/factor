@@ -106,40 +106,48 @@ $nl
 "The " { $emphasis "ordered" } " comparison operators set floating point exception flags if the result of the comparison is unordered. The standard comparison operators (" { $link < } ", " { $link <= } ", " { $link > } ", " { $link >= } ") perform ordered comparisons."
 $nl
 "The " { $link number= } " operation performs an unordered comparison. The following set of operators also perform unordered comparisons:"
-{ $subsection u< }
-{ $subsection u<= }
-{ $subsection u> }
-{ $subsection u>= }
+{ $subsections
+    u<
+    u<=
+    u>
+    u>=
+}
 "A word to check if two values are unordered with respect to each other:"
-{ $subsection unordered? }
+{ $subsections unordered? }
 "To test for floating point exceptions, use the " { $vocab-link "math.floats.env" } " vocabulary."
 $nl
 "If neither input to a comparison operator is a floating point value, then " { $link u< } ", " { $link u<= } ", " { $link u> } " and " { $link u>= } " are equivalent to the ordered operators." ;
 
 ARTICLE: "math.floats.bitwise" "Bitwise operations on floats"
 "Floating point numbers are represented internally in IEEE 754 double-precision format. This internal representation can be accessed for advanced operations and input/output purposes."
-{ $subsection float>bits }
-{ $subsection double>bits }
-{ $subsection bits>float }
-{ $subsection bits>double }
+{ $subsections
+    float>bits
+    double>bits
+    bits>float
+    bits>double
+}
 "Constructing floating point NaNs:"
-{ $subsection <fp-nan> }
+{ $subsections <fp-nan> }
 "Floating point numbers are discrete:"
-{ $subsection prev-float }
-{ $subsection next-float }
+{ $subsections
+    prev-float
+    next-float
+}
 "Introspection on floating point numbers:"
-{ $subsection fp-special? }
-{ $subsection fp-nan? }
-{ $subsection fp-qnan? }
-{ $subsection fp-snan? }
-{ $subsection fp-infinity? }
-{ $subsection fp-nan-payload }
+{ $subsections
+    fp-special?
+    fp-nan?
+    fp-qnan?
+    fp-snan?
+    fp-infinity?
+    fp-nan-payload
+}
 "Comparing two floating point numbers for bitwise equality:"
-{ $subsection fp-bitwise= }
+{ $subsections fp-bitwise= }
 { $see-also POSTPONE: NAN: } ;
 
 ARTICLE: "floats" "Floats"
-{ $subsection float }
+{ $subsections float }
 "Rational numbers represent " { $emphasis "exact" } " quantities. On the other hand, a floating point number is an " { $emphasis "approximate" } " value. While rationals can grow to any required precision, floating point numbers have limited precision, and manipulating them is usually faster than manipulating ratios or bignums."
 $nl
 "Introducing a floating point number in a computation forces the result to be expressed in floating point."
@@ -148,11 +156,13 @@ $nl
 "Floating point literal syntax is documented in " { $link "syntax-floats" } "."
 $nl
 "Integers and rationals can be converted to floats:"
-{ $subsection >float }
+{ $subsections >float }
 "Two real numbers can be divided yielding a float result:"
-{ $subsection /f }
-{ $subsection "math.floats.bitwise" }
-{ $subsection "math.floats.compare" }
+{ $subsections
+    /f
+    "math.floats.bitwise"
+    "math.floats.compare"
+}
 "The " { $vocab-link "math.floats.env" } " vocabulary provides functionality for controlling floating point exceptions, rounding modes, and denormal behavior." ;
 
 ABOUT: "floats"

@@ -5,47 +5,63 @@ IN: refs
 
 ARTICLE: "refs" "References"
 "References provide a uniform way of accessing and changing values. Some examples of referenced values are variables, tuple slots, and keys or values of assocs. References can be read, written, and deleted. References are defined in the " { $vocab-link "refs" } " vocabulary, and new reference types can be made by implementing a protocol."
-{ $subsection "refs-protocol" }
-{ $subsection "refs-impls" }
-{ $subsection "refs-utils" }
+{ $subsections
+    "refs-protocol"
+    "refs-impls"
+    "refs-utils"
+}
 "References are used by the " { $link "ui-inspector" } "." ;
 
 ABOUT: "refs"
 
 ARTICLE: "refs-impls" "Reference implementations"
 "References to objects:"
-{ $subsection obj-ref }
-{ $subsection <obj-ref> }
+{ $subsections
+    obj-ref
+    <obj-ref>
+}
 "References to assoc keys:"
-{ $subsection key-ref }
-{ $subsection <key-ref> }
+{ $subsections
+    key-ref
+    <key-ref>
+}
 "References to assoc values:"
-{ $subsection value-ref }
-{ $subsection <value-ref> }
+{ $subsections
+    value-ref
+    <value-ref>
+}
 "References to variables:"
-{ $subsection var-ref }
-{ $subsection <var-ref> }
-{ $subsection global-var-ref }
-{ $subsection <global-var-ref> }
+{ $subsections
+    var-ref
+    <var-ref>
+    global-var-ref
+    <global-var-ref>
+}
 "References to tuple slots:"
-{ $subsection slot-ref }
-{ $subsection <slot-ref> }
+{ $subsections
+    slot-ref
+    <slot-ref>
+}
 "Using boxes as references:"
-{ $subsection "box-refs" } ;
+{ $subsections "box-refs" } ;
 
 ARTICLE: "refs-utils" "Reference utilities"
-{ $subsection ref-on }
-{ $subsection ref-off }
-{ $subsection ref-inc }
-{ $subsection ref-dec }
-{ $subsection set-ref* } ;
+{ $subsections
+    ref-on
+    ref-off
+    ref-inc
+    ref-dec
+    set-ref*
+} ;
 
 ARTICLE: "refs-protocol" "Reference protocol"
 "To use a class of objects as references you must implement the reference protocol for that class, and mark your class as an instance of the " { $link ref } " mixin class. All references must implement these two words:"
-{ $subsection get-ref }
-{ $subsection set-ref }
+{ $subsections
+    get-ref
+    set-ref
+}
 "References may also implement:"
-{ $subsection delete-ref } ;
+{ $subsections delete-ref } ;
 
 ARTICLE: "box-refs" "Boxes as references"
 { $link "boxes" } " are elements of the " { $link ref } " mixin class, so any box may be used as a reference. Bear in mind that boxes will still throw an error if you call " { $link get-ref } " on an empty box." ;

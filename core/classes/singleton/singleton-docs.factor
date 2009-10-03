@@ -3,12 +3,16 @@ IN: classes.singleton
 
 ARTICLE: "singletons" "Singleton classes"
 "A singleton is a class with only one instance and with no state."
-{ $subsection POSTPONE: SINGLETON: }
-{ $subsection POSTPONE: SINGLETONS: }
-{ $subsection define-singleton-class }
+{ $subsections
+    POSTPONE: SINGLETON:
+    POSTPONE: SINGLETONS:
+    define-singleton-class
+}
 "The set of all singleton classes is itself a class:"
-{ $subsection singleton-class? }
-{ $subsection singleton-class } ;
+{ $subsections
+    singleton-class?
+    singleton-class
+} ;
 
 HELP: define-singleton-class
 { $values { "word" "a new word" } }

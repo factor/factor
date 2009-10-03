@@ -26,16 +26,22 @@ HELP: font-with-foreground
 
 ARTICLE: "fonts" "Fonts"
 "The " { $vocab-link "fonts" } " vocabulary implements a data type for fonts that other vocabularies, for example " { $link "ui" } ", can use. A font combines a font name, size, style, and color information into a single object."
-{ $subsection font }
-{ $subsection <font> }
+{ $subsections
+    font
+    <font>
+}
 "Modifying fonts:"
-{ $subsection font-with-foreground }
-{ $subsection font-with-background }
+{ $subsections
+    font-with-foreground
+    font-with-background
+}
 "Useful constants:"
-{ $subsection monospace-font }
-{ $subsection sans-serif-font }
-{ $subsection serif-font }
+{ $subsections
+    monospace-font
+    sans-serif-font
+    serif-font
+}
 "A data type for font metrics. The " { $vocab-link "fonts" } " vocabulary does not provide any means of computing font metrics, it simply defines a common data type that other vocabularies, such as " { $vocab-link "ui.text" } " may use:"
-{ $subsection metrics } ;
+{ $subsections metrics } ;
 
 ABOUT: "fonts"

@@ -34,10 +34,11 @@ HELP: nmake-tuple
 
 ARTICLE: "combinators.tuple" "Tuple-constructing combinators"
 "The " { $vocab-link "combinators.tuple" } " vocabulary provides dataflow combinators that construct " { $link tuple } " objects."
-{ $subsection make-tuple }
-{ $subsection 2make-tuple }
-{ $subsection 3make-tuple }
-{ $subsection nmake-tuple }
-;
+{ $subsections
+    make-tuple
+    2make-tuple
+    3make-tuple
+    nmake-tuple
+} ;
 
 ABOUT: "combinators.tuple"

@@ -1,5 +1,5 @@
 ! (c)Joe Groff bsd license
-USING: classes.struct math.matrices.simd math.vectors.simd
+USING: classes.struct math.matrices.simd math.vectors.simd math
 literals math.constants math.functions specialized-arrays tools.test ;
 QUALIFIED-WITH: alien.c-types c
 FROM: math.matrices => m~ ;
@@ -47,6 +47,19 @@ IN: math.matrices.simd.tests
             float-4{  0.0  0.0  1.0 0.0 }
             float-4{  0.0 -1.0  0.0 0.0 }
             float-4{  1.0  0.0  0.0 0.0 }
+            float-4{  0.0  0.0  0.0 1.0 }
+        }
+    }
+    1.0e-7 m~ 
+] unit-test
+
+[ t ] [
+    float-4{ 0.0 1.0 0.0 1.0 } pi 1/2. * rotation-matrix4
+    S{ matrix4 f
+        float-4-array{
+            float-4{  0.0  0.0  1.0 0.0 }
+            float-4{  0.0  1.0  0.0 0.0 }
+            float-4{ -1.0  0.0  0.0 0.0 }
             float-4{  0.0  0.0  0.0 1.0 }
         }
     }

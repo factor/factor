@@ -31,10 +31,12 @@ HELP: fulfill
 
 ARTICLE: "concurrency.promises" "Promises"
 "The " { $vocab-link "concurrency.promises" } " vocabulary implements " { $emphasis "promises" } ", which are thread-safe write-once variables. Once a promise is created, threads may block waiting for it to be " { $emphasis "fulfilled" } "; at some point in the future, another thread may provide a value at which point all waiting threads are notified."
-{ $subsection promise }
-{ $subsection <promise> }
-{ $subsection fulfill }
-{ $subsection ?promise }
-{ $subsection ?promise-timeout } ;
+{ $subsections
+    promise
+    <promise>
+    fulfill
+    ?promise
+    ?promise-timeout
+} ;
 
 ABOUT: "concurrency.promises"

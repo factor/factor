@@ -62,14 +62,4 @@ static const cell rel_relative_arm_3_mask = 0xffffff;
 /* code relocation table consists of a table of entries for each fixup */
 typedef u32 relocation_entry;
 
-struct factor_vm;
-
-typedef void (*relocation_iterator)(relocation_entry rel, cell index, code_block *compiled, factor_vm *vm);
-
-// callback functions
-void relocate_code_block(code_block *compiled, factor_vm *myvm);
-void copy_literal_references(code_block *compiled, factor_vm *myvm);
-void update_word_references(code_block *compiled, factor_vm *myvm);
-void update_literal_and_word_references(code_block *compiled, factor_vm *myvm);
-
 }

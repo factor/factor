@@ -51,7 +51,7 @@ struct data_heap {
 	
 	bool have_aging_p() { return gen_count > 2; }
 
-	data_heap(factor_vm *myvm, cell gen_count, cell young_size, cell aging_size, cell tenured_size);
+	explicit data_heap(factor_vm *myvm, cell gen_count, cell young_size, cell aging_size, cell tenured_size);
 	~data_heap();
 };
 
@@ -61,12 +61,5 @@ inline static bool in_zone(zone *z, object *pointer)
 {
 	return (cell)pointer >= z->start && (cell)pointer < z->end;
 }
-
-PRIMITIVE(data_room);
-PRIMITIVE(size);
-
-PRIMITIVE(begin_scan);
-PRIMITIVE(next_object);
-PRIMITIVE(end_scan);
 
 }

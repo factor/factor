@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test images.png ;
+USING: images.png images.testing namespaces tools.test
+images.pam ;
 IN: images.png.tests
 
-: png-test-path ( -- path )
-    "vocab:images/test-images/rgb.png" ;
+"vocab:images/testing/png/rgb.png" decode-test
+"vocab:images/testing/png/yin_yang.png" decode-test

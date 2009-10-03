@@ -5,8 +5,10 @@ ARTICLE: "builtin-classes" "Built-in classes"
 "Every object is an instance of exactly one canonical " { $emphasis "built-in class" } " which defines its layout in memory and basic behavior."
 $nl
 "The set of built-in classes is a class:"
-{ $subsection builtin-class }
-{ $subsection builtin-class? }
+{ $subsections
+    builtin-class
+    builtin-class?
+}
 "See " { $link "type-index" } " for a list of built-in classes." ;
 
 HELP: builtin-class

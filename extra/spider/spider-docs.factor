@@ -42,10 +42,10 @@ ARTICLE: "spider-tutorial" "Spider tutorial"
 
 ARTICLE: "spider" "Spider"
 "The " { $vocab-link "spider" } " vocabulary implements a simple web spider for retrieving sets of webpages."
-{ $subsection "spider-tutorial" }
+{ $subsections "spider-tutorial" }
 "Creating a new spider:"
-{ $subsection <spider> }
+{ $subsections <spider> }
 "Running the spider:"
-{ $subsection run-spider } ;
+{ $subsections run-spider } ;
 
 ABOUT: "spider"

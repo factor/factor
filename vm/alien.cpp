@@ -46,7 +46,7 @@ cell factor_vm::allot_alien(cell delegate_, cell displacement)
 }
 
 /* make an alien pointing at an offset of another alien */
-inline void factor_vm::primitive_displaced_alien()
+void factor_vm::primitive_displaced_alien()
 {
 	cell alien = dpop();
 	cell displacement = to_cell(dpop());
@@ -69,16 +69,12 @@ inline void factor_vm::primitive_displaced_alien()
 	}
 }
 
-PRIMITIVE_FORWARD(displaced_alien)
-
 /* address of an object representing a C pointer. Explicitly throw an error
 if the object is a byte array, as a sanity check. */
-inline void factor_vm::primitive_alien_address()
+void factor_vm::primitive_alien_address()
 {
 	box_unsigned_cell((cell)pinned_alien_offset(dpop()));
 }
-
-PRIMITIVE_FORWARD(alien_address)
 
 /* pop ( alien n ) from datastack, return alien's address plus n */
 void *factor_vm::alien_pointer()
@@ -115,7 +111,7 @@ DEFINE_ALIEN_ACCESSOR(double,double,box_double,to_double)
 DEFINE_ALIEN_ACCESSOR(cell,void *,box_alien,pinned_alien_offset)
 
 /* open a native library and push a handle */
-inline void factor_vm::primitive_dlopen()
+void factor_vm::primitive_dlopen()
 {
 	gc_root<byte_array> path(dpop(),this);
 	path.untag_check(this);
@@ -125,10 +121,8 @@ inline void factor_vm::primitive_dlopen()
 	dpush(library.value());
 }
 
-PRIMITIVE_FORWARD(dlopen)
-
 /* look up a symbol in a native library */
-inline void factor_vm::primitive_dlsym()
+void factor_vm::primitive_dlsym()
 {
 	gc_root<object> library(dpop(),this);
 	gc_root<byte_array> name(dpop(),this);
@@ -149,19 +143,15 @@ inline void factor_vm::primitive_dlsym()
 	}
 }
 
-PRIMITIVE_FORWARD(dlsym)
-
 /* close a native library handle */
-inline void factor_vm::primitive_dlclose()
+void factor_vm::primitive_dlclose()
 {
 	dll *d = untag_check<dll>(dpop());
 	if(d->dll != NULL)
 		ffi_dlclose(d);
 }
 
-PRIMITIVE_FORWARD(dlclose)
-
-inline void factor_vm::primitive_dll_validp()
+void factor_vm::primitive_dll_validp()
 {
 	cell library = dpop();
 	if(library == F)
@@ -169,8 +159,6 @@ inline void factor_vm::primitive_dll_validp()
 	else
 		dpush(untag_check<dll>(library)->dll == NULL ? F : T);
 }
-
-PRIMITIVE_FORWARD(dll_validp)
 
 /* gets the address of an object representing a C pointer */
 char *factor_vm::alien_offset(cell obj)
@@ -285,11 +273,9 @@ VM_C_API void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size, f
 	return VM_PTR->box_medium_struct(x1, x2, x3, x4, size);
 }
 
-inline void factor_vm::primitive_vm_ptr()
+void factor_vm::primitive_vm_ptr()
 {
 	box_alien(this);
 }
-
-PRIMITIVE_FORWARD(vm_ptr)
 
 }

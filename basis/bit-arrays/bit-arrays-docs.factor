@@ -10,19 +10,27 @@ $nl
 "Bit arrays play a special role in the C library interface; they can be used to pass binary data back and forth between Factor and C. See " { $link "c-pointers" } "."
 $nl
 "Bit arrays form a class of objects:"
-{ $subsection bit-array }
-{ $subsection bit-array? }
+{ $subsections
+    bit-array
+    bit-array?
+}
 "Creating new bit arrays:"
-{ $subsection >bit-array }
-{ $subsection <bit-array> }
+{ $subsections
+    >bit-array
+    <bit-array>
+}
 "Efficiently setting and clearing all bits in a bit array:"
-{ $subsection set-bits }
-{ $subsection clear-bits }
+{ $subsections
+    set-bits
+    clear-bits
+}
 "Converting between unsigned integers and their binary representation:"
-{ $subsection integer>bit-array }
-{ $subsection bit-array>integer }
+{ $subsections
+    integer>bit-array
+    bit-array>integer
+}
 "Bit array literal syntax:"
-{ $subsection POSTPONE: ?{ } ;
+{ $subsections POSTPONE: ?{ } ;
 
 ABOUT: "bit-arrays"
 

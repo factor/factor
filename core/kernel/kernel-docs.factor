@@ -799,16 +799,18 @@ HELP: loop
 
 ARTICLE: "looping-combinators" "Looping combinators"
 "In most cases, loops should be written using high-level combinators (such as " { $link "sequences-combinators" } ") or tail recursion. However, sometimes, the best way to express intent is with a loop."
-{ $subsection while }
-{ $subsection until }
+{ $subsections
+    while
+    until
+}
 "To execute one iteration of a loop, use the following word:"
-{ $subsection do }
+{ $subsections do }
 "This word is intended as a modifier. The normal " { $link while } " loop never executes the body if the predicate returns false on the first iteration. To ensure the body executes at least once, use " { $link do } ":"
 { $code
     "[ P ] [ Q ] do while"
 }
 "A simpler looping combinator which executes a single quotation until it returns " { $link f } ":"
-{ $subsection loop } ;
+{ $subsections loop } ;
 
 HELP: assert
 { $values { "got" "the obtained value" } { "expect" "the expected value" } }
@@ -825,47 +827,55 @@ $nl
 "The " { $link "cleave-combinators" } ", " { $link "spread-combinators" } " and " { $link "apply-combinators" } " are closely related to shuffle words and should be used instead where possible because they can result in clearer code; also, see the advice in " { $link "cookbook-philosophy" } "."
 $nl
 "Removing stack elements:"
-{ $subsection drop }
-{ $subsection 2drop }
-{ $subsection 3drop }
-{ $subsection nip }
-{ $subsection 2nip }
+{ $subsections
+    drop
+    2drop
+    3drop
+    nip
+    2nip
+}
 "Duplicating stack elements:"
-{ $subsection dup }
-{ $subsection 2dup }
-{ $subsection 3dup }
-{ $subsection dupd }
-{ $subsection over }
-{ $subsection 2over }
-{ $subsection pick }
-{ $subsection tuck }
+{ $subsections
+    dup
+    2dup
+    3dup
+    dupd
+    over
+    2over
+    pick
+    tuck
+}
 "Permuting stack elements:"
-{ $subsection swap }
-{ $subsection swapd }
-{ $subsection rot }
-{ $subsection -rot }
-{ $subsection spin }
-{ $subsection roll }
-{ $subsection -roll } ;
+{ $subsections
+    swap
+    swapd
+    rot
+    -rot
+    spin
+    roll
+    -roll
+} ;
 
 ARTICLE: "equality" "Equality"
 "There are two distinct notions of “sameness” when it comes to objects."
 $nl
 "You can test if two references point to the same object (" { $emphasis "identity comparison" } "). This is rarely used; it is mostly useful with large, mutable objects where the object identity matters but the value is transient:"
-{ $subsection eq? }
+{ $subsections eq? }
 "You can test if two objects are equal in a domain-specific sense, usually by being instances of the same class, and having equal slot values (" { $emphasis "value comparison" } "):"
-{ $subsection = }
+{ $subsections = }
 "A third form of equality is provided by " { $link number= } ". It compares numeric value while disregarding types."
 $nl
 "Custom value comparison methods for use with " { $link = } " can be defined on a generic word:"
-{ $subsection equal? }
+{ $subsections equal? }
 "Utility class:"
-{ $subsection identity-tuple }
+{ $subsections identity-tuple }
 "An object can be cloned; the clone has distinct identity but equal value:"
-{ $subsection clone } ;
+{ $subsections clone } ;
 
 ARTICLE: "assertions" "Assertions"
 "Some words to make assertions easier to enforce:"
-{ $subsection assert }
-{ $subsection assert= } ;
+{ $subsections
+    assert
+    assert=
+} ;
 

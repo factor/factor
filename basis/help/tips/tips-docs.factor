@@ -34,8 +34,8 @@ ARTICLE: "all-tips-of-the-day" "All tips of the day"
 
 ARTICLE: "tips-of-the-day" "Tips of the day"
 "The " { $vocab-link "help.tips" } " vocabulary provides a facility for displaying tips of the day in the " { $link "ui-listener" } ". Tips are defined with a parsing word:"
-{ $subsection POSTPONE: TIP: }
+{ $subsections POSTPONE: TIP: }
 "All tips defined so far:"
-{ $subsection "all-tips-of-the-day" } ;
+{ $subsections "all-tips-of-the-day" } ;
 
 ABOUT: "tips-of-the-day"

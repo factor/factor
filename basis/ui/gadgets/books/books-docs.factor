@@ -17,8 +17,10 @@ HELP: <empty-book>
 
 ARTICLE: "ui-book-layout" "Book layouts"
 "Books can contain any number of children, and display one child at a time. The currently visible child is determined by the value of the model, which must be an integer."
-{ $subsection book }
-{ $subsection <book> }
-{ $subsection <empty-book> } ;
+{ $subsections
+    book
+    <book>
+    <empty-book>
+} ;
 
 ABOUT: "ui-book-layout"

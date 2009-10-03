@@ -5,8 +5,8 @@ ARTICLE: "words.constant" "Constants"
 "There is a syntax for defining words which push literals on the stack."
 $nl
 "Define a new word that pushes a literal on the stack:"
-{ $subsection POSTPONE: CONSTANT: }
+{ $subsections POSTPONE: CONSTANT: }
 "Define an constant at run-time:"
-{ $subsection define-constant } ;
+{ $subsections define-constant } ;
 
 ABOUT: "words.constant"

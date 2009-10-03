@@ -16,11 +16,15 @@ ARTICLE: "breakpoints" "Setting breakpoints"
 "In addition to invoking the walker explicitly through the UI, it is possible to set breakpoints on words using words in the " { $vocab-link "tools.walker" } " vocabulary."
 $nl
 "Annotating a word with a breakpoint (see " { $link "tools.annotations" } "):"
-{ $subsection breakpoint }
-{ $subsection breakpoint-if }
+{ $subsections
+    breakpoint
+    breakpoint-if
+}
 "Breakpoints can be inserted directly into code:"
-{ $subsection break }
-{ $subsection POSTPONE: B }
+{ $subsections
+    break
+    POSTPONE: B
+}
 "Note that because the walker calls various core library and UI words while rendering its own user interface, setting a breakpoint on a word such as " { $link append } " or " { $link + } " will hang the UI." ;
 
 ABOUT: "breakpoints"

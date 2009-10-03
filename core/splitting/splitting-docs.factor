@@ -3,17 +3,19 @@ IN: splitting
 
 ARTICLE: "sequences-split" "Splitting sequences"
 "Splitting sequences at occurrences of subsequences:"
-{ $subsection ?head }
-{ $subsection ?head-slice }
-{ $subsection ?tail }
-{ $subsection ?tail-slice }
-{ $subsection split1 }
-{ $subsection split1-slice }
-{ $subsection split1-last }
-{ $subsection split1-last-slice }
-{ $subsection split }
+{ $subsections
+    ?head
+    ?head-slice
+    ?tail
+    ?tail-slice
+    split1
+    split1-slice
+    split1-last
+    split1-last-slice
+    split
+}
 "Splitting a string into lines:"
-{ $subsection string-lines } ;
+{ $subsections string-lines } ;
 
 ABOUT: "sequences-split"
 

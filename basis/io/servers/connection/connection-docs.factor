@@ -4,11 +4,13 @@ io.sockets.secure concurrency.semaphores calendar classes math ;
 
 ARTICLE: "server-config" "Threaded server configuration"
 "The " { $link threaded-server } " tuple has a variety of slots which can be set before starting the server with " { $link start-server } " or " { $link start-server* } "."
-{ $subsection "server-config-logging" }
-{ $subsection "server-config-listen" }
-{ $subsection "server-config-limit" }
-{ $subsection "server-config-stream" }
-{ $subsection "server-config-handler" } ;
+{ $subsections
+    "server-config-logging"
+    "server-config-listen"
+    "server-config-limit"
+    "server-config-stream"
+    "server-config-handler"
+} ;
 
 ARTICLE: "server-config-logging" "Logging connections"
 "The " { $snippet "name" } " slot of a threaded server instance should be set to a string naming the logging service name to use. See " { $link "logging" } " for details." ;
@@ -19,8 +21,10 @@ $nl
 "The " { $snippet "secure" } " slot of a threaded server instance is interpreted in the same manner as the " { $snippet "insecure" } " slot, except that secure encrypted connections are then allowed. If this slot is set, the " { $snippet "secure-config" } " slot should also be set to a " { $link secure-config } " instance containing SSL server configuration. See " { $link "ssl-config" } " for details."
 $nl
 "Two utility words for producing address specifiers:"
-{ $subsection local-server }
-{ $subsection internet-server } ;
+{ $subsections
+    local-server
+    internet-server
+} ;
 
 ARTICLE: "server-config-limit" "Limiting connections"
 "The " { $snippet "max-connections" } " slot is initially set to " { $link f } ", which disables connection limiting, but can be set to an integer specifying the maximum number of simultaneous connections."
@@ -50,27 +54,33 @@ ARTICLE: "server-examples" "Threaded server examples"
 
 ARTICLE: "io.servers.connection" "Threaded servers"
 "The " { $vocab-link "io.servers.connection" } " vocabulary implements a generic server abstraction for " { $link "network-connection" } ". A set of threads listen for connections, and additional threads are spawned for each client connection. In addition to this basic functionality, it provides some advanced features such as logging, connection limits and secure socket support."
-{ $subsection "server-examples" }
+{ $subsections "server-examples" }
 "Creating threaded servers with client handler quotations:"
-{ $subsection <threaded-server> }
+{ $subsections <threaded-server> }
 "Client handlers can also be implemented by subclassing a threaded server; see " { $link "server-config-handler" } " for details:"
-{ $subsection threaded-server }
-{ $subsection new-threaded-server }
-{ $subsection handle-client* }
+{ $subsections
+    threaded-server
+    new-threaded-server
+    handle-client*
+}
 "The server must be configured before it can be started." 
-{ $subsection "server-config" }
+{ $subsections "server-config" }
 "Starting the server:"
-{ $subsection start-server }
-{ $subsection start-server* }
-{ $subsection wait-for-server }
+{ $subsections
+    start-server
+    start-server*
+    wait-for-server
+}
 "Stopping the server:"
-{ $subsection stop-server }
+{ $subsections stop-server }
 "From within the dynamic scope of a client handler, several words can be used to interact with the threaded server:"
-{ $subsection stop-this-server }
-{ $subsection secure-port }
-{ $subsection insecure-port }
+{ $subsections
+    stop-this-server
+    secure-port
+    insecure-port
+}
 "Additionally, the " { $link local-address } " and "
-{ $subsection remote-address } " variables are set, as in " { $link with-client } "." ;
+{ $subsections remote-address } " variables are set, as in " { $link with-client } "." ;
 
 ABOUT: "io.servers.connection"
 

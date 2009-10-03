@@ -9,11 +9,11 @@ $nl
 "Memoization is useful in situations where the set of possible inputs is small, but the results are expensive to compute and should be cached. Memoized words should not have any side effects."
 $nl
 "Defining a memoized word at parse time:"
-{ $subsection POSTPONE: MEMO: }
+{ $subsections POSTPONE: MEMO: }
 "Defining a memoized word at run time:"
-{ $subsection define-memoized }
+{ $subsections define-memoized }
 "Clearing memoized results:"
-{ $subsection reset-memoized } ;
+{ $subsections reset-memoized } ;
 
 ABOUT: "memoize"
 

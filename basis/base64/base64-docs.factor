@@ -36,12 +36,16 @@ HELP: encode-base64-lines
 ARTICLE: "base64" "Base 64 conversions"
 "The " { $vocab-link "base64" } " vocabulary implements conversions of sequences to printable characters in base 64. These plain-text representations of binary data may be passed around and converted back to binary data later." $nl
 "Converting to and from base64 as strings:"
-{ $subsection >base64 }
-{ $subsection >base64-lines }
-{ $subsection base64> }
+{ $subsections
+    >base64
+    >base64-lines
+    base64>
+}
 "Using base64 from streams:"
-{ $subsection encode-base64 }
-{ $subsection encode-base64-lines }
-{ $subsection decode-base64 } ;
+{ $subsections
+    encode-base64
+    encode-base64-lines
+    decode-base64
+} ;
 
 ABOUT: "base64"

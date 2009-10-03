@@ -26,13 +26,17 @@ $nl
 "While parsing words supporting arbitrary syntax can be defined, the default set is found in the " { $vocab-link "syntax" } " vocabulary and provides the basis for all further syntactic interaction with Factor." ;
 
 ARTICLE: "syntax-comments" "Comments"
-{ $subsection POSTPONE: ! }
-{ $subsection POSTPONE: #! } ;
+{ $subsections
+    POSTPONE: !
+    POSTPONE: #!
+} ;
 
 ARTICLE: "syntax-immediate" "Parse time evaluation"
 "Code can be evaluated at parse time. This is a rarely-used feature; one use-case is " { $link "loading-libs" } ", where you want to execute some code before the words in a source file are compiled."
-{ $subsection POSTPONE: << }
-{ $subsection POSTPONE: >> } ;
+{ $subsections
+    POSTPONE: <<
+    POSTPONE: >>
+} ;
 
 ARTICLE: "syntax-integers" "Integer syntax"
 "The printed representation of an integer consists of a sequence of digits, optionally prefixed by a sign."
@@ -42,9 +46,11 @@ ARTICLE: "syntax-integers" "Integer syntax"
     "2432902008176640000"
 }
 "Integers are entered in base 10 unless prefixed with a base change parsing word."
-{ $subsection POSTPONE: BIN: }
-{ $subsection POSTPONE: OCT: }
-{ $subsection POSTPONE: HEX: }
+{ $subsections
+    POSTPONE: BIN:
+    POSTPONE: OCT:
+    POSTPONE: HEX:
+}
 "More information on integers can be found in " { $link "integers" } "." ;
 
 ARTICLE: "syntax-ratios" "Ratio syntax"
@@ -78,7 +84,7 @@ ARTICLE: "syntax-floats" "Float syntax"
 { "Not-a-number" { $snippet "0/0." } }
 }
 "A Not-a-number with an arbitrary payload can also be parsed in:"
-{ $subsection POSTPONE: NAN: }
+{ $subsections POSTPONE: NAN: }
 "More information on floats can be found in " { $link "floats" } "." ;
 
 ARTICLE: "syntax-complex-numbers" "Complex number syntax"
@@ -87,20 +93,24 @@ ARTICLE: "syntax-complex-numbers" "Complex number syntax"
     "C{ 1/2 1/3 }   ! the complex number 1/2+1/3i"
     "C{ 0 1 }       ! the imaginary unit"
 }
-{ $subsection POSTPONE: C{ }
+{ $subsections POSTPONE: C{ }
 "More information on complex numbers can be found in " { $link "complex-numbers" } "." ;
 
 ARTICLE: "syntax-numbers" "Number syntax"
 "If a vocabulary lookup of a token fails, the parser attempts to parse it as a number."
-{ $subsection "syntax-integers" }
-{ $subsection "syntax-ratios" }
-{ $subsection "syntax-floats" }
-{ $subsection "syntax-complex-numbers" } ;
+{ $subsections
+    "syntax-integers"
+    "syntax-ratios"
+    "syntax-floats"
+    "syntax-complex-numbers"
+} ;
 
 ARTICLE: "syntax-words" "Word syntax"
 "A word occurring inside a quotation is executed when the quotation is called. Sometimes a word needs to be pushed on the data stack instead. The canonical use-case for this is passing the word to the " { $link execute } " combinator, or alternatively, reflectively accessing word properties (" { $link "word-props" } ")."
-{ $subsection POSTPONE: \ }
-{ $subsection POSTPONE: POSTPONE: }
+{ $subsections
+    POSTPONE: \
+    POSTPONE: POSTPONE:
+}
 "The implementation of the " { $link POSTPONE: \ } " word is discussed in detail in " { $link "reading-ahead" } ". Words are documented in " { $link "words" } "." ;
 
 ARTICLE: "escape" "Character escape codes"
@@ -120,48 +130,54 @@ ARTICLE: "escape" "Character escape codes"
 
 ARTICLE: "syntax-strings" "Character and string syntax"
 "Factor has no distinct character type, however Unicode character value integers can be read by specifying a literal character, or an escaped representation thereof."
-{ $subsection POSTPONE: CHAR: }
-{ $subsection POSTPONE: " }
-{ $subsection "escape" }
+{ $subsections
+    POSTPONE: CHAR:
+    POSTPONE: "
+    "escape"
+}
 "Strings are documented in " { $link "strings" } "." ;
 
 ARTICLE: "syntax-sbufs" "String buffer syntax"
-{ $subsection POSTPONE: SBUF" }
+{ $subsections POSTPONE: SBUF" }
 "String buffers are documented in " { $link "sbufs" } "." ;
 
 ARTICLE: "syntax-arrays" "Array syntax"
-{ $subsection POSTPONE: { }
-{ $subsection POSTPONE: } }
+{ $subsections
+    POSTPONE: {
+    POSTPONE: }
+}
 "Arrays are documented in " { $link "arrays" } "." ;
 
 ARTICLE: "syntax-vectors" "Vector syntax"
-{ $subsection POSTPONE: V{ }
+{ $subsections POSTPONE: V{ }
 "Vectors are documented in " { $link "vectors" } "." ;
 
 ARTICLE: "syntax-hashtables" "Hashtable syntax"
-{ $subsection POSTPONE: H{ }
+{ $subsections POSTPONE: H{ }
 "Hashtables are documented in " { $link "hashtables" } "." ;
 
 ARTICLE: "syntax-tuples" "Tuple syntax"
-{ $subsection POSTPONE: T{ }
+{ $subsections POSTPONE: T{ }
 "Tuples are documented in " { $link "tuples" } "."  ;
 
 ARTICLE: "syntax-quots" "Quotation syntax"
-{ $subsection POSTPONE: [ }
-{ $subsection POSTPONE: ] }
+{ $subsections
+    POSTPONE: [
+    POSTPONE: ]
+}
 "Quotations are documented in " { $link "quotations" } "." ;
 
 ARTICLE: "syntax-byte-arrays" "Byte array syntax"
-{ $subsection POSTPONE: B{ }
+{ $subsections POSTPONE: B{ }
 "Byte arrays are documented in " { $link "byte-arrays" } "." ;
 
 ARTICLE: "syntax-pathnames" "Pathname syntax"
-{ $subsection POSTPONE: P" }
+{ $subsections POSTPONE: P" }
 "Pathnames are documented in " { $link "io.pathnames" } "." ;
 
 ARTICLE: "syntax-effects" "Stack effect syntax"
 "Note that this is " { $emphasis "not" } " syntax to declare stack effects of words. This pushes an " { $link effect } " instance on the stack for reflection, for use with words such as " { $link define-declared } ", " { $link call-effect } " and " { $link execute-effect } "."
-{ $subsection POSTPONE: (( }
+{ $subsections POSTPONE: (( }
 { $see-also "effects" "inference" "tools.inference" } ;
 
 ARTICLE: "syntax-literals" "Literals"
@@ -170,27 +186,31 @@ $nl
 "If a quotation contains a literal object, the same literal object instance is used each time the quotation executes; that is, literals are “live”."
 $nl
 "Using mutable object literals in word definitions requires care, since if those objects are mutated, the actual word definition will be changed, which is in most cases not what you would expect. Literals should be " { $link clone } "d before being passed to word which may potentially mutate them."
-{ $subsection "syntax-numbers" }
-{ $subsection "syntax-words" }
-{ $subsection "syntax-quots" }
-{ $subsection "syntax-arrays" }
-{ $subsection "syntax-strings" }
-{ $subsection "syntax-byte-arrays" }
-{ $subsection "syntax-vectors" }
-{ $subsection "syntax-sbufs" }
-{ $subsection "syntax-hashtables" }
-{ $subsection "syntax-tuples" }
-{ $subsection "syntax-pathnames" }
-{ $subsection "syntax-effects" } ;
+{ $subsections
+    "syntax-numbers"
+    "syntax-words"
+    "syntax-quots"
+    "syntax-arrays"
+    "syntax-strings"
+    "syntax-byte-arrays"
+    "syntax-vectors"
+    "syntax-sbufs"
+    "syntax-hashtables"
+    "syntax-tuples"
+    "syntax-pathnames"
+    "syntax-effects"
+} ;
 
 ARTICLE: "syntax" "Syntax"
 "Factor has two main forms of syntax: " { $emphasis "definition" } " syntax and " { $emphasis "literal" } " syntax. Code is data, so the syntax for code is a special case of object literal syntax. This section documents literal syntax. Definition syntax is covered in " { $link "words" } ". Extending the parser is the main topic of " { $link "parser" } "."
-{ $subsection "parser-algorithm" }
-{ $subsection "word-search" }
-{ $subsection "top-level-forms" }
-{ $subsection "syntax-comments" }
-{ $subsection "syntax-literals" }
-{ $subsection "syntax-immediate" } ;
+{ $subsections
+    "parser-algorithm"
+    "word-search"
+    "top-level-forms"
+    "syntax-comments"
+    "syntax-literals"
+    "syntax-immediate"
+} ;
 
 ABOUT: "syntax"
 

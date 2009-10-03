@@ -15,9 +15,16 @@ PREDICATE: simple-element < array
 SYMBOL: last-element
 SYMBOL: span
 SYMBOL: block
+SYMBOL: blank-line
 
 : last-span? ( -- ? ) last-element get span eq? ;
 : last-block? ( -- ? ) last-element get block eq? ;
+: last-blank-line? ( -- ? ) last-element get blank-line eq? ;
+
+: ?nl ( -- )
+    last-element get
+    last-blank-line? not
+    and [ nl ] when ;
 
 : ($span) ( quot -- )
     last-block? [ nl ] when
@@ -45,7 +52,7 @@ M: f print-element drop ;
     [ print-element ] with-default-style ;
 
 : ($block) ( quot -- )
-    last-element get [ nl ] when
+    ?nl
     span last-element set
     call
     block last-element set ; inline
@@ -71,11 +78,12 @@ ALIAS: $slot $snippet
     ] ($span) ;
 
 : $nl ( children -- )
-    nl last-block? [ nl ] unless drop ;
+    drop nl last-element get [ nl ] when
+    blank-line last-element set ;
 
 ! Some blocks
 : ($heading) ( children quot -- )
-    last-element get [ nl ] when ($block) ; inline
+    ?nl ($block) ; inline
 
 : $heading ( element -- )
     [ heading-style get print-element* ] ($heading) ;
@@ -212,7 +220,7 @@ PRIVATE>
     ] ($subsection) ;
 
 : $subsections ( children -- )
-    [ $subsection* ] each nl ;
+    [ $subsection* ] each nl nl blank-line last-element set ;
 
 : $subsection ( element -- )
     first $subsection* ;

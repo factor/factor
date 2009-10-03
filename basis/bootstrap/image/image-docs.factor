@@ -3,7 +3,7 @@ IN: bootstrap.image
 
 ARTICLE: "bootstrap.image" "Bootstrapping new images"
 "A new image can be built from source; this is known as " { $emphasis "bootstrap" } ". Bootstrap is a two-step process. The first stage is the creation of a bootstrap image from a running Factor instance:"
-{ $subsection make-image }
+{ $subsections make-image }
 "The second bootstrapping stage is initiated by running the resulting bootstrap image:"
 { $code "./factor -i=boot.x86.32.image" }
 "This stage loads additional code, compiles all words, and dumps a final " { $snippet "factor.image" } "."

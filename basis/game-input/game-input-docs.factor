@@ -5,26 +5,34 @@ IN: game-input
 ARTICLE: "game-input" "Game controller input"
 "The " { $vocab-link "game-input" } " vocabulary provides cross-platform access to game controller devices such as joysticks and gamepads. It also provides an interface for polling raw keyboard and mouse input." $nl
 "The game input interface must be initialized before being used:"
-{ $subsection open-game-input }
-{ $subsection close-game-input }
-{ $subsection with-game-input }
+{ $subsections
+    open-game-input
+    close-game-input
+    with-game-input
+}
 "Once the game input interface is open, connected controller devices can be enumerated:"
-{ $subsection get-controllers }
-{ $subsection find-controller-products }
-{ $subsection find-controller-instance }
+{ $subsections
+    get-controllers
+    find-controller-products
+    find-controller-instance
+}
 "These " { $link controller } " objects can be queried of their identity:"
-{ $subsection product-string }
-{ $subsection product-id }
-{ $subsection instance-id }
+{ $subsections
+    product-string
+    product-id
+    instance-id
+}
 "A hook is provided for invoking the system calibration tool:"
-{ $subsection calibrate-controller }
+{ $subsections calibrate-controller }
 "The current state of a controller, the keyboard, and the mouse can be read:"
-{ $subsection read-controller }
-{ $subsection read-keyboard }
-{ $subsection read-mouse }
-{ $subsection controller-state }
-{ $subsection keyboard-state }
-{ $subsection mouse-state } ;
+{ $subsections
+    read-controller
+    read-keyboard
+    read-mouse
+    controller-state
+    keyboard-state
+    mouse-state
+} ;
 
 HELP: open-game-input
 { $description "Initializes the game input interface. An exception will be thrown if the initialization fails. Calls to open-game-input are reference counted; each call to open-game-input needs a corresponding call to close-game-input to close the game input interface." } ;

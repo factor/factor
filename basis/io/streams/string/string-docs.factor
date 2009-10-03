@@ -3,11 +3,15 @@ IN: io.streams.string
 
 ARTICLE: "io.streams.string" "String streams"
 "String streams:"
-{ $subsection <string-reader> }
-{ $subsection <string-writer> }
+{ $subsections
+    <string-reader>
+    <string-writer>
+}
 "Utility combinators:"
-{ $subsection with-string-reader }
-{ $subsection with-string-writer } ;
+{ $subsections
+    with-string-reader
+    with-string-writer
+} ;
 
 ABOUT: "io.streams.string"
 

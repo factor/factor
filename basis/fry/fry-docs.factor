@@ -78,17 +78,21 @@ ARTICLE: "fry" "Fried quotations"
 "The " { $vocab-link "fry" } " vocabulary implements " { $emphasis "fried quotation" } ". Conceptually, fried quotations are quotations with “holes” (more formally, " { $emphasis "fry specifiers" } "), and the holes are filled in when the fried quotation is pushed on the stack."
 $nl
 "Fried quotations are started by a special parsing word:"
-{ $subsection POSTPONE: '[ }
+{ $subsections POSTPONE: '[ }
 "There are two types of fry specifiers; the first can hold a value, and the second “splices” a quotation, as if it were inserted without surrounding brackets:"
-{ $subsection _ }
-{ $subsection @ }
+{ $subsections
+    _
+    @
+}
 "The holes are filled in with the top of stack going in the rightmost hole, the second item on the stack going in the second hole from the right, and so on."
-{ $subsection "fry.examples" }
-{ $subsection "fry.philosophy" }
+{ $subsections
+    "fry.examples"
+    "fry.philosophy"
+}
 "Fry is implemented as a parsing word which reads a quotation and scans for occurrences of " { $link _ } " and " { $link @ } "; these words are not actually executed, and doing so raises an error (this can happen if they're accidentally used outside of a fry)."
 $nl
 "Fried quotations can also be constructed without using a parsing word; this is useful when meta-programming:"
-{ $subsection fry }
+{ $subsections fry }
 "Fried quotations are an abstraction on top of the " { $link "compositional-combinators" } "; their use is encouraged over the combinators, because often the fry form is shorter and clearer than the combinator form." ;
 
 ABOUT: "fry"
