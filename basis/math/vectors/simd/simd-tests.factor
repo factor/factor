@@ -160,7 +160,7 @@ CONSTANT: simd-classes
     { vlshift vrshift } unique assoc-diff ;
 
 : boolean-ops ( -- words )
-    { vand vandn vor vxor } ;
+    { vand vandn vor vxor vnot } ;
 
 : remove-boolean-words ( alist -- alist' )
     boolean-ops unique assoc-diff ;
