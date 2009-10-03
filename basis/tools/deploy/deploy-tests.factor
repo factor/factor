@@ -106,3 +106,10 @@ os windows? os macosx? or [
 os macosx? [
     [ ] [ "tools.deploy.test.14" shake-and-bake run-temp-image ] unit-test
 ] when
+
+[ { "a" "b" "c" } ] [
+    "tools.deploy.test.15" shake-and-bake deploy-test-command
+    { "a" "b" "c" } append
+    ascii [ lines ] with-process-reader
+    rest
+] unit-test
