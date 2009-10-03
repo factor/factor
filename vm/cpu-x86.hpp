@@ -3,7 +3,7 @@
 namespace factor
 {
 
-#define FRAME_RETURN_ADDRESS(frame) *(void **)(frame_successor(frame) + 1)
+#define FRAME_RETURN_ADDRESS(frame,vm) *(void **)(vm->frame_successor(frame) + 1)
 
 inline static void flush_icache(cell start, cell len) {}
 

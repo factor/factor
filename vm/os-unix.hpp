@@ -56,8 +56,9 @@ s64 current_micros();
 void sleep_micros(cell usec);
 
 void init_platform_globals();
-struct factor_vm;
+
 void register_vm_with_thread(factor_vm *vm);
 factor_vm *tls_vm();
 void open_console();
+
 }

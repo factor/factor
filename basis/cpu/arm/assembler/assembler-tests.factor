@@ -1,8 +1,9 @@
 IN: cpu.arm.assembler.tests
-USING: assembler-arm math test namespaces sequences kernel
-quotations ;
+USING: cpu.arm.assembler math tools.test namespaces make
+sequences kernel quotations ;
+FROM: cpu.arm.assembler => B ;
 
-: test-opcode [ { } make first ] curry unit-test ;
+: test-opcode ( expect quot -- ) [ { } make first ] curry unit-test ;
 
 [ HEX: ea000000 ] [ 0 B ] test-opcode
 [ HEX: eb000000 ] [ 0 BL ] test-opcode

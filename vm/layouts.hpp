@@ -106,9 +106,9 @@ struct header {
 	cell value;
 
         /* Default ctor to make gcc 3.x happy */
-        header() { abort(); }
+        explicit header() { abort(); }
 
-	header(cell value_) : value(value_ << TAG_BITS) {}
+	explicit header(cell value_) : value(value_ << TAG_BITS) {}
 
 	void check_header() {
 #ifdef FACTOR_DEBUG
@@ -179,7 +179,7 @@ struct byte_array : public object {
 	/* tagged */
 	cell capacity;
 
-	template<typename T> T *data() { return (T *)(this + 1); }
+	template<typename Scalar> Scalar *data() { return (Scalar *)(this + 1); }
 };
 
 /* Assembly code makes assumptions about the layout of this struct */

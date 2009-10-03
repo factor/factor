@@ -1,8 +1,6 @@
 namespace factor
 {
 
-struct factor_vm;
-
 inline cell align_page(cell a)
 {
 	return align(a,getpagesize());
@@ -16,7 +14,7 @@ struct segment {
 	cell size;
 	cell end;
 
-	segment(factor_vm *myvm, cell size);
+	explicit segment(factor_vm *myvm, cell size);
 	~segment();
 };
 
