@@ -141,13 +141,24 @@ CONSTANT: simd-classes
 
 "== Checking vector operations" print
 
-: random-vector ( class -- vec )
-    new [ drop 1000 random ] map ;
+: random-int-vector ( class -- vec )
+    new [ drop 1,000 random ] map ;
+: random-float-vector ( class -- vec )
+    new [
+        drop
+        -1,000.0 1,000.0 uniform-random-float 
+        10 swap <array> 0/0. suffix random
+    ] map ;
+
+: random-vector ( class elt-class -- vec )
+    float =
+    [ random-float-vector ]
+    [ random-int-vector ] if ;
 
 :: check-vector-op ( word inputs class elt-class -- inputs quot )
     inputs [
         {
-            { +vector+ [ class random-vector ] }
+            { +vector+ [ class elt-class random-vector ] }
             { +scalar+ [ 1000 random elt-class float = [ >float ] when ] }
         } case
     ] [ ] map-as
@@ -160,7 +171,7 @@ CONSTANT: simd-classes
     { vlshift vrshift } unique assoc-diff ;
 
 : boolean-ops ( -- words )
-    { vand vandn vor vxor } ;
+    { vand vandn vor vxor vnot } ;
 
 : remove-boolean-words ( alist -- alist' )
     boolean-ops unique assoc-diff ;
@@ -169,7 +180,7 @@ CONSTANT: simd-classes
     ! These have their own tests later
     {
         hlshift hrshift vshuffle vbroadcast
-        v= vany? vall? vnone?
+        vany? vall? vnone?
     } unique assoc-diff ;
 
 : ops-to-check ( elt-class -- alist )
@@ -186,6 +197,7 @@ CONSTANT: simd-classes
 
 : approx= ( x y -- ? )
     {
+        { [ 2dup [ fp-nan? ] both? ] [ 2drop t ] }
         { [ 2dup [ float? ] both? ] [ -1.e8 ~ ] }
         { [ 2dup [ fp-infinity? ] either? ] [ fp-bitwise= ] }
         { [ 2dup [ sequence? ] both? ] [
@@ -315,70 +327,7 @@ simd-classes [
     ] unit-test
 ] each
 
-"== Checking element tests" print
-
-[ short-8{ t f t f f f t f } ]
-[ short-8{ 1 2 3 4 5 6 7 8 } short-8{ 1 0 3 -1 -2 -3 7 -4 } v= ] unit-test
-
-[ short-8{ t f t f f f t f } ]
-[ short-8{ 1 2 3 4 5 6 7 8 } short-8{ 1 0 3 -1 -2 -3 7 -4 } [ { short-8 short-8 } declare v= ] compile-call ] unit-test
-
-[ int-8{ t f t f f f t f } ]
-[ int-8{ 1 2 3 4 5 6 7 8 } int-8{ 1 0 3 -1 -2 -3 7 -4 } v= ] unit-test
-
-[ int-8{ t f t f f f t f } ]
-[ int-8{ 1 2 3 4 5 6 7 8 } int-8{ 1 0 3 -1 -2 -3 7 -4 } [ { int-8 int-8 } declare v= ] compile-call ] unit-test
-
-[ int-4{ t f t f } ]
-[ int-4{ 1 2 3 4 } int-4{ 1 0 3 -1 } [ { int-4 int-4 } declare v= ] compile-call ] unit-test
-
-[ int-4{ t f t f } ]
-[ int-4{ 1 2 3 4 } int-4{ 1 0 3 -1 } v= ] unit-test
-
-[ int-4{ t f t f } ]
-[ int-4{ 1 2 3 4 } int-4{ 1 0 3 -1 } [ { int-4 int-4 } declare v= ] compile-call ] unit-test
-
-[ t ]
-[
-    float-4{ t f t f }
-    float-4{ 1.0 0/0. 3.0 4.0 } float-4{ 1.0 0/0. 3.0 -1.0 } v=
-    exact=
-] unit-test
-
-[ t ]
-[
-    float-4{ t f t f }
-    float-4{ 1.0 0/0. 3.0 4.0 } float-4{ 1.0 0/0. 3.0 -1.0 } [ { float-4 float-4 } declare v= ] compile-call
-    exact=
-] unit-test
-
-[ t ]
-[
-    float-8{ t f t f f t t t }
-    float-8{ 1.0 0/0. 3.0 4.0 5.0 6.0 7.0 8.0 } float-8{ 1.0 0/0. 3.0 -1.0 -2.0 6.0 7.0 8.0 } v=
-    exact=
-] unit-test
-
-[ t ]
-[
-    float-8{ t f t f f t t t }
-    float-8{ 1.0 0/0. 3.0 4.0 5.0 6.0 7.0 8.0 } float-8{ 1.0 0/0. 3.0 -1.0 -2.0 6.0 7.0 8.0 } [ { float-8 float-8 } declare v= ] compile-call
-    exact=
-] unit-test
-
-[ t ]
-[
-    double-2{ f t }
-    double-2{ 0/0. 3.0 } double-2{ 0/0. 3.0 } v=
-    exact=
-] unit-test
-
-[ t ]
-[
-    double-2{ f t }
-    double-2{ 0/0. 3.0 } double-2{ 0/0. 3.0 } [ { double-2 double-2 } declare v= ] compile-call
-    exact=
-] unit-test
+"== Checking vector tests" print
 
 :: test-vector-tests-bool ( vector declaration -- none? any? all? )
     vector

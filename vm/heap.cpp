@@ -208,55 +208,6 @@ void heap::unmark_marked()
 	}
 }
 
-/* After code GC, all referenced code blocks have status set to B_MARKED, so any
-which are allocated and not marked can be reclaimed. */
-void heap::free_unmarked(heap_iterator iter)
-{
-	clear_free_list();
-
-	heap_block *prev = NULL;
-	heap_block *scan = first_block();
-
-	while(scan)
-	{
-		switch(scan->status)
-		{
-		case B_ALLOCATED:
-			if(myvm->secure_gc)
-				memset(scan + 1,0,scan->size - sizeof(heap_block));
-
-			if(prev && prev->status == B_FREE)
-				prev->size += scan->size;
-			else
-			{
-				scan->status = B_FREE;
-				prev = scan;
-			}
-			break;
-		case B_FREE:
-			if(prev && prev->status == B_FREE)
-				prev->size += scan->size;
-			else
-				prev = scan;
-			break;
-		case B_MARKED:
-			if(prev && prev->status == B_FREE)
-				add_to_free_list((free_heap_block *)prev);
-			scan->status = B_ALLOCATED;
-			prev = scan;
-			(myvm->*iter)(scan);
-			break;
-		default:
-			myvm->critical_error("Invalid scan->status",(cell)scan);
-		}
-
-		scan = next_block(scan);
-	}
-
-	if(prev && prev->status == B_FREE)
-		add_to_free_list((free_heap_block *)prev);
-}
-
 /* Compute total sum of sizes of free blocks, and size of largest free block */
 void heap::heap_usage(cell *used, cell *total_free, cell *max_free)
 {
@@ -335,6 +286,23 @@ void heap::compact_heap(unordered_map<heap_block *,char *> &forwarding)
 		if(scan->status == B_ALLOCATED)
 			memmove(forwarding[scan],scan,scan->size);
 		scan = next;
+	}
+}
+
+heap_block *heap::free_allocated(heap_block *prev, heap_block *scan)
+{
+	if(myvm->secure_gc)
+		memset(scan + 1,0,scan->size - sizeof(heap_block));
+
+	if(prev && prev->status == B_FREE)
+	{
+		prev->size += scan->size;
+		return prev;
+	}
+	else
+	{
+		scan->status = B_FREE;
+		return scan;
 	}
 }
 

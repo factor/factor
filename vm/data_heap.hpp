@@ -51,7 +51,7 @@ struct data_heap {
 	
 	bool have_aging_p() { return gen_count > 2; }
 
-	data_heap(factor_vm *myvm, cell gen_count, cell young_size, cell aging_size, cell tenured_size);
+	explicit data_heap(factor_vm *myvm, cell gen_count, cell young_size, cell aging_size, cell tenured_size);
 	~data_heap();
 };
 

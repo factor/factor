@@ -310,12 +310,12 @@ void factor_vm::primitive_end_scan()
 	gc_off = false;
 }
 
-template<typename TYPE> void factor_vm::each_object(TYPE &functor)
+template<typename Iterator> void factor_vm::each_object(Iterator &iterator)
 {
 	begin_scan();
 	cell obj;
 	while((obj = next_object()) != F)
-		functor(tagged<object>(obj));
+		iterator(tagged<object>(obj));
 	end_scan();
 }
 
@@ -324,13 +324,13 @@ namespace
 
 struct word_counter {
 	cell count;
-	word_counter() : count(0) {}
+	explicit word_counter() : count(0) {}
 	void operator()(tagged<object> obj) { if(obj.type_p(WORD_TYPE)) count++; }
 };
 
 struct word_accumulator {
 	growable_array words;
-	word_accumulator(int count,factor_vm *vm) : words(vm,count) {}
+	explicit word_accumulator(int count,factor_vm *vm) : words(vm,count) {}
 	void operator()(tagged<object> obj) { if(obj.type_p(WORD_TYPE)) words.add(obj.value()); }
 };
 
