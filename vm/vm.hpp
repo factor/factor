@@ -32,7 +32,8 @@ struct factor_vm
 	void primitive_check_datastack();
 
 	// run
-	cell T;  /* Canonical T object. It's just a word */
+	/* Canonical T object. It's just a word */
+	cell T;
 
 	void primitive_getenv();
 	void primitive_setenv();
@@ -168,7 +169,7 @@ struct factor_vm
 	cell next_object();
 	void primitive_next_object();
 	void primitive_end_scan();
-	template<typename T> void each_object(T &functor);
+	template<typename Iterator> void each_object(Iterator &iterator);
 	cell find_all_words();
 	cell object_size(cell tagged);
 	
@@ -228,53 +229,46 @@ struct factor_vm
 
 	// data_gc
 	/* used during garbage collection only */
-	zone *newspace;
-	bool performing_gc;
-	bool performing_compaction;
-	cell collecting_gen;
-	/* if true, we are collecting aging space for the second time, so if it is still
-	   full, we go on to collect tenured */
-	bool collecting_aging_again;
-	/* in case a generation fills up in the middle of a gc, we jump back
-	   up to try collecting the next generation. */
-	jmp_buf gc_jmp;
+	gc_state *current_gc;
+	/* statistics */
 	gc_stats stats[max_gen_count];
 	u64 cards_scanned;
 	u64 decks_scanned;
 	u64 card_scan_time;
 	cell code_heap_scans;
-	/* What generation was being collected when copy_code_heap_roots() was last
+	/* What generation was being collected when trace_code_heap_roots() was last
 	   called? Until the next call to add_code_block(), future
 	   collections of younger generations don't have to touch the code
 	   heap. */
 	cell last_code_heap_scan;
-	/* sometimes we grow the heap */
-	bool growing_data_heap;
-	data_heap *old_data_heap;
 
 	void init_data_gc();
 	object *copy_untagged_object_impl(object *pointer, cell size);
 	object *copy_object_impl(object *untagged);
 	bool should_copy_p(object *untagged);
 	object *resolve_forwarding(object *untagged);
-	template <typename T> T *copy_untagged_object(T *untagged);
+	template<typename Type> Type *copy_untagged_object(Type *untagged);
 	cell copy_object(cell pointer);
-	void copy_handle(cell *handle);
-	void copy_card(card *ptr, cell gen, cell here);
-	void copy_card_deck(card_deck *deck, cell gen, card mask, card unmask);
-	void copy_gen_cards(cell gen);
-	void copy_cards();
-	void copy_stack_elements(segment *region, cell top);
-	void copy_registered_locals();
-	void copy_registered_bignums();
-	void copy_roots();
+	void trace_handle(cell *handle);
+	void trace_card(card *ptr, cell gen, cell here);
+	void trace_card_deck(card_deck *deck, cell gen, card mask, card unmask);
+	void trace_generation_cards(cell gen);
+	void trace_cards();
+	void trace_stack_elements(segment *region, cell top);
+	void trace_registered_locals();
+	void trace_registered_bignums();
+	void trace_roots();
+	void trace_contexts();
+	void update_code_heap_roots();
 	cell copy_next_from_nursery(cell scan);
 	cell copy_next_from_aging(cell scan);
 	cell copy_next_from_tenured(cell scan);
 	void copy_reachable_objects(cell scan, cell *end);
+	void free_unmarked_code_blocks();
+	void update_dirty_code_blocks();
 	void begin_gc(cell requested_bytes);
-	void end_gc(cell gc_elapsed);
-	void garbage_collection(cell gen,bool growing_data_heap_,cell requested_bytes);
+	void end_gc();
+	void garbage_collection(cell gen, bool growing_data_heap, bool trace_contexts, cell requested_bytes);
 	void gc();
 	void primitive_gc();
 	void primitive_gc_stats();
@@ -285,23 +279,15 @@ struct factor_vm
 	object *allot_object(header header, cell size);
 	void primitive_clear_gc_stats();
 
-	template<typename TYPE> TYPE *allot(cell size)
+	template<typename Type> Type *allot(cell size)
 	{
-		return (TYPE *)allot_object(header(TYPE::type_number),size);
-	}
-
-	inline bool collecting_accumulation_gen_p()
-	{
-		return ((data->have_aging_p()
-			 && collecting_gen == data->aging()
-			 && !collecting_aging_again)
-			|| collecting_gen == data->tenured());
+		return (Type *)allot_object(header(Type::type_number),size);
 	}
 
 	inline void check_data_pointer(object *pointer)
 	{
 	#ifdef FACTOR_DEBUG
-		if(!growing_data_heap)
+		if(!(current_gc && current_gc->growing_data_heap))
 		{
 			assert((cell)pointer >= data->seg->start
 			       && (cell)pointer < data->seg->end);
@@ -329,15 +315,13 @@ struct factor_vm
 	std::vector<cell> gc_bignums;
 
 	// generic arrays
-	template <typename T> T *allot_array_internal(cell capacity);
-	template <typename T> bool reallot_array_in_place_p(T *array, cell capacity);
-	template <typename TYPE> TYPE *reallot_array(TYPE *array_, cell capacity);
+	template<typename Array> Array *allot_array_internal(cell capacity);
+	template<typename Array> bool reallot_array_in_place_p(Array *array, cell capacity);
+	template<typename Array> Array *reallot_array(Array *array_, cell capacity);
 
 	//debug
 	bool fep_disabled;
 	bool full_output;
-	cell look_for;
-	cell obj;
 
 	void print_chars(string* str);
 	void print_word(word* word, cell nesting);
@@ -349,7 +333,6 @@ struct factor_vm
 	void print_objects(cell *start, cell *end);
 	void print_datastack();
 	void print_retainstack();
-	void print_stack_frame(stack_frame *frame);
 	void print_callstack();
 	void dump_cell(cell x);
 	void dump_memory(cell from, cell to);
@@ -499,8 +482,8 @@ struct factor_vm
 	inline double untag_float_check(cell tagged);
 	inline fixnum float_to_fixnum(cell tagged);
 	inline double fixnum_to_float(cell tagged);
-	template <typename T> T *untag_check(cell value);
-	template <typename T> T *untag(cell value);
+	template<typename Type> Type *untag_check(cell value);
+	template<typename Type> Type *untag(cell value);
 	
 	//io
 	void init_c_io();
@@ -515,8 +498,6 @@ struct factor_vm
 	void primitive_fclose();
 
 	//code_block
-	typedef void (factor_vm::*relocation_iterator)(relocation_entry rel, cell index, code_block *compiled);
-
 	relocation_type relocation_type_of(relocation_entry r);
 	relocation_class relocation_class_of(relocation_entry r);
 	cell relocation_offset_of(relocation_entry r);
@@ -529,20 +510,16 @@ struct factor_vm
 	void undefined_symbol();
 	void *get_rel_symbol(array *literals, cell index);
 	cell compute_relocation(relocation_entry rel, cell index, code_block *compiled);
-	void iterate_relocations(code_block *compiled, relocation_iterator iter);
+	template<typename Iterator> void iterate_relocations(code_block *compiled, Iterator &iter);
 	void store_address_2_2(cell *ptr, cell value);
 	void store_address_masked(cell *ptr, fixnum value, cell mask, fixnum shift);
 	void store_address_in_code_block(cell klass, cell offset, fixnum absolute_value);
-	void update_literal_references_step(relocation_entry rel, cell index, code_block *compiled);
 	void update_literal_references(code_block *compiled);
-	void copy_literal_references(code_block *compiled);
+	void trace_literal_references(code_block *compiled);
 	void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled);
-	void update_word_references_step(relocation_entry rel, cell index, code_block *compiled);
 	void update_word_references(code_block *compiled);
-	void update_literal_and_word_references(code_block *compiled);
 	void check_code_address(cell address);
 	void mark_code_block(code_block *compiled);
-	void mark_stack_frame_step(stack_frame *frame);
 	void mark_active_blocks(context *stacks);
 	void mark_object_code_block(object *object);
 	void relocate_code_block(code_block *compiled);
@@ -562,17 +539,28 @@ struct factor_vm
 	void init_code_heap(cell size);
 	bool in_code_heap_p(cell ptr);
 	void jit_compile_word(cell word_, cell def_, bool relocate);
-	void iterate_code_heap(code_heap_iterator iter);
-	void copy_code_heap_roots();
+	void trace_code_heap_roots();
 	void update_code_heap_words();
 	void primitive_modify_code_heap();
 	void primitive_code_room();
 	code_block *forward_xt(code_block *compiled);
-	void forward_frame_xt(stack_frame *frame);
 	void forward_object_xts();
 	void fixup_object_xts();
 	void compact_code_heap();
 	inline void check_code_pointer(cell ptr);
+
+	/* Apply a function to every code block */
+	template<typename Iterator> void iterate_code_heap(Iterator &iter)
+	{
+		heap_block *scan = code->first_block();
+	
+		while(scan)
+		{
+			if(scan->status != B_FREE)
+				iter((code_block *)scan);
+			scan = code->next_block(scan);
+		}
+	}
 
 	//image
 	cell code_relocation_base;
@@ -585,11 +573,10 @@ struct factor_vm
 	void primitive_save_image();
 	void primitive_save_image_and_exit();
 	void data_fixup(cell *cell);
-	template <typename T> void code_fixup(T **handle);
+	template<typename Type> void code_fixup(Type **handle);
 	void fixup_word(word *word);
 	void fixup_quotation(quotation *quot);
 	void fixup_alien(alien *d);
-	void fixup_stack_frame(stack_frame *frame);
 	void fixup_callstack_object(callstack *stack);
 	void relocate_object(object *object);
 	void relocate_data();
@@ -598,7 +585,7 @@ struct factor_vm
 	void load_image(vm_parameters *p);
 
 	//callstack
-	template<typename T> void iterate_callstack_object(callstack *stack_, T &iterator);
+	template<typename Iterator> void iterate_callstack_object(callstack *stack_, Iterator &iterator);
 	void check_frame(stack_frame *frame);
 	callstack *allot_callstack(cell size);
 	stack_frame *fix_callstack_top(stack_frame *top, stack_frame *bottom);
@@ -617,8 +604,25 @@ struct factor_vm
 	void primitive_innermost_stack_frame_scan();
 	void primitive_set_innermost_stack_frame_quot();
 	void save_callstack_bottom(stack_frame *callstack_bottom);
-	template<typename T> void iterate_callstack(cell top, cell bottom, T &iterator);
-	inline void do_slots(cell obj, void (* iter)(cell *,factor_vm*));
+	template<typename Iterator> void iterate_callstack(cell top, cell bottom, Iterator &iterator);
+	
+	/* Every object has a regular representation in the runtime, which makes GC
+	much simpler. Every slot of the object until binary_payload_start is a pointer
+	to some other object. */
+	template<typename Iterator> void do_slots(cell obj, Iterator &iter)
+	{
+		cell scan = obj;
+		cell payload_start = binary_payload_start((object *)obj);
+		cell end = obj + payload_start;
+	
+		scan += sizeof(cell);
+	
+		while(scan < end)
+		{
+			iter((cell *)scan);
+			scan += sizeof(cell);
+		}
+	}
 
 	//alien
 	char *pinned_alien_offset(cell obj);
@@ -742,10 +746,6 @@ struct factor_vm
 		: profiling_p(false),
 		  secure_gc(false),
 		  gc_off(false),
-		  performing_gc(false),
-		  performing_compaction(false),
-		  collecting_aging_again(false),
-		  growing_data_heap(false),
 		  fep_disabled(false),
 		  full_output(false),
 		  max_pic_size(0)
@@ -796,6 +796,6 @@ struct factor_vm
   #define SIGNAL_VM_PTR() tls_vm()
 #endif
 
-extern unordered_map<THREADHANDLE, factor_vm*> thread_vms;
+extern unordered_map<THREADHANDLE, factor_vm *> thread_vms;
 
 }

@@ -116,7 +116,7 @@ cell factor_vm::frame_scan(stack_frame *frame)
 				return F;
 			else
 			{
-				char *return_addr = (char *)FRAME_RETURN_ADDRESS(frame);
+				char *return_addr = (char *)FRAME_RETURN_ADDRESS(frame,this);
 				char *quot_xt = (char *)(frame_code(frame) + 1);
 
 				return tag_fixnum(quot_code_offset_to_scan(
@@ -135,11 +135,12 @@ namespace
 {
 
 struct stack_frame_accumulator {
+	factor_vm *myvm;
 	growable_array frames;
 
-	stack_frame_accumulator(factor_vm *vm) : frames(vm) {} 
+	explicit stack_frame_accumulator(factor_vm *myvm_) : myvm(myvm_), frames(myvm_) {} 
 
-	void operator()(stack_frame *frame, factor_vm *myvm)
+	void operator()(stack_frame *frame)
 	{
 		gc_root<object> executing(myvm->frame_executing(frame),myvm);
 		gc_root<object> scan(myvm->frame_scan(frame),myvm);
@@ -204,9 +205,9 @@ void factor_vm::primitive_set_innermost_stack_frame_quot()
 	jit_compile(quot.value(),true);
 
 	stack_frame *inner = innermost_stack_frame_quot(callstack.untagged());
-	cell offset = (char *)FRAME_RETURN_ADDRESS(inner) - (char *)inner->xt;
+	cell offset = (char *)FRAME_RETURN_ADDRESS(inner,this) - (char *)inner->xt;
 	inner->xt = quot->xt;
-	FRAME_RETURN_ADDRESS(inner) = (char *)quot->xt + offset;
+	FRAME_RETURN_ADDRESS(inner,this) = (char *)quot->xt + offset;
 }
 
 /* called before entry into Factor code. */
