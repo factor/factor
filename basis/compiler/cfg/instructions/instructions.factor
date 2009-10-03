@@ -261,6 +261,10 @@ PURE-INSN: ##zero-vector
 def: dst
 literal: rep ;
 
+PURE-INSN: ##fill-vector
+def: dst
+literal: rep ;
+
 PURE-INSN: ##gather-vector-2
 def: dst
 use: src1/scalar-rep src2/scalar-rep
@@ -401,6 +405,11 @@ literal: rep ;
 PURE-INSN: ##xor-vector
 def: dst
 use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##not-vector
+def: dst
+use: src
 literal: rep ;
 
 PURE-INSN: ##shl-vector
@@ -765,6 +774,7 @@ UNION: kill-vreg-insn
 UNION: def-is-use-insn
 ##box-alien
 ##box-displaced-alien
+##not-vector
 ##string-nth
 ##unbox-any-c-ptr ;
 

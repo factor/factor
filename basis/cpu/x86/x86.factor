@@ -575,6 +575,19 @@ M: x86 %zero-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
+M: x86 %fill-vector
+    {
+        { double-2-rep [ dup [ XORPD ] [ CMPEQPD ] 2bi ] }
+        { float-4-rep  [ dup [ XORPS ] [ CMPEQPS ] 2bi ] }
+        [ drop dup PCMPEQB ]
+    } case ;
+
+M: x86 %fill-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
 : unsign-rep ( rep -- rep' )
     {
         { uint-4-rep      int-4-rep }
@@ -1048,6 +1061,16 @@ M: x86 %xor-vector ( dst src1 src2 rep -- )
     } case ;
 
 M: x86 %xor-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+M:: x86 %not-vector ( dst src rep -- )
+    dst rep %fill-vector
+    dst dst src rep %xor-vector ;
+
+M: x86 %not-vector-reps
     {
         { sse? { float-4-rep } }
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }

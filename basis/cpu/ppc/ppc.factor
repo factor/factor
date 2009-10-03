@@ -258,6 +258,7 @@ M: ppc %double>single-float double-rep %copy ;
 
 ! VMX/AltiVec not supported yet
 M: ppc %zero-vector-reps { } ;
+M: ppc %fill-vector-reps { } ;
 M: ppc %gather-vector-2-reps { } ;
 M: ppc %gather-vector-4-reps { } ;
 M: ppc %shuffle-vector-reps { } ;
@@ -282,6 +283,7 @@ M: ppc %and-vector-reps { } ;
 M: ppc %andn-vector-reps { } ;
 M: ppc %or-vector-reps { } ;
 M: ppc %xor-vector-reps { } ;
+M: ppc %not-vector-reps { } ;
 M: ppc %shl-vector-reps { } ;
 M: ppc %shr-vector-reps { } ;
 M: ppc %horizontal-shl-vector-reps { } ;
