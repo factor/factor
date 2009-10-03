@@ -49,6 +49,9 @@ M: fd cancel-operation ( fd -- )
         2bi
     ] if ;
 
+M: unix tell-handle ( handle -- n )
+    fd>> SEEK_SET 0 lseek [ io-error ] [ ] bi ;
+
 M: unix seek-handle ( n seek-type handle -- )
     swap {
         { io:seek-absolute [ SEEK_SET ] }
