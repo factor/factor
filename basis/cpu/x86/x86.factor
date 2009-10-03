@@ -721,20 +721,54 @@ M: x86 %shuffle-vector-reps
         { sse2? { double-2-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-: %compare-vector-equal ( dst src rep -- )
-    unsign-rep {
-        { double-2-rep   [ CMPEQPD ] }
-        { float-4-rep    [ CMPEQPS ] }
-        { longlong-2-rep [ PCMPEQQ ] }
-        { int-4-rep      [ PCMPEQD ] }
-        { short-8-rep    [ PCMPEQW ] }
-        { char-16-rep    [ PCMPEQB ] }
+:: compare-float-v-operands ( dst src1 src2 temp rep cc -- dst' src' rep cc' )
+    cc { cc> cc>= cc/> cc/>= } member?
+    [ dst src2 src1 rep two-operand rep cc swap-cc ]
+    [ dst src1 src2 rep two-operand rep cc         ] if ;
+: (%compare-float-vector) ( dst src rep double single -- )
+    [ double-2-rep eq? ] 2dip if ; inline
+: %compare-float-vector ( dst src1 src2 temp rep cc -- )
+    compare-float-v-operands {
+        { cc<    [ [ CMPLTPD    ] [ CMPLTPS    ] (%compare-float-vector) ] }
+        { cc<=   [ [ CMPLEPD    ] [ CMPLEPS    ] (%compare-float-vector) ] }
+        { cc=    [ [ CMPEQPD    ] [ CMPEQPS    ] (%compare-float-vector) ] }
+        { cc<>=  [ [ CMPORDPD   ] [ CMPORDPS   ] (%compare-float-vector) ] }
+        { cc/<   [ [ CMPNLTPD   ] [ CMPNLTPS   ] (%compare-float-vector) ] }
+        { cc/<=  [ [ CMPNLEPD   ] [ CMPNLEPS   ] (%compare-float-vector) ] }
+        { cc/=   [ [ CMPNEQPD   ] [ CMPNEQPS   ] (%compare-float-vector) ] }
+        { cc/<>= [ [ CMPUNORDPD ] [ CMPUNORDPS ] (%compare-float-vector) ] }
     } case ;
 
-M: x86 %compare-vector ( dst src1 src2 rep cc -- )
-    [ [ two-operand ] keep ] dip {
-        { cc= [ %compare-vector-equal ] }
+:: compare-int-v-operands ( dst src1 src2 temp rep cc -- not-dst/f cmp-dst src' rep cc' )
+    cc order-cc :> occ
+    occ {
+        { cc=  [ f   dst  src1 src2 rep two-operand rep cc= ] }
+        { cc/= [ dst temp src1 src2 rep two-operand rep cc= ] }
+        { cc<= [ dst temp src1 src2 rep two-operand rep cc> ] }
+        { cc<  [ f   dst  src2 src1 rep two-operand rep cc> ] }
+        { cc>  [ f   dst  src1 src2 rep two-operand rep cc> ] }
+        { cc>= [ dst temp src2 src1 rep two-operand rep cc> ] }
     } case ;
+:: (%compare-int-vector) ( dst src rep int64 int32 int16 int8 -- )
+    rep unsign-rep :> rep'
+    dst src rep' {
+        { longlong-2-rep [ int64 call ] }
+        { int-4-rep      [ int32 call ] }
+        { short-8-rep    [ int16 call ] }
+        { char-16-rep    [ int8  call ] }
+    } case ; inline
+:: %compare-int-vector ( dst src1 src2 temp rep cc -- )
+    dst src1 src2 temp rep cc compare-int-v-operands :> cc' :> rep :> src' :> cmp-dst :> not-dst
+    cmp-dst src' rep cc' {
+        { cc= [ [ PCMPEQQ ] [ PCMPEQD ] [ PCMPEQW ] [ PCMPEQB ] (%compare-int-vector) ] }
+        { cc> [ [ PCMPGTQ ] [ PCMPGTD ] [ PCMPGTW ] [ PCMPGTB ] (%compare-int-vector) ] }
+    } case
+    not-dst [ cmp-dst rep %not-vector ] when* ;
+
+M: x86 %compare-vector ( dst src1 src2 temp rep cc -- )
+    over float-vector-rep?
+    [ %compare-float-vector ]
+    [ %compare-int-vector ] if ;
 
 M: x86 %compare-vector-reps
     {
