@@ -25,7 +25,7 @@ HELP: (command-line)
 { $description "Outputs the command line parameters which were passed to the Factor VM on startup." } ;
 
 HELP: command-line
-{ $var-description "The command line parameters which follow the name of the script on the command line." } ;
+{ $var-description "When Factor is run with a script, this variable contains command line parameters which follow the name of the script on the command line. In deployed applications, it contains the entire command line. In all other cases it is set to " { $link f } "." } ;
 
 HELP: main-vocab-hook
 { $var-description "Global variable holding a quotation which outputs a vocabulary name. UI backends set this so that the UI can automatically start if the prerequisites are met (for example, " { $snippet "$DISPLAY" } " being set on X11)." } ;
@@ -139,8 +139,8 @@ $nl
 
 ARTICLE: "cli" "Command line arguments"
 "Factor command line usage:"
-{ $code "factor [system switches...] [script args...]" }
-"Zero or more system switches can be passed in, followed by an optional script file name. If the script file is specified, it will be run on startup, any arguments after the script file are stored in a variable, with no further processing by Factor itself:"
+{ $code "factor [VM args...] [script] [args...]" }
+"Zero or more VM arguments can be passed in, followed by an optional script file name. If the script file is specified, it will be run on startup, any arguments after the script file are stored in the following variable, with no further processing by Factor itself:"
 { $subsections command-line }
 "Instead of running a script, it is also possible to run a vocabulary; this invokes the vocabulary's " { $link POSTPONE: MAIN: } " word:"
 { $code "factor [system switches...] -run=<vocab name>" }
