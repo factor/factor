@@ -136,6 +136,7 @@ PRIMITIVE(fread);
 PRIMITIVE(fputc);
 PRIMITIVE(fwrite);
 PRIMITIVE(fflush);
+PRIMITIVE(ftell);
 PRIMITIVE(fseek);
 PRIMITIVE(fclose);
 PRIMITIVE(wrapper);

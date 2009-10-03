@@ -510,6 +510,7 @@ struct factor_vm
 	void primitive_fread();
 	void primitive_fputc();
 	void primitive_fwrite();
+	void primitive_ftell();
 	void primitive_fseek();
 	void primitive_fflush();
 	void primitive_fclose();
