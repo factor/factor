@@ -78,8 +78,10 @@ HELP: translation-4D
 ARTICLE: "implementation details" "How 4DNav is done"
 "4DNav is build using :"
 
-{ $subsection "4DNav.camera" }
-{ $subsection "adsoda-main-page" }
+{ $subsections
+    "4DNav.camera"
+    "adsoda-main-page"
+}
 ;
 
 ARTICLE: "Space file" "Create a new space file"
@@ -188,10 +190,11 @@ $nl
     }
 
 { $heading "Links" }
-{ $subsection "Space file" }
-
-{ $subsection "TODO" }
-{ $subsection "implementation details" }
+{ $subsections
+    "Space file"
+    "TODO"
+    "implementation details"
+}
 
 ;
 

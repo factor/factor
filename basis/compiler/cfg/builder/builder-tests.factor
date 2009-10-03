@@ -159,9 +159,12 @@ IN: compiler.cfg.builder.tests
     { pinned-c-ptr class fixnum } \ set-alien-cell '[ _ declare _ execute ] unit-test-cfg
 ] each
 
-: contains-insn? ( quot insn-check -- ? )
+: count-insns ( quot insn-check -- ? )
     [ test-mr [ instructions>> ] map ] dip
-    '[ _ any? ] any? ; inline
+    '[ _ count ] sigma ; inline
+
+: contains-insn? ( quot insn-check -- ? )
+    count-insns 0 > ; inline
 
 [ t ] [ [ swap ] [ ##replace? ] contains-insn? ] unit-test
 
@@ -197,14 +200,16 @@ IN: compiler.cfg.builder.tests
     [ f t ] [
         [ { byte-array fixnum } declare alien-cell 4 alien-float ]
         [ [ ##box-alien? ] contains-insn? ]
-        [ [ ##box-float? ] contains-insn? ] bi
+        [ [ ##allot? ] contains-insn? ] bi
     ] unit-test
 
     [ f t ] [
         [ { byte-array fixnum } declare alien-cell { simple-alien } declare 4 alien-float ]
         [ [ ##box-alien? ] contains-insn? ]
-        [ [ ##box-float? ] contains-insn? ] bi
+        [ [ ##allot? ] contains-insn? ] bi
     ] unit-test
+    
+    [ 1 ] [ [ dup float+ ] [ ##alien-double? ] count-insns ] unit-test
 ] when
 
 ! Regression. Make sure everything is inlined correctly

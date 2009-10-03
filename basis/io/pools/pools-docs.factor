@@ -43,19 +43,23 @@ ARTICLE: "io.pools" "Connection pools"
 "Connection pools are implemented in the " { $snippet "io.pools" } " vocabulary. They are used to reuse sockets and connections which may be potentially expensive to create and destroy."
 $nl
 "The class of connection pools:"
-{ $subsection pool }
+{ $subsections pool }
 "Creating connection pools:"
-{ $subsection <pool> }
+{ $subsections <pool> }
 "A utility combinator:"
-{ $subsection with-pool }
+{ $subsections with-pool }
 "Acquiring and returning connections, and a utility combinator:"
-{ $subsection acquire-connection }
-{ $subsection return-connection }
-{ $subsection with-pooled-connection }
+{ $subsections
+    acquire-connection
+    return-connection
+    with-pooled-connection
+}
 "Pools are not created directly, instead one uses subclasses which implement a generic word:"
-{ $subsection make-connection }
+{ $subsections make-connection }
 "One example is a datagram socket pool:"
-{ $subsection datagram-pool }
-{ $subsection <datagram-pool> } ;
+{ $subsections
+    datagram-pool
+    <datagram-pool>
+} ;
 
 ABOUT: "io.pools"

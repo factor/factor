@@ -60,8 +60,10 @@ HELP: build-quad ( -- array )
 ARTICLE: "24-game" "The Game of 24"
 "A classic math game, where one attempts to create 24, by applying "
 "arithmetical operations and some shuffle words to a stack of 4 numbers. "
-{ $subsection play-game }
-{ $subsection 24-able }
-{ $subsection 24-able? }
-{ $subsection build-quad } ;
+{ $subsections
+    play-game
+    24-able
+    24-able?
+    build-quad
+} ;
 ABOUT: "24-game"

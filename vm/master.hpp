@@ -25,16 +25,31 @@
 
 /* C++ headers */
 #include <vector>
+#include <set>
 
 #if __GNUC__ == 4
         #include <tr1/unordered_map>
-        #define unordered_map std::tr1::unordered_map
+
+	namespace factor
+	{
+		using std::tr1::unordered_map;
+	}
 #elif __GNUC__ == 3
         #include <boost/unordered_map.hpp>
-        #define unordered_map boost::unordered_map
+
+	namespace factor
+	{
+		using boost::unordered_map;
+	}
 #else
         #error Factor requires GCC 3.x or later
 #endif
+
+/* Forward-declare this since it comes up in function prototypes */
+namespace factor
+{
+	struct factor_vm;
+}
 
 /* Factor headers */
 #include "layouts.hpp"
@@ -52,26 +67,25 @@
 #include "data_heap.hpp"
 #include "write_barrier.hpp"
 #include "data_gc.hpp"
-#include "local_roots.hpp"
-#include "generic_arrays.hpp"
 #include "debug.hpp"
-#include "arrays.hpp"
 #include "strings.hpp"
-#include "booleans.hpp"
-#include "byte_arrays.hpp"
 #include "tuples.hpp"
 #include "words.hpp"
-#include "math.hpp"
 #include "float_bits.hpp"
 #include "io.hpp"
 #include "heap.hpp"
-#include "code_heap.hpp"
 #include "image.hpp"
-#include "callstack.hpp"
 #include "alien.hpp"
 #include "vm.hpp"
 #include "tagged.hpp"
-#include "inlineimpls.hpp"
+#include "local_roots.hpp"
+#include "callstack.hpp"
+#include "generic_arrays.hpp"
+#include "arrays.hpp"
+#include "math.hpp"
+#include "booleans.hpp"
+#include "code_heap.hpp"
+#include "byte_arrays.hpp"
 #include "jit.hpp"
 #include "quotations.hpp"
 #include "dispatch.hpp"

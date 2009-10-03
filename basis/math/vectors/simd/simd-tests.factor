@@ -141,13 +141,24 @@ CONSTANT: simd-classes
 
 "== Checking vector operations" print
 
-: random-vector ( class -- vec )
-    new [ drop 1000 random ] map ;
+: random-int-vector ( class -- vec )
+    new [ drop 1,000 random ] map ;
+: random-float-vector ( class -- vec )
+    new [
+        drop
+        -1,000.0 1,000.0 uniform-random-float 
+        10 swap <array> 0/0. suffix random
+    ] map ;
+
+: random-vector ( class elt-class -- vec )
+    float =
+    [ random-float-vector ]
+    [ random-int-vector ] if ;
 
 :: check-vector-op ( word inputs class elt-class -- inputs quot )
     inputs [
         {
-            { +vector+ [ class random-vector ] }
+            { +vector+ [ class elt-class random-vector ] }
             { +scalar+ [ 1000 random elt-class float = [ >float ] when ] }
         } case
     ] [ ] map-as
@@ -159,13 +170,23 @@ CONSTANT: simd-classes
 : remove-integer-words ( alist -- alist' )
     { vlshift vrshift } unique assoc-diff ;
 
+: boolean-ops ( -- words )
+    { vand vandn vor vxor vnot } ;
+
+: remove-boolean-words ( alist -- alist' )
+    boolean-ops unique assoc-diff ;
+
 : remove-special-words ( alist -- alist' )
     ! These have their own tests later
-    { hlshift hrshift vshuffle vbroadcast } unique assoc-diff ;
+    {
+        hlshift hrshift vshuffle vbroadcast
+        vany? vall? vnone?
+    } unique assoc-diff ;
 
 : ops-to-check ( elt-class -- alist )
     [ vector-words >alist ] dip
     float = [ remove-integer-words ] [ remove-float-words ] if
+    remove-boolean-words
     remove-special-words ;
 
 : check-vector-ops ( class elt-class compare-quot -- )
@@ -176,6 +197,7 @@ CONSTANT: simd-classes
 
 : approx= ( x y -- ? )
     {
+        { [ 2dup [ fp-nan? ] both? ] [ 2drop t ] }
         { [ 2dup [ float? ] both? ] [ -1.e8 ~ ] }
         { [ 2dup [ fp-infinity? ] either? ] [ fp-bitwise= ] }
         { [ 2dup [ sequence? ] both? ] [
@@ -206,6 +228,30 @@ CONSTANT: simd-classes
 
 simd-classes&reps [
     [ [ { } ] ] dip first3 '[ _ _ _ check-vector-ops ] unit-test
+] each
+
+"== Checking boolean operations" print
+
+: random-boolean-vector ( class -- vec )
+    new [ drop 2 random zero? ] map ;
+
+:: check-boolean-op ( word inputs class elt-class -- inputs quot )
+    inputs [
+        {
+            { +vector+ [ class random-boolean-vector ] }
+            { +scalar+ [ 1000 random elt-class float = [ >float ] when ] }
+        } case
+    ] [ ] map-as
+    word '[ _ execute ] ;
+
+: check-boolean-ops ( class elt-class compare-quot -- )
+    [
+        [ boolean-ops [ dup word-schema ] { } map>assoc ] 2dip
+        '[ first2 inputs _ _ check-boolean-op ]
+    ] dip check-optimizer ; inline
+
+simd-classes&reps [
+    [ [ { } ] ] dip first3 '[ _ _ _ check-boolean-ops ] unit-test
 ] each
 
 "== Checking shifts and permutations" print
@@ -280,6 +326,78 @@ simd-classes [
         [ = ] check-optimizer
     ] unit-test
 ] each
+
+"== Checking vector tests" print
+
+:: test-vector-tests-bool ( vector declaration -- none? any? all? )
+    vector
+    [ [ declaration declare vnone? ] compile-call ]
+    [ [ declaration declare vany?  ] compile-call ]
+    [ [ declaration declare vall?  ] compile-call ] tri ; inline
+
+: yes ( -- x ) t ;
+: no ( -- x ) f ;
+
+:: test-vector-tests-branch ( vector declaration -- none? any? all? )
+    vector
+    [ [ declaration declare vnone? [ yes ] [ no ] if ] compile-call ]
+    [ [ declaration declare vany?  [ yes ] [ no ] if ] compile-call ]
+    [ [ declaration declare vall?  [ yes ] [ no ] if ] compile-call ] tri ; inline
+
+SYMBOL: !!inconsistent!!
+
+: ?inconsistent ( a b -- ab/inconsistent )
+    2dup = [ drop ] [ 2drop !!inconsistent!! ] if ;
+
+:: test-vector-tests ( vector decl -- none? any? all? )
+    vector decl test-vector-tests-bool :> bool-all :> bool-any :> bool-none
+    vector decl test-vector-tests-branch :> branch-all :> branch-any :> branch-none
+    
+    bool-none branch-none ?inconsistent
+    bool-any  branch-any  ?inconsistent
+    bool-all  branch-all  ?inconsistent ; inline
+
+[ f t t ]
+[ float-4{ t t t t } { float-4 } test-vector-tests ] unit-test
+[ f t f ]
+[ float-4{ f t t t } { float-4 } test-vector-tests ] unit-test
+[ t f f ]
+[ float-4{ f f f f } { float-4 } test-vector-tests ] unit-test
+
+[ f t t ]
+[ double-2{ t t } { double-2 } test-vector-tests ] unit-test
+[ f t f ]
+[ double-2{ f t } { double-2 } test-vector-tests ] unit-test
+[ t f f ]
+[ double-2{ f f } { double-2 } test-vector-tests ] unit-test
+
+[ f t t ]
+[ int-4{ t t t t } { int-4 } test-vector-tests ] unit-test
+[ f t f ]
+[ int-4{ f t t t } { int-4 } test-vector-tests ] unit-test
+[ t f f ]
+[ int-4{ f f f f } { int-4 } test-vector-tests ] unit-test
+
+[ f t t ]
+[ float-8{ t t t t t t t t } { float-8 } test-vector-tests ] unit-test
+[ f t f ]
+[ float-8{ f t t t t f t t } { float-8 } test-vector-tests ] unit-test
+[ t f f ]
+[ float-8{ f f f f f f f f } { float-8 } test-vector-tests ] unit-test
+
+[ f t t ]
+[ double-4{ t t t t } { double-4 } test-vector-tests ] unit-test
+[ f t f ]
+[ double-4{ f t t f } { double-4 } test-vector-tests ] unit-test
+[ t f f ]
+[ double-4{ f f f f } { double-4 } test-vector-tests ] unit-test
+
+[ f t t ]
+[ int-8{ t t t t t t t t } { int-8 } test-vector-tests ] unit-test
+[ f t f ]
+[ int-8{ f t t t t f f f } { int-8 } test-vector-tests ] unit-test
+[ t f f ]
+[ int-8{ f f f f f f f f } { int-8 } test-vector-tests ] unit-test
 
 "== Checking element access" print
 

@@ -4,8 +4,10 @@ IN: sequences.complex-components
 
 ARTICLE: "sequences.complex-components" "Complex component virtual sequences"
 "The " { $link complex-components } " class wraps a sequence of " { $link complex } " number values, presenting a sequence of " { $link real } " values made by interleaving the real and imaginary parts of the complex values in the original sequence."
-{ $subsection complex-components }
-{ $subsection <complex-components> } ;
+{ $subsections
+    complex-components
+    <complex-components>
+} ;
 
 ABOUT: "sequences.complex-components"
 

@@ -86,12 +86,27 @@ H{
     { vbitandn { +vector+ +vector+ -> +vector+ } }
     { vbitor { +vector+ +vector+ -> +vector+ } }
     { vbitxor { +vector+ +vector+ -> +vector+ } }
+    { vbitnot { +vector+ -> +vector+ } }
+    { vand { +vector+ +vector+ -> +vector+ } }
+    { vandn { +vector+ +vector+ -> +vector+ } }
+    { vor { +vector+ +vector+ -> +vector+ } }
+    { vxor { +vector+ +vector+ -> +vector+ } }
+    { vnot { +vector+ -> +vector+ } }
     { vlshift { +vector+ +scalar+ -> +vector+ } }
     { vrshift { +vector+ +scalar+ -> +vector+ } }
     { hlshift { +vector+ +literal+ -> +vector+ } }
     { hrshift { +vector+ +literal+ -> +vector+ } }
     { vshuffle { +vector+ +literal+ -> +vector+ } }
     { vbroadcast { +vector+ +literal+ -> +vector+ } }
+    { v<= { +vector+ +vector+ -> +vector+ } }
+    { v< { +vector+ +vector+ -> +vector+ } }
+    { v= { +vector+ +vector+ -> +vector+ } }
+    { v> { +vector+ +vector+ -> +vector+ } }
+    { v>= { +vector+ +vector+ -> +vector+ } }
+    { vunordered? { +vector+ +vector+ -> +vector+ } }
+    { vany? { +vector+ -> +scalar+ } }
+    { vall? { +vector+ -> +scalar+ } }
+    { vnone? { +vector+ -> +scalar+ } }
 }
 
 PREDICATE: vector-word < word vector-words key? ;

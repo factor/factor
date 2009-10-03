@@ -8,22 +8,30 @@ ARTICLE: "math.libm" "C standard library math functions"
 { $example "USE: math.functions" "2.0 acos ." "C{ 0.0 1.316957896924817 }" }
 { $unchecked-example "USE: math.libm" "2.0 facos ." "0/0." } }
 "Trigonometric functions:"
-{ $subsection fcos }
-{ $subsection fsin }
-{ $subsection facos }
-{ $subsection fasin }
-{ $subsection fatan }
-{ $subsection fatan2 }
+{ $subsections
+    fcos
+    fsin
+    facos
+    fasin
+    fatan
+    fatan2
+}
 "Hyperbolic functions:"
-{ $subsection fcosh }
-{ $subsection fsinh }
+{ $subsections
+    fcosh
+    fsinh
+}
 "Exponentials and logarithms:"
-{ $subsection fexp }
-{ $subsection flog }
-{ $subsection flog10 }
+{ $subsections
+    fexp
+    flog
+    flog10
+}
 "Powers:"
-{ $subsection fpow }
-{ $subsection fsqrt } ;
+{ $subsections
+    fpow
+    fsqrt
+} ;
 
 ABOUT: "math.libm"
 

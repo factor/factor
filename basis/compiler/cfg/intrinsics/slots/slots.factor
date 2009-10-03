@@ -8,6 +8,9 @@ IN: compiler.cfg.intrinsics.slots
 
 : value-tag ( info -- n ) class>> class-tag ; inline
 
+: ^^tag-offset>slot ( slot tag -- vreg' )
+    [ ^^offset>slot ] dip ^^sub-imm ;
+
 : (emit-slot) ( infos -- dst )
     [ 2inputs ] [ first value-tag ] bi*
     ^^tag-offset>slot ^^slot ;

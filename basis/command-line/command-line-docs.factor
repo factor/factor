@@ -25,7 +25,7 @@ HELP: (command-line)
 { $description "Outputs the command line parameters which were passed to the Factor VM on startup." } ;
 
 HELP: command-line
-{ $var-description "The command line parameters which follow the name of the script on the command line." } ;
+{ $var-description "When Factor is run with a script, this variable contains command line parameters which follow the name of the script on the command line. In deployed applications, it contains the entire command line. In all other cases it is set to " { $link f } "." } ;
 
 HELP: main-vocab-hook
 { $var-description "Global variable holding a quotation which outputs a vocabulary name. UI backends set this so that the UI can automatically start if the prerequisites are met (for example, " { $snippet "$DISPLAY" } " being set on X11)." } ;
@@ -99,26 +99,28 @@ ARTICLE: "factor-boot-rc" "Bootstrap initialization file"
 "The botstrap initialization file is named " { $snippet "factor-boot-rc" } " on Windows and " { $snippet ".factor-boot-rc" } " on Unix. This file can contain " { $link require } " calls for vocabularies you use frequently, and other such long-running tasks that you do not want to perform every time Factor starts."
 $nl
 "A word to run this file from an existing Factor session:"
-{ $subsection run-bootstrap-init }
+{ $subsections run-bootstrap-init }
 "For example, if you changed " { $snippet ".factor-boot-rc" } " and do not want to bootstrap again, you can just invoke " { $link run-bootstrap-init } " in the listener." ;
 
 ARTICLE: "factor-rc" "Startup initialization file"
 "The startup initialization file is named " { $snippet "factor-rc" } " on Windows and " { $snippet ".factor-rc" } " on Unix. If it exists, it is run every time Factor starts."
 $nl
 "A word to run this file from an existing Factor session:"
-{ $subsection run-user-init } ;
+{ $subsections run-user-init } ;
 
 ARTICLE: "factor-roots" "Additional vocabulary roots file"
 "The vocabulary roots file is named " { $snippet "factor-roots" } " on Windows and " { $snippet ".factor-roots" } " on Unix. If it exists, it is loaded every time Factor starts. It contains a newline-separated list of " { $link "vocabs.roots" } "."
 $nl
 "A word to run this file from an existing Factor session:"
-{ $subsection load-vocab-roots } ;
+{ $subsections load-vocab-roots } ;
 
 ARTICLE: "rc-files" "Running code on startup"
 "Factor looks for three optional files in your home directory."
-{ $subsection "factor-boot-rc" }
-{ $subsection "factor-rc" }
-{ $subsection "factor-roots" }
+{ $subsections
+    "factor-boot-rc"
+    "factor-rc"
+    "factor-roots"
+}
 "The " { $snippet "-no-user-init" } " command line switch will inhibit loading running of these files."
 $nl
 "If you are unsure where the files should be located, evaluate the following code:"
@@ -127,19 +129,17 @@ $nl
     "\"factor-rc\" rc-path print"
     "\"factor-boot-rc\" rc-path print"
 }
-"Here is an example " { $snippet ".factor-boot-rc" } " which sets up GVIM editor integration, adds an additional vocabulary root (see " { $link "vocabs.roots" } "), and increases the font size in the UI by setting the DPI (dots-per-inch) variable:"
+"Here is an example " { $snippet ".factor-boot-rc" } " which sets up GVIM editor integration:"
 { $code
-    "USING: editors.gvim vocabs.loader ui.freetype namespaces sequences ;"
+    "USING: editors.gvim namespaces ;"
     "\"/opt/local/bin\" \\ gvim-path set-global"
-    "\"/home/jane/src/\" vocab-roots get push"
-    "100 dpi set-global"
 } ;
 
 ARTICLE: "cli" "Command line arguments"
 "Factor command line usage:"
-{ $code "factor [system switches...] [script args...]" }
-"Zero or more system switches can be passed in, followed by an optional script file name. If the script file is specified, it will be run on startup, any arguments after the script file are stored in a variable, with no further processing by Factor itself:"
-{ $subsection command-line }
+{ $code "factor [VM args...] [script] [args...]" }
+"Zero or more VM arguments can be passed in, followed by an optional script file name. If the script file is specified, it will be run on startup, any arguments after the script file are stored in the following variable, with no further processing by Factor itself:"
+{ $subsections command-line }
 "Instead of running a script, it is also possible to run a vocabulary; this invokes the vocabulary's " { $link POSTPONE: MAIN: } " word:"
 { $code "factor [system switches...] -run=<vocab name>" }
 "If no script file or " { $snippet "-run=" } " switch is specified, Factor will start " { $link "listener" } " or " { $link "ui-tools" } ", depending on the operating system."
@@ -152,12 +152,14 @@ $nl
     { { $snippet "-no-" { $emphasis "foo" } } " - sets the global variable " { $snippet "\"" { $emphasis "foo" } "\"" } " to " { $link f } }
     { { $snippet "-" { $emphasis "foo" } "=" { $emphasis "bar" } } " - sets the global variable " { $snippet "\"" { $emphasis "foo" } "\"" } " to " { $snippet "\"" { $emphasis "bar" } "\"" } }
 }
-{ $subsection "runtime-cli-args" }
-{ $subsection "bootstrap-cli-args" }
-{ $subsection "standard-cli-args" }
+{ $subsections
+    "runtime-cli-args"
+    "bootstrap-cli-args"
+    "standard-cli-args"
+}
 "The raw list of command line arguments can also be obtained and inspected directly:"
-{ $subsection (command-line) }
+{ $subsections (command-line) }
 "There is a way to override the default vocabulary to run on startup, if no script name or " { $snippet "-run" } " switch is specified:"
-{ $subsection main-vocab-hook } ;
+{ $subsections main-vocab-hook } ;
 
 ABOUT: "cli"

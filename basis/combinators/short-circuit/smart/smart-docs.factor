@@ -31,8 +31,8 @@ ARTICLE: "combinators.short-circuit.smart" "Smart short-circuit combinators"
 "The " { $vocab-link "combinators.short-circuit.smart" } " vocabulary is similar to " { $vocab-link "combinators.short-circuit" } " except the combinators here infer the number of inputs that the sequence of quotations takes."
 $nl
 "Generalized AND:"
-{ $subsection && }
+{ $subsections && }
 "Generalized OR:"
-{ $subsection || } ;
+{ $subsections || } ;
 
 ABOUT: "combinators.short-circuit.smart"

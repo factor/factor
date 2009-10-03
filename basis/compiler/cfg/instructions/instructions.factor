@@ -199,15 +199,6 @@ def: dst/int-rep
 use: src/int-rep ;
 
 ! Float arithmetic
-PURE-INSN: ##unbox-float
-def: dst/double-rep
-use: src/int-rep ;
-
-PURE-INSN: ##box-float
-def: dst/int-rep
-use: src/double-rep
-temp: temp/int-rep ;
-
 PURE-INSN: ##add-float
 def: dst/double-rep
 use: src1/double-rep src2/double-rep ;
@@ -266,19 +257,11 @@ def: dst/double-rep
 use: src/int-rep ;
 
 ! SIMD operations
-
-PURE-INSN: ##box-vector
-def: dst/int-rep
-use: src
-literal: rep
-temp: temp/int-rep ;
-
-PURE-INSN: ##unbox-vector
+PURE-INSN: ##zero-vector
 def: dst
-use: src/int-rep
 literal: rep ;
 
-PURE-INSN: ##zero-vector
+PURE-INSN: ##fill-vector
 def: dst
 literal: rep ;
 
@@ -296,6 +279,29 @@ PURE-INSN: ##shuffle-vector
 def: dst
 use: src
 literal: shuffle rep ;
+
+PURE-INSN: ##compare-vector
+def: dst
+use: src1 src2
+temp: temp
+literal: rep cc ;
+
+PURE-INSN: ##test-vector
+def: dst/int-rep
+use: src1
+temp: temp/int-rep
+literal: rep vcc ;
+
+INSN: ##test-vector-branch
+use: src1
+temp: temp/int-rep
+literal: rep vcc ;
+
+INSN: _test-vector-branch
+literal: label
+use: src1
+temp: temp/int-rep
+literal: rep vcc ;
 
 PURE-INSN: ##add-vector
 def: dst
@@ -400,6 +406,11 @@ literal: rep ;
 PURE-INSN: ##xor-vector
 def: dst
 use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##not-vector
+def: dst
+use: src
 literal: rep ;
 
 PURE-INSN: ##shl-vector
@@ -738,13 +749,11 @@ literal: n ;
 
 UNION: ##allocation
 ##allot
-##box-float
-##box-vector
 ##box-alien
 ##box-displaced-alien ;
 
 ! For alias analysis
-UNION: ##read ##slot ##slot-imm ;
+UNION: ##read ##slot ##slot-imm ##vm-field-ptr ##alien-global ;
 UNION: ##write ##set-slot ##set-slot-imm ;
 
 ! Instructions that kill all live vregs but cannot trigger GC
@@ -766,6 +775,8 @@ UNION: kill-vreg-insn
 UNION: def-is-use-insn
 ##box-alien
 ##box-displaced-alien
+##compare-vector
+##not-vector
 ##string-nth
 ##unbox-any-c-ptr ;
 

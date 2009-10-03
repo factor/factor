@@ -39,14 +39,14 @@ HELP: with-delimiter
 ARTICLE: "csv" "Comma-separated-values parsing and writing"
 "The " { $vocab-link "csv" } " vocabulary can read and write CSV (comma-separated-value) files." $nl
 "Reading a csv file:"
-{ $subsection file>csv }
+{ $subsections file>csv }
 "Writing a csv file:"
-{ $subsection csv>file }
+{ $subsections csv>file }
 "Changing the delimiter from a comma:"
-{ $subsection with-delimiter }
+{ $subsections with-delimiter }
 "Reading from a stream:"
-{ $subsection csv }
+{ $subsections csv }
 "Writing to a stream:"
-{ $subsection write-csv } ;
+{ $subsections write-csv } ;
 
 ABOUT: "csv"

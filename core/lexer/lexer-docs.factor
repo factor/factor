@@ -95,15 +95,17 @@ HELP: lexer-factory
 
 ARTICLE: "parser-lexer" "The lexer"
 "A variable that encapsulate internal parser state:"
-{ $subsection lexer }
+{ $subsections lexer }
 "Creating a default lexer:"
-{ $subsection <lexer> }
+{ $subsections <lexer> }
 "A word to test of the end of input has been reached:"
-{ $subsection still-parsing? }
+{ $subsections still-parsing? }
 "A word to advance the lexer to the next line:"
-{ $subsection next-line }
+{ $subsections next-line }
 "Two generic words to override the lexer's token boundary detection:"
-{ $subsection skip-blank }
-{ $subsection skip-word }
+{ $subsections
+    skip-blank
+    skip-word
+}
 "Utility combinator:"
-{ $subsection with-lexer } ;
+{ $subsections with-lexer } ;

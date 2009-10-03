@@ -8,6 +8,6 @@ HELP: iso2022
 { $see-also "encodings-introduction" } ;
 
 ARTICLE: "io.encodings.iso2022" "ISO 2022-JP-1 encoding"
-{ $subsection iso2022 } ;
+{ $subsections iso2022 } ;
 
 ABOUT: "io.encodings.iso2022"

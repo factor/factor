@@ -49,23 +49,8 @@ insn-classes get [
         [ ##load-reference ]
     } cond ;
 
-: ^^unbox-c-ptr ( src class -- dst )
-    [ next-vreg dup ] 2dip next-vreg ##unbox-c-ptr ;
-
-: ^^allot-tuple ( n -- dst )
-    2 + cells tuple ^^allot ;
-
-: ^^allot-array ( n -- dst )
-    2 + cells array ^^allot ;
-
-: ^^allot-byte-array ( n -- dst )
-    2 cells + byte-array ^^allot ;
-
 : ^^offset>slot ( slot -- vreg' )
     cell 4 = [ 1 ^^shr-imm ] [ any-rep ^^copy ] if ;
-
-: ^^tag-offset>slot ( slot tag -- vreg' )
-    [ ^^offset>slot ] dip ^^sub-imm ;
 
 : ^^tag-fixnum ( src -- dst )
     tag-bits get ^^shl-imm ;

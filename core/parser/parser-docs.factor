@@ -7,8 +7,10 @@ IN: parser
 
 ARTICLE: "reading-ahead" "Reading ahead"
 "Parsing words can consume input:"
-{ $subsection scan }
-{ $subsection scan-word }
+{ $subsections
+    scan
+    scan-word
+}
 "For example, the " { $link POSTPONE: HEX: } " word uses this feature to read hexadecimal literals:"
 { $see POSTPONE: HEX: }
 "It is defined in terms of a lower-level word that takes the numerical base on the data stack, but reads the number from the parser and then adds it to the parse tree:"
@@ -22,23 +24,25 @@ $nl
 "A simple example is the parsing word that reads a quotation:"
 { $see POSTPONE: [ }
 "This word uses a utility word which recursively invokes the parser, reading objects into a new accumulator until an occurrence of " { $link POSTPONE: ] } ":"
-{ $subsection parse-literal }
+{ $subsections parse-literal }
 "There is another, lower-level word for reading nested structure, which is also useful when called directly:"
-{ $subsection parse-until }
+{ $subsections parse-until }
 "Words such as " { $link POSTPONE: ] } " use a declaration which causes them to throw an error when an unpaired occurrence is encountered:"
-{ $subsection POSTPONE: delimiter }
+{ $subsections POSTPONE: delimiter }
 { $see-also POSTPONE: { POSTPONE: H{ POSTPONE: V{ POSTPONE: W{ POSTPONE: T{ POSTPONE: } } ;
 
 ARTICLE: "defining-words" "Defining words"
 "Defining words add definitions to the dictionary without modifying the parse tree. The simplest example is the " { $link POSTPONE: SYMBOL: } " word."
 { $see POSTPONE: SYMBOL: }
 "The key factor in the definition of " { $link POSTPONE: SYMBOL: } " is " { $link CREATE } ", which reads a token from the input and creates a word with that name. This word is then passed to " { $link define-symbol } "."
-{ $subsection CREATE }
-{ $subsection CREATE-WORD }
+{ $subsections
+    CREATE
+    CREATE-WORD
+}
 "Colon definitions are defined in a more elaborate way:"
-{ $subsection POSTPONE: : }
+{ $subsections POSTPONE: : }
 "The " { $link POSTPONE: : } " word first calls " { $link CREATE } ", and then reads input until reaching " { $link POSTPONE: ; } " using a utility word:"
-{ $subsection parse-definition }
+{ $subsections parse-definition }
 "The " { $link POSTPONE: ; } " word is just a delimiter; an unpaired occurrence throws a parse error:"
 { $see POSTPONE: ; }
 "There are additional parsing words whose syntax is delimited by " { $link POSTPONE: ; } ", and they are all implemented by calling " { $link parse-definition } "." ;
@@ -49,13 +53,13 @@ $nl
 "One example is the " { $link POSTPONE: USING: } " parsing word."
 { $see POSTPONE: USING: } 
 "It reads a list of vocabularies terminated by " { $link POSTPONE: ; } ". However, the vocabulary names do not name words, except by coincidence; so " { $link parse-until } " cannot be used here. Instead, a lower-level word is called:"
-{ $subsection parse-tokens } ;
+{ $subsections parse-tokens } ;
 
 ARTICLE: "parsing-words" "Parsing words"
 "The Factor parser follows a simple recursive-descent design. The parser reads successive tokens from the input; if the token identifies a number or an ordinary word, it is added to an accumulator vector. Otherwise if the token identifies a parsing word, the parsing word is executed immediately."
 $nl
 "Parsing words are defined using the defining word:"
-{ $subsection POSTPONE: SYNTAX: }
+{ $subsections POSTPONE: SYNTAX: }
 "Parsing words have uppercase names by convention. Here is the simplest possible parsing word; it prints a greeting at parse time:"
 { $code "SYNTAX: HELLO \"Hello world\" print ;" }
 "Parsing words must not pop or push items from the stack; however, they are permitted to access the accumulator vector supplied by the parser at the top of the stack. That is, parsing words must have stack effect " { $snippet "( accum -- accum )" } ", where " { $snippet "accum" } " is the accumulator vector supplied by the parser."
@@ -65,18 +69,22 @@ $nl
 "Because of the stack restriction, parsing words cannot pass data to other words by leaving values on the stack; instead, use " { $link parsed } " to add the data to the parse tree so that it can be evaluated later."
 $nl
 "Parsing words cannot be called from the same source file where they are defined, because new definitions are only compiled at the end of the source file. An attempt to use a parsing word in its own source file raises an error:"
-{ $subsection staging-violation }
+{ $subsections staging-violation }
 "Tools for implementing parsing words:"
-{ $subsection "reading-ahead" }
-{ $subsection "parsing-word-nest" }
-{ $subsection "defining-words" }
-{ $subsection "parsing-tokens" }
-{ $subsection "word-search-parsing" } ;
+{ $subsections
+    "reading-ahead"
+    "parsing-word-nest"
+    "defining-words"
+    "parsing-tokens"
+    "word-search-parsing"
+} ;
 
 ARTICLE: "parser-files" "Parsing source files"
 "The parser can run source files:"
-{ $subsection run-file }
-{ $subsection parse-file }
+{ $subsections
+    run-file
+    parse-file
+}
 "The parser cross-references source files and definitions. This allows it to keep track of removed definitions, and prevent forward references and accidental redefinitions."
 $nl
 "While the above words are useful for one-off experiments, real programs should be written to use the vocabulary system instead; see " { $link "vocabs.loader" } "."
@@ -93,11 +101,11 @@ ARTICLE: "parser" "The parser"
 "This parser is a general facility for reading textual representations of objects and definitions. The parser is implemented in the " { $vocab-link "parser" } " and " { $vocab-link "syntax" } " vocabularies."
 $nl
 "This section concerns itself with usage and extension of the parser. Standard syntax is described in " { $link "syntax" } "."
-{ $subsection "parser-files" }
+{ $subsections "parser-files" }
 "The parser can be extended."
-{ $subsection "parser-lexer" }
+{ $subsections "parser-lexer" }
 "The parser can be invoked reflectively;"
-{ $subsection parse-stream }
+{ $subsections parse-stream }
 { $see-also "parsing-words" "definitions" "definition-checking" } ;
 
 ABOUT: "parser"

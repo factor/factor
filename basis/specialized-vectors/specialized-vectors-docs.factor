@@ -21,8 +21,10 @@ ARTICLE: "specialized-vector-c" "Passing specialized vectors to C functions"
 
 ARTICLE: "specialized-vectors" "Specialized vectors"
 "The " { $vocab-link "specialized-vectors" } " vocabulary implements resizable sequence types for storing machine values in a space-efficient manner without boxing."
-{ $subsection "specialized-vector-words" }
-{ $subsection "specialized-vector-c" }
+{ $subsections
+    "specialized-vector-words"
+    "specialized-vector-c"
+}
 "The " { $vocab-link "specialized-arrays" } " vocabulary provides a fixed-length version of this abstraction." ;
 
 ABOUT: "specialized-vectors"

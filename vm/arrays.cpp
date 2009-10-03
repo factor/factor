@@ -24,14 +24,12 @@ array *factor_vm::allot_array(cell capacity, cell fill_)
 }
 
 /* push a new array on the stack */
-inline void factor_vm::primitive_array()
+void factor_vm::primitive_array()
 {
 	cell initial = dpop();
 	cell size = unbox_array_size();
 	dpush(tag<array>(allot_array(size,initial)));
 }
-
-PRIMITIVE_FORWARD(array)
 
 cell factor_vm::allot_array_1(cell obj_)
 {
@@ -65,14 +63,12 @@ cell factor_vm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
 	return a.value();
 }
 
-inline void factor_vm::primitive_resize_array()
+void factor_vm::primitive_resize_array()
 {
 	array* a = untag_check<array>(dpop());
 	cell capacity = unbox_array_size();
 	dpush(tag<array>(reallot_array(a,capacity)));
 }
-
-PRIMITIVE_FORWARD(resize_array)
 
 void growable_array::add(cell elt_)
 {

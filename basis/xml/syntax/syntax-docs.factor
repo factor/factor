@@ -7,15 +7,17 @@ ABOUT: "xml.syntax"
 
 ARTICLE: "xml.syntax" "Syntax extensions for XML"
 "The " { $link "xml.syntax" } " vocabulary defines a number of new parsing words forXML processing."
-{ $subsection { "xml.syntax" "tags" } }
-{ $subsection { "xml.syntax" "literals" } }
-{ $subsection POSTPONE: XML-NS: } ;
+{ $subsections
+    { "xml.syntax" "tags" }
+    { "xml.syntax" "literals" }
+    POSTPONE: XML-NS:
+} ;
 
 ARTICLE: { "xml.syntax" "tags" } "Dispatch on XML tag names"
 "There is a system, analogous to generic words, for processing XML. A word can dispatch off the name of the tag that is passed to it. To define such a word, use"
-{ $subsection POSTPONE: TAGS: }
+{ $subsections POSTPONE: TAGS: }
 "and to define a new 'method' for this word, use"
-{ $subsection POSTPONE: TAG: } ;
+{ $subsections POSTPONE: TAG: } ;
 
 HELP: TAGS:
 { $syntax "TAGS: word" }
@@ -32,10 +34,12 @@ HELP: TAG:
 
 ARTICLE: { "xml.syntax" "literals" } "XML literals"
 "The following words provide syntax for XML literals:"
-{ $subsection POSTPONE: <XML }
-{ $subsection POSTPONE: [XML }
+{ $subsections
+    POSTPONE: <XML
+    POSTPONE: [XML
+}
 "These can be used for creating an XML literal, which can be used with variables or a fry-like syntax to interpolate data into XML."
-{ $subsection { "xml.syntax" "interpolation" } } ;
+{ $subsections { "xml.syntax" "interpolation" } } ;
 
 HELP: <XML
 { $syntax "<XML <?xml version=\"1.0\"?><document>...</document> XML>" }

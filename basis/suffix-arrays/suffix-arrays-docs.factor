@@ -36,10 +36,10 @@ ARTICLE: "suffix-arrays" "Suffix arrays"
 "The " { $vocab-link "suffix-arrays" } " vocabulary implements the suffix array data structure for efficient lookup of subsequences. This suffix array implementation is a sorted array of suffixes. Querying it for matches uses binary search for efficiency." $nl
 
 "Creating new suffix arrays:"
-{ $subsection >suffix-array }
+{ $subsections >suffix-array }
 "Literal suffix arrays:"
-{ $subsection POSTPONE: SA{ }
+{ $subsections POSTPONE: SA{ }
 "Querying suffix arrays:"
-{ $subsection query } ;
+{ $subsections query } ;
 
 ABOUT: "suffix-arrays"

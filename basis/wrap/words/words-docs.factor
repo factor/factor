@@ -7,9 +7,11 @@ ABOUT: "wrap.words"
 
 ARTICLE: "wrap.words" "Word object wrapping"
 "The " { $vocab-link "wrap.words" } " vocabulary implements word wrapping on abstract word objects, which have certain properties making it a more suitable input representation than strings."
-{ $subsection wrap-words }
-{ $subsection word }
-{ $subsection <word> } ;
+{ $subsections
+    wrap-words
+    word
+    <word>
+} ;
 
 HELP: wrap-words
 { $values { "words" { "a sequence of " { $instance word } "s" } } { "line-max" integer } { "line-ideal" integer } { "lines" "a sequence of sequences of words" } }

@@ -28,34 +28,40 @@ void factor_vm::jit_compile_word(cell word_, cell def_, bool relocate)
 	if(word->pic_tail_def != F) jit_compile(word->pic_tail_def,relocate);
 }
 
-/* Apply a function to every code block */
-void factor_vm::iterate_code_heap(code_heap_iterator iter)
-{
-	heap_block *scan = code->first_block();
+struct literal_reference_tracer {
+	factor_vm *myvm;
 
-	while(scan)
+	explicit literal_reference_tracer(factor_vm *myvm_) : myvm(myvm_) {}
+	void operator()(code_block *compiled)
 	{
-		if(scan->status != B_FREE)
-			iter((code_block *)scan,this);
-		scan = code->next_block(scan);
+		myvm->trace_literal_references(compiled);
 	}
-}
+};
 
 /* Copy literals referenced from all code blocks to newspace. Only for
 aging and nursery collections */
-void factor_vm::copy_code_heap_roots()
+void factor_vm::trace_code_heap_roots()
 {
-	iterate_code_heap(factor::copy_literal_references);
+	code_heap_scans++;
+
+	literal_reference_tracer tracer(this);
+	iterate_code_heap(tracer);
+
+	if(current_gc->collecting_accumulation_gen_p())
+		last_code_heap_scan = current_gc->collecting_gen;
+	else
+		last_code_heap_scan = current_gc->collecting_gen + 1;
 }
 
 /* Update pointers to words referenced from all code blocks. Only after
 defining a new word. */
 void factor_vm::update_code_heap_words()
 {
-	iterate_code_heap(factor::update_word_references);
+	word_updater updater(this);
+	iterate_code_heap(updater);
 }
 
-inline void factor_vm::primitive_modify_code_heap()
+void factor_vm::primitive_modify_code_heap()
 {
 	gc_root<array> alist(dpop(),this);
 
@@ -106,10 +112,8 @@ inline void factor_vm::primitive_modify_code_heap()
 	update_code_heap_words();
 }
 
-PRIMITIVE_FORWARD(modify_code_heap)
-
 /* Push the free space and total size of the code heap */
-inline void factor_vm::primitive_code_room()
+void factor_vm::primitive_code_room()
 {
 	cell used, total_free, max_free;
 	code->heap_usage(&used,&total_free,&max_free);
@@ -119,25 +123,24 @@ inline void factor_vm::primitive_code_room()
 	dpush(tag_fixnum(max_free / 1024));
 }
 
-PRIMITIVE_FORWARD(code_room)
-
 code_block *factor_vm::forward_xt(code_block *compiled)
 {
 	return (code_block *)forwarding[compiled];
 }
 
-void factor_vm::forward_frame_xt(stack_frame *frame)
-{
-	cell offset = (cell)FRAME_RETURN_ADDRESS(frame) - (cell)frame_code(frame);
-	code_block *forwarded = forward_xt(frame_code(frame));
-	frame->xt = forwarded->xt();
-	FRAME_RETURN_ADDRESS(frame) = (void *)((cell)forwarded + offset);
-}
+struct xt_forwarder {
+	factor_vm *myvm;
 
-void forward_frame_xt(stack_frame *frame,factor_vm *myvm)
-{
-	return myvm->forward_frame_xt(frame);
-}
+	explicit xt_forwarder(factor_vm *myvm_) : myvm(myvm_) {}
+
+	void operator()(stack_frame *frame)
+	{
+		cell offset = (cell)FRAME_RETURN_ADDRESS(frame,myvm) - (cell)myvm->frame_code(frame);
+		code_block *forwarded = myvm->forward_xt(myvm->frame_code(frame));
+		frame->xt = forwarded->xt();
+		FRAME_RETURN_ADDRESS(frame,myvm) = (void *)((cell)forwarded + offset);
+	}
+};
 
 void factor_vm::forward_object_xts()
 {
@@ -170,7 +173,8 @@ void factor_vm::forward_object_xts()
 		case CALLSTACK_TYPE:
 			{
 				callstack *stack = untag<callstack>(obj);
-				iterate_callstack_object(stack,factor::forward_frame_xt);
+				xt_forwarder forwarder(this);
+				iterate_callstack_object(stack,forwarder);
 			}
 			break;
 		default:
@@ -216,8 +220,8 @@ do this before saving a deployed image and exiting, so performaance is not
 critical here */
 void factor_vm::compact_code_heap()
 {
-	/* Free all unreachable code blocks */
-	gc();
+	/* Free all unreachable code blocks, don't trace contexts */
+	garbage_collection(data->tenured(),false,false,0);
 
 	/* Figure out where the code heap blocks are going to end up */
 	cell size = code->compute_heap_forwarding(forwarding);

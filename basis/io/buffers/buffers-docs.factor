@@ -9,24 +9,32 @@ $nl
 "Buffers are used to implement native I/O backends."
 $nl
 "Buffer words are found in the " { $vocab-link "io.buffers" } " vocabulary."
-{ $subsection buffer }
-{ $subsection <buffer> }
+{ $subsections
+    buffer
+    <buffer>
+}
 "Buffers must be manually deallocated by calling " { $link dispose } "."
 $nl
 "Buffer operations:"
-{ $subsection buffer-reset }
-{ $subsection buffer-length }
-{ $subsection buffer-empty? }
-{ $subsection buffer-capacity }
-{ $subsection buffer@ }
+{ $subsections
+    buffer-reset
+    buffer-length
+    buffer-empty?
+    buffer-capacity
+    buffer@
+}
 "Reading from the buffer:"
-{ $subsection buffer-peek }
-{ $subsection buffer-pop }
-{ $subsection buffer-read }
+{ $subsections
+    buffer-peek
+    buffer-pop
+    buffer-read
+}
 "Writing to the buffer:"
-{ $subsection byte>buffer }
-{ $subsection >buffer }
-{ $subsection n>buffer } ;
+{ $subsections
+    byte>buffer
+    >buffer
+    n>buffer
+} ;
 
 ABOUT: "buffers"
 

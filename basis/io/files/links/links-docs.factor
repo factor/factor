@@ -47,13 +47,15 @@ HELP: too-many-symlinks
 
 ARTICLE: "io.files.links" "Symbolic links"
 "Reading links:"
-{ $subsection read-link }
-{ $subsection follow-link }
-{ $subsection follow-links }
+{ $subsections
+    read-link
+    follow-link
+    follow-links
+}
 "Creating links:"
-{ $subsection make-link }
+{ $subsections make-link }
 "Copying links:"
-{ $subsection copy-link }
+{ $subsections copy-link }
 "Not all operating systems support symbolic links."
 { $see-also link-info } ;
 

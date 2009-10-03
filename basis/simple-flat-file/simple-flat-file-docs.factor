@@ -7,9 +7,11 @@ ABOUT: "simple-flat-file"
 
 ARTICLE: "simple-flat-file" "Parsing simple flat files"
 "The " { $vocab-link "simple-flat-file" } " vocabulary provides words for loading and parsing simple flat files in a particular format which is common for encoding and Unicode tasks."
-{ $subsection flat-file>biassoc }
-{ $subsection load-interval-file }
-{ $subsection data } ;
+{ $subsections
+    flat-file>biassoc
+    load-interval-file
+    data
+} ;
 
 HELP: load-interval-file
 { $values { "filename" string } { "table" "an interval map" } }

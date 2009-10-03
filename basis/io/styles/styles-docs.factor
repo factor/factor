@@ -92,24 +92,30 @@ $io-error ;
 
 ARTICLE: "formatted-stream-protocol" "Formatted stream protocol"
 "The " { $vocab-link "io.styles" } " vocabulary defines a protocol for output streams that support rich text."
-{ $subsection stream-format }
-{ $subsection make-span-stream }
-{ $subsection make-block-stream }
-{ $subsection make-cell-stream }
-{ $subsection stream-write-table } ;
+{ $subsections
+    stream-format
+    make-span-stream
+    make-block-stream
+    make-cell-stream
+    stream-write-table
+} ;
 
 ARTICLE: "formatted-stdout" "Formatted output on the default stream"
 "The below words perform formatted output on " { $link output-stream } "."
 $nl
 "Formatted output:"
-{ $subsection format }
-{ $subsection with-style }
-{ $subsection with-nesting }
+{ $subsections
+    format
+    with-style
+    with-nesting
+}
 "Tabular output:"
-{ $subsection tabular-output }
-{ $subsection with-row }
-{ $subsection with-cell }
-{ $subsection write-cell } ;
+{ $subsections
+    tabular-output
+    with-row
+    with-cell
+    write-cell
+} ;
 
 HELP: href
 { $description "Character style. A URL string that the text links to." } ;
@@ -119,28 +125,36 @@ HELP: image
 
 ARTICLE: "character-styles" "Character styles"
 "Character styles for " { $link stream-format } " and " { $link with-style } ":"
-{ $subsection foreground }
-{ $subsection background }
-{ $subsection font-name }
-{ $subsection font-size }
-{ $subsection font-style }
+{ $subsections
+    foreground
+    background
+    font-name
+    font-size
+    font-style
+}
 "Special styles:"
-{ $subsection href }
-{ $subsection image }
+{ $subsections
+    href
+    image
+}
 { $see-also "presentations" } ;
 
 ARTICLE: "paragraph-styles" "Paragraph styles"
 "Paragraph styles for " { $link with-nesting } ":"
-{ $subsection page-color }
-{ $subsection border-color }
-{ $subsection inset }
-{ $subsection wrap-margin }
-{ $subsection presented } ;
+{ $subsections
+    page-color
+    border-color
+    inset
+    wrap-margin
+    presented
+} ;
 
 ARTICLE: "table-styles" "Table styles"
 "Table styles for " { $link tabular-output } ":"
-{ $subsection table-gap }
-{ $subsection table-border } ;
+{ $subsections
+    table-gap
+    table-border
+} ;
 
 HELP: write-object
 { $values { "str" string } { "obj" "an object" } }
@@ -149,24 +163,28 @@ $io-error ;
 
 ARTICLE: "presentations" "Presentations"
 "A special style for " { $link format } " and " { $link with-nesting } ":"
-{ $subsection presented }
+{ $subsections presented }
 "The " { $link presented } " style can be used to emit clickable objects. A utility word for outputting this style:"
-{ $subsection write-object } ;
+{ $subsections write-object } ;
 
 ARTICLE: "styles" "Text styles"
 "The " { $link stream-format } ", " { $link with-style } ", " { $link with-nesting } " and " { $link tabular-output } " words take a hashtable of style attributes. Output stream implementations are free to ignore style information."
 $nl
 "Style hashtables are keyed by symbols from the " { $vocab-link "io.styles" } " vocabulary."
-{ $subsection "character-styles" }
-{ $subsection "paragraph-styles" }
-{ $subsection "table-styles" }
-{ $subsection "presentations" } ;
+{ $subsections
+    "character-styles"
+    "paragraph-styles"
+    "table-styles"
+    "presentations"
+} ;
 
 ARTICLE: "io.styles" "Formatted output"
 "The " { $vocab-link "io.styles" } " vocabulary defines a protocol for formatted output. This is used by the prettyprinter, help system, and various developer tools. Implementations include " { $vocab-link "ui.gadgets.panes" } ", " { $vocab-link "html.streams" } ", and " { $vocab-link "io.streams.plain" } "."
-{ $subsection "formatted-stream-protocol" }
-{ $subsection "formatted-stdout" }
-{ $subsection "styles" } ;
+{ $subsections
+    "formatted-stream-protocol"
+    "formatted-stdout"
+    "styles"
+} ;
 
 ABOUT: "io.styles"
 
@@ -284,4 +302,4 @@ ARTICLE: "io.streams.plain" "Plain writer streams"
 { $link make-span-stream } ", "
 { $link make-block-stream } " and "
 { $link make-cell-stream } "."
-{ $subsection plain-writer } ;
+{ $subsections plain-writer } ;

@@ -31,12 +31,16 @@ ARTICLE: "interval-maps" "Interval maps"
 "The " { $vocab-link "interval-maps" } " vocabulary implements a data structure, similar to assocs, where a set of closed intervals of keys are associated with values. As such, interval maps do not conform to the assoc protocol, because intervals of floats, for example, can be used, and it is impossible to get a list of keys in between."
 $nl
 "The following operations are used to query interval maps:"
-{ $subsection interval-at* }
-{ $subsection interval-at }
-{ $subsection interval-key? }
-{ $subsection interval-values }
+{ $subsections
+    interval-at*
+    interval-at
+    interval-key?
+    interval-values
+}
 "Use the following to construct interval maps"
-{ $subsection <interval-map> }
-{ $subsection coalesce } ;
+{ $subsections
+    <interval-map>
+    coalesce
+} ;
 
 ABOUT: "interval-maps"

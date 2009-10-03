@@ -48,17 +48,21 @@ HELP: <toolbar>
 
 ARTICLE: "ui.gadgets.buttons" "Button gadgets"
 "The " { $vocab-link "ui.gadgets.buttons" } " vocabulary implements buttons. Buttons respond to mouse clicks by invoking a quotation."
-{ $subsection button }
+{ $subsections button }
 "There are many ways to create a new button:"
-{ $subsection <button> }
-{ $subsection <roll-button> }
-{ $subsection <border-button> }
-{ $subsection <repeat-button> }
+{ $subsections
+    <button>
+    <roll-button>
+    <border-button>
+    <repeat-button>
+}
 "Gadgets for invoking commands:"
-{ $subsection <command-button> }
-{ $subsection <toolbar> }
+{ $subsections
+    <command-button>
+    <toolbar>
+}
 "Button appearance can be customized:"
-{ $subsection button-pen }
+{ $subsections button-pen }
 "Button constructors take " { $emphasis "label specifiers" } " as input. A label specifier is either a string, an array of strings, a gadget or " { $link f } "."
 { $see-also <command-button> "ui-commands" } ;
 

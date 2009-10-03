@@ -44,12 +44,14 @@ ARTICLE: "furnace.recaptcha" "Recaptcha"
 "The recaptcha responder is a " { $link filter-responder } " that wraps another responder. Set the " { $slot "domain" } ", " { $slot "public-key" } ", and " { $slot "private-key" } " slots of this responder to your Recaptcha account information." $nl
 
 "Wrapping a responder with Recaptcha:"
-{ $subsection <recaptcha> }
+{ $subsections <recaptcha> }
 "Validating recaptcha:"
-{ $subsection validate-recaptcha }
+{ $subsections validate-recaptcha }
 "Symbols set after validation:"
-{ $subsection recaptcha-valid? }
-{ $subsection recaptcha-error }
-{ $subsection "recaptcha-example" } ;
+{ $subsections
+    recaptcha-valid?
+    recaptcha-error
+    "recaptcha-example"
+} ;
 
 ABOUT: "furnace.recaptcha"

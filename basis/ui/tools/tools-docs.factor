@@ -46,23 +46,27 @@ $nl
 
 ARTICLE: "ui-tools" "UI developer tools"
 "The " { $vocab-link "ui.tools" } " vocabulary hierarchy implements a collection of simple developer tools."
-{ $subsection "starting-ui-tools" }
+{ $subsections "starting-ui-tools" }
 "To take full advantage of the UI tools, you should be using a supported text editor. See " { $link "editor" } "."
 $nl
 "Common functionality:"
-{ $subsection "ui-shortcuts" }
-{ $subsection "ui-presentations" }
-{ $subsection "definitions.icons" }
+{ $subsections
+    "ui-shortcuts"
+    "ui-presentations"
+    "definitions.icons"
+}
 "Tools:"
-{ $subsection "ui-listener" }
-{ $subsection "ui-browser" }
-{ $subsection "ui-inspector" }
-{ $subsection "ui.tools.error-list" }
-{ $subsection "ui.tools.profiler" }
-{ $subsection "ui-walker" }
-{ $subsection "ui.tools.deploy" }
+{ $subsections
+    "ui-listener"
+    "ui-browser"
+    "ui-inspector"
+    "ui.tools.error-list"
+    "ui.tools.profiler"
+    "ui-walker"
+    "ui.tools.deploy"
+}
 "Platform-specific features:"
-{ $subsection "ui-cocoa" } ;
+{ $subsections "ui-cocoa" } ;
 
 TIP: "All UI developer tools support a common set of " { $link "ui-shortcuts" } ". Each individual tool has its own shortcuts as well; the F1 key is context-sensitive." ;
 

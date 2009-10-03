@@ -6,22 +6,28 @@ ARTICLE: "dlists" "Double-linked lists"
 "A double-linked list is the canonical implementation of a " { $link deque } "."
 $nl
 "Double-linked lists form a class:"
-{ $subsection dlist }
-{ $subsection dlist? }
+{ $subsections
+    dlist
+    dlist?
+}
 "Constructing a double-linked list:"
-{ $subsection <dlist> }
+{ $subsections <dlist> }
 "Double-linked lists support all the operations of the deque protocol (" { $link "deques" } ") as well as the following."
 $nl
 "Iterating over elements:"
-{ $subsection dlist-each }
-{ $subsection dlist-find }
-{ $subsection dlist-filter }
-{ $subsection dlist-any? }
+{ $subsections
+    dlist-each
+    dlist-find
+    dlist-filter
+    dlist-any?
+}
 "Deleting a node matching a predicate:"
-{ $subsection delete-node-if* }
-{ $subsection delete-node-if }
+{ $subsections
+    delete-node-if*
+    delete-node-if
+}
 "Search deque implementation:"
-{ $subsection <hashed-dlist> } ;
+{ $subsections <hashed-dlist> } ;
 
 ABOUT: "dlists"
 

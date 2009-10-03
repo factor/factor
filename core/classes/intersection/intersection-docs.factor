@@ -5,13 +5,15 @@ IN: classes.intersection
 
 ARTICLE: "intersections" "Intersection classes"
 "An object is an instance of a intersection class if it is an instance of all of its participants."
-{ $subsection POSTPONE: INTERSECTION: }
-{ $subsection define-intersection-class }
+{ $subsections POSTPONE: INTERSECTION: }
+{ $subsections define-intersection-class }
 "Intersection classes can be introspected:"
-{ $subsection participants }
+{ $subsections participants }
 "The set of intersection classes is a class:"
-{ $subsection intersection-class }
-{ $subsection intersection-class? }
+{ $subsections
+    intersection-class
+    intersection-class?
+}
 "Intersection classes are used to associate a method with objects which are simultaneously instances of multiple different classes, as well as to conveniently define predicates." ;
 
 ABOUT: "intersections"

@@ -4,6 +4,7 @@ namespace factor
 {
 
 factor_vm *vm;
+unordered_map<THREADHANDLE, factor_vm*> thread_vms;
 
 void init_globals()
 {
@@ -46,7 +47,7 @@ void factor_vm::default_parameters(vm_parameters *p)
 #else
 	if (this == vm)
 		p->console = true;
-	else 		
+	else		
 		p->console = false;
 	
 #endif
@@ -221,27 +222,37 @@ struct startargs {
 	vm_char **argv;
 };
 
-void* start_standalone_factor_thread(void *arg) 
+factor_vm *new_factor_vm()
 {
 	factor_vm *newvm = new factor_vm;
 	register_vm_with_thread(newvm);
+	thread_vms[thread_id()] = newvm;
+
+	return newvm;
+}
+
+// arg must be new'ed because we're going to delete it!
+void* start_standalone_factor_thread(void *arg) 
+{
+	factor_vm *newvm = new_factor_vm();
 	startargs *args = (startargs*) arg;
-	newvm->start_standalone_factor(args->argc, args->argv);
+	int argc = args->argc; vm_char **argv = args->argv;
+	delete args;
+	newvm->start_standalone_factor(argc, argv);
 	return 0;
 }
 
 VM_C_API void start_standalone_factor(int argc, vm_char **argv)
 {
-	factor_vm *newvm = new factor_vm;
+	factor_vm *newvm = new_factor_vm();
 	vm = newvm;
-	register_vm_with_thread(newvm);
 	return newvm->start_standalone_factor(argc,argv);
 }
 
 VM_C_API THREADHANDLE start_standalone_factor_in_new_thread(int argc, vm_char **argv)
 {
-	startargs *args = new startargs;   // leaks startargs structure
-	args->argc = argc; args->argv = argv;
+	startargs *args = new startargs;
+	args->argc = argc; args->argv = argv; 
 	return start_thread(start_standalone_factor_thread,args);
 }
 

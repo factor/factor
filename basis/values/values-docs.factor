@@ -3,12 +3,14 @@ IN: values
 
 ARTICLE: "values" "Global values"
 "Usually, dynamically-scoped variables subsume global variables and are sufficient for holding global data. But occasionally, for global information that's calculated just once and must be accessed more rapidly than a dynamic variable lookup can provide, it's useful to use the word mechanism instead, and set a word to the appropriate value just once. The " { $vocab-link "values" } " vocabulary implements " { $emphasis "values" } ", which abstract over this concept. To create a new word as a value, use the following syntax:"
-{ $subsection POSTPONE: VALUE: }
+{ $subsections POSTPONE: VALUE: }
 "To get the value, just call the word. The following words manipulate values:"
-{ $subsection get-value }
-{ $subsection set-value }
-{ $subsection POSTPONE: to: }
-{ $subsection change-value } ;
+{ $subsections
+    get-value
+    set-value
+    POSTPONE: to:
+    change-value
+} ;
 
 ABOUT: "values"
 
