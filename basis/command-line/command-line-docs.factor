@@ -129,12 +129,10 @@ $nl
     "\"factor-rc\" rc-path print"
     "\"factor-boot-rc\" rc-path print"
 }
-"Here is an example " { $snippet ".factor-boot-rc" } " which sets up GVIM editor integration, adds an additional vocabulary root (see " { $link "vocabs.roots" } "), and increases the font size in the UI by setting the DPI (dots-per-inch) variable:"
+"Here is an example " { $snippet ".factor-boot-rc" } " which sets up GVIM editor integration:"
 { $code
-    "USING: editors.gvim vocabs.loader ui.freetype namespaces sequences ;"
+    "USING: editors.gvim namespaces ;"
     "\"/opt/local/bin\" \\ gvim-path set-global"
-    "\"/home/jane/src/\" vocab-roots get push"
-    "100 dpi set-global"
 } ;
 
 ARTICLE: "cli" "Command line arguments"
