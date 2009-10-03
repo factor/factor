@@ -8,4 +8,14 @@ inline void factor_vm::check_code_pointer(cell ptr)
 #endif
 }
 
+struct word_updater {
+	factor_vm *myvm;
+
+	explicit word_updater(factor_vm *myvm_) : myvm(myvm_) {}
+	void operator()(code_block *compiled)
+	{
+		myvm->update_word_references(compiled);
+	}
+};
+
 }
