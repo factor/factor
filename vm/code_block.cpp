@@ -188,7 +188,7 @@ cell factor_vm::compute_relocation(relocation_entry rel, cell index, code_block 
 #undef ARG
 }
 
-void factor_vm::iterate_relocations(code_block *compiled, relocation_iterator iter)
+template<typename Iterator> void factor_vm::iterate_relocations(code_block *compiled, Iterator &iter)
 {
 	if(compiled->relocation != F)
 	{
@@ -200,7 +200,7 @@ void factor_vm::iterate_relocations(code_block *compiled, relocation_iterator it
 		for(cell i = 0; i < length; i++)
 		{
 			relocation_entry rel = relocation->data<relocation_entry>()[i];
-			(this->*iter)(rel,index,compiled);
+			iter(rel,index,compiled);
 			index += number_of_parameters(relocation_type_of(rel));			
 		}
 	}
@@ -270,54 +270,51 @@ void factor_vm::store_address_in_code_block(cell klass, cell offset, fixnum abso
 	}
 }
 
-void factor_vm::update_literal_references_step(relocation_entry rel, cell index, code_block *compiled)
-{
-	if(relocation_type_of(rel) == RT_IMMEDIATE)
-	{
-		cell offset = relocation_offset_of(rel) + (cell)(compiled + 1);
-		array *literals = untag<array>(compiled->literals);
-		fixnum absolute_value = array_nth(literals,index);
-		store_address_in_code_block(relocation_class_of(rel),offset,absolute_value);
-	}
-}
+struct literal_references_updater {
+	factor_vm *myvm;
 
-void update_literal_references_step(relocation_entry rel, cell index, code_block *compiled, factor_vm *myvm)
-{
-	return myvm->update_literal_references_step(rel,index,compiled);
-}
+	explicit literal_references_updater(factor_vm *myvm_) : myvm(myvm_) {}
+
+	void operator()(relocation_entry rel, cell index, code_block *compiled)
+	{
+		if(myvm->relocation_type_of(rel) == RT_IMMEDIATE)
+		{
+			cell offset = myvm->relocation_offset_of(rel) + (cell)(compiled + 1);
+			array *literals = myvm->untag<array>(compiled->literals);
+			fixnum absolute_value = array_nth(literals,index);
+			myvm->store_address_in_code_block(myvm->relocation_class_of(rel),offset,absolute_value);
+		}
+	}
+};
 
 /* Update pointers to literals from compiled code. */
 void factor_vm::update_literal_references(code_block *compiled)
 {
 	if(!compiled->needs_fixup)
 	{
-		iterate_relocations(compiled,&factor_vm::update_literal_references_step);
+		literal_references_updater updater(this);
+		iterate_relocations(compiled,updater);
 		flush_icache_for(compiled);
 	}
 }
 
 /* Copy all literals referenced from a code block to newspace. Only for
 aging and nursery collections */
-void factor_vm::copy_literal_references(code_block *compiled)
+void factor_vm::trace_literal_references(code_block *compiled)
 {
-	if(collecting_gen >= compiled->last_scan)
+	if(current_gc->collecting_gen >= compiled->last_scan)
 	{
-		if(collecting_accumulation_gen_p())
-			compiled->last_scan = collecting_gen;
+		if(current_gc->collecting_accumulation_gen_p())
+			compiled->last_scan = current_gc->collecting_gen;
 		else
-			compiled->last_scan = collecting_gen + 1;
+			compiled->last_scan = current_gc->collecting_gen + 1;
 
-		/* initialize chase pointer */
-		cell scan = newspace->here;
+		trace_handle(&compiled->literals);
+		trace_handle(&compiled->relocation);
 
-		copy_handle(&compiled->literals);
-		copy_handle(&compiled->relocation);
-
-		/* do some tracing so that all reachable literals are now
-		at their final address */
-		copy_reachable_objects(scan,&newspace->here);
-
-		update_literal_references(compiled);
+		/* once we finish tracing, re-visit this code block and update
+		literals */
+		current_gc->dirty_code_blocks.insert(compiled);
 	}
 }
 
@@ -336,22 +333,17 @@ void factor_vm::relocate_code_block_step(relocation_entry rel, cell index, code_
 				    compute_relocation(rel,index,compiled));
 }
 
-void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled, factor_vm *myvm)
-{
-	return myvm->relocate_code_block_step(rel,index,compiled);
-}
+struct word_references_updater {
+	factor_vm *myvm;
 
-void factor_vm::update_word_references_step(relocation_entry rel, cell index, code_block *compiled)
-{
-	relocation_type type = relocation_type_of(rel);
-	if(type == RT_XT || type == RT_XT_PIC || type == RT_XT_PIC_TAIL)
-		relocate_code_block_step(rel,index,compiled);
-}
-
-void update_word_references_step(relocation_entry rel, cell index, code_block *compiled, factor_vm *myvm)
-{
-	return myvm->update_word_references_step(rel,index,compiled);
-}
+	explicit word_references_updater(factor_vm *myvm_) : myvm(myvm_) {}
+	void operator()(relocation_entry rel, cell index, code_block *compiled)
+	{
+		relocation_type type = myvm->relocation_type_of(rel);
+		if(type == RT_XT || type == RT_XT_PIC || type == RT_XT_PIC_TAIL)
+			myvm->relocate_code_block_step(rel,index,compiled);
+	}
+};
 
 /* Relocate new code blocks completely; updating references to literals,
 dlsyms, and words. For all other words in the code heap, we only need
@@ -372,25 +364,10 @@ void factor_vm::update_word_references(code_block *compiled)
 		code->heap_free(compiled);
 	else
 	{
-		iterate_relocations(compiled,&factor_vm::update_word_references_step);
+		word_references_updater updater(this);
+		iterate_relocations(compiled,updater);
 		flush_icache_for(compiled);
 	}
-}
-
-void update_word_references(code_block *compiled, factor_vm *myvm)
-{
-	return myvm->update_word_references(compiled);
-}
-
-void factor_vm::update_literal_and_word_references(code_block *compiled)
-{
-	update_literal_references(compiled);
-	update_word_references(compiled);
-}
-
-void update_literal_and_word_references(code_block *compiled, factor_vm *myvm)
-{
-	return myvm->update_literal_and_word_references(compiled);
 }
 
 void factor_vm::check_code_address(cell address)
@@ -411,29 +388,30 @@ void factor_vm::mark_code_block(code_block *compiled)
 
 	code->mark_block(compiled);
 
-	copy_handle(&compiled->literals);
-	copy_handle(&compiled->relocation);
+	trace_handle(&compiled->literals);
+	trace_handle(&compiled->relocation);
 }
 
-void factor_vm::mark_stack_frame_step(stack_frame *frame)
-{
-	mark_code_block(frame_code(frame));
-}
+struct stack_frame_marker {
+	factor_vm *myvm;
 
-void mark_stack_frame_step(stack_frame *frame, factor_vm *myvm)
-{
-	return myvm->mark_stack_frame_step(frame);
-}
+	explicit stack_frame_marker(factor_vm *myvm_) : myvm(myvm_) {}
+	void operator()(stack_frame *frame)
+	{
+		myvm->mark_code_block(myvm->frame_code(frame));
+	}
+};
 
 /* Mark code blocks executing in currently active stack frames. */
 void factor_vm::mark_active_blocks(context *stacks)
 {
-	if(collecting_gen == data->tenured())
+	if(current_gc->collecting_tenured_p())
 	{
 		cell top = (cell)stacks->callstack_top;
 		cell bottom = (cell)stacks->callstack_bottom;
 
-		iterate_callstack(top,bottom,factor::mark_stack_frame_step);
+		stack_frame_marker marker(this);
+		iterate_callstack(top,bottom,marker);
 	}
 }
 
@@ -460,18 +438,32 @@ void factor_vm::mark_object_code_block(object *object)
 	case CALLSTACK_TYPE:
 		{
 			callstack *stack = (callstack *)object;
-			iterate_callstack_object(stack,factor::mark_stack_frame_step);
+			stack_frame_marker marker(this);
+			iterate_callstack_object(stack,marker);
 			break;
 		}
 	}
 }
+
+struct code_block_relocator {
+	factor_vm *myvm;
+
+	explicit code_block_relocator(factor_vm *myvm_) : myvm(myvm_) {}
+
+	void operator()(relocation_entry rel, cell index, code_block *compiled)
+	{
+		myvm->relocate_code_block_step(rel,index,compiled);
+	}
+
+};
 
 /* Perform all fixups on a code block */
 void factor_vm::relocate_code_block(code_block *compiled)
 {
 	compiled->last_scan = data->nursery();
 	compiled->needs_fixup = false;
-	iterate_relocations(compiled,&factor_vm::relocate_code_block_step);
+	code_block_relocator relocator(this);
+	iterate_relocations(compiled,relocator);
 	flush_icache_for(compiled);
 }
 
