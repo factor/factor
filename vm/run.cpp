@@ -58,7 +58,7 @@ cell factor_vm::clone_object(cell obj_)
 	else
 	{
 		cell size = object_size(obj.value());
-		object *new_obj = allot_object(obj.type(),size);
+		object *new_obj = allot_object(header(obj.type()),size);
 		memcpy(new_obj,obj.untagged(),size);
 		return tag_dynamic(new_obj);
 	}

@@ -19,7 +19,10 @@ IN: tools.deploy.test
     ] bi*
     <= ;
 
-: run-temp-image ( -- )
+: deploy-test-command ( -- args )
     os macosx?
     "resource:Factor.app/Contents/MacOS/factor" normalize-path vm ?
-    "-i=" "test.image" temp-file append 2array try-output-process ;
+    "-i=" "test.image" temp-file append 2array ;
+
+: run-temp-image ( -- )
+    deploy-test-command try-output-process ;

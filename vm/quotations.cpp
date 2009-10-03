@@ -330,7 +330,9 @@ void factor_vm::compile_all_words()
 
 	}
 
-	iterate_code_heap(&factor_vm::relocate_code_block);
+	/* Update XTs in code heap */
+	word_updater updater(this);
+	iterate_code_heap(updater);
 }
 
 /* Allocates memory */

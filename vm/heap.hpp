@@ -9,14 +9,12 @@ struct heap_free_list {
 	free_heap_block *large_blocks;
 };
 
-typedef void (factor_vm::*heap_iterator)(heap_block *compiled);
-
 struct heap {
 	factor_vm *myvm;
 	segment *seg;
 	heap_free_list free;
 
-	heap(factor_vm *myvm, cell size);
+	explicit heap(factor_vm *myvm, cell size);
 
 	inline heap_block *next_block(heap_block *block)
 	{
@@ -48,12 +46,50 @@ struct heap {
 	void heap_free(heap_block *block);
 	void mark_block(heap_block *block);
 	void unmark_marked();
-	void free_unmarked(heap_iterator iter);
 	void heap_usage(cell *used, cell *total_free, cell *max_free);
 	cell heap_size();
 	cell compute_heap_forwarding(unordered_map<heap_block *,char *> &forwarding);
 	void compact_heap(unordered_map<heap_block *,char *> &forwarding);
 
+	heap_block *free_allocated(heap_block *prev, heap_block *scan);
+
+	/* After code GC, all referenced code blocks have status set to B_MARKED, so any
+	which are allocated and not marked can be reclaimed. */
+	template<typename Iterator> void free_unmarked(Iterator &iter)
+	{
+		clear_free_list();
+	
+		heap_block *prev = NULL;
+		heap_block *scan = first_block();
+	
+		while(scan)
+		{
+			switch(scan->status)
+			{
+			case B_ALLOCATED:
+				prev = free_allocated(prev,scan);
+				break;
+			case B_FREE:
+				if(prev && prev->status == B_FREE)
+					prev->size += scan->size;
+				else
+					prev = scan;
+				break;
+			case B_MARKED:
+				if(prev && prev->status == B_FREE)
+					add_to_free_list((free_heap_block *)prev);
+				scan->status = B_ALLOCATED;
+				prev = scan;
+				iter(scan);
+				break;
+			}
+	
+			scan = next_block(scan);
+		}
+	
+		if(prev && prev->status == B_FREE)
+			add_to_free_list((free_heap_block *)prev);
+	}
 };
 
 }

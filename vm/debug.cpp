@@ -164,34 +164,35 @@ void factor_vm::print_retainstack()
 	print_objects((cell *)rs_bot,(cell *)rs);
 }
 
-void factor_vm::print_stack_frame(stack_frame *frame)
-{
-	print_obj(frame_executing(frame));
-	print_string("\n");
-	print_obj(frame_scan(frame));
-	print_string("\n");
-	print_string("word/quot addr: ");
-	print_cell_hex((cell)frame_executing(frame));
-	print_string("\n");
-	print_string("word/quot xt: ");
-	print_cell_hex((cell)frame->xt);
-	print_string("\n");
-	print_string("return address: ");
-	print_cell_hex((cell)FRAME_RETURN_ADDRESS(frame));
-	print_string("\n");
-}
+struct stack_frame_printer {
+	factor_vm *myvm;
 
-void print_stack_frame(stack_frame *frame, factor_vm *myvm)
-{
-	return myvm->print_stack_frame(frame);
-}
+	explicit stack_frame_printer(factor_vm *myvm_) : myvm(myvm_) {}
+	void operator()(stack_frame *frame)
+	{
+		myvm->print_obj(myvm->frame_executing(frame));
+		print_string("\n");
+		myvm->print_obj(myvm->frame_scan(frame));
+		print_string("\n");
+		print_string("word/quot addr: ");
+		print_cell_hex((cell)myvm->frame_executing(frame));
+		print_string("\n");
+		print_string("word/quot xt: ");
+		print_cell_hex((cell)frame->xt);
+		print_string("\n");
+		print_string("return address: ");
+		print_cell_hex((cell)FRAME_RETURN_ADDRESS(frame,myvm));
+		print_string("\n");
+	}
+};
 
 void factor_vm::print_callstack()
 {
 	print_string("==== CALL STACK:\n");
 	cell bottom = (cell)stack_chain->callstack_bottom;
 	cell top = (cell)stack_chain->callstack_top;
-	iterate_callstack(top,bottom,factor::print_stack_frame);
+	stack_frame_printer printer(this);
+	iterate_callstack(top,bottom,printer);
 }
 
 void factor_vm::dump_cell(cell x)
@@ -263,30 +264,36 @@ void factor_vm::dump_objects(cell type)
 	end_scan();
 }
 
-void factor_vm::find_data_references_step(cell *scan)
-{
-	if(look_for == *scan)
+struct data_references_finder {
+	cell look_for, obj;
+	factor_vm *myvm;
+
+	explicit data_references_finder(cell look_for_, cell obj_, factor_vm *myvm_)
+		: look_for(look_for_), obj(obj_), myvm(myvm_) { }
+
+	void operator()(cell *scan)
 	{
-		print_cell_hex_pad(obj);
-		print_string(" ");
-		print_nested_obj(obj,2);
-		nl();
+		if(look_for == *scan)
+		{
+			print_cell_hex_pad(obj);
+			print_string(" ");
+			myvm->print_nested_obj(obj,2);
+			nl();
+		}
 	}
-}
+};
 
-void find_data_references_step(cell *scan,factor_vm *myvm)
+void factor_vm::find_data_references(cell look_for)
 {
-	return myvm->find_data_references_step(scan);
-}
-
-void factor_vm::find_data_references(cell look_for_)
-{
-	look_for = look_for_;
-
 	begin_scan();
 
+	cell obj;
+
 	while((obj = next_object()) != F)
-		do_slots(UNTAG(obj),factor::find_data_references_step);
+	{
+		data_references_finder finder(look_for,obj,this);
+		do_slots(UNTAG(obj),finder);
+	}
 
 	end_scan();
 }
