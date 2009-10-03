@@ -98,7 +98,12 @@ H{
     { hrshift { +vector+ +literal+ -> +vector+ } }
     { vshuffle { +vector+ +literal+ -> +vector+ } }
     { vbroadcast { +vector+ +literal+ -> +vector+ } }
+    { v<= { +vector+ +vector+ -> +vector+ } }
+    { v< { +vector+ +vector+ -> +vector+ } }
     { v= { +vector+ +vector+ -> +vector+ } }
+    { v> { +vector+ +vector+ -> +vector+ } }
+    { v>= { +vector+ +vector+ -> +vector+ } }
+    { vunordered? { +vector+ +vector+ -> +vector+ } }
     { vany? { +vector+ -> +scalar+ } }
     { vall? { +vector+ -> +scalar+ } }
     { vnone? { +vector+ -> +scalar+ } }

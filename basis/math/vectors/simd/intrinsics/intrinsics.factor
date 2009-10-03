@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data assocs combinators
-cpu.architecture fry generalizations kernel libc macros math
-sequences effects accessors namespaces lexer parser vocabs.parser
-words arrays math.vectors ;
+cpu.architecture compiler.cfg.comparisons fry generalizations
+kernel libc macros math sequences effects accessors namespaces
+lexer parser vocabs.parser words arrays math.vectors ;
 IN: math.vectors.simd.intrinsics
 
 ERROR: bad-simd-call ;
@@ -55,7 +55,12 @@ SIMD-OP: vrshift
 SIMD-OP: hlshift
 SIMD-OP: hrshift
 SIMD-OP: vshuffle
+SIMD-OP: v<=
+SIMD-OP: v<
 SIMD-OP: v=
+SIMD-OP: v>
+SIMD-OP: v>=
+SIMD-OP: vunordered?
 SIMD-OP: vany?
 SIMD-OP: vall?
 SIMD-OP: vnone?
@@ -113,39 +118,44 @@ GENERIC# supported-simd-op? 1 ( rep intrinsic -- ? )
 
 M: vector-rep supported-simd-op?
     {
-        { \ (simd-v+)       [ %add-vector-reps            ] }
-        { \ (simd-vs+)      [ %saturated-add-vector-reps  ] }
-        { \ (simd-v+-)      [ %add-sub-vector-reps        ] }
-        { \ (simd-v-)       [ %sub-vector-reps            ] }
-        { \ (simd-vs-)      [ %saturated-sub-vector-reps  ] }
-        { \ (simd-v*)       [ %mul-vector-reps            ] }
-        { \ (simd-vs*)      [ %saturated-mul-vector-reps  ] }
-        { \ (simd-v/)       [ %div-vector-reps            ] }
-        { \ (simd-vmin)     [ %min-vector-reps            ] }
-        { \ (simd-vmax)     [ %max-vector-reps            ] }
-        { \ (simd-v.)       [ %dot-vector-reps            ] }
-        { \ (simd-vsqrt)    [ %sqrt-vector-reps           ] }
-        { \ (simd-sum)      [ %horizontal-add-vector-reps ] }
-        { \ (simd-vabs)     [ %abs-vector-reps            ] }
-        { \ (simd-vbitand)  [ %and-vector-reps            ] }
-        { \ (simd-vbitandn) [ %andn-vector-reps           ] }
-        { \ (simd-vbitor)   [ %or-vector-reps             ] }
-        { \ (simd-vbitxor)  [ %xor-vector-reps            ] }
-        { \ (simd-vbitnot)  [ %not-vector-reps            ] }
-        { \ (simd-vand)     [ %and-vector-reps            ] }
-        { \ (simd-vandn)    [ %andn-vector-reps           ] }
-        { \ (simd-vor)      [ %or-vector-reps             ] }
-        { \ (simd-vxor)     [ %xor-vector-reps            ] }
-        { \ (simd-vnot)     [ %not-vector-reps            ] }
-        { \ (simd-vlshift)  [ %shl-vector-reps            ] }
-        { \ (simd-vrshift)  [ %shr-vector-reps            ] }
-        { \ (simd-hlshift)  [ %horizontal-shl-vector-reps ] }
-        { \ (simd-hrshift)  [ %horizontal-shr-vector-reps ] }
-        { \ (simd-vshuffle) [ %shuffle-vector-reps        ] }
-        { \ (simd-v=)       [ %compare-vector-reps        ] }
-        { \ (simd-gather-2) [ %gather-vector-2-reps       ] }
-        { \ (simd-gather-4) [ %gather-vector-4-reps       ] }
-        { \ (simd-vany?)    [ %test-vector-reps           ] }
-        { \ (simd-vall?)    [ %test-vector-reps           ] }
-        { \ (simd-vnone?)   [ %test-vector-reps           ] }
+        { \ (simd-v+)          [ %add-vector-reps            ] }
+        { \ (simd-vs+)         [ %saturated-add-vector-reps  ] }
+        { \ (simd-v+-)         [ %add-sub-vector-reps        ] }
+        { \ (simd-v-)          [ %sub-vector-reps            ] }
+        { \ (simd-vs-)         [ %saturated-sub-vector-reps  ] }
+        { \ (simd-v*)          [ %mul-vector-reps            ] }
+        { \ (simd-vs*)         [ %saturated-mul-vector-reps  ] }
+        { \ (simd-v/)          [ %div-vector-reps            ] }
+        { \ (simd-vmin)        [ %min-vector-reps            ] }
+        { \ (simd-vmax)        [ %max-vector-reps            ] }
+        { \ (simd-v.)          [ %dot-vector-reps            ] }
+        { \ (simd-vsqrt)       [ %sqrt-vector-reps           ] }
+        { \ (simd-sum)         [ %horizontal-add-vector-reps ] }
+        { \ (simd-vabs)        [ %abs-vector-reps            ] }
+        { \ (simd-vbitand)     [ %and-vector-reps            ] }
+        { \ (simd-vbitandn)    [ %andn-vector-reps           ] }
+        { \ (simd-vbitor)      [ %or-vector-reps             ] }
+        { \ (simd-vbitxor)     [ %xor-vector-reps            ] }
+        { \ (simd-vbitnot)     [ %not-vector-reps            ] }
+        { \ (simd-vand)        [ %and-vector-reps            ] }
+        { \ (simd-vandn)       [ %andn-vector-reps           ] }
+        { \ (simd-vor)         [ %or-vector-reps             ] }
+        { \ (simd-vxor)        [ %xor-vector-reps            ] }
+        { \ (simd-vnot)        [ %not-vector-reps            ] }
+        { \ (simd-vlshift)     [ %shl-vector-reps            ] }
+        { \ (simd-vrshift)     [ %shr-vector-reps            ] }
+        { \ (simd-hlshift)     [ %horizontal-shl-vector-reps ] }
+        { \ (simd-hrshift)     [ %horizontal-shr-vector-reps ] }
+        { \ (simd-vshuffle)    [ %shuffle-vector-reps        ] }
+        { \ (simd-v<=)         [ cc<= %compare-vector-reps   ] }
+        { \ (simd-v<)          [ cc< %compare-vector-reps    ] }
+        { \ (simd-v=)          [ cc= %compare-vector-reps    ] }
+        { \ (simd-v>)          [ cc> %compare-vector-reps    ] }
+        { \ (simd-v>=)         [ cc>= %compare-vector-reps   ] }
+        { \ (simd-vunordered?) [ cc/<>= %compare-vector-reps ] }
+        { \ (simd-gather-2)    [ %gather-vector-2-reps       ] }
+        { \ (simd-gather-4)    [ %gather-vector-4-reps       ] }
+        { \ (simd-vany?)       [ %test-vector-reps           ] }
+        { \ (simd-vall?)       [ %test-vector-reps           ] }
+        { \ (simd-vnone?)      [ %test-vector-reps           ] }
     } case member? ;
