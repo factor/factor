@@ -1,18 +1,18 @@
 namespace factor
 {
 
-template <typename TYPE>
-struct gc_root : public tagged<TYPE>
+template<typename Type>
+struct gc_root : public tagged<Type>
 {
 	factor_vm *parent_vm;
 
-	void push() { parent_vm->check_tagged_pointer(tagged<TYPE>::value()); parent_vm->gc_locals.push_back((cell)this); }
+	void push() { parent_vm->check_tagged_pointer(tagged<Type>::value()); parent_vm->gc_locals.push_back((cell)this); }
 	
-	explicit gc_root(cell value_,factor_vm *vm) : tagged<TYPE>(value_),parent_vm(vm) { push(); }
-	explicit gc_root(TYPE *value_, factor_vm *vm) : tagged<TYPE>(value_),parent_vm(vm) { push(); }
+	explicit gc_root(cell value_,factor_vm *vm) : tagged<Type>(value_),parent_vm(vm) { push(); }
+	explicit gc_root(Type *value_, factor_vm *vm) : tagged<Type>(value_),parent_vm(vm) { push(); }
 
-	const gc_root<TYPE>& operator=(const TYPE *x) { tagged<TYPE>::operator=(x); return *this; }
-	const gc_root<TYPE>& operator=(const cell &x) { tagged<TYPE>::operator=(x); return *this; }
+	const gc_root<Type>& operator=(const Type *x) { tagged<Type>::operator=(x); return *this; }
+	const gc_root<Type>& operator=(const cell &x) { tagged<Type>::operator=(x); return *this; }
 
 	~gc_root() {
 #ifdef FACTOR_DEBUG

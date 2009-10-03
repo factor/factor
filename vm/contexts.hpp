@@ -44,7 +44,6 @@ struct context {
 DEFPUSHPOP(d,ds)
 DEFPUSHPOP(r,rs)
 
-struct factor_vm;
 VM_C_API void nest_stacks(factor_vm *vm);
 VM_C_API void unnest_stacks(factor_vm *vm);
 
