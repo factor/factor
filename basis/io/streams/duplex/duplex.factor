@@ -44,4 +44,3 @@ M: duplex-stream underlying-handle
     >duplex-stream<
     [ underlying-handle ] bi@
     [ = [ invalid-duplex-stream ] when ] keep ;
-

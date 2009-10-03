@@ -29,6 +29,10 @@ io.encodings.utf8 io kernel arrays strings namespaces math ;
     ] with-byte-reader
 ] unit-test
 
+[ 0 ] [
+    B{ 1 2 3 4 5 6 7 8 9 10 11 12 } binary [ tell-input ] with-byte-reader
+] unit-test
+
 ! Overly aggressive compiler optimizations
 [ B{ 123 } ] [
     binary [ 123 >bignum write1 ] with-byte-writer
