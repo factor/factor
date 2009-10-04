@@ -86,6 +86,14 @@ HELP: stream-copy
 { $description "Copies the contents of one stream into another, closing both streams when done." } 
 $io-error ;
 
+HELP: stream-tell
+{ $values
+     { "stream" "a stream" } { "n" integer }
+}
+{ $description "Returns the index of the stream pointer if the stream is seekable." }
+{ $notes "Stream seeking is not supported on streams that do not have a known length, e.g. TCP/IP streams." } ;
+
+
 HELP: stream-seek
 { $values
      { "n" integer } { "seek-type" "a seek singleton" } { "stream" "a stream" }
@@ -274,8 +282,11 @@ $nl
 }
 "This word is only required for string output streams:"
 { $subsections stream-nl }
-"This word is for streams that allow seeking:"
-{ $subsections stream-seek }
+"These words are for seekable streams:"
+{ $subsections
+    stream-tell
+    stream-seek
+}
 { $see-also "io.timeouts" } ;
 
 ARTICLE: "stdio-motivation" "Motivation for default streams"
