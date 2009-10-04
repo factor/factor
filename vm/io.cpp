@@ -164,6 +164,17 @@ void factor_vm::primitive_fwrite()
 	}
 }
 
+void factor_vm::primitive_ftell()
+{
+	FILE *file = (FILE *)unbox_alien();
+	off_t offset;
+
+	if((offset = FTELL(file)) == -1)
+		io_error();
+
+	box_signed_8(offset);
+}
+
 void factor_vm::primitive_fseek()
 {
 	int whence = to_fixnum(dpop());
