@@ -24,7 +24,22 @@ HELP: limit
         "    \"123456\" <string-reader> 3 stream-throws limit"
         "    100 swap stream-read ."
         "] [ ] recover ."
-        "T{ limit-exceeded }"
+"""T{ limit-exceeded
+    { n 1 }
+    { stream
+        T{ limited-stream
+            { stream
+                T{ string-reader
+                    { underlying "123456" }
+                    { i 3 }
+                }
+            }
+            { mode stream-throws }
+            { count 4 }
+            { limit 3 }
+        }
+    }
+}"""
     }
     "Returning " { $link f } " on exhaustion:"
     { $example

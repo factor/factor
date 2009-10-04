@@ -50,6 +50,10 @@ M: object <decoder> f decoder boa ;
 M: decoder stream-element-type
     drop +character+ ;
 
+M: decoder stream-tell stream>> stream-tell ;
+
+M: decoder stream-seek stream>> stream-seek ;
+
 M: decoder stream-read1
     dup >decoder< decode-char fix-read1 ;
 
