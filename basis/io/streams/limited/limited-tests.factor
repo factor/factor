@@ -2,7 +2,7 @@ USING: accessors continuations destructors io io.encodings
 io.encodings.8-bit io.encodings.ascii io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files io.pipes
 io.streams.byte-array io.streams.limited io.streams.string
-kernel namespaces strings tools.test ;
+kernel namespaces strings tools.test system ;
 IN: io.streams.limited.tests
 
 [ ] [
@@ -199,4 +199,18 @@ IN: io.streams.limited.tests
     "asdf" over stream-write dup stream-flush
     [ 2 seek-absolute rot in>> stream-seek ] [ drop ] recover
     2 swap stream-read
+] unit-test
+
+[ 7 ] [
+    image binary stream-throws <limited-file-reader> [
+        7 read drop
+        tell-input
+    ] with-input-stream
+] unit-test
+
+[ 70000 ] [
+    image binary stream-throws <limited-file-reader> [
+        70000 read drop
+        tell-input
+    ] with-input-stream
 ] unit-test
