@@ -1,6 +1,6 @@
 USING: io.files io.streams.string io io.streams.byte-array
 tools.test kernel io.encodings.ascii io.encodings.utf8
-namespaces accessors io.encodings ;
+namespaces accessors io.encodings io.streams.limited ;
 IN: io.streams.encodings.tests
 
 [ { } ]

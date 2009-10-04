@@ -128,6 +128,7 @@ const primitive_type primitives[] = {
 	primitive_fputc,
 	primitive_fwrite,
 	primitive_fflush,
+	primitive_ftell,
 	primitive_fseek,
 	primitive_fclose,
 	primitive_wrapper,
@@ -254,6 +255,7 @@ PRIMITIVE_FORWARD(fread)
 PRIMITIVE_FORWARD(fputc)
 PRIMITIVE_FORWARD(fwrite)
 PRIMITIVE_FORWARD(fflush)
+PRIMITIVE_FORWARD(ftell)
 PRIMITIVE_FORWARD(fseek)
 PRIMITIVE_FORWARD(fclose)
 PRIMITIVE_FORWARD(wrapper)

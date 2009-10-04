@@ -163,6 +163,8 @@ CODEGEN: ##zero-vector %zero-vector
 CODEGEN: ##gather-vector-2 %gather-vector-2
 CODEGEN: ##gather-vector-4 %gather-vector-4
 CODEGEN: ##shuffle-vector %shuffle-vector
+CODEGEN: ##merge-vector-head %merge-vector-head
+CODEGEN: ##merge-vector-tail %merge-vector-tail
 CODEGEN: ##compare-vector %compare-vector
 CODEGEN: ##test-vector %test-vector
 CODEGEN: ##add-vector %add-vector

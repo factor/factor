@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables generic kernel math namespaces make sequences
-continuations destructors assocs combinators ;
+USING: accessors combinators continuations destructors kernel
+math namespaces sequences ;
 IN: io
 
 SYMBOLS: +byte+ +character+ ;
@@ -23,9 +23,24 @@ ERROR: bad-seek-type type ;
 
 SINGLETONS: seek-absolute seek-relative seek-end ;
 
+GENERIC: stream-tell ( stream -- n )
 GENERIC: stream-seek ( n seek-type stream -- )
 
-: stream-print ( str stream -- ) [ stream-write ] keep stream-nl ;
+<PRIVATE
+
+SLOT: i
+
+: (stream-seek) ( n seek-type stream -- )
+    swap {
+        { seek-absolute [ (>>i) ] }
+        { seek-relative [ [ + ] change-i drop ] }
+        { seek-end [ [ underlying>> length + ] [ (>>i) ] bi ] }
+        [ bad-seek-type ]
+    } case ;
+
+PRIVATE>
+
+: stream-print ( str stream -- ) [ stream-write ] [ stream-nl ] bi ;
 
 ! Default streams
 SYMBOL: input-stream
@@ -37,6 +52,8 @@ SYMBOL: error-stream
 : read ( n -- seq ) input-stream get stream-read ;
 : read-until ( seps -- seq sep/f ) input-stream get stream-read-until ;
 : read-partial ( n -- seq ) input-stream get stream-read-partial ;
+: tell-input ( -- n ) input-stream get stream-tell ;
+: tell-output ( -- n ) output-stream get stream-tell ;
 : seek-input ( n seek-type -- ) input-stream get stream-seek ;
 : seek-output ( n seek-type -- ) output-stream get stream-seek ;
 

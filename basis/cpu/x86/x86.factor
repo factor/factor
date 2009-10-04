@@ -721,6 +721,34 @@ M: x86 %shuffle-vector-reps
         { sse2? { double-2-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
+M: x86 %merge-vector-head
+    [ two-operand ] keep
+    unsign-rep {
+        { double-2-rep   [ UNPCKLPD ] }
+        { float-4-rep    [ UNPCKLPS ] }
+        { longlong-2-rep [ PUNPCKLQDQ ] }
+        { int-4-rep      [ PUNPCKLDQ ] }
+        { short-8-rep    [ PUNPCKLWD ] }
+        { char-16-rep    [ PUNPCKLBW ] }
+    } case ;
+
+M: x86 %merge-vector-tail
+    [ two-operand ] keep
+    unsign-rep {
+        { double-2-rep   [ UNPCKHPD ] }
+        { float-4-rep    [ UNPCKHPS ] }
+        { longlong-2-rep [ PUNPCKHQDQ ] }
+        { int-4-rep      [ PUNPCKHDQ ] }
+        { short-8-rep    [ PUNPCKHWD ] }
+        { char-16-rep    [ PUNPCKHBW ] }
+    } case ;
+
+M: x86 %merge-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
 :: compare-float-v-operands ( dst src1 src2 temp rep cc -- dst' src' rep cc' )
     cc { cc> cc>= cc/> cc/>= } member?
     [ dst src2 src1 rep two-operand rep cc swap-cc ]

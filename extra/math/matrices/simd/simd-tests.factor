@@ -32,6 +32,26 @@ IN: math.matrices.simd.tests
 [ 
     S{ matrix4 f
         float-4-array{
+            float-4{ 0.0 0.0 -1.0 0.0 }
+            float-4{ 1.0 0.0  0.0 0.0 }
+            float-4{ 0.0 1.0  0.0 0.0 }
+            float-4{ 3.0 4.0  2.0 1.0 }
+        }
+    }
+] [
+    S{ matrix4 f
+        float-4-array{
+            float-4{  0.0 1.0 0.0 3.0 }
+            float-4{  0.0 0.0 1.0 4.0 }
+            float-4{ -1.0 0.0 0.0 2.0 }
+            float-4{  0.0 0.0 0.0 1.0 }
+        }
+    } transpose-matrix4
+] unit-test
+
+[ 
+    S{ matrix4 f
+        float-4-array{
             float-4{ 1.0 0.0 0.0 3.0 }
             float-4{ 0.0 1.0 0.0 4.0 }
             float-4{ 0.0 0.0 1.0 2.0 }

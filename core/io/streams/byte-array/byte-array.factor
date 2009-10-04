@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-arrays byte-vectors kernel io.encodings sequences io
-namespaces io.encodings.private accessors sequences.private
-io.streams.sequence destructors math combinators ;
+USING: accessors byte-arrays byte-vectors destructors io
+io.encodings io.private io.streams.sequence kernel namespaces
+sequences sequences.private ;
 IN: io.streams.byte-array
 
 M: byte-vector stream-element-type drop +byte+ ;
@@ -24,13 +24,8 @@ M: byte-reader stream-read1 sequence-read1 ;
 M: byte-reader stream-read-until sequence-read-until ;
 M: byte-reader dispose drop ;
 
-M: byte-reader stream-seek ( n seek-type stream -- )
-    swap {
-        { seek-absolute [ (>>i) ] }
-        { seek-relative [ [ + ] change-i drop ] }
-        { seek-end [ [ underlying>> length + ] keep (>>i) ] }
-        [ bad-seek-type ]
-    } case ;
+M: byte-reader stream-tell i>> ;
+M: byte-reader stream-seek (stream-seek) ;
 
 : <byte-reader> ( byte-array encoding -- stream )
     [ B{ } like 0 byte-reader boa ] dip <decoder> ;
