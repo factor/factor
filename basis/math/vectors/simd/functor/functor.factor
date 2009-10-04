@@ -325,6 +325,8 @@ A-v.-op      DEFINES-PRIVATE ${A}-v.-op
 A-sum-op     DEFINES-PRIVATE ${A}-sum-op
 A-vany-op    DEFINES-PRIVATE ${A}-vany-op
 A-vall-op    DEFINES-PRIVATE ${A}-vall-op
+A-vmerge-head-op    DEFINES-PRIVATE ${A}-vmerge-head-op
+A-vmerge-tail-op    DEFINES-PRIVATE ${A}-vmerge-tail-op
 
 WHERE
 
@@ -419,6 +421,20 @@ INSTANCE: A sequence
 : A-vall-op ( v1 quot -- n )
     [ (simd-vbitand) ] (A-v->n-op) ; inline
 
+: A-vmerge-head-op ( v1 v2 quot -- v )
+    drop
+    [ underlying1>> ] bi@
+    [ A-rep (simd-vmerge-head) ]
+    [ A-rep (simd-vmerge-tail) ] 2bi
+    \ A boa ;
+    
+: A-vmerge-tail-op ( v1 v2 quot -- v )
+    drop
+    [ underlying2>> ] bi@
+    [ A-rep (simd-vmerge-head) ]
+    [ A-rep (simd-vmerge-tail) ] 2bi
+    \ A boa ;
+
 simd new
     \ A >>class
     \ A-with >>ctor
@@ -429,6 +445,8 @@ simd new
         { vnone? A-vany-op }
         { vany?  A-vany-op }
         { vall?  A-vall-op }
+        { vmerge-head A-vmerge-head-op }
+        { vmerge-tail A-vmerge-tail-op }
     } >>special-wrappers
     {
         { { +vector+ +vector+ -> +vector+ } A-vv->v-op }

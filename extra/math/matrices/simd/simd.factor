@@ -1,5 +1,5 @@
 ! (c)Joe Groff bsd license
-USING: accessors classes.struct generalizations kernel locals
+USING: accessors classes.struct fry generalizations kernel locals
 math math.combinatorics math.functions math.matrices.simd math.vectors
 math.vectors.simd sequences sequences.private specialized-arrays
 typed ;
@@ -30,30 +30,22 @@ M: matrix4 new-sequence 2drop matrix4 (struct) ; inline
     c4 rows set-fourth
     c ; inline
 
+: make-matrix4 ( quot: ( -- c1 c2 c3 c4 ) -- c )
+    matrix4 (struct) swap dip set-rows ; inline
+
 :: 2map-rows ( a b quot -- c )
-    matrix4 (struct) :> c
+    [
+        a rows :> a4 :> a3 :> a2 :> a1
+        b rows :> b4 :> b3 :> b2 :> b1
 
-    a rows :> a4 :> a3 :> a2 :> a1
-    b rows :> b4 :> b3 :> b2 :> b1
+        a1 b1 quot call
+        a2 b2 quot call
+        a3 b3 quot call
+        a4 b4 quot call
+    ] make-matrix4 ; inline
 
-    a1 b1 quot call
-    a2 b2 quot call
-    a3 b3 quot call
-    a4 b4 quot call
-
-    c set-rows ; inline
-
-:: map-rows ( a quot -- c )
-    matrix4 (struct) :> c
-
-    a rows :> a4 :> a3 :> a2 :> a1
-
-    a1 quot call
-    a2 quot call
-    a3 quot call
-    a4 quot call
-
-    c set-rows ; inline
+: map-rows ( a quot -- c )
+    '[ rows _ 4 napply ] make-matrix4 ; inline
     
 PRIVATE>
 
@@ -68,32 +60,30 @@ TYPED: n*m4 ( a: float b: matrix4 -- c: matrix4 ) [ n*v ] with map-rows ;
 TYPED: n/m4 ( a: float b: matrix4 -- c: matrix4 ) [ n/v ] with map-rows ;
 
 TYPED:: m4. ( a: matrix4 b: matrix4 -- c: matrix4 )
-    matrix4 (struct) :> c
+    [
+        a rows :> a4 :> a3 :> a2 :> a1
+        b rows :> b4 :> b3 :> b2 :> b1
 
-    a rows :> a4 :> a3 :> a2 :> a1
-    b rows :> b4 :> b3 :> b2 :> b1
+        a1 first  b1 n*v :> c1a
+        a2 first  b1 n*v :> c2a
+        a3 first  b1 n*v :> c3a
+        a4 first  b1 n*v :> c4a
 
-    a1 first  b1 n*v :> c1a
-    a2 first  b1 n*v :> c2a
-    a3 first  b1 n*v :> c3a
-    a4 first  b1 n*v :> c4a
+        a1 second b2 n*v c1a v+ :> c1b 
+        a2 second b2 n*v c2a v+ :> c2b
+        a3 second b2 n*v c3a v+ :> c3b
+        a4 second b2 n*v c4a v+ :> c4b
 
-    a1 second b2 n*v c1a v+ :> c1b 
-    a2 second b2 n*v c2a v+ :> c2b
-    a3 second b2 n*v c3a v+ :> c3b
-    a4 second b2 n*v c4a v+ :> c4b
+        a1 third  b3 n*v c1b v+ :> c1c 
+        a2 third  b3 n*v c2b v+ :> c2c
+        a3 third  b3 n*v c3b v+ :> c3c
+        a4 third  b3 n*v c4b v+ :> c4c
 
-    a1 third  b3 n*v c1b v+ :> c1c 
-    a2 third  b3 n*v c2b v+ :> c2c
-    a3 third  b3 n*v c3b v+ :> c3c
-    a4 third  b3 n*v c4b v+ :> c4c
-
-    a1 fourth b4 n*v c1c v+
-    a2 fourth b4 n*v c2c v+
-    a3 fourth b4 n*v c3c v+
-    a4 fourth b4 n*v c4c v+
-
-    c set-rows ;
+        a1 fourth b4 n*v c1c v+
+        a2 fourth b4 n*v c2c v+
+        a3 fourth b4 n*v c3c v+
+        a4 fourth b4 n*v c4c v+
+    ] make-matrix4 ;
 
 TYPED:: v.m4 ( a: float-4 b: matrix4 -- c: float-4 )
     b rows :> b4 :> b3 :> b2 :> b1
@@ -129,17 +119,21 @@ CONSTANT: zero-matrix4
 TYPED:: m4^n ( m: matrix4 n: fixnum -- m^n: matrix4 )
     identity-matrix4 n [ m m4. ] times ;
 
-TYPED:: scale-matrix4 ( factors: float-4 -- matrix: matrix4 )
-    matrix4 (struct) :> c
+: vmerge-diagonal ( x -- h t )
+    0.0 float-4-with [ vmerge-head ] [ swap vmerge-tail ] 2bi ; inline
 
-    factors float-4{ t t t f } vbitand :> factors'
+TYPED: diagonal-matrix4 ( diagonal: float-4 -- matrix: matrix4 )
+    [ vmerge-diagonal [ vmerge-diagonal ] bi@ ] make-matrix4 ;
 
-    factors' { 0 3 3 3 } vshuffle
-    factors' { 3 1 3 3 } vshuffle
-    factors' { 3 3 2 3 } vshuffle
-    float-4{ 0.0 0.0 0.0 1.0 }
+: vmerge-transpose ( a b c d -- a' b' c' d' )
+    [ vmerge ] bi-curry@ bi* ; inline
 
-    c set-rows ;
+TYPED: transpose-matrix4 ( matrix: matrix4 -- matrix: matrix4 )
+    [ rows vmerge-transpose vmerge-transpose ] make-matrix4 ;
+
+: scale-matrix4 ( factors -- matrix )
+    [ float-4{ t t t f } ] dip float-4{ 0.0 0.0 0.0 1.0 } v?
+    diagonal-matrix4 ;
 
 : ortho-matrix4 ( factors -- matrix )
     float-4{ 1.0 1.0 1.0 1.0 } swap v/ scale-matrix4 ; inline

@@ -23,6 +23,7 @@ typedef char symbol_char;
 #define STRNCMP strncmp
 #define STRDUP strdup
 
+#define FTELL ftello
 #define FSEEK fseeko
 
 #define FIXNUM_FORMAT "%ld"

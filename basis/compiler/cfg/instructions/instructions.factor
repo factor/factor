@@ -280,6 +280,16 @@ def: dst
 use: src
 literal: shuffle rep ;
 
+PURE-INSN: ##merge-vector-head
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##merge-vector-tail
+def: dst
+use: src1 src2
+literal: rep ;
+
 PURE-INSN: ##compare-vector
 def: dst
 use: src1 src2
