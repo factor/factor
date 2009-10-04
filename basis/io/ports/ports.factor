@@ -129,7 +129,8 @@ HOOK: seek-handle os ( n seek-type handle -- )
 
 M: buffered-port stream-tell ( stream -- n )
     [ check-disposed ]
-    [ handle>> tell-handle ] bi ;
+    [ handle>> tell-handle ]
+    [ buffer>> pos>> ] tri + ;
 
 M: input-port stream-seek ( n seek-type stream -- )
     [ check-disposed ]
