@@ -355,6 +355,37 @@ HELP: hrshift
 { $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "w" "a SIMD array" } }
 { $description "Shifts the entire SIMD array to the right by " { $snippet "n" } " bytes, filling the vacated left-hand bits with zeroes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
 
+HELP: vmerge
+{ $values { "u" "a sequence" } { "v" "a sequence" } { "h" "a sequence" } { "t" "a sequence" } }
+{ $description "Creates two new sequences of the same type and size as " { $snippet "u" } " and " { $snippet "v" } " by interleaving the elements of " { $snippet "u" } " and " { $snippet "v" } "." }
+{ $examples
+{ $example """USING: kernel math.vectors prettyprint ;
+
+{ "A" "B" "C" "D" } { "1" "2" "3" "4" } vmerge [ . ] bi@"""
+"""{ "A" "1" "B" "2" }
+{ "C" "3" "D" "4" }"""
+} } ;
+
+HELP: vmerge-head
+{ $values { "u" "a sequence" } { "v" "a sequence" } { "h" "a sequence" } }
+{ $description "Creates two new sequences of the same type and size as " { $snippet "u" } " and " { $snippet "v" } " by interleaving the elements from the first half of " { $snippet "u" } " and " { $snippet "v" } "." }
+{ $examples
+{ $example """USING: kernel math.vectors prettyprint ;
+
+{ "A" "B" "C" "D" } { "1" "2" "3" "4" } vmerge-head ."""
+"""{ "A" "1" "B" "2" }"""
+} } ;
+
+HELP: vmerge-tail
+{ $values { "u" "a sequence" } { "v" "a sequence" } { "t" "a sequence" } }
+{ $description "Creates two new sequences of the same type and size as " { $snippet "u" } " and " { $snippet "v" } " by interleaving the elements from the tail half of " { $snippet "u" } " and " { $snippet "v" } "." }
+{ $examples
+{ $example """USING: kernel math.vectors prettyprint ;
+
+{ "A" "B" "C" "D" } { "1" "2" "3" "4" } vmerge-tail ."""
+"""{ "C" "3" "D" "4" }"""
+} } ;
+
 HELP: vbroadcast
 { $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "v" "a SIMD array" } }
 { $description "Outputs a new SIMD array of the same type as " { $snippet "u" } " where every element is equal to the " { $snippet "n" } "th element of " { $snippet "u" } "." }
