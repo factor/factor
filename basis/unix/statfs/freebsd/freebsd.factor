@@ -31,4 +31,4 @@ STRUCT: statfs
     { f_mntfromname { char MNAMELEN } }
     { f_mntonname { char MNAMELEN } } ;
 
-FUNCTION: int statfs ( char* path, statvfs* buf ) ;
+FUNCTION: int statfs ( char* path, statfs* buf ) ;
