@@ -122,7 +122,7 @@ TYPED:: m4^n ( m: matrix4 n: fixnum -- m^n: matrix4 )
 : vmerge-diagonal* ( x y -- h t )
     [ vmerge-head ] [ swap vmerge-tail ] 2bi ; inline
 : vmerge-diagonal ( x -- h t )
-    0.0 float-4-with vmerge-diagonal* ;
+    0.0 float-4-with vmerge-diagonal* ; inline
 
 TYPED: diagonal-matrix4 ( diagonal: float-4 -- matrix: matrix4 )
     [ vmerge-diagonal [ vmerge-diagonal ] bi@ ] make-matrix4 ;
@@ -189,16 +189,13 @@ TYPED:: rotation-matrix4 ( axis: float-4 theta: float -- matrix: matrix4 )
     diagonal-m triangle-m m4+ ;
 
 TYPED:: frustum-matrix4 ( xy: float-4 near: float far: float -- matrix: matrix4 )
-    matrix4 (struct) :> c
-
-    near near near far + 2 near far * * float-4-boa :> num
-    float-4{ t t f f } xy near far - float-4-with v? :> denom
-    num denom v/ :> fov
-
-    fov { 0 0 0 0 } vshuffle float-4{ t f f f } vbitand
-    fov { 1 1 1 1 } vshuffle float-4{ f t f f } vbitand
-    fov { 2 2 2 3 } vshuffle float-4{ f f t t } vbitand
-    float-4{ 0.0 0.0 -1.0 0.0 }
-
-    c set-rows ;
+    [
+        near near near far + 2 near far * * float-4-boa ! num
+        float-4{ t t f f } xy near far - float-4-with v? ! denom
+        v/ :> fov
+        
+        fov 0.0 float-4-with vmerge-head vmerge-diagonal
+        fov float-4{ f f t t } vand
+        float-4{ 0.0 0.0 -1.0 0.0 }
+    ] make-matrix4 ;
 
