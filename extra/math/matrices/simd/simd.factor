@@ -119,8 +119,10 @@ CONSTANT: zero-matrix4
 TYPED:: m4^n ( m: matrix4 n: fixnum -- m^n: matrix4 )
     identity-matrix4 n [ m m4. ] times ;
 
+: vmerge-diagonal* ( x y -- h t )
+    [ vmerge-head ] [ swap vmerge-tail ] 2bi ; inline
 : vmerge-diagonal ( x -- h t )
-    0.0 float-4-with [ vmerge-head ] [ swap vmerge-tail ] 2bi ; inline
+    0.0 float-4-with vmerge-diagonal* ;
 
 TYPED: diagonal-matrix4 ( diagonal: float-4 -- matrix: matrix4 )
     [ vmerge-diagonal [ vmerge-diagonal ] bi@ ] make-matrix4 ;
@@ -139,17 +141,16 @@ TYPED: transpose-matrix4 ( matrix: matrix4 -- matrix: matrix4 )
     float-4{ 1.0 1.0 1.0 1.0 } swap v/ scale-matrix4 ; inline
 
 TYPED:: translation-matrix4 ( offset: float-4 -- matrix: matrix4 )
-    matrix4 (struct) :> c
+    [
+        float-4{ 1.0 1.0 1.0 1.0 } :> diagonal
 
-    float-4{ 0.0 0.0 0.0 1.0 } :> c4
-    float-4{ t t t f } offset c4 v? :> offset'
+        offset 0 float-4-with vmerge
+        [ 0 float-4-with swap vmerge ] bi@ drop :> z :> y :> x
 
-    offset' { 3 3 3 0 } vshuffle float-4{ t f f t } vbitand
-    offset' { 3 3 3 1 } vshuffle float-4{ f t f t } vbitand
-    offset' { 3 3 3 2 } vshuffle float-4{ f f t t } vbitand
-    c4
-
-    c set-rows ;
+        diagonal y vmerge-diagonal*
+        [ x vmerge-diagonal* ]
+        [ z vmerge-diagonal* ] bi*
+    ] make-matrix4 ;
 
 TYPED:: rotation-matrix4 ( axis: float-4 theta: float -- matrix: matrix4 )
     !   x*x + c*(1.0 - x*x)   x*y*(1.0 - c) - s*z   x*z*(1.0 - c) + s*y   0
