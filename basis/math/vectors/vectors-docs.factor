@@ -58,7 +58,8 @@ $nl
 { $subsection vshuffle }
 { $subsection vbroadcast }
 { $subsection hlshift } 
-{ $subsection hrshift } ;
+{ $subsection hrshift }
+{ $subsection vmerge } ;
 
 ARTICLE: "math-vectors-logic" "Vector component- and bit-wise logic"
 { $notes
@@ -385,6 +386,8 @@ HELP: vmerge-tail
 { "A" "B" "C" "D" } { "1" "2" "3" "4" } vmerge-tail ."""
 """{ "C" "3" "D" "4" }"""
 } } ;
+
+{ vmerge vmerge-head vmerge-tail } related-words
 
 HELP: vbroadcast
 { $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "v" "a SIMD array" } }
