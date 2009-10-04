@@ -146,7 +146,7 @@ CONSTANT: simd-classes
 : random-float-vector ( class -- vec )
     new [
         drop
-        -1,000.0 1,000.0 uniform-random-float 
+        1000 random
         10 swap <array> 0/0. suffix random
     ] map ;
 
