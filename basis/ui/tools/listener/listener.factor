@@ -150,11 +150,11 @@ M: interactor stream-readln
     ] if ;
 
 M: interactor stream-read
-    swap dup zero? [
-        2drop ""
+    swap [
+        drop ""
     ] [
         [ interactor-read dup [ "\n" join ] when ] dip short head
-    ] if ;
+    ] if-zero ;
 
 M: interactor stream-read-partial
     stream-read ;
