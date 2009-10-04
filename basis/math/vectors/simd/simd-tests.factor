@@ -146,7 +146,7 @@ CONSTANT: simd-classes
 : random-float-vector ( class -- vec )
     new [
         drop
-        -1,000.0 1,000.0 uniform-random-float 
+        1000 random
         10 swap <array> 0/0. suffix random
     ] map ;
 
@@ -253,6 +253,41 @@ simd-classes&reps [
 simd-classes&reps [
     [ [ { } ] ] dip first3 '[ _ _ _ check-boolean-ops ] unit-test
 ] each
+
+"== Checking vector blend" print
+
+[ char-16{ 0 1 22 33 4 5 6 77 8 99 110 121 12 143 14 15 } ]
+[
+    char-16{ t  t  f  f  t  t  t  f  t  f   f   f   t   f   t   t }
+    char-16{ 0  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15 }
+    char-16{ 0 11 22 33 44 55 66 77 88 99 110 121 132 143 154 165 } v?
+] unit-test
+
+[ char-16{ 0 1 22 33 4 5 6 77 8 99 110 121 12 143 14 15 } ]
+[
+    char-16{ t  t  f  f  t  t  t  f  t  f   f   f   t   f   t   t }
+    char-16{ 0  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15 }
+    char-16{ 0 11 22 33 44 55 66 77 88 99 110 121 132 143 154 165 }
+    [ { char-16 char-16 char-16 } declare v? ] compile-call
+] unit-test
+
+[ int-4{ 1 22 33 4 } ]
+[ int-4{ t f f t } int-4{ 1 2 3 4 } int-4{ 11 22 33 44 } v? ] unit-test
+
+[ int-4{ 1 22 33 4 } ]
+[
+    int-4{ t f f t } int-4{ 1 2 3 4 } int-4{ 11 22 33 44 }
+    [ { int-4 int-4 int-4 } declare v? ] compile-call
+] unit-test
+
+[ float-4{ 1.0 22.0 33.0 4.0 } ]
+[ float-4{ t f f t } float-4{ 1.0 2.0 3.0 4.0 } float-4{ 11.0 22.0 33.0 44.0 } v? ] unit-test
+
+[ float-4{ 1.0 22.0 33.0 4.0 } ]
+[
+    float-4{ t f f t } float-4{ 1.0 2.0 3.0 4.0 } float-4{ 11.0 22.0 33.0 44.0 }
+    [ { float-4 float-4 float-4 } declare v? ] compile-call
+] unit-test
 
 "== Checking shifts and permutations" print
 
