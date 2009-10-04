@@ -65,7 +65,7 @@ PRIVATE>
     } case ; inline
 
 : element>bool ( x seq -- ? )
-    element-type [ zero? not ] when ; inline
+    element-type [ [ f ] when-zero ] when ; inline
 
 : bitandn ( x y -- z ) [ bitnot ] dip bitand ; inline
 
