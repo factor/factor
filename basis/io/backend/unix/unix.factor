@@ -50,7 +50,7 @@ M: fd cancel-operation ( fd -- )
     ] if ;
 
 M: unix tell-handle ( handle -- n )
-    fd>> SEEK_SET 0 lseek [ io-error ] [ ] bi ;
+    fd>> 0 SEEK_CUR lseek [ io-error ] [ ] bi ;
 
 M: unix seek-handle ( n seek-type handle -- )
     swap {
