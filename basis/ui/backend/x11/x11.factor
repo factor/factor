@@ -107,9 +107,9 @@ CONSTANT: key-codes
 : valid-input? ( string gesture -- ? )
     over empty? [ 2drop f ] [
         mods>> { f { S+ } } member? [
-            [ [ 127 = not ] [ CHAR: \s >= ] bi and ] all?
+            [ { [ 127 = not ] [ CHAR: \s >= ] } 1&& ] all?
         ] [
-            [ [ 127 = not ] [ CHAR: \s >= ] [ alpha? not ] tri and and ] all?
+            [ { [ 127 = not ] [ CHAR: \s >= ] [ alpha? not ] } 1&& ] all?
         ] if
     ] if ;
 
