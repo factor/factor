@@ -86,8 +86,7 @@ M: editor ungraft*
 : editor-mark ( editor -- loc ) mark>> value>> ;
 
 : set-caret ( loc editor -- )
-    [ model>> validate-loc ] keep
-    caret>> set-model ;
+    [ model>> validate-loc ] [ caret>> ] bi set-model ;
 
 : change-caret ( editor quot -- )
     [ [ [ editor-caret ] [ model>> ] bi ] dip call ] [ drop ] 2bi
@@ -136,7 +135,7 @@ M: editor ungraft*
     [ editor-caret ] keep loc>point ;
 
 : caret-dim ( editor -- dim )
-    line-height 0 swap 2array ;
+    [ 0 ] dip line-height 2array ;
 
 : scroll>caret ( editor -- )
     dup graft-state>> second [
@@ -228,13 +227,13 @@ M: editor gadget-selection?
     selection-start/end = not ;
 
 M: editor gadget-selection
-    [ selection-start/end ] keep model>> doc-range ;
+    [ selection-start/end ] [ model>> ] bi doc-range ;
 
 : remove-selection ( editor -- )
-    [ selection-start/end ] keep model>> remove-doc-range ;
+    [ selection-start/end ] [ model>> ] bi remove-doc-range ;
 
 M: editor user-input*
-    [ selection-start/end ] keep model>> set-doc-range t ;
+    [ selection-start/end ] [ model>> ] bi set-doc-range t ;
 
 : editor-string ( editor -- string )
     model>> doc-string ;
@@ -265,14 +264,15 @@ M: editor gadget-text* editor-string % ;
 
 : drag-selection-mark ( loc editor element -- loc )
     [
-        [ drag-direction? not ] keep
-        [ editor-mark ] [ model>> ] bi
+        [ drag-direction? not ]
+        [ editor-mark ]
+        [ model>> ] tri
     ] dip prev/next-elt ? ;
 
 : drag-caret&mark ( editor -- caret mark )
-    dup clicked-loc swap mouse-elt
-    [ drag-selection-caret ] 3keep
-    drag-selection-mark ;
+    [ clicked-loc ] [ mouse-elt ] bi
+    [ drag-selection-caret ]
+    [ drag-selection-mark ] 3bi ;
 
 : drag-selection ( editor -- )
     dup drag-caret&mark
