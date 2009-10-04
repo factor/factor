@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays alien.c-types kernel sequences math math.functions
+USING: arrays alien.c-types assocs kernel sequences math math.functions
 hints math.order math.libm fry combinators byte-arrays accessors
 locals ;
 QUALIFIED-WITH: alien.c-types c
@@ -90,6 +90,11 @@ PRIVATE>
 
 : hlshift ( u n -- w ) '[ _ <byte-array> prepend 16 head ] change-underlying ;
 : hrshift ( u n -- w ) '[ _ <byte-array> append 16 tail* ] change-underlying ;
+
+: vmerge-head ( u v -- h ) over length 2 / '[ _ head-slice ] bi@ [ zip ] keep concat-as ;
+: vmerge-tail ( u v -- t ) over length 2 / '[ _ tail-slice ] bi@ [ zip ] keep concat-as ;
+
+: vmerge ( u v -- h t ) [ vmerge-head ] [ vmerge-tail ] 2bi ; inline
 
 : vand ( u v -- w )  over '[ [ _ element>bool ] bi@ and ] 2map ;
 : vandn ( u v -- w ) over '[ [ _ element>bool ] bi@ [ not ] dip and ] 2map ;
