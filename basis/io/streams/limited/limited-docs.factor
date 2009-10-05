@@ -88,7 +88,7 @@ HELP: stream-throws
 { stream-eofs stream-throws } related-words
 
 ARTICLE: "io.streams.limited" "Limited input streams"
-"The " { $vocab-link "io.streams.limited" } " vocabulary wraps a stream to behave as if it had only a limited number of bytes, either throwing an error or returning " { $link f } " upon reaching the end." $nl
+"The " { $vocab-link "io.streams.limited" } " vocabulary wraps a stream to behave as if it had only a limited number of bytes, either throwing an error or returning " { $link f } " upon reaching the end. Limiting a non-seekable stream keeps a byte count and triggers the end-of-stream behavior when this byte count has been reached. However, limiting a seekable stream creates a window of bytes that supports seeking and re-reading of bytes in that window." $nl
 "Wrap a stream in a limited stream:"
 { $subsections limit }
 "Wrap the current " { $link input-stream } " in a limited stream:"
