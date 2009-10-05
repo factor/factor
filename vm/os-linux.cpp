@@ -3,7 +3,7 @@
 namespace factor
 {
 
-/* Snarfed from SBCL linux-so.c. You must delete[] the result yourself. */
+/* Snarfed from SBCL linux-so.c. You must free() the result yourself. */
 const char *vm_executable_path()
 {
 	char *path = new char[PATH_MAX + 1];
@@ -17,7 +17,10 @@ const char *vm_executable_path()
 	else
 	{
 		path[size] = '\0';
-		return safe_strdup(path);
+
+		const char *ret = safe_strdup(path);
+		delete[] path;
+		return ret;
 	}
 }
 
