@@ -424,15 +424,15 @@ INSTANCE: A sequence
 : A-vmerge-head-op ( v1 v2 quot -- v )
     drop
     [ underlying1>> ] bi@
-    [ A-rep (simd-vmerge-head) ]
-    [ A-rep (simd-vmerge-tail) ] 2bi
+    [ A-rep (simd-(vmerge-head)) ]
+    [ A-rep (simd-(vmerge-tail)) ] 2bi
     \ A boa ;
     
 : A-vmerge-tail-op ( v1 v2 quot -- v )
     drop
     [ underlying2>> ] bi@
-    [ A-rep (simd-vmerge-head) ]
-    [ A-rep (simd-vmerge-tail) ] 2bi
+    [ A-rep (simd-(vmerge-head)) ]
+    [ A-rep (simd-(vmerge-tail)) ] 2bi
     \ A boa ;
 
 simd new
@@ -445,8 +445,8 @@ simd new
         { vnone? A-vany-op }
         { vany?  A-vany-op }
         { vall?  A-vall-op }
-        { vmerge-head A-vmerge-head-op }
-        { vmerge-tail A-vmerge-tail-op }
+        { (vmerge-head) A-vmerge-head-op }
+        { (vmerge-tail) A-vmerge-tail-op }
     } >>special-wrappers
     {
         { { +vector+ +vector+ -> +vector+ } A-vv->v-op }

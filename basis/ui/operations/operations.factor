@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays definitions kernel ui.commands
-ui.gestures sequences strings math words generic namespaces
-hashtables quotations assocs fry linked-assocs ;
+USING: accessors arrays assocs combinators.short-circuit fry
+kernel linked-assocs namespaces sequences ui.commands words ;
 IN: ui.operations
 
 SYMBOL: +keyboard+
@@ -18,7 +17,7 @@ TUPLE: operation predicate command translator listener? ;
         swap >>predicate ;
 
 PREDICATE: listener-operation < operation
-    [ command>> listener-command? ] [ listener?>> ] bi or ;
+    { [ command>> listener-command? ] [ listener?>> ] } 1|| ;
 
 M: operation command-name
     command>> command-name ;
