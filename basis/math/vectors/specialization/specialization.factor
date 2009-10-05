@@ -98,8 +98,8 @@ H{
     { hrshift { +vector+ +literal+ -> +vector+ } }
     { vshuffle { +vector+ +literal+ -> +vector+ } }
     { vbroadcast { +vector+ +literal+ -> +vector+ } }
-    { vmerge-head { +vector+ +vector+ -> +vector+ } }
-    { vmerge-tail { +vector+ +vector+ -> +vector+ } }
+    { (vmerge-head) { +vector+ +vector+ -> +vector+ } }
+    { (vmerge-tail) { +vector+ +vector+ -> +vector+ } }
     { v<= { +vector+ +vector+ -> +vector+ } }
     { v< { +vector+ +vector+ -> +vector+ } }
     { v= { +vector+ +vector+ -> +vector+ } }
