@@ -46,11 +46,12 @@ LONG factor_vm::exception_handler(PEXCEPTION_POINTERS pe)
 	else
 		signal_callstack_top = NULL;
 
-    switch (e->ExceptionCode) {
-    case EXCEPTION_ACCESS_VIOLATION:
+        switch (e->ExceptionCode)
+        {
+        case EXCEPTION_ACCESS_VIOLATION:
 		signal_fault_addr = e->ExceptionInformation[1];
 		c->EIP = (cell)factor::memory_signal_handler_impl;
-	break;
+                break;
 
 	case STATUS_FLOAT_DENORMAL_OPERAND:
 	case STATUS_FLOAT_DIVIDE_BY_ZERO:
