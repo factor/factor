@@ -34,6 +34,8 @@ struct gc_state {
 	/* GC start time, for benchmarking */
 	u64 start_time;
 
+        jmp_buf gc_unwind;
+
 	explicit gc_state(data_heap *data_, bool growing_data_heap_, cell collecting_gen_);
 	~gc_state();
 
@@ -55,11 +57,6 @@ struct gc_state {
 			|| collecting_gen == data->tenured());
 	}
 };
-
-/* We leave this many bytes free at the top of the nursery so that inline
-allocation (which does not call GC because of possible roots in volatile
-registers) does not run out of memory */
-static const cell allot_buffer_zone = 1024;
 
 VM_C_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *myvm);
 
