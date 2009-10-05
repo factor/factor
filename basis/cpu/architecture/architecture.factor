@@ -317,7 +317,7 @@ HOOK: %allot cpu ( dst size class temp -- )
 HOOK: %write-barrier cpu ( src card# table -- )
 
 ! GC checks
-HOOK: %check-nursery cpu ( label temp1 temp2 -- )
+HOOK: %check-nursery cpu ( label size temp1 temp2 -- )
 HOOK: %save-gc-root cpu ( gc-root register -- )
 HOOK: %load-gc-root cpu ( gc-root register -- )
 HOOK: %call-gc cpu ( gc-root-count temp1 -- )

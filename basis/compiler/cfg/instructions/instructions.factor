@@ -672,7 +672,7 @@ use: src1/int-rep src2/int-rep ;
 
 INSN: ##gc
 temp: temp1/int-rep temp2/int-rep
-literal: data-values tagged-values uninitialized-locs ;
+literal: size data-values tagged-values uninitialized-locs ;
 
 INSN: ##save-context
 temp: temp1/int-rep temp2/int-rep
@@ -739,10 +739,6 @@ use: src1/int-rep src2/int-rep ;
 
 TUPLE: spill-slot { n integer } ;
 C: <spill-slot> spill-slot
-
-INSN: _gc
-temp: temp1 temp2
-literal: data-values tagged-values uninitialized-locs ;
 
 ! These instructions operate on machine registers and not
 ! virtual registers

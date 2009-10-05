@@ -271,10 +271,10 @@ M: object load-gc-root drop %load-gc-root ;
 
 : load-data-regs ( data-regs -- ) [ first3 %reload ] each ;
 
-M: _gc generate-insn
+M: ##gc generate-insn
     "no-gc" define-label
     {
-        [ [ "no-gc" get ] dip [ temp1>> ] [ temp2>> ] bi %check-nursery ]
+        [ [ "no-gc" get ] dip [ size>> ] [ temp1>> ] [ temp2>> ] tri %check-nursery ]
         [ [ uninitialized-locs>> ] [ temp1>> ] bi wipe-locs ]
         [ data-values>> save-data-regs ]
         [ [ tagged-values>> ] [ temp1>> ] bi save-gc-roots ]
