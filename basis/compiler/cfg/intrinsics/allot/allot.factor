@@ -55,6 +55,9 @@ IN: compiler.cfg.intrinsics.allot
         ] [ node emit-primitive ] if
     ] ;
 
+: expand-(byte-array)? ( obj -- ? )
+    dup integer? [ 0 1024 between? ] [ drop f ] if ;
+
 : expand-<byte-array>? ( obj -- ? )
     dup integer? [ 0 32 between? ] [ drop f ] if ;
 
@@ -69,7 +72,7 @@ IN: compiler.cfg.intrinsics.allot
     [ byte-array store-length ] [ ds-push ] [ ] tri ;
 
 : emit-(byte-array) ( node -- )
-    dup node-input-infos first literal>> dup expand-<byte-array>?
+    dup node-input-infos first literal>> dup expand-(byte-array)?
     [ nip emit-allot-byte-array drop ] [ drop emit-primitive ] if ;
 
 :: emit-<byte-array> ( node -- )

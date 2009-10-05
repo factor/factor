@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math assocs namespaces sequences heaps
 fry make combinators sets locals arrays
-cpu.architecture
+cpu.architecture layouts
 compiler.cfg
 compiler.cfg.def-use
 compiler.cfg.liveness
@@ -117,8 +117,6 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 M: vreg-insn assign-registers-in-insn
     [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ;
 
-! TODO: needs tagged-rep
-
 : trace-on-gc ( assoc -- assoc' )
     ! When a GC occurs, virtual registers which contain tagged data
     ! are traced by the GC. Outputs a sequence physical registers.
@@ -141,12 +139,16 @@ M: vreg-insn assign-registers-in-insn
         ] assoc-each
     ] { } make ;
 
+: gc-root-offsets ( registers -- alist )
+    ! Outputs a sequence of { offset register/spill-slot } pairs
+    [ length iota [ cell * ] map ] keep zip ;
+
 M: ##gc assign-registers-in-insn
     ! Since ##gc is always the first instruction in a block, the set of
     ! values live at the ##gc is just live-in.
     dup call-next-method
     basic-block get register-live-ins get at
-    [ trace-on-gc >>tagged-values ] [ spill-on-gc >>data-values ] bi
+    [ trace-on-gc gc-root-offsets >>tagged-values ] [ spill-on-gc >>data-values ] bi
     drop ;
 
 M: insn assign-registers-in-insn drop ;
