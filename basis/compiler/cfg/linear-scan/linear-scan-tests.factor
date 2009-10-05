@@ -1465,7 +1465,7 @@ V{
 
 [ ] [ { 1 2 3 } test-linear-scan-on-cfg ] unit-test
 
-[ { 1 } ] [ 1 get instructions>> first tagged-values>> ] unit-test
+[ { { 0 1 } } ] [ 1 get instructions>> first tagged-values>> ] unit-test
 
 V{
     T{ ##peek f 0 D 0 }
@@ -1487,4 +1487,4 @@ V{
 
 [ ] [ { 1 2 3 } test-linear-scan-on-cfg ] unit-test
 
-[ { 1 } ] [ 1 get instructions>> first tagged-values>> ] unit-test
+[ { { 0 1 } } ] [ 1 get instructions>> first tagged-values>> ] unit-test

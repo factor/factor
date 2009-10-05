@@ -91,10 +91,15 @@ PRIVATE>
 : hlshift ( u n -- w ) '[ _ <byte-array> prepend 16 head ] change-underlying ;
 : hrshift ( u n -- w ) '[ _ <byte-array> append 16 tail* ] change-underlying ;
 
-: vmerge-head ( u v -- h ) over length 2 / '[ _ head-slice ] bi@ [ zip ] keep concat-as ;
-: vmerge-tail ( u v -- t ) over length 2 / '[ _ tail-slice ] bi@ [ zip ] keep concat-as ;
+: (vmerge-head) ( u v -- h )
+    over length 2 /i '[ _ head-slice ] bi@ [ zip ] keep concat-as ;
+: (vmerge-tail) ( u v -- t )
+    over length 2 /i '[ _ tail-slice ] bi@ [ zip ] keep concat-as ;
 
-: vmerge ( u v -- h t ) [ vmerge-head ] [ vmerge-tail ] 2bi ; inline
+: (vmerge) ( u v -- h t )
+    [ (vmerge-head) ] [ (vmerge-tail) ] 2bi ; inline
+
+: vmerge ( u v -- w ) [ zip ] keep concat-as ;
 
 : vand ( u v -- w )  over '[ [ _ element>bool ] bi@ and ] 2map ;
 : vandn ( u v -- w ) over '[ [ _ element>bool ] bi@ [ not ] dip and ] 2map ;
