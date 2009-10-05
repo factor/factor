@@ -26,7 +26,8 @@ M: glue pref-dim* drop { 0 0 } ;
     length 1 + * [-] ; inline
 
 : -center) ( pref-dim gap filled-cell dims -- )
-    [ nip available-space ] 2keep [ remove-nth sum [-] ] 2keep set-nth ; inline
+    [ nip available-space ]
+    [ [ remove-nth sum [-] ] [ set-nth ] 2bi ] 2bi ; inline
 
 : (fill-center) ( frame grid-layout quot1 quot2 -- ) (fill- -center) ; inline
 
@@ -35,7 +36,7 @@ M: glue pref-dim* drop { 0 0 } ;
     [ [ second ] [ row-heights>> ] (fill-center) ] 2bi ;
 
 : <frame-layout> ( frame -- grid-layout )
-    dup <grid-layout> [ fill-center ] keep ;
+    dup <grid-layout> [ fill-center ] [ ] bi ;
 
 PRIVATE>
 

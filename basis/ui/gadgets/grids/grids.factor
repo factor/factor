@@ -27,7 +27,9 @@ PRIVATE>
 : grid-child ( grid pair -- gadget ) grid@ nth ;
 
 : grid-add ( grid child pair -- grid )
-    [ nip grid-child unparent ] [ drop add-gadget ] [ swapd grid@ set-nth ] 3tri ;
+    [ nip grid-child unparent ]
+    [ drop add-gadget ]
+    [ swapd grid@ set-nth ] 3tri ;
 
 : grid-remove ( grid pair -- grid ) [ <gadget> ] dip grid-add ;
 
@@ -114,8 +116,7 @@ M: grid layout* [ grid>> ] [ <grid-layout> ] bi grid-layout ;
 M: grid children-on ( rect gadget -- seq )
     dup children>> empty? [ 2drop f ] [
         [ { 0 1 } ] dip grid>>
-        [ 0 <column> fast-children-on ] keep
-        <slice> concat
+        [ 0 <column> fast-children-on ] [ <slice> concat ] bi
     ] if ;
 
 M: grid gadget-text*
