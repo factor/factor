@@ -112,7 +112,7 @@ M: editor ungraft*
     } cond ;
 
 : clicked-loc ( editor -- loc )
-    [ hand-rel ] [ point>loc ] bi ;
+    [ hand-rel ] keep point>loc ;
 
 : click-loc ( editor model -- )
     [ clicked-loc ] dip set-model ;
@@ -130,7 +130,7 @@ M: editor ungraft*
     [ loc>x ] [ [ first ] dip line>y ceiling ] 2bi 2array ;
 
 : caret-loc ( editor -- loc )
-    [ editor-caret ] [ loc>point ] bi ;
+    [ editor-caret ] keep loc>point ;
 
 : caret-dim ( editor -- dim )
     [ 0 ] dip line-height 2array ;
@@ -139,7 +139,7 @@ M: editor ungraft*
     dup graft-state>> second [
         [
             [ caret-loc ] [ caret-dim { 2 1 } v+ ] bi <rect>
-        ] [ scroll>rect ] bi
+        ] keep scroll>rect
     ] [ drop ] if ;
 
 : draw-caret? ( editor -- ? )
@@ -212,7 +212,7 @@ M: editor cap-height font>> font-metrics cap-height>> ;
     [ nip relayout ] 2tri ;
 
 : caret/mark-changed ( editor -- )
-    [ restart-blinking ] [ scroll>caret ] bi ;
+    [ restart-blinking ] keep scroll>caret ;
 
 M: editor model-changed
     {
