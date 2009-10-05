@@ -60,6 +60,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/strings.o \
 	vm/tuples.o \
 	vm/utilities.o \
+        vm/vm.o \
 	vm/words.o \
 	vm/write_barrier.o
 

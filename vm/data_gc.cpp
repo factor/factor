@@ -12,18 +12,16 @@ gc_state::gc_state(data_heap *data_, bool growing_data_heap_, cell collecting_ge
 	data(data_),
 	growing_data_heap(growing_data_heap_),
 	collecting_gen(collecting_gen_),
+        collecting_aging_again(false),
 	start_time(current_micros()) { }
 
 gc_state::~gc_state() { }
-
-/* If a generation fills up, throw this error. It is caught in garbage_collection() */
-struct generation_full_condition { };
 
 /* Given a pointer to oldspace, copy it to newspace */
 object *factor_vm::copy_untagged_object_impl(object *pointer, cell size)
 {
 	if(current_gc->newspace->here + size >= current_gc->newspace->end)
-		throw generation_full_condition();
+		longjmp(current_gc->gc_unwind,1);
 
 	object *newpointer = allot_zone(current_gc->newspace,size);
 
@@ -502,7 +500,6 @@ void factor_vm::begin_gc(cell requested_bytes)
 
 void factor_vm::end_gc()
 {
-
 	gc_stats *s = &stats[current_gc->collecting_gen];
 
 	cell gc_elapsed = (current_micros() - current_gc->start_time);
@@ -545,77 +542,70 @@ void factor_vm::garbage_collection(cell collecting_gen_, bool growing_data_heap_
 
 	/* Keep trying to GC higher and higher generations until we don't run out
 	of space */
-	for(;;)
-	{
-		try
-		{
-			begin_gc(requested_bytes);
+        if(setjmp(current_gc->gc_unwind))
+        {
+                /* We come back here if a generation is full */
 
-			/* Initialize chase pointer */
-			cell scan = current_gc->newspace->here;
+                /* We have no older generations we can try collecting, so we
+                resort to growing the data heap */
+                if(current_gc->collecting_tenured_p())
+                {
+                        current_gc->growing_data_heap = true;
 
-			/* Trace objects referenced from global environment */
-			trace_roots();
+                        /* see the comment in unmark_marked() */
+                        code->unmark_marked();
+                }
+                /* we try collecting aging space twice before going on to
+                collect tenured */
+                else if(data->have_aging_p()
+                        && current_gc->collecting_gen == data->aging()
+                        && !current_gc->collecting_aging_again)
+                {
+                        current_gc->collecting_aging_again = true;
+                }
+                /* Collect the next oldest generation */
+                else
+                {
+                        current_gc->collecting_gen++;
+                }
+        }
 
-			/* Trace objects referenced from stacks, unless we're doing
-			save-image-and-exit in which case stack objects are irrelevant */
-			if(trace_contexts_) trace_contexts();
+        begin_gc(requested_bytes);
 
-			/* Trace objects referenced from older generations */
-			trace_cards();
+        /* Initialize chase pointer */
+        cell scan = current_gc->newspace->here;
 
-			/* On minor GC, trace code heap roots if it has pointers
-			to this generation or younger. Otherwise, tracing data heap objects
-			will mark all reachable code blocks, and we free the unmarked ones
-			after. */
-			if(!current_gc->collecting_tenured_p() && current_gc->collecting_gen >= last_code_heap_scan)
-			{
-				update_code_heap_roots();
-			}
+        /* Trace objects referenced from global environment */
+        trace_roots();
 
-			/* do some copying -- this is where most of the work is done */
-			copy_reachable_objects(scan,&current_gc->newspace->here);
+        /* Trace objects referenced from stacks, unless we're doing
+        save-image-and-exit in which case stack objects are irrelevant */
+        if(trace_contexts_) trace_contexts();
 
-			/* On minor GC, update literal references in code blocks, now that all
-			data heap objects are in their final location. On a major GC,
-			free all code blocks that did not get marked during tracing. */
-			if(current_gc->collecting_tenured_p())
-				free_unmarked_code_blocks();
-			else
-				update_dirty_code_blocks();
+        /* Trace objects referenced from older generations */
+        trace_cards();
 
-			/* GC completed without any generations filling up; finish up */
-			break;
-		}
-		catch(const generation_full_condition &c)
-		{
-			/* We come back here if a generation is full */
+        /* On minor GC, trace code heap roots if it has pointers
+        to this generation or younger. Otherwise, tracing data heap objects
+        will mark all reachable code blocks, and we free the unmarked ones
+        after. */
+        if(!current_gc->collecting_tenured_p() && current_gc->collecting_gen >= last_code_heap_scan)
+        {
+                update_code_heap_roots();
+        }
 
-			/* We have no older generations we can try collecting, so we
-			resort to growing the data heap */
-			if(current_gc->collecting_tenured_p())
-			{
-				current_gc->growing_data_heap = true;
+        /* do some copying -- this is where most of the work is done */
+        copy_reachable_objects(scan,&current_gc->newspace->here);
 
-				/* see the comment in unmark_marked() */
-				code->unmark_marked();
-			}
-			/* we try collecting aging space twice before going on to
-			collect tenured */
-			else if(data->have_aging_p()
-				&& current_gc->collecting_gen == data->aging()
-				&& !current_gc->collecting_aging_again)
-			{
-				current_gc->collecting_aging_again = true;
-			}
-			/* Collect the next oldest generation */
-			else
-			{
-				current_gc->collecting_gen++;
-			}
-		}
-	}
+        /* On minor GC, update literal references in code blocks, now that all
+        data heap objects are in their final location. On a major GC,
+        free all code blocks that did not get marked during tracing. */
+        if(current_gc->collecting_tenured_p())
+                free_unmarked_code_blocks();
+        else
+                update_dirty_code_blocks();
 
+        /* GC completed without any generations filling up; finish up */
 	end_gc();
 
 	delete current_gc;
