@@ -4,7 +4,7 @@ namespace factor
 template<typename Array> cell array_capacity(Array *array)
 {
 #ifdef FACTOR_DEBUG
-	assert(array->h.hi_tag() == T::type_number);
+	assert(array->h.hi_tag() == Array::type_number);
 #endif
 	return array->capacity >> TAG_BITS;
 }

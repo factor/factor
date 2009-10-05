@@ -34,6 +34,8 @@ struct gc_state {
 	/* GC start time, for benchmarking */
 	u64 start_time;
 
+        jmp_buf gc_unwind;
+
 	explicit gc_state(data_heap *data_, bool growing_data_heap_, cell collecting_gen_);
 	~gc_state();
 

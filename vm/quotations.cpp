@@ -330,6 +330,7 @@ void factor_vm::compile_all_words()
 
 	}
 
+        printf("done\n");
 	/* Update XTs in code heap */
 	word_updater updater(this);
 	iterate_code_heap(updater);

@@ -1,10 +1,10 @@
 namespace factor
 {
 
-struct factor_vm 
+struct factor_vm
 {
 	// First five fields accessed directly by assembler. See vm.factor
-	context *stack_chain; 
+	context *stack_chain;
 	zone nursery; /* new objects are allocated here */
 	cell cards_offset;
 	cell decks_offset;
@@ -101,20 +101,20 @@ struct factor_vm
 	bignum *bignum_multiply_unsigned_small_factor(bignum * x, bignum_digit_type y,int negative_p);
 	void bignum_destructive_add(bignum * bignum, bignum_digit_type n);
 	void bignum_destructive_scale_up(bignum * bignum, bignum_digit_type factor);
-	void bignum_divide_unsigned_large_denominator(bignum * numerator, bignum * denominator, 
+	void bignum_divide_unsigned_large_denominator(bignum * numerator, bignum * denominator,
 						      bignum * * quotient, bignum * * remainder, int q_negative_p, int r_negative_p);
 	void bignum_divide_unsigned_normalized(bignum * u, bignum * v, bignum * q);
-	bignum_digit_type bignum_divide_subtract(bignum_digit_type * v_start, bignum_digit_type * v_end, 
+	bignum_digit_type bignum_divide_subtract(bignum_digit_type * v_start, bignum_digit_type * v_end,
 						 bignum_digit_type guess, bignum_digit_type * u_start);
-	void bignum_divide_unsigned_medium_denominator(bignum * numerator,bignum_digit_type denominator, 
+	void bignum_divide_unsigned_medium_denominator(bignum * numerator,bignum_digit_type denominator,
 						       bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
 	void bignum_destructive_normalization(bignum * source, bignum * target, int shift_left);
 	void bignum_destructive_unnormalization(bignum * bignum, int shift_right);
-	bignum_digit_type bignum_digit_divide(bignum_digit_type uh, bignum_digit_type ul, 
+	bignum_digit_type bignum_digit_divide(bignum_digit_type uh, bignum_digit_type ul,
 					      bignum_digit_type v, bignum_digit_type * q) /* return value */;
-	bignum_digit_type bignum_digit_divide_subtract(bignum_digit_type v1, bignum_digit_type v2, 
+	bignum_digit_type bignum_digit_divide_subtract(bignum_digit_type v1, bignum_digit_type v2,
 						       bignum_digit_type guess, bignum_digit_type * u);
-	void bignum_divide_unsigned_small_denominator(bignum * numerator, bignum_digit_type denominator, 
+	void bignum_divide_unsigned_small_denominator(bignum * numerator, bignum_digit_type denominator,
 						      bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
 	bignum_digit_type bignum_destructive_scale_down(bignum * bignum, bignum_digit_type denominator);
 	bignum * bignum_remainder_unsigned_small_denominator(bignum * n, bignum_digit_type d, int negative_p);
@@ -172,7 +172,7 @@ struct factor_vm
 	template<typename Iterator> void each_object(Iterator &iterator);
 	cell find_all_words();
 	cell object_size(cell tagged);
-	
+
 	//write barrier
 	cell allot_markers_offset;
 
@@ -185,27 +185,27 @@ struct factor_vm
 	{
 		return ((cell)c - cards_offset) << card_bits;
 	}
-	
+
 	inline cell card_offset(card *c)
 	{
 		return *(c - (cell)data->cards + (cell)data->allot_markers);
 	}
-	
+
 	inline card_deck *addr_to_deck(cell a)
 	{
 		return (card_deck *)(((cell)a >> deck_bits) + decks_offset);
 	}
-	
+
 	inline cell deck_to_addr(card_deck *c)
 	{
 		return ((cell)c - decks_offset) << deck_bits;
 	}
-	
+
 	inline card *deck_to_card(card_deck *d)
 	{
 		return (card *)((((cell)d - decks_offset) << (deck_bits - card_bits)) + cards_offset);
 	}
-	
+
 	inline card *addr_to_allot_marker(object *a)
 	{
 		return (card *)(((cell)a >> card_bits) + allot_markers_offset);
@@ -397,7 +397,7 @@ struct factor_vm
 	//math
 	cell bignum_zero;
 	cell bignum_pos_one;
-	cell bignum_neg_one;	
+	cell bignum_neg_one;
 
 	void primitive_bignum_to_fixnum();
 	void primitive_float_to_fixnum();
@@ -484,7 +484,7 @@ struct factor_vm
 	inline double fixnum_to_float(cell tagged);
 	template<typename Type> Type *untag_check(cell value);
 	template<typename Type> Type *untag(cell value);
-	
+
 	//io
 	void init_c_io();
 	void io_error();
@@ -535,7 +535,6 @@ struct factor_vm
 	//code_heap
 	heap *code;
 	unordered_map<heap_block *, char *> forwarding;
-	typedef void (factor_vm::*code_heap_iterator)(code_block *compiled);
 
 	void init_code_heap(cell size);
 	bool in_code_heap_p(cell ptr);
@@ -554,7 +553,7 @@ struct factor_vm
 	template<typename Iterator> void iterate_code_heap(Iterator &iter)
 	{
 		heap_block *scan = code->first_block();
-	
+
 		while(scan)
 		{
 			if(scan->status != B_FREE)
@@ -606,7 +605,7 @@ struct factor_vm
 	void primitive_set_innermost_stack_frame_quot();
 	void save_callstack_bottom(stack_frame *callstack_bottom);
 	template<typename Iterator> void iterate_callstack(cell top, cell bottom, Iterator &iterator);
-	
+
 	/* Every object has a regular representation in the runtime, which makes GC
 	much simpler. Every slot of the object until binary_payload_start is a pointer
 	to some other object. */
@@ -615,9 +614,9 @@ struct factor_vm
 		cell scan = obj;
 		cell payload_start = binary_payload_start((object *)obj);
 		cell end = obj + payload_start;
-	
+
 		scan += sizeof(cell);
-	
+
 		while(scan < end)
 		{
 			iter((cell *)scan);
@@ -725,11 +724,11 @@ struct factor_vm
 	const vm_char *default_image_path();
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);
 	bool windows_stat(vm_char *path);
-	
+
    #if defined(WINNT)
 	void open_console();
 	LONG exception_handler(PEXCEPTION_POINTERS pe);
- 	// next method here:	
+ 	// next method here:
    #endif
   #else  // UNIX
 	void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap);
@@ -742,59 +741,50 @@ struct factor_vm
   #ifdef __APPLE__
 	void call_fault_handler(exception_type_t exception, exception_data_type_t code, MACH_EXC_STATE_TYPE *exc_state, MACH_THREAD_STATE_TYPE *thread_state, MACH_FLOAT_STATE_TYPE *float_state);
   #endif
-	
-	factor_vm() 
-		: profiling_p(false),
-		  secure_gc(false),
-		  gc_off(false),
-		  fep_disabled(false),
-		  full_output(false),
-		  max_pic_size(0)
-	{
-		memset(this,0,sizeof(this)); // just to make sure
-	}
+
+	factor_vm();
 
 };
 
 #ifndef FACTOR_REENTRANT
-   #define FACTOR_SINGLE_THREADED_TESTING
+        #define FACTOR_SINGLE_THREADED_TESTING
 #endif
 
 #ifdef FACTOR_SINGLE_THREADED_SINGLETON
 /* calls are dispatched using the singleton vm ptr */
-  extern factor_vm *vm;
-  #define PRIMITIVE_GETVM() vm
-  #define PRIMITIVE_OVERFLOW_GETVM() vm
-  #define VM_PTR vm
-  #define ASSERTVM() 
-  #define SIGNAL_VM_PTR() vm
+        extern factor_vm *vm;
+        #define PRIMITIVE_GETVM() vm
+        #define PRIMITIVE_OVERFLOW_GETVM() vm
+        #define VM_PTR vm
+        #define ASSERTVM()
+        #define SIGNAL_VM_PTR() vm
 #endif
 
 #ifdef FACTOR_SINGLE_THREADED_TESTING
 /* calls are dispatched as per multithreaded, but checked against singleton */
-  extern factor_vm *vm;
-  #define ASSERTVM() assert(vm==myvm)
-  #define PRIMITIVE_GETVM() ((factor_vm*)myvm)
-  #define PRIMITIVE_OVERFLOW_GETVM() ASSERTVM(); myvm
-  #define VM_PTR myvm
-  #define SIGNAL_VM_PTR() tls_vm()
+        extern factor_vm *vm;
+        #define ASSERTVM() assert(vm==myvm)
+        #define PRIMITIVE_GETVM() ((factor_vm*)myvm)
+        #define PRIMITIVE_OVERFLOW_GETVM() ASSERTVM(); myvm
+        #define VM_PTR myvm
+        #define SIGNAL_VM_PTR() tls_vm()
 #endif
 
 #ifdef FACTOR_REENTRANT_TLS
 /* uses thread local storage to obtain vm ptr */
-  #define PRIMITIVE_GETVM() tls_vm()
-  #define PRIMITIVE_OVERFLOW_GETVM() tls_vm()
-  #define VM_PTR tls_vm()
-  #define ASSERTVM() 
-  #define SIGNAL_VM_PTR() tls_vm()
+        #define PRIMITIVE_GETVM() tls_vm()
+        #define PRIMITIVE_OVERFLOW_GETVM() tls_vm()
+        #define VM_PTR tls_vm()
+        #define ASSERTVM()
+        #define SIGNAL_VM_PTR() tls_vm()
 #endif
 
 #ifdef FACTOR_REENTRANT
-  #define PRIMITIVE_GETVM() ((factor_vm*)myvm)
-  #define PRIMITIVE_OVERFLOW_GETVM() ((factor_vm*)myvm)
-  #define VM_PTR myvm
-  #define ASSERTVM() 
-  #define SIGNAL_VM_PTR() tls_vm()
+        #define PRIMITIVE_GETVM() ((factor_vm*)myvm)
+        #define PRIMITIVE_OVERFLOW_GETVM() ((factor_vm*)myvm)
+        #define VM_PTR myvm
+        #define ASSERTVM()
+        #define SIGNAL_VM_PTR() tls_vm()
 #endif
 
 extern unordered_map<THREADHANDLE, factor_vm *> thread_vms;
