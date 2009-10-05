@@ -369,7 +369,7 @@ HELP: vmerge
 
 HELP: vmerge-head
 { $values { "u" "a sequence" } { "v" "a sequence" } { "h" "a sequence" } }
-{ $description "Creates two new sequences of the same type and size as " { $snippet "u" } " and " { $snippet "v" } " by interleaving the elements from the first half of " { $snippet "u" } " and " { $snippet "v" } "." }
+{ $description "Creates a new sequence of the same type and size as " { $snippet "u" } " and " { $snippet "v" } " by interleaving the elements from the first half of " { $snippet "u" } " and " { $snippet "v" } "." }
 { $examples
 { $example """USING: kernel math.vectors prettyprint ;
 
@@ -379,7 +379,7 @@ HELP: vmerge-head
 
 HELP: vmerge-tail
 { $values { "u" "a sequence" } { "v" "a sequence" } { "t" "a sequence" } }
-{ $description "Creates two new sequences of the same type and size as " { $snippet "u" } " and " { $snippet "v" } " by interleaving the elements from the tail half of " { $snippet "u" } " and " { $snippet "v" } "." }
+{ $description "Creates a new sequence of the same type and size as " { $snippet "u" } " and " { $snippet "v" } " by interleaving the elements from the tail half of " { $snippet "u" } " and " { $snippet "v" } "." }
 { $examples
 { $example """USING: kernel math.vectors prettyprint ;
 
