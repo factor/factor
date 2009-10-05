@@ -135,7 +135,7 @@ TYPED: transpose-matrix4 ( matrix: matrix4 -- matrix: matrix4 )
 
 : scale-matrix4 ( factors -- matrix )
     [ float-4{ t t t f } ] dip float-4{ 0.0 0.0 0.0 1.0 } v?
-    diagonal-matrix4 ;
+    diagonal-matrix4 ; inline
 
 : ortho-matrix4 ( factors -- matrix )
     float-4{ 1.0 1.0 1.0 1.0 } swap v/ scale-matrix4 ; inline
