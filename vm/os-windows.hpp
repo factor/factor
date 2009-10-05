@@ -19,8 +19,8 @@ typedef wchar_t vm_char;
 #define STRNCMP wcsncmp
 #define STRDUP _wcsdup
 #define MIN(a,b) ((a)>(b)?(b):(a))
-#define FTELL _ftelli64
-#define FSEEK _fseeki64
+#define FTELL ftello64
+#define FSEEK fseeko64
 
 #ifdef WIN64
 	#define CELL_FORMAT "%Iu"
