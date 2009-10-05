@@ -738,10 +738,10 @@ object *factor_vm::allot_object(header header, cell size)
 
 	object *obj;
 
-	if(nursery.size - allot_buffer_zone > size)
+	if(nursery.size > size)
 	{
 		/* If there is insufficient room, collect the nursery */
-		if(nursery.here + allot_buffer_zone + size > nursery.end)
+		if(nursery.here + size > nursery.end)
 			garbage_collection(data->nursery(),false,true,0);
 
 		cell h = nursery.here;

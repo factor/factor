@@ -410,10 +410,10 @@ M:: x86 %write-barrier ( src card# table -- )
     table table [] MOV
     table card# [+] card-mark <byte> MOV ;
 
-M:: x86 %check-nursery ( label temp1 temp2 -- )
+M:: x86 %check-nursery ( label size temp1 temp2 -- )
     temp1 load-zone-ptr
     temp2 temp1 cell [+] MOV
-    temp2 1024 ADD
+    temp2 size ADD
     temp1 temp1 3 cells [+] MOV
     temp2 temp1 CMP
     label JLE ;

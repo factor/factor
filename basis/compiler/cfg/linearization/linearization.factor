@@ -97,21 +97,6 @@ M: ##dispatch linearize-insn
     [ successors>> [ block-number _dispatch-label ] each ]
     bi* ;
 
-: gc-root-offsets ( registers -- alist )
-    ! Outputs a sequence of { offset register/spill-slot } pairs
-    [ length iota [ cell * ] map ] keep zip ;
-
-M: ##gc linearize-insn
-    nip
-    {
-        [ temp1>> ]
-        [ temp2>> ]
-        [ data-values>> ]
-        [ tagged-values>> gc-root-offsets ]
-        [ uninitialized-locs>> ]
-    } cleave
-    _gc ;
-
 : linearize-basic-blocks ( cfg -- insns )
     [
         [
