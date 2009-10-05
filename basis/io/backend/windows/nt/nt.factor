@@ -91,6 +91,8 @@ ERROR: seek-before-start n ;
 : set-seek-ptr ( n handle -- )
     [ dup 0 < [ seek-before-start ] when ] dip (>>ptr) ;
 
+M: winnt tell-handle ( handle -- n ) ptr>> ;
+
 M: winnt seek-handle ( n seek-type handle -- )
     swap {
         { seek-absolute [ set-seek-ptr ] }
