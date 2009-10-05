@@ -446,12 +446,11 @@ M:: ppc %write-barrier ( src card# table -- )
     src card# deck-bits SRWI
     table scratch-reg card# STBX ;
 
-M:: ppc %check-nursery ( label temp1 temp2 -- )
+M:: ppc %check-nursery ( label size temp1 temp2 -- )
     temp2 load-zone-ptr
     temp1 temp2 cell LWZ
     temp2 temp2 3 cells LWZ
-    ! add ALLOT_BUFFER_ZONE to here
-    temp1 temp1 1024 ADDI
+    temp1 temp1 size ADDI
     ! is here >= end?
     temp1 0 temp2 CMP
     label BLE ;
