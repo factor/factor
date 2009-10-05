@@ -224,7 +224,7 @@ struct startargs {
 
 factor_vm *new_factor_vm()
 {
-	factor_vm *newvm = new factor_vm;
+	factor_vm *newvm = new factor_vm();
 	register_vm_with_thread(newvm);
 	thread_vms[thread_id()] = newvm;
 
