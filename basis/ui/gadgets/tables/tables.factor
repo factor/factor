@@ -307,7 +307,7 @@ PRIVATE>
     '[ _ row-value eq? ] with find drop ;
 
 : (update-selected-indices) ( table -- set )
-    [ selection>> value>> dup [ array? not ] [ ] bi and [ 1array ] when ] keep
+    [ selection>> value>> dup { [ array? not ] [ ] } 1&& [ 1array ] when ] keep
     '[ _ find-row-index ] map sift unique f assoc-like ;
 
 : initial-selected-indices ( table -- set )
