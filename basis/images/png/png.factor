@@ -26,6 +26,9 @@ CONSTANT: indexed-color 3
 CONSTANT: greyscale-alpha 4
 CONSTANT: truecolor-alpha 6
 
+CONSTANT: interlace-none 0
+CONSTANT: interlace-adam7 1
+
 : <loading-png> ( -- image )
     loading-png new
     V{ } clone >>chunks ;
@@ -86,8 +89,8 @@ ERROR: unimplemented-color-type image ;
 
 : png-bytes-per-pixel ( loading-png -- n )
     dup color-type>> {
-        { 2 [ scale-bit-depth 3 * ] }
-        { 6 [ scale-bit-depth 4 * ] }
+        { truecolor [ scale-bit-depth 3 * ] }
+        { truecolor-alpha [ scale-bit-depth 4 * ] }
         [ unknown-color-type ]
     } case ; inline
 
@@ -118,20 +121,41 @@ ERROR: unimplemented-color-type image ;
     lines dup first length 0 <array> prefix
     [ n 1 - 0 <array> prepend ] map
     2 clump [
-        n swap first2 [ ] [ n 1 - swap nth ] [ [ 0 n 1 - ] dip set-nth ] tri
+        n swap first2
+        [ ]
+        [ n 1 - swap nth ]
+        [ [ 0 n 1 - ] dip set-nth ] tri
         png-unfilter-line
     ] map B{ } concat-as ;
 
+ERROR: unimplemented-interlace ;
+
+: reverse-interlace ( byte-array loading-png -- byte-array )
+    {
+        { interlace-none [ ] }
+        { interlace-adam7 [ unimplemented-interlace ] }
+        [ unimplemented-interlace ]
+    } case ;
+
 : png-image-bytes ( loading-png -- byte-array )
     [ png-bytes-per-pixel ]
-    [ inflate-data ]
+    [ [ inflate-data ] [ interlace-method>> ] bi reverse-interlace ]
     [ png-group-width ] tri group reverse-png-filter ;
+
+ERROR: unknown-component-type n ;
+
+: png-component ( loading-png -- obj )
+    bit-depth>> {
+        { 8 [ ubyte-components ] }
+        { 16 [ ushort-components ] }
+        [ unknown-component-type ]
+    } case ;
 
 : loading-png>image ( loading-png -- image )
     [ image new ] dip {
         [ png-image-bytes >>bitmap ]
         [ [ width>> ] [ height>> ] bi 2array >>dim ]
-        [ drop ubyte-components >>component-type ]
+        [ png-component >>component-type ]
     } cleave ;
 
 : decode-greyscale ( loading-png -- image )
