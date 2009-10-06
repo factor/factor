@@ -4,13 +4,10 @@ USING: accessors alien.c-types arrays byte-arrays combinators
 compression.run-length fry grouping images images.loader io
 io.binary io.encodings.8-bit io.encodings.binary
 io.encodings.string io.streams.limited kernel math math.bitwise
-sequences specialized-arrays summary ;
+sequences specialized-arrays summary images.bitmap ;
 QUALIFIED-WITH: bitstreams b
 SPECIALIZED-ARRAY: ushort
 IN: images.bitmap.loading
-
-SINGLETON: bitmap-image
-"bmp" bitmap-image register-image-class
 
 ! http://www.fileformat.info/format/bmp/egff.htm
 ! http://www.digicamsoft.com/bmp/bmp.html
@@ -364,7 +361,7 @@ ERROR: unsupported-bitmap-file magic ;
 : loading-bitmap>bytes ( loading-bitmap -- byte-array )
     uncompress-bitmap bitmap>bytes ;
 
-M: bitmap-image stream>image ( stream bitmap-image -- bitmap )
+M: bmp-image stream>image ( stream bmp-image -- bitmap )
     drop load-bitmap
     [ image new ] dip
     {
