@@ -115,7 +115,7 @@ M: gadget gadget-text-separator
     gadget-text-separator '[ _ % ] [ gadget-text* ] interleave ;
 
 M: gadget gadget-text*
-    [ children>> ] [ gadget-seq-text ] bi ;
+    [ children>> ] keep gadget-seq-text ;
 
 M: array gadget-text*
     [ gadget-text* ] each ;
@@ -183,7 +183,7 @@ GENERIC: pref-dim* ( gadget -- dim )
 
 : pref-dim ( gadget -- dim )
     dup pref-dim>> [ ] [
-        [ pref-dim* ] [ dup layout-state>> ] bi
+        [ pref-dim* ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd (>>pref-dim) ] if
     ] ?if ;
 
@@ -388,7 +388,7 @@ M: gadget request-focus-on parent>> request-focus-on ;
 M: f request-focus-on 2drop ;
 
 : request-focus ( gadget -- )
-    [ focusable-child ] [ request-focus-on ] bi ;
+    [ focusable-child ] keep request-focus-on ;
 
 : focus-path ( gadget -- seq )
     [ focus>> ] follow ;
