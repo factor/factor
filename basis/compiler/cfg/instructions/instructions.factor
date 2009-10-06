@@ -290,6 +290,36 @@ def: dst
 use: src1 src2
 literal: rep ;
 
+PURE-INSN: ##signed-pack-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##unsigned-pack-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##unpack-vector-head
+def: dst
+use: src
+literal: rep ;
+
+PURE-INSN: ##unpack-vector-tail
+def: dst
+use: src
+literal: rep ;
+
+PURE-INSN: ##integer>float-vector
+def: dst
+use: src
+literal: rep ;
+
+PURE-INSN: ##float>integer-vector
+def: dst
+use: src
+literal: rep ;
+
 PURE-INSN: ##compare-vector
 def: dst
 use: src1 src2
@@ -783,6 +813,8 @@ UNION: def-is-use-insn
 ##box-displaced-alien
 ##compare-vector
 ##not-vector
+##unpack-vector-head
+##unpack-vector-tail
 ##string-nth
 ##unbox-any-c-ptr ;
 
