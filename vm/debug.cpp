@@ -225,13 +225,13 @@ void factor_vm::dump_generations()
 	print_string("Nursery: ");
 	dump_zone(&nursery);
 	
-	for(i = 1; i < data->gen_count; i++)
+	for(i = 1; i < gen_count; i++)
 	{
 		print_string("Generation "); print_cell(i); print_string(": ");
 		dump_zone(&data->generations[i]);
 	}
 
-	for(i = 0; i < data->gen_count; i++)
+	for(i = 0; i < gen_count; i++)
 	{
 		print_string("Semispace "); print_cell(i); print_string(": ");
 		dump_zone(&data->semispaces[i]);

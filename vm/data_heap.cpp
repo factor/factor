@@ -11,7 +11,7 @@ void factor_vm::init_card_decks()
 	decks_offset = (cell)data->decks - (start >> deck_bits);
 }
 
-data_heap::data_heap(factor_vm *myvm, cell gen_count_, cell young_size_, cell aging_size_, cell tenured_size_)
+data_heap::data_heap(factor_vm *myvm, cell young_size_, cell aging_size_, cell tenured_size_)
 {
 	young_size_ = align(young_size_,deck_size);
 	aging_size_ = align(aging_size_,deck_size);
@@ -20,18 +20,8 @@ data_heap::data_heap(factor_vm *myvm, cell gen_count_, cell young_size_, cell ag
 	young_size = young_size_;
 	aging_size = aging_size_;
 	tenured_size = tenured_size_;
-	gen_count = gen_count_;
 
-	cell total_size;
-	if(gen_count == 2)
-		total_size = young_size + 2 * tenured_size;
-	else if(gen_count == 3)
-		total_size = young_size + 2 * aging_size + 2 * tenured_size;
-	else
-	{
-		total_size = 0;
-		fatal_error("Invalid number of generations",gen_count);
-	}
+	cell total_size = young_size + 2 * aging_size + 2 * tenured_size;
 
 	total_size += deck_size;
 
@@ -56,17 +46,11 @@ data_heap::data_heap(factor_vm *myvm, cell gen_count_, cell young_size_, cell ag
 	alloter = generations[tenured()].init_zone(tenured_size,alloter);
 	alloter = semispaces[tenured()].init_zone(tenured_size,alloter);
 
-	if(gen_count == 3)
-	{
-		alloter = generations[aging()].init_zone(aging_size,alloter);
-		alloter = semispaces[aging()].init_zone(aging_size,alloter);
-	}
+	alloter = generations[aging()].init_zone(aging_size,alloter);
+	alloter = semispaces[aging()].init_zone(aging_size,alloter);
 
-	if(gen_count >= 2)
-	{
-		alloter = generations[nursery()].init_zone(young_size,alloter);
-		alloter = semispaces[nursery()].init_zone(0,alloter);
-	}
+	alloter = generations[nursery()].init_zone(young_size,alloter);
+	alloter = semispaces[nursery()].init_zone(0,alloter);
 
 	if(seg->end - alloter > deck_size)
 		myvm->critical_error("Bug in alloc_data_heap",alloter);
@@ -77,7 +61,6 @@ data_heap *factor_vm::grow_data_heap(data_heap *data, cell requested_bytes)
 	cell new_tenured_size = (data->tenured_size * 2) + requested_bytes;
 
 	return new data_heap(this,
-		data->gen_count,
 		data->young_size,
 		data->aging_size,
 		new_tenured_size);
@@ -149,9 +132,9 @@ void factor_vm::set_data_heap(data_heap *data_)
 	clear_allot_markers(data->nursery(),data->tenured());
 }
 
-void factor_vm::init_data_heap(cell gens,cell young_size,cell aging_size,cell tenured_size,bool secure_gc_)
+void factor_vm::init_data_heap(cell young_size, cell aging_size, cell tenured_size, bool secure_gc_)
 {
-	set_data_heap(new data_heap(this,gens,young_size,aging_size,tenured_size));
+	set_data_heap(new data_heap(this,young_size,aging_size,tenured_size));
 	secure_gc = secure_gc_;
 	init_data_gc();
 }
@@ -257,7 +240,7 @@ void factor_vm::primitive_data_room()
 	growable_array a(this);
 
 	cell gen;
-	for(gen = 0; gen < data->gen_count; gen++)
+	for(gen = 0; gen < gen_count; gen++)
 	{
 		zone *z = (gen == data->nursery() ? &nursery : &data->generations[gen]);
 		a.add(tag_fixnum((z->end - z->here) >> 10));

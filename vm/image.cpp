@@ -21,8 +21,7 @@ void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 	if(good_size > p->tenured_size)
 		p->tenured_size = good_size;
 
-	init_data_heap(p->gen_count,
-		p->young_size,
+	init_data_heap(p->young_size,
 		p->aging_size,
 		p->tenured_size,
 		p->secure_gc);
