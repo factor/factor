@@ -484,15 +484,18 @@ struct nursery_collector : copying_collector<nursery_collector>
 
 struct aging_collector : copying_collector<aging_collector>
 {
+	zone *tenured;
+
 	explicit aging_collector(factor_vm *myvm_, zone *newspace_) :
-		copying_collector<aging_collector>(myvm_,newspace_) {}
+		copying_collector<aging_collector>(myvm_,newspace_),
+		tenured(&myvm->data->generations[myvm->data->tenured()]) {}
 
 	bool should_copy_p(object *untagged)
 	{
 		if(newspace->contains_p(untagged))
 			return false;
 		else
-			return !myvm->data->generations[myvm->data->tenured()].contains_p(untagged);
+			return !tenured->contains_p(untagged);
 	}
 	
 	void copy_reachable_objects(cell scan, cell *end)
