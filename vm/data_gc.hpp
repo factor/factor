@@ -44,6 +44,11 @@ struct gc_state {
 		return collecting_gen == data->nursery();
 	}
 
+	inline bool collecting_aging_p()
+	{
+		return data->have_aging_p() && collecting_gen == data->aging();
+	}
+
 	inline bool collecting_tenured_p()
 	{
 		return collecting_gen == data->tenured();

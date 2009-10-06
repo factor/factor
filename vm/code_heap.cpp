@@ -28,31 +28,6 @@ void factor_vm::jit_compile_word(cell word_, cell def_, bool relocate)
 	if(word->pic_tail_def != F) jit_compile(word->pic_tail_def,relocate);
 }
 
-struct literal_reference_tracer {
-	factor_vm *myvm;
-
-	explicit literal_reference_tracer(factor_vm *myvm_) : myvm(myvm_) {}
-	void operator()(code_block *compiled)
-	{
-		myvm->trace_literal_references(compiled);
-	}
-};
-
-/* Copy literals referenced from all code blocks to newspace. Only for
-aging and nursery collections */
-void factor_vm::trace_code_heap_roots()
-{
-	code_heap_scans++;
-
-	literal_reference_tracer tracer(this);
-	iterate_code_heap(tracer);
-
-	if(current_gc->collecting_accumulation_gen_p())
-		last_code_heap_scan = current_gc->collecting_gen;
-	else
-		last_code_heap_scan = current_gc->collecting_gen + 1;
-}
-
 /* Update pointers to words referenced from all code blocks. Only after
 defining a new word. */
 void factor_vm::update_code_heap_words()
