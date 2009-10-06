@@ -67,7 +67,15 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
     { } [ dup array? [ dup first 16 = ] [ f ] if [ [ unclip-last ] [ second 1 + swap <repetition> append ] bi* ] [ suffix ] if ] reduce
     [ dup array? [ second 0 <repetition> ] [ 1array ] if ] map concat
     nip swap cut 2array [ [ length>> [0,b) ] [ ] bi get-table ] map ;
-    
+
+: static-huffman-tables ( -- tables )
+      0 143 [a,b] [ 8 ] replicate
+    144 255 [a,b] [ 9 ] replicate append
+    256 279 [a,b] [ 7 ] replicate append
+    280 287 [a,b] [ 8 ] replicate append
+    0 31 [a,b] [ 5 ] replicate 
+    2array [ [ length>> [0,b) ] [ ] bi get-table ] map ;    
+
 CONSTANT: length-table
     {
         3 4 5 6 7 8 9 10
@@ -103,9 +111,8 @@ CONSTANT: dist-table
     ] each 
     bytes ;
 
-:: inflate-dynamic ( bitstream -- bytes )
-    bitstream decode-huffman-tables
-    bitstream '[ _ swap <huffman-decoder> ] map :> tables
+:: inflate-huffman ( bitstream tables -- bytes )
+    tables bitstream '[ _ swap <huffman-decoder> ] map :> tables
     [
         tables first read1-huff2
         dup 256 >
@@ -161,7 +168,11 @@ CONSTANT: dist-table
     bitstream bytes>> <slice>
     len 8 * bitstream bs:seek ;
 
-: inflate-static ( bitstream -- bytes ) zlib-unimplemented ;
+: inflate-dynamic ( bitstream -- bytes ) 
+    dup decode-huffman-tables inflate-huffman ;
+
+: inflate-static ( bitstream -- bytes ) 
+    static-huffman-tables inflate-huffman ;
 
 :: inflate-loop ( bitstream -- bytes )
     [ 1 bitstream bs:read 0 = ]
