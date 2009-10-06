@@ -157,7 +157,7 @@ struct factor_vm
 	void reset_generation(cell i);
 	void reset_generations(cell from, cell to);
 	void set_data_heap(data_heap *data_);
-	void init_data_heap(cell gens,cell young_size,cell aging_size,cell tenured_size,bool secure_gc_);
+	void init_data_heap(cell young_size, cell aging_size, cell tenured_size, bool secure_gc_);
 	cell untagged_object_size(object *pointer);
 	cell unaligned_object_size(object *pointer);
 	void primitive_size();
@@ -231,7 +231,7 @@ struct factor_vm
 	/* used during garbage collection only */
 	gc_state *current_gc;
 	/* statistics */
-	gc_stats stats[max_gen_count];
+	gc_stats stats[gen_count];
 	u64 cards_scanned;
 	u64 decks_scanned;
 	u64 card_scan_time;
@@ -255,11 +255,11 @@ struct factor_vm
 	template<typename Strategy> void mark_object_code_block(object *object, Strategy &strategy);
 	void free_unmarked_code_blocks();
 	void update_dirty_code_blocks();
-	void begin_gc(cell requested_bytes);
 	void collect_nursery();
 	void collect_aging();
-	void collect_tenured(bool trace_contexts_);
-	void end_gc();
+	void collect_aging_again();
+	void collect_tenured(cell requested_bytes, bool trace_contexts_);
+	void record_gc_stats();
 	void garbage_collection(cell gen, bool growing_data_heap, bool trace_contexts, cell requested_bytes);
 	void gc();
 	void primitive_gc();

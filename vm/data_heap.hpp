@@ -31,8 +31,6 @@ struct data_heap {
 	cell aging_size;
 	cell tenured_size;
 
-	cell gen_count;
-
 	zone *generations;
 	zone *semispaces;
 
@@ -49,17 +47,15 @@ struct data_heap {
 	cell nursery() { return 0; }
 	
 	/* where objects hang around */
-	cell aging() { return gen_count - 2; }
+	cell aging() { return 1; }
 	
 	/* the oldest generation */
-	cell tenured() { return gen_count - 1; }
+	cell tenured() { return 2; }
 	
-	bool have_aging_p() { return gen_count > 2; }
-
-	explicit data_heap(factor_vm *myvm, cell gen_count, cell young_size, cell aging_size, cell tenured_size);
+	explicit data_heap(factor_vm *myvm, cell young_size, cell aging_size, cell tenured_size);
 	~data_heap();
 };
 
-static const cell max_gen_count = 3;
+static const cell gen_count = 3;
 
 }
