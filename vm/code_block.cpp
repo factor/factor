@@ -194,9 +194,9 @@ template<typename Iterator> void factor_vm::iterate_relocations(code_block *comp
 	{
 		byte_array *relocation = untag<byte_array>(compiled->relocation);
 
-		cell index = stack_traces_p() ? 1 : 0;
-
+		cell index = 0;
 		cell length = array_capacity(relocation) / sizeof(relocation_entry);
+
 		for(cell i = 0; i < length; i++)
 		{
 			relocation_entry rel = relocation->data<relocation_entry>()[i];
@@ -425,15 +425,18 @@ code_block *factor_vm::allot_code_block(cell size, cell type)
 }
 
 /* Might GC */
-code_block *factor_vm::add_code_block(cell type, cell code_, cell labels_, cell relocation_, cell literals_)
+code_block *factor_vm::add_code_block(cell type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_)
 {
 	gc_root<byte_array> code(code_,this);
 	gc_root<object> labels(labels_,this);
+	gc_root<object> owner(owner_,this);
 	gc_root<byte_array> relocation(relocation_,this);
 	gc_root<array> literals(literals_,this);
 
 	cell code_length = align8(array_capacity(code.untagged()));
 	code_block *compiled = allot_code_block(code_length,type);
+
+	compiled->owner = owner.value();
 
 	/* slight space optimization */
 	if(relocation.type() == BYTE_ARRAY_TYPE && array_capacity(relocation.untagged()) == 0)

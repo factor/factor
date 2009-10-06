@@ -32,30 +32,21 @@ SYMBOL: calls
     #! Compile this word later.
     calls get push ;
 
-SYMBOL: compiling-word
-
-: compiled-stack-traces? ( -- ? ) 67 getenv ;
-
 ! Mapping _label IDs to label instances
 SYMBOL: labels
 
-: init-generator ( word -- )
+: init-generator ( -- )
     H{ } clone labels set
-    V{ } clone calls set
-    compiling-word set
-    compiled-stack-traces? [ compiling-word get add-literal ] when ;
+    V{ } clone calls set ;
 
 : generate-insns ( asm -- code )
-    [
-        [ word>> init-generator ]
-        [
-            instructions>>
-            [
-                [ class insn-counts get inc-at ]
-                [ generate-insn ]
-                bi
-            ] each
-        ] bi
+    dup word>> [
+        init-generator
+        instructions>> [
+            [ class insn-counts get inc-at ]
+            [ generate-insn ]
+            bi
+        ] each
     ] with-fixup ;
 
 : generate ( mr -- asm )

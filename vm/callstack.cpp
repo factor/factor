@@ -86,16 +86,7 @@ cell factor_vm::frame_type(stack_frame *frame)
 
 cell factor_vm::frame_executing(stack_frame *frame)
 {
-	code_block *compiled = frame_code(frame);
-	if(compiled->literals == F || !stack_traces_p())
-		return F;
-	else
-	{
-		array *literals = untag<array>(compiled->literals);
-		cell executing = array_nth(literals,0);
-		check_data_pointer((object *)executing);
-		return executing;
-	}
+	return frame_code(frame)->owner;
 }
 
 stack_frame *factor_vm::frame_successor(stack_frame *frame)
