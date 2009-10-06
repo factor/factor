@@ -63,6 +63,22 @@ struct gc_state {
 	}
 };
 
+template<typename Strategy> struct copying_collector {
+	factor_vm *myvm;
+	gc_state *current_gc;
+	cell scan;
+
+	explicit copying_collector(factor_vm *myvm_);
+	Strategy &strategy();
+	object *copy_untagged_object_impl(object *pointer, cell size);
+	cell copy_next(cell scan);
+	object *copy_object_impl(object *untagged);
+	object *resolve_forwarding(object *untagged);
+	cell copy_object(cell pointer);
+	bool should_copy_p(object *pointer);
+	void go();
+};
+
 VM_C_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *myvm);
 
 }
