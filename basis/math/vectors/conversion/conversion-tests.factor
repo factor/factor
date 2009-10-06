@@ -35,6 +35,18 @@ MACRO:: test-vconvert ( from-type to-type -- )
         drop outputs firstn
     ] ;
 
+[ uint-4{ 5 1 2 6 } int-4 float-4 vconvert ]
+[ bad-vconvert-input? ] must-fail-with
+
+[ int-4{ 1 2 3 4 } uint-4{ 5 1 2 6 } int-4 short-8 vconvert ]
+[ bad-vconvert-input? ] must-fail-with
+
+[ uint-4{ 1 2 3 4 } int-4{ 5 1 2 6 } int-4 short-8 vconvert ]
+[ bad-vconvert-input? ] must-fail-with
+
+[ uint-4{ 5 1 2 6 } int-4 longlong-2 vconvert ]
+[ bad-vconvert-input? ] must-fail-with
+
 [ float-4{ -5.0 1.0 2.0 6.0 } ]
 [ int-4{ -5 1 2 6 } int-4 float-4 test-vconvert ] unit-test
 

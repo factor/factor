@@ -1,11 +1,12 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien.c-types arrays assocs combinators
+USING: accessors alien.c-types arrays assocs classes combinators
 combinators.short-circuit cords fry kernel locals math
 math.vectors sequences ;
 FROM: alien.c-types => char uchar short ushort int uint longlong ulonglong float double ;
 IN: math.vectors.conversion
 
 ERROR: bad-vconvert from-type to-type ;
+ERROR: bad-vconvert-input value expected-type ;
 
 <PRIVATE
 
@@ -30,6 +31,9 @@ ERROR: bad-vconvert from-type to-type ;
 : unsigned-type? ( c-type -- ? )
     { uchar ushort uint ulonglong } memq? ;
 
+: check-vconvert-type ( value expected-type -- value )
+    2dup instance? [ drop ] [ bad-vconvert-input ] if ; inline
+
 :: [vconvert] ( from-element to-element from-size to-size from-type to-type -- quot )
     {
         {
@@ -48,7 +52,8 @@ ERROR: bad-vconvert from-type to-type ;
             [ to-element   float-type? ]
             [ [ to-type (v>float)   ] ]
         }
-    } cond ;
+    } cond
+    [ from-type check-vconvert-type ] prepose ;
 
 :: [vpack] ( from-element to-element from-size to-size from-type to-type -- quot )
     from-size to-size /i log2 :> steps
@@ -59,7 +64,8 @@ ERROR: bad-vconvert from-type to-type ;
         [ from-element unsigned-type? to-element unsigned-type? not and ]
     } 0|| [ from-type to-type bad-vconvert ] when
 
-    to-type unsigned-type? [ to-type (vpack-unsigned) ] [ to-type (vpack-signed) ] ? ;
+    to-element unsigned-type? [ to-type (vpack-unsigned) ] [ to-type (vpack-signed) ] ?
+    [ [ from-type check-vconvert-type ] bi@ ] prepose ;
 
 :: [vunpack] ( from-element to-element from-size to-size from-type to-type -- quot )
     to-size from-size /i log2 :> steps
@@ -70,7 +76,10 @@ ERROR: bad-vconvert from-type to-type ;
         [ from-element unsigned-type? not to-element unsigned-type? and ]
     } 0|| [ from-type to-type bad-vconvert ] when
 
-    [ [ to-type (vunpack-head) ] [ to-type (vunpack-tail) ] bi ] ;
+    [
+        from-type check-vconvert-type
+        [ to-type (vunpack-head) ] [ to-type (vunpack-tail) ] bi
+    ] ;
 
 PRIVATE>
 
@@ -87,3 +96,4 @@ MACRO:: vconvert ( from-type to-type -- )
         { [ from-size to-size = ] [ [vconvert] ] }
         { [ from-size to-size > ] [ [vpack] ] }
     } cond ;
+
