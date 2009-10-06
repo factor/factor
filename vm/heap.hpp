@@ -19,7 +19,7 @@ struct heap {
 
 	inline heap_block *next_block(heap_block *block)
 	{
-		cell next = ((cell)block + block->size);
+		cell next = ((cell)block + block->size());
 		if(next == seg->end)
 			return NULL;
 		else
@@ -43,7 +43,7 @@ struct heap {
 	void assert_free_block(free_heap_block *block);
 	free_heap_block *find_free_block(cell size);
 	free_heap_block *split_free_block(free_heap_block *block, cell size);
-	heap_block *heap_allot(cell size);
+	heap_block *heap_allot(cell size, cell type);
 	void heap_free(heap_block *block);
 	void mark_block(heap_block *block);
 	void unmark_marked();
@@ -65,30 +65,28 @@ struct heap {
 	
 		while(scan)
 		{
-			switch(scan->status)
+			if(scan->type() == FREE_BLOCK_TYPE)
 			{
-			case B_ALLOCATED:
-				prev = free_allocated(prev,scan);
-				break;
-			case B_FREE:
-				if(prev && prev->status == B_FREE)
-					prev->size += scan->size;
+				if(prev && prev->type() == FREE_BLOCK_TYPE)
+					prev->set_size(prev->size() + scan->size());
 				else
 					prev = scan;
-				break;
-			case B_MARKED:
-				if(prev && prev->status == B_FREE)
+			}
+			else if(scan->marked_p())
+			{
+				if(prev && prev->type() == FREE_BLOCK_TYPE)
 					add_to_free_list((free_heap_block *)prev);
-				scan->status = B_ALLOCATED;
+				scan->set_marked_p(false);
 				prev = scan;
 				iter(scan);
-				break;
 			}
-	
+			else
+				prev = free_allocated(prev,scan);
+
 			scan = next_block(scan);
 		}
-	
-		if(prev && prev->status == B_FREE)
+
+		if(prev && prev->type() == FREE_BLOCK_TYPE)
 			add_to_free_list((free_heap_block *)prev);
 	}
 };

@@ -49,12 +49,12 @@ void factor_vm::primitive_word_xt()
 	if(profiling_p)
 	{
 		dpush(allot_cell((cell)w->profiling->xt()));
-		dpush(allot_cell((cell)w->profiling + w->profiling->size));
+		dpush(allot_cell((cell)w->profiling + w->profiling->size()));
 	}
 	else
 	{
 		dpush(allot_cell((cell)w->code->xt()));
-		dpush(allot_cell((cell)w->code + w->code->size));
+		dpush(allot_cell((cell)w->code + w->code->size()));
 	}
 }
 

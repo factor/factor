@@ -308,28 +308,23 @@ void factor_vm::dump_code_heap()
 	while(scan)
 	{
 		const char *status;
-		switch(scan->status)
-		{
-		case B_FREE:
+		if(scan->type() == FREE_BLOCK_TYPE)
 			status = "free";
-			break;
-		case B_ALLOCATED:
-			reloc_size += object_size(((code_block *)scan)->relocation);
-			literal_size += object_size(((code_block *)scan)->literals);
-			status = "allocated";
-			break;
-		case B_MARKED:
+		else if(scan->marked_p())
+		{
 			reloc_size += object_size(((code_block *)scan)->relocation);
 			literal_size += object_size(((code_block *)scan)->literals);
 			status = "marked";
-			break;
-		default:
-			status = "invalid";
-			break;
+		}
+		else
+		{
+			reloc_size += object_size(((code_block *)scan)->relocation);
+			literal_size += object_size(((code_block *)scan)->literals);
+			status = "allocated";
 		}
 
 		print_cell_hex((cell)scan); print_string(" ");
-		print_cell_hex(scan->size); print_string(" ");
+		print_cell_hex(scan->size()); print_string(" ");
 		print_string(status); print_string("\n");
 
 		scan = code->next_block(scan);
