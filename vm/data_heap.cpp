@@ -76,60 +76,52 @@ data_heap::~data_heap()
 	delete[] decks;
 }
 
-void factor_vm::clear_cards(cell from, cell to)
+void factor_vm::clear_cards(cell gen)
 {
 	/* NOTE: reverse order due to heap layout. */
-	card *first_card = addr_to_card(data->generations[to].start);
-	card *last_card = addr_to_card(data->generations[from].end);
+	card *first_card = addr_to_card(data->generations[gen].start);
+	card *last_card = addr_to_card(data->generations[gen].end);
 	memset(first_card,0,last_card - first_card);
 }
 
-void factor_vm::clear_decks(cell from, cell to)
+void factor_vm::clear_decks(cell gen)
 {
 	/* NOTE: reverse order due to heap layout. */
-	card_deck *first_deck = addr_to_deck(data->generations[to].start);
-	card_deck *last_deck = addr_to_deck(data->generations[from].end);
+	card_deck *first_deck = addr_to_deck(data->generations[gen].start);
+	card_deck *last_deck = addr_to_deck(data->generations[gen].end);
 	memset(first_deck,0,last_deck - first_deck);
 }
 
-void factor_vm::clear_allot_markers(cell from, cell to)
+void factor_vm::clear_allot_markers(cell gen)
 {
-	/* NOTE: reverse order due to heap layout. */
-	card *first_card = addr_to_allot_marker((object *)data->generations[to].start);
-	card *last_card = addr_to_allot_marker((object *)data->generations[from].end);
+	card *first_card = addr_to_allot_marker((object *)data->generations[gen].start);
+	card *last_card = addr_to_allot_marker((object *)data->generations[gen].end);
 	memset(first_card,invalid_allot_marker,last_card - first_card);
-}
-
-void factor_vm::reset_generation(cell i)
-{
-	zone *z = (i == data->nursery() ? &nursery : &data->generations[i]);
-
-	z->here = z->start;
-	if(secure_gc)
-		memset((void*)z->start,69,z->size);
 }
 
 /* After garbage collection, any generations which are now empty need to have
 their allocation pointers and cards reset. */
-void factor_vm::reset_generations(cell from, cell to)
+void factor_vm::reset_generation(cell gen)
 {
-	cell i;
-	for(i = from; i <= to; i++)
-		reset_generation(i);
+	assert(gen != data->nursery());
 
-	clear_cards(from,to);
-	clear_decks(from,to);
-	clear_allot_markers(from,to);
+	zone *z = &data->generations[gen];
+	z->here = z->start;
+	if(secure_gc) memset((void*)z->start,69,z->size);
+
+	clear_cards(gen);
+	clear_decks(gen);
+	clear_allot_markers(gen);
 }
 
 void factor_vm::set_data_heap(data_heap *data_)
 {
 	data = data_;
 	nursery = data->generations[data->nursery()];
+	nursery.here = nursery.start;
 	init_card_decks();
-	clear_cards(data->nursery(),data->tenured());
-	clear_decks(data->nursery(),data->tenured());
-	clear_allot_markers(data->nursery(),data->tenured());
+	reset_generation(data->aging());
+	reset_generation(data->tenured());
 }
 
 void factor_vm::init_data_heap(cell young_size, cell aging_size, cell tenured_size, bool secure_gc_)
