@@ -20,7 +20,7 @@ struct zone {
 	
 	inline bool contains_p(object *pointer)
 	{
-		return (cell)pointer >= start && (cell)pointer < end;
+		return ((cell)pointer - start) < size;
 	}
 };
 
