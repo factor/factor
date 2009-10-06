@@ -17,68 +17,6 @@ gc_state::gc_state(data_heap *data_, bool growing_data_heap_, cell collecting_ge
 
 gc_state::~gc_state() { }
 
-/* Given a pointer to oldspace, copy it to newspace */
-object *factor_vm::copy_untagged_object_impl(object *pointer, cell size)
-{
-	if(current_gc->newspace->here + size >= current_gc->newspace->end)
-		longjmp(current_gc->gc_unwind,1);
-
-	object *newpointer = allot_zone(current_gc->newspace,size);
-
-	gc_stats *s = &stats[current_gc->collecting_gen];
-	s->object_count++;
-	s->bytes_copied += size;
-
-	memcpy(newpointer,pointer,size);
-	return newpointer;
-}
-
-object *factor_vm::copy_object_impl(object *untagged)
-{
-	object *newpointer = copy_untagged_object_impl(untagged,untagged_object_size(untagged));
-	untagged->h.forward_to(newpointer);
-	return newpointer;
-}
-
-/* Follow a chain of forwarding pointers */
-template<typename Strategy> object *factor_vm::resolve_forwarding(object *untagged, Strategy &strategy)
-{
-	check_data_pointer(untagged);
-
-	/* is there another forwarding pointer? */
-	if(untagged->h.forwarding_pointer_p())
-		return resolve_forwarding(untagged->h.forwarding_pointer(),strategy);
-	/* we've found the destination */
-	else
-	{
-		untagged->h.check_header();
-		if(strategy.should_copy_p(untagged))
-			return copy_object_impl(untagged);
-		else
-			return untagged;
-	}
-}
-
-template<typename Type, typename Strategy> Type *factor_vm::copy_untagged_object(Type *untagged, Strategy &strategy)
-{
-	check_data_pointer(untagged);
-
-	if(untagged->h.forwarding_pointer_p())
-		untagged = (Type *)resolve_forwarding(untagged->h.forwarding_pointer(),strategy);
-	else
-	{
-		untagged->h.check_header();
-		untagged = (Type *)copy_object_impl(untagged);
-	}
-
-	return untagged;
-}
-
-template<typename Strategy> cell factor_vm::copy_object(cell pointer, Strategy &strategy)
-{
-	return RETAG(copy_untagged_object(untag<object>(pointer),strategy),TAG(pointer));
-}
-
 template<typename Strategy> void factor_vm::trace_handle(cell *handle, Strategy &strategy)
 {
 	cell pointer = *handle;
@@ -88,7 +26,7 @@ template<typename Strategy> void factor_vm::trace_handle(cell *handle, Strategy 
 		object *obj = untag<object>(pointer);
 		check_data_pointer(obj);
 		if(strategy.should_copy_p(obj))
-			*handle = copy_object(pointer,strategy);
+			*handle = strategy.copy_object(pointer);
 	}
 }
 
@@ -247,7 +185,7 @@ template<typename Strategy> void factor_vm::trace_registered_bignums(Strategy &s
 		{
 			check_data_pointer(pointer);
 			if(strategy.should_copy_p(pointer))
-				*handle = copy_untagged_object(pointer,strategy);
+				*handle = untag<bignum>(strategy.copy_object(tag<bignum>(pointer)));
 #ifdef FACTOR_DEBUG
 			assert((*handle)->h.hi_tag() == BIGNUM_TYPE);
 #endif
@@ -383,15 +321,18 @@ template<typename Strategy> struct literal_reference_tracer {
 aging and nursery collections */
 template<typename Strategy> void factor_vm::trace_code_heap_roots(Strategy &strategy)
 {
-	literal_reference_tracer<Strategy> tracer(this,strategy);
-	iterate_code_heap(tracer);
+	if(current_gc->collecting_gen >= last_code_heap_scan)
+	{
+		literal_reference_tracer<Strategy> tracer(this,strategy);
+		iterate_code_heap(tracer);
 
-	if(current_gc->collecting_accumulation_gen_p())
-		last_code_heap_scan = current_gc->collecting_gen;
-	else
-		last_code_heap_scan = current_gc->collecting_gen + 1;
-	
-	code_heap_scans++;
+		if(current_gc->collecting_accumulation_gen_p())
+			last_code_heap_scan = current_gc->collecting_gen;
+		else
+			last_code_heap_scan = current_gc->collecting_gen + 1;
+
+		code_heap_scans++;
+	}
 }
 
 /* Mark all literals referenced from a word XT. Only for tenured
@@ -404,37 +345,6 @@ template<typename Strategy> void factor_vm::mark_code_block(code_block *compiled
 
 	trace_handle(&compiled->literals,strategy);
 	trace_handle(&compiled->relocation,strategy);
-}
-
-template<typename Strategy> cell factor_vm::copy_next(cell scan, Strategy &strategy)
-{
-	cell *obj = (cell *)scan;
-	cell *end = (cell *)(scan + binary_payload_start((object *)scan));
-
-	if(obj != end)
-	{
-		obj++;
-
-		for(; obj < end; obj++)
-			trace_handle(obj,strategy);
-	}
-
-	return scan + untagged_object_size((object *)scan);
-}
-
-template<typename Strategy> void factor_vm::update_code_heap_roots(Strategy &strategy)
-{
-	if(current_gc->collecting_gen >= last_code_heap_scan)
-	{
-		code_heap_scans++;
-
-		trace_code_heap_roots(strategy);
-
-		if(current_gc->collecting_accumulation_gen_p())
-			last_code_heap_scan = current_gc->collecting_gen;
-		else
-			last_code_heap_scan = current_gc->collecting_gen + 1;
-	}
 }
 
 struct literal_and_word_reference_updater {
@@ -502,12 +412,107 @@ void factor_vm::begin_gc(cell requested_bytes)
 	}
 }
 
-struct nursery_collector
+template<typename Strategy>
+copying_collector<Strategy>::copying_collector(factor_vm *myvm_)
+: myvm(myvm_), current_gc(myvm_->current_gc)
 {
-	factor_vm *myvm;
+	scan = current_gc->newspace->here;
+}
 
-	explicit nursery_collector(factor_vm *myvm_) : myvm(myvm_) {}
-	
+template<typename Strategy> Strategy &copying_collector<Strategy>::strategy()
+{
+	return static_cast<Strategy &>(*this);
+}
+
+/* Given a pointer to oldspace, copy it to newspace */
+template<typename Strategy> object *copying_collector<Strategy>::copy_untagged_object_impl(object *pointer, cell size)
+{
+	if(current_gc->newspace->here + size >= current_gc->newspace->end)
+		longjmp(current_gc->gc_unwind,1);
+
+	object *newpointer = myvm->allot_zone(current_gc->newspace,size);
+
+	gc_stats *s = &myvm->stats[current_gc->collecting_gen];
+	s->object_count++;
+	s->bytes_copied += size;
+
+	memcpy(newpointer,pointer,size);
+	return newpointer;
+}
+
+template<typename Strategy> object *copying_collector<Strategy>::copy_object_impl(object *untagged)
+{
+	object *newpointer = copy_untagged_object_impl(untagged,myvm->untagged_object_size(untagged));
+	untagged->h.forward_to(newpointer);
+	return newpointer;
+}
+
+/* Follow a chain of forwarding pointers */
+template<typename Strategy> object *copying_collector<Strategy>::resolve_forwarding(object *untagged)
+{
+	myvm->check_data_pointer(untagged);
+
+	/* is there another forwarding pointer? */
+	if(untagged->h.forwarding_pointer_p())
+		return resolve_forwarding(untagged->h.forwarding_pointer());
+	/* we've found the destination */
+	else
+	{
+		untagged->h.check_header();
+		if(should_copy_p(untagged))
+			return copy_object_impl(untagged);
+		else
+			return untagged;
+	}
+}
+
+template<typename Strategy> cell copying_collector<Strategy>::copy_object(cell pointer)
+{
+	object *untagged = myvm->untag<object>(pointer);
+
+	myvm->check_data_pointer(untagged);
+
+	if(untagged->h.forwarding_pointer_p())
+		untagged = resolve_forwarding(untagged->h.forwarding_pointer());
+	else
+	{
+		untagged->h.check_header();
+		untagged = copy_object_impl(untagged);
+	}
+
+	return RETAG(untagged,TAG(pointer));
+}
+
+template<typename Strategy> bool copying_collector<Strategy>::should_copy_p(object *pointer)
+{
+	return strategy().should_copy_p(pointer);
+}
+
+template<typename Strategy> cell copying_collector<Strategy>::copy_next(cell scan)
+{
+	cell *obj = (cell *)scan;
+	cell *end = (cell *)(scan + myvm->binary_payload_start((object *)scan));
+
+	if(obj != end)
+	{
+		obj++;
+
+		for(; obj < end; obj++)
+			myvm->trace_handle(obj,strategy());
+	}
+
+	return scan + myvm->untagged_object_size((object *)scan);
+}
+
+template<typename Strategy> void copying_collector<Strategy>::go()
+{
+	strategy().copy_reachable_objects(scan,&current_gc->newspace->here);
+}
+
+struct nursery_collector : copying_collector<nursery_collector>
+{
+	explicit nursery_collector(factor_vm *myvm_) : copying_collector<nursery_collector>(myvm_) {}
+
 	bool should_copy_p(object *untagged)
 	{
 		if(myvm->current_gc->newspace->contains_p(untagged))
@@ -515,11 +520,10 @@ struct nursery_collector
 		else
 			return myvm->nursery.contains_p(untagged);
 	}
-	
+
 	void copy_reachable_objects(cell scan, cell *end)
 	{
-		while(scan < myvm->current_gc->newspace->here)
-			scan = myvm->copy_next(scan,*this);
+		while(scan < *end) scan = copy_next(scan);
 	}
 };
 
@@ -527,26 +531,18 @@ void factor_vm::collect_nursery()
 {
 	nursery_collector collector(this);
 
-        cell scan = current_gc->newspace->here;
-
         trace_roots(collector);
         trace_contexts(collector);
         trace_cards(collector);
-
-        if(current_gc->collecting_gen >= last_code_heap_scan)
-                update_code_heap_roots(collector);
-
-        collector.copy_reachable_objects(scan,&current_gc->newspace->here);
-
+	trace_code_heap_roots(collector);
+        collector.go();
         update_dirty_code_blocks();
 }
 
-struct aging_collector
+struct aging_collector : copying_collector<aging_collector>
 {
-	factor_vm *myvm;
+	explicit aging_collector(factor_vm *myvm_) : copying_collector<aging_collector>(myvm_) {}
 
-	explicit aging_collector(factor_vm *myvm_) : myvm(myvm_) {}
-	
 	bool should_copy_p(object *untagged)
 	{
 		if(myvm->current_gc->newspace->contains_p(untagged))
@@ -557,8 +553,7 @@ struct aging_collector
 	
 	void copy_reachable_objects(cell scan, cell *end)
 	{
-		while(scan < myvm->current_gc->newspace->here)
-			scan = myvm->copy_next(scan,*this);
+		while(scan < *end) scan = copy_next(scan);
 	}
 };
 
@@ -566,25 +561,17 @@ void factor_vm::collect_aging()
 {
 	aging_collector collector(this);
 
-        cell scan = current_gc->newspace->here;
-
         trace_roots(collector);
         trace_contexts(collector);
         trace_cards(collector);
-
-        if(current_gc->collecting_gen >= last_code_heap_scan)
-                update_code_heap_roots(collector);
-
-        collector.copy_reachable_objects(scan,&current_gc->newspace->here);
-
+	trace_code_heap_roots(collector);
+        collector.go();
         update_dirty_code_blocks();
 }
 
-struct tenured_collector
+struct tenured_collector : copying_collector<tenured_collector>
 {
-	factor_vm *myvm;
-
-	explicit tenured_collector(factor_vm *myvm_) : myvm(myvm_) {}
+	explicit tenured_collector(factor_vm *myvm_) : copying_collector<tenured_collector>(myvm_) {}
 	
 	bool should_copy_p(object *untagged)
 	{
@@ -593,10 +580,10 @@ struct tenured_collector
 	
 	void copy_reachable_objects(cell scan, cell *end)
 	{
-		while(scan < myvm->current_gc->newspace->here)
+		while(scan < *end)
 		{
 			myvm->mark_object_code_block(myvm->untag<object>(scan),*this);
-			scan = myvm->copy_next(scan,*this);
+			scan = copy_next(scan);
 		}
 	}
 };
@@ -605,14 +592,9 @@ void factor_vm::collect_tenured(bool trace_contexts_)
 {
 	tenured_collector collector(this);
 
-        cell scan = current_gc->newspace->here;
-
         trace_roots(collector);
-        if(trace_contexts_)
-        	trace_contexts(collector);
-
-        collector.copy_reachable_objects(scan,&current_gc->newspace->here);
-
+        if(trace_contexts_) trace_contexts(collector);
+        collector.go();
         free_unmarked_code_blocks();
 }
 
