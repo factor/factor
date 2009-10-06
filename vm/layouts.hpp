@@ -233,8 +233,8 @@ struct free_heap_block : public heap_block
 
 struct code_block : public heap_block
 {
-	cell unused;
-	cell literals; /* # bytes */
+	cell owner; /* tagged pointer to word, quotation or f */
+	cell literals; /* tagged pointer to array or f */
 	cell relocation; /* tagged pointer to byte-array or f */
 
 	void *xt() { return (void *)(this + 1); }

@@ -20,9 +20,7 @@ jit::jit(cell type_, cell owner_, factor_vm *vm)
 	  position(0),
 	  offset(0),
 	  parent_vm(vm)
-{
-	if(parent_vm->stack_traces_p()) literal(owner.value());
-}
+{}
 
 void jit::emit_relocation(cell code_template_)
 {
@@ -106,6 +104,7 @@ code_block *jit::to_code_block()
 		type,
 		code.elements.value(),
 		F, /* no labels */
+		owner.value(),
 		relocation.elements.value(),
 		literals.elements.value());
 }

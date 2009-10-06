@@ -208,7 +208,7 @@ IN: tools.deploy.shaker
     [ word? ] instances
     deploy-word-props? get [ 2dup strip-word-props ] unless
     deploy-word-defs? get [ dup strip-word-defs ] unless
-    strip-word-names? [ dup strip-word-names ] when
+    strip-word-names? [ dup strip-word-names strip-stack-traces ] when
     2drop ;
 
 : compiler-classes ( -- seq )

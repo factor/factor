@@ -37,7 +37,6 @@ struct vm_parameters {
 	bool secure_gc;
 	bool fep;
 	bool console;
-	bool stack_traces;
 	cell max_pic_size;
 };
 
