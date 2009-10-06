@@ -14,9 +14,6 @@ struct gc_state {
 	/* The data heap we're collecting */
 	data_heap *data;
 
-	/* New objects are copied here */
-	zone *newspace;
-
 	/* sometimes we grow the heap */
 	bool growing_data_heap;
 	data_heap *old_data_heap;
@@ -46,7 +43,7 @@ struct gc_state {
 
 	inline bool collecting_aging_p()
 	{
-		return data->have_aging_p() && collecting_gen == data->aging();
+		return collecting_gen == data->aging();
 	}
 
 	inline bool collecting_tenured_p()
@@ -56,22 +53,21 @@ struct gc_state {
 
 	inline bool collecting_accumulation_gen_p()
 	{
-		return ((data->have_aging_p()
-			 && collecting_gen == data->aging()
-			 && !collecting_aging_again)
-			|| collecting_gen == data->tenured());
+		return ((collecting_aging_p() && !collecting_aging_again)
+			|| collecting_tenured_p());
 	}
 };
 
 template<typename Strategy> struct copying_collector {
 	factor_vm *myvm;
 	gc_state *current_gc;
+	zone *newspace;
 	cell scan;
 
-	explicit copying_collector(factor_vm *myvm_);
+	explicit copying_collector(factor_vm *myvm_, zone *newspace);
 	Strategy &strategy();
 	object *copy_untagged_object_impl(object *pointer, cell size);
-	cell copy_next(cell scan);
+	cell trace_next(cell scan);
 	object *copy_object_impl(object *untagged);
 	object *resolve_forwarding(object *untagged);
 	cell copy_object(cell pointer);

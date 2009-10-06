@@ -21,7 +21,6 @@ void factor_vm::default_parameters(vm_parameters *p)
 	p->ds_size = 8 * sizeof(cell);
 	p->rs_size = 8 * sizeof(cell);
 
-	p->gen_count = 2;
 	p->code_size = 4;
 	p->young_size = 1;
 	p->aging_size = 1;
@@ -30,7 +29,6 @@ void factor_vm::default_parameters(vm_parameters *p)
 	p->ds_size = 32 * sizeof(cell);
 	p->rs_size = 32 * sizeof(cell);
 
-	p->gen_count = 3;
 	p->code_size = 8 * sizeof(cell);
 	p->young_size = sizeof(cell) / 4;
 	p->aging_size = sizeof(cell) / 2;
@@ -78,7 +76,6 @@ void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **
 	{
 		if(factor_arg(argv[i],STRING_LITERAL("-datastack=%d"),&p->ds_size));
 		else if(factor_arg(argv[i],STRING_LITERAL("-retainstack=%d"),&p->rs_size));
-		else if(factor_arg(argv[i],STRING_LITERAL("-generations=%d"),&p->gen_count));
 		else if(factor_arg(argv[i],STRING_LITERAL("-young=%d"),&p->young_size));
 		else if(factor_arg(argv[i],STRING_LITERAL("-aging=%d"),&p->aging_size));
 		else if(factor_arg(argv[i],STRING_LITERAL("-tenured=%d"),&p->tenured_size));

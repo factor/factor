@@ -24,8 +24,9 @@
 #include <time.h>
 
 /* C++ headers */
-#include <vector>
+#include <algorithm>
 #include <set>
+#include <vector>
 
 #if __GNUC__ == 4
         #include <tr1/unordered_map>

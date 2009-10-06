@@ -74,7 +74,7 @@ template<typename Strategy> void factor_vm::trace_card_deck(card_deck *deck, cel
 	decks_scanned++;
 }
 
-/* Copy all newspace objects referenced from marked cards to the destination */
+/* Trace all objects referenced from marked cards */
 template<typename Strategy> void factor_vm::trace_generation_cards(cell gen, Strategy &strategy)
 {
 	card_deck *first_deck = addr_to_deck(data->generations[gen].start);
@@ -95,7 +95,7 @@ template<typename Strategy> void factor_vm::trace_generation_cards(cell gen, Str
 			unmask = card_points_to_nursery;
 		/* after the collection, all cards in aging space can be
 		cleared */
-		else if(data->have_aging_p() && gen == data->aging())
+		else if(gen == data->aging())
 			unmask = card_mark_mask;
 		else
 		{
@@ -106,7 +106,7 @@ template<typename Strategy> void factor_vm::trace_generation_cards(cell gen, Str
 	/* if we are collecting aging space into tenured space, we care about
 	all old->nursery and old->aging pointers. no old->aging pointers can
 	remain */
-	else if(data->have_aging_p() && current_gc->collecting_gen == data->aging())
+	else if(current_gc->collecting_aging_p())
 	{
 		if(current_gc->collecting_aging_again)
 		{
@@ -147,7 +147,7 @@ template<typename Strategy> void factor_vm::trace_cards(Strategy &strategy)
 	u64 start = current_micros();
 
 	cell i;
-	for(i = current_gc->collecting_gen + 1; i < data->gen_count; i++)
+	for(i = current_gc->collecting_gen + 1; i < gen_count; i++)
 		trace_generation_cards(i,strategy);
 
 	card_scan_time += (current_micros() - start);
@@ -284,8 +284,7 @@ template<typename Strategy> void factor_vm::trace_contexts(Strategy &strategy)
 	}
 }
 
-/* Copy all literals referenced from a code block to newspace. Only for
-aging and nursery collections */
+/* Trace all literals referenced from a code block. Only for aging and nursery collections */
 template<typename Strategy> void factor_vm::trace_literal_references(code_block *compiled, Strategy &strategy)
 {
 	if(current_gc->collecting_gen >= compiled->last_scan)
@@ -317,8 +316,7 @@ template<typename Strategy> struct literal_reference_tracer {
 	}
 };
 
-/* Copy literals referenced from all code blocks to newspace. Only for
-aging and nursery collections */
+/* Trace literals referenced from all code blocks. Only for aging and nursery collections */
 template<typename Strategy> void factor_vm::trace_code_heap_roots(Strategy &strategy)
 {
 	if(current_gc->collecting_gen >= code->last_code_heap_scan)
@@ -379,44 +377,11 @@ void factor_vm::update_dirty_code_blocks()
 	dirty_code_blocks.clear();
 }
 
-/* Prepare to start copying reachable objects into an unused zone */
-void factor_vm::begin_gc(cell requested_bytes)
-{
-	if(current_gc->growing_data_heap)
-	{
-		assert(current_gc->collecting_tenured_p());
-
-		current_gc->old_data_heap = data;
-		set_data_heap(grow_data_heap(current_gc->old_data_heap,requested_bytes));
-		current_gc->newspace = &data->generations[data->tenured()];
-	}
-	else if(current_gc->collecting_accumulation_gen_p())
-	{
-		/* when collecting one of these generations, rotate it
-		with the semispace */
-		zone z = data->generations[current_gc->collecting_gen];
-		data->generations[current_gc->collecting_gen] = data->semispaces[current_gc->collecting_gen];
-		data->semispaces[current_gc->collecting_gen] = z;
-		reset_generation(current_gc->collecting_gen);
-		current_gc->newspace = &data->generations[current_gc->collecting_gen];
-		clear_cards(current_gc->collecting_gen,current_gc->collecting_gen);
-		clear_decks(current_gc->collecting_gen,current_gc->collecting_gen);
-		clear_allot_markers(current_gc->collecting_gen,current_gc->collecting_gen);
-	}
-	else
-	{
-		/* when collecting a younger generation, we copy
-		reachable objects to the next oldest generation,
-		so we set the newspace so the next generation. */
-		current_gc->newspace = &data->generations[current_gc->collecting_gen + 1];
-	}
-}
-
 template<typename Strategy>
-copying_collector<Strategy>::copying_collector(factor_vm *myvm_)
-: myvm(myvm_), current_gc(myvm_->current_gc)
+copying_collector<Strategy>::copying_collector(factor_vm *myvm_, zone *newspace_)
+: myvm(myvm_), current_gc(myvm_->current_gc), newspace(newspace_)
 {
-	scan = current_gc->newspace->here;
+	scan = newspace->here;
 }
 
 template<typename Strategy> Strategy &copying_collector<Strategy>::strategy()
@@ -427,10 +392,10 @@ template<typename Strategy> Strategy &copying_collector<Strategy>::strategy()
 /* Given a pointer to oldspace, copy it to newspace */
 template<typename Strategy> object *copying_collector<Strategy>::copy_untagged_object_impl(object *pointer, cell size)
 {
-	if(current_gc->newspace->here + size >= current_gc->newspace->end)
+	if(newspace->here + size >= newspace->end)
 		longjmp(current_gc->gc_unwind,1);
 
-	object *newpointer = myvm->allot_zone(current_gc->newspace,size);
+	object *newpointer = myvm->allot_zone(newspace,size);
 
 	gc_stats *s = &myvm->stats[current_gc->collecting_gen];
 	s->object_count++;
@@ -488,7 +453,7 @@ template<typename Strategy> bool copying_collector<Strategy>::should_copy_p(obje
 	return strategy().should_copy_p(pointer);
 }
 
-template<typename Strategy> cell copying_collector<Strategy>::copy_next(cell scan)
+template<typename Strategy> cell copying_collector<Strategy>::trace_next(cell scan)
 {
 	cell *obj = (cell *)scan;
 	cell *end = (cell *)(scan + myvm->binary_payload_start((object *)scan));
@@ -506,16 +471,17 @@ template<typename Strategy> cell copying_collector<Strategy>::copy_next(cell sca
 
 template<typename Strategy> void copying_collector<Strategy>::go()
 {
-	strategy().copy_reachable_objects(scan,&current_gc->newspace->here);
+	strategy().copy_reachable_objects(scan,&newspace->here);
 }
 
 struct nursery_collector : copying_collector<nursery_collector>
 {
-	explicit nursery_collector(factor_vm *myvm_) : copying_collector<nursery_collector>(myvm_) {}
+	explicit nursery_collector(factor_vm *myvm_, zone *newspace_) :
+		copying_collector<nursery_collector>(myvm_,newspace_) {}
 
 	bool should_copy_p(object *untagged)
 	{
-		if(myvm->current_gc->newspace->contains_p(untagged))
+		if(newspace->contains_p(untagged))
 			return false;
 		else
 			return myvm->nursery.contains_p(untagged);
@@ -523,29 +489,18 @@ struct nursery_collector : copying_collector<nursery_collector>
 
 	void copy_reachable_objects(cell scan, cell *end)
 	{
-		while(scan < *end) scan = copy_next(scan);
+		while(scan < *end) scan = trace_next(scan);
 	}
 };
 
-void factor_vm::collect_nursery()
-{
-	nursery_collector collector(this);
-
-        trace_roots(collector);
-        trace_contexts(collector);
-        trace_cards(collector);
-	trace_code_heap_roots(collector);
-        collector.go();
-        update_dirty_code_blocks();
-}
-
 struct aging_collector : copying_collector<aging_collector>
 {
-	explicit aging_collector(factor_vm *myvm_) : copying_collector<aging_collector>(myvm_) {}
+	explicit aging_collector(factor_vm *myvm_, zone *newspace_) :
+		copying_collector<aging_collector>(myvm_,newspace_) {}
 
 	bool should_copy_p(object *untagged)
 	{
-		if(myvm->current_gc->newspace->contains_p(untagged))
+		if(newspace->contains_p(untagged))
 			return false;
 		else
 			return !myvm->data->generations[myvm->data->tenured()].contains_p(untagged);
@@ -553,29 +508,34 @@ struct aging_collector : copying_collector<aging_collector>
 	
 	void copy_reachable_objects(cell scan, cell *end)
 	{
-		while(scan < *end) scan = copy_next(scan);
+		while(scan < *end) scan = trace_next(scan);
 	}
 };
 
-void factor_vm::collect_aging()
+struct aging_again_collector : copying_collector<aging_again_collector>
 {
-	aging_collector collector(this);
+	explicit aging_again_collector(factor_vm *myvm_, zone *newspace_) :
+		copying_collector<aging_again_collector>(myvm_,newspace_) {}
 
-        trace_roots(collector);
-        trace_contexts(collector);
-        trace_cards(collector);
-	trace_code_heap_roots(collector);
-        collector.go();
-        update_dirty_code_blocks();
-}
+	bool should_copy_p(object *untagged)
+	{
+		return !newspace->contains_p(untagged);
+	}
+	
+	void copy_reachable_objects(cell scan, cell *end)
+	{
+		while(scan < *end) scan = trace_next(scan);
+	}
+};
 
 struct tenured_collector : copying_collector<tenured_collector>
 {
-	explicit tenured_collector(factor_vm *myvm_) : copying_collector<tenured_collector>(myvm_) {}
+	explicit tenured_collector(factor_vm *myvm_, zone *newspace_) :
+		copying_collector<tenured_collector>(myvm_,newspace_) {}
 	
 	bool should_copy_p(object *untagged)
 	{
-		return !myvm->current_gc->newspace->contains_p(untagged);
+		return !newspace->contains_p(untagged);
 	}
 	
 	void copy_reachable_objects(cell scan, cell *end)
@@ -583,22 +543,83 @@ struct tenured_collector : copying_collector<tenured_collector>
 		while(scan < *end)
 		{
 			myvm->mark_object_code_block(myvm->untag<object>(scan),*this);
-			scan = copy_next(scan);
+			scan = trace_next(scan);
 		}
 	}
 };
 
-void factor_vm::collect_tenured(bool trace_contexts_)
+void factor_vm::collect_nursery()
 {
-	tenured_collector collector(this);
+	nursery_collector collector(this,&data->generations[data->aging()]);
+
+	trace_roots(collector);
+	trace_contexts(collector);
+	trace_cards(collector);
+	trace_code_heap_roots(collector);
+	collector.go();
+	update_dirty_code_blocks();
+
+	nursery.here = nursery.start;
+}
+
+void factor_vm::collect_aging()
+{
+	std::swap(data->generations[data->aging()],data->semispaces[data->aging()]);
+	reset_generations(data->aging(),data->aging());
+
+	aging_collector collector(this,&data->generations[data->aging()]);
+
+	trace_roots(collector);
+	trace_contexts(collector);
+	trace_cards(collector);
+	trace_code_heap_roots(collector);
+	collector.go();
+	update_dirty_code_blocks();
+
+	reset_generations(data->nursery(),data->nursery());
+}
+
+void factor_vm::collect_aging_again()
+{
+	aging_again_collector collector(this,&data->generations[data->tenured()]);
+
+	trace_roots(collector);
+	trace_contexts(collector);
+	trace_cards(collector);
+	trace_code_heap_roots(collector);
+	collector.go();
+	update_dirty_code_blocks();
+
+	reset_generations(data->nursery(),data->aging());
+}
+
+void factor_vm::collect_tenured(cell requested_bytes, bool trace_contexts_)
+{
+	if(current_gc->growing_data_heap)
+	{
+		current_gc->old_data_heap = data;
+		set_data_heap(grow_data_heap(current_gc->old_data_heap,requested_bytes));
+	}
+	else
+	{
+		std::swap(data->generations[data->tenured()],data->semispaces[data->tenured()]);
+		reset_generations(data->tenured(),data->tenured());
+	}
+
+	tenured_collector collector(this,&data->generations[data->tenured()]);
 
         trace_roots(collector);
         if(trace_contexts_) trace_contexts(collector);
         collector.go();
         free_unmarked_code_blocks();
+
+	reset_generations(data->nursery(),data->aging());
+
+	if(current_gc->growing_data_heap)
+		delete current_gc->old_data_heap;
 }
 
-void factor_vm::end_gc()
+void factor_vm::record_gc_stats()
 {
 	gc_stats *s = &stats[current_gc->collecting_gen];
 
@@ -607,24 +628,6 @@ void factor_vm::end_gc()
 	s->gc_time += gc_elapsed;
 	if(s->max_gc_time < gc_elapsed)
 		s->max_gc_time = gc_elapsed;
-
-	if(current_gc->growing_data_heap)
-		delete current_gc->old_data_heap;
-
-	if(current_gc->collecting_nursery_p())
-	{
-		nursery.here = nursery.start;
-	}
-	else if(current_gc->collecting_accumulation_gen_p())
-	{
-		reset_generations(data->nursery(),current_gc->collecting_gen - 1);
-	}
-	else
-	{
-		/* all generations up to and including the one
-		collected are now empty */
-		reset_generations(data->nursery(),current_gc->collecting_gen);
-	}
 }
 
 /* Collect gen and all younger generations.
@@ -657,8 +660,7 @@ void factor_vm::garbage_collection(cell collecting_gen_, bool growing_data_heap_
                 }
                 /* we try collecting aging space twice before going on to
                 collect tenured */
-                else if(data->have_aging_p()
-                        && current_gc->collecting_gen == data->aging()
+                else if(current_gc->collecting_aging_p()
                         && !current_gc->collecting_aging_again)
                 {
                         current_gc->collecting_aging_again = true;
@@ -670,16 +672,19 @@ void factor_vm::garbage_collection(cell collecting_gen_, bool growing_data_heap_
                 }
         }
 
-        begin_gc(requested_bytes);
-
         if(current_gc->collecting_nursery_p())
         	collect_nursery();
         else if(current_gc->collecting_aging_p())
-        	collect_aging();
+	{
+		if(current_gc->collecting_aging_again)
+			collect_aging_again();
+		else
+			collect_aging();
+	}
         else if(current_gc->collecting_tenured_p())
-        	collect_tenured(trace_contexts_);
+        	collect_tenured(requested_bytes,trace_contexts_);
 
-	end_gc();
+	record_gc_stats();
 
 	delete current_gc;
 	current_gc = NULL;
@@ -702,7 +707,7 @@ void factor_vm::primitive_gc_stats()
 	cell i;
 	u64 total_gc_time = 0;
 
-	for(i = 0; i < max_gen_count; i++)
+	for(i = 0; i < gen_count; i++)
 	{
 		gc_stats *s = &stats[i];
 		result.add(allot_cell(s->collections));
@@ -727,7 +732,7 @@ void factor_vm::primitive_gc_stats()
 
 void factor_vm::clear_gc_stats()
 {
-	for(cell i = 0; i < max_gen_count; i++)
+	for(cell i = 0; i < gen_count; i++)
 		memset(&stats[i],0,sizeof(gc_stats));
 
 	cards_scanned = 0;

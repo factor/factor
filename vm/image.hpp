@@ -32,7 +32,7 @@ struct vm_parameters {
 	const vm_char *image_path;
 	const vm_char *executable_path;
 	cell ds_size, rs_size;
-	cell gen_count, young_size, aging_size, tenured_size;
+	cell young_size, aging_size, tenured_size;
 	cell code_size;
 	bool secure_gc;
 	bool fep;
