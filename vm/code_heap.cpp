@@ -5,6 +5,18 @@ namespace factor
 
 code_heap::code_heap(factor_vm *myvm, cell size) : heap(myvm,size) {}
 
+void code_heap::write_barrier(code_block *compiled)
+{
+	remembered_set[compiled] = myvm->data->nursery();
+	youngest_referenced_generation = myvm->data->nursery();
+}
+
+void code_heap::code_heap_free(code_block *compiled)
+{
+	remembered_set.erase(compiled);
+	heap_free(compiled);
+}
+
 /* Allocate a code heap during startup */
 void factor_vm::init_code_heap(cell size)
 {

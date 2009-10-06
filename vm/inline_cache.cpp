@@ -28,7 +28,7 @@ void factor_vm::deallocate_inline_cache(cell return_address)
 #endif
 
 	if(old_type == PIC_TYPE)
-		code->heap_free(old_block);
+		code->code_heap_free(old_block);
 }
 
 /* Figure out what kind of type check the PIC needs based on the methods

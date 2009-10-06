@@ -341,7 +341,7 @@ void factor_vm::update_word_references(code_block *compiled)
 	   the code heap with dead PICs that will be freed on the next
 	   GC, we add them to the free list immediately. */
 	else if(compiled->type == PIC_TYPE)
-		code->heap_free(compiled);
+		code->code_heap_free(compiled);
 	else
 	{
 		word_references_updater updater(this);
@@ -372,16 +372,10 @@ struct code_block_relocator {
 /* Perform all fixups on a code block */
 void factor_vm::relocate_code_block(code_block *compiled)
 {
-	compiled->last_scan = data->nursery();
 	compiled->needs_fixup = false;
 	code_block_relocator relocator(this);
 	iterate_relocations(compiled,relocator);
 	flush_icache_for(compiled);
-}
-
-void relocate_code_block(code_block *compiled, factor_vm *myvm)
-{
-	return myvm->relocate_code_block(compiled);
 }
 
 /* Fixup labels. This is done at compile time, not image load time */
@@ -443,7 +437,6 @@ code_block *factor_vm::add_code_block(cell type, cell code_, cell labels_, cell 
 
 	/* compiled header */
 	compiled->type = type;
-	compiled->last_scan = data->nursery();
 	compiled->needs_fixup = true;
 
 	/* slight space optimization */
@@ -466,7 +459,7 @@ code_block *factor_vm::add_code_block(cell type, cell code_, cell labels_, cell 
 
 	/* next time we do a minor GC, we have to scan the code heap for
 	literals */
-	this->code->last_code_heap_scan = data->nursery();
+	this->code->write_barrier(compiled);
 
 	return compiled;
 }

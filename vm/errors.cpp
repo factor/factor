@@ -29,7 +29,7 @@ void factor_vm::throw_error(cell error, stack_frame *callstack_top)
 {
 	/* If the error handler is set, we rewind any C stack frames and
 	pass the error to user-space. */
-	if(userenv[BREAK_ENV] != F)
+	if(!current_gc && userenv[BREAK_ENV] != F)
 	{
 		/* If error was thrown during heap scan, we re-enable the GC */
 		gc_off = false;
