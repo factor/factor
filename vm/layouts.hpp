@@ -207,7 +207,7 @@ struct heap_block
 {
 	unsigned char status; /* free or allocated? */
 	unsigned char type; /* this is WORD_TYPE or QUOTATION_TYPE */
-	unsigned char last_scan; /* the youngest generation in which this block's literals may live */
+	unsigned char unused;
 	unsigned char needs_fixup; /* is this a new block that needs full fixup? */
 
 	/* In bytes, includes this header */

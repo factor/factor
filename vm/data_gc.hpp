@@ -25,9 +25,6 @@ struct gc_state {
 	   full, we go on to collect tenured */
 	bool collecting_aging_again;
 
-	/* A set of code blocks which need to have their literals updated */
-	std::set<code_block *> dirty_code_blocks;
-
 	/* GC start time, for benchmarking */
 	u64 start_time;
 

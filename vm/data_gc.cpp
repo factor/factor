@@ -5,7 +5,7 @@ namespace factor
 
 void factor_vm::init_data_gc()
 {
-	code->last_code_heap_scan = data->nursery();
+	code->youngest_referenced_generation = data->nursery();
 }
 
 gc_state::gc_state(data_heap *data_, bool growing_data_heap_, cell collecting_gen_) :
@@ -287,47 +287,23 @@ template<typename Strategy> void factor_vm::trace_contexts(Strategy &strategy)
 /* Trace all literals referenced from a code block. Only for aging and nursery collections */
 template<typename Strategy> void factor_vm::trace_literal_references(code_block *compiled, Strategy &strategy)
 {
-	if(current_gc->collecting_gen >= compiled->last_scan)
-	{
-		if(current_gc->collecting_accumulation_gen_p())
-			compiled->last_scan = current_gc->collecting_gen;
-		else
-			compiled->last_scan = current_gc->collecting_gen + 1;
-
-		trace_handle(&compiled->literals,strategy);
-		trace_handle(&compiled->relocation,strategy);
-
-		/* once we finish tracing, re-visit this code block and update
-		literals */
-		current_gc->dirty_code_blocks.insert(compiled);
-	}
+	trace_handle(&compiled->literals,strategy);
+	trace_handle(&compiled->relocation,strategy);
 }
-
-template<typename Strategy> struct literal_reference_tracer {
-	factor_vm *myvm;
-	Strategy strategy;
-
-	explicit literal_reference_tracer(factor_vm *myvm_, Strategy &strategy_) :
-		myvm(myvm_), strategy(strategy_) {}
-
-	void operator()(code_block *compiled)
-	{
-		myvm->trace_literal_references(compiled,strategy);
-	}
-};
 
 /* Trace literals referenced from all code blocks. Only for aging and nursery collections */
 template<typename Strategy> void factor_vm::trace_code_heap_roots(Strategy &strategy)
 {
-	if(current_gc->collecting_gen >= code->last_code_heap_scan)
+	if(current_gc->collecting_gen >= code->youngest_referenced_generation)
 	{
-		literal_reference_tracer<Strategy> tracer(this,strategy);
-		iterate_code_heap(tracer);
+		unordered_map<code_block *,cell>::const_iterator iter = code->remembered_set.begin();
+		unordered_map<code_block *,cell>::const_iterator end = code->remembered_set.end();
 
-		if(current_gc->collecting_accumulation_gen_p())
-			code->last_code_heap_scan = current_gc->collecting_gen;
-		else
-			code->last_code_heap_scan = current_gc->collecting_gen + 1;
+		for(; iter != end; iter++)
+		{
+			if(current_gc->collecting_gen >= iter->second)
+				trace_literal_references(iter->first,strategy);
+		}
 
 		code_heap_scans++;
 	}
@@ -340,9 +316,7 @@ template<typename Strategy> void factor_vm::mark_code_block(code_block *compiled
 	check_code_address((cell)compiled);
 
 	code->mark_block(compiled);
-
-	trace_handle(&compiled->literals,strategy);
-	trace_handle(&compiled->relocation,strategy);
+	trace_literal_references(compiled,strategy);
 }
 
 struct literal_and_word_reference_updater {
@@ -362,19 +336,34 @@ void factor_vm::free_unmarked_code_blocks()
 {
 	literal_and_word_reference_updater updater(this);
 	code->free_unmarked(updater);
-	code->last_code_heap_scan = current_gc->collecting_gen;
+	code->remembered_set.clear();
+	code->youngest_referenced_generation = data->tenured();
 }
 
 void factor_vm::update_dirty_code_blocks()
 {
-	std::set<code_block *> dirty_code_blocks = current_gc->dirty_code_blocks;
-	std::set<code_block *>::const_iterator iter = dirty_code_blocks.begin();
-	std::set<code_block *>::const_iterator end = dirty_code_blocks.end();
+	/* The youngest generation that any code block can now reference */
+	cell gen;
+
+	if(current_gc->collecting_accumulation_gen_p())
+		gen = current_gc->collecting_gen;
+	else
+		gen = current_gc->collecting_gen + 1;
+
+	unordered_map<code_block *,cell>::iterator iter = code->remembered_set.begin();
+	unordered_map<code_block *,cell>::iterator end = code->remembered_set.end();
 
 	for(; iter != end; iter++)
-		update_literal_references(*iter);
+	{
+		if(current_gc->collecting_gen >= iter->second)
+		{
+			check_code_address((cell)iter->first);
+			update_literal_references(iter->first);
+			iter->second = gen;
+		}
+	}
 
-	dirty_code_blocks.clear();
+	code->youngest_referenced_generation = gen;
 }
 
 template<typename Strategy>
@@ -635,11 +624,8 @@ If growing_data_heap_ is true, we must grow the data heap to such a size that
 an allocation of requested_bytes won't fail */
 void factor_vm::garbage_collection(cell collecting_gen_, bool growing_data_heap_, bool trace_contexts_, cell requested_bytes)
 {
-	if(gc_off)
-	{
-		critical_error("GC disabled",collecting_gen_);
-		return;
-	}
+	assert(!gc_off);
+	assert(!current_gc);
 
 	current_gc = new gc_state(data,growing_data_heap_,collecting_gen_);
 
