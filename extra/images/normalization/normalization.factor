@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel accessors grouping sequences
 combinators math byte-arrays fry images half-floats
-specialized-arrays ;
+specialized-arrays words ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: ushort
@@ -29,7 +29,8 @@ IN: images.normalization
 
 ! TODO RGBX, XRGB, BGRX, XBGR conversions
 
-! BGR>
+: BGR>BGR ( bitmap -- bitmap' ) ;
+
 : BGR>RGB ( bitmap -- bitmap' )
     3 <sliced-groups> [ <reversed> ] map concat ; inline
 
@@ -40,7 +41,8 @@ IN: images.normalization
 : BGR>ARGB ( bitmap -- bitmap' )
     3 <sliced-groups> [ 255 suffix <reversed> ] map concat ; inline
 
-! BGRA>
+: BGRA>BGRA ( bitmap -- bitmap' ) ;
+
 : BGRA>BGR ( bitmap -- bitmap' )
     4 <sliced-groups> [ but-last-slice ] map concat ; inline
 
@@ -54,7 +56,8 @@ IN: images.normalization
 : BGRA>ARGB ( bitmap -- bitmap' )
     4 <sliced-groups> [ <reversed> ] map concat ; inline
 
-! RGB>
+: RGB>RGB ( bitmap -- bitmap' ) ;
+
 : RGB>BGR ( bitmap -- bitmap' ) BGR>RGB ; inline
 
 : RGB>RGBA ( bitmap -- bitmap' ) add-dummy-alpha ; inline
@@ -65,7 +68,7 @@ IN: images.normalization
 : RGB>ARGB ( bitmap -- bitmap' )
     3 <sliced-groups> [ 255 prefix ] map concat ; inline
 
-! RGBA>
+: RGBA>RGBA ( bitmap -- bitmap' ) ;
 
 : RGBA>BGR ( bitmap -- bitmap' ) BGRA>RGB ; inline
 
@@ -76,7 +79,7 @@ IN: images.normalization
 : RGBA>ARGB ( bitmap -- bitmap' )
     4 <sliced-groups> [ unclip-last-slice prefix ] map concat ; inline
 
-! ARGB>
+: ARGB>ARGB ( bitmap -- bitmap' ) ;
 
 : ARGB>RGB ( bitmap -- bitmap' )
     4 <sliced-groups> [ rest-slice ] map concat ; inline
@@ -91,67 +94,19 @@ IN: images.normalization
     4 <sliced-groups>
     [ unclip-slice [ <reversed> ] dip suffix ] map concat ; inline
 
-! Dispatch
-GENERIC# convert-component-order 1 ( image src-order dest-order -- image )
-
-M: RGB convert-component-order
-    nip [ >>component-order ] keep {
-        { RGB  [ ] }
-        { RGBA [ [ RGB>RGBA ] change-bitmap ] }
-        { BGRA [ [ BGR>BGRA ] change-bitmap ] }
-        { ARGB [ [ RGB>RGBA RGBA>ARGB ] change-bitmap ] }
-        { BGR  [ [ RGB>BGR ] change-bitmap ] }
-        [ "Cannot convert from RGB to desired component order!" throw ]
-    } case ;
-
-M: RGBA convert-component-order
-    nip [ >>component-order ] keep {
-        { RGBA [ ] }
-        { BGRA [ [ RGBA>BGRA ] change-bitmap ] }
-        { BGR  [ [ RGBA>BGR ] change-bitmap ] }
-        { RGB  [ [ RGBA>RGB ] change-bitmap ] }
-        { ARGB [ [ RGBA>ARGB ] change-bitmap ] }
-        [ "Cannot convert from RGBA to desired component order!" throw ]
-    } case ;
-
-M: BGR convert-component-order
-    nip [ >>component-order ] keep {
-        { BGR  [ ] }
-        { BGRA [ [ BGR>BGRA ] change-bitmap ] }
-        { RGB  [ [ BGR>RGB ] change-bitmap ] }
-        { RGBA [ [ BGR>RGBA ] change-bitmap ] }
-        { ARGB [ [ BGR>ARGB ] change-bitmap ] }
-        [ "Cannot convert from BGR to desired component order!" throw ]
-    } case ;
-
-M: BGRA convert-component-order
-    nip [ >>component-order ] keep {
-        { BGRA [ ] }
-        { BGR  [ [ BGRA>BGR ] change-bitmap ] }
-        { RGB  [ [ BGRA>RGB ] change-bitmap ] }
-        { RGBA [ [ BGRA>RGBA ] change-bitmap ] }
-        { ARGB [ [ BGRA>ARGB ] change-bitmap ] }
-        [ "Cannot convert from BGRA to desired component order!" throw ]
-    } case ;
-
-M: ARGB convert-component-order
-    nip [ >>component-order ] keep {
-        { ARGB [ ] }
-        { BGR  [ [ ARGB>BGR ] change-bitmap ] }
-        { RGB  [ [ ARGB>RGB ] change-bitmap ] }
-        { RGBA [ [ ARGB>RGBA ] change-bitmap ] }
-        { BGRA [ [ ARGB>BGRA ] change-bitmap ] }
-        [ "Cannot convert from ARGB to desired component order!" throw ]
-    } case ;
+: (reorder-colors) ( image src-order des-order -- image )
+    [ name>> ] bi@ ">" glue "images.normalization.private" lookup
+    [ '[ _ execute( image -- image' ) ] change-bitmap ]
+    [ "No component-order conversion found." throw ]
+    if* ;
 
 PRIVATE>
 
-! asserts that component-type must be ubyte-components
 : reorder-colors ( image component-order -- image )
     [
         [ component-type>> ubyte-components assert= ]
         [ dup component-order>> ] bi
-    ] dip convert-component-order ;
+    ] dip (reorder-colors) ;
 
 <PRIVATE
 
