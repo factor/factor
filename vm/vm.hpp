@@ -236,11 +236,6 @@ struct factor_vm
 	u64 decks_scanned;
 	u64 card_scan_time;
 	cell code_heap_scans;
-	/* What generation was being collected when trace_code_heap_roots() was last
-	   called? Until the next call to add_code_block(), future
-	   collections of younger generations don't have to touch the code
-	   heap. */
-	cell last_code_heap_scan;
 
 	void init_data_gc();
 	template<typename Strategy> void trace_handle(cell *handle, Strategy &strategy);
@@ -526,8 +521,14 @@ struct factor_vm
 	}
 
 	//code_heap
-	heap *code;
-	unordered_map<heap_block *, char *> forwarding;
+	code_heap *code;
+
+	inline void check_code_pointer(cell ptr)
+	{
+	#ifdef FACTOR_DEBUG
+		assert(in_code_heap_p(ptr));
+	#endif
+	}
 
 	void init_code_heap(cell size);
 	bool in_code_heap_p(cell ptr);
@@ -539,7 +540,6 @@ struct factor_vm
 	void forward_object_xts();
 	void fixup_object_xts();
 	void compact_code_heap();
-	inline void check_code_pointer(cell ptr);
 
 	/* Apply a function to every code block */
 	template<typename Iterator> void iterate_code_heap(Iterator &iter)
