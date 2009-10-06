@@ -3,10 +3,12 @@
 namespace factor
 {
 
+code_heap::code_heap(factor_vm *myvm, cell size) : heap(myvm,size) {}
+
 /* Allocate a code heap during startup */
 void factor_vm::init_code_heap(cell size)
 {
-	code = new heap(this,size);
+	code = new code_heap(this,size);
 }
 
 bool factor_vm::in_code_heap_p(cell ptr)
@@ -27,6 +29,16 @@ void factor_vm::jit_compile_word(cell word_, cell def_, bool relocate)
 	if(word->pic_def != F) jit_compile(word->pic_def,relocate);
 	if(word->pic_tail_def != F) jit_compile(word->pic_tail_def,relocate);
 }
+
+struct word_updater {
+	factor_vm *myvm;
+
+	explicit word_updater(factor_vm *myvm_) : myvm(myvm_) {}
+	void operator()(code_block *compiled)
+	{
+		myvm->update_word_references(compiled);
+	}
+};
 
 /* Update pointers to words referenced from all code blocks. Only after
 defining a new word. */
@@ -100,7 +112,7 @@ void factor_vm::primitive_code_room()
 
 code_block *factor_vm::forward_xt(code_block *compiled)
 {
-	return (code_block *)forwarding[compiled];
+	return (code_block *)code->forwarding[compiled];
 }
 
 struct xt_forwarder {
@@ -199,13 +211,13 @@ void factor_vm::compact_code_heap()
 	garbage_collection(data->tenured(),false,false,0);
 
 	/* Figure out where the code heap blocks are going to end up */
-	cell size = code->compute_heap_forwarding(forwarding);
+	cell size = code->compute_heap_forwarding();
 
 	/* Update word and quotation code pointers */
 	forward_object_xts();
 
 	/* Actually perform the compaction */
-	code->compact_heap(forwarding);
+	code->compact_heap();
 
 	/* Update word and quotation XTs */
 	fixup_object_xts();

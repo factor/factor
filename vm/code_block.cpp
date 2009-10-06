@@ -466,7 +466,7 @@ code_block *factor_vm::add_code_block(cell type, cell code_, cell labels_, cell 
 
 	/* next time we do a minor GC, we have to scan the code heap for
 	literals */
-	last_code_heap_scan = data->nursery();
+	this->code->last_code_heap_scan = data->nursery();
 
 	return compiled;
 }

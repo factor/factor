@@ -96,7 +96,6 @@ void heap::assert_free_block(free_heap_block *block)
 		myvm->critical_error("Invalid block in free list",(cell)block);
 }
 
-		
 free_heap_block *heap::find_free_block(cell size)
 {
 	cell attempt = size;
@@ -254,7 +253,7 @@ cell heap::heap_size()
 }
 
 /* Compute where each block is going to go, after compaction */
-cell heap::compute_heap_forwarding(unordered_map<heap_block *,char *> &forwarding)
+cell heap::compute_heap_forwarding()
 {
 	heap_block *scan = first_block();
 	char *address = (char *)first_block();
@@ -275,7 +274,7 @@ cell heap::compute_heap_forwarding(unordered_map<heap_block *,char *> &forwardin
 	return (cell)address - seg->start;
 }
 
-void heap::compact_heap(unordered_map<heap_block *,char *> &forwarding)
+void heap::compact_heap()
 {
 	heap_block *scan = first_block();
 
