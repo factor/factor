@@ -151,11 +151,10 @@ struct factor_vm
 
 	void init_card_decks();
 	data_heap *grow_data_heap(data_heap *data, cell requested_bytes);
-	void clear_cards(cell from, cell to);
-	void clear_decks(cell from, cell to);
-	void clear_allot_markers(cell from, cell to);
-	void reset_generation(cell i);
-	void reset_generations(cell from, cell to);
+	void clear_cards(cell gen);
+	void clear_decks(cell gen);
+	void clear_allot_markers(cell gen);
+	void reset_generation(cell gen);
 	void set_data_heap(data_heap *data_);
 	void init_data_heap(cell young_size, cell aging_size, cell tenured_size, bool secure_gc_);
 	cell untagged_object_size(object *pointer);

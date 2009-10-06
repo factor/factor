@@ -555,7 +555,7 @@ void factor_vm::collect_nursery()
 void factor_vm::collect_aging()
 {
 	std::swap(data->generations[data->aging()],data->semispaces[data->aging()]);
-	reset_generations(data->aging(),data->aging());
+	reset_generation(data->aging());
 
 	aging_collector collector(this,&data->generations[data->aging()]);
 
@@ -566,7 +566,7 @@ void factor_vm::collect_aging()
 	collector.go();
 	update_dirty_code_blocks();
 
-	reset_generations(data->nursery(),data->nursery());
+	nursery.here = nursery.start;
 }
 
 void factor_vm::collect_aging_again()
@@ -580,7 +580,8 @@ void factor_vm::collect_aging_again()
 	collector.go();
 	update_dirty_code_blocks();
 
-	reset_generations(data->nursery(),data->aging());
+	reset_generation(data->aging());
+	nursery.here = nursery.start;
 }
 
 void factor_vm::collect_tenured(cell requested_bytes, bool trace_contexts_)
@@ -593,7 +594,7 @@ void factor_vm::collect_tenured(cell requested_bytes, bool trace_contexts_)
 	else
 	{
 		std::swap(data->generations[data->tenured()],data->semispaces[data->tenured()]);
-		reset_generations(data->tenured(),data->tenured());
+		reset_generation(data->tenured());
 	}
 
 	tenured_collector collector(this,&data->generations[data->tenured()]);
@@ -603,7 +604,8 @@ void factor_vm::collect_tenured(cell requested_bytes, bool trace_contexts_)
         collector.go();
         free_unmarked_code_blocks();
 
-	reset_generations(data->nursery(),data->aging());
+	reset_generation(data->aging());
+	nursery.here = nursery.start;
 
 	if(current_gc->growing_data_heap)
 		delete current_gc->old_data_heap;
