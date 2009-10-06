@@ -5,7 +5,7 @@ namespace factor
 
 void factor_vm::init_data_gc()
 {
-	last_code_heap_scan = data->nursery();
+	code->last_code_heap_scan = data->nursery();
 }
 
 gc_state::gc_state(data_heap *data_, bool growing_data_heap_, cell collecting_gen_) :
@@ -321,15 +321,15 @@ template<typename Strategy> struct literal_reference_tracer {
 aging and nursery collections */
 template<typename Strategy> void factor_vm::trace_code_heap_roots(Strategy &strategy)
 {
-	if(current_gc->collecting_gen >= last_code_heap_scan)
+	if(current_gc->collecting_gen >= code->last_code_heap_scan)
 	{
 		literal_reference_tracer<Strategy> tracer(this,strategy);
 		iterate_code_heap(tracer);
 
 		if(current_gc->collecting_accumulation_gen_p())
-			last_code_heap_scan = current_gc->collecting_gen;
+			code->last_code_heap_scan = current_gc->collecting_gen;
 		else
-			last_code_heap_scan = current_gc->collecting_gen + 1;
+			code->last_code_heap_scan = current_gc->collecting_gen + 1;
 
 		code_heap_scans++;
 	}
@@ -364,7 +364,7 @@ void factor_vm::free_unmarked_code_blocks()
 {
 	literal_and_word_reference_updater updater(this);
 	code->free_unmarked(updater);
-	last_code_heap_scan = current_gc->collecting_gen;
+	code->last_code_heap_scan = current_gc->collecting_gen;
 }
 
 void factor_vm::update_dirty_code_blocks()

@@ -13,6 +13,7 @@ struct heap {
 	factor_vm *myvm;
 	segment *seg;
 	heap_free_list free;
+	unordered_map<heap_block *, char *> forwarding;
 
 	explicit heap(factor_vm *myvm, cell size);
 
@@ -48,8 +49,8 @@ struct heap {
 	void unmark_marked();
 	void heap_usage(cell *used, cell *total_free, cell *max_free);
 	cell heap_size();
-	cell compute_heap_forwarding(unordered_map<heap_block *,char *> &forwarding);
-	void compact_heap(unordered_map<heap_block *,char *> &forwarding);
+	cell compute_heap_forwarding();
+	void compact_heap();
 
 	heap_block *free_allocated(heap_block *prev, heap_block *scan);
 
