@@ -822,7 +822,7 @@ M: x86 %integer>float-vector-reps
 
 M: x86 %float>integer-vector ( dst src rep -- )
     {
-        { float-4-rep [ CVTPS2DQ ] }
+        { float-4-rep [ CVTTPS2DQ ] }
     } case ;
 
 M: x86 %float>integer-vector-reps
