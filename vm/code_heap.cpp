@@ -11,9 +11,15 @@ void code_heap::write_barrier(code_block *compiled)
 	youngest_referenced_generation = myvm->data->nursery();
 }
 
+bool code_heap::needs_fixup_p(code_block *compiled)
+{
+	return needs_fixup.count(compiled) > 0;
+}
+
 void code_heap::code_heap_free(code_block *compiled)
 {
 	remembered_set.erase(compiled);
+	needs_fixup.erase(compiled);
 	heap_free(compiled);
 }
 

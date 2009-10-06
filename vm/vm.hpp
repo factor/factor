@@ -513,8 +513,8 @@ struct factor_vm
 	void check_code_address(cell address);
 	void relocate_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
-	code_block *allot_code_block(cell size);
-	code_block *add_code_block(cell type,cell code_,cell labels_,cell relocation_,cell literals_);
+	code_block *allot_code_block(cell size, cell type);
+	code_block *add_code_block(cell type, cell code_, cell labels_, cell relocation_, cell literals_);
 	inline bool stack_traces_p()
 	{
 		return userenv[STACK_TRACES_ENV] != F;
@@ -548,7 +548,7 @@ struct factor_vm
 
 		while(scan)
 		{
-			if(scan->status != B_FREE)
+			if(scan->type() != FREE_BLOCK_TYPE)
 				iter((code_block *)scan);
 			scan = code->next_block(scan);
 		}

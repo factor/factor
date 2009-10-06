@@ -20,7 +20,7 @@ cell factor_vm::relocation_offset_of(relocation_entry r)
 
 void factor_vm::flush_icache_for(code_block *block)
 {
-	flush_icache((cell)block,block->size);
+	flush_icache((cell)block,block->size());
 }
 
 int factor_vm::number_of_parameters(relocation_type type)
@@ -290,7 +290,7 @@ struct literal_references_updater {
 /* Update pointers to literals from compiled code. */
 void factor_vm::update_literal_references(code_block *compiled)
 {
-	if(!compiled->needs_fixup)
+	if(!code->needs_fixup_p(compiled))
 	{
 		literal_references_updater updater(this);
 		iterate_relocations(compiled,updater);
@@ -331,7 +331,7 @@ to update references to other words, without worrying about literals
 or dlsyms. */
 void factor_vm::update_word_references(code_block *compiled)
 {
-	if(compiled->needs_fixup)
+	if(code->needs_fixup_p(compiled))
 		relocate_code_block(compiled);
 	/* update_word_references() is always applied to every block in
 	   the code heap. Since it resets all call sites to point to
@@ -340,7 +340,7 @@ void factor_vm::update_word_references(code_block *compiled)
 	   are referenced after this is done. So instead of polluting
 	   the code heap with dead PICs that will be freed on the next
 	   GC, we add them to the free list immediately. */
-	else if(compiled->type == PIC_TYPE)
+	else if(compiled->type() == PIC_TYPE)
 		code->code_heap_free(compiled);
 	else
 	{
@@ -372,7 +372,7 @@ struct code_block_relocator {
 /* Perform all fixups on a code block */
 void factor_vm::relocate_code_block(code_block *compiled)
 {
-	compiled->needs_fixup = false;
+	code->needs_fixup.erase(compiled);
 	code_block_relocator relocator(this);
 	iterate_relocations(compiled,relocator);
 	flush_icache_for(compiled);
@@ -397,15 +397,15 @@ void factor_vm::fixup_labels(array *labels, code_block *compiled)
 }
 
 /* Might GC */
-code_block *factor_vm::allot_code_block(cell size)
+code_block *factor_vm::allot_code_block(cell size, cell type)
 {
-	heap_block *block = code->heap_allot(size + sizeof(code_block));
+	heap_block *block = code->heap_allot(size + sizeof(code_block),type);
 
 	/* If allocation failed, do a code GC */
 	if(block == NULL)
 	{
 		gc();
-		block = code->heap_allot(size + sizeof(code_block));
+		block = code->heap_allot(size + sizeof(code_block),type);
 
 		/* Insufficient room even after code GC, give up */
 		if(block == NULL)
@@ -433,11 +433,7 @@ code_block *factor_vm::add_code_block(cell type, cell code_, cell labels_, cell 
 	gc_root<array> literals(literals_,this);
 
 	cell code_length = align8(array_capacity(code.untagged()));
-	code_block *compiled = allot_code_block(code_length);
-
-	/* compiled header */
-	compiled->type = type;
-	compiled->needs_fixup = true;
+	code_block *compiled = allot_code_block(code_length,type);
 
 	/* slight space optimization */
 	if(relocation.type() == BYTE_ARRAY_TYPE && array_capacity(relocation.untagged()) == 0)
@@ -460,6 +456,7 @@ code_block *factor_vm::add_code_block(cell type, cell code_, cell labels_, cell 
 	/* next time we do a minor GC, we have to scan the code heap for
 	literals */
 	this->code->write_barrier(compiled);
+	this->code->needs_fixup.insert(compiled);
 
 	return compiled;
 }
