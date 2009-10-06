@@ -243,13 +243,6 @@ struct factor_vm
 	cell last_code_heap_scan;
 
 	void init_data_gc();
-	object *copy_untagged_object_impl(object *pointer, cell size);
-	object *copy_object_impl(object *untagged);
-	object *resolve_forwarding(object *untagged);
-	template<typename Type> Type *copy_untagged_object(Type *untagged);
-	template<typename Strategy> object *resolve_forwarding(object *untagged, Strategy &strategy);
-	template<typename Type, typename Strategy> Type *copy_untagged_object(Type *untagged, Strategy &strategy);
-	template<typename Strategy> cell copy_object(cell pointer, Strategy &strategy);
 	template<typename Strategy> void trace_handle(cell *handle, Strategy &strategy);
 	template<typename Strategy> void trace_card(card *ptr, cell gen, cell here, Strategy &strategy);
 	template<typename Strategy> void trace_card_deck(card_deck *deck, cell gen, card mask, card unmask, Strategy &strategy);
@@ -265,8 +258,6 @@ struct factor_vm
 	template<typename Strategy> void trace_code_heap_roots(Strategy &strategy);
 	template<typename Strategy> void mark_code_block(code_block *compiled, Strategy &strategy);
 	template<typename Strategy> void mark_object_code_block(object *object, Strategy &strategy);
-	template<typename Strategy> cell copy_next(cell scan, Strategy &strategy);
-	template<typename Strategy> void update_code_heap_roots(Strategy &strategy);
 	void free_unmarked_code_blocks();
 	void update_dirty_code_blocks();
 	void begin_gc(cell requested_bytes);

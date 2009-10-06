@@ -6,6 +6,10 @@ namespace factor
 void factor_vm::init_inline_caching(int max_size)
 {
 	max_pic_size = max_size;
+	cold_call_to_ic_transitions = 0;
+	ic_to_pic_transitions = 0;
+	pic_to_mega_transitions = 0;
+	for(int i = 0; i < 4; i++) pic_counts[i] = 0;
 }
 
 void factor_vm::deallocate_inline_cache(cell return_address)
