@@ -1,12 +1,11 @@
 ! Copyright (C) 2009 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-vectors combinators
-compression.huffman fry hashtables io.binary kernel locals math
-math.bitwise math.order math.ranges sequences sorting ;
+combinators.smart compression.huffman fry hashtables io.binary
+kernel literals locals math math.bitwise math.order math.ranges
+sequences sorting ;
 QUALIFIED-WITH: bitstreams bs
 IN: compression.inflate
-
-QUALIFIED-WITH: bitstreams bs
 
 <PRIVATE
 
@@ -28,13 +27,6 @@ ERROR: bad-zlib-header ;
     1 data bs:read 0 assert=            ! dictionnary - not allowed in png
     2 data bs:seek                      ! compression level; ignore
     ;
-
-:: default-table ( -- table )
-    0 <hashtable> :> table
-    0 143 [a,b] 280 287 [a,b] append 8 table set-at
-    144 255 [a,b] >array 9 table set-at
-    256 279 [a,b] >array 7 table set-at 
-    table enum>seq 1 tail ;
 
 CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
 
@@ -67,13 +59,17 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
     [ dup array? [ second 0 <repetition> ] [ 1array ] if ] map concat
     nip swap cut 2array [ [ length>> [0,b) ] [ ] bi get-table ] map ;
 
-: static-huffman-tables ( -- tables )
-      0 143 [a,b] [ 8 ] replicate
-    144 255 [a,b] [ 9 ] replicate append
-    256 279 [a,b] [ 7 ] replicate append
-    280 287 [a,b] [ 8 ] replicate append
-    0 31 [a,b] [ 5 ] replicate 
-    2array [ [ length>> [0,b) ] [ ] bi get-table ] map ;    
+CONSTANT: static-huffman-tables 
+    $[
+        [
+            0 143 [a,b] [ 8 ] replicate
+            144 255 [a,b] [ 9 ] replicate append
+            256 279 [a,b] [ 7 ] replicate append
+            280 287 [a,b] [ 8 ] replicate append
+        ] append-outputs
+        0 31 [a,b] [ 5 ] replicate 2array
+        [ [ length>> [0,b) ] [ ] bi get-table ] map
+    ]
 
 CONSTANT: length-table
     {
@@ -183,10 +179,8 @@ CONSTANT: dist-table
             { 1 [ inflate-static ] }
             { 2 [ inflate-dynamic ] }
             { 3 [ bad-zlib-data f ] }
-        }
-        case
-    ]
-    [ produce ] keep call suffix concat ;
+        } case
+    ] [ produce ] keep call suffix concat ;
 
 PRIVATE>
 
