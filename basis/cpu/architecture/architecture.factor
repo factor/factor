@@ -56,6 +56,18 @@ uint-4-rep
 longlong-2-rep
 ulonglong-2-rep ;
 
+UNION: signed-int-vector-rep
+char-16-rep
+short-8-rep
+int-4-rep
+longlong-2-rep ;
+
+UNION: unsigned-int-vector-rep
+uchar-16-rep
+ushort-8-rep
+uint-4-rep
+ulonglong-2-rep ;
+
 UNION: scalar-rep
 char-scalar-rep
 uchar-scalar-rep
@@ -220,6 +232,12 @@ HOOK: %gather-vector-4 cpu ( dst src1 src2 src3 src4 rep -- )
 HOOK: %shuffle-vector cpu ( dst src shuffle rep -- )
 HOOK: %merge-vector-head cpu ( dst src1 src2 rep -- )
 HOOK: %merge-vector-tail cpu ( dst src1 src2 rep -- )
+HOOK: %signed-pack-vector cpu ( dst src1 src2 rep -- )
+HOOK: %unsigned-pack-vector cpu ( dst src1 src2 rep -- )
+HOOK: %unpack-vector-head cpu ( dst src rep -- )
+HOOK: %unpack-vector-tail cpu ( dst src rep -- )
+HOOK: %integer>float-vector cpu ( dst src rep -- )
+HOOK: %float>integer-vector cpu ( dst src rep -- )
 HOOK: %compare-vector cpu ( dst src1 src2 temp rep cc -- )
 HOOK: %test-vector cpu ( dst src1 temp rep vcc -- )
 HOOK: %test-vector-branch cpu ( label src1 temp rep vcc -- )
@@ -259,6 +277,11 @@ HOOK: %gather-vector-2-reps cpu ( -- reps )
 HOOK: %gather-vector-4-reps cpu ( -- reps )
 HOOK: %shuffle-vector-reps cpu ( -- reps )
 HOOK: %merge-vector-reps cpu ( -- reps )
+HOOK: %signed-pack-vector-reps cpu ( -- reps )
+HOOK: %unsigned-pack-vector-reps cpu ( -- reps )
+HOOK: %unpack-vector-reps cpu ( -- reps )
+HOOK: %integer>float-vector-reps cpu ( -- reps )
+HOOK: %float>integer-vector-reps cpu ( -- reps )
 HOOK: %compare-vector-reps cpu ( cc -- reps )
 HOOK: %test-vector-reps cpu ( -- reps )
 HOOK: %add-vector-reps cpu ( -- reps )

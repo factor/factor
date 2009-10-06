@@ -165,6 +165,12 @@ CODEGEN: ##gather-vector-4 %gather-vector-4
 CODEGEN: ##shuffle-vector %shuffle-vector
 CODEGEN: ##merge-vector-head %merge-vector-head
 CODEGEN: ##merge-vector-tail %merge-vector-tail
+CODEGEN: ##signed-pack-vector %signed-pack-vector
+CODEGEN: ##unsigned-pack-vector %unsigned-pack-vector
+CODEGEN: ##unpack-vector-head %unpack-vector-head
+CODEGEN: ##unpack-vector-tail %unpack-vector-tail
+CODEGEN: ##integer>float-vector %integer>float-vector
+CODEGEN: ##float>integer-vector %float>integer-vector
 CODEGEN: ##compare-vector %compare-vector
 CODEGEN: ##test-vector %test-vector
 CODEGEN: ##add-vector %add-vector
