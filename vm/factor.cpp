@@ -49,8 +49,6 @@ void factor_vm::default_parameters(vm_parameters *p)
 		p->console = false;
 	
 #endif
-
-	p->stack_traces = true;
 }
 
 bool factor_vm::factor_arg(const vm_char* str, const vm_char* arg, cell* value)
@@ -85,7 +83,6 @@ void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **
 		else if(STRCMP(argv[i],STRING_LITERAL("-fep")) == 0) p->fep = true;
 		else if(STRNCMP(argv[i],STRING_LITERAL("-i="),3) == 0) p->image_path = argv[i] + 3;
 		else if(STRCMP(argv[i],STRING_LITERAL("-console")) == 0) p->console = true;
-		else if(STRCMP(argv[i],STRING_LITERAL("-no-stack-traces")) == 0) p->stack_traces = false;
 	}
 }
 
@@ -152,10 +149,7 @@ void factor_vm::init_factor(vm_parameters *p)
 	gc_off = false;
 
 	if(userenv[STAGE2_ENV] == F)
-	{
-		userenv[STACK_TRACES_ENV] = tag_boolean(p->stack_traces);
 		do_stage1_init();
-	}
 }
 
 /* May allocate memory */

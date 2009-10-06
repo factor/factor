@@ -91,15 +91,17 @@ void factor_vm::primitive_modify_code_heap()
 		case ARRAY_TYPE:
 			{
 				array *compiled_data = data.as<array>().untagged();
-				cell literals = array_nth(compiled_data,0);
-				cell relocation = array_nth(compiled_data,1);
-				cell labels = array_nth(compiled_data,2);
-				cell code = array_nth(compiled_data,3);
+				cell owner = array_nth(compiled_data,0);
+				cell literals = array_nth(compiled_data,1);
+				cell relocation = array_nth(compiled_data,2);
+				cell labels = array_nth(compiled_data,3);
+				cell code = array_nth(compiled_data,4);
 
 				code_block *compiled = add_code_block(
 					WORD_TYPE,
 					code,
 					labels,
+					owner,
 					relocation,
 					literals);
 
@@ -243,6 +245,21 @@ void factor_vm::compact_code_heap()
 	/* Now update the free list; there will be a single free block at
 	the end */
 	code->build_free_list(size);
+}
+
+struct stack_trace_stripper {
+	explicit stack_trace_stripper() {}
+
+	void operator()(code_block *compiled)
+	{
+		compiled->owner = F;
+	}
+};
+
+void factor_vm::primitive_strip_stack_traces()
+{
+	stack_trace_stripper stripper;
+	iterate_code_heap(stripper);
 }
 
 }

@@ -164,6 +164,7 @@ const primitive_type primitives[] = {
 	primitive_optimized_p,
 	primitive_quot_compiled_p,
 	primitive_vm_ptr,
+	primitive_strip_stack_traces,
 };
 
 PRIMITIVE_FORWARD(bignum_to_fixnum)
@@ -289,5 +290,6 @@ PRIMITIVE_FORWARD(inline_cache_stats)
 PRIMITIVE_FORWARD(optimized_p)
 PRIMITIVE_FORWARD(quot_compiled_p)
 PRIMITIVE_FORWARD(vm_ptr)
+PRIMITIVE_FORWARD(strip_stack_traces)
 
 }

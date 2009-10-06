@@ -295,8 +295,9 @@ void factor_vm::relocate_data()
 void factor_vm::fixup_code_block(code_block *compiled)
 {
 	/* relocate literal table data */
-	data_fixup(&compiled->relocation);
+	data_fixup(&compiled->owner);
 	data_fixup(&compiled->literals);
+	data_fixup(&compiled->relocation);
 
 	relocate_code_block(compiled);
 }

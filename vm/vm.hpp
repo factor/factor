@@ -514,11 +514,7 @@ struct factor_vm
 	void relocate_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
 	code_block *allot_code_block(cell size, cell type);
-	code_block *add_code_block(cell type, cell code_, cell labels_, cell relocation_, cell literals_);
-	inline bool stack_traces_p()
-	{
-		return userenv[STACK_TRACES_ENV] != F;
-	}
+	code_block *add_code_block(cell type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_);
 
 	//code_heap
 	code_heap *code;
@@ -540,6 +536,7 @@ struct factor_vm
 	void forward_object_xts();
 	void fixup_object_xts();
 	void compact_code_heap();
+	void primitive_strip_stack_traces();
 
 	/* Apply a function to every code block */
 	template<typename Iterator> void iterate_code_heap(Iterator &iter)

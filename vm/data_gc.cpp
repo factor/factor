@@ -287,6 +287,7 @@ template<typename Strategy> void factor_vm::trace_contexts(Strategy &strategy)
 /* Trace all literals referenced from a code block. Only for aging and nursery collections */
 template<typename Strategy> void factor_vm::trace_literal_references(code_block *compiled, Strategy &strategy)
 {
+	trace_handle(&compiled->owner,strategy);
 	trace_handle(&compiled->literals,strategy);
 	trace_handle(&compiled->relocation,strategy);
 }
