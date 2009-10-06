@@ -533,9 +533,13 @@ code_block *factor_vm::add_code_block(cell type, cell code_, cell labels_, cell 
 	compiled->type = type;
 	compiled->last_scan = data->nursery();
 	compiled->needs_fixup = true;
-	compiled->relocation = relocation.value();
 
 	/* slight space optimization */
+	if(relocation.type() == BYTE_ARRAY_TYPE && array_capacity(relocation.untagged()) == 0)
+		compiled->relocation = F;
+	else
+		compiled->relocation = relocation.value();
+
 	if(literals.type() == ARRAY_TYPE && array_capacity(literals.untagged()) == 0)
 		compiled->literals = F;
 	else
