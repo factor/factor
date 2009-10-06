@@ -471,10 +471,7 @@ struct nursery_collector : copying_collector<nursery_collector>
 
 	bool should_copy_p(object *untagged)
 	{
-		if(newspace->contains_p(untagged))
-			return false;
-		else
-			return myvm->nursery.contains_p(untagged);
+		return myvm->nursery.contains_p(untagged);
 	}
 
 	void copy_reachable_objects(cell scan, cell *end)
