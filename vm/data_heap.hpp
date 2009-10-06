@@ -17,6 +17,11 @@ struct zone {
 		end = start_ + size_;
 		return end;
 	}
+	
+	inline bool contains_p(object *pointer)
+	{
+		return (cell)pointer >= start && (cell)pointer < end;
+	}
 };
 
 struct data_heap {
@@ -56,10 +61,5 @@ struct data_heap {
 };
 
 static const cell max_gen_count = 3;
-
-inline static bool in_zone(zone *z, object *pointer)
-{
-	return (cell)pointer >= z->start && (cell)pointer < z->end;
-}
 
 }
