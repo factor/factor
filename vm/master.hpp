@@ -30,17 +30,21 @@
 
 #if __GNUC__ == 4
         #include <tr1/unordered_map>
+        #include <tr1/unordered_set>
 
 	namespace factor
 	{
 		using std::tr1::unordered_map;
+		using std::tr1::unordered_set;
 	}
 #elif __GNUC__ == 3
         #include <boost/unordered_map.hpp>
+        #include <boost/unordered_set.hpp>
 
 	namespace factor
 	{
 		using boost::unordered_map;
+		using boost::unordered_set;
 	}
 #else
         #error Factor requires GCC 3.x or later

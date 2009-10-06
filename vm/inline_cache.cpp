@@ -19,7 +19,7 @@ void factor_vm::deallocate_inline_cache(cell return_address)
 	check_code_pointer((cell)old_xt);
 
 	code_block *old_block = (code_block *)old_xt - 1;
-	cell old_type = old_block->type;
+	cell old_type = old_block->type();
 
 #ifdef FACTOR_DEBUG
 	/* The call target was either another PIC,

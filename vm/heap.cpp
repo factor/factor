@@ -21,9 +21,9 @@ heap::heap(factor_vm *myvm_, cell size)
 
 void heap::add_to_free_list(free_heap_block *block)
 {
-	if(block->size < free_list_count * block_size_increment)
+	if(block->size() < free_list_count * block_size_increment)
 	{
-		int index = block->size / block_size_increment;
+		int index = block->size() / block_size_increment;
 		block->next_free = free.small_blocks[index];
 		free.small_blocks[index] = block;
 	}
@@ -52,17 +52,8 @@ void heap::build_free_list(cell size)
 	/* Add all free blocks to the free list */
 	while(scan && scan < (heap_block *)end)
 	{
-		switch(scan->status)
-		{
-		case B_FREE:
+		if(scan->type() == FREE_BLOCK_TYPE)
 			add_to_free_list((free_heap_block *)scan);
-			break;
-		case B_ALLOCATED:
-			break;
-		default:
-			myvm->critical_error("Invalid scan->status",(cell)scan);
-			break;
-		}
 
 		prev = scan;
 		scan = next_block(scan);
@@ -72,8 +63,9 @@ void heap::build_free_list(cell size)
 	branch is only taken after loading a new image, not after code GC */
 	if((cell)(end + 1) <= seg->end)
 	{
-		end->status = B_FREE;
-		end->size = seg->end - (cell)end;
+		end->set_marked_p(false);
+		end->set_type(FREE_BLOCK_TYPE);
+		end->set_size(seg->end - (cell)end);
 
 		/* add final free block */
 		add_to_free_list(end);
@@ -85,14 +77,14 @@ void heap::build_free_list(cell size)
 		/* even if there's no room at the end of the heap for a new
 		free block, we might have to jigger it up by a few bytes in
 		case prev + prev->size */
-		if(prev) prev->size = seg->end - (cell)prev;
+		if(prev) prev->set_size(seg->end - (cell)prev);
 	}
 
 }
 
 void heap::assert_free_block(free_heap_block *block)
 {
-	if(block->status != B_FREE)
+	if(block->type() != FREE_BLOCK_TYPE)
 		myvm->critical_error("Invalid block in free list",(cell)block);
 }
 
@@ -120,7 +112,7 @@ free_heap_block *heap::find_free_block(cell size)
 	while(block)
 	{
 		assert_free_block(block);
-		if(block->size >= size)
+		if(block->size() >= size)
 		{
 			if(prev)
 				prev->next_free = block->next_free;
@@ -138,14 +130,14 @@ free_heap_block *heap::find_free_block(cell size)
 
 free_heap_block *heap::split_free_block(free_heap_block *block, cell size)
 {
-	if(block->size != size )
+	if(block->size() != size )
 	{
 		/* split the block in two */
 		free_heap_block *split = (free_heap_block *)((cell)block + size);
-		split->status = B_FREE;
-		split->size = block->size - size;
+		split->set_type(FREE_BLOCK_TYPE);
+		split->set_size(block->size() - size);
 		split->next_free = block->next_free;
-		block->size = size;
+		block->set_size(size);
 		add_to_free_list(split);
 	}
 
@@ -153,7 +145,7 @@ free_heap_block *heap::split_free_block(free_heap_block *block, cell size)
 }
 
 /* Allocate a block of memory from the mark and sweep GC heap */
-heap_block *heap::heap_allot(cell size)
+heap_block *heap::heap_allot(cell size, cell type)
 {
 	size = (size + block_size_increment - 1) & ~(block_size_increment - 1);
 
@@ -161,8 +153,8 @@ heap_block *heap::heap_allot(cell size)
 	if(block)
 	{
 		block = split_free_block(block,size);
-
-		block->status = B_ALLOCATED;
+		block->set_type(type);
+		block->set_marked_p(false);
 		return block;
 	}
 	else
@@ -172,24 +164,13 @@ heap_block *heap::heap_allot(cell size)
 /* Deallocates a block manually */
 void heap::heap_free(heap_block *block)
 {
-	block->status = B_FREE;
+	block->set_type(FREE_BLOCK_TYPE);
 	add_to_free_list((free_heap_block *)block);
 }
 
 void heap::mark_block(heap_block *block)
 {
-	/* If already marked, do nothing */
-	switch(block->status)
-	{
-	case B_MARKED:
-		return;
-	case B_ALLOCATED:
-		block->status = B_MARKED;
-		break;
-	default:
-		myvm->critical_error("Marking the wrong block",(cell)block);
-		break;
-	}
+	block->set_marked_p(true);
 }
 
 /* If in the middle of code GC, we have to grow the heap, data GC restarts from
@@ -200,9 +181,7 @@ void heap::unmark_marked()
 
 	while(scan)
 	{
-		if(scan->status == B_MARKED)
-			scan->status = B_ALLOCATED;
-
+		scan->set_marked_p(false);
 		scan = next_block(scan);
 	}
 }
@@ -218,19 +197,16 @@ void heap::heap_usage(cell *used, cell *total_free, cell *max_free)
 
 	while(scan)
 	{
-		switch(scan->status)
+		cell size = scan->size();
+
+		if(scan->type() == FREE_BLOCK_TYPE)
 		{
-		case B_ALLOCATED:
-			*used += scan->size;
-			break;
-		case B_FREE:
-			*total_free += scan->size;
-			if(scan->size > *max_free)
-				*max_free = scan->size;
-			break;
-		default:
-			myvm->critical_error("Invalid scan->status",(cell)scan);
+			*total_free += size;
+			if(size > *max_free)
+				*max_free = size;
 		}
+		else
+			*used += size;
 
 		scan = next_block(scan);
 	}
@@ -245,7 +221,7 @@ cell heap::heap_size()
 		scan = next_block(scan);
 
 	/* this is the last block in the heap, and it is free */
-	if(scan->status == B_FREE)
+	if(scan->type() == FREE_BLOCK_TYPE)
 		return (cell)scan - seg->start;
 	/* otherwise the last block is allocated */
 	else
@@ -260,14 +236,11 @@ cell heap::compute_heap_forwarding()
 
 	while(scan)
 	{
-		if(scan->status == B_ALLOCATED)
+		if(scan->type() != FREE_BLOCK_TYPE)
 		{
 			forwarding[scan] = address;
-			address += scan->size;
+			address += scan->size();
 		}
-		else if(scan->status == B_MARKED)
-			myvm->critical_error("Why is the block marked?",0);
-
 		scan = next_block(scan);
 	}
 
@@ -282,8 +255,8 @@ void heap::compact_heap()
 	{
 		heap_block *next = next_block(scan);
 
-		if(scan->status == B_ALLOCATED)
-			memmove(forwarding[scan],scan,scan->size);
+		if(scan->type() != FREE_BLOCK_TYPE)
+			memmove(forwarding[scan],scan,scan->size());
 		scan = next;
 	}
 }
@@ -291,16 +264,16 @@ void heap::compact_heap()
 heap_block *heap::free_allocated(heap_block *prev, heap_block *scan)
 {
 	if(myvm->secure_gc)
-		memset(scan + 1,0,scan->size - sizeof(heap_block));
+		memset(scan + 1,0,scan->size() - sizeof(heap_block));
 
-	if(prev && prev->status == B_FREE)
+	if(prev && prev->type() == FREE_BLOCK_TYPE)
 	{
-		prev->size += scan->size;
+		prev->set_size(prev->size() + scan->size());
 		return prev;
 	}
 	else
 	{
-		scan->status = B_FREE;
+		scan->set_type(FREE_BLOCK_TYPE);
 		return scan;
 	}
 }
