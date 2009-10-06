@@ -40,48 +40,31 @@ object *factor_vm::copy_object_impl(object *untagged)
 	return newpointer;
 }
 
-bool factor_vm::should_copy_p(object *untagged)
-{
-	if(in_zone(current_gc->newspace,untagged))
-		return false;
-	if(current_gc->collecting_tenured_p())
-		return true;
-	else if(data->have_aging_p() && current_gc->collecting_gen == data->aging())
-		return !in_zone(&data->generations[data->tenured()],untagged);
-	else if(current_gc->collecting_nursery_p())
-		return in_zone(&nursery,untagged);
-	else
-	{
-		critical_error("Bug in should_copy_p",(cell)untagged);
-		return false;
-	}
-}
-
 /* Follow a chain of forwarding pointers */
-object *factor_vm::resolve_forwarding(object *untagged)
+template<typename Strategy> object *factor_vm::resolve_forwarding(object *untagged, Strategy &strategy)
 {
 	check_data_pointer(untagged);
 
 	/* is there another forwarding pointer? */
 	if(untagged->h.forwarding_pointer_p())
-		return resolve_forwarding(untagged->h.forwarding_pointer());
+		return resolve_forwarding(untagged->h.forwarding_pointer(),strategy);
 	/* we've found the destination */
 	else
 	{
 		untagged->h.check_header();
-		if(should_copy_p(untagged))
+		if(strategy.should_copy_p(untagged))
 			return copy_object_impl(untagged);
 		else
 			return untagged;
 	}
 }
 
-template<typename Type> Type *factor_vm::copy_untagged_object(Type *untagged)
+template<typename Type, typename Strategy> Type *factor_vm::copy_untagged_object(Type *untagged, Strategy &strategy)
 {
 	check_data_pointer(untagged);
 
 	if(untagged->h.forwarding_pointer_p())
-		untagged = (Type *)resolve_forwarding(untagged->h.forwarding_pointer());
+		untagged = (Type *)resolve_forwarding(untagged->h.forwarding_pointer(),strategy);
 	else
 	{
 		untagged->h.check_header();
@@ -91,12 +74,12 @@ template<typename Type> Type *factor_vm::copy_untagged_object(Type *untagged)
 	return untagged;
 }
 
-cell factor_vm::copy_object(cell pointer)
+template<typename Strategy> cell factor_vm::copy_object(cell pointer, Strategy &strategy)
 {
-	return RETAG(copy_untagged_object(untag<object>(pointer)),TAG(pointer));
+	return RETAG(copy_untagged_object(untag<object>(pointer),strategy),TAG(pointer));
 }
 
-void factor_vm::trace_handle(cell *handle)
+template<typename Strategy> void factor_vm::trace_handle(cell *handle, Strategy &strategy)
 {
 	cell pointer = *handle;
 
@@ -104,13 +87,12 @@ void factor_vm::trace_handle(cell *handle)
 	{
 		object *obj = untag<object>(pointer);
 		check_data_pointer(obj);
-		if(should_copy_p(obj))
-			*handle = copy_object(pointer);
+		if(strategy.should_copy_p(obj))
+			*handle = copy_object(pointer,strategy);
 	}
 }
 
-/* Scan all the objects in the card */
-void factor_vm::trace_card(card *ptr, cell gen, cell here)
+template<typename Strategy> void factor_vm::trace_card(card *ptr, cell gen, cell here, Strategy &strategy)
 {
 	cell card_scan = card_to_addr(ptr) + card_offset(ptr);
 	cell card_end = card_to_addr(ptr + 1);
@@ -118,12 +100,12 @@ void factor_vm::trace_card(card *ptr, cell gen, cell here)
 	if(here < card_end)
 		card_end = here;
 
-	copy_reachable_objects(card_scan,&card_end);
+	strategy.copy_reachable_objects(card_scan,&card_end);
 
 	cards_scanned++;
 }
 
-void factor_vm::trace_card_deck(card_deck *deck, cell gen, card mask, card unmask)
+template<typename Strategy> void factor_vm::trace_card_deck(card_deck *deck, cell gen, card mask, card unmask, Strategy &strategy)
 {
 	card *first_card = deck_to_card(deck);
 	card *last_card = deck_to_card(deck + 1);
@@ -144,7 +126,7 @@ void factor_vm::trace_card_deck(card_deck *deck, cell gen, card mask, card unmas
 			{
 				if(ptr[card] & mask)
 				{
-					trace_card(&ptr[card],gen,here);
+					trace_card(&ptr[card],gen,here,strategy);
 					ptr[card] &= ~unmask;
 				}
 			}
@@ -155,7 +137,7 @@ void factor_vm::trace_card_deck(card_deck *deck, cell gen, card mask, card unmas
 }
 
 /* Copy all newspace objects referenced from marked cards to the destination */
-void factor_vm::trace_generation_cards(cell gen)
+template<typename Strategy> void factor_vm::trace_generation_cards(cell gen, Strategy &strategy)
 {
 	card_deck *first_deck = addr_to_deck(data->generations[gen].start);
 	card_deck *last_deck = addr_to_deck(data->generations[gen].end);
@@ -214,7 +196,7 @@ void factor_vm::trace_generation_cards(cell gen)
 	{
 		if(*ptr & mask)
 		{
-			trace_card_deck(ptr,gen,mask,unmask);
+			trace_card_deck(ptr,gen,mask,unmask,strategy);
 			*ptr &= ~unmask;
 		}
 	}
@@ -222,36 +204,36 @@ void factor_vm::trace_generation_cards(cell gen)
 
 /* Scan cards in all generations older than the one being collected, copying
 old->new references */
-void factor_vm::trace_cards()
+template<typename Strategy> void factor_vm::trace_cards(Strategy &strategy)
 {
 	u64 start = current_micros();
 
 	cell i;
 	for(i = current_gc->collecting_gen + 1; i < data->gen_count; i++)
-		trace_generation_cards(i);
+		trace_generation_cards(i,strategy);
 
 	card_scan_time += (current_micros() - start);
 }
 
 /* Copy all tagged pointers in a range of memory */
-void factor_vm::trace_stack_elements(segment *region, cell top)
+template<typename Strategy> void factor_vm::trace_stack_elements(segment *region, cell top, Strategy &strategy)
 {
 	cell ptr = region->start;
 
 	for(; ptr <= top; ptr += sizeof(cell))
-		trace_handle((cell*)ptr);
+		trace_handle((cell*)ptr,strategy);
 }
 
-void factor_vm::trace_registered_locals()
+template<typename Strategy> void factor_vm::trace_registered_locals(Strategy &strategy)
 {
 	std::vector<cell>::const_iterator iter = gc_locals.begin();
 	std::vector<cell>::const_iterator end = gc_locals.end();
 
 	for(; iter < end; iter++)
-		trace_handle((cell *)(*iter));
+		trace_handle((cell *)(*iter),strategy);
 }
 
-void factor_vm::trace_registered_bignums()
+template<typename Strategy> void factor_vm::trace_registered_bignums(Strategy &strategy)
 {
 	std::vector<cell>::const_iterator iter = gc_bignums.begin();
 	std::vector<cell>::const_iterator end = gc_bignums.end();
@@ -264,8 +246,8 @@ void factor_vm::trace_registered_bignums()
 		if(pointer)
 		{
 			check_data_pointer(pointer);
-			if(should_copy_p(pointer))
-				*handle = copy_untagged_object(pointer);
+			if(strategy.should_copy_p(pointer))
+				*handle = copy_untagged_object(pointer,strategy);
 #ifdef FACTOR_DEBUG
 			assert((*handle)->h.hi_tag() == BIGNUM_TYPE);
 #endif
@@ -275,41 +257,156 @@ void factor_vm::trace_registered_bignums()
 
 /* Copy roots over at the start of GC, namely various constants, stacks,
 the user environment and extra roots registered by local_roots.hpp */
-void factor_vm::trace_roots()
+template<typename Strategy> void factor_vm::trace_roots(Strategy &strategy)
 {
-	trace_handle(&T);
-	trace_handle(&bignum_zero);
-	trace_handle(&bignum_pos_one);
-	trace_handle(&bignum_neg_one);
+	trace_handle(&T,strategy);
+	trace_handle(&bignum_zero,strategy);
+	trace_handle(&bignum_pos_one,strategy);
+	trace_handle(&bignum_neg_one,strategy);
 
-	trace_registered_locals();
-	trace_registered_bignums();
+	trace_registered_locals(strategy);
+	trace_registered_bignums(strategy);
 
 	int i;
 	for(i = 0; i < USER_ENV; i++)
-		trace_handle(&userenv[i]);
+		trace_handle(&userenv[i],strategy);
 }
 
-void factor_vm::trace_contexts()
+template<typename Strategy> struct stack_frame_marker {
+	factor_vm *myvm;
+	Strategy &strategy;
+
+	explicit stack_frame_marker(factor_vm *myvm_, Strategy &strategy_) :
+		myvm(myvm_), strategy(strategy_) {}
+	void operator()(stack_frame *frame)
+	{
+		myvm->mark_code_block(myvm->frame_code(frame),strategy);
+	}
+};
+
+/* Mark code blocks executing in currently active stack frames. */
+template<typename Strategy> void factor_vm::mark_active_blocks(context *stacks, Strategy &strategy)
+{
+	if(current_gc->collecting_tenured_p())
+	{
+		cell top = (cell)stacks->callstack_top;
+		cell bottom = (cell)stacks->callstack_bottom;
+
+		stack_frame_marker<Strategy> marker(this,strategy);
+		iterate_callstack(top,bottom,marker);
+	}
+}
+
+template<typename Strategy> void factor_vm::mark_object_code_block(object *object, Strategy &strategy)
+{
+	switch(object->h.hi_tag())
+	{
+	case WORD_TYPE:
+		{
+			word *w = (word *)object;
+			if(w->code)
+				mark_code_block(w->code,strategy);
+			if(w->profiling)
+				mark_code_block(w->profiling,strategy);
+			break;
+		}
+	case QUOTATION_TYPE:
+		{
+			quotation *q = (quotation *)object;
+			if(q->code)
+				mark_code_block(q->code,strategy);
+			break;
+		}
+	case CALLSTACK_TYPE:
+		{
+			callstack *stack = (callstack *)object;
+			stack_frame_marker<Strategy> marker(this,strategy);
+			iterate_callstack_object(stack,marker);
+			break;
+		}
+	}
+}
+
+template<typename Strategy> void factor_vm::trace_contexts(Strategy &strategy)
 {
 	save_stacks();
 	context *stacks = stack_chain;
 
 	while(stacks)
 	{
-		trace_stack_elements(stacks->datastack_region,stacks->datastack);
-		trace_stack_elements(stacks->retainstack_region,stacks->retainstack);
+		trace_stack_elements(stacks->datastack_region,stacks->datastack,strategy);
+		trace_stack_elements(stacks->retainstack_region,stacks->retainstack,strategy);
 
-		trace_handle(&stacks->catchstack_save);
-		trace_handle(&stacks->current_callback_save);
+		trace_handle(&stacks->catchstack_save,strategy);
+		trace_handle(&stacks->current_callback_save,strategy);
 
-		mark_active_blocks(stacks);
+		mark_active_blocks(stacks,strategy);
 
 		stacks = stacks->next;
 	}
 }
 
-cell factor_vm::copy_next_from_nursery(cell scan)
+/* Copy all literals referenced from a code block to newspace. Only for
+aging and nursery collections */
+template<typename Strategy> void factor_vm::trace_literal_references(code_block *compiled, Strategy &strategy)
+{
+	if(current_gc->collecting_gen >= compiled->last_scan)
+	{
+		if(current_gc->collecting_accumulation_gen_p())
+			compiled->last_scan = current_gc->collecting_gen;
+		else
+			compiled->last_scan = current_gc->collecting_gen + 1;
+
+		trace_handle(&compiled->literals,strategy);
+		trace_handle(&compiled->relocation,strategy);
+
+		/* once we finish tracing, re-visit this code block and update
+		literals */
+		current_gc->dirty_code_blocks.insert(compiled);
+	}
+}
+
+template<typename Strategy> struct literal_reference_tracer {
+	factor_vm *myvm;
+	Strategy strategy;
+
+	explicit literal_reference_tracer(factor_vm *myvm_, Strategy &strategy_) :
+		myvm(myvm_), strategy(strategy_) {}
+
+	void operator()(code_block *compiled)
+	{
+		myvm->trace_literal_references(compiled,strategy);
+	}
+};
+
+/* Copy literals referenced from all code blocks to newspace. Only for
+aging and nursery collections */
+template<typename Strategy> void factor_vm::trace_code_heap_roots(Strategy &strategy)
+{
+	literal_reference_tracer<Strategy> tracer(this,strategy);
+	iterate_code_heap(tracer);
+
+	if(current_gc->collecting_accumulation_gen_p())
+		last_code_heap_scan = current_gc->collecting_gen;
+	else
+		last_code_heap_scan = current_gc->collecting_gen + 1;
+	
+	code_heap_scans++;
+}
+
+/* Mark all literals referenced from a word XT. Only for tenured
+collections */
+template<typename Strategy> void factor_vm::mark_code_block(code_block *compiled, Strategy &strategy)
+{
+	check_code_address((cell)compiled);
+
+	code->mark_block(compiled);
+
+	trace_handle(&compiled->literals,strategy);
+	trace_handle(&compiled->relocation,strategy);
+}
+
+template<typename Strategy> cell factor_vm::copy_next(cell scan, Strategy &strategy)
 {
 	cell *obj = (cell *)scan;
 	cell *end = (cell *)(scan + binary_payload_start((object *)scan));
@@ -318,113 +415,20 @@ cell factor_vm::copy_next_from_nursery(cell scan)
 	{
 		obj++;
 
-		cell nursery_start = nursery.start;
-		cell nursery_end = nursery.end;
-
 		for(; obj < end; obj++)
-		{
-			cell pointer = *obj;
-
-			if(!immediate_p(pointer))
-			{
-				check_data_pointer((object *)pointer);
-				if(pointer >= nursery_start && pointer < nursery_end)
-					*obj = copy_object(pointer);
-			}
-		}
+			trace_handle(obj,strategy);
 	}
 
 	return scan + untagged_object_size((object *)scan);
 }
 
-cell factor_vm::copy_next_from_aging(cell scan)
-{
-	cell *obj = (cell *)scan;
-	cell *end = (cell *)(scan + binary_payload_start((object *)scan));
-
-	if(obj != end)
-	{
-		obj++;
-
-		cell tenured_start = data->generations[data->tenured()].start;
-		cell tenured_end = data->generations[data->tenured()].end;
-
-		cell newspace_start = current_gc->newspace->start;
-		cell newspace_end = current_gc->newspace->end;
-
-		for(; obj < end; obj++)
-		{
-			cell pointer = *obj;
-
-			if(!immediate_p(pointer))
-			{
-				check_data_pointer((object *)pointer);
-				if(!(pointer >= newspace_start && pointer < newspace_end)
-				   && !(pointer >= tenured_start && pointer < tenured_end))
-					*obj = copy_object(pointer);
-			}
-		}
-	}
-
-	return scan + untagged_object_size((object *)scan);
-}
-
-cell factor_vm::copy_next_from_tenured(cell scan)
-{
-	cell *obj = (cell *)scan;
-	cell *end = (cell *)(scan + binary_payload_start((object *)scan));
-
-	if(obj != end)
-	{
-		obj++;
-
-		cell newspace_start = current_gc->newspace->start;
-		cell newspace_end = current_gc->newspace->end;
-
-		for(; obj < end; obj++)
-		{
-			cell pointer = *obj;
-
-			if(!immediate_p(pointer))
-			{
-				check_data_pointer((object *)pointer);
-				if(!(pointer >= newspace_start && pointer < newspace_end))
-					*obj = copy_object(pointer);
-			}
-		}
-	}
-
-	mark_object_code_block((object *)scan);
-
-	return scan + untagged_object_size((object *)scan);
-}
-
-void factor_vm::copy_reachable_objects(cell scan, cell *end)
-{
-	if(current_gc->collecting_nursery_p())
-	{
-		while(scan < *end)
-			scan = copy_next_from_nursery(scan);
-	}
-	else if(data->have_aging_p() && current_gc->collecting_gen == data->aging())
-	{
-		while(scan < *end)
-			scan = copy_next_from_aging(scan);
-	}
-	else if(current_gc->collecting_tenured_p())
-	{
-		while(scan < *end)
-			scan = copy_next_from_tenured(scan);
-	}
-}
-
-void factor_vm::update_code_heap_roots()
+template<typename Strategy> void factor_vm::update_code_heap_roots(Strategy &strategy)
 {
 	if(current_gc->collecting_gen >= last_code_heap_scan)
 	{
 		code_heap_scans++;
 
-		trace_code_heap_roots();
+		trace_code_heap_roots(strategy);
 
 		if(current_gc->collecting_accumulation_gen_p())
 			last_code_heap_scan = current_gc->collecting_gen;
@@ -496,6 +500,120 @@ void factor_vm::begin_gc(cell requested_bytes)
 		so we set the newspace so the next generation. */
 		current_gc->newspace = &data->generations[current_gc->collecting_gen + 1];
 	}
+}
+
+struct nursery_collector
+{
+	factor_vm *myvm;
+
+	explicit nursery_collector(factor_vm *myvm_) : myvm(myvm_) {}
+	
+	bool should_copy_p(object *untagged)
+	{
+		if(myvm->current_gc->newspace->contains_p(untagged))
+			return false;
+		else
+			return myvm->nursery.contains_p(untagged);
+	}
+	
+	void copy_reachable_objects(cell scan, cell *end)
+	{
+		while(scan < myvm->current_gc->newspace->here)
+			scan = myvm->copy_next(scan,*this);
+	}
+};
+
+void factor_vm::collect_nursery()
+{
+	nursery_collector collector(this);
+
+        cell scan = current_gc->newspace->here;
+
+        trace_roots(collector);
+        trace_contexts(collector);
+        trace_cards(collector);
+
+        if(current_gc->collecting_gen >= last_code_heap_scan)
+                update_code_heap_roots(collector);
+
+        collector.copy_reachable_objects(scan,&current_gc->newspace->here);
+
+        update_dirty_code_blocks();
+}
+
+struct aging_collector
+{
+	factor_vm *myvm;
+
+	explicit aging_collector(factor_vm *myvm_) : myvm(myvm_) {}
+	
+	bool should_copy_p(object *untagged)
+	{
+		if(myvm->current_gc->newspace->contains_p(untagged))
+			return false;
+		else
+			return !myvm->data->generations[myvm->data->tenured()].contains_p(untagged);
+	}
+	
+	void copy_reachable_objects(cell scan, cell *end)
+	{
+		while(scan < myvm->current_gc->newspace->here)
+			scan = myvm->copy_next(scan,*this);
+	}
+};
+
+void factor_vm::collect_aging()
+{
+	aging_collector collector(this);
+
+        cell scan = current_gc->newspace->here;
+
+        trace_roots(collector);
+        trace_contexts(collector);
+        trace_cards(collector);
+
+        if(current_gc->collecting_gen >= last_code_heap_scan)
+                update_code_heap_roots(collector);
+
+        collector.copy_reachable_objects(scan,&current_gc->newspace->here);
+
+        update_dirty_code_blocks();
+}
+
+struct tenured_collector
+{
+	factor_vm *myvm;
+
+	explicit tenured_collector(factor_vm *myvm_) : myvm(myvm_) {}
+	
+	bool should_copy_p(object *untagged)
+	{
+		return !myvm->current_gc->newspace->contains_p(untagged);
+	}
+	
+	void copy_reachable_objects(cell scan, cell *end)
+	{
+		while(scan < myvm->current_gc->newspace->here)
+		{
+			myvm->mark_object_code_block(myvm->untag<object>(scan),*this);
+			scan = myvm->copy_next(scan,*this);
+		}
+	}
+};
+
+void factor_vm::collect_tenured(bool trace_contexts_)
+{
+	tenured_collector collector(this);
+
+        cell scan = current_gc->newspace->here;
+
+        trace_roots(collector);
+        if(trace_contexts_)
+        	trace_contexts(collector);
+
+        collector.copy_reachable_objects(scan,&current_gc->newspace->here);
+
+        free_unmarked_code_blocks();
 }
 
 void factor_vm::end_gc()
@@ -572,40 +690,13 @@ void factor_vm::garbage_collection(cell collecting_gen_, bool growing_data_heap_
 
         begin_gc(requested_bytes);
 
-        /* Initialize chase pointer */
-        cell scan = current_gc->newspace->here;
+        if(current_gc->collecting_nursery_p())
+        	collect_nursery();
+        else if(current_gc->collecting_aging_p())
+        	collect_aging();
+        else if(current_gc->collecting_tenured_p())
+        	collect_tenured(trace_contexts_);
 
-        /* Trace objects referenced from global environment */
-        trace_roots();
-
-        /* Trace objects referenced from stacks, unless we're doing
-        save-image-and-exit in which case stack objects are irrelevant */
-        if(trace_contexts_) trace_contexts();
-
-        /* Trace objects referenced from older generations */
-        trace_cards();
-
-        /* On minor GC, trace code heap roots if it has pointers
-        to this generation or younger. Otherwise, tracing data heap objects
-        will mark all reachable code blocks, and we free the unmarked ones
-        after. */
-        if(!current_gc->collecting_tenured_p() && current_gc->collecting_gen >= last_code_heap_scan)
-        {
-                update_code_heap_roots();
-        }
-
-        /* do some copying -- this is where most of the work is done */
-        copy_reachable_objects(scan,&current_gc->newspace->here);
-
-        /* On minor GC, update literal references in code blocks, now that all
-        data heap objects are in their final location. On a major GC,
-        free all code blocks that did not get marked during tracing. */
-        if(current_gc->collecting_tenured_p())
-                free_unmarked_code_blocks();
-        else
-                update_dirty_code_blocks();
-
-        /* GC completed without any generations filling up; finish up */
 	end_gc();
 
 	delete current_gc;

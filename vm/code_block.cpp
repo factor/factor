@@ -298,26 +298,6 @@ void factor_vm::update_literal_references(code_block *compiled)
 	}
 }
 
-/* Copy all literals referenced from a code block to newspace. Only for
-aging and nursery collections */
-void factor_vm::trace_literal_references(code_block *compiled)
-{
-	if(current_gc->collecting_gen >= compiled->last_scan)
-	{
-		if(current_gc->collecting_accumulation_gen_p())
-			compiled->last_scan = current_gc->collecting_gen;
-		else
-			compiled->last_scan = current_gc->collecting_gen + 1;
-
-		trace_handle(&compiled->literals);
-		trace_handle(&compiled->relocation);
-
-		/* once we finish tracing, re-visit this code block and update
-		literals */
-		current_gc->dirty_code_blocks.insert(compiled);
-	}
-}
-
 /* Compute an address to store at a relocation */
 void factor_vm::relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled)
 {
@@ -375,74 +355,6 @@ void factor_vm::check_code_address(cell address)
 #ifdef FACTOR_DEBUG
 	assert(address >= code->seg->start && address < code->seg->end);
 #endif
-}
-
-/* Update references to words. This is done after a new code block
-is added to the heap. */
-
-/* Mark all literals referenced from a word XT. Only for tenured
-collections */
-void factor_vm::mark_code_block(code_block *compiled)
-{
-	check_code_address((cell)compiled);
-
-	code->mark_block(compiled);
-
-	trace_handle(&compiled->literals);
-	trace_handle(&compiled->relocation);
-}
-
-struct stack_frame_marker {
-	factor_vm *myvm;
-
-	explicit stack_frame_marker(factor_vm *myvm_) : myvm(myvm_) {}
-	void operator()(stack_frame *frame)
-	{
-		myvm->mark_code_block(myvm->frame_code(frame));
-	}
-};
-
-/* Mark code blocks executing in currently active stack frames. */
-void factor_vm::mark_active_blocks(context *stacks)
-{
-	if(current_gc->collecting_tenured_p())
-	{
-		cell top = (cell)stacks->callstack_top;
-		cell bottom = (cell)stacks->callstack_bottom;
-
-		stack_frame_marker marker(this);
-		iterate_callstack(top,bottom,marker);
-	}
-}
-
-void factor_vm::mark_object_code_block(object *object)
-{
-	switch(object->h.hi_tag())
-	{
-	case WORD_TYPE:
-		{
-			word *w = (word *)object;
-			if(w->code)
-				mark_code_block(w->code);
-			if(w->profiling)
-				mark_code_block(w->profiling);
-			break;
-		}
-	case QUOTATION_TYPE:
-		{
-			quotation *q = (quotation *)object;
-			if(q->code)
-				mark_code_block(q->code);
-			break;
-		}
-	case CALLSTACK_TYPE:
-		{
-			callstack *stack = (callstack *)object;
-			stack_frame_marker marker(this);
-			iterate_callstack_object(stack,marker);
-			break;
-		}
-	}
 }
 
 struct code_block_relocator {
