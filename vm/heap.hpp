@@ -10,12 +10,12 @@ struct heap_free_list {
 };
 
 struct heap {
-	factor_vm *myvm;
+	bool secure_gc;
 	segment *seg;
 	heap_free_list free;
 	unordered_map<heap_block *, char *> forwarding;
 
-	explicit heap(factor_vm *myvm, cell size);
+	explicit heap(bool secure_gc_, cell size);
 
 	inline heap_block *next_block(heap_block *block)
 	{

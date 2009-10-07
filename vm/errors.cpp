@@ -3,26 +3,26 @@
 namespace factor
 {
 
-void factor_vm::out_of_memory()
-{
-	print_string("Out of memory\n\n");
-	dump_generations();
-	exit(1);
-}
-
-void fatal_error(const char* msg, cell tagged)
+void fatal_error(const char *msg, cell tagged)
 {
 	print_string("fatal_error: "); print_string(msg);
 	print_string(": "); print_cell_hex(tagged); nl();
 	exit(1);
 }
 
-void factor_vm::critical_error(const char* msg, cell tagged)
+void critical_error(const char *msg, cell tagged)
 {
 	print_string("You have triggered a bug in Factor. Please report.\n");
 	print_string("critical_error: "); print_string(msg);
 	print_string(": "); print_cell_hex(tagged); nl();
-	factorbug();
+	SIGNAL_VM_PTR()->factorbug();
+}
+
+void out_of_memory()
+{
+	print_string("Out of memory\n\n");
+	SIGNAL_VM_PTR()->dump_generations();
+	exit(1);
 }
 
 void factor_vm::throw_error(cell error, stack_frame *callstack_top)

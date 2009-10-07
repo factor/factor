@@ -5,7 +5,7 @@ namespace factor
 
 void factor_vm::init_data_gc()
 {
-	code->youngest_referenced_generation = data->nursery();
+	code->youngest_referenced_generation = nursery_gen;
 }
 
 gc_state::gc_state(data_heap *data_, bool growing_data_heap_, cell collecting_gen_) :
@@ -71,7 +71,7 @@ template<typename Strategy> object *factor_vm::promote_object(object *untagged, 
 	object *newpointer = strategy.allot(size);
 	if(!newpointer) longjmp(current_gc->gc_unwind,1);
 
-	gc_stats *s = &stats[current_gc->collecting_gen];
+	generation_stats *s = &stats.generations[current_gc->collecting_gen];
 	s->object_count++;
 	s->bytes_copied += size;
 
@@ -91,7 +91,7 @@ template<typename Strategy> void factor_vm::trace_card(card *ptr, cell gen, cell
 
 	strategy.copy_reachable_objects(card_scan,&card_end);
 
-	cards_scanned++;
+	stats.cards_scanned++;
 }
 
 template<typename Strategy> void factor_vm::trace_card_deck(card_deck *deck, cell gen, card mask, card unmask, Strategy &strategy)
@@ -122,7 +122,7 @@ template<typename Strategy> void factor_vm::trace_card_deck(card_deck *deck, cel
 		}
 	}
 
-	decks_scanned++;
+	stats.decks_scanned++;
 }
 
 /* Trace all objects referenced from marked cards */
@@ -142,11 +142,11 @@ template<typename Strategy> void factor_vm::trace_generation_cards(cell gen, Str
 		/* after the collection, no old->nursery pointers remain
 		anywhere, but old->aging pointers might remain in tenured
 		space */
-		if(gen == data->tenured())
+		if(gen == tenured_gen)
 			unmask = card_points_to_nursery;
 		/* after the collection, all cards in aging space can be
 		cleared */
-		else if(gen == data->aging())
+		else if(gen == aging_gen)
 			unmask = card_mark_mask;
 		else
 		{
@@ -201,7 +201,7 @@ template<typename Strategy> void factor_vm::trace_cards(Strategy &strategy)
 	for(i = current_gc->collecting_gen + 1; i < gen_count; i++)
 		trace_generation_cards(i,strategy);
 
-	card_scan_time += (current_micros() - start);
+	stats.card_scan_time += (current_micros() - start);
 }
 
 /* Copy all tagged pointers in a range of memory */
@@ -353,7 +353,7 @@ template<typename Strategy> void factor_vm::trace_code_heap_roots(Strategy &stra
 				trace_literal_references(iter->first,strategy);
 		}
 
-		code_heap_scans++;
+		stats.code_heap_scans++;
 	}
 }
 
@@ -385,7 +385,7 @@ void factor_vm::free_unmarked_code_blocks()
 	literal_and_word_reference_updater updater(this);
 	code->free_unmarked(updater);
 	code->remembered_set.clear();
-	code->youngest_referenced_generation = data->tenured();
+	code->youngest_referenced_generation = tenured_gen;
 }
 
 void factor_vm::update_dirty_code_blocks()
@@ -429,7 +429,11 @@ template<typename Strategy> Strategy &copying_collector<Strategy>::strategy()
 template<typename Strategy> object *copying_collector<Strategy>::allot(cell size)
 {
 	if(newspace->here + size <= newspace->end)
-		return myvm->allot_zone(newspace,size);
+	{
+		object *obj = newspace->allot(size);
+		myvm->allot_barrier(obj);
+		return obj;
+	}
 	else
 		return NULL;
 }
@@ -478,7 +482,7 @@ struct aging_collector : copying_collector<aging_collector>
 
 	explicit aging_collector(factor_vm *myvm_, zone *newspace_) :
 		copying_collector<aging_collector>(myvm_,newspace_),
-		tenured(&myvm->data->generations[myvm->data->tenured()]) {}
+		tenured(&myvm->data->generations[tenured_gen]) {}
 
 	bool should_copy_p(object *untagged)
 	{
@@ -532,7 +536,7 @@ struct tenured_collector : copying_collector<tenured_collector>
 
 void factor_vm::collect_nursery()
 {
-	nursery_collector collector(this,&data->generations[data->aging()]);
+	nursery_collector collector(this,&data->generations[aging_gen]);
 
 	trace_roots(collector);
 	trace_contexts(collector);
@@ -546,10 +550,10 @@ void factor_vm::collect_nursery()
 
 void factor_vm::collect_aging()
 {
-	std::swap(data->generations[data->aging()],data->semispaces[data->aging()]);
-	reset_generation(data->aging());
+	std::swap(data->generations[aging_gen],data->semispaces[aging_gen]);
+	reset_generation(aging_gen);
 
-	aging_collector collector(this,&data->generations[data->aging()]);
+	aging_collector collector(this,&data->generations[aging_gen]);
 
 	trace_roots(collector);
 	trace_contexts(collector);
@@ -563,7 +567,7 @@ void factor_vm::collect_aging()
 
 void factor_vm::collect_aging_again()
 {
-	aging_again_collector collector(this,&data->generations[data->tenured()]);
+	aging_again_collector collector(this,&data->generations[tenured_gen]);
 
 	trace_roots(collector);
 	trace_contexts(collector);
@@ -572,7 +576,7 @@ void factor_vm::collect_aging_again()
 	collector.go();
 	update_dirty_code_blocks();
 
-	reset_generation(data->aging());
+	reset_generation(aging_gen);
 	nursery.here = nursery.start;
 }
 
@@ -585,18 +589,18 @@ void factor_vm::collect_tenured(cell requested_bytes, bool trace_contexts_)
 	}
 	else
 	{
-		std::swap(data->generations[data->tenured()],data->semispaces[data->tenured()]);
-		reset_generation(data->tenured());
+		std::swap(data->generations[tenured_gen],data->semispaces[tenured_gen]);
+		reset_generation(tenured_gen);
 	}
 
-	tenured_collector collector(this,&data->generations[data->tenured()]);
+	tenured_collector collector(this,&data->generations[tenured_gen]);
 
         trace_roots(collector);
         if(trace_contexts_) trace_contexts(collector);
         collector.go();
         free_unmarked_code_blocks();
 
-	reset_generation(data->aging());
+	reset_generation(aging_gen);
 	nursery.here = nursery.start;
 
 	if(current_gc->growing_data_heap)
@@ -605,7 +609,7 @@ void factor_vm::collect_tenured(cell requested_bytes, bool trace_contexts_)
 
 void factor_vm::record_gc_stats()
 {
-	gc_stats *s = &stats[current_gc->collecting_gen];
+	generation_stats *s = &stats.generations[current_gc->collecting_gen];
 
 	cell gc_elapsed = (current_micros() - current_gc->start_time);
 	s->collections++;
@@ -673,7 +677,7 @@ void factor_vm::garbage_collection(cell collecting_gen_, bool growing_data_heap_
 
 void factor_vm::gc()
 {
-	garbage_collection(data->tenured(),false,true,0);
+	garbage_collection(tenured_gen,false,true,0);
 }
 
 void factor_vm::primitive_gc()
@@ -690,7 +694,7 @@ void factor_vm::primitive_gc_stats()
 
 	for(i = 0; i < gen_count; i++)
 	{
-		gc_stats *s = &stats[i];
+		generation_stats *s = &stats.generations[i];
 		result.add(allot_cell(s->collections));
 		result.add(tag<bignum>(long_long_to_bignum(s->gc_time)));
 		result.add(tag<bignum>(long_long_to_bignum(s->max_gc_time)));
@@ -702,10 +706,10 @@ void factor_vm::primitive_gc_stats()
 	}
 
 	result.add(tag<bignum>(ulong_long_to_bignum(total_gc_time)));
-	result.add(tag<bignum>(ulong_long_to_bignum(cards_scanned)));
-	result.add(tag<bignum>(ulong_long_to_bignum(decks_scanned)));
-	result.add(tag<bignum>(ulong_long_to_bignum(card_scan_time)));
-	result.add(allot_cell(code_heap_scans));
+	result.add(tag<bignum>(ulong_long_to_bignum(stats.cards_scanned)));
+	result.add(tag<bignum>(ulong_long_to_bignum(stats.decks_scanned)));
+	result.add(tag<bignum>(ulong_long_to_bignum(stats.card_scan_time)));
+	result.add(allot_cell(stats.code_heap_scans));
 
 	result.trim();
 	dpush(result.elements.value());
@@ -713,13 +717,7 @@ void factor_vm::primitive_gc_stats()
 
 void factor_vm::clear_gc_stats()
 {
-	for(cell i = 0; i < gen_count; i++)
-		memset(&stats[i],0,sizeof(gc_stats));
-
-	cards_scanned = 0;
-	decks_scanned = 0;
-	card_scan_time = 0;
-	code_heap_scans = 0;
+	memset(&stats,0,sizeof(gc_stats));
 }
 
 void factor_vm::primitive_clear_gc_stats()
@@ -763,7 +761,7 @@ void factor_vm::inline_gc(cell *gc_roots_base, cell gc_roots_size)
 	for(cell i = 0; i < gc_roots_size; i++)
 		gc_locals.push_back((cell)&gc_roots_base[i]);
 
-	garbage_collection(data->nursery(),false,true,0);
+	garbage_collection(nursery_gen,false,true,0);
 
 	for(cell i = 0; i < gc_roots_size; i++)
 		gc_locals.pop_back();
@@ -773,15 +771,6 @@ VM_C_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *myvm
 {
 	ASSERTVM();
 	VM_PTR->inline_gc(gc_roots_base,gc_roots_size);
-}
-
-inline object *factor_vm::allot_zone(zone *z, cell a)
-{
-	cell h = z->here;
-	z->here = h + align8(a);
-	object *obj = (object *)h;
-	allot_barrier(obj);
-	return obj;
 }
 
 /*
@@ -801,33 +790,32 @@ object *factor_vm::allot_object(header header, cell size)
 	{
 		/* If there is insufficient room, collect the nursery */
 		if(nursery.here + size > nursery.end)
-			garbage_collection(data->nursery(),false,true,0);
+			garbage_collection(nursery_gen,false,true,0);
 
-		cell h = nursery.here;
-		nursery.here = h + align8(size);
-		obj = (object *)h;
+		obj = nursery.allot(size);
 	}
 	/* If the object is bigger than the nursery, allocate it in
 	tenured space */
 	else
 	{
-		zone *tenured = &data->generations[data->tenured()];
+		zone *tenured = &data->generations[tenured_gen];
 
 		/* If tenured space does not have enough room, collect */
 		if(tenured->here + size > tenured->end)
 		{
 			gc();
-			tenured = &data->generations[data->tenured()];
+			tenured = &data->generations[tenured_gen];
 		}
 
 		/* If it still won't fit, grow the heap */
 		if(tenured->here + size > tenured->end)
 		{
-			garbage_collection(data->tenured(),true,true,size);
-			tenured = &data->generations[data->tenured()];
+			garbage_collection(tenured_gen,true,true,size);
+			tenured = &data->generations[tenured_gen];
 		}
 
-		obj = allot_zone(tenured,size);
+		obj = tenured->allot(size);
+		allot_barrier(obj);
 
 		/* Allows initialization code to store old->new pointers
 		without hitting the write barrier in the common case of
