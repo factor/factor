@@ -211,10 +211,10 @@ struct factor_vm
 	//data_heap
 	void init_card_decks();
 	data_heap *grow_data_heap(data_heap *data, cell requested_bytes);
-	void clear_cards(cell gen);
-	void clear_decks(cell gen);
-	void clear_allot_markers(cell gen);
-	void reset_generation(cell gen);
+	void clear_cards(zone *gen);
+	void clear_decks(zone *gen);
+	void clear_allot_markers(zone *gen);
+	void reset_generation(zone *gen);
 	void set_data_heap(data_heap *data_);
 	void init_data_heap(cell young_size, cell aging_size, cell tenured_size, bool secure_gc_);
 	cell untagged_object_size(object *pointer);
@@ -285,15 +285,13 @@ struct factor_vm
 	}
 
 	// data_gc
-	void init_data_gc();
 	template<typename Strategy> object *resolve_forwarding(object *untagged, Strategy &strategy);
 	template<typename Strategy> void trace_handle(cell *handle, Strategy &strategy);
 	template<typename Strategy> object *promote_object(object *pointer, Strategy &strategy);
 	template<typename Strategy> void trace_slots(object *ptr, Strategy &strategy);
-	template<typename Strategy> void trace_card(card *ptr, cell gen, cell here, Strategy &strategy);
-	template<typename Strategy> void trace_card_deck(card_deck *deck, cell gen, card mask, card unmask, Strategy &strategy);
-	template<typename Strategy> void trace_generation_cards(cell gen, Strategy &strategy);
-	template<typename Strategy> void trace_cards(Strategy &strategy);
+	template<typename Strategy> void trace_card(card *ptr, cell here, Strategy &strategy);
+	template<typename Strategy> void trace_card_deck(card_deck *deck, cell here, card mask, card unmask, Strategy &strategy);
+	template<typename Strategy> void trace_cards(cell gen, zone *z, Strategy &strategy);
 	template<typename Strategy> void trace_stack_elements(segment *region, cell top, Strategy &strategy);
 	template<typename Strategy> void trace_registered_locals(Strategy &strategy);
 	template<typename Strategy> void trace_registered_bignums(Strategy &strategy);
@@ -368,7 +366,7 @@ struct factor_vm
 	void print_callstack();
 	void dump_cell(cell x);
 	void dump_memory(cell from, cell to);
-	void dump_zone(zone *z);
+	void dump_zone(cell gen, zone *z);
 	void dump_generations();
 	void dump_objects(cell type);
 	void find_data_references_step(cell *scan);

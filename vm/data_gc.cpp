@@ -3,11 +3,6 @@
 namespace factor
 {
 
-void factor_vm::init_data_gc()
-{
-	code->youngest_referenced_generation = nursery_gen;
-}
-
 gc_state::gc_state(data_heap *data_, bool growing_data_heap_, cell collecting_gen_) :
 	data(data_),
 	growing_data_heap(growing_data_heap_),
@@ -81,25 +76,22 @@ template<typename Strategy> object *factor_vm::promote_object(object *untagged, 
 	return newpointer;
 }
 
-template<typename Strategy> void factor_vm::trace_card(card *ptr, cell gen, cell here, Strategy &strategy)
+template<typename Strategy> void factor_vm::trace_card(card *ptr, cell here, Strategy &strategy)
 {
 	cell card_scan = card_to_addr(ptr) + card_offset(ptr);
 	cell card_end = card_to_addr(ptr + 1);
 
-	if(here < card_end)
-		card_end = here;
+	if(here < card_end) card_end = here;
 
 	strategy.copy_reachable_objects(card_scan,&card_end);
 
 	gc_stats.cards_scanned++;
 }
 
-template<typename Strategy> void factor_vm::trace_card_deck(card_deck *deck, cell gen, card mask, card unmask, Strategy &strategy)
+template<typename Strategy> void factor_vm::trace_card_deck(card_deck *deck, cell here, card mask, card unmask, Strategy &strategy)
 {
 	card *first_card = deck_to_card(deck);
 	card *last_card = deck_to_card(deck + 1);
-
-	cell here = data->generations[gen].here;
 
 	u32 *quad_ptr;
 	u32 quad_mask = mask | (mask << 8) | (mask << 16) | (mask << 24);
@@ -115,7 +107,7 @@ template<typename Strategy> void factor_vm::trace_card_deck(card_deck *deck, cel
 			{
 				if(ptr[card] & mask)
 				{
-					trace_card(&ptr[card],gen,here,strategy);
+					trace_card(&ptr[card],here,strategy);
 					ptr[card] &= ~unmask;
 				}
 			}
@@ -126,10 +118,12 @@ template<typename Strategy> void factor_vm::trace_card_deck(card_deck *deck, cel
 }
 
 /* Trace all objects referenced from marked cards */
-template<typename Strategy> void factor_vm::trace_generation_cards(cell gen, Strategy &strategy)
+template<typename Strategy> void factor_vm::trace_cards(cell gen, zone *z, Strategy &strategy)
 {
-	card_deck *first_deck = addr_to_deck(data->generations[gen].start);
-	card_deck *last_deck = addr_to_deck(data->generations[gen].end);
+	u64 start_time = current_micros();
+
+	card_deck *first_deck = addr_to_deck(z->start);
+	card_deck *last_deck = addr_to_deck(z->end);
 
 	card mask, unmask;
 
@@ -185,23 +179,12 @@ template<typename Strategy> void factor_vm::trace_generation_cards(cell gen, Str
 	{
 		if(*ptr & mask)
 		{
-			trace_card_deck(ptr,gen,mask,unmask,strategy);
+			trace_card_deck(ptr,z->here,mask,unmask,strategy);
 			*ptr &= ~unmask;
 		}
 	}
-}
 
-/* Scan cards in all generations older than the one being collected, copying
-old->new references */
-template<typename Strategy> void factor_vm::trace_cards(Strategy &strategy)
-{
-	u64 start = current_micros();
-
-	cell i;
-	for(i = current_gc->collecting_gen + 1; i < gen_count; i++)
-		trace_generation_cards(i,strategy);
-
-	gc_stats.card_scan_time += (current_micros() - start);
+	gc_stats.card_scan_time += (current_micros() - start_time);
 }
 
 /* Copy all tagged pointers in a range of memory */
@@ -482,7 +465,7 @@ struct aging_collector : copying_collector<aging_collector>
 
 	explicit aging_collector(factor_vm *myvm_, zone *newspace_) :
 		copying_collector<aging_collector>(myvm_,newspace_),
-		tenured(&myvm->data->generations[tenured_gen]) {}
+		tenured(myvm->data->tenured) {}
 
 	bool should_copy_p(object *untagged)
 	{
@@ -536,11 +519,12 @@ struct tenured_collector : copying_collector<tenured_collector>
 
 void factor_vm::collect_nursery()
 {
-	nursery_collector collector(this,&data->generations[aging_gen]);
+	nursery_collector collector(this,data->aging);
 
 	trace_roots(collector);
 	trace_contexts(collector);
-	trace_cards(collector);
+	trace_cards(tenured_gen,data->tenured,collector);
+	trace_cards(aging_gen,data->aging,collector);
 	trace_code_heap_roots(collector);
 	collector.go();
 	update_dirty_code_blocks();
@@ -550,14 +534,14 @@ void factor_vm::collect_nursery()
 
 void factor_vm::collect_aging()
 {
-	std::swap(data->generations[aging_gen],data->semispaces[aging_gen]);
-	reset_generation(aging_gen);
+	std::swap(data->aging,data->aging_semispace);
+	reset_generation(data->aging);
 
-	aging_collector collector(this,&data->generations[aging_gen]);
+	aging_collector collector(this,data->aging);
 
 	trace_roots(collector);
 	trace_contexts(collector);
-	trace_cards(collector);
+	trace_cards(tenured_gen,data->tenured,collector);
 	trace_code_heap_roots(collector);
 	collector.go();
 	update_dirty_code_blocks();
@@ -567,16 +551,16 @@ void factor_vm::collect_aging()
 
 void factor_vm::collect_aging_again()
 {
-	aging_again_collector collector(this,&data->generations[tenured_gen]);
+	aging_again_collector collector(this,data->tenured);
 
 	trace_roots(collector);
 	trace_contexts(collector);
-	trace_cards(collector);
+	trace_cards(tenured_gen,data->tenured,collector);
 	trace_code_heap_roots(collector);
 	collector.go();
 	update_dirty_code_blocks();
 
-	reset_generation(aging_gen);
+	reset_generation(data->aging);
 	nursery.here = nursery.start;
 }
 
@@ -589,18 +573,18 @@ void factor_vm::collect_tenured(cell requested_bytes, bool trace_contexts_)
 	}
 	else
 	{
-		std::swap(data->generations[tenured_gen],data->semispaces[tenured_gen]);
-		reset_generation(tenured_gen);
+		std::swap(data->tenured,data->tenured_semispace);
+		reset_generation(data->tenured);
 	}
 
-	tenured_collector collector(this,&data->generations[tenured_gen]);
+	tenured_collector collector(this,data->tenured);
 
         trace_roots(collector);
         if(trace_contexts_) trace_contexts(collector);
         collector.go();
         free_unmarked_code_blocks();
 
-	reset_generation(aging_gen);
+	reset_generation(data->aging);
 	nursery.here = nursery.start;
 
 	if(current_gc->growing_data_heap)
@@ -798,23 +782,15 @@ object *factor_vm::allot_object(header header, cell size)
 	tenured space */
 	else
 	{
-		zone *tenured = &data->generations[tenured_gen];
-
 		/* If tenured space does not have enough room, collect */
-		if(tenured->here + size > tenured->end)
-		{
+		if(data->tenured->here + size > data->tenured->end)
 			gc();
-			tenured = &data->generations[tenured_gen];
-		}
 
 		/* If it still won't fit, grow the heap */
-		if(tenured->here + size > tenured->end)
-		{
+		if(data->tenured->here + size > data->tenured->end)
 			garbage_collection(tenured_gen,true,true,size);
-			tenured = &data->generations[tenured_gen];
-		}
 
-		obj = tenured->allot(size);
+		obj = data->tenured->allot(size);
 		allot_barrier(obj);
 
 		/* Allows initialization code to store old->new pointers
