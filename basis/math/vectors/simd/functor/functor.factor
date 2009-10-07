@@ -3,7 +3,7 @@
 USING: accessors assocs byte-arrays classes classes.algebra effects fry
 functors generalizations kernel literals locals math math.functions
 math.vectors math.vectors.private math.vectors.simd.intrinsics
-math.vectors.conversion math.vectors.conversion.private
+math.vectors.conversion.backend
 math.vectors.specialization parser prettyprint.custom sequences
 sequences.private strings words definitions macros cpu.architecture
 namespaces arrays quotations combinators combinators.short-circuit sets

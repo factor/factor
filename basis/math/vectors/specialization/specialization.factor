@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words kernel make sequences effects sets kernel.private
 accessors combinators math math.intervals math.vectors
-math.vectors.conversion math.vectors.conversion.private
+math.vectors.conversion.backend
 namespaces assocs fry splitting classes.algebra generalizations
 locals compiler.tree.propagation.info ;
 IN: math.vectors.specialization
