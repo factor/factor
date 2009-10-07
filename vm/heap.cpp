@@ -11,10 +11,9 @@ void heap::clear_free_list()
 	memset(&free,0,sizeof(heap_free_list));
 }
 
-heap::heap(factor_vm *myvm_, cell size)
+heap::heap(bool secure_gc_, cell size) : secure_gc(secure_gc_)
 {
-	myvm = myvm_;
-	seg = new segment(myvm,align_page(size));
+	seg = new segment(align_page(size));
 	if(!seg) fatal_error("Out of memory in new_heap",size);
 	clear_free_list();
 }
@@ -85,7 +84,7 @@ void heap::build_free_list(cell size)
 void heap::assert_free_block(free_heap_block *block)
 {
 	if(block->type() != FREE_BLOCK_TYPE)
-		myvm->critical_error("Invalid block in free list",(cell)block);
+		critical_error("Invalid block in free list",(cell)block);
 }
 
 free_heap_block *heap::find_free_block(cell size)
@@ -263,7 +262,7 @@ void heap::compact_heap()
 
 heap_block *heap::free_allocated(heap_block *prev, heap_block *scan)
 {
-	if(myvm->secure_gc)
+	if(secure_gc)
 		memset(scan + 1,0,scan->size() - sizeof(heap_block));
 
 	if(prev && prev->type() == FREE_BLOCK_TYPE)

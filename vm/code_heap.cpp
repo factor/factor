@@ -3,12 +3,12 @@
 namespace factor
 {
 
-code_heap::code_heap(factor_vm *myvm, cell size) : heap(myvm,size) {}
+code_heap::code_heap(bool secure_gc, cell size) : heap(secure_gc,size) {}
 
 void code_heap::write_barrier(code_block *compiled)
 {
-	remembered_set[compiled] = myvm->data->nursery();
-	youngest_referenced_generation = myvm->data->nursery();
+	remembered_set[compiled] = nursery_gen;
+	youngest_referenced_generation = nursery_gen;
 }
 
 bool code_heap::needs_fixup_p(code_block *compiled)
@@ -26,7 +26,7 @@ void code_heap::code_heap_free(code_block *compiled)
 /* Allocate a code heap during startup */
 void factor_vm::init_code_heap(cell size)
 {
-	code = new code_heap(this,size);
+	code = new code_heap(secure_gc,size);
 }
 
 bool factor_vm::in_code_heap_p(cell ptr)
@@ -228,7 +228,7 @@ critical here */
 void factor_vm::compact_code_heap()
 {
 	/* Free all unreachable code blocks, don't trace contexts */
-	garbage_collection(data->tenured(),false,false,0);
+	garbage_collection(tenured_gen,false,false,0);
 
 	/* Figure out where the code heap blocks are going to end up */
 	cell size = code->compute_heap_forwarding();

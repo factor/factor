@@ -9,7 +9,7 @@ struct zone {
 	cell here;
 	cell size;
 	cell end;
-	
+
 	cell init_zone(cell size_, cell start_)
 	{
 		size = size_;
@@ -17,10 +17,17 @@ struct zone {
 		end = start_ + size_;
 		return end;
 	}
-	
+
 	inline bool contains_p(object *pointer)
 	{
 		return ((cell)pointer - start) < size;
+	}
+
+	inline object *allot(cell size)
+	{
+		cell h = here;
+		here = h + align8(size);
+		return (object *)h;
 	}
 };
 
@@ -43,19 +50,13 @@ struct data_heap {
 	char *decks;
 	char *decks_end;
 	
-	/* the 0th generation is where new objects are allocated. */
-	cell nursery() { return 0; }
-	
-	/* where objects hang around */
-	cell aging() { return 1; }
-	
-	/* the oldest generation */
-	cell tenured() { return 2; }
-	
 	explicit data_heap(factor_vm *myvm, cell young_size, cell aging_size, cell tenured_size);
 	~data_heap();
 };
 
+static const cell nursery_gen = 0;
+static const cell aging_gen = 1;
+static const cell tenured_gen = 2;
 static const cell gen_count = 3;
 
 }

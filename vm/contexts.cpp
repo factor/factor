@@ -44,8 +44,8 @@ context *factor_vm::alloc_context()
 	else
 	{
 		new_context = new context;
-		new_context->datastack_region = new segment(this,ds_size);
-		new_context->retainstack_region = new segment(this,rs_size);
+		new_context->datastack_region = new segment(ds_size);
+		new_context->retainstack_region = new segment(rs_size);
 	}
 
 	return new_context;

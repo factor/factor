@@ -28,7 +28,7 @@ void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 
 	clear_gc_stats();
 
-	zone *tenured = &data->generations[data->tenured()];
+	zone *tenured = &data->generations[tenured_gen];
 
 	fixnum bytes_read = fread((void*)tenured->start,1,h->data_size,file);
 
@@ -85,7 +85,7 @@ bool factor_vm::save_image(const vm_char *filename)
 		return false;
 	}
 
-	zone *tenured = &data->generations[data->tenured()];
+	zone *tenured = &data->generations[tenured_gen];
 
 	h.magic = image_magic;
 	h.version = image_version;
@@ -156,7 +156,7 @@ void factor_vm::data_fixup(cell *cell)
 	if(immediate_p(*cell))
 		return;
 
-	zone *tenured = &data->generations[data->tenured()];
+	zone *tenured = &data->generations[tenured_gen];
 	*cell += (tenured->start - data_relocation_base);
 }
 
@@ -280,7 +280,7 @@ void factor_vm::relocate_data()
 	data_fixup(&bignum_pos_one);
 	data_fixup(&bignum_neg_one);
 
-	zone *tenured = &data->generations[data->tenured()];
+	zone *tenured = &data->generations[tenured_gen];
 
 	for(relocating = tenured->start;
 		relocating < tenured->here;

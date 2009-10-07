@@ -13,7 +13,7 @@ struct code_heap : heap {
 	/* Minimum value in the above map. */
 	cell youngest_referenced_generation;
 
-	explicit code_heap(factor_vm *myvm, cell size);
+	explicit code_heap(bool secure_gc, cell size);
 	void write_barrier(code_block *compiled);
 	bool needs_fixup_p(code_block *compiled);
 	void code_heap_free(code_block *compiled);
