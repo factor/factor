@@ -280,7 +280,7 @@ void factor_vm::relocate_data()
 		relocating += untagged_object_size((object *)relocating))
 	{
 		object *obj = (object *)relocating;
-		allot_barrier(obj);
+		data->tenured->record_allocation(obj);
 		relocate_object(obj);
 	}
 }

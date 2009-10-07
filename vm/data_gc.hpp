@@ -66,10 +66,10 @@ struct gc_state {
 template<typename Strategy> struct copying_collector {
 	factor_vm *myvm;
 	gc_state *current_gc;
-	zone *newspace;
+	old_space *target;
 	cell scan;
 
-	explicit copying_collector(factor_vm *myvm_, zone *newspace);
+	explicit copying_collector(factor_vm *myvm_, old_space *target);
 	Strategy &strategy();
 	object *allot(cell size);
 	cell trace_next(cell scan);
