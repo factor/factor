@@ -157,12 +157,12 @@ M: vector-rep supported-simd-op?
         { \ (simd-vbitandn)      [ %andn-vector-reps           ] }
         { \ (simd-vbitor)        [ %or-vector-reps             ] }
         { \ (simd-vbitxor)       [ %xor-vector-reps            ] }
-        { \ (simd-vbitnot)       [ %not-vector-reps            ] }
+        { \ (simd-vbitnot)       [ %xor-vector-reps            ] }
         { \ (simd-vand)          [ %and-vector-reps            ] }
         { \ (simd-vandn)         [ %andn-vector-reps           ] }
         { \ (simd-vor)           [ %or-vector-reps             ] }
         { \ (simd-vxor)          [ %xor-vector-reps            ] }
-        { \ (simd-vnot)          [ %not-vector-reps            ] }
+        { \ (simd-vnot)          [ %xor-vector-reps            ] }
         { \ (simd-vlshift)       [ %shl-vector-reps            ] }
         { \ (simd-vrshift)       [ %shr-vector-reps            ] }
         { \ (simd-hlshift)       [ %horizontal-shl-vector-reps ] }

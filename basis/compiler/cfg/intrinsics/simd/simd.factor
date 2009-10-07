@@ -115,3 +115,9 @@ MACRO: if-literals-match ( quots -- )
         [ byte-array inline-alien-setter? ]
         inline-alien
     ] with emit-vector-op ;
+
+: generate-not-vector ( src rep -- dst )
+    dup %not-vector-reps member?
+    [ ^^not-vector ]
+    [ [ ^^fill-vector ] [ ^^xor-vector ] bi ] if ;
+
