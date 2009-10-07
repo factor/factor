@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types kernel locals math math.ranges
 math.bitwise math.vectors math.vectors.simd random
-sequences specialized-arrays sequences.private classes.struct ;
+sequences specialized-arrays sequences.private classes.struct
+combinators.short-circuit fry ;
 SIMD: uint
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: uint-4
@@ -18,6 +19,7 @@ STRUCT: sfmt-state
     { m uint }
     { index uint }
     { mask uint-4 }
+    { parity uint-4 }
     { r1 uint-4 }
     { r2 uint-4 } ;
 
@@ -58,7 +60,6 @@ M:: sfmt generate ( sfmt -- )
         i array nth-unsafe
         i m + array nth-unsafe
         mask state r1>> state r2>> formula :> r
-! USE: io "r = " write r .
 
         r i array set-nth-unsafe
         state r2>> state (>>r1)
@@ -79,6 +80,25 @@ M:: sfmt generate ( sfmt -- )
 
     0 state (>>index) ;
 
+: period-certified? ( sfmt -- ? )
+    [ uint-4-array>> first ]
+    [ state>> parity>> ] bi vbitand odd-parity? ;
+
+: first-set-bit ( x -- n )
+    0 swap [
+        dup { [ 0 > ] [ 1 bitand 0 = ] } 1&&
+    ] [
+        [ 1 + ] [ -1 shift ] bi*
+    ] while drop ;
+
+: correct-period ( sfmt -- )
+    [ drop 0 ]
+    [ state>> parity>> first first-set-bit ]
+    [ uint-array>> swap '[ _ toggle-bit ] change-nth ] tri ;
+
+: certify-period ( sfmt -- sfmt )
+    dup period-certified? [ dup correct-period ] unless ;
+
 : <sfmt-array> ( sfmt -- uint-array uint-4-array )
     state>>
     [ n>> 4 * 1 swap [a,b] >uint-array ] [ seed>> ] bi
@@ -90,8 +110,9 @@ M:: sfmt generate ( sfmt -- )
     ] uint-array{ } accumulate-as nip
     dup underlying>> byte-array>uint-4-array ;
 
-: <sfmt-state> ( seed n m mask -- sfmt )
+: <sfmt-state> ( seed n m mask parity -- sfmt )
     sfmt-state <struct>
+        swap >>parity
         swap >>mask
         swap >>m
         swap >>n
@@ -100,9 +121,9 @@ M:: sfmt generate ( sfmt -- )
 
 : init-sfmt ( sfmt -- sfmt' )
     dup <sfmt-array> [ >>uint-array ] [ >>uint-4-array ] bi*
-    [ generate ] keep ; inline
+    certify-period [ generate ] keep ; inline
 
-: <sfmt> ( seed n m mask -- sfmt )
+: <sfmt> ( seed n m mask parity -- sfmt )
     <sfmt-state>
     sfmt new
         swap >>state
@@ -128,5 +149,6 @@ M: sfmt seed-random ( sfmt seed -- sfmt )
 
 : <sfmt-19937> ( seed -- sfmt )
     156 122
-    uint-4{ HEX: DFFFFFEF HEX: DDFECB7F HEX: BFFAFFFF HEX: BFFFFFF6 }
+    uint-4{ HEX: dfffffef HEX: ddfecb7f HEX: bffaffff HEX: bffffff6 }
+    uint-4{ HEX: 1 HEX: 0 HEX: 0 HEX: 13c9e684 }
     <sfmt> ; inline
