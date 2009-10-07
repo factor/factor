@@ -40,12 +40,15 @@ template<typename Strategy> void factor_vm::trace_handle(cell *handle, Strategy 
 		if(strategy.should_copy_p(untagged))
 		{
 			object *forwarding = resolve_forwarding(untagged,strategy);
+
 			if(forwarding == untagged)
-				*handle = strategy.copy_object(pointer);
+				untagged = strategy.copy_object(untagged);
 			else if(strategy.should_copy_p(forwarding))
-				*handle = strategy.copy_object(RETAG(forwarding,TAG(pointer)));
+				untagged = strategy.copy_object(forwarding);
 			else
-				*handle = RETAG(forwarding,TAG(pointer));
+				untagged = forwarding;
+
+			*handle = RETAG(untagged,TAG(pointer));
 		}
 	}
 }
@@ -60,6 +63,22 @@ template<typename Strategy> void factor_vm::trace_slots(object *ptr, Strategy &s
 		slot++;
 		for(; slot < end; slot++) trace_handle(slot,strategy);
 	}
+}
+
+template<typename Strategy> object *factor_vm::promote_object(object *untagged, Strategy &strategy)
+{
+	cell size = untagged_object_size(untagged);
+	object *newpointer = strategy.allot(size);
+	if(!newpointer) longjmp(current_gc->gc_unwind,1);
+
+	gc_stats *s = &stats[current_gc->collecting_gen];
+	s->object_count++;
+	s->bytes_copied += size;
+
+	memcpy(newpointer,untagged,size);
+	untagged->h.forward_to(newpointer);
+
+	return newpointer;
 }
 
 template<typename Strategy> void factor_vm::trace_card(card *ptr, cell gen, cell here, Strategy &strategy)
@@ -407,28 +426,17 @@ template<typename Strategy> Strategy &copying_collector<Strategy>::strategy()
 	return static_cast<Strategy &>(*this);
 }
 
-/* Given a pointer to oldspace, copy it to newspace */
-template<typename Strategy> object *copying_collector<Strategy>::copy_untagged_object(object *pointer, cell size)
+template<typename Strategy> object *copying_collector<Strategy>::allot(cell size)
 {
-	if(newspace->here + size >= newspace->end)
-		longjmp(current_gc->gc_unwind,1);
-
-	object *newpointer = myvm->allot_zone(newspace,size);
-
-	gc_stats *s = &myvm->stats[current_gc->collecting_gen];
-	s->object_count++;
-	s->bytes_copied += size;
-
-	memcpy(newpointer,pointer,size);
-	return newpointer;
+	if(newspace->here + size <= newspace->end)
+		return myvm->allot_zone(newspace,size);
+	else
+		return NULL;
 }
 
-template<typename Strategy> cell copying_collector<Strategy>::copy_object(cell pointer)
+template<typename Strategy> object *copying_collector<Strategy>::copy_object(object *untagged)
 {
-	object *untagged = myvm->untag<object>(pointer);
-	object *newpointer = copy_untagged_object(untagged,myvm->untagged_object_size(untagged));
-	untagged->h.forward_to(newpointer);
-	return RETAG(newpointer,TAG(pointer));
+	return myvm->promote_object(untagged,strategy());
 }
 
 template<typename Strategy> bool copying_collector<Strategy>::should_copy_p(object *pointer)
