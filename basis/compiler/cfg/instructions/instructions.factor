@@ -303,11 +303,13 @@ literal: rep ;
 PURE-INSN: ##unpack-vector-head
 def: dst
 use: src
+temp: temp
 literal: rep ;
 
 PURE-INSN: ##unpack-vector-tail
 def: dst
 use: src
+temp: temp
 literal: rep ;
 
 PURE-INSN: ##integer>float-vector
@@ -813,8 +815,6 @@ UNION: def-is-use-insn
 ##box-displaced-alien
 ##compare-vector
 ##not-vector
-##unpack-vector-head
-##unpack-vector-tail
 ##string-nth
 ##unbox-any-c-ptr ;
 
