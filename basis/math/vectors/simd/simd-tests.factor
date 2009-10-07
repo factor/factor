@@ -181,6 +181,9 @@ CONSTANT: simd-classes
     {
         hlshift hrshift vshuffle vbroadcast
         vany? vall? vnone?
+        (v>float) (v>integer)
+        (vpack-signed) (vpack-unsigned)
+        (vunpack-head) (vunpack-tail)
     } unique assoc-diff ;
 
 : ops-to-check ( elt-class -- alist )

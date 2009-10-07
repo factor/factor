@@ -749,6 +749,90 @@ M: x86 %merge-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
+M: x86 %signed-pack-vector
+    [ two-operand ] keep
+    {
+        { int-4-rep    [ PACKSSDW ] }
+        { short-8-rep  [ PACKSSWB ] }
+    } case ;
+
+M: x86 %signed-pack-vector-reps
+    {
+        { sse2? { short-8-rep int-4-rep } }
+    } available-reps ;
+
+M: x86 %unsigned-pack-vector
+    [ two-operand ] keep
+    unsign-rep {
+        { int-4-rep   [ PACKUSDW ] }
+        { short-8-rep [ PACKUSWB ] }
+    } case ;
+
+M: x86 %unsigned-pack-vector-reps
+    {
+        { sse2? { ushort-8-rep short-8-rep } }
+        { sse4.1? { uint-4-rep int-4-rep } }
+    } available-reps ;
+
+:: %sign-extension-vector ( dst src rep -- )
+    dst rep %zero-vector
+    dst src rep {
+        { char-16-rep    [ PCMPGTB ] }
+        { short-8-rep    [ PCMPGTW ] }
+        { int-4-rep      [ PCMPGTD ] }
+        { longlong-2-rep [ PCMPGTQ ] }
+    } case ;
+
+:: (%unpack-vector-signs) ( dst src rep -- )
+    dst rep signed-int-vector-rep?
+    [ src rep %sign-extension-vector ]
+    [ rep %zero-vector ] if ;
+
+M:: x86 %unpack-vector-head ( dst src temp rep -- )
+    temp src rep (%unpack-vector-signs)
+    dst src rep %copy
+    dst temp rep unsign-rep {
+        { char-16-rep    [ PUNPCKLBW ] }
+        { short-8-rep    [ PUNPCKLWD ] }
+        { int-4-rep      [ PUNPCKLDQ ] }
+        { longlong-2-rep [ PUNPCKLQDQ ] }
+    } case ;
+
+M:: x86 %unpack-vector-tail ( dst src temp rep -- )
+    temp src rep (%unpack-vector-signs)
+    dst src rep %copy
+    dst temp rep unsign-rep {
+        { char-16-rep    [ PUNPCKHBW ] }
+        { short-8-rep    [ PUNPCKHWD ] }
+        { int-4-rep      [ PUNPCKHDQ ] }
+        { longlong-2-rep [ PUNPCKHQDQ ] }
+    } case ;
+
+M: x86 %unpack-vector-reps ( -- reps )
+    {
+        { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+M: x86 %integer>float-vector ( dst src rep -- )
+    {
+        { int-4-rep [ CVTDQ2PS ] }
+    } case ;
+
+M: x86 %integer>float-vector-reps
+    {
+        { sse2? { int-4-rep } }
+    } available-reps ;
+
+M: x86 %float>integer-vector ( dst src rep -- )
+    {
+        { float-4-rep [ CVTTPS2DQ ] }
+    } case ;
+
+M: x86 %float>integer-vector-reps
+    {
+        { sse2? { float-4-rep } }
+    } available-reps ;
+
 :: compare-float-v-operands ( dst src1 src2 temp rep cc -- dst' src' rep cc' )
     cc { cc> cc>= cc/> cc/>= } member?
     [ dst src2 src1 rep two-operand rep cc swap-cc ]

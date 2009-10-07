@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words kernel make sequences effects sets kernel.private
 accessors combinators math math.intervals math.vectors
+math.vectors.conversion.backend
 namespaces assocs fry splitting classes.algebra generalizations
 locals compiler.tree.propagation.info ;
 IN: math.vectors.specialization
@@ -100,6 +101,12 @@ H{
     { vbroadcast { +vector+ +literal+ -> +vector+ } }
     { (vmerge-head) { +vector+ +vector+ -> +vector+ } }
     { (vmerge-tail) { +vector+ +vector+ -> +vector+ } }
+    { (v>float) { +vector+ +literal+ -> +vector+ } }
+    { (v>integer) { +vector+ +literal+ -> +vector+ } }
+    { (vpack-signed) { +vector+ +vector+ +literal+ -> +vector+ } }
+    { (vpack-unsigned) { +vector+ +vector+ +literal+ -> +vector+ } }
+    { (vunpack-head) { +vector+ +literal+ -> +vector+ } }
+    { (vunpack-tail) { +vector+ +literal+ -> +vector+ } }
     { v<= { +vector+ +vector+ -> +vector+ } }
     { v< { +vector+ +vector+ -> +vector+ } }
     { v= { +vector+ +vector+ -> +vector+ } }
@@ -152,8 +159,13 @@ ERROR: bad-vector-word word ;
         { [ dup complex class<= ] [ vector-words keys { vsqrt } diff ] }
         [ { } ]
     } cond
-    ! Don't specialize horizontal shifts or shuffles at all, they're only for SIMD
-    { hlshift hrshift vshuffle vbroadcast } diff
+    ! Don't specialize horizontal shifts, shuffles, and conversions at all, they're only for SIMD
+    {
+        hlshift hrshift vshuffle vbroadcast
+        (v>integer) (v>float)
+        (vpack-signed) (vpack-unsigned)
+        (vunpack-head) (vunpack-tail)
+    } diff
     nip ;
 
 :: specialize-vector-words ( array-type elt-type simd -- )
