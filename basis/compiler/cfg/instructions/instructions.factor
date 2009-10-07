@@ -814,7 +814,6 @@ UNION: def-is-use-insn
 ##box-alien
 ##box-displaced-alien
 ##compare-vector
-##not-vector
 ##string-nth
 ##unbox-any-c-ptr ;
 

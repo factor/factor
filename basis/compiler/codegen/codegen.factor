@@ -160,6 +160,7 @@ CODEGEN: ##double>single-float %double>single-float
 CODEGEN: ##integer>float %integer>float
 CODEGEN: ##float>integer %float>integer
 CODEGEN: ##zero-vector %zero-vector
+CODEGEN: ##fill-vector %fill-vector
 CODEGEN: ##gather-vector-2 %gather-vector-2
 CODEGEN: ##gather-vector-4 %gather-vector-4
 CODEGEN: ##shuffle-vector %shuffle-vector
