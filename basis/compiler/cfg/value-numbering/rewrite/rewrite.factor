@@ -459,7 +459,7 @@ M: ##shuffle-vector rewrite
     value>> over rep>> {
         { float-4-rep [ float>bits 4 >le (fold-scalar>vector) ] }
         { double-2-rep [ double>bits 8 >le (fold-scalar>vector) ] }
-        [ rep-component-type heap-size >le (fold-scalar>vector) ]
+        [ [ untag-fixnum ] dip rep-component-type heap-size >le (fold-scalar>vector) ]
     } case ;
 
 M: ##scalar>vector rewrite
