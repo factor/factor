@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman, Keith Lazuka
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types byte-arrays combinators fry
-grouping half-floats images kernel math math.vectors sequences
-specialized-arrays specialized-arrays.instances.float
+grouping half-floats images kernel locals math math.vectors
+sequences specialized-arrays specialized-arrays.instances.float
 specialized-arrays.instances.half
 specialized-arrays.instances.uint
 specialized-arrays.instances.ushort words ;
@@ -13,17 +13,18 @@ IN: images.normalization
 
 CONSTANT: don't-care 3
 
-: permutation ( src dst -- seq n )
-    [
-        swap '[ _ index [ don't-care ] unless* ] { } map-as
-        4 don't-care pad-tail
-    ] keep length ;
+: permutation ( src dst -- seq )
+    swap '[ _ index [ don't-care ] unless* ] { } map-as
+    4 don't-care pad-tail ;
 
 : pad4 ( seq -- newseq ) 4 255 pad-tail ;
 
-: permute ( byte-array src-order dst-order -- byte-array )
-   [ name>> [ length ] keep ] [ name>> ] bi*
-   permutation [ group ] 2dip '[ pad4 _ vshuffle _ head ] map concat ;
+:: permute ( bytes src-order dst-order -- new-bytes )
+    [let | src [ src-order name>> ]
+           dst [ dst-order name>> ] |
+        bytes src length group
+        [ pad4 src dst permutation vshuffle dst length head ]
+        map concat ] ;
 
 : (reorder-colors) ( image src-order dest-order -- image )
     [ permute ] 2curry change-bitmap ;
