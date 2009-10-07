@@ -63,10 +63,8 @@ template<typename Strategy> struct copying_collector {
 
 	explicit copying_collector(factor_vm *myvm_, zone *newspace);
 	Strategy &strategy();
-	object *copy_untagged_object_impl(object *pointer, cell size);
+	object *copy_untagged_object(object *pointer, cell size);
 	cell trace_next(cell scan);
-	object *copy_object_impl(object *untagged);
-	object *resolve_forwarding(object *untagged);
 	cell copy_object(cell pointer);
 	bool should_copy_p(object *pointer);
 	void go();

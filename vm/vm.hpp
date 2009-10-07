@@ -237,7 +237,9 @@ struct factor_vm
 	cell code_heap_scans;
 
 	void init_data_gc();
+	template<typename Strategy> object *resolve_forwarding(object *untagged, Strategy &strategy);
 	template<typename Strategy> void trace_handle(cell *handle, Strategy &strategy);
+	template<typename Strategy> void trace_slots(object *ptr, Strategy &strategy);
 	template<typename Strategy> void trace_card(card *ptr, cell gen, cell here, Strategy &strategy);
 	template<typename Strategy> void trace_card_deck(card_deck *deck, cell gen, card mask, card unmask, Strategy &strategy);
 	template<typename Strategy> void trace_generation_cards(cell gen, Strategy &strategy);

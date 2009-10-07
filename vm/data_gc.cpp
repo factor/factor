@@ -17,16 +17,48 @@ gc_state::gc_state(data_heap *data_, bool growing_data_heap_, cell collecting_ge
 
 gc_state::~gc_state() { }
 
+template<typename Strategy> object *factor_vm::resolve_forwarding(object *untagged, Strategy &strategy)
+{
+	check_data_pointer(untagged);
+
+	/* is there another forwarding pointer? */
+	while(untagged->h.forwarding_pointer_p())
+		untagged = untagged->h.forwarding_pointer();
+
+	/* we've found the destination */
+	untagged->h.check_header();
+	return untagged;
+}
+
 template<typename Strategy> void factor_vm::trace_handle(cell *handle, Strategy &strategy)
 {
 	cell pointer = *handle;
 
 	if(!immediate_p(pointer))
 	{
-		object *obj = untag<object>(pointer);
-		check_data_pointer(obj);
-		if(strategy.should_copy_p(obj))
-			*handle = strategy.copy_object(pointer);
+		object *untagged = untag<object>(pointer);
+		if(strategy.should_copy_p(untagged))
+		{
+			object *forwarding = resolve_forwarding(untagged,strategy);
+			if(forwarding == untagged)
+				*handle = strategy.copy_object(pointer);
+			else if(strategy.should_copy_p(forwarding))
+				*handle = strategy.copy_object(RETAG(forwarding,TAG(pointer)));
+			else
+				*handle = RETAG(forwarding,TAG(pointer));
+		}
+	}
+}
+
+template<typename Strategy> void factor_vm::trace_slots(object *ptr, Strategy &strategy)
+{
+	cell *slot = (cell *)ptr;
+	cell *end = (cell *)((cell)ptr + binary_payload_start(ptr));
+
+	if(slot != end)
+	{
+		slot++;
+		for(; slot < end; slot++) trace_handle(slot,strategy);
 	}
 }
 
@@ -178,17 +210,13 @@ template<typename Strategy> void factor_vm::trace_registered_bignums(Strategy &s
 
 	for(; iter < end; iter++)
 	{
-		bignum **handle = (bignum **)(*iter);
-		bignum *pointer = *handle;
+		cell *handle = (cell *)(*iter);
 
-		if(pointer)
+		if(*handle)
 		{
-			check_data_pointer(pointer);
-			if(strategy.should_copy_p(pointer))
-				*handle = untag<bignum>(strategy.copy_object(tag<bignum>(pointer)));
-#ifdef FACTOR_DEBUG
-			assert((*handle)->h.hi_tag() == BIGNUM_TYPE);
-#endif
+			*handle |= BIGNUM_TYPE;
+			trace_handle(handle,strategy);
+			*handle &= ~BIGNUM_TYPE;
 		}
 	}
 }
@@ -380,7 +408,7 @@ template<typename Strategy> Strategy &copying_collector<Strategy>::strategy()
 }
 
 /* Given a pointer to oldspace, copy it to newspace */
-template<typename Strategy> object *copying_collector<Strategy>::copy_untagged_object_impl(object *pointer, cell size)
+template<typename Strategy> object *copying_collector<Strategy>::copy_untagged_object(object *pointer, cell size)
 {
 	if(newspace->here + size >= newspace->end)
 		longjmp(current_gc->gc_unwind,1);
@@ -395,47 +423,12 @@ template<typename Strategy> object *copying_collector<Strategy>::copy_untagged_o
 	return newpointer;
 }
 
-template<typename Strategy> object *copying_collector<Strategy>::copy_object_impl(object *untagged)
-{
-	object *newpointer = copy_untagged_object_impl(untagged,myvm->untagged_object_size(untagged));
-	untagged->h.forward_to(newpointer);
-	return newpointer;
-}
-
-/* Follow a chain of forwarding pointers */
-template<typename Strategy> object *copying_collector<Strategy>::resolve_forwarding(object *untagged)
-{
-	myvm->check_data_pointer(untagged);
-
-	/* is there another forwarding pointer? */
-	if(untagged->h.forwarding_pointer_p())
-		return resolve_forwarding(untagged->h.forwarding_pointer());
-	/* we've found the destination */
-	else
-	{
-		untagged->h.check_header();
-		if(should_copy_p(untagged))
-			return copy_object_impl(untagged);
-		else
-			return untagged;
-	}
-}
-
 template<typename Strategy> cell copying_collector<Strategy>::copy_object(cell pointer)
 {
 	object *untagged = myvm->untag<object>(pointer);
-
-	myvm->check_data_pointer(untagged);
-
-	if(untagged->h.forwarding_pointer_p())
-		untagged = resolve_forwarding(untagged->h.forwarding_pointer());
-	else
-	{
-		untagged->h.check_header();
-		untagged = copy_object_impl(untagged);
-	}
-
-	return RETAG(untagged,TAG(pointer));
+	object *newpointer = copy_untagged_object(untagged,myvm->untagged_object_size(untagged));
+	untagged->h.forward_to(newpointer);
+	return RETAG(newpointer,TAG(pointer));
 }
 
 template<typename Strategy> bool copying_collector<Strategy>::should_copy_p(object *pointer)
@@ -445,18 +438,9 @@ template<typename Strategy> bool copying_collector<Strategy>::should_copy_p(obje
 
 template<typename Strategy> cell copying_collector<Strategy>::trace_next(cell scan)
 {
-	cell *obj = (cell *)scan;
-	cell *end = (cell *)(scan + myvm->binary_payload_start((object *)scan));
-
-	if(obj != end)
-	{
-		obj++;
-
-		for(; obj < end; obj++)
-			myvm->trace_handle(obj,strategy());
-	}
-
-	return scan + myvm->untagged_object_size((object *)scan);
+	object *obj = (object *)scan;
+	myvm->trace_slots(obj,strategy());
+	return scan + myvm->untagged_object_size(obj);
 }
 
 template<typename Strategy> void copying_collector<Strategy>::go()
