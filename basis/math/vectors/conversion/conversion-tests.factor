@@ -118,6 +118,15 @@ MACRO:: test-vconvert ( from-type to-type -- )
 [ longlong-4{ 1 2 3 4 } longlong-4{ 3 4 5 6 } ]
 [ uint-8{ 1 2 3 4 3 4 5 6 } uint-8 longlong-4 test-vconvert ] unit-test
 
+[ int-4{ 1 2 -3 -4 } int-4{ 5 -6 7 -8 } ]
+[ short-8{ 1 2 -3 -4 5 -6 7 -8 } short-8 int-4 test-vconvert ] unit-test
+
+[ uint-4{ 1 2 3 4 } uint-4{ 5 6 7 8 } ]
+[ ushort-8{ 1 2 3 4 5 6 7 8 } ushort-8 uint-4 test-vconvert ] unit-test
+
+[ longlong-4{ 1 2 3 4 } longlong-4{ 3 4 5 6 } ]
+[ uint-8{ 1 2 3 4 3 4 5 6 } uint-8 longlong-4 test-vconvert ] unit-test
+
 ! TODO we should be able to do 128->256 unpack
 ! [ longlong-4{ 1 2 3 4 } ]
 [ uint-4{ 1 2 3 4 } uint-4 longlong-4 test-vconvert ]
