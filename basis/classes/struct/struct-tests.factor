@@ -352,3 +352,8 @@ STRUCT: struct-that's-a-word { x int } ;
 ] unit-test
 
 [ f ] [ "a-struct" c-types get key? ] unit-test
+
+STRUCT: bit-field-test
+    { a uint bits: 12 }
+    { b int bits: 2 }
+    { c char } ;

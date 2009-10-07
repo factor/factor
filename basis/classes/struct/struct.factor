@@ -1,4 +1,4 @@
-! (c)Joe Groff bsd license
+! (c)Joe Groff, Daniel Ehrenberg bsd license
 USING: accessors alien alien.c-types alien.data alien.parser arrays
 byte-arrays classes classes.parser classes.tuple classes.tuple.parser
 classes.tuple.private combinators combinators.short-circuit
@@ -6,10 +6,28 @@ combinators.smart cpu.architecture definitions functors.backend
 fry generalizations generic.parser kernel kernel.private lexer
 libc locals macros make math math.order parser quotations
 sequences slots slots.private specialized-arrays vectors words
-summary namespaces assocs vocabs.parser ;
+summary namespaces assocs vocabs.parser math.functions bit-arrays ;
+QUALIFIED: math
 IN: classes.struct
 
 SPECIALIZED-ARRAY: uchar
+
+<PRIVATE
+
+TUPLE: bits size signed? ;
+C: <bits> bits
+
+M: bits heap-size size>> 8 / ;
+
+M: bits c-type-align drop 1/8 ;
+
+: align ( m w -- n )
+    ! Really, you could write 'align' correctly
+    ! for any real w; this is just a hack
+    ! that only works here
+    dup integer? [ [ ceiling ] dip math:align ] [ drop ] if ;
+
+PRIVATE>
 
 ERROR: struct-must-have-slots ;
 
@@ -84,13 +102,55 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
 : pad-struct-slots ( values class -- values' class )
     [ struct-slots [ initial>> ] map over length tail append ] keep ;
 
-: (reader-quot) ( slot -- quot )
+: read-normal ( slot -- quot )
     [ type>> c-type-getter-boxer ]
     [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
 
-: (writer-quot) ( slot -- quot )
+: bits@ ( slot -- beginning end )
+    [ offset>> 8 * ] [ type>> size>> ] bi dupd + ;
+
+QUALIFIED: math.bits
+
+: bytes>bits ( byte-array -- bit-array )
+    [ 8 math.bits:<bits> ] { } map-as ?{ } join ;
+
+: (read-bits) ( beginning end byte-array -- n )
+    ! This is absurdly inefficient
+    bytes>bits subseq bit-array>integer ;
+
+: sign-extend ( n bits -- n' )
+    ! formula from:
+    ! http://guru.multimedia.cx/fast-sign-extension/
+    1 - -1 swap shift [ + ] keep bitxor ; inline
+
+: read-bits ( slot -- quot )
+    [ bits@ ] [ type>> signed?>> ] [ type>> size>> ] tri '[
+        [ _ _ ] dip (underlying)>> (read-bits)
+        _ [ _ sign-extend ] when
+    ] ;
+
+: (reader-quot) ( slot -- quot )
+    dup type>> bits? [ read-bits ] [ read-normal ] if ;
+
+: write-normal ( slot -- quot )
     [ type>> c-setter ]
     [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
+
+: overwrite ( donor victim -- )
+    0 swap copy ;
+
+: (write-bits) ( value offset end byte-array -- )
+    ! This is absurdly inefficient
+    [
+        [ [ swap - math.bits:<bits> ] 2keep ] [ bytes>bits ] bi*
+        replace-slice ?{ } like underlying>>
+    ] keep overwrite ;
+
+: write-bits ( slot -- quot )
+    bits@ '[ [ _ _ ] dip (underlying)>> (write-bits) ] ;
+
+: (writer-quot) ( slot -- quot )
+    dup type>> bits? [ write-bits ] [ write-normal ] if ;
 
 : (boxer-quot) ( class -- quot )
     '[ _ memory>struct ] ;
@@ -196,10 +256,10 @@ M: struct-c-type c-struct? drop t ;
     ] reduce ;
 
 : union-struct-offsets ( slots -- size )
-    [ 0 >>offset type>> heap-size ] [ max ] map-reduce ;
+    1 [ 0 >>offset type>> heap-size max ] reduce ;
 
 : struct-align ( slots -- align )
-    [ type>> c-type-align ] [ max ] map-reduce ;
+    1 [ type>> c-type-align max ] reduce ;
 PRIVATE>
 
 M: struct byte-length class "struct-size" word-prop ; foldable
@@ -273,11 +333,36 @@ ERROR: invalid-struct-slot token ;
     c-type c-type-boxed-class
     dup \ byte-array = [ drop \ c-ptr ] when ;
 
+SYMBOL: bits:
+
+<PRIVATE
+
+ERROR: bad-type-for-bits type ;
+
+: set-bits ( slot-spec n -- slot-spec )
+    over type>> {
+        { int [ t ] }
+        { uint [ f ] }
+        [ bad-type-for-bits ]
+    } case <bits> >>type ;
+
+: peel-off-struct-attributes ( slot-spec array -- slot-spec array )
+    dup empty? [
+        unclip {
+            { initial: [ [ first >>initial ] [ rest ] bi ] }
+            { read-only [ [ t >>read-only ] dip ] }
+            { bits: [ [ first set-bits ] [ rest ] bi ] }
+            [ bad-slot-attribute ]
+        } case
+    ] unless ;
+
+PRIVATE>
+
 : <struct-slot-spec> ( name c-type attributes -- slot-spec )
     [ struct-slot-spec new ] 3dip
     [ >>name ]
     [ [ >>type ] [ struct-slot-class >>class ] bi ]
-    [ [ dup empty? ] [ peel-off-attributes ] until drop ] tri* ;
+    [ [ dup empty? ] [ peel-off-struct-attributes ] until drop ] tri* ;
 
 <PRIVATE
 : parse-struct-slot ( -- slot )
