@@ -2,7 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data assocs combinators
 cpu.architecture compiler.cfg.comparisons fry generalizations
-kernel libc macros math sequences effects accessors namespaces
+kernel libc macros math
+math.vectors.conversion.backend
+sequences effects accessors namespaces
 lexer parser vocabs.parser words arrays math.vectors ;
 IN: math.vectors.simd.intrinsics
 
@@ -12,17 +14,27 @@ ERROR: bad-simd-call ;
 
 : simd-effect ( word -- effect )
     stack-effect [ in>> "rep" suffix ] [ out>> ] bi <effect> ;
+: simd-conversion-effect ( word -- effect )
+    stack-effect [ in>> but-last "rep" suffix ] [ out>> ] bi <effect> ;
 
 SYMBOL: simd-ops
 
 V{ } clone simd-ops set-global
 
-SYNTAX: SIMD-OP:
-    scan-word dup name>> "(simd-" ")" surround create-in
-    [ nip [ bad-simd-call ] define ]
-    [ [ simd-effect ] dip set-stack-effect ]
+: (SIMD-OP:) ( accum quot -- accum )
+    [
+        scan-word dup name>> "(simd-" ")" surround create-in
+        [ nip [ bad-simd-call ] define ]
+    ] dip
+    '[ _ dip set-stack-effect ]
     [ 2array simd-ops get push ]
-    2tri ;
+    2tri ; inline
+
+SYNTAX: SIMD-OP:
+    [ simd-effect ] (SIMD-OP:) ;
+
+SYNTAX: SIMD-CONVERSION-OP:
+    [ simd-conversion-effect ] (SIMD-OP:) ;
 
 >>
 
@@ -66,6 +78,13 @@ SIMD-OP: vunordered?
 SIMD-OP: vany?
 SIMD-OP: vall?
 SIMD-OP: vnone?
+
+SIMD-CONVERSION-OP: (v>float)
+SIMD-CONVERSION-OP: (v>integer)
+SIMD-CONVERSION-OP: (vpack-signed)
+SIMD-CONVERSION-OP: (vpack-unsigned)
+SIMD-CONVERSION-OP: (vunpack-head)
+SIMD-CONVERSION-OP: (vunpack-tail)
 
 : (simd-with) ( x rep -- v ) bad-simd-call ;
 : (simd-gather-2) ( a b rep -- v ) bad-simd-call ;
@@ -151,6 +170,12 @@ M: vector-rep supported-simd-op?
         { \ (simd-vshuffle)      [ %shuffle-vector-reps        ] }
         { \ (simd-(vmerge-head)) [ %merge-vector-reps          ] }
         { \ (simd-(vmerge-tail)) [ %merge-vector-reps          ] }
+        { \ (simd-(v>float))        [ %integer>float-vector-reps ] }
+        { \ (simd-(v>integer))      [ %float>integer-vector-reps ] }
+        { \ (simd-(vpack-signed))   [ %signed-pack-vector-reps   ] }
+        { \ (simd-(vpack-unsigned)) [ %unsigned-pack-vector-reps ] }
+        { \ (simd-(vunpack-head))   [ %unpack-vector-reps        ] }
+        { \ (simd-(vunpack-tail))   [ %unpack-vector-reps        ] }
         { \ (simd-v<=)           [ cc<= %compare-vector-reps   ] }
         { \ (simd-v<)            [ cc< %compare-vector-reps    ] }
         { \ (simd-v=)            [ cc= %compare-vector-reps    ] }

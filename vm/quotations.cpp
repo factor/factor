@@ -103,6 +103,28 @@ bool quotation_jit::stack_frame_p()
 	return false;
 }
 
+bool quotation_jit::trivial_quotation_p(array *elements)
+{
+	return array_capacity(elements) == 1 && tagged<object>(array_nth(elements,0)).type_p(WORD_TYPE);
+}
+
+void quotation_jit::emit_quot(cell quot_)
+{
+	gc_root<quotation> quot(quot_,parent_vm);
+
+	array *elements = parent_vm->untag<array>(quot->array);
+
+	/* If the quotation consists of a single word, compile a direct call
+	to the word. */
+	if(trivial_quotation_p(elements))
+		literal(array_nth(elements,0));
+	else
+	{
+		if(compiling) parent_vm->jit_compile(quot.value(),relocate);
+		literal(quot.value());
+	}
+}
+
 /* Allocates memory */
 void quotation_jit::iterate_quotation()
 {
@@ -194,14 +216,8 @@ void quotation_jit::iterate_quotation()
 				if(stack_frame) emit(parent_vm->userenv[JIT_EPILOG]);
 				tail_call = true;
 
-				if(compiling)
-				{
-					parent_vm->jit_compile(array_nth(elements.untagged(),i),relocate);
-					parent_vm->jit_compile(array_nth(elements.untagged(),i + 1),relocate);
-				}
-
-				literal(array_nth(elements.untagged(),i));
-				literal(array_nth(elements.untagged(),i + 1));
+				emit_quot(array_nth(elements.untagged(),i));
+				emit_quot(array_nth(elements.untagged(),i + 1));
 				emit(parent_vm->userenv[JIT_IF]);
 
 				i += 2;
@@ -209,25 +225,22 @@ void quotation_jit::iterate_quotation()
 			/* dip */
 			else if(fast_dip_p(i,length))
 			{
-				if(compiling)
-					parent_vm->jit_compile(obj.value(),relocate);
-				emit_with(parent_vm->userenv[JIT_DIP],obj.value());
+				emit_quot(obj.value());
+				emit(parent_vm->userenv[JIT_DIP]);
 				i++;
 			}
 			/* 2dip */
 			else if(fast_2dip_p(i,length))
 			{
-				if(compiling)
-					parent_vm->jit_compile(obj.value(),relocate);
-				emit_with(parent_vm->userenv[JIT_2DIP],obj.value());
+				emit_quot(obj.value());
+				emit(parent_vm->userenv[JIT_2DIP]);
 				i++;
 			}
 			/* 3dip */
 			else if(fast_3dip_p(i,length))
 			{
-				if(compiling)
-					parent_vm->jit_compile(obj.value(),relocate);
-				emit_with(parent_vm->userenv[JIT_3DIP],obj.value());
+				emit_quot(obj.value());
+				emit(parent_vm->userenv[JIT_3DIP]);
 				i++;
 			}
 			else
