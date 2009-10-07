@@ -783,23 +783,25 @@ M: x86 %unsigned-pack-vector-reps
         { longlong-2-rep [ PCMPGTQ ] }
     } case ;
 
-:: (%unpack-vector-dest) ( dst src rep -- )
+:: (%unpack-vector-signs) ( dst src rep -- )
     dst rep signed-int-vector-rep?
     [ src rep %sign-extension-vector ]
     [ rep %zero-vector ] if ;
 
-M: x86 %unpack-vector-head ( dst src rep -- )
-    [ (%unpack-vector-dest) ] 3keep
-    unsign-rep {
+M:: x86 %unpack-vector-head ( dst src temp rep -- )
+    temp src rep (%unpack-vector-signs)
+    dst src rep %copy
+    dst temp rep unsign-rep {
         { char-16-rep    [ PUNPCKLBW ] }
         { short-8-rep    [ PUNPCKLWD ] }
         { int-4-rep      [ PUNPCKLDQ ] }
         { longlong-2-rep [ PUNPCKLQDQ ] }
     } case ;
 
-M: x86 %unpack-vector-tail ( dst src rep -- )
-    [ (%unpack-vector-dest) ] 3keep
-    unsign-rep {
+M:: x86 %unpack-vector-tail ( dst src temp rep -- )
+    temp src rep (%unpack-vector-signs)
+    dst src rep %copy
+    dst temp rep unsign-rep {
         { char-16-rep    [ PUNPCKHBW ] }
         { short-8-rep    [ PUNPCKHWD ] }
         { int-4-rep      [ PUNPCKHDQ ] }
