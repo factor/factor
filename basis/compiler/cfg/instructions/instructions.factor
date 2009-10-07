@@ -328,7 +328,6 @@ literal: rep ;
 PURE-INSN: ##compare-vector
 def: dst
 use: src1 src2
-temp: temp
 literal: rep cc ;
 
 PURE-INSN: ##test-vector
@@ -816,7 +815,6 @@ UNION: kill-vreg-insn
 UNION: def-is-use-insn
 ##box-alien
 ##box-displaced-alien
-##compare-vector
 ##string-nth
 ##unbox-any-c-ptr ;
 
