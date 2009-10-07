@@ -16,7 +16,7 @@ STRUCT: sfmt-state
     { seed uint }
     { n uint }
     { m uint }
-    { ix uint }
+    { index uint }
     { mask uint-4 }
     { r1 uint-4 }
     { r2 uint-4 } ;
@@ -50,14 +50,15 @@ M:: sfmt generate ( sfmt -- )
     sfmt uint-4-array>> :> array
     state n>> 2 - array nth state (>>r1)
     state n>> 1 - array nth state (>>r2)
-    state m>> :> m 
-    state n>> :> n 
+    state m>> :> m
+    state n>> :> n
     state mask>> :> mask
 
     n m - >fixnum iota [| i |
-        i array nth-unsafe 
+        i array nth-unsafe
         i m + array nth-unsafe
         mask state r1>> state r2>> formula :> r
+! USE: io "r = " write r .
 
         r i array set-nth-unsafe
         state r2>> state (>>r1)
@@ -75,19 +76,17 @@ M:: sfmt generate ( sfmt -- )
         state r2>> state (>>r1)
         r state (>>r2)
     ] each
-    
-    0 state (>>ix) ;
+
+    0 state (>>index) ;
 
 : <sfmt-array> ( sfmt -- uint-array uint-4-array )
-    state>> 
-    [ n>> 4 * iota >uint-array ] [ seed>> ] bi
+    state>>
+    [ n>> 4 * 1 swap [a,b] >uint-array ] [ seed>> ] bi
     [
         [
-            [
-                [ -30 shift ] [ ] bi bitxor
-                state-multiplier * 32 bits
-            ] dip +
-        ] unless-zero 32 bits
+            [ -30 shift ] [ ] bi bitxor
+            state-multiplier * 32 bits
+        ] dip + 32 bits
     ] uint-array{ } accumulate-as nip
     dup underlying>> byte-array>uint-4-array ;
 
@@ -97,7 +96,7 @@ M:: sfmt generate ( sfmt -- )
         swap >>m
         swap >>n
         swap >>seed
-        0 >>ix ;
+        0 >>index ;
 
 : init-sfmt ( sfmt -- sfmt' )
     dup <sfmt-array> [ >>uint-array ] [ >>uint-4-array ] bi*
@@ -110,13 +109,13 @@ M:: sfmt generate ( sfmt -- )
         init-sfmt ; inline
 
 : refill-sfmt? ( sfmt -- ? )
-    state>> [ ix>> ] [ n>> 4 * ] bi >= ;
+    state>> [ index>> ] [ n>> 4 * ] bi >= ;
 
-: next-ix ( sfmt -- ix )
-    state>> [ dup 1 + ] change-ix drop ; inline
+: next-index ( sfmt -- index )
+    state>> [ dup 1 + ] change-index drop ; inline
 
 : next ( sfmt -- n )
-    [ next-ix ] [ uint-array>> ] bi nth-unsafe ; inline
+    [ next-index ] [ uint-array>> ] bi nth-unsafe ; inline
 
 PRIVATE>
 
@@ -128,5 +127,6 @@ M: sfmt seed-random ( sfmt seed -- sfmt )
     [ drop init-sfmt ] 2bi ;
 
 : <sfmt-19937> ( seed -- sfmt )
-    348 330 uint-4{ HEX: BFFFFFF6 HEX: BFFAFFFF HEX: DDFECB7F HEX: DFFFFFEF }
+    156 122
+    uint-4{ HEX: DFFFFFEF HEX: DDFECB7F HEX: BFFAFFFF HEX: BFFFFFF6 }
     <sfmt> ; inline
