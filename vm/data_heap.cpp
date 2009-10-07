@@ -27,12 +27,7 @@ data_heap::data_heap(factor_vm *myvm, cell young_size_, cell aging_size_, cell t
 
 	seg = new segment(total_size);
 
-	generations = new zone[gen_count];
-	semispaces = new zone[gen_count];
-
 	cell cards_size = total_size >> card_bits;
-	allot_markers = new char[cards_size];
-	allot_markers_end = allot_markers + cards_size;
 
 	cards = new char[cards_size];
 	cards_end = cards + cards_size;
@@ -41,19 +36,39 @@ data_heap::data_heap(factor_vm *myvm, cell young_size_, cell aging_size_, cell t
 	decks = new char[decks_size];
 	decks_end = decks + decks_size;
 
+	allot_markers = new char[cards_size];
+	allot_markers_end = allot_markers + cards_size;
+
 	cell alloter = align(seg->start,deck_size);
 
-	alloter = generations[tenured_gen].init_zone(tenured_size,alloter);
-	alloter = semispaces[tenured_gen].init_zone(tenured_size,alloter);
+	tenured = new zone;
+	tenured_semispace = new zone;
+	alloter = tenured->init_zone(tenured_size,alloter);
+	alloter = tenured_semispace->init_zone(tenured_size,alloter);
 
-	alloter = generations[aging_gen].init_zone(aging_size,alloter);
-	alloter = semispaces[aging_gen].init_zone(aging_size,alloter);
+	aging = new zone;
+	aging_semispace = new zone;
+	alloter = aging->init_zone(aging_size,alloter);
+	alloter = aging_semispace->init_zone(aging_size,alloter);
 
-	alloter = generations[nursery_gen].init_zone(young_size,alloter);
-	alloter = semispaces[nursery_gen].init_zone(0,alloter);
+	nursery = new zone;
+	alloter = nursery->init_zone(young_size,alloter);
 
 	if(seg->end - alloter > deck_size)
 		critical_error("Bug in alloc_data_heap",alloter);
+}
+
+data_heap::~data_heap()
+{
+	delete seg;
+	delete nursery;
+	delete aging;
+	delete aging_semispace;
+	delete tenured;
+	delete tenured_semispace;
+	delete[] allot_markers;
+	delete[] cards;
+	delete[] decks;
 }
 
 data_heap *factor_vm::grow_data_heap(data_heap *data, cell requested_bytes)
@@ -66,48 +81,35 @@ data_heap *factor_vm::grow_data_heap(data_heap *data, cell requested_bytes)
 		new_tenured_size);
 }
 
-data_heap::~data_heap()
-{
-	delete seg;
-	delete[] generations;
-	delete[] semispaces;
-	delete[] allot_markers;
-	delete[] cards;
-	delete[] decks;
-}
-
-void factor_vm::clear_cards(cell gen)
+void factor_vm::clear_cards(zone *gen)
 {
 	/* NOTE: reverse order due to heap layout. */
-	card *first_card = addr_to_card(data->generations[gen].start);
-	card *last_card = addr_to_card(data->generations[gen].end);
+	card *first_card = addr_to_card(gen->start);
+	card *last_card = addr_to_card(gen->end);
 	memset(first_card,0,last_card - first_card);
 }
 
-void factor_vm::clear_decks(cell gen)
+void factor_vm::clear_decks(zone *gen)
 {
 	/* NOTE: reverse order due to heap layout. */
-	card_deck *first_deck = addr_to_deck(data->generations[gen].start);
-	card_deck *last_deck = addr_to_deck(data->generations[gen].end);
+	card_deck *first_deck = addr_to_deck(gen->start);
+	card_deck *last_deck = addr_to_deck(gen->end);
 	memset(first_deck,0,last_deck - first_deck);
 }
 
-void factor_vm::clear_allot_markers(cell gen)
+void factor_vm::clear_allot_markers(zone *gen)
 {
-	card *first_card = addr_to_allot_marker((object *)data->generations[gen].start);
-	card *last_card = addr_to_allot_marker((object *)data->generations[gen].end);
+	card *first_card = addr_to_allot_marker((object *)gen->start);
+	card *last_card = addr_to_allot_marker((object *)gen->end);
 	memset(first_card,invalid_allot_marker,last_card - first_card);
 }
 
 /* After garbage collection, any generations which are now empty need to have
 their allocation pointers and cards reset. */
-void factor_vm::reset_generation(cell gen)
+void factor_vm::reset_generation(zone *gen)
 {
-	assert(gen != nursery_gen);
-
-	zone *z = &data->generations[gen];
-	z->here = z->start;
-	if(secure_gc) memset((void*)z->start,69,z->size);
+	gen->here = gen->start;
+	if(secure_gc) memset((void*)gen->start,69,gen->size);
 
 	clear_cards(gen);
 	clear_decks(gen);
@@ -117,18 +119,17 @@ void factor_vm::reset_generation(cell gen)
 void factor_vm::set_data_heap(data_heap *data_)
 {
 	data = data_;
-	nursery = data->generations[nursery_gen];
+	nursery = *data->nursery;
 	nursery.here = nursery.start;
 	init_card_decks();
-	reset_generation(aging_gen);
-	reset_generation(tenured_gen);
+	reset_generation(data->aging);
+	reset_generation(data->tenured);
 }
 
 void factor_vm::init_data_heap(cell young_size, cell aging_size, cell tenured_size, bool secure_gc_)
 {
 	set_data_heap(new data_heap(this,young_size,aging_size,tenured_size));
 	secure_gc = secure_gc_;
-	init_data_gc();
 }
 
 /* Size of the object pointed to by a tagged pointer */
@@ -231,13 +232,14 @@ void factor_vm::primitive_data_room()
 
 	growable_array a(this);
 
-	cell gen;
-	for(gen = 0; gen < gen_count; gen++)
-	{
-		zone *z = (gen == nursery_gen ? &nursery : &data->generations[gen]);
-		a.add(tag_fixnum((z->end - z->here) >> 10));
-		a.add(tag_fixnum((z->size) >> 10));
-	}
+	a.add(tag_fixnum((nursery.end - nursery.here) >> 10));
+	a.add(tag_fixnum((nursery.size) >> 10));
+
+	a.add(tag_fixnum((data->aging->end - data->aging->here) >> 10));
+	a.add(tag_fixnum((data->aging->size) >> 10));
+
+	a.add(tag_fixnum((data->tenured->end - data->tenured->here) >> 10));
+	a.add(tag_fixnum((data->tenured->size) >> 10));
 
 	a.trim();
 	dpush(a.elements.value());
@@ -246,7 +248,7 @@ void factor_vm::primitive_data_room()
 /* Disables GC and activates next-object ( -- obj ) primitive */
 void factor_vm::begin_scan()
 {
-	heap_scan_ptr = data->generations[tenured_gen].start;
+	heap_scan_ptr = data->tenured->start;
 	gc_off = true;
 }
 
@@ -265,7 +267,7 @@ cell factor_vm::next_object()
 	if(!gc_off)
 		general_error(ERROR_HEAP_SCAN,F,F,NULL);
 
-	if(heap_scan_ptr >= data->generations[tenured_gen].here)
+	if(heap_scan_ptr >= data->tenured->here)
 		return F;
 
 	object *obj = (object *)heap_scan_ptr;
@@ -294,9 +296,6 @@ template<typename Iterator> void factor_vm::each_object(Iterator &iterator)
 	end_scan();
 }
 
-namespace
-{
-
 struct word_counter {
 	cell count;
 	explicit word_counter() : count(0) {}
@@ -308,8 +307,6 @@ struct word_accumulator {
 	explicit word_accumulator(int count,factor_vm *vm) : words(vm,count) {}
 	void operator()(tagged<object> obj) { if(obj.type_p(WORD_TYPE)) words.add(obj.value()); }
 };
-
-}
 
 cell factor_vm::find_all_words()
 {

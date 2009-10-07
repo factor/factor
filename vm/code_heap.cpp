@@ -27,6 +27,7 @@ void code_heap::code_heap_free(code_block *compiled)
 void factor_vm::init_code_heap(cell size)
 {
 	code = new code_heap(secure_gc,size);
+	code->youngest_referenced_generation = nursery_gen;
 }
 
 bool factor_vm::in_code_heap_p(cell ptr)

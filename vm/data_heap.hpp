@@ -1,45 +1,18 @@
 namespace factor
 {
 
-/* generational copying GC divides memory into zones */
-struct zone {
-	/* allocation pointer is 'here'; its offset is hardcoded in the
-	compiler backends */
-	cell start;
-	cell here;
-	cell size;
-	cell end;
-
-	cell init_zone(cell size_, cell start_)
-	{
-		size = size_;
-		start = here = start_;
-		end = start_ + size_;
-		return end;
-	}
-
-	inline bool contains_p(object *pointer)
-	{
-		return ((cell)pointer - start) < size;
-	}
-
-	inline object *allot(cell size)
-	{
-		cell h = here;
-		here = h + align8(size);
-		return (object *)h;
-	}
-};
-
 struct data_heap {
-	segment *seg;
-
 	cell young_size;
 	cell aging_size;
 	cell tenured_size;
 
-	zone *generations;
-	zone *semispaces;
+	segment *seg;
+
+	zone *nursery;
+	zone *aging;
+	zone *aging_semispace;
+	zone *tenured;
+	zone *tenured_semispace;
 
 	char *allot_markers;
 	char *allot_markers_end;

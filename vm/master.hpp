@@ -69,6 +69,7 @@ namespace factor
 #include "bignumint.hpp"
 #include "bignum.hpp"
 #include "code_block.hpp"
+#include "gc/zone.hpp"
 #include "data_heap.hpp"
 #include "write_barrier.hpp"
 #include "data_gc.hpp"
