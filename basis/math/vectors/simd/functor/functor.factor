@@ -3,6 +3,7 @@
 USING: accessors assocs byte-arrays classes classes.algebra effects fry
 functors generalizations kernel literals locals math math.functions
 math.vectors math.vectors.private math.vectors.simd.intrinsics
+math.vectors.conversion math.vectors.conversion.private
 math.vectors.specialization parser prettyprint.custom sequences
 sequences.private strings words definitions macros cpu.architecture
 namespaces arrays quotations combinators combinators.short-circuit sets
@@ -174,6 +175,8 @@ A-vn->v-op   DEFINES-PRIVATE ${A}-vn->v-op
 A-vv->n-op   DEFINES-PRIVATE ${A}-vv->n-op
 A-v->v-op    DEFINES-PRIVATE ${A}-v->v-op
 A-v->n-op    DEFINES-PRIVATE ${A}-v->n-op
+A-v-conversion-op DEFINES-PRIVATE ${A}-v-conversion-op
+A-vv-conversion-op DEFINES-PRIVATE ${A}-vv-conversion-op
 
 A-element-class [ A-rep rep-component-type c:c-type-boxed-class ]
 
@@ -251,10 +254,29 @@ INSTANCE: A sequence
 : A-v->n-op ( v quot -- n )
     [ underlying>> A-rep ] dip call ; inline
 
+: A-v-conversion-op ( v1 to-type quot -- v2 )
+    swap [ underlying>> A-rep ] [ call ] [ '[ _ boa ] call( u -- v ) ] tri* ; inline
+
+: A-vv-conversion-op ( v1 v2 to-type quot -- v2 )
+    swap {
+        [ underlying>> ]
+        [ underlying>> A-rep ]
+        [ call ]
+        [ '[ _ boa ] call( u -- v ) ]
+    } spread ; inline
+
 simd new
     \ A >>class
     \ A-with >>ctor
     \ A-rep >>rep
+    {
+        { (v>float) A-v-conversion-op }
+        { (v>integer) A-v-conversion-op }
+        { (vpack-signed) A-vv-conversion-op }
+        { (vpack-unsigned) A-vv-conversion-op }
+        { (vunpack-head) A-v-conversion-op }
+        { (vunpack-tail) A-v-conversion-op }
+    } >>special-wrappers
     {
         { { +vector+ +vector+ -> +vector+ } A-vv->v-op }
         { { +vector+ +scalar+ -> +vector+ } A-vn->v-op }
@@ -327,6 +349,10 @@ A-vany-op    DEFINES-PRIVATE ${A}-vany-op
 A-vall-op    DEFINES-PRIVATE ${A}-vall-op
 A-vmerge-head-op    DEFINES-PRIVATE ${A}-vmerge-head-op
 A-vmerge-tail-op    DEFINES-PRIVATE ${A}-vmerge-tail-op
+A-v-conversion-op   DEFINES-PRIVATE ${A}-v-conversion-op
+A-vpack-op          DEFINES-PRIVATE ${A}-vpack-op
+A-vunpack-head-op   DEFINES-PRIVATE ${A}-vunpack-head-op
+A-vunpack-tail-op   DEFINES-PRIVATE ${A}-vunpack-tail-op
 
 WHERE
 
@@ -426,14 +452,39 @@ INSTANCE: A sequence
     [ underlying1>> ] bi@
     [ A-rep (simd-(vmerge-head)) ]
     [ A-rep (simd-(vmerge-tail)) ] 2bi
-    \ A boa ;
+    \ A boa ; inline
     
 : A-vmerge-tail-op ( v1 v2 quot -- v )
     drop
     [ underlying2>> ] bi@
     [ A-rep (simd-(vmerge-head)) ]
     [ A-rep (simd-(vmerge-tail)) ] 2bi
-    \ A boa ;
+    \ A boa ; inline
+
+: A-v-conversion-op ( v1 to-type quot -- v )
+    swap [ 
+        [ [ underlying1>> A-rep ] dip call ]
+        [ [ underlying2>> A-rep ] dip call ] 2bi
+    ] dip '[ _ boa ] call( u1 u2 -- v ) ; inline
+
+: A-vpack-op ( v1 v2 to-type quot -- v )
+    swap [ 
+        '[ [ underlying1>> ] [ underlying2>> ] bi A-rep @ ] bi*
+    ] dip '[ _ boa ] call( u1 u2 -- v ) ; inline
+
+: A-vunpack-head-op ( v1 to-type quot -- v )
+    '[
+        underlying1>>
+        [ A-rep @ ]
+        [ A-rep (simd-(vunpack-tail)) ] bi
+    ] dip '[ _ boa ] call( u1 u2 -- v ) ; inline
+
+: A-vunpack-tail-op ( v1 to-type quot -- v )
+    '[
+        underlying2>>
+        [ A-rep (simd-(vunpack-head)) ]
+        [ A-rep @ ] bi
+    ] dip '[ _ boa ] call( u1 u2 -- v ) ; inline
 
 simd new
     \ A >>class
@@ -447,6 +498,12 @@ simd new
         { vall?  A-vall-op }
         { (vmerge-head) A-vmerge-head-op }
         { (vmerge-tail) A-vmerge-tail-op }
+        { (v>integer) A-v-conversion-op }
+        { (v>float) A-v-conversion-op }
+        { (vpack-signed) A-vpack-op }
+        { (vpack-unsigned) A-vpack-op }
+        { (vunpack-head) A-vunpack-head-op }
+        { (vunpack-tail) A-vunpack-tail-op }
     } >>special-wrappers
     {
         { { +vector+ +vector+ -> +vector+ } A-vv->v-op }
