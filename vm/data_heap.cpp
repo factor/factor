@@ -37,11 +37,11 @@ data_heap::data_heap(factor_vm *myvm, cell young_size_, cell aging_size_, cell t
 
 	cell start = align(seg->start,deck_size);
 
-	tenured = new old_space(tenured_size,start);
-	tenured_semispace = new old_space(tenured_size,tenured->end);
+	tenured = new tenured_space(tenured_size,start);
+	tenured_semispace = new tenured_space(tenured_size,tenured->end);
 
-	aging = new old_space(aging_size,tenured_semispace->end);
-	aging_semispace = new old_space(aging_size,aging->end);
+	aging = new aging_space(aging_size,tenured_semispace->end);
+	aging_semispace = new aging_space(aging_size,aging->end);
 
 	nursery = new zone(young_size,aging_semispace->end);
 

@@ -9,13 +9,7 @@ struct zone {
 	cell size;
 	cell end;
 
-	cell init_zone(cell size_, cell start_)
-	{
-		size = size_;
-		start = here = start_;
-		end = start_ + size_;
-		return end;
-	}
+	zone(cell size_, cell start_) : start(start_), here(0), size(size_), end(start_ + size_) {}
 
 	inline bool contains_p(object *pointer)
 	{
