@@ -774,44 +774,31 @@ M: x86 %unsigned-pack-vector-reps
         { sse4.1? { int-4-rep } }
     } available-reps ;
 
-:: %sign-extension-vector ( dst src rep -- )
-    dst rep %zero-vector
-    dst src rep {
-        { char-16-rep    [ PCMPGTB ] }
-        { short-8-rep    [ PCMPGTW ] }
-        { int-4-rep      [ PCMPGTD ] }
-        { longlong-2-rep [ PCMPGTQ ] }
+M: x86 %tail>head-vector ( dst src rep -- )
+    dup {
+        { float-4-rep [ drop MOVHLPS ] }
+        { double-2-rep [ [ %copy ] [ drop UNPCKHPD ] 3bi ] }
+        [ drop [ %copy ] [ drop PUNPCKHQDQ ] 3bi ]
     } case ;
 
-:: (%unpack-vector-signs) ( dst src rep -- )
-    dst rep signed-int-vector-rep?
-    [ src rep %sign-extension-vector ]
-    [ rep %zero-vector ] if ;
-
-M:: x86 %unpack-vector-head ( dst src temp rep -- )
-    temp src rep (%unpack-vector-signs)
-    dst src rep %copy
-    dst temp rep unsign-rep {
-        { char-16-rep    [ PUNPCKLBW ] }
-        { short-8-rep    [ PUNPCKLWD ] }
-        { int-4-rep      [ PUNPCKLDQ ] }
-        { longlong-2-rep [ PUNPCKLQDQ ] }
-    } case ;
-
-M:: x86 %unpack-vector-tail ( dst src temp rep -- )
-    temp src rep (%unpack-vector-signs)
-    dst src rep %copy
-    dst temp rep unsign-rep {
-        { char-16-rep    [ PUNPCKHBW ] }
-        { short-8-rep    [ PUNPCKHWD ] }
-        { int-4-rep      [ PUNPCKHDQ ] }
-        { longlong-2-rep [ PUNPCKHQDQ ] }
-    } case ;
-
-M: x86 %unpack-vector-reps ( -- reps )
+M: x86 %unpack-vector-head ( dst src rep -- )
     {
-        { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+        { char-16-rep  [ PMOVSXBW ] }
+        { uchar-16-rep [ PMOVZXBW ] }
+        { short-8-rep  [ PMOVSXWD ] }
+        { ushort-8-rep [ PMOVZXWD ] }
+        { int-4-rep    [ PMOVSXDQ ] }
+        { uint-4-rep   [ PMOVZXDQ ] }
+        { float-4-rep  [ CVTPS2PD ] }
+    } case ;
+
+M: x86 %unpack-vector-head-reps ( -- reps )
+    {
+        { sse2? { float-4-rep } }
+        { sse4.1? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
+
+M: x86 %unpack-vector-tail-reps ( -- reps ) { } ;
 
 M: x86 %integer>float-vector ( dst src rep -- )
     {
