@@ -51,7 +51,6 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/inline_cache.o \
 	vm/io.o \
 	vm/jit.o \
-	vm/local_roots.o \
 	vm/math.o \
 	vm/primitives.o \
 	vm/profiler.o \
@@ -61,8 +60,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/tuples.o \
 	vm/utilities.o \
         vm/vm.o \
-	vm/words.o \
-	vm/write_barrier.o
+	vm/words.o
 
 EXE_OBJS = $(PLAF_EXE_OBJS)
 

@@ -53,9 +53,6 @@ struct factor_vm
 	/* Code heap */
 	code_heap *code;
 
-	/* Where we store object start offsets in cards */
-	cell allot_markers_offset;
-
 	/* Only set if we're performing a GC */
 	gc_state *current_gc;
 
@@ -211,10 +208,9 @@ struct factor_vm
 	//data_heap
 	void init_card_decks();
 	data_heap *grow_data_heap(data_heap *data, cell requested_bytes);
-	void clear_cards(zone *gen);
-	void clear_decks(zone *gen);
-	void clear_allot_markers(zone *gen);
-	void reset_generation(zone *gen);
+	void clear_cards(old_space *gen);
+	void clear_decks(old_space *gen);
+	void reset_generation(old_space *gen);
 	void set_data_heap(data_heap *data_);
 	void init_data_heap(cell young_size, cell aging_size, cell tenured_size, bool secure_gc_);
 	cell untagged_object_size(object *pointer);
@@ -243,11 +239,6 @@ struct factor_vm
 		return ((cell)c - cards_offset) << card_bits;
 	}
 
-	inline cell card_offset(card *c)
-	{
-		return *(c - (cell)data->cards + (cell)data->allot_markers);
-	}
-
 	inline card_deck *addr_to_deck(cell a)
 	{
 		return (card_deck *)(((cell)a >> deck_bits) + decks_offset);
@@ -263,11 +254,6 @@ struct factor_vm
 		return (card *)((((cell)d - decks_offset) << (deck_bits - card_bits)) + cards_offset);
 	}
 
-	inline card *addr_to_allot_marker(object *a)
-	{
-		return (card *)(((cell)a >> card_bits) + allot_markers_offset);
-	}
-
 	/* the write barrier must be called any time we are potentially storing a
 	   pointer from an older generation to a younger one */
 	inline void write_barrier(object *obj)
@@ -276,22 +262,14 @@ struct factor_vm
 		*addr_to_deck((cell)obj) = card_mark_mask;
 	}
 
-	/* we need to remember the first object allocated in the card */
-	inline void allot_barrier(object *address)
-	{
-		card *ptr = addr_to_allot_marker(address);
-		if(*ptr == invalid_allot_marker)
-			*ptr = ((cell)address & addr_card_mask);
-	}
-
 	// data_gc
 	template<typename Strategy> object *resolve_forwarding(object *untagged, Strategy &strategy);
 	template<typename Strategy> void trace_handle(cell *handle, Strategy &strategy);
 	template<typename Strategy> object *promote_object(object *pointer, Strategy &strategy);
 	template<typename Strategy> void trace_slots(object *ptr, Strategy &strategy);
-	template<typename Strategy> void trace_card(card *ptr, cell here, Strategy &strategy);
-	template<typename Strategy> void trace_card_deck(card_deck *deck, cell here, card mask, card unmask, Strategy &strategy);
-	template<typename Strategy> void trace_cards(cell gen, zone *z, Strategy &strategy);
+	template<typename Strategy> void trace_card(card *ptr, old_space *gen, Strategy &strategy);
+	template<typename Strategy> void trace_card_deck(card_deck *deck, old_space *gen, card mask, card unmask, Strategy &strategy);
+	template<typename Strategy> void trace_cards(cell gen, old_space *z, Strategy &strategy);
 	template<typename Strategy> void trace_stack_elements(segment *region, cell top, Strategy &strategy);
 	template<typename Strategy> void trace_registered_locals(Strategy &strategy);
 	template<typename Strategy> void trace_registered_bignums(Strategy &strategy);

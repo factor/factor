@@ -9,13 +9,10 @@ struct data_heap {
 	segment *seg;
 
 	zone *nursery;
-	zone *aging;
-	zone *aging_semispace;
-	zone *tenured;
-	zone *tenured_semispace;
-
-	char *allot_markers;
-	char *allot_markers_end;
+	old_space *aging;
+	old_space *aging_semispace;
+	old_space *tenured;
+	old_space *tenured_semispace;
 
 	char *cards;
 	char *cards_end;
