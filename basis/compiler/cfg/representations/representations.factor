@@ -236,7 +236,7 @@ M: ##phi conversions-for-insn
 : convert-to-fill-vector? ( insn -- ? )
     {
         [ dst>> rep-of vector-rep? ]
-        [ obj>> B{ 255 255 255 255  255 255 255 255  255 255 255 255  255 255 255 } = ]
+        [ obj>> B{ 255 255 255 255  255 255 255 255  255 255 255 255  255 255 255 255 } = ]
     } 1&& ;
 
 : (convert-to-zero/fill-vector) ( insn -- dst rep )
