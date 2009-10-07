@@ -770,7 +770,8 @@ M: x86 %unsigned-pack-vector
 
 M: x86 %unsigned-pack-vector-reps
     {
-        { sse2? { ushort-8-rep short-8-rep uint-4-rep int-4-rep } }
+        { sse2? { ushort-8-rep short-8-rep } }
+        { sse4.1? { uint-4-rep int-4-rep } }
     } available-reps ;
 
 :: %sign-extension-vector ( dst src rep -- )
