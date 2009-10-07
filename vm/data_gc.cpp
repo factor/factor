@@ -399,48 +399,48 @@ void factor_vm::update_dirty_code_blocks()
 }
 
 template<typename Strategy>
-copying_collector<Strategy>::copying_collector(factor_vm *myvm_, old_space *target_)
+cheney_collector<Strategy>::cheney_collector(factor_vm *myvm_, old_space *target_)
 : myvm(myvm_), current_gc(myvm_->current_gc), target(target_)
 {
 	scan = target->here;
 }
 
-template<typename Strategy> Strategy &copying_collector<Strategy>::strategy()
+template<typename Strategy> Strategy &cheney_collector<Strategy>::strategy()
 {
 	return static_cast<Strategy &>(*this);
 }
 
-template<typename Strategy> object *copying_collector<Strategy>::allot(cell size)
+template<typename Strategy> object *cheney_collector<Strategy>::allot(cell size)
 {
 	return target->allot(size);
 }
 
-template<typename Strategy> object *copying_collector<Strategy>::copy_object(object *untagged)
+template<typename Strategy> object *cheney_collector<Strategy>::copy_object(object *untagged)
 {
 	return myvm->promote_object(untagged,strategy());
 }
 
-template<typename Strategy> bool copying_collector<Strategy>::should_copy_p(object *pointer)
+template<typename Strategy> bool cheney_collector<Strategy>::should_copy_p(object *pointer)
 {
 	return strategy().should_copy_p(pointer);
 }
 
-template<typename Strategy> cell copying_collector<Strategy>::trace_next(cell scan)
+template<typename Strategy> cell cheney_collector<Strategy>::trace_next(cell scan)
 {
 	object *obj = (object *)scan;
 	myvm->trace_slots(obj,strategy());
 	return scan + myvm->untagged_object_size(obj);
 }
 
-template<typename Strategy> void copying_collector<Strategy>::go()
+template<typename Strategy> void cheney_collector<Strategy>::go()
 {
 	strategy().copy_reachable_objects(scan,&target->here);
 }
 
-struct nursery_collector : copying_collector<nursery_collector>
+struct nursery_strategy : cheney_collector<nursery_strategy>
 {
-	explicit nursery_collector(factor_vm *myvm_, old_space *target_) :
-		copying_collector<nursery_collector>(myvm_,target_) {}
+	explicit nursery_strategy(factor_vm *myvm_, old_space *target_) :
+		cheney_collector<nursery_strategy>(myvm_,target_) {}
 
 	bool should_copy_p(object *untagged)
 	{
@@ -453,12 +453,12 @@ struct nursery_collector : copying_collector<nursery_collector>
 	}
 };
 
-struct aging_collector : copying_collector<aging_collector>
+struct aging_strategy : cheney_collector<aging_strategy>
 {
 	zone *tenured;
 
-	explicit aging_collector(factor_vm *myvm_, old_space *target_) :
-		copying_collector<aging_collector>(myvm_,target_),
+	explicit aging_strategy(factor_vm *myvm_, old_space *target_) :
+		cheney_collector<aging_strategy>(myvm_,target_),
 		tenured(myvm->data->tenured) {}
 
 	bool should_copy_p(object *untagged)
@@ -475,10 +475,10 @@ struct aging_collector : copying_collector<aging_collector>
 	}
 };
 
-struct aging_again_collector : copying_collector<aging_again_collector>
+struct aging_agian_strategy : cheney_collector<aging_agian_strategy>
 {
-	explicit aging_again_collector(factor_vm *myvm_, old_space *target_) :
-		copying_collector<aging_again_collector>(myvm_,target_) {}
+	explicit aging_agian_strategy(factor_vm *myvm_, old_space *target_) :
+		cheney_collector<aging_agian_strategy>(myvm_,target_) {}
 
 	bool should_copy_p(object *untagged)
 	{
@@ -491,10 +491,10 @@ struct aging_again_collector : copying_collector<aging_again_collector>
 	}
 };
 
-struct tenured_collector : copying_collector<tenured_collector>
+struct tenured_strategy : cheney_collector<tenured_strategy>
 {
-	explicit tenured_collector(factor_vm *myvm_, old_space *target_) :
-		copying_collector<tenured_collector>(myvm_,target_) {}
+	explicit tenured_strategy(factor_vm *myvm_, old_space *target_) :
+		cheney_collector<tenured_strategy>(myvm_,target_) {}
 	
 	bool should_copy_p(object *untagged)
 	{
@@ -513,7 +513,7 @@ struct tenured_collector : copying_collector<tenured_collector>
 
 void factor_vm::collect_nursery()
 {
-	nursery_collector collector(this,data->aging);
+	nursery_strategy collector(this,data->aging);
 
 	trace_roots(collector);
 	trace_contexts(collector);
@@ -531,7 +531,7 @@ void factor_vm::collect_aging()
 	std::swap(data->aging,data->aging_semispace);
 	reset_generation(data->aging);
 
-	aging_collector collector(this,data->aging);
+	aging_strategy collector(this,data->aging);
 
 	trace_roots(collector);
 	trace_contexts(collector);
@@ -545,7 +545,7 @@ void factor_vm::collect_aging()
 
 void factor_vm::collect_aging_again()
 {
-	aging_again_collector collector(this,data->tenured);
+	aging_agian_strategy collector(this,data->tenured);
 
 	trace_roots(collector);
 	trace_contexts(collector);
@@ -571,7 +571,7 @@ void factor_vm::collect_tenured(cell requested_bytes, bool trace_contexts_)
 		reset_generation(data->tenured);
 	}
 
-	tenured_collector collector(this,data->tenured);
+	tenured_strategy collector(this,data->tenured);
 
         trace_roots(collector);
         if(trace_contexts_) trace_contexts(collector);

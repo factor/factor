@@ -31,6 +31,7 @@ ifdef CONFIG
 endif
 
 DLL_OBJS = $(PLAF_DLL_OBJS) \
+	vm/aging_collector.o \
 	vm/alien.o \
 	vm/arrays.o \
 	vm/bignum.o \
@@ -46,17 +47,21 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/dispatch.o \
 	vm/errors.o \
 	vm/factor.o \
+	vm/full_collector.o \
 	vm/heap.o \
 	vm/image.o \
 	vm/inline_cache.o \
 	vm/io.o \
 	vm/jit.o \
 	vm/math.o \
+	vm/nursery_collector.o \
+	vm/old_space.o \
 	vm/primitives.o \
 	vm/profiler.o \
 	vm/quotations.o \
 	vm/run.o \
 	vm/strings.o \
+	vm/to_tenured_collector.o \
 	vm/tuples.o \
 	vm/utilities.o \
         vm/vm.o \
