@@ -50,6 +50,9 @@ struct factor_vm
 	/* Data heap */
 	data_heap *data;
 
+	/* Code heap */
+	code_heap *code;
+
 	/* Where we store object start offsets in cards */
 	cell allot_markers_offset;
 
@@ -57,10 +60,7 @@ struct factor_vm
 	gc_state *current_gc;
 
 	/* Statistics */
-	gc_stats stats;
-
-	/* Code heap */
-	code_heap *code;
+	gc_statistics gc_stats;
 
 	/* If a runtime function needs to call another function which potentially
 	   allocates memory, it must wrap any local variable references to Factor
