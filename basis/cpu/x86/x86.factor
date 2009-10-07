@@ -770,8 +770,8 @@ M: x86 %unsigned-pack-vector
 
 M: x86 %unsigned-pack-vector-reps
     {
-        { sse2? { ushort-8-rep short-8-rep } }
-        { sse4.1? { uint-4-rep int-4-rep } }
+        { sse2? { short-8-rep } }
+        { sse4.1? { int-4-rep } }
     } available-reps ;
 
 :: %sign-extension-vector ( dst src rep -- )
@@ -869,13 +869,16 @@ M: x86 %float>integer-vector-reps
         { short-8-rep    [ int16 call ] }
         { char-16-rep    [ int8  call ] }
     } case ; inline
+:: (%not-vector) ( dst src rep -- )
+    dst rep %fill-vector
+    dst dst src rep %xor-vector ;
 :: %compare-int-vector ( dst src1 src2 temp rep cc -- )
     dst src1 src2 temp rep cc compare-int-v-operands :> cc' :> rep :> src' :> cmp-dst :> not-dst
     cmp-dst src' rep cc' {
         { cc= [ [ PCMPEQQ ] [ PCMPEQD ] [ PCMPEQW ] [ PCMPEQB ] (%compare-int-vector) ] }
         { cc> [ [ PCMPGTQ ] [ PCMPGTD ] [ PCMPGTW ] [ PCMPGTB ] (%compare-int-vector) ] }
     } case
-    not-dst [ cmp-dst rep %not-vector ] when* ;
+    not-dst [ cmp-dst rep (%not-vector) ] when* ;
 
 M: x86 %compare-vector ( dst src1 src2 temp rep cc -- )
     over float-vector-rep?
@@ -1230,15 +1233,7 @@ M: x86 %xor-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-M:: x86 %not-vector ( dst src rep -- )
-    dst rep %fill-vector
-    dst dst src rep %xor-vector ;
-
-M: x86 %not-vector-reps
-    {
-        { sse? { float-4-rep } }
-        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
-    } available-reps ;
+M: x86 %not-vector-reps { } ;
 
 M: x86 %shl-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
