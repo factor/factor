@@ -2,7 +2,7 @@ namespace factor
 {
 
 /* statistics */
-struct generation_stats {
+struct generation_statistics {
 	cell collections;
 	u64 gc_time;
 	u64 max_gc_time;
@@ -10,8 +10,8 @@ struct generation_stats {
 	u64 bytes_copied;
 };
 
-struct gc_stats {
-	generation_stats generations[gen_count];
+struct gc_statistics {
+	generation_statistics generations[gen_count];
 	u64 cards_scanned;
 	u64 decks_scanned;
 	u64 card_scan_time;

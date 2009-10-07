@@ -71,7 +71,7 @@ template<typename Strategy> object *factor_vm::promote_object(object *untagged, 
 	object *newpointer = strategy.allot(size);
 	if(!newpointer) longjmp(current_gc->gc_unwind,1);
 
-	generation_stats *s = &stats.generations[current_gc->collecting_gen];
+	generation_statistics *s = &gc_stats.generations[current_gc->collecting_gen];
 	s->object_count++;
 	s->bytes_copied += size;
 
@@ -91,7 +91,7 @@ template<typename Strategy> void factor_vm::trace_card(card *ptr, cell gen, cell
 
 	strategy.copy_reachable_objects(card_scan,&card_end);
 
-	stats.cards_scanned++;
+	gc_stats.cards_scanned++;
 }
 
 template<typename Strategy> void factor_vm::trace_card_deck(card_deck *deck, cell gen, card mask, card unmask, Strategy &strategy)
@@ -122,7 +122,7 @@ template<typename Strategy> void factor_vm::trace_card_deck(card_deck *deck, cel
 		}
 	}
 
-	stats.decks_scanned++;
+	gc_stats.decks_scanned++;
 }
 
 /* Trace all objects referenced from marked cards */
@@ -201,7 +201,7 @@ template<typename Strategy> void factor_vm::trace_cards(Strategy &strategy)
 	for(i = current_gc->collecting_gen + 1; i < gen_count; i++)
 		trace_generation_cards(i,strategy);
 
-	stats.card_scan_time += (current_micros() - start);
+	gc_stats.card_scan_time += (current_micros() - start);
 }
 
 /* Copy all tagged pointers in a range of memory */
@@ -353,7 +353,7 @@ template<typename Strategy> void factor_vm::trace_code_heap_roots(Strategy &stra
 				trace_literal_references(iter->first,strategy);
 		}
 
-		stats.code_heap_scans++;
+		gc_stats.code_heap_scans++;
 	}
 }
 
@@ -609,7 +609,7 @@ void factor_vm::collect_tenured(cell requested_bytes, bool trace_contexts_)
 
 void factor_vm::record_gc_stats()
 {
-	generation_stats *s = &stats.generations[current_gc->collecting_gen];
+	generation_statistics *s = &gc_stats.generations[current_gc->collecting_gen];
 
 	cell gc_elapsed = (current_micros() - current_gc->start_time);
 	s->collections++;
@@ -694,7 +694,7 @@ void factor_vm::primitive_gc_stats()
 
 	for(i = 0; i < gen_count; i++)
 	{
-		generation_stats *s = &stats.generations[i];
+		generation_statistics *s = &gc_stats.generations[i];
 		result.add(allot_cell(s->collections));
 		result.add(tag<bignum>(long_long_to_bignum(s->gc_time)));
 		result.add(tag<bignum>(long_long_to_bignum(s->max_gc_time)));
@@ -706,10 +706,10 @@ void factor_vm::primitive_gc_stats()
 	}
 
 	result.add(tag<bignum>(ulong_long_to_bignum(total_gc_time)));
-	result.add(tag<bignum>(ulong_long_to_bignum(stats.cards_scanned)));
-	result.add(tag<bignum>(ulong_long_to_bignum(stats.decks_scanned)));
-	result.add(tag<bignum>(ulong_long_to_bignum(stats.card_scan_time)));
-	result.add(allot_cell(stats.code_heap_scans));
+	result.add(tag<bignum>(ulong_long_to_bignum(gc_stats.cards_scanned)));
+	result.add(tag<bignum>(ulong_long_to_bignum(gc_stats.decks_scanned)));
+	result.add(tag<bignum>(ulong_long_to_bignum(gc_stats.card_scan_time)));
+	result.add(allot_cell(gc_stats.code_heap_scans));
 
 	result.trim();
 	dpush(result.elements.value());
@@ -717,7 +717,7 @@ void factor_vm::primitive_gc_stats()
 
 void factor_vm::clear_gc_stats()
 {
-	memset(&stats,0,sizeof(gc_stats));
+	memset(&gc_stats,0,sizeof(gc_statistics));
 }
 
 void factor_vm::primitive_clear_gc_stats()
