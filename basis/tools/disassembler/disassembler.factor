@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays byte-arrays combinators
-destructors generic io kernel libc math sequences system tr
-vocabs.loader words alien.data ;
+USING: alien alien.data arrays byte-arrays compiler.units destructors
+io kernel libc math quotations sequences stack-checker system tr
+vocabs.loader words ;
 IN: tools.disassembler
 
 GENERIC: disassemble ( obj -- )
@@ -23,6 +23,8 @@ M: byte-array disassemble
 M: pair disassemble first2 disassemble* [ tabs>spaces print ] each ;
 
 M: word disassemble word-xt 2array disassemble ;
+
+M: quotation disassemble [ dup infer define-temp ] with-compilation-unit disassemble ;
 
 cpu x86?
 "tools.disassembler.udis"
