@@ -6,6 +6,6 @@ IN: benchmark.mt
 : mt-benchmark ( n -- )
     >fixnum HEX: 533d <mersenne-twister> '[ _ random-32* drop ] times ;
 
-: mt-main ( -- ) 100000000 mt-benchmark ;
+: mt-main ( -- ) 10000000 mt-benchmark ;
 
 MAIN: mt-main
