@@ -200,8 +200,8 @@ IN: compiler.cfg.intrinsics
         { math.vectors.simd.intrinsics:(simd-(v>integer)) [ [ ^^float>integer-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-(vpack-signed)) [ [ ^^signed-pack-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-(vpack-unsigned)) [ [ ^^unsigned-pack-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-(vunpack-head)) [ [ ^^unpack-vector-head ] emit-unary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-(vunpack-tail)) [ [ ^^unpack-vector-tail ] emit-unary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-(vunpack-head)) [ [ generate-unpack-vector-head ] emit-unary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-(vunpack-tail)) [ [ generate-unpack-vector-tail ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-select) [ emit-select-vector ] }
         { math.vectors.simd.intrinsics:(simd-sum) [ [ ^^horizontal-add-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:alien-vector [ emit-alien-vector ] }
