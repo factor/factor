@@ -16,6 +16,13 @@ SINGLETON: bmp-image
 : write2 ( n -- ) 2 >le write ;
 : write4 ( n -- ) 4 >le write ;
 
+: output-width-and-height ( image -- )
+    [ dim>> first write4 ]
+    [
+        [ dim>> second ] [ upside-down?>> ] bi
+        [ neg ] unless write4
+    ] bi ;
+
 : output-bmp ( image -- )
     B{ CHAR: B CHAR: M } write
     [
@@ -25,8 +32,7 @@ SINGLETON: bmp-image
         40 write4
     ] [
         {
-            ! width height
-            [ dim>> first2 [ write4 ] bi@ ]
+            [ output-width-and-height ]
 
             ! planes
             [ drop 1 write2 ]
