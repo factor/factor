@@ -4,7 +4,7 @@ cpu.architecture tools.test kernel math combinators.short-circuit
 accessors sequences compiler.cfg.predecessors locals compiler.cfg.dce
 compiler.cfg.ssa.destruction compiler.cfg.loop-detection
 compiler.cfg.representations compiler.cfg assocs vectors arrays
-layouts namespaces alien ;
+layouts literals namespaces alien ;
 IN: compiler.cfg.value-numbering.tests
 
 : trim-temps ( insns -- insns )
@@ -1212,6 +1212,20 @@ cell 8 = [
     {
         T{ ##shuffle-vector f 1 0 { 1 2 3 0 } float-4-rep }
         T{ ##shuffle-vector f 2 1 { 1 0 } double-2-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-constant f 0 $[ 55 tag-fixnum ] }
+        T{ ##load-constant f 1 B{ 55 0 0 0  55 0 0 0  55 0 0 0  55 0 0 0 } }
+        T{ ##copy f 2 1 any-rep }
+    }
+] [
+    {
+        T{ ##load-constant f 0 $[ 55 tag-fixnum ] }
+        T{ ##scalar>vector f 1 0 int-4-rep }
+        T{ ##shuffle-vector f 2 1 { 0 0 0 0 } float-4-rep }
     } value-numbering-step
 ] unit-test
 
