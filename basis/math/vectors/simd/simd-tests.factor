@@ -129,6 +129,8 @@ CONSTANT: simd-classes
 
 [ HEX: ffffffff ] [ HEX: ffffffff [ uint-4-with ] compile-call first ] unit-test
 
+[ HEX: ffffffff ] [ [ HEX: ffffffff uint-4-with ] compile-call first ] unit-test
+
 "== Checking -boa constructors" print
 
 [ { } ] [
