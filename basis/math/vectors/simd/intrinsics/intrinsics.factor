@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.data assocs combinators
 cpu.architecture compiler.cfg.comparisons fry generalizations
 kernel libc macros math
-math.vectors.conversion math.vectors.conversion.private
+math.vectors.conversion.backend
 sequences effects accessors namespaces
 lexer parser vocabs.parser words arrays math.vectors ;
 IN: math.vectors.simd.intrinsics
