@@ -63,13 +63,13 @@ struct gc_state {
 	}
 };
 
-template<typename Strategy> struct copying_collector {
+template<typename Strategy> struct cheney_collector {
 	factor_vm *myvm;
 	gc_state *current_gc;
 	old_space *target;
 	cell scan;
 
-	explicit copying_collector(factor_vm *myvm_, old_space *target);
+	explicit cheney_collector(factor_vm *myvm_, old_space *target);
 	Strategy &strategy();
 	object *allot(cell size);
 	cell trace_next(cell scan);
