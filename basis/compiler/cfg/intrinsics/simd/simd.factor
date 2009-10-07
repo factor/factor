@@ -122,6 +122,28 @@ MACRO: if-literals-match ( quots -- )
     [ ^^not-vector ]
     [ [ ^^fill-vector ] [ ^^xor-vector ] bi ] if ;
 
+:: (generate-compare-vector) ( src1 src2 rep {cc,swap} -- dst )
+    {cc,swap} first2 :> swap? :> cc
+    swap?
+    [ src2 src1 rep cc ^^compare-vector ]
+    [ src1 src2 rep cc ^^compare-vector ] if ;
+
+:: generate-compare-vector ( src1 src2 rep orig-cc -- dst )
+    rep orig-cc %compare-vector-ccs :> not? :> ccs
+
+    ccs empty?
+    [ rep not? [ ^^fill-vector ] [ ^^zero-vector ] if ]
+    [
+        ccs unclip :> first-cc :> rest-ccs
+        src1 src2 rep first-cc (generate-compare-vector) :> first-dst
+
+        rest-ccs first-dst
+        [ [ src1 src2 rep ] dip (generate-compare-vector) rep ^^or-vector ]
+        reduce
+
+        not? [ rep generate-not-vector ] when
+    ] if ;
+
 :: generate-unpack-vector-head ( src rep -- dst )
     {
         {
