@@ -27,6 +27,9 @@ SYMBOL: mega-cache-size
 : tag-fixnum ( n -- tagged )
     tag-bits get shift ;
 
+: untag-fixnum ( n -- tagged )
+    tag-bits get neg shift ;
+
 ! We do this in its own compilation unit so that they can be
 ! folded below
 <<
