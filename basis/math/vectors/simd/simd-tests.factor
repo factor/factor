@@ -4,6 +4,7 @@ math.private math.vectors math.vectors.simd
 math.vectors.simd.private prettyprint random sequences system
 tools.test vocabs assocs compiler.cfg.debugger words
 locals math.vectors.specialization combinators cpu.architecture
+math.vectors.conversion.backend
 math.vectors.simd.intrinsics namespaces byte-arrays alien
 specialized-arrays classes.struct eval classes.algebra sets
 quotations math.constants compiler.units ;
