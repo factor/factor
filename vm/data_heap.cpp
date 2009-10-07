@@ -25,7 +25,7 @@ data_heap::data_heap(factor_vm *myvm, cell young_size_, cell aging_size_, cell t
 
 	total_size += deck_size;
 
-	seg = new segment(myvm,total_size);
+	seg = new segment(total_size);
 
 	generations = new zone[gen_count];
 	semispaces = new zone[gen_count];
@@ -43,17 +43,17 @@ data_heap::data_heap(factor_vm *myvm, cell young_size_, cell aging_size_, cell t
 
 	cell alloter = align(seg->start,deck_size);
 
-	alloter = generations[tenured()].init_zone(tenured_size,alloter);
-	alloter = semispaces[tenured()].init_zone(tenured_size,alloter);
+	alloter = generations[tenured_gen].init_zone(tenured_size,alloter);
+	alloter = semispaces[tenured_gen].init_zone(tenured_size,alloter);
 
-	alloter = generations[aging()].init_zone(aging_size,alloter);
-	alloter = semispaces[aging()].init_zone(aging_size,alloter);
+	alloter = generations[aging_gen].init_zone(aging_size,alloter);
+	alloter = semispaces[aging_gen].init_zone(aging_size,alloter);
 
-	alloter = generations[nursery()].init_zone(young_size,alloter);
-	alloter = semispaces[nursery()].init_zone(0,alloter);
+	alloter = generations[nursery_gen].init_zone(young_size,alloter);
+	alloter = semispaces[nursery_gen].init_zone(0,alloter);
 
 	if(seg->end - alloter > deck_size)
-		myvm->critical_error("Bug in alloc_data_heap",alloter);
+		critical_error("Bug in alloc_data_heap",alloter);
 }
 
 data_heap *factor_vm::grow_data_heap(data_heap *data, cell requested_bytes)
@@ -103,7 +103,7 @@ void factor_vm::clear_allot_markers(cell gen)
 their allocation pointers and cards reset. */
 void factor_vm::reset_generation(cell gen)
 {
-	assert(gen != data->nursery());
+	assert(gen != nursery_gen);
 
 	zone *z = &data->generations[gen];
 	z->here = z->start;
@@ -117,11 +117,11 @@ void factor_vm::reset_generation(cell gen)
 void factor_vm::set_data_heap(data_heap *data_)
 {
 	data = data_;
-	nursery = data->generations[data->nursery()];
+	nursery = data->generations[nursery_gen];
 	nursery.here = nursery.start;
 	init_card_decks();
-	reset_generation(data->aging());
-	reset_generation(data->tenured());
+	reset_generation(aging_gen);
+	reset_generation(tenured_gen);
 }
 
 void factor_vm::init_data_heap(cell young_size, cell aging_size, cell tenured_size, bool secure_gc_)
@@ -234,7 +234,7 @@ void factor_vm::primitive_data_room()
 	cell gen;
 	for(gen = 0; gen < gen_count; gen++)
 	{
-		zone *z = (gen == data->nursery() ? &nursery : &data->generations[gen]);
+		zone *z = (gen == nursery_gen ? &nursery : &data->generations[gen]);
 		a.add(tag_fixnum((z->end - z->here) >> 10));
 		a.add(tag_fixnum((z->size) >> 10));
 	}
@@ -246,7 +246,7 @@ void factor_vm::primitive_data_room()
 /* Disables GC and activates next-object ( -- obj ) primitive */
 void factor_vm::begin_scan()
 {
-	heap_scan_ptr = data->generations[data->tenured()].start;
+	heap_scan_ptr = data->generations[tenured_gen].start;
 	gc_off = true;
 }
 
@@ -265,7 +265,7 @@ cell factor_vm::next_object()
 	if(!gc_off)
 		general_error(ERROR_HEAP_SCAN,F,F,NULL);
 
-	if(heap_scan_ptr >= data->generations[data->tenured()].here)
+	if(heap_scan_ptr >= data->generations[tenured_gen].here)
 		return F;
 
 	object *obj = (object *)heap_scan_ptr;

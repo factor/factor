@@ -23,7 +23,9 @@ enum vm_error_type
 	ERROR_FP_TRAP,
 };
 
-void fatal_error(const char* msg, cell tagged);
+void fatal_error(const char *msg, cell tagged);
+void critical_error(const char *msg, cell tagged);
+void out_of_memory();
 void memory_signal_handler_impl();
 void fp_signal_handler_impl();
 void misc_signal_handler_impl();

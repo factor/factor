@@ -2,12 +2,20 @@ namespace factor
 {
 
 /* statistics */
-struct gc_stats {
+struct generation_stats {
 	cell collections;
 	u64 gc_time;
 	u64 max_gc_time;
 	cell object_count;
 	u64 bytes_copied;
+};
+
+struct gc_stats {
+	generation_stats generations[gen_count];
+	u64 cards_scanned;
+	u64 decks_scanned;
+	u64 card_scan_time;
+	cell code_heap_scans;
 };
 
 struct gc_state {
@@ -35,17 +43,17 @@ struct gc_state {
 
 	inline bool collecting_nursery_p()
 	{
-		return collecting_gen == data->nursery();
+		return collecting_gen == nursery_gen;
 	}
 
 	inline bool collecting_aging_p()
 	{
-		return collecting_gen == data->aging();
+		return collecting_gen == aging_gen;
 	}
 
 	inline bool collecting_tenured_p()
 	{
-		return collecting_gen == data->tenured();
+		return collecting_gen == tenured_gen;
 	}
 
 	inline bool collecting_accumulation_gen_p()
