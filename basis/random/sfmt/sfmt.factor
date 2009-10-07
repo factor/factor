@@ -130,7 +130,7 @@ M:: sfmt generate ( sfmt -- )
         init-sfmt ; inline
 
 : refill-sfmt? ( sfmt -- ? )
-    state>> [ index>> ] [ n>> 4 * ] bi >= ;
+    state>> [ index>> ] [ n>> 4 * ] bi >= ; inline
 
 : next-index ( sfmt -- index )
     state>> [ dup 1 + ] change-index drop ; inline
