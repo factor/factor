@@ -28,9 +28,7 @@ void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 
 	clear_gc_stats();
 
-	zone *tenured = &data->generations[tenured_gen];
-
-	fixnum bytes_read = fread((void*)tenured->start,1,h->data_size,file);
+	fixnum bytes_read = fread((void*)data->tenured->start,1,h->data_size,file);
 
 	if((cell)bytes_read != h->data_size)
 	{
@@ -42,7 +40,7 @@ void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 		fatal_error("load_data_heap failed",0);
 	}
 
-	tenured->here = tenured->start + h->data_size;
+	data->tenured->here = data->tenured->start + h->data_size;
 	data_relocation_base = h->data_relocation_base;
 }
 
@@ -85,12 +83,10 @@ bool factor_vm::save_image(const vm_char *filename)
 		return false;
 	}
 
-	zone *tenured = &data->generations[tenured_gen];
-
 	h.magic = image_magic;
 	h.version = image_version;
-	h.data_relocation_base = tenured->start;
-	h.data_size = tenured->here - tenured->start;
+	h.data_relocation_base = data->tenured->start;
+	h.data_size = data->tenured->here - data->tenured->start;
 	h.code_relocation_base = code->seg->start;
 	h.code_size = code->heap_size();
 
@@ -105,7 +101,7 @@ bool factor_vm::save_image(const vm_char *filename)
 	bool ok = true;
 
 	if(fwrite(&h,sizeof(image_header),1,file) != 1) ok = false;
-	if(fwrite((void*)tenured->start,h.data_size,1,file) != 1) ok = false;
+	if(fwrite((void*)data->tenured->start,h.data_size,1,file) != 1) ok = false;
 	if(fwrite(code->first_block(),h.code_size,1,file) != 1) ok = false;
 	if(fclose(file)) ok = false;
 
@@ -156,8 +152,7 @@ void factor_vm::data_fixup(cell *cell)
 	if(immediate_p(*cell))
 		return;
 
-	zone *tenured = &data->generations[tenured_gen];
-	*cell += (tenured->start - data_relocation_base);
+	*cell += (data->tenured->start - data_relocation_base);
 }
 
 template<typename Type> void factor_vm::code_fixup(Type **handle)
@@ -280,10 +275,8 @@ void factor_vm::relocate_data()
 	data_fixup(&bignum_pos_one);
 	data_fixup(&bignum_neg_one);
 
-	zone *tenured = &data->generations[tenured_gen];
-
-	for(relocating = tenured->start;
-		relocating < tenured->here;
+	for(relocating = data->tenured->start;
+		relocating < data->tenured->here;
 		relocating += untagged_object_size((object *)relocating))
 	{
 		object *obj = (object *)relocating;
