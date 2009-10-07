@@ -76,19 +76,20 @@ template<typename Strategy> object *factor_vm::promote_object(object *untagged, 
 	return newpointer;
 }
 
-template<typename Strategy> void factor_vm::trace_card(card *ptr, cell here, Strategy &strategy)
+template<typename Strategy> void factor_vm::trace_card(card *ptr, old_space *gen, Strategy &strategy)
 {
-	cell card_scan = card_to_addr(ptr) + card_offset(ptr);
+	cell card_start = card_to_addr(ptr);
+	cell card_scan = card_start + gen->card_offset(card_start);
 	cell card_end = card_to_addr(ptr + 1);
 
-	if(here < card_end) card_end = here;
+	if(gen->here < card_end) card_end = gen->here;
 
 	strategy.copy_reachable_objects(card_scan,&card_end);
 
 	gc_stats.cards_scanned++;
 }
 
-template<typename Strategy> void factor_vm::trace_card_deck(card_deck *deck, cell here, card mask, card unmask, Strategy &strategy)
+template<typename Strategy> void factor_vm::trace_card_deck(card_deck *deck, old_space *gen, card mask, card unmask, Strategy &strategy)
 {
 	card *first_card = deck_to_card(deck);
 	card *last_card = deck_to_card(deck + 1);
@@ -107,7 +108,7 @@ template<typename Strategy> void factor_vm::trace_card_deck(card_deck *deck, cel
 			{
 				if(ptr[card] & mask)
 				{
-					trace_card(&ptr[card],here,strategy);
+					trace_card(&ptr[card],gen,strategy);
 					ptr[card] &= ~unmask;
 				}
 			}
@@ -118,7 +119,7 @@ template<typename Strategy> void factor_vm::trace_card_deck(card_deck *deck, cel
 }
 
 /* Trace all objects referenced from marked cards */
-template<typename Strategy> void factor_vm::trace_cards(cell gen, zone *z, Strategy &strategy)
+template<typename Strategy> void factor_vm::trace_cards(cell gen, old_space *z, Strategy &strategy)
 {
 	u64 start_time = current_micros();
 
@@ -179,7 +180,7 @@ template<typename Strategy> void factor_vm::trace_cards(cell gen, zone *z, Strat
 	{
 		if(*ptr & mask)
 		{
-			trace_card_deck(ptr,z->here,mask,unmask,strategy);
+			trace_card_deck(ptr,z,mask,unmask,strategy);
 			*ptr &= ~unmask;
 		}
 	}
@@ -398,10 +399,10 @@ void factor_vm::update_dirty_code_blocks()
 }
 
 template<typename Strategy>
-copying_collector<Strategy>::copying_collector(factor_vm *myvm_, zone *newspace_)
-: myvm(myvm_), current_gc(myvm_->current_gc), newspace(newspace_)
+copying_collector<Strategy>::copying_collector(factor_vm *myvm_, old_space *target_)
+: myvm(myvm_), current_gc(myvm_->current_gc), target(target_)
 {
-	scan = newspace->here;
+	scan = target->here;
 }
 
 template<typename Strategy> Strategy &copying_collector<Strategy>::strategy()
@@ -411,14 +412,7 @@ template<typename Strategy> Strategy &copying_collector<Strategy>::strategy()
 
 template<typename Strategy> object *copying_collector<Strategy>::allot(cell size)
 {
-	if(newspace->here + size <= newspace->end)
-	{
-		object *obj = newspace->allot(size);
-		myvm->allot_barrier(obj);
-		return obj;
-	}
-	else
-		return NULL;
+	return target->allot(size);
 }
 
 template<typename Strategy> object *copying_collector<Strategy>::copy_object(object *untagged)
@@ -440,13 +434,13 @@ template<typename Strategy> cell copying_collector<Strategy>::trace_next(cell sc
 
 template<typename Strategy> void copying_collector<Strategy>::go()
 {
-	strategy().copy_reachable_objects(scan,&newspace->here);
+	strategy().copy_reachable_objects(scan,&target->here);
 }
 
 struct nursery_collector : copying_collector<nursery_collector>
 {
-	explicit nursery_collector(factor_vm *myvm_, zone *newspace_) :
-		copying_collector<nursery_collector>(myvm_,newspace_) {}
+	explicit nursery_collector(factor_vm *myvm_, old_space *target_) :
+		copying_collector<nursery_collector>(myvm_,target_) {}
 
 	bool should_copy_p(object *untagged)
 	{
@@ -463,13 +457,13 @@ struct aging_collector : copying_collector<aging_collector>
 {
 	zone *tenured;
 
-	explicit aging_collector(factor_vm *myvm_, zone *newspace_) :
-		copying_collector<aging_collector>(myvm_,newspace_),
+	explicit aging_collector(factor_vm *myvm_, old_space *target_) :
+		copying_collector<aging_collector>(myvm_,target_),
 		tenured(myvm->data->tenured) {}
 
 	bool should_copy_p(object *untagged)
 	{
-		if(newspace->contains_p(untagged))
+		if(target->contains_p(untagged))
 			return false;
 		else
 			return !tenured->contains_p(untagged);
@@ -483,12 +477,12 @@ struct aging_collector : copying_collector<aging_collector>
 
 struct aging_again_collector : copying_collector<aging_again_collector>
 {
-	explicit aging_again_collector(factor_vm *myvm_, zone *newspace_) :
-		copying_collector<aging_again_collector>(myvm_,newspace_) {}
+	explicit aging_again_collector(factor_vm *myvm_, old_space *target_) :
+		copying_collector<aging_again_collector>(myvm_,target_) {}
 
 	bool should_copy_p(object *untagged)
 	{
-		return !newspace->contains_p(untagged);
+		return !target->contains_p(untagged);
 	}
 	
 	void copy_reachable_objects(cell scan, cell *end)
@@ -499,12 +493,12 @@ struct aging_again_collector : copying_collector<aging_again_collector>
 
 struct tenured_collector : copying_collector<tenured_collector>
 {
-	explicit tenured_collector(factor_vm *myvm_, zone *newspace_) :
-		copying_collector<tenured_collector>(myvm_,newspace_) {}
+	explicit tenured_collector(factor_vm *myvm_, old_space *target_) :
+		copying_collector<tenured_collector>(myvm_,target_) {}
 	
 	bool should_copy_p(object *untagged)
 	{
-		return !newspace->contains_p(untagged);
+		return !target->contains_p(untagged);
 	}
 	
 	void copy_reachable_objects(cell scan, cell *end)
@@ -791,7 +785,6 @@ object *factor_vm::allot_object(header header, cell size)
 			garbage_collection(tenured_gen,true,true,size);
 
 		obj = data->tenured->allot(size);
-		allot_barrier(obj);
 
 		/* Allows initialization code to store old->new pointers
 		without hitting the write barrier in the common case of
