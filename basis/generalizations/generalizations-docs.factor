@@ -303,6 +303,12 @@ HELP: ntuck
 }
 { $description "A generalization of " { $link tuck } " that can work for any stack depth. The top item will be copied and placed " { $snippet "n" } " items down on the stack." } ;
 
+HELP: nspin
+{ $values
+    { "n" integer }
+}
+{ $description "A generalization of " { $link spin } " that can work for any stack depth. The top " { $snippet "n" } " items will be reversed in order." } ;
+
 ARTICLE: "sequence-generalizations" "Generalized sequence operations"
 { $subsections
     narray
@@ -321,6 +327,7 @@ ARTICLE: "shuffle-generalizations" "Generalized shuffle words"
     nnip
     ndrop
     ntuck
+    nspin
     mnswap
     nweave
 } ;

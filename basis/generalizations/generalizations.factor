@@ -104,3 +104,6 @@ MACRO: nbi-curry ( n -- )
     [ narray concat ] dip like ; inline
 
 : nappend ( n -- seq ) narray concat ; inline
+
+MACRO: nspin ( n -- )
+    [ [ ] ] swap [ swap [ ] curry compose ] n*quot [ call ] 3append ;
