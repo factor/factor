@@ -9,43 +9,43 @@ IN: classes.struct.bit-accessors
 : ones-between ( start end -- n )
     [ 2^ 1 - ] bi@ swap bitnot bitand ;
 
-: ones-around ( start end -- n )
-    ones-between bitnot ;
-
-:: read-bits ( offset bits -- quot: ( alien -- n ) shift-amount offset' bits' )
+:: manipulate-bits ( offset bits step-quot -- quot shift-amount offset' bits' )
     offset 8 /mod :> start-bit :> i
     start-bit bits + 8 min :> end-bit
     start-bit end-bit ones-between :> mask
     end-bit start-bit - :> used-bits
 
-    [ i alien-unsigned-1 mask bitand start-bit neg shift ]
+    start-bit i end-bit mask step-quot call( a b c d -- quot )
     used-bits
     i 1 + 8 *
-    bits used-bits - ;
+    bits used-bits - ; inline
+
+:: bit-manipulator ( offset bits
+                    step-quot: ( start-bit i end-bit mask -- quot )
+                    combine-quot: ( prev-quot shift-amount next-quot -- quot )
+                    -- quot )
+    offset bits step-quot manipulate-bits
+    dup zero? [ 3drop ] [
+        step-quot combine-quot bit-manipulator
+        combine-quot call( prev shift next -- quot )
+    ] if ; inline recursive
 
 : bit-reader ( offset bits -- quot: ( alien -- n ) )
-    read-bits dup zero? [ 3drop ] [
-        bit-reader swap '[ _ _ bi _ shift bitor ]
-    ] if ;
-
-:: write-bits ( offset bits -- quot: ( alien -- n ) shift-amount offset' bits' )
-    offset 8 /mod :> start-bit :> i
-    start-bit bits + 8 min :> end-bit
-    start-bit end-bit ones-between :> mask
-    end-bit start-bit - :> used-bits
-
-    [
-        [
-            [ start-bit shift mask bitand ]
-            [ i alien-unsigned-1 mask bitnot bitand ]
-            bi* bitor
-        ] keep i set-alien-unsigned-1
+    [| start-bit i end-bit mask |
+        [ i alien-unsigned-1 mask bitand start-bit neg shift ]
     ]
-    used-bits
-    i 1 + 8 *
-    bits used-bits - ;
+    [ swap '[ _ _ bi _ shift bitor ] ]
+    bit-manipulator ;
 
 : bit-writer ( offset bits -- quot: ( n alien -- ) )
-    write-bits dup zero? [ 3drop ] [
-        bit-writer '[ _ [ [ _ neg shift ] dip @ ] 2bi ]
-    ] if ;
+    [| start-bit i end-bit mask |
+        [
+            [
+                [ start-bit shift mask bitand ]
+                [ i alien-unsigned-1 mask bitnot bitand ]
+                bi* bitor
+            ] keep i set-alien-unsigned-1
+        ]
+    ]
+    [ '[ _ [ [ _ neg shift ] dip @ ] 2bi ] ]
+    bit-manipulator ;
