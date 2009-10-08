@@ -152,3 +152,6 @@ M: sfmt seed-random ( sfmt seed -- sfmt )
     uint-4{ HEX: dfffffef HEX: ddfecb7f HEX: bffaffff HEX: bffffff6 }
     uint-4{ HEX: 1 HEX: 0 HEX: 0 HEX: 13c9e684 }
     <sfmt> ; inline
+
+: default-sfmt ( -- sfmt )
+    [ random-32 ] with-secure-random <sfmt-19937> ;

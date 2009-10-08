@@ -112,4 +112,4 @@ PRIVATE>
     { [ os unix? ] [ "random.unix" require ] }
 } cond
 
-"random.mersenne-twister" require
+"random.backend" require

@@ -76,7 +76,3 @@ M: mersenne-twister random-32* ( mt -- r )
 : default-mersenne-twister ( -- mersenne-twister )
     [ 32 random-bits ] with-system-random
     <mersenne-twister> ;
-
-[
-    default-mersenne-twister random-generator set-global
-] "bootstrap.random" add-init-hook
