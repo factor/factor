@@ -4,7 +4,7 @@ USING: kernel sequences math fry locals math.order alien.accessors ;
 IN: classes.struct.bit-accessors
 
 ! Bitfield accessors are little-endian on all platforms
-! Why not? It's platform-dependent in C
+! Why not? It's unspecified in C
 
 : ones-between ( start end -- n )
     [ 2^ 1 - ] bi@ swap bitnot bitand ;
