@@ -205,7 +205,7 @@ struct factor_vm
 	int bignum_unsigned_logbitp(int shift, bignum * bignum);
 	bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int, factor_vm *), unsigned int radix, int negative_p);
 
-	//data_heap
+	//data heap
 	void init_card_decks();
 	data_heap *grow_data_heap(data_heap *data, cell requested_bytes);
 	void clear_cards(old_space *gen);
@@ -262,32 +262,15 @@ struct factor_vm
 		*addr_to_deck((cell)obj) = card_mark_mask;
 	}
 
-	// data_gc
-	template<typename Strategy> object *resolve_forwarding(object *untagged, Strategy &strategy);
-	template<typename Strategy> void trace_handle(cell *handle, Strategy &strategy);
-	template<typename Strategy> object *promote_object(object *pointer, Strategy &strategy);
-	template<typename Strategy> void trace_slots(object *ptr, Strategy &strategy);
-	template<typename Strategy> void trace_card(card *ptr, old_space *gen, Strategy &strategy);
-	template<typename Strategy> void trace_card_deck(card_deck *deck, old_space *gen, card mask, card unmask, Strategy &strategy);
-	template<typename Strategy> void trace_cards(cell gen, old_space *z, Strategy &strategy);
-	template<typename Strategy> void trace_stack_elements(segment *region, cell top, Strategy &strategy);
-	template<typename Strategy> void trace_registered_locals(Strategy &strategy);
-	template<typename Strategy> void trace_registered_bignums(Strategy &strategy);
-	template<typename Strategy> void trace_roots(Strategy &strategy);
-	template<typename Strategy> void mark_active_blocks(context *stacks, Strategy &strategy);
-	template<typename Strategy> void trace_contexts(Strategy &strategy);
-	template<typename Strategy> void trace_literal_references(code_block *compiled, Strategy &strategy);
-	template<typename Strategy> void trace_code_heap_roots(Strategy &strategy);
-	template<typename Strategy> void mark_code_block(code_block *compiled, Strategy &strategy);
-	template<typename Strategy> void mark_object_code_block(object *object, Strategy &strategy);
+	// gc
 	void free_unmarked_code_blocks();
 	void update_dirty_code_blocks();
 	void collect_nursery();
 	void collect_aging();
-	void collect_aging_again();
-	void collect_tenured(cell requested_bytes, bool trace_contexts_);
+	void collect_to_tenured();
+	void collect_full(cell requested_bytes, bool trace_contexts_p);
 	void record_gc_stats();
-	void garbage_collection(cell gen, bool growing_data_heap, bool trace_contexts, cell requested_bytes);
+	void garbage_collection(cell gen, bool growing_data_heap, bool trace_contexts_p, cell requested_bytes);
 	void gc();
 	void primitive_gc();
 	void primitive_gc_stats();
@@ -528,7 +511,7 @@ struct factor_vm
 	code_block *allot_code_block(cell size, cell type);
 	code_block *add_code_block(cell type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_);
 
-	//code_heap
+	//code heap
 	inline void check_code_pointer(cell ptr)
 	{
 	#ifdef FACTOR_DEBUG
