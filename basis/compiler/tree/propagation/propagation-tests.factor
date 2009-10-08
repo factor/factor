@@ -899,3 +899,6 @@ M: tuple-with-read-only-slot clone
 ! We want this to inline
 [ t ] [ [ void* <c-direct-array> ] { <c-direct-array> } inlined? ] unit-test
 [ V{ void*-array } ] [ [ void* <c-direct-array> ] final-classes ] unit-test
+
+[ t ] [ [ alien-unsigned-1 255 bitand ] { bitand fixnum-bitand } inlined? ] unit-test
+[ t ] [ [ alien-unsigned-1 255 swap bitand ] { bitand fixnum-bitand } inlined? ] unit-test
