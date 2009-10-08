@@ -50,6 +50,11 @@ HELP: firstn
     }
 } ;
 
+HELP: set-firstn
+{ $values { "n" integer } }
+{ $description "A generalization of " { $link set-first } " "
+"that sets the first " { $snippet "n" } " elements of a sequence from the top " { $snippet "n" } " elements of the stack." } ;
+
 HELP: npick
 { $values { "n" integer } }
 { $description "A generalization of " { $link dup } ", "
@@ -257,7 +262,7 @@ HELP: nweave
 HELP: n*quot
 { $values
      { "n" integer } { "quot" quotation }
-     { "quot'" quotation }
+     { "quotquot" quotation }
 }
 { $examples
     { $example "USING: generalizations prettyprint math ;"
@@ -314,6 +319,7 @@ ARTICLE: "sequence-generalizations" "Generalized sequence operations"
     narray
     nsequence
     firstn
+    set-firstn
     nappend
     nappend-as
 } ;
