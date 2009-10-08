@@ -39,31 +39,44 @@ ERROR: bad-vconvert-input value expected-type ;
     } cond
     [ from-type check-vconvert-type ] prepose ;
 
-:: [vpack] ( from-element to-element from-size to-size from-type to-type -- quot )
-    from-size to-size /i log2 :> steps
-
+:: check-vpack ( from-element to-element from-type to-type steps -- )
     {
         [ steps 1 = not ]
         [ from-element to-element [ float-type? ] bi@ xor ]
         [ from-element unsigned-type? to-element unsigned-type? not and ]
-    } 0|| [ from-type to-type bad-vconvert ] when
+    } 0|| [ from-type to-type bad-vconvert ] when ;
 
-    to-element unsigned-type? [ to-type (vpack-unsigned) ] [ to-type (vpack-signed) ] ?
-    [ [ from-type check-vconvert-type ] bi@ ] prepose ;
+:: [[vpack-unsigned]] ( from-type to-type -- quot )
+    [ [ from-type check-vconvert-type ] bi@ to-type (vpack-unsigned) ] ;
 
-:: [vunpack] ( from-element to-element from-size to-size from-type to-type -- quot )
-    to-size from-size /i log2 :> steps
+:: [[vpack-signed]] ( from-type to-type -- quot )
+    [ [ from-type check-vconvert-type ] bi@ to-type (vpack-signed) ] ;
 
+:: [vpack] ( from-element to-element from-size to-size from-type to-type -- quot )
+    from-size to-size /i log2 :> steps
+
+    from-element to-element from-type to-type steps check-vpack
+
+    from-type to-type to-element unsigned-type?
+    [ [[vpack-unsigned]] ] [ [[vpack-signed]] ] if ;
+
+:: check-vunpack ( from-element to-element from-type to-type steps -- )
     {
         [ steps 1 = not ]
         [ from-element to-element [ float-type? ] bi@ xor ]
         [ from-element unsigned-type? not to-element unsigned-type? and ]
-    } 0|| [ from-type to-type bad-vconvert ] when
+    } 0|| [ from-type to-type bad-vconvert ] when ;
 
+:: [[vunpack]] ( from-type to-type -- quot )
     [
         from-type check-vconvert-type
         [ to-type (vunpack-head) ] [ to-type (vunpack-tail) ] bi
     ] ;
+
+:: [vunpack] ( from-element to-element from-size to-size from-type to-type -- quot )
+    to-size from-size /i log2 :> steps
+    from-element to-element from-type to-type steps check-vunpack
+    from-type to-type [[vunpack]] ; 
 
 PRIVATE>
 

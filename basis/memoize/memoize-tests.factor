@@ -7,9 +7,18 @@ IN: memoize.tests
 MEMO: fib ( m -- n )
     dup 1 <= [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] if ;
 
+MEMO: x ( a b c d e -- f g h i j )
+    [ 1 + ] 4 ndip ;
+
 [ 89 ] [ 10 fib ] unit-test
 
-[ "USING: kernel math memoize generalizations ; IN: memoize.tests MEMO: x ( a b c d e -- f g h i j ) [ 1 + ] 4 ndip ;" eval( -- ) ] must-fail
+[
+    1 0 0 0 0
+    1 0 0 0 0
+] [
+    0 0 0 0 0 x
+    0 0 0 0 0 x
+] unit-test
 
 MEMO: see-test ( a -- b ) reverse ;
 
