@@ -10,7 +10,7 @@ IN: alien.parser
 : parse-c-type-name ( name -- word )
     dup search [ nip ] [ no-word ] if* ;
 
-: parse-c-type ( string -- array )
+: parse-c-type ( string -- type )
     {
         { [ dup "void" =            ] [ drop void ] }
         { [ CHAR: ] over member?    ] [ parse-array-type parse-c-type-name prefix ] }

@@ -19,12 +19,10 @@ ABOUT: "memoize"
 
 HELP: define-memoized
 { $values { "word" word } { "quot" quotation } { "effect" effect } }
-{ $description "defines the given word at runtime as one which memoizes its output given a particular input" }
-{ $notes "A maximum of four input and four output arguments can be used" }
-{ $see-also POSTPONE: MEMO: } ;
+{ $description "Defines the given word at run time as one which memoizes its outputs given a particular input." } ;
 
 HELP: MEMO:
 { $syntax "MEMO: word ( stack -- effect ) definition ;" }
-{ $description "defines the given word at parsetime as one which memoizes its output given a particular input. The stack effect is mandatory." }
-{ $notes "A maximum of four input and four output arguments can be used" }
-{ $see-also define-memoized } ;
+{ $description "Defines the given word at parse time as one which memoizes its output given a particular input. The stack effect is mandatory." } ;
+
+{ define-memoized POSTPONE: MEMO: } related-words

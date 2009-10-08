@@ -26,6 +26,8 @@ IN: generalizations.tests
 { 0 } [ 0 1 2 3 4 4 ndrop ] unit-test
 [ [ 1 ] 5 ndip ] must-infer
 [ 1 2 3 4 ] [ 2 3 4 [ 1 ] 3 ndip ] unit-test
+[ 5 nspin ] must-infer
+[ 1 5 4 3 2 ] [ 1 2 3 4 5 4 nspin ] unit-test
 
 [ 1 2 3 4 5 [ drop drop drop drop drop 2 ] 5 nkeep ] must-infer
 { 2 1 2 3 4 5 } [ 1 2 3 4 5 [ drop drop drop drop drop 2 ] 5 nkeep ] unit-test
