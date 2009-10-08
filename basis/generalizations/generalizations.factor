@@ -48,6 +48,18 @@ MACRO: nrot ( n -- )
 MACRO: -nrot ( n -- )
     1 - [ ] [ '[ swap _ dip ] ] repeat ;
 
+MACRO: set-firstn-unsafe ( n -- )
+    [ 1 + ]
+    [ iota [ '[ _ rot [ set-nth-unsafe ] keep ] ] map ] bi
+    '[ _ -nrot _ spread drop ] ;
+
+MACRO: set-firstn ( n -- )
+    dup zero? [ drop [ drop ] ] [
+        [ 1 - swap bounds-check 2drop ]
+        [ set-firstn-unsafe ]
+        bi-curry '[ _ _ bi ]
+    ] if ;
+
 MACRO: ndrop ( n -- )
     [ drop ] n*quot ;
 

@@ -40,6 +40,8 @@ IN: generalizations.tests
 [ { "xyc" "xyd" } ] [ "x" "y" { "c" "d" } [ 3append ] 2 nwith map ] unit-test
 
 [ 1 2 3 4 ] [ { 1 2 3 4 } 4 firstn ] unit-test
+[ { 1 2 3 4 } ] [ 1 2 3 4 { f f f f } [ 4 set-firstn ] keep ] unit-test
+[ 1 2 3 4 { f f f } [ 4 set-firstn ] keep ] must-fail
 [ ] [ { } 0 firstn ] unit-test
 [ "a" ] [ { "a" } 1 firstn ] unit-test
 
