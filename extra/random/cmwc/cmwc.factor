@@ -19,9 +19,15 @@ TUPLE: cmwc-seed Q c ;
         dup b>> 1 - >>r
         dup Q>> length 1 - >>mod ;
 
+: <cmwc-seed> ( Q c -- cmwc-seed )
+    cmwc-seed new
+        swap >>c
+        swap >>Q ; inline
+
 M: cmwc seed-random
-    [ >>Q ]
-    [ length 1 - >>i ] bi ;
+    [ Q>> >>Q ]
+    [ Q>> length 1 - >>i ]
+    [ c>> >>c ] tri ;
 
 M:: cmwc random-32* ( cmwc -- n )
     cmwc dup mod>> '[ 1 + _ bitand ] change-i

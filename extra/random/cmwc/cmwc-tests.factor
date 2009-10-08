@@ -30,13 +30,13 @@ IN: random.cmwc.tests
 ] unit-test
 
 [ t ] [
-    cmwc-4096
-    4096 iota >array seed-random [
-        10 [ random-32 ] replicate
-    ] with-random
-
-    cmwc-4096
-    4096 iota >array seed-random [
-        10 [ random-32 ] replicate
-    ] with-random =
+    cmwc-4096 [
+        4096 iota >array 362436 <cmwc-seed> seed-random [
+            10 [ random-32 ] replicate
+        ] with-random
+    ] [
+        4096 iota >array 362436 <cmwc-seed seed-random [
+            10 [ random-32 ] replicate
+        ] with-random
+    ] bi =
 ] unit-test
