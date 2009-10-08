@@ -1,6 +1,6 @@
 USING: arrays accessors continuations kernel math system
 sequences namespaces init vocabs vocabs.loader combinators ;
-IN: game-input
+IN: game.input
 
 SYMBOLS: game-input-backend game-input-opened ;
 
@@ -91,7 +91,7 @@ M: mouse-state clone
     call-next-method dup buttons>> clone >>buttons ;
 
 {
-    { [ os windows? ] [ "game-input.dinput" require ] }
-    { [ os macosx? ] [ "game-input.iokit" require ] }
+    { [ os windows? ] [ "game.input.dinput" require ] }
+    { [ os macosx? ] [ "game.input.iokit" require ] }
     { [ t ] [ ] }
 } cond
