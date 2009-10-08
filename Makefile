@@ -41,13 +41,13 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/code_block.o \
 	vm/code_heap.o \
 	vm/contexts.o \
-	vm/data_gc.o \
 	vm/data_heap.o \
 	vm/debug.o \
 	vm/dispatch.o \
 	vm/errors.o \
 	vm/factor.o \
 	vm/full_collector.o \
+	vm/gc.o \
 	vm/heap.o \
 	vm/image.o \
 	vm/inline_cache.o \

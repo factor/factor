@@ -75,7 +75,7 @@ namespace factor
 #include "aging_space.hpp"
 #include "tenured_space.hpp"
 #include "data_heap.hpp"
-#include "data_gc.hpp"
+#include "gc.hpp"
 #include "debug.hpp"
 #include "strings.hpp"
 #include "tuples.hpp"
