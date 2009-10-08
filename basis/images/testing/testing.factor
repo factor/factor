@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Keith Lazuka.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry images.loader images.normalization io
-io.encodings.binary io.files io.pathnames io.streams.byte-array
-kernel locals namespaces quotations sequences serialize
-tools.test ;
+USING: fry images.loader images.normalization images.viewer io
+io.directories io.encodings.binary io.files io.pathnames
+io.streams.byte-array kernel locals namespaces quotations
+sequences serialize tools.test ;
 IN: images.testing
 
 <PRIVATE
@@ -15,9 +15,25 @@ IN: images.testing
 
 PRIVATE>
 
+:: with-matching-files ( dirpath extension quot -- )
+    dirpath [
+        [
+            dup file-extension extension = quot [ drop ] if
+        ] each
+    ] with-directory-files ; inline
+
+: images. ( dirpath extension -- )
+    [ image. ] with-matching-files ;
+
+: ls ( dirpath extension -- )
+    [ "\"" dup surround print ] with-matching-files ;
+
 : save-as-reference-image ( path -- )
     [ load-image ] [ fig-name ] bi
     binary [ serialize ] with-file-writer ;
+
+: save-all-as-reference-images ( dirpath extension -- )
+    [ save-as-reference-image ] with-matching-files ;
 
 : load-reference-image ( path -- image )
     fig-name binary [ deserialize ] with-file-reader ;
