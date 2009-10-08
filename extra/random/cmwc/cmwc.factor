@@ -48,4 +48,7 @@ M:: cmwc random-32* ( cmwc -- n )
 : cmwc-4096 ( -- cmwc )
     4096
     [ 18782 4294967295 362436 <cmwc> ]
-    [ '[ [ random-32 ] replicate ] with-system-random seed-random ] bi ;
+    [
+        '[ [ random-32 ] replicate ] with-system-random
+        362436 <cmwc-seed> seed-random
+    ] bi ;
