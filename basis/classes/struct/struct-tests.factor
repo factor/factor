@@ -357,3 +357,11 @@ STRUCT: bit-field-test
     { a uint bits: 12 }
     { b int bits: 2 }
     { c char } ;
+
+[ S{ bit-field-test f 0 0 0 } ] [ bit-field-test <struct> ] unit-test
+[ S{ bit-field-test f 1 -2 3 } ] [ bit-field-test <struct> 1 >>a 2 >>b 3 >>c ] unit-test
+[ 4095 ] [ bit-field-test <struct> 8191 >>a a>> ] unit-test
+[ 1 ] [ bit-field-test <struct> 1 >>b b>> ] unit-test
+[ -2 ] [ bit-field-test <struct> 2 >>b b>> ] unit-test
+[ 1 ] [ bit-field-test <struct> 257 >>c c>> ] unit-test
+[ 3 ] [ bit-field-test heap-size ] unit-test

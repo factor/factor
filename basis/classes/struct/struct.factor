@@ -12,23 +12,6 @@ IN: classes.struct
 
 SPECIALIZED-ARRAY: uchar
 
-<PRIVATE
-
-TUPLE: bits size signed? ;
-C: <bits> bits
-
-M: bits heap-size size>> 8 / ;
-
-M: bits c-type-align drop 1/8 ;
-
-: align ( m w -- n )
-    ! Really, you could write 'align' correctly
-    ! for any real w; this is just a hack
-    ! that only works here
-    dup integer? [ [ ceiling ] dip math:align ] [ drop ] if ;
-
-PRIVATE>
-
 ERROR: struct-must-have-slots ;
 
 M: struct-must-have-slots summary
@@ -39,6 +22,10 @@ TUPLE: struct
 
 TUPLE: struct-slot-spec < slot-spec
     type ;
+
+! For a struct-bit-slot-spec, offset is in bits, not bytes
+TUPLE: struct-bit-slot-spec < struct-slot-spec
+    bits signed? ;
 
 PREDICATE: struct-class < tuple-class
     superclass \ struct eq? ;
@@ -102,19 +89,15 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
 : pad-struct-slots ( values class -- values' class )
     [ struct-slots [ initial>> ] map over length tail append ] keep ;
 
-: read-normal ( slot -- quot )
-    [ type>> c-type-getter-boxer ]
-    [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
-
 : bits@ ( slot -- beginning end )
-    [ offset>> 8 * ] [ type>> size>> ] bi dupd + ;
+    [ offset>> ] [ bits>> ] bi dupd + ;
 
 QUALIFIED: math.bits
 
 : bytes>bits ( byte-array -- bit-array )
     [ 8 math.bits:<bits> ] { } map-as ?{ } join ;
 
-: (read-bits) ( beginning end byte-array -- n )
+: read-bits ( beginning end byte-array -- n )
     ! This is absurdly inefficient
     bytes>bits subseq bit-array>integer ;
 
@@ -123,34 +106,33 @@ QUALIFIED: math.bits
     ! http://guru.multimedia.cx/fast-sign-extension/
     1 - -1 swap shift [ + ] keep bitxor ; inline
 
-: read-bits ( slot -- quot )
-    [ bits@ ] [ type>> signed?>> ] [ type>> size>> ] tri '[
-        [ _ _ ] dip (underlying)>> (read-bits)
+GENERIC: (reader-quot) ( slot -- quot )
+
+M: struct-slot-spec (reader-quot)
+    [ type>> c-type-getter-boxer ]
+    [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
+
+M: struct-bit-slot-spec (reader-quot)
+    [ bits@ ] [ signed?>> ] [ bits>> ] tri '[
+        [ _ _ ] dip (underlying)>> read-bits
         _ [ _ sign-extend ] when
     ] ;
 
-: (reader-quot) ( slot -- quot )
-    dup type>> bits? [ read-bits ] [ read-normal ] if ;
+GENERIC: (writer-quot) ( slot -- quot )
 
-: write-normal ( slot -- quot )
+M: struct-slot-spec (writer-quot)
     [ type>> c-setter ]
     [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
-
-: overwrite ( donor victim -- )
-    0 swap copy ;
 
 : (write-bits) ( value offset end byte-array -- )
     ! This is absurdly inefficient
     [
         [ [ swap - math.bits:<bits> ] 2keep ] [ bytes>bits ] bi*
         replace-slice ?{ } like underlying>>
-    ] keep overwrite ;
+    ] keep 0 swap copy ;
 
-: write-bits ( slot -- quot )
+M: struct-bit-slot-spec (writer-quot) ( slot -- quot )
     bits@ '[ [ _ _ ] dip (underlying)>> (write-bits) ] ;
-
-: (writer-quot) ( slot -- quot )
-    dup type>> bits? [ write-bits ] [ write-normal ] if ;
 
 : (boxer-quot) ( class -- quot )
     '[ _ memory>struct ] ;
@@ -246,19 +228,23 @@ M: struct-c-type c-struct? drop t ;
         class (unboxer-quot) >>unboxer-quot
         class (boxer-quot)   >>boxer-quot ;
     
-: align-offset ( offset class -- offset' )
-    c-type-align align ;
+GENERIC: align-offset ( offset class -- offset' )
+
+M: struct-slot-spec align-offset
+    [ type>> c-type-align 8 * align ] keep
+    [ [ 8 /i ] dip (>>offset) ] [ type>> heap-size 8 * + ] 2bi ;
+
+M: struct-bit-slot-spec align-offset
+    [ (>>offset) ] [ bits>> + ] 2bi ;
 
 : struct-offsets ( slots -- size )
-    0 [
-        [ type>> align-offset ] keep
-        [ (>>offset) ] [ type>> heap-size + ] 2bi
-    ] reduce ;
+    0 [ align-offset ] reduce 8 align 8 /i ;
 
 : union-struct-offsets ( slots -- size )
     1 [ 0 >>offset type>> heap-size max ] reduce ;
 
 : struct-align ( slots -- align )
+    [ struct-bit-slot-spec? not ] filter
     1 [ type>> c-type-align max ] reduce ;
 PRIVATE>
 
@@ -339,12 +325,19 @@ SYMBOL: bits:
 
 ERROR: bad-type-for-bits type ;
 
-: set-bits ( slot-spec n -- slot-spec )
-    over type>> {
-        { int [ t ] }
-        { uint [ f ] }
-        [ bad-type-for-bits ]
-    } case <bits> >>type ;
+:: set-bits ( slot-spec n -- slot-spec )
+    struct-bit-slot-spec new
+        n >>bits
+        slot-spec type>> {
+            { int [ t ] }
+            { uint [ f ] }
+            [ bad-type-for-bits ]
+        } case >>signed?
+        slot-spec name>> >>name
+        slot-spec class>> >>class
+        slot-spec type>> >>type
+        slot-spec read-only>> >>read-only
+        slot-spec initial>> >>initial ;
 
 : peel-off-struct-attributes ( slot-spec array -- slot-spec array )
     dup empty? [
