@@ -13,6 +13,8 @@ struct quotation_jit : public jit {
 
 	void emit_mega_cache_lookup(cell methods, fixnum index, cell cache);
 	bool primitive_call_p(cell i, cell length);
+	bool trivial_quotation_p(array *elements);
+	void emit_quot(cell quot);
 	bool fast_if_p(cell i, cell length);
 	bool fast_dip_p(cell i, cell length);
 	bool fast_2dip_p(cell i, cell length);

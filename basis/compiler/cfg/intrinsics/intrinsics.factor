@@ -171,18 +171,18 @@ IN: compiler.cfg.intrinsics
         { math.vectors.simd.intrinsics:(simd-vbitandn) [ [ ^^andn-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vbitor) [ [ ^^or-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vbitxor) [ [ ^^xor-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-vbitnot) [ [ ^^not-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-vbitnot) [ [ generate-not-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vand) [ [ ^^and-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vandn) [ [ ^^andn-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vor) [ [ ^^or-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vxor) [ [ ^^xor-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-vnot) [ [ ^^not-vector ] emit-unary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-v<=) [ [ cc<= ^^compare-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-v<) [ [ cc< ^^compare-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-v=) [ [ cc= ^^compare-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-v>) [ [ cc> ^^compare-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-v>=) [ [ cc>= ^^compare-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-vunordered?) [ [ cc/<>= ^^compare-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-vnot) [ [ generate-not-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-v<=) [ [ cc<= generate-compare-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-v<) [ [ cc< generate-compare-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-v=) [ [ cc= generate-compare-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-v>) [ [ cc> generate-compare-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-v>=) [ [ cc>= generate-compare-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-vunordered?) [ [ cc/<>= generate-compare-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vany?) [ [ vcc-any ^^test-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vall?) [ [ vcc-all ^^test-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vnone?) [ [ vcc-none ^^test-vector ] emit-unary-vector-op ] }
@@ -194,8 +194,14 @@ IN: compiler.cfg.intrinsics
         { math.vectors.simd.intrinsics:(simd-gather-2) [ emit-gather-vector-2 ] }
         { math.vectors.simd.intrinsics:(simd-gather-4) [ emit-gather-vector-4 ] }
         { math.vectors.simd.intrinsics:(simd-vshuffle) [ emit-shuffle-vector ] }
-        { math.vectors.simd.intrinsics:(simd-vmerge-head) [ [ ^^merge-vector-head ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-vmerge-tail) [ [ ^^merge-vector-tail ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-(vmerge-head)) [ [ ^^merge-vector-head ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-(vmerge-tail)) [ [ ^^merge-vector-tail ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-(v>float)) [ [ ^^integer>float-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-(v>integer)) [ [ ^^float>integer-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-(vpack-signed)) [ [ ^^signed-pack-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-(vpack-unsigned)) [ [ ^^unsigned-pack-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-(vunpack-head)) [ [ generate-unpack-vector-head ] emit-unary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-(vunpack-tail)) [ [ generate-unpack-vector-tail ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-select) [ emit-select-vector ] }
         { math.vectors.simd.intrinsics:(simd-sum) [ [ ^^horizontal-add-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:alien-vector [ emit-alien-vector ] }
