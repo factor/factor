@@ -6,7 +6,8 @@ combinators.smart cpu.architecture definitions functors.backend
 fry generalizations generic.parser kernel kernel.private lexer
 libc locals macros make math math.order parser quotations
 sequences slots slots.private specialized-arrays vectors words
-summary namespaces assocs vocabs.parser math.functions bit-arrays ;
+summary namespaces assocs vocabs.parser math.functions
+classes.struct.bit-accessors bit-arrays ;
 QUALIFIED: math
 IN: classes.struct
 
@@ -89,22 +90,13 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
 : pad-struct-slots ( values class -- values' class )
     [ struct-slots [ initial>> ] map over length tail append ] keep ;
 
-: bits@ ( slot -- beginning end )
-    [ offset>> ] [ bits>> ] bi dupd + ;
-
-QUALIFIED: math.bits
-
-: bytes>bits ( byte-array -- bit-array )
-    [ 8 math.bits:<bits> ] { } map-as ?{ } join ;
-
-: read-bits ( beginning end byte-array -- n )
-    ! This is absurdly inefficient
-    bytes>bits subseq bit-array>integer ;
-
 : sign-extend ( n bits -- n' )
     ! formula from:
     ! http://guru.multimedia.cx/fast-sign-extension/
     1 - -1 swap shift [ + ] keep bitxor ; inline
+
+: sign-extender ( signed? bits -- quot )
+    '[ _ [ _ sign-extend ] when ] ;
 
 GENERIC: (reader-quot) ( slot -- quot )
 
@@ -113,10 +105,10 @@ M: struct-slot-spec (reader-quot)
     [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
 
 M: struct-bit-slot-spec (reader-quot)
-    [ bits@ ] [ signed?>> ] [ bits>> ] tri '[
-        [ _ _ ] dip (underlying)>> read-bits
-        _ [ _ sign-extend ] when
-    ] ;
+    [ [ offset>> ] [ bits>> ] bi bit-reader ]
+    [ [ signed?>> ] [ bits>> ] bi sign-extender ]
+    bi compose
+    [ >c-ptr ] prepose ;
 
 GENERIC: (writer-quot) ( slot -- quot )
 
@@ -124,12 +116,20 @@ M: struct-slot-spec (writer-quot)
     [ type>> c-setter ]
     [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
 
+QUALIFIED: math.bits
+
+: bytes>bits ( byte-array -- bit-array )
+    [ 8 math.bits:<bits> ] { } map-as ?{ } join ;
+
 : (write-bits) ( value offset end byte-array -- )
     ! This is absurdly inefficient
     [
         [ [ swap - math.bits:<bits> ] 2keep ] [ bytes>bits ] bi*
         replace-slice ?{ } like underlying>>
     ] keep 0 swap copy ;
+
+: bits@ ( slot -- beginning end )
+    [ offset>> ] [ bits>> ] bi dupd + ;
 
 M: struct-bit-slot-spec (writer-quot) ( slot -- quot )
     bits@ '[ [ _ _ ] dip (underlying)>> (write-bits) ] ;
