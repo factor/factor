@@ -226,24 +226,40 @@ SYMBOL: phi-mappings
 M: ##phi conversions-for-insn
     [ , ] [ [ inputs>> values ] [ dst>> ] bi phi-mappings get set-at ] bi ;
 
-! When a literal zero vector is unboxed, we replace the ##load-reference
-! with a ##zero-vector instruction since this is more efficient.
+! When a literal zeroes/ones vector is unboxed, we replace the ##load-reference
+! with a ##zero-vector or ##fill-vector instruction since this is more efficient.
 : convert-to-zero-vector? ( insn -- ? )
     {
         [ dst>> rep-of vector-rep? ]
-        [ obj>> B{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 } = ]
+        [ obj>> B{ 0 0 0 0  0 0 0 0  0 0 0 0  0 0 0 0 } = ]
+    } 1&& ;
+: convert-to-fill-vector? ( insn -- ? )
+    {
+        [ dst>> rep-of vector-rep? ]
+        [ obj>> B{ 255 255 255 255  255 255 255 255  255 255 255 255  255 255 255 255 } = ]
     } 1&& ;
 
-: convert-to-zero-vector ( insn -- )
-    dst>> dup rep-of ##zero-vector ;
+: (convert-to-zero/fill-vector) ( insn -- dst rep )
+    dst>> dup rep-of ; inline
+
+: conversions-for-load-insn ( insn -- ?insn )
+    {
+        {
+            [ dup convert-to-zero-vector? ]
+            [ (convert-to-zero/fill-vector) ##zero-vector f ]
+        }
+        {
+            [ dup convert-to-fill-vector? ]
+            [ (convert-to-zero/fill-vector) ##fill-vector f ]
+        }
+        [ ]
+    } cond ;
 
 M: ##load-reference conversions-for-insn
-    dup convert-to-zero-vector?
-    [ convert-to-zero-vector ] [ call-next-method ] if ;
+    conversions-for-load-insn [ call-next-method ] when* ;
 
 M: ##load-constant conversions-for-insn
-    dup convert-to-zero-vector?
-    [ convert-to-zero-vector ] [ call-next-method ] if ;
+    conversions-for-load-insn [ call-next-method ] when* ;
 
 M: vreg-insn conversions-for-insn
     [ compute-renaming-set ] [ perform-renaming ] bi ;

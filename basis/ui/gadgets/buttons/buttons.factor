@@ -69,8 +69,8 @@ C: <button-pen> button-pen
 
 : button-pen ( button pen -- button pen )
     over find-button {
-        { [ dup { [ pressed?>> ] [ selected?>> ] } 1&& ]
-            [ drop pressed-selected>>
+        { [ dup { [ pressed?>> ] [ selected?>> ] } 1&& ] [
+            drop pressed-selected>>
         ] }
         { [ dup pressed?>> ] [ drop pressed>> ] }
         { [ dup selected?>> ] [ drop selected>> ] }

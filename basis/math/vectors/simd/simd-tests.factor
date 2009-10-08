@@ -4,6 +4,7 @@ math.private math.vectors math.vectors.simd
 math.vectors.simd.private prettyprint random sequences system
 tools.test vocabs assocs compiler.cfg.debugger words
 locals math.vectors.specialization combinators cpu.architecture
+math.vectors.conversion.backend
 math.vectors.simd.intrinsics namespaces byte-arrays alien
 specialized-arrays classes.struct eval classes.algebra sets
 quotations math.constants compiler.units ;
@@ -128,6 +129,8 @@ CONSTANT: simd-classes
 
 [ HEX: ffffffff ] [ HEX: ffffffff [ uint-4-with ] compile-call first ] unit-test
 
+[ HEX: ffffffff ] [ [ HEX: ffffffff uint-4-with ] compile-call first ] unit-test
+
 "== Checking -boa constructors" print
 
 [ { } ] [
@@ -181,6 +184,9 @@ CONSTANT: simd-classes
     {
         hlshift hrshift vshuffle vbroadcast
         vany? vall? vnone?
+        (v>float) (v>integer)
+        (vpack-signed) (vpack-unsigned)
+        (vunpack-head) (vunpack-tail)
     } unique assoc-diff ;
 
 : ops-to-check ( elt-class -- alist )
