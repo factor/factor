@@ -120,7 +120,7 @@ TYPED:: m4^n ( m: matrix4 n: fixnum -- m^n: matrix4 )
     identity-matrix4 n [ m m4. ] times ;
 
 : vmerge-diagonal* ( x y -- h t )
-    [ vmerge-head ] [ swap vmerge-tail ] 2bi ; inline
+    [ (vmerge-head) ] [ swap (vmerge-tail) ] 2bi ; inline
 : vmerge-diagonal ( x -- h t )
     0.0 float-4-with vmerge-diagonal* ; inline
 
@@ -128,7 +128,7 @@ TYPED: diagonal-matrix4 ( diagonal: float-4 -- matrix: matrix4 )
     [ vmerge-diagonal [ vmerge-diagonal ] bi@ ] make-matrix4 ;
 
 : vmerge-transpose ( a b c d -- a' b' c' d' )
-    [ vmerge ] bi-curry@ bi* ; inline
+    [ (vmerge) ] bi-curry@ bi* ; inline
 
 TYPED: transpose-matrix4 ( matrix: matrix4 -- matrix: matrix4 )
     [ rows vmerge-transpose vmerge-transpose ] make-matrix4 ;
@@ -144,8 +144,8 @@ TYPED:: translation-matrix4 ( offset: float-4 -- matrix: matrix4 )
     [
         float-4{ 1.0 1.0 1.0 1.0 } :> diagonal
 
-        offset 0 float-4-with vmerge
-        [ 0 float-4-with swap vmerge ] bi@ drop :> z :> y :> x
+        offset 0 float-4-with (vmerge)
+        [ 0 float-4-with swap (vmerge) ] bi@ drop :> z :> y :> x
 
         diagonal y vmerge-diagonal*
         [ x vmerge-diagonal* ]
@@ -194,7 +194,7 @@ TYPED:: frustum-matrix4 ( xy: float-4 near: float far: float -- matrix: matrix4 
         float-4{ t t f f } xy near far - float-4-with v? ! denom
         v/ :> fov
         
-        fov 0.0 float-4-with vmerge-head vmerge-diagonal
+        fov 0.0 float-4-with (vmerge-head) vmerge-diagonal
         fov float-4{ f f t t } vand
         float-4{ 0.0 0.0 -1.0 0.0 }
     ] make-matrix4 ;

@@ -6,6 +6,6 @@ IN: benchmark.sfmt
 : sfmt-benchmark ( n -- )
     >fixnum HEX: 533d <sfmt-19937> '[ _ random-32* drop ] times ;
 
-: sfmt-main ( -- ) 100000000 sfmt-benchmark ;
+: sfmt-main ( -- ) 10000000 sfmt-benchmark ;
 
 MAIN: sfmt-main

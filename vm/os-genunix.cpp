@@ -30,6 +30,7 @@ const char *default_image_path()
 	char *new_path = new char[PATH_MAX + SUFFIX_LEN + 1];
 	memcpy(new_path,path,len + 1);
 	memcpy(new_path + len,SUFFIX,SUFFIX_LEN + 1);
+	free(const_cast<char *>(path));
 	return new_path;
 }
 
