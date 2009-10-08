@@ -280,6 +280,11 @@ def: dst
 use: src
 literal: shuffle rep ;
 
+PURE-INSN: ##tail>head-vector
+def: dst
+use: src
+literal: rep ;
+
 PURE-INSN: ##merge-vector-head
 def: dst
 use: src1 src2
@@ -303,13 +308,11 @@ literal: rep ;
 PURE-INSN: ##unpack-vector-head
 def: dst
 use: src
-temp: temp
 literal: rep ;
 
 PURE-INSN: ##unpack-vector-tail
 def: dst
 use: src
-temp: temp
 literal: rep ;
 
 PURE-INSN: ##integer>float-vector
@@ -325,7 +328,6 @@ literal: rep ;
 PURE-INSN: ##compare-vector
 def: dst
 use: src1 src2
-temp: temp
 literal: rep cc ;
 
 PURE-INSN: ##test-vector
@@ -813,7 +815,6 @@ UNION: kill-vreg-insn
 UNION: def-is-use-insn
 ##box-alien
 ##box-displaced-alien
-##compare-vector
 ##string-nth
 ##unbox-any-c-ptr ;
 

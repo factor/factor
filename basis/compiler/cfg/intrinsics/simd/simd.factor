@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays fry cpu.architecture kernel math
 sequences math.vectors.simd.intrinsics macros generalizations
-combinators combinators.short-circuit arrays
+combinators combinators.short-circuit arrays locals
 compiler.tree.propagation.info compiler.cfg.builder.blocks
+compiler.cfg.comparisons
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.cfg.hats
 compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.intrinsics.alien ;
@@ -120,4 +121,59 @@ MACRO: if-literals-match ( quots -- )
     dup %not-vector-reps member?
     [ ^^not-vector ]
     [ [ ^^fill-vector ] [ ^^xor-vector ] bi ] if ;
+
+:: (generate-compare-vector) ( src1 src2 rep {cc,swap} -- dst )
+    {cc,swap} first2 :> swap? :> cc
+    swap?
+    [ src2 src1 rep cc ^^compare-vector ]
+    [ src1 src2 rep cc ^^compare-vector ] if ;
+
+:: generate-compare-vector ( src1 src2 rep orig-cc -- dst )
+    rep orig-cc %compare-vector-ccs :> not? :> ccs
+
+    ccs empty?
+    [ rep not? [ ^^fill-vector ] [ ^^zero-vector ] if ]
+    [
+        ccs unclip :> first-cc :> rest-ccs
+        src1 src2 rep first-cc (generate-compare-vector) :> first-dst
+
+        rest-ccs first-dst
+        [ [ src1 src2 rep ] dip (generate-compare-vector) rep ^^or-vector ]
+        reduce
+
+        not? [ rep generate-not-vector ] when
+    ] if ;
+
+:: generate-unpack-vector-head ( src rep -- dst )
+    {
+        {
+            [ rep %unpack-vector-head-reps member? ]
+            [ src rep ^^unpack-vector-head ]
+        }
+        [
+            rep ^^zero-vector :> zero
+            zero src rep cc> ^^compare-vector :> sign
+            src sign rep ^^merge-vector-head
+        ] 
+    } cond ;
+
+:: generate-unpack-vector-tail ( src rep -- dst )
+    {
+        {
+            [ rep %unpack-vector-tail-reps member? ]
+            [ src rep ^^unpack-vector-tail ]
+        }
+        {
+            [ rep %unpack-vector-head-reps member? ]
+            [
+                src rep ^^tail>head-vector :> tail
+                tail rep ^^unpack-vector-head
+            ]
+        }
+        [
+            rep ^^zero-vector :> zero
+            zero src rep cc> ^^compare-vector :> sign
+            src sign rep ^^merge-vector-tail
+        ] 
+    } cond ;
 

@@ -4,7 +4,7 @@ USING: alien alien.c-types alien.data assocs combinators
 cpu.architecture compiler.cfg.comparisons fry generalizations
 kernel libc macros math
 math.vectors.conversion.backend
-sequences effects accessors namespaces
+sequences sets effects accessors namespaces
 lexer parser vocabs.parser words arrays math.vectors ;
 IN: math.vectors.simd.intrinsics
 
@@ -137,6 +137,10 @@ MACRO: (simd-boa) ( rep -- quot )
 
 GENERIC# supported-simd-op? 1 ( rep intrinsic -- ? )
 
+: (%unpack-reps) ( -- reps )
+    %merge-vector-reps [ int-vector-rep? ] filter
+    %unpack-vector-head-reps union ;
+
 M: vector-rep supported-simd-op?
     {
         { \ (simd-v+)            [ %add-vector-reps            ] }
@@ -174,8 +178,8 @@ M: vector-rep supported-simd-op?
         { \ (simd-(v>integer))      [ %float>integer-vector-reps ] }
         { \ (simd-(vpack-signed))   [ %signed-pack-vector-reps   ] }
         { \ (simd-(vpack-unsigned)) [ %unsigned-pack-vector-reps ] }
-        { \ (simd-(vunpack-head))   [ %unpack-vector-reps        ] }
-        { \ (simd-(vunpack-tail))   [ %unpack-vector-reps        ] }
+        { \ (simd-(vunpack-head))   [ (%unpack-reps)             ] }
+        { \ (simd-(vunpack-tail))   [ (%unpack-reps)             ] }
         { \ (simd-v<=)           [ cc<= %compare-vector-reps   ] }
         { \ (simd-v<)            [ cc< %compare-vector-reps    ] }
         { \ (simd-v=)            [ cc= %compare-vector-reps    ] }
