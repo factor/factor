@@ -1,12 +1,11 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types fry kernel literals locals math
-random sequences specialized-arrays ;
+random sequences specialized-arrays namespaces ;
 SPECIALIZED-ARRAY: double
 IN: random.lagged-fibonacci
 
 TUPLE: lagged-fibonacci u pt0 pt1 ;
-
 
 <PRIVATE
 
