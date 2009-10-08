@@ -10,7 +10,7 @@ const char *vm_executable_path()
 	static Dl_info info = {0};
 	if (!info.dli_fname)
 		dladdr((void *)main, &info);
-	return info.dli_fname;
+	return safe_strdup(info.dli_fname);
 }
 
 }
