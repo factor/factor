@@ -1,6 +1,6 @@
-USING: ui game-input tools.test kernel system threads calendar
+USING: ui game.input tools.test kernel system threads calendar
 combinators.short-circuit ;
-IN: game-input.tests
+IN: game.input.tests
 
 os { [ windows? ] [ macosx? ] } 1|| [
     [ ] [ open-game-input ] unit-test

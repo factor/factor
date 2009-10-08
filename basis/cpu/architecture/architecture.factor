@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays generic kernel kernel.private math
-memory namespaces make sequences layouts system hashtables
+USING: accessors arrays assocs generic kernel kernel.private
+math memory namespaces make sequences layouts system hashtables
 classes alien byte-arrays combinators words sets fry ;
 IN: cpu.architecture
 
@@ -56,6 +56,18 @@ uint-4-rep
 longlong-2-rep
 ulonglong-2-rep ;
 
+UNION: signed-int-vector-rep
+char-16-rep
+short-8-rep
+int-4-rep
+longlong-2-rep ;
+
+UNION: unsigned-int-vector-rep
+uchar-16-rep
+ushort-8-rep
+uint-4-rep
+ulonglong-2-rep ;
+
 UNION: scalar-rep
 char-scalar-rep
 uchar-scalar-rep
@@ -82,6 +94,18 @@ float-rep
 double-rep
 vector-rep
 scalar-rep ;
+
+: unsign-rep ( rep -- rep' )
+    {
+        { uint-4-rep           int-4-rep }
+        { ulonglong-2-rep      longlong-2-rep }
+        { ushort-8-rep         short-8-rep }
+        { uchar-16-rep         char-16-rep }
+        { uchar-scalar-rep     char-scalar-rep }
+        { ushort-scalar-rep    short-scalar-rep }
+        { uint-scalar-rep      int-scalar-rep }
+        { ulonglong-scalar-rep longlong-scalar-rep }
+    } ?at drop ;
 
 ! Register classes
 SINGLETONS: int-regs float-regs ;
@@ -218,9 +242,16 @@ HOOK: %fill-vector cpu ( dst rep -- )
 HOOK: %gather-vector-2 cpu ( dst src1 src2 rep -- )
 HOOK: %gather-vector-4 cpu ( dst src1 src2 src3 src4 rep -- )
 HOOK: %shuffle-vector cpu ( dst src shuffle rep -- )
+HOOK: %tail>head-vector cpu ( dst src rep -- )
 HOOK: %merge-vector-head cpu ( dst src1 src2 rep -- )
 HOOK: %merge-vector-tail cpu ( dst src1 src2 rep -- )
-HOOK: %compare-vector cpu ( dst src1 src2 temp rep cc -- )
+HOOK: %signed-pack-vector cpu ( dst src1 src2 rep -- )
+HOOK: %unsigned-pack-vector cpu ( dst src1 src2 rep -- )
+HOOK: %unpack-vector-head cpu ( dst src rep -- )
+HOOK: %unpack-vector-tail cpu ( dst src rep -- )
+HOOK: %integer>float-vector cpu ( dst src rep -- )
+HOOK: %float>integer-vector cpu ( dst src rep -- )
+HOOK: %compare-vector cpu ( dst src1 src2 rep cc -- )
 HOOK: %test-vector cpu ( dst src1 temp rep vcc -- )
 HOOK: %test-vector-branch cpu ( label src1 temp rep vcc -- )
 HOOK: %add-vector cpu ( dst src1 src2 rep -- )
@@ -259,7 +290,14 @@ HOOK: %gather-vector-2-reps cpu ( -- reps )
 HOOK: %gather-vector-4-reps cpu ( -- reps )
 HOOK: %shuffle-vector-reps cpu ( -- reps )
 HOOK: %merge-vector-reps cpu ( -- reps )
+HOOK: %signed-pack-vector-reps cpu ( -- reps )
+HOOK: %unsigned-pack-vector-reps cpu ( -- reps )
+HOOK: %unpack-vector-head-reps cpu ( -- reps )
+HOOK: %unpack-vector-tail-reps cpu ( -- reps )
+HOOK: %integer>float-vector-reps cpu ( -- reps )
+HOOK: %float>integer-vector-reps cpu ( -- reps )
 HOOK: %compare-vector-reps cpu ( cc -- reps )
+HOOK: %compare-vector-ccs cpu ( rep cc -- {cc,swap?}s not? )
 HOOK: %test-vector-reps cpu ( -- reps )
 HOOK: %add-vector-reps cpu ( -- reps )
 HOOK: %saturated-add-vector-reps cpu ( -- reps )

@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors arrays combinators.smart game-input
-game-input.scancodes game-loop game-worlds
+game.input.scancodes game.loop game.worlds
 gpu.render gpu.state kernel literals
 locals math math.constants math.functions math.matrices
 math.order math.vectors opengl.gl sequences

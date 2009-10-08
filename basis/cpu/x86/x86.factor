@@ -588,14 +588,6 @@ M: x86 %fill-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-: unsign-rep ( rep -- rep' )
-    {
-        { uint-4-rep      int-4-rep }
-        { ulonglong-2-rep longlong-2-rep }
-        { ushort-8-rep    short-8-rep }
-        { uchar-16-rep    char-16-rep }
-    } ?at drop ;
-
 ! M:: x86 %broadcast-vector ( dst src rep -- )
 !     rep unsign-rep {
 !         { float-4-rep [
@@ -749,14 +741,81 @@ M: x86 %merge-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-:: compare-float-v-operands ( dst src1 src2 temp rep cc -- dst' src' rep cc' )
-    cc { cc> cc>= cc/> cc/>= } member?
-    [ dst src2 src1 rep two-operand rep cc swap-cc ]
-    [ dst src1 src2 rep two-operand rep cc         ] if ;
+M: x86 %signed-pack-vector
+    [ two-operand ] keep
+    {
+        { int-4-rep    [ PACKSSDW ] }
+        { short-8-rep  [ PACKSSWB ] }
+    } case ;
+
+M: x86 %signed-pack-vector-reps
+    {
+        { sse2? { short-8-rep int-4-rep } }
+    } available-reps ;
+
+M: x86 %unsigned-pack-vector
+    [ two-operand ] keep
+    unsign-rep {
+        { int-4-rep   [ PACKUSDW ] }
+        { short-8-rep [ PACKUSWB ] }
+    } case ;
+
+M: x86 %unsigned-pack-vector-reps
+    {
+        { sse2? { short-8-rep } }
+        { sse4.1? { int-4-rep } }
+    } available-reps ;
+
+M: x86 %tail>head-vector ( dst src rep -- )
+    dup {
+        { float-4-rep [ drop MOVHLPS ] }
+        { double-2-rep [ [ %copy ] [ drop UNPCKHPD ] 3bi ] }
+        [ drop [ %copy ] [ drop PUNPCKHQDQ ] 3bi ]
+    } case ;
+
+M: x86 %unpack-vector-head ( dst src rep -- )
+    {
+        { char-16-rep  [ PMOVSXBW ] }
+        { uchar-16-rep [ PMOVZXBW ] }
+        { short-8-rep  [ PMOVSXWD ] }
+        { ushort-8-rep [ PMOVZXWD ] }
+        { int-4-rep    [ PMOVSXDQ ] }
+        { uint-4-rep   [ PMOVZXDQ ] }
+        { float-4-rep  [ CVTPS2PD ] }
+    } case ;
+
+M: x86 %unpack-vector-head-reps ( -- reps )
+    {
+        { sse2? { float-4-rep } }
+        { sse4.1? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
+    } available-reps ;
+
+M: x86 %unpack-vector-tail-reps ( -- reps ) { } ;
+
+M: x86 %integer>float-vector ( dst src rep -- )
+    {
+        { int-4-rep [ CVTDQ2PS ] }
+    } case ;
+
+M: x86 %integer>float-vector-reps
+    {
+        { sse2? { int-4-rep } }
+    } available-reps ;
+
+M: x86 %float>integer-vector ( dst src rep -- )
+    {
+        { float-4-rep [ CVTTPS2DQ ] }
+    } case ;
+
+M: x86 %float>integer-vector-reps
+    {
+        { sse2? { float-4-rep } }
+    } available-reps ;
+
 : (%compare-float-vector) ( dst src rep double single -- )
     [ double-2-rep eq? ] 2dip if ; inline
-: %compare-float-vector ( dst src1 src2 temp rep cc -- )
-    compare-float-v-operands {
+: %compare-float-vector ( dst src rep cc -- )
+    {
         { cc<    [ [ CMPLTPD    ] [ CMPLTPS    ] (%compare-float-vector) ] }
         { cc<=   [ [ CMPLEPD    ] [ CMPLEPS    ] (%compare-float-vector) ] }
         { cc=    [ [ CMPEQPD    ] [ CMPEQPS    ] (%compare-float-vector) ] }
@@ -767,16 +826,6 @@ M: x86 %merge-vector-reps
         { cc/<>= [ [ CMPUNORDPD ] [ CMPUNORDPS ] (%compare-float-vector) ] }
     } case ;
 
-:: compare-int-v-operands ( dst src1 src2 temp rep cc -- not-dst/f cmp-dst src' rep cc' )
-    cc order-cc :> occ
-    occ {
-        { cc=  [ f   dst  src1 src2 rep two-operand rep cc= ] }
-        { cc/= [ dst temp src1 src2 rep two-operand rep cc= ] }
-        { cc<= [ dst temp src1 src2 rep two-operand rep cc> ] }
-        { cc<  [ f   dst  src2 src1 rep two-operand rep cc> ] }
-        { cc>  [ f   dst  src1 src2 rep two-operand rep cc> ] }
-        { cc>= [ dst temp src2 src1 rep two-operand rep cc> ] }
-    } case ;
 :: (%compare-int-vector) ( dst src rep int64 int32 int16 int8 -- )
     rep unsign-rep :> rep'
     dst src rep' {
@@ -785,15 +834,14 @@ M: x86 %merge-vector-reps
         { short-8-rep    [ int16 call ] }
         { char-16-rep    [ int8  call ] }
     } case ; inline
-:: %compare-int-vector ( dst src1 src2 temp rep cc -- )
-    dst src1 src2 temp rep cc compare-int-v-operands :> cc' :> rep :> src' :> cmp-dst :> not-dst
-    cmp-dst src' rep cc' {
+: %compare-int-vector ( dst src rep cc -- )
+    {
         { cc= [ [ PCMPEQQ ] [ PCMPEQD ] [ PCMPEQW ] [ PCMPEQB ] (%compare-int-vector) ] }
         { cc> [ [ PCMPGTQ ] [ PCMPGTD ] [ PCMPGTW ] [ PCMPGTB ] (%compare-int-vector) ] }
-    } case
-    not-dst [ cmp-dst rep %not-vector ] when* ;
+    } case ;
 
-M: x86 %compare-vector ( dst src1 src2 temp rep cc -- )
+M: x86 %compare-vector ( dst src1 src2 rep cc -- )
+    [ [ two-operand ] keep ] dip
     over float-vector-rep?
     [ %compare-float-vector ]
     [ %compare-int-vector ] if ;
@@ -803,11 +851,6 @@ M: x86 %compare-vector ( dst src1 src2 temp rep cc -- )
         { sse? { float-4-rep } }
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
         { sse4.1? { longlong-2-rep ulonglong-2-rep } }
-    } available-reps ;
-: %compare-vector-unord-reps ( -- reps )
-    {
-        { sse? { float-4-rep } }
-        { sse2? { double-2-rep } }
     } available-reps ;
 : %compare-vector-ord-reps ( -- reps )
     {
@@ -819,9 +862,43 @@ M: x86 %compare-vector ( dst src1 src2 temp rep cc -- )
 M: x86 %compare-vector-reps
     {
         { [ dup { cc= cc/= } memq? ] [ drop %compare-vector-eq-reps ] }
-        { [ dup { cc<>= cc/<>= } memq? ] [ drop %compare-vector-unord-reps ] }
         [ drop %compare-vector-ord-reps ]
     } cond ;
+
+: %compare-float-vector-ccs ( cc -- ccs not? )
+    {
+        { cc<    [ { { cc<  f   }              } f ] }
+        { cc<=   [ { { cc<= f   }              } f ] }
+        { cc>    [ { { cc<  t   }              } f ] }
+        { cc>=   [ { { cc<= t   }              } f ] }
+        { cc=    [ { { cc=  f   }              } f ] }
+        { cc<>   [ { { cc<  f   } { cc<    t } } f ] }
+        { cc<>=  [ { { cc<>= f  }              } f ] }
+        { cc/<   [ { { cc/<  f  }              } f ] }
+        { cc/<=  [ { { cc/<= f  }              } f ] }
+        { cc/>   [ { { cc/<  t  }              } f ] }
+        { cc/>=  [ { { cc/<= t  }              } f ] }
+        { cc/=   [ { { cc/=  f  }              } f ] }
+        { cc/<>  [ { { cc/=  f  } { cc/<>= f } } f ] }
+        { cc/<>= [ { { cc/<>= f }              } f ] }
+    } case ;
+
+: %compare-int-vector-ccs ( cc -- ccs not? )
+    order-cc {
+        { cc<    [ { { cc> t } } f ] }
+        { cc<=   [ { { cc> f } } t ] }
+        { cc>    [ { { cc> f } } f ] }
+        { cc>=   [ { { cc> t } } t ] }
+        { cc=    [ { { cc= f } } f ] }
+        { cc/=   [ { { cc= f } } t ] }
+        { t      [ {           } t ] }
+        { f      [ {           } f ] }
+    } case ;
+
+M: x86 %compare-vector-ccs
+    swap float-vector-rep?
+    [ %compare-float-vector-ccs ]
+    [ %compare-int-vector-ccs ] if ;
 
 :: %test-vector-mask ( dst temp mask vcc -- )
     vcc {
@@ -1146,15 +1223,7 @@ M: x86 %xor-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-M:: x86 %not-vector ( dst src rep -- )
-    dst rep %fill-vector
-    dst dst src rep %xor-vector ;
-
-M: x86 %not-vector-reps
-    {
-        { sse? { float-4-rep } }
-        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
-    } available-reps ;
+M: x86 %not-vector-reps { } ;
 
 M: x86 %shl-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
