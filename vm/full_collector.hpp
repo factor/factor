@@ -17,6 +17,10 @@ struct full_collector : copying_collector<tenured_space,full_policy> {
 	bool trace_contexts_p;
 
 	full_collector(factor_vm *myvm_, bool trace_contexts_p_);
+	void mark_active_blocks(context *stacks);
+	void mark_object_code_block(object *object);
+	void trace_literal_references(code_block *compiled);
+	void mark_code_block(code_block *compiled);
 	void go();
 };
 
