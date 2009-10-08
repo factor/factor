@@ -3,7 +3,7 @@
 USING: accessors arrays assocs byte-vectors combinators
 combinators.smart compression.huffman fry hashtables io.binary
 kernel literals locals math math.bitwise math.order math.ranges
-sequences sorting memoize combinators.short-circuit ;
+sequences sorting memoize combinators.short-circuit byte-arrays ;
 QUALIFIED-WITH: bitstreams bs
 IN: compression.inflate
 
@@ -88,14 +88,14 @@ CONSTANT: dist-table
 : nth* ( n seq -- elt )
     [ length 1 - swap - ] [ nth ] bi ; inline
 
-:: inflate-lz77 ( seq -- bytes )
+:: inflate-lz77 ( seq -- byte-array )
     1000 <byte-vector> :> bytes
     seq [
         dup array?
         [ first2 '[ _ 1 - bytes nth* bytes push ] times ]
         [ bytes push ] if
     ] each
-    bytes ;
+    bytes >byte-array ;
 
 :: inflate-huffman ( bitstream tables -- bytes )
     bitstream tables [ <huffman-decoder> ] with map :> tables

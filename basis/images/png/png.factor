@@ -4,6 +4,7 @@ USING: accessors arrays checksums checksums.crc32 combinators
 compression.inflate fry grouping images images.loader io
 io.binary io.encodings.ascii io.encodings.string kernel locals
 math math.bitwise math.ranges sequences sorting ;
+QUALIFIED-WITH: bitstreams bs
 IN: images.png
 
 SINGLETON: png-image
@@ -85,18 +86,17 @@ ERROR: unimplemented-color-type image ;
 : inflate-data ( loading-png -- bytes )
     find-compressed-bytes zlib-inflate ; 
 
-: scale-bit-depth ( loading-png -- n ) bit-depth>> 8 / ; inline
-
-: png-bytes-per-pixel ( loading-png -- n )
-    dup color-type>> {
-        { truecolor [ scale-bit-depth 3 * ] }
-        { truecolor-alpha [ scale-bit-depth 4 * ] }
+: png-components-per-pixel ( loading-png -- n )
+    color-type>> {
+        { truecolor [ 3 ] }
+        { truecolor-alpha [ 4 ] }
         [ unknown-color-type ]
     } case ; inline
 
 : png-group-width ( loading-png -- n )
     ! 1 + is for the filter type, 1 byte preceding each line
-    [ png-bytes-per-pixel ] [ width>> ] bi * 1 + ;
+    [ [ png-components-per-pixel ] [ bit-depth>> ] bi * ]
+    [ width>> ] bi * 1 + ;
 
 :: paeth ( a b c -- p ) 
     a b + c - { a b c } [ [ - abs ] keep 2array ] with map 
@@ -117,7 +117,7 @@ ERROR: unimplemented-color-type image ;
     } case 
     curr width tail ;
 
-:: reverse-png-filter ( n lines -- byte-array )
+:: reverse-png-filter ( lines n -- byte-array )
     lines dup first length 0 <array> prefix
     [ n 1 - 0 <array> prepend ] map
     2 clump [
@@ -130,17 +130,36 @@ ERROR: unimplemented-color-type image ;
 
 ERROR: unimplemented-interlace ;
 
-: reverse-interlace ( byte-array loading-png -- byte-array )
+: reverse-interlace ( byte-array loading-png -- bitstream )
     {
         { interlace-none [ ] }
         { interlace-adam7 [ unimplemented-interlace ] }
         [ unimplemented-interlace ]
-    } case ;
+    } case bs:<lsb0-bit-reader> ;
 
-: png-image-bytes ( loading-png -- byte-array )
-    [ png-bytes-per-pixel ]
-    [ [ inflate-data ] [ interlace-method>> ] bi reverse-interlace ]
-    [ png-group-width ] tri group reverse-png-filter ;
+: uncompress-bytes ( loading-png -- bitstream )
+    [ inflate-data ] [ interlace-method>> ] bi reverse-interlace ;
+
+:: png-image-bytes ( loading-png -- byte-array )
+    loading-png uncompress-bytes :> bs
+    loading-png width>> :> width
+    loading-png height>> :> height
+    loading-png png-components-per-pixel :> #components
+    loading-png bit-depth>> :> bit-depth
+    bit-depth :> depth!
+    #components width * :> count!
+
+    ! Only read up to 8 bits at a time
+    bit-depth 16 = [
+        8 depth!
+        count 2 * count!
+    ] when
+
+    height [
+        8 bs bs:read
+        count [ depth bs bs:read ] replicate swap prefix
+    ] replicate
+    #components bit-depth 16 = [ 2 * ] when reverse-png-filter ;
 
 ERROR: unknown-component-type n ;
 
