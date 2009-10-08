@@ -18,7 +18,6 @@ struct aging_policy {
 
 struct aging_collector : copying_collector<aging_space,aging_policy> {
 	aging_collector(factor_vm *myvm_);
-	void go();
 };
 
 }
