@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel hashtables sequences arrays words namespaces make
-parser math assocs effects definitions quotations summary
-accessors fry ;
+USING: kernel hashtables sequences sequences.private arrays
+words namespaces make parser math assocs effects definitions
+quotations summary accessors fry ;
 IN: memoize
 
 <PRIVATE
@@ -12,20 +12,20 @@ IN: memoize
 : (n*quot) ( n quot -- quotquot )
     <repetition> concat >quotation ;
 
-: [narray] ( length -- quot )
-    [ [ 1 - ] keep '[ _ _ f <array> ] ]
-    [ [ [ set-nth ] 2keep [ 1 - ] dip ] (n*quot) ] bi
+: [nsequence] ( length exemplar -- quot )
+    [ [ [ 1 - ] keep ] dip '[ _ _ _ new-sequence ] ]
+    [ drop [ [ set-nth-unsafe ] 2keep [ 1 - ] dip ] (n*quot) ] 2bi
     [ nip ] 3append ; 
 
 : [firstn] ( length -- quot )
     [ 0 swap ] swap
-    [ [ nth ] 2keep [ 1 + ] dip ] (n*quot)
+    [ [ nth-unsafe ] 2keep [ 1 + ] dip ] (n*quot)
     [ 2drop ] 3append ;
 
 : packer ( seq -- quot )
     length dup 4 <=
     [ { [ f ] [ ] [ 2array ] [ 3array ] [ 4array ] } nth ]
-    [ [narray] ] if ;
+    [ { } [nsequence] ] if ;
 
 : unpacker ( seq -- quot )
     length dup 4 <=
