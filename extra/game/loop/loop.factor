@@ -1,7 +1,7 @@
 USING: accessors calendar continuations destructors kernel math
 math.order namespaces system threads ui ui.gadgets.worlds
 sequences ;
-IN: game-loop
+IN: game.loop
 
 TUPLE: game-loop
     { tick-length integer read-only }
@@ -106,4 +106,4 @@ M: game-loop dispose
 
 USING: vocabs vocabs.loader ;
 
-"prettyprint" vocab [ "game-loop.prettyprint" require ] when
+"prettyprint" vocab [ "game.loop.prettyprint" require ] when

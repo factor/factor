@@ -1,6 +1,6 @@
-USING: accessors game-input game-loop kernel math ui.gadgets
+USING: accessors game.input game.loop kernel math ui.gadgets
 ui.gadgets.worlds ui.gestures threads ;
-IN: game-worlds
+IN: game.worlds
 
 TUPLE: game-world < world
     game-loop

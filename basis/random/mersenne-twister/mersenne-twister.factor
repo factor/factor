@@ -80,3 +80,4 @@ M: mersenne-twister random-32* ( mt -- r )
 [
     default-mersenne-twister random-generator set-global
 ] "bootstrap.random" add-init-hook
+
