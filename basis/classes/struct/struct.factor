@@ -116,23 +116,9 @@ M: struct-slot-spec (writer-quot)
     [ type>> c-setter ]
     [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
 
-QUALIFIED: math.bits
-
-: bytes>bits ( byte-array -- bit-array )
-    [ 8 math.bits:<bits> ] { } map-as ?{ } join ;
-
-: (write-bits) ( value offset end byte-array -- )
-    ! This is absurdly inefficient
-    [
-        [ [ swap - math.bits:<bits> ] 2keep ] [ bytes>bits ] bi*
-        replace-slice ?{ } like underlying>>
-    ] keep 0 swap copy ;
-
-: bits@ ( slot -- beginning end )
-    [ offset>> ] [ bits>> ] bi dupd + ;
-
-M: struct-bit-slot-spec (writer-quot) ( slot -- quot )
-    bits@ '[ [ _ _ ] dip (underlying)>> (write-bits) ] ;
+M: struct-bit-slot-spec (writer-quot)
+    [ offset>> ] [ bits>> ] bi bit-writer
+    [ >c-ptr ] prepose ;
 
 : (boxer-quot) ( class -- quot )
     '[ _ memory>struct ] ;
