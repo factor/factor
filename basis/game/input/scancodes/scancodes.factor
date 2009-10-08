@@ -1,4 +1,4 @@
-IN: game-input.scancodes
+IN: game.input.scancodes
 
 CONSTANT: key-undefined HEX: 0000
 CONSTANT: key-error-roll-over HEX: 0001
