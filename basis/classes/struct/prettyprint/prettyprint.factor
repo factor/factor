@@ -23,6 +23,11 @@ IN: classes.struct.prettyprint
         [ type>> pprint-c-type ]
         [ read-only>> [ \ read-only pprint-word ] when ]
         [ initial>> [ \ initial: pprint-word pprint* ] when* ]
+        [
+            dup struct-bit-slot-spec?
+            [ \ bits: pprint-word bits>> pprint* ]
+            [ drop ] if
+        ]
     } cleave block>
     \ } pprint-word block> ;
 
