@@ -3,9 +3,8 @@
 namespace factor
 {
 
-full_collector::full_collector(factor_vm *myvm_, bool trace_contexts_p_) :
-	copying_collector<tenured_space,full_policy>(myvm_,myvm_->data->tenured,full_policy(myvm_)),
-	trace_contexts_p(trace_contexts_p_) {}
+full_collector::full_collector(factor_vm *myvm_) :
+	copying_collector<tenured_space,full_policy>(myvm_,myvm_->data->tenured,full_policy(myvm_)) {}
 
 struct stack_frame_marker {
 	factor_vm *myvm;
@@ -21,22 +20,29 @@ struct stack_frame_marker {
 };
 
 /* Mark code blocks executing in currently active stack frames. */
-void full_collector::mark_active_blocks(context *stacks)
+void full_collector::mark_active_blocks()
 {
-	cell top = (cell)stacks->callstack_top;
-	cell bottom = (cell)stacks->callstack_bottom;
+	context *stacks = this->myvm->stack_chain;
 
-	stack_frame_marker marker(this);
-	myvm->iterate_callstack(top,bottom,marker);
+	while(stacks)
+	{
+		cell top = (cell)stacks->callstack_top;
+		cell bottom = (cell)stacks->callstack_bottom;
+
+		stack_frame_marker marker(this);
+		myvm->iterate_callstack(top,bottom,marker);
+
+		stacks = stacks->next;
+	}
 }
 
-void full_collector::mark_object_code_block(object *object)
+void full_collector::mark_object_code_block(object *obj)
 {
-	switch(object->h.hi_tag())
+	switch(obj->h.hi_tag())
 	{
 	case WORD_TYPE:
 		{
-			word *w = (word *)object;
+			word *w = (word *)obj;
 			if(w->code)
 				mark_code_block(w->code);
 			if(w->profiling)
@@ -45,14 +51,14 @@ void full_collector::mark_object_code_block(object *object)
 		}
 	case QUOTATION_TYPE:
 		{
-			quotation *q = (quotation *)object;
+			quotation *q = (quotation *)obj;
 			if(q->code)
 				mark_code_block(q->code);
 			break;
 		}
 	case CALLSTACK_TYPE:
 		{
-			callstack *stack = (callstack *)object;
+			callstack *stack = (callstack *)obj;
 			stack_frame_marker marker(this);
 			myvm->iterate_callstack_object(stack,marker);
 			break;
@@ -78,11 +84,47 @@ void full_collector::mark_code_block(code_block *compiled)
 	trace_literal_references(compiled);
 }
 
-void full_collector::go()
+void full_collector::cheneys_algorithm()
 {
-	trace_roots();
-        if(trace_contexts_p) trace_contexts();
-        cheneys_algorithm();
+	while(scan && scan < target->here)
+	{
+		object *obj = (object *)scan;
+		this->trace_slots(obj);
+		this->mark_object_code_block(obj);
+		scan = target->next_object_after(this->myvm,scan);
+	}
+}
+
+void factor_vm::collect_full(cell requested_bytes, bool trace_contexts_p)
+{
+	if(current_gc->growing_data_heap)
+	{
+		current_gc->old_data_heap = data;
+		set_data_heap(grow_data_heap(current_gc->old_data_heap,requested_bytes));
+	}
+	else
+	{
+		std::swap(data->tenured,data->tenured_semispace);
+		reset_generation(data->tenured);
+	}
+
+	full_collector collector(this);
+
+	collector.trace_roots();
+        if(trace_contexts_p)
+	{
+		collector.trace_contexts();
+		collector.mark_active_blocks();
+	}
+
+	collector.cheneys_algorithm();
+	free_unmarked_code_blocks();
+
+	reset_generation(data->aging);
+	nursery.here = nursery.start;
+
+	if(current_gc->growing_data_heap)
+		delete current_gc->old_data_heap;
 }
 
 }

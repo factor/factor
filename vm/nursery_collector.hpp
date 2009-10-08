@@ -14,7 +14,6 @@ struct nursery_policy {
 
 struct nursery_collector : copying_collector<aging_space,nursery_policy> {
 	nursery_collector(factor_vm *myvm_);
-	void go();
 };
 
 }

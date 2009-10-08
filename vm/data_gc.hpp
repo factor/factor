@@ -63,21 +63,6 @@ struct gc_state {
 	}
 };
 
-template<typename Strategy> struct cheney_collector {
-	factor_vm *myvm;
-	gc_state *current_gc;
-	old_space *target;
-	cell scan;
-
-	explicit cheney_collector(factor_vm *myvm_, old_space *target);
-	Strategy &strategy();
-	object *allot(cell size);
-	cell trace_next(cell scan);
-	object *copy_object(object *untagged);
-	bool should_copy_p(object *untagged);
-	void go();
-};
-
 VM_C_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *myvm);
 
 }
