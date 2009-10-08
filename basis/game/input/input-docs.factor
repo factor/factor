@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel ui.gestures quotations
 sequences strings math ;
-IN: game-input
+IN: game.input
 
 ARTICLE: "game-input" "Game controller input"
 "The " { $vocab-link "game-input" } " vocabulary provides cross-platform access to game controller devices such as joysticks and gamepads. It also provides an interface for polling raw keyboard and mouse input." $nl
@@ -136,8 +136,8 @@ HELP: controller-state
     { "A value of " { $link f } " in any slot (besides the elements of " { $snippet "buttons" } ") indicates that the corresponding element is not present on the device." } } } ;
 
 HELP: keyboard-state
-{ $class-description "The " { $link read-keyboard } " word returns objects of this class. The " { $snippet "keys" } " slot of a " { $snippet "keyboard-state" } " object contains a " { $link sequence } " of 256 members representing the state of the keys on the keyboard. Each element is a boolean value indicating whether the corresponding key is pressed. The sequence is indexed by scancode as defined under usage page 7 of the USB HID standard. Named scancode constants are provided in the " { $vocab-link "game-input.scancodes" } " vocabulary." }
-{ $warning "The scancodes used to index " { $snippet "keyboard-state" } " objects correspond to physical key positions on the keyboard--they are unaffected by keymaps, modifier keys, or other operating environment postprocessing. The face value of the constants in " { $vocab-link "game-input.scancodes" } " do not necessarily correspond to what the user expects the key to type. Because of this, " { $link read-keyboard } " should not be used for text entry purposes. The Factor UI's standard gesture mechanism should be used in cases where the logical meaning of keypresses is needed; see " { $link "keyboard-gestures" } "." } ;
+{ $class-description "The " { $link read-keyboard } " word returns objects of this class. The " { $snippet "keys" } " slot of a " { $snippet "keyboard-state" } " object contains a " { $link sequence } " of 256 members representing the state of the keys on the keyboard. Each element is a boolean value indicating whether the corresponding key is pressed. The sequence is indexed by scancode as defined under usage page 7 of the USB HID standard. Named scancode constants are provided in the " { $vocab-link "game.input.scancodes" } " vocabulary." }
+{ $warning "The scancodes used to index " { $snippet "keyboard-state" } " objects correspond to physical key positions on the keyboard--they are unaffected by keymaps, modifier keys, or other operating environment postprocessing. The face value of the constants in " { $vocab-link "game.input.scancodes" } " do not necessarily correspond to what the user expects the key to type. Because of this, " { $link read-keyboard } " should not be used for text entry purposes. The Factor UI's standard gesture mechanism should be used in cases where the logical meaning of keypresses is needed; see " { $link "keyboard-gestures" } "." } ;
 
 HELP: mouse-state
 { $class-description "The " { $link read-mouse } " word returns objects of this class. " { $snippet "mouse-state" } " objects have the following slots:"
