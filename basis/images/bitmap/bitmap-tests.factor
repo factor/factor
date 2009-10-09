@@ -1,4 +1,4 @@
-USING: images.bitmap images.testing kernel ;
+USING: images.bitmap images.bitmap.loading images.testing kernel ;
 IN: images.bitmap.tests
 
 ! "vocab:images/testing/bmp/1bit.bmp" decode-test
