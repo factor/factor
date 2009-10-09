@@ -45,10 +45,12 @@ HELP: load-library
 
 HELP: add-library
 { $values { "name" string } { "path" string } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } }
-{ $description "Defines a new logical library named " { $snippet "name" } " located in the file system at " { $snippet "path" } "and the specified ABI." }
-{ $notes "Because the entire source file is parsed before top-level forms are executed, " { $link add-library } " cannot be used in the same file as " { $link POSTPONE: FUNCTION: } " definitions from that library. The " { $link add-library } " call will happen too late, after compilation, and the alien calls will not work."
+{ $description "Defines a new logical library named " { $snippet "name" } " located in the file system at " { $snippet "path" } " and the specified ABI. The logical library name can then be used by a " { $link POSTPONE: LIBRARY: } " form to specify the logical library for subsequent " { $link POSTPONE: FUNCTION: } " definitions." }
+{ $notes "Because the entire source file is parsed before top-level forms are executed, " { $link add-library } " must be placed within a " { $snippet "<< ... >>" } " parse-time evaluation block."
 $nl
-"Instead, " { $link add-library } " calls must either be placed in different source files from those that use that library, or alternatively, " { $link "syntax-immediate" } " can be used to load the library before compilation." }
+"This ensures that if the logical library is later used in the same file, for example by a " { $link POSTPONE: FUNCTION: } " definition. Otherwise, the " { $link add-library } " call will happen too late, after compilation, and the C function calls will not refer to the correct library."
+$nl
+"For details about parse-time evaluation, see " { $link "syntax-immediate" } "." }
 { $examples "Here is a typical usage of " { $link add-library } ":"
 { $code
     "<< \"freetype\" {"

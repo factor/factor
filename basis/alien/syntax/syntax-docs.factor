@@ -1,5 +1,6 @@
 IN: alien.syntax
-USING: alien alien.c-types alien.parser classes.struct help.markup help.syntax see ;
+USING: alien alien.c-types alien.parser alien.libraries
+classes.struct help.markup help.syntax see ;
 
 HELP: DLL"
 { $syntax "DLL\" path\"" }
@@ -21,7 +22,8 @@ ARTICLE: "syntax-aliens" "Alien object literal syntax"
 HELP: LIBRARY:
 { $syntax "LIBRARY: name" }
 { $values { "name" "a logical library name" } }
-{ $description "Sets the logical library for consequent " { $link POSTPONE: FUNCTION: } " definitions that follow." } ;
+{ $description "Sets the logical library for consequent " { $link POSTPONE: FUNCTION: } ", " { $link POSTPONE: C-GLOBAL: } " and " { $link POSTPONE: CALLBACK: } " definitions, as well as " { $link POSTPONE: &: } " forms." }
+{ $notes "Logical library names are defined with the " { $link add-library } " word." } ;
 
 HELP: FUNCTION:
 { $syntax "FUNCTION: return name ( parameters )" }
@@ -96,21 +98,26 @@ HELP: CALLBACK:
 
 HELP: &:
 { $syntax "&: symbol" }
-{ $values { "symbol" "A C library symbol name" } }
+{ $values { "symbol" "A C global variable name" } }
 { $description "Pushes the address of a symbol named " { $snippet "symbol" } " from the current library, set with " { $link POSTPONE: LIBRARY: } "." } ;
 
 HELP: typedef
-{ $values { "old" "a string" } { "new" "a string" } }
+{ $values { "old" "a C type" } { "new" "a C type" } }
 { $description "Aliases the C type " { $snippet "old" } " under the name " { $snippet "new" } "." }
 { $notes "Using this word in the same source file which defines C bindings can cause problems, because words are compiled before top-level forms are run. Use the " { $link POSTPONE: TYPEDEF: } " word instead." } ;
 
 { POSTPONE: TYPEDEF: typedef } related-words
 
 HELP: c-struct?
-{ $values { "c-type" "a C type name" } { "?" "a boolean" } }
+{ $values { "c-type" "a C type" } { "?" "a boolean" } }
 { $description "Tests if a C type is a structure defined by " { $link POSTPONE: STRUCT: } "." } ;
 
 HELP: define-function
 { $values { "return" "a C return type" } { "library" "a logical library name" } { "function" "a C function name" } { "parameters" "a sequence of C parameter types" } }
 { $description "Defines a word named " { $snippet "function" } " in the current vocabulary (see " { $link "vocabularies" } "). The word calls " { $link alien-invoke } " with the specified parameters." }
 { $notes "This word is used to implement the " { $link POSTPONE: FUNCTION: } " parsing word." } ;
+
+HELP: C-GLOBAL:
+{ $syntax "C-GLOBAL: type name" }
+{ $values { "type" "a C type" } { "name" "a C global variable name" } }
+{ $description "Defines a new word named " { $snippet "name" } " which accesses a global variable in the current library, set with " { $link POSTPONE: LIBRARY: } "." } ;

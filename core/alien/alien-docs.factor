@@ -192,6 +192,13 @@ ARTICLE: "alien-callback" "Calling Factor from C"
 { $subsections "alien-callback-gc" }
 { $see-also "byte-arrays-gc" } ;
 
+ARTICLE: "alien-globals" "Accessing C global variables"
+"The " { $vocab-link "alien.syntax" } " vocabulary defines two parsing words for accessing the value of a global variable, and get the address of a global variable, respectively."
+{ $subsections
+    POSTPONE: C-GLOBAL:
+    POSTPONE: &:
+} ;
+
 ARTICLE: "dll.private" "DLL handles"
 "DLL handles are a built-in class of objects which represent loaded native libraries. DLL handles are instances of the " { $link dll } " class, and have a literal syntax used for debugging prinouts; see " { $link "syntax-aliens" } "."
 $nl
@@ -281,6 +288,7 @@ $nl
     "alien-callback"
     "c-data"
     "classes.struct"
+    "alien-globals"
     "dll.private"
     "embedding"
 } ;
