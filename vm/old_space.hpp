@@ -1,6 +1,11 @@
 namespace factor
 {
 
+struct allot_marker {
+	char first_object_start;
+	char last_object_start;
+};
+
 struct old_space : zone {
 	card *allot_markers;
 	card *allot_markers_end;
@@ -8,7 +13,7 @@ struct old_space : zone {
 	old_space(cell size_, cell start_);
 	~old_space();
 
-	cell card_offset(cell address)
+	cell first_object_in_card(cell address)
 	{
 		return allot_markers[(address - start) >> card_bits];
 	}
