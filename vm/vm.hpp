@@ -547,7 +547,7 @@ struct factor_vm
 	bool save_image(const vm_char *filename);
 	void primitive_save_image();
 	void primitive_save_image_and_exit();
-	void data_fixup(cell *cell, cell data_relocation_base);
+	void data_fixup(cell *handle, cell data_relocation_base);
 	template<typename Type> void code_fixup(Type **handle, cell code_relocation_base);
 	void fixup_word(word *word, cell code_relocation_base);
 	void fixup_quotation(quotation *quot, cell code_relocation_base);
