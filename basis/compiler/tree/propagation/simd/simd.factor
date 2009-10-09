@@ -8,6 +8,7 @@ IN: compiler.tree.propagation.simd
 {
     (simd-v+)
     (simd-v-)
+    (simd-vneg)
     (simd-v+-)
     (simd-v*)
     (simd-v/)
