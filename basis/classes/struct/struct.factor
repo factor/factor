@@ -1,4 +1,4 @@
-! (c)Joe Groff bsd license
+! (c)Joe Groff, Daniel Ehrenberg bsd license
 USING: accessors alien alien.c-types alien.data alien.parser arrays
 byte-arrays classes classes.parser classes.tuple classes.tuple.parser
 classes.tuple.private combinators combinators.short-circuit
@@ -6,7 +6,9 @@ combinators.smart cpu.architecture definitions functors.backend
 fry generalizations generic.parser kernel kernel.private lexer
 libc locals macros make math math.order parser quotations
 sequences slots slots.private specialized-arrays vectors words
-summary namespaces assocs vocabs.parser ;
+summary namespaces assocs vocabs.parser math.functions
+classes.struct.bit-accessors bit-arrays ;
+QUALIFIED: math
 IN: classes.struct
 
 SPECIALIZED-ARRAY: uchar
@@ -21,6 +23,10 @@ TUPLE: struct
 
 TUPLE: struct-slot-spec < slot-spec
     type ;
+
+! For a struct-bit-slot-spec, offset is in bits, not bytes
+TUPLE: struct-bit-slot-spec < struct-slot-spec
+    bits signed? ;
 
 PREDICATE: struct-class < tuple-class
     superclass \ struct eq? ;
@@ -84,13 +90,35 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
 : pad-struct-slots ( values class -- values' class )
     [ struct-slots [ initial>> ] map over length tail append ] keep ;
 
-: (reader-quot) ( slot -- quot )
+: sign-extend ( n bits -- n' )
+    ! formula from:
+    ! http://guru.multimedia.cx/fast-sign-extension/
+    1 - -1 swap shift [ + ] keep bitxor ; inline
+
+: sign-extender ( signed? bits -- quot )
+    '[ _ [ _ sign-extend ] when ] ;
+
+GENERIC: (reader-quot) ( slot -- quot )
+
+M: struct-slot-spec (reader-quot)
     [ type>> c-type-getter-boxer ]
     [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
 
-: (writer-quot) ( slot -- quot )
+M: struct-bit-slot-spec (reader-quot)
+    [ [ offset>> ] [ bits>> ] bi bit-reader ]
+    [ [ signed?>> ] [ bits>> ] bi sign-extender ]
+    bi compose
+    [ >c-ptr ] prepose ;
+
+GENERIC: (writer-quot) ( slot -- quot )
+
+M: struct-slot-spec (writer-quot)
     [ type>> c-setter ]
     [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
+
+M: struct-bit-slot-spec (writer-quot)
+    [ offset>> ] [ bits>> ] bi bit-writer
+    [ >c-ptr ] prepose ;
 
 : (boxer-quot) ( class -- quot )
     '[ _ memory>struct ] ;
@@ -186,20 +214,24 @@ M: struct-c-type c-struct? drop t ;
         class (unboxer-quot) >>unboxer-quot
         class (boxer-quot)   >>boxer-quot ;
     
-: align-offset ( offset class -- offset' )
-    c-type-align align ;
+GENERIC: align-offset ( offset class -- offset' )
+
+M: struct-slot-spec align-offset
+    [ type>> c-type-align 8 * align ] keep
+    [ [ 8 /i ] dip (>>offset) ] [ type>> heap-size 8 * + ] 2bi ;
+
+M: struct-bit-slot-spec align-offset
+    [ (>>offset) ] [ bits>> + ] 2bi ;
 
 : struct-offsets ( slots -- size )
-    0 [
-        [ type>> align-offset ] keep
-        [ (>>offset) ] [ type>> heap-size + ] 2bi
-    ] reduce ;
+    0 [ align-offset ] reduce 8 align 8 /i ;
 
 : union-struct-offsets ( slots -- size )
-    [ 0 >>offset type>> heap-size ] [ max ] map-reduce ;
+    1 [ 0 >>offset type>> heap-size max ] reduce ;
 
 : struct-align ( slots -- align )
-    [ type>> c-type-align ] [ max ] map-reduce ;
+    [ struct-bit-slot-spec? not ] filter
+    1 [ type>> c-type-align max ] reduce ;
 PRIVATE>
 
 M: struct byte-length class "struct-size" word-prop ; foldable
@@ -273,11 +305,43 @@ ERROR: invalid-struct-slot token ;
     c-type c-type-boxed-class
     dup \ byte-array = [ drop \ c-ptr ] when ;
 
+SYMBOL: bits:
+
+<PRIVATE
+
+ERROR: bad-type-for-bits type ;
+
+:: set-bits ( slot-spec n -- slot-spec )
+    struct-bit-slot-spec new
+        n >>bits
+        slot-spec type>> {
+            { int [ t ] }
+            { uint [ f ] }
+            [ bad-type-for-bits ]
+        } case >>signed?
+        slot-spec name>> >>name
+        slot-spec class>> >>class
+        slot-spec type>> >>type
+        slot-spec read-only>> >>read-only
+        slot-spec initial>> >>initial ;
+
+: peel-off-struct-attributes ( slot-spec array -- slot-spec array )
+    dup empty? [
+        unclip {
+            { initial: [ [ first >>initial ] [ rest ] bi ] }
+            { read-only [ [ t >>read-only ] dip ] }
+            { bits: [ [ first set-bits ] [ rest ] bi ] }
+            [ bad-slot-attribute ]
+        } case
+    ] unless ;
+
+PRIVATE>
+
 : <struct-slot-spec> ( name c-type attributes -- slot-spec )
     [ struct-slot-spec new ] 3dip
     [ >>name ]
     [ [ >>type ] [ struct-slot-class >>class ] bi ]
-    [ [ dup empty? ] [ peel-off-attributes ] until drop ] tri* ;
+    [ [ dup empty? ] [ peel-off-struct-attributes ] until drop ] tri* ;
 
 <PRIVATE
 : parse-struct-slot ( -- slot )
