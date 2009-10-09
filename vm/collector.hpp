@@ -80,6 +80,10 @@ template<typename TargetGeneration, typename Policy> struct collector {
 		memcpy(newpointer,untagged,size);
 		untagged->h.forward_to(newpointer);
 
+		generation_statistics *stats = &myvm->gc_stats.generations[current_gc->collecting_gen];
+		stats->object_count++;
+		stats->bytes_copied += size;
+
 		return newpointer;
 	}
 
