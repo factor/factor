@@ -20,7 +20,7 @@ cell factor_vm::relocation_offset_of(relocation_entry r)
 
 void factor_vm::flush_icache_for(code_block *block)
 {
-	flush_icache((cell)block,block->size);
+	flush_icache((cell)block,block->size());
 }
 
 int factor_vm::number_of_parameters(relocation_type type)
@@ -194,9 +194,9 @@ template<typename Iterator> void factor_vm::iterate_relocations(code_block *comp
 	{
 		byte_array *relocation = untag<byte_array>(compiled->relocation);
 
-		cell index = stack_traces_p() ? 1 : 0;
-
+		cell index = 0;
 		cell length = array_capacity(relocation) / sizeof(relocation_entry);
+
 		for(cell i = 0; i < length; i++)
 		{
 			relocation_entry rel = relocation->data<relocation_entry>()[i];
@@ -290,31 +290,11 @@ struct literal_references_updater {
 /* Update pointers to literals from compiled code. */
 void factor_vm::update_literal_references(code_block *compiled)
 {
-	if(!compiled->needs_fixup)
+	if(!code->needs_fixup_p(compiled))
 	{
 		literal_references_updater updater(this);
 		iterate_relocations(compiled,updater);
 		flush_icache_for(compiled);
-	}
-}
-
-/* Copy all literals referenced from a code block to newspace. Only for
-aging and nursery collections */
-void factor_vm::trace_literal_references(code_block *compiled)
-{
-	if(current_gc->collecting_gen >= compiled->last_scan)
-	{
-		if(current_gc->collecting_accumulation_gen_p())
-			compiled->last_scan = current_gc->collecting_gen;
-		else
-			compiled->last_scan = current_gc->collecting_gen + 1;
-
-		trace_handle(&compiled->literals);
-		trace_handle(&compiled->relocation);
-
-		/* once we finish tracing, re-visit this code block and update
-		literals */
-		current_gc->dirty_code_blocks.insert(compiled);
 	}
 }
 
@@ -351,7 +331,7 @@ to update references to other words, without worrying about literals
 or dlsyms. */
 void factor_vm::update_word_references(code_block *compiled)
 {
-	if(compiled->needs_fixup)
+	if(code->needs_fixup_p(compiled))
 		relocate_code_block(compiled);
 	/* update_word_references() is always applied to every block in
 	   the code heap. Since it resets all call sites to point to
@@ -360,8 +340,8 @@ void factor_vm::update_word_references(code_block *compiled)
 	   are referenced after this is done. So instead of polluting
 	   the code heap with dead PICs that will be freed on the next
 	   GC, we add them to the free list immediately. */
-	else if(compiled->type == PIC_TYPE)
-		code->heap_free(compiled);
+	else if(compiled->type() == PIC_TYPE)
+		code->code_heap_free(compiled);
 	else
 	{
 		word_references_updater updater(this);
@@ -375,74 +355,6 @@ void factor_vm::check_code_address(cell address)
 #ifdef FACTOR_DEBUG
 	assert(address >= code->seg->start && address < code->seg->end);
 #endif
-}
-
-/* Update references to words. This is done after a new code block
-is added to the heap. */
-
-/* Mark all literals referenced from a word XT. Only for tenured
-collections */
-void factor_vm::mark_code_block(code_block *compiled)
-{
-	check_code_address((cell)compiled);
-
-	code->mark_block(compiled);
-
-	trace_handle(&compiled->literals);
-	trace_handle(&compiled->relocation);
-}
-
-struct stack_frame_marker {
-	factor_vm *myvm;
-
-	explicit stack_frame_marker(factor_vm *myvm_) : myvm(myvm_) {}
-	void operator()(stack_frame *frame)
-	{
-		myvm->mark_code_block(myvm->frame_code(frame));
-	}
-};
-
-/* Mark code blocks executing in currently active stack frames. */
-void factor_vm::mark_active_blocks(context *stacks)
-{
-	if(current_gc->collecting_tenured_p())
-	{
-		cell top = (cell)stacks->callstack_top;
-		cell bottom = (cell)stacks->callstack_bottom;
-
-		stack_frame_marker marker(this);
-		iterate_callstack(top,bottom,marker);
-	}
-}
-
-void factor_vm::mark_object_code_block(object *object)
-{
-	switch(object->h.hi_tag())
-	{
-	case WORD_TYPE:
-		{
-			word *w = (word *)object;
-			if(w->code)
-				mark_code_block(w->code);
-			if(w->profiling)
-				mark_code_block(w->profiling);
-			break;
-		}
-	case QUOTATION_TYPE:
-		{
-			quotation *q = (quotation *)object;
-			if(q->code)
-				mark_code_block(q->code);
-			break;
-		}
-	case CALLSTACK_TYPE:
-		{
-			callstack *stack = (callstack *)object;
-			stack_frame_marker marker(this);
-			iterate_callstack_object(stack,marker);
-			break;
-		}
-	}
 }
 
 struct code_block_relocator {
@@ -460,16 +372,10 @@ struct code_block_relocator {
 /* Perform all fixups on a code block */
 void factor_vm::relocate_code_block(code_block *compiled)
 {
-	compiled->last_scan = data->nursery();
-	compiled->needs_fixup = false;
+	code->needs_fixup.erase(compiled);
 	code_block_relocator relocator(this);
 	iterate_relocations(compiled,relocator);
 	flush_icache_for(compiled);
-}
-
-void relocate_code_block(code_block *compiled, factor_vm *myvm)
-{
-	return myvm->relocate_code_block(compiled);
 }
 
 /* Fixup labels. This is done at compile time, not image load time */
@@ -491,15 +397,15 @@ void factor_vm::fixup_labels(array *labels, code_block *compiled)
 }
 
 /* Might GC */
-code_block *factor_vm::allot_code_block(cell size)
+code_block *factor_vm::allot_code_block(cell size, cell type)
 {
-	heap_block *block = code->heap_allot(size + sizeof(code_block));
+	heap_block *block = code->heap_allot(size + sizeof(code_block),type);
 
 	/* If allocation failed, do a code GC */
 	if(block == NULL)
 	{
 		gc();
-		block = code->heap_allot(size + sizeof(code_block));
+		block = code->heap_allot(size + sizeof(code_block),type);
 
 		/* Insufficient room even after code GC, give up */
 		if(block == NULL)
@@ -519,20 +425,18 @@ code_block *factor_vm::allot_code_block(cell size)
 }
 
 /* Might GC */
-code_block *factor_vm::add_code_block(cell type, cell code_, cell labels_, cell relocation_, cell literals_)
+code_block *factor_vm::add_code_block(cell type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_)
 {
 	gc_root<byte_array> code(code_,this);
 	gc_root<object> labels(labels_,this);
+	gc_root<object> owner(owner_,this);
 	gc_root<byte_array> relocation(relocation_,this);
 	gc_root<array> literals(literals_,this);
 
 	cell code_length = align8(array_capacity(code.untagged()));
-	code_block *compiled = allot_code_block(code_length);
+	code_block *compiled = allot_code_block(code_length,type);
 
-	/* compiled header */
-	compiled->type = type;
-	compiled->last_scan = data->nursery();
-	compiled->needs_fixup = true;
+	compiled->owner = owner.value();
 
 	/* slight space optimization */
 	if(relocation.type() == BYTE_ARRAY_TYPE && array_capacity(relocation.untagged()) == 0)
@@ -554,7 +458,8 @@ code_block *factor_vm::add_code_block(cell type, cell code_, cell labels_, cell 
 
 	/* next time we do a minor GC, we have to scan the code heap for
 	literals */
-	last_code_heap_scan = data->nursery();
+	this->code->write_barrier(compiled);
+	this->code->needs_fixup.insert(compiled);
 
 	return compiled;
 }

@@ -1,5 +1,6 @@
-USING: help.markup help.syntax alien math continuations
-destructors specialized-arrays ;
+USING: alien alien.c-types continuations destructors
+help.markup help.syntax kernel math quotations
+specialized-arrays ;
 IN: io.mmap
 
 HELP: mapped-file
@@ -33,9 +34,42 @@ HELP: close-mapped-file
 { $contract "Releases system resources associated with the mapped file. This word should not be called by user code; use " { $link dispose } " instead." }
 { $errors "Throws an error if a memory mapping could not be established." } ;
 
+HELP: <mapped-file-reader>
+{ $values { "path" "a pathname string" }  { "mmap" mapped-file } }
+{ $contract "Opens a file for reading only and maps its contents into memory. The length is permitted to exceed the length of the file on disk, in which case the remaining space is padded with zero bytes." }
+{ $notes "You must call " { $link dispose } " when you are finished working with the returned object, to reclaim resources. The " { $link with-mapped-file } " provides an abstraction which can close the mapped file for you." }
+{ $errors "Throws an error if a memory mapping could not be established." } ;
+
+HELP: with-mapped-array
+{ $values
+    { "path" "a pathname string" } { "c-type" c-type } { "quot" quotation }
+}
+{ $description "Memory-maps a file for reading and writing as a mapped-array of the given c-type. The mapped file is disposed of when the quotation returns, or if an error is thrown." }
+{ $examples
+    { $unchecked-example
+        "USING: alien.c-types io.mmap prettyprint specialized-arrays ;"
+        "SPECIALIZED-ARRAY: uint"
+""""resource:license.txt" uint [
+    [ . ] each
+] with-mapped-array"""
+        ""
+    }
+}
+{ $errors "Throws an error if a memory mapping could not be established." } ;
+
+HELP: with-mapped-array-reader
+{ $values
+    { "path" "a pathname string" } { "c-type" c-type } { "quot" quotation }
+}
+{ $description "Memory-maps a file for reading as a mapped-array of the given c-type. The mapped file is disposed of when the quotation returns, or if an error is thrown." }
+{ $errors "Throws an error if a memory mapping could not be established." } ;
+
 ARTICLE: "io.mmap.arrays" "Working with memory-mapped data"
 "The " { $link <mapped-file> } " word returns an instance of " { $link mapped-file } ", which doesn't directly support the sequence protocol. Instead, it needs to be wrapped in a specialized array of the appropriate C type:"
 { $subsections <mapped-array> }
+"Additionally, files may be opened with two combinators which take a c-type as input:"
+{ $subsections with-mapped-array }
+{ $subsections with-mapped-array-reader }
 "The appropriate specialized array type must first be generated with " { $link POSTPONE: SPECIALIZED-ARRAY: } "."
 $nl
 "Data can also be read and written from the " { $link mapped-file } " by applying low-level alien words to the " { $slot "address" } " slot. This approach is not recommended, though, since in most cases the compiler will generate efficient code for specialized array usage. See " { $link "reading-writing-memory" } " for a description of low-level memory access primitives." ;
@@ -46,10 +80,10 @@ ARTICLE: "io.mmap.examples" "Memory-mapped file examples"
     "USING: alien.c-types grouping io.mmap sequences" "specialized-arrays ;"
     "SPECIALIZED-ARRAY: char"
     ""
-    "\"mydata.dat\" ["
-    "    char <mapped-array> 4 <sliced-groups>"
+    "\"mydata.dat\" char ["
+    "    4 <sliced-groups>"
     "    [ reverse-here ] change-each"
-    "] with-mapped-file"
+    "] with-mapped-array"
 }
 "Normalize a file containing packed quadrupes of floats:"
 { $code
@@ -57,17 +91,20 @@ ARTICLE: "io.mmap.examples" "Memory-mapped file examples"
     "SIMD: float"
     "SPECIALIZED-ARRAY: float-4"
     ""
-    "\"mydata.dat\" ["
-    "    float-4 <mapped-array>"
+    "\"mydata.dat\" float-4 ["
     "    [ normalize ] change-each"
-    "] with-mapped-file"
+    "] with-mapped-array"
 } ;
 
 ARTICLE: "io.mmap" "Memory-mapped files"
 "The " { $vocab-link "io.mmap" } " vocabulary implements support for memory-mapped files."
 { $subsections <mapped-file> }
-"Memory-mapped files are disposable and can be closed with " { $link dispose } " or " { $link with-disposal } ". A utility combinator which wraps the above:"
+"Memory-mapped files are disposable and can be closed with " { $link dispose } " or " { $link with-disposal } "." $nl
+"Utility combinators which wrap the above:"
 { $subsections with-mapped-file }
+{ $subsections with-mapped-file-reader }
+{ $subsections with-mapped-array }
+{ $subsections with-mapped-array-reader }
 "Instances of " { $link mapped-file } " don't support any interesting operations in themselves. There are two facilities for accessing their contents:"
 { $subsections
     "io.mmap.arrays"

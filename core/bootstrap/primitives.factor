@@ -522,6 +522,7 @@ tuple
     { "optimized?" "words" (( word -- ? )) }
     { "quot-compiled?" "quotations" (( quot -- ? )) }
     { "vm-ptr" "vm" (( -- ptr )) }
+    { "strip-stack-traces" "kernel.private" (( -- )) }
 } [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number

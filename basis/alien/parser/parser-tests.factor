@@ -1,6 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien.c-types alien.parser alien.syntax
-tools.test vocabs.parser parser ;
+tools.test vocabs.parser parser eval vocabs.parser debugger
+continuations ;
 IN: alien.parser.tests
 
 TYPEDEF: char char2
@@ -29,3 +30,14 @@ SYMBOL: not-c-type
     [ "not-word" parse-c-type ] [ error>> no-word-error? ] must-fail-with
 
 ] with-file-vocabs
+
+! Reported by mnestic
+TYPEDEF: int alien-parser-test-int ! reasonably unique name...
+
+[ "OK!" ] [
+    [
+        "USE: specialized-arrays SPECIALIZED-ARRAY: alien-parser-test-int" eval( -- )
+        ! after restart, we end up here
+        "OK!"
+    ] [ :1 ] recover
+] unit-test

@@ -172,5 +172,6 @@ PRIMITIVE(inline_cache_stats);
 PRIMITIVE(optimized_p);
 PRIMITIVE(quot_compiled_p);
 PRIMITIVE(vm_ptr);
+PRIMITIVE(strip_stack_traces);
 
 }

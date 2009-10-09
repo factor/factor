@@ -108,8 +108,8 @@ void factor_vm::primitive_string()
 
 bool factor_vm::reallot_string_in_place_p(string *str, cell capacity)
 {
-	return in_zone(&nursery,str)
-		&& (str->aux == F || in_zone(&nursery,untag<byte_array>(str->aux)))
+	return nursery.contains_p(str)
+		&& (str->aux == F || nursery.contains_p(untag<byte_array>(str->aux)))
 		&& capacity <= string_capacity(str);
 }
 

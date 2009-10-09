@@ -38,3 +38,12 @@ ERROR: no-such-symbol name library ;
 
 SYNTAX: &:
     scan "c-library" get '[ _ _ address-of ] over push-all ;
+
+: global-quot ( type word -- quot )
+    name>> "c-library" get '[ _ _ address-of 0 ]
+    swap c-type-getter-boxer append ;
+
+: define-global ( type word -- )
+    [ nip ] [ global-quot ] 2bi (( -- value )) define-declared ;
+
+SYNTAX: C-GLOBAL: scan-c-type CREATE-WORD define-global ;

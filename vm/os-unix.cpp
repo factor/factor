@@ -83,9 +83,8 @@ void factor_vm::primitive_existsp()
 	box_boolean(stat(path,&sb) >= 0);
 }
 
-segment::segment(factor_vm *myvm_, cell size_)
+segment::segment(cell size_)
 {
-	myvm = myvm_;
 	size = size_;
 
 	int pagesize = getpagesize();
@@ -94,8 +93,7 @@ segment::segment(factor_vm *myvm_, cell size_)
 		PROT_READ | PROT_WRITE | PROT_EXEC,
 		MAP_ANON | MAP_PRIVATE,-1,0);
 
-	if(array == (char*)-1)
-		myvm->out_of_memory();
+	if(array == (char*)-1) out_of_memory();
 
 	if(mprotect(array,pagesize,PROT_NONE) == -1)
 		fatal_error("Cannot protect low guard page",(cell)array);
