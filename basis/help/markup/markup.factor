@@ -26,6 +26,9 @@ SYMBOL: blank-line
     last-blank-line? not
     and [ nl ] when ;
 
+: ($blank-line) ( -- )
+    nl nl blank-line last-element set ;
+
 : ($span) ( quot -- )
     last-block? [ nl ] when
     span last-element set
@@ -44,7 +47,6 @@ M: f print-element drop ;
 
 : with-default-style ( quot -- )
     default-span-style get [
-        last-element off
         default-block-style get swap with-nesting
     ] with-style ; inline
 
@@ -220,7 +222,7 @@ PRIVATE>
     ] ($subsection) ;
 
 : $subsections ( children -- )
-    [ $subsection* ] each nl nl blank-line last-element set ;
+    [ $subsection* ] each ($blank-line) ;
 
 : $subsection ( element -- )
     first $subsection* ;
