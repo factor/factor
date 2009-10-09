@@ -215,7 +215,7 @@ ERROR: invalid-color-type/bit-depth loading-png ;
 
 : decode-greyscale-alpha ( loading-image -- byte-array' )
     [ raw-bytes ] [ bit-depth>> ] bi 16 = [
-        3 group [ first3 swapd 3array ] map B{ } concat-as
+        4 group [ first4 [ swap ] 2dip 4array ] map B{ } concat-as
     ] when ;
 
 : loading-png>bitmap ( loading-png -- bytes component-order )
