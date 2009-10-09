@@ -40,6 +40,7 @@ SYNTAX: SIMD-CONVERSION-OP:
 
 SIMD-OP: v+
 SIMD-OP: v-
+SIMD-OP: vneg
 SIMD-OP: v+-
 SIMD-OP: vs+
 SIMD-OP: vs-
@@ -148,6 +149,7 @@ M: vector-rep supported-simd-op?
         { \ (simd-v+-)           [ %add-sub-vector-reps        ] }
         { \ (simd-v-)            [ %sub-vector-reps            ] }
         { \ (simd-vs-)           [ %saturated-sub-vector-reps  ] }
+        { \ (simd-vneg)          [ %sub-vector-reps            ] }
         { \ (simd-v*)            [ %mul-vector-reps            ] }
         { \ (simd-vs*)           [ %saturated-mul-vector-reps  ] }
         { \ (simd-v/)            [ %div-vector-reps            ] }
