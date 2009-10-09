@@ -1,6 +1,26 @@
 namespace factor
 {
 
+struct dummy_unmarker {
+	void operator()(bool result, card *ptr) {}
+};
+
+struct simple_unmarker {
+	card unmask;
+	simple_unmarker(card unmask_) : unmask(unmask_) {}
+	void operator()(bool result, card *ptr) { *ptr &= ~unmask; }
+};
+
+struct complex_unmarker {
+	card unmask_none, unmask_some;
+	complex_unmarker(card unmask_none_, card unmask_some_) :
+		unmask_none(unmask_none_), unmask_some(unmask_some_) {}
+
+	void operator()(bool result, card *ptr) {
+		*ptr &= (result ? ~unmask_some : ~unmask_none);
+	}
+};
+
 template<typename TargetGeneration, typename Policy>
 struct copying_collector : collector<TargetGeneration,Policy> {
 	cell scan;
@@ -8,29 +28,37 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 	explicit copying_collector(factor_vm *myvm_, TargetGeneration *target_, Policy policy_) :
 		collector<TargetGeneration,Policy>(myvm_,target_,policy_), scan(target_->here) {}
 
-	template<typename SourceGeneration> void trace_objects_between(SourceGeneration *gen, cell scan, cell *end)
+	template<typename SourceGeneration>
+	bool trace_objects_between(SourceGeneration *gen, cell scan, cell *end)
 	{
+		bool copied = false;
+
 		while(scan && scan < *end)
 		{
-			this->trace_slots((object *)scan);
+			copied |= this->trace_slots((object *)scan);
 			scan = gen->next_object_after(this->myvm,scan);
 		}
+
+		return copied;
 	}
 
-	template<typename SourceGeneration> void trace_card(SourceGeneration *gen, card *ptr, card unmask)
+	template<typename SourceGeneration, typename Unmarker>
+	bool trace_card(SourceGeneration *gen, card *ptr, Unmarker unmarker)
 	{
 		cell card_start = this->myvm->card_to_addr(ptr);
 		cell card_scan = card_start + gen->card_offset(card_start);
 		cell card_end = this->myvm->card_to_addr(ptr + 1);
 
-		trace_objects_between(gen,card_scan,&card_end);
-
-		*ptr &= ~unmask;
+		bool result = this->trace_objects_between(gen,card_scan,&card_end);
+		unmarker(result,ptr);
 
 		this->myvm->gc_stats.cards_scanned++;
+
+		return result;
 	}
 
-	template<typename SourceGeneration> void trace_card_deck(SourceGeneration *gen, card_deck *deck, card mask, card unmask)
+	template<typename SourceGeneration, typename Unmarker>
+	bool trace_card_deck(SourceGeneration *gen, card_deck *deck, card mask, Unmarker unmarker)
 	{
 		card *first_card = this->myvm->deck_to_card(deck);
 		card *last_card = this->myvm->deck_to_card(deck + 1);
@@ -38,84 +66,38 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 		u32 *quad_ptr;
 		u32 quad_mask = mask | (mask << 8) | (mask << 16) | (mask << 24);
 
+		bool copied = false;
+
 		for(quad_ptr = (u32 *)first_card; quad_ptr < (u32 *)last_card; quad_ptr++)
 		{
 			if(*quad_ptr & quad_mask)
 			{
 				card *ptr = (card *)quad_ptr;
 
-				if(ptr[0] & mask) trace_card(gen,&ptr[0],unmask);
-				if(ptr[1] & mask) trace_card(gen,&ptr[1],unmask);
-				if(ptr[2] & mask) trace_card(gen,&ptr[2],unmask);
-				if(ptr[3] & mask) trace_card(gen,&ptr[3],unmask);
+				if(ptr[0] & mask) copied |= trace_card(gen,&ptr[0],unmarker);
+				if(ptr[1] & mask) copied |= trace_card(gen,&ptr[1],unmarker);
+				if(ptr[2] & mask) copied |= trace_card(gen,&ptr[2],unmarker);
+				if(ptr[3] & mask) copied |= trace_card(gen,&ptr[3],unmarker);
 			}
 		}
 
 		this->myvm->gc_stats.decks_scanned++;
+
+		return copied;
 	}
 
-	template<typename SourceGeneration> void trace_cards(SourceGeneration *gen)
+	template<typename SourceGeneration, typename Unmarker>
+	void trace_cards(SourceGeneration *gen, cell mask, Unmarker unmarker)
 	{
 		u64 start = current_micros();
 
 		card_deck *first_deck = this->myvm->addr_to_deck(gen->start);
 		card_deck *last_deck = this->myvm->addr_to_deck(gen->end);
 
-		card mask, unmask;
-
-		/* if we are collecting the nursery, we care about old->nursery pointers
-		but not old->aging pointers */
-		if(this->current_gc->collecting_nursery_p())
-		{
-			mask = card_points_to_nursery;
-
-			/* after the collection, no old->nursery pointers remain
-			anywhere, but old->aging pointers might remain in tenured
-			space */
-			if(gen->is_tenured_p())
-				unmask = card_points_to_nursery;
-			/* after the collection, all cards in aging space can be
-			cleared */
-			else if(gen->is_aging_p())
-				unmask = card_mark_mask;
-			else
-			{
-				critical_error("bug in trace_gen_cards",0);
-				return;
-			}
-		}
-		/* if we are collecting aging space into tenured space, we care about
-		all old->nursery and old->aging pointers. no old->aging pointers can
-		remain */
-		else if(this->current_gc->collecting_aging_p())
-		{
-			if(this->current_gc->collecting_aging_again)
-			{
-				mask = card_points_to_aging;
-				unmask = card_mark_mask;
-			}
-			/* after we collect aging space into the aging semispace, no
-			old->nursery pointers remain but tenured space might still have
-			pointers to aging space. */
-			else
-			{
-				mask = card_points_to_aging;
-				unmask = card_points_to_nursery;
-			}
-		}
-		else
-		{
-			critical_error("bug in trace_gen_cards",0);
-			return;
-		}
-
 		for(card_deck *ptr = first_deck; ptr < last_deck; ptr++)
 		{
 			if(*ptr & mask)
-			{
-				trace_card_deck(gen,ptr,mask,unmask);
-				*ptr &= ~unmask;
-			}
+				unmarker(trace_card_deck(gen,ptr,mask,unmarker),ptr);
 		}
 
 		this->myvm->gc_stats.card_scan_time += (current_micros() - start);

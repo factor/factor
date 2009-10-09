@@ -13,7 +13,9 @@ void factor_vm::collect_to_tenured()
 
 	collector.trace_roots();
 	collector.trace_contexts();
-	collector.trace_cards(data->tenured);
+	collector.trace_cards(data->tenured,
+		card_points_to_aging,
+		dummy_unmarker());
 	collector.trace_code_heap_roots(&code->points_to_aging);
 	collector.cheneys_algorithm();
 	update_dirty_code_blocks(&code->points_to_aging);
