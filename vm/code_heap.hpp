@@ -3,7 +3,7 @@ namespace factor
 
 struct code_heap : heap {
 	/* Set of blocks which need full relocation. */
-	unordered_set<code_block *> needs_fixup;
+	std::set<code_block *> needs_fixup;
 
 	/* Code blocks which may reference objects in the nursery */
 	std::set<code_block *> points_to_nursery;
