@@ -130,24 +130,13 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 		this->trace_handle(&compiled->literals);
 		this->trace_handle(&compiled->relocation);
 	}
-	
-	/* Trace literals referenced from all code blocks. Only for aging and nursery collections */
-	void trace_code_heap_roots()
+
+	void trace_code_heap_roots(std::set<code_block *> *remembered_set)
 	{
-		if(this->current_gc->collecting_gen >= this->myvm->code->youngest_referenced_generation)
-		{
-			unordered_map<code_block *,cell> &remembered_set = this->myvm->code->remembered_set;
-			unordered_map<code_block *,cell>::const_iterator iter = remembered_set.begin();
-			unordered_map<code_block *,cell>::const_iterator end = remembered_set.end();
-	
-			for(; iter != end; iter++)
-			{
-				if(this->current_gc->collecting_gen >= iter->second)
-					trace_literal_references(iter->first);
-			}
-	
-			this->myvm->gc_stats.code_heap_scans++;
-		}
+		std::set<code_block *>::const_iterator iter = remembered_set->begin();
+		std::set<code_block *>::const_iterator end = remembered_set->end();
+
+		for(; iter != end; iter++) trace_literal_references(*iter);
 	}
 
 	void cheneys_algorithm()

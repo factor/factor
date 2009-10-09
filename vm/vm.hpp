@@ -264,7 +264,7 @@ struct factor_vm
 
 	// gc
 	void free_unmarked_code_blocks();
-	void update_dirty_code_blocks();
+	void update_dirty_code_blocks(std::set<code_block *> *remembered_set);
 	void collect_nursery();
 	void collect_aging();
 	void collect_to_tenured();
