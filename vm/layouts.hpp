@@ -305,7 +305,7 @@ struct quotation : public object {
 struct alien : public object {
 	static const cell type_number = ALIEN_TYPE;
 	/* tagged */
-	cell alien;
+	cell base;
 	/* tagged */
 	cell expired;
 	/* untagged */
