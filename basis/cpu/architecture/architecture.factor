@@ -324,6 +324,46 @@ HOOK: %shr-vector-reps cpu ( -- reps )
 HOOK: %horizontal-shl-vector-reps cpu ( -- reps )
 HOOK: %horizontal-shr-vector-reps cpu ( -- reps )
 
+M: object %zero-vector-reps { } ;
+M: object %fill-vector-reps { } ;
+M: object %gather-vector-2-reps { } ;
+M: object %gather-vector-4-reps { } ;
+M: object %shuffle-vector-reps { } ;
+M: object %merge-vector-reps { } ;
+M: object %signed-pack-vector-reps { } ;
+M: object %unsigned-pack-vector-reps { } ;
+M: object %unpack-vector-head-reps { } ;
+M: object %unpack-vector-tail-reps { } ;
+M: object %integer>float-vector-reps { } ;
+M: object %float>integer-vector-reps { } ;
+M: object %compare-vector-reps drop { } ;
+M: object %compare-vector-ccs 2drop { } f ;
+M: object %test-vector-reps { } ;
+M: object %add-vector-reps { } ;
+M: object %saturated-add-vector-reps { } ;
+M: object %add-sub-vector-reps { } ;
+M: object %sub-vector-reps { } ;
+M: object %saturated-sub-vector-reps { } ;
+M: object %mul-vector-reps { } ;
+M: object %saturated-mul-vector-reps { } ;
+M: object %div-vector-reps { } ;
+M: object %min-vector-reps { } ;
+M: object %max-vector-reps { } ;
+M: object %dot-vector-reps { } ;
+M: object %sqrt-vector-reps { } ;
+M: object %horizontal-add-vector-reps { } ;
+M: object %horizontal-sub-vector-reps { } ;
+M: object %abs-vector-reps { } ;
+M: object %and-vector-reps { } ;
+M: object %andn-vector-reps { } ;
+M: object %or-vector-reps { } ;
+M: object %xor-vector-reps { } ;
+M: object %not-vector-reps { } ;
+M: object %shl-vector-reps { } ;
+M: object %shr-vector-reps { } ;
+M: object %horizontal-shl-vector-reps { } ;
+M: object %horizontal-shr-vector-reps { } ;
+
 HOOK: %unbox-alien cpu ( dst src -- )
 HOOK: %unbox-any-c-ptr cpu ( dst src temp -- )
 HOOK: %box-alien cpu ( dst src temp -- )

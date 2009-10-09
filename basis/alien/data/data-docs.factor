@@ -56,7 +56,6 @@ $nl
 { $subsections
     malloc-object
     malloc-byte-array
-    malloc-file-contents
 }
 "The " { $vocab-link "libc" } " vocabulary defines several words which directly call C standard library memory management functions:"
 { $subsections
