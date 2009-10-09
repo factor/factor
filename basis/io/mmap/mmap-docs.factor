@@ -47,7 +47,7 @@ HELP: with-mapped-array
 { $description "Memory-maps a file for reading and writing as a mapped-array of the given c-type. The mapped file is disposed of when the quotation returns, or if an error is thrown." }
 { $examples
     { $unchecked-example
-        "USING: io.mmap prettyprint specialized-arrays ;"
+        "USING: alien.c-types io.mmap prettyprint specialized-arrays ;"
         "SPECIALIZED-ARRAY: uint"
 """"resource:license.txt" uint [
     [ . ] each
