@@ -45,6 +45,27 @@ IN: compiler.tree.propagation.transforms
 : simplify-bitand? ( value -- ? )
     value-info literal>> positive-fixnum? ;
 
+: all-ones? ( int -- ? )
+    dup 1 + bitand zero? ; inline
+
+: redundant-bitand? ( var 111... -- ? )
+    [ value-info ] bi@ [ interval>> ] [ literal>> ] bi* {
+        [ nip integer? ]
+        [ nip all-ones? ]
+        [ 0 swap [a,b] interval-subset? ]
+    } 2&& ;
+
+: (zero-bitand?) ( value-info value-info' -- ? )
+    [ interval>> ] [ literal>> ] bi* {
+        [ nip integer? ]
+        [ nip bitnot all-ones? ]
+        [ 0 swap bitnot [a,b] interval-subset? ]
+    } 2&& ;
+
+: zero-bitand? ( var1 var2 -- ? )
+    [ value-info ] bi@
+    { [ (zero-bitand?) ] [ swap (zero-bitand?) ] } 2|| ;
+
 {
     bitand-integer-integer
     bitand-integer-fixnum
@@ -53,6 +74,18 @@ IN: compiler.tree.propagation.transforms
 } [
     [
         {
+            {
+                [ dup in-d>> first2 zero-bitand? ]
+                [ drop [ 2drop 0 ] ]
+            }
+            {
+                [ dup in-d>> first2 redundant-bitand? ]
+                [ drop [ drop ] ]
+            }
+            {
+                [ dup in-d>> first2 swap redundant-bitand? ]
+                [ drop [ nip ] ]
+            }
             {
                 [ dup in-d>> first simplify-bitand? ]
                 [ drop [ >fixnum fixnum-bitand ] ]
