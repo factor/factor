@@ -95,13 +95,15 @@ void full_collector::cheneys_algorithm()
 
 void factor_vm::collect_full(cell requested_bytes, bool trace_contexts_p)
 {
+	data_heap *old;
 	if(current_gc->growing_data_heap)
 	{
-		current_gc->old_data_heap = data;
-		set_data_heap(grow_data_heap(current_gc->old_data_heap,requested_bytes));
+		old = data;
+		set_data_heap(grow_data_heap(data,requested_bytes));
 	}
 	else
 	{
+		old = NULL;
 		std::swap(data->tenured,data->tenured_semispace);
 		reset_generation(data->tenured);
 	}
@@ -121,8 +123,7 @@ void factor_vm::collect_full(cell requested_bytes, bool trace_contexts_p)
 	reset_generation(data->aging);
 	nursery.here = nursery.start;
 
-	if(current_gc->growing_data_heap)
-		delete current_gc->old_data_heap;
+	if(old) delete old;
 }
 
 }
