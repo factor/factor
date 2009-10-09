@@ -64,5 +64,5 @@ SINGLETON: bmp-image
     ] bi ;
 
 M: bmp-image image>stream
-    drop BGR reorder-colors output-bmp ;
+    drop BGR reorder-components output-bmp ;
 

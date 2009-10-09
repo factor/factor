@@ -32,7 +32,7 @@ CONSTANT: fill-value 255
         [ pad4 src dst permutation shuffle dst length head ]
         map concat ] ;
 
-: (reorder-colors) ( image src-order dest-order -- image )
+: (reorder-components) ( image src-order dest-order -- image )
     [ permute ] 2curry change-bitmap ;
 
 GENERIC: normalize-component-type* ( image component-type -- image )
@@ -63,17 +63,23 @@ M: ubyte-components normalize-component-type*
         f >>upside-down?
     ] when ;
 
+: validate-request ( src-order dst-order -- src-order dst-order )
+    [
+        [ { DEPTH DEPTH-STENCIL INTENSITY } member? ] bi@
+        or [ "Invalid component-order" throw ] when
+    ] 2keep ;
+
 PRIVATE>
 
-: reorder-colors ( image component-order -- image )
+: reorder-components ( image component-order -- image )
     [
         dup component-type>> '[ _ normalize-component-type* ] change-bitmap
         dup component-order>>
     ] dip
-    [ (reorder-colors) ] keep >>component-order ;
+    validate-request [ (reorder-components) ] keep >>component-order ;
 
 : normalize-image ( image -- image )
     [ >byte-array ] change-bitmap
-    RGBA reorder-colors
+    RGBA reorder-components
     normalize-scan-line-order ;
 
