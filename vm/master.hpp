@@ -24,8 +24,9 @@
 #include <time.h>
 
 /* C++ headers */
-#include <vector>
+#include <algorithm>
 #include <set>
+#include <vector>
 
 #if __GNUC__ == 4
         #include <tr1/unordered_map>
@@ -64,9 +65,13 @@ namespace factor
 #include "bignumint.hpp"
 #include "bignum.hpp"
 #include "code_block.hpp"
-#include "data_heap.hpp"
+#include "zone.hpp"
 #include "write_barrier.hpp"
-#include "data_gc.hpp"
+#include "old_space.hpp"
+#include "aging_space.hpp"
+#include "tenured_space.hpp"
+#include "data_heap.hpp"
+#include "gc.hpp"
 #include "debug.hpp"
 #include "strings.hpp"
 #include "tuples.hpp"
@@ -76,15 +81,21 @@ namespace factor
 #include "heap.hpp"
 #include "image.hpp"
 #include "alien.hpp"
+#include "code_heap.hpp"
 #include "vm.hpp"
 #include "tagged.hpp"
 #include "local_roots.hpp"
+#include "collector.hpp"
+#include "copying_collector.hpp"
+#include "nursery_collector.hpp"
+#include "aging_collector.hpp"
+#include "to_tenured_collector.hpp"
+#include "full_collector.hpp"
 #include "callstack.hpp"
 #include "generic_arrays.hpp"
 #include "arrays.hpp"
 #include "math.hpp"
 #include "booleans.hpp"
-#include "code_heap.hpp"
 #include "byte_arrays.hpp"
 #include "jit.hpp"
 #include "quotations.hpp"

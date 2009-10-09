@@ -9,12 +9,11 @@ inline cell align_page(cell a)
 /* segments set up guard pages to check for under/overflow.
 size must be a multiple of the page size */
 struct segment {
-	factor_vm *myvm;
 	cell start;
 	cell size;
 	cell end;
 
-	explicit segment(factor_vm *myvm, cell size);
+	explicit segment(cell size);
 	~segment();
 };
 

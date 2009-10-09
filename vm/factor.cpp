@@ -21,7 +21,6 @@ void factor_vm::default_parameters(vm_parameters *p)
 	p->ds_size = 8 * sizeof(cell);
 	p->rs_size = 8 * sizeof(cell);
 
-	p->gen_count = 2;
 	p->code_size = 4;
 	p->young_size = 1;
 	p->aging_size = 1;
@@ -30,7 +29,6 @@ void factor_vm::default_parameters(vm_parameters *p)
 	p->ds_size = 32 * sizeof(cell);
 	p->rs_size = 32 * sizeof(cell);
 
-	p->gen_count = 3;
 	p->code_size = 8 * sizeof(cell);
 	p->young_size = sizeof(cell) / 4;
 	p->aging_size = sizeof(cell) / 2;
@@ -51,8 +49,6 @@ void factor_vm::default_parameters(vm_parameters *p)
 		p->console = false;
 	
 #endif
-
-	p->stack_traces = true;
 }
 
 bool factor_vm::factor_arg(const vm_char* str, const vm_char* arg, cell* value)
@@ -78,7 +74,6 @@ void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **
 	{
 		if(factor_arg(argv[i],STRING_LITERAL("-datastack=%d"),&p->ds_size));
 		else if(factor_arg(argv[i],STRING_LITERAL("-retainstack=%d"),&p->rs_size));
-		else if(factor_arg(argv[i],STRING_LITERAL("-generations=%d"),&p->gen_count));
 		else if(factor_arg(argv[i],STRING_LITERAL("-young=%d"),&p->young_size));
 		else if(factor_arg(argv[i],STRING_LITERAL("-aging=%d"),&p->aging_size));
 		else if(factor_arg(argv[i],STRING_LITERAL("-tenured=%d"),&p->tenured_size));
@@ -88,7 +83,6 @@ void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **
 		else if(STRCMP(argv[i],STRING_LITERAL("-fep")) == 0) p->fep = true;
 		else if(STRNCMP(argv[i],STRING_LITERAL("-i="),3) == 0) p->image_path = argv[i] + 3;
 		else if(STRCMP(argv[i],STRING_LITERAL("-console")) == 0) p->console = true;
-		else if(STRCMP(argv[i],STRING_LITERAL("-no-stack-traces")) == 0) p->stack_traces = false;
 	}
 }
 
@@ -155,10 +149,7 @@ void factor_vm::init_factor(vm_parameters *p)
 	gc_off = false;
 
 	if(userenv[STAGE2_ENV] == F)
-	{
-		userenv[STACK_TRACES_ENV] = tag_boolean(p->stack_traces);
 		do_stage1_init();
-	}
 }
 
 /* May allocate memory */

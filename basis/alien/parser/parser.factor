@@ -8,7 +8,7 @@ namespaces summary math vocabs.parser ;
 IN: alien.parser
 
 : parse-c-type-name ( name -- word )
-    dup search [ nip ] [ no-word ] if* ;
+    dup search [ ] [ no-word ] ?if ;
 
 : parse-c-type ( string -- type )
     {
@@ -17,7 +17,7 @@ IN: alien.parser
         { [ dup search c-type-word? ] [ parse-c-type-name ] }
         { [ "**" ?tail              ] [ drop void* ] }
         { [ "*" ?tail               ] [ parse-c-type-name resolve-pointer-type ] }
-        [ parse-c-type-name no-c-type ]
+        [ dup search [ no-c-type ] [ no-word ] ?if ]
     } cond ;
 
 : scan-c-type ( -- c-type )

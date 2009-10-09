@@ -11,7 +11,7 @@ IN: tools.deploy.tests
 
 [ t ] [ "hello-ui" shake-and-bake 1300000 small-enough? ] unit-test
 
-[ "staging.math-threads-compiler-ui-strip.image" ] [
+[ "staging.math-threads-compiler-ui.image" ] [
     "hello-ui" deploy-config
     [ bootstrap-profile staging-image-name file-name ] bind
 ] unit-test
