@@ -60,7 +60,7 @@ IN: images.normalization.tests
 [ B{ 3 2 1 0 7 6 5 4 } ]
 [ B{ 0 1 2 3 4 5 6 7 } RGBA ABGR permute ] unit-test
 
-! A little ad hoc testing
+! Edge cases
 
 [ B{ 0 4 } ]
 [ B{ 0 1 2 3 4 5 6 7 } RGBA R permute ] unit-test
@@ -73,4 +73,36 @@ IN: images.normalization.tests
 
 [ B{ 255 255 255 255 255 255 255 255 } ]
 [ B{ 0 1 } L RGBA permute ] unit-test
+
+! Invalid inputs
+
+[
+    T{ image f { 1 1 } DEPTH ubyte-components f B{ 0 } }
+    RGB reorder-components
+] must-fail
+
+[
+    T{ image f { 1 1 } DEPTH-STENCIL ubyte-components f B{ 0 } }
+    RGB reorder-components
+] must-fail
+
+[
+    T{ image f { 1 1 } INTENSITY ubyte-components f B{ 0 } }
+    RGB reorder-components
+] must-fail
+
+[
+    T{ image f { 1 1 } RGB ubyte-components f B{ 0 0 0 } }
+    DEPTH reorder-components
+] must-fail
+
+[
+    T{ image f { 1 1 } RGB ubyte-components f B{ 0 0 0 } }
+    DEPTH-STENCIL reorder-components
+] must-fail
+
+[
+    T{ image f { 1 1 } RGB ubyte-components f B{ 0 0 0 } }
+    INTENSITY reorder-components
+] must-fail
 
