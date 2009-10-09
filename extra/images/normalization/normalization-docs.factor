@@ -21,7 +21,7 @@ HELP: reorder-colors
 ARTICLE: "images.normalization" "Image normalization"
 "The " { $vocab-link "images.normalization" } " vocab can be used to convert between " { $link image } " representations."
 $nl
-"You can normalize any image to RGBA with ubyte-components:"
+"You can normalize any image to a RGBA with ubyte-components representation:"
 { $subsections normalize-image }
 "Convert an image's pixel layout to match an arbitrary " { $link component-order } ":"
 { $subsections reorder-colors } ;

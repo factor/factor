@@ -4,93 +4,73 @@ USING: images images.normalization images.normalization.private
 sequences tools.test ;
 IN: images.normalization.tests
 
-! R
+! 1>x
+
+[ B{ 255 255 } ]
+[ B{ 0 1 } A L permute ] unit-test
+
+[ B{ 255 255 255 255 } ]
+[ B{ 0 1 } A RG permute ] unit-test
+
+[ B{ 255 255 255 255 255 255 } ]
+[ B{ 0 1 } A BGR permute ] unit-test
 
 [ B{ 0 255 255 255 1 255 255 255 } ]
-[ B{ 0 1 } R RGBA permute ] unit-test
+[ B{ 0 1 } A ABGR permute ] unit-test
 
-[ B{ 255 255 0 255 255 1 } ]
-[ B{ 0 1 } R BGR permute ] unit-test
+! 2>x
 
-[ B{ 255 255 0 255 255 255 1 255 } ]
-[ B{ 0 1 } R BGRA permute ] unit-test
+[ B{ 0 2 } ]
+[ B{ 0 1 2 3 } LA L permute ] unit-test
 
-[ B{ 255 0 255 255 255 1 255 255 } ]
-[ B{ 0 1 } R ARGB permute ] unit-test
+[ B{ 255 255 255 255 } ]
+[ B{ 0 1 2 3 } LA RG permute ] unit-test
 
-! RGB
+[ B{ 255 255 255 255 255 255 } ]
+[ B{ 0 1 2 3 } LA BGR permute ] unit-test
 
-[ B{ 0 3 } ]
-[ B{ 0 1 2 3 4 5 } RGB R permute ] unit-test
+[ B{ 1 255 255 255 3 255 255 255 } ]
+[ B{ 0 1 2 3 } LA ABGR permute ] unit-test
 
-[ B{ 0 1 2 255 3 4 5 255 } ]
-[ B{ 0 1 2 3 4 5 } RGB RGBA permute ] unit-test
+! 3>x
+
+[ B{ 255 255 } ]
+[ B{ 0 1 2 3 4 5 } RGB L permute ] unit-test
+
+[ B{ 0 1 3 4 } ]
+[ B{ 0 1 2 3 4 5 } RGB RG permute ] unit-test
 
 [ B{ 2 1 0 5 4 3 } ]
 [ B{ 0 1 2 3 4 5 } RGB BGR permute ] unit-test
 
-[ B{ 2 1 0 255 5 4 3 255 } ]
-[ B{ 0 1 2 3 4 5 } RGB BGRA permute ] unit-test
+[ B{ 255 2 1 0 255 5 4 3 } ]
+[ B{ 0 1 2 3 4 5 } RGB ABGR permute ] unit-test
 
-[ B{ 255 0 1 2 255 3 4 5 } ]
-[ B{ 0 1 2 3 4 5 } RGB ARGB permute ] unit-test
+! 4>x
 
-! RGBA
+[ B{ 255 255 } ]
+[ B{ 0 1 2 3 4 5 6 7 } RGBA L permute ] unit-test
 
-[ B{ 0 4 } ]
-[ B{ 0 1 2 3 4 5 6 7 } RGBA R permute ] unit-test
-
-[ B{ 0 1 2 4 5 6 } ]
-[ B{ 0 1 2 3 4 5 6 7 } RGBA RGB permute ] unit-test
+[ B{ 0 1 4 5 } ]
+[ B{ 0 1 2 3 4 5 6 7 } RGBA RG permute ] unit-test
 
 [ B{ 2 1 0 6 5 4 } ]
 [ B{ 0 1 2 3 4 5 6 7 } RGBA BGR permute ] unit-test
 
-[ B{ 2 1 0 3 6 5 4 7 } ]
-[ B{ 0 1 2 3 4 5 6 7 } RGBA BGRA permute ] unit-test
-
-[ B{ 3 0 1 2 7 4 5 6 } ]
-[ B{ 0 1 2 3 4 5 6 7 } RGBA ARGB permute ] unit-test
-
-! BGR
-
-[ B{ 2 1 0 5 4 3 } ]
-[ B{ 0 1 2 3 4 5 } BGR RGB permute ] unit-test
-
-[ B{ 2 1 0 255 5 4 3 255 } ]
-[ B{ 0 1 2 3 4 5 } BGR RGBA permute ] unit-test
-
-[ B{ 0 1 2 255 3 4 5 255 } ]
-[ B{ 0 1 2 3 4 5 } BGR BGRA permute ] unit-test
-
-[ B{ 255 2 1 0 255 5 4 3 } ]
-[ B{ 0 1 2 3 4 5 } BGR ARGB permute ] unit-test
-
-! BGRA
-
-[ B{ 2 1 0 6 5 4 } ]
-[ B{ 0 1 2 3 4 5 6 7 } BGRA RGB permute ] unit-test
-
-[ B{ 0 1 2 4 5 6 } ]
-[ B{ 0 1 2 3 4 5 6 7 } BGRA BGR permute ] unit-test
-
-[ B{ 2 1 0 3 6 5 4 7 } ]
-[ B{ 0 1 2 3 4 5 6 7 } BGRA RGBA permute ] unit-test
-
 [ B{ 3 2 1 0 7 6 5 4 } ]
-[ B{ 0 1 2 3 4 5 6 7 } BGRA ARGB permute ] unit-test
+[ B{ 0 1 2 3 4 5 6 7 } RGBA ABGR permute ] unit-test
 
-! ARGB
+! A little ad hoc testing
 
-[ B{ 1 2 3 5 6 7 } ]
-[ B{ 0 1 2 3 4 5 6 7 } ARGB RGB permute ] unit-test
+[ B{ 0 4 } ]
+[ B{ 0 1 2 3 4 5 6 7 } RGBA R permute ] unit-test
 
-[ B{ 3 2 1 7 6 5 } ]
-[ B{ 0 1 2 3 4 5 6 7 } ARGB BGR permute ] unit-test
+[ B{ 255 0 1 2 255 4 5 6 } ]
+[ B{ 0 1 2 3 4 5 6 7 } RGBA XRGB permute ] unit-test
 
-[ B{ 3 2 1 0 7 6 5 4 } ]
-[ B{ 0 1 2 3 4 5 6 7 } ARGB BGRA permute ] unit-test
+[ B{ 1 2 3 255 5 6 7 255 } ]
+[ B{ 0 1 2 3 4 5 6 7 } XRGB RGBA permute ] unit-test
 
-[ B{ 1 2 3 0 5 6 7 4 } ]
-[ B{ 0 1 2 3 4 5 6 7 } ARGB RGBA permute ] unit-test
+[ B{ 255 255 255 255 255 255 255 255 } ]
+[ B{ 0 1 } L RGBA permute ] unit-test
 
