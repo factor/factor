@@ -36,8 +36,8 @@ void factor_vm::free_unmarked_code_blocks()
 void factor_vm::update_dirty_code_blocks(std::set<code_block *> *remembered_set)
 {
 	/* The youngest generation that any code block can now reference */
-	std::set<code_block *>::iterator iter = remembered_set->begin();
-	std::set<code_block *>::iterator end = remembered_set->end();
+	std::set<code_block *>::const_iterator iter = remembered_set->begin();
+	std::set<code_block *>::const_iterator end = remembered_set->end();
 
 	for(; iter != end; iter++) update_literal_references(*iter);
 }
@@ -146,7 +146,7 @@ void factor_vm::primitive_gc_stats()
 	result.add(tag<bignum>(ulong_long_to_bignum(gc_stats.cards_scanned)));
 	result.add(tag<bignum>(ulong_long_to_bignum(gc_stats.decks_scanned)));
 	result.add(tag<bignum>(ulong_long_to_bignum(gc_stats.card_scan_time)));
-	result.add(allot_cell(gc_stats.code_heap_scans));
+	result.add(allot_cell(gc_stats.code_blocks_scanned));
 
 	result.trim();
 	dpush(result.elements.value());

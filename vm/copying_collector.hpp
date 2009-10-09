@@ -17,13 +17,15 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 		}
 	}
 
-	template<typename SourceGeneration> void trace_card(SourceGeneration *gen, card *ptr)
+	template<typename SourceGeneration> void trace_card(SourceGeneration *gen, card *ptr, card unmask)
 	{
 		cell card_start = this->myvm->card_to_addr(ptr);
 		cell card_scan = card_start + gen->card_offset(card_start);
 		cell card_end = this->myvm->card_to_addr(ptr + 1);
 
 		trace_objects_between(gen,card_scan,&card_end);
+
+		*ptr &= ~unmask;
 
 		this->myvm->gc_stats.cards_scanned++;
 	}
@@ -42,14 +44,10 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 			{
 				card *ptr = (card *)quad_ptr;
 
-				for(int card = 0; card < 4; card++)
-				{
-					if(ptr[card] & mask)
-					{
-						trace_card(gen,&ptr[card]);
-						ptr[card] &= ~unmask;
-					}
-				}
+				if(ptr[0] & mask) trace_card(gen,&ptr[0],unmask);
+				if(ptr[1] & mask) trace_card(gen,&ptr[1],unmask);
+				if(ptr[2] & mask) trace_card(gen,&ptr[2],unmask);
+				if(ptr[3] & mask) trace_card(gen,&ptr[3],unmask);
 			}
 		}
 
@@ -129,6 +127,7 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 		this->trace_handle(&compiled->owner);
 		this->trace_handle(&compiled->literals);
 		this->trace_handle(&compiled->relocation);
+		this->myvm->gc_stats.code_blocks_scanned++;
 	}
 
 	void trace_code_heap_roots(std::set<code_block *> *remembered_set)

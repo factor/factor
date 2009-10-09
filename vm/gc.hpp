@@ -15,7 +15,7 @@ struct gc_statistics {
 	u64 cards_scanned;
 	u64 decks_scanned;
 	u64 card_scan_time;
-	cell code_heap_scans;
+	u64 code_blocks_scanned;
 };
 
 struct gc_state {
