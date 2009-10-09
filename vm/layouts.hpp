@@ -64,9 +64,9 @@ inline static cell align8(cell a)
 
 #define TYPE_COUNT 15
 
-/* Not a real type, but code_block's type field can be set to this */
-#define PIC_TYPE 42
-#define FREE_BLOCK_TYPE 69
+/* Not real types, but code_block's type can be set to this */
+#define PIC_TYPE 16
+#define FREE_BLOCK_TYPE 17
 
 /* Constants used when floating-point trap exceptions are thrown */
 enum
@@ -213,16 +213,16 @@ struct heap_block
 			header &= ~1;
 	}
 
-	cell type() { return (header >> 1) & 0x7f; }
+	cell type() { return (header >> 1) & 0x1f; }
 	void set_type(cell type)
 	{
-		header = ((header & ~(0x7f << 1)) | (type << 1));
+		header = ((header & ~(0x1f << 1)) | (type << 1));
 	}
 
-	cell size() { return (header >> 8); }
+	cell size() { return (header >> 6); }
 	void set_size(cell size)
 	{
-		header = (header & 0xff) | (size << 8);
+		header = (header & 0x2f) | (size << 6);
 	}
 };
 
