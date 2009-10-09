@@ -145,12 +145,12 @@ void factor_vm::primitive_save_image_and_exit()
 		exit(1);
 }
 
-void factor_vm::data_fixup(cell *cell, cell data_relocation_base)
+void factor_vm::data_fixup(cell *handle, cell data_relocation_base)
 {
-	if(immediate_p(*cell))
+	if(immediate_p(*handle))
 		return;
 
-	*cell += (data->tenured->start - data_relocation_base);
+	*handle += (data->tenured->start - data_relocation_base);
 }
 
 template<typename Type> void factor_vm::code_fixup(Type **handle, cell code_relocation_base)
