@@ -47,7 +47,6 @@ ARTICLE: "runtime-cli-args" "Command line switches for the VM"
     { { $snippet "-i=" { $emphasis "image" } } { "Specifies the image file to use; see " { $link "images" } } }
     { { $snippet "-datastack=" { $emphasis "n" } } "Data stack size, kilobytes" }
     { { $snippet "-retainstack=" { $emphasis "n" } } "Retain stack size, kilobytes" }
-    { { $snippet "-generations=" { $emphasis "n" } } "Number of generations, must equal 1, 2 or 3" }
     { { $snippet "-young=" { $emphasis "n" } } { "Size of youngest generation (0), megabytes" } }
     { { $snippet "-aging=" { $emphasis "n" } } "Size of aging generation (1), megabytes" }
     { { $snippet "-tenured=" { $emphasis "n" } } "Size of oldest generation (2), megabytes" }

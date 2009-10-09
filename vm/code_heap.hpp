@@ -1,21 +1,20 @@
 namespace factor
 {
 
-inline void factor_vm::check_code_pointer(cell ptr)
-{
-#ifdef FACTOR_DEBUG
-	assert(in_code_heap_p(ptr));
-#endif
-}
+struct code_heap : heap {
+	/* Set of blocks which need full relocation. */
+	std::set<code_block *> needs_fixup;
 
-struct word_updater {
-	factor_vm *myvm;
+	/* Code blocks which may reference objects in the nursery */
+	std::set<code_block *> points_to_nursery;
 
-	explicit word_updater(factor_vm *myvm_) : myvm(myvm_) {}
-	void operator()(code_block *compiled)
-	{
-		myvm->update_word_references(compiled);
-	}
+	/* Code blocks which may reference objects in aging space or the nursery */
+	std::set<code_block *> points_to_aging;
+
+	explicit code_heap(bool secure_gc, cell size);
+	void write_barrier(code_block *compiled);
+	bool needs_fixup_p(code_block *compiled);
+	void code_heap_free(code_block *compiled);
 };
 
 }

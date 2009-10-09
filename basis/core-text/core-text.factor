@@ -6,19 +6,19 @@ math.order math.vectors math.rectangles math.functions locals init
 namespaces combinators fonts colors cache core-foundation
 core-foundation.strings core-foundation.attributed-strings
 core-foundation.utilities core-graphics core-graphics.types
-core-text.fonts core-text.utilities ;
+core-text.fonts ;
 IN: core-text
 
 TYPEDEF: void* CTLineRef
 
-C-GLOBAL: kCTFontAttributeName
-C-GLOBAL: kCTKernAttributeName
-C-GLOBAL: kCTLigatureAttributeName
-C-GLOBAL: kCTForegroundColorAttributeName
-C-GLOBAL: kCTParagraphStyleAttributeName
-C-GLOBAL: kCTUnderlineStyleAttributeName
-C-GLOBAL: kCTVerticalFormsAttributeName
-C-GLOBAL: kCTGlyphInfoAttributeName
+C-GLOBAL: CFStringRef kCTFontAttributeName
+C-GLOBAL: CFStringRef kCTKernAttributeName
+C-GLOBAL: CFStringRef kCTLigatureAttributeName
+C-GLOBAL: CFStringRef kCTForegroundColorAttributeName
+C-GLOBAL: CFStringRef kCTParagraphStyleAttributeName
+C-GLOBAL: CFStringRef kCTUnderlineStyleAttributeName
+C-GLOBAL: CFStringRef kCTVerticalFormsAttributeName
+C-GLOBAL: CFStringRef kCTGlyphInfoAttributeName
 
 FUNCTION: CTLineRef CTLineCreateWithAttributedString ( CFAttributedStringRef string ) ;
 

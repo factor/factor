@@ -281,7 +281,7 @@ void quotation_jit::iterate_quotation()
 
 void factor_vm::set_quot_xt(quotation *quot, code_block *code)
 {
-	if(code->type != QUOTATION_TYPE)
+	if(code->type() != QUOTATION_TYPE)
 		critical_error("Bad param to set_quot_xt",(cell)code);
 
 	quot->code = code;
@@ -343,9 +343,7 @@ void factor_vm::compile_all_words()
 
 	}
 
-	/* Update XTs in code heap */
-	word_updater updater(this);
-	iterate_code_heap(updater);
+	update_code_heap_words();
 }
 
 /* Allocates memory */

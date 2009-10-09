@@ -43,9 +43,7 @@ void factor_vm::set_profiling(bool profiling)
 		update_word_xt(word.value());
 	}
 
-	/* Update XTs in code heap */
-	word_updater updater(this);
-	iterate_code_heap(updater);
+	update_code_heap_words();
 }
 
 void factor_vm::primitive_profiling()

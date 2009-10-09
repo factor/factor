@@ -2,7 +2,7 @@ namespace factor
 {
 
 /* statistics */
-struct gc_stats {
+struct generation_statistics {
 	cell collections;
 	u64 gc_time;
 	u64 max_gc_time;
@@ -10,12 +10,17 @@ struct gc_stats {
 	u64 bytes_copied;
 };
 
+struct gc_statistics {
+	generation_statistics generations[gen_count];
+	u64 cards_scanned;
+	u64 decks_scanned;
+	u64 card_scan_time;
+	u64 code_blocks_scanned;
+};
+
 struct gc_state {
 	/* The data heap we're collecting */
 	data_heap *data;
-
-	/* New objects are copied here */
-	zone *newspace;
 
 	/* sometimes we grow the heap */
 	bool growing_data_heap;
@@ -28,9 +33,6 @@ struct gc_state {
 	   full, we go on to collect tenured */
 	bool collecting_aging_again;
 
-	/* A set of code blocks which need to have their literals updated */
-	std::set<code_block *> dirty_code_blocks;
-
 	/* GC start time, for benchmarking */
 	u64 start_time;
 
@@ -41,20 +43,23 @@ struct gc_state {
 
 	inline bool collecting_nursery_p()
 	{
-		return collecting_gen == data->nursery();
+		return collecting_gen == nursery_gen;
+	}
+
+	inline bool collecting_aging_p()
+	{
+		return collecting_gen == aging_gen;
 	}
 
 	inline bool collecting_tenured_p()
 	{
-		return collecting_gen == data->tenured();
+		return collecting_gen == tenured_gen;
 	}
 
 	inline bool collecting_accumulation_gen_p()
 	{
-		return ((data->have_aging_p()
-			 && collecting_gen == data->aging()
-			 && !collecting_aging_again)
-			|| collecting_gen == data->tenured());
+		return ((collecting_aging_p() && !collecting_aging_again)
+			|| collecting_tenured_p());
 	}
 };
 

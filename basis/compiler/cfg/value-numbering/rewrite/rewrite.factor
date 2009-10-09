@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
+! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit arrays
 fry kernel layouts math namespaces sequences cpu.architecture
@@ -241,6 +241,28 @@ M: ##shl-imm constant-fold* drop shift ;
     [ dst>> ]
     [ [ src1>> vreg>constant ] [ src2>> ] [ ] tri constant-fold* ] bi
     \ ##load-immediate new-insn ; inline
+
+: unary-constant-fold? ( insn -- ? )
+    src>> vreg>expr constant-expr? ; inline
+
+GENERIC: unary-constant-fold* ( x insn -- y )
+
+M: ##not unary-constant-fold* drop bitnot ;
+M: ##neg unary-constant-fold* drop neg ;
+
+: unary-constant-fold ( insn -- insn' )
+    [ dst>> ]
+    [ [ src>> vreg>constant ] [ ] bi unary-constant-fold* ] bi
+    \ ##load-immediate new-insn ; inline
+
+: maybe-unary-constant-fold ( insn -- insn' )
+    dup unary-constant-fold? [ unary-constant-fold ] [ drop f ] if ;
+
+M: ##neg rewrite
+    maybe-unary-constant-fold ;
+
+M: ##not rewrite
+    maybe-unary-constant-fold ;
 
 : reassociate ( insn op -- insn )
     [

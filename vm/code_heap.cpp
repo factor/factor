@@ -3,10 +3,31 @@
 namespace factor
 {
 
+code_heap::code_heap(bool secure_gc, cell size) : heap(secure_gc,size) {}
+
+void code_heap::write_barrier(code_block *compiled)
+{
+	points_to_nursery.insert(compiled);
+	points_to_aging.insert(compiled);
+}
+
+bool code_heap::needs_fixup_p(code_block *compiled)
+{
+	return needs_fixup.count(compiled) > 0;
+}
+
+void code_heap::code_heap_free(code_block *compiled)
+{
+	points_to_nursery.erase(compiled);
+	points_to_aging.erase(compiled);
+	needs_fixup.erase(compiled);
+	heap_free(compiled);
+}
+
 /* Allocate a code heap during startup */
 void factor_vm::init_code_heap(cell size)
 {
-	code = new heap(this,size);
+	code = new code_heap(secure_gc,size);
 }
 
 bool factor_vm::in_code_heap_p(cell ptr)
@@ -28,30 +49,15 @@ void factor_vm::jit_compile_word(cell word_, cell def_, bool relocate)
 	if(word->pic_tail_def != F) jit_compile(word->pic_tail_def,relocate);
 }
 
-struct literal_reference_tracer {
+struct word_updater {
 	factor_vm *myvm;
 
-	explicit literal_reference_tracer(factor_vm *myvm_) : myvm(myvm_) {}
+	explicit word_updater(factor_vm *myvm_) : myvm(myvm_) {}
 	void operator()(code_block *compiled)
 	{
-		myvm->trace_literal_references(compiled);
+		myvm->update_word_references(compiled);
 	}
 };
-
-/* Copy literals referenced from all code blocks to newspace. Only for
-aging and nursery collections */
-void factor_vm::trace_code_heap_roots()
-{
-	code_heap_scans++;
-
-	literal_reference_tracer tracer(this);
-	iterate_code_heap(tracer);
-
-	if(current_gc->collecting_accumulation_gen_p())
-		last_code_heap_scan = current_gc->collecting_gen;
-	else
-		last_code_heap_scan = current_gc->collecting_gen + 1;
-}
 
 /* Update pointers to words referenced from all code blocks. Only after
 defining a new word. */
@@ -86,15 +92,17 @@ void factor_vm::primitive_modify_code_heap()
 		case ARRAY_TYPE:
 			{
 				array *compiled_data = data.as<array>().untagged();
-				cell literals = array_nth(compiled_data,0);
-				cell relocation = array_nth(compiled_data,1);
-				cell labels = array_nth(compiled_data,2);
-				cell code = array_nth(compiled_data,3);
+				cell owner = array_nth(compiled_data,0);
+				cell literals = array_nth(compiled_data,1);
+				cell relocation = array_nth(compiled_data,2);
+				cell labels = array_nth(compiled_data,3);
+				cell code = array_nth(compiled_data,4);
 
 				code_block *compiled = add_code_block(
 					WORD_TYPE,
 					code,
 					labels,
+					owner,
 					relocation,
 					literals);
 
@@ -125,7 +133,7 @@ void factor_vm::primitive_code_room()
 
 code_block *factor_vm::forward_xt(code_block *compiled)
 {
-	return (code_block *)forwarding[compiled];
+	return (code_block *)code->forwarding[compiled];
 }
 
 struct xt_forwarder {
@@ -221,16 +229,16 @@ critical here */
 void factor_vm::compact_code_heap()
 {
 	/* Free all unreachable code blocks, don't trace contexts */
-	garbage_collection(data->tenured(),false,false,0);
+	garbage_collection(tenured_gen,false,false,0);
 
 	/* Figure out where the code heap blocks are going to end up */
-	cell size = code->compute_heap_forwarding(forwarding);
+	cell size = code->compute_heap_forwarding();
 
 	/* Update word and quotation code pointers */
 	forward_object_xts();
 
 	/* Actually perform the compaction */
-	code->compact_heap(forwarding);
+	code->compact_heap();
 
 	/* Update word and quotation XTs */
 	fixup_object_xts();
@@ -238,6 +246,21 @@ void factor_vm::compact_code_heap()
 	/* Now update the free list; there will be a single free block at
 	the end */
 	code->build_free_list(size);
+}
+
+struct stack_trace_stripper {
+	explicit stack_trace_stripper() {}
+
+	void operator()(code_block *compiled)
+	{
+		compiled->owner = F;
+	}
+};
+
+void factor_vm::primitive_strip_stack_traces()
+{
+	stack_trace_stripper stripper;
+	iterate_code_heap(stripper);
 }
 
 }

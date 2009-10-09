@@ -28,7 +28,7 @@ template<typename Array> Array *factor_vm::allot_array_internal(cell capacity)
 
 template<typename Array> bool factor_vm::reallot_array_in_place_p(Array *array, cell capacity)
 {
-	return in_zone(&nursery,array) && capacity <= array_capacity(array);
+	return nursery.contains_p(array) && capacity <= array_capacity(array);
 }
 
 template<typename Array> Array *factor_vm::reallot_array(Array *array_, cell capacity)

@@ -120,12 +120,12 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
         title-style get [
             [ ($title) ] [ ($navigation) ] bi
         ] with-nesting
-    ] with-style nl ;
+    ] with-style ;
 
 : print-topic ( topic -- )
     >link
     last-element off
-    [ $title ] [ nl article-content print-content nl ] bi ;
+    [ $title ] [ ($blank-line) article-content print-content ] bi ;
 
 SYMBOL: help-hook
 

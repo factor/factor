@@ -211,8 +211,9 @@ void factor_vm::dump_memory(cell from, cell to)
 		dump_cell(from);
 }
 
-void factor_vm::dump_zone(zone *z)
+void factor_vm::dump_zone(cell gen, zone *z)
 {
+	print_string("Generation "); print_cell(gen); print_string(": ");
 	print_string("Start="); print_cell(z->start);
 	print_string(", size="); print_cell(z->size);
 	print_string(", here="); print_cell(z->here - z->start); nl();
@@ -220,22 +221,9 @@ void factor_vm::dump_zone(zone *z)
 
 void factor_vm::dump_generations()
 {
-	cell i;
-
-	print_string("Nursery: ");
-	dump_zone(&nursery);
-	
-	for(i = 1; i < data->gen_count; i++)
-	{
-		print_string("Generation "); print_cell(i); print_string(": ");
-		dump_zone(&data->generations[i]);
-	}
-
-	for(i = 0; i < data->gen_count; i++)
-	{
-		print_string("Semispace "); print_cell(i); print_string(": ");
-		dump_zone(&data->semispaces[i]);
-	}
+	dump_zone(nursery_gen,&nursery);
+	dump_zone(aging_gen,data->aging);
+	dump_zone(tenured_gen,data->tenured);
 
 	print_string("Cards: base=");
 	print_cell((cell)data->cards);
@@ -308,28 +296,23 @@ void factor_vm::dump_code_heap()
 	while(scan)
 	{
 		const char *status;
-		switch(scan->status)
-		{
-		case B_FREE:
+		if(scan->type() == FREE_BLOCK_TYPE)
 			status = "free";
-			break;
-		case B_ALLOCATED:
-			reloc_size += object_size(((code_block *)scan)->relocation);
-			literal_size += object_size(((code_block *)scan)->literals);
-			status = "allocated";
-			break;
-		case B_MARKED:
+		else if(scan->marked_p())
+		{
 			reloc_size += object_size(((code_block *)scan)->relocation);
 			literal_size += object_size(((code_block *)scan)->literals);
 			status = "marked";
-			break;
-		default:
-			status = "invalid";
-			break;
+		}
+		else
+		{
+			reloc_size += object_size(((code_block *)scan)->relocation);
+			literal_size += object_size(((code_block *)scan)->literals);
+			status = "allocated";
 		}
 
 		print_cell_hex((cell)scan); print_string(" ");
-		print_cell_hex(scan->size); print_string(" ");
+		print_cell_hex(scan->size()); print_string(" ");
 		print_string(status); print_string("\n");
 
 		scan = code->next_block(scan);

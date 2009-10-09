@@ -6,6 +6,10 @@ namespace factor
 void factor_vm::init_inline_caching(int max_size)
 {
 	max_pic_size = max_size;
+	cold_call_to_ic_transitions = 0;
+	ic_to_pic_transitions = 0;
+	pic_to_mega_transitions = 0;
+	for(int i = 0; i < 4; i++) pic_counts[i] = 0;
 }
 
 void factor_vm::deallocate_inline_cache(cell return_address)
@@ -15,7 +19,7 @@ void factor_vm::deallocate_inline_cache(cell return_address)
 	check_code_pointer((cell)old_xt);
 
 	code_block *old_block = (code_block *)old_xt - 1;
-	cell old_type = old_block->type;
+	cell old_type = old_block->type();
 
 #ifdef FACTOR_DEBUG
 	/* The call target was either another PIC,
@@ -24,7 +28,7 @@ void factor_vm::deallocate_inline_cache(cell return_address)
 #endif
 
 	if(old_type == PIC_TYPE)
-		code->heap_free(old_block);
+		code->code_heap_free(old_block);
 }
 
 /* Figure out what kind of type check the PIC needs based on the methods

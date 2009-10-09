@@ -4,16 +4,90 @@ namespace factor
 struct factor_vm
 {
 	// First five fields accessed directly by assembler. See vm.factor
+
+	/* Current stacks */
 	context *stack_chain;
-	zone nursery; /* new objects are allocated here */
+	
+	/* New objects are allocated here */
+	zone nursery;
+
+	/* Add this to a shifted address to compute write barrier offsets */
 	cell cards_offset;
 	cell decks_offset;
-	cell userenv[USER_ENV]; /* TAGGED user environment data; see getenv/setenv prims */
 
-	// contexts
+	/* TAGGED user environment data; see getenv/setenv prims */
+	cell userenv[USER_ENV];
+
+	/* Data stack and retain stack sizes */
 	cell ds_size, rs_size;
+
+	/* Pooling unused contexts to make callbacks cheaper */
 	context *unused_contexts;
 
+	/* Canonical T object. It's just a word */
+	cell T;
+
+	/* Is call counting enabled? */
+	bool profiling_p;
+
+	/* Global variables used to pass fault handler state from signal handler to
+	   user-space */
+	cell signal_number;
+	cell signal_fault_addr;
+	unsigned int signal_fpu_status;
+	stack_frame *signal_callstack_top;
+
+	/* Zeroes out deallocated memory; set by the -securegc command line argument */
+	bool secure_gc;
+
+	/* A heap walk allows useful things to be done, like finding all
+	   references to an object for debugging purposes. */
+	cell heap_scan_ptr;
+
+	/* GC is off during heap walking */
+	bool gc_off;
+
+	/* Data heap */
+	data_heap *data;
+
+	/* Code heap */
+	code_heap *code;
+
+	/* Only set if we're performing a GC */
+	gc_state *current_gc;
+
+	/* Statistics */
+	gc_statistics gc_stats;
+
+	/* If a runtime function needs to call another function which potentially
+	   allocates memory, it must wrap any local variable references to Factor
+	   objects in gc_root instances */
+	std::vector<cell> gc_locals;
+	std::vector<cell> gc_bignums;
+
+	/* Debugger */
+	bool fep_disabled;
+	bool full_output;
+
+	/* Canonical bignums */
+	cell bignum_zero;
+	cell bignum_pos_one;
+	cell bignum_neg_one;
+
+	/* Method dispatch statistics */
+	cell megamorphic_cache_hits;
+	cell megamorphic_cache_misses;
+
+	cell cold_call_to_ic_transitions;
+	cell ic_to_pic_transitions;
+	cell pic_to_mega_transitions;
+	/* Indexed by PIC_TAG, PIC_HI_TAG, PIC_TUPLE, PIC_HI_TAG_TUPLE */
+	cell pic_counts[4];
+
+	/* Number of entries in a polymorphic inline cache */
+	cell max_pic_size;
+
+	// contexts
 	void reset_datastack();
 	void reset_retainstack();
 	void fix_stacks();
@@ -32,9 +106,6 @@ struct factor_vm
 	void primitive_check_datastack();
 
 	// run
-	/* Canonical T object. It's just a word */
-	cell T;
-
 	void primitive_getenv();
 	void primitive_setenv();
 	void primitive_exit();
@@ -46,23 +117,12 @@ struct factor_vm
 	void primitive_clone();
 
 	// profiler
-	bool profiling_p;
-
 	void init_profiler();
 	code_block *compile_profiling_stub(cell word_);
 	void set_profiling(bool profiling);
 	void primitive_profiling();
 
 	// errors
-	/* Global variables used to pass fault handler state from signal handler to
-	   user-space */
-	cell signal_number;
-	cell signal_fault_addr;
-	unsigned int signal_fpu_status;
-	stack_frame *signal_callstack_top;
-
-	void out_of_memory();
-	void critical_error(const char* msg, cell tagged);
 	void throw_error(cell error, stack_frame *callstack_top);
 	void not_implemented_error();
 	bool in_page(cell fault, cell area, cell area_size, int offset);
@@ -141,23 +201,14 @@ struct factor_vm
 	int bignum_unsigned_logbitp(int shift, bignum * bignum);
 	bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int, factor_vm *), unsigned int radix, int negative_p);
 
-	//data_heap
-	bool secure_gc;  /* Set by the -securegc command line argument */
-	bool gc_off; /* GC is off during heap walking */
-	data_heap *data;
-	/* A heap walk allows useful things to be done, like finding all
-	   references to an object for debugging purposes. */
-	cell heap_scan_ptr;
-
+	//data heap
 	void init_card_decks();
 	data_heap *grow_data_heap(data_heap *data, cell requested_bytes);
-	void clear_cards(cell from, cell to);
-	void clear_decks(cell from, cell to);
-	void clear_allot_markers(cell from, cell to);
-	void reset_generation(cell i);
-	void reset_generations(cell from, cell to);
+	void clear_cards(old_space *gen);
+	void clear_decks(old_space *gen);
+	void reset_generation(old_space *gen);
 	void set_data_heap(data_heap *data_);
-	void init_data_heap(cell gens,cell young_size,cell aging_size,cell tenured_size,bool secure_gc_);
+	void init_data_heap(cell young_size, cell aging_size, cell tenured_size, bool secure_gc_);
 	cell untagged_object_size(object *pointer);
 	cell unaligned_object_size(object *pointer);
 	void primitive_size();
@@ -174,8 +225,6 @@ struct factor_vm
 	cell object_size(cell tagged);
 
 	//write barrier
-	cell allot_markers_offset;
-
 	inline card *addr_to_card(cell a)
 	{
 		return (card*)(((cell)(a) >> card_bits) + cards_offset);
@@ -184,11 +233,6 @@ struct factor_vm
 	inline cell card_to_addr(card *c)
 	{
 		return ((cell)c - cards_offset) << card_bits;
-	}
-
-	inline cell card_offset(card *c)
-	{
-		return *(c - (cell)data->cards + (cell)data->allot_markers);
 	}
 
 	inline card_deck *addr_to_deck(cell a)
@@ -206,11 +250,6 @@ struct factor_vm
 		return (card *)((((cell)d - decks_offset) << (deck_bits - card_bits)) + cards_offset);
 	}
 
-	inline card *addr_to_allot_marker(object *a)
-	{
-		return (card *)(((cell)a >> card_bits) + allot_markers_offset);
-	}
-
 	/* the write barrier must be called any time we are potentially storing a
 	   pointer from an older generation to a younger one */
 	inline void write_barrier(object *obj)
@@ -219,63 +258,21 @@ struct factor_vm
 		*addr_to_deck((cell)obj) = card_mark_mask;
 	}
 
-	/* we need to remember the first object allocated in the card */
-	inline void allot_barrier(object *address)
-	{
-		card *ptr = addr_to_allot_marker(address);
-		if(*ptr == invalid_allot_marker)
-			*ptr = ((cell)address & addr_card_mask);
-	}
-
-	// data_gc
-	/* used during garbage collection only */
-	gc_state *current_gc;
-	/* statistics */
-	gc_stats stats[max_gen_count];
-	u64 cards_scanned;
-	u64 decks_scanned;
-	u64 card_scan_time;
-	cell code_heap_scans;
-	/* What generation was being collected when trace_code_heap_roots() was last
-	   called? Until the next call to add_code_block(), future
-	   collections of younger generations don't have to touch the code
-	   heap. */
-	cell last_code_heap_scan;
-
-	void init_data_gc();
-	object *copy_untagged_object_impl(object *pointer, cell size);
-	object *copy_object_impl(object *untagged);
-	bool should_copy_p(object *untagged);
-	object *resolve_forwarding(object *untagged);
-	template<typename Type> Type *copy_untagged_object(Type *untagged);
-	cell copy_object(cell pointer);
-	void trace_handle(cell *handle);
-	void trace_card(card *ptr, cell gen, cell here);
-	void trace_card_deck(card_deck *deck, cell gen, card mask, card unmask);
-	void trace_generation_cards(cell gen);
-	void trace_cards();
-	void trace_stack_elements(segment *region, cell top);
-	void trace_registered_locals();
-	void trace_registered_bignums();
-	void trace_roots();
-	void trace_contexts();
-	void update_code_heap_roots();
-	cell copy_next_from_nursery(cell scan);
-	cell copy_next_from_aging(cell scan);
-	cell copy_next_from_tenured(cell scan);
-	void copy_reachable_objects(cell scan, cell *end);
+	// gc
 	void free_unmarked_code_blocks();
-	void update_dirty_code_blocks();
-	void begin_gc(cell requested_bytes);
-	void end_gc();
-	void garbage_collection(cell gen, bool growing_data_heap, bool trace_contexts, cell requested_bytes);
+	void update_dirty_code_blocks(std::set<code_block *> *remembered_set);
+	void collect_nursery();
+	void collect_aging();
+	void collect_to_tenured();
+	void collect_full(cell requested_bytes, bool trace_contexts_p);
+	void record_gc_stats();
+	void garbage_collection(cell gen, bool growing_data_heap, bool trace_contexts_p, cell requested_bytes);
 	void gc();
 	void primitive_gc();
 	void primitive_gc_stats();
 	void clear_gc_stats();
 	void primitive_become();
 	void inline_gc(cell *gc_roots_base, cell gc_roots_size);
-	inline object *allot_zone(zone *z, cell a);
 	object *allot_object(header header, cell size);
 	void primitive_clear_gc_stats();
 
@@ -307,22 +304,12 @@ struct factor_vm
 	#endif
 	}
 
-	// local roots
-	/* If a runtime function needs to call another function which potentially
-	   allocates memory, it must wrap any local variable references to Factor
-	   objects in gc_root instances */
-	std::vector<cell> gc_locals;
-	std::vector<cell> gc_bignums;
-
 	// generic arrays
 	template<typename Array> Array *allot_array_internal(cell capacity);
 	template<typename Array> bool reallot_array_in_place_p(Array *array, cell capacity);
 	template<typename Array> Array *reallot_array(Array *array_, cell capacity);
 
 	//debug
-	bool fep_disabled;
-	bool full_output;
-
 	void print_chars(string* str);
 	void print_word(word* word, cell nesting);
 	void print_factor_string(string* str);
@@ -336,7 +323,7 @@ struct factor_vm
 	void print_callstack();
 	void dump_cell(cell x);
 	void dump_memory(cell from, cell to);
-	void dump_zone(zone *z);
+	void dump_zone(cell gen, zone *z);
 	void dump_generations();
 	void dump_objects(cell type);
 	void find_data_references_step(cell *scan);
@@ -395,10 +382,6 @@ struct factor_vm
 	void primitive_wrapper();
 
 	//math
-	cell bignum_zero;
-	cell bignum_pos_one;
-	cell bignum_neg_one;
-
 	void primitive_bignum_to_fixnum();
 	void primitive_float_to_fixnum();
 	void primitive_fixnum_divint();
@@ -516,30 +499,25 @@ struct factor_vm
 	void store_address_masked(cell *ptr, fixnum value, cell mask, fixnum shift);
 	void store_address_in_code_block(cell klass, cell offset, fixnum absolute_value);
 	void update_literal_references(code_block *compiled);
-	void trace_literal_references(code_block *compiled);
 	void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled);
 	void update_word_references(code_block *compiled);
 	void check_code_address(cell address);
-	void mark_code_block(code_block *compiled);
-	void mark_active_blocks(context *stacks);
-	void mark_object_code_block(object *object);
 	void relocate_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
-	code_block *allot_code_block(cell size);
-	code_block *add_code_block(cell type,cell code_,cell labels_,cell relocation_,cell literals_);
-	inline bool stack_traces_p()
-	{
-		return userenv[STACK_TRACES_ENV] != F;
-	}
+	code_block *allot_code_block(cell size, cell type);
+	code_block *add_code_block(cell type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_);
 
-	//code_heap
-	heap *code;
-	unordered_map<heap_block *, char *> forwarding;
+	//code heap
+	inline void check_code_pointer(cell ptr)
+	{
+	#ifdef FACTOR_DEBUG
+		assert(in_code_heap_p(ptr));
+	#endif
+	}
 
 	void init_code_heap(cell size);
 	bool in_code_heap_p(cell ptr);
 	void jit_compile_word(cell word_, cell def_, bool relocate);
-	void trace_code_heap_roots();
 	void update_code_heap_words();
 	void primitive_modify_code_heap();
 	void primitive_code_room();
@@ -547,7 +525,7 @@ struct factor_vm
 	void forward_object_xts();
 	void fixup_object_xts();
 	void compact_code_heap();
-	inline void check_code_pointer(cell ptr);
+	void primitive_strip_stack_traces();
 
 	/* Apply a function to every code block */
 	template<typename Iterator> void iterate_code_heap(Iterator &iter)
@@ -556,32 +534,29 @@ struct factor_vm
 
 		while(scan)
 		{
-			if(scan->status != B_FREE)
+			if(scan->type() != FREE_BLOCK_TYPE)
 				iter((code_block *)scan);
 			scan = code->next_block(scan);
 		}
 	}
 
 	//image
-	cell code_relocation_base;
-	cell data_relocation_base;
-
 	void init_objects(image_header *h);
 	void load_data_heap(FILE *file, image_header *h, vm_parameters *p);
 	void load_code_heap(FILE *file, image_header *h, vm_parameters *p);
 	bool save_image(const vm_char *filename);
 	void primitive_save_image();
 	void primitive_save_image_and_exit();
-	void data_fixup(cell *cell);
-	template<typename Type> void code_fixup(Type **handle);
-	void fixup_word(word *word);
-	void fixup_quotation(quotation *quot);
+	void data_fixup(cell *handle, cell data_relocation_base);
+	template<typename Type> void code_fixup(Type **handle, cell code_relocation_base);
+	void fixup_word(word *word, cell code_relocation_base);
+	void fixup_quotation(quotation *quot, cell code_relocation_base);
 	void fixup_alien(alien *d);
-	void fixup_callstack_object(callstack *stack);
-	void relocate_object(object *object);
-	void relocate_data();
-	void fixup_code_block(code_block *compiled);
-	void relocate_code();
+	void fixup_callstack_object(callstack *stack, cell code_relocation_base);
+	void relocate_object(object *object, cell data_relocation_base, cell code_relocation_base);
+	void relocate_data(cell data_relocation_base, cell code_relocation_base);
+	void fixup_code_block(code_block *compiled, cell data_relocation_base);
+	void relocate_code(cell data_relocation_base);
 	void load_image(vm_parameters *p);
 
 	//callstack
@@ -655,9 +630,6 @@ struct factor_vm
 	void primitive_quot_compiled_p();
 
 	//dispatch
-	cell megamorphic_cache_hits;
-	cell megamorphic_cache_misses;
-
 	cell search_lookup_alist(cell table, cell klass);
 	cell search_lookup_hash(cell table, cell klass, cell hashcode);
 	cell nth_superclass(tuple_layout *layout, fixnum echelon);
@@ -675,12 +647,6 @@ struct factor_vm
 	void primitive_dispatch_stats();
 
 	//inline cache
-	cell max_pic_size;
-	cell cold_call_to_ic_transitions;
-	cell ic_to_pic_transitions;
-	cell pic_to_mega_transitions;
-	cell pic_counts[4];  /* PIC_TAG, PIC_HI_TAG, PIC_TUPLE, PIC_HI_TAG_TUPLE */
-
 	void init_inline_caching(int max_size);
 	void deallocate_inline_cache(cell return_address);
 	cell determine_inline_cache_type(array *cache_entries);

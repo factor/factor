@@ -983,6 +983,34 @@ cell 8 = [
     ] unit-test
 ] when
 
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 1 1 }
+        T{ ##load-immediate f 2 -1 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 1 1 }
+        T{ ##neg f 2 1 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 1 1 }
+        T{ ##load-immediate f 2 -2 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 1 1 }
+        T{ ##not f 2 1 }
+    } value-numbering-step
+] unit-test
+
 ! Displaced alien optimizations
 3 vreg-counter set-global
 
