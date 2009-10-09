@@ -46,7 +46,7 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 	bool trace_card(SourceGeneration *gen, card *ptr, Unmarker unmarker)
 	{
 		cell card_start = this->myvm->card_to_addr(ptr);
-		cell card_scan = card_start + gen->card_offset(card_start);
+		cell card_scan = card_start + gen->first_object_in_card(card_start);
 		cell card_end = this->myvm->card_to_addr(ptr + 1);
 
 		bool result = this->trace_objects_between(gen,card_scan,&card_end);
@@ -63,23 +63,10 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 		card *first_card = this->myvm->deck_to_card(deck);
 		card *last_card = this->myvm->deck_to_card(deck + 1);
 
-		u32 *quad_ptr;
-		u32 quad_mask = mask | (mask << 8) | (mask << 16) | (mask << 24);
-
 		bool copied = false;
 
-		for(quad_ptr = (u32 *)first_card; quad_ptr < (u32 *)last_card; quad_ptr++)
-		{
-			if(*quad_ptr & quad_mask)
-			{
-				card *ptr = (card *)quad_ptr;
-
-				if(ptr[0] & mask) copied |= trace_card(gen,&ptr[0],unmarker);
-				if(ptr[1] & mask) copied |= trace_card(gen,&ptr[1],unmarker);
-				if(ptr[2] & mask) copied |= trace_card(gen,&ptr[2],unmarker);
-				if(ptr[3] & mask) copied |= trace_card(gen,&ptr[3],unmarker);
-			}
-		}
+		for(card *ptr = first_card; ptr < last_card; ptr++)
+			if(*ptr & mask) copied |= trace_card(gen,ptr,unmarker);
 
 		this->myvm->gc_stats.decks_scanned++;
 
@@ -87,7 +74,7 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 	}
 
 	template<typename SourceGeneration, typename Unmarker>
-	void trace_cards(SourceGeneration *gen, cell mask, Unmarker unmarker)
+	void trace_cards(SourceGeneration *gen, card mask, Unmarker unmarker)
 	{
 		u64 start = current_micros();
 
@@ -95,10 +82,7 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 		card_deck *last_deck = this->myvm->addr_to_deck(gen->end);
 
 		for(card_deck *ptr = first_deck; ptr < last_deck; ptr++)
-		{
-			if(*ptr & mask)
-				unmarker(trace_card_deck(gen,ptr,mask,unmarker),ptr);
-		}
+			if(*ptr & mask) unmarker(trace_card_deck(gen,ptr,mask,unmarker),ptr);
 
 		this->myvm->gc_stats.card_scan_time += (current_micros() - start);
 	}
