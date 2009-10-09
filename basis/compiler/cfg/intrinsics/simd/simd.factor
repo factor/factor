@@ -180,10 +180,44 @@ MACRO: if-literals-match ( quots -- )
         ] 
     } cond ;
 
-:: generate-neg-vector ( src rep -- dst )
+:: generate-load-neg-zero-vector ( rep -- dst )
     rep {
         { float-4-rep [ float-array{ -0.0 -0.0 -0.0 -0.0 } underlying>> ^^load-constant ] }
         { double-2-rep [ double-array{ -0.0 -0.0 } underlying>> ^^load-constant ] }
         [ drop rep ^^zero-vector ]
-    } case
+    } case ;
+
+:: generate-neg-vector ( src rep -- dst )
+    rep generate-load-neg-zero-vector
     src rep ^^sub-vector ;
+
+:: generate-blend-vector ( mask true false rep -- dst )
+    mask true rep ^^and-vector
+    mask false rep ^^andn-vector
+    rep ^^or-vector ;
+
+:: generate-abs-vector ( src rep -- dst )
+    {
+        {
+            [ rep unsigned-int-vector-rep? ]
+            [ src ]
+        }
+        {
+            [ rep %abs-vector-reps member? ]
+            [ src rep ^^abs-vector ]
+        }
+        {
+            [ rep float-vector-rep? ]
+            [
+                rep generate-load-neg-zero-vector
+                src rep ^^andn-vector
+            ]
+        }
+        [ 
+            rep ^^zero-vector :> zero
+            zero src rep ^^sub-vector :> -src
+            zero src rep cc> ^^compare-vector :> sign 
+            sign -src src rep generate-blend-vector
+        ]
+    } cond ;
+

@@ -166,7 +166,7 @@ IN: compiler.cfg.intrinsics
         { math.vectors.simd.intrinsics:(simd-vmin) [ [ ^^min-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vmax) [ [ ^^max-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-v.) [ [ ^^dot-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-vabs) [ [ ^^abs-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-vabs) [ [ generate-abs-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vsqrt) [ [ ^^sqrt-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vbitand) [ [ ^^and-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vbitandn) [ [ ^^andn-vector ] emit-binary-vector-op ] }
