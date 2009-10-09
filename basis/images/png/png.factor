@@ -4,7 +4,7 @@ USING: accessors arrays checksums checksums.crc32 combinators
 compression.inflate fry grouping images images.loader io
 io.binary io.encodings.ascii io.encodings.string kernel locals
 math math.bitwise math.ranges sequences sorting assocs
-math.functions ;
+math.functions math.order ;
 QUALIFIED-WITH: bitstreams bs
 IN: images.png
 
@@ -146,6 +146,8 @@ ERROR: unimplemented-interlace ;
 : uncompress-bytes ( loading-png -- bitstream )
     [ inflate-data ] [ interlace-method>> ] bi reverse-interlace ;
 
+ERROR: bad-filter n ;
+
 :: raw-bytes ( loading-png -- array )
     loading-png uncompress-bytes :> bs
     loading-png width>> :> width
@@ -162,7 +164,7 @@ ERROR: unimplemented-interlace ;
     ] when
 
     height [
-        8 bs bs:read
+        8 bs bs:read dup 0 4 between? [ bad-filter ] unless
         count [ depth bs bs:read ] replicate swap prefix
         8 bs bs:align
     ] replicate
@@ -210,7 +212,7 @@ ERROR: invalid-PLTE array ;
 : decode-indexed-color ( loading-image -- byte-array )
     [ raw-bytes ] keep "PLTE" find-chunk data>> verify-PLTE
     3 group '[ _ nth ] { } map-as B{ } concat-as ; inline
- 
+
 ERROR: invalid-color-type/bit-depth loading-png ;
 
 : validate-bit-depth ( loading-png seq -- loading-png )
