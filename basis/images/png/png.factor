@@ -180,24 +180,14 @@ ERROR: unknown-component-type n ;
         { 1 [ 255 ] }
         { 2 [ 127 ] }
         { 4 [ 17 ] }
-        { 8 [ 1 ] }
     } case ;
 
 : scale-greyscale ( byte-array loading-png -- byte-array' )
-    [ bit-depth>> ] [ color-type>> ] bi {
-        { greyscale [
-            dup 16 = [
-                drop
-            ] [
-                scale-factor '[ _ * ] B{ } map-as
-            ] if
-        ] }
-        { greyscale-alpha [
-            [ 8 group ] dip '[
-                [ [ 0 5 ] dip <slice> [ _ * ] change-each ] keep
-            ] map B{ } concat-as
-        ] }
-    } case ;
+    bit-depth>> dup 8 >= [
+        drop
+    ] [
+        scale-factor '[ _ * ] B{ } map-as
+    ] if ;
 
 : decode-greyscale ( loading-png -- byte-array )
     [ raw-bytes ] keep scale-greyscale ;
@@ -235,7 +225,7 @@ ERROR: invalid-color-type/bit-depth loading-png ;
             validate-indexed-color unimplemented-color-type
         ] }
         { greyscale-alpha [
-            validate-greyscale-alpha decode-greyscale LA
+            validate-greyscale-alpha raw-bytes LA
         ] }
         { truecolor-alpha [
             validate-truecolor-alpha raw-bytes RGBA
