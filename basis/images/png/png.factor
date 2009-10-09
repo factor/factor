@@ -3,7 +3,7 @@
 USING: accessors arrays checksums checksums.crc32 combinators
 compression.inflate fry grouping images images.loader io
 io.binary io.encodings.ascii io.encodings.string kernel locals
-math math.bitwise math.ranges sequences sorting ;
+math math.bitwise math.ranges sequences sorting assocs ;
 QUALIFIED-WITH: bitstreams bs
 IN: images.png
 
@@ -183,11 +183,11 @@ ERROR: unknown-component-type n ;
     } case ;
 
 : scale-greyscale ( byte-array loading-png -- byte-array' )
-    bit-depth>> dup 8 >= [
-        drop
-    ] [
-        scale-factor '[ _ * ] B{ } map-as
-    ] if ;
+    bit-depth>> {
+        { 8 [ ] }
+        { 16 [ 2 group [ swap ] assoc-map B{ } concat-as ] }
+        [ scale-factor '[ _ * ] B{ } map-as ]
+    } case ;
 
 : decode-greyscale ( loading-png -- byte-array )
     [ raw-bytes ] keep scale-greyscale ;
@@ -213,6 +213,11 @@ ERROR: invalid-color-type/bit-depth loading-png ;
 : validate-truecolor-alpha ( loading-png -- loading-png )
     { 8 16 } validate-bit-depth ;
 
+: decode-greyscale-alpha ( loading-image -- byte-array' )
+    [ raw-bytes ] [ bit-depth>> ] bi 16 = [
+        3 group [ first3 swapd 3array ] map B{ } concat-as
+    ] when ;
+
 : loading-png>bitmap ( loading-png -- bytes component-order )
     dup color-type>> {
         { greyscale [
@@ -225,7 +230,7 @@ ERROR: invalid-color-type/bit-depth loading-png ;
             validate-indexed-color unimplemented-color-type
         ] }
         { greyscale-alpha [
-            validate-greyscale-alpha raw-bytes LA
+            validate-greyscale-alpha decode-greyscale-alpha LA
         ] }
         { truecolor-alpha [
             validate-truecolor-alpha raw-bytes RGBA
