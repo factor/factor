@@ -5,7 +5,8 @@ combinators definitions definitions.icons effects fry generic
 hashtables help.stylesheet help.topics io io.styles kernel make
 math namespaces parser present prettyprint
 prettyprint.stylesheet quotations see sequences sets slots
-sorting splitting strings vectors vocabs vocabs.loader words ;
+sorting splitting strings vectors vocabs vocabs.loader words
+words.symbol ;
 FROM: prettyprint.sections => with-pprint ;
 IN: help.markup
 
@@ -181,12 +182,23 @@ GENERIC: link-long-text ( topic -- )
 M: topic link-long-text
     [ article-title ] keep write-link ;
 
+GENERIC: link-effect? ( word -- ? )
+
+M: parsing-word link-effect? drop f ;
+M: symbol link-effect? drop f ;
+M: word link-effect? drop t ;
+
+: $effect ( effect -- )
+    effect>string stack-effect-style get format ;
+
 M: word link-long-text
     dup presented associate [
         [ article-name link-style get format ]
-        [ drop bl ]
-        [ stack-effect effect>string stack-effect-style get format ]
-        tri
+        [
+            dup link-effect? [
+                bl stack-effect $effect
+            ] [ drop ] if
+        ] bi
     ] with-nesting ;
 
 : >topic ( obj -- topic ) dup topic? [ >link ] unless ;
