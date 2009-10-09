@@ -7,7 +7,10 @@ compiler.tree.propagation.info compiler.cfg.builder.blocks
 compiler.cfg.comparisons
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.cfg.hats
 compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.intrinsics.alien ;
+compiler.cfg.intrinsics.alien
+specialized-arrays ;
+FROM: alien.c-types => float double ;
+SPECIALIZED-ARRAYS: float double ;
 IN: compiler.cfg.intrinsics.simd
 
 MACRO: check-elements ( quots -- )
@@ -177,3 +180,10 @@ MACRO: if-literals-match ( quots -- )
         ] 
     } cond ;
 
+:: generate-neg-vector ( src rep -- dst )
+    rep {
+        { float-4-rep [ float-array{ -0.0 -0.0 -0.0 -0.0 } underlying>> ^^load-constant ] }
+        { double-2-rep [ double-array{ -0.0 -0.0 } underlying>> ^^load-constant ] }
+        [ drop rep ^^zero-vector ]
+    } case
+    src rep ^^sub-vector ;
