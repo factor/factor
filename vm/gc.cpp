@@ -67,36 +67,37 @@ void factor_vm::garbage_collection(cell collecting_gen_, bool growing_data_heap_
 
 	/* Keep trying to GC higher and higher generations until we don't run out
 	of space */
-        if(setjmp(current_gc->gc_unwind))
-        {
-                /* We come back here if a generation is full */
+	if(setjmp(current_gc->gc_unwind))
+	{
+		/* We come back here if a generation is full */
 
-                /* We have no older generations we can try collecting, so we
-                resort to growing the data heap */
-                if(current_gc->collecting_tenured_p())
-                {
-                        current_gc->growing_data_heap = true;
+		/* We have no older generations we can try collecting, so we
+		resort to growing the data heap */
+		if(current_gc->collecting_tenured_p())
+		{
+			current_gc->growing_data_heap = true;
 
-                        /* see the comment in unmark_marked() */
-                        code->unmark_marked();
-                }
-                /* we try collecting aging space twice before going on to
-                collect tenured */
-                else if(current_gc->collecting_aging_p()
-                        && !current_gc->collecting_aging_again)
-                {
-                        current_gc->collecting_aging_again = true;
-                }
-                /* Collect the next oldest generation */
-                else
-                {
-                        current_gc->collecting_gen++;
-                }
-        }
+			/* Since we start tracing again, any previously
+			marked code blocks must be re-marked and re-traced */
+			code->clear_mark_bits();
+		}
+		/* we try collecting aging space twice before going on to
+		collect tenured */
+		else if(current_gc->collecting_aging_p()
+			&& !current_gc->collecting_aging_again)
+		{
+			current_gc->collecting_aging_again = true;
+		}
+		/* Collect the next oldest generation */
+		else
+		{
+			current_gc->collecting_gen++;
+		}
+	}
 
-        if(current_gc->collecting_nursery_p())
-        	collect_nursery();
-        else if(current_gc->collecting_aging_p())
+	if(current_gc->collecting_nursery_p())
+		collect_nursery();
+	else if(current_gc->collecting_aging_p())
 	{
 		if(current_gc->collecting_aging_again)
 			collect_to_tenured();
