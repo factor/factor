@@ -46,7 +46,7 @@ struct heap {
 	heap_block *heap_allot(cell size, cell type);
 	void heap_free(heap_block *block);
 	void mark_block(heap_block *block);
-	void unmark_marked();
+	void clear_mark_bits();
 	void heap_usage(cell *used, cell *total_free, cell *max_free);
 	cell heap_size();
 	cell compute_heap_forwarding();
