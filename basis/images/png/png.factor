@@ -3,7 +3,8 @@
 USING: accessors arrays checksums checksums.crc32 combinators
 compression.inflate fry grouping images images.loader io
 io.binary io.encodings.ascii io.encodings.string kernel locals
-math math.bitwise math.ranges sequences sorting assocs ;
+math math.bitwise math.ranges sequences sorting assocs
+math.functions ;
 QUALIFIED-WITH: bitstreams bs
 IN: images.png
 
@@ -65,6 +66,9 @@ ERROR: bad-checksum ;
 : find-chunk ( loading-png string -- chunk )
     [ chunks>> ] dip '[ type>> _ = ] find nip ;
 
+: find-chunks ( loading-png string -- chunk )
+    [ chunks>> ] dip '[ type>> _ = ] filter ;
+
 : parse-ihdr-chunk ( loading-png -- loading-png )
     dup "IHDR" find-chunk data>> {
         [ [ 0 4 ] dip subseq be> >>width ]
@@ -77,8 +81,7 @@ ERROR: bad-checksum ;
     } cleave ;
 
 : find-compressed-bytes ( loading-png -- bytes )
-    chunks>> [ type>> "IDAT" = ] filter
-    [ data>> ] map concat ;
+    "IDAT" find-chunks [ data>> ] map concat ;
 
 ERROR: unknown-color-type n ;
 ERROR: unimplemented-color-type image ;
@@ -91,6 +94,7 @@ ERROR: unimplemented-color-type image ;
         { greyscale [ 1 ] }
         { truecolor [ 3 ] }
         { greyscale-alpha [ 2 ] }
+        { indexed-color [ 1 ] }
         { truecolor-alpha [ 4 ] }
         [ unknown-color-type ]
     } case ; inline
@@ -160,6 +164,7 @@ ERROR: unimplemented-interlace ;
     height [
         8 bs bs:read
         count [ depth bs bs:read ] replicate swap prefix
+        8 bs bs:align
     ] replicate
     #components bit-depth 16 = [ 2 * ] when reverse-png-filter ;
 
@@ -191,6 +196,20 @@ ERROR: unknown-component-type n ;
 
 : decode-greyscale ( loading-png -- byte-array )
     [ raw-bytes ] keep scale-greyscale ;
+
+: decode-greyscale-alpha ( loading-image -- byte-array )
+    [ raw-bytes ] [ bit-depth>> ] bi 16 = [
+        4 group [ first4 [ swap ] 2dip 4array ] map B{ } concat-as
+    ] when ;
+
+ERROR: invalid-PLTE array ;
+
+: verify-PLTE ( seq -- seq )
+    dup length 3 divisor? [ invalid-PLTE ] unless ;
+
+: decode-indexed-color ( loading-image -- byte-array )
+    [ raw-bytes ] keep "PLTE" find-chunk data>> verify-PLTE
+    3 group '[ _ nth ] { } map-as B{ } concat-as ; inline
  
 ERROR: invalid-color-type/bit-depth loading-png ;
 
@@ -213,11 +232,6 @@ ERROR: invalid-color-type/bit-depth loading-png ;
 : validate-truecolor-alpha ( loading-png -- loading-png )
     { 8 16 } validate-bit-depth ;
 
-: decode-greyscale-alpha ( loading-image -- byte-array' )
-    [ raw-bytes ] [ bit-depth>> ] bi 16 = [
-        4 group [ first4 [ swap ] 2dip 4array ] map B{ } concat-as
-    ] when ;
-
 : loading-png>bitmap ( loading-png -- bytes component-order )
     dup color-type>> {
         { greyscale [
@@ -227,7 +241,7 @@ ERROR: invalid-color-type/bit-depth loading-png ;
             validate-truecolor raw-bytes RGB
         ] }
         { indexed-color [
-            validate-indexed-color unimplemented-color-type
+            validate-indexed-color decode-indexed-color RGB
         ] }
         { greyscale-alpha [
             validate-greyscale-alpha decode-greyscale-alpha LA
