@@ -28,14 +28,14 @@ data_heap::data_heap(factor_vm *myvm, cell young_size_, cell aging_size_, cell t
 
 	cell cards_size = total_size >> card_bits;
 
-	cards = new char[cards_size];
+	cards = new card[cards_size];
 	cards_end = cards + cards_size;
 
 	cell decks_size = total_size >> deck_bits;
-	decks = new char[decks_size];
+	decks = new card_deck[decks_size];
 	decks_end = decks + decks_size;
 
-	cell start = align(seg->start,deck_size);
+	start = align(seg->start,deck_size);
 
 	tenured = new tenured_space(tenured_size,start);
 	tenured_semispace = new tenured_space(tenured_size,tenured->end);
