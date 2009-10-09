@@ -13,8 +13,9 @@ void heap::clear_free_list()
 
 heap::heap(bool secure_gc_, cell size) : secure_gc(secure_gc_)
 {
+	if(size > (1L << (sizeof(cell) * 8 - 6))) fatal_error("Heap too large",size);
 	seg = new segment(align_page(size));
-	if(!seg) fatal_error("Out of memory in new_heap",size);
+	if(!seg) fatal_error("Out of memory in heap allocator",size);
 	clear_free_list();
 }
 
