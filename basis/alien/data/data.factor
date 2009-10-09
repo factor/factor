@@ -56,9 +56,6 @@ M: word <c-direct-array>
 : malloc-string ( string encoding -- alien )
     string>alien malloc-byte-array ;
 
-: malloc-file-contents ( path -- alien len )
-    binary file-contents [ malloc-byte-array ] [ length ] bi ;
-
 M: memory-stream stream-read
     [
         [ index>> ] [ alien>> ] bi <displaced-alien>
@@ -80,4 +77,5 @@ M: value-type c-type-getter
 M: value-type c-type-setter ( type -- quot )
     [ c-type-getter ] [ c-type-unboxer-quot ] [ heap-size ] tri
     '[ @ swap @ _ memcpy ] ;
+
 

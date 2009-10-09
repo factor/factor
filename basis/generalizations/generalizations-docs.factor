@@ -50,6 +50,11 @@ HELP: firstn
     }
 } ;
 
+HELP: set-firstn
+{ $values { "n" integer } }
+{ $description "A generalization of " { $link set-first } " "
+"that sets the first " { $snippet "n" } " elements of a sequence from the top " { $snippet "n" } " elements of the stack." } ;
+
 HELP: npick
 { $values { "n" integer } }
 { $description "A generalization of " { $link dup } ", "
@@ -257,7 +262,7 @@ HELP: nweave
 HELP: n*quot
 { $values
      { "n" integer } { "quot" quotation }
-     { "quot'" quotation }
+     { "quotquot" quotation }
 }
 { $examples
     { $example "USING: generalizations prettyprint math ;"
@@ -303,11 +308,18 @@ HELP: ntuck
 }
 { $description "A generalization of " { $link tuck } " that can work for any stack depth. The top item will be copied and placed " { $snippet "n" } " items down on the stack." } ;
 
+HELP: nspin
+{ $values
+    { "n" integer }
+}
+{ $description "A generalization of " { $link spin } " that can work for any stack depth. The top " { $snippet "n" } " items will be reversed in order." } ;
+
 ARTICLE: "sequence-generalizations" "Generalized sequence operations"
 { $subsections
     narray
     nsequence
     firstn
+    set-firstn
     nappend
     nappend-as
 } ;
@@ -321,6 +333,7 @@ ARTICLE: "shuffle-generalizations" "Generalized shuffle words"
     nnip
     ndrop
     ntuck
+    nspin
     mnswap
     nweave
 } ;
