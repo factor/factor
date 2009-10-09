@@ -24,7 +24,6 @@ struct gc_state {
 
 	/* sometimes we grow the heap */
 	bool growing_data_heap;
-	data_heap *old_data_heap;
 
 	/* Which generation is being collected */
 	cell collecting_gen;
