@@ -37,7 +37,10 @@ ARTICLE: "math.vectors.simd.types" "SIMD vector types"
 "Each SIMD vector type is named " { $snippet "scalar-count" } ", where " { $snippet "scalar" } " is a scalar C type and " { $snippet "count" } " is a vector dimension."
 $nl
 "To use a SIMD vector type, a parsing word is used to generate the relevant code and bring it into the vocabulary search path; this is the same idea as with " { $link "specialized-arrays" } ":"
-{ $subsections POSTPONE: SIMD: }
+{ $subsections
+    POSTPONE: SIMD:
+    POSTPONE: SIMDS:
+}
 "The following vector types are supported:"
 { $code
     "char-16"
@@ -204,5 +207,12 @@ HELP: SIMD:
 { $syntax "SIMD: type" }
 { $values { "type" "a scalar C type" } }
 { $description "Defines 128-bit and 256-bit SIMD arrays for holding elements of " { $snippet "type" } " into the vocabulary search path. The possible type/length combinations are listed in " { $link "math.vectors.simd.types" } " and the generated words are documented in " { $link "math.vectors.simd.words" } "." } ;
+
+HELP: SIMDS:
+{ $syntax "SIMDS: type type type ... ;" }
+{ $values { "type" "a scalar C type" } }
+{ $description "Defines 128-bit and 256-bit SIMD arrays for holding elements of each " { $snippet "type" } " into the vocabulary search path. The possible type/length combinations are listed in " { $link "math.vectors.simd.types" } " and the generated words are documented in " { $link "math.vectors.simd.words" } "." } ;
+
+{ POSTPONE: SIMD: POSTPONE: SIMDS: } related-words
 
 ABOUT: "math.vectors.simd"
