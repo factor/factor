@@ -4,7 +4,7 @@ USING: tools.test compression.inflate ;
 IN: compression.inflate.tests
 
 [
-BV{
+B{
     1 255 255 255 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
     0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 122 121 94 119
     239 237 227 88 16 16 10 5 16 17 26 172 3 20 19 245 22 54 55

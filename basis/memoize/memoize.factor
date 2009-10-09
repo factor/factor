@@ -1,22 +1,36 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel hashtables sequences arrays words namespaces make
-parser math assocs effects definitions quotations summary
-accessors fry ;
+USING: kernel hashtables sequences sequences.private arrays
+words namespaces make parser math assocs effects definitions
+quotations summary accessors fry ;
 IN: memoize
-
-ERROR: too-many-arguments ;
-
-M: too-many-arguments summary
-    drop "There must be no more than 4 input and 4 output arguments" ;
 
 <PRIVATE
 
+! We can't use n*quot, narray and firstn from generalizations because
+! they're macros, and macros use memoize!
+: (n*quot) ( n quot -- quotquot )
+    <repetition> concat >quotation ;
+
+: [nsequence] ( length exemplar -- quot )
+    [ [ [ 1 - ] keep ] dip '[ _ _ _ new-sequence ] ]
+    [ drop [ [ set-nth-unsafe ] 2keep [ 1 - ] dip ] (n*quot) ] 2bi
+    [ nip ] 3append ; 
+
+: [firstn] ( length -- quot )
+    [ 0 swap ] swap
+    [ [ nth-unsafe ] 2keep [ 1 + ] dip ] (n*quot)
+    [ 2drop ] 3append ;
+
 : packer ( seq -- quot )
-    length { [ f ] [ ] [ 2array ] [ 3array ] [ 4array ] } nth ;
+    length dup 4 <=
+    [ { [ f ] [ ] [ 2array ] [ 3array ] [ 4array ] } nth ]
+    [ { } [nsequence] ] if ;
 
 : unpacker ( seq -- quot )
-    length { [ drop ] [ ] [ first2 ] [ first3 ] [ first4 ] } nth ;
+    length dup 4 <=
+    [ { [ drop ] [ ] [ first2 ] [ first3 ] [ first4 ] } nth ]
+    [ [firstn] ] if ;
 
 : pack/unpack ( quot effect -- newquot )
     [ in>> packer ] [ out>> unpacker ] bi surround ;
@@ -24,11 +38,7 @@ M: too-many-arguments summary
 : unpack/pack ( quot effect -- newquot )
     [ in>> unpacker ] [ out>> packer ] bi surround ;
 
-: check-memoized ( effect -- )
-    [ in>> ] [ out>> ] bi [ length 4 > ] either? [ too-many-arguments ] when ;
-
 : make-memoizer ( table quot effect -- quot )
-    [ check-memoized ] keep
     [ unpack/pack '[ _ _ cache ] ] keep
     pack/unpack ;
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien io io.files kernel math math.bitwise system unix
-io.backend.unix io.ports io.mmap destructors locals accessors ;
+USING: accessors destructors io.backend.unix io.mmap
+io.mmap.private kernel locals math.bitwise system unix ;
 IN: io.mmap.unix
 
 :: mmap-open ( path length prot flags open-mode -- alien fd )

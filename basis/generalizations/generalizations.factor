@@ -2,22 +2,19 @@
 ! Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private math combinators
-macros quotations fry effects ;
+macros quotations fry effects memoize.private ;
 IN: generalizations
 
 <<
 
-: n*quot ( n quot -- quot' ) <repetition> concat >quotation ;
+ALIAS: n*quot (n*quot)
 
 : repeat ( n obj quot -- ) swapd times ; inline
 
 >>
 
 MACRO: nsequence ( n seq -- )
-    [
-        [ drop iota <reversed> ] [ '[ _ _ new-sequence ] ] 2bi
-        [ '[ @ [ _ swap set-nth-unsafe ] keep ] ] reduce
-    ] keep
+    [ [nsequence] ] keep
     '[ @ _ like ] ;
 
 MACRO: narray ( n -- )
@@ -27,7 +24,7 @@ MACRO: nsum ( n -- )
     1 - [ + ] n*quot ;
 
 MACRO: firstn-unsafe ( n -- )
-    iota [ '[ [ _ ] dip nth-unsafe ] ] map '[ _ cleave ] ;
+    [firstn] ;
 
 MACRO: firstn ( n -- )
     dup zero? [ drop [ drop ] ] [
@@ -50,6 +47,18 @@ MACRO: nrot ( n -- )
 
 MACRO: -nrot ( n -- )
     1 - [ ] [ '[ swap _ dip ] ] repeat ;
+
+MACRO: set-firstn-unsafe ( n -- )
+    [ 1 + ]
+    [ iota [ '[ _ rot [ set-nth-unsafe ] keep ] ] map ] bi
+    '[ _ -nrot _ spread drop ] ;
+
+MACRO: set-firstn ( n -- )
+    dup zero? [ drop [ drop ] ] [
+        [ 1 - swap bounds-check 2drop ]
+        [ set-firstn-unsafe ]
+        bi-curry '[ _ _ bi ]
+    ] if ;
 
 MACRO: ndrop ( n -- )
     [ drop ] n*quot ;
@@ -104,3 +113,6 @@ MACRO: nbi-curry ( n -- )
     [ narray concat ] dip like ; inline
 
 : nappend ( n -- seq ) narray concat ; inline
+
+MACRO: nspin ( n -- )
+    [ [ ] ] swap [ swap [ ] curry compose ] n*quot [ call ] 3append ;
