@@ -172,9 +172,7 @@ void heap::mark_block(heap_block *block)
 	block->set_marked_p(true);
 }
 
-/* If in the middle of code GC, we have to grow the heap, data GC restarts from
-scratch, so we have to unmark any marked blocks. */
-void heap::unmark_marked()
+void heap::clear_mark_bits()
 {
 	heap_block *scan = first_block();
 

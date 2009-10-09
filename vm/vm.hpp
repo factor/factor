@@ -74,10 +74,6 @@ struct factor_vm
 	cell bignum_pos_one;
 	cell bignum_neg_one;
 
-	/* Only used during image loading */
-	cell code_relocation_base;
-	cell data_relocation_base;
-
 	/* Method dispatch statistics */
 	cell megamorphic_cache_hits;
 	cell megamorphic_cache_misses;
@@ -551,16 +547,16 @@ struct factor_vm
 	bool save_image(const vm_char *filename);
 	void primitive_save_image();
 	void primitive_save_image_and_exit();
-	void data_fixup(cell *cell);
-	template<typename Type> void code_fixup(Type **handle);
-	void fixup_word(word *word);
-	void fixup_quotation(quotation *quot);
+	void data_fixup(cell *cell, cell data_relocation_base);
+	template<typename Type> void code_fixup(Type **handle, cell code_relocation_base);
+	void fixup_word(word *word, cell code_relocation_base);
+	void fixup_quotation(quotation *quot, cell code_relocation_base);
 	void fixup_alien(alien *d);
-	void fixup_callstack_object(callstack *stack);
-	void relocate_object(object *object);
-	void relocate_data();
-	void fixup_code_block(code_block *compiled);
-	void relocate_code();
+	void fixup_callstack_object(callstack *stack, cell code_relocation_base);
+	void relocate_object(object *object, cell data_relocation_base, cell code_relocation_base);
+	void relocate_data(cell data_relocation_base, cell code_relocation_base);
+	void fixup_code_block(code_block *compiled, cell data_relocation_base);
+	void relocate_code(cell data_relocation_base);
 	void load_image(vm_parameters *p);
 
 	//callstack

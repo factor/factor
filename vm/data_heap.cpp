@@ -95,7 +95,7 @@ void factor_vm::reset_generation(old_space *gen)
 
 	clear_cards(gen);
 	clear_decks(gen);
-	gen->clear_allot_markers();
+	gen->clear_object_start_offsets();
 }
 
 void factor_vm::set_data_heap(data_heap *data_)
