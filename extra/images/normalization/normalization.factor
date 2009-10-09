@@ -11,19 +11,25 @@ IN: images.normalization
 
 <PRIVATE
 
-CONSTANT: don't-care 3
+CONSTANT: don't-care 127
+CONSTANT: fill-value 255
 
 : permutation ( src dst -- seq )
     swap '[ _ index [ don't-care ] unless* ] { } map-as
     4 don't-care pad-tail ;
 
-: pad4 ( seq -- newseq ) 4 255 pad-tail ;
+: pad4 ( seq -- newseq ) 4 fill-value pad-tail ;
+
+: shuffle ( seq permutation -- newseq )
+    swap '[
+        dup 4 >= [ drop fill-value ] [ _ nth ] if
+    ] B{ } map-as ;
 
 :: permute ( bytes src-order dst-order -- new-bytes )
     [let | src [ src-order name>> ]
            dst [ dst-order name>> ] |
         bytes src length group
-        [ pad4 src dst permutation vshuffle dst length head ]
+        [ pad4 src dst permutation shuffle dst length head ]
         map concat ] ;
 
 : (reorder-colors) ( image src-order dest-order -- image )
