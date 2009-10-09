@@ -7,8 +7,8 @@ code_heap::code_heap(bool secure_gc, cell size) : heap(secure_gc,size) {}
 
 void code_heap::write_barrier(code_block *compiled)
 {
-	remembered_set[compiled] = nursery_gen;
-	youngest_referenced_generation = nursery_gen;
+	points_to_nursery.insert(compiled);
+	points_to_aging.insert(compiled);
 }
 
 bool code_heap::needs_fixup_p(code_block *compiled)
@@ -18,7 +18,8 @@ bool code_heap::needs_fixup_p(code_block *compiled)
 
 void code_heap::code_heap_free(code_block *compiled)
 {
-	remembered_set.erase(compiled);
+	points_to_nursery.erase(compiled);
+	points_to_aging.erase(compiled);
 	needs_fixup.erase(compiled);
 	heap_free(compiled);
 }
@@ -27,7 +28,6 @@ void code_heap::code_heap_free(code_block *compiled)
 void factor_vm::init_code_heap(cell size)
 {
 	code = new code_heap(secure_gc,size);
-	code->youngest_referenced_generation = nursery_gen;
 }
 
 bool factor_vm::in_code_heap_p(cell ptr)

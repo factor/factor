@@ -78,9 +78,7 @@ void full_collector::trace_literal_references(code_block *compiled)
 collections */
 void full_collector::mark_code_block(code_block *compiled)
 {
-	myvm->check_code_address((cell)compiled);
-
-	this->myvm->code->mark_block(compiled);
+	this->code->mark_block(compiled);
 	trace_literal_references(compiled);
 }
 

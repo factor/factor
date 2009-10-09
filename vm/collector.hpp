@@ -4,6 +4,7 @@ namespace factor
 template<typename TargetGeneration, typename Policy> struct collector {
 	factor_vm *myvm;
 	data_heap *data;
+	code_heap *code;
 	gc_state *current_gc;
 	TargetGeneration *target;
 	Policy policy;
@@ -11,6 +12,7 @@ template<typename TargetGeneration, typename Policy> struct collector {
 	explicit collector(factor_vm *myvm_, TargetGeneration *target_, Policy policy_) :
 		myvm(myvm_),
 		data(myvm_->data),
+		code(myvm_->code),
 		current_gc(myvm_->current_gc),
 		target(target_),
 		policy(policy_) {}

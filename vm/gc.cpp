@@ -29,34 +29,17 @@ void factor_vm::free_unmarked_code_blocks()
 {
 	literal_and_word_reference_updater updater(this);
 	code->free_unmarked(updater);
-	code->remembered_set.clear();
-	code->youngest_referenced_generation = tenured_gen;
+	code->points_to_nursery.clear();
+	code->points_to_aging.clear();
 }
 
-void factor_vm::update_dirty_code_blocks()
+void factor_vm::update_dirty_code_blocks(std::set<code_block *> *remembered_set)
 {
 	/* The youngest generation that any code block can now reference */
-	cell gen;
+	std::set<code_block *>::iterator iter = remembered_set->begin();
+	std::set<code_block *>::iterator end = remembered_set->end();
 
-	if(current_gc->collecting_accumulation_gen_p())
-		gen = current_gc->collecting_gen;
-	else
-		gen = current_gc->collecting_gen + 1;
-
-	unordered_map<code_block *,cell>::iterator iter = code->remembered_set.begin();
-	unordered_map<code_block *,cell>::iterator end = code->remembered_set.end();
-
-	for(; iter != end; iter++)
-	{
-		if(current_gc->collecting_gen >= iter->second)
-		{
-			check_code_address((cell)iter->first);
-			update_literal_references(iter->first);
-			iter->second = gen;
-		}
-	}
-
-	code->youngest_referenced_generation = gen;
+	for(; iter != end; iter++) update_literal_references(*iter);
 }
 
 void factor_vm::record_gc_stats()

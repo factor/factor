@@ -15,12 +15,12 @@ void factor_vm::collect_nursery()
 	collector.trace_contexts();
 	collector.trace_cards(data->tenured);
 	collector.trace_cards(data->aging);
-	collector.trace_code_heap_roots();
+	collector.trace_code_heap_roots(&code->points_to_nursery);
 	collector.cheneys_algorithm();
-
-	update_dirty_code_blocks();
+	update_dirty_code_blocks(&code->points_to_nursery);
 
 	nursery.here = nursery.start;
+	code->points_to_nursery.clear();
 }
 
 }
