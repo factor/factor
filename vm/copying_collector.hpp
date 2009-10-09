@@ -16,7 +16,8 @@ struct complex_unmarker {
 	complex_unmarker(card unmask_none_, card unmask_some_) :
 		unmask_none(unmask_none_), unmask_some(unmask_some_) {}
 
-	void operator()(bool result, card *ptr) {
+	void operator()(bool result, card *ptr)
+	{
 		*ptr &= (result ? ~unmask_some : ~unmask_none);
 	}
 };
@@ -42,15 +43,30 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 		return copied;
 	}
 
-	template<typename SourceGeneration, typename Unmarker>
-	bool trace_card(SourceGeneration *gen, card *ptr, Unmarker unmarker)
+	inline cell card_index(cell deck)
 	{
-		cell card_start = this->myvm->card_to_addr(ptr);
+		return deck << (deck_bits - card_bits);
+	}
+
+	inline cell card_deck_index(cell a)
+	{
+		return (a - this->data->start) >> deck_bits;
+	}
+
+	inline cell card_start_address(cell card)
+	{
+		return (card << card_bits) + this->data->start;
+	}
+
+	template<typename SourceGeneration, typename Unmarker>
+	bool trace_card(SourceGeneration *gen, card *cards, cell card_index, Unmarker unmarker)
+	{
+		cell card_start = card_start_address(card_index);
 		cell card_scan = card_start + gen->first_object_in_card(card_start);
-		cell card_end = this->myvm->card_to_addr(ptr + 1);
+		cell card_end = card_start_address(card_index + 1);
 
 		bool result = this->trace_objects_between(gen,card_scan,&card_end);
-		unmarker(result,ptr);
+		unmarker(result,&cards[card_index]);
 
 		this->myvm->gc_stats.cards_scanned++;
 
@@ -58,15 +74,18 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 	}
 
 	template<typename SourceGeneration, typename Unmarker>
-	bool trace_card_deck(SourceGeneration *gen, card_deck *deck, card mask, Unmarker unmarker)
+	bool trace_card_deck(SourceGeneration *gen, cell deck_index, card mask, Unmarker unmarker)
 	{
-		card *first_card = this->myvm->deck_to_card(deck);
-		card *last_card = this->myvm->deck_to_card(deck + 1);
+		cell first_card = card_index(deck_index);
+		cell last_card = card_index(deck_index + 1);
 
 		bool copied = false;
 
-		for(card *ptr = first_card; ptr < last_card; ptr++)
-			if(*ptr & mask) copied |= trace_card(gen,ptr,unmarker);
+		card *cards = this->data->cards;
+		for(cell i = first_card; i < last_card; i++)
+		{
+			if(cards[i] & mask) copied |= trace_card(gen,cards,i,unmarker);
+		}
 
 		this->myvm->gc_stats.decks_scanned++;
 
@@ -78,11 +97,15 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 	{
 		u64 start = current_micros();
 
-		card_deck *first_deck = this->myvm->addr_to_deck(gen->start);
-		card_deck *last_deck = this->myvm->addr_to_deck(gen->end);
+		cell first_deck = card_deck_index(gen->start);
+		cell last_deck = card_deck_index(gen->end);
 
-		for(card_deck *ptr = first_deck; ptr < last_deck; ptr++)
-			if(*ptr & mask) unmarker(trace_card_deck(gen,ptr,mask,unmarker),ptr);
+		card_deck *decks = this->data->decks;
+		for(cell i = first_deck; i < last_deck; i++)
+		{
+			if(decks[i] & mask)
+				unmarker(trace_card_deck(gen,i,mask,unmarker),&decks[i]);
+		}
 
 		this->myvm->gc_stats.card_scan_time += (current_micros() - start);
 	}
