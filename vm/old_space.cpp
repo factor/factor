@@ -45,7 +45,7 @@ void old_space::clear_allot_markers()
 cell old_space::next_object_after(factor_vm *myvm, cell scan)
 {
 	cell size = myvm->untagged_object_size((object *)scan);
-	if(scan + size < end)
+	if(scan + size < here)
 		return scan + size;
 	else
 		return NULL;
