@@ -98,7 +98,8 @@ H{
     { vrshift { +vector+ +scalar+ -> +vector+ } }
     { hlshift { +vector+ +literal+ -> +vector+ } }
     { hrshift { +vector+ +literal+ -> +vector+ } }
-    { vshuffle { +vector+ +literal+ -> +vector+ } }
+    { vshuffle-elements { +vector+ +literal+ -> +vector+ } }
+    { vshuffle-bytes    { +vector+ +vector+  -> +vector+ } }
     { vbroadcast { +vector+ +literal+ -> +vector+ } }
     { (vmerge-head) { +vector+ +vector+ -> +vector+ } }
     { (vmerge-tail) { +vector+ +vector+ -> +vector+ } }
@@ -162,7 +163,7 @@ ERROR: bad-vector-word word ;
     } cond
     ! Don't specialize horizontal shifts, shuffles, and conversions at all, they're only for SIMD
     {
-        hlshift hrshift vshuffle vbroadcast
+        hlshift hrshift vshuffle-elements vshuffle-bytes vbroadcast
         (v>integer) (v>float)
         (vpack-signed) (vpack-unsigned)
         (vunpack-head) (vunpack-tail)

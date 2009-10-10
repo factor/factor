@@ -6,6 +6,9 @@ locals ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors
 
+MIXIN: simd-128
+MIXIN: simd-256
+
 GENERIC: element-type ( obj -- c-type )
 M: object element-type drop f ; inline
 
@@ -83,7 +86,20 @@ PRIVATE>
 : vbitnot ( u -- w ) dup '[ _ [ bitnot ] fp-bitwise-unary ] map ;
 
 :: vbroadcast ( u n -- v ) u length n u nth <repetition> u like ;
-: vshuffle ( u perm -- v ) swap [ '[ _ nth ] ] keep map-as ;
+
+: vshuffle-elements ( u perm -- v )
+    swap [ '[ _ nth ] ] keep map-as ;
+
+: vshuffle-bytes ( u perm -- v )
+    underlying>> [
+        swap [ '[ _ nth ] ] keep map-as
+    ] curry change-underlying ;
+
+GENERIC: vshuffle ( u perm -- v )
+M: array vshuffle ( u perm -- v )
+    vshuffle-elements ; inline
+M: simd-128 vshuffle ( u perm -- v )
+    vshuffle-bytes ; inline
 
 : vlshift ( u n -- w ) '[ _ shift ] map ;
 : vrshift ( u n -- w ) neg '[ _ shift ] map ;
@@ -107,9 +123,9 @@ PRIVATE>
 : vxor ( u v -- w )  over '[ [ _ element>bool ] bi@ xor ] 2map ;
 : vnot ( u -- w )    dup '[ _ element>bool not ] map ;
 
-: vall? ( v -- ? ) [ ] all? ;
-: vany? ( v -- ? ) [ ] any? ;
-: vnone? ( v -- ? ) [ not ] all? ;
+: vall? ( v -- ? ) dup '[ _ element>bool ] all? ;
+: vany? ( v -- ? ) dup '[ _ element>bool ] any? ;
+: vnone? ( v -- ? ) dup '[ _ element>bool not ] all? ;
 
 : v<  ( u v -- w ) [ <   ] 2map ;
 : v<= ( u v -- w ) [ <=  ] 2map ;

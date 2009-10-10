@@ -1215,31 +1215,31 @@ cell 8 = [
     }
 ] [
     {
-        T{ ##shuffle-vector f 1 0 { 0 1 2 3 } float-4-rep }
+        T{ ##shuffle-vector-imm f 1 0 { 0 1 2 3 } float-4-rep }
     } value-numbering-step
 ] unit-test
 
 [
     {
-        T{ ##shuffle-vector f 1 0 { 1 2 3 0 } float-4-rep }
-        T{ ##shuffle-vector f 2 0 { 0 2 3 1 } float-4-rep }
+        T{ ##shuffle-vector-imm f 1 0 { 1 2 3 0 } float-4-rep }
+        T{ ##shuffle-vector-imm f 2 0 { 0 2 3 1 } float-4-rep }
     }
 ] [
     {
-        T{ ##shuffle-vector f 1 0 { 1 2 3 0 } float-4-rep }
-        T{ ##shuffle-vector f 2 1 { 3 1 2 0 } float-4-rep }
+        T{ ##shuffle-vector-imm f 1 0 { 1 2 3 0 } float-4-rep }
+        T{ ##shuffle-vector-imm f 2 1 { 3 1 2 0 } float-4-rep }
     } value-numbering-step
 ] unit-test
 
 [
     {
-        T{ ##shuffle-vector f 1 0 { 1 2 3 0 } float-4-rep }
-        T{ ##shuffle-vector f 2 1 { 1 0 } double-2-rep }
+        T{ ##shuffle-vector-imm f 1 0 { 1 2 3 0 } float-4-rep }
+        T{ ##shuffle-vector-imm f 2 1 { 1 0 } double-2-rep }
     }
 ] [
     {
-        T{ ##shuffle-vector f 1 0 { 1 2 3 0 } float-4-rep }
-        T{ ##shuffle-vector f 2 1 { 1 0 } double-2-rep }
+        T{ ##shuffle-vector-imm f 1 0 { 1 2 3 0 } float-4-rep }
+        T{ ##shuffle-vector-imm f 2 1 { 1 0 } double-2-rep }
     } value-numbering-step
 ] unit-test
 
@@ -1253,7 +1253,7 @@ cell 8 = [
     {
         T{ ##load-constant f 0 $[ 55 tag-fixnum ] }
         T{ ##scalar>vector f 1 0 int-4-rep }
-        T{ ##shuffle-vector f 2 1 { 0 0 0 0 } float-4-rep }
+        T{ ##shuffle-vector-imm f 2 1 { 0 0 0 0 } float-4-rep }
     } value-numbering-step
 ] unit-test
 
@@ -1267,7 +1267,7 @@ cell 8 = [
     {
         T{ ##load-constant f 0 1.25 }
         T{ ##scalar>vector f 1 0 float-4-rep }
-        T{ ##shuffle-vector f 2 1 { 0 0 0 0 } float-4-rep }
+        T{ ##shuffle-vector-imm f 2 1 { 0 0 0 0 } float-4-rep }
     } value-numbering-step
 ] unit-test
 
