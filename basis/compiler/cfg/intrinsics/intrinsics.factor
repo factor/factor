@@ -194,7 +194,8 @@ IN: compiler.cfg.intrinsics
         { math.vectors.simd.intrinsics:(simd-with) [ [ ^^with-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-gather-2) [ emit-gather-vector-2 ] }
         { math.vectors.simd.intrinsics:(simd-gather-4) [ emit-gather-vector-4 ] }
-        { math.vectors.simd.intrinsics:(simd-vshuffle) [ emit-shuffle-vector ] }
+        { math.vectors.simd.intrinsics:(simd-vshuffle-elements) [ emit-shuffle-vector ] }
+        { math.vectors.simd.intrinsics:(simd-vshuffle-bytes) [ emit-shuffle-vector-var ] }
         { math.vectors.simd.intrinsics:(simd-(vmerge-head)) [ [ ^^merge-vector-head ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-(vmerge-tail)) [ [ ^^merge-vector-tail ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-(v>float)) [ [ ^^integer>float-vector ] emit-unary-vector-op ] }
