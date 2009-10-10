@@ -1,9 +1,9 @@
-USING: accessors alien arrays definitions generic generic.standard
-generic.math assocs hashtables io kernel math namespaces parser
-prettyprint sequences strings tools.test vectors words
-quotations classes classes.algebra classes.tuple continuations
-layouts classes.union sorting compiler.units eval multiline
-io.streams.string ;
+USING: accessors alien arrays assocs classes classes.algebra
+classes.tuple classes.union compiler.units continuations
+definitions eval generic generic.math generic.standard
+hashtables io io.streams.string kernel layouts math math.order
+namespaces parser prettyprint quotations sequences sorting
+strings tools.test vectors words generic.single ;
 IN: generic.tests
 
 GENERIC: foobar ( x -- y )
@@ -140,26 +140,20 @@ M: f generic-forget-test ;
 
 ! erg's regression
 [ ] [
-    <"
-    IN: compiler.tests
+    """IN: compiler.tests
 
     GENERIC: jeah ( a -- b )
     TUPLE: boii ;
     M: boii jeah ;
     GENERIC: jeah* ( a -- b )
-    M: boii jeah* jeah ;
-    "> eval( -- )
+    M: boii jeah* jeah ;""" eval( -- )
 
-    <"
-    IN: compiler.tests
-    FORGET: boii
-    "> eval( -- )
+    """IN: compiler.tests
+    FORGET: boii""" eval( -- )
     
-    <"
-    IN: compiler.tests
+    """IN: compiler.tests
     TUPLE: boii ;
-    M: boii jeah ;
-    "> eval( -- )
+    M: boii jeah ;""" eval( -- )
 ] unit-test
 
 ! call-next-method cache test
@@ -186,3 +180,35 @@ GENERIC: move-method-generic ( a -- b )
 [ ] [ "IN: generic.tests.a" <string-reader> "move-method-test-1" parse-stream drop ] unit-test
 
 [ { string } ] [ \ move-method-generic order ] unit-test
+
+GENERIC: foozul ( a -- b )
+M: reversed foozul ;
+M: integer foozul ;
+M: slice foozul ;
+
+[ t ] [
+    reversed \ foozul method-for-class
+    reversed \ foozul method
+    eq?
+] unit-test
+
+[ t ] [
+    fixnum \ <=> method-for-class
+    real \ <=> method
+    eq?
+] unit-test
+
+! FORGET: on method wrappers
+GENERIC: forget-test ( a -- b )
+
+M: integer forget-test 3 + ;
+
+[ ] [ "IN: generic.tests USE: math FORGET: M\\ integer forget-test" eval( -- ) ] unit-test
+
+[ { } ] [
+    \ + compiled-usage keys
+    [ method-body? ] filter
+    [ "method-generic" word-prop \ forget-test eq? ] filter
+] unit-test
+
+[ 10 forget-test ] [ no-method? ] must-fail-with

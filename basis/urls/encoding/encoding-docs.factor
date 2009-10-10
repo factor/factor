@@ -1,5 +1,5 @@
+USING: strings help.markup help.syntax assocs ;
 IN: urls.encoding
-USING: strings help.markup help.syntax assocs multiline ;
 
 HELP: url-decode
 { $values { "str" string } { "decoded" string } }
@@ -39,23 +39,27 @@ HELP: query>assoc
         "USING: prettyprint urls.encoding ;"
         "\"gender=female&agefrom=22&ageto=28&location=Omaha+NE\""
         "query>assoc ."
-        <" H{
+        """H{
     { "gender" "female" }
     { "agefrom" "22" }
     { "ageto" "28" }
     { "location" "Omaha NE" }
-}">
+}"""
     }
 } ;
 
 ARTICLE: "url-encoding" "URL encoding and decoding"
 "URL encoding and decoding strings:"
-{ $subsection url-encode }
-{ $subsection url-decode }
-{ $subsection url-quotable? }
+{ $subsections
+    url-encode
+    url-decode
+    url-quotable?
+}
 "Encoding and decoding queries:"
-{ $subsection assoc>query }
-{ $subsection query>assoc }
+{ $subsections
+    assoc>query
+    query>assoc
+}
 "See " { $url "http://en.wikipedia.org/wiki/Percent-encoding" } " for a description of URL encoding." ;
 
 ABOUT: "url-encoding"

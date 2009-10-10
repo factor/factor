@@ -54,12 +54,14 @@ HELP: pile-empty
 
 ARTICLE: "memory.piles" "Piles"
 "A " { $link pile } " is a block of raw memory. Portions of its memory can be allocated from the beginning of the pile in constant time, and the pile can be emptied and its pointer reset to the beginning."
-{ $subsection <pile> }
-{ $subsection pile-alloc }
-{ $subsection <pile-c-array> }
-{ $subsection <pile-c-object> }
-{ $subsection pile-align }
-{ $subsection pile-empty }
+{ $subsections
+    <pile>
+    pile-alloc
+    <pile-c-array>
+    <pile-c-object>
+    pile-align
+    pile-empty
+}
 "An example of the utility of piles is in video games. For example, the game Abuse was scripted with a Lisp dialect. In order to avoid stalls from traditional GC or heap-based allocators, the Abuse Lisp VM would allocate values from a preallocated pile over the course of a frame, and release the entire pile at the end of the frame." ;
 
 ABOUT: "memory.piles"

@@ -6,23 +6,32 @@ ARTICLE: "math.libm" "C standard library math functions"
 { $warning
 "These functions are unsafe. The compiler special-cases them to operate on floats only. They can be called directly, however there is little reason to do so, since they only implement real-valued functions, and in some cases place restrictions on the domain:"
 { $example "USE: math.functions" "2.0 acos ." "C{ 0.0 1.316957896924817 }" }
-{ $unchecked-example "USE: math.libm" "2 facos ." "0/0." } }
+{ $unchecked-example "USE: math.libm" "2.0 facos ." "0/0." } }
 "Trigonometric functions:"
-{ $subsection fcos }
-{ $subsection fsin }
-{ $subsection facos }
-{ $subsection fasin }
-{ $subsection fatan }
-{ $subsection fatan2 }
+{ $subsections
+    fcos
+    fsin
+    facos
+    fasin
+    fatan
+    fatan2
+}
 "Hyperbolic functions:"
-{ $subsection fcosh }
-{ $subsection fsinh }
+{ $subsections
+    fcosh
+    fsinh
+}
 "Exponentials and logarithms:"
-{ $subsection fexp }
-{ $subsection flog }
+{ $subsections
+    fexp
+    flog
+    flog10
+}
 "Powers:"
-{ $subsection fpow }
-{ $subsection fsqrt } ;
+{ $subsections
+    fpow
+    fsqrt
+} ;
 
 ABOUT: "math.libm"
 
@@ -65,6 +74,10 @@ HELP: fexp
 HELP: flog
 { $values { "x" real } { "y" real } }
 { $description "Calls the natural logarithm function from the C standard library. User code should call " { $link log } " instead." } ;
+
+HELP: flog10
+{ $values { "x" real } { "y" real } }
+{ $description "Calls the base 10 logarithm function from the C standard library. User code should call " { $link log10 } " instead." } ;
 
 HELP: fpow
 { $values { "x" real } { "y" real } { "z" real } }

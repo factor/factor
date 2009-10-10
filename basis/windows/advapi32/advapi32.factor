@@ -1,5 +1,5 @@
-USING: alien.syntax kernel math windows.types windows.kernel32
-math.bitwise ;
+USING: alien.c-types alien.syntax kernel math windows.types
+windows.kernel32 math.bitwise classes.struct ;
 IN: windows.advapi32
 
 LIBRARY: advapi32
@@ -62,12 +62,12 @@ CONSTANT: CRYPT_DELETEKEYSET   HEX: 10
 CONSTANT: CRYPT_MACHINE_KEYSET HEX: 20
 CONSTANT: CRYPT_SILENT         HEX: 40
 
-C-STRUCT: ACL
-    { "BYTE" "AclRevision" }
-    { "BYTE" "Sbz1" }
-    { "WORD" "AclSize" }
-    { "WORD" "AceCount" }
-    { "WORD" "Sbz2" } ;
+STRUCT: ACL
+    { AclRevision BYTE }
+    { Sbz1 BYTE }
+    { AclSize WORD }
+    { AceCount WORD }
+    { Sbz2 WORD } ;
 
 TYPEDEF: ACL* PACL
 
@@ -82,56 +82,56 @@ CONSTANT: NO_PROPAGATE_INHERIT_ACE HEX: 4
 CONSTANT: INHERIT_ONLY_ACE HEX: 8
 CONSTANT: VALID_INHERIT_FLAGS HEX: f
 
-C-STRUCT: ACE_HEADER
-    { "BYTE" "AceType" }
-    { "BYTE" "AceFlags" }
-    { "WORD" "AceSize" } ;
+STRUCT: ACE_HEADER
+    { AceType BYTE }
+    { AceFlags BYTE }
+    { AceSize WORD } ;
 
 TYPEDEF: ACE_HEADER* PACE_HEADER
 
-C-STRUCT: ACCESS_ALLOWED_ACE
-    { "ACE_HEADER" "Header" }
-    { "DWORD" "Mask" }
-    { "DWORD" "SidStart" } ;
+STRUCT: ACCESS_ALLOWED_ACE
+    { Header ACE_HEADER }
+    { Mask DWORD }
+    { SidStart DWORD } ;
 
 TYPEDEF: ACCESS_ALLOWED_ACE* PACCESS_ALLOWED_ACE
 
-C-STRUCT: ACCESS_DENIED_ACE
-    { "ACE_HEADER" "Header" }
-    { "DWORD" "Mask" }
-    { "DWORD" "SidStart" } ;
+STRUCT: ACCESS_DENIED_ACE
+    { Header ACE_HEADER }
+    { Mask DWORD }
+    { SidStart DWORD } ;
 TYPEDEF: ACCESS_DENIED_ACE* PACCESS_DENIED_ACE
 
 
-C-STRUCT: SYSTEM_AUDIT_ACE
-    { "ACE_HEADER" "Header" }
-    { "DWORD" "Mask" }
-    { "DWORD" "SidStart" } ;
+STRUCT: SYSTEM_AUDIT_ACE
+    { Header ACE_HEADER }
+    { Mask DWORD }
+    { SidStart DWORD } ;
 
 TYPEDEF: SYSTEM_AUDIT_ACE* PSYSTEM_AUDIT_ACE
 
-C-STRUCT: SYSTEM_ALARM_ACE
-    { "ACE_HEADER" "Header" }
-    { "DWORD" "Mask" }
-    { "DWORD" "SidStart" } ;
+STRUCT: SYSTEM_ALARM_ACE
+    { Header ACE_HEADER }
+    { Mask DWORD }
+    { SidStart DWORD } ;
 
 TYPEDEF: SYSTEM_ALARM_ACE* PSYSTEM_ALARM_ACE
 
-C-STRUCT: ACCESS_ALLOWED_CALLBACK_ACE
-    { "ACE_HEADER" "Header" }
-    { "DWORD" "Mask" }
-    { "DWORD" "SidStart" } ;
+STRUCT: ACCESS_ALLOWED_CALLBACK_ACE
+    { Header ACE_HEADER }
+    { Mask DWORD }
+    { SidStart DWORD } ;
 
 TYPEDEF: ACCESS_ALLOWED_CALLBACK_ACE* PACCESS_ALLOWED_CALLBACK_ACE
 
-C-STRUCT: SECURITY_DESCRIPTOR
-    { "UCHAR" "Revision" }
-    { "UCHAR" "Sbz1" }
-    { "WORD" "Control" }
-    { "PVOID" "Owner" }
-    { "PVOID" "Group" }
-    { "PACL" "Sacl" }
-    { "PACL" "Dacl" } ;
+STRUCT: SECURITY_DESCRIPTOR
+    { Revision UCHAR }
+    { Sbz1 UCHAR }
+    { Control WORD }
+    { Owner PVOID }
+    { Group PVOID }
+    { Sacl PACL }
+    { Dacl PACL } ;
 
 TYPEDEF: SECURITY_DESCRIPTOR* PSECURITY_DESCRIPTOR
 
@@ -222,23 +222,23 @@ C-ENUM:
     SE_WMIGUID_OBJECT
     SE_REGISTRY_WOW64_32KEY ;
 
+STRUCT: TRUSTEE
+    { pMultipleTrustee TRUSTEE* }
+    { MultipleTrusteeOperation MULTIPLE_TRUSTEE_OPERATION }
+    { TrusteeForm TRUSTEE_FORM }
+    { TrusteeType TRUSTEE_TYPE }
+    { ptstrName LPTSTR } ;
+
 TYPEDEF: TRUSTEE* PTRUSTEE
 
-C-STRUCT: TRUSTEE
-    { "PTRUSTEE" "pMultipleTrustee" }
-    { "MULTIPLE_TRUSTEE_OPERATION" "MultipleTrusteeOperation" }
-    { "TRUSTEE_FORM" "TrusteeForm" }
-    { "TRUSTEE_TYPE" "TrusteeType" }
-    { "LPTSTR" "ptstrName" } ;
+STRUCT: EXPLICIT_ACCESS
+    { grfAccessPermissions DWORD }
+    { grfAccessMode ACCESS_MODE }
+    { grfInheritance DWORD }
+    { Trustee TRUSTEE } ;
 
-C-STRUCT: EXPLICIT_ACCESS
-    { "DWORD" "grfAccessPermissions" }
-    { "ACCESS_MODE" "grfAccessMode" }
-    { "DWORD" "grfInheritance" }
-    { "TRUSTEE" "Trustee" } ;
-
-C-STRUCT: SID_IDENTIFIER_AUTHORITY
-    { { "BYTE" 6 } "Value" } ;
+STRUCT: SID_IDENTIFIER_AUTHORITY
+    { Value { BYTE 6 } } ;
 
 TYPEDEF: SID_IDENTIFIER_AUTHORITY* PSID_IDENTIFIER_AUTHORITY
 

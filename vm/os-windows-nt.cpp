@@ -3,6 +3,31 @@
 namespace factor
 {
 
+THREADHANDLE start_thread(void *(*start_routine)(void *),void *args){
+    return (void*) CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, args, 0, 0); 
+}
+
+DWORD dwTlsIndex; 
+
+void init_platform_globals()
+{
+	if ((dwTlsIndex = TlsAlloc()) == TLS_OUT_OF_INDEXES)
+		fatal_error("TlsAlloc failed - out of indexes",0);
+}
+
+void register_vm_with_thread(factor_vm *vm)
+{
+	if (! TlsSetValue(dwTlsIndex, vm))
+		fatal_error("TlsSetValue failed",0);
+}
+
+factor_vm *tls_vm()
+{
+	factor_vm *vm = (factor_vm*)TlsGetValue(dwTlsIndex);
+	assert(vm != NULL);
+	return vm;
+}
+
 s64 current_micros()
 {
 	FILETIME t;
@@ -11,7 +36,7 @@ s64 current_micros()
 		- EPOCH_OFFSET) / 10;
 }
 
-FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
+LONG factor_vm::exception_handler(PEXCEPTION_POINTERS pe)
 {
 	PEXCEPTION_RECORD e = (PEXCEPTION_RECORD)pe->ExceptionRecord;
 	CONTEXT *c = (CONTEXT*)pe->ContextRecord;
@@ -21,48 +46,62 @@ FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 	else
 		signal_callstack_top = NULL;
 
-    switch (e->ExceptionCode) {
-    case EXCEPTION_ACCESS_VIOLATION:
+        switch (e->ExceptionCode)
+        {
+        case EXCEPTION_ACCESS_VIOLATION:
 		signal_fault_addr = e->ExceptionInformation[1];
-		c->EIP = (cell)memory_signal_handler_impl;
-        break;
+		c->EIP = (cell)factor::memory_signal_handler_impl;
+                break;
 
-    case EXCEPTION_FLT_DENORMAL_OPERAND:
-    case EXCEPTION_FLT_DIVIDE_BY_ZERO:
-    case EXCEPTION_FLT_INEXACT_RESULT:
-    case EXCEPTION_FLT_INVALID_OPERATION:
-    case EXCEPTION_FLT_OVERFLOW:
-    case EXCEPTION_FLT_STACK_CHECK:
-    case EXCEPTION_FLT_UNDERFLOW:
-        c->EIP = (cell)fp_signal_handler_impl;
-        break;
-
-	/* If the Widcomm bluetooth stack is installed, the BTTray.exe process
-	   injects code into running programs. For some reason this results in
-	   random SEH exceptions with this (undocumented) exception code being
-	   raised. The workaround seems to be ignoring this altogether, since that
-	   is what happens if SEH is not enabled. Don't really have any idea what
-	   this exception means. */
-    case 0x40010006:
-        break;
-
-    default:
+	case STATUS_FLOAT_DENORMAL_OPERAND:
+	case STATUS_FLOAT_DIVIDE_BY_ZERO:
+	case STATUS_FLOAT_INEXACT_RESULT:
+	case STATUS_FLOAT_INVALID_OPERATION:
+	case STATUS_FLOAT_OVERFLOW:
+	case STATUS_FLOAT_STACK_CHECK:
+	case STATUS_FLOAT_UNDERFLOW:
+	case STATUS_FLOAT_MULTIPLE_FAULTS:
+	case STATUS_FLOAT_MULTIPLE_TRAPS:
+		signal_fpu_status = fpu_status(X87SW(c) | MXCSR(c));
+		X87SW(c) = 0;
+		MXCSR(c) &= 0xffffffc0;
+		c->EIP = (cell)factor::fp_signal_handler_impl;
+		break;
+	case 0x40010006:
+		/* If the Widcomm bluetooth stack is installed, the BTTray.exe
+		process injects code into running programs. For some reason this
+		results in random SEH exceptions with this (undocumented)
+		exception code being raised. The workaround seems to be ignoring
+		this altogether, since that is what happens if SEH is not
+		enabled. Don't really have any idea what this exception means. */
+		break;
+	default:
 		signal_number = e->ExceptionCode;
-		c->EIP = (cell)misc_signal_handler_impl;
-        break;
-    }
-    return EXCEPTION_CONTINUE_EXECUTION;
+		c->EIP = (cell)factor::misc_signal_handler_impl;
+		break;
+	}
+	return EXCEPTION_CONTINUE_EXECUTION;
 }
 
-void c_to_factor_toplevel(cell quot)
+FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 {
-	if(!AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)exception_handler))
-		fatal_error("AddVectoredExceptionHandler failed", 0);
-	c_to_factor(quot);
-	RemoveVectoredExceptionHandler((void *)exception_handler);
+	return SIGNAL_VM_PTR()->exception_handler(pe);
 }
 
-void open_console()
+bool handler_added = 0;
+
+void factor_vm::c_to_factor_toplevel(cell quot)
+{
+	if(!handler_added){
+		if(!AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)factor::exception_handler))
+			fatal_error("AddVectoredExceptionHandler failed", 0);
+		handler_added = 1;
+	}
+	c_to_factor(quot,this);
+ 	RemoveVectoredExceptionHandler((void *)factor::exception_handler);
+}
+
+void factor_vm::open_console()
 {
 }
 

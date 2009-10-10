@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2009 Slava Pestov.
+! Copyright (C) 2003, 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math.private ;
 IN: math
@@ -22,7 +22,12 @@ MATH: <  ( x y -- ? ) foldable
 MATH: <= ( x y -- ? ) foldable
 MATH: >  ( x y -- ? ) foldable
 MATH: >= ( x y -- ? ) foldable
+
 MATH: unordered? ( x y -- ? ) foldable
+MATH: u<  ( x y -- ? ) foldable
+MATH: u<= ( x y -- ? ) foldable
+MATH: u>  ( x y -- ? ) foldable
+MATH: u>= ( x y -- ? ) foldable
 
 M: object unordered? 2drop f ;
 

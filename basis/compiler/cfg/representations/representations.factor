@@ -1,8 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel fry accessors sequences assocs sets namespaces
-arrays combinators make locals deques dlists
-cpu.architecture compiler.utilities
+arrays combinators combinators.short-circuit math make locals
+deques dlists layouts byte-arrays cpu.architecture
+compiler.utilities
+compiler.constants
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.hats
@@ -22,28 +24,44 @@ ERROR: bad-conversion dst src dst-rep src-rep ;
 GENERIC: emit-box ( dst src rep -- )
 GENERIC: emit-unbox ( dst src rep -- )
 
-M: float-rep emit-box
-    drop
-    [ double-rep next-vreg-rep dup ] dip ##single>double-float
-    int-rep next-vreg-rep ##box-float ;
+M:: float-rep emit-box ( dst src rep -- )
+    double-rep next-vreg-rep :> temp
+    temp src ##single>double-float
+    dst temp double-rep emit-box ;
 
-M: float-rep emit-unbox
-    drop
-    [ double-rep next-vreg-rep dup ] dip ##unbox-float
-    ##double>single-float ;
+M:: float-rep emit-unbox ( dst src rep -- )
+    double-rep next-vreg-rep :> temp
+    temp src double-rep emit-unbox
+    dst temp ##double>single-float ;
 
 M: double-rep emit-box
     drop
-    int-rep next-vreg-rep ##box-float ;
+    [ drop 16 float int-rep next-vreg-rep ##allot ]
+    [ float-offset swap ##set-alien-double ]
+    2bi ;
 
 M: double-rep emit-unbox
-    drop ##unbox-float ;
+    drop float-offset ##alien-double ;
 
-M: vector-rep emit-box
-    int-rep next-vreg-rep ##box-vector ;
+M:: vector-rep emit-box ( dst src rep -- )
+    int-rep next-vreg-rep :> temp
+    dst 16 2 cells + byte-array int-rep next-vreg-rep ##allot
+    temp 16 tag-fixnum ##load-immediate
+    temp dst 1 byte-array tag-number ##set-slot-imm
+    dst byte-array-offset src rep ##set-alien-vector ;
 
 M: vector-rep emit-unbox
-    ##unbox-vector ;
+    [ byte-array-offset ] dip ##alien-vector ;
+
+M:: scalar-rep emit-box ( dst src rep -- )
+    int-rep next-vreg-rep :> temp
+    temp src rep ##scalar>integer
+    dst temp tag-bits get ##shl-imm ;
+
+M:: scalar-rep emit-unbox ( dst src rep -- )
+    int-rep next-vreg-rep :> temp
+    temp src tag-bits get ##sar-imm
+    dst temp rep ##integer>scalar ;
 
 : emit-conversion ( dst src dst-rep src-rep -- )
     {
@@ -87,9 +105,8 @@ SYMBOL: always-boxed
     H{ } clone [
         '[
             [
-                dup ##load-reference? [ drop ] [
-                    [ _ (compute-always-boxed) ] each-def-rep
-                ] if
+                dup [ ##load-reference? ] [ ##load-constant? ] bi or
+                [ drop ] [ [ _ (compute-always-boxed) ] each-def-rep ] if
             ] each-non-phi
         ] each-basic-block
     ] keep ;
@@ -135,6 +152,9 @@ SYMBOL: costs
 ! Insert conversions. This introduces new temporaries, so we need
 ! to rename opearands too.
 
+! Mapping from vreg,rep pairs to vregs
+SYMBOL: alternatives
+
 :: emit-def-conversion ( dst preferred required -- new-dst' )
     ! If an instruction defines a register with representation 'required',
     ! but the register has preferred representation 'preferred', then
@@ -147,7 +167,13 @@ SYMBOL: costs
     ! but the register has preferred representation 'preferred', then
     ! we rename the instruction's input to a new register, which
     ! becomes the output of a conversion instruction.
-    required next-vreg-rep [ src required preferred emit-conversion ] keep ;
+    preferred required eq? [ src ] [
+        src required alternatives get [
+            required next-vreg-rep :> new-src
+            [ new-src ] 2dip preferred emit-conversion
+            new-src
+        ] 2cache
+    ] if ;
 
 SYMBOLS: renaming-set needs-renaming? ;
 
@@ -200,6 +226,41 @@ SYMBOL: phi-mappings
 M: ##phi conversions-for-insn
     [ , ] [ [ inputs>> values ] [ dst>> ] bi phi-mappings get set-at ] bi ;
 
+! When a literal zeroes/ones vector is unboxed, we replace the ##load-reference
+! with a ##zero-vector or ##fill-vector instruction since this is more efficient.
+: convert-to-zero-vector? ( insn -- ? )
+    {
+        [ dst>> rep-of vector-rep? ]
+        [ obj>> B{ 0 0 0 0  0 0 0 0  0 0 0 0  0 0 0 0 } = ]
+    } 1&& ;
+: convert-to-fill-vector? ( insn -- ? )
+    {
+        [ dst>> rep-of vector-rep? ]
+        [ obj>> B{ 255 255 255 255  255 255 255 255  255 255 255 255  255 255 255 255 } = ]
+    } 1&& ;
+
+: (convert-to-zero/fill-vector) ( insn -- dst rep )
+    dst>> dup rep-of ; inline
+
+: conversions-for-load-insn ( insn -- ?insn )
+    {
+        {
+            [ dup convert-to-zero-vector? ]
+            [ (convert-to-zero/fill-vector) ##zero-vector f ]
+        }
+        {
+            [ dup convert-to-fill-vector? ]
+            [ (convert-to-zero/fill-vector) ##fill-vector f ]
+        }
+        [ ]
+    } cond ;
+
+M: ##load-reference conversions-for-insn
+    conversions-for-load-insn [ call-next-method ] when* ;
+
+M: ##load-constant conversions-for-insn
+    conversions-for-load-insn [ call-next-method ] when* ;
+
 M: vreg-insn conversions-for-insn
     [ compute-renaming-set ] [ perform-renaming ] bi ;
 
@@ -209,6 +270,7 @@ M: insn conversions-for-insn , ;
     dup kill-block? [ drop ] [
         [
             [
+                H{ } clone alternatives set
                 [ conversions-for-insn ] each
             ] V{ } make
         ] change-instructions drop

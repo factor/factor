@@ -2,18 +2,18 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations destructors io.files io.files.info
 io.backend kernel quotations system alien alien.accessors
-accessors vocabs.loader combinators alien.c-types
+accessors vocabs.loader combinators alien.c-types alien.data
 math ;
 IN: io.mmap
 
 TUPLE: mapped-file < disposable address handle length ;
 
-HOOK: (mapped-file-reader) os ( path length -- address handle )
-HOOK: (mapped-file-r/w) os ( path length -- address handle )
-
 ERROR: bad-mmap-size n ;
 
 <PRIVATE
+
+HOOK: (mapped-file-reader) os ( path length -- address handle )
+HOOK: (mapped-file-r/w) os ( path length -- address handle )
 
 : prepare-mapped-file ( path quot -- mapped-file path' length )
     [
@@ -25,10 +25,10 @@ ERROR: bad-mmap-size n ;
 PRIVATE>
 
 : <mapped-file-reader> ( path -- mmap )
-    [ (mapped-file-reader) ] prepare-mapped-file ;
+    [ (mapped-file-reader) ] prepare-mapped-file ; inline
 
 : <mapped-file> ( path -- mmap )
-    [ (mapped-file-r/w) ] prepare-mapped-file ;
+    [ (mapped-file-r/w) ] prepare-mapped-file ; inline
 
 : <mapped-array> ( mmap c-type -- direct-array )
     [ [ address>> ] [ length>> ] bi ] dip
@@ -44,6 +44,19 @@ M: mapped-file dispose* ( mmap -- ) close-mapped-file ;
 
 : with-mapped-file-reader ( path quot -- )
     [ <mapped-file-reader> ] dip with-disposal ; inline
+
+<PRIVATE
+
+: (with-mapped-array) ( c-type quot -- )
+    [ [ <mapped-array> ] curry ] dip compose with-disposal ; inline
+
+PRIVATE>
+
+: with-mapped-array ( path c-type quot -- )
+    [ <mapped-file> ] 2dip (with-mapped-array) ; inline
+
+: with-mapped-array-reader ( path c-type quot -- )
+    [ <mapped-file-reader> ] 2dip (with-mapped-array) ; inline
 
 {
     { [ os unix? ] [ "io.mmap.unix" require ] }

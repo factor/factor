@@ -8,18 +8,20 @@ $nl
 "Words defined in a compilation unit may not be called until the compilation unit is finished. The parser detects this case for parsing words and throws a " { $link staging-violation } "; calling any other word from within its own compilation unit throws an " { $link undefined } " error."
 $nl
 "The parser groups all definitions in a source file into one compilation unit, and parsing words do not need to concern themselves with compilation units. However, if definitions are being created at run time, a compilation unit must be created explicitly:"
-{ $subsection with-compilation-unit }
+{ $subsections with-compilation-unit }
 "Compiling a set of words:"
-{ $subsection compile }
+{ $subsections compile }
 "Words called to associate a definition with a compilation unit and a source file location:"
-{ $subsection remember-definition }
-{ $subsection remember-class }
+{ $subsections
+    remember-definition
+    remember-class
+}
 "Forward reference checking (see " { $link "definition-checking" } "):"
-{ $subsection forward-reference? }
+{ $subsections forward-reference? }
 "A hook to be called at the end of the compilation unit. If the optimizing compiler is loaded, this compiles new words with the " { $link "compiler" } ":"
-{ $subsection recompile }
+{ $subsections recompile }
 "Low-level compiler interface exported by the Factor VM:"
-{ $subsection modify-code-heap } ;
+{ $subsections modify-code-heap } ;
 
 ABOUT: "compilation-units"
 

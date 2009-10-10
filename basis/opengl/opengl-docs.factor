@@ -72,23 +72,28 @@ ARTICLE: "gl-utilities" "OpenGL utility words"
 "The " { $vocab-link "opengl" } " vocabulary implements some utility words to give OpenGL a more Factor-like feel."
 $nl
 "The " { $vocab-link "opengl.gl" } " and " { $vocab-link "opengl.glu" } " vocabularies have the actual OpenGL bindings."
-{ $subsection "opengl-low-level" }
+{ $subsections "opengl-low-level" }
 "Error reporting:"
-{ $subsection gl-error }
+{ $subsections gl-error }
 "Wrappers:"
-{ $subsection gl-color }
-{ $subsection gl-translate }
-{ $subsection bind-texture-unit }
+{ $subsections
+    gl-color
+    gl-translate
+    bind-texture-unit
+}
 "Combinators:"
-{ $subsection do-enabled }
-{ $subsection do-attribs }
-{ $subsection do-matrix }
-{ $subsection with-translation }
-{ $subsection make-dlist }
+{ $subsections
+    do-enabled
+    do-attribs
+    do-matrix
+    with-translation
+    make-dlist
+}
 "Rendering geometric shapes:"
-{ $subsection gl-line }
-{ $subsection gl-fill-rect }
-{ $subsection gl-rect }
-;
+{ $subsections
+    gl-line
+    gl-fill-rect
+    gl-rect
+} ;
 
 ABOUT: "gl-utilities"

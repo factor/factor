@@ -23,6 +23,7 @@ typedef char symbol_char;
 #define STRNCMP strncmp
 #define STRDUP strdup
 
+#define FTELL ftello
 #define FSEEK fseeko
 
 #define FIXNUM_FORMAT "%ld"
@@ -42,12 +43,10 @@ typedef char symbol_char;
 
 #define print_native_string(string) print_string(string)
 
-void start_thread(void *(*start_routine)(void *));
+typedef pthread_t THREADHANDLE;
 
-void init_ffi();
-void ffi_dlopen(dll *dll);
-void *ffi_dlsym(dll *dll, symbol_char *symbol);
-void ffi_dlclose(dll *dll);
+THREADHANDLE start_thread(void *(*start_routine)(void *),void *args);
+inline static THREADHANDLE thread_id() { return pthread_self(); }
 
 void unix_init_signals();
 void signal_handler(int signal, siginfo_t* siginfo, void* uap);
@@ -56,6 +55,10 @@ void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap);
 s64 current_micros();
 void sleep_micros(cell usec);
 
+void init_platform_globals();
+
+void register_vm_with_thread(factor_vm *vm);
+factor_vm *tls_vm();
 void open_console();
 
 }

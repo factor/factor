@@ -46,9 +46,9 @@ $nl
 "Factor macros are similar to Lisp macros; they are not like C preprocessor macros."
 $nl
 "Defining new macros:"
-{ $subsection POSTPONE: MACRO: }
+{ $subsections POSTPONE: MACRO: }
 "A slightly lower-level facility, " { $emphasis "compiler transforms" } ", allows an ordinary word definition to co-exist with a version that performs compile-time expansion."
-{ $subsection define-transform }
+{ $subsections define-transform }
 "An example is the " { $link member? } " word. If the input sequence is a literal, the compile transform kicks in and converts the " { $link member? } " call into a series of conditionals. Otherwise, if the input sequence is not literal, a call to the definition of " { $link member? } " is generated."
 { $see-also "generalizations" "fry" } ;
 

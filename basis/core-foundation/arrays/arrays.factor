@@ -1,6 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax kernel sequences fry ;
+USING: alien.c-types alien.syntax core-foundation kernel
+sequences fry ;
 IN: core-foundation.arrays
 
 TYPEDEF: void* CFArrayRef

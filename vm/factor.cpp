@@ -3,7 +3,15 @@
 namespace factor
 {
 
-VM_C_API void default_parameters(vm_parameters *p)
+factor_vm *vm;
+unordered_map<THREADHANDLE, factor_vm*> thread_vms;
+
+void init_globals()
+{
+	init_platform_globals();
+}
+
+void factor_vm::default_parameters(vm_parameters *p)
 {
 	p->image_path = NULL;
 
@@ -13,7 +21,6 @@ VM_C_API void default_parameters(vm_parameters *p)
 	p->ds_size = 8 * sizeof(cell);
 	p->rs_size = 8 * sizeof(cell);
 
-	p->gen_count = 2;
 	p->code_size = 4;
 	p->young_size = 1;
 	p->aging_size = 1;
@@ -22,7 +29,6 @@ VM_C_API void default_parameters(vm_parameters *p)
 	p->ds_size = 32 * sizeof(cell);
 	p->rs_size = 32 * sizeof(cell);
 
-	p->gen_count = 3;
 	p->code_size = 8 * sizeof(cell);
 	p->young_size = sizeof(cell) / 4;
 	p->aging_size = sizeof(cell) / 2;
@@ -37,13 +43,15 @@ VM_C_API void default_parameters(vm_parameters *p)
 #ifdef WINDOWS
 	p->console = false;
 #else
-	p->console = true;
+	if (this == vm)
+		p->console = true;
+	else		
+		p->console = false;
+	
 #endif
-
-	p->stack_traces = true;
 }
 
-static bool factor_arg(const vm_char* str, const vm_char* arg, cell* value)
+bool factor_vm::factor_arg(const vm_char* str, const vm_char* arg, cell* value)
 {
 	int val;
 	if(SSCANF(str,arg,&val) > 0)
@@ -55,7 +63,7 @@ static bool factor_arg(const vm_char* str, const vm_char* arg, cell* value)
 		return false;
 }
 
-VM_C_API void init_parameters_from_args(vm_parameters *p, int argc, vm_char **argv)
+void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **argv)
 {
 	default_parameters(p);
 	p->executable_path = argv[0];
@@ -66,7 +74,6 @@ VM_C_API void init_parameters_from_args(vm_parameters *p, int argc, vm_char **ar
 	{
 		if(factor_arg(argv[i],STRING_LITERAL("-datastack=%d"),&p->ds_size));
 		else if(factor_arg(argv[i],STRING_LITERAL("-retainstack=%d"),&p->rs_size));
-		else if(factor_arg(argv[i],STRING_LITERAL("-generations=%d"),&p->gen_count));
 		else if(factor_arg(argv[i],STRING_LITERAL("-young=%d"),&p->young_size));
 		else if(factor_arg(argv[i],STRING_LITERAL("-aging=%d"),&p->aging_size));
 		else if(factor_arg(argv[i],STRING_LITERAL("-tenured=%d"),&p->tenured_size));
@@ -76,12 +83,11 @@ VM_C_API void init_parameters_from_args(vm_parameters *p, int argc, vm_char **ar
 		else if(STRCMP(argv[i],STRING_LITERAL("-fep")) == 0) p->fep = true;
 		else if(STRNCMP(argv[i],STRING_LITERAL("-i="),3) == 0) p->image_path = argv[i] + 3;
 		else if(STRCMP(argv[i],STRING_LITERAL("-console")) == 0) p->console = true;
-		else if(STRCMP(argv[i],STRING_LITERAL("-no-stack-traces")) == 0) p->stack_traces = false;
 	}
 }
 
 /* Do some initialization that we do once only */
-static void do_stage1_init()
+void factor_vm::do_stage1_init()
 {
 	print_string("*** Stage 2 early init... ");
 	fflush(stdout);
@@ -93,7 +99,7 @@ static void do_stage1_init()
 	fflush(stdout);
 }
 
-VM_C_API void init_factor(vm_parameters *p)
+void factor_vm::init_factor(vm_parameters *p)
 {
 	/* Kilobytes */
 	p->ds_size = align_page(p->ds_size << 10);
@@ -143,26 +149,24 @@ VM_C_API void init_factor(vm_parameters *p)
 	gc_off = false;
 
 	if(userenv[STAGE2_ENV] == F)
-	{
-		userenv[STACK_TRACES_ENV] = tag_boolean(p->stack_traces);
 		do_stage1_init();
-	}
 }
 
 /* May allocate memory */
-VM_C_API void pass_args_to_factor(int argc, vm_char **argv)
+void factor_vm::pass_args_to_factor(int argc, vm_char **argv)
 {
-	growable_array args;
+	growable_array args(this);
 	int i;
 
-	for(i = 1; i < argc; i++)
+	for(i = 1; i < argc; i++){
 		args.add(allot_alien(F,(cell)argv[i]));
+	}
 
 	args.trim();
 	userenv[ARGS_ENV] = args.elements.value();
 }
 
-static void start_factor(vm_parameters *p)
+void factor_vm::start_factor(vm_parameters *p)
 {
 	if(p->fep) factorbug();
 
@@ -171,13 +175,30 @@ static void start_factor(vm_parameters *p)
 	unnest_stacks();
 }
 
-VM_C_API void start_embedded_factor(vm_parameters *p)
+char *factor_vm::factor_eval_string(char *string)
 {
-	userenv[EMBEDDED_ENV] = T;
-	start_factor(p);
+	char *(*callback)(char *) = (char *(*)(char *))alien_offset(userenv[EVAL_CALLBACK_ENV]);
+	return callback(string);
 }
 
-VM_C_API void start_standalone_factor(int argc, vm_char **argv)
+void factor_vm::factor_eval_free(char *result)
+{
+	free(result);
+}
+
+void factor_vm::factor_yield()
+{
+	void (*callback)() = (void (*)())alien_offset(userenv[YIELD_CALLBACK_ENV]);
+	callback();
+}
+
+void factor_vm::factor_sleep(long us)
+{
+	void (*callback)(long) = (void (*)(long))alien_offset(userenv[SLEEP_CALLBACK_ENV]);
+	callback(us);
+}
+
+void factor_vm::start_standalone_factor(int argc, vm_char **argv)
 {
 	vm_parameters p;
 	default_parameters(&p);
@@ -187,27 +208,43 @@ VM_C_API void start_standalone_factor(int argc, vm_char **argv)
 	start_factor(&p);
 }
 
-VM_C_API char *factor_eval_string(char *string)
+struct startargs {
+	int argc;
+	vm_char **argv;
+};
+
+factor_vm *new_factor_vm()
 {
-	char *(*callback)(char *) = (char *(*)(char *))alien_offset(userenv[EVAL_CALLBACK_ENV]);
-	return callback(string);
+	factor_vm *newvm = new factor_vm();
+	register_vm_with_thread(newvm);
+	thread_vms[thread_id()] = newvm;
+
+	return newvm;
 }
 
-VM_C_API void factor_eval_free(char *result)
+// arg must be new'ed because we're going to delete it!
+void* start_standalone_factor_thread(void *arg) 
 {
-	free(result);
+	factor_vm *newvm = new_factor_vm();
+	startargs *args = (startargs*) arg;
+	int argc = args->argc; vm_char **argv = args->argv;
+	delete args;
+	newvm->start_standalone_factor(argc, argv);
+	return 0;
 }
 
-VM_C_API void factor_yield()
+VM_C_API void start_standalone_factor(int argc, vm_char **argv)
 {
-	void (*callback)() = (void (*)())alien_offset(userenv[YIELD_CALLBACK_ENV]);
-	callback();
+	factor_vm *newvm = new_factor_vm();
+	vm = newvm;
+	return newvm->start_standalone_factor(argc,argv);
 }
 
-VM_C_API void factor_sleep(long us)
+VM_C_API THREADHANDLE start_standalone_factor_in_new_thread(int argc, vm_char **argv)
 {
-	void (*callback)(long) = (void (*)(long))alien_offset(userenv[SLEEP_CALLBACK_ENV]);
-	callback(us);
+	startargs *args = new startargs;
+	args->argc = argc; args->argv = argv; 
+	return start_thread(start_standalone_factor_thread,args);
 }
 
 }

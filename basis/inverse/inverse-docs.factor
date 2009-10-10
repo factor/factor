@@ -50,14 +50,18 @@ HELP: switch
 
 ARTICLE: { "inverse" "intro" } "Invertible quotations"
 "The inverse vocab defines a way to 'undo' quotations, and builds a pattern matching framework on that basis. A quotation can be inverted by reversing it and inverting each word. To define the inverse for particular word, use"
-{ $subsection define-inverse }
-{ $subsection define-pop-inverse }
+{ $subsections
+    define-inverse
+    define-pop-inverse
+}
 "To build an inverse quotation"
-{ $subsection [undo] }
+{ $subsections [undo] }
 "To use the inverse quotation for pattern matching"
-{ $subsection undo }
-{ $subsection matches? }
-{ $subsection switch } ;
+{ $subsections
+    undo
+    matches?
+    switch
+} ;
 
 IN: inverse
 ABOUT: { "inverse" "intro" }

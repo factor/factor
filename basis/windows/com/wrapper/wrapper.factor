@@ -1,9 +1,9 @@
-USING: alien alien.c-types alien.accessors windows.com.syntax
-init windows.com.syntax.private windows.com continuations kernel
-namespaces windows.ole32 libc vocabs assocs accessors arrays
-sequences quotations combinators math words compiler.units
-destructors fry math.parser generalizations sets
-specialized-arrays windows.kernel32 classes.struct ;
+USING: alien alien.c-types alien.data alien.accessors
+windows.com.syntax init windows.com.syntax.private windows.com
+continuations kernel namespaces windows.ole32 libc vocabs
+assocs accessors arrays sequences quotations combinators math
+words compiler.units destructors fry math.parser generalizations
+sets specialized-arrays windows.kernel32 classes.struct ;
 SPECIALIZED-ARRAY: void*
 IN: windows.com.wrapper
 
@@ -52,13 +52,13 @@ unless
         swap GUID memory>struct
         _ case
         [
-            "void*" heap-size * rot <displaced-alien> com-add-ref
+            void* heap-size * rot <displaced-alien> com-add-ref
             swap 0 set-alien-cell S_OK
         ] [ nip f swap 0 set-alien-cell E_NOINTERFACE ] if*
     ] ;
 
 : (make-add-ref) ( interfaces -- quot )
-    length "void*" heap-size * '[
+    length void* heap-size * '[
         _
         [ alien-unsigned-4 1 + dup ]
         [ set-alien-unsigned-4 ]
@@ -66,7 +66,7 @@ unless
     ] ;
 
 : (make-release) ( interfaces -- quot )
-    length "void*" heap-size * '[
+    length void* heap-size * '[
         _
         [ drop ]
         [ alien-unsigned-4 1 - dup ]
@@ -84,7 +84,7 @@ unless
 : (thunk) ( n -- quot )
     dup 0 =
     [ drop [ ] ]
-    [ "void*" heap-size neg * '[ _ swap <displaced-alien> ] ]
+    [ void* heap-size neg * '[ _ swap <displaced-alien> ] ]
     if ;
 
 : (thunked-quots) ( quots iunknown-methods thunk -- {thunk,quot}s )
@@ -97,15 +97,15 @@ unless
     [ [ (( -- alien )) define-declared ] pick [ call ] dip ]
     with-compilation-unit ;
 
-: (callback-word) ( function-name interface-name counter -- word )
-    [ "::" rot 3append "-callback-" ] dip number>string 3append
+: (callback-word) ( function-name interface counter -- word )
+    [ name>> "::" rot 3append "-callback-" ] dip number>string 3append
     "windows.com.wrapper.callbacks" create ;
 
 : (finish-thunk) ( param-count thunk quot -- thunked-quot )
     [ [ drop [ ] ] [ swap 1 - '[ _ _ ndip ] ] if-empty ]
     dip compose ;
 
-: (make-interface-callbacks) ( interface-name quots iunknown-methods n -- words )
+: (make-interface-callbacks) ( interface quots iunknown-methods n -- words )
     (thunk) (thunked-quots)
     swap [ find-com-interface-definition family-tree-functions ]
     keep (next-vtbl-counter) '[
@@ -128,8 +128,8 @@ unless
     curry map-index ;
 
 : (malloc-wrapped-object) ( wrapper -- wrapped-object )
-    vtbls>> length "void*" heap-size *
-    [ "ulong" heap-size + malloc ] keep
+    vtbls>> length void* heap-size *
+    [ ulong heap-size + malloc ] keep
     [ [ 1 ] 2dip set-alien-unsigned-4 ] [ drop ] 2bi ;
 
 : (callbacks>vtbl) ( callbacks -- vtbl )

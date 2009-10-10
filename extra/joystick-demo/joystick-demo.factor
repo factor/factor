@@ -1,6 +1,6 @@
 USING: ui ui.gadgets sequences kernel arrays math colors
 colors.constants ui.render ui.pens.polygon ui.pens.solid math.vectors
-accessors fry ui.gadgets.packs game-input ui.gadgets.labels
+accessors fry ui.gadgets.packs game.input ui.gadgets.labels
 ui.gadgets.borders alarms calendar locals strings ui.gadgets.buttons
 combinators math.parser assocs threads ;
 IN: joystick-demo

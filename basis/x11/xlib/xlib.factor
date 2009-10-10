@@ -10,9 +10,10 @@
 ! add to this library and are wondering what part of the file to
 ! modify, just find the function or data structure in the manual
 ! and note the section.
-USING: accessors kernel arrays alien alien.c-types alien.strings
-alien.syntax classes.struct math math.bitwise words sequences
-namespaces continuations io io.encodings.ascii x11.syntax ;
+USING: accessors kernel arrays alien alien.c-types alien.data
+alien.strings alien.syntax classes.struct math math.bitwise words
+sequences namespaces continuations io io.encodings.ascii x11.syntax ;
+FROM: alien.c-types => short ;
 IN: x11.xlib
 
 LIBRARY: xlib
@@ -30,12 +31,12 @@ TYPEDEF: XID KeySym
 TYPEDEF: ulong Atom
 
 TYPEDEF: char* XPointer
-TYPEDEF: void* Screen*
+C-TYPE: Screen
 TYPEDEF: void* GC
-TYPEDEF: void* Visual*
-TYPEDEF: void* XExtData*
-TYPEDEF: void* XFontProp*
-TYPEDEF: void* XComposeStatus*
+C-TYPE: Visual
+C-TYPE: XExtData
+C-TYPE: XFontProp
+C-TYPE: XComposeStatus
 TYPEDEF: void* XIM
 TYPEDEF: void* XIC
 
@@ -45,9 +46,6 @@ TYPEDEF: int Bool
 
 TYPEDEF: ulong VisualID
 TYPEDEF: ulong Time
-
-TYPEDEF: void* Window**
-TYPEDEF: void* Atom**
 
 ALIAS: <XID> <ulong>
 ALIAS: <Window> <XID>
@@ -409,10 +407,6 @@ STRUCT: XCharStruct
 { descent short }
 { attributes ushort } ;
 
-X-FUNCTION: Font XLoadFont ( Display* display, char* name ) ;
-X-FUNCTION: XFontStruct* XQueryFont ( Display* display, XID font_ID ) ;
-X-FUNCTION: XFontStruct* XLoadQueryFont ( Display* display, char* name ) ;
-
 STRUCT: XFontStruct
 { ext_data XExtData* }
 { fid Font }
@@ -430,6 +424,10 @@ STRUCT: XFontStruct
 { per_char XCharStruct* }
 { ascent int }
 { descent int } ;
+
+X-FUNCTION: Font XLoadFont ( Display* display, char* name ) ;
+X-FUNCTION: XFontStruct* XQueryFont ( Display* display, XID font_ID ) ;
+X-FUNCTION: XFontStruct* XLoadQueryFont ( Display* display, char* name ) ;
 
 X-FUNCTION: int XTextWidth ( XFontStruct* font_struct, char* string, int count ) ;
 

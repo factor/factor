@@ -1,4 +1,7 @@
-USING: accessors math math.bitwise tools.test kernel words ;
+USING: accessors math math.bitwise tools.test kernel words
+specialized-arrays alien.c-types math.vectors.simd
+sequences destructors libc ;
+SPECIALIZED-ARRAY: int
 IN: math.bitwise.tests
 
 [ 0 ] [ 1 0 0 bitroll ] unit-test
@@ -37,3 +40,23 @@ CONSTANT: b 2
 [ 4 ] [ BIN: 1010101 bit-count ] unit-test
 [ 0 ] [ BIN: 0 bit-count ] unit-test
 [ 1 ] [ BIN: 1 bit-count ] unit-test
+
+SIMD: uint
+SPECIALIZED-ARRAY: uint
+SPECIALIZED-ARRAY: uint-4
+
+[ 1 ] [ uint-4{ 1 0 0 0 } bit-count ] unit-test
+
+[ 1 ] [
+    [
+        2 malloc-int-array &free 1 0 pick set-nth bit-count
+    ] with-destructors
+] unit-test
+
+[ 1 ] [ B{ 1 0 0 } bit-count ] unit-test
+[ 3 ] [ B{ 1 1 1 } bit-count ] unit-test
+
+[ t ] [ BIN: 0 even-parity? ] unit-test
+[ f ] [ BIN: 1 even-parity? ] unit-test
+[ f ] [ BIN: 0 odd-parity? ] unit-test
+[ t ] [ BIN: 1 odd-parity? ] unit-test

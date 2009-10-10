@@ -12,13 +12,17 @@ HELP: define-symbol
 
 ARTICLE: "words.symbol" "Symbols"
 "A symbol pushes itself on the stack when executed. By convention, symbols are used as variable names (" { $link "namespaces" } ")."
-{ $subsection symbol }
-{ $subsection symbol? }
+{ $subsections
+    symbol
+    symbol?
+}
 "Defining symbols at parse time:"
-{ $subsection POSTPONE: SYMBOL: }
-{ $subsection POSTPONE: SYMBOLS: }
+{ $subsections
+    POSTPONE: SYMBOL:
+    POSTPONE: SYMBOLS:
+}
 "Defining symbols at run time:"
-{ $subsection define-symbol }
+{ $subsections define-symbol }
 "Symbols are just compound definitions in disguise. The following two lines are equivalent:"
 { $code
     "SYMBOL: foo"

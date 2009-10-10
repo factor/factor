@@ -61,14 +61,16 @@ $nl
 "A detailed description of the algorithm, along with implementations in various languages, can be at in " { $url "http://www.tartarus.org/~martin/PorterStemmer" } "."
 $nl
 "The main word of the algorithm takes an English word as input and outputs its stem:"
-{ $subsection stem }
+{ $subsections stem }
 "The algorithm consists of a number of steps:"
-{ $subsection step1a }
-{ $subsection step1b }
-{ $subsection step1c }
-{ $subsection step2 }
-{ $subsection step3 }
-{ $subsection step4 }
-{ $subsection step5 } ;
+{ $subsections
+    step1a
+    step1b
+    step1c
+    step2
+    step3
+    step4
+    step5
+} ;
 
 ABOUT: "porter-stemmer"

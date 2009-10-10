@@ -53,9 +53,7 @@ CONSTANT: theme-path "basis/ui/gadgets/theme/"
     ] { } make ;
 
 : staging-image-name ( profile -- name )
-    "staging."
-    swap strip-word-names? [ "strip" suffix ] when
-    "-" join ".image" 3append temp-file ;
+    "-" join "staging." ".image" surround temp-file ;
 
 DEFER: ?make-staging-image
 
@@ -72,7 +70,6 @@ DEFER: ?make-staging-image
         ] if
         "-output-image=" over staging-image-name append ,
         "-include=" swap " " join append ,
-        strip-word-names? [ "-no-stack-traces" , ] when
         "-no-user-init" ,
     ] { } make ;
 
@@ -102,7 +99,6 @@ DEFER: ?make-staging-image
             [ "-deploy-vocab=" prepend , ]
             [ make-deploy-config "-deploy-config=" prepend , ] bi
             "-output-image=" prepend ,
-            strip-word-names? [ "-no-stack-traces" , ] when
         ] { } make
     ] bind ;
 

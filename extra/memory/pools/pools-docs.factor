@@ -68,9 +68,11 @@ HELP: set-class-pool
 
 ARTICLE: "memory.pools" "Pools"
 "The " { $vocab-link "memory.pools" } " vocabulary provides " { $link pool } " objects which manage preallocated collections of objects."
-{ $subsection pool }
-{ $subsection POSTPONE: POOL: }
-{ $subsection new-from-pool }
-{ $subsection free-to-pool } ;
+{ $subsections
+    pool
+    POSTPONE: POOL:
+    new-from-pool
+    free-to-pool
+} ;
 
 ABOUT: "memory.pools"

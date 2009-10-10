@@ -4,36 +4,40 @@ USING: help.syntax help.markup ;
 IN: opengl.gl
 
 ARTICLE: "opengl-low-level" "OpenGL binding"
-  { $subsection "opengl-specifying-vertices" }
-  { $subsection "opengl-geometric-primitives" }
-  { $subsection "opengl-modeling-transformations" } ;
+{ $subsections
+    "opengl-specifying-vertices"
+    "opengl-geometric-primitives"
+    "opengl-modeling-transformations"
+} ;
 
 ARTICLE: "opengl-specifying-vertices" "Specifying vertices"
+{ $subsections
+    glVertex2d
+    glVertex2f
+    glVertex2i
+    glVertex2s
+    glVertex3d
+    glVertex3f
+    glVertex3i
+    glVertex3s
+    glVertex4d
+    glVertex4f
+    glVertex4i
+    glVertex4s
+    glVertex2dv
+    glVertex2fv
+    glVertex2iv
+    glVertex2sv
+    glVertex3dv
+    glVertex3fv
+    glVertex3iv
+    glVertex3sv
+    glVertex4dv
+    glVertex4fv
+    glVertex4iv
+    glVertex4sv
+} ;
 
-  { $subsection glVertex2d }
-  { $subsection glVertex2f }
-  { $subsection glVertex2i }
-  { $subsection glVertex2s }
-  { $subsection glVertex3d }
-  { $subsection glVertex3f }
-  { $subsection glVertex3i }
-  { $subsection glVertex3s }
-  { $subsection glVertex4d }
-  { $subsection glVertex4f }
-  { $subsection glVertex4i }
-  { $subsection glVertex4s }
-  { $subsection glVertex2dv }
-  { $subsection glVertex2fv }
-  { $subsection glVertex2iv }
-  { $subsection glVertex2sv }
-  { $subsection glVertex3dv }
-  { $subsection glVertex3fv }
-  { $subsection glVertex3iv }
-  { $subsection glVertex3sv }
-  { $subsection glVertex4dv }
-  { $subsection glVertex4fv }
-  { $subsection glVertex4iv }
-  { $subsection glVertex4sv } ;
 
 ARTICLE: "opengl-geometric-primitives" "OpenGL geometric primitives"
 
@@ -71,12 +75,14 @@ HELP: glPolygonMode
                          { $link GL_FILL } } } } } ;
 
 ARTICLE: "opengl-modeling-transformations" "Modeling transformations"
-  { $subsection glTranslatef }
-  { $subsection glTranslated }
-  { $subsection glRotatef }
-  { $subsection glRotated }
-  { $subsection glScalef }
-  { $subsection glScaled } ;
+{ $subsections
+    glTranslatef
+    glTranslated
+    glRotatef
+    glRotated
+    glScalef
+    glScaled
+} ;
 
 
 { glTranslatef glTranslated glRotatef glRotated glScalef glScaled }

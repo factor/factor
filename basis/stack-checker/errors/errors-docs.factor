@@ -1,14 +1,43 @@
 USING: help.markup help.syntax kernel effects sequences
-sequences.private words ;
+sequences.private words combinators ;
 IN: stack-checker.errors
+
+HELP: do-not-compile
+{ $error-description "Thrown when inference encounters a macro being applied to a value which is not known to be a literal. Such code needs changes before it can compile and run. See " { $link "inference-combinators" } " and " { $link "inference-escape" } " for details." }
+{ $examples
+    "In this example, " { $link cleave } " is being applied to an array that is constructed on the fly. This is not allowed and fails to compile with a " { $link do-not-compile } " error:"
+    { $code
+        ": cannot-compile-call-example ( x -- y z )"
+        "    [ 1 + ] [ 1 - ] 2array cleave ;"
+    }
+} ;
 
 HELP: literal-expected
 { $error-description "Thrown when inference encounters a combinator or macro being applied to a value which is not known to be a literal, or constructed in a manner which can be analyzed statically. Such code needs changes before it can compile and run. See " { $link "inference-combinators" } " and " { $link "inference-escape" } " for details." }
 { $examples
-    "In this example, words calling " { $snippet "literal-expected-example" } " will have a static stac keffect, even if " { $snippet "literal-expected-example" } " does not:"
+    "In this example, the words being defined cannot be called, because they fail to compile with a " { $link literal-expected } " error:"
     { $code
-        ": literal-expected-example ( quot -- )"
+        ": bad-example ( quot -- )"
+        "    [ call ] [ call ] bi ;"
+        ""
+        ": usage ( -- )"
+        "    10 [ 2 * ] bad-example . ;"
+    }
+    "One fix is to declare the combinator as inline:"
+    { $code
+        ": good-example ( quot -- )"
         "    [ call ] [ call ] bi ; inline"
+        ""
+        ": usage ( -- )"
+        "    10 [ 2 * ] good-example . ;"
+    }
+    "Another fix is to use " { $link POSTPONE: call( } ":"
+    { $code
+        ": good-example ( quot -- )"
+        "    [ call( x -- y ) ] [ call( x -- y ) ] bi ;"
+        ""
+        ": usage ( -- )"
+        "    10 [ 2 * ] good-example . ;"
     }
 } ;
 
@@ -89,21 +118,28 @@ ARTICLE: "inference-errors" "Stack checker errors"
     { { $link "tools.inference" } " throws them as errors" }
     { "The " { $link "compiler" } " reports them via " { $link "tools.errors" } }
 }
-"Error thrown when insufficient information is available to calculate the stack effect of a combinator call (see " { $link "inference-combinators" } "):"
-{ $subsection literal-expected }
+"Errors thrown when insufficient information is available to calculate the stack effect of a call to a combinator or macro (see " { $link "inference-combinators" } "):"
+{ $subsections
+    do-not-compile
+    literal-expected
+}
 "Error thrown when a word's stack effect declaration does not match the composition of the stack effects of its factors:"
-{ $subsection effect-error }
+{ $subsections effect-error }
 "Error thrown when branches have incompatible stack effects (see " { $link "inference-branches" } "):"
-{ $subsection unbalanced-branches-error }
+{ $subsections unbalanced-branches-error }
 "Inference errors for inline recursive words (see " { $link "inference-recursive-combinators" } "):"
-{ $subsection undeclared-recursion-error }
-{ $subsection diverging-recursion-error }
-{ $subsection unbalanced-recursion-error }
-{ $subsection inconsistent-recursive-call-error }
+{ $subsections
+    undeclared-recursion-error
+    diverging-recursion-error
+    unbalanced-recursion-error
+    inconsistent-recursive-call-error
+}
 "More obscure errors that are unlikely to arise in ordinary code:"
-{ $subsection recursive-quotation-error }
-{ $subsection too-many->r }
-{ $subsection too-many-r> }
-{ $subsection missing-effect } ;
+{ $subsections
+    recursive-quotation-error
+    too-many->r
+    too-many-r>
+    missing-effect
+} ;
 
 ABOUT: "inference-errors"

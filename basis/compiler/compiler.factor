@@ -44,8 +44,11 @@ SYMBOL: compiled
     dup recompile-callers?
     [ compiled-usage keys [ queue-compile ] each ] [ drop ] if ;
 
+: compiler-message ( string -- )
+    "trace-compilation" get [ global [ print flush ] bind ] [ drop ] if ;
+
 : start ( word -- )
-    "trace-compilation" get [ dup name>> print flush ] when
+    dup name>> compiler-message
     H{ } clone dependencies set
     H{ } clone generic-dependencies set
     clear-compiler-error ;
@@ -194,7 +197,7 @@ M: optimizing-compiler recompile ( words -- alist )
         compile-queue get compile-loop
         compiled get >alist
     ] with-scope
-    "trace-compilation" get [ "--- compile done" print flush ] when ;
+    "--- compile done" compiler-message ;
 
 : with-optimizer ( quot -- )
     [ optimizing-compiler compiler-impl ] dip with-variable ; inline

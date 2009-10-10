@@ -24,7 +24,7 @@ HELP: compile-attr
 { $description "Compiles code which pushes an attribute value previously extracted by " { $link required-attr } " or " { $link optional-attr } " on the stack. If the attribute value begins with " { $snippet "@" } ", compiles into code which pushes the a form value." } ;
 
 HELP: CHLOE:
-{ $syntax "name definition... ;" }
+{ $syntax "CHLOE: name definition... ;" }
 { $values { "name" "the tag name" } { "definition" { $quotation "( tag -- )" } } }
 { $description "Defines compilation semantics for the Chloe tag named " { $snippet "tag" } ". The definition body receives a " { $link tag } " on the stack." } ;
 
@@ -174,10 +174,12 @@ $nl
     "    ..."
     "</t:chloe>"
 }
-{ $subsection "html.templates.chloe.tags.component" }
-{ $subsection "html.templates.chloe.tags.boilerplate" }
-{ $subsection "html.templates.chloe.tags.control" }
-{ $subsection "html.templates.chloe.tags.form" } ;
+{ $subsections
+    "html.templates.chloe.tags.component"
+    "html.templates.chloe.tags.boilerplate"
+    "html.templates.chloe.tags.control"
+    "html.templates.chloe.tags.form"
+} ;
 
 ARTICLE: "html.templates.chloe.extend" "Extending Chloe"
 "The " { $vocab-link "html.templates.chloe.syntax" } " and " { $vocab-link "html.templates.chloe.compiler" } " vocabularies contain the heart of the Chloe implementation."
@@ -185,29 +187,37 @@ $nl
 "Chloe is implemented as a compiler which converts XML templates into Factor quotations. The template only has to be parsed and compiled once, and not on every HTTP request. This helps improve performance and memory usage."
 $nl
 "These vocabularies provide various hooks by which Chloe can be extended. First of all, new " { $link "html.components" } " can be wired in. If further flexibility is needed, entirely new tags can be defined by hooking into the Chloe compiler."
-{ $subsection "html.templates.chloe.extend.components" }
-{ $subsection "html.templates.chloe.extend.tags" } ;
+{ $subsections
+    "html.templates.chloe.extend.components"
+    "html.templates.chloe.extend.tags"
+} ;
 
 ARTICLE: "html.templates.chloe.extend.tags" "Extending Chloe with custom tags"
 "Syntax for defining custom tags:"
-{ $subsection POSTPONE: CHLOE: }
+{ $subsections POSTPONE: CHLOE: }
 "A number of compiler words can be used from the " { $link POSTPONE: CHLOE: } " body to emit compiled template code."
 $nl
 "Extracting attributes from the XML tag:"
-{ $subsection required-attr }
-{ $subsection optional-attr }
-{ $subsection compile-attr }
+{ $subsections
+    required-attr
+    optional-attr
+    compile-attr
+}
 "Examining tag nesting:"
-{ $subsection tag-stack }
+{ $subsections tag-stack }
 "Generating code for printing strings and calling quotations:"
-{ $subsection [write] }
-{ $subsection [code] }
+{ $subsections
+    [write]
+    [code]
+}
 "Generating code from child elements:"
-{ $subsection process-children }
-{ $subsection compile-children>string }
-{ $subsection compile-with-scope }
+{ $subsections
+    process-children
+    compile-children>string
+    compile-with-scope
+}
 "Examples which illustrate some of the above:"
-{ $subsection "html.templates.chloe.extend.tags.example" } ;
+{ $subsections "html.templates.chloe.extend.tags.example" } ;
 
 ARTICLE: "html.templates.chloe.extend.tags.example" "Examples of custom Chloe tags"
 "As a first example, let's develop a custom Chloe tag which simply renders a random number. The tag will be used as follows:"
@@ -272,14 +282,18 @@ ARTICLE: "html.templates.chloe.extend.components.example" "An example of a custo
 
 ARTICLE: "html.templates.chloe.extend.components" "Extending Chloe with custom components"
 "Custom HTML components implementing the " { $link render* } " word can be wired up with Chloe using the following syntax from " { $vocab-link "html.templates.chloe.components" } ":"
-{ $subsection POSTPONE: COMPONENT: }
-{ $subsection "html.templates.chloe.extend.components.example" } ;
+{ $subsections
+    POSTPONE: COMPONENT:
+    "html.templates.chloe.extend.components.example"
+} ;
 
 ARTICLE: "html.templates.chloe" "Chloe templates"
 "The " { $vocab-link "html.templates.chloe" } " vocabulary implements an XHTML templating engine. Unlike " { $vocab-link "html.templates.fhtml" } ", Chloe templates are always well-formed XML, and no Factor code can be embedded in them, enforcing proper separation of concerns. Chloe templates can be edited using standard XML editing tools; they are less flexible than FHTML, but often simpler as a result."
-{ $subsection <chloe> }
-{ $subsection reset-cache }
-{ $subsection "html.templates.chloe.tags" }
-{ $subsection "html.templates.chloe.extend" } ;
+{ $subsections
+    <chloe>
+    reset-cache
+    "html.templates.chloe.tags"
+    "html.templates.chloe.extend"
+} ;
 
 ABOUT: "html.templates.chloe"

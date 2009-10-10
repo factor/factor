@@ -2,7 +2,9 @@ IN: json
 USING: help.markup help.syntax ;
 
 ARTICLE: "json" "JSON serialization"
-{ $subsection "json.reader" }
-{ $subsection "json.writer" } ;
+{ $subsections
+    "json.reader"
+    "json.writer"
+} ;
 
 ABOUT: "json"

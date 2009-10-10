@@ -23,20 +23,14 @@ ARTICLE: "ui-walker-step" "Stepping through code"
 $nl
 "The " { $link com-back } " command travels backwards through time, and restore stacks. This does not undo side effects (modifying array entries, writing to files, formatting the hard drive, etc) and therefore can only be used reliably on referentially transparent code." ;
 
-ARTICLE: "breakpoints" "Setting breakpoints"
-"In addition to invoking the walker explicitly through the UI, it is possible to set breakpoints on words. See " { $link "tools.annotations" } "."
-$nl
-"Breakpoints can be inserted directly into code:"
-{ $subsection break }
-{ $subsection POSTPONE: B }
-"Note that because the walker calls various core library and UI words while rendering its own user interface, setting a breakpoint on a word such as " { $link append } " or " { $link draw-gadget } " will hang the UI." ;
-
 ARTICLE: "ui-walker" "UI walker"
 "The walker single-steps through quotations. To use the walker, enter a piece of code in the listener's input area and press " { $operation walk } "."
 $nl
 "Walkers are instances of " { $link walker-gadget } "."
-{ $subsection "ui-walker-step" }
-{ $subsection "breakpoints" }
+{ $subsections
+    "ui-walker-step"
+    "breakpoints"
+}
 { $command-map walker-gadget "toolbar" }
 { $command-map walker-gadget "multitouch" } ;
 

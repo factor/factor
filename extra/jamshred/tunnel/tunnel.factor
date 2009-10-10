@@ -5,6 +5,7 @@ kernel literals locals math math.constants math.matrices
 math.order math.quadratic math.ranges math.vectors random
 sequences specialized-arrays vectors ;
 FROM: jamshred.oint => distance ;
+FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: jamshred.tunnel
 

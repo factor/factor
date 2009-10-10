@@ -16,7 +16,9 @@ ARTICLE: "starting-ui-tools" "Starting the UI tools"
 { $code "USE: threads" "[ \"ui.tools\" run ] in-thread" } ;
 
 ARTICLE: "ui-shortcuts" "UI tool keyboard shortcuts"
-"Every UI tool has its own set of keyboard shortcuts; press " { $snippet "F1" } " inside a tool to see help. Some common shortcuts are also supported by all tools:"
+"Every UI tool has its own set of keyboard shortcuts. Mouse-over a toolbar button to see its shortcut, if any, in the status bar, or press " { $snippet "F1" } " to see a list of all shortcuts supported by the tool."
+$nl
+"Some common shortcuts are supported by all tools:"
 { $command-map tool "tool-switching" }
 { $command-map tool "common" } ;
 
@@ -44,23 +46,27 @@ $nl
 
 ARTICLE: "ui-tools" "UI developer tools"
 "The " { $vocab-link "ui.tools" } " vocabulary hierarchy implements a collection of simple developer tools."
-{ $subsection "starting-ui-tools" }
+{ $subsections "starting-ui-tools" }
 "To take full advantage of the UI tools, you should be using a supported text editor. See " { $link "editor" } "."
 $nl
 "Common functionality:"
-{ $subsection "ui-shortcuts" }
-{ $subsection "ui-presentations" }
-{ $subsection "definitions.icons" }
+{ $subsections
+    "ui-shortcuts"
+    "ui-presentations"
+    "definitions.icons"
+}
 "Tools:"
-{ $subsection "ui-listener" }
-{ $subsection "ui-browser" }
-{ $subsection "ui-inspector" }
-{ $subsection "ui.tools.error-list" }
-{ $subsection "ui.tools.profiler" }
-{ $subsection "ui-walker" }
-{ $subsection "ui.tools.deploy" }
+{ $subsections
+    "ui-listener"
+    "ui-browser"
+    "ui-inspector"
+    "ui.tools.error-list"
+    "ui.tools.profiler"
+    "ui-walker"
+    "ui.tools.deploy"
+}
 "Platform-specific features:"
-{ $subsection "ui-cocoa" } ;
+{ $subsections "ui-cocoa" } ;
 
 TIP: "All UI developer tools support a common set of " { $link "ui-shortcuts" } ". Each individual tool has its own shortcuts as well; the F1 key is context-sensitive." ;
 

@@ -14,14 +14,14 @@ The Factor library provides platform-specific code for Unix and Windows
 with many more capabilities so these words are not usually used in
 normal operation. */
 
-void init_c_io()
+void factor_vm::init_c_io()
 {
 	userenv[STDIN_ENV] = allot_alien(F,(cell)stdin);
 	userenv[STDOUT_ENV] = allot_alien(F,(cell)stdout);
 	userenv[STDERR_ENV] = allot_alien(F,(cell)stderr);
 }
 
-void io_error()
+void factor_vm::io_error()
 {
 #ifndef WINCE
 	if(errno == EINTR)
@@ -31,12 +31,12 @@ void io_error()
 	general_error(ERROR_IO,tag_fixnum(errno),F,NULL);
 }
 
-PRIMITIVE(fopen)
+void factor_vm::primitive_fopen()
 {
-	gc_root<byte_array> mode(dpop());
-	gc_root<byte_array> path(dpop());
-	mode.untag_check();
-	path.untag_check();
+	gc_root<byte_array> mode(dpop(),this);
+	gc_root<byte_array> path(dpop(),this);
+	mode.untag_check(this);
+	path.untag_check(this);
 
 	for(;;)
 	{
@@ -52,7 +52,7 @@ PRIMITIVE(fopen)
 	}
 }
 
-PRIMITIVE(fgetc)
+void factor_vm::primitive_fgetc()
 {
 	FILE *file = (FILE *)unbox_alien();
 
@@ -77,7 +77,7 @@ PRIMITIVE(fgetc)
 	}
 }
 
-PRIMITIVE(fread)
+void factor_vm::primitive_fread()
 {
 	FILE *file = (FILE *)unbox_alien();
 	fixnum size = unbox_array_size();
@@ -88,7 +88,7 @@ PRIMITIVE(fread)
 		return;
 	}
 
-	gc_root<byte_array> buf(allot_array_internal<byte_array>(size));
+	gc_root<byte_array> buf(allot_array_internal<byte_array>(size),this);
 
 	for(;;)
 	{
@@ -117,7 +117,7 @@ PRIMITIVE(fread)
 	}
 }
 
-PRIMITIVE(fputc)
+void factor_vm::primitive_fputc()
 {
 	FILE *file = (FILE *)unbox_alien();
 	fixnum ch = to_fixnum(dpop());
@@ -135,7 +135,7 @@ PRIMITIVE(fputc)
 	}
 }
 
-PRIMITIVE(fwrite)
+void factor_vm::primitive_fwrite()
 {
 	FILE *file = (FILE *)unbox_alien();
 	byte_array *text = untag_check<byte_array>(dpop());
@@ -164,7 +164,18 @@ PRIMITIVE(fwrite)
 	}
 }
 
-PRIMITIVE(fseek)
+void factor_vm::primitive_ftell()
+{
+	FILE *file = (FILE *)unbox_alien();
+	off_t offset;
+
+	if((offset = FTELL(file)) == -1)
+		io_error();
+
+	box_signed_8(offset);
+}
+
+void factor_vm::primitive_fseek()
 {
 	int whence = to_fixnum(dpop());
 	FILE *file = (FILE *)unbox_alien();
@@ -189,7 +200,7 @@ PRIMITIVE(fseek)
 	}
 }
 
-PRIMITIVE(fflush)
+void factor_vm::primitive_fflush()
 {
 	FILE *file = (FILE *)unbox_alien();
 	for(;;)
@@ -201,7 +212,7 @@ PRIMITIVE(fflush)
 	}
 }
 
-PRIMITIVE(fclose)
+void factor_vm::primitive_fclose()
 {
 	FILE *file = (FILE *)unbox_alien();
 	for(;;)
@@ -225,5 +236,4 @@ VM_C_API void clear_err_no()
 {
 	errno = 0;
 }
-
 }

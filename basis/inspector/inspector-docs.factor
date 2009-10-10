@@ -6,19 +6,21 @@ ARTICLE: "inspector" "The inspector"
 "The inspector displays a tabular view of an object and adds navigation and editing features. Inspector words are found in the " { $vocab-link "inspector" } " vocabulary."
 $nl
 "Starting the inspector:"
-{ $subsection inspect }
+{ $subsections inspect }
 "The inspector supports a number of commands which operate on the most recently inspected object:"
-{ $subsection &push }
-{ $subsection &back }
-{ $subsection &at }
-{ $subsection &put }
-{ $subsection &add }
-{ $subsection &rename }
-{ $subsection &delete }
+{ $subsections
+    &push
+    &back
+    &at
+    &put
+    &add
+    &rename
+    &delete
+}
 "A variable holding the current object:"
-{ $subsection me }
+{ $subsections me }
 "A description of an object can be printed without starting the inspector:"
-{ $subsection describe } ;
+{ $subsections describe } ;
 
 ABOUT: "inspector"
 

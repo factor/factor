@@ -4,8 +4,8 @@ USING: alien alien.c-types alien.strings alien.syntax kernel
 math sequences namespaces make assocs init accessors
 continuations combinators io.encodings.utf8 destructors locals
 arrays specialized-arrays classes.struct core-foundation
-core-foundation.run-loop core-foundation.strings
-core-foundation.time ;
+core-foundation.arrays core-foundation.run-loop
+core-foundation.strings core-foundation.time unix.types ;
 IN: core-foundation.fsevents
 
 SPECIALIZED-ARRAY: void*

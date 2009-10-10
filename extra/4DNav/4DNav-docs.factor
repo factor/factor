@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Jean-François Bigot.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel quotations strings multiline ;
+USING: help.markup help.syntax kernel quotations strings ;
 IN: 4DNav
 
 
@@ -78,8 +78,10 @@ HELP: translation-4D
 ARTICLE: "implementation details" "How 4DNav is done"
 "4DNav is build using :"
 
-{ $subsection "4DNav.camera" }
-{ $subsection "adsoda-main-page" }
+{ $subsections
+    "4DNav.camera"
+    "adsoda-main-page"
+}
 ;
 
 ARTICLE: "Space file" "Create a new space file"
@@ -87,7 +89,7 @@ ARTICLE: "Space file" "Create a new space file"
 
 $nl
 "An example is:"
-{ $code <"
+{ $code """
 <model>
 <space>
  <dimension>4</dimension>
@@ -136,7 +138,7 @@ $nl
  </light>
  <color>0.8,0.9,0.9</color>
 </space>
-</model> "> } ;
+</model>""" } ;
 
 ARTICLE: "TODO" "Todo"
 { $list 
@@ -188,10 +190,11 @@ $nl
     }
 
 { $heading "Links" }
-{ $subsection "Space file" }
-
-{ $subsection "TODO" }
-{ $subsection "implementation details" }
+{ $subsections
+    "Space file"
+    "TODO"
+    "implementation details"
+}
 
 ;
 

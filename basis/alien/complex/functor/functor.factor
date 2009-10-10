@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.structs alien.c-types classes.struct math
+USING: accessors alien alien.c-types classes.struct math
 math.functions sequences arrays kernel functors vocabs.parser
 namespaces quotations ;
 IN: alien.complex.functor
@@ -25,7 +25,7 @@ STRUCT: T-class { real N } { imaginary N } ;
 T-class c-type
 <T> 1quotation >>unboxer-quot
 *T 1quotation >>boxer-quot
-number >>boxed-class
+complex >>boxed-class
 drop
 
 ;FUNCTOR

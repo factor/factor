@@ -1,9 +1,11 @@
-USING: generalizations accessors arrays compiler kernel kernel.private
-math hashtables.private math.private namespaces sequences tools.test
-namespaces.private slots.private sequences.private byte-arrays alien
-alien.accessors layouts words definitions compiler.units io
-combinators vectors grouping make alien.c-types combinators.short-circuit
-math.order math.libm math.parser ;
+USING: generalizations accessors arrays compiler kernel
+kernel.private math hashtables.private math.private namespaces
+sequences tools.test namespaces.private slots.private
+sequences.private byte-arrays alien alien.accessors layouts
+words definitions compiler.units io combinators vectors grouping
+make alien.c-types combinators.short-circuit math.order
+math.libm math.parser math.functions alien.syntax ;
+FROM: math => float ;
 QUALIFIED: namespaces.private
 IN: compiler.tests.codegen
 
@@ -415,3 +417,62 @@ cell 4 = [
 [ 1 "0.169967142900241" "0.9854497299884601" ] [ 1.4 1 [ swap >float [ fcos ] [ fsin ] bi ] compile-call [ number>string ] bi@ ] unit-test
 
 [ 6.0 ] [ 1.0 [ >float 3.0 + [ B{ 0 0 0 0 } 0 set-alien-float ] [ 2.0 + ] bi ] compile-call ] unit-test
+
+! Bug in linearization
+[ 283686952174081 ] [
+    B{ 1 1 1 1 } [
+        { byte-array } declare
+        [ 0 2 ] dip
+        [
+            [ drop ] 2dip
+            [
+                swap 1 < [ [ ] dip ] [ [ ] dip ] if
+                0 alien-signed-4
+            ] curry dup bi *
+        ] curry each-integer
+    ] compile-call
+] unit-test
+
+! Bug in CSSA construction
+TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-only } ;
+
+[ 2 ] [
+    little-endian?
+    T{ myseq f B{ 1 0 0 0 } B{ 1 0 0 0 } }
+    T{ myseq f B{ 0 0 0 1 } B{ 0 0 0 1 } } ?
+    [
+        { myseq } declare
+        [ 0 2 ] dip dup
+        [
+            [
+                over 1 < [ underlying1>> ] [ [ 1 - ] dip underlying2>> ] if
+                swap 4 * >fixnum alien-signed-4
+            ] bi-curry@ bi * +
+        ] 2curry each-integer
+    ] compile-call
+] unit-test
+
+! Bug in linear scan's partial sync point logic
+[ t ] [
+    [ 1.0 100 [ fsin ] times 1.0 float+ ] compile-call
+    1.168852488727981 1.e-9 ~
+] unit-test
+
+[ 65537.0 ] [
+    [ 2.0 4 [ 2.0 fpow ] times 1.0 float+ ] compile-call
+] unit-test
+
+! ##box-displaced-alien is a def-is-use instruction
+[ ALIEN: 3e9 ] [
+    [
+        f
+        100 [ 10 swap <displaced-alien> ] times
+        1 swap <displaced-alien>
+    ] compile-call
+] unit-test
+
+! Forgot to two-operand shifts
+[ 2 0 ] [
+    1 1
+    [ [ HEX: f bitand ] bi@ [ shift ] [ drop -3 shift ] 2bi ] compile-call
+] unit-test

@@ -6,6 +6,10 @@ IN: math.functions.tests
 [ t ] [ 4.0000001 4.0000001 .000001 ~ ] unit-test
 [ f ] [ -4.0000001 4.0000001 .00001 ~ ] unit-test
 [ t ] [ -.0000000000001 0 .0000000001 ~ ] unit-test
+[ t ] [ 100 101 -.9 ~ ] unit-test
+[ f ] [ 100 120 -.09 ~ ] unit-test
+[ t ] [ 0 0 -.9 ~ ] unit-test
+[ f ] [ 0 10 -.9 ~ ] unit-test
 
 ! Lets get the argument order correct, eh?
 [ 0.0 ] [ 0.0 1.0 fatan2 ] unit-test
@@ -33,9 +37,21 @@ IN: math.functions.tests
 [ 0.0 ] [ 1.0 log ] unit-test
 [ 1.0 ] [ e log ] unit-test
 
-[ t ] [ 1 exp e = ] unit-test
-[ t ] [ 1.0 exp e = ] unit-test
-[ 1.0 ] [ -1 exp e * ] unit-test
+[ 0.0 ] [ 1.0 log10 ] unit-test
+[ 1.0 ] [ 10.0 log10 ] unit-test
+[ 2.0 ] [ 100.0 log10 ] unit-test
+[ 3.0 ] [ 1000.0 log10 ] unit-test
+[ 4.0 ] [ 10000.0 log10 ] unit-test
+
+[ t ] [ 1 exp e 1.e-10 ~ ] unit-test
+[ f ] [ 1 exp 0/0. 1.e-10 ~ ] unit-test
+[ f ] [ 0/0. 1 exp 1.e-10 ~ ] unit-test
+[ t ] [ 1.0 exp e 1.e-10 ~ ] unit-test
+[ t ] [ -1 exp e * 1.0 1.e-10 ~ ] unit-test
+[ f ] [ 1/0. 1/0. 1.e-10 ~ ] unit-test
+[ f ] [ 1/0. -1/0. 1.e-10 ~ ] unit-test
+[ f ] [ 1/0. 0/0. 1.e-10 ~ ] unit-test
+[ f ] [ 0/0. -1/0. 1.e-10 ~ ] unit-test
 
 [ 1.0 ] [ 0 cosh ] unit-test
 [ 1.0 ] [ 0.0 cosh ] unit-test

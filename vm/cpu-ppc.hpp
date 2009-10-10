@@ -62,10 +62,28 @@ inline static bool tail_call_site_p(cell return_address)
 	return (insn & 0x1) == 0;
 }
 
+inline static unsigned int fpu_status(unsigned int status)
+{
+        unsigned int r = 0;
+
+        if (status & 0x20000000)
+		r |= FP_TRAP_INVALID_OPERATION;
+        if (status & 0x10000000)
+		r |= FP_TRAP_OVERFLOW;
+        if (status & 0x08000000)
+		r |= FP_TRAP_UNDERFLOW;
+        if (status & 0x04000000)
+		r |= FP_TRAP_ZERO_DIVIDE;
+        if (status & 0x02000000)
+		r |= FP_TRAP_INEXACT;
+
+        return r;
+}
+
 /* Defined in assembly */
-VM_ASM_API void c_to_factor(cell quot);
-VM_ASM_API void throw_impl(cell quot, stack_frame *rewind);
-VM_ASM_API void lazy_jit_compile(cell quot);
+VM_ASM_API void c_to_factor(cell quot, void *vm);
+VM_ASM_API void throw_impl(cell quot, stack_frame *rewind, void *vm);
+VM_ASM_API void lazy_jit_compile(cell quot, void *vm);
 VM_ASM_API void flush_icache(cell start, cell len);
 
 VM_ASM_API void set_callstack(stack_frame *to,

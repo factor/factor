@@ -1,23 +1,24 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax alien.destructors ;
+USING: alien.c-types alien.syntax alien.destructors classes.struct
+windows.types ;
 IN: windows.usp10
 
 LIBRARY: usp10
 
-C-STRUCT: SCRIPT_CONTROL
-    { "DWORD" "flags" } ;
+STRUCT: SCRIPT_CONTROL
+    { flags DWORD } ;
 
-C-STRUCT: SCRIPT_STATE
-    { "WORD" "flags" } ;
+STRUCT: SCRIPT_STATE
+    { flags WORD } ;
 
-C-STRUCT: SCRIPT_ANALYSIS
-    { "WORD" "flags" }
-    { "SCRIPT_STATE" "s" } ;
+STRUCT: SCRIPT_ANALYSIS
+    { flags WORD }
+    { s SCRIPT_STATE } ;
 
-C-STRUCT: SCRIPT_ITEM
-    { "int" "iCharPos" }
-    { "SCRIPT_ANALYSIS" "a" } ;
+STRUCT: SCRIPT_ITEM
+    { iCharPos int }
+    { a SCRIPT_ANALYSIS } ;
 
 FUNCTION: HRESULT ScriptItemize (
     WCHAR* pwcInChars,
@@ -53,8 +54,11 @@ SCRIPT_JUSTIFY_BARA
 SCRIPT_JUSTIFY_SEEN
 SCRIPT_JUSTIFFY_RESERVED4 ;
 
-C-STRUCT: SCRIPT_VISATTR
-    { "WORD" "flags" } ;
+STRUCT: SCRIPT_VISATTR
+    { flags WORD } ;
+
+TYPEDEF: void* SCRIPT_CACHE*
+C-TYPE: ABC
 
 FUNCTION: HRESULT ScriptShape (
     HDC hdc,
@@ -69,9 +73,9 @@ FUNCTION: HRESULT ScriptShape (
     int* pcGlyphs
 ) ;
 
-C-STRUCT: GOFFSET
-    { "LONG" "du" }
-    { "LONG" "dv" } ;
+STRUCT: GOFFSET
+    { du LONG }
+    { dv LONG } ;
 
 FUNCTION: HRESULT ScriptPlace (
     HDC hdc,
@@ -111,8 +115,8 @@ FUNCTION: HRESULT ScriptJustify (
     int* piJustify
 ) ;
 
-C-STRUCT: SCRIPT_LOGATTR
-    { "BYTE" "flags" } ;
+STRUCT: SCRIPT_LOGATTR
+    { flags BYTE } ;
 
 FUNCTION: HRESULT ScriptBreak (
     WCHAR* pwcChars,
@@ -184,21 +188,21 @@ FUNCTION: HRESULT ScriptGetGlyphABCWidth (
     ABC* pABC
 ) ;
 
-C-STRUCT: SCRIPT_PROPERTIES
-    { "DWORD" "flags" } ;
+STRUCT: SCRIPT_PROPERTIES
+    { flags DWORD } ;
 
 FUNCTION: HRESULT ScriptGetProperties (
     SCRIPT_PROPERTIES*** ppSp,
     int* piNumScripts
 ) ;
 
-C-STRUCT: SCRIPT_FONTPROPERTIES
-    { "int" "cBytes" }
-    { "WORD" "wgBlank" }
-    { "WORD" "wgDefault" }
-    { "WORD" "wgInvalid" }
-    { "WORD" "wgKashida" }
-    { "int" "iKashidaWidth" } ;
+STRUCT: SCRIPT_FONTPROPERTIES
+    { cBytes int }
+    { wgBlank WORD }
+    { wgDefault WORD }
+    { wgInvalid WORD }
+    { wgKashida WORD }
+    { iKashidaWidth int } ;
 
 FUNCTION: HRESULT ScriptGetFontProperties (
     HDC hdc,
@@ -234,11 +238,11 @@ CONSTANT: SSA_LAYOUTRTL HEX: 20000000
 CONSTANT: SSA_DONTGLYPH HEX: 40000000
 CONSTANT: SSA_NOKASHIDA HEX: 80000000
 
-C-STRUCT: SCRIPT_TABDEF
-    { "int" "cTabStops" }
-    { "int" "iScale" }
-    { "int*" "pTabStops" }
-    { "int" "iTabOrigin" } ;
+STRUCT: SCRIPT_TABDEF
+    { cTabStops int }
+    { iScale int }
+    { pTabStops int* }
+    { iTabOrigin int } ;
 
 TYPEDEF: void* SCRIPT_STRING_ANALYSIS
 
@@ -319,8 +323,8 @@ FUNCTION: HRESULT ScriptIsComplex (
     DWORD dwFlags
 ) ;
 
-C-STRUCT: SCRIPT_DIGITSUBSTITUTE
-    { "DWORD" "flags" } ;
+STRUCT: SCRIPT_DIGITSUBSTITUTE
+    { flags DWORD } ;
 
 FUNCTION: HRESULT ScriptRecordDigitSubstitution (
     LCID Locale,

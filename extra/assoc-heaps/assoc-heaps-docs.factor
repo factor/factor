@@ -24,9 +24,11 @@ HELP: assoc-heap
 ARTICLE: "assoc-heaps" "Associative heaps"
 "The " { $vocab-link "assoc-heaps" } " vocabulary combines exists to synthesize data structures with better time properties than either of the two component data structures alone." $nl
 "Associative heap constructor:"
-{ $subsection <assoc-heap> }
+{ $subsections <assoc-heap> }
 "Unique heaps:"
-{ $subsection <unique-min-heap> }
-{ $subsection <unique-max-heap> } ;
+{ $subsections
+    <unique-min-heap>
+    <unique-max-heap>
+} ;
 
 ABOUT: "assoc-heaps"

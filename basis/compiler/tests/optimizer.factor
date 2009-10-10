@@ -122,17 +122,6 @@ GENERIC: void-generic ( obj -- * )
 
 [ t ] [ \ <tuple>-regression optimized? ] unit-test
 
-GENERIC: foozul ( a -- b )
-M: reversed foozul ;
-M: integer foozul ;
-M: slice foozul ;
-
-[ t ] [
-    reversed \ foozul specific-method
-    reversed \ foozul method
-    eq?
-] unit-test
-
 ! regression
 : constant-fold-2 ( -- value ) f ; foldable
 : constant-fold-3 ( -- value ) 4 ; foldable

@@ -21,9 +21,11 @@ ARTICLE: "core-graphics.types" "Core Graphics types"
     "CGSize"
 }
 "Some words for working with the above:"
-{ $subsection <CGRect> }
-{ $subsection <CGPoint> }
-{ $subsection <CGSize> } ;
+{ $subsections
+    <CGRect>
+    <CGPoint>
+    <CGSize>
+} ;
 
 IN: core-graphics.types
 ABOUT: "core-graphics.types"

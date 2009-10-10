@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math assocs namespaces sequences heaps
 fry make combinators sets locals arrays
-cpu.architecture
+cpu.architecture layouts
 compiler.cfg
 compiler.cfg.def-use
 compiler.cfg.liveness
@@ -28,10 +28,12 @@ SYMBOL: pending-interval-assoc
 : remove-pending ( live-interval -- )
     vreg>> pending-interval-assoc get delete-at ;
 
+ERROR: bad-vreg vreg ;
+
 : (vreg>reg) ( vreg pending -- reg )
     ! If a live vreg is not in the pending set, then it must
     ! have been spilled.
-    ?at [ spill-slots get at <spill-slot> ] unless ;
+    ?at [ spill-slots get ?at [ ] [ bad-vreg ] if ] unless ;
 
 : vreg>reg ( vreg -- reg )
     pending-interval-assoc get (vreg>reg) ;
@@ -115,8 +117,6 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 M: vreg-insn assign-registers-in-insn
     [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ;
 
-! TODO: needs tagged-rep
-
 : trace-on-gc ( assoc -- assoc' )
     ! When a GC occurs, virtual registers which contain tagged data
     ! are traced by the GC. Outputs a sequence physical registers.
@@ -139,12 +139,16 @@ M: vreg-insn assign-registers-in-insn
         ] assoc-each
     ] { } make ;
 
+: gc-root-offsets ( registers -- alist )
+    ! Outputs a sequence of { offset register/spill-slot } pairs
+    [ length iota [ cell * ] map ] keep zip ;
+
 M: ##gc assign-registers-in-insn
     ! Since ##gc is always the first instruction in a block, the set of
     ! values live at the ##gc is just live-in.
     dup call-next-method
     basic-block get register-live-ins get at
-    [ trace-on-gc >>tagged-values ] [ spill-on-gc >>data-values ] bi
+    [ trace-on-gc gc-root-offsets >>tagged-values ] [ spill-on-gc >>data-values ] bi
     drop ;
 
 M: insn assign-registers-in-insn drop ;
@@ -156,8 +160,6 @@ M: insn assign-registers-in-insn drop ;
 
 : end-block ( bb -- )
     [ live-out vregs>regs ] keep register-live-outs get set-at ;
-
-ERROR: bad-vreg vreg ;
 
 : vreg-at-start ( vreg bb -- state )
     register-live-ins get at ?at [ bad-vreg ] unless ;

@@ -2,7 +2,7 @@ USING: help.markup help.syntax math math.private ;
 IN: math.integers
 
 ARTICLE: "integers" "Integers"
-{ $subsection integer }
+{ $subsections integer }
 "Integers come in two varieties -- fixnums and bignums. Fixnums fit in a machine word and are faster to manipulate; if the result of a fixnum operation is too large to fit in a fixnum, the result is upgraded to a bignum. Here is an example where two fixnums are multiplied yielding a bignum:"
 { $example "USE: classes" "134217728 class ." "fixnum" }
 { $example "USE: classes" "128 class ." "fixnum" }
@@ -11,11 +11,13 @@ ARTICLE: "integers" "Integers"
 "Integers can be entered using a different base; see " { $link "syntax-numbers" } "."
 $nl
 "Integers can be tested for, and real numbers can be converted to integers:"
-{ $subsection fixnum? }
-{ $subsection bignum? }
-{ $subsection >fixnum }
-{ $subsection >integer }
-{ $subsection >bignum }
+{ $subsections
+    fixnum?
+    bignum?
+    >fixnum
+    >integer
+    >bignum
+}
 { $see-also "prettyprint-numbers" "modular-arithmetic" "bitwise-arithmetic" "integer-functions" "syntax-integers" } ;
 
 ABOUT: "integers"

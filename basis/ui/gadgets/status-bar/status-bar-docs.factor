@@ -24,10 +24,12 @@ HELP: open-status-window
 
 ARTICLE: "ui.gadgets.status-bar" "Status bars and mouse-over help"
 "The " { $vocab-link "ui.gadgets.status-bar" } " vocabulary implements a word to display windows with a status bar."
-{ $subsection open-status-window }
+{ $subsections open-status-window }
 "Gadgets can use a pair of words to show and hide status bar messages. These words will work in any gadget, but will have no effect unless the gadget is displayed inside a window with a status bar."
-{ $subsection show-status }
-{ $subsection hide-status }
+{ $subsections
+    show-status
+    hide-status
+}
 { $link "ui.gadgets.presentations" } " use the status bar to display object summary." ;
 
 ABOUT: "ui.gadgets.status-bar"

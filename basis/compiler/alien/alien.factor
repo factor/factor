@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces make math sequences layouts
-alien.c-types alien.structs cpu.architecture ;
+alien.c-types cpu.architecture ;
 IN: compiler.alien
 
 : large-struct? ( ctype -- ? )

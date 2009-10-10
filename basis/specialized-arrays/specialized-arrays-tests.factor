@@ -4,14 +4,13 @@ specialized-arrays.private sequences alien.c-types accessors
 kernel arrays combinators compiler compiler.units classes.struct
 combinators.smart compiler.tree.debugger math libc destructors
 sequences.private multiline eval words vocabs namespaces
-assocs prettyprint ;
+assocs prettyprint alien.data math.vectors ;
+FROM: alien.c-types => float ;
 
 SPECIALIZED-ARRAY: int
-SPECIALIZED-ARRAY: bool
-SPECIALIZED-ARRAY: ushort
-SPECIALIZED-ARRAY: char
-SPECIALIZED-ARRAY: uint
-SPECIALIZED-ARRAY: float
+SPECIALIZED-ARRAYS: bool ushort char uint float ulonglong ;
+
+[ ulonglong ] [ ulonglong-array{ } element-type ] unit-test
 
 [ t ] [ { 1 2 3 } >int-array int-array? ] unit-test
 
@@ -100,12 +99,12 @@ SPECIALIZED-ARRAY: test-struct
 ] unit-test
 
 ! Regression
-STRUCT: fixed-string { text char[100] } ;
+STRUCT: fixed-string { text char[64] } ;
 
 SPECIALIZED-ARRAY: fixed-string
 
-[ { ALIEN: 123 ALIEN: 223 ALIEN: 323 ALIEN: 423 } ] [
-    ALIEN: 123 4 <direct-fixed-string-array> [ (underlying)>> ] { } map-as
+[ { ALIEN: 100 ALIEN: 140 ALIEN: 180 ALIEN: 1c0 } ] [
+    ALIEN: 100 4 <direct-fixed-string-array> [ (underlying)>> ] { } map-as
 ] unit-test
 
 ! Ensure that byte-length works with direct arrays
@@ -124,22 +123,22 @@ SPECIALIZED-ARRAY: fixed-string
 ] unit-test
 
 [
-    <"
+    """
 IN: specialized-arrays.tests
 USING: specialized-arrays ;
 
-SPECIALIZED-ARRAY: __does_not_exist__ "> eval( -- )
+SPECIALIZED-ARRAY: __does_not_exist__ """ eval( -- )
 ] must-fail
 
 [ ] [
-    <"
+    """
 IN: specialized-arrays.tests
-USING: classes.struct specialized-arrays ;
+USING: alien.c-types classes.struct specialized-arrays ;
 
 STRUCT: __does_not_exist__ { x int } ;
 
 SPECIALIZED-ARRAY: __does_not_exist__
-"> eval( -- )
+""" eval( -- )
 ] unit-test
 
 [ f ] [

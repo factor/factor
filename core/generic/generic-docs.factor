@@ -21,7 +21,7 @@ $nl
 "Now, the linear order is the following, from least-specific to most-specific:"
 { $code "{ object sequence number integer }" }
 "The " { $link order } " word can be useful to clarify method dispatch order:"
-{ $subsection order } ;
+{ $subsections order } ;
 
 ARTICLE: "generic-introspection" "Generic word introspection"
 "In most cases, generic words and methods are defined at parse time with " { $link POSTPONE: GENERIC: } " (or some other parsing word) and " { $link POSTPONE: M: } "."
@@ -29,25 +29,29 @@ $nl
 "Sometimes, generic words need to be inspected defined at run time; words for performing these tasks are found in the " { $vocab-link "generic" } " vocabulary."
 $nl
 "The set of generic words is a class which implements the " { $link "definition-protocol" } ":"
-{ $subsection generic }
-{ $subsection generic? }
+{ $subsections
+    generic
+    generic?
+}
 "New generic words can be defined:"
-{ $subsection define-generic }
-{ $subsection define-simple-generic }
+{ $subsections
+    define-generic
+    define-simple-generic
+}
 "Methods can be added to existing generic words:"
-{ $subsection create-method }
+{ $subsections create-method }
 "Method definitions can be looked up:"
-{ $subsection method }
+{ $subsections method }
 "Finding the most specific method for an object:"
-{ $subsection effective-method }
+{ $subsections effective-method }
 "A generic word contains methods; the list of methods specializing on a class can also be obtained:"
-{ $subsection implementors }
+{ $subsections implementors }
 "Low-level word which rebuilds the generic word after methods are added or removed, or the method combination is changed:"
-{ $subsection make-generic }
+{ $subsections make-generic }
 "Low-level method constructor:"
-{ $subsection <method> }
+{ $subsections <method> }
 "Methods may be pushed on the stack with a literal syntax:"
-{ $subsection POSTPONE: M\ }
+{ $subsections POSTPONE: M\ }
 { $see-also "see" } ;
 
 ARTICLE: "method-combination" "Custom method combination"
@@ -72,14 +76,16 @@ ARTICLE: "call-next-method" "Calling less-specific methods"
 "If a generic word is called with an object and multiple methods specialize on classes that this object is an instance of, usually the most specific method is called (" { $link "method-order" } ")."
 $nl
 "Less-specific methods can be called directly:"
-{ $subsection POSTPONE: call-next-method }
+{ $subsections POSTPONE: call-next-method }
 "A lower-level word which the above expands into:"
-{ $subsection (call-next-method) }
+{ $subsections (call-next-method) }
 "To look up the next applicable method reflectively:"
-{ $subsection next-method }
+{ $subsections next-method }
 "Errors thrown by improper calls to " { $link POSTPONE: call-next-method } ":"
-{ $subsection inconsistent-next-method }
-{ $subsection no-next-method } ;
+{ $subsections
+    inconsistent-next-method
+    no-next-method
+} ;
 
 ARTICLE: "generic" "Generic words and methods"
 "A " { $emphasis "generic word" } " is composed of zero or more " { $emphasis "methods" } " together with a " { $emphasis "method combination" } ". A method " { $emphasis "specializes" } " on a class; when a generic word executed, the method combination chooses the most appropriate method and calls its definition."
@@ -87,20 +93,22 @@ $nl
 "A generic word behaves roughly like a long series of class predicate conditionals in a " { $link cond } " form, however methods can be defined in independent source files, reducing coupling and increasing extensibility. The method combination determines which object the generic word will " { $emphasis "dispatch" } " on; this could be the top of the stack, or some other value."
 $nl
 "Generic words which dispatch on the object at the top of the stack:"
-{ $subsection POSTPONE: GENERIC: }
+{ $subsections POSTPONE: GENERIC: }
 "A method combination which dispatches on a specified stack position:"
-{ $subsection POSTPONE: GENERIC# }
+{ $subsections POSTPONE: GENERIC# }
 "A method combination which dispatches on the value of a variable at the time the generic word is called:"
-{ $subsection POSTPONE: HOOK: }
+{ $subsections POSTPONE: HOOK: }
 "A method combination which dispatches on a pair of stack values, which must be numbers, and upgrades both to the same type of number:"
-{ $subsection POSTPONE: MATH: }
+{ $subsections POSTPONE: MATH: }
 "Method definition:"
-{ $subsection POSTPONE: M: }
+{ $subsections POSTPONE: M: }
 "Generic words must declare their stack effect in order to compile. See " { $link "effects" } "."
-{ $subsection "method-order" }
-{ $subsection "call-next-method" }
-{ $subsection "method-combination" }
-{ $subsection "generic-introspection" }
+{ $subsections
+    "method-order"
+    "call-next-method"
+    "method-combination"
+    "generic-introspection"
+}
 "Generic words specialize behavior based on the class of an object; sometimes behavior needs to be specialized on the object's " { $emphasis "structure" } "; this is known as " { $emphasis "pattern matching" } " and is implemented in the " { $vocab-link "match" } " vocabulary." ;
 
 ABOUT: "generic"

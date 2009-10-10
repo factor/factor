@@ -33,11 +33,13 @@ HELP: sorted-memq?
 
 ARTICLE: "binary-search" "Binary search"
 "The " { $emphasis "binary search" } " algorithm allows elements to be located in sorted sequence in " { $snippet "O(log n)" } " time."
-{ $subsection search }
+{ $subsections search }
 "Variants of sequence words optimized for sorted sequences:"
-{ $subsection sorted-index }
-{ $subsection sorted-member? }
-{ $subsection sorted-memq? }
+{ $subsections
+    sorted-index
+    sorted-member?
+    sorted-memq?
+}
 { $see-also "order-specifiers" "sequences-sorting" } ;
 
 ABOUT: "binary-search"

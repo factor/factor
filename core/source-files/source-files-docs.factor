@@ -6,16 +6,18 @@ ARTICLE: "source-files" "Source files"
 "Words in the " { $vocab-link "source-files" } " vocabulary are used to keep track of loaded source files. This is used to implement " { $link "vocabs.refresh" } "."
 $nl
 "The source file database:"
-{ $subsection source-files }
+{ $subsections source-files }
 "The class of source files:"
-{ $subsection source-file }
+{ $subsections source-file }
 "Words intended for the parser:"
-{ $subsection record-checksum }
-{ $subsection record-definitions }
+{ $subsections
+    record-checksum
+    record-definitions
+}
 "Removing a source file from the database:"
-{ $subsection forget-source }
+{ $subsections forget-source }
 "Updating the database:"
-{ $subsection reset-checksums }
+{ $subsections reset-checksums }
 "The " { $link pathname } " class implements the definition protocol by working with the corresponding source file; see " { $link "definitions" } "." ;
 
 ABOUT: "source-files"

@@ -1,18 +1,18 @@
 ! Copyright (C) 2004, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry accessors alien alien.accessors arrays byte-arrays classes
-continuations.private effects generic hashtables
+USING: fry accessors alien alien.accessors arrays byte-arrays
+classes continuations.private effects generic hashtables
 hashtables.private io io.backend io.files io.files.private
 io.streams.c kernel kernel.private math math.private
 math.parser.private memory memory.private namespaces
 namespaces.private parser quotations quotations.private sbufs
 sbufs.private sequences sequences.private slots.private strings
 strings.private system threads.private classes.tuple
-classes.tuple.private vectors vectors.private words definitions assocs
-summary compiler.units system.private combinators
-combinators.short-circuit locals locals.backend locals.types
-combinators.private stack-checker.values
-generic.single generic.single.private
+classes.tuple.private vectors vectors.private words
+words.private definitions assocs summary compiler.units
+system.private combinators combinators.short-circuit locals
+locals.backend locals.types combinators.private
+stack-checker.values generic.single generic.single.private
 alien.libraries
 stack-checker.alien
 stack-checker.state
@@ -455,11 +455,11 @@ M: bad-executable summary
 \ float/f { float float } { float } define-primitive
 \ float/f make-foldable
 
-\ float< { float float } { object } define-primitive
-\ float< make-foldable
-
 \ float-mod { float float } { float } define-primitive
 \ float-mod make-foldable
+
+\ float< { float float } { object } define-primitive
+\ float< make-foldable
 
 \ float<= { float float } { object } define-primitive
 \ float<= make-foldable
@@ -470,8 +470,20 @@ M: bad-executable summary
 \ float>= { float float } { object } define-primitive
 \ float>= make-foldable
 
-\ <word> { object object } { word } define-primitive
-\ <word> make-flushable
+\ float-u< { float float } { object } define-primitive
+\ float-u< make-foldable
+
+\ float-u<= { float float } { object } define-primitive
+\ float-u<= make-foldable
+
+\ float-u> { float float } { object } define-primitive
+\ float-u> make-foldable
+
+\ float-u>= { float float } { object } define-primitive
+\ float-u>= make-foldable
+
+\ (word) { object object object } { word } define-primitive
+\ (word) make-flushable
 
 \ word-xt { word } { integer integer } define-primitive
 \ word-xt make-flushable
