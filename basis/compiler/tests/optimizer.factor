@@ -413,5 +413,35 @@ M: object bad-dispatch-position-test* ;
     ] with-compilation-unit
 ] unit-test
 
+[ 16 ] [
+    [
+        0 2
+        [
+            nip
+            [
+                1 + {
+                    [ 16 ]
+                    [ 16 ]
+                    [ 16 ]
+                } dispatch
+            ] [
+                {
+                    [ ]
+                    [ ]
+                    [ ]
+                } dispatch
+            ] bi
+        ] each-integer
+    ] compile-call
+] unit-test
+
+: dispatch-branch-problem ( a b c -- d )
+    dup 0 < [ "boo" throw ] when
+    1 + { [ + ] [ - ] [ * ] } dispatch ;
+
+[ 3 4 -1 dispatch-branch-problem ] [ "boo" = ] must-fail-with
+[ -1 ] [ 3 4 0 dispatch-branch-problem ] unit-test
+[ 12 ] [ 3 4 1 dispatch-branch-problem ] unit-test
+
 ! Not sure if I want to fix this...
 ! [ t [ [ f ] [ 3 ] if >fixnum ] compile-call ] [ no-method? ] must-fail-with

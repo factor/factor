@@ -154,6 +154,9 @@ M: c-type-name c-direct-array-constructor
     dup [ "<direct-" "-array>" surround ] [ specialized-array-vocab ] bi lookup
     [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 
+SYNTAX: SPECIALIZED-ARRAYS:
+    ";" parse-tokens [ parse-c-type define-array-vocab use-vocab ] each ;
+
 SYNTAX: SPECIALIZED-ARRAY:
     scan-c-type define-array-vocab use-vocab ;
 

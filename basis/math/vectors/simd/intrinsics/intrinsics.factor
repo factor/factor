@@ -40,6 +40,7 @@ SYNTAX: SIMD-CONVERSION-OP:
 
 SIMD-OP: v+
 SIMD-OP: v-
+SIMD-OP: vneg
 SIMD-OP: v+-
 SIMD-OP: vs+
 SIMD-OP: vs-
@@ -141,6 +142,12 @@ GENERIC# supported-simd-op? 1 ( rep intrinsic -- ? )
     %merge-vector-reps [ int-vector-rep? ] filter
     %unpack-vector-head-reps union ;
 
+: (%abs-reps) ( -- reps )
+    cc> %compare-vector-reps [ int-vector-rep? ] filter
+    %xor-vector-reps [ float-vector-rep? ] filter
+    union
+    { uchar-16-rep ushort-8-rep uint-4-rep ulonglong-2-rep } union ;
+
 M: vector-rep supported-simd-op?
     {
         { \ (simd-v+)            [ %add-vector-reps            ] }
@@ -148,6 +155,7 @@ M: vector-rep supported-simd-op?
         { \ (simd-v+-)           [ %add-sub-vector-reps        ] }
         { \ (simd-v-)            [ %sub-vector-reps            ] }
         { \ (simd-vs-)           [ %saturated-sub-vector-reps  ] }
+        { \ (simd-vneg)          [ %sub-vector-reps            ] }
         { \ (simd-v*)            [ %mul-vector-reps            ] }
         { \ (simd-vs*)           [ %saturated-mul-vector-reps  ] }
         { \ (simd-v/)            [ %div-vector-reps            ] }
@@ -156,7 +164,7 @@ M: vector-rep supported-simd-op?
         { \ (simd-v.)            [ %dot-vector-reps            ] }
         { \ (simd-vsqrt)         [ %sqrt-vector-reps           ] }
         { \ (simd-sum)           [ %horizontal-add-vector-reps ] }
-        { \ (simd-vabs)          [ %abs-vector-reps            ] }
+        { \ (simd-vabs)          [ (%abs-reps)                 ] }
         { \ (simd-vbitand)       [ %and-vector-reps            ] }
         { \ (simd-vbitandn)      [ %andn-vector-reps           ] }
         { \ (simd-vbitor)        [ %or-vector-reps             ] }

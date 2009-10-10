@@ -11,15 +11,7 @@ quotations math.constants compiler.units ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
 SIMD: c:char
-SIMD: c:uchar
-SIMD: c:short
-SIMD: c:ushort
-SIMD: c:int
-SIMD: c:uint
-SIMD: c:longlong
-SIMD: c:ulonglong
-SIMD: c:float
-SIMD: c:double
+SIMDS: c:uchar c:short c:ushort c:int c:uint c:longlong c:ulonglong c:float c:double ;
 IN: math.vectors.simd.tests
 
 ! Make sure the functor doesn't generate bogus vocabularies

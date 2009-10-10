@@ -8,12 +8,7 @@ assocs prettyprint alien.data math.vectors ;
 FROM: alien.c-types => float ;
 
 SPECIALIZED-ARRAY: int
-SPECIALIZED-ARRAY: bool
-SPECIALIZED-ARRAY: ushort
-SPECIALIZED-ARRAY: char
-SPECIALIZED-ARRAY: uint
-SPECIALIZED-ARRAY: float
-SPECIALIZED-ARRAY: ulonglong
+SPECIALIZED-ARRAYS: bool ushort char uint float ulonglong ;
 
 [ ulonglong ] [ ulonglong-array{ } element-type ] unit-test
 

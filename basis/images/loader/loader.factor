@@ -53,3 +53,4 @@ GENERIC: image>stream ( image class -- )
 : save-graphic-image ( image path -- )
     [ image-class ] [ ] bi
     binary [ image>stream ] with-file-writer ;
+

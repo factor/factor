@@ -1,8 +1,8 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry kernel sequences assocs accessors namespaces
 math.intervals arrays classes.algebra combinators columns
-stack-checker.branches locals
+stack-checker.branches locals math
 compiler.utilities
 compiler.tree
 compiler.tree.combinators
@@ -21,6 +21,9 @@ M: #if child-constraints
 M: #dispatch child-constraints
     children>> length f <repetition> ;
 
+! There is an important invariant here, either no flags are set
+! in live-branches, exactly one is set, or all are set.
+
 GENERIC: live-branches ( #branch -- indices )
 
 M: #if live-branches
@@ -32,8 +35,12 @@ M: #if live-branches
     } cond nip ;
 
 M: #dispatch live-branches
-    [ children>> length ] [ in-d>> first value-info interval>> ] bi
-    '[ _ interval-contains? ] map ;
+    [ children>> ] [ in-d>> first value-info ] bi {
+        { [ dup class>> null-class? ] [ drop length f <array> ] }
+        { [ dup literal>> integer? not ] [ drop length t <array> ] }
+        { [ 2dup literal>> swap bounds-check? not ] [ drop length t <array> ] }
+        [ literal>> swap length f <array> [ [ t ] 2dip set-nth ] keep ]
+    } cond ;
 
 : live-children ( #branch -- children )
     [ children>> ] [ live-branches>> ] bi select-children ;
