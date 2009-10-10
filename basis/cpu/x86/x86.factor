@@ -673,17 +673,24 @@ M: x86 %gather-vector-2-reps
         [ dupd SHUFPD ]
     } case ;
 
-: float-4-shuffle ( dst shuffle -- )
+: sse1-float-4-shuffle ( dst shuffle -- )
     {
         { { 0 1 2 3 } [ drop ] }
-        { { 0 0 2 2 } [ dup MOVSLDUP ] }
-        { { 1 1 3 3 } [ dup MOVSHDUP ] }
         { { 0 1 0 1 } [ dup MOVLHPS ] }
         { { 2 3 2 3 } [ dup MOVHLPS ] }
         { { 0 0 1 1 } [ dup UNPCKLPS ] }
         { { 2 2 3 3 } [ dup UNPCKHPS ] }
         [ dupd SHUFPS ]
     } case ;
+
+: float-4-shuffle ( dst shuffle -- )
+    sse3? [
+        {
+            { { 0 0 2 2 } [ dup MOVSLDUP ] }
+            { { 1 1 3 3 } [ dup MOVSHDUP ] }
+            [ sse1-float-4-shuffle ]
+        } case
+    ] [ sse1-float-4-shuffle ] if ;
 
 : int-4-shuffle ( dst shuffle -- )
     {
