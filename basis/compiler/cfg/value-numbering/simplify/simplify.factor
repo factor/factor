@@ -136,7 +136,7 @@ M: scalar>vector-expr simplify*
         [ drop f ]
     } cond ;
 
-M: shuffle-vector-expr simplify*
+M: shuffle-vector-imm-expr simplify*
     [ src>> ] [ shuffle>> ] [ rep>> rep-components iota ] tri
     sequence= [ drop f ] unless ;
 
