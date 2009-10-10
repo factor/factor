@@ -432,8 +432,13 @@ M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
     temp 0 MOV \ t rc-absolute-cell rel-immediate
     dst temp word execute ; inline
 
+: (%compare) ( src1 src2 cc -- )
+    2over [ { cc= cc/= } member? ] [ register? ] [ 0 = ] tri* and and
+    [ drop dup TEST ]
+    [ CMP ] if ;
+
 M:: x86 %compare ( dst src1 src2 cc temp -- )
-    src1 src2 CMP
+    src1 src2 cc (%compare)
     cc order-cc {
         { cc<  [ dst temp \ CMOVL %boolean ] }
         { cc<= [ dst temp \ CMOVLE %boolean ] }
@@ -447,7 +452,7 @@ M: x86 %compare-imm ( dst src1 src2 cc temp -- )
     %compare ;
 
 M:: x86 %compare-branch ( label src1 src2 cc -- )
-    src1 src2 CMP
+    src1 src2 cc (%compare)
     cc order-cc {
         { cc<  [ label JL ] }
         { cc<= [ label JLE ] }
