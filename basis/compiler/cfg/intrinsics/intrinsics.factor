@@ -159,13 +159,14 @@ IN: compiler.cfg.intrinsics
         { math.vectors.simd.intrinsics:(simd-v+-) [ [ ^^add-sub-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-v-) [ [ ^^sub-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vs-) [ [ ^^saturated-sub-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-vneg) [ [ generate-neg-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-v*) [ [ ^^mul-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vs*) [ [ ^^saturated-mul-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-v/) [ [ ^^div-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vmin) [ [ ^^min-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vmax) [ [ ^^max-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-v.) [ [ ^^dot-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-vabs) [ [ ^^abs-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-vabs) [ [ generate-abs-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vsqrt) [ [ ^^sqrt-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vbitand) [ [ ^^and-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vbitandn) [ [ ^^andn-vector ] emit-binary-vector-op ] }

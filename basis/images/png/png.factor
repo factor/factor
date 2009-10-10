@@ -4,7 +4,7 @@ USING: accessors arrays checksums checksums.crc32 combinators
 compression.inflate fry grouping images images.loader io
 io.binary io.encodings.ascii io.encodings.string kernel locals
 math math.bitwise math.ranges sequences sorting assocs
-math.functions math.order ;
+math.functions math.order byte-arrays ;
 QUALIFIED-WITH: bitstreams bs
 IN: images.png
 
@@ -30,6 +30,13 @@ CONSTANT: truecolor-alpha 6
 
 CONSTANT: interlace-none 0
 CONSTANT: interlace-adam7 1
+
+CONSTANT: starting-row  { 0 0 4 0 2 0 1 }
+CONSTANT: starting-col  { 0 4 0 2 0 1 0 }
+CONSTANT: row-increment { 8 8 8 4 4 2 2 }
+CONSTANT: col-increment { 8 8 4 4 2 2 1 }
+CONSTANT: block-height  { 8 8 4 4 2 2 1 }
+CONSTANT: block-width   { 8 4 4 2 2 1 1 }
 
 : <loading-png> ( -- image )
     loading-png new
@@ -134,22 +141,14 @@ ERROR: unimplemented-color-type image ;
         png-unfilter-line
     ] map B{ } concat-as ;
 
-ERROR: unimplemented-interlace ;
-
-: reverse-interlace ( byte-array loading-png -- bitstream )
-    {
-        { interlace-none [ ] }
-        { interlace-adam7 [ unimplemented-interlace ] }
-        [ unimplemented-interlace ]
-    } case bs:<msb0-bit-reader> ;
-
-: uncompress-bytes ( loading-png -- bitstream )
-    [ inflate-data ] [ interlace-method>> ] bi reverse-interlace ;
+:: visit ( row col height width pixel image -- )
+    row image nth :> irow
+    pixel col irow set-nth ;
 
 ERROR: bad-filter n ;
 
-:: raw-bytes ( loading-png -- array )
-    loading-png uncompress-bytes :> bs
+:: reverse-interlace-none ( byte-array loading-png -- array )
+    byte-array bs:<msb0-bit-reader> :> bs
     loading-png width>> :> width
     loading-png height>> :> height
     loading-png png-components-per-pixel :> #components
@@ -169,6 +168,62 @@ ERROR: bad-filter n ;
         8 bs bs:align
     ] replicate
     #components bit-depth 16 = [ 2 * ] when reverse-png-filter ;
+
+:: reverse-interlace-adam7 ( byte-array loading-png -- byte-array )
+    byte-array bs:<msb0-bit-reader> :> bs
+    loading-png height>> :> height
+    loading-png width>> :> width
+    loading-png bit-depth>> :> bit-depth
+    loading-png png-components-per-pixel :> #bytes
+    width height #bytes * * <byte-array> width <sliced-groups> :> image
+
+    0 :> row!
+    0 :> col!
+
+    0 :> pass!
+    [ pass 7 < ] [
+        pass starting-row nth row!
+        [
+            row height <
+        ] [
+            pass starting-col nth col!
+            [
+                col width <
+            ] [
+                row
+                col
+
+                pass block-height nth
+                height row - min
+
+                pass block-width nth
+                width col - min
+
+                bit-depth bs bs:read
+                image
+                visit
+
+                col pass col-increment nth + col!
+            ] while
+            row pass row-increment nth + row!
+        ] while
+        pass 1 + pass!
+    ] while
+    bit-depth 16 = [
+        image { } concat-as
+        [ 2 >be ] map B{ } concat-as
+    ] [
+        image B{ } concat-as
+    ] if ;
+
+ERROR: unimplemented-interlace ;
+
+: uncompress-bytes ( loading-png -- bitstream )
+    [ inflate-data ] [ ] [ interlace-method>> ] tri {
+        { interlace-none [ reverse-interlace-none ] }
+        { interlace-adam7 [ "adam7 is broken" throw reverse-interlace-adam7 ] }
+        [ unimplemented-interlace ]
+    } case ;
 
 ERROR: unknown-component-type n ;
 
@@ -197,10 +252,10 @@ ERROR: unknown-component-type n ;
     } case ;
 
 : decode-greyscale ( loading-png -- byte-array )
-    [ raw-bytes ] keep scale-greyscale ;
+    [ uncompress-bytes ] keep scale-greyscale ;
 
 : decode-greyscale-alpha ( loading-image -- byte-array )
-    [ raw-bytes ] [ bit-depth>> ] bi 16 = [
+    [ uncompress-bytes ] [ bit-depth>> ] bi 16 = [
         4 group [ first4 [ swap ] 2dip 4array ] map B{ } concat-as
     ] when ;
 
@@ -210,8 +265,9 @@ ERROR: invalid-PLTE array ;
     dup length 3 divisor? [ invalid-PLTE ] unless ;
 
 : decode-indexed-color ( loading-image -- byte-array )
-    [ raw-bytes ] keep "PLTE" find-chunk data>> verify-PLTE
-    3 group '[ _ nth ] { } map-as B{ } concat-as ; inline
+    [ uncompress-bytes ] keep
+    "PLTE" find-chunk data>> verify-PLTE
+    3 group '[ _ nth ] { } map-as B{ } concat-as ;
 
 ERROR: invalid-color-type/bit-depth loading-png ;
 
@@ -240,7 +296,7 @@ ERROR: invalid-color-type/bit-depth loading-png ;
             validate-greyscale decode-greyscale L
         ] }
         { truecolor [
-            validate-truecolor raw-bytes RGB
+            validate-truecolor uncompress-bytes RGB
         ] }
         { indexed-color [
             validate-indexed-color decode-indexed-color RGB
@@ -249,7 +305,7 @@ ERROR: invalid-color-type/bit-depth loading-png ;
             validate-greyscale-alpha decode-greyscale-alpha LA
         ] }
         { truecolor-alpha [
-            validate-truecolor-alpha raw-bytes RGBA
+            validate-truecolor-alpha uncompress-bytes RGBA
         ] }
         [ unknown-color-type ]
     } case ;

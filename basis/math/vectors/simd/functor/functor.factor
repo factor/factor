@@ -109,7 +109,6 @@ ERROR: bad-schema op schema ;
     ! Some SIMD operations are defined in terms of others.
     {
         { vbroadcast [ swap nth ctor execute ] }
-        { vneg [ [ dup vbitxor ] keep v- ] }
         { n+v [ [ ctor execute ] dip v+ ] }
         { v+n [ ctor execute v+ ] }
         { n-v [ [ ctor execute ] dip v- ] }
