@@ -123,9 +123,9 @@ M: simd-128 vshuffle ( u perm -- v )
 : vxor ( u v -- w )  over '[ [ _ element>bool ] bi@ xor ] 2map ;
 : vnot ( u -- w )    dup '[ _ element>bool not ] map ;
 
-: vall? ( v -- ? ) [ ] all? ;
-: vany? ( v -- ? ) [ ] any? ;
-: vnone? ( v -- ? ) [ not ] all? ;
+: vall? ( v -- ? ) dup '[ _ element>bool ] all? ;
+: vany? ( v -- ? ) dup '[ _ element>bool ] any? ;
+: vnone? ( v -- ? ) dup '[ _ element>bool not ] all? ;
 
 : v<  ( u v -- w ) [ <   ] 2map ;
 : v<= ( u v -- w ) [ <=  ] 2map ;
