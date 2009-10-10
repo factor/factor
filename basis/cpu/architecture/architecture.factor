@@ -289,6 +289,7 @@ HOOK: %zero-vector-reps cpu ( -- reps )
 HOOK: %fill-vector-reps cpu ( -- reps )
 HOOK: %gather-vector-2-reps cpu ( -- reps )
 HOOK: %gather-vector-4-reps cpu ( -- reps )
+HOOK: %alien-vector-reps cpu ( -- reps )
 HOOK: %shuffle-vector-reps cpu ( -- reps )
 HOOK: %shuffle-vector-imm-reps cpu ( -- reps )
 HOOK: %merge-vector-reps cpu ( -- reps )
@@ -330,6 +331,7 @@ M: object %zero-vector-reps { } ;
 M: object %fill-vector-reps { } ;
 M: object %gather-vector-2-reps { } ;
 M: object %gather-vector-4-reps { } ;
+M: object %alien-vector-reps { } ;
 M: object %shuffle-vector-reps { } ;
 M: object %shuffle-vector-imm-reps { } ;
 M: object %merge-vector-reps { } ;
