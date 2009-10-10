@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.syntax accessors
 destructors fry kernel math math.bitwise sequences libc colors
-images images.memory core-graphics.types core-foundation.utilities ;
+images images.memory core-graphics.types core-foundation.utilities
+opengl.gl ;
 IN: core-graphics
 
 ! CGImageAlphaInfo

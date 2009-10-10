@@ -88,16 +88,22 @@ HELP: find-by-extensions
 ARTICLE: "io.directories.search" "Searching directories"
 "The " { $vocab-link "io.directories.search" } " vocabulary contains words used for recursively iterating over a directory and for finding files in a directory tree." $nl
 "Traversing directories:"
-{ $subsection recursive-directory-files }
-{ $subsection recursive-directory-entries }
-{ $subsection each-file }
+{ $subsections
+    recursive-directory-files
+    recursive-directory-entries
+    each-file
+}
 "Finding files by name:"
-{ $subsection find-file }
-{ $subsection find-all-files }
-{ $subsection find-in-directories }
-{ $subsection find-all-in-directories }
+{ $subsections
+    find-file
+    find-all-files
+    find-in-directories
+    find-all-in-directories
+}
 "Finding files by extension:"
-{ $subsection find-by-extension }
-{ $subsection find-by-extensions } ;
+{ $subsections
+    find-by-extension
+    find-by-extensions
+} ;
 
 ABOUT: "io.directories.search"

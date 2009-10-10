@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.libraries alien.syntax kernel sequences words system
-combinators ;
+USING: alien alien.c-types alien.libraries alien.syntax kernel
+sequences words system combinators opengl.gl ;
 IN: opengl.glu
 
 <<
@@ -17,10 +17,10 @@ os {
 LIBRARY: glu
  
 ! These are defined as structs in glu.h, but we only ever use pointers to them
-TYPEDEF: void* GLUnurbs*
-TYPEDEF: void* GLUquadric*
-TYPEDEF: void* GLUtesselator*
-TYPEDEF: void* GLubyte*
+C-TYPE: GLUnurbs
+C-TYPE: GLUquadric
+C-TYPE: GLUtesselator
+C-TYPE: GLubyte
 TYPEDEF: void* GLUfuncptr
 
 ! StringName

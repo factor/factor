@@ -4,11 +4,11 @@ IN: ui.gadgets.tracks
 
 ARTICLE: "ui-track-layout" "Track layouts"
 "Track gadgets are like " { $link "ui-pack-layout" } " except each child is resized to a fixed multiple of the track's dimension."
-{ $subsection track }
+{ $subsections track }
 "Creating empty tracks:"
-{ $subsection <track> }
+{ $subsections <track> }
 "Adding children:"
-{ $subsection track-add } ;
+{ $subsections track-add } ;
 
 HELP: track
 { $class-description "A track is like a " { $link pack } " except each child is resized to a fixed multiple of the track's dimension in the direction of " { $snippet "orientation" } ". Tracks are created by calling " { $link <track> } "." } ;

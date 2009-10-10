@@ -43,16 +43,20 @@ HELP: pheap>values
 
 ARTICLE: "persistent-heaps" "Persistent heaps"
 "This vocabulary implements persistent minheaps, aka priority queues. They are purely functional and support efficient O(log n) operations of pushing and popping, with O(1) time access to the minimum element. To create heaps, use the following words:"
-{ $subsection <persistent-heap> }
-{ $subsection <singleton-heap> }
+{ $subsections
+    <persistent-heap>
+    <singleton-heap>
+}
 "To manipulate them:"
-{ $subsection pheap-peek }
-{ $subsection pheap-push }
-{ $subsection pheap-pop }
-{ $subsection pheap-pop* }
-{ $subsection pheap-empty? }
-{ $subsection assoc>pheap }
-{ $subsection pheap>alist }
-{ $subsection pheap>values } ;
+{ $subsections
+    pheap-peek
+    pheap-push
+    pheap-pop
+    pheap-pop*
+    pheap-empty?
+    assoc>pheap
+    pheap>alist
+    pheap>values
+} ;
 
 ABOUT: "persistent-heaps"

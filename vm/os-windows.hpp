@@ -19,7 +19,8 @@ typedef wchar_t vm_char;
 #define STRNCMP wcsncmp
 #define STRDUP _wcsdup
 #define MIN(a,b) ((a)>(b)?(b):(a))
-#define FSEEK fseek
+#define FTELL ftello64
+#define FSEEK fseeko64
 
 #ifdef WIN64
 	#define CELL_FORMAT "%Iu"
@@ -41,19 +42,10 @@ typedef wchar_t vm_char;
 /* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
 #define EPOCH_OFFSET 0x019db1ded53e8000LL
 
-void init_ffi();
-void ffi_dlopen(dll *dll);
-void *ffi_dlsym(dll *dll, symbol_char *symbol);
-void ffi_dlclose(dll *dll);
-
-void sleep_micros(u64 msec);
-
 inline static void init_signals() {}
 inline static void early_init() {}
-const vm_char *vm_executable_path();
-const vm_char *default_image_path();
-long getpagesize ();
 
 s64 current_micros();
+long getpagesize();
 
 }

@@ -1,7 +1,9 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.smart fry kernel
-macros math math.bits sequences sequences.private words ;
+macros math math.bits sequences sequences.private words
+byte-arrays alien alien.c-types specialized-arrays ;
+SPECIALIZED-ARRAY: uchar
 IN: math.bitwise
 
 ! utilities
@@ -84,24 +86,36 @@ DEFER: byte-bit-count
 GENERIC: (bit-count) ( x -- n )
 
 M: fixnum (bit-count)
-    [
-        {
-            [           byte-bit-count ]
-            [ -8  shift byte-bit-count ]
-            [ -16 shift byte-bit-count ]
-            [ -24 shift byte-bit-count ]
-        } cleave
-    ] sum-outputs ;
+    0 swap [
+        dup 0 >
+    ] [
+        [ 8 bits byte-bit-count ] [ -8 shift ] bi
+        [ + ] dip
+    ] while drop ;
 
 M: bignum (bit-count)
     dup 0 = [ drop 0 ] [
         [ byte-bit-count ] [ -8 shift (bit-count) ] bi +
     ] if ;
 
+: byte-array-bit-count ( byte-array -- n )
+    0 [ byte-bit-count + ] reduce ;
+
 PRIVATE>
 
-: bit-count ( x -- n )
-    dup 0 < [ bitnot ] when (bit-count) ; inline
+ERROR: invalid-bit-count-target object ;
+
+GENERIC: bit-count ( obj -- n )
+
+M: integer bit-count
+    dup 0 < [ invalid-bit-count-target ] when (bit-count) ; inline
+
+M: byte-array bit-count
+    byte-array-bit-count ;
+
+M: object bit-count
+    [ >c-ptr ] [ byte-length ] bi <direct-uchar-array>
+    byte-array-bit-count ;
 
 : >signed ( x n -- y )
     2dup neg 1 + shift 1 = [ 2^ - ] [ drop ] if ;
@@ -113,3 +127,7 @@ PRIVATE>
 : next-even ( m -- n ) >even 2 + ; foldable
 
 : next-odd ( m -- n ) dup even? [ 1 + ] [ 2 + ] if ; foldable
+
+: even-parity? ( obj -- ? ) bit-count even? ;
+
+: odd-parity? ( obj -- ? ) bit-count odd? ;

@@ -9,22 +9,20 @@ $nl
 "Memoization is useful in situations where the set of possible inputs is small, but the results are expensive to compute and should be cached. Memoized words should not have any side effects."
 $nl
 "Defining a memoized word at parse time:"
-{ $subsection POSTPONE: MEMO: }
+{ $subsections POSTPONE: MEMO: }
 "Defining a memoized word at run time:"
-{ $subsection define-memoized }
+{ $subsections define-memoized }
 "Clearing memoized results:"
-{ $subsection reset-memoized } ;
+{ $subsections reset-memoized } ;
 
 ABOUT: "memoize"
 
 HELP: define-memoized
 { $values { "word" word } { "quot" quotation } { "effect" effect } }
-{ $description "defines the given word at runtime as one which memoizes its output given a particular input" }
-{ $notes "A maximum of four input and four output arguments can be used" }
-{ $see-also POSTPONE: MEMO: } ;
+{ $description "Defines the given word at run time as one which memoizes its outputs given a particular input." } ;
 
 HELP: MEMO:
 { $syntax "MEMO: word ( stack -- effect ) definition ;" }
-{ $description "defines the given word at parsetime as one which memoizes its output given a particular input. The stack effect is mandatory." }
-{ $notes "A maximum of four input and four output arguments can be used" }
-{ $see-also define-memoized } ;
+{ $description "Defines the given word at parse time as one which memoizes its output given a particular input. The stack effect is mandatory." } ;
+
+{ define-memoized POSTPONE: MEMO: } related-words

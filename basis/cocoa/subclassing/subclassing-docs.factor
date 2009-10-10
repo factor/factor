@@ -37,9 +37,9 @@ HELP: CLASS:
 
 ARTICLE: "objc-subclassing" "Subclassing Objective C classes"
 "Objective C classes can be subclassed, with new methods defined in Factor, using a parsing word:"
-{ $subsection POSTPONE: CLASS: }
+{ $subsections POSTPONE: CLASS: }
 "This word is actually syntax sugar for an ordinary word:"
-{ $subsection define-objc-class }
+{ $subsections define-objc-class }
 "Objective C class definitions are saved in the image. If the image is saved and Factor is restarted with the saved image, custom class definitions are made available to the Objective C runtime when they are first accessed from within Factor." ;
 
 IN: cocoa.subclassing

@@ -9,8 +9,10 @@ compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker
 slots.private words hashtables classes assocs locals
 specialized-arrays system sorting math.libm
-math.intervals quotations effects alien ;
+math.intervals quotations effects alien alien.data ;
+FROM: math => float ;
 SPECIALIZED-ARRAY: double
+SPECIALIZED-ARRAY: void*
 IN: compiler.tree.propagation.tests
 
 [ V{ } ] [ [ ] final-classes ] unit-test
@@ -30,6 +32,8 @@ IN: compiler.tree.propagation.tests
 [ V{ fixnum } ] [ [ dup fixnum? [ ] [ drop 3 ] if ] final-classes ] unit-test
 
 [ V{ 69 } ] [ [ [ 69 ] [ 69 ] if ] final-literals ] unit-test
+
+[ V{ integer } ] [ [ bitnot ] final-classes ] unit-test
 
 [ V{ fixnum } ] [ [ { fixnum } declare bitnot ] final-classes ] unit-test
 
@@ -164,6 +168,18 @@ IN: compiler.tree.propagation.tests
 
 [ t ] [ [ absq ] final-info first interval>> [0,inf] = ] unit-test
 
+[ t ] [ [ { fixnum } declare abs ] final-info first interval>> [0,inf] interval-subset? ] unit-test
+
+[ t ] [ [ { fixnum } declare absq ] final-info first interval>> [0,inf] interval-subset? ] unit-test
+
+[ V{ integer } ] [ [ { fixnum } declare abs ] final-classes ] unit-test
+
+[ V{ integer } ] [ [ { fixnum } declare absq ] final-classes ] unit-test
+
+[ t ] [ [ { bignum } declare abs ] final-info first interval>> [0,inf] interval-subset? ] unit-test
+
+[ t ] [ [ { bignum } declare absq ] final-info first interval>> [0,inf] interval-subset? ] unit-test
+
 [ t ] [ [ { float } declare abs ] final-info first interval>> [0,inf] = ] unit-test
 
 [ t ] [ [ { float } declare absq ] final-info first interval>> [0,inf] = ] unit-test
@@ -171,6 +187,10 @@ IN: compiler.tree.propagation.tests
 [ t ] [ [ { complex } declare abs ] final-info first interval>> [0,inf] = ] unit-test
 
 [ t ] [ [ { complex } declare absq ] final-info first interval>> [0,inf] = ] unit-test
+
+[ t ] [ [ { float float } declare rect> C{ 0.0 0.0 } + absq ] final-info first interval>> [0,inf] = ] unit-test
+
+[ V{ float } ] [ [ { float float } declare rect> C{ 0.0 0.0 } + absq ] final-classes ] unit-test
 
 [ t ] [ [ [ - absq ] [ + ] 2map-reduce ] final-info first interval>> [0,inf] = ] unit-test
 
@@ -250,7 +270,21 @@ IN: compiler.tree.propagation.tests
 [ V{ 1.5 } ] [
     [
         /f
+        dup 1.5 u<= [ dup 1.5 u>= [ ] [ drop 1.5 ] if ] [ drop 1.5 ] if
+    ] final-literals
+] unit-test
+
+[ V{ 1.5 } ] [
+    [
+        /f
         dup 1.5 <= [ dup 10 >= [ ] [ drop 1.5 ] if ] [ drop 1.5 ] if
+    ] final-literals
+] unit-test
+
+[ V{ 1.5 } ] [
+    [
+        /f
+        dup 1.5 u<= [ dup 10 u>= [ ] [ drop 1.5 ] if ] [ drop 1.5 ] if
     ] final-literals
 ] unit-test
 
@@ -258,6 +292,13 @@ IN: compiler.tree.propagation.tests
     [
         /f
         dup 0.0 <= [ dup 0.0 >= [ drop 0.0 ] unless ] [ drop 0.0 ] if
+    ] final-literals
+] unit-test
+
+[ V{ f } ] [
+    [
+        /f
+        dup 0.0 u<= [ dup 0.0 u>= [ drop 0.0 ] unless ] [ drop 0.0 ] if
     ] final-literals
 ] unit-test
 
@@ -270,11 +311,23 @@ IN: compiler.tree.propagation.tests
 ] unit-test
 
 [ V{ fixnum } ] [
+    [ 0 dup 10 u> [ 100 * ] when ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [ 0 dup 10 u> [ drop "foo" ] when ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
     [ { fixnum } declare 3 3 - + ] final-classes
 ] unit-test
 
 [ V{ t } ] [
     [ dup 10 < [ 3 * 30 < ] [ drop t ] if ] final-literals
+] unit-test
+
+[ V{ t } ] [
+    [ dup 10 u< [ 3 * 30 u< ] [ drop t ] if ] final-literals
 ] unit-test
 
 [ V{ "d" } ] [
@@ -300,8 +353,16 @@ IN: compiler.tree.propagation.tests
     [ >fixnum dup 100 < [ 1 + ] [ "Oops" throw ] if ] final-classes
 ] unit-test
 
+[ V{ fixnum } ] [
+    [ >fixnum dup 100 u< [ 1 + ] [ "Oops" throw ] if ] final-classes
+] unit-test
+
 [ V{ -1 } ] [
     [ 0 dup 100 < not [ 1 + ] [ 1 - ] if ] final-literals
+] unit-test
+
+[ V{ -1 } ] [
+    [ 0 dup 100 u< not [ 1 + ] [ 1 - ] if ] final-literals
 ] unit-test
 
 [ V{ 2 } ] [
@@ -312,9 +373,19 @@ IN: compiler.tree.propagation.tests
     [ 0 * 10 < ] final-classes
 ] unit-test
 
+[ V{ object } ] [
+    [ 0 * 10 u< ] final-classes
+] unit-test
+
 [ V{ 27 } ] [
     [
         123 bitand dup 10 < over 8 > and [ 3 * ] [ "B" throw ] if
+    ] final-literals
+] unit-test
+
+[ V{ 27 } ] [
+    [
+        123 bitand dup 10 u< over 8 u> and [ 3 * ] [ "B" throw ] if
     ] final-literals
 ] unit-test
 
@@ -694,17 +765,17 @@ MIXIN: empty-mixin
     [ { word object } declare equal? ] final-classes
 ] unit-test
 
-! [ V{ string } ] [
-!     [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
-! ] unit-test
+[ V{ string } ] [
+    [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
+] unit-test
 
-! [ t ] [ [ dup t xor or ] final-classes first true-class? ] unit-test
+[ t ] [ [ dup t xor or ] final-classes first true-class? ] unit-test
 
-! [ t ] [ [ dup t xor swap or ] final-classes first true-class? ] unit-test
+[ t ] [ [ dup t xor swap or ] final-classes first true-class? ] unit-test
 
-! [ t ] [ [ dup t xor and ] final-classes first false-class? ] unit-test
+[ t ] [ [ dup t xor and ] final-classes first false-class? ] unit-test
 
-! [ t ] [ [ dup t xor swap and ] final-classes first false-class? ] unit-test
+[ t ] [ [ dup t xor swap and ] final-classes first false-class? ] unit-test
 
 ! generalize-counter-interval wasn't being called in all the right places.
 ! bug found by littledan
@@ -824,3 +895,14 @@ M: tuple-with-read-only-slot clone
 [ t ] [ [ >fixnum dup 0 >= [ 16 /i ] when ] { /i fixnum/i fixnum/i-fast } inlined? ] unit-test
 [ f ] [ [ >fixnum dup 0 >= [ 16 /i ] when ] { fixnum-shift-fast } inlined? ] unit-test
 [ f ] [ [ >float dup 0 >= [ 16 /i ] when ] { /i float/f } inlined? ] unit-test
+
+! We want this to inline
+[ t ] [ [ void* <c-direct-array> ] { <c-direct-array> } inlined? ] unit-test
+[ V{ void*-array } ] [ [ void* <c-direct-array> ] final-classes ] unit-test
+
+[ t ] [ [ alien-unsigned-1 255 bitand ] { bitand fixnum-bitand } inlined? ] unit-test
+[ t ] [ [ alien-unsigned-1 255 swap bitand ] { bitand fixnum-bitand } inlined? ] unit-test
+
+[ t ] [ [ { fixnum } declare 256 rem -256 bitand ] { fixnum-bitand } inlined? ] unit-test
+[ t ] [ [ { fixnum } declare 250 rem -256 bitand ] { fixnum-bitand } inlined? ] unit-test
+[ f ] [ [ { fixnum } declare 257 rem -256 bitand ] { fixnum-bitand } inlined? ] unit-test

@@ -3,10 +3,12 @@ IN: ctags.etags
 
 ARTICLE: "etags" "Etags file"
 { $emphasis "Etags" } " generates a index file of every factor word in etags format as supported by emacs and other editors. More information can be found at " { $url "http://en.wikipedia.org/wiki/Ctags#Etags_2" } "."
-{ $subsection etags }
-{ $subsection etags-write }
-{ $subsection etag-strings }
-{ $subsection etag-header }
+{ $subsections
+    etags
+    etags-write
+    etag-strings
+    etag-header
+}
 
 HELP: etags ( path -- )
 { $values { "path" string } }

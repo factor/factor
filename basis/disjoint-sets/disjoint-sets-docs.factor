@@ -42,17 +42,21 @@ $nl
 "The two main supported operations are equating two elements, which joins their equivalence classes, and checking if two elements belong to the same equivalence class. Both operations have the time complexity of the inverse Ackermann function, which for all intents and purposes is constant time."
 $nl
 "The class of disjoint sets:"
-{ $subsection disjoint-set }
+{ $subsections disjoint-set }
 "Creating new disjoint sets:"
-{ $subsection <disjoint-set> }
-{ $subsection assoc>disjoint-set }
+{ $subsections
+    <disjoint-set>
+    assoc>disjoint-set
+}
 "Queries:"
-{ $subsection equiv? }
-{ $subsection equiv-set-size }
+{ $subsections
+    equiv?
+    equiv-set-size
+}
 "Adding elements:"
-{ $subsection add-atom }
+{ $subsections add-atom }
 "Equating elements:"
-{ $subsection equate }
+{ $subsections equate }
 "Additionally, disjoint sets implement the " { $link clone } " generic word." ;
 
 ABOUT: "disjoint-sets"

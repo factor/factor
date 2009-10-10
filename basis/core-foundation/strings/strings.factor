@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax alien.strings io.encodings.string kernel
-sequences byte-arrays io.encodings.utf8 math core-foundation
-core-foundation.arrays destructors ;
+USING: alien.c-types alien.syntax alien.strings io.encodings.string
+kernel sequences byte-arrays io.encodings.utf8 math core-foundation
+core-foundation.arrays destructors parser fry alien words ;
 IN: core-foundation.strings
 
 TYPEDEF: void* CFStringRef
@@ -83,3 +83,8 @@ FUNCTION: CFStringRef CFStringCreateWithCString (
 
 : <CFStringArray> ( seq -- alien )
     [ [ <CFString> &CFRelease ] map <CFArray> ] with-destructors ;
+
+SYNTAX: CFSTRING: 
+    CREATE scan-object 
+    [ drop ] [ '[ _ [ _ <CFString> ] initialize-alien ] ] 2bi
+    (( -- alien )) define-declared ;

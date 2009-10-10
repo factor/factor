@@ -112,26 +112,34 @@ HELP: copy-files-into
 
 ARTICLE: "current-directory" "Current working directory"
 "File system I/O operations use the value of a variable to resolve relative pathnames:"
-{ $subsection current-directory }
+{ $subsections current-directory }
 "This variable can be changed with a pair of words:"
-{ $subsection set-current-directory }
-{ $subsection with-directory }
+{ $subsections
+    set-current-directory
+    with-directory
+}
 "This variable is independent of the operating system notion of “current working directory”. While all Factor I/O operations use the variable and not the operating system's value, care must be taken when making FFI calls which expect a pathname. The first option is to resolve relative paths:"
-{ $subsection (normalize-path) }
+{ $subsections (normalize-path) }
 "The second is to change the working directory of the current process:"
-{ $subsection cd }
-{ $subsection cwd } ;
+{ $subsections
+    cd
+    cwd
+} ;
 
 ARTICLE: "io.directories.listing" "Directory listing"
 "Directory listing:"
-{ $subsection directory-entries }
-{ $subsection directory-files }
-{ $subsection with-directory-entries }
-{ $subsection with-directory-files } ;
+{ $subsections
+    directory-entries
+    directory-files
+    with-directory-entries
+    with-directory-files
+} ;
 
 ARTICLE: "io.directories.create" "Creating directories"
-{ $subsection make-directory }
-{ $subsection make-directories } ;
+{ $subsections
+    make-directory
+    make-directories
+} ;
 
 ARTICLE: "delete-move-copy" "Deleting, moving, and copying files"
 "Operations for deleting and copying files come in two forms:"
@@ -148,25 +156,33 @@ ARTICLE: "delete-move-copy" "Deleting, moving, and copying files"
 "Since both of the above lists apply to copying files, that this means that there are a total of six variations on copying a file."
 $nl
 "Deleting files:"
-{ $subsection delete-file }
-{ $subsection delete-directory }
+{ $subsections
+    delete-file
+    delete-directory
+}
 "Moving files:"
-{ $subsection move-file }
-{ $subsection move-file-into }
-{ $subsection move-files-into }
+{ $subsections
+    move-file
+    move-file-into
+    move-files-into
+}
 "Copying files:"
-{ $subsection copy-file }
-{ $subsection copy-file-into }
-{ $subsection copy-files-into }
+{ $subsections
+    copy-file
+    copy-file-into
+    copy-files-into
+}
 "On most operating systems, files can only be moved within the same file system. To move files between file systems, use " { $link copy-file } " followed by " { $link delete-file } " on the old name." ;
 
 ARTICLE: "io.directories" "Directory manipulation"
 "The " { $vocab-link "io.directories" } " vocabulary defines words for inspecting and manipulating directory trees."
-{ $subsection home }
-{ $subsection "current-directory" }
-{ $subsection "io.directories.listing" }
-{ $subsection "io.directories.create" }
-{ $subsection "delete-move-copy" }
-{ $subsection "io.directories.hierarchy" } ;
+{ $subsections
+    home
+    "current-directory"
+    "io.directories.listing"
+    "io.directories.create"
+    "delete-move-copy"
+    "io.directories.hierarchy"
+} ;
 
 ABOUT: "io.directories"

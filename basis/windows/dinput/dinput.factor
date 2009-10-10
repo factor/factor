@@ -1,38 +1,9 @@
 USING: windows.kernel32 windows.ole32 windows.com windows.com.syntax
 alien alien.c-types alien.syntax kernel system namespaces math
-classes.struct ;
+classes.struct windows.types ;
 IN: windows.dinput
 
 LIBRARY: dinput
-
-TYPEDEF: void* LPDIENUMDEVICESCALLBACKW
-: LPDIENUMDEVICESCALLBACKW ( quot -- alien )
-    [ "BOOL" { "LPCDIDEVICEINSTANCEW" "LPVOID" } "stdcall" ]
-    dip alien-callback ; inline
-TYPEDEF: void* LPDIENUMDEVICESBYSEMANTICSCBW
-: LPDIENUMDEVICESBYSEMANTICSCBW ( quot -- alien )
-    [ "BOOL" { "LPCDIDEVICEINSTANCEW" "IDirectInputDevice8W*" "DWORD" "DWORD" "LPVOID" } "stdcall" ]
-    dip alien-callback ; inline
-TYPEDEF: void* LPDICONFIGUREDEVICESCALLBACK
-: LPDICONFIGUREDEVICESCALLBACK ( quot -- alien )
-    [ "BOOL" { "IUnknown*" "LPVOID" } "stdcall" ]
-    dip alien-callback ; inline
-TYPEDEF: void* LPDIENUMEFFECTSCALLBACKW
-: LPDIENUMEFFECTSCALLBACKW ( quot -- alien )
-    [ "BOOL" { "LPCDIEFFECTINFOW" "LPVOID" } "stdcall" ]
-    dip alien-callback ; inline
-TYPEDEF: void* LPDIENUMCREATEDEFFECTOBJECTSCALLBACK
-: LPDIENUMCREATEDEFFECTOBJECTSCALLBACK ( quot -- callback )
-    [ "BOOL" { "LPDIRECTINPUTEFFECT" "LPVOID" } "stdcall" ]
-    dip alien-callback ; inline
-TYPEDEF: void* LPDIENUMEFFECTSINFILECALLBACK
-: LPDIENUMEFFECTSINFILECALLBACK ( quot -- callback )
-    [ "BOOL" { "LPCDIFILEEFFECT" "LPVOID" } "stdcall" ]
-    dip alien-callback ; inline
-TYPEDEF: void* LPDIENUMDEVICEOBJECTSCALLBACKW
-: LPDIENUMDEVICEOBJECTSCALLBACKW ( quot -- callback )
-    [ "BOOL" { "LPCDIDEVICEOBJECTINSTANCEW" "LPVOID" } "stdcall" ]
-    dip alien-callback ; inline
 
 TYPEDEF: DWORD D3DCOLOR
 
@@ -326,6 +297,27 @@ STRUCT: DIJOYSTATE2
 TYPEDEF: DIJOYSTATE2* LPDIJOYSTATE2
 TYPEDEF: DIJOYSTATE2* LPCDIJOYSTATE2
 
+CALLBACK: BOOL LPDIENUMDEVICESCALLBACKW (
+    LPCDIDEVICEINSTANCEW lpddi,
+    LPVOID pvRef
+) ;
+CALLBACK: BOOL LPDICONFIGUREDEVICESCALLBACK (
+    IUnknown* lpDDSTarget,
+    LPVOID pvRef
+) ;
+CALLBACK: BOOL LPDIENUMEFFECTSCALLBACKW (
+    LPCDIEFFECTINFOW pdei,
+    LPVOID pvRef
+) ;
+CALLBACK: BOOL LPDIENUMEFFECTSINFILECALLBACK (
+    LPCDIFILEEFFECT lpDiFileEf,
+    LPVOID pvRef
+) ;
+CALLBACK: BOOL LPDIENUMDEVICEOBJECTSCALLBACKW (
+    LPCDIDEVICEOBJECTINSTANCEW lpddoi,
+    LPVOID pvRef
+) ;
+
 COM-INTERFACE: IDirectInputEffect IUnknown {E7E1F7C0-88D2-11D0-9AD0-00A0C9A06E35}
     HRESULT Initialize ( HINSTANCE hinst, DWORD dwVersion, REFGUID rguid )
     HRESULT GetEffectGuid ( LPGUID pguid )
@@ -337,6 +329,11 @@ COM-INTERFACE: IDirectInputEffect IUnknown {E7E1F7C0-88D2-11D0-9AD0-00A0C9A06E35
     HRESULT Download ( )
     HRESULT Unload ( )
     HRESULT Escape ( LPDIEFFESCAPE pesc ) ;
+
+CALLBACK: BOOL LPDIENUMCREATEDEFFECTOBJECTSCALLBACK (
+    IDirectInputEffect* peff,
+    LPVOID pvRef
+) ;
 
 COM-INTERFACE: IDirectInputDevice8W IUnknown {54D41081-DC15-4833-A41B-748F73A38179}
     HRESULT GetCapabilities ( LPDIDEVCAPS lpDIDeviceCaps )
@@ -368,6 +365,14 @@ COM-INTERFACE: IDirectInputDevice8W IUnknown {54D41081-DC15-4833-A41B-748F73A381
     HRESULT BuildActionMap ( LPDIACTIONFORMATW lpdiaf, LPCWSTR lpszUserName, DWORD dwFlags )
     HRESULT SetActionMap ( LPDIACTIONFORMATW lpdiActionFormat, LPCWSTR lpwszUserName, DWORD dwFlags )
     HRESULT GetImageInfo ( LPDIDEVICEIMAGEINFOHEADERW lpdiDeviceImageInfoHeader ) ;
+
+CALLBACK: BOOL LPDIENUMDEVICESBYSEMANTICSCBW (
+    LPCDIDEVICEINSTANCEW lpddi, 
+    IDirectInputDevice8W* lpdid,
+    DWORD dwFlags,
+    DWORD dwRemaining,
+    LPVOID pvRef
+) ;
 
 COM-INTERFACE: IDirectInput8W IUnknown {BF798031-483A-4DA2-AA99-5D64ED369700}
     HRESULT CreateDevice ( REFGUID rguid, IDirectInputDevice8W** lplpDevice, LPUNKNOWN pUnkOuter )

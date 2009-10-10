@@ -1,4 +1,4 @@
-USING: sequences math mirrors splitting grouping
+USING: alien.c-types sequences math mirrors splitting grouping
 kernel make assocs alien.syntax columns
 specialized-arrays bit-arrays ;
 SPECIALIZED-ARRAY: double

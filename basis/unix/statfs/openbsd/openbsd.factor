@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax unix.types unix.stat classes.struct ;
+USING: alien.c-types alien.syntax unix.types classes.struct 
+unix.stat ;
 IN: unix.statfs.openbsd
 
 CONSTANT: MFSNAMELEN 16
@@ -25,9 +26,9 @@ STRUCT: statfs
     { f_owner uid_t }
     { f_ctime u_int32_t }
     { f_spare u_int32_t[3] }
-    { f_fstypename { "char" MFSNAMELEN } }
-    { f_mntonname { "char" MNAMELEN } }
-    { f_mntfromname { "char" MNAMELEN } }
+    { f_fstypename { char MFSNAMELEN } }
+    { f_mntonname { char MNAMELEN } }
+    { f_mntfromname { char MNAMELEN } }
     { mount_info char[160] } ;
 
-FUNCTION: int statfs ( char* path, statvfs* buf ) ;
+FUNCTION: int statfs ( char* path, statfs* buf ) ;

@@ -1,6 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax kernel destructors core-foundation
+USING: alien.c-types alien.syntax kernel destructors
+core-foundation core-foundation.dictionaries
+core-foundation.strings
 core-foundation.utilities ;
 IN: core-foundation.attributed-strings
 

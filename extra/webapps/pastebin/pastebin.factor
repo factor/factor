@@ -10,6 +10,7 @@ html.templates.chloe
 http.server
 http.server.dispatchers
 http.server.redirection
+http.server.responses
 furnace
 furnace.actions
 furnace.redirection
@@ -64,15 +65,18 @@ TUPLE: paste < entity annotations ;
 
 TUPLE: annotation < entity parent ;
 
-annotation "ANNOTATIONS"
+\ annotation "ANNOTATIONS"
 {
     { "parent" "PARENT" INTEGER +not-null+ }
 } define-persistent
 
 : <annotation> ( parent id -- annotation )
-    annotation new
+    \ annotation new
         swap >>id
         swap >>parent ;
+
+: annotation ( id -- annotation )
+    [ f ] dip <annotation> select-tuple ;
 
 : paste ( id -- paste )
     [ <paste> select-tuple ]
@@ -133,6 +137,11 @@ M: annotation entity-url
         ] >>init
 
         { pastebin "paste" } >>template ;
+
+: <raw-paste-action> ( -- action )
+    <action>
+        [ validate-integer-id "id" value paste from-object ] >>init
+        [ "contents" value "text/plain" <content> ] >>display ;
 
 : <paste-feed-action> ( -- action )
     <feed-action>
@@ -213,13 +222,18 @@ M: annotation entity-url
             tri
         ] >>submit ;
 
+: <raw-annotation-action> ( -- action )
+    <action>
+        [ validate-integer-id "id" value annotation from-object ] >>init
+        [ "contents" value "text/plain" <content> ] >>display ;
+
 : <delete-annotation-action> ( -- action )
     <action>
 
         [ { { "id" [ v-number ] } } validate-params ] >>validate
 
         [
-            f "id" value <annotation> select-tuple
+            f "id" value annotation
             [ delete-tuples ]
             [ parent>> paste-url <redirect> ]
             bi
@@ -234,10 +248,12 @@ M: annotation entity-url
         <pastebin-action> "" add-responder
         <pastebin-feed-action> "list.atom" add-responder
         <paste-action> "paste" add-responder
+        <raw-paste-action> "paste.txt" add-responder
         <paste-feed-action> "paste.atom" add-responder
         <new-paste-action> "new-paste" add-responder
         <delete-paste-action> "delete-paste" add-responder
         <new-annotation-action> "new-annotation" add-responder
+        <raw-annotation-action> "annotation.txt" add-responder
         <delete-annotation-action> "delete-annotation" add-responder
     <boilerplate>
         { pastebin "pastebin-common" } >>template ;

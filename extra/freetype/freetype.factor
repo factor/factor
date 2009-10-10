@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax kernel system combinators
-alien.libraries ;
+USING: alien alien.c-types alien.syntax kernel system combinators
+alien.libraries classes.struct ;
 IN: freetype
 
 << "freetype" {
@@ -23,7 +23,7 @@ TYPEDEF: ushort FT_UShort
 TYPEDEF: long FT_Long
 TYPEDEF: ulong FT_ULong
 TYPEDEF: uchar FT_Bool
-TYPEDEF: cell FT_Offset
+TYPEDEF: ulong FT_Offset
 TYPEDEF: int FT_PtrDist
 TYPEDEF: char FT_String
 TYPEDEF: int FT_Tag
@@ -38,133 +38,135 @@ TYPEDEF: long FT_F26Dot6
 FUNCTION: FT_Error FT_Init_FreeType ( void* library ) ;
 
 ! circular reference between glyph and face
-TYPEDEF: void face
-TYPEDEF: void glyph
+C-TYPE: face
+C-TYPE: glyph
 
-C-STRUCT: glyph
-    { "void*" "library" }
-    { "face*" "face" }
-    { "glyph*" "next" }
-    { "FT_UInt" "reserved" }
-    { "void*" "generic" }
-    { "void*" "generic" }
+STRUCT: glyph
+    { library void* }
+    { face face* }
+    { next glyph* }
+    { reserved FT_UInt }
+    { generic void* }
+    { generic2 void* }
 
-    { "FT_Pos" "width" }
-    { "FT_Pos" "height" }
+    { width FT_Pos }
+    { height FT_Pos }
 
-    { "FT_Pos" "hori-bearing-x" }
-    { "FT_Pos" "hori-bearing-y" }
-    { "FT_Pos" "hori-advance" }
+    { hori-bearing-x FT_Pos }
+    { hori-bearing-y FT_Pos }
+    { hori-advance FT_Pos }
 
-    { "FT_Pos" "vert-bearing-x" }
-    { "FT_Pos" "vert-bearing-y" }
-    { "FT_Pos" "vert-advance" }
+    { vert-bearing-x FT_Pos }
+    { vert-bearing-y FT_Pos }
+    { vert-advance FT_Pos }
 
-    { "FT_Fixed" "linear-hori-advance" }
-    { "FT_Fixed" "linear-vert-advance" }
-    { "FT_Pos" "advance-x" }
-    { "FT_Pos" "advance-y" }
+    { linear-hori-advance FT_Fixed }
+    { linear-vert-advance FT_Fixed }
+    { advance-x FT_Pos }
+    { advance-y FT_Pos }
 
-    { "intptr_t" "format" }
+    { format intptr_t }
 
-    { "int" "bitmap-rows" }
-    { "int" "bitmap-width" }
-    { "int" "bitmap-pitch" }
-    { "void*" "bitmap-buffer" }
-    { "short" "bitmap-num-grays" }
-    { "char" "bitmap-pixel-mode" }
-    { "char" "bitmap-palette-mode" }
-    { "void*" "bitmap-palette" }
+    { bitmap-rows int }
+    { bitmap-width int }
+    { bitmap-pitch int }
+    { bitmap-buffer void* }
+    { bitmap-num-grays short }
+    { bitmap-pixel-mode char }
+    { bitmap-palette-mode char }
+    { bitmap-palette void* }
 
-    { "FT_Int" "bitmap-left" }
-    { "FT_Int" "bitmap-top" }
+    { bitmap-left FT_Int }
+    { bitmap-top FT_Int }
 
-    { "short" "n-contours" }
-    { "short" "n-points" }
+    { n-contours short }
+    { n-points short }
 
-    { "void*" "points" }
-    { "char*" "tags" }
-    { "short*" "contours" }
+    { points void* }
+    { tags char* }
+    { contours short* }
 
-    { "int" "outline-flags" }
+    { outline-flags int }
 
-    { "FT_UInt" "num_subglyphs" }
-    { "void*" "subglyphs" }
+    { num_subglyphs FT_UInt }
+    { subglyphs void* }
 
-    { "void*" "control-data" }
-    { "long" "control-len" }
+    { control-data void* }
+    { control-len long }
 
-    { "FT_Pos" "lsb-delta" }
-    { "FT_Pos" "rsb-delta" }
+    { lsb-delta FT_Pos }
+    { rsb-delta FT_Pos }
 
-    { "void*" "other" } ;
+    { other void* } ;
 
-C-STRUCT: face-size
-    { "face*" "face" }
-    { "void*" "generic" }
-    { "void*" "generic" }
+STRUCT: face-size
+    { face face* }
+    { generic void* }
+    { generic2 void* }
 
-    { "FT_UShort" "x-ppem" }
-    { "FT_UShort" "y-ppem" }
+    { x-ppem FT_UShort }
+    { y-ppem FT_UShort }
 
-    { "FT_Fixed" "x-scale" }
-    { "FT_Fixed" "y-scale" }
+    { x-scale FT_Fixed }
+    { y-scale FT_Fixed }
 
-    { "FT_Pos" "ascender" }
-    { "FT_Pos" "descender" }
-    { "FT_Pos" "height" }
-    { "FT_Pos" "max-advance" } ;
+    { ascender FT_Pos }
+    { descender FT_Pos }
+    { height FT_Pos }
+    { max-advance FT_Pos } ;
 
-C-STRUCT: face
-    { "FT_Long" "num-faces" }
-    { "FT_Long" "index" }
+STRUCT: face
+    { num-faces FT_Long }
+    { index FT_Long }
 
-    { "FT_Long" "flags" }
-    { "FT_Long" "style-flags" }
+    { flags FT_Long }
+    { style-flags FT_Long }
 
-    { "FT_Long" "num-glyphs" }
+    { num-glyphs FT_Long }
 
-    { "FT_Char*" "family-name" }
-    { "FT_Char*" "style-name" }
+    { family-name FT_Char* }
+    { style-name FT_Char* }
 
-    { "FT_Int" "num-fixed-sizes" }
-    { "void*" "available-sizes" }
+    { num-fixed-sizes FT_Int }
+    { available-sizes void* }
 
-    { "FT_Int" "num-charmaps" }
-    { "void*" "charmaps" }
+    { num-charmaps FT_Int }
+    { charmaps void* }
 
-    { "void*" "generic" }
-    { "void*" "generic" }
+    { generic void* }
+    { generic2 void* }
 
-    { "FT_Pos" "x-min" }
-    { "FT_Pos" "y-min" }
-    { "FT_Pos" "x-max" }
-    { "FT_Pos" "y-max" }
+    { x-min FT_Pos }
+    { y-min FT_Pos }
+    { x-max FT_Pos }
+    { y-max FT_Pos }
 
-    { "FT_UShort" "units-per-em" }
-    { "FT_Short" "ascender" }
-    { "FT_Short" "descender" }
-    { "FT_Short" "height" }
+    { units-per-em FT_UShort }
+    { ascender FT_Short }
+    { descender FT_Short }
+    { height FT_Short }
 
-    { "FT_Short" "max-advance-width" }
-    { "FT_Short" "max-advance-height" }
+    { max-advance-width FT_Short }
+    { max-advance-height FT_Short }
 
-    { "FT_Short" "underline-position" }
-    { "FT_Short" "underline-thickness" }
+    { underline-position FT_Short }
+    { underline-thickness FT_Short }
 
-    { "glyph*" "glyph" }
-    { "face-size*" "size" }
-    { "void*" "charmap" } ;
+    { glyph glyph* }
+    { size face-size* }
+    { charmap void* } ;
 
-C-STRUCT: FT_Bitmap
-    { "int" "rows" }
-    { "int" "width" }
-    { "int" "pitch" }
-    { "void*" "buffer" }
-    { "short" "num_grays" }
-    { "char" "pixel_mode" }
-    { "char" "palette_mode" }
-    { "void*" "palette" } ;
+STRUCT: FT_Bitmap
+    { rows int }
+    { width int }
+    { pitch int }
+    { buffer void* }
+    { num_grays short }
+    { pixel_mode char }
+    { palette_mode char }
+    { palette void* } ;
+
+TYPEDEF: void* FT_Face*
 
 FUNCTION: FT_Error FT_New_Face ( void* library, FT_Char* font, FT_Long index, face* face ) ;
 

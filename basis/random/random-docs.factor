@@ -2,8 +2,12 @@ USING: help.markup help.syntax math kernel sequences ;
 IN: random
 
 HELP: seed-random
-{ $values { "tuple" "a random number generator" } { "seed" "an integer between 0 and 2^32-1" } }
-{ $description "Seed the random number generator." }
+{ $values
+    { "tuple" "a random number generator" }
+    { "seed" "a seed specific to the random number generator" }
+    { "tuple'" "a random number generator" }
+}
+{ $description "Seed the random number generator. Repeatedly seeding the random number generator should provide the same sequence of random numbers." }
 { $notes "Not supported on all random number generators." } ;
 
 HELP: random-32*
@@ -28,6 +32,10 @@ HELP: random
         "{ heads tails } random ."
         "heads" }
 } ;
+
+HELP: random-32
+{ $values { "n" "a 32-bit random integer" } }
+{ $description "Outputs 32 random bits. This word is more efficient than calling " { $link random } " because no scaling is done on the output." } ;
 
 HELP: random-bytes
 { $values { "n" "an integer" } { "byte-array" "a random integer" } }
@@ -72,6 +80,18 @@ HELP: randomize
 }
 { $description "Randomizes a sequence in-place with the Fisher-Yates algorithm and returns the sequence." } ;
 
+HELP: sample
+{ $values
+    { "seq" sequence } { "n" integer }
+    { "seq'" sequence }
+}
+{ $description "Takes " { $snippet "n" } " samples at random without replacement from a sequence. Throws an error if " { $snippet "n" } " is longer than the sequence." }
+{ $examples
+    { $unchecked-example "USING: random prettyprint ; { 1 2 3 } 2 sample ."
+        "{ 3 2 }"
+    }
+} ;
+
 HELP: delete-random
 { $values
      { "seq" sequence }
@@ -80,10 +100,12 @@ HELP: delete-random
 
 ARTICLE: "random-protocol" "Random protocol"
 "A random number generator must implement one of these two words:"
-{ $subsection random-32* }
-{ $subsection random-bytes* }
+{ $subsections
+    random-32*
+    random-bytes*
+}
 "Optional, to seed a random number generator:"
-{ $subsection seed-random } ;
+{ $subsections seed-random } ;
 
 ARTICLE: "random" "Generating random integers"
 "The " { $vocab-link "random" } " vocabulary contains a protocol for generating random or pseudorandom numbers."
@@ -91,19 +113,27 @@ $nl
 "The “Mersenne Twister” pseudorandom number generator algorithm is the default generator stored in " { $link random-generator } "."
 $nl
 "Generate a random object:"
-{ $subsection random }
+{ $subsections random }
+"Efficient 32-bit random numbers:"
+{ $subsections random-32 }
 "Combinators to change the random number generator:"
-{ $subsection with-random }
-{ $subsection with-system-random }
-{ $subsection with-secure-random }
+{ $subsections
+    with-random
+    with-system-random
+    with-secure-random
+}
 "Implementation:"
-{ $subsection "random-protocol" }
+{ $subsections "random-protocol" }
 "Randomizing a sequence:"
-{ $subsection randomize }
+{ $subsections randomize }
+"Sampling a sequences:"
+{ $subsections sample }
 "Deleting a random element from a sequence:"
-{ $subsection delete-random }
+{ $subsections delete-random }
 "Random numbers with " { $snippet "n" } " bits:"
-{ $subsection random-bits }
-{ $subsection random-bits* } ;
+{ $subsections
+    random-bits
+    random-bits*
+} ;
 
 ABOUT: "random"

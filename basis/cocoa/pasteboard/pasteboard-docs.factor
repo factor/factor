@@ -14,9 +14,11 @@ HELP: set-pasteboard-string
 { $description "Sets the contents of the pasteboard." } ;
 
 ARTICLE: "cocoa-pasteboard-utils" "Cocoa pasteboard utilities"
-{ $subsection pasteboard-string? }
-{ $subsection pasteboard-string }
-{ $subsection set-pasteboard-string } ;
+{ $subsections
+    pasteboard-string?
+    pasteboard-string
+    set-pasteboard-string
+} ;
 
 IN: cocoa.pasteboard
 ABOUT: "cocoa-pasteboard-utils"

@@ -6,17 +6,18 @@ ARTICLE: "tools.annotations" "Word annotations"
 "The word annotation feature modifies word definitions to add debugging code. You can restore the old definition by calling " { $link reset } " on the word in question."
 $nl
 "Printing messages when a word is called or returns:"
-{ $subsection watch }
-{ $subsection watch-vars }
-"Starting the walker when a word is called:"
-{ $subsection breakpoint }
-{ $subsection breakpoint-if }
+{ $subsections
+    watch
+    watch-vars
+}
 "Timing words:"
-{ $subsection reset-word-timing }
-{ $subsection add-timing }
-{ $subsection word-timing. }
+{ $subsections
+    reset-word-timing
+    add-timing
+    word-timing.
+}
 "All of the above words are implemented using a single combinator which applies a quotation to a word definition to yield a new definition:"
-{ $subsection annotate }
+{ $subsections annotate }
 { $warning
     "Certain internal words, such as words in the " { $vocab-link "math" } ", " { $vocab-link "sequences" } " and UI vocabularies, cannot be annotated, since the annotated code may end up recursively invoking the word in question. This may crash or hang Factor. It is safest to only define annotations on your own words."
 } ;
@@ -33,14 +34,6 @@ HELP: watch
 { $description "Annotates a word definition to print the data stack on entry and exit." } ;
 
 { watch watch-vars reset } related-words
-
-HELP: breakpoint
-{ $values { "word" word } }
-{ $description "Annotates a word definition to enter the single stepper when executed." } ;
-
-HELP: breakpoint-if
-{ $values { "quot" { $quotation "( -- ? )" } } { "word" word } }
-{ $description "Annotates a word definition to enter the single stepper if the quotation yields true." } ;
 
 HELP: reset
 { $values

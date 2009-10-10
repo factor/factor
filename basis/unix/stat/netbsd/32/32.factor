@@ -1,4 +1,5 @@
-USING: kernel alien.syntax math classes.struct ;
+USING: kernel alien.c-types alien.syntax math classes.struct
+unix.time unix.types ;
 IN: unix.stat
 
 ! NetBSD 4.0

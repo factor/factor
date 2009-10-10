@@ -1,8 +1,8 @@
 USING: alien.c-types arrays accessors combinators classes.struct
-alien.syntax ;
+alien.syntax unix.time unix.types ;
 IN: unix.stat
 
-! Mac OS X ppc
+! Mac OS X
 
 ! stat64 structure
 STRUCT: stat

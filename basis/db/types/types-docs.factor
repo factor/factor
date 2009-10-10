@@ -157,32 +157,42 @@ HELP: unknown-modifier
 ARTICLE: "db.types" "Database types"
 "The " { $vocab-link "db.types" } " vocabulary maps Factor types to database types." $nl
 "Primary keys:"
-{ $subsection +db-assigned-id+ }
-{ $subsection +user-assigned-id+ }
-{ $subsection +random-id+ }
+{ $subsections
+    +db-assigned-id+
+    +user-assigned-id+
+    +random-id+
+}
 "Null and boolean types:"
-{ $subsection NULL }
-{ $subsection BOOLEAN }
+{ $subsections
+    NULL
+    BOOLEAN
+}
 "Text types:"
-{ $subsection VARCHAR }
-{ $subsection TEXT }
+{ $subsections
+    VARCHAR
+    TEXT
+}
 "Number types:"
-{ $subsection INTEGER }
-{ $subsection BIG-INTEGER }
-{ $subsection SIGNED-BIG-INTEGER }
-{ $subsection UNSIGNED-BIG-INTEGER }
-{ $subsection DOUBLE }
-{ $subsection REAL }
+{ $subsections
+    INTEGER
+    BIG-INTEGER
+    SIGNED-BIG-INTEGER
+    UNSIGNED-BIG-INTEGER
+    DOUBLE
+    REAL
+}
 "Calendar types:"
-{ $subsection DATE }
-{ $subsection DATETIME }
-{ $subsection TIME }
-{ $subsection TIMESTAMP }
+{ $subsections
+    DATE
+    DATETIME
+    TIME
+    TIMESTAMP
+}
 "Factor byte-arrays:"
-{ $subsection BLOB }
+{ $subsections BLOB }
 "Arbitrary Factor objects:"
-{ $subsection FACTOR-BLOB }
+{ $subsections FACTOR-BLOB }
 "Factor URLs:"
-{ $subsection URL } ;
+{ $subsections URL } ;
 
 ABOUT: "db.types"

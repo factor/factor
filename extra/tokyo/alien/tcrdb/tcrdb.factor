@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax
 combinators kernel system tokyo.alien.tchdb tokyo.alien.tcutil
-tokyo.alien.tctdb ;
+tokyo.alien.tctdb classes.struct ;
 IN: tokyo.alien.tcrdb
 
 << "tokyotyrant" {
@@ -13,17 +13,17 @@ IN: tokyo.alien.tcrdb
 
 LIBRARY: tokyotyrant
 
-TYPEDEF: void* TCRDB*
-! C-STRUCT: TCRDB
-!     { "pthread_mutex_t" mmtx }
-!     { "pthread_key_t" eckey }
-!     { "char*" host }
-!     { "int" port }
-!     { "char*" expr }
-!     { "int" fd }
-!     { "TTSOCK*" sock }
-!     { "double" timeout }
-!     { "int" opts } ;
+C-TYPE: TCRDB
+! STRUCT: TCRDB
+!     { mmtx pthread_mutex_t }
+!     { eckey pthread_key_t }
+!     { host char* }
+!     { port int }
+!     { expr char* }
+!     { fd int }
+!     { sock TTSOCK* }
+!     { timeout double }
+!     { opts int } ;
 
 C-ENUM:
     TTESUCCESS
@@ -95,10 +95,10 @@ CONSTANT: RDBITOPT     TDBITOPT
 CONSTANT: RDBITVOID    TDBITVOID
 CONSTANT: RDBITKEEP    TDBITKEEP
 
-TYPEDEF: void* RDBQRY*
-! C-STRUCT: RDBQRY
-!     { "TCRDB*" rdb }
-!     { "TCLIST*" args } ;
+C-TYPE: RDBQRY
+! STRUCT: RDBQRY
+!     { rdb TCRDB* }
+!     { args TCLIST* } ;
 
 CONSTANT: RDBQCSTREQ   TDBQCSTREQ
 CONSTANT: RDBQCSTRINC  TDBQCSTRINC

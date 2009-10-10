@@ -177,13 +177,15 @@ HELP: set-texture-parameters
 
 HELP: texture
 { $class-description "Textures are typed, multidimensional arrays of GPU memory used for storing image data, lookup tables, and other kinds of multidimensional data for use with shader programs. They come in different types depending on dimensionality and intended usage:"
-{ $subsection texture-1d }
-{ $subsection texture-2d }
-{ $subsection texture-3d } 
-{ $subsection texture-cube-map }
-{ $subsection texture-rectangle }
-{ $subsection texture-1d-array }
-{ $subsection texture-2d-array }
+{ $subsections
+    texture-1d
+    texture-2d
+    texture-3d
+    texture-cube-map
+    texture-rectangle
+    texture-1d-array
+    texture-2d-array
+}
 "Textures are constructed using the corresponding " { $snippet "<constructor word>" } " for their type. The constructor sets the texture's " { $link component-order } ", " { $link component-type } ", and " { $link texture-parameters } ". Once created, memory for a texture can be allocated with " { $link allocate-texture } ", updated with " { $link update-texture } ", or retrieved with " { $link read-texture } "." } ;
 
 HELP: texture-1d
@@ -292,14 +294,18 @@ HELP: update-texture-image
 
 ARTICLE: "gpu.textures" "Texture objects"
 "The " { $vocab-link "gpu.textures" } " vocabulary provides words for creating, allocating, updating, and reading GPU texture objects."
-{ $subsection texture }
-{ $subsection allocate-texture }
-{ $subsection update-texture }
-{ $subsection read-texture }
+{ $subsections
+    texture
+    allocate-texture
+    update-texture
+    read-texture
+}
 "Words are also provided to interface textures with the " { $vocab-link "images" } " library:"
-{ $subsection allocate-texture-image }
-{ $subsection update-texture-image }
-{ $subsection read-texture-image }
+{ $subsections
+    allocate-texture-image
+    update-texture-image
+    read-texture-image
+}
 ;
 
 ABOUT: "gpu.textures"

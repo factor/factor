@@ -29,13 +29,15 @@ HELP: add-init-hook
 
 ARTICLE: "init" "Initialization and startup"
 "When Factor starts, the first thing it does is call a word:"
-{ $subsection boot }
+{ $subsections boot }
 "Next, initialization hooks are called:"
-{ $subsection do-init-hooks }
+{ $subsections do-init-hooks }
 "Initialization hooks can be defined:"
-{ $subsection add-init-hook }
+{ $subsections add-init-hook }
 "The boot quotation can be changed:"
-{ $subsection boot-quot }
-{ $subsection set-boot-quot } ;
+{ $subsections
+    boot-quot
+    set-boot-quot
+} ;
 
 ABOUT: "init"

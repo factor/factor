@@ -8,9 +8,12 @@ IN: compiler.cfg.intrinsics.slots
 
 : value-tag ( info -- n ) class>> class-tag ; inline
 
+: ^^tag-offset>slot ( slot tag -- vreg' )
+    [ ^^offset>slot ] dip ^^sub-imm ;
+
 : (emit-slot) ( infos -- dst )
-    [ 2inputs ^^offset>slot ] [ first value-tag ] bi*
-    ^^slot ;
+    [ 2inputs ] [ first value-tag ] bi*
+    ^^tag-offset>slot ^^slot ;
 
 : (emit-slot-imm) ( infos -- dst )
     ds-drop
@@ -28,8 +31,8 @@ IN: compiler.cfg.intrinsics.slots
     ] [ drop emit-primitive ] if ;
 
 : (emit-set-slot) ( infos -- obj-reg )
-    [ 3inputs ^^offset>slot ] [ second value-tag ] bi*
-    pick [ next-vreg ##set-slot ] dip ;
+    [ 3inputs ] [ second value-tag ] bi*
+    ^^tag-offset>slot over [ ##set-slot ] dip ;
 
 : (emit-set-slot-imm) ( infos -- obj-reg )
     ds-drop

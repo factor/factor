@@ -1,6 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: gpu.buffers gpu.render gpu.shaders gpu.textures images kernel
 specialized-arrays ;
+FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: gpu.util
 

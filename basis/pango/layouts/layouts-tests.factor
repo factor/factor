@@ -1,5 +1,5 @@
 IN: pango.layouts.tests
-USING: pango.layouts tools.test glib fonts accessors
+USING: pango.layouts pango.cairo tools.test glib fonts accessors
 sequences combinators.short-circuit math destructors ;
 
 [ t ] [

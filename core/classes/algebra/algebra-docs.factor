@@ -4,18 +4,21 @@ IN: classes.algebra
 
 ARTICLE: "class-operations" "Class operations"
 "Set-theoretic operations on classes:"
-{ $subsection class= }
-{ $subsection class< }
-{ $subsection class<= }
-{ $subsection class-and }
-{ $subsection class-or }
-{ $subsection classes-intersect? }
-{ $subsection min-class }
+{ $subsections
+    class=
+    class<
+    class<=
+    class-and
+    class-or
+    classes-intersect?
+}
 "Low-level implementation detail:"
-{ $subsection flatten-class }
-{ $subsection flatten-builtin-class }
-{ $subsection class-types }
-{ $subsection class-tags } ;
+{ $subsections
+    flatten-class
+    flatten-builtin-class
+    class-types
+    class-tags
+} ;
 
 ARTICLE: "class-linearization" "Class linearization"
 "Classes have an intrinsic partial order; given two classes A and B, we either have that A is a subset of B, B is a subset of A, A and B are equal as sets, or they are incomparable. The last two situations present difficulties for method dispatch:"
@@ -35,10 +38,13 @@ $nl
 "The second problem is resolved with another tie-breaker. When performing the topological sort of classes, if there are multiple candidates at any given step of the sort, lexicographical order on the class name is used."
 $nl
 "Operations:"
-{ $subsection class< }
-{ $subsection sort-classes }
+{ $subsections
+    class<
+    sort-classes
+    smallest-class
+}
 "Metaclass order:"
-{ $subsection rank-class } ;
+{ $subsections rank-class } ;
 
 HELP: flatten-builtin-class
 { $values { "class" class } { "assoc" "an assoc whose keys are classes" } }
@@ -73,6 +79,6 @@ HELP: classes-intersect?
 { $values { "first" class } { "second" class } { "?" "a boolean" } }
 { $description "Tests if two classes have a non-empty intersection. If the intersection is empty, no object can be an instance of both classes at once." } ;
 
-HELP: min-class
-{ $values { "class" class } { "seq" "a sequence of class words" } { "class/f" "a class word or " { $link f } } }
-{ $description "If all classes in " { $snippet "seq" } " that intersect " { $snippet "class" } " are subtypes of " { $snippet "class" } ", outputs the last such element of " { $snippet "seq" } ". If any conditions fail to hold, outputs " { $link f } "." } ;
+HELP: smallest-class
+{ $values { "classes" "a sequence of class words" } { "class/f" { $maybe class } } }
+{ $description "Outputs a minimum class from the given sequence." } ;

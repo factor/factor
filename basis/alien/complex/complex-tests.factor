@@ -16,6 +16,6 @@ STRUCT: complex-holder
 
 [ C{ 1.0 2.0 } ] [ "h" get z>> ] unit-test
 
-[ number ] [ "complex-float" c-type-boxed-class ] unit-test
+[ complex ] [ "complex-float" c-type-boxed-class ] unit-test
 
-[ number ] [ "complex-double" c-type-boxed-class ] unit-test
+[ complex ] [ "complex-double" c-type-boxed-class ] unit-test

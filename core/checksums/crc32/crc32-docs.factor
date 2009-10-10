@@ -6,6 +6,6 @@ HELP: crc32
 
 ARTICLE: "checksums.crc32" "CRC32 checksum"
 "The CRC32 checksum algorithm provides a quick but unreliable way to detect changes in data."
-{ $subsection crc32 } ;
+{ $subsections crc32 } ;
 
 ABOUT: "checksums.crc32"

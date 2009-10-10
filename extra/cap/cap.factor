@@ -23,6 +23,7 @@ IN: cap
 : screenshot ( window -- bitmap )
     [ <image> ] dip
     [ gl-screenshot >>bitmap ] [ dim>> >>dim ] bi
+    ubyte-components >>component-type
     RGBA >>component-order
     t >>upside-down?
     normalize-image ;

@@ -10,7 +10,7 @@ TUPLE: push-insn value ;
 GENERIC: eval-insn ( stack insn -- stack )
 
 : binary-op ( stack quot: ( x y -- z ) -- stack )
-    [ uncons uncons ] dip dip cons ; inline
+    [ uncons uncons [ swap ] dip ] dip dip cons ; inline
 
 M: add-insn eval-insn drop [ + ] binary-op ;
 M: sub-insn eval-insn drop [ - ] binary-op ;
@@ -35,11 +35,11 @@ M: push-insn eval-insn value>> swons ;
 : print-stack ( list -- )
     [ number>string print ] leach ;
 
-: rpn-eval ( tokens -- )
-    nil [ eval-insn ] foldl print-stack ;
+: rpn-eval ( tokens -- stack )
+    nil [ eval-insn ] foldl ;
 
 : rpn ( -- )
     "RPN> " write flush
-    readln [ rpn-parse rpn-eval rpn ] when* ;
+    readln [ rpn-parse rpn-eval print-stack rpn ] when* ;
 
 MAIN: rpn

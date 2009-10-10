@@ -52,9 +52,11 @@ ARTICLE: "animations" "Animations"
 "that use rates which do not change across platforms. The speed of the "
 "computer should correlate with the smoothness of the animation, not "
 "the speed of the animation!"
-{ $subsection animate }
-{ $subsection reset-progress }
-{ $subsection progress }
+{ $subsections
+    animate
+    reset-progress
+    progress
+}
 ! A little talk about when to use progress and when to use animate
     { $link progress } " specifically provides the length of time since "
     { $link reset-progress } " was called, and also calls "

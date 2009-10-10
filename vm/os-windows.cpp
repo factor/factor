@@ -5,30 +5,30 @@ namespace factor
 
 HMODULE hFactorDll;
 
-void init_ffi()
+void factor_vm::init_ffi()
 {
 	hFactorDll = GetModuleHandle(FACTOR_DLL);
 	if(!hFactorDll)
 		fatal_error("GetModuleHandle(\"" FACTOR_DLL_NAME "\") failed", 0);
 }
 
-void ffi_dlopen(dll *dll)
+void factor_vm::ffi_dlopen(dll *dll)
 {
 	dll->dll = LoadLibraryEx((WCHAR *)alien_offset(dll->path), NULL, 0);
 }
 
-void *ffi_dlsym(dll *dll, symbol_char *symbol)
+void *factor_vm::ffi_dlsym(dll *dll, symbol_char *symbol)
 {
 	return (void *)GetProcAddress(dll ? (HMODULE)dll->dll : hFactorDll, symbol);
 }
 
-void ffi_dlclose(dll *dll)
+void factor_vm::ffi_dlclose(dll *dll)
 {
 	FreeLibrary((HMODULE)dll->dll);
 	dll->dll = NULL;
 }
 
-bool windows_stat(vm_char *path)
+bool factor_vm::windows_stat(vm_char *path)
 {
 	BY_HANDLE_FILE_INFORMATION bhfi;
 	HANDLE h = CreateFileW(path,
@@ -56,14 +56,14 @@ bool windows_stat(vm_char *path)
 	return ret;
 }
 
-void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length)
+void factor_vm::windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length)
 {
 	snwprintf(temp_path, length-1, L"%s.image", full_path); 
-	temp_path[sizeof(temp_path) - 1] = 0;
+	temp_path[length - 1] = 0;
 }
 
 /* You must free() this yourself. */
-const vm_char *default_image_path()
+const vm_char *factor_vm::default_image_path()
 {
 	vm_char full_path[MAX_UNICODE_PATH];
 	vm_char *ptr;
@@ -75,14 +75,14 @@ const vm_char *default_image_path()
 	if((ptr = wcsrchr(full_path, '.')))
 		*ptr = 0;
 
-	snwprintf(temp_path, sizeof(temp_path)-1, L"%s.image", full_path); 
-	temp_path[sizeof(temp_path) - 1] = 0;
+	snwprintf(temp_path, MAX_UNICODE_PATH-1, L"%s.image", full_path); 
+	temp_path[MAX_UNICODE_PATH - 1] = 0;
 
 	return safe_strdup(temp_path);
 }
 
 /* You must free() this yourself. */
-const vm_char *vm_executable_path()
+const vm_char *factor_vm::vm_executable_path()
 {
 	vm_char full_path[MAX_UNICODE_PATH];
 	if(!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
@@ -90,15 +90,16 @@ const vm_char *vm_executable_path()
 	return safe_strdup(full_path);
 }
 
-
-PRIMITIVE(existsp)
+void factor_vm::primitive_existsp()
 {
 	vm_char *path = untag_check<byte_array>(dpop())->data<vm_char>();
 	box_boolean(windows_stat(path));
 }
 
-segment *alloc_segment(cell size)
+segment::segment(cell size_)
 {
+	size = size_;
+
 	char *mem;
 	DWORD ignore;
 
@@ -113,22 +114,21 @@ segment *alloc_segment(cell size)
 		getpagesize(), PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate high guard page", (cell)mem);
 
-	segment *block = (segment *)safe_malloc(sizeof(segment));
-
-	block->start = (cell)mem + getpagesize();
-	block->size = size;
-	block->end = block->start + size;
-
-	return block;
+	start = (cell)mem + getpagesize();
+	end = start + size;
 }
 
-void dealloc_segment(segment *block)
+segment::~segment()
 {
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
-	if(!VirtualFree((void*)(block->start - si.dwPageSize), 0, MEM_RELEASE))
-		fatal_error("dealloc_segment failed",0);
-	free(block);
+	if(!VirtualFree((void*)(start - si.dwPageSize), 0, MEM_RELEASE))
+		fatal_error("Segment deallocation failed",0);
+}
+
+void factor_vm::sleep_micros(u64 usec)
+{
+	Sleep((DWORD)(usec / 1000));
 }
 
 long getpagesize()
@@ -141,11 +141,6 @@ long getpagesize()
 		g_pagesize = system_info.dwPageSize;
 	}
 	return g_pagesize;
-}
-
-void sleep_micros(u64 usec)
-{
-	Sleep((DWORD)(usec / 1000));
 }
 
 }

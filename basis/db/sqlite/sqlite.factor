@@ -6,7 +6,7 @@ sequences strings classes.tuple alien.c-types continuations
 db.sqlite.lib db.sqlite.ffi db.tuples words db.types combinators
 math.intervals io nmake accessors vectors math.ranges random
 math.bitwise db.queries destructors db.tuples.private interpolate
-io.streams.string multiline make db.private sequences.deep
+io.streams.string make db.private sequences.deep
 db.errors.sqlite ;
 IN: db.sqlite
 
@@ -201,19 +201,19 @@ M: sqlite-db-connection persistent-table ( -- assoc )
 
 : insert-trigger ( -- string )
     [
-    <"
+    """
         CREATE TRIGGER fki_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE INSERT ON ${table-name}
         FOR EACH ROW BEGIN
             SELECT RAISE(ROLLBACK, 'insert on table "${table-name}" violates foreign key constraint "fki_${table-name}_$table-id}_${foreign-table-name}_${foreign-table-id}_id"')
             WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
         END;
-    "> interpolate
+    """ interpolate
     ] with-string-writer ;
 
 : insert-trigger-not-null ( -- string )
     [
-    <"
+    """
         CREATE TRIGGER fki_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE INSERT ON ${table-name}
         FOR EACH ROW BEGIN
@@ -221,24 +221,24 @@ M: sqlite-db-connection persistent-table ( -- assoc )
             WHERE NEW.${table-id} IS NOT NULL
                 AND (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
         END;
-    "> interpolate
+    """ interpolate
     ] with-string-writer ;
 
 : update-trigger ( -- string )
     [
-    <"
+    """
         CREATE TRIGGER fku_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE UPDATE ON ${table-name}
         FOR EACH ROW BEGIN
             SELECT RAISE(ROLLBACK, 'update on table "${table-name}" violates foreign key constraint "fku_${table-name}_$table-id}_${foreign-table-name}_${foreign-table-id}_id"')
             WHERE (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
         END;
-    "> interpolate
+    """ interpolate
     ] with-string-writer ;
 
 : update-trigger-not-null ( -- string )
     [
-    <"
+    """
         CREATE TRIGGER fku_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE UPDATE ON ${table-name}
         FOR EACH ROW BEGIN
@@ -246,30 +246,30 @@ M: sqlite-db-connection persistent-table ( -- assoc )
             WHERE NEW.${table-id} IS NOT NULL
                 AND (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
         END;
-    "> interpolate
+    """ interpolate
     ] with-string-writer ;
 
 : delete-trigger-restrict ( -- string )
     [
-    <"
+    """
         CREATE TRIGGER fkd_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE DELETE ON ${foreign-table-name}
         FOR EACH ROW BEGIN
             SELECT RAISE(ROLLBACK, 'delete on table "${foreign-table-name}" violates foreign key constraint "fkd_${table-name}_$table-id}_${foreign-table-name}_${foreign-table-id}_id"')
             WHERE (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = OLD.${foreign-table-id}) IS NOT NULL;
         END;
-    "> interpolate
+    """ interpolate
     ] with-string-writer ;
 
 : delete-trigger-cascade ( -- string )
     [
-    <"
+    """
         CREATE TRIGGER fkd_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE DELETE ON ${foreign-table-name}
         FOR EACH ROW BEGIN
             DELETE from ${table-name} WHERE ${table-id} = OLD.${foreign-table-id};
         END;
-    "> interpolate
+    """ interpolate
     ] with-string-writer ;
 
 : can-be-null? ( -- ? )

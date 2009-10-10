@@ -10,7 +10,9 @@ HELP: basic-auth-realm
 
 ARTICLE: "furnace.auth.basic" "Basic authentication"
 "The " { $vocab-link "furnace.auth.basic" } " vocabulary implements HTTP basic authentication."
-{ $subsection basic-auth-realm }
-{ $subsection <basic-auth-realm> } ;
+{ $subsections
+    basic-auth-realm
+    <basic-auth-realm>
+} ;
 
 ABOUT: "furnace.auth.basic"

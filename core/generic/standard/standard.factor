@@ -40,7 +40,7 @@ M: standard-combination dispatch# #>> ;
 
 M: standard-generic effective-method
     [ datastack ] dip [ "combination" word-prop #>> swap <reversed> nth ] keep
-    (effective-method) ;
+    method-for-object ;
 
 : inline-cache-quot ( word methods miss-word -- quot )
     [ [ literalize , ] [ , ] [ combination get #>> , { } , , ] tri* ] [ ] make ;

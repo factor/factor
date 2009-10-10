@@ -48,19 +48,23 @@ HELP: using
 
 ARTICLE: "tools.scaffold" "Scaffold tool"
 "Scaffold setup:"
-{ $subsection developer-name }
+{ $subsections developer-name }
 "Generate new vocabs:"
-{ $subsection scaffold-vocab }
+{ $subsections scaffold-vocab }
 "Generate help scaffolding:"
-{ $subsection scaffold-help }
-{ $subsection scaffold-undocumented }
-{ $subsection help. }
+{ $subsections
+    scaffold-help
+    scaffold-undocumented
+    help.
+}
 "Types that are unrecognized by the scaffold generator will be of type " { $link null } ". The developer should change these to strings that describe the stack effect names instead." $nl
 "Scaffolding a configuration file:"
-{ $subsection scaffold-rc }
-{ $subsection scaffold-factor-boot-rc }
-{ $subsection scaffold-factor-rc }
-{ $subsection scaffold-emacs }
+{ $subsections
+    scaffold-rc
+    scaffold-factor-boot-rc
+    scaffold-factor-rc
+    scaffold-emacs
+}
 ;
 
 ABOUT: "tools.scaffold"

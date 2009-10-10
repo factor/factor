@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io kernel math namespaces sequences sbufs
 strings generic splitting continuations destructors sequences.private
-io.streams.plain io.encodings math.order growable io.streams.sequence ;
+io.streams.plain io.encodings math.order growable io.streams.sequence
+io.private ;
 IN: io.streams.string
 
 ! Readers
@@ -13,6 +14,8 @@ M: string-reader stream-read-partial stream-read ;
 M: string-reader stream-read sequence-read ;
 M: string-reader stream-read1 sequence-read1 ;
 M: string-reader stream-read-until sequence-read-until ;
+M: string-reader stream-tell i>> ;
+M: string-reader stream-seek (stream-seek) ;
 M: string-reader dispose drop ;
 
 <PRIVATE

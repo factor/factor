@@ -1,25 +1,29 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel strings help.markup help.syntax math regexp.parser
-regexp.ast multiline ;
+regexp.ast ;
 IN: regexp
 
 ABOUT: "regexp"
 
 ARTICLE: "regexp" "Regular expressions"
 "The " { $vocab-link "regexp" } " vocabulary provides word for creating and using regular expressions."
-{ $subsection { "regexp" "intro" } }
+{ $subsections { "regexp" "intro" } }
 "The class of regular expressions:"
-{ $subsection regexp }
+{ $subsections regexp }
 "Basic usage:"
-{ $subsection { "regexp" "syntax" } }
-{ $subsection { "regexp" "options" } }
-{ $subsection { "regexp" "construction" } }
-{ $subsection { "regexp" "operations" } }
+{ $subsections
+    { "regexp" "syntax" }
+    { "regexp" "options" }
+    { "regexp" "construction" }
+    { "regexp" "operations" }
+}
 "Advanced topics:"
 { $vocab-subsection "Regular expression combinators" "regexp.combinators" }
-{ $subsection { "regexp" "theory" } }
-{ $subsection { "regexp" "deploy" } } ;
+{ $subsections
+    { "regexp" "theory" }
+    { "regexp" "deploy" }
+} ;
 
 ARTICLE: { "regexp" "intro" } "A quick introduction to regular expressions"
 "Regular expressions are a terse way to do certain simple string processing tasks. For example, to replace all instances of " { $snippet "foo" } " in one string with " { $snippet "bar" } ", the following can be used:"
@@ -29,17 +33,16 @@ ARTICLE: { "regexp" "intro" } "A quick introduction to regular expressions"
 "The " { $snippet "+" } " operator matches one or more occurrences of the previous expression; in this case " { $snippet "o" } ". Another useful feature is alternation. Say we want to do this replacement with fooooo or boooo. Then we could use the code"
 { $code "R/ (f|b)oo+/ \"bar\" re-replace" }
 "To search a file for all lines that match a given regular expression, you could use code like this:"
-{ $code <" "file.txt" ascii file-lines [ R/ (f|b)oo+/ re-contains? ] filter "> }
+{ $code """"file.txt" ascii file-lines [ R/ (f|b)oo+/ re-contains? ] filter""" }
 "To test if a string in its entirety matches a regular expression, the following can be used:"
-{ $example <" USE: regexp "fooo" R/ (b|f)oo+/ matches? . "> "t" }
+{ $example """USE: regexp "fooo" R/ (b|f)oo+/ matches? .""" "t" }
 "Regular expressions can't be used for all parsing tasks. For example, they are not powerful enough to match balancing parentheses." ;
 
 ARTICLE: { "regexp" "construction" } "Constructing regular expressions"
 "Most of the time, regular expressions are literals and the parsing word should be used, to construct them at parse time. This ensures that they are only compiled once, and gives parse time syntax checking."
-{ $subsection POSTPONE: R/ }
+{ $subsections POSTPONE: R/ }
 "Sometimes, regular expressions need to be constructed at run time instead; for example, in a text editor, the user might input a regular expression to search for in a document."
-{ $subsection <regexp> } 
-{ $subsection <optioned-regexp> }
+{ $subsections <regexp> <optioned-regexp> } 
 "Another approach is to use " { $vocab-link "regexp.combinators" } "." ;
 
 ARTICLE: { "regexp" "syntax" } "Regular expression syntax"
@@ -167,18 +170,19 @@ ARTICLE: { "regexp" "theory" } "The theory of regular expressions"
 
 ARTICLE: { "regexp" "operations" } "Matching operations with regular expressions"
 "Testing if a string matches a regular expression:"
-{ $subsection matches? }
+{ $subsections matches? }
 "Finding a match inside a string:"
-{ $subsection re-contains? }
-{ $subsection first-match }
+{ $subsections re-contains? first-match }
 "Finding all matches inside a string:"
-{ $subsection count-matches }
-{ $subsection all-matching-slices }
-{ $subsection all-matching-subseqs }
+{ $subsections
+    count-matches
+    all-matching-slices
+    all-matching-subseqs
+}
 "Splitting a string into tokens delimited by a regular expression:"
-{ $subsection re-split }
+{ $subsections re-split }
 "Replacing occurrences of a regular expression with a string:"
-{ $subsection re-replace } ;
+{ $subsections re-replace } ;
 
 ARTICLE: { "regexp" "deploy" } "Regular expressions and the deploy tool"
 "The " { $link "tools.deploy" } " tool has the option to strip out the optimizing compiler from the resulting image. Since regular expressions compile to Factor code, this creates a minor performance-related caveat."

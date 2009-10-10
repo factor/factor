@@ -1,6 +1,6 @@
 USING: help.markup help.syntax io kernel math parser
 prettyprint sequences vocabs.loader namespaces stack-checker
-help command-line multiline see ;
+help command-line see ;
 IN: help.cookbook
 
 ARTICLE: "cookbook-syntax" "Basic syntax cookbook"
@@ -195,7 +195,7 @@ $nl
 { $heading "Example: ls" }
 "Here is an example implementing a simplified version of the Unix " { $snippet "ls" } " command in Factor:"
 { $code
-    <" USING: command-line namespaces io io.files
+    """USING: command-line namespaces io io.files
 io.pathnames tools.files sequences kernel ;
 
 command-line get [
@@ -204,13 +204,13 @@ command-line get [
     dup length 1 = [ first directory. ] [
         [ [ nl write ":" print ] [ directory. ] bi ] each
     ] if
-] if-empty">
+] if-empty"""
 }
 "You can put it in a file named " { $snippet "ls.factor" } ", and then run it, to list the " { $snippet "/usr/bin" } " directory for example:"
 { $code "./factor ls.factor /usr/bin" }
 { $heading "Example: grep" }
 "The following is a more complicated example, implementing something like the Unix " { $snippet "grep" } " command:"
-{ $code <" USING: kernel fry io io.files io.encodings.ascii sequences
+{ $code """USING: kernel fry io io.files io.encodings.ascii sequences
 regexp command-line namespaces ;
 IN: grep
 
@@ -231,7 +231,7 @@ command-line get [
     ] [
         [ grep-file ] with each
     ] if-empty
-] if-empty"> }
+] if-empty""" }
 "You can run it like so,"
 { $code "./factor grep.factor '.*hello.*' myfile.txt" }
 "You'll notice this script takes a while to start. This is because it is loading and compiling the " { $vocab-link "regexp" } " vocabulary every time. To speed up startup, load the vocabulary into your image, and save the image:"
@@ -309,15 +309,17 @@ ARTICLE: "cookbook-next" "Next steps"
 
 ARTICLE: "cookbook" "Factor cookbook"
 "The Factor cookbook is a high-level overview of the most important concepts required to program in Factor."
-{ $subsection "cookbook-syntax" }
-{ $subsection "cookbook-colon-defs" }
-{ $subsection "cookbook-combinators" }
-{ $subsection "cookbook-variables" }
-{ $subsection "cookbook-vocabs" }
-{ $subsection "cookbook-application" }
-{ $subsection "cookbook-scripts" }
-{ $subsection "cookbook-philosophy" }
-{ $subsection "cookbook-pitfalls" }
-{ $subsection "cookbook-next" } ;
+{ $subsections
+    "cookbook-syntax"
+    "cookbook-colon-defs"
+    "cookbook-combinators"
+    "cookbook-variables"
+    "cookbook-vocabs"
+    "cookbook-application"
+    "cookbook-scripts"
+    "cookbook-philosophy"
+    "cookbook-pitfalls"
+    "cookbook-next"
+} ;
 
 ABOUT: "cookbook"

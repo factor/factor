@@ -1,11 +1,13 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types alien.structs.fields ascii
+USING: accessors alien alien.c-types alien.data ascii
 assocs byte-arrays classes.struct classes.tuple.private
 combinators compiler.tree.debugger compiler.units destructors
 io.encodings.utf8 io.pathnames io.streams.string kernel libc
-literals math mirrors multiline namespaces prettyprint
+literals math mirrors namespaces prettyprint
 prettyprint.config see sequences specialized-arrays system
-tools.test parser lexer eval ;
+tools.test parser lexer eval layouts ;
+FROM: math => float ;
+QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: char
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: ushort
@@ -46,9 +48,9 @@ STRUCT: struct-test-bar
 
 [ {
     { "underlying" B{ 98 0 0 98 127 0 0 127 0 0 0 0 } }
-    { { "x" "char" } 98            }
-    { { "y" "int"  } HEX: 7F00007F }
-    { { "z" "bool" } f             }
+    { { "x" char } 98            }
+    { { "y" int  } HEX: 7F00007F }
+    { { "z" bool } f             }
 } ] [
     B{ 98 0 0 98 127 0 0 127 0 0 0 0 } struct-test-foo memory>struct
     make-mirror >alist
@@ -128,7 +130,7 @@ STRUCT: struct-test-bar
 ] unit-test
 
 UNION-STRUCT: struct-test-float-and-bits
-    { f float }
+    { f c:float }
     { bits uint } ;
 
 [ 1.0 ] [ struct-test-float-and-bits <struct> 1.0 float>bits >>bits f>> ] unit-test
@@ -181,58 +183,58 @@ STRUCT: struct-test-string-ptr
     ] with-scope
 ] unit-test
 
-[ <" USING: classes.struct ;
+[ "USING: alien.c-types classes.struct ;
 IN: classes.struct.tests
 STRUCT: struct-test-foo
     { x char initial: 0 } { y int initial: 123 } { z bool } ;
-"> ]
+" ]
 [ [ struct-test-foo see ] with-string-writer ] unit-test
 
-[ <" USING: classes.struct ;
+[ "USING: alien.c-types classes.struct ;
 IN: classes.struct.tests
 UNION-STRUCT: struct-test-float-and-bits
     { f float initial: 0.0 } { bits uint initial: 0 } ;
-"> ]
+" ]
 [ [ struct-test-float-and-bits see ] with-string-writer ] unit-test
 
 [ {
-    T{ field-spec
+    T{ struct-slot-spec
         { name "x" }
         { offset 0 }
-        { type "char" }
-        { reader x>> }
-        { writer (>>x) }
+        { initial 0 }
+        { class fixnum }
+        { type char }
     }
-    T{ field-spec
+    T{ struct-slot-spec
         { name "y" }
         { offset 4 }
-        { type "int" }
-        { reader y>> }
-        { writer (>>y) }
+        { initial 123 }
+        { class integer }
+        { type int }
     }
-    T{ field-spec
+    T{ struct-slot-spec
         { name "z" }
         { offset 8 }
-        { type "bool" }
-        { reader z>> }
-        { writer (>>z) }
+        { initial f }
+        { type bool }
+        { class object }
     }
 } ] [ "struct-test-foo" c-type fields>> ] unit-test
 
 [ {
-    T{ field-spec
+    T{ struct-slot-spec
         { name "f" }
         { offset 0 }
-        { type "float" }
-        { reader f>> }
-        { writer (>>f) }
+        { type c:float }
+        { class float }
+        { initial 0.0 }
     }
-    T{ field-spec
+    T{ struct-slot-spec
         { name "bits" }
         { offset 0 }
-        { type "uint" }
-        { reader bits>> }
-        { writer (>>bits) }
+        { type uint }
+        { class integer }
+        { initial 0 }
     }
 } ] [ "struct-test-float-and-bits" c-type fields>> ] unit-test
 
@@ -277,7 +279,7 @@ STRUCT: struct-test-array-slots
 ] unit-test
 
 STRUCT: struct-test-optimization
-    { x { "int" 3 } } { y int } ;
+    { x { int 3 } } { y int } ;
 
 SPECIALIZED-ARRAY: struct-test-optimization
 
@@ -350,3 +352,16 @@ STRUCT: struct-that's-a-word { x int } ;
 ] unit-test
 
 [ f ] [ "a-struct" c-types get key? ] unit-test
+
+STRUCT: bit-field-test
+    { a uint bits: 12 }
+    { b int bits: 2 }
+    { c char } ;
+
+[ S{ bit-field-test f 0 0 0 } ] [ bit-field-test <struct> ] unit-test
+[ S{ bit-field-test f 1 -2 3 } ] [ bit-field-test <struct> 1 >>a 2 >>b 3 >>c ] unit-test
+[ 4095 ] [ bit-field-test <struct> 8191 >>a a>> ] unit-test
+[ 1 ] [ bit-field-test <struct> 1 >>b b>> ] unit-test
+[ -2 ] [ bit-field-test <struct> 2 >>b b>> ] unit-test
+[ 1 ] [ bit-field-test <struct> 257 >>c c>> ] unit-test
+[ 3 ] [ bit-field-test heap-size ] unit-test

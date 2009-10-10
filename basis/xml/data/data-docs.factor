@@ -5,52 +5,60 @@ ABOUT: "xml.data"
 
 ARTICLE: "xml.data" "XML data types"
 "The " { $vocab-link "xml.data" } " vocabulary defines a simple document object model for XML. Everything is simply a tuple and can be manipulated as such."
-{ $subsection { "xml.data" "classes" } }
-{ $subsection { "xml.data" "constructors" } }
+{ $subsections
+    { "xml.data" "classes" }
+    { "xml.data" "constructors" }
+}
 "Simple words for manipulating names:"
-    { $subsection names-match? }
-    { $subsection assure-name }
+{ $subsections
+    names-match?
+    assure-name
+}
 "For high-level tools for manipulating XML, see " { $vocab-link "xml.traversal" } ;
 
 ARTICLE: { "xml.data" "classes" } "XML data classes"
-    "XML documents and chunks are made of the following classes:"
-    { $subsection xml }
-    { $subsection xml-chunk }
-    { $subsection tag }
-    { $subsection name }
-    { $subsection contained-tag }
-    { $subsection open-tag }
-    { $subsection prolog }
-    { $subsection comment }
-    { $subsection instruction }
-    { $subsection unescaped }
-    { $subsection element-decl }
-    { $subsection attlist-decl }
-    { $subsection entity-decl }
-    { $subsection system-id }
-    { $subsection public-id }
-    { $subsection doctype-decl }
-    { $subsection notation-decl } ;
+"XML documents and chunks are made of the following classes:"
+{ $subsections
+    xml
+    xml-chunk
+    tag
+    name
+    contained-tag
+    open-tag
+    prolog
+    comment
+    instruction
+    unescaped
+    element-decl
+    attlist-decl
+    entity-decl
+    system-id
+    public-id
+    doctype-decl
+    notation-decl
+} ;
 
 ARTICLE: { "xml.data" "constructors" } "XML data constructors"
-    "These data types are constructed with:"
-    { $subsection <xml> }
-    { $subsection <xml-chunk> } 
-    { $subsection <tag> }
-    { $subsection <name> }
-    { $subsection <contained-tag> }
-    { $subsection <prolog> }
-    { $subsection <comment> }
-    { $subsection <instruction> }
-    { $subsection <unescaped> }
-    { $subsection <simple-name> }
-    { $subsection <element-decl> }
-    { $subsection <attlist-decl> }
-    { $subsection <entity-decl> }
-    { $subsection <system-id> }
-    { $subsection <public-id> }
-    { $subsection <doctype-decl> }
-    { $subsection <notation-decl> } ;
+"These data types are constructed with:"
+{ $subsections
+    <xml>
+    <xml-chunk>
+    <tag>
+    <name>
+    <contained-tag>
+    <prolog>
+    <comment>
+    <instruction>
+    <unescaped>
+    <simple-name>
+    <element-decl>
+    <attlist-decl>
+    <entity-decl>
+    <system-id>
+    <public-id>
+    <doctype-decl>
+    <notation-decl>
+} ;
 
 HELP: tag
 { $class-description "Tuple representing an XML tag, delegating to a " { $link

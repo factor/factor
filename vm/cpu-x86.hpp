@@ -3,7 +3,7 @@
 namespace factor
 {
 
-#define FRAME_RETURN_ADDRESS(frame) *(void **)(frame_successor(frame) + 1)
+#define FRAME_RETURN_ADDRESS(frame,vm) *(void **)(vm->frame_successor(frame) + 1)
 
 inline static void flush_icache(cell start, cell len) {}
 
@@ -50,10 +50,28 @@ inline static bool tail_call_site_p(cell return_address)
 	return call_site_opcode(return_address) == jmp_opcode;
 }
 
+inline static unsigned int fpu_status(unsigned int status)
+{
+        unsigned int r = 0;
+	
+        if (status & 0x01)
+		r |= FP_TRAP_INVALID_OPERATION;
+        if (status & 0x04)
+		r |= FP_TRAP_ZERO_DIVIDE;
+        if (status & 0x08)
+		r |= FP_TRAP_OVERFLOW;
+        if (status & 0x10)
+		r |= FP_TRAP_UNDERFLOW;
+        if (status & 0x20)
+		r |= FP_TRAP_INEXACT;
+
+        return r;
+}
+
 /* Defined in assembly */
-VM_ASM_API void c_to_factor(cell quot);
-VM_ASM_API void throw_impl(cell quot, stack_frame *rewind_to);
-VM_ASM_API void lazy_jit_compile(cell quot);
+VM_ASM_API void c_to_factor(cell quot, void *vm);
+VM_ASM_API void throw_impl(cell quot, stack_frame *rewind_to, void *vm);
+VM_ASM_API void lazy_jit_compile(cell quot, void *vm);
 
 VM_C_API void set_callstack(stack_frame *to,
 			      stack_frame *from,

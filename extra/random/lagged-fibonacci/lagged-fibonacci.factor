@@ -1,0 +1,71 @@
+! Copyright (C) 2009 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors alien.c-types fry kernel literals locals math
+random sequences specialized-arrays namespaces ;
+SPECIALIZED-ARRAY: double
+IN: random.lagged-fibonacci
+
+TUPLE: lagged-fibonacci u pt0 pt1 ;
+
+<PRIVATE
+
+CONSTANT: p-r 1278
+CONSTANT: q-r 417
+
+CONSTANT: lagged-fibonacci 899999963
+CONSTANT: lagged-fibonacci-max-seed 900000000
+CONSTANT: lagged-fibonacci-sig-bits 24
+
+: normalize-seed ( seed -- seed' )
+    abs lagged-fibonacci-max-seed mod ;
+
+: adjust-ptr ( ptr -- ptr' )
+    1 - dup 0 < [ drop p-r ] when ;
+
+PRIVATE>
+
+M:: lagged-fibonacci seed-random ( lagged-fibonacci seed! -- lagged-fibonacci )
+    seed normalize-seed seed!
+    seed 30082 /i :> ij
+    seed 30082 ij * - :> kl
+    ij 177 /i 177 mod 2 + :> i!
+    ij 177 mod 2 + :> j!
+    kl 169 /i 178 mod 1 + :> k!
+    kl 169 mod :> l!
+
+    lagged-fibonacci u>> [
+        drop
+        0.0 :> s!
+        0.5 :> t!
+        0.0 :> m!
+        lagged-fibonacci-sig-bits [
+            i j * 179 mod k * 179 mod m!
+            j i!
+            k j!
+            m k!
+            53 l * 1 + 169 mod l!
+            l m * 64 mod 31 > [ s t + s! ] when
+            t 0.5 * t!
+        ] times
+        s
+    ] change-each
+    lagged-fibonacci p-r >>pt0
+        q-r >>pt1 ;
+
+: <lagged-fibonacci> ( seed -- lagged-fibonacci )
+    lagged-fibonacci new
+        p-r 1 + <double-array> >>u
+        swap seed-random ;
+
+GENERIC: random-float* ( tuple -- r )
+ 
+: random-float ( -- n ) random-generator get random-float* ;
+
+M:: lagged-fibonacci random-float* ( lagged-fibonacci -- x )
+    lagged-fibonacci [ pt0>> ] [ u>> ] bi nth
+    lagged-fibonacci [ pt1>> ] [ u>> ] bi nth - :> uni!
+    uni 0.0 < [ uni 1.0 + uni! ] when
+    uni lagged-fibonacci [ pt0>> ] [ u>> ] bi set-nth
+    lagged-fibonacci [ adjust-ptr ] change-pt0 drop
+    lagged-fibonacci [ adjust-ptr ] change-pt1 drop
+    uni ; inline

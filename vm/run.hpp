@@ -57,6 +57,7 @@ enum special_object {
 	JIT_EXECUTE_WORD,
 	JIT_EXECUTE_JUMP,
 	JIT_EXECUTE_CALL,
+	JIT_DECLARE_WORD,
 
 	/* Polymorphic inline cache generation in inline_cache.c */
 	PIC_LOAD            = 47,
@@ -86,8 +87,6 @@ enum special_object {
 	THREADS_ENV         = 64,
 	RUN_QUEUE_ENV       = 65,
 	SLEEP_QUEUE_ENV     = 66,
-
-	STACK_TRACES_ENV    = 67,
 };
 
 #define FIRST_SAVE_ENV BOOT_ENV
@@ -95,22 +94,9 @@ enum special_object {
 
 inline static bool save_env_p(cell i)
 {
-	return (i >= FIRST_SAVE_ENV && i <= LAST_SAVE_ENV) || i == STACK_TRACES_ENV;
+	return (i >= FIRST_SAVE_ENV && i <= LAST_SAVE_ENV);
 }
-
-/* Canonical T object. It's just a word */
-extern cell T;
-
-PRIMITIVE(getenv);
-PRIMITIVE(setenv);
-PRIMITIVE(exit);
-PRIMITIVE(micros);
-PRIMITIVE(sleep);
-PRIMITIVE(set_slot);
-PRIMITIVE(load_locals);
-PRIMITIVE(clone);
 
 }
 
-/* TAGGED user environment data; see getenv/setenv prims */
-VM_C_API factor::cell userenv[USER_ENV];
+ 

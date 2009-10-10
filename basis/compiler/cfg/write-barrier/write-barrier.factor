@@ -75,7 +75,7 @@ M: insn remove-dead-barrier drop t ;
 ! Anticipation of this and set-slot would help too, maybe later
 FORWARD-ANALYSIS: slot
 
-UNION: access ##read ##write ;
+UNION: access ##slot ##slot-imm ##set-slot ##set-slot-imm ;
 
 M: slot-analysis transfer-set
     drop [ H{ } assoc-clone-like ] dip

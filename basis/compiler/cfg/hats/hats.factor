@@ -45,16 +45,15 @@ insn-classes get [
     [ next-vreg dup ] dip {
         { [ dup not ] [ drop \ f tag-number ##load-immediate ] }
         { [ dup fixnum? ] [ tag-fixnum ##load-immediate ] }
+        { [ dup float? ] [ ##load-constant ] }
         [ ##load-reference ]
-    } cond ; inline
+    } cond ;
 
-: ^^unbox-c-ptr ( src class -- dst )
-    [ next-vreg dup ] 2dip next-vreg ##unbox-c-ptr ; inline
+: ^^offset>slot ( slot -- vreg' )
+    cell 4 = [ 1 ^^shr-imm ] [ any-rep ^^copy ] if ;
 
-: ^^neg ( src -- dst ) [ 0 ^^load-literal ] dip ^^sub ; inline
-: ^^allot-tuple ( n -- dst ) 2 + cells tuple ^^allot ; inline
-: ^^allot-array ( n -- dst ) 2 + cells array ^^allot ; inline
-: ^^allot-byte-array ( n -- dst ) 2 cells + byte-array ^^allot ; inline
-: ^^offset>slot ( vreg -- vreg' ) cell 4 = [ 1 ^^shr-imm ] [ any-rep ^^copy ] if ; inline
-: ^^tag-fixnum ( src -- dst ) tag-bits get ^^shl-imm ; inline
-: ^^untag-fixnum ( src -- dst ) tag-bits get ^^sar-imm ; inline
+: ^^tag-fixnum ( src -- dst )
+    tag-bits get ^^shl-imm ;
+
+: ^^untag-fixnum ( src -- dst )
+    tag-bits get ^^sar-imm ;

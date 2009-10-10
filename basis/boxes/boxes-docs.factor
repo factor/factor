@@ -24,14 +24,16 @@ HELP: ?box
 
 ARTICLE: "boxes" "Boxes"
 "A " { $emphasis "box" } " is a container which can either be empty or hold a single value."
-{ $subsection box }
+{ $subsections box }
 "Creating an empty box:"
-{ $subsection <box> }
+{ $subsections <box> }
 "Storing a value and removing a value from a box:"
-{ $subsection >box }
-{ $subsection box> }
+{ $subsections
+    >box
+    box>
+}
 "Safely removing a value:"
-{ $subsection ?box }
+{ $subsections ?box }
 "Testing if a box is full can be done by reading the " { $snippet "occupied" } " slot." ;
 
 ABOUT: "boxes"

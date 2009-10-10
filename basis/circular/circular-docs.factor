@@ -51,14 +51,20 @@ HELP: rotate-circular
 ARTICLE: "circular" "Circular sequences"
 "The " { $vocab-link "circular" } " vocabulary implements the " { $link "sequence-protocol" } " to allow an arbitrary start index and wrap-around indexing." $nl
 "Creating a new circular object:"
-{ $subsection <circular> }
-{ $subsection <circular-string> }
-{ $subsection <growing-circular> }
+{ $subsections
+    <circular>
+    <circular-string>
+    <growing-circular>
+}
 "Changing the start index:"
-{ $subsection change-circular-start }
-{ $subsection rotate-circular }
+{ $subsections
+    change-circular-start
+    rotate-circular
+}
 "Pushing new elements:"
-{ $subsection push-circular }
-{ $subsection push-growing-circular } ;
+{ $subsections
+    push-circular
+    push-growing-circular
+} ;
 
 ABOUT: "circular"

@@ -6,35 +6,37 @@ IN: cords
 
 <PRIVATE
 
-TUPLE: simple-cord first second ;
+TUPLE: simple-cord
+    { first read-only } { second read-only } ;
 
 M: simple-cord length
-    [ first>> length ] [ second>> length ] bi + ;
+    [ first>> length ] [ second>> length ] bi + ; inline
 
-M: simple-cord virtual-seq first>> ;
+M: simple-cord virtual-seq first>> ; inline
 
 M: simple-cord virtual@
     2dup first>> length <
-    [ first>> ] [ [ first>> length - ] [ second>> ] bi ] if ;
+    [ first>> ] [ [ first>> length - ] [ second>> ] bi ] if ; inline
 
-TUPLE: multi-cord count seqs ;
+TUPLE: multi-cord
+    { count read-only } { seqs read-only } ;
 
-M: multi-cord length count>> ;
+M: multi-cord length count>> ; inline
 
 M: multi-cord virtual@
     dupd
     seqs>> [ first <=> ] with search nip
-    [ first - ] [ second ] bi ;
+    [ first - ] [ second ] bi ; inline
 
 M: multi-cord virtual-seq
-    seqs>> [ f ] [ first second ] if-empty ;
+    seqs>> [ f ] [ first second ] if-empty ; inline
 
 : <cord> ( seqs -- cord )
     dup length 2 = [
         first2 simple-cord boa
     ] [
         [ 0 [ length + ] accumulate ] keep zip multi-cord boa
-    ] if ;
+    ] if ; inline
 
 PRIVATE>
 
@@ -52,7 +54,7 @@ INSTANCE: multi-cord virtual-sequence
         { [ over cord? ] [ [ seqs>> values ] dip suffix <cord> ] }
         { [ dup cord? ] [ seqs>> values swap prefix <cord> ] }
         [ 2array <cord> ]
-    } cond ;
+    } cond ; inline
 
 : cord-concat ( seqs -- cord )
     {
@@ -67,4 +69,4 @@ INSTANCE: multi-cord virtual-sequence
                 } cond
             ] map concat <cord>
         ]
-    } cond ;
+    } cond ; inline
