@@ -128,6 +128,9 @@ MACRO: if-literals-match ( quots -- )
     [ ^^select-vector ] [unary/param]
     { [ integer? ] [ representation? ] } if-literals-match ; inline
 
+: emit-alien-vector-op ( node quot: ( rep -- ) -- )
+    { [ %alien-vector-reps member? ] } if-literals-match ; inline
+
 : emit-alien-vector ( node -- )
     dup [
         '[
@@ -135,7 +138,7 @@ MACRO: if-literals-match ( quots -- )
             _ ^^alien-vector ds-push
         ]
         [ inline-alien-getter? ] inline-alien
-    ] with emit-vector-op ;
+    ] with emit-alien-vector-op ;
 
 : emit-set-alien-vector ( node -- )
     dup [
@@ -145,7 +148,7 @@ MACRO: if-literals-match ( quots -- )
         ]
         [ byte-array inline-alien-setter? ]
         inline-alien
-    ] with emit-vector-op ;
+    ] with emit-alien-vector-op ;
 
 : generate-not-vector ( src rep -- dst )
     dup %not-vector-reps member?
