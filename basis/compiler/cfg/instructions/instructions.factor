@@ -277,6 +277,11 @@ literal: rep ;
 
 PURE-INSN: ##shuffle-vector
 def: dst
+use: src shuffle
+literal: rep ;
+
+PURE-INSN: ##shuffle-vector-imm
+def: dst
 use: src
 literal: shuffle rep ;
 
