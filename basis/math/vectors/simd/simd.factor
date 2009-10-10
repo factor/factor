@@ -37,3 +37,6 @@ PRIVATE>
 SYNTAX: SIMD:
     scan-word define-simd-vocab use-vocab ;
 
+SYNTAX: SIMDS:
+    \ ; parse-until [ define-simd-vocab use-vocab ] each ;
+
