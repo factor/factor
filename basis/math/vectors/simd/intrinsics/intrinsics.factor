@@ -67,7 +67,8 @@ SIMD-OP: vlshift
 SIMD-OP: vrshift
 SIMD-OP: hlshift
 SIMD-OP: hrshift
-SIMD-OP: vshuffle
+SIMD-OP: vshuffle-elements
+SIMD-OP: vshuffle-bytes
 SIMD-OP: (vmerge-head)
 SIMD-OP: (vmerge-tail)
 SIMD-OP: v<=
@@ -148,6 +149,9 @@ GENERIC# supported-simd-op? 1 ( rep intrinsic -- ? )
     union
     { uchar-16-rep ushort-8-rep uint-4-rep ulonglong-2-rep } union ;
 
+: (%shuffle-imm-reps) ( -- reps )
+    %shuffle-vector-reps %shuffle-vector-imm-reps union ;
+
 M: vector-rep supported-simd-op?
     {
         { \ (simd-v+)            [ %add-vector-reps            ] }
@@ -179,7 +183,8 @@ M: vector-rep supported-simd-op?
         { \ (simd-vrshift)       [ %shr-vector-reps            ] }
         { \ (simd-hlshift)       [ %horizontal-shl-vector-reps ] }
         { \ (simd-hrshift)       [ %horizontal-shr-vector-reps ] }
-        { \ (simd-vshuffle)      [ %shuffle-vector-reps        ] }
+        { \ (simd-vshuffle-elements) [ (%shuffle-imm-reps)         ] }
+        { \ (simd-vshuffle-bytes)    [ %shuffle-vector-reps        ] }
         { \ (simd-(vmerge-head)) [ %merge-vector-reps          ] }
         { \ (simd-(vmerge-tail)) [ %merge-vector-reps          ] }
         { \ (simd-(v>float))        [ %integer>float-vector-reps ] }

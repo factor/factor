@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.parser
 assocs byte-arrays classes compiler.units functors kernel lexer
-libc math math.vectors math.vectors.specialization namespaces
+libc math math.vectors math.vectors.private
+math.vectors.specialization namespaces
 parser prettyprint.custom sequences sequences.private strings
 summary vocabs vocabs.loader vocabs.parser vocabs.generated
 words fry combinators present ;
@@ -67,6 +68,8 @@ TUPLE: A
     >c-ptr dup length \ T heap-size /mod 0 =
     [ drop \ T bad-byte-array-length ] unless
     <direct-A> ; inline
+
+M: A new-underlying drop byte-array>A ;
 
 M: A clone [ underlying>> clone ] [ length>> ] bi <direct-A> ; inline
 
