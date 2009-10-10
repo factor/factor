@@ -129,7 +129,7 @@ ARTICLE: "tuple-inheritance-example" "Tuple subclassing example"
 }
 "Rectangles and parallelograms use the same algorithm for computing the area, whereas they use different algorithms for computing perimiter. Also, rectangles and parallelograms both have " { $snippet "width" } " and " { $snippet "height" } " slots. We can exploit this with subclassing:"
 { $code
-    "USING: math.constants math.functions ;"
+    "USING: accessors kernel math math.constants math.functions ;"
     "GENERIC: area ( shape -- n )"
     "GENERIC: perimiter ( shape -- n )"
     ""
