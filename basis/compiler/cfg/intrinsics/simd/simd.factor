@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien byte-arrays fry cpu.architecture kernel math
-sequences math.vectors math.vectors.simd.intrinsics macros
-generalizations combinators combinators.short-circuit arrays locals
+USING: accessors alien byte-arrays fry classes.algebra
+cpu.architecture kernel math sequences math.vectors
+math.vectors.simd.intrinsics macros generalizations combinators
+combinators.short-circuit arrays locals
 compiler.tree.propagation.info compiler.cfg.builder.blocks
 compiler.cfg.comparisons
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.cfg.hats
@@ -75,46 +76,43 @@ MACRO: if-literals-match ( quots -- )
         ds-push
     ] emit-vector-op ;
 
-: variable-shuffle? ( obj -- ? )
-    ! the vshuffle intrinsic current doesn't allow variable shuffles
-    drop f ;
+: shuffle? ( obj -- ? ) { [ array? ] [ [ integer? ] all? ] } 1&& ;
 
-: immediate-shuffle? ( obj -- ? ) { [ array? ] [ [ integer? ] all? ] } 1&& ;
-
-: shuffle? ( obj -- ? ) { [ variable-shuffle? ] [ immediate-shuffle? ] } 1|| ;
-
-: (>variable-shuffle) ( shuffle rep -- shuffle )
+: >variable-shuffle ( shuffle rep -- shuffle' )
     rep-component-type heap-size
     [ dup <repetition> >byte-array ]
     [ iota >byte-array ] bi
     '[ _ n*v _ v+ ] map concat ;
 
-: >variable-shuffle ( shuffle rep -- shuffle' )
-    over immediate-shuffle? [ (>variable-shuffle) ] [ drop ] if ;
-
-: generate-shuffle-vector-imm? ( shuffle rep -- ? )
-    {
-        [ drop immediate-shuffle? ]
-        [ nip %shuffle-vector-imm-reps member? ]
-    } 2&& ;
-
-: generate-shuffle-vector ( src shuffle rep -- dst )
-    2dup generate-shuffle-vector-imm?
+: generate-shuffle-vector-imm ( src shuffle rep -- dst )
+    dup %shuffle-vector-imm-reps member?
     [ ^^shuffle-vector-imm ]
     [
         [ >variable-shuffle ^^load-constant ] keep
         ^^shuffle-vector
     ] if ;
 
-: emit-shuffle-vector ( node -- )
+: emit-shuffle-vector-imm ( node -- )
     ! Pad the permutation with zeroes if it's too short, since we
     ! can't throw an error at this point.
-    [ [ rep-components 0 pad-tail ] keep generate-shuffle-vector ] [unary/param]
+    [ [ rep-components 0 pad-tail ] keep generate-shuffle-vector-imm ] [unary/param]
     { [ shuffle? ] [ representation? ] } if-literals-match ;
+
+: emit-shuffle-vector-var ( node -- )
+    [ ^^shuffle-vector ] [binary]
+    { [ %shuffle-vector-reps member? ] } if-literals-match ;
+
+: emit-shuffle-vector ( node -- )
+    dup node-input-infos {
+        [ length 3 = ]
+        [ first  class>> byte-array class<= ]
+        [ second class>> byte-array class<= ]
+        [ third  literal>> representation?  ]
+    } 1&& [ emit-shuffle-vector-var ] [ emit-shuffle-vector-imm ] if ;
 
 : ^^broadcast-vector ( src n rep -- dst )
     [ rep-components swap <array> ] keep
-    generate-shuffle-vector ;
+    generate-shuffle-vector-imm ;
 
 : emit-broadcast-vector ( node -- )
     [ ^^broadcast-vector ] [unary/param]

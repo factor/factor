@@ -60,7 +60,7 @@ MACRO: simd-boa ( rep class -- simd-array )
     [ rep-components ] [ new ] [ '[ _ ] ] tri* swap replicate-as ; inline
 
 : simd-with/nth-fast? ( rep -- ? )
-    [ \ (simd-vshuffle) supported-simd-op? ]
+    [ \ (simd-vshuffle-elements) supported-simd-op? ]
     [ rep-component-type can-be-unboxed? ]
     bi and ;
 
@@ -183,6 +183,8 @@ WHERE
 
 TUPLE: A
 { underlying byte-array read-only initial: $[ 16 <byte-array> ] } ;
+
+INSTANCE: A simd-128
 
 M: A clone underlying>> clone \ A boa ; inline
 
@@ -315,7 +317,7 @@ SLOT: underlying2
     class c:typedef ;
 
 : (define-simd-256) ( simd -- )
-    simd-ops get { vshuffle hlshift hrshift } unique assoc-diff >>ops
+    simd-ops get { vshuffle-elements vshuffle-bytes hlshift hrshift } unique assoc-diff >>ops
     [ define-simd ]
     [ [ class>> ] [ rep>> ] bi define-simd-256-type ] bi ;
 
@@ -361,6 +363,8 @@ SLOT: underlying2
 TUPLE: A
 { underlying1 byte-array initial: $[ 16 <byte-array> ] read-only }
 { underlying2 byte-array initial: $[ 16 <byte-array> ] read-only } ;
+
+INSTANCE: A simd-256
 
 M: A clone
     [ underlying1>> clone ] [ underlying2>> clone ] bi

@@ -174,7 +174,7 @@ CONSTANT: simd-classes
 : remove-special-words ( alist -- alist' )
     ! These have their own tests later
     {
-        hlshift hrshift vshuffle vbroadcast
+        hlshift hrshift vshuffle-bytes vshuffle-elements vbroadcast
         vany? vall? vnone?
         (v>float) (v>integer)
         (vpack-signed) (vpack-unsigned)
@@ -359,6 +359,23 @@ simd-classes [
         [ = ] check-optimizer
     ] unit-test
 ] each
+
+"== Checking variable shuffles" print
+
+: random-shift-vector ( class -- vec )
+    new [ drop 16 random ] map ;
+
+:: test-shift-vector ( class -- ? )
+    class random-int-vector :> src
+    char-16 random-shift-vector :> perm
+    { class char-16 } :> decl
+
+    src perm vshuffle
+    src perm [ decl declare vshuffle ] compile-call
+    = ; inline
+
+{ char-16 uchar-16 short-8 ushort-8 int-4 uint-4 longlong-2 ulonglong-2 }
+[ 10 swap '[ [ t ] [ _ test-shift-vector ] unit-test ] times ] each
 
 "== Checking vector tests" print
 
