@@ -23,7 +23,7 @@ struct old_space : zone {
 
 	/* Find the card which contains the header of the object which contains
 	the given address */
-	cell find_object_start_card(cell address)
+	cell find_card_containing_header(cell address)
 	{
 		cell i = object_start_map_index(address);
 		while(i >= 0 && object_start_offsets[i] == card_starts_inside_object) i--;
