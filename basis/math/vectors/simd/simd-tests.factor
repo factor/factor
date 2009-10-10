@@ -529,38 +529,38 @@ SYMBOL: !!inconsistent!!
 
 STRUCT: simd-struct
 { x float-4 }
-{ y double-2 }
+{ y longlong-2 }
 { z double-4 }
-{ w float-8 } ;
+{ w int-8 } ;
 
 [ t ] [ [ simd-struct <struct> ] compile-call >c-ptr [ 0 = ] all? ] unit-test
 
 [
     float-4{ 1 2 3 4 }
-    double-2{ 2 1 }
+    longlong-2{ 2 1 }
     double-4{ 4 3 2 1 }
-    float-8{ 1 2 3 4 5 6 7 8 }
+    int-8{ 1 2 3 4 5 6 7 8 }
 ] [
     simd-struct <struct>
     float-4{ 1 2 3 4 } >>x
-    double-2{ 2 1 } >>y
+    longlong-2{ 2 1 } >>y
     double-4{ 4 3 2 1 } >>z
-    float-8{ 1 2 3 4 5 6 7 8 } >>w
+    int-8{ 1 2 3 4 5 6 7 8 } >>w
     { [ x>> ] [ y>> ] [ z>> ] [ w>> ] } cleave
 ] unit-test
 
 [
     float-4{ 1 2 3 4 }
-    double-2{ 2 1 }
+    longlong-2{ 2 1 }
     double-4{ 4 3 2 1 }
-    float-8{ 1 2 3 4 5 6 7 8 }
+    int-8{ 1 2 3 4 5 6 7 8 }
 ] [
     [
         simd-struct <struct>
         float-4{ 1 2 3 4 } >>x
-        double-2{ 2 1 } >>y
+        longlong-2{ 2 1 } >>y
         double-4{ 4 3 2 1 } >>z
-        float-8{ 1 2 3 4 5 6 7 8 } >>w
+        int-8{ 1 2 3 4 5 6 7 8 } >>w
         { [ x>> ] [ y>> ] [ z>> ] [ w>> ] } cleave
     ] compile-call
 ] unit-test
