@@ -1288,6 +1288,7 @@ M:: x86 %scalar>integer ( dst src rep -- )
             ] with-small-register
         ] }
         { uchar-scalar-rep [
+            dst 32-bit-version-of src MOVD
             dst { } 8 [| tmp-dst |
                 tmp-dst dst int-rep %copy
                 tmp-dst tmp-dst 8-bit-version-of MOVZX
