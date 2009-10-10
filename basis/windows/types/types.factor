@@ -3,6 +3,7 @@
 USING: alien alien.c-types alien.syntax namespaces kernel words
 sequences math math.bitwise math.vectors colors
 io.encodings.utf16n classes.struct accessors ;
+FROM: alien.c-types => float short ;
 IN: windows.types
 
 TYPEDEF: char                CHAR
@@ -10,6 +11,12 @@ TYPEDEF: uchar               UCHAR
 TYPEDEF: uchar               BYTE
 
 TYPEDEF: ushort              wchar_t
+SYMBOL: wchar_t*
+<<
+{ char* utf16n } \ wchar_t* typedef
+\ wchar_t \ wchar_t* "pointer-c-type" set-word-prop
+>>
+
 TYPEDEF: wchar_t             WCHAR
 
 TYPEDEF: short               SHORT
@@ -54,6 +61,7 @@ TYPEDEF: ulong       ULONG_PTR
 TYPEDEF: int         INT32
 TYPEDEF: uint        UINT32
 TYPEDEF: uint        DWORD32
+TYPEDEF: long        LONG32
 TYPEDEF: ulong       ULONG32
 TYPEDEF: ulonglong   ULONG64
 TYPEDEF: long*       POINTER_32
@@ -68,8 +76,8 @@ TYPEDEF: longlong    LARGE_INTEGER
 TYPEDEF: ulonglong   ULARGE_INTEGER
 TYPEDEF: LARGE_INTEGER* PLARGE_INTEGER
 TYPEDEF: ULARGE_INTEGER* PULARGE_INTEGER
-
-<< { "char*" utf16n } "wchar_t*" typedef >>
+TYPEDEF: size_t SIZE_T
+TYPEDEF: ptrdiff_t SSIZE_T
 
 TYPEDEF: wchar_t*  LPCSTR
 TYPEDEF: wchar_t*  LPWSTR
@@ -196,15 +204,6 @@ TYPEDEF: LONG_PTR            SSIZE_T
 TYPEDEF: LONGLONG            USN
 TYPEDEF: UINT_PTR            WPARAM
 
-TYPEDEF: RECT* LPRECT
-TYPEDEF: void* PWNDCLASS
-TYPEDEF: void* PWNDCLASSEX
-TYPEDEF: void* LPWNDCLASS
-TYPEDEF: void* LPWNDCLASSEX
-TYPEDEF: void* MSGBOXPARAMSA
-TYPEDEF: void* MSGBOXPARAMSW
-TYPEDEF: void* LPOVERLAPPED_COMPLETION_ROUTINE
-
 TYPEDEF: size_t socklen_t
 
 TYPEDEF: void* WNDPROC
@@ -248,14 +247,13 @@ STRUCT: RECT
     { right LONG }
     { bottom LONG } ;
 
-C-STRUCT: PAINTSTRUCT
-    { "HDC" " hdc" }
-    { "BOOL" "fErase" }
-    { "RECT" "rcPaint" }
-    { "BOOL" "fRestore" }
-    { "BOOL" "fIncUpdate" }
-    { "BYTE[32]" "rgbReserved" }
-;
+STRUCT: PAINTSTRUCT
+    { hdc HDC }
+    { fErase BOOL }
+    { rcPaint RECT }
+    { fRestore BOOL }
+    { fIncUpdate BOOL }
+    { rgbReserved BYTE[32] } ;
 
 STRUCT: BITMAPINFOHEADER
     { biSize DWORD }
@@ -283,21 +281,21 @@ STRUCT: BITMAPINFO
 TYPEDEF: void* LPPAINTSTRUCT
 TYPEDEF: void* PAINTSTRUCT
 
-C-STRUCT: POINT
-    { "LONG" "x" }
-    { "LONG" "y" } ; 
+STRUCT: POINT
+    { x LONG }
+    { y LONG } ; 
 
 STRUCT: SIZE
     { cx LONG }
     { cy LONG } ;
 
-C-STRUCT: MSG
-    { "HWND" "hWnd" }
-    { "UINT" "message" }
-    { "WPARAM" "wParam" }
-    { "LPARAM" "lParam" }
-    { "DWORD" "time" }
-    { "POINT" "pt" } ;
+STRUCT: MSG
+    { hWnd HWND }
+    { message UINT }
+    { wParam WPARAM }
+    { lParam LPARAM }
+    { time DWORD }
+    { pt POINT } ;
 
 TYPEDEF: MSG*                LPMSG
 
@@ -339,34 +337,42 @@ TYPEDEF: PFD* LPPFD
 TYPEDEF: HANDLE HGLRC
 TYPEDEF: HANDLE HRGN
 
-C-STRUCT: LVITEM
-    { "uint" "mask" }
-    { "int" "iItem" }
-    { "int" "iSubItem" }
-    { "uint" "state" }
-    { "uint" "stateMask" }
-    { "void*" "pszText" }
-    { "int" "cchTextMax" }
-    { "int" "iImage" }
-    { "long" "lParam" }
-    { "int" "iIndent" }
-    { "int" "iGroupId" }
-    { "uint" "cColumns" }
-    { "uint*" "puColumns" }
-    { "int*" "piColFmt" }
-    { "int" "iGroup" } ;
+TYPEDEF: void* PWNDCLASS
+TYPEDEF: void* PWNDCLASSEX
+TYPEDEF: void* LPWNDCLASS
+TYPEDEF: void* LPWNDCLASSEX
+TYPEDEF: void* MSGBOXPARAMSA
+TYPEDEF: void* MSGBOXPARAMSW
+TYPEDEF: void* LPOVERLAPPED_COMPLETION_ROUTINE
 
-C-STRUCT: LVFINDINFO
-    { "uint" "flags" }
-    { "char*" "psz" }
-    { "long" "lParam" }
-    { "POINT" "pt" }
-    { "uint" "vkDirection" } ;
+STRUCT: LVITEM
+    { mask uint }
+    { iItem int }
+    { iSubItem int }
+    { state uint }
+    { stateMask uint }
+    { pszText void* }
+    { cchTextMax int }
+    { iImage int }
+    { lParam long }
+    { iIndent int }
+    { iGroupId int }
+    { cColumns uint }
+    { puColumns uint* }
+    { piColFmt int* }
+    { iGroup int } ;
 
-C-STRUCT: ACCEL
-    { "BYTE" "fVirt" }
-    { "WORD" "key" }
-    { "WORD" "cmd" } ;
+STRUCT: LVFINDINFO
+    { flags uint }
+    { psz char* }
+    { lParam long }
+    { pt POINT }
+    { vkDirection uint } ;
+
+STRUCT: ACCEL
+    { fVirt BYTE }
+    { key WORD }
+    { cmd WORD } ;
 TYPEDEF: ACCEL* LPACCEL
 
 TYPEDEF: DWORD COLORREF
@@ -374,9 +380,15 @@ TYPEDEF: DWORD* LPCOLORREF
 
 : RGB ( r g b -- COLORREF )
     { 16 8 0 } bitfield ; inline
+: >RGB< ( COLORREF -- r g b )
+    [           HEX: ff bitand ]
+    [  -8 shift HEX: ff bitand ]
+    [ -16 shift HEX: ff bitand ] tri ;
 
 : color>RGB ( color -- COLORREF )
     >rgba-components drop [ 255 * >integer ] tri@ RGB ;
+: RGB>color ( COLORREF -- color )
+    >RGB< [ 1/255. * >float ] tri@ 1.0 <rgba> ;
 
 STRUCT: TEXTMETRICW
     { tmHeight LONG }

@@ -41,14 +41,18 @@ HELP: objc-error
 
 ARTICLE: "cocoa-application-utils" "Cocoa application utilities"
 "Utilities:"
-{ $subsection NSApp }
-{ $subsection add-observer }
-{ $subsection remove-observer }
-{ $subsection install-delegate }
+{ $subsections
+    NSApp
+    add-observer
+    remove-observer
+    install-delegate
+}
 "Combinators:"
-{ $subsection cocoa-app }
-{ $subsection with-autorelease-pool }
-{ $subsection with-cocoa } ;
+{ $subsections
+    cocoa-app
+    with-autorelease-pool
+    with-cocoa
+} ;
 
 IN: cocoa.application
 ABOUT: "cocoa-application-utils"

@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io kernel math quotations
-opengl.gl multiline assocs ;
+opengl.gl assocs ;
 IN: opengl.capabilities
 
 HELP: gl-version
@@ -42,10 +42,10 @@ HELP: has-gl-extensions?
 { $values { "extensions" "A sequence of extension name strings" } { "?" "A boolean value" } }
 { $description "Returns true if the set of " { $snippet "extensions" } " is a subset of the implementation-supported extensions returned by " { $link gl-extensions } ". Elements of " { $snippet "extensions" } " can be sequences, in which case true will be returned if any one of the extensions in the subsequence are available." }
 { $examples "Testing for framebuffer object and pixel buffer support:"
-    { $code <" {
+    { $code """{
     { "GL_EXT_framebuffer_object" "GL_ARB_framebuffer_object" }
     "GL_ARB_pixel_buffer_object"
-} has-gl-extensions? "> }
+} has-gl-extensions?""" }
 } ;
 
 HELP: has-gl-version-or-extensions?

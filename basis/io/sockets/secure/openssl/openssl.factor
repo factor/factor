@@ -1,10 +1,10 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays kernel sequences namespaces math
-math.order combinators init alien alien.c-types alien.strings
-libc continuations destructors summary splitting assocs random
-math.parser locals unicode.case openssl openssl.libcrypto
-openssl.libssl io.backend io.ports io.pathnames
+math.order combinators init alien alien.c-types alien.data
+alien.strings libc continuations destructors summary splitting
+assocs random math.parser locals unicode.case openssl
+openssl.libcrypto openssl.libssl io.backend io.ports io.pathnames
 io.encodings.8-bit io.timeouts io.sockets.secure ;
 IN: io.sockets.secure.openssl
 
@@ -31,7 +31,7 @@ TUPLE: openssl-context < secure-context aliens sessions ;
     ] [ drop ] if ;
 
 : password-callback ( -- alien )
-    "int" { "void*" "int" "bool" "void*" } "cdecl"
+    int { void* int bool void* } "cdecl"
     [| buf size rwflag password! |
         password [ B{ 0 } password! ] unless
 

@@ -24,6 +24,11 @@ M: fixnum <= fixnum<= ; inline
 M: fixnum > fixnum> ; inline
 M: fixnum >= fixnum>= ; inline
 
+M: fixnum u< fixnum< ; inline
+M: fixnum u<= fixnum<= ; inline
+M: fixnum u> fixnum> ; inline
+M: fixnum u>= fixnum>= ; inline
+
 M: fixnum + fixnum+ ; inline
 M: fixnum - fixnum- ; inline
 M: fixnum * fixnum* ; inline
@@ -64,6 +69,11 @@ M: bignum < bignum< ; inline
 M: bignum <= bignum<= ; inline
 M: bignum > bignum> ; inline
 M: bignum >= bignum>= ; inline
+
+M: bignum u< bignum< ; inline
+M: bignum u<= bignum<= ; inline
+M: bignum u> bignum> ; inline
+M: bignum u>= bignum>= ; inline
 
 M: bignum + bignum+ ; inline
 M: bignum - bignum- ; inline

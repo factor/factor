@@ -27,9 +27,11 @@ ARTICLE: "furnace.boilerplate.example" "Boilerplate example"
 
 ARTICLE: "furnace.boilerplate" "Furnace boilerplate support"
 "The " { $vocab-link "furnace.boilerplate" } " vocabulary implements a facility for sharing a common header and footer between different pages on a web site. It builds on top of " { $link "html.templates.boilerplate" } "."
-{ $subsection <boilerplate> }
-{ $subsection "furnace.boilerplate.config" }
-{ $subsection "furnace.boilerplate.example" }
+{ $subsections
+    <boilerplate>
+    "furnace.boilerplate.config"
+    "furnace.boilerplate.example"
+}
 { $see-also "html.templates.chloe.tags.boilerplate" } ;
 
 ABOUT: "furnace.boilerplate"

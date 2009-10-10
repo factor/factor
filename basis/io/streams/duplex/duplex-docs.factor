@@ -3,11 +3,15 @@ IN: io.streams.duplex
 
 ARTICLE: "io.streams.duplex" "Duplex streams"
 "Duplex streams combine an input stream and an output stream into a bidirectional stream."
-{ $subsection duplex-stream }
-{ $subsection <duplex-stream> }
+{ $subsections
+    duplex-stream
+    <duplex-stream>
+}
 "A pair of combinators for rebinding both default streams at once:"
-{ $subsection with-stream }
-{ $subsection with-stream* } ;
+{ $subsections
+    with-stream
+    with-stream*
+} ;
 
 ABOUT: "io.streams.duplex"
 

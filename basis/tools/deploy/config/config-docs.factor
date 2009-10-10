@@ -1,18 +1,22 @@
-USING: help.markup help.syntax words alien.c-types assocs
+USING: help.markup help.syntax words alien.c-types alien.data assocs
 kernel math ;
 IN: tools.deploy.config
 
 ARTICLE: "deploy-flags" "Deployment flags"
 "There are two sets of deployment flags. The first set controls the major subsystems which are to be included in the deployment image:"
-{ $subsection deploy-math?     }
-{ $subsection deploy-unicode?   }
-{ $subsection deploy-threads?  }
-{ $subsection deploy-ui?       }
+{ $subsections
+    deploy-math?
+    deploy-unicode?
+    deploy-threads?
+    deploy-ui?
+}
 "The second set of flags controls the level of stripping to be performed on the deployment image; there is a trade-off between image size, and retaining functionality which is required by the application:"
-{ $subsection deploy-io          }
-{ $subsection deploy-reflection  }
-{ $subsection deploy-word-props? }
-{ $subsection deploy-c-types?    } ;
+{ $subsections
+    deploy-io
+    deploy-reflection
+    deploy-word-props?
+    deploy-c-types?
+} ;
 
 ABOUT: "deploy-flags"
 

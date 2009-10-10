@@ -86,7 +86,7 @@ IN: bootstrap.syntax
         } cond parsed
     ] define-core-syntax
 
-    "\"" [ parse-string parsed ] define-core-syntax
+    "\"" [ parse-multiline-string parsed ] define-core-syntax
 
     "SBUF\"" [
         lexer get skip-blank parse-string >sbuf parsed

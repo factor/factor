@@ -1,6 +1,8 @@
 nmap <silent> <Leader>fi :FactorVocabImpl<CR>
 nmap <silent> <Leader>fd :FactorVocabDocs<CR>
 nmap <silent> <Leader>ft :FactorVocabTests<CR>
+nmap <Leader>fv :FactorVocab<SPACE>
+nmap <Leader>fn :NewFactorVocab<SPACE>
 
 if !exists("g:FactorRoot")
     let g:FactorRoot = "~/factor"
@@ -10,7 +12,12 @@ if !exists("g:FactorVocabRoots")
     let g:FactorVocabRoots = ["core", "basis", "extra", "work"]
 endif
 
+if !exists("g:FactorNewVocabRoot")
+    let g:FactorNewVocabRoot = "work"
+endif
+
 command! -nargs=1 -complete=customlist,FactorCompleteVocab FactorVocab :call GoToFactorVocab("<args>")
+command! -nargs=1 -complete=customlist,FactorCompleteVocab NewFactorVocab :call MakeFactorVocab("<args>")
 command! FactorVocabImpl  :call GoToFactorVocabImpl()
 command! FactorVocabDocs  :call GoToFactorVocabDocs()
 command! FactorVocabTests :call GoToFactorVocabTests()
@@ -49,11 +56,11 @@ function! FactorCompleteVocab(arglead, cmdline, cursorpos)
     return vocabs
 endfunction
 
-function! FactorVocabFile(root, vocab)
+function! FactorVocabFile(root, vocab, mustexist)
     let vocabpath = substitute(a:vocab, "\\.", "/", "g")
     let vocabfile = FactorVocabRoot(a:root) . vocabpath . "/" . fnamemodify(vocabpath, ":t") . ".factor"
     
-    if getftype(vocabfile) != ""
+    if !a:mustexist || getftype(vocabfile) != ""
         return vocabfile
     else
         return ""
@@ -62,13 +69,22 @@ endfunction
 
 function! GoToFactorVocab(vocab)
     for root in g:FactorVocabRoots
-        let vocabfile = FactorVocabFile(root, a:vocab)
+        let vocabfile = FactorVocabFile(root, a:vocab, 1)
         if vocabfile != ""
             exe "edit " fnameescape(vocabfile)
             return
         endif
     endfor
     echo "Vocabulary " vocab " not found"
+endfunction
+
+function! MakeFactorVocab(vocab)
+    let vocabfile = FactorVocabFile(g:FactorNewVocabRoot, a:vocab, 0)
+    echo vocabfile
+    let vocabdir = fnamemodify(vocabfile, ":h")
+    echo vocabdir
+    exe "!mkdir -p " shellescape(vocabdir)
+    exe "edit " fnameescape(vocabfile)
 endfunction
 
 function! FactorFileBase()

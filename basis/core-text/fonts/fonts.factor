@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.syntax assocs core-foundation
-core-foundation.strings core-text.utilities destructors init
-kernel math memoize fonts combinators ;
+USING: accessors alien.c-types alien.syntax assocs core-foundation
+core-foundation.dictionaries core-foundation.strings
+core-graphics.types destructors init
+kernel math memoize fonts combinators unix.types ;
 IN: core-text.fonts
 
 TYPEDEF: void* CTFontRef
@@ -17,28 +18,28 @@ TYPEDEF: void* CTFontDescriptorRef
 : kCTFontVerticalTrait ( -- n ) 11 2^ ; inline
 : kCTFontUIOptimizedTrait ( -- n ) 12 2^ ; inline
 
-C-GLOBAL: kCTFontSymbolicTrait
-C-GLOBAL: kCTFontWeightTrait
-C-GLOBAL: kCTFontWidthTrait
-C-GLOBAL: kCTFontSlantTrait
+C-GLOBAL: CFStringRef kCTFontSymbolicTrait
+C-GLOBAL: CFStringRef kCTFontWeightTrait
+C-GLOBAL: CFStringRef kCTFontWidthTrait
+C-GLOBAL: CFStringRef kCTFontSlantTrait
 
-C-GLOBAL: kCTFontNameAttribute
-C-GLOBAL: kCTFontDisplayNameAttribute
-C-GLOBAL: kCTFontFamilyNameAttribute
-C-GLOBAL: kCTFontStyleNameAttribute
-C-GLOBAL: kCTFontTraitsAttribute
-C-GLOBAL: kCTFontVariationAttribute
-C-GLOBAL: kCTFontSizeAttribute
-C-GLOBAL: kCTFontMatrixAttribute
-C-GLOBAL: kCTFontCascadeListAttribute
-C-GLOBAL: kCTFontCharacterSetAttribute
-C-GLOBAL: kCTFontLanguagesAttribute
-C-GLOBAL: kCTFontBaselineAdjustAttribute
-C-GLOBAL: kCTFontMacintoshEncodingsAttribute
-C-GLOBAL: kCTFontFeaturesAttribute
-C-GLOBAL: kCTFontFeatureSettingsAttribute
-C-GLOBAL: kCTFontFixedAdvanceAttribute
-C-GLOBAL: kCTFontOrientationAttribute
+C-GLOBAL: CFStringRef kCTFontNameAttribute
+C-GLOBAL: CFStringRef kCTFontDisplayNameAttribute
+C-GLOBAL: CFStringRef kCTFontFamilyNameAttribute
+C-GLOBAL: CFStringRef kCTFontStyleNameAttribute
+C-GLOBAL: CFStringRef kCTFontTraitsAttribute
+C-GLOBAL: CFStringRef kCTFontVariationAttribute
+C-GLOBAL: CFStringRef kCTFontSizeAttribute
+C-GLOBAL: CFStringRef kCTFontMatrixAttribute
+C-GLOBAL: CFStringRef kCTFontCascadeListAttribute
+C-GLOBAL: CFStringRef kCTFontCharacterSetAttribute
+C-GLOBAL: CFStringRef kCTFontLanguagesAttribute
+C-GLOBAL: CFStringRef kCTFontBaselineAdjustAttribute
+C-GLOBAL: CFStringRef kCTFontMacintoshEncodingsAttribute
+C-GLOBAL: CFStringRef kCTFontFeaturesAttribute
+C-GLOBAL: CFStringRef kCTFontFeatureSettingsAttribute
+C-GLOBAL: CFStringRef kCTFontFixedAdvanceAttribute
+C-GLOBAL: CFStringRef kCTFontOrientationAttribute
 
 FUNCTION: CTFontDescriptorRef CTFontDescriptorCreateWithAttributes (
    CFDictionaryRef attributes

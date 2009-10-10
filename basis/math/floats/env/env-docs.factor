@@ -1,5 +1,5 @@
 ! (c)Joe Groff bsd license
-USING: help help.markup help.syntax quotations ;
+USING: help help.markup help.syntax kernel quotations ;
 IN: math.floats.env
 
 HELP: fp-exception
@@ -97,31 +97,49 @@ HELP: fp-traps
 
 HELP: with-fp-traps
 { $values { "exceptions" "a sequence of " { $link fp-exception } " symbols" } { "quot" quotation } }
-{ $description "Replaces the floating-point exception mask to enable processor traps to be raised for the set of exception conditions specified in " { $snippet "exceptions" } " for the dynamic extent of " { $snippet "quot" } ", restoring the original exception mask on " { $snippet "quot" } "'s completion." } ;
+{ $description "Clears the floating-point exception flags and replaces the exception mask, enabling processor traps for the set of exception conditions specified in " { $snippet "exceptions" } " for the dynamic extent of " { $snippet "quot" } ". The original exception mask is restored on " { $snippet "quot" } "'s completion." } ;
 
 HELP: without-fp-traps
 { $values { "quot" quotation } }
 { $description "Disables all floating-pointer processor traps for the dynamic extent of " { $snippet "quot" } ", restoring the original exception mask on " { $snippet "quot" } "'s completion." } ;
 
-{ fp-traps with-fp-traps without-fp-traps } related-words
+{ fp-traps with-fp-traps without-fp-traps vm-error>exception-flags vm-error-exception-flag? } related-words
+
+HELP: vm-error>exception-flags
+{ $values { "error" "a floating-point error object from the Factor VM" } { "exceptions" "a sequence of " { $link fp-exception } " symbols" } }
+{ $description "When a floating-point trap is raised, the Factor VM reports the trap by throwing a Factor exception containing the exception flags at the time the trap was raised. This word extracts the exception flag information from " { $snippet "error" } " and converts it into a sequence of " { $link fp-exception } "s." } ;
+
+HELP: vm-error-exception-flag?
+{ $values { "error" "a floating-point error object from the Factor VM" } { "flag" fp-exception } { "?" boolean } }
+{ $description "When a floating-point trap is raised, the Factor VM reports the trap by throwing a Factor exception containing the exception flags at the time the trap was raised. This word returns a boolean indicating whether the exception " { $snippet "flag" } " was raised at the time " { $snippet "error" } " was thrown." } ;
 
 ARTICLE: "math.floats.env" "Controlling the floating-point environment"
 "The " { $vocab-link "math.floats.env" } " vocabulary contains words for querying and controlling the floating-point environment."
 $nl
 "Querying and setting exception flags:"
-{ $subsection fp-exception-flags }
-{ $subsection set-fp-exception-flags }
-{ $subsection clear-fp-exception-flags }
-{ $subsection collect-fp-exceptions }
+{ $subsections
+    fp-exception-flags
+    set-fp-exception-flags
+    clear-fp-exception-flags
+    collect-fp-exceptions
+}
 "Querying and controlling processor traps for floating-point exceptions:"
-{ $subsection fp-traps }
-{ $subsection with-fp-traps }
-{ $subsection without-fp-traps }
+{ $subsections
+    fp-traps
+    with-fp-traps
+    without-fp-traps
+}
+"Getting the floating-point exception state from errors raised by enabled traps:"
+{ $subsections
+    vm-error>exception-flags
+    vm-error-exception-flag?
+}
 "Querying and controlling the rounding mode and treatment of denormals:"
-{ $subsection rounding-mode }
-{ $subsection with-rounding-mode }
-{ $subsection denormal-mode }
-{ $subsection with-denormal-mode }
-{ $notes "On PowerPC, the above words only modify the scalar FPU's state (in FPSCR); the AltiVec unit is currently unaffected." } ;
+{ $subsections
+    rounding-mode
+    with-rounding-mode
+    denormal-mode
+    with-denormal-mode
+} ;
 
 ABOUT: "math.floats.env"

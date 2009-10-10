@@ -50,7 +50,7 @@ M: callable uses ( quot -- assoc )
 
 M: word uses def>> uses ;
 
-M: link uses { $subsection $link $see-also } article-links ;
+M: link uses { $subsection $subsections $link $see-also } article-links ;
 
 M: pathname uses string>> source-file top-level-form>> [ uses ] [ { } ] if* ;
 
@@ -105,7 +105,8 @@ M: f smart-usage drop \ f smart-usage ;
     synopsis-alist sort-keys definitions. ;
 
 : usage. ( word -- )
-    smart-usage sorted-definitions. ;
+    smart-usage
+    [ "No usages." print ] [ sorted-definitions. ] if-empty ;
 
 : vocab-xref ( vocab quot -- vocabs )
     [ [ vocab-name ] [ words [ generic? not ] filter ] bi ] dip map

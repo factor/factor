@@ -37,13 +37,13 @@ TUPLE: test-implementation x ;
 C: <test-implementation> test-implementation 
 
 {
-    { "IInherited" {
+    { IInherited {
         [ drop S_OK ] ! ISimple::returnOK
         [ drop E_FAIL ] ! ISimple::returnError
         [ x>> ] ! IInherited::getX
         [ >>x drop ] ! IInherited::setX
     } }
-    { "IUnrelated" {
+    { IUnrelated {
         [ swap x>> + ] ! IUnrelated::xPlus
         [ spin x>> * + ] ! IUnrelated::xMulAdd
     } }
@@ -85,7 +85,7 @@ dup +test-wrapper+ set [
             +guinea-pig-implementation+ get ISimple-iid com-query-interface
             dup com-release
         ] unit-test
-        "void*" heap-size +guinea-pig-implementation+ get <displaced-alien>
+        void* heap-size +guinea-pig-implementation+ get <displaced-alien>
         +guinea-pig-implementation+ get
         2array [
             +guinea-pig-implementation+ get IUnrelated-iid com-query-interface

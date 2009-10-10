@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types destructors fry images kernel
-libc math sequences ;
+USING: accessors alien.c-types alien.data destructors fry images
+kernel libc math sequences ;
 IN: images.memory
 
 ! Some code shared by core-graphics and cairo for constructing

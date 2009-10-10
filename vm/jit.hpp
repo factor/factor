@@ -10,8 +10,9 @@ struct jit {
 	bool computing_offset_p;
 	fixnum position;
 	cell offset;
+	factor_vm *parent_vm;
 
-	jit(cell jit_type, cell owner);
+	explicit jit(cell jit_type, cell owner, factor_vm *vm);
 	void compute_position(cell offset);
 
 	void emit_relocation(cell code_template);
@@ -21,27 +22,27 @@ struct jit {
 	void emit_with(cell code_template_, cell literal_);
 
 	void push(cell literal) {
-		emit_with(userenv[JIT_PUSH_IMMEDIATE],literal);
+		emit_with(parent_vm->userenv[JIT_PUSH_IMMEDIATE],literal);
 	}
 
 	void word_jump(cell word) {
 		literal(tag_fixnum(xt_tail_pic_offset));
 		literal(word);
-		emit(userenv[JIT_WORD_JUMP]);
+		emit(parent_vm->userenv[JIT_WORD_JUMP]);
 	}
 
 	void word_call(cell word) {
-		emit_with(userenv[JIT_WORD_CALL],word);
+		emit_with(parent_vm->userenv[JIT_WORD_CALL],word);
 	}
 
 	void word_special(cell word) {
-		emit_with(userenv[JIT_WORD_SPECIAL],word);
+		emit_with(parent_vm->userenv[JIT_WORD_SPECIAL],word);
 	}
 
 	void emit_subprimitive(cell word_) {
-		gc_root<word> word(word_);
-		gc_root<array> code_template(word->subprimitive);
-		if(array_capacity(code_template.untagged()) > 1) literal(T);
+		gc_root<word> word(word_,parent_vm);
+		gc_root<array> code_template(word->subprimitive,parent_vm);
+		if(array_capacity(code_template.untagged()) > 1) literal(parent_vm->T);
 		emit(code_template.value());
 	}
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math namespaces make sequences system
-layouts alien alien.c-types alien.accessors alien.structs slots
+layouts alien alien.c-types alien.accessors slots
 splitting assocs combinators locals compiler.constants
 compiler.codegen compiler.codegen.fixup compiler.cfg.instructions
 compiler.cfg.builder compiler.cfg.intrinsics compiler.cfg.stack-frame
@@ -36,9 +36,10 @@ M:: x86.64 %dispatch ( src temp -- )
     [ align-code ]
     bi ;
 
-M: x86.64 param-reg-1 int-regs param-regs first ;
-M: x86.64 param-reg-2 int-regs param-regs second ;
+: param-reg-1 ( -- reg ) int-regs param-regs first ; inline
+: param-reg-2 ( -- reg ) int-regs param-regs second ; inline
 : param-reg-3 ( -- reg ) int-regs param-regs third ; inline
+: param-reg-4 ( -- reg ) int-regs param-regs fourth ; inline
 
 M: x86.64 pic-tail-reg RBX ;
 
@@ -58,9 +59,9 @@ M: stack-params copy-register*
         { [ over integer? ] [ R11 swap MOV              param@ R11 MOV ] }
     } cond ;
 
-M: x86 %save-param-reg [ param@ ] 2dip copy-register ;
+M: x86 %save-param-reg [ param@ ] 2dip %copy ;
 
-M: x86 %load-param-reg [ swap param@ ] dip copy-register ;
+M: x86 %load-param-reg [ swap param@ ] dip %copy ;
 
 : with-return-regs ( quot -- )
     [
@@ -74,7 +75,11 @@ M: x86.64 %prepare-unbox ( -- )
     param-reg-1 R14 [] MOV
     R14 cell SUB ;
 
+: %mov-vm-ptr ( reg -- )
+    0 MOV rc-absolute-cell rt-vm rel-fixup ;
+
 M:: x86.64 %unbox ( n rep func -- )
+    param-reg-2 %mov-vm-ptr
     ! Call the unboxer
     func f %alien-invoke
     ! Store the return value on the C stack if this is an
@@ -94,6 +99,7 @@ M: x86.64 %unbox-long-long ( n func -- )
 
 M: x86.64 %unbox-small-struct ( c-type -- )
     ! Alien must be in param-reg-1.
+    param-reg-2 %mov-vm-ptr
     "alien_offset" f %alien-invoke
     ! Move alien_offset() return value to R11 so that we don't
     ! clobber it.
@@ -108,6 +114,7 @@ M:: x86.64 %unbox-large-struct ( n c-type -- )
     param-reg-2 n param@ LEA
     ! Load structure size into param-reg-3
     param-reg-3 c-type heap-size MOV
+    param-reg-4 %mov-vm-ptr
     ! Copy the struct to the C stack
     "to_value_struct" f %alien-invoke ;
 
@@ -115,7 +122,7 @@ M:: x86.64 %unbox-large-struct ( n c-type -- )
     [ [ 0 ] dip reg-class-of param-reg ]
     [ reg-class-of return-reg ]
     [ ]
-    tri copy-register ;
+    tri %copy ;
 
 M:: x86.64 %box ( n rep func -- )
     n [
@@ -125,6 +132,7 @@ M:: x86.64 %box ( n rep func -- )
     ] [
         rep load-return-value
     ] if
+    rep int-rep? [ param-reg-2 ] [ param-reg-1 ] if %mov-vm-ptr
     func f %alien-invoke ;
 
 M: x86.64 %box-long-long ( n func -- )
@@ -145,6 +153,7 @@ M: x86.64 %box-small-struct ( c-type -- )
         [ param-reg-3 swap heap-size MOV ] bi
         param-reg-1 0 box-struct-field@ MOV
         param-reg-2 1 box-struct-field@ MOV
+        param-reg-4 %mov-vm-ptr
         "box_small_struct" f %alien-invoke
     ] with-return-regs ;
 
@@ -156,6 +165,7 @@ M: x86.64 %box-large-struct ( n c-type -- )
     param-reg-2 swap heap-size MOV
     ! Compute destination address
     param-reg-1 swap struct-return@ LEA
+    param-reg-3 %mov-vm-ptr
     ! Copy the struct from the C stack
     "box_value_struct" f %alien-invoke ;
 
@@ -172,7 +182,16 @@ M: x86.64 %alien-invoke
     rc-absolute-cell rel-dlsym
     R11 CALL ;
 
+M: x86.64 %nest-stacks ( -- )
+    param-reg-1 0 MOV rc-absolute-cell rt-vm rel-fixup
+    "nest_stacks" f %alien-invoke ;
+
+M: x86.64 %unnest-stacks ( -- )
+    param-reg-1 0 MOV rc-absolute-cell rt-vm rel-fixup
+    "unnest_stacks" f %alien-invoke ;
+
 M: x86.64 %prepare-alien-indirect ( -- )
+    param-reg-1 %mov-vm-ptr
     "unbox_alien" f %alien-invoke
     RBP RAX MOV ;
 
@@ -181,6 +200,7 @@ M: x86.64 %alien-indirect ( -- )
 
 M: x86.64 %alien-callback ( quot -- )
     param-reg-1 swap %load-reference
+    param-reg-2 %mov-vm-ptr
     "c_to_factor" f %alien-invoke ;
 
 M: x86.64 %callback-value ( ctype -- )
@@ -189,6 +209,7 @@ M: x86.64 %callback-value ( ctype -- )
     ! Save top of data stack
     RSP 8 SUB
     param-reg-1 PUSH
+    param-reg-1 %mov-vm-ptr
     ! Restore data/call/retain stacks
     "unnest_stacks" f %alien-invoke
     ! Put former top of data stack in param-reg-1
@@ -197,11 +218,11 @@ M: x86.64 %callback-value ( ctype -- )
     ! Unbox former top of data stack to return registers
     unbox-return ;
 
-: float-function-param ( i spill-slot -- )
-    [ float-regs param-regs nth ] [ n>> spill@ ] bi* MOVSD ;
+: float-function-param ( i src -- )
+    [ float-regs param-regs nth ] dip double-rep %copy ;
 
 : float-function-return ( reg -- )
-    float-regs return-reg double-rep copy-register ;
+    float-regs return-reg double-rep %copy ;
 
 M:: x86.64 %unary-float-function ( dst src func -- )
     0 src float-function-param
@@ -209,17 +230,26 @@ M:: x86.64 %unary-float-function ( dst src func -- )
     dst float-function-return ;
 
 M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
+    ! src1 might equal dst; otherwise it will be a spill slot
+    ! src2 is always a spill slot
     0 src1 float-function-param
     1 src2 float-function-param
     func f %alien-invoke
     dst float-function-return ;
 
+M:: x86.64 %call-gc ( gc-root-count temp -- )
+    ! Pass pointer to start of GC roots as first parameter
+    param-reg-1 gc-root-base param@ LEA
+    ! Pass number of roots as second parameter
+    param-reg-2 gc-root-count MOV
+    ! Pass VM ptr as third parameter
+    param-reg-3 %mov-vm-ptr
+    ! Call GC
+    "inline_gc" f %alien-invoke ;
+
 ! The result of reading 4 bytes from memory is a fixnum on
 ! x86-64.
 enable-alien-4-intrinsics
-
-! Enable fast calling of libc math functions
-enable-float-functions
 
 USE: vocabs.loader
 
@@ -228,4 +258,4 @@ USE: vocabs.loader
     { [ os winnt? ] [ "cpu.x86.64.winnt" require ] }
 } cond
 
-"cpu.x86.features" require
+check-sse

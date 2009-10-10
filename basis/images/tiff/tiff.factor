@@ -7,6 +7,7 @@ io.encodings.string io.encodings.utf8 io.files kernel math
 math.bitwise math.order math.parser pack prettyprint sequences
 strings math.vectors specialized-arrays locals
 images.loader ;
+FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: images.tiff
 
@@ -437,7 +438,7 @@ ERROR: unhandled-compression compression ;
 : (uncompress-strips) ( strips compression -- uncompressed-strips )
     {
         { compression-none [ ] }
-        { compression-lzw [ [ lzw-uncompress ] map ] }
+        { compression-lzw [ [ tiff-lzw-uncompress ] map ] }
         [ unhandled-compression ]
     } case ;
 
@@ -555,7 +556,7 @@ ERROR: unknown-component-order ifd ;
 : process-tif-ifds ( loading-tiff -- )
     ifds>> [ process-ifd ] each ;
 
-: load-tiff ( path -- loading-tiff )
+: load-tiff ( stream -- loading-tiff )
     [ load-tiff-ifds dup ]
     [
         [ [ 0 seek-absolute ] dip stream-seek ]

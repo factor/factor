@@ -16,8 +16,8 @@ HELP: hexdump
 ARTICLE: "tools.hexdump" "Hexdump"
 "The " { $vocab-link "tools.hexdump" } " vocabulary provides a traditional hexdump view of a sequence." $nl
 "Write hexdump to string:"
-{ $subsection hexdump }
+{ $subsections hexdump }
 "Write the hexdump to the output stream:"
-{ $subsection hexdump. } ;
+{ $subsections hexdump. } ;
 
 ABOUT: "tools.hexdump"

@@ -7,18 +7,20 @@ ABOUT: "unicode.data"
 
 ARTICLE: "unicode.data" "Unicode data tables"
 "The " { $vocab-link "unicode.data" "unicode.data" } " vocabulary contains core Unicode data tables and code for parsing this from files. The following words access these data tables."
-{ $subsection canonical-entry }
-{ $subsection combine-chars }
-{ $subsection combining-class }
-{ $subsection non-starter? }
-{ $subsection name>char }
-{ $subsection char>name }
-{ $subsection property? }
-{ $subsection category }
-{ $subsection ch>upper }
-{ $subsection ch>lower } 
-{ $subsection ch>title } 
-{ $subsection special-case } ;
+{ $subsections
+    canonical-entry
+    combine-chars
+    combining-class
+    non-starter?
+    name>char
+    char>name
+    property?
+    category
+    ch>upper
+    ch>lower
+    ch>title
+    special-case
+} ;
 
 HELP: canonical-entry
 { $values { "char" "a code point" } { "seq" string } }

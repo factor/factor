@@ -1,14 +1,15 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel quotations accessors fry assocs present math.order
-math.vectors arrays locals models.search models.sort models sequences
-vocabs tools.profiler words prettyprint combinators.smart
-definitions.icons see ui ui.commands ui.gadgets ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.tracks ui.gestures ui.gadgets.buttons
-ui.gadgets.tables ui.gadgets.search-tables ui.gadgets.labeled
-ui.gadgets.packs ui.gadgets.labels ui.gadgets.tabbed
-ui.gadgets.status-bar ui.gadgets.borders ui.tools.browser
-ui.tools.common ui.baseline-alignment ui.operations ui.images ;
+USING: accessors arrays assocs combinators.short-circuit
+combinators.smart definitions.icons fry kernel locals
+math.order models models.search models.sort present see
+sequences tools.profiler ui.baseline-alignment ui.commands
+ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+ui.gadgets.labeled ui.gadgets.labels ui.gadgets.packs
+ui.gadgets.search-tables ui.gadgets.status-bar
+ui.gadgets.tabbed ui.gadgets.tables ui.gadgets.tracks
+ui.gestures ui.images ui.operations ui.tools.browser
+ui.tools.common vocabs words ;
 FROM: models.arrow => <arrow> ;
 FROM: models.arrow.smart => <smart-arrow> ;
 FROM: models.product => <product> ;
@@ -105,9 +106,10 @@ M: method-renderer column-titles drop { "" "Method" "Count" } ;
 
 : method-matches? ( method generic class -- ? )
     [ first ] 2dip
-    [ drop dup [ subwords memq? ] [ 2drop t ] if ]
-    [ nip dup [ swap "method-class" word-prop = ] [ 2drop t ] if ]
-    3bi and ;
+    {
+        [ drop dup [ subwords memq? ] [ 2drop t ] if ]
+        [ nip dup [ swap "method-class" word-prop = ] [ 2drop t ] if ]
+    } 3&& ;
 
 : <methods-model> ( profiler -- model )
     [

@@ -64,8 +64,19 @@ inline static cell align8(cell a)
 
 #define TYPE_COUNT 15
 
-/* Not a real type, but code_block's type field can be set to this */
-#define PIC_TYPE 69
+/* Not real types, but code_block's type can be set to this */
+#define PIC_TYPE 16
+#define FREE_BLOCK_TYPE 17
+
+/* Constants used when floating-point trap exceptions are thrown */
+enum
+{
+	FP_TRAP_INVALID_OPERATION = 1 << 0,
+	FP_TRAP_OVERFLOW          = 1 << 1,
+	FP_TRAP_UNDERFLOW         = 1 << 2,
+	FP_TRAP_ZERO_DIVIDE       = 1 << 3,
+	FP_TRAP_INEXACT           = 1 << 4,
+};
 
 inline static bool immediate_p(cell obj)
 {
@@ -96,9 +107,9 @@ struct header {
 	cell value;
 
         /* Default ctor to make gcc 3.x happy */
-        header() { abort(); }
+        explicit header() { abort(); }
 
-	header(cell value_) : value(value_ << TAG_BITS) {}
+	explicit header(cell value_) : value(value_ << TAG_BITS) {}
 
 	void check_header() {
 #ifdef FACTOR_DEBUG
@@ -169,7 +180,7 @@ struct byte_array : public object {
 	/* tagged */
 	cell capacity;
 
-	template<typename T> T *data() { return (T *)(this + 1); }
+	template<typename Scalar> Scalar *data() { return (Scalar *)(this + 1); }
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
@@ -186,34 +197,46 @@ struct string : public object {
 };
 
 /* The compiled code heap is structured into blocks. */
-enum block_status
-{
-	B_FREE,
-	B_ALLOCATED,
-	B_MARKED
-};
-
 struct heap_block
 {
-	unsigned char status; /* free or allocated? */
-	unsigned char type; /* this is WORD_TYPE or QUOTATION_TYPE */
-	unsigned char last_scan; /* the youngest generation in which this block's literals may live */
-	unsigned char needs_fixup; /* is this a new block that needs full fixup? */
+	/* Bit 0: mark
+	   Bit 1-7: type
+	   Bit 8-...: size */
+	cell header;
 
-	/* In bytes, includes this header */
-	cell size;
+	bool marked_p() { return header & 1; }
+	void set_marked_p(bool marked)
+	{
+		if(marked)
+			header |= 1;
+		else
+			header &= ~1;
+	}
+
+	cell type() { return (header >> 1) & 0x1f; }
+	void set_type(cell type)
+	{
+		header = ((header & ~(0x1f << 1)) | (type << 1));
+	}
+
+	cell size() { return (header >> 6); }
+	void set_size(cell size)
+	{
+		header = (header & 0x2f) | (size << 6);
+	}
 };
 
 struct free_heap_block : public heap_block
 {
-        free_heap_block *next_free;
+	free_heap_block *next_free;
 };
 
 struct code_block : public heap_block
 {
-	cell literals; /* # bytes */
+	cell owner; /* tagged pointer to word, quotation or f */
+	cell literals; /* tagged pointer to array or f */
 	cell relocation; /* tagged pointer to byte-array or f */
-	
+
 	void *xt() { return (void *)(this + 1); }
 };
 
@@ -282,7 +305,7 @@ struct quotation : public object {
 struct alien : public object {
 	static const cell type_number = ALIEN_TYPE;
 	/* tagged */
-	cell alien;
+	cell base;
 	/* tagged */
 	cell expired;
 	/* untagged */

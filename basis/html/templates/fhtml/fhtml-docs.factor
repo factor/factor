@@ -11,6 +11,6 @@ $nl
 "FHTML provides an alternative to " { $vocab-link "html.templates.chloe" } " for situations where complex logic must be embedded in the presentation layer of a web application. While this is discouraged for larger applications, it is useful for prototyping as well as simpler applications."
 $nl
 "The entire syntax of an FHTML template can be summarized as thus: text outside of " { $snippet "<%" } " and " { $snippet "%>" } " is rendered literally. Text inside " { $snippet "<%" } " and " { $snippet "%>" } " is interpreted as Factor source code."
-{ $subsection <fhtml> } ;
+{ $subsections <fhtml> } ;
 
 ABOUT: "html.templates.fhtml"

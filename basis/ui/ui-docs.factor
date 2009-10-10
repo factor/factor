@@ -98,56 +98,66 @@ ARTICLE: "ui-glossary" "UI glossary"
 
 ARTICLE: "building-ui" "Building user interfaces"
 "A gadget is a graphical element which responds to user input. Gadgets are implemented as tuples which (directly or indirectly) inherit from " { $link gadget } ", which in turn inherits from " { $link rect } "."
-{ $subsection gadget }
+{ $subsections gadget }
 "Gadgets are arranged in a hierarchy, and all visible gadgets except for instances of " { $link world } " are contained in a parent gadget, stored in the " { $snippet "parent" } " slot."
-{ $subsection "ui-geometry" }
-{ $subsection "ui-layouts" }
-{ $subsection "gadgets" }
-{ $subsection "ui-windows" }
-{ $subsection "ui.gadgets.status-bar" }
+{ $subsections
+    "ui-geometry"
+    "ui-layouts"
+    "gadgets"
+    "ui-windows"
+    "ui.gadgets.status-bar"
+}
 { $see-also "models" } ;
 
 ARTICLE: "gadgets" "Pre-made UI gadgets"
-{ $subsection "ui.gadgets.labels" }
-{ $subsection "ui.gadgets.borders" }
-{ $subsection "ui.gadgets.labeled" }
-{ $subsection "ui.gadgets.buttons" }
-{ $subsection "ui.gadgets.sliders" }
-{ $subsection "ui.gadgets.scrollers" }
-{ $subsection "ui.gadgets.editors" }
-{ $subsection "ui.gadgets.menus" }
-{ $subsection "ui.gadgets.panes" }
-{ $subsection "ui.gadgets.presentations" }
-{ $subsection "ui.gadgets.tables" } ;
+{ $subsections
+    "ui.gadgets.labels"
+    "ui.gadgets.borders"
+    "ui.gadgets.labeled"
+    "ui.gadgets.buttons"
+    "ui.gadgets.sliders"
+    "ui.gadgets.scrollers"
+    "ui.gadgets.editors"
+    "ui.gadgets.menus"
+    "ui.gadgets.panes"
+    "ui.gadgets.presentations"
+    "ui.gadgets.tables"
+} ;
 
 ARTICLE: "ui-geometry" "Gadget geometry"
 "The " { $link gadget } " class inherits from the " { $link rect } " class, and thus all gadgets have a bounding box:"
-{ $subsection "math.rectangles" }
+{ $subsections "math.rectangles" }
 "Word for converting from a child gadget's co-ordinate system to a parent's:"
-{ $subsection relative-loc }
-{ $subsection screen-loc }
+{ $subsections
+    relative-loc
+    screen-loc
+}
 "Hit testing:"
-{ $subsection pick-up }
-{ $subsection children-on } ;
+{ $subsections
+    pick-up
+    children-on
+} ;
 
 ARTICLE: "ui-windows" "Top-level windows"
 "Opening a top-level window:"
-{ $subsection open-window }
+{ $subsections open-window }
 "Finding top-level windows:"
-{ $subsection find-window }
+{ $subsections find-window }
 "Top-level windows are stored in a global variable:"
-{ $subsection windows }
+{ $subsections windows }
 "When a gadget is displayed in a top-level window, or added to a parent which is already showing in a top-level window, a generic word is called allowing the gadget to perform initialization tasks:"
-{ $subsection graft* }
+{ $subsections graft* }
 "When the gadget is removed from a parent shown in a top-level window, or when the top-level window is closed, a corresponding generic word is called to clean up:"
-{ $subsection ungraft* }
+{ $subsections ungraft* }
 "The root of the gadget hierarchy in a window is a special gadget which is rarely operated on directly, but it is helpful to know it exists:"
-{ $subsection world } ;
+{ $subsections world } ;
 
 ARTICLE: "ui-backend" "Developing UI backends"
 "None of the words documented in this section should be called directly by user code. They are only of interest when developing new UI backends."
-{ $subsection "ui-backend-init" }
-{ $subsection "ui-backend-windows" }
+{ $subsections
+    "ui-backend-init"
+    "ui-backend-windows"
+}
 "UI backends may implement the " { $link "clipboard-protocol" } "." ;
 
 ARTICLE: "ui-backend-init" "UI initialization and the event loop"
@@ -162,66 +172,82 @@ ARTICLE: "ui-backend-init" "UI initialization and the event loop"
     "    ... start event loop here ... ;"
 }
 "The above word must call the following:"
-{ $subsection start-ui }
+{ $subsections start-ui }
 "The " { $link (with-ui) } " word must not return until the event loop has stopped and the UI has been shut down." ;
 
 ARTICLE: "ui-backend-windows" "UI backend window management"
 "The high-level " { $link open-window } " word eventually calls a low-level word which you must implement:"
-{ $subsection open-world-window }
+{ $subsections open-world-window }
 "This word should create a native window, store some kind of handle in the " { $snippet "handle" } " slot, then call two words:"
-{ $subsection register-window }
+{ $subsections register-window }
 "The following words must also be implemented:"
-{ $subsection set-title }
-{ $subsection raise-window }
+{ $subsections
+    set-title
+    raise-window
+}
 "When a world needs to be redrawn, the UI will call a word automatically:"
-{ $subsection draw-world }
+{ $subsections draw-world }
 "This word can also be called directly if the UI backend is notified by the window system that window contents have been invalidated. Before and after drawing, two words are called, which the UI backend must implement:"
-{ $subsection select-gl-context }
-{ $subsection flush-gl-context }
+{ $subsections
+    select-gl-context
+    flush-gl-context
+}
 "If the user clicks the window's close box, you must call the following word:"
-{ $subsection close-window } ;
+{ $subsections close-window } ;
 
 ARTICLE: "ui-layouts" "Gadget hierarchy and layouts"
 "A layout gadget is a gadget whose sole purpose is to contain other gadgets. Layout gadgets position and resize children according to a certain policy, taking the preferred size of the children into account. Gadget hierarchies are constructed by building up nested layouts."
-{ $subsection "ui-layout-basics" }
+{ $subsections "ui-layout-basics" }
 "Common layout gadgets:"
-{ $subsection "ui-pack-layout" }
-{ $subsection "ui-track-layout" }
-{ $subsection "ui-grid-layout" }
-{ $subsection "ui-frame-layout" }
-{ $subsection "ui-book-layout" }
+{ $subsections
+    "ui-pack-layout"
+    "ui-track-layout"
+    "ui-grid-layout"
+    "ui-frame-layout"
+    "ui-book-layout"
+}
 "Advanced topics:"
-{ $subsection "ui.gadgets.glass" }
-{ $subsection "ui-null-layout" }
-{ $subsection "ui-incremental-layout" }
-{ $subsection "ui-layout-impl" }
+{ $subsections
+    "ui.gadgets.glass"
+    "ui-null-layout"
+    "ui-incremental-layout"
+    "ui-layout-impl"
+}
 { $see-also "ui.gadgets.borders" } ;
 
 ARTICLE: "ui-layout-basics" "Layout basics"
 "Gadgets are arranged in a hierarchy, and all visible gadgets except for instances of " { $link world } " are contained in a parent gadget."
 $nl
 "Managing the gadget hierarchy:"
-{ $subsection add-gadget }
-{ $subsection unparent }
-{ $subsection add-gadgets }
-{ $subsection clear-gadget }
+{ $subsections
+    add-gadget
+    unparent
+    add-gadgets
+    clear-gadget
+}
 "The children of a gadget are available via the "
 { $snippet "children" } " slot. "
 $nl
 "Working with gadget children:"
-{ $subsection gadget-child }
-{ $subsection nth-gadget }
-{ $subsection each-child }
-{ $subsection child? }
+{ $subsections
+    gadget-child
+    nth-gadget
+    each-child
+    child?
+}
 "Working with gadget parents:"
-{ $subsection parents }
-{ $subsection each-parent }
-{ $subsection find-parent }
+{ $subsections
+    parents
+    each-parent
+    find-parent
+}
 "Adding children, removing children and performing certain other operations initiates relayout requests automatically. In other cases, relayout may have to be triggered explicitly. There is no harm from doing this several times in a row as consecutive relayout requests are coalesced."
-{ $subsection relayout }
-{ $subsection relayout-1 }
+{ $subsections
+    relayout
+    relayout-1
+}
 "Gadgets implement a generic word to inform their parents of their preferred size:"
-{ $subsection pref-dim* }
+{ $subsections pref-dim* }
 "To get a gadget's preferred size, do not call the above word, instead use " { $link pref-dim  } ", which caches the result." ;
 
 ARTICLE: "ui-null-layout" "Manual layouts"
@@ -229,14 +255,16 @@ ARTICLE: "ui-null-layout" "Manual layouts"
 
 ARTICLE: "ui-layout-impl" "Implementing layout gadgets"
 "The relayout process proceeds top-down, with parents laying out their children, which in turn lay out their children. Custom layout policy is implemented by defining a method on a generic word:"
-{ $subsection layout* }
+{ $subsections layout* }
 "When a " { $link layout* } " method is called, the size and location of the gadget has already been determined by its parent, and the method's job is to lay out the gadget's children. Children can be positioned and resized by setting a pair of slots, " { $snippet "loc" } " and " { $snippet "dim" } "." $nl
 "Some assorted utility words which are useful for implementing layout logic:"
-{ $subsection pref-dim }
-{ $subsection pref-dims }
-{ $subsection prefer }
-{ $subsection max-dim }
-{ $subsection dim-sum }
+{ $subsections
+    pref-dim
+    pref-dims
+    prefer
+    max-dim
+    dim-sum
+}
 { $warning
     "When implementing the " { $link layout* } " generic word for a gadget which inherits from another layout, the " { $link children-on } " word might have to be re-implemented as well."
     $nl
@@ -247,28 +275,32 @@ ARTICLE: "new-gadgets" "Implementing new gadgets"
 "One of the goals of the Factor UI is to minimize the need to implement new types of gadgets by offering a highly reusable, orthogonal set of building blocks. However, in some cases implementing a new type of gadget is necessary, for example when writing a graphical visualization."
 $nl
 "Bare gadgets can be constructed directly, which is useful if all you need is a custom appearance with no further behavior (see " { $link "ui-pen-protocol" } "):"
-{ $subsection <gadget> }
+{ $subsections <gadget> }
 "New gadgets are defined as subclasses of an existing gadget type, perhaps even " { $link gadget } " itself. Direct subclasses of " { $link gadget } " can be constructed using " { $link new } ", however some subclasses may define their own parametrized constructors (see " { $link "parametrized-constructors" } ")."
 $nl
 "Further topics:"
-{ $subsection "ui-gestures" }
-{ $subsection "ui-paint" }
-{ $subsection "ui-control-impl" }
-{ $subsection "clipboard-protocol" }
-{ $subsection "ui.gadgets.line-support" }
+{ $subsections
+    "ui-gestures"
+    "ui-paint"
+    "ui-control-impl"
+    "clipboard-protocol"
+    "ui.gadgets.line-support"
+}
 { $see-also "ui-layout-impl" } ;
 
 ARTICLE: "starting-ui" "Starting the UI"
 "The main word of a vocabulary implementing a UI application should use a combinator to ensure that the application works when run from the command line as well as in the UI listener:"
-{ $subsection with-ui } ;
+{ $subsections with-ui } ;
 
 ARTICLE: "ui" "UI framework"
 "The " { $vocab-link "ui" } " vocabulary hierarchy implements the Factor UI framework. The implementation relies on a small amount of platform-specific code to open windows and receive keyboard and mouse events; UI gadgets are rendered using OpenGL."
-{ $subsection "starting-ui" }
-{ $subsection "ui-glossary" }
-{ $subsection "building-ui" }
-{ $subsection "new-gadgets" }
-{ $subsection "ui-backend" } ;
+{ $subsections
+    "starting-ui"
+    "ui-glossary"
+    "building-ui"
+    "new-gadgets"
+    "ui-backend"
+} ;
 
 ABOUT: "ui"
 
@@ -290,12 +322,18 @@ HELP: small-title-bar
 HELP: normal-title-bar
 { $description "Asks for a window to have a title bar. Without a title bar, the " { $link close-button } ", " { $link minimize-button } ", and " { $link maximize-button } " controls will not be available." } ;
 
+HELP: textured-background
+{ $description "Asks for a window to have a background that blends seamlessly with the window frame. Factor will leave the window background transparent and pass mouse button gestures not handled directly by a gadget through to the window system so that the window can be dragged from anywhere on its background." } ;
+
 ARTICLE: "ui.gadgets.worlds-window-controls" "Window controls"
 "The following window controls can be placed in a " { $link world } " window:"
-{ $subsection close-button }
-{ $subsection minimize-button }
-{ $subsection maximize-button }
-{ $subsection resize-handles }
-{ $subsection small-title-bar }
-{ $subsection normal-title-bar }
+{ $subsections
+    close-button
+    minimize-button
+    maximize-button
+    resize-handles
+    small-title-bar
+    normal-title-bar
+    textured-background
+}
 "Provide a sequence of these values in the " { $snippet "window-controls" } " slot of the " { $link world-attributes } " tuple you pass to " { $link open-window } "." ;

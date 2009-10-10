@@ -18,12 +18,13 @@ compiler.tree.propagation.constraints
 compiler.tree.propagation.call-effect
 compiler.tree.propagation.transforms
 compiler.tree.propagation.simd ;
+FROM: alien.c-types => (signed-interval) (unsigned-interval) ;
 IN: compiler.tree.propagation.known-words
 
 { + - * / }
 [ { number number } "input-classes" set-word-prop ] each
 
-{ /f < > <= >= }
+{ /f < > <= >= u< u> u<= u>= }
 [ { real real } "input-classes" set-word-prop ] each
 
 { /i mod /mod }
@@ -34,36 +35,12 @@ IN: compiler.tree.propagation.known-words
 
 \ bitnot { integer } "input-classes" set-word-prop
 
-: real-op ( info quot -- quot' )
-    [
-        dup class>> real classes-intersect?
-        [ clone ] [ drop real <class-info> ] if
-    ] dip
-    change-interval ; inline
-
-{ bitnot fixnum-bitnot bignum-bitnot } [
-    [ [ interval-bitnot ] real-op ] "outputs" set-word-prop
-] each
-
-\ abs [ [ interval-abs ] real-op ] "outputs" set-word-prop
-
-\ absq [ [ interval-absq ] real-op ] "outputs" set-word-prop
-
 : math-closure ( class -- newclass )
     { fixnum bignum integer rational float real number object }
     [ class<= ] with find nip ;
 
 : fits-in-fixnum? ( interval -- ? )
     fixnum-interval interval-subset? ;
-
-: binary-op-class ( info1 info2 -- newclass )
-    [ class>> ] bi@
-    2dup [ null-class? ] either? [ 2drop null ] [
-        [ math-closure ] bi@ math-class-max
-    ] if ;
-
-: binary-op-interval ( info1 info2 quot -- newinterval )
-    [ [ interval>> ] bi@ ] dip call ; inline
 
 : won't-overflow? ( class interval -- ? )
     [ fixnum class<= ] [ fits-in-fixnum? ] bi* and ;
@@ -100,6 +77,39 @@ IN: compiler.tree.propagation.known-words
     over null-class? [
         [ drop float ] dip
     ] unless ;
+
+: unary-op-class ( info -- newclass )
+    class>> dup null-class? [ drop null ] [ math-closure ] if ;
+
+: unary-op-interval ( info quot -- newinterval )
+    [
+        dup class>> real classes-intersect?
+        [ interval>> ] [ drop full-interval ] if
+    ] dip call ; inline
+
+: unary-op ( word interval-quot post-proc-quot -- )
+    '[
+        [ unary-op-class ] [ _ unary-op-interval ] bi
+        @
+        <class/interval-info>
+    ] "outputs" set-word-prop ;
+
+{ bitnot fixnum-bitnot bignum-bitnot } [
+    [ interval-bitnot ] [ integer-valued ] unary-op
+] each
+
+\ abs [ interval-abs ] [ may-overflow real-valued ] unary-op
+
+\ absq [ interval-absq ] [ may-overflow real-valued ] unary-op
+
+: binary-op-class ( info1 info2 -- newclass )
+    [ class>> ] bi@
+    2dup [ null-class? ] either? [ 2drop null ] [
+        [ math-closure ] bi@ math-class-max
+    ] if ;
+
+: binary-op-interval ( info1 info2 quot -- newinterval )
+    [ [ interval>> ] bi@ ] dip call ; inline
 
 : binary-op ( word interval-quot post-proc-quot -- )
     '[
@@ -251,15 +261,9 @@ generic-comparison-ops [
     alien-unsigned-8
 } [
     dup name>> {
-        {
-            [ "alien-signed-" ?head ]
-            [ string>number 8 * 1 - 2^ dup neg swap 1 - [a,b] ]
-        }
-        {
-            [ "alien-unsigned-" ?head ]
-            [ string>number 8 * 2^ 1 - 0 swap [a,b] ]
-        }
-    } cond
+        { [ "alien-signed-" ?head ] [ string>number (signed-interval) ] }
+        { [ "alien-unsigned-" ?head ] [ string>number (unsigned-interval) ] }
+    } cond [a,b]
     [ fits-in-fixnum? fixnum integer ? ] keep <class/interval-info>
     '[ 2drop _ ] "outputs" set-word-prop
 ] each

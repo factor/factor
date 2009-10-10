@@ -5,13 +5,17 @@ ARTICLE: "byte-vectors" "Byte vectors"
 "The " { $vocab-link "byte-vectors" } " vocabulary implements resizable mutable sequence of unsigned bytes. Byte vectors implement the " { $link "sequence-protocol" } " and thus all " { $link "sequences" } " can be used with them."
 $nl
 "Byte vectors form a class:"
-{ $subsection byte-vector }
-{ $subsection byte-vector? }
+{ $subsections
+    byte-vector
+    byte-vector?
+}
 "Creating byte vectors:"
-{ $subsection >byte-vector }
-{ $subsection <byte-vector> }
+{ $subsections
+    >byte-vector
+    <byte-vector>
+}
 "Literal syntax:"
-{ $subsection POSTPONE: BV{ }
+{ $subsections POSTPONE: BV{ }
 "If you don't care about initial capacity, a more elegant way to create a new byte vector is to write:"
 { $code "BV{ } clone" } ;
 

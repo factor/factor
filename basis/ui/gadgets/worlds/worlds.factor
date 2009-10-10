@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs continuations kernel math models
-namespaces opengl opengl.textures sequences io combinators
+namespaces opengl opengl.textures sequences io colors combinators
 combinators.short-circuit fry math.vectors math.rectangles cache
 ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
 ui.pixel-formats destructors literals strings ;
@@ -13,10 +13,15 @@ SYMBOLS:
     maximize-button
     resize-handles
     small-title-bar
-    normal-title-bar ;
+    normal-title-bar
+    textured-background ;
 
 CONSTANT: default-world-pixel-format-attributes
-    { windowed double-buffered T{ depth-bits { value 16 } } }
+    {
+        windowed
+        double-buffered
+        T{ depth-bits { value 16 } }
+    }
 
 CONSTANT: default-world-window-controls
     {
@@ -34,6 +39,7 @@ TUPLE: world < track
     text-handle handle images
     window-loc
     pixel-format-attributes
+    background-color
     window-controls
     window-resources ;
 
@@ -113,12 +119,18 @@ M: world request-focus-on ( child gadget -- )
         f >>grab-input?
         V{ } clone >>window-resources ;
 
+: initial-background-color ( attributes -- color )
+    window-controls>> textured-background swap memq?
+    [ T{ rgba f 0.0 0.0 0.0 0.0 } ]
+    [ T{ rgba f 1.0 1.0 1.0 1.0 } ] if ;
+
 : apply-world-attributes ( world attributes -- world )
     {
         [ title>> >>title ]
         [ status>> >>status ]
         [ pixel-format-attributes>> >>pixel-format-attributes ]
         [ window-controls>> >>window-controls ]
+        [ initial-background-color >>background-color ]
         [ grab-input?>> >>grab-input? ]
         [ gadgets>> [ 1 track-add ] each ]
     } cleave ;

@@ -1,12 +1,14 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: locals alien.c-types alien.syntax arrays kernel fry math
-namespaces sequences system layouts io vocabs.loader accessors init
-combinators command-line make compiler compiler.units
-compiler.constants compiler.alien compiler.codegen
-compiler.codegen.fixup compiler.cfg.instructions compiler.cfg.builder
-compiler.cfg.intrinsics compiler.cfg.stack-frame cpu.x86.assembler
-cpu.x86.assembler.operands cpu.x86 cpu.architecture ;
+USING: locals alien.c-types alien.libraries alien.syntax arrays
+kernel fry math namespaces sequences system layouts io
+vocabs.loader accessors init combinators command-line make
+compiler compiler.units compiler.constants compiler.alien
+compiler.codegen compiler.codegen.fixup
+compiler.cfg.instructions compiler.cfg.builder
+compiler.cfg.intrinsics compiler.cfg.stack-frame
+cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
+cpu.architecture ;
 IN: cpu.x86.32
 
 ! We implement the FFI for Linux, OS X and Windows all at once.
@@ -38,14 +40,17 @@ M:: x86.32 %dispatch ( src temp -- )
     bi ;
 
 ! Registers for fastcall
-M: x86.32 param-reg-1 EAX ;
-M: x86.32 param-reg-2 EDX ;
+: param-reg-1 ( -- reg ) EAX ;
+: param-reg-2 ( -- reg ) EDX ;
 
 M: x86.32 pic-tail-reg EBX ;
 
 M: x86.32 reserved-area-size 0 ;
 
 M: x86.32 %alien-invoke 0 CALL rc-relative rel-dlsym ;
+
+: push-vm-ptr ( -- )
+    0 PUSH rc-absolute-cell rt-vm rel-fixup ; ! push the vm ptr as an argument
 
 M: x86.32 return-struct-in-registers? ( c-type -- ? )
     c-type
@@ -103,9 +108,12 @@ M: x86.32 %save-param-reg 3drop ;
     #! parameter being passed to a callback from C.
     over [ load-return-reg ] [ 2drop ] if ;
 
+CONSTANT: vm-ptr-size 4
+
 M:: x86.32 %box ( n rep func -- )
     n rep (%box)
-    rep rep-size [
+    rep rep-size vm-ptr-size + [
+        push-vm-ptr
         rep push-return-reg
         func f %alien-invoke
     ] with-aligned-stack ;
@@ -118,7 +126,8 @@ M:: x86.32 %box ( n rep func -- )
 
 M: x86.32 %box-long-long ( n func -- )
     [ (%box-long-long) ] dip
-    8 [
+    8 vm-ptr-size + [
+        push-vm-ptr
         EDX PUSH
         EAX PUSH
         f %alien-invoke
@@ -126,12 +135,13 @@ M: x86.32 %box-long-long ( n func -- )
 
 M:: x86.32 %box-large-struct ( n c-type -- )
     ! Compute destination address
-    ECX n struct-return@ LEA
-    8 [
+    EDX n struct-return@ LEA
+    8 vm-ptr-size + [
+        push-vm-ptr
         ! Push struct size
         c-type heap-size PUSH
         ! Push destination address
-        ECX PUSH
+        EDX PUSH
         ! Copy the struct from the C stack
         "box_value_struct" f %alien-invoke
     ] with-aligned-stack ;
@@ -144,7 +154,8 @@ M: x86.32 %prepare-box-struct ( -- )
 
 M: x86.32 %box-small-struct ( c-type -- )
     #! Box a <= 8-byte struct returned in EAX:EDX. OS X only.
-    12 [
+    12 vm-ptr-size + [
+        push-vm-ptr
         heap-size PUSH
         EDX PUSH
         EAX PUSH
@@ -157,7 +168,9 @@ M: x86.32 %prepare-unbox ( -- )
     ESI 4 SUB ;
 
 : call-unbox-func ( func -- )
-    4 [
+    8 [
+        ! push the vm ptr as an argument
+        push-vm-ptr
         ! Push parameter
         EAX PUSH
         ! Call the unboxer
@@ -183,7 +196,8 @@ M: x86.32 %unbox-long-long ( n func -- )
 
 : %unbox-struct-1 ( -- )
     #! Alien must be in EAX.
-    4 [
+    4 vm-ptr-size + [
+        push-vm-ptr
         EAX PUSH
         "alien_offset" f %alien-invoke
         ! Load first cell
@@ -192,7 +206,8 @@ M: x86.32 %unbox-long-long ( n func -- )
 
 : %unbox-struct-2 ( -- )
     #! Alien must be in EAX.
-    4 [
+    4 vm-ptr-size + [
+        push-vm-ptr
         EAX PUSH
         "alien_offset" f %alien-invoke
         ! Load second cell
@@ -211,20 +226,34 @@ M: x86 %unbox-small-struct ( size -- )
 M:: x86.32 %unbox-large-struct ( n c-type -- )
     ! Alien must be in EAX.
     ! Compute destination address
-    ECX n stack@ LEA
-    12 [
+    EDX n stack@ LEA
+    12 vm-ptr-size + [
+        push-vm-ptr
         ! Push struct size
         c-type heap-size PUSH
         ! Push destination address
-        ECX PUSH
+        EDX PUSH
         ! Push source address
         EAX PUSH
         ! Copy the struct to the stack
         "to_value_struct" f %alien-invoke
     ] with-aligned-stack ;
 
+M: x86.32 %nest-stacks ( -- )
+    4 [
+        push-vm-ptr
+        "nest_stacks" f %alien-invoke
+    ] with-aligned-stack ;
+
+M: x86.32 %unnest-stacks ( -- )
+    4 [
+        push-vm-ptr
+        "unnest_stacks" f %alien-invoke
+    ] with-aligned-stack ;
+
 M: x86.32 %prepare-alien-indirect ( -- )
-    "unbox_alien" f %alien-invoke
+    push-vm-ptr "unbox_alien" f %alien-invoke
+    temp-reg POP
     EBP EAX MOV ;
 
 M: x86.32 %alien-indirect ( -- )
@@ -234,6 +263,7 @@ M: x86.32 %alien-callback ( quot -- )
     4 [
         EAX swap %load-reference
         EAX PUSH
+        param-reg-2 0 MOV rc-absolute-cell rt-vm rel-fixup 
         "c_to_factor" f %alien-invoke
     ] with-aligned-stack ;
 
@@ -243,14 +273,45 @@ M: x86.32 %callback-value ( ctype -- )
     ! Save top of data stack in non-volatile register
     %prepare-unbox
     EAX PUSH
+    push-vm-ptr
     ! Restore data/call/retain stacks
     "unnest_stacks" f %alien-invoke
     ! Place top of data stack in EAX
+    temp-reg POP
     EAX POP
     ! Restore C stack
     ESP 12 ADD
     ! Unbox EAX
     unbox-return ;
+
+GENERIC: float-function-param ( stack-slot dst src -- )
+
+M:: spill-slot float-function-param ( stack-slot dst src -- )
+    ! We can clobber dst here since its going to contain the
+    ! final result
+    dst src double-rep %copy
+    stack-slot dst double-rep %copy ;
+
+M: register float-function-param
+    nip double-rep %copy ;
+
+: float-function-return ( reg -- )
+    ESP [] FSTPL
+    ESP [] MOVSD
+    ESP 16 ADD ;
+
+M:: x86.32 %unary-float-function ( dst src func -- )
+    ESP -16 [+] dst src float-function-param
+    ESP 16 SUB
+    func "libm" load-library %alien-invoke
+    dst float-function-return ;
+
+M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
+    ESP -16 [+] dst src1 float-function-param
+    ESP  -8 [+] dst src2 float-function-param
+    ESP 16 SUB
+    func "libm" load-library %alien-invoke
+    dst float-function-return ;
 
 M: x86.32 %cleanup ( params -- )
     #! a) If we just called an stdcall function in Windows, it
@@ -283,6 +344,19 @@ M: x86.32 %callback-return ( n -- )
         [ drop 0 ]
     } cond RET ;
 
+M:: x86.32 %call-gc ( gc-root-count temp -- )
+    temp gc-root-base param@ LEA
+    12 [
+        ! Pass the VM ptr as the third parameter
+        0 PUSH rc-absolute-cell rt-vm rel-fixup
+        ! Pass number of roots as second parameter
+        gc-root-count PUSH 
+        ! Pass pointer to start of GC roots as first parameter
+        temp PUSH 
+        ! Call GC
+        "inline_gc" f %alien-invoke
+    ] with-aligned-stack ;
+
 M: x86.32 dummy-stack-params? f ;
 
 M: x86.32 dummy-int-params? f ;
@@ -295,4 +369,4 @@ os windows? [
     4 "double" c-type (>>align)
 ] unless
 
-"cpu.x86.features" require
+check-sse

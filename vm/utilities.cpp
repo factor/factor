@@ -4,13 +4,6 @@ namespace factor
 {
 
 /* If memory allocation fails, bail out */
-void *safe_malloc(size_t size)
-{
-	void *ptr = malloc(size);
-	if(!ptr) fatal_error("Out of memory in safe_malloc", 0);
-	return ptr;
-}
-
 vm_char *safe_strdup(const vm_char *str)
 {
 	vm_char *ptr = STRDUP(str);
@@ -55,6 +48,6 @@ cell read_cell_hex()
 	cell cell;
 	if(scanf(CELL_HEX_FORMAT,&cell) < 0) exit(1);
 	return cell;
-};
+}
 
 }

@@ -2,29 +2,29 @@
 ! Copyright (C) 2007, 2009 Slava Pestov
 ! Copyright (C) 2007, 2008 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien assocs continuations alien.destructors kernel
+USING: alien alien.c-types assocs continuations alien.destructors kernel
 namespaces accessors sets summary destructors destructors.private ;
 IN: libc
 
 : errno ( -- int )
-    "int" "factor" "err_no" { } alien-invoke ;
+    int "factor" "err_no" { } alien-invoke ;
 
 : clear-errno ( -- )
-    "void" "factor" "clear_err_no" { } alien-invoke ;
+    void "factor" "clear_err_no" { } alien-invoke ;
 
 <PRIVATE
 
 : (malloc) ( size -- alien )
-    "void*" "libc" "malloc" { "ulong" } alien-invoke ;
+    void* "libc" "malloc" { ulong } alien-invoke ;
 
 : (calloc) ( count size -- alien )
-    "void*" "libc" "calloc" { "ulong" "ulong" } alien-invoke ;
+    void* "libc" "calloc" { ulong ulong } alien-invoke ;
 
 : (free) ( alien -- )
-    "void" "libc" "free" { "void*" } alien-invoke ;
+    void "libc" "free" { void* } alien-invoke ;
 
 : (realloc) ( alien size -- newalien )
-    "void*" "libc" "realloc" { "void*" "ulong" } alien-invoke ;
+    void* "libc" "realloc" { void* ulong } alien-invoke ;
 
 ! We stick malloc-ptr instances in the global disposables set
 TUPLE: malloc-ptr value continuation ;
@@ -81,15 +81,15 @@ PRIVATE>
     >c-ptr [ delete-malloc ] [ (free) ] bi ;
 
 : memcpy ( dst src size -- )
-    "void" "libc" "memcpy" { "void*" "void*" "ulong" } alien-invoke ;
+    void "libc" "memcpy" { void* void* ulong } alien-invoke ;
 
 : memcmp ( a b size -- cmp )
-    "int" "libc" "memcmp" { "void*" "void*" "ulong" } alien-invoke ;
+    int "libc" "memcmp" { void* void* ulong } alien-invoke ;
 
 : memory= ( a b size -- ? )
     memcmp 0 = ;
 
 : strlen ( alien -- len )
-    "size_t" "libc" "strlen" { "char*" } alien-invoke ;
+    size_t "libc" "strlen" { char* } alien-invoke ;
 
 DESTRUCTOR: free

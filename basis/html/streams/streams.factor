@@ -1,29 +1,18 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel assocs io io.styles math math.order math.parser
-sequences strings make words combinators macros xml.syntax html fry
-destructors ;
+USING: accessors assocs combinators destructors fry html io
+io.backend io.pathnames io.styles kernel macros make math
+math.order math.parser namespaces sequences strings words
+splitting xml xml.syntax ;
 IN: html.streams
 
 GENERIC: url-of ( object -- url )
 
 M: object url-of drop f ;
 
-TUPLE: html-writer data last-div ;
+TUPLE: html-writer data ;
 
 <PRIVATE
-
-! stream-nl after with-nesting or tabular-output is
-! ignored, so that HTML stream output looks like
-! UI pane output
-: last-div? ( stream -- ? )
-    [ f ] change-last-div drop ;
-
-: not-a-div ( stream -- stream )
-    f >>last-div ; inline
-
-: a-div ( stream -- stream )
-    t >>last-div ; inline
 
 : new-html-writer ( class -- html-writer )
     new V{ } clone >>data ; inline
@@ -87,14 +76,26 @@ MACRO: make-css ( pairs -- str )
 : emit-html ( quot stream -- )
     dip data>> push ; inline
 
+: image-path ( path -- images-path )
+    "vocab:definitions/icons/" ?head [ "/icons/" prepend ] when ;
+
+: img-tag ( xml style -- xml )
+    image swap at [ nip image-path simple-image ] when* ;
+
 : format-html-span ( string style stream -- )
-    [ [ span-tag ] [ href-link-tag ] [ object-link-tag ] tri ]
-    emit-html ;
+    [
+        {
+            [ span-tag ]
+            [ href-link-tag ]
+            [ object-link-tag ]
+            [ img-tag ]
+        } cleave
+    ] emit-html ;
 
 TUPLE: html-span-stream < html-sub-stream ;
 
 M: html-span-stream dispose
-    end-sub-stream not-a-div format-html-span ;
+    end-sub-stream format-html-span ;
 
 : border-css, ( border -- )
     "border: 1px solid #" % hex-color, "; " % ;
@@ -111,10 +112,8 @@ CONSTANT: pre-css "white-space: pre; font-family: monospace;"
             { border-color border-css, }
             { inset padding-css, }
         } make-css
-    ] [
-        wrap-margin swap at
-        [ pre-css append ] unless
-    ] bi ;
+    ] [ wrap-margin swap at [ pre-css append ] unless ] bi
+    "display: inline-block;" append ;
 
 : div-tag ( xml style -- xml' )
     div-css-style
@@ -126,7 +125,7 @@ CONSTANT: pre-css "white-space: pre; font-family: monospace;"
 TUPLE: html-block-stream < html-sub-stream ;
 
 M: html-block-stream dispose ( quot style stream -- )
-    end-sub-stream a-div format-html-div ;
+    end-sub-stream format-html-div ;
 
 : border-spacing-css, ( pair -- )
     "padding: " % first2 max 2 /i # "px; " % ;
@@ -144,16 +143,16 @@ PRIVATE>
 M: html-writer stream-flush drop ;
 
 M: html-writer stream-write1
-    not-a-div [ 1string ] emit-html ;
+    [ 1string ] emit-html ;
 
 M: html-writer stream-write
-    not-a-div [ ] emit-html ;
+    [ ] emit-html ;
 
 M: html-writer stream-format
     format-html-span ;
 
 M: html-writer stream-nl
-    dup last-div? [ drop ] [ [ [XML <br/> XML] ] emit-html ] if ;
+    [ [XML <br/> XML] ] emit-html ;
 
 M: html-writer make-span-stream
     html-span-stream new-html-sub-stream ;
@@ -165,12 +164,12 @@ M: html-writer make-cell-stream
     html-sub-stream new-html-sub-stream ;
 
 M: html-writer stream-write-table
-    a-div [
+    [
         table-style swap [
             [ data>> [XML <td valign="top" style=<->><-></td> XML] ] with map
             [XML <tr><-></tr> XML]
         ] with map
-        [XML <table><-></table> XML]
+        [XML <table style="display: inline-table;"><-></table> XML]
     ] emit-html ;
 
 M: html-writer dispose drop ;

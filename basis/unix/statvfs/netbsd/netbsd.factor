@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax classes.struct ;
+USING: alien.c-types alien.syntax classes.struct unix.types
+unix.stat ;
 IN: unix.statvfs.netbsd
 
 CONSTANT: _VFS_NAMELEN    32
@@ -28,8 +29,8 @@ STRUCT: statvfs
     { f_namemax ulong }
     { f_owner uid_t }
     { f_spare uint32_t[4] }
-    { f_fstypename { "char" _VFS_NAMELEN } }
-    { f_mntonname { "char" _VFS_MNAMELEN } }
-    { f_mntfromname { "char" _VFS_MNAMELEN } } ;
+    { f_fstypename { char _VFS_NAMELEN } }
+    { f_mntonname { char _VFS_MNAMELEN } }
+    { f_mntfromname { char _VFS_MNAMELEN } } ;
 
 FUNCTION: int statvfs ( char* path, statvfs* buf ) ;

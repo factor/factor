@@ -7,8 +7,4 @@ inline static cell tuple_size(tuple_layout *layout)
 	return sizeof(tuple) + size * sizeof(cell);
 }
 
-PRIMITIVE(tuple);
-PRIMITIVE(tuple_boa);
-PRIMITIVE(tuple_layout);
-
 }

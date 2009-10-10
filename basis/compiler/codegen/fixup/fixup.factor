@@ -4,8 +4,11 @@ USING: arrays byte-arrays byte-vectors generic assocs hashtables
 io.binary kernel kernel.private math namespaces make sequences
 words quotations strings alien.accessors alien.strings layouts
 system combinators math.bitwise math.order
-accessors growable compiler.constants ;
+accessors growable fry generalizations compiler.constants ;
 IN: compiler.codegen.fixup
+
+! Owner
+SYMBOL: compiling-word
 
 ! Literal table
 SYMBOL: literal-table
@@ -91,17 +94,19 @@ SYMBOL: relocation-table
     [ [ resolve-relative-label ] map concat ]
     bi* ;
 
-: init-fixup ( -- )
+: init-fixup ( word -- )
+    compiling-word set
     V{ } clone literal-table set
     V{ } clone label-table set
     BV{ } clone relocation-table set ;
 
-: with-fixup ( quot -- code )
-    [
+: with-fixup ( word quot -- code )
+    '[
         init-fixup
-        call
+        @
         label-table [ resolve-labels ] change
+        compiling-word get
         literal-table get >array
         relocation-table get >byte-array
         label-table get
-    ] B{ } make 4array ; inline
+    ] B{ } make 5 narray ; inline

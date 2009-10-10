@@ -97,30 +97,38 @@ ARTICLE: "html.forms.forms" "HTML form infrastructure"
 "The below words are used to implement the " { $vocab-link "furnace.actions" } " vocabulary. Calling them directly is rarely necessary."
 $nl
 "Creating a new form:"
-{ $subsection <form> }
+{ $subsections <form> }
 "Variable holding current form:"
-{ $subsection form }
+{ $subsections form }
 "Working with forms:"
-{ $subsection with-form }
-{ $subsection begin-form }
+{ $subsections
+    with-form
+    begin-form
+}
 "Validation:"
-{ $subsection validation-error }
-{ $subsection validation-failed? }
-{ $subsection validate-values } ;
+{ $subsections
+    validation-error
+    validation-failed?
+    validate-values
+} ;
 
 ARTICLE: "html.forms.values" "HTML form values"
 "Form values are a central concept in the Furnace framework. Web actions primarily concern themselves with validating values, marshalling values to a database, and setting values for display in a form."
 $nl
 "Getting and setting values:"
-{ $subsection value }
-{ $subsection set-value }
-{ $subsection from-object }
-{ $subsection to-object }
+{ $subsections
+    value
+    set-value
+    from-object
+    to-object
+}
 "Iterating over values; these words are used by " { $vocab-link "html.templates.chloe" } " to implement the " { $snippet "t:each" } " and " { $snippet "t:bind-each" } " tags:"
-{ $subsection with-each-value }
-{ $subsection with-each-object }
+{ $subsections
+    with-each-value
+    with-each-object
+}
 "Nesting a form inside another form as a value:"
-{ $subsection nest-form } ;
+{ $subsections nest-form } ;
 
 ARTICLE: "html.forms" "HTML forms"
 "The " { $vocab-link "html.forms" } " vocabulary implements support for rendering and validating HTML forms. The definition of a " { $emphasis "form" } " is a bit more general than the content of an " { $snippet "<form>" } " tag. Namely, a page which displays a database record without offering any editing capability is considered a form too; it consists entirely of read-only components."
@@ -128,7 +136,9 @@ $nl
 "This vocabulary is an integral part of the " { $vocab-link "furnace" } " web framework. The " { $vocab-link "html.templates.chloe" } " vocabulary uses the HTML form words to implement various template tags. The words are also often used directly from web action implementations."
 $nl
 "This vocabulary can be used without either the Furnace framework or the HTTP server; for example, as part of a static HTML generation tool."
-{ $subsection "html.forms.forms" }
-{ $subsection "html.forms.values" } ;
+{ $subsections
+    "html.forms.forms"
+    "html.forms.values"
+} ;
 
 ABOUT: "html.forms"

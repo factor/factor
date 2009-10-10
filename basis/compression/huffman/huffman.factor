@@ -2,31 +2,35 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs fry
 hashtables io kernel locals math math.order math.parser
-math.ranges multiline sequences ;
+math.ranges multiline sequences bitstreams bit-arrays ;
 IN: compression.huffman
 
 QUALIFIED-WITH: bitstreams bs
 
 <PRIVATE
 
-! huffman codes
-
 TUPLE: huffman-code
-    { value }
-    { size }
-    { code } ;
+    { value fixnum }
+    { size fixnum }
+    { code fixnum } ;
 
-: <huffman-code> ( -- code ) 0 0 0 huffman-code boa ;
-: next-size ( code -- ) [ 1 + ] change-size [ 2 * ] change-code drop ;
-: next-code ( code -- ) [ 1 + ] change-code drop ;
+: <huffman-code> ( -- huffman-code )
+    0 0 0 huffman-code boa ; inline
 
-:: all-patterns ( huff n -- seq )
-    n log2 huff size>> - :> free-bits
+: next-size ( huffman-code -- )
+    [ 1 + ] change-size
+    [ 2 * ] change-code drop ; inline
+
+: next-code ( huffman-code -- )
+    [ 1 + ] change-code drop ; inline
+
+:: all-patterns ( huffman-code n -- seq )
+    n log2 huffman-code size>> - :> free-bits
     free-bits 0 >
-    [ free-bits 2^ [0,b) [ huff code>> free-bits 2^ * + ] map ]
-    [ huff code>> free-bits neg 2^ /i 1array ] if ;
+    [ free-bits 2^ iota [ huffman-code code>> free-bits 2^ * + ] map ]
+    [ huffman-code code>> free-bits neg 2^ /i 1array ] if ;
 
-:: huffman-each ( tdesc quot: ( huff -- ) -- )
+:: huffman-each ( tdesc quot: ( huffman-code -- ) -- )
     <huffman-code> :> code
     tdesc
     [
@@ -34,7 +38,7 @@ TUPLE: huffman-code
         [ code (>>value) code clone quot call code next-code ] each
     ] each ; inline
 
-: update-reverse-table ( huff n table -- )
+: update-reverse-table ( huffman-code n table -- )
     [ drop all-patterns ]
     [ nip '[ _ swap _ set-at ] each ] 3bi ;
 
@@ -43,49 +47,29 @@ TUPLE: huffman-code
    tdesc [ n table update-reverse-table ] huffman-each
    table seq>> ;
 
-:: huffman-table ( tdesc max -- table )
-   max f <array> :> table
-   tdesc [ [ ] [ value>> ] bi table set-nth ] huffman-each
-   table ;
-
 PRIVATE>
 
-! decoder
-
 TUPLE: huffman-decoder
-    { bs }
-    { tdesc }
-    { rtable }
-    { bits/level } ;
+    { bs bit-reader }
+    { tdesc array }
+    { rtable array }
+    { bits/level fixnum } ;
 
-: <huffman-decoder> ( bs tdesc -- decoder )
+: <huffman-decoder> ( bs tdesc -- huffman-decoder )
     huffman-decoder new
-    swap >>tdesc
-    swap >>bs
-    16 >>bits/level
-    [ ] [ tdesc>> ] [ bits/level>> 2^ ] tri reverse-table >>rtable ;
+        swap >>tdesc
+        swap >>bs
+        16 >>bits/level
+        dup [ tdesc>> ] [ bits/level>> 2^ ] bi reverse-table >>rtable ; inline
 
-: read1-huff ( decoder -- elt )
-    16 over [ bs>> bs:peek ] [ rtable>> nth ] bi ! first/last
-    [ size>> swap bs>> bs:seek ] [ value>> ] bi ;
+: read1-huff ( huffman-decoder -- elt )
+    16 over [ bs>> bs:peek ] [ rtable>> nth ] bi
+    [ size>> swap bs>> bs:seek ] [ value>> ] bi ; inline
 
-! %remove
 : reverse-bits ( value bits -- value' )
-    [ >bin ] [ CHAR: 0 pad-head <reversed> bin> ] bi* ;
+    [ integer>bit-array ] dip
+    f pad-tail reverse bit-array>integer ; inline
 
-: read1-huff2 ( decoder -- elt )
-    16 over [ bs>> bs:peek 16 reverse-bits ] [ rtable>> nth ] bi ! first/last
-    [ size>> swap bs>> bs:seek ] [ value>> ] bi ;
-
-/*
-: huff>string ( code -- str )
-    [ value>> number>string ]
-    [ [ code>> ] [ size>> bits>string ] bi ] bi
-    " = " glue ;
-
-: huff. ( code -- ) huff>string print ;
-
-:: rtable. ( rtable -- )
-    rtable length>> log2 :> n
-    rtable <enum> [ swap n bits. [ huff. ] each ] assoc-each ;
-*/
+: read1-huff2 ( huffman-decoder -- elt )
+    16 over [ bs>> bs:peek 16 reverse-bits ] [ rtable>> nth ] bi
+    [ size>> swap bs>> bs:seek ] [ value>> ] bi ; inline

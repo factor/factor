@@ -1,6 +1,6 @@
 USING: kernel math namespaces make tools.test vectors sequences
 sequences.private hashtables io prettyprint assocs
-continuations specialized-arrays ;
+continuations specialized-arrays alien.c-types ;
 SPECIALIZED-ARRAY: double
 IN: assocs.tests
 

@@ -5,6 +5,8 @@ USING: arrays accessors io io.files io.files.temp
 io.encodings.binary kernel math math.constants math.functions
 math.vectors math.vectors.simd math.parser make sequences
 sequences.private words hints classes.struct ;
+QUALIFIED-WITH: alien.c-types c
+SIMD: c:double
 IN: benchmark.raytracer-simd
 
 ! parameters

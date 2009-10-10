@@ -24,6 +24,8 @@ navigating Factor source:
     :FactorVocab factor.vocab.name
         Opens the source file implementing the "factor.vocab.name"
         vocabulary.
+    :NewFactorVocab factor.vocab.name
+        Creates a new factor vocabulary under the working vocabulary root.
     :FactorVocabImpl
         Opens the main implementation file for the current vocabulary
         (name.factor).  The keyboard shortcut "\fi" is bound to this
@@ -46,6 +48,10 @@ variables in your vimrc file:
         This variable should be set to a list of Factor vocabulary roots.
         The paths may be either relative to g:FactorRoot or absolute paths.
         The default value is ["core", "basis", "extra", "work"].
+    g:FactorNewVocabRoot
+        This variable should be set to the vocabulary root in which
+        vocabularies created with NewFactorVocab should be created. The
+        default value is "work".
 
 Note: The syntax-highlighting file is automatically generated to include the
 names of all the vocabularies Factor knows about. To regenerate it manually,

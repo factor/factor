@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax kernel windows.types multiline
-classes.struct ;
+USING: alien alien.c-types alien.syntax kernel windows.types
+multiline classes.struct ;
 IN: windows.kernel32
 
 CONSTANT: MAX_PATH 260
@@ -317,14 +317,14 @@ STRUCT: OSVERSIONINFO
 
 TYPEDEF: void* LPOSVERSIONINFO
 
-C-STRUCT: MEMORY_BASIC_INFORMATION
-  { "void*" "BaseAddress" }
-  { "void*" "AllocationBase" }
-  { "DWORD" "AllocationProtect" }
-  { "SIZE_T" "RegionSize" }
-  { "DWORD" "state" }
-  { "DWORD" "protect" }
-  { "DWORD" "type" } ;
+STRUCT: MEMORY_BASIC_INFORMATION
+  { BaseAddress void* }
+  { AllocationBase void* }
+  { AllocationProtect DWORD }
+  { RegionSize SIZE_T }
+  { state DWORD }
+  { protect DWORD }
+  { type DWORD } ;
 
 STRUCT: GUID
     { Data1 ULONG }
@@ -524,55 +524,55 @@ CONSTANT: EV_RX80FULL     HEX: 400
 CONSTANT: EV_EVENT1       HEX: 800
 CONSTANT: EV_EVENT2       HEX: 1000
 
-C-STRUCT: DCB
-    { "DWORD" "DCBlength" }
-    { "DWORD" "BaudRate" }
-    { "DWORD" "flags" }
-    { "WORD"  "wReserved" }
-    { "WORD"  "XonLim" }
-    { "WORD"  "XoffLim" }
-    { "BYTE"  "ByteSize" }
-    { "BYTE"  "Parity" }
-    { "BYTE"  "StopBits" }
-    { "char"  "XonChar" }
-    { "char"  "XoffChar" }
-    { "char"  "ErrorChar" }
-    { "char"  "EofChar" }
-    { "char"  "EvtChar" }
-    { "WORD"  "wReserved1" } ;
+STRUCT: DCB
+    { DCBlength DWORD }
+    { BaudRate DWORD }
+    { flags DWORD }
+    { wReserved WORD  }
+    { XonLim WORD  }
+    { XoffLim WORD  }
+    { ByteSize BYTE  }
+    { Parity BYTE  }
+    { StopBits BYTE  }
+    { XonChar char  }
+    { XoffChar char  }
+    { ErrorChar char  }
+    { EofChar char  }
+    { EvtChar char  }
+    { wReserved1 WORD  } ;
 TYPEDEF: DCB* PDCB
 TYPEDEF: DCB* LPDCB
 
-C-STRUCT: COMM_CONFIG
-    { "DWORD" "dwSize" }
-    { "WORD" "wVersion" }
-    { "WORD" "wReserved" }
-    { "DCB" "dcb" }
-    { "DWORD" "dwProviderSubType" }
-    { "DWORD" "dwProviderOffset" }
-    { "DWORD" "dwProviderSize" }
-    { { "WCHAR" 1 } "wcProviderData" } ;
+STRUCT: COMMCONFIG
+    { dwSize DWORD }
+    { wVersion WORD }
+    { wReserved WORD }
+    { dcb DCB }
+    { dwProviderSubType DWORD }
+    { dwProviderOffset DWORD }
+    { dwProviderSize DWORD }
+    { wcProviderData { WCHAR 1 } } ;
 TYPEDEF: COMMCONFIG* LPCOMMCONFIG
 
-C-STRUCT: COMMPROP
-    { "WORD" "wPacketLength" }
-    { "WORD" "wPacketVersion" }
-    { "DWORD" "dwServiceMask" }
-    { "DWORD" "dwReserved1" }
-    { "DWORD" "dwMaxTxQueue" }
-    { "DWORD" "dwMaxRxQueue" }
-    { "DWORD" "dwMaxBaud" }
-    { "DWORD" "dwProvSubType" }
-    { "DWORD" "dwProvCapabilities" }
-    { "DWORD" "dwSettableParams" }
-    { "DWORD" "dwSettableBaud" }
-    { "WORD"  "wSettableData" }
-    { "WORD"  "wSettableStopParity" }
-    { "DWORD" "dwCurrentTxQueue" }
-    { "DWORD" "dwCurrentRxQueue" }
-    { "DWORD" "dwProvSpec1" }
-    { "DWORD" "dwProvSpec2" }
-    { { "WCHAR" 1 } "wcProvChar" } ;
+STRUCT: COMMPROP
+    { wPacketLength WORD }
+    { wPacketVersion WORD }
+    { dwServiceMask DWORD }
+    { dwReserved1 DWORD }
+    { dwMaxTxQueue DWORD }
+    { dwMaxRxQueue DWORD }
+    { dwMaxBaud DWORD }
+    { dwProvSubType DWORD }
+    { dwProvCapabilities DWORD }
+    { dwSettableParams DWORD }
+    { dwSettableBaud DWORD }
+    { wSettableData WORD  }
+    { wSettableStopParity WORD  }
+    { dwCurrentTxQueue DWORD }
+    { dwCurrentRxQueue DWORD }
+    { dwProvSpec1 DWORD }
+    { dwProvSpec2 DWORD }
+    { wcProvChar { WCHAR 1 } } ;
 TYPEDEF: COMMPROP* LPCOMMPROP
 
 
@@ -645,19 +645,19 @@ CONSTANT: WAIT_TIMEOUT 258
 CONSTANT: WAIT_IO_COMPLETION HEX: c0
 CONSTANT: WAIT_FAILED HEX: ffffffff
 
-C-STRUCT: LUID
-    { "DWORD" "LowPart" }
-    { "LONG" "HighPart" } ;
+STRUCT: LUID
+    { LowPart DWORD }
+    { HighPart LONG } ;
 TYPEDEF: LUID* PLUID
 
-C-STRUCT: LUID_AND_ATTRIBUTES
-    { "LUID" "Luid" }
-    { "DWORD" "Attributes" } ;
+STRUCT: LUID_AND_ATTRIBUTES
+    { Luid LUID }
+    { Attributes DWORD } ;
 TYPEDEF: LUID_AND_ATTRIBUTES* PLUID_AND_ATTRIBUTES
 
-C-STRUCT: TOKEN_PRIVILEGES
-    { "DWORD" "PrivilegeCount" }
-    { "LUID_AND_ATTRIBUTES*" "Privileges" } ;
+STRUCT: TOKEN_PRIVILEGES
+    { PrivilegeCount DWORD }
+    { Privileges LUID_AND_ATTRIBUTES* } ;
 TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 
 STRUCT: WIN32_FILE_ATTRIBUTE_DATA
@@ -669,29 +669,29 @@ STRUCT: WIN32_FILE_ATTRIBUTE_DATA
     { nFileSizeLow DWORD } ;
 TYPEDEF: WIN32_FILE_ATTRIBUTE_DATA* LPWIN32_FILE_ATTRIBUTE_DATA
 
-C-STRUCT: BY_HANDLE_FILE_INFORMATION
-  { "DWORD" "dwFileAttributes" }
-  { "FILETIME" "ftCreationTime" }
-  { "FILETIME" "ftLastAccessTime" }
-  { "FILETIME" "ftLastWriteTime" }
-  { "DWORD" "dwVolumeSerialNumber" }
-  { "DWORD" "nFileSizeHigh" }
-  { "DWORD" "nFileSizeLow" }
-  { "DWORD" "nNumberOfLinks" }
-  { "DWORD" "nFileIndexHigh" }
-  { "DWORD" "nFileIndexLow" } ;
+STRUCT: BY_HANDLE_FILE_INFORMATION
+  { dwFileAttributes DWORD }
+  { ftCreationTime FILETIME }
+  { ftLastAccessTime FILETIME }
+  { ftLastWriteTime FILETIME }
+  { dwVolumeSerialNumber DWORD }
+  { nFileSizeHigh DWORD }
+  { nFileSizeLow DWORD }
+  { nNumberOfLinks DWORD }
+  { nFileIndexHigh DWORD }
+  { nFileIndexLow DWORD } ;
 TYPEDEF: BY_HANDLE_FILE_INFORMATION* LPBY_HANDLE_FILE_INFORMATION
 
 CONSTANT: OFS_MAXPATHNAME 128
 
-C-STRUCT: OFSTRUCT
-    { "BYTE" "cBytes" }
-    { "BYTE" "fFixedDisk" }
-    { "WORD" "nErrCode" }
-    { "WORD" "Reserved1" }
-    { "WORD" "Reserved2" }
-    ! { { "CHAR" OFS_MAXPATHNAME } "szPathName" } ;
-    { { "CHAR" 128 } "szPathName" } ;
+STRUCT: OFSTRUCT
+    { cBytes BYTE }
+    { fFixedDisk BYTE }
+    { nErrCode WORD }
+    { Reserved1 WORD }
+    { Reserved2 WORD }
+    { szPathName { CHAR 128 } } ;
+    ! { szPathName { CHAR OFS_MAXPATHNAME } } ;
 
 TYPEDEF: OFSTRUCT* LPOFSTRUCT
 
@@ -704,20 +704,8 @@ STRUCT: WIN32_FIND_DATA
     { nFileSizeLow DWORD }
     { dwReserved0 DWORD }
     { dwReserved1 DWORD }
-    { cFileName { "TCHAR" MAX_PATH } }
+    { cFileName { TCHAR MAX_PATH } }
     { cAlternateFileName TCHAR[14] } ;
-
-STRUCT: BY_HANDLE_FILE_INFORMATION
-    { dwFileAttributes DWORD }
-    { ftCreationTime FILETIME }
-    { ftLastAccessTime FILETIME }
-    { ftLastWriteTime FILETIME }
-    { dwVolumeSerialNumber DWORD }
-    { nFileSizeHigh DWORD }
-    { nFileSizeLow DWORD }
-    { nNumberOfLinks DWORD }
-    { nFileIndexHigh DWORD }
-    { nFileIndexLow DWORD } ;
 
 TYPEDEF: WIN32_FIND_DATA* PWIN32_FIND_DATA
 TYPEDEF: WIN32_FIND_DATA* LPWIN32_FIND_DATA

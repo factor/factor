@@ -18,6 +18,10 @@ else
 	CFLAGS += -O3
 endif
 
+ifdef REENTRANT
+	CFLAGS += -DFACTOR_REENTRANT
+endif
+
 CFLAGS += $(SITE_CFLAGS)
 
 ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
@@ -27,6 +31,7 @@ ifdef CONFIG
 endif
 
 DLL_OBJS = $(PLAF_DLL_OBJS) \
+	vm/aging_collector.o \
 	vm/alien.o \
 	vm/arrays.o \
 	vm/bignum.o \
@@ -34,30 +39,33 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/byte_arrays.o \
 	vm/callstack.o \
 	vm/code_block.o \
-	vm/code_gc.o \
 	vm/code_heap.o \
 	vm/contexts.o \
-	vm/data_gc.o \
 	vm/data_heap.o \
 	vm/debug.o \
 	vm/dispatch.o \
 	vm/errors.o \
 	vm/factor.o \
+	vm/full_collector.o \
+	vm/gc.o \
+	vm/heap.o \
 	vm/image.o \
 	vm/inline_cache.o \
 	vm/io.o \
 	vm/jit.o \
-	vm/local_roots.o \
 	vm/math.o \
+	vm/nursery_collector.o \
+	vm/old_space.o \
 	vm/primitives.o \
 	vm/profiler.o \
 	vm/quotations.o \
 	vm/run.o \
 	vm/strings.o \
+	vm/to_tenured_collector.o \
 	vm/tuples.o \
 	vm/utilities.o \
-	vm/words.o \
-	vm/write_barrier.o
+        vm/vm.o \
+	vm/words.o
 
 EXE_OBJS = $(PLAF_EXE_OBJS)
 
@@ -164,17 +172,17 @@ macosx.app: factor
 		Factor.app/Contents/MacOS/factor
 
 $(EXECUTABLE): $(DLL_OBJS) $(EXE_OBJS)
-	$(LINKER) $(ENGINE) $(DLL_OBJS)
-	$(CPP) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
+	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
 
 $(CONSOLE_EXECUTABLE): $(DLL_OBJS) $(EXE_OBJS)
-	$(LINKER) $(ENGINE) $(DLL_OBJS)
-	$(CPP) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
+	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) $(CFLAGS_CONSOLE) -o factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION) $(EXE_OBJS)
 
 $(TEST_LIBRARY): vm/ffi_test.o
-	$(CC) $(LIBPATH) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o libfactor-ffi-test$(SHARED_DLL_EXTENSION) $(TEST_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CC) $(LIBPATH) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o libfactor-ffi-test$(SHARED_DLL_EXTENSION) $(TEST_OBJS)
 
 clean:
 	rm -f vm/*.o
@@ -187,22 +195,22 @@ tags:
 	etags vm/*.{cpp,hpp,mm,S,c}
 
 vm/resources.o:
-	$(WINDRES) vm/factor.rs vm/resources.o
+	$(TOOLCHAIN_PREFIX)$(WINDRES) vm/factor.rs vm/resources.o
 
 vm/ffi_test.o: vm/ffi_test.c
-	$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -o $@ $<
 
 .c.o:
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) -o $@ $<
 
 .cpp.o:
-	$(CPP) -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CPP) -c $(CFLAGS) -o $@ $<
 
 .S.o:
-	$(CC) -x assembler-with-cpp -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CC) -x assembler-with-cpp -c $(CFLAGS) -o $@ $<
 
 .mm.o:
-	$(CPP) -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CPP) -c $(CFLAGS) -o $@ $<
 
 .PHONY: factor tags clean
 

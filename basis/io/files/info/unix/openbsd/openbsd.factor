@@ -6,7 +6,7 @@ sequences system unix unix.getfsstat.openbsd grouping
 unix.statfs.openbsd unix.statvfs.openbsd unix.types
 arrays io.files.info.unix classes.struct
 specialized-arrays io.encodings.utf8 ;
-SPECIALIZED-ARRAY: statvfs
+SPECIALIZED-ARRAY: statfs
 IN: io.files.unix.openbsd
 
 TUPLE: openbsd-file-system-info < unix-file-system-info
@@ -49,6 +49,6 @@ M: openbsd statvfs>file-system-info ( file-system-info statvfs -- file-system-in
 
 M: openbsd file-systems ( -- seq )
     f 0 0 getfsstat dup io-error
-    <statvfs-array>
+    <statfs-array>
     [ dup byte-length 0 getfsstat io-error ]
     [ [ f_mntonname>> utf8 alien>string file-system-info ] { } map-as ] bi ;

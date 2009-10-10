@@ -101,8 +101,10 @@ bootstrapping? on
     "threads.private"
     "tools.profiler.private"
     "words"
+    "words.private"
     "vectors"
     "vectors.private"
+    "vm"
 } [ create-vocab drop ] each
 
 ! Builtin classes
@@ -409,7 +411,11 @@ tuple
     { "float<=" "math.private" (( x y -- ? )) }
     { "float>" "math.private" (( x y -- ? )) }
     { "float>=" "math.private" (( x y -- ? )) }
-    { "<word>" "words" (( name vocab -- word )) }
+    { "float-u<" "math.private" (( x y -- ? )) }
+    { "float-u<=" "math.private" (( x y -- ? )) }
+    { "float-u>" "math.private" (( x y -- ? )) }
+    { "float-u>=" "math.private" (( x y -- ? )) }
+    { "(word)" "words.private" (( name vocab -- word )) }
     { "word-xt" "words" (( word -- start end )) }
     { "getenv" "kernel.private" (( n -- obj )) }
     { "setenv" "kernel.private" (( obj n -- )) }
@@ -480,6 +486,7 @@ tuple
     { "fputc" "io.streams.c" (( ch alien -- )) }
     { "fwrite" "io.streams.c" (( string alien -- )) }
     { "fflush" "io.streams.c" (( alien -- )) }
+    { "ftell" "io.streams.c" (( alien -- n )) }
     { "fseek" "io.streams.c" (( alien offset whence -- )) }
     { "fclose" "io.streams.c" (( alien -- )) }
     { "<wrapper>" "kernel" (( obj -- wrapper )) }
@@ -514,6 +521,8 @@ tuple
     { "inline-cache-stats" "generic.single" (( -- stats )) }
     { "optimized?" "words" (( word -- ? )) }
     { "quot-compiled?" "quotations" (( quot -- ? )) }
+    { "vm-ptr" "vm" (( -- ptr )) }
+    { "strip-stack-traces" "kernel.private" (( -- )) }
 } [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number

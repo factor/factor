@@ -1,4 +1,4 @@
-USING: kernel system alien.syntax combinators vocabs.loader ;
+USING: kernel system alien.c-types alien.syntax combinators vocabs.loader ;
 IN: unix.types
 
 TYPEDEF: char int8_t
@@ -37,6 +37,12 @@ TYPEDEF: fsfilcnt_t __fsfilcnt_t
 TYPEDEF: __uint64_t rlim_t
 TYPEDEF: uint32_t id_t
 
+C-TYPE: DIR
+C-TYPE: FILE
+C-TYPE: rlimit
+C-TYPE: rusage
+C-TYPE: sockaddr
+
 os {
     { linux   [ "unix.types.linux"   require ] }
     { macosx  [ "unix.types.macosx"  require ] }
@@ -45,3 +51,4 @@ os {
     { netbsd  [ "unix.types.netbsd"  require ] }
     { winnt [ ] }
 } case
+

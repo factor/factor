@@ -7,8 +7,10 @@ HELP: <users-in-memory>
 
 ARTICLE: "furnace.auth.providers.assoc" "In-memory authentication provider"
 "The " { $vocab-link "furnace.auth.providers.assoc" } " vocabulary implements an authentication provider which looks up usernames and passwords in an associative mapping."
-{ $subsection users-in-memory }
-{ $subsection <users-in-memory> }
+{ $subsections
+    users-in-memory
+    <users-in-memory>
+}
 "The " { $slot "assoc" } " slot of the " { $link users-in-memory } " tuple maps usernames to checksums of passwords." ;
 
 ABOUT: "furnace.auth.providers.assoc"

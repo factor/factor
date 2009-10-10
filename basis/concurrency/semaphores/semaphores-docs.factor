@@ -43,14 +43,20 @@ $nl
     "] parallel-map"
 }
 "Creating semaphores:"
-{ $subsection semaphore }
-{ $subsection <semaphore> }
+{ $subsections
+    semaphore
+    <semaphore>
+}
 "Unlike locks, where acquisition and release are always paired by a combinator, semaphores expose these operations directly and there is no requirement that they be performed in the same thread:"
-{ $subsection acquire }
-{ $subsection acquire-timeout }
-{ $subsection release }
+{ $subsections
+    acquire
+    acquire-timeout
+    release
+}
 "Combinators which pair acquisition and release:"
-{ $subsection with-semaphore }
-{ $subsection with-semaphore-timeout } ;
+{ $subsections
+    with-semaphore
+    with-semaphore-timeout
+} ;
 
 ABOUT: "concurrency.semaphores"

@@ -1,5 +1,4 @@
-USING: eval tools.test compiler.units vocabs multiline words
-kernel ;
+USING: eval tools.test compiler.units vocabs words kernel ;
 IN: compiler.tests.redefine10
 
 ! Mixin redefinition did not recompile all necessary words.
@@ -7,21 +6,19 @@ IN: compiler.tests.redefine10
 [ ] [ [ "compiler.tests.redefine10" forget-vocab ] with-compilation-unit ] unit-test
 
 [ ] [
-    <"
-    USING: kernel math classes ;
+    "USING: kernel math classes ;
     IN: compiler.tests.redefine10
     MIXIN: my-mixin
     INSTANCE: fixnum my-mixin
-    : my-inline ( a -- b ) dup my-mixin instance? [ 1 + ] when ;
-    "> eval( -- )
+    : my-inline ( a -- b ) dup my-mixin instance? [ 1 + ] when ;"
+    eval( -- )
 ] unit-test
 
 [ ] [
-    <"
-    USE: math
+    "USE: math
     IN: compiler.tests.redefine10
-    INSTANCE: float my-mixin
-    "> eval( -- )
+    INSTANCE: float my-mixin"
+    eval( -- )
 ] unit-test
 
 [ 2.0 ] [

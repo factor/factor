@@ -79,7 +79,7 @@ PRIVATE>
     [ second ] [ [ line-height ] [ min-rows>> ] [ max-rows>> ] tri ] bi* clamp ;
 
 M: line-gadget pref-viewport-dim
-    [ pref-dim ] keep
+    [ pref-dim ] [ ] bi
     [ line-gadget-width ]
     [ line-gadget-height ]
     2bi 2array ;

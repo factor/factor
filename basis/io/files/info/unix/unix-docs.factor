@@ -215,63 +215,73 @@ HELP: user-write?
 
 ARTICLE: "unix-file-permissions" "Unix file permissions"
 "Reading all file permissions:"
-{ $subsection file-permissions }
+{ $subsections file-permissions }
 "Reading individual file permissions:"
-{ $subsection uid? }
-{ $subsection gid? }
-{ $subsection sticky? }
-{ $subsection user-read? }
-{ $subsection user-write? }
-{ $subsection user-execute? }
-{ $subsection group-read? }
-{ $subsection group-write? }
-{ $subsection group-execute? }
-{ $subsection other-read? }
-{ $subsection other-write? }
-{ $subsection other-execute? }
+{ $subsections
+    uid?
+    gid?
+    sticky?
+    user-read?
+    user-write?
+    user-execute?
+    group-read?
+    group-write?
+    group-execute?
+    other-read?
+    other-write?
+    other-execute?
+}
 "Writing all file permissions:"
-{ $subsection set-file-permissions }
+{ $subsections set-file-permissions }
 "Writing individual file permissions:"
-{ $subsection set-uid }
-{ $subsection set-gid }
-{ $subsection set-sticky }
-{ $subsection set-user-read }
-{ $subsection set-user-write }
-{ $subsection set-user-execute }
-{ $subsection set-group-read }
-{ $subsection set-group-write }
-{ $subsection set-group-execute }
-{ $subsection set-other-read }
-{ $subsection set-other-write }
-{ $subsection set-other-execute } ;
+{ $subsections
+    set-uid
+    set-gid
+    set-sticky
+    set-user-read
+    set-user-write
+    set-user-execute
+    set-group-read
+    set-group-write
+    set-group-execute
+    set-other-read
+    set-other-write
+    set-other-execute
+} ;
 
 ARTICLE: "unix-file-timestamps" "Unix file timestamps"
 "To read file times, use the accessors on the object returned by the " { $link file-info } " word." $nl
 "Setting multiple file times:"
-{ $subsection set-file-times }
+{ $subsections set-file-times }
 "Setting just the last access time:"
-{ $subsection set-file-access-time }
+{ $subsections set-file-access-time }
 "Setting just the last modified time:"
-{ $subsection set-file-modified-time } ;
+{ $subsections set-file-modified-time } ;
 
 
 ARTICLE: "unix-file-ids" "Unix file user and group ids"
 "Reading file user data:"
-{ $subsection file-user-id }
-{ $subsection file-user-name }
+{ $subsections
+    file-user-id
+    file-user-name
+}
 "Setting file user data:"
-{ $subsection set-file-user }
+{ $subsections set-file-user }
 "Reading file group data:"
-{ $subsection file-group-id }
-{ $subsection file-group-name }
+{ $subsections
+    file-group-id
+    file-group-name
+}
 "Setting file group data:"
-{ $subsection set-file-group } ;
+{ $subsections set-file-group } ;
 
 
 ARTICLE: "io.files.info.unix" "Unix file attributes"
 "The " { $vocab-link "io.files.info.unix" } " vocabulary implements a high-level way to set Unix-specific permissions, timestamps, and user and group IDs for files."
-{ $subsection "unix-file-permissions" }
-{ $subsection "unix-file-timestamps" }
-{ $subsection "unix-file-ids" } ;
+{ $subsections
+    "unix-file-permissions"
+    "unix-file-timestamps"
+    "unix-file-ids"
+} ;
 
 ABOUT: "io.files.info.unix"

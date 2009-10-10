@@ -28,6 +28,8 @@ IN: bootstrap.x86
     temp0 [] stack-reg MOV
     ! load XT
     temp1 0 MOV rc-absolute-cell rt-primitive jit-rel
+    ! load vm ptr
+    arg1 0 MOV rc-absolute-cell rt-vm jit-rel
     ! go
     temp1 JMP
 ] jit-primitive jit-define

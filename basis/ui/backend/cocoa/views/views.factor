@@ -1,10 +1,10 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.strings arrays assocs
-cocoa kernel math cocoa.messages cocoa.subclassing cocoa.classes
-cocoa.views cocoa.application cocoa.pasteboard cocoa.types
-cocoa.windows sequences io.encodings.utf8 ui ui.private ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures
+USING: accessors alien alien.c-types alien.data alien.strings
+arrays assocs cocoa kernel math cocoa.messages cocoa.subclassing
+cocoa.classes cocoa.views cocoa.application cocoa.pasteboard
+cocoa.types cocoa.windows sequences io.encodings.utf8 ui ui.private
+ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
 core-foundation.strings core-graphics core-graphics.types threads
 combinators math.rectangles ;
 IN: ui.backend.cocoa.views
@@ -396,6 +396,12 @@ CLASS: {
         [ drop ] 2dip
         SUPER-> initWithFrame:pixelFormat:
         dup dup add-resize-observer
+    ]
+}
+
+{ "isOpaque" "char" { "id" "SEL" }
+    [
+        2drop 0
     ]
 }
 

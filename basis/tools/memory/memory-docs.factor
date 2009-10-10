@@ -3,19 +3,25 @@ IN: tools.memory
 
 ARTICLE: "tools.memory" "Object memory tools"
 "You can print object heap status information:"
-{ $subsection room. }
-{ $subsection heap-stats. }
-{ $subsection heap-stats }
+{ $subsections
+    room.
+    heap-stats.
+    heap-stats
+}
 "You can query memory status:"
-{ $subsection data-room }
-{ $subsection code-room }
+{ $subsections
+    data-room
+    code-room
+}
 "There are a pair of combinators, analogous to " { $link each } " and " { $link filter } ", which operate on the entire collection of objects in the object heap:"
-{ $subsection each-object }
-{ $subsection instances }
+{ $subsections
+    each-object
+    instances
+}
 "You can check an object's the heap memory usage:"
-{ $subsection size }
+{ $subsections size }
 "The garbage collector can be invoked manually:"
-{ $subsection gc }
+{ $subsections gc }
 { $see-also "images" } ;
 
 ABOUT: "tools.memory"

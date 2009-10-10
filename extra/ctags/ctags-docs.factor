@@ -3,13 +3,15 @@ IN: ctags
 
 ARTICLE: "ctags" "Ctags file"
 { $emphasis "ctags" } " generates a index file of every factor word in ctags format as supported by vi and other editors. More information can be found at " { $url "http://en.wikipedia.org/wiki/Ctags" } "."
-{ $subsection ctags }
-{ $subsection ctags-write }
-{ $subsection ctag-strings }
-{ $subsection ctag }
-{ $subsection ctag-word }
-{ $subsection ctag-path }
-{ $subsection ctag-lineno } ;
+{ $subsections
+    ctags
+    ctags-write
+    ctag-strings
+    ctag
+    ctag-word
+    ctag-path
+    ctag-lineno
+} ;
 
 HELP: ctags ( path -- )
 { $values { "path" "a pathname string" } }

@@ -1,8 +1,9 @@
 USING: windows.dinput windows.kernel32 windows.ole32 windows.com
-windows.com.syntax alien alien.c-types alien.syntax kernel system namespaces
-combinators sequences fry math accessors macros words quotations
-libc continuations generalizations splitting locals assocs init
-specialized-arrays memoize classes.struct ;
+windows.com.syntax alien alien.c-types alien.data alien.syntax
+kernel system namespaces combinators sequences fry math accessors
+macros words quotations libc continuations generalizations
+splitting locals assocs init specialized-arrays memoize
+classes.struct strings arrays ;
 SPECIALIZED-ARRAY: DIOBJECTDATAFORMAT
 IN: windows.dinput.constants
 
@@ -22,12 +23,17 @@ SYMBOLS:
 MEMO: c-type* ( name -- c-type ) c-type ;
 MEMO: heap-size* ( c-type -- n ) heap-size ;
 
+GENERIC: array-base-type ( c-type -- c-type' )
+M: object array-base-type ;
+M: string array-base-type "[" split1 drop ;
+M: array array-base-type first ;
+
 : (field-spec-of) ( field struct -- field-spec )
     c-type* fields>> [ name>> = ] with find nip ;
 : (offsetof) ( field struct -- offset )
     [ (field-spec-of) offset>> ] [ drop 0 ] if* ;
 : (sizeof) ( field struct -- size )
-    [ (field-spec-of) type>> "[" split1 drop heap-size* ] [ drop 1 ] if* ;
+    [ (field-spec-of) type>> array-base-type heap-size* ] [ drop 1 ] if* ;
 
 : (flag) ( thing -- integer )
     {

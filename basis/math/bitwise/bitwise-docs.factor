@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax math sequences ;
+USING: assocs help.markup help.syntax math sequences kernel ;
 IN: math.bitwise
 
 HELP: bitfield
@@ -67,17 +67,21 @@ HELP: bit-clear?
 
 HELP: bit-count
 { $values
-     { "x" integer }
+     { "obj" object }
      { "n" integer }
 }
-{ $description "Returns the number of set bits as an integer." }
+{ $description "Returns the number of set bits as an object. This word only works on non-negative integers or objects that can be represented as a byte-array." }
 { $examples 
     { $example "USING: math.bitwise prettyprint ;"
                "HEX: f0 bit-count ."
                "4"
     }
     { $example "USING: math.bitwise prettyprint ;"
-               "-7 bit-count ."
+               "-1 32 bits bit-count ."
+               "32"
+    }
+    { $example "USING: math.bitwise prettyprint ;"
+               "B{ 1 0 1 } bit-count ."
                "2"
     }
 } ;
@@ -132,9 +136,7 @@ HELP: clear-bit
 } ;
 
 HELP: flags
-{ $values
-     { "values" sequence }
-}
+{ $values { "values" sequence } }
 { $description "Constructs a constant flag value from a sequence of integers or words that output integers. The resulting constant is computed at compile-time, which makes this word as efficient as using a literal integer." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
@@ -207,6 +209,20 @@ HELP: mask?
         "f"
     }
 } ;
+
+HELP: even-parity?
+{ $values
+    { "obj" object }
+    { "?" boolean }
+}
+{ $description "Returns true if the number of set bits in an object is even." } ;
+
+HELP: odd-parity?
+{ $values
+    { "obj" object }
+    { "?" boolean }
+}
+{ $description "Returns true if the number of set bits in an object is odd." } ;
 
 HELP: on-bits
 { $values
@@ -344,38 +360,52 @@ HELP: wrap
 
 ARTICLE: "math-bitfields" "Constructing bit fields"
 "Some applications, such as binary communication protocols and assemblers, need to construct integers from elaborate bit field specifications. Hand-coding this using " { $link shift } " and " { $link bitor } " results in repetitive code. A higher-level facility exists to factor out this repetition:"
-{ $subsection bitfield } ;
+{ $subsections bitfield } ;
 
 ARTICLE: "math.bitwise" "Additional bitwise arithmetic"
 "The " { $vocab-link "math.bitwise" } " vocabulary provides bitwise arithmetic words extending " { $link "bitwise-arithmetic" } ". They are useful for efficiency, low-level programming, and interfacing with C libraries."
 $nl
 "Setting and clearing bits:"
-{ $subsection set-bit }
-{ $subsection clear-bit }
+{ $subsections
+    set-bit
+    clear-bit
+}
 "Testing if bits are set or clear:"
-{ $subsection bit? }
-{ $subsection bit-clear? }
+{ $subsections
+    bit?
+    bit-clear?
+}
 "Operations with bitmasks:"
-{ $subsection mask }
-{ $subsection unmask }
-{ $subsection mask? }
-{ $subsection unmask? }
+{ $subsections
+    mask
+    unmask
+    mask?
+    unmask?
+}
 "Generating an integer with n set bits:"
-{ $subsection on-bits }
+{ $subsections on-bits }
 "Counting the number of set bits:"
-{ $subsection bit-count }
+{ $subsections bit-count }
+"Testing the parity of an object:"
+{ $subsections even-parity? odd-parity? }
 "More efficient modding by powers of two:"
-{ $subsection wrap }
+{ $subsections wrap }
 "Bit-rolling:"
-{ $subsection bitroll }
-{ $subsection bitroll-32 }
-{ $subsection bitroll-64 }
+{ $subsections
+    bitroll
+    bitroll-32
+    bitroll-64
+}
 "32-bit arithmetic:"
-{ $subsection w+ }
-{ $subsection w- }
-{ $subsection w* }
+{ $subsections
+    w+
+    w-
+    w*
+}
 "Bitfields:"
-{ $subsection flags }
-{ $subsection "math-bitfields" } ;
+{ $subsections
+    flags
+    "math-bitfields"
+} ;
 
 ABOUT: "math.bitwise"

@@ -1,6 +1,6 @@
 USING: assocs hashtables help.markup help.syntax
 io.streams.string io.files io.pathnames kernel strings present
-math multiline ;
+math ;
 IN: urls
 
 HELP: url
@@ -112,11 +112,11 @@ HELP: set-query-param
 }
 { $examples
     { $code
-        <" USING: kernel http.client urls ;
+        """USING: kernel http.client urls ;
 URL" http://search.yahooapis.com/WebSearchService/V1/webSearch" clone
     "concatenative programming (NSFW)" "query" set-query-param
     "1" "adult_ok" set-query-param
-http-get">
+http-get"""
     }
     "(For a complete Yahoo! search web service implementation, see the " { $vocab-link "yahoo" } " vocabulary.)"
 }
@@ -167,9 +167,11 @@ HELP: url-append-path
 { $description "Like " { $link append-path } ", but intended for use with URL paths and not filesystem paths." } ;
 
 ARTICLE: "url-utilities" "URL implementation utilities"
-{ $subsection parse-host }
-{ $subsection secure-protocol? }
-{ $subsection url-append-path } ;
+{ $subsections
+    parse-host
+    secure-protocol?
+    url-append-path
+} ;
 
 ARTICLE: "urls" "URL objects"
 "The " { $vocab-link "urls" } " vocabulary implements a URL data type. The benefit of using a data type to prepresent URLs rather than a string is that the parsing, printing and escaping logic is encapsulated and reused, rather than re-implemented in a potentially buggy manner every time."
@@ -177,25 +179,29 @@ $nl
 "URL objects are used heavily by the " { $vocab-link "http" } " and " { $vocab-link "furnace" } " vocabularies, and are also useful on their own."
 $nl
 "The class of URLs, and a constructor:"
-{ $subsection url }
-{ $subsection <url> }
+{ $subsections
+    url
+    <url>
+}
 "Converting strings to URLs:"
-{ $subsection >url }
+{ $subsections >url }
 "URLs can be converted back to strings using the " { $link present } " word."
 $nl
 "URL literal syntax:"
-{ $subsection POSTPONE: URL" }
+{ $subsections POSTPONE: URL" }
 "Manipulating URLs:"
-{ $subsection derive-url }
-{ $subsection relative-url }
-{ $subsection ensure-port }
-{ $subsection query-param }
-{ $subsection set-query-param }
+{ $subsections
+    derive-url
+    relative-url
+    ensure-port
+    query-param
+    set-query-param
+}
 "Creating " { $link "network-addressing" } " from URLs:"
-{ $subsection url-addr }
+{ $subsections url-addr }
 "The URL implemention encodes and decodes components of " { $link url } " instances automatically, but sometimes this functionality is needed for non-URL strings."
-{ $subsection "url-encoding" }
+{ $subsections "url-encoding" }
 "Utility words used by the URL implementation:"
-{ $subsection "url-utilities" } ;
+{ $subsections "url-utilities" } ;
 
 ABOUT: "urls"
