@@ -99,31 +99,39 @@ ARTICLE: "deques" "Deques"
 "The " { $vocab-link "deques" } " vocabulary implements the deque data structure which has constant-time insertion and removal of elements at both ends."
 $nl
 "Deques must be instances of a mixin class:"
-{ $subsection deque }
+{ $subsections deque }
 "Deques must implement a protocol."
 $nl
 "Querying the deque:"
-{ $subsection peek-front }
-{ $subsection peek-back }
-{ $subsection deque-empty? }
-{ $subsection deque-member? }
+{ $subsections
+    peek-front
+    peek-back
+    deque-empty?
+    deque-member?
+}
 "Adding and removing elements:"
-{ $subsection push-front* }
-{ $subsection push-back* }
-{ $subsection pop-front* }
-{ $subsection pop-back* }
-{ $subsection clear-deque }
+{ $subsections
+    push-front*
+    push-back*
+    pop-front*
+    pop-back*
+    clear-deque
+}
 "Working with node objects output by " { $link push-front* } " and " { $link push-back* } ":"
-{ $subsection delete-node }
-{ $subsection node-value }
+{ $subsections
+    delete-node
+    node-value
+}
 "Utility operations built in terms of the above:"
-{ $subsection push-front }
-{ $subsection push-all-front }
-{ $subsection push-back }
-{ $subsection push-all-back }
-{ $subsection pop-front }
-{ $subsection pop-back }
-{ $subsection slurp-deque }
+{ $subsections
+    push-front
+    push-all-front
+    push-back
+    push-all-back
+    pop-front
+    pop-back
+    slurp-deque
+}
 "When using a deque as a queue, the convention is to queue elements with " { $link push-front } " and deque them with " { $link pop-back } "." ;
 
 ABOUT: "deques"

@@ -5,21 +5,25 @@ IN: graph-theory
 
 ARTICLE: "graph-protocol" "Graph protocol"
 "All graphs must be instances of the graph mixin:"
-{ $subsection graph }
+{ $subsections graph }
 "All graphs must implement a method on the following generic word:"
-{ $subsection vertices }
+{ $subsections vertices }
 "At least one of the following two generic words must have a method; the " { $link graph } " mixin has default definitions which are mutually recursive:"
-{ $subsection adjlist }
-{ $subsection adj? }
+{ $subsections
+    adjlist
+    adj?
+}
 "All mutable graphs must implement a method on the following generic word:"
-{ $subsection add-blank-vertex }
+{ $subsections add-blank-vertex }
 "All mutable undirected graphs must implement a method on the following generic word:"
-{ $subsection add-edge }
+{ $subsections add-edge }
 "Mutable directed graphs should not implement the above word, as it has a default definition defined in terms of the following generic word:"
-{ $subsection add-edge* }
+{ $subsections add-edge* }
 "The following two words have default definitions, but are available as generics to allow implementations to optimize them:"
-{ $subsection num-vertices }
-{ $subsection num-edges } ;
+{ $subsections
+    num-vertices
+    num-edges
+} ;
 
 HELP: graph
 { $class-description "A mixin class whose instances are graphs.  Custom implementations of the graph protocol should be declared as instances of this mixin for all graph functionality to work correctly:"

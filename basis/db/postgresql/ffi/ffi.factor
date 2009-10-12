@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 ! tested on debian linux with postgresql 8.1
-USING: alien alien.syntax combinators system alien.libraries ;
+USING: alien alien.c-types alien.syntax combinators system
+alien.libraries ;
 IN: db.postgresql.ffi
 
 << "postgresql" {
@@ -58,18 +59,18 @@ TYPEDEF: int PostgresPollingStatusType
 TYPEDEF: int PGTransactionStatusType 
 TYPEDEF: int PGVerbosity 
 
-TYPEDEF: void* PGconn*
-TYPEDEF: void* PGresult*
-TYPEDEF: void* PGcancel*
+C-TYPE: PGconn
+C-TYPE: PGresult
+C-TYPE: PGcancel
 TYPEDEF: uint Oid
 TYPEDEF: uint* Oid*
 TYPEDEF: char pqbool
-TYPEDEF: void* PQconninfoOption*
-TYPEDEF: void* PGnotify*
-TYPEDEF: void* PQArgBlock*
-TYPEDEF: void* PQprintOpt*
-TYPEDEF: void* FILE*
-TYPEDEF: void* SSL*
+C-TYPE: PQconninfoOption
+C-TYPE: PGnotify
+C-TYPE: PQArgBlock
+C-TYPE: PQprintOpt
+C-TYPE: SSL
+C-TYPE: FILE
 
 LIBRARY: postgresql
 

@@ -9,7 +9,7 @@ IN: compiler.cfg.stacks.uninitialized
 
 ! Consider the following sequence of instructions:
 ! ##inc-d 2
-! _gc
+! ##gc
 ! ##replace ... D 0
 ! ##replace ... D 1
 ! The GC check runs before stack locations 0 and 1 have been initialized,

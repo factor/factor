@@ -1,35 +1,35 @@
 ! (c)2009 Slava Pestov, Joe Groff bsd license
 USING: accessors alien alien.c-types alien.strings arrays
 byte-arrays cpu.architecture fry io io.encodings.binary
-io.files io.streams.memory kernel libc math sequences ;
+io.files io.streams.memory kernel libc math sequences words ;
 IN: alien.data
 
 GENERIC: require-c-array ( c-type -- )
 
 M: array require-c-array first require-c-array ;
 
-GENERIC: c-array-constructor ( c-type -- word )
+GENERIC: c-array-constructor ( c-type -- word ) foldable
 
-GENERIC: c-(array)-constructor ( c-type -- word )
+GENERIC: c-(array)-constructor ( c-type -- word ) foldable
 
-GENERIC: c-direct-array-constructor ( c-type -- word )
+GENERIC: c-direct-array-constructor ( c-type -- word ) foldable
 
 GENERIC: <c-array> ( len c-type -- array )
 
-M: c-type-name <c-array>
+M: word <c-array>
     c-array-constructor execute( len -- array ) ; inline
 
 GENERIC: (c-array) ( len c-type -- array )
 
-M: c-type-name (c-array)
+M: word (c-array)
     c-(array)-constructor execute( len -- array ) ; inline
 
 GENERIC: <c-direct-array> ( alien len c-type -- array )
 
-M: c-type-name <c-direct-array>
+M: word <c-direct-array>
     c-direct-array-constructor execute( alien len -- array ) ; inline
 
-: malloc-array ( n type -- alien )
+: malloc-array ( n type -- array )
     [ heap-size calloc ] [ <c-direct-array> ] 2bi ; inline
 
 : (malloc-array) ( n type -- alien )
@@ -56,9 +56,6 @@ M: c-type-name <c-direct-array>
 : malloc-string ( string encoding -- alien )
     string>alien malloc-byte-array ;
 
-: malloc-file-contents ( path -- alien len )
-    binary file-contents [ malloc-byte-array ] [ length ] bi ;
-
 M: memory-stream stream-read
     [
         [ index>> ] [ alien>> ] bi <displaced-alien>
@@ -80,4 +77,5 @@ M: value-type c-type-getter
 M: value-type c-type-setter ( type -- quot )
     [ c-type-getter ] [ c-type-unboxer-quot ] [ heap-size ] tri
     '[ @ swap @ _ memcpy ] ;
+
 

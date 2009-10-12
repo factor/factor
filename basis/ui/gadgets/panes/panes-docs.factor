@@ -49,20 +49,28 @@ HELP: <pane-stream>
 
 ARTICLE: "ui.gadgets.panes" "Pane gadgets"
 "The " { $vocab-link "ui.gadgets.panes" } " vocabulary implements panes, which display formatted text."
-{ $subsection pane }
-{ $subsection <pane> }
-{ $subsection <pane-control> }
+{ $subsections
+    pane
+    <pane>
+    <pane-control>
+}
 "Panes are written to by creating a special output stream:"
-{ $subsection pane-stream }
-{ $subsection <pane-stream> }
+{ $subsections
+    pane-stream
+    <pane-stream>
+}
 "In addition to the stream output words (" { $link "stream-protocol" } ", pane streams can have gadgets written to them:"
-{ $subsection write-gadget }
-{ $subsection print-gadget }
-{ $subsection gadget. }
+{ $subsections
+    write-gadget
+    print-gadget
+    gadget.
+}
 "The " { $link gadget. } " word is useful for interactive debugging of gadgets in the listener."
 $nl
 "There are a few combinators for working with panes:"
-{ $subsection with-pane }
-{ $subsection make-pane } ;
+{ $subsections
+    with-pane
+    make-pane
+} ;
 
 ABOUT: "ui.gadgets.panes"

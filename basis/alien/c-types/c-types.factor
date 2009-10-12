@@ -1,11 +1,12 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays arrays assocs kernel kernel.private math
-namespaces make parser sequences strings words splitting math.parser
-cpu.architecture alien alien.accessors alien.strings quotations
-layouts system compiler.units io io.files io.encodings.binary
-io.streams.memory accessors combinators effects continuations fry
-classes vocabs vocabs.loader words.symbol ;
+math.order math.parser namespaces make parser sequences strings
+words splitting cpu.architecture alien alien.accessors
+alien.strings quotations layouts system compiler.units io
+io.files io.encodings.binary io.streams.memory accessors
+combinators effects continuations fry classes vocabs
+vocabs.loader words.symbol ;
 QUALIFIED: math
 IN: alien.c-types
 
@@ -38,8 +39,8 @@ unboxer
 { rep initial: int-rep }
 stack-align? ;
 
-: <c-type> ( -- type )
-    \ c-type new ;
+: <c-type> ( -- c-type )
+    \ c-type new ; inline
 
 SYMBOL: c-types
 
@@ -55,13 +56,19 @@ PREDICATE: c-type-word < word
 UNION: c-type-name string c-type-word ;
 
 ! C type protocol
-GENERIC: c-type ( name -- type ) foldable
+GENERIC: c-type ( name -- c-type ) foldable
 
 GENERIC: resolve-pointer-type ( name -- c-type )
+
+<< \ void \ void* "pointer-c-type" set-word-prop >>
+
+: void? ( c-type -- ? )
+    { void "void" } member? ;
 
 M: word resolve-pointer-type
     dup "pointer-c-type" word-prop
     [ ] [ drop void* ] ?if ;
+
 M: string resolve-pointer-type
     dup "*" append dup c-types get at
     [ nip ] [
@@ -70,14 +77,15 @@ M: string resolve-pointer-type
         [ resolve-pointer-type ] [ drop void* ] if
     ] if ;
 
-: resolve-typedef ( name -- type )
+: resolve-typedef ( name -- c-type )
+    dup void? [ no-c-type ] when
     dup c-type-name? [ c-type ] when ;
 
-: parse-array-type ( name -- dims type )
+: parse-array-type ( name -- dims c-type )
     "[" split unclip
     [ [ "]" ?tail drop string>number ] map ] dip ;
 
-M: string c-type ( name -- type )
+M: string c-type ( name -- c-type )
     CHAR: ] over member? [
         parse-array-type prefix
     ] [
@@ -87,12 +95,10 @@ M: string c-type ( name -- type )
     ] if ;
 
 M: word c-type
-    "c-type" word-prop resolve-typedef ;
+    dup "c-type" word-prop resolve-typedef
+    [ ] [ no-c-type ] ?if ;
 
-: void? ( c-type -- ? )
-    { void "void" } member? ;
-
-GENERIC: c-struct? ( type -- ? )
+GENERIC: c-struct? ( c-type -- ? )
 
 M: object c-struct?
     drop f ;
@@ -168,33 +174,33 @@ M: c-type c-type-stack-align? stack-align?>> ;
 
 M: c-type-name c-type-stack-align? c-type c-type-stack-align? ;
 
-: c-type-box ( n type -- )
+: c-type-box ( n c-type -- )
     [ c-type-rep ] [ c-type-boxer [ "No boxer" throw ] unless* ] bi
     %box ;
 
-: c-type-unbox ( n ctype -- )
+: c-type-unbox ( n c-type -- )
     [ c-type-rep ] [ c-type-unboxer [ "No unboxer" throw ] unless* ] bi
     %unbox ;
 
-GENERIC: box-parameter ( n ctype -- )
+GENERIC: box-parameter ( n c-type -- )
 
 M: c-type box-parameter c-type-box ;
 
 M: c-type-name box-parameter c-type box-parameter ;
 
-GENERIC: box-return ( ctype -- )
+GENERIC: box-return ( c-type -- )
 
 M: c-type box-return f swap c-type-box ;
 
 M: c-type-name box-return c-type box-return ;
 
-GENERIC: unbox-parameter ( n ctype -- )
+GENERIC: unbox-parameter ( n c-type -- )
 
 M: c-type unbox-parameter c-type-unbox ;
 
 M: c-type-name unbox-parameter c-type unbox-parameter ;
 
-GENERIC: unbox-return ( ctype -- )
+GENERIC: unbox-return ( c-type -- )
 
 M: c-type unbox-return f swap c-type-unbox ;
 
@@ -202,13 +208,13 @@ M: c-type-name unbox-return c-type unbox-return ;
 
 : little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
 
-GENERIC: heap-size ( type -- size ) foldable
+GENERIC: heap-size ( name -- size ) foldable
 
 M: c-type-name heap-size c-type heap-size ;
 
 M: abstract-c-type heap-size size>> ;
 
-GENERIC: stack-size ( type -- size ) foldable
+GENERIC: stack-size ( name -- size ) foldable
 
 M: c-type-name stack-size c-type stack-size ;
 
@@ -235,7 +241,7 @@ MIXIN: value-type
         [ "Cannot write struct fields with this type" throw ]
     ] unless* ;
 
-: array-accessor ( type quot -- def )
+: array-accessor ( c-type quot -- def )
     [
         \ swap , [ heap-size , [ * >fixnum ] % ] [ % ] bi*
     ] [ ] make ;
@@ -261,19 +267,19 @@ M: word typedef ( old new -- )
 
 TUPLE: long-long-type < c-type ;
 
-: <long-long-type> ( -- type )
+: <long-long-type> ( -- c-type )
     long-long-type new ;
 
-M: long-long-type unbox-parameter ( n type -- )
+M: long-long-type unbox-parameter ( n c-type -- )
     c-type-unboxer %unbox-long-long ;
 
-M: long-long-type unbox-return ( type -- )
+M: long-long-type unbox-return ( c-type -- )
     f swap unbox-parameter ;
 
-M: long-long-type box-parameter ( n type -- )
+M: long-long-type box-parameter ( n c-type -- )
     c-type-boxer %box-long-long ;
 
-M: long-long-type box-return ( type -- )
+M: long-long-type box-return ( c-type -- )
     f swap box-parameter ;
 
 : define-deref ( name -- )
@@ -285,13 +291,13 @@ M: long-long-type box-return ( type -- )
     [ dup c-setter '[ _ heap-size <byte-array> [ 0 @ ] keep ] ] bi
     (( value -- c-ptr )) define-inline ;
 
-: define-primitive-type ( type name -- )
+: define-primitive-type ( c-type name -- )
     [ typedef ]
     [ name>> define-deref ]
     [ name>> define-out ]
     tri ;
 
-: if-void ( type true false -- )
+: if-void ( c-type true false -- )
     pick void? [ drop nip call ] [ nip call ] if ; inline
 
 CONSTANT: primitive-types
@@ -306,7 +312,7 @@ CONSTANT: primitive-types
     }
 
 SYMBOLS:
-    ptrdiff_t intptr_t size_t
+    ptrdiff_t intptr_t uintptr_t size_t
     char* uchar* ;
 
 [
@@ -467,8 +473,33 @@ SYMBOLS:
         [ >float ] >>unboxer-quot
     \ double define-primitive-type
 
-    \ long \ ptrdiff_t typedef
-    \ long \ intptr_t typedef
-    \ ulong \ size_t typedef
+    \ long c-type \ ptrdiff_t typedef
+    \ long c-type \ intptr_t typedef
+    \ ulong c-type \ uintptr_t typedef
+    \ ulong c-type \ size_t typedef
 ] with-compilation-unit
 
+M: char-16-rep rep-component-type drop char ;
+M: uchar-16-rep rep-component-type drop uchar ;
+M: short-8-rep rep-component-type drop short ;
+M: ushort-8-rep rep-component-type drop ushort ;
+M: int-4-rep rep-component-type drop int ;
+M: uint-4-rep rep-component-type drop uint ;
+M: longlong-2-rep rep-component-type drop longlong ;
+M: ulonglong-2-rep rep-component-type drop ulonglong ;
+M: float-4-rep rep-component-type drop float ;
+M: double-2-rep rep-component-type drop double ;
+
+: (unsigned-interval) ( bytes -- from to ) [ 0 ] dip 8 * 2^ 1 - ; foldable
+: unsigned-interval ( c-type -- from to ) heap-size (unsigned-interval) ; foldable
+: (signed-interval) ( bytes -- from to ) 8 * 1 - 2^ [ neg ] [ 1 - ] bi ; foldable
+: signed-interval ( c-type -- from to ) heap-size (signed-interval) ; foldable
+
+: c-type-interval ( c-type -- from to )
+    {
+        { [ dup { float double } memq? ] [ drop -1/0. 1/0. ] }
+        { [ dup { char short int long longlong } memq? ] [ signed-interval ] }
+        { [ dup { uchar ushort uint ulong ulonglong } memq? ] [ unsigned-interval ] }
+    } cond ; foldable
+
+: c-type-clamp ( value c-type -- value' ) c-type-interval clamp ; inline

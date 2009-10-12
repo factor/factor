@@ -96,26 +96,38 @@ ARTICLE: "furnace.extension-points" "Furnace extension points"
 "Furnace features such as session management, conversation scope and asides need to modify URLs in links and redirects, and insert hidden form fields, to implement state on top of the stateless HTTP protocol. In order to decouple the server-side state management code from the HTML templating code, a series of hooks are used."
 $nl
 "Responders can implement methods on the following generic words:"
-{ $subsection modify-query }
-{ $subsection modify-redirect-query }
-{ $subsection link-attr }
-{ $subsection modify-form }
+{ $subsections
+    modify-query
+    modify-redirect-query
+    link-attr
+    modify-form
+}
 "Presentation-level code can call the following words:"
-{ $subsection adjust-url }
-{ $subsection adjust-redirect-url } ;
+{ $subsections
+    adjust-url
+    adjust-redirect-url
+} ;
 
 ARTICLE: "furnace.misc" "Miscellaneous Furnace features"
 "Inspecting the chain of responders handling the current request:"
-{ $subsection nested-responders }
-{ $subsection each-responder }
-{ $subsection resolve-base-path }
+{ $subsections
+    nested-responders
+    each-responder
+    resolve-base-path
+}
 "Vocabulary root-relative resources:"
-{ $subsection vocab-path }
-{ $subsection resolve-template-path }
+{ $subsections
+    vocab-path
+    resolve-template-path
+}
 "Early return from a responder:"
-{ $subsection with-exit-continuation }
-{ $subsection exit-with }
+{ $subsections
+    with-exit-continuation
+    exit-with
+}
 "Other useful words:"
-{ $subsection hidden-form-field }
-{ $subsection client-state }
-{ $subsection user-agent } ;
+{ $subsections
+    hidden-form-field
+    client-state
+    user-agent
+} ;

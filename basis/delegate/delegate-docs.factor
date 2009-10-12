@@ -44,13 +44,17 @@ $nl
 "Unlike " { $link "tuple-subclassing" } ", which expresses " { $emphasis "is-a" } " relationships by statically including the methods and slots of the superclass in all subclasses, consultation forwards generic word calls to another distinct object."
 $nl
 "Defining new protocols:"
-{ $subsection POSTPONE: PROTOCOL: }
-{ $subsection define-protocol }
+{ $subsections
+    POSTPONE: PROTOCOL:
+    define-protocol
+}
 "Defining new protocols consisting of slot accessors:"
-{ $subsection POSTPONE: SLOT-PROTOCOL: }
+{ $subsections POSTPONE: SLOT-PROTOCOL: }
 "Defining consultation:"
-{ $subsection POSTPONE: CONSULT: }
-{ $subsection define-consult }
+{ $subsections
+    POSTPONE: CONSULT:
+    define-consult
+}
 "Every tuple class has an associated protocol consisting of all of its slot accessor methods. The " { $vocab-link "delegate.protocols" } " vocabulary defines formal protocols for the various informal protocols used in the Factor core, such as " { $link "sequence-protocol" } ", " { $link "assocs-protocol" } " or " { $link "stream-protocol" } ;
 
 ABOUT: "delegate"

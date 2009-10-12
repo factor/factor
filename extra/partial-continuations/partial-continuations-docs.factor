@@ -16,7 +16,9 @@ ARTICLE: "partial-continuations" "Partial continuations"
 { $url "http://groups.google.com/group/comp.lang.scheme/msg/9f0d61da01540816" } "."
 " See this blog entry for more details:"
 { $url "http://www.bluishcoder.co.nz/2006/03/factor-partial-continuation-updates.html" }
-{ $subsection breset }
-{ $subsection bshift } ;
+{ $subsections
+    breset
+    bshift
+} ;
 
 ABOUT: "partial-continuations"

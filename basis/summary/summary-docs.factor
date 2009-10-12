@@ -3,7 +3,7 @@ USING: kernel strings help.markup help.syntax ;
 
 ARTICLE: "summary" "Converting objects to summary strings"
 "A word for getting very brief descriptions of words and general objects:"
-{ $subsection summary } ;
+{ $subsections summary } ;
 
 HELP: summary
 { $values { "object" object } { "string" string } }

@@ -66,29 +66,37 @@ HELP: string>dtd
 { read-dtd file>dtd string>dtd } related-words
 
 ARTICLE: { "xml" "reading" } "Reading XML"
-    "The following words are used to read something into an XML document"
-    { $subsection read-xml }
-    { $subsection read-xml-chunk }
-    { $subsection string>xml }
-    { $subsection string>xml-chunk }
-    { $subsection file>xml }
-    { $subsection bytes>xml }
-    "To read a DTD:"
-    { $subsection read-dtd }
-    { $subsection file>dtd }
-    { $subsection string>dtd } ;
+"The following words are used to read something into an XML document"
+{ $subsections
+    read-xml
+    read-xml-chunk
+    string>xml
+    string>xml-chunk
+    file>xml
+    bytes>xml
+}
+"To read a DTD:"
+{ $subsections
+    read-dtd
+    file>dtd
+    string>dtd
+} ;
 
 ARTICLE: { "xml" "events" } "Event-based XML parsing"
     "In addition to DOM-style parsing based around " { $link read-xml } ", the XML module also provides SAX-style event-based parsing. This uses much of the same data structures as normal XML, with the exception of the classes " { $link xml } " and " { $link tag } " and as such, the article " { $vocab-link "xml.data" } " may be useful in learning how to process documents in this way. Other useful words are:"
-    { $subsection each-element }
-    { $subsection opener }
-    { $subsection closer }
-    { $subsection contained }
-    "There is also pull-based parsing to augment the push-parsing of SAX. This is probably easier to use and more logical. It uses the same parsing objects as the above style of parsing, except string elements are always in arrays, for example { \"\" }. Relevant pull-parsing words are:"
-    { $subsection <pull-xml> }
-    { $subsection pull-xml }
-    { $subsection pull-event }
-    { $subsection pull-elem } ;
+{ $subsections
+    each-element
+    opener
+    closer
+    contained
+}
+"There is also pull-based parsing to augment the push-parsing of SAX. This is probably easier to use and more logical. It uses the same parsing objects as the above style of parsing, except string elements are always in arrays, for example { \"\" }. Relevant pull-parsing words are:"
+{ $subsections
+    <pull-xml>
+    pull-xml
+    pull-event
+    pull-elem
+} ;
 
 ARTICLE: { "xml" "namespaces" } "Working with XML namespaces"
 "The Factor XML parser implements XML namespaces, and provides convenient utilities for working with them. Anywhere in the public API that a name is accepted as an argument, either a string or an XML name is accepted. If a string is used, it is coerced into a name by giving it a null namespace. Names are stored as " { $link name } " tuples, which have slots for the namespace prefix and namespace URL as well as the main part of the tag name." $nl
@@ -97,14 +105,16 @@ ARTICLE: { "xml" "namespaces" } "Working with XML namespaces"
 
 ARTICLE: "xml" "XML parser"
 "The " { $vocab-link "xml" } " vocabulary implements the XML 1.0 and 1.1 standards, converting strings of text into XML and vice versa. The parser checks for well-formedness but is not validating. There is only partial support for processing DTDs."
-    { $subsection { "xml" "reading" } }
-    { $subsection { "xml" "events" } }
-    { $subsection { "xml" "namespaces" } }
-    { $vocab-subsection "Writing XML" "xml.writer" }
-    { $vocab-subsection "XML parsing errors" "xml.errors" }
-    { $vocab-subsection "XML entities" "xml.entities" }
-    { $vocab-subsection "XML data types" "xml.data" }
-    { $vocab-subsection "Utilities for traversing XML" "xml.traversal" }
-    { $vocab-subsection "Syntax extensions for XML" "xml.syntax" } ;
+{ $subsections
+    { "xml" "reading" }
+    { "xml" "events" }
+    { "xml" "namespaces" }
+}
+{ $vocab-subsection "Writing XML" "xml.writer" }
+{ $vocab-subsection "XML parsing errors" "xml.errors" }
+{ $vocab-subsection "XML entities" "xml.entities" }
+{ $vocab-subsection "XML data types" "xml.data" }
+{ $vocab-subsection "Utilities for traversing XML" "xml.traversal" }
+{ $vocab-subsection "Syntax extensions for XML" "xml.syntax" } ;
 
 ABOUT: "xml"

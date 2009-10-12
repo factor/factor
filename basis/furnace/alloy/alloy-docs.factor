@@ -1,5 +1,5 @@
+USING: help.markup help.syntax db ;
 IN: furnace.alloy
-USING: help.markup help.syntax db multiline ;
 
 HELP: init-furnace-tables
 { $description "Initializes database tables used by asides, conversations and session management. This word must be invoked inside a " { $link with-db } " scope." } ;
@@ -10,13 +10,13 @@ HELP: <alloy>
 { $examples
     "The " { $vocab-link "webapps.counter" } " vocabulary uses an alloy to configure the counter:"
     { $code
-        <" : counter-db ( -- db ) "counter.db" <sqlite-db> ;
+        """: counter-db ( -- db ) "counter.db" <sqlite-db> ;
 
 : run-counter ( -- )
     <counter-app>
         counter-db <alloy>
         main-responder set-global
-    8080 httpd ;">
+    8080 httpd ;"""
     }
 } ;
 
@@ -33,10 +33,10 @@ ARTICLE: "furnace.alloy" "Furnace alloy responder"
     { $link "furnace.db" }
 }
 "A word to wrap a responder in an alloy:"
-{ $subsection <alloy> }
+{ $subsections <alloy> }
 "Initializing database tables for asides, conversations and sessions:"
-{ $subsection init-furnace-tables }
+{ $subsections init-furnace-tables }
 "Start a timer to expire asides, conversations and sessions:"
-{ $subsection start-expiring } ;
+{ $subsections start-expiring } ;
 
 ABOUT: "furnace.alloy"

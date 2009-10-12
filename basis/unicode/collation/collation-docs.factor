@@ -3,14 +3,18 @@ IN: unicode.collation
 
 ARTICLE: "unicode.collation" "Collation and weak comparison"
 "The " { $vocab-link "unicode.collation" "unicode.collation" } " vocabulary implements the Unicode Collation Algorithm. The Unicode Collation Algorithm (UTS #10) forms a reasonable way to sort strings when accouting for all of the characters in Unicode. It is far preferred over code point order when sorting for human consumption, in user interfaces. At the moment, only the default Unicode collation element table (DUCET) is used, but a more accurate collation would take locale into account. The following words are useful for collation directly:"
-{ $subsection sort-strings }
-{ $subsection collation-key }
-{ $subsection string<=> }
+{ $subsections
+    sort-strings
+    collation-key
+    string<=>
+}
 "Predicates for weak equality testing:"
-{ $subsection primary= }
-{ $subsection secondary= }
-{ $subsection tertiary= }
-{ $subsection quaternary= } ;
+{ $subsections
+    primary=
+    secondary=
+    tertiary=
+    quaternary=
+} ;
 
 ABOUT: "unicode.collation"
 

@@ -1,20 +1,22 @@
-! by blei on #concatenative
+! Copyright (C) 2009 blei, Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences math locals make multiline ;
 IN: nested-comments
 
-:: (subsequences-at) ( sseq seq n -- )
-    sseq seq n start*
-    [ dup , sseq length + [ sseq seq ] dip (subsequences-at) ]
-    when* ;
+: (count-subsequences) ( count substring string n -- count' )
+    [ 2dup ] dip start* [
+        pick length +
+        [ 1 + ] 3dip (count-subsequences)
+    ] [
+        2drop
+    ] if* ;
 
-: subsequences-at ( sseq seq -- indices )
-    [ 0 (subsequences-at) ] { } make ;
+: count-subsequences ( subseq seq -- n )
+    [ 0 ] 2dip 0 (count-subsequences) ;
 
-: count-subsequences ( sseq seq -- i )
-    subsequences-at length ;
+: parse-nestable-comment ( parsed-vector left-to-parse -- parsed-vector )
+    1 - "*)" parse-multiline-string
+    [ "(*" ] dip
+    count-subsequences + dup 0 > [ parse-nestable-comment ] [ drop ] if ;
 
-: parse-all-(* ( parsed-vector left-to-parse -- parsed-vector )
-    1 - "*)" parse-multiline-string [ "(*" ] dip
-    count-subsequences + dup 0 > [ parse-all-(* ] [ drop ] if ;
-
-SYNTAX: (* 1 parse-all-(* ;
+SYNTAX: (* 1 parse-nestable-comment ;

@@ -1,4 +1,5 @@
-USING: kernel alien.syntax math classes.struct ;
+USING: kernel alien.c-types alien.syntax math classes.struct
+unix.time unix.types ;
 IN: unix.stat
 
 ! Ubuntu 7.10 64-bit

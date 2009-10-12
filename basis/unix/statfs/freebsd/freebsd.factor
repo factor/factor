@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax unix.types unix.stat classes.struct ;
+USING: alien.syntax alien.c-types unix.types unix.stat classes.struct ;
 IN: unix.statfs.freebsd
 
 CONSTANT: MFSNAMELEN      16            ! length of type name including null */
@@ -27,8 +27,8 @@ STRUCT: statfs
     { f_owner uid_t }
     { f_fsid fsid_t }
     { f_charspare char[80] }
-    { f_fstypename { "char" MFSNAMELEN } }
-    { f_mntfromname { "char" MNAMELEN } }
-    { f_mntonname { "char" MNAMELEN } } ;
+    { f_fstypename { char MFSNAMELEN } }
+    { f_mntfromname { char MNAMELEN } }
+    { f_mntonname { char MNAMELEN } } ;
 
-FUNCTION: int statfs ( char* path, statvfs* buf ) ;
+FUNCTION: int statfs ( char* path, statfs* buf ) ;

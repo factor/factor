@@ -11,7 +11,9 @@ HELP: <labeled-gadget>
 
 ARTICLE: "ui.gadgets.labeled" "Labeled gadgets"
 "The " { $vocab-link "ui.gadgets.labeled" } " vocabulary implements labeled borders around child gadgets."
-{ $subsection labeled-gadget }
-{ $subsection <labeled-gadget> } ;
+{ $subsections
+    labeled-gadget
+    <labeled-gadget>
+} ;
 
 ABOUT: "ui.gadgets.labeled"

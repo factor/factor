@@ -3,8 +3,8 @@
 USING: kernel accessors sequences arrays fry namespaces generic
 words sets combinators generalizations cpu.architecture compiler.units
 compiler.cfg.utilities compiler.cfg compiler.cfg.rpo
-compiler.cfg.instructions compiler.cfg.instructions.syntax
-compiler.cfg.def-use ;
+compiler.cfg.instructions compiler.cfg.def-use ;
+FROM: compiler.cfg.instructions.syntax => insn-def-slot insn-use-slots insn-temp-slots scalar-rep ;
 IN: compiler.cfg.representations.preferred
 
 GENERIC: defs-vreg-rep ( insn -- rep/f )

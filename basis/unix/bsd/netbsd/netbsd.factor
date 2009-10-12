@@ -1,5 +1,5 @@
 USING: alien.syntax alien.c-types math vocabs.loader
-classes.struct ;
+classes.struct unix.types ;
 IN: unix
 
 CONSTANT: FD_SETSIZE 256

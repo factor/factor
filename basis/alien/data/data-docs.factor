@@ -1,6 +1,7 @@
-USING: alien alien.c-types help.syntax help.markup libc kernel.private
-byte-arrays math strings hashtables alien.syntax alien.strings sequences
-io.encodings.string debugger destructors vocabs.loader ;
+USING: alien alien.c-types help.syntax help.markup libc
+kernel.private byte-arrays math strings hashtables alien.syntax
+alien.strings sequences io.encodings.string debugger destructors
+vocabs.loader classes.struct ;
 IN: alien.data
 
 HELP: <c-array>
@@ -26,7 +27,7 @@ HELP: byte-array>memory
 { $warning "This word is unsafe. Improper use can corrupt memory." } ;
 
 HELP: malloc-array
-{ $values { "n" "a non-negative integer" } { "type" "a C type" } { "alien" alien } }
+{ $values { "n" "a non-negative integer" } { "type" "a C type" } { "array" "a specialized array" } }
 { $description "Allocates an unmanaged memory block large enough to hold " { $snippet "n" } " values of a C type, then wraps the memory in a sequence object using " { $link <c-direct-array> } "." }
 { $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. The vocabulary can be loaded with the " { $link require-c-array } " word. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
@@ -52,60 +53,70 @@ ARTICLE: "malloc" "Manual memory management"
 "Sometimes data passed to C functions must be allocated at a fixed address. See " { $link "byte-arrays-gc" } " for an explanation of when this is the case."
 $nl
 "Allocating a C datum with a fixed address:"
-{ $subsection malloc-object }
-{ $subsection malloc-array }
-{ $subsection malloc-byte-array }
-"There is a set of words in the " { $vocab-link "libc" } " vocabulary which directly call C standard library memory management functions:"
-{ $subsection malloc }
-{ $subsection calloc }
-{ $subsection realloc }
+{ $subsections
+    malloc-object
+    malloc-byte-array
+}
+"The " { $vocab-link "libc" } " vocabulary defines several words which directly call C standard library memory management functions:"
+{ $subsections
+    malloc
+    calloc
+    realloc
+}
 "You must always free pointers returned by any of the above words when the block of memory is no longer in use:"
-{ $subsection free }
+{ $subsections free }
 "Utilities for automatically freeing memory in conjunction with " { $link with-destructors } ":"
-{ $subsection &free }
-{ $subsection |free }
+{ $subsections
+    &free
+    |free
+}
 "The " { $link &free } " and " { $link |free } " words are generated using " { $link "alien.destructors" } "."
 $nl
 "You can unsafely copy a range of bytes from one memory location to another:"
-{ $subsection memcpy }
+{ $subsections memcpy }
 "You can copy a range of bytes from memory into a byte array:"
-{ $subsection memory>byte-array }
+{ $subsections memory>byte-array }
 "You can copy a byte array to memory unsafely:"
-{ $subsection byte-array>memory } ;
+{ $subsections byte-array>memory } ;
 
-
-ARTICLE: "c-byte-arrays" "Passing data in byte arrays"
-"Instances of the " { $link byte-array } " class can be passed to C functions; the C function receives a pointer to the first element of the array."
-$nl
-"Byte arrays can be allocated directly with a byte count using the " { $link <byte-array> } " word. However in most cases, instead of computing a size in bytes directly, it is easier to use a higher-level word which expects C type and outputs a byte array large enough to hold that type:"
-{ $subsection <c-object> }
-{ $subsection <c-array> }
+ARTICLE: "c-pointers" "Passing pointers to C functions"
+"The following Factor objects may be passed to C function parameters with pointer types:"
+{ $list
+    { "Instances of " { $link alien } "." }
+    { "Instances of " { $link f } "; this is interpreted as a null pointer." }
+    { "Instances of " { $link byte-array } "; the C function receives a pointer to the first element of the array." }
+    { "Any data type which defines a method on " { $link >c-ptr } " that returns an instance of one of the above. This includes " { $link "classes.struct" } " and " { $link "specialized-arrays" } "." } 
+}
+"The class of primitive C pointer types:"
+{ $subsections c-ptr }
+"A generic word for converting any object to a C pointer; user-defined types may add methods to this generic word:"
+{ $subsections >c-ptr }
+"More about the " { $link alien } " type:"
+{ $subsections "aliens" }
 { $warning
-"The Factor garbage collector can move byte arrays around, and code passing byte arrays to C must obey important guidelines. See " { $link "byte-arrays-gc" } "." }
-{ $see-also "c-arrays" } ;
+"The Factor garbage collector can move byte arrays around, and code passing byte arrays, or objects backed by byte arrays, must obey important guidelines. See " { $link "byte-arrays-gc" } "." } ;
 
 ARTICLE: "c-data" "Passing data between Factor and C"
 "Two defining characteristics of Factor are dynamic typing and automatic memory management, which are somewhat incompatible with the machine-level data model exposed by C. Factor's C library interface defines its own set of C data types, distinct from Factor language types, together with automatic conversion between Factor values and C types. For example, C integer types must be declared and are fixed-width, whereas Factor supports arbitrary-precision integers."
 $nl
 "Furthermore, Factor's garbage collector can move objects in memory; for a discussion of the consequences, see " { $link "byte-arrays-gc" } "."
-{ $subsection "c-types-specs" }
-{ $subsection "c-byte-arrays" }
-{ $subsection "malloc" }
-{ $subsection "c-strings" }
-{ $subsection "c-arrays" }
-{ $subsection "c-out-params" }
+{ $subsections
+    "c-types-specs"
+    "c-pointers"
+    "malloc"
+    "c-strings"
+    "c-out-params"
+}
 "Important guidelines for passing data in byte arrays:"
-{ $subsection "byte-arrays-gc" }
+{ $subsections "byte-arrays-gc" }
 "C-style enumerated types are supported:"
-{ $subsection POSTPONE: C-ENUM: }
+{ $subsections POSTPONE: C-ENUM: }
 "C types can be aliased for convenience and consitency with native library documentation:"
-{ $subsection POSTPONE: TYPEDEF: }
-"New C types can be defined:"
-{ $subsection "c-structs" }
-{ $subsection "c-unions" }
+{ $subsections POSTPONE: TYPEDEF: }
 "A utility for defining " { $link "destructors" } " for deallocating memory:"
-{ $subsection "alien.destructors" }
-{ $see-also "aliens" } ;
+{ $subsections "alien.destructors" }
+"C struct and union types can be defined with " { $link POSTPONE: STRUCT: } " and " { $link POSTPONE: UNION: } ". See " { $link "classes.struct" } " for details. For passing arrays to and from C, use the " { $link "specialized-arrays" } " vocabulary." ;
+
 HELP: malloc-string
 { $values { "string" string } { "encoding" "an encoding descriptor" } { "alien" c-ptr } }
 { $description "Encodes a string together with a trailing null code point using the given encoding, and stores the resulting bytes in a freshly-allocated unmanaged memory block." }
@@ -138,11 +149,13 @@ $nl
 "Care must be taken if the C function expects a " { $link char* } " with a length in bytes, rather than a null-terminated " { $link char* } "; passing the result of calling " { $link length } " on the string object will not suffice. This is because a Factor string of " { $emphasis "n" } " characters will not necessarily encode to " { $emphasis "n" } " bytes. The correct idiom for C functions which take a string with a length is to first encode the string using " { $link encode } ", and then pass the resulting byte array together with the length of this byte array."
 $nl
 "Sometimes a C function has a parameter type of " { $link void* } ", and various data types, among them strings, can be passed in. In this case, strings are not automatically converted to aliens, and instead you must call one of these words:"
-{ $subsection string>alien }
-{ $subsection malloc-string }
+{ $subsections
+    string>alien
+    malloc-string
+}
 "The first allocates " { $link byte-array } "s, and the latter allocates manually-managed memory which is not moved by the garbage collector and has to be explicitly freed by calling " { $link free } ". See " { $link "byte-arrays-gc" } " for a discussion of the two approaches."
 $nl
 "A word to read strings from arbitrary addresses:"
-{ $subsection alien>string }
+{ $subsections alien>string }
 "For example, if a C function returns a " { $link char* } " but stipulates that the caller must deallocate the memory afterward, you must define the function as returning " { $link void* } ", and call one of the above words before passing the pointer to " { $link free } "." ;
 

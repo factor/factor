@@ -1,6 +1,6 @@
 IN: specialized-vectors.tests
 USING: specialized-arrays specialized-vectors
-tools.test kernel sequences ;
+tools.test kernel sequences alien.c-types ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-VECTOR: float
 SPECIALIZED-VECTOR: double

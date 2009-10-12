@@ -6,20 +6,24 @@ ARTICLE: "byte-arrays" "Byte arrays"
 $nl
 "Byte array words are in the " { $vocab-link "byte-arrays" } " vocabulary."
 $nl
-"Byte arrays play a special role in the C library interface; they can be used to pass binary data back and forth between Factor and C. See " { $link "c-byte-arrays" } "."
+"Byte arrays play a special role in the C library interface; they can be used to pass binary data back and forth between Factor and C. See " { $link "c-pointers" } "."
 $nl
 "Byte arrays form a class of objects."
-{ $subsection byte-array }
-{ $subsection byte-array? }
+{ $subsections
+    byte-array
+    byte-array?
+}
 "There are several ways to construct byte arrays."
-{ $subsection >byte-array }
-{ $subsection <byte-array> }
-{ $subsection 1byte-array }
-{ $subsection 2byte-array }
-{ $subsection 3byte-array }
-{ $subsection 4byte-array }
+{ $subsections
+    >byte-array
+    <byte-array>
+    1byte-array
+    2byte-array
+    3byte-array
+    4byte-array
+}
 "Resizing byte-arrays:"
-{ $subsection resize-byte-array } ;
+{ $subsections resize-byte-array } ;
 
 ABOUT: "byte-arrays"
 

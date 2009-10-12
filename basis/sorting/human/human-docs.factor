@@ -28,9 +28,11 @@ HELP: human>=<
 ARTICLE: "sorting.human" "Human-friendly sorting"
 "The " { $vocab-link "sorting.human" } " vocabulary sorts by numbers as a human would -- by comparing their magnitudes -- rather than in a lexicographic way. For example, sorting a1, a10, a03, a2 with human sort returns a1, a2, a03, a10, while sorting with natural sort returns a03, a1, a10, a2." $nl
 "Comparing two objects:"
-{ $subsection human<=> }
-{ $subsection human>=< }
+{ $subsections
+    human<=>
+    human>=<
+}
 "Splitting a string into substrings and integers:"
-{ $subsection find-numbers } ;
+{ $subsections find-numbers } ;
 
 ABOUT: "sorting.human"

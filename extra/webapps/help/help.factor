@@ -38,6 +38,7 @@ M: result link-href href>> ;
     help-webapp new-dispatcher
         <main-action> "" add-responder
         over <search-action> "search" add-responder
-        swap <static> "content" add-responder ;
+        swap <static> "content" add-responder
+        "resource:basis/definitions/icons/" <static> "icons" add-responder ;
 
 

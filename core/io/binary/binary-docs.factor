@@ -17,15 +17,21 @@ $nl
     { "Value:" { $snippet "ca" } { $snippet "fe" } { $snippet "ba" } { $snippet "be" } }
 }
 "Two words convert a sequence of bytes into an integer:"
-{ $subsection be> }
-{ $subsection le> }
+{ $subsections
+    be>
+    le>
+}
 "Two words convert an integer into a sequence of bytes:"
-{ $subsection >be }
-{ $subsection >le }
+{ $subsections
+    >be
+    >le
+}
 "Words for taking larger integers apart into smaller integers:"
-{ $subsection d>w/w }
-{ $subsection w>h/h }
-{ $subsection h>b/b } ;
+{ $subsections
+    d>w/w
+    w>h/h
+    h>b/b
+} ;
 
 ABOUT: "stream-binary"
 

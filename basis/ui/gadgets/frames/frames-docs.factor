@@ -8,9 +8,9 @@ $nl
 "The filled cell's column/row pair is stored in the frame gadget's " { $slot "filled-cell" } " slot. If the actual dimensions of a frame exceed it preferred dimensions, then the fill slot is resized appropriately, together with its row and column."
 $nl
 "Because frames inherit from grids, grid layout words can be used to add and remove children."
-{ $subsection frame }
+{ $subsections frame }
 "Creating empty frames:"
-{ $subsection <frame> } ;
+{ $subsections <frame> } ;
 
 HELP: frame
 { $class-description "A frame is a gadget which lays out its children in a grid, and assigns all remaining space to a distinguished filled cell. The " { $slot "filled-cell" } " slot stores a pair with shape " { $snippet "{ col row }" } "."

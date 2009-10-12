@@ -27,18 +27,20 @@ SYMBOL: viewport-translation
     [ clip set ] bi
     do-clip ;
 
-: init-gl ( clip-rect -- )
+SLOT: background-color
+
+: init-gl ( world -- )
     GL_SMOOTH glShadeModel
     GL_SCISSOR_TEST glEnable
     GL_BLEND glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
     GL_VERTEX_ARRAY glEnableClientState
     init-matrices
-    init-clip
-    ! white gl-clear is broken w.r.t window resizing
-    ! Linux/PPC Radeon 9200
-    COLOR: white gl-color
-    { 0 0 } clip get dim>> gl-fill-rect ;
+    [ init-clip ]
+    [
+        background-color>> >rgba-components glClearColor
+        GL_COLOR_BUFFER_BIT glClear
+    ] bi ;
 
 GENERIC: draw-gadget* ( gadget -- )
 

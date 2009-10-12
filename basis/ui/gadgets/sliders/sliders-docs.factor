@@ -35,12 +35,16 @@ HELP: <slider>
 
 ARTICLE: "ui.gadgets.sliders" "Slider gadgets"
 "The " { $vocab-link "ui.gadgets.sliders" } " vocabulary implements slider gadgets. A slider allows the user to graphically manipulate a value by moving a thumb back and forth."
-{ $subsection slider }
-{ $subsection <slider> }
+{ $subsections
+    slider
+    <slider>
+}
 "Changing slider values:"
-{ $subsection slide-by }
-{ $subsection slide-by-line }
-{ $subsection slide-by-page }
+{ $subsections
+    slide-by
+    slide-by-line
+    slide-by-page
+}
 "Since sliders are controls the value can be get and set by via the " { $snippet "model" } " slot. " ;
 
 ABOUT: "ui.gadgets.sliders"

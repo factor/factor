@@ -43,15 +43,19 @@ ARTICLE: "furnace.sessions" "Furnace sessions"
 "The " { $vocab-link "furnace.sessions" } " vocabulary implements session management, which allows state to be maintained between HTTP requests. The session state is stored on the server; the client receives an opaque ID which is saved in a cookie (for GET requests) or a hidden form field (for POST requests)."
 $nl
 "To use session management, wrap your responder in an session manager:"
-{ $subsection <sessions> }
+{ $subsections <sessions> }
 "The sessions responder must be wrapped inside a database persistence responder (" { $link <db-persistence> } "). The " { $vocab-link "furnace.alloy" } " vocabulary combines all of these responders into one."
 $nl
 "Reading and writing session variables from a request:"
-{ $subsection sget }
-{ $subsection sset }
-{ $subsection schange }
+{ $subsections
+    sget
+    sset
+    schange
+}
 "Additional topics:"
-{ $subsection "furnace.sessions.config" }
-{ $subsection "furnace.sessions.serialize" } ;
+{ $subsections
+    "furnace.sessions.config"
+    "furnace.sessions.serialize"
+} ;
 
 ABOUT: "furnace.sessions"

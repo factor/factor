@@ -67,24 +67,30 @@ HELP: set-editor-string
 
 ARTICLE: "gadgets-editors-selection" "The caret and mark"
 "If there is no selection, the caret and the mark are at the same location; otherwise the mark delimits the end-point of the selection opposite the caret."
-{ $subsection editor-caret }
-{ $subsection editor-mark }
-{ $subsection change-caret }
-{ $subsection change-caret&mark }
-{ $subsection mark>caret }
+{ $subsections
+    editor-caret
+    editor-mark
+    change-caret
+    change-caret&mark
+    mark>caret
+}
 "Getting the selected text:"
-{ $subsection gadget-selection? }
-{ $subsection gadget-selection }
+{ $subsections
+    gadget-selection?
+    gadget-selection
+}
 "Removing selected text:"
-{ $subsection remove-selection }
+{ $subsections remove-selection }
 "Scrolling to the caret location:"
-{ $subsection scroll>caret }
+{ $subsections scroll>caret }
 "Use " { $link user-input* } " to change selected text." ;
 
 ARTICLE: "gadgets-editors-contents" "Getting and setting editor contents"
-{ $subsection editor-string }
-{ $subsection set-editor-string }
-{ $subsection clear-editor } ;
+{ $subsections
+    editor-string
+    set-editor-string
+    clear-editor
+} ;
 
 ARTICLE: "gadgets-editors-commands" "Editor gadget commands"
 { $command-map editor "editing" }
@@ -95,19 +101,23 @@ ARTICLE: "gadgets-editors-commands" "Editor gadget commands"
 
 ARTICLE: "ui.gadgets.editors" "Editor gadgets"
 "The " { $vocab-link "ui.gadgets.editors" } " vocabulary implements editor gadgets. An editor edits a passage of text. Editors display a " { $link document } ". Editors are built from and inherit all features of " { $link "ui.gadgets.line-support" } "."
-{ $subsection "gadgets-editors-commands" }
+{ $subsections "gadgets-editors-commands" }
 "Editors:"
-{ $subsection editor }
-{ $subsection <editor> }
-{ $subsection "gadgets-editors-contents" }
-{ $subsection "gadgets-editors-selection" }
+{ $subsections
+    editor
+    <editor>
+    "gadgets-editors-contents"
+    "gadgets-editors-selection"
+}
 "Multiline editors:"
-{ $subsection <multiline-editor> }
+{ $subsections <multiline-editor> }
 "Fields:"
-{ $subsection <model-field> }
-{ $subsection <action-field> }
+{ $subsections
+    <model-field>
+    <action-field>
+}
 "Editors edit " { $emphasis "documents" } ":"
-{ $subsection "documents" } ;
+{ $subsections "documents" } ;
 
 TIP: "Editor gadgets support undo and redo; press " { $command editor "editing" com-undo } " and " { $command editor "editing" com-redo } "." ;
 

@@ -11,7 +11,7 @@ $nl
 "Since value semantics differ from reference semantics, it is best to use tuple arrays with tuples where all slots are declared " { $link read-only } "."
 $nl
 "Tuple arrays should not be used with inheritance; storing an instance of a subclass in a tuple array will slice off the subclass slots, and getting the same value out again will yield an instance of the superclass. Also, tuple arrays do not get updated if tuples are redefined to add or remove slots, so caution should be exercised when doing interactive development on code that uses tuple arrays."
-{ $subsection POSTPONE: TUPLE-ARRAY: }
+{ $subsections POSTPONE: TUPLE-ARRAY: }
 "An example:"
 { $example
   "USE: tuple-arrays"

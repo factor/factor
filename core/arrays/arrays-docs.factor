@@ -4,8 +4,10 @@ IN: arrays
 
 ARTICLE: "arrays-unsafe" "Unsafe array operations"
 "These two words are used internally by the Factor implementation. User code should never need to call them; instead use " { $link nth } " and " { $link set-nth } "."
-{ $subsection array-nth }
-{ $subsection set-array-nth } ;
+{ $subsections
+    array-nth
+    set-array-nth
+} ;
 
 ARTICLE: "arrays" "Arrays"
 "The " { $vocab-link "arrays" } " vocabulary implements fixed-size mutable sequences which support the " { $link "sequence-protocol" } "."
@@ -15,20 +17,26 @@ $nl
 "Array literal syntax is documented in " { $link "syntax-arrays" } ". Resizable arrays also exist and are known as " { $link "vectors" } "."
 $nl
 "Arrays form a class of objects:"
-{ $subsection array }
-{ $subsection array? }
+{ $subsections
+    array
+    array?
+}
 "Creating new arrays:"
-{ $subsection >array }
-{ $subsection <array> }
+{ $subsections
+    >array
+    <array>
+}
 "Creating an array from several elements on the stack:"
-{ $subsection 1array }
-{ $subsection 2array }
-{ $subsection 3array }
-{ $subsection 4array }
+{ $subsections
+    1array
+    2array
+    3array
+    4array
+}
 "The class of two-element arrays:"
-{ $subsection pair }
+{ $subsections pair }
 "Arrays can be accessed without bounds checks in a pointer unsafe way."
-{ $subsection "arrays-unsafe" } ;
+{ $subsections "arrays-unsafe" } ;
 
 ABOUT: "arrays"
 

@@ -29,6 +29,7 @@ set-default-fp-env
 [ t ] +fp-overflow+ [ 1.0e250 1.0e100 ] [ * ] test-fp-exception-compiled unit-test
 [ t ] +fp-underflow+ [ 1.0e-250 1.0e-100 ] [ * ] test-fp-exception-compiled unit-test
 [ t ] +fp-overflow+ [ 2.0 100,000.0 ] [ fpow ] test-fp-exception-compiled unit-test
+[ t ] +fp-invalid-operation+ [ 2.0 0/0. 1.0e-9 ] [ ~ ] test-fp-exception-compiled unit-test
 
 ! No underflow on Linux with this test, just inexact. Reported as an Ubuntu bug:
 ! https://bugs.launchpad.net/ubuntu/+source/glibc/+bug/429113
@@ -109,72 +110,77 @@ os linux? cpu x86.64? and [
     -1.0 3.0 /f double>bits
 ] unit-test
 
-: test-traps ( traps inputs quot -- quot' )
-    append '[ _ _ with-fp-traps ] ;
+! FP traps cause a kernel panic on OpenBSD 4.5 i386
+os openbsd eq? cpu x86.32 eq? and [
 
-: test-traps-compiled ( traps inputs quot -- quot' )
-    swapd '[ @ [ _ _ with-fp-traps ] compile-call ] ;
+    : test-traps ( traps inputs quot -- quot' )
+        append '[ _ _ with-fp-traps ] ;
 
-{ +fp-zero-divide+ } [ 1.0 0.0 ] [ /f ] test-traps must-fail
-{ +fp-inexact+ } [ 1.0 3.0 ] [ /f ] test-traps must-fail
-{ +fp-invalid-operation+ } [ -1.0 ] [ fsqrt ] test-traps must-fail
-{ +fp-overflow+ } [ 2.0 ] [ 100,000.0 ^ ] test-traps must-fail
-{ +fp-underflow+ +fp-inexact+ } [ 2.0 ] [ -100,000.0 ^ ] test-traps must-fail
+    : test-traps-compiled ( traps inputs quot -- quot' )
+        swapd '[ @ [ _ _ with-fp-traps ] compile-call ] ;
 
-{ +fp-zero-divide+ } [ 1.0 0.0 ] [ /f ] test-traps-compiled must-fail
-{ +fp-inexact+ } [ 1.0 3.0 ] [ /f ] test-traps-compiled must-fail
-{ +fp-invalid-operation+ } [ -1.0 ] [ fsqrt ] test-traps-compiled must-fail
-{ +fp-overflow+ } [ 2.0 ] [ 100,000.0 ^ ] test-traps-compiled must-fail
-{ +fp-underflow+ +fp-inexact+ } [ 2.0 ] [ -100,000.0 ^ ] test-traps-compiled must-fail
+    { +fp-zero-divide+ } [ 1.0 0.0 ] [ /f ] test-traps must-fail
+    { +fp-inexact+ } [ 1.0 3.0 ] [ /f ] test-traps must-fail
+    { +fp-invalid-operation+ } [ -1.0 ] [ fsqrt ] test-traps must-fail
+    { +fp-overflow+ } [ 2.0 ] [ 100,000.0 ^ ] test-traps must-fail
+    { +fp-underflow+ +fp-inexact+ } [ 2.0 ] [ -100,000.0 ^ ] test-traps must-fail
 
-! Ensure ordered comparisons raise traps
-:: test-comparison-quot ( word -- quot )
-    [
-        { float float } declare
-        { +fp-invalid-operation+ } [ word execute ] with-fp-traps
-    ] ;
+    { +fp-zero-divide+ } [ 1.0 0.0 ] [ /f ] test-traps-compiled must-fail
+    { +fp-inexact+ } [ 1.0 3.0 ] [ /f ] test-traps-compiled must-fail
+    { +fp-invalid-operation+ } [ -1.0 ] [ fsqrt ] test-traps-compiled must-fail
+    { +fp-overflow+ } [ 2.0 ] [ 100,000.0 ^ ] test-traps-compiled must-fail
+    { +fp-underflow+ +fp-inexact+ } [ 2.0 ] [ -100,000.0 ^ ] test-traps-compiled must-fail
 
-: test-comparison ( inputs word -- quot )
-    test-comparison-quot append ;
+    ! Ensure ordered comparisons raise traps
+    :: test-comparison-quot ( word -- quot )
+        [
+            { float float } declare
+            { +fp-invalid-operation+ } [ word execute ] with-fp-traps
+        ] ;
 
-: test-comparison-compiled ( inputs word -- quot )
-    test-comparison-quot '[ @ _ compile-call ] ;
+    : test-comparison ( inputs word -- quot )
+        test-comparison-quot append ;
 
-\ float< "intrinsic" word-prop [
-    [ 0/0. -15.0 ] \ < test-comparison must-fail
-    [ 0/0. -15.0 ] \ < test-comparison-compiled must-fail
-    [ -15.0 0/0. ] \ < test-comparison must-fail
-    [ -15.0 0/0. ] \ < test-comparison-compiled must-fail
-    [ 0/0. -15.0 ] \ <= test-comparison must-fail
-    [ 0/0. -15.0 ] \ <= test-comparison-compiled must-fail
-    [ -15.0 0/0. ] \ <= test-comparison must-fail
-    [ -15.0 0/0. ] \ <= test-comparison-compiled must-fail
-    [ 0/0. -15.0 ] \ > test-comparison must-fail
-    [ 0/0. -15.0 ] \ > test-comparison-compiled must-fail
-    [ -15.0 0/0. ] \ > test-comparison must-fail
-    [ -15.0 0/0. ] \ > test-comparison-compiled must-fail
-    [ 0/0. -15.0 ] \ >= test-comparison must-fail
-    [ 0/0. -15.0 ] \ >= test-comparison-compiled must-fail
-    [ -15.0 0/0. ] \ >= test-comparison must-fail
-    [ -15.0 0/0. ] \ >= test-comparison-compiled must-fail
+    : test-comparison-compiled ( inputs word -- quot )
+        test-comparison-quot '[ @ _ compile-call ] ;
 
-    [ f ] [ 0/0. -15.0 ] \ u< test-comparison unit-test
-    [ f ] [ 0/0. -15.0 ] \ u< test-comparison-compiled unit-test
-    [ f ] [ -15.0 0/0. ] \ u< test-comparison unit-test
-    [ f ] [ -15.0 0/0. ] \ u< test-comparison-compiled unit-test
-    [ f ] [ 0/0. -15.0 ] \ u<= test-comparison unit-test
-    [ f ] [ 0/0. -15.0 ] \ u<= test-comparison-compiled unit-test
-    [ f ] [ -15.0 0/0. ] \ u<= test-comparison unit-test
-    [ f ] [ -15.0 0/0. ] \ u<= test-comparison-compiled unit-test
-    [ f ] [ 0/0. -15.0 ] \ u> test-comparison unit-test
-    [ f ] [ 0/0. -15.0 ] \ u> test-comparison-compiled unit-test
-    [ f ] [ -15.0 0/0. ] \ u> test-comparison unit-test
-    [ f ] [ -15.0 0/0. ] \ u> test-comparison-compiled unit-test
-    [ f ] [ 0/0. -15.0 ] \ u>= test-comparison unit-test
-    [ f ] [ 0/0. -15.0 ] \ u>= test-comparison-compiled unit-test
-    [ f ] [ -15.0 0/0. ] \ u>= test-comparison unit-test
-    [ f ] [ -15.0 0/0. ] \ u>= test-comparison-compiled unit-test
-] when
+    \ float< "intrinsic" word-prop [
+        [ 0/0. -15.0 ] \ < test-comparison must-fail
+        [ 0/0. -15.0 ] \ < test-comparison-compiled must-fail
+        [ -15.0 0/0. ] \ < test-comparison must-fail
+        [ -15.0 0/0. ] \ < test-comparison-compiled must-fail
+        [ 0/0. -15.0 ] \ <= test-comparison must-fail
+        [ 0/0. -15.0 ] \ <= test-comparison-compiled must-fail
+        [ -15.0 0/0. ] \ <= test-comparison must-fail
+        [ -15.0 0/0. ] \ <= test-comparison-compiled must-fail
+        [ 0/0. -15.0 ] \ > test-comparison must-fail
+        [ 0/0. -15.0 ] \ > test-comparison-compiled must-fail
+        [ -15.0 0/0. ] \ > test-comparison must-fail
+        [ -15.0 0/0. ] \ > test-comparison-compiled must-fail
+        [ 0/0. -15.0 ] \ >= test-comparison must-fail
+        [ 0/0. -15.0 ] \ >= test-comparison-compiled must-fail
+        [ -15.0 0/0. ] \ >= test-comparison must-fail
+        [ -15.0 0/0. ] \ >= test-comparison-compiled must-fail
+
+        [ f ] [ 0/0. -15.0 ] \ u< test-comparison unit-test
+        [ f ] [ 0/0. -15.0 ] \ u< test-comparison-compiled unit-test
+        [ f ] [ -15.0 0/0. ] \ u< test-comparison unit-test
+        [ f ] [ -15.0 0/0. ] \ u< test-comparison-compiled unit-test
+        [ f ] [ 0/0. -15.0 ] \ u<= test-comparison unit-test
+        [ f ] [ 0/0. -15.0 ] \ u<= test-comparison-compiled unit-test
+        [ f ] [ -15.0 0/0. ] \ u<= test-comparison unit-test
+        [ f ] [ -15.0 0/0. ] \ u<= test-comparison-compiled unit-test
+        [ f ] [ 0/0. -15.0 ] \ u> test-comparison unit-test
+        [ f ] [ 0/0. -15.0 ] \ u> test-comparison-compiled unit-test
+        [ f ] [ -15.0 0/0. ] \ u> test-comparison unit-test
+        [ f ] [ -15.0 0/0. ] \ u> test-comparison-compiled unit-test
+        [ f ] [ 0/0. -15.0 ] \ u>= test-comparison unit-test
+        [ f ] [ 0/0. -15.0 ] \ u>= test-comparison-compiled unit-test
+        [ f ] [ -15.0 0/0. ] \ u>= test-comparison unit-test
+        [ f ] [ -15.0 0/0. ] \ u>= test-comparison-compiled unit-test
+    ] when
+
+] unless
 
 ! Ensure traps get cleared
 [ 1/0. ] [ 1.0 0.0 /f ] unit-test

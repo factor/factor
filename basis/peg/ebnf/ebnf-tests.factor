@@ -521,10 +521,10 @@ Tok                = Spaces (Number | Special )
 
 [ "USE: peg.ebnf [EBNF EBNF]" eval( -- ) ] must-fail
 
-[ <" USE: peg.ebnf [EBNF
+[ """USE: peg.ebnf [EBNF
     lol = a
     lol = b
-  EBNF] "> eval( -- )
+  EBNF]""" eval( -- )
 ] [
     error>> [ redefined-rule? ] [ name>> "lol" = ] bi and
 ] must-fail-with

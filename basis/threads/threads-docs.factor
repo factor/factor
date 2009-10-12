@@ -5,47 +5,57 @@ IN: threads
 
 ARTICLE: "threads-start/stop" "Starting and stopping threads"
 "Spawning new threads:"
-{ $subsection spawn }
-{ $subsection spawn-server }
+{ $subsections
+    spawn
+    spawn-server
+}
 "Creating and spawning a thread can be factored out into two separate steps:"
-{ $subsection <thread> }
-{ $subsection (spawn) }
+{ $subsections
+    <thread>
+    (spawn)
+}
 "Threads stop either when the quotation given to " { $link spawn } " returns, or when the following word is called:"
-{ $subsection stop }
+{ $subsections stop }
 "If the image is saved and started again, all runnable threads are stopped. Vocabularies wishing to have a background thread always running should use " { $link add-init-hook } "." ;
 
 ARTICLE: "threads-yield" "Yielding and suspending threads"
 "Yielding to other threads:"
-{ $subsection yield }
+{ $subsections yield }
 "Sleeping for a period of time:"
-{ $subsection sleep }
+{ $subsections sleep }
 "Interrupting sleep:"
-{ $subsection interrupt }
+{ $subsections interrupt }
 "Threads can be suspended and woken up at some point in the future when a condition is satisfied:"
-{ $subsection suspend }
-{ $subsection resume }
-{ $subsection resume-with } ;
+{ $subsections
+    suspend
+    resume
+    resume-with
+} ;
 
 ARTICLE: "thread-state" "Thread-local state and variables"
 "Threads form a class of objects:"
-{ $subsection thread }
+{ $subsections thread }
 "The current thread:"
-{ $subsection self }
+{ $subsections self }
 "Thread-local variables:"
-{ $subsection tnamespace }
-{ $subsection tget }
-{ $subsection tset }
-{ $subsection tchange }
+{ $subsections
+    tnamespace
+    tget
+    tset
+    tchange
+}
 "Each thread has its own independent set of thread-local variables and newly-spawned threads begin with an empty set."
 $nl
 "Global hashtable of all threads, keyed by " { $snippet "id" } ":"
-{ $subsection threads }
+{ $subsections threads }
 "Threads have an identity independent of continuations. If a continuation is refied in one thread and then resumed in another thread, the code running in that continuation will observe a change in the value output by " { $link self } "." ;
 
 ARTICLE: "thread-impl" "Thread implementation"
 "Thread implementation:"
-{ $subsection run-queue }
-{ $subsection sleep-queue } ;
+{ $subsections
+    run-queue
+    sleep-queue
+} ;
 
 ARTICLE: "threads" "Lightweight co-operative threads"
 "Factor supports lightweight co-operative threads implemented on top of " { $link "continuations" } ". A thread will yield while waiting for input/output operations to complete, or when a yield has been explicitly requested."
@@ -53,10 +63,12 @@ $nl
 "Factor threads are very lightweight. Each thread can take as little as 900 bytes of memory. This library has been tested running hundreds of thousands of simple threads."
 $nl
 "Words for working with threads are in the " { $vocab-link "threads" } " vocabulary."
-{ $subsection "threads-start/stop" }
-{ $subsection "threads-yield" }
-{ $subsection "thread-state" }
-{ $subsection "thread-impl" } ;
+{ $subsections
+    "threads-start/stop"
+    "threads-yield"
+    "thread-state"
+    "thread-impl"
+} ;
 
 ABOUT: "threads"
 

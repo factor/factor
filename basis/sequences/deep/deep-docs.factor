@@ -37,13 +37,15 @@ HELP: deep-change-each
 
 ARTICLE: "sequences.deep" "Deep sequence combinators"
 "The combinators in the " { $vocab-link "sequences.deep" } " vocabulary are variants of standard sequence combinators which traverse nested subsequences."
-{ $subsection deep-each }
-{ $subsection deep-map }
-{ $subsection deep-filter }
-{ $subsection deep-find }
-{ $subsection deep-any? }
-{ $subsection deep-change-each }
+{ $subsections
+    deep-each
+    deep-map
+    deep-filter
+    deep-find
+    deep-any?
+    deep-change-each
+}
 "A utility word to collapse nested subsequences:"
-{ $subsection flatten } ;
+{ $subsections flatten } ;
 
 ABOUT: "sequences.deep"

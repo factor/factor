@@ -1,4 +1,4 @@
-USING: game-input game-input.scancodes
+USING: game.input game.input.scancodes
 kernel ui.gadgets ui.gadgets.buttons sequences accessors
 words arrays assocs math calendar fry alarms ui
 ui.gadgets.borders ui.gestures ;

@@ -34,11 +34,15 @@ IN: compiler.cfg.linear-scan.allocation
         [ drop assign-blocked-register ]
     } cond ;
 
+: spill-at-sync-point ( live-interval n -- ? )
+    ! If the live interval has a usage at 'n', don't spill it,
+    ! since this means its being defined by the sync point
+    ! instruction. Output t if this is the case.
+    2dup [ uses>> ] dip swap member? [ 2drop t ] [ spill f ] if ;
+
 : handle-sync-point ( n -- )
     [ active-intervals get values ] dip
-    [ '[ [ _ spill ] each ] each ]
-    [ drop [ delete-all ] each ]
-    2bi ;
+    '[ [ _ spill-at-sync-point ] filter-here ] each ;
 
 :: handle-progress ( n sync? -- )
     n {

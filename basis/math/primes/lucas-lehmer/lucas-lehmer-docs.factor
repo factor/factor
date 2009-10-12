@@ -20,6 +20,6 @@ HELP: lucas-lehmer
 ARTICLE: "math.primes.lucas-lehmer" "Lucas-Lehmer Mersenne Primality test"
 "The " { $vocab-link "math.primes.lucas-lehmer" } " vocabulary tests numbers of the form " { $snippet "(2 ^ p) - 1" } " for primality, where " { $snippet "p" } " is prime." $nl
 "Run the Lucas-Lehmer test:"
-{ $subsection lucas-lehmer } ;
+{ $subsections lucas-lehmer } ;
 
 ABOUT: "math.primes.lucas-lehmer"

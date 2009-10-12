@@ -105,6 +105,8 @@ CONSTANT: SD_BOTH 2
 
 CONSTANT: SOL_SOCKET HEX: ffff
 
+C-TYPE: sockaddr
+
 STRUCT: sockaddr-in
     { family short }
     { port ushort }
@@ -139,13 +141,15 @@ STRUCT: timeval
     { sec long }
     { usec long } ;
 
+TYPEDEF: void* fd_set*
+
 LIBRARY: winsock
 
 FUNCTION: int setsockopt ( SOCKET s, int level, int optname, char* optval, int optlen ) ;
 
 FUNCTION: ushort htons ( ushort n ) ;
 FUNCTION: ushort ntohs ( ushort n ) ;
-FUNCTION: int bind ( void* socket, sockaddr_in* sockaddr, int len ) ;
+FUNCTION: int bind ( void* socket, sockaddr-in* sockaddr, int len ) ;
 FUNCTION: int listen ( void* socket, int backlog ) ;
 FUNCTION: char* inet_ntoa ( int in-addr ) ;
 FUNCTION: int getaddrinfo ( char* nodename,
@@ -158,15 +162,15 @@ FUNCTION: void freeaddrinfo ( addrinfo* ai ) ;
 
 FUNCTION: hostent* gethostbyname ( char* name ) ;
 FUNCTION: int gethostname ( char* name, int len ) ;
-FUNCTION: int connect ( void* socket, sockaddr_in* sockaddr, int addrlen ) ;
+FUNCTION: int connect ( void* socket, sockaddr-in* sockaddr, int addrlen ) ;
 FUNCTION: int select ( int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, timeval* timeout ) ;
 FUNCTION: int closesocket ( SOCKET s ) ;
 FUNCTION: int shutdown ( SOCKET s, int how ) ;
 FUNCTION: int send ( SOCKET s, char* buf, int len, int flags ) ;
 FUNCTION: int recv ( SOCKET s, char* buf, int len, int flags ) ;
 
-FUNCTION: int getsockname ( SOCKET s, sockaddr_in* address, int* addrlen ) ;
-FUNCTION: int getpeername ( SOCKET s, sockaddr_in* address, int* addrlen ) ;
+FUNCTION: int getsockname ( SOCKET s, sockaddr-in* address, int* addrlen ) ;
+FUNCTION: int getpeername ( SOCKET s, sockaddr-in* address, int* addrlen ) ;
 
 TYPEDEF: uint SERVICETYPE
 TYPEDEF: OVERLAPPED WSAOVERLAPPED

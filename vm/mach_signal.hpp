@@ -38,7 +38,6 @@ Modified for Factor by Slava Pestov */
    exception thread directly.  */
 extern "C" boolean_t exc_server (mach_msg_header_t *request_msg, mach_msg_header_t *reply_msg);
 
-
 /* http://web.mit.edu/darwin/src/modules/xnu/osfmk/man/catch_exception_raise.html
    These functions are defined in this file, and called by exc_server.
    FIXME: What needs to be done when this code is put into a shared library? */

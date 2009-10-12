@@ -18,20 +18,21 @@ ARTICLE: "regexp.combinators.intro" "Regular expression combinator rationale"
 
 ARTICLE: "regexp.combinators" "Regular expression combinators"
 "The " { $vocab-link "regexp.combinators" } " vocabulary defines combinators which can be used to build up regular expressions to match strings. This complements the traditional syntax defined in the " { $vocab-link "regexp" } " vocabulary."
-{ $subsection "regexp.combinators.intro" }
+{ $subsections "regexp.combinators.intro" }
 "Basic combinators:"
-{ $subsection <literal> }
-{ $subsection <nothing> }
+{ $subsections <literal> <nothing> }
 "Higher-order combinators for building new regular expressions from existing ones:"
-{ $subsection <or> }
-{ $subsection <and> }
-{ $subsection <not> }
-{ $subsection <sequence> }
-{ $subsection <zero-or-more> }
+{ $subsections
+    <or>
+    <and>
+    <not>
+    <sequence>
+    <zero-or-more>
+}
 "Derived combinators implemented in terms of the above:"
-{ $subsection <one-or-more> }
+{ $subsections <one-or-more> }
 "Setting options:"
-{ $subsection <option> } ;
+{ $subsections <option> } ;
 
 HELP: <literal>
 { $values { "string" string } { "regexp" regexp } }

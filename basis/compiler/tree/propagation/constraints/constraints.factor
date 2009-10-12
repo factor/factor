@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs math math.intervals kernel accessors
 sequences namespaces classes classes.algebra
-combinators words
+combinators words combinators.short-circuit
 compiler.tree
 compiler.tree.propagation.info
 compiler.tree.propagation.copy ;
@@ -28,15 +28,19 @@ M: object satisfied? drop f ;
 ! Boolean constraints
 TUPLE: true-constraint value ;
 
-: =t ( value -- constriant ) resolve-copy true-constraint boa ;
+: =t ( value -- constraint ) resolve-copy true-constraint boa ;
+
+: follow-implications ( constraint -- )
+    constraints get assoc-stack [ assume ] when* ;
 
 M: true-constraint assume*
     [ \ f class-not <class-info> swap value>> refine-value-info ]
-    [ constraints get assoc-stack [ assume ] when* ]
+    [ follow-implications ]
     bi ;
 
 M: true-constraint satisfied?
-    value>> value-info class>> true-class? ;
+    value>> value-info class>>
+    { [ true-class? ] [ null-class? not ] } 1&& ;
 
 TUPLE: false-constraint value ;
 
@@ -44,11 +48,12 @@ TUPLE: false-constraint value ;
 
 M: false-constraint assume*
     [ \ f <class-info> swap value>> refine-value-info ]
-    [ constraints get assoc-stack [ assume ] when* ]
+    [ follow-implications ]
     bi ;
 
 M: false-constraint satisfied?
-    value>> value-info class>> false-class? ;
+    value>> value-info class>>
+    { [ false-class? ] [ null-class? not ] } 1&& ;
 
 ! Class constraints
 TUPLE: class-constraint value class ;
@@ -82,7 +87,7 @@ TUPLE: implication p q ;
 
 C: --> implication
 
-: assume-implication ( p q -- )
+: assume-implication ( q p -- )
     [ constraints get [ assoc-stack swap suffix ] 2keep last set-at ]
     [ satisfied? [ assume ] [ drop ] if ] 2bi ;
 

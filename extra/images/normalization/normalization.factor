@@ -1,30 +1,48 @@
-! Copyright (C) 2009 Doug Coleman
+! Copyright (C) 2009 Doug Coleman, Keith Lazuka
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors grouping sequences combinators math
-byte-arrays fry images half-floats specialized-arrays ;
-SPECIALIZED-ARRAY: uint
-SPECIALIZED-ARRAY: ushort
-SPECIALIZED-ARRAY: float
+USING: accessors alien.c-types byte-arrays combinators fry
+grouping images kernel locals math math.vectors
+sequences specialized-arrays half-floats ;
+FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: half
+SPECIALIZED-ARRAY: float
+SPECIALIZED-ARRAY: ushort
 IN: images.normalization
 
 <PRIVATE
 
-: add-dummy-alpha ( seq -- seq' )
-    3 <groups> [ 255 suffix ] map concat ;
+CONSTANT: don't-care 127
+CONSTANT: fill-value 255
+
+: permutation ( src dst -- seq )
+    swap '[ _ index [ don't-care ] unless* ] { } map-as
+    4 don't-care pad-tail ;
+
+: pad4 ( seq -- newseq ) 4 fill-value pad-tail ;
+
+: shuffle ( seq permutation -- newseq )
+    swap '[
+        dup 4 >= [ drop fill-value ] [ _ nth ] if
+    ] B{ } map-as ;
+
+:: permute ( bytes src-order dst-order -- new-bytes )
+    [let | src [ src-order name>> ]
+           dst [ dst-order name>> ] |
+        bytes src length group
+        [ pad4 src dst permutation shuffle dst length head ]
+        map concat ] ;
+
+: (reorder-components) ( image src-order dest-order -- image )
+    [ permute ] 2curry change-bitmap ;
+
+GENERIC: normalize-component-type* ( image component-type -- image )
 
 : normalize-floats ( float-array -- byte-array )
     [ 255.0 * >integer ] B{ } map-as ;
 
-GENERIC: normalize-component-type* ( image component-type -- image )
-GENERIC: normalize-component-order* ( image component-order -- image )
-
-: normalize-component-order ( image -- image )
-    dup component-type>> '[ _ normalize-component-type* ] change-bitmap
-    dup component-order>> '[ _ normalize-component-order* ] change-bitmap ;
-
 M: float-components normalize-component-type*
     drop byte-array>float-array normalize-floats ;
+
 M: half-components normalize-component-type*
     drop byte-array>half-array normalize-floats ;
 
@@ -37,45 +55,6 @@ M: ushort-components normalize-component-type*
 M: ubyte-components normalize-component-type*
     drop ;
 
-M: RGBA normalize-component-order* drop ;
-
-: BGR>RGB ( bitmap -- pixels )
-    3 <sliced-groups> [ <reversed> ] map B{ } join ; inline
-
-: BGRA>RGBA ( bitmap -- pixels )
-    4 <sliced-groups>
-    [ unclip-last-slice [ <reversed> ] dip suffix ] map concat ; inline
-
-M: BGRA normalize-component-order*
-    drop BGRA>RGBA ;
-
-M: RGB normalize-component-order*
-    drop add-dummy-alpha ;
-
-M: BGR normalize-component-order*
-    drop BGR>RGB add-dummy-alpha ;
-
-: ARGB>RGBA ( bitmap -- bitmap' )
-    4 <groups> [ unclip suffix ] map B{ } join ; inline
-
-M: ARGB normalize-component-order*
-    drop ARGB>RGBA ;
-
-M: ABGR normalize-component-order*
-    drop ARGB>RGBA BGRA>RGBA ;
-
-: fix-XBGR ( bitmap -- bitmap' )
-    dup 4 <sliced-groups> [ [ 255 0 ] dip set-nth ] each ;
-
-M: XBGR normalize-component-order*
-    drop fix-XBGR ABGR normalize-component-order* ;
-
-: fix-BGRX ( bitmap -- bitmap' )
-    dup 4 <sliced-groups> [ [ 255 3 ] dip set-nth ] each ;
-
-M: BGRX normalize-component-order*
-    drop fix-BGRX BGRA normalize-component-order* ;
-
 : normalize-scan-line-order ( image -- image )
     dup upside-down?>> [
         dup dim>> first 4 * '[
@@ -84,10 +63,23 @@ M: BGRX normalize-component-order*
         f >>upside-down?
     ] when ;
 
+: validate-request ( src-order dst-order -- src-order dst-order )
+    [
+        [ { DEPTH DEPTH-STENCIL INTENSITY } member? ] bi@
+        or [ "Invalid component-order" throw ] when
+    ] 2keep ;
+
 PRIVATE>
+
+: reorder-components ( image component-order -- image )
+    [
+        dup component-type>> '[ _ normalize-component-type* ] change-bitmap
+        dup component-order>>
+    ] dip
+    validate-request [ (reorder-components) ] keep >>component-order ;
 
 : normalize-image ( image -- image )
     [ >byte-array ] change-bitmap
-    normalize-component-order
-    normalize-scan-line-order
-    RGBA >>component-order ;
+    RGBA reorder-components
+    normalize-scan-line-order ;
+

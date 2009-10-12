@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax ;
+USING: alien.c-types alien.syntax unix.statfs.openbsd ;
 IN: unix.getfsstat.openbsd
 
 CONSTANT: MNT_WAIT   1 ! synchronously wait for I/O to complete

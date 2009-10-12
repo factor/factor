@@ -3,14 +3,15 @@
 namespace factor
 {
 
-factorvm *vm;
+factor_vm *vm;
+unordered_map<THREADHANDLE, factor_vm*> thread_vms;
 
 void init_globals()
 {
 	init_platform_globals();
 }
 
-void factorvm::default_parameters(vm_parameters *p)
+void factor_vm::default_parameters(vm_parameters *p)
 {
 	p->image_path = NULL;
 
@@ -20,7 +21,6 @@ void factorvm::default_parameters(vm_parameters *p)
 	p->ds_size = 8 * sizeof(cell);
 	p->rs_size = 8 * sizeof(cell);
 
-	p->gen_count = 2;
 	p->code_size = 4;
 	p->young_size = 1;
 	p->aging_size = 1;
@@ -29,7 +29,6 @@ void factorvm::default_parameters(vm_parameters *p)
 	p->ds_size = 32 * sizeof(cell);
 	p->rs_size = 32 * sizeof(cell);
 
-	p->gen_count = 3;
 	p->code_size = 8 * sizeof(cell);
 	p->young_size = sizeof(cell) / 4;
 	p->aging_size = sizeof(cell) / 2;
@@ -46,15 +45,13 @@ void factorvm::default_parameters(vm_parameters *p)
 #else
 	if (this == vm)
 		p->console = true;
-	else 		
+	else		
 		p->console = false;
 	
 #endif
-
-	p->stack_traces = true;
 }
 
-bool factorvm::factor_arg(const vm_char* str, const vm_char* arg, cell* value)
+bool factor_vm::factor_arg(const vm_char* str, const vm_char* arg, cell* value)
 {
 	int val;
 	if(SSCANF(str,arg,&val) > 0)
@@ -66,7 +63,7 @@ bool factorvm::factor_arg(const vm_char* str, const vm_char* arg, cell* value)
 		return false;
 }
 
-void factorvm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **argv)
+void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **argv)
 {
 	default_parameters(p);
 	p->executable_path = argv[0];
@@ -77,7 +74,6 @@ void factorvm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **a
 	{
 		if(factor_arg(argv[i],STRING_LITERAL("-datastack=%d"),&p->ds_size));
 		else if(factor_arg(argv[i],STRING_LITERAL("-retainstack=%d"),&p->rs_size));
-		else if(factor_arg(argv[i],STRING_LITERAL("-generations=%d"),&p->gen_count));
 		else if(factor_arg(argv[i],STRING_LITERAL("-young=%d"),&p->young_size));
 		else if(factor_arg(argv[i],STRING_LITERAL("-aging=%d"),&p->aging_size));
 		else if(factor_arg(argv[i],STRING_LITERAL("-tenured=%d"),&p->tenured_size));
@@ -87,12 +83,11 @@ void factorvm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **a
 		else if(STRCMP(argv[i],STRING_LITERAL("-fep")) == 0) p->fep = true;
 		else if(STRNCMP(argv[i],STRING_LITERAL("-i="),3) == 0) p->image_path = argv[i] + 3;
 		else if(STRCMP(argv[i],STRING_LITERAL("-console")) == 0) p->console = true;
-		else if(STRCMP(argv[i],STRING_LITERAL("-no-stack-traces")) == 0) p->stack_traces = false;
 	}
 }
 
 /* Do some initialization that we do once only */
-void factorvm::do_stage1_init()
+void factor_vm::do_stage1_init()
 {
 	print_string("*** Stage 2 early init... ");
 	fflush(stdout);
@@ -104,7 +99,7 @@ void factorvm::do_stage1_init()
 	fflush(stdout);
 }
 
-void factorvm::init_factor(vm_parameters *p)
+void factor_vm::init_factor(vm_parameters *p)
 {
 	/* Kilobytes */
 	p->ds_size = align_page(p->ds_size << 10);
@@ -154,14 +149,11 @@ void factorvm::init_factor(vm_parameters *p)
 	gc_off = false;
 
 	if(userenv[STAGE2_ENV] == F)
-	{
-		userenv[STACK_TRACES_ENV] = tag_boolean(p->stack_traces);
 		do_stage1_init();
-	}
 }
 
 /* May allocate memory */
-void factorvm::pass_args_to_factor(int argc, vm_char **argv)
+void factor_vm::pass_args_to_factor(int argc, vm_char **argv)
 {
 	growable_array args(this);
 	int i;
@@ -174,7 +166,7 @@ void factorvm::pass_args_to_factor(int argc, vm_char **argv)
 	userenv[ARGS_ENV] = args.elements.value();
 }
 
-void factorvm::start_factor(vm_parameters *p)
+void factor_vm::start_factor(vm_parameters *p)
 {
 	if(p->fep) factorbug();
 
@@ -183,31 +175,30 @@ void factorvm::start_factor(vm_parameters *p)
 	unnest_stacks();
 }
 
-
-char *factorvm::factor_eval_string(char *string)
+char *factor_vm::factor_eval_string(char *string)
 {
 	char *(*callback)(char *) = (char *(*)(char *))alien_offset(userenv[EVAL_CALLBACK_ENV]);
 	return callback(string);
 }
 
-void factorvm::factor_eval_free(char *result)
+void factor_vm::factor_eval_free(char *result)
 {
 	free(result);
 }
 
-void factorvm::factor_yield()
+void factor_vm::factor_yield()
 {
 	void (*callback)() = (void (*)())alien_offset(userenv[YIELD_CALLBACK_ENV]);
 	callback();
 }
 
-void factorvm::factor_sleep(long us)
+void factor_vm::factor_sleep(long us)
 {
 	void (*callback)(long) = (void (*)(long))alien_offset(userenv[SLEEP_CALLBACK_ENV]);
 	callback(us);
 }
 
-void factorvm::start_standalone_factor(int argc, vm_char **argv)
+void factor_vm::start_standalone_factor(int argc, vm_char **argv)
 {
 	vm_parameters p;
 	default_parameters(&p);
@@ -222,28 +213,37 @@ struct startargs {
 	vm_char **argv;
 };
 
+factor_vm *new_factor_vm()
+{
+	factor_vm *newvm = new factor_vm();
+	register_vm_with_thread(newvm);
+	thread_vms[thread_id()] = newvm;
+
+	return newvm;
+}
+
+// arg must be new'ed because we're going to delete it!
 void* start_standalone_factor_thread(void *arg) 
 {
-	factorvm *newvm = new factorvm;
-	register_vm_with_thread(newvm);
+	factor_vm *newvm = new_factor_vm();
 	startargs *args = (startargs*) arg;
-	newvm->start_standalone_factor(args->argc, args->argv);
+	int argc = args->argc; vm_char **argv = args->argv;
+	delete args;
+	newvm->start_standalone_factor(argc, argv);
 	return 0;
 }
 
-
 VM_C_API void start_standalone_factor(int argc, vm_char **argv)
 {
-	factorvm *newvm = new factorvm;
+	factor_vm *newvm = new_factor_vm();
 	vm = newvm;
-	register_vm_with_thread(newvm);
 	return newvm->start_standalone_factor(argc,argv);
 }
 
 VM_C_API THREADHANDLE start_standalone_factor_in_new_thread(int argc, vm_char **argv)
 {
-	startargs *args = new startargs;   // leaks startargs structure
-	args->argc = argc; args->argv = argv;
+	startargs *args = new startargs;
+	args->argc = argc; args->argv = argv; 
 	return start_thread(start_standalone_factor_thread,args);
 }
 

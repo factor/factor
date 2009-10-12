@@ -520,125 +520,142 @@ HELP: since-1970
 
 ARTICLE: "calendar" "Calendar"
 "The two data types used throughout the calendar library:"
-{ $subsection timestamp }
-{ $subsection duration }
+{ $subsections
+    timestamp
+    duration
+}
 "Durations represent spans of time:"
-{ $subsection "using-durations" }
+{ $subsections "using-durations" }
 "Arithmetic on timestamps and durations:"
-{ $subsection "timestamp-arithmetic" }
+{ $subsections "timestamp-arithmetic" }
 "Getting the current timestamp:"
-{ $subsection now }
-{ $subsection gmt }
+{ $subsections
+    now
+    gmt
+}
 "Converting between timestamps:"
-{ $subsection >local-time }
-{ $subsection >gmt }
+{ $subsections
+    >local-time
+    >gmt
+}
 "Converting between timezones:"
-{ $subsection convert-timezone }
+{ $subsections convert-timezone }
 "Timestamps relative to each other:"
-{ $subsection "relative-timestamps" }
+{ $subsections "relative-timestamps" }
 "Operations on units of time:"
-{ $subsection "years" }
-{ $subsection "months" }
-{ $subsection "days" }
+{ $subsections
+    "years"
+    "months"
+    "days"
+}
 "Meta-data about the calendar:"
-{ $subsection "calendar-facts" }
+{ $subsections "calendar-facts" }
 ;
 
 ARTICLE: "timestamp-arithmetic" "Timestamp arithmetic"
 "Adding timestamps and durations, or durations and durations:"
-{ $subsection time+ }
+{ $subsections time+ }
 "Subtracting:"
-{ $subsection time- }
+{ $subsections time- }
 "Element-wise multiplication:"
-{ $subsection time* } ;
+{ $subsections time* } ;
 
 ARTICLE: "using-durations" "Using durations"
 "Creating a duration object:"
-{ $subsection years }
-{ $subsection months }
-{ $subsection weeks }
-{ $subsection days }
-{ $subsection hours }
-{ $subsection minutes }
-{ $subsection seconds }
-{ $subsection milliseconds }
-{ $subsection microseconds }
-{ $subsection nanoseconds }
-{ $subsection instant }
+{ $subsections
+    years
+    months
+    weeks
+    days
+    hours
+    minutes
+    seconds
+    milliseconds
+    microseconds
+    nanoseconds
+    instant
+}
 "Converting a duration to a number:"
-{ $subsection duration>years }
-{ $subsection duration>months }
-{ $subsection duration>days }
-{ $subsection duration>hours }
-{ $subsection duration>minutes }
-{ $subsection duration>seconds }
-{ $subsection duration>milliseconds }
-{ $subsection duration>microseconds }
-{ $subsection duration>nanoseconds } ;
+{ $subsections
+    duration>years
+    duration>months
+    duration>days
+    duration>hours
+    duration>minutes
+    duration>seconds
+    duration>milliseconds
+    duration>microseconds
+    duration>nanoseconds
+} ;
 
 ARTICLE: "relative-timestamps" "Relative timestamps"
 "In the future:"
-{ $subsection hence }
+{ $subsections hence }
 "In the past:"
-{ $subsection ago }
+{ $subsections ago }
 "Invert a duration:"
-{ $subsection before }
+{ $subsections before }
 "Days of the week relative to " { $link now } ":"
-{ $subsection sunday }
-{ $subsection monday }
-{ $subsection tuesday }
-{ $subsection wednesday }
-{ $subsection thursday }
-{ $subsection friday }
-{ $subsection saturday }
+{ $subsections
+    sunday
+    monday
+    tuesday
+    wednesday
+    thursday
+    friday
+    saturday
+}
 "New timestamps relative to calendar events:"
-{ $subsection beginning-of-year }
-{ $subsection beginning-of-month }
-{ $subsection beginning-of-week }
-{ $subsection midnight }
-{ $subsection noon }
-;
+{ $subsections
+    beginning-of-year
+    beginning-of-month
+    beginning-of-week
+    midnight
+    noon
+} ;
 
 ARTICLE: "days" "Day operations"
 "Naming days:"
-{ $subsection day-abbreviation2 }
-{ $subsection day-abbreviations2 }
-{ $subsection day-abbreviation3 }
-{ $subsection day-abbreviations3 }
-{ $subsection day-name }
-{ $subsection day-names }
+{ $subsections
+    day-abbreviation2
+    day-abbreviations2
+    day-abbreviation3
+    day-abbreviations3
+    day-name
+    day-names
+}
 "Calculating a Julian day number:"
-{ $subsection julian-day-number }
+{ $subsections julian-day-number }
 "Calculate a timestamp:"
-{ $subsection julian-day-number>date }
-;
+{ $subsections julian-day-number>date } ;
 
 ARTICLE: "calendar-facts" "Calendar facts"
 "Calendar facts:"
-{ $subsection average-month }
-{ $subsection months-per-year }
-{ $subsection days-per-year }
-{ $subsection hours-per-year }
-{ $subsection minutes-per-year }
-{ $subsection seconds-per-year }
-{ $subsection days-in-month }
-{ $subsection day-of-year }
-{ $subsection day-of-week }
-;
+{ $subsections
+    average-month
+    months-per-year
+    days-per-year
+    hours-per-year
+    minutes-per-year
+    seconds-per-year
+    days-in-month
+    day-of-year
+    day-of-week
+} ;
 
 ARTICLE: "years" "Year operations"
 "Leap year predicate:"
-{ $subsection leap-year? }
+{ $subsections leap-year? }
 "Find the number of days in a year:"
-{ $subsection days-in-year }
-;
+{ $subsections days-in-year } ;
 
 ARTICLE: "months" "Month operations"
 "Naming months:"
-{ $subsection month-name }
-{ $subsection month-names }
-{ $subsection month-abbreviation }
-{ $subsection month-abbreviations }
-;
+{ $subsections
+    month-name
+    month-names
+    month-abbreviation
+    month-abbreviations
+} ;
 
 ABOUT: "calendar"

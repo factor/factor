@@ -1,12 +1,14 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: locals alien.c-types alien.syntax arrays kernel fry math
-namespaces sequences system layouts io vocabs.loader accessors init
-combinators command-line make compiler compiler.units
-compiler.constants compiler.alien compiler.codegen
-compiler.codegen.fixup compiler.cfg.instructions compiler.cfg.builder
-compiler.cfg.intrinsics compiler.cfg.stack-frame cpu.x86.assembler
-cpu.x86.assembler.operands cpu.x86 cpu.architecture ;
+USING: locals alien.c-types alien.libraries alien.syntax arrays
+kernel fry math namespaces sequences system layouts io
+vocabs.loader accessors init combinators command-line make
+compiler compiler.units compiler.constants compiler.alien
+compiler.codegen compiler.codegen.fixup
+compiler.cfg.instructions compiler.cfg.builder
+compiler.cfg.intrinsics compiler.cfg.stack-frame
+cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
+cpu.architecture ;
 IN: cpu.x86.32
 
 ! We implement the FFI for Linux, OS X and Windows all at once.
@@ -38,8 +40,8 @@ M:: x86.32 %dispatch ( src temp -- )
     bi ;
 
 ! Registers for fastcall
-M: x86.32 param-reg-1 EAX ;
-M: x86.32 param-reg-2 EDX ;
+: param-reg-1 ( -- reg ) EAX ;
+: param-reg-2 ( -- reg ) EDX ;
 
 M: x86.32 pic-tail-reg EBX ;
 
@@ -48,16 +50,7 @@ M: x86.32 reserved-area-size 0 ;
 M: x86.32 %alien-invoke 0 CALL rc-relative rel-dlsym ;
 
 : push-vm-ptr ( -- )
-    temp-reg 0 MOV rc-absolute-cell rt-vm rel-fixup ! push the vm ptr as an argument
-    temp-reg PUSH ;
-
-M: x86.32 %vm-invoke-1st-arg ( function -- )
-    push-vm-ptr
-    f %alien-invoke
-    temp-reg POP ;
-
-M: x86.32 %vm-invoke-3rd-arg ( function -- )
-    %vm-invoke-1st-arg ;    ! first 2 args are regs, 3rd is stack so vm-invoke-1st-arg works here
+    0 PUSH rc-absolute-cell rt-vm rel-fixup ; ! push the vm ptr as an argument
 
 M: x86.32 return-struct-in-registers? ( c-type -- ? )
     c-type
@@ -246,6 +239,18 @@ M:: x86.32 %unbox-large-struct ( n c-type -- )
         "to_value_struct" f %alien-invoke
     ] with-aligned-stack ;
 
+M: x86.32 %nest-stacks ( -- )
+    4 [
+        push-vm-ptr
+        "nest_stacks" f %alien-invoke
+    ] with-aligned-stack ;
+
+M: x86.32 %unnest-stacks ( -- )
+    4 [
+        push-vm-ptr
+        "unnest_stacks" f %alien-invoke
+    ] with-aligned-stack ;
+
 M: x86.32 %prepare-alien-indirect ( -- )
     push-vm-ptr "unbox_alien" f %alien-invoke
     temp-reg POP
@@ -279,6 +284,35 @@ M: x86.32 %callback-value ( ctype -- )
     ! Unbox EAX
     unbox-return ;
 
+GENERIC: float-function-param ( stack-slot dst src -- )
+
+M:: spill-slot float-function-param ( stack-slot dst src -- )
+    ! We can clobber dst here since its going to contain the
+    ! final result
+    dst src double-rep %copy
+    stack-slot dst double-rep %copy ;
+
+M: register float-function-param
+    nip double-rep %copy ;
+
+: float-function-return ( reg -- )
+    ESP [] FSTPL
+    ESP [] MOVSD
+    ESP 16 ADD ;
+
+M:: x86.32 %unary-float-function ( dst src func -- )
+    ESP -16 [+] dst src float-function-param
+    ESP 16 SUB
+    func "libm" load-library %alien-invoke
+    dst float-function-return ;
+
+M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
+    ESP -16 [+] dst src1 float-function-param
+    ESP  -8 [+] dst src2 float-function-param
+    ESP 16 SUB
+    func "libm" load-library %alien-invoke
+    dst float-function-return ;
+
 M: x86.32 %cleanup ( params -- )
     #! a) If we just called an stdcall function in Windows, it
     #! cleaned up the stack frame for us. But we don't want that
@@ -310,6 +344,19 @@ M: x86.32 %callback-return ( n -- )
         [ drop 0 ]
     } cond RET ;
 
+M:: x86.32 %call-gc ( gc-root-count temp -- )
+    temp gc-root-base param@ LEA
+    12 [
+        ! Pass the VM ptr as the third parameter
+        0 PUSH rc-absolute-cell rt-vm rel-fixup
+        ! Pass number of roots as second parameter
+        gc-root-count PUSH 
+        ! Pass pointer to start of GC roots as first parameter
+        temp PUSH 
+        ! Call GC
+        "inline_gc" f %alien-invoke
+    ] with-aligned-stack ;
+
 M: x86.32 dummy-stack-params? f ;
 
 M: x86.32 dummy-int-params? f ;
@@ -322,4 +369,4 @@ os windows? [
     4 "double" c-type (>>align)
 ] unless
 
-"cpu.x86.features" require
+check-sse

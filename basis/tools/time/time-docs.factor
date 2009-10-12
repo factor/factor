@@ -3,12 +3,14 @@ IN: tools.time
 
 ARTICLE: "timing" "Timing code"
 "You can time the execution of a quotation in the listener:"
-{ $subsection time }
+{ $subsections time }
 "A lower-level word puts timings on the stack, intead of printing:"
-{ $subsection benchmark }
+{ $subsections benchmark }
 "You can also read the system clock and garbage collection statistics directly:"
-{ $subsection micros } 
-{ $subsection gc-stats }
+{ $subsections
+    micros
+    gc-stats
+}
 { $see-also "profiling" } ;
 
 ABOUT: "timing"

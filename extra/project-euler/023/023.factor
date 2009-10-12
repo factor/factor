@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.ranges project-euler.common sequences sets sorting ;
+USING: kernel math math.ranges project-euler.common sequences sets sorting assocs fry ;
 IN: project-euler.023
 
 ! http://projecteuler.net/index.php?section=problems&id=23
@@ -42,10 +42,9 @@ IN: project-euler.023
     [1,b] [ abundant? ] filter ;
 
 : possible-sums ( seq -- seq )
-    dup { } -rot [
-        dupd [ + ] curry map
-        rot append prune swap rest
-    ] each drop natural-sort ;
+    H{ } clone
+    [ dupd '[ _ [ + _ conjoin ] with each ] each ]
+    keep keys ;
 
 PRIVATE>
 
@@ -53,9 +52,7 @@ PRIVATE>
     source-023
     20161 abundants-upto possible-sums diff sum ;
 
-! TODO: solution is still too slow, although it takes under 1 minute
-
 ! [ euler023 ] time
-! 52780 ms run / 3839 ms GC
+! 2.15542 seconds
 
 SOLUTION: euler023

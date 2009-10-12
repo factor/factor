@@ -25,9 +25,11 @@ HELP: <flipped>
 
 ARTICLE: "columns" "Column sequences"
 "A " { $emphasis "column" } " presents a column of a matrix represented as a sequence of rows:"
-{ $subsection column }
-{ $subsection <column> }
+{ $subsections
+    column
+    <column>
+}
 "A utility word:"
-{ $subsection <flipped> } ;
+{ $subsections <flipped> } ;
 
 ABOUT: "columns"
