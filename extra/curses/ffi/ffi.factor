@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.syntax combinators kernel system
-alien.libraries classes.struct ;
+alien.c-types alien.libraries classes.struct unix.types ;
 IN: curses.ffi
 
 << "curses" {
@@ -10,8 +10,8 @@ IN: curses.ffi
     { [ os unix?  ]  [ "libcurses.so" ] }
 } cond "cdecl" add-library >>
 
-TYPEDEF: void* WINDOW*
-TYPEDEF: void* SCREEN*
+C-TYPE: WINDOW
+C-TYPE: SCREEN
 TYPEDEF: void* va_list
 
 TYPEDEF: uint chtype
@@ -74,8 +74,7 @@ STRUCT: c-window
 
 LIBRARY: curses
 
-: stdscr ( -- alien )
-    "stdscr" "curses" library dll>> dlsym ;
+C-GLOBAL: void* stdscr
 
 FUNCTION: WINDOW* initscr ( ) ;
 FUNCTION: int endwin ( ) ;

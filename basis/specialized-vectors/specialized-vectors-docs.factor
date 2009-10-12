@@ -16,13 +16,15 @@ ARTICLE: "specialized-vector-words" "Specialized vector words"
 }
 "Behind the scenes, these words are placed in a vocabulary named " { $snippet "specialized-vectors.instances.T" } ", however this vocabulary should not be placed in a " { $link POSTPONE: USING: } " form directly. Instead, always use " { $link POSTPONE: SPECIALIZED-VECTOR: } ". This ensures that the vocabulary can get generated the first time it is needed." ;
 
-ARTICLE: "specialized-vector-c" "Passing specialized arrays to C functions"
-"Each specialized array has a " { $slot "underlying" } " slot holding a specialized array, which in turn has an " { $slot "underlying" } " slot holding a " { $link byte-array } " with the raw data. Passing a specialized vector as a parameter to a C function call will automatically extract the underlying data. To get at the underlying data directly, call the " { $link >c-ptr } " word on a specialized vector." ;
+ARTICLE: "specialized-vector-c" "Passing specialized vectors to C functions"
+"Each specialized vector has a " { $slot "underlying" } " slot holding a specialized array, which in turn has an " { $slot "underlying" } " slot holding a " { $link byte-array } " with the raw data. Passing a specialized vector as a parameter to a C function call will automatically extract the underlying data. To get at the underlying data directly, call the " { $link >c-ptr } " word on a specialized vector." ;
 
 ARTICLE: "specialized-vectors" "Specialized vectors"
 "The " { $vocab-link "specialized-vectors" } " vocabulary implements resizable sequence types for storing machine values in a space-efficient manner without boxing."
-{ $subsection "specialized-vector-words" }
-{ $subsection "specialized-vector-c" }
+{ $subsections
+    "specialized-vector-words"
+    "specialized-vector-c"
+}
 "The " { $vocab-link "specialized-arrays" } " vocabulary provides a fixed-length version of this abstraction." ;
 
 ABOUT: "specialized-vectors"

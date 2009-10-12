@@ -434,11 +434,15 @@ HELP: byte-array>bignum
 { $description "Converts a byte-array, interpreted as little-endian, into a bignum integer. User code should call " { $link le> } " or " { $link be> } " instead." } ;
 
 ARTICLE: "division-by-zero" "Division by zero"
-"Floating point division never raises an error if the denominator is zero. This means that if at least one of the two inputs to " { $link / } ", " { $link /f } " or " { $link mod } " is a float, the result will be a floating point infinity or not a number value."
+"Behavior of division operations when a denominator of zero is used depends on the data types in question, as well as the platform being used."
+$nl
+"Floating point division only throws an error if the appropriate traps are enabled in the floating point environment. If traps are disabled, a Not-a-number value or an infinity is output, depending on whether the numerator is zero or non-zero."
+$nl
+"Floating point traps are disabled by default and the " { $vocab-link "math.floats.env" } " vocabulary provides words to enable them. Floating point division is performed by " { $link / } ", " { $link /f } " or " { $link mod } " if at least one of the two inputs is a float. Floating point division is always performed by " { $link /f } "."
 $nl
 "The behavior of integer division is hardware specific. On x86 processors, " { $link /i } " and " { $link mod } " raise an error if both inputs are integers and the denominator is zero. On PowerPC, integer division by zero yields a result of zero."
 $nl
-"On the other hand, the " { $link / } " word, when given integer arguments, implements a much more expensive division algorithm which always yields an exact rational answer, and this word always tests for division by zero explicitly." ;
+"The " { $link / } " word, when given integer arguments, implements a much more expensive division algorithm which always yields an exact rational answer, and this word always tests for division by zero explicitly." ;
 
 ARTICLE: "number-protocol" "Number protocol"
 "Math operations obey certain numerical upgrade rules. If one of the inputs is a bignum and the other is a fixnum, the latter is first coerced to a bignum; if one of the inputs is a float, the other is coerced to a float."
@@ -447,49 +451,62 @@ $nl
 { $example "USE: classes" "3 >fixnum 6 >bignum * class ." "bignum" }
 { $example "1/2 2.0 + ." "2.5" }
 "The following usual operations are supported by all numbers."
-{ $subsection + }
-{ $subsection - }
-{ $subsection * }
-{ $subsection / }
+{ $subsections
+    +
+    -
+    *
+    /
+}
 "Non-commutative operations take operands from the stack in the natural order; " { $snippet "6 2 /" } " divides 6 by 2."
-{ $subsection "division-by-zero" }
+{ $subsections "division-by-zero" }
 "Real numbers (but not complex numbers) can be ordered:"
-{ $subsection < }
-{ $subsection <= }
-{ $subsection > }
-{ $subsection >= }
+{ $subsections
+    <
+    <=
+    >
+    >=
+}
 "Numbers can be compared for equality using " { $link = } ", or a less precise test which disregards types:"
-{ $subsection number= } ;
+{ $subsections number= }
+{ $see-also "math.floats.compare" } ;
 
 ARTICLE: "modular-arithmetic" "Modular arithmetic"
-{ $subsection mod }
-{ $subsection rem }
-{ $subsection /mod }
-{ $subsection /i }
+{ $subsections
+    mod
+    rem
+    /mod
+    /i
+}
 { $see-also "integer-functions" } ;
 
 ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
 "There are two ways of looking at an integer -- as an abstract mathematical entity, or as a string of bits. The latter representation motivates " { $emphasis "bitwise operations" } "."
-{ $subsection bitand }
-{ $subsection bitor }
-{ $subsection bitxor }
-{ $subsection bitnot }
-{ $subsection shift }
-{ $subsection 2/ }
-{ $subsection 2^ }
-{ $subsection bit? }
+{ $subsections
+    bitand
+    bitor
+    bitxor
+    bitnot
+    shift
+    2/
+    2^
+    bit?
+}
 "Advanced topics:"
-{ $subsection "math.bitwise" }
-{ $subsection "math.bits" }
+{ $subsections
+    "math.bitwise"
+    "math.bits"
+}
 { $see-also "booleans" } ;
 
 ARTICLE: "arithmetic" "Arithmetic"
 "Factor attempts to preserve natural mathematical semantics for numbers. Multiplying two large integers never results in overflow, and dividing two integers yields an exact ratio. Floating point numbers are also supported, along with complex numbers."
 $nl
 "Math words are in the " { $vocab-link "math" } " vocabulary. Implementation details are in the " { $vocab-link "math.private" } " vocabulary."
-{ $subsection "number-protocol" }
-{ $subsection "modular-arithmetic" }
-{ $subsection "bitwise-arithmetic" }
+{ $subsections
+    "number-protocol"
+    "modular-arithmetic"
+    "bitwise-arithmetic"
+}
 { $see-also "integers" "rationals" "floats" "complex-numbers" } ;
 
 ABOUT: "arithmetic"

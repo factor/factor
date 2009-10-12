@@ -61,6 +61,7 @@ TYPEDEF: ulong       ULONG_PTR
 TYPEDEF: int         INT32
 TYPEDEF: uint        UINT32
 TYPEDEF: uint        DWORD32
+TYPEDEF: long        LONG32
 TYPEDEF: ulong       ULONG32
 TYPEDEF: ulonglong   ULONG64
 TYPEDEF: long*       POINTER_32
@@ -75,6 +76,8 @@ TYPEDEF: longlong    LARGE_INTEGER
 TYPEDEF: ulonglong   ULARGE_INTEGER
 TYPEDEF: LARGE_INTEGER* PLARGE_INTEGER
 TYPEDEF: ULARGE_INTEGER* PULARGE_INTEGER
+TYPEDEF: size_t SIZE_T
+TYPEDEF: ptrdiff_t SSIZE_T
 
 TYPEDEF: wchar_t*  LPCSTR
 TYPEDEF: wchar_t*  LPWSTR
@@ -200,15 +203,6 @@ TYPEDEF: ULONG_PTR           SIZE_T
 TYPEDEF: LONG_PTR            SSIZE_T
 TYPEDEF: LONGLONG            USN
 TYPEDEF: UINT_PTR            WPARAM
-
-TYPEDEF: RECT* LPRECT
-TYPEDEF: void* PWNDCLASS
-TYPEDEF: void* PWNDCLASSEX
-TYPEDEF: void* LPWNDCLASS
-TYPEDEF: void* LPWNDCLASSEX
-TYPEDEF: void* MSGBOXPARAMSA
-TYPEDEF: void* MSGBOXPARAMSW
-TYPEDEF: void* LPOVERLAPPED_COMPLETION_ROUTINE
 
 TYPEDEF: size_t socklen_t
 
@@ -343,6 +337,14 @@ TYPEDEF: PFD* LPPFD
 TYPEDEF: HANDLE HGLRC
 TYPEDEF: HANDLE HRGN
 
+TYPEDEF: void* PWNDCLASS
+TYPEDEF: void* PWNDCLASSEX
+TYPEDEF: void* LPWNDCLASS
+TYPEDEF: void* LPWNDCLASSEX
+TYPEDEF: void* MSGBOXPARAMSA
+TYPEDEF: void* MSGBOXPARAMSW
+TYPEDEF: void* LPOVERLAPPED_COMPLETION_ROUTINE
+
 STRUCT: LVITEM
     { mask uint }
     { iItem int }
@@ -378,9 +380,15 @@ TYPEDEF: DWORD* LPCOLORREF
 
 : RGB ( r g b -- COLORREF )
     { 16 8 0 } bitfield ; inline
+: >RGB< ( COLORREF -- r g b )
+    [           HEX: ff bitand ]
+    [  -8 shift HEX: ff bitand ]
+    [ -16 shift HEX: ff bitand ] tri ;
 
 : color>RGB ( color -- COLORREF )
     >rgba-components drop [ 255 * >integer ] tri@ RGB ;
+: RGB>color ( COLORREF -- color )
+    >RGB< [ 1/255. * >float ] tri@ 1.0 <rgba> ;
 
 STRUCT: TEXTMETRICW
     { tmHeight LONG }

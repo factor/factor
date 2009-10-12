@@ -3,15 +3,19 @@ IN: listener
 
 ARTICLE: "listener-watch" "Watching variables in the listener"
 "The listener prints the concepts of the data and retain stacks after every expression. It can also print values of dynamic variables which are added to a watch list:"
-{ $subsection visible-vars }
+{ $subsections visible-vars }
 "To add or remove a single variable:"
-{ $subsection show-var }
-{ $subsection hide-var }
+{ $subsections
+    show-var
+    hide-var
+}
 "To add and remove multiple variables:"
-{ $subsection show-vars }
-{ $subsection hide-vars }
+{ $subsections
+    show-vars
+    hide-vars
+}
 "Hiding all visible variables:"
-{ $subsection hide-all-vars } ;
+{ $subsections hide-all-vars } ;
 
 HELP: only-use-vocabs
 { $values { "vocabs" "a sequence of vocabulary specifiers" } }
@@ -44,13 +48,13 @@ $nl
 "Multi-line expressions are supported:"
 { $example "{ 1 2 3 } [\n    .\n] each" "1\n2\n3" }
 "The listener knows when to expect more input by looking at the height of the stack. Parsing words such as " { $link POSTPONE: { } " leave elements on the parser stack, and corresponding words such as " { $link POSTPONE: } } " pop them."
-{ $subsection "listener-watch" }
+{ $subsections "listener-watch" }
 "To start a nested listener:"
-{ $subsection listener }
+{ $subsections listener }
 "To exit the listener, invoke the " { $link return } " word."
 $nl
 "Multi-line quotations can be read independently of the rest of the listener:"
-{ $subsection read-quot } ;
+{ $subsections read-quot } ;
 
 ABOUT: "listener"
 

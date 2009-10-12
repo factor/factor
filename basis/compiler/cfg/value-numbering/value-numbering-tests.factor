@@ -4,7 +4,7 @@ cpu.architecture tools.test kernel math combinators.short-circuit
 accessors sequences compiler.cfg.predecessors locals compiler.cfg.dce
 compiler.cfg.ssa.destruction compiler.cfg.loop-detection
 compiler.cfg.representations compiler.cfg assocs vectors arrays
-layouts namespaces alien ;
+layouts literals namespaces alien ;
 IN: compiler.cfg.value-numbering.tests
 
 : trim-temps ( insns -- insns )
@@ -14,21 +14,23 @@ IN: compiler.cfg.value-numbering.tests
             [ ##compare-imm? ]
             [ ##compare-float-unordered? ]
             [ ##compare-float-ordered? ]
+            [ ##test-vector? ]
+            [ ##test-vector-branch? ]
         } 1|| [ f >>temp ] when
     ] map ;
 
 ! Folding constants together
 [
     {
-        T{ ##load-reference f 0 0.0 }
-        T{ ##load-reference f 1 -0.0 }
+        T{ ##load-constant f 0 0.0 }
+        T{ ##load-constant f 1 -0.0 }
         T{ ##replace f 0 D 0 }
         T{ ##replace f 1 D 1 }
     }
 ] [
     {
-        T{ ##load-reference f 0 0.0 }
-        T{ ##load-reference f 1 -0.0 }
+        T{ ##load-constant f 0 0.0 }
+        T{ ##load-constant f 1 -0.0 }
         T{ ##replace f 0 D 0 }
         T{ ##replace f 1 D 1 }
     } value-numbering-step
@@ -36,15 +38,15 @@ IN: compiler.cfg.value-numbering.tests
 
 [
     {
-        T{ ##load-reference f 0 0.0 }
+        T{ ##load-constant f 0 0.0 }
         T{ ##copy f 1 0 any-rep }
         T{ ##replace f 0 D 0 }
         T{ ##replace f 1 D 1 }
     }
 ] [
     {
-        T{ ##load-reference f 0 0.0 }
-        T{ ##load-reference f 1 0.0 }
+        T{ ##load-constant f 0 0.0 }
+        T{ ##load-constant f 1 0.0 }
         T{ ##replace f 0 D 0 }
         T{ ##replace f 1 D 1 }
     } value-numbering-step
@@ -52,15 +54,15 @@ IN: compiler.cfg.value-numbering.tests
 
 [
     {
-        T{ ##load-reference f 0 t }
+        T{ ##load-constant f 0 t }
         T{ ##copy f 1 0 any-rep }
         T{ ##replace f 0 D 0 }
         T{ ##replace f 1 D 1 }
     }
 ] [
     {
-        T{ ##load-reference f 0 t }
-        T{ ##load-reference f 1 t }
+        T{ ##load-constant f 0 t }
+        T{ ##load-constant f 1 t }
         T{ ##replace f 0 D 0 }
         T{ ##replace f 1 D 1 }
     } value-numbering-step
@@ -107,19 +109,15 @@ IN: compiler.cfg.value-numbering.tests
     {
         T{ ##peek f 8 D 0 }
         T{ ##peek f 9 D -1 }
-        T{ ##unbox-float f 10 8 }
-        T{ ##unbox-float f 11 9 }
-        T{ ##compare-float-unordered f 12 10 11 cc< }
-        T{ ##compare-float-unordered f 14 10 11 cc/< }
+        T{ ##compare-float-unordered f 12 8 9 cc< }
+        T{ ##compare-float-unordered f 14 8 9 cc/< }
         T{ ##replace f 14 D 0 }
     }
 ] [
     {
         T{ ##peek f 8 D 0 }
         T{ ##peek f 9 D -1 }
-        T{ ##unbox-float f 10 8 }
-        T{ ##unbox-float f 11 9 }
-        T{ ##compare-float-unordered f 12 10 11 cc< }
+        T{ ##compare-float-unordered f 12 8 9 cc< }
         T{ ##compare-imm f 14 12 5 cc= }
         T{ ##replace f 14 D 0 }
     } value-numbering-step trim-temps
@@ -138,6 +136,20 @@ IN: compiler.cfg.value-numbering.tests
         T{ ##peek f 30 D -2 }
         T{ ##compare f 33 29 30 cc<= }
         T{ ##compare-imm-branch f 33 5 cc/= }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##peek f 1 D -1 }
+        T{ ##test-vector f 2 1 f float-4-rep vcc-any }
+        T{ ##test-vector-branch f 1 f float-4-rep vcc-any }
+    }
+] [
+    {
+        T{ ##peek f 1 D -1 }
+        T{ ##test-vector f 2 1 f float-4-rep vcc-any }
+        T{ ##compare-imm-branch f 2 5 cc/= }
     } value-numbering-step trim-temps
 ] unit-test
 
@@ -233,6 +245,78 @@ IN: compiler.cfg.value-numbering.tests
     {
         T{ ##peek f 1 D 0 }
         T{ ##mul-imm f 2 1 8 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 1 -1 }
+        T{ ##neg f 2 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 1 -1 }
+        T{ ##mul f 2 0 1 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 1 -1 }
+        T{ ##neg f 2 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 1 -1 }
+        T{ ##mul f 2 1 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 1 0 }
+        T{ ##neg f 2 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 1 0 }
+        T{ ##sub f 2 1 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 1 0 }
+        T{ ##neg f 2 0 }
+        T{ ##copy f 3 0 any-rep }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 1 0 }
+        T{ ##sub f 2 1 0 }
+        T{ ##sub f 3 1 2 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##not f 1 0 }
+        T{ ##copy f 2 0 any-rep }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##not f 1 0 }
+        T{ ##not f 2 1 }
     } value-numbering-step
 ] unit-test
 
@@ -337,6 +421,20 @@ IN: compiler.cfg.value-numbering.tests
 [
     {
         T{ ##peek f 0 D 0 }
+        T{ ##load-constant f 1 3.5 }
+        T{ ##compare f 2 0 1 cc= }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-constant f 1 3.5 }
+        T{ ##compare f 2 0 1 cc= }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
         T{ ##load-immediate f 1 100 }
         T{ ##compare-imm f 2 0 100 cc>= }
     }
@@ -360,6 +458,20 @@ IN: compiler.cfg.value-numbering.tests
         T{ ##load-immediate f 1 100 }
         T{ ##compare-branch f 0 1 cc<= }
     } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-constant f 1 3.5 }
+        T{ ##compare-branch f 0 1 cc= }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-constant f 1 3.5 }
+        T{ ##compare-branch f 0 1 cc= }
+    } value-numbering-step trim-temps
 ] unit-test
 
 [
@@ -871,6 +983,34 @@ cell 8 = [
     ] unit-test
 ] when
 
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 1 1 }
+        T{ ##load-immediate f 2 -1 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 1 1 }
+        T{ ##neg f 2 1 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 1 1 }
+        T{ ##load-immediate f 2 -2 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-immediate f 1 1 }
+        T{ ##not f 2 1 }
+    } value-numbering-step
+] unit-test
+
 ! Displaced alien optimizations
 3 vreg-counter set-global
 
@@ -947,7 +1087,7 @@ cell 8 = [
     {
         T{ ##load-immediate f 1 1 }
         T{ ##load-immediate f 2 2 }
-        T{ ##load-reference f 3 t }
+        T{ ##load-constant f 3 t }
     }
 ] [
     {
@@ -961,7 +1101,7 @@ cell 8 = [
     {
         T{ ##load-immediate f 1 1 }
         T{ ##load-immediate f 2 2 }
-        T{ ##load-reference f 3 t }
+        T{ ##load-constant f 3 t }
     }
 ] [
     {
@@ -1000,7 +1140,7 @@ cell 8 = [
 [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##load-reference f 1 t }
+        T{ ##load-constant f 1 t }
     }
 ] [
     {
@@ -1024,7 +1164,7 @@ cell 8 = [
 [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##load-reference f 1 t }
+        T{ ##load-constant f 1 t }
     }
 ] [
     {
@@ -1048,12 +1188,96 @@ cell 8 = [
 [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##load-reference f 1 t }
+        T{ ##load-constant f 1 t }
     }
 ] [
     {
         T{ ##peek f 0 D 0 }
         T{ ##compare f 1 0 0 cc= }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##vector>scalar f 1 0 float-4-rep }
+        T{ ##copy f 2 0 any-rep }
+    }
+] [
+    {
+        T{ ##vector>scalar f 1 0 float-4-rep }
+        T{ ##scalar>vector f 2 1 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##copy f 1 0 any-rep }
+    }
+] [
+    {
+        T{ ##shuffle-vector-imm f 1 0 { 0 1 2 3 } float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##shuffle-vector-imm f 1 0 { 1 2 3 0 } float-4-rep }
+        T{ ##shuffle-vector-imm f 2 0 { 0 2 3 1 } float-4-rep }
+    }
+] [
+    {
+        T{ ##shuffle-vector-imm f 1 0 { 1 2 3 0 } float-4-rep }
+        T{ ##shuffle-vector-imm f 2 1 { 3 1 2 0 } float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##shuffle-vector-imm f 1 0 { 1 2 3 0 } float-4-rep }
+        T{ ##shuffle-vector-imm f 2 1 { 1 0 } double-2-rep }
+    }
+] [
+    {
+        T{ ##shuffle-vector-imm f 1 0 { 1 2 3 0 } float-4-rep }
+        T{ ##shuffle-vector-imm f 2 1 { 1 0 } double-2-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-constant f 0 $[ 55 tag-fixnum ] }
+        T{ ##load-constant f 1 B{ 55 0 0 0  55 0 0 0  55 0 0 0  55 0 0 0 } }
+        T{ ##copy f 2 1 any-rep }
+    }
+] [
+    {
+        T{ ##load-constant f 0 $[ 55 tag-fixnum ] }
+        T{ ##scalar>vector f 1 0 int-4-rep }
+        T{ ##shuffle-vector-imm f 2 1 { 0 0 0 0 } float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-constant f 0 1.25 }
+        T{ ##load-constant f 1 B{ 0 0 160 63 0 0 160 63 0 0 160 63 0 0 160 63 } }
+        T{ ##copy f 2 1 any-rep }
+    }
+] [
+    {
+        T{ ##load-constant f 0 1.25 }
+        T{ ##scalar>vector f 1 0 float-4-rep }
+        T{ ##shuffle-vector-imm f 2 1 { 0 0 0 0 } float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##zero-vector f 2 float-4-rep }
+    }
+] [
+    {
+        T{ ##xor-vector f 2 1 1 float-4-rep }
     } value-numbering-step
 ] unit-test
 
@@ -1203,7 +1427,7 @@ cell 8 = [
 [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##load-reference f 1 t }
+        T{ ##load-constant f 1 t }
         T{ ##branch }
     }
     0

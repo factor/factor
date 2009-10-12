@@ -3,7 +3,7 @@
 namespace factor
 {
 
-#define FRAME_RETURN_ADDRESS(frame) *(void **)(frame_successor(frame) + 1)
+#define FRAME_RETURN_ADDRESS(frame,vm) *(void **)(vm->frame_successor(frame) + 1)
 
 inline static void flush_icache(cell start, cell len) {}
 
@@ -69,7 +69,7 @@ inline static unsigned int fpu_status(unsigned int status)
 }
 
 /* Defined in assembly */
-VM_ASM_API void c_to_factor(cell quot,void *vm);
+VM_ASM_API void c_to_factor(cell quot, void *vm);
 VM_ASM_API void throw_impl(cell quot, stack_frame *rewind_to, void *vm);
 VM_ASM_API void lazy_jit_compile(cell quot, void *vm);
 

@@ -1,43 +1,11 @@
-USING: images.bitmap images.viewer io.encodings.binary
-io.files io.files.unique kernel tools.test images.loader
-literals sequences checksums.md5 checksums ;
+USING: images.bitmap images.bitmap.loading images.testing kernel ;
 IN: images.bitmap.tests
 
-CONSTANT: test-bitmap24 "vocab:images/test-images/thiswayup24.bmp"
+! "vocab:images/testing/bmp/1bit.bmp" decode-test
+! "vocab:images/testing/bmp/rgb_4bit.bmp" decode-test
 
-CONSTANT: test-bitmap8 "vocab:images/test-images/rgb8bit.bmp"
+"vocab:images/testing/bmp/rgb_8bit.bmp"
+[ decode-test ] [ bmp-image encode-test ] bi
 
-CONSTANT: test-bitmap4 "vocab:images/test-images/rgb4bit.bmp"
-
-CONSTANT: test-bitmap1 "vocab:images/test-images/1bit.bmp"
-
-CONSTANT: test-40 "vocab:images/test-images/40red24bit.bmp"
-CONSTANT: test-41 "vocab:images/test-images/41red24bit.bmp"
-CONSTANT: test-42 "vocab:images/test-images/42red24bit.bmp"
-CONSTANT: test-43 "vocab:images/test-images/43red24bit.bmp"
-
-${
-    test-bitmap8
-    test-bitmap24
-    "vocab:ui/render/test/reference.bmp"
-} [ [ ] swap [ load-image drop ] curry unit-test ] each
-
-
-: test-bitmap-save ( path -- ? )
-    [ md5 checksum-file ]
-    [ load-image ] bi
-    "bitmap-save-test" ".bmp" make-unique-file
-    [ save-bitmap ]
-    [ md5 checksum-file ] bi = ;
-
-[
-    t   
-] [
-    ${
-        test-40
-        test-41
-        test-42
-        test-43
-        test-bitmap24
-    } [ test-bitmap-save ] all?
-] unit-test
+"vocab:images/testing/bmp/42red_24bit.bmp"
+[ decode-test ] [ bmp-image encode-test ] bi

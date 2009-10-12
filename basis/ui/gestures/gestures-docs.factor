@@ -263,28 +263,34 @@ ARTICLE: "ui-gestures" "UI gestures"
 "User actions such as keyboard input and mouse button clicks deliver " { $emphasis "gestures" } " to gadgets. If the direct receiver of the gesture does not handle it, the gesture is passed on to the receiver's parent, and this way it travels up the gadget hierarchy. Gestures which are not handled at some point are ignored."
 $nl
 "There are two ways to define gesture handling logic. The simplest way is to associate a fixed set of gestures with a class:"
-{ $subsection set-gestures }
+{ $subsections set-gestures }
 "Another way is to define a generic word on a class which handles all gestures sent to gadgets of that class:"
-{ $subsection handle-gesture }
+{ $subsections handle-gesture }
 "Sometimes a gesture needs to be presented to the user:"
-{ $subsection gesture>string }
+{ $subsections gesture>string }
 "Keyboard input:"
-{ $subsection "ui-focus" }
-{ $subsection "keyboard-gestures" }
-{ $subsection "action-gestures" }
-{ $subsection "ui-user-input" }
+{ $subsections
+    "ui-focus"
+    "keyboard-gestures"
+    "action-gestures"
+    "ui-user-input"
+}
 "Mouse input:"
-{ $subsection "mouse-gestures" }
-{ $subsection "multitouch-gestures" }
+{ $subsections
+    "mouse-gestures"
+    "multitouch-gestures"
+}
 "Guidelines for cross-platform applications:"
-{ $subsection "gesture-differences" }
+{ $subsections "gesture-differences" }
 "Abstractions built on top of gestures:"
-{ $subsection "ui-commands" }
-{ $subsection "ui-operations" } ;
+{ $subsections
+    "ui-commands"
+    "ui-operations"
+} ;
 
 ARTICLE: "ui-focus" "Keyboard focus"
 "The gadget with keyboard focus is the current receiver of keyboard gestures and user input. Gadgets that wish to receive keyboard input should request focus when clicked:"
-{ $subsection request-focus }
+{ $subsections request-focus }
 "The following example demonstrates defining a handler for a mouse click gesture which requests focus:"
 { $code
     "my-gadget H{"
@@ -292,21 +298,27 @@ ARTICLE: "ui-focus" "Keyboard focus"
     "} set-gestures"
 }
 "To nominate a single child as the default focusable child, implement a method on a generic word:"
-{ $subsection focusable-child* }
+{ $subsections focusable-child* }
 "Gestures are sent to a gadget when it gains or loses focus; this can be used to change the gadget's appearance, for example by displaying a border:"
-{ $subsection gain-focus }
-{ $subsection lose-focus } ;
+{ $subsections
+    gain-focus
+    lose-focus
+} ;
 
 ARTICLE: "keyboard-gestures" "Keyboard gestures"
 "There are two types of keyboard gestures:"
-{ $subsection key-down }
-{ $subsection key-up }
+{ $subsections
+    key-down
+    key-up
+}
 "Each keyboard gesture has a set of modifiers and a key symbol. The set modifiers is denoted by an array which must either be " { $link f } ", or an order-preserving subsequence of the following:"
 { $code "{ S+ C+ A+ M+ }" }
-{ $subsection S+ }
-{ $subsection C+ }
-{ $subsection A+ }
-{ $subsection M+ }
+{ $subsections
+    S+
+    C+
+    A+
+    M+
+}
 "A key symbol is either a single-character string denoting literal input, or one of the following strings:"
 { $list
   { $snippet "CLEAR" }
@@ -339,66 +351,82 @@ ARTICLE: "keyboard-gestures" "Keyboard gestures"
 
 ARTICLE: "ui-user-input" "Free-form keyboard input"
 "Whereas keyboard gestures are intended to be used for keyboard shortcuts, certain gadgets such as text fields need to accept free-form keyboard input. This can be done by implementing a generic word:"
-{ $subsection user-input* } ;
+{ $subsections user-input* } ;
 
 ARTICLE: "mouse-gestures" "Mouse gestures"
 "There are two types of mouse gestures indicating button clicks:"
-{ $subsection button-down }
-{ $subsection button-up }
+{ $subsections
+    button-down
+    button-up
+}
 "When a mouse button is pressed or released, two gestures are sent. The first gesture indicates the specific button number, and if this gesture is not handled, the second has a button number set to " { $link f } ":"
 { $code "T{ button-down f 1 }" "T{ button-down f f }" }
 "Because tuple literals fill unspecified slots with " { $link f } ", the last gesture can be written as " { $snippet "T{ button-down }" } "."
 $nl
 "Gestures to indicate mouse motion, depending on whenever a button is held down or not:"
-{ $subsection motion }
-{ $subsection drag }
+{ $subsections
+    motion
+    drag
+}
 "Gestures to indicate that the mouse has crossed gadget boundaries:"
-{ $subsection mouse-enter }
-{ $subsection mouse-leave }
+{ $subsections
+    mouse-enter
+    mouse-leave
+}
 "A number of global variables are set after a mouse gesture is sent. These variables can be read to obtain additional information about the gesture."
-{ $subsection hand-gadget }
-{ $subsection hand-world }
-{ $subsection hand-loc }
-{ $subsection hand-buttons }
-{ $subsection hand-clicked }
-{ $subsection hand-click-loc }
-{ $subsection hand-click# }
+{ $subsections
+    hand-gadget
+    hand-world
+    hand-loc
+    hand-buttons
+    hand-clicked
+    hand-click-loc
+    hand-click#
+}
 "There are some utility words for working with click locations:"
-{ $subsection hand-rel }
-{ $subsection hand-click-rel }
-{ $subsection drag-loc }
+{ $subsections
+    hand-rel
+    hand-click-rel
+    drag-loc
+}
 "Mouse scroll wheel gesture:"
-{ $subsection mouse-scroll }
+{ $subsections mouse-scroll }
 "Global variable set when a mouse scroll wheel gesture is sent:"
-{ $subsection scroll-direction } ;
+{ $subsections scroll-direction } ;
 
 ARTICLE: "multitouch-gestures" "Multi-touch gestures"
 "Multi-touch gestures are only supported on Mac OS X with newer MacBook and MacBook Pro models."
 $nl
 "Three-finger swipe:"
-{ $subsection left-action }
-{ $subsection right-action }
-{ $subsection up-action }
-{ $subsection down-action }
+{ $subsections
+    left-action
+    right-action
+    up-action
+    down-action
+}
 "Two-finger pinch:"
-{ $subsection zoom-in-action }
-{ $subsection zoom-out-action } ;
+{ $subsections
+    zoom-in-action
+    zoom-out-action
+} ;
 
 ARTICLE: "action-gestures" "Action gestures"
 "Action gestures exist to keep keyboard shortcuts for common application operations consistent."
-{ $subsection undo-action }
-{ $subsection redo-action }
-{ $subsection cut-action }
-{ $subsection copy-action }
-{ $subsection paste-action }
-{ $subsection delete-action }
-{ $subsection select-all-action }
-{ $subsection new-action }
-{ $subsection open-action }
-{ $subsection save-action }
-{ $subsection save-as-action }
-{ $subsection revert-action }
-{ $subsection close-action }
+{ $subsections
+    undo-action
+    redo-action
+    cut-action
+    copy-action
+    paste-action
+    delete-action
+    select-all-action
+    new-action
+    open-action
+    save-action
+    save-as-action
+    revert-action
+    close-action
+}
 "The following keyboard gestures, if not handled directly, send action gestures:"
 { $table
     { { $strong "Keyboard gesture" } { $strong "Action gesture" } }

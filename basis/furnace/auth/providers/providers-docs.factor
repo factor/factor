@@ -36,10 +36,12 @@ ARTICLE: "furnace.auth.providers.protocol" "Authentication provider protocol"
 "The " { $vocab-link "furnace.auth.providers" } " vocabulary implements a protocol for persistence and authentication of users."
 $nl
 "The class of users:"
-{ $subsection user }
+{ $subsections user }
 "Generic protocol:"
-{ $subsection get-user }
-{ $subsection new-user }
-{ $subsection update-user } ;
+{ $subsections
+    get-user
+    new-user
+    update-user
+} ;
 
 ABOUT: "furnace.auth.providers.protocol"

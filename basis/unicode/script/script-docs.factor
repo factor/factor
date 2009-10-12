@@ -7,7 +7,7 @@ ABOUT: "unicode.script"
 
 ARTICLE: "unicode.script" "Unicode script properties"
 "The unicode standard gives every character a script. Note that this is different from a language, and that it is non-trivial to detect language from a string. To get the script of a character, use"
-{ $subsection script-of } ;
+{ $subsections script-of } ;
 
 HELP: script-of
 { $values { "char" "a code point" } { "script" string } }

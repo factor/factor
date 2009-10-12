@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax kernel windows.types multiline
-classes.struct ;
+USING: alien alien.c-types alien.syntax kernel windows.types
+multiline classes.struct ;
 IN: windows.kernel32
 
 CONSTANT: MAX_PATH 260
@@ -543,7 +543,7 @@ STRUCT: DCB
 TYPEDEF: DCB* PDCB
 TYPEDEF: DCB* LPDCB
 
-STRUCT: COMM_CONFIG
+STRUCT: COMMCONFIG
     { dwSize DWORD }
     { wVersion WORD }
     { wReserved WORD }
@@ -704,7 +704,7 @@ STRUCT: WIN32_FIND_DATA
     { nFileSizeLow DWORD }
     { dwReserved0 DWORD }
     { dwReserved1 DWORD }
-    { cFileName { "TCHAR" MAX_PATH } }
+    { cFileName { TCHAR MAX_PATH } }
     { cAlternateFileName TCHAR[14] } ;
 
 TYPEDEF: WIN32_FIND_DATA* PWIN32_FIND_DATA

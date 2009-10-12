@@ -5,13 +5,17 @@ IN: classes.union
 
 ARTICLE: "unions" "Union classes"
 "An object is an instance of a union class if it is an instance of one of its members."
-{ $subsection POSTPONE: UNION: }
-{ $subsection define-union-class }
+{ $subsections
+    POSTPONE: UNION:
+    define-union-class
+}
 "Union classes can be introspected:"
-{ $subsection members }
+{ $subsections members }
 "The set of union classes is a class:"
-{ $subsection union-class }
-{ $subsection union-class? } 
+{ $subsections
+    union-class
+    union-class?
+}
 "Unions are used to define behavior shared between a fixed set of classes, as well as to conveniently define predicates."
 { $see-also "mixins" "tuple-subclassing" } ;
 

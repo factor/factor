@@ -52,16 +52,20 @@ ARTICLE: "syndication" "Atom and RSS feed syndication"
 "The " { $vocab-link "syndication" } " vocabulary implements support for reading Atom and RSS feeds, and writing Atom feeds."
 $nl
 "Data types:"
-{ $subsection feed }
-{ $subsection <feed> }
-{ $subsection entry }
-{ $subsection <entry> }
+{ $subsections
+    feed
+    <feed>
+    entry
+    <entry>
+}
 "Reading feeds:"
-{ $subsection download-feed }
-{ $subsection parse-feed }
-{ $subsection xml>feed }
+{ $subsections
+    download-feed
+    parse-feed
+    xml>feed
+}
 "Writing feeds:"
-{ $subsection feed>xml }
+{ $subsections feed>xml }
 "The " { $vocab-link "furnace.syndication" } " vocabulary builds on top of this vocabulary to enable easy generation of Atom feeds from web applications. The " { $vocab-link "webapps.planet" } " vocabulary is a complete example of a web application which reads and exports feeds."
 { $see-also "urls" } ;
 

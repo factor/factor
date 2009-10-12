@@ -10,6 +10,8 @@ COM-INTERFACE: IUnknown f {00000000-0000-0000-C000-000000000046}
     ULONG AddRef ( )
     ULONG Release ( ) ;
 
+C-TYPE: IAdviseSink
+
 COM-INTERFACE: IDataObject IUnknown {0000010E-0000-0000-C000-000000000046}
     HRESULT GetData ( FORMATETC* pFormatetc, STGMEDIUM* pmedium )
     HRESULT GetDataHere ( FORMATETC* pFormatetc, STGMEDIUM* pmedium )
@@ -26,6 +28,10 @@ COM-INTERFACE: IDropTarget IUnknown {00000122-0000-0000-C000-000000000046}
     HRESULT DragOver ( DWORD grfKeyState, POINTL pt, DWORD* pdwEffect )
     HRESULT DragLeave ( )
     HRESULT Drop ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect ) ;
+
+FUNCTION: HRESULT RegisterDragDrop ( HWND hWnd, IDropTarget* pDropTarget ) ;
+FUNCTION: HRESULT RevokeDragDrop ( HWND hWnd ) ;
+FUNCTION: void ReleaseStgMedium ( LPSTGMEDIUM pmedium ) ;
 
 : com-query-interface ( interface iid -- interface' )
     [

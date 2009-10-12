@@ -13,6 +13,8 @@ TUPLE: c-stream < disposable handle ;
 
 M: c-stream dispose* handle>> fclose ;
 
+M: c-stream stream-tell handle>> ftell ;
+
 M: c-stream stream-seek
     handle>> swap {
         { seek-absolute [ 0 ] }

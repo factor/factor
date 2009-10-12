@@ -7,23 +7,33 @@ ARTICLE: "io.ports" "Non-blocking I/O implementation"
 "On Windows and Unix, Factor implements blocking file and network streams on top of a non-blocking I/O substrate, ensuring that Factor threads will yield when performing I/O. This substrate is implemented in the " { $vocab-link "io.ports" } " vocabulary."
 $nl
 "A " { $emphasis "port" } " is a stream using non-blocking I/O substrate:"
-{ $subsection port }
-{ $subsection <port> }
-{ $subsection <buffered-port> }
+{ $subsections
+    port
+    <port>
+    <buffered-port>
+}
 "Input ports:"
-{ $subsection input-port }
-{ $subsection <input-port> }
+{ $subsections
+    input-port
+    <input-port>
+}
 "Output ports:"
-{ $subsection output-port }
-{ $subsection <output-port> }
+{ $subsections
+    output-port
+    <output-port>
+}
 "Global native I/O protocol:"
-{ $subsection io-backend }
-{ $subsection init-io }
-{ $subsection init-stdio }
-{ $subsection io-multiplex }
+{ $subsections
+    io-backend
+    init-io
+    init-stdio
+    io-multiplex
+}
 "Per-port native I/O protocol:"
-{ $subsection (wait-to-read) }
-{ $subsection (wait-to-write) }
+{ $subsections
+    (wait-to-read)
+    (wait-to-write)
+}
 "Additionally, the I/O backend must provide an implementation of the " { $link dispose } " generic word." ;
 
 ABOUT: "io.ports"

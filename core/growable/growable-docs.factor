@@ -6,14 +6,14 @@ ARTICLE: "growable" "Resizable sequence implementation"
 "Resizable sequences are implementing by having a wrapper object hold a reference to an underlying sequence, together with a fill pointer indicating how many elements of the underlying sequence are occupied. When the fill pointer exceeds the underlying sequence capacity, the underlying sequence grows."
 $nl
 "There is a resizable sequence mixin:"
-{ $subsection growable }
+{ $subsections growable }
 "This mixin implements the sequence protocol by assuming the object has two specific slots:"
 { $list
     { { $snippet "length" } " - the fill pointer (number of occupied elements in the underlying storage)" }
     { { $snippet "underlying" } " - the underlying storage" }
 }
 "The underlying sequence must implement a generic word:"
-{ $subsection resize }
+{ $subsections resize }
 { $link "vectors" } " and " { $link "sbufs" } " are implemented using the resizable sequence facility." ;
 
 ABOUT: "growable"

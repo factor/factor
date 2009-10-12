@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel tools.test peg peg.javascript.ast peg.javascript.parser 
-       accessors multiline sequences math peg.ebnf ;
+       accessors sequences math peg.ebnf ;
 IN: peg.javascript.parser.tests
 
 {
@@ -25,29 +25,29 @@ IN: peg.javascript.parser.tests
 ] unit-test
 
 { t } [ 
-<"
+"""
 var x=5
 var y=10
-"> main \ javascript rule (parse) remaining>> length zero?
+""" main \ javascript rule (parse) remaining>> length zero?
 ] unit-test
 
 
 { t } [ 
-<"
+"""
 function foldl(f, initial, seq) {
    for(var i=0; i< seq.length; ++i)
      initial = f(initial, seq[i]);
    return initial;
-}"> main \ javascript rule (parse) remaining>> length zero?
+}""" main \ javascript rule (parse) remaining>> length zero?
 ] unit-test
 
 { t } [ 
-<"
+"""
 ParseState.prototype.from = function(index) {
     var r = new ParseState(this.input, this.index + index);
     r.cache = this.cache;
     r.length = this.length - index;
     return r;
-}"> main \ javascript rule (parse) remaining>> length zero?
+}""" main \ javascript rule (parse) remaining>> length zero?
 ] unit-test
 

@@ -2,11 +2,14 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-vectors combinators destructors fry io
-io.encodings io.files io.files.info kernel math namespaces
-sequences ;
+io.encodings io.files io.files.info kernel locals math
+namespaces sequences ;
 IN: io.streams.limited
 
-TUPLE: limited-stream stream count limit mode stack ;
+TUPLE: limited-stream
+    stream mode
+    count limit
+    current start stop ;
 
 SINGLETONS: stream-throws stream-eofs ;
 
@@ -37,7 +40,7 @@ M: decoder unlimited ( stream -- stream' )
     [ stream>> ] change-stream ;
 
 M: object unlimited ( stream -- stream' )
-    stream>> stream>> ;
+    stream>> ;
 
 : limit-input ( limit mode -- )
     [ input-stream ] 2dip '[ _ _ limit ] change ;
@@ -51,13 +54,27 @@ M: object unlimited ( stream -- stream' )
 : with-limited-stream ( stream limit mode quot -- )
     [ limit ] dip call ; inline
 
-ERROR: limit-exceeded ;
+ERROR: limit-exceeded n stream ;
 
 ERROR: bad-stream-mode mode ;
 
 <PRIVATE
 
-: adjust-limit ( n stream -- n' stream )
+: adjust-current-limit ( n stream -- n' stream )
+    2dup [ + ] change-current
+    [ current>> ] [ stop>> ] bi >
+    [
+        dup mode>> {
+            { stream-throws [ limit-exceeded ] }
+            { stream-eofs [ 
+                dup [ current>> ] [ stop>> ] bi -
+                '[ _ - ] dip
+            ] }
+            [ bad-stream-mode ]
+        } case
+    ] when ; inline
+
+: adjust-count-limit ( n stream -- n' stream )
     2dup [ + ] change-count
     [ count>> ] [ limit>> ] bi >
     [
@@ -66,13 +83,29 @@ ERROR: bad-stream-mode mode ;
             { stream-eofs [ 
                 dup [ count>> ] [ limit>> ] bi -
                 '[ _ - ] dip
+                dup limit>> >>count
             ] }
             [ bad-stream-mode ]
         } case
     ] when ; inline
 
+: check-count-bounds ( n stream -- n stream )
+    dup [ count>> ] [ limit>> ] bi >
+    [ limit-exceeded ] when ;
+
+: check-current-bounds ( n stream -- n stream )
+    dup [ current>> ] [ start>> ] bi <
+    [ limit-exceeded ] when ;
+
+: adjust-limited-read ( n stream -- n stream )
+    dup start>> [
+        check-current-bounds adjust-current-limit
+    ] [
+        check-count-bounds adjust-count-limit
+    ] if ;
+
 : maybe-read ( n limited-stream quot: ( n stream -- seq/f ) -- seq/f )
-    [ adjust-limit ] dip
+    [ adjust-limited-read ] dip
     pick 0 <= [ 3drop f ] [ [ stream>> ] dip call ] if ; inline
 
 PRIVATE>
@@ -93,13 +126,35 @@ M: limited-stream stream-read-partial
     3dup [ [ stream-read1 dup ] dip memq? ] dip
     swap [ drop ] [ push (read-until) ] if ;
 
+:: limited-stream-seek ( n seek-type stream -- )
+    seek-type {
+        { seek-absolute [ n stream (>>current) ] }
+        { seek-relative [ stream [ n + ] change-current drop ] }
+        { seek-end [ stream stop>> n - stream (>>current) ] }
+        [ bad-seek-type ]
+    } case ;
+
+: >limited-seek ( stream -- stream' )
+    dup start>> [
+        dup stream-tell >>current
+        dup [ current>> ] [ count>> ] bi - >>start
+        dup [ start>> ] [ limit>> ] bi + >>stop
+    ] unless ;
+
 PRIVATE>
 
 M: limited-stream stream-read-until
     swap BV{ } clone (read-until) [ 2nip B{ } like ] dip ;
 
-M: limited-stream stream-seek
-    stream>> stream-seek ;
+M: limited-stream stream-tell
+    stream>> stream-tell ;
 
-M: limited-stream dispose
-    stream>> dispose ;
+M: limited-stream stream-seek
+    >limited-seek
+    [ stream>> stream-seek ]
+    [ limited-stream-seek ] 3bi ;
+
+M: limited-stream dispose stream>> dispose ;
+
+M: limited-stream stream-element-type
+    stream>> stream-element-type ;

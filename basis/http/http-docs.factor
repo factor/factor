@@ -126,48 +126,64 @@ $nl
 "The " { $vocab-link "furnace.sessions" } " vocabulary implements session management using cookies, thus the most common use case can be taken care of without working with cookies directly."
 $nl
 "The class of cookies:"
-{ $subsection cookie }
+{ $subsections cookie }
 "Creating cookies:"
-{ $subsection <cookie> }
+{ $subsections <cookie> }
 "Getting, adding, and deleting cookies in " { $link request } " and " { $link response } " objects:"
-{ $subsection get-cookie }
-{ $subsection put-cookie }
-{ $subsection delete-cookie } ;
+{ $subsections
+    get-cookie
+    put-cookie
+    delete-cookie
+} ;
 
 ARTICLE: "http.headers" "HTTP headers"
 "Every " { $link request } " and " { $link response } " has a set of HTTP headers stored in the " { $slot "header" } " slot. Header names are normalized to lower-case when a request or response is being parsed."
-{ $subsection header }
-{ $subsection set-header } ;
+{ $subsections
+    header
+    set-header
+} ;
 
 ARTICLE: "http.post-data" "HTTP post data"
 "Every " { $link request } " where the " { $slot "method" } " slot is " { $snippet "POST" } " can contain post data."
-{ $subsection post-data }
-{ $subsection <post-data> } ;
+{ $subsections
+    post-data
+    <post-data>
+} ;
 
 ARTICLE: "http.requests" "HTTP requests"
 "HTTP requests:"
-{ $subsection request }
-{ $subsection <request> }
+{ $subsections
+    request
+    <request>
+}
 "Requests can contain form submissions:"
-{ $subsection "http.post-data" } ;
+{ $subsections "http.post-data" } ;
 
 ARTICLE: "http.responses" "HTTP responses"
 "HTTP responses:"
-{ $subsection response }
-{ $subsection <response> }
+{ $subsections
+    response
+    <response>
+}
 "Raw responses only contain a status line, with no header. They are used by webapps which need full control over the HTTP response, for example " { $vocab-link "http.server.cgi" } ":"
-{ $subsection raw-response }
-{ $subsection <raw-response> } ;
+{ $subsections
+    raw-response
+    <raw-response>
+} ;
 
 ARTICLE: "http" "HTTP protocol objects"
 "The " { $vocab-link "http" } " vocabulary contains data types shared by " { $vocab-link "http.client" } " and " { $vocab-link "http.server" } "."
 $nl
 "The HTTP client sends an HTTP request to the server and receives an HTTP response back. The HTTP server receives HTTP requests from clients and sends HTTP responses back."
-{ $subsection "http.requests" }
-{ $subsection "http.responses" }
+{ $subsections
+    "http.requests"
+    "http.responses"
+}
 "Both requests and responses support some common functionality:"
-{ $subsection "http.headers" }
-{ $subsection "http.cookies" }
+{ $subsections
+    "http.headers"
+    "http.cookies"
+}
 { $see-also "urls" } ;
 
 ABOUT: "http"

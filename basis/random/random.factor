@@ -1,16 +1,16 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types kernel math namespaces sequences
-io.backend io.binary combinators system vocabs.loader
-summary math.bitwise byte-vectors fry byte-arrays
-math.ranges math.constants math.functions accessors ;
+USING: accessors alien.c-types assocs byte-arrays byte-vectors
+combinators fry io.backend io.binary kernel locals math
+math.bitwise math.constants math.functions math.ranges
+namespaces sequences sets summary system vocabs.loader ;
 IN: random
 
 SYMBOL: system-random-generator
 SYMBOL: secure-random-generator
 SYMBOL: random-generator
 
-GENERIC: seed-random ( tuple seed -- )
+GENERIC# seed-random 1 ( tuple seed -- tuple' )
 GENERIC: random-32* ( tuple -- r )
 GENERIC: random-bytes* ( n tuple -- byte-array )
 
@@ -22,7 +22,7 @@ M: object random-bytes* ( n tuple -- byte-array )
         [ 2drop ] [ random-32* 4 >le swap head over push-all ] if
     ] bi-curry bi* ;
 
-M: object random-32* ( tuple -- r ) 4 random-bytes* le> ;
+M: object random-32* ( tuple -- r ) 4 swap random-bytes* le> ;
 
 ERROR: no-random-number-generator ;
 
@@ -55,10 +55,31 @@ PRIVATE>
         [ length random-integer ] keep nth
     ] if-empty ;
 
+: random-32 ( -- n ) random-generator get random-32* ;
+
 : randomize ( seq -- seq )
     dup length [ dup 1 > ]
     [ [ iota random ] [ 1 - ] bi [ pick exchange ] keep ]
     while drop ;
+
+ERROR: too-many-samples seq n ;
+
+<PRIVATE
+
+:: next-sample ( length n seq hashtable -- elt )
+    n hashtable key? [
+        length n 1 + length mod seq hashtable next-sample
+    ] [
+        n hashtable conjoin
+        n seq nth
+    ] if ;
+
+PRIVATE>
+
+: sample ( seq n -- seq' )
+    2dup [ length ] dip < [ too-many-samples ] when
+    swap [ length ] [ ] bi H{ } clone 
+    '[ _ dup random _ _ next-sample ] replicate ;
 
 : delete-random ( seq -- elt )
     [ length random-integer ] keep [ nth ] 2keep delete-nth ;

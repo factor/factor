@@ -86,6 +86,14 @@ HELP: stream-copy
 { $description "Copies the contents of one stream into another, closing both streams when done." } 
 $io-error ;
 
+HELP: stream-tell
+{ $values
+     { "stream" "a stream" } { "n" integer }
+}
+{ $description "Returns the index of the stream pointer if the stream is seekable." }
+{ $notes "Stream seeking is not supported on streams that do not have a known length, e.g. TCP/IP streams." } ;
+
+
 HELP: stream-seek
 { $values
      { "n" integer } { "seek-type" "a seek singleton" } { "stream" "a stream" }
@@ -256,22 +264,29 @@ $nl
 "All streams must implement the " { $link dispose } " word in addition to the stream protocol."
 $nl
 "The following word is required for all input and output streams:"
-{ $subsection stream-element-type }
+{ $subsections stream-element-type }
 "These words are required for binary and string input streams:"
-{ $subsection stream-read1 }
-{ $subsection stream-read }
-{ $subsection stream-read-until }
-{ $subsection stream-read-partial }
+{ $subsections
+    stream-read1
+    stream-read
+    stream-read-until
+    stream-read-partial
+}
 "This word is only required for string input streams:"
-{ $subsection stream-readln }
+{ $subsections stream-readln }
 "These words are required for binary and string output streams:"
-{ $subsection stream-flush }
-{ $subsection stream-write1 }
-{ $subsection stream-write }
+{ $subsections
+    stream-flush
+    stream-write1
+    stream-write
+}
 "This word is only required for string output streams:"
-{ $subsection stream-nl }
-"This word is for streams that allow seeking:"
-{ $subsection stream-seek }
+{ $subsections stream-nl }
+"These words are for seekable streams:"
+{ $subsections
+    stream-tell
+    stream-seek
+}
 { $see-also "io.timeouts" } ;
 
 ARTICLE: "stdio-motivation" "Motivation for default streams"
@@ -312,63 +327,81 @@ ARTICLE: "stdio-motivation" "Motivation for default streams"
 } ;
 
 ARTICLE: "stdio" "Default input and output streams"
-{ $subsection "stdio-motivation" }
+{ $subsections "stdio-motivation" }
 "The default input stream is stored in a dynamically-scoped variable:"
-{ $subsection input-stream }
+{ $subsections input-stream }
 "Unless rebound in a child namespace, this variable will be set to a console stream for reading input from the user."
 $nl
 "Words reading from the default input stream:"
-{ $subsection read1 }
-{ $subsection read }
-{ $subsection read-until }
-{ $subsection read-partial }
+{ $subsections
+    read1
+    read
+    read-until
+    read-partial
+}
 "If the default input stream is a character stream (" { $link stream-element-type } " outputs " { $link +character+ } "), lines of text can be read:"
-{ $subsection readln }
+{ $subsections readln }
 "Seeking on the default input stream:"
-{ $subsection seek-input }
+{ $subsections seek-input }
 "A pair of combinators for rebinding the " { $link input-stream } " variable:"
-{ $subsection with-input-stream }
-{ $subsection with-input-stream* }
+{ $subsections
+    with-input-stream
+    with-input-stream*
+}
 "The default output stream is stored in a dynamically-scoped variable:"
-{ $subsection output-stream }
+{ $subsections output-stream }
 "Unless rebound in a child namespace, this variable will be set to a console stream for showing output to the user."
 $nl
 "Words writing to the default output stream:"
-{ $subsection flush }
-{ $subsection write1 }
-{ $subsection write }
+{ $subsections
+    flush
+    write1
+    write
+}
 "If the default output stream is a character stream (" { $link stream-element-type } " outputs " { $link +character+ } "), lines of text can be written:"
-{ $subsection print }
-{ $subsection nl }
-{ $subsection bl }
+{ $subsections
+    print
+    nl
+    bl
+}
 "Seeking on the default output stream:"
-{ $subsection seek-output }
+{ $subsections seek-output }
 "Seeking descriptors:"
-{ $subsection seek-absolute }
-{ $subsection seek-relative }
-{ $subsection seek-end }
+{ $subsections
+    seek-absolute
+    seek-relative
+    seek-end
+}
 "A pair of combinators for rebinding the " { $link output-stream } " variable:"
-{ $subsection with-output-stream }
-{ $subsection with-output-stream* }
+{ $subsections
+    with-output-stream
+    with-output-stream*
+}
 "A pair of combinators for rebinding both default streams at once:"
-{ $subsection with-streams }
-{ $subsection with-streams* } ;
+{ $subsections
+    with-streams
+    with-streams*
+} ;
 
 ARTICLE: "stream-utils" "Stream utilities"
 "There are a few useful stream-related words which are not generic, but merely built up from the stream protocol."
 $nl
 "First, a simple composition of " { $link stream-write } " and " { $link stream-nl } ":"
-{ $subsection stream-print }
+{ $subsections stream-print }
 "Processing lines one by one:"
-{ $subsection stream-lines }
-{ $subsection lines }
-{ $subsection each-line }
+{ $subsections
+    stream-lines
+    lines
+    each-line
+}
 "Processing blocks of data:"
-{ $subsection stream-contents }
-{ $subsection contents }
-{ $subsection each-block }
+{ $subsections
+    stream-contents
+    contents
+    each-block
+}
 "Copying the contents of one stream to another:"
-{ $subsection stream-copy } ;
+{ $subsections stream-copy } ;
 
 ARTICLE: "stream-examples" "Stream example"
 "Ask the user for their age, and print it back:"
@@ -390,11 +423,13 @@ ARTICLE: "stream-examples" "Stream example"
 
 ARTICLE: "streams" "Streams"
 "Input and output centers on the concept of a " { $emphasis "stream" } ", which is a source or sink of " { $emphasis "elements" } "."
-{ $subsection "stream-examples" }
+{ $subsections "stream-examples" }
 "A stream can either be passed around on the stack or bound to a dynamic variable and used as one of the two implicit " { $emphasis "default streams" } "."
-{ $subsection "stream-protocol" }
-{ $subsection "stdio" }
-{ $subsection "stream-utils" }
+{ $subsections
+    "stream-protocol"
+    "stdio"
+    "stream-utils"
+}
 { $see-also "io.streams.string" "io.streams.plain" "io.streams.duplex" } ;
 
 ABOUT: "streams"

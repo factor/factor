@@ -5,11 +5,12 @@ sequences math.bitwise ;
 IN: cocoa.windows
 
 ! Window styles
-CONSTANT: NSBorderlessWindowMask     0
-CONSTANT: NSTitledWindowMask         1
-CONSTANT: NSClosableWindowMask       2
-CONSTANT: NSMiniaturizableWindowMask 4
-CONSTANT: NSResizableWindowMask      8
+CONSTANT: NSBorderlessWindowMask           0
+CONSTANT: NSTitledWindowMask               1
+CONSTANT: NSClosableWindowMask             2
+CONSTANT: NSMiniaturizableWindowMask       4
+CONSTANT: NSResizableWindowMask            8
+CONSTANT: NSTexturedBackgroundWindowMask 256
 
 ! Additional panel-only styles 
 CONSTANT: NSUtilityWindowMask       16
@@ -26,7 +27,7 @@ CONSTANT: NSBackingStoreBuffered    2
     -> initWithContentRect:styleMask:backing:defer: ;
 
 : class-for-style ( style -- NSWindow/NSPanel )
-    HEX: 1ff0 bitand zero? NSWindow NSPanel ? ;
+    HEX: 1ef0 bitand zero? NSWindow NSPanel ? ;
 
 : <ViewWindow> ( view rect style -- window )
     dup class-for-style <NSWindow> [ swap -> setContentView: ] keep

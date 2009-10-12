@@ -5,9 +5,11 @@ IN: io.encodings.utf32
 
 ARTICLE: "io.encodings.utf32" "UTF-32 encoding"
 "The UTF-32 encoding is a fixed-width encoding. Unicode code points are encoded as 4 byte sequences. There are three encoding descriptor classes for working with UTF-32, depending on endianness or the presence of a BOM:"
-{ $subsection utf32 }
-{ $subsection utf32le }
-{ $subsection utf32be } ;
+{ $subsections
+    utf32
+    utf32le
+    utf32be
+} ;
 
 ABOUT: "io.encodings.utf32"
 

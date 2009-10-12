@@ -4,7 +4,7 @@ USING: namespaces make math math.order math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types
 alien.strings alien.arrays alien.complex alien.libraries sets libc
-continuations.private fry cpu.architecture classes locals
+continuations.private fry cpu.architecture classes classes.struct locals
 source-files.errors slots parser generic.parser
 compiler.errors
 compiler.alien
@@ -16,8 +16,6 @@ compiler.cfg.registers
 compiler.cfg.builder
 compiler.codegen.fixup
 compiler.utilities ;
-QUALIFIED: classes.struct
-QUALIFIED: alien.structs
 IN: compiler.codegen
 
 SYMBOL: insn-counts
@@ -34,30 +32,21 @@ SYMBOL: calls
     #! Compile this word later.
     calls get push ;
 
-SYMBOL: compiling-word
-
-: compiled-stack-traces? ( -- ? ) 67 getenv ;
-
 ! Mapping _label IDs to label instances
 SYMBOL: labels
 
-: init-generator ( word -- )
+: init-generator ( -- )
     H{ } clone labels set
-    V{ } clone calls set
-    compiling-word set
-    compiled-stack-traces? [ compiling-word get add-literal ] when ;
+    V{ } clone calls set ;
 
 : generate-insns ( asm -- code )
-    [
-        [ word>> init-generator ]
-        [
-            instructions>>
-            [
-                [ class insn-counts get inc-at ]
-                [ generate-insn ]
-                bi
-            ] each
-        ] bi
+    dup word>> [
+        init-generator
+        instructions>> [
+            [ class insn-counts get inc-at ]
+            [ generate-insn ]
+            bi
+        ] each
     ] with-fixup ;
 
 : generate ( mr -- asm )
@@ -112,6 +101,7 @@ SYNTAX: CODEGEN:
 
 CODEGEN: ##load-immediate %load-immediate
 CODEGEN: ##load-reference %load-reference
+CODEGEN: ##load-constant %load-reference
 CODEGEN: ##peek %peek
 CODEGEN: ##replace %replace
 CODEGEN: ##inc-d %inc-d
@@ -144,12 +134,9 @@ CODEGEN: ##sar-imm %sar-imm
 CODEGEN: ##min %min
 CODEGEN: ##max %max
 CODEGEN: ##not %not
+CODEGEN: ##neg %neg
 CODEGEN: ##log2 %log2
 CODEGEN: ##copy %copy
-CODEGEN: ##integer>bignum %integer>bignum
-CODEGEN: ##bignum>integer %bignum>integer
-CODEGEN: ##unbox-float %unbox-float
-CODEGEN: ##box-float %box-float
 CODEGEN: ##add-float %add-float
 CODEGEN: ##sub-float %sub-float
 CODEGEN: ##mul-float %mul-float
@@ -163,19 +150,51 @@ CODEGEN: ##single>double-float %single>double-float
 CODEGEN: ##double>single-float %double>single-float
 CODEGEN: ##integer>float %integer>float
 CODEGEN: ##float>integer %float>integer
-CODEGEN: ##unbox-vector %unbox-vector
-CODEGEN: ##broadcast-vector %broadcast-vector
+CODEGEN: ##zero-vector %zero-vector
+CODEGEN: ##fill-vector %fill-vector
 CODEGEN: ##gather-vector-2 %gather-vector-2
 CODEGEN: ##gather-vector-4 %gather-vector-4
-CODEGEN: ##box-vector %box-vector
+CODEGEN: ##shuffle-vector-imm %shuffle-vector-imm
+CODEGEN: ##shuffle-vector %shuffle-vector
+CODEGEN: ##tail>head-vector %tail>head-vector
+CODEGEN: ##merge-vector-head %merge-vector-head
+CODEGEN: ##merge-vector-tail %merge-vector-tail
+CODEGEN: ##signed-pack-vector %signed-pack-vector
+CODEGEN: ##unsigned-pack-vector %unsigned-pack-vector
+CODEGEN: ##unpack-vector-head %unpack-vector-head
+CODEGEN: ##unpack-vector-tail %unpack-vector-tail
+CODEGEN: ##integer>float-vector %integer>float-vector
+CODEGEN: ##float>integer-vector %float>integer-vector
+CODEGEN: ##compare-vector %compare-vector
+CODEGEN: ##test-vector %test-vector
 CODEGEN: ##add-vector %add-vector
+CODEGEN: ##saturated-add-vector %saturated-add-vector
+CODEGEN: ##add-sub-vector %add-sub-vector
 CODEGEN: ##sub-vector %sub-vector
+CODEGEN: ##saturated-sub-vector %saturated-sub-vector
 CODEGEN: ##mul-vector %mul-vector
+CODEGEN: ##saturated-mul-vector %saturated-mul-vector
 CODEGEN: ##div-vector %div-vector
 CODEGEN: ##min-vector %min-vector
 CODEGEN: ##max-vector %max-vector
+CODEGEN: ##dot-vector %dot-vector
 CODEGEN: ##sqrt-vector %sqrt-vector
 CODEGEN: ##horizontal-add-vector %horizontal-add-vector
+CODEGEN: ##horizontal-sub-vector %horizontal-sub-vector
+CODEGEN: ##horizontal-shl-vector %horizontal-shl-vector
+CODEGEN: ##horizontal-shr-vector %horizontal-shr-vector
+CODEGEN: ##abs-vector %abs-vector
+CODEGEN: ##and-vector %and-vector
+CODEGEN: ##andn-vector %andn-vector
+CODEGEN: ##or-vector %or-vector
+CODEGEN: ##xor-vector %xor-vector
+CODEGEN: ##not-vector %not-vector
+CODEGEN: ##shl-vector %shl-vector
+CODEGEN: ##shr-vector %shr-vector
+CODEGEN: ##integer>scalar %integer>scalar
+CODEGEN: ##scalar>integer %scalar>integer
+CODEGEN: ##vector>scalar %vector>scalar
+CODEGEN: ##scalar>vector %scalar>vector
 CODEGEN: ##box-alien %box-alien
 CODEGEN: ##box-displaced-alien %box-displaced-alien
 CODEGEN: ##unbox-alien %unbox-alien
@@ -204,6 +223,7 @@ CODEGEN: ##compare-imm %compare-imm
 CODEGEN: ##compare-float-ordered %compare-float-ordered
 CODEGEN: ##compare-float-unordered %compare-float-unordered
 CODEGEN: ##save-context %save-context
+CODEGEN: ##vm-field-ptr %vm-field-ptr
 
 CODEGEN: _fixnum-add %fixnum-add
 CODEGEN: _fixnum-sub %fixnum-sub
@@ -214,6 +234,7 @@ CODEGEN: _compare-branch %compare-branch
 CODEGEN: _compare-imm-branch %compare-imm-branch
 CODEGEN: _compare-float-ordered-branch %compare-float-ordered-branch
 CODEGEN: _compare-float-unordered-branch %compare-float-unordered-branch
+CODEGEN: _test-vector-branch %test-vector-branch
 CODEGEN: _dispatch %dispatch
 CODEGEN: _spill %spill
 CODEGEN: _reload %reload
@@ -229,7 +250,7 @@ CODEGEN: _reload %reload
 GENERIC# save-gc-root 1 ( gc-root operand temp -- )
 
 M:: spill-slot save-gc-root ( gc-root operand temp -- )
-    temp int-rep operand n>> %reload
+    temp int-rep operand %reload
     gc-root temp %save-gc-root ;
 
 M: object save-gc-root drop %save-gc-root ;
@@ -242,7 +263,7 @@ GENERIC# load-gc-root 1 ( gc-root operand temp -- )
 
 M:: spill-slot load-gc-root ( gc-root operand temp -- )
     gc-root temp %load-gc-root
-    temp int-rep operand n>> %spill ;
+    temp int-rep operand %spill ;
 
 M: object load-gc-root drop %load-gc-root ;
 
@@ -250,15 +271,15 @@ M: object load-gc-root drop %load-gc-root ;
 
 : load-data-regs ( data-regs -- ) [ first3 %reload ] each ;
 
-M: _gc generate-insn
+M: ##gc generate-insn
     "no-gc" define-label
     {
-        [ [ "no-gc" get ] dip [ temp1>> ] [ temp2>> ] bi %check-nursery ]
+        [ [ "no-gc" get ] dip [ size>> ] [ temp1>> ] [ temp2>> ] tri %check-nursery ]
         [ [ uninitialized-locs>> ] [ temp1>> ] bi wipe-locs ]
         [ data-values>> save-data-regs ]
         [ [ tagged-values>> ] [ temp1>> ] bi save-gc-roots ]
         [ [ temp1>> ] [ temp2>> ] bi t %save-context ]
-        [ tagged-values>> length %call-gc ]
+        [ [ tagged-values>> length ] [ temp1>> ] bi %call-gc ]
         [ [ tagged-values>> ] [ temp1>> ] bi load-gc-roots ]
         [ data-values>> load-data-regs ]
     } cleave
@@ -269,9 +290,6 @@ M: _loop-entry generate-insn drop %loop-entry ;
 M: ##alien-global generate-insn
     [ dst>> ] [ symbol>> ] [ library>> ] tri
     %alien-global ;
-
-M: ##vm-field-ptr generate-insn
-    [ dst>> ] [ fieldname>> ] bi %vm-field-ptr ;
 
 ! ##alien-invoke
 GENERIC: next-fastcall-param ( rep -- )
@@ -321,10 +339,7 @@ GENERIC: flatten-value-type ( type -- types )
 
 M: object flatten-value-type 1array ;
 
-M: alien.structs:struct-type flatten-value-type ( type -- types )
-    stack-size cell align (flatten-int-type) ;
-
-M: classes.struct:struct-c-type flatten-value-type ( type -- types )
+M: struct-c-type flatten-value-type ( type -- types )
     stack-size cell align (flatten-int-type) ;
 
 M: long-long-type flatten-value-type ( type -- types )
@@ -437,7 +452,7 @@ M: ##alien-indirect generate-insn
     ! Generate code for boxing input parameters in a callback.
     [
         dup \ %save-param-reg move-parameters
-        "nest_stacks" %vm-invoke-1st-arg
+        %nest-stacks
         box-parameters
     ] with-param-regs ;
 
@@ -474,8 +489,6 @@ TUPLE: callback-context ;
         [ callback-return-quot ] tri 3append ,
         [ callback-context new do-callback ] %
     ] [ ] make ;
-
-: %unnest-stacks ( -- ) "unnest_stacks" %vm-invoke-1st-arg ;
 
 M: ##callback-return generate-insn
     #! All the extra book-keeping for %unwind is only for x86.

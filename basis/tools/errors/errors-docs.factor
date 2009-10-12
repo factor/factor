@@ -10,8 +10,10 @@ ARTICLE: "compiler-errors" "Compiler errors"
 "This indicates that some words did not pass the stack checker. Stack checker error conditions are documented in " { $link "inference-errors" } ", and the stack checker itself in " { $link "inference" } "."
 $nl
 "Words to view errors:"
-{ $subsection :errors }
-{ $subsection :linkage }
+{ $subsections
+    :errors
+    :linkage
+}
 "Compiler errors are reported using the " { $link "tools.errors" } " mechanism, and as a result, they are also are shown in the " { $link "ui.tools.error-list" } "." ;
 
 HELP: compiler-error
@@ -38,11 +40,11 @@ ARTICLE: "tools.errors" "Batch error reporting"
 "Some tools, such as the " { $link "compiler" } ", " { $link "tools.test" } " and " { $link "help.lint" } " need to report multiple errors at a time. Each error is associated with a source file, line number, and optionally, a definition. " { $link "errors" } " cannot be used for this purpose, so the " { $vocab-link "source-files.errors" } " vocabulary provides an alternative mechanism. Note that the words in this vocabulary are used for implementation only; to actually list errors, consult the documentation for the relevant tools."
 $nl
 "Source file errors inherit from a class:"
-{ $subsection source-file-error }
+{ $subsections source-file-error }
 "Printing an error summary:"
-{ $subsection error-summary }
+{ $subsections error-summary }
 "Printing a list of errors:"
-{ $subsection errors. }
+{ $subsections errors. }
 "Batch errors are reported in the " { $link "ui.tools.error-list" } "." ;
 
 ABOUT: "tools.errors"

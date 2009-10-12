@@ -17,25 +17,25 @@ THREADHANDLE start_thread(void *(*start_routine)(void *),void *args)
 	return thread;
 }
 
-
 pthread_key_t tlsKey = 0;
 
 void init_platform_globals()
 {
-	if (pthread_key_create(&tlsKey, NULL) != 0){
+	if (pthread_key_create(&tlsKey, NULL) != 0)
 		fatal_error("pthread_key_create() failed",0);
-	}
 
 }
 
-void register_vm_with_thread(factorvm *vm)
+void register_vm_with_thread(factor_vm *vm)
 {
 	pthread_setspecific(tlsKey,vm);
 }
 
-factorvm *tls_vm()
+factor_vm *tls_vm()
 {
-	return (factorvm*)pthread_getspecific(tlsKey);
+	factor_vm *vm = (factor_vm*)pthread_getspecific(tlsKey);
+	assert(vm != NULL);
+	return vm;
 }
 
 static void *null_dll;
@@ -52,55 +52,48 @@ void sleep_micros(cell usec)
 	usleep(usec);
 }
 
-void factorvm::init_ffi()
+void factor_vm::init_ffi()
 {
 	/* NULL_DLL is "libfactor.dylib" for OS X and NULL for generic unix */
 	null_dll = dlopen(NULL_DLL,RTLD_LAZY);
 }
 
-void factorvm::ffi_dlopen(dll *dll)
+void factor_vm::ffi_dlopen(dll *dll)
 {
 	dll->dll = dlopen(alien_offset(dll->path), RTLD_LAZY);
 }
 
-void *factorvm::ffi_dlsym(dll *dll, symbol_char *symbol)
+void *factor_vm::ffi_dlsym(dll *dll, symbol_char *symbol)
 {
 	void *handle = (dll == NULL ? null_dll : dll->dll);
 	return dlsym(handle,symbol);
 }
 
-void factorvm::ffi_dlclose(dll *dll)
+void factor_vm::ffi_dlclose(dll *dll)
 {
 	if(dlclose(dll->dll))
 		general_error(ERROR_FFI,F,F,NULL);
 	dll->dll = NULL;
 }
 
-
-
-
-inline void factorvm::vmprim_existsp()
+void factor_vm::primitive_existsp()
 {
 	struct stat sb;
 	char *path = (char *)(untag_check<byte_array>(dpop()) + 1);
 	box_boolean(stat(path,&sb) >= 0);
 }
 
-PRIMITIVE(existsp)
+segment::segment(cell size_)
 {
-	PRIMITIVE_GETVM()->vmprim_existsp();
-}
+	size = size_;
 
-segment *factorvm::alloc_segment(cell size)
-{
 	int pagesize = getpagesize();
 
 	char *array = (char *)mmap(NULL,pagesize + size + pagesize,
 		PROT_READ | PROT_WRITE | PROT_EXEC,
 		MAP_ANON | MAP_PRIVATE,-1,0);
 
-	if(array == (char*)-1)
-		out_of_memory();
+	if(array == (char*)-1) out_of_memory();
 
 	if(mprotect(array,pagesize,PROT_NONE) == -1)
 		fatal_error("Cannot protect low guard page",(cell)array);
@@ -108,29 +101,19 @@ segment *factorvm::alloc_segment(cell size)
 	if(mprotect(array + pagesize + size,pagesize,PROT_NONE) == -1)
 		fatal_error("Cannot protect high guard page",(cell)array);
 
-	segment *retval = (segment *)safe_malloc(sizeof(segment));
-
-	retval->start = (cell)(array + pagesize);
-	retval->size = size;
-	retval->end = retval->start + size;
-
-	return retval;
+	start = (cell)(array + pagesize);
+	end = start + size;
 }
 
-void dealloc_segment(segment *block)
+segment::~segment()
 {
 	int pagesize = getpagesize();
-
-	int retval = munmap((void*)(block->start - pagesize),
-		pagesize + block->size + pagesize);
-	
+	int retval = munmap((void*)(start - pagesize),pagesize + size + pagesize);
 	if(retval)
-		fatal_error("dealloc_segment failed",0);
-
-	free(block);
+		fatal_error("Segment deallocation failed",0);
 }
   
-stack_frame *factorvm::uap_stack_pointer(void *uap)
+stack_frame *factor_vm::uap_stack_pointer(void *uap)
 {
 	/* There is a race condition here, but in practice a signal
 	delivered during stack frame setup/teardown or while transitioning
@@ -147,9 +130,7 @@ stack_frame *factorvm::uap_stack_pointer(void *uap)
 		return NULL;
 }
 
-
-
-void factorvm::memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+void factor_vm::memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	signal_fault_addr = (cell)siginfo->si_addr;
 	signal_callstack_top = uap_stack_pointer(uap);
@@ -161,8 +142,7 @@ void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 	SIGNAL_VM_PTR()->memory_signal_handler(signal,siginfo,uap);
 }
 
-
-void factorvm::misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+void factor_vm::misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	signal_number = signal;
 	signal_callstack_top = uap_stack_pointer(uap);
@@ -174,7 +154,7 @@ void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 	SIGNAL_VM_PTR()->misc_signal_handler(signal,siginfo,uap);
 }
 
-void factorvm::fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+void factor_vm::fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	signal_number = signal;
 	signal_callstack_top = uap_stack_pointer(uap);

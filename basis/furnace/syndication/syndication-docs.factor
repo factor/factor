@@ -57,17 +57,21 @@ ARTICLE: "furnace.syndication.config" "Configuring Atom feed actions"
 
 ARTICLE: "furnace.syndication.protocol" "Atom feed entry protocol"
 "An Atom feed action takes a sequence of objects and converts them into Atom feed entries. The objects must implement a protocol consisting of either a single generic word:"
-{ $subsection >entry }
+{ $subsections >entry }
 "Or a series of generic words, called by the default implementation of " { $link >entry } ":"
-{ $subsection feed-entry-title }
-{ $subsection feed-entry-description }
-{ $subsection feed-entry-date }
-{ $subsection feed-entry-url } ;
+{ $subsections
+    feed-entry-title
+    feed-entry-description
+    feed-entry-date
+    feed-entry-url
+} ;
 
 ARTICLE: "furnace.syndication" "Furnace Atom syndication support"
 "The " { $vocab-link "furnace.syndication" } " vocabulary builds on the " { $link "syndication" } " library by providing easy support for generating Atom feeds from " { $link "furnace.actions" } "."
-{ $subsection <feed-action> }
-{ $subsection "furnace.syndication.config" }
-{ $subsection "furnace.syndication.protocol" } ;
+{ $subsections
+    <feed-action>
+    "furnace.syndication.config"
+    "furnace.syndication.protocol"
+} ;
 
 ABOUT: "furnace.syndication"

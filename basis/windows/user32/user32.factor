@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax parser namespaces kernel math
-windows.types generalizations math.bitwise classes.struct
-literals ;
+USING: alien alien.c-types alien.syntax parser namespaces
+kernel math windows.types generalizations math.bitwise
+classes.struct literals windows.kernel32 ;
 IN: windows.user32
 
 ! HKL for ActivateKeyboardLayout
@@ -560,7 +560,7 @@ STRUCT: MONITORINFOEX
     { rcMonitor RECT }
     { rcWork RECT }
     { dwFlags DWORD }
-    { szDevice { "TCHAR" $ CCHDEVICENAME } } ;
+    { szDevice { TCHAR CCHDEVICENAME } } ;
 
 TYPEDEF: MONITORINFOEX* LPMONITORINFOEX
 TYPEDEF: MONITORINFOEX* LPMONITORINFO
@@ -998,7 +998,7 @@ FUNCTION: int GetPriorityClipboardFormat ( UINT* paFormatPriorityList, int cForm
 ! FUNCTION: GetScrollRange
 ! FUNCTION: GetShellWindow
 ! FUNCTION: GetSubMenu
-! FUNCTION: GetSysColor
+FUNCTION: COLORREF GetSysColor ( int nIndex ) ;
 FUNCTION: HBRUSH GetSysColorBrush ( int nIndex ) ;
 FUNCTION: HMENU GetSystemMenu ( HWND hWnd, BOOL bRevert ) ;
 ! FUNCTION: GetSystemMetrics

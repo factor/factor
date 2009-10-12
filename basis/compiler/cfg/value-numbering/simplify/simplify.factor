@@ -1,6 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors combinators classes math layouts
+sequences math.vectors.simd.intrinsics
 compiler.cfg.instructions
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.expressions ;
@@ -21,6 +22,22 @@ M: unbox-any-c-ptr-expr simplify* simplify-unbox-alien ;
 : expr-zero? ( expr -- ? ) T{ constant-expr f 0 } = ; inline
 
 : expr-one? ( expr -- ? ) T{ constant-expr f 1 } = ; inline
+
+: expr-neg-one? ( expr -- ? ) T{ constant-expr f -1 } = ; inline
+
+: >unary-expr< ( expr -- in ) src>> vn>expr ; inline
+
+M: neg-expr simplify*
+    >unary-expr< {
+        { [ dup neg-expr? ] [ src>> ] }
+        [ drop f ]
+    } cond ;
+
+M: not-expr simplify*
+    >unary-expr< {
+        { [ dup not-expr? ] [ src>> ] }
+        [ drop f ]
+    } cond ;
 
 : >binary-expr< ( expr -- in1 in2 )
     [ src1>> vn>expr ] [ src2>> vn>expr ] bi ; inline
@@ -112,6 +129,16 @@ M: box-displaced-alien-expr simplify*
         { [ dup vn>expr expr-zero? ] [ drop ] }
         [ 2drop f ]
     } cond ;
+
+M: scalar>vector-expr simplify*
+    src>> vn>expr {
+        { [ dup vector>scalar-expr? ] [ src>> ] }
+        [ drop f ]
+    } cond ;
+
+M: shuffle-vector-imm-expr simplify*
+    [ src>> ] [ shuffle>> ] [ rep>> rep-components iota ] tri
+    sequence= [ drop f ] unless ;
 
 M: expr simplify* drop f ;
 

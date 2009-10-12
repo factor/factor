@@ -1,23 +1,22 @@
 ! Copyright (C) 2009 Phil Dawes.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.structs alien.syntax ;
+USING: classes.struct alien.c-types alien.syntax ;
 IN: vm
 
 TYPEDEF: void* cell
+C-TYPE: context
 
-C-STRUCT: zone
-    { "cell" "start" }
-    { "cell" "here" }
-    { "cell" "size" }
-    { "cell" "end" }
-    ;
+STRUCT: zone
+    { start cell }
+    { here cell }
+    { size cell }
+    { end cell } ;
 
-C-STRUCT: vm
-    { "context*" "stack_chain" }
-    { "zone" "nursery" }
-    { "cell" "cards_offset" }
-    { "cell" "decks_offset" }
-    { "cell[70]" "userenv" }
-    ;
+STRUCT: vm
+    { stack_chain context* }
+    { nursery zone }
+    { cards_offset cell }
+    { decks_offset cell }
+    { userenv cell[70] } ;
 
-: vm-field-offset ( field -- offset ) "vm" offset-of ;
+: vm-field-offset ( field -- offset ) vm offset-of ; inline

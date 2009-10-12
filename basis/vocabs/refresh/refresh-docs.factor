@@ -16,7 +16,9 @@ HELP: refresh-all
 
 ARTICLE: "vocabs.refresh" "Runtime code reloading"
 "Reloading source files changed on disk:"
-{ $subsection refresh }
-{ $subsection refresh-all } ;
+{ $subsections
+    refresh
+    refresh-all
+} ;
 
 ABOUT: "vocabs.refresh"

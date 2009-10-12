@@ -1,4 +1,4 @@
-USING: calendar game-input threads ui ui.gadgets.worlds kernel
+USING: calendar game.input threads ui ui.gadgets.worlds kernel
 method-chains system ;
 IN: tools.deploy.test.8
 

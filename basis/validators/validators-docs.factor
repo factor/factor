@@ -89,27 +89,33 @@ $nl
 "Note that validators which take numbers must be preceded by " { $link v-integer } " or " { $link v-number } " if the original input is a string."
 $nl
 "Higher-order validators which require additional parameters:"
-{ $subsection v-default     }
-{ $subsection v-optional    }
-{ $subsection v-min-length  }
-{ $subsection v-max-length  }
-{ $subsection v-min-value   }
-{ $subsection v-max-value   }
-{ $subsection v-regexp      }
+{ $subsections
+    v-default
+    v-optional
+    v-min-length
+    v-max-length
+    v-min-value
+    v-max-value
+    v-regexp
+}
 "Simple validators:"
-{ $subsection v-required    }
-{ $subsection v-number      }
-{ $subsection v-integer     }
-{ $subsection v-one-line    }
-{ $subsection v-one-word    }
-{ $subsection v-captcha     }
-{ $subsection v-checkbox    }
+{ $subsections
+    v-required
+    v-number
+    v-integer
+    v-one-line
+    v-one-word
+    v-captcha
+    v-checkbox
+}
 "More complex validators:"
-{ $subsection v-email       }
-{ $subsection v-url         }
-{ $subsection v-username    }
-{ $subsection v-password    }
-{ $subsection v-credit-card }
-{ $subsection v-mode        } ;
+{ $subsections
+    v-email
+    v-url
+    v-username
+    v-password
+    v-credit-card
+    v-mode
+} ;
 
 ABOUT: "validators"

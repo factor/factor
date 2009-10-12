@@ -59,3 +59,8 @@ words ;
 [ ] [ [ [ ] compile-call ] profile ] unit-test
 
 [ [ gensym execute ] profile ] [ T{ undefined } = ] must-fail-with
+
+: crash-bug-1 ( -- x ) "hi" "bye" <word> ;
+: crash-bug-2 ( -- ) 100000 [ crash-bug-1 drop ] times ;
+
+[ ] [ [ crash-bug-2 ] profile ] unit-test

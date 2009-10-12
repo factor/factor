@@ -1,5 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors arrays combinators.tuple game-loop game-worlds
+USING: accessors arrays combinators.tuple game.loop game.worlds
 generalizations gpu gpu.render gpu.shaders gpu.util gpu.util.wasd
 kernel literals math math.matrices math.order math.vectors
 method-chains sequences ui ui.gadgets ui.gadgets.worlds

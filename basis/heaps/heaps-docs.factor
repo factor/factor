@@ -8,29 +8,39 @@ $nl
 "Heap elements are key/value pairs and are compared using the " { $link <=> } " generic word on the first element of the pair."
 $nl
 "There are two classes of heaps. Min-heaps sort their elements so that the minimum element is first:"
-{ $subsection min-heap }
-{ $subsection min-heap? }
-{ $subsection <min-heap> }
+{ $subsections
+    min-heap
+    min-heap?
+    <min-heap>
+}
 "Max-heaps sort their elements so that the maximum element is first:"
-{ $subsection max-heap }
-{ $subsection max-heap? }
-{ $subsection <max-heap> }
+{ $subsections
+    max-heap
+    max-heap?
+    <max-heap>
+}
 "Both obey a protocol."
 $nl
 "Queries:"
-{ $subsection heap-empty? }
-{ $subsection heap-size }
-{ $subsection heap-peek }
+{ $subsections
+    heap-empty?
+    heap-size
+    heap-peek
+}
 "Insertion:"
-{ $subsection heap-push }
-{ $subsection heap-push* }
-{ $subsection heap-push-all }
+{ $subsections
+    heap-push
+    heap-push*
+    heap-push-all
+}
 "Removal:"
-{ $subsection heap-pop* }
-{ $subsection heap-pop }
-{ $subsection heap-delete }
+{ $subsections
+    heap-pop*
+    heap-pop
+    heap-delete
+}
 "Processing heaps:"
-{ $subsection slurp-heap } ;
+{ $subsections slurp-heap } ;
 
 ABOUT: "heaps"
 

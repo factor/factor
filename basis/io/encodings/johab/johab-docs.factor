@@ -7,6 +7,6 @@ HELP: johab
 { $class-description "Korean Johab encoding (KSC5601-1992). This encoding is not commonly used anymore." } ;
 
 ARTICLE: "io.encodings.johab" "Korean Johab encoding"
-{ $subsection johab } ;
+{ $subsections johab } ;
 
 ABOUT: "io.encodings.johab"

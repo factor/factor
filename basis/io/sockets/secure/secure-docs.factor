@@ -26,10 +26,12 @@ $nl
 
 ARTICLE: "ssl-methods" "SSL/TLS methods"
 "The " { $snippet "method" } " slot of a " { $link secure-config } " can be set to one of the following values:"
-{ $subsection SSLv2 }
-{ $subsection SSLv23 }
-{ $subsection SSLv3 }
-{ $subsection TLSv1 }
+{ $subsections
+    SSLv2
+    SSLv23
+    SSLv3
+    TLSv1
+}
 "The default value is " { $link SSLv23 } "." ;
 
 HELP: secure-config
@@ -61,15 +63,17 @@ $nl
 
 ARTICLE: "ssl-config" "Secure socket configuration"
 "Secure sockets require some configuration, particularly for server sockets. A class represents secure socket configuration parameters:"
-{ $subsection secure-config }
+{ $subsections secure-config }
 "Creating new instances:"
-{ $subsection <secure-config> }
+{ $subsections <secure-config> }
 "Configuration parameters:"
-{ $subsection "ssl-methods" }
-{ $subsection "ssl-key-file" }
-{ $subsection "ssl-ca-file" }
-{ $subsection "ssl-dh-file" }
-{ $subsection "ssl-ephemeral-rsa" } ;
+{ $subsections
+    "ssl-methods"
+    "ssl-key-file"
+    "ssl-ca-file"
+    "ssl-dh-file"
+    "ssl-ephemeral-rsa"
+} ;
 
 HELP: <secure-context>
 { $values { "config" secure-config } { "context" secure-context } }
@@ -81,7 +85,7 @@ HELP: with-secure-context
 
 ARTICLE: "ssl-contexts" "Secure socket contexts"
 "All secure socket operations must be performed in a secure socket context. A context is created from a secure socket configuration. An implicit context with the default configuration is always available, however server sockets require a certificate to be set together with other parameters, and the default configuration is insufficient, so a context must be explicitly created in that case."
-{ $subsection with-secure-context } ;
+{ $subsections with-secure-context } ;
 
 HELP: secure
 { $class-description "The class of secure socket addresses." } ;
@@ -94,9 +98,9 @@ ARTICLE: "ssl-addresses" "Secure socket addresses"
 "Secure socket connections are established by passing a secure socket address to " { $link <client> } " or " { $link <server> } "."
 $nl
 "Secure socket addresses form a class:"
-{ $subsection secure }
+{ $subsections secure }
 "Constructing secure socket addresses:"
-{ $subsection <secure> }
+{ $subsections <secure> }
 "Instances of this class can wrap an " { $link inet } ", " { $link inet4 } " or an " { $link inet6 } ", although note that certificate validation is only performed for instances of " { $link inet } " since otherwise the host name is not available." ;
 
 HELP: send-secure-handshake
@@ -112,9 +116,9 @@ ARTICLE: "ssl-upgrade" "Upgrading existing connections"
 "Some protocols, such as HTTPS, require that the connection be established as an SSL/TLS connection. Others, such as secure SMTP and POP3 require that the client and server initiate an SSL/TLS handshake upon the client sending a plain-text request. The latter use-case is accomodated by a pair of words."
 $nl
 "Upgrading a connection to a secure socket by initiating an SSL/TLS handshake with the server:"
-{ $subsection send-secure-handshake }
+{ $subsections send-secure-handshake }
 "Upgrading a connection to a secure socket by waiting for an SSL/TLS handshake from the client:"
-{ $subsection accept-secure-handshake } ;
+{ $subsections accept-secure-handshake } ;
 
 HELP: premature-close
 { $error-description "Thrown if an SSL connection is closed without the proper " { $snippet "close_notify" } " sequence. This error is never reported for " { $link SSLv2 } " connections because there is no distinction between expected and unexpected connection closure in that case." } ;
@@ -134,12 +138,16 @@ HELP: upgrade-buffers-full
 
 ARTICLE: "ssl-errors" "Secure socket errors"
 "Secure sockets can throw one of several errors in addition to the usual I/O errors:"
-{ $subsection premature-close }
-{ $subsection certificate-verify-error }
-{ $subsection common-name-verify-error }
+{ $subsections
+    premature-close
+    certificate-verify-error
+    common-name-verify-error
+}
 "The " { $link send-secure-handshake } " word can throw one of two errors:"
-{ $subsection upgrade-on-non-socket }
-{ $subsection upgrade-buffers-full } ;
+{ $subsections
+    upgrade-on-non-socket
+    upgrade-buffers-full
+} ;
 
 ARTICLE: "io.sockets.secure" "Secure sockets (SSL, TLS)"
 "The " { $vocab-link "io.sockets.secure" } " vocabulary implements secure, encrypted sockets using the OpenSSL library."
@@ -147,10 +155,12 @@ $nl
 "At present, this vocabulary only works on Unix, and not on Windows."
 $nl
 "This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (" { $url "http://www.openssl.org/" } "), cryptographic software written by Eric Young (eay@cryptsoft.com) and software written by Tim Hudson (tjh@cryptsoft.com)."
-{ $subsection "ssl-config" }
-{ $subsection "ssl-contexts" }
-{ $subsection "ssl-addresses" }
-{ $subsection "ssl-upgrade" }
-{ $subsection "ssl-errors" } ;
+{ $subsections
+    "ssl-config"
+    "ssl-contexts"
+    "ssl-addresses"
+    "ssl-upgrade"
+    "ssl-errors"
+} ;
 
 ABOUT: "io.sockets.secure"

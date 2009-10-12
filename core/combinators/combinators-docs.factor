@@ -29,17 +29,24 @@ ARTICLE: "cleave-combinators" "Cleave combinators"
 "The cleave combinators apply multiple quotations to a single value."
 $nl
 "Two quotations:"
-{ $subsection bi }
-{ $subsection 2bi }
-{ $subsection 3bi }
+{ $subsections
+    bi
+    2bi
+    3bi
+}
 "Three quotations:"
-{ $subsection tri }
-{ $subsection 2tri }
-{ $subsection 3tri }
+{ $subsections
+    tri
+    2tri
+    3tri
+}
 "An array of quotations:"
-{ $subsection cleave }
-{ $subsection 2cleave }
-{ $subsection 3cleave }
+{ $subsections
+    cleave
+    2cleave
+    3cleave
+}
+$nl
 "Technically, the cleave combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on the top of the stack can be written in one of two ways:"
 { $code
     "! First alternative; uses keep"
@@ -52,7 +59,8 @@ $nl
     "[ 2 * ] tri"
 }
 "The latter is more aesthetically pleasing than the former."
-{ $subsection "cleave-shuffle-equivalence" } ;
+$nl
+{ $subsections "cleave-shuffle-equivalence" } ;
 
 ARTICLE: "spread-shuffle-equivalence" "Expressing shuffle words with spread combinators"
 "Spread combinators are defined in terms of shuffle words, and mappings from certain shuffle idioms to spread combinators are discussed in the documentation for " { $link bi* } ", " { $link 2bi* } ", " { $link tri* } ", and " { $link 2tri* } "."
@@ -88,13 +96,11 @@ ARTICLE: "spread-combinators" "Spread combinators"
 "The spread combinators apply multiple quotations to multiple values. In this case, " { $snippet "*" } " suffix signify spreading."
 $nl
 "Two quotations:"
-{ $subsection bi* }
-{ $subsection 2bi* }
+{ $subsections bi* 2bi* }
 "Three quotations:"
-{ $subsection tri* }
-{ $subsection 2tri* }
+{ $subsections tri* 2tri* }
 "An array of quotations:"
-{ $subsection spread }
+{ $subsections spread }
 "Technically, the spread combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on three related values can be written in one of two ways:"
 { $code
     "! First alternative; uses dip"
@@ -103,44 +109,34 @@ $nl
     "[ 1 + ] [ 1 - ] [ 2 * ] tri*"
 }
 "A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "."
-{ $subsection "spread-shuffle-equivalence" } ;
+$nl
+{ $subsections "spread-shuffle-equivalence" } ;
 
 ARTICLE: "apply-combinators" "Apply combinators"
 "The apply combinators apply a single quotation to multiple values. The " { $snippet "@" } " suffix signifies application."
 $nl
 "Two quotations:"
-{ $subsection bi@ }
-{ $subsection 2bi@ }
+{ $subsections bi@ 2bi@ }
 "Three quotations:"
-{ $subsection tri@ }
-{ $subsection 2tri@ }
+{ $subsections tri@ 2tri@ }
 "A pair of utility words built from " { $link bi@ } ":"
-{ $subsection both? }
-{ $subsection either? } ;
+{ $subsections both? either? } ;
 
 ARTICLE: "retainstack-combinators" "Retain stack combinators"
 "Sometimes an additional storage area is needed to hold objects. The " { $emphasis "retain stack" } " is an auxilliary stack for this purpose. Objects can be moved between the data and retain stacks using a set of combinators."
 $nl
 "The dip combinators invoke the quotation at the top of the stack, hiding the values underneath:"
-{ $subsection dip }
-{ $subsection 2dip }
-{ $subsection 3dip }
-{ $subsection 4dip }
+{ $subsections dip 2dip 3dip 4dip }
 "The keep combinators invoke a quotation which takes a number of values off the stack, and then they restore those values:"
-{ $subsection keep }
-{ $subsection 2keep }
-{ $subsection 3keep } ;
+{ $subsections keep 2keep 3keep } ;
 
 ARTICLE: "curried-dataflow" "Curried dataflow combinators"
 "Curried cleave combinators:"
-{ $subsection bi-curry }
-{ $subsection tri-curry }
+{ $subsections bi-curry tri-curry }
 "Curried spread combinators:"
-{ $subsection bi-curry* }
-{ $subsection tri-curry* }
+{ $subsections bi-curry* tri-curry* }
 "Curried apply combinators:"
-{ $subsection bi-curry@ }
-{ $subsection tri-curry@ }
+{ $subsections bi-curry@ tri-curry@ }
 { $see-also "dataflow-combinators" } ;
 
 ARTICLE: "compositional-examples" "Examples of compositional combinator usage"
@@ -170,33 +166,30 @@ $nl
 
 ARTICLE: "compositional-combinators" "Compositional combinators"
 "Certain combinators transform quotations to produce a new quotation."
-{ $subsection "compositional-examples" }
+{ $subsections "compositional-examples" }
 "Fundamental operations:"
-{ $subsection curry }
-{ $subsection compose }
+{ $subsections curry compose }
 "Derived operations:"
-{ $subsection 2curry }
-{ $subsection 3curry }
-{ $subsection with }
-{ $subsection prepose }
+{ $subsections 2curry 3curry with prepose }
 "These operations run in constant time, and in many cases are optimized out altogether by the " { $link "compiler" } ". " { $link "fry" } " are an abstraction built on top of these operations, and code that uses this abstraction is often clearer than direct calls to the below words."
 $nl
 "Curried dataflow combinators can be used to build more complex dataflow by combining cleave, spread and apply patterns in various ways."
-{ $subsection "curried-dataflow" }
+{ $subsections "curried-dataflow" }
 "Quotations also implement the sequence protocol, and can be manipulated with sequence words; see " { $link "quotations" } ". However, such runtime quotation manipulation will not be optimized by the optimizing compiler." ;
 
 ARTICLE: "booleans" "Booleans"
 "In Factor, any object that is not " { $link f } " has a true value, and " { $link f } " has a false value. The " { $link t } " object is the canonical true value."
-{ $subsection f }
-{ $subsection t }
+{ $subsections f t }
 "A union class of the above:"
-{ $subsection boolean }
+{ $subsections boolean }
 "There are some logical operations on booleans:"
-{ $subsection >boolean }
-{ $subsection not }
-{ $subsection and }
-{ $subsection or }
-{ $subsection xor }
+{ $subsections
+    >boolean
+    not
+    and
+    or
+    xor
+}
 "Boolean values are most frequently used for " { $link "conditionals" } "."
 { $heading "The f object and f class" }
 "The " { $link f } " object is the unique instance of the " { $link f } " class; the two are distinct objects. The latter is also a parsing word which adds the " { $link f } " object to the parse tree at parse time. To refer to the class itself you must use " { $link POSTPONE: POSTPONE: } " or " { $link POSTPONE: \ } " to prevent the parsing word from executing."
@@ -231,41 +224,35 @@ $nl
 
 ARTICLE: "conditionals" "Conditional combinators"
 "The basic conditionals:"
-{ $subsection if }
-{ $subsection when }
-{ $subsection unless }
+{ $subsections if when unless }
 "Forms abstracting a common stack shuffle pattern:"
-{ $subsection if* }
-{ $subsection when* }
-{ $subsection unless* }
+{ $subsections if* when* unless* }
 "Another form abstracting a common stack shuffle pattern:"
-{ $subsection ?if }
+{ $subsections ?if }
 "Sometimes instead of branching, you just need to pick one of two values:"
-{ $subsection ? }
+{ $subsections ? }
 "Two combinators which abstract out nested chains of " { $link if } ":"
-{ $subsection cond }
-{ $subsection case }
-{ $subsection "conditionals-boolean-equivalence" }
+{ $subsections cond case }
+{ $subsections "conditionals-boolean-equivalence" }
 { $see-also "booleans" "bitwise-arithmetic" both? either? } ;
 
 ARTICLE: "dataflow-combinators" "Data flow combinators"
 "Data flow combinators pass values between quotations:"
-{ $subsection "retainstack-combinators" }
-{ $subsection "cleave-combinators" }
-{ $subsection "spread-combinators" }
-{ $subsection "apply-combinators" }
+{ $subsections
+    "retainstack-combinators"
+    "cleave-combinators"
+    "spread-combinators"
+    "apply-combinators"
+}
 { $see-also "curried-dataflow" } ;
 
 ARTICLE: "combinators-quot" "Quotation construction utilities"
 "Some words for creating quotations which can be useful for implementing method combinations and compiler transforms:"
-{ $subsection cond>quot }
-{ $subsection case>quot }
-{ $subsection alist>quot } ;
+{ $subsections cond>quot case>quot alist>quot } ;
 
 ARTICLE: "call-unsafe" "Unsafe combinators"
 "Unsafe calls declare an effect statically without any runtime checking:"
-{ $subsection call-effect-unsafe }
-{ $subsection execute-effect-unsafe } ;
+{ $subsections call-effect-unsafe execute-effect-unsafe } ;
 
 ARTICLE: "call" "Fundamental combinators"
 "The most basic combinators are those that take either a quotation or word, and invoke it immediately."
@@ -273,30 +260,29 @@ $nl
 "There are two sets of combinators; they differ in whether or not the stack effect of the expected code is declared."
 $nl
 "The simplest combinators do not take an effect declaration. The compiler checks the stack effect at compile time, rejecting the program if this cannot be done:"
-{ $subsection call }
-{ $subsection execute }
+{ $subsections call execute }
 "The second set of combinators takes an effect declaration. Note that the opening parenthesis is actually part of the word name; these are parsing words, and they read a stack effect until the corresponding closing parenthesis. The stack effect of the quotation or word is then checked at runtime:"
-{ $subsection POSTPONE: call( }
-{ $subsection POSTPONE: execute( }
+{ $subsections POSTPONE: call( POSTPONE: execute( }
 "The above are syntax sugar. The underlying words are a bit more verbose but allow non-constant effects to be passed in:"
-{ $subsection call-effect }
-{ $subsection execute-effect }
+{ $subsections call-effect execute-effect }
 "The combinator variants that do not take an effect declaration can only be used if the compiler is able to infer the stack effect by other means. See " { $link "inference-combinators" } "."
-{ $subsection "call-unsafe" }
+{ $subsections "call-unsafe" }
 { $see-also "effects" "inference" } ;
 
 ARTICLE: "combinators" "Combinators"
 "A central concept in Factor is that of a " { $emphasis "combinator" } ", which is a word taking code as input."
-{ $subsection "call" }
-{ $subsection "dataflow-combinators" }
-{ $subsection "conditionals" }
-{ $subsection "looping-combinators" }
-{ $subsection "compositional-combinators" }
-{ $subsection "combinators.short-circuit" }
-{ $subsection "combinators.smart" }
+{ $subsections
+    "call"
+    "dataflow-combinators"
+    "conditionals"
+    "looping-combinators"
+    "compositional-combinators"
+    "combinators.short-circuit"
+    "combinators.smart"
+    "combinators-quot"
+    "generalizations"
+}
 "More combinators are defined for working on data structures, such as " { $link "sequences-combinators" } " and " { $link "assocs-combinators" } "."
-{ $subsection "combinators-quot" }
-{ $subsection "generalizations" }
 { $see-also "quotations" } ;
 
 ABOUT: "combinators"

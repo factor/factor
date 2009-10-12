@@ -72,13 +72,14 @@ M: word-completion row-color
 M: vocab-completion row-color
     drop vocab? COLOR: black COLOR: dark-gray ? ;
 
-: complete-IN:/USE:? ( tokens -- ? )
-    1 short head* 2 short tail* { "IN:" "USE:" } intersects? ;
+: complete-vocab? ( tokens -- ? )
+    1 short head* 2 short tail*
+    { "IN:" "USE:" "UNUSE:" "QUALIFIED:" "QUALIFIED-WITH:" } intersects? ;
 
 : chop-; ( seq -- seq' )
     { ";" } split1-last [ ] [ ] ?if ;
 
-: complete-USING:? ( tokens -- ? )
+: complete-vocab-list? ( tokens -- ? )
     chop-; 1 short head* { "USING:" } intersects? ;
 
 : complete-CHAR:? ( tokens -- ? )
@@ -90,7 +91,7 @@ M: vocab-completion row-color
 : completion-mode ( interactor -- symbol )
     [ manifest>> ] [ editor-caret ] [ model>> ] tri up-to-caret " \r\n" split
     {
-        { [ dup { [ complete-IN:/USE:? ] [ complete-USING:? ] } 1|| ] [ 2drop vocab-completion ] }
+        { [ dup { [ complete-vocab? ] [ complete-vocab-list? ] } 1|| ] [ 2drop vocab-completion ] }
         { [ dup complete-CHAR:? ] [ 2drop char-completion ] }
         [ drop <word-completion> ]
     } cond ;

@@ -3,103 +3,91 @@ sequences quotations math.functions.private ;
 IN: math.functions
 
 ARTICLE: "integer-functions" "Integer functions"
-{ $subsection align }
-{ $subsection gcd }
-{ $subsection log2 }
-{ $subsection next-power-of-2 }
+{ $subsections
+    align
+    gcd
+    log2
+    next-power-of-2
+}
 "Modular exponentiation:"
-{ $subsection ^mod }
-{ $subsection mod-inv }
+{ $subsections ^mod mod-inv }
 "Tests:"
-{ $subsection power-of-2? }
-{ $subsection even? }
-{ $subsection odd? }
-{ $subsection divisor? } ;
+{ $subsections
+    power-of-2?
+    even?
+    odd?
+    divisor?
+} ;
 
 ARTICLE: "arithmetic-functions" "Arithmetic functions"
 "Computing additive and multiplicative inverses:"
-{ $subsection neg }
-{ $subsection recip }
+{ $subsections neg recip }
 "Complex conjugation:"
-{ $subsection conjugate }
+{ $subsections conjugate }
 "Tests:"
-{ $subsection zero? }
-{ $subsection between? }
+{ $subsections zero? between? }
 "Control flow:"
-{ $subsection if-zero }
-{ $subsection when-zero }
-{ $subsection unless-zero }
+{ $subsections
+    if-zero
+    when-zero
+    unless-zero
+}
 "Sign:"
-{ $subsection sgn }
+{ $subsections sgn }
 "Rounding:"
-{ $subsection ceiling }
-{ $subsection floor }
-{ $subsection truncate }
-{ $subsection round }
+{ $subsections
+    ceiling
+    floor
+    truncate
+    round
+}
 "Inexact comparison:"
-{ $subsection ~ }
+{ $subsections ~ }
 "Numbers implement the " { $link "math.order" } ", therefore operations such as " { $link min } " and " { $link max } " can be used with numbers." ;
 
 ARTICLE: "power-functions" "Powers and logarithms"
 "Squares:"
-{ $subsection sq }
-{ $subsection sqrt }
+{ $subsections sq sqrt }
 "Exponential and natural logarithm:"
-{ $subsection exp }
-{ $subsection cis }
-{ $subsection log }
+{ $subsections exp cis log }
 "Other logarithms:"
-{ $subsection log1+ }
-{ $subsection log10 }
+{ $subsections log1+ log10 }
 "Raising a number to a power:"
-{ $subsection ^ }
-{ $subsection 10^ }
+{ $subsections ^ 10^ }
 "Converting between rectangular and polar form:"
-{ $subsection abs }
-{ $subsection absq }
-{ $subsection arg }
-{ $subsection >polar }
-{ $subsection polar> } ;
+{ $subsections
+    abs
+    absq
+    arg
+    >polar
+    polar>
+} ;
 
 ARTICLE: "trig-hyp-functions" "Trigonometric and hyperbolic functions"
 "Trigonometric functions:"
-{ $subsection cos }
-{ $subsection sin }
-{ $subsection tan }
+{ $subsections cos sin tan }
 "Reciprocals:"
-{ $subsection sec }
-{ $subsection cosec }
-{ $subsection cot }
+{ $subsections sec cosec cot }
 "Inverses:"
-{ $subsection acos }
-{ $subsection asin }
-{ $subsection atan }
+{ $subsections acos asin atan }
 "Inverse reciprocals:"
-{ $subsection asec }
-{ $subsection acosec }
-{ $subsection acot }
+{ $subsections asec acosec acot }
 "Hyperbolic functions:"
-{ $subsection cosh }
-{ $subsection sinh }
-{ $subsection tanh }
+{ $subsections cosh sinh tanh }
 "Reciprocals:"
-{ $subsection sech }
-{ $subsection cosech }
-{ $subsection coth }
+{ $subsections sech cosech coth }
 "Inverses:"
-{ $subsection acosh }
-{ $subsection asinh }
-{ $subsection atanh }
+{ $subsections acosh asinh atanh }
 "Inverse reciprocals:"
-{ $subsection asech }
-{ $subsection acosech }
-{ $subsection acoth } ;
+{ $subsections asech acosech acoth } ;
 
 ARTICLE: "math-functions" "Mathematical functions"
-{ $subsection "integer-functions" }
-{ $subsection "arithmetic-functions" }
-{ $subsection "power-functions" }
-{ $subsection "trig-hyp-functions" } ;
+{ $subsections
+    "integer-functions"
+    "arithmetic-functions"
+    "power-functions"
+    "trig-hyp-functions"
+} ;
 
 ABOUT: "math-functions"
 

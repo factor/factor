@@ -1,8 +1,9 @@
-! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
+! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit arrays
 fry kernel layouts math namespaces sequences cpu.architecture
-math.bitwise math.order classes vectors locals make
+math.bitwise math.order math.vectors.simd.intrinsics classes
+vectors locals make alien.c-types io.binary grouping
 compiler.cfg
 compiler.cfg.registers
 compiler.cfg.comparisons
@@ -15,6 +16,7 @@ IN: compiler.cfg.value-numbering.rewrite
 : vreg-small-constant? ( vreg -- ? )
     vreg>expr {
         [ constant-expr? ]
+        [ value>> fixnum? ]
         [ value>> small-enough? ]
     } 1&& ;
 
@@ -38,6 +40,7 @@ M: insn rewrite drop f ;
         [ compare-imm-expr? ]
         [ compare-float-unordered-expr? ]
         [ compare-float-ordered-expr? ]
+        [ test-vector-expr? ]
     } 1|| ;
 
 : rewrite-boolean-comparison? ( insn -- ? )
@@ -51,12 +54,21 @@ M: insn rewrite drop f ;
 : >compare-imm-expr< ( expr -- in1 in2 cc )
     [ src1>> vn>vreg ] [ src2>> vn>constant ] [ cc>> ] tri ; inline
 
+: >test-vector-expr< ( expr -- src1 temp rep vcc )
+    {
+        [ src1>> vn>vreg ]
+        [ drop next-vreg ]
+        [ rep>> ]
+        [ vcc>> ]
+    } cleave ; inline
+
 : rewrite-boolean-comparison ( expr -- insn )
     src1>> vreg>expr {
         { [ dup compare-expr? ] [ >compare-expr< \ ##compare-branch new-insn ] }
         { [ dup compare-imm-expr? ] [ >compare-imm-expr< \ ##compare-imm-branch new-insn ] }
         { [ dup compare-float-unordered-expr? ] [ >compare-expr< \ ##compare-float-unordered-branch new-insn ] }
         { [ dup compare-float-ordered-expr? ] [ >compare-expr< \ ##compare-float-ordered-branch new-insn ] }
+        { [ dup test-vector-expr? ] [ >test-vector-expr< \ ##test-vector-branch new-insn ] }
     } cond ;
 
 : tag-fixnum-expr? ( expr -- ? )
@@ -184,7 +196,7 @@ M: ##compare-branch rewrite
 : >boolean-insn ( insn ? -- insn' )
     [ dst>> ] dip
     {
-        { t [ t \ ##load-reference new-insn ] }
+        { t [ t \ ##load-constant new-insn ] }
         { f [ \ f tag-number \ ##load-immediate new-insn ] }
     } case ;
 
@@ -230,6 +242,28 @@ M: ##shl-imm constant-fold* drop shift ;
     [ [ src1>> vreg>constant ] [ src2>> ] [ ] tri constant-fold* ] bi
     \ ##load-immediate new-insn ; inline
 
+: unary-constant-fold? ( insn -- ? )
+    src>> vreg>expr constant-expr? ; inline
+
+GENERIC: unary-constant-fold* ( x insn -- y )
+
+M: ##not unary-constant-fold* drop bitnot ;
+M: ##neg unary-constant-fold* drop neg ;
+
+: unary-constant-fold ( insn -- insn' )
+    [ dst>> ]
+    [ [ src>> vreg>constant ] [ ] bi unary-constant-fold* ] bi
+    \ ##load-immediate new-insn ; inline
+
+: maybe-unary-constant-fold ( insn -- insn' )
+    dup unary-constant-fold? [ unary-constant-fold ] [ drop f ] if ;
+
+M: ##neg rewrite
+    maybe-unary-constant-fold ;
+
+M: ##not rewrite
+    maybe-unary-constant-fold ;
+
 : reassociate ( insn op -- insn )
     [
         {
@@ -258,16 +292,23 @@ M: ##sub-imm rewrite
         [ sub-imm>add-imm ]
     } cond ;
 
-: strength-reduce-mul ( insn -- insn' )
-    [ [ dst>> ] [ src1>> ] bi ] [ src2>> log2 ] bi \ ##shl-imm new-insn ;
+: mul-to-neg? ( insn -- ? )
+    src2>> -1 = ;
 
-: strength-reduce-mul? ( insn -- ? )
+: mul-to-neg ( insn -- insn' )
+    [ dst>> ] [ src1>> ] bi \ ##neg new-insn ;
+
+: mul-to-shl? ( insn -- ? )
     src2>> power-of-2? ;
+
+: mul-to-shl ( insn -- insn' )
+    [ [ dst>> ] [ src1>> ] bi ] [ src2>> log2 ] bi \ ##shl-imm new-insn ;
 
 M: ##mul-imm rewrite
     {
         { [ dup constant-fold? ] [ constant-fold ] }
-        { [ dup strength-reduce-mul? ] [ strength-reduce-mul ] }
+        { [ dup mul-to-neg? ] [ mul-to-neg ] }
+        { [ dup mul-to-shl? ] [ mul-to-shl ] }
         { [ dup src1>> vreg>expr mul-imm-expr? ] [ \ ##mul-imm reassociate ] }
         [ drop f ]
     } cond ;
@@ -338,8 +379,15 @@ M: ##add rewrite \ ##add-imm rewrite-arithmetic-commutative ;
 : rewrite-subtraction-identity ( insn -- insn' )
     dst>> 0 \ ##load-immediate new-insn ;
 
+: sub-to-neg? ( ##sub -- ? )
+    src1>> vn>expr expr-zero? ;
+
+: sub-to-neg ( ##sub -- insn )
+    [ dst>> ] [ src2>> ] bi \ ##neg new-insn ;
+
 M: ##sub rewrite
     {
+        { [ dup sub-to-neg? ] [ sub-to-neg ] }
         { [ dup subtraction-identity? ] [ rewrite-subtraction-identity ] }
         [ \ ##sub-imm rewrite-arithmetic ]
     } cond ;
@@ -375,3 +423,71 @@ M: ##sar rewrite \ ##sar-imm rewrite-arithmetic ;
 M: ##unbox-any-c-ptr rewrite
     dup src>> vreg>expr dup box-displaced-alien-expr?
     [ rewrite-unbox-displaced-alien ] [ 2drop f ] if ;
+
+! More efficient addressing for alien intrinsics
+: rewrite-alien-addressing ( insn -- insn' )
+    dup src>> vreg>expr dup add-imm-expr? [
+        [ src1>> vn>vreg ] [ src2>> vn>constant ] bi
+        [ >>src ] [ '[ _ + ] change-offset ] bi*
+    ] [ 2drop f ] if ;
+
+M: ##alien-unsigned-1 rewrite rewrite-alien-addressing ;
+M: ##alien-unsigned-2 rewrite rewrite-alien-addressing ;
+M: ##alien-unsigned-4 rewrite rewrite-alien-addressing ;
+M: ##alien-signed-1 rewrite rewrite-alien-addressing ;
+M: ##alien-signed-2 rewrite rewrite-alien-addressing ;
+M: ##alien-signed-4 rewrite rewrite-alien-addressing ;
+M: ##alien-float rewrite rewrite-alien-addressing ;
+M: ##alien-double rewrite rewrite-alien-addressing ;
+M: ##alien-vector rewrite rewrite-alien-addressing ;
+M: ##set-alien-integer-1 rewrite rewrite-alien-addressing ;
+M: ##set-alien-integer-2 rewrite rewrite-alien-addressing ;
+M: ##set-alien-integer-4 rewrite rewrite-alien-addressing ;
+M: ##set-alien-float rewrite rewrite-alien-addressing ;
+M: ##set-alien-double rewrite rewrite-alien-addressing ;
+M: ##set-alien-vector rewrite rewrite-alien-addressing ;
+
+! Some lame constant folding for SIMD intrinsics. Eventually this
+! should be redone completely.
+
+: rewrite-shuffle-vector-imm ( insn expr -- insn' )
+    2dup [ rep>> ] bi@ eq? [
+        [ [ dst>> ] [ src>> vn>vreg ] bi* ]
+        [ [ shuffle>> ] bi@ nths ]
+        [ drop rep>> ]
+        2tri \ ##shuffle-vector-imm new-insn
+    ] [ 2drop f ] if ;
+
+: (fold-shuffle-vector-imm) ( shuffle bytes -- bytes' )
+    2dup length swap length /i group nths concat ;
+
+: fold-shuffle-vector-imm ( insn expr -- insn' )
+    [ [ dst>> ] [ shuffle>> ] bi ] dip value>>
+    (fold-shuffle-vector-imm) \ ##load-constant new-insn ;
+
+M: ##shuffle-vector-imm rewrite
+    dup src>> vreg>expr {
+        { [ dup shuffle-vector-imm-expr? ] [ rewrite-shuffle-vector-imm ] }
+        { [ dup reference-expr? ] [ fold-shuffle-vector-imm ] }
+        { [ dup constant-expr? ] [ fold-shuffle-vector-imm ] }
+        [ 2drop f ]
+    } cond ;
+
+: (fold-scalar>vector) ( insn bytes -- insn' )
+    [ [ dst>> ] [ rep>> rep-components ] bi ] dip <repetition> concat
+    \ ##load-constant new-insn ;
+
+: fold-scalar>vector ( insn expr -- insn' )
+    value>> over rep>> {
+        { float-4-rep [ float>bits 4 >le (fold-scalar>vector) ] }
+        { double-2-rep [ double>bits 8 >le (fold-scalar>vector) ] }
+        [ [ untag-fixnum ] dip rep-component-type heap-size >le (fold-scalar>vector) ]
+    } case ;
+
+M: ##scalar>vector rewrite
+    dup src>> vreg>expr dup constant-expr?
+    [ fold-scalar>vector ] [ 2drop f ] if ;
+
+M: ##xor-vector rewrite
+    dup [ src1>> vreg>vn ] [ src2>> vreg>vn ] bi eq?
+    [ [ dst>> ] [ rep>> ] bi \ ##zero-vector new-insn ] [ drop f ] if ;

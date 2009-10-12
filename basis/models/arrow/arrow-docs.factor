@@ -21,7 +21,9 @@ HELP: <arrow>
 
 ARTICLE: "models.arrow" "Arrow models"
 "Arrow model values are computed by applying a quotation to the value of another model."
-{ $subsection arrow }
-{ $subsection <arrow> } ;
+{ $subsections
+    arrow
+    <arrow>
+} ;
 
 ABOUT: "models.arrow"

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test namespaces documents documents.elements multiline ;
+USING: tools.test namespaces documents documents.elements ;
 IN: document.elements.tests
 
 SYMBOL: doc
@@ -56,12 +56,12 @@ SYMBOL: doc
 
 ! page-elt
 <document> doc set
-<" First line
+"First line
 Second line
 Third line
 Fourth line
 Fifth line
-Sixth line"> doc get set-doc-string
+Sixth line" doc get set-doc-string
 
 [ { 0 0 } ] [ { 3 3 } doc get 4 <page-elt> prev-elt ] unit-test
 [ { 1 2 } ] [ { 5 2 } doc get 4 <page-elt> prev-elt ] unit-test

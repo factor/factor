@@ -93,21 +93,23 @@ HELP: parse-mp3-directory
 ARTICLE: "id3" "ID3 tags"
 "The " { $vocab-link "id3" } " vocabulary contains words for parsing " { $emphasis "ID3" } " tags, which are textual fields storing an MP3's title, artist, and other metadata." $nl
 "Parsing ID3 tags for a directory of MP3s, recursively:"
-{ $subsection parse-mp3-directory }
+{ $subsections parse-mp3-directory }
 "Finding MP3 files recursively:"
-{ $subsection find-mp3s }
+{ $subsections find-mp3s }
 "Parsing a sequence of MP3 pathnames:"
-{ $subsection mp3-paths>id3s }
+{ $subsections mp3-paths>id3s }
 "Parsing an MP3 file's ID3 tags:"
-{ $subsection mp3>id3 }
+{ $subsections mp3>id3 }
 "ID3v1 frame tag accessors:"
-{ $subsection album }
-{ $subsection artist }
-{ $subsection comment }
-{ $subsection genre }
-{ $subsection title }
-{ $subsection year }
+{ $subsections
+    album
+    artist
+    comment
+    genre
+    title
+    year
+}
 "Access any frame tag:"
-{ $subsection find-id3-frame } ;
+{ $subsections find-id3-frame } ;
 
 ABOUT: "id3"

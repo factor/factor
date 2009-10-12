@@ -729,3 +729,8 @@ DEFER: redefine-tuple-twice
 [ ] [ "IN: classes.tuple.tests TUPLE: redefine-tuple-twice ;" eval( -- ) ] unit-test
 
 [ t ] [ \ redefine-tuple-twice symbol? ] unit-test
+
+ERROR: base-error x y ;
+ERROR: derived-error < base-error z ;
+
+[ (( x y z -- * )) ] [ \ derived-error stack-effect ] unit-test

@@ -1,7 +1,7 @@
-USING: accessors alien.syntax arrays assocs biassocs
-classes.struct combinators cpu.x86.features kernel literals
-math math.bitwise math.floats.env math.floats.env.private
-system ;
+USING: accessors alien.c-types alien.syntax arrays assocs
+biassocs classes.struct combinators cpu.x86.features kernel
+literals math math.bitwise math.floats.env
+math.floats.env.private system ;
 IN: math.floats.env.x86
 
 STRUCT: sse-env
@@ -31,9 +31,7 @@ M: x87-env (set-fp-env-register)
     set_x87_env ;
 
 M: x86 (fp-env-registers)
-    sse-version 20 >=
-    [ <sse-env> <x87-env> 2array ]
-    [ <x87-env> 1array ] if ;
+    sse2? [ <sse-env> <x87-env> 2array ] [ <x87-env> 1array ] if ;
 
 CONSTANT: sse-exception-flag-bits HEX: 3f
 CONSTANT: sse-exception-flag>bit

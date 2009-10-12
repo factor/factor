@@ -2,6 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel io math math.functions math.parser math.vectors
 math.vectors.simd sequences specialized-arrays ;
+QUALIFIED-WITH: alien.c-types c
+SIMD: c:float
 SPECIALIZED-ARRAY: float-4
 IN: benchmark.simd-1
 

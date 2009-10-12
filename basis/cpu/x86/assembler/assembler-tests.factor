@@ -56,8 +56,24 @@ IN: cpu.x86.assembler.tests
 ! [ { HEX: f2 HEX: 41 HEX: 0f HEX: 11 HEX: 04 HEX: 24 } ] [ [ R12 [] XMM0 MOVSD ] { } make ] unit-test
 
 ! 3-operand r-rm-imm sse instructions
-[ { HEX: 66 HEX: 0f HEX: 70 HEX: c1 HEX: 02 } ] [ [ XMM0 XMM1 2 PSHUFD ] { } make ] unit-test
-[ { HEX: 0f HEX: c6 HEX: c1 HEX: 02 } ] [ [ XMM0 XMM1 2 SHUFPS ] { } make ] unit-test
+[ { HEX: 66 HEX: 0f HEX: 70 HEX: c1 HEX: 02 } ]
+[ [ XMM0 XMM1 2 PSHUFD ] { } make ] unit-test
+
+[ { HEX: 0f HEX: c6 HEX: c1 HEX: 02 } ]
+[ [ XMM0 XMM1 2 SHUFPS ] { } make ] unit-test
+
+! shufflers with arrays of indexes
+[ { HEX: 66 HEX: 0f HEX: 70 HEX: c1 HEX: 02 } ]
+[ [ XMM0 XMM1 { 2 0 0 0 } PSHUFD ] { } make ] unit-test
+
+[ { HEX: 0f HEX: c6 HEX: c1 HEX: 63 } ]
+[ [ XMM0 XMM1 { 3 0 2 1 } SHUFPS ] { } make ] unit-test
+
+[ { HEX: 66 HEX: 0f HEX: c6 HEX: c1 HEX: 2 } ]
+[ [ XMM0 XMM1 { 0 1 } SHUFPD ] { } make ] unit-test
+
+[ { HEX: 66 HEX: 0f HEX: c6 HEX: c1 HEX: 1 } ]
+[ [ XMM0 XMM1 { 1 0 } SHUFPD ] { } make ] unit-test
 
 ! scalar register insert/extract sse instructions
 [ { HEX: 66 HEX: 0f HEX: c4 HEX: c1 HEX: 02 } ] [ [ XMM0 ECX 2 PINSRW ] { } make ] unit-test

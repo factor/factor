@@ -18,6 +18,7 @@ compiler.tree.propagation.constraints
 compiler.tree.propagation.call-effect
 compiler.tree.propagation.transforms
 compiler.tree.propagation.simd ;
+FROM: alien.c-types => (signed-interval) (unsigned-interval) ;
 IN: compiler.tree.propagation.known-words
 
 { + - * / }
@@ -260,15 +261,9 @@ generic-comparison-ops [
     alien-unsigned-8
 } [
     dup name>> {
-        {
-            [ "alien-signed-" ?head ]
-            [ string>number 8 * 1 - 2^ dup neg swap 1 - [a,b] ]
-        }
-        {
-            [ "alien-unsigned-" ?head ]
-            [ string>number 8 * 2^ 1 - 0 swap [a,b] ]
-        }
-    } cond
+        { [ "alien-signed-" ?head ] [ string>number (signed-interval) ] }
+        { [ "alien-unsigned-" ?head ] [ string>number (unsigned-interval) ] }
+    } cond [a,b]
     [ fits-in-fixnum? fixnum integer ? ] keep <class/interval-info>
     '[ 2drop _ ] "outputs" set-word-prop
 ] each

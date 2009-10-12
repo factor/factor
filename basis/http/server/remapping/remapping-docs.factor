@@ -15,7 +15,7 @@ ARTICLE: "http.server.remapping" "HTTP server port remapping"
 "However, the HTTP server is unaware of the forwarding, and still believes that it is listening on port 8080 and 8443, respectively. This can be a problem if a responder wishes to redirect the user to a secure page; they will be sent to port 8443 and not 443 as one would expect."
 $nl
 "The " { $vocab-link "http.server.remapping" } " vocabulary defines a variable which may store an assoc of port mappings:"
-{ $subsection port-remapping }
+{ $subsections port-remapping }
 "For example, with the above setup, we would set it as follows:"
 { $code
     "{ { 8080 80 } { 8443 443 } } port-remapping set-global"

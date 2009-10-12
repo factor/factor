@@ -3,16 +3,14 @@
 namespace factor
 {
 
-
-void factorvm::print_chars(string* str)
+void factor_vm::print_chars(string* str)
 {
 	cell i;
 	for(i = 0; i < string_capacity(str); i++)
 		putchar(string_nth(str,i));
 }
 
-
-void factorvm::print_word(word* word, cell nesting)
+void factor_vm::print_word(word* word, cell nesting)
 {
 	if(tagged<object>(word->vocabulary).type_p(STRING_TYPE))
 	{
@@ -30,16 +28,14 @@ void factorvm::print_word(word* word, cell nesting)
 	}
 }
 
-
-void factorvm::print_factor_string(string* str)
+void factor_vm::print_factor_string(string* str)
 {
 	putchar('"');
 	print_chars(str);
 	putchar('"');
 }
 
-
-void factorvm::print_array(array* array, cell nesting)
+void factor_vm::print_array(array* array, cell nesting)
 {
 	cell length = array_capacity(array);
 	cell i;
@@ -63,8 +59,7 @@ void factorvm::print_array(array* array, cell nesting)
 		print_string("...");
 }
 
-
-void factorvm::print_tuple(tuple *tuple, cell nesting)
+void factor_vm::print_tuple(tuple *tuple, cell nesting)
 {
 	tuple_layout *layout = untag<tuple_layout>(tuple->layout);
 	cell length = to_fixnum(layout->size);
@@ -93,8 +88,7 @@ void factorvm::print_tuple(tuple *tuple, cell nesting)
 		print_string("...");
 }
 
-
-void factorvm::print_nested_obj(cell obj, fixnum nesting)
+void factor_vm::print_nested_obj(cell obj, fixnum nesting)
 {
 	if(nesting <= 0 && !full_output)
 	{
@@ -144,14 +138,12 @@ void factorvm::print_nested_obj(cell obj, fixnum nesting)
 	}
 }
 
-
-void factorvm::print_obj(cell obj)
+void factor_vm::print_obj(cell obj)
 {
 	print_nested_obj(obj,10);
 }
 
-
-void factorvm::print_objects(cell *start, cell *end)
+void factor_vm::print_objects(cell *start, cell *end)
 {
 	for(; start <= end; start++)
 	{
@@ -160,53 +152,50 @@ void factorvm::print_objects(cell *start, cell *end)
 	}
 }
 
-
-void factorvm::print_datastack()
+void factor_vm::print_datastack()
 {
 	print_string("==== DATA STACK:\n");
 	print_objects((cell *)ds_bot,(cell *)ds);
 }
 
-
-void factorvm::print_retainstack()
+void factor_vm::print_retainstack()
 {
 	print_string("==== RETAIN STACK:\n");
 	print_objects((cell *)rs_bot,(cell *)rs);
 }
 
+struct stack_frame_printer {
+	factor_vm *myvm;
 
-void factorvm::print_stack_frame(stack_frame *frame)
-{
-	print_obj(frame_executing(frame));
-	print_string("\n");
-	print_obj(frame_scan(frame));
-	print_string("\n");
-	print_string("word/quot addr: ");
-	print_cell_hex((cell)frame_executing(frame));
-	print_string("\n");
-	print_string("word/quot xt: ");
-	print_cell_hex((cell)frame->xt);
-	print_string("\n");
-	print_string("return address: ");
-	print_cell_hex((cell)FRAME_RETURN_ADDRESS(frame));
-	print_string("\n");
-}
+	explicit stack_frame_printer(factor_vm *myvm_) : myvm(myvm_) {}
+	void operator()(stack_frame *frame)
+	{
+		myvm->print_obj(myvm->frame_executing(frame));
+		print_string("\n");
+		myvm->print_obj(myvm->frame_scan(frame));
+		print_string("\n");
+		print_string("word/quot addr: ");
+		print_cell_hex((cell)myvm->frame_executing(frame));
+		print_string("\n");
+		print_string("word/quot xt: ");
+		print_cell_hex((cell)frame->xt);
+		print_string("\n");
+		print_string("return address: ");
+		print_cell_hex((cell)FRAME_RETURN_ADDRESS(frame,myvm));
+		print_string("\n");
+	}
+};
 
-void print_stack_frame(stack_frame *frame, factorvm *myvm)
-{
-	return myvm->print_stack_frame(frame);
-}
-
-void factorvm::print_callstack()
+void factor_vm::print_callstack()
 {
 	print_string("==== CALL STACK:\n");
 	cell bottom = (cell)stack_chain->callstack_bottom;
 	cell top = (cell)stack_chain->callstack_top;
-	iterate_callstack(top,bottom,factor::print_stack_frame);
+	stack_frame_printer printer(this);
+	iterate_callstack(top,bottom,printer);
 }
 
-
-void factorvm::dump_cell(cell x)
+void factor_vm::dump_cell(cell x)
 {
 	print_cell_hex_pad(x); print_string(": ");
 	x = *(cell *)x;
@@ -214,8 +203,7 @@ void factorvm::dump_cell(cell x)
 	nl();
 }
 
-
-void factorvm::dump_memory(cell from, cell to)
+void factor_vm::dump_memory(cell from, cell to)
 {
 	from = UNTAG(from);
 
@@ -223,33 +211,19 @@ void factorvm::dump_memory(cell from, cell to)
 		dump_cell(from);
 }
 
-
-void factorvm::dump_zone(zone *z)
+void factor_vm::dump_zone(cell gen, zone *z)
 {
+	print_string("Generation "); print_cell(gen); print_string(": ");
 	print_string("Start="); print_cell(z->start);
 	print_string(", size="); print_cell(z->size);
 	print_string(", here="); print_cell(z->here - z->start); nl();
 }
 
-
-void factorvm::dump_generations()
+void factor_vm::dump_generations()
 {
-	cell i;
-
-	print_string("Nursery: ");
-	dump_zone(&nursery);
-	
-	for(i = 1; i < data->gen_count; i++)
-	{
-		print_string("Generation "); print_cell(i); print_string(": ");
-		dump_zone(&data->generations[i]);
-	}
-
-	for(i = 0; i < data->gen_count; i++)
-	{
-		print_string("Semispace "); print_cell(i); print_string(": ");
-		dump_zone(&data->semispaces[i]);
-	}
+	dump_zone(nursery_gen,&nursery);
+	dump_zone(aging_gen,data->aging);
+	dump_zone(tenured_gen,data->tenured);
 
 	print_string("Cards: base=");
 	print_cell((cell)data->cards);
@@ -258,8 +232,7 @@ void factorvm::dump_generations()
 	nl();
 }
 
-
-void factorvm::dump_objects(cell type)
+void factor_vm::dump_objects(cell type)
 {
 	gc();
 	begin_scan();
@@ -279,80 +252,77 @@ void factorvm::dump_objects(cell type)
 	end_scan();
 }
 
+struct data_references_finder {
+	cell look_for, obj;
+	factor_vm *myvm;
 
+	explicit data_references_finder(cell look_for_, cell obj_, factor_vm *myvm_)
+		: look_for(look_for_), obj(obj_), myvm(myvm_) { }
 
-void factorvm::find_data_references_step(cell *scan)
-{
-	if(look_for == *scan)
+	void operator()(cell *scan)
 	{
-		print_cell_hex_pad(obj);
-		print_string(" ");
-		print_nested_obj(obj,2);
-		nl();
+		if(look_for == *scan)
+		{
+			print_cell_hex_pad(obj);
+			print_string(" ");
+			myvm->print_nested_obj(obj,2);
+			nl();
+		}
 	}
-}
+};
 
-void find_data_references_step(cell *scan,factorvm *myvm)
+void factor_vm::find_data_references(cell look_for)
 {
-	return myvm->find_data_references_step(scan);
-}
-
-void factorvm::find_data_references(cell look_for_)
-{
-	look_for = look_for_;
-
 	begin_scan();
 
+	cell obj;
+
 	while((obj = next_object()) != F)
-		do_slots(UNTAG(obj),factor::find_data_references_step);
+	{
+		data_references_finder finder(look_for,obj,this);
+		do_slots(UNTAG(obj),finder);
+	}
 
 	end_scan();
 }
 
-
 /* Dump all code blocks for debugging */
-void factorvm::dump_code_heap()
+void factor_vm::dump_code_heap()
 {
 	cell reloc_size = 0, literal_size = 0;
 
-	heap_block *scan = first_block(&code);
+	heap_block *scan = code->first_block();
 
 	while(scan)
 	{
 		const char *status;
-		switch(scan->status)
-		{
-		case B_FREE:
+		if(scan->type() == FREE_BLOCK_TYPE)
 			status = "free";
-			break;
-		case B_ALLOCATED:
-			reloc_size += object_size(((code_block *)scan)->relocation);
-			literal_size += object_size(((code_block *)scan)->literals);
-			status = "allocated";
-			break;
-		case B_MARKED:
+		else if(scan->marked_p())
+		{
 			reloc_size += object_size(((code_block *)scan)->relocation);
 			literal_size += object_size(((code_block *)scan)->literals);
 			status = "marked";
-			break;
-		default:
-			status = "invalid";
-			break;
+		}
+		else
+		{
+			reloc_size += object_size(((code_block *)scan)->relocation);
+			literal_size += object_size(((code_block *)scan)->literals);
+			status = "allocated";
 		}
 
 		print_cell_hex((cell)scan); print_string(" ");
-		print_cell_hex(scan->size); print_string(" ");
+		print_cell_hex(scan->size()); print_string(" ");
 		print_string(status); print_string("\n");
 
-		scan = next_block(&code,scan);
+		scan = code->next_block(scan);
 	}
 	
 	print_cell(reloc_size); print_string(" bytes of relocation data\n");
 	print_cell(literal_size); print_string(" bytes of literal data\n");
 }
 
-
-void factorvm::factorbug()
+void factor_vm::factorbug()
 {
 	if(fep_disabled)
 	{
@@ -496,17 +466,11 @@ void factorvm::factorbug()
 	}
 }
 
-
-inline void factorvm::vmprim_die()
+void factor_vm::primitive_die()
 {
 	print_string("The die word was called by the library. Unless you called it yourself,\n");
 	print_string("you have triggered a bug in Factor. Please report.\n");
 	factorbug();
-}
-
-PRIMITIVE(die)
-{
-	PRIMITIVE_GETVM()->vmprim_die();
 }
 
 }

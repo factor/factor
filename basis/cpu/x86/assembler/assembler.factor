@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io.binary kernel combinators kernel.private math locals
-namespaces make sequences words system layouts math.order accessors
-cpu.x86.assembler.operands cpu.x86.assembler.operands.private ;
+USING: arrays io.binary kernel combinators kernel.private math
+math.bitwise locals namespaces make sequences words system
+layouts math.order accessors cpu.x86.assembler.operands
+cpu.x86.assembler.operands.private ;
 QUALIFIED: sequences
 IN: cpu.x86.assembler
 
@@ -198,11 +199,15 @@ M: register POP f HEX: 58 short-operand ;
 M: operand POP { BIN: 000 f HEX: 8f } 1-operand ;
 
 ! MOV where the src is immediate.
+<PRIVATE
+
 GENERIC: (MOV-I) ( src dst -- )
 M: register (MOV-I) t HEX: b8 short-operand cell, ;
 M: operand (MOV-I)
     { BIN: 000 t HEX: c6 }
     pick byte? [ immediate-1 ] [ immediate-4 ] if ;
+
+PRIVATE>
 
 GENERIC: MOV ( dst src -- )
 M: immediate MOV swap (MOV-I) ;
@@ -219,8 +224,12 @@ GENERIC: CALL ( op -- )
 M: integer CALL HEX: e8 , 4, ;
 M: operand CALL { BIN: 010 t HEX: ff } 1-operand ;
 
+<PRIVATE
+
 GENERIC# JUMPcc 1 ( addr opcode -- )
 M: integer JUMPcc extended-opcode, 4, ;
+
+PRIVATE>
 
 : JO  ( dst -- ) HEX: 80 JUMPcc ;
 : JNO ( dst -- ) HEX: 81 JUMPcc ;
@@ -296,12 +305,16 @@ M: operand TEST OCT: 204 2-operand ;
 : CDQ ( -- ) HEX: 99 , ;
 : CQO ( -- ) HEX: 48 , CDQ ;
 
+<PRIVATE
+
 : (SHIFT) ( dst src op -- )
     over CL eq? [
         nip t HEX: d3 3array 1-operand
     ] [
         swapd t HEX: c0 3array immediate-1
     ] if ; inline
+
+PRIVATE>
 
 : ROL ( dst n -- ) BIN: 000 (SHIFT) ;
 : ROR ( dst n -- ) BIN: 001 (SHIFT) ;
@@ -605,9 +618,18 @@ ALIAS: PINSRQ PINSRD
 : MOVDQA     ( dest src -- ) { HEX: 6f HEX: 7f } HEX: 66 2-operand-rm-mr-sse ;
 : MOVDQU     ( dest src -- ) { HEX: 6f HEX: 7f } HEX: f3 2-operand-rm-mr-sse ;
 
-: PSHUFD     ( dest src imm -- ) HEX: 70 HEX: 66 3-operand-rm-sse ;
-: PSHUFLW    ( dest src imm -- ) HEX: 70 HEX: f2 3-operand-rm-sse ;
-: PSHUFHW    ( dest src imm -- ) HEX: 70 HEX: f3 3-operand-rm-sse ;
+<PRIVATE
+
+: 2shuffler ( indexes/mask -- mask )
+    dup integer? [ first2 { 1 0 } bitfield ] unless ;
+: 4shuffler ( indexes/mask -- mask )
+    dup integer? [ first4 { 6 4 2 0 } bitfield ] unless ;
+
+PRIVATE>
+
+: PSHUFD     ( dest src imm -- ) 4shuffler HEX: 70 HEX: 66 3-operand-rm-sse ;
+: PSHUFLW    ( dest src imm -- ) 4shuffler HEX: 70 HEX: f2 3-operand-rm-sse ;
+: PSHUFHW    ( dest src imm -- ) 4shuffler HEX: 70 HEX: f3 3-operand-rm-sse ;
 
 <PRIVATE
 
@@ -701,8 +723,8 @@ PRIVATE>
 : MOVNTI     ( dest src -- ) { HEX: 0f HEX: c3 } (2-operand) ;
 
 : PINSRW     ( dest src imm -- ) HEX: c4 HEX: 66 3-operand-rm-sse ;
-: SHUFPS     ( dest src imm -- ) HEX: c6 f       3-operand-rm-sse ;
-: SHUFPD     ( dest src imm -- ) HEX: c6 HEX: 66 3-operand-rm-sse ;
+: SHUFPS     ( dest src imm -- ) 4shuffler HEX: c6 f       3-operand-rm-sse ;
+: SHUFPD     ( dest src imm -- ) 2shuffler HEX: c6 HEX: 66 3-operand-rm-sse ;
 
 : ADDSUBPD   ( dest src -- ) HEX: d0 HEX: 66 2-operand-rm-sse ;
 : ADDSUBPS   ( dest src -- ) HEX: d0 HEX: f2 2-operand-rm-sse ;

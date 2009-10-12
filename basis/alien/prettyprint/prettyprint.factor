@@ -45,13 +45,16 @@ M: typedef-word synopsis*
         first2 pprint-function-arg
     ] if-empty ;
 
+: pprint-library ( library -- )
+    [ \ LIBRARY: [ text ] pprint-prefix ] when* ;
+
 M: alien-function-word definer
     drop \ FUNCTION: \ ; ;
 M: alien-function-word definition drop f ;
 M: alien-function-word synopsis*
     {
         [ seeing-word ]
-        [ def>> second [ \ LIBRARY: [ text ] pprint-prefix ] when* ]
+        [ def>> second pprint-library ]
         [ definer. ]
         [ def>> first pprint-c-type ]
         [ pprint-word ]
@@ -64,13 +67,12 @@ M: alien-function-word synopsis*
     } cleave ;
 
 M: alien-callback-type-word definer
-    "callback-abi" word-prop "stdcall" =
-    \ STDCALL-CALLBACK: \ CALLBACK: ? 
-    f ;
+    drop \ CALLBACK: \ ; ;
 M: alien-callback-type-word definition drop f ;
 M: alien-callback-type-word synopsis*
     {
         [ seeing-word ]
+        [ "callback-library" word-prop pprint-library ]
         [ definer. ]
         [ def>> first pprint-c-type ]
         [ pprint-word ]

@@ -7,9 +7,8 @@ words memory kernel.private continuations io vocabs.loader
 system strings sets vectors quotations byte-arrays sorting
 compiler.units definitions generic generic.standard
 generic.single tools.deploy.config combinators classes
-classes.builtin slots.private grouping ;
+classes.builtin slots.private grouping command-line ;
 QUALIFIED: bootstrap.stage2
-QUALIFIED: command-line
 QUALIFIED: compiler.errors
 QUALIFIED: continuations
 QUALIFIED: definitions
@@ -22,11 +21,14 @@ IN: tools.deploy.shaker
 
 ! This file is some hairy shit.
 
+: add-command-line-hook ( -- )
+    [ (command-line) command-line set-global ] "command-line"
+    init-hooks get set-at ;
+
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
     {
         "alien.strings"
-        "command-line"
         "cpu.x86"
         "destructors"
         "environment"
@@ -196,13 +198,17 @@ IN: tools.deploy.shaker
                 "word-style"
             } %
         ] when
+        
+        deploy-c-types? get [
+            { "c-type" "struct-slots" "struct-align" } %
+        ] unless
     ] { } make ;
 
 : strip-words ( props -- )
     [ word? ] instances
     deploy-word-props? get [ 2dup strip-word-props ] unless
     deploy-word-defs? get [ dup strip-word-defs ] unless
-    strip-word-names? [ dup strip-word-names ] when
+    strip-word-names? [ dup strip-word-names strip-stack-traces ] when
     2drop ;
 
 : compiler-classes ( -- seq )
@@ -324,7 +330,7 @@ IN: tools.deploy.shaker
                 classes-intersect-cache
                 implementors-map
                 update-map
-                command-line:main-vocab-hook
+                main-vocab-hook
                 compiled-crossref
                 compiled-generic-crossref
                 compiler-impl
@@ -344,6 +350,8 @@ IN: tools.deploy.shaker
             { } { "layouts" } strip-vocab-globals %
 
             { } { "math.partial-dispatch" } strip-vocab-globals %
+
+            { } { "math.vectors.simd" } strip-vocab-globals %
 
             { } { "peg" } strip-vocab-globals %
         ] when
@@ -497,6 +505,7 @@ SYMBOL: deploy-vocab
     strip-debugger
     compute-next-methods
     strip-init-hooks
+    add-command-line-hook
     strip-c-io
     strip-default-methods
     strip-compiler-classes

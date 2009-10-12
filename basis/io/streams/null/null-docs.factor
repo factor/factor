@@ -19,10 +19,14 @@ ARTICLE: "io.streams.null" "Null streams"
 "The " { $vocab-link "io.streams.null" } " vocabulary implements a pair of streams which are useful for testing. The null reader always yields EOF and the null writer ignores all output. Conceptually, they are similar to " { $snippet "/dev/null" } " on a Unix system."
 $nl
 "Null readers:"
-{ $subsection null-reader }
-{ $subsection with-null-writer }
+{ $subsections
+    null-reader
+    with-null-writer
+}
 "Null writers:"
-{ $subsection null-writer }
-{ $subsection with-null-reader } ;
+{ $subsections
+    null-writer
+    with-null-reader
+} ;
 
 ABOUT: "io.streams.null"

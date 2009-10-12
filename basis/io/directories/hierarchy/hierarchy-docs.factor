@@ -27,10 +27,12 @@ ARTICLE: "io.directories.hierarchy" "Directory hierarchy manipulation"
 "The " { $vocab-link "io.directories.hierarchy" } " vocabulary defines words for operating on directory hierarchies recursively."
 $nl
 "Deleting directory trees recursively:"
-{ $subsection delete-tree }
+{ $subsections delete-tree }
 "Copying directory trees recursively:"
-{ $subsection copy-tree }
-{ $subsection copy-tree-into }
-{ $subsection copy-trees-into } ;
+{ $subsections
+    copy-tree
+    copy-tree-into
+    copy-trees-into
+} ;
 
 ABOUT: "io.directories.hierarchy"
