@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel tools.test peg peg.ebnf peg.pl0 
-       multiline sequences accessors ;
+       sequences accessors ;
 IN: peg.pl0.tests
 
 { t } [
@@ -42,8 +42,7 @@ IN: peg.pl0.tests
 ] unit-test
 
 { t } [
-  <"
-VAR x, squ;
+"""VAR x, squ;
 
 PROCEDURE square;
 BEGIN
@@ -57,11 +56,11 @@ BEGIN
       CALL square;
       x := x + 1;
    END
-END."> main \ pl0 rule (parse) remaining>> empty?
+END.""" main \ pl0 rule (parse) remaining>> empty?
 ] unit-test
 
 { f } [
-  <"
+""" 
 CONST
   m =  7,
   n = 85;
@@ -123,5 +122,5 @@ BEGIN
   y := 36;
   CALL gcd;
 END.
-  "> main \ pl0 rule (parse) remaining>> empty?
+""" main \ pl0 rule (parse) remaining>> empty?
 ] unit-test

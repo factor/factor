@@ -9,9 +9,10 @@ compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker
 slots.private words hashtables classes assocs locals
 specialized-arrays system sorting math.libm
-math.intervals quotations effects alien ;
+math.intervals quotations effects alien alien.data ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
+SPECIALIZED-ARRAY: void*
 IN: compiler.tree.propagation.tests
 
 [ V{ } ] [ [ ] final-classes ] unit-test
@@ -764,17 +765,17 @@ MIXIN: empty-mixin
     [ { word object } declare equal? ] final-classes
 ] unit-test
 
-! [ V{ string } ] [
-!     [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
-! ] unit-test
+[ V{ string } ] [
+    [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
+] unit-test
 
-! [ t ] [ [ dup t xor or ] final-classes first true-class? ] unit-test
+[ t ] [ [ dup t xor or ] final-classes first true-class? ] unit-test
 
-! [ t ] [ [ dup t xor swap or ] final-classes first true-class? ] unit-test
+[ t ] [ [ dup t xor swap or ] final-classes first true-class? ] unit-test
 
-! [ t ] [ [ dup t xor and ] final-classes first false-class? ] unit-test
+[ t ] [ [ dup t xor and ] final-classes first false-class? ] unit-test
 
-! [ t ] [ [ dup t xor swap and ] final-classes first false-class? ] unit-test
+[ t ] [ [ dup t xor swap and ] final-classes first false-class? ] unit-test
 
 ! generalize-counter-interval wasn't being called in all the right places.
 ! bug found by littledan
@@ -894,3 +895,14 @@ M: tuple-with-read-only-slot clone
 [ t ] [ [ >fixnum dup 0 >= [ 16 /i ] when ] { /i fixnum/i fixnum/i-fast } inlined? ] unit-test
 [ f ] [ [ >fixnum dup 0 >= [ 16 /i ] when ] { fixnum-shift-fast } inlined? ] unit-test
 [ f ] [ [ >float dup 0 >= [ 16 /i ] when ] { /i float/f } inlined? ] unit-test
+
+! We want this to inline
+[ t ] [ [ void* <c-direct-array> ] { <c-direct-array> } inlined? ] unit-test
+[ V{ void*-array } ] [ [ void* <c-direct-array> ] final-classes ] unit-test
+
+[ t ] [ [ alien-unsigned-1 255 bitand ] { bitand fixnum-bitand } inlined? ] unit-test
+[ t ] [ [ alien-unsigned-1 255 swap bitand ] { bitand fixnum-bitand } inlined? ] unit-test
+
+[ t ] [ [ { fixnum } declare 256 rem -256 bitand ] { fixnum-bitand } inlined? ] unit-test
+[ t ] [ [ { fixnum } declare 250 rem -256 bitand ] { fixnum-bitand } inlined? ] unit-test
+[ f ] [ [ { fixnum } declare 257 rem -256 bitand ] { fixnum-bitand } inlined? ] unit-test

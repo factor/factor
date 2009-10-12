@@ -22,8 +22,10 @@ HELP: ?future
 
 ARTICLE: "concurrency.futures" "Futures"
 "The " { $vocab-link "concurrency.futures" } " vocabulary implements " { $emphasis "futures" } ", which are deferred computations performed in a background thread. A thread may create a future, then proceed to perform other tasks, then later wait for the future to complete."
-{ $subsection future }
-{ $subsection ?future }
-{ $subsection ?future-timeout } ;
+{ $subsections
+    future
+    ?future
+    ?future-timeout
+} ;
 
 ABOUT: "concurrency.futures"

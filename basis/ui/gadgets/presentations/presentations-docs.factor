@@ -45,7 +45,9 @@ ARTICLE: "ui.gadgets.presentations" "Presentation gadgets"
 "The " { $vocab-link "ui.gadgets.presentations" } " vocabulary implements presentations, which are graphical representations of an object, associated with the object itself (see " { $link "ui-operations" } ")."
 $nl
 "Clicking a presentation with the left mouse button invokes the object's primary operation, and clicking with the right mouse button displays a menu of all applicable operations. Presentations are usually not constructed directly, and instead are written to " { $link "ui.gadgets.panes" } " with formatted stream output words (see " { $link "presentations" } ")."
-{ $subsection presentation }
-{ $subsection <presentation> } ;
+{ $subsections
+    presentation
+    <presentation>
+} ;
 
 ABOUT: "ui.gadgets.presentations"

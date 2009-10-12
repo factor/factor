@@ -50,6 +50,11 @@ HELP: firstn
     }
 } ;
 
+HELP: set-firstn
+{ $values { "n" integer } }
+{ $description "A generalization of " { $link set-first } " "
+"that sets the first " { $snippet "n" } " elements of a sequence from the top " { $snippet "n" } " elements of the stack." } ;
+
 HELP: npick
 { $values { "n" integer } }
 { $description "A generalization of " { $link dup } ", "
@@ -202,7 +207,7 @@ HELP: nwith
 } ;
 
 HELP: napply
-{ $values { "quot" quotation } { "n" integer } }
+{ $values { "n" integer } }
 { $description "A generalization of " { $link bi@ } " and " { $link tri@ } " that can work for any stack depth."
 } 
 { $examples
@@ -257,7 +262,7 @@ HELP: nweave
 HELP: n*quot
 { $values
      { "n" integer } { "quot" quotation }
-     { "quot'" quotation }
+     { "quotquot" quotation }
 }
 { $examples
     { $example "USING: generalizations prettyprint math ;"
@@ -303,43 +308,61 @@ HELP: ntuck
 }
 { $description "A generalization of " { $link tuck } " that can work for any stack depth. The top item will be copied and placed " { $snippet "n" } " items down on the stack." } ;
 
+HELP: nspin
+{ $values
+    { "n" integer }
+}
+{ $description "A generalization of " { $link spin } " that can work for any stack depth. The top " { $snippet "n" } " items will be reversed in order." } ;
+
 ARTICLE: "sequence-generalizations" "Generalized sequence operations"
-{ $subsection narray }
-{ $subsection nsequence }
-{ $subsection firstn }
-{ $subsection nappend }
-{ $subsection nappend-as } ;
+{ $subsections
+    narray
+    nsequence
+    firstn
+    set-firstn
+    nappend
+    nappend-as
+} ;
 
 ARTICLE: "shuffle-generalizations" "Generalized shuffle words"
-{ $subsection ndup }
-{ $subsection npick }
-{ $subsection nrot }
-{ $subsection -nrot }
-{ $subsection nnip }
-{ $subsection ndrop }
-{ $subsection ntuck }
-{ $subsection mnswap }
-{ $subsection nweave } ;
+{ $subsections
+    ndup
+    npick
+    nrot
+    -nrot
+    nnip
+    ndrop
+    ntuck
+    nspin
+    mnswap
+    nweave
+} ;
 
 ARTICLE: "combinator-generalizations" "Generalized combinators"
-{ $subsection ndip }
-{ $subsection nkeep }
-{ $subsection napply }
-{ $subsection ncleave }
-{ $subsection nspread } ;
+{ $subsections
+    ndip
+    nkeep
+    napply
+    ncleave
+    nspread
+} ;
 
 ARTICLE: "other-generalizations" "Additional generalizations"
-{ $subsection ncurry } 
-{ $subsection nwith }
-{ $subsection nsum } ;
+{ $subsections
+    ncurry
+    nwith
+    nsum
+} ;
 
 ARTICLE: "generalizations" "Generalized shuffle words and combinators"
 "The " { $vocab-link "generalizations" } " vocabulary defines a number of stack shuffling words and combinators for use in "
 "macros where the arity of the input quotations depends on an "
 "input parameter."
-{ $subsection "sequence-generalizations" }
-{ $subsection "shuffle-generalizations" }
-{ $subsection "combinator-generalizations" }
-{ $subsection "other-generalizations" } ;
+{ $subsections
+    "sequence-generalizations"
+    "shuffle-generalizations"
+    "combinator-generalizations"
+    "other-generalizations"
+} ;
 
 ABOUT: "generalizations"

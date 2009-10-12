@@ -1,15 +1,14 @@
 ! (c)2009 Joe Groff bsd license
-USING: help.markup help.syntax multiline tools.continuations ;
+USING: help.markup help.syntax tools.continuations ;
 IN: opengl.debug
 
 HELP: G
 { $description "Makes the OpenGL context associated with " { $link G-world } " active for subsequent OpenGL calls. This is intended to be used from the listener, where interactively entered OpenGL calls can be directed to any window. Note that the Factor UI resets the OpenGL context every time a window is updated, so every code snippet entered in the listener must be prefixed with " { $snippet "G" } " in this use case." }
-{ $examples { $code <" USING: opengl.debug ui ;
+{ $examples { $code """USING: opengl.debug ui ;
 
 [ drop t ] find-window G-world set
 G 0.0 0.0 1.0 1.0 glClearColor
-G GL_COLOR_BUFFER_BIT glClear
-"> } } ;
+G GL_COLOR_BUFFER_BIT glClear""" } } ;
 
 HELP: F
 { $description "Flushes the OpenGL context associated with " { $link G-world } ", thereby committing any outstanding drawing operations." } ;
@@ -27,10 +26,12 @@ HELP: gl-break
 
 ARTICLE: "opengl.debug" "Interactive debugging of OpenGL applications"
 "The " { $vocab-link "opengl.debug" } " vocabulary provides words to assist with interactive debugging of OpenGL applications in the Factor UI."
-{ $subsection G-world }
-{ $subsection G }
-{ $subsection F }
-{ $subsection GB }
-{ $subsection gl-break } ;
+{ $subsections
+    G-world
+    G
+    F
+    GB
+    gl-break
+} ;
 
 ABOUT: "opengl.debug"

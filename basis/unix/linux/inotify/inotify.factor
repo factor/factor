@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax math math.bitwise classes.struct ;
+USING: alien.c-types alien.syntax math math.bitwise classes.struct ;
 IN: unix.linux.inotify
 
 STRUCT: inotify-event

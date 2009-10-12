@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes kernel help.markup help.syntax sequences
-alien assocs strings math multiline quotations db.private ;
+alien assocs strings math quotations db.private ;
 IN: db
 
 HELP: db-connection
@@ -31,8 +31,10 @@ HELP: statement
 
 HELP: result-set
 { $description "An object encapsulating a raw SQL result object. There are two ways in which a result set can be accessed, but they are specific to the database backend in use."
-    { $subsection "db-random-access-result-set" }
-    { $subsection "db-sequential-result-set" }
+{ $subsections
+    "db-random-access-result-set"
+    "db-sequential-result-set"
+}
 } ;
 
 HELP: new-result-set
@@ -177,14 +179,16 @@ HELP: with-transaction
 
 ARTICLE: "db" "Database library"
 "Accessing a database:"
-{ $subsection "db-custom-database-combinators" }
+{ $subsections "db-custom-database-combinators" }
 "Higher-level database help:"
 { $vocab-subsection "Database types" "db.types" }
 { $vocab-subsection "High-level tuple/database integration" "db.tuples" }
 "Low-level database help:"
-{ $subsection "db-protocol" }
-{ $subsection "db-result-sets" }
-{ $subsection "db-lowlevel-tutorial" }
+{ $subsections
+    "db-protocol"
+    "db-result-sets"
+    "db-lowlevel-tutorial"
+}
 "Supported database backends:"
 { $vocab-subsection "SQLite" "db.sqlite" }
 { $vocab-subsection "PostgreSQL" "db.postgresql" } ;
@@ -193,82 +197,98 @@ ARTICLE: "db-random-access-result-set" "Random access result sets"
 "Random-access result sets do not have to be traversed in order. For instance, PostgreSQL's result set object can be accessed as a matrix with i,j coordinates."
 $nl
 "Databases which work in this way must provide methods for the following traversal words:"
-{ $subsection #rows }
-{ $subsection #columns }
-{ $subsection row-column }
-{ $subsection row-column-typed } ;
+{ $subsections
+    #rows
+    #columns
+    row-column
+    row-column-typed
+} ;
 
 ARTICLE: "db-sequential-result-set" "Sequential result sets"
 "Sequential result sets can be iterated one element after the next. SQLite's result sets offer this method of traversal."
 $nl
 "Databases which work in this way must provide methods for the following traversal words:"
-{ $subsection more-rows? }
-{ $subsection advance-row }
-{ $subsection row-column }
-{ $subsection row-column-typed } ;
+{ $subsections
+    more-rows?
+    advance-row
+    row-column
+    row-column-typed
+} ;
 
 ARTICLE: "db-result-sets" "Result sets"
 "Result sets are the encapsulated, database-specific results from a SQL query."
 $nl
 "Two possible protocols for iterating over result sets exist:"
-{ $subsection "db-random-access-result-set" }
-{ $subsection "db-sequential-result-set" }
+{ $subsections
+    "db-random-access-result-set"
+    "db-sequential-result-set"
+}
 "Query the number of rows or columns:"
-{ $subsection #rows }
-{ $subsection #columns }
+{ $subsections
+    #rows
+    #columns
+}
 "Traversing a result set:"
-{ $subsection advance-row }
-{ $subsection more-rows? }
+{ $subsections
+    advance-row
+    more-rows?
+}
 "Pulling out a single row of results:"
-{ $subsection row-column }
-{ $subsection row-column-typed } ;
+{ $subsections
+    row-column
+    row-column-typed
+} ;
 
 ARTICLE: "db-protocol" "Low-level database protocol"
 "The high-level protocol (see " { $vocab-link "db.tuples" } ") uses this low-level protocol for executing statements and queries." $nl
 "Opening a database:"
-{ $subsection db-open }
+{ $subsections db-open }
 "Closing a database:"
-{ $subsection db-close }
+{ $subsections db-close }
 "Creating statements:"
-{ $subsection <simple-statement> }
-{ $subsection <prepared-statement> }
+{ $subsections
+    <simple-statement>
+    <prepared-statement>
+}
 "Using statements with the database:"
-{ $subsection prepare-statement }
-{ $subsection bind-statement* }
-{ $subsection low-level-bind }
+{ $subsections
+    prepare-statement
+    bind-statement*
+    low-level-bind
+}
 "Performing a query:"
-{ $subsection query-results }
+{ $subsections query-results }
 "Handling query results:"
-{ $subsection "db-result-sets" }
+{ $subsections "db-result-sets" }
 ;
 ! { $subsection bind-tuple }
 
 ARTICLE: "db-lowlevel-tutorial" "Low-level database tutorial"
 "Although Factor makes integrating a database with its object system easy (see " { $vocab-link "db.tuples" } "), sometimes you may want to write SQL directly and get the results back as arrays of strings, for instance, when interfacing with a legacy database that doesn't easily map to " { $snippet "tuples" } "." $nl
 "Executing a SQL command:"
-{ $subsection sql-command }
+{ $subsections sql-command }
 "Executing a query directly:"
-{ $subsection sql-query }
+{ $subsections sql-query }
 "Here's an example usage where we'll make a book table, insert some objects, and query them." $nl
 "First, let's set up a custom combinator for using our database. See " { $link "db-custom-database-combinators" } " for more details."
-{ $code <"
+{ $code """
 USING: db.sqlite db io.files io.files.temp ;
 : with-book-db ( quot -- )
-    "book.db" temp-file <sqlite-db> swap with-db ; inline"> }
+    "book.db" temp-file <sqlite-db> swap with-db ; inline" }
 "Now let's create the table manually:"
-{ $code <" "create table books
+{ $code " "create table books
     (id integer primary key, title text, author text, date_published timestamp,
      edition integer, cover_price double, condition text)"
-    [ sql-command ] with-book-db"> }
+    [ sql-command ] with-book-db""" }
 "Time to insert some books:"
-{ $code <"
+{ $code """
 "insert into books
     (title, author, date_published, edition, cover_price, condition)
     values('Factor for Sheeple', 'Mister Stacky Pants', date('now'), 1, 13.37, 'mint')"
-[ sql-command ] with-book-db"> }
+[ sql-command ] with-book-db""" }
 "Now let's select the book:"
-{ $code <"
-"select id, title, cover_price from books;" [ sql-query ] with-book-db "> }
+{ $code """
+"select id, title, cover_price from books;" [ sql-query ] with-book-db""" }
 "Notice that the result of this query is a Factor array containing the database rows as arrays of strings. We would have to convert the " { $snippet "cover_price" } " from a string to a number in order to use it in a calculation." $nl
 "In conclusion, this method of accessing a database is supported, but it is fairly low-level and generally specific to a single database. The " { $vocab-link "db.tuples" } " vocabulary is a good alternative to writing SQL by hand." ;
 
@@ -278,13 +298,13 @@ ARTICLE: "db-custom-database-combinators" "Custom database combinators"
 "Make a " { $snippet "with-" } " combinator to open and close a database so that resources are not leaked." $nl
 
 "SQLite example combinator:"
-{ $code <"
+{ $code """
 USING: db.sqlite db io.files io.files.temp ;
 : with-sqlite-db ( quot -- )
-    "my-database.db" temp-file <sqlite-db> swap with-db ; inline"> } 
+    "my-database.db" temp-file <sqlite-db> swap with-db ; inline""" } 
 
 "PostgreSQL example combinator:"
-{ $code <" USING: db.postgresql db ;
+{ $code """USING: db.postgresql db ;
 : with-postgresql-db ( quot -- )
     <postgresql-db>
         "localhost" >>host
@@ -292,7 +312,7 @@ USING: db.sqlite db io.files io.files.temp ;
         "erg" >>username
         "secrets?" >>password
         "factor-test" >>database
-    swap with-db ; inline">
+    swap with-db ; inline"""
 } ;
 
 ABOUT: "db"

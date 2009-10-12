@@ -40,19 +40,21 @@ ARTICLE: "namespaces-make" "Making sequences with variables"
 "The " { $vocab-link "make" } " vocabulary implements a facility for constructing sequences by holding an accumulator sequence in a variable. Storing the accumulator sequence in a variable rather than the stack may allow code to be written with less stack manipulation."
 $nl
 "Sequence construction is wrapped in a combinator:"
-{ $subsection make }
+{ $subsections make }
 "Inside the quotation passed to " { $link make } ", several words accumulate values:"
-{ $subsection , }
-{ $subsection % }
-{ $subsection # }
+{ $subsections
+    ,
+    %
+    #
+}
 "The accumulator sequence can be accessed directly from inside a " { $link make } ":"
-{ $subsection building }
+{ $subsections building }
 { $example
   "USING: make math.parser ;"
   "[ \"Language #\" % CHAR: \\s , 5 # ] \"\" make print"
   "Language # 5"
 }
-{ $subsection "make-philosophy" } ;
+{ $subsections "make-philosophy" } ;
 
 ABOUT: "namespaces-make"
 

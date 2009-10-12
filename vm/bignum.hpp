@@ -1,7 +1,7 @@
 namespace factor
 {
 
-/* :tabSize=2:indentSize=2:noTabs=true:
+/* 
 
 Copyright (C) 1989-1992 Massachusetts Institute of Technology
 Portions copyright (C) 2004-2009 Slava Pestov
@@ -44,10 +44,6 @@ enum bignum_comparison
   bignum_comparison_greater = 1
 };
 
-struct factorvm;
-bignum * digit_stream_to_bignum(unsigned int n_digits,
-								unsigned int (*producer)(unsigned int,factorvm*),
-                                   unsigned int radix,
-                                   int negative_p);
+bignum * digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int,factor_vm*), unsigned int radix, int negative_p);
 
 }

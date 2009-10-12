@@ -1,7 +1,8 @@
 ! Factor port of
 ! http://shootout.alioth.debian.org/gp4/benchmark.php?test=spectralnorm&lang=all
-USING: specialized-arrays kernel math math.functions
-math.vectors sequences prettyprint words hints locals ;
+USING: alien.c-types specialized-arrays kernel math
+math.functions math.vectors sequences prettyprint words hints
+locals ;
 SPECIALIZED-ARRAY: double
 IN: benchmark.spectral-norm
 

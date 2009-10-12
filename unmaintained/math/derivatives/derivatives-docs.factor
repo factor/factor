@@ -96,8 +96,10 @@ HELP: derivative-func
 
 ARTICLE: "derivatives" "The Derivative Toolkit"
 "A toolkit for computing the derivative of functions."
-{ $subsection derivative }
-{ $subsection derivative-func }
-{ $subsection (derivative) } ;
+{ $subsections
+    derivative
+    derivative-func
+    (derivative)
+} ;
 
 ABOUT: "derivatives"

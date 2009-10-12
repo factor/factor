@@ -23,11 +23,11 @@ else
     set iskeyword=!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255
 endif
 
-syn cluster factorCluster contains=factorComment,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorCompileDirective,factorString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorCharErr,factorBackslash,@factorWordOps,factorAlien,factorTuple
+syn cluster factorCluster contains=factorComment,factorFryDirective,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorCompileDirective,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorCharErr,factorBackslash,@factorWordOps,factorAlien,factorTuple,factorStruct
 
 syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
-syn match factorComment /\<#! .*/ contains=factorTodo
-syn match factorComment /\<! .*/ contains=factorTodo
+syn match factorComment /\<#!\>.*/ contains=factorTodo
+syn match factorComment /\<!\>.*/ contains=factorTodo
 
 syn cluster factorDefnContents contains=@factorCluster,factorStackEffect,factorLiteralStackEffect,factorArray0,factorQuotation0
 
@@ -44,9 +44,11 @@ syn region factorPGenericN matchgroup=factorPGenericNDelims start=/\<GENERIC#\s\
 syn region None matchgroup=factorPrivate start=/\<<PRIVATE\>/ end=/\<PRIVATE>\>/ contains=@factorDefnContents,factorPrivateDefn,factorPrivateMethod,factorPGeneric,factorPGenericN
 
 
-syn keyword factorBoolean boolean f general-t t
+syn keyword factorBoolean f t
+syn match factorFryDirective /\<\(@\|_\)\>/ contained
 syn keyword factorCompileDirective inline foldable recursive
 
+syn keyword factorKeyword boolean
 syn keyword factorKeyword or tuck 2bi 2tri while wrapper nip 4dip wrapper? bi* callstack>array both? hashcode die dupd callstack callstack? 3dup tri@ pick curry build ?execute 3bi prepose >boolean ?if clone eq? tri* ? = swapd call-clear 2over 2keep 3keep clear 2dup when not tuple? dup 2bi* 2tri* call tri-curry object bi@ do unless* if* loop bi-curry* drop when* assert= retainstack assert? -rot execute 2bi@ 2tri@ boa with either? 3drop bi curry? datastack until 3dip over 3curry roll tri-curry* swap tri-curry@ 2nip and throw set-retainstack bi-curry (clone) hashcode* compose spin 2dip if 3tri unless compose? tuple keep 2curry equal? set-datastack assert tri 2drop most <wrapper> boolean? identity-tuple? null new set-callstack dip bi-curry@ rot -roll xor identity-tuple boolean
 syn keyword factorKeyword ?at assoc? assoc-clone-like assoc= delete-at* assoc-partition extract-keys new-assoc value? assoc-size map>assoc push-at assoc-like key? assoc-intersect assoc-refine update assoc-union assoc-combine at* assoc-empty? at+ set-at assoc-all? assoc-subset? assoc-hashcode change-at assoc-each assoc-diff zip values value-at rename-at inc-at enum? at cache assoc>map <enum> assoc assoc-map enum value-at* remove-all assoc-map-as >alist assoc-filter-as substitute-here clear-assoc assoc-stack maybe-set-at substitute assoc-filter 2cache delete-at assoc-find keys assoc-any? unzip
 syn keyword factorKeyword case execute-effect no-cond no-case? 3cleave>quot 2cleave cond>quot wrong-values? no-cond? cleave>quot no-case case>quot 3cleave wrong-values to-fixed-point alist>quot case-find cond cleave call-effect 2cleave>quot recursive-hashcode linear-case-quot spread spread>quot
@@ -63,16 +65,17 @@ syn keyword factorKeyword with-return restarts return-continuation with-datastac
 syn cluster factorReal          contains=factorInt,factorFloat,factorRatio,factorBinary,factorHex,factorOctal
 syn cluster factorNumber        contains=@factorReal,factorComplex
 syn cluster factorNumErr        contains=factorBinErr,factorHexErr,factorOctErr
-syn match   factorInt           /\<-\=\d\+\>/
-syn match   factorFloat         /\<-\=\d*\.\d\+\>/
-syn match   factorRatio         /\<-\=\d*\.*\d\+\/-\=\d*\.*\d\+\>/
+syn match   factorInt           /\<-\=[0-9]\([0-9,]*[0-9]\)\?\>/
+syn match   factorFloat         /\<-\=[0-9]\([0-9,]*[0-9]\)\?\.[0-9,]*[0-9]\+\>/
+syn match   factorRatio         /\<-\=[0-9]\([0-9,]*[0-9]\)\?\(+[0-9]\([0-9,]*[0-9]\+\)\?\)\?\/-\=[0-9]\([0-9,]*[0-9]\+\)\?\.\?\>/
 syn region  factorComplex       start=/\<C{\>/ end=/\<}\>/ contains=@factorReal
-syn match   factorBinErr        /\<BIN:\s\+[01]*[^\s01]\S*\>/
-syn match   factorBinary        /\<BIN:\s\+[01]\+\>/
-syn match   factorHexErr        /\<HEX:\s\+\x*[^\x\s]\S*\>/
-syn match   factorHex           /\<HEX:\s\+\x\+\>/
-syn match   factorOctErr        /\<OCT:\s\+\o*[^\o\s]\S*\>/
-syn match   factorOctal         /\<OCT:\s\+\o\+\>/
+syn match   factorBinErr        /\<BIN:\s\+-\=[01,]*[^01 ]\S*\>/
+syn match   factorBinary        /\<BIN:\s\+-\=[01,]\+\>/
+syn match   factorHexErr        /\<HEX:\s\+-\=\(,\S*\|\S*,\|[-0-9a-fA-Fp,]*[^-0-9a-fA-Fp, ]\S*\)\>/
+syn match   factorHex           /\<HEX:\s\+-\=[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\(\.[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\)\?\(p-\=[0-9]\([0-9,]*[0-9]\)\?\)\?\>/
+syn match   factorOctErr        /\<OCT:\s\+-\=\(,\S*\|\S*,\|[0-7,]*[^0-7, ]\S*\)\>/
+syn match   factorOctal         /\<OCT:\s\+-\=[0-7,]\+\>/
+syn match   factorNan           /\<NAN:\s\+[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\>/
 
 syn match   factorIn            /\<IN:\s\+\S\+\>/
 syn match   factorUse           /\<USE:\s\+\S\+\>/
@@ -84,13 +87,18 @@ syn match   factorChar          /\<CHAR:\s\+\\\=\S\>/
 syn match   factorBackslash     /\<\\\>\s\+\S\+\>/
 
 syn region  factorUsing         start=/\<USING:\>/       end=/;/
+syn match   factorQualified     /\<QUALIFIED:\s\+\S\+\>/
+syn match   factorQualifiedWith /\<QUALIFIED-WITH:\s\+\S\+\s\+\S\+\>/
+syn region  factorFrom          start=/\<FROM:\>/        end=/;/
 syn region  factorSingletons    start=/\<SINGLETONS:\>/  end=/;/
 syn match   factorSymbol        /\<SYMBOL:\s\+\S\+\>/
 syn region  factorSymbols       start=/\<SYMBOLS:\>/     end=/;/
 syn region  factorConstructor2  start=/\<CONSTRUCTOR:\?/ end=/;/
 syn region  factorTuple         start=/\<TUPLE:\>/ end=/\<;\>/
+syn region  factorStruct        start=/\<\(UNION-STRUCT:\|STRUCT:\)\>/ end=/\<;\>/
 
 syn match   factorConstant      /\<CONSTANT:\s\+\S\+\>/
+syn match   factorAlias         /\<ALIAS:\s\+\S\+\>/
 syn match   factorSingleton     /\<SINGLETON:\s\+\S\+\>/
 syn match   factorPostpone      /\<POSTPONE:\s\+\S\+\>/
 syn match   factorDefer         /\<DEFER:\s\+\S\+\>/
@@ -100,10 +108,9 @@ syn match   factorInstance      /\<INSTANCE:\s\+\S\+\s\+\S\+\>/
 syn match   factorHook          /\<HOOK:\s\+\S\+\s\+\S\+\>/
 syn match   factorMain          /\<MAIN:\s\+\S\+\>/
 syn match   factorConstructor   /\<C:\s\+\S\+\s\+\S\+\>/
-syn match   factorAlien         /\<ALIEN:\s\+\d\+\>/
+syn match   factorAlien         /\<ALIEN:\s\+[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\>/
 
-syn cluster factorWordOps       contains=factorSymbol,factorPostpone,factorDefer,factorForget,factorMixin,factorInstance,factorHook,factorMain,factorConstructor
-
+syn cluster factorWordOps       contains=factorConstant,factorAlias,factorSingleton,factorSingletons,factorSymbol,factorSymbols,factorPostpone,factorDefer,factorForget,factorMixin,factorInstance,factorHook,factorMain,factorConstructor
 
 "TODO:
 "misc:
@@ -113,24 +120,15 @@ syn cluster factorWordOps       contains=factorSymbol,factorPostpone,factorDefer
 " PRIMITIVE:
 
 "C interface:
-" FIELD:
-" BEGIN-STRUCT:
 " C-ENUM:
 " FUNCTION:
-" END-STRUCT
-" DLL"
 " TYPEDEF:
 " LIBRARY:
-" C-UNION:
-"QUALIFIED:
-"QUALIFIED-WITH:
-"FROM:
-"ALIAS:
-"! POSTPONE: "
 "#\ "
 
-syn region factorString start=/"/ skip=/\\"/ end=/"/ oneline
-syn region factorSbuf start=/SBUF" / skip=/\\"/ end=/"/ oneline
+syn region factorString start=/\<"/ skip=/\\"/ end=/"/
+syn region factorTriString start=/\<"""/ skip=/\\"/ end=/"""/
+syn region factorSbuf start=/\<SBUF"\>/ skip=/\\"/ end=/"/
 
 syn region factorMultiString matchgroup=factorMultiStringDelims start=/\<STRING:\s\+\S\+\>/ end=/^;$/ contains=factorMultiStringContents
 syn match factorMultiStringContents /.*/ contained
@@ -143,33 +141,33 @@ syn match factorLiteralStackEffect /\<(( .*--.* ))\>/
 
 "adapted from lisp.vim
 if exists("g:factor_norainbow") 
-    syn region factorQuotation matchgroup=factorDelimiter start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ matchgroup=factorDelimiter end=/\<\]\>/ contains=ALL
+    syn region factorQuotation matchgroup=factorDelimiter start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/ matchgroup=factorDelimiter end=/\<\]\>/ contains=ALL
 else
-    syn region factorQuotation0           matchgroup=hlLevel0 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation1,factorArray1
-    syn region factorQuotation1 contained matchgroup=hlLevel1 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation2,factorArray2
-    syn region factorQuotation2 contained matchgroup=hlLevel2 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation3,factorArray3
-    syn region factorQuotation3 contained matchgroup=hlLevel3 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation4,factorArray4
-    syn region factorQuotation4 contained matchgroup=hlLevel4 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation5,factorArray5
-    syn region factorQuotation5 contained matchgroup=hlLevel5 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation6,factorArray6
-    syn region factorQuotation6 contained matchgroup=hlLevel6 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation7,factorArray7
-    syn region factorQuotation7 contained matchgroup=hlLevel7 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation8,factorArray8
-    syn region factorQuotation8 contained matchgroup=hlLevel8 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation9,factorArray9
-    syn region factorQuotation9 contained matchgroup=hlLevel9 start=/\<\(\('\|\$\|\)\[\)\|\[\(let\||\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation0,factorArray0
+    syn region factorQuotation0           matchgroup=hlLevel0 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation1,factorArray1
+    syn region factorQuotation1 contained matchgroup=hlLevel1 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/  end=/\<\]\>/ contains=@factorCluster,factorQuotation2,factorArray2
+    syn region factorQuotation2 contained matchgroup=hlLevel2 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/  end=/\<\]\>/ contains=@factorCluster,factorQuotation3,factorArray3
+    syn region factorQuotation3 contained matchgroup=hlLevel3 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/  end=/\<\]\>/ contains=@factorCluster,factorQuotation4,factorArray4
+    syn region factorQuotation4 contained matchgroup=hlLevel4 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/  end=/\<\]\>/ contains=@factorCluster,factorQuotation5,factorArray5
+    syn region factorQuotation5 contained matchgroup=hlLevel5 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/  end=/\<\]\>/ contains=@factorCluster,factorQuotation6,factorArray6
+    syn region factorQuotation6 contained matchgroup=hlLevel6 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/  end=/\<\]\>/ contains=@factorCluster,factorQuotation7,factorArray7
+    syn region factorQuotation7 contained matchgroup=hlLevel7 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/  end=/\<\]\>/ contains=@factorCluster,factorQuotation8,factorArray8
+    syn region factorQuotation8 contained matchgroup=hlLevel8 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/  end=/\<\]\>/ contains=@factorCluster,factorQuotation9,factorArray9
+    syn region factorQuotation9 contained matchgroup=hlLevel9 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/  end=/\<\]\>/ contains=@factorCluster,factorQuotation0,factorArray0
 endif
 
 if exists("g:factor_norainbow") 
-    syn region factorArray    matchgroup=factorDelimiter start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/  matchgroup=factorDelimiter end=/\<}\>/ contains=ALL
+    syn region factorArray    matchgroup=factorDelimiter start=/\<\(\$\|[-a-zA-Z0-9]\+\)\?{\>/  matchgroup=factorDelimiter end=/\<}\>/ contains=ALL
 else
-    syn region factorArray0           matchgroup=hlLevel0 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray1,factorQuotation1
-    syn region factorArray1 contained matchgroup=hlLevel1 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray2,factorQuotation2
-    syn region factorArray2 contained matchgroup=hlLevel2 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray3,factorQuotation3
-    syn region factorArray3 contained matchgroup=hlLevel3 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray4,factorQuotation4
-    syn region factorArray4 contained matchgroup=hlLevel4 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray5,factorQuotation5
-    syn region factorArray5 contained matchgroup=hlLevel5 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray6,factorQuotation6
-    syn region factorArray6 contained matchgroup=hlLevel6 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray7,factorQuotation7
-    syn region factorArray7 contained matchgroup=hlLevel7 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray8,factorQuotation8
-    syn region factorArray8 contained matchgroup=hlLevel8 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray9,factorQuotation9
-    syn region factorArray9 contained matchgroup=hlLevel9 start=/\<\(V\|H\|T\|W\|F\|B\|\$\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray0,factorQuotation0
+    syn region factorArray0           matchgroup=hlLevel0 start=/\<\(\$\|[-a-zA-Z0-9]\+\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray1,factorQuotation1
+    syn region factorArray1 contained matchgroup=hlLevel1 start=/\<\(\$\|[-a-zA-Z0-9]\+\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray2,factorQuotation2
+    syn region factorArray2 contained matchgroup=hlLevel2 start=/\<\(\$\|[-a-zA-Z0-9]\+\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray3,factorQuotation3
+    syn region factorArray3 contained matchgroup=hlLevel3 start=/\<\(\$\|[-a-zA-Z0-9]\+\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray4,factorQuotation4
+    syn region factorArray4 contained matchgroup=hlLevel4 start=/\<\(\$\|[-a-zA-Z0-9]\+\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray5,factorQuotation5
+    syn region factorArray5 contained matchgroup=hlLevel5 start=/\<\(\$\|[-a-zA-Z0-9]\+\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray6,factorQuotation6
+    syn region factorArray6 contained matchgroup=hlLevel6 start=/\<\(\$\|[-a-zA-Z0-9]\+\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray7,factorQuotation7
+    syn region factorArray7 contained matchgroup=hlLevel7 start=/\<\(\$\|[-a-zA-Z0-9]\+\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray8,factorQuotation8
+    syn region factorArray8 contained matchgroup=hlLevel8 start=/\<\(\$\|[-a-zA-Z0-9]\+\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray9,factorQuotation9
+    syn region factorArray9 contained matchgroup=hlLevel9 start=/\<\(\$\|[-a-zA-Z0-9]\+\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray0,factorQuotation0
 endif
 
 syn match factorBracketErr /\<\]\>/
@@ -194,6 +192,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorConditional            Conditional
     HiLink factorKeyword                Keyword
     HiLink factorOperator               Operator
+    HiLink factorFryDirective           Operator
     HiLink factorBoolean                Boolean
     HiLink factorDefnDelims             Typedef
     HiLink factorMethodDelims           Typedef
@@ -207,6 +206,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorPGenericDelims         Special
     HiLink factorPGenericNDelims        Special
     HiLink factorString                 String
+    HiLink factorTriString              String
     HiLink factorSbuf                   String
     HiLink factorMultiStringContents    String
     HiLink factorMultiStringDelims      Typedef
@@ -217,11 +217,15 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorBinErr                 Error
     HiLink factorHex                    Number
     HiLink factorHexErr                 Error
+    HiLink factorNan                    Number
     HiLink factorOctal                  Number
     HiLink factorOctErr                 Error
     HiLink factorFloat                  Float
     HiLink factorInt                    Number
     HiLink factorUsing                  Include
+    HiLink factorQualified              Include
+    HiLink factorQualifiedWith          Include
+    HiLink factorFrom                   Include
     HiLink factorUse                    Include
     HiLink factorUnuse                  Include
     HiLink factorIn                     Define
@@ -243,6 +247,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorForget                 Define
     HiLink factorAlien                  Define
     HiLink factorTuple                  Typedef
+    HiLink factorStruct                 Typedef
 
     if &bg == "dark"
         hi   hlLevel0 ctermfg=red         guifg=red1

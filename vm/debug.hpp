@@ -1,7 +1,4 @@
 namespace factor
 {
 
-
-PRIMITIVE(die);
-
 }

@@ -27,8 +27,10 @@ ARTICLE: "ui-walker" "UI walker"
 "The walker single-steps through quotations. To use the walker, enter a piece of code in the listener's input area and press " { $operation walk } "."
 $nl
 "Walkers are instances of " { $link walker-gadget } "."
-{ $subsection "ui-walker-step" }
-{ $subsection "breakpoints" }
+{ $subsections
+    "ui-walker-step"
+    "breakpoints"
+}
 { $command-map walker-gadget "toolbar" }
 { $command-map walker-gadget "multitouch" } ;
 

@@ -1,8 +1,8 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry kernel sequences assocs accessors namespaces
 math.intervals arrays classes.algebra combinators columns
-stack-checker.branches
+stack-checker.branches locals math
 compiler.utilities
 compiler.tree
 compiler.tree.combinators
@@ -21,6 +21,9 @@ M: #if child-constraints
 M: #dispatch child-constraints
     children>> length f <repetition> ;
 
+! There is an important invariant here, either no flags are set
+! in live-branches, exactly one is set, or all are set.
+
 GENERIC: live-branches ( #branch -- indices )
 
 M: #if live-branches
@@ -32,8 +35,12 @@ M: #if live-branches
     } cond nip ;
 
 M: #dispatch live-branches
-    [ children>> length ] [ in-d>> first value-info interval>> ] bi
-    '[ _ interval-contains? ] map ;
+    [ children>> ] [ in-d>> first value-info ] bi {
+        { [ dup class>> null-class? ] [ drop length f <array> ] }
+        { [ dup literal>> integer? not ] [ drop length t <array> ] }
+        { [ 2dup literal>> swap bounds-check? not ] [ drop length t <array> ] }
+        [ literal>> swap length f <array> [ [ t ] 2dip set-nth ] keep ]
+    } cond ;
 
 : live-children ( #branch -- children )
     [ children>> ] [ live-branches>> ] bi select-children ;
@@ -82,6 +89,13 @@ M: #phi propagate-before ( #phi -- )
     [ [ phi-info-d>> flip ] [ out-d>> ] bi merge-value-infos ]
     bi ;
 
+:: update-constraints ( new old -- )
+    new [| key value | key old [ value append ] change-at ] assoc-each ;
+
+: include-child-constraints ( i -- )
+    infer-children-data get nth constraints swap at last
+    constraints get last update-constraints ;
+
 : branch-phi-constraints ( output values booleans -- )
      {
         {
@@ -116,22 +130,24 @@ M: #phi propagate-before ( #phi -- )
                 swap t-->
             ]
         }
-        ! {
-        !     { { t f } { } }
-        !     [ B
-        !         first
-        !         [ [ =t ] bi@ <--> ]
-        !         [ [ =f ] bi@ <--> ] 2bi /\
-        !     ]
-        ! }
-        ! {
-        !     { { } { t f } }
-        !     [
-        !         second
-        !         [ [ =t ] bi@ <--> ]
-        !         [ [ =f ] bi@ <--> ] 2bi /\
-        !     ]
-        ! }
+        {
+            { { t f } { } }
+            [
+                first
+                [ [ =t ] bi@ <--> ]
+                [ [ =f ] bi@ <--> ] 2bi /\
+                0 include-child-constraints
+            ]
+        }
+        {
+            { { } { t f } }
+            [
+                second
+                [ [ =t ] bi@ <--> ]
+                [ [ =f ] bi@ <--> ] 2bi /\
+                1 include-child-constraints
+            ]
+        }
         [ 3drop f ]
     } case assume ;
 
@@ -145,9 +161,6 @@ M: #phi propagate-after ( #phi -- )
             branch-phi-constraints
         ] 3each
     ] [ drop ] if ;
-
-M: #phi propagate-around ( #phi -- )
-    [ propagate-before ] [ propagate-after ] bi ;
 
 M: #branch propagate-around
     dup live-branches >>live-branches

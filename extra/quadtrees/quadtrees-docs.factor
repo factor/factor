@@ -3,16 +3,20 @@ IN: quadtrees
 
 ARTICLE: "quadtrees" "Quadtrees"
 "The " { $snippet "quadtrees" } " vocabulary implements the quadtree data structure in Factor."
-{ $subsection <quadtree> }
+{ $subsections <quadtree> }
 "Quadtrees follow the " { $link "assocs-protocol" } " for insertion, deletion, and querying of exact points, using two-dimensional vectors as keys. Additional words are provided for spatial queries and pruning the tree structure:"
-{ $subsection in-rect }
-{ $subsection prune-quadtree }
+{ $subsections
+    in-rect
+    prune-quadtree
+}
 "The following words are provided to help write quadtree algorithms:"
-{ $subsection descend }
-{ $subsection each-quadrant }
-{ $subsection map-quadrant }
+{ $subsections
+    descend
+    each-quadrant
+    map-quadrant
+}
 "Quadtrees can be used to \"swizzle\" a sequence to improve the locality of spatial data in memory:"
-{ $subsection swizzle } ;
+{ $subsections swizzle } ;
 
 ABOUT: "quadtrees"
 

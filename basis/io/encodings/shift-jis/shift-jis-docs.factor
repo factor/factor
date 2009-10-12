@@ -5,8 +5,10 @@ IN: io.encodings.shift-jis
 
 ARTICLE: "io.encodings.shift-jis" "Shift JIS"
 "Shift JIS is a text encoding for Japanese. There are multiple versions, depending on whether the offical standard or the modified Microsoft version is required."
-{ $subsection shift-jis }
-{ $subsection windows-31j } ;
+{ $subsections
+    shift-jis
+    windows-31j
+} ;
 
 ABOUT: "io.encodings.shift-jis"
 

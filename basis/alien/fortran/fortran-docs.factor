@@ -56,13 +56,14 @@ HELP: fortran-invoke
 
 ARTICLE: "alien.fortran" "Fortran FFI"
 "The " { $vocab-link "alien.fortran" } " vocabulary provides an interface to code in shared libraries written in Fortran."
-{ $subsection "alien.fortran-types" }
-{ $subsection "alien.fortran-abis" }
-{ $subsection add-fortran-library }
-{ $subsection POSTPONE: LIBRARY: }
-{ $subsection POSTPONE: FUNCTION: }
-{ $subsection POSTPONE: SUBROUTINE: }
-{ $subsection fortran-invoke }
-;
+{ $subsections
+    "alien.fortran-types"
+    "alien.fortran-abis"
+    add-fortran-library
+    POSTPONE: LIBRARY:
+    POSTPONE: FUNCTION:
+    POSTPONE: SUBROUTINE:
+    fortran-invoke
+} ;
 
 ABOUT: "alien.fortran"

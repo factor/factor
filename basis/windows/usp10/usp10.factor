@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax alien.destructors classes.struct ;
+USING: alien.c-types alien.syntax alien.destructors classes.struct
+windows.types ;
 IN: windows.usp10
 
 LIBRARY: usp10
@@ -55,6 +56,9 @@ SCRIPT_JUSTIFFY_RESERVED4 ;
 
 STRUCT: SCRIPT_VISATTR
     { flags WORD } ;
+
+TYPEDEF: void* SCRIPT_CACHE*
+C-TYPE: ABC
 
 FUNCTION: HRESULT ScriptShape (
     HDC hdc,

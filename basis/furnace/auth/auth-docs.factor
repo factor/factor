@@ -1,7 +1,7 @@
 USING: assocs classes help.markup help.syntax kernel
 quotations strings words words.symbol furnace.auth.providers.db
 checksums.sha furnace.auth.providers math byte-arrays
-http multiline ;
+http ;
 IN: furnace.auth
 
 HELP: <protected>
@@ -86,15 +86,17 @@ ARTICLE: "furnace.auth.capabilities" "Authentication capabilities"
 "Every user in the authentication framework has a set of associated capabilities."
 $nl
 "Defining new capabilities:"
-{ $subsection define-capability }
+{ $subsections define-capability }
 "Capabilities are stored in a global variable:"
-{ $subsection capabilities }
+{ $subsections capabilities }
 "Protected resources can be restricted to users possessing certain capabilities only by storing a sequence of capabilities in the " { $slot "capabilities" } " slot of a " { $link protected } " instance." ;
 
 ARTICLE: "furnace.auth.protected" "Protected resources"
 "To restrict access to authenticated clients only, wrap a responder in a protected responder."
-{ $subsection protected }
-{ $subsection <protected> }
+{ $subsections
+    protected
+    <protected>
+}
 "Protected responders have the following two slots which may be set:"
 { $table
     { { $slot "description" } "A string identifying the protected resource for user interface purposes" }
@@ -114,79 +116,87 @@ ARTICLE: "furnace.auth.providers" "Authentication providers"
 "The " { $vocab-link "furnace.auth" } " framework looks up users using an authentication provider. Different authentication providers can be swapped in to implement various authentication strategies."
 $nl
 "Each authentication realm has a provider stored in the " { $slot "users" } " slot. The default provider is " { $link users-in-db } "."
-{ $subsection "furnace.auth.providers.protocol" }
-{ $subsection "furnace.auth.providers.null" }
-{ $subsection "furnace.auth.providers.assoc" }
-{ $subsection "furnace.auth.providers.db" } ;
+{ $subsections
+    "furnace.auth.providers.protocol"
+    "furnace.auth.providers.null"
+    "furnace.auth.providers.assoc"
+    "furnace.auth.providers.db"
+} ;
 
 ARTICLE: "furnace.auth.features" "Optional authentication features"
 "Vocabularies having names prefixed by " { $code "furnace.auth.features" } " implement optional features which can be enabled by calling special words. These words define new actions on an authentication realm."
-{ $subsection "furnace.auth.features.deactivate-user" }
-{ $subsection "furnace.auth.features.edit-profile" }
-{ $subsection "furnace.auth.features.recover-password" }
-{ $subsection "furnace.auth.features.registration" } ;
+{ $subsections
+    "furnace.auth.features.deactivate-user"
+    "furnace.auth.features.edit-profile"
+    "furnace.auth.features.recover-password"
+    "furnace.auth.features.registration"
+} ;
 
 ARTICLE: "furnace.auth.realms" "Authentication realms"
 "The superclass of authentication realms:"
-{ $subsection realm }
+{ $subsections realm }
 "There are two concrete implementations:"
-{ $subsection "furnace.auth.basic" }
-{ $subsection "furnace.auth.login" }
+{ $subsections
+    "furnace.auth.basic"
+    "furnace.auth.login"
+}
 "Authentication realms need to be configured after construction."
-{ $subsection "furnace.auth.realm-config" } ;
+{ $subsections "furnace.auth.realm-config" } ;
 
 ARTICLE: "furnace.auth.users" "User profiles"
 "A responder wrapped in an authentication realm may access the currently logged-in user,"
-{ $subsection logged-in-user }
+{ $subsections logged-in-user }
 "as well as the logged-in username:"
-{ $subsection username }
+{ $subsections username }
 "Values can also be stored in user profile variables:"
-{ $subsection uget }
-{ $subsection uset }
-{ $subsection uchange }
+{ $subsections
+    uget
+    uset
+    uchange
+}
 "User profile variables have the same restrictions on their values as session variables; see " { $link "furnace.sessions.serialize" } " for a discussion." ;
 
 ARTICLE: "furnace.auth.example" "Furnace authentication example"
 "The " { $vocab-link "webapps.todo" } " vocabulary wraps all of its responders in a protected responder. The " { $slot "description" } " slot is set so that the login page contains the message “You must log in to view your todo list”:"
 { $code
-    <" <protected>
-    "view your todo list" >>description">
+    """<protected>
+    "view your todo list" >>description"""
 }
 "The " { $vocab-link "webapps.wiki" } " vocabulary defines a mix of protected and unprotected actions. One example of a protected action is that for deleting wiki pages, an action normally reserved for administrators. This action is protected with the following code:"
 { $code
-    <" <protected>
+    """<protected>
     "delete wiki articles" >>description
-    { can-delete-wiki-articles? } >>capabilities">
+    { can-delete-wiki-articles? } >>capabilities"""
 }
 "The " { $vocab-link "websites.concatenative" } " vocabulary wraps all of its responders, including the wiki, in a login authentication realm:"
 { $code
-<" : <login-config> ( responder -- responder' )
+""": <login-config> ( responder -- responder' )
     "Factor website" <login-realm>
         "Factor website" >>name
         allow-registration
         allow-password-recovery
         allow-edit-profile
-        allow-deactivation ;">
+        allow-deactivation ;"""
 } ;
 
 ARTICLE: "furnace.auth" "Furnace authentication"
 "The " { $vocab-link "furnace.auth" } " vocabulary implements a pluggable authentication framework."
 $nl
 "Usernames and passwords are verified using an " { $emphasis "authentication provider" } "."
-{ $subsection "furnace.auth.providers" }
+{ $subsections "furnace.auth.providers" }
 "Users have capabilities assigned to them."
-{ $subsection "furnace.auth.capabilities" }
+{ $subsections "furnace.auth.capabilities" }
 "An " { $emphasis "authentication realm" } " is a responder which manages access to protected resources."
-{ $subsection "furnace.auth.realms" }
+{ $subsections "furnace.auth.realms" }
 "Actions contained inside an authentication realm can be protected by wrapping them with a responder."
-{ $subsection "furnace.auth.protected" }
+{ $subsections "furnace.auth.protected" }
 "Actions contained inside an authentication realm can access the currently logged-in user profile."
-{ $subsection "furnace.auth.users" }
+{ $subsections "furnace.auth.users" }
 "Authentication realms can be adorned with additional functionality."
-{ $subsection "furnace.auth.features" }
+{ $subsections "furnace.auth.features" }
 "An administration tool."
-{ $subsection "furnace.auth.user-admin" }
+{ $subsections "furnace.auth.user-admin" }
 "A concrete example."
-{ $subsection "furnace.auth.example" } ;
+{ $subsections "furnace.auth.example" } ;
 
 ABOUT: "furnace.auth"

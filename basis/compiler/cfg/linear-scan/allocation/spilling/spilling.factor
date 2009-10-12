@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators fry hints kernel locals
-math sequences sets sorting splitting namespaces
+math sequences sets sorting splitting namespaces linked-assocs
 combinators.short-circuit compiler.utilities
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.allocation.splitting
@@ -83,7 +83,7 @@ ERROR: bad-live-ranges interval ;
     find-use-positions ;
 
 : spill-status ( new -- use-pos )
-    H{ } clone
+    H{ } <linked-assoc>
     [ inactive-positions ] [ active-positions ] [ nip ] 2tri
     >alist alist-max ;
 

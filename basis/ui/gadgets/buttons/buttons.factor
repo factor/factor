@@ -1,12 +1,13 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel math models namespaces sequences
-strings quotations assocs combinators classes colors colors.constants
-classes.tuple opengl opengl.gl math.vectors ui.commands ui.gadgets
-ui.gadgets.borders ui.gadgets.labels ui.gadgets.tracks
-ui.gadgets.packs ui.gadgets.worlds ui.gestures ui.pens ui.pens.solid
-ui.pens.image ui.pens.tile math.rectangles locals fry
-combinators.smart ;
+USING: accessors arrays assocs classes classes.tuple colors
+colors.constants combinators combinators.short-circuit
+combinators.smart fry kernel locals math math.rectangles
+math.vectors models namespaces opengl opengl.gl quotations
+sequences strings ui.commands ui.gadgets ui.gadgets.borders
+ui.gadgets.labels ui.gadgets.packs ui.gadgets.tracks
+ui.gadgets.worlds ui.gestures ui.pens ui.pens.image
+ui.pens.solid ui.pens.tile ;
 FROM: models => change-model ;
 IN: ui.gadgets.buttons
 
@@ -30,7 +31,7 @@ PRIVATE>
 
 : button-update ( button -- )
     dup
-    [ mouse-clicked? ] [ button-rollover? ] bi and
+    { [ mouse-clicked? ] [ button-rollover? ] } 1&&
     buttons-down? and
     >>pressed?
     relayout-1 ;
@@ -42,8 +43,9 @@ PRIVATE>
     dup "" swap show-status button-update ;
 
 : button-clicked ( button -- )
-    dup button-update
-    dup button-rollover?
+    [ ]
+    [ button-update ]
+    [ button-rollover? ] tri
     [ dup quot>> call( button -- ) ] [ drop ] if ;
 
 button H{
@@ -67,7 +69,9 @@ C: <button-pen> button-pen
 
 : button-pen ( button pen -- button pen )
     over find-button {
-        { [ dup [ pressed?>> ] [ selected?>> ] bi and ] [ drop pressed-selected>> ] }
+        { [ dup { [ pressed?>> ] [ selected?>> ] } 1&& ] [
+            drop pressed-selected>>
+        ] }
         { [ dup pressed?>> ] [ drop pressed>> ] }
         { [ dup selected?>> ] [ drop selected>> ] }
         { [ dup button-rollover? ] [ drop rollover>> ] }
@@ -233,7 +237,7 @@ PRIVATE>
     '[ _ _ invoke-command ] ;
 
 : gesture>tooltip ( gesture -- str/f )
-    dup [ gesture>string "Shortcut: " prepend ] when ;
+    gesture>string dup [ "Shortcut: " prepend ] when ;
 
 : <command-button> ( target gesture command -- button )
     swapd [ command-name swap ] keep command-button-quot

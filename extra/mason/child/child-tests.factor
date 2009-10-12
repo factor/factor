@@ -33,7 +33,7 @@ USING: mason.child mason.config tools.test namespaces io kernel sequences ;
     ] with-scope
 ] unit-test
 
-[ { "./factor.com" "-i=boot.x86.32.image" "-no-user-init" "-sse-version=30" } ] [
+[ { "./factor.com" "-i=boot.x86.32.image" "-no-user-init" } ] [
     [
         "winnt" target-os set
         "x86.32" target-cpu set

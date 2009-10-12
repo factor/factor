@@ -16,6 +16,6 @@ ARTICLE: "logging.parser" "Log file parser"
 "The " { $vocab-link "logging.parser" } " vocabulary parses log files output by the " { $vocab-link "logging" } " vocabulary. It is used by " { $link "logging.analysis" } " and " { $vocab-link "logging.insomniac" } " to analyze logs."
 $nl
 "There is only one primary entry point:"
-{ $subsection parse-log } ;
+{ $subsections parse-log } ;
 
 ABOUT: "logging.parser"

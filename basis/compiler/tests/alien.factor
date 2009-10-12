@@ -4,7 +4,7 @@ compiler continuations effects io io.backend io.pathnames
 io.streams.string kernel math memory namespaces
 namespaces.private parser quotations sequences
 specialized-arrays stack-checker stack-checker.errors
-system threads tools.test words ;
+system threads tools.test words alien.complex ;
 FROM: alien.c-types => float short ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: char
@@ -588,3 +588,8 @@ FUNCTION: short ffi_test_48 ( bool-field-test x ) ;
         123 >>parents
     ffi_test_48
 ] unit-test
+
+! Regression: calling an undefined function would raise a protection fault
+FUNCTION: void this_does_not_exist ( ) ;
+
+[ this_does_not_exist ] [ { "kernel-error" 10 f f } = ] must-fail-with

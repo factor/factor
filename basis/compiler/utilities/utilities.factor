@@ -29,9 +29,9 @@ yield-hook [ [ ] ] initialize
 : alist-most ( alist quot -- pair )
     [ [ ] ] dip '[ [ [ second ] bi@ @ ] most ] map-reduce ; inline
 
-: alist-min ( alist -- pair ) [ before? ] alist-most ;
+: alist-min ( alist -- pair ) [ before=? ] alist-most ;
 
-: alist-max ( alist -- pair ) [ after? ] alist-most ;
+: alist-max ( alist -- pair ) [ after=? ] alist-most ;
 
 : penultimate ( seq -- elt ) [ length 2 - ] keep nth ;
 

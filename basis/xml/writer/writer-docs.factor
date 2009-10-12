@@ -6,16 +6,22 @@ IN: xml.writer
 ABOUT: "xml.writer"
 
 ARTICLE: "xml.writer" "Writing XML"
-    "These words are used to print XML preserving whitespace in text nodes"
-    { $subsection write-xml }
-    { $subsection xml>string }
-    "These words are used to prettyprint XML"
-    { $subsection pprint-xml>string }
-    { $subsection pprint-xml }
-    "Certain variables can be changed to mainpulate prettyprinting"
-    { $subsection sensitive-tags }
-    { $subsection indenter }
-    "All of these words operate on arbitrary pieces of XML: they can take, as in put, XML documents, comments, tags, strings (text nodes), XML chunks, etc." ;
+"These words are used to print XML preserving whitespace in text nodes"
+{ $subsections
+    write-xml
+    xml>string
+}
+"These words are used to prettyprint XML"
+{ $subsections
+    pprint-xml>string
+    pprint-xml
+}
+"Certain variables can be changed to mainpulate prettyprinting"
+{ $subsections
+    sensitive-tags
+    indenter
+}
+"All of these words operate on arbitrary pieces of XML: they can take, as in put, XML documents, comments, tags, strings (text nodes), XML chunks, etc." ;
 
 HELP: xml>string
 { $values { "xml" "an XML document" } { "string" "a string" } }
@@ -41,18 +47,19 @@ HELP: pprint-xml
 
 HELP: indenter
 { $var-description "Contains the string which is used for indenting in the XML prettyprinter. For example, to print an XML document using " { $snippet "%%%%" } " for indentation, you can use the following:" }
-{ $example {" USING: xml.syntax xml.writer namespaces ;
-[XML <foo>bar</foo> XML] "%%%%" indenter [ pprint-xml ] with-variable "} {"
+{ $example """USING: xml.syntax xml.writer namespaces ;
+[XML <foo>bar</foo> XML] "%%%%" indenter [ pprint-xml ] with-variable """ """
 <foo>
 %%%%bar
-</foo>"} } ;
+</foo>""" } ;
 
 HELP: sensitive-tags
 { $var-description "Contains a sequence of " { $link name } "s where whitespace should be considered significant for prettyprinting purposes. The sequence can contain " { $link string } "s in place of names. For example, to preserve whitespace inside a " { $snippet "pre" } " tag:" }
-{ $example {" USING: xml.syntax xml.writer namespaces ;
+{ $example """USING: xml.syntax xml.writer namespaces ;
 [XML <html> <head>   <title> something</title></head><body><pre>bing
 bang
-   bong</pre></body></html> XML] { "pre" } sensitive-tags [ pprint-xml ] with-variable "} {"
+   bong</pre></body></html> XML] { "pre" } sensitive-tags [ pprint-xml ] with-variable"""
+"""
 <html>
   <head>
     <title>
@@ -64,4 +71,4 @@ bang
 bang
    bong</pre>
   </body>
-</html>"} } ;
+</html>""" } ;

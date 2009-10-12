@@ -3,7 +3,7 @@
 USING: accessors alien.c-types assocs compiler.units functors
 growable kernel lexer namespaces parser prettyprint.custom
 sequences specialized-arrays specialized-arrays.private strings
-vocabs vocabs.parser fry ;
+vocabs vocabs.parser vocabs.generated fry ;
 QUALIFIED: vectors.functor
 IN: specialized-vectors
 

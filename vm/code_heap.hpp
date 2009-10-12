@@ -1,9 +1,20 @@
 namespace factor
 {
-struct factorvm;
-typedef void (*code_heap_iterator)(code_block *compiled,factorvm *myvm);
 
-PRIMITIVE(modify_code_heap);
-PRIMITIVE(code_room);
+struct code_heap : heap {
+	/* Set of blocks which need full relocation. */
+	std::set<code_block *> needs_fixup;
+
+	/* Code blocks which may reference objects in the nursery */
+	std::set<code_block *> points_to_nursery;
+
+	/* Code blocks which may reference objects in aging space or the nursery */
+	std::set<code_block *> points_to_aging;
+
+	explicit code_heap(bool secure_gc, cell size);
+	void write_barrier(code_block *compiled);
+	bool needs_fixup_p(code_block *compiled);
+	void code_heap_free(code_block *compiled);
+};
 
 }

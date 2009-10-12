@@ -3,67 +3,81 @@ IN: math.intervals
 
 ARTICLE: "math-intervals-new" "Creating intervals"
 "Standard constructors:"
-{ $subsection [a,b] }
-{ $subsection (a,b) }
-{ $subsection [a,b) }
-{ $subsection (a,b] }
+{ $subsections
+    [a,b]
+    (a,b)
+    [a,b)
+    (a,b]
+}
 "One-point interval constructor:"
-{ $subsection [a,a] }
+{ $subsections [a,a] }
 "Open-ended interval constructors:"
-{ $subsection [-inf,a] }
-{ $subsection [-inf,a) }
-{ $subsection [a,inf] }
-{ $subsection (a,inf] }
+{ $subsections
+    [-inf,a]
+    [-inf,a)
+    [a,inf]
+    (a,inf]
+}
 "The set of all real numbers with infinities:"
-{ $subsection [-inf,inf] }
+{ $subsections [-inf,inf] }
 "The empty set:"
-{ $subsection empty-interval }
+{ $subsections empty-interval }
 "Another constructor:"
-{ $subsection points>interval } ;
+{ $subsections points>interval } ;
 
 ARTICLE: "math-intervals-arithmetic" "Interval arithmetic"
 "Binary operations on intervals:"
-{ $subsection interval+ }
-{ $subsection interval- }
-{ $subsection interval* }
-{ $subsection interval/ }
-{ $subsection interval/i }
-{ $subsection interval-mod }
-{ $subsection interval-rem }
-{ $subsection interval-min }
-{ $subsection interval-max }
+{ $subsections
+    interval+
+    interval-
+    interval*
+    interval/
+    interval/i
+    interval-mod
+    interval-rem
+    interval-min
+    interval-max
+}
 "Bitwise operations on intervals:"
-{ $subsection interval-shift }
-{ $subsection interval-bitand }
-{ $subsection interval-bitor }
-{ $subsection interval-bitxor }
+{ $subsections
+    interval-shift
+    interval-bitand
+    interval-bitor
+    interval-bitxor
+}
 "Unary operations on intervals:"
-{ $subsection interval-1+ }
-{ $subsection interval-1- }
-{ $subsection interval-neg }
-{ $subsection interval-bitnot }
-{ $subsection interval-recip }
-{ $subsection interval-2/ }
-{ $subsection interval-abs }
-{ $subsection interval-log2 } ;
+{ $subsections
+    interval-1+
+    interval-1-
+    interval-neg
+    interval-bitnot
+    interval-recip
+    interval-2/
+    interval-abs
+    interval-log2
+} ;
 
 ARTICLE: "math-intervals-sets" "Set-theoretic operations on intervals"
-{ $subsection interval-contains? }
-{ $subsection interval-subset? }
-{ $subsection interval-intersect }
-{ $subsection interval-union }
-{ $subsection interval-closure }
-{ $subsection integral-closure } ;
+{ $subsections
+    interval-contains?
+    interval-subset?
+    interval-intersect
+    interval-union
+    interval-closure
+    integral-closure
+} ;
 
 ARTICLE: "math-intervals-compare" "Comparing intervals"
-{ $subsection interval< }
-{ $subsection interval<= }
-{ $subsection interval> }
-{ $subsection interval>= }
-{ $subsection assume< }
-{ $subsection assume<= }
-{ $subsection assume> }
-{ $subsection assume>= } ;
+{ $subsections
+    interval<
+    interval<=
+    interval>
+    interval>=
+    assume<
+    assume<=
+    assume>
+    assume>=
+} ;
 
 ARTICLE: "math-interval-properties" "Properties of interval arithmetic"
 "For some operations, interval arithmetic yields inaccurate results, either because the result of lifting some operations to intervals does not result in intervals (bitwise operations, for example) or for the sake of simplicity of implementation."
@@ -74,15 +88,19 @@ $nl
 
 ARTICLE: "math-intervals" "Intervals"
 "Interval arithmetic is performed on ranges of real numbers, rather than exact values. It is used by the Factor compiler to convert arbitrary-precision arithmetic to machine arithmetic, by inferring bounds for integer calculations."
-{ $subsection "math-interval-properties" }
+{ $subsections "math-interval-properties" }
 "The class of intervals:"
-{ $subsection interval }
-{ $subsection interval? }
+{ $subsections
+    interval
+    interval?
+}
 "Interval operations:"
-{ $subsection "math-intervals-new" }
-{ $subsection "math-intervals-arithmetic" }
-{ $subsection "math-intervals-sets" }
-{ $subsection "math-intervals-compare" } ;
+{ $subsections
+    "math-intervals-new"
+    "math-intervals-arithmetic"
+    "math-intervals-sets"
+    "math-intervals-compare"
+} ;
 
 ABOUT: "math-intervals"
 

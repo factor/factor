@@ -31,8 +31,10 @@ $nl
 $nl
 "Bloom filters cannot be resized and do not support removal."
 $nl
-{ $subsection <bloom-filter> }
-{ $subsection bloom-filter-insert }
-{ $subsection bloom-filter-member? } ;
+{ $subsections
+    <bloom-filter>
+    bloom-filter-insert
+    bloom-filter-member?
+} ;
 
 ABOUT: "bloom-filters"

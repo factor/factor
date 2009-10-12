@@ -15,9 +15,11 @@ HELP: ppop
 
 ARTICLE: "persistent.sequences" "Persistent sequence protocol"
 "The persistent sequence protocol consists of the non-mutating sequence protocol words, such as " { $link length } " and " { $link nth } ", together with the following operations:"
-{ $subsection new-nth }
-{ $subsection ppush }
-{ $subsection ppop }
+{ $subsections
+    new-nth
+    ppush
+    ppop
+}
 "The default implementations of the above run in " { $snippet "O(n)" } " time; the " { $vocab-link "persistent.vectors" } " vocabulary provides an implementation of these operations in " { $snippet "O(1)" } " time." ;
 
 ABOUT: "persistent.sequences"

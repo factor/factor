@@ -29,6 +29,10 @@ INSN: ##load-reference
 def: dst/int-rep
 constant: obj ;
 
+INSN: ##load-constant
+def: dst/int-rep
+constant: obj ;
+
 INSN: ##peek
 def: dst/int-rep
 literal: loc ;
@@ -63,9 +67,7 @@ temp: temp/int-rep ;
 ! Slot access
 INSN: ##slot
 def: dst/int-rep
-use: obj/int-rep slot/int-rep
-literal: tag
-temp: temp/int-rep ;
+use: obj/int-rep slot/int-rep ;
 
 INSN: ##slot-imm
 def: dst/int-rep
@@ -73,9 +75,7 @@ use: obj/int-rep
 literal: slot tag ;
 
 INSN: ##set-slot
-use: src/int-rep obj/int-rep slot/int-rep
-literal: tag
-temp: temp/int-rep ;
+use: src/int-rep obj/int-rep slot/int-rep ;
 
 INSN: ##set-slot-imm
 use: src/int-rep obj/int-rep
@@ -190,31 +190,15 @@ PURE-INSN: ##not
 def: dst/int-rep
 use: src/int-rep ;
 
+PURE-INSN: ##neg
+def: dst/int-rep
+use: src/int-rep ;
+
 PURE-INSN: ##log2
 def: dst/int-rep
 use: src/int-rep ;
 
-! Bignum/integer conversion
-PURE-INSN: ##integer>bignum
-def: dst/int-rep
-use: src/int-rep
-temp: temp/int-rep ;
-
-PURE-INSN: ##bignum>integer
-def: dst/int-rep
-use: src/int-rep
-temp: temp/int-rep ;
-
 ! Float arithmetic
-PURE-INSN: ##unbox-float
-def: dst/double-rep
-use: src/int-rep ;
-
-PURE-INSN: ##box-float
-def: dst/int-rep
-use: src/double-rep
-temp: temp/int-rep ;
-
 PURE-INSN: ##add-float
 def: dst/double-rep
 use: src1/double-rep src2/double-rep ;
@@ -273,21 +257,12 @@ def: dst/double-rep
 use: src/int-rep ;
 
 ! SIMD operations
-
-PURE-INSN: ##box-vector
-def: dst/int-rep
-use: src
-literal: rep
-temp: temp/int-rep ;
-
-PURE-INSN: ##unbox-vector
+PURE-INSN: ##zero-vector
 def: dst
-use: src/int-rep
 literal: rep ;
 
-PURE-INSN: ##broadcast-vector
+PURE-INSN: ##fill-vector
 def: dst
-use: src/scalar-rep
 literal: rep ;
 
 PURE-INSN: ##gather-vector-2
@@ -300,7 +275,94 @@ def: dst
 use: src1/scalar-rep src2/scalar-rep src3/scalar-rep src4/scalar-rep
 literal: rep ;
 
+PURE-INSN: ##shuffle-vector
+def: dst
+use: src shuffle
+literal: rep ;
+
+PURE-INSN: ##shuffle-vector-imm
+def: dst
+use: src
+literal: shuffle rep ;
+
+PURE-INSN: ##tail>head-vector
+def: dst
+use: src
+literal: rep ;
+
+PURE-INSN: ##merge-vector-head
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##merge-vector-tail
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##signed-pack-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##unsigned-pack-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##unpack-vector-head
+def: dst
+use: src
+literal: rep ;
+
+PURE-INSN: ##unpack-vector-tail
+def: dst
+use: src
+literal: rep ;
+
+PURE-INSN: ##integer>float-vector
+def: dst
+use: src
+literal: rep ;
+
+PURE-INSN: ##float>integer-vector
+def: dst
+use: src
+literal: rep ;
+
+PURE-INSN: ##compare-vector
+def: dst
+use: src1 src2
+literal: rep cc ;
+
+PURE-INSN: ##test-vector
+def: dst/int-rep
+use: src1
+temp: temp/int-rep
+literal: rep vcc ;
+
+INSN: ##test-vector-branch
+use: src1
+temp: temp/int-rep
+literal: rep vcc ;
+
+INSN: _test-vector-branch
+literal: label
+use: src1
+temp: temp/int-rep
+literal: rep vcc ;
+
 PURE-INSN: ##add-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##saturated-add-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##add-sub-vector
 def: dst
 use: src1 src2
 literal: rep ;
@@ -310,7 +372,17 @@ def: dst
 use: src1 src2
 literal: rep ;
 
+PURE-INSN: ##saturated-sub-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
 PURE-INSN: ##mul-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##saturated-mul-vector
 def: dst
 use: src1 src2
 literal: rep ;
@@ -330,14 +402,95 @@ def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##sqrt-vector
-def: dst
-use: src
+PURE-INSN: ##dot-vector
+def: dst/scalar-rep
+use: src1 src2
 literal: rep ;
 
 PURE-INSN: ##horizontal-add-vector
 def: dst/scalar-rep
 use: src
+literal: rep ;
+
+PURE-INSN: ##horizontal-sub-vector
+def: dst/scalar-rep
+use: src
+literal: rep ;
+
+PURE-INSN: ##horizontal-shl-vector
+def: dst
+use: src1
+literal: src2 rep ;
+
+PURE-INSN: ##horizontal-shr-vector
+def: dst
+use: src1
+literal: src2 rep ;
+
+PURE-INSN: ##abs-vector
+def: dst
+use: src
+literal: rep ;
+
+PURE-INSN: ##sqrt-vector
+def: dst
+use: src
+literal: rep ;
+
+PURE-INSN: ##and-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##andn-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##or-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##xor-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##not-vector
+def: dst
+use: src
+literal: rep ;
+
+PURE-INSN: ##shl-vector
+def: dst
+use: src1 src2/int-scalar-rep
+literal: rep ;
+
+PURE-INSN: ##shr-vector
+def: dst
+use: src1 src2/int-scalar-rep
+literal: rep ;
+
+! Scalar/vector conversion
+PURE-INSN: ##scalar>integer
+def: dst/int-rep
+use: src
+literal: rep ;
+
+PURE-INSN: ##integer>scalar
+def: dst
+use: src/int-rep
+literal: rep ;
+
+PURE-INSN: ##vector>scalar
+def: dst/scalar-rep
+use: src
+literal: rep ;
+
+PURE-INSN: ##scalar>vector
+def: dst
+use: src/scalar-rep
 literal: rep ;
 
 ! Boxing and unboxing aliens
@@ -375,65 +528,88 @@ use: src/int-rep ;
 ! Alien accessors
 INSN: ##alien-unsigned-1
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-unsigned-2
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-unsigned-4
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-signed-1
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-signed-2
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-signed-4
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-cell
 def: dst/int-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-float
 def: dst/float-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-double
 def: dst/double-rep
-use: src/int-rep ;
+use: src/int-rep
+literal: offset ;
 
 INSN: ##alien-vector
 def: dst
 use: src/int-rep
-literal: rep ;
+literal: offset rep ;
 
 INSN: ##set-alien-integer-1
-use: src/int-rep value/int-rep ;
+use: src/int-rep
+literal: offset
+use: value/int-rep ;
 
 INSN: ##set-alien-integer-2
-use: src/int-rep value/int-rep ;
+use: src/int-rep
+literal: offset
+use: value/int-rep ;
 
 INSN: ##set-alien-integer-4
-use: src/int-rep value/int-rep ;
+use: src/int-rep
+literal: offset
+use: value/int-rep ;
 
 INSN: ##set-alien-cell
-use: src/int-rep value/int-rep ;
+use: src/int-rep
+literal: offset
+use: value/int-rep ;
 
 INSN: ##set-alien-float
-use: src/int-rep value/float-rep ;
+use: src/int-rep
+literal: offset
+use: value/float-rep ;
 
 INSN: ##set-alien-double
-use: src/int-rep value/double-rep ;
+use: src/int-rep
+literal: offset
+use: value/double-rep ;
 
 INSN: ##set-alien-vector
-use: src/int-rep value
+use: src/int-rep
+literal: offset
+use: value
 literal: rep ;
 
 ! Memory allocation
@@ -452,7 +628,7 @@ literal: symbol library ;
 
 INSN: ##vm-field-ptr
 def: dst/int-rep
-literal: fieldname ;
+literal: field-name ;
 
 ! FFI
 INSN: ##alien-invoke
@@ -535,7 +711,7 @@ use: src1/int-rep src2/int-rep ;
 
 INSN: ##gc
 temp: temp1/int-rep temp2/int-rep
-literal: data-values tagged-values uninitialized-locs ;
+literal: size data-values tagged-values uninitialized-locs ;
 
 INSN: ##save-context
 temp: temp1/int-rep temp2/int-rep
@@ -600,35 +776,29 @@ literal: label
 def: dst/int-rep
 use: src1/int-rep src2/int-rep ;
 
-TUPLE: spill-slot n ; C: <spill-slot> spill-slot
-
-INSN: _gc
-temp: temp1 temp2
-literal: data-values tagged-values uninitialized-locs ;
+TUPLE: spill-slot { n integer } ;
+C: <spill-slot> spill-slot
 
 ! These instructions operate on machine registers and not
 ! virtual registers
 INSN: _spill
 use: src
-literal: rep n ;
+literal: rep dst ;
 
 INSN: _reload
 def: dst
-literal: rep n ;
+literal: rep src ;
 
 INSN: _spill-area-size
 literal: n ;
 
 UNION: ##allocation
 ##allot
-##box-float
-##box-vector
 ##box-alien
-##box-displaced-alien
-##integer>bignum ;
+##box-displaced-alien ;
 
 ! For alias analysis
-UNION: ##read ##slot ##slot-imm ;
+UNION: ##read ##slot ##slot-imm ##vm-field-ptr ##alien-global ;
 UNION: ##write ##set-slot ##set-slot-imm ;
 
 ! Instructions that kill all live vregs but cannot trigger GC
@@ -648,8 +818,9 @@ UNION: kill-vreg-insn
 ! Instructions that have complex expansions and require that the
 ! output registers are not equal to any of the input registers
 UNION: def-is-use-insn
-##integer>bignum
-##bignum>integer
+##box-alien
+##box-displaced-alien
+##string-nth
 ##unbox-any-c-ptr ;
 
 SYMBOL: vreg-insn

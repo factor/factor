@@ -39,12 +39,14 @@ ARTICLE: "ui-paint" "Customizing gadget appearance"
     { "The " { $link draw-boundary } " generic word is called on the value of the " { $snippet "boundary" } " slot." }
 }
 "Now, each one of these steps will be covered in detail."
-{ $subsection "ui-pen-protocol" }
-{ $subsection "ui-paint-custom" } ;
+{ $subsections
+    "ui-pen-protocol"
+    "ui-paint-custom"
+} ;
 
 ARTICLE: "ui-paint-coord" "The UI co-ordinate system"
 "The UI uses a co-ordinate system where the y axis is oriented down. The OpenGL " { $link GL_MODELVIEW } " matrix is saved or restored when rendering a gadget, and the origin is translated to the gadget's origin within the window. The current origin is stored in a variable:"
-{ $subsection origin }
+{ $subsections origin }
 "Gadgets must not draw outside of their bounding box, however clipping is not enforced by default, for performance reasons. This can be changed by setting the " { $slot "clipped?" } " slot to " { $link t } " in the gadget's constructor." ;
 
 ABOUT: "ui-paint"

@@ -3,18 +3,26 @@ IN: vocabs.metadata
 
 ARTICLE: "vocabs.metadata" "Vocabulary metadata"
 "Vocabulary summaries:"
-{ $subsection vocab-summary }
-{ $subsection set-vocab-summary }
+{ $subsections
+    vocab-summary
+    set-vocab-summary
+}
 "Vocabulary authors:"
-{ $subsection vocab-authors }
-{ $subsection set-vocab-authors }
+{ $subsections
+    vocab-authors
+    set-vocab-authors
+}
 "Vocabulary tags:"
-{ $subsection vocab-tags }
-{ $subsection set-vocab-tags }
-{ $subsection add-vocab-tags }
+{ $subsections
+    vocab-tags
+    set-vocab-tags
+    add-vocab-tags
+}
 "Getting and setting arbitrary vocabulary metadata:"
-{ $subsection vocab-file-contents }
-{ $subsection set-vocab-file-contents } ;
+{ $subsections
+    vocab-file-contents
+    set-vocab-file-contents
+} ;
 
 ABOUT: "vocabs.metadata"
 

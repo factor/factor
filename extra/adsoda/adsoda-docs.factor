@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Jeff Bigot
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax multiline ;
+USING: help.markup help.syntax ;
 IN: adsoda
 
 ! --------------------------------------------------------------
@@ -14,15 +14,21 @@ $nl
 "halfspace touching-corners adjacent-faces" $nl
 "touching-corners list of pointers to the corners which touch this face" $nl
 "adjacent-faces list of pointers to the faces which touch this face"
-{ $subsection face }
-{ $subsection <face> }
+{ $subsections
+    face
+    <face>
+}
 "test relative position"
-{ $subsection point-inside-or-on-face? } 
-{ $subsection point-inside-face? }
+{ $subsections
+    point-inside-or-on-face?
+    point-inside-face?
+}
 "handling face"
-{ $subsection flip-face }
-{ $subsection face-translate  }
-{ $subsection  face-transform }
+{ $subsections
+    flip-face
+    face-translate
+    face-transform
+}
 
 ;
 
@@ -65,26 +71,30 @@ ARTICLE: "solid-page" "Solid in ADSODA"
 "explanation of solids"
 $nl
 "link to functions"
-{ $subsection solid }
-{ $subsection <solid> }
+{ $subsections
+    solid
+    <solid>
+}
 "test relative position"
-{ $subsection point-inside-solid? }
-{ $subsection point-inside-or-on-solid? }
+{ $subsections
+    point-inside-solid?
+    point-inside-or-on-solid?
+}
 "playing with faces and solids"
-{ $subsection add-face }
-{ $subsection cut-solid }
-{ $subsection slice-solid }
+{ $subsections
+    add-face
+    cut-solid
+    slice-solid
+}
 "solid handling"
-{ $subsection solid-project }
-{ $subsection solid-translate }
-{ $subsection solid-transform }
-{ $subsection subtract }
-
-{ $subsection get-silhouette  }
-
-{ $subsection  solid= }
-
-
+{ $subsections
+    solid-project
+    solid-translate
+    solid-transform
+    subtract
+    get-silhouette 
+    solid=
+}
 ;
 
 HELP: solid 
@@ -141,21 +151,25 @@ $nl
 "link to functions"
 $nl
 "Defining words"
-{ $subsection space }
-{ $subsection <space> } 
-{ $subsection suffix-solids  }
-{ $subsection suffix-lights }
-{ $subsection clear-space-solids  }
-{ $subsection describe-space }
+{ $subsections
+    space
+    <space>
+    suffix-solids 
+    suffix-lights
+    clear-space-solids 
+    describe-space
+}
 
 
 "Handling space"
-{ $subsection space-ensure-solids }
-{ $subsection eliminate-empty-solids  }
-{ $subsection space-transform }
-{ $subsection space-translate }
-{ $subsection remove-hidden-solids }
-{ $subsection space-project }
+{ $subsections
+    space-ensure-solids
+    eliminate-empty-solids
+    space-transform
+    space-translate
+    remove-hidden-solids
+    space-project
+}
 
 
 ;
@@ -211,9 +225,11 @@ ARTICLE: "3D-rendering-page" "The 3D rendering in ADSODA"
 "explanation of 3D rendering"
 $nl
 "link to functions"
-{ $subsection face->GL }
-{ $subsection solid->GL }
-{ $subsection space->GL }
+{ $subsections
+    face->GL
+    solid->GL
+    space->GL
+}
 
 ;
 
@@ -240,7 +256,7 @@ $nl
 ;
 
 ARTICLE: { "adsoda" "light" } "ADSODA : lights"
-{ $code <"
+{ $code """
 ! HELP: light position color
 ! <light> ( -- tuple ) light new ;
 ! light est un vecteur avec 3 variables pour les couleurs\n
@@ -260,7 +276,7 @@ ARTICLE: { "adsoda" "light" } "ADSODA : lights"
   if (cRed > 1.0) cRed = 1.0;
    if (cGreen > 1.0) cGreen = 1.0;
    if (cBlue > 1.0) cBlue = 1.0;
-"> }
+""" }
 ;
 
 
@@ -281,11 +297,12 @@ $nl
 "full explanation on adsoda page at " { $url "http://www.flowerfire.com/ADSODA/" }
 $nl
 "Useful words are describe on the following pages: "
-{ $subsection "face-page" }
-{ $subsection "solid-page" }
-{ $subsection "space-page" }
-{ $subsection "light-page" }
-{ $subsection "3D-rendering-page" }
- ;
+{ $subsections
+    "face-page"
+    "solid-page"
+    "space-page"
+    "light-page"
+    "3D-rendering-page"
+} ;
 
 ABOUT: "adsoda-main-page"

@@ -25,11 +25,13 @@ ARTICLE: "logging.insomniac" "Automated log analysis"
 "The " { $vocab-link "logging.insomniac" } " vocabulary builds on the " { $vocab-link "logging.analysis" } " vocabulary. It provides support for e-mailing log reports and rotating logs on a daily basis. E-mails are sent using the " { $vocab-link "smtp" } " vocabulary."
 $nl
 "Required configuration parameters:"
-{ $subsection insomniac-sender }
-{ $subsection insomniac-recipients }
+{ $subsections
+    insomniac-sender
+    insomniac-recipients
+}
 "E-mailing a one-off report:"
-{ $subsection email-log-report }
+{ $subsections email-log-report }
 "E-mailing reports and rotating logs on a daily basis:"
-{ $subsection schedule-insomniac } ;
+{ $subsections schedule-insomniac } ;
 
 ABOUT: "logging.insomniac"

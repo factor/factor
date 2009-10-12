@@ -4,7 +4,7 @@ namespace factor
 {
 
 /* make a new array with an initial element */
-array *factorvm::allot_array(cell capacity, cell fill_)
+array *factor_vm::allot_array(cell capacity, cell fill_)
 {
 	gc_root<object> fill(fill_,this);
 	gc_root<array> new_array(allot_array_internal<array>(capacity),this);
@@ -23,21 +23,15 @@ array *factorvm::allot_array(cell capacity, cell fill_)
 	return new_array.untagged();
 }
 
-
 /* push a new array on the stack */
-inline void factorvm::vmprim_array()
+void factor_vm::primitive_array()
 {
 	cell initial = dpop();
 	cell size = unbox_array_size();
 	dpush(tag<array>(allot_array(size,initial)));
 }
 
-PRIMITIVE(array)
-{
-	PRIMITIVE_GETVM()->vmprim_array();
-}
-
-cell factorvm::allot_array_1(cell obj_)
+cell factor_vm::allot_array_1(cell obj_)
 {
 	gc_root<object> obj(obj_,this);
 	gc_root<array> a(allot_array_internal<array>(1),this);
@@ -45,8 +39,7 @@ cell factorvm::allot_array_1(cell obj_)
 	return a.value();
 }
 
-
-cell factorvm::allot_array_2(cell v1_, cell v2_)
+cell factor_vm::allot_array_2(cell v1_, cell v2_)
 {
 	gc_root<object> v1(v1_,this);
 	gc_root<object> v2(v2_,this);
@@ -56,8 +49,7 @@ cell factorvm::allot_array_2(cell v1_, cell v2_)
 	return a.value();
 }
 
-
-cell factorvm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
+cell factor_vm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
 {
 	gc_root<object> v1(v1_,this);
 	gc_root<object> v2(v2_,this);
@@ -71,33 +63,27 @@ cell factorvm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
 	return a.value();
 }
 
-
-inline void factorvm::vmprim_resize_array()
+void factor_vm::primitive_resize_array()
 {
 	array* a = untag_check<array>(dpop());
 	cell capacity = unbox_array_size();
 	dpush(tag<array>(reallot_array(a,capacity)));
 }
 
-PRIMITIVE(resize_array)
-{
-	PRIMITIVE_GETVM()->vmprim_resize_array();
-}
-
 void growable_array::add(cell elt_)
 {
-	factorvm* myvm = elements.myvm;
-	gc_root<object> elt(elt_,myvm);
+	factor_vm* parent_vm = elements.parent_vm;
+	gc_root<object> elt(elt_,parent_vm);
 	if(count == array_capacity(elements.untagged()))
-		elements = myvm->reallot_array(elements.untagged(),count * 2);
+		elements = parent_vm->reallot_array(elements.untagged(),count * 2);
 
-	myvm->set_array_nth(elements.untagged(),count++,elt.value());
+	parent_vm->set_array_nth(elements.untagged(),count++,elt.value());
 }
 
 void growable_array::trim()
 {
-	factorvm *myvm = elements.myvm;
-	elements = myvm->reallot_array(elements.untagged(),count);
+	factor_vm *parent_vm = elements.parent_vm;
+	elements = parent_vm->reallot_array(elements.untagged(),count);
 }
 
 }

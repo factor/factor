@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences assocs fry
-cpu.architecture
+cpu.architecture layouts
 compiler.cfg.rpo
 compiler.cfg.registers
 compiler.cfg.instructions
@@ -17,11 +17,26 @@ IN: compiler.cfg.gc-checks
 : blocks-with-gc ( cfg -- bbs )
     post-order [ insert-gc-check? ] filter ;
 
+GENERIC: allocation-size* ( insn -- n )
+
+M: ##allot allocation-size* size>> ;
+
+M: ##box-alien allocation-size* drop 4 cells ;
+
+M: ##box-displaced-alien allocation-size* drop 4 cells ;
+
+: allocation-size ( bb -- n )
+    instructions>> [ ##allocation? ] filter [ allocation-size* ] sigma ;
+
 : insert-gc-check ( bb -- )
-    dup '[
+    dup dup '[
         int-rep next-vreg-rep
         int-rep next-vreg-rep
-        f f _ uninitialized-locs \ ##gc new-insn
+        _ allocation-size
+        f
+        f
+        _ uninitialized-locs
+        \ ##gc new-insn
         prefix
     ] change-instructions drop ;
 

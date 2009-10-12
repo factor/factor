@@ -11,28 +11,25 @@ IN: compiler.cfg.ssa.interference.live-ranges
 
 SYMBOLS: local-def-indices local-kill-indices ;
 
-: record-def ( n vreg -- )
+: record-def ( n insn -- )
     ! We allow multiple defs of a vreg as long as they're
     ! all in the same basic block
-    dup [
+    defs-vreg dup [
         local-def-indices get 2dup key?
         [ 3drop ] [ set-at ] if
     ] [ 2drop ] if ;
 
-: record-uses ( n vregs -- )
-    local-kill-indices get '[ _ set-at ] with each ;
+: record-uses ( n insn -- )
+    ! Record live intervals so that all but the first input interfere
+    ! with the output. This lets us coalesce the output with the
+    ! first input.
+    [ uses-vregs ] [ def-is-use-insn? ] bi over empty? [ 3drop ] [
+        [ [ first local-kill-indices get set-at ] [ rest-slice ] 2bi ] unless
+        [ 1 + ] dip [ local-kill-indices get set-at ] with each
+    ] if ;
 
 : visit-insn ( insn n -- )
-    ! Instructions are numbered 2 apart. If the instruction requires
-    ! that outputs are in different registers than the inputs, then
-    ! a use will be registered for every output immediately after
-    ! this instruction and before the next one, ensuring that outputs
-    ! interfere with inputs.
-    2 *
-    [ swap defs-vreg record-def ]
-    [ swap uses-vregs record-uses ]
-    [ over def-is-use-insn? [ 1 + swap defs-vreg 1array record-uses ] [ 2drop ] if ]
-    2tri ;
+    2 * swap [ record-def ] [ record-uses ] 2bi ;
 
 SYMBOLS: def-indices kill-indices ;
 
