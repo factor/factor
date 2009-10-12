@@ -24,7 +24,7 @@ USING: definitions io io.files io.pathnames kernel math math.parser
     project-euler.116 project-euler.117 project-euler.124 project-euler.134
     project-euler.148 project-euler.150 project-euler.151 project-euler.164
     project-euler.169 project-euler.173 project-euler.175 project-euler.186
-    project-euler.190 project-euler.203 project-euler.215 ;
+    project-euler.188 project-euler.190 project-euler.203 project-euler.215 ;
 IN: project-euler
 
 <PRIVATE
