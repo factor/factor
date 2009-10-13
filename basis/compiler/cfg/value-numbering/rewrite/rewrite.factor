@@ -450,26 +450,26 @@ M: ##set-alien-vector rewrite rewrite-alien-addressing ;
 ! Some lame constant folding for SIMD intrinsics. Eventually this
 ! should be redone completely.
 
-: rewrite-shuffle-vector ( insn expr -- insn' )
+: rewrite-shuffle-vector-imm ( insn expr -- insn' )
     2dup [ rep>> ] bi@ eq? [
         [ [ dst>> ] [ src>> vn>vreg ] bi* ]
         [ [ shuffle>> ] bi@ nths ]
         [ drop rep>> ]
-        2tri \ ##shuffle-vector new-insn
+        2tri \ ##shuffle-vector-imm new-insn
     ] [ 2drop f ] if ;
 
-: (fold-shuffle-vector) ( shuffle bytes -- bytes' )
+: (fold-shuffle-vector-imm) ( shuffle bytes -- bytes' )
     2dup length swap length /i group nths concat ;
 
-: fold-shuffle-vector ( insn expr -- insn' )
+: fold-shuffle-vector-imm ( insn expr -- insn' )
     [ [ dst>> ] [ shuffle>> ] bi ] dip value>>
-    (fold-shuffle-vector) \ ##load-constant new-insn ;
+    (fold-shuffle-vector-imm) \ ##load-constant new-insn ;
 
-M: ##shuffle-vector rewrite
+M: ##shuffle-vector-imm rewrite
     dup src>> vreg>expr {
-        { [ dup shuffle-vector-expr? ] [ rewrite-shuffle-vector ] }
-        { [ dup reference-expr? ] [ fold-shuffle-vector ] }
-        { [ dup constant-expr? ] [ fold-shuffle-vector ] }
+        { [ dup shuffle-vector-imm-expr? ] [ rewrite-shuffle-vector-imm ] }
+        { [ dup reference-expr? ] [ fold-shuffle-vector-imm ] }
+        { [ dup constant-expr? ] [ fold-shuffle-vector-imm ] }
         [ 2drop f ]
     } cond ;
 
