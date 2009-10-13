@@ -41,7 +41,21 @@ $nl
     POSTPONE: SIMD:
     POSTPONE: SIMDS:
 }
-"The following vector types are supported:"
+"The following scalar types are supported:"
+{ $code
+    "char"
+    "uchar"
+    "short"
+    "ushort"
+    "int"
+    "uint"
+    "longlong"
+    "ulonglong"
+    "float"
+    "double"
+}
+
+"The following vector types are generated from the above scalar types:"
 { $code
     "char-16"
     "uchar-16"
@@ -89,6 +103,7 @@ $nl
 { $code
 """USING: compiler.tree.debugger math.vectors
 math.vectors.simd ;
+SIMD: double
 SYMBOLS: x y ;
 
 [
@@ -107,7 +122,7 @@ IN: simd-demo
     { float-4 float-4 float-4 } declare
     [ v* ] [ [ 1.0 ] dip n-v v* ] bi-curry* bi v+ ;
 
-\ interpolate optimizer-report.""" }
+\\ interpolate optimizer-report.""" }
 "Note that using " { $link declare } " is not recommended. Safer ways of getting type information for the input parameters to a word include defining methods on a generic word (the value being dispatched upon has a statically known type in the method body), as well as using " { $link "hints" } " and " { $link POSTPONE: inline } " declarations."
 $nl
 "Here is a better version of the " { $snippet "interpolate" } " words above that uses hints:"
@@ -122,7 +137,7 @@ IN: simd-demo
 
 HINTS: interpolate float-4 float-4 float-4 ;
 
-\ interpolate optimizer-report. """ }
+\\ interpolate optimizer-report. """ }
 "This time, the optimizer report lists calls to both SIMD primitives and high-level vector words, because hints cause two code paths to be generated. The " { $snippet "optimized." } " word can be used to make sure that the fast code path consists entirely of calls to primitives."
 $nl
 "If the " { $snippet "interpolate" } " word was to be used in several places with different types of vectors, it would be best to declare it " { $link POSTPONE: inline } "."
@@ -153,13 +168,13 @@ M: actor advance ( dt actor -- )
     [ >float ] dip
     [ update-velocity ] [ update-position ] 2bi ;
 
-M\ actor advance optimized."""
+M\\ actor advance optimized."""
 }
 "The " { $vocab-link "compiler.cfg.debugger" } " vocabulary can give a lower-level picture of the generated code, that includes register assignments and other low-level details. To look at low-level optimizer output, call " { $snippet "test-mr mr." } " on a word or quotation:"
 { $code
 """USE: compiler.tree.debugger
 
-M\ actor advance test-mr mr.""" }
+M\\ actor advance test-mr mr.""" }
 "An example of a high-performance algorithm that uses SIMD primitives can be found in the " { $vocab-link "benchmark.nbody-simd" } " vocabulary." ;
 
 ARTICLE: "math.vectors.simd.intrinsics" "Low-level SIMD primitives"
@@ -206,7 +221,7 @@ ARTICLE: "math.vectors.simd" "Hardware vector arithmetic (SIMD)"
 HELP: SIMD:
 { $syntax "SIMD: type" }
 { $values { "type" "a scalar C type" } }
-{ $description "Defines 128-bit and 256-bit SIMD arrays for holding elements of " { $snippet "type" } " into the vocabulary search path. The possible type/length combinations are listed in " { $link "math.vectors.simd.types" } " and the generated words are documented in " { $link "math.vectors.simd.words" } "." } ;
+{ $description "Defines 128-bit and 256-bit SIMD arrays for holding elements of " { $snippet "type" } " into the vocabulary search path. The allowed scalar types, and the auto-generated type/length vector combinations that result, are listed in " { $link "math.vectors.simd.types" } ". Generated words are documented in " { $link "math.vectors.simd.words" } "." } ;
 
 HELP: SIMDS:
 { $syntax "SIMDS: type type type ... ;" }
