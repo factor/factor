@@ -1,4 +1,4 @@
-USING: kernel layouts math quotations tools.test typed ;
+USING: accessors effects kernel layouts math quotations tools.test typed words ;
 IN: typed.tests
 
 TYPED: f+ ( a: float b: float -- c: float )
@@ -35,3 +35,21 @@ TYPED:: f+locals ( a: float b: float -- c: float )
     a b + ;
 
 [ 3.5 ] [ 2 1+1/2 f+locals ] unit-test
+
+TUPLE: unboxable
+    { x fixnum read-only }
+    { y fixnum read-only } ;
+
+TUPLE: unboxable2
+    { u unboxable read-only }
+    { xy fixnum read-only } ;
+
+TYPED: unboxy ( in: unboxable -- out: unboxable2 )
+    dup [ x>> ] [ y>> ] bi - unboxable2 boa ;
+
+[ (( in: fixnum in: fixnum -- out: fixnum out: fixnum out: fixnum )) ]
+[ \ unboxy "typed-word" word-prop stack-effect ] unit-test
+
+[ T{ unboxable2 { u T{ unboxable { x 12 } { y 3 } } } { xy 9 } } ]
+[ T{ unboxable { x 12 } { y 3 } } unboxy ] unit-test
+
