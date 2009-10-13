@@ -66,7 +66,7 @@ M: array month. ( pair -- )
     [ month-name write bl number>string print ]
     [ 1 zeller-congruence ]
     [ (days-in-month) day-abbreviations2 " " join print ] 2tri
-    over "   " <repetition> concat write
+    over "   " <repetition> "" concat-as write
     [
         [ 1 + day. ] keep
         1 + + 7 mod zero? [ nl ] [ bl ] if
