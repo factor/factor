@@ -432,8 +432,13 @@ M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
     temp 0 MOV \ t rc-absolute-cell rel-immediate
     dst temp word execute ; inline
 
+: (%compare) ( src1 src2 cc -- )
+    2over [ { cc= cc/= } member? ] [ register? ] [ 0 = ] tri* and and
+    [ drop dup TEST ]
+    [ CMP ] if ;
+
 M:: x86 %compare ( dst src1 src2 cc temp -- )
-    src1 src2 CMP
+    src1 src2 cc (%compare)
     cc order-cc {
         { cc<  [ dst temp \ CMOVL %boolean ] }
         { cc<= [ dst temp \ CMOVLE %boolean ] }
@@ -447,7 +452,7 @@ M: x86 %compare-imm ( dst src1 src2 cc temp -- )
     %compare ;
 
 M:: x86 %compare-branch ( label src1 src2 cc -- )
-    src1 src2 CMP
+    src1 src2 cc (%compare)
     cc order-cc {
         { cc<  [ label JL ] }
         { cc<= [ label JLE ] }
@@ -562,6 +567,12 @@ MACRO: available-reps ( alist -- )
     reverse [ { } ] suffix
     '[ _ cond ] ;
 
+M: x86 %alien-vector-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
 M: x86 %zero-vector
     {
         { double-2-rep [ dup XORPD ] }
@@ -673,17 +684,24 @@ M: x86 %gather-vector-2-reps
         [ dupd SHUFPD ]
     } case ;
 
-: float-4-shuffle ( dst shuffle -- )
+: sse1-float-4-shuffle ( dst shuffle -- )
     {
         { { 0 1 2 3 } [ drop ] }
-        { { 0 0 2 2 } [ dup MOVSLDUP ] }
-        { { 1 1 3 3 } [ dup MOVSHDUP ] }
         { { 0 1 0 1 } [ dup MOVLHPS ] }
         { { 2 3 2 3 } [ dup MOVHLPS ] }
         { { 0 0 1 1 } [ dup UNPCKLPS ] }
         { { 2 2 3 3 } [ dup UNPCKHPS ] }
         [ dupd SHUFPS ]
     } case ;
+
+: float-4-shuffle ( dst shuffle -- )
+    sse3? [
+        {
+            { { 0 0 2 2 } [ dup MOVSLDUP ] }
+            { { 1 1 3 3 } [ dup MOVSHDUP ] }
+            [ sse1-float-4-shuffle ]
+        } case
+    ] [ sse1-float-4-shuffle ] if ;
 
 : int-4-shuffle ( dst shuffle -- )
     {
@@ -698,7 +716,7 @@ M: x86 %gather-vector-2-reps
 : longlong-2-shuffle ( dst shuffle -- )
     first2 [ 2 * dup 1 + ] bi@ 4array int-4-shuffle ;
 
-M:: x86 %shuffle-vector ( dst src shuffle rep -- )
+M:: x86 %shuffle-vector-imm ( dst src shuffle rep -- )
     dst src rep %copy
     dst shuffle rep unsign-rep {
         { double-2-rep [ double-2-shuffle ] }
@@ -707,10 +725,18 @@ M:: x86 %shuffle-vector ( dst src shuffle rep -- )
         { longlong-2-rep [ longlong-2-shuffle ] }
     } case ;
 
-M: x86 %shuffle-vector-reps
+M: x86 %shuffle-vector-imm-reps
     {
         { sse? { float-4-rep } }
         { sse2? { double-2-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+M: x86 %shuffle-vector ( dst src shuffle rep -- )
+    two-operand PSHUFB ;
+
+M: x86 %shuffle-vector-reps
+    {
+        { ssse3? { float-4-rep double-2-rep longlong-2-rep ulonglong-2-rep int-4-rep uint-4-rep short-8-rep ushort-8-rep char-16-rep uchar-16-rep } }
     } available-reps ;
 
 M: x86 %merge-vector-head
@@ -789,8 +815,6 @@ M: x86 %unpack-vector-head-reps ( -- reps )
         { sse2? { float-4-rep } }
         { sse4.1? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
-
-M: x86 %unpack-vector-tail-reps ( -- reps ) { } ;
 
 M: x86 %integer>float-vector ( dst src rep -- )
     {
@@ -1037,10 +1061,6 @@ M: x86 %mul-vector-reps
         { sse4.1? { int-4-rep uint-4-rep } }
     } available-reps ;
 
-M: x86 %saturated-mul-vector-reps
-    ! No multiplication with saturation on x86
-    { } ;
-
 M: x86 %div-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
     {
@@ -1223,8 +1243,6 @@ M: x86 %xor-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-M: x86 %not-vector-reps { } ;
-
 M: x86 %shl-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
     {
@@ -1270,6 +1288,30 @@ M:: x86 %scalar>integer ( dst src rep -- )
         ] }
         { uint-scalar-rep [
             dst 32-bit-version-of src MOVD
+        ] }
+        { short-scalar-rep [
+            dst 32-bit-version-of src MOVD
+            dst dst 16-bit-version-of MOVSX
+        ] }
+        { ushort-scalar-rep [
+            dst 32-bit-version-of src MOVD
+            dst dst 16-bit-version-of MOVZX
+        ] }
+        { char-scalar-rep [
+            dst 32-bit-version-of src MOVD
+            dst { } 8 [| tmp-dst |
+                tmp-dst dst int-rep %copy
+                tmp-dst tmp-dst 8-bit-version-of MOVSX
+                dst tmp-dst int-rep %copy
+            ] with-small-register
+        ] }
+        { uchar-scalar-rep [
+            dst 32-bit-version-of src MOVD
+            dst { } 8 [| tmp-dst |
+                tmp-dst dst int-rep %copy
+                tmp-dst tmp-dst 8-bit-version-of MOVZX
+                dst tmp-dst int-rep %copy
+            ] with-small-register
         ] }
     } case ;
 

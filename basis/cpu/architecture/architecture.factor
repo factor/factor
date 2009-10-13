@@ -242,6 +242,7 @@ HOOK: %fill-vector cpu ( dst rep -- )
 HOOK: %gather-vector-2 cpu ( dst src1 src2 rep -- )
 HOOK: %gather-vector-4 cpu ( dst src1 src2 src3 src4 rep -- )
 HOOK: %shuffle-vector cpu ( dst src shuffle rep -- )
+HOOK: %shuffle-vector-imm cpu ( dst src shuffle rep -- )
 HOOK: %tail>head-vector cpu ( dst src rep -- )
 HOOK: %merge-vector-head cpu ( dst src1 src2 rep -- )
 HOOK: %merge-vector-tail cpu ( dst src1 src2 rep -- )
@@ -288,7 +289,9 @@ HOOK: %zero-vector-reps cpu ( -- reps )
 HOOK: %fill-vector-reps cpu ( -- reps )
 HOOK: %gather-vector-2-reps cpu ( -- reps )
 HOOK: %gather-vector-4-reps cpu ( -- reps )
+HOOK: %alien-vector-reps cpu ( -- reps )
 HOOK: %shuffle-vector-reps cpu ( -- reps )
+HOOK: %shuffle-vector-imm-reps cpu ( -- reps )
 HOOK: %merge-vector-reps cpu ( -- reps )
 HOOK: %signed-pack-vector-reps cpu ( -- reps )
 HOOK: %unsigned-pack-vector-reps cpu ( -- reps )
@@ -328,7 +331,9 @@ M: object %zero-vector-reps { } ;
 M: object %fill-vector-reps { } ;
 M: object %gather-vector-2-reps { } ;
 M: object %gather-vector-4-reps { } ;
+M: object %alien-vector-reps { } ;
 M: object %shuffle-vector-reps { } ;
+M: object %shuffle-vector-imm-reps { } ;
 M: object %merge-vector-reps { } ;
 M: object %signed-pack-vector-reps { } ;
 M: object %unsigned-pack-vector-reps { } ;

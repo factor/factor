@@ -174,7 +174,7 @@ CONSTANT: simd-classes
 : remove-special-words ( alist -- alist' )
     ! These have their own tests later
     {
-        hlshift hrshift vshuffle vbroadcast
+        hlshift hrshift vshuffle-bytes vshuffle-elements vbroadcast
         vany? vall? vnone?
         (v>float) (v>integer)
         (vpack-signed) (vpack-unsigned)
@@ -360,6 +360,23 @@ simd-classes [
     ] unit-test
 ] each
 
+"== Checking variable shuffles" print
+
+: random-shift-vector ( class -- vec )
+    new [ drop 16 random ] map ;
+
+:: test-shift-vector ( class -- ? )
+    class random-int-vector :> src
+    char-16 random-shift-vector :> perm
+    { class char-16 } :> decl
+
+    src perm vshuffle
+    src perm [ decl declare vshuffle ] compile-call
+    = ; inline
+
+{ char-16 uchar-16 short-8 ushort-8 int-4 uint-4 longlong-2 ulonglong-2 }
+[ 10 swap '[ [ t ] [ _ test-shift-vector ] unit-test ] times ] each
+
 "== Checking vector tests" print
 
 :: test-vector-tests-bool ( vector declaration -- none? any? all? )
@@ -512,38 +529,38 @@ SYMBOL: !!inconsistent!!
 
 STRUCT: simd-struct
 { x float-4 }
-{ y double-2 }
+{ y longlong-2 }
 { z double-4 }
-{ w float-8 } ;
+{ w int-8 } ;
 
 [ t ] [ [ simd-struct <struct> ] compile-call >c-ptr [ 0 = ] all? ] unit-test
 
 [
     float-4{ 1 2 3 4 }
-    double-2{ 2 1 }
+    longlong-2{ 2 1 }
     double-4{ 4 3 2 1 }
-    float-8{ 1 2 3 4 5 6 7 8 }
+    int-8{ 1 2 3 4 5 6 7 8 }
 ] [
     simd-struct <struct>
     float-4{ 1 2 3 4 } >>x
-    double-2{ 2 1 } >>y
+    longlong-2{ 2 1 } >>y
     double-4{ 4 3 2 1 } >>z
-    float-8{ 1 2 3 4 5 6 7 8 } >>w
+    int-8{ 1 2 3 4 5 6 7 8 } >>w
     { [ x>> ] [ y>> ] [ z>> ] [ w>> ] } cleave
 ] unit-test
 
 [
     float-4{ 1 2 3 4 }
-    double-2{ 2 1 }
+    longlong-2{ 2 1 }
     double-4{ 4 3 2 1 }
-    float-8{ 1 2 3 4 5 6 7 8 }
+    int-8{ 1 2 3 4 5 6 7 8 }
 ] [
     [
         simd-struct <struct>
         float-4{ 1 2 3 4 } >>x
-        double-2{ 2 1 } >>y
+        longlong-2{ 2 1 } >>y
         double-4{ 4 3 2 1 } >>z
-        float-8{ 1 2 3 4 5 6 7 8 } >>w
+        int-8{ 1 2 3 4 5 6 7 8 } >>w
         { [ x>> ] [ y>> ] [ z>> ] [ w>> ] } cleave
     ] compile-call
 ] unit-test
