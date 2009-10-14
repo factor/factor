@@ -1,5 +1,5 @@
 USING: tools.test generalizations kernel math arrays sequences
-ascii fry math.parser ;
+ascii fry math.parser io io.streams.string ;
 IN: generalizations.tests
 
 { 1 2 3 4 1 } [ 1 2 3 4 4 npick ] unit-test
@@ -79,3 +79,18 @@ IN: generalizations.tests
 [ 1 2 3 4 1 2 3 ] [ nover-test ] unit-test
 
 [ '[ number>string _ append ] 4 napply ] must-infer
+
+: neach-test ( a b c d -- )
+    [ 4 nappend print ] 4 neach ;
+
+[ """A1a!
+B2b@
+C3c#
+D4d$
+""" ] [
+    { "A" "B" "C" "D" }
+    { "1" "2" "3" "4" }
+    { "a" "b" "c" "d" }
+    { "!" "@" "#" "$" }
+    [ neach-test ] with-string-writer
+] unit-test

@@ -236,6 +236,10 @@ HELP: nspread
 { $description "A generalization of " { $link spread } " that can work for any quotation arity."
 } ;
 
+HELP: neach
+{ $values { "n" integer } }
+{ $description "A generalization of " { $link each } ", " { $link 2each } ", and " { $link 3each } " that can iterate over any number of sequences in parallel." } ;
+
 HELP: mnswap
 { $values { "m" integer } { "n" integer } }
 { $description "Swaps the top " { $snippet "m" } " stack elements with the " { $snippet "n" } " elements directly underneath." }
@@ -345,6 +349,7 @@ ARTICLE: "combinator-generalizations" "Generalized combinators"
     napply
     ncleave
     nspread
+    neach
 } ;
 
 ARTICLE: "other-generalizations" "Additional generalizations"
