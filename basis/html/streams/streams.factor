@@ -113,7 +113,7 @@ CONSTANT: pre-css "white-space: pre; font-family: monospace;"
             { inset padding-css, }
         } make-css
     ] [ wrap-margin swap at [ pre-css append ] unless ] bi
-    "display: inline-block;" append ;
+    " display: inline-block;" append ;
 
 : div-tag ( xml style -- xml' )
     div-css-style
