@@ -237,8 +237,16 @@ HELP: nspread
 } ;
 
 HELP: neach
-{ $values { "n" integer } }
+{ $values { "...seq" "a set of " { $snippet "n" } " sequences" } { "quot" "a quotation with stack effect " { $snippet "( ...element -- )" } } { "n" integer } }
 { $description "A generalization of " { $link each } ", " { $link 2each } ", and " { $link 3each } " that can iterate over any number of sequences in parallel." } ;
+
+HELP: nmap
+{ $values { "...seq" "a set of " { $snippet "n" } " sequences" } { "quot" "a quotation with stack effect " { $snippet "( ...element -- result )" } } { "n" integer } { "result" "a sequence of the same type as the first " { $snippet "seq" } } }
+{ $description "A generalization of " { $link map } ", " { $link 2map } ", and " { $link 3map } " that can map over any number of sequences in parallel." } ;
+
+HELP: nmap-as
+{ $values { "...seq" "a set of " { $snippet "n" } " sequences" } { "quot" "a quotation with stack effect " { $snippet "( ...element -- result )" } } { "exemplar" sequence } { "n" integer } { "result" "a sequence of the same type as " { $snippet "exemplar" } } }
+{ $description "A generalization of " { $link map-as } ", " { $link 2map-as } ", and " { $link 3map-as } " that can map over any number of sequences in parallel." } ;
 
 HELP: mnswap
 { $values { "m" integer } { "n" integer } }
@@ -350,6 +358,8 @@ ARTICLE: "combinator-generalizations" "Generalized combinators"
     ncleave
     nspread
     neach
+    nmap
+    nmap-as
 } ;
 
 ARTICLE: "other-generalizations" "Additional generalizations"
