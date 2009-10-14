@@ -99,7 +99,7 @@ void factor_vm::collect_full(cell requested_bytes, bool trace_contexts_p)
 	if(current_gc->growing_data_heap)
 	{
 		old = data;
-		set_data_heap(grow_data_heap(data,requested_bytes));
+		set_data_heap(data->grow(requested_bytes));
 	}
 	else
 	{

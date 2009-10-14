@@ -45,8 +45,8 @@ void factor_vm::set_string_nth_slow(string *str_, cell index, cell ch)
 		the bits are clear. */
 		aux = allot_array_internal<byte_array>(untag_fixnum(str->length) * sizeof(u16));
 
-		write_barrier(str.untagged());
 		str->aux = tag<byte_array>(aux);
+		write_barrier(&str->aux);
 	}
 	else
 		aux = untag<byte_array>(str->aux);
@@ -143,8 +143,8 @@ string* factor_vm::reallot_string(string *str_, cell capacity)
 		{
 			byte_array *new_aux = allot_byte_array(capacity * sizeof(u16));
 
-			write_barrier(new_str.untagged());
 			new_str->aux = tag<byte_array>(new_aux);
+			write_barrier(&new_str->aux);
 
 			byte_array *aux = untag<byte_array>(str->aux);
 			memcpy(new_aux->data<u16>(),aux->data<u16>(),to_copy * sizeof(u16));
