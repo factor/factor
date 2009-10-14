@@ -1,8 +1,9 @@
 ! Copyright (C) 2007, 2009 Chris Double, Doug Coleman, Eduardo
 ! Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences sequences.private math combinators
-macros math.order quotations fry effects memoize.private ;
+USING: kernel kernel.private sequences sequences.private math
+combinators macros math.order math.ranges quotations fry effects
+memoize.private ;
 IN: generalizations
 
 <<
@@ -42,6 +43,10 @@ MACRO: nover ( n -- )
 MACRO: ndup ( n -- )
     dup '[ _ npick ] n*quot ;
 
+MACRO: dupn ( n -- )
+    [ [ drop ] ]
+    [ 1 - [ dup ] n*quot ] if-zero ;
+
 MACRO: nrot ( n -- )
     1 - [ ] [ '[ _ dip swap ] ] repeat ;
 
@@ -69,8 +74,8 @@ MACRO: nnip ( n -- )
 MACRO: ntuck ( n -- )
     2 + '[ dup _ -nrot ] ;
 
-MACRO: ndip ( quot n -- )
-    [ '[ _ dip ] ] times ;
+MACRO: ndip ( n -- )
+    [ [ dip ] curry ] n*quot [ call ] compose ;
 
 MACRO: nkeep ( quot n -- )
     tuck '[ _ ndup _ _ ndip ] ;
@@ -96,8 +101,28 @@ MACRO: nspread ( quots n -- )
         '[ [ _ _ nspread ] _ ndip @ ]
     ] if ;
 
+MACRO: spread* ( n -- )
+    [ [ ] ] [
+        1 swap [a,b) [ '[ [ [ _ ndip ] curry ] dip compose ] ] map [ ] concat-as
+        [ call ] compose
+    ] if-zero ;
+
+MACRO: cleave* ( n -- )
+    [ [ ] ]
+    [ 1 - [ [ [ keep ] curry ] dip compose ] n*quot [ call ] compose ] 
+    if-zero ;
+
 MACRO: napply ( n -- )
     [ [ drop ] ] dip [ '[ tuck _ 2dip call ] ] times ;
+
+: apply-curry ( ...a quot n -- )
+    [ [curry] ] dip napply ; inline
+
+: cleave-curry ( a ...quot n -- )
+    [ [curry] ] swap [ napply ] [ cleave* ] bi ; inline
+
+: spread-curry ( ...a ...quot n -- )
+    [ [curry] ] swap [ napply ] [ spread* ] bi ; inline
 
 MACRO: mnswap ( m n -- )
     1 + '[ _ -nrot ] swap '[ _ _ napply ] ;
@@ -121,12 +146,16 @@ MACRO: nmin-length ( n -- )
     dup 1 - [ min ] n*quot
     '[ [ length ] _ napply @ ] ;
 
-MACRO: nnth-unsafe ( n -- )
-    '[ [ '[ _ nth-unsafe ] keep ] _ napply drop ] ;
+: nnth-unsafe ( n ...seq n -- )
+    [ nth-unsafe ] swap [ apply-curry ] [ cleave* ] bi ; inline
+MACRO: nset-nth-unsafe ( n -- )
+    [ [ drop ] ]
+    [ '[ [ set-nth-unsafe ] _ [ apply-curry ] [ cleave-curry ] [ spread* ] tri ] ]
+    if-zero ;
 
-MACRO: (neach) ( n -- )
+: (neach) ( ...seq quot n -- len quot' )
     dup dup dup
-    '[ [ [ _ nmin-length ] _ nkeep [ _ nnth-unsafe ] _ ncurry ] dip compose ] ;
+    '[ [ _ nmin-length ] _ nkeep [ _ nnth-unsafe ] _ ncurry ] dip compose ; inline
 
 : neach ( ...seq quot n -- )
     (neach) each-integer ; inline
@@ -136,3 +165,34 @@ MACRO: (neach) ( n -- )
 
 : nmap ( ...seq quot n -- result )
     dup '[ [ _ npick ] dip swap ] dip nmap-as ; inline
+
+MACRO: nnew-sequence ( n -- )
+    [ [ drop ] ]
+    [ dup '[ [ new-sequence ] _ apply-curry _ cleave* ] ] if-zero ;
+
+: nnew-like ( len ...exemplar quot n -- result... )
+    dup dup dup dup '[
+        _ nover
+        [ [ _ nnew-sequence ] dip call ]
+        _ ndip [ like ]
+        _ apply-curry
+        _ spread*
+    ] call ; inline
+
+MACRO: (ncollect) ( n -- )
+    dup dup 1 +
+    '[ [ [ keep ] _ ndip _ nset-nth-unsafe ] _ ncurry ] ;
+
+: ncollect ( len quot ...into n -- )
+    (ncollect) each-integer ; inline
+
+: nmap-integers ( len quot ...exemplar n -- result... )
+    dup dup dup
+    '[ [ over ] _ ndip [ [ _ ncollect ] _ nkeep ] _ nnew-like ] call ; inline
+
+: mnmap-as ( m*seq quot n*exemplar m n -- result*n )
+    dup '[ [ _ (neach) ] _ ndip _ nmap-integers ] call ; inline
+
+: mnmap ( m*seq quot m n -- result*n )
+    2dup '[ [ _ npick ] dip swap _ dupn ] 2dip mnmap-as ; inline
+
