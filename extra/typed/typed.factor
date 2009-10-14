@@ -79,7 +79,7 @@ DEFER: make-boxer
 ! defining typed words
 
 : (depends-on) ( types -- types )
-    dup [ inlined-dependency depends-on ] each ;
+    dup [ inlined-dependency depends-on ] each ; inline
 
 MACRO: (typed) ( word def effect -- quot )
     [ swap ] dip
@@ -96,8 +96,8 @@ MACRO: (typed) ( word def effect -- quot )
 PREDICATE: typed-gensym < word "typed-gensym" word-prop ;
 
 : typed-gensym ( parent-word -- word )
-    name>> "( typed " " )" surround f <word>
-    dup t "typed-gensym" set-word-prop ;
+    [ name>> "( typed " " )" surround f <word> dup ]
+    [ "typed-gensym" set-word-prop ] bi ;
 
 : unboxed-effect ( effect -- effect' )
     [ effect-in-types unboxed-types [ "in" swap 2array ] map ]
@@ -108,6 +108,8 @@ PREDICATE: typed-lambda-word < lambda-word "typed-word" word-prop ;
 
 M: typed-gensym stack-effect
     call-next-method unboxed-effect ;
+M: typed-gensym crossref? 
+    "typed-gensym" word-prop crossref? ;
 
 : define-typed-gensym ( word def effect -- gensym )
     [ 2drop typed-gensym dup ]
@@ -150,4 +152,7 @@ M: typed-lambda-word definer drop \ TYPED:: \ ; ;
 M: typed-word definition "typed-def" word-prop ;
 M: typed-word declarations. "typed-word" word-prop declarations. ;
 
-M: typed-word subwords "typed-word" word-prop 1array ;
+M: typed-word subwords
+    [ call-next-method ]
+    [ "typed-word" word-prop ] bi suffix ;
+
