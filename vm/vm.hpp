@@ -227,8 +227,8 @@ struct factor_vm
 	   pointer from an older generation to a younger one */
 	inline void write_barrier(cell *slot_ptr)
 	{
-		data->cards[addr_to_card((cell)slot_ptr - data->start)] = card_mark_mask;
-		data->decks[addr_to_deck((cell)slot_ptr - data->start)] = card_mark_mask;
+		*(char *)(cards_offset + ((cell)slot_ptr >> card_bits)) = card_mark_mask;
+		*(char *)(decks_offset + ((cell)slot_ptr >> deck_bits)) = card_mark_mask;
 	}
 
 	// gc
