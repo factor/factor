@@ -16,8 +16,7 @@ array *factor_vm::allot_array(cell capacity, cell fill_)
 		/* No need for write barrier here. Either the object is in
 		the nursery, or it was allocated directly in tenured space
 		and the write barrier is already hit for us in that case. */
-		cell i;
-		for(i = 0; i < capacity; i++)
+		for(cell i = 0; i < capacity; i++)
 			new_array->data()[i] = fill.value();
 	}
 	return new_array.untagged();

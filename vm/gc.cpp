@@ -249,7 +249,9 @@ object *factor_vm::allot_object(header header, cell size)
 		/* Allows initialization code to store old->new pointers
 		without hitting the write barrier in the common case of
 		a nursery allocation */
-		write_barrier(obj);
+		char *start = (char *)obj;
+		for(cell offset = 0; offset < size; offset += card_size)
+			write_barrier((cell *)(start + offset));
 	}
 
 	obj->h = header;

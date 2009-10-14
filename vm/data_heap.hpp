@@ -22,8 +22,9 @@ struct data_heap {
 	card_deck *decks;
 	card_deck *decks_end;
 	
-	explicit data_heap(factor_vm *myvm, cell young_size, cell aging_size, cell tenured_size);
+	explicit data_heap(cell young_size, cell aging_size, cell tenured_size);
 	~data_heap();
+	data_heap *grow(cell requested_size);
 };
 
 static const cell nursery_gen = 0;
