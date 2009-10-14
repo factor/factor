@@ -170,7 +170,7 @@ cell factor_vm::compute_relocation(relocation_entry rel, cell index, code_block 
 	case RT_HERE:
 	{
 		fixnum arg = untag_fixnum(ARG);
-		return (arg >= 0 ? offset + arg : (cell)(compiled +1) - arg);
+		return (arg >= 0 ? offset + arg : (cell)(compiled + 1) - arg);
 	}
 	case RT_THIS:
 		return (cell)(compiled + 1);
@@ -372,7 +372,6 @@ struct code_block_relocator {
 	{
 		myvm->relocate_code_block_step(rel,index,compiled);
 	}
-
 };
 
 /* Perform all fixups on a code block */
