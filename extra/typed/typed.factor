@@ -3,7 +3,7 @@ USING: accessors arrays classes classes.tuple combinators
 combinators.short-circuit definitions effects fry hints
 math kernel kernel.private namespaces parser quotations
 see.private sequences slots words locals locals.definitions
-locals.parser ;
+locals.parser macros stack-checker.state ;
 IN: typed
 
 ERROR: type-mismatch-error word expected-types ;
@@ -78,42 +78,55 @@ DEFER: make-boxer
 
 ! defining typed words
 
-: typed-gensym-quot ( def word effect -- quot )
+: (depends-on) ( types -- types )
+    dup [ inlined-dependency depends-on ] each ;
+
+MACRO: (typed) ( word def effect -- quot )
+    [ swap ] dip
     [
-        nip effect-in-types swap
+        nip effect-in-types (depends-on) swap
         [ [ unboxed-types ] [ make-boxer ] bi ] dip
         '[ _ declare @ @ ]
     ]
-    [ effect-out-types dup typed-stack-effect? [ typed-outputs ] [ 2drop ] if ] 2bi ;
+    [
+        effect-out-types (depends-on)
+        dup typed-stack-effect? [ typed-outputs ] [ 2drop ] if
+    ] 2bi ;
+
+PREDICATE: typed-gensym < word "typed-gensym" word-prop ;
 
 : typed-gensym ( parent-word -- word )
-    name>> "( typed " " )" surround f <word> ;
+    name>> "( typed " " )" surround f <word>
+    dup t "typed-gensym" set-word-prop ;
 
 : unboxed-effect ( effect -- effect' )
     [ effect-in-types unboxed-types [ "in" swap 2array ] map ]
     [ effect-out-types unboxed-types [ "out" swap 2array ] map ] bi <effect> ;
 
-: define-typed-gensym ( word def effect -- gensym )
-    [ 2drop typed-gensym dup ]
-    [ [ swap ] dip typed-gensym-quot ]
-    [ 2nip unboxed-effect ] 3tri define-declared ;
-
 PREDICATE: typed-standard-word < word "typed-word" word-prop ;
 PREDICATE: typed-lambda-word < lambda-word "typed-word" word-prop ;
 
+M: typed-gensym stack-effect
+    call-next-method unboxed-effect ;
+
+: define-typed-gensym ( word def effect -- gensym )
+    [ 2drop typed-gensym dup ]
+    [ [ (typed) ] 3curry ]
+    [ 2nip ] 3tri define-declared ;
+
 UNION: typed-word typed-standard-word typed-lambda-word ;
 
-: typed-quot ( quot word effect -- quot' )
-    [ effect-in-types dup typed-stack-effect? [ typed-inputs ] [ 2drop ] if ] 
+MACRO: typed ( quot word effect -- quot' )
+    [ effect-in-types (depends-on) dup typed-stack-effect? [ typed-inputs ] [ 2drop ] if ] 
     [
-        nip effect-out-types dup typed-stack-effect?
+        nip effect-out-types (depends-on) dup typed-stack-effect?
         [ [ unboxed-types ] [ make-boxer ] bi '[ @ _ declare @ ] ] [ drop ] if
     ] 2bi ;
 
 : (typed-def) ( word def effect -- quot )
     [ define-typed-gensym ] 3keep
     [ drop [ swap "typed-word" set-word-prop ] [ [ 1quotation ] dip ] 2bi ] dip
-    typed-quot ;
+    [ typed ] 3curry ;
 
 : typed-def ( word def effect -- quot )
     dup {
