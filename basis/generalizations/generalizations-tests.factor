@@ -82,6 +82,10 @@ IN: generalizations.tests
 
 : neach-test ( a b c d -- )
     [ 4 nappend print ] 4 neach ;
+: nmap-test ( a b c d -- e )
+    [ 4 nappend ] 4 nmap ;
+: nmap-as-test ( a b c d -- e )
+    [ 4 nappend ] [ ] 4 nmap-as ;
 
 [ """A1a!
 B2b@
@@ -93,4 +97,22 @@ D4d$
     { "a" "b" "c" "d" }
     { "!" "@" "#" "$" }
     [ neach-test ] with-string-writer
+] unit-test
+
+[ { "A1a!" "B2b@" "C3c#" "D4d$" } ]
+[ 
+    { "A" "B" "C" "D" }
+    { "1" "2" "3" "4" }
+    { "a" "b" "c" "d" }
+    { "!" "@" "#" "$" }
+    nmap-test
+] unit-test
+
+[ [ "A1a!" "B2b@" "C3c#" "D4d$" ] ]
+[ 
+    { "A" "B" "C" "D" }
+    { "1" "2" "3" "4" }
+    { "a" "b" "c" "d" }
+    { "!" "@" "#" "$" }
+    nmap-as-test
 ] unit-test

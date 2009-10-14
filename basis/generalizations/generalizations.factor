@@ -128,5 +128,11 @@ MACRO: (neach) ( n -- )
     dup dup dup
     '[ [ [ _ nmin-length ] _ nkeep [ _ nnth-unsafe ] _ ncurry ] dip compose ] ;
 
-: neach ( ... seq quot n -- )
+: neach ( ...seq quot n -- )
     (neach) each-integer ; inline
+
+: nmap-as ( ...seq quot exemplar n -- result )
+    '[ _ (neach) ] dip map-integers ; inline
+
+: nmap ( ...seq quot n -- result )
+    dup '[ [ _ npick ] dip swap ] dip nmap-as ; inline
