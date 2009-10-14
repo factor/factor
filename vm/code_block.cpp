@@ -41,6 +41,8 @@ int factor_vm::number_of_parameters(relocation_type type)
 	case RT_STACK_CHAIN:
 	case RT_MEGAMORPHIC_CACHE_HITS:
 	case RT_VM:
+	case RT_CARDS_OFFSET:
+	case RT_DECKS_OFFSET:
 		return 0;
 	default:
 		critical_error("Bad rel type",type);
@@ -180,6 +182,10 @@ cell factor_vm::compute_relocation(relocation_entry rel, cell index, code_block 
 		return (cell)&megamorphic_cache_hits;
 	case RT_VM:
 		return (cell)this;
+	case RT_CARDS_OFFSET:
+		return cards_offset;
+	case RT_DECKS_OFFSET:
+		return decks_offset;
 	default:
 		critical_error("Bad rel type",rel);
 		return 0; /* Can't happen */
