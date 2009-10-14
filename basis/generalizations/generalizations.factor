@@ -2,7 +2,7 @@
 ! Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private math combinators
-macros quotations fry effects memoize.private ;
+macros math.order quotations fry effects memoize.private ;
 IN: generalizations
 
 <<
@@ -116,3 +116,17 @@ MACRO: nbi-curry ( n -- )
 
 MACRO: nspin ( n -- )
     [ [ ] ] swap [ swap [ ] curry compose ] n*quot [ call ] 3append ;
+
+MACRO: nmin-length ( n -- )
+    dup 1 - [ min ] n*quot
+    '[ [ length ] _ napply @ ] ;
+
+MACRO: nnth-unsafe ( n -- )
+    '[ [ '[ _ nth-unsafe ] keep ] _ napply drop ] ;
+
+MACRO: (neach) ( n -- )
+    dup dup dup
+    '[ [ [ _ nmin-length ] _ nkeep [ _ nnth-unsafe ] _ ncurry ] dip compose ] ;
+
+: neach ( ... seq quot n -- )
+    (neach) each-integer ; inline
