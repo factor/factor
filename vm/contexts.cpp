@@ -91,8 +91,7 @@ void factor_vm::nest_stacks()
 
 void nest_stacks(factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->nest_stacks();
+	return myvm->nest_stacks();
 }
 
 /* called when leaving a compiled callback */
@@ -112,8 +111,7 @@ void factor_vm::unnest_stacks()
 
 void unnest_stacks(factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->unnest_stacks();
+	return myvm->unnest_stacks();
 }
 
 /* called on startup */
