@@ -232,12 +232,14 @@ struct factor_vm
 	}
 
 	// gc
-	void free_unmarked_code_blocks();
 	void update_dirty_code_blocks(std::set<code_block *> *remembered_set);
 	void collect_nursery();
 	void collect_aging();
 	void collect_to_tenured();
-	void collect_full(cell requested_bytes, bool trace_contexts_p);
+	void free_unmarked_code_blocks(bool growing_data_heap);
+	void collect_full_impl(bool trace_contexts_p);
+	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p);
+	void collect_full(bool trace_contexts_p);
 	void record_gc_stats();
 	void garbage_collection(cell gen, bool growing_data_heap, bool trace_contexts_p, cell requested_bytes);
 	void gc();
