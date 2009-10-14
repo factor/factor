@@ -37,8 +37,9 @@ void factor_vm::primitive_set_slot()
 	object *obj = untag<object>(dpop());
 	cell value = dpop();
 
-	obj->slots()[slot] = value;
-	write_barrier(obj);
+	cell *slot_ptr = &obj->slots()[slot];
+	*slot_ptr = value;
+	write_barrier(slot_ptr);
 }
 
 void factor_vm::primitive_load_locals()

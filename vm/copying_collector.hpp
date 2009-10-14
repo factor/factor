@@ -29,28 +29,24 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 	explicit copying_collector(factor_vm *myvm_, TargetGeneration *target_, Policy policy_) :
 		collector<TargetGeneration,Policy>(myvm_,target_,policy_), scan(target_->here) {}
 
-	template<typename SourceGeneration>
-	bool trace_objects_between(SourceGeneration *gen, cell scan, cell *end)
-	{
-		bool copied = false;
-
-		while(scan && scan < *end)
-		{
-			copied |= this->trace_slots((object *)scan);
-			scan = gen->next_object_after(this->myvm,scan);
-		}
-
-		return copied;
-	}
-
-	inline cell card_index(cell deck)
+	inline cell first_card_in_deck(cell deck)
 	{
 		return deck << (deck_bits - card_bits);
 	}
 
-	inline cell card_deck_index(cell a)
+	inline cell last_card_in_deck(cell deck)
 	{
-		return (a - this->data->start) >> deck_bits;
+		return first_card_in_deck(deck + 1);
+	}
+
+	inline cell card_to_addr(cell c)
+	{
+		return c << card_bits + this->data->start;
+	}
+
+	inline cell card_deck_for_address(cell a)
+	{
+		return addr_to_deck(a - this->data->start);
 	}
 
 	inline cell card_start_address(cell card)
@@ -58,36 +54,31 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 		return (card << card_bits) + this->data->start;
 	}
 
-	template<typename SourceGeneration, typename Unmarker>
-	bool trace_card(SourceGeneration *gen, card *cards, cell card_index, Unmarker unmarker)
+	inline cell card_end_address(cell card)
 	{
-		cell card_start = card_start_address(card_index);
-		cell card_scan = card_start + gen->first_object_in_card(card_start);
-		cell card_end = card_start_address(card_index + 1);
-
-		bool result = this->trace_objects_between(gen,card_scan,&card_end);
-		unmarker(result,&cards[card_index]);
-
-		this->myvm->gc_stats.cards_scanned++;
-
-		return result;
+		return ((card + 1) << card_bits) + this->data->start;
 	}
 
-	template<typename SourceGeneration, typename Unmarker>
-	bool trace_card_deck(SourceGeneration *gen, cell deck_index, card mask, Unmarker unmarker)
+	bool trace_partial_objects(cell start, cell end, cell card_start, cell card_end)
 	{
-		cell first_card = card_index(deck_index);
-		cell last_card = card_index(deck_index + 1);
-
 		bool copied = false;
 
-		card *cards = this->data->cards;
-		for(cell i = first_card; i < last_card; i++)
+		if(card_start < end)
 		{
-			if(cards[i] & mask) copied |= trace_card(gen,cards,i,unmarker);
-		}
+			start += sizeof(cell);
 
-		this->myvm->gc_stats.decks_scanned++;
+			if(start < card_start) start = card_start;
+			if(end > card_end) end = card_end;
+
+			cell *slot_ptr = (cell *)start;
+			cell *end_ptr = (cell *)end;
+
+			if(slot_ptr != end_ptr)
+			{
+				for(; slot_ptr < end_ptr; slot_ptr++)
+					copied |= this->trace_handle(slot_ptr);
+			}
+		}
 
 		return copied;
 	}
@@ -95,19 +86,73 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 	template<typename SourceGeneration, typename Unmarker>
 	void trace_cards(SourceGeneration *gen, card mask, Unmarker unmarker)
 	{
-		u64 start = current_micros();
-
-		cell first_deck = card_deck_index(gen->start);
-		cell last_deck = card_deck_index(gen->end);
-
+		u64 start_time = current_micros();
+	
 		card_deck *decks = this->data->decks;
-		for(cell i = first_deck; i < last_deck; i++)
+		card_deck *cards = this->data->cards;
+	
+		cell gen_start_card = addr_to_card(gen->start - this->data->start);
+
+		cell first_deck = card_deck_for_address(gen->start);
+		cell last_deck = card_deck_for_address(gen->end);
+	
+		cell start = 0, binary_start = 0, end = 0;
+	
+		for(cell deck_index = first_deck; deck_index < last_deck; deck_index++)
 		{
-			if(decks[i] & mask)
-				unmarker(trace_card_deck(gen,i,mask,unmarker),&decks[i]);
+			if(decks[deck_index] & mask)
+			{
+				cell first_card = first_card_in_deck(deck_index);
+				cell last_card = last_card_in_deck(deck_index);
+	
+				bool deck_dirty = false;
+	
+				for(cell card_index = first_card; card_index < last_card; card_index++)
+				{
+					if(cards[card_index] & mask)
+					{
+						if(card_start_address(card_index) >= end)
+						{
+							start = gen->find_object_containing_card(card_index - gen_start_card);
+							binary_start = start + this->myvm->binary_payload_start((object *)start);
+							end = start + this->myvm->untagged_object_size((object *)start);
+						}
+	
+						bool card_dirty = false;
+	
+#ifdef FACTOR_DEBUG
+						assert(addr_to_card(start - this->data->start) <= card_index);
+						assert(start < card_end_address(card_index));
+#endif
+
+scan_next_object:				{
+							card_dirty |= trace_partial_objects(
+								start,
+								binary_start,
+								card_start_address(card_index),
+								card_end_address(card_index));
+							if(end < card_end_address(card_index))
+							{
+								start = gen->next_object_after(this->myvm,start);
+								if(!start) goto end;
+								binary_start = start + this->myvm->binary_payload_start((object *)start);
+								end = start + this->myvm->untagged_object_size((object *)start);
+								goto scan_next_object;
+							}
+						}
+	
+						unmarker(card_dirty,&cards[card_index]);
+						this->myvm->gc_stats.cards_scanned++;
+	
+						deck_dirty |= card_dirty;
+					}
+				}
+	
+				unmarker(deck_dirty,&decks[deck_index]);
+			}
 		}
 
-		this->myvm->gc_stats.card_scan_time += (current_micros() - start);
+end:		this->myvm->gc_stats.card_scan_time += (current_micros() - start_time);
 	}
 
 	/* Trace all literals referenced from a code block. Only for aging and nursery collections */
@@ -125,6 +170,20 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 		std::set<code_block *>::const_iterator end = remembered_set->end();
 
 		for(; iter != end; iter++) trace_literal_references(*iter);
+	}
+
+	template<typename SourceGeneration>
+	bool trace_objects_between(SourceGeneration *gen, cell scan, cell *end)
+	{
+		bool copied = false;
+
+		while(scan && scan < *end)
+		{
+			copied |= this->trace_slots((object *)scan);
+			scan = gen->next_object_after(this->myvm,scan);
+		}
+
+		return copied;
 	}
 
 	void cheneys_algorithm()
