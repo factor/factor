@@ -619,8 +619,13 @@ literal: size class
 temp: temp/int-rep ;
 
 INSN: ##write-barrier
+use: src/int-rep slot/int-rep
+temp: temp1/int-rep temp2/int-rep ;
+
+INSN: ##write-barrier-imm
 use: src/int-rep
-temp: card#/int-rep table/int-rep ;
+literal: slot
+temp: temp1/int-rep temp2/int-rep ;
 
 INSN: ##alien-global
 def: dst/int-rep

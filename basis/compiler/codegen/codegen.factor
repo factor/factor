@@ -218,6 +218,7 @@ CODEGEN: ##set-alien-double %set-alien-double
 CODEGEN: ##set-alien-vector %set-alien-vector
 CODEGEN: ##allot %allot
 CODEGEN: ##write-barrier %write-barrier
+CODEGEN: ##write-barrier-imm %write-barrier-imm
 CODEGEN: ##compare %compare
 CODEGEN: ##compare-imm %compare-imm
 CODEGEN: ##compare-float-ordered %compare-float-ordered

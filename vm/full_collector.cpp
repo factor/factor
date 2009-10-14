@@ -93,21 +93,49 @@ void full_collector::cheneys_algorithm()
 	}
 }
 
-void factor_vm::collect_full(cell requested_bytes, bool trace_contexts_p)
-{
-	data_heap *old;
-	if(current_gc->growing_data_heap)
+struct full_updater {
+	factor_vm *myvm;
+
+	full_updater(factor_vm *myvm_) : myvm(myvm_) {}
+
+	void operator()(heap_block *block)
 	{
-		old = data;
-		set_data_heap(data->grow(requested_bytes));
+		myvm->relocate_code_block((code_block *)block);
+	}
+};
+
+struct literal_and_word_reference_updater {
+	factor_vm *myvm;
+
+	literal_and_word_reference_updater(factor_vm *myvm_) : myvm(myvm_) {}
+
+	void operator()(heap_block *block)
+	{
+		code_block *compiled = (code_block *)block;
+		myvm->update_literal_references(compiled);
+		myvm->update_word_references(compiled);
+	}
+};
+
+void factor_vm::free_unmarked_code_blocks(bool growing_data_heap)
+{
+	if(growing_data_heap)
+	{
+		full_updater updater(this);
+		code->free_unmarked(updater);
 	}
 	else
 	{
-		old = NULL;
-		std::swap(data->tenured,data->tenured_semispace);
-		reset_generation(data->tenured);
+		literal_and_word_reference_updater updater(this);
+		code->free_unmarked(updater);
 	}
 
+	code->points_to_nursery.clear();
+	code->points_to_aging.clear();
+}
+
+void factor_vm::collect_full_impl(bool trace_contexts_p)
+{
 	full_collector collector(this);
 
 	collector.trace_roots();
@@ -118,12 +146,26 @@ void factor_vm::collect_full(cell requested_bytes, bool trace_contexts_p)
 	}
 
 	collector.cheneys_algorithm();
-	free_unmarked_code_blocks();
 
 	reset_generation(data->aging);
 	nursery.here = nursery.start;
+}
 
-	if(old) delete old;
+void factor_vm::collect_growing_heap(cell requested_bytes, bool trace_contexts_p)
+{
+	data_heap *old = data;
+	set_data_heap(data->grow(requested_bytes));
+	collect_full(trace_contexts_p);
+	free_unmarked_code_blocks(true);
+	delete old;
+}
+
+void factor_vm::collect_full(bool trace_contexts_p)
+{
+	std::swap(data->tenured,data->tenured_semispace);
+	reset_generation(data->tenured);
+	collect_full_impl(trace_contexts_p);
+	free_unmarked_code_blocks(false);
 }
 
 }

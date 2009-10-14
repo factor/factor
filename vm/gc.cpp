@@ -12,27 +12,6 @@ gc_state::gc_state(data_heap *data_, bool growing_data_heap_, cell collecting_ge
 
 gc_state::~gc_state() { }
 
-struct literal_and_word_reference_updater {
-	factor_vm *myvm;
-
-	literal_and_word_reference_updater(factor_vm *myvm_) : myvm(myvm_) {}
-
-	void operator()(heap_block *block)
-	{
-		code_block *compiled = (code_block *)block;
-		myvm->update_literal_references(compiled);
-		myvm->update_word_references(compiled);
-	}
-};
-
-void factor_vm::free_unmarked_code_blocks()
-{
-	literal_and_word_reference_updater updater(this);
-	code->free_unmarked(updater);
-	code->points_to_nursery.clear();
-	code->points_to_aging.clear();
-}
-
 void factor_vm::update_dirty_code_blocks(std::set<code_block *> *remembered_set)
 {
 	/* The youngest generation that any code block can now reference */
@@ -75,6 +54,7 @@ void factor_vm::garbage_collection(cell collecting_gen_, bool growing_data_heap_
 		resort to growing the data heap */
 		if(current_gc->collecting_tenured_p())
 		{
+			assert(!current_gc->growing_data_heap);
 			current_gc->growing_data_heap = true;
 
 			/* Since we start tracing again, any previously
@@ -105,7 +85,14 @@ void factor_vm::garbage_collection(cell collecting_gen_, bool growing_data_heap_
 			collect_aging();
 	}
         else if(current_gc->collecting_tenured_p())
-        	collect_full(requested_bytes,trace_contexts_p);
+	{
+		if(current_gc->growing_data_heap)
+			collect_growing_heap(requested_bytes,trace_contexts_p);
+		else
+			collect_full(trace_contexts_p);
+	}
+	else
+		critical_error("Bug in GC",0);
 
 	record_gc_stats();
 
