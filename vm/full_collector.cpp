@@ -155,7 +155,7 @@ void factor_vm::collect_growing_heap(cell requested_bytes, bool trace_contexts_p
 {
 	data_heap *old = data;
 	set_data_heap(data->grow(requested_bytes));
-	collect_full(trace_contexts_p);
+	collect_full_impl(trace_contexts_p);
 	free_unmarked_code_blocks(true);
 	delete old;
 }

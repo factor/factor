@@ -102,6 +102,8 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 		{
 			if(decks[deck_index] & mask)
 			{
+				this->myvm->gc_stats.decks_scanned++;
+
 				cell first_card = first_card_in_deck(deck_index);
 				cell last_card = last_card_in_deck(deck_index);
 	
@@ -111,7 +113,9 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 				{
 					if(cards[card_index] & mask)
 					{
-						if(card_start_address(card_index) >= end)
+						this->myvm->gc_stats.cards_scanned++;
+
+						if(end < card_start_address(card_index))
 						{
 							start = gen->find_object_containing_card(card_index - gen_start_card);
 							binary_start = start + this->myvm->binary_payload_start((object *)start);
@@ -134,17 +138,20 @@ scan_next_object:				{
 							if(end < card_end_address(card_index))
 							{
 								start = gen->next_object_after(this->myvm,start);
-								if(!start) goto end;
-								binary_start = start + this->myvm->binary_payload_start((object *)start);
-								end = start + this->myvm->untagged_object_size((object *)start);
-								goto scan_next_object;
+								if(start)
+								{
+									binary_start = start + this->myvm->binary_payload_start((object *)start);
+									end = start + this->myvm->untagged_object_size((object *)start);
+									goto scan_next_object;
+								}
 							}
 						}
 	
 						unmarker(card_dirty,&cards[card_index]);
-						this->myvm->gc_stats.cards_scanned++;
 	
 						deck_dirty |= card_dirty;
+
+						if(!start) goto end;
 					}
 				}
 	
