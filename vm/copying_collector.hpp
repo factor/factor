@@ -2,24 +2,13 @@ namespace factor
 {
 
 struct dummy_unmarker {
-	void operator()(bool result, card *ptr) {}
+	void operator()(card *ptr) {}
 };
 
 struct simple_unmarker {
 	card unmask;
 	simple_unmarker(card unmask_) : unmask(unmask_) {}
-	void operator()(bool result, card *ptr) { *ptr &= ~unmask; }
-};
-
-struct complex_unmarker {
-	card unmask_none, unmask_some;
-	complex_unmarker(card unmask_none_, card unmask_some_) :
-		unmask_none(unmask_none_), unmask_some(unmask_some_) {}
-
-	void operator()(bool result, card *ptr)
-	{
-		*ptr &= (result ? ~unmask_some : ~unmask_none);
-	}
+	void operator()(card *ptr) { *ptr &= ~unmask; }
 };
 
 template<typename TargetGeneration, typename Policy>
@@ -59,10 +48,8 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 		return ((card + 1) << card_bits) + this->data->start;
 	}
 
-	bool trace_partial_objects(cell start, cell end, cell card_start, cell card_end)
+	void trace_partial_objects(cell start, cell end, cell card_start, cell card_end)
 	{
-		bool copied = false;
-
 		if(card_start < end)
 		{
 			start += sizeof(cell);
@@ -76,11 +63,9 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 			if(slot_ptr != end_ptr)
 			{
 				for(; slot_ptr < end_ptr; slot_ptr++)
-					copied |= this->trace_handle(slot_ptr);
+					this->trace_handle(slot_ptr);
 			}
 		}
-
-		return copied;
 	}
 
 	template<typename SourceGeneration, typename Unmarker>
@@ -107,8 +92,6 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 				cell first_card = first_card_in_deck(deck_index);
 				cell last_card = last_card_in_deck(deck_index);
 	
-				bool deck_dirty = false;
-	
 				for(cell card_index = first_card; card_index < last_card; card_index++)
 				{
 					if(cards[card_index] & mask)
@@ -122,15 +105,13 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 							end = start + this->myvm->untagged_object_size((object *)start);
 						}
 	
-						bool card_dirty = false;
-	
 #ifdef FACTOR_DEBUG
 						assert(addr_to_card(start - this->data->start) <= card_index);
 						assert(start < card_end_address(card_index));
 #endif
 
 scan_next_object:				{
-							card_dirty |= trace_partial_objects(
+							trace_partial_objects(
 								start,
 								binary_start,
 								card_start_address(card_index),
@@ -147,15 +128,13 @@ scan_next_object:				{
 							}
 						}
 	
-						unmarker(card_dirty,&cards[card_index]);
+						unmarker(&cards[card_index]);
 	
-						deck_dirty |= card_dirty;
-
 						if(!start) goto end;
 					}
 				}
 	
-				unmarker(deck_dirty,&decks[deck_index]);
+				unmarker(&decks[deck_index]);
 			}
 		}
 
@@ -180,17 +159,13 @@ end:		this->myvm->gc_stats.card_scan_time += (current_micros() - start_time);
 	}
 
 	template<typename SourceGeneration>
-	bool trace_objects_between(SourceGeneration *gen, cell scan, cell *end)
+	void trace_objects_between(SourceGeneration *gen, cell scan, cell *end)
 	{
-		bool copied = false;
-
 		while(scan && scan < *end)
 		{
-			copied |= this->trace_slots((object *)scan);
+			this->trace_slots((object *)scan);
 			scan = gen->next_object_after(this->myvm,scan);
 		}
-
-		return copied;
 	}
 
 	void cheneys_algorithm()
