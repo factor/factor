@@ -3,7 +3,7 @@
 USING: help.syntax help.markup cpu.8080.emulator ;
 IN: lunar-rescue 
 
-HELP: run 
+HELP: run-lunar 
 { $description 
 "Run the Lunar Rescue emulator in a new window." $nl
 { $link rom-root } " must be set to the directory containing the "
@@ -26,7 +26,7 @@ ARTICLE: { "lunar-rescue" "lunar-rescue" } "Lunar Rescue Emulator"
   "lrescue/lrescue.6"
 }
 "These are the same ROM files as used by MAME. To run the game use the " 
-{ $link run } " word." $nl
+{ $link run-lunar } " word." $nl
 "Keys:" 
 { $table
   { "Backspace" "Insert Coin" }
