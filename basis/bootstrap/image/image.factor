@@ -111,18 +111,25 @@ SYMBOL: jit-relocations
 : jit-rel ( rc rt -- )
     over compute-offset 3array jit-relocations get push-all ;
 
-: make-jit ( quot -- jit-data )
+SYMBOL: jit-literals
+
+: jit-literal ( literal -- )
+    jit-literals get push ;
+
+: make-jit ( quot -- jit-literals jit-data )
     [
+        V{ } clone jit-literals set
         V{ } clone jit-relocations set
         call( -- )
+        jit-literals get >array
         jit-relocations get >array
     ] B{ } make prefix ;
 
 : jit-define ( quot name -- )
-    [ make-jit ] dip set ;
+    [ make-jit nip ] dip set ;
 
 : define-sub-primitive ( quot word -- )
-    [ make-jit ] dip sub-primitives get set-at ;
+    [ make-jit 2array ] dip sub-primitives get set-at ;
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
