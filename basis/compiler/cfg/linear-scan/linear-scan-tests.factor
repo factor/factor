@@ -1306,10 +1306,11 @@ V{
         { slot 2 }
         { tag 7 }
     }
-    T{ ##write-barrier
+    T{ ##write-barrier-imm
         { src 141 }
-        { card# 145 }
-        { table 146 }
+        { slot 2 }
+        { temp1 145 }
+        { temp2 146 }
     }
     T{ ##inc-d { n -1 } }
     T{ ##inc-r { n -1 } }

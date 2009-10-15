@@ -211,9 +211,9 @@ void factor_vm::dump_memory(cell from, cell to)
 		dump_cell(from);
 }
 
-void factor_vm::dump_zone(cell gen, zone *z)
+void factor_vm::dump_zone(char *name, zone *z)
 {
-	print_string("Generation "); print_cell(gen); print_string(": ");
+	print_string(name); print_string(": ");
 	print_string("Start="); print_cell(z->start);
 	print_string(", size="); print_cell(z->size);
 	print_string(", here="); print_cell(z->here - z->start); nl();
@@ -221,9 +221,9 @@ void factor_vm::dump_zone(cell gen, zone *z)
 
 void factor_vm::dump_generations()
 {
-	dump_zone(nursery_gen,&nursery);
-	dump_zone(aging_gen,data->aging);
-	dump_zone(tenured_gen,data->tenured);
+	dump_zone("Nursery",&nursery);
+	dump_zone("Aging",data->aging);
+	dump_zone("Tenured",data->tenured);
 
 	print_string("Cards: base=");
 	print_cell((cell)data->cards);
