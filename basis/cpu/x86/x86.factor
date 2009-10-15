@@ -93,7 +93,7 @@ M: x86 %return ( -- ) 0 RET ;
     0 <repetition> % ;
 
 :: (%slot-imm) ( obj slot tag -- op )
-    obj slot cells tag - [+] ; inline
+    obj slot tag slot-offset [+] ; inline
 
 M: x86 %slot ( dst obj slot -- ) [+] MOV ;
 M: x86 %slot-imm ( dst obj slot tag -- ) (%slot-imm) MOV ;
@@ -395,8 +395,7 @@ M:: x86 %allot ( dst size class nursery-ptr -- )
 
 :: (%write-barrier) ( src slot temp1 temp2 -- )
     ! Compute slot address.
-    temp1 src MOV
-    temp1 slot ADD
+    temp1 src slot [+] LEA
 
     ! Mark the card
     temp1 card-bits SHR

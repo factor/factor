@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: layouts namespaces kernel accessors sequences classes.algebra
-fry compiler.tree.propagation.info compiler.cfg.stacks compiler.cfg.hats
-compiler.cfg.registers compiler.cfg.instructions
-compiler.cfg.utilities compiler.cfg.builder.blocks ;
+USING: layouts namespaces kernel accessors sequences
+classes.algebra locals compiler.tree.propagation.info
+compiler.cfg.stacks compiler.cfg.hats compiler.cfg.registers
+compiler.cfg.instructions compiler.cfg.utilities
+compiler.cfg.builder.blocks compiler.constants ;
 IN: compiler.cfg.intrinsics.slots
 
 : value-tag ( info -- n ) class>> class-tag ; inline
@@ -30,18 +31,31 @@ IN: compiler.cfg.intrinsics.slots
         ds-push
     ] [ drop emit-primitive ] if ;
 
-: (emit-set-slot) ( infos -- )
-    [ first class>> immediate class<= ]
-    [ [ 3inputs ] [ second value-tag ] bi* ^^tag-offset>slot ] bi
-    [ ##set-slot ]
-    [ '[ _ drop _ _ next-vreg next-vreg ##write-barrier ] unless ] 3bi ;
+: emit-write-barrier? ( infos -- ? )
+    first class>> immediate class<= not ;
 
-: (emit-set-slot-imm) ( infos -- )
+:: (emit-set-slot) ( infos -- )
+    3inputs :> slot :> obj :> src
+
+    slot infos second value-tag ^^tag-offset>slot :> slot
+
+    src obj slot ##set-slot
+
+    infos emit-write-barrier?
+    [ obj slot next-vreg next-vreg ##write-barrier ] when ;
+
+:: (emit-set-slot-imm) ( infos -- )
     ds-drop
-    [ first class>> immediate class<= ]
-    [ [ 2inputs ] [ [ third literal>> ] [ second value-tag ] bi ] bi* ] bi
-    '[ _ ##set-slot-imm ]
-    [ '[ _ drop _ _ cells next-vreg next-vreg ##write-barrier-imm ] unless ] 3bi ;
+
+    2inputs :> obj :> src
+
+    infos third literal>> :> slot
+    infos second value-tag :> tag
+
+    src obj slot tag ##set-slot-imm
+
+    infos emit-write-barrier?
+    [ obj slot tag slot-offset next-vreg next-vreg ##write-barrier-imm ] when ;
 
 : emit-set-slot ( node -- )
     dup node-input-infos
