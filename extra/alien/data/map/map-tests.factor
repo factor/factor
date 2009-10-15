@@ -1,6 +1,6 @@
 ! (c)Joe Groff bsd license
-USING: alien.data.map generalizations kernel math.vectors
-math.vectors.conversion math.vectors.simd
+USING: alien.data.map fry generalizations kernel math.vectors
+math.vectors.conversion math math.vectors.simd
 specialized-arrays tools.test ;
 FROM: alien.c-types => uchar short int float ;
 SIMDS: float int short uchar ;
@@ -19,6 +19,16 @@ IN: alien.data.map.tests
     [ dup ] data-map!( int -- float[2] )
 ] unit-test
 
+: float-pixels>byte-pixels* ( floats scale bias -- bytes )
+    '[
+        [ _ 255.0 * v*n _ 255.0 * v+n float-4 int-4 vconvert ] 4 napply 
+        [ int-4 short-8 vconvert ] 2bi@
+        short-8 uchar-16 vconvert
+    ] data-map( float-4[4] -- uchar-16 ) ; inline
+
+: float-pixels>byte-pixels ( floats -- bytes )
+    1.0 0.0 float-pixels>byte-pixels* ;
+
 [
     B{
         127 191 255 63
@@ -32,11 +42,7 @@ IN: alien.data.map.tests
         1.0 0.1 0.2 0.3
         0.3 0.2 0.9 0.5
         0.1 1.0 1.5 2.0
-    } [
-        [ 255.0 v*n float-4 int-4 vconvert ] 4 napply 
-        [ int-4 short-8 vconvert ] 2bi@
-        short-8 uchar-16 vconvert
-    ] data-map( float-4[4] -- uchar-16 )
+    } float-pixels>byte-pixels
 ] unit-test
 
 [
@@ -63,6 +69,10 @@ IN: alien.data.map.tests
 : vmerge-transpose ( a b c d -- ac bd ac bd )
     [ (vmerge) ] bi-curry@ bi* ; inline
 
+: fold-rgba-planes ( r g b a -- rgba )
+    [ vmerge-transpose vmerge-transpose ]
+    data-map( uchar-16 uchar-16 uchar-16 uchar-16 -- uchar-16[4] ) ;
+
 [
     B{
          1  10  11  15
@@ -87,6 +97,5 @@ IN: alien.data.map.tests
     B{  10  20  30  40  50  60  70  80  90 100 110 120 130 140 150 160 }
     B{  11  22  33  44  55  66  77  88  99 110 121 132 143 154 165 176 }
     B{  15  25  35  45  55  65  75  85  95 105 115 125 135 145 155 165 }
-    [ vmerge-transpose vmerge-transpose ]
-    data-map( uchar-16 uchar-16 uchar-16 uchar-16 -- uchar-16[4] )
+    fold-rgba-planes
 ] unit-test
