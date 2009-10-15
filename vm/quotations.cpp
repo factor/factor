@@ -199,7 +199,9 @@ void quotation_jit::iterate_quotation()
 			/* Primitive calls */
 			if(primitive_call_p(i,length))
 			{
-				emit_with(parent_vm->userenv[JIT_PRIMITIVE],obj.value());
+				literal(tag_fixnum(0));
+				literal(obj.value());
+				emit(parent_vm->userenv[JIT_PRIMITIVE]);
 
 				i++;
 

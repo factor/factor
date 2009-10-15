@@ -34,13 +34,15 @@ int factor_vm::number_of_parameters(relocation_type type)
 	case RT_IMMEDIATE:
 	case RT_HERE:
 	case RT_UNTAGGED:
+	case RT_VM:
 		return 1;
 	case RT_DLSYM:
 		return 2;
 	case RT_THIS:
 	case RT_STACK_CHAIN:
 	case RT_MEGAMORPHIC_CACHE_HITS:
-	case RT_VM:
+	case RT_CARDS_OFFSET:
+	case RT_DECKS_OFFSET:
 		return 0;
 	default:
 		critical_error("Bad rel type",type);
@@ -168,7 +170,7 @@ cell factor_vm::compute_relocation(relocation_entry rel, cell index, code_block 
 	case RT_HERE:
 	{
 		fixnum arg = untag_fixnum(ARG);
-		return (arg >= 0 ? offset + arg : (cell)(compiled +1) - arg);
+		return (arg >= 0 ? offset + arg : (cell)(compiled + 1) - arg);
 	}
 	case RT_THIS:
 		return (cell)(compiled + 1);
@@ -179,7 +181,11 @@ cell factor_vm::compute_relocation(relocation_entry rel, cell index, code_block 
 	case RT_MEGAMORPHIC_CACHE_HITS:
 		return (cell)&megamorphic_cache_hits;
 	case RT_VM:
-		return (cell)this;
+		return (cell)this + untag_fixnum(ARG);
+	case RT_CARDS_OFFSET:
+		return cards_offset;
+	case RT_DECKS_OFFSET:
+		return decks_offset;
 	default:
 		critical_error("Bad rel type",rel);
 		return 0; /* Can't happen */
@@ -366,7 +372,6 @@ struct code_block_relocator {
 	{
 		myvm->relocate_code_block_step(rel,index,compiled);
 	}
-
 };
 
 /* Perform all fixups on a code block */

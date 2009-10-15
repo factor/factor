@@ -42,6 +42,9 @@ M: ##set-slot-imm build-liveness-graph
 M: ##write-barrier build-liveness-graph
     dup src>> setter-liveness-graph ;
 
+M: ##write-barrier-imm build-liveness-graph
+    dup src>> setter-liveness-graph ;
+
 M: ##allot build-liveness-graph
     [ dst>> allocations get conjoin ] [ call-next-method ] bi ;
 
@@ -74,6 +77,9 @@ M: ##set-slot-imm compute-live-vregs
 M: ##write-barrier compute-live-vregs
     dup src>> setter-live-vregs ;
 
+M: ##write-barrier-imm compute-live-vregs
+    dup src>> setter-live-vregs ;
+
 M: ##fixnum-add compute-live-vregs record-live ;
 
 M: ##fixnum-sub compute-live-vregs record-live ;
@@ -90,6 +96,8 @@ M: ##set-slot live-insn? obj>> live-vreg? ;
 M: ##set-slot-imm live-insn? obj>> live-vreg? ;
 
 M: ##write-barrier live-insn? src>> live-vreg? ;
+
+M: ##write-barrier-imm live-insn? src>> live-vreg? ;
 
 M: ##fixnum-add live-insn? drop t ;
 

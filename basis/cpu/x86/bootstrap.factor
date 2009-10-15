@@ -252,7 +252,7 @@ big-endian off
     ! pop stack
     ds-reg bootstrap-cell SUB
     ! pass vm pointer
-    arg2 0 MOV rc-absolute-cell rt-vm jit-rel
+    arg2 0 MOV 0 jit-literal rc-absolute-cell rt-vm jit-rel
     ! call quotation
     arg1 quot-xt-offset [+] JMP
 ] \ (call) define-sub-primitive
@@ -402,6 +402,7 @@ big-endian off
 ! Comparisons
 : jit-compare ( insn -- )
     ! load t
+    t jit-literal
     temp3 0 MOV rc-absolute-cell rt-immediate jit-rel
     ! load f
     temp1 \ f tag-number MOV
