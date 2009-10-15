@@ -394,7 +394,7 @@ M:: ppc %allot ( dst size class nursery-ptr -- )
     0 swap LOAD32 rc-absolute-ppc-2/2 rel-cards-offset ;
 
 : load-decks-offset ( dst -- )
-    0 swap LOAD32 rc-absolute-ppc-2/2 rel-decks-offset
+    0 swap LOAD32 rc-absolute-ppc-2/2 rel-decks-offset ;
 
 :: (%write-barrier) ( temp1 temp2 -- )
     card-mark scratch-reg LI
