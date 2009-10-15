@@ -172,7 +172,7 @@ HELP: ndip
 } ;
 
 HELP: nkeep
-{ $values { "quot" quotation } { "n" integer } }
+{ $values { "n" integer } }
 { $description "A generalization of " { $link keep } " that can work " 
 "for any stack depth. The first " { $snippet "n" } " items after the quotation will be "
 "saved, the quotation called, and the items restored."
