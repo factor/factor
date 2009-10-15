@@ -26,6 +26,8 @@ IN: s3
 SYMBOL: key-id
 SYMBOL: secret-key
 
+<PRIVATE
+
 TUPLE: s3-request path mime-type date method headers  bucket data ;
 
 : hashtable>headers ( hashtable -- seq )
@@ -81,7 +83,11 @@ TUPLE: s3-request path mime-type date method headers  bucket data ;
     "PUT" <s3-request> dup s3-url swapd <put-request> 
     sign-http-request http-request ;
 
+PRIVATE>
+
 TUPLE: bucket name date ;
+
+<PRIVATE
 
 : (buckets) ( xml -- seq )
     "Buckets" tag-named 
@@ -89,15 +95,19 @@ TUPLE: bucket name date ;
         [ "Name" tag-named children>string ] 
         [ "CreationDate" tag-named children>string ] bi bucket boa
     ] map ;
+PRIVATE>
  
 : buckets ( -- seq )
     f "/" H{ } clone s3-get nip >string string>xml (buckets) ;
 
+<PRIVATE
 : bucket-url ( bucket -- string )
     [ "http://" % % ".s3.amazonaws.com/" % ] "" make ;
+PRIVATE>
 
 TUPLE: key name last-modified size ;
 
+<PRIVATE
 : (keys) ( xml -- seq )
     "Contents" tags-named [
       [ "Key" tag-named children>string ]
@@ -105,12 +115,13 @@ TUPLE: key name last-modified size ;
       [ "Size" tag-named children>string ]
       tri key boa
   ] map ;
+PRIVATE>
  
 : keys ( bucket -- seq )
     "/" H{ } clone s3-get
     nip >string string>xml (keys) ;
 
-: object-get ( bucket key -- response data )
+: get-object ( bucket key -- response data )
     s3-request new
         swap "/" prepend >>path
         swap >>bucket
@@ -128,7 +139,7 @@ TUPLE: key name last-modified size ;
     "/" H{ } clone "DELETE" <s3-request>
     dup s3-url <delete-request> sign-http-request http-request 2drop ;
  
-: put-object ( object type bucket key headers -- )
+: put-object ( data mime-type bucket key headers -- )
     [ "/" prepend ] dip "PUT" <s3-request> 
     over >>mime-type
     [ <post-data> swap >>data ] dip
@@ -140,14 +151,3 @@ TUPLE: key name last-modified size ;
 : delete-object ( bucket key -- )
     "/" prepend H{ } clone "DELETE" <s3-request>
     dup s3-url <delete-request> sign-http-request http-request 2drop ;
-
-! "testbucket" create-bucket
-! "testbucket" delete-bucket
-! buckets
-! "testbucket" keys 
-! "hello world" binary encode "text/plain" "testbucket" "hello.txt" 
-! H{ { "x-amz-acl" "public-read" } } put-object
-! "hello.txt" <pathname> "text/plain" "testbucket" "hello.txt" 
-! H{ { "x-amz-acl" "public-read" } } put-object
-! "testbucket" "hello.txt" object-get
-! Need to write docs...
