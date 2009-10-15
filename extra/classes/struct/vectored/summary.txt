@@ -1,0 +1,1 @@
+Derive a tuple of specialized arrays from a struct class
