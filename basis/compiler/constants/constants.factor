@@ -51,6 +51,8 @@ CONSTANT: rt-stack-chain 9
 CONSTANT: rt-untagged 10
 CONSTANT: rt-megamorphic-cache-hits 11
 CONSTANT: rt-vm 12
+CONSTANT: rt-cards-offset 13
+CONSTANT: rt-decks-offset 14
 
 : rc-absolute? ( n -- ? )
     ${ rc-absolute-ppc-2/2 rc-absolute-cell rc-absolute } member? ;

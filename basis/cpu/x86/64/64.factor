@@ -75,9 +75,6 @@ M: x86.64 %prepare-unbox ( -- )
     param-reg-1 R14 [] MOV
     R14 cell SUB ;
 
-: %mov-vm-ptr ( reg -- )
-    0 MOV rc-absolute-cell rt-vm rel-fixup ;
-
 M:: x86.64 %unbox ( n rep func -- )
     param-reg-2 %mov-vm-ptr
     ! Call the unboxer
@@ -183,11 +180,11 @@ M: x86.64 %alien-invoke
     R11 CALL ;
 
 M: x86.64 %nest-stacks ( -- )
-    param-reg-1 0 MOV rc-absolute-cell rt-vm rel-fixup
+    param-reg-1 %mov-vm-ptr
     "nest_stacks" f %alien-invoke ;
 
 M: x86.64 %unnest-stacks ( -- )
-    param-reg-1 0 MOV rc-absolute-cell rt-vm rel-fixup
+    param-reg-1 %mov-vm-ptr
     "unnest_stacks" f %alien-invoke ;
 
 M: x86.64 %prepare-alien-indirect ( -- )

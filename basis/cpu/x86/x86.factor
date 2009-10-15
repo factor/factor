@@ -369,19 +369,17 @@ M: x86 %shl int-rep two-operand [ SHL ] emit-shift ;
 M: x86 %shr int-rep two-operand [ SHR ] emit-shift ;
 M: x86 %sar int-rep two-operand [ SAR ] emit-shift ;
 
-M: x86 %vm-field-ptr ( dst field -- )
-    [ drop 0 MOV rc-absolute-cell rt-vm rel-fixup ]
-    [ vm-field-offset ADD ] 2bi ;
+: %mov-vm-ptr ( reg -- )
+    0 MOV 0 rc-absolute-cell rel-vm ;
 
-: load-zone-ptr ( reg -- )
-    #! Load pointer to start of zone array
-    "nursery" %vm-field-ptr ;
+M: x86 %vm-field-ptr ( dst field -- )
+    [ 0 MOV ] dip vm-field-offset rc-absolute-cell rel-vm ;
 
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
-    [ drop load-zone-ptr ] [ swap cell [+] MOV ] 2bi ;
+    [ drop "nursery" %vm-field-ptr ] [ swap [] MOV ] 2bi ;
 
 : inc-allot-ptr ( nursery-ptr n -- )
-    [ cell [+] ] dip 8 align ADD ;
+    [ [] ] dip 8 align ADD ;
 
 : store-header ( temp class -- )
     [ [] ] [ type-number tag-fixnum ] bi* MOV ;
@@ -395,26 +393,32 @@ M:: x86 %allot ( dst size class nursery-ptr -- )
     dst class store-tagged
     nursery-ptr size inc-allot-ptr ;
 
-M:: x86 %write-barrier ( src card# table -- )
-    #! Mark the card pointed to by vreg.
+:: (%write-barrier) ( src slot temp1 temp2 -- )
+    ! Compute slot address.
+    temp1 src MOV
+    temp1 slot ADD
+
     ! Mark the card
-    card# src MOV
-    card# card-bits SHR
-    table "cards_offset" %vm-field-ptr
-    table table [] MOV
-    table card# [+] card-mark <byte> MOV
+    temp1 card-bits SHR
+    temp2 0 MOV rc-absolute-cell rel-cards-offset
+    temp2 temp1 [+] card-mark <byte> MOV
 
     ! Mark the card deck
-    card# deck-bits card-bits - SHR
-    table "decks_offset" %vm-field-ptr
-    table table [] MOV
-    table card# [+] card-mark <byte> MOV ;
+    temp1 deck-bits card-bits - SHR
+    temp2 0 MOV rc-absolute-cell rel-decks-offset
+    temp2 temp1 [+] card-mark <byte> MOV ;
+
+M: x86 %write-barrier ( src slot temp1 temp2 -- ) (%write-barrier) ;
+
+M: x86 %write-barrier-imm ( src slot temp1 temp2 -- ) (%write-barrier) ;
 
 M:: x86 %check-nursery ( label size temp1 temp2 -- )
-    temp1 load-zone-ptr
-    temp2 temp1 cell [+] MOV
+    temp1 "nursery" %vm-field-ptr
+    ! Load 'here' into temp2
+    temp2 temp1 [] MOV
     temp2 size ADD
-    temp1 temp1 3 cells [+] MOV
+    ! Load 'end' into temp1
+    temp1 temp1 2 cells [+] MOV
     temp2 temp1 CMP
     label JLE ;
 
@@ -1327,8 +1331,8 @@ M:: x86 %save-context ( temp1 temp2 callback-allowed? -- )
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    temp1 0 MOV rc-absolute-cell rt-vm rel-fixup
-    temp1 temp1 "stack_chain" vm-field-offset [+] MOV
+    temp1 "stack_chain" %vm-field-ptr
+    temp1 temp1 [] MOV
     temp2 stack-reg cell neg [+] LEA
     temp1 [] temp2 MOV
     callback-allowed? [

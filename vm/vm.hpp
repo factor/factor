@@ -203,7 +203,6 @@ struct factor_vm
 
 	//data heap
 	void init_card_decks();
-	data_heap *grow_data_heap(data_heap *data, cell requested_bytes);
 	void clear_cards(old_space *gen);
 	void clear_decks(old_space *gen);
 	void reset_generation(old_space *gen);
@@ -224,47 +223,23 @@ struct factor_vm
 	cell find_all_words();
 	cell object_size(cell tagged);
 
-	//write barrier
-	inline card *addr_to_card(cell a)
-	{
-		return (card*)(((cell)(a) >> card_bits) + cards_offset);
-	}
-
-	inline cell card_to_addr(card *c)
-	{
-		return ((cell)c - cards_offset) << card_bits;
-	}
-
-	inline card_deck *addr_to_deck(cell a)
-	{
-		return (card_deck *)(((cell)a >> deck_bits) + decks_offset);
-	}
-
-	inline cell deck_to_addr(card_deck *c)
-	{
-		return ((cell)c - decks_offset) << deck_bits;
-	}
-
-	inline card *deck_to_card(card_deck *d)
-	{
-		return (card *)((((cell)d - decks_offset) << (deck_bits - card_bits)) + cards_offset);
-	}
-
 	/* the write barrier must be called any time we are potentially storing a
 	   pointer from an older generation to a younger one */
-	inline void write_barrier(object *obj)
+	inline void write_barrier(cell *slot_ptr)
 	{
-		*addr_to_card((cell)obj) = card_mark_mask;
-		*addr_to_deck((cell)obj) = card_mark_mask;
+		*(char *)(cards_offset + ((cell)slot_ptr >> card_bits)) = card_mark_mask;
+		*(char *)(decks_offset + ((cell)slot_ptr >> deck_bits)) = card_mark_mask;
 	}
 
 	// gc
-	void free_unmarked_code_blocks();
 	void update_dirty_code_blocks(std::set<code_block *> *remembered_set);
 	void collect_nursery();
 	void collect_aging();
 	void collect_to_tenured();
-	void collect_full(cell requested_bytes, bool trace_contexts_p);
+	void free_unmarked_code_blocks(bool growing_data_heap);
+	void collect_full_impl(bool trace_contexts_p);
+	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p);
+	void collect_full(bool trace_contexts_p);
 	void record_gc_stats();
 	void garbage_collection(cell gen, bool growing_data_heap, bool trace_contexts_p, cell requested_bytes);
 	void gc();
