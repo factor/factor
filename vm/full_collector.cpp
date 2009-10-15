@@ -4,7 +4,11 @@ namespace factor
 {
 
 full_collector::full_collector(factor_vm *myvm_) :
-	copying_collector<tenured_space,full_policy>(myvm_,myvm_->data->tenured,full_policy(myvm_)) {}
+	copying_collector<tenured_space,full_policy>(
+		myvm_,
+		&myvm_->gc_stats.full_stats,
+		myvm_->data->tenured,
+		full_policy(myvm_)) {}
 
 struct stack_frame_marker {
 	factor_vm *myvm;
