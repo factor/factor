@@ -50,7 +50,7 @@ M: x86.32 reserved-area-size 0 ;
 M: x86.32 %alien-invoke 0 CALL rc-relative rel-dlsym ;
 
 : push-vm-ptr ( -- )
-    0 PUSH rc-absolute-cell rel-vm ; ! push the vm ptr as an argument
+    0 PUSH 0 rc-absolute-cell rel-vm ; ! push the vm ptr as an argument
 
 M: x86.32 return-struct-in-registers? ( c-type -- ? )
     c-type

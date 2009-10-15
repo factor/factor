@@ -8,10 +8,10 @@ IN: quotations
 <PRIVATE
 
 : uncurry ( curry -- obj quot )
-    dup 2 slot swap 3 slot ; inline
+    { curry } declare dup 2 slot swap 3 slot ; inline
 
 : uncompose ( compose -- quot quot2 )
-    dup 2 slot swap 3 slot ; inline
+    { compose } declare dup 2 slot swap 3 slot ; inline
 
 PRIVATE>
 

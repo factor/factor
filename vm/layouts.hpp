@@ -199,9 +199,6 @@ struct string : public object {
 /* The compiled code heap is structured into blocks. */
 struct heap_block
 {
-	/* Bit 0: mark
-	   Bit 1-7: type
-	   Bit 8-...: size */
 	cell header;
 
 	bool marked_p() { return header & 1; }
