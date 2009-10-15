@@ -405,7 +405,7 @@ M:: ppc %allot ( dst size class nursery-ptr -- )
     temp1 scratch-reg temp2 STBX
 
     ! Mark the card deck
-    temp1 temp1 deck-bits SRWI
+    temp1 temp1 deck-bits card-bits - SRWI
     temp2 load-decks-offset
     temp1 scratch-reg temp2 STBX ;
 
