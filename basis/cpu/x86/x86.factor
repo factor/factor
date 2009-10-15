@@ -387,6 +387,12 @@ M: x86 %vm-field-ptr ( dst field -- )
 : store-tagged ( dst tag -- )
     tag-number OR ;
 
+: load-cards-offset ( dst -- )
+    0 MOV rc-absolute-cell rel-cards-offset ;
+
+: load-decks-offset ( dst -- )
+    0 MOV rc-absolute-cell rel-decks-offset ;
+
 M:: x86 %allot ( dst size class nursery-ptr -- )
     nursery-ptr dst load-allot-ptr
     dst class store-header
@@ -399,12 +405,12 @@ M:: x86 %allot ( dst size class nursery-ptr -- )
 
     ! Mark the card
     temp1 card-bits SHR
-    temp2 0 MOV rc-absolute-cell rel-cards-offset
+    temp2 load-cards-offset
     temp2 temp1 [+] card-mark <byte> MOV
 
     ! Mark the card deck
     temp1 deck-bits card-bits - SHR
-    temp2 0 MOV rc-absolute-cell rel-decks-offset
+    temp2 load-decks-offset
     temp2 temp1 [+] card-mark <byte> MOV ;
 
 M: x86 %write-barrier ( src slot temp1 temp2 -- ) (%write-barrier) ;
