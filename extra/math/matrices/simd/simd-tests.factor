@@ -229,3 +229,13 @@ IN: math.matrices.simd.tests
     float-4{ 2.0 2.0 0.0 0.0 } 1.0 5.0
     frustum-matrix4
 ] unit-test
+
+[ float-4{ 3.0 4.0 5.0 1.0 } ]
+[ float-4{ 1.0 1.0 1.0 1.0 } translation-matrix4 float-4{ 2.0 3.0 4.0 1.0 } m4.v ] unit-test
+
+[ float-4{ 2.0 2.5 3.0 1.0 } ]
+[
+    float-4{ 1.0 1.0 1.0 1.0 } translation-matrix4
+    float-4{ 0.5 0.5 0.5 1.0 } scale-matrix4 m4.
+    float-4{ 2.0 3.0 4.0 1.0 } m4.v
+] unit-test
