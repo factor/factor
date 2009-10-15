@@ -1,69 +1,112 @@
 ! (c)Joe Groff bsd license
-USING: alien alien.c-types alien.data alien.parser arrays
-byte-arrays fry generalizations kernel lexer locals macros math
-math.ranges parser sequences sequences.private ;
+USING: accessors alien alien.c-types alien.data alien.parser arrays
+byte-arrays combinators effects.parser fry generalizations kernel
+lexer locals macros math math.ranges parser sequences sequences.private ;
 IN: alien.data.map
 
 ERROR: bad-data-map-input-length byte-length iter-size remainder ;
 
 <PRIVATE
 
-: even-/i ( d d -- q )
-    2dup [ >fixnum ] bi@ /mod
-    [ 2nip ]
-    [ bad-data-map-input-length ] if-zero ; inline
+: <displaced-direct-array> ( displacement bytes length type -- direct-array )
+    [ <displaced-alien> ] 2dip <c-direct-array> ; inline
 
-:: data-map-length ( array type count -- byte-length iter-size iter-count )
-    array byte-length >fixnum
-    type heap-size count *
-    2dup even-/i ; inline
+TUPLE: data-map-param
+    { c-type read-only }
+    { count fixnum read-only }
+    { orig read-only }
+    { bytes c-ptr read-only }
+    { byte-length fixnum read-only }
+    { iter-length fixnum read-only }
+    { iter-count fixnum read-only } ;
 
-: <displaced-direct-array> ( byte-array displacement length type -- direct-array )
-    [ swap <displaced-alien> ] 2dip <c-direct-array> ; inline
+ERROR: bad-data-map-param param remainder ;
 
-:: data-map-loop ( input loop-quot out-bytes-quot in-type in-count out-type out-count -- out-bytes )
-    input in-type in-count data-map-length
-        :> iter-count :> in-size :> in-byte-length
-    input >c-ptr :> in-bytes
+M: data-map-param length
+    iter-count>> ; inline
 
-    out-count out-type heap-size * :> out-size
-    out-size iter-count * :> out-byte-length
-    out-byte-length out-bytes-quot call :> out-bytes
+M: data-map-param nth-unsafe
+    {
+        [ iter-length>> * >fixnum ]
+        [ bytes>> ]
+        [ count>> ]
+        [ c-type>> ] 
+    } cleave <displaced-direct-array> ; inline
 
-    0 in-byte-length 1 - >fixnum in-size >fixnum <range>
-    0 out-byte-length 1 - >fixnum out-size >fixnum <range>
-    [| in-base out-base |
-        in-bytes in-base in-count in-type <displaced-direct-array>
-        in-count firstn-unsafe
-        loop-quot call
-        out-bytes out-base out-count out-type <displaced-direct-array>
-        out-count set-firstn-unsafe
-    ] 2each
-    out-bytes ; inline
+INSTANCE: data-map-param immutable-sequence
 
-PRIVATE>
+: c-type-count ( in/out -- c-type count iter-length )
+    dup array? [ unclip swap product >fixnum ] [ 1 ] if
+    2dup swap heap-size * >fixnum ; inline
 
-MACRO: data-map ( in-type in-count out-type out-count -- )
-    '[ [ (byte-array) ] _ _ _ _ data-map-loop ] ;
+MACRO:: >param ( in -- quot: ( array -- param ) )
+    in c-type-count :> iter-length :> count :> c-type
 
-MACRO: data-map! ( in-type in-count out-type out-count -- )
-    '[ swap [ [ nip >c-ptr ] curry _ _ _ _ data-map-loop drop ] keep ] ;
+    [
+        [ c-type count ] dip
+        [ ]
+        [ >c-ptr ]
+        [ byte-length ] tri
+        iter-length
+        2dup /i
+        data-map-param boa
+    ] ;
 
-<PRIVATE
+MACRO:: alloc-param ( out -- quot: ( len -- param ) )
+    out c-type-count :> iter-length :> count :> c-type
 
-: c-type-parsed ( accum c-type -- accum )
-    dup array? [ unclip swap product ] [ 1 ] if
-    [ parsed ] bi@ ;
+    [
+        [ c-type count ] dip
+        [
+            iter-length * >fixnum [ (byte-array) dup ] keep
+            iter-length
+        ] keep
+        data-map-param boa
+    ] ;
+
+MACRO: unpack-params ( ins -- )
+    [ c-type-count drop nip '[ _ firstn-unsafe ] ] map '[ _ spread ] ;
+
+MACRO: pack-params ( outs -- )
+    [ ] [ c-type-count drop nip dup [ [ ndip _ ] dip set-firstn ] 3curry ] reduce
+    fry [ call ] compose ;
+
+:: [data-map] ( ins outs param-quot -- quot )
+    ins length :> #ins
+    outs length :> #outs
+    #ins #outs + :> #params
+
+    [| quot |
+        param-quot call
+        [
+            [ [ ins unpack-params quot call ] #outs ndip outs pack-params ]
+            #params neach
+        ] #outs nkeep
+        [ orig>> ] #outs napply
+    ] ;
+
+MACRO: data-map ( ins outs -- )
+    2dup
+    [
+        [ [ '[ _ >param ] ] map '[ _ spread ] ]
+        [ length dup '[ _ ndup _ nmin-length ] compose ] bi
+    ]
+    [ [ '[ _ alloc-param ] ] map '[ _ cleave ] ] bi* compose
+    [data-map] ;
+
+MACRO: data-map! ( ins outs -- )
+    2dup append [ '[ _ >param ] ] map '[ _ spread ] [data-map] ;
+
+: parse-data-map-effect ( accum -- accum )
+    ")" parse-effect
+    [ in>>  [ parse-c-type ] map parsed ]
+    [ out>> [ parse-c-type ] map parsed ] bi ;
 
 PRIVATE>
 
 SYNTAX: data-map(
-    scan-c-type c-type-parsed
-    "--" expect scan-c-type c-type-parsed ")" expect
-    \ data-map parsed ;
+    parse-data-map-effect \ data-map parsed ;
 
 SYNTAX: data-map!(
-    scan-c-type c-type-parsed
-    "--" expect scan-c-type c-type-parsed ")" expect
-    \ data-map! parsed ;
+    parse-data-map-effect \ data-map! parsed ;
 
