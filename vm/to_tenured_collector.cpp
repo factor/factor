@@ -4,8 +4,11 @@ namespace factor
 {
 
 to_tenured_collector::to_tenured_collector(factor_vm *myvm_) :
-	copying_collector<tenured_space,to_tenured_policy>
-	(myvm_,myvm_->data->tenured,to_tenured_policy(myvm_)) {}
+	copying_collector<tenured_space,to_tenured_policy>(
+		myvm_,
+		&myvm_->gc_stats.aging_stats,
+		myvm_->data->tenured,
+		to_tenured_policy(myvm_)) {}
 
 void factor_vm::collect_to_tenured()
 {

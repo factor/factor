@@ -3,14 +3,9 @@
 namespace factor
 {
 
-gc_state::gc_state(data_heap *data_, bool growing_data_heap_, cell collecting_gen_) :
-	data(data_),
-	growing_data_heap(growing_data_heap_),
-	collecting_gen(collecting_gen_),
-        collecting_aging_again(false),
-	start_time(current_micros()) { }
+gc_state::gc_state(gc_op op_) : op(op_), start_time(current_micros()) {}
 
-gc_state::~gc_state() { }
+gc_state::~gc_state() {}
 
 void factor_vm::update_dirty_code_blocks(std::set<code_block *> *remembered_set)
 {
@@ -21,80 +16,81 @@ void factor_vm::update_dirty_code_blocks(std::set<code_block *> *remembered_set)
 	for(; iter != end; iter++) update_literal_references(*iter);
 }
 
-void factor_vm::record_gc_stats()
+void factor_vm::record_gc_stats(generation_statistics *stats)
 {
-	generation_statistics *s = &gc_stats.generations[current_gc->collecting_gen];
-
 	cell gc_elapsed = (current_micros() - current_gc->start_time);
-	s->collections++;
-	s->gc_time += gc_elapsed;
-	if(s->max_gc_time < gc_elapsed)
-		s->max_gc_time = gc_elapsed;
+	stats->collections++;
+	stats->gc_time += gc_elapsed;
+	if(stats->max_gc_time < gc_elapsed)
+		stats->max_gc_time = gc_elapsed;
 }
 
 /* Collect gen and all younger generations.
 If growing_data_heap_ is true, we must grow the data heap to such a size that
 an allocation of requested_bytes won't fail */
-void factor_vm::garbage_collection(cell collecting_gen_, bool growing_data_heap_, bool trace_contexts_p, cell requested_bytes)
+void factor_vm::garbage_collection(gc_op op, bool trace_contexts_p, cell requested_bytes)
 {
 	assert(!gc_off);
 	assert(!current_gc);
 
 	save_stacks();
 
-	current_gc = new gc_state(data,growing_data_heap_,collecting_gen_);
+	current_gc = new gc_state(op);
 
 	/* Keep trying to GC higher and higher generations until we don't run out
 	of space */
 	if(setjmp(current_gc->gc_unwind))
 	{
 		/* We come back here if a generation is full */
-
-		/* We have no older generations we can try collecting, so we
-		resort to growing the data heap */
-		if(current_gc->collecting_tenured_p())
+		switch(current_gc->op)
 		{
-			assert(!current_gc->growing_data_heap);
-			current_gc->growing_data_heap = true;
-
+		case collect_nursery_op:
+			current_gc->op = collect_aging_op;
+			break;
+		case collect_aging_op:
+			current_gc->op = collect_to_tenured_op;
+			break;
+		case collect_to_tenured_op:
+			current_gc->op = collect_full_op;
+			break;
+		case collect_full_op:
 			/* Since we start tracing again, any previously
 			marked code blocks must be re-marked and re-traced */
 			code->clear_mark_bits();
-		}
-		/* we try collecting aging space twice before going on to
-		collect tenured */
-		else if(current_gc->collecting_aging_p()
-			&& !current_gc->collecting_aging_again)
-		{
-			current_gc->collecting_aging_again = true;
-		}
-		/* Collect the next oldest generation */
-		else
-		{
-			current_gc->collecting_gen++;
+			current_gc->op = collect_growing_heap_op;
+			break;
+		default:
+			critical_error("Bad GC op\n",op);
+			break;
 		}
 	}
 
-	if(current_gc->collecting_nursery_p())
+	switch(current_gc->op)
+	{
+	case collect_nursery_op:
 		collect_nursery();
-	else if(current_gc->collecting_aging_p())
-	{
-		if(current_gc->collecting_aging_again)
-			collect_to_tenured();
-		else
-			collect_aging();
+		record_gc_stats(&gc_stats.nursery_stats);
+		break;
+	case collect_aging_op:
+		collect_aging();
+		record_gc_stats(&gc_stats.aging_stats);
+		break;
+	case collect_to_tenured_op:
+		collect_to_tenured();
+		record_gc_stats(&gc_stats.aging_stats);
+		break;
+	case collect_full_op:
+		collect_full(trace_contexts_p);
+		record_gc_stats(&gc_stats.full_stats);
+		break;
+	case collect_growing_heap_op:
+		collect_growing_heap(requested_bytes,trace_contexts_p);
+		record_gc_stats(&gc_stats.full_stats);
+		break;
+	default:
+		critical_error("Bad GC op\n",op);
+		break;
 	}
-        else if(current_gc->collecting_tenured_p())
-	{
-		if(current_gc->growing_data_heap)
-			collect_growing_heap(requested_bytes,trace_contexts_p);
-		else
-			collect_full(trace_contexts_p);
-	}
-	else
-		critical_error("Bug in GC",0);
-
-	record_gc_stats();
 
 	delete current_gc;
 	current_gc = NULL;
@@ -102,7 +98,7 @@ void factor_vm::garbage_collection(cell collecting_gen_, bool growing_data_heap_
 
 void factor_vm::gc()
 {
-	garbage_collection(tenured_gen,false,true,0);
+	garbage_collection(collect_full_op,true,0);
 }
 
 void factor_vm::primitive_gc()
@@ -110,25 +106,28 @@ void factor_vm::primitive_gc()
 	gc();
 }
 
+void factor_vm::add_gc_stats(generation_statistics *stats, growable_array *result)
+{
+	result->add(allot_cell(stats->collections));
+	result->add(tag<bignum>(long_long_to_bignum(stats->gc_time)));
+	result->add(tag<bignum>(long_long_to_bignum(stats->max_gc_time)));
+	result->add(allot_cell(stats->collections == 0 ? 0 : stats->gc_time / stats->collections));
+	result->add(allot_cell(stats->object_count));
+	result->add(tag<bignum>(long_long_to_bignum(stats->bytes_copied)));
+}
+
 void factor_vm::primitive_gc_stats()
 {
 	growable_array result(this);
 
-	cell i;
-	u64 total_gc_time = 0;
+	add_gc_stats(&gc_stats.nursery_stats,&result);
+	add_gc_stats(&gc_stats.aging_stats,&result);
+	add_gc_stats(&gc_stats.full_stats,&result);
 
-	for(i = 0; i < gen_count; i++)
-	{
-		generation_statistics *s = &gc_stats.generations[i];
-		result.add(allot_cell(s->collections));
-		result.add(tag<bignum>(long_long_to_bignum(s->gc_time)));
-		result.add(tag<bignum>(long_long_to_bignum(s->max_gc_time)));
-		result.add(allot_cell(s->collections == 0 ? 0 : s->gc_time / s->collections));
-		result.add(allot_cell(s->object_count));
-		result.add(tag<bignum>(long_long_to_bignum(s->bytes_copied)));
-
-		total_gc_time += s->gc_time;
-	}
+	u64 total_gc_time =
+		gc_stats.nursery_stats.gc_time +
+		gc_stats.aging_stats.gc_time +
+		gc_stats.full_stats.gc_time;
 
 	result.add(tag<bignum>(ulong_long_to_bignum(total_gc_time)));
 	result.add(tag<bignum>(ulong_long_to_bignum(gc_stats.cards_scanned)));
@@ -186,7 +185,7 @@ void factor_vm::inline_gc(cell *gc_roots_base, cell gc_roots_size)
 	for(cell i = 0; i < gc_roots_size; i++)
 		gc_locals.push_back((cell)&gc_roots_base[i]);
 
-	garbage_collection(nursery_gen,false,true,0);
+	garbage_collection(collect_nursery_op,true,0);
 
 	for(cell i = 0; i < gc_roots_size; i++)
 		gc_locals.pop_back();
@@ -215,7 +214,7 @@ object *factor_vm::allot_object(header header, cell size)
 	{
 		/* If there is insufficient room, collect the nursery */
 		if(nursery.here + size > nursery.end)
-			garbage_collection(nursery_gen,false,true,0);
+			garbage_collection(collect_nursery_op,true,0);
 
 		obj = nursery.allot(size);
 	}
@@ -229,7 +228,7 @@ object *factor_vm::allot_object(header header, cell size)
 
 		/* If it still won't fit, grow the heap */
 		if(data->tenured->here + size > data->tenured->end)
-			garbage_collection(tenured_gen,true,true,size);
+			garbage_collection(collect_growing_heap_op,true,size);
 
 		obj = data->tenured->allot(size);
 
