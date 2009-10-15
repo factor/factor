@@ -30,7 +30,9 @@ IN: generalizations.tests
 [ 1 5 4 3 2 ] [ 1 2 3 4 5 4 nspin ] unit-test
 
 [ 1 2 3 4 5 [ drop drop drop drop drop 2 ] 5 nkeep ] must-infer
+[ 1 2 3 4 5 2 '[ drop drop drop drop drop _ ] 5 nkeep ] must-infer
 { 2 1 2 3 4 5 } [ 1 2 3 4 5 [ drop drop drop drop drop 2 ] 5 nkeep ] unit-test
+{ 2 1 2 3 4 5 } [ 1 2 3 4 5 2 '[ drop drop drop drop drop _ ] 5 nkeep ] unit-test
 [ [ 1 2 3 + ] ] [ 1 2 3 [ + ] 3 ncurry ] unit-test
 
 [ "HELLO" ] [ "hello" [ >upper ] 1 napply ] unit-test
