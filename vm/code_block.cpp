@@ -34,13 +34,13 @@ int factor_vm::number_of_parameters(relocation_type type)
 	case RT_IMMEDIATE:
 	case RT_HERE:
 	case RT_UNTAGGED:
+	case RT_VM:
 		return 1;
 	case RT_DLSYM:
 		return 2;
 	case RT_THIS:
 	case RT_STACK_CHAIN:
 	case RT_MEGAMORPHIC_CACHE_HITS:
-	case RT_VM:
 	case RT_CARDS_OFFSET:
 	case RT_DECKS_OFFSET:
 		return 0;
@@ -181,7 +181,7 @@ cell factor_vm::compute_relocation(relocation_entry rel, cell index, code_block 
 	case RT_MEGAMORPHIC_CACHE_HITS:
 		return (cell)&megamorphic_cache_hits;
 	case RT_VM:
-		return (cell)this;
+		return (cell)this + untag_fixnum(ARG);
 	case RT_CARDS_OFFSET:
 		return cards_offset;
 	case RT_DECKS_OFFSET:

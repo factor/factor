@@ -29,6 +29,7 @@ struct growable_array {
 	explicit growable_array(factor_vm *myvm, cell capacity = 10) : count(0), elements(myvm->allot_array(capacity,F),myvm) {}
 
 	void add(cell elt);
+	void append(array *elts);
 	void trim();
 };
 

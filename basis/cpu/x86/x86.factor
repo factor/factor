@@ -370,10 +370,10 @@ M: x86 %shr int-rep two-operand [ SHR ] emit-shift ;
 M: x86 %sar int-rep two-operand [ SAR ] emit-shift ;
 
 : %mov-vm-ptr ( reg -- )
-    0 MOV rc-absolute-cell rel-vm ;
+    0 MOV 0 rc-absolute-cell rel-vm ;
 
 M: x86 %vm-field-ptr ( dst field -- )
-    [ drop %mov-vm-ptr ] [ vm-field-offset ADD ] 2bi ;
+    [ 0 MOV ] dip vm-field-offset rc-absolute-cell rel-vm ;
 
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
     [ drop "nursery" %vm-field-ptr ] [ swap [] MOV ] 2bi ;

@@ -77,8 +77,8 @@ SYMBOL: relocation-table
 : rel-here ( offset class -- )
     [ add-literal ] dip rt-here rel-fixup ;
 
-: rel-vm ( class -- )
-    rt-vm rel-fixup ;
+: rel-vm ( offset class -- )
+    [ add-literal ] dip rt-vm rel-fixup ;
 
 : rel-cards-offset ( class -- )
     rt-cards-offset rel-fixup ;
