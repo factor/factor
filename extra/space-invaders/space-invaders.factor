@@ -272,10 +272,10 @@ M: space-invaders reset ( cpu -- )
   [ port1>> 255 HEX: 40 - bitand ] keep (>>port1) ;
 
 
-TUPLE: invaders-gadget < gadget cpu quit? ;
+TUPLE: invaders-gadget < gadget cpu quit? windowed? ;
 
 invaders-gadget H{
-    { T{ key-down f f "ESC" }    [ t swap (>>quit?) ] }
+    { T{ key-down f f "ESC" }    [ t over (>>quit?) dup windowed?>> [ close-window ] [ drop ] if ] }
     { T{ key-down f f "BACKSPACE" } [ cpu>> coin-down ] }
     { T{ key-up   f f "BACKSPACE" } [ cpu>> coin-up ] }
     { T{ key-down f f "1" }         [ cpu>> player1-down ] }
@@ -386,17 +386,18 @@ M: invaders-gadget ungraft* ( gadget -- )
  t swap (>>quit?) ;
 
 : (run) ( title cpu rom-info -- )
-  over load-rom* <invaders-gadget> swap open-window ;
+  over load-rom* <invaders-gadget> t >>windowed? swap open-window ;
 
-: run ( -- )  
-  [
-    "Space Invaders" <space-invaders> {
+CONSTANT: rom-info {
       { HEX: 0000 "invaders/invaders.h" }
       { HEX: 0800 "invaders/invaders.g" }
       { HEX: 1000 "invaders/invaders.f" }
-     { HEX: 1800 "invaders/invaders.e" }
-    }  
-    (run) 
+      { HEX: 1800 "invaders/invaders.e" }
+   }
+
+: run ( -- )  
+  [
+    "Space Invaders" <space-invaders> rom-info (run)
   ] with-ui ;
 
 MAIN: run
