@@ -32,11 +32,11 @@ enable-float-intrinsics
 >>
 
 : %load-vm-addr ( reg -- )
-    0 swap LOAD32 rc-absolute-ppc-2/2 rt-vm rel-fixup ;
+    0 swap LOAD32 0 rc-absolute-ppc-2/2 rel-vm ;
 
 : %load-vm-field-addr ( reg symbol -- )
-    [ drop %load-vm-addr ]
-    [ [ dup ] dip vm-field-offset ADDI ] 2bi ;
+    [ 0 swap LOAD32 ] dip
+    vm-field-offset rc-absolute-ppc-2/2 rel-vm ;
 
 M: ppc %vm-field-ptr ( dst field -- ) %load-vm-field-addr ;
 
@@ -137,13 +137,10 @@ M:: ppc %dispatch ( src temp -- )
     temp MTCTR
     BCTR ;
 
-: (%slot-imm) ( obj slot tag -- reg offset )
-    [ cells ] dip - ; inline
-
 M: ppc %slot ( dst obj slot -- ) swapd LWZX ;
-M: ppc %slot-imm ( dst obj slot tag -- ) (%slot-imm) LWZ ;
+M: ppc %slot-imm ( dst obj slot tag -- ) slot-offset LWZ ;
 M: ppc %set-slot ( src obj slot -- ) swapd STWX ;
-M: ppc %set-slot-imm ( src obj slot tag -- ) (%slot-imm) STW ;
+M: ppc %set-slot-imm ( src obj slot tag -- ) slot-offset STW ;
 
 M:: ppc %string-nth ( dst src index temp -- )
     [
@@ -374,11 +371,11 @@ M: ppc %set-alien-double -rot STFD ;
     "nursery" %load-vm-field-addr ;
 
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
-    [ drop load-zone-ptr ] [ swap 4 LWZ ] 2bi ;
+    [ drop load-zone-ptr ] [ swap 0 LWZ ] 2bi ;
 
 :: inc-allot-ptr ( nursery-ptr allot-ptr n -- )
     scratch-reg allot-ptr n 8 align ADDI
-    scratch-reg nursery-ptr 4 STW ;
+    scratch-reg nursery-ptr 0 STW ;
 
 :: store-header ( dst class -- )
     class type-number tag-fixnum scratch-reg LI
@@ -394,28 +391,36 @@ M:: ppc %allot ( dst size class nursery-ptr -- )
     dst class store-tagged ;
 
 : load-cards-offset ( dst -- )
-    [ "cards_offset" %load-vm-field-addr ] [ dup 0 LWZ ] bi ;
+    0 swap LOAD32 rc-absolute-ppc-2/2 rel-cards-offset ;
 
 : load-decks-offset ( dst -- )
-    [ "decks_offset" %load-vm-field-addr ] [ dup 0 LWZ ] bi  ;
+    0 swap LOAD32 rc-absolute-ppc-2/2 rel-decks-offset
 
-M:: ppc %write-barrier ( src card# table -- )
+:: (%write-barrier) ( temp1 temp2 -- )
     card-mark scratch-reg LI
 
     ! Mark the card
-    table load-cards-offset
-    src card# card-bits SRWI
-    table scratch-reg card# STBX
+    temp1 temp1 card-bits SRWI
+    temp2 load-cards-offset
+    temp1 scratch-reg temp2 STBX
 
     ! Mark the card deck
-    table load-decks-offset
-    src card# deck-bits SRWI
-    table scratch-reg card# STBX ;
+    temp1 temp1 deck-bits SRWI
+    temp2 load-decks-offset
+    temp1 scratch-reg temp2 STBX ;
+
+M:: ppc %write-barrier ( src slot temp1 temp2 -- )
+    temp1 src slot ADD
+    temp1 temp2 (%write-barrier) ;
+
+M:: ppc %write-barrier-imm ( src slot temp1 temp2 -- )
+    temp1 src slot ADDI
+    temp1 temp2 (%write-barrier) ;
 
 M:: ppc %check-nursery ( label size temp1 temp2 -- )
     temp2 load-zone-ptr
-    temp1 temp2 cell LWZ
-    temp2 temp2 3 cells LWZ
+    temp1 temp2 0 LWZ
+    temp2 temp2 2 cells LWZ
     temp1 temp1 size ADDI
     ! is here >= end?
     temp1 0 temp2 CMP
