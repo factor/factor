@@ -93,7 +93,7 @@ M: x86 %return ( -- ) 0 RET ;
     0 <repetition> % ;
 
 :: (%slot-imm) ( obj slot tag -- op )
-    obj slot cells tag - [+] ; inline
+    obj slot tag slot-offset [+] ; inline
 
 M: x86 %slot ( dst obj slot -- ) [+] MOV ;
 M: x86 %slot-imm ( dst obj slot tag -- ) (%slot-imm) MOV ;
@@ -387,6 +387,12 @@ M: x86 %vm-field-ptr ( dst field -- )
 : store-tagged ( dst tag -- )
     tag-number OR ;
 
+: load-cards-offset ( dst -- )
+    0 MOV rc-absolute-cell rel-cards-offset ;
+
+: load-decks-offset ( dst -- )
+    0 MOV rc-absolute-cell rel-decks-offset ;
+
 M:: x86 %allot ( dst size class nursery-ptr -- )
     nursery-ptr dst load-allot-ptr
     dst class store-header
@@ -395,17 +401,16 @@ M:: x86 %allot ( dst size class nursery-ptr -- )
 
 :: (%write-barrier) ( src slot temp1 temp2 -- )
     ! Compute slot address.
-    temp1 src MOV
-    temp1 slot ADD
+    temp1 src slot [+] LEA
 
     ! Mark the card
     temp1 card-bits SHR
-    temp2 0 MOV rc-absolute-cell rel-cards-offset
+    temp2 load-cards-offset
     temp2 temp1 [+] card-mark <byte> MOV
 
     ! Mark the card deck
     temp1 deck-bits card-bits - SHR
-    temp2 0 MOV rc-absolute-cell rel-decks-offset
+    temp2 load-decks-offset
     temp2 temp1 [+] card-mark <byte> MOV ;
 
 M: x86 %write-barrier ( src slot temp1 temp2 -- ) (%write-barrier) ;

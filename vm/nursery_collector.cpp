@@ -4,8 +4,11 @@ namespace factor
 {
 
 nursery_collector::nursery_collector(factor_vm *myvm_) :
-	copying_collector<aging_space,nursery_policy>
-	(myvm_,myvm_->data->aging,nursery_policy(myvm_)) {}
+	copying_collector<aging_space,nursery_policy>(
+		myvm_,
+		&myvm_->gc_stats.nursery_stats,
+		myvm_->data->aging,
+		nursery_policy(myvm_)) {}
 
 void factor_vm::collect_nursery()
 {

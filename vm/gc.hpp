@@ -1,6 +1,14 @@
 namespace factor
 {
 
+enum gc_op {
+	collect_nursery_op,
+	collect_aging_op,
+	collect_to_tenured_op,
+	collect_full_op,
+	collect_growing_heap_op
+};
+
 /* statistics */
 struct generation_statistics {
 	cell collections;
@@ -11,7 +19,9 @@ struct generation_statistics {
 };
 
 struct gc_statistics {
-	generation_statistics generations[gen_count];
+	generation_statistics nursery_stats;
+	generation_statistics aging_stats;
+	generation_statistics full_stats;
 	u64 cards_scanned;
 	u64 decks_scanned;
 	u64 card_scan_time;
@@ -19,47 +29,12 @@ struct gc_statistics {
 };
 
 struct gc_state {
-	/* The data heap we're collecting */
-	data_heap *data;
-
-	/* sometimes we grow the heap */
-	bool growing_data_heap;
-
-	/* Which generation is being collected */
-	cell collecting_gen;
-
-	/* If true, we are collecting aging space for the second time, so if it is still
-	   full, we go on to collect tenured */
-	bool collecting_aging_again;
-
-	/* GC start time, for benchmarking */
+	gc_op op;
 	u64 start_time;
-
         jmp_buf gc_unwind;
 
-	explicit gc_state(data_heap *data_, bool growing_data_heap_, cell collecting_gen_);
+	explicit gc_state(gc_op op_);
 	~gc_state();
-
-	inline bool collecting_nursery_p()
-	{
-		return collecting_gen == nursery_gen;
-	}
-
-	inline bool collecting_aging_p()
-	{
-		return collecting_gen == aging_gen;
-	}
-
-	inline bool collecting_tenured_p()
-	{
-		return collecting_gen == tenured_gen;
-	}
-
-	inline bool collecting_accumulation_gen_p()
-	{
-		return ((collecting_aging_p() && !collecting_aging_again)
-			|| collecting_tenured_p());
-	}
 };
 
 VM_C_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *myvm);

@@ -10,19 +10,21 @@ CONSTANT: deck-bits 18
 : card-mark ( -- n ) HEX: 40 HEX: 80 bitor ; inline
 
 ! These constants must match vm/layouts.h
-: header-offset ( -- n ) object tag-number neg ; inline
+: slot-offset ( slot tag -- n ) [ bootstrap-cells ] dip - ; inline
+
+: header-offset ( -- n ) 0 object tag-number slot-offset ; inline
 : float-offset ( -- n ) 8 float tag-number - ; inline
-: string-offset ( -- n ) 4 bootstrap-cells string tag-number - ; inline
-: string-aux-offset ( -- n ) 2 bootstrap-cells string tag-number - ; inline
-: profile-count-offset ( -- n ) 8 bootstrap-cells \ word tag-number - ; inline
-: byte-array-offset ( -- n ) 2 bootstrap-cells byte-array tag-number - ; inline
-: alien-offset ( -- n ) 3 bootstrap-cells alien tag-number - ; inline
-: underlying-alien-offset ( -- n ) bootstrap-cell alien tag-number - ; inline
-: tuple-class-offset ( -- n ) bootstrap-cell tuple tag-number - ; inline
-: word-xt-offset ( -- n ) 10 bootstrap-cells \ word tag-number - ; inline
-: quot-xt-offset ( -- n ) 4 bootstrap-cells quotation tag-number - ; inline
-: word-code-offset ( -- n ) 11 bootstrap-cells \ word tag-number - ; inline
-: array-start-offset ( -- n ) 2 bootstrap-cells array tag-number - ; inline
+: string-offset ( -- n ) 4 string tag-number slot-offset ; inline
+: string-aux-offset ( -- n ) 2 string tag-number slot-offset ; inline
+: profile-count-offset ( -- n ) 8 \ word tag-number slot-offset ; inline
+: byte-array-offset ( -- n ) 2 byte-array tag-number slot-offset ; inline
+: alien-offset ( -- n ) 3 alien tag-number slot-offset ; inline
+: underlying-alien-offset ( -- n ) 1 alien tag-number slot-offset ; inline
+: tuple-class-offset ( -- n ) 1 tuple tag-number slot-offset ; inline
+: word-xt-offset ( -- n ) 10 \ word tag-number slot-offset ; inline
+: quot-xt-offset ( -- n ) 4 quotation tag-number slot-offset ; inline
+: word-code-offset ( -- n ) 11 \ word tag-number slot-offset ; inline
+: array-start-offset ( -- n ) 2 array tag-number slot-offset ; inline
 : compiled-header-size ( -- n ) 4 bootstrap-cells ; inline
 
 ! Relocation classes
