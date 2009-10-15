@@ -17,8 +17,9 @@ inline void factor_vm::set_array_nth(array *array, cell slot, cell value)
 	assert(array->h.hi_tag() == ARRAY_TYPE);
 	check_tagged_pointer(value);
 #endif
-	array->data()[slot] = value;
-	write_barrier(array);
+	cell *slot_ptr = &array->data()[slot];
+	*slot_ptr = value;
+	write_barrier(slot_ptr);
 }
 
 struct growable_array {
@@ -28,6 +29,7 @@ struct growable_array {
 	explicit growable_array(factor_vm *myvm, cell capacity = 10) : count(0), elements(myvm->allot_array(capacity,F),myvm) {}
 
 	void add(cell elt);
+	void append(array *elts);
 	void trim();
 };
 
