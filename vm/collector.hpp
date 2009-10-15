@@ -6,14 +6,16 @@ template<typename TargetGeneration, typename Policy> struct collector {
 	data_heap *data;
 	code_heap *code;
 	gc_state *current_gc;
+	generation_statistics *stats;
 	TargetGeneration *target;
 	Policy policy;
 
-	explicit collector(factor_vm *myvm_, TargetGeneration *target_, Policy policy_) :
+	explicit collector(factor_vm *myvm_, generation_statistics *stats_, TargetGeneration *target_, Policy policy_) :
 		myvm(myvm_),
 		data(myvm_->data),
 		code(myvm_->code),
 		current_gc(myvm_->current_gc),
+		stats(stats_),
 		target(target_),
 		policy(policy_) {}
 
@@ -74,7 +76,6 @@ template<typename TargetGeneration, typename Policy> struct collector {
 		memcpy(newpointer,untagged,size);
 		untagged->h.forward_to(newpointer);
 
-		generation_statistics *stats = &myvm->gc_stats.generations[current_gc->collecting_gen];
 		stats->object_count++;
 		stats->bytes_copied += size;
 

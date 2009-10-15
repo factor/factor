@@ -1,6 +1,8 @@
 namespace factor
 {
 
+struct growable_array;
+
 struct factor_vm
 {
 	// First five fields accessed directly by assembler. See vm.factor
@@ -240,8 +242,8 @@ struct factor_vm
 	void collect_full_impl(bool trace_contexts_p);
 	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p);
 	void collect_full(bool trace_contexts_p);
-	void record_gc_stats();
-	void garbage_collection(cell gen, bool growing_data_heap, bool trace_contexts_p, cell requested_bytes);
+	void record_gc_stats(generation_statistics *stats);
+	void garbage_collection(gc_op op, bool trace_contexts_p, cell requested_bytes);
 	void gc();
 	void primitive_gc();
 	void primitive_gc_stats();
@@ -249,6 +251,7 @@ struct factor_vm
 	void primitive_become();
 	void inline_gc(cell *gc_roots_base, cell gc_roots_size);
 	object *allot_object(header header, cell size);
+	void add_gc_stats(generation_statistics *stats, growable_array *result);
 	void primitive_clear_gc_stats();
 
 	template<typename Type> Type *allot(cell size)
@@ -259,7 +262,7 @@ struct factor_vm
 	inline void check_data_pointer(object *pointer)
 	{
 	#ifdef FACTOR_DEBUG
-		if(!(current_gc && current_gc->growing_data_heap))
+		if(!(current_gc && current_gc->op == collect_growing_heap_op))
 		{
 			assert((cell)pointer >= data->seg->start
 			       && (cell)pointer < data->seg->end);
@@ -298,7 +301,7 @@ struct factor_vm
 	void print_callstack();
 	void dump_cell(cell x);
 	void dump_memory(cell from, cell to);
-	void dump_zone(cell gen, zone *z);
+	void dump_zone(char *name, zone *z);
 	void dump_generations();
 	void dump_objects(cell type);
 	void find_data_references_step(cell *scan);

@@ -27,9 +27,4 @@ struct data_heap {
 	data_heap *grow(cell requested_size);
 };
 
-static const cell nursery_gen = 0;
-static const cell aging_gen = 1;
-static const cell tenured_gen = 2;
-static const cell gen_count = 3;
-
 }

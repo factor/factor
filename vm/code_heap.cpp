@@ -229,7 +229,7 @@ critical here */
 void factor_vm::compact_code_heap()
 {
 	/* Free all unreachable code blocks, don't trace contexts */
-	garbage_collection(tenured_gen,false,false,0);
+	garbage_collection(collect_full_op,false,0);
 
 	/* Figure out where the code heap blocks are going to end up */
 	cell size = code->compute_heap_forwarding();
