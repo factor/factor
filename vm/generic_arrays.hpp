@@ -45,13 +45,13 @@ template<typename Array> Array *factor_vm::reallot_array(Array *array_, cell cap
 		cell to_copy = array_capacity(array.untagged());
 		if(capacity < to_copy)
 			to_copy = capacity;
-			
+
 		Array *new_array = allot_array_internal<Array>(capacity);
-		
+
 		memcpy(new_array + 1,array.untagged() + 1,to_copy * Array::element_size);
 		memset((char *)(new_array + 1) + to_copy * Array::element_size,
 		       0,(capacity - to_copy) * Array::element_size);
-		
+
 		return new_array;
 	}
 }

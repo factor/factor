@@ -28,6 +28,10 @@ enum relocation_type {
 	RT_MEGAMORPHIC_CACHE_HITS,
 	/* address of vm object */
 	RT_VM,
+	/* value of vm->cards_offset */
+	RT_CARDS_OFFSET,
+	/* value of vm->decks_offset */
+	RT_DECKS_OFFSET,
 };
 
 enum relocation_class {

@@ -41,9 +41,9 @@ struct jit {
 
 	void emit_subprimitive(cell word_) {
 		gc_root<word> word(word_,parent_vm);
-		gc_root<array> code_template(word->subprimitive,parent_vm);
-		if(array_capacity(code_template.untagged()) > 1) literal(parent_vm->T);
-		emit(code_template.value());
+		gc_root<array> code_pair(word->subprimitive,parent_vm);
+		literals.append(parent_vm->untag<array>(array_nth(code_pair.untagged(),0)));
+		emit(array_nth(code_pair.untagged(),1));
 	}
 
 	void emit_class_lookup(fixnum index, cell type);

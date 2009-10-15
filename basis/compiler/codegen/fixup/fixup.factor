@@ -77,6 +77,15 @@ SYMBOL: relocation-table
 : rel-here ( offset class -- )
     [ add-literal ] dip rt-here rel-fixup ;
 
+: rel-vm ( offset class -- )
+    [ add-literal ] dip rt-vm rel-fixup ;
+
+: rel-cards-offset ( class -- )
+    rt-cards-offset rel-fixup ;
+
+: rel-decks-offset ( class -- )
+    rt-decks-offset rel-fixup ;
+
 ! And the rest
 : resolve-offset ( label-fixup -- offset )
     label>> offset>> [ "Unresolved label" throw ] unless* ;

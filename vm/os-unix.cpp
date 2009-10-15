@@ -211,7 +211,6 @@ void unix_init_signals()
 	misc_sigaction.sa_sigaction = misc_signal_handler;
 	misc_sigaction.sa_flags = SA_SIGINFO;
 
-	sigaction_safe(SIGABRT,&misc_sigaction,NULL);
 	sigaction_safe(SIGQUIT,&misc_sigaction,NULL);
 	sigaction_safe(SIGILL,&misc_sigaction,NULL);
 
