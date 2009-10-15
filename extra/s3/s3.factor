@@ -137,6 +137,10 @@ TUPLE: key name last-modified size ;
     sign-http-request 
     http-request 2drop ;
 
+: delete-object ( bucket key -- )
+    "/" prepend H{ } clone "DELETE" <s3-request>
+    dup s3-url <delete-request> sign-http-request http-request 2drop ;
+
 ! "testbucket" create-bucket
 ! "testbucket" delete-bucket
 ! buckets
