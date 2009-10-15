@@ -255,7 +255,7 @@ CONSTANT: rs-reg 14
 [
     3 ds-reg 0 LWZ
     ds-reg dup 4 SUBI
-    4 0 swap LOAD32 rc-absolute-ppc-2/2 rt-vm jit-rel
+    4 0 swap LOAD32 0 jit-literal rc-absolute-ppc-2/2 rt-vm jit-rel
     5 3 quot-xt-offset LWZ
     5 MTCTR
     BCTR
@@ -387,6 +387,7 @@ CONSTANT: rs-reg 14
 
 ! Comparisons
 : jit-compare ( insn -- )
+    t jit-literal
     0 3 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
     4 ds-reg 0 LWZ
     5 ds-reg -4 LWZU
