@@ -15,8 +15,8 @@ template<typename TargetGeneration, typename Policy>
 struct copying_collector : collector<TargetGeneration,Policy> {
 	cell scan;
 
-	explicit copying_collector(factor_vm *myvm_, TargetGeneration *target_, Policy policy_) :
-		collector<TargetGeneration,Policy>(myvm_,target_,policy_), scan(target_->here) {}
+	explicit copying_collector(factor_vm *myvm_, generation_statistics *stats_, TargetGeneration *target_, Policy policy_) :
+		collector<TargetGeneration,Policy>(myvm_,stats_,target_,policy_), scan(target_->here) {}
 
 	inline cell first_card_in_deck(cell deck)
 	{
@@ -26,11 +26,6 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 	inline cell last_card_in_deck(cell deck)
 	{
 		return first_card_in_deck(deck + 1);
-	}
-
-	inline cell card_to_addr(cell c)
-	{
-		return c << card_bits + this->data->start;
 	}
 
 	inline cell card_deck_for_address(cell a)
