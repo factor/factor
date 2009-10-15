@@ -2,6 +2,8 @@ namespace factor
 {
 
 struct data_heap {
+	cell start;
+
 	cell young_size;
 	cell aging_size;
 	cell tenured_size;
@@ -14,14 +16,15 @@ struct data_heap {
 	tenured_space *tenured;
 	tenured_space *tenured_semispace;
 
-	char *cards;
-	char *cards_end;
+	card *cards;
+	card *cards_end;
 
-	char *decks;
-	char *decks_end;
+	card_deck *decks;
+	card_deck *decks_end;
 	
-	explicit data_heap(factor_vm *myvm, cell young_size, cell aging_size, cell tenured_size);
+	explicit data_heap(cell young_size, cell aging_size, cell tenured_size);
 	~data_heap();
+	data_heap *grow(cell requested_size);
 };
 
 static const cell nursery_gen = 0;

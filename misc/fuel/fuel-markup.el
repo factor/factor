@@ -134,6 +134,7 @@
     ($strong . fuel-markup--strong)
     ($subheading . fuel-markup--subheading)
     ($subsection . fuel-markup--subsection)
+    ($subsections . fuel-markup--subsections)
     ($synopsis . fuel-markup--synopsis)
     ($syntax . fuel-markup--syntax)
     ($table . fuel-markup--table)
@@ -223,6 +224,13 @@
   (insert "  - ")
   (fuel-markup--link (cons '$link (cdr e)))
   (fuel-markup--maybe-nl))
+
+(defun fuel-markup--subsections (e)
+  (dolist (link (cdr e))
+    (fuel-markup--insert-nl-if-nb)
+    (insert "  - ")      
+    (fuel-markup--link (list '$link link))
+    (fuel-markup--maybe-nl)))
 
 (defun fuel-markup--vocab-subsection (e)
   (fuel-markup--insert-nl-if-nb)

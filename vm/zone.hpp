@@ -2,14 +2,13 @@ namespace factor
 {
 
 struct zone {
-	/* allocation pointer is 'here'; its offset is hardcoded in the
-	compiler backends */
-	cell start;
+	/* offset of 'here' and 'end' is hardcoded in compiler backends */
 	cell here;
-	cell size;
+	cell start;
 	cell end;
+	cell size;
 
-	zone(cell size_, cell start_) : start(start_), here(0), size(size_), end(start_ + size_) {}
+	zone(cell size_, cell start_) : here(0), start(start_), end(start_ + size_), size(size_) {}
 
 	inline bool contains_p(object *pointer)
 	{
