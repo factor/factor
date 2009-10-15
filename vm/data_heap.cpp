@@ -5,12 +5,11 @@ namespace factor
 
 void factor_vm::init_card_decks()
 {
-	cell start = align(data->seg->start,deck_size);
-	cards_offset = (cell)data->cards - (start >> card_bits);
-	decks_offset = (cell)data->decks - (start >> deck_bits);
+	cards_offset = (cell)data->cards - addr_to_card(data->start);
+	decks_offset = (cell)data->decks - addr_to_deck(data->start);
 }
 
-data_heap::data_heap(factor_vm *myvm, cell young_size_, cell aging_size_, cell tenured_size_)
+data_heap::data_heap(cell young_size_, cell aging_size_, cell tenured_size_)
 {
 	young_size_ = align(young_size_,deck_size);
 	aging_size_ = align(aging_size_,deck_size);
@@ -26,16 +25,16 @@ data_heap::data_heap(factor_vm *myvm, cell young_size_, cell aging_size_, cell t
 
 	seg = new segment(total_size);
 
-	cell cards_size = total_size >> card_bits;
+	cell cards_size = addr_to_card(total_size);
 
-	cards = new char[cards_size];
+	cards = new card[cards_size];
 	cards_end = cards + cards_size;
 
-	cell decks_size = total_size >> deck_bits;
-	decks = new char[decks_size];
+	cell decks_size = addr_to_deck(total_size);
+	decks = new card_deck[decks_size];
 	decks_end = decks + decks_size;
 
-	cell start = align(seg->start,deck_size);
+	start = align(seg->start,deck_size);
 
 	tenured = new tenured_space(tenured_size,start);
 	tenured_semispace = new tenured_space(tenured_size,tenured->end);
@@ -60,30 +59,24 @@ data_heap::~data_heap()
 	delete[] decks;
 }
 
-data_heap *factor_vm::grow_data_heap(data_heap *data, cell requested_bytes)
+data_heap *data_heap::grow(cell requested_bytes)
 {
-	cell new_tenured_size = (data->tenured_size * 2) + requested_bytes;
-
-	return new data_heap(this,
-		data->young_size,
-		data->aging_size,
-		new_tenured_size);
+	cell new_tenured_size = (tenured_size * 2) + requested_bytes;
+	return new data_heap(young_size,aging_size,new_tenured_size);
 }
 
 void factor_vm::clear_cards(old_space *gen)
 {
-	/* NOTE: reverse order due to heap layout. */
-	card *first_card = addr_to_card(gen->start);
-	card *last_card = addr_to_card(gen->end);
-	memset(first_card,0,last_card - first_card);
+	cell first_card = addr_to_card(gen->start - data->start);
+	cell last_card = addr_to_card(gen->end - data->start);
+	memset(&data->cards[first_card],0,last_card - first_card);
 }
 
 void factor_vm::clear_decks(old_space *gen)
 {
-	/* NOTE: reverse order due to heap layout. */
-	card_deck *first_deck = addr_to_deck(gen->start);
-	card_deck *last_deck = addr_to_deck(gen->end);
-	memset(first_deck,0,last_deck - first_deck);
+	cell first_deck = addr_to_deck(gen->start - data->start);
+	cell last_deck = addr_to_deck(gen->end - data->start);
+	memset(&data->decks[first_deck],0,last_deck - first_deck);
 }
 
 /* After garbage collection, any generations which are now empty need to have
@@ -110,7 +103,7 @@ void factor_vm::set_data_heap(data_heap *data_)
 
 void factor_vm::init_data_heap(cell young_size, cell aging_size, cell tenured_size, bool secure_gc_)
 {
-	set_data_heap(new data_heap(this,young_size,aging_size,tenured_size));
+	set_data_heap(new data_heap(young_size,aging_size,tenured_size));
 	secure_gc = secure_gc_;
 }
 

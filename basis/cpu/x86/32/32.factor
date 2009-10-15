@@ -50,7 +50,7 @@ M: x86.32 reserved-area-size 0 ;
 M: x86.32 %alien-invoke 0 CALL rc-relative rel-dlsym ;
 
 : push-vm-ptr ( -- )
-    0 PUSH rc-absolute-cell rt-vm rel-fixup ; ! push the vm ptr as an argument
+    0 PUSH 0 rc-absolute-cell rel-vm ; ! push the vm ptr as an argument
 
 M: x86.32 return-struct-in-registers? ( c-type -- ? )
     c-type
@@ -263,7 +263,7 @@ M: x86.32 %alien-callback ( quot -- )
     4 [
         EAX swap %load-reference
         EAX PUSH
-        param-reg-2 0 MOV rc-absolute-cell rt-vm rel-fixup 
+        param-reg-2 %mov-vm-ptr
         "c_to_factor" f %alien-invoke
     ] with-aligned-stack ;
 
@@ -348,7 +348,7 @@ M:: x86.32 %call-gc ( gc-root-count temp -- )
     temp gc-root-base param@ LEA
     12 [
         ! Pass the VM ptr as the third parameter
-        0 PUSH rc-absolute-cell rt-vm rel-fixup
+        push-vm-ptr
         ! Pass number of roots as second parameter
         gc-root-count PUSH 
         ! Pass pointer to start of GC roots as first parameter
