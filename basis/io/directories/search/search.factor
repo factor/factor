@@ -1,16 +1,16 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays continuations deques dlists fry
-io.directories io.files io.files.info io.pathnames kernel
-sequences system vocabs.loader locals math namespaces
-sorting assocs calendar threads io math.parser unicode.case ;
+USING: accessors arrays assocs continuations deques dlists fry
+io.backend io.directories io.files.info io.pathnames kernel
+locals math sequences sorting system unicode.case vocabs.loader ;
 IN: io.directories.search
 
 : qualified-directory-entries ( path -- seq )
-    dup directory-entries
-    [ [ append-path ] change-name ] with map ;
+    normalize-path
+    dup directory-entries [ [ append-path ] change-name ] with map ;
 
 : qualified-directory-files ( path -- seq )
+    normalize-path
     dup directory-files [ append-path ] with map ;
 
 : with-qualified-directory-files ( path quot -- )
