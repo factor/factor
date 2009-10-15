@@ -3,7 +3,7 @@
 USING: help.syntax help.markup cpu.8080.emulator ;
 IN: space-invaders 
 
-HELP: run 
+HELP: run-invaders
 { $description 
 "Run the Space Invaders emulator in a new window." $nl
 { $link rom-root } " must be set to the directory containing the "
@@ -24,7 +24,7 @@ ARTICLE: { "space-invaders" "space-invaders" } "Space Invaders Emulator"
   "invaders/invaders.h"
 }
 "These are the same ROM files as used by MAME. To run the game use the " 
-{ $link run } " word." $nl
+{ $link run-invaders } " word." $nl
 "Keys:" 
 { $table
   { "Backspace" "Insert Coin" }

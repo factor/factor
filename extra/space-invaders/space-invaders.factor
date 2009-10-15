@@ -12,6 +12,7 @@ USING:
     cpu.8080 
     cpu.8080.emulator
     io.files
+    io.pathnames
     kernel 
     math
     openal
@@ -66,7 +67,7 @@ CONSTANT: SOUND-WALK4        7
 CONSTANT: SOUND-UFO-HIT      8 
 
 : init-sound ( index cpu filename  -- )
-  swapd [ sounds>> nth AL_BUFFER ] dip
+  canonicalize-path swapd [ sounds>> nth AL_BUFFER ] dip
   create-buffer-from-wav set-source-param ; 
 
 : init-sounds ( cpu -- )
@@ -76,7 +77,7 @@ CONSTANT: SOUND-UFO-HIT      8
   [ SOUND-UFO         "resource:extra/space-invaders/resources/Ufo.wav" init-sound ] keep 
   [ sounds>> SOUND-UFO swap nth AL_LOOPING AL_TRUE set-source-param ] keep
   [ SOUND-BASE-HIT    "resource:extra/space-invaders/resources/BaseHit.wav" init-sound ] keep 
-  [ SOUND-INVADER-HIT "resource:extra/space-invaders/resources/InvHit.wav" init-sound ] keep 
+  [ SOUND-INVADER-HIT "resource:extra/space-invaders/resources/InvHit.Wav" init-sound ] keep 
   [ SOUND-WALK1       "resource:extra/space-invaders/resources/Walk1.wav" init-sound ] keep 
   [ SOUND-WALK2       "resource:extra/space-invaders/resources/Walk2.wav" init-sound ] keep 
   [ SOUND-WALK3       "resource:extra/space-invaders/resources/Walk3.wav" init-sound ] keep 
@@ -84,11 +85,13 @@ CONSTANT: SOUND-UFO-HIT      8
   [ SOUND-UFO-HIT    "resource:extra/space-invaders/resources/UfoHit.wav" init-sound ] keep
   f swap (>>looping?) ;
 
-: <space-invaders> ( -- cpu )
-  space-invaders new 
+: cpu-init ( cpu -- cpu )
   make-opengl-bitmap over (>>bitmap)
   [ init-sounds ] keep
   [ reset ] keep ;
+
+: <space-invaders> ( -- cpu )
+  space-invaders new cpu-init ;
 
 : play-invaders-sound ( cpu sound -- )
   swap sounds>> nth source-play ;
@@ -395,9 +398,9 @@ CONSTANT: rom-info {
       { HEX: 1800 "invaders/invaders.e" }
    }
 
-: run ( -- )  
+: run-invaders ( -- )  
   [
     "Space Invaders" <space-invaders> rom-info (run)
   ] with-ui ;
 
-MAIN: run
+MAIN: run-invaders
