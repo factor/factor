@@ -67,86 +67,6 @@ void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 	code->build_free_list(h->code_size);
 }
 
-/* Save the current image to disk */
-bool factor_vm::save_image(const vm_char *filename)
-{
-	FILE* file;
-	image_header h;
-
-	file = OPEN_WRITE(filename);
-	if(file == NULL)
-	{
-		print_string("Cannot open image file: "); print_native_string(filename); nl();
-		print_string(strerror(errno)); nl();
-		return false;
-	}
-
-	h.magic = image_magic;
-	h.version = image_version;
-	h.data_relocation_base = data->tenured->start;
-	h.data_size = data->tenured->here - data->tenured->start;
-	h.code_relocation_base = code->seg->start;
-	h.code_size = code->heap_size();
-
-	h.t = T;
-	h.bignum_zero = bignum_zero;
-	h.bignum_pos_one = bignum_pos_one;
-	h.bignum_neg_one = bignum_neg_one;
-
-	for(cell i = 0; i < USER_ENV; i++)
-		h.userenv[i] = (save_env_p(i) ? userenv[i] : F);
-
-	bool ok = true;
-
-	if(fwrite(&h,sizeof(image_header),1,file) != 1) ok = false;
-	if(fwrite((void*)data->tenured->start,h.data_size,1,file) != 1) ok = false;
-	if(fwrite(code->first_block(),h.code_size,1,file) != 1) ok = false;
-	if(fclose(file)) ok = false;
-
-	if(!ok)
-	{
-		print_string("save-image failed: "); print_string(strerror(errno)); nl();
-	}
-
-	return ok;
-}
-
-void factor_vm::primitive_save_image()
-{
-	/* do a full GC to push everything into tenured space */
-	primitive_compact_gc();
-
-	gc_root<byte_array> path(dpop(),this);
-	path.untag_check(this);
-	save_image((vm_char *)(path.untagged() + 1));
-}
-
-void factor_vm::primitive_save_image_and_exit()
-{
-	/* We unbox this before doing anything else. This is the only point
-	where we might throw an error, so we have to throw an error here since
-	later steps destroy the current image. */
-	gc_root<byte_array> path(dpop(),this);
-	path.untag_check(this);
-
-	/* strip out userenv data which is set on startup anyway */
-	for(cell i = 0; i < USER_ENV; i++)
-	{
-		if(!save_env_p(i)) userenv[i] = F;
-	}
-
-	gc(collect_full_op,
-		0, /* requested size */
-		false, /* discard objects only reachable from stacks */
-		true /* compact the code heap */);
-
-	/* Save the image */
-	if(save_image((vm_char *)(path.untagged() + 1)))
-		exit(0);
-	else
-		exit(1);
-}
-
 void factor_vm::data_fixup(cell *handle, cell data_relocation_base)
 {
 	if(immediate_p(*handle))
@@ -351,6 +271,86 @@ void factor_vm::load_image(vm_parameters *p)
 
 	/* Store image path name */
 	userenv[IMAGE_ENV] = allot_alien(F,(cell)p->image_path);
+}
+
+/* Save the current image to disk */
+bool factor_vm::save_image(const vm_char *filename)
+{
+	FILE* file;
+	image_header h;
+
+	file = OPEN_WRITE(filename);
+	if(file == NULL)
+	{
+		print_string("Cannot open image file: "); print_native_string(filename); nl();
+		print_string(strerror(errno)); nl();
+		return false;
+	}
+
+	h.magic = image_magic;
+	h.version = image_version;
+	h.data_relocation_base = data->tenured->start;
+	h.data_size = data->tenured->here - data->tenured->start;
+	h.code_relocation_base = code->seg->start;
+	h.code_size = code->heap_size();
+
+	h.t = T;
+	h.bignum_zero = bignum_zero;
+	h.bignum_pos_one = bignum_pos_one;
+	h.bignum_neg_one = bignum_neg_one;
+
+	for(cell i = 0; i < USER_ENV; i++)
+		h.userenv[i] = (save_env_p(i) ? userenv[i] : F);
+
+	bool ok = true;
+
+	if(fwrite(&h,sizeof(image_header),1,file) != 1) ok = false;
+	if(fwrite((void*)data->tenured->start,h.data_size,1,file) != 1) ok = false;
+	if(fwrite(code->first_block(),h.code_size,1,file) != 1) ok = false;
+	if(fclose(file)) ok = false;
+
+	if(!ok)
+	{
+		print_string("save-image failed: "); print_string(strerror(errno)); nl();
+	}
+
+	return ok;
+}
+
+void factor_vm::primitive_save_image()
+{
+	/* do a full GC to push everything into tenured space */
+	primitive_compact_gc();
+
+	gc_root<byte_array> path(dpop(),this);
+	path.untag_check(this);
+	save_image((vm_char *)(path.untagged() + 1));
+}
+
+void factor_vm::primitive_save_image_and_exit()
+{
+	/* We unbox this before doing anything else. This is the only point
+	where we might throw an error, so we have to throw an error here since
+	later steps destroy the current image. */
+	gc_root<byte_array> path(dpop(),this);
+	path.untag_check(this);
+
+	/* strip out userenv data which is set on startup anyway */
+	for(cell i = 0; i < USER_ENV; i++)
+	{
+		if(!save_env_p(i)) userenv[i] = F;
+	}
+
+	gc(collect_full_op,
+		0, /* requested size */
+		false, /* discard objects only reachable from stacks */
+		true /* compact the code heap */);
+
+	/* Save the image */
+	if(save_image((vm_char *)(path.untagged() + 1)))
+		exit(0);
+	else
+		exit(1);
 }
 
 }
