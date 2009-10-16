@@ -15,7 +15,7 @@ struct callback_heap {
 	explicit callback_heap(cell size, factor_vm *myvm);
 	~callback_heap();
 
-	callback *callback_heap::add(code_block *compiled);
+	callback *add(code_block *compiled);
 	void update(callback *stub);
 
 	callback *next(callback *stub)
