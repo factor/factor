@@ -1,22 +1,41 @@
-USING: kernel cpu.8080 cpu.8080.emulator math math io
-tools.time combinators sequences io.files io.encodings.ascii ;
+USING: 
+    accessors
+    combinators
+    cpu.8080
+    cpu.8080.emulator
+    io
+    io.files
+    io.encodings.ascii
+    kernel 
+    math
+    math.bits
+    sequences
+    tools.time
+;
 IN: cpu.8080.test
 
 : step ( cpu -- )
   #! Run a single 8080 instruction
   [ read-instruction ] keep ! n cpu
   over get-cycles over inc-cycles
-  [ swap instructions case ] keep
-  [ cpu-pc HEX: FFFF bitand ] keep 
-  [ set-cpu-pc ] keep 
+  [ swap instructions nth call( cpu -- ) ] keep
+  [ pc>> HEX: FFFF bitand ] keep 
+  [ (>>pc) ] keep 
   process-interrupts ;
-
 
 : test-step ( cpu -- cpu )
   [ step ] keep dup cpu. ;
 
+: invaders ( -- seq )
+  {
+    { HEX: 0000 "invaders/invaders.h" }
+    { HEX: 0800 "invaders/invaders.g" }
+    { HEX: 1000 "invaders/invaders.f" }
+    { HEX: 1800 "invaders/invaders.e" }
+  } ;
+
 : test-cpu ( -- cpu )
-  <cpu> "invaders.rom" over load-rom dup cpu. ;
+  <cpu> invaders over load-rom* dup cpu. ;
 
 : test-n ( n -- )
   test-cpu swap [ test-step ] times drop ;
@@ -25,7 +44,7 @@ IN: cpu.8080.test
   [ dup step ] times ;
 
 : each-8bit ( n quot -- )
-  8 -rot [ >r bit? r> call ] 2curry each ; inline
+  [ 8 <bits> ] dip each ; inline
 
 : >ppm ( cpu filename -- cpu )
   #! Dump the current screen image to a ppm image file with the given name.
@@ -36,8 +55,8 @@ IN: cpu.8080.test
     224 [
       32 [
         over 32 * over +  HEX: 2400 + ! cpu h w addr
-        >r pick r> swap cpu-ram nth [
-          0 = [
+        [ pick ] dip swap ram>> nth [
+          [
             " 0 0 0" write
           ] [
             " 1 1 1" write
