@@ -83,7 +83,7 @@ M: string resolve-pointer-type
 
 : parse-array-type ( name -- dims c-type )
     "[" split unclip
-    [ [ "]" ?tail drop string>number ] map ] dip ;
+    [ [ "]" ?tail drop parse-word ] map ] dip ;
 
 M: string c-type ( name -- c-type )
     CHAR: ] over member? [
