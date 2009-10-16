@@ -2,6 +2,7 @@
 USING: accessors alien alien.c-types alien.data alien.parser arrays
 byte-arrays combinators effects.parser fry generalizations kernel
 lexer locals macros make math math.ranges parser sequences sequences.private ;
+FROM: alien.arrays => array-length ;
 IN: alien.data.map
 
 ERROR: bad-data-map-input-length byte-length iter-size remainder ;
@@ -36,7 +37,7 @@ M: data-map-param nth-unsafe
 INSTANCE: data-map-param immutable-sequence
 
 : c-type-count ( in/out -- c-type count iter-length )
-    dup array? [ unclip swap product >fixnum ] [ 1 ] if
+    dup array? [ unclip swap array-length >fixnum ] [ 1 ] if
     2dup swap heap-size * >fixnum ; inline
 
 MACRO: >param ( in -- quot: ( array -- param ) )
