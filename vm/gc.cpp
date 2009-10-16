@@ -7,7 +7,7 @@ gc_state::gc_state(gc_op op_) : op(op_), start_time(current_micros()) {}
 
 gc_state::~gc_state() {}
 
-void factor_vm::update_dirty_code_blocks(std::set<code_block *> *remembered_set)
+void factor_vm::update_code_heap_for_minor_gc(std::set<code_block *> *remembered_set)
 {
 	/* The youngest generation that any code block can now reference */
 	std::set<code_block *>::const_iterator iter = remembered_set->begin();

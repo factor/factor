@@ -234,11 +234,11 @@ struct factor_vm
 	}
 
 	// gc
-	void update_dirty_code_blocks(std::set<code_block *> *remembered_set);
+	void update_code_heap_for_minor_gc(std::set<code_block *> *remembered_set);
 	void collect_nursery();
 	void collect_aging();
 	void collect_to_tenured();
-	void free_unmarked_code_blocks(bool growing_data_heap);
+	void update_code_heap_for_full_gc(bool growing_data_heap);
 	void collect_full_impl(bool trace_contexts_p);
 	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p);
 	void collect_full(bool trace_contexts_p);
@@ -479,6 +479,7 @@ struct factor_vm
 	void update_literal_references(code_block *compiled);
 	void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled);
 	void update_word_references(code_block *compiled);
+	void update_code_block_for_full_gc(code_block *compiled);
 	void check_code_address(cell address);
 	void relocate_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
