@@ -31,9 +31,8 @@ HELP: dlopen ( path -- dll )
 { $notes "This is the low-level facility used to implement " { $link load-library } ". Use the latter instead." } ;
 
 HELP: dlsym ( name dll -- alien )
-{ $values { "name" "a C symbol name" } { "dll" "a DLL handle" } { "alien" "an alien pointer" } }
-{ $description "Looks up a symbol in a native library. If " { $snippet "dll" } " is " { $link f } " looks for the symbol in the runtime executable." }
-{ $errors "Throws an error if the symbol could not be found." } ;
+{ $values { "name" "a C symbol name" } { "dll" "a DLL handle" } { "alien" { $maybe alien } } }
+{ $description "Looks up a symbol in a native library. If " { $snippet "dll" } " is " { $link f } " looks for the symbol in the runtime executable. If the symbol was not found, outputs " { $link f } "." } ;
 
 HELP: dlclose ( dll -- )
 { $values { "dll" "a DLL handle" } }
