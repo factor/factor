@@ -110,7 +110,7 @@ struct factor_vm
 	void primitive_set_retainstack();
 	void primitive_check_datastack();
 
-	template<typename Iterator> void factor_vm::iterate_active_frames(Iterator &iter)
+	template<typename Iterator> void iterate_active_frames(Iterator &iter)
 	{
 		context *ctx = this->ctx;
 
@@ -537,8 +537,8 @@ struct factor_vm
 	}
 
 	//callbacks
-	void factor_vm::init_callbacks(cell size);
-	void factor_vm::primitive_callback();
+	void init_callbacks(cell size);
+	void primitive_callback();
 
 	//image
 	void init_objects(image_header *h);
