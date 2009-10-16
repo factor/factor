@@ -32,7 +32,7 @@ M: x86.64 %mark-card
     0 MOV rc-absolute-cell rel-decks-offset ;
 
 M: x86.64 %mark-deck
-    dup load-cards-offset
+    dup load-decks-offset
     [+] card-mark <byte> MOV ;
 
 M:: x86.64 %dispatch ( src temp -- )
