@@ -40,12 +40,13 @@ SYMBOL: auto-use?
     [ <no-word-error> throw-restarts no-word-restarted ]
     if ;
 
+: parse-word ( string -- word/number )
+    dup search [ ] [
+        dup string>number [ ] [ no-word ] ?if
+    ] ?if ;
+
 : scan-word ( -- word/number/f )
-    scan dup [
-        dup search [ ] [
-            dup string>number [ ] [ no-word ] ?if
-        ] ?if
-    ] when ;
+    scan dup [ parse-word ] when ;
 
 ERROR: staging-violation word ;
 
