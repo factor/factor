@@ -15,13 +15,13 @@ void critical_error(const char *msg, cell tagged)
 	print_string("You have triggered a bug in Factor. Please report.\n");
 	print_string("critical_error: "); print_string(msg);
 	print_string(": "); print_cell_hex(tagged); nl();
-	SIGNAL_VM_PTR()->factorbug();
+	tls_vm()->factorbug();
 }
 
 void out_of_memory()
 {
 	print_string("Out of memory\n\n");
-	SIGNAL_VM_PTR()->dump_generations();
+	tls_vm()->dump_generations();
 	exit(1);
 }
 
@@ -49,12 +49,9 @@ void factor_vm::throw_error(cell error, stack_frame *callstack_top)
 		actual stack pointer at the time, since the saved pointer is
 		not necessarily up to date at that point. */
 		if(callstack_top)
-		{
-			callstack_top = fix_callstack_top(callstack_top,
-				stack_chain->callstack_bottom);
-		}
+			callstack_top = fix_callstack_top(callstack_top,ctx->callstack_bottom);
 		else
-			callstack_top = stack_chain->callstack_top;
+			callstack_top = ctx->callstack_top;
 
 		throw_impl(userenv[BREAK_ENV],callstack_top,this);
 	}
@@ -130,7 +127,7 @@ void factor_vm::fp_trap_error(unsigned int fpu_status, stack_frame *signal_calls
 
 void factor_vm::primitive_call_clear()
 {
-	throw_impl(dpop(),stack_chain->callstack_bottom,this);
+	throw_impl(dpop(),ctx->callstack_bottom,this);
 }
 
 /* For testing purposes */
@@ -146,7 +143,7 @@ void factor_vm::memory_signal_handler_impl()
 
 void memory_signal_handler_impl()
 {
-	SIGNAL_VM_PTR()->memory_signal_handler_impl();
+	tls_vm()->memory_signal_handler_impl();
 }
 
 void factor_vm::misc_signal_handler_impl()
@@ -156,7 +153,7 @@ void factor_vm::misc_signal_handler_impl()
 
 void misc_signal_handler_impl()
 {
-	SIGNAL_VM_PTR()->misc_signal_handler_impl();
+	tls_vm()->misc_signal_handler_impl();
 }
 
 void factor_vm::fp_signal_handler_impl()
@@ -166,7 +163,7 @@ void factor_vm::fp_signal_handler_impl()
 
 void fp_signal_handler_impl()
 {
-	SIGNAL_VM_PTR()->fp_signal_handler_impl();
+	tls_vm()->fp_signal_handler_impl();
 }
 
 }

@@ -495,7 +495,11 @@ M: bad-executable summary
 
 \ (exists?) { string } { object } define-primitive
 
+\ minor-gc { } { } define-primitive
+
 \ gc { } { } define-primitive
+
+\ compact-gc { } { } define-primitive
 
 \ gc-stats { } { array } define-primitive
 
@@ -711,3 +715,7 @@ M: bad-executable summary
 \ inline-cache-stats { } { array } define-primitive
 
 \ optimized? { word } { object } define-primitive
+
+\ strip-stack-traces { } { } define-primitive
+
+\ <callback> { word } { alien } define-primitive

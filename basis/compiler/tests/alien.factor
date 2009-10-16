@@ -355,16 +355,12 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
     "testing" callback-5 callback_test_1
 ] unit-test
 
-: callback-5a ( -- callback )
-    "void" { } "cdecl" [ 8000000 f <array> drop ] alien-callback ;
+: callback-5b ( -- callback )
+    "void" { } "cdecl" [ compact-gc ] alien-callback ;
 
-! Hack; if we're on ARM, we probably don't have much RAM, so
-! skip this test.
-! cpu "arm" = [
-!     [ "testing" ] [
-!         "testing" callback-5a callback_test_1
-!     ] unit-test
-! ] unless
+[ "testing" ] [
+    "testing" callback-5b callback_test_1
+] unit-test
 
 : callback-6 ( -- callback )
     "void" { } "cdecl" [ [ continue ] callcc0 ] alien-callback ;
@@ -593,3 +589,4 @@ FUNCTION: short ffi_test_48 ( bool-field-test x ) ;
 FUNCTION: void this_does_not_exist ( ) ;
 
 [ this_does_not_exist ] [ { "kernel-error" 10 f f } = ] must-fail-with
+

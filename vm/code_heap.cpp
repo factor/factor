@@ -3,12 +3,18 @@
 namespace factor
 {
 
-code_heap::code_heap(bool secure_gc, cell size) : heap(secure_gc,size) {}
+code_heap::code_heap(bool secure_gc, cell size) : heap(secure_gc,size,true) {}
 
 void code_heap::write_barrier(code_block *compiled)
 {
 	points_to_nursery.insert(compiled);
 	points_to_aging.insert(compiled);
+}
+
+void code_heap::clear_remembered_set()
+{
+	points_to_nursery.clear();
+	points_to_aging.clear();
 }
 
 bool code_heap::needs_fixup_p(code_block *compiled)
@@ -131,22 +137,24 @@ void factor_vm::primitive_code_room()
 	dpush(tag_fixnum(max_free / 1024));
 }
 
-code_block *factor_vm::forward_xt(code_block *compiled)
+code_block *code_heap::forward_code_block(code_block *compiled)
 {
-	return (code_block *)code->forwarding[compiled];
+	return (code_block *)forwarding[compiled];
 }
 
-struct xt_forwarder {
+struct callframe_forwarder {
 	factor_vm *myvm;
 
-	explicit xt_forwarder(factor_vm *myvm_) : myvm(myvm_) {}
+	explicit callframe_forwarder(factor_vm *myvm_) : myvm(myvm_) {}
 
 	void operator()(stack_frame *frame)
 	{
-		cell offset = (cell)FRAME_RETURN_ADDRESS(frame,myvm) - (cell)myvm->frame_code(frame);
-		code_block *forwarded = myvm->forward_xt(myvm->frame_code(frame));
+		cell offset = (cell)FRAME_RETURN_ADDRESS(frame,myvm) - (cell)frame->xt;
+
+		code_block *forwarded = myvm->code->forward_code_block(myvm->frame_code(frame));
 		frame->xt = forwarded->xt();
-		FRAME_RETURN_ADDRESS(frame,myvm) = (void *)((cell)forwarded + offset);
+
+		FRAME_RETURN_ADDRESS(frame,myvm) = (void *)((cell)frame->xt + offset);
 	}
 };
 
@@ -165,9 +173,11 @@ void factor_vm::forward_object_xts()
 				word *w = untag<word>(obj);
 
 				if(w->code)
-					w->code = forward_xt(w->code);
+					w->code = code->forward_code_block(w->code);
 				if(w->profiling)
-					w->profiling = forward_xt(w->profiling);
+					w->profiling = code->forward_code_block(w->profiling);
+
+				update_word_xt(obj);
 			}
 			break;
 		case QUOTATION_TYPE:
@@ -175,13 +185,16 @@ void factor_vm::forward_object_xts()
 				quotation *quot = untag<quotation>(obj);
 
 				if(quot->code)
-					quot->code = forward_xt(quot->code);
+				{
+					quot->code = code->forward_code_block(quot->code);
+					set_quot_xt(quot,quot->code);
+				}
 			}
 			break;
 		case CALLSTACK_TYPE:
 			{
 				callstack *stack = untag<callstack>(obj);
-				xt_forwarder forwarder(this);
+				callframe_forwarder forwarder(this);
 				iterate_callstack_object(stack,forwarder);
 			}
 			break;
@@ -193,59 +206,44 @@ void factor_vm::forward_object_xts()
 	end_scan();
 }
 
-/* Set the XT fields now that the heap has been compacted */
-void factor_vm::fixup_object_xts()
+void factor_vm::forward_context_xts()
 {
-	begin_scan();
-
-	cell obj;
-
-	while((obj = next_object()) != F)
-	{
-		switch(tagged<object>(obj).type())
-		{
-		case WORD_TYPE:
-			update_word_xt(obj);
-			break;
-		case QUOTATION_TYPE:
-			{
-				quotation *quot = untag<quotation>(obj);
-				if(quot->code)
-					set_quot_xt(quot,quot->code);
-				break;
-			}
-		default:
-			break;
-		}
-	}
-
-	end_scan();
+	callframe_forwarder forwarder(this);
+	iterate_active_frames(forwarder);
 }
 
-/* Move all free space to the end of the code heap. This is not very efficient,
-since it makes several passes over the code and data heaps, but we only ever
-do this before saving a deployed image and exiting, so performaance is not
-critical here */
-void factor_vm::compact_code_heap()
+struct callback_forwarder {
+	code_heap *code;
+	callback_heap *callbacks;
+
+	callback_forwarder(code_heap *code_, callback_heap *callbacks_) :
+		code(code_), callbacks(callbacks_) {}
+
+	void operator()(callback *stub)
+	{
+		stub->compiled = code->forward_code_block(stub->compiled);
+		callbacks->update(stub);
+	}
+};
+
+void factor_vm::forward_callback_xts()
 {
-	/* Free all unreachable code blocks, don't trace contexts */
-	garbage_collection(collect_full_op,false,0);
+	callback_forwarder forwarder(code,callbacks);
+	callbacks->iterate(forwarder);
+}
 
-	/* Figure out where the code heap blocks are going to end up */
-	cell size = code->compute_heap_forwarding();
-
-	/* Update word and quotation code pointers */
-	forward_object_xts();
-
-	/* Actually perform the compaction */
+/* Move all free space to the end of the code heap. Live blocks must be marked
+on entry to this function. XTs in code blocks must be updated after this
+function returns. */
+void factor_vm::compact_code_heap(bool trace_contexts_p)
+{
 	code->compact_heap();
-
-	/* Update word and quotation XTs */
-	fixup_object_xts();
-
-	/* Now update the free list; there will be a single free block at
-	the end */
-	code->build_free_list(size);
+	forward_object_xts();
+	if(trace_contexts_p)
+	{
+		forward_context_xts();
+		forward_callback_xts();
+	}
 }
 
 struct stack_trace_stripper {

@@ -283,9 +283,7 @@ void quotation_jit::iterate_quotation()
 
 void factor_vm::set_quot_xt(quotation *quot, code_block *code)
 {
-	if(code->type() != QUOTATION_TYPE)
-		critical_error("Bad param to set_quot_xt",(cell)code);
-
+	assert(code->type() == QUOTATION_TYPE);
 	quot->code = code;
 	quot->xt = code->xt();
 }
@@ -364,15 +362,14 @@ fixnum factor_vm::quot_code_offset_to_scan(cell quot_, cell offset)
 cell factor_vm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
 {
 	gc_root<quotation> quot(quot_,this);
-	stack_chain->callstack_top = stack;
+	ctx->callstack_top = stack;
 	jit_compile(quot.value(),true);
 	return quot.value();
 }
 
 VM_ASM_API cell lazy_jit_compile_impl(cell quot_, stack_frame *stack, factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->lazy_jit_compile_impl(quot_,stack);
+	return myvm->lazy_jit_compile_impl(quot_,stack);
 }
 
 void factor_vm::primitive_quot_compiled_p()
