@@ -123,23 +123,6 @@ struct after_full_updater {
 	}
 };
 
-void factor_vm::update_code_heap_for_full_gc(bool growing_data_heap)
-{
-	if(growing_data_heap)
-	{
-		after_growing_heap_updater updater(this);
-		code->free_unmarked(updater);
-	}
-	else
-	{
-		after_full_updater updater(this);
-		code->free_unmarked(updater);
-	}
-
-	code->points_to_nursery.clear();
-	code->points_to_aging.clear();
-}
-
 void factor_vm::collect_full_impl(bool trace_contexts_p)
 {
 	full_collector collector(this);
@@ -159,19 +142,27 @@ void factor_vm::collect_full_impl(bool trace_contexts_p)
 
 void factor_vm::collect_growing_heap(cell requested_bytes, bool trace_contexts_p)
 {
+	/* Grow the data heap and copy all live objects to the new heap. */
 	data_heap *old = data;
 	set_data_heap(data->grow(requested_bytes));
 	collect_full_impl(trace_contexts_p);
-	update_code_heap_for_full_gc(true);
 	delete old;
+
+	after_growing_heap_updater updater(this);
+	code->free_unmarked(updater);
+	code->clear_remembered_set();
 }
 
 void factor_vm::collect_full(bool trace_contexts_p)
 {
+	/* Copy all live objects to the tenured semispace. */
 	std::swap(data->tenured,data->tenured_semispace);
 	reset_generation(data->tenured);
 	collect_full_impl(trace_contexts_p);
-	update_code_heap_for_full_gc(false);
+
+	after_full_updater updater(this);
+	code->free_unmarked(updater);
+	code->clear_remembered_set();
 }
 
 }

@@ -238,7 +238,6 @@ struct factor_vm
 	void collect_nursery();
 	void collect_aging();
 	void collect_to_tenured();
-	void update_code_heap_for_full_gc(bool growing_data_heap);
 	void collect_full_impl(bool trace_contexts_p);
 	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p);
 	void collect_full(bool trace_contexts_p);
