@@ -239,12 +239,13 @@ struct factor_vm
 	void collect_aging();
 	void collect_to_tenured();
 	void collect_full_impl(bool trace_contexts_p);
-	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p);
-	void collect_full(bool trace_contexts_p);
+	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p, bool compact_code_heap_p);
+	void collect_full(bool trace_contexts_p, bool compact_code_heap_p);
 	void record_gc_stats(generation_statistics *stats);
-	void garbage_collection(gc_op op, bool trace_contexts_p, cell requested_bytes);
-	void gc();
-	void primitive_gc();
+	void gc(gc_op op, cell requested_bytes, bool trace_contexts_p, bool compact_code_heap_p);
+	void primitive_full_gc();
+	void primitive_minor_gc();
+	void primitive_compact_gc();
 	void primitive_gc_stats();
 	void clear_gc_stats();
 	void primitive_become();
@@ -499,10 +500,9 @@ struct factor_vm
 	void update_code_heap_words();
 	void primitive_modify_code_heap();
 	void primitive_code_room();
-	code_block *forward_xt(code_block *compiled);
 	void forward_object_xts();
-	void fixup_object_xts();
-	void compact_code_heap();
+	void forward_context_xts();
+	void compact_code_heap(bool trace_contexts_p);
 	void primitive_strip_stack_traces();
 
 	/* Apply a function to every code block */
@@ -557,7 +557,7 @@ struct factor_vm
 	void primitive_innermost_stack_frame_scan();
 	void primitive_set_innermost_stack_frame_quot();
 	void save_callstack_bottom(stack_frame *callstack_bottom);
-	template<typename Iterator> void iterate_callstack(cell top, cell bottom, Iterator &iterator);
+	template<typename Iterator> void iterate_callstack(context *ctx, Iterator &iterator);
 
 	/* Every object has a regular representation in the runtime, which makes GC
 	much simpler. Every slot of the object until binary_payload_start is a pointer
