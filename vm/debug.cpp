@@ -296,7 +296,7 @@ void factor_vm::dump_code_heap()
 		const char *status;
 		if(scan->type() == FREE_BLOCK_TYPE)
 			status = "free";
-		else if(scan->marked_p())
+		else if(code->state->is_marked_p(scan))
 		{
 			reloc_size += object_size(((code_block *)scan)->relocation);
 			literal_size += object_size(((code_block *)scan)->literals);

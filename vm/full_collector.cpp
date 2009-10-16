@@ -134,6 +134,8 @@ void factor_vm::collect_full_impl(bool trace_contexts_p)
 {
 	full_collector collector(this);
 
+	code->state->clear_mark_bits();
+
 	collector.trace_roots();
         if(trace_contexts_p)
 	{
@@ -148,16 +150,6 @@ void factor_vm::collect_full_impl(bool trace_contexts_p)
 	nursery.here = nursery.start;
 }
 
-/* In both cases, compact code heap before updating code blocks so that
-XTs are correct after */
-
-void factor_vm::big_code_heap_update()
-{
-	big_code_heap_updater updater(this);
-	code->free_unmarked(updater);
-	code->clear_remembered_set();
-}
-
 void factor_vm::collect_growing_heap(cell requested_bytes,
 	bool trace_contexts_p,
 	bool compact_code_heap_p)
@@ -168,15 +160,18 @@ void factor_vm::collect_growing_heap(cell requested_bytes,
 	collect_full_impl(trace_contexts_p);
 	delete old;
 
-	if(compact_code_heap_p) compact_code_heap(trace_contexts_p);
+	if(compact_code_heap_p)
+	{
+		compact_code_heap(trace_contexts_p);
+		big_code_heap_updater updater(this);
+		iterate_code_heap(updater);
+	}
+	else
+	{
+		big_code_heap_updater updater(this);
+		code->free_unmarked(updater);
+	}
 
-	big_code_heap_update();
-}
-
-void factor_vm::small_code_heap_update()
-{
-	small_code_heap_updater updater(this);
-	code->free_unmarked(updater);
 	code->clear_remembered_set();
 }
 
@@ -190,10 +185,16 @@ void factor_vm::collect_full(bool trace_contexts_p, bool compact_code_heap_p)
 	if(compact_code_heap_p)
 	{
 		compact_code_heap(trace_contexts_p);
-		big_code_heap_update();
+		big_code_heap_updater updater(this);
+		iterate_code_heap(updater);
 	}
 	else
-		small_code_heap_update();
+	{
+		small_code_heap_updater updater(this);
+		code->free_unmarked(updater);
+	}
+
+	code->clear_remembered_set();
 }
 
 }
