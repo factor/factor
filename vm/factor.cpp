@@ -76,7 +76,7 @@ void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **
 	for(i = 1; i < argc; i++)
 	{
 		vm_char *arg = argv[i];
-		if(STRCMP(arg,"--") == 0) break;
+		if(STRCMP(arg,STRING_LITERAL("--")) == 0) break;
 		else if(factor_arg(arg,STRING_LITERAL("-datastack=%d"),&p->ds_size));
 		else if(factor_arg(arg,STRING_LITERAL("-retainstack=%d"),&p->rs_size));
 		else if(factor_arg(arg,STRING_LITERAL("-young=%d"),&p->young_size));
