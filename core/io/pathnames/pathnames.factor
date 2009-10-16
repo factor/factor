@@ -6,8 +6,6 @@ IN: io.pathnames
 
 SYMBOL: current-directory
 
-<PRIVATE
-
 : path-separator? ( ch -- ? ) os windows? "/\\" "/" ? member? ;
 
 : path-separator ( -- string ) os windows? "\\" "/" ? ;
@@ -25,8 +23,6 @@ HOOK: root-directory? io-backend ( path -- ? )
 
 M: object root-directory? ( path -- ? )
     [ f ] [ [ path-separator? ] all? ] if-empty ;
-
-PRIVATE>
 
 ERROR: no-parent-directory path ;
 
