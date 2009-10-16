@@ -1,5 +1,5 @@
 USING: io.files io.pathnames kernel tools.test io.backend
-io.files.windows.nt splitting sequences ;
+io.files.windows.nt splitting sequences io.pathnames.private ;
 IN: io.files.windows.nt.tests
 
 [ f ] [ "\\foo" absolute-path? ] unit-test
