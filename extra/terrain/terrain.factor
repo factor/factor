@@ -1,42 +1,47 @@
 ! (c)2009 Joe Groff, Doug Coleman. bsd license
 USING: accessors arrays combinators game.input game.loop
 game.input.scancodes grouping kernel literals locals
-math math.constants math.functions math.matrices math.order
+math math.constants math.functions math.order
 math.vectors opengl opengl.capabilities opengl.gl
 opengl.shaders opengl.textures opengl.textures.private
 sequences sequences.product specialized-arrays
-terrain.generation terrain.shaders ui ui.gadgets
+terrain.generation terrain.shaders typed ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats game.worlds method-chains
-math.affine-transforms noise ui.gestures combinators.short-circuit
-destructors grid-meshes ;
-FROM: alien.c-types => float ;
-SPECIALIZED-ARRAY: float
+math.matrices.simd noise ui.gestures combinators.short-circuit
+destructors grid-meshes math.vectors.simd ;
+QUALIFIED-WITH: alien.c-types c
+SPECIALIZED-ARRAY: c:float
+SIMD: c:float
 IN: terrain
 
 CONSTANT: FOV $[ 2.0 sqrt 1 + ]
-CONSTANT: NEAR-PLANE $[ 1.0 1024.0 / ]
+CONSTANT: NEAR-PLANE 1/1024.
 CONSTANT: FAR-PLANE 2.0
-CONSTANT: PLAYER-START-LOCATION { 0.5 0.51 0.5 }
-CONSTANT: VELOCITY-MODIFIER-NORMAL { 1.0 1.0 1.0 }
-CONSTANT: VELOCITY-MODIFIER-FAST { 2.0 1.0 2.0 }
-CONSTANT: PLAYER-HEIGHT $[ 1.0 256.0 / ]
-CONSTANT: GRAVITY $[ 1.0 4096.0 / ]
-CONSTANT: JUMP $[ 1.0 1024.0 / ]
-CONSTANT: MOUSE-SCALE $[ 1.0 10.0 / ]
-CONSTANT: MOVEMENT-SPEED $[ 1.0 16384.0 / ]
-CONSTANT: FRICTION { 0.95 0.99 0.95 }
-CONSTANT: COMPONENT-SCALE { 0.5 0.01 0.0005 0.0 }
+CONSTANT: PLAYER-START-LOCATION float-4{ 0.5 0.51 0.5 1.0 }
+CONSTANT: VELOCITY-MODIFIER-NORMAL float-4{ 1.0 1.0 1.0 0.0 }
+CONSTANT: VELOCITY-MODIFIER-FAST float-4{ 2.0 1.0 2.0 0.0 }
+CONSTANT: PLAYER-HEIGHT 1/256.
+CONSTANT: GRAVITY float-4{ 0.0 -1/4096. 0.0 0.0 }
+CONSTANT: JUMP 1/1024.
+CONSTANT: MOUSE-SCALE 1/10.
+CONSTANT: MOVEMENT-SPEED 1/16384.
+CONSTANT: FRICTION float-4{ 0.95 0.99 0.95 1.0 }
+CONSTANT: COMPONENT-SCALE float-4{ 0.5 0.01 0.0005 0.0 }
 CONSTANT: SKY-PERIOD 1200
 CONSTANT: SKY-SPEED 0.0005
 
 CONSTANT: terrain-vertex-size { 512 512 }
 
 TUPLE: player
-    location yaw pitch velocity velocity-modifier
+    { location float-4 }
+    { yaw float }
+    { pitch float }
+    { velocity float-4 }
+    { velocity-modifier float-4 }
     reverse-time ;
 
 TUPLE: terrain-world < game-world
-    player
+    { player player }
     sky-image sky-texture sky-program
     terrain terrain-segment terrain-texture terrain-program
     terrain-mesh
@@ -47,7 +52,7 @@ TUPLE: terrain-world < game-world
         PLAYER-START-LOCATION >>location
         0.0 >>yaw
         0.0 >>pitch
-        { 0.0 0.0 0.0 } >>velocity
+        float-4{ 0.0 0.0 0.0 1.0 } >>velocity
         VELOCITY-MODIFIER-NORMAL >>velocity-modifier ;
 
 M: terrain-world tick-length
@@ -68,48 +73,40 @@ M: terrain-world tick-length
     [ location>> vneg first3 glTranslatef ] tri ;
 
 : degrees ( deg -- rad )
-    pi 180.0 / * ;
+    pi 180.0 / * ; inline
 
-:: eye-rotate ( yaw pitch v -- v' )
-    yaw degrees neg :> y
-    pitch degrees neg :> p
-    y cos :> cosy
-    y sin :> siny
-    p cos :> cosp
-    p sin :> sinp
-
-    cosy         0.0       siny        neg  3array
-    siny sinp *  cosp      cosy sinp *      3array
-    siny cosp *  sinp neg  cosy cosp *      3array 3array
-    v swap v.m ;
+TYPED: eye-rotate ( yaw: float pitch: float v: float-4 -- v': float-4 )
+    [ float-4{  0.0 -1.0 0.0 0.0 } swap degrees rotation-matrix4 ]
+    [ float-4{ -1.0  0.0 0.0 0.0 } swap degrees rotation-matrix4 m4. ]
+    [ m4.v ] tri* float-4{ t t t f } vand ;
 
 : forward-vector ( player -- v )
     yaw>> 0.0
-    ${ 0.0 0.0 MOVEMENT-SPEED } vneg eye-rotate ;
+    float-4{ 0.0 0.0 $ MOVEMENT-SPEED 1.0 } vneg eye-rotate ; inline
 : rightward-vector ( player -- v )
     yaw>> 0.0
-    ${ MOVEMENT-SPEED 0.0 0.0 } eye-rotate ;
+    float-4{ $ MOVEMENT-SPEED 0.0 0.0 1.0 } eye-rotate ; inline
 : clamp-pitch ( pitch -- pitch' )
-    -90.0 90.0 clamp ;
+    -90.0 90.0 clamp ; inline
 
 : walk-forward ( player -- )
-    dup forward-vector [ v+ ] curry change-velocity drop ;
+    dup forward-vector [ v+ ] curry change-velocity drop ; inline
 : walk-backward ( player -- )
-    dup forward-vector [ v- ] curry change-velocity drop ;
+    dup forward-vector [ v- ] curry change-velocity drop ; inline
 : walk-leftward ( player -- )
-    dup rightward-vector [ v- ] curry change-velocity drop ;
+    dup rightward-vector [ v- ] curry change-velocity drop ; inline
 : walk-rightward ( player -- )
-    dup rightward-vector [ v+ ] curry change-velocity drop ;
+    dup rightward-vector [ v+ ] curry change-velocity drop ; inline
 : jump ( player -- )
-    [ ${ 0.0 JUMP 0.0 } v+ ] change-velocity drop ;
+    [ float-4{ 0.0 $ JUMP 0.0 0.0 } v+ ] change-velocity drop ; inline
 : rotate-leftward ( player x -- )
-    [ - ] curry change-yaw drop ;
+    [ - ] curry change-yaw drop ; inline
 : rotate-rightward ( player x -- )
-    [ + ] curry change-yaw drop ;
+    [ + ] curry change-yaw drop ; inline
 : look-horizontally ( player x -- )
-    [ + ] curry change-yaw drop ;
+    [ + ] curry change-yaw drop ; inline
 : look-vertically ( player x -- )
-    [ + clamp-pitch ] curry change-pitch drop ;
+    [ + clamp-pitch ] curry change-pitch drop ; inline
 
 
 : rotate-with-mouse ( player mouse -- )
@@ -155,7 +152,7 @@ terrain-world H{
     FRICTION v* ;
 
 : apply-gravity ( velocity -- velocity' )
-    1 over [ GRAVITY - ] change-nth ;
+    GRAVITY v+ ;
 
 : clamp-coords ( coords dim -- coords' )
     [ { 0 0 } vmax ] dip { 2 2 } v- vmin ;
@@ -206,11 +203,9 @@ terrain-world H{
     drop ;
 
 : tick-player ( world player -- )
-    dup reverse-time>> [
-        tick-player-reverse
-    ] [
-        tick-player-forward
-    ] if ;
+    dup reverse-time>>
+    [ tick-player-reverse ]
+    [ tick-player-forward ] if ;
 
 M: terrain-world tick*
     [ dup focused?>> [ handle-input ] [ drop ] if ]
@@ -236,11 +231,11 @@ BEFORE: terrain-world begin-world
     GL_VERTEX_ARRAY glEnableClientState
     <player> >>player
     V{ } clone >>history
-    <perlin-noise-table> 0.01 0.01 <scale> { 512 512 } perlin-noise-image
+    <perlin-noise-table> 0.01 float-4-with scale-matrix4 { 512 512 } perlin-noise-image
     [ >>sky-image ] keep
     make-texture [ set-texture-parameters ] keep >>sky-texture
     <terrain> [ >>terrain ] keep
-    { 0 0 } terrain-segment [ >>terrain-segment ] keep
+    float-4{ 0.0 0.0 0.0 1.0 } terrain-segment [ >>terrain-segment ] keep
     make-texture [ set-texture-parameters ] keep >>terrain-texture
     sky-vertex-shader sky-pixel-shader <simple-gl-program>
     >>sky-program
@@ -282,7 +277,7 @@ M: terrain-world draw-world*
         ] with-gl-program ]
     } cleave gl-error ;
 
-M: terrain-world pref-dim* drop { 640 480 } ;
+M: terrain-world pref-dim* drop { 1024 768 } ;
 
 : terrain-window ( -- )
     [
