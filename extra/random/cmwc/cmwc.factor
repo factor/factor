@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays fry kernel locals math
-math.bitwise random sequences specialized-arrays
-specialized-arrays.instances.uint ;
+math.bitwise random sequences sequences.private
+specialized-arrays specialized-arrays.instances.uint ;
 IN: random.cmwc
 
 ! Multiply-with-carry RNG
@@ -25,7 +25,7 @@ TUPLE: cmwc-seed { Q uint-array read-only } { c read-only } ;
         swap >>a
         swap [ 1 - >>i ] [ <uint-array> >>Q ] bi
         dup b>> 1 - >>r
-        dup Q>> length 1 - >>mod ;
+        dup Q>> length 1 - >>mod ; inline
 
 : <cmwc-seed> ( Q c -- cmwc-seed )
     cmwc-seed boa ; inline
@@ -38,7 +38,7 @@ M: cmwc seed-random
 M:: cmwc random-32* ( cmwc -- n )
     cmwc dup mod>> '[ 1 + _ bitand ] change-i
     [ a>> ]
-    [ [ i>> ] [ Q>> ] bi nth * ]
+    [ [ i>> ] [ Q>> ] bi nth-unsafe * ]
     [ c>> + ] tri :> t!
 
     t -32 shift cmwc (>>c)
@@ -49,7 +49,7 @@ M:: cmwc random-32* ( cmwc -- n )
         t cmwc b>> - 32 bits t!
     ] when
 
-    cmwc [ r>> t - 32 bits dup ] [ i>> ] [ Q>> ] tri set-nth ;
+    cmwc [ r>> t - 32 bits dup ] [ i>> ] [ Q>> ] tri set-nth-unsafe ;
 
 : cmwc-4096 ( -- cmwc )
     4096
