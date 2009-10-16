@@ -70,6 +70,11 @@ PRIVATE>
 : unique-file ( prefix -- path )
     "" make-unique-file ;
 
+: move-file-unique ( path directory -- path' )
+    [
+        "" unique-file [ move-file ] keep
+    ] with-temporary-directory ;
+
 {
     { [ os unix? ] [ "io.files.unique.unix" ] }
     { [ os windows? ] [ "io.files.unique.windows" ] }
