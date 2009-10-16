@@ -211,7 +211,7 @@ void factor_vm::dump_memory(cell from, cell to)
 		dump_cell(from);
 }
 
-void factor_vm::dump_zone(char *name, zone *z)
+void factor_vm::dump_zone(const char *name, zone *z)
 {
 	print_string(name); print_string(": ");
 	print_string("Start="); print_cell(z->start);
