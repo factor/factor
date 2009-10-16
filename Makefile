@@ -37,6 +37,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/bignum.o \
 	vm/booleans.o \
 	vm/byte_arrays.o \
+	vm/callbacks.o \
 	vm/callstack.o \
 	vm/code_block.o \
 	vm/code_heap.o \

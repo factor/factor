@@ -114,7 +114,7 @@ bool factor_vm::save_image(const vm_char *filename)
 void factor_vm::primitive_save_image()
 {
 	/* do a full GC to push everything into tenured space */
-	primitive_full_gc();
+	primitive_compact_gc();
 
 	gc_root<byte_array> path(dpop(),this);
 	path.untag_check(this);

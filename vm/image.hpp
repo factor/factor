@@ -37,7 +37,9 @@ struct vm_parameters {
 	bool secure_gc;
 	bool fep;
 	bool console;
+	bool signals;
 	cell max_pic_size;
+	cell callback_size;
 };
 
 }
