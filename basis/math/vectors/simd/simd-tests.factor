@@ -394,10 +394,10 @@ simd-classes [
     [ [ declaration declare vany?  [ yes ] [ no ] if ] compile-call ]
     [ [ declaration declare vall?  [ yes ] [ no ] if ] compile-call ] tri ; inline
 
-SYMBOL: !!inconsistent!!
+TUPLE: inconsistent-vector-test bool branch ;
 
-: ?inconsistent ( a b -- ab/inconsistent )
-    2dup = [ drop ] [ 2drop !!inconsistent!! ] if ;
+: ?inconsistent ( bool branch -- ?/inconsistent )
+    2dup = [ drop ] [ inconsistent-vector-test boa ] if ;
 
 :: test-vector-tests ( vector decl -- none? any? all? )
     vector decl test-vector-tests-bool :> bool-all :> bool-any :> bool-none
