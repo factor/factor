@@ -14,6 +14,7 @@ IN: bootstrap.x86
 : temp1 ( -- reg ) RSI ;
 : temp2 ( -- reg ) RDX ;
 : temp3 ( -- reg ) RBX ;
+: safe-reg ( -- reg ) RAX ;
 : stack-reg ( -- reg ) RSP ;
 : ds-reg ( -- reg ) R14 ;
 : rs-reg ( -- reg ) R15 ;

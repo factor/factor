@@ -25,10 +25,10 @@ void factor_vm::fix_stacks()
 be stored in registers, so callbacks must save and restore the correct values */
 void factor_vm::save_stacks()
 {
-	if(stack_chain)
+	if(ctx)
 	{
-		stack_chain->datastack = ds;
-		stack_chain->retainstack = rs;
+		ctx->datastack = ds;
+		ctx->retainstack = rs;
 	}
 }
 
@@ -58,12 +58,12 @@ void factor_vm::dealloc_context(context *old_context)
 }
 
 /* called on entry into a compiled callback */
-void factor_vm::nest_stacks()
+void factor_vm::nest_stacks(stack_frame *magic_frame)
 {
-	context *new_context = alloc_context();
+	context *new_ctx = alloc_context();
 
-	new_context->callstack_bottom = (stack_frame *)-1;
-	new_context->callstack_top = (stack_frame *)-1;
+	new_ctx->callstack_bottom = (stack_frame *)-1;
+	new_ctx->callstack_top = (stack_frame *)-1;
 
 	/* note that these register values are not necessarily valid stack
 	pointers. they are merely saved non-volatile registers, and are
@@ -75,37 +75,39 @@ void factor_vm::nest_stacks()
 	- Factor callback returns
 	- C function restores registers
 	- C function returns to Factor code */
-	new_context->datastack_save = ds;
-	new_context->retainstack_save = rs;
+	new_ctx->datastack_save = ds;
+	new_ctx->retainstack_save = rs;
+
+	new_ctx->magic_frame = magic_frame;
 
 	/* save per-callback userenv */
-	new_context->current_callback_save = userenv[CURRENT_CALLBACK_ENV];
-	new_context->catchstack_save = userenv[CATCHSTACK_ENV];
+	new_ctx->current_callback_save = userenv[CURRENT_CALLBACK_ENV];
+	new_ctx->catchstack_save = userenv[CATCHSTACK_ENV];
 
-	new_context->next = stack_chain;
-	stack_chain = new_context;
+	new_ctx->next = ctx;
+	ctx = new_ctx;
 
 	reset_datastack();
 	reset_retainstack();
 }
 
-void nest_stacks(factor_vm *myvm)
+void nest_stacks(stack_frame *magic_frame, factor_vm *myvm)
 {
-	return myvm->nest_stacks();
+	return myvm->nest_stacks(magic_frame);
 }
 
 /* called when leaving a compiled callback */
 void factor_vm::unnest_stacks()
 {
-	ds = stack_chain->datastack_save;
-	rs = stack_chain->retainstack_save;
+	ds = ctx->datastack_save;
+	rs = ctx->retainstack_save;
 
 	/* restore per-callback userenv */
-	userenv[CURRENT_CALLBACK_ENV] = stack_chain->current_callback_save;
-	userenv[CATCHSTACK_ENV] = stack_chain->catchstack_save;
+	userenv[CURRENT_CALLBACK_ENV] = ctx->current_callback_save;
+	userenv[CATCHSTACK_ENV] = ctx->catchstack_save;
 
-	context *old_ctx = stack_chain;
-	stack_chain = old_ctx->next;
+	context *old_ctx = ctx;
+	ctx = old_ctx->next;
 	dealloc_context(old_ctx);
 }
 
@@ -119,7 +121,7 @@ void factor_vm::init_stacks(cell ds_size_, cell rs_size_)
 {
 	ds_size = ds_size_;
 	rs_size = rs_size_;
-	stack_chain = NULL;
+	ctx = NULL;
 	unused_contexts = NULL;
 }
 

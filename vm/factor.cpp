@@ -39,6 +39,7 @@ void factor_vm::default_parameters(vm_parameters *p)
 
 	p->secure_gc = false;
 	p->fep = false;
+	p->signals = true;
 
 #ifdef WINDOWS
 	p->console = false;
@@ -49,6 +50,8 @@ void factor_vm::default_parameters(vm_parameters *p)
 		p->console = false;
 	
 #endif
+
+	p->callback_size = 256;
 }
 
 bool factor_vm::factor_arg(const vm_char* str, const vm_char* arg, cell* value)
@@ -72,17 +75,21 @@ void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **
 
 	for(i = 1; i < argc; i++)
 	{
-		if(factor_arg(argv[i],STRING_LITERAL("-datastack=%d"),&p->ds_size));
-		else if(factor_arg(argv[i],STRING_LITERAL("-retainstack=%d"),&p->rs_size));
-		else if(factor_arg(argv[i],STRING_LITERAL("-young=%d"),&p->young_size));
-		else if(factor_arg(argv[i],STRING_LITERAL("-aging=%d"),&p->aging_size));
-		else if(factor_arg(argv[i],STRING_LITERAL("-tenured=%d"),&p->tenured_size));
-		else if(factor_arg(argv[i],STRING_LITERAL("-codeheap=%d"),&p->code_size));
-		else if(factor_arg(argv[i],STRING_LITERAL("-pic=%d"),&p->max_pic_size));
-		else if(STRCMP(argv[i],STRING_LITERAL("-securegc")) == 0) p->secure_gc = true;
-		else if(STRCMP(argv[i],STRING_LITERAL("-fep")) == 0) p->fep = true;
-		else if(STRNCMP(argv[i],STRING_LITERAL("-i="),3) == 0) p->image_path = argv[i] + 3;
-		else if(STRCMP(argv[i],STRING_LITERAL("-console")) == 0) p->console = true;
+		vm_char *arg = argv[i];
+		if(STRCMP(arg,"--") == 0) break;
+		else if(factor_arg(arg,STRING_LITERAL("-datastack=%d"),&p->ds_size));
+		else if(factor_arg(arg,STRING_LITERAL("-retainstack=%d"),&p->rs_size));
+		else if(factor_arg(arg,STRING_LITERAL("-young=%d"),&p->young_size));
+		else if(factor_arg(arg,STRING_LITERAL("-aging=%d"),&p->aging_size));
+		else if(factor_arg(arg,STRING_LITERAL("-tenured=%d"),&p->tenured_size));
+		else if(factor_arg(arg,STRING_LITERAL("-codeheap=%d"),&p->code_size));
+		else if(factor_arg(arg,STRING_LITERAL("-pic=%d"),&p->max_pic_size));
+		else if(factor_arg(arg,STRING_LITERAL("-callbacks=%d"),&p->callback_size));
+		else if(STRCMP(arg,STRING_LITERAL("-securegc")) == 0) p->secure_gc = true;
+		else if(STRCMP(arg,STRING_LITERAL("-fep")) == 0) p->fep = true;
+		else if(STRCMP(arg,STRING_LITERAL("-nosignals")) == 0) p->signals = false;
+		else if(STRNCMP(arg,STRING_LITERAL("-i="),3) == 0) p->image_path = arg + 3;
+		else if(STRCMP(arg,STRING_LITERAL("-console")) == 0) p->console = true;
 	}
 }
 
@@ -104,6 +111,7 @@ void factor_vm::init_factor(vm_parameters *p)
 	/* Kilobytes */
 	p->ds_size = align_page(p->ds_size << 10);
 	p->rs_size = align_page(p->rs_size << 10);
+	p->callback_size = align_page(p->callback_size << 10);
 
 	/* Megabytes */
 	p->young_size <<= 20;
@@ -128,10 +136,12 @@ void factor_vm::init_factor(vm_parameters *p)
 	srand(current_micros());
 	init_ffi();
 	init_stacks(p->ds_size,p->rs_size);
+	init_callbacks(p->callback_size);
 	load_image(p);
 	init_c_io();
 	init_inline_caching(p->max_pic_size);
-	init_signals();
+	if(p->signals)
+		init_signals();
 
 	if(p->console)
 		open_console();
@@ -170,7 +180,7 @@ void factor_vm::start_factor(vm_parameters *p)
 {
 	if(p->fep) factorbug();
 
-	nest_stacks();
+	nest_stacks(NULL);
 	c_to_factor_toplevel(userenv[BOOT_ENV]);
 	unnest_stacks();
 }
