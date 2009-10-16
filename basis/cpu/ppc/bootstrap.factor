@@ -249,6 +249,12 @@ CONSTANT: rs-reg 14
     ! fall-through on miss
 ] mega-lookup jit-define
 
+[
+    0 2 LOAD32 rc-absolute-cell rt-xt jit-rel
+    2 MTCTR
+    BCTR
+] callback-stub jit-define
+
 ! ! ! Sub-primitives
 
 ! Quotations and words

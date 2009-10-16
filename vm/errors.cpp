@@ -49,12 +49,9 @@ void factor_vm::throw_error(cell error, stack_frame *callstack_top)
 		actual stack pointer at the time, since the saved pointer is
 		not necessarily up to date at that point. */
 		if(callstack_top)
-		{
-			callstack_top = fix_callstack_top(callstack_top,
-				stack_chain->callstack_bottom);
-		}
+			callstack_top = fix_callstack_top(callstack_top,ctx->callstack_bottom);
 		else
-			callstack_top = stack_chain->callstack_top;
+			callstack_top = ctx->callstack_top;
 
 		throw_impl(userenv[BREAK_ENV],callstack_top,this);
 	}
@@ -130,7 +127,7 @@ void factor_vm::fp_trap_error(unsigned int fpu_status, stack_frame *signal_calls
 
 void factor_vm::primitive_call_clear()
 {
-	throw_impl(dpop(),stack_chain->callstack_bottom,this);
+	throw_impl(dpop(),ctx->callstack_bottom,this);
 }
 
 /* For testing purposes */

@@ -8,7 +8,7 @@ struct factor_vm
 	// First five fields accessed directly by assembler. See vm.factor
 
 	/* Current stacks */
-	context *stack_chain;
+	context *ctx;
 	
 	/* New objects are allocated here */
 	zone nursery;
@@ -55,6 +55,9 @@ struct factor_vm
 	/* Code heap */
 	code_heap *code;
 
+	/* Pinned callback stubs */
+	callback_heap *callbacks;
+
 	/* Only set if we're performing a GC */
 	gc_state *current_gc;
 
@@ -96,7 +99,7 @@ struct factor_vm
 	void save_stacks();
 	context *alloc_context();
 	void dealloc_context(context *old_context);
-	void nest_stacks();
+	void nest_stacks(stack_frame *magic_frame);
 	void unnest_stacks();
 	void init_stacks(cell ds_size_, cell rs_size_);
 	bool stack_to_array(cell bottom, cell top);
@@ -106,6 +109,18 @@ struct factor_vm
 	void primitive_set_datastack();
 	void primitive_set_retainstack();
 	void primitive_check_datastack();
+
+	template<typename Iterator> void factor_vm::iterate_active_frames(Iterator &iter)
+	{
+		context *ctx = this->ctx;
+
+		while(ctx)
+		{
+			iterate_callstack(ctx,iter);
+			if(ctx->magic_frame) iter(ctx->magic_frame);
+			ctx = ctx->next;
+		}
+	}
 
 	// run
 	void primitive_getenv();
@@ -238,13 +253,15 @@ struct factor_vm
 	void collect_nursery();
 	void collect_aging();
 	void collect_to_tenured();
+	void big_code_heap_update();
+	void small_code_heap_update();
 	void collect_full_impl(bool trace_contexts_p);
 	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p, bool compact_code_heap_p);
 	void collect_full(bool trace_contexts_p, bool compact_code_heap_p);
 	void record_gc_stats(generation_statistics *stats);
 	void gc(gc_op op, cell requested_bytes, bool trace_contexts_p, bool compact_code_heap_p);
-	void primitive_full_gc();
 	void primitive_minor_gc();
+	void primitive_full_gc();
 	void primitive_compact_gc();
 	void primitive_gc_stats();
 	void clear_gc_stats();
@@ -502,6 +519,7 @@ struct factor_vm
 	void primitive_code_room();
 	void forward_object_xts();
 	void forward_context_xts();
+	void forward_callback_xts();
 	void compact_code_heap(bool trace_contexts_p);
 	void primitive_strip_stack_traces();
 
@@ -517,6 +535,10 @@ struct factor_vm
 			scan = code->next_block(scan);
 		}
 	}
+
+	//callbacks
+	void factor_vm::init_callbacks(cell size);
+	void factor_vm::primitive_callback();
 
 	//image
 	void init_objects(image_header *h);

@@ -26,14 +26,8 @@ struct stack_frame_marker {
 /* Mark code blocks executing in currently active stack frames. */
 void full_collector::mark_active_blocks()
 {
-	context *ctx = this->myvm->stack_chain;
-
-	while(ctx)
-	{
-		stack_frame_marker marker(this);
-		myvm->iterate_callstack(ctx,marker);
-		ctx = ctx->next;
-	}
+	stack_frame_marker marker(this);
+	myvm->iterate_active_frames(marker);
 }
 
 void full_collector::mark_object_code_block(object *obj)
@@ -66,6 +60,23 @@ void full_collector::mark_object_code_block(object *obj)
 	}
 }
 
+struct callback_tracer {
+	full_collector *collector;
+
+	callback_tracer(full_collector *collector_) : collector(collector_) {}
+	
+	void operator()(callback *stub)
+	{
+		collector->mark_code_block(stub->compiled);
+	}
+};
+
+void full_collector::trace_callbacks()
+{
+	callback_tracer tracer(this);
+	myvm->callbacks->iterate(tracer);
+}
+
 /* Trace all literals referenced from a code block. Only for aging and nursery collections */
 void full_collector::trace_literal_references(code_block *compiled)
 {
@@ -95,10 +106,10 @@ void full_collector::cheneys_algorithm()
 
 /* After growing the heap, we have to perform a full relocation to update
 references to card and deck arrays. */
-struct after_growing_heap_updater {
+struct big_code_heap_updater {
 	factor_vm *myvm;
 
-	after_growing_heap_updater(factor_vm *myvm_) : myvm(myvm_) {}
+	big_code_heap_updater(factor_vm *myvm_) : myvm(myvm_) {}
 
 	void operator()(heap_block *block)
 	{
@@ -108,10 +119,10 @@ struct after_growing_heap_updater {
 
 /* After a full GC that did not grow the heap, we have to update references
 to literals and other words. */
-struct after_full_updater {
+struct small_code_heap_updater {
 	factor_vm *myvm;
 
-	after_full_updater(factor_vm *myvm_) : myvm(myvm_) {}
+	small_code_heap_updater(factor_vm *myvm_) : myvm(myvm_) {}
 
 	void operator()(heap_block *block)
 	{
@@ -128,6 +139,7 @@ void factor_vm::collect_full_impl(bool trace_contexts_p)
 	{
 		collector.trace_contexts();
 		collector.mark_active_blocks();
+		collector.trace_callbacks();
 	}
 
 	collector.cheneys_algorithm();
@@ -138,6 +150,13 @@ void factor_vm::collect_full_impl(bool trace_contexts_p)
 
 /* In both cases, compact code heap before updating code blocks so that
 XTs are correct after */
+
+void factor_vm::big_code_heap_update()
+{
+	big_code_heap_updater updater(this);
+	code->free_unmarked(updater);
+	code->clear_remembered_set();
+}
 
 void factor_vm::collect_growing_heap(cell requested_bytes,
 	bool trace_contexts_p,
@@ -151,7 +170,12 @@ void factor_vm::collect_growing_heap(cell requested_bytes,
 
 	if(compact_code_heap_p) compact_code_heap(trace_contexts_p);
 
-	after_growing_heap_updater updater(this);
+	big_code_heap_update();
+}
+
+void factor_vm::small_code_heap_update()
+{
+	small_code_heap_updater updater(this);
 	code->free_unmarked(updater);
 	code->clear_remembered_set();
 }
@@ -163,11 +187,13 @@ void factor_vm::collect_full(bool trace_contexts_p, bool compact_code_heap_p)
 	reset_generation(data->tenured);
 	collect_full_impl(trace_contexts_p);
 
-	if(compact_code_heap_p) compact_code_heap(trace_contexts_p);
-
-	after_full_updater updater(this);
-	code->free_unmarked(updater);
-	code->clear_remembered_set();
+	if(compact_code_heap_p)
+	{
+		compact_code_heap(trace_contexts_p);
+		big_code_heap_update();
+	}
+	else
+		small_code_heap_update();
 }
 
 }

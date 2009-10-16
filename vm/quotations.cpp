@@ -362,7 +362,7 @@ fixnum factor_vm::quot_code_offset_to_scan(cell quot_, cell offset)
 cell factor_vm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
 {
 	gc_root<quotation> quot(quot_,this);
-	stack_chain->callstack_top = stack;
+	ctx->callstack_top = stack;
 	jit_compile(quot.value(),true);
 	return quot.value();
 }

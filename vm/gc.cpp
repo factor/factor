@@ -96,17 +96,17 @@ void factor_vm::gc(gc_op op,
 	current_gc = NULL;
 }
 
-void factor_vm::primitive_full_gc()
+void factor_vm::primitive_minor_gc()
 {
-	gc(collect_full_op,
+	gc(collect_nursery_op,
 		0, /* requested size */
 		true, /* trace contexts? */
 		false /* compact code heap? */);
 }
 
-void factor_vm::primitive_minor_gc()
+void factor_vm::primitive_full_gc()
 {
-	gc(collect_nursery_op,
+	gc(collect_full_op,
 		0, /* requested size */
 		true, /* trace contexts? */
 		false /* compact code heap? */);
