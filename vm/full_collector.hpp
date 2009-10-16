@@ -19,6 +19,7 @@ struct full_collector : copying_collector<tenured_space,full_policy> {
 	full_collector(factor_vm *myvm_);
 	void mark_active_blocks();
 	void mark_object_code_block(object *object);
+	void trace_callbacks();
 	void trace_literal_references(code_block *compiled);
 	void mark_code_block(code_block *compiled);
 	void cheneys_algorithm();

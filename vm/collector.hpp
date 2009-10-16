@@ -132,7 +132,7 @@ template<typename TargetGeneration, typename Policy> struct collector {
 
 	void trace_contexts()
 	{
-		context *ctx = myvm->stack_chain;
+		context *ctx = myvm->ctx;
 
 		while(ctx)
 		{

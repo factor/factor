@@ -194,7 +194,9 @@ M: x86.64 %alien-invoke
     R11 CALL ;
 
 M: x86.64 %nest-stacks ( -- )
-    param-reg-1 %mov-vm-ptr
+    ! Save current frame. See comment in vm/contexts.hpp
+    param-reg-1 stack-reg stack-frame get total-size>> 3 cells - [+] LEA
+    param-reg-2 %mov-vm-ptr
     "nest_stacks" f %alien-invoke ;
 
 M: x86.64 %unnest-stacks ( -- )
