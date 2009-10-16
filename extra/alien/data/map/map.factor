@@ -5,8 +5,6 @@ lexer locals macros make math math.ranges parser sequences sequences.private ;
 FROM: alien.arrays => array-length ;
 IN: alien.data.map
 
-ERROR: bad-data-map-input-length byte-length iter-size remainder ;
-
 <PRIVATE
 
 : <displaced-direct-array> ( displacement bytes length type -- direct-array )
