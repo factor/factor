@@ -85,7 +85,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_POINTERS pe)
 
 FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 {
-	return SIGNAL_VM_PTR()->exception_handler(pe);
+	return tls_vm()->exception_handler(pe);
 }
 
 bool handler_added = 0;
