@@ -132,17 +132,17 @@ template<typename TargetGeneration, typename Policy> struct collector {
 
 	void trace_contexts()
 	{
-		context *stacks = myvm->stack_chain;
+		context *ctx = myvm->stack_chain;
 
-		while(stacks)
+		while(ctx)
 		{
-			trace_stack_elements(stacks->datastack_region,(cell *)stacks->datastack);
-			trace_stack_elements(stacks->retainstack_region,(cell *)stacks->retainstack);
+			trace_stack_elements(ctx->datastack_region,(cell *)ctx->datastack);
+			trace_stack_elements(ctx->retainstack_region,(cell *)ctx->retainstack);
 
-			trace_handle(&stacks->catchstack_save);
-			trace_handle(&stacks->current_callback_save);
+			trace_handle(&ctx->catchstack_save);
+			trace_handle(&ctx->current_callback_save);
 
-			stacks = stacks->next;
+			ctx = ctx->next;
 		}
 	}
 };

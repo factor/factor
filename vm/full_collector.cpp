@@ -26,17 +26,13 @@ struct stack_frame_marker {
 /* Mark code blocks executing in currently active stack frames. */
 void full_collector::mark_active_blocks()
 {
-	context *stacks = this->myvm->stack_chain;
+	context *ctx = this->myvm->stack_chain;
 
-	while(stacks)
+	while(ctx)
 	{
-		cell top = (cell)stacks->callstack_top;
-		cell bottom = (cell)stacks->callstack_bottom;
-
 		stack_frame_marker marker(this);
-		myvm->iterate_callstack(top,bottom,marker);
-
-		stacks = stacks->next;
+		myvm->iterate_callstack(ctx,marker);
+		ctx = ctx->next;
 	}
 }
 
@@ -140,7 +136,12 @@ void factor_vm::collect_full_impl(bool trace_contexts_p)
 	nursery.here = nursery.start;
 }
 
-void factor_vm::collect_growing_heap(cell requested_bytes, bool trace_contexts_p)
+/* In both cases, compact code heap before updating code blocks so that
+XTs are correct after */
+
+void factor_vm::collect_growing_heap(cell requested_bytes,
+	bool trace_contexts_p,
+	bool compact_code_heap_p)
 {
 	/* Grow the data heap and copy all live objects to the new heap. */
 	data_heap *old = data;
@@ -148,17 +149,21 @@ void factor_vm::collect_growing_heap(cell requested_bytes, bool trace_contexts_p
 	collect_full_impl(trace_contexts_p);
 	delete old;
 
+	if(compact_code_heap_p) compact_code_heap(trace_contexts_p);
+
 	after_growing_heap_updater updater(this);
 	code->free_unmarked(updater);
 	code->clear_remembered_set();
 }
 
-void factor_vm::collect_full(bool trace_contexts_p)
+void factor_vm::collect_full(bool trace_contexts_p, bool compact_code_heap_p)
 {
 	/* Copy all live objects to the tenured semispace. */
 	std::swap(data->tenured,data->tenured_semispace);
 	reset_generation(data->tenured);
 	collect_full_impl(trace_contexts_p);
+
+	if(compact_code_heap_p) compact_code_heap(trace_contexts_p);
 
 	after_full_updater updater(this);
 	code->free_unmarked(updater);

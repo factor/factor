@@ -25,10 +25,10 @@ void factor_vm::record_gc_stats(generation_statistics *stats)
 		stats->max_gc_time = gc_elapsed;
 }
 
-/* Collect gen and all younger generations.
-If growing_data_heap_ is true, we must grow the data heap to such a size that
-an allocation of requested_bytes won't fail */
-void factor_vm::garbage_collection(gc_op op, bool trace_contexts_p, cell requested_bytes)
+void factor_vm::gc(gc_op op,
+	cell requested_bytes,
+	bool trace_contexts_p,
+	bool compact_code_heap_p)
 {
 	assert(!gc_off);
 	assert(!current_gc);
@@ -80,11 +80,11 @@ void factor_vm::garbage_collection(gc_op op, bool trace_contexts_p, cell request
 		record_gc_stats(&gc_stats.aging_stats);
 		break;
 	case collect_full_op:
-		collect_full(trace_contexts_p);
+		collect_full(trace_contexts_p,compact_code_heap_p);
 		record_gc_stats(&gc_stats.full_stats);
 		break;
 	case collect_growing_heap_op:
-		collect_growing_heap(requested_bytes,trace_contexts_p);
+		collect_growing_heap(requested_bytes,trace_contexts_p,compact_code_heap_p);
 		record_gc_stats(&gc_stats.full_stats);
 		break;
 	default:
@@ -96,14 +96,28 @@ void factor_vm::garbage_collection(gc_op op, bool trace_contexts_p, cell request
 	current_gc = NULL;
 }
 
-void factor_vm::gc()
+void factor_vm::primitive_full_gc()
 {
-	garbage_collection(collect_full_op,true,0);
+	gc(collect_full_op,
+		0, /* requested size */
+		true, /* trace contexts? */
+		false /* compact code heap? */);
 }
 
-void factor_vm::primitive_gc()
+void factor_vm::primitive_minor_gc()
 {
-	gc();
+	gc(collect_nursery_op,
+		0, /* requested size */
+		true, /* trace contexts? */
+		false /* compact code heap? */);
+}
+
+void factor_vm::primitive_compact_gc()
+{
+	gc(collect_full_op,
+		0, /* requested size */
+		true, /* trace contexts? */
+		true /* compact code heap? */);
 }
 
 void factor_vm::add_gc_stats(generation_statistics *stats, growable_array *result)
@@ -171,7 +185,7 @@ void factor_vm::primitive_become()
 			old_obj->h.forward_to(new_obj.untagged());
 	}
 
-	gc();
+	primitive_full_gc();
 
 	/* If a word's definition quotation was in old_objects and the
 	   quotation in new_objects is not compiled, we might leak memory
@@ -185,7 +199,7 @@ void factor_vm::inline_gc(cell *gc_roots_base, cell gc_roots_size)
 	for(cell i = 0; i < gc_roots_size; i++)
 		gc_locals.push_back((cell)&gc_roots_base[i]);
 
-	garbage_collection(collect_nursery_op,true,0);
+	primitive_minor_gc();
 
 	for(cell i = 0; i < gc_roots_size; i++)
 		gc_locals.pop_back();
@@ -204,16 +218,18 @@ object *factor_vm::allot_object(header header, cell size)
 {
 #ifdef GC_DEBUG
 	if(!gc_off)
-		gc();
+		primitive_full_gc();
 #endif
 
 	object *obj;
 
+	/* If the object is smaller than the nursery, allocate it in the nursery,
+	after a GC if needed */
 	if(nursery.size > size)
 	{
 		/* If there is insufficient room, collect the nursery */
 		if(nursery.here + size > nursery.end)
-			garbage_collection(collect_nursery_op,true,0);
+			primitive_minor_gc();
 
 		obj = nursery.allot(size);
 	}
@@ -223,11 +239,16 @@ object *factor_vm::allot_object(header header, cell size)
 	{
 		/* If tenured space does not have enough room, collect */
 		if(data->tenured->here + size > data->tenured->end)
-			gc();
+			primitive_full_gc();
 
 		/* If it still won't fit, grow the heap */
 		if(data->tenured->here + size > data->tenured->end)
-			garbage_collection(collect_growing_heap_op,true,size);
+		{
+			gc(collect_growing_heap_op,
+				size, /* requested size */
+				true, /* trace contexts? */
+				false /* compact code heap? */);
+		}
 
 		obj = data->tenured->allot(size);
 
