@@ -1,6 +1,6 @@
 USING: io.pathnames io.files.temp io.directories
 continuations math io.files.private kernel
-namespaces tools.test ;
+namespaces tools.test io.pathnames.private ;
 IN: io.pathnames.tests
 
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test
