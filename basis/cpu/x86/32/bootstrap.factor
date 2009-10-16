@@ -17,6 +17,7 @@ IN: bootstrap.x86
 : temp1 ( -- reg ) EDX ;
 : temp2 ( -- reg ) ECX ;
 : temp3 ( -- reg ) EBX ;
+: safe-reg ( -- reg ) EAX ;
 : stack-reg ( -- reg ) ESP ;
 : ds-reg ( -- reg ) ESI ;
 : rs-reg ( -- reg ) EDI ;

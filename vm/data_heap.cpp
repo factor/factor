@@ -23,7 +23,7 @@ data_heap::data_heap(cell young_size_, cell aging_size_, cell tenured_size_)
 
 	total_size += deck_size;
 
-	seg = new segment(total_size);
+	seg = new segment(total_size,false);
 
 	cell cards_size = addr_to_card(total_size);
 

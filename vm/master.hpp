@@ -82,6 +82,7 @@ namespace factor
 #include "image.hpp"
 #include "alien.hpp"
 #include "code_heap.hpp"
+#include "callbacks.hpp"
 #include "vm.hpp"
 #include "tagged.hpp"
 #include "local_roots.hpp"

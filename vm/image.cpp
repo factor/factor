@@ -114,7 +114,7 @@ bool factor_vm::save_image(const vm_char *filename)
 void factor_vm::primitive_save_image()
 {
 	/* do a full GC to push everything into tenured space */
-	gc();
+	primitive_compact_gc();
 
 	gc_root<byte_array> path(dpop(),this);
 	path.untag_check(this);
@@ -135,8 +135,10 @@ void factor_vm::primitive_save_image_and_exit()
 		if(!save_env_p(i)) userenv[i] = F;
 	}
 
-	/* do a full GC + code heap compaction */
-	compact_code_heap();
+	gc(collect_full_op,
+		0, /* requested size */
+		false, /* discard objects only reachable from stacks */
+		true /* compact the code heap */);
 
 	/* Save the image */
 	if(save_image((vm_char *)(path.untagged() + 1)))

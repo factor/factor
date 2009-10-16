@@ -243,6 +243,11 @@ big-endian off
     ! fall-through on miss
 ] mega-lookup jit-define
 
+[
+    safe-reg 0 MOV rc-absolute-cell rt-xt jit-rel
+    safe-reg JMP
+] callback-stub jit-define
+
 ! ! ! Sub-primitives
 
 ! Quotations and words

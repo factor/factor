@@ -15,7 +15,7 @@ struct heap {
 	heap_free_list free;
 	unordered_map<heap_block *, char *> forwarding;
 
-	explicit heap(bool secure_gc_, cell size);
+	explicit heap(bool secure_gc_, cell size, bool executable_p);
 
 	inline heap_block *next_block(heap_block *block)
 	{
@@ -49,7 +49,6 @@ struct heap {
 	void clear_mark_bits();
 	void heap_usage(cell *used, cell *total_free, cell *max_free);
 	cell heap_size();
-	cell compute_heap_forwarding();
 	void compact_heap();
 
 	heap_block *free_allocated(heap_block *prev, heap_block *scan);

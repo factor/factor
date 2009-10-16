@@ -23,8 +23,11 @@ template<typename Iterator> void factor_vm::iterate_callstack_object(callstack *
 	}
 }
 
-template<typename Iterator> void factor_vm::iterate_callstack(cell top, cell bottom, Iterator &iterator)
+template<typename Iterator> void factor_vm::iterate_callstack(context *ctx, Iterator &iterator)
 {
+	cell top = (cell)ctx->callstack_top;
+	cell bottom = (cell)ctx->callstack_bottom;
+
 	stack_frame *frame = (stack_frame *)bottom - 1;
 
 	while((cell)frame >= top)

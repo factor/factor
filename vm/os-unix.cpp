@@ -83,16 +83,19 @@ void factor_vm::primitive_existsp()
 	box_boolean(stat(path,&sb) >= 0);
 }
 
-segment::segment(cell size_)
+segment::segment(cell size_, bool executable_p)
 {
 	size = size_;
 
 	int pagesize = getpagesize();
 
-	char *array = (char *)mmap(NULL,pagesize + size + pagesize,
-		PROT_READ | PROT_WRITE | PROT_EXEC,
-		MAP_ANON | MAP_PRIVATE,-1,0);
+	int prot;
+	if(executable_p)
+		prot = (PROT_READ | PROT_WRITE | PROT_EXEC);
+	else
+		prot = (PROT_READ | PROT_WRITE);
 
+	char *array = (char *)mmap(NULL,pagesize + size + pagesize,prot,MAP_ANON | MAP_PRIVATE,-1,0);
 	if(array == (char*)-1) out_of_memory();
 
 	if(mprotect(array,pagesize,PROT_NONE) == -1)
@@ -139,7 +142,7 @@ void factor_vm::memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	SIGNAL_VM_PTR()->memory_signal_handler(signal,siginfo,uap);
+	tls_vm()->memory_signal_handler(signal,siginfo,uap);
 }
 
 void factor_vm::misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
@@ -151,7 +154,7 @@ void factor_vm::misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 
 void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	SIGNAL_VM_PTR()->misc_signal_handler(signal,siginfo,uap);
+	tls_vm()->misc_signal_handler(signal,siginfo,uap);
 }
 
 void factor_vm::fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
@@ -168,7 +171,7 @@ void factor_vm::fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 
 void fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	SIGNAL_VM_PTR()->fpe_signal_handler(signal, siginfo, uap);
+	tls_vm()->fpe_signal_handler(signal, siginfo, uap);
 }
 
 static void sigaction_safe(int signum, const struct sigaction *act, struct sigaction *oldact)

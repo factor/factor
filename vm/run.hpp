@@ -59,6 +59,9 @@ enum special_object {
 	JIT_EXECUTE_CALL,
 	JIT_DECLARE_WORD,
 
+	/* Callback stub generation in callbacks.c */
+	CALLBACK_STUB       = 45,
+
 	/* Polymorphic inline cache generation in inline_cache.c */
 	PIC_LOAD            = 47,
 	PIC_TAG,

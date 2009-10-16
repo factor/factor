@@ -172,6 +172,8 @@ USERENV: jit-execute-jump 42
 USERENV: jit-execute-call 43
 USERENV: jit-declare-word 44
 
+USERENV: callback-stub 45
+
 ! PIC stubs
 USERENV: pic-load 47
 USERENV: pic-tag 48

@@ -13,7 +13,7 @@ struct segment {
 	cell size;
 	cell end;
 
-	explicit segment(cell size);
+	explicit segment(cell size, bool executable_p);
 	~segment();
 };
 

@@ -715,7 +715,9 @@ M: ppc %box-small-struct ( c-type -- )
     3 3 0 LWZ ;
 
 M: ppc %nest-stacks ( -- )
-    3 %load-vm-addr
+    ! Save current frame. See comment in vm/contexts.hpp
+    3 1 stack-frame get total-size>> 2 cells - ADDI
+    4 %load-vm-addr
     "nest_stacks" f %alien-invoke ;
 
 M: ppc %unnest-stacks ( -- )

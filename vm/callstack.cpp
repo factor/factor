@@ -37,19 +37,16 @@ called by continuation implementation, and user code shouldn't
 be calling it at all, so we leave it as it is for now. */
 stack_frame *factor_vm::capture_start()
 {
-	stack_frame *frame = stack_chain->callstack_bottom - 1;
-	while(frame >= stack_chain->callstack_top
-		&& frame_successor(frame) >= stack_chain->callstack_top)
-	{
+	stack_frame *frame = ctx->callstack_bottom - 1;
+	while(frame >= ctx->callstack_top && frame_successor(frame) >= ctx->callstack_top)
 		frame = frame_successor(frame);
-	}
 	return frame + 1;
 }
 
 void factor_vm::primitive_callstack()
 {
 	stack_frame *top = capture_start();
-	stack_frame *bottom = stack_chain->callstack_bottom;
+	stack_frame *bottom = ctx->callstack_bottom;
 
 	fixnum size = (cell)bottom - (cell)top;
 	if(size < 0)
@@ -64,7 +61,7 @@ void factor_vm::primitive_set_callstack()
 {
 	callstack *stack = untag_check<callstack>(dpop());
 
-	set_callstack(stack_chain->callstack_bottom,
+	set_callstack(ctx->callstack_bottom,
 		stack->top(),
 		untag_fixnum(stack->length),
 		memcpy);
@@ -204,13 +201,12 @@ void factor_vm::primitive_set_innermost_stack_frame_quot()
 /* called before entry into Factor code. */
 void factor_vm::save_callstack_bottom(stack_frame *callstack_bottom)
 {
-	stack_chain->callstack_bottom = callstack_bottom;
+	ctx->callstack_bottom = callstack_bottom;
 }
 
 VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom, factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->save_callstack_bottom(callstack_bottom);
+	return myvm->save_callstack_bottom(callstack_bottom);
 }
 
 }
