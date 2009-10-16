@@ -1,31 +1,26 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors arrays destructors kernel math opengl
-opengl.gl sequences sequences.product specialized-arrays ;
+USING: accessors alien.data.map arrays destructors fry grouping
+kernel math math.ranges math.vectors.simd opengl opengl.gl sequences
+sequences.product specialized-arrays ;
 FROM: alien.c-types => float ;
-SPECIALIZED-ARRAY: float
+SIMD: float
+SPECIALIZED-ARRAY: float-4
 IN: grid-meshes
 
 TUPLE: grid-mesh dim buffer row-length ;
 
 <PRIVATE
 
-: vertex-array-vertex ( dim x z -- vertex )
-    [ swap first /f ]
-    [ swap second /f ] bi-curry* bi
-    [ 0 ] dip float-array{ } 3sequence ;
-
-: vertex-array-row ( dim z -- vertices )
-    dup 1 + 2array
-    over first 1 + iota
-    2array [ first2 swap vertex-array-vertex ] with product-map
-    concat ;
+: vertex-array-row ( range z0 z1 -- vertices )
+    '[ _ _ [ 0.0 swap 1.0 float-4-boa ] bi-curry@ bi ]
+    data-map( void -- float-4[2] ) ; inline
 
 : vertex-array ( dim -- vertices )
-    dup second iota
-    [ vertex-array-row ] with map concat ;
+    first2 [ [ 0.0 1.0 1.0 ] dip /f <range> ] bi@
+    2 <sliced-clumps> [ first2 vertex-array-row ] with map concat ;
 
 : >vertex-buffer ( bytes -- buffer )
-    [ GL_ARRAY_BUFFER ] dip GL_STATIC_DRAW <gl-buffer> ;
+    [ GL_ARRAY_BUFFER ] dip GL_STATIC_DRAW <gl-buffer> ; inline
 
 : draw-vertex-buffer-row ( grid-mesh i -- )
     swap [ GL_TRIANGLE_STRIP ] 2dip
@@ -36,13 +31,16 @@ PRIVATE>
 
 : draw-grid-mesh ( grid-mesh -- )
     GL_ARRAY_BUFFER over buffer>> [
-        [ 3 GL_FLOAT 0 f glVertexPointer ] dip
+        [ 4 GL_FLOAT 0 f glVertexPointer ] dip
         dup dim>> second iota [ draw-vertex-buffer-row ] with each
     ] with-gl-buffer ;
 
+USE: tools.time
 : <grid-mesh> ( dim -- grid-mesh )
+    [
     [ ] [ vertex-array >vertex-buffer ] [ first 1 + 2 * ] tri
-    grid-mesh boa ;
+    grid-mesh boa
+    ] time ;
 
 M: grid-mesh dispose
     [ [ delete-gl-buffer ] when* f ] change-buffer
