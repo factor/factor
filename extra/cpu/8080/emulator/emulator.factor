@@ -1,10 +1,32 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: accessors kernel math sequences words arrays io io.files
-math.parser assocs quotations parser lexer
-peg peg.ebnf peg.parsers tools.time io.encodings.binary sequences.deep
-symbols combinators fry namespaces ;
+USING: 
+    accessors
+    arrays
+    assocs
+    combinators
+    fry
+    io
+    io.encodings.binary
+    io.files
+    io.pathnames
+    kernel
+    lexer
+    make
+    math
+    math.parser
+    namespaces
+    parser
+    peg
+    peg.ebnf
+    peg.parsers
+    quotations
+    sequences
+    sequences.deep
+    syntax
+    words
+;
 IN: cpu.8080.emulator
 
 TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles ram ;
@@ -27,93 +49,93 @@ M: cpu write-port ( value port cpu -- )
   #! an 8-bit value.
   3drop ;
 
-: carry-flag        HEX: 01 ; inline
-: parity-flag       HEX: 04 ; inline
-: half-carry-flag   HEX: 10 ; inline
-: interrupt-flag    HEX: 20 ; inline
-: zero-flag         HEX: 40 ; inline
-: sign-flag         HEX: 80 ; inline
+CONSTANT: carry-flag        HEX: 01
+CONSTANT: parity-flag       HEX: 04
+CONSTANT: half-carry-flag   HEX: 10
+CONSTANT: interrupt-flag    HEX: 20
+CONSTANT: zero-flag         HEX: 40
+CONSTANT: sign-flag         HEX: 80
 
 : >word< ( word -- byte byte )
   #! Explode a word into its two 8 bit values.
   dup HEX: FF bitand swap -8 shift HEX: FF bitand swap ;
 
-: cpu-af ( cpu -- word )
+: af>> ( cpu -- word )
   #! Return the 16-bit pseudo register AF.
-  [ cpu-a 8 shift ] keep cpu-f bitor ;
+  [ a>> 8 shift ] keep f>> bitor ;
 
-: set-cpu-af ( value cpu -- )
+: (>>af) ( value cpu -- )
   #! Set the value of the 16-bit pseudo register AF
-  >r >word< r> tuck set-cpu-f set-cpu-a ;
+  [ >word< ] dip swap >>f swap >>a drop ;
 
-: cpu-bc ( cpu -- word )
+: bc>> ( cpu -- word )
   #! Return the 16-bit pseudo register BC.
-  [ cpu-b 8 shift ] keep cpu-c bitor ;
+  [ b>> 8 shift ] keep c>> bitor ;
 
-: set-cpu-bc ( value cpu -- )
+: (>>bc) ( value cpu -- )
   #! Set the value of the 16-bit pseudo register BC
-  >r >word< r> tuck set-cpu-c set-cpu-b ;
+  [ >word< ] dip swap >>c swap >>b drop ;
 
-: cpu-de ( cpu -- word )
+: de>> ( cpu -- word )
   #! Return the 16-bit pseudo register DE.
-  [ cpu-d 8 shift ] keep cpu-e bitor ;
+  [ d>> 8 shift ] keep e>> bitor ;
 
-: set-cpu-de ( value cpu -- )
+: (>>de) ( value cpu -- )
   #! Set the value of the 16-bit pseudo register DE
-  >r >word< r> tuck set-cpu-e set-cpu-d ;
+  [ >word< ] dip swap >>e swap >>d drop ;
 
-: cpu-hl ( cpu -- word )
+: hl>> ( cpu -- word )
   #! Return the 16-bit pseudo register HL.
-  [ cpu-h 8 shift ] keep cpu-l bitor ;
+  [ h>> 8 shift ] keep l>> bitor ;
 
-: set-cpu-hl ( value cpu -- )
+: (>>hl) ( value cpu -- )
   #! Set the value of the 16-bit pseudo register HL
-  >r >word< r> tuck set-cpu-l set-cpu-h ;
+  [ >word< ] dip swap >>l swap >>h drop ;
 
 : flag-set? ( flag cpu -- bool )
-  cpu-f bitand 0 = not ;
+  f>> bitand 0 = not ;
 
 : flag-clear? ( flag cpu -- bool )
-  cpu-f bitand 0 = ;
+  f>> bitand 0 = ;
 
 : flag-nz? ( cpu -- bool )
   #! Test flag status
-  cpu-f zero-flag bitand 0 = ;
+  f>> zero-flag bitand 0 = ;
 
 : flag-z? ( cpu -- bool )
   #! Test flag status
-  cpu-f zero-flag bitand 0 = not ;
+  f>> zero-flag bitand 0 = not ;
 
 : flag-nc? ( cpu -- bool )
   #! Test flag status
-  cpu-f carry-flag bitand 0 = ;
+  f>> carry-flag bitand 0 = ;
 
 : flag-c? ( cpu -- bool )
   #! Test flag status
-  cpu-f carry-flag bitand 0 = not ;
+  f>> carry-flag bitand 0 = not ;
 
 : flag-po? ( cpu -- bool )
   #! Test flag status
-  cpu-f parity-flag bitand 0 =  ;
+  f>> parity-flag bitand 0 =  ;
 
 : flag-pe? ( cpu -- bool )
   #! Test flag status
-  cpu-f parity-flag bitand 0 = not ;
+  f>> parity-flag bitand 0 = not ;
 
 : flag-p? ( cpu -- bool )
   #! Test flag status
-  cpu-f sign-flag bitand 0 = ;
+  f>> sign-flag bitand 0 = ;
 
 : flag-m? ( cpu -- bool )
   #! Test flag status
-  cpu-f sign-flag bitand 0 = not ;
+  f>> sign-flag bitand 0 = not ;
 
 : read-byte ( addr cpu -- byte )
   #! Read one byte from memory at the specified address.
   #! The address is 16-bit, but if a value greater than
   #! 0xFFFF is provided then return a default value.
   over HEX: FFFF <= [
-    cpu-ram nth
+    ram>> nth
   ] [
     2drop HEX: FF
   ] if ;
@@ -122,21 +144,21 @@ M: cpu write-port ( value port cpu -- )
   #! Read a 16-bit word from memory at the specified address.
   #! The address is 16-bit, but if a value greater than
   #! 0xFFFF is provided then return a default value.
-  [ read-byte ] 2keep >r 1 + r> read-byte 8 shift bitor ;
+  [ read-byte ] 2keep [ 1 + ] dip read-byte 8 shift bitor ;
  
 : next-byte ( cpu -- byte )
   #! Return the value of the byte at PC, and increment PC.
-  [ cpu-pc ] keep
+  [ pc>> ] keep
   [ read-byte ] keep 
-  [ cpu-pc 1 + ] keep
-  set-cpu-pc ;
+  [ pc>> 1 + ] keep
+  (>>pc) ;
 
 : next-word ( cpu -- word )
   #! Return the value of the word at PC, and increment PC.
-  [ cpu-pc ] keep
+  [ pc>> ] keep
   [ read-word ] keep 
-  [ cpu-pc 2 + ] keep
-  set-cpu-pc ;
+  [ pc>> 2 + ] keep
+  (>>pc) ;
 
 
 : write-byte ( value addr cpu -- )
@@ -144,54 +166,54 @@ M: cpu write-port ( value port cpu -- )
   over dup HEX: 2000 < swap HEX: FFFF > or [
     3drop
   ] [
-    3dup cpu-ram set-nth
+    3dup ram>> set-nth
     update-video
   ] if ;
 
 
 : write-word ( value addr cpu -- )
   #! Write a 16-bit word to the specified memory address.
-  >r >r >word< r> r> [ write-byte ] 2keep >r 1 + r> write-byte ;
+  [ >word< ] 2dip [ write-byte ] 2keep [ 1 + ] dip write-byte ;
 
 : cpu-a-bitand ( quot cpu -- )
   #! A &= quot call 
-  [ cpu-a swap call bitand ] keep set-cpu-a ; inline
+  [ a>> swap call bitand ] keep (>>a) ; inline
 
 : cpu-a-bitor ( quot cpu -- )
   #! A |= quot call 
-  [ cpu-a swap call bitor ] keep set-cpu-a ; inline
+  [ a>> swap call bitor ] keep (>>a) ; inline
 
 : cpu-a-bitxor ( quot cpu -- )
   #! A ^= quot call 
-  [ cpu-a swap call bitxor ] keep set-cpu-a ; inline
+  [ a>> swap call bitxor ] keep (>>a) ; inline
 
 : cpu-a-bitxor= ( value cpu -- )
   #! cpu-a ^= value
-  [ cpu-a bitxor ] keep set-cpu-a ;
+  [ a>> bitxor ] keep (>>a) ;
 
 : cpu-f-bitand ( quot cpu -- )
   #! F &= quot call 
-  [ cpu-f swap call bitand ] keep set-cpu-f ; inline
+  [ f>> swap call bitand ] keep (>>f) ; inline
 
 : cpu-f-bitor ( quot cpu -- )
   #! F |= quot call 
-  [ cpu-f swap call bitor ] keep set-cpu-f ; inline
+  [ f>> swap call bitor ] keep (>>f) ; inline
 
 : cpu-f-bitxor ( quot cpu -- )
   #! F |= quot call 
-  [ cpu-f swap call bitxor ] keep set-cpu-f ; inline
+  [ f>> swap call bitxor ] keep (>>f) ; inline
 
 : cpu-f-bitor= ( value cpu -- )
   #! cpu-f |= value
-  [ cpu-f bitor ] keep set-cpu-f ;
+  [ f>> bitor ] keep (>>f) ;
 
 : cpu-f-bitand= ( value cpu -- )
   #! cpu-f &= value
-  [ cpu-f bitand ] keep set-cpu-f ;
+  [ f>> bitand ] keep (>>f) ;
 
 : cpu-f-bitxor= ( value cpu -- )
   #! cpu-f ^= value
-  [ cpu-f bitxor ] keep set-cpu-f ;
+  [ f>> bitxor ] keep (>>f) ;
 
 : set-flag ( cpu flag -- )
   swap cpu-f-bitor= ;
@@ -228,7 +250,7 @@ M: cpu write-port ( value port cpu -- )
   #! The 'original' is the original value of the register being changed.
   #! 'change-by' is the amount it is being added or decremented by.
   #! 'result' is the result of that change.
-  >r bitxor bitxor HEX: 10 bitand 0 = not r> 
+  [ bitxor bitxor HEX: 10 bitand 0 = not ] dip
   swap [ half-carry-flag set-flag ] [ half-carry-flag clear-flag ] if ;
 
 : update-flags ( result cpu -- )
@@ -244,18 +266,18 @@ M: cpu write-port ( value port cpu -- )
 
 : add-byte ( lhs rhs cpu -- result )
   #! Add rhs to lhs
-  >r 2dup + r> ! lhs rhs result cpu
+  [ 2dup + ] dip 
   [ update-flags ] 2keep 
   [ update-half-carry-flag ] 2keep
   drop HEX: FF bitand ;
 
 : add-carry ( change-by result cpu -- change-by result )
   #! Add the effect of the carry flag to the result
-  flag-c? [ 1 + >r 1 + r> ] when ;
+  flag-c? [ 1 + [ 1 + ] dip ] when ;
 
 : add-byte-with-carry ( lhs rhs cpu -- result )
   #! Add rhs to lhs plus carry.
-  >r 2dup + r> ! lhs rhs result cpu
+  [ 2dup + ] dip
   [ add-carry ] keep
   [ update-flags ] 2keep 
   [ update-half-carry-flag ] 2keep
@@ -263,18 +285,18 @@ M: cpu write-port ( value port cpu -- )
 
 : sub-carry ( change-by result cpu -- change-by result ) 
   #! Subtract the effect of the carry flag from the result
-  flag-c? [ 1 - >r 1 - r>  ] when ;
+  flag-c? [ 1 - [ 1 - ] dip  ] when ;
 
 : sub-byte ( lhs rhs cpu -- result )
   #! Subtract rhs from lhs
-  >r 2dup - r> 
+  [ 2dup - ] dip
   [ update-flags ] 2keep 
   [ update-half-carry-flag ] 2keep
   drop HEX: FF bitand ;
 
 : sub-byte-with-carry ( lhs rhs cpu -- result )
   #! Subtract rhs from lhs and take carry into account
-  >r 2dup - r> 
+  [ 2dup - ] dip
   [ sub-carry ] keep 
   [ update-flags ] 2keep 
   [ update-half-carry-flag ] 2keep
@@ -283,7 +305,7 @@ M: cpu write-port ( value port cpu -- )
 : inc-byte ( byte cpu -- result )
   #! Increment byte by one. Note that carry flag is not affected
   #! by this operation.
-  >r 1 2dup + r> ! lhs rhs result cpu
+  [ 1 2dup + ] dip
   [ update-flags-no-carry ] 2keep 
   [ update-half-carry-flag ] 2keep
   drop HEX: FF bitand ;
@@ -291,7 +313,7 @@ M: cpu write-port ( value port cpu -- )
 : dec-byte ( byte cpu -- result )
   #! Decrement byte by one. Note that carry flag is not affected
   #! by this operation.
-  >r 1 2dup - r> ! lhs rhs result cpu
+  [ 1 2dup - ] dip
   [ update-flags-no-carry ] 2keep 
   [ update-half-carry-flag ] 2keep
   drop HEX: FF bitand ;
@@ -307,47 +329,45 @@ M: cpu write-port ( value port cpu -- )
 : add-word ( lhs rhs cpu -- result )
   #! Add rhs to lhs. Note that only the carry flag is modified
   #! and only if there is a carry out of the double precision add.
-  >r + r> over HEX: FFFF > [ carry-flag set-flag ] [ drop ] if HEX: FFFF bitand ;
+  [ + ] dip over HEX: FFFF > [ carry-flag set-flag ] [ drop ] if HEX: FFFF bitand ;
 
 : bit3or ( lhs rhs -- 0|1 )
   #! bitor bit 3 of the two numbers on the stack
-  BIN: 00001000 bitand -3 shift >r
-  BIN: 00001000 bitand -3 shift r> 
+  BIN: 00001000 bitand -3 shift [
+    BIN: 00001000 bitand -3 shift 
+  ] dip
   bitor ;
 
 : and-byte ( lhs rhs cpu -- result )
   #! Logically and rhs to lhs. The carry flag is cleared and
   #! the half carry is set to the ORing of bits 3 of the operands.
   [ drop bit3or ] 3keep ! bit3or lhs rhs cpu
-  >r bitand r> [ update-flags ] 2keep 
+  [ bitand ] dip [ update-flags ] 2keep 
   [ carry-flag clear-flag ] keep
   rot 0 = [ half-carry-flag set-flag ] [ half-carry-flag clear-flag ] if
   HEX: FF bitand ;
 
 : xor-byte ( lhs rhs cpu -- result )
   #! Logically xor rhs to lhs. The carry and half-carry flags are cleared.
-  >r bitxor r> [ update-flags ] 2keep 
+  [ bitxor ] dip [ update-flags ] 2keep 
   [ half-carry-flag carry-flag bitor clear-flag ] keep
   drop HEX: FF bitand ;
 
 : or-byte ( lhs rhs cpu -- result )
   #! Logically or rhs to lhs. The carry and half-carry flags are cleared.
-  >r bitor r> [ update-flags ] 2keep 
+  [ bitor ] dip [ update-flags ] 2keep 
   [ half-carry-flag carry-flag bitor clear-flag ] keep
   drop HEX: FF bitand ;
 
-: flags ( seq -- seq )
-  [ 0 [ execute bitor ] reduce ] map ;
-
 : decrement-sp ( n cpu -- )
   #! Decrement the stackpointer by n.  
-  [ cpu-sp ] keep 
-  >r swap - r> set-cpu-sp ;
+  [ sp>> ] keep 
+  [ swap - ] dip (>>sp) ;
 
 : save-pc ( cpu -- )
   #! Save the value of the PC on the stack.
-  [ cpu-pc ] keep ! pc cpu
-  [ cpu-sp ] keep ! pc sp cpu
+  [ pc>> ] keep ! pc cpu
+  [ sp>> ] keep ! pc sp cpu
   write-word ;
 
 : push-pc ( cpu -- )
@@ -357,46 +377,49 @@ M: cpu write-port ( value port cpu -- )
 
 : pop-pc ( cpu -- pc )
   #! Pop the value of the PC off the stack.
-  [ cpu-sp ] keep
+  [ sp>> ] keep
   [ read-word ] keep 
   -2 swap decrement-sp ;
 
 : push-sp ( value cpu -- )
   [ 2 swap decrement-sp ] keep
-  [ cpu-sp ] keep
+  [ sp>> ] keep
   write-word ;
   
 : pop-sp ( cpu -- value )
-  [ cpu-sp ] keep
+  [ sp>> ] keep
   [ read-word ] keep
   -2 swap decrement-sp ;
 
 : call-sub ( addr cpu -- )
   #! Call the address as a subroutine.
   dup push-pc 
-  >r HEX: FFFF bitand r> set-cpu-pc ;
+  [ HEX: FFFF bitand ] dip (>>pc) ;
 
 : ret-from-sub ( cpu -- )
-  [ pop-pc ] keep set-cpu-pc ;
+  [ pop-pc ] keep (>>pc) ;
  
 : interrupt ( number cpu -- )
   #! Perform a hardware interrupt
 !  "***Interrupt: " write over 16 >base print 
-  dup cpu-f interrupt-flag bitand 0 = not [
+  dup f>> interrupt-flag bitand 0 = not [
     dup push-pc
-    set-cpu-pc
+    (>>pc)
   ] [
     2drop
   ] if ;
 
 : inc-cycles ( n cpu -- )
   #! Increment the number of cpu cycles
-  [ cpu-cycles + ] keep set-cpu-cycles ;
+  [ cycles>> + ] keep (>>cycles) ;
   
 : instruction-cycles ( -- vector )
   #! Return a 256 element vector containing the cycles for
   #! each opcode in the 8080 instruction set.
-  << 256 f <array> parsed >> ;
+  \ instruction-cycles get-global [
+    256 f <array> \ instruction-cycles set-global
+  ] unless
+  \ instruction-cycles get-global ;
 
 : not-implemented ( <cpu> -- )
   drop ;
@@ -404,33 +427,37 @@ M: cpu write-port ( value port cpu -- )
 : instructions ( -- vector )
   #! Return a 256 element vector containing the emulation words for
   #! each opcode in the 8080 instruction set.
-  << 256 [ [ not-implemented ] 2array ] map parsed >> ; inline
+  \ instructions get-global [
+    256 [ not-implemented ] <array> \ instructions set-global
+  ] unless
+  \ instructions get-global ;
 
 : set-instruction ( quot n -- )
-  tuck >r 2array r> instructions set-nth ;
+  instructions set-nth ;
 
 M: cpu reset ( cpu -- )
   #! Reset the CPU to its poweron state
-  [ 0 swap set-cpu-b  ] keep
-  [ 0 swap set-cpu-c  ] keep
-  [ 0 swap set-cpu-d  ] keep
-  [ 0 swap set-cpu-e  ] keep
-  [ 0 swap set-cpu-h  ] keep
-  [ 0 swap set-cpu-l  ] keep
-  [ 0 swap set-cpu-a  ] keep
-  [ 0 swap set-cpu-f  ] keep
-  [ 0 swap set-cpu-pc  ] keep
-  [ HEX: F000 swap set-cpu-sp  ] keep 
-  [ HEX: FFFF 0 <array> swap set-cpu-ram ] keep
-  [ f swap set-cpu-halted? ] keep
-  [ HEX: 10 swap set-cpu-last-interrupt ] keep
-  0 swap set-cpu-cycles ;
+  0 >>b
+  0 >>c
+  0 >>d
+  0 >>e
+  0 >>h
+  0 >>l
+  0 >>a
+  0 >>f
+  0 >>pc
+  HEX: F000 >>sp
+  HEX: FFFF 0 <array> >>ram
+  f >>halted?
+  HEX: 10 >>last-interrupt
+  0 >>cycles 
+  drop ;
 
 : <cpu> ( -- cpu ) cpu new dup reset ;
 
 : (load-rom) ( n ram -- )
   read1 [ ! n ram ch
-    -rot [ set-nth ] 2keep >r 1 + r> (load-rom)
+    -rot [ set-nth ] 2keep [ 1 + ] dip (load-rom)
   ] [
     2drop
   ] if* ;
@@ -440,7 +467,7 @@ M: cpu reset ( cpu -- )
 : load-rom ( filename cpu -- )
   #! Load the contents of the file into ROM.
   #! (address 0x0000-0x1FFF).
-  cpu-ram swap binary [ 
+  ram>> swap binary [ 
     0 swap (load-rom)
   ] with-file-reader ;
 
@@ -455,7 +482,7 @@ SYMBOL: rom-root
   #! file will be loaded at the specified address. This
   #! file path shoul dbe relative to the '/roms' resource path.
   rom-dir [
-    cpu-ram [
+    ram>> [
       swap first2 rom-dir prepend-path binary [      
         swap (load-rom)
       ] with-file-reader
@@ -469,8 +496,8 @@ SYMBOL: rom-root
 : read-instruction ( cpu -- word )
   #! Read the next instruction from the cpu's program 
   #! counter, and increment the program counter.
-  [ cpu-pc ] keep ! pc cpu
-  [ over 1 + swap set-cpu-pc ] keep
+  [ pc>> ] keep ! pc cpu
+  [ over 1 + swap (>>pc) ] keep
   read-byte ;
 
 : get-cycles ( n -- opcode )
@@ -484,50 +511,50 @@ SYMBOL: rom-root
 
 : process-interrupts ( cpu -- )
   #! Process any hardware interrupts
-  [ cpu-cycles ] keep 
+  [ cycles>> ] keep 
   over 16667 < [
     2drop
   ] [ 
-    [ >r 16667 - r> set-cpu-cycles ] keep
-    dup cpu-last-interrupt HEX: 10 = [
-      HEX: 08 over set-cpu-last-interrupt HEX: 08 swap interrupt
+    [ [ 16667 - ] dip (>>cycles) ] keep
+    dup last-interrupt>> HEX: 10 = [
+      HEX: 08 over (>>last-interrupt) HEX: 08 swap interrupt
     ] [
-      HEX: 10 over set-cpu-last-interrupt HEX: 10 swap interrupt
+      HEX: 10 over (>>last-interrupt) HEX: 10 swap interrupt
     ] if     
   ] if ;
 
 : peek-instruction ( cpu -- word )
   #! Return the next instruction from the cpu's program
   #! counter, but don't increment the counter.
-  [ cpu-pc ] keep read-byte instructions nth first ;
+  [ pc>> ] keep read-byte instructions nth first ;
 
 : cpu. ( cpu -- )
-  [ " PC: " write cpu-pc 16 >base 4 CHAR: \s pad-left write ] keep 
-  [ " B: " write cpu-b 16 >base 2 CHAR: \s pad-left write ] keep 
-  [ " C: " write cpu-c 16 >base 2 CHAR: \s pad-left write ] keep 
-  [ " D: " write cpu-d 16 >base 2 CHAR: \s pad-left write ] keep 
-  [ " E: " write cpu-e 16 >base 2 CHAR: \s pad-left write ] keep 
-  [ " F: " write cpu-f 16 >base 2 CHAR: \s pad-left write ] keep 
-  [ " H: " write cpu-h 16 >base 2 CHAR: \s pad-left write ] keep 
-  [ " L: " write cpu-l 16 >base 2 CHAR: \s pad-left write ] keep 
-  [ " A: " write cpu-a 16 >base 2 CHAR: \s pad-left write ] keep 
-  [ " SP: " write cpu-sp 16 >base 4 CHAR: \s pad-left write ] keep 
-  [ " cycles: " write cpu-cycles number>string 5 CHAR: \s pad-left write ] keep 
+  [ " PC: " write pc>> 16 >base 4 CHAR: \s pad-head write ] keep 
+  [ " B: " write b>> 16 >base 2 CHAR: \s pad-head write ] keep 
+  [ " C: " write c>> 16 >base 2 CHAR: \s pad-head write ] keep 
+  [ " D: " write d>> 16 >base 2 CHAR: \s pad-head write ] keep 
+  [ " E: " write e>> 16 >base 2 CHAR: \s pad-head write ] keep 
+  [ " F: " write f>> 16 >base 2 CHAR: \s pad-head write ] keep 
+  [ " H: " write h>> 16 >base 2 CHAR: \s pad-head write ] keep 
+  [ " L: " write l>> 16 >base 2 CHAR: \s pad-head write ] keep 
+  [ " A: " write a>> 16 >base 2 CHAR: \s pad-head write ] keep 
+  [ " SP: " write sp>> 16 >base 4 CHAR: \s pad-head write ] keep 
+  [ " cycles: " write cycles>> number>string 5 CHAR: \s pad-head write ] keep 
   [ " " write peek-instruction name>> write " " write ] keep
   nl drop ;
 
 : cpu*. ( cpu -- )
-  [ " PC: " write cpu-pc 16 >base 4 CHAR: \s pad-left write ] keep 
-  [ " B: " write cpu-b 16 >base 2 CHAR: \s pad-left write ] keep 
-  [ " C: " write cpu-c 16 >base 2 CHAR: \s pad-left write ] keep 
-  [ " D: " write cpu-d 16 >base 2 CHAR: \s pad-left write ] keep 
-  [ " E: " write cpu-e 16 >base 2 CHAR: \s pad-left write ] keep 
-  [ " F: " write cpu-f 16 >base 2 CHAR: \s pad-left write ] keep 
-  [ " H: " write cpu-h 16 >base 2 CHAR: \s pad-left write ] keep 
-  [ " L: " write cpu-l 16 >base 2 CHAR: \s pad-left write ] keep 
-  [ " A: " write cpu-a 16 >base 2 CHAR: \s pad-left write ] keep 
-  [ " SP: " write cpu-sp 16 >base 4 CHAR: \s pad-left write ] keep 
-  [ " cycles: " write cpu-cycles number>string 5 CHAR: \s pad-left write ] keep 
+  [ " PC: " write pc>> 16 >base 4 CHAR: \s pad-head write ] keep 
+  [ " B: " write b>> 16 >base 2 CHAR: \s pad-head write ] keep 
+  [ " C: " write c>> 16 >base 2 CHAR: \s pad-head write ] keep 
+  [ " D: " write d>> 16 >base 2 CHAR: \s pad-head write ] keep 
+  [ " E: " write e>> 16 >base 2 CHAR: \s pad-head write ] keep 
+  [ " F: " write f>> 16 >base 2 CHAR: \s pad-head write ] keep 
+  [ " H: " write h>> 16 >base 2 CHAR: \s pad-head write ] keep 
+  [ " L: " write l>> 16 >base 2 CHAR: \s pad-head write ] keep 
+  [ " A: " write a>> 16 >base 2 CHAR: \s pad-head write ] keep 
+  [ " SP: " write sp>> 16 >base 4 CHAR: \s pad-head write ] keep 
+  [ " cycles: " write cycles>> number>string 5 CHAR: \s pad-head write ] keep 
   nl drop ;
 
 : register-lookup ( string -- vector )
@@ -535,18 +562,18 @@ SYMBOL: rom-root
   #! where the 1st item is the getter and the 2nd is the setter
   #! for that register.
   H{
-    { "A"  { cpu-a  set-cpu-a  } }
-    { "B"  { cpu-b  set-cpu-b  } }
-    { "C"  { cpu-c  set-cpu-c  } }
-    { "D"  { cpu-d  set-cpu-d  } }
-    { "E"  { cpu-e  set-cpu-e  } }
-    { "H"  { cpu-h  set-cpu-h  } }
-    { "L"  { cpu-l  set-cpu-l  } }
-    { "AF" { cpu-af set-cpu-af } }
-    { "BC" { cpu-bc set-cpu-bc } }
-    { "DE" { cpu-de set-cpu-de } }
-    { "HL" { cpu-hl set-cpu-hl } }
-    { "SP" { cpu-sp set-cpu-sp } }
+    { "A"  { a>>  (>>a)  } }
+    { "B"  { b>>  (>>b)  } }
+    { "C"  { c>>  (>>c)  } }
+    { "D"  { d>>  (>>d)  } }
+    { "E"  { e>>  (>>e)  } }
+    { "H"  { h>>  (>>h)  } }
+    { "L"  { l>>  (>>l)  } }
+    { "AF" { af>> (>>af) } }
+    { "BC" { bc>> (>>bc) } }
+    { "DE" { de>> (>>de) } }
+    { "HL" { hl>> (>>hl) } }
+    { "SP" { sp>> (>>sp) } }
   } at ;
 
 
@@ -579,40 +606,40 @@ SYMBOLS: $1 $2 $3 $4 ;
 
 : (emulate-RST) ( n cpu -- )
   #! RST nn
-  [ cpu-sp 2 - dup ] keep ! sp sp cpu
-  [ set-cpu-sp ] keep ! sp cpu
-  [ cpu-pc ] keep ! sp pc cpu
+  [ sp>> 2 - dup ] keep ! sp sp cpu
+  [ (>>sp) ] keep ! sp cpu
+  [ pc>> ] keep ! sp pc cpu
   swapd [ write-word ] keep ! cpu
-  >r 8 * r> set-cpu-pc ;
+  [ 8 * ] dip (>>pc) ;
 
 : (emulate-CALL) ( cpu -- )
   #! 205 - CALL nn
   [ next-word HEX: FFFF bitand ] keep ! addr cpu
-  [ cpu-sp 2 - dup ] keep ! addr sp sp cpu
-  [ set-cpu-sp ] keep ! addr sp cpu
-  [ cpu-pc ] keep ! addr sp pc cpu
+  [ sp>> 2 - dup ] keep ! addr sp sp cpu
+  [ (>>sp) ] keep ! addr sp cpu
+  [ pc>> ] keep ! addr sp pc cpu
   swapd [ write-word ] keep ! addr cpu
-  set-cpu-pc ;
+  (>>pc) ;
 
 : (emulate-RLCA) ( cpu -- )
   #! The content of the accumulator is rotated left
   #! one position. The low order bit and the carry flag
   #! are both set to the value shifd out of the high
   #! order bit position. Only the carry flag is affected.
-  [ cpu-a -7 shift ] keep 
+  [ a>> -7 shift ] keep 
   over 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] if
-  [ cpu-a 1 shift HEX: FF bitand ] keep 
-  >r bitor r> set-cpu-a ;
+  [ a>> 1 shift HEX: FF bitand ] keep 
+  [ bitor ] dip (>>a) ;
 
 : (emulate-RRCA) ( cpu -- )
   #! The content of the accumulator is rotated right
   #! one position. The high order bit and the carry flag
   #! are both set to the value shifd out of the low
   #! order bit position. Only the carry flag is affected.
-  [ cpu-a 1 bitand 7 shift ] keep 
+  [ a>> 1 bitand 7 shift ] keep 
   over 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] if
-  [ cpu-a 254 bitand -1 shift ] keep 
-  >r bitor r> set-cpu-a ;
+  [ a>> 254 bitand -1 shift ] keep 
+  [ bitor ] dip (>>a) ;
 
 : (emulate-RLA) ( cpu -- )  
   #! The content of the accumulator is rotated left
@@ -622,9 +649,9 @@ SYMBOLS: $1 $2 $3 $4 ;
   #! of the high order bit. Only the carry flag is
   #! affected.
   [ carry-flag swap flag-set? [ 1 ] [ 0 ] if ] keep 
-  [ cpu-a 127 bitand 7 shift ] keep 
-  dup cpu-a 128 bitand 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] if
-  >r bitor r> set-cpu-a ;
+  [ a>> 127 bitand 7 shift ] keep 
+  dup a>> 128 bitand 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] if
+  [ bitor ] dip (>>a) ;
 
 : (emulate-RRA) ( cpu -- )  
   #! The content of the accumulator is rotated right
@@ -633,9 +660,9 @@ SYMBOLS: $1 $2 $3 $4 ;
   #! set to the value shifd out of the low order bit. 
   #! Only the carry flag is affected.
   [ carry-flag swap flag-set? [ BIN: 10000000 ] [ 0 ] if ] keep 
-  [ cpu-a 254 bitand -1 shift ] keep 
-  dup cpu-a 1 bitand 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] if
-  >r bitor r> set-cpu-a ;
+  [ a>> 254 bitand -1 shift ] keep 
+  dup a>> 1 bitand 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] if
+  [ bitor ] dip (>>a) ;
 
 : (emulate-CPL) ( cpu -- )  
   #! The contents of the accumulator are complemented
@@ -649,18 +676,18 @@ SYMBOLS: $1 $2 $3 $4 ;
   #! digits.
   [
     dup half-carry-flag swap flag-set? swap 
-    cpu-a BIN: 1111 bitand 9 > or [ 6 ] [ 0 ] if 
+    a>> BIN: 1111 bitand 9 > or [ 6 ] [ 0 ] if 
   ] keep 
-  [ cpu-a + ] keep
+  [ a>> + ] keep
   [ update-flags ] 2keep  
-  [ swap HEX: FF bitand swap set-cpu-a ] keep 
+  [ swap HEX: FF bitand swap (>>a) ] keep 
   [
     dup carry-flag swap flag-set? swap 
-    cpu-a -4 shift BIN: 1111 bitand 9 > or [ 96 ] [ 0 ] if 
+    a>> -4 shift BIN: 1111 bitand 9 > or [ 96 ] [ 0 ] if 
   ] keep 
-  [ cpu-a + ] keep
+  [ a>> + ] keep
   [ update-flags ] 2keep  
-  swap HEX: FF bitand swap set-cpu-a ;
+  swap HEX: FF bitand swap (>>a) ;
   
 : patterns ( -- hashtable )
   #! table of code quotation patterns for each type of instruction.
@@ -676,18 +703,18 @@ SYMBOLS: $1 $2 $3 $4 ;
     { "RST-30H"      [ HEX: 30 swap (emulate-RST) ] }
     { "RST-38H"      [ HEX: 38 swap (emulate-RST) ] }
     { "RET-F|FF"      [ dup $1 [ 6 over inc-cycles ret-from-sub ] [ drop ] if ] }
-    { "CP-N"      [ [ cpu-a ] keep [ next-byte ] keep sub-byte drop ] }
-    { "CP-R"      [ [ cpu-a ] keep [ $1 ] keep sub-byte drop  ] }
-    { "CP-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep sub-byte drop ] }
-    { "OR-N"      [ [ cpu-a ] keep [ next-byte ] keep [ or-byte ] keep set-cpu-a ] }
-    { "OR-R"      [ [ cpu-a ] keep [ $1 ] keep [ or-byte ] keep set-cpu-a ] }
-    { "OR-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ or-byte ] keep set-cpu-a  ] }
-    { "XOR-N"      [ [ cpu-a ] keep [ next-byte ] keep [ xor-byte ] keep set-cpu-a ] }
-    { "XOR-R"      [ [ cpu-a ] keep [ $1 ] keep [ xor-byte ] keep set-cpu-a ] }
-    { "XOR-(RR)"   [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ xor-byte ] keep set-cpu-a  ] }
-    { "AND-N"      [ [ cpu-a ] keep [ next-byte ] keep [ and-byte ] keep set-cpu-a  ] }
-    { "AND-R"      [ [ cpu-a ] keep [ $1 ] keep [ and-byte ] keep set-cpu-a ] }
-    { "AND-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ and-byte ] keep set-cpu-a  ] }
+    { "CP-N"      [ [ a>> ] keep [ next-byte ] keep sub-byte drop ] }
+    { "CP-R"      [ [ a>> ] keep [ $1 ] keep sub-byte drop  ] }
+    { "CP-(RR)"      [ [ a>> ] keep [ $1 ] keep [ read-byte ] keep sub-byte drop ] }
+    { "OR-N"      [ [ a>> ] keep [ next-byte ] keep [ or-byte ] keep (>>a) ] }
+    { "OR-R"      [ [ a>> ] keep [ $1 ] keep [ or-byte ] keep (>>a) ] }
+    { "OR-(RR)"      [ [ a>> ] keep [ $1 ] keep [ read-byte ] keep [ or-byte ] keep (>>a)  ] }
+    { "XOR-N"      [ [ a>> ] keep [ next-byte ] keep [ xor-byte ] keep (>>a) ] }
+    { "XOR-R"      [ [ a>> ] keep [ $1 ] keep [ xor-byte ] keep (>>a) ] }
+    { "XOR-(RR)"   [ [ a>> ] keep [ $1 ] keep [ read-byte ] keep [ xor-byte ] keep (>>a)  ] }
+    { "AND-N"      [ [ a>> ] keep [ next-byte ] keep [ and-byte ] keep (>>a)  ] }
+    { "AND-R"      [ [ a>> ] keep [ $1 ] keep [ and-byte ] keep (>>a) ] }
+    { "AND-(RR)"      [ [ a>> ] keep [ $1 ] keep [ read-byte ] keep [ and-byte ] keep (>>a)  ] }
     { "ADC-R,N"      [ [ $1 ] keep [ next-byte ] keep [ add-byte-with-carry ] keep $2 ] }
     { "ADC-R,R"      [ [ $1 ] keep [ $3 ] keep [ add-byte-with-carry ] keep $2 ] }
     { "ADC-R,(RR)"      [ [ $1 ] keep [ $3 ] keep [ read-byte ] keep [ add-byte-with-carry ] keep $2 ] }
@@ -698,9 +725,9 @@ SYMBOLS: $1 $2 $3 $4 ;
     { "SBC-R,N"      [ [ $1 ] keep [ next-byte ] keep [ sub-byte-with-carry ] keep $2 ] }
     { "SBC-R,R"      [ [ $1 ] keep [ $3 ] keep [ sub-byte-with-carry ] keep $2 ] }
     { "SBC-R,(RR)"      [ [ $1 ] keep [ $3 ] keep [ read-byte ] keep [ sub-byte-with-carry ] keep $2 ] }
-    { "SUB-R"      [ [ cpu-a ] keep [ $1 ] keep [ sub-byte ] keep set-cpu-a ] }
-    { "SUB-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ sub-byte ] keep set-cpu-a ] }
-    { "SUB-N"      [ [ cpu-a ] keep [ next-byte ] keep [ sub-byte ] keep set-cpu-a ] }
+    { "SUB-R"      [ [ a>> ] keep [ $1 ] keep [ sub-byte ] keep (>>a) ] }
+    { "SUB-(RR)"      [ [ a>> ] keep [ $1 ] keep [ read-byte ] keep [ sub-byte ] keep (>>a) ] }
+    { "SUB-N"      [ [ a>> ] keep [ next-byte ] keep [ sub-byte ] keep (>>a) ] }
     { "CPL"          [ (emulate-CPL) ]               }
     { "DAA"          [ (emulate-DAA) ]               }
     { "RLA"          [ (emulate-RLA) ]               }
@@ -720,11 +747,11 @@ SYMBOLS: $1 $2 $3 $4 ;
     { "DEC-RR"     [ [ $1 ] keep [ dec-word ] keep $2 ] }
     { "DEC-(RR)"     [ [ $1 ] keep [ read-byte ] keep [ dec-byte ] keep [ $1 ] keep write-byte ] }
     { "INC-(RR)" [ [ $1 ] keep [ read-byte ] keep [ inc-byte ] keep  [ $1 ] keep write-byte ] }
-    { "JP-NN"           [ [ cpu-pc ] keep [ read-word ] keep set-cpu-pc ]               }
-    { "JP-F|FF,NN"      [ [ $1 ] keep swap [ [ next-word ] keep [ set-cpu-pc ] keep [ cpu-cycles ] keep swap 5 + swap set-cpu-cycles ] [ [ cpu-pc 2 + ] keep set-cpu-pc ] if ] }
-    { "JP-(RR)"      [ [ $1 ] keep set-cpu-pc ] }
+    { "JP-NN"           [ [ pc>> ] keep [ read-word ] keep (>>pc) ]               }
+    { "JP-F|FF,NN"      [ [ $1 ] keep swap [ [ next-word ] keep [ (>>pc) ] keep [ cycles>> ] keep swap 5 + swap (>>cycles) ] [ [ pc>> 2 + ] keep (>>pc) ] if ] }
+    { "JP-(RR)"      [ [ $1 ] keep (>>pc) ] }
     { "CALL-NN"         [ (emulate-CALL) ] }
-    { "CALL-F|FF,NN"    [ [ $1 ] keep swap [ 7 over inc-cycles (emulate-CALL) ] [ [ cpu-pc 2 + ] keep set-cpu-pc ] if ]   }
+    { "CALL-F|FF,NN"    [ [ $1 ] keep swap [ 7 over inc-cycles (emulate-CALL) ] [ [ pc>> 2 + ] keep (>>pc) ] if ]   }
     { "LD-RR,NN"     [ [ next-word ] keep $2 ] }
     { "LD-RR,RR"     [ [ $3 ] keep $2 ] }
     { "LD-R,N"     [ [ next-byte ] keep $2 ] }
@@ -737,7 +764,7 @@ SYMBOLS: $1 $2 $3 $4 ;
     { "LD-RR,(NN)"    [ [ next-word ] keep [ read-word ] keep $2 ]  }
     { "LD-R,(NN)"    [ [ next-word ] keep [ read-byte ] keep $2 ] }
     { "OUT-(N),R"    [ [ $1 ] keep [ next-byte ] keep write-port ] }
-    { "IN-R,(N)"    [ [ next-byte ] keep [ read-port ] keep set-cpu-a ] }
+    { "IN-R,(N)"    [ [ next-byte ] keep [ read-port ] keep (>>a) ] }
     { "EX-(RR),RR"  [  [ $1 ] keep [ read-word ] keep [ $3 ] keep [ $1 ] keep [ write-word ] keep $4 ] }
     { "EX-RR,RR"    [ [ $1 ] keep [ $3 ] keep [ $2 ] keep $4 ] }
   } ;
@@ -789,14 +816,14 @@ SYMBOLS: $1 $2 $3 $4 ;
   #! Return a parser for then instruction identified by the token. 
   #! The parser return parses the token only and expects no additional
   #! arguments to the instruction.
-  token [ '[ { } , generate-instruction ] ] action ;
+  token [ '[ { } _ generate-instruction ] ] action ;
 
 : complex-instruction ( type token -- parser )
   #! Return a parser for an instruction identified by the token. 
   #! The instruction is expected to take additional arguments by 
   #! being combined with other parsers. Then 'type' is used for a lookup
   #! in a pattern hashtable to return the instruction quotation pattern.
-  token swap [ nip '[ , generate-instruction ] ] curry action ;
+  token swap [ nip '[ _ generate-instruction ] ] curry action ;
 
 : no-params ( ast -- ast )
   first { } swap curry ;
@@ -1347,7 +1374,7 @@ SYMBOLS: $1 $2 $3 $4 ;
     IN-R,(N)-instruction ,
     EX-(RR),RR-instruction ,
     EX-RR,RR-instruction ,
-  ] choice* [ call ] action ;
+  ] choice* [ call( -- quot ) ] action ;
 
 : instruction-quotations ( string -- emulate-quot )
   #! Given an instruction string, return the emulation quotation for
@@ -1358,22 +1385,23 @@ SYMBOLS: $1 $2 $3 $4 ;
 SYMBOL: last-instruction
 SYMBOL: last-opcode
 
-: parse-instructions ( list -- emulate-quot )
+: parse-instructions ( list -- )
   #! Process the list of strings, which should make
   #! up an 8080 instruction, and output a quotation
   #! that would implement that instruction.
   dup " " join instruction-quotations
-  >r "_" join [ "emulate-" % % ] "" make create-in dup last-instruction global set-at  
-  r> (( cpu -- )) define-declared ;
+  [
+     "_" join [ "emulate-" % % ] "" make create-in dup last-instruction global set-at  
+  ] dip (( cpu -- )) define-declared ;
 
-: INSTRUCTION: ";" parse-tokens parse-instructions ; parsing
+SYNTAX: INSTRUCTION:  ";" parse-tokens parse-instructions ;
 
-: cycles ( -- )
+SYNTAX: cycles 
   #! Set the number of cycles for the last instruction that was defined. 
-  scan string>number last-opcode global at instruction-cycles set-nth ; parsing
+  scan string>number last-opcode global at instruction-cycles set-nth ; 
 
-: opcode ( -- )
+SYNTAX: opcode ( -- )
   #! Set the opcode number for the last instruction that was defined.
   last-instruction global at 1quotation scan 16 base>
-  dup last-opcode global set-at set-instruction ; parsing
+  dup last-opcode global set-at set-instruction ; 
 
