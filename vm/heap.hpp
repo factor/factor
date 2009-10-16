@@ -15,7 +15,7 @@ struct heap {
 	heap_free_list free;
 	unordered_map<heap_block *, char *> forwarding;
 
-	explicit heap(bool secure_gc_, cell size);
+	explicit heap(bool secure_gc_, cell size, bool executable_p);
 
 	inline heap_block *next_block(heap_block *block)
 	{

@@ -83,16 +83,19 @@ void factor_vm::primitive_existsp()
 	box_boolean(stat(path,&sb) >= 0);
 }
 
-segment::segment(cell size_)
+segment::segment(cell size_, bool executable_p)
 {
 	size = size_;
 
 	int pagesize = getpagesize();
 
-	char *array = (char *)mmap(NULL,pagesize + size + pagesize,
-		PROT_READ | PROT_WRITE | PROT_EXEC,
-		MAP_ANON | MAP_PRIVATE,-1,0);
+	int prot;
+	if(executable_p)
+		prot = (PROT_READ | PROT_WRITE | PROT_EXEC);
+	else
+		prot = (PROT_READ | PROT_WRITE);
 
+	char *array = (char *)mmap(NULL,pagesize + size + pagesize,prot,MAP_ANON | MAP_PRIVATE,-1,0);
 	if(array == (char*)-1) out_of_memory();
 
 	if(mprotect(array,pagesize,PROT_NONE) == -1)
