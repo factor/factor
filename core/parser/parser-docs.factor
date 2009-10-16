@@ -142,7 +142,7 @@ HELP: no-word
 
 HELP: scan-word
 { $values { "word/number/f" "a word, number or " { $link f } } }
-{ $description "Reads the next token from parser input. If the token is a valid number literal, it is converted to a number, otherwise the dictionary is searched for a word named by the token. Outputs " { $link f } " if the end of the input has been reached." }
+{ $description "Reads the next token from parser input. If the token is a valid number literal, it is converted to a number, otherwise the vocabulary search path is searched for a word named by the token. Outputs " { $link f } " if the end of the input has been reached." }
 { $errors "Throws an error if the token does not name a word, and does not parse as a number." }
 $parsing-note ;
 
