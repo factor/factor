@@ -1,6 +1,6 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien alien.c-types alien.data alien.parser arrays
-byte-arrays combinators effects.parser fry generalizations kernel
+byte-arrays combinators effects.parser fry generalizations grouping kernel
 lexer locals macros make math math.ranges parser sequences sequences.private ;
 FROM: alien.arrays => array-length ;
 IN: alien.data.map
@@ -19,8 +19,6 @@ TUPLE: data-map-param
     { iter-length fixnum read-only }
     { iter-count fixnum read-only } ;
 
-ERROR: bad-data-map-param param remainder ;
-
 M: data-map-param length
     iter-count>> ; inline
 
@@ -34,12 +32,14 @@ M: data-map-param nth-unsafe
 
 INSTANCE: data-map-param immutable-sequence
 
-: c-type-count ( in/out -- c-type count iter-length )
-    dup array? [ unclip swap array-length >fixnum ] [ 1 ] if
-    2dup swap heap-size * >fixnum ; inline
+: c-type-count ( in/out -- c-type count )
+    dup array? [ unclip swap array-length >fixnum ] [ 1 ] if ; inline
 
-MACRO: >param ( in -- quot: ( array -- param ) )
-    c-type-count '[
+: c-type-iter-length ( c-type count -- iter-length )
+    swap heap-size * >fixnum ; inline
+
+: [>c-type-param] ( c-type count -- quot )
+    2dup c-type-iter-length '[
         [ _ _ ] dip
         [ ]
         [ >c-ptr ]
@@ -49,8 +49,18 @@ MACRO: >param ( in -- quot: ( array -- param ) )
         data-map-param boa
     ] ;
 
-MACRO: alloc-param ( out -- quot: ( len -- param ) )
-    c-type-count dup '[
+: [>object-param] ( class count -- quot )
+    nip '[ _ <sliced-groups> ] ;
+
+: [>param] ( type -- quot )
+    c-type-count over c-type-name?
+    [ [>c-type-param] ] [ [>object-param] ] if ; 
+
+MACRO: >param ( in -- quot: ( array -- param ) )
+    [>param] ;
+
+: [alloc-c-type-param] ( c-type count -- quot )
+    2dup c-type-iter-length dup '[
         [ _ _ ] dip
         [
             _ * >fixnum [ (byte-array) dup ] keep
@@ -59,11 +69,21 @@ MACRO: alloc-param ( out -- quot: ( len -- param ) )
         data-map-param boa
     ] ;
 
+: [alloc-object-param] ( type count -- quot )
+    "Factor sequences as data-map outputs not supported" throw ;
+
+: [alloc-param] ( type -- quot )
+    c-type-count over c-type-name?
+    [ [alloc-c-type-param] ] [ [alloc-object-param] ] if ; 
+
+MACRO: alloc-param ( out -- quot: ( len -- param ) )
+    [alloc-param] ;
+
 MACRO: unpack-params ( ins -- )
-    [ c-type-count drop nip '[ _ firstn-unsafe ] ] map '[ _ spread ] ;
+    [ c-type-count nip '[ _ firstn-unsafe ] ] map '[ _ spread ] ;
 
 MACRO: pack-params ( outs -- )
-    [ ] [ c-type-count drop nip dup [ [ ndip _ ] dip set-firstn ] 3curry ] reduce
+    [ ] [ c-type-count nip dup [ [ ndip _ ] dip set-firstn ] 3curry ] reduce
     fry [ call ] compose ;
 
 :: [data-map] ( ins outs param-quot -- quot )
