@@ -8,6 +8,8 @@ TYPEDEF: char char2
 
 SYMBOL: not-c-type
 
+CONSTANT: eleven 11
+
 [
     "alien.parser.tests" use-vocab
     "alien.c-types" use-vocab
@@ -15,6 +17,7 @@ SYMBOL: not-c-type
     [ int ] [ "int" parse-c-type ] unit-test
     [ { int 5 } ] [ "int[5]" parse-c-type ] unit-test
     [ { int 5 10 11 } ] [ "int[5][10][11]" parse-c-type ] unit-test
+    [ { int 5 10 eleven } ] [ "int[5][10][eleven]" parse-c-type ] unit-test
     [ void* ] [ "int*" parse-c-type ] unit-test
     [ void* ] [ "int**" parse-c-type ] unit-test
     [ void* ] [ "int***" parse-c-type ] unit-test
