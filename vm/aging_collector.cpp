@@ -12,6 +12,8 @@ aging_collector::aging_collector(factor_vm *myvm_) :
 
 void factor_vm::collect_aging()
 {
+	/* Promote objects referenced from tenured space to tenured space, copy
+	everything else to the aging semi-space, and reset the nursery pointer. */
 	{
 		/* Change the op so that if we fail here, we proceed to a full
 		tenured collection. We are collecting to tenured space, and

@@ -11,6 +11,12 @@ void code_heap::write_barrier(code_block *compiled)
 	points_to_aging.insert(compiled);
 }
 
+void code_heap::clear_remembered_set()
+{
+	points_to_nursery.clear();
+	points_to_aging.clear();
+}
+
 bool code_heap::needs_fixup_p(code_block *compiled)
 {
 	return needs_fixup.count(compiled) > 0;
@@ -224,7 +230,7 @@ void factor_vm::fixup_object_xts()
 
 /* Move all free space to the end of the code heap. This is not very efficient,
 since it makes several passes over the code and data heaps, but we only ever
-do this before saving a deployed image and exiting, so performaance is not
+do this before saving a deployed image and exiting, so performance is not
 critical here */
 void factor_vm::compact_code_heap()
 {
