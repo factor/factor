@@ -250,7 +250,7 @@ CONSTANT: rs-reg 14
 ] mega-lookup jit-define
 
 [
-    0 2 LOAD32 rc-absolute-cell rt-xt jit-rel
+    0 2 LOAD32 rc-absolute-ppc-2/2 rt-xt jit-rel
     2 MTCTR
     BCTR
 ] callback-stub jit-define
