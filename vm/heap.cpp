@@ -11,10 +11,10 @@ void heap::clear_free_list()
 	memset(&free,0,sizeof(heap_free_list));
 }
 
-heap::heap(bool secure_gc_, cell size) : secure_gc(secure_gc_)
+heap::heap(bool secure_gc_, cell size, bool executable_p) : secure_gc(secure_gc_)
 {
 	if(size > (1L << (sizeof(cell) * 8 - 6))) fatal_error("Heap too large",size);
-	seg = new segment(align_page(size));
+	seg = new segment(align_page(size),executable_p);
 	if(!seg) fatal_error("Out of memory in heap allocator",size);
 	clear_free_list();
 }
