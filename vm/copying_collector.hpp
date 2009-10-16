@@ -153,19 +153,13 @@ end:		this->myvm->gc_stats.card_scan_time += (current_micros() - start_time);
 		for(; iter != end; iter++) trace_literal_references(*iter);
 	}
 
-	template<typename SourceGeneration>
-	void trace_objects_between(SourceGeneration *gen, cell scan, cell *end)
-	{
-		while(scan && scan < *end)
-		{
-			this->trace_slots((object *)scan);
-			scan = gen->next_object_after(this->myvm,scan);
-		}
-	}
-
 	void cheneys_algorithm()
 	{
-		trace_objects_between(this->target,scan,&this->target->here);
+		while(scan && scan < this->target->here)
+		{
+			this->trace_slots((object *)scan);
+			scan = this->target->next_object_after(this->myvm,scan);
+		}
 	}
 };
 

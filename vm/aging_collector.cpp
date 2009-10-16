@@ -38,7 +38,7 @@ void factor_vm::collect_aging()
 		collector.trace_contexts();
 		collector.trace_code_heap_roots(&code->points_to_aging);
 		collector.cheneys_algorithm();
-		update_dirty_code_blocks(&code->points_to_aging);
+		update_code_heap_for_minor_gc(&code->points_to_aging);
 
 		nursery.here = nursery.start;
 		code->points_to_nursery.clear();

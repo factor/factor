@@ -25,6 +25,18 @@ M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
 M: x86.32 temp-reg ECX ;
 
+M: x86.32 %mark-card
+    drop HEX: ffffffff [+] card-mark <byte> MOV
+    building get pop
+    rc-absolute-cell rel-cards-offset
+    building get push ;
+
+M: x86.32 %mark-deck
+    drop HEX: ffffffff [+] card-mark <byte> MOV
+    building get pop
+    rc-absolute-cell rel-decks-offset
+    building get push ;
+
 M:: x86.32 %dispatch ( src temp -- )
     ! Load jump table base.
     temp src HEX: ffffffff [+] LEA
