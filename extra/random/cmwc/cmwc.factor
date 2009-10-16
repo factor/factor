@@ -43,10 +43,10 @@ M:: cmwc random-32* ( cmwc -- n )
 
     t -32 shift cmwc (>>c)
 
-    t cmwc [ b>> bitand ] [ c>> + ] bi 64 bits t!
+    t cmwc [ b>> bitand ] [ c>> + ] bi 32 bits t!
     t cmwc r>> > [
         cmwc [ 1 + ] change-c drop
-        t cmwc b>> - 64 bits t!
+        t cmwc b>> - 32 bits t!
     ] when
 
     cmwc [ r>> t - 32 bits dup ] [ i>> ] [ Q>> ] tri set-nth ;
