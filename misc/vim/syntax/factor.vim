@@ -23,7 +23,7 @@ else
     set iskeyword=!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255
 endif
 
-syn cluster factorCluster contains=factorComment,factorFryDirective,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorCompileDirective,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorCharErr,factorBackslash,@factorWordOps,factorAlien,factorTuple,factorStruct
+syn cluster factorCluster contains=factorComment,factorFryDirective,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorCompileDirective,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorCharErr,factorBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorTuple,factorStruct
 
 syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
 syn match factorComment /\<#!\>.*/ contains=factorTodo
@@ -85,6 +85,8 @@ syn match   factorCharErr       /\<CHAR:\s\+\S\+/
 syn match   factorChar          /\<CHAR:\s\+\\\=\S\>/
 
 syn match   factorBackslash     /\<\\\>\s\+\S\+\>/
+syn match   factorLiteral       /\<\$\>\s\+\S\+\>/
+syn region  factorLiteralBlock  start=/\<\$\[\>/ end=/\<\]\>/
 
 syn region  factorUsing         start=/\<USING:\>/       end=/;/
 syn match   factorQualified     /\<QUALIFIED:\s\+\S\+\>/
@@ -233,6 +235,8 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorCharErr                Error
     HiLink factorDelimiter              Delimiter
     HiLink factorBackslash              Special
+    HiLink factorLiteral                Special
+    HiLink factorLiteralBlock           Special
     HiLink factorCompileDirective       Typedef
     HiLink factorSymbol                 Define
     HiLink factorConstant               Define
