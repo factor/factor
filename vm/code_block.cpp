@@ -97,7 +97,7 @@ void factor_vm::undefined_symbol()
 
 void undefined_symbol()
 {
-	return SIGNAL_VM_PTR()->undefined_symbol();
+	return tls_vm()->undefined_symbol();
 }
 
 /* Look up an external library symbol referenced by a compiled code block */

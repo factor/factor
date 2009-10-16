@@ -139,7 +139,7 @@ void factor_vm::memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	SIGNAL_VM_PTR()->memory_signal_handler(signal,siginfo,uap);
+	tls_vm()->memory_signal_handler(signal,siginfo,uap);
 }
 
 void factor_vm::misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
@@ -151,7 +151,7 @@ void factor_vm::misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 
 void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	SIGNAL_VM_PTR()->misc_signal_handler(signal,siginfo,uap);
+	tls_vm()->misc_signal_handler(signal,siginfo,uap);
 }
 
 void factor_vm::fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
@@ -168,7 +168,7 @@ void factor_vm::fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 
 void fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	SIGNAL_VM_PTR()->fpe_signal_handler(signal, siginfo, uap);
+	tls_vm()->fpe_signal_handler(signal, siginfo, uap);
 }
 
 static void sigaction_safe(int signum, const struct sigaction *act, struct sigaction *oldact)

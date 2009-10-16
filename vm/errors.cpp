@@ -15,13 +15,13 @@ void critical_error(const char *msg, cell tagged)
 	print_string("You have triggered a bug in Factor. Please report.\n");
 	print_string("critical_error: "); print_string(msg);
 	print_string(": "); print_cell_hex(tagged); nl();
-	SIGNAL_VM_PTR()->factorbug();
+	tls_vm()->factorbug();
 }
 
 void out_of_memory()
 {
 	print_string("Out of memory\n\n");
-	SIGNAL_VM_PTR()->dump_generations();
+	tls_vm()->dump_generations();
 	exit(1);
 }
 
@@ -146,7 +146,7 @@ void factor_vm::memory_signal_handler_impl()
 
 void memory_signal_handler_impl()
 {
-	SIGNAL_VM_PTR()->memory_signal_handler_impl();
+	tls_vm()->memory_signal_handler_impl();
 }
 
 void factor_vm::misc_signal_handler_impl()
@@ -156,7 +156,7 @@ void factor_vm::misc_signal_handler_impl()
 
 void misc_signal_handler_impl()
 {
-	SIGNAL_VM_PTR()->misc_signal_handler_impl();
+	tls_vm()->misc_signal_handler_impl();
 }
 
 void factor_vm::fp_signal_handler_impl()
@@ -166,7 +166,7 @@ void factor_vm::fp_signal_handler_impl()
 
 void fp_signal_handler_impl()
 {
-	SIGNAL_VM_PTR()->fp_signal_handler_impl();
+	tls_vm()->fp_signal_handler_impl();
 }
 
 }

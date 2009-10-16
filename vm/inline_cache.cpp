@@ -250,8 +250,7 @@ void *factor_vm::inline_cache_miss(cell return_address)
 
 VM_C_API void *inline_cache_miss(cell return_address, factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->inline_cache_miss(return_address);
+	return myvm->inline_cache_miss(return_address);
 }
 
 void factor_vm::primitive_reset_inline_cache_stats()

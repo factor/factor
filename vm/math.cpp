@@ -395,8 +395,7 @@ fixnum factor_vm::to_fixnum(cell tagged)
 
 VM_C_API fixnum to_fixnum(cell tagged,factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->to_fixnum(tagged);
+	return myvm->to_fixnum(tagged);
 }
 
 cell factor_vm::to_cell(cell tagged)
@@ -406,8 +405,7 @@ cell factor_vm::to_cell(cell tagged)
 
 VM_C_API cell to_cell(cell tagged, factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->to_cell(tagged);
+	return myvm->to_cell(tagged);
 }
 
 void factor_vm::box_signed_1(s8 n)
@@ -417,8 +415,7 @@ void factor_vm::box_signed_1(s8 n)
 
 VM_C_API void box_signed_1(s8 n,factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->box_signed_1(n);
+	return myvm->box_signed_1(n);
 }
 
 void factor_vm::box_unsigned_1(u8 n)
@@ -428,8 +425,7 @@ void factor_vm::box_unsigned_1(u8 n)
 
 VM_C_API void box_unsigned_1(u8 n,factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->box_unsigned_1(n);
+	return myvm->box_unsigned_1(n);
 }
 
 void factor_vm::box_signed_2(s16 n)
@@ -439,8 +435,7 @@ void factor_vm::box_signed_2(s16 n)
 
 VM_C_API void box_signed_2(s16 n,factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->box_signed_2(n);
+	return myvm->box_signed_2(n);
 }
 
 void factor_vm::box_unsigned_2(u16 n)
@@ -450,8 +445,7 @@ void factor_vm::box_unsigned_2(u16 n)
 
 VM_C_API void box_unsigned_2(u16 n,factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->box_unsigned_2(n);
+	return myvm->box_unsigned_2(n);
 }
 
 void factor_vm::box_signed_4(s32 n)
@@ -461,8 +455,7 @@ void factor_vm::box_signed_4(s32 n)
 
 VM_C_API void box_signed_4(s32 n,factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->box_signed_4(n);
+	return myvm->box_signed_4(n);
 }
 
 void factor_vm::box_unsigned_4(u32 n)
@@ -472,8 +465,7 @@ void factor_vm::box_unsigned_4(u32 n)
 
 VM_C_API void box_unsigned_4(u32 n,factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->box_unsigned_4(n);
+	return myvm->box_unsigned_4(n);
 }
 
 void factor_vm::box_signed_cell(fixnum integer)
@@ -483,8 +475,7 @@ void factor_vm::box_signed_cell(fixnum integer)
 
 VM_C_API void box_signed_cell(fixnum integer,factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->box_signed_cell(integer);
+	return myvm->box_signed_cell(integer);
 }
 
 void factor_vm::box_unsigned_cell(cell cell)
@@ -494,8 +485,7 @@ void factor_vm::box_unsigned_cell(cell cell)
 
 VM_C_API void box_unsigned_cell(cell cell,factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->box_unsigned_cell(cell);
+	return myvm->box_unsigned_cell(cell);
 }
 
 void factor_vm::box_signed_8(s64 n)
@@ -508,8 +498,7 @@ void factor_vm::box_signed_8(s64 n)
 
 VM_C_API void box_signed_8(s64 n,factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->box_signed_8(n);
+	return myvm->box_signed_8(n);
 }
 
 s64 factor_vm::to_signed_8(cell obj)
@@ -528,8 +517,7 @@ s64 factor_vm::to_signed_8(cell obj)
 
 VM_C_API s64 to_signed_8(cell obj,factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->to_signed_8(obj);
+	return myvm->to_signed_8(obj);
 }
 
 void factor_vm::box_unsigned_8(u64 n)
@@ -542,8 +530,7 @@ void factor_vm::box_unsigned_8(u64 n)
 
 VM_C_API void box_unsigned_8(u64 n,factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->box_unsigned_8(n);
+	return myvm->box_unsigned_8(n);
 }
 
 u64 factor_vm::to_unsigned_8(cell obj)
@@ -562,8 +549,7 @@ u64 factor_vm::to_unsigned_8(cell obj)
 
 VM_C_API u64 to_unsigned_8(cell obj,factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->to_unsigned_8(obj);
+	return myvm->to_unsigned_8(obj);
 }
  
 void factor_vm::box_float(float flo)
@@ -573,8 +559,7 @@ void factor_vm::box_float(float flo)
 
 VM_C_API void box_float(float flo, factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->box_float(flo);
+	return myvm->box_float(flo);
 }
 
 float factor_vm::to_float(cell value)
@@ -584,8 +569,7 @@ float factor_vm::to_float(cell value)
 
 VM_C_API float to_float(cell value,factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->to_float(value);
+	return myvm->to_float(value);
 }
 
 void factor_vm::box_double(double flo)
@@ -595,8 +579,7 @@ void factor_vm::box_double(double flo)
 
 VM_C_API void box_double(double flo,factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->box_double(flo);
+	return myvm->box_double(flo);
 }
 
 double factor_vm::to_double(cell value)
@@ -606,8 +589,7 @@ double factor_vm::to_double(cell value)
 
 VM_C_API double to_double(cell value,factor_vm *myvm)
 {
-	ASSERTVM();
-	return VM_PTR->to_double(value);
+	return myvm->to_double(value);
 }
 
 /* The fixnum+, fixnum- and fixnum* primitives are defined in cpu_*.S. On
@@ -620,7 +602,7 @@ inline void factor_vm::overflow_fixnum_add(fixnum x, fixnum y)
 
 VM_ASM_API void overflow_fixnum_add(fixnum x, fixnum y, factor_vm *myvm)
 {
-	PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_add(x,y);
+	((factor_vm*)myvm)->overflow_fixnum_add(x,y);
 }
 
 inline void factor_vm::overflow_fixnum_subtract(fixnum x, fixnum y)
@@ -631,7 +613,7 @@ inline void factor_vm::overflow_fixnum_subtract(fixnum x, fixnum y)
 
 VM_ASM_API void overflow_fixnum_subtract(fixnum x, fixnum y, factor_vm *myvm)
 {
-	PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_subtract(x,y);
+	((factor_vm*)myvm)->overflow_fixnum_subtract(x,y);
 }
 
 inline void factor_vm::overflow_fixnum_multiply(fixnum x, fixnum y)
@@ -645,7 +627,7 @@ inline void factor_vm::overflow_fixnum_multiply(fixnum x, fixnum y)
 
 VM_ASM_API void overflow_fixnum_multiply(fixnum x, fixnum y, factor_vm *myvm)
 {
-	PRIMITIVE_OVERFLOW_GETVM()->overflow_fixnum_multiply(x,y);
+	((factor_vm*)myvm)->overflow_fixnum_multiply(x,y);
 }
 
 }
