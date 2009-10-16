@@ -1,5 +1,5 @@
 ! (c)Joe Groff bsd license
-USING: alien.data.map fry generalizations kernel math.vectors
+USING: alien.data.map fry generalizations kernel locals math.vectors
 math.vectors.conversion math math.vectors.simd
 specialized-arrays tools.test ;
 FROM: alien.c-types => uchar short int float ;
@@ -19,6 +19,13 @@ IN: alien.data.map.tests
     [ dup ] data-map!( int -- float[2] )
 ] unit-test
 
+:: float-pixels>byte-pixels-locals ( floats scale bias -- bytes )
+    floats [
+        [ scale 255.0 * v*n bias 255.0 * v+n float-4 int-4 vconvert ] 4 napply
+        [ int-4 short-8 vconvert ] 2bi@
+        short-8 uchar-16 vconvert
+    ] data-map( float-4[4] -- uchar-16 ) ; inline
+
 : float-pixels>byte-pixels* ( floats scale bias -- bytes )
     '[
         [ _ 255.0 * v*n _ 255.0 * v+n float-4 int-4 vconvert ] 4 napply 
@@ -28,6 +35,22 @@ IN: alien.data.map.tests
 
 : float-pixels>byte-pixels ( floats -- bytes )
     1.0 0.0 float-pixels>byte-pixels* ;
+
+[
+    B{
+        127 191 255 63
+        255 25 51 76
+        76 51 229 127
+        25 255 255 255
+    } 
+] [
+    float-array{
+        0.5 0.75 1.0 0.25
+        1.0 0.1 0.2 0.3
+        0.3 0.2 0.9 0.5
+        0.1 1.0 1.5 2.0
+    } 1.0 0.0 float-pixels>byte-pixels-locals
+] unit-test
 
 [
     B{
