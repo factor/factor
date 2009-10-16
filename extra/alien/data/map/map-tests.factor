@@ -1,6 +1,6 @@
 ! (c)Joe Groff bsd license
 USING: alien.data.map fry generalizations kernel locals math.vectors
-math.vectors.conversion math math.vectors.simd
+math.vectors.conversion math math.vectors.simd sequences
 specialized-arrays tools.test ;
 FROM: alien.c-types => uchar short int float ;
 SIMDS: float int short uchar ;
@@ -11,6 +11,28 @@ IN: alien.data.map.tests
 [
     int-array{ 1 3 5 } [ dup ] data-map( int -- float[2] )
     byte-array>float-array
+] unit-test
+
+[
+    float-4-array{
+        float-4{ 0.0 0.0 0.0 0.0 }
+        float-4{ 1.0 1.0 1.0 1.0 }
+        float-4{ 2.0 2.0 2.0 2.0 }
+    }
+] [
+    3 iota [ float-4-with ] data-map( object -- float-4 )
+    byte-array>float-4-array
+] unit-test
+
+[
+    float-4-array{
+        float-4{ 0.0 1.0  2.0  3.0 }
+        float-4{ 4.0 5.0  6.0  7.0 }
+        float-4{ 8.0 9.0 10.0 11.0 }
+    }
+] [
+    12 iota [ float-4-boa ] data-map( object[4] -- float-4 )
+    byte-array>float-4-array
 ] unit-test
 
 [ float-array{ 1.0 1.0 3.0 3.0 5.0 5.0 0.0 0.0 } ]
