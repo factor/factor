@@ -15,6 +15,17 @@ IN: alien.data.map.tests
 
 [
     float-4-array{
+        float-4{ 0.0 0.0 0.0 0.0 }
+        float-4{ 1.0 1.0 1.0 1.0 }
+        float-4{ 2.0 2.0 2.0 2.0 }
+    }
+] [
+    3 iota [ float-4-with ] data-map( object -- float-4 )
+    byte-array>float-4-array
+] unit-test
+
+[
+    float-4-array{
         float-4{ 0.0 1.0  2.0  3.0 }
         float-4{ 4.0 5.0  6.0  7.0 }
         float-4{ 8.0 9.0 10.0 11.0 }

@@ -13,7 +13,7 @@ TUPLE: grid-mesh dim buffer row-length ;
 
 : vertex-array-row ( range z0 z1 -- vertices )
     '[ _ _ [ 0.0 swap 1.0 float-4-boa ] bi-curry@ bi ]
-    data-map( void -- float-4[2] ) ; inline
+    data-map( object -- float-4[2] ) ; inline
 
 : vertex-array ( dim -- vertices )
     first2 [ [ 0.0 1.0 1.0 ] dip /f <range> ] bi@

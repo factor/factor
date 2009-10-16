@@ -117,8 +117,8 @@ MACRO: data-map! ( ins outs -- )
 
 : parse-data-map-effect ( accum -- accum )
     ")" parse-effect
-    [ in>>  [ parse-c-type ] map parsed ]
-    [ out>> [ parse-c-type ] map parsed ] bi ;
+    [ in>>  [ (parse-c-type) ] map parsed ]
+    [ out>> [ (parse-c-type) ] map parsed ] bi ;
 
 PRIVATE>
 
