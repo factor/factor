@@ -52,7 +52,9 @@ PRIMITIVE_FORWARD(word_xt)
 PRIMITIVE_FORWARD(getenv)
 PRIMITIVE_FORWARD(setenv)
 PRIMITIVE_FORWARD(existsp)
+PRIMITIVE_FORWARD(minor_gc)
 PRIMITIVE_FORWARD(full_gc)
+PRIMITIVE_FORWARD(compact_gc)
 PRIMITIVE_FORWARD(gc_stats)
 PRIMITIVE_FORWARD(save_image)
 PRIMITIVE_FORWARD(save_image_and_exit)
@@ -127,6 +129,7 @@ PRIMITIVE_FORWARD(optimized_p)
 PRIMITIVE_FORWARD(quot_compiled_p)
 PRIMITIVE_FORWARD(vm_ptr)
 PRIMITIVE_FORWARD(strip_stack_traces)
+PRIMITIVE_FORWARD(callback)
 
 const primitive_type primitives[] = {
 	primitive_bignum_to_fixnum,
@@ -187,7 +190,9 @@ const primitive_type primitives[] = {
 	primitive_getenv,
 	primitive_setenv,
 	primitive_existsp,
+	primitive_minor_gc,
 	primitive_full_gc,
+	primitive_compact_gc,
 	primitive_gc_stats,
 	primitive_save_image,
 	primitive_save_image_and_exit,
@@ -290,6 +295,7 @@ const primitive_type primitives[] = {
 	primitive_quot_compiled_p,
 	primitive_vm_ptr,
 	primitive_strip_stack_traces,
+	primitive_callback,
 };
 
 }

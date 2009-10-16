@@ -208,14 +208,28 @@ void factor_vm::forward_object_xts()
 
 void factor_vm::forward_context_xts()
 {
-	context *ctx = stack_chain;
+	callframe_forwarder forwarder(this);
+	iterate_active_frames(forwarder);
+}
 
-	while(ctx)
+struct callback_forwarder {
+	code_heap *code;
+	callback_heap *callbacks;
+
+	callback_forwarder(code_heap *code_, callback_heap *callbacks_) :
+		code(code_), callbacks(callbacks_) {}
+
+	void operator()(callback *stub)
 	{
-		callframe_forwarder forwarder(this);
-		iterate_callstack(ctx,forwarder);
-		ctx = ctx->next;
+		stub->compiled = code->forward_code_block(stub->compiled);
+		callbacks->update(stub);
 	}
+};
+
+void factor_vm::forward_callback_xts()
+{
+	callback_forwarder forwarder(code,callbacks);
+	callbacks->iterate(forwarder);
 }
 
 /* Move all free space to the end of the code heap. Live blocks must be marked
@@ -225,7 +239,11 @@ void factor_vm::compact_code_heap(bool trace_contexts_p)
 {
 	code->compact_heap();
 	forward_object_xts();
-	if(trace_contexts_p) forward_context_xts();
+	if(trace_contexts_p)
+	{
+		forward_context_xts();
+		forward_callback_xts();
+	}
 }
 
 struct stack_trace_stripper {

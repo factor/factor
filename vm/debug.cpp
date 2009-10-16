@@ -190,7 +190,7 @@ void factor_vm::print_callstack()
 {
 	print_string("==== CALL STACK:\n");
 	stack_frame_printer printer(this);
-	iterate_callstack(stack_chain,printer);
+	iterate_callstack(ctx,printer);
 }
 
 void factor_vm::dump_cell(cell x)
