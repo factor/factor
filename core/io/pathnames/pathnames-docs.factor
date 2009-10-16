@@ -7,7 +7,7 @@ HELP: path-separator?
 { $description "Tests if the code point is a platform-specific path separator." }
 { $examples
     "On Unix:"
-    { $example "USING: io.pathnames.private prettyprint ;" "CHAR: / path-separator? ." "t" }
+    { $example "USING: io.pathnames prettyprint ;" "CHAR: / path-separator? ." "t" }
 } ;
 
 HELP: parent-directory
@@ -90,8 +90,9 @@ HELP: pathname
 
 HELP: normalize-path
 { $values { "string" "a pathname string" } { "string'" "a new pathname string" } }
-{ $description "Prepends the " { $link current-directory } " to the pathname, resolves a " { $snippet "resource:" } " prefix, if present, and performs any platform-specific pathname normalization." }
+{ $description "Prepends the " { $link current-directory } " to the pathname, resolves a " { $snippet "resource:" } " or " { $snippet "voacb:" } " prefix, if present, and performs any platform-specific pathname normalization." }
 { $notes "High-level words, such as " { $link <file-reader> } " and " { $link delete-file } " call this word for you. It only needs to be called directly when passing pathnames to C functions or external processes. This is because Factor does not use the operating system's notion of a current directory, and instead maintains its own dynamically-scoped " { $link current-directory } " variable." }
+{ $notes "On Windows NT platforms, this word does prepends the Unicode path prefix." }
 { $examples
   "For example, if you create a file named " { $snippet "data.txt" } " in the current directory, and wish to pass it to a process, you must normalize it:"
   { $code
@@ -99,6 +100,14 @@ HELP: normalize-path
     "\"munge\" \"data.txt\" normalize-path 2array run-process"
   }
 } ;
+
+HELP: (normalize-path)
+{ $values
+    { "path" "a pathname string" }
+    { "path'" "a pathname string" }
+}
+{ $description "Prepends the " { $link current-directory } " to the pathname and resolves a " { $snippet "resource:" } " prefix, if present." }
+{ $notes "On Windows NT platforms, this word does not prepend the Unicode path prefix." } ;
 
 HELP: canonicalize-path
 { $values { "path" "a pathname string" } { "path'" "a new pathname string" } }
