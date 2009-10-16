@@ -54,9 +54,6 @@ void factor_vm::gc(gc_op op,
 			current_gc->op = collect_full_op;
 			break;
 		case collect_full_op:
-			/* Since we start tracing again, any previously
-			marked code blocks must be re-marked and re-traced */
-			code->clear_mark_bits();
 			current_gc->op = collect_growing_heap_op;
 			break;
 		default:
