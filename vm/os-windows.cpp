@@ -96,7 +96,7 @@ void factor_vm::primitive_existsp()
 	box_boolean(windows_stat(path));
 }
 
-segment::segment(cell size_)
+segment::segment(cell size_, bool executable_p)
 {
 	size = size_;
 
@@ -104,7 +104,7 @@ segment::segment(cell size_)
 	DWORD ignore;
 
 	if((mem = (char *)VirtualAlloc(NULL, getpagesize() * 2 + size,
-		MEM_COMMIT, PAGE_EXECUTE_READWRITE)) == 0)
+		MEM_COMMIT, executable_p ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE)) == 0)
 		out_of_memory();
 
 	if (!VirtualProtect(mem, getpagesize(), PAGE_NOACCESS, &ignore))

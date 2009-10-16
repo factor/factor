@@ -3,7 +3,7 @@
 namespace factor
 {
 
-code_heap::code_heap(bool secure_gc, cell size) : heap(secure_gc,size) {}
+code_heap::code_heap(bool secure_gc, cell size) : heap(secure_gc,size,true) {}
 
 void code_heap::write_barrier(code_block *compiled)
 {
