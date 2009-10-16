@@ -1,41 +1,96 @@
-USING: accessors arrays byte-arrays combinators
-combinators.short-circuit fry hints images kernel locals math
-math.affine-transforms math.functions math.order math.polynomials
-math.vectors random random.mersenne-twister sequences
-sequences.private sequences.product ;
+USING: accessors alien.data.map byte-arrays combinators combinators.short-circuit
+fry generalizations images kernel locals math math.constants math.functions
+math.libm math.matrices.simd math.vectors math.vectors.conversion math.vectors.simd
+memoize random random.mersenne-twister sequences sequences.private specialized-arrays
+typed ;
+QUALIFIED-WITH: alien.c-types c
+SIMDS: c:float c:int c:short c:uchar ;
+SPECIALIZED-ARRAYS: c:float c:uchar float-4 uchar-16 ;
 IN: noise
-
-: <perlin-noise-table> ( -- table )
-    256 iota >byte-array randomize dup append ; inline
 
 : with-seed ( seed quot -- )
     [ <mersenne-twister> ] dip with-random ; inline
 
-<PRIVATE
+: random-int-4 ( -- v )
+    16 random-bytes underlying>> int-4 boa ; inline
 
-: (fade) ( x y z -- x' y' z' )
-    [ { 0.0 0.0 0.0 10.0 -15.0 6.0 } polyval* ] tri@ ;
+: (random-float-4) ( -- v )
+    random-int-4 int-4 float-4 vconvert ; inline
 
-HINTS: (fade) { float float float } ;
+! XXX redundant add
+: uniform-random-float-4 ( min max -- n )
+    (random-float-4) (random-float-4)
+    2.0 31 ^ v+n 2.0 32 ^ v*n v+
+    [ over - 2.0 -64 ^ * ] dip n*v n+v ; inline
 
-: fade ( point -- point' )
-    first3 (fade) 3array ; inline
+: normal-random-float-4 ( mean sigma -- n )
+    0.0 1.0 uniform-random-float-4
+    0.0 1.0 uniform-random-float-4
+    [ 2 pi * v*n [ fcos ] map ]
+    [ 1.0 swap n-v [ flog ] map -2.0 v*n vsqrt ]
+    bi* v* n*v n+v ; inline
 
-:: grad ( hash x y z -- gradient )
-    hash 8  bitand zero? [ x ] [ y ] if
-        :> u
-    hash 12 bitand zero?
-    [ y ] [ hash 13 bitand 12 = [ x ] [ z ] if ] if
-        :> v
+: float-map>byte-map ( floats: float-array scale: float bias: float -- bytes: byte-array )
+    '[
+        [ _ 255.0 * v*n _ 255.0 * v+n float-4 int-4 vconvert ] 4 napply 
+        [ int-4 short-8 vconvert ] 2bi@
+        short-8 uchar-16 vconvert
+    ] data-map( float-4[4] -- uchar-16 ) ; inline
 
-    hash 1 bitand zero? [ u ] [ u neg ] if
-    hash 2 bitand zero? [ v ] [ v neg ] if + ;
+TYPED:: float-map>image ( floats: float-array dim scale: float bias: float -- image: image )
+    image new
+        dim >>dim
+        floats scale bias float-map>byte-map >>bitmap
+        L >>component-order
+        ubyte-components >>component-type ;
 
-HINTS: grad { fixnum float float float } ;
+TYPED: uniform-noise-map ( seed: integer dim -- map: float-array )
+    '[
+        _ product 4 / [ 0.0 1.0 uniform-random-float-4 ]
+        float-4-array{ } replicate-as
+        byte-array>float-array
+    ] with-seed ;
 
-: unit-cube ( point -- cube )
-    [ floor 256 rem ] map ;
+: uniform-noise-image ( seed dim -- image )
+    [ uniform-noise-map ] [ 1.0 0.0 float-map>image ] bi ; inline
 
+TYPED: normal-noise-map ( seed: integer sigma: float dim -- map: float-array )
+    swap '[
+        _ product 4 / [ 0.5 _ normal-random-float-4 ]
+        float-4-array{ } replicate-as
+        byte-array>float-array
+    ] with-seed ;
+
+: normal-noise-image ( seed sigma dim -- image )
+    [ normal-noise-map ] [ 1.0 0.0 float-map>image ] bi ; inline
+
+ERROR: invalid-perlin-noise-table table ;
+
+: <perlin-noise-table> ( -- table )
+    256 iota >byte-array randomize dup append ; inline
+
+: validate-table ( table -- table )
+    dup { [ byte-array? ] [ length 512 >= ] } 1&&
+    [ invalid-perlin-noise-table ] unless ;
+
+! XXX doesn't work for NaNs or very large floats
+: floor-vector ( v -- v' )
+    [ float-4 int-4 vconvert int-4 float-4 vconvert ]
+    [ [ v> -1.0 float-4-with vand ] curry keep v+ ] bi ; inline
+
+: unit-cubed ( floats -- ints )
+    float-4 int-4 vconvert 255 int-4-with vbitand ; inline
+
+: fade ( gradient -- gradient' )
+    {
+        [ drop  6.0 ]
+        [ n*v -15.0 v+n ]
+        [ v*   10.0 v+n ]
+        [ v* ]
+        [ v* ]
+        [ v* ]
+    } cleave ; inline
+    
 :: hashes ( table x y z -- aaa baa aba bba aab bab abb bbb )
     x      table nth-unsafe y + :> a
     x  1 + table nth-unsafe y + :> b
@@ -54,79 +109,41 @@ HINTS: grad { fixnum float float float } ;
     ab 1 + table nth-unsafe
     bb 1 + table nth-unsafe ; inline
 
-HINTS: hashes { byte-array fixnum fixnum fixnum } ;
+:: grad ( hash v -- gradient )
+    hash 8  bitand zero? [ v first ] [ v second ] if
+        :> u
+    hash 12 bitand zero?
+    [ v second ] [ hash 13 bitand 12 = [ v first ] [ v third ] if ] if
+        :> v
 
-: >byte-map ( floats -- bytes )
-    [ 255.0 * >fixnum ] B{ } map-as ;
+    hash 1 bitand zero? [ u ] [ u neg ] if
+    hash 2 bitand zero? [ v ] [ v neg ] if + ; inline
 
-: >image ( bytes dim -- image )
-    image new
-        swap >>dim
-        swap >>bitmap
-        L >>component-order
-        ubyte-components >>component-type ;
-
-:: perlin-noise-unsafe ( table point -- value )
-    point unit-cube :> cube
-    point dup vfloor v- :> gradients
+TYPED:: perlin-noise ( table: byte-array point: float-4 -- value: float )
+    point floor-vector :> _point_
+    _point_ unit-cubed :> cube
+    point _point_ v- :> gradients
     gradients fade :> faded
 
     table cube first3 hashes {
-        [ gradients first3                                    grad ]
-        [ gradients first3 [ 1.0 - ] [       ] [       ] tri* grad ]
-        [ gradients first3 [       ] [ 1.0 - ] [       ] tri* grad ]
-        [ gradients first3 [ 1.0 - ] [ 1.0 - ] [       ] tri* grad ]
-        [ gradients first3 [       ] [       ] [ 1.0 - ] tri* grad ]
-        [ gradients first3 [ 1.0 - ] [       ] [ 1.0 - ] tri* grad ]
-        [ gradients first3 [       ] [ 1.0 - ] [ 1.0 - ] tri* grad ]
-        [ gradients first3 [ 1.0 - ] [ 1.0 - ] [ 1.0 - ] tri* grad ]
+        [ gradients                               grad ]
+        [ gradients float-4{ 1.0 0.0 0.0 0.0 } v- grad ]
+        [ gradients float-4{ 0.0 1.0 0.0 0.0 } v- grad ]
+        [ gradients float-4{ 1.0 1.0 0.0 0.0 } v- grad ]
+        [ gradients float-4{ 0.0 0.0 1.0 0.0 } v- grad ]
+        [ gradients float-4{ 1.0 0.0 1.0 0.0 } v- grad ]
+        [ gradients float-4{ 0.0 1.0 1.0 0.0 } v- grad ]
+        [ gradients float-4{ 1.0 1.0 1.0 0.0 } v- grad ]
     } spread
     faded trilerp ;
 
-ERROR: invalid-perlin-noise-table table ;
+MEMO: perlin-noise-map-coords ( dim -- coords )
+    first2 [| x y | x [ y 0.0 0.0 float-4-boa ] float-4-array{ } map-as ] with map concat ; 
 
-: validate-table ( table -- table )
-    dup { [ byte-array? ] [ length 512 >= ] } 1&&
-    [ invalid-perlin-noise-table ] unless ;
-
-PRIVATE>
-
-: perlin-noise ( table point -- value )
-    [ validate-table ] dip perlin-noise-unsafe ; inline
-
-: normalize-0-1 ( sequence -- sequence' )
-    [ supremum ] [ infimum [ - ] keep ] [ ] tri
-    [ swap - ] with map [ swap / ] with map ;
-
-: clamp-0-1 ( sequence -- sequence' )
-    [ 0.0 max 1.0 min ] map ;
-
-: perlin-noise-map ( table transform dim -- map ) 
-    [ validate-table ] 2dip
-    [ iota ] map [ a.v 0.0 suffix perlin-noise-unsafe ] with with product-map ;
-
-: perlin-noise-byte-map ( table transform dim -- map )
-    perlin-noise-map normalize-0-1 >byte-map ;
+TYPED:: perlin-noise-map ( table: byte-array transform: matrix4 coords: float-4-array -- map: float-array )
+    coords [| coord | table transform coord m4.v perlin-noise ] data-map( float-4 -- c:float )
+    byte-array>float-array ;
 
 : perlin-noise-image ( table transform dim -- image )
-    [ perlin-noise-byte-map ] [ >image ] bi ;
+    [ perlin-noise-map-coords perlin-noise-map ] [ 5/7. 0.5 float-map>image ] bi ;
 
-: uniform-noise-map ( seed dim -- map )
-    [ product [ 0.0 1.0 uniform-random-float ] replicate ]
-    curry with-seed ;
-
-: uniform-noise-byte-map ( seed dim -- map )
-    uniform-noise-map >byte-map ;
-
-: uniform-noise-image ( seed dim -- image )
-    [ uniform-noise-byte-map ] [ >image ] bi ;
-
-: normal-noise-map ( seed sigma dim -- map )
-    swap '[ _ product [ 0.5 _ normal-random-float ] replicate ]
-    with-seed ;
-
-: normal-noise-byte-map ( seed sigma dim -- map )
-    normal-noise-map clamp-0-1 >byte-map ;
-
-: normal-noise-image ( seed sigma dim -- image )
-    [ normal-noise-byte-map ] [ >image ] bi ;
