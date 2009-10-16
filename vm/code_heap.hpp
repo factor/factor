@@ -13,8 +13,10 @@ struct code_heap : heap {
 
 	explicit code_heap(bool secure_gc, cell size);
 	void write_barrier(code_block *compiled);
+	void clear_remembered_set();
 	bool needs_fixup_p(code_block *compiled);
 	void code_heap_free(code_block *compiled);
+	code_block *forward_code_block(code_block *compiled);
 };
 
 }

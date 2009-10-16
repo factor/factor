@@ -8,7 +8,7 @@ struct factor_vm
 	// First five fields accessed directly by assembler. See vm.factor
 
 	/* Current stacks */
-	context *stack_chain;
+	context *ctx;
 	
 	/* New objects are allocated here */
 	zone nursery;
@@ -55,6 +55,9 @@ struct factor_vm
 	/* Code heap */
 	code_heap *code;
 
+	/* Pinned callback stubs */
+	callback_heap *callbacks;
+
 	/* Only set if we're performing a GC */
 	gc_state *current_gc;
 
@@ -96,7 +99,7 @@ struct factor_vm
 	void save_stacks();
 	context *alloc_context();
 	void dealloc_context(context *old_context);
-	void nest_stacks();
+	void nest_stacks(stack_frame *magic_frame);
 	void unnest_stacks();
 	void init_stacks(cell ds_size_, cell rs_size_);
 	bool stack_to_array(cell bottom, cell top);
@@ -106,6 +109,18 @@ struct factor_vm
 	void primitive_set_datastack();
 	void primitive_set_retainstack();
 	void primitive_check_datastack();
+
+	template<typename Iterator> void iterate_active_frames(Iterator &iter)
+	{
+		context *ctx = this->ctx;
+
+		while(ctx)
+		{
+			iterate_callstack(ctx,iter);
+			if(ctx->magic_frame) iter(ctx->magic_frame);
+			ctx = ctx->next;
+		}
+	}
 
 	// run
 	void primitive_getenv();
@@ -238,14 +253,16 @@ struct factor_vm
 	void collect_nursery();
 	void collect_aging();
 	void collect_to_tenured();
-	void update_code_heap_for_full_gc(bool growing_data_heap);
+	void big_code_heap_update();
+	void small_code_heap_update();
 	void collect_full_impl(bool trace_contexts_p);
-	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p);
-	void collect_full(bool trace_contexts_p);
+	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p, bool compact_code_heap_p);
+	void collect_full(bool trace_contexts_p, bool compact_code_heap_p);
 	void record_gc_stats(generation_statistics *stats);
-	void garbage_collection(gc_op op, bool trace_contexts_p, cell requested_bytes);
-	void gc();
-	void primitive_gc();
+	void gc(gc_op op, cell requested_bytes, bool trace_contexts_p, bool compact_code_heap_p);
+	void primitive_minor_gc();
+	void primitive_full_gc();
+	void primitive_compact_gc();
 	void primitive_gc_stats();
 	void clear_gc_stats();
 	void primitive_become();
@@ -500,10 +517,10 @@ struct factor_vm
 	void update_code_heap_words();
 	void primitive_modify_code_heap();
 	void primitive_code_room();
-	code_block *forward_xt(code_block *compiled);
 	void forward_object_xts();
-	void fixup_object_xts();
-	void compact_code_heap();
+	void forward_context_xts();
+	void forward_callback_xts();
+	void compact_code_heap(bool trace_contexts_p);
 	void primitive_strip_stack_traces();
 
 	/* Apply a function to every code block */
@@ -518,6 +535,10 @@ struct factor_vm
 			scan = code->next_block(scan);
 		}
 	}
+
+	//callbacks
+	void init_callbacks(cell size);
+	void primitive_callback();
 
 	//image
 	void init_objects(image_header *h);
@@ -558,7 +579,7 @@ struct factor_vm
 	void primitive_innermost_stack_frame_scan();
 	void primitive_set_innermost_stack_frame_quot();
 	void save_callstack_bottom(stack_frame *callstack_bottom);
-	template<typename Iterator> void iterate_callstack(cell top, cell bottom, Iterator &iterator);
+	template<typename Iterator> void iterate_callstack(context *ctx, Iterator &iterator);
 
 	/* Every object has a regular representation in the runtime, which makes GC
 	much simpler. Every slot of the object until binary_payload_start is a pointer
@@ -690,47 +711,6 @@ struct factor_vm
 	factor_vm();
 
 };
-
-#ifndef FACTOR_REENTRANT
-        #define FACTOR_SINGLE_THREADED_TESTING
-#endif
-
-#ifdef FACTOR_SINGLE_THREADED_SINGLETON
-/* calls are dispatched using the singleton vm ptr */
-        extern factor_vm *vm;
-        #define PRIMITIVE_GETVM() vm
-        #define PRIMITIVE_OVERFLOW_GETVM() vm
-        #define VM_PTR vm
-        #define ASSERTVM()
-        #define SIGNAL_VM_PTR() vm
-#endif
-
-#ifdef FACTOR_SINGLE_THREADED_TESTING
-/* calls are dispatched as per multithreaded, but checked against singleton */
-        extern factor_vm *vm;
-        #define ASSERTVM() assert(vm==myvm)
-        #define PRIMITIVE_GETVM() ((factor_vm*)myvm)
-        #define PRIMITIVE_OVERFLOW_GETVM() ASSERTVM(); myvm
-        #define VM_PTR myvm
-        #define SIGNAL_VM_PTR() tls_vm()
-#endif
-
-#ifdef FACTOR_REENTRANT_TLS
-/* uses thread local storage to obtain vm ptr */
-        #define PRIMITIVE_GETVM() tls_vm()
-        #define PRIMITIVE_OVERFLOW_GETVM() tls_vm()
-        #define VM_PTR tls_vm()
-        #define ASSERTVM()
-        #define SIGNAL_VM_PTR() tls_vm()
-#endif
-
-#ifdef FACTOR_REENTRANT
-        #define PRIMITIVE_GETVM() ((factor_vm*)myvm)
-        #define PRIMITIVE_OVERFLOW_GETVM() ((factor_vm*)myvm)
-        #define VM_PTR myvm
-        #define ASSERTVM()
-        #define SIGNAL_VM_PTR() tls_vm()
-#endif
 
 extern unordered_map<THREADHANDLE, factor_vm *> thread_vms;
 

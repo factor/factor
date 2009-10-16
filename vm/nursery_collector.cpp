@@ -12,6 +12,8 @@ nursery_collector::nursery_collector(factor_vm *myvm_) :
 
 void factor_vm::collect_nursery()
 {
+	/* Copy live objects from the nursery (as determined by the root set and
+	marked cards in aging and tenured) to aging space. */
 	nursery_collector collector(this);
 
 	collector.trace_roots();

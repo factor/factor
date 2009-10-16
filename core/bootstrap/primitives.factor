@@ -420,7 +420,9 @@ tuple
     { "getenv" "kernel.private" (( n -- obj )) }
     { "setenv" "kernel.private" (( obj n -- )) }
     { "(exists?)" "io.files.private" (( path -- ? )) }
+    { "minor-gc" "memory" (( -- )) }
     { "gc" "memory" (( -- )) }
+    { "compact-gc" "memory" (( -- )) }
     { "gc-stats" "memory" f }
     { "(save-image)" "memory.private" (( path -- )) }
     { "(save-image-and-exit)" "memory.private" (( path -- )) }
@@ -523,6 +525,7 @@ tuple
     { "quot-compiled?" "quotations" (( quot -- ? )) }
     { "vm-ptr" "vm" (( -- ptr )) }
     { "strip-stack-traces" "kernel.private" (( -- )) }
+    { "<callback>" "alien" (( word -- alien )) }
 } [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number

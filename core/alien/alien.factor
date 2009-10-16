@@ -66,8 +66,10 @@ ERROR: alien-invoke-error library symbol ;
 : alien-invoke ( ... return library function parameters -- ... )
     2over alien-invoke-error ;
 
-! Callbacks are registered in a global hashtable. If you clear
-! this hashtable, they will all be blown away by code GC, beware.
+! Callbacks are registered in a global hashtable. Note that they
+! are also pinned in a special callback area, so clearing this
+! hashtable will not reclaim callbacks. It should only be
+! cleared on startup.
 SYMBOL: callbacks
 
 [ H{ } clone callbacks set-global ] "alien" add-init-hook

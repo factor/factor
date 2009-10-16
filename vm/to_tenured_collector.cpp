@@ -12,6 +12,7 @@ to_tenured_collector::to_tenured_collector(factor_vm *myvm_) :
 
 void factor_vm::collect_to_tenured()
 {
+	/* Copy live objects from aging space to tenured space. */
 	to_tenured_collector collector(this);
 
 	collector.trace_roots();
