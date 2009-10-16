@@ -91,6 +91,12 @@ MACRO:: test-vconvert ( from-type to-type -- )
 [ uint-4{ -1 2 3 -40000 } uint-4{ 5 60000 -7 80000 } uint-4 short-8 test-vconvert ]
 [ error>> bad-vconvert? ] must-fail-with
 
+[ ushort-8{ 0 1 2 3 128 129 130 131 } ushort-8{ 4 5 6 7 132 133 134 135 } ]
+[
+    uchar-16{ 0 1 2 3 128 129 130 131 4 5 6 7 132 133 134 135 }
+    uchar-16 ushort-8 test-vconvert
+] unit-test
+
 ! TODO we should be able to do 256->128 pack
 ! [ float-4{ -1.25 2.0 3.0 -4.0 } ]
 [ double-4{ -1.25 2.0 3.0 -4.0 } double-4 float-4 test-vconvert ]
