@@ -21,7 +21,7 @@ IN: alien.parser
     } cond ;
 
 : valid-c-type? ( c-type -- ? )
-    { [ array? ] [ c-type-name? ] } 1|| ;
+    { [ array? ] [ c-type-name? ] [ void? ] } 1|| ;
 
 : parse-c-type ( string -- type )
     (parse-c-type) dup valid-c-type? [ no-c-type ] unless ;
