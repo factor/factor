@@ -301,7 +301,7 @@ struct factor_vm
 	void print_callstack();
 	void dump_cell(cell x);
 	void dump_memory(cell from, cell to);
-	void dump_zone(char *name, zone *z);
+	void dump_zone(const char *name, zone *z);
 	void dump_generations();
 	void dump_objects(cell type);
 	void find_data_references_step(cell *scan);
