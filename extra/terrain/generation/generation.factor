@@ -32,7 +32,7 @@ TUPLE: terrain
     terrain-segment-size-vector v* translation-matrix4 m4. 
     terrain-segment-size perlin-noise-image bitmap>> ; inline
 : tiny-noise-segment ( terrain at -- bytes )
-    [ tiny-noise-seed>> ] dip seed-at 0.1
+    [ tiny-noise-seed>> ] dip seed-at
     terrain-segment-size normal-noise-image bitmap>> ; inline
 : padding ( terrain at -- padding )
     2drop terrain-segment-size product 255 <repetition> >byte-array ; inline
