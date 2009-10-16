@@ -21,6 +21,20 @@ M: x86.64 ds-reg R14 ;
 M: x86.64 rs-reg R15 ;
 M: x86.64 stack-reg RSP ;
 
+: load-cards-offset ( dst -- )
+    0 MOV rc-absolute-cell rel-cards-offset ;
+
+M: x86.64 %mark-card
+    dup load-cards-offset
+    [+] card-mark <byte> MOV ;
+
+: load-decks-offset ( dst -- )
+    0 MOV rc-absolute-cell rel-decks-offset ;
+
+M: x86.64 %mark-deck
+    dup load-cards-offset
+    [+] card-mark <byte> MOV ;
+
 M:: x86.64 %dispatch ( src temp -- )
     building get length :> start
     ! Load jump table base.

@@ -356,6 +356,41 @@ void factor_vm::update_word_references(code_block *compiled)
 	}
 }
 
+/* This runs after a full collection */
+struct literal_and_word_references_updater {
+	factor_vm *myvm;
+
+	explicit literal_and_word_references_updater(factor_vm *myvm_) : myvm(myvm_) {}
+
+	void operator()(relocation_entry rel, cell index, code_block *compiled)
+	{
+		relocation_type type = myvm->relocation_type_of(rel);
+		switch(type)
+		{
+		case RT_IMMEDIATE:
+		case RT_XT:
+		case RT_XT_PIC:
+		case RT_XT_PIC_TAIL:
+			myvm->relocate_code_block_step(rel,index,compiled);
+			break;
+		default:
+			break;
+		}
+	}
+};
+
+void factor_vm::update_code_block_for_full_gc(code_block *compiled)
+{
+	if(code->needs_fixup_p(compiled))
+		relocate_code_block(compiled);
+	else
+	{
+		literal_and_word_references_updater updater(this);
+		iterate_relocations(compiled,updater);
+		flush_icache_for(compiled);
+	}
+}
+
 void factor_vm::check_code_address(cell address)
 {
 #ifdef FACTOR_DEBUG
