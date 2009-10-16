@@ -20,8 +20,8 @@ enum relocation_type {
 	RT_THIS,
 	/* immediate literal */
 	RT_IMMEDIATE,
-	/* address of stack_chain var */
-	RT_STACK_CHAIN,
+	/* address of ctx var */
+	RT_CONTEXT,
 	/* untagged fixnum literal */
 	RT_UNTAGGED,
 	/* address of megamorphic_cache_hits var */

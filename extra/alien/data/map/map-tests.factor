@@ -92,9 +92,11 @@ IN: alien.data.map.tests
 : vmerge-transpose ( a b c d -- ac bd ac bd )
     [ (vmerge) ] bi-curry@ bi* ; inline
 
+CONSTANT: plane-count 4
+
 : fold-rgba-planes ( r g b a -- rgba )
     [ vmerge-transpose vmerge-transpose ]
-    data-map( uchar-16 uchar-16 uchar-16 uchar-16 -- uchar-16[4] ) ;
+    data-map( uchar-16 uchar-16 uchar-16 uchar-16 -- uchar-16[plane-count] ) ;
 
 [
     B{
