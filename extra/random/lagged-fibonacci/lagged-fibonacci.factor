@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types fry kernel literals locals math
-random sequences specialized-arrays namespaces ;
+random sequences specialized-arrays namespaces sequences.private ;
 SPECIALIZED-ARRAY: double
 IN: random.lagged-fibonacci
 
@@ -50,25 +50,26 @@ M:: lagged-fibonacci seed-random ( lagged-fibonacci seed! -- lagged-fibonacci )
         s
     ] change-each
     lagged-fibonacci p-r >>pt0
-        q-r >>pt1 ;
+        q-r >>pt1 ; inline
 
 : <lagged-fibonacci> ( seed -- lagged-fibonacci )
     lagged-fibonacci new
         p-r 1 + <double-array> >>u
-        swap seed-random ;
+        swap seed-random ; inline
 
 GENERIC: random-float* ( tuple -- r )
  
 : random-float ( -- n ) random-generator get random-float* ; inline
 
 M:: lagged-fibonacci random-float* ( lagged-fibonacci -- x )
-    lagged-fibonacci [ pt0>> ] [ u>> ] bi nth
-    lagged-fibonacci [ pt1>> ] [ u>> ] bi nth - :> uni!
-    uni 0.0 < [ uni 1.0 + uni! ] when
-    uni lagged-fibonacci [ pt0>> ] [ u>> ] bi set-nth
-    lagged-fibonacci [ adjust-ptr ] change-pt0 drop
-    lagged-fibonacci [ adjust-ptr ] change-pt1 drop
-    uni ; inline
+    lagged-fibonacci [ pt0>> ] [ u>> ] bi nth-unsafe
+    lagged-fibonacci [ pt1>> ] [ u>> ] bi nth-unsafe -
+    dup 0.0 < [ 1.0 + ] when
+    [
+        lagged-fibonacci [ pt0>> ] [ u>> ] bi set-nth-unsafe
+        lagged-fibonacci [ adjust-ptr ] change-pt0 drop
+        lagged-fibonacci [ adjust-ptr ] change-pt1 drop
+    ] keep ; inline
 
 : default-lagged-fibonacci ( -- obj )
-    [ random-32 ] with-system-random <lagged-fibonacci> ;
+    [ random-32 ] with-system-random <lagged-fibonacci> ; inline
