@@ -502,10 +502,10 @@ TUPLE: action-parser p1 quot ;
 
 : check-action ( result quot -- result )
   over [
-    over ast>> swap call >>ast
+    over ast>> swap call( ast -- ast ) >>ast
   ] [
     drop
-  ] if ; inline
+  ] if ;
 
 M: action-parser (compile) ( peg -- quot )
   [ p1>> compile-parser-quot ] [ quot>> ] bi '[ @ _ check-action ] ;
