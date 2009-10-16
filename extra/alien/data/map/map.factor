@@ -1,7 +1,7 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien alien.c-types alien.data alien.parser arrays
 byte-arrays combinators effects.parser fry generalizations kernel
-lexer locals macros math math.ranges parser sequences sequences.private ;
+lexer locals macros make math math.ranges parser sequences sequences.private ;
 IN: alien.data.map
 
 ERROR: bad-data-map-input-length byte-length iter-size remainder ;
@@ -39,27 +39,23 @@ INSTANCE: data-map-param immutable-sequence
     dup array? [ unclip swap product >fixnum ] [ 1 ] if
     2dup swap heap-size * >fixnum ; inline
 
-MACRO:: >param ( in -- quot: ( array -- param ) )
-    in c-type-count :> iter-length :> count :> c-type
-
-    [
-        [ c-type count ] dip
+MACRO: >param ( in -- quot: ( array -- param ) )
+    c-type-count '[
+        [ _ _ ] dip
         [ ]
         [ >c-ptr ]
         [ byte-length ] tri
-        iter-length
+        _
         2dup /i
         data-map-param boa
     ] ;
 
-MACRO:: alloc-param ( out -- quot: ( len -- param ) )
-    out c-type-count :> iter-length :> count :> c-type
-
-    [
-        [ c-type count ] dip
+MACRO: alloc-param ( out -- quot: ( len -- param ) )
+    c-type-count dup '[
+        [ _ _ ] dip
         [
-            iter-length * >fixnum [ (byte-array) dup ] keep
-            iter-length
+            _ * >fixnum [ (byte-array) dup ] keep
+            _
         ] keep
         data-map-param boa
     ] ;
@@ -76,14 +72,17 @@ MACRO: pack-params ( outs -- )
     outs length :> #outs
     #ins #outs + :> #params
 
-    [| quot |
-        param-quot call
+    [
+        param-quot %
         [
-            [ [ ins unpack-params quot call ] #outs ndip outs pack-params ]
-            #params neach
-        ] #outs nkeep
-        [ orig>> ] #outs napply
-    ] ;
+            [
+                [ ins , \ unpack-params , \ @ , ] [ ] make ,
+                #outs , \ ndip , outs , \ pack-params ,
+            ] [ ] make ,
+            #params , \ neach ,
+        ] [ ] make , #outs , \ nkeep ,
+        [ orig>> ] , #outs , \ napply ,
+    ] [ ] make fry \ call suffix ;
 
 MACRO: data-map ( ins outs -- )
     2dup
