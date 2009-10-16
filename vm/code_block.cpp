@@ -444,7 +444,7 @@ code_block *factor_vm::allot_code_block(cell size, cell type)
 	/* If allocation failed, do a code GC */
 	if(block == NULL)
 	{
-		gc();
+		primitive_full_gc();
 		block = code->heap_allot(size + sizeof(code_block),type);
 
 		/* Insufficient room even after code GC, give up */

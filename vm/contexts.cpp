@@ -104,9 +104,9 @@ void factor_vm::unnest_stacks()
 	userenv[CURRENT_CALLBACK_ENV] = stack_chain->current_callback_save;
 	userenv[CATCHSTACK_ENV] = stack_chain->catchstack_save;
 
-	context *old_stacks = stack_chain;
-	stack_chain = old_stacks->next;
-	dealloc_context(old_stacks);
+	context *old_ctx = stack_chain;
+	stack_chain = old_ctx->next;
+	dealloc_context(old_ctx);
 }
 
 void unnest_stacks(factor_vm *myvm)

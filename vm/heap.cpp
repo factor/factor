@@ -226,37 +226,32 @@ cell heap::heap_size()
 		return seg->size;
 }
 
-/* Compute where each block is going to go, after compaction */
-cell heap::compute_heap_forwarding()
-{
-	heap_block *scan = first_block();
-	char *address = (char *)first_block();
-
-	while(scan)
-	{
-		if(scan->type() != FREE_BLOCK_TYPE)
-		{
-			forwarding[scan] = address;
-			address += scan->size();
-		}
-		scan = next_block(scan);
-	}
-
-	return (cell)address - seg->start;
-}
-
 void heap::compact_heap()
 {
-	heap_block *scan = first_block();
+	forwarding.clear();
 
+	heap_block *scan = first_block();
+	char *address = (char *)scan;
+
+	/* Slide blocks up while building the forwarding hashtable. */
 	while(scan)
 	{
 		heap_block *next = next_block(scan);
+ 
+		if(scan->type() != FREE_BLOCK_TYPE && scan->marked_p())
+		{
+			cell size = scan->size();
+			memmove(address,scan,size);
+			forwarding[scan] = address;
+			address += size;
+		}
 
-		if(scan->type() != FREE_BLOCK_TYPE)
-			memmove(forwarding[scan],scan,scan->size());
 		scan = next;
 	}
+
+	/* Now update the free list; there will be a single free block at
+	the end */
+	build_free_list((cell)address - seg->start);
 }
 
 heap_block *heap::free_allocated(heap_block *prev, heap_block *scan)
