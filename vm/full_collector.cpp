@@ -97,10 +97,12 @@ void full_collector::cheneys_algorithm()
 	}
 }
 
-struct full_updater {
+/* After growing the heap, we have to perform a full relocation to update
+references to card and deck arrays. */
+struct after_growing_heap_updater {
 	factor_vm *myvm;
 
-	full_updater(factor_vm *myvm_) : myvm(myvm_) {}
+	after_growing_heap_updater(factor_vm *myvm_) : myvm(myvm_) {}
 
 	void operator()(heap_block *block)
 	{
@@ -108,29 +110,29 @@ struct full_updater {
 	}
 };
 
-struct literal_and_word_reference_updater {
+/* After a full GC that did not grow the heap, we have to update references
+to literals and other words. */
+struct after_full_updater {
 	factor_vm *myvm;
 
-	literal_and_word_reference_updater(factor_vm *myvm_) : myvm(myvm_) {}
+	after_full_updater(factor_vm *myvm_) : myvm(myvm_) {}
 
 	void operator()(heap_block *block)
 	{
-		code_block *compiled = (code_block *)block;
-		myvm->update_literal_references(compiled);
-		myvm->update_word_references(compiled);
+		myvm->update_code_block_for_full_gc((code_block *)block);
 	}
 };
 
-void factor_vm::free_unmarked_code_blocks(bool growing_data_heap)
+void factor_vm::update_code_heap_for_full_gc(bool growing_data_heap)
 {
 	if(growing_data_heap)
 	{
-		full_updater updater(this);
+		after_growing_heap_updater updater(this);
 		code->free_unmarked(updater);
 	}
 	else
 	{
-		literal_and_word_reference_updater updater(this);
+		after_full_updater updater(this);
 		code->free_unmarked(updater);
 	}
 
@@ -160,7 +162,7 @@ void factor_vm::collect_growing_heap(cell requested_bytes, bool trace_contexts_p
 	data_heap *old = data;
 	set_data_heap(data->grow(requested_bytes));
 	collect_full_impl(trace_contexts_p);
-	free_unmarked_code_blocks(true);
+	update_code_heap_for_full_gc(true);
 	delete old;
 }
 
@@ -169,7 +171,7 @@ void factor_vm::collect_full(bool trace_contexts_p)
 	std::swap(data->tenured,data->tenured_semispace);
 	reset_generation(data->tenured);
 	collect_full_impl(trace_contexts_p);
-	free_unmarked_code_blocks(false);
+	update_code_heap_for_full_gc(false);
 }
 
 }
