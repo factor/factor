@@ -140,11 +140,19 @@ HELP: no-word
 { $values { "name" string } { "newword" word } }
 { $description "Throws a " { $link no-word-error } "." } ;
 
+HELP: parse-word
+{ $values { "string" string } { "word/number" "a word or number" } }
+{ $description "If " { $snippet "string" } " is a valid number literal, it is converted to a number, otherwise the current vocabulary search path is searched for a word named by the string." }
+{ $errors "Throws an error if the token does not name a word, and does not parse as a number." }
+{ $notes "This word is used to implement " { $link scan-word } "." } ;
+
 HELP: scan-word
 { $values { "word/number/f" "a word, number or " { $link f } } }
 { $description "Reads the next token from parser input. If the token is a valid number literal, it is converted to a number, otherwise the dictionary is searched for a word named by the token. Outputs " { $link f } " if the end of the input has been reached." }
 { $errors "Throws an error if the token does not name a word, and does not parse as a number." }
 $parsing-note ;
+
+{ scan-word parse-word } related-words
 
 HELP: parse-step
 { $values { "accum" vector } { "end" word } { "?" "a boolean" } }
