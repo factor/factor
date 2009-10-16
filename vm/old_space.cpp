@@ -68,7 +68,7 @@ cell old_space::next_object_after(factor_vm *myvm, cell scan)
 	if(scan + size < here)
 		return scan + size;
 	else
-		return NULL;
+		return 0;
 }
 
 }

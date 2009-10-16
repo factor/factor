@@ -77,8 +77,8 @@ MACRO: ntuck ( n -- )
 MACRO: ndip ( n -- )
     [ [ dip ] curry ] n*quot [ call ] compose ;
 
-MACRO: nkeep ( quot n -- )
-    tuck '[ _ ndup _ _ ndip ] ;
+MACRO: nkeep ( n -- )
+    dup '[ [ _ ndup ] dip _ ndip ] ;
 
 MACRO: ncurry ( n -- )
     [ curry ] n*quot ;
