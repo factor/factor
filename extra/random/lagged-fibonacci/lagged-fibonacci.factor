@@ -5,7 +5,7 @@ random sequences specialized-arrays namespaces ;
 SPECIALIZED-ARRAY: double
 IN: random.lagged-fibonacci
 
-TUPLE: lagged-fibonacci u pt0 pt1 ;
+TUPLE: lagged-fibonacci { u double-array } { pt0 fixnum } { pt1 fixnum } ;
 
 <PRIVATE
 
@@ -17,10 +17,10 @@ CONSTANT: lagged-fibonacci-max-seed 900000000
 CONSTANT: lagged-fibonacci-sig-bits 24
 
 : normalize-seed ( seed -- seed' )
-    abs lagged-fibonacci-max-seed mod ;
+    abs lagged-fibonacci-max-seed mod ; inline
 
 : adjust-ptr ( ptr -- ptr' )
-    1 - dup 0 < [ drop p-r ] when ;
+    1 - dup 0 < [ drop p-r ] when ; inline
 
 PRIVATE>
 
@@ -59,7 +59,7 @@ M:: lagged-fibonacci seed-random ( lagged-fibonacci seed! -- lagged-fibonacci )
 
 GENERIC: random-float* ( tuple -- r )
  
-: random-float ( -- n ) random-generator get random-float* ;
+: random-float ( -- n ) random-generator get random-float* ; inline
 
 M:: lagged-fibonacci random-float* ( lagged-fibonacci -- x )
     lagged-fibonacci [ pt0>> ] [ u>> ] bi nth
@@ -69,3 +69,6 @@ M:: lagged-fibonacci random-float* ( lagged-fibonacci -- x )
     lagged-fibonacci [ adjust-ptr ] change-pt0 drop
     lagged-fibonacci [ adjust-ptr ] change-pt1 drop
     uni ; inline
+
+: default-lagged-fibonacci ( -- obj )
+    [ random-32 ] with-system-random <lagged-fibonacci> ;
