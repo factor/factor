@@ -183,6 +183,13 @@ MACRO: if-literals-match ( quots -- )
             [ rep %unpack-vector-head-reps member? ]
             [ src rep ^^unpack-vector-head ]
         }
+        {
+            [ rep unsigned-int-vector-rep? ]
+            [
+                rep ^^zero-vector :> zero
+                src zero rep ^^merge-vector-head
+            ]
+        }
         [
             rep ^^zero-vector :> zero
             zero src rep cc> ^^compare-vector :> sign
@@ -201,6 +208,13 @@ MACRO: if-literals-match ( quots -- )
             [
                 src rep ^^tail>head-vector :> tail
                 tail rep ^^unpack-vector-head
+            ]
+        }
+        {
+            [ rep unsigned-int-vector-rep? ]
+            [
+                rep ^^zero-vector :> zero
+                src zero rep ^^merge-vector-tail
             ]
         }
         [
