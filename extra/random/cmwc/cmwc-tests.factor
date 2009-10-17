@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel random random.cmwc sequences tools.test ;
+USING: alien.c-types arrays kernel random random.cmwc sequences
+specialized-arrays specialized-arrays.instances.uint tools.test ;
 IN: random.cmwc.tests
 
 [ ] [
@@ -24,18 +25,18 @@ IN: random.cmwc.tests
 }
 ] [
     cmwc-4096
-    4096 iota >array 362436 <cmwc-seed> seed-random [
+    4096 iota >uint-array 362436 <cmwc-seed> seed-random [
         10 [ random-32 ] replicate
     ] with-random
 ] unit-test
 
 [ t ] [
     cmwc-4096 [
-        4096 iota >array 362436 <cmwc-seed> seed-random [
+        4096 iota >uint-array 362436 <cmwc-seed> seed-random [
             10 [ random-32 ] replicate
         ] with-random
     ] [
-        4096 iota >array 362436 <cmwc-seed> seed-random [
+        4096 iota >uint-array 362436 <cmwc-seed> seed-random [
             10 [ random-32 ] replicate
         ] with-random
     ] bi =
