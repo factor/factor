@@ -2,7 +2,7 @@
 USING: accessors arrays classes classes.tuple combinators
 combinators.short-circuit definitions effects fry hints
 math kernel kernel.private namespaces parser quotations
-see see.private sequences slots words locals locals.definitions
+sequences slots words locals 
 locals.parser macros stack-checker.state ;
 IN: typed
 
@@ -11,8 +11,7 @@ ERROR: input-mismatch-error < type-mismatch-error ;
 ERROR: output-mismatch-error < type-mismatch-error ;
 
 PREDICATE: typed-gensym < word "typed-gensym" word-prop ;
-PREDICATE: typed-standard-word < word "typed-word" word-prop ;
-PREDICATE: typed-lambda-word < lambda-word "typed-word" word-prop ;
+PREDICATE: typed-word < word "typed-word" word-prop ;
 
 <PRIVATE
 
@@ -117,8 +116,6 @@ M: typed-gensym crossref?
     [ [ (typed) ] 3curry ]
     [ 2nip ] 3tri define-declared ;
 
-UNION: typed-word typed-standard-word typed-lambda-word ;
-
 MACRO: typed ( quot word effect -- quot' )
     [ effect-in-types (depends-on) dup typed-stack-effect? [ typed-inputs ] [ 2drop ] if ] 
     [
@@ -137,6 +134,10 @@ MACRO: typed ( quot word effect -- quot' )
         [ effect-out-types typed-stack-effect? ]
     } 1|| [ (typed-def) ] [ drop nip ] if ;
 
+M: typed-word subwords
+    [ call-next-method ]
+    [ "typed-word" word-prop ] bi suffix ;
+
 PRIVATE>
 
 : define-typed ( word def effect -- )
@@ -149,13 +150,6 @@ SYNTAX: TYPED:
 SYNTAX: TYPED::
     (::) define-typed ;
 
-M: typed-standard-word definer drop \ TYPED: \ ; ;
-M: typed-lambda-word definer drop \ TYPED:: \ ; ;
+USING: vocabs vocabs.loader ;
 
-M: typed-word definition "typed-def" word-prop ;
-M: typed-word declarations. "typed-word" word-prop declarations. ;
-
-M: typed-word subwords
-    [ call-next-method ]
-    [ "typed-word" word-prop ] bi suffix ;
-
+"prettyprint" vocab [ "typed.prettyprint" require ] when
