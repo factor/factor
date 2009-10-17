@@ -48,11 +48,6 @@ cpu x86? [
         float-4{ 0 1 0 2 }
         [ { float-4 } declare dup v+ underlying>> double-2 boa dup v+ ] compile-call
     ] unit-test
-    
-    [ 33.0 ] [
-        double-2{ 1 2 } double-2{ 10 20 }
-        [ { double-2 double-2 } declare v+ underlying>> 3.0 float* ] compile-call
-    ] unit-test
 ] when
 
 ! Fuzz testing
