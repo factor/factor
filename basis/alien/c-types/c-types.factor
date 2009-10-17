@@ -81,9 +81,13 @@ M: string resolve-pointer-type
     dup void? [ no-c-type ] when
     dup c-type-name? [ c-type ] when ;
 
+<PRIVATE
+
 : parse-array-type ( name -- dims c-type )
     "[" split unclip
-    [ [ "]" ?tail drop parse-word ] map ] dip ;
+    [ [ "]" ?tail drop string>number ] map ] dip ;
+
+PRIVATE>
 
 M: string c-type ( name -- c-type )
     CHAR: ] over member? [
