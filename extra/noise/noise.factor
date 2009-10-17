@@ -38,10 +38,10 @@ CONSTANT: normal-noise-count 4
 TYPED: normal-noise-map ( seed: integer dim -- bytes )
     '[ _ product normal-noise-count * random-bytes >byte-array ] with-seed
     [
-        [ ushort-8{ 0 0 0 0 0 0 0 0 } ushort-8{ 0 0 0 0 0 0 0 0 } ] normal-noise-count ndip
-        [ uchar-16 ushort-8 vconvert [ v+ ] bi-curry@ bi* ] normal-noise-count napply
+        [ short-8{ 0 0 0 0 0 0 0 0 } short-8{ 0 0 0 0 0 0 0 0 } ] normal-noise-count ndip
+        [ uchar-16 short-8 vconvert [ v+ ] bi-curry@ bi* ] normal-noise-count napply
         [ normal-noise-pow vrshift ] bi@
-        ushort-8 uchar-16 vconvert
+        short-8 uchar-16 vconvert
     ] data-map( uchar-16[normal-noise-count] -- uchar-16 ) ; inline
 
 : normal-noise-image ( seed dim -- image )
