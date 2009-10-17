@@ -187,6 +187,8 @@ IN: tools.deploy.shaker
                 "transform-n"
                 "transform-quot"
                 "type"
+                "typed-def"
+                "typed-word"
                 "writer"
                 "writing"
             } %
