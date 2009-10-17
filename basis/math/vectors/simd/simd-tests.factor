@@ -289,23 +289,23 @@ simd-classes&reps [
 
 "== Checking shifts and permutations" print
 
-[ int-4{ 256 512 1024 2048 } ]
-[ int-4{ 1 2 4 8 } 1 hlshift ] unit-test
+[ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } ]
+[ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } 1 hlshift ] unit-test
 
-[ int-4{ 256 512 1024 2048 } ]
-[ int-4{ 1 2 4 8 } [ { int-4 } declare 1 hlshift ] compile-call ] unit-test
+[ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } ]
+[ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } [ { char-16 } declare 1 hlshift ] compile-call ] unit-test
 
-[ int-4{ 256 512 1024 2048 } ]
-[ int-4{ 1 2 4 8 } 1 [ { int-4 fixnum } declare hlshift ] compile-call ] unit-test
+[ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } ]
+[ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } 1 [ { char-16 fixnum } declare hlshift ] compile-call ] unit-test
 
-[ int-4{ 1 2 4 8 } ]
-[ int-4{ 256 512 1024 2048 } 1 hrshift ] unit-test
+[ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } ]
+[ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } 1 hrshift ] unit-test
 
-[ int-4{ 1 2 4 8 } ]
-[ int-4{ 256 512 1024 2048 } [ { int-4 } declare 1 hrshift ] compile-call ] unit-test
+[ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } ]
+[ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } [ { char-16 } declare 1 hrshift ] compile-call ] unit-test
 
-[ int-4{ 1 2 4 8 } ]
-[ int-4{ 256 512 1024 2048 } 1 [ { int-4 fixnum } declare hrshift ] compile-call ] unit-test
+[ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } ]
+[ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } 1 [ { char-16 fixnum } declare hrshift ] compile-call ] unit-test
 
 ! Invalid inputs should not cause the compiler to throw errors
 [ ] [
