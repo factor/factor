@@ -1,14 +1,14 @@
 USING: tools.deploy.config ;
 H{
-    { deploy-ui? t }
-    { deploy-reflection 1 }
-    { deploy-unicode? f }
-    { deploy-math? t }
-    { deploy-io 2 }
-    { deploy-c-types? f }
     { deploy-name "Terrain" }
-    { deploy-word-props? f }
-    { deploy-word-defs? f }
+    { deploy-ui? t }
+    { deploy-c-types? f }
+    { deploy-unicode? f }
+    { deploy-io 2 }
+    { deploy-reflection 2 }
     { "stop-after-last-window?" t }
+    { deploy-word-props? f }
+    { deploy-math? t }
     { deploy-threads? t }
+    { deploy-word-defs? f }
 }
