@@ -10,6 +10,12 @@ ERROR: type-mismatch-error word expected-types ;
 ERROR: input-mismatch-error < type-mismatch-error ;
 ERROR: output-mismatch-error < type-mismatch-error ;
 
+PREDICATE: typed-gensym < word "typed-gensym" word-prop ;
+PREDICATE: typed-standard-word < word "typed-word" word-prop ;
+PREDICATE: typed-lambda-word < lambda-word "typed-word" word-prop ;
+
+<PRIVATE
+
 : unboxable-tuple-class? ( type -- ? )
     {
         [ all-slots empty? not ]
@@ -93,9 +99,7 @@ MACRO: (typed) ( word def effect -- quot )
         dup typed-stack-effect? [ typed-outputs ] [ 2drop ] if
     ] 2bi ;
 
-PREDICATE: typed-gensym < word "typed-gensym" word-prop ;
-
-: typed-gensym ( parent-word -- word )
+: <typed-gensym> ( parent-word -- word )
     [ name>> "( typed " " )" surround f <word> dup ]
     [ "typed-gensym" set-word-prop ] bi ;
 
@@ -103,16 +107,13 @@ PREDICATE: typed-gensym < word "typed-gensym" word-prop ;
     [ effect-in-types unboxed-types [ "in" swap 2array ] map ]
     [ effect-out-types unboxed-types [ "out" swap 2array ] map ] bi <effect> ;
 
-PREDICATE: typed-standard-word < word "typed-word" word-prop ;
-PREDICATE: typed-lambda-word < lambda-word "typed-word" word-prop ;
-
 M: typed-gensym stack-effect
     call-next-method unboxed-effect ;
 M: typed-gensym crossref? 
     "typed-gensym" word-prop crossref? ;
 
 : define-typed-gensym ( word def effect -- gensym )
-    [ 2drop typed-gensym dup ]
+    [ 2drop <typed-gensym> dup ]
     [ [ (typed) ] 3curry ]
     [ 2nip ] 3tri define-declared ;
 
@@ -135,6 +136,8 @@ MACRO: typed ( quot word effect -- quot' )
         [ effect-in-types typed-stack-effect? ]
         [ effect-out-types typed-stack-effect? ]
     } 1|| [ (typed-def) ] [ drop nip ] if ;
+
+PRIVATE>
 
 : define-typed ( word def effect -- )
     [ [ 2drop ] [ typed-def ] [ 2nip ] 3tri define-inline ] 
