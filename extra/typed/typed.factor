@@ -2,7 +2,7 @@
 USING: accessors arrays classes classes.tuple combinators
 combinators.short-circuit definitions effects fry hints
 math kernel kernel.private namespaces parser quotations
-see.private sequences slots words locals locals.definitions
+see see.private sequences slots words locals locals.definitions
 locals.parser macros stack-checker.state ;
 IN: typed
 
