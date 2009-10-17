@@ -265,20 +265,19 @@ M: x86.32 %unnest-stacks ( -- )
     ] with-aligned-stack ;
 
 M: x86.32 %prepare-alien-indirect ( -- )
-    push-vm-ptr "unbox_alien" f %alien-invoke
-    temp-reg POP
+    4 [
+        push-vm-ptr
+        "unbox_alien" f %alien-invoke
+    ] with-aligned-stack
     EBP EAX MOV ;
 
 M: x86.32 %alien-indirect ( -- )
     EBP CALL ;
 
 M: x86.32 %alien-callback ( quot -- )
-    4 [
-        EAX swap %load-reference
-        EAX PUSH
-        param-reg-2 %mov-vm-ptr
-        "c_to_factor" f %alien-invoke
-    ] with-aligned-stack ;
+    param-reg-1 swap %load-reference
+    param-reg-2 %mov-vm-ptr
+    "c_to_factor" f %alien-invoke ;
 
 M: x86.32 %callback-value ( ctype -- )
     ! Align C stack
