@@ -85,6 +85,13 @@ IN: tools.deploy.shaker
         run-file
     ] when ;
 
+: strip-specialized-arrays ( -- )
+    strip-dictionary? "specialized-arrays" vocab and [
+        "Stripping specialized arrays" show
+        "vocab:tools/deploy/shaker/strip-specialized-arrays.factor"
+        run-file
+    ] when ;
+
 : strip-word-names ( words -- )
     "Stripping word names" show
     [ f >>name f >>vocabulary drop ] each ;
@@ -180,6 +187,8 @@ IN: tools.deploy.shaker
                 "transform-n"
                 "transform-quot"
                 "type"
+                "typed-def"
+                "typed-word"
                 "writer"
                 "writing"
             } %
@@ -503,6 +512,7 @@ SYMBOL: deploy-vocab
     strip-call
     strip-cocoa
     strip-debugger
+    strip-specialized-arrays
     compute-next-methods
     strip-init-hooks
     add-command-line-hook

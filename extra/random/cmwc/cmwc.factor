@@ -9,11 +9,11 @@ IN: random.cmwc
 
 TUPLE: cmwc
     { Q uint-array }
-    { a fixnum }
-    { b fixnum }
-    { c fixnum }
-    { i fixnum }
-    { r fixnum }
+    { a integer }
+    { b integer }
+    { c integer }
+    { i integer }
+    { r integer }
     { mod fixnum } ;
 
 TUPLE: cmwc-seed { Q uint-array read-only } { c read-only } ;
