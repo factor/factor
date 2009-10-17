@@ -35,12 +35,9 @@ PRIVATE>
         dup dim>> second iota [ draw-vertex-buffer-row ] with each
     ] with-gl-buffer ;
 
-USE: tools.time
 : <grid-mesh> ( dim -- grid-mesh )
-    [
     [ ] [ vertex-array >vertex-buffer ] [ first 1 + 2 * ] tri
-    grid-mesh boa
-    ] time ;
+    grid-mesh boa ;
 
 M: grid-mesh dispose
     [ [ delete-gl-buffer ] when* f ] change-buffer

@@ -325,7 +325,7 @@ FUNCTOR: define-simd-256 ( T -- )
 
 N            [ 32 T c:heap-size /i ]
 
-N/2          [ N 2 / ]
+N/2          [ N 2 /i ]
 A/2          IS ${T}-${N/2}
 A/2-boa      IS ${A/2}-boa
 A/2-with     IS ${A/2}-with
