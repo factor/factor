@@ -89,7 +89,7 @@ HELP: pathname
 { $class-description "Class of path name objects. Path name objects can be created by calling " { $link <pathname> } "." } ;
 
 HELP: normalize-path
-{ $values { "string" "a pathname string" } { "string'" "a new pathname string" } }
+{ $values { "path" "a pathname string" } { "path'" "a new pathname string" } }
 { $description "Prepends the " { $link current-directory } " to the pathname, resolves a " { $snippet "resource:" } " or " { $snippet "voacb:" } " prefix, if present, and performs any platform-specific pathname normalization." }
 { $notes "High-level words, such as " { $link <file-reader> } " and " { $link delete-file } " call this word for you. It only needs to be called directly when passing pathnames to C functions or external processes. This is because Factor does not use the operating system's notion of a current directory, and instead maintains its own dynamically-scoped " { $link current-directory } " variable." }
 { $notes "On Windows NT platforms, this word does prepends the Unicode path prefix." }
