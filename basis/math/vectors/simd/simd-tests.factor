@@ -193,21 +193,17 @@ CONSTANT: simd-classes
         '[ first2 inputs _ _ check-vector-op ]
     ] dip check-optimizer ; inline
 
-: approx= ( x y -- ? )
+: (approx=) ( x y -- ? )
     {
         { [ 2dup [ fp-nan? ] both? ] [ 2drop t ] }
-        { [ 2dup [ float? ] both? ] [ -1.e8 ~ ] }
+        { [ 2dup [ fp-nan? ] either? ] [ 2drop f ] }
         { [ 2dup [ fp-infinity? ] either? ] [ fp-bitwise= ] }
-        { [ 2dup [ sequence? ] both? ] [
-            [
-                {
-                    { [ 2dup [ fp-nan? ] both? ] [ 2drop t ] }
-                    { [ 2dup [ fp-infinity? ] either? ] [ fp-bitwise= ] }
-                    { [ 2dup [ fp-nan? ] either? not ] [ -1.e8 ~ ] }
-                } cond
-            ] 2all?
-        ] }
+        { [ 2dup [ float? ] both? ] [ -1.e8 ~ ] }
     } cond ;
+
+: approx= ( x y -- ? )
+    2dup [ sequence? ] both?
+    [ [ (approx=) ] 2all? ] [ (approx=) ] if ;
 
 : exact= ( x y -- ? )
     {
