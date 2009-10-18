@@ -283,8 +283,10 @@ simd new
         { { +vector+ +scalar+ -> +vector+ } A-vn->v-op }
         { { +vector+ +literal+ -> +vector+ } A-vn->v-op }
         { { +vector+ +vector+ -> +scalar+ } A-vv->n-op }
+        { { +vector+ +vector+ -> +boolean+ } A-vv->n-op }
         { { +vector+ -> +vector+ } A-v->v-op }
         { { +vector+ -> +scalar+ } A-v->n-op }
+        { { +vector+ -> +boolean+ } A-v->n-op }
         { { +vector+ -> +nonnegative+ } A-v->n-op }
     } >>schema-wrappers
 (define-simd-128)
