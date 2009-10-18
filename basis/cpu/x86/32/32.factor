@@ -250,10 +250,10 @@ M:: x86.32 %unbox-large-struct ( n c-type -- )
     ] with-aligned-stack ;
 
 M: x86.32 %nest-stacks ( -- )
+    ! Save current frame. See comment in vm/contexts.hpp
+    EAX stack-reg stack-frame get total-size>> 3 cells - [+] LEA
     8 [
         push-vm-ptr
-        ! Save current frame. See comment in vm/contexts.hpp
-        EAX stack-reg stack-frame get total-size>> [+] LEA
         EAX PUSH
         "nest_stacks" f %alien-invoke
     ] with-aligned-stack ;
