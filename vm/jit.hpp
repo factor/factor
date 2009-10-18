@@ -25,9 +25,10 @@ struct jit {
 		emit_with(parent_vm->userenv[JIT_PUSH_IMMEDIATE],literal);
 	}
 
-	void word_jump(cell word) {
+	void word_jump(cell word_) {
+		gc_root<word> word(word_,parent_vm);
 		literal(tag_fixnum(xt_tail_pic_offset));
-		literal(word);
+		literal(word.value());
 		emit(parent_vm->userenv[JIT_WORD_JUMP]);
 	}
 
