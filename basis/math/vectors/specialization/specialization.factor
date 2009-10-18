@@ -7,13 +7,14 @@ namespaces assocs fry splitting classes.algebra generalizations
 locals compiler.tree.propagation.info ;
 IN: math.vectors.specialization
 
-SYMBOLS: -> +vector+ +scalar+ +nonnegative+ +literal+ ;
+SYMBOLS: -> +vector+ +scalar+ +boolean+ +nonnegative+ +literal+ ;
 
 : signature-for-schema ( array-type elt-type schema -- signature )
     [
         {
             { +vector+ [ drop ] }
             { +scalar+ [ nip ] }
+            { +boolean+ [ 2drop boolean ] }
             { +nonnegative+ [ nip ] }
             { +literal+ [ 2drop f ] }
         } case
@@ -32,6 +33,7 @@ SYMBOLS: -> +vector+ +scalar+ +nonnegative+ +literal+ ;
         {
             { +vector+ [ drop <class-info> ] }
             { +scalar+ [ nip <class-info> ] }
+            { +boolean+ [ 2drop boolean <class-info> ] }
             {
                 +nonnegative+
                 [
@@ -115,9 +117,9 @@ H{
     { v> { +vector+ +vector+ -> +vector+ } }
     { v>= { +vector+ +vector+ -> +vector+ } }
     { vunordered? { +vector+ +vector+ -> +vector+ } }
-    { vany? { +vector+ -> +scalar+ } }
-    { vall? { +vector+ -> +scalar+ } }
-    { vnone? { +vector+ -> +scalar+ } }
+    { vany?  { +vector+ -> +boolean+ } }
+    { vall?  { +vector+ -> +boolean+ } }
+    { vnone? { +vector+ -> +boolean+ } }
 }
 
 PREDICATE: vector-word < word vector-words key? ;

@@ -48,11 +48,6 @@ cpu x86? [
         float-4{ 0 1 0 2 }
         [ { float-4 } declare dup v+ underlying>> double-2 boa dup v+ ] compile-call
     ] unit-test
-    
-    [ 33.0 ] [
-        double-2{ 1 2 } double-2{ 10 20 }
-        [ { double-2 double-2 } declare v+ underlying>> 3.0 float* ] compile-call
-    ] unit-test
 ] when
 
 ! Fuzz testing
@@ -193,21 +188,17 @@ CONSTANT: simd-classes
         '[ first2 inputs _ _ check-vector-op ]
     ] dip check-optimizer ; inline
 
-: approx= ( x y -- ? )
+: (approx=) ( x y -- ? )
     {
         { [ 2dup [ fp-nan? ] both? ] [ 2drop t ] }
-        { [ 2dup [ float? ] both? ] [ -1.e8 ~ ] }
+        { [ 2dup [ fp-nan? ] either? ] [ 2drop f ] }
         { [ 2dup [ fp-infinity? ] either? ] [ fp-bitwise= ] }
-        { [ 2dup [ sequence? ] both? ] [
-            [
-                {
-                    { [ 2dup [ fp-nan? ] both? ] [ 2drop t ] }
-                    { [ 2dup [ fp-infinity? ] either? ] [ fp-bitwise= ] }
-                    { [ 2dup [ fp-nan? ] either? not ] [ -1.e8 ~ ] }
-                } cond
-            ] 2all?
-        ] }
+        { [ 2dup [ float? ] both? ] [ -1.e8 ~ ] }
     } cond ;
+
+: approx= ( x y -- ? )
+    2dup [ sequence? ] both?
+    [ [ (approx=) ] 2all? ] [ (approx=) ] if ;
 
 : exact= ( x y -- ? )
     {
