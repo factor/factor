@@ -416,14 +416,41 @@ HELP: vbroadcast
 } ;
 
 HELP: vshuffle
-{ $values { "u" "a SIMD array" } { "perm" "an array of integers" } { "v" "a SIMD array" } }
-{ $description "Permutes the elements of a SIMD array. Duplicate entries are allowed in the permutation." }
+{ $values { "u" "a SIMD array" } { "perm" "an array of integers, or a byte-array" } { "v" "a SIMD array" } }
+{ $description "Permutes the elements of a SIMD array. Duplicate entries are allowed in the permutation. The " { $snippet "perm" } " argument can have one of two forms:"
+{ $list
+{ "A literal array of integers of the same length as the vector. This will perform a static, elementwise shuffle." }
+{ "A byte array or SIMD vector of the same byte length as the vector. This will perform a variable bytewise shuffle." }
+} }
 { $examples
     { $example
         "USING: alien.c-types math.vectors math.vectors.simd" "prettyprint ;"
         "SIMD: int"
         "int-4{ 69 42 911 13 } { 1 3 2 3 } vshuffle ."
         "int-4{ 42 13 911 13 }"
+    }
+    { $example
+        "USING: alien.c-types combinators math.vectors math.vectors.simd"
+        "namespaces prettyprint prettyprint.config ;"
+        "SIMDS: int uchar ;"
+        "IN: scratchpad"
+        ""
+        ": endian-swap ( size -- vector )"
+        "    {"
+        "        { 1 [ uchar-16{ 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 } ] }"
+        "        { 2 [ uchar-16{ 1 0 3 2 5 4 7 6 9 8 11 10 13 12 15 14 } ] }"
+        "        { 4 [ uchar-16{ 3 2 1 0 7 6 5 4 11 10 9 8 15 14 13 12 } ] }"
+        "    } case ;"
+        ""
+        "int-4{ HEX: 11223344 HEX: 11223344 HEX: 11223344 HEX: 11223344 }"
+        "4 endian-swap vshuffle"
+        "16 number-base [ . ] with-variable"
+        """int-4{
+    HEX: 44332211
+    HEX: 44332211
+    HEX: 44332211
+    HEX: 44332211
+}"""
     }
 } ;
 
