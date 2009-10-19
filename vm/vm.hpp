@@ -494,7 +494,7 @@ struct factor_vm
 	void update_literal_references(code_block *compiled);
 	void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled);
 	void update_word_references(code_block *compiled);
-	void update_code_block_for_full_gc(code_block *compiled);
+	void update_code_block_words_and_literals(code_block *compiled);
 	void check_code_address(cell address);
 	void relocate_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
@@ -513,6 +513,8 @@ struct factor_vm
 	bool in_code_heap_p(cell ptr);
 	void jit_compile_word(cell word_, cell def_, bool relocate);
 	void update_code_heap_words();
+	void update_code_heap_words_and_literals();
+	void relocate_code_heap();
 	void primitive_modify_code_heap();
 	void primitive_code_room();
 	void forward_object_xts();
@@ -711,6 +713,6 @@ struct factor_vm
 
 };
 
-extern unordered_map<THREADHANDLE, factor_vm *> thread_vms;
+extern std::map<THREADHANDLE, factor_vm *> thread_vms;
 
 }

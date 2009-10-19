@@ -104,32 +104,6 @@ void full_collector::cheneys_algorithm()
 	}
 }
 
-/* After growing the heap, we have to perform a full relocation to update
-references to card and deck arrays. */
-struct big_code_heap_updater {
-	factor_vm *parent;
-
-	big_code_heap_updater(factor_vm *parent_) : parent(parent_) {}
-
-	void operator()(heap_block *block)
-	{
-		parent->relocate_code_block((code_block *)block);
-	}
-};
-
-/* After a full GC that did not grow the heap, we have to update references
-to literals and other words. */
-struct small_code_heap_updater {
-	factor_vm *parent;
-
-	small_code_heap_updater(factor_vm *parent_) : parent(parent_) {}
-
-	void operator()(heap_block *block)
-	{
-		parent->update_code_block_for_full_gc((code_block *)block);
-	}
-};
-
 void factor_vm::collect_full_impl(bool trace_contexts_p)
 {
 	full_collector collector(this);
@@ -161,16 +135,9 @@ void factor_vm::collect_growing_heap(cell requested_bytes,
 	delete old;
 
 	if(compact_code_heap_p)
-	{
 		compact_code_heap(trace_contexts_p);
-		big_code_heap_updater updater(this);
-		iterate_code_heap(updater);
-	}
 	else
-	{
-		big_code_heap_updater updater(this);
-		code->free_unmarked(updater);
-	}
+		relocate_code_heap();
 
 	code->clear_remembered_set();
 }
@@ -183,16 +150,9 @@ void factor_vm::collect_full(bool trace_contexts_p, bool compact_code_heap_p)
 	collect_full_impl(trace_contexts_p);
 
 	if(compact_code_heap_p)
-	{
 		compact_code_heap(trace_contexts_p);
-		big_code_heap_updater updater(this);
-		iterate_code_heap(updater);
-	}
 	else
-	{
-		small_code_heap_updater updater(this);
-		code->free_unmarked(updater);
-	}
+		update_code_heap_words_and_literals();
 
 	code->clear_remembered_set();
 }
