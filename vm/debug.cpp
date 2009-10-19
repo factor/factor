@@ -290,8 +290,9 @@ void factor_vm::dump_code_heap()
 	cell reloc_size = 0, literal_size = 0;
 
 	heap_block *scan = code->first_block();
+	heap_block *end = code->last_block();
 
-	while(scan)
+	while(scan != end)
 	{
 		const char *status;
 		if(scan->type() == FREE_BLOCK_TYPE)
@@ -313,7 +314,7 @@ void factor_vm::dump_code_heap()
 		print_cell_hex(scan->size()); print_string(" ");
 		print_string(status); print_string("\n");
 
-		scan = code->next_block(scan);
+		scan = scan->next();
 	}
 	
 	print_cell(reloc_size); print_string(" bytes of relocation data\n");
