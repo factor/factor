@@ -29,9 +29,9 @@ struct tagged
 
 	bool type_p(cell type_) const { return type() == type_; }
 
-	Type *untag_check(factor_vm *myvm) const {
+	Type *untag_check(factor_vm *parent) const {
 		if(Type::type_number != TYPE_COUNT && !type_p(Type::type_number))
-			myvm->type_error(Type::type_number,value_);
+			parent->type_error(Type::type_number,value_);
 		return untagged();
 	}
 

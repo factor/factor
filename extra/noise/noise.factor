@@ -4,31 +4,12 @@ math.libm math.matrices.simd math.vectors math.vectors.conversion math.vectors.s
 memoize random random.mersenne-twister sequences sequences.private specialized-arrays
 typed ;
 QUALIFIED-WITH: alien.c-types c
-SIMDS: c:float c:int c:short c:uchar ;
+SIMDS: c:float c:int c:short c:ushort c:uchar ;
 SPECIALIZED-ARRAYS: c:float c:uchar float-4 uchar-16 ;
 IN: noise
 
 : with-seed ( seed quot -- )
     [ <mersenne-twister> ] dip with-random ; inline
-
-: random-int-4 ( -- v )
-    16 random-bytes underlying>> int-4 boa ; inline
-
-: (random-float-4) ( -- v )
-    random-int-4 int-4 float-4 vconvert ; inline
-
-! XXX redundant add
-: uniform-random-float-4 ( min max -- n )
-    (random-float-4) (random-float-4)
-    2.0 31 ^ v+n 2.0 32 ^ v*n v+
-    [ over - 2.0 -64 ^ * ] dip n*v n+v ; inline
-
-: normal-random-float-4 ( mean sigma -- n )
-    0.0 1.0 uniform-random-float-4
-    0.0 1.0 uniform-random-float-4
-    [ 2 pi * v*n [ fcos ] map ]
-    [ 1.0 swap n-v [ flog ] map -2.0 v*n vsqrt ]
-    bi* v* n*v n+v ; inline
 
 : float-map>byte-map ( floats: float-array scale: float bias: float -- bytes: byte-array )
     '[
@@ -37,32 +18,34 @@ IN: noise
         short-8 uchar-16 vconvert
     ] data-map( float-4[4] -- uchar-16 ) ; inline
 
-TYPED:: float-map>image ( floats: float-array dim scale: float bias: float -- image: image )
+TYPED: byte-map>image ( bytes: byte-array dim -- image: image )
     image new
-        dim >>dim
-        floats scale bias float-map>byte-map >>bitmap
+        swap >>dim
+        swap >>bitmap
         L >>component-order
         ubyte-components >>component-type ;
 
-TYPED: uniform-noise-map ( seed: integer dim -- map: float-array )
-    '[
-        _ product 4 / [ 0.0 1.0 uniform-random-float-4 ]
-        float-4-array{ } replicate-as
-        byte-array>float-array
-    ] with-seed ;
+:: float-map>image ( floats: float-array dim scale: float bias: float -- image: image )
+    floats scale bias float-map>byte-map dim byte-map>image ; inline
 
 : uniform-noise-image ( seed dim -- image )
-    [ uniform-noise-map ] [ 1.0 0.0 float-map>image ] bi ; inline
+    [ '[ _ product random-bytes >byte-array ] with-seed ]
+    [ byte-map>image ] bi ; inline
 
-TYPED: normal-noise-map ( seed: integer sigma: float dim -- map: float-array )
-    swap '[
-        _ product 4 / [ 0.5 _ normal-random-float-4 ]
-        float-4-array{ } replicate-as
-        byte-array>float-array
-    ] with-seed ;
+CONSTANT: normal-noise-pow 2
+CONSTANT: normal-noise-count 4
 
-: normal-noise-image ( seed sigma dim -- image )
-    [ normal-noise-map ] [ 1.0 0.0 float-map>image ] bi ; inline
+TYPED: normal-noise-map ( seed: integer dim -- bytes )
+    '[ _ product normal-noise-count * random-bytes >byte-array ] with-seed
+    [
+        [ short-8{ 0 0 0 0 0 0 0 0 } short-8{ 0 0 0 0 0 0 0 0 } ] normal-noise-count ndip
+        [ uchar-16 short-8 vconvert [ v+ ] bi-curry@ bi* ] normal-noise-count napply
+        [ normal-noise-pow vrshift ] bi@
+        short-8 uchar-16 vconvert
+    ] data-map( uchar-16[normal-noise-count] -- uchar-16 ) ; inline
+
+: normal-noise-image ( seed dim -- image )
+    [ normal-noise-map ] [ byte-map>image ] bi ; inline
 
 ERROR: invalid-perlin-noise-table table ;
 
@@ -73,7 +56,7 @@ ERROR: invalid-perlin-noise-table table ;
     dup { [ byte-array? ] [ length 512 >= ] } 1&&
     [ invalid-perlin-noise-table ] unless ;
 
-! XXX doesn't work for NaNs or very large floats
+! XXX doesn't work for NaNs or floats > 2^31
 : floor-vector ( v -- v' )
     [ float-4 int-4 vconvert int-4 float-4 vconvert ]
     [ [ v> -1.0 float-4-with vand ] curry keep v+ ] bi ; inline

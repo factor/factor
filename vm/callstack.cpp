@@ -100,22 +100,22 @@ cell factor_vm::frame_scan(stack_frame *frame)
 	case QUOTATION_TYPE:
 		{
 			cell quot = frame_executing(frame);
-			if(quot == F)
-				return F;
-			else
+			if(to_boolean(quot))
 			{
 				char *return_addr = (char *)FRAME_RETURN_ADDRESS(frame,this);
 				char *quot_xt = (char *)(frame_code(frame) + 1);
 
 				return tag_fixnum(quot_code_offset_to_scan(
 					quot,(cell)(return_addr - quot_xt)));
-			}
+			}    
+			else
+				return false_object;
 		}
 	case WORD_TYPE:
-		return F;
+		return false_object;
 	default:
 		critical_error("Bad frame type",frame_type(frame));
-		return F;
+		return false_object;
 	}
 }
 
@@ -123,15 +123,15 @@ namespace
 {
 
 struct stack_frame_accumulator {
-	factor_vm *myvm;
+	factor_vm *parent;
 	growable_array frames;
 
-	explicit stack_frame_accumulator(factor_vm *myvm_) : myvm(myvm_), frames(myvm_) {} 
+	explicit stack_frame_accumulator(factor_vm *parent_) : parent(parent_), frames(parent_) {} 
 
 	void operator()(stack_frame *frame)
 	{
-		gc_root<object> executing(myvm->frame_executing(frame),myvm);
-		gc_root<object> scan(myvm->frame_scan(frame),myvm);
+		gc_root<object> executing(parent->frame_executing(frame),parent);
+		gc_root<object> scan(parent->frame_scan(frame),parent);
 
 		frames.add(executing.value());
 		frames.add(scan.value());
@@ -204,9 +204,9 @@ void factor_vm::save_callstack_bottom(stack_frame *callstack_bottom)
 	ctx->callstack_bottom = callstack_bottom;
 }
 
-VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom, factor_vm *myvm)
+VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom, factor_vm *parent)
 {
-	return myvm->save_callstack_bottom(callstack_bottom);
+	return parent->save_callstack_bottom(callstack_bottom);
 }
 
 }

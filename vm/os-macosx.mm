@@ -13,7 +13,7 @@ NS_DURING
 		c_to_factor(quot,this);
 		NS_VOIDRETURN;
 NS_HANDLER
-		dpush(allot_alien(F,(cell)localException));
+		dpush(allot_alien(false_object,(cell)localException));
 		quot = userenv[COCOA_EXCEPTION_ENV];
 		if(!tagged<object>(quot).type_p(QUOTATION_TYPE))
 		{

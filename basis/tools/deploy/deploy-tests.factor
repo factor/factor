@@ -113,3 +113,5 @@ os macosx? [
     ascii [ lines ] with-process-reader
     rest
 ] unit-test
+
+[ ] [ "tools.deploy.test.16" shake-and-bake run-temp-image ] unit-test

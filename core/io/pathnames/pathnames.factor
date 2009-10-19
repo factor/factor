@@ -10,10 +10,10 @@ SYMBOL: current-directory
 
 : path-separator ( -- string ) os windows? "\\" "/" ? ;
 
-: trim-tail-separators ( str -- newstr )
+: trim-tail-separators ( string -- string' )
     [ path-separator? ] trim-tail ;
 
-: trim-head-separators ( str -- newstr )
+: trim-head-separators ( string -- string' )
     [ path-separator? ] trim-head ;
 
 : last-path-separator ( path -- n ? )
@@ -61,8 +61,6 @@ ERROR: no-parent-directory path ;
         [ nip ]
     } cond ;
 
-PRIVATE>
-
 : windows-absolute-path? ( path -- path ? )
     {
         { [ dup "\\\\?\\" head? ] [ t ] }
@@ -87,7 +85,9 @@ PRIVATE>
         [ f ]
     } cond nip ;
 
-: append-path ( str1 str2 -- str )
+PRIVATE>
+
+: append-path ( path1 path2 -- path )
     {
         { [ over empty? ] [ append-path-empty ] }
         { [ dup empty? ] [ drop ] }
@@ -107,7 +107,7 @@ PRIVATE>
         ]
     } cond ;
 
-: prepend-path ( str1 str2 -- str )
+: prepend-path ( path1 path2 -- path )
     swap append-path ; inline
 
 : file-name ( path -- string )

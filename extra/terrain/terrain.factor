@@ -20,6 +20,7 @@ CONSTANT: FAR-PLANE 2.0
 CONSTANT: PLAYER-START-LOCATION float-4{ 0.5 0.51 0.5 1.0 }
 CONSTANT: VELOCITY-MODIFIER-NORMAL float-4{ 1.0 1.0 1.0 0.0 }
 CONSTANT: VELOCITY-MODIFIER-FAST float-4{ 2.0 1.0 2.0 0.0 }
+CONSTANT: BOUNCE float-4{ 1.0 -0.2 1.0 1.0 }
 CONSTANT: PLAYER-HEIGHT 1/256.
 CONSTANT: GRAVITY float-4{ 0.0 -1/4096. 0.0 0.0 }
 CONSTANT: JUMP 1/1024.
@@ -177,10 +178,23 @@ terrain-world H{
     indices [ pixels nth COMPONENT-SCALE v. 255.0 / ] map
     first4 pixel-mantissa bilerp ;
 
-: collide ( segment location -- location' )
-    [ [ first ] [ third ] bi 2array terrain-height-at PLAYER-HEIGHT + ]
-    [ [ 1 ] 2dip [ max ] with change-nth ]
-    [ ] tri ;
+: (collide) ( segment location -- location' )
+    [
+        { 0 2 3 3 } vshuffle terrain-height-at PLAYER-HEIGHT +
+        -1/0. swap -1/0. -1/0. float-4-boa
+    ] keep vmax ;
+
+:: collide ( world player -- )
+    world terrain-segment>> :> segment
+    player location>> :> location
+    segment location (collide) :> location'
+
+    location location' = not [
+        player
+            location' >>location
+            [ BOUNCE v* ] change-velocity
+            drop
+    ] when ;
 
 : scaled-velocity ( player -- velocity )
     [ velocity>> ] [ velocity-modifier>> ] bi v* ;
@@ -199,8 +213,8 @@ terrain-world H{
 : tick-player-forward ( world player -- )
     2dup save-history
     [ apply-friction apply-gravity ] change-velocity
-    dup scaled-velocity [ v+ [ terrain-segment>> ] dip collide ] curry with change-location
-    drop ;
+    dup scaled-velocity [ v+ ] curry change-location
+    collide ;
 
 : tick-player ( world player -- )
     dup reverse-time>>

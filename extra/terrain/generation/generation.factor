@@ -1,13 +1,13 @@
 USING: accessors alien.data.map arrays byte-arrays combinators
 combinators.smart fry grouping images kernel math
 math.matrices.simd math.order math.vectors noise random
-sequences math.vectors.simd ;
+sequences math.vectors.simd typed ;
 FROM: alien.c-types => float uchar ;
 SIMDS: float uchar ;
 IN: terrain.generation
 
 CONSTANT: terrain-segment-size { 512 512 }
-CONSTANT: terrain-segment-size-vector { 512.0 512.0 1.0 1.0 }
+CONSTANT: terrain-segment-size-vector float-4{ 512.0 512.0 1.0 1.0 }
 CONSTANT: terrain-big-noise-scale float-4{ 0.002 0.002 0.002 0.002 }
 CONSTANT: terrain-small-noise-scale float-4{ 0.05 0.05 0.05 0.05 }
 
@@ -32,7 +32,7 @@ TUPLE: terrain
     terrain-segment-size-vector v* translation-matrix4 m4. 
     terrain-segment-size perlin-noise-image bitmap>> ; inline
 : tiny-noise-segment ( terrain at -- bytes )
-    [ tiny-noise-seed>> ] dip seed-at 0.1
+    [ tiny-noise-seed>> ] dip seed-at
     terrain-segment-size normal-noise-image bitmap>> ; inline
 : padding ( terrain at -- padding )
     2drop terrain-segment-size product 255 <repetition> >byte-array ; inline
@@ -51,7 +51,7 @@ TUPLE: segment image ;
         ubyte-components >>component-type
         terrain-segment-size >>dim ;
 
-: terrain-segment ( terrain at -- image )
+TYPED: terrain-segment ( terrain: terrain at: float-4 -- image )
     {
         [ big-noise-segment ]
         [ small-noise-segment ]

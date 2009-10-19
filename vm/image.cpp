@@ -8,7 +8,7 @@ void factor_vm::init_objects(image_header *h)
 {
 	memcpy(userenv,h->userenv,sizeof(userenv));
 
-	T = h->t;
+	true_object = h->true_object;
 	bignum_zero = h->bignum_zero;
 	bignum_pos_one = h->bignum_pos_one;
 	bignum_neg_one = h->bignum_neg_one;
@@ -104,19 +104,19 @@ void factor_vm::fixup_quotation(quotation *quot, cell code_relocation_base)
 
 void factor_vm::fixup_alien(alien *d)
 {
-	if(d->base == F) d->expired = T;
+	if(!to_boolean(d->base)) d->expired = true_object;
 }
 
 struct stack_frame_fixupper {
-	factor_vm *myvm;
+	factor_vm *parent;
 	cell code_relocation_base;
 
-	explicit stack_frame_fixupper(factor_vm *myvm_, cell code_relocation_base_) :
-		myvm(myvm_), code_relocation_base(code_relocation_base_) {}
+	explicit stack_frame_fixupper(factor_vm *parent_, cell code_relocation_base_) :
+		parent(parent_), code_relocation_base(code_relocation_base_) {}
 	void operator()(stack_frame *frame)
 	{
-		myvm->code_fixup(&frame->xt,code_relocation_base);
-		myvm->code_fixup(&FRAME_RETURN_ADDRESS(frame,myvm),code_relocation_base);
+		parent->code_fixup(&frame->xt,code_relocation_base);
+		parent->code_fixup(&FRAME_RETURN_ADDRESS(frame,parent),code_relocation_base);
 	}
 };
 
@@ -127,15 +127,15 @@ void factor_vm::fixup_callstack_object(callstack *stack, cell code_relocation_ba
 }
 
 struct object_fixupper {
-	factor_vm *myvm;
+	factor_vm *parent;
 	cell data_relocation_base;
 
-	explicit object_fixupper(factor_vm *myvm_, cell data_relocation_base_) :
-		myvm(myvm_), data_relocation_base(data_relocation_base_) { }
+	explicit object_fixupper(factor_vm *parent_, cell data_relocation_base_) :
+		parent(parent_), data_relocation_base(data_relocation_base_) { }
 
 	void operator()(cell *scan)
 	{
-		myvm->data_fixup(scan,data_relocation_base);
+		parent->data_fixup(scan,data_relocation_base);
 	}
 };
 
@@ -193,7 +193,7 @@ void factor_vm::relocate_data(cell data_relocation_base, cell code_relocation_ba
 	for(cell i = 0; i < USER_ENV; i++)
 		data_fixup(&userenv[i],data_relocation_base);
 
-	data_fixup(&T,data_relocation_base);
+	data_fixup(&true_object,data_relocation_base);
 	data_fixup(&bignum_zero,data_relocation_base);
 	data_fixup(&bignum_pos_one,data_relocation_base);
 	data_fixup(&bignum_neg_one,data_relocation_base);
@@ -219,15 +219,15 @@ void factor_vm::fixup_code_block(code_block *compiled, cell data_relocation_base
 }
 
 struct code_block_fixupper {
-	factor_vm *myvm;
+	factor_vm *parent;
 	cell data_relocation_base;
 
-	code_block_fixupper(factor_vm *myvm_, cell data_relocation_base_) :
-		myvm(myvm_), data_relocation_base(data_relocation_base_) { }
+	code_block_fixupper(factor_vm *parent_, cell data_relocation_base_) :
+		parent(parent_), data_relocation_base(data_relocation_base_) { }
 
 	void operator()(code_block *compiled)
 	{
-		myvm->fixup_code_block(compiled,data_relocation_base);
+		parent->fixup_code_block(compiled,data_relocation_base);
 	}
 };
 
@@ -270,7 +270,7 @@ void factor_vm::load_image(vm_parameters *p)
 	relocate_code(h.data_relocation_base);
 
 	/* Store image path name */
-	userenv[IMAGE_ENV] = allot_alien(F,(cell)p->image_path);
+	userenv[IMAGE_ENV] = allot_alien(false_object,(cell)p->image_path);
 }
 
 /* Save the current image to disk */
@@ -294,13 +294,13 @@ bool factor_vm::save_image(const vm_char *filename)
 	h.code_relocation_base = code->seg->start;
 	h.code_size = code->heap_size();
 
-	h.t = T;
+	h.true_object = true_object;
 	h.bignum_zero = bignum_zero;
 	h.bignum_pos_one = bignum_pos_one;
 	h.bignum_neg_one = bignum_neg_one;
 
 	for(cell i = 0; i < USER_ENV; i++)
-		h.userenv[i] = (save_env_p(i) ? userenv[i] : F);
+		h.userenv[i] = (save_env_p(i) ? userenv[i] : false_object);
 
 	bool ok = true;
 
@@ -337,9 +337,7 @@ void factor_vm::primitive_save_image_and_exit()
 
 	/* strip out userenv data which is set on startup anyway */
 	for(cell i = 0; i < USER_ENV; i++)
-	{
-		if(!save_env_p(i)) userenv[i] = F;
-	}
+		if(!save_env_p(i)) userenv[i] = false_object;
 
 	gc(collect_full_op,
 		0, /* requested size */
