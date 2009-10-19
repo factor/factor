@@ -55,12 +55,15 @@ ARTICLE: "math-vectors-shuffle" "Vector shuffling, packing, and unpacking"
 "These operations are primarily meant to be used with " { $vocab-link "math.vectors.simd" } " types. The software fallbacks for types not supported by hardware will not perform well."
 }
 $nl
-{ $subsection vshuffle }
-{ $subsection vbroadcast }
-{ $subsection hlshift } 
-{ $subsection hrshift }
-{ $subsection vmerge }
-{ $subsection (vmerge) } ;
+{ $subsections
+    vshuffle
+    vbroadcast
+    hlshift
+    hrshift
+    vmerge
+    (vmerge)
+}
+"See the " { $vocab-link "math.vectors.conversion" } " vocabulary for packing, unpacking, and converting vectors." ;
 
 ARTICLE: "math-vectors-logic" "Vector component- and bit-wise logic"
 { $notes
