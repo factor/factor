@@ -12,8 +12,8 @@ char *factor_vm::pinned_alien_offset(cell obj)
 	case ALIEN_TYPE:
 		{
 			alien *ptr = untag<alien>(obj);
-			if(ptr->expired != F)
-				general_error(ERROR_EXPIRED,obj,F,NULL);
+			if(to_boolean(ptr->expired))
+				general_error(ERROR_EXPIRED,obj,false_object,NULL);
 			return pinned_alien_offset(ptr->base) + ptr->displacement;
 		}
 	case F_TYPE:
@@ -40,7 +40,7 @@ cell factor_vm::allot_alien(cell delegate_, cell displacement)
 		new_alien->base = delegate.value();
 
 	new_alien->displacement = displacement;
-	new_alien->expired = F;
+	new_alien->expired = false_object;
 
 	return new_alien.value();
 }
@@ -51,8 +51,8 @@ void factor_vm::primitive_displaced_alien()
 	cell alien = dpop();
 	cell displacement = to_cell(dpop());
 
-	if(alien == F && displacement == 0)
-		dpush(F);
+	if(!to_boolean(alien) && displacement == 0)
+		dpush(false_object);
 	else
 	{
 		switch(tagged<object>(alien).type())
@@ -130,17 +130,17 @@ void factor_vm::primitive_dlsym()
 
 	symbol_char *sym = name->data<symbol_char>();
 
-	if(library.value() == F)
-		box_alien(ffi_dlsym(NULL,sym));
-	else
+	if(to_boolean(library.value()))
 	{
 		dll *d = untag_check<dll>(library.value());
 
 		if(d->dll == NULL)
-			dpush(F);
+			dpush(false_object);
 		else
 			box_alien(ffi_dlsym(d,sym));
 	}
+	else
+		box_alien(ffi_dlsym(NULL,sym));
 }
 
 /* close a native library handle */
@@ -154,10 +154,10 @@ void factor_vm::primitive_dlclose()
 void factor_vm::primitive_dll_validp()
 {
 	cell library = dpop();
-	if(library == F)
-		dpush(T);
+	if(to_boolean(library))
+		dpush(tag_boolean(untag_check<dll>(library)->dll != NULL));
 	else
-		dpush(untag_check<dll>(library)->dll == NULL ? F : T);
+		dpush(true_object);
 }
 
 /* gets the address of an object representing a C pointer */
@@ -170,8 +170,8 @@ char *factor_vm::alien_offset(cell obj)
 	case ALIEN_TYPE:
 		{
 			alien *ptr = untag<alien>(obj);
-			if(ptr->expired != F)
-				general_error(ERROR_EXPIRED,obj,F,NULL);
+			if(to_boolean(ptr->expired))
+				general_error(ERROR_EXPIRED,obj,false_object,NULL);
 			return alien_offset(ptr->base) + ptr->displacement;
 		}
 	case F_TYPE:
@@ -202,9 +202,9 @@ VM_C_API char *unbox_alien(factor_vm *myvm)
 void factor_vm::box_alien(void *ptr)
 {
 	if(ptr == NULL)
-		dpush(F);
+		dpush(false_object);
 	else
-		dpush(allot_alien(F,(cell)ptr));
+		dpush(allot_alien(false_object,(cell)ptr));
 }
 
 VM_C_API void box_alien(void *ptr, factor_vm *myvm)

@@ -236,7 +236,7 @@ void factor_vm::dump_objects(cell type)
 	begin_scan();
 
 	cell obj;
-	while((obj = next_object()) != F)
+	while(to_boolean(obj = next_object()))
 	{
 		if(type == TYPE_COUNT || tagged<object>(obj).type_p(type))
 		{
@@ -275,7 +275,7 @@ void factor_vm::find_data_references(cell look_for)
 
 	cell obj;
 
-	while((obj = next_object()) != F)
+	while(to_boolean(obj = next_object()))
 	{
 		data_references_finder finder(look_for,obj,this);
 		do_slots(UNTAG(obj),finder);

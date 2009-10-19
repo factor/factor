@@ -72,7 +72,7 @@ void *factor_vm::ffi_dlsym(dll *dll, symbol_char *symbol)
 void factor_vm::ffi_dlclose(dll *dll)
 {
 	if(dlclose(dll->dll))
-		general_error(ERROR_FFI,F,F,NULL);
+		general_error(ERROR_FFI,false_object,false_object,NULL);
 	dll->dll = NULL;
 }
 

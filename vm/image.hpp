@@ -17,7 +17,7 @@ struct image_header {
 	/* size of code heap */
 	cell code_size;
 	/* tagged pointer to t singleton */
-	cell t;
+	cell true_object;
 	/* tagged pointer to bignum 0 */
 	cell bignum_zero;
 	/* tagged pointer to bignum 1 */
