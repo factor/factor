@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays fry kernel locals math
 math.bitwise random sequences sequences.private
-specialized-arrays specialized-arrays.instances.uint ;
+specialized-arrays ;
+SPECIALIZED-ARRAY: uint
 IN: random.cmwc
 
 ! Multiply-with-carry RNG
