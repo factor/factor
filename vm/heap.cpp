@@ -189,35 +189,6 @@ cell heap::heap_size()
 	return (cell)scan - (cell)first_block();
 }
 
-void heap::compact_heap()
-{
-	state->compute_forwarding();
-
-	heap_block *scan = first_block();
-	heap_block *end = last_block();
-
-	char *address = (char *)scan;
-
-	/* Slide blocks up while building the forwarding hashtable. */
-	while(scan != end)
-	{
-		heap_block *next = scan->next();
- 
-		if(state->is_marked_p(scan))
-		{
-			cell size = scan->size();
-			memmove(address,scan,size);
-			address += size;
-		}
-
-		scan = next;
-	}
-
-	/* Now update the free list; there will be a single free block at
-	the end */
-	build_free_list((cell)address - seg->start);
-}
-
 heap_block *heap::free_allocated(heap_block *prev, heap_block *scan)
 {
 	if(secure_gc)

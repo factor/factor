@@ -29,7 +29,6 @@ struct heap {
 	}
 
 	void clear_free_list();
-	void new_heap(cell size);
 	void add_to_free_list(free_heap_block *block);
 	void build_free_list(cell size);
 	void assert_free_block(free_heap_block *block);
@@ -44,41 +43,69 @@ struct heap {
 
 	heap_block *free_allocated(heap_block *prev, heap_block *scan);
 
-	/* After code GC, all live code blocks are marked, so any
-	which are not marked can be reclaimed. */
-	template<typename Iterator> void sweep_heap(Iterator &iter)
+	template<typename Iterator> void sweep_heap(Iterator &iter);
+	template<typename Iterator> void compact_heap(Iterator &iter);
+
+	template<typename Iterator> void iterate_heap(Iterator &iter)
 	{
-		clear_free_list();
-	
-		heap_block *prev = NULL;
 		heap_block *scan = first_block();
 		heap_block *end = last_block();
-	
+
 		while(scan != end)
 		{
-			if(scan->type() == FREE_BLOCK_TYPE)
-			{
-				if(prev && prev->type() == FREE_BLOCK_TYPE)
-					prev->set_size(prev->size() + scan->size());
-				else
-					prev = scan;
-			}
-			else if(state->is_marked_p(scan))
-			{
-				if(prev && prev->type() == FREE_BLOCK_TYPE)
-					add_to_free_list((free_heap_block *)prev);
-				prev = scan;
-				iter(scan);
-			}
-			else
-				prev = free_allocated(prev,scan);
-
-			scan = scan->next();
+			heap_block *next = scan->next();
+			if(scan->type() != FREE_BLOCK_TYPE) iter(scan,scan->size());
+			scan = next;
 		}
-
-		if(prev && prev->type() == FREE_BLOCK_TYPE)
-			add_to_free_list((free_heap_block *)prev);
 	}
 };
+
+/* After code GC, all live code blocks are marked, so any
+which are not marked can be reclaimed. */
+template<typename Iterator> void heap::sweep_heap(Iterator &iter)
+{
+	this->clear_free_list();
+
+	heap_block *prev = NULL;
+	heap_block *scan = this->first_block();
+	heap_block *end = this->last_block();
+
+	while(scan != end)
+	{
+		if(scan->type() == FREE_BLOCK_TYPE)
+		{
+			if(prev && prev->type() == FREE_BLOCK_TYPE)
+				prev->set_size(prev->size() + scan->size());
+			else
+				prev = scan;
+		}
+		else if(this->state->is_marked_p(scan))
+		{
+			if(prev && prev->type() == FREE_BLOCK_TYPE)
+				this->add_to_free_list((free_heap_block *)prev);
+			prev = scan;
+			iter(scan,scan->size());
+		}
+		else
+			prev = this->free_allocated(prev,scan);
+
+		scan = scan->next();
+	}
+
+	if(prev && prev->type() == FREE_BLOCK_TYPE)
+		this->add_to_free_list((free_heap_block *)prev);
+}
+
+/* The forwarding map must be computed first by calling
+state->compute_forwarding(). */
+template<typename Iterator> void heap::compact_heap(Iterator &iter)
+{
+	heap_compacter<heap_block,block_size_increment,Iterator> compacter(state,first_block(),iter);
+	this->iterate_heap(compacter);
+
+	/* Now update the free list; there will be a single free block at
+	the end */
+	this->build_free_list((cell)compacter.address - this->seg->start);
+}
 
 }

@@ -59,7 +59,7 @@ struct word_updater {
 	factor_vm *parent;
 
 	explicit word_updater(factor_vm *parent_) : parent(parent_) {}
-	void operator()(code_block *compiled)
+	void operator()(code_block *compiled, cell size)
 	{
 		parent->update_word_references(compiled);
 	}
@@ -80,7 +80,7 @@ struct word_and_literal_code_heap_updater {
 
 	word_and_literal_code_heap_updater(factor_vm *parent_) : parent(parent_) {}
 
-	void operator()(heap_block *block)
+	void operator()(heap_block *block, cell size)
 	{
 		parent->update_code_block_words_and_literals((code_block *)block);
 	}
@@ -99,16 +99,17 @@ struct code_heap_relocator {
 
 	code_heap_relocator(factor_vm *parent_) : parent(parent_) {}
 
-	void operator()(heap_block *block)
+	void operator()(code_block *block, cell size)
 	{
-		parent->relocate_code_block((code_block *)block);
+		parent->relocate_code_block(block);
 	}
 };
 
 void factor_vm::relocate_code_heap()
 {
 	code_heap_relocator relocator(this);
-	code->sweep_heap(relocator);
+	code_heap_iterator<code_heap_relocator> iter(relocator);
+	code->sweep_heap(iter);
 }
 
 void factor_vm::primitive_modify_code_heap()
@@ -275,7 +276,10 @@ on entry to this function. XTs in code blocks must be updated after this
 function returns. */
 void factor_vm::compact_code_heap(bool trace_contexts_p)
 {
-	code->compact_heap();
+	/* Figure out where blocks are going to go */
+	code->state->compute_forwarding();
+
+	/* Update references to the code heap from the data heap */
 	forward_object_xts();
 	if(trace_contexts_p)
 	{
@@ -283,14 +287,17 @@ void factor_vm::compact_code_heap(bool trace_contexts_p)
 		forward_callback_xts();
 	}
 
+	/* Move code blocks and update references amongst them (this requires
+	that the data heap is up to date since relocation looks up object XTs) */
 	code_heap_relocator relocator(this);
-	iterate_code_heap(relocator);
+	code_heap_iterator<code_heap_relocator> iter(relocator);
+	code->compact_heap(iter);
 }
 
 struct stack_trace_stripper {
 	explicit stack_trace_stripper() {}
 
-	void operator()(code_block *compiled)
+	void operator()(code_block *compiled, cell size)
 	{
 		compiled->owner = false_object;
 	}
