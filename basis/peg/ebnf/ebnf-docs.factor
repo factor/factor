@@ -88,7 +88,7 @@ ARTICLE: "peg.ebnf.sequence" "Sequence"
 { $examples
     { $example 
        "USING: prettyprint peg.ebnf ;"
-       "\"abbba\" [EBNF rule=\"a\" (\"b\"*) \"a\" EBNF] ."
+       "\"abbba\" [EBNF rule=\"a\" (\"b\")* \"a\" EBNF] ."
        "V{ \"a\" V{ \"b\" \"b\" \"b\" } \"a\" }"
     }
 } 
