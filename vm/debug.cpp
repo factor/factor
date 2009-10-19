@@ -165,23 +165,23 @@ void factor_vm::print_retainstack()
 }
 
 struct stack_frame_printer {
-	factor_vm *myvm;
+	factor_vm *parent;
 
-	explicit stack_frame_printer(factor_vm *myvm_) : myvm(myvm_) {}
+	explicit stack_frame_printer(factor_vm *parent_) : parent(parent_) {}
 	void operator()(stack_frame *frame)
 	{
-		myvm->print_obj(myvm->frame_executing(frame));
+		parent->print_obj(parent->frame_executing(frame));
 		print_string("\n");
-		myvm->print_obj(myvm->frame_scan(frame));
+		parent->print_obj(parent->frame_scan(frame));
 		print_string("\n");
 		print_string("word/quot addr: ");
-		print_cell_hex((cell)myvm->frame_executing(frame));
+		print_cell_hex((cell)parent->frame_executing(frame));
 		print_string("\n");
 		print_string("word/quot xt: ");
 		print_cell_hex((cell)frame->xt);
 		print_string("\n");
 		print_string("return address: ");
-		print_cell_hex((cell)FRAME_RETURN_ADDRESS(frame,myvm));
+		print_cell_hex((cell)FRAME_RETURN_ADDRESS(frame,parent));
 		print_string("\n");
 	}
 };
@@ -236,7 +236,7 @@ void factor_vm::dump_objects(cell type)
 	begin_scan();
 
 	cell obj;
-	while((obj = next_object()) != F)
+	while(to_boolean(obj = next_object()))
 	{
 		if(type == TYPE_COUNT || tagged<object>(obj).type_p(type))
 		{
@@ -252,10 +252,10 @@ void factor_vm::dump_objects(cell type)
 
 struct data_references_finder {
 	cell look_for, obj;
-	factor_vm *myvm;
+	factor_vm *parent;
 
-	explicit data_references_finder(cell look_for_, cell obj_, factor_vm *myvm_)
-		: look_for(look_for_), obj(obj_), myvm(myvm_) { }
+	explicit data_references_finder(cell look_for_, cell obj_, factor_vm *parent_)
+		: look_for(look_for_), obj(obj_), parent(parent_) { }
 
 	void operator()(cell *scan)
 	{
@@ -263,7 +263,7 @@ struct data_references_finder {
 		{
 			print_cell_hex_pad(obj);
 			print_string(" ");
-			myvm->print_nested_obj(obj,2);
+			parent->print_nested_obj(obj,2);
 			nl();
 		}
 	}
@@ -275,7 +275,7 @@ void factor_vm::find_data_references(cell look_for)
 
 	cell obj;
 
-	while((obj = next_object()) != F)
+	while(to_boolean(obj = next_object()))
 	{
 		data_references_finder finder(look_for,obj,this);
 		do_slots(UNTAG(obj),finder);

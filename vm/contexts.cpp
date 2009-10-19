@@ -91,9 +91,9 @@ void factor_vm::nest_stacks(stack_frame *magic_frame)
 	reset_retainstack();
 }
 
-void nest_stacks(stack_frame *magic_frame, factor_vm *myvm)
+void nest_stacks(stack_frame *magic_frame, factor_vm *parent)
 {
-	return myvm->nest_stacks(magic_frame);
+	return parent->nest_stacks(magic_frame);
 }
 
 /* called when leaving a compiled callback */
@@ -111,9 +111,9 @@ void factor_vm::unnest_stacks()
 	dealloc_context(old_ctx);
 }
 
-void unnest_stacks(factor_vm *myvm)
+void unnest_stacks(factor_vm *parent)
 {
-	return myvm->unnest_stacks();
+	return parent->unnest_stacks();
 }
 
 /* called on startup */
@@ -143,13 +143,13 @@ bool factor_vm::stack_to_array(cell bottom, cell top)
 void factor_vm::primitive_datastack()
 {
 	if(!stack_to_array(ds_bot,ds))
-		general_error(ERROR_DS_UNDERFLOW,F,F,NULL);
+		general_error(ERROR_DS_UNDERFLOW,false_object,false_object,NULL);
 }
 
 void factor_vm::primitive_retainstack()
 {
 	if(!stack_to_array(rs_bot,rs))
-		general_error(ERROR_RS_UNDERFLOW,F,F,NULL);
+		general_error(ERROR_RS_UNDERFLOW,false_object,false_object,NULL);
 }
 
 /* returns pointer to top of stack */
@@ -180,7 +180,7 @@ void factor_vm::primitive_check_datastack()
 	fixnum saved_height = array_capacity(saved_datastack);
 	fixnum current_height = (ds - ds_bot + sizeof(cell)) / sizeof(cell);
 	if(current_height - height != saved_height)
-		dpush(F);
+		dpush(false_object);
 	else
 	{
 		fixnum i;
@@ -188,11 +188,11 @@ void factor_vm::primitive_check_datastack()
 		{
 			if(((cell *)ds_bot)[i] != array_nth(saved_datastack,i))
 			{
-				dpush(F);
+				dpush(false_object);
 				return;
 			}
 		}
-		dpush(T);
+		dpush(true_object);
 	}
 }
 
