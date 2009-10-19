@@ -139,7 +139,11 @@ void factor_vm::primitive_code_room()
 
 code_block *code_heap::forward_code_block(code_block *compiled)
 {
-	return (code_block *)forwarding[compiled];
+	code_block *block1 = (code_block *)state->forward_block(compiled);
+	code_block *block2 = (code_block *)forwarding[compiled];
+	printf("%lx %lx\n",block1,block2);
+	assert(block1 == block2);
+	return block2;
 }
 
 struct callframe_forwarder {

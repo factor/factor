@@ -525,12 +525,13 @@ struct factor_vm
 	template<typename Iterator> void iterate_code_heap(Iterator &iter)
 	{
 		heap_block *scan = code->first_block();
+		heap_block *end = code->last_block();
 
-		while(scan)
+		while(scan != end)
 		{
 			if(scan->type() != FREE_BLOCK_TYPE)
 				iter((code_block *)scan);
-			scan = code->next_block(scan);
+			scan = scan->next();
 		}
 	}
 
