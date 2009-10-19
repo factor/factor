@@ -191,7 +191,6 @@ cell heap::heap_size()
 
 void heap::compact_heap()
 {
-	forwarding.clear();
 	state->compute_forwarding();
 
 	heap_block *scan = first_block();
@@ -208,7 +207,6 @@ void heap::compact_heap()
 		{
 			cell size = scan->size();
 			memmove(address,scan,size);
-			forwarding[scan] = address;
 			address += size;
 		}
 

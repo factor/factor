@@ -92,11 +92,8 @@ template<typename Block, int Granularity> struct mark_bits {
 		{
 			bits[start.first] |= ~start_mask;
 
-			if(end.first != 0)
-			{
-				for(cell index = start.first + 1; index < end.first - 1; index++)
-					bits[index] = (u64)-1;
-			}
+			for(cell index = start.first + 1; index < end.first; index++)
+				bits[index] = (u64)-1;
 
 			bits[end.first] |= end_mask;
 		}
@@ -122,21 +119,9 @@ template<typename Block, int Granularity> struct mark_bits {
 		set_bitmap_range(allocated,address);
 	}
 
-	cell popcount1(u64 x)
-	{
-		cell accum = 0;
-		while(x > 0)
-		{
-			accum += (x & 1);
-			x >>= 1;
-		}
-		return accum;
-	}
-
 	/* From http://chessprogramming.wikispaces.com/Population+Count */
 	cell popcount(u64 x)
 	{
-		cell old = x;
 		u64 k1 = 0x5555555555555555ll;
 		u64 k2 = 0x3333333333333333ll;
 		u64 k4 = 0x0f0f0f0f0f0f0f0fll;
@@ -145,13 +130,12 @@ template<typename Block, int Granularity> struct mark_bits {
 		x = (x & k2) + ((x >> 2)  & k2); // put count of each 4 bits into those 4 bits
 		x = (x       +  (x >> 4)) & k4 ; // put count of each 8 bits into those 8 bits
 		x = (x * kf) >> 56; // returns 8 most significant bits of x + (x<<8) + (x<<16) + (x<<24) + ...
-		
-		assert(x == popcount1(old));
+
 		return (cell)x;
 	}
 
 	/* The eventual destination of a block after compaction is just the number
-	of marked blocks before it. */
+	of marked blocks before it. Live blocks must be marked on entry. */
 	void compute_forwarding()
 	{
 		cell accum = 0;

@@ -4,7 +4,7 @@ namespace factor
 {
 
 factor_vm *vm;
-unordered_map<THREADHANDLE, factor_vm*> thread_vms;
+std::map<THREADHANDLE, factor_vm*> thread_vms;
 
 void init_globals()
 {

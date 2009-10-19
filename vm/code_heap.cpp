@@ -73,6 +73,44 @@ void factor_vm::update_code_heap_words()
 	iterate_code_heap(updater);
 }
 
+/* After a full GC that did not grow the heap, we have to update references
+to literals and other words. */
+struct word_and_literal_code_heap_updater {
+	factor_vm *parent;
+
+	word_and_literal_code_heap_updater(factor_vm *parent_) : parent(parent_) {}
+
+	void operator()(heap_block *block)
+	{
+		parent->update_code_block_words_and_literals((code_block *)block);
+	}
+};
+
+void factor_vm::update_code_heap_words_and_literals()
+{
+	word_and_literal_code_heap_updater updater(this);
+	code->sweep_heap(updater);
+}
+
+/* After growing the heap, we have to perform a full relocation to update
+references to card and deck arrays. */
+struct code_heap_relocator {
+	factor_vm *parent;
+
+	code_heap_relocator(factor_vm *parent_) : parent(parent_) {}
+
+	void operator()(heap_block *block)
+	{
+		parent->relocate_code_block((code_block *)block);
+	}
+};
+
+void factor_vm::relocate_code_heap()
+{
+	code_heap_relocator relocator(this);
+	code->sweep_heap(relocator);
+}
+
 void factor_vm::primitive_modify_code_heap()
 {
 	gc_root<array> alist(dpop(),this);
@@ -139,11 +177,7 @@ void factor_vm::primitive_code_room()
 
 code_block *code_heap::forward_code_block(code_block *compiled)
 {
-	code_block *block1 = (code_block *)state->forward_block(compiled);
-	code_block *block2 = (code_block *)forwarding[compiled];
-	printf("%lx %lx\n",block1,block2);
-	assert(block1 == block2);
-	return block2;
+	return (code_block *)state->forward_block(compiled);
 }
 
 struct callframe_forwarder {
@@ -248,6 +282,9 @@ void factor_vm::compact_code_heap(bool trace_contexts_p)
 		forward_context_xts();
 		forward_callback_xts();
 	}
+
+	code_heap_relocator relocator(this);
+	iterate_code_heap(relocator);
 }
 
 struct stack_trace_stripper {
