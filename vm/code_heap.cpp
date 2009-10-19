@@ -51,17 +51,17 @@ void factor_vm::jit_compile_word(cell word_, cell def_, bool relocate)
 
 	word->code = def->code;
 
-	if(word->pic_def != F) jit_compile(word->pic_def,relocate);
-	if(word->pic_tail_def != F) jit_compile(word->pic_tail_def,relocate);
+	if(to_boolean(word->pic_def)) jit_compile(word->pic_def,relocate);
+	if(to_boolean(word->pic_tail_def)) jit_compile(word->pic_tail_def,relocate);
 }
 
 struct word_updater {
-	factor_vm *myvm;
+	factor_vm *parent;
 
-	explicit word_updater(factor_vm *myvm_) : myvm(myvm_) {}
+	explicit word_updater(factor_vm *parent_) : parent(parent_) {}
 	void operator()(code_block *compiled)
 	{
-		myvm->update_word_references(compiled);
+		parent->update_word_references(compiled);
 	}
 };
 
@@ -143,18 +143,18 @@ code_block *code_heap::forward_code_block(code_block *compiled)
 }
 
 struct callframe_forwarder {
-	factor_vm *myvm;
+	factor_vm *parent;
 
-	explicit callframe_forwarder(factor_vm *myvm_) : myvm(myvm_) {}
+	explicit callframe_forwarder(factor_vm *parent_) : parent(parent_) {}
 
 	void operator()(stack_frame *frame)
 	{
-		cell offset = (cell)FRAME_RETURN_ADDRESS(frame,myvm) - (cell)frame->xt;
+		cell offset = (cell)FRAME_RETURN_ADDRESS(frame,parent) - (cell)frame->xt;
 
-		code_block *forwarded = myvm->code->forward_code_block(myvm->frame_code(frame));
+		code_block *forwarded = parent->code->forward_code_block(parent->frame_code(frame));
 		frame->xt = forwarded->xt();
 
-		FRAME_RETURN_ADDRESS(frame,myvm) = (void *)((cell)frame->xt + offset);
+		FRAME_RETURN_ADDRESS(frame,parent) = (void *)((cell)frame->xt + offset);
 	}
 };
 
@@ -164,7 +164,7 @@ void factor_vm::forward_object_xts()
 
 	cell obj;
 
-	while((obj = next_object()) != F)
+	while(to_boolean(obj = next_object()))
 	{
 		switch(tagged<object>(obj).type())
 		{
@@ -251,7 +251,7 @@ struct stack_trace_stripper {
 
 	void operator()(code_block *compiled)
 	{
-		compiled->owner = F;
+		compiled->owner = false_object;
 	}
 };
 

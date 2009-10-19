@@ -16,9 +16,9 @@ normal operation. */
 
 void factor_vm::init_c_io()
 {
-	userenv[STDIN_ENV] = allot_alien(F,(cell)stdin);
-	userenv[STDOUT_ENV] = allot_alien(F,(cell)stdout);
-	userenv[STDERR_ENV] = allot_alien(F,(cell)stderr);
+	userenv[STDIN_ENV] = allot_alien(false_object,(cell)stdin);
+	userenv[STDOUT_ENV] = allot_alien(false_object,(cell)stdout);
+	userenv[STDERR_ENV] = allot_alien(false_object,(cell)stderr);
 }
 
 void factor_vm::io_error()
@@ -28,7 +28,7 @@ void factor_vm::io_error()
 		return;
 #endif
 
-	general_error(ERROR_IO,tag_fixnum(errno),F,NULL);
+	general_error(ERROR_IO,tag_fixnum(errno),false_object,NULL);
 }
 
 void factor_vm::primitive_fopen()
@@ -63,7 +63,7 @@ void factor_vm::primitive_fgetc()
 		{
 			if(feof(file))
 			{
-				dpush(F);
+				dpush(false_object);
 				break;
 			}
 			else
@@ -97,7 +97,7 @@ void factor_vm::primitive_fread()
 		{
 			if(feof(file))
 			{
-				dpush(F);
+				dpush(false_object);
 				break;
 			}
 			else

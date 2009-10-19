@@ -15,7 +15,7 @@ IN: tools.deploy.test
     [
         cell 4 / *
         cpu ppc? [ 100000 + ] when
-        os windows? [ 150000 + ] when
+        os windows? [ 250000 + ] when
     ] bi*
     <= ;
 

@@ -3,23 +3,23 @@
 namespace factor
 {
 
-full_collector::full_collector(factor_vm *myvm_) :
+full_collector::full_collector(factor_vm *parent_) :
 	copying_collector<tenured_space,full_policy>(
-		myvm_,
-		&myvm_->gc_stats.full_stats,
-		myvm_->data->tenured,
-		full_policy(myvm_)) {}
+		parent_,
+		&parent_->gc_stats.full_stats,
+		parent_->data->tenured,
+		full_policy(parent_)) {}
 
 struct stack_frame_marker {
-	factor_vm *myvm;
+	factor_vm *parent;
 	full_collector *collector;
 
 	explicit stack_frame_marker(full_collector *collector_) :
-		myvm(collector_->myvm), collector(collector_) {}
+		parent(collector_->parent), collector(collector_) {}
 
 	void operator()(stack_frame *frame)
 	{
-		collector->mark_code_block(myvm->frame_code(frame));
+		collector->mark_code_block(parent->frame_code(frame));
 	}
 };
 
@@ -27,7 +27,7 @@ struct stack_frame_marker {
 void full_collector::mark_active_blocks()
 {
 	stack_frame_marker marker(this);
-	myvm->iterate_active_frames(marker);
+	parent->iterate_active_frames(marker);
 }
 
 void full_collector::mark_object_code_block(object *obj)
@@ -54,7 +54,7 @@ void full_collector::mark_object_code_block(object *obj)
 		{
 			callstack *stack = (callstack *)obj;
 			stack_frame_marker marker(this);
-			myvm->iterate_callstack_object(stack,marker);
+			parent->iterate_callstack_object(stack,marker);
 			break;
 		}
 	}
@@ -74,7 +74,7 @@ struct callback_tracer {
 void full_collector::trace_callbacks()
 {
 	callback_tracer tracer(this);
-	myvm->callbacks->iterate(tracer);
+	parent->callbacks->iterate(tracer);
 }
 
 /* Trace all literals referenced from a code block. Only for aging and nursery collections */
@@ -100,33 +100,33 @@ void full_collector::cheneys_algorithm()
 		object *obj = (object *)scan;
 		this->trace_slots(obj);
 		this->mark_object_code_block(obj);
-		scan = target->next_object_after(this->myvm,scan);
+		scan = target->next_object_after(this->parent,scan);
 	}
 }
 
 /* After growing the heap, we have to perform a full relocation to update
 references to card and deck arrays. */
 struct big_code_heap_updater {
-	factor_vm *myvm;
+	factor_vm *parent;
 
-	big_code_heap_updater(factor_vm *myvm_) : myvm(myvm_) {}
+	big_code_heap_updater(factor_vm *parent_) : parent(parent_) {}
 
 	void operator()(heap_block *block)
 	{
-		myvm->relocate_code_block((code_block *)block);
+		parent->relocate_code_block((code_block *)block);
 	}
 };
 
 /* After a full GC that did not grow the heap, we have to update references
 to literals and other words. */
 struct small_code_heap_updater {
-	factor_vm *myvm;
+	factor_vm *parent;
 
-	small_code_heap_updater(factor_vm *myvm_) : myvm(myvm_) {}
+	small_code_heap_updater(factor_vm *parent_) : parent(parent_) {}
 
 	void operator()(heap_block *block)
 	{
-		myvm->update_code_block_for_full_gc((code_block *)block);
+		parent->update_code_block_for_full_gc((code_block *)block);
 	}
 };
 

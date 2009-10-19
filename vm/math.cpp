@@ -219,9 +219,9 @@ unsigned int factor_vm::bignum_producer(unsigned int digit)
 	return *(ptr + digit);
 }
 
-unsigned int bignum_producer(unsigned int digit, factor_vm *myvm)
+unsigned int bignum_producer(unsigned int digit, factor_vm *parent)
 {
-	return myvm->bignum_producer(digit);
+	return parent->bignum_producer(digit);
 }
 
 void factor_vm::primitive_byte_array_to_bignum()
@@ -285,7 +285,7 @@ void factor_vm::primitive_str_to_float()
 	if(end == c_str + capacity - 1)
 		drepl(allot_float(f));
 	else
-		drepl(F);
+		drepl(false_object);
 }
 
 void factor_vm::primitive_float_to_str()
@@ -393,9 +393,9 @@ fixnum factor_vm::to_fixnum(cell tagged)
 	}
 }
 
-VM_C_API fixnum to_fixnum(cell tagged,factor_vm *myvm)
+VM_C_API fixnum to_fixnum(cell tagged,factor_vm *parent)
 {
-	return myvm->to_fixnum(tagged);
+	return parent->to_fixnum(tagged);
 }
 
 cell factor_vm::to_cell(cell tagged)
@@ -403,9 +403,9 @@ cell factor_vm::to_cell(cell tagged)
 	return (cell)to_fixnum(tagged);
 }
 
-VM_C_API cell to_cell(cell tagged, factor_vm *myvm)
+VM_C_API cell to_cell(cell tagged, factor_vm *parent)
 {
-	return myvm->to_cell(tagged);
+	return parent->to_cell(tagged);
 }
 
 void factor_vm::box_signed_1(s8 n)
@@ -413,9 +413,9 @@ void factor_vm::box_signed_1(s8 n)
 	dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_signed_1(s8 n,factor_vm *myvm)
+VM_C_API void box_signed_1(s8 n,factor_vm *parent)
 {
-	return myvm->box_signed_1(n);
+	return parent->box_signed_1(n);
 }
 
 void factor_vm::box_unsigned_1(u8 n)
@@ -423,9 +423,9 @@ void factor_vm::box_unsigned_1(u8 n)
 	dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_unsigned_1(u8 n,factor_vm *myvm)
+VM_C_API void box_unsigned_1(u8 n,factor_vm *parent)
 {
-	return myvm->box_unsigned_1(n);
+	return parent->box_unsigned_1(n);
 }
 
 void factor_vm::box_signed_2(s16 n)
@@ -433,9 +433,9 @@ void factor_vm::box_signed_2(s16 n)
 	dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_signed_2(s16 n,factor_vm *myvm)
+VM_C_API void box_signed_2(s16 n,factor_vm *parent)
 {
-	return myvm->box_signed_2(n);
+	return parent->box_signed_2(n);
 }
 
 void factor_vm::box_unsigned_2(u16 n)
@@ -443,9 +443,9 @@ void factor_vm::box_unsigned_2(u16 n)
 	dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_unsigned_2(u16 n,factor_vm *myvm)
+VM_C_API void box_unsigned_2(u16 n,factor_vm *parent)
 {
-	return myvm->box_unsigned_2(n);
+	return parent->box_unsigned_2(n);
 }
 
 void factor_vm::box_signed_4(s32 n)
@@ -453,9 +453,9 @@ void factor_vm::box_signed_4(s32 n)
 	dpush(allot_integer(n));
 }
 
-VM_C_API void box_signed_4(s32 n,factor_vm *myvm)
+VM_C_API void box_signed_4(s32 n,factor_vm *parent)
 {
-	return myvm->box_signed_4(n);
+	return parent->box_signed_4(n);
 }
 
 void factor_vm::box_unsigned_4(u32 n)
@@ -463,9 +463,9 @@ void factor_vm::box_unsigned_4(u32 n)
 	dpush(allot_cell(n));
 }
 
-VM_C_API void box_unsigned_4(u32 n,factor_vm *myvm)
+VM_C_API void box_unsigned_4(u32 n,factor_vm *parent)
 {
-	return myvm->box_unsigned_4(n);
+	return parent->box_unsigned_4(n);
 }
 
 void factor_vm::box_signed_cell(fixnum integer)
@@ -473,9 +473,9 @@ void factor_vm::box_signed_cell(fixnum integer)
 	dpush(allot_integer(integer));
 }
 
-VM_C_API void box_signed_cell(fixnum integer,factor_vm *myvm)
+VM_C_API void box_signed_cell(fixnum integer,factor_vm *parent)
 {
-	return myvm->box_signed_cell(integer);
+	return parent->box_signed_cell(integer);
 }
 
 void factor_vm::box_unsigned_cell(cell cell)
@@ -483,9 +483,9 @@ void factor_vm::box_unsigned_cell(cell cell)
 	dpush(allot_cell(cell));
 }
 
-VM_C_API void box_unsigned_cell(cell cell,factor_vm *myvm)
+VM_C_API void box_unsigned_cell(cell cell,factor_vm *parent)
 {
-	return myvm->box_unsigned_cell(cell);
+	return parent->box_unsigned_cell(cell);
 }
 
 void factor_vm::box_signed_8(s64 n)
@@ -496,9 +496,9 @@ void factor_vm::box_signed_8(s64 n)
 		dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_signed_8(s64 n,factor_vm *myvm)
+VM_C_API void box_signed_8(s64 n,factor_vm *parent)
 {
-	return myvm->box_signed_8(n);
+	return parent->box_signed_8(n);
 }
 
 s64 factor_vm::to_signed_8(cell obj)
@@ -515,9 +515,9 @@ s64 factor_vm::to_signed_8(cell obj)
 	}
 }
 
-VM_C_API s64 to_signed_8(cell obj,factor_vm *myvm)
+VM_C_API s64 to_signed_8(cell obj,factor_vm *parent)
 {
-	return myvm->to_signed_8(obj);
+	return parent->to_signed_8(obj);
 }
 
 void factor_vm::box_unsigned_8(u64 n)
@@ -528,9 +528,9 @@ void factor_vm::box_unsigned_8(u64 n)
 		dpush(tag_fixnum(n));
 }
 
-VM_C_API void box_unsigned_8(u64 n,factor_vm *myvm)
+VM_C_API void box_unsigned_8(u64 n,factor_vm *parent)
 {
-	return myvm->box_unsigned_8(n);
+	return parent->box_unsigned_8(n);
 }
 
 u64 factor_vm::to_unsigned_8(cell obj)
@@ -547,9 +547,9 @@ u64 factor_vm::to_unsigned_8(cell obj)
 	}
 }
 
-VM_C_API u64 to_unsigned_8(cell obj,factor_vm *myvm)
+VM_C_API u64 to_unsigned_8(cell obj,factor_vm *parent)
 {
-	return myvm->to_unsigned_8(obj);
+	return parent->to_unsigned_8(obj);
 }
  
 void factor_vm::box_float(float flo)
@@ -557,9 +557,9 @@ void factor_vm::box_float(float flo)
         dpush(allot_float(flo));
 }
 
-VM_C_API void box_float(float flo, factor_vm *myvm)
+VM_C_API void box_float(float flo, factor_vm *parent)
 {
-	return myvm->box_float(flo);
+	return parent->box_float(flo);
 }
 
 float factor_vm::to_float(cell value)
@@ -567,9 +567,9 @@ float factor_vm::to_float(cell value)
 	return untag_float_check(value);
 }
 
-VM_C_API float to_float(cell value,factor_vm *myvm)
+VM_C_API float to_float(cell value,factor_vm *parent)
 {
-	return myvm->to_float(value);
+	return parent->to_float(value);
 }
 
 void factor_vm::box_double(double flo)
@@ -577,9 +577,9 @@ void factor_vm::box_double(double flo)
         dpush(allot_float(flo));
 }
 
-VM_C_API void box_double(double flo,factor_vm *myvm)
+VM_C_API void box_double(double flo,factor_vm *parent)
 {
-	return myvm->box_double(flo);
+	return parent->box_double(flo);
 }
 
 double factor_vm::to_double(cell value)
@@ -587,9 +587,9 @@ double factor_vm::to_double(cell value)
 	return untag_float_check(value);
 }
 
-VM_C_API double to_double(cell value,factor_vm *myvm)
+VM_C_API double to_double(cell value,factor_vm *parent)
 {
-	return myvm->to_double(value);
+	return parent->to_double(value);
 }
 
 /* The fixnum+, fixnum- and fixnum* primitives are defined in cpu_*.S. On
@@ -600,9 +600,9 @@ inline void factor_vm::overflow_fixnum_add(fixnum x, fixnum y)
 		untag_fixnum(x) + untag_fixnum(y))));
 }
 
-VM_ASM_API void overflow_fixnum_add(fixnum x, fixnum y, factor_vm *myvm)
+VM_ASM_API void overflow_fixnum_add(fixnum x, fixnum y, factor_vm *parent)
 {
-	((factor_vm*)myvm)->overflow_fixnum_add(x,y);
+	parent->overflow_fixnum_add(x,y);
 }
 
 inline void factor_vm::overflow_fixnum_subtract(fixnum x, fixnum y)
@@ -611,9 +611,9 @@ inline void factor_vm::overflow_fixnum_subtract(fixnum x, fixnum y)
 		untag_fixnum(x) - untag_fixnum(y))));
 }
 
-VM_ASM_API void overflow_fixnum_subtract(fixnum x, fixnum y, factor_vm *myvm)
+VM_ASM_API void overflow_fixnum_subtract(fixnum x, fixnum y, factor_vm *parent)
 {
-	((factor_vm*)myvm)->overflow_fixnum_subtract(x,y);
+	parent->overflow_fixnum_subtract(x,y);
 }
 
 inline void factor_vm::overflow_fixnum_multiply(fixnum x, fixnum y)
@@ -625,9 +625,9 @@ inline void factor_vm::overflow_fixnum_multiply(fixnum x, fixnum y)
 	drepl(tag<bignum>(bignum_multiply(bx,by)));
 }
 
-VM_ASM_API void overflow_fixnum_multiply(fixnum x, fixnum y, factor_vm *myvm)
+VM_ASM_API void overflow_fixnum_multiply(fixnum x, fixnum y, factor_vm *parent)
 {
-	((factor_vm*)myvm)->overflow_fixnum_multiply(x,y);
+	parent->overflow_fixnum_multiply(x,y);
 }
 
 }
