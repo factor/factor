@@ -14,11 +14,11 @@ word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 	new_word->vocabulary = vocab.value();
 	new_word->name = name.value();
 	new_word->def = userenv[UNDEFINED_ENV];
-	new_word->props = F;
+	new_word->props = false_object;
 	new_word->counter = tag_fixnum(0);
-	new_word->pic_def = F;
-	new_word->pic_tail_def = F;
-	new_word->subprimitive = F;
+	new_word->pic_def = false_object;
+	new_word->pic_tail_def = false_object;
+	new_word->subprimitive = false_object;
 	new_word->profiling = NULL;
 	new_word->code = NULL;
 

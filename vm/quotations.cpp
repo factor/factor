@@ -88,7 +88,7 @@ bool quotation_jit::stack_frame_p()
 		switch(tagged<object>(obj).type())
 		{
 		case WORD_TYPE:
-			if(parent_vm->untag<word>(obj)->subprimitive == F)
+			if(!parent_vm->to_boolean(parent_vm->untag<word>(obj)->subprimitive))
 				return true;
 			break;
 		case QUOTATION_TYPE:
@@ -149,7 +149,7 @@ void quotation_jit::iterate_quotation()
 		{
 		case WORD_TYPE:
 			/* Intrinsics */
-			if(obj.as<word>()->subprimitive != F)
+			if(parent_vm->to_boolean(obj.as<word>()->subprimitive))
 				emit_subprimitive(obj.value());
 			/* The (execute) primitive is special-cased */
 			else if(obj.value() == parent_vm->userenv[JIT_EXECUTE_WORD])
@@ -313,8 +313,8 @@ void factor_vm::primitive_array_to_quotation()
 {
 	quotation *quot = allot<quotation>(sizeof(quotation));
 	quot->array = dpeek();
-	quot->cached_effect = F;
-	quot->cache_counter = F;
+	quot->cached_effect = false_object;
+	quot->cache_counter = false_object;
 	quot->xt = (void *)lazy_jit_compile;
 	quot->code = NULL;
 	drepl(tag<quotation>(quot));

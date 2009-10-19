@@ -103,7 +103,7 @@ code_block *jit::to_code_block()
 	return parent_vm->add_code_block(
 		type,
 		code.elements.value(),
-		F, /* no labels */
+		false_object, /* no labels */
 		owner.value(),
 		relocation.elements.value(),
 		literals.elements.value());

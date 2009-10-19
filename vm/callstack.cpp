@@ -100,22 +100,22 @@ cell factor_vm::frame_scan(stack_frame *frame)
 	case QUOTATION_TYPE:
 		{
 			cell quot = frame_executing(frame);
-			if(quot == F)
-				return F;
-			else
+			if(to_boolean(quot))
 			{
 				char *return_addr = (char *)FRAME_RETURN_ADDRESS(frame,this);
 				char *quot_xt = (char *)(frame_code(frame) + 1);
 
 				return tag_fixnum(quot_code_offset_to_scan(
 					quot,(cell)(return_addr - quot_xt)));
-			}
+			}    
+			else
+				return false_object;
 		}
 	case WORD_TYPE:
-		return F;
+		return false_object;
 	default:
 		critical_error("Bad frame type",frame_type(frame));
-		return F;
+		return false_object;
 	}
 }
 

@@ -285,7 +285,7 @@ void factor_vm::primitive_str_to_float()
 	if(end == c_str + capacity - 1)
 		drepl(allot_float(f));
 	else
-		drepl(F);
+		drepl(false_object);
 }
 
 void factor_vm::primitive_float_to_str()
