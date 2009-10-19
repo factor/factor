@@ -10,13 +10,13 @@ FROM: compiler.units => with-compilation-unit ;
 FROM: vocabs.parser => search ;
 IN: peg.ebnf
 
-<PRIVATE
-
 : rule ( name word -- parser )
   #! Given an EBNF word produced from EBNF: return the EBNF rule
   "ebnf-parser" word-prop at ;
 
 ERROR: no-rule rule parser ;
+
+<PRIVATE
 
 : lookup-rule ( rule parser -- rule' )
     2dup rule [ 2nip ] [ no-rule ] if* ; 
