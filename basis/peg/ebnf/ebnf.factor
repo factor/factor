@@ -10,6 +10,8 @@ FROM: compiler.units => with-compilation-unit ;
 FROM: vocabs.parser => search ;
 IN: peg.ebnf
 
+<PRIVATE
+
 : rule ( name word -- parser )
   #! Given an EBNF word produced from EBNF: return the EBNF rule
   "ebnf-parser" word-prop at ;
@@ -539,6 +541,8 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
 : ebnf>quot ( string -- hashtable quot )
   parse-ebnf dup dup parser [ main swap at compile ] with-variable
   [ compiled-parse ] curry [ with-scope ast>> ] curry ;
+
+PRIVATE>
 
 SYNTAX: <EBNF
   "EBNF>"
