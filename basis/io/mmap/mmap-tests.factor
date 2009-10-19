@@ -1,7 +1,8 @@
 USING: alien.c-types alien.data compiler.tree.debugger
 continuations io.directories io.encodings.ascii io.files
 io.files.temp io.mmap kernel math sequences sequences.private
-specialized-arrays specialized-arrays.instances.uint tools.test ;
+specialized-arrays tools.test ;
+SPECIALIZED-ARRAY: uint
 IN: io.mmap.tests
 
 [ "mmap-test-file.txt" temp-file delete-file ] ignore-errors
