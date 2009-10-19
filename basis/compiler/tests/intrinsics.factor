@@ -97,7 +97,7 @@ IN: compiler.tests.intrinsics
 [ 11 ] [ 12 7 [ fixnum-bitxor ] compile-call ] unit-test
 [ 11 ] [ 12 [ 7 fixnum-bitxor ] compile-call ] unit-test
 [ 11 ] [ [ 12 7 fixnum-bitxor ] compile-call ] unit-test
-[ -16 ] [ -1 [ -16 fixnum-bitxor ] compile-call ] unit-test
+[ 15 ] [ -1 [ -16 fixnum-bitxor ] compile-call ] unit-test
 
 [ f ] [ 12 7 [ fixnum< [ t ] [ f ] if ] compile-call ] unit-test
 [ f ] [ 12 [ 7 fixnum< [ t ] [ f ] if ] compile-call ] unit-test
