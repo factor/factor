@@ -4,7 +4,7 @@ specialized-arrays.private sequences alien.c-types accessors
 kernel arrays combinators compiler compiler.units classes.struct
 combinators.smart compiler.tree.debugger math libc destructors
 sequences.private multiline eval words vocabs namespaces
-assocs prettyprint alien.data math.vectors ;
+assocs prettyprint alien.data math.vectors definitions ;
 FROM: alien.c-types => float ;
 
 SPECIALIZED-ARRAY: int
@@ -120,9 +120,10 @@ SPECIALIZED-ARRAY: fixed-string
 [ "int-array@ f 100" ] [ f 100 <direct-int-array> unparse ] unit-test
 
 ! If the C type doesn't exist, don't generate a vocab
+SYMBOL: __does_not_exist__
+
 [ ] [
-    [ "__does_not_exist__" specialized-array-vocab forget-vocab ] with-compilation-unit
-    "__does_not_exist__" c-types get delete-at
+    [ __does_not_exist__ specialized-array-vocab forget-vocab ] with-compilation-unit
 ] unit-test
 
 [
@@ -146,6 +147,8 @@ SPECIALIZED-ARRAY: __does_not_exist__
 
 [ f ] [
     "__does_not_exist__-array{"
-    "__does_not_exist__" specialized-array-vocab lookup
+    __does_not_exist__ specialized-array-vocab lookup
     deferred?
 ] unit-test
+
+[ \ __does_not_exist__ forget ] with-compilation-unit
