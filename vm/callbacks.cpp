@@ -3,10 +3,10 @@
 namespace factor
 {
 
-callback_heap::callback_heap(cell size, factor_vm *myvm_) :
+callback_heap::callback_heap(cell size, factor_vm *parent_) :
 	seg(new segment(size,true)),
 	here(seg->start),
-	myvm(myvm_) {}
+	parent(parent_) {}
 
 callback_heap::~callback_heap()
 {
@@ -21,12 +21,12 @@ void factor_vm::init_callbacks(cell size)
 
 void callback_heap::update(callback *stub)
 {
-	tagged<array> code_template(myvm->userenv[CALLBACK_STUB]);
+	tagged<array> code_template(parent->userenv[CALLBACK_STUB]);
 
 	cell rel_class = untag_fixnum(array_nth(code_template.untagged(),1));
 	cell offset = untag_fixnum(array_nth(code_template.untagged(),3));
 
-	myvm->store_address_in_code_block(rel_class,
+	parent->store_address_in_code_block(rel_class,
 		(cell)(stub + 1) + offset,
 		(cell)(stub->compiled + 1));
 
@@ -35,7 +35,7 @@ void callback_heap::update(callback *stub)
 
 callback *callback_heap::add(code_block *compiled)
 {
-	tagged<array> code_template(myvm->userenv[CALLBACK_STUB]);
+	tagged<array> code_template(parent->userenv[CALLBACK_STUB]);
 	tagged<byte_array> insns(array_nth(code_template.untagged(),0));
 	cell size = array_capacity(insns.untagged());
 

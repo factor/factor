@@ -35,7 +35,9 @@ void factor_vm::set_string_nth_slow(string *str_, cell index, cell ch)
 
 	str->data()[index] = ((ch & 0x7f) | 0x80);
 
-	if(str->aux == F)
+	if(to_boolean(str->aux))
+		aux = untag<byte_array>(str->aux);
+	else
 	{
 		/* We don't need to pre-initialize the
 		byte array with any data, since we
@@ -48,8 +50,6 @@ void factor_vm::set_string_nth_slow(string *str_, cell index, cell ch)
 		str->aux = tag<byte_array>(aux);
 		write_barrier(&str->aux);
 	}
-	else
-		aux = untag<byte_array>(str->aux);
 
 	aux->data<u16>()[index] = ((ch >> 7) ^ 1);
 }
@@ -69,8 +69,8 @@ string *factor_vm::allot_string_internal(cell capacity)
 	string *str = allot<string>(string_size(capacity));
 
 	str->length = tag_fixnum(capacity);
-	str->hashcode = F;
-	str->aux = F;
+	str->hashcode = false_object;
+	str->aux = false_object;
 
 	return str;
 }
@@ -109,7 +109,7 @@ void factor_vm::primitive_string()
 bool factor_vm::reallot_string_in_place_p(string *str, cell capacity)
 {
 	return nursery.contains_p(str)
-		&& (str->aux == F || nursery.contains_p(untag<byte_array>(str->aux)))
+		&& (!to_boolean(str->aux) || nursery.contains_p(untag<byte_array>(str->aux)))
 		&& capacity <= string_capacity(str);
 }
 
@@ -121,7 +121,7 @@ string* factor_vm::reallot_string(string *str_, cell capacity)
 	{
 		str->length = tag_fixnum(capacity);
 
-		if(str->aux != F)
+		if(to_boolean(str->aux))
 		{
 			byte_array *aux = untag<byte_array>(str->aux);
 			aux->capacity = tag_fixnum(capacity * 2);
@@ -139,7 +139,7 @@ string* factor_vm::reallot_string(string *str_, cell capacity)
 
 		memcpy(new_str->data(),str->data(),to_copy);
 
-		if(str->aux != F)
+		if(to_boolean(str->aux))
 		{
 			byte_array *new_aux = allot_byte_array(capacity * sizeof(u16));
 
