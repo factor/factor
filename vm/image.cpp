@@ -225,7 +225,7 @@ struct code_block_fixupper {
 	code_block_fixupper(factor_vm *parent_, cell data_relocation_base_) :
 		parent(parent_), data_relocation_base(data_relocation_base_) { }
 
-	void operator()(code_block *compiled)
+	void operator()(code_block *compiled, cell size)
 	{
 		parent->fixup_code_block(compiled,data_relocation_base);
 	}

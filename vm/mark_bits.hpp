@@ -159,4 +159,23 @@ template<typename Block, int Granularity> struct mark_bits {
 	}
 };
 
+template<typename Block, int Granularity, typename Iterator> struct heap_compacter {
+	mark_bits<Block,Granularity> *state;
+	char *address;
+	Iterator &iter;
+
+	explicit heap_compacter(mark_bits<Block,Granularity> *state_, Block *address_, Iterator &iter_) :
+		state(state_), address((char *)address_), iter(iter_) {}
+
+	void operator()(Block *block, cell size)
+	{
+		if(this->state->is_marked_p(block))
+		{
+			memmove(address,block,size);
+			iter((Block *)address,size);
+			address += size;
+		}
+	}
+};
+
 }
