@@ -87,12 +87,12 @@ void *factor_vm::alien_pointer()
 #define DEFINE_ALIEN_ACCESSOR(name,type,boxer,to) \
 	PRIMITIVE(alien_##name) \
 	{ \
-		((factor_vm*)myvm)->boxer(*(type*)((factor_vm*)myvm)->alien_pointer());	\
+		parent->boxer(*(type*)(parent->alien_pointer())); \
 	} \
 	PRIMITIVE(set_alien_##name) \
 	{ \
-		type *ptr = (type *)((factor_vm*)myvm)->alien_pointer(); \
-		type value = ((factor_vm*)myvm)->to(dpop()); \
+		type *ptr = (type *)parent->alien_pointer(); \
+		type value = parent->to(dpop()); \
 		*ptr = value; \
 	}
 
@@ -182,9 +182,9 @@ char *factor_vm::alien_offset(cell obj)
 	}
 }
 
-VM_C_API char *alien_offset(cell obj, factor_vm *myvm)
+VM_C_API char *alien_offset(cell obj, factor_vm *parent)
 {
-	return myvm->alien_offset(obj);
+	return parent->alien_offset(obj);
 }
 
 /* pop an object representing a C pointer */
@@ -193,9 +193,9 @@ char *factor_vm::unbox_alien()
 	return alien_offset(dpop());
 }
 
-VM_C_API char *unbox_alien(factor_vm *myvm)
+VM_C_API char *unbox_alien(factor_vm *parent)
 {
-	return myvm->unbox_alien();
+	return parent->unbox_alien();
 }
 
 /* make an alien and push */
@@ -207,9 +207,9 @@ void factor_vm::box_alien(void *ptr)
 		dpush(allot_alien(false_object,(cell)ptr));
 }
 
-VM_C_API void box_alien(void *ptr, factor_vm *myvm)
+VM_C_API void box_alien(void *ptr, factor_vm *parent)
 {
-	return myvm->box_alien(ptr);
+	return parent->box_alien(ptr);
 }
 
 /* for FFI calls passing structs by value */
@@ -218,9 +218,9 @@ void factor_vm::to_value_struct(cell src, void *dest, cell size)
 	memcpy(dest,alien_offset(src),size);
 }
 
-VM_C_API void to_value_struct(cell src, void *dest, cell size, factor_vm *myvm)
+VM_C_API void to_value_struct(cell src, void *dest, cell size, factor_vm *parent)
 {
-	return myvm->to_value_struct(src,dest,size);
+	return parent->to_value_struct(src,dest,size);
 }
 
 /* for FFI callbacks receiving structs by value */
@@ -231,9 +231,9 @@ void factor_vm::box_value_struct(void *src, cell size)
 	dpush(tag<byte_array>(bytes));
 }
 
-VM_C_API void box_value_struct(void *src, cell size,factor_vm *myvm)
+VM_C_API void box_value_struct(void *src, cell size,factor_vm *parent)
 {
-	return myvm->box_value_struct(src,size);
+	return parent->box_value_struct(src,size);
 }
 
 /* On some x86 OSes, structs <= 8 bytes are returned in registers. */
@@ -245,9 +245,9 @@ void factor_vm::box_small_struct(cell x, cell y, cell size)
 	box_value_struct(data,size);
 }
 
-VM_C_API void box_small_struct(cell x, cell y, cell size, factor_vm *myvm)
+VM_C_API void box_small_struct(cell x, cell y, cell size, factor_vm *parent)
 {
-	return myvm->box_small_struct(x,y,size);
+	return parent->box_small_struct(x,y,size);
 }
 
 /* On OS X/PPC, complex numbers are returned in registers. */
@@ -261,9 +261,9 @@ void factor_vm::box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size)
 	box_value_struct(data,size);
 }
 
-VM_C_API void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size, factor_vm *myvm)
+VM_C_API void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size, factor_vm *parent)
 {
-	return myvm->box_medium_struct(x1, x2, x3, x4, size);
+	return parent->box_medium_struct(x1, x2, x3, x4, size);
 }
 
 void factor_vm::primitive_vm_ptr()

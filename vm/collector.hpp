@@ -2,7 +2,7 @@ namespace factor
 {
 
 template<typename TargetGeneration, typename Policy> struct collector {
-	factor_vm *myvm;
+	factor_vm *parent;
 	data_heap *data;
 	code_heap *code;
 	gc_state *current_gc;
@@ -10,18 +10,18 @@ template<typename TargetGeneration, typename Policy> struct collector {
 	TargetGeneration *target;
 	Policy policy;
 
-	explicit collector(factor_vm *myvm_, generation_statistics *stats_, TargetGeneration *target_, Policy policy_) :
-		myvm(myvm_),
-		data(myvm_->data),
-		code(myvm_->code),
-		current_gc(myvm_->current_gc),
+	explicit collector(factor_vm *parent_, generation_statistics *stats_, TargetGeneration *target_, Policy policy_) :
+		parent(parent_),
+		data(parent_->data),
+		code(parent_->code),
+		current_gc(parent_->current_gc),
 		stats(stats_),
 		target(target_),
 		policy(policy_) {}
 
 	object *resolve_forwarding(object *untagged)
 	{
-		myvm->check_data_pointer(untagged);
+		parent->check_data_pointer(untagged);
 
 		/* is there another forwarding pointer? */
 		while(untagged->h.forwarding_pointer_p())
@@ -38,7 +38,7 @@ template<typename TargetGeneration, typename Policy> struct collector {
 
 		if(immediate_p(pointer)) return;
 
-		object *untagged = myvm->untag<object>(pointer);
+		object *untagged = parent->untag<object>(pointer);
 		if(!policy.should_copy_p(untagged))
 			return;
 
@@ -57,7 +57,7 @@ template<typename TargetGeneration, typename Policy> struct collector {
 	void trace_slots(object *ptr)
 	{
 		cell *slot = (cell *)ptr;
-		cell *end = (cell *)((cell)ptr + myvm->binary_payload_start(ptr));
+		cell *end = (cell *)((cell)ptr + parent->binary_payload_start(ptr));
 
 		if(slot != end)
 		{
@@ -68,7 +68,7 @@ template<typename TargetGeneration, typename Policy> struct collector {
 
 	object *promote_object(object *untagged)
 	{
-		cell size = myvm->untagged_object_size(untagged);
+		cell size = parent->untagged_object_size(untagged);
 		object *newpointer = target->allot(size);
 		/* XXX not exception-safe */
 		if(!newpointer) longjmp(current_gc->gc_unwind,1);
@@ -90,8 +90,8 @@ template<typename TargetGeneration, typename Policy> struct collector {
 
 	void trace_registered_locals()
 	{
-		std::vector<cell>::const_iterator iter = myvm->gc_locals.begin();
-		std::vector<cell>::const_iterator end = myvm->gc_locals.end();
+		std::vector<cell>::const_iterator iter = parent->gc_locals.begin();
+		std::vector<cell>::const_iterator end = parent->gc_locals.end();
 
 		for(; iter < end; iter++)
 			trace_handle((cell *)(*iter));
@@ -99,8 +99,8 @@ template<typename TargetGeneration, typename Policy> struct collector {
 
 	void trace_registered_bignums()
 	{
-		std::vector<cell>::const_iterator iter = myvm->gc_bignums.begin();
-		std::vector<cell>::const_iterator end = myvm->gc_bignums.end();
+		std::vector<cell>::const_iterator iter = parent->gc_bignums.begin();
+		std::vector<cell>::const_iterator end = parent->gc_bignums.end();
 
 		for(; iter < end; iter++)
 		{
@@ -119,20 +119,20 @@ template<typename TargetGeneration, typename Policy> struct collector {
 	the user environment and extra roots registered by local_roots.hpp */
 	void trace_roots()
 	{
-		trace_handle(&myvm->true_object);
-		trace_handle(&myvm->bignum_zero);
-		trace_handle(&myvm->bignum_pos_one);
-		trace_handle(&myvm->bignum_neg_one);
+		trace_handle(&parent->true_object);
+		trace_handle(&parent->bignum_zero);
+		trace_handle(&parent->bignum_pos_one);
+		trace_handle(&parent->bignum_neg_one);
 
 		trace_registered_locals();
 		trace_registered_bignums();
 
-		for(int i = 0; i < USER_ENV; i++) trace_handle(&myvm->userenv[i]);
+		for(int i = 0; i < USER_ENV; i++) trace_handle(&parent->userenv[i]);
 	}
 
 	void trace_contexts()
 	{
-		context *ctx = myvm->ctx;
+		context *ctx = parent->ctx;
 
 		while(ctx)
 		{
