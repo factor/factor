@@ -4,7 +4,7 @@ USING: accessors alien.c-types kernel locals math math.ranges
 math.bitwise math.vectors math.vectors.simd random
 sequences specialized-arrays sequences.private classes.struct
 combinators.short-circuit fry ;
-SIMD: uint
+SIMDS: uchar uint ;
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: uint-4
 IN: random.sfmt
@@ -28,14 +28,25 @@ TUPLE: sfmt
     { uint-array uint-array }
     { uint-4-array uint-4-array } ;
 
+: endian-shuffle ( v -- w )
+    little-endian? [
+        B{ 3 2 1 0 7 6 5 4 11 10 9 8 15 14 13 12 } uint-4 boa vshuffle
+    ] unless ; inline
+
+: hlshift* ( v n -- w )
+    [ endian-shuffle ] dip hlshift endian-shuffle ; inline
+
+: hrshift* ( v n -- w )
+    [ endian-shuffle ] dip hrshift endian-shuffle ; inline
+
 : wA ( w -- wA )
-   dup 1 hlshift vbitxor ; inline
+   dup 1 hlshift* vbitxor ; inline
 
 : wB ( w mask -- wB )
    [ 11 vrshift ] dip vbitand ; inline
 
 : wC ( w -- wC )
-   1 hrshift ; inline
+   1 hrshift* ; inline
 
 : wD ( w -- wD )
    18 vlshift ; inline
