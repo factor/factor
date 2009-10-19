@@ -210,7 +210,7 @@ ARTICLE: "peg.ebnf.action" "Action"
 "replaced by the AST left on the stack. This is mostly useful if variables are "
 "used in the rule since they can be referenced like locals in the action quotation. "
 "The action is defined by having a ' => ' at the end of a rule and "
-"using '[[' and  ']]' to open and close the quotation. "
+"using '[[' and ']]' to open and close the quotation. "
 "If an action leaves the object 'ignore' on the stack then the result of that "
 "action will not be put in the AST of the result."
 { $examples
@@ -287,7 +287,7 @@ ARTICLE: "peg.ebnf.foreign-rules" "Foreign Rules"
 ;
 
 ARTICLE: "peg.ebnf.tokenizers" "Tokenizers"
-"It is  possible to override the tokenizer in an EBNF defined parser. "
+"It is possible to override the tokenizer in an EBNF defined parser. "
 "Usually the input sequence to be parsed is an array of characters or a string. "
 "Terminals in a rule match successive characters in the array or string. "
 { $examples
@@ -414,7 +414,7 @@ ARTICLE: "peg.ebnf.tokenizers" "Tokenizers"
 ARTICLE: "peg.ebnf" "EBNF"
 "This vocubalary provides a DSL that allows writing PEG parsers that look like "
 "EBNF syntax. It provides three parsing words described below. These words all "
-"accept the same EBNF syntax. The difference is in how they are used."
+"accept the same EBNF syntax. The difference is in how they are used. "
 { $subsection POSTPONE: <EBNF }
 { $subsection POSTPONE: [EBNF }
 { $subsection POSTPONE: EBNF: }
@@ -425,7 +425,7 @@ ARTICLE: "peg.ebnf" "EBNF"
 }
 "The last defined rule is the main rule for the EBNF. It is the first one run "
 "and it is expected that the remaining rules are used by that rule. Rules may be "
-"left recursive."
+"left recursive. "
 "Each rule can contain the following: "
 { $subsection "peg.ebnf.strings" }
 { $subsection "peg.ebnf.any" }
