@@ -379,7 +379,7 @@ struct literal_and_word_references_updater {
 	}
 };
 
-void factor_vm::update_code_block_for_full_gc(code_block *compiled)
+void factor_vm::update_code_block_words_and_literals(code_block *compiled)
 {
 	if(code->needs_fixup_p(compiled))
 		relocate_code_block(compiled);

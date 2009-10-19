@@ -14,7 +14,6 @@ struct heap {
 	segment *seg;
 	heap_free_list free;
 	mark_bits<heap_block,block_size_increment> *state;
-	unordered_map<heap_block *, char *> forwarding;
 
 	explicit heap(bool secure_gc_, cell size, bool executable_p);
 	~heap();
@@ -45,9 +44,9 @@ struct heap {
 
 	heap_block *free_allocated(heap_block *prev, heap_block *scan);
 
-	/* After code GC, all referenced code blocks have status set to B_MARKED, so any
-	which are allocated and not marked can be reclaimed. */
-	template<typename Iterator> void free_unmarked(Iterator &iter)
+	/* After code GC, all live code blocks are marked, so any
+	which are not marked can be reclaimed. */
+	template<typename Iterator> void sweep_heap(Iterator &iter)
 	{
 		clear_free_list();
 	
