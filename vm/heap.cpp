@@ -141,7 +141,7 @@ void heap::heap_free(heap_block *block)
 
 void heap::mark_block(heap_block *block)
 {
-	state->set_marked_p(block,true);
+	state->set_marked_p(block);
 }
 
 /* Compute total sum of sizes of free blocks, and size of largest free block */
@@ -152,8 +152,9 @@ void heap::heap_usage(cell *used, cell *total_free, cell *max_free)
 	*max_free = 0;
 
 	heap_block *scan = first_block();
+	heap_block *end = last_block();
 
-	while(scan)
+	while(scan != end)
 	{
 		cell size = scan->size();
 
@@ -166,7 +167,7 @@ void heap::heap_usage(cell *used, cell *total_free, cell *max_free)
 		else
 			*used += size;
 
-		scan = next_block(scan);
+		scan = scan->next();
 	}
 }
 
@@ -174,11 +175,12 @@ void heap::heap_usage(cell *used, cell *total_free, cell *max_free)
 cell heap::heap_size()
 {
 	heap_block *scan = first_block();
+	heap_block *end = last_block();
 	
-	while(scan)
+	while(scan != end)
 	{
 		if(scan->type() == FREE_BLOCK_TYPE) break;
-		else scan = next_block(scan);
+		else scan = scan->next();
 	}
 
 	assert(scan->type() == FREE_BLOCK_TYPE);
@@ -190,14 +192,17 @@ cell heap::heap_size()
 void heap::compact_heap()
 {
 	forwarding.clear();
+	state->compute_forwarding();
 
 	heap_block *scan = first_block();
+	heap_block *end = last_block();
+
 	char *address = (char *)scan;
 
 	/* Slide blocks up while building the forwarding hashtable. */
-	while(scan)
+	while(scan != end)
 	{
-		heap_block *next = next_block(scan);
+		heap_block *next = scan->next();
  
 		if(state->is_marked_p(scan))
 		{

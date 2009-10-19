@@ -18,15 +18,6 @@ struct heap {
 
 	explicit heap(bool secure_gc_, cell size, bool executable_p);
 	~heap();
-
-	inline heap_block *next_block(heap_block *block)
-	{
-		cell next = ((cell)block + block->size());
-		if(next == seg->end)
-			return NULL;
-		else
-			return (heap_block *)next;
-	}
 	
 	inline heap_block *first_block()
 	{
@@ -62,8 +53,9 @@ struct heap {
 	
 		heap_block *prev = NULL;
 		heap_block *scan = first_block();
+		heap_block *end = last_block();
 	
-		while(scan)
+		while(scan != end)
 		{
 			if(scan->type() == FREE_BLOCK_TYPE)
 			{
@@ -82,7 +74,7 @@ struct heap {
 			else
 				prev = free_allocated(prev,scan);
 
-			scan = next_block(scan);
+			scan = scan->next();
 		}
 
 		if(prev && prev->type() == FREE_BLOCK_TYPE)
