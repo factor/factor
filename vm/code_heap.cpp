@@ -51,8 +51,8 @@ void factor_vm::jit_compile_word(cell word_, cell def_, bool relocate)
 
 	word->code = def->code;
 
-	if(word->pic_def != F) jit_compile(word->pic_def,relocate);
-	if(word->pic_tail_def != F) jit_compile(word->pic_tail_def,relocate);
+	if(to_boolean(word->pic_def)) jit_compile(word->pic_def,relocate);
+	if(to_boolean(word->pic_tail_def)) jit_compile(word->pic_tail_def,relocate);
 }
 
 struct word_updater {
@@ -164,7 +164,7 @@ void factor_vm::forward_object_xts()
 
 	cell obj;
 
-	while((obj = next_object()) != F)
+	while(to_boolean(obj = next_object()))
 	{
 		switch(tagged<object>(obj).type())
 		{
@@ -251,7 +251,7 @@ struct stack_trace_stripper {
 
 	void operator()(code_block *compiled)
 	{
-		compiled->owner = F;
+		compiled->owner = false_object;
 	}
 };
 

@@ -15,14 +15,14 @@ cell factor_vm::search_lookup_alist(cell table, cell klass)
 			index -= 2;
 	}
 
-	return F;
+	return false_object;
 }
 
 cell factor_vm::search_lookup_hash(cell table, cell klass, cell hashcode)
 {
 	array *buckets = untag<array>(table);
 	cell bucket = array_nth(buckets,hashcode & (array_capacity(buckets) - 1));
-	if(tagged<object>(bucket).type_p(WORD_TYPE) || bucket == F)
+	if(tagged<object>(bucket).type_p(WORD_TYPE) || !to_boolean(bucket))
 		return bucket;
 	else
 		return search_lookup_alist(bucket,klass);
@@ -56,12 +56,12 @@ cell factor_vm::lookup_tuple_method(cell obj, cell methods)
 
 		if(tagged<object>(echelon_methods).type_p(WORD_TYPE))
 			return echelon_methods;
-		else if(echelon_methods != F)
+		else if(to_boolean(echelon_methods))
 		{
 			cell klass = nth_superclass(layout,echelon);
 			cell hashcode = untag_fixnum(nth_hashcode(layout,echelon));
 			cell result = search_lookup_hash(echelon_methods,klass,hashcode);
-			if(result != F)
+			if(to_boolean(result))
 				return result;
 		}
 
@@ -69,7 +69,7 @@ cell factor_vm::lookup_tuple_method(cell obj, cell methods)
 	}
 
 	critical_error("Cannot find tuple method",methods);
-	return F;
+	return false_object;
 }
 
 cell factor_vm::lookup_hi_tag_method(cell obj, cell methods)

@@ -119,7 +119,7 @@ template<typename TargetGeneration, typename Policy> struct collector {
 	the user environment and extra roots registered by local_roots.hpp */
 	void trace_roots()
 	{
-		trace_handle(&myvm->T);
+		trace_handle(&myvm->true_object);
 		trace_handle(&myvm->bignum_zero);
 		trace_handle(&myvm->bignum_pos_one);
 		trace_handle(&myvm->bignum_neg_one);
