@@ -283,7 +283,6 @@ void quotation_jit::iterate_quotation()
 
 void factor_vm::set_quot_xt(quotation *quot, code_block *code)
 {
-	assert(code->type() == QUOTATION_TYPE);
 	quot->code = code;
 	quot->xt = code->xt();
 }
