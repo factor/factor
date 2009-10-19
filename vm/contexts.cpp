@@ -91,9 +91,9 @@ void factor_vm::nest_stacks(stack_frame *magic_frame)
 	reset_retainstack();
 }
 
-void nest_stacks(stack_frame *magic_frame, factor_vm *myvm)
+void nest_stacks(stack_frame *magic_frame, factor_vm *parent)
 {
-	return myvm->nest_stacks(magic_frame);
+	return parent->nest_stacks(magic_frame);
 }
 
 /* called when leaving a compiled callback */
@@ -111,9 +111,9 @@ void factor_vm::unnest_stacks()
 	dealloc_context(old_ctx);
 }
 
-void unnest_stacks(factor_vm *myvm)
+void unnest_stacks(factor_vm *parent)
 {
-	return myvm->unnest_stacks();
+	return parent->unnest_stacks();
 }
 
 /* called on startup */
