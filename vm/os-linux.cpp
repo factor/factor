@@ -45,19 +45,19 @@ VM_C_API int inotify_rm_watch(int fd, u32 wd)
 
 VM_C_API int inotify_init()
 {
-	myvm->not_implemented_error();
+	parent->not_implemented_error();
 	return -1;
 }
 
 VM_C_API int inotify_add_watch(int fd, const char *name, u32 mask)
 {
-	myvm->not_implemented_error();
+	parent->not_implemented_error();
 	return -1;
 }
 
 VM_C_API int inotify_rm_watch(int fd, u32 wd)
 {
-	myvm->not_implemented_error();
+	parent->not_implemented_error();
 	return -1;
 }
 

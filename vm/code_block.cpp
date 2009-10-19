@@ -277,18 +277,18 @@ void factor_vm::store_address_in_code_block(cell klass, cell offset, fixnum abso
 }
 
 struct literal_references_updater {
-	factor_vm *myvm;
+	factor_vm *parent;
 
-	explicit literal_references_updater(factor_vm *myvm_) : myvm(myvm_) {}
+	explicit literal_references_updater(factor_vm *parent_) : parent(parent_) {}
 
 	void operator()(relocation_entry rel, cell index, code_block *compiled)
 	{
-		if(myvm->relocation_type_of(rel) == RT_IMMEDIATE)
+		if(parent->relocation_type_of(rel) == RT_IMMEDIATE)
 		{
-			cell offset = myvm->relocation_offset_of(rel) + (cell)(compiled + 1);
-			array *literals = myvm->untag<array>(compiled->literals);
+			cell offset = parent->relocation_offset_of(rel) + (cell)(compiled + 1);
+			array *literals = parent->untag<array>(compiled->literals);
 			fixnum absolute_value = array_nth(literals,index);
-			myvm->store_address_in_code_block(myvm->relocation_class_of(rel),offset,absolute_value);
+			parent->store_address_in_code_block(parent->relocation_class_of(rel),offset,absolute_value);
 		}
 	}
 };
@@ -320,14 +320,14 @@ void factor_vm::relocate_code_block_step(relocation_entry rel, cell index, code_
 }
 
 struct word_references_updater {
-	factor_vm *myvm;
+	factor_vm *parent;
 
-	explicit word_references_updater(factor_vm *myvm_) : myvm(myvm_) {}
+	explicit word_references_updater(factor_vm *parent_) : parent(parent_) {}
 	void operator()(relocation_entry rel, cell index, code_block *compiled)
 	{
-		relocation_type type = myvm->relocation_type_of(rel);
+		relocation_type type = parent->relocation_type_of(rel);
 		if(type == RT_XT || type == RT_XT_PIC || type == RT_XT_PIC_TAIL)
-			myvm->relocate_code_block_step(rel,index,compiled);
+			parent->relocate_code_block_step(rel,index,compiled);
 	}
 };
 
@@ -358,20 +358,20 @@ void factor_vm::update_word_references(code_block *compiled)
 
 /* This runs after a full collection */
 struct literal_and_word_references_updater {
-	factor_vm *myvm;
+	factor_vm *parent;
 
-	explicit literal_and_word_references_updater(factor_vm *myvm_) : myvm(myvm_) {}
+	explicit literal_and_word_references_updater(factor_vm *parent_) : parent(parent_) {}
 
 	void operator()(relocation_entry rel, cell index, code_block *compiled)
 	{
-		relocation_type type = myvm->relocation_type_of(rel);
+		relocation_type type = parent->relocation_type_of(rel);
 		switch(type)
 		{
 		case RT_IMMEDIATE:
 		case RT_XT:
 		case RT_XT_PIC:
 		case RT_XT_PIC_TAIL:
-			myvm->relocate_code_block_step(rel,index,compiled);
+			parent->relocate_code_block_step(rel,index,compiled);
 			break;
 		default:
 			break;
@@ -399,13 +399,13 @@ void factor_vm::check_code_address(cell address)
 }
 
 struct code_block_relocator {
-	factor_vm *myvm;
+	factor_vm *parent;
 
-	explicit code_block_relocator(factor_vm *myvm_) : myvm(myvm_) {}
+	explicit code_block_relocator(factor_vm *parent_) : parent(parent_) {}
 
 	void operator()(relocation_entry rel, cell index, code_block *compiled)
 	{
-		myvm->relocate_code_block_step(rel,index,compiled);
+		parent->relocate_code_block_step(rel,index,compiled);
 	}
 };
 

@@ -188,15 +188,15 @@ void factor_vm::fixup_alien(alien *d)
 }
 
 struct stack_frame_fixupper {
-	factor_vm *myvm;
+	factor_vm *parent;
 	cell code_relocation_base;
 
-	explicit stack_frame_fixupper(factor_vm *myvm_, cell code_relocation_base_) :
-		myvm(myvm_), code_relocation_base(code_relocation_base_) {}
+	explicit stack_frame_fixupper(factor_vm *parent_, cell code_relocation_base_) :
+		parent(parent_), code_relocation_base(code_relocation_base_) {}
 	void operator()(stack_frame *frame)
 	{
-		myvm->code_fixup(&frame->xt,code_relocation_base);
-		myvm->code_fixup(&FRAME_RETURN_ADDRESS(frame,myvm),code_relocation_base);
+		parent->code_fixup(&frame->xt,code_relocation_base);
+		parent->code_fixup(&FRAME_RETURN_ADDRESS(frame,parent),code_relocation_base);
 	}
 };
 
@@ -207,15 +207,15 @@ void factor_vm::fixup_callstack_object(callstack *stack, cell code_relocation_ba
 }
 
 struct object_fixupper {
-	factor_vm *myvm;
+	factor_vm *parent;
 	cell data_relocation_base;
 
-	explicit object_fixupper(factor_vm *myvm_, cell data_relocation_base_) :
-		myvm(myvm_), data_relocation_base(data_relocation_base_) { }
+	explicit object_fixupper(factor_vm *parent_, cell data_relocation_base_) :
+		parent(parent_), data_relocation_base(data_relocation_base_) { }
 
 	void operator()(cell *scan)
 	{
-		myvm->data_fixup(scan,data_relocation_base);
+		parent->data_fixup(scan,data_relocation_base);
 	}
 };
 
@@ -299,15 +299,15 @@ void factor_vm::fixup_code_block(code_block *compiled, cell data_relocation_base
 }
 
 struct code_block_fixupper {
-	factor_vm *myvm;
+	factor_vm *parent;
 	cell data_relocation_base;
 
-	code_block_fixupper(factor_vm *myvm_, cell data_relocation_base_) :
-		myvm(myvm_), data_relocation_base(data_relocation_base_) { }
+	code_block_fixupper(factor_vm *parent_, cell data_relocation_base_) :
+		parent(parent_), data_relocation_base(data_relocation_base_) { }
 
 	void operator()(code_block *compiled)
 	{
-		myvm->fixup_code_block(compiled,data_relocation_base);
+		parent->fixup_code_block(compiled,data_relocation_base);
 	}
 };
 

@@ -123,15 +123,15 @@ namespace
 {
 
 struct stack_frame_accumulator {
-	factor_vm *myvm;
+	factor_vm *parent;
 	growable_array frames;
 
-	explicit stack_frame_accumulator(factor_vm *myvm_) : myvm(myvm_), frames(myvm_) {} 
+	explicit stack_frame_accumulator(factor_vm *parent_) : parent(parent_), frames(parent_) {} 
 
 	void operator()(stack_frame *frame)
 	{
-		gc_root<object> executing(myvm->frame_executing(frame),myvm);
-		gc_root<object> scan(myvm->frame_scan(frame),myvm);
+		gc_root<object> executing(parent->frame_executing(frame),parent);
+		gc_root<object> scan(parent->frame_scan(frame),parent);
 
 		frames.add(executing.value());
 		frames.add(scan.value());
@@ -204,9 +204,9 @@ void factor_vm::save_callstack_bottom(stack_frame *callstack_bottom)
 	ctx->callstack_bottom = callstack_bottom;
 }
 
-VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom, factor_vm *myvm)
+VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom, factor_vm *parent)
 {
-	return myvm->save_callstack_bottom(callstack_bottom);
+	return parent->save_callstack_bottom(callstack_bottom);
 }
 
 }

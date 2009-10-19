@@ -15,8 +15,8 @@ template<typename TargetGeneration, typename Policy>
 struct copying_collector : collector<TargetGeneration,Policy> {
 	cell scan;
 
-	explicit copying_collector(factor_vm *myvm_, generation_statistics *stats_, TargetGeneration *target_, Policy policy_) :
-		collector<TargetGeneration,Policy>(myvm_,stats_,target_,policy_), scan(target_->here) {}
+	explicit copying_collector(factor_vm *parent_, generation_statistics *stats_, TargetGeneration *target_, Policy policy_) :
+		collector<TargetGeneration,Policy>(parent_,stats_,target_,policy_), scan(target_->here) {}
 
 	inline cell first_card_in_deck(cell deck)
 	{
@@ -82,7 +82,7 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 		{
 			if(decks[deck_index] & mask)
 			{
-				this->myvm->gc_stats.decks_scanned++;
+				this->parent->gc_stats.decks_scanned++;
 
 				cell first_card = first_card_in_deck(deck_index);
 				cell last_card = last_card_in_deck(deck_index);
@@ -91,13 +91,13 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 				{
 					if(cards[card_index] & mask)
 					{
-						this->myvm->gc_stats.cards_scanned++;
+						this->parent->gc_stats.cards_scanned++;
 
 						if(end < card_start_address(card_index))
 						{
 							start = gen->find_object_containing_card(card_index - gen_start_card);
-							binary_start = start + this->myvm->binary_payload_start((object *)start);
-							end = start + this->myvm->untagged_object_size((object *)start);
+							binary_start = start + this->parent->binary_payload_start((object *)start);
+							end = start + this->parent->untagged_object_size((object *)start);
 						}
 	
 #ifdef FACTOR_DEBUG
@@ -113,11 +113,11 @@ scan_next_object:				{
 								card_end_address(card_index));
 							if(end < card_end_address(card_index))
 							{
-								start = gen->next_object_after(this->myvm,start);
+								start = gen->next_object_after(this->parent,start);
 								if(start)
 								{
-									binary_start = start + this->myvm->binary_payload_start((object *)start);
-									end = start + this->myvm->untagged_object_size((object *)start);
+									binary_start = start + this->parent->binary_payload_start((object *)start);
+									end = start + this->parent->untagged_object_size((object *)start);
 									goto scan_next_object;
 								}
 							}
@@ -133,7 +133,7 @@ scan_next_object:				{
 			}
 		}
 
-end:		this->myvm->gc_stats.card_scan_time += (current_micros() - start_time);
+end:		this->parent->gc_stats.card_scan_time += (current_micros() - start_time);
 	}
 
 	/* Trace all literals referenced from a code block. Only for aging and nursery collections */
@@ -142,7 +142,7 @@ end:		this->myvm->gc_stats.card_scan_time += (current_micros() - start_time);
 		this->trace_handle(&compiled->owner);
 		this->trace_handle(&compiled->literals);
 		this->trace_handle(&compiled->relocation);
-		this->myvm->gc_stats.code_blocks_scanned++;
+		this->parent->gc_stats.code_blocks_scanned++;
 	}
 
 	void trace_code_heap_roots(std::set<code_block *> *remembered_set)
@@ -158,7 +158,7 @@ end:		this->myvm->gc_stats.card_scan_time += (current_micros() - start_time);
 		while(scan && scan < this->target->here)
 		{
 			this->trace_slots((object *)scan);
-			scan = this->target->next_object_after(this->myvm,scan);
+			scan = this->target->next_object_after(this->parent,scan);
 		}
 	}
 };

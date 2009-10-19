@@ -180,28 +180,28 @@ void factor_vm::primitive_dispatch_stats()
 
 void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index, cell cache_)
 {
-	gc_root<array> methods(methods_,parent_vm);
-	gc_root<array> cache(cache_,parent_vm);
+	gc_root<array> methods(methods_,parent);
+	gc_root<array> cache(cache_,parent);
 
 	/* Generate machine code to determine the object's class. */
 	emit_class_lookup(index,PIC_HI_TAG_TUPLE);
 
 	/* Do a cache lookup. */
-	emit_with(parent_vm->userenv[MEGA_LOOKUP],cache.value());
+	emit_with(parent->userenv[MEGA_LOOKUP],cache.value());
 	
 	/* If we end up here, the cache missed. */
-	emit(parent_vm->userenv[JIT_PROLOG]);
+	emit(parent->userenv[JIT_PROLOG]);
 
 	/* Push index, method table and cache on the stack. */
 	push(methods.value());
 	push(tag_fixnum(index));
 	push(cache.value());
-	word_call(parent_vm->userenv[MEGA_MISS_WORD]);
+	word_call(parent->userenv[MEGA_MISS_WORD]);
 
 	/* Now the new method has been stored into the cache, and its on
 	   the stack. */
-	emit(parent_vm->userenv[JIT_EPILOG]);
-	emit(parent_vm->userenv[JIT_EXECUTE_JUMP]);
+	emit(parent->userenv[JIT_EPILOG]);
+	emit(parent->userenv[JIT_EXECUTE_JUMP]);
 }
 
 }
