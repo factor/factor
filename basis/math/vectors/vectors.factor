@@ -92,7 +92,7 @@ PRIVATE>
 
 : vshuffle-bytes ( u perm -- v )
     underlying>> [
-        swap [ '[ _ nth ] ] keep map-as
+        swap [ '[ 15 bitand _ nth ] ] keep map-as
     ] curry change-underlying ;
 
 GENERIC: vshuffle ( u perm -- v )
