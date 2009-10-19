@@ -432,33 +432,49 @@ PRIVATE>
 : <program-instance> ( program -- instance )
     [ find-program-instance dup world get ] keep instances>> set-at ;
 
+<PRIVATE
+
+: old-instances ( name -- instances )
+    dup constant? [
+        execute( -- s/p ) dup { [ shader? ] [ program? ] } 1||
+        [ instances>> ] [ drop H{ } clone ] if
+    ] [ drop H{ } clone ] if ;
+
+PRIVATE>
+
 SYNTAX: GLSL-SHADER:
-    CREATE-WORD dup
-    scan-word
-    f
-    lexer get line>>
-    parse-here
-    H{ } clone
+    CREATE dup
+    dup old-instances [
+        scan-word
+        f
+        lexer get line>>
+        parse-here
+    ] dip
     shader boa
+    over reset-generic
     define-constant ;
 
 SYNTAX: GLSL-SHADER-FILE:
-    CREATE-WORD dup
-    scan-word execute( -- kind )
-    scan-object in-word's-path
-    0
-    over ascii file-contents 
-    H{ } clone
+    CREATE dup
+    dup old-instances [
+        scan-word execute( -- kind )
+        scan-object in-word's-path
+        0
+        over ascii file-contents 
+    ] dip
     shader boa
+    over reset-generic
     define-constant ;
 
 SYNTAX: GLSL-PROGRAM:
-    CREATE-WORD dup
-    f
-    lexer get line>>
-    \ ; parse-until >array shaders-and-feedback-format
-    H{ } clone
+    CREATE dup
+    dup old-instances [
+        f
+        lexer get line>>
+        \ ; parse-until >array shaders-and-feedback-format
+    ] dip
     program boa
+    over reset-generic
     define-constant ;
 
 M: shader-instance dispose

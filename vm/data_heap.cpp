@@ -240,10 +240,10 @@ void factor_vm::primitive_begin_scan()
 cell factor_vm::next_object()
 {
 	if(!gc_off)
-		general_error(ERROR_HEAP_SCAN,F,F,NULL);
+		general_error(ERROR_HEAP_SCAN,false_object,false_object,NULL);
 
 	if(heap_scan_ptr >= data->tenured->here)
-		return F;
+		return false_object;
 
 	object *obj = (object *)heap_scan_ptr;
 	heap_scan_ptr += untagged_object_size(obj);
@@ -266,7 +266,7 @@ template<typename Iterator> void factor_vm::each_object(Iterator &iterator)
 {
 	begin_scan();
 	cell obj;
-	while((obj = next_object()) != F)
+	while(to_boolean(obj = next_object()))
 		iterator(tagged<object>(obj));
 	end_scan();
 }

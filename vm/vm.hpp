@@ -26,8 +26,8 @@ struct factor_vm
 	/* Pooling unused contexts to make callbacks cheaper */
 	context *unused_contexts;
 
-	/* Canonical T object. It's just a word */
-	cell T;
+	/* Canonical truth value. In Factor, 't' */
+	cell true_object;
 
 	/* Is call counting enabled? */
 	bool profiling_p;

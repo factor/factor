@@ -48,11 +48,6 @@ cpu x86? [
         float-4{ 0 1 0 2 }
         [ { float-4 } declare dup v+ underlying>> double-2 boa dup v+ ] compile-call
     ] unit-test
-    
-    [ 33.0 ] [
-        double-2{ 1 2 } double-2{ 10 20 }
-        [ { double-2 double-2 } declare v+ underlying>> 3.0 float* ] compile-call
-    ] unit-test
 ] when
 
 ! Fuzz testing
@@ -193,21 +188,17 @@ CONSTANT: simd-classes
         '[ first2 inputs _ _ check-vector-op ]
     ] dip check-optimizer ; inline
 
-: approx= ( x y -- ? )
+: (approx=) ( x y -- ? )
     {
         { [ 2dup [ fp-nan? ] both? ] [ 2drop t ] }
-        { [ 2dup [ float? ] both? ] [ -1.e8 ~ ] }
+        { [ 2dup [ fp-nan? ] either? ] [ 2drop f ] }
         { [ 2dup [ fp-infinity? ] either? ] [ fp-bitwise= ] }
-        { [ 2dup [ sequence? ] both? ] [
-            [
-                {
-                    { [ 2dup [ fp-nan? ] both? ] [ 2drop t ] }
-                    { [ 2dup [ fp-infinity? ] either? ] [ fp-bitwise= ] }
-                    { [ 2dup [ fp-nan? ] either? not ] [ -1.e8 ~ ] }
-                } cond
-            ] 2all?
-        ] }
+        { [ 2dup [ float? ] both? ] [ -1.e8 ~ ] }
     } cond ;
+
+: approx= ( x y -- ? )
+    2dup [ sequence? ] both?
+    [ [ (approx=) ] 2all? ] [ (approx=) ] if ;
 
 : exact= ( x y -- ? )
     {
@@ -289,23 +280,23 @@ simd-classes&reps [
 
 "== Checking shifts and permutations" print
 
-[ int-4{ 256 512 1024 2048 } ]
-[ int-4{ 1 2 4 8 } 1 hlshift ] unit-test
+[ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } ]
+[ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } 1 hlshift ] unit-test
 
-[ int-4{ 256 512 1024 2048 } ]
-[ int-4{ 1 2 4 8 } [ { int-4 } declare 1 hlshift ] compile-call ] unit-test
+[ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } ]
+[ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } [ { char-16 } declare 1 hlshift ] compile-call ] unit-test
 
-[ int-4{ 256 512 1024 2048 } ]
-[ int-4{ 1 2 4 8 } 1 [ { int-4 fixnum } declare hlshift ] compile-call ] unit-test
+[ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } ]
+[ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } 1 [ { char-16 fixnum } declare hlshift ] compile-call ] unit-test
 
-[ int-4{ 1 2 4 8 } ]
-[ int-4{ 256 512 1024 2048 } 1 hrshift ] unit-test
+[ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } ]
+[ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } 1 hrshift ] unit-test
 
-[ int-4{ 1 2 4 8 } ]
-[ int-4{ 256 512 1024 2048 } [ { int-4 } declare 1 hrshift ] compile-call ] unit-test
+[ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } ]
+[ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } [ { char-16 } declare 1 hrshift ] compile-call ] unit-test
 
-[ int-4{ 1 2 4 8 } ]
-[ int-4{ 256 512 1024 2048 } 1 [ { int-4 fixnum } declare hrshift ] compile-call ] unit-test
+[ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } ]
+[ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } 1 [ { char-16 fixnum } declare hrshift ] compile-call ] unit-test
 
 ! Invalid inputs should not cause the compiler to throw errors
 [ ] [
@@ -394,10 +385,10 @@ simd-classes [
     [ [ declaration declare vany?  [ yes ] [ no ] if ] compile-call ]
     [ [ declaration declare vall?  [ yes ] [ no ] if ] compile-call ] tri ; inline
 
-SYMBOL: !!inconsistent!!
+TUPLE: inconsistent-vector-test bool branch ;
 
-: ?inconsistent ( a b -- ab/inconsistent )
-    2dup = [ drop ] [ 2drop !!inconsistent!! ] if ;
+: ?inconsistent ( bool branch -- ?/inconsistent )
+    2dup = [ drop ] [ inconsistent-vector-test boa ] if ;
 
 :: test-vector-tests ( vector decl -- none? any? all? )
     vector decl test-vector-tests-bool :> bool-all :> bool-any :> bool-none
