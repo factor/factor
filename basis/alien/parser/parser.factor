@@ -10,15 +10,25 @@ IN: alien.parser
 : parse-c-type-name ( name -- word )
     dup search [ ] [ no-word ] ?if ;
 
-: parse-c-type ( string -- type )
+: parse-array-type ( name -- dims c-type )
+    "[" split unclip
+    [ [ "]" ?tail drop parse-word ] map ] dip ;
+
+: (parse-c-type) ( string -- type )
     {
-        { [ dup "void" =            ] [ drop void ] }
-        { [ CHAR: ] over member?    ] [ parse-array-type parse-c-type-name prefix ] }
-        { [ dup search c-type-word? ] [ parse-c-type-name ] }
-        { [ "**" ?tail              ] [ drop void* ] }
-        { [ "*" ?tail               ] [ parse-c-type-name resolve-pointer-type ] }
-        [ dup search [ no-c-type ] [ no-word ] ?if ]
+        { [ dup "void" =         ] [ drop void ] }
+        { [ CHAR: ] over member? ] [ parse-array-type parse-c-type-name prefix ] }
+        { [ dup search           ] [ parse-c-type-name ] }
+        { [ "**" ?tail           ] [ drop void* ] }
+        { [ "*" ?tail            ] [ parse-c-type-name resolve-pointer-type ] }
+        [ dup search [ ] [ no-word ] ?if ]
     } cond ;
+
+: valid-c-type? ( c-type -- ? )
+    { [ array? ] [ c-type-name? ] [ void? ] } 1|| ;
+
+: parse-c-type ( string -- type )
+    (parse-c-type) dup valid-c-type? [ no-c-type ] unless ;
 
 : scan-c-type ( -- c-type )
     scan dup "{" =

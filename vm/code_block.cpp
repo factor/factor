@@ -66,7 +66,7 @@ void *factor_vm::object_xt(cell obj)
 
 void *factor_vm::xt_pic(word *w, cell tagged_quot)
 {
-	if(tagged_quot == F || max_pic_size == 0)
+	if(!to_boolean(tagged_quot) || max_pic_size == 0)
 		return w->xt;
 	else
 	{
@@ -92,7 +92,7 @@ void *factor_vm::word_xt_pic_tail(word *w)
 image load */
 void factor_vm::undefined_symbol()
 {
-	general_error(ERROR_UNDEFINED_SYMBOL,F,F,NULL);
+	general_error(ERROR_UNDEFINED_SYMBOL,false_object,false_object,NULL);
 }
 
 void undefined_symbol()
@@ -106,7 +106,7 @@ void *factor_vm::get_rel_symbol(array *literals, cell index)
 	cell symbol = array_nth(literals,index);
 	cell library = array_nth(literals,index + 1);
 
-	dll *d = (library == F ? NULL : untag<dll>(library));
+	dll *d = (to_boolean(library) ? untag<dll>(library) : NULL);
 
 	if(d != NULL && !d->dll)
 		return (void *)factor::undefined_symbol;
@@ -147,8 +147,8 @@ void *factor_vm::get_rel_symbol(array *literals, cell index)
 
 cell factor_vm::compute_relocation(relocation_entry rel, cell index, code_block *compiled)
 {
-	array *literals = (compiled->literals == F
-		? NULL : untag<array>(compiled->literals));
+	array *literals = (to_boolean(compiled->literals)
+		? untag<array>(compiled->literals) : NULL);
 	cell offset = relocation_offset_of(rel) + (cell)compiled->xt();
 
 #define ARG array_nth(literals,index)
@@ -196,7 +196,7 @@ cell factor_vm::compute_relocation(relocation_entry rel, cell index, code_block 
 
 template<typename Iterator> void factor_vm::iterate_relocations(code_block *compiled, Iterator &iter)
 {
-	if(compiled->relocation != F)
+	if(to_boolean(compiled->relocation))
 	{
 		byte_array *relocation = untag<byte_array>(compiled->relocation);
 
@@ -277,18 +277,18 @@ void factor_vm::store_address_in_code_block(cell klass, cell offset, fixnum abso
 }
 
 struct literal_references_updater {
-	factor_vm *myvm;
+	factor_vm *parent;
 
-	explicit literal_references_updater(factor_vm *myvm_) : myvm(myvm_) {}
+	explicit literal_references_updater(factor_vm *parent_) : parent(parent_) {}
 
 	void operator()(relocation_entry rel, cell index, code_block *compiled)
 	{
-		if(myvm->relocation_type_of(rel) == RT_IMMEDIATE)
+		if(parent->relocation_type_of(rel) == RT_IMMEDIATE)
 		{
-			cell offset = myvm->relocation_offset_of(rel) + (cell)(compiled + 1);
-			array *literals = myvm->untag<array>(compiled->literals);
+			cell offset = parent->relocation_offset_of(rel) + (cell)(compiled + 1);
+			array *literals = parent->untag<array>(compiled->literals);
 			fixnum absolute_value = array_nth(literals,index);
-			myvm->store_address_in_code_block(myvm->relocation_class_of(rel),offset,absolute_value);
+			parent->store_address_in_code_block(parent->relocation_class_of(rel),offset,absolute_value);
 		}
 	}
 };
@@ -308,9 +308,9 @@ void factor_vm::update_literal_references(code_block *compiled)
 void factor_vm::relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled)
 {
 #ifdef FACTOR_DEBUG
-	if(compiled->literals != F)
+	if(to_boolean(compiled->literals))
 		tagged<array>(compiled->literals).untag_check(this);
-	if(compiled->relocation != F)
+	if(to_boolean(compiled->relocation))
 		tagged<byte_array>(compiled->relocation).untag_check(this);
 #endif
 
@@ -320,14 +320,14 @@ void factor_vm::relocate_code_block_step(relocation_entry rel, cell index, code_
 }
 
 struct word_references_updater {
-	factor_vm *myvm;
+	factor_vm *parent;
 
-	explicit word_references_updater(factor_vm *myvm_) : myvm(myvm_) {}
+	explicit word_references_updater(factor_vm *parent_) : parent(parent_) {}
 	void operator()(relocation_entry rel, cell index, code_block *compiled)
 	{
-		relocation_type type = myvm->relocation_type_of(rel);
+		relocation_type type = parent->relocation_type_of(rel);
 		if(type == RT_XT || type == RT_XT_PIC || type == RT_XT_PIC_TAIL)
-			myvm->relocate_code_block_step(rel,index,compiled);
+			parent->relocate_code_block_step(rel,index,compiled);
 	}
 };
 
@@ -358,20 +358,20 @@ void factor_vm::update_word_references(code_block *compiled)
 
 /* This runs after a full collection */
 struct literal_and_word_references_updater {
-	factor_vm *myvm;
+	factor_vm *parent;
 
-	explicit literal_and_word_references_updater(factor_vm *myvm_) : myvm(myvm_) {}
+	explicit literal_and_word_references_updater(factor_vm *parent_) : parent(parent_) {}
 
 	void operator()(relocation_entry rel, cell index, code_block *compiled)
 	{
-		relocation_type type = myvm->relocation_type_of(rel);
+		relocation_type type = parent->relocation_type_of(rel);
 		switch(type)
 		{
 		case RT_IMMEDIATE:
 		case RT_XT:
 		case RT_XT_PIC:
 		case RT_XT_PIC_TAIL:
-			myvm->relocate_code_block_step(rel,index,compiled);
+			parent->relocate_code_block_step(rel,index,compiled);
 			break;
 		default:
 			break;
@@ -399,13 +399,13 @@ void factor_vm::check_code_address(cell address)
 }
 
 struct code_block_relocator {
-	factor_vm *myvm;
+	factor_vm *parent;
 
-	explicit code_block_relocator(factor_vm *myvm_) : myvm(myvm_) {}
+	explicit code_block_relocator(factor_vm *parent_) : parent(parent_) {}
 
 	void operator()(relocation_entry rel, cell index, code_block *compiled)
 	{
-		myvm->relocate_code_block_step(rel,index,compiled);
+		parent->relocate_code_block_step(rel,index,compiled);
 	}
 };
 
@@ -484,12 +484,12 @@ code_block *factor_vm::add_code_block(cell type, cell code_, cell labels_, cell 
 
 	/* slight space optimization */
 	if(relocation.type() == BYTE_ARRAY_TYPE && array_capacity(relocation.untagged()) == 0)
-		compiled->relocation = F;
+		compiled->relocation = false_object;
 	else
 		compiled->relocation = relocation.value();
 
 	if(literals.type() == ARRAY_TYPE && array_capacity(literals.untagged()) == 0)
-		compiled->literals = F;
+		compiled->literals = false_object;
 	else
 		compiled->literals = literals.value();
 
@@ -497,7 +497,7 @@ code_block *factor_vm::add_code_block(cell type, cell code_, cell labels_, cell 
 	memcpy(compiled + 1,code.untagged() + 1,code_length);
 
 	/* fixup labels */
-	if(labels.value() != F)
+	if(to_boolean(labels.value()))
 		fixup_labels(labels.as<array>().untagged(),compiled);
 
 	/* next time we do a minor GC, we have to scan the code heap for

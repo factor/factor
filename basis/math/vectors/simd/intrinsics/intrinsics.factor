@@ -8,7 +8,7 @@ sequences sets effects accessors namespaces
 lexer parser vocabs.parser words arrays math.vectors ;
 IN: math.vectors.simd.intrinsics
 
-ERROR: bad-simd-call ;
+ERROR: bad-simd-call word ;
 
 <<
 
@@ -24,7 +24,7 @@ V{ } clone simd-ops set-global
 : (SIMD-OP:) ( accum quot -- accum )
     [
         scan-word dup name>> "(simd-" ")" surround create-in
-        [ nip [ bad-simd-call ] define ]
+        [ nip dup '[ _ bad-simd-call ] define ]
     ] dip
     '[ _ dip set-stack-effect ]
     [ 2array simd-ops get push ]
@@ -147,7 +147,7 @@ GENERIC# supported-simd-op? 1 ( rep intrinsic -- ? )
     cc> %compare-vector-reps [ int-vector-rep? ] filter
     %xor-vector-reps [ float-vector-rep? ] filter
     union
-    { uchar-16-rep ushort-8-rep uint-4-rep ulonglong-2-rep } union ;
+    [ { } ] [ { uchar-16-rep ushort-8-rep uint-4-rep ulonglong-2-rep } union ] if-empty ;
 
 : (%shuffle-imm-reps) ( -- reps )
     %shuffle-vector-reps %shuffle-vector-imm-reps union ;

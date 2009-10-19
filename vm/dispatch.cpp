@@ -15,14 +15,14 @@ cell factor_vm::search_lookup_alist(cell table, cell klass)
 			index -= 2;
 	}
 
-	return F;
+	return false_object;
 }
 
 cell factor_vm::search_lookup_hash(cell table, cell klass, cell hashcode)
 {
 	array *buckets = untag<array>(table);
 	cell bucket = array_nth(buckets,hashcode & (array_capacity(buckets) - 1));
-	if(tagged<object>(bucket).type_p(WORD_TYPE) || bucket == F)
+	if(tagged<object>(bucket).type_p(WORD_TYPE) || !to_boolean(bucket))
 		return bucket;
 	else
 		return search_lookup_alist(bucket,klass);
@@ -56,12 +56,12 @@ cell factor_vm::lookup_tuple_method(cell obj, cell methods)
 
 		if(tagged<object>(echelon_methods).type_p(WORD_TYPE))
 			return echelon_methods;
-		else if(echelon_methods != F)
+		else if(to_boolean(echelon_methods))
 		{
 			cell klass = nth_superclass(layout,echelon);
 			cell hashcode = untag_fixnum(nth_hashcode(layout,echelon));
 			cell result = search_lookup_hash(echelon_methods,klass,hashcode);
-			if(result != F)
+			if(to_boolean(result))
 				return result;
 		}
 
@@ -69,7 +69,7 @@ cell factor_vm::lookup_tuple_method(cell obj, cell methods)
 	}
 
 	critical_error("Cannot find tuple method",methods);
-	return F;
+	return false_object;
 }
 
 cell factor_vm::lookup_hi_tag_method(cell obj, cell methods)
@@ -180,28 +180,28 @@ void factor_vm::primitive_dispatch_stats()
 
 void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index, cell cache_)
 {
-	gc_root<array> methods(methods_,parent_vm);
-	gc_root<array> cache(cache_,parent_vm);
+	gc_root<array> methods(methods_,parent);
+	gc_root<array> cache(cache_,parent);
 
 	/* Generate machine code to determine the object's class. */
 	emit_class_lookup(index,PIC_HI_TAG_TUPLE);
 
 	/* Do a cache lookup. */
-	emit_with(parent_vm->userenv[MEGA_LOOKUP],cache.value());
+	emit_with(parent->userenv[MEGA_LOOKUP],cache.value());
 	
 	/* If we end up here, the cache missed. */
-	emit(parent_vm->userenv[JIT_PROLOG]);
+	emit(parent->userenv[JIT_PROLOG]);
 
 	/* Push index, method table and cache on the stack. */
 	push(methods.value());
 	push(tag_fixnum(index));
 	push(cache.value());
-	word_call(parent_vm->userenv[MEGA_MISS_WORD]);
+	word_call(parent->userenv[MEGA_MISS_WORD]);
 
 	/* Now the new method has been stored into the cache, and its on
 	   the stack. */
-	emit(parent_vm->userenv[JIT_EPILOG]);
-	emit(parent_vm->userenv[JIT_EXECUTE_JUMP]);
+	emit(parent->userenv[JIT_EPILOG]);
+	emit(parent->userenv[JIT_EXECUTE_JUMP]);
 }
 
 }

@@ -100,7 +100,7 @@ void factor_vm::do_stage1_init()
 	fflush(stdout);
 
 	compile_all_words();
-	userenv[STAGE2_ENV] = T;
+	userenv[STAGE2_ENV] = true_object;
 
 	print_string("done\n");
 	fflush(stdout);
@@ -148,17 +148,17 @@ void factor_vm::init_factor(vm_parameters *p)
 
 	init_profiler();
 
-	userenv[CPU_ENV] = allot_alien(F,(cell)FACTOR_CPU_STRING);
-	userenv[OS_ENV] = allot_alien(F,(cell)FACTOR_OS_STRING);
+	userenv[CPU_ENV] = allot_alien(false_object,(cell)FACTOR_CPU_STRING);
+	userenv[OS_ENV] = allot_alien(false_object,(cell)FACTOR_OS_STRING);
 	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(cell));
-	userenv[EXECUTABLE_ENV] = allot_alien(F,(cell)p->executable_path);
-	userenv[ARGS_ENV] = F;
-	userenv[EMBEDDED_ENV] = F;
+	userenv[EXECUTABLE_ENV] = allot_alien(false_object,(cell)p->executable_path);
+	userenv[ARGS_ENV] = false_object;
+	userenv[EMBEDDED_ENV] = false_object;
 
 	/* We can GC now */
 	gc_off = false;
 
-	if(userenv[STAGE2_ENV] == F)
+	if(!to_boolean(userenv[STAGE2_ENV]))
 		do_stage1_init();
 }
 
@@ -169,7 +169,7 @@ void factor_vm::pass_args_to_factor(int argc, vm_char **argv)
 	int i;
 
 	for(i = 1; i < argc; i++){
-		args.add(allot_alien(F,(cell)argv[i]));
+		args.add(allot_alien(false_object,(cell)argv[i]));
 	}
 
 	args.trim();

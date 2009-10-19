@@ -1,28 +1,34 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays fry kernel locals math math.bitwise
-random sequences ;
+USING: accessors alien.c-types arrays fry kernel locals math
+math.bitwise random sequences sequences.private
+specialized-arrays specialized-arrays.instances.uint ;
 IN: random.cmwc
 
 ! Multiply-with-carry RNG
 
-TUPLE: cmwc Q a b c i r mod ;
+TUPLE: cmwc
+    { Q uint-array }
+    { a integer }
+    { b integer }
+    { c integer }
+    { i integer }
+    { r integer }
+    { mod fixnum } ;
 
-TUPLE: cmwc-seed Q c ;
+TUPLE: cmwc-seed { Q uint-array read-only } { c read-only } ;
 
 : <cmwc> ( length a b c -- cmwc )
     cmwc new
         swap >>c
         swap >>b
         swap >>a
-        swap [ 1 - >>i ] [ 0 <array> >>Q ] bi
+        swap [ 1 - >>i ] [ <uint-array> >>Q ] bi
         dup b>> 1 - >>r
-        dup Q>> length 1 - >>mod ;
+        dup Q>> length 1 - >>mod ; inline
 
 : <cmwc-seed> ( Q c -- cmwc-seed )
-    cmwc-seed new
-        swap >>c
-        swap >>Q ; inline
+    cmwc-seed boa ; inline
 
 M: cmwc seed-random
     [ Q>> >>Q ]
@@ -32,23 +38,25 @@ M: cmwc seed-random
 M:: cmwc random-32* ( cmwc -- n )
     cmwc dup mod>> '[ 1 + _ bitand ] change-i
     [ a>> ]
-    [ [ i>> ] [ Q>> ] bi nth * ]
-    [ c>> + ] tri :> t!
+    [ [ i>> ] [ Q>> ] bi nth-unsafe * ]
+    [ c>> + ] tri
 
-    t -32 shift cmwc (>>c)
+    [ >fixnum -32 shift cmwc (>>c) ]
+    [ cmwc [ b>> bitand ] [ c>> + ] bi 32 bits ] bi
 
-    t cmwc [ b>> bitand ] [ c>> + ] bi 64 bits t!
-    t cmwc r>> > [
+    dup cmwc r>> > [
         cmwc [ 1 + ] change-c drop
-        t cmwc b>> - 64 bits t!
+        cmwc b>> - 32 bits
     ] when
 
-    cmwc [ r>> t - 32 bits dup ] [ i>> ] [ Q>> ] tri set-nth ;
+    cmwc swap '[ r>> _ - 32 bits dup ] [ i>> ] [ Q>> ] tri set-nth-unsafe ;
 
 : cmwc-4096 ( -- cmwc )
     4096
     [ 18782 4294967295 362436 <cmwc> ]
     [
-        '[ [ random-32 ] replicate ] with-system-random
+        '[ [ random-32 ] uint-array{ } replicate-as ] with-system-random
         362436 <cmwc-seed> seed-random
     ] bi ;
+
+: default-cmwc ( -- cmwc ) cmwc-4096 ;

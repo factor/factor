@@ -10,9 +10,9 @@ struct callback {
 struct callback_heap {
 	segment *seg;
 	cell here;
-	factor_vm *myvm;
+	factor_vm *parent;
 
-	explicit callback_heap(cell size, factor_vm *myvm);
+	explicit callback_heap(cell size, factor_vm *parent);
 	~callback_heap();
 
 	callback *add(code_block *compiled);
