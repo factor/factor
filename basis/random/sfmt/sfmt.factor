@@ -30,7 +30,7 @@ TUPLE: sfmt
 
 : endian-shuffle ( v -- w )
     little-endian? [
-        B{ 3 2 1 0 7 6 5 4 11 10 9 8 15 14 13 12 } uint-4 boa vshuffle
+        uchar-16{ 3 2 1 0 7 6 5 4 11 10 9 8 15 14 13 12 } vshuffle
     ] unless ; inline
 
 : hlshift* ( v n -- w )
