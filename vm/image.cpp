@@ -155,7 +155,7 @@ void factor_vm::relocate_object(object *object,
 		data_fixup(&t->layout,data_relocation_base);
 
 		cell *scan = t->data();
-		cell *end = (cell *)((cell)object + untagged_object_size(object));
+		cell *end = (cell *)((cell)object + object->size());
 
 		for(; scan < end; scan++)
 			data_fixup(scan,data_relocation_base);
@@ -204,7 +204,7 @@ void factor_vm::relocate_data(cell data_relocation_base, cell code_relocation_ba
 	{
 		relocate_object((object *)obj,data_relocation_base,code_relocation_base);
 		data->tenured->record_object_start_offset((object *)obj);
-		obj = data->tenured->next_object_after(this,obj);
+		obj = data->tenured->next_object_after(obj);
 	}
 }
 

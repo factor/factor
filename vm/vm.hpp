@@ -220,13 +220,8 @@ struct factor_vm
 
 	//data heap
 	void init_card_decks();
-	void clear_cards(old_space *gen);
-	void clear_decks(old_space *gen);
-	void reset_generation(old_space *gen);
 	void set_data_heap(data_heap *data_);
 	void init_data_heap(cell young_size, cell aging_size, cell tenured_size, bool secure_gc_);
-	cell untagged_object_size(object *pointer);
-	cell unaligned_object_size(object *pointer);
 	void primitive_size();
 	cell binary_payload_start(object *pointer);
 	void primitive_data_room();

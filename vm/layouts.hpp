@@ -114,26 +114,31 @@ struct header {
 
 	explicit header(cell value_) : value(value_ << TAG_BITS) {}
 
-	void check_header() {
+	void check_header()
+	{
 #ifdef FACTOR_DEBUG
 		assert(TAG(value) == FIXNUM_TYPE && untag_fixnum(value) < TYPE_COUNT);
 #endif
 	}
 
-	cell hi_tag() {
+	cell hi_tag()
+	{
 		check_header();
 		return value >> TAG_BITS;
 	}
 
-	bool forwarding_pointer_p() {
+	bool forwarding_pointer_p()
+	{
 		return TAG(value) == GC_COLLECTED;
 	}
 
-	object *forwarding_pointer() {
+	object *forwarding_pointer()
+	{
 		return (object *)UNTAG(value);
 	}
 
-	void forward_to(object *pointer) {
+	void forward_to(object *pointer)
+	{
 		value = RETAG(pointer,GC_COLLECTED);
 	}
 };
@@ -144,6 +149,7 @@ struct object {
 	NO_TYPE_CHECK;
 	header h;
 	cell *slots() { return (cell *)this; }
+	cell size();
 };
 
 /* Assembly code makes assumptions about the layout of this struct */

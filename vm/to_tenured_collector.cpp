@@ -25,7 +25,7 @@ void factor_vm::collect_to_tenured()
 	update_code_heap_for_minor_gc(&code->points_to_aging);
 
 	nursery.here = nursery.start;
-	reset_generation(data->aging);
+	data->reset_generation(data->aging);
 	code->points_to_nursery.clear();
 	code->points_to_aging.clear();
 }
