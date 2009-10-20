@@ -9,10 +9,10 @@ IN: compiler.alien
 
 : alien-parameters ( params -- seq )
     dup parameters>>
-    swap return>> large-struct? [ "void*" prefix ] when ;
+    swap return>> large-struct? [ void* prefix ] when ;
 
 : alien-return ( params -- ctype )
-    return>> dup large-struct? [ drop "void" ] when ;
+    return>> dup large-struct? [ drop void ] when ;
 
 : c-type-stack-align ( type -- align )
     dup c-type-stack-align? [ c-type-align ] [ drop cell ] if ;
