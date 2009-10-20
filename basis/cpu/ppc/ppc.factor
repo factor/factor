@@ -577,10 +577,8 @@ M:: ppc %save-param-reg ( stack reg rep -- )
 M:: ppc %load-param-reg ( stack reg rep -- )
     reg stack local@ rep load-from-frame ;
 
-M: ppc %prepare-unbox ( -- )
-    ! First parameter is top of stack
-    3 ds-reg 0 LWZ
-    ds-reg dup cell SUBI ;
+M: ppc %prepare-unbox ( n -- )
+    [ 3 ] dip <ds-loc> loc>operand LWZ ;
 
 M: ppc %unbox ( n rep func -- )
     ! Value must be in r3
