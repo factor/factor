@@ -49,7 +49,6 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/factor.o \
 	vm/full_collector.o \
 	vm/gc.o \
-	vm/heap.o \
 	vm/image.o \
 	vm/inline_cache.o \
 	vm/io.o \

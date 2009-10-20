@@ -1,9 +1,11 @@
 namespace factor
 {
 
+const int block_granularity = 16;
 const int forwarding_granularity = 64;
 
-template<typename Block, int Granularity> struct mark_bits {
+template<typename Block, typename HeapLayout> struct mark_bits {
+	HeapLayout layout;
 	cell start;
 	cell size;
 	cell bits_size;
@@ -23,7 +25,7 @@ template<typename Block, int Granularity> struct mark_bits {
 	explicit mark_bits(cell start_, cell size_) :
 		start(start_),
 		size(size_),
-		bits_size(size / Granularity / forwarding_granularity),
+		bits_size(size / block_granularity / forwarding_granularity),
 		marked(new u64[bits_size]),
 		forwarding(new cell[bits_size])
 	{
@@ -41,12 +43,12 @@ template<typename Block, int Granularity> struct mark_bits {
 
 	cell block_line(Block *address)
 	{
-		return (((cell)address - start) / Granularity);
+		return (((cell)address - start) / block_granularity);
 	}
 
 	Block *line_block(cell line)
 	{
-		return (Block *)(line * Granularity + start);
+		return (Block *)(line * block_granularity + start);
 	}
 
 	std::pair<cell,cell> bitmap_deref(Block *address)
@@ -71,7 +73,7 @@ template<typename Block, int Granularity> struct mark_bits {
 	void set_bitmap_range(u64 *bits, Block *address)
 	{
 		std::pair<cell,cell> start = bitmap_deref(address);
-		std::pair<cell,cell> end = bitmap_deref(address->next());
+		std::pair<cell,cell> end = bitmap_deref(layout.next_block_after(address));
 
 		u64 start_mask = ((u64)1 << start.second) - 1;
 		u64 end_mask = ((u64)1 << end.second) - 1;
@@ -139,12 +141,12 @@ template<typename Block, int Granularity> struct mark_bits {
 	}
 };
 
-template<typename Block, int Granularity, typename Iterator> struct heap_compacter {
-	mark_bits<Block,Granularity> *state;
+template<typename Block, typename HeapLayout, typename Iterator> struct heap_compactor {
+	mark_bits<Block,HeapLayout> *state;
 	char *address;
 	Iterator &iter;
 
-	explicit heap_compacter(mark_bits<Block,Granularity> *state_, Block *address_, Iterator &iter_) :
+	explicit heap_compactor(mark_bits<Block,HeapLayout> *state_, Block *address_, Iterator &iter_) :
 		state(state_), address((char *)address_), iter(iter_) {}
 
 	void operator()(Block *block, cell size)

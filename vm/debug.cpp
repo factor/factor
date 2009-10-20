@@ -284,41 +284,44 @@ void factor_vm::find_data_references(cell look_for)
 	end_scan();
 }
 
-/* Dump all code blocks for debugging */
-void factor_vm::dump_code_heap()
-{
-	cell reloc_size = 0, literal_size = 0;
+struct code_block_printer {
+	factor_vm *parent;
+	cell reloc_size, literal_size;
 
-	heap_block *scan = code->first_block();
-	heap_block *end = code->last_block();
+	code_block_printer(factor_vm *parent_) :
+		parent(parent_), reloc_size(0), literal_size(0) {}
 
-	while(scan != end)
+	void operator()(heap_block *scan, cell size)
 	{
 		const char *status;
 		if(scan->free_p())
 			status = "free";
-		else if(code->state->is_marked_p(scan))
+		else if(parent->code->state->is_marked_p(scan))
 		{
-			reloc_size += object_size(((code_block *)scan)->relocation);
-			literal_size += object_size(((code_block *)scan)->literals);
+			reloc_size += parent->object_size(((code_block *)scan)->relocation);
+			literal_size += parent->object_size(((code_block *)scan)->literals);
 			status = "marked";
 		}
 		else
 		{
-			reloc_size += object_size(((code_block *)scan)->relocation);
-			literal_size += object_size(((code_block *)scan)->literals);
+			reloc_size += parent->object_size(((code_block *)scan)->relocation);
+			literal_size += parent->object_size(((code_block *)scan)->literals);
 			status = "allocated";
 		}
 
 		print_cell_hex((cell)scan); print_string(" ");
-		print_cell_hex(scan->size()); print_string(" ");
+		print_cell_hex(size); print_string(" ");
 		print_string(status); print_string("\n");
-
-		scan = scan->next();
 	}
-	
-	print_cell(reloc_size); print_string(" bytes of relocation data\n");
-	print_cell(literal_size); print_string(" bytes of literal data\n");
+};
+
+/* Dump all code blocks for debugging */
+void factor_vm::dump_code_heap()
+{
+	code_block_printer printer(this);
+	code->iterate_heap(printer);
+	print_cell(printer.reloc_size); print_string(" bytes of relocation data\n");
+	print_cell(printer.literal_size); print_string(" bytes of literal data\n");
 }
 
 void factor_vm::factorbug()
