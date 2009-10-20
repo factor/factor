@@ -47,7 +47,7 @@ load-help? off
             "Cannot find " write write "." print
             "Please move " write image write " to the same directory as the Factor sources," print
             "and try again." print
-            1 exit
+            1 (exit)
         ] if
     ] %
 ] [ ] make

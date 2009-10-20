@@ -432,7 +432,7 @@ tuple
     { "set-datastack" "kernel" (( ds -- )) }
     { "set-retainstack" "kernel" (( rs -- )) }
     { "set-callstack" "kernel" (( cs -- )) }
-    { "exit" "system" (( n -- )) }
+    { "(exit)" "system" (( n -- )) }
     { "data-room" "memory" (( -- cards decks generations )) }
     { "code-room" "memory" (( -- code-total code-used code-free largest-free-block )) }
     { "micros" "system" (( -- us )) }

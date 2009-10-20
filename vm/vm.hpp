@@ -668,6 +668,7 @@ struct factor_vm
 	void init_factor(vm_parameters *p);
 	void pass_args_to_factor(int argc, vm_char **argv);
 	void start_factor(vm_parameters *p);
+	void stop_factor();
 	void start_embedded_factor(vm_parameters *p);
 	void start_standalone_factor(int argc, vm_char **argv);
 	char *factor_eval_string(char *string);

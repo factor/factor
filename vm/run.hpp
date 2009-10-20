@@ -90,6 +90,7 @@ enum special_object {
 	THREADS_ENV         = 64,
 	RUN_QUEUE_ENV       = 65,
 	SLEEP_QUEUE_ENV     = 66,
+	SHUTDOWN_ENV        = 67,
 };
 
 #define FIRST_SAVE_ENV BOOT_ENV
