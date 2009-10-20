@@ -3,7 +3,7 @@
 USING: arrays assocs continuations debugger generic hashtables
 init io io.files kernel kernel.private make math memory
 namespaces parser prettyprint sequences splitting system
-vectors vocabs vocabs.loader words ;
+vectors vocabs vocabs.loader words destructors ;
 QUALIFIED: bootstrap.image.private
 IN: bootstrap.stage1
 
@@ -42,7 +42,7 @@ load-help? off
     [
         "resource:basis/bootstrap/stage2.factor"
         dup exists? [
-            run-file
+            [ run-file ] with-destructors
         ] [
             "Cannot find " write write "." print
             "Please move " write image write " to the same directory as the Factor sources," print

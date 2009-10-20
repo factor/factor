@@ -113,8 +113,7 @@ SYMBOL: receive-buffer
 
 CONSTANT: packet-size 65536
 
-[ packet-size malloc receive-buffer set-global ] "io.sockets.unix" add-startup-hook
-[ receive-buffer get-global free ] "io.sockets.unix" add-shutdown-hook
+[ packet-size malloc &free receive-buffer set-global ] "io.sockets.unix" add-startup-hook
 
 :: do-receive ( port -- packet sockaddr )
     port addr>> empty-sockaddr/size :> len :> sockaddr
