@@ -84,10 +84,8 @@ M: x86 %load-param-reg [ swap param@ ] dip %copy ;
         call
     ] with-scope ; inline
 
-M: x86.64 %prepare-unbox ( -- )
-    ! First parameter is top of stack
-    param-reg-1 R14 [] MOV
-    R14 cell SUB ;
+M: x86.64 %prepare-unbox ( n -- )
+    param-reg-1 swap ds-reg reg-stack MOV ;
 
 M:: x86.64 %unbox ( n rep func -- )
     param-reg-2 %mov-vm-ptr
@@ -217,9 +215,7 @@ M: x86.64 %alien-callback ( quot -- )
     "c_to_factor" f %alien-invoke ;
 
 M: x86.64 %callback-value ( ctype -- )
-    ! Save top of data stack
-    %prepare-unbox
-    ! Save top of data stack
+    0 %prepare-unbox
     RSP 8 SUB
     param-reg-1 PUSH
     param-reg-1 %mov-vm-ptr
