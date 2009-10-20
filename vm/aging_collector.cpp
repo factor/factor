@@ -32,7 +32,7 @@ void factor_vm::collect_aging()
 		current_gc->op = collect_aging_op;
 
 		std::swap(data->aging,data->aging_semispace);
-		reset_generation(data->aging);
+		data->reset_generation(data->aging);
 
 		aging_collector collector(this);
 

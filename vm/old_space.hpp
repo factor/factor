@@ -15,7 +15,7 @@ struct old_space : zone {
 	void record_object_start_offset(object *obj);
 	object *allot(cell size);
 	void clear_object_start_offsets();
-	cell next_object_after(factor_vm *parent, cell scan);
+	cell next_object_after(cell scan);
 };
 
 }

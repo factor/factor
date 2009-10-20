@@ -65,40 +65,14 @@ data_heap *data_heap::grow(cell requested_bytes)
 	return new data_heap(young_size,aging_size,new_tenured_size);
 }
 
-void factor_vm::clear_cards(old_space *gen)
-{
-	cell first_card = addr_to_card(gen->start - data->start);
-	cell last_card = addr_to_card(gen->end - data->start);
-	memset(&data->cards[first_card],0,last_card - first_card);
-}
-
-void factor_vm::clear_decks(old_space *gen)
-{
-	cell first_deck = addr_to_deck(gen->start - data->start);
-	cell last_deck = addr_to_deck(gen->end - data->start);
-	memset(&data->decks[first_deck],0,last_deck - first_deck);
-}
-
-/* After garbage collection, any generations which are now empty need to have
-their allocation pointers and cards reset. */
-void factor_vm::reset_generation(old_space *gen)
-{
-	gen->here = gen->start;
-	if(secure_gc) memset((void*)gen->start,69,gen->size);
-
-	clear_cards(gen);
-	clear_decks(gen);
-	gen->clear_object_start_offsets();
-}
-
 void factor_vm::set_data_heap(data_heap *data_)
 {
 	data = data_;
 	nursery = *data->nursery;
 	nursery.here = nursery.start;
 	init_card_decks();
-	reset_generation(data->aging);
-	reset_generation(data->tenured);
+	data->reset_generation(data->aging);
+	data->reset_generation(data->tenured);
 }
 
 void factor_vm::init_data_heap(cell young_size, cell aging_size, cell tenured_size, bool secure_gc_)
@@ -113,46 +87,43 @@ cell factor_vm::object_size(cell tagged)
 	if(immediate_p(tagged))
 		return 0;
 	else
-		return untagged_object_size(untag<object>(tagged));
+		return untag<object>(tagged)->size();
 }
 
 /* Size of the object pointed to by an untagged pointer */
-cell factor_vm::untagged_object_size(object *pointer)
+cell object::size()
 {
-	return align(unaligned_object_size(pointer),data_alignment);
-}
-
-/* Size of the data area of an object pointed to by an untagged pointer */
-cell factor_vm::unaligned_object_size(object *pointer)
-{
-	switch(pointer->h.hi_tag())
+	switch(h.hi_tag())
 	{
 	case ARRAY_TYPE:
-		return array_size((array*)pointer);
+		return align(array_size((array*)this),data_alignment);
 	case BIGNUM_TYPE:
-		return array_size((bignum*)pointer);
+		return align(array_size((bignum*)this),data_alignment);
 	case BYTE_ARRAY_TYPE:
-		return array_size((byte_array*)pointer);
+		return align(array_size((byte_array*)this),data_alignment);
 	case STRING_TYPE:
-		return string_size(string_capacity((string*)pointer));
+		return align(string_size(string_capacity((string*)this)),data_alignment);
 	case TUPLE_TYPE:
-		return tuple_size(untag<tuple_layout>(((tuple *)pointer)->layout));
+		{
+			tuple_layout *layout = (tuple_layout *)UNTAG(((tuple *)this)->layout);
+			return align(tuple_size(layout),data_alignment);
+		}
 	case QUOTATION_TYPE:
-		return sizeof(quotation);
+		return align(sizeof(quotation),data_alignment);
 	case WORD_TYPE:
-		return sizeof(word);
+		return align(sizeof(word),data_alignment);
 	case FLOAT_TYPE:
-		return sizeof(boxed_float);
+		return align(sizeof(boxed_float),data_alignment);
 	case DLL_TYPE:
-		return sizeof(dll);
+		return align(sizeof(dll),data_alignment);
 	case ALIEN_TYPE:
-		return sizeof(alien);
+		return align(sizeof(alien),data_alignment);
 	case WRAPPER_TYPE:
-		return sizeof(wrapper);
+		return align(sizeof(wrapper),data_alignment);
 	case CALLSTACK_TYPE:
-		return callstack_size(untag_fixnum(((callstack *)pointer)->length));
+		return align(callstack_size(untag_fixnum(((callstack *)this)->length)),data_alignment);
 	default:
-		critical_error("Invalid header",(cell)pointer);
+		critical_error("Invalid header",(cell)this);
 		return 0; /* can't happen */
 	}
 }
@@ -246,7 +217,7 @@ cell factor_vm::next_object()
 		return false_object;
 
 	object *obj = (object *)heap_scan_ptr;
-	heap_scan_ptr += untagged_object_size(obj);
+	heap_scan_ptr += obj->size();
 	return tag_dynamic(obj);
 }
 
