@@ -21,6 +21,15 @@ struct zone {
 		here = h + align(size,data_alignment);
 		return (object *)h;
 	}
+
+	cell next_object_after(cell scan)
+	{
+		cell size = ((object *)scan)->size();
+		if(scan + size < here)
+			return scan + size;
+		else
+			return 0;
+	}
 };
 
 }

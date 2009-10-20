@@ -28,6 +28,11 @@ template<typename Block, typename HeapLayout> struct heap {
 		return (Block *)seg->end;
 	}
 
+	Block *next_block_after(heap_block *block)
+	{
+		return (Block *)((cell)block + layout.block_size(block));
+	}
+
 	void clear_free_list();
 	void add_to_free_list(free_heap_block *block);
 	void build_free_list(cell size);
@@ -50,7 +55,7 @@ template<typename Block, typename HeapLayout> struct heap {
 
 		while(scan != end)
 		{
-			Block *next = layout.next_block_after(scan);
+			Block *next = next_block_after(scan);
 			if(!scan->free_p()) iter(scan,layout.block_size(scan));
 			scan = next;
 		}
@@ -229,7 +234,7 @@ void heap<Block,HeapLayout>::heap_usage(cell *used, cell *total_free, cell *max_
 		else
 			*used += size;
 
-		scan = layout.next_block_after(scan);
+		scan = next_block_after(scan);
 	}
 }
 
@@ -243,7 +248,7 @@ cell heap<Block,HeapLayout>::heap_size()
 	while(scan != end)
 	{
 		if(scan->free_p()) break;
-		else scan = layout.next_block_after(scan);
+		else scan = next_block_after(scan);
 	}
 
 	if(scan != end)
@@ -308,7 +313,7 @@ void heap<Block,HeapLayout>::sweep_heap(Iterator &iter)
 			}
 		}
 
-		scan = layout.next_block_after(scan);
+		scan = next_block_after(scan);
 	}
 
 	if(prev && prev->free_p())

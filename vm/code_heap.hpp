@@ -6,11 +6,6 @@ struct code_heap_layout {
 	{
 		return block->size();
 	}
-
-	heap_block *next_block_after(heap_block *block)
-	{
-		return (heap_block *)((cell)block + block_size(block));
-	}
 };
 
 struct code_heap : heap<heap_block,code_heap_layout> {

@@ -3,23 +3,24 @@
 namespace factor
 {
 
-old_space::old_space(cell size_, cell start_) : zone(size_,start_)
+object_start_map::object_start_map(cell size_, cell start_) :
+	size(size_), start(start_)
 {
 	object_start_offsets = new card[addr_to_card(size_)];
 	object_start_offsets_end = object_start_offsets + addr_to_card(size_);
 }
 
-old_space::~old_space()
+object_start_map::~object_start_map()
 {
 	delete[] object_start_offsets;
 }
 
-cell old_space::first_object_in_card(cell card_index)
+cell object_start_map::first_object_in_card(cell card_index)
 {
 	return object_start_offsets[card_index];
 }
 
-cell old_space::find_object_containing_card(cell card_index)
+cell object_start_map::find_object_containing_card(cell card_index)
 {
 	if(card_index == 0)
 		return start;
@@ -41,34 +42,16 @@ cell old_space::find_object_containing_card(cell card_index)
 }
 
 /* we need to remember the first object allocated in the card */
-void old_space::record_object_start_offset(object *obj)
+void object_start_map::record_object_start_offset(object *obj)
 {
 	cell idx = addr_to_card((cell)obj - start);
-	if(object_start_offsets[idx] == card_starts_inside_object)
-		object_start_offsets[idx] = ((cell)obj & addr_card_mask);
+	card obj_start = ((cell)obj & addr_card_mask);
+	object_start_offsets[idx] = std::min(object_start_offsets[idx],obj_start);
 }
 
-object *old_space::allot(cell size)
-{
-	if(here + size > end) return NULL;
-
-	object *obj = zone::allot(size);
-	record_object_start_offset(obj);
-	return obj;
-}
-
-void old_space::clear_object_start_offsets()
+void object_start_map::clear_object_start_offsets()
 {
 	memset(object_start_offsets,card_starts_inside_object,addr_to_card(size));
-}
-
-cell old_space::next_object_after(cell scan)
-{
-	cell size = ((object *)scan)->size();
-	if(scan + size < here)
-		return scan + size;
-	else
-		return 0;
 }
 
 }

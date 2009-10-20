@@ -148,8 +148,17 @@ struct header {
 struct object {
 	NO_TYPE_CHECK;
 	header h;
-	cell *slots() { return (cell *)this; }
+
 	cell size();
+
+	cell *slots() { return (cell *)this; }
+
+	/* Only valid for objects in tenured space; must fast to free_heap_block
+	to do anything with it if its free */
+	bool free_p()
+	{
+		return h.value & 1 == 1;
+	}
 };
 
 /* Assembly code makes assumptions about the layout of this struct */

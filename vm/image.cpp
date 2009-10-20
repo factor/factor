@@ -203,7 +203,7 @@ void factor_vm::relocate_data(cell data_relocation_base, cell code_relocation_ba
 	while(obj)
 	{
 		relocate_object((object *)obj,data_relocation_base,code_relocation_base);
-		data->tenured->record_object_start_offset((object *)obj);
+		data->tenured->starts.record_object_start_offset((object *)obj);
 		obj = data->tenured->next_object_after(obj);
 	}
 }
