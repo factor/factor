@@ -95,7 +95,7 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 
 						if(end < card_start_address(card_index))
 						{
-							start = gen->find_object_containing_card(card_index - gen_start_card);
+							start = gen->starts.find_object_containing_card(card_index - gen_start_card);
 							binary_start = start + this->parent->binary_payload_start((object *)start);
 							end = start + ((object *)start)->size();
 						}

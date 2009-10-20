@@ -70,10 +70,15 @@ template<typename Block, typename HeapLayout> struct mark_bits {
 		return (bits[pair.first] & ((u64)1 << pair.second)) != 0;
 	}
 
+	Block *next_block_after(Block *block)
+	{
+		return (Block *)((cell)block + layout.block_size(block));
+	}
+
 	void set_bitmap_range(u64 *bits, Block *address)
 	{
 		std::pair<cell,cell> start = bitmap_deref(address);
-		std::pair<cell,cell> end = bitmap_deref(layout.next_block_after(address));
+		std::pair<cell,cell> end = bitmap_deref(next_block_after(address));
 
 		u64 start_mask = ((u64)1 << start.second) - 1;
 		u64 end_mask = ((u64)1 << end.second) - 1;
