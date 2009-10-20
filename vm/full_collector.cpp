@@ -89,7 +89,7 @@ void full_collector::trace_literal_references(code_block *compiled)
 collections */
 void full_collector::mark_code_block(code_block *compiled)
 {
-	this->code->mark_block(compiled);
+	this->code->set_marked_p(compiled);
 	trace_literal_references(compiled);
 }
 
@@ -108,7 +108,7 @@ void factor_vm::collect_full_impl(bool trace_contexts_p)
 {
 	full_collector collector(this);
 
-	code->state->clear_mark_bits();
+	code->clear_mark_bits();
 
 	collector.trace_roots();
         if(trace_contexts_p)

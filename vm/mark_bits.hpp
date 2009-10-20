@@ -95,7 +95,7 @@ template<typename Block> struct mark_bits {
 		}
 	}
 
-	bool is_marked_p(Block *address)
+	bool marked_p(Block *address)
 	{
 		return bitmap_elt(marked,address);
 	}
@@ -155,7 +155,7 @@ template<typename Block, typename Iterator> struct heap_compactor {
 
 	void operator()(Block *block, cell size)
 	{
-		if(this->state->is_marked_p(block))
+		if(this->state->marked_p(block))
 		{
 			memmove(address,block,size);
 			iter((Block *)address,size);

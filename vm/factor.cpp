@@ -37,7 +37,6 @@ void factor_vm::default_parameters(vm_parameters *p)
 
 	p->max_pic_size = 3;
 
-	p->secure_gc = false;
 	p->fep = false;
 	p->signals = true;
 
@@ -85,7 +84,6 @@ void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **
 		else if(factor_arg(arg,STRING_LITERAL("-codeheap=%d"),&p->code_size));
 		else if(factor_arg(arg,STRING_LITERAL("-pic=%d"),&p->max_pic_size));
 		else if(factor_arg(arg,STRING_LITERAL("-callbacks=%d"),&p->callback_size));
-		else if(STRCMP(arg,STRING_LITERAL("-securegc")) == 0) p->secure_gc = true;
 		else if(STRCMP(arg,STRING_LITERAL("-fep")) == 0) p->fep = true;
 		else if(STRCMP(arg,STRING_LITERAL("-nosignals")) == 0) p->signals = false;
 		else if(STRNCMP(arg,STRING_LITERAL("-i="),3) == 0) p->image_path = arg + 3;

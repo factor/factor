@@ -439,7 +439,7 @@ void factor_vm::fixup_labels(array *labels, code_block *compiled)
 /* Might GC */
 code_block *factor_vm::allot_code_block(cell size, code_block_type type)
 {
-	heap_block *block = code->heap_allot(size + sizeof(code_block));
+	heap_block *block = code->allocator->allot(size + sizeof(code_block));
 
 	/* If allocation failed, do a full GC and compact the code heap.
 	A full GC that occurs as a result of the data heap filling up does not
@@ -449,13 +449,13 @@ code_block *factor_vm::allot_code_block(cell size, code_block_type type)
 	if(block == NULL)
 	{
 		primitive_compact_gc();
-		block = code->heap_allot(size + sizeof(code_block));
+		block = code->allocator->allot(size + sizeof(code_block));
 
 		/* Insufficient room even after code GC, give up */
 		if(block == NULL)
 		{
 			cell used, total_free, max_free;
-			code->heap_usage(&used,&total_free,&max_free);
+			code->allocator->usage(&used,&total_free,&max_free);
 
 			print_string("Code heap stats:\n");
 			print_string("Used: "); print_cell(used); nl();

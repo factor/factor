@@ -3,7 +3,7 @@ namespace factor
 
 struct full_policy {
 	factor_vm *parent;
-	zone *tenured;
+	tenured_space *tenured;
 
 	full_policy(factor_vm *parent_) : parent(parent_), tenured(parent->data->tenured) {}
 
