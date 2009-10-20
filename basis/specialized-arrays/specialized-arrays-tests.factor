@@ -122,10 +122,6 @@ SPECIALIZED-ARRAY: fixed-string
 ! If the C type doesn't exist, don't generate a vocab
 SYMBOL: __does_not_exist__
 
-[ ] [
-    [ __does_not_exist__ specialized-array-vocab forget-vocab ] with-compilation-unit
-] unit-test
-
 [
     """
 IN: specialized-arrays.tests
@@ -151,4 +147,9 @@ SPECIALIZED-ARRAY: __does_not_exist__
     deferred?
 ] unit-test
 
-[ \ __does_not_exist__ forget ] with-compilation-unit
+[ ] [
+    [
+        \ __does_not_exist__ forget
+        __does_not_exist__ specialized-array-vocab forget-vocab
+    ] with-compilation-unit
+] unit-test
