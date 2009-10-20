@@ -24,15 +24,20 @@ M: x86 vector-regs float-regs ;
 
 HOOK: stack-reg cpu ( -- reg )
 
-HOOK: reserved-area-size cpu ( -- n )
+HOOK: reserved-stack-space cpu ( -- n )
+
+HOOK: extra-stack-space cpu ( stack-frame -- n )
 
 : stack@ ( n -- op ) stack-reg swap [+] ;
 
-: param@ ( n -- op ) reserved-area-size + stack@ ;
+: special@ ( n -- op )
+    stack-frame get extra-stack-space +
+    reserved-stack-space +
+    stack@ ;
 
-: spill@ ( n -- op ) spill-offset param@ ;
+: spill@ ( n -- op ) spill-offset special@ ;
 
-: gc-root@ ( n -- op ) gc-root-offset param@ ;
+: gc-root@ ( n -- op ) gc-root-offset special@ ;
 
 : decr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap SUB ] if ;
@@ -44,7 +49,11 @@ HOOK: reserved-area-size cpu ( -- n )
     os macosx? cpu x86.64? or [ 16 align ] when ;
 
 M: x86 stack-frame-size ( stack-frame -- i )
-    (stack-frame-size) 3 cells reserved-area-size + + align-stack ;
+    [ (stack-frame-size) ]
+    [ extra-stack-space ] bi +
+    reserved-stack-space +
+    3 cells +
+    align-stack ;
 
 ! Must be a volatile register not used for parameter passing, for safe
 ! use in calls in and out of C

@@ -25,6 +25,11 @@ M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
 M: x86.32 temp-reg ECX ;
 
+: local@ ( n -- op )
+    stack-frame get extra-stack-space dup 16 assert= + stack@ ;
+
+M: x86.32 extra-stack-space calls-vm?>> 16 0 ? ;
+
 M: x86.32 %mark-card
     drop HEX: ffffffff [+] card-mark <byte> MOV
     building get pop
@@ -57,7 +62,7 @@ M:: x86.32 %dispatch ( src temp -- )
 
 M: x86.32 pic-tail-reg EBX ;
 
-M: x86.32 reserved-area-size 4 cells ;
+M: x86.32 reserved-stack-space 4 cells ;
 
 M: x86.32 %alien-invoke 0 CALL rc-relative rel-dlsym ;
 
@@ -72,7 +77,7 @@ M: x86.32 return-struct-in-registers? ( c-type -- ? )
     and or ;
 
 : struct-return@ ( n -- operand )
-    [ next-stack@ ] [ stack-frame get params>> param@ ] if* ;
+    [ next-stack@ ] [ stack-frame get params>> local@ ] if* ;
 
 ! On x86, parameters are never passed in registers.
 M: int-regs return-reg drop EAX ;
@@ -98,7 +103,7 @@ M: x86.32 %prologue ( n -- )
 
 M: x86.32 %load-param-reg
     stack-params assert=
-    [ [ EAX ] dip param@ MOV ] dip
+    [ [ EAX ] dip local@ MOV ] dip
     stack@ EAX MOV ;
 
 M: x86.32 %save-param-reg 3drop ;
@@ -140,7 +145,7 @@ M: x86.32 %prepare-box-struct ( -- )
     ! Compute target address for value struct return
     EAX f struct-return@ LEA
     ! Store it as the first parameter
-    0 param@ EAX MOV ;
+    0 local@ EAX MOV ;
 
 M: x86.32 %box-small-struct ( c-type -- )
     #! Box a <= 8-byte struct returned in EAX:EDX. OS X only.
@@ -165,14 +170,14 @@ M: x86.32 %unbox ( n rep func -- )
     #! a parameter to a C function about to be called.
     call-unbox-func
     ! Store the return value on the C stack
-    over [ [ param@ ] dip store-return-reg ] [ 2drop ] if ;
+    over [ [ local@ ] dip store-return-reg ] [ 2drop ] if ;
 
 M: x86.32 %unbox-long-long ( n func -- )
     call-unbox-func
     ! Store the return value on the C stack
     [
-        dup param@ EAX MOV
-        4 + param@ EDX MOV
+        [ local@ EAX MOV ]
+        [ 4 + local@ EDX MOV ] bi
     ] when* ;
 
 : %unbox-struct-1 ( -- )
@@ -203,7 +208,7 @@ M: x86 %unbox-small-struct ( size -- )
 M:: x86.32 %unbox-large-struct ( n c-type -- )
     ! Alien must be in EAX.
     ! Compute destination address
-    EDX n param@ LEA
+    EDX n local@ LEA
     12 save-vm-ptr
     8 stack@ c-type heap-size MOV
     4 stack@ EDX MOV
@@ -307,7 +312,7 @@ M: x86.32 %callback-return ( n -- )
     } cond RET ;
 
 M:: x86.32 %call-gc ( gc-root-count temp -- )
-    temp gc-root-base param@ LEA
+    temp gc-root-base special@ LEA
     8 save-vm-ptr
     4 stack@ gc-root-count MOV
     0 stack@ temp MOV
