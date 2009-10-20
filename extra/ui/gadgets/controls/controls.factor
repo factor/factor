@@ -1,7 +1,7 @@
 USING: accessors assocs arrays kernel models monads sequences
 models.combinators ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-ui.gadgets.buttons.private ui.gadgets.editors words images.loader
-ui.gadgets.scrollers ui.images vocabs.parser lexer
+ui.gadgets.buttons.private ui.gadgets.editors ui.gadgets.editors.private
+words images.loader ui.gadgets.scrollers ui.images vocabs.parser lexer
 models.range ui.gadgets.sliders ;
 QUALIFIED-WITH: ui.gadgets.sliders slider
 QUALIFIED-WITH: ui.gadgets.tables tbl

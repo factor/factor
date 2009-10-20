@@ -333,35 +333,29 @@ M: reg-class reg-class-full?
     [ alloc-stack-param ] [ alloc-fastcall-param ] if
     [ param-reg ] dip ;
 
-: (flatten-int-type) ( size -- seq )
-    cell /i "void*" c-type <repetition> ;
+: (flatten-int-type) ( type -- seq )
+    stack-size cell align cell /i void* c-type <repetition> ;
 
 GENERIC: flatten-value-type ( type -- types )
 
 M: object flatten-value-type 1array ;
-
-M: struct-c-type flatten-value-type ( type -- types )
-    stack-size cell align (flatten-int-type) ;
-
-M: long-long-type flatten-value-type ( type -- types )
-    stack-size cell align (flatten-int-type) ;
+M: struct-c-type flatten-value-type (flatten-int-type) ;
+M: long-long-type flatten-value-type (flatten-int-type) ;
+M: c-type-name flatten-value-type c-type flatten-value-type ;
 
 : flatten-value-types ( params -- params )
     #! Convert value type structs to consecutive void*s.
     [
         0 [
             c-type
-            [ parameter-align (flatten-int-type) % ] keep
+            [ parameter-align cell /i void* c-type <repetition> % ] keep
             [ stack-size cell align + ] keep
             flatten-value-type %
         ] reduce drop
     ] { } make ;
 
 : each-parameter ( parameters quot -- )
-    [ [ parameter-sizes nip ] keep ] dip 2each ; inline
-
-: reverse-each-parameter ( parameters quot -- )
-    [ [ parameter-sizes nip ] keep ] dip 2reverse-each ; inline
+    [ [ parameter-offsets nip ] keep ] dip 2each ; inline
 
 : reset-fastcall-counts ( -- )
     { int-regs float-regs stack-params } [ 0 swap set ] each ;
@@ -378,10 +372,17 @@ M: long-long-type flatten-value-type ( type -- types )
     [ '[ alloc-parameter _ execute ] ]
     bi* each-parameter ; inline
 
+: reverse-each-parameter ( parameters quot -- )
+    [ [ parameter-offsets nip ] keep ] dip 2reverse-each ; inline
+
+: prepare-unbox-parameters ( parameters -- offsets types indices )
+    [ parameter-offsets nip ] [ ] [ length iota reverse ] tri ;
+
 : unbox-parameters ( offset node -- )
-    parameters>> [
-        %prepare-unbox [ over + ] dip unbox-parameter
-    ] reverse-each-parameter drop ;
+    parameters>> swap
+    '[ prepare-unbox-parameters [ %prepare-unbox [ _ + ] dip unbox-parameter ] 3each ]
+    [ length neg %inc-d ]
+    bi ;
 
 : prepare-box-struct ( node -- offset )
     #! Return offset on C stack where to store unboxed
@@ -413,7 +414,7 @@ M: long-long-type flatten-value-type ( type -- types )
     ] if ;
 
 : stdcall-mangle ( symbol params -- symbol )
-    parameters>> parameter-sizes drop number>string "@" glue ;
+    parameters>> parameter-offsets drop number>string "@" glue ;
 
 : alien-invoke-dlsym ( params -- symbols dll )
     [ [ function>> dup ] keep stdcall-mangle 2array ]

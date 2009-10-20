@@ -463,7 +463,7 @@ HOOK: dummy-int-params? cpu ( -- ? )
 ! If t, all int parameters are shadowed by dummy FP parameters
 HOOK: dummy-fp-params? cpu ( -- ? )
 
-HOOK: %prepare-unbox cpu ( -- )
+HOOK: %prepare-unbox cpu ( n -- )
 
 HOOK: %unbox cpu ( n rep func -- )
 
