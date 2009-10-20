@@ -231,11 +231,6 @@ struct heap_block
 	{
 		header = (header & 0x7) | (size << 3);
 	}
-
-	inline heap_block *next()
-	{
-		return (heap_block *)((cell)this + size());
-	}
 };
 
 struct free_heap_block : public heap_block
