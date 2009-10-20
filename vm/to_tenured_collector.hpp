@@ -3,7 +3,7 @@ namespace factor
 
 struct to_tenured_policy {
 	factor_vm *myvm;
-	zone *tenured;
+	tenured_space *tenured;
 
 	to_tenured_policy(factor_vm *myvm_) : myvm(myvm_), tenured(myvm->data->tenured) {}
 

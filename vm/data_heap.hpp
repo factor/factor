@@ -10,7 +10,7 @@ struct data_heap {
 
 	segment *seg;
 
-	zone *nursery;
+	bump_allocator *nursery;
 	aging_space *aging;
 	aging_space *aging_semispace;
 	tenured_space *tenured;

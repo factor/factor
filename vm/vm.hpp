@@ -11,7 +11,7 @@ struct factor_vm
 	context *ctx;
 	
 	/* New objects are allocated here */
-	zone nursery;
+	bump_allocator nursery;
 
 	/* Add this to a shifted address to compute write barrier offsets */
 	cell cards_offset;
@@ -38,9 +38,6 @@ struct factor_vm
 	cell signal_fault_addr;
 	unsigned int signal_fpu_status;
 	stack_frame *signal_callstack_top;
-
-	/* Zeroes out deallocated memory; set by the -securegc command line argument */
-	bool secure_gc;
 
 	/* A heap walk allows useful things to be done, like finding all
 	   references to an object for debugging purposes. */
@@ -221,7 +218,7 @@ struct factor_vm
 	//data heap
 	void init_card_decks();
 	void set_data_heap(data_heap *data_);
-	void init_data_heap(cell young_size, cell aging_size, cell tenured_size, bool secure_gc_);
+	void init_data_heap(cell young_size, cell aging_size, cell tenured_size);
 	void primitive_size();
 	cell binary_payload_start(object *pointer);
 	void primitive_data_room();
@@ -311,7 +308,7 @@ struct factor_vm
 	void print_callstack();
 	void dump_cell(cell x);
 	void dump_memory(cell from, cell to);
-	void dump_zone(const char *name, zone *z);
+	void dump_zone(const char *name, bump_allocator *z);
 	void dump_generations();
 	void dump_objects(cell type);
 	void find_data_references_step(cell *scan);
@@ -531,7 +528,7 @@ struct factor_vm
 	template<typename Iterator> void iterate_code_heap(Iterator &iter_)
 	{
 		code_heap_iterator<Iterator> iter(iter_);
-		code->iterate_heap(iter);
+		code->allocator->iterate(iter);
 	}
 
 	//callbacks

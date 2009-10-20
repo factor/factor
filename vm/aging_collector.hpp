@@ -3,7 +3,8 @@ namespace factor
 
 struct aging_policy {
 	factor_vm *parent;
-	zone *aging, *tenured;
+	aging_space *aging;
+	tenured_space *tenured;
 
 	aging_policy(factor_vm *parent_) :
 		parent(parent_),
