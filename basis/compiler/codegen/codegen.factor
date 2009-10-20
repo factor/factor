@@ -355,10 +355,7 @@ M: c-type-name flatten-value-type c-type flatten-value-type ;
     ] { } make ;
 
 : each-parameter ( parameters quot -- )
-    [ [ parameter-sizes nip ] keep ] dip 2each ; inline
-
-: reverse-each-parameter ( parameters quot -- )
-    [ [ parameter-sizes nip ] keep ] dip 2reverse-each ; inline
+    [ [ parameter-offsets nip ] keep ] dip 2each ; inline
 
 : reset-fastcall-counts ( -- )
     { int-regs float-regs stack-params } [ 0 swap set ] each ;
@@ -375,10 +372,17 @@ M: c-type-name flatten-value-type c-type flatten-value-type ;
     [ '[ alloc-parameter _ execute ] ]
     bi* each-parameter ; inline
 
+: reverse-each-parameter ( parameters quot -- )
+    [ [ parameter-offsets nip ] keep ] dip 2reverse-each ; inline
+
+: prepare-unbox-parameters ( parameters -- offsets types indices )
+    [ parameter-offsets nip ] [ ] [ length iota reverse ] tri ;
+
 : unbox-parameters ( offset node -- )
-    parameters>> [
-        %prepare-unbox [ over + ] dip unbox-parameter
-    ] reverse-each-parameter drop ;
+    parameters>> swap
+    '[ prepare-unbox-parameters [ %prepare-unbox [ _ + ] dip unbox-parameter ] 3each ]
+    [ length neg %inc-d ]
+    bi ;
 
 : prepare-box-struct ( node -- offset )
     #! Return offset on C stack where to store unboxed
@@ -410,7 +414,7 @@ M: c-type-name flatten-value-type c-type flatten-value-type ;
     ] if ;
 
 : stdcall-mangle ( symbol params -- symbol )
-    parameters>> parameter-sizes drop number>string "@" glue ;
+    parameters>> parameter-offsets drop number>string "@" glue ;
 
 : alien-invoke-dlsym ( params -- symbols dll )
     [ [ function>> dup ] keep stdcall-mangle 2array ]

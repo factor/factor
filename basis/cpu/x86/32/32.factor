@@ -151,9 +151,7 @@ M: x86.32 %box-small-struct ( c-type -- )
     "box_small_struct" f %alien-invoke ;
 
 M: x86.32 %prepare-unbox ( -- )
-    #! Move top of data stack to EAX.
-    EAX ESI [] MOV
-    ESI 4 SUB ;
+    EAX swap ds-reg reg-stack MOV ;
 
 : call-unbox-func ( func -- )
     4 save-vm-ptr
@@ -238,8 +236,7 @@ M: x86.32 %alien-callback ( quot -- )
     "c_to_factor" f %alien-invoke ;
 
 M: x86.32 %callback-value ( ctype -- )
-    ! Save top of data stack in non-volatile register
-    %prepare-unbox
+    0 %prepare-unbox
     4 stack@ EAX MOV
     0 save-vm-ptr
     ! Restore data/call/retain stacks

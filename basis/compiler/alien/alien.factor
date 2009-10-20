@@ -20,8 +20,7 @@ IN: compiler.alien
 : parameter-align ( n type -- n delta )
     [ c-type-stack-align align dup ] [ drop ] 2bi - ;
 
-: parameter-sizes ( types -- total offsets )
-    #! Compute stack frame locations.
+: parameter-offsets ( types -- total offsets )
     [
         0 [
             [ parameter-align drop dup , ] keep stack-size +
