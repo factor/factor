@@ -17,7 +17,7 @@ CONSTANT: deck-bits 18
 : string-offset ( -- n ) 4 string tag-number slot-offset ; inline
 : string-aux-offset ( -- n ) 2 string tag-number slot-offset ; inline
 : profile-count-offset ( -- n ) 8 \ word tag-number slot-offset ; inline
-: byte-array-offset ( -- n ) 2 byte-array tag-number slot-offset ; inline
+: byte-array-offset ( -- n ) 16 byte-array tag-number - ; inline
 : alien-offset ( -- n ) 3 alien tag-number slot-offset ; inline
 : underlying-alien-offset ( -- n ) 1 alien tag-number slot-offset ; inline
 : tuple-class-offset ( -- n ) 1 tuple tag-number slot-offset ; inline

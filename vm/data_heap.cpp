@@ -119,7 +119,7 @@ cell factor_vm::object_size(cell tagged)
 /* Size of the object pointed to by an untagged pointer */
 cell factor_vm::untagged_object_size(object *pointer)
 {
-	return align8(unaligned_object_size(pointer));
+	return align(unaligned_object_size(pointer),data_alignment);
 }
 
 /* Size of the data area of an object pointed to by an untagged pointer */

@@ -374,7 +374,7 @@ M: ppc %set-alien-double -rot STFD ;
     [ drop load-zone-ptr ] [ swap 0 LWZ ] 2bi ;
 
 :: inc-allot-ptr ( nursery-ptr allot-ptr n -- )
-    scratch-reg allot-ptr n 8 align ADDI
+    scratch-reg allot-ptr n data-alignment get align ADDI
     scratch-reg nursery-ptr 0 STW ;
 
 :: store-header ( dst class -- )

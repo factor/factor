@@ -298,7 +298,7 @@ struct factor_vm
 	}
 
 	// generic arrays
-	template<typename Array> Array *allot_array_internal(cell capacity);
+	template<typename Array> Array *allot_uninitialized_array(cell capacity);
 	template<typename Array> bool reallot_array_in_place_p(Array *array, cell capacity);
 	template<typename Array> Array *reallot_array(Array *array_, cell capacity);
 

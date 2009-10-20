@@ -4,6 +4,8 @@ USING: namespaces math words kernel assocs classes
 math.order kernel.private ;
 IN: layouts
 
+SYMBOL: data-alignment
+
 SYMBOL: tag-mask
 
 SYMBOL: num-tags
