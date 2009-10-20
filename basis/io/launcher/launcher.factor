@@ -75,7 +75,7 @@ SYMBOL: wait-flag
 [
     H{ } clone processes set-global
     start-wait-thread
-] "io.launcher" add-init-hook
+] "io.launcher" add-startup-hook
 
 : process-started ( process handle -- )
     >>handle

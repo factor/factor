@@ -100,4 +100,4 @@ FUNCTION: void NSUpdateDynamicServices ;
     install-app-delegate
     "Factor.nib" load-nib
     register-services
-] cocoa-init-hook set-global
+] cocoa-startup-hook set-global

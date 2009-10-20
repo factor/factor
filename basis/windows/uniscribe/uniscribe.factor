@@ -114,4 +114,7 @@ SYMBOL: cached-script-strings
     cached-script-strings get-global [ <script-string> ] 2cache ;
 
 [ <cache-assoc> cached-script-strings set-global ]
-"windows.uniscribe" add-init-hook
+"windows.uniscribe" add-startup-hook
+
+[ cached-script-strings get-global dispose ]
+"windows.uniscribe" add-shutdown-hook

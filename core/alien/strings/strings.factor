@@ -69,5 +69,4 @@ M: sequence string>symbol [ string>symbol* ] map ;
 [
     8 getenv utf8 alien>string string>cpu \ cpu set-global
     9 getenv utf8 alien>string string>os \ os set-global
-] "alien.strings" add-init-hook
-
+] "alien.strings" add-startup-hook

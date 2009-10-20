@@ -127,4 +127,4 @@ MEMO: (cache-font-metrics) ( font -- metrics )
 [
     \ (cache-font) reset-memoized
     \ (cache-font-metrics) reset-memoized
-] "core-text.fonts" add-init-hook
+] "core-text.fonts" add-startup-hook
