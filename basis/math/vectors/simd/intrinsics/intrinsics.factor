@@ -163,8 +163,8 @@ M: vector-rep supported-simd-op?
         { \ (simd-v*)            [ %mul-vector-reps            ] }
         { \ (simd-vs*)           [ %saturated-mul-vector-reps  ] }
         { \ (simd-v/)            [ %div-vector-reps            ] }
-        { \ (simd-vmin)          [ %min-vector-reps            ] }
-        { \ (simd-vmax)          [ %max-vector-reps            ] }
+        { \ (simd-vmin)          [ %min-vector-reps cc< %compare-vector-reps union ] }
+        { \ (simd-vmax)          [ %max-vector-reps cc> %compare-vector-reps union ] }
         { \ (simd-v.)            [ %dot-vector-reps            ] }
         { \ (simd-vsqrt)         [ %sqrt-vector-reps           ] }
         { \ (simd-sum)           [ %horizontal-add-vector-reps ] }
