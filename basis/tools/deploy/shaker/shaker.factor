@@ -23,9 +23,9 @@ IN: tools.deploy.shaker
 
 : add-command-line-hook ( -- )
     [ (command-line) command-line set-global ] "command-line"
-    init-hooks get set-at ;
+    startup-hooks get set-at ;
 
-: strip-init-hooks ( -- )
+: strip-startup-hooks ( -- )
     "Stripping startup hooks" show
     {
         "alien.strings"
@@ -34,17 +34,17 @@ IN: tools.deploy.shaker
         "environment"
         "libc"
     }
-    [ init-hooks get delete-at ] each
+    [ startup-hooks get delete-at ] each
     deploy-threads? get [
-        "threads" init-hooks get delete-at
+        "threads" startup-hooks get delete-at
     ] unless
     native-io? [
-        "io.thread" init-hooks get delete-at
+        "io.thread" startup-hooks get delete-at
     ] unless
     strip-io? [
-        "io.files" init-hooks get delete-at
-        "io.backend" init-hooks get delete-at
-        "io.thread" init-hooks get delete-at
+        "io.files" startup-hooks get delete-at
+        "io.backend" startup-hooks get delete-at
+        "io.thread" startup-hooks get delete-at
     ] when
     strip-dictionary? [
         {
@@ -52,7 +52,7 @@ IN: tools.deploy.shaker
             "vocabs"
             "vocabs.cache"
             "source-files.errors"
-        } [ init-hooks get delete-at ] each
+        } [ startup-hooks get delete-at ] each
     ] when ;
 
 : strip-debugger ( -- )
@@ -293,7 +293,7 @@ IN: tools.deploy.shaker
             continuations:error-continuation
             continuations:error-thread
             continuations:restarts
-            init:init-hooks
+            init:startup-hooks
             source-files:source-files
             input-stream
             output-stream
@@ -448,7 +448,7 @@ SYMBOL: deploy-vocab
 : deploy-boot-quot ( word -- )
     [
         [ boot ] %
-        init-hooks get values concat %
+        startup-hooks get values concat %
         strip-debugger? [ , ] [
             ! Don't reference 'try' directly since we don't want
             ! to pull in the debugger and prettyprinter into every
@@ -467,7 +467,7 @@ SYMBOL: deploy-vocab
     ] [ ] make
     set-boot-quot ;
 
-: init-stripper ( -- )
+: startup-stripper ( -- )
     t "quiet" set-global
     f output-stream set-global ;
 
@@ -506,7 +506,7 @@ SYMBOL: deploy-vocab
     [ clear-megamorphic-cache ] each ;
 
 : strip ( -- )
-    init-stripper
+    startup-stripper
     strip-libc
     strip-destructors
     strip-call
@@ -514,7 +514,7 @@ SYMBOL: deploy-vocab
     strip-debugger
     strip-specialized-arrays
     compute-next-methods
-    strip-init-hooks
+    strip-startup-hooks
     add-command-line-hook
     strip-c-io
     strip-default-methods
