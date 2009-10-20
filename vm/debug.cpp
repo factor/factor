@@ -295,7 +295,7 @@ void factor_vm::dump_code_heap()
 	while(scan != end)
 	{
 		const char *status;
-		if(scan->type() == FREE_BLOCK_TYPE)
+		if(scan->free_p())
 			status = "free";
 		else if(code->state->is_marked_p(scan))
 		{

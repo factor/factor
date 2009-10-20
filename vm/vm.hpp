@@ -498,8 +498,8 @@ struct factor_vm
 	void check_code_address(cell address);
 	void relocate_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
-	code_block *allot_code_block(cell size, cell type);
-	code_block *add_code_block(cell type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_);
+	code_block *allot_code_block(cell size, code_block_type type);
+	code_block *add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_);
 
 	//code heap
 	inline void check_code_pointer(cell ptr)

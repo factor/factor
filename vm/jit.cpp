@@ -10,7 +10,7 @@ namespace factor
 - polymorphic inline caches (inline_cache.cpp) */
 
 /* Allocates memory */
-jit::jit(cell type_, cell owner_, factor_vm *vm)
+jit::jit(code_block_type type_, cell owner_, factor_vm *vm)
 	: type(type_),
 	  owner(owner_,vm),
 	  code(vm),

@@ -27,23 +27,34 @@ struct tagged
 			return tag;
 	}
 
-	bool type_p(cell type_) const { return type() == type_; }
+	bool type_p(cell type_) const
+	{
+		return type() == type_;
+	}
+
+	bool type_p() const
+	{
+		if(Type::type_number == TYPE_COUNT)
+			return true;
+		else
+			return type_p(Type::type_number);
+	}
 
 	Type *untag_check(factor_vm *parent) const {
-		if(Type::type_number != TYPE_COUNT && !type_p(Type::type_number))
+		if(!type_p())
 			parent->type_error(Type::type_number,value_);
 		return untagged();
 	}
 
 	explicit tagged(cell tagged) : value_(tagged) {
 #ifdef FACTOR_DEBUG
-		untag_check(tls_vm());
+		assert(type_p());
 #endif
 	}
 
 	explicit tagged(Type *untagged) : value_(factor::tag(untagged)) {
 #ifdef FACTOR_DEBUG
-		untag_check(tls_vm()); 
+		assert(type_p());
 #endif
 	}
 

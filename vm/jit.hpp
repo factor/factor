@@ -2,7 +2,7 @@ namespace factor
 {
 
 struct jit {
-	cell type;
+	code_block_type type;
 	gc_root<object> owner;
 	growable_byte_array code;
 	growable_byte_array relocation;
@@ -12,7 +12,7 @@ struct jit {
 	cell offset;
 	factor_vm *parent;
 
-	explicit jit(cell jit_type, cell owner, factor_vm *vm);
+	explicit jit(code_block_type type, cell owner, factor_vm *parent);
 	void compute_position(cell offset);
 
 	void emit_relocation(cell code_template);
