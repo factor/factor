@@ -515,3 +515,48 @@ M: ##scalar>vector rewrite
 M: ##xor-vector rewrite
     dup [ src1>> vreg>vn ] [ src2>> vreg>vn ] bi eq?
     [ [ dst>> ] [ rep>> ] bi \ ##zero-vector new-insn ] [ drop f ] if ;
+
+: vector-not? ( expr -- ? )
+    {
+        [ not-vector-expr? ]
+        [ {
+            [ xor-vector-expr? ]
+            [ [ src1>> ] [ src2>> ] bi [ vn>expr fill-vector-expr? ] either? ]
+        } 1&& ]
+    } 1|| ;
+
+GENERIC: vector-not-src ( expr -- vreg )
+M: not-vector-expr vector-not-src src>> vn>vreg ;
+M: xor-vector-expr vector-not-src
+    dup src1>> vn>expr fill-vector-expr? [ src2>> ] [ src1>> ] if vn>vreg ;
+
+M: ##and-vector rewrite 
+    {
+        { [ dup src1>> vreg>expr vector-not? ] [
+            {
+                [ dst>> ]
+                [ src1>> vreg>expr vector-not-src ]
+                [ src2>> ]
+                [ rep>> ]
+            } cleave \ ##andn-vector new-insn
+        ] }
+        { [ dup src2>> vreg>expr vector-not? ] [
+            {
+                [ dst>> ]
+                [ src2>> vreg>expr vector-not-src ]
+                [ src1>> ]
+                [ rep>> ]
+            } cleave \ ##andn-vector new-insn
+        ] }
+        [ drop f ]
+    } cond ;
+
+M: ##andn-vector rewrite
+    dup src1>> vreg>expr vector-not? [
+        {
+            [ dst>> ]
+            [ src1>> vreg>expr vector-not-src ]
+            [ src2>> ]
+            [ rep>> ]
+        } cleave \ ##and-vector new-insn
+    ] [ drop f ] if ;
