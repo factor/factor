@@ -9,7 +9,7 @@ $nl
     builtin-class
     builtin-class?
 }
-"See " { $link "type-index" } " for a list of built-in classes." ;
+"See " { $link "class-index" } " for a list of built-in classes." ;
 
 HELP: builtin-class
 { $class-description "The class of built-in classes." }
