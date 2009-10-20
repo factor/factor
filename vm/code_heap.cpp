@@ -144,7 +144,7 @@ void factor_vm::primitive_modify_code_heap()
 				cell code = array_nth(compiled_data,4);
 
 				code_block *compiled = add_code_block(
-					WORD_TYPE,
+					code_block_optimized,
 					code,
 					labels,
 					owner,

@@ -62,8 +62,14 @@ inline static cell align8(cell a)
 #define TYPE_COUNT 15
 
 /* Not real types, but code_block's type can be set to this */
-#define PIC_TYPE 16
-#define FREE_BLOCK_TYPE 17
+
+enum code_block_type
+{
+	code_block_unoptimized,
+	code_block_optimized,
+	code_block_profiling,
+	code_block_pic
+};
 
 /* Constants used when floating-point trap exceptions are thrown */
 enum
@@ -201,16 +207,29 @@ struct heap_block
 {
 	cell header;
 
-	cell type() { return (header >> 1) & 0x1f; }
-	void set_type(cell type)
+	bool free_p()
 	{
-		header = ((header & ~(0x1f << 1)) | (type << 1));
+		return header & 1 == 1;
 	}
 
-	cell size() { return (header >> 6); }
+	void set_free()
+	{
+		header |= 1;
+	}
+
+	void clear_free()
+	{
+		header &= ~1;
+	}
+
+	cell size()
+	{
+		return header >> 3;
+	}
+
 	void set_size(cell size)
 	{
-		header = (header & 0x2f) | (size << 6);
+		header = (header & 0x7) | (size << 3);
 	}
 
 	inline heap_block *next()
@@ -230,7 +249,30 @@ struct code_block : public heap_block
 	cell literals; /* tagged pointer to array or f */
 	cell relocation; /* tagged pointer to byte-array or f */
 
-	void *xt() { return (void *)(this + 1); }
+	void *xt()
+	{
+		return (void *)(this + 1);
+	}
+
+	cell type()
+	{
+		return (header >> 1) & 0x3;
+	}
+
+	void set_type(code_block_type type)
+	{
+		header = ((header & ~0x7) | (type << 1));
+	}
+
+	bool pic_p()
+	{
+		return type() == code_block_pic;
+	}
+
+	bool optimized_p()
+	{
+		return type() == code_block_optimized;
+	}
 };
 
 /* Assembly code makes assumptions about the layout of this struct */

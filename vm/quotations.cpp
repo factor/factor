@@ -335,7 +335,7 @@ void factor_vm::compile_all_words()
 	{
 		gc_root<word> word(array_nth(words.untagged(),i),this);
 
-		if(!word->code || !word_optimized_p(word.untagged()))
+		if(!word->code || !word->code->optimized_p())
 			jit_compile_word(word.value(),word->def,false);
 
 		update_word_xt(word.value());

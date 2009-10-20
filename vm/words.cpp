@@ -82,7 +82,8 @@ void factor_vm::update_word_xt(cell w_)
 
 void factor_vm::primitive_optimized_p()
 {
-	drepl(tag_boolean(word_optimized_p(untag_check<word>(dpeek()))));
+	word *w = untag_check<word>(dpeek());
+	drepl(tag_boolean(w->code->optimized_p()));
 }
 
 void factor_vm::primitive_wrapper()
