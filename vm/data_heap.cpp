@@ -93,6 +93,8 @@ cell factor_vm::object_size(cell tagged)
 /* Size of the object pointed to by an untagged pointer */
 cell object::size()
 {
+	if(free_p()) return ((free_heap_block *)this)->size();
+
 	switch(h.hi_tag())
 	{
 	case ARRAY_TYPE:

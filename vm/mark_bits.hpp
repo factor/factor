@@ -4,8 +4,7 @@ namespace factor
 const int block_granularity = 16;
 const int forwarding_granularity = 64;
 
-template<typename Block, typename HeapLayout> struct mark_bits {
-	HeapLayout layout;
+template<typename Block> struct mark_bits {
 	cell start;
 	cell size;
 	cell bits_size;
@@ -72,7 +71,7 @@ template<typename Block, typename HeapLayout> struct mark_bits {
 
 	Block *next_block_after(Block *block)
 	{
-		return (Block *)((cell)block + layout.block_size(block));
+		return (Block *)((cell)block + block->size());
 	}
 
 	void set_bitmap_range(u64 *bits, Block *address)
@@ -146,12 +145,12 @@ template<typename Block, typename HeapLayout> struct mark_bits {
 	}
 };
 
-template<typename Block, typename HeapLayout, typename Iterator> struct heap_compactor {
-	mark_bits<Block,HeapLayout> *state;
+template<typename Block, typename Iterator> struct heap_compactor {
+	mark_bits<Block> *state;
 	char *address;
 	Iterator &iter;
 
-	explicit heap_compactor(mark_bits<Block,HeapLayout> *state_, Block *address_, Iterator &iter_) :
+	explicit heap_compactor(mark_bits<Block> *state_, Block *address_, Iterator &iter_) :
 		state(state_), address((char *)address_), iter(iter_) {}
 
 	void operator()(Block *block, cell size)

@@ -113,7 +113,7 @@ scan_next_object:				{
 								card_end_address(card_index));
 							if(end < card_end_address(card_index))
 							{
-								start = gen->next_object_after(start);
+								start = gen->next_allocated_block_after(start);
 								if(start)
 								{
 									binary_start = start + this->parent->binary_payload_start((object *)start);
@@ -158,7 +158,7 @@ end:		this->parent->gc_stats.card_scan_time += (current_micros() - start_time);
 		while(scan && scan < this->target->here)
 		{
 			this->trace_slots((object *)scan);
-			scan = this->target->next_object_after(scan);
+			scan = this->target->next_allocated_block_after(scan);
 		}
 	}
 };
