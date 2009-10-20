@@ -681,7 +681,9 @@ M: ppc %callback-value ( ctype -- )
     ! Unbox former top of data stack to return registers
     unbox-return ;
 
-M: ppc small-enough? ( n -- ? ) -32768 32767 between? ;
+M: ppc immediate-arithmetic? ( n -- ? ) -32768 32767 between? ;
+
+M: ppc immediate-bitwise? ( n -- ? ) 0 65535 between? ;
 
 M: ppc return-struct-in-registers? ( c-type -- ? )
     c-type return-in-registers?>> ;

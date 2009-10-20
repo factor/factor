@@ -33,7 +33,7 @@ ARTICLE: "first-program-logic" "Writing some logic in your first program"
 $nl
 "In order to be able to call the words defined in the " { $snippet "palindrome" } " vocabulary, you need to issue the following command in the listener:"
 { $code "USE: palindrome" }
-"Now, we will be making some additions to the file. Since the file was loaded by the scaffold tool in the previous step, you need to tell Factor to reload it if it changes. Factor has a handy feature for this; pressing " { $command tool "common" refresh-all } " in the listener window will reload any changed source files. You can also force a single vocabulary to reload:"
+"Now, we will be making some additions to the file. Since the file was loaded by the scaffold tool in the previous step, you need to tell Factor to reload it if it changes. Factor has a handy feature for this; pressing " { $command tool "common" refresh-all } " in the listener window will reload any changed source files. You can also force a single vocabulary to reload, in case the refresh feature does not pick up changes from disk:"
 { $code "\"palindrome\" reload" }
 "We will now write our first word using " { $link POSTPONE: : } ". This word will test if a string is a palindrome; it will take a string as input, and give back a boolean as output. We will call this word " { $snippet "palindrome?" } ", following a naming convention that words returning booleans have names ending with " { $snippet "?" } "."
 $nl
