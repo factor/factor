@@ -265,3 +265,16 @@ MACRO: if-literals-match ( quots -- )
         ]
     } cond ;
 
+: generate-min-vector ( src1 src2 rep -- dst )
+    dup %min-vector-reps member?
+    [ ^^min-vector ] [
+        [ cc< generate-compare-vector ]
+        [ generate-blend-vector ] 3bi
+    ] if ;
+
+: generate-max-vector ( src1 src2 rep -- dst )
+    dup %max-vector-reps member?
+    [ ^^max-vector ] [
+        [ cc> generate-compare-vector ]
+        [ generate-blend-vector ] 3bi
+    ] if ;
