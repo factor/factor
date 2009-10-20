@@ -1,19 +1,6 @@
 namespace factor
 {
 
-struct tenured_space_layout {
-	cell block_size(object *block)
-	{
-		if(block->free_p())
-		{
-			free_heap_block *free_block = (free_heap_block *)block;
-			return free_block->size();
-		}
-		else
-			return block->size();
-	}
-};
-
 struct tenured_space : zone {
 	object_start_map starts;
 

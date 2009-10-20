@@ -8,12 +8,11 @@ struct heap_free_list {
 	free_heap_block *large_blocks;
 };
 
-template<typename Block, typename HeapLayout> struct heap {
+template<typename Block> struct heap {
 	bool secure_gc;
 	segment *seg;
 	heap_free_list free;
-	mark_bits<Block,HeapLayout> *state;
-	HeapLayout layout;
+	mark_bits<Block> *state;
 
 	explicit heap(bool secure_gc_, cell size, bool executable_p);
 	~heap();
@@ -30,7 +29,7 @@ template<typename Block, typename HeapLayout> struct heap {
 
 	Block *next_block_after(heap_block *block)
 	{
-		return (Block *)((cell)block + layout.block_size(block));
+		return (Block *)((cell)block + block->size());
 	}
 
 	void clear_free_list();
@@ -55,31 +54,29 @@ template<typename Block, typename HeapLayout> struct heap {
 
 		while(scan != end)
 		{
-			Block *next = next_block_after(scan);
-			if(!scan->free_p()) iter(scan,layout.block_size(scan));
+			cell size = scan->size();
+			Block *next = (Block *)((cell)scan + size);
+			if(!scan->free_p()) iter(scan,size);
 			scan = next;
 		}
 	}
 };
 
-template<typename Block, typename HeapLayout>
-void heap<Block,HeapLayout>::clear_free_list()
+template<typename Block> void heap<Block>::clear_free_list()
 {
 	memset(&free,0,sizeof(heap_free_list));
 }
 
-template<typename Block, typename HeapLayout>
-heap<Block,HeapLayout>::heap(bool secure_gc_, cell size, bool executable_p) : secure_gc(secure_gc_)
+template<typename Block> heap<Block>::heap(bool secure_gc_, cell size, bool executable_p) : secure_gc(secure_gc_)
 {
 	if(size > (1L << (sizeof(cell) * 8 - 6))) fatal_error("Heap too large",size);
 	seg = new segment(align_page(size),executable_p);
 	if(!seg) fatal_error("Out of memory in heap allocator",size);
-	state = new mark_bits<Block,HeapLayout>(seg->start,size);
+	state = new mark_bits<Block>(seg->start,size);
 	clear_free_list();
 }
 
-template<typename Block, typename HeapLayout>
-heap<Block,HeapLayout>::~heap()
+template<typename Block> heap<Block>::~heap()
 {
 	delete seg;
 	seg = NULL;
@@ -87,8 +84,7 @@ heap<Block,HeapLayout>::~heap()
 	state = NULL;
 }
 
-template<typename Block, typename HeapLayout>
-void heap<Block,HeapLayout>::add_to_free_list(free_heap_block *block)
+template<typename Block> void heap<Block>::add_to_free_list(free_heap_block *block)
 {
 	if(block->size() < free_list_count * block_granularity)
 	{
@@ -105,8 +101,7 @@ void heap<Block,HeapLayout>::add_to_free_list(free_heap_block *block)
 
 /* Called after reading the code heap from the image file, and after code heap
 compaction. Makes a free list consisting of one free block, at the very end. */
-template<typename Block, typename HeapLayout>
-void heap<Block,HeapLayout>::build_free_list(cell size)
+template<typename Block> void heap<Block>::build_free_list(cell size)
 {
 	clear_free_list();
 	free_heap_block *end = (free_heap_block *)(seg->start + size);
@@ -115,16 +110,14 @@ void heap<Block,HeapLayout>::build_free_list(cell size)
 	add_to_free_list(end);
 }
 
-template<typename Block, typename HeapLayout>
-void heap<Block,HeapLayout>::assert_free_block(free_heap_block *block)
+template<typename Block> void heap<Block>::assert_free_block(free_heap_block *block)
 {
 #ifdef FACTOR_DEBUG
 	assert(block->free_p());
 #endif
 }
 
-template<typename Block, typename HeapLayout>
-free_heap_block *heap<Block,HeapLayout>::find_free_block(cell size)
+template<typename Block> free_heap_block *heap<Block>::find_free_block(cell size)
 {
 	cell attempt = size;
 
@@ -164,8 +157,7 @@ free_heap_block *heap<Block,HeapLayout>::find_free_block(cell size)
 	return NULL;
 }
 
-template<typename Block, typename HeapLayout>
-free_heap_block *heap<Block,HeapLayout>::split_free_block(free_heap_block *block, cell size)
+template<typename Block> free_heap_block *heap<Block>::split_free_block(free_heap_block *block, cell size)
 {
 	if(block->size() != size)
 	{
@@ -181,8 +173,7 @@ free_heap_block *heap<Block,HeapLayout>::split_free_block(free_heap_block *block
 	return block;
 }
 
-template<typename Block, typename HeapLayout>
-Block *heap<Block,HeapLayout>::heap_allot(cell size)
+template<typename Block> Block *heap<Block>::heap_allot(cell size)
 {
 	size = align(size,block_granularity);
 
@@ -196,23 +187,20 @@ Block *heap<Block,HeapLayout>::heap_allot(cell size)
 		return NULL;
 }
 
-template<typename Block, typename HeapLayout>
-void heap<Block,HeapLayout>::heap_free(Block *block)
+template<typename Block> void heap<Block>::heap_free(Block *block)
 {
 	free_heap_block *free_block = (free_heap_block *)block;
 	free_block->set_free();
 	add_to_free_list(free_block);
 }
 
-template<typename Block, typename HeapLayout>
-void heap<Block,HeapLayout>::mark_block(Block *block)
+template<typename Block> void heap<Block>::mark_block(Block *block)
 {
 	state->set_marked_p(block);
 }
 
 /* Compute total sum of sizes of free blocks, and size of largest free block */
-template<typename Block, typename HeapLayout>
-void heap<Block,HeapLayout>::heap_usage(cell *used, cell *total_free, cell *max_free)
+template<typename Block> void heap<Block>::heap_usage(cell *used, cell *total_free, cell *max_free)
 {
 	*used = 0;
 	*total_free = 0;
@@ -223,7 +211,7 @@ void heap<Block,HeapLayout>::heap_usage(cell *used, cell *total_free, cell *max_
 
 	while(scan != end)
 	{
-		cell size = layout.block_size(scan);
+		cell size = scan->size();
 
 		if(scan->free_p())
 		{
@@ -239,8 +227,7 @@ void heap<Block,HeapLayout>::heap_usage(cell *used, cell *total_free, cell *max_
 }
 
 /* The size of the heap after compaction */
-template<typename Block, typename HeapLayout>
-cell heap<Block,HeapLayout>::heap_size()
+template<typename Block> cell heap<Block>::heap_size()
 {
 	Block *scan = first_block();
 	Block *end = last_block();
@@ -255,7 +242,7 @@ cell heap<Block,HeapLayout>::heap_size()
 	{
 		free_heap_block *free_block = (free_heap_block *)scan;
 		assert(free_block->free_p());
-		assert((cell)scan + scan->size() == seg->end);
+		assert((cell)scan + free_block->size() == seg->end);
 
 		return (cell)scan - (cell)first_block();
 	}
@@ -265,9 +252,9 @@ cell heap<Block,HeapLayout>::heap_size()
 
 /* After code GC, all live code blocks are marked, so any
 which are not marked can be reclaimed. */
-template<typename Block, typename HeapLayout>
+template<typename Block>
 template<typename Iterator>
-void heap<Block,HeapLayout>::sweep_heap(Iterator &iter)
+void heap<Block>::sweep_heap(Iterator &iter)
 {
 	this->clear_free_list();
 
@@ -277,14 +264,14 @@ void heap<Block,HeapLayout>::sweep_heap(Iterator &iter)
 
 	while(scan != end)
 	{
+		cell size = scan->size();
+
 		if(scan->free_p())
 		{
-			free_heap_block *free_scan = (free_heap_block *)scan;
-
 			if(prev && prev->free_p())
 			{
 				free_heap_block *free_prev = (free_heap_block *)prev;
-				free_prev->set_size(free_prev->size() + free_scan->size());
+				free_prev->set_size(free_prev->size() + size);
 			}
 			else
 				prev = scan;
@@ -294,17 +281,14 @@ void heap<Block,HeapLayout>::sweep_heap(Iterator &iter)
 			if(prev && prev->free_p())
 				this->add_to_free_list((free_heap_block *)prev);
 			prev = scan;
-			iter(scan,layout.block_size(scan));
+			iter(scan,size);
 		}
 		else
 		{
-			if(secure_gc)
-				memset(scan + 1,0,layout.block_size(scan) - sizeof(heap_block));
-
 			if(prev && prev->free_p())
 			{
 				free_heap_block *free_prev = (free_heap_block *)prev;
-				free_prev->set_size(free_prev->size() + layout.block_size(scan));
+				free_prev->set_size(free_prev->size() + size);
 			}
 			else
 			{
@@ -313,7 +297,7 @@ void heap<Block,HeapLayout>::sweep_heap(Iterator &iter)
 			}
 		}
 
-		scan = next_block_after(scan);
+		scan = (Block *)((cell)scan + size);
 	}
 
 	if(prev && prev->free_p())
@@ -322,11 +306,11 @@ void heap<Block,HeapLayout>::sweep_heap(Iterator &iter)
 
 /* The forwarding map must be computed first by calling
 state->compute_forwarding(). */
-template<typename Block, typename HeapLayout>
+template<typename Block>
 template<typename Iterator>
-void heap<Block,HeapLayout>::compact_heap(Iterator &iter)
+void heap<Block>::compact_heap(Iterator &iter)
 {
-	heap_compactor<Block,HeapLayout,Iterator> compactor(state,first_block(),iter);
+	heap_compactor<Block,Iterator> compactor(state,first_block(),iter);
 	this->iterate_heap(compactor);
 
 	/* Now update the free list; there will be a single free block at

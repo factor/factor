@@ -100,7 +100,7 @@ void full_collector::cheneys_algorithm()
 		object *obj = (object *)scan;
 		this->trace_slots(obj);
 		this->mark_object_code_block(obj);
-		scan = target->next_object_after(scan);
+		scan = target->next_allocated_block_after(scan);
 	}
 }
 
