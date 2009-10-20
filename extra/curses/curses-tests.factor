@@ -1,17 +1,17 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors curses kernel threads tools.test ;
+USING: accessors calendar curses kernel threads tools.test
+strings sequences ;
 IN: curses.tests
 
 : hello-curses ( -- )
-    [
-        curses-window new
-            "mainwin" >>name
-        add-curses-window
+    <curses-window> [
+        "Hello Curses!" [
+            dup curses-move curses-addch
+        ] each-index
+        curses-refresh
 
-        "mainwin" "hi" curses-printf
-
-        2000000 sleep
+        2 seconds sleep
     ] with-curses ;
 
 curses-ok? [
