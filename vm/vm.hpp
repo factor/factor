@@ -571,7 +571,7 @@ struct factor_vm
 	void primitive_callstack();
 	void primitive_set_callstack();
 	code_block *frame_code(stack_frame *frame);
-	cell frame_type(stack_frame *frame);
+	code_block_type frame_type(stack_frame *frame);
 	cell frame_executing(stack_frame *frame);
 	stack_frame *frame_successor(stack_frame *frame);
 	cell frame_scan(stack_frame *frame);

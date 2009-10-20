@@ -479,7 +479,7 @@ code_block *factor_vm::add_code_block(code_block_type type, cell code_, cell lab
 	gc_root<byte_array> relocation(relocation_,this);
 	gc_root<array> literals(literals_,this);
 
-	cell code_length = align8(array_capacity(code.untagged()));
+	cell code_length = array_capacity(code.untagged());
 	code_block *compiled = allot_code_block(code_length,type);
 
 	compiled->owner = owner.value();
