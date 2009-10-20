@@ -16,19 +16,12 @@ M: unix-random random-bytes* ( n tuple -- byte-array )
 
 os openbsd? [
     [
-        "/dev/srandom" <unix-random> secure-random-generator set-global
-        "/dev/arandom" <unix-random> system-random-generator set-global
+        "/dev/srandom" <unix-random> &dispose secure-random-generator set-global
+        "/dev/arandom" <unix-random> &dispose system-random-generator set-global
     ] "random.unix" add-startup-hook
 ] [
     [
-        "/dev/random" <unix-random> secure-random-generator set-global
-        "/dev/urandom" <unix-random> system-random-generator set-global
+        "/dev/random" <unix-random> &dispose secure-random-generator set-global
+        "/dev/urandom" <unix-random> &dispose system-random-generator set-global
     ] "random.unix" add-startup-hook
 ] if
-
-[
-    [
-        secure-random-generator get-global &dispose drop
-        system-random-generator get-global &dispose drop
-    ] with-destructors
-] "random.unix" add-shutdown-hook

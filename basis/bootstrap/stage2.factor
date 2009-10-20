@@ -56,6 +56,7 @@ SYMBOL: bootstrap-time
     error-continuation set-global
     error set-global ; inline
 
+
 [
     ! We time bootstrap
     millis
