@@ -24,7 +24,6 @@ USING:
     quotations
     sequences
     sequences.deep
-    syntax
     words
 ;
 IN: cpu.8080.emulator

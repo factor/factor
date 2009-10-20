@@ -253,8 +253,6 @@ struct factor_vm
 	void collect_nursery();
 	void collect_aging();
 	void collect_to_tenured();
-	void big_code_heap_update();
-	void small_code_heap_update();
 	void collect_full_impl(bool trace_contexts_p);
 	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p, bool compact_code_heap_p);
 	void collect_full(bool trace_contexts_p, bool compact_code_heap_p);
