@@ -52,7 +52,7 @@ template<typename Generation> void data_heap::reset_generation(Generation *gen)
 
 	clear_cards(gen);
 	clear_decks(gen);
-	gen->clear_object_start_offsets();
+	gen->starts.clear_object_start_offsets();
 }
 
 }
