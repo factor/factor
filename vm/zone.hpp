@@ -22,7 +22,7 @@ struct zone {
 		return (object *)h;
 	}
 
-	cell next_object_after(cell scan)
+	cell next_allocated_block_after(cell scan)
 	{
 		cell size = ((object *)scan)->size();
 		if(scan + size < here)

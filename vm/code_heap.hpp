@@ -1,14 +1,7 @@
 namespace factor
 {
 
-struct code_heap_layout {
-	cell block_size(heap_block *block)
-	{
-		return block->size();
-	}
-};
-
-struct code_heap : heap<heap_block,code_heap_layout> {
+struct code_heap : heap<heap_block> {
 	/* Set of blocks which need full relocation. */
 	std::set<code_block *> needs_fixup;
 
