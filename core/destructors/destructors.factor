@@ -6,7 +6,7 @@ IN: destructors
 
 SYMBOL: disposables
 
-[ H{ } clone disposables set-global ] "destructors" add-init-hook
+[ H{ } clone disposables set-global ] "destructors" add-startup-hook
 
 ERROR: already-unregistered disposable ;
 

@@ -3,7 +3,7 @@ io ;
 
 [
     boot
-    do-init-hooks
+    do-startup-hooks
     (command-line) parse-command-line
     "run" get run
     output-stream get [ stream-flush ] when*

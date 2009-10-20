@@ -35,7 +35,7 @@ M: f (reset-game-input) ;
 : reset-game-input ( -- )
     (reset-game-input) ;
 
-[ reset-game-input ] "game-input" add-init-hook
+[ reset-game-input ] "game-input" add-startup-hook
 
 PRIVATE>
 

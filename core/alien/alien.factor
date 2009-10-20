@@ -72,7 +72,7 @@ ERROR: alien-invoke-error library symbol ;
 ! cleared on startup.
 SYMBOL: callbacks
 
-[ H{ } clone callbacks set-global ] "alien" add-init-hook
+[ H{ } clone callbacks set-global ] "alien" add-startup-hook
 
 <PRIVATE
 

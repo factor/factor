@@ -3,7 +3,7 @@ namespaces eval kernel vocabs.loader io ;
 
 [
     boot
-    do-init-hooks
+    do-startup-hooks
     [
         (command-line) parse-command-line
         load-vocab-roots
