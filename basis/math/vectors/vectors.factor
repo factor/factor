@@ -167,20 +167,20 @@ PRIVATE>
 
 : bilerp ( aa ba ab bb {t,u} -- a_tu )
     [ first lerp ] [ second lerp ] bi-curry
-    [ 2bi@ ] [ call ] bi* ;
+    [ 2bi@ ] [ call ] bi* ; inline
 
 : vlerp ( a b t -- a_t )
-    [ lerp ] 3map ;
+    [ over v- ] dip v* v+ ; inline
 
 : vnlerp ( a b t -- a_t )
-    [ lerp ] curry 2map ;
+    [ over v- ] dip v*n v+ ; inline
 
 : vbilerp ( aa ba ab bb {t,u} -- a_tu )
     [ first vnlerp ] [ second vnlerp ] bi-curry
-    [ 2bi@ ] [ call ] bi* ;
+    [ 2bi@ ] [ call ] bi* ; inline
 
 : v~ ( a b epsilon -- ? )
-    [ ~ ] curry 2all? ;
+    [ ~ ] curry 2all? ; inline
 
 HINTS: vneg { array } ;
 HINTS: norm-sq { array } ;
