@@ -13,11 +13,18 @@ compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.simplify ;
 IN: compiler.cfg.value-numbering.rewrite
 
-: vreg-small-constant? ( vreg -- ? )
+: vreg-immediate-arithmetic? ( vreg -- ? )
     vreg>expr {
         [ constant-expr? ]
         [ value>> fixnum? ]
-        [ value>> small-enough? ]
+        [ value>> immediate-arithmetic? ]
+    } 1&& ;
+
+: vreg-immediate-bitwise? ( vreg -- ? )
+    vreg>expr {
+        [ constant-expr? ]
+        [ value>> fixnum? ]
+        [ value>> immediate-bitwise? ]
     } 1&& ;
 
 ! Outputs f to mean no change
@@ -174,8 +181,8 @@ M: ##compare-imm-branch rewrite
 
 M: ##compare-branch rewrite
     {
-        { [ dup src1>> vreg-small-constant? ] [ t >compare-imm-branch ] }
-        { [ dup src2>> vreg-small-constant? ] [ f >compare-imm-branch ] }
+        { [ dup src1>> vreg-immediate-arithmetic? ] [ t >compare-imm-branch ] }
+        { [ dup src2>> vreg-immediate-arithmetic? ] [ f >compare-imm-branch ] }
         { [ dup self-compare? ] [ rewrite-self-compare-branch ] }
         [ drop f ]
     } cond ;
@@ -205,8 +212,8 @@ M: ##compare-branch rewrite
 
 M: ##compare rewrite
     {
-        { [ dup src1>> vreg-small-constant? ] [ t >compare-imm ] }
-        { [ dup src2>> vreg-small-constant? ] [ f >compare-imm ] }
+        { [ dup src1>> vreg-immediate-arithmetic? ] [ t >compare-imm ] }
+        { [ dup src2>> vreg-immediate-arithmetic? ] [ f >compare-imm ] }
         { [ dup self-compare? ] [ rewrite-self-compare ] }
         [ drop f ]
     } cond ;
@@ -264,6 +271,19 @@ M: ##neg rewrite
 M: ##not rewrite
     maybe-unary-constant-fold ;
 
+: arithmetic-op? ( op -- ? )
+    {
+        ##add
+        ##add-imm
+        ##sub
+        ##sub-imm
+        ##mul
+        ##mul-imm
+    } memq? ;
+
+: immediate? ( value op -- ? )
+    arithmetic-op? [ immediate-arithmetic? ] [ immediate-bitwise? ] if ;
+
 : reassociate ( insn op -- insn )
     [
         {
@@ -273,7 +293,7 @@ M: ##not rewrite
             [ ]
         } cleave constant-fold*
     ] dip
-    over small-enough? [ new-insn ] [ 2drop 2drop f ] if ; inline
+    2dup immediate? [ new-insn ] [ 2drop 2drop f ] if ; inline
 
 M: ##add-imm rewrite
     {
@@ -283,7 +303,7 @@ M: ##add-imm rewrite
     } cond ;
 
 : sub-imm>add-imm ( insn -- insn' )
-    [ dst>> ] [ src1>> ] [ src2>> neg ] tri dup small-enough?
+    [ dst>> ] [ src1>> ] [ src2>> neg ] tri dup immediate-arithmetic?
     [ \ ##add-imm new-insn ] [ 3drop f ] if ;
 
 M: ##sub-imm rewrite
@@ -358,16 +378,20 @@ M: ##sar-imm rewrite
         [ swap ] when vreg>constant
     ] dip new-insn ; inline
 
+: vreg-immediate? ( vreg op -- ? )
+    arithmetic-op?
+    [ vreg-immediate-arithmetic? ] [ vreg-immediate-bitwise? ] if ;
+
 : rewrite-arithmetic ( insn op -- ? )
     {
-        { [ over src2>> vreg-small-constant? ] [ f insn>imm-insn ] }
+        { [ over src2>> over vreg-immediate? ] [ f insn>imm-insn ] }
         [ 2drop f ]
     } cond ; inline
 
 : rewrite-arithmetic-commutative ( insn op -- ? )
     {
-        { [ over src2>> vreg-small-constant? ] [ f insn>imm-insn ] }
-        { [ over src1>> vreg-small-constant? ] [ t insn>imm-insn ] }
+        { [ over src2>> over vreg-immediate? ] [ f insn>imm-insn ] }
+        { [ over src1>> over vreg-immediate? ] [ t insn>imm-insn ] }
         [ 2drop f ]
     } cond ; inline
 

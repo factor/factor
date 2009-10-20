@@ -168,12 +168,12 @@ M: multi-index-elements render-vertex-indexes
 : (bind-texture-unit) ( texture texture-unit -- )
     swap [ GL_TEXTURE0 + glActiveTexture ] [ bind-texture drop ] bi* ; inline
 
-GENERIC: bind-uniform-textures ( program-instance uniform-tuple -- )
-GENERIC: bind-uniforms ( program-instance uniform-tuple -- )
+GENERIC: (bind-uniform-textures) ( program-instance uniform-tuple -- )
+GENERIC: (bind-uniforms) ( program-instance uniform-tuple -- )
 
-M: uniform-tuple bind-uniform-textures
+M: uniform-tuple (bind-uniform-textures)
     2drop ;
-M: uniform-tuple bind-uniforms
+M: uniform-tuple (bind-uniforms)
     2drop ;
 
 : uniform-slot-type ( uniform -- type )
@@ -363,7 +363,7 @@ DEFER: [bind-uniform-tuple]
 
 :: [bind-uniforms] ( superclass uniforms -- quot )
     superclass "uniform-tuple-texture-units" word-prop 0 or :> first-texture-unit
-    superclass \ bind-uniforms method :> next-method
+    superclass \ (bind-uniforms) method :> next-method
     first-texture-unit uniforms "" [bind-uniform-tuple] nip :> bind-quot
 
     { 2dup next-method } bind-quot [ ] append-as ;
@@ -371,10 +371,10 @@ DEFER: [bind-uniform-tuple]
 : define-uniform-tuple-methods ( class superclass uniforms -- )
     [
         2drop
-        [ \ bind-uniform-textures create-method-in ]
+        [ \ (bind-uniform-textures) create-method-in ]
         [ [bind-uniform-textures] ] bi define
     ] [
-        [ \ bind-uniforms create-method-in ] 2dip
+        [ \ (bind-uniforms) create-method-in ] 2dip
         [bind-uniforms] define
     ] 3bi ;
 
@@ -481,12 +481,15 @@ TUPLE: render-set
 : 3<render-set> ( x y z quot-assoc -- render-set )
     render-set swap 3make-tuple ; inline
 
+: bind-uniforms ( program-instance uniforms -- )
+    [ (bind-uniform-textures) ] [ (bind-uniforms) ] 2bi ; inline
+
 : render ( render-set -- )
     {
         [ vertex-array>> program-instance>> handle>> glUseProgram ]
         [
             [ vertex-array>> program-instance>> ] [ uniforms>> ] bi
-            [ bind-uniform-textures ] [ bind-uniforms ] 2bi
+            bind-uniforms
         ]
         [
             framebuffer>> 

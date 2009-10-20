@@ -1337,7 +1337,10 @@ M:: x86 %save-context ( temp1 temp2 callback-allowed? -- )
 
 M: x86 value-struct? drop t ;
 
-M: x86 small-enough? ( n -- ? )
+M: x86 immediate-arithmetic? ( n -- ? )
+    HEX: -80000000 HEX: 7fffffff between? ;
+
+M: x86 immediate-bitwise? ( n -- ? )
     HEX: -80000000 HEX: 7fffffff between? ;
 
 : next-stack@ ( n -- operand )
