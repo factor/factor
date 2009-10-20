@@ -5,6 +5,8 @@ hashtables vectors strings sbufs arrays
 quotations assocs layouts classes.tuple.private
 kernel.private ;
 
+16 data-alignment set
+
 BIN: 111 tag-mask set
 8 num-tags set
 3 tag-bits set

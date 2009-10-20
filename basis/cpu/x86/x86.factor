@@ -388,7 +388,7 @@ M: x86 %vm-field-ptr ( dst field -- )
     [ drop "nursery" %vm-field-ptr ] [ swap [] MOV ] 2bi ;
 
 : inc-allot-ptr ( nursery-ptr n -- )
-    [ [] ] dip 8 align ADD ;
+    [ [] ] dip data-alignment get align ADD ;
 
 : store-header ( temp class -- )
     [ [] ] [ type-number tag-fixnum ] bi* MOV ;

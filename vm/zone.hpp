@@ -18,7 +18,7 @@ struct zone {
 	inline object *allot(cell size)
 	{
 		cell h = here;
-		here = h + align8(size);
+		here = h + align(size,data_alignment);
 		return (object *)h;
 	}
 };

@@ -5,7 +5,7 @@ namespace factor
 
 byte_array *factor_vm::allot_byte_array(cell size)
 {
-	byte_array *array = allot_array_internal<byte_array>(size);
+	byte_array *array = allot_uninitialized_array<byte_array>(size);
 	memset(array + 1,0,size);
 	return array;
 }
@@ -19,7 +19,7 @@ void factor_vm::primitive_byte_array()
 void factor_vm::primitive_uninitialized_byte_array()
 {
 	cell size = unbox_array_size();
-	dpush(tag<byte_array>(allot_array_internal<byte_array>(size)));
+	dpush(tag<byte_array>(allot_uninitialized_array<byte_array>(size)));
 }
 
 void factor_vm::primitive_resize_byte_array()
