@@ -92,7 +92,7 @@ PRIVATE>
 
 : vshuffle-bytes ( u perm -- v )
     underlying>> [
-        swap [ '[ _ nth ] ] keep map-as
+        swap [ '[ 15 bitand _ nth ] ] keep map-as
     ] curry change-underlying ;
 
 GENERIC: vshuffle ( u perm -- v )
@@ -163,7 +163,7 @@ PRIVATE>
 
 : trilerp ( aaa baa aba bba aab bab abb bbb {t,u,v} -- a_tuv )
     [ first lerp ] [ second lerp ] [ third lerp ] tri-curry
-    [ 2tetra@ ] [ 2bi@ ] [ call ] tri* ;
+    [ 2tetra@ ] [ 2bi@ ] [ call ] tri* ; inline
 
 : bilerp ( aa ba ab bb {t,u} -- a_tu )
     [ first lerp ] [ second lerp ] bi-curry

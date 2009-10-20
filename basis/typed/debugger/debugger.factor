@@ -1,5 +1,6 @@
 ! (c)Joe Groff bsd license
-USING: typed compiler.cfg.debugger compiler.tree.debugger words ;
+USING: typed compiler.cfg.debugger compiler.tree.debugger
+tools.disassembler words ;
 IN: typed.debugger
 
 : typed-test-mr ( word -- mrs )
@@ -8,3 +9,6 @@ IN: typed.debugger
     "typed-word" word-prop test-mr mr. ; inline
 : typed-optimized. ( word -- )
     "typed-word" word-prop optimized. ; inline
+
+: typed-disassemble ( word -- )
+    "typed-word" word-prop disassemble ; inline
