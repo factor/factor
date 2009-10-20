@@ -34,14 +34,12 @@ struct heap {
 	void assert_free_block(free_heap_block *block);
 	free_heap_block *find_free_block(cell size);
 	free_heap_block *split_free_block(free_heap_block *block, cell size);
-	heap_block *heap_allot(cell size, cell type);
+	heap_block *heap_allot(cell size);
 	void heap_free(heap_block *block);
 	void mark_block(heap_block *block);
 	void heap_usage(cell *used, cell *total_free, cell *max_free);
 	cell heap_size();
 	void compact_heap();
-
-	heap_block *free_allocated(heap_block *prev, heap_block *scan);
 
 	template<typename Iterator> void sweep_heap(Iterator &iter);
 	template<typename Iterator> void compact_heap(Iterator &iter);
@@ -54,7 +52,7 @@ struct heap {
 		while(scan != end)
 		{
 			heap_block *next = scan->next();
-			if(scan->type() != FREE_BLOCK_TYPE) iter(scan,scan->size());
+			if(!scan->free_p()) iter(scan,scan->size());
 			scan = next;
 		}
 	}
@@ -72,27 +70,41 @@ template<typename Iterator> void heap::sweep_heap(Iterator &iter)
 
 	while(scan != end)
 	{
-		if(scan->type() == FREE_BLOCK_TYPE)
+		if(scan->free_p())
 		{
-			if(prev && prev->type() == FREE_BLOCK_TYPE)
+			if(prev && prev->free_p())
 				prev->set_size(prev->size() + scan->size());
 			else
 				prev = scan;
 		}
 		else if(this->state->is_marked_p(scan))
 		{
-			if(prev && prev->type() == FREE_BLOCK_TYPE)
+			if(prev && prev->free_p())
 				this->add_to_free_list((free_heap_block *)prev);
 			prev = scan;
 			iter(scan,scan->size());
 		}
 		else
-			prev = this->free_allocated(prev,scan);
+		{
+			if(secure_gc)
+				memset(scan + 1,0,scan->size() - sizeof(heap_block));
+
+			if(prev && prev->free_p())
+			{
+				free_heap_block *free_prev = (free_heap_block *)prev;
+				free_prev->set_size(free_prev->size() + scan->size());
+			}
+			else
+			{
+				scan->set_free();
+				prev = scan;
+			}
+		}
 
 		scan = scan->next();
 	}
 
-	if(prev && prev->type() == FREE_BLOCK_TYPE)
+	if(prev && prev->free_p())
 		this->add_to_free_list((free_heap_block *)prev);
 }
 

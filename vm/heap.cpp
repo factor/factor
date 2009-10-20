@@ -49,15 +49,16 @@ void heap::build_free_list(cell size)
 {
 	clear_free_list();
 	free_heap_block *end = (free_heap_block *)(seg->start + size);
-	end->set_type(FREE_BLOCK_TYPE);
+	end->set_free();
 	end->set_size(seg->end - (cell)end);
 	add_to_free_list(end);
 }
 
 void heap::assert_free_block(free_heap_block *block)
 {
-	if(block->type() != FREE_BLOCK_TYPE)
-		critical_error("Invalid block in free list",(cell)block);
+#ifdef FACTOR_DEBUG
+	assert(block->free_p());
+#endif
 }
 
 free_heap_block *heap::find_free_block(cell size)
@@ -102,11 +103,11 @@ free_heap_block *heap::find_free_block(cell size)
 
 free_heap_block *heap::split_free_block(free_heap_block *block, cell size)
 {
-	if(block->size() != size )
+	if(block->size() != size)
 	{
 		/* split the block in two */
 		free_heap_block *split = (free_heap_block *)((cell)block + size);
-		split->set_type(FREE_BLOCK_TYPE);
+		split->set_free();
 		split->set_size(block->size() - size);
 		split->next_free = block->next_free;
 		block->set_size(size);
@@ -116,27 +117,25 @@ free_heap_block *heap::split_free_block(free_heap_block *block, cell size)
 	return block;
 }
 
-/* Allocate a block of memory from the mark and sweep GC heap */
-heap_block *heap::heap_allot(cell size, cell type)
+heap_block *heap::heap_allot(cell size)
 {
-	size = (size + block_size_increment - 1) & ~(block_size_increment - 1);
+	size = align(size,block_size_increment);
 
 	free_heap_block *block = find_free_block(size);
 	if(block)
 	{
 		block = split_free_block(block,size);
-		block->set_type(type);
 		return block;
 	}
 	else
 		return NULL;
 }
 
-/* Deallocates a block manually */
 void heap::heap_free(heap_block *block)
 {
-	block->set_type(FREE_BLOCK_TYPE);
-	add_to_free_list((free_heap_block *)block);
+	free_heap_block *free_block = (free_heap_block *)block;
+	free_block->set_free();
+	add_to_free_list(free_block);
 }
 
 void heap::mark_block(heap_block *block)
@@ -158,7 +157,7 @@ void heap::heap_usage(cell *used, cell *total_free, cell *max_free)
 	{
 		cell size = scan->size();
 
-		if(scan->type() == FREE_BLOCK_TYPE)
+		if(scan->free_p())
 		{
 			*total_free += size;
 			if(size > *max_free)
@@ -179,31 +178,19 @@ cell heap::heap_size()
 	
 	while(scan != end)
 	{
-		if(scan->type() == FREE_BLOCK_TYPE) break;
+		if(scan->free_p()) break;
 		else scan = scan->next();
 	}
 
-	assert(scan->type() == FREE_BLOCK_TYPE);
-	assert((cell)scan + scan->size() == seg->end);
-
-	return (cell)scan - (cell)first_block();
-}
-
-heap_block *heap::free_allocated(heap_block *prev, heap_block *scan)
-{
-	if(secure_gc)
-		memset(scan + 1,0,scan->size() - sizeof(heap_block));
-
-	if(prev && prev->type() == FREE_BLOCK_TYPE)
+	if(scan != end)
 	{
-		prev->set_size(prev->size() + scan->size());
-		return prev;
+		assert(scan->free_p());
+		assert((cell)scan + scan->size() == seg->end);
+
+		return (cell)scan - (cell)first_block();
 	}
 	else
-	{
-		scan->set_type(FREE_BLOCK_TYPE);
-		return scan;
-	}
+		return seg->size;
 }
 
 }

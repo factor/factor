@@ -8,17 +8,11 @@ template<typename Block, int Granularity> struct mark_bits {
 	cell size;
 	cell bits_size;
 	u64 *marked;
-	u64 *allocated;
 	cell *forwarding;
 
 	void clear_mark_bits()
 	{
 		memset(marked,0,bits_size * sizeof(u64));
-	}
-
-	void clear_allocated_bits()
-	{
-		memset(allocated,0,bits_size * sizeof(u64));
 	}
 
 	void clear_forwarding()
@@ -31,11 +25,9 @@ template<typename Block, int Granularity> struct mark_bits {
 		size(size_),
 		bits_size(size / Granularity / forwarding_granularity),
 		marked(new u64[bits_size]),
-		allocated(new u64[bits_size]),
 		forwarding(new cell[bits_size])
 	{
 		clear_mark_bits();
-		clear_allocated_bits();
 		clear_forwarding();
 	}
 
@@ -43,8 +35,6 @@ template<typename Block, int Granularity> struct mark_bits {
 	{
 		delete[] marked;
 		marked = NULL;
-		delete[] allocated;
-		allocated = NULL;
 		delete[] forwarding;
 		forwarding = NULL;
 	}
@@ -107,16 +97,6 @@ template<typename Block, int Granularity> struct mark_bits {
 	void set_marked_p(Block *address)
 	{
 		set_bitmap_range(marked,address);
-	}
-
-	bool is_allocated_p(Block *address)
-	{
-		return bitmap_elt(allocated,address);
-	}
-
-	void set_allocated_p(Block *address)
-	{
-		set_bitmap_range(allocated,address);
 	}
 
 	/* From http://chessprogramming.wikispaces.com/Population+Count */

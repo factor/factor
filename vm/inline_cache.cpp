@@ -19,15 +19,9 @@ void factor_vm::deallocate_inline_cache(cell return_address)
 	check_code_pointer((cell)old_xt);
 
 	code_block *old_block = (code_block *)old_xt - 1;
-	cell old_type = old_block->type();
 
-#ifdef FACTOR_DEBUG
-	/* The call target was either another PIC,
-	   or a compiled quotation (megamorphic stub) */
-	assert(old_type == PIC_TYPE || old_type == QUOTATION_TYPE);
-#endif
-
-	if(old_type == PIC_TYPE)
+	/* Free the old PIC since we know its unreachable */
+	if(old_block->pic_p())
 		code->code_heap_free(old_block);
 }
 
@@ -78,7 +72,7 @@ void factor_vm::update_pic_count(cell type)
 struct inline_cache_jit : public jit {
 	fixnum index;
 
-	explicit inline_cache_jit(cell generic_word_,factor_vm *vm) : jit(PIC_TYPE,generic_word_,vm) {};
+	explicit inline_cache_jit(cell generic_word_,factor_vm *vm) : jit(code_block_pic,generic_word_,vm) {};
 
 	void emit_check(cell klass);
 	void compile_inline_cache(fixnum index,
