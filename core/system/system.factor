@@ -56,3 +56,5 @@ PRIVATE>
 : embedded? ( -- ? ) 15 getenv ;
 
 : millis ( -- ms ) micros 1000 /i ;
+
+: exit ( n -- ) do-shutdown-hooks (exit) ;

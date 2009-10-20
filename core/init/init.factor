@@ -10,12 +10,12 @@ SYMBOL: shutdown-hooks
 startup-hooks global [ drop V{ } clone ] cache drop
 shutdown-hooks global [ drop V{ } clone ] cache drop
 
-: do-hooks ( assoc -- )
-    [ nip call( -- ) ] assoc-each ;
+: do-hooks ( symbol -- )
+    get [ nip call( -- ) ] assoc-each ;
 
-: do-startup-hooks ( -- ) startup-hooks get do-hooks ;
+: do-startup-hooks ( -- ) startup-hooks do-hooks ;
 
-: do-shutdown-hooks ( -- ) shutdown-hooks get do-hooks ;
+: do-shutdown-hooks ( -- ) shutdown-hooks do-hooks ;
 
 : add-startup-hook ( quot name -- )
     startup-hooks get
@@ -30,3 +30,9 @@ shutdown-hooks global [ drop V{ } clone ] cache drop
 : boot-quot ( -- quot ) 20 getenv ;
 
 : set-boot-quot ( quot -- ) 20 setenv ;
+
+: shutdown-quot ( -- quot ) 67 getenv ;
+
+: set-shutdown-quot ( quot -- ) 67 setenv ;
+
+[ do-shutdown-hooks ] set-shutdown-quot
