@@ -3,7 +3,21 @@
 namespace factor
 {
 
-code_heap::code_heap(bool secure_gc, cell size) : heap<heap_block>(secure_gc,size,true) {}
+code_heap::code_heap(cell size)
+{
+	if(size > (1L << (sizeof(cell) * 8 - 6))) fatal_error("Heap too large",size);
+	seg = new segment(align_page(size),true);
+	if(!seg) fatal_error("Out of memory in heap allocator",size);
+	allocator = new free_list_allocator<heap_block>(seg->start,size);
+}
+
+code_heap::~code_heap()
+{
+	delete allocator;
+	allocator = NULL;
+	delete seg;
+	seg = NULL;
+}
 
 void code_heap::write_barrier(code_block *compiled)
 {
@@ -22,18 +36,33 @@ bool code_heap::needs_fixup_p(code_block *compiled)
 	return needs_fixup.count(compiled) > 0;
 }
 
+bool code_heap::marked_p(heap_block *compiled)
+{
+	return allocator->state.marked_p(compiled);
+}
+
+void code_heap::set_marked_p(code_block *compiled)
+{
+	allocator->state.set_marked_p(compiled);
+}
+
+void code_heap::clear_mark_bits()
+{
+	allocator->state.clear_mark_bits();
+}
+
 void code_heap::code_heap_free(code_block *compiled)
 {
 	points_to_nursery.erase(compiled);
 	points_to_aging.erase(compiled);
 	needs_fixup.erase(compiled);
-	heap_free(compiled);
+	allocator->free(compiled);
 }
 
 /* Allocate a code heap during startup */
 void factor_vm::init_code_heap(cell size)
 {
-	code = new code_heap(secure_gc,size);
+	code = new code_heap(size);
 }
 
 bool factor_vm::in_code_heap_p(cell ptr)
@@ -89,7 +118,7 @@ struct word_and_literal_code_heap_updater {
 void factor_vm::update_code_heap_words_and_literals()
 {
 	word_and_literal_code_heap_updater updater(this);
-	code->sweep_heap(updater);
+	code->allocator->sweep(updater);
 }
 
 /* After growing the heap, we have to perform a full relocation to update
@@ -109,7 +138,7 @@ void factor_vm::relocate_code_heap()
 {
 	code_heap_relocator relocator(this);
 	code_heap_iterator<code_heap_relocator> iter(relocator);
-	code->sweep_heap(iter);
+	code->allocator->sweep(iter);
 }
 
 void factor_vm::primitive_modify_code_heap()
@@ -169,7 +198,7 @@ void factor_vm::primitive_modify_code_heap()
 void factor_vm::primitive_code_room()
 {
 	cell used, total_free, max_free;
-	code->heap_usage(&used,&total_free,&max_free);
+	code->allocator->usage(&used,&total_free,&max_free);
 	dpush(tag_fixnum(code->seg->size / 1024));
 	dpush(tag_fixnum(used / 1024));
 	dpush(tag_fixnum(total_free / 1024));
@@ -178,7 +207,7 @@ void factor_vm::primitive_code_room()
 
 code_block *code_heap::forward_code_block(code_block *compiled)
 {
-	return (code_block *)state->forward_block(compiled);
+	return (code_block *)allocator->state.forward_block(compiled);
 }
 
 struct callframe_forwarder {
@@ -277,7 +306,7 @@ function returns. */
 void factor_vm::compact_code_heap(bool trace_contexts_p)
 {
 	/* Figure out where blocks are going to go */
-	code->state->compute_forwarding();
+	code->allocator->state.compute_forwarding();
 
 	/* Update references to the code heap from the data heap */
 	forward_object_xts();
@@ -291,7 +320,7 @@ void factor_vm::compact_code_heap(bool trace_contexts_p)
 	that the data heap is up to date since relocation looks up object XTs) */
 	code_heap_relocator relocator(this);
 	code_heap_iterator<code_heap_relocator> iter(relocator);
-	code->compact_heap(iter);
+	code->allocator->compact(iter);
 }
 
 struct stack_trace_stripper {

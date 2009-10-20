@@ -23,8 +23,7 @@ void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 
 	init_data_heap(p->young_size,
 		p->aging_size,
-		p->tenured_size,
-		p->secure_gc);
+		p->tenured_size);
 
 	clear_gc_stats();
 
@@ -52,7 +51,7 @@ void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 
 	if(h->code_size != 0)
 	{
-		size_t bytes_read = fread(code->first_block(),1,h->code_size,file);
+		size_t bytes_read = fread(code->allocator->first_block(),1,h->code_size,file);
 		if(bytes_read != h->code_size)
 		{
 			print_string("truncated image: ");
@@ -64,7 +63,7 @@ void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 		}
 	}
 
-	code->build_free_list(h->code_size);
+	code->allocator->build_free_list(h->code_size);
 }
 
 void factor_vm::data_fixup(cell *handle, cell data_relocation_base)
@@ -292,7 +291,7 @@ bool factor_vm::save_image(const vm_char *filename)
 	h.data_relocation_base = data->tenured->start;
 	h.data_size = data->tenured->here - data->tenured->start;
 	h.code_relocation_base = code->seg->start;
-	h.code_size = code->heap_size();
+	h.code_size = code->allocator->occupied();
 
 	h.true_object = true_object;
 	h.bignum_zero = bignum_zero;
@@ -306,7 +305,7 @@ bool factor_vm::save_image(const vm_char *filename)
 
 	if(fwrite(&h,sizeof(image_header),1,file) != 1) ok = false;
 	if(fwrite((void*)data->tenured->start,h.data_size,1,file) != 1) ok = false;
-	if(fwrite(code->first_block(),h.code_size,1,file) != 1) ok = false;
+	if(fwrite(code->allocator->first_block(),h.code_size,1,file) != 1) ok = false;
 	if(fclose(file)) ok = false;
 
 	if(!ok)

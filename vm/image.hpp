@@ -34,7 +34,6 @@ struct vm_parameters {
 	cell ds_size, rs_size;
 	cell young_size, aging_size, tenured_size;
 	cell code_size;
-	bool secure_gc;
 	bool fep;
 	bool console;
 	bool signals;

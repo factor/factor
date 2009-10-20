@@ -42,7 +42,7 @@ data_heap::data_heap(cell young_size_, cell aging_size_, cell tenured_size_)
 	aging = new aging_space(aging_size,tenured_semispace->end);
 	aging_semispace = new aging_space(aging_size,aging->end);
 
-	nursery = new zone(young_size,aging_semispace->end);
+	nursery = new bump_allocator(young_size,aging_semispace->end);
 
 	assert(seg->end - nursery->end <= deck_size);
 }
@@ -75,10 +75,9 @@ void factor_vm::set_data_heap(data_heap *data_)
 	data->reset_generation(data->tenured);
 }
 
-void factor_vm::init_data_heap(cell young_size, cell aging_size, cell tenured_size, bool secure_gc_)
+void factor_vm::init_data_heap(cell young_size, cell aging_size, cell tenured_size)
 {
 	set_data_heap(new data_heap(young_size,aging_size,tenured_size));
-	secure_gc = secure_gc_;
 }
 
 /* Size of the object pointed to by a tagged pointer */

@@ -209,7 +209,7 @@ void factor_vm::dump_memory(cell from, cell to)
 		dump_cell(from);
 }
 
-void factor_vm::dump_zone(const char *name, zone *z)
+void factor_vm::dump_zone(const char *name, bump_allocator *z)
 {
 	print_string(name); print_string(": ");
 	print_string("Start="); print_cell(z->start);
@@ -296,7 +296,7 @@ struct code_block_printer {
 		const char *status;
 		if(scan->free_p())
 			status = "free";
-		else if(parent->code->state->is_marked_p(scan))
+		else if(parent->code->marked_p(scan))
 		{
 			reloc_size += parent->object_size(((code_block *)scan)->relocation);
 			literal_size += parent->object_size(((code_block *)scan)->literals);
@@ -319,7 +319,7 @@ struct code_block_printer {
 void factor_vm::dump_code_heap()
 {
 	code_block_printer printer(this);
-	code->iterate_heap(printer);
+	code->allocator->iterate(printer);
 	print_cell(printer.reloc_size); print_string(" bytes of relocation data\n");
 	print_cell(printer.literal_size); print_string(" bytes of literal data\n");
 }

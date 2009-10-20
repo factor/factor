@@ -55,7 +55,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/jit.o \
 	vm/math.o \
 	vm/nursery_collector.o \
-	vm/old_space.o \
+	vm/object_start_map.o \
 	vm/primitives.o \
 	vm/profiler.o \
 	vm/quotations.o \
