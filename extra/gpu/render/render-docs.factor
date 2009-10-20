@@ -226,6 +226,11 @@ HELP: render-set
 } }
 { $notes "User-created framebuffers require OpenGL 3.0 or one of the " { $snippet "GL_EXT_framebuffer_object" } " or " { $snippet "GL_ARB_framebuffer_object" } " extensions. Disabling rasterization requires OpenGL 3.0 or the " { $snippet "GL_EXT_transform_feedback" } " extension. Named output-attachment values are available in GLSL 1.30 or later, and GLSL 1.20 and earlier using the " { $snippet "GL_EXT_gpu_shader4" } " extension. Transform feedback requires OpenGL 3.0 or one of the " { $snippet "GL_EXT_transform_feedback" } " or " { $snippet "GL_ARB_transform_feedback" } " extensions." } ;
 
+HELP: bind-uniforms
+{ $values { "program-instance" program-instance } { "uniforms" uniform-tuple } }
+{ $description "Binds the uniform shader parameters for " { $snippet "program-instance" } " using values from the given uniform tuple." }
+{ $notes "The " { $link render } " word uses this word. Calling this word directly is only necessary if uniform parameters need to be bound independently of a " { $snippet "render" } " operation." } ;
+
 { render render-set } related-words
 
 HELP: texture-uniform
