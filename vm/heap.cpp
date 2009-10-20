@@ -16,7 +16,16 @@ heap::heap(bool secure_gc_, cell size, bool executable_p) : secure_gc(secure_gc_
 	if(size > (1L << (sizeof(cell) * 8 - 6))) fatal_error("Heap too large",size);
 	seg = new segment(align_page(size),executable_p);
 	if(!seg) fatal_error("Out of memory in heap allocator",size);
+	state = new mark_bits<heap_block,block_size_increment>(seg->start,size);
 	clear_free_list();
+}
+
+heap::~heap()
+{
+	delete seg;
+	seg = NULL;
+	delete state;
+	state = NULL;
 }
 
 void heap::add_to_free_list(free_heap_block *block)
@@ -34,52 +43,15 @@ void heap::add_to_free_list(free_heap_block *block)
 	}
 }
 
-/* Called after reading the code heap from the image file, and after code GC.
-
-In the former case, we must add a large free block from compiling.base + size to
-compiling.limit. */
+/* Called after reading the code heap from the image file, and after code heap
+compaction. Makes a free list consisting of one free block, at the very end. */
 void heap::build_free_list(cell size)
 {
-	heap_block *prev = NULL;
-
 	clear_free_list();
-
-	size = (size + block_size_increment - 1) & ~(block_size_increment - 1);
-
-	heap_block *scan = first_block();
 	free_heap_block *end = (free_heap_block *)(seg->start + size);
-
-	/* Add all free blocks to the free list */
-	while(scan && scan < (heap_block *)end)
-	{
-		if(scan->type() == FREE_BLOCK_TYPE)
-			add_to_free_list((free_heap_block *)scan);
-
-		prev = scan;
-		scan = next_block(scan);
-	}
-
-	/* If there is room at the end of the heap, add a free block. This
-	branch is only taken after loading a new image, not after code GC */
-	if((cell)(end + 1) <= seg->end)
-	{
-		end->set_marked_p(false);
-		end->set_type(FREE_BLOCK_TYPE);
-		end->set_size(seg->end - (cell)end);
-
-		/* add final free block */
-		add_to_free_list(end);
-	}
-	/* This branch is taken if the newly loaded image fits exactly, or
-	after code GC */
-	else
-	{
-		/* even if there's no room at the end of the heap for a new
-		free block, we might have to jigger it up by a few bytes in
-		case prev + prev->size */
-		if(prev) prev->set_size(seg->end - (cell)prev);
-	}
-
+	end->set_type(FREE_BLOCK_TYPE);
+	end->set_size(seg->end - (cell)end);
+	add_to_free_list(end);
 }
 
 void heap::assert_free_block(free_heap_block *block)
@@ -154,7 +126,6 @@ heap_block *heap::heap_allot(cell size, cell type)
 	{
 		block = split_free_block(block,size);
 		block->set_type(type);
-		block->set_marked_p(false);
 		return block;
 	}
 	else
@@ -170,18 +141,7 @@ void heap::heap_free(heap_block *block)
 
 void heap::mark_block(heap_block *block)
 {
-	block->set_marked_p(true);
-}
-
-void heap::clear_mark_bits()
-{
-	heap_block *scan = first_block();
-
-	while(scan)
-	{
-		scan->set_marked_p(false);
-		scan = next_block(scan);
-	}
+	state->set_marked_p(block,true);
 }
 
 /* Compute total sum of sizes of free blocks, and size of largest free block */
@@ -210,20 +170,21 @@ void heap::heap_usage(cell *used, cell *total_free, cell *max_free)
 	}
 }
 
-/* The size of the heap, not including the last block if it's free */
+/* The size of the heap after compaction */
 cell heap::heap_size()
 {
 	heap_block *scan = first_block();
+	
+	while(scan)
+	{
+		if(scan->type() == FREE_BLOCK_TYPE) break;
+		else scan = next_block(scan);
+	}
 
-	while(next_block(scan) != NULL)
-		scan = next_block(scan);
+	assert(scan->type() == FREE_BLOCK_TYPE);
+	assert((cell)scan + scan->size() == seg->end);
 
-	/* this is the last block in the heap, and it is free */
-	if(scan->type() == FREE_BLOCK_TYPE)
-		return (cell)scan - seg->start;
-	/* otherwise the last block is allocated */
-	else
-		return seg->size;
+	return (cell)scan - (cell)first_block();
 }
 
 void heap::compact_heap()
@@ -238,7 +199,7 @@ void heap::compact_heap()
 	{
 		heap_block *next = next_block(scan);
  
-		if(scan->type() != FREE_BLOCK_TYPE && scan->marked_p())
+		if(state->is_marked_p(scan))
 		{
 			cell size = scan->size();
 			memmove(address,scan,size);
