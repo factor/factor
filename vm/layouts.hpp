@@ -201,15 +201,6 @@ struct heap_block
 {
 	cell header;
 
-	bool marked_p() { return header & 1; }
-	void set_marked_p(bool marked)
-	{
-		if(marked)
-			header |= 1;
-		else
-			header &= ~1;
-	}
-
 	cell type() { return (header >> 1) & 0x1f; }
 	void set_type(cell type)
 	{
