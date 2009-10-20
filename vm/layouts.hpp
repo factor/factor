@@ -23,10 +23,7 @@ inline static cell align(cell a, cell b)
 	return (a + (b-1)) & ~(b-1);
 }
 
-inline static cell align8(cell a)
-{
-	return align(a,8);
-}
+static const cell data_alignment = 16;
 
 #define WORD_SIZE (signed)(sizeof(cell)*8)
 
@@ -186,6 +183,11 @@ struct byte_array : public object {
 	/* tagged */
 	cell capacity;
 
+#ifndef FACTOR_64
+	cell padding0;
+	cell padding1;
+#endif
+
 	template<typename Scalar> Scalar *data() { return (Scalar *)(this + 1); }
 };
 
@@ -249,9 +251,9 @@ struct code_block : public heap_block
 		return (void *)(this + 1);
 	}
 
-	cell type()
+	code_block_type type()
 	{
-		return (header >> 1) & 0x3;
+		return (code_block_type)((header >> 1) & 0x3);
 	}
 
 	void set_type(code_block_type type)

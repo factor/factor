@@ -218,8 +218,12 @@ USERENV: undefined-quot 60
 
 : here-as ( tag -- pointer ) here bitor ;
 
+: (align-here) ( alignment -- )
+    [ here neg ] dip rem
+    [ bootstrap-cell /i [ 0 emit ] times ] unless-zero ;
+
 : align-here ( -- )
-    here 8 mod 4 = [ 0 emit ] when ;
+    data-alignment get (align-here) ;
 
 : emit-fixnum ( n -- ) tag-fixnum emit ;
 
@@ -293,7 +297,7 @@ M: fake-bignum ' n>> tag-fixnum ;
 M: float '
     [
         float [
-            align-here double>bits emit-64
+            8 (align-here) double>bits emit-64
         ] emit-object
     ] cache-eql-object ;
 
@@ -411,6 +415,7 @@ M: byte-array '
     [
         byte-array [
             dup length emit-fixnum
+            bootstrap-cell 4 = [ 0 emit 0 emit ] when
             pad-bytes emit-bytes
         ] emit-object
     ] cache-eq-object ;

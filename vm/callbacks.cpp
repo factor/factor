@@ -39,14 +39,14 @@ callback *callback_heap::add(code_block *compiled)
 	tagged<byte_array> insns(array_nth(code_template.untagged(),0));
 	cell size = array_capacity(insns.untagged());
 
-	cell bump = align8(size) + sizeof(callback);
+	cell bump = align(size,sizeof(cell)) + sizeof(callback);
 	if(here + bump > seg->end) fatal_error("Out of callback space",0);
 
 	callback *stub = (callback *)here;
 	stub->compiled = compiled;
 	memcpy(stub + 1,insns->data<void>(),size);
 
-	stub->size = align8(size);
+	stub->size = align(size,sizeof(cell));
 	here += bump;
 
 	update(stub);

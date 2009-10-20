@@ -88,7 +88,7 @@ void factor_vm::primitive_fread()
 		return;
 	}
 
-	gc_root<byte_array> buf(allot_array_internal<byte_array>(size),this);
+	gc_root<byte_array> buf(allot_uninitialized_array<byte_array>(size),this);
 
 	for(;;)
 	{

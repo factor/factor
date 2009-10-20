@@ -133,7 +133,7 @@ bool factor_vm::stack_to_array(cell bottom, cell top)
 		return false;
 	else
 	{
-		array *a = allot_array_internal<array>(depth / sizeof(cell));
+		array *a = allot_uninitialized_array<array>(depth / sizeof(cell));
 		memcpy(a + 1,(void*)bottom,depth);
 		dpush(tag<array>(a));
 		return true;
