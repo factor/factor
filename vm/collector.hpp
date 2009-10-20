@@ -68,7 +68,7 @@ template<typename TargetGeneration, typename Policy> struct collector {
 
 	object *promote_object(object *untagged)
 	{
-		cell size = parent->untagged_object_size(untagged);
+		cell size = untagged->size();
 		object *newpointer = target->allot(size);
 		/* XXX not exception-safe */
 		if(!newpointer) longjmp(current_gc->gc_unwind,1);

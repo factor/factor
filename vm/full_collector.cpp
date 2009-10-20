@@ -100,7 +100,7 @@ void full_collector::cheneys_algorithm()
 		object *obj = (object *)scan;
 		this->trace_slots(obj);
 		this->mark_object_code_block(obj);
-		scan = target->next_object_after(this->parent,scan);
+		scan = target->next_object_after(scan);
 	}
 }
 
@@ -120,7 +120,7 @@ void factor_vm::collect_full_impl(bool trace_contexts_p)
 
 	collector.cheneys_algorithm();
 
-	reset_generation(data->aging);
+	data->reset_generation(data->aging);
 	nursery.here = nursery.start;
 }
 
@@ -146,7 +146,7 @@ void factor_vm::collect_full(bool trace_contexts_p, bool compact_code_heap_p)
 {
 	/* Copy all live objects to the tenured semispace. */
 	std::swap(data->tenured,data->tenured_semispace);
-	reset_generation(data->tenured);
+	data->reset_generation(data->tenured);
 	collect_full_impl(trace_contexts_p);
 
 	if(compact_code_heap_p)
