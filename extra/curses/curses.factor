@@ -121,6 +121,30 @@ PRIVATE>
             [ endwin curses-error ] [ ] cleanup
         ] curry with-window
     ] with-destructors ; inline
+
+TUPLE: curses-terminal < disposable
+    infd outfd ptr ;
+
+: <curses-terminal> ( infd outfd ptr -- curses-terminal )
+    curses-terminal new-disposable
+        swap >>ptr
+        swap >>outfd
+        swap >>infd ;
+
+M: curses-terminal dispose
+    [ outfd>> fclose ] [ infd>> fclose ]
+    [ ptr>> delscreen ] tri ;
+
+: init-terminal ( terminal -- curses-terminal )
+    "xterm-color" swap [ "rb" fopen ] [ "wb" fopen ] bi
+    [ newterm curses-pointer-error ] 2keep <curses-terminal> ;
+
+: start-remote-curses ( terminal window -- curses-terminal )
+    [
+        init-terminal
+        initscr curses-pointer-error drop
+        dup ptr>> set_term curses-pointer-error drop
+    ] dip apply-options ;
     
 
 <PRIVATE
