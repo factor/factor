@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien.c-types assocs kernel sequences math math.functions
-hints math.order math.libm fry combinators byte-arrays accessors
-locals ;
+hints math.order math.libm math.floats.private fry combinators
+byte-arrays accessors locals ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors
 
@@ -29,8 +29,16 @@ M: object element-type drop f ; inline
 : [v-] ( u v -- w ) [ [-] ] 2map ;
 : v*   ( u v -- w ) [ * ] 2map ;
 : v/   ( u v -- w ) [ / ] 2map ;
-: vmax ( u v -- w ) [ max ] 2map ;
-: vmin ( u v -- w ) [ min ] 2map ;
+
+<PRIVATE
+
+: if-both-floats ( x y p q -- )
+    [ 2dup [ float? ] both? ] 2dip if ; inline
+
+PRIVATE>
+
+: vmax ( u v -- w ) [ [ float-max ] [ max ] if-both-floats ] 2map ;
+: vmin ( u v -- w ) [ [ float-min ] [ min ] if-both-floats ] 2map ;
 
 : v+- ( u v -- w )
     [ t ] 2dip
