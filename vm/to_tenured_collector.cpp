@@ -4,11 +4,22 @@ namespace factor
 {
 
 to_tenured_collector::to_tenured_collector(factor_vm *myvm_) :
-	copying_collector<tenured_space,to_tenured_policy>(
+	collector<tenured_space,to_tenured_policy>(
 		myvm_,
 		&myvm_->gc_stats.aging_stats,
 		myvm_->data->tenured,
 		to_tenured_policy(myvm_)) {}
+
+void to_tenured_collector::tenure_reachable_objects()
+{
+	std::vector<object *> *mark_stack = &this->target->mark_stack;
+	while(!mark_stack->empty())
+	{
+		object *obj = mark_stack->back();
+		mark_stack->pop_back();
+		this->trace_slots(obj);
+	}
+}
 
 void factor_vm::collect_to_tenured()
 {
@@ -21,7 +32,7 @@ void factor_vm::collect_to_tenured()
 		card_points_to_aging,
 		dummy_unmarker());
 	collector.trace_code_heap_roots(&code->points_to_aging);
-	collector.cheneys_algorithm();
+	collector.tenure_reachable_objects();
 	update_code_heap_for_minor_gc(&code->points_to_aging);
 
 	nursery.here = nursery.start;
