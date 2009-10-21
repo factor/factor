@@ -18,9 +18,10 @@ HELP: mailbox-put
 { $description "Put the object into the mailbox. Any threads that have a blocking get on the mailbox are resumed. Only one of those threads will successfully get the object, the rest will immediately block waiting for the next item in the mailbox." } ;
 
 HELP: block-unless-pred
-{ $values { "pred" { $quotation "( obj -- ? )" } } 
+{ $values
     { "mailbox" mailbox }
     { "timeout" "a " { $link duration } " or " { $link f } }
+    { "pred" { $quotation "( obj -- ? )" } } 
 }
 { $description "Block the thread if there are no items in the mailbox that return true when the predicate is called with the item on the stack." } ;
 
