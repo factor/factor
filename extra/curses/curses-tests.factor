@@ -7,9 +7,9 @@ IN: curses.tests
 : hello-curses ( -- )
     <curses-window> [
         "Hello Curses!" [
-            dup curses-move curses-addch
+            dup cmove addch
         ] each-index
-        curses-refresh
+        crefresh
 
         2 seconds sleep
     ] with-curses ;
