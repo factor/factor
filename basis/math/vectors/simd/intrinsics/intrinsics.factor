@@ -193,12 +193,12 @@ M: vector-rep supported-simd-op?
         { \ (simd-(vpack-unsigned)) [ %unsigned-pack-vector-reps ] }
         { \ (simd-(vunpack-head))   [ (%unpack-reps)             ] }
         { \ (simd-(vunpack-tail))   [ (%unpack-reps)             ] }
-        { \ (simd-v<=)           [ cc<= %compare-vector-reps   ] }
-        { \ (simd-v<)            [ cc< %compare-vector-reps    ] }
-        { \ (simd-v=)            [ cc= %compare-vector-reps    ] }
-        { \ (simd-v>)            [ cc> %compare-vector-reps    ] }
-        { \ (simd-v>=)           [ cc>= %compare-vector-reps   ] }
-        { \ (simd-vunordered?)   [ cc/<>= %compare-vector-reps ] }
+        { \ (simd-v<=)           [ unsign-rep cc<= %compare-vector-reps   ] }
+        { \ (simd-v<)            [ unsign-rep cc< %compare-vector-reps    ] }
+        { \ (simd-v=)            [ unsign-rep cc= %compare-vector-reps    ] }
+        { \ (simd-v>)            [ unsign-rep cc> %compare-vector-reps    ] }
+        { \ (simd-v>=)           [ unsign-rep cc>= %compare-vector-reps   ] }
+        { \ (simd-vunordered?)   [ unsign-rep cc/<>= %compare-vector-reps ] }
         { \ (simd-gather-2)      [ %gather-vector-2-reps       ] }
         { \ (simd-gather-4)      [ %gather-vector-4-reps       ] }
         { \ (simd-vany?)         [ %test-vector-reps           ] }
