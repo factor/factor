@@ -122,7 +122,7 @@ DEFER: if
 : 2bi@ ( w x y z quot -- )
     dup 2bi* ; inline
 
-: 2tri@ ( u v w y x z quot -- )
+: 2tri@ ( u v w x y z quot -- )
     dup dup 2tri* ; inline
 
 ! Quotation building
