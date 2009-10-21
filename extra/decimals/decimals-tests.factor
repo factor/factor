@@ -49,3 +49,4 @@ ERROR: decimal-test-failure D1 D2 quot ;
 [ f ] [ D: -1 D: -2 before? ] unit-test
 [ f ] [ D: -2 D: -2 before? ] unit-test
 [ t ] [ D: -3 D: -2 before? ] unit-test
+[ t ] [ D: .5 D: 0 D: 1.0 between? ] unit-test
