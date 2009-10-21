@@ -122,13 +122,13 @@ unit-test
 [ "stdcall" ] [ "f-stdcall" library abi>> ] unit-test
 
 : ffi_test_18 ( w x y z -- int )
-    "int" "f-stdcall" "ffi_test_18" { "int" "int" "int" "int" }
+    int "f-stdcall" "ffi_test_18" { int int int int }
     alien-invoke gc ;
 
 [ 25 ] [ 2 3 4 5 ffi_test_18 ] unit-test
 
 : ffi_test_19 ( x y z -- BAR )
-    "BAR" "f-stdcall" "ffi_test_19" { "long" "long" "long" }
+    BAR "f-stdcall" "ffi_test_19" { long long long }
     alien-invoke gc ;
 
 [ 11 6 -7 ] [
@@ -157,17 +157,17 @@ FUNCTION: void ffi_test_20 double x1, double x2, double x3,
 ! Make sure XT doesn't get clobbered in stack frame
 
 : ffi_test_31 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result y )
-    "int"
+    int
     "f-cdecl" "ffi_test_31"
-    { "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" }
+    { int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int }
     alien-invoke gc 3 ;
 
 [ 861 3 ] [ 42 [ ] each ffi_test_31 ] unit-test
 
 : ffi_test_31_point_5 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result )
-    "float"
+    float
     "f-cdecl" "ffi_test_31_point_5"
-    { "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" }
+    { float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float }
     alien-invoke ;
 
 [ 861.0 ] [ 42 [ >float ] each ffi_test_31_point_5 ] unit-test
