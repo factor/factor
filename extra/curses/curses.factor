@@ -20,6 +20,26 @@ CONSTANT: COLOR_MAGEN 5
 CONSTANT: COLOR_CYAN  6
 CONSTANT: COLOR_WHITE 7
 
+CONSTANT: A_NORMAL      0
+CONSTANT: A_ATTRIBUTES  -256
+CONSTANT: A_CHARTEXT    255
+CONSTANT: A_COLOR       65280
+CONSTANT: A_STANDOUT    65536
+CONSTANT: A_UNDERLINE   131072
+CONSTANT: A_REVERSE     262144
+CONSTANT: A_BLINK       524288
+CONSTANT: A_DIM         1048576
+CONSTANT: A_BOLD        2097152
+CONSTANT: A_ALTCHARSET  4194304
+CONSTANT: A_INVIS       8388608
+CONSTANT: A_PROTECT     16777216
+CONSTANT: A_HORIZONTAL  33554432
+CONSTANT: A_LEFT        67108864
+CONSTANT: A_LOW         134217728
+CONSTANT: A_RIGHT       268435456
+CONSTANT: A_TOP         536870912
+CONSTANT: A_VERTICAL    1073741824
+
 ERROR: curses-failed ;
 ERROR: unsupported-curses-terminal ;
 
@@ -112,15 +132,13 @@ PRIVATE>
 : with-curses ( window quot -- )
     curses-ok? [ unsupported-curses-terminal ] unless
     [
-        [
+        '[
             ffi:initscr curses-pointer-error
             >>ptr dup apply-options
-        ] dip
-        ffi:erase curses-error
-        init-colors
-        [
-            [ ffi:endwin curses-error ] [ ] cleanup
-        ] curry with-window
+            ffi:erase curses-error
+            init-colors
+            _ with-window
+        ] [ ffi:endwin curses-error ] [ ] cleanup
     ] with-destructors ; inline
 
 TUPLE: curses-terminal < disposable
@@ -172,16 +190,22 @@ M: curses-terminal dispose
 : (wgetch) ( window -- key )
     ffi:wgetch [ curses-error ] keep ; inline
 
+: (wattroff) ( attribute window-ptr -- )
+    swap ffi:wattroff curses-error ; inline
+
+: (wattron) ( attribute window-ptr -- )
+    swap ffi:wattron curses-error ; inline
+
 PRIVATE>
 
 : wcrefresh ( window -- ) ptr>> (wcrefresh) ;
 : crefresh ( -- ) current-window get wcrefresh ;
 
-: wcwrite ( string window -- ) ptr>> (wcwrite) ;
-: cwrite ( string -- ) current-window get wcwrite ;
-
 : wcnl ( window -- ) [ "\n" ] dip ptr>> (wcwrite) ;
 : cnl ( -- ) current-window get wcnl ;
+
+: wcwrite ( string window -- ) ptr>> (wcwrite) ;
+: cwrite ( string -- ) current-window get wcwrite ;
 
 : wcprint ( string window -- )
     ptr>> [ (wcwrite) ] [ "\n" swap (wcwrite) ] bi ;
@@ -190,7 +214,7 @@ PRIVATE>
 : wcprintf ( string window -- )
     ptr>> [ (wcwrite) ] [ "\n" swap (wcwrite) ]
     [ (wcrefresh) ] tri ;
-: curses-print-refresh ( string -- ) current-window get wcprintf ;
+: cprintf ( string -- ) current-window get wcprintf ;
 
 : wcwritef ( string window -- )
     ptr>> [ (wcwrite) ] [ (wcrefresh) ] bi ;
@@ -227,11 +251,20 @@ PRIVATE>
 : insert-line ( string y -- )
     current-window get winsert-line ;
 
+: wattron ( attribute window -- ) ptr>> (wattron) ;
+: attron ( attribute -- ) current-window get wattron ;
+
+: wattroff ( attribute window -- ) ptr>> (wattroff) ;
+: attroff ( attribute -- ) current-window get wattroff ;
+
+: wall-attroff ( window -- ) [ A_NORMAL ] dip wattroff ;
+: all-attroff ( -- ) current-window get wall-attroff ;
+
 : wccolor ( foreground background window -- )
     [
         2dup [ COLOR_WHITE = ] [ COLOR_BLACK = ] bi* and
         [ 2drop 0 ] [ register-color ] if ffi:COLOR_PAIR
-    ] dip ptr>> swap ffi:wattron curses-error ;
+    ] dip ptr>> (wattron) ;
 
 : ccolor ( foreground background -- )
     current-window get wccolor ;
