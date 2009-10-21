@@ -40,6 +40,102 @@ CONSTANT: A_RIGHT       268435456
 CONSTANT: A_TOP         536870912
 CONSTANT: A_VERTICAL    1073741824
 
+CONSTANT: KEY_CODE_YES  OCT: 400  /* A wchar_t contains a key code */
+CONSTANT: KEY_MIN       OCT: 401  /* Minimum curses key */
+CONSTANT: KEY_BREAK     OCT: 401  /* Break key (unreliable) */
+CONSTANT: KEY_SRESET    OCT: 530  /* Soft (partial) reset (unreliable) */
+CONSTANT: KEY_RESET     OCT: 531  /* Reset or hard reset (unreliable) */
+CONSTANT: KEY_DOWN      OCT: 402  /* down-arrow key */
+CONSTANT: KEY_UP        OCT: 403  /* up-arrow key */
+CONSTANT: KEY_LEFT      OCT: 404  /* left-arrow key */
+CONSTANT: KEY_RIGHT     OCT: 405  /* right-arrow key */
+CONSTANT: KEY_HOME      OCT: 406  /* home key */
+CONSTANT: KEY_BACKSPACE OCT: 407  /* backspace key */
+CONSTANT: KEY_DL        OCT: 510  /* delete-line key */
+CONSTANT: KEY_IL        OCT: 511  /* insert-line key */
+CONSTANT: KEY_DC        OCT: 512  /* delete-character key */
+CONSTANT: KEY_IC        OCT: 513  /* insert-character key */
+CONSTANT: KEY_EIC       OCT: 514  /* sent by rmir or smir in insert mode */
+CONSTANT: KEY_CLEAR     OCT: 515  /* clear-screen or erase key */
+CONSTANT: KEY_EOS       OCT: 516  /* clear-to-end-of-screen key */
+CONSTANT: KEY_EOL       OCT: 517  /* clear-to-end-of-line key */
+CONSTANT: KEY_SF        OCT: 520  /* scroll-forward key */
+CONSTANT: KEY_SR        OCT: 521  /* scroll-backward key */
+CONSTANT: KEY_NPAGE     OCT: 522  /* next-page key */
+CONSTANT: KEY_PPAGE     OCT: 523  /* previous-page key */
+CONSTANT: KEY_STAB      OCT: 524  /* set-tab key */
+CONSTANT: KEY_CTAB      OCT: 525  /* clear-tab key */
+CONSTANT: KEY_CATAB     OCT: 526  /* clear-all-tabs key */
+CONSTANT: KEY_ENTER     OCT: 527  /* enter/send key */
+CONSTANT: KEY_PRINT     OCT: 532  /* print key */
+CONSTANT: KEY_LL        OCT: 533  /* lower-left key (home down) */
+CONSTANT: KEY_A1        OCT: 534  /* upper left of keypad */
+CONSTANT: KEY_A3        OCT: 535  /* upper right of keypad */
+CONSTANT: KEY_B2        OCT: 536  /* center of keypad */
+CONSTANT: KEY_C1        OCT: 537  /* lower left of keypad */
+CONSTANT: KEY_C3        OCT: 540  /* lower right of keypad */
+CONSTANT: KEY_BTAB      OCT: 541  /* back-tab key */
+CONSTANT: KEY_BEG       OCT: 542  /* begin key */
+CONSTANT: KEY_CANCEL    OCT: 543  /* cancel key */
+CONSTANT: KEY_CLOSE     OCT: 544  /* close key */
+CONSTANT: KEY_COMMAND   OCT: 545  /* command key */
+CONSTANT: KEY_COPY      OCT: 546  /* copy key */
+CONSTANT: KEY_CREATE    OCT: 547  /* create key */
+CONSTANT: KEY_END       OCT: 550  /* end key */
+CONSTANT: KEY_EXIT      OCT: 551  /* exit key */
+CONSTANT: KEY_FIND      OCT: 552  /* find key */
+CONSTANT: KEY_HELP      OCT: 553  /* help key */
+CONSTANT: KEY_MARK      OCT: 554  /* mark key */
+CONSTANT: KEY_MESSAGE   OCT: 555  /* message key */
+CONSTANT: KEY_MOVE      OCT: 556  /* move key */
+CONSTANT: KEY_NEXT      OCT: 557  /* next key */
+CONSTANT: KEY_OPEN      OCT: 560  /* open key */
+CONSTANT: KEY_OPTIONS   OCT: 561  /* options key */
+CONSTANT: KEY_PREVIOUS  OCT: 562  /* previous key */
+CONSTANT: KEY_REDO      OCT: 563  /* redo key */
+CONSTANT: KEY_REFERENCE OCT: 564  /* reference key */
+CONSTANT: KEY_REFRESH   OCT: 565  /* refresh key */
+CONSTANT: KEY_REPLACE   OCT: 566  /* replace key */
+CONSTANT: KEY_RESTART   OCT: 567  /* restart key */
+CONSTANT: KEY_RESUME    OCT: 570  /* resume key */
+CONSTANT: KEY_SAVE      OCT: 571  /* save key */
+CONSTANT: KEY_SBEG      OCT: 572  /* shifted begin key */
+CONSTANT: KEY_SCANCEL   OCT: 573  /* shifted cancel key */
+CONSTANT: KEY_SCOMMAND  OCT: 574  /* shifted command key */
+CONSTANT: KEY_SCOPY     OCT: 575  /* shifted copy key */
+CONSTANT: KEY_SCREATE   OCT: 576  /* shifted create key */
+CONSTANT: KEY_SDC       OCT: 577  /* shifted delete-character key */
+CONSTANT: KEY_SDL       OCT: 600  /* shifted delete-line key */
+CONSTANT: KEY_SELECT    OCT: 601  /* select key */
+CONSTANT: KEY_SEND      OCT: 602  /* shifted end key */
+CONSTANT: KEY_SEOL      OCT: 603  /* shifted clear-to-end-of-line key */
+CONSTANT: KEY_SEXIT     OCT: 604  /* shifted exit key */
+CONSTANT: KEY_SFIND     OCT: 605  /* shifted find key */
+CONSTANT: KEY_SHELP     OCT: 606  /* shifted help key */
+CONSTANT: KEY_SHOME     OCT: 607  /* shifted home key */
+CONSTANT: KEY_SIC       OCT: 610  /* shifted insert-character key */
+CONSTANT: KEY_SLEFT     OCT: 611  /* shifted left-arrow key */
+CONSTANT: KEY_SMESSAGE  OCT: 612  /* shifted message key */
+CONSTANT: KEY_SMOVE     OCT: 613  /* shifted move key */
+CONSTANT: KEY_SNEXT     OCT: 614  /* shifted next key */
+CONSTANT: KEY_SOPTIONS  OCT: 615  /* shifted options key */
+CONSTANT: KEY_SPREVIOUS OCT: 616  /* shifted previous key */
+CONSTANT: KEY_SPRINT    OCT: 617  /* shifted print key */
+CONSTANT: KEY_SREDO     OCT: 620  /* shifted redo key */
+CONSTANT: KEY_SREPLACE  OCT: 621  /* shifted replace key */
+CONSTANT: KEY_SRIGHT    OCT: 622  /* shifted right-arrow key */
+CONSTANT: KEY_SRSUME    OCT: 623  /* shifted resume key */
+CONSTANT: KEY_SSAVE     OCT: 624  /* shifted save key */
+CONSTANT: KEY_SSUSPEND  OCT: 625  /* shifted suspend key */
+CONSTANT: KEY_SUNDO     OCT: 626  /* shifted undo key */
+CONSTANT: KEY_SUSPEND   OCT: 627  /* suspend key */
+CONSTANT: KEY_UNDO      OCT: 630  /* undo key */
+CONSTANT: KEY_MOUSE     OCT: 631  /* Mouse event has occurred */
+CONSTANT: KEY_RESIZE    OCT: 632  /* Terminal resize event */
+CONSTANT: KEY_EVENT     OCT: 633  /* We were interrupted by an event */
+CONSTANT: KEY_F0        OCT: 410  /* Function keys.  Space for 64 */
+: KEY_F ( n -- code ) KEY_F0 + ; inline /* Value of function key n */
+
 ERROR: curses-failed ;
 ERROR: unsupported-curses-terminal ;
 
