@@ -142,8 +142,15 @@ M: simd-128 vshuffle ( u perm -- v )
 : vunordered? ( u v -- w ) [ unordered? ] 2map ;
 : v=  ( u v -- w ) [ =   ] 2map ;
 
-: v? ( mask true false -- w )
+: v? ( mask true false -- result )
     [ vand ] [ vandn ] bi-curry* bi vor ; inline
+
+:: vif ( mask true-quot false-quot -- result )
+    {
+        { [ mask vall?  ] [ true-quot  call ] }
+        { [ mask vnone? ] [ false-quot call ] }
+        [ mask true-quot call false-quot call v? ]
+    } cond ; inline
 
 : vfloor    ( u -- v ) [ floor ] map ;
 : vceiling  ( u -- v ) [ ceiling ] map ;

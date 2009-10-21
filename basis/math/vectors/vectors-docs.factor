@@ -101,6 +101,7 @@ $nl
     vxor
     vnot
     v?
+    vif
 }
 "Entire vector tests:"
 { $subsections
@@ -534,9 +535,18 @@ HELP: vnot
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: v?
-{ $values { "mask" "a sequence of booleans" } { "true" "a sequence of numbers" } { "false" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "mask" "a sequence of booleans" } { "true" "a sequence of numbers" } { "false" "a sequence of numbers" } { "result" "a sequence of numbers" } }
 { $description "Creates a new sequence by selecting elements from the " { $snippet "true" } " and " { $snippet "false" } " sequences based on whether the corresponding bits of the " { $snippet "mask" } " sequence are set or not." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
+
+HELP: vif
+{ $values { "mask" "a sequence of booleans" } { "true-quot" { $quotation "( -- vector )" } } { "false-quot" { $quotation "( -- vector )" } } { "result" "a sequence" } }
+{ $description "If all of the elements of " { $snippet "mask" } " are true, " { $snippet "true-quot" } " is called and its output value returned. If all of the elements of " { $snippet "mask" } " are false, " { $snippet "false-quot" } " is called and its output value returned. Otherwise, both quotations are called and " { $snippet "mask" } " is used to select elements from each output as with " { $link v? } "." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types."
+$nl
+"For most conditional SIMD code, unless a case is exceptionally expensive to compute, it is usually most efficient to just compute all cases and blend them with " { $link v? } " instead of using " { $snippet "vif" } "." } ;
+
+{ v? vif } related-words
 
 HELP: vany?
 { $values { "v" "a sequence of booleans" } { "?" "a boolean" } }
