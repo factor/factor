@@ -91,3 +91,10 @@ PRIVATE>
         [ do-error-destructors ]
         cleanup
     ] with-scope ; inline
+
+[
+    [
+        always-destructors get-global dispose-each
+        error-destructors get-global dispose-each
+    ] with-destructors
+] "destructors.global" add-shutdown-hook
