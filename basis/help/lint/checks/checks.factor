@@ -33,14 +33,13 @@ SYMBOL: vocab-articles
 
 : extract-values ( element -- seq )
     \ $values swap elements dup empty? [
-        first rest [ first ] map prune natural-sort
+        first rest [ first ] map prune
     ] unless ;
 
 : effect-values ( word -- seq )
     stack-effect
     [ in>> ] [ out>> ] bi append
-    [ dup pair? [ first ] when effect>string ] map
-    prune natural-sort ;
+    [ dup pair? [ first ] when effect>string ] map prune ;
 
 : contains-funky-elements? ( element -- ? )
     {
