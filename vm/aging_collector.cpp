@@ -25,7 +25,7 @@ void factor_vm::collect_aging()
 		collector.trace_cards(data->tenured,
 			card_points_to_aging,
 			simple_unmarker(card_mark_mask));
-		collector.cheneys_algorithm();
+		collector.tenure_reachable_objects();
 	}
 	{
 		/* If collection fails here, do a to_tenured collection. */

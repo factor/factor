@@ -8,7 +8,7 @@ code_heap::code_heap(cell size)
 	if(size > (1L << (sizeof(cell) * 8 - 6))) fatal_error("Heap too large",size);
 	seg = new segment(align_page(size),true);
 	if(!seg) fatal_error("Out of memory in heap allocator",size);
-	allocator = new free_list_allocator<heap_block>(seg->start,size);
+	allocator = new free_list_allocator<heap_block>(size,seg->start);
 }
 
 code_heap::~code_heap()

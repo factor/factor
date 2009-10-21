@@ -10,11 +10,10 @@ struct data_heap {
 
 	segment *seg;
 
-	bump_allocator *nursery;
+	nursery_space *nursery;
 	aging_space *aging;
 	aging_space *aging_semispace;
 	tenured_space *tenured;
-	tenured_space *tenured_semispace;
 
 	card *cards;
 	card *cards_end;
@@ -49,7 +48,6 @@ their allocation pointers and cards reset. */
 template<typename Generation> void data_heap::reset_generation(Generation *gen)
 {
 	gen->here = gen->start;
-
 	clear_cards(gen);
 	clear_decks(gen);
 	gen->starts.clear_object_start_offsets();

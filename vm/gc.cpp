@@ -235,11 +235,13 @@ object *factor_vm::allot_object(header header, cell size)
 	else
 	{
 		/* If tenured space does not have enough room, collect */
-		if(data->tenured->here + size > data->tenured->end)
+		//XXX
+		//if(data->tenured->here + size > data->tenured->end)
 			primitive_full_gc();
 
 		/* If it still won't fit, grow the heap */
-		if(data->tenured->here + size > data->tenured->end)
+		//XXX
+		//if(data->tenured->here + size > data->tenured->end)
 		{
 			gc(collect_growing_heap_op,
 				size, /* requested size */

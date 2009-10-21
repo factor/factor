@@ -9,29 +9,17 @@ struct free_list {
 };
 
 template<typename Block> struct free_list_allocator {
-	cell start;
 	cell size;
+	cell start;
 	cell end;
 	free_list free_blocks;
 	mark_bits<Block> state;
 
-	explicit free_list_allocator(cell start, cell size);
-
-	inline Block *first_block()
-	{
-		return (Block *)start;
-	}
-
-	inline Block *last_block()
-	{
-		return (Block *)end;
-	}
-
-	Block *next_block_after(heap_block *block)
-	{
-		return (Block *)((cell)block + block->size());
-	}
-
+	explicit free_list_allocator(cell size, cell start);
+	bool contains_p(Block *block);
+	Block *first_block();
+	Block *last_block();
+	Block *next_block_after(Block *block);
 	void clear_free_list();
 	void add_to_free_list(free_heap_block *block);
 	void build_free_list(cell size);
@@ -42,35 +30,42 @@ template<typename Block> struct free_list_allocator {
 	void free(Block *block);
 	void usage(cell *used, cell *total_free, cell *max_free);
 	cell occupied();
-
+	void sweep();
 	template<typename Iterator> void sweep(Iterator &iter);
 	template<typename Iterator> void compact(Iterator &iter);
-
-	template<typename Iterator> void iterate(Iterator &iter)
-	{
-		Block *scan = first_block();
-		Block *end = last_block();
-
-		while(scan != end)
-		{
-			cell size = scan->size();
-			Block *next = (Block *)((cell)scan + size);
-			if(!scan->free_p()) iter(scan,size);
-			scan = next;
-		}
-	}
+	template<typename Iterator> void iterate(Iterator &iter);
 };
+
+template<typename Block>
+free_list_allocator<Block>::free_list_allocator(cell size_, cell start_) :
+	size(size_), start(start_), end(start_ + size_), state(mark_bits<Block>(size_,start_))
+{
+	clear_free_list();
+}
 
 template<typename Block> void free_list_allocator<Block>::clear_free_list()
 {
 	memset(&free_blocks,0,sizeof(free_list));
 }
 
-template<typename Block>
-free_list_allocator<Block>::free_list_allocator(cell start_, cell size_) :
-	start(start_), size(size_), end(start_ + size_), state(mark_bits<Block>(start_,size_))
+template<typename Block> bool free_list_allocator<Block>::contains_p(Block *block)
 {
-	clear_free_list();
+	return ((cell)block - start) < size;
+}
+
+template<typename Block> Block *free_list_allocator<Block>::first_block()
+{
+	return (Block *)start;
+}
+
+template<typename Block> Block *free_list_allocator<Block>::last_block()
+{
+	return (Block *)end;
+}
+
+template<typename Block> Block *free_list_allocator<Block>::next_block_after(Block *block)
+{
+	return (Block *)((cell)block + block->size());
 }
 
 template<typename Block> void free_list_allocator<Block>::add_to_free_list(free_heap_block *block)
@@ -234,8 +229,56 @@ template<typename Block> cell free_list_allocator<Block>::occupied()
 		return size;
 }
 
-/* After code GC, all live code blocks are marked, so any
-which are not marked can be reclaimed. */
+template<typename Block>
+void free_list_allocator<Block>::sweep()
+{
+	this->clear_free_list();
+
+	Block *prev = NULL;
+	Block *scan = this->first_block();
+	Block *end = this->last_block();
+
+	while(scan != end)
+	{
+		cell size = scan->size();
+
+		if(scan->free_p())
+		{
+			if(prev && prev->free_p())
+			{
+				free_heap_block *free_prev = (free_heap_block *)prev;
+				free_prev->set_size(free_prev->size() + size);
+			}
+			else
+				prev = scan;
+		}
+		else if(this->state.marked_p(scan))
+		{
+			if(prev && prev->free_p())
+				this->add_to_free_list((free_heap_block *)prev);
+			prev = scan;
+		}
+		else
+		{
+			if(prev && prev->free_p())
+			{
+				free_heap_block *free_prev = (free_heap_block *)prev;
+				free_prev->set_size(free_prev->size() + size);
+			}
+			else
+			{
+				((free_heap_block *)scan)->set_free();
+				prev = scan;
+			}
+		}
+
+		scan = (Block *)((cell)scan + size);
+	}
+
+	if(prev && prev->free_p())
+		this->add_to_free_list((free_heap_block *)prev);
+}
+
 template<typename Block>
 template<typename Iterator>
 void free_list_allocator<Block>::sweep(Iterator &iter)
@@ -300,6 +343,22 @@ void free_list_allocator<Block>::compact(Iterator &iter)
 	/* Now update the free list; there will be a single free block at
 	the end */
 	this->build_free_list((cell)compactor.address - this->start);
+}
+
+template<typename Block>
+template<typename Iterator>
+void free_list_allocator<Block>::iterate(Iterator &iter)
+{
+	Block *scan = first_block();
+	Block *end = last_block();
+
+	while(scan != end)
+	{
+		cell size = scan->size();
+		Block *next = (Block *)((cell)scan + size);
+		if(!scan->free_p()) iter(scan,size);
+		scan = next;
+	}
 }
 
 }

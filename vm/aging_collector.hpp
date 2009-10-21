@@ -15,6 +15,10 @@ struct aging_policy {
 	{
 		return !(aging->contains_p(untagged) || tenured->contains_p(untagged));
 	}
+
+	void promoted_object(object *obj) {}
+
+	void visited_object(object *obj) {}
 };
 
 struct aging_collector : copying_collector<aging_space,aging_policy> {
