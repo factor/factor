@@ -188,14 +188,17 @@ M: curses-window dispose* ( window -- )
         [ ffi:cbreak ] [ ffi:nocbreak ] if
     ] if curses-error ;
 
-: apply-options ( window -- )
+: apply-window-options ( window -- )
     {
-        [ [ cbreak>> ] [ raw>> ] bi set-cbreak/raw ]
-        [ echo>> [ ffi:echo ] [ ffi:noecho ] if curses-error ]
         [ [ ptr>> ] [ scrollok>> >BOOLEAN ] bi ffi:scrollok curses-error ]
         [ [ ptr>> ] [ leaveok>> >BOOLEAN ] bi ffi:leaveok curses-error ]
         [ [ ptr>> ] [ keypad>> >BOOLEAN ] bi ffi:keypad curses-error ]
     } cleave ;
+
+: apply-global-options ( window -- )
+    [ [ cbreak>> ] [ raw>> ] bi set-cbreak/raw ]
+    [ echo>> [ ffi:echo ] [ ffi:noecho ] if curses-error ]
+    bi ;
 
 SYMBOL: n-registered-colors
 
@@ -220,7 +223,7 @@ PRIVATE>
         ] [
             window-params ffi:newwin
         ] if* [ curses-error ] keep >>ptr &dispose
-    ] [ apply-options ] bi ;
+    ] [ apply-window-options ] bi ;
 
 : with-window ( window quot -- )
     [ current-window ] dip with-variable ; inline
@@ -230,9 +233,12 @@ PRIVATE>
     [
         '[
             ffi:initscr curses-pointer-error
-            >>ptr dup apply-options
+            >>ptr
+            [ apply-global-options ] [ apply-window-options ] [ ] tri
+
             ffi:erase curses-error
             init-colors
+
             _ with-window
         ] [ ffi:endwin curses-error ] [ ] cleanup
     ] with-destructors ; inline
@@ -259,7 +265,7 @@ M: curses-terminal dispose
         init-terminal
         ffi:initscr curses-pointer-error drop
         dup ptr>> ffi:set_term curses-pointer-error drop
-    ] dip apply-options ;
+    ] dip [ apply-global-options ] [ apply-window-options ] bi ;
     
 <PRIVATE
 
