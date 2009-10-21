@@ -8,8 +8,8 @@ CLASS: {
     { +name+ "Foo" }
 } {
     "foo:"
-    "void"
-    { "id" "SEL" "NSRect" }
+    void
+    { id SEL NSRect }
     [ gc "x" set 2drop ]
 } ;
 
@@ -30,8 +30,8 @@ CLASS: {
     { +name+ "Bar" }
 } {
     "bar"
-    "NSRect"
-    { "id" "SEL" }
+    NSRect
+    { id SEL }
     [ 2drop test-foo "x" get ]
 } ;
 
@@ -52,13 +52,13 @@ CLASS: {
     { +name+ "Bar" }
 } {
     "bar"
-    "NSRect"
-    { "id" "SEL" }
+    NSRect
+    { id SEL }
     [ 2drop test-foo "x" get ]
 } {
     "babb"
-    "int"
-    { "id" "SEL" "int" }
+    int
+    { id SEL int }
     [ 2nip sq ]
 } ;
 

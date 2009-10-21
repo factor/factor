@@ -9,8 +9,8 @@ CLASS: {
     { +name+ "Bar" }
 } {
     "bar:"
-    "float"
-    { "id" "SEL" "NSRect" }
+    float
+    { id SEL NSRect }
     [
         [ origin>> [ x>> ] [ y>> ] bi + ]
         [ size>> [ w>> ] [ h>> ] bi + ]
