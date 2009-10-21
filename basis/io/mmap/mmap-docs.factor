@@ -68,8 +68,7 @@ ARTICLE: "io.mmap.arrays" "Working with memory-mapped data"
 "The " { $link <mapped-file> } " word returns an instance of " { $link mapped-file } ", which doesn't directly support the sequence protocol. Instead, it needs to be wrapped in a specialized array of the appropriate C type:"
 { $subsections <mapped-array> }
 "Additionally, files may be opened with two combinators which take a c-type as input:"
-{ $subsections with-mapped-array }
-{ $subsections with-mapped-array-reader }
+{ $subsections with-mapped-array with-mapped-array-reader }
 "The appropriate specialized array type must first be generated with " { $link POSTPONE: SPECIALIZED-ARRAY: } "."
 $nl
 "Data can also be read and written from the " { $link mapped-file } " by applying low-level alien words to the " { $slot "address" } " slot. This approach is not recommended, though, since in most cases the compiler will generate efficient code for specialized array usage. See " { $link "reading-writing-memory" } " for a description of low-level memory access primitives." ;
@@ -101,10 +100,10 @@ ARTICLE: "io.mmap" "Memory-mapped files"
 { $subsections <mapped-file> }
 "Memory-mapped files are disposable and can be closed with " { $link dispose } " or " { $link with-disposal } "." $nl
 "Utility combinators which wrap the above:"
-{ $subsections with-mapped-file }
-{ $subsections with-mapped-file-reader }
-{ $subsections with-mapped-array }
-{ $subsections with-mapped-array-reader }
+{ $subsections with-mapped-file
+    with-mapped-file-reader
+    with-mapped-array
+    with-mapped-array-reader }
 "Instances of " { $link mapped-file } " don't support any interesting operations in themselves. There are two facilities for accessing their contents:"
 { $subsections
     "io.mmap.arrays"
