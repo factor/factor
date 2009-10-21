@@ -93,8 +93,6 @@ PRIVATE>
     ] with-scope ; inline
 
 [
-    [
-        always-destructors get-global dispose-each
-        error-destructors get-global dispose-each
-    ] with-destructors
+    always-destructors get-global
+    error-destructors get-global append dispose-each
 ] "destructors.global" add-shutdown-hook
