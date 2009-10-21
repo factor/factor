@@ -39,7 +39,7 @@ void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 		fatal_error("load_data_heap failed",0);
 	}
 
-	data->tenured->here = data->tenured->start + h->data_size;
+	data->tenured->build_free_list(h->data_size);
 }
 
 void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
@@ -203,7 +203,7 @@ void factor_vm::relocate_data(cell data_relocation_base, cell code_relocation_ba
 	{
 		relocate_object((object *)obj,data_relocation_base,code_relocation_base);
 		data->tenured->starts.record_object_start_offset((object *)obj);
-		obj = data->tenured->next_allocated_block_after(obj);
+		obj = data->tenured->next_object_after(obj);
 	}
 }
 
@@ -289,7 +289,7 @@ bool factor_vm::save_image(const vm_char *filename)
 	h.magic = image_magic;
 	h.version = image_version;
 	h.data_relocation_base = data->tenured->start;
-	h.data_size = data->tenured->here - data->tenured->start;
+	h.data_size = data->tenured->occupied();
 	h.code_relocation_base = code->seg->start;
 	h.code_size = code->allocator->occupied();
 

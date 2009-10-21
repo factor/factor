@@ -11,7 +11,7 @@ struct factor_vm
 	context *ctx;
 	
 	/* New objects are allocated here */
-	bump_allocator nursery;
+	nursery_space nursery;
 
 	/* Add this to a shifted address to compute write barrier offsets */
 	cell cards_offset;
@@ -308,7 +308,7 @@ struct factor_vm
 	void print_callstack();
 	void dump_cell(cell x);
 	void dump_memory(cell from, cell to);
-	void dump_zone(const char *name, bump_allocator *z);
+	template<typename Generation> void dump_generation(const char *name, Generation *gen);
 	void dump_generations();
 	void dump_objects(cell type);
 	void find_data_references_step(cell *scan);

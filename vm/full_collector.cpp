@@ -4,7 +4,7 @@ namespace factor
 {
 
 full_collector::full_collector(factor_vm *parent_) :
-	copying_collector<tenured_space,full_policy>(
+	collector<tenured_space,full_policy>(
 		parent_,
 		&parent_->gc_stats.full_stats,
 		parent_->data->tenured,
@@ -89,18 +89,22 @@ void full_collector::trace_literal_references(code_block *compiled)
 collections */
 void full_collector::mark_code_block(code_block *compiled)
 {
-	this->code->set_marked_p(compiled);
-	trace_literal_references(compiled);
+	if(!this->code->marked_p(compiled))
+	{
+		this->code->set_marked_p(compiled);
+		trace_literal_references(compiled);
+	}
 }
 
-void full_collector::cheneys_algorithm()
+void full_collector::mark_reachable_objects()
 {
-	while(scan && scan < target->here)
+	std::vector<object *> *mark_stack = &this->target->mark_stack;
+	while(!mark_stack->empty())
 	{
-		object *obj = (object *)scan;
+		object *obj = mark_stack->back();
+		mark_stack->pop_back();
 		this->trace_slots(obj);
 		this->mark_object_code_block(obj);
-		scan = target->next_allocated_block_after(scan);
 	}
 }
 
@@ -109,6 +113,7 @@ void factor_vm::collect_full_impl(bool trace_contexts_p)
 	full_collector collector(this);
 
 	code->clear_mark_bits();
+	data->tenured->clear_mark_bits();
 
 	collector.trace_roots();
         if(trace_contexts_p)
@@ -118,8 +123,9 @@ void factor_vm::collect_full_impl(bool trace_contexts_p)
 		collector.trace_callbacks();
 	}
 
-	collector.cheneys_algorithm();
+	collector.mark_reachable_objects();
 
+	data->tenured->sweep();
 	data->reset_generation(data->aging);
 	nursery.here = nursery.start;
 }
@@ -144,9 +150,6 @@ void factor_vm::collect_growing_heap(cell requested_bytes,
 
 void factor_vm::collect_full(bool trace_contexts_p, bool compact_code_heap_p)
 {
-	/* Copy all live objects to the tenured semispace. */
-	std::swap(data->tenured,data->tenured_semispace);
-	data->reset_generation(data->tenured);
 	collect_full_impl(trace_contexts_p);
 
 	if(compact_code_heap_p)

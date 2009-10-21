@@ -19,7 +19,7 @@ data_heap::data_heap(cell young_size_, cell aging_size_, cell tenured_size_)
 	aging_size = aging_size_;
 	tenured_size = tenured_size_;
 
-	cell total_size = young_size + 2 * aging_size + 2 * tenured_size;
+	cell total_size = young_size + 2 * aging_size + tenured_size;
 
 	total_size += deck_size;
 
@@ -29,20 +29,21 @@ data_heap::data_heap(cell young_size_, cell aging_size_, cell tenured_size_)
 
 	cards = new card[cards_size];
 	cards_end = cards + cards_size;
+	memset(cards,0,cards_size);
 
 	cell decks_size = addr_to_deck(total_size);
 	decks = new card_deck[decks_size];
 	decks_end = decks + decks_size;
+	memset(decks,0,decks_size);
 
 	start = align(seg->start,deck_size);
 
 	tenured = new tenured_space(tenured_size,start);
-	tenured_semispace = new tenured_space(tenured_size,tenured->end);
 
-	aging = new aging_space(aging_size,tenured_semispace->end);
+	aging = new aging_space(aging_size,tenured->end);
 	aging_semispace = new aging_space(aging_size,aging->end);
 
-	nursery = new bump_allocator(young_size,aging_semispace->end);
+	nursery = new nursery_space(young_size,aging_semispace->end);
 
 	assert(seg->end - nursery->end <= deck_size);
 }
@@ -54,7 +55,6 @@ data_heap::~data_heap()
 	delete aging;
 	delete aging_semispace;
 	delete tenured;
-	delete tenured_semispace;
 	delete[] cards;
 	delete[] decks;
 }
@@ -71,8 +71,6 @@ void factor_vm::set_data_heap(data_heap *data_)
 	nursery = *data->nursery;
 	nursery.here = nursery.start;
 	init_card_decks();
-	data->reset_generation(data->aging);
-	data->reset_generation(data->tenured);
 }
 
 void factor_vm::init_data_heap(cell young_size, cell aging_size, cell tenured_size)
@@ -185,8 +183,11 @@ void factor_vm::primitive_data_room()
 	a.add(tag_fixnum((data->aging->end - data->aging->here) >> 10));
 	a.add(tag_fixnum((data->aging->size) >> 10));
 
-	a.add(tag_fixnum((data->tenured->end - data->tenured->here) >> 10));
-	a.add(tag_fixnum((data->tenured->size) >> 10));
+	//XXX
+	cell used, total_free, max_free;
+	data->tenured->usage(&used,&total_free,&max_free);
+	a.add(tag_fixnum(total_free >> 10));
+	a.add(tag_fixnum(used >> 10));
 
 	a.trim();
 	dpush(a.elements.value());
@@ -195,7 +196,7 @@ void factor_vm::primitive_data_room()
 /* Disables GC and activates next-object ( -- obj ) primitive */
 void factor_vm::begin_scan()
 {
-	heap_scan_ptr = data->tenured->start;
+	heap_scan_ptr = data->tenured->first_object();
 	gc_off = true;
 }
 
@@ -214,12 +215,14 @@ cell factor_vm::next_object()
 	if(!gc_off)
 		general_error(ERROR_HEAP_SCAN,false_object,false_object,NULL);
 
-	if(heap_scan_ptr >= data->tenured->here)
+	if(heap_scan_ptr)
+	{
+		cell current = heap_scan_ptr;
+		heap_scan_ptr = data->tenured->next_object_after(heap_scan_ptr);
+		return tag_dynamic((object *)current);
+	}
+	else
 		return false_object;
-
-	object *obj = (object *)heap_scan_ptr;
-	heap_scan_ptr += obj->size();
-	return tag_dynamic(obj);
 }
 
 /* Push object at heap scan cursor and advance; pushes f when done */

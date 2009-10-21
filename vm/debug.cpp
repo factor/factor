@@ -209,19 +209,21 @@ void factor_vm::dump_memory(cell from, cell to)
 		dump_cell(from);
 }
 
-void factor_vm::dump_zone(const char *name, bump_allocator *z)
+template<typename Generation>
+void factor_vm::dump_generation(const char *name, Generation *gen)
 {
 	print_string(name); print_string(": ");
-	print_string("Start="); print_cell(z->start);
-	print_string(", size="); print_cell(z->size);
-	print_string(", here="); print_cell(z->here - z->start); nl();
+	print_string("Start="); print_cell(gen->start);
+	print_string(", size="); print_cell(gen->size);
+	print_string(", end="); print_cell(gen->end);
+	nl();
 }
 
 void factor_vm::dump_generations()
 {
-	dump_zone("Nursery",&nursery);
-	dump_zone("Aging",data->aging);
-	dump_zone("Tenured",data->tenured);
+	dump_generation("Nursery",&nursery);
+	dump_generation("Aging",data->aging);
+	dump_generation("Tenured",data->tenured);
 
 	print_string("Cards: base=");
 	print_cell((cell)data->cards);
