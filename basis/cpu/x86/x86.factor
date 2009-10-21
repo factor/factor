@@ -893,7 +893,7 @@ M: x86 %compare-vector ( dst src1 src2 rep cc -- )
 
 M: x86 %compare-vector-reps
     {
-        { [ dup { cc= cc/= } memq? ] [ drop %compare-vector-eq-reps ] }
+        { [ dup { cc= cc/= cc/<>= cc<>= } memq? ] [ drop %compare-vector-eq-reps ] }
         [ drop %compare-vector-ord-reps ]
     } cond ;
 
@@ -1098,7 +1098,7 @@ M: x86 %min-vector ( dst src1 src2 rep -- )
 M: x86 %min-vector-reps
     {
         { sse? { float-4-rep } }
-        { sse2? { uchar-16-rep short-8-rep double-2-rep short-8-rep uchar-16-rep } }
+        { sse2? { uchar-16-rep short-8-rep double-2-rep } }
         { sse4.1? { char-16-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
@@ -1118,7 +1118,7 @@ M: x86 %max-vector ( dst src1 src2 rep -- )
 M: x86 %max-vector-reps
     {
         { sse? { float-4-rep } }
-        { sse2? { uchar-16-rep short-8-rep double-2-rep short-8-rep uchar-16-rep } }
+        { sse2? { uchar-16-rep short-8-rep double-2-rep } }
         { sse4.1? { char-16-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
