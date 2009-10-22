@@ -31,11 +31,8 @@ void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 
 	if((cell)bytes_read != h->data_size)
 	{
-		print_string("truncated image: ");
-		print_fixnum(bytes_read);
-		print_string(" bytes read, ");
-		print_cell(h->data_size);
-		print_string(" bytes expected\n");
+		std::cout << "truncated image: " << bytes_read << " bytes read, ";
+		std::cout << h->data_size << " bytes expected\n";
 		fatal_error("load_data_heap failed",0);
 	}
 
@@ -54,11 +51,8 @@ void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 		size_t bytes_read = fread(code->allocator->first_block(),1,h->code_size,file);
 		if(bytes_read != h->code_size)
 		{
-			print_string("truncated image: ");
-			print_fixnum(bytes_read);
-			print_string(" bytes read, ");
-			print_cell(h->code_size);
-			print_string(" bytes expected\n");
+			std::cout << "truncated image: " << bytes_read << " bytes read, ";
+			std::cout << h->code_size << " bytes expected\n";
 			fatal_error("load_code_heap failed",0);
 		}
 	}
@@ -243,8 +237,8 @@ void factor_vm::load_image(vm_parameters *p)
 	FILE *file = OPEN_READ(p->image_path);
 	if(file == NULL)
 	{
-		print_string("Cannot open image file: "); print_native_string(p->image_path); nl();
-		print_string(strerror(errno)); nl();
+		std::cout << "Cannot open image file: " << p->image_path << std::endl;
+		std::cout << strerror(errno) << std::endl;
 		exit(1);
 	}
 
@@ -281,8 +275,8 @@ bool factor_vm::save_image(const vm_char *filename)
 	file = OPEN_WRITE(filename);
 	if(file == NULL)
 	{
-		print_string("Cannot open image file: "); print_native_string(filename); nl();
-		print_string(strerror(errno)); nl();
+		std::cout << "Cannot open image file: " << filename << std::endl;
+		std::cout << strerror(errno) << std::endl;
 		return false;
 	}
 
@@ -309,9 +303,7 @@ bool factor_vm::save_image(const vm_char *filename)
 	if(fclose(file)) ok = false;
 
 	if(!ok)
-	{
-		print_string("save-image failed: "); print_string(strerror(errno)); nl();
-	}
+		std::cout << "save-image failed: " << strerror(errno) << std::endl;
 
 	return ok;
 }

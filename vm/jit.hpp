@@ -43,7 +43,7 @@ struct jit {
 	void emit_subprimitive(cell word_) {
 		gc_root<word> word(word_,parent);
 		gc_root<array> code_pair(word->subprimitive,parent);
-		literals.append(parent->untag<array>(array_nth(code_pair.untagged(),0)));
+		literals.append(untag<array>(array_nth(code_pair.untagged(),0)));
 		emit(array_nth(code_pair.untagged(),1));
 	}
 

@@ -88,7 +88,7 @@ bool quotation_jit::stack_frame_p()
 		switch(tagged<object>(obj).type())
 		{
 		case WORD_TYPE:
-			if(!parent->to_boolean(parent->untag<word>(obj)->subprimitive))
+			if(!parent->to_boolean(untag<word>(obj)->subprimitive))
 				return true;
 			break;
 		case QUOTATION_TYPE:
@@ -112,7 +112,7 @@ void quotation_jit::emit_quot(cell quot_)
 {
 	gc_root<quotation> quot(quot_,parent);
 
-	array *elements = parent->untag<array>(quot->array);
+	array *elements = untag<array>(quot->array);
 
 	/* If the quotation consists of a single word, compile a direct call
 	to the word. */
