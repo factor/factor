@@ -498,11 +498,14 @@ PRIVATE>
 : partition ( seq quot -- trueseq falseseq )
     over [ 2pusher [ each ] 2dip ] dip [ like ] curry bi@ ; inline
 
+: accumulator-for ( quot exemplar -- quot' vec )
+    [ length ] keep new-resizable [ [ push ] curry compose ] keep ; inline
+
 : accumulator ( quot -- quot' vec )
-    V{ } clone [ [ push ] curry compose ] keep ; inline
+    V{ } accumulator-for ; inline
 
 : produce-as ( pred quot exemplar -- seq )
-    [ accumulator [ while ] dip ] dip like ; inline
+    dup '[ _ accumulator-for [ while ] dip ] dip like ; inline
 
 : produce ( pred quot -- seq )
     { } produce-as ; inline
