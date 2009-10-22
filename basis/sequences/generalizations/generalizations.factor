@@ -1,3 +1,4 @@
+! (c)2009 Joe Groff bsd license
 USING: kernel sequences sequences.private math
 combinators macros math.order math.ranges quotations fry effects
 memoize.private generalizations ;
@@ -32,7 +33,7 @@ MACRO: nnew-sequence ( n -- )
     [ dup '[ [ new-sequence ] _ apply-curry _ cleave* ] ] if-zero ;
 
 : nnew-like ( len ...exemplar quot n -- result... )
-    dup dup dup dup '[
+    5 dupn '[
         _ nover
         [ [ _ nnew-sequence ] dip call ]
         _ ndip [ like ]
@@ -41,14 +42,14 @@ MACRO: nnew-sequence ( n -- )
     ] call ; inline
 
 MACRO: (ncollect) ( n -- )
-    dup dup 1 +
+    3 dupn 1 +
     '[ [ [ keep ] _ ndip _ nset-nth-unsafe ] _ ncurry ] ;
 
 : ncollect ( len quot ...into n -- )
     (ncollect) each-integer ; inline
 
 : nmap-integers ( len quot ...exemplar n -- result... )
-    dup dup dup
+    4 dupn
     '[ [ over ] _ ndip [ [ _ ncollect ] _ nkeep ] _ nnew-like ] call ; inline
 
 : mnmap-as ( m*seq quot n*exemplar m n -- result*n )
@@ -57,3 +58,22 @@ MACRO: (ncollect) ( n -- )
 : mnmap ( m*seq quot m n -- result*n )
     2dup '[ [ _ npick ] dip swap _ dupn ] 2dip mnmap-as ; inline
 
+: naccumulator-for ( quot ...exemplar n -- quot' vec... )
+    5 dupn '[
+        [ [ length ] keep new-resizable ] _ napply
+        [ [ [ push ] _ apply-curry _ spread* ] _ ncurry compose ] _ nkeep
+    ] call ; inline
+
+: naccumulator ( quot n -- quot' vec... )
+    [ V{ } swap dupn ] keep naccumulator-for ; inline
+
+: nproduce-as ( pred quot ...exemplar n -- seq... )
+    7 dupn '[
+        _ ndup
+        [ _ naccumulator-for [ while ] _ ndip ]
+        _ ncurry _ ndip
+        [ like ] _ apply-curry _ spread*
+    ] call ; inline
+
+: nproduce ( pred quot n -- seq... )
+    [ { } swap dupn ] keep nproduce-as ; inline

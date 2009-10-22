@@ -19,6 +19,14 @@ IN: sequences.generalizations.tests
     [ 4 nappend ] 4 1 mnmap ;
 : mnmap-0-test ( a b c d -- )
     [ 4 nappend print ] 4 0 mnmap ;
+: nproduce-as-test ( n -- a b )
+    [ dup zero? not ]
+    [ [ 2 - ] [ ] [ 1 - ] tri ] { } B{ } 2 nproduce-as
+    [ drop ] 2dip ;
+: nproduce-test ( n -- a b )
+    [ dup zero? not ]
+    [ [ 2 - ] [ ] [ 1 - ] tri ] 2 nproduce
+    [ drop ] 2dip ;
 
 [ """A1a!
 B2b@
@@ -105,3 +113,8 @@ D4d$
     [ mnmap-0-test ] with-string-writer
 ] unit-test
 
+[ { 10 8 6 4 2 } B{ 9 7 5 3 1 } ]
+[ 10 nproduce-as-test ] unit-test
+
+[ { 10 8 6 4 2 } { 9 7 5 3 1 } ]
+[ 10 nproduce-test ] unit-test
