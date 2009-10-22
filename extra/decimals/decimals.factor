@@ -37,8 +37,7 @@ SYNTAX: D: parse-decimal parsed ;
     ] 2bi ;
 
 : scale-decimals ( D1 D2 -- D1' D2' )
-    [ drop ]
-    [ scale-mantissas <decimal> nip ] 2bi ;
+    scale-mantissas tuck [ <decimal> ] 2dip <decimal> ;
 
 ERROR: decimal-types-expected d1 d2 ;
 
@@ -83,3 +82,6 @@ M: decimal before?
     
     e1
     e2 a + - <decimal> ;
+
+M: decimal <=>
+    2dup before? [ 2drop +lt+ ] [ equal? +eq+ +gt+ ? ] if ; inline

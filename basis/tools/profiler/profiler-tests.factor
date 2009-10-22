@@ -1,7 +1,7 @@
-IN: tools.profiler.tests
 USING: accessors tools.profiler tools.test kernel memory math
-threads alien tools.profiler.private sequences compiler compiler.units
-words ;
+threads alien alien.c-types tools.profiler.private sequences
+compiler compiler.units words ;
+IN: tools.profiler.tests
 
 [ t ] [
     \ length counter>>
@@ -21,9 +21,9 @@ words ;
 
 [ ] [ \ + usage-profile. ] unit-test
 
-: callback-test ( -- callback ) "void" { } "cdecl" [ ] alien-callback ;
+: callback-test ( -- callback ) void { } "cdecl" [ ] alien-callback ;
 
-: indirect-test ( callback -- ) "void" { } "cdecl" alien-indirect ;
+: indirect-test ( callback -- ) void { } "cdecl" alien-indirect ;
 
 : foobar ( -- ) ;
 
