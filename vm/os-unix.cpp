@@ -115,63 +115,47 @@ segment::~segment()
 	if(retval)
 		fatal_error("Segment deallocation failed",0);
 }
-  
-stack_frame *factor_vm::uap_stack_pointer(void *uap)
+
+void factor_vm::dispatch_signal(void *uap, void (handler)())
 {
-	/* There is a race condition here, but in practice a signal
-	delivered during stack frame setup/teardown or while transitioning
-	from Factor to C is a sign of things seriously gone wrong, not just
-	a divide by zero or stack underflow in the listener */
 	if(in_code_heap_p(UAP_PROGRAM_COUNTER(uap)))
 	{
-		stack_frame *ptr = (stack_frame *)ucontext_stack_pointer(uap);
-		if(!ptr)
-			critical_error("Invalid uap",(cell)uap);
-		return ptr;
+		stack_frame *ptr = (stack_frame *)UAP_STACK_POINTER(uap);
+		assert(ptr);
+		signal_callstack_top = ptr;
 	}
 	else
-		return NULL;
-}
+		signal_callstack_top = NULL;
 
-void factor_vm::memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
-{
-	signal_fault_addr = (cell)siginfo->si_addr;
-	signal_callstack_top = uap_stack_pointer(uap);
-	UAP_PROGRAM_COUNTER(uap) = (cell)factor::memory_signal_handler_impl;
+	UAP_STACK_POINTER(uap) = (void *)align_stack_pointer((cell)UAP_STACK_POINTER(uap));
+	UAP_PROGRAM_COUNTER(uap) = (cell)handler;
 }
 
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	tls_vm()->memory_signal_handler(signal,siginfo,uap);
-}
-
-void factor_vm::misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
-{
-	signal_number = signal;
-	signal_callstack_top = uap_stack_pointer(uap);
-	UAP_PROGRAM_COUNTER(uap) = (cell)factor::misc_signal_handler_impl;
+	factor_vm *vm = tls_vm();
+	vm->signal_fault_addr = (cell)siginfo->si_addr;
+	vm->dispatch_signal(uap,factor::memory_signal_handler_impl);
 }
 
 void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	tls_vm()->misc_signal_handler(signal,siginfo,uap);
-}
-
-void factor_vm::fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
-{
-	signal_number = signal;
-	signal_callstack_top = uap_stack_pointer(uap);
-	signal_fpu_status = fpu_status(uap_fpu_status(uap));
-	uap_clear_fpu_status(uap);
-	UAP_PROGRAM_COUNTER(uap) =
-		(siginfo->si_code == FPE_INTDIV || siginfo->si_code == FPE_INTOVF)
-		? (cell)factor::misc_signal_handler_impl
-		: (cell)factor::fp_signal_handler_impl;
+	factor_vm *vm = tls_vm();
+	vm->signal_number = signal;
+	vm->dispatch_signal(uap,factor::misc_signal_handler_impl);
 }
 
 void fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	tls_vm()->fpe_signal_handler(signal, siginfo, uap);
+	factor_vm *vm = tls_vm();
+	vm->signal_number = signal;
+	vm->signal_fpu_status = fpu_status(uap_fpu_status(uap));
+	uap_clear_fpu_status(uap);
+
+	vm->dispatch_signal(uap,
+		(siginfo->si_code == FPE_INTDIV || siginfo->si_code == FPE_INTOVF)
+		? factor::misc_signal_handler_impl
+		: factor::fp_signal_handler_impl);
 }
 
 static void sigaction_safe(int signum, const struct sigaction *act, struct sigaction *oldact)

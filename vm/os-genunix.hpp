@@ -10,4 +10,9 @@ void early_init();
 const char *vm_executable_path();
 const char *default_image_path();
 
+inline static cell align_stack_pointer(cell sp)
+{
+	return sp;
+}
+
 }
