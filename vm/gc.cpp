@@ -54,9 +54,6 @@ void factor_vm::gc(gc_op op,
 			current_gc->op = collect_full_op;
 			break;
 		case collect_full_op:
-			/* Since we start tracing again, any previously
-			marked code blocks must be re-marked and re-traced */
-			code->clear_mark_bits();
 			current_gc->op = collect_growing_heap_op;
 			break;
 		default:
@@ -205,9 +202,9 @@ void factor_vm::inline_gc(cell *gc_roots_base, cell gc_roots_size)
 		gc_locals.pop_back();
 }
 
-VM_C_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *myvm)
+VM_C_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *parent)
 {
-	myvm->inline_gc(gc_roots_base,gc_roots_size);
+	parent->inline_gc(gc_roots_base,gc_roots_size);
 }
 
 /*

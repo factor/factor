@@ -36,8 +36,8 @@ STRUCT: FSEventStreamContext
     { release void* }
     { copyDescription void* } ;
 
-! callback(FSEventStreamRef streamRef, void *clientCallBackInfo, size_t numEvents, void *eventPaths, const FSEventStreamEventFlags eventFlags[], const FSEventStreamEventId eventIds[]);
-TYPEDEF: void* FSEventStreamCallback
+! callback(
+CALLBACK: void FSEventStreamCallback ( FSEventStreamRef streamRef, void* clientCallBackInfo, size_t numEvents, void* eventPaths, FSEventStreamEventFlags* eventFlags, FSEventStreamEventId* eventIds ) ;
 
 CONSTANT: FSEventStreamEventIdSinceNow HEX: FFFFFFFFFFFFFFFF
 

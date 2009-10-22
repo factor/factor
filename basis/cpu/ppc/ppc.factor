@@ -577,10 +577,8 @@ M:: ppc %save-param-reg ( stack reg rep -- )
 M:: ppc %load-param-reg ( stack reg rep -- )
     reg stack local@ rep load-from-frame ;
 
-M: ppc %prepare-unbox ( -- )
-    ! First parameter is top of stack
-    3 ds-reg 0 LWZ
-    ds-reg dup cell SUBI ;
+M: ppc %prepare-unbox ( n -- )
+    [ 3 ] dip <ds-loc> loc>operand LWZ ;
 
 M: ppc %unbox ( n rep func -- )
     ! Value must be in r3
@@ -681,7 +679,9 @@ M: ppc %callback-value ( ctype -- )
     ! Unbox former top of data stack to return registers
     unbox-return ;
 
-M: ppc small-enough? ( n -- ? ) -32768 32767 between? ;
+M: ppc immediate-arithmetic? ( n -- ? ) -32768 32767 between? ;
+
+M: ppc immediate-bitwise? ( n -- ? ) 0 65535 between? ;
 
 M: ppc return-struct-in-registers? ( c-type -- ? )
     c-type return-in-registers?>> ;

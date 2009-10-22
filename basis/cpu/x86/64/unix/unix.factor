@@ -12,7 +12,7 @@ M: int-regs param-regs
 M: float-regs param-regs
     drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
-M: x86.64 reserved-area-size 0 ;
+M: x86.64 reserved-stack-space 0 ;
 
 SYMBOL: (stack-value)
 ! The ABI for passing structs by value is pretty great

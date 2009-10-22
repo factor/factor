@@ -440,9 +440,13 @@ M: reg-class param-reg param-regs nth ;
 
 M: stack-params param-reg drop ;
 
-! Is this integer small enough to appear in value template
-! slots?
-HOOK: small-enough? cpu ( n -- ? )
+! Is this integer small enough to be an immediate operand for
+! %add-imm, %sub-imm, and %mul-imm?
+HOOK: immediate-arithmetic? cpu ( n -- ? )
+
+! Is this integer small enough to be an immediate operand for
+! %and-imm, %or-imm, and %xor-imm?
+HOOK: immediate-bitwise? cpu ( n -- ? )
 
 ! Is this structure small enough to be returned in registers?
 HOOK: return-struct-in-registers? cpu ( c-type -- ? )
@@ -459,7 +463,7 @@ HOOK: dummy-int-params? cpu ( -- ? )
 ! If t, all int parameters are shadowed by dummy FP parameters
 HOOK: dummy-fp-params? cpu ( -- ? )
 
-HOOK: %prepare-unbox cpu ( -- )
+HOOK: %prepare-unbox cpu ( n -- )
 
 HOOK: %unbox cpu ( n rep func -- )
 

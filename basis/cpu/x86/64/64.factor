@@ -8,6 +8,22 @@ compiler.cfg.builder compiler.cfg.intrinsics compiler.cfg.stack-frame
 cpu.x86.assembler cpu.x86.assembler.operands cpu.x86 cpu.architecture ;
 IN: cpu.x86.64
 
+: param-reg-1 ( -- reg ) int-regs param-regs first ; inline
+: param-reg-2 ( -- reg ) int-regs param-regs second ; inline
+: param-reg-3 ( -- reg ) int-regs param-regs third ; inline
+: param-reg-4 ( -- reg ) int-regs param-regs fourth ; inline
+
+M: x86.64 pic-tail-reg RBX ;
+
+M: int-regs return-reg drop RAX ;
+M: float-regs return-reg drop XMM0 ;
+
+M: x86.64 ds-reg R14 ;
+M: x86.64 rs-reg R15 ;
+M: x86.64 stack-reg RSP ;
+
+M: x86.64 extra-stack-space drop 0 ;
+
 M: x86.64 machine-registers
     {
         { int-regs { RAX RCX RDX RBX RBP RSI RDI R8 R9 R10 R11 R12 R13 } }
@@ -17,9 +33,13 @@ M: x86.64 machine-registers
         } }
     } ;
 
-M: x86.64 ds-reg R14 ;
-M: x86.64 rs-reg R15 ;
-M: x86.64 stack-reg RSP ;
+: param@ ( n -- op ) reserved-stack-space + stack@ ;
+
+M: x86.64 %prologue ( n -- )
+    temp-reg 0 MOV rc-absolute-cell rel-this
+    dup PUSH
+    temp-reg PUSH
+    stack-reg swap 3 cells - SUB ;
 
 : load-cards-offset ( dst -- )
     0 MOV rc-absolute-cell rel-cards-offset ;
@@ -50,22 +70,6 @@ M:: x86.64 %dispatch ( src temp -- )
     [ align-code ]
     bi ;
 
-: param-reg-1 ( -- reg ) int-regs param-regs first ; inline
-: param-reg-2 ( -- reg ) int-regs param-regs second ; inline
-: param-reg-3 ( -- reg ) int-regs param-regs third ; inline
-: param-reg-4 ( -- reg ) int-regs param-regs fourth ; inline
-
-M: x86.64 pic-tail-reg RBX ;
-
-M: int-regs return-reg drop RAX ;
-M: float-regs return-reg drop XMM0 ;
-
-M: x86.64 %prologue ( n -- )
-    temp-reg 0 MOV rc-absolute-cell rel-this
-    dup PUSH
-    temp-reg PUSH
-    stack-reg swap 3 cells - SUB ;
-
 M: stack-params copy-register*
     drop
     {
@@ -84,10 +88,8 @@ M: x86 %load-param-reg [ swap param@ ] dip %copy ;
         call
     ] with-scope ; inline
 
-M: x86.64 %prepare-unbox ( -- )
-    ! First parameter is top of stack
-    param-reg-1 R14 [] MOV
-    R14 cell SUB ;
+M: x86.64 %prepare-unbox ( n -- )
+    param-reg-1 swap ds-reg reg-stack MOV ;
 
 M:: x86.64 %unbox ( n rep func -- )
     param-reg-2 %mov-vm-ptr
@@ -217,9 +219,7 @@ M: x86.64 %alien-callback ( quot -- )
     "c_to_factor" f %alien-invoke ;
 
 M: x86.64 %callback-value ( ctype -- )
-    ! Save top of data stack
-    %prepare-unbox
-    ! Save top of data stack
+    0 %prepare-unbox
     RSP 8 SUB
     param-reg-1 PUSH
     param-reg-1 %mov-vm-ptr
