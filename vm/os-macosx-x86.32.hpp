@@ -64,7 +64,7 @@ inline static unsigned int uap_fpu_status(void *uap)
 	return mach_fpu_status(UAP_FS(uap));
 }
 
-inline static cell fix_stack_pointer(cell sp)
+inline static cell align_stack_pointer(cell sp)
 {
 	return ((sp + 4) & ~15) - 4;
 }
