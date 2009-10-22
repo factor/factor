@@ -193,7 +193,7 @@ TUPLE: curses-window < disposable
     { x integer initial: 0 }
 
     { cbreak initial: t }
-    { echo initial: t }
+    { echo initial: f }
     { raw initial: f }
 
     { scrollok initial: t }
