@@ -122,7 +122,9 @@ IN: math.matrices
 
 PRIVATE>
 
-: cross ( vec1 vec2 -- vec3 ) [ [ i ] [ j ] [ k ] 2tri ] keep 3sequence ;
+: cross ( vec1 vec2 -- vec3 )
+    [ [ { 1 2 1 } vshuffle ] [ { 2 0 0 } vshuffle ] bi* v* ]
+    [ [ { 2 0 0 } vshuffle ] [ { 1 2 1 } vshuffle ] bi* v* ] 2bi v- ; inline
 
 : proj ( v u -- w )
     [ [ v. ] [ norm-sq ] bi / ] keep n*v ;
