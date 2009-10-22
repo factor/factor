@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs debugger io kernel literals namespaces prettyprint
-sequences system windows.kernel32 ;
+USING: assocs debugger io kernel literals math.parser namespaces
+prettyprint sequences system windows.kernel32 ;
 IN: debugger.windows
 
 CONSTANT: seh-names
@@ -33,8 +33,8 @@ CONSTANT: seh-names
     }
 
 : seh-name. ( n -- )
-    seh-names get at [ " (" ")" surround write ] when* ;
+    seh-names at [ " (" ")" surround write ] when* ;
 
 M: windows signal-error.
     "Windows exception 0x" write
-    third [ .h ] [ seh-name. ] bi nl ;
+    third [ >hex write ] [ seh-name. ] bi nl ;
