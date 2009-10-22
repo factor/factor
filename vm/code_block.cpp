@@ -286,7 +286,7 @@ struct literal_references_updater {
 		if(parent->relocation_type_of(rel) == RT_IMMEDIATE)
 		{
 			cell offset = parent->relocation_offset_of(rel) + (cell)(compiled + 1);
-			array *literals = parent->untag<array>(compiled->literals);
+			array *literals = untag<array>(compiled->literals);
 			fixnum absolute_value = array_nth(literals,index);
 			parent->store_address_in_code_block(parent->relocation_class_of(rel),offset,absolute_value);
 		}
@@ -457,10 +457,10 @@ code_block *factor_vm::allot_code_block(cell size, code_block_type type)
 			cell used, total_free, max_free;
 			code->allocator->usage(&used,&total_free,&max_free);
 
-			print_string("Code heap stats:\n");
-			print_string("Used: "); print_cell(used); nl();
-			print_string("Total free space: "); print_cell(total_free); nl();
-			print_string("Largest free block: "); print_cell(max_free); nl();
+			std::cout << "Code heap stats:\n";
+			std::cout << "Used: " << used << "\n";
+			std::cout << "Total free space: " << total_free << "\n";
+			std::cout << "Largest free block: " << max_free << "\n";
 			fatal_error("Out of memory in add-compiled-block",0);
 		}
 	}

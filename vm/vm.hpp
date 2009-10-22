@@ -46,6 +46,9 @@ struct factor_vm
 	/* GC is off during heap walking */
 	bool gc_off;
 
+	/* GC logging */
+	bool verbosegc;
+
 	/* Data heap */
 	data_heap *data;
 
@@ -327,7 +330,7 @@ struct factor_vm
 	inline void set_array_nth(array *array, cell slot, cell value);
 
 	//strings
-	cell string_nth(string* str, cell index);
+	cell string_nth(const string *str, cell index);
 	void set_string_nth_fast(string *str, cell index, cell ch);
 	void set_string_nth_slow(string *str_, cell index, cell ch);
 	void set_string_nth(string *str, cell index, cell ch);
@@ -450,8 +453,9 @@ struct factor_vm
 	inline double untag_float_check(cell tagged);
 	inline fixnum float_to_fixnum(cell tagged);
 	inline double fixnum_to_float(cell tagged);
+
+	// tagged
 	template<typename Type> Type *untag_check(cell value);
-	template<typename Type> Type *untag(cell value);
 
 	//io
 	void init_c_io();

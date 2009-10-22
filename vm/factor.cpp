@@ -38,6 +38,7 @@ void factor_vm::default_parameters(vm_parameters *p)
 	p->max_pic_size = 3;
 
 	p->fep = false;
+	p->verbosegc = false;
 	p->signals = true;
 
 #ifdef WINDOWS
@@ -86,6 +87,7 @@ void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **
 		else if(factor_arg(arg,STRING_LITERAL("-callbacks=%d"),&p->callback_size));
 		else if(STRCMP(arg,STRING_LITERAL("-fep")) == 0) p->fep = true;
 		else if(STRCMP(arg,STRING_LITERAL("-nosignals")) == 0) p->signals = false;
+		else if(STRCMP(arg,STRING_LITERAL("-verbosegc")) == 0) p->verbosegc = true;
 		else if(STRNCMP(arg,STRING_LITERAL("-i="),3) == 0) p->image_path = arg + 3;
 		else if(STRCMP(arg,STRING_LITERAL("-console")) == 0) p->console = true;
 	}
@@ -94,14 +96,13 @@ void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **
 /* Do some initialization that we do once only */
 void factor_vm::do_stage1_init()
 {
-	print_string("*** Stage 2 early init... ");
+	std::cout << "*** Stage 2 early init... ";
 	fflush(stdout);
 
 	compile_all_words();
 	userenv[STAGE2_ENV] = true_object;
 
-	print_string("done\n");
-	fflush(stdout);
+	std::cout << "done\n";
 }
 
 void factor_vm::init_factor(vm_parameters *p)
@@ -140,6 +141,8 @@ void factor_vm::init_factor(vm_parameters *p)
 	init_inline_caching(p->max_pic_size);
 	if(p->signals)
 		init_signals();
+
+	verbosegc = p->verbosegc;
 
 	if(p->console)
 		open_console();

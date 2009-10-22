@@ -35,6 +35,7 @@ struct vm_parameters {
 	cell young_size, aging_size, tenured_size;
 	cell code_size;
 	bool fep;
+	bool verbosegc;
 	bool console;
 	bool signals;
 	cell max_pic_size;

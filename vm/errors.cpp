@@ -5,22 +5,24 @@ namespace factor
 
 void fatal_error(const char *msg, cell tagged)
 {
-	print_string("fatal_error: "); print_string(msg);
-	print_string(": "); print_cell_hex(tagged); nl();
+	std::cout << "fatal_error: " << msg;
+	std::cout << ": " << std::hex << tagged << std::dec;
+	std::cout << std::endl;
 	exit(1);
 }
 
 void critical_error(const char *msg, cell tagged)
 {
-	print_string("You have triggered a bug in Factor. Please report.\n");
-	print_string("critical_error: "); print_string(msg);
-	print_string(": "); print_cell_hex(tagged); nl();
+	std::cout << "You have triggered a bug in Factor. Please report.\n";
+	std::cout << "critical_error: " << msg;
+	std::cout << ": " << std::hex << tagged << std::dec;
+	std::cout << std::endl;
 	tls_vm()->factorbug();
 }
 
 void out_of_memory()
 {
-	print_string("Out of memory\n\n");
+	std::cout << "Out of memory\n\n";
 	tls_vm()->dump_generations();
 	exit(1);
 }
@@ -59,10 +61,10 @@ void factor_vm::throw_error(cell error, stack_frame *callstack_top)
 	crash. */
 	else
 	{
-		print_string("You have triggered a bug in Factor. Please report.\n");
-		print_string("early_error: ");
+		std::cout << "You have triggered a bug in Factor. Please report.\n";
+		std::cout << "early_error: ";
 		print_obj(error);
-		nl();
+		std::cout << std::endl;
 		factorbug();
 	}
 }

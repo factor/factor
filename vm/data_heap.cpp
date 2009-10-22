@@ -120,7 +120,7 @@ cell factor_vm::object_size(cell tagged)
 }
 
 /* Size of the object pointed to by an untagged pointer */
-cell object::size()
+cell object::size() const
 {
 	if(free_p()) return ((free_heap_block *)this)->size();
 
