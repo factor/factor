@@ -22,7 +22,7 @@ template<typename Block> struct free_list_allocator {
 	Block *next_block_after(Block *block);
 	void clear_free_list();
 	void add_to_free_list(free_heap_block *block);
-	void build_free_list(cell size);
+	void initial_free_list(cell size);
 	void assert_free_block(free_heap_block *block);
 	free_heap_block *find_free_block(cell size);
 	free_heap_block *split_free_block(free_heap_block *block, cell size);
@@ -40,7 +40,7 @@ template<typename Block>
 free_list_allocator<Block>::free_list_allocator(cell size_, cell start_) :
 	size(size_), start(start_), end(start_ + size_), state(mark_bits<Block>(size_,start_))
 {
-	clear_free_list();
+	initial_free_list(0);
 }
 
 template<typename Block> void free_list_allocator<Block>::clear_free_list()
@@ -85,7 +85,7 @@ template<typename Block> void free_list_allocator<Block>::add_to_free_list(free_
 
 /* Called after reading the heap from the image file, and after heap compaction.
 Makes a free list consisting of one free block, at the very end. */
-template<typename Block> void free_list_allocator<Block>::build_free_list(cell size)
+template<typename Block> void free_list_allocator<Block>::initial_free_list(cell size)
 {
 	clear_free_list();
 	if(size != this->size)
@@ -345,7 +345,7 @@ void free_list_allocator<Block>::compact(Iterator &iter)
 
 	/* Now update the free list; there will be a single free block at
 	the end */
-	this->build_free_list((cell)compactor.address - this->start);
+	this->initial_free_list((cell)compactor.address - this->start);
 }
 
 template<typename Block>

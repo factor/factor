@@ -81,12 +81,21 @@ template<typename Block> struct mark_bits {
 			bits[start.first] |= start_mask ^ end_mask;
 		else
 		{
+#ifdef FACTOR_DEBUG
+			assert(start.first < bits_size);
+#endif
 			bits[start.first] |= ~start_mask;
 
 			for(cell index = start.first + 1; index < end.first; index++)
 				bits[index] = (u64)-1;
 
-			bits[end.first] |= end_mask;
+			if(end_mask != 0)
+			{
+#ifdef FACTOR_DEBUG
+				assert(end.first < bits_size);
+#endif
+				bits[end.first] |= end_mask;
+			}
 		}
 	}
 
