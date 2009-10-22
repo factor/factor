@@ -1,0 +1,107 @@
+! (c)2009 Joe Groff bsd license
+USING: tools.test generalizations kernel math arrays sequences
+sequences.generalizations ascii fry math.parser io io.streams.string ;
+IN: sequences.generalizations.tests
+
+: neach-test ( a b c d -- )
+    [ 4 nappend print ] 4 neach ;
+: nmap-test ( a b c d -- e )
+    [ 4 nappend ] 4 nmap ;
+: nmap-as-test ( a b c d -- e )
+    [ 4 nappend ] [ ] 4 nmap-as ;
+: mnmap-3-test ( a b c d -- e f g )
+    [ append ] 4 3 mnmap ;
+: mnmap-2-test ( a b c d -- e f )
+    [ [ append ] 2bi@ ] 4 2 mnmap ;
+: mnmap-as-test ( a b c d -- e f )
+    [ [ append ] 2bi@ ] { } [ ] 4 2 mnmap-as ;
+: mnmap-1-test ( a b c d -- e )
+    [ 4 nappend ] 4 1 mnmap ;
+: mnmap-0-test ( a b c d -- )
+    [ 4 nappend print ] 4 0 mnmap ;
+
+[ """A1a!
+B2b@
+C3c#
+D4d$
+""" ] [
+    { "A" "B" "C" "D" }
+    { "1" "2" "3" "4" }
+    { "a" "b" "c" "d" }
+    { "!" "@" "#" "$" }
+    [ neach-test ] with-string-writer
+] unit-test
+
+[ { "A1a!" "B2b@" "C3c#" "D4d$" } ]
+[ 
+    { "A" "B" "C" "D" }
+    { "1" "2" "3" "4" }
+    { "a" "b" "c" "d" }
+    { "!" "@" "#" "$" }
+    nmap-test
+] unit-test
+
+[ [ "A1a!" "B2b@" "C3c#" "D4d$" ] ]
+[ 
+    { "A" "B" "C" "D" }
+    { "1" "2" "3" "4" }
+    { "a" "b" "c" "d" }
+    { "!" "@" "#" "$" }
+    nmap-as-test
+] unit-test
+
+[
+    { "A" "B" "C" "D" }
+    { "1" "2" "3" "4" }
+    { "a!" "b@" "c#" "d$" }
+] [ 
+    { "A" "B" "C" "D" }
+    { "1" "2" "3" "4" }
+    { "a" "b" "c" "d" }
+    { "!" "@" "#" "$" }
+    mnmap-3-test
+] unit-test
+
+[
+    { "A1" "B2" "C3" "D4" }
+    { "a!" "b@" "c#" "d$" }
+] [ 
+    { "A" "B" "C" "D" }
+    { "1" "2" "3" "4" }
+    { "a" "b" "c" "d" }
+    { "!" "@" "#" "$" }
+    mnmap-2-test
+] unit-test
+
+[
+    { "A1" "B2" "C3" "D4" }
+    [ "a!" "b@" "c#" "d$" ]
+] [ 
+    { "A" "B" "C" "D" }
+    { "1" "2" "3" "4" }
+    { "a" "b" "c" "d" }
+    { "!" "@" "#" "$" }
+    mnmap-as-test
+] unit-test
+
+[ { "A1a!" "B2b@" "C3c#" "D4d$" } ]
+[ 
+    { "A" "B" "C" "D" }
+    { "1" "2" "3" "4" }
+    { "a" "b" "c" "d" }
+    { "!" "@" "#" "$" }
+    mnmap-1-test
+] unit-test
+
+[ """A1a!
+B2b@
+C3c#
+D4d$
+""" ] [
+    { "A" "B" "C" "D" }
+    { "1" "2" "3" "4" }
+    { "a" "b" "c" "d" }
+    { "!" "@" "#" "$" }
+    [ mnmap-0-test ] with-string-writer
+] unit-test
+

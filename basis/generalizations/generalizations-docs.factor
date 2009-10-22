@@ -266,26 +266,6 @@ HELP: spread-curry
 { $description "Curries the " { $snippet "n" } " quotations on the top of the datastack with the " { $snippet "n" } " values just below them. A generalization of " { $link bi-curry* } " and " { $link tri-curry* } "." }
 { $notes "This word can be used with " { $link cleave* } " and " { $link spread* } " to generalize dataflow patterns such as " { $snippet "bi-curry* bi" } ", " { $snippet "tri-curry* tri" } ", " { $snippet "bi-curry* bi*" } ", and " { $snippet "tri-curry* tri*" } "." } ;
 
-HELP: neach
-{ $values { "...seq" { $snippet "n" } " sequences on the datastack" } { "quot" "a quotation with stack effect " { $snippet "( ...element -- )" } } { "n" integer } }
-{ $description "A generalization of " { $link each } ", " { $link 2each } ", and " { $link 3each } " that can iterate over any number of sequences in parallel." } ;
-
-HELP: nmap
-{ $values { "...seq" { $snippet "n" } " sequences on the datastack" } { "quot" "a quotation with stack effect " { $snippet "( ...element -- result )" } } { "n" integer } { "result" "a sequence of the same type as the first " { $snippet "seq" } } }
-{ $description "A generalization of " { $link map } ", " { $link 2map } ", and " { $link 3map } " that can map over any number of sequences in parallel." } ;
-
-HELP: nmap-as
-{ $values { "...seq" { $snippet "n" } " sequences on the datastack" } { "quot" "a quotation with stack effect " { $snippet "( ...element -- result )" } } { "exemplar" sequence } { "n" integer } { "result" "a sequence of the same type as " { $snippet "exemplar" } } }
-{ $description "A generalization of " { $link map-as } ", " { $link 2map-as } ", and " { $link 3map-as } " that can map over any number of sequences in parallel." } ;
-
-HELP: mnmap
-{ $values { "m*seq" { $snippet "m" } " sequences on the datastack" } { "quot" "a quotation with stack effect " { $snippet "( m*element -- result*n )" } } { "m" integer } { "n" integer } { "result*n" { $snippet "n" } " sequences of the same type as the first " { $snippet "seq" } } }
-{ $description "A generalization of " { $link map } ", " { $link 2map } ", and " { $link 3map } " that can map over any number of sequences in parallel and provide any number of output sequences." } ;
-
-HELP: mnmap-as
-{ $values { "m*seq" { $snippet "m" } " sequences on the datastack" } { "quot" "a quotation with stack effect " { $snippet "( m*element -- result*n )" } } { "n*exemplar" { $snippet "n" } " sequences on the datastack" } { "m" integer } { "n" integer } { "result*n" { $snippet "n" } " sequences of the same type as the " { $snippet "exemplar" } "s" } }
-{ $description "A generalization of " { $link map-as } ", " { $link 2map-as } ", and " { $link 3map-as } " that can map over any number of sequences in parallel and provide any number of output sequences of distinct types." } ;
-
 HELP: mnswap
 { $values { "m" integer } { "n" integer } }
 { $description "Swaps the top " { $snippet "m" } " stack elements with the " { $snippet "n" } " elements directly underneath." }
@@ -401,11 +381,6 @@ ARTICLE: "combinator-generalizations" "Generalized combinators"
     apply-curry
     cleave-curry
     spread-curry
-    neach
-    nmap
-    nmap-as
-    mnmap
-    mnmap-as
 } ;
 
 ARTICLE: "other-generalizations" "Additional generalizations"
@@ -424,6 +399,7 @@ ARTICLE: "generalizations" "Generalized shuffle words and combinators"
     "shuffle-generalizations"
     "combinator-generalizations"
     "other-generalizations"
-} ;
+}
+"Also see the " { $vocab-link "sequences.generalizations" } " vocabulary for generalized sequence iteration combinators." ;
 
 ABOUT: "generalizations"
