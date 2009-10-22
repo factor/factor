@@ -888,7 +888,7 @@ M: x86 %compare-vector ( dst src1 src2 rep cc -- )
     {
         { sse? { float-4-rep } }
         { sse2? { double-2-rep char-16-rep short-8-rep int-4-rep } }
-        { sse4.1? { longlong-2-rep } }
+        { sse4.2? { longlong-2-rep } }
     } available-reps ;
 
 M: x86 %compare-vector-reps
