@@ -36,7 +36,7 @@ void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 		fatal_error("load_data_heap failed",0);
 	}
 
-	data->tenured->build_free_list(h->data_size);
+	data->tenured->initial_free_list(h->data_size);
 }
 
 void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
@@ -57,7 +57,7 @@ void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 		}
 	}
 
-	code->allocator->build_free_list(h->code_size);
+	code->allocator->initial_free_list(h->code_size);
 }
 
 void factor_vm::data_fixup(cell *handle, cell data_relocation_base)

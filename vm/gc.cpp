@@ -60,12 +60,12 @@ void factor_vm::gc(gc_op op,
 			current_gc->op = collect_growing_heap_op;
 			break;
 		default:
-			critical_error("Bad GC op\n",op);
+			critical_error("Bad GC op",current_gc->op);
 			break;
 		}
 
 		if(verbosegc)
-			std::cout << "GC rewind, op=" << op << std::endl;
+			std::cout << "GC rewind, op=" << current_gc->op << std::endl;
 	}
 
 	switch(current_gc->op)
@@ -91,20 +91,20 @@ void factor_vm::gc(gc_op op,
 		record_gc_stats(&gc_stats.full_stats);
 		break;
 	default:
-		critical_error("Bad GC op\n",op);
+		critical_error("Bad GC op\n",current_gc->op);
 		break;
 	}
 
+	if(verbosegc)
+		std::cout << "GC done, op=" << current_gc->op << std::endl;
+
 	delete current_gc;
 	current_gc = NULL;
-
-	if(verbosegc)
-		std::cout << "GC done, op=" << op << std::endl;
 }
 
 void factor_vm::primitive_minor_gc()
 {
-	gc(collect_full_op,
+	gc(collect_nursery_op,
 		0, /* requested size */
 		true, /* trace contexts? */
 		false /* compact code heap? */);
