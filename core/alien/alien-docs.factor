@@ -79,7 +79,7 @@ HELP: alien-callback-error
 HELP: alien-callback
 { $values { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "quot" "a quotation" } { "alien" alien } }
 { $description
-    "Defines a callback from C to Factor which accepts the given set of parameters from the C caller, pushes them on the data stack, calls the quotation, and passes a return value back to the C caller. A return type of " { $snippet "\"void\"" } " indicates that no value is to be returned."
+    "Defines a callback from C to Factor which accepts the given set of parameters from the C caller, pushes them on the data stack, calls the quotation, and passes a return value back to the C caller. A return type of " { $snippet "void" } " indicates that no value is to be returned."
     $nl
     "When a compiled reference to this word is called, it pushes the callback's alien address on the data stack. This address can be passed to any C function expecting a C function pointer with the correct signature. The callback is actually generated when the word calling " { $link alien-callback } " is compiled."
     $nl
@@ -90,7 +90,7 @@ HELP: alien-callback
     "A simple example, showing a C function which returns the difference of two given integers:"
     { $code
         ": difference-callback ( -- alien )"
-        "    \"int\" { \"int\" \"int\" } \"cdecl\" [ - ] alien-callback ;"
+        "    int { int int } \"cdecl\" [ - ] alien-callback ;"
     }
 }
 { $errors "Throws an " { $link alien-callback-error } " if the word calling " { $link alien-callback } " is not compiled." } ;

@@ -6,6 +6,7 @@ compiler.cfg arrays locals byte-arrays kernel.private math
 slots.private vectors sbufs strings math.partial-dispatch
 hashtables assocs combinators.short-circuit
 strings.private accessors compiler.cfg.instructions ;
+FROM: alien.c-types => int ;
 IN: compiler.cfg.builder.tests
 
 ! Just ensure that various CFGs build correctly.
@@ -66,9 +67,9 @@ IN: compiler.cfg.builder.tests
     [ [ t ] loop ]
     [ [ dup ] loop ]
     [ [ 2 ] [ 3 throw ] if 4 ]
-    [ "int" f "malloc" { "int" } alien-invoke ]
-    [ "int" { "int" } "cdecl" alien-indirect ]
-    [ "int" { "int" } "cdecl" [ ] alien-callback ]
+    [ int f "malloc" { int } alien-invoke ]
+    [ int { int } "cdecl" alien-indirect ]
+    [ int { int } "cdecl" [ ] alien-callback ]
     [ swap - + * ]
     [ swap slot ]
     [ blahblah ]

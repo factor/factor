@@ -10,4 +10,9 @@ void early_init();
 const char *vm_executable_path();
 const char *default_image_path();
 
+template<typename Type> Type align_stack_pointer(Type sp)
+{
+	return sp;
+}
+
 }

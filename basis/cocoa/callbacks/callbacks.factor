@@ -16,11 +16,11 @@ CLASS: {
     { +superclass+ "NSObject" }
 }
 
-{ "perform:" "void" { "id" "SEL" "id" }
+{ "perform:" void { id SEL id }
     [ 2drop callbacks get at try ]
 }
 
-{ "dealloc" "void" { "id" "SEL" }
+{ "dealloc" void { id SEL }
     [
         drop
         dup callbacks get delete-at
