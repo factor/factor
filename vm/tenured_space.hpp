@@ -51,6 +51,11 @@ struct tenured_space : free_list_allocator<object> {
 		state.clear_mark_bits();
 	}
 
+	void clear_mark_stack()
+	{
+		mark_stack.clear();
+	}
+
 	bool marked_p(object *obj)
 	{
 		return this->state.marked_p(obj);
