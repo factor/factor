@@ -111,10 +111,10 @@ SYMBOL: negative?
     {
         { 16 [ hex>float ] }
         [ drop dec>float ]
-    } case ;
+    } case ; inline
 
 : number-char? ( char -- ? )
-    "0123456789ABCDEFabcdef." member? ;
+    "0123456789ABCDEFabcdef." member? ; inline
 
 : numeric-looking? ( str -- ? )
     "-" ?head drop
@@ -127,7 +127,7 @@ SYMBOL: negative?
 PRIVATE>
 
 : string>float ( str -- n/f )
-    10 base>float ;
+    10 base>float ; inline
 
 : base> ( str radix -- n/f )
     over numeric-looking? [
@@ -138,13 +138,13 @@ PRIVATE>
         } case
     ] [ 2drop f ] if ;
 
-: string>number ( str -- n/f ) 10 base> ;
-: bin> ( str -- n/f ) 2 base> ;
-: oct> ( str -- n/f ) 8 base> ;
-: hex> ( str -- n/f ) 16 base> ;
+: string>number ( str -- n/f ) 10 base> ; inline
+: bin> ( str -- n/f ) 2 base> ; inline
+: oct> ( str -- n/f ) 8 base> ; inline
+: hex> ( str -- n/f ) 16 base> ; inline
 
 : >digit ( n -- ch )
-    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] if ;
+    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] if ; inline
 
 : positive>base ( num radix -- str )
     dup 1 <= [ "Invalid radix" throw ] when
@@ -234,12 +234,12 @@ M: ratio >base
     {
         { 16 [ float>hex ] }
         [ drop float>decimal ]
-    } case ;
+    } case ; inline
 
 PRIVATE>
 
 : float>string ( n -- str )
-    10 float>base ;
+    10 float>base ; inline
 
 M: float >base
     {
@@ -251,9 +251,9 @@ M: float >base
         [ float>base ]
     } cond ;
 
-: number>string ( n -- str ) 10 >base ;
-: >bin ( n -- str ) 2 >base ;
-: >oct ( n -- str ) 8 >base ;
-: >hex ( n -- str ) 16 >base ;
+: number>string ( n -- str ) 10 >base ; inline
+: >bin ( n -- str ) 2 >base ; inline
+: >oct ( n -- str ) 8 >base ; inline
+: >hex ( n -- str ) 16 >base ; inline
 
-: # ( n -- ) number>string % ;
+: # ( n -- ) number>string % ; inline
