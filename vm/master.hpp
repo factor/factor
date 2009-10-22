@@ -78,6 +78,7 @@ namespace factor
 #include "words.hpp"
 #include "float_bits.hpp"
 #include "io.hpp"
+#include "mark_bits.hpp"
 #include "heap.hpp"
 #include "image.hpp"
 #include "alien.hpp"

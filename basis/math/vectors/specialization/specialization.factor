@@ -7,12 +7,20 @@ namespaces assocs fry splitting classes.algebra generalizations
 locals compiler.tree.propagation.info ;
 IN: math.vectors.specialization
 
-SYMBOLS: -> +vector+ +scalar+ +boolean+ +nonnegative+ +literal+ ;
+SYMBOLS: -> +vector+ +any-vector+ +scalar+ +boolean+ +nonnegative+ +literal+ ;
+
+: parent-vector-class ( type -- type' )
+    {
+        { [ dup simd-128 class<= ] [ drop simd-128 ] }
+        { [ dup simd-256 class<= ] [ drop simd-256 ] }
+        [ "Not a vector class" throw ]
+    } cond ;
 
 : signature-for-schema ( array-type elt-type schema -- signature )
     [
         {
             { +vector+ [ drop ] }
+            { +any-vector+ [ drop parent-vector-class ] }
             { +scalar+ [ nip ] }
             { +boolean+ [ 2drop boolean ] }
             { +nonnegative+ [ nip ] }
@@ -32,6 +40,7 @@ SYMBOLS: -> +vector+ +scalar+ +boolean+ +nonnegative+ +literal+ ;
     [
         {
             { +vector+ [ drop <class-info> ] }
+            { +any-vector+ [ drop parent-vector-class <class-info> ] }
             { +scalar+ [ nip <class-info> ] }
             { +boolean+ [ 2drop boolean <class-info> ] }
             {
@@ -101,7 +110,7 @@ H{
     { hlshift { +vector+ +literal+ -> +vector+ } }
     { hrshift { +vector+ +literal+ -> +vector+ } }
     { vshuffle-elements { +vector+ +literal+ -> +vector+ } }
-    { vshuffle-bytes    { +vector+ +vector+  -> +vector+ } }
+    { vshuffle-bytes    { +vector+ +any-vector+  -> +vector+ } }
     { vbroadcast { +vector+ +literal+ -> +vector+ } }
     { (vmerge-head) { +vector+ +vector+ -> +vector+ } }
     { (vmerge-tail) { +vector+ +vector+ -> +vector+ } }

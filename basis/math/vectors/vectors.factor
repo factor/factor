@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien.c-types assocs kernel sequences math math.functions
-hints math.order math.libm fry combinators byte-arrays accessors
-locals ;
+hints math.order math.libm math.floats.private fry combinators
+byte-arrays accessors locals ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors
 
@@ -29,8 +29,16 @@ M: object element-type drop f ; inline
 : [v-] ( u v -- w ) [ [-] ] 2map ;
 : v*   ( u v -- w ) [ * ] 2map ;
 : v/   ( u v -- w ) [ / ] 2map ;
-: vmax ( u v -- w ) [ max ] 2map ;
-: vmin ( u v -- w ) [ min ] 2map ;
+
+<PRIVATE
+
+: if-both-floats ( x y p q -- )
+    [ 2dup [ float? ] both? ] 2dip if ; inline
+
+PRIVATE>
+
+: vmax ( u v -- w ) [ [ float-max ] [ max ] if-both-floats ] 2map ;
+: vmin ( u v -- w ) [ [ float-min ] [ min ] if-both-floats ] 2map ;
 
 : v+- ( u v -- w )
     [ t ] 2dip
@@ -92,7 +100,7 @@ PRIVATE>
 
 : vshuffle-bytes ( u perm -- v )
     underlying>> [
-        swap [ '[ _ nth ] ] keep map-as
+        swap [ '[ 15 bitand _ nth ] ] keep map-as
     ] curry change-underlying ;
 
 GENERIC: vshuffle ( u perm -- v )
@@ -134,8 +142,15 @@ M: simd-128 vshuffle ( u perm -- v )
 : vunordered? ( u v -- w ) [ unordered? ] 2map ;
 : v=  ( u v -- w ) [ =   ] 2map ;
 
-: v? ( mask true false -- w )
+: v? ( mask true false -- result )
     [ vand ] [ vandn ] bi-curry* bi vor ; inline
+
+:: vif ( mask true-quot false-quot -- result )
+    {
+        { [ mask vall?  ] [ true-quot  call ] }
+        { [ mask vnone? ] [ false-quot call ] }
+        [ mask true-quot call false-quot call v? ]
+    } cond ; inline
 
 : vfloor    ( u -- v ) [ floor ] map ;
 : vceiling  ( u -- v ) [ ceiling ] map ;
@@ -163,24 +178,24 @@ PRIVATE>
 
 : trilerp ( aaa baa aba bba aab bab abb bbb {t,u,v} -- a_tuv )
     [ first lerp ] [ second lerp ] [ third lerp ] tri-curry
-    [ 2tetra@ ] [ 2bi@ ] [ call ] tri* ;
+    [ 2tetra@ ] [ 2bi@ ] [ call ] tri* ; inline
 
 : bilerp ( aa ba ab bb {t,u} -- a_tu )
     [ first lerp ] [ second lerp ] bi-curry
-    [ 2bi@ ] [ call ] bi* ;
+    [ 2bi@ ] [ call ] bi* ; inline
 
 : vlerp ( a b t -- a_t )
-    [ lerp ] 3map ;
+    [ over v- ] dip v* v+ ; inline
 
 : vnlerp ( a b t -- a_t )
-    [ lerp ] curry 2map ;
+    [ over v- ] dip v*n v+ ; inline
 
 : vbilerp ( aa ba ab bb {t,u} -- a_tu )
     [ first vnlerp ] [ second vnlerp ] bi-curry
-    [ 2bi@ ] [ call ] bi* ;
+    [ 2bi@ ] [ call ] bi* ; inline
 
 : v~ ( a b epsilon -- ? )
-    [ ~ ] curry 2all? ;
+    [ ~ ] curry 2all? ; inline
 
 HINTS: vneg { array } ;
 HINTS: norm-sq { array } ;

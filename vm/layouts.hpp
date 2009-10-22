@@ -46,9 +46,6 @@ inline static cell align8(cell a)
 #define OBJECT_TYPE 6
 #define TUPLE_TYPE 7
 
-/* Canonical F object */
-#define F F_TYPE
-
 #define HEADER_TYPE 8 /* anything less than this is a tag */
 
 #define GC_COLLECTED 5 /* can be anything other than FIXNUM_TYPE */
@@ -78,9 +75,12 @@ enum
 	FP_TRAP_INEXACT           = 1 << 4,
 };
 
+/* What Factor calls 'f' */
+static const cell false_object = F_TYPE;
+
 inline static bool immediate_p(cell obj)
 {
-	return (obj == F || TAG(obj) == FIXNUM_TYPE);
+	return (obj == false_object || TAG(obj) == FIXNUM_TYPE);
 }
 
 inline static fixnum untag_fixnum(cell tagged)
@@ -200,15 +200,6 @@ struct string : public object {
 struct heap_block
 {
 	cell header;
-
-	bool marked_p() { return header & 1; }
-	void set_marked_p(bool marked)
-	{
-		if(marked)
-			header |= 1;
-		else
-			header &= ~1;
-	}
 
 	cell type() { return (header >> 1) & 0x1f; }
 	void set_type(cell type)

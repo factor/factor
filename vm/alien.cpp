@@ -12,8 +12,8 @@ char *factor_vm::pinned_alien_offset(cell obj)
 	case ALIEN_TYPE:
 		{
 			alien *ptr = untag<alien>(obj);
-			if(ptr->expired != F)
-				general_error(ERROR_EXPIRED,obj,F,NULL);
+			if(to_boolean(ptr->expired))
+				general_error(ERROR_EXPIRED,obj,false_object,NULL);
 			return pinned_alien_offset(ptr->base) + ptr->displacement;
 		}
 	case F_TYPE:
@@ -40,7 +40,7 @@ cell factor_vm::allot_alien(cell delegate_, cell displacement)
 		new_alien->base = delegate.value();
 
 	new_alien->displacement = displacement;
-	new_alien->expired = F;
+	new_alien->expired = false_object;
 
 	return new_alien.value();
 }
@@ -51,8 +51,8 @@ void factor_vm::primitive_displaced_alien()
 	cell alien = dpop();
 	cell displacement = to_cell(dpop());
 
-	if(alien == F && displacement == 0)
-		dpush(F);
+	if(!to_boolean(alien) && displacement == 0)
+		dpush(false_object);
 	else
 	{
 		switch(tagged<object>(alien).type())
@@ -87,12 +87,12 @@ void *factor_vm::alien_pointer()
 #define DEFINE_ALIEN_ACCESSOR(name,type,boxer,to) \
 	PRIMITIVE(alien_##name) \
 	{ \
-		((factor_vm*)myvm)->boxer(*(type*)((factor_vm*)myvm)->alien_pointer());	\
+		parent->boxer(*(type*)(parent->alien_pointer())); \
 	} \
 	PRIMITIVE(set_alien_##name) \
 	{ \
-		type *ptr = (type *)((factor_vm*)myvm)->alien_pointer(); \
-		type value = ((factor_vm*)myvm)->to(dpop()); \
+		type *ptr = (type *)parent->alien_pointer(); \
+		type value = parent->to(dpop()); \
 		*ptr = value; \
 	}
 
@@ -130,17 +130,17 @@ void factor_vm::primitive_dlsym()
 
 	symbol_char *sym = name->data<symbol_char>();
 
-	if(library.value() == F)
-		box_alien(ffi_dlsym(NULL,sym));
-	else
+	if(to_boolean(library.value()))
 	{
 		dll *d = untag_check<dll>(library.value());
 
 		if(d->dll == NULL)
-			dpush(F);
+			dpush(false_object);
 		else
 			box_alien(ffi_dlsym(d,sym));
 	}
+	else
+		box_alien(ffi_dlsym(NULL,sym));
 }
 
 /* close a native library handle */
@@ -154,10 +154,10 @@ void factor_vm::primitive_dlclose()
 void factor_vm::primitive_dll_validp()
 {
 	cell library = dpop();
-	if(library == F)
-		dpush(T);
+	if(to_boolean(library))
+		dpush(tag_boolean(untag_check<dll>(library)->dll != NULL));
 	else
-		dpush(untag_check<dll>(library)->dll == NULL ? F : T);
+		dpush(true_object);
 }
 
 /* gets the address of an object representing a C pointer */
@@ -170,8 +170,8 @@ char *factor_vm::alien_offset(cell obj)
 	case ALIEN_TYPE:
 		{
 			alien *ptr = untag<alien>(obj);
-			if(ptr->expired != F)
-				general_error(ERROR_EXPIRED,obj,F,NULL);
+			if(to_boolean(ptr->expired))
+				general_error(ERROR_EXPIRED,obj,false_object,NULL);
 			return alien_offset(ptr->base) + ptr->displacement;
 		}
 	case F_TYPE:
@@ -182,9 +182,9 @@ char *factor_vm::alien_offset(cell obj)
 	}
 }
 
-VM_C_API char *alien_offset(cell obj, factor_vm *myvm)
+VM_C_API char *alien_offset(cell obj, factor_vm *parent)
 {
-	return myvm->alien_offset(obj);
+	return parent->alien_offset(obj);
 }
 
 /* pop an object representing a C pointer */
@@ -193,23 +193,23 @@ char *factor_vm::unbox_alien()
 	return alien_offset(dpop());
 }
 
-VM_C_API char *unbox_alien(factor_vm *myvm)
+VM_C_API char *unbox_alien(factor_vm *parent)
 {
-	return myvm->unbox_alien();
+	return parent->unbox_alien();
 }
 
 /* make an alien and push */
 void factor_vm::box_alien(void *ptr)
 {
 	if(ptr == NULL)
-		dpush(F);
+		dpush(false_object);
 	else
-		dpush(allot_alien(F,(cell)ptr));
+		dpush(allot_alien(false_object,(cell)ptr));
 }
 
-VM_C_API void box_alien(void *ptr, factor_vm *myvm)
+VM_C_API void box_alien(void *ptr, factor_vm *parent)
 {
-	return myvm->box_alien(ptr);
+	return parent->box_alien(ptr);
 }
 
 /* for FFI calls passing structs by value */
@@ -218,9 +218,9 @@ void factor_vm::to_value_struct(cell src, void *dest, cell size)
 	memcpy(dest,alien_offset(src),size);
 }
 
-VM_C_API void to_value_struct(cell src, void *dest, cell size, factor_vm *myvm)
+VM_C_API void to_value_struct(cell src, void *dest, cell size, factor_vm *parent)
 {
-	return myvm->to_value_struct(src,dest,size);
+	return parent->to_value_struct(src,dest,size);
 }
 
 /* for FFI callbacks receiving structs by value */
@@ -231,9 +231,9 @@ void factor_vm::box_value_struct(void *src, cell size)
 	dpush(tag<byte_array>(bytes));
 }
 
-VM_C_API void box_value_struct(void *src, cell size,factor_vm *myvm)
+VM_C_API void box_value_struct(void *src, cell size,factor_vm *parent)
 {
-	return myvm->box_value_struct(src,size);
+	return parent->box_value_struct(src,size);
 }
 
 /* On some x86 OSes, structs <= 8 bytes are returned in registers. */
@@ -245,9 +245,9 @@ void factor_vm::box_small_struct(cell x, cell y, cell size)
 	box_value_struct(data,size);
 }
 
-VM_C_API void box_small_struct(cell x, cell y, cell size, factor_vm *myvm)
+VM_C_API void box_small_struct(cell x, cell y, cell size, factor_vm *parent)
 {
-	return myvm->box_small_struct(x,y,size);
+	return parent->box_small_struct(x,y,size);
 }
 
 /* On OS X/PPC, complex numbers are returned in registers. */
@@ -261,9 +261,9 @@ void factor_vm::box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size)
 	box_value_struct(data,size);
 }
 
-VM_C_API void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size, factor_vm *myvm)
+VM_C_API void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size, factor_vm *parent)
 {
-	return myvm->box_medium_struct(x1, x2, x3, x4, size);
+	return parent->box_medium_struct(x1, x2, x3, x4, size);
 }
 
 void factor_vm::primitive_vm_ptr()

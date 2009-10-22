@@ -6,7 +6,12 @@ VM_C_API bool to_boolean(cell value, factor_vm *vm);
 
 inline cell factor_vm::tag_boolean(cell untagged)
 {
-	return (untagged ? T : F);
+	return (untagged ? true_object : false_object);
+}
+
+inline bool factor_vm::to_boolean(cell value)
+{
+	return value != false_object;
 }
 
 }

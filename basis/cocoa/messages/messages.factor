@@ -2,10 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.strings arrays assocs
 classes.struct continuations combinators compiler compiler.alien
-stack-checker kernel math namespaces make quotations sequences
-strings words cocoa.runtime io macros memoize io.encodings.utf8
-effects libc libc.private lexer init core-foundation fry
-generalizations specialized-arrays ;
+core-graphics.types stack-checker kernel math namespaces make
+quotations sequences strings words cocoa.runtime cocoa.types io
+macros memoize io.encodings.utf8 effects layouts libc
+libc.private lexer init core-foundation fry generalizations
+specialized-arrays ;
+QUALIFIED-WITH: alien.c-types c
 IN: cocoa.messages
 
 SPECIALIZED-ARRAY: void*
@@ -98,75 +100,84 @@ class-init-hooks [ H{ } clone ] initialize
 SYMBOL: objc>alien-types
 
 H{
-    { "c" "char" }
-    { "i" "int" }
-    { "s" "short" }
-    { "C" "uchar" }
-    { "I" "uint" }
-    { "S" "ushort" }
-    { "f" "float" }
-    { "d" "double" }
-    { "B" "bool" }
-    { "v" "void" }
-    { "*" "char*" }
-    { "?" "unknown_type" }
-    { "@" "id" }
-    { "#" "Class" }
-    { ":" "SEL" }
+    { "c" c:char }
+    { "i" c:int }
+    { "s" c:short }
+    { "C" c:uchar }
+    { "I" c:uint }
+    { "S" c:ushort }
+    { "f" c:float }
+    { "d" c:double }
+    { "B" c:bool }
+    { "v" c:void }
+    { "*" c:char* }
+    { "?" unknown_type }
+    { "@" id }
+    { "#" Class }
+    { ":" SEL }
 }
-"ptrdiff_t" heap-size {
+cell {
     { 4 [ H{
-        { "l" "long" }
-        { "q" "longlong" }
-        { "L" "ulong" }
-        { "Q" "ulonglong" }
+        { "l" c:long }
+        { "q" c:longlong }
+        { "L" c:ulong }
+        { "Q" c:ulonglong }
     } ] }
     { 8 [ H{
-        { "l" "long32" }
-        { "q" "long" }
-        { "L" "ulong32" }
-        { "Q" "ulong" }
+        { "l" long32 }
+        { "q" long }
+        { "L" ulong32 }
+        { "Q" ulong }
     } ] }
 } case
 assoc-union objc>alien-types set-global
+
+SYMBOL: objc>struct-types
+
+H{
+    { "_NSPoint" NSPoint }
+    { "NSPoint"  NSPoint }
+    { "CGPoint"  NSPoint }
+    { "_NSRect"  NSRect  }
+    { "NSRect"   NSRect  }
+    { "CGRect"   NSRect  }
+    { "_NSSize"  NSSize  }
+    { "NSSize"   NSSize  }
+    { "CGSize"   NSSize  }
+    { "_NSRange" NSRange }
+    { "NSRange"  NSRange }
+} objc>struct-types set-global
 
 ! The transpose of the above map
 SYMBOL: alien>objc-types
 
 objc>alien-types get [ swap ] assoc-map
 ! A hack...
-"ptrdiff_t" heap-size {
+cell {
     { 4 [ H{
-        { "NSPoint"    "{_NSPoint=ff}" }
-        { "NSRect"     "{_NSRect={_NSPoint=ff}{_NSSize=ff}}" }
-        { "NSSize"     "{_NSSize=ff}" }
-        { "NSRange"    "{_NSRange=II}" }
-        { "NSInteger"  "i" }
-        { "NSUInteger" "I" }
-        { "CGFloat"    "f" }
+        { NSPoint    "{_NSPoint=ff}" }
+        { NSRect     "{_NSRect={_NSPoint=ff}{_NSSize=ff}}" }
+        { NSSize     "{_NSSize=ff}" }
+        { NSRange    "{_NSRange=II}" }
+        { NSInteger  "i" }
+        { NSUInteger "I" }
+        { CGFloat    "f" }
     } ] }
     { 8 [ H{
-        { "NSPoint"    "{CGPoint=dd}" }
-        { "NSRect"     "{CGRect={CGPoint=dd}{CGSize=dd}}" }
-        { "NSSize"     "{CGSize=dd}" }
-        { "NSRange"    "{_NSRange=QQ}" }
-        { "NSInteger"  "q" }
-        { "NSUInteger" "Q" }
-        { "CGFloat"    "d" }
+        { NSPoint    "{CGPoint=dd}" }
+        { NSRect     "{CGRect={CGPoint=dd}{CGSize=dd}}" }
+        { NSSize     "{CGSize=dd}" }
+        { NSRange    "{_NSRange=QQ}" }
+        { NSInteger  "q" }
+        { NSUInteger "Q" }
+        { CGFloat    "d" }
     } ] }
 } case
 assoc-union alien>objc-types set-global
 
-: internal-cocoa-type? ( c-type -- ? )
-    [ "?" = ] [ first CHAR: _ = ] bi or ;
-
-: warn-c-type ( c-type -- )
-    dup internal-cocoa-type?
-    [ drop ] [ "Warning: no such C type: " write print ] if ;
-
 : objc-struct-type ( i string -- ctype )
     [ CHAR: = ] 2keep index-from swap subseq
-    dup c-types get key? [ warn-c-type "void*" ] unless ;
+    objc>struct-types get at* [ drop void* ] unless ;
 
 ERROR: no-objc-type name ;
 
@@ -177,9 +188,9 @@ ERROR: no-objc-type name ;
 : (parse-objc-type) ( i string -- ctype )
     [ [ 1 + ] dip ] [ nth ] 2bi {
         { [ dup "rnNoORV" member? ] [ drop (parse-objc-type) ] }
-        { [ dup CHAR: ^ = ] [ 3drop "void*" ] }
+        { [ dup CHAR: ^ = ] [ 3drop void* ] }
         { [ dup CHAR: { = ] [ drop objc-struct-type ] }
-        { [ dup CHAR: [ = ] [ 3drop "void*" ] }
+        { [ dup CHAR: [ = ] [ 3drop void* ] }
         [ 2nip decode-type ]
     } cond ;
 

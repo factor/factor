@@ -37,6 +37,6 @@ struct gc_state {
 	~gc_state();
 };
 
-VM_C_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *myvm);
+VM_C_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *parent);
 
 }
