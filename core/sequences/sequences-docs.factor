@@ -426,6 +426,10 @@ HELP: filter
 { $values { "seq" sequence } { "quot" { $quotation "( elt -- ? )" } } { "subseq" "a new sequence" } }
 { $description "Applies the quotation to each element in turn, and outputs a new sequence containing the elements of the original sequence for which the quotation output a true value." } ;
 
+HELP: filter-as
+{ $values { "seq" sequence } { "quot" { $quotation "( elt -- ? )" } } { "exemplar" sequence } { "subseq" "a new sequence" } }
+{ $description "Applies the quotation to each element in turn, and outputs a new sequence of the same type as " { $snippet "exemplar" } " containing the elements of the original sequence for which the quotation output a true value." } ;
+
 HELP: filter-here
 { $values { "seq" "a resizable mutable sequence" } { "quot" { $quotation "( elt -- ? )" } } }
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a false value." }
@@ -1512,6 +1516,7 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 "Filtering:"
 { $subsections
     filter
+    filter-as
     partition
 }
 "Testing if a sequence contains elements satisfying a predicate:"
