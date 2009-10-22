@@ -26,8 +26,8 @@ struct factor_vm
 	/* Pooling unused contexts to make callbacks cheaper */
 	context *unused_contexts;
 
-	/* Canonical T object. It's just a word */
-	cell T;
+	/* Canonical truth value. In Factor, 't' */
+	cell true_object;
 
 	/* Is call counting enabled? */
 	bool profiling_p;
@@ -253,8 +253,6 @@ struct factor_vm
 	void collect_nursery();
 	void collect_aging();
 	void collect_to_tenured();
-	void big_code_heap_update();
-	void small_code_heap_update();
 	void collect_full_impl(bool trace_contexts_p);
 	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p, bool compact_code_heap_p);
 	void collect_full(bool trace_contexts_p, bool compact_code_heap_p);

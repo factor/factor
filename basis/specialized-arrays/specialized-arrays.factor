@@ -6,7 +6,7 @@ libc math math.vectors math.vectors.private
 math.vectors.specialization namespaces
 parser prettyprint.custom sequences sequences.private strings
 summary vocabs vocabs.loader vocabs.parser vocabs.generated
-words fry combinators present ;
+words fry combinators make ;
 IN: specialized-arrays
 
 MIXIN: specialized-array
@@ -125,11 +125,13 @@ M: word (underlying-type) "c-type" word-prop ;
         [ drop ]
     } cond ;
 
-: underlying-type-name ( c-type -- name )
-    underlying-type present ;
-
 : specialized-array-vocab ( c-type -- vocab )
-    present "specialized-arrays.instances." prepend ;
+    [
+        "specialized-arrays.instances." %
+        [ vocabulary>> % "." % ]
+        [ name>> % ]
+        bi
+    ] "" make ;
 
 PRIVATE>
 
@@ -143,18 +145,18 @@ M: c-type-name require-c-array define-array-vocab drop ;
 ERROR: specialized-array-vocab-not-loaded c-type ;
 
 M: c-type-name c-array-constructor
-    underlying-type-name
-    dup [ "<" "-array>" surround ] [ specialized-array-vocab ] bi lookup
+    underlying-type
+    dup [ name>> "<" "-array>" surround ] [ specialized-array-vocab ] bi lookup
     [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 
 M: c-type-name c-(array)-constructor
-    underlying-type-name
-    dup [ "(" "-array)" surround ] [ specialized-array-vocab ] bi lookup
+    underlying-type
+    dup [ name>> "(" "-array)" surround ] [ specialized-array-vocab ] bi lookup
     [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 
 M: c-type-name c-direct-array-constructor
-    underlying-type-name
-    dup [ "<direct-" "-array>" surround ] [ specialized-array-vocab ] bi lookup
+    underlying-type
+    dup [ name>> "<direct-" "-array>" surround ] [ specialized-array-vocab ] bi lookup
     [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 
 SYNTAX: SPECIALIZED-ARRAYS:

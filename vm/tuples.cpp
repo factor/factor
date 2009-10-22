@@ -18,7 +18,7 @@ void factor_vm::primitive_tuple()
 	tuple *t = allot_tuple(layout.value());
 	fixnum i;
 	for(i = tuple_size(layout.untagged()) - 1; i >= 0; i--)
-		t->data()[i] = F;
+		t->data()[i] = false_object;
 
 	dpush(tag<tuple>(t));
 }

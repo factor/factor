@@ -239,9 +239,6 @@ ARTICLE: "primitive-index" "Primitive index"
 ARTICLE: "error-index" "Error index"
 { $index [ all-errors ] } ;
 
-ARTICLE: "type-index" "Type index"
-{ $index [ builtins get sift ] } ;
-
 ARTICLE: "class-index" "Class index"
 { $heading "Built-in classes" }
 { $index [ classes [ builtin-class? ] filter ] }
@@ -387,7 +384,6 @@ ARTICLE: "handbook" "Factor handbook"
     "article-index"
     "primitive-index"
     "error-index"
-    "type-index"
     "class-index"
 }
 { $heading "Explore the code base" }

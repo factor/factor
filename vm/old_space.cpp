@@ -62,9 +62,9 @@ void old_space::clear_object_start_offsets()
 	memset(object_start_offsets,card_starts_inside_object,addr_to_card(size));
 }
 
-cell old_space::next_object_after(factor_vm *myvm, cell scan)
+cell old_space::next_object_after(factor_vm *parent, cell scan)
 {
-	cell size = myvm->untagged_object_size((object *)scan);
+	cell size = parent->untagged_object_size((object *)scan);
 	if(scan + size < here)
 		return scan + size;
 	else

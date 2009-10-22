@@ -55,12 +55,15 @@ ARTICLE: "math-vectors-shuffle" "Vector shuffling, packing, and unpacking"
 "These operations are primarily meant to be used with " { $vocab-link "math.vectors.simd" } " types. The software fallbacks for types not supported by hardware will not perform well."
 }
 $nl
-{ $subsection vshuffle }
-{ $subsection vbroadcast }
-{ $subsection hlshift } 
-{ $subsection hrshift }
-{ $subsection vmerge }
-{ $subsection (vmerge) } ;
+{ $subsections
+    vshuffle
+    vbroadcast
+    hlshift
+    hrshift
+    vmerge
+    (vmerge)
+}
+"See the " { $vocab-link "math.vectors.conversion" } " vocabulary for packing, unpacking, and converting vectors." ;
 
 ARTICLE: "math-vectors-logic" "Vector component- and bit-wise logic"
 { $notes
@@ -98,6 +101,7 @@ $nl
     vxor
     vnot
     v?
+    vif
 }
 "Entire vector tests:"
 { $subsections
@@ -416,14 +420,41 @@ HELP: vbroadcast
 } ;
 
 HELP: vshuffle
-{ $values { "u" "a SIMD array" } { "perm" "an array of integers" } { "v" "a SIMD array" } }
-{ $description "Permutes the elements of a SIMD array. Duplicate entries are allowed in the permutation." }
+{ $values { "u" "a SIMD array" } { "perm" "an array of integers, or a byte-array" } { "v" "a SIMD array" } }
+{ $description "Permutes the elements of a SIMD array. Duplicate entries are allowed in the permutation. The " { $snippet "perm" } " argument can have one of two forms:"
+{ $list
+{ "A literal array of integers of the same length as the vector. This will perform a static, elementwise shuffle." }
+{ "A byte array or SIMD vector of the same byte length as the vector. This will perform a variable bytewise shuffle." }
+} }
 { $examples
     { $example
         "USING: alien.c-types math.vectors math.vectors.simd" "prettyprint ;"
         "SIMD: int"
         "int-4{ 69 42 911 13 } { 1 3 2 3 } vshuffle ."
         "int-4{ 42 13 911 13 }"
+    }
+    { $example
+        "USING: alien.c-types combinators math.vectors math.vectors.simd"
+        "namespaces prettyprint prettyprint.config ;"
+        "SIMDS: int uchar ;"
+        "IN: scratchpad"
+        ""
+        ": endian-swap ( size -- vector )"
+        "    {"
+        "        { 1 [ uchar-16{ 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 } ] }"
+        "        { 2 [ uchar-16{ 1 0 3 2 5 4 7 6 9 8 11 10 13 12 15 14 } ] }"
+        "        { 4 [ uchar-16{ 3 2 1 0 7 6 5 4 11 10 9 8 15 14 13 12 } ] }"
+        "    } case ;"
+        ""
+        "int-4{ HEX: 11223344 HEX: 11223344 HEX: 11223344 HEX: 11223344 }"
+        "4 endian-swap vshuffle"
+        "16 number-base [ . ] with-variable"
+        """int-4{
+    HEX: 44332211
+    HEX: 44332211
+    HEX: 44332211
+    HEX: 44332211
+}"""
     }
 } ;
 
@@ -504,9 +535,18 @@ HELP: vnot
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: v?
-{ $values { "mask" "a sequence of booleans" } { "true" "a sequence of numbers" } { "false" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "mask" "a sequence of booleans" } { "true" "a sequence of numbers" } { "false" "a sequence of numbers" } { "result" "a sequence of numbers" } }
 { $description "Creates a new sequence by selecting elements from the " { $snippet "true" } " and " { $snippet "false" } " sequences based on whether the corresponding bits of the " { $snippet "mask" } " sequence are set or not." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
+
+HELP: vif
+{ $values { "mask" "a sequence of booleans" } { "true-quot" { $quotation "( -- vector )" } } { "false-quot" { $quotation "( -- vector )" } } { "result" "a sequence" } }
+{ $description "If all of the elements of " { $snippet "mask" } " are true, " { $snippet "true-quot" } " is called and its output value returned. If all of the elements of " { $snippet "mask" } " are false, " { $snippet "false-quot" } " is called and its output value returned. Otherwise, both quotations are called and " { $snippet "mask" } " is used to select elements from each output as with " { $link v? } "." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types."
+$nl
+"For most conditional SIMD code, unless a case is exceptionally expensive to compute, it is usually most efficient to just compute all cases and blend them with " { $link v? } " instead of using " { $snippet "vif" } "." } ;
+
+{ v? vif } related-words
 
 HELP: vany?
 { $values { "v" "a sequence of booleans" } { "?" "a boolean" } }

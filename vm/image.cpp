@@ -8,7 +8,7 @@ void factor_vm::init_objects(image_header *h)
 {
 	memcpy(userenv,h->userenv,sizeof(userenv));
 
-	T = h->t;
+	true_object = h->true_object;
 	bignum_zero = h->bignum_zero;
 	bignum_pos_one = h->bignum_pos_one;
 	bignum_neg_one = h->bignum_neg_one;
@@ -67,86 +67,6 @@ void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 	code->build_free_list(h->code_size);
 }
 
-/* Save the current image to disk */
-bool factor_vm::save_image(const vm_char *filename)
-{
-	FILE* file;
-	image_header h;
-
-	file = OPEN_WRITE(filename);
-	if(file == NULL)
-	{
-		print_string("Cannot open image file: "); print_native_string(filename); nl();
-		print_string(strerror(errno)); nl();
-		return false;
-	}
-
-	h.magic = image_magic;
-	h.version = image_version;
-	h.data_relocation_base = data->tenured->start;
-	h.data_size = data->tenured->here - data->tenured->start;
-	h.code_relocation_base = code->seg->start;
-	h.code_size = code->heap_size();
-
-	h.t = T;
-	h.bignum_zero = bignum_zero;
-	h.bignum_pos_one = bignum_pos_one;
-	h.bignum_neg_one = bignum_neg_one;
-
-	for(cell i = 0; i < USER_ENV; i++)
-		h.userenv[i] = (save_env_p(i) ? userenv[i] : F);
-
-	bool ok = true;
-
-	if(fwrite(&h,sizeof(image_header),1,file) != 1) ok = false;
-	if(fwrite((void*)data->tenured->start,h.data_size,1,file) != 1) ok = false;
-	if(fwrite(code->first_block(),h.code_size,1,file) != 1) ok = false;
-	if(fclose(file)) ok = false;
-
-	if(!ok)
-	{
-		print_string("save-image failed: "); print_string(strerror(errno)); nl();
-	}
-
-	return ok;
-}
-
-void factor_vm::primitive_save_image()
-{
-	/* do a full GC to push everything into tenured space */
-	primitive_compact_gc();
-
-	gc_root<byte_array> path(dpop(),this);
-	path.untag_check(this);
-	save_image((vm_char *)(path.untagged() + 1));
-}
-
-void factor_vm::primitive_save_image_and_exit()
-{
-	/* We unbox this before doing anything else. This is the only point
-	where we might throw an error, so we have to throw an error here since
-	later steps destroy the current image. */
-	gc_root<byte_array> path(dpop(),this);
-	path.untag_check(this);
-
-	/* strip out userenv data which is set on startup anyway */
-	for(cell i = 0; i < USER_ENV; i++)
-	{
-		if(!save_env_p(i)) userenv[i] = F;
-	}
-
-	gc(collect_full_op,
-		0, /* requested size */
-		false, /* discard objects only reachable from stacks */
-		true /* compact the code heap */);
-
-	/* Save the image */
-	if(save_image((vm_char *)(path.untagged() + 1)))
-		exit(0);
-	else
-		exit(1);
-}
-
 void factor_vm::data_fixup(cell *handle, cell data_relocation_base)
 {
 	if(immediate_p(*handle))
@@ -184,19 +104,19 @@ void factor_vm::fixup_quotation(quotation *quot, cell code_relocation_base)
 
 void factor_vm::fixup_alien(alien *d)
 {
-	if(d->base == F) d->expired = T;
+	if(!to_boolean(d->base)) d->expired = true_object;
 }
 
 struct stack_frame_fixupper {
-	factor_vm *myvm;
+	factor_vm *parent;
 	cell code_relocation_base;
 
-	explicit stack_frame_fixupper(factor_vm *myvm_, cell code_relocation_base_) :
-		myvm(myvm_), code_relocation_base(code_relocation_base_) {}
+	explicit stack_frame_fixupper(factor_vm *parent_, cell code_relocation_base_) :
+		parent(parent_), code_relocation_base(code_relocation_base_) {}
 	void operator()(stack_frame *frame)
 	{
-		myvm->code_fixup(&frame->xt,code_relocation_base);
-		myvm->code_fixup(&FRAME_RETURN_ADDRESS(frame,myvm),code_relocation_base);
+		parent->code_fixup(&frame->xt,code_relocation_base);
+		parent->code_fixup(&FRAME_RETURN_ADDRESS(frame,parent),code_relocation_base);
 	}
 };
 
@@ -207,15 +127,15 @@ void factor_vm::fixup_callstack_object(callstack *stack, cell code_relocation_ba
 }
 
 struct object_fixupper {
-	factor_vm *myvm;
+	factor_vm *parent;
 	cell data_relocation_base;
 
-	explicit object_fixupper(factor_vm *myvm_, cell data_relocation_base_) :
-		myvm(myvm_), data_relocation_base(data_relocation_base_) { }
+	explicit object_fixupper(factor_vm *parent_, cell data_relocation_base_) :
+		parent(parent_), data_relocation_base(data_relocation_base_) { }
 
 	void operator()(cell *scan)
 	{
-		myvm->data_fixup(scan,data_relocation_base);
+		parent->data_fixup(scan,data_relocation_base);
 	}
 };
 
@@ -273,7 +193,7 @@ void factor_vm::relocate_data(cell data_relocation_base, cell code_relocation_ba
 	for(cell i = 0; i < USER_ENV; i++)
 		data_fixup(&userenv[i],data_relocation_base);
 
-	data_fixup(&T,data_relocation_base);
+	data_fixup(&true_object,data_relocation_base);
 	data_fixup(&bignum_zero,data_relocation_base);
 	data_fixup(&bignum_pos_one,data_relocation_base);
 	data_fixup(&bignum_neg_one,data_relocation_base);
@@ -299,15 +219,15 @@ void factor_vm::fixup_code_block(code_block *compiled, cell data_relocation_base
 }
 
 struct code_block_fixupper {
-	factor_vm *myvm;
+	factor_vm *parent;
 	cell data_relocation_base;
 
-	code_block_fixupper(factor_vm *myvm_, cell data_relocation_base_) :
-		myvm(myvm_), data_relocation_base(data_relocation_base_) { }
+	code_block_fixupper(factor_vm *parent_, cell data_relocation_base_) :
+		parent(parent_), data_relocation_base(data_relocation_base_) { }
 
 	void operator()(code_block *compiled)
 	{
-		myvm->fixup_code_block(compiled,data_relocation_base);
+		parent->fixup_code_block(compiled,data_relocation_base);
 	}
 };
 
@@ -350,7 +270,85 @@ void factor_vm::load_image(vm_parameters *p)
 	relocate_code(h.data_relocation_base);
 
 	/* Store image path name */
-	userenv[IMAGE_ENV] = allot_alien(F,(cell)p->image_path);
+	userenv[IMAGE_ENV] = allot_alien(false_object,(cell)p->image_path);
+}
+
+/* Save the current image to disk */
+bool factor_vm::save_image(const vm_char *filename)
+{
+	FILE* file;
+	image_header h;
+
+	file = OPEN_WRITE(filename);
+	if(file == NULL)
+	{
+		print_string("Cannot open image file: "); print_native_string(filename); nl();
+		print_string(strerror(errno)); nl();
+		return false;
+	}
+
+	h.magic = image_magic;
+	h.version = image_version;
+	h.data_relocation_base = data->tenured->start;
+	h.data_size = data->tenured->here - data->tenured->start;
+	h.code_relocation_base = code->seg->start;
+	h.code_size = code->heap_size();
+
+	h.true_object = true_object;
+	h.bignum_zero = bignum_zero;
+	h.bignum_pos_one = bignum_pos_one;
+	h.bignum_neg_one = bignum_neg_one;
+
+	for(cell i = 0; i < USER_ENV; i++)
+		h.userenv[i] = (save_env_p(i) ? userenv[i] : false_object);
+
+	bool ok = true;
+
+	if(fwrite(&h,sizeof(image_header),1,file) != 1) ok = false;
+	if(fwrite((void*)data->tenured->start,h.data_size,1,file) != 1) ok = false;
+	if(fwrite(code->first_block(),h.code_size,1,file) != 1) ok = false;
+	if(fclose(file)) ok = false;
+
+	if(!ok)
+	{
+		print_string("save-image failed: "); print_string(strerror(errno)); nl();
+	}
+
+	return ok;
+}
+
+void factor_vm::primitive_save_image()
+{
+	/* do a full GC to push everything into tenured space */
+	primitive_compact_gc();
+
+	gc_root<byte_array> path(dpop(),this);
+	path.untag_check(this);
+	save_image((vm_char *)(path.untagged() + 1));
+}
+
+void factor_vm::primitive_save_image_and_exit()
+{
+	/* We unbox this before doing anything else. This is the only point
+	where we might throw an error, so we have to throw an error here since
+	later steps destroy the current image. */
+	gc_root<byte_array> path(dpop(),this);
+	path.untag_check(this);
+
+	/* strip out userenv data which is set on startup anyway */
+	for(cell i = 0; i < USER_ENV; i++)
+		if(!save_env_p(i)) userenv[i] = false_object;
+
+	gc(collect_full_op,
+		0, /* requested size */
+		false, /* discard objects only reachable from stacks */
+		true /* compact the code heap */);
+
+	/* Save the image */
+	if(save_image((vm_char *)(path.untagged() + 1)))
+		exit(0);
+	else
+		exit(1);
 }
 
 }

@@ -71,33 +71,33 @@ void factor_vm::primitive_resize_array()
 
 void growable_array::add(cell elt_)
 {
-	factor_vm *parent_vm = elements.parent_vm;
-	gc_root<object> elt(elt_,parent_vm);
+	factor_vm *parent = elements.parent;
+	gc_root<object> elt(elt_,parent);
 	if(count == array_capacity(elements.untagged()))
-		elements = parent_vm->reallot_array(elements.untagged(),count * 2);
+		elements = parent->reallot_array(elements.untagged(),count * 2);
 
-	parent_vm->set_array_nth(elements.untagged(),count++,elt.value());
+	parent->set_array_nth(elements.untagged(),count++,elt.value());
 }
 
 void growable_array::append(array *elts_)
 {
-	factor_vm *parent_vm = elements.parent_vm;
-	gc_root<array> elts(elts_,parent_vm);
+	factor_vm *parent = elements.parent;
+	gc_root<array> elts(elts_,parent);
 	cell capacity = array_capacity(elts.untagged());
 	if(count + capacity > array_capacity(elements.untagged()))
 	{
-		elements = parent_vm->reallot_array(elements.untagged(),
+		elements = parent->reallot_array(elements.untagged(),
 			(count + capacity) * 2);
 	}
 
 	for(cell index = 0; index < capacity; index++)
-		parent_vm->set_array_nth(elements.untagged(),count++,array_nth(elts.untagged(),index));
+		parent->set_array_nth(elements.untagged(),count++,array_nth(elts.untagged(),index));
 }
 
 void growable_array::trim()
 {
-	factor_vm *parent_vm = elements.parent_vm;
-	elements = parent_vm->reallot_array(elements.untagged(),count);
+	factor_vm *parent = elements.parent;
+	elements = parent->reallot_array(elements.untagged(),count);
 }
 
 }

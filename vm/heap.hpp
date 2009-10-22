@@ -1,8 +1,8 @@
 namespace factor
 {
 
-static const cell free_list_count = 16;
-static const cell block_size_increment = 32;
+static const cell free_list_count = 32;
+static const cell block_size_increment = 16;
 
 struct heap_free_list {
 	free_heap_block *small_blocks[free_list_count];
@@ -13,9 +13,11 @@ struct heap {
 	bool secure_gc;
 	segment *seg;
 	heap_free_list free;
+	mark_bits<heap_block,block_size_increment> *state;
 	unordered_map<heap_block *, char *> forwarding;
 
 	explicit heap(bool secure_gc_, cell size, bool executable_p);
+	~heap();
 
 	inline heap_block *next_block(heap_block *block)
 	{
@@ -46,7 +48,6 @@ struct heap {
 	heap_block *heap_allot(cell size, cell type);
 	void heap_free(heap_block *block);
 	void mark_block(heap_block *block);
-	void clear_mark_bits();
 	void heap_usage(cell *used, cell *total_free, cell *max_free);
 	cell heap_size();
 	void compact_heap();
@@ -71,11 +72,10 @@ struct heap {
 				else
 					prev = scan;
 			}
-			else if(scan->marked_p())
+			else if(state->is_marked_p(scan))
 			{
 				if(prev && prev->type() == FREE_BLOCK_TYPE)
 					add_to_free_list((free_heap_block *)prev);
-				scan->set_marked_p(false);
 				prev = scan;
 				iter(scan);
 			}
