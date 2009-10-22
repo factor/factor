@@ -438,7 +438,7 @@ $nl
 { $notes "This word is used behind the scenes to compile " { $link cond } " forms efficiently; it can also be called directly,  which is useful for meta-programming." } ;
 
 HELP: case>quot
-{ $values { "assoc" "a sequence of pairs of quotations" } { "default" quotation } { "quot" quotation } }
+{ $values { "default" quotation } { "assoc" "a sequence of pairs of quotations" } { "quot" quotation } }
 { $description "Creates a quotation that when called, has the same effect as applying " { $link case } " to " { $snippet "assoc" } "."
 $nl
 "This word uses three strategies:"
