@@ -689,17 +689,12 @@ struct factor_vm
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);
 	bool windows_stat(vm_char *path);
 
-   #if defined(WINNT)
+  #if defined(WINNT)
 	void open_console();
 	LONG exception_handler(PEXCEPTION_POINTERS pe);
- 	// next method here:
-   #endif
+  #endif
   #else  // UNIX
-	void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap);
-	void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap);
-	void fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap);
-	stack_frame *uap_stack_pointer(void *uap);
-
+	void factor_vm::dispatch_signal(void *uap, void (handler)());
   #endif
 
   #ifdef __APPLE__
