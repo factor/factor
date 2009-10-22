@@ -483,11 +483,17 @@ PRIVATE>
 : push-if ( elt quot accum -- )
     [ keep ] dip rot [ push ] [ 2drop ] if ; inline
 
+: pusher-for ( quot exemplar -- quot accum )
+    [ length ] keep new-resizable [ [ push-if ] 2curry ] keep ; inline
+
 : pusher ( quot -- quot accum )
-    V{ } clone [ [ push-if ] 2curry ] keep ; inline
+    V{ } pusher-for ; inline
+
+: filter-as ( seq quot exemplar -- subseq )
+    dup [ pusher-for [ each ] dip ] curry dip like ; inline
 
 : filter ( seq quot -- subseq )
-    over [ pusher [ each ] dip ] dip like ; inline
+    over filter-as ; inline
 
 : push-either ( elt quot accum1 accum2 -- )
     [ keep swap ] 2dip ? push ; inline
