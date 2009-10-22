@@ -90,14 +90,14 @@ FUNCTION: TINY ffi_test_17 int x ;
 [ [ alien-indirect ] infer ] [ inference-error? ] must-fail-with
 
 : indirect-test-1 ( ptr -- result )
-    "int" { } "cdecl" alien-indirect ;
+    int { } "cdecl" alien-indirect ;
 
 { 1 1 } [ indirect-test-1 ] must-infer-as
 
 [ 3 ] [ &: ffi_test_1 indirect-test-1 ] unit-test
 
 : indirect-test-1' ( ptr -- )
-    "int" { } "cdecl" alien-indirect drop ;
+    int { } "cdecl" alien-indirect drop ;
 
 { 1 0 } [ indirect-test-1' ] must-infer-as
 
@@ -106,7 +106,7 @@ FUNCTION: TINY ffi_test_17 int x ;
 [ -1 indirect-test-1 ] must-fail
 
 : indirect-test-2 ( x y ptr -- result )
-    "int" { "int" "int" } "cdecl" alien-indirect gc ;
+    int { int int } "cdecl" alien-indirect gc ;
 
 { 3 1 } [ indirect-test-2 ] must-infer-as
 
@@ -115,7 +115,7 @@ FUNCTION: TINY ffi_test_17 int x ;
 unit-test
 
 : indirect-test-3 ( a b c d ptr -- result )
-    "int" { "int" "int" "int" "int" } "stdcall" alien-indirect
+    int { int int int int } "stdcall" alien-indirect
     gc ;
 
 [ f ] [ "f-stdcall" load-library f = ] unit-test
@@ -312,21 +312,21 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
 
 ! Test callbacks
 
-: callback-1 ( -- callback ) "void" { } "cdecl" [ ] alien-callback ;
+: callback-1 ( -- callback ) void { } "cdecl" [ ] alien-callback ;
 
 [ 0 1 ] [ [ callback-1 ] infer [ in>> ] [ out>> ] bi ] unit-test
 
 [ t ] [ callback-1 alien? ] unit-test
 
-: callback_test_1 ( ptr -- ) "void" { } "cdecl" alien-indirect ;
+: callback_test_1 ( ptr -- ) void { } "cdecl" alien-indirect ;
 
 [ ] [ callback-1 callback_test_1 ] unit-test
 
-: callback-2 ( -- callback ) "void" { } "cdecl" [ [ 5 throw ] ignore-errors ] alien-callback ;
+: callback-2 ( -- callback ) void { } "cdecl" [ [ 5 throw ] ignore-errors ] alien-callback ;
 
 [ ] [ callback-2 callback_test_1 ] unit-test
 
-: callback-3 ( -- callback ) "void" { } "cdecl" [ 5 "x" set ] alien-callback ;
+: callback-3 ( -- callback ) void { } "cdecl" [ 5 "x" set ] alien-callback ;
 
 [ t ] [
     namestack*
@@ -341,7 +341,7 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
 ] unit-test
 
 : callback-4 ( -- callback )
-    "void" { } "cdecl" [ "Hello world" write ] alien-callback
+    void { } "cdecl" [ "Hello world" write ] alien-callback
     gc ;
 
 [ "Hello world" ] [
@@ -349,40 +349,40 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
 ] unit-test
 
 : callback-5 ( -- callback )
-    "void" { } "cdecl" [ gc ] alien-callback ;
+    void { } "cdecl" [ gc ] alien-callback ;
 
 [ "testing" ] [
     "testing" callback-5 callback_test_1
 ] unit-test
 
 : callback-5b ( -- callback )
-    "void" { } "cdecl" [ compact-gc ] alien-callback ;
+    void { } "cdecl" [ compact-gc ] alien-callback ;
 
 [ "testing" ] [
     "testing" callback-5b callback_test_1
 ] unit-test
 
 : callback-6 ( -- callback )
-    "void" { } "cdecl" [ [ continue ] callcc0 ] alien-callback ;
+    void { } "cdecl" [ [ continue ] callcc0 ] alien-callback ;
 
 [ 1 2 3 ] [ callback-6 callback_test_1 1 2 3 ] unit-test
 
 : callback-7 ( -- callback )
-    "void" { } "cdecl" [ 1000000 sleep ] alien-callback ;
+    void { } "cdecl" [ 1000000 sleep ] alien-callback ;
 
 [ 1 2 3 ] [ callback-7 callback_test_1 1 2 3 ] unit-test
 
 [ f ] [ namespace global eq? ] unit-test
 
 : callback-8 ( -- callback )
-    "void" { } "cdecl" [
+    void { } "cdecl" [
         [ continue ] callcc0
     ] alien-callback ;
 
 [ ] [ callback-8 callback_test_1 ] unit-test
 
 : callback-9 ( -- callback )
-    "int" { "int" "int" "int" } "cdecl" [
+    int { int int int } "cdecl" [
         + + 1 +
     ] alien-callback ;
 
@@ -440,13 +440,13 @@ STRUCT: double-rect
     } cleave ;
 
 : double-rect-callback ( -- alien )
-    "void" { "void*" "void*" "double-rect" } "cdecl"
+    void { void* void* double-rect } "cdecl"
     [ "example" set-global 2drop ] alien-callback ;
 
 : double-rect-test ( arg -- arg' )
     f f rot
     double-rect-callback
-    "void" { "void*" "void*" "double-rect" } "cdecl" alien-indirect
+    void { void* void* double-rect } "cdecl" alien-indirect
     "example" get-global ;
 
 [ 1.0 2.0 3.0 4.0 ]
@@ -463,7 +463,7 @@ FUNCTION: test_struct_14 ffi_test_40 ( double x1, double x2 ) ;
 ] unit-test
 
 : callback-10 ( -- callback )
-    "test_struct_14" { "double" "double" } "cdecl"
+    test_struct_14 { double double } "cdecl"
     [
         test_struct_14 <struct>
             swap >>x2
@@ -471,7 +471,7 @@ FUNCTION: test_struct_14 ffi_test_40 ( double x1, double x2 ) ;
     ] alien-callback ;
 
 : callback-10-test ( x1 x2 callback -- result )
-    "test_struct_14" { "double" "double" } "cdecl" alien-indirect ;
+    test_struct_14 { double double } "cdecl" alien-indirect ;
 
 [ 1.0 2.0 ] [
     1.0 2.0 callback-10 callback-10-test
@@ -486,7 +486,7 @@ FUNCTION: test-struct-12 ffi_test_41 ( int a, double x ) ;
 ] unit-test
 
 : callback-11 ( -- callback )
-    "test-struct-12" { "int" "double" } "cdecl"
+    test-struct-12 { int double } "cdecl"
     [
         test-struct-12 <struct>
             swap >>x
@@ -494,7 +494,7 @@ FUNCTION: test-struct-12 ffi_test_41 ( int a, double x ) ;
     ] alien-callback ;
 
 : callback-11-test ( x1 x2 callback -- result )
-    "test-struct-12" { "int" "double" } "cdecl" alien-indirect ;
+    test-struct-12 { int double } "cdecl" alien-indirect ;
 
 [ 1 2.0 ] [
     1 2.0 callback-11 callback-11-test
@@ -510,7 +510,7 @@ FUNCTION: test_struct_15 ffi_test_42 ( float x, float y ) ;
 [ 1.0 2.0 ] [ 1.0 2.0 ffi_test_42 [ x>> ] [ y>> ] bi ] unit-test
 
 : callback-12 ( -- callback )
-    "test_struct_15" { "float" "float" } "cdecl"
+    test_struct_15 { float float } "cdecl"
     [
         test_struct_15 <struct>
             swap >>y
@@ -518,7 +518,7 @@ FUNCTION: test_struct_15 ffi_test_42 ( float x, float y ) ;
     ] alien-callback ;
 
 : callback-12-test ( x1 x2 callback -- result )
-    "test_struct_15" { "float" "float" } "cdecl" alien-indirect ;
+    test_struct_15 { float float } "cdecl" alien-indirect ;
 
 [ 1.0 2.0 ] [
     1.0 2.0 callback-12 callback-12-test [ x>> ] [ y>> ] bi
@@ -533,7 +533,7 @@ FUNCTION: test_struct_16 ffi_test_43 ( float x, int a ) ;
 [ 1.0 2 ] [ 1.0 2 ffi_test_43 [ x>> ] [ a>> ] bi ] unit-test
 
 : callback-13 ( -- callback )
-    "test_struct_16" { "float" "int" } "cdecl"
+    test_struct_16 { float int } "cdecl"
     [
         test_struct_16 <struct>
             swap >>a
@@ -541,7 +541,7 @@ FUNCTION: test_struct_16 ffi_test_43 ( float x, int a ) ;
     ] alien-callback ;
 
 : callback-13-test ( x1 x2 callback -- result )
-    "test_struct_16" { "float" "int" } "cdecl" alien-indirect ;
+    test_struct_16 { float int } "cdecl" alien-indirect ;
 
 [ 1.0 2 ] [
     1.0 2 callback-13 callback-13-test
