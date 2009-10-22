@@ -3,13 +3,14 @@
 USING: kernel arrays namespaces math accessors alien locals
 destructors system threads io.backend.unix.multiplexers
 io.backend.unix.multiplexers.kqueue core-foundation
-core-foundation.run-loop ;
+core-foundation.run-loop core-foundation.file-descriptors ;
+FROM: alien.c-types => void void* ;
 IN: io.backend.unix.multiplexers.run-loop
 
 TUPLE: run-loop-mx kqueue-mx ;
 
 : file-descriptor-callback ( -- callback )
-    "void" { "CFFileDescriptorRef" "CFOptionFlags" "void*" }
+    void { CFFileDescriptorRef CFOptionFlags void* }
     "cdecl" [
         3drop
         0 mx get kqueue-mx>> wait-for-events

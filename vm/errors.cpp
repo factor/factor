@@ -114,7 +114,7 @@ void factor_vm::memory_protection_error(cell addr, stack_frame *native_stack)
 
 void factor_vm::signal_error(int signal, stack_frame *native_stack)
 {
-	general_error(ERROR_SIGNAL,tag_fixnum(signal),false_object,native_stack);
+	general_error(ERROR_SIGNAL,allot_cell(signal),false_object,native_stack);
 }
 
 void factor_vm::divide_by_zero_error()
