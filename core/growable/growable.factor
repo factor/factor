@@ -66,4 +66,6 @@ M: growable shorten ( n seq -- )
         2dup (>>length)
     ] when 2drop ; inline
 
+M: growable new-resizable new-sequence 0 over set-length ; inline
+
 INSTANCE: growable sequence
