@@ -3,13 +3,15 @@ USING: accessors alien.c-types arrays classes.struct combinators
 combinators.short-circuit game.worlds gpu gpu.buffers
 gpu.util.wasd gpu.framebuffers gpu.render gpu.shaders gpu.state
 gpu.textures gpu.util grouping http.client images images.loader
-io io.encodings.ascii io.files io.files.temp kernel math
-math.matrices math.parser math.vectors method-chains sequences
-splitting threads ui ui.gadgets ui.gadgets.worlds
-ui.pixel-formats specialized-arrays specialized-vectors ;
+io io.encodings.ascii io.files io.files.temp kernel locals math
+math.matrices math.vectors.simd math.parser math.vectors
+method-chains sequences splitting threads ui ui.gadgets
+ui.gadgets.worlds ui.pixel-formats specialized-arrays
+specialized-vectors ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-VECTOR: uint
+SIMD: float
 IN: gpu.demos.bunny
 
 GLSL-SHADER-FILE: bunny-vertex-shader vertex-shader "bunny.v.glsl"
@@ -52,7 +54,10 @@ VERTEX-FORMAT: bunny-vertex
     { f        float-components 1 f }
     { "normal" float-components 3 f }
     { f        float-components 1 f } ;
-VERTEX-STRUCT: bunny-vertex-struct bunny-vertex
+
+STRUCT: bunny-vertex-struct
+    { vertex float-4 }
+    { normal float-4 } ;
 
 SPECIALIZED-VECTOR: bunny-vertex-struct
 
@@ -75,42 +80,40 @@ UNIFORM-TUPLE: loading-uniforms
     { "loading-texture" texture-uniform f } ;
 
 : numbers ( str -- seq )
-    " " split [ string>number ] map sift ;
+    " " split [ empty? not ] filter [ string>number ] map ; inline
 
 : <bunny-vertex> ( vertex -- struct )
     bunny-vertex-struct <struct>
-        swap >float-array >>vertex ; inline
+        swap first3 0.0 float-4-boa >>vertex ; inline
 
 : (parse-bunny-model) ( vs is -- vs is )
-    readln [
+    [
         numbers {
             { [ dup length 5 = ] [ 3 head <bunny-vertex> pick push ] }
             { [ dup first 3 = ] [ rest over push-all ] }
             [ drop ]
-        } cond (parse-bunny-model)
-    ] when* ;
+        } cond
+    ] each-line ; inline
 
 : parse-bunny-model ( -- vertexes indexes )
     100000 <bunny-vertex-struct-vector>
     100000 <uint-vector>
-    (parse-bunny-model) ;
+    (parse-bunny-model) ; inline
 
-: normal ( vertexes -- normal )
-    [ [ second ] [ first ] bi v- ]
-    [ [ third  ] [ first ] bi v- ] bi cross
-    vneg normalize ; inline
+:: normal ( a b c -- normal )
+    c a v-
+    b a v- cross normalize ; inline
 
-: calc-bunny-normal ( vertexes indexes -- )
-    swap
-    [ [ nth vertex>> ] curry { } map-as normal ]
-    [ [ nth [ v+ ] change-normal drop ] curry with each ] 2bi ;
+:: calc-bunny-normal ( a b c vertexes -- )
+    a b c [ vertexes nth vertex>> ] tri@ normal :> n
+    a b c [ vertexes nth [ n v+ ] change-normal drop ] tri@ ; inline
 
 : calc-bunny-normals ( vertexes indexes -- )
-    3 <groups>
-    [ calc-bunny-normal ] with each ;
+    3 <sliced-groups> swap
+    [ [ first3 ] dip calc-bunny-normal ] curry each ; inline
 
 : normalize-bunny-normals ( vertexes -- )
-    [ [ normalize ] change-normal drop ] each ;
+    [ [ normalize ] change-normal drop ] each ; inline
 
 : bunny-data ( filename -- vertexes indexes )
     ascii [ parse-bunny-model ] with-file-reader
