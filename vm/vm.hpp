@@ -694,7 +694,7 @@ struct factor_vm
 	LONG exception_handler(PEXCEPTION_POINTERS pe);
   #endif
   #else  // UNIX
-	void factor_vm::dispatch_signal(void *uap, void (handler)());
+	void dispatch_signal(void *uap, void (handler)());
   #endif
 
   #ifdef __APPLE__

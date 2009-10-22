@@ -62,9 +62,9 @@ inline static unsigned int uap_fpu_status(void *uap)
 	return mach_fpu_status(UAP_FS(uap));
 }
 
-inline static cell align_stack_pointer(cell sp)
+template<typename Type> Type align_stack_pointer(Type sp)
 {
-	return ((sp + 8) & ~15) - 8;
+	return (Type)((((cell)sp + 8) & ~15) - 8);
 }
 
 inline static void mach_clear_fpu_status(x86_float_state64_t *float_state)
