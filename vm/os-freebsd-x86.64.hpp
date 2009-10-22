@@ -4,12 +4,6 @@
 namespace factor
 {
 
-inline static void *ucontext_stack_pointer(void *uap)
-{
-        ucontext_t *ucontext = (ucontext_t *)uap;
-        return (void *)ucontext->uc_mcontext.mc_rsp;
-}
-
 inline static unsigned int uap_fpu_status(void *uap)
 {
         ucontext_t *ucontext = (ucontext_t *)uap;
@@ -33,6 +27,8 @@ inline static void uap_clear_fpu_status(void *uap)
         }
 }
 
-#define UAP_PROGRAM_COUNTER(ucontext) (((ucontext_t *)(ucontext))->uc_mcontext.mc_rip)
+
+#define UAP_STACK_POINTER(ucontext) (((ucontext_t *)ucontext)->uc_mcontext.mc_rsp)
+#define UAP_PROGRAM_COUNTER(ucontext) (((ucontext_t *)ucontext)->uc_mcontext.mc_rip)
 
 }
