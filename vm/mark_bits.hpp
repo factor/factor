@@ -55,11 +55,6 @@ template<typename Block> struct mark_bits {
 		cell line_number = block_line(address);
 		cell word_index = (line_number >> 6);
 		cell word_shift = (line_number & 63);
-
-#ifdef FACTOR_DEBUG
-		assert(word_index < bits_size);
-#endif
-
 		return std::make_pair(word_index,word_shift);
 	}
 

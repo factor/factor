@@ -108,12 +108,24 @@ void full_collector::mark_reachable_objects()
 	}
 }
 
+struct object_start_map_updater {
+	object_start_map *starts;
+
+	object_start_map_updater(object_start_map *starts_) : starts(starts_) {}
+
+	void operator()(object *obj, cell size)
+	{
+		starts->record_object_start_offset(obj);
+	}
+};
+
 void factor_vm::collect_full_impl(bool trace_contexts_p)
 {
 	full_collector collector(this);
 
 	code->clear_mark_bits();
 	data->tenured->clear_mark_bits();
+	data->tenured->clear_mark_stack();
 
 	collector.trace_roots();
         if(trace_contexts_p)
@@ -125,9 +137,14 @@ void factor_vm::collect_full_impl(bool trace_contexts_p)
 
 	collector.mark_reachable_objects();
 
-	data->tenured->sweep();
+	data->tenured->starts.clear_object_start_offsets();
+	object_start_map_updater updater(&data->tenured->starts);
+	data->tenured->sweep(updater);
+
+	data->reset_generation(data->tenured);
 	data->reset_generation(data->aging);
-	nursery.here = nursery.start;
+	data->reset_generation(&nursery);
+	code->clear_remembered_set();
 }
 
 void factor_vm::collect_growing_heap(cell requested_bytes,
@@ -144,8 +161,6 @@ void factor_vm::collect_growing_heap(cell requested_bytes,
 		compact_code_heap(trace_contexts_p);
 	else
 		relocate_code_heap();
-
-	code->clear_remembered_set();
 }
 
 void factor_vm::collect_full(bool trace_contexts_p, bool compact_code_heap_p)
@@ -156,8 +171,6 @@ void factor_vm::collect_full(bool trace_contexts_p, bool compact_code_heap_p)
 		compact_code_heap(trace_contexts_p);
 	else
 		update_code_heap_words_and_literals();
-
-	code->clear_remembered_set();
 }
 
 }

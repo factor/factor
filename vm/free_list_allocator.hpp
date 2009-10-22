@@ -88,10 +88,12 @@ Makes a free list consisting of one free block, at the very end. */
 template<typename Block> void free_list_allocator<Block>::build_free_list(cell size)
 {
 	clear_free_list();
-	free_heap_block *last_block = (free_heap_block *)(start + size);
-	last_block->set_free();
-	last_block->set_size(end - (cell)last_block);
-	add_to_free_list(last_block);
+	if(size != this->size)
+	{
+		free_heap_block *last_block = (free_heap_block *)(start + size);
+		last_block->make_free(end - (cell)last_block);
+		add_to_free_list(last_block);
+	}
 }
 
 template<typename Block> void free_list_allocator<Block>::assert_free_block(free_heap_block *block)
@@ -147,10 +149,9 @@ template<typename Block> free_heap_block *free_list_allocator<Block>::split_free
 	{
 		/* split the block in two */
 		free_heap_block *split = (free_heap_block *)((cell)block + size);
-		split->set_free();
-		split->set_size(block->size() - size);
+		split->make_free(block->size() - size);
 		split->next_free = block->next_free;
-		block->set_size(size);
+		block->make_free(size);
 		add_to_free_list(split);
 	}
 
@@ -174,7 +175,7 @@ template<typename Block> Block *free_list_allocator<Block>::allot(cell size)
 template<typename Block> void free_list_allocator<Block>::free(Block *block)
 {
 	free_heap_block *free_block = (free_heap_block *)block;
-	free_block->set_free();
+	free_block->make_free(block->size());
 	add_to_free_list(free_block);
 }
 
@@ -267,7 +268,8 @@ void free_list_allocator<Block>::sweep()
 			}
 			else
 			{
-				((free_heap_block *)scan)->set_free();
+				free_heap_block *free_block = (free_heap_block *)scan;
+				free_block->make_free(size);
 				prev = scan;
 			}
 		}
@@ -319,7 +321,8 @@ void free_list_allocator<Block>::sweep(Iterator &iter)
 			}
 			else
 			{
-				scan->set_free();
+				free_heap_block *free_block = (free_heap_block *)scan;
+				free_block->make_free(size);
 				prev = scan;
 			}
 		}

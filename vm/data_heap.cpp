@@ -65,11 +65,43 @@ data_heap *data_heap::grow(cell requested_bytes)
 	return new data_heap(young_size,aging_size,new_tenured_size);
 }
 
+template<typename Generation> void data_heap::clear_cards(Generation *gen)
+{
+	cell first_card = addr_to_card(gen->start - start);
+	cell last_card = addr_to_card(gen->end - start);
+	memset(&cards[first_card],0,last_card - first_card);
+}
+
+template<typename Generation> void data_heap::clear_decks(Generation *gen)
+{
+	cell first_deck = addr_to_deck(gen->start - start);
+	cell last_deck = addr_to_deck(gen->end - start);
+	memset(&decks[first_deck],0,last_deck - first_deck);
+}
+
+void data_heap::reset_generation(nursery_space *gen)
+{
+	gen->here = gen->start;
+}
+
+void data_heap::reset_generation(aging_space *gen)
+{
+	gen->here = gen->start;
+	clear_cards(gen);
+	clear_decks(gen);
+	gen->starts.clear_object_start_offsets();
+}
+
+void data_heap::reset_generation(tenured_space *gen)
+{
+	clear_cards(gen);
+	clear_decks(gen);
+}
+
 void factor_vm::set_data_heap(data_heap *data_)
 {
 	data = data_;
 	nursery = *data->nursery;
-	nursery.here = nursery.start;
 	init_card_decks();
 }
 
