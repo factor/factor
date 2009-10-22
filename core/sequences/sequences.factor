@@ -505,7 +505,7 @@ PRIVATE>
     V{ } accumulator-for ; inline
 
 : produce-as ( pred quot exemplar -- seq )
-    dup '[ _ accumulator-for [ while ] dip ] dip like ; inline
+    dup [ accumulator-for [ while ] dip ] curry dip like ; inline
 
 : produce ( pred quot -- seq )
     { } produce-as ; inline
