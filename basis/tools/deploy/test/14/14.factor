@@ -1,7 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.struct cocoa cocoa.classes
-cocoa.subclassing core-graphics.types kernel math ;
+cocoa.runtime cocoa.subclassing cocoa.types core-graphics.types
+kernel math ;
+FROM: alien.c-types => float ;
 IN: tools.deploy.test.14
 
 CLASS: {
