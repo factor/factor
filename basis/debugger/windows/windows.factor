@@ -30,6 +30,8 @@ CONSTANT: seh-names
         { $ STATUS_PRIVILEGED_INSTRUCTION     "STATUS_PRIVILEGED_INSTRUCTION"   }
         { $ STATUS_STACK_OVERFLOW             "STATUS_STACK_OVERFLOW"           }
         { $ STATUS_CONTROL_C_EXIT             "STATUS_CONTROL_C_EXIT"           }
+        { $ STATUS_FLOAT_MULTIPLE_FAULTS      "STATUS_FLOAT_MULTIPLE_FAULTS"    }
+        { $ STATUS_FLOAT_MULTIPLE_TRAPS       "STATUS_FLOAT_MULTIPLE_TRAPS"     }
     }
 
 : seh-name. ( n -- )
