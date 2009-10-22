@@ -83,8 +83,8 @@ SYMBOL: negative?
     ] if ; inline
 
 : dec>float ( str -- n/f )
-    [ CHAR: , eq? not ] filter
-    >byte-array 0 suffix (string>float) ;
+    [ CHAR: , eq? not ] BV{ } filter-as
+    0 over push B{ } like (string>float) ;
 
 : hex>float-parts ( str -- neg? mantissa-str expt )
     "-" ?head swap "p" split1 [ 10 base> ] [ 0 ] if* ;
