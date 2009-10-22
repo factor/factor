@@ -58,8 +58,6 @@ static const cell data_alignment = 16;
 
 #define TYPE_COUNT 15
 
-/* Not real types, but code_block's type can be set to this */
-
 enum code_block_type
 {
 	code_block_unoptimized,
@@ -229,30 +227,29 @@ struct heap_block
 		return header & 1 == 1;
 	}
 
-	void set_free()
-	{
-		header |= 1;
-	}
-
-	void clear_free()
-	{
-		header &= ~1;
-	}
-
 	cell size()
 	{
-		return header >> 3;
+		cell bytes = header >> 3;
+#ifdef FACTOR_DEBUG
+		assert(bytes > 0);
+#endif
+		return bytes;
 	}
 
 	void set_size(cell size)
 	{
-		header = (header & 0x7) | (size << 3);
+		header = ((header & 0x7) | (size << 3));
 	}
 };
 
 struct free_heap_block : public heap_block
 {
 	free_heap_block *next_free;
+
+	void make_free(cell size)
+	{
+		header = (size << 3) | 1;
+	}
 };
 
 struct code_block : public heap_block

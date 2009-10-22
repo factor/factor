@@ -26,19 +26,20 @@ void factor_vm::collect_to_tenured()
 	/* Copy live objects from aging space to tenured space. */
 	to_tenured_collector collector(this);
 
+	data->tenured->clear_mark_stack();
+
 	collector.trace_roots();
 	collector.trace_contexts();
 	collector.trace_cards(data->tenured,
 		card_points_to_aging,
-		dummy_unmarker());
+		simple_unmarker(card_mark_mask));
 	collector.trace_code_heap_roots(&code->points_to_aging);
 	collector.tenure_reachable_objects();
 	update_code_heap_for_minor_gc(&code->points_to_aging);
 
-	nursery.here = nursery.start;
+	data->reset_generation(&nursery);
 	data->reset_generation(data->aging);
-	code->points_to_nursery.clear();
-	code->points_to_aging.clear();
+	code->clear_remembered_set();
 }
 
 }
