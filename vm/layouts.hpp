@@ -112,25 +112,25 @@ struct header {
 
 	explicit header(cell value_) : value(value_ << TAG_BITS) {}
 
-	void check_header()
+	void check_header() const
 	{
 #ifdef FACTOR_DEBUG
 		assert(TAG(value) == FIXNUM_TYPE && untag_fixnum(value) < TYPE_COUNT);
 #endif
 	}
 
-	cell hi_tag()
+	cell hi_tag() const
 	{
 		check_header();
 		return value >> TAG_BITS;
 	}
 
-	bool forwarding_pointer_p()
+	bool forwarding_pointer_p() const
 	{
 		return TAG(value) == GC_COLLECTED;
 	}
 
-	object *forwarding_pointer()
+	object *forwarding_pointer() const
 	{
 		return (object *)UNTAG(value);
 	}
@@ -147,13 +147,13 @@ struct object {
 	NO_TYPE_CHECK;
 	header h;
 
-	cell size();
+	cell size() const;
 
-	cell *slots() { return (cell *)this; }
+	cell *slots()  const { return (cell *)this; }
 
 	/* Only valid for objects in tenured space; must fast to free_heap_block
 	to do anything with it if its free */
-	bool free_p()
+	bool free_p() const
 	{
 		return h.value & 1 == 1;
 	}
@@ -166,7 +166,7 @@ struct array : public object {
 	/* tagged */
 	cell capacity;
 
-	cell *data() { return (cell *)(this + 1); }
+	cell *data() const { return (cell *)(this + 1); }
 };
 
 /* These are really just arrays, but certain elements have special
@@ -187,7 +187,7 @@ struct bignum : public object {
 	/* tagged */
 	cell capacity;
 
-	cell *data() { return (cell *)(this + 1); }
+	cell *data() const { return (cell *)(this + 1); }
 };
 
 struct byte_array : public object {
@@ -201,7 +201,7 @@ struct byte_array : public object {
 	cell padding1;
 #endif
 
-	template<typename Scalar> Scalar *data() { return (Scalar *)(this + 1); }
+	template<typename Scalar> Scalar *data() const { return (Scalar *)(this + 1); }
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
@@ -214,7 +214,9 @@ struct string : public object {
 	/* tagged */
 	cell hashcode;
 
-	u8 *data() { return (u8 *)(this + 1); }
+	u8 *data() const { return (u8 *)(this + 1); }
+
+	cell nth(cell i) const;
 };
 
 /* The compiled code heap is structured into blocks. */
@@ -222,12 +224,12 @@ struct heap_block
 {
 	cell header;
 
-	bool free_p()
+	bool free_p() const
 	{
 		return header & 1 == 1;
 	}
 
-	cell size()
+	cell size() const
 	{
 		cell bytes = header >> 3;
 #ifdef FACTOR_DEBUG
@@ -258,12 +260,12 @@ struct code_block : public heap_block
 	cell literals; /* tagged pointer to array or f */
 	cell relocation; /* tagged pointer to byte-array or f */
 
-	void *xt()
+	void *xt() const
 	{
 		return (void *)(this + 1);
 	}
 
-	code_block_type type()
+	code_block_type type() const
 	{
 		return (code_block_type)((header >> 1) & 0x3);
 	}
@@ -273,12 +275,12 @@ struct code_block : public heap_block
 		header = ((header & ~0x7) | (type << 1));
 	}
 
-	bool pic_p()
+	bool pic_p() const
 	{
 		return type() == code_block_pic;
 	}
 
-	bool optimized_p()
+	bool optimized_p() const
 	{
 		return type() == code_block_optimized;
 	}
@@ -376,13 +378,13 @@ struct callstack : public object {
 	/* tagged */
 	cell length;
 	
-	stack_frame *frame_at(cell offset)
+	stack_frame *frame_at(cell offset) const
 	{
 		return (stack_frame *)((char *)(this + 1) + offset);
 	}
 
-	stack_frame *top() { return (stack_frame *)(this + 1); }
-	stack_frame *bottom() { return (stack_frame *)((cell)(this + 1) + untag_fixnum(length)); }
+	stack_frame *top() const { return (stack_frame *)(this + 1); }
+	stack_frame *bottom() const { return (stack_frame *)((cell)(this + 1) + untag_fixnum(length)); }
 };
 
 struct tuple : public object {
@@ -390,7 +392,7 @@ struct tuple : public object {
 	/* tagged layout */
 	cell layout;
 
-	cell *data() { return (cell *)(this + 1); }
+	cell *data() const { return (cell *)(this + 1); }
 };
 
 }

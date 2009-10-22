@@ -28,6 +28,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <iostream>
 
 /* Forward-declare this since it comes up in function prototypes */
 namespace factor

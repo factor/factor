@@ -3,20 +3,20 @@
 namespace factor
 {
 
-cell factor_vm::string_nth(string* str, cell index)
+cell string::nth(cell index) const
 {
 	/* If high bit is set, the most significant 16 bits of the char
 	come from the aux vector. The least significant bit of the
 	corresponding aux vector entry is negated, so that we can
 	XOR the two components together and get the original code point
 	back. */
-	cell lo_bits = str->data()[index];
+	cell lo_bits = data()[index];
 
 	if((lo_bits & 0x80) == 0)
 		return lo_bits;
 	else
 	{
-		byte_array *aux = untag<byte_array>(str->aux);
+		byte_array *aux = untag<byte_array>(this->aux);
 		cell hi_bits = aux->data<u16>()[index];
 		return (hi_bits << 7) ^ lo_bits;
 	}
@@ -166,7 +166,7 @@ void factor_vm::primitive_string_nth()
 {
 	string *str = untag<string>(dpop());
 	cell index = untag_fixnum(dpop());
-	dpush(tag_fixnum(string_nth(str,index)));
+	dpush(tag_fixnum(str->nth(index)));
 }
 
 void factor_vm::primitive_set_string_nth_fast()

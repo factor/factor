@@ -37,6 +37,9 @@ void factor_vm::gc(gc_op op,
 
 	current_gc = new gc_state(op);
 
+	if(verbosegc)
+		std::cout << "GC requested, op=" << op << std::endl;
+
 	/* Keep trying to GC higher and higher generations until we don't run out
 	of space */
 	if(setjmp(current_gc->gc_unwind))
@@ -60,6 +63,9 @@ void factor_vm::gc(gc_op op,
 			critical_error("Bad GC op\n",op);
 			break;
 		}
+
+		if(verbosegc)
+			std::cout << "GC rewind, op=" << op << std::endl;
 	}
 
 	switch(current_gc->op)
@@ -91,11 +97,14 @@ void factor_vm::gc(gc_op op,
 
 	delete current_gc;
 	current_gc = NULL;
+
+	if(verbosegc)
+		std::cout << "GC done, op=" << op << std::endl;
 }
 
 void factor_vm::primitive_minor_gc()
 {
-	gc(collect_nursery_op,
+	gc(collect_full_op,
 		0, /* requested size */
 		true, /* trace contexts? */
 		false /* compact code heap? */);

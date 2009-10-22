@@ -233,10 +233,10 @@ void *factor_vm::inline_cache_miss(cell return_address)
 	set_call_target(return_address,xt);
 
 #ifdef PIC_DEBUG
-	printf("Updated %s call site 0x%lx with 0x%lx\n",
-	       tail_call_site_p(return_address) ? "tail" : "non-tail",
-	       return_address,
-	       (cell)xt);
+	std::cout << "Updated "
+		<< (tail_call_site_p(return_address) ? "tail" : "non-tail")
+		<< " call site 0x" << std::hex << return_address << std::dec
+		<< " with " << std::hex << (cell)xt << std::dec;
 #endif
 
 	return xt;

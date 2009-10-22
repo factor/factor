@@ -38,7 +38,7 @@ template<typename TargetGeneration, typename Policy> struct collector {
 
 		if(immediate_p(pointer)) return;
 
-		object *untagged = parent->untag<object>(pointer);
+		object *untagged = untag<object>(pointer);
 		if(!policy.should_copy_p(untagged))
 		{
 			policy.visited_object(untagged);
