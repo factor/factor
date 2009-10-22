@@ -18,6 +18,7 @@ TYPEDEF: uint chtype
 TYPEDEF: chtype attr_t
 TYPEDEF: short NCURSES_SIZE_T
 TYPEDEF: ushort wchar_t
+TYPEDEF: ulong mmask_t
 
 CONSTANT: CCHARW_MAX  5
 
@@ -75,6 +76,11 @@ STRUCT: c-window
 { _yoffset NCURSES_SIZE_T }
 
 { _bkgrnd cchar_t } ;
+
+STRUCT: MEVENT
+    { id short }
+    { x int } { y int } { z int }
+    { bstate mmask_t } ;
 
 LIBRARY: curses
 
@@ -180,7 +186,6 @@ FUNCTION: int vw_printw ( WINDOW* win, c-string fmt, va_list varglist ) ;
 FUNCTION: int move ( int y, int x ) ;
 FUNCTION: int wmove ( WINDOW* win, int y, int x ) ;
 
-
 FUNCTION: int scroll ( WINDOW* win ) ;
 FUNCTION: int scrl ( int n ) ;
 FUNCTION: int wscrl ( WINDOW* win, int n ) ;
@@ -252,3 +257,20 @@ C-GLOBAL: int COLOR_PAIRS
 FUNCTION: int wattron ( WINDOW* win, int attrs ) ;
 FUNCTION: int wattroff ( WINDOW* win, int attrs ) ;
 FUNCTION: int wattrset ( WINDOW* win, int attrs ) ;
+
+: NCURSES_MOUSE_MASK ( b m -- mask ) swap 1 - 5 * shift ; inline
+
+CONSTANT: NCURSES_BUTTON_RELEASED OCT: 01
+CONSTANT: NCURSES_BUTTON_PRESSED  OCT: 02
+CONSTANT: NCURSES_BUTTON_CLICKED  OCT: 04
+CONSTANT: NCURSES_DOUBLE_CLICKED  OCT: 10
+CONSTANT: NCURSES_TRIPLE_CLICKED  OCT: 20
+CONSTANT: NCURSES_RESERVED_EVENT  OCT: 40
+
+FUNCTION: int getmouse ( MEVENT* event ) ;
+FUNCTION: int ungetmouse ( MEVENT* event ) ;
+FUNCTION: mmask_t mousemask ( mmask_t newmask, mmask_t* oldmask ) ;
+FUNCTION: bool wenclose ( WINDOW* win, int y, int x ) ;
+FUNCTION: bool mouse_trafo ( int* pY, int* pX, bool to_screen ) ;
+FUNCTION: bool wmouse_trafo ( WINDOW* win, int* pY, int* pX, bool to_screen ) ;
+FUNCTION: int mouseinterval ( int erval ) ;
