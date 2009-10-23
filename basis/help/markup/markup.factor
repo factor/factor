@@ -430,8 +430,8 @@ M: simple-element elements*
 M: object elements* 2drop ;
 
 M: array elements*
-    [ [ elements* ] with each ] 2keep
-    [ first eq? ] keep swap [ , ] [ drop ] if ;
+    [ dup first \ $markup-example eq? [ 2drop ] [ [ elements* ] with each ] if ]
+    [ [ first eq? ] keep swap [ , ] [ drop ] if ] 2bi ;
 
 : elements ( elt-type element -- seq ) [ elements* ] { } make ;
 

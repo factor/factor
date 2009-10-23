@@ -53,12 +53,12 @@ HELP: <max-heap>
 { $description "Create a new " { $link max-heap } "." } ;
 
 HELP: heap-push
-{ $values { "key" "a comparable object" } { "value" object } { "heap" "a heap" } }
+{ $values { "value" object } { "key" "a comparable object" } { "heap" "a heap" } }
 { $description "Push a pair onto a heap. The key must be comparable with all other keys by the " { $link <=> } " generic word." }
 { $side-effects "heap" } ;
 
 HELP: heap-push*
-{ $values { "key" "a comparable object" } { "value" object } { "heap" "a heap" } { "entry" entry } }
+{ $values { "value" object } { "key" "a comparable object" } { "heap" "a heap" } { "entry" entry } }
 { $description "Push a pair onto a heap, and output an entry which may later be passed to " { $link heap-delete } "." }
 { $side-effects "heap" } ;
 
@@ -68,7 +68,7 @@ HELP: heap-push-all
 { $side-effects "heap" } ;
 
 HELP: heap-peek
-{ $values { "heap" "a heap" } { "key" object } { "value" object } }
+{ $values { "heap" "a heap" } { "value" object } { "key" object } }
 { $description "Output the first element in the heap, leaving it in the heap." } ;
 
 HELP: heap-pop*
@@ -77,7 +77,7 @@ HELP: heap-pop*
 { $side-effects "heap" } ;
 
 HELP: heap-pop
-{ $values { "heap" "a heap" } { "key" object } { "value" object } }
+{ $values { "heap" "a heap" } { "value" object } { "key" object } }
 { $description "Output and remove the first element in the heap." }
 { $side-effects "heap" } ;
 
