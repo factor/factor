@@ -96,6 +96,7 @@ PRIVATE>
 :: vbroadcast ( u n -- v ) u length n u nth <repetition> u like ;
 
 : vshuffle-elements ( u perm -- v )
+    over length 0 pad-tail
     swap [ '[ _ nth ] ] keep map-as ;
 
 : vshuffle-bytes ( u perm -- v )

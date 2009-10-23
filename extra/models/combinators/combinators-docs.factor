@@ -10,7 +10,7 @@ HELP: filter-model
 { $description "Creates a model that uses the updates of another model only when they satisfy a given predicate" } ;
 
 HELP: fold
-{ $values { "oldval" "starting value" } { "quot" "applied to update and previous values" } { "model" model } { "model" model } }
+{ $values { "model" model } { "oldval" "starting value" } { "quot" "applied to update and previous values" } { "model" model } }
 { $description "Similar to " { $link reduce } " but works on models, applying a quotation to the previous and new values at each update" } ;
 
 HELP: switch-models
