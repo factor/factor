@@ -1,6 +1,7 @@
 USING: compiler compiler.units tools.test kernel kernel.private
 sequences.private math.private math combinators strings alien
-arrays memory vocabs parser eval ;
+arrays memory vocabs parser eval quotations compiler.errors
+definitions ;
 IN: compiler.tests.simple
 
 ! Test empty word
@@ -238,3 +239,13 @@ M: f single-combination-test-2 single-combination-test-4 ;
         "USING: prettyprint words accessors ; IN: compiler.tests.foo : (recursive) ( -- ) (recursive) (recursive) ; inline recursive : recursive ( -- ) (recursive) ; \\ (recursive) optimized?" eval( -- obj )
     ] unit-test
 ] times
+
+! This should not compile
+GENERIC: bad-effect-test ( a -- )
+M: quotation bad-effect-test call ; inline
+: bad-effect-test* ( -- ) [ 1 2 3 ] bad-effect-test ;
+
+[ bad-effect-test* ] [ not-compiled? ] must-fail-with
+
+! Don't want compiler error to stick around
+[ ] [ [ M\ quotation bad-effect-test forget ] with-compilation-unit ] unit-test
