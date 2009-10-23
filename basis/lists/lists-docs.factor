@@ -122,7 +122,7 @@ HELP: uncons
 { $description "Put the head and tail of the list on the stack." } ;
 
 HELP: unswons
-{ $values { "cons" list } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
+{ $values { "cons" list } { "cdr" "the tail of the list" } { "car" "the head of the list" } }
 { $description "Put the head and tail of the list on the stack." } ;
 
 { leach foldl lmap>array } related-words

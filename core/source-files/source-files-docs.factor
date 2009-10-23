@@ -38,7 +38,7 @@ HELP: source-file
 } ;
 
 HELP: record-checksum
-{ $values { "source-file" source-file } { "lines" "a sequence of strings" } }
+{ $values { "lines" "a sequence of strings" } { "source-file" source-file } }
 { $description "Records the CRC32 checksm of the source file's contents." } 
 $low-level-note ;
 

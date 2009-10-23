@@ -1,6 +1,7 @@
 USING: help.crossref help.topics help.markup tools.test words
 definitions assocs sequences kernel namespaces parser arrays
-io.streams.string continuations debugger compiler.units eval ;
+io.streams.string continuations debugger compiler.units eval
+help.syntax ;
 IN: help.crossref.tests
 
 [ ] [
@@ -54,3 +55,11 @@ IN: help.crossref.tests
 ] unit-test
 
 [ "xxx" ] [ "yyy" article-parent ] unit-test
+
+ARTICLE: "crossref-test-1" "Crossref test 1"
+"Hello world" ;
+
+ARTICLE: "crossref-test-2" "Crossref test 2"
+{ $markup-example { $subsection "crossref-test-1" } } ;
+
+[ V{ } ] [ "crossref-test-2" >link article-children ] unit-test

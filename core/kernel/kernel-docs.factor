@@ -168,7 +168,7 @@ HELP: xor
 { $notes "This word implements boolean exclusive or, so applying it to integers will not yield useful results (all integers have a true value). Bitwise exclusive or is the " { $link bitxor } " word." } ;
 
 HELP: both?
-{ $values { "quot" { $quotation "( obj -- ? )" } } { "x" object } { "y" object } { "?" "a boolean" } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation "( obj -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if the quotation yields a true value when applied to both " { $snippet "x" } " and " { $snippet "y" } "." }
 { $examples
     { $example "USING: kernel math prettyprint ;" "3 5 [ odd? ] both? ." "t" }
@@ -176,7 +176,7 @@ HELP: both?
 } ;
 
 HELP: either?
-{ $values { "quot" { $quotation "( obj -- ? )" } } { "x" object } { "y" object } { "?" "a boolean" } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation "( obj -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if the quotation yields a true value when applied to either " { $snippet "x" } " or " { $snippet "y" } "." }
 { $examples
     { $example "USING: kernel math prettyprint ;" "3 6 [ odd? ] either? ." "t" }
@@ -213,18 +213,18 @@ HELP: call-clear ( quot -- )
 { $notes "Used to implement " { $link "threads" } "." } ;
 
 HELP: keep
-{ $values { "quot" { $quotation "( x -- ... )" } } { "x" object } }
+{ $values { "x" object } { "quot" { $quotation "( x -- ... )" } } }
 { $description "Call a quotation with a value on the stack, restoring the value when the quotation returns." }
 { $examples
     { $example "USING: arrays kernel prettyprint ;" "2 \"greetings\" [ <array> ] keep 2array ." "{ { \"greetings\" \"greetings\" } \"greetings\" }" }
 } ;
 
 HELP: 2keep
-{ $values { "quot" { $quotation "( x y -- ... )" } } { "x" object } { "y" object } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation "( x y -- ... )" } } }
 { $description "Call a quotation with two values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: 3keep
-{ $values { "quot" { $quotation "( x y z -- ... )" } } { "x" object } { "y" object } { "z" object } }
+{ $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( x y z -- ... )" } } }
 { $description "Call a quotation with three values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: bi
@@ -664,7 +664,7 @@ HELP: getenv ( n -- obj )
 { $description "Reads an object from the Factor VM's environment table. User code never has to read the environment table directly; instead, use one of the callers of this word." } ;
 
 HELP: setenv ( obj n -- )
-{ $values { "n" "a non-negative integer" } { "obj" object } }
+{ $values { "obj" object } { "n" "a non-negative integer" } }
 { $description "Writes an object to the Factor VM's environment table. User code never has to write to the environment table directly; instead, use one of the callers of this word." } ;
 
 HELP: object
