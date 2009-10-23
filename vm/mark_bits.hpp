@@ -5,8 +5,8 @@ const int block_granularity = 16;
 const int forwarding_granularity = 64;
 
 template<typename Block> struct mark_bits {
-	cell start;
 	cell size;
+	cell start;
 	cell bits_size;
 	u64 *marked;
 	cell *forwarding;
@@ -21,9 +21,9 @@ template<typename Block> struct mark_bits {
 		memset(forwarding,0,bits_size * sizeof(cell));
 	}
 
-	explicit mark_bits(cell start_, cell size_) :
-		start(start_),
+	explicit mark_bits(cell size_, cell start_) :
 		size(size_),
+		start(start_),
 		bits_size(size / block_granularity / forwarding_granularity),
 		marked(new u64[bits_size]),
 		forwarding(new cell[bits_size])
