@@ -100,8 +100,12 @@ IN: compiler.tree.propagation.transforms
 ] each
 
 ! Speeds up 2^
+: 2^? ( #call -- ? )
+    in-d>> first value-info
+    { [ literal>> 1 = ] [ class>> fixnum class<= ] } 1&& ;
+
 \ shift [
-    in-d>> first value-info literal>> 1 = [
+     2^? [
         cell-bits tag-bits get - 1 -
         '[
             >fixnum dup 0 < [ 2drop 0 ] [
