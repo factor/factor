@@ -31,7 +31,7 @@ void factor_vm::throw_error(cell error, stack_frame *callstack_top)
 {
 	/* If the error handler is set, we rewind any C stack frames and
 	pass the error to user-space. */
-	if(!current_gc && to_boolean(userenv[BREAK_ENV]))
+	if(!current_gc && to_boolean(special_objects[OBJ_BREAK]))
 	{
 		/* If error was thrown during heap scan, we re-enable the GC */
 		gc_off = false;
@@ -55,7 +55,7 @@ void factor_vm::throw_error(cell error, stack_frame *callstack_top)
 		else
 			callstack_top = ctx->callstack_top;
 
-		throw_impl(userenv[BREAK_ENV],callstack_top,this);
+		throw_impl(special_objects[OBJ_BREAK],callstack_top,this);
 	}
 	/* Error was thrown in early startup before error handler is set, just
 	crash. */
@@ -71,7 +71,7 @@ void factor_vm::throw_error(cell error, stack_frame *callstack_top)
 
 void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2, stack_frame *callstack_top)
 {
-	throw_error(allot_array_4(userenv[ERROR_ENV],
+	throw_error(allot_array_4(special_objects[OBJ_ERROR],
 		tag_fixnum(error),arg1,arg2),callstack_top);
 }
 

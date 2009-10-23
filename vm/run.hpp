@@ -1,39 +1,39 @@
 namespace factor
 {
 
-#define USER_ENV 70
+static const cell special_object_count = 70;
 
 enum special_object {
-	NAMESTACK_ENV,            /* used by library only */
-	CATCHSTACK_ENV,           /* used by library only, per-callback */
+	OBJ_NAMESTACK,            /* used by library only */
+	OBJ_CATCHSTACK,           /* used by library only, per-callback */
 
-	CURRENT_CALLBACK_ENV = 2, /* used by library only, per-callback */
-	WALKER_HOOK_ENV,          /* non-local exit hook, used by library only */
-	CALLCC_1_ENV,             /* used to pass the value in callcc1 */
+	OBJ_CURRENT_CALLBACK = 2, /* used by library only, per-callback */
+	OBJ_WALKER_HOOK,          /* non-local exit hook, used by library only */
+	OBJ_CALLCC_1,             /* used to pass the value in callcc1 */
 
-	BREAK_ENV            = 5, /* quotation called by throw primitive */
-	ERROR_ENV,                /* a marker consed onto kernel errors */
+	OBJ_BREAK            = 5, /* quotation called by throw primitive */
+	OBJ_ERROR,                /* a marker consed onto kernel errors */
 
-	CELL_SIZE_ENV        = 7, /* sizeof(cell) */
-	CPU_ENV,                  /* CPU architecture */
-	OS_ENV,                   /* operating system name */
+	OBJ_CELL_SIZE        = 7, /* sizeof(cell) */
+	OBJ_CPU,                  /* CPU architecture */
+	OBJ_OS,                   /* operating system name */
 
-	ARGS_ENV            = 10, /* command line arguments */
-	STDIN_ENV,                /* stdin FILE* handle */
-	STDOUT_ENV,               /* stdout FILE* handle */
+	OBJ_ARGS            = 10, /* command line arguments */
+	OBJ_STDIN,                /* stdin FILE* handle */
+	OBJ_STDOUT,               /* stdout FILE* handle */
 
-	IMAGE_ENV           = 13, /* image path name */
-	EXECUTABLE_ENV,		  /* runtime executable path name */
+	OBJ_IMAGE           = 13, /* image path name */
+	OBJ_EXECUTABLE,		  /* runtime executable path name */
 
-	EMBEDDED_ENV 	    = 15, /* are we embedded in another app? */
-	EVAL_CALLBACK_ENV,        /* used when Factor is embedded in a C app */
-	YIELD_CALLBACK_ENV,       /* used when Factor is embedded in a C app */
-	SLEEP_CALLBACK_ENV,       /* used when Factor is embedded in a C app */
+	OBJ_EMBEDDED 	    = 15, /* are we embedded in another app? */
+	OBJ_EVAL_CALLBACK,        /* used when Factor is embedded in a C app */
+	OBJ_YIELD_CALLBACK,       /* used when Factor is embedded in a C app */
+	OBJ_SLEEP_CALLBACK,       /* used when Factor is embedded in a C app */
 
-	COCOA_EXCEPTION_ENV = 19, /* Cocoa exception handler quotation */
+	OBJ_COCOA_EXCEPTION = 19, /* Cocoa exception handler quotation */
 
-	BOOT_ENV            = 20, /* boot quotation */
-	GLOBAL_ENV,               /* global namespace */
+	OBJ_BOOT            = 20, /* boot quotation */
+	OBJ_GLOBAL,               /* global namespace */
 
 	/* Quotation compilation in quotations.c */
 	JIT_PROLOG          = 23,
@@ -79,25 +79,25 @@ enum special_object {
 	MEGA_LOOKUP_WORD,
         MEGA_MISS_WORD,
 
-	UNDEFINED_ENV       = 60, /* default quotation for undefined words */
+	OBJ_UNDEFINED       = 60, /* default quotation for undefined words */
 
-	STDERR_ENV          = 61, /* stderr FILE* handle */
+	OBJ_STDERR          = 61, /* stderr FILE* handle */
 
-	STAGE2_ENV          = 62, /* have we bootstrapped? */
+	OBJ_STAGE2          = 62, /* have we bootstrapped? */
 
-	CURRENT_THREAD_ENV  = 63,
+	OBJ_CURRENT_THREAD  = 63,
 
-	THREADS_ENV         = 64,
-	RUN_QUEUE_ENV       = 65,
-	SLEEP_QUEUE_ENV     = 66,
+	OBJ_THREADS         = 64,
+	OBJ_RUN_QUEUE       = 65,
+	OBJ_SLEEP_QUEUE     = 66,
 };
 
-#define FIRST_SAVE_ENV BOOT_ENV
-#define LAST_SAVE_ENV STAGE2_ENV
+#define OBJ_FIRST_SAVE OBJ_BOOT
+#define OBJ_LAST_SAVE OBJ_STAGE2
 
 inline static bool save_env_p(cell i)
 {
-	return (i >= FIRST_SAVE_ENV && i <= LAST_SAVE_ENV);
+	return (i >= OBJ_FIRST_SAVE && i <= OBJ_LAST_SAVE);
 }
 
 }

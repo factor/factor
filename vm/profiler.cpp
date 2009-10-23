@@ -14,7 +14,7 @@ code_block *factor_vm::compile_profiling_stub(cell word_)
 	gc_root<word> word(word_,this);
 
 	jit jit(code_block_profiling,word.value(),this);
-	jit.emit_with(userenv[JIT_PROFILING],word.value());
+	jit.emit_with(special_objects[JIT_PROFILING],word.value());
 
 	return jit.to_code_block();
 }
