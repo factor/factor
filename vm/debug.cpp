@@ -419,9 +419,8 @@ void factor_vm::factorbug()
 			print_callstack();
 		else if(strcmp(cmd,"e") == 0)
 		{
-			int i;
-			for(i = 0; i < USER_ENV; i++)
-				dump_cell((cell)&userenv[i]);
+			for(cell i = 0; i < special_object_count; i++)
+				dump_cell((cell)&special_objects[i]);
 		}
 		else if(strcmp(cmd,"g") == 0)
 			dump_generations();

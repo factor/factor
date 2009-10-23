@@ -86,9 +86,9 @@ void inline_cache_jit::emit_check(cell klass)
 {
 	cell code_template;
 	if(TAG(klass) == FIXNUM_TYPE && untag_fixnum(klass) < HEADER_TYPE)
-		code_template = parent->userenv[PIC_CHECK_TAG];
+		code_template = parent->special_objects[PIC_CHECK_TAG];
 	else
-		code_template = parent->userenv[PIC_CHECK];
+		code_template = parent->special_objects[PIC_CHECK];
 
 	emit_with(code_template,klass);
 }
@@ -121,7 +121,7 @@ void inline_cache_jit::compile_inline_cache(fixnum index,
 
 		/* Yes? Jump to method */
 		cell method = array_nth(cache_entries.untagged(),i + 1);
-		emit_with(parent->userenv[PIC_HIT],method);
+		emit_with(parent->special_objects[PIC_HIT],method);
 	}
 
 	/* Generate machine code to handle a cache miss, which ultimately results in
@@ -133,7 +133,7 @@ void inline_cache_jit::compile_inline_cache(fixnum index,
 	push(methods.value());
 	push(tag_fixnum(index));
 	push(cache_entries.value());
-	word_special(parent->userenv[tail_call_p ? PIC_MISS_TAIL_WORD : PIC_MISS_WORD]);
+	word_special(parent->special_objects[tail_call_p ? PIC_MISS_TAIL_WORD : PIC_MISS_WORD]);
 }
 
 code_block *factor_vm::compile_inline_cache(fixnum index,cell generic_word_,cell methods_,cell cache_entries_,bool tail_call_p)

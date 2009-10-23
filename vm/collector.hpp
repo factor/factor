@@ -135,7 +135,8 @@ template<typename TargetGeneration, typename Policy> struct collector {
 		trace_registered_locals();
 		trace_registered_bignums();
 
-		for(int i = 0; i < USER_ENV; i++) trace_handle(&parent->userenv[i]);
+		for(cell i = 0; i < special_object_count; i++)
+			trace_handle(&parent->special_objects[i]);
 	}
 
 	void trace_contexts()

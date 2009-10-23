@@ -18,7 +18,7 @@ struct factor_vm
 	cell decks_offset;
 
 	/* TAGGED user environment data; see getenv/setenv prims */
-	cell userenv[USER_ENV];
+	cell special_objects[special_object_count];
 
 	/* Data stack and retain stack sizes */
 	cell ds_size, rs_size;

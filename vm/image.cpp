@@ -6,7 +6,7 @@ namespace factor
 /* Certain special objects in the image are known to the runtime */
 void factor_vm::init_objects(image_header *h)
 {
-	memcpy(userenv,h->userenv,sizeof(userenv));
+	memcpy(special_objects,h->special_objects,sizeof(special_objects));
 
 	true_object = h->true_object;
 	bignum_zero = h->bignum_zero;
@@ -183,8 +183,8 @@ void factor_vm::relocate_object(object *object,
 where it is loaded, we need to fix up pointers in the image. */
 void factor_vm::relocate_data(cell data_relocation_base, cell code_relocation_base)
 {
-	for(cell i = 0; i < USER_ENV; i++)
-		data_fixup(&userenv[i],data_relocation_base);
+	for(cell i = 0; i < special_object_count; i++)
+		data_fixup(&special_objects[i],data_relocation_base);
 
 	data_fixup(&true_object,data_relocation_base);
 	data_fixup(&bignum_zero,data_relocation_base);
@@ -263,7 +263,7 @@ void factor_vm::load_image(vm_parameters *p)
 	relocate_code(h.data_relocation_base);
 
 	/* Store image path name */
-	userenv[IMAGE_ENV] = allot_alien(false_object,(cell)p->image_path);
+	special_objects[OBJ_IMAGE] = allot_alien(false_object,(cell)p->image_path);
 }
 
 /* Save the current image to disk */
@@ -292,8 +292,8 @@ bool factor_vm::save_image(const vm_char *filename)
 	h.bignum_pos_one = bignum_pos_one;
 	h.bignum_neg_one = bignum_neg_one;
 
-	for(cell i = 0; i < USER_ENV; i++)
-		h.userenv[i] = (save_env_p(i) ? userenv[i] : false_object);
+	for(cell i = 0; i < special_object_count; i++)
+		h.special_objects[i] = (save_env_p(i) ? special_objects[i] : false_object);
 
 	bool ok = true;
 
@@ -326,9 +326,9 @@ void factor_vm::primitive_save_image_and_exit()
 	gc_root<byte_array> path(dpop(),this);
 	path.untag_check(this);
 
-	/* strip out userenv data which is set on startup anyway */
-	for(cell i = 0; i < USER_ENV; i++)
-		if(!save_env_p(i)) userenv[i] = false_object;
+	/* strip out special_objects data which is set on startup anyway */
+	for(cell i = 0; i < special_object_count; i++)
+		if(!save_env_p(i)) special_objects[i] = false_object;
 
 	gc(collect_full_op,
 		0, /* requested size */
