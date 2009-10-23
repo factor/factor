@@ -17,6 +17,7 @@ TUPLE: source-file-error error asset file line# ;
 
 M: source-file-error error-file [ error>> error-file ] [ file>> ] bi or ;
 M: source-file-error error-line [ error>> error-line ] [ line#>> ] bi or ;
+M: source-file-error compute-restarts error>> compute-restarts ;
 
 : sort-errors ( errors -- alist )
     [ [ line#>> ] sort-with ] { } assoc-map-as sort-keys ;
