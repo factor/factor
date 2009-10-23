@@ -5,7 +5,7 @@ gpu.util.wasd gpu.framebuffers gpu.render gpu.shaders gpu.state
 gpu.textures gpu.util grouping http.client images images.loader
 io io.encodings.ascii io.files io.files.temp kernel locals math
 math.matrices math.vectors.simd math.parser math.vectors
-method-chains sequences splitting threads ui ui.gadgets
+method-chains namespaces sequences splitting threads ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats specialized-arrays
 specialized-vectors ;
 FROM: alien.c-types => float ;
@@ -79,12 +79,29 @@ UNIFORM-TUPLE: loading-uniforms
     { "texcoord-scale"  vec2-uniform    f }
     { "loading-texture" texture-uniform f } ;
 
-: numbers ( str -- seq )
-    " " split [ empty? not ] filter [ string>number ] map ; inline
+: numbers ( tokens -- seq )
+    [ string>number ] map ; inline
 
 : <bunny-vertex> ( vertex -- struct )
     bunny-vertex-struct <struct>
         swap first3 0.0 float-4-boa >>vertex ; inline
+
+: (read-line-tokens) ( seq stream -- seq )
+    " \n" over stream-read-until
+    [ [ pick push ] unless-empty ]
+    [
+        {
+            { CHAR: \s [ (read-line-tokens) ] }
+            { CHAR: \n [ drop ] }
+            [ 2drop [ f ] when-empty ]
+        } case
+    ] bi* ; inline recursive
+
+: stream-read-line-tokens ( stream -- seq )
+    V{ } clone swap (read-line-tokens) ;
+
+: each-line-tokens ( quot -- )
+    input-stream get [ stream-read-line-tokens ] curry each-morsel ; inline
 
 : (parse-bunny-model) ( vs is -- vs is )
     [
@@ -93,7 +110,7 @@ UNIFORM-TUPLE: loading-uniforms
             { [ dup first 3 = ] [ rest over push-all ] }
             [ drop ]
         } cond
-    ] each-line ; inline
+    ] each-line-tokens ; inline
 
 : parse-bunny-model ( -- vertexes indexes )
     100000 <bunny-vertex-struct-vector>
