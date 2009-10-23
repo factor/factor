@@ -89,7 +89,7 @@ UNIFORM-TUPLE: loading-uniforms
 : (parse-bunny-model) ( vs is -- vs is )
     [
         numbers {
-            { [ dup length 5 = ] [ 3 head <bunny-vertex> pick push ] }
+            { [ dup length 5 = ] [ <bunny-vertex> pick push ] }
             { [ dup first 3 = ] [ rest over push-all ] }
             [ drop ]
         } cond
