@@ -100,7 +100,7 @@ void factor_vm::do_stage1_init()
 	fflush(stdout);
 
 	compile_all_words();
-	userenv[STAGE2_ENV] = true_object;
+	special_objects[OBJ_STAGE2] = true_object;
 
 	std::cout << "done\n";
 }
@@ -149,17 +149,17 @@ void factor_vm::init_factor(vm_parameters *p)
 
 	init_profiler();
 
-	userenv[CPU_ENV] = allot_alien(false_object,(cell)FACTOR_CPU_STRING);
-	userenv[OS_ENV] = allot_alien(false_object,(cell)FACTOR_OS_STRING);
-	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(cell));
-	userenv[EXECUTABLE_ENV] = allot_alien(false_object,(cell)p->executable_path);
-	userenv[ARGS_ENV] = false_object;
-	userenv[EMBEDDED_ENV] = false_object;
+	special_objects[OBJ_CPU] = allot_alien(false_object,(cell)FACTOR_CPU_STRING);
+	special_objects[OBJ_OS] = allot_alien(false_object,(cell)FACTOR_OS_STRING);
+	special_objects[OBJ_CELL_SIZE] = tag_fixnum(sizeof(cell));
+	special_objects[OBJ_EXECUTABLE] = allot_alien(false_object,(cell)p->executable_path);
+	special_objects[OBJ_ARGS] = false_object;
+	special_objects[OBJ_EMBEDDED] = false_object;
 
 	/* We can GC now */
 	gc_off = false;
 
-	if(!to_boolean(userenv[STAGE2_ENV]))
+	if(!to_boolean(special_objects[OBJ_STAGE2]))
 		do_stage1_init();
 }
 
@@ -174,7 +174,7 @@ void factor_vm::pass_args_to_factor(int argc, vm_char **argv)
 	}
 
 	args.trim();
-	userenv[ARGS_ENV] = args.elements.value();
+	special_objects[OBJ_ARGS] = args.elements.value();
 }
 
 void factor_vm::start_factor(vm_parameters *p)
@@ -182,13 +182,13 @@ void factor_vm::start_factor(vm_parameters *p)
 	if(p->fep) factorbug();
 
 	nest_stacks(NULL);
-	c_to_factor_toplevel(userenv[BOOT_ENV]);
+	c_to_factor_toplevel(special_objects[OBJ_BOOT]);
 	unnest_stacks();
 }
 
 char *factor_vm::factor_eval_string(char *string)
 {
-	char *(*callback)(char *) = (char *(*)(char *))alien_offset(userenv[EVAL_CALLBACK_ENV]);
+	char *(*callback)(char *) = (char *(*)(char *))alien_offset(special_objects[OBJ_EVAL_CALLBACK]);
 	return callback(string);
 }
 
@@ -199,13 +199,13 @@ void factor_vm::factor_eval_free(char *result)
 
 void factor_vm::factor_yield()
 {
-	void (*callback)() = (void (*)())alien_offset(userenv[YIELD_CALLBACK_ENV]);
+	void (*callback)() = (void (*)())alien_offset(special_objects[OBJ_YIELD_CALLBACK]);
 	callback();
 }
 
 void factor_vm::factor_sleep(long us)
 {
-	void (*callback)(long) = (void (*)(long))alien_offset(userenv[SLEEP_CALLBACK_ENV]);
+	void (*callback)(long) = (void (*)(long))alien_offset(special_objects[OBJ_SLEEP_CALLBACK]);
 	callback(us);
 }
 

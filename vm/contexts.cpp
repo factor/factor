@@ -80,9 +80,9 @@ void factor_vm::nest_stacks(stack_frame *magic_frame)
 
 	new_ctx->magic_frame = magic_frame;
 
-	/* save per-callback userenv */
-	new_ctx->current_callback_save = userenv[CURRENT_CALLBACK_ENV];
-	new_ctx->catchstack_save = userenv[CATCHSTACK_ENV];
+	/* save per-callback special_objects */
+	new_ctx->current_callback_save = special_objects[OBJ_CURRENT_CALLBACK];
+	new_ctx->catchstack_save = special_objects[OBJ_CATCHSTACK];
 
 	new_ctx->next = ctx;
 	ctx = new_ctx;
@@ -102,9 +102,9 @@ void factor_vm::unnest_stacks()
 	ds = ctx->datastack_save;
 	rs = ctx->retainstack_save;
 
-	/* restore per-callback userenv */
-	userenv[CURRENT_CALLBACK_ENV] = ctx->current_callback_save;
-	userenv[CATCHSTACK_ENV] = ctx->catchstack_save;
+	/* restore per-callback special_objects */
+	special_objects[OBJ_CURRENT_CALLBACK] = ctx->current_callback_save;
+	special_objects[OBJ_CATCHSTACK] = ctx->catchstack_save;
 
 	context *old_ctx = ctx;
 	ctx = old_ctx->next;
