@@ -5,39 +5,18 @@ strings arrays combinators splitting math assocs byte-arrays make ;
 IN: math.parser
 
 : digit> ( ch -- n )
-    H{
-        { CHAR: 0 0 }
-        { CHAR: 1 1 }
-        { CHAR: 2 2 }
-        { CHAR: 3 3 }
-        { CHAR: 4 4 }
-        { CHAR: 5 5 }
-        { CHAR: 6 6 }
-        { CHAR: 7 7 }
-        { CHAR: 8 8 }
-        { CHAR: 9 9 }
-        { CHAR: A 10 }
-        { CHAR: B 11 }
-        { CHAR: C 12 }
-        { CHAR: D 13 }
-        { CHAR: E 14 }
-        { CHAR: F 15 }
-        { CHAR: a 10 }
-        { CHAR: b 11 }
-        { CHAR: c 12 }
-        { CHAR: d 13 }
-        { CHAR: e 14 }
-        { CHAR: f 15 }
-        { CHAR: , f }
-    } at* [ drop 255 ] unless ; inline
+    127 bitand {
+        { [ dup CHAR: 9 <= ] [ CHAR: 0 - ] }
+        { [ dup CHAR: a <  ] [ CHAR: A 10 - - ] }
+        [ CHAR: a 10 - - ]
+    } cond
+    dup 0 < [ drop 255 ] [ dup 16 >= [ drop 255 ] when ] if ; inline
 
 : string>digits ( str -- digits )
     [ digit> ] B{ } map-as ; inline
 
 : (digits>integer) ( valid? accum digit radix -- valid? accum )
-    over [
-        2dup < [ swapd * + ] [ 2drop 2drop f 0 ] if
-    ] [ 2drop ] if ; inline
+    2dup < [ swapd * + ] [ 2drop 2drop f 0 ] if ; inline
 
 : each-digit ( seq radix quot -- n/f )
     [ t 0 ] 3dip curry each swap [ drop f ] unless ; inline
@@ -54,8 +33,8 @@ SYMBOL: negative?
 
 : string>natural ( seq radix -- n/f )
     over empty? [ 2drop f ] [
-        [ [ digit> ] dip (digits>integer) ] each-digit
-    ] if ; inline
+        [ over CHAR: , eq? [ 2drop ] [ [ digit> ] dip (digits>integer) ] if ] each-digit
+    ] if ;
 
 : sign ( -- str ) negative? get "-" "+" ? ;
 
@@ -116,13 +95,23 @@ SYMBOL: negative?
 : number-char? ( char -- ? )
     "0123456789ABCDEFabcdef." member? ; inline
 
+: last-unsafe ( seq -- elt )
+    [ length 1 - ] [ nth-unsafe ] bi ; inline
+
 : numeric-looking? ( str -- ? )
-    "-" ?head drop
     dup empty? [ drop f ] [
-        dup first number-char? [
-            last number-char?
-        ] [ drop f ] if
-    ] if ;
+        dup first-unsafe number-char? [
+            last-unsafe number-char?
+        ] [
+            dup first-unsafe CHAR: - eq? [
+                dup length 1 eq? [ drop f ] [
+                    1 over nth-unsafe number-char? [
+                        last-unsafe number-char?
+                    ] [ drop f ] if
+                ] if
+            ] [ drop f ] if
+        ] if
+    ] if ; inline
 
 PRIVATE>
 
