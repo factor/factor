@@ -79,6 +79,7 @@ namespace factor
 #include "aging_collector.hpp"
 #include "to_tenured_collector.hpp"
 #include "code_block_visitor.hpp"
+#include "compaction.hpp"
 #include "full_collector.hpp"
 #include "callstack.hpp"
 #include "generic_arrays.hpp"
