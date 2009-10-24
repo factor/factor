@@ -1,6 +1,9 @@
+! Copyright (C) 2007, 2009 Slava Pestov, Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors io.sockets io.sockets.private
 io.backend.windows io.backend windows.winsock system destructors
 alien.c-types classes.struct combinators ;
+FROM: namespaces => get ;
 IN: io.sockets.windows
 
 M: windows addrinfo-error ( n -- )

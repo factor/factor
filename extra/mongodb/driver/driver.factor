@@ -188,9 +188,7 @@ M: mdb-query-msg skip
 : asc ( key -- spec ) 1 2array ; inline
 : desc ( key -- spec ) -1 2array ; inline
 
-GENERIC# sort 1 ( mdb-query-msg sort-quot -- mdb-query-msg )
-
-M: mdb-query-msg sort
+: sort ( mdb-query-msg sort-quot -- mdb-query-msg )
     output>array [ 1array >hashtable ] map >>orderby ; inline
 
 : key-spec ( spec-quot -- spec-assoc )

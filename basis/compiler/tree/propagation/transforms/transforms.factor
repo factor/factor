@@ -42,29 +42,26 @@ IN: compiler.tree.propagation.transforms
 : positive-fixnum? ( obj -- ? )
     { [ fixnum? ] [ 0 >= ] } 1&& ;
 
-: simplify-bitand? ( value -- ? )
-    value-info literal>> positive-fixnum? ;
+: simplify-bitand? ( value1 value2 -- ? )
+    [ literal>> positive-fixnum? ]
+    [ class>> fixnum swap class<= ]
+    bi* and ;
 
-: all-ones? ( int -- ? )
-    dup 1 + bitand zero? ; inline
+: all-ones? ( n -- ? ) dup 1 + bitand zero? ; inline
 
-: redundant-bitand? ( var 111... -- ? )
-    [ value-info ] bi@ [ interval>> ] [ literal>> ] bi* {
+: redundant-bitand? ( value1 value2 -- ? )
+    [ interval>> ] [ literal>> ] bi* {
         [ nip integer? ]
         [ nip all-ones? ]
         [ 0 swap [a,b] interval-subset? ]
     } 2&& ;
 
-: (zero-bitand?) ( value-info value-info' -- ? )
+: zero-bitand? ( value1 value2 -- ? )
     [ interval>> ] [ literal>> ] bi* {
         [ nip integer? ]
         [ nip bitnot all-ones? ]
         [ 0 swap bitnot [a,b] interval-subset? ]
     } 2&& ;
-
-: zero-bitand? ( var1 var2 -- ? )
-    [ value-info ] bi@
-    { [ (zero-bitand?) ] [ swap (zero-bitand?) ] } 2|| ;
 
 {
     bitand-integer-integer
@@ -73,35 +70,45 @@ IN: compiler.tree.propagation.transforms
     bitand
 } [
     [
-        {
+        in-d>> first2 [ value-info ] bi@ {
             {
-                [ dup in-d>> first2 zero-bitand? ]
-                [ drop [ 2drop 0 ] ]
+                [ 2dup zero-bitand? ]
+                [ 2drop [ 2drop 0 ] ]
             }
             {
-                [ dup in-d>> first2 redundant-bitand? ]
-                [ drop [ drop ] ]
+                [ 2dup swap zero-bitand? ]
+                [ 2drop [ 2drop 0 ] ]
             }
             {
-                [ dup in-d>> first2 swap redundant-bitand? ]
-                [ drop [ nip ] ]
+                [ 2dup redundant-bitand? ]
+                [ 2drop [ drop ] ]
             }
             {
-                [ dup in-d>> first simplify-bitand? ]
-                [ drop [ >fixnum fixnum-bitand ] ]
+                [ 2dup swap redundant-bitand? ]
+                [ 2drop [ nip ] ]
             }
             {
-                [ dup in-d>> second simplify-bitand? ]
-                [ drop [ [ >fixnum ] dip fixnum-bitand ] ]
+                [ 2dup simplify-bitand? ]
+                [ 2drop [ >fixnum fixnum-bitand ] ]
             }
-            [ drop f ]
+            {
+                [ 2dup swap simplify-bitand? ]
+                [ 2drop [ [ >fixnum ] dip fixnum-bitand ] ]
+            }
+            [ 2drop f ]
         } cond
     ] "custom-inlining" set-word-prop
 ] each
 
 ! Speeds up 2^
+: 2^? ( #call -- ? )
+    in-d>> first2 [ value-info ] bi@
+    [ { [ literal>> 1 = ] [ class>> fixnum class<= ] } 1&& ]
+    [ class>> fixnum class<= ]
+    bi* and ;
+
 \ shift [
-    in-d>> first value-info literal>> 1 = [
+     2^? [
         cell-bits tag-bits get - 1 -
         '[
             >fixnum dup 0 < [ 2drop 0 ] [

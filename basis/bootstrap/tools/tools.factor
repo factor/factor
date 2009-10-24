@@ -2,8 +2,10 @@ USING: vocabs.loader sequences ;
 IN: bootstrap.tools
 
 {
+    "editors"
     "inspector"
     "bootstrap.image"
+    "see"
     "tools.annotations"
     "tools.crossref"
     "tools.errors"
@@ -19,5 +21,4 @@ IN: bootstrap.tools
     "vocabs.hierarchy"
     "vocabs.refresh"
     "vocabs.refresh.monitor"
-    "editors"
 } [ require ] each
