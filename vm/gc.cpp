@@ -28,7 +28,7 @@ void factor_vm::record_gc_stats(generation_statistics *stats)
 void factor_vm::gc(gc_op op,
 	cell requested_bytes,
 	bool trace_contexts_p,
-	bool compact_code_heap_p)
+	bool compact_p)
 {
 	assert(!gc_off);
 	assert(!current_gc);
@@ -83,11 +83,11 @@ void factor_vm::gc(gc_op op,
 		record_gc_stats(&gc_stats.aging_stats);
 		break;
 	case collect_full_op:
-		collect_full(trace_contexts_p,compact_code_heap_p);
+		collect_full(trace_contexts_p,compact_p);
 		record_gc_stats(&gc_stats.full_stats);
 		break;
 	case collect_growing_heap_op:
-		collect_growing_heap(requested_bytes,trace_contexts_p,compact_code_heap_p);
+		collect_growing_heap(requested_bytes,trace_contexts_p,compact_p);
 		record_gc_stats(&gc_stats.full_stats);
 		break;
 	default:

@@ -249,10 +249,11 @@ struct factor_vm
 	void collect_aging();
 	void collect_to_tenured();
 	void collect_full_impl(bool trace_contexts_p);
-	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p, bool compact_code_heap_p);
-	void collect_full(bool trace_contexts_p, bool compact_code_heap_p);
+	void compact_full_impl(bool trace_contexts_p);
+	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p, bool compact_p);
+	void collect_full(bool trace_contexts_p, bool compact_p);
 	void record_gc_stats(generation_statistics *stats);
-	void gc(gc_op op, cell requested_bytes, bool trace_contexts_p, bool compact_code_heap_p);
+	void gc(gc_op op, cell requested_bytes, bool trace_contexts_p, bool compact_p);
 	void primitive_minor_gc();
 	void primitive_full_gc();
 	void primitive_compact_gc();
@@ -506,10 +507,6 @@ struct factor_vm
 	void relocate_code_heap();
 	void primitive_modify_code_heap();
 	void primitive_code_room();
-	void forward_object_xts();
-	void forward_context_xts();
-	void forward_callback_xts();
-	void compact_code_heap(bool trace_contexts_p);
 	void primitive_strip_stack_traces();
 
 	/* Apply a function to every code block */

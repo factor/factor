@@ -44,7 +44,7 @@ template<typename TargetGeneration, typename Policy> struct collector_workhorse 
 		return newpointer;
 	}
 
-	object *visit_handle(object *obj)
+	object *visit_object(object *obj)
 	{
 		if(!policy.should_copy_p(obj))
 		{
