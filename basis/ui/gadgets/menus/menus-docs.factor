@@ -3,7 +3,7 @@ kernel ;
 IN: ui.gadgets.menus
 
 HELP: <commands-menu>
-{ $values { "target" object } { "commands" "a sequence of commands" } { "hook" { $quotation "( button -- )" } }  { "menu" "a new " { $link gadget } } }
+{ $values { "target" object } { "hook" { $quotation "( button -- )" } } { "commands" "a sequence of commands" } { "menu" "a new " { $link gadget } } }
 { $description "Creates a popup menu of commands which are to be invoked on " { $snippet "target" } ". The " { $snippet "hook" } " quotation is run before a command is invoked." } ;
 
 HELP: show-menu

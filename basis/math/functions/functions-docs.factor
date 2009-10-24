@@ -239,7 +239,7 @@ HELP: cis
 { cis exp } related-words
 
 HELP: polar>
-{ $values { "z" number } { "abs" "a non-negative real number" } { "arg" real } }
+{ $values { "abs" "a non-negative real number" } { "arg" real } { "z" number } }
 { $description "Converts an absolute value and argument (polar form) to a complex number." } ;
 
 HELP: [-1,1]?

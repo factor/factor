@@ -110,19 +110,9 @@ IN: math.matrices
 : mmax ( m -- n ) [ -1/0. ] dip [ [ max ] each ] each ;
 : mnorm ( m -- n ) dup mmax abs m/n ;
 
-<PRIVATE
-
-: x ( seq -- elt ) first ; inline
-: y ( seq -- elt ) second ; inline
-: z ( seq -- elt ) third ; inline
-
-: i ( seq1 seq2 -- n ) [ [ y ] [ z ] bi* * ] [ [ z ] [ y ] bi* * ] 2bi - ;
-: j ( seq1 seq2 -- n ) [ [ z ] [ x ] bi* * ] [ [ x ] [ z ] bi* * ] 2bi - ;
-: k ( seq1 seq2 -- n ) [ [ y ] [ x ] bi* * ] [ [ x ] [ y ] bi* * ] 2bi - ;
-
-PRIVATE>
-
-: cross ( vec1 vec2 -- vec3 ) [ [ i ] [ j ] [ k ] 2tri ] keep 3sequence ;
+: cross ( vec1 vec2 -- vec3 )
+    [ [ { 1 2 1 } vshuffle ] [ { 2 0 0 } vshuffle ] bi* v* ]
+    [ [ { 2 0 0 } vshuffle ] [ { 1 2 1 } vshuffle ] bi* v* ] 2bi v- ; inline
 
 : proj ( v u -- w )
     [ [ v. ] [ norm-sq ] bi / ] keep n*v ;
