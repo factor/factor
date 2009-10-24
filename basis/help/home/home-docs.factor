@@ -24,7 +24,7 @@ ARTICLE: "help.home" "Factor documentation"
 { $heading "Searches" }
 "Use the search field in the top-right of the " { $link "ui-browser" } " window to search for words, vocabularies, and help articles."
 { $recent-searches }
-{ $heading "Recently visited" }
+{ $heading "Recently visited pages" }
 { $table
   { "Words" "Articles" "Vocabs" }
   { { $recent recent-words } { $recent recent-articles } { $recent recent-vocabs } }
