@@ -229,7 +229,7 @@ scan_next_object:				{
 								start = gen->next_object_after(start);
 								if(start)
 								{
-									binary_start = ((object *)start)->binary_payload_start();
+									binary_start = start + ((object *)start)->binary_payload_start();
 									end = start + ((object *)start)->size();
 									goto scan_next_object;
 								}
