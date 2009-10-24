@@ -223,7 +223,6 @@ struct factor_vm
 	void set_data_heap(data_heap *data_);
 	void init_data_heap(cell young_size, cell aging_size, cell tenured_size);
 	void primitive_size();
-	cell binary_payload_start(object *pointer);
 	void primitive_data_room();
 	void begin_scan();
 	void end_scan();
@@ -576,7 +575,7 @@ struct factor_vm
 	template<typename Iterator> void do_slots(cell obj, Iterator &iter)
 	{
 		cell scan = obj;
-		cell payload_start = binary_payload_start((object *)obj);
+		cell payload_start = ((object *)obj)->binary_payload_start();
 		cell end = obj + payload_start;
 
 		scan += sizeof(cell);

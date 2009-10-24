@@ -148,6 +148,7 @@ struct object {
 	header h;
 
 	cell size() const;
+	cell binary_payload_start() const;
 
 	cell *slots()  const { return (cell *)this; }
 

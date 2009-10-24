@@ -1,7 +1,7 @@
 namespace factor
 {
 
-template<typename Array> cell array_capacity(Array *array)
+template<typename Array> cell array_capacity(const Array *array)
 {
 #ifdef FACTOR_DEBUG
 	assert(array->h.hi_tag() == Array::type_number);
