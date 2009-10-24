@@ -47,7 +47,7 @@ $nl
 HELP: ::
 { $syntax ":: word ( bindings... -- outputs... ) body... ;" }
 { $description "Defines a word with named inputs; it reads datastack values into local variable bindings from left to right, then executes the body with those bindings in lexical scope." }
-{ $notes "The output names do not affect the word's behavior, however the compiler attempts to check the stack effect as with other definitions." }
+{ $notes "The names of the " { $snippet "outputs" } " do not affect the word's behavior. However, the compiler verifies that the stack effect accurately represents the number of outputs as with " { $link POSTPONE: : } " definitions." }
 { $examples "See " { $link "locals-examples" } "." } ;
 
 { POSTPONE: : POSTPONE: :: } related-words
@@ -55,7 +55,6 @@ HELP: ::
 HELP: MACRO::
 { $syntax "MACRO:: word ( bindings... -- outputs... ) body... ;" }
 { $description "Defines a macro with named inputs; it reads datastack values into local variable bindings from left to right, then executes the body with those bindings in lexical scope." }
-{ $notes "The output names do not affect the word's behavior, however the compiler attempts to check the stack effect as with other definitions." }
 { $examples "See " { $link "locals-examples" } "." } ;
 
 { POSTPONE: MACRO: POSTPONE: MACRO:: } related-words
@@ -70,7 +69,7 @@ HELP: MEMO::
 HELP: M::
 { $syntax "M:: class generic ( bindings... -- outputs... ) body... ;" }
 { $description "Defines a macro with named inputs; it reads datastack values into local variable bindings from left to right, then executes the body with those bindings in lexical scope." }
-{ $notes "The output names do not affect the word's behavior, however the compiler attempts to check the stack effect as with other definitions." }
+{ $notes "The names of the " { $snippet "outputs" } " do not affect the word's behavior. However, the compiler verifies that the stack effect accurately represents the number of outputs as with " { $link POSTPONE: M: } " definitions." }
 { $examples "See " { $link "locals-examples" } "." } ;
 
 { POSTPONE: M: POSTPONE: M:: } related-words
@@ -283,7 +282,7 @@ $nl
     "        { [ a 0 = ] [ ... ] }"
     "    } swap swap cond ;"
 }
-"The reason is that locals are rewritten into stack code at parse time, whereas macro expansion is performed later during compile time. To circumvent this problem, the " { $vocab-link "macros.expander" } " vocabulary is used to rewrite simple macro usages prior to local transformation, however " { $vocab-link "macros.expander" } " cannot deal with more complicated cases where the literal inputs to the macro do not immediately precede the macro call in the source." ;
+"The reason is that locals are rewritten into stack code at parse time, whereas macro expansion is performed later during compile time. To circumvent this problem, the " { $vocab-link "macros.expander" } " vocabulary is used to rewrite simple macro usages prior to local transformation. However, " { $vocab-link "macros.expander" } " cannot deal with more complicated cases where the literal inputs to the macro do not immediately precede the macro call in the source." ;
 
 ARTICLE: "locals" "Lexical variables and closures"
 "The " { $vocab-link "locals" } " vocabulary provides lexically scoped local variables. Full closure semantics, both downward and upward, are supported. Mutable variable bindings are also provided, supporting assignment to bindings in the current scope or outer scopes."
