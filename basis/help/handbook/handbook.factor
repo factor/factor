@@ -39,13 +39,13 @@ ARTICLE: "conventions" "Conventions"
 { $heading "Documentation conventions" }
 "Factor documentation consists of two distinct bodies of text. There is a hierarchy of articles, much like this one, and there is word documentation. Help articles reference word documentation, and vice versa, but not every documented word is referenced from some help article."
 $nl
+"The browser, completion popups and other tools use a common set of " { $link "definitions.icons" } "."
+$nl
 "Every article has links to parent articles at the top. Explore these if the article you are reading is too specific."
 $nl
 "Some generic words have " { $strong "Description" } " headings, and others have " { $strong "Contract" } " headings. A distinction is made between words which are not intended to be extended with user-defined methods, and those that are."
 { $heading "Vocabulary naming conventions" }
-"A vocabulary name ending in " { $snippet ".private" } " contains words which are either implementation detail, unsafe, or both. For example, the " { $snippet "sequence.private" } " vocabulary contains words which access sequence elements without bounds checking (" { $link "sequences-unsafe" } ")."
-$nl
-"You should avoid using internal words from the Factor library unless absolutely necessary. Similarly, your own code can place words in internal vocabularies if you do not want other people to use them unless they have a good reason."
+"A vocabulary name ending in " { $snippet ".private" } " contains words which are either implementation details, unsafe, or both. For example, the " { $snippet "sequence.private" } " vocabulary contains words which access sequence elements without bounds checking (" { $link "sequences-unsafe" } "). You should avoid using private words from the Factor library unless absolutely necessary. Similarly, your own code can place words in private vocabularies using " { $link POSTPONE: <PRIVATE } " if you do not want other people using them without good reason."
 { $heading "Word naming conventions" }
 "These conventions are not hard and fast, but are usually a good first step in understanding a word's behavior:"
 { $table
@@ -364,12 +364,6 @@ ARTICLE: "handbook-library-reference" "Libraries"
 { $index [ orphan-articles { "help.home" "handbook" } diff ] } ;
 
 ARTICLE: "handbook" "Factor handbook"
-{ $heading "Getting Started" }
-{ $subsections
-    "cookbook"
-    "first-program"
-}
-{ $heading "Reference" }
 { $subsections
     "handbook-language-reference"
     "io"
@@ -379,15 +373,6 @@ ARTICLE: "handbook" "Factor handbook"
     "ui-tools"
     "alien"
     "handbook-library-reference"
-}
-{ $heading "Explore loaded libraries" }
-{ $subsections
-    "article-index"
-    "primitive-index"
-    "error-index"
-    "class-index"
-}
-{ $heading "Explore the code base" }
-{ $subsections "vocab-index" } ;
+} ;
 
 ABOUT: "handbook"
