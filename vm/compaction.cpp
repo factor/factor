@@ -29,11 +29,11 @@ struct code_block_forwarder {
 struct object_compaction_updater {
 	factor_vm *parent;
 	slot_visitor<object_slot_forwarder> slot_forwarder;
-	code_block_forwarder code_forwarder;
+	code_block_visitor<code_block_forwarder> code_forwarder;
 
 	explicit object_compaction_updater(factor_vm *parent_,
 		slot_visitor<object_slot_forwarder> slot_forwader_,
-		code_block_forwarder code_forwarder_) :
+		code_block_visitor<code_block_forwarder> code_forwarder_) :
 		parent(parent_),
 		slot_forwarder(slot_forwader_),
 		code_forwarder(code_forwarder_) {}
@@ -41,7 +41,7 @@ struct object_compaction_updater {
 	void operator()(object *obj, cell size)
 	{
 		slot_forwarder.visit_slots(obj);
-		parent->visit_object_code_block(obj,code_forwarder);
+		code_forwarder.visit_object_code_block(obj);
 	}
 };
 
@@ -71,14 +71,14 @@ void factor_vm::compact_full_impl(bool trace_contexts_p)
 
 	/* Update root pointers */
 	slot_visitor<object_slot_forwarder> slot_forwarder(this,object_slot_forwarder(data_forwarding_map));
-	code_block_forwarder code_forwarder(code_forwarding_map);
+	code_block_visitor<code_block_forwarder> code_forwarder(this,code_block_forwarder(code_forwarding_map));
 
 	slot_forwarder.visit_roots();
 	if(trace_contexts_p)
 	{
 		slot_forwarder.visit_contexts();
-		visit_context_code_blocks(code_forwarder);
-		visit_callback_code_blocks(code_forwarder);
+		code_forwarder.visit_context_code_blocks();
+		code_forwarder.visit_callback_code_blocks();
 	}
 
 	/* Slide everything in tenured space up, and update data and code heap

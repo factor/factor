@@ -29,20 +29,6 @@ struct code_block_marker {
 	}
 };
 
-void full_collector::mark_reachable_objects()
-{
-	code_block_marker marker(code,this);
-	std::vector<object *> *mark_stack = &this->target->mark_stack;
-
-	while(!mark_stack->empty())
-	{
-		object *obj = mark_stack->back();
-		mark_stack->pop_back();
-		this->trace_slots(obj);
-		parent->visit_object_code_block(obj,marker);
-	}
-}
-
 struct object_start_map_updater {
 	object_start_map *starts;
 
@@ -62,16 +48,25 @@ void factor_vm::collect_full_impl(bool trace_contexts_p)
 	data->tenured->clear_mark_bits();
 	data->tenured->clear_mark_stack();
 
+	code_block_visitor<code_block_marker> code_marker(this,code_block_marker(code,&collector));
+
 	collector.trace_roots();
         if(trace_contexts_p)
 	{
 		collector.trace_contexts();
-		code_block_marker marker(code,&collector);
-		visit_context_code_blocks(marker);
-		visit_callback_code_blocks(marker);
+		code_marker.visit_context_code_blocks();
+		code_marker.visit_callback_code_blocks();
 	}
 
-	collector.mark_reachable_objects();
+	std::vector<object *> *mark_stack = &data->tenured->mark_stack;
+
+	while(!mark_stack->empty())
+	{
+		object *obj = mark_stack->back();
+		mark_stack->pop_back();
+		collector.trace_slots(obj);
+		code_marker.visit_object_code_block(obj);
+	}
 
 	data->tenured->starts.clear_object_start_offsets();
 	object_start_map_updater updater(&data->tenured->starts);

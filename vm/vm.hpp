@@ -485,11 +485,6 @@ struct factor_vm
 	code_block *allot_code_block(cell size, code_block_type type);
 	code_block *add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_);
 
-	//code_block_visitor
-	template<typename Visitor> void visit_object_code_block(object *obj, Visitor visitor);
-	template<typename Visitor> void visit_context_code_blocks(Visitor visitor);
-	template<typename Visitor> void visit_callback_code_blocks(Visitor visitor);
-
 	//code heap
 	inline void check_code_pointer(cell ptr)
 	{
