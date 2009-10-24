@@ -338,7 +338,7 @@ void factor_vm::compile_all_words()
 		if(!word->code || !word->code->optimized_p())
 			jit_compile_word(word.value(),word->def,false);
 
-		update_word_xt(word.value());
+		update_word_xt(word.untagged());
 
 	}
 

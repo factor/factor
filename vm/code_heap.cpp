@@ -188,7 +188,7 @@ void factor_vm::primitive_modify_code_heap()
 			break;
 		}
 
-		update_word_xt(word.value());
+		update_word_xt(word.untagged());
 	}
 
 	update_code_heap_words();
@@ -205,99 +205,42 @@ void factor_vm::primitive_code_room()
 	dpush(tag_fixnum(max_free / 1024));
 }
 
-code_block *code_heap::forward_code_block(code_block *compiled)
-{
-	return (code_block *)allocator->state.forward_block(compiled);
-}
+struct code_block_forwarder {
+	mark_bits<heap_block> *forwarding_map;
 
-struct callframe_forwarder {
-	factor_vm *parent;
+	explicit code_block_forwarder(mark_bits<heap_block> *forwarding_map_) :
+		forwarding_map(forwarding_map_) {}
 
-	explicit callframe_forwarder(factor_vm *parent_) : parent(parent_) {}
-
-	void operator()(stack_frame *frame)
+	code_block *operator()(code_block *compiled)
 	{
-		cell offset = (cell)FRAME_RETURN_ADDRESS(frame,parent) - (cell)frame->xt;
-
-		code_block *forwarded = parent->code->forward_code_block(parent->frame_code(frame));
-		frame->xt = forwarded->xt();
-
-		FRAME_RETURN_ADDRESS(frame,parent) = (void *)((cell)frame->xt + offset);
+		return (code_block *)forwarding_map->forward_block(compiled);
 	}
 };
 
 void factor_vm::forward_object_xts()
 {
+	code_block_forwarder forwarder(&code->allocator->state);
+
 	begin_scan();
 
 	cell obj;
 
 	while(to_boolean(obj = next_object()))
-	{
-		switch(tagged<object>(obj).type())
-		{
-		case WORD_TYPE:
-			{
-				word *w = untag<word>(obj);
-
-				if(w->code)
-					w->code = code->forward_code_block(w->code);
-				if(w->profiling)
-					w->profiling = code->forward_code_block(w->profiling);
-
-				update_word_xt(obj);
-			}
-			break;
-		case QUOTATION_TYPE:
-			{
-				quotation *quot = untag<quotation>(obj);
-
-				if(quot->code)
-				{
-					quot->code = code->forward_code_block(quot->code);
-					set_quot_xt(quot,quot->code);
-				}
-			}
-			break;
-		case CALLSTACK_TYPE:
-			{
-				callstack *stack = untag<callstack>(obj);
-				callframe_forwarder forwarder(this);
-				iterate_callstack_object(stack,forwarder);
-			}
-			break;
-		default:
-			break;
-		}
-	}
+		visit_object_code_block(untag<object>(obj),forwarder);
 
 	end_scan();
 }
 
 void factor_vm::forward_context_xts()
 {
-	callframe_forwarder forwarder(this);
-	iterate_active_frames(forwarder);
+	code_block_forwarder forwarder(&code->allocator->state);
+	visit_context_code_blocks(forwarder);
 }
-
-struct callback_forwarder {
-	code_heap *code;
-	callback_heap *callbacks;
-
-	callback_forwarder(code_heap *code_, callback_heap *callbacks_) :
-		code(code_), callbacks(callbacks_) {}
-
-	void operator()(callback *stub)
-	{
-		stub->compiled = code->forward_code_block(stub->compiled);
-		callbacks->update(stub);
-	}
-};
 
 void factor_vm::forward_callback_xts()
 {
-	callback_forwarder forwarder(code,callbacks);
-	callbacks->iterate(forwarder);
+	code_block_forwarder forwarder(&code->allocator->state);
+	visit_callback_code_blocks(forwarder);
 }
 
 /* Move all free space to the end of the code heap. Live blocks must be marked
