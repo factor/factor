@@ -408,7 +408,15 @@ IN: compiler.tree.propagation.tests
 ] unit-test
 
 [ V{ fixnum } ] [
+    [ { fixnum fixnum } declare 7 bitand neg >bignum shift ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
     [ { fixnum } declare 1 swap 7 bitand shift ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [ { fixnum } declare 1 swap 7 bitand >bignum shift ] final-classes
 ] unit-test
 
 cell-bits 32 = [
@@ -900,9 +908,20 @@ M: tuple-with-read-only-slot clone
 [ t ] [ [ void* <c-direct-array> ] { <c-direct-array> } inlined? ] unit-test
 [ V{ void*-array } ] [ [ void* <c-direct-array> ] final-classes ] unit-test
 
+! bitand identities
 [ t ] [ [ alien-unsigned-1 255 bitand ] { bitand fixnum-bitand } inlined? ] unit-test
 [ t ] [ [ alien-unsigned-1 255 swap bitand ] { bitand fixnum-bitand } inlined? ] unit-test
 
 [ t ] [ [ { fixnum } declare 256 rem -256 bitand ] { fixnum-bitand } inlined? ] unit-test
 [ t ] [ [ { fixnum } declare 250 rem -256 bitand ] { fixnum-bitand } inlined? ] unit-test
 [ f ] [ [ { fixnum } declare 257 rem -256 bitand ] { fixnum-bitand } inlined? ] unit-test
+
+[ V{ fixnum } ] [ [ >bignum 10 mod 2^ ] final-classes ] unit-test
+[ V{ bignum } ] [ [ >bignum 10 bitand ] final-classes ] unit-test
+[ V{ bignum } ] [ [ >bignum 10 >bignum bitand ] final-classes ] unit-test
+[ V{ bignum } ] [ [ >bignum 10 mod ] final-classes ] unit-test
+[ V{ bignum } ] [ [ { fixnum } declare -1 >bignum bitand ] final-classes ] unit-test
+[ V{ bignum } ] [ [ { fixnum } declare -1 >bignum swap bitand ] final-classes ] unit-test
+
+! Could be bignum not integer but who cares
+[ V{ integer } ] [ [ 10 >bignum bitand ] final-classes ] unit-test
