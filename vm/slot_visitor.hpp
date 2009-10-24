@@ -22,7 +22,7 @@ template<typename Visitor> struct slot_visitor {
 	void visit_slots(object *ptr)
 	{
 		cell *slot = (cell *)ptr;
-		cell *end = (cell *)((cell)ptr + parent->binary_payload_start(ptr));
+		cell *end = (cell *)((cell)ptr + ptr->binary_payload_start());
 
 		if(slot != end)
 		{

@@ -209,7 +209,7 @@ template<typename TargetGeneration, typename Policy> struct collector {
 						if(end < card_start_address(card_index))
 						{
 							start = gen->starts.find_object_containing_card(card_index - gen_start_card);
-							binary_start = start + parent->binary_payload_start((object *)start);
+							binary_start = start + ((object *)start)->binary_payload_start();
 							end = start + ((object *)start)->size();
 						}
 	
@@ -229,7 +229,7 @@ scan_next_object:				{
 								start = gen->next_object_after(start);
 								if(start)
 								{
-									binary_start = start + parent->binary_payload_start((object *)start);
+									binary_start = ((object *)start)->binary_payload_start();
 									end = start + ((object *)start)->size();
 									goto scan_next_object;
 								}
