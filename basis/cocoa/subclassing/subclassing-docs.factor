@@ -2,7 +2,7 @@ USING: help.markup help.syntax strings alien hashtables ;
 IN: cocoa.subclassing
 
 HELP: define-objc-class
-{ $values { "hash" hashtable } { "imeth" "a sequence of instance method definitions" } }
+{ $values { "imeth" "a sequence of instance method definitions" } { "hash" hashtable } }
 { $description "Defines a new Objective C class. The hashtable can contain the following keys:"
     { $list
         { { $link +name+ } " - a string naming the new class. Required." }

@@ -55,28 +55,22 @@ SYMBOL: compiled
 
 GENERIC: no-compile? ( word -- ? )
 
-M: word no-compile? "no-compile" word-prop ;
-
 M: method-body no-compile? "method-generic" word-prop no-compile? ;
 
 M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
 
+M: word no-compile?
+    {
+        [ macro? ]
+        [ inline? ]
+        [ "special" word-prop ]
+        [ "no-compile" word-prop ]
+    } 1|| ;
+
 : ignore-error? ( word error -- ? )
     #! Ignore some errors on inline combinators, macros, and special
     #! words such as 'call'.
-    [
-        {
-            [ macro? ]
-            [ inline? ]
-            [ no-compile? ]
-            [ "special" word-prop ]
-        } 1||
-    ] [
-        {
-            [ do-not-compile? ]
-            [ literal-expected? ]
-        } 1||
-    ] bi* and ;
+    [ no-compile? ] [ { [ do-not-compile? ] [ literal-expected? ] } 1|| ] bi* and ;
 
 : finish ( word -- )
     #! Recompile callers if the word's stack effect changed, then

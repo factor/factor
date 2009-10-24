@@ -11,12 +11,8 @@ void early_init();
 const char *vm_executable_path();
 const char *default_image_path();
 
-inline static void *ucontext_stack_pointer(void *uap)
-{
-	ucontext_t *ucontext = (ucontext_t *)uap;
-	return ucontext->uc_stack.ss_sp;
-}
-
 void c_to_factor_toplevel(cell quot);
+
+#define UAP_STACK_POINTER(ucontext) (((ucontext_t *)ucontext)->uc_stack.ss_sp)
 
 }

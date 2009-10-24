@@ -443,5 +443,7 @@ M: object bad-dispatch-position-test* ;
 [ -1 ] [ 3 4 0 dispatch-branch-problem ] unit-test
 [ 12 ] [ 3 4 1 dispatch-branch-problem ] unit-test
 
+[ 1024 bignum ] [ 10 [ 1 >bignum swap >fixnum shift ] compile-call dup class ] unit-test
+
 ! Not sure if I want to fix this...
 ! [ t [ [ f ] [ 3 ] if >fixnum ] compile-call ] [ no-method? ] must-fail-with

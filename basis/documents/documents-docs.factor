@@ -12,11 +12,11 @@ HELP: +line
 { $description "Adds an integer to the line number of a line/column pair." } ;
 
 HELP: =col
-{ $values { "loc" "a pair of integers" } { "n" integer } { "newloc" "a pair of integers" } }
+{ $values { "n" integer } { "loc" "a pair of integers" } { "newloc" "a pair of integers" } }
 { $description "Sets the column number of a line/column pair." } ;
 
 HELP: =line
-{ $values { "loc" "a pair of integers" } { "n" integer } { "newloc" "a pair of integers" } }
+{ $values { "n" integer } { "loc" "a pair of integers" } { "newloc" "a pair of integers" } }
 { $description "Sets the line number of a line/column pair." } ;
 
 HELP: lines-equal?
