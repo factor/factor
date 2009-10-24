@@ -8,18 +8,21 @@ continuations.private combinators generic.math classes.builtin classes
 compiler.units generic.standard generic.single vocabs init
 kernel.private io.encodings accessors math.order destructors
 source-files parser classes.tuple.parser effects.parser lexer
-generic.parser strings.parser vocabs.loader vocabs.parser see
+generic.parser strings.parser vocabs.loader vocabs.parser
 source-files.errors ;
 IN: debugger
 
-GENERIC: error. ( error -- )
 GENERIC: error-help ( error -- topic )
-
-M: object error. . ;
 
 M: object error-help drop f ;
 
 M: tuple error-help class ;
+
+M: source-file-error error-help error>> error-help ;
+
+GENERIC: error. ( error -- )
+
+M: object error. . ;
 
 M: string error. print ;
 
