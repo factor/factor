@@ -28,7 +28,6 @@ struct full_collector : collector<tenured_space,full_policy> {
 	bool trace_contexts_p;
 
 	full_collector(factor_vm *parent_);
-	void mark_reachable_objects();
 };
 
 }
