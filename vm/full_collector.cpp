@@ -85,7 +85,7 @@ void factor_vm::collect_full_impl(bool trace_contexts_p)
 
 void factor_vm::collect_growing_heap(cell requested_bytes,
 	bool trace_contexts_p,
-	bool compact_code_heap_p)
+	bool compact_p)
 {
 	/* Grow the data heap and copy all live objects to the new heap. */
 	data_heap *old = data;
@@ -93,18 +93,18 @@ void factor_vm::collect_growing_heap(cell requested_bytes,
 	collect_full_impl(trace_contexts_p);
 	delete old;
 
-	if(compact_code_heap_p)
-		compact_code_heap(trace_contexts_p);
+	if(compact_p)
+		compact_full_impl(trace_contexts_p);
 	else
 		relocate_code_heap();
 }
 
-void factor_vm::collect_full(bool trace_contexts_p, bool compact_code_heap_p)
+void factor_vm::collect_full(bool trace_contexts_p, bool compact_p)
 {
 	collect_full_impl(trace_contexts_p);
 
-	if(compact_code_heap_p)
-		compact_code_heap(trace_contexts_p);
+	if(compact_p)
+		compact_full_impl(trace_contexts_p);
 	else
 		update_code_heap_words_and_literals();
 }

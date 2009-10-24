@@ -41,6 +41,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/callstack.o \
 	vm/code_block.o \
 	vm/code_heap.o \
+	vm/compaction.o \
 	vm/contexts.o \
 	vm/data_heap.o \
 	vm/debug.o \

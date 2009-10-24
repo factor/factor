@@ -205,67 +205,6 @@ void factor_vm::primitive_code_room()
 	dpush(tag_fixnum(max_free / 1024));
 }
 
-struct code_block_forwarder {
-	mark_bits<heap_block> *forwarding_map;
-
-	explicit code_block_forwarder(mark_bits<heap_block> *forwarding_map_) :
-		forwarding_map(forwarding_map_) {}
-
-	code_block *operator()(code_block *compiled)
-	{
-		return (code_block *)forwarding_map->forward_block(compiled);
-	}
-};
-
-void factor_vm::forward_object_xts()
-{
-	code_block_forwarder forwarder(&code->allocator->state);
-
-	begin_scan();
-
-	cell obj;
-
-	while(to_boolean(obj = next_object()))
-		visit_object_code_block(untag<object>(obj),forwarder);
-
-	end_scan();
-}
-
-void factor_vm::forward_context_xts()
-{
-	code_block_forwarder forwarder(&code->allocator->state);
-	visit_context_code_blocks(forwarder);
-}
-
-void factor_vm::forward_callback_xts()
-{
-	code_block_forwarder forwarder(&code->allocator->state);
-	visit_callback_code_blocks(forwarder);
-}
-
-/* Move all free space to the end of the code heap. Live blocks must be marked
-on entry to this function. XTs in code blocks must be updated after this
-function returns. */
-void factor_vm::compact_code_heap(bool trace_contexts_p)
-{
-	/* Figure out where blocks are going to go */
-	code->allocator->state.compute_forwarding();
-
-	/* Update references to the code heap from the data heap */
-	forward_object_xts();
-	if(trace_contexts_p)
-	{
-		forward_context_xts();
-		forward_callback_xts();
-	}
-
-	/* Move code blocks and update references amongst them (this requires
-	that the data heap is up to date since relocation looks up object XTs) */
-	code_heap_relocator relocator(this);
-	code_heap_iterator<code_heap_relocator> iter(relocator);
-	code->allocator->compact(iter);
-}
-
 struct stack_trace_stripper {
 	explicit stack_trace_stripper() {}
 
