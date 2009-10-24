@@ -10,101 +10,36 @@ full_collector::full_collector(factor_vm *parent_) :
 		parent_->data->tenured,
 		full_policy(parent_)) {}
 
-struct stack_frame_marker {
-	factor_vm *parent;
+struct code_block_marker {
+	code_heap *code;
 	full_collector *collector;
 
-	explicit stack_frame_marker(full_collector *collector_) :
-		parent(collector_->parent), collector(collector_) {}
+	explicit code_block_marker(code_heap *code_, full_collector *collector_) :
+		code(code_), collector(collector_) {}
 
-	void operator()(stack_frame *frame)
+	code_block *operator()(code_block *compiled)
 	{
-		collector->mark_code_block(parent->frame_code(frame));
+		if(!code->marked_p(compiled))
+		{
+			code->set_marked_p(compiled);
+			collector->trace_literal_references(compiled);
+		}
+
+		return compiled;
 	}
 };
-
-/* Mark code blocks executing in currently active stack frames. */
-void full_collector::mark_active_blocks()
-{
-	stack_frame_marker marker(this);
-	parent->iterate_active_frames(marker);
-}
-
-void full_collector::mark_object_code_block(object *obj)
-{
-	switch(obj->h.hi_tag())
-	{
-	case WORD_TYPE:
-		{
-			word *w = (word *)obj;
-			if(w->code)
-				mark_code_block(w->code);
-			if(w->profiling)
-				mark_code_block(w->profiling);
-			break;
-		}
-	case QUOTATION_TYPE:
-		{
-			quotation *q = (quotation *)obj;
-			if(q->code)
-				mark_code_block(q->code);
-			break;
-		}
-	case CALLSTACK_TYPE:
-		{
-			callstack *stack = (callstack *)obj;
-			stack_frame_marker marker(this);
-			parent->iterate_callstack_object(stack,marker);
-			break;
-		}
-	}
-}
-
-struct callback_tracer {
-	full_collector *collector;
-
-	callback_tracer(full_collector *collector_) : collector(collector_) {}
-	
-	void operator()(callback *stub)
-	{
-		collector->mark_code_block(stub->compiled);
-	}
-};
-
-void full_collector::trace_callbacks()
-{
-	callback_tracer tracer(this);
-	parent->callbacks->iterate(tracer);
-}
-
-/* Trace all literals referenced from a code block. Only for aging and nursery collections */
-void full_collector::trace_literal_references(code_block *compiled)
-{
-	this->trace_handle(&compiled->owner);
-	this->trace_handle(&compiled->literals);
-	this->trace_handle(&compiled->relocation);
-}
-
-/* Mark all literals referenced from a word XT. Only for tenured
-collections */
-void full_collector::mark_code_block(code_block *compiled)
-{
-	if(!this->code->marked_p(compiled))
-	{
-		this->code->set_marked_p(compiled);
-		trace_literal_references(compiled);
-	}
-}
 
 void full_collector::mark_reachable_objects()
 {
+	code_block_marker marker(code,this);
 	std::vector<object *> *mark_stack = &this->target->mark_stack;
+
 	while(!mark_stack->empty())
 	{
 		object *obj = mark_stack->back();
 		mark_stack->pop_back();
 		this->trace_slots(obj);
-		this->mark_object_code_block(obj);
+		parent->visit_object_code_block(obj,marker);
 	}
 }
 
@@ -131,8 +66,9 @@ void factor_vm::collect_full_impl(bool trace_contexts_p)
         if(trace_contexts_p)
 	{
 		collector.trace_contexts();
-		collector.mark_active_blocks();
-		collector.trace_callbacks();
+		code_block_marker marker(code,&collector);
+		visit_context_code_blocks(marker);
+		visit_callback_code_blocks(marker);
 	}
 
 	collector.mark_reachable_objects();

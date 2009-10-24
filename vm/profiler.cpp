@@ -40,7 +40,7 @@ void factor_vm::set_profiling(bool profiling)
 		tagged<word> word(array_nth(words.untagged(),i));
 		if(profiling)
 			word->counter = tag_fixnum(0);
-		update_word_xt(word.value());
+		update_word_xt(word.untagged());
 	}
 
 	update_code_heap_words();
