@@ -168,3 +168,7 @@ SYNTAX: SPECIALIZED-ARRAY:
 "prettyprint" vocab [
     "specialized-arrays.prettyprint" require
 ] when
+
+"mirrors" vocab [
+    "specialized-arrays.mirrors" require
+] when
