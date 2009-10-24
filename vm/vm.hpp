@@ -353,7 +353,7 @@ struct factor_vm
 	word *allot_word(cell name_, cell vocab_, cell hashcode_);
 	void primitive_word();
 	void primitive_word_xt();
-	void update_word_xt(cell w_);
+	void update_word_xt(word *w_);
 	void primitive_optimized_p();
 	void primitive_wrapper();
 
@@ -484,6 +484,11 @@ struct factor_vm
 	void fixup_labels(array *labels, code_block *compiled);
 	code_block *allot_code_block(cell size, code_block_type type);
 	code_block *add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_);
+
+	//code_block_visitor
+	template<typename Visitor> void visit_object_code_block(object *obj, Visitor visitor);
+	template<typename Visitor> void visit_context_code_blocks(Visitor visitor);
+	template<typename Visitor> void visit_callback_code_blocks(Visitor visitor);
 
 	//code heap
 	inline void check_code_pointer(cell ptr)

@@ -26,7 +26,6 @@ struct code_heap {
 	void set_marked_p(code_block *compiled);
 	void clear_mark_bits();
 	void code_heap_free(code_block *compiled);
-	code_block *forward_code_block(code_block *compiled);
 };
 
 }

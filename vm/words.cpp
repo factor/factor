@@ -23,7 +23,7 @@ word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 	new_word->code = NULL;
 
 	jit_compile_word(new_word.value(),new_word->def,true);
-	update_word_xt(new_word.value());
+	update_word_xt(new_word.untagged());
 
 	if(profiling_p)
 		relocate_code_block(new_word->profiling);
@@ -59,7 +59,7 @@ void factor_vm::primitive_word_xt()
 }
 
 /* Allocates memory */
-void factor_vm::update_word_xt(cell w_)
+void factor_vm::update_word_xt(word *w_)
 {
 	gc_root<word> w(w_,this);
 
