@@ -140,8 +140,19 @@ IN: compiler.tree.propagation.known-words
     '[ _ _ 2bi ] "outputs" set-word-prop
 ] each
 
-\ shift [ [ interval-shift-safe ] [ may-overflow integer-valued ] binary-op ] each-derived-op
-\ shift [ [ interval-shift-safe ] [ integer-valued ] binary-op ] each-fast-derived-op
+: shift-op-class ( info1 info2 -- newclass )
+    [ class>> ] bi@
+    2dup [ null-class? ] either? [ 2drop null ] [ drop math-closure ] if ;
+
+: shift-op ( word interval-quot post-proc-quot -- )
+    '[
+        [ shift-op-class ] [ _ binary-op-interval ] 2bi
+        @
+        <class/interval-info>
+    ] "outputs" set-word-prop ;
+
+\ shift [ [ interval-shift-safe ] [ may-overflow integer-valued ] shift-op ] each-derived-op
+\ shift [ [ interval-shift-safe ] [ integer-valued ] shift-op ] each-fast-derived-op
 
 \ bitand [ [ interval-bitand ] [ integer-valued ] binary-op ] each-derived-op
 \ bitor [ [ interval-bitor ] [ integer-valued ] binary-op ] each-derived-op

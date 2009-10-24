@@ -46,7 +46,7 @@ M: abstract-groups group@
 TUPLE: abstract-clumps < chunking-seq ;
 
 M: abstract-clumps length
-    [ seq>> length ] [ n>> ] bi - 1 + ; inline
+    [ seq>> length 1 + ] [ n>> ] bi [-] ; inline
 
 M: abstract-clumps set-length
     [ n>> + 1 - ] [ seq>> ] bi set-length ; inline
