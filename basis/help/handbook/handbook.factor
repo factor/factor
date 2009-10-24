@@ -10,6 +10,32 @@ IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
 "Various conventions are used throughout the Factor documentation and source code."
+{ $heading "Glossary of terms" }
+"Common terminology and abbreviations used throughout Factor and its documentation:"
+{ $table
+    { "Term" "Definition" }
+    { "alist" { "an association list; see " { $link "alists" } } }
+    { "assoc" { "an associative mapping; see " { $link "assocs" } } }
+    { "associative mapping" { "an object whose class implements the " { $link "assocs-protocol" } } }
+    { "boolean"               { { $link t } " or " { $link f } } }
+    { "class"                 { "a set of objects identified by a " { $emphasis "class word" } " together with a discriminating predicate. See " { $link "classes" } } }
+    { "combinator"            { "a word taking a quotation or another word as input; a higher-order function. See " { $link "combinators" } } }
+    { "definition specifier"  { "an instance of " { $link definition } " which implements the " { $link "definition-protocol" } } }
+    { "generalized boolean"   { "an object interpreted as a boolean; a value of " { $link f } " denotes false and anything else denotes true" } }
+    { "generic word"          { "a word whose behavior depends can be specialized on the class of one of its inputs. See " { $link "generic" } } }
+    { "method"                { "a specialized behavior of a generic word on a class. See " { $link "generic" } } }
+    { "object"                { "any datum which can be identified" } }
+    { "ordering specifier"    { "see " { $link "order-specifiers" } } }
+    { "pathname string"       { "an OS-specific pathname which identifies a file" } }
+    { "quotation"             { "an anonymous function; an instance of the " { $link quotation } " class. More generally, instances of the " { $link callable } " class can be used in many places documented to expect quotations" } }
+    { "sequence" { "a sequence; see " { $link "sequence-protocol" } } }
+    { "slot"                  { "a component of an object which can store a value" } }
+    { "stack effect"          { "a pictorial representation of a word's inputs and outputs, for example " { $snippet "+ ( x y -- z )" } ". See " { $link "effects" } } }
+    { "true value"            { "any object not equal to " { $link f } } }
+    { { "vocabulary " { $strong "or" } " vocab" } { "a named set of words. See " { $link "vocabularies" } } }
+    { "vocabulary specifier"  { "a " { $link vocab } ", " { $link vocab-link } " or a string naming a vocabulary" } }
+    { "word"                  { "the basic unit of code, analogous to a function or procedure in other programming languages. See " { $link "words" } } }
+} 
 { $heading "Documentation conventions" }
 "Factor documentation consists of two distinct bodies of text. There is a hierarchy of articles, much like this one, and there is word documentation. Help articles reference word documentation, and vice versa, but not every documented word is referenced from some help article."
 $nl
@@ -40,32 +66,7 @@ $nl
 }
 { $heading "Stack effect conventions" }
 "Stack effect conventions are documented in " { $link "effects" } "."
-{ $heading "Glossary of terms" }
-"Common terminology and abbreviations used throughout Factor and its documentation:"
-{ $table
-    { "Term" "Definition" }
-    { "alist" { "an association list; see " { $link "alists" } } }
-    { "assoc" { "an associative mapping; see " { $link "assocs" } } }
-    { "associative mapping" { "an object whose class implements the " { $link "assocs-protocol" } } }
-    { "boolean"               { { $link t } " or " { $link f } } }
-    { "class"                 { "a set of objects identified by a " { $emphasis "class word" } " together with a discriminating predicate. See " { $link "classes" } } }
-    { "combinator"            { "a word taking a quotation or another word as input; a higher-order function. See " { $link "combinators" } } }
-    { "definition specifier"  { "an instance of " { $link definition } " which implements the " { $link "definition-protocol" } } }
-    { "generalized boolean"   { "an object interpreted as a boolean; a value of " { $link f } " denotes false and anything else denotes true" } }
-    { "generic word"          { "a word whose behavior depends can be specialized on the class of one of its inputs. See " { $link "generic" } } }
-    { "method"                { "a specialized behavior of a generic word on a class. See " { $link "generic" } } }
-    { "object"                { "any datum which can be identified" } }
-    { "ordering specifier"    { "see " { $link "order-specifiers" } } }
-    { "pathname string"       { "an OS-specific pathname which identifies a file" } }
-    { "quotation"             { "an anonymous function; an instance of the " { $link quotation } " class. More generally, instances of the " { $link callable } " class can be used in many places documented to expect quotations" } }
-    { "sequence" { "a sequence; see " { $link "sequence-protocol" } } }
-    { "slot"                  { "a component of an object which can store a value" } }
-    { "stack effect"          { "a pictorial representation of a word's inputs and outputs, for example " { $snippet "+ ( x y -- z )" } ". See " { $link "effects" } } }
-    { "true value"            { "any object not equal to " { $link f } } }
-    { "vocabulary" { "a named set of words. See " { $link "vocabularies" } } }
-    { "vocabulary specifier"  { "a " { $link vocab } ", " { $link vocab-link } " or a string naming a vocabulary" } }
-    { "word"                  { "the basic unit of code, analogous to a function or procedure in other programming languages. See " { $link "words" } } }
-} ;
+;
 
 ARTICLE: "tail-call-opt" "Tail-call optimization"
 "If the last action performed is the execution of a word, the current quotation is not saved on the call stack; this is known as " { $emphasis "tail-call optimization" } " and the Factor implementation guarantees that it will be performed."
