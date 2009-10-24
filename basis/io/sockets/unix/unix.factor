@@ -69,8 +69,12 @@ M: object establish-connection ( client-out remote -- )
         [ (io-error) ]
     } cond ;
 
+: ?bind-client ( socket -- )
+    bind-local-address get [ [ fd>> ] dip make-sockaddr/size bind io-error ] [ drop ] if* ; inline
+
 M: object ((client)) ( addrspec -- fd )
-    protocol-family SOCK_STREAM socket-fd dup init-client-socket ;
+    protocol-family SOCK_STREAM socket-fd
+    [ init-client-socket ] [ ?bind-client ] [ ] tri ;
 
 ! Server sockets - TCP and Unix domain
 : init-server-socket ( fd -- )
