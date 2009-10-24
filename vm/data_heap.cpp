@@ -159,17 +159,12 @@ cell object::size() const
 	}
 }
 
-void factor_vm::primitive_size()
-{
-	box_unsigned_cell(object_size(dpop()));
-}
-
 /* The number of cells from the start of the object which should be scanned by
 the GC. Some types have a binary payload at the end (string, word, DLL) which
 we ignore. */
-cell factor_vm::binary_payload_start(object *pointer)
+cell object::binary_payload_start() const
 {
-	switch(pointer->h.hi_tag())
+	switch(h.hi_tag())
 	{
 	/* these objects do not refer to other objects at all */
 	case FLOAT_TYPE:
@@ -190,15 +185,20 @@ cell factor_vm::binary_payload_start(object *pointer)
 		return sizeof(string);
 	/* everything else consists entirely of pointers */
 	case ARRAY_TYPE:
-		return array_size<array>(array_capacity((array*)pointer));
+		return array_size<array>(array_capacity((array*)this));
 	case TUPLE_TYPE:
-		return tuple_size(untag<tuple_layout>(((tuple *)pointer)->layout));
+		return tuple_size(untag<tuple_layout>(((tuple *)this)->layout));
 	case WRAPPER_TYPE:
 		return sizeof(wrapper);
 	default:
-		critical_error("Invalid header",(cell)pointer);
+		critical_error("Invalid header",(cell)this);
                 return 0; /* can't happen */
 	}
+}
+
+void factor_vm::primitive_size()
+{
+	box_unsigned_cell(object_size(dpop()));
 }
 
 /* Push memory usage statistics in data heap */
