@@ -5,39 +5,18 @@ strings arrays combinators splitting math assocs byte-arrays make ;
 IN: math.parser
 
 : digit> ( ch -- n )
-    H{
-        { CHAR: 0 0 }
-        { CHAR: 1 1 }
-        { CHAR: 2 2 }
-        { CHAR: 3 3 }
-        { CHAR: 4 4 }
-        { CHAR: 5 5 }
-        { CHAR: 6 6 }
-        { CHAR: 7 7 }
-        { CHAR: 8 8 }
-        { CHAR: 9 9 }
-        { CHAR: A 10 }
-        { CHAR: B 11 }
-        { CHAR: C 12 }
-        { CHAR: D 13 }
-        { CHAR: E 14 }
-        { CHAR: F 15 }
-        { CHAR: a 10 }
-        { CHAR: b 11 }
-        { CHAR: c 12 }
-        { CHAR: d 13 }
-        { CHAR: e 14 }
-        { CHAR: f 15 }
-        { CHAR: , f }
-    } at* [ drop 255 ] unless ; inline
+    127 bitand {
+        { [ dup CHAR: 9 <= ] [ CHAR: 0 - ] }
+        { [ dup CHAR: a <  ] [ CHAR: A 10 - - ] }
+        [ CHAR: a 10 - - ]
+    } cond
+    dup 0 < [ drop 255 ] [ dup 16 >= [ drop 255 ] when ] if ; inline
 
 : string>digits ( str -- digits )
     [ digit> ] B{ } map-as ; inline
 
 : (digits>integer) ( valid? accum digit radix -- valid? accum )
-    over [
-        2dup < [ swapd * + ] [ 2drop 2drop f 0 ] if
-    ] [ 2drop ] if ; inline
+    2dup < [ swapd * + ] [ 2drop 2drop f 0 ] if ; inline
 
 : each-digit ( seq radix quot -- n/f )
     [ t 0 ] 3dip curry each swap [ drop f ] unless ; inline
@@ -54,8 +33,8 @@ SYMBOL: negative?
 
 : string>natural ( seq radix -- n/f )
     over empty? [ 2drop f ] [
-        [ [ digit> ] dip (digits>integer) ] each-digit
-    ] if ; inline
+        [ over CHAR: , eq? [ 2drop ] [ [ digit> ] dip (digits>integer) ] if ] each-digit
+    ] if ;
 
 : sign ( -- str ) negative? get "-" "+" ? ;
 
@@ -83,8 +62,8 @@ SYMBOL: negative?
     ] if ; inline
 
 : dec>float ( str -- n/f )
-    [ CHAR: , eq? not ] filter
-    >byte-array 0 suffix (string>float) ;
+    [ CHAR: , eq? not ] BV{ } filter-as
+    0 over push B{ } like (string>float) ;
 
 : hex>float-parts ( str -- neg? mantissa-str expt )
     "-" ?head swap "p" split1 [ 10 base> ] [ 0 ] if* ;
@@ -111,23 +90,33 @@ SYMBOL: negative?
     {
         { 16 [ hex>float ] }
         [ drop dec>float ]
-    } case ;
+    } case ; inline
 
 : number-char? ( char -- ? )
-    "0123456789ABCDEFabcdef." member? ;
+    "0123456789ABCDEFabcdef." member? ; inline
+
+: last-unsafe ( seq -- elt )
+    [ length 1 - ] [ nth-unsafe ] bi ; inline
 
 : numeric-looking? ( str -- ? )
-    "-" ?head drop
     dup empty? [ drop f ] [
-        dup first number-char? [
-            last number-char?
-        ] [ drop f ] if
-    ] if ;
+        dup first-unsafe number-char? [
+            last-unsafe number-char?
+        ] [
+            dup first-unsafe CHAR: - eq? [
+                dup length 1 eq? [ drop f ] [
+                    1 over nth-unsafe number-char? [
+                        last-unsafe number-char?
+                    ] [ drop f ] if
+                ] if
+            ] [ drop f ] if
+        ] if
+    ] if ; inline
 
 PRIVATE>
 
 : string>float ( str -- n/f )
-    10 base>float ;
+    10 base>float ; inline
 
 : base> ( str radix -- n/f )
     over numeric-looking? [
@@ -138,13 +127,13 @@ PRIVATE>
         } case
     ] [ 2drop f ] if ;
 
-: string>number ( str -- n/f ) 10 base> ;
-: bin> ( str -- n/f ) 2 base> ;
-: oct> ( str -- n/f ) 8 base> ;
-: hex> ( str -- n/f ) 16 base> ;
+: string>number ( str -- n/f ) 10 base> ; inline
+: bin> ( str -- n/f ) 2 base> ; inline
+: oct> ( str -- n/f ) 8 base> ; inline
+: hex> ( str -- n/f ) 16 base> ; inline
 
 : >digit ( n -- ch )
-    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] if ;
+    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] if ; inline
 
 : positive>base ( num radix -- str )
     dup 1 <= [ "Invalid radix" throw ] when
@@ -234,12 +223,12 @@ M: ratio >base
     {
         { 16 [ float>hex ] }
         [ drop float>decimal ]
-    } case ;
+    } case ; inline
 
 PRIVATE>
 
 : float>string ( n -- str )
-    10 float>base ;
+    10 float>base ; inline
 
 M: float >base
     {
@@ -251,9 +240,9 @@ M: float >base
         [ float>base ]
     } cond ;
 
-: number>string ( n -- str ) 10 >base ;
-: >bin ( n -- str ) 2 >base ;
-: >oct ( n -- str ) 8 >base ;
-: >hex ( n -- str ) 16 >base ;
+: number>string ( n -- str ) 10 >base ; inline
+: >bin ( n -- str ) 2 >base ; inline
+: >oct ( n -- str ) 8 >base ; inline
+: >hex ( n -- str ) 16 >base ; inline
 
-: # ( n -- ) number>string % ;
+: # ( n -- ) number>string % ; inline

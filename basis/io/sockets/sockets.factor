@@ -173,6 +173,8 @@ GENERIC: (get-remote-address) ( handle remote -- sockaddr )
         [ <input-port> |dispose ] [ <output-port> |dispose ] bi
     ] with-destructors ;
 
+SYMBOL: bind-local-address
+
 GENERIC: establish-connection ( client-out remote -- )
 
 GENERIC: ((client)) ( remote -- handle )
@@ -320,6 +322,18 @@ M: invalid-inet-server summary
 
 M: inet (server)
     invalid-inet-server ;
+
+ERROR: invalid-local-address addrspec ;
+
+M: invalid-local-address summary
+    drop "Cannot use with-local-address with <inet>; use <inet4> or <inet6> instead" ;
+
+: with-local-address ( addr quot -- )
+    [
+        [ ] [ inet4? ] [ inet6? ] tri or
+        [ bind-local-address ]
+        [ invalid-local-address ] if
+    ] dip with-variable ; inline
 
 {
     { [ os unix? ] [ "io.sockets.unix" require ] }
