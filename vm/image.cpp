@@ -327,10 +327,9 @@ void factor_vm::primitive_save_image_and_exit()
 	for(cell i = 0; i < special_object_count; i++)
 		if(!save_env_p(i)) special_objects[i] = false_object;
 
-	gc(collect_full_op,
+	gc(collect_compact_op,
 		0, /* requested size */
-		false, /* discard objects only reachable from stacks */
-		true /* compact the code heap */);
+		false /* discard objects only reachable from stacks */);
 
 	/* Save the image */
 	if(save_image((vm_char *)(path.untagged() + 1)))
