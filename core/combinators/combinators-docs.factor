@@ -122,12 +122,10 @@ $nl
 "A pair of utility words built from " { $link bi@ } ":"
 { $subsections both? either? } ;
 
-ARTICLE: "retainstack-combinators" "Retain stack combinators"
-"Sometimes an additional storage area is needed to hold objects. The " { $emphasis "retain stack" } " is an auxilliary stack for this purpose. Objects can be moved between the data and retain stacks using a set of combinators."
-$nl
-"The dip combinators invoke the quotation at the top of the stack, hiding the values underneath:"
+ARTICLE: "dip-keep-combinators" "Preserving combinators"
+"Sometimes it is necessary to temporarily hide values on the datastack. The " { $snippet "dip" } " combinators invoke the quotation at the top of the stack, hiding some number of values underneath:"
 { $subsections dip 2dip 3dip 4dip }
-"The keep combinators invoke a quotation which takes a number of values off the stack, and then they restore those values:"
+"The " { $snippet "keep" } " combinators invoke a quotation and restore some number of values to the top of the stack when it completes:"
 { $subsections keep 2keep 3keep } ;
 
 ARTICLE: "curried-dataflow" "Curried dataflow combinators"
@@ -237,14 +235,14 @@ ARTICLE: "conditionals" "Conditional combinators"
 { $see-also "booleans" "bitwise-arithmetic" both? either? } ;
 
 ARTICLE: "dataflow-combinators" "Data flow combinators"
-"Data flow combinators pass values between quotations:"
+"Data flow combinators express common dataflow patterns such as performing a operation while preserving its inputs, applying multiple operations to a single value, applying a set of operations to a set of values, or applying a single operation to multiple values."
 { $subsections
-    "retainstack-combinators"
+    "dip-keep-combinators"
     "cleave-combinators"
     "spread-combinators"
     "apply-combinators"
 }
-{ $see-also "curried-dataflow" } ;
+"More intricate data flow can be constructed by composing " { $link "curried-dataflow" } "." ;
 
 ARTICLE: "combinators-quot" "Quotation construction utilities"
 "Some words for creating quotations which can be useful for implementing method combinations and compiler transforms:"
@@ -255,17 +253,17 @@ ARTICLE: "call-unsafe" "Unsafe combinators"
 { $subsections call-effect-unsafe execute-effect-unsafe } ;
 
 ARTICLE: "call" "Fundamental combinators"
-"The most basic combinators are those that take either a quotation or word, and invoke it immediately."
+"The most basic combinators are those that take either a quotation or word, and invoke it immediately. There are two sets of these fundamental combinators. They differ in whether the compiler is expected to determine the stack effect of the expression at compile time or the stack effect is declared and verified at run time."
 $nl
-"There are two sets of combinators; they differ in whether or not the stack effect of the expected code is declared."
-$nl
-"The simplest combinators do not take an effect declaration. The compiler checks the stack effect at compile time, rejecting the program if this cannot be done:"
+{ $heading "Compile-time checked combinators" }
+"With these combinators, the compiler attempts to determine the stack effect of the expression at compile time, rejecting the program if the effect cannot be determined. See " { $link "inference-combinators" } "."
 { $subsections call execute }
-"The second set of combinators takes an effect declaration. Note that the opening parenthesis is actually part of the word name; these are parsing words, and they read a stack effect until the corresponding closing parenthesis. The stack effect of the quotation or word is then checked at runtime:"
+{ $heading "Run-time checked combinators" }
+"With these combinators, the stack effect of the expression is checked at run time."
 { $subsections POSTPONE: call( POSTPONE: execute( }
-"The above are syntax sugar. The underlying words are a bit more verbose but allow non-constant effects to be passed in:"
+"Note that the opening parenthesis is actually part of the word name for " { $snippet "call(" } " and " { $snippet "execute(" } "; they are parsing words, and they read a stack effect until the corresponding closing parenthesis. The underlying words are a bit more verbose, but they can be given non-constant stack effects:"
 { $subsections call-effect execute-effect }
-"The combinator variants that do not take an effect declaration can only be used if the compiler is able to infer the stack effect by other means. See " { $link "inference-combinators" } "."
+{ $heading "Unchecked combinators" }
 { $subsections "call-unsafe" }
 { $see-also "effects" "inference" } ;
 
@@ -344,7 +342,7 @@ HELP: spread
 { $values { "objs..." "objects" } { "seq" "a sequence of quotations with stack effect " { $snippet "( x -- ... )" } } }
 { $description "Applies each quotation to the object in turn." }
 { $examples
-    "The " { $link bi* } " combinator takes two values and two quotations; the " { $link tri* } " combinator takes three values and three quotations. The " { $link spread } " combinator takes " { $snippet "n" } " values and " { $snippet "n" } " quotations, where " { $snippet "n" } " is the length of the input sequence, and is essentially equivalent to series of retain stack manipulations:"
+    "The " { $link bi* } " combinator takes two values and two quotations; the " { $link tri* } " combinator takes three values and three quotations. The " { $link spread } " combinator takes " { $snippet "n" } " values and " { $snippet "n" } " quotations, where " { $snippet "n" } " is the length of the input sequence, and is essentially equivalent to a nested series of " { $link dip } "s:"
     { $code
         "! Equivalent"
         "{ [ p ] [ q ] [ r ] [ s ] } spread"
