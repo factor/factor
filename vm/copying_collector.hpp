@@ -7,7 +7,7 @@ struct dummy_unmarker {
 
 struct simple_unmarker {
 	card unmask;
-	simple_unmarker(card unmask_) : unmask(unmask_) {}
+	explicit simple_unmarker(card unmask_) : unmask(unmask_) {}
 	void operator()(card *ptr) { *ptr &= ~unmask; }
 };
 

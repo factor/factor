@@ -32,7 +32,7 @@ struct code_block_marker {
 struct object_start_map_updater {
 	object_start_map *starts;
 
-	object_start_map_updater(object_start_map *starts_) : starts(starts_) {}
+	explicit object_start_map_updater(object_start_map *starts_) : starts(starts_) {}
 
 	void operator()(object *obj, cell size)
 	{

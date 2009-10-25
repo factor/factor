@@ -6,7 +6,7 @@ struct aging_policy {
 	aging_space *aging;
 	tenured_space *tenured;
 
-	aging_policy(factor_vm *parent_) :
+	explicit aging_policy(factor_vm *parent_) :
 		parent(parent_),
 		aging(parent->data->aging),
 		tenured(parent->data->tenured) {}
@@ -22,7 +22,7 @@ struct aging_policy {
 };
 
 struct aging_collector : copying_collector<aging_space,aging_policy> {
-	aging_collector(factor_vm *parent_);
+	explicit aging_collector(factor_vm *parent_);
 };
 
 }
