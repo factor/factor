@@ -19,16 +19,21 @@ template<typename Visitor> struct slot_visitor {
 		*handle = RETAG(untagged,TAG(pointer));
 	}
 
-	void visit_slots(object *ptr)
+	void visit_slots(object *ptr, cell payload_start)
 	{
 		cell *slot = (cell *)ptr;
-		cell *end = (cell *)((cell)ptr + ptr->binary_payload_start());
+		cell *end = (cell *)((cell)ptr + payload_start);
 
 		if(slot != end)
 		{
 			slot++;
 			for(; slot < end; slot++) visit_handle(slot);
 		}
+	}
+
+	void visit_slots(object *ptr)
+	{
+		visit_slots(ptr,ptr->binary_payload_start());
 	}
 
 	void visit_stack_elements(segment *region, cell *top)

@@ -8,6 +8,7 @@ object_start_map::object_start_map(cell size_, cell start_) :
 {
 	object_start_offsets = new card[addr_to_card(size_)];
 	object_start_offsets_end = object_start_offsets + addr_to_card(size_);
+	clear_object_start_offsets();
 }
 
 object_start_map::~object_start_map()

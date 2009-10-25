@@ -53,7 +53,8 @@ template<typename Block> struct free_list_allocator {
 	cell occupied();
 	void sweep();
 	template<typename Iterator> void sweep(Iterator &iter);
-	template<typename Iterator> void compact(Iterator &iter);
+	template<typename Iterator, typename Sizer> void compact(Iterator &iter, Sizer &sizer);
+	template<typename Iterator, typename Sizer> void iterate(Iterator &iter, Sizer &sizer);
 	template<typename Iterator> void iterate(Iterator &iter);
 };
 
@@ -358,31 +359,47 @@ void free_list_allocator<Block>::sweep(Iterator &iter)
 /* The forwarding map must be computed first by calling
 state.compute_forwarding(). */
 template<typename Block>
-template<typename Iterator>
-void free_list_allocator<Block>::compact(Iterator &iter)
+template<typename Iterator, typename Sizer>
+void free_list_allocator<Block>::compact(Iterator &iter, Sizer &sizer)
 {
 	heap_compactor<Block,Iterator> compactor(&state,first_block(),iter);
-	this->iterate(compactor);
+	this->iterate(compactor,sizer);
 
 	/* Now update the free list; there will be a single free block at
 	the end */
 	this->initial_free_list((cell)compactor.address - this->start);
 }
 
+/* During compaction we have to be careful and measure object sizes differently */
 template<typename Block>
-template<typename Iterator>
-void free_list_allocator<Block>::iterate(Iterator &iter)
+template<typename Iterator, typename Sizer>
+void free_list_allocator<Block>::iterate(Iterator &iter, Sizer &sizer)
 {
 	Block *scan = first_block();
 	Block *end = last_block();
 
 	while(scan != end)
 	{
-		cell size = scan->size();
+		cell size = sizer(scan);
 		Block *next = (Block *)((cell)scan + size);
 		if(!scan->free_p()) iter(scan,size);
 		scan = next;
 	}
+}
+
+template<typename Block> struct standard_sizer {
+	cell operator()(Block *block)
+	{
+		return block->size();
+	}
+};
+
+template<typename Block>
+template<typename Iterator>
+void free_list_allocator<Block>::iterate(Iterator &iter)
+{
+	standard_sizer<Block> sizer;
+	iterate(iter,sizer);
 }
 
 }
