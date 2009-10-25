@@ -364,6 +364,12 @@ ARTICLE: "handbook-library-reference" "Libraries"
 { $index [ orphan-articles { "help.home" "handbook" } diff ] } ;
 
 ARTICLE: "handbook" "Factor handbook"
+{ $heading "Getting started" }
+{ $subsections
+    "cookbook"
+    "first-program"
+}
+{ $heading "Reference" }
 { $subsections
     "handbook-language-reference"
     "io"
@@ -373,6 +379,15 @@ ARTICLE: "handbook" "Factor handbook"
     "ui-tools"
     "alien"
     "handbook-library-reference"
-} ;
+}
+{ $heading "Index" }
+{ $subsections
+  "vocab-index"
+  "article-index"
+  "primitive-index"
+  "error-index"
+  "class-index"
+}
+;
 
 ABOUT: "handbook"
