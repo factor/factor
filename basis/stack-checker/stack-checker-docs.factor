@@ -21,16 +21,19 @@ $nl
 { $example "[ 2 + ] infer." "( object -- object )" } ;
 
 ARTICLE: "inference-combinators" "Combinator stack effects"
-"If a word, call it " { $snippet "W" } ", calls a combinator, one of the following two conditions must hold:"
+"If a word calls a combinator, one of the following two conditions must hold for the stack checker to succeed:"
 { $list
-  { "The combinator may be called with a quotation that is either a literal, or built from literals, " { $link curry } " and " { $link compose } "." }
-  { "The combinator must be called on an input parameter, or be built from input parameters, literals, " { $link curry } " and " { $link compose } ", " { $strong "if" } " the word " { $snippet "W" } " must be declared " { $link POSTPONE: inline } ". Then " { $snippet "W" } " is itself considered to be a combinator, and its callers must satisfy one of these two conditions." }
+  { "The combinator must be called with a quotation that is either literal or built from literal quotations, " { $link curry } ", and " { $link compose } ". (Note that quotations that use " { $vocab-link "fry" } " or " { $vocab-link "locals" } " use " { $link curry } " and " { $link compose } " from the perspective of the stack checker.)" }
+  { "If the word is declared " { $link POSTPONE: inline } ", the combinator may additionally be called on one of the word's input parameters or with quotations built from the word's input parameters, literal quotations, " { $link curry } ", and " { $link compose } ". When inline, a word is itself considered to be a combinator, and its callers must in turn satisfy these conditions." }
 }
-"If neither condition holds, the stack checker throws a " { $link literal-expected } " error, and an escape hatch such as " { $link POSTPONE: call( } " must be used instead. See " { $link "inference-escape" } " for details. An inline combinator can be called with an unknown quotation by currying the quotation onto a literal quotation that uses " { $link POSTPONE: call( } "."
+"If neither condition holds, the stack checker throws a " { $link literal-expected } " error. To make the code compile, a runtime checking combinator such as " { $link POSTPONE: call( } " must be used instead. See " { $link "inference-escape" } " for details. An inline combinator can be called with an unknown quotation by " { $link curry } "ing the quotation onto a literal quotation that uses " { $link POSTPONE: call( } "."
 { $heading "Examples" }
 { $subheading "Calling a combinator" }
 "The following usage of " { $link map } " passes the stack checker, because the quotation is the result of " { $link curry } ":"
-{ $example "[ [ + ] curry map ] infer." "( object object -- object )" }
+{ $example "USING: math sequences ;" "[ [ + ] curry map ] infer." "( object object -- object )" }
+"The equivalent code using " { $vocab-link "fry" } " and " { $vocab-link "locals" } " likewise passes the stack checker:"
+{ $example "USING: fry math sequences ;" "[ '[ _ + ] map ] infer." "( object object -- object )" }
+{ $example "USING: locals math sequences ;" "[| a | [ a + ] map ] infer." "( object object -- object )" }
 { $subheading "Defining an inline combinator" }
 "The following word calls a quotation twice; the word is declared " { $link POSTPONE: inline } ", since it invokes " { $link call } " on the result of " { $link compose } " on an input parameter:"
 { $code ": twice ( value quot -- result ) dup compose call ; inline" }
@@ -52,11 +55,11 @@ ARTICLE: "inference-combinators" "Combinator stack effects"
 $nl
 "On the other hand, the stack effect of applying " { $link call } " to a literal quotation or a " { $link curry } " of a literal quotation is easy to compute; it behaves as if the quotation was substituted at that point."
 { $heading "Limitations" }
-"Passing a literal quotation on the data stack through an inlined recursive combinator nullifies its literal status. For example, the following will not infer:"
+"The stack checker cannot guarantee that a literal quotation is still literal if it is passed on the data stack to an inlined recursive combinator such as " { $link each } " or " { $link map } ". For example, the following will not infer:"
 { $example
   "[ [ reverse ] swap [ reverse ] map swap call ] infer." "Got a computed value where a literal quotation was expected"
 }
-"To make this work, pass the quotation on the retain stack instead:"
+"To make this work, use " { $link dip } " to pass the quotation instead:"
 { $example
   "[ [ reverse ] [ [ reverse ] map ] dip call ] infer." "( object -- object )"
 } ;
