@@ -40,7 +40,7 @@ struct object_start_map_updater {
 	}
 };
 
-void factor_vm::collect_full_mark(bool trace_contexts_p)
+void factor_vm::collect_mark_impl(bool trace_contexts_p)
 {
 	full_collector collector(this);
 
@@ -74,43 +74,21 @@ void factor_vm::collect_full_mark(bool trace_contexts_p)
 	code->clear_remembered_set();
 }
 
-void factor_vm::collect_full_sweep()
+void factor_vm::collect_sweep_impl()
 {
 	data->tenured->starts.clear_object_start_offsets();
 	object_start_map_updater updater(&data->tenured->starts);
 	data->tenured->sweep(updater);
 }
 
-void factor_vm::collect_growing_heap(cell requested_bytes,
-	bool trace_contexts_p,
-	bool compact_p)
+void factor_vm::collect_growing_heap(cell requested_bytes, bool trace_contexts_p)
 {
 	/* Grow the data heap and copy all live objects to the new heap. */
 	data_heap *old = data;
 	set_data_heap(data->grow(requested_bytes));
-	collect_full_mark(trace_contexts_p);
+	collect_mark_impl(trace_contexts_p);
+	collect_compact_impl(trace_contexts_p);
 	delete old;
-
-	if(compact_p)
-		collect_full_compact(trace_contexts_p);
-	else
-	{
-		collect_full_sweep();
-		relocate_code_heap();
-	}
-}
-
-void factor_vm::collect_full(bool trace_contexts_p, bool compact_p)
-{
-	collect_full_mark(trace_contexts_p);
-
-	if(compact_p)
-		collect_full_compact(trace_contexts_p);
-	else
-	{
-		collect_full_sweep();
-		update_code_heap_words_and_literals();
-	}
 }
 
 }

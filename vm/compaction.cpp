@@ -110,7 +110,7 @@ struct code_block_compaction_updater {
 	}
 };
 
-void factor_vm::collect_full_compact(bool trace_contexts_p)
+void factor_vm::collect_compact_impl(bool trace_contexts_p)
 {
 	tenured_space *tenured = data->tenured;
 	mark_bits<object> *data_forwarding_map = &tenured->state;
