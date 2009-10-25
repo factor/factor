@@ -67,6 +67,7 @@ struct object_compaction_updater {
 	slot_visitor<object_slot_forwarder> slot_forwarder;
 	code_block_visitor<code_block_forwarder> code_forwarder;
 	mark_bits<object> *data_forwarding_map;
+	object_start_map *starts;
 
 	explicit object_compaction_updater(factor_vm *parent_,
 		slot_visitor<object_slot_forwarder> slot_forwarder_,
@@ -75,18 +76,22 @@ struct object_compaction_updater {
 		parent(parent_),
 		slot_forwarder(slot_forwarder_),
 		code_forwarder(code_forwarder_),
-		data_forwarding_map(data_forwarding_map_) {}
+		data_forwarding_map(data_forwarding_map_),
+		starts(&parent->data->tenured->starts) {}
 
-	void operator()(object *obj, cell size)
+	void operator()(object *old_address, object *new_address, cell size)
 	{
 		cell payload_start;
-		if(obj->h.hi_tag() == TUPLE_TYPE)
-			payload_start = tuple_size_with_forwarding(data_forwarding_map,obj);
+		if(old_address->h.hi_tag() == TUPLE_TYPE)
+			payload_start = tuple_size_with_forwarding(data_forwarding_map,old_address);
 		else
-			payload_start = obj->binary_payload_start();
+			payload_start = old_address->binary_payload_start();
 
-		slot_forwarder.visit_slots(obj,payload_start);
-		code_forwarder.visit_object_code_block(obj);
+		memmove(new_address,old_address,size);
+
+		slot_forwarder.visit_slots(new_address,payload_start);
+		code_forwarder.visit_object_code_block(new_address);
+		starts->record_object_start_offset(new_address);
 	}
 };
 
@@ -97,14 +102,15 @@ struct code_block_compaction_updater {
 	explicit code_block_compaction_updater(factor_vm *parent_, slot_visitor<object_slot_forwarder> slot_forwarder_) :
 		parent(parent_), slot_forwarder(slot_forwarder_) {}
 
-	void operator()(code_block *compiled, cell size)
+	void operator()(code_block *old_address, code_block *new_address, cell size)
 	{
-		slot_forwarder.visit_literal_references(compiled);
-		parent->relocate_code_block(compiled);
+		memmove(new_address,old_address,size);
+		slot_forwarder.visit_literal_references(new_address);
+		parent->relocate_code_block(new_address);
 	}
 };
 
-void factor_vm::compact_full_impl(bool trace_contexts_p)
+void factor_vm::collect_full_compact(bool trace_contexts_p)
 {
 	tenured_space *tenured = data->tenured;
 	mark_bits<object> *data_forwarding_map = &tenured->state;
@@ -117,6 +123,9 @@ void factor_vm::compact_full_impl(bool trace_contexts_p)
 	/* Update root pointers */
 	slot_visitor<object_slot_forwarder> slot_forwarder(this,object_slot_forwarder(data_forwarding_map));
 	code_block_visitor<code_block_forwarder> code_forwarder(this,code_block_forwarder(code_forwarding_map));
+
+	/* Object start offsets get recomputed by the object_compaction_updater */
+	data->tenured->starts.clear_object_start_offsets();
 
 	/* Slide everything in tenured space up, and update data and code heap
 	pointers inside objects. */

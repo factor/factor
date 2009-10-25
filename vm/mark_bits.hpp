@@ -139,32 +139,20 @@ template<typename Block> struct mark_bits {
 	/* We have the popcount for every 64 entries; look up and compute the rest */
 	Block *forward_block(Block *original)
 	{
+#ifdef FACTOR_DEBUG
+		assert(marked_p(original));
+#endif
 		std::pair<cell,cell> pair = bitmap_deref(original);
 
 		cell approx_popcount = forwarding[pair.first];
 		u64 mask = ((u64)1 << pair.second) - 1;
 
 		cell new_line_number = approx_popcount + popcount(marked[pair.first] & mask);
-		return line_block(new_line_number);
-	}
-};
-
-template<typename Block, typename Iterator> struct heap_compactor {
-	mark_bits<Block> *state;
-	char *address;
-	Iterator &iter;
-
-	explicit heap_compactor(mark_bits<Block> *state_, Block *address_, Iterator &iter_) :
-		state(state_), address((char *)address_), iter(iter_) {}
-
-	void operator()(Block *block, cell size)
-	{
-		if(this->state->marked_p(block))
-		{
-			memmove(address,block,size);
-			iter((Block *)address,size);
-			address += size;
-		}
+		Block *new_block = line_block(new_line_number);
+#ifdef FACTOR_DEBUG
+		assert(new_block <= original);
+#endif
+		return new_block;
 	}
 };
 
