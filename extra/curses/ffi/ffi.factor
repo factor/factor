@@ -274,3 +274,8 @@ FUNCTION: bool wenclose ( WINDOW* win, int y, int x ) ;
 FUNCTION: bool mouse_trafo ( int* pY, int* pX, bool to_screen ) ;
 FUNCTION: bool wmouse_trafo ( WINDOW* win, int* pY, int* pX, bool to_screen ) ;
 FUNCTION: int mouseinterval ( int erval ) ;
+
+FUNCTION: int wborder ( WINDOW* win, chtype ls, chtype rs, chtype ts, chtype bs, chtype tl, chtype tr, chtype bl, chtype br ) ;
+FUNCTION: int box ( WINDOW* win, chtype verch, chtype horch ) ;
+FUNCTION: int whline ( WINDOW* win, chtype ch, int n ) ;
+FUNCTION: int wvline ( WINDOW* win, chtype ch, int n ) ;
