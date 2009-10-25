@@ -118,14 +118,6 @@ void factor_vm::compact_full_impl(bool trace_contexts_p)
 	slot_visitor<object_slot_forwarder> slot_forwarder(this,object_slot_forwarder(data_forwarding_map));
 	code_block_visitor<code_block_forwarder> code_forwarder(this,code_block_forwarder(code_forwarding_map));
 
-	slot_forwarder.visit_roots();
-	if(trace_contexts_p)
-	{
-		slot_forwarder.visit_contexts();
-		code_forwarder.visit_context_code_blocks();
-		code_forwarder.visit_callback_code_blocks();
-	}
-
 	/* Slide everything in tenured space up, and update data and code heap
 	pointers inside objects. */
 	object_compaction_updater object_updater(this,slot_forwarder,code_forwarder,data_forwarding_map);
@@ -137,6 +129,14 @@ void factor_vm::compact_full_impl(bool trace_contexts_p)
 	code_block_compaction_updater code_block_updater(this,slot_forwarder);
 	standard_sizer<code_block> code_block_sizer;
 	code->allocator->compact(code_block_updater,code_block_sizer);
+
+	slot_forwarder.visit_roots();
+	if(trace_contexts_p)
+	{
+		slot_forwarder.visit_contexts();
+		code_forwarder.visit_context_code_blocks();
+		code_forwarder.visit_callback_code_blocks();
+	}
 }
 
 }
