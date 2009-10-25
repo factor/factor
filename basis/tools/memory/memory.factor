@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences arrays generic assocs io math
 namespaces parser prettyprint strings io.styles words
@@ -8,48 +8,41 @@ IN: tools.memory
 
 <PRIVATE
 
-: write-size ( n -- )
+: kilobytes ( n -- str )
     number>string
     dup length 4 > [ 3 cut* "," glue ] when
-    " KB" append write-cell ;
+    " KB" append ;
 
-: write-total/used/free ( free total str -- )
-    [
-        write-cell
-        dup write-size
-        over - write-size
-        write-size
-    ] with-row ;
+: memory-table. ( sizes seq -- )
+    swap [ kilobytes ] map zip simple-table. ;
 
-: write-total ( n str -- )
-    [
-        write-cell
-        write-size
-        [ ] with-cell
-        [ ] with-cell
-    ] with-row ;
+: young-room. ( seq -- )
+    { "Total:" "Allocated:" "Free:" } memory-table. ;
 
-: write-headings ( seq -- )
-    [ [ write-cell ] each ] with-row ;
+: nursery-room. ( seq -- ) "- Nursery space" print young-room. ;
 
-: (data-room.) ( -- )
-    data-room 2 <groups> [
-        [ first2 ] [ number>string "Generation " prepend ] bi*
-        write-total/used/free
-    ] each-index
-    "Decks" write-total
-    "Cards" write-total ;
+: aging-room. ( seq -- ) "- Aging space" print young-room. ;
 
-: write-labeled-size ( n string -- )
-    [ write-cell write-size ] with-row ;
+: mark-sweep-table. ( sizes -- )
+    { "Total:" "Allocated:" "Contiguous free:" "Total free:" } memory-table. ;
 
-: (code-room.) ( -- )
-    code-room {
-        [ "Size:" write-labeled-size ]
-        [ "Used:" write-labeled-size ]
-        [ "Total free space:" write-labeled-size ]
-        [ "Largest free block:" write-labeled-size ]
-    } spread ;
+: tenured-room. ( seq -- ) "- Tenured space" print mark-sweep-table. ;
+
+: misc-room. ( seq -- )
+    "- Miscellaneous buffers" print
+    { "Card array:" "Deck array:" "Mark stack:" } memory-table. ;
+
+: data-room. ( -- )
+    "==== DATA HEAP" print nl
+    data-room
+    3 cut [ nursery-room. nl ] dip
+    3 cut [ aging-room. nl ] dip
+    4 cut [ tenured-room. nl ] dip
+    misc-room. ;
+
+: code-room. ( -- )
+    "==== CODE HEAP" print nl
+    code-room mark-sweep-table. ;
 
 : heap-stat-step ( obj counts sizes -- )
     [ [ class ] dip inc-at ]
@@ -57,18 +50,7 @@ IN: tools.memory
 
 PRIVATE>
 
-: room. ( -- )
-    "==== DATA HEAP" print
-    standard-table-style [
-        { "" "Total" "Used" "Free" } write-headings
-        (data-room.)
-    ] tabular-output
-    nl nl
-    "==== CODE HEAP" print
-    standard-table-style [
-        (code-room.)
-    ] tabular-output
-    nl ;
+: room. ( -- ) data-room. nl code-room. ;
 
 : heap-stats ( -- counts sizes )
     [ ] instances H{ } clone H{ } clone
@@ -76,7 +58,7 @@ PRIVATE>
 
 : heap-stats. ( -- )
     heap-stats dup keys natural-sort standard-table-style [
-        { "Class" "Bytes" "Instances" } write-headings
+        [ { "Class" "Bytes" "Instances" } [ write-cell ] each ] with-row
         [
             [
                 dup pprint-cell
