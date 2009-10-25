@@ -219,7 +219,7 @@ void factor_vm::primitive_data_room()
 	cell used, total_free, max_free;
 	data->tenured->usage(&used,&total_free,&max_free);
 	a.add(tag_fixnum(total_free >> 10));
-	a.add(tag_fixnum(used >> 10));
+	a.add(tag_fixnum(data->tenured->size >> 10));
 
 	a.trim();
 	dpush(a.elements.value());
