@@ -204,22 +204,26 @@ void factor_vm::primitive_size()
 /* Push memory usage statistics in data heap */
 void factor_vm::primitive_data_room()
 {
-	dpush(tag_fixnum((data->cards_end - data->cards) >> 10));
-	dpush(tag_fixnum((data->decks_end - data->decks) >> 10));
-
 	growable_array a(this);
 
-	a.add(tag_fixnum((nursery.end - nursery.here) >> 10));
 	a.add(tag_fixnum((nursery.size) >> 10));
+	a.add(tag_fixnum((nursery.here - nursery.start) >> 10));
+	a.add(tag_fixnum((nursery.end - nursery.here) >> 10));
 
-	a.add(tag_fixnum((data->aging->end - data->aging->here) >> 10));
 	a.add(tag_fixnum((data->aging->size) >> 10));
+	a.add(tag_fixnum((data->aging->here - data->aging->start) >> 10));
+	a.add(tag_fixnum((data->aging->end - data->aging->here) >> 10));
 
-	//XXX
 	cell used, total_free, max_free;
 	data->tenured->usage(&used,&total_free,&max_free);
-	a.add(tag_fixnum(total_free >> 10));
 	a.add(tag_fixnum(data->tenured->size >> 10));
+	a.add(tag_fixnum(used >> 10));
+	a.add(tag_fixnum(total_free >> 10));
+	a.add(tag_fixnum(max_free >> 10));
+
+	a.add(tag_fixnum((data->cards_end - data->cards) >> 10));
+	a.add(tag_fixnum((data->decks_end - data->decks) >> 10));
+	a.add(tag_fixnum((data->tenured->mark_stack.capacity()) >> 10));
 
 	a.trim();
 	dpush(a.elements.value());
