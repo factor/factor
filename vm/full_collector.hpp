@@ -5,7 +5,7 @@ struct full_policy {
 	factor_vm *parent;
 	tenured_space *tenured;
 
-	full_policy(factor_vm *parent_) : parent(parent_), tenured(parent->data->tenured) {}
+	explicit full_policy(factor_vm *parent_) : parent(parent_), tenured(parent->data->tenured) {}
 
 	bool should_copy_p(object *untagged)
 	{
@@ -27,7 +27,7 @@ struct full_policy {
 struct full_collector : collector<tenured_space,full_policy> {
 	bool trace_contexts_p;
 
-	full_collector(factor_vm *parent_);
+	explicit full_collector(factor_vm *parent_);
 };
 
 }
