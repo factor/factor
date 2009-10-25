@@ -16,13 +16,10 @@ struct tagged
 {
 	cell value_;
 
-	cell value() const { return value_; }
-	Type *untagged() const { return (Type *)(UNTAG(value_)); }
-
 	cell type() const {
 		cell tag = TAG(value_);
 		if(tag == OBJECT_TYPE)
-			return untagged()->h.hi_tag();
+			return ((object *)UNTAG(value_))->h.hi_tag();
 		else
 			return tag;
 	}
@@ -40,23 +37,27 @@ struct tagged
 			return type_p(Type::type_number);
 	}
 
+	cell value() const {
+#ifdef FACTOR_DEBUG
+		assert(type_p());
+#endif
+		return value_;
+	}
+	Type *untagged() const {
+#ifdef FACTOR_DEBUG
+		assert(type_p());
+#endif
+		return (Type *)(UNTAG(value_));
+	}
+
 	Type *untag_check(factor_vm *parent) const {
 		if(!type_p())
 			parent->type_error(Type::type_number,value_);
 		return untagged();
 	}
 
-	explicit tagged(cell tagged) : value_(tagged) {
-#ifdef FACTOR_DEBUG
-		assert(type_p());
-#endif
-	}
-
-	explicit tagged(Type *untagged) : value_(factor::tag(untagged)) {
-#ifdef FACTOR_DEBUG
-		assert(type_p());
-#endif
-	}
+	explicit tagged(cell tagged) : value_(tagged) {}
+	explicit tagged(Type *untagged) : value_(factor::tag(untagged)) {}
 
 	Type *operator->() const { return untagged(); }
 	cell *operator&() const { return &value_; }
