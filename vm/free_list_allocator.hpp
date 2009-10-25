@@ -47,6 +47,7 @@ template<typename Block> struct free_list_allocator {
 	void assert_free_block(free_heap_block *block);
 	free_heap_block *find_free_block(cell size);
 	free_heap_block *split_free_block(free_heap_block *block, cell size);
+	bool can_allot_p(cell size);
 	Block *allot(cell size);
 	void free(Block *block);
 	void usage(cell *used, cell *total_free, cell *max_free);
@@ -178,6 +179,27 @@ template<typename Block> free_heap_block *free_list_allocator<Block>::split_free
 	}
 
 	return block;
+}
+
+template<typename Block> bool free_list_allocator<Block>::can_allot_p(cell size)
+{
+	cell attempt = size;
+
+	while(attempt < free_list_count * block_granularity)
+	{
+		int index = attempt / block_granularity;
+		if(free_blocks.small_blocks[index]) return true;
+		attempt *= 2;
+	}
+
+	free_heap_block *block = free_blocks.large_blocks;
+	while(block)
+	{
+		if(block->size() >= size) return true;
+		block = block->next_free;
+	}
+
+	return false;
 }
 
 template<typename Block> Block *free_list_allocator<Block>::allot(cell size)

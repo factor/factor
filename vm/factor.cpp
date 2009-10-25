@@ -32,7 +32,7 @@ void factor_vm::default_parameters(vm_parameters *p)
 	p->code_size = 8 * sizeof(cell);
 	p->young_size = sizeof(cell) / 4;
 	p->aging_size = sizeof(cell) / 2;
-	p->tenured_size = 4 * sizeof(cell);
+	p->tenured_size = 16 * sizeof(cell);
 #endif
 
 	p->max_pic_size = 3;
