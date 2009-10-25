@@ -254,7 +254,7 @@ PRIVATE>
             ptr>> swap window-params ffi:derwin
         ] [
             window-params ffi:newwin
-        ] if* [ curses-error ] keep >>ptr &dispose
+        ] if* curses-pointer-error >>ptr &dispose
     ] [ apply-window-options ] bi ;
 
 : with-window ( window quot -- )
@@ -266,9 +266,13 @@ PRIVATE>
         '[
             ffi:initscr curses-pointer-error
             >>ptr
-            [ apply-global-options ] [ apply-window-options ] [ ] tri
-
-            ffi:erase curses-error
+            {
+                [ apply-global-options ]
+                [ apply-window-options ]
+                [ ptr>> ffi:wclear curses-error ]
+                [ ptr>> ffi:wrefresh curses-error ]
+                [ ]
+            } cleave
             init-colors
 
             _ with-window
@@ -402,3 +406,9 @@ PRIVATE>
 
 : ccolor ( foreground background -- )
     current-window get wccolor ;
+
+: wccbox ( window -- )
+    ptr>> 0 0 ffi:box curses-error ;
+: cbox ( -- )
+    current-window get wccbox ;
+
