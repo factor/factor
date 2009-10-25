@@ -115,7 +115,7 @@ void factor_vm::primitive_full_gc()
 	gc(collect_full_op,
 		0, /* requested size */
 		true, /* trace contexts? */
-		false /* compact code heap? */);
+		true /* compact code heap? */);
 }
 
 void factor_vm::primitive_compact_gc()
@@ -231,7 +231,7 @@ object *factor_vm::allot_object(header header, cell size)
 
 	/* If the object is smaller than the nursery, allocate it in the nursery,
 	after a GC if needed */
-	if(nursery.size > size)
+	if(size < nursery.size)
 	{
 		/* If there is insufficient room, collect the nursery */
 		if(nursery.here + size > nursery.end)
@@ -239,23 +239,21 @@ object *factor_vm::allot_object(header header, cell size)
 
 		obj = nursery.allot(size);
 	}
-	/* If the object is bigger than the nursery, allocate it in
-	tenured space */
 	else
 	{
-		/* If tenured space does not have enough room, collect */
-		//XXX
-		//if(data->tenured->here + size > data->tenured->end)
-			primitive_full_gc();
-
-		/* If it still won't fit, grow the heap */
-		//XXX
-		//if(data->tenured->here + size > data->tenured->end)
+		/* If tenured space does not have enough room, collect and compact */
+		if(!data->tenured->can_allot_p(size))
 		{
-			gc(collect_growing_heap_op,
-				size, /* requested size */
-				true, /* trace contexts? */
-				false /* compact code heap? */);
+			primitive_compact_gc();
+
+			/* If it still won't fit, grow the heap */
+			if(!data->tenured->can_allot_p(size))
+			{
+				gc(collect_growing_heap_op,
+					size, /* requested size */
+					true, /* trace contexts? */
+					false /* compact code heap? */);
+			}
 		}
 
 		obj = data->tenured->allot(size);

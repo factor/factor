@@ -16,10 +16,7 @@ void factor_vm::init_objects(image_header *h)
 
 void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 {
-	cell good_size = h->data_size + (1 << 20);
-
-	if(good_size > p->tenured_size)
-		p->tenured_size = good_size;
+	p->tenured_size = std::max((h->data_size * 3) / 2,p->tenured_size);
 
 	init_data_heap(p->young_size,
 		p->aging_size,
