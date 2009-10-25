@@ -8,7 +8,7 @@ code_heap::code_heap(cell size)
 	if(size > (1L << (sizeof(cell) * 8 - 6))) fatal_error("Heap too large",size);
 	seg = new segment(align_page(size),true);
 	if(!seg) fatal_error("Out of memory in heap allocator",size);
-	allocator = new free_list_allocator<heap_block>(size,seg->start);
+	allocator = new free_list_allocator<code_block>(size,seg->start);
 }
 
 code_heap::~code_heap()
@@ -36,7 +36,7 @@ bool code_heap::needs_fixup_p(code_block *compiled)
 	return needs_fixup.count(compiled) > 0;
 }
 
-bool code_heap::marked_p(heap_block *compiled)
+bool code_heap::marked_p(code_block *compiled)
 {
 	return allocator->state.marked_p(compiled);
 }
@@ -109,9 +109,9 @@ struct word_and_literal_code_heap_updater {
 
 	word_and_literal_code_heap_updater(factor_vm *parent_) : parent(parent_) {}
 
-	void operator()(heap_block *block, cell size)
+	void operator()(code_block *block, cell size)
 	{
-		parent->update_code_block_words_and_literals((code_block *)block);
+		parent->update_code_block_words_and_literals(block);
 	}
 };
 
@@ -137,8 +137,7 @@ struct code_heap_relocator {
 void factor_vm::relocate_code_heap()
 {
 	code_heap_relocator relocator(this);
-	code_heap_iterator<code_heap_relocator> iter(relocator);
-	code->allocator->sweep(iter);
+	code->allocator->sweep(relocator);
 }
 
 void factor_vm::primitive_modify_code_heap()

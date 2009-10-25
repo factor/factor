@@ -504,18 +504,8 @@ struct factor_vm
 	void primitive_strip_stack_traces();
 
 	/* Apply a function to every code block */
-	template<typename Iterator> struct code_heap_iterator {
-		Iterator &iter;
-		explicit code_heap_iterator(Iterator &iter_) : iter(iter_) {}
-		void operator()(heap_block *block, cell size)
-		{
-			iter((code_block *)block,size);
-		}
-	};
-
-	template<typename Iterator> void iterate_code_heap(Iterator &iter_)
+	template<typename Iterator> void iterate_code_heap(Iterator &iter)
 	{
-		code_heap_iterator<Iterator> iter(iter_);
 		code->allocator->iterate(iter);
 	}
 

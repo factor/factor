@@ -439,7 +439,7 @@ void factor_vm::fixup_labels(array *labels, code_block *compiled)
 /* Might GC */
 code_block *factor_vm::allot_code_block(cell size, code_block_type type)
 {
-	heap_block *block = code->allocator->allot(size + sizeof(code_block));
+	code_block *block = code->allocator->allot(size + sizeof(code_block));
 
 	/* If allocation failed, do a full GC and compact the code heap.
 	A full GC that occurs as a result of the data heap filling up does not
@@ -465,9 +465,8 @@ code_block *factor_vm::allot_code_block(cell size, code_block_type type)
 		}
 	}
 
-	code_block *compiled = (code_block *)block;
-	compiled->set_type(type);
-	return compiled;
+	block->set_type(type);
+	return block;
 }
 
 /* Might GC */
