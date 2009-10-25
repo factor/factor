@@ -221,49 +221,16 @@ struct string : public object {
 };
 
 /* The compiled code heap is structured into blocks. */
-struct heap_block
+struct code_block
 {
 	cell header;
-
-	bool free_p() const
-	{
-		return header & 1 == 1;
-	}
-
-	cell size() const
-	{
-		cell bytes = header >> 3;
-#ifdef FACTOR_DEBUG
-		assert(bytes > 0);
-#endif
-		return bytes;
-	}
-
-	void set_size(cell size)
-	{
-		header = ((header & 0x7) | (size << 3));
-	}
-};
-
-struct free_heap_block : public heap_block
-{
-	free_heap_block *next_free;
-
-	void make_free(cell size)
-	{
-		header = (size << 3) | 1;
-	}
-};
-
-struct code_block : public heap_block
-{
 	cell owner; /* tagged pointer to word, quotation or f */
 	cell literals; /* tagged pointer to array or f */
 	cell relocation; /* tagged pointer to byte-array or f */
 
-	void *xt() const
+	bool free_p() const
 	{
-		return (void *)(this + 1);
+		return header & 1 == 1;
 	}
 
 	code_block_type type() const
@@ -284,6 +251,16 @@ struct code_block : public heap_block
 	bool optimized_p() const
 	{
 		return type() == code_block_optimized;
+	}
+
+	cell size() const
+	{
+		return header >> 3;
+	}
+
+	void *xt() const
+	{
+		return (void *)(this + 1);
 	}
 };
 

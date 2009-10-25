@@ -15,14 +15,14 @@ struct object_slot_forwarder {
 };
 
 struct code_block_forwarder {
-	mark_bits<heap_block> *forwarding_map;
+	mark_bits<code_block> *forwarding_map;
 
-	explicit code_block_forwarder(mark_bits<heap_block> *forwarding_map_) :
+	explicit code_block_forwarder(mark_bits<code_block> *forwarding_map_) :
 		forwarding_map(forwarding_map_) {}
 
 	code_block *operator()(code_block *compiled)
 	{
-		return (code_block *)forwarding_map->forward_block(compiled);
+		return forwarding_map->forward_block(compiled);
 	}
 };
 
@@ -63,7 +63,7 @@ void factor_vm::compact_full_impl(bool trace_contexts_p)
 {
 	tenured_space *tenured = data->tenured;
 	mark_bits<object> *data_forwarding_map = &tenured->state;
-	mark_bits<heap_block> *code_forwarding_map = &code->allocator->state;
+	mark_bits<code_block> *code_forwarding_map = &code->allocator->state;
 
 	/* Figure out where blocks are going to go */
 	data_forwarding_map->compute_forwarding();
@@ -89,8 +89,7 @@ void factor_vm::compact_full_impl(bool trace_contexts_p)
 	/* Slide everything in the code heap up, and update data and code heap
 	pointers inside code blocks. */
 	code_block_compaction_updater code_block_updater(this,slot_forwarder);
-	code_heap_iterator<code_block_compaction_updater> iter(code_block_updater);
-	code->allocator->compact(iter);
+	code->allocator->compact(code_block_updater);
 }
 
 }
