@@ -356,6 +356,24 @@ void free_list_allocator<Block>::sweep(Iterator &iter)
 		this->add_to_free_list((free_heap_block *)prev);
 }
 
+template<typename Block, typename Iterator> struct heap_compactor {
+	mark_bits<Block> *state;
+	char *address;
+	Iterator &iter;
+
+	explicit heap_compactor(mark_bits<Block> *state_, Block *address_, Iterator &iter_) :
+		state(state_), address((char *)address_), iter(iter_) {}
+
+	void operator()(Block *block, cell size)
+	{
+		if(this->state->marked_p(block))
+		{
+			iter(block,(Block *)address,size);
+			address += size;
+		}
+	}
+};
+
 /* The forwarding map must be computed first by calling
 state.compute_forwarding(). */
 template<typename Block>

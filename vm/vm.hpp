@@ -247,8 +247,9 @@ struct factor_vm
 	void collect_nursery();
 	void collect_aging();
 	void collect_to_tenured();
-	void collect_full_impl(bool trace_contexts_p);
-	void compact_full_impl(bool trace_contexts_p);
+	void collect_full_mark(bool trace_contexts_p);
+	void collect_full_sweep();
+	void collect_full_compact(bool trace_contexts_p);
 	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p, bool compact_p);
 	void collect_full(bool trace_contexts_p, bool compact_p);
 	void record_gc_stats(generation_statistics *stats);
