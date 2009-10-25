@@ -293,21 +293,21 @@ struct code_block_printer {
 	code_block_printer(factor_vm *parent_) :
 		parent(parent_), reloc_size(0), literal_size(0) {}
 
-	void operator()(heap_block *scan, cell size)
+	void operator()(code_block *scan, cell size)
 	{
 		const char *status;
 		if(scan->free_p())
 			status = "free";
 		else if(parent->code->marked_p(scan))
 		{
-			reloc_size += parent->object_size(((code_block *)scan)->relocation);
-			literal_size += parent->object_size(((code_block *)scan)->literals);
+			reloc_size += parent->object_size(scan->relocation);
+			literal_size += parent->object_size(scan->literals);
 			status = "marked";
 		}
 		else
 		{
-			reloc_size += parent->object_size(((code_block *)scan)->relocation);
-			literal_size += parent->object_size(((code_block *)scan)->literals);
+			reloc_size += parent->object_size(scan->relocation);
+			literal_size += parent->object_size(scan->literals);
 			status = "allocated";
 		}
 

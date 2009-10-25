@@ -3,6 +3,27 @@ namespace factor
 
 static const cell free_list_count = 32;
 
+struct free_heap_block
+{
+	cell header;
+	free_heap_block *next_free;
+
+	bool free_p() const
+	{
+		return header & 1 == 1;
+	}
+
+	cell size() const
+	{
+		return header >> 3;
+	}
+
+	void make_free(cell size)
+	{
+		header = (size << 3) | 1;
+	}
+};
+
 struct free_list {
 	free_heap_block *small_blocks[free_list_count];
 	free_heap_block *large_blocks;
@@ -248,7 +269,7 @@ void free_list_allocator<Block>::sweep()
 			if(prev && prev->free_p())
 			{
 				free_heap_block *free_prev = (free_heap_block *)prev;
-				free_prev->set_size(free_prev->size() + size);
+				free_prev->make_free(free_prev->size() + size);
 			}
 			else
 				prev = scan;
@@ -264,7 +285,7 @@ void free_list_allocator<Block>::sweep()
 			if(prev && prev->free_p())
 			{
 				free_heap_block *free_prev = (free_heap_block *)prev;
-				free_prev->set_size(free_prev->size() + size);
+				free_prev->make_free(free_prev->size() + size);
 			}
 			else
 			{
@@ -300,7 +321,7 @@ void free_list_allocator<Block>::sweep(Iterator &iter)
 			if(prev && prev->free_p())
 			{
 				free_heap_block *free_prev = (free_heap_block *)prev;
-				free_prev->set_size(free_prev->size() + size);
+				free_prev->make_free(free_prev->size() + size);
 			}
 			else
 				prev = scan;
@@ -317,7 +338,7 @@ void free_list_allocator<Block>::sweep(Iterator &iter)
 			if(prev && prev->free_p())
 			{
 				free_heap_block *free_prev = (free_heap_block *)prev;
-				free_prev->set_size(free_prev->size() + size);
+				free_prev->make_free(free_prev->size() + size);
 			}
 			else
 			{
