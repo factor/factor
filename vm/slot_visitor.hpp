@@ -5,7 +5,7 @@ template<typename Visitor> struct slot_visitor {
 	factor_vm *parent;
 	Visitor visitor;
 
-	slot_visitor<Visitor>(factor_vm *parent_, Visitor visitor_) :
+	explicit slot_visitor<Visitor>(factor_vm *parent_, Visitor visitor_) :
 		parent(parent_), visitor(visitor_) {}
 
 	void visit_handle(cell *handle)

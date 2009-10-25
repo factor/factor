@@ -88,6 +88,7 @@ struct word_updater {
 	factor_vm *parent;
 
 	explicit word_updater(factor_vm *parent_) : parent(parent_) {}
+
 	void operator()(code_block *compiled, cell size)
 	{
 		parent->update_word_references(compiled);
@@ -107,7 +108,7 @@ to literals and other words. */
 struct word_and_literal_code_heap_updater {
 	factor_vm *parent;
 
-	word_and_literal_code_heap_updater(factor_vm *parent_) : parent(parent_) {}
+	explicit word_and_literal_code_heap_updater(factor_vm *parent_) : parent(parent_) {}
 
 	void operator()(code_block *block, cell size)
 	{
@@ -126,7 +127,7 @@ references to card and deck arrays. */
 struct code_heap_relocator {
 	factor_vm *parent;
 
-	code_heap_relocator(factor_vm *parent_) : parent(parent_) {}
+	explicit code_heap_relocator(factor_vm *parent_) : parent(parent_) {}
 
 	void operator()(code_block *block, cell size)
 	{

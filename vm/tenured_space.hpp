@@ -5,7 +5,7 @@ struct tenured_space : free_list_allocator<object> {
 	object_start_map starts;
 	std::vector<object *> mark_stack;
 
-	tenured_space(cell size, cell start) :
+	explicit tenured_space(cell size, cell start) :
 		free_list_allocator<object>(size,start), starts(size,start) {}
 
 	object *allot(cell size)

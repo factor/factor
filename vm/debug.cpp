@@ -290,7 +290,7 @@ struct code_block_printer {
 	factor_vm *parent;
 	cell reloc_size, literal_size;
 
-	code_block_printer(factor_vm *parent_) :
+	explicit code_block_printer(factor_vm *parent_) :
 		parent(parent_), reloc_size(0), literal_size(0) {}
 
 	void operator()(code_block *scan, cell size)
