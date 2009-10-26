@@ -170,13 +170,13 @@ PRIVATE>
     4 swap [ (4sequence) ] new-like ; inline
 
 : first2 ( seq -- first second )
-    1 swap bounds-check nip first2-unsafe ; flushable
+    1 swap bounds-check nip first2-unsafe ; inline
 
 : first3 ( seq -- first second third )
-    2 swap bounds-check nip first3-unsafe ; flushable
+    2 swap bounds-check nip first3-unsafe ; inline
 
 : first4 ( seq -- first second third fourth )
-    3 swap bounds-check nip first4-unsafe ; flushable
+    3 swap bounds-check nip first4-unsafe ; inline
 
 : ?nth ( n seq -- elt/f )
     2dup bounds-check? [ nth-unsafe ] [ 2drop f ] if ; inline
