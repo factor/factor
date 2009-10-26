@@ -412,3 +412,9 @@ PRIVATE>
 : cbox ( -- )
     current-window get wccbox ;
 
+: mousemask ( mask -- newmask oldmask )
+    0 <ulong> [ ffi:mousemask ] keep *ulong ;
+
+: getmouse ( -- MEVENT/f )
+    ffi:MEVENT <struct> dup ffi:getmouse
+    ffi:ERR = [ drop f ] when ;
