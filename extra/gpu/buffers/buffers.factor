@@ -124,7 +124,7 @@ UNION: gpu-data-ptr buffer-ptr c-ptr ;
 
     quot call
 
-    target glUnmapBuffer ; inline
+    target glUnmapBuffer drop ; inline
 
 :: with-bound-buffer ( buffer target quot: ( -- ) -- )
     target gl-target buffer glBindBuffer
