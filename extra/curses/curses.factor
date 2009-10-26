@@ -161,6 +161,7 @@ CONSTANT: KEY_F0        OCT: 410  /* Function keys.  Space for 64 */
 : BUTTON2_RESERVED_EVENT ( -- mask ) 2 ffi:NCURSES_RESERVED_EVENT ffi:NCURSES_MOUSE_MASK ; inline
 : BUTTON3_RESERVED_EVENT ( -- mask ) 3 ffi:NCURSES_RESERVED_EVENT ffi:NCURSES_MOUSE_MASK ; inline
 : BUTTON4_RESERVED_EVENT ( -- mask ) 4 ffi:NCURSES_RESERVED_EVENT ffi:NCURSES_MOUSE_MASK ; inline
+
 : BUTTON_CTRL            ( -- mask ) 5 OCT: 01 ffi:NCURSES_MOUSE_MASK ; inline
 : BUTTON_SHIFT           ( -- mask ) 5 OCT: 02 ffi:NCURSES_MOUSE_MASK ; inline
 : BUTTON_ALT             ( -- mask ) 5 OCT: 04 ffi:NCURSES_MOUSE_MASK ; inline
@@ -412,9 +413,77 @@ PRIVATE>
 : cbox ( -- )
     current-window get wccbox ;
 
+SYMBOLS: +pressed+ +released+ +clicked+ +double+ +triple+ ;
+
+TUPLE: mouse-event
+    { id fixnum }
+    { y fixnum }
+    { x fixnum }
+    { button fixnum }
+    type
+    alt
+    shift
+    ctrl ;
+
+<PRIVATE
+
+: substate-n ( bstate n -- substate )
+    [ 1 + ffi:NCURSES_BUTTON_RELEASED ffi:NCURSES_MOUSE_MASK 1 - bitand ] keep
+    1 - -6 * shift ; inline
+
+: button-n? ( bstate n -- ? ) substate-n 0 = not ; inline
+
+: fill-in-type ( mouse-event substate -- )
+    {
+        { BUTTON1_RELEASED       [ +released+ >>type drop ] }
+        { BUTTON1_PRESSED        [ +pressed+  >>type drop ] }
+        { BUTTON1_CLICKED        [ +clicked+  >>type drop ] }
+        { BUTTON1_DOUBLE_CLICKED [ +double+   >>type drop ] }
+        { BUTTON1_TRIPLE_CLICKED [ +triple+   >>type drop ] }
+    } case ; inline
+
+: fill-in-bstate ( mouse-event bstate -- )
+    2dup {
+        {
+            [ dup 1 button-n? ]
+            [ [ 1 >>button ] dip 1 substate-n fill-in-type ]
+        }
+        {
+            [ dup 2 button-n? ]
+            [ [ 2 >>button ] dip 2 substate-n fill-in-type ]
+        }
+        {
+            [ dup 3 button-n? ]
+            [ [ 3 >>button ] dip 3 substate-n fill-in-type ]
+        }
+        {
+            [ dup 4 button-n? ]
+            [ [ 4 >>button ] dip 4 substate-n fill-in-type ]
+        }
+    } cond
+    {
+        [ BUTTON_CTRL  bitand 0 = not [ t >>ctrl  ] when drop ]
+        [ BUTTON_SHIFT bitand 0 = not [ t >>shift ] when drop ]
+        [ BUTTON_ALT   bitand 0 = not [ t >>alt   ] when drop ]
+    } 2cleave ;
+
+: <mouse-event> ( MEVENT -- mouse-event )
+    [ mouse-event new ] dip {
+        [ id>> >>id drop ]
+        [ y>> >>y drop ]
+        [ x>> >>x drop ]
+        [ bstate>> fill-in-bstate ]
+        [ drop ]
+    } 2cleave ;
+
+PRIVATE>
+
+: getmouse ( -- mouse-event/f )
+    [
+        ffi:MEVENT malloc-struct &free
+        dup ffi:getmouse
+        ffi:ERR = [ drop f ] [ <mouse-event> ] if
+    ] with-destructors ;
+
 : mousemask ( mask -- newmask oldmask )
     0 <ulong> [ ffi:mousemask ] keep *ulong ;
-
-: getmouse ( -- MEVENT/f )
-    ffi:MEVENT <struct> dup ffi:getmouse
-    ffi:ERR = [ drop f ] when ;

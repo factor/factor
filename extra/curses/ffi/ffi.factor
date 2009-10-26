@@ -258,7 +258,7 @@ FUNCTION: int wattron ( WINDOW* win, int attrs ) ;
 FUNCTION: int wattroff ( WINDOW* win, int attrs ) ;
 FUNCTION: int wattrset ( WINDOW* win, int attrs ) ;
 
-: NCURSES_MOUSE_MASK ( b m -- mask ) swap 1 - 5 * shift ; inline
+: NCURSES_MOUSE_MASK ( b m -- mask ) swap 1 - 6 * shift ; inline
 
 CONSTANT: NCURSES_BUTTON_RELEASED OCT: 01
 CONSTANT: NCURSES_BUTTON_PRESSED  OCT: 02
