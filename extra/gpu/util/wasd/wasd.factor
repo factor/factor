@@ -49,6 +49,9 @@ M: wasd-world wasd-fly-vertically? drop t ;
 : wasd-p-matrix ( world -- matrix )
     p-matrix>> ;
 
+: <mvp-uniforms> ( world -- uniforms )
+    [ wasd-mv-matrix ] [ wasd-p-matrix ] bi mvp-uniforms boa ;
+
 CONSTANT: fov 0.7
 
 :: generate-p-matrix ( world -- matrix )
@@ -107,12 +110,12 @@ CONSTANT: fov 0.7
 
 :: wasd-keyboard-input ( world -- )
     read-keyboard keys>> :> keys
-    key-w keys nth key-, keys nth or [ world walk-forward   ] when 
-    key-s keys nth key-o keys nth or [ world walk-backward  ] when 
-    key-a keys nth                   [ world walk-leftward  ] when 
-    key-d keys nth key-e keys nth or [ world walk-rightward ] when 
+    key-w keys nth [ world walk-forward   ] when 
+    key-s keys nth [ world walk-backward  ] when 
+    key-a keys nth [ world walk-leftward  ] when 
+    key-d keys nth [ world walk-rightward ] when 
     key-space keys nth [ world walk-upward ] when 
-    key-c keys nth key-j keys nth or [ world walk-downward ] when 
+    key-c keys nth [ world walk-downward ] when 
     key-escape keys nth [ world close-window ] when ;
 
 : wasd-mouse-input ( world -- )
