@@ -11,14 +11,14 @@ struct factor_vm
 	context *ctx;
 	
 	/* New objects are allocated here */
-	zone nursery;
+	nursery_space nursery;
 
 	/* Add this to a shifted address to compute write barrier offsets */
 	cell cards_offset;
 	cell decks_offset;
 
 	/* TAGGED user environment data; see getenv/setenv prims */
-	cell userenv[USER_ENV];
+	cell special_objects[special_object_count];
 
 	/* Data stack and retain stack sizes */
 	cell ds_size, rs_size;
@@ -39,15 +39,15 @@ struct factor_vm
 	unsigned int signal_fpu_status;
 	stack_frame *signal_callstack_top;
 
-	/* Zeroes out deallocated memory; set by the -securegc command line argument */
-	bool secure_gc;
-
 	/* A heap walk allows useful things to be done, like finding all
 	   references to an object for debugging purposes. */
 	cell heap_scan_ptr;
 
 	/* GC is off during heap walking */
 	bool gc_off;
+
+	/* GC logging */
+	bool verbosegc;
 
 	/* Data heap */
 	data_heap *data;
@@ -220,15 +220,9 @@ struct factor_vm
 
 	//data heap
 	void init_card_decks();
-	void clear_cards(old_space *gen);
-	void clear_decks(old_space *gen);
-	void reset_generation(old_space *gen);
 	void set_data_heap(data_heap *data_);
-	void init_data_heap(cell young_size, cell aging_size, cell tenured_size, bool secure_gc_);
-	cell untagged_object_size(object *pointer);
-	cell unaligned_object_size(object *pointer);
+	void init_data_heap(cell young_size, cell aging_size, cell tenured_size);
 	void primitive_size();
-	cell binary_payload_start(object *pointer);
 	void primitive_data_room();
 	void begin_scan();
 	void end_scan();
@@ -253,11 +247,12 @@ struct factor_vm
 	void collect_nursery();
 	void collect_aging();
 	void collect_to_tenured();
-	void collect_full_impl(bool trace_contexts_p);
-	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p, bool compact_code_heap_p);
-	void collect_full(bool trace_contexts_p, bool compact_code_heap_p);
+	void collect_mark_impl(bool trace_contexts_p);
+	void collect_sweep_impl();
+	void collect_compact_impl(bool trace_contexts_p);
+	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p);
 	void record_gc_stats(generation_statistics *stats);
-	void gc(gc_op op, cell requested_bytes, bool trace_contexts_p, bool compact_code_heap_p);
+	void gc(gc_op op, cell requested_bytes, bool trace_contexts_p);
 	void primitive_minor_gc();
 	void primitive_full_gc();
 	void primitive_compact_gc();
@@ -285,20 +280,8 @@ struct factor_vm
 	#endif
 	}
 
-	inline void check_tagged_pointer(cell tagged)
-	{
-	#ifdef FACTOR_DEBUG
-		if(!immediate_p(tagged))
-		{
-			object *obj = untag<object>(tagged);
-			check_data_pointer(obj);
-			obj->h.hi_tag();
-		}
-	#endif
-	}
-
 	// generic arrays
-	template<typename Array> Array *allot_array_internal(cell capacity);
+	template<typename Array> Array *allot_uninitialized_array(cell capacity);
 	template<typename Array> bool reallot_array_in_place_p(Array *array, cell capacity);
 	template<typename Array> Array *reallot_array(Array *array_, cell capacity);
 
@@ -316,7 +299,7 @@ struct factor_vm
 	void print_callstack();
 	void dump_cell(cell x);
 	void dump_memory(cell from, cell to);
-	void dump_zone(const char *name, zone *z);
+	template<typename Generation> void dump_generation(const char *name, Generation *gen);
 	void dump_generations();
 	void dump_objects(cell type);
 	void find_data_references_step(cell *scan);
@@ -335,7 +318,7 @@ struct factor_vm
 	inline void set_array_nth(array *array, cell slot, cell value);
 
 	//strings
-	cell string_nth(string* str, cell index);
+	cell string_nth(const string *str, cell index);
 	void set_string_nth_fast(string *str, cell index, cell ch);
 	void set_string_nth_slow(string *str_, cell index, cell ch);
 	void set_string_nth(string *str, cell index, cell ch);
@@ -370,7 +353,7 @@ struct factor_vm
 	word *allot_word(cell name_, cell vocab_, cell hashcode_);
 	void primitive_word();
 	void primitive_word_xt();
-	void update_word_xt(cell w_);
+	void update_word_xt(word *w_);
 	void primitive_optimized_p();
 	void primitive_wrapper();
 
@@ -458,8 +441,9 @@ struct factor_vm
 	inline double untag_float_check(cell tagged);
 	inline fixnum float_to_fixnum(cell tagged);
 	inline double fixnum_to_float(cell tagged);
+
+	// tagged
 	template<typename Type> Type *untag_check(cell value);
-	template<typename Type> Type *untag(cell value);
 
 	//io
 	void init_c_io();
@@ -494,12 +478,12 @@ struct factor_vm
 	void update_literal_references(code_block *compiled);
 	void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled);
 	void update_word_references(code_block *compiled);
-	void update_code_block_for_full_gc(code_block *compiled);
+	void update_code_block_words_and_literals(code_block *compiled);
 	void check_code_address(cell address);
 	void relocate_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
-	code_block *allot_code_block(cell size, cell type);
-	code_block *add_code_block(cell type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_);
+	code_block *allot_code_block(cell size, code_block_type type);
+	code_block *add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_);
 
 	//code heap
 	inline void check_code_pointer(cell ptr)
@@ -513,26 +497,16 @@ struct factor_vm
 	bool in_code_heap_p(cell ptr);
 	void jit_compile_word(cell word_, cell def_, bool relocate);
 	void update_code_heap_words();
+	void update_code_heap_words_and_literals();
+	void relocate_code_heap();
 	void primitive_modify_code_heap();
 	void primitive_code_room();
-	void forward_object_xts();
-	void forward_context_xts();
-	void forward_callback_xts();
-	void compact_code_heap(bool trace_contexts_p);
 	void primitive_strip_stack_traces();
 
 	/* Apply a function to every code block */
 	template<typename Iterator> void iterate_code_heap(Iterator &iter)
 	{
-		heap_block *scan = code->first_block();
-		heap_block *end = code->last_block();
-
-		while(scan != end)
-		{
-			if(scan->type() != FREE_BLOCK_TYPE)
-				iter((code_block *)scan);
-			scan = scan->next();
-		}
+		code->allocator->iterate(iter);
 	}
 
 	//callbacks
@@ -567,7 +541,7 @@ struct factor_vm
 	void primitive_callstack();
 	void primitive_set_callstack();
 	code_block *frame_code(stack_frame *frame);
-	cell frame_type(stack_frame *frame);
+	code_block_type frame_type(stack_frame *frame);
 	cell frame_executing(stack_frame *frame);
 	stack_frame *frame_successor(stack_frame *frame);
 	cell frame_scan(stack_frame *frame);
@@ -586,7 +560,7 @@ struct factor_vm
 	template<typename Iterator> void do_slots(cell obj, Iterator &iter)
 	{
 		cell scan = obj;
-		cell payload_start = binary_payload_start((object *)obj);
+		cell payload_start = ((object *)obj)->binary_payload_start();
 		cell end = obj + payload_start;
 
 		scan += sizeof(cell);
@@ -690,17 +664,12 @@ struct factor_vm
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);
 	bool windows_stat(vm_char *path);
 
-   #if defined(WINNT)
+  #if defined(WINNT)
 	void open_console();
 	LONG exception_handler(PEXCEPTION_POINTERS pe);
- 	// next method here:
-   #endif
+  #endif
   #else  // UNIX
-	void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap);
-	void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap);
-	void fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap);
-	stack_frame *uap_stack_pointer(void *uap);
-
+	void dispatch_signal(void *uap, void (handler)());
   #endif
 
   #ifdef __APPLE__
@@ -711,6 +680,6 @@ struct factor_vm
 
 };
 
-extern unordered_map<THREADHANDLE, factor_vm *> thread_vms;
+extern std::map<THREADHANDLE, factor_vm *> thread_vms;
 
 }

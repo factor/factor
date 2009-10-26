@@ -218,7 +218,7 @@ HELP: 3sequence
 { $description "Creates a three-element sequence of the same type as " { $snippet "exemplar" } "." } ;
 
 HELP: 4sequence
-{ $values { "obj1" object } { "obj2" object } { "exemplar" sequence } { "obj3" object } { "obj4" object } { "seq" sequence } }
+{ $values { "obj1" object } { "obj2" object } { "obj3" object } { "obj4" object } { "exemplar" sequence } { "seq" sequence } }
 { $description "Creates a four-element sequence of the same type as " { $snippet "exemplar" } "." } ;
 
 HELP: first2
@@ -277,7 +277,7 @@ HELP: reduce-index
 } } ;
 
 HELP: accumulate-as
-{ $values { "identity" object } { "seq" sequence } { "quot" { $quotation "( prev elt -- next )" } } { "exemplar" sequence } { "final" "the final result" } { "newseq" "a new sequence" } }
+{ $values { "seq" sequence } { "identity" object } { "quot" { $quotation "( prev elt -- next )" } } { "exemplar" sequence } { "final" "the final result" } { "newseq" "a new sequence" } }
 { $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of the same type as " { $snippet "exemplar" } " containing intermediate results, together with the final result."
 $nl
 "The first element of the new sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the old sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the old sequence."
@@ -285,7 +285,7 @@ $nl
 "When given the empty sequence, outputs an empty sequence together with the " { $snippet "identity" } "." } ;
 
 HELP: accumulate
-{ $values { "identity" object } { "seq" sequence } { "quot" { $quotation "( prev elt -- next )" } } { "final" "the final result" } { "newseq" "a new array" } }
+{ $values { "seq" sequence } { "identity" object } { "quot" { $quotation "( prev elt -- next )" } } { "final" "the final result" } { "newseq" "a new array" } }
 { $description "Combines successive elements of the sequence using a binary operation, and outputs an array of intermediate results, together with the final result."
 $nl
 "The first element of the new sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the old sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the old sequence."
@@ -300,7 +300,7 @@ HELP: map
 { $description "Applies the quotation to each element of the sequence in order. The new elements are collected into a sequence of the same class as the input sequence." } ;
 
 HELP: map-as
-{ $values { "seq" sequence } { "quot" { $quotation "( old -- new )" } } { "newseq" "a new sequence" } { "exemplar" sequence } }
+{ $values { "seq" sequence } { "quot" { $quotation "( old -- new )" } } { "exemplar" sequence } { "newseq" "a new sequence" } }
 { $description "Applies the quotation to each element of the sequence in order. The new elements are collected into a sequence of the same class as " { $snippet "exemplar" } "." }
 { $examples
     "The following example converts a string into an array of one-element strings:"
@@ -426,6 +426,10 @@ HELP: filter
 { $values { "seq" sequence } { "quot" { $quotation "( elt -- ? )" } } { "subseq" "a new sequence" } }
 { $description "Applies the quotation to each element in turn, and outputs a new sequence containing the elements of the original sequence for which the quotation output a true value." } ;
 
+HELP: filter-as
+{ $values { "seq" sequence } { "quot" { $quotation "( elt -- ? )" } } { "exemplar" sequence } { "subseq" "a new sequence" } }
+{ $description "Applies the quotation to each element in turn, and outputs a new sequence of the same type as " { $snippet "exemplar" } " containing the elements of the original sequence for which the quotation output a true value." } ;
+
 HELP: filter-here
 { $values { "seq" "a resizable mutable sequence" } { "quot" { $quotation "( elt -- ? )" } } }
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a false value." }
@@ -483,7 +487,7 @@ HELP: remove-nth
 } } ;
 
 HELP: move
-{ $values { "from" "an index in " { $snippet "seq" } } { "to" "an index in " { $snippet "seq" } } { "seq" "a mutable sequence" } }
+{ $values { "to" "an index in " { $snippet "seq" } } { "from" "an index in " { $snippet "seq" } } { "seq" "a mutable sequence" } }
 { $description "Sets the element with index " { $snippet "m" } " to the element with index " { $snippet "n" } "." }
 { $side-effects "seq" } ;
 
@@ -510,7 +514,7 @@ HELP: delete-slice
 { $side-effects "seq" } ;
 
 HELP: replace-slice
-{ $values { "new" sequence } { "seq" sequence } { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq'" sequence } }
+{ $values { "new" sequence } { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } { "seq'" sequence } }
 { $description "Replaces a range of elements beginning at index " { $snippet "from" } " and ending before index " { $snippet "to" } " with a new sequence." }
 { $errors "Throws an error if " { $snippet "new" } " contains elements whose types are not permissible in " { $snippet "seq" } "." } ;
 
@@ -1512,6 +1516,7 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 "Filtering:"
 { $subsections
     filter
+    filter-as
     partition
 }
 "Testing if a sequence contains elements satisfying a predicate:"

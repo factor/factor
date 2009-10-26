@@ -5,22 +5,24 @@ namespace factor
 
 void fatal_error(const char *msg, cell tagged)
 {
-	print_string("fatal_error: "); print_string(msg);
-	print_string(": "); print_cell_hex(tagged); nl();
+	std::cout << "fatal_error: " << msg;
+	std::cout << ": " << std::hex << tagged << std::dec;
+	std::cout << std::endl;
 	exit(1);
 }
 
 void critical_error(const char *msg, cell tagged)
 {
-	print_string("You have triggered a bug in Factor. Please report.\n");
-	print_string("critical_error: "); print_string(msg);
-	print_string(": "); print_cell_hex(tagged); nl();
+	std::cout << "You have triggered a bug in Factor. Please report.\n";
+	std::cout << "critical_error: " << msg;
+	std::cout << ": " << std::hex << tagged << std::dec;
+	std::cout << std::endl;
 	tls_vm()->factorbug();
 }
 
 void out_of_memory()
 {
-	print_string("Out of memory\n\n");
+	std::cout << "Out of memory\n\n";
 	tls_vm()->dump_generations();
 	exit(1);
 }
@@ -29,7 +31,7 @@ void factor_vm::throw_error(cell error, stack_frame *callstack_top)
 {
 	/* If the error handler is set, we rewind any C stack frames and
 	pass the error to user-space. */
-	if(!current_gc && to_boolean(userenv[BREAK_ENV]))
+	if(!current_gc && to_boolean(special_objects[OBJ_BREAK]))
 	{
 		/* If error was thrown during heap scan, we re-enable the GC */
 		gc_off = false;
@@ -53,23 +55,23 @@ void factor_vm::throw_error(cell error, stack_frame *callstack_top)
 		else
 			callstack_top = ctx->callstack_top;
 
-		throw_impl(userenv[BREAK_ENV],callstack_top,this);
+		throw_impl(special_objects[OBJ_BREAK],callstack_top,this);
 	}
 	/* Error was thrown in early startup before error handler is set, just
 	crash. */
 	else
 	{
-		print_string("You have triggered a bug in Factor. Please report.\n");
-		print_string("early_error: ");
+		std::cout << "You have triggered a bug in Factor. Please report.\n";
+		std::cout << "early_error: ";
 		print_obj(error);
-		nl();
+		std::cout << std::endl;
 		factorbug();
 	}
 }
 
 void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2, stack_frame *callstack_top)
 {
-	throw_error(allot_array_4(userenv[ERROR_ENV],
+	throw_error(allot_array_4(special_objects[OBJ_ERROR],
 		tag_fixnum(error),arg1,arg2),callstack_top);
 }
 
@@ -112,7 +114,7 @@ void factor_vm::memory_protection_error(cell addr, stack_frame *native_stack)
 
 void factor_vm::signal_error(int signal, stack_frame *native_stack)
 {
-	general_error(ERROR_SIGNAL,tag_fixnum(signal),false_object,native_stack);
+	general_error(ERROR_SIGNAL,allot_cell(signal),false_object,native_stack);
 }
 
 void factor_vm::divide_by_zero_error()

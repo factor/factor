@@ -187,21 +187,21 @@ void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index, cell cac
 	emit_class_lookup(index,PIC_HI_TAG_TUPLE);
 
 	/* Do a cache lookup. */
-	emit_with(parent->userenv[MEGA_LOOKUP],cache.value());
+	emit_with(parent->special_objects[MEGA_LOOKUP],cache.value());
 	
 	/* If we end up here, the cache missed. */
-	emit(parent->userenv[JIT_PROLOG]);
+	emit(parent->special_objects[JIT_PROLOG]);
 
 	/* Push index, method table and cache on the stack. */
 	push(methods.value());
 	push(tag_fixnum(index));
 	push(cache.value());
-	word_call(parent->userenv[MEGA_MISS_WORD]);
+	word_call(parent->special_objects[MEGA_MISS_WORD]);
 
 	/* Now the new method has been stored into the cache, and its on
 	   the stack. */
-	emit(parent->userenv[JIT_EPILOG]);
-	emit(parent->userenv[JIT_EXECUTE_JUMP]);
+	emit(parent->special_objects[JIT_EPILOG]);
+	emit(parent->special_objects[JIT_EXECUTE_JUMP]);
 }
 
 }

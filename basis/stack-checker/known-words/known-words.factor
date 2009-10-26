@@ -507,10 +507,10 @@ M: bad-executable summary
 
 \ (save-image-and-exit) { byte-array } { } define-primitive
 
-\ data-room { } { integer integer array } define-primitive
+\ data-room { } { array } define-primitive
 \ data-room make-flushable
 
-\ code-room { } { integer integer integer integer } define-primitive
+\ code-room { } { array } define-primitive
 \ code-room  make-flushable
 
 \ micros { } { integer } define-primitive

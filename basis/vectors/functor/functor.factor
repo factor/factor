@@ -24,6 +24,8 @@ M: V new-sequence drop [ <A> ] [ >fixnum ] bi V boa ; inline
 
 M: A new-resizable drop <V> ; inline
 
+M: V new-resizable drop <V> ; inline
+
 M: V equal? over V instance? [ sequence= ] [ 2drop f ] if ;
 
 : >V ( seq -- vector ) V new clone-like ; inline

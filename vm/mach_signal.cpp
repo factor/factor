@@ -47,7 +47,7 @@ void factor_vm::call_fault_handler(
 	else
 		signal_callstack_top = NULL;
 
-	MACH_STACK_POINTER(thread_state) = fix_stack_pointer(MACH_STACK_POINTER(thread_state));
+	MACH_STACK_POINTER(thread_state) = align_stack_pointer(MACH_STACK_POINTER(thread_state));
 
 	/* Now we point the program counter at the right handler function. */
 	if(exception == EXC_BAD_ACCESS)
@@ -63,7 +63,13 @@ void factor_vm::call_fault_handler(
 	}
 	else
 	{
-		signal_number = (exception == EXC_ARITHMETIC ? SIGFPE : SIGABRT);
+		switch(exception)
+		{
+		case EXC_ARITHMETIC: signal_number = SIGFPE; break;
+		case EXC_BAD_INSTRUCTION: signal_number = SIGILL; break;
+		default: signal_number = SIGABRT; break;
+		}
+
 		MACH_PROGRAM_COUNTER(thread_state) = (cell)factor::misc_signal_handler_impl;
 	}
 }
@@ -78,7 +84,7 @@ static void call_fault_handler(
 {
 	THREADHANDLE thread_id = pthread_from_mach_thread_np(thread);
 	assert(thread_id);
-	unordered_map<THREADHANDLE, factor_vm*>::const_iterator vm = thread_vms.find(thread_id);
+	std::map<THREADHANDLE, factor_vm*>::const_iterator vm = thread_vms.find(thread_id);
 	if (vm != thread_vms.end())
 	    vm->second->call_fault_handler(exception,code,exc_state,thread_state,float_state);
 }
@@ -226,7 +232,7 @@ void mach_initialize ()
 		fatal_error("mach_port_insert_right() failed",0);
 
 	/* The exceptions we want to catch. */
-	mask = EXC_MASK_BAD_ACCESS | EXC_MASK_ARITHMETIC;
+	mask = EXC_MASK_BAD_ACCESS | EXC_MASK_BAD_INSTRUCTION | EXC_MASK_ARITHMETIC;
 
 	/* Create the thread listening on the exception port.  */
 	start_thread(mach_exception_thread,NULL);

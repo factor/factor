@@ -25,10 +25,7 @@ void factor_vm::record_gc_stats(generation_statistics *stats)
 		stats->max_gc_time = gc_elapsed;
 }
 
-void factor_vm::gc(gc_op op,
-	cell requested_bytes,
-	bool trace_contexts_p,
-	bool compact_code_heap_p)
+void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 {
 	assert(!gc_off);
 	assert(!current_gc);
@@ -36,6 +33,9 @@ void factor_vm::gc(gc_op op,
 	save_stacks();
 
 	current_gc = new gc_state(op);
+
+	if(verbosegc)
+		std::cout << "GC requested, op=" << op << std::endl;
 
 	/* Keep trying to GC higher and higher generations until we don't run out
 	of space */
@@ -54,12 +54,16 @@ void factor_vm::gc(gc_op op,
 			current_gc->op = collect_full_op;
 			break;
 		case collect_full_op:
+		case collect_compact_op:
 			current_gc->op = collect_growing_heap_op;
 			break;
 		default:
-			critical_error("Bad GC op\n",op);
+			critical_error("Bad GC op",current_gc->op);
 			break;
 		}
+
+		if(verbosegc)
+			std::cout << "GC rewind, op=" << current_gc->op << std::endl;
 	}
 
 	switch(current_gc->op)
@@ -77,17 +81,27 @@ void factor_vm::gc(gc_op op,
 		record_gc_stats(&gc_stats.aging_stats);
 		break;
 	case collect_full_op:
-		collect_full(trace_contexts_p,compact_code_heap_p);
+		collect_mark_impl(trace_contexts_p);
+		collect_sweep_impl();
+		update_code_heap_words_and_literals();
+		record_gc_stats(&gc_stats.full_stats);
+		break;
+	case collect_compact_op:
+		collect_mark_impl(trace_contexts_p);
+		collect_compact_impl(trace_contexts_p);
 		record_gc_stats(&gc_stats.full_stats);
 		break;
 	case collect_growing_heap_op:
-		collect_growing_heap(requested_bytes,trace_contexts_p,compact_code_heap_p);
+		collect_growing_heap(requested_bytes,trace_contexts_p);
 		record_gc_stats(&gc_stats.full_stats);
 		break;
 	default:
-		critical_error("Bad GC op\n",op);
+		critical_error("Bad GC op\n",current_gc->op);
 		break;
 	}
+
+	if(verbosegc)
+		std::cout << "GC done, op=" << current_gc->op << std::endl;
 
 	delete current_gc;
 	current_gc = NULL;
@@ -97,24 +111,21 @@ void factor_vm::primitive_minor_gc()
 {
 	gc(collect_nursery_op,
 		0, /* requested size */
-		true, /* trace contexts? */
-		false /* compact code heap? */);
+		true /* trace contexts? */);
 }
 
 void factor_vm::primitive_full_gc()
 {
 	gc(collect_full_op,
 		0, /* requested size */
-		true, /* trace contexts? */
-		false /* compact code heap? */);
+		true /* trace contexts? */);
 }
 
 void factor_vm::primitive_compact_gc()
 {
-	gc(collect_full_op,
+	gc(collect_compact_op,
 		0, /* requested size */
-		true, /* trace contexts? */
-		true /* compact code heap? */);
+		true /* trace contexts? */);
 }
 
 void factor_vm::add_gc_stats(generation_statistics *stats, growable_array *result)
@@ -222,7 +233,7 @@ object *factor_vm::allot_object(header header, cell size)
 
 	/* If the object is smaller than the nursery, allocate it in the nursery,
 	after a GC if needed */
-	if(nursery.size > size)
+	if(size < nursery.size)
 	{
 		/* If there is insufficient room, collect the nursery */
 		if(nursery.here + size > nursery.end)
@@ -230,21 +241,20 @@ object *factor_vm::allot_object(header header, cell size)
 
 		obj = nursery.allot(size);
 	}
-	/* If the object is bigger than the nursery, allocate it in
-	tenured space */
 	else
 	{
-		/* If tenured space does not have enough room, collect */
-		if(data->tenured->here + size > data->tenured->end)
-			primitive_full_gc();
-
-		/* If it still won't fit, grow the heap */
-		if(data->tenured->here + size > data->tenured->end)
+		/* If tenured space does not have enough room, collect and compact */
+		if(!data->tenured->can_allot_p(size))
 		{
-			gc(collect_growing_heap_op,
-				size, /* requested size */
-				true, /* trace contexts? */
-				false /* compact code heap? */);
+			primitive_compact_gc();
+
+			/* If it still won't fit, grow the heap */
+			if(!data->tenured->can_allot_p(size))
+			{
+				gc(collect_growing_heap_op,
+					size, /* requested size */
+					true /* trace contexts? */);
+			}
 		}
 
 		obj = data->tenured->allot(size);

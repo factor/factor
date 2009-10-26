@@ -16,6 +16,8 @@ IN: peg.ebnf
 
 ERROR: no-rule rule parser ;
 
+<PRIVATE
+
 : lookup-rule ( rule parser -- rule' )
     2dup rule [ 2nip ] [ no-rule ] if* ; 
 
@@ -539,6 +541,8 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
 : ebnf>quot ( string -- hashtable quot )
   parse-ebnf dup dup parser [ main swap at compile ] with-variable
   [ compiled-parse ] curry [ with-scope ast>> ] curry ;
+
+PRIVATE>
 
 SYNTAX: <EBNF
   "EBNF>"

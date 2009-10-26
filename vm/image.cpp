@@ -6,7 +6,7 @@ namespace factor
 /* Certain special objects in the image are known to the runtime */
 void factor_vm::init_objects(image_header *h)
 {
-	memcpy(userenv,h->userenv,sizeof(userenv));
+	memcpy(special_objects,h->special_objects,sizeof(special_objects));
 
 	true_object = h->true_object;
 	bignum_zero = h->bignum_zero;
@@ -16,15 +16,11 @@ void factor_vm::init_objects(image_header *h)
 
 void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 {
-	cell good_size = h->data_size + (1 << 20);
-
-	if(good_size > p->tenured_size)
-		p->tenured_size = good_size;
+	p->tenured_size = std::max((h->data_size * 3) / 2,p->tenured_size);
 
 	init_data_heap(p->young_size,
 		p->aging_size,
-		p->tenured_size,
-		p->secure_gc);
+		p->tenured_size);
 
 	clear_gc_stats();
 
@@ -32,15 +28,12 @@ void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 
 	if((cell)bytes_read != h->data_size)
 	{
-		print_string("truncated image: ");
-		print_fixnum(bytes_read);
-		print_string(" bytes read, ");
-		print_cell(h->data_size);
-		print_string(" bytes expected\n");
+		std::cout << "truncated image: " << bytes_read << " bytes read, ";
+		std::cout << h->data_size << " bytes expected\n";
 		fatal_error("load_data_heap failed",0);
 	}
 
-	data->tenured->here = data->tenured->start + h->data_size;
+	data->tenured->initial_free_list(h->data_size);
 }
 
 void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
@@ -52,19 +45,16 @@ void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 
 	if(h->code_size != 0)
 	{
-		size_t bytes_read = fread(code->first_block(),1,h->code_size,file);
+		size_t bytes_read = fread(code->allocator->first_block(),1,h->code_size,file);
 		if(bytes_read != h->code_size)
 		{
-			print_string("truncated image: ");
-			print_fixnum(bytes_read);
-			print_string(" bytes read, ");
-			print_cell(h->code_size);
-			print_string(" bytes expected\n");
+			std::cout << "truncated image: " << bytes_read << " bytes read, ";
+			std::cout << h->code_size << " bytes expected\n";
 			fatal_error("load_code_heap failed",0);
 		}
 	}
 
-	code->build_free_list(h->code_size);
+	code->allocator->initial_free_list(h->code_size);
 }
 
 void factor_vm::data_fixup(cell *handle, cell data_relocation_base)
@@ -155,7 +145,7 @@ void factor_vm::relocate_object(object *object,
 		data_fixup(&t->layout,data_relocation_base);
 
 		cell *scan = t->data();
-		cell *end = (cell *)((cell)object + untagged_object_size(object));
+		cell *end = (cell *)((cell)object + object->size());
 
 		for(; scan < end; scan++)
 			data_fixup(scan,data_relocation_base);
@@ -190,8 +180,8 @@ void factor_vm::relocate_object(object *object,
 where it is loaded, we need to fix up pointers in the image. */
 void factor_vm::relocate_data(cell data_relocation_base, cell code_relocation_base)
 {
-	for(cell i = 0; i < USER_ENV; i++)
-		data_fixup(&userenv[i],data_relocation_base);
+	for(cell i = 0; i < special_object_count; i++)
+		data_fixup(&special_objects[i],data_relocation_base);
 
 	data_fixup(&true_object,data_relocation_base);
 	data_fixup(&bignum_zero,data_relocation_base);
@@ -203,8 +193,8 @@ void factor_vm::relocate_data(cell data_relocation_base, cell code_relocation_ba
 	while(obj)
 	{
 		relocate_object((object *)obj,data_relocation_base,code_relocation_base);
-		data->tenured->record_object_start_offset((object *)obj);
-		obj = data->tenured->next_object_after(this,obj);
+		data->tenured->starts.record_object_start_offset((object *)obj);
+		obj = data->tenured->next_object_after(obj);
 	}
 }
 
@@ -222,10 +212,10 @@ struct code_block_fixupper {
 	factor_vm *parent;
 	cell data_relocation_base;
 
-	code_block_fixupper(factor_vm *parent_, cell data_relocation_base_) :
+	explicit code_block_fixupper(factor_vm *parent_, cell data_relocation_base_) :
 		parent(parent_), data_relocation_base(data_relocation_base_) { }
 
-	void operator()(code_block *compiled)
+	void operator()(code_block *compiled, cell size)
 	{
 		parent->fixup_code_block(compiled,data_relocation_base);
 	}
@@ -244,8 +234,8 @@ void factor_vm::load_image(vm_parameters *p)
 	FILE *file = OPEN_READ(p->image_path);
 	if(file == NULL)
 	{
-		print_string("Cannot open image file: "); print_native_string(p->image_path); nl();
-		print_string(strerror(errno)); nl();
+		std::cout << "Cannot open image file: " << p->image_path << std::endl;
+		std::cout << strerror(errno) << std::endl;
 		exit(1);
 	}
 
@@ -270,7 +260,7 @@ void factor_vm::load_image(vm_parameters *p)
 	relocate_code(h.data_relocation_base);
 
 	/* Store image path name */
-	userenv[IMAGE_ENV] = allot_alien(false_object,(cell)p->image_path);
+	special_objects[OBJ_IMAGE] = allot_alien(false_object,(cell)p->image_path);
 }
 
 /* Save the current image to disk */
@@ -282,37 +272,35 @@ bool factor_vm::save_image(const vm_char *filename)
 	file = OPEN_WRITE(filename);
 	if(file == NULL)
 	{
-		print_string("Cannot open image file: "); print_native_string(filename); nl();
-		print_string(strerror(errno)); nl();
+		std::cout << "Cannot open image file: " << filename << std::endl;
+		std::cout << strerror(errno) << std::endl;
 		return false;
 	}
 
 	h.magic = image_magic;
 	h.version = image_version;
 	h.data_relocation_base = data->tenured->start;
-	h.data_size = data->tenured->here - data->tenured->start;
+	h.data_size = data->tenured->occupied();
 	h.code_relocation_base = code->seg->start;
-	h.code_size = code->heap_size();
+	h.code_size = code->allocator->occupied();
 
 	h.true_object = true_object;
 	h.bignum_zero = bignum_zero;
 	h.bignum_pos_one = bignum_pos_one;
 	h.bignum_neg_one = bignum_neg_one;
 
-	for(cell i = 0; i < USER_ENV; i++)
-		h.userenv[i] = (save_env_p(i) ? userenv[i] : false_object);
+	for(cell i = 0; i < special_object_count; i++)
+		h.special_objects[i] = (save_env_p(i) ? special_objects[i] : false_object);
 
 	bool ok = true;
 
 	if(fwrite(&h,sizeof(image_header),1,file) != 1) ok = false;
 	if(fwrite((void*)data->tenured->start,h.data_size,1,file) != 1) ok = false;
-	if(fwrite(code->first_block(),h.code_size,1,file) != 1) ok = false;
+	if(fwrite(code->allocator->first_block(),h.code_size,1,file) != 1) ok = false;
 	if(fclose(file)) ok = false;
 
 	if(!ok)
-	{
-		print_string("save-image failed: "); print_string(strerror(errno)); nl();
-	}
+		std::cout << "save-image failed: " << strerror(errno) << std::endl;
 
 	return ok;
 }
@@ -335,14 +323,13 @@ void factor_vm::primitive_save_image_and_exit()
 	gc_root<byte_array> path(dpop(),this);
 	path.untag_check(this);
 
-	/* strip out userenv data which is set on startup anyway */
-	for(cell i = 0; i < USER_ENV; i++)
-		if(!save_env_p(i)) userenv[i] = false_object;
+	/* strip out special_objects data which is set on startup anyway */
+	for(cell i = 0; i < special_object_count; i++)
+		if(!save_env_p(i)) special_objects[i] = false_object;
 
-	gc(collect_full_op,
+	gc(collect_compact_op,
 		0, /* requested size */
-		false, /* discard objects only reachable from stacks */
-		true /* compact the code heap */);
+		false /* discard objects only reachable from stacks */);
 
 	/* Save the image */
 	if(save_image((vm_char *)(path.untagged() + 1)))

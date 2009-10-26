@@ -7,7 +7,7 @@ namespace factor
 array *factor_vm::allot_array(cell capacity, cell fill_)
 {
 	gc_root<object> fill(fill_,this);
-	gc_root<array> new_array(allot_array_internal<array>(capacity),this);
+	gc_root<array> new_array(allot_uninitialized_array<array>(capacity),this);
 
 	if(fill.value() == tag_fixnum(0))
 		memset(new_array->data(),'\0',capacity * sizeof(cell));
@@ -33,7 +33,7 @@ void factor_vm::primitive_array()
 cell factor_vm::allot_array_1(cell obj_)
 {
 	gc_root<object> obj(obj_,this);
-	gc_root<array> a(allot_array_internal<array>(1),this);
+	gc_root<array> a(allot_uninitialized_array<array>(1),this);
 	set_array_nth(a.untagged(),0,obj.value());
 	return a.value();
 }
@@ -42,7 +42,7 @@ cell factor_vm::allot_array_2(cell v1_, cell v2_)
 {
 	gc_root<object> v1(v1_,this);
 	gc_root<object> v2(v2_,this);
-	gc_root<array> a(allot_array_internal<array>(2),this);
+	gc_root<array> a(allot_uninitialized_array<array>(2),this);
 	set_array_nth(a.untagged(),0,v1.value());
 	set_array_nth(a.untagged(),1,v2.value());
 	return a.value();
@@ -54,7 +54,7 @@ cell factor_vm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
 	gc_root<object> v2(v2_,this);
 	gc_root<object> v3(v3_,this);
 	gc_root<object> v4(v4_,this);
-	gc_root<array> a(allot_array_internal<array>(4),this);
+	gc_root<array> a(allot_uninitialized_array<array>(4),this);
 	set_array_nth(a.untagged(),0,v1.value());
 	set_array_nth(a.untagged(),1,v2.value());
 	set_array_nth(a.untagged(),2,v3.value());
