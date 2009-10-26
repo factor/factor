@@ -98,7 +98,7 @@ IN: compiler.tests.low-level-ir
     V{
         T{ ##load-reference f 1 B{ 31 67 52 } }
         T{ ##unbox-any-c-ptr f 0 1 2 }
-        T{ ##alien-unsigned-1 f 0 0 }
+        T{ ##alien-unsigned-1 f 0 0 0 }
         T{ ##shl-imm f 0 0 3 }
     } compile-test-bb
 ] unit-test

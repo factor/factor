@@ -9,7 +9,7 @@ M: int-regs param-regs drop { RCX RDX R8 R9 } ;
 
 M: float-regs param-regs drop { XMM0 XMM1 XMM2 XMM3 } ;
 
-M: x86.64 reserved-area-size 4 cells ;
+M: x86.64 reserved-stack-space 4 cells ;
 
 M: x86.64 return-struct-in-registers? ( c-type -- ? )
     heap-size { 1 2 4 8 } member? ;

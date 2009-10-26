@@ -87,14 +87,17 @@ IN: compiler.tests.intrinsics
 [ 4 ] [ 12 7 [ fixnum-bitand ] compile-call ] unit-test
 [ 4 ] [ 12 [ 7 fixnum-bitand ] compile-call ] unit-test
 [ 4 ] [ [ 12 7 fixnum-bitand ] compile-call ] unit-test
+[ -16 ] [ -1 [ -16 fixnum-bitand ] compile-call ] unit-test
 
 [ 15 ] [ 12 7 [ fixnum-bitor ] compile-call ] unit-test
 [ 15 ] [ 12 [ 7 fixnum-bitor ] compile-call ] unit-test
 [ 15 ] [ [ 12 7 fixnum-bitor ] compile-call ] unit-test
+[ -1 ] [ -1 [ -16 fixnum-bitor ] compile-call ] unit-test
 
 [ 11 ] [ 12 7 [ fixnum-bitxor ] compile-call ] unit-test
 [ 11 ] [ 12 [ 7 fixnum-bitxor ] compile-call ] unit-test
 [ 11 ] [ [ 12 7 fixnum-bitxor ] compile-call ] unit-test
+[ 15 ] [ -1 [ -16 fixnum-bitxor ] compile-call ] unit-test
 
 [ f ] [ 12 7 [ fixnum< [ t ] [ f ] if ] compile-call ] unit-test
 [ f ] [ 12 [ 7 fixnum< [ t ] [ f ] if ] compile-call ] unit-test

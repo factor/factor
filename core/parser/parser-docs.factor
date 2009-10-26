@@ -188,7 +188,7 @@ HELP: parse-lines
 { $errors "Throws a " { $link lexer-error } " if the input is malformed." } ;
 
 HELP: parse-base
-{ $values { "base" "an integer between 2 and 36" } { "parsed" integer } }
+{ $values { "parsed" integer } { "base" "an integer between 2 and 36" } { "parsed" integer } }
 { $description "Reads an integer in a specific numerical base from the parser input." }
 $parsing-note ;
 

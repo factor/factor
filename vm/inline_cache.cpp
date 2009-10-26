@@ -19,15 +19,9 @@ void factor_vm::deallocate_inline_cache(cell return_address)
 	check_code_pointer((cell)old_xt);
 
 	code_block *old_block = (code_block *)old_xt - 1;
-	cell old_type = old_block->type();
 
-#ifdef FACTOR_DEBUG
-	/* The call target was either another PIC,
-	   or a compiled quotation (megamorphic stub) */
-	assert(old_type == PIC_TYPE || old_type == QUOTATION_TYPE);
-#endif
-
-	if(old_type == PIC_TYPE)
+	/* Free the old PIC since we know its unreachable */
+	if(old_block->pic_p())
 		code->code_heap_free(old_block);
 }
 
@@ -78,7 +72,7 @@ void factor_vm::update_pic_count(cell type)
 struct inline_cache_jit : public jit {
 	fixnum index;
 
-	explicit inline_cache_jit(cell generic_word_,factor_vm *vm) : jit(PIC_TYPE,generic_word_,vm) {};
+	explicit inline_cache_jit(cell generic_word_,factor_vm *vm) : jit(code_block_pic,generic_word_,vm) {};
 
 	void emit_check(cell klass);
 	void compile_inline_cache(fixnum index,
@@ -92,9 +86,9 @@ void inline_cache_jit::emit_check(cell klass)
 {
 	cell code_template;
 	if(TAG(klass) == FIXNUM_TYPE && untag_fixnum(klass) < HEADER_TYPE)
-		code_template = parent->userenv[PIC_CHECK_TAG];
+		code_template = parent->special_objects[PIC_CHECK_TAG];
 	else
-		code_template = parent->userenv[PIC_CHECK];
+		code_template = parent->special_objects[PIC_CHECK];
 
 	emit_with(code_template,klass);
 }
@@ -127,7 +121,7 @@ void inline_cache_jit::compile_inline_cache(fixnum index,
 
 		/* Yes? Jump to method */
 		cell method = array_nth(cache_entries.untagged(),i + 1);
-		emit_with(parent->userenv[PIC_HIT],method);
+		emit_with(parent->special_objects[PIC_HIT],method);
 	}
 
 	/* Generate machine code to handle a cache miss, which ultimately results in
@@ -139,7 +133,7 @@ void inline_cache_jit::compile_inline_cache(fixnum index,
 	push(methods.value());
 	push(tag_fixnum(index));
 	push(cache_entries.value());
-	word_special(parent->userenv[tail_call_p ? PIC_MISS_TAIL_WORD : PIC_MISS_WORD]);
+	word_special(parent->special_objects[tail_call_p ? PIC_MISS_TAIL_WORD : PIC_MISS_WORD]);
 }
 
 code_block *factor_vm::compile_inline_cache(fixnum index,cell generic_word_,cell methods_,cell cache_entries_,bool tail_call_p)
@@ -239,10 +233,10 @@ void *factor_vm::inline_cache_miss(cell return_address)
 	set_call_target(return_address,xt);
 
 #ifdef PIC_DEBUG
-	printf("Updated %s call site 0x%lx with 0x%lx\n",
-	       tail_call_site_p(return_address) ? "tail" : "non-tail",
-	       return_address,
-	       (cell)xt);
+	std::cout << "Updated "
+		<< (tail_call_site_p(return_address) ? "tail" : "non-tail")
+		<< " call site 0x" << std::hex << return_address << std::dec
+		<< " with " << std::hex << (cell)xt << std::dec;
 #endif
 
 	return xt;

@@ -16,36 +16,48 @@ struct tagged
 {
 	cell value_;
 
-	cell value() const { return value_; }
-	Type *untagged() const { return (Type *)(UNTAG(value_)); }
-
 	cell type() const {
 		cell tag = TAG(value_);
 		if(tag == OBJECT_TYPE)
-			return untagged()->h.hi_tag();
+			return ((object *)UNTAG(value_))->h.hi_tag();
 		else
 			return tag;
 	}
 
-	bool type_p(cell type_) const { return type() == type_; }
+	bool type_p(cell type_) const
+	{
+		return type() == type_;
+	}
+
+	bool type_p() const
+	{
+		if(Type::type_number == TYPE_COUNT)
+			return true;
+		else
+			return type_p(Type::type_number);
+	}
+
+	cell value() const {
+#ifdef FACTOR_DEBUG
+		assert(type_p());
+#endif
+		return value_;
+	}
+	Type *untagged() const {
+#ifdef FACTOR_DEBUG
+		assert(type_p());
+#endif
+		return (Type *)(UNTAG(value_));
+	}
 
 	Type *untag_check(factor_vm *parent) const {
-		if(Type::type_number != TYPE_COUNT && !type_p(Type::type_number))
+		if(!type_p())
 			parent->type_error(Type::type_number,value_);
 		return untagged();
 	}
 
-	explicit tagged(cell tagged) : value_(tagged) {
-#ifdef FACTOR_DEBUG
-		untag_check(tls_vm());
-#endif
-	}
-
-	explicit tagged(Type *untagged) : value_(factor::tag(untagged)) {
-#ifdef FACTOR_DEBUG
-		untag_check(tls_vm()); 
-#endif
-	}
+	explicit tagged(cell tagged) : value_(tagged) {}
+	explicit tagged(Type *untagged) : value_(factor::tag(untagged)) {}
 
 	Type *operator->() const { return untagged(); }
 	cell *operator&() const { return &value_; }
@@ -64,7 +76,7 @@ template<typename Type> Type *factor_vm::untag_check(cell value)
 	return tagged<Type>(value).untag_check(this);
 }
 
-template<typename Type> Type *factor_vm::untag(cell value)
+template<typename Type> Type *untag(cell value)
 {
 	return tagged<Type>(value).untagged();
 }

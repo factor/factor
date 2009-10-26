@@ -25,14 +25,14 @@ void factor_vm::collect_aging()
 		collector.trace_cards(data->tenured,
 			card_points_to_aging,
 			simple_unmarker(card_mark_mask));
-		collector.cheneys_algorithm();
+		collector.tenure_reachable_objects();
 	}
 	{
 		/* If collection fails here, do a to_tenured collection. */
 		current_gc->op = collect_aging_op;
 
 		std::swap(data->aging,data->aging_semispace);
-		reset_generation(data->aging);
+		data->reset_generation(data->aging);
 
 		aging_collector collector(this);
 
@@ -40,9 +40,10 @@ void factor_vm::collect_aging()
 		collector.trace_contexts();
 		collector.trace_code_heap_roots(&code->points_to_aging);
 		collector.cheneys_algorithm();
+
 		update_code_heap_for_minor_gc(&code->points_to_aging);
 
-		nursery.here = nursery.start;
+		data->reset_generation(&nursery);
 		code->points_to_nursery.clear();
 	}
 }

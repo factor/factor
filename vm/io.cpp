@@ -16,9 +16,9 @@ normal operation. */
 
 void factor_vm::init_c_io()
 {
-	userenv[STDIN_ENV] = allot_alien(false_object,(cell)stdin);
-	userenv[STDOUT_ENV] = allot_alien(false_object,(cell)stdout);
-	userenv[STDERR_ENV] = allot_alien(false_object,(cell)stderr);
+	special_objects[OBJ_STDIN] = allot_alien(false_object,(cell)stdin);
+	special_objects[OBJ_STDOUT] = allot_alien(false_object,(cell)stdout);
+	special_objects[OBJ_STDERR] = allot_alien(false_object,(cell)stderr);
 }
 
 void factor_vm::io_error()
@@ -88,7 +88,7 @@ void factor_vm::primitive_fread()
 		return;
 	}
 
-	gc_root<byte_array> buf(allot_array_internal<byte_array>(size),this);
+	gc_root<byte_array> buf(allot_uninitialized_array<byte_array>(size),this);
 
 	for(;;)
 	{

@@ -24,15 +24,20 @@ M: x86 vector-regs float-regs ;
 
 HOOK: stack-reg cpu ( -- reg )
 
-HOOK: reserved-area-size cpu ( -- n )
+HOOK: reserved-stack-space cpu ( -- n )
+
+HOOK: extra-stack-space cpu ( stack-frame -- n )
 
 : stack@ ( n -- op ) stack-reg swap [+] ;
 
-: param@ ( n -- op ) reserved-area-size + stack@ ;
+: special@ ( n -- op )
+    stack-frame get extra-stack-space +
+    reserved-stack-space +
+    stack@ ;
 
-: spill@ ( n -- op ) spill-offset param@ ;
+: spill@ ( n -- op ) spill-offset special@ ;
 
-: gc-root@ ( n -- op ) gc-root-offset param@ ;
+: gc-root@ ( n -- op ) gc-root-offset special@ ;
 
 : decr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap SUB ] if ;
@@ -44,7 +49,11 @@ HOOK: reserved-area-size cpu ( -- n )
     os macosx? cpu x86.64? or [ 16 align ] when ;
 
 M: x86 stack-frame-size ( stack-frame -- i )
-    (stack-frame-size) 3 cells reserved-area-size + + align-stack ;
+    [ (stack-frame-size) ]
+    [ extra-stack-space ] bi +
+    reserved-stack-space +
+    3 cells +
+    align-stack ;
 
 ! Must be a volatile register not used for parameter passing, for safe
 ! use in calls in and out of C
@@ -379,7 +388,7 @@ M: x86 %vm-field-ptr ( dst field -- )
     [ drop "nursery" %vm-field-ptr ] [ swap [] MOV ] 2bi ;
 
 : inc-allot-ptr ( nursery-ptr n -- )
-    [ [] ] dip 8 align ADD ;
+    [ [] ] dip data-alignment get align ADD ;
 
 : store-header ( temp class -- )
     [ [] ] [ type-number tag-fixnum ] bi* MOV ;
@@ -879,12 +888,12 @@ M: x86 %compare-vector ( dst src1 src2 rep cc -- )
     {
         { sse? { float-4-rep } }
         { sse2? { double-2-rep char-16-rep short-8-rep int-4-rep } }
-        { sse4.1? { longlong-2-rep } }
+        { sse4.2? { longlong-2-rep } }
     } available-reps ;
 
 M: x86 %compare-vector-reps
     {
-        { [ dup { cc= cc/= } memq? ] [ drop %compare-vector-eq-reps ] }
+        { [ dup { cc= cc/= cc/<>= cc<>= } memq? ] [ drop %compare-vector-eq-reps ] }
         [ drop %compare-vector-ord-reps ]
     } cond ;
 
@@ -1089,7 +1098,7 @@ M: x86 %min-vector ( dst src1 src2 rep -- )
 M: x86 %min-vector-reps
     {
         { sse? { float-4-rep } }
-        { sse2? { uchar-16-rep short-8-rep double-2-rep short-8-rep uchar-16-rep } }
+        { sse2? { uchar-16-rep short-8-rep double-2-rep } }
         { sse4.1? { char-16-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
@@ -1109,7 +1118,7 @@ M: x86 %max-vector ( dst src1 src2 rep -- )
 M: x86 %max-vector-reps
     {
         { sse? { float-4-rep } }
-        { sse2? { uchar-16-rep short-8-rep double-2-rep short-8-rep uchar-16-rep } }
+        { sse2? { uchar-16-rep short-8-rep double-2-rep } }
         { sse4.1? { char-16-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
@@ -1337,7 +1346,10 @@ M:: x86 %save-context ( temp1 temp2 callback-allowed? -- )
 
 M: x86 value-struct? drop t ;
 
-M: x86 small-enough? ( n -- ? )
+M: x86 immediate-arithmetic? ( n -- ? )
+    HEX: -80000000 HEX: 7fffffff between? ;
+
+M: x86 immediate-bitwise? ( n -- ? )
     HEX: -80000000 HEX: 7fffffff between? ;
 
 : next-stack@ ( n -- operand )

@@ -44,7 +44,8 @@ HELP: random-prime
 
 HELP: unique-primes
 { $values
-    { "numbits" integer } { "n" integer }
+    { "n" integer }
+    { "numbits" integer }
     { "seq" sequence }
 }
 { $description "Generates a sequence of " { $snippet "n" } " unique prime numbers with exactly " { $snippet "numbits" } " bits." } ;
