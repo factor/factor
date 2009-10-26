@@ -78,9 +78,6 @@ SYNTAX: HINTS:
     [ parse-definition { } like "specializer" set-word-prop ] tri ;
 
 ! Default specializers
-{ first first2 first3 first4 }
-[ { array } "specializer" set-word-prop ] each
-
 { last pop* pop } [
     { vector } "specializer" set-word-prop
 ] each
