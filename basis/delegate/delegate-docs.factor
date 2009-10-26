@@ -2,7 +2,7 @@ USING: help.syntax help.markup delegate.private ;
 IN: delegate
 
 HELP: define-protocol
-{ $values { "wordlist" "a sequence of words" } { "protocol" "a word for the new protocol" } }
+{ $values { "protocol" "a word for the new protocol" } { "wordlist" "a sequence of words" } }
 { $description "Defines a symbol as a protocol." }
 { $notes "Usually, " { $link POSTPONE: PROTOCOL: } " should be used instead. This is only for runtime use." } ;
 

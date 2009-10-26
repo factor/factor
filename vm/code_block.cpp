@@ -286,7 +286,7 @@ struct literal_references_updater {
 		if(parent->relocation_type_of(rel) == RT_IMMEDIATE)
 		{
 			cell offset = parent->relocation_offset_of(rel) + (cell)(compiled + 1);
-			array *literals = parent->untag<array>(compiled->literals);
+			array *literals = untag<array>(compiled->literals);
 			fixnum absolute_value = array_nth(literals,index);
 			parent->store_address_in_code_block(parent->relocation_class_of(rel),offset,absolute_value);
 		}
@@ -346,7 +346,7 @@ void factor_vm::update_word_references(code_block *compiled)
 	   are referenced after this is done. So instead of polluting
 	   the code heap with dead PICs that will be freed on the next
 	   GC, we add them to the free list immediately. */
-	else if(compiled->type() == PIC_TYPE)
+	else if(compiled->pic_p())
 		code->code_heap_free(compiled);
 	else
 	{
@@ -379,7 +379,7 @@ struct literal_and_word_references_updater {
 	}
 };
 
-void factor_vm::update_code_block_for_full_gc(code_block *compiled)
+void factor_vm::update_code_block_words_and_literals(code_block *compiled)
 {
 	if(code->needs_fixup_p(compiled))
 		relocate_code_block(compiled);
@@ -437,9 +437,9 @@ void factor_vm::fixup_labels(array *labels, code_block *compiled)
 }
 
 /* Might GC */
-code_block *factor_vm::allot_code_block(cell size, cell type)
+code_block *factor_vm::allot_code_block(cell size, code_block_type type)
 {
-	heap_block *block = code->heap_allot(size + sizeof(code_block),type);
+	code_block *block = code->allocator->allot(size + sizeof(code_block));
 
 	/* If allocation failed, do a full GC and compact the code heap.
 	A full GC that occurs as a result of the data heap filling up does not
@@ -449,27 +449,28 @@ code_block *factor_vm::allot_code_block(cell size, cell type)
 	if(block == NULL)
 	{
 		primitive_compact_gc();
-		block = code->heap_allot(size + sizeof(code_block),type);
+		block = code->allocator->allot(size + sizeof(code_block));
 
 		/* Insufficient room even after code GC, give up */
 		if(block == NULL)
 		{
 			cell used, total_free, max_free;
-			code->heap_usage(&used,&total_free,&max_free);
+			code->allocator->usage(&used,&total_free,&max_free);
 
-			print_string("Code heap stats:\n");
-			print_string("Used: "); print_cell(used); nl();
-			print_string("Total free space: "); print_cell(total_free); nl();
-			print_string("Largest free block: "); print_cell(max_free); nl();
+			std::cout << "Code heap stats:\n";
+			std::cout << "Used: " << used << "\n";
+			std::cout << "Total free space: " << total_free << "\n";
+			std::cout << "Largest free block: " << max_free << "\n";
 			fatal_error("Out of memory in add-compiled-block",0);
 		}
 	}
 
-	return (code_block *)block;
+	block->set_type(type);
+	return block;
 }
 
 /* Might GC */
-code_block *factor_vm::add_code_block(cell type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_)
+code_block *factor_vm::add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_)
 {
 	gc_root<byte_array> code(code_,this);
 	gc_root<object> labels(labels_,this);
@@ -477,7 +478,7 @@ code_block *factor_vm::add_code_block(cell type, cell code_, cell labels_, cell 
 	gc_root<byte_array> relocation(relocation_,this);
 	gc_root<array> literals(literals_,this);
 
-	cell code_length = align8(array_capacity(code.untagged()));
+	cell code_length = array_capacity(code.untagged());
 	code_block *compiled = allot_code_block(code_length,type);
 
 	compiled->owner = owner.value();

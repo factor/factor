@@ -13,7 +13,7 @@ word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 	new_word->hashcode = hashcode_;
 	new_word->vocabulary = vocab.value();
 	new_word->name = name.value();
-	new_word->def = userenv[UNDEFINED_ENV];
+	new_word->def = special_objects[OBJ_UNDEFINED];
 	new_word->props = false_object;
 	new_word->counter = tag_fixnum(0);
 	new_word->pic_def = false_object;
@@ -23,7 +23,7 @@ word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 	new_word->code = NULL;
 
 	jit_compile_word(new_word.value(),new_word->def,true);
-	update_word_xt(new_word.value());
+	update_word_xt(new_word.untagged());
 
 	if(profiling_p)
 		relocate_code_block(new_word->profiling);
@@ -59,7 +59,7 @@ void factor_vm::primitive_word_xt()
 }
 
 /* Allocates memory */
-void factor_vm::update_word_xt(cell w_)
+void factor_vm::update_word_xt(word *w_)
 {
 	gc_root<word> w(w_,this);
 
@@ -82,7 +82,8 @@ void factor_vm::update_word_xt(cell w_)
 
 void factor_vm::primitive_optimized_p()
 {
-	drepl(tag_boolean(word_optimized_p(untag_check<word>(dpeek()))));
+	word *w = untag_check<word>(dpeek());
+	drepl(tag_boolean(w->code->optimized_p()));
 }
 
 void factor_vm::primitive_wrapper()

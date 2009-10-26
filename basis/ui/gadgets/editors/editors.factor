@@ -17,6 +17,8 @@ caret-color
 caret mark
 focused? blink blink-alarm ;
 
+<PRIVATE
+
 : <loc> ( -- loc ) { 0 0 } <model> ;
 
 : init-editor-locs ( editor -- editor )
@@ -27,6 +29,8 @@ focused? blink blink-alarm ;
     COLOR: red >>caret-color
     monospace-font >>font ; inline
 
+PRIVATE>
+
 : new-editor ( class -- editor )
     new-line-gadget
         <document> >>model
@@ -35,6 +39,8 @@ focused? blink blink-alarm ;
 
 : <editor> ( -- editor )
     editor new-editor ;
+
+<PRIVATE
 
 : activate-editor-model ( editor model -- )
     [ add-connection ]
@@ -69,6 +75,8 @@ SYMBOL: blink-interval
         [ relayout-1 ]
         bi
     ] [ drop ] if ;
+
+PRIVATE>
 
 M: editor graft*
     [ dup caret>> activate-editor-model ]
@@ -142,6 +150,8 @@ M: editor ungraft*
         ] keep scroll>rect
     ] [ drop ] if ;
 
+<PRIVATE
+
 : draw-caret? ( editor -- ? )
     { [ focused?>> ] [ blink>> ] } 1&& ;
 
@@ -189,6 +199,8 @@ TUPLE: selected-line start end first? last? ;
         ] 3bi
     ] if ;
 
+PRIVATE>
+
 M: editor draw-line ( line index editor -- )
     [ selected-lines get at ] dip over
     [ draw-selected-line ] [ nip draw-unselected-line ] if ;
@@ -206,6 +218,8 @@ M: editor baseline font>> font-metrics ascent>> ;
 
 M: editor cap-height font>> font-metrics cap-height>> ;
 
+<PRIVATE
+
 : contents-changed ( model editor -- )
     [ [ nip caret>> ] [ drop ] 2bi '[ _ validate-loc ] (change-model) ]
     [ [ nip mark>> ] [ drop ] 2bi '[ _ validate-loc ] (change-model) ]
@@ -213,6 +227,8 @@ M: editor cap-height font>> font-metrics cap-height>> ;
 
 : caret/mark-changed ( editor -- )
     [ restart-blinking ] keep scroll>caret ;
+
+PRIVATE>
 
 M: editor model-changed
     {
@@ -513,6 +529,8 @@ PRIVATE>
 : change-selection ( editor quot -- )
     '[ gadget-selection @ ] [ user-input* drop ] bi ; inline
 
+<PRIVATE
+
 : join-lines ( string -- string' )
     "\n" split
     [ rest-slice [ [ blank? ] trim-head-slice ] change-each ]
@@ -520,22 +538,39 @@ PRIVATE>
     [ " " join ]
     tri ;
 
-: this-line-and-next ( document line -- start end )
-    [ nip 0 swap 2array ]
-    [ 1 + [ nip ] [ swap doc-line length ] 2bi 2array ]
-    2bi ;
-
 : last-line? ( document line -- ? )
     [ last-line# ] dip = ;
+
+: prev-line-and-this ( document line -- start end )
+    swap
+    [ drop 1 - 0 2array ]
+    [ [ drop ] [ doc-line length ] 2bi 2array ]
+    2bi ;
+
+: join-with-prev ( document line -- )
+    [ prev-line-and-this ] [ drop ] 2bi
+    [ join-lines ] change-doc-range ;
+
+: this-line-and-next ( document line -- start end )
+    swap
+    [ drop 0 2array ]
+    [ [ 1 + ] dip [ drop ] [ doc-line length ] 2bi 2array ]
+    2bi ;
+
+: join-with-next ( document line -- )
+    [ this-line-and-next ] [ drop ] 2bi
+    [ join-lines ] change-doc-range ;
+
+PRIVATE>
 
 : com-join-lines ( editor -- )
     dup gadget-selection?
     [ [ join-lines ] change-selection ] [
-        [ model>> ] [ editor-caret first ] bi
-        2dup last-line? [ 2drop ] [
-            [ this-line-and-next ] [ drop ] 2bi
-            [ join-lines ] change-doc-range
-        ] if
+        [ model>> ] [ editor-caret first ] bi {
+            { [ over last-line# 0 = ] [ 2drop ] }
+            { [ 2dup last-line? ] [ join-with-prev ] }
+            [ join-with-next ]
+        } cond
     ] if ;
 
 multiline-editor "multiline" f {
@@ -566,6 +601,8 @@ TUPLE: source-editor < multiline-editor ;
 ! Fields wrap an editor
 TUPLE: field < border editor min-cols max-cols ;
 
+<PRIVATE
+
 : field-theme ( gadget -- gadget )
     { 2 2 } >>size
     { 1 0 } >>fill
@@ -575,6 +612,8 @@ TUPLE: field < border editor min-cols max-cols ;
     { 2 2 } <border>
         { 1 0 } >>fill
         field-theme ;
+
+PRIVATE>
 
 : new-field ( class -- gadget )
     [ <editor> ] dip new-border

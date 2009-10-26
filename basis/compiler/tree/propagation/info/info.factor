@@ -340,18 +340,3 @@ SYMBOL: value-infos
         dup in-d>> last node-value-info
         literal>> first immutable-tuple-class?
     ] [ drop f ] if ;
-
-: value-info-small-fixnum? ( value-info -- ? )
-    literal>> {
-        { [ dup fixnum? ] [ tag-fixnum small-enough? ] }
-        [ drop f ]
-    } cond ;
-
-: value-info-small-tagged? ( value-info -- ? )
-    dup literal?>> [
-        literal>> {
-            { [ dup fixnum? ] [ tag-fixnum small-enough? ] }
-            { [ dup not ] [ drop t ] }
-            [ drop f ]
-        } cond
-    ] [ drop f ] if ;

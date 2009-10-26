@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: layouts namespaces kernel accessors sequences
-classes.algebra locals compiler.tree.propagation.info
-compiler.cfg.stacks compiler.cfg.hats compiler.cfg.registers
+USING: layouts namespaces kernel accessors sequences math
+classes.algebra locals combinators cpu.architecture
+compiler.tree.propagation.info compiler.cfg.stacks
+compiler.cfg.hats compiler.cfg.registers
 compiler.cfg.instructions compiler.cfg.utilities
 compiler.cfg.builder.blocks compiler.constants ;
 IN: compiler.cfg.intrinsics.slots
@@ -22,11 +23,17 @@ IN: compiler.cfg.intrinsics.slots
     [ [ second literal>> ] [ first value-tag ] bi ] bi*
     ^^slot-imm ;
 
+: immediate-slot-offset? ( value-info -- ? )
+    literal>> {
+        { [ dup fixnum? ] [ tag-fixnum immediate-arithmetic? ] }
+        [ drop f ]
+    } cond ;
+
 : emit-slot ( node -- )
     dup node-input-infos
     dup first value-tag [
         nip
-        dup second value-info-small-fixnum?
+        dup second immediate-slot-offset?
         [ (emit-slot-imm) ] [ (emit-slot) ] if
         ds-push
     ] [ drop emit-primitive ] if ;
@@ -61,7 +68,7 @@ IN: compiler.cfg.intrinsics.slots
     dup node-input-infos
     dup second value-tag [
         nip
-        dup third value-info-small-fixnum?
+        dup third immediate-slot-offset?
         [ (emit-set-slot-imm) ] [ (emit-set-slot) ] if
     ] [ drop emit-primitive ] if ;
 

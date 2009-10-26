@@ -3,7 +3,7 @@
 USING: assocs hashtables kernel sequences generic words
 arrays classes slots slots.private classes.tuple
 classes.tuple.private math vectors math.vectors quotations
-accessors combinators byte-arrays specialized-arrays ;
+accessors combinators byte-arrays vocabs vocabs.loader ;
 IN: mirrors
 
 TUPLE: mirror { object read-only } ;
@@ -53,12 +53,13 @@ INSTANCE: array             enumerated-sequence
 INSTANCE: vector            enumerated-sequence
 INSTANCE: callable          enumerated-sequence
 INSTANCE: byte-array        enumerated-sequence
-INSTANCE: specialized-array enumerated-sequence
-INSTANCE: simd-128          enumerated-sequence
-INSTANCE: simd-256          enumerated-sequence
 
 GENERIC: make-mirror ( obj -- assoc )
 M: hashtable make-mirror ;
 M: integer make-mirror drop f ;
 M: enumerated-sequence make-mirror <enum> ;
 M: object make-mirror <mirror> ;
+
+"specialized-arrays" vocab [
+    "specialized-arrays.mirrors" require
+] when

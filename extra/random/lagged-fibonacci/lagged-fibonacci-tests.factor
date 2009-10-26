@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry kernel math.functions random random.lagged-fibonacci
-sequences specialized-arrays.instances.double tools.test ;
+sequences tools.test specialized-arrays alien.c-types ;
+SPECIALIZED-ARRAY: double
 IN: random.lagged-fibonacci.tests
 
 [ t ] [

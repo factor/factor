@@ -41,6 +41,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/callstack.o \
 	vm/code_block.o \
 	vm/code_heap.o \
+	vm/compaction.o \
 	vm/contexts.o \
 	vm/data_heap.o \
 	vm/debug.o \
@@ -49,14 +50,13 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/factor.o \
 	vm/full_collector.o \
 	vm/gc.o \
-	vm/heap.o \
 	vm/image.o \
 	vm/inline_cache.o \
 	vm/io.o \
 	vm/jit.o \
 	vm/math.o \
 	vm/nursery_collector.o \
-	vm/old_space.o \
+	vm/object_start_map.o \
 	vm/primitives.o \
 	vm/profiler.o \
 	vm/quotations.o \

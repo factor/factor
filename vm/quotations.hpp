@@ -6,7 +6,7 @@ struct quotation_jit : public jit {
 	bool compiling, relocate;
 
 	explicit quotation_jit(cell quot, bool compiling_, bool relocate_, factor_vm *vm)
-		: jit(QUOTATION_TYPE,quot,vm),
+		: jit(code_block_unoptimized,quot,vm),
 		  elements(owner.as<quotation>().untagged()->array,vm),
 		  compiling(compiling_),
 		  relocate(relocate_){};

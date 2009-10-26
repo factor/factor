@@ -10,8 +10,8 @@ compiler.cfg.stacks compiler.cfg.stacks.local compiler.cfg.hats
 compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.intrinsics.alien
 specialized-arrays ;
-FROM: alien.c-types => heap-size char uchar float double ;
-SPECIALIZED-ARRAYS: float double ;
+FROM: alien.c-types => heap-size uchar ushort uint ulonglong float double ;
+SPECIALIZED-ARRAYS: uchar ushort uint ulonglong float double ;
 IN: compiler.cfg.intrinsics.simd
 
 MACRO: check-elements ( quots -- )
@@ -155,27 +155,78 @@ MACRO: if-literals-match ( quots -- )
     [ ^^not-vector ]
     [ [ ^^fill-vector ] [ ^^xor-vector ] bi ] if ;
 
-:: (generate-compare-vector) ( src1 src2 rep {cc,swap} -- dst )
+:: ((generate-compare-vector)) ( src1 src2 rep {cc,swap} -- dst )
     {cc,swap} first2 :> swap? :> cc
     swap?
     [ src2 src1 rep cc ^^compare-vector ]
     [ src1 src2 rep cc ^^compare-vector ] if ;
 
-:: generate-compare-vector ( src1 src2 rep orig-cc -- dst )
+:: (generate-compare-vector) ( src1 src2 rep orig-cc -- dst )
     rep orig-cc %compare-vector-ccs :> not? :> ccs
 
     ccs empty?
     [ rep not? [ ^^fill-vector ] [ ^^zero-vector ] if ]
     [
         ccs unclip :> first-cc :> rest-ccs
-        src1 src2 rep first-cc (generate-compare-vector) :> first-dst
+        src1 src2 rep first-cc ((generate-compare-vector)) :> first-dst
 
         rest-ccs first-dst
-        [ [ src1 src2 rep ] dip (generate-compare-vector) rep ^^or-vector ]
+        [ [ src1 src2 rep ] dip ((generate-compare-vector)) rep ^^or-vector ]
         reduce
 
         not? [ rep generate-not-vector ] when
     ] if ;
+
+: sign-bit-mask ( rep -- byte-array )
+    unsign-rep {
+        { char-16-rep [ uchar-array{
+            HEX: 80 HEX: 80 HEX: 80 HEX: 80
+            HEX: 80 HEX: 80 HEX: 80 HEX: 80
+            HEX: 80 HEX: 80 HEX: 80 HEX: 80
+            HEX: 80 HEX: 80 HEX: 80 HEX: 80
+        } underlying>> ] }
+        { short-8-rep [ ushort-array{
+            HEX: 8000 HEX: 8000 HEX: 8000 HEX: 8000
+            HEX: 8000 HEX: 8000 HEX: 8000 HEX: 8000
+        } underlying>> ] }
+        { int-4-rep [ uint-array{
+            HEX: 8000,0000 HEX: 8000,0000
+            HEX: 8000,0000 HEX: 8000,0000
+        } underlying>> ] }
+        { longlong-2-rep [ ulonglong-array{
+            HEX: 8000,0000,0000,0000
+            HEX: 8000,0000,0000,0000
+        } underlying>> ] }
+    } case ;
+
+:: (generate-minmax-compare-vector) ( src1 src2 rep orig-cc -- dst )
+    orig-cc order-cc {
+        { cc<  [ src1 src2 rep ^^max-vector src1 rep cc/= (generate-compare-vector) ] }
+        { cc<= [ src1 src2 rep ^^min-vector src1 rep cc=  (generate-compare-vector) ] }
+        { cc>  [ src1 src2 rep ^^min-vector src1 rep cc/= (generate-compare-vector) ] }
+        { cc>= [ src1 src2 rep ^^max-vector src1 rep cc=  (generate-compare-vector) ] }
+    } case ;
+
+:: generate-compare-vector ( src1 src2 rep orig-cc -- dst )
+    {
+        {
+            [ rep orig-cc %compare-vector-reps member? ]
+            [ src1 src2 rep orig-cc (generate-compare-vector) ]
+        }
+        {
+            [ rep %min-vector-reps member? ]
+            [ src1 src2 rep orig-cc (generate-minmax-compare-vector) ]
+        }
+        {
+            [ rep unsign-rep orig-cc %compare-vector-reps member? ]
+            [ 
+                rep sign-bit-mask ^^load-constant :> sign-bits
+                src1 sign-bits rep ^^xor-vector
+                src2 sign-bits rep ^^xor-vector
+                rep unsign-rep orig-cc (generate-compare-vector)
+            ]
+        }
+    } cond ;
 
 :: generate-unpack-vector-head ( src rep -- dst )
     {
@@ -264,4 +315,18 @@ MACRO: if-literals-match ( quots -- )
             sign -src src rep generate-blend-vector
         ]
     } cond ;
+
+: generate-min-vector ( src1 src2 rep -- dst )
+    dup %min-vector-reps member?
+    [ ^^min-vector ] [
+        [ cc< generate-compare-vector ]
+        [ generate-blend-vector ] 3bi
+    ] if ;
+
+: generate-max-vector ( src1 src2 rep -- dst )
+    dup %max-vector-reps member?
+    [ ^^max-vector ] [
+        [ cc> generate-compare-vector ]
+        [ generate-blend-vector ] 3bi
+    ] if ;
 

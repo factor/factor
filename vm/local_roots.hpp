@@ -6,8 +6,8 @@ struct gc_root : public tagged<Type>
 {
 	factor_vm *parent;
 
-	void push() { parent->check_tagged_pointer(tagged<Type>::value()); parent->gc_locals.push_back((cell)this); }
-	
+	void push() { parent->gc_locals.push_back((cell)this); }
+
 	explicit gc_root(cell value_,factor_vm *vm) : tagged<Type>(value_),parent(vm) { push(); }
 	explicit gc_root(Type *value_, factor_vm *vm) : tagged<Type>(value_),parent(vm) { push(); }
 

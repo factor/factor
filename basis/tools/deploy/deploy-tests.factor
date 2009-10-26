@@ -22,7 +22,7 @@ IN: tools.deploy.tests
 
 [ t ] [ "spheres" shake-and-bake 1500000 small-enough? ] unit-test
 
-[ t ] [ "terrain" shake-and-bake 1600000 small-enough? ] unit-test
+[ t ] [ "terrain" shake-and-bake 1700000 small-enough? ] unit-test
 
 [ t ] [ "bunny" shake-and-bake 2500000 small-enough? ] unit-test
 

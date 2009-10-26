@@ -1281,6 +1281,128 @@ cell 8 = [
     } value-numbering-step
 ] unit-test
 
+! NOT x AND y => x ANDN y
+
+[
+    {
+        T{ ##fill-vector f 3 float-4-rep }
+        T{ ##xor-vector  f 4 0 3 float-4-rep }
+        T{ ##andn-vector f 5 0 1 float-4-rep }
+    }
+] [
+    {
+        T{ ##fill-vector f 3 float-4-rep }
+        T{ ##xor-vector  f 4 0 3 float-4-rep }
+        T{ ##and-vector  f 5 4 1 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##not-vector  f 4 0 float-4-rep }
+        T{ ##andn-vector f 5 0 1 float-4-rep }
+    }
+] [
+    {
+        T{ ##not-vector  f 4 0 float-4-rep }
+        T{ ##and-vector  f 5 4 1 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+! x AND NOT y => y ANDN x
+
+[
+    {
+        T{ ##fill-vector f 3 float-4-rep }
+        T{ ##xor-vector  f 4 0 3 float-4-rep }
+        T{ ##andn-vector f 5 0 1 float-4-rep }
+    }
+] [
+    {
+        T{ ##fill-vector f 3 float-4-rep }
+        T{ ##xor-vector  f 4 0 3 float-4-rep }
+        T{ ##and-vector  f 5 1 4 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##not-vector  f 4 0 float-4-rep }
+        T{ ##andn-vector f 5 0 1 float-4-rep }
+    }
+] [
+    {
+        T{ ##not-vector  f 4 0 float-4-rep }
+        T{ ##and-vector  f 5 1 4 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+! NOT x ANDN y => x AND y
+
+[
+    {
+        T{ ##fill-vector f 3 float-4-rep }
+        T{ ##xor-vector  f 4 0 3 float-4-rep }
+        T{ ##and-vector  f 5 0 1 float-4-rep }
+    }
+] [
+    {
+        T{ ##fill-vector f 3 float-4-rep }
+        T{ ##xor-vector  f 4 0 3 float-4-rep }
+        T{ ##andn-vector f 5 4 1 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##not-vector  f 4 0 float-4-rep }
+        T{ ##and-vector  f 5 0 1 float-4-rep }
+    }
+] [
+    {
+        T{ ##not-vector  f 4 0 float-4-rep }
+        T{ ##andn-vector f 5 4 1 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+! AND <=> ANDN
+
+[
+    {
+        T{ ##fill-vector f 3 float-4-rep }
+        T{ ##xor-vector  f 4 0 3 float-4-rep }
+        T{ ##andn-vector f 5 0 1 float-4-rep }
+        T{ ##and-vector  f 6 0 2 float-4-rep }
+        T{ ##or-vector   f 7 5 6 float-4-rep }
+    }
+] [
+    {
+        T{ ##fill-vector f 3 float-4-rep }
+        T{ ##xor-vector  f 4 0 3 float-4-rep }
+        T{ ##and-vector  f 5 4 1 float-4-rep }
+        T{ ##andn-vector f 6 4 2 float-4-rep }
+        T{ ##or-vector   f 7 5 6 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##not-vector  f 4 0   float-4-rep }
+        T{ ##andn-vector f 5 0 1 float-4-rep }
+        T{ ##and-vector  f 6 0 2 float-4-rep }
+        T{ ##or-vector   f 7 5 6 float-4-rep }
+    }
+] [
+    {
+        T{ ##not-vector  f 4 0   float-4-rep }
+        T{ ##and-vector  f 5 4 1 float-4-rep }
+        T{ ##andn-vector f 6 4 2 float-4-rep }
+        T{ ##or-vector   f 7 5 6 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+! branch folding
+
 : test-branch-folding ( insns -- insns' n )
     <basic-block>
     [ V{ 0 1 } clone >>successors basic-block set value-numbering-step ] keep

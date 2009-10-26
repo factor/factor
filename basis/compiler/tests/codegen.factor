@@ -270,8 +270,8 @@ TUPLE: id obj ;
     { float } declare dup 0 =
     [ drop 1 ] [
         dup 0 >=
-        [ 2 "double" "libm" "pow" { "double" "double" } alien-invoke ]
-        [ -0.5 "double" "libm" "pow" { "double" "double" } alien-invoke ]
+        [ 2 double "libm" "pow" { double double } alien-invoke ]
+        [ -0.5 double "libm" "pow" { double double } alien-invoke ]
         if
     ] if ;
 

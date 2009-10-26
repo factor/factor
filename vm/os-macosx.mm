@@ -14,7 +14,7 @@ NS_DURING
 		NS_VOIDRETURN;
 NS_HANDLER
 		dpush(allot_alien(false_object,(cell)localException));
-		quot = userenv[COCOA_EXCEPTION_ENV];
+		quot = special_objects[OBJ_COCOA_EXCEPTION];
 		if(!tagged<object>(quot).type_p(QUOTATION_TYPE))
 		{
 			/* No Cocoa exception handler was registered, so

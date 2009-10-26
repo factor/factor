@@ -4,7 +4,7 @@ namespace factor
 {
 
 factor_vm *vm;
-unordered_map<THREADHANDLE, factor_vm*> thread_vms;
+std::map<THREADHANDLE, factor_vm*> thread_vms;
 
 void init_globals()
 {
@@ -32,13 +32,13 @@ void factor_vm::default_parameters(vm_parameters *p)
 	p->code_size = 8 * sizeof(cell);
 	p->young_size = sizeof(cell) / 4;
 	p->aging_size = sizeof(cell) / 2;
-	p->tenured_size = 4 * sizeof(cell);
+	p->tenured_size = 16 * sizeof(cell);
 #endif
 
 	p->max_pic_size = 3;
 
-	p->secure_gc = false;
 	p->fep = false;
+	p->verbosegc = false;
 	p->signals = true;
 
 #ifdef WINDOWS
@@ -85,9 +85,9 @@ void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **
 		else if(factor_arg(arg,STRING_LITERAL("-codeheap=%d"),&p->code_size));
 		else if(factor_arg(arg,STRING_LITERAL("-pic=%d"),&p->max_pic_size));
 		else if(factor_arg(arg,STRING_LITERAL("-callbacks=%d"),&p->callback_size));
-		else if(STRCMP(arg,STRING_LITERAL("-securegc")) == 0) p->secure_gc = true;
 		else if(STRCMP(arg,STRING_LITERAL("-fep")) == 0) p->fep = true;
 		else if(STRCMP(arg,STRING_LITERAL("-nosignals")) == 0) p->signals = false;
+		else if(STRCMP(arg,STRING_LITERAL("-verbosegc")) == 0) p->verbosegc = true;
 		else if(STRNCMP(arg,STRING_LITERAL("-i="),3) == 0) p->image_path = arg + 3;
 		else if(STRCMP(arg,STRING_LITERAL("-console")) == 0) p->console = true;
 	}
@@ -96,14 +96,13 @@ void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **
 /* Do some initialization that we do once only */
 void factor_vm::do_stage1_init()
 {
-	print_string("*** Stage 2 early init... ");
+	std::cout << "*** Stage 2 early init... ";
 	fflush(stdout);
 
 	compile_all_words();
-	userenv[STAGE2_ENV] = true_object;
+	special_objects[OBJ_STAGE2] = true_object;
 
-	print_string("done\n");
-	fflush(stdout);
+	std::cout << "done\n";
 }
 
 void factor_vm::init_factor(vm_parameters *p)
@@ -143,22 +142,24 @@ void factor_vm::init_factor(vm_parameters *p)
 	if(p->signals)
 		init_signals();
 
+	verbosegc = p->verbosegc;
+
 	if(p->console)
 		open_console();
 
 	init_profiler();
 
-	userenv[CPU_ENV] = allot_alien(false_object,(cell)FACTOR_CPU_STRING);
-	userenv[OS_ENV] = allot_alien(false_object,(cell)FACTOR_OS_STRING);
-	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(cell));
-	userenv[EXECUTABLE_ENV] = allot_alien(false_object,(cell)p->executable_path);
-	userenv[ARGS_ENV] = false_object;
-	userenv[EMBEDDED_ENV] = false_object;
+	special_objects[OBJ_CPU] = allot_alien(false_object,(cell)FACTOR_CPU_STRING);
+	special_objects[OBJ_OS] = allot_alien(false_object,(cell)FACTOR_OS_STRING);
+	special_objects[OBJ_CELL_SIZE] = tag_fixnum(sizeof(cell));
+	special_objects[OBJ_EXECUTABLE] = allot_alien(false_object,(cell)p->executable_path);
+	special_objects[OBJ_ARGS] = false_object;
+	special_objects[OBJ_EMBEDDED] = false_object;
 
 	/* We can GC now */
 	gc_off = false;
 
-	if(!to_boolean(userenv[STAGE2_ENV]))
+	if(!to_boolean(special_objects[OBJ_STAGE2]))
 		do_stage1_init();
 }
 
@@ -173,7 +174,7 @@ void factor_vm::pass_args_to_factor(int argc, vm_char **argv)
 	}
 
 	args.trim();
-	userenv[ARGS_ENV] = args.elements.value();
+	special_objects[OBJ_ARGS] = args.elements.value();
 }
 
 void factor_vm::start_factor(vm_parameters *p)
@@ -181,13 +182,13 @@ void factor_vm::start_factor(vm_parameters *p)
 	if(p->fep) factorbug();
 
 	nest_stacks(NULL);
-	c_to_factor_toplevel(userenv[BOOT_ENV]);
+	c_to_factor_toplevel(special_objects[OBJ_BOOT]);
 	unnest_stacks();
 }
 
 char *factor_vm::factor_eval_string(char *string)
 {
-	char *(*callback)(char *) = (char *(*)(char *))alien_offset(userenv[EVAL_CALLBACK_ENV]);
+	char *(*callback)(char *) = (char *(*)(char *))alien_offset(special_objects[OBJ_EVAL_CALLBACK]);
 	return callback(string);
 }
 
@@ -198,13 +199,13 @@ void factor_vm::factor_eval_free(char *result)
 
 void factor_vm::factor_yield()
 {
-	void (*callback)() = (void (*)())alien_offset(userenv[YIELD_CALLBACK_ENV]);
+	void (*callback)() = (void (*)())alien_offset(special_objects[OBJ_YIELD_CALLBACK]);
 	callback();
 }
 
 void factor_vm::factor_sleep(long us)
 {
-	void (*callback)(long) = (void (*)(long))alien_offset(userenv[SLEEP_CALLBACK_ENV]);
+	void (*callback)(long) = (void (*)(long))alien_offset(special_objects[OBJ_SLEEP_CALLBACK]);
 	callback(us);
 }
 
