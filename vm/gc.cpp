@@ -7,6 +7,87 @@ gc_state::gc_state(gc_op op_) : op(op_), start_time(current_micros()) {}
 
 gc_state::~gc_state() {}
 
+gc_event::gc_event(gc_op op_, factor_vm *parent) :
+	op(op_),
+	start_time(current_micros()),
+	card_scan_time(0),
+	data_sweep_time(0),
+	code_sweep_time(0),
+	compaction_time(0)
+{
+	nursery_size_before = parent->nursery.occupied_space();
+	aging_size_before = parent->data->aging->occupied_space();
+	tenured_size_before = parent->data->tenured->occupied_space();
+	tenured_free_block_count_before = parent->data->tenured->free_blocks.free_block_count;
+	code_size_before = parent->code->allocator->occupied_space();
+	code_free_block_count_before = parent->code->allocator->free_blocks.free_block_count;
+	start_time = current_micros();
+}
+
+void gc_event::started_card_scan()
+{
+	card_scan_time = current_micros();
+}
+
+void gc_event::ended_card_scan(cell cards_scanned_, cell decks_scanned_)
+{
+	cards_scanned += cards_scanned_;
+	decks_scanned += decks_scanned_;
+	card_scan_time = (card_scan_time - current_micros());
+}
+
+void gc_event::started_code_scan()
+{
+	code_scan_time = current_micros();
+}
+
+void gc_event::ended_code_scan(cell code_blocks_scanned_)
+{
+	code_blocks_scanned += code_blocks_scanned_;
+	code_scan_time = (code_scan_time - current_micros());
+}
+
+void gc_event::started_data_sweep()
+{
+	data_sweep_time = current_micros();
+}
+
+void gc_event::ended_data_sweep()
+{
+	data_sweep_time = (data_sweep_time - current_micros());
+}
+
+void gc_event::started_code_sweep()
+{
+	code_sweep_time = current_micros();
+}
+
+void gc_event::ended_code_sweep()
+{
+	code_sweep_time = (code_sweep_time - current_micros());
+}
+
+void gc_event::started_compaction()
+{
+	compaction_time = current_micros();
+}
+
+void gc_event::ended_compaction()
+{
+	compaction_time = (compaction_time - current_micros());
+}
+
+void gc_event::ended_gc(factor_vm *parent)
+{
+	nursery_size_after = parent->nursery.occupied_space();
+	aging_size_after = parent->data->aging->occupied_space();
+	tenured_size_after = parent->data->tenured->occupied_space();
+	tenured_free_block_count_after = parent->data->tenured->free_blocks.free_block_count;
+	code_size_after = parent->code->allocator->occupied_space();
+	code_free_block_count_after = parent->code->allocator->free_blocks.free_block_count;
+	total_time = current_micros() - start_time;
+}
+
 void factor_vm::update_code_heap_for_minor_gc(std::set<code_block *> *remembered_set)
 {
 	/* The youngest generation that any code block can now reference */
