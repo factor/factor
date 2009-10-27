@@ -128,6 +128,8 @@ PRIMITIVE_FORWARD(quot_compiled_p)
 PRIMITIVE_FORWARD(vm_ptr)
 PRIMITIVE_FORWARD(strip_stack_traces)
 PRIMITIVE_FORWARD(callback)
+PRIMITIVE_FORWARD(enable_gc_events)
+PRIMITIVE_FORWARD(disable_gc_events)
 
 const primitive_type primitives[] = {
 	primitive_bignum_to_fixnum,
@@ -292,6 +294,8 @@ const primitive_type primitives[] = {
 	primitive_vm_ptr,
 	primitive_strip_stack_traces,
 	primitive_callback,
+	primitive_enable_gc_events,
+	primitive_disable_gc_events,
 };
 
 }

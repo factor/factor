@@ -31,4 +31,21 @@ struct data_heap {
 	void reset_generation(tenured_space *gen);
 };
 
+struct data_heap_room {
+	cell nursery_size;
+	cell nursery_occupied;
+	cell nursery_free;
+	cell aging_size;
+	cell aging_occupied;
+	cell aging_free;
+	cell tenured_size;
+	cell tenured_occupied;
+	cell tenured_total_free;
+	cell tenured_contiguous_free;
+	cell tenured_free_block_count;
+	cell cards;
+	cell decks;
+	cell mark_stack;
+};
+
 }

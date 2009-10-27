@@ -432,8 +432,8 @@ tuple
     { "set-retainstack" "kernel" (( rs -- )) }
     { "set-callstack" "kernel" (( cs -- )) }
     { "exit" "system" (( n -- )) }
-    { "data-room" "memory" (( -- cards decks generations )) }
-    { "code-room" "memory" (( -- code-total code-used code-free largest-free-block )) }
+    { "data-room" "memory" (( -- data-room )) }
+    { "code-room" "memory" (( -- code-room )) }
     { "micros" "system" (( -- us )) }
     { "modify-code-heap" "compiler.units" (( alist -- )) }
     { "(dlopen)" "alien.libraries" (( path -- dll )) }
@@ -524,6 +524,8 @@ tuple
     { "vm-ptr" "vm" (( -- ptr )) }
     { "strip-stack-traces" "kernel.private" (( -- )) }
     { "<callback>" "alien" (( word -- alien )) }
+    { "enable-gc-events" "memory" (( -- )) }
+    { "disable-gc-events" "memory" (( -- events )) }
 } [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number

@@ -61,6 +61,9 @@ struct factor_vm
 	/* Only set if we're performing a GC */
 	gc_state *current_gc;
 
+	/* If not NULL, we push GC events here */
+	std::vector<gc_event> *gc_events;
+
 	/* If a runtime function needs to call another function which potentially
 	   allocates memory, it must wrap any local variable references to Factor
 	   objects in gc_root instances */
@@ -240,6 +243,8 @@ struct factor_vm
 	}
 
 	// gc
+	void end_gc();
+	void start_gc_again();
 	void update_code_heap_for_minor_gc(std::set<code_block *> *remembered_set);
 	void collect_nursery();
 	void collect_aging();
@@ -255,6 +260,8 @@ struct factor_vm
 	void primitive_become();
 	void inline_gc(cell *gc_roots_base, cell gc_roots_size);
 	object *allot_object(header header, cell size);
+	void primitive_enable_gc_events();
+	void primitive_disable_gc_events();
 
 	template<typename Type> Type *allot(cell size)
 	{
@@ -335,6 +342,9 @@ struct factor_vm
 	void primitive_byte_array();
 	void primitive_uninitialized_byte_array();
 	void primitive_resize_byte_array();
+
+	template<typename T> byte_array *byte_array_from_value(T *value);
+	template<typename T> byte_array *byte_array_from_values(T *values, cell len);
 
 	//tuples
 	tuple *allot_tuple(cell layout_);
