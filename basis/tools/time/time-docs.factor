@@ -6,12 +6,9 @@ ARTICLE: "timing" "Timing code"
 { $subsections time }
 "A lower-level word puts timings on the stack, intead of printing:"
 { $subsections benchmark }
-"You can also read the system clock and garbage collection statistics directly:"
-{ $subsections
-    micros
-    gc-stats
-}
-{ $see-also "profiling" } ;
+"You can also read the system clock directly:"
+{ $subsections micros }
+{ $see-also "profiling" "calendar" } ;
 
 ABOUT: "timing"
 
@@ -23,6 +20,6 @@ HELP: benchmark
 
 HELP: time
 { $values { "quot" "a quotation" } }
-{ $description "Runs a quotation and then prints the total run time and some garbage collection statistics." } ;
+{ $description "Runs a quotation and then prints the total run time and some statistics." } ;
 
 { benchmark micros time } related-words
