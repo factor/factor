@@ -18,10 +18,6 @@ TUPLE: let* < binding-form ;
 
 C: <let*> let*
 
-TUPLE: wlet < binding-form ;
-
-C: <wlet> wlet
-
 TUPLE: quote local ;
 
 C: <quote> quote

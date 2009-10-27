@@ -86,19 +86,6 @@ M: lambda-parser parse-quotation ( -- quotation )
     "|" expect "|" parse-bindings*
     (parse-lambda) <let*> ?rewrite-closures ;
 
-: (parse-wbindings) ( end -- )
-    dup parse-binding dup [
-        first2 [ make-local-word ] keep 2array ,
-        (parse-wbindings)
-    ] [ 2drop ] if ;
-
-: parse-wbindings ( end -- bindings vars )
-    [ (parse-wbindings) ] with-bindings ;
-
-: parse-wlet ( -- form )
-    "|" expect "|" parse-wbindings
-    (parse-lambda) <wlet> ?rewrite-closures ;
-
 : parse-locals ( -- effect vars assoc )
     complete-effect
     dup
