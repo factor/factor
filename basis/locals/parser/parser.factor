@@ -56,35 +56,8 @@ M: lambda-parser parse-quotation ( -- quotation )
         [ nip scan-object 2array ]
     } cond ;
 
-: (parse-bindings) ( end -- )
-    dup parse-binding dup [
-        first2 [ make-local ] dip 2array ,
-        (parse-bindings)
-    ] [ 2drop ] if ;
-
-: with-bindings ( quot -- words assoc )
-    '[
-        in-lambda? on
-        _ H{ } make-assoc
-    ] { } make swap ; inline
-
-: parse-bindings ( end -- bindings vars )
-    [ (parse-bindings) ] with-bindings ;
-
 : parse-let ( -- form )
-    "|" expect "|" parse-bindings
-    (parse-lambda) <let> ?rewrite-closures ;
-
-: parse-bindings* ( end -- words assoc )
-    [
-        namespace use-words
-        (parse-bindings)
-        namespace unuse-words
-    ] with-bindings ;
-
-: parse-let* ( -- form )
-    "|" expect "|" parse-bindings*
-    (parse-lambda) <let*> ?rewrite-closures ;
+    H{ } clone (parse-lambda) <let> ?rewrite-closures ;
 
 : parse-locals ( -- effect vars assoc )
     complete-effect

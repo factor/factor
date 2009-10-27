@@ -8,15 +8,9 @@ TUPLE: lambda vars body ;
 
 C: <lambda> lambda
 
-TUPLE: binding-form bindings body ;
-
-TUPLE: let < binding-form ;
+TUPLE: let body ;
 
 C: <let> let
-
-TUPLE: let* < binding-form ;
-
-C: <let*> let*
 
 TUPLE: quote local ;
 

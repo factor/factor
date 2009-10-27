@@ -9,10 +9,10 @@ M: >r/r>-in-lambda-error summary
     drop
     "Explicit retain stack manipulation is not permitted in lambda bodies" ;
 
-ERROR: binding-form-in-literal-error ;
+ERROR: let-form-in-literal-error ;
 
-M: binding-form-in-literal-error summary
-    drop "[let and [let* not permitted inside literals" ;
+M: let-form-in-literal-error summary
+    drop "[let not permitted inside literals" ;
 
 ERROR: local-writer-in-literal-error ;
 
@@ -27,7 +27,7 @@ M: local-word-in-literal-error summary
 ERROR: :>-outside-lambda-error ;
 
 M: :>-outside-lambda-error summary
-    drop ":> cannot be used outside of lambda expressions" ;
+    drop ":> cannot be used outside of [let, [|, or :: forms" ;
 
 ERROR: bad-local args obj ;
 
