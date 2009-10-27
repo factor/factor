@@ -454,13 +454,8 @@ code_block *factor_vm::allot_code_block(cell size, code_block_type type)
 		/* Insufficient room even after code GC, give up */
 		if(block == NULL)
 		{
-			cell used, total_free, max_free;
-			code->allocator->usage(&used,&total_free,&max_free);
-
-			std::cout << "Code heap stats:\n";
-			std::cout << "Used: " << used << "\n";
-			std::cout << "Total free space: " << total_free << "\n";
-			std::cout << "Largest free block: " << max_free << "\n";
+			std::cout << "Code heap used: " << code->allocator->occupied_space() << "\n";
+			std::cout << "Code heap free: " << code->allocator->free_space() << "\n";
 			fatal_error("Out of memory in add-compiled-block",0);
 		}
 	}

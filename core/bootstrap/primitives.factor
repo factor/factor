@@ -423,7 +423,6 @@ tuple
     { "minor-gc" "memory" (( -- )) }
     { "gc" "memory" (( -- )) }
     { "compact-gc" "memory" (( -- )) }
-    { "gc-stats" "memory" f }
     { "(save-image)" "memory.private" (( path -- )) }
     { "(save-image-and-exit)" "memory.private" (( path -- )) }
     { "datastack" "kernel" (( -- ds )) }
@@ -509,7 +508,6 @@ tuple
     { "resize-byte-array" "byte-arrays" (( n byte-array -- newbyte-array )) }
     { "dll-valid?" "alien.libraries" (( dll -- ? )) }
     { "unimplemented" "kernel.private" (( -- * )) }
-    { "gc-reset" "memory" (( -- )) }
     { "jit-compile" "quotations" (( quot -- )) }
     { "load-locals" "locals.backend" (( ... n -- )) }
     { "check-datastack" "kernel.private" (( array in# out# -- ? )) }

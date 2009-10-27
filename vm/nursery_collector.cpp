@@ -6,7 +6,6 @@ namespace factor
 nursery_collector::nursery_collector(factor_vm *parent_) :
 	copying_collector<aging_space,nursery_policy>(
 		parent_,
-		&parent_->gc_stats.nursery_stats,
 		parent_->data->aging,
 		nursery_policy(parent_)) {}
 

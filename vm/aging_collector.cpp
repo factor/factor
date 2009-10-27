@@ -6,7 +6,6 @@ namespace factor
 aging_collector::aging_collector(factor_vm *parent_) :
 	copying_collector<aging_space,aging_policy>(
 		parent_,
-		&parent_->gc_stats.aging_stats,
 		parent_->data->aging,
 		aging_policy(parent_)) {}
 

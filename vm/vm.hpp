@@ -47,7 +47,7 @@ struct factor_vm
 	bool gc_off;
 
 	/* GC logging */
-	bool verbosegc;
+	bool verbose_gc;
 
 	/* Data heap */
 	data_heap *data;
@@ -60,9 +60,6 @@ struct factor_vm
 
 	/* Only set if we're performing a GC */
 	gc_state *current_gc;
-
-	/* Statistics */
-	gc_statistics gc_stats;
 
 	/* If a runtime function needs to call another function which potentially
 	   allocates memory, it must wrap any local variable references to Factor
@@ -251,18 +248,13 @@ struct factor_vm
 	void collect_sweep_impl();
 	void collect_compact_impl(bool trace_contexts_p);
 	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p);
-	void record_gc_stats(generation_statistics *stats);
 	void gc(gc_op op, cell requested_bytes, bool trace_contexts_p);
 	void primitive_minor_gc();
 	void primitive_full_gc();
 	void primitive_compact_gc();
-	void primitive_gc_stats();
-	void clear_gc_stats();
 	void primitive_become();
 	void inline_gc(cell *gc_roots_base, cell gc_roots_size);
 	object *allot_object(header header, cell size);
-	void add_gc_stats(generation_statistics *stats, growable_array *result);
-	void primitive_clear_gc_stats();
 
 	template<typename Type> Type *allot(cell size)
 	{

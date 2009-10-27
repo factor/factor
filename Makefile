@@ -48,6 +48,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/dispatch.o \
 	vm/errors.o \
 	vm/factor.o \
+	vm/free_list.o \
 	vm/full_collector.o \
 	vm/gc.o \
 	vm/image.o \

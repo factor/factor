@@ -3,13 +3,11 @@ namespace factor
 
 template<typename TargetGeneration, typename Policy> struct collector_workhorse {
 	factor_vm *parent;
-	generation_statistics *stats;
 	TargetGeneration *target;
 	Policy policy;
 
-	explicit collector_workhorse(factor_vm *parent_, generation_statistics *stats_, TargetGeneration *target_, Policy policy_) :
+	explicit collector_workhorse(factor_vm *parent_, TargetGeneration *target_, Policy policy_) :
 		parent(parent_),
-		stats(stats_),
 		target(target_),
 		policy(policy_) {}
 
@@ -35,9 +33,6 @@ template<typename TargetGeneration, typename Policy> struct collector_workhorse 
 
 		memcpy(newpointer,untagged,size);
 		untagged->h.forward_to(newpointer);
-
-		stats->object_count++;
-		stats->bytes_copied += size;
 
 		policy.promoted_object(newpointer);
 
@@ -69,29 +64,34 @@ template<typename TargetGeneration, typename Policy> struct collector_workhorse 
 template<typename TargetGeneration, typename Policy>
 inline static slot_visitor<collector_workhorse<TargetGeneration,Policy> > make_collector_workhorse(
 	factor_vm *parent,
-	generation_statistics *stats,
 	TargetGeneration *target,
 	Policy policy)
 {
 	return slot_visitor<collector_workhorse<TargetGeneration,Policy> >(parent,
-		collector_workhorse<TargetGeneration,Policy>(parent,stats,target,policy));
+		collector_workhorse<TargetGeneration,Policy>(parent,target,policy));
 }
 
 template<typename TargetGeneration, typename Policy> struct collector {
 	factor_vm *parent;
 	data_heap *data;
 	code_heap *code;
-	generation_statistics *stats;
 	TargetGeneration *target;
 	slot_visitor<collector_workhorse<TargetGeneration,Policy> > workhorse;
+	cell cards_scanned;
+	cell decks_scanned;
+	cell card_scan_time;
+	cell code_blocks_scanned;
 
-	explicit collector(factor_vm *parent_, generation_statistics *stats_, TargetGeneration *target_, Policy policy_) :
+	explicit collector(factor_vm *parent_, TargetGeneration *target_, Policy policy_) :
 		parent(parent_),
 		data(parent_->data),
 		code(parent_->code),
-		stats(stats_),
 		target(target_),
-		workhorse(make_collector_workhorse(parent_,stats_,target_,policy_)) {}
+		workhorse(make_collector_workhorse(parent_,target_,policy_)),
+		cards_scanned(0),
+		decks_scanned(0),
+		card_scan_time(0),
+		code_blocks_scanned(0) {}
 
 	void trace_handle(cell *handle)
 	{
@@ -127,7 +127,7 @@ template<typename TargetGeneration, typename Policy> struct collector {
 		for(; iter != end; iter++)
 		{
 			trace_literal_references(*iter);
-			parent->gc_stats.code_blocks_scanned++;
+			code_blocks_scanned++;
 		}
 	}
 
@@ -195,7 +195,7 @@ template<typename TargetGeneration, typename Policy> struct collector {
 		{
 			if(decks[deck_index] & mask)
 			{
-				parent->gc_stats.decks_scanned++;
+				decks_scanned++;
 
 				cell first_card = first_card_in_deck(deck_index);
 				cell last_card = last_card_in_deck(deck_index);
@@ -204,7 +204,7 @@ template<typename TargetGeneration, typename Policy> struct collector {
 				{
 					if(cards[card_index] & mask)
 					{
-						parent->gc_stats.cards_scanned++;
+						cards_scanned++;
 
 						if(end < card_start_address(card_index))
 						{
@@ -246,7 +246,7 @@ scan_next_object:				{
 			}
 		}
 
-end:		parent->gc_stats.card_scan_time += (current_micros() - start_time);
+end:		card_scan_time += (current_micros() - start_time);
 	}
 };
 
