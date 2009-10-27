@@ -4,7 +4,7 @@ USING: kernel sequences arrays generic assocs io math
 namespaces parser prettyprint strings io.styles words
 system sorting splitting grouping math.parser classes memory
 combinators fry vm specialized-arrays accessors continuations
-classes.struct ;
+classes.struct generalizations ;
 SPECIALIZED-ARRAY: gc-event
 IN: tools.memory
 
@@ -95,4 +95,52 @@ PRIVATE>
 
 : collect-gc-events ( quot -- events )
     enable-gc-events [ ] [ disable-gc-events drop ] cleanup
-    disable-gc-events byte-array>gc-event-array ;
+    disable-gc-events byte-array>gc-event-array ; inline
+
+: generation-sizes-before ( events -- sizes )
+    [
+        {
+            [ start-time>> ]
+            [ nursery-size-before>> ]
+            [ aging-size-before>> ]
+            [ tenured-size-before>> ]
+            [ code-size-before>> ]
+        } cleave 5 narray
+    ] { } map-as ;
+
+: generation-sizes-after ( events -- sizes )
+    [
+        {
+            [ start-time>> ]
+            [ nursery-size-after>> ]
+            [ aging-size-after>> ]
+            [ tenured-size-after>> ]
+            [ code-size-after>> ]
+        } cleave 5 narray
+    ] { } map-as ;
+
+: reclaimed-space ( events -- sizes )
+    [
+        [ start-time>> ] [
+            {
+                [ [ nursery-size-before>> ] [ nursery-size-after>> ] bi - ]
+                [ [   aging-size-before>> ] [   aging-size-after>> ] bi - ]
+                [ [ tenured-size-before>> ] [ tenured-size-after>> ] bi - ]
+                [ [    code-size-before>> ] [    code-size-after>> ] bi - ]
+            } cleave
+            + + +
+        ] bi 2array
+    ] { } map-as ;
+
+: allocated-space ( events -- sizes )
+    2 <sliced-clumps> [
+        [ second start-time>> ] [
+            {
+                [ [ second nursery-size-before>> ] [ first nursery-size-after>> ] bi - ]
+                [ [ second   aging-size-before>> ] [ first   aging-size-after>> ] bi - ]
+                [ [ second tenured-size-before>> ] [ first tenured-size-after>> ] bi - ]
+                [ [ second    code-size-before>> ] [ first    code-size-after>> ] bi - ]
+            } cleave
+            + + +
+        ] bi 2array
+    ] { } map-as ;
