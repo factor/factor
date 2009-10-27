@@ -112,6 +112,8 @@ struct code_block_compaction_updater {
 
 void factor_vm::collect_compact_impl(bool trace_contexts_p)
 {
+	current_gc->event->started_compaction();
+
 	tenured_space *tenured = data->tenured;
 	mark_bits<object> *data_forwarding_map = &tenured->state;
 	mark_bits<code_block> *code_forwarding_map = &code->allocator->state;
@@ -146,6 +148,8 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p)
 		code_forwarder.visit_context_code_blocks();
 		code_forwarder.visit_callback_code_blocks();
 	}
+
+	current_gc->event->ended_compaction();
 }
 
 }
