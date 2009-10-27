@@ -16,15 +16,6 @@ void factor_vm::update_code_heap_for_minor_gc(std::set<code_block *> *remembered
 	for(; iter != end; iter++) update_literal_references(*iter);
 }
 
-void factor_vm::record_gc_stats(generation_statistics *stats)
-{
-	cell gc_elapsed = (current_micros() - current_gc->start_time);
-	stats->collections++;
-	stats->gc_time += gc_elapsed;
-	if(stats->max_gc_time < gc_elapsed)
-		stats->max_gc_time = gc_elapsed;
-}
-
 void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 {
 	assert(!gc_off);
@@ -34,7 +25,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 
 	current_gc = new gc_state(op);
 
-	if(verbosegc)
+	if(verbose_gc)
 		std::cout << "GC requested, op=" << op << std::endl;
 
 	/* Keep trying to GC higher and higher generations until we don't run out
@@ -62,7 +53,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 			break;
 		}
 
-		if(verbosegc)
+		if(verbose_gc)
 			std::cout << "GC rewind, op=" << current_gc->op << std::endl;
 	}
 
@@ -70,37 +61,31 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 	{
 	case collect_nursery_op:
 		collect_nursery();
-		record_gc_stats(&gc_stats.nursery_stats);
 		break;
 	case collect_aging_op:
 		collect_aging();
-		record_gc_stats(&gc_stats.aging_stats);
 		break;
 	case collect_to_tenured_op:
 		collect_to_tenured();
-		record_gc_stats(&gc_stats.aging_stats);
 		break;
 	case collect_full_op:
 		collect_mark_impl(trace_contexts_p);
 		collect_sweep_impl();
 		update_code_heap_words_and_literals();
-		record_gc_stats(&gc_stats.full_stats);
 		break;
 	case collect_compact_op:
 		collect_mark_impl(trace_contexts_p);
 		collect_compact_impl(trace_contexts_p);
-		record_gc_stats(&gc_stats.full_stats);
 		break;
 	case collect_growing_heap_op:
 		collect_growing_heap(requested_bytes,trace_contexts_p);
-		record_gc_stats(&gc_stats.full_stats);
 		break;
 	default:
 		critical_error("Bad GC op\n",current_gc->op);
 		break;
 	}
 
-	if(verbosegc)
+	if(verbose_gc)
 		std::cout << "GC done, op=" << current_gc->op << std::endl;
 
 	delete current_gc;
@@ -126,49 +111,6 @@ void factor_vm::primitive_compact_gc()
 	gc(collect_compact_op,
 		0, /* requested size */
 		true /* trace contexts? */);
-}
-
-void factor_vm::add_gc_stats(generation_statistics *stats, growable_array *result)
-{
-	result->add(allot_cell(stats->collections));
-	result->add(tag<bignum>(long_long_to_bignum(stats->gc_time)));
-	result->add(tag<bignum>(long_long_to_bignum(stats->max_gc_time)));
-	result->add(allot_cell(stats->collections == 0 ? 0 : stats->gc_time / stats->collections));
-	result->add(allot_cell(stats->object_count));
-	result->add(tag<bignum>(long_long_to_bignum(stats->bytes_copied)));
-}
-
-void factor_vm::primitive_gc_stats()
-{
-	growable_array result(this);
-
-	add_gc_stats(&gc_stats.nursery_stats,&result);
-	add_gc_stats(&gc_stats.aging_stats,&result);
-	add_gc_stats(&gc_stats.full_stats,&result);
-
-	u64 total_gc_time =
-		gc_stats.nursery_stats.gc_time +
-		gc_stats.aging_stats.gc_time +
-		gc_stats.full_stats.gc_time;
-
-	result.add(tag<bignum>(ulong_long_to_bignum(total_gc_time)));
-	result.add(tag<bignum>(ulong_long_to_bignum(gc_stats.cards_scanned)));
-	result.add(tag<bignum>(ulong_long_to_bignum(gc_stats.decks_scanned)));
-	result.add(tag<bignum>(ulong_long_to_bignum(gc_stats.card_scan_time)));
-	result.add(allot_cell(gc_stats.code_blocks_scanned));
-
-	result.trim();
-	dpush(result.elements.value());
-}
-
-void factor_vm::clear_gc_stats()
-{
-	memset(&gc_stats,0,sizeof(gc_statistics));
-}
-
-void factor_vm::primitive_clear_gc_stats()
-{
-	clear_gc_stats();
 }
 
 /* classes.tuple uses this to reshape tuples; tools.deploy.shaker uses this

@@ -11,16 +11,26 @@ template<typename Block> struct bump_allocator {
 	explicit bump_allocator(cell size_, cell start_) :
 		here(start_), start(start_), end(start_ + size_), size(size_) {}
 
-	inline bool contains_p(Block *block)
+	bool contains_p(Block *block)
 	{
 		return ((cell)block - start) < size;
 	}
 
-	inline Block *allot(cell size)
+	Block *allot(cell size)
 	{
 		cell h = here;
 		here = h + align(size,data_alignment);
 		return (Block *)h;
+	}
+
+	cell occupied_space()
+	{
+		return here - start;
+	}
+
+	cell free_space()
+	{
+		return end - here;
 	}
 };
 

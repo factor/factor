@@ -206,24 +206,23 @@ void factor_vm::primitive_data_room()
 {
 	growable_array a(this);
 
-	a.add(tag_fixnum((nursery.size) >> 10));
-	a.add(tag_fixnum((nursery.here - nursery.start) >> 10));
-	a.add(tag_fixnum((nursery.end - nursery.here) >> 10));
+	a.add(tag_fixnum(nursery.size));
+	a.add(tag_fixnum(nursery.occupied_space()));
+	a.add(tag_fixnum(nursery.free_space()));
 
-	a.add(tag_fixnum((data->aging->size) >> 10));
-	a.add(tag_fixnum((data->aging->here - data->aging->start) >> 10));
-	a.add(tag_fixnum((data->aging->end - data->aging->here) >> 10));
+	a.add(tag_fixnum(data->aging->size));
+	a.add(tag_fixnum(data->aging->occupied_space()));
+	a.add(tag_fixnum(data->aging->free_space()));
 
-	cell used, total_free, max_free;
-	data->tenured->usage(&used,&total_free,&max_free);
-	a.add(tag_fixnum(data->tenured->size >> 10));
-	a.add(tag_fixnum(used >> 10));
-	a.add(tag_fixnum(total_free >> 10));
-	a.add(tag_fixnum(max_free >> 10));
+	a.add(tag_fixnum(data->tenured->size));
+	a.add(tag_fixnum(data->tenured->occupied_space()));
+	a.add(tag_fixnum(data->tenured->free_space()));
+	a.add(tag_fixnum(data->tenured->free_blocks.largest_free_block()));
+	a.add(tag_fixnum(data->tenured->free_blocks.free_block_count));
 
-	a.add(tag_fixnum((data->cards_end - data->cards) >> 10));
-	a.add(tag_fixnum((data->decks_end - data->decks) >> 10));
-	a.add(tag_fixnum((data->tenured->mark_stack.capacity()) >> 10));
+	a.add(tag_fixnum(data->cards_end - data->cards));
+	a.add(tag_fixnum(data->decks_end - data->decks));
+	a.add(tag_fixnum(data->tenured->mark_stack.capacity()));
 
 	a.trim();
 	dpush(a.elements.value());

@@ -55,7 +55,6 @@ PRIMITIVE_FORWARD(existsp)
 PRIMITIVE_FORWARD(minor_gc)
 PRIMITIVE_FORWARD(full_gc)
 PRIMITIVE_FORWARD(compact_gc)
-PRIMITIVE_FORWARD(gc_stats)
 PRIMITIVE_FORWARD(save_image)
 PRIMITIVE_FORWARD(save_image_and_exit)
 PRIMITIVE_FORWARD(datastack)
@@ -115,7 +114,6 @@ PRIMITIVE_FORWARD(call_clear)
 PRIMITIVE_FORWARD(resize_byte_array)
 PRIMITIVE_FORWARD(dll_validp)
 PRIMITIVE_FORWARD(unimplemented)
-PRIMITIVE_FORWARD(clear_gc_stats)
 PRIMITIVE_FORWARD(jit_compile)
 PRIMITIVE_FORWARD(load_locals)
 PRIMITIVE_FORWARD(check_datastack)
@@ -193,7 +191,6 @@ const primitive_type primitives[] = {
 	primitive_minor_gc,
 	primitive_full_gc,
 	primitive_compact_gc,
-	primitive_gc_stats,
 	primitive_save_image,
 	primitive_save_image_and_exit,
 	primitive_datastack,
@@ -279,7 +276,6 @@ const primitive_type primitives[] = {
 	primitive_resize_byte_array,
 	primitive_dll_validp,
 	primitive_unimplemented,
-	primitive_clear_gc_stats,
 	primitive_jit_compile,
 	primitive_load_locals,
 	primitive_check_datastack,

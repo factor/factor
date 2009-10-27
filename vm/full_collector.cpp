@@ -6,7 +6,6 @@ namespace factor
 full_collector::full_collector(factor_vm *parent_) :
 	collector<tenured_space,full_policy>(
 		parent_,
-		&parent_->gc_stats.full_stats,
 		parent_->data->tenured,
 		full_policy(parent_)) {}
 
