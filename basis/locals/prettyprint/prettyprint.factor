@@ -40,8 +40,6 @@ M: lambda pprint*
 
 M: let pprint* \ [let pprint-let ;
 
-M: wlet pprint* \ [wlet pprint-let ;
-
 M: let* pprint* \ [let* pprint-let ;
 
 M: def pprint*

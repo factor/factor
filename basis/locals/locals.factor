@@ -15,8 +15,6 @@ SYNTAX: [let parse-let over push-all ;
 
 SYNTAX: [let* parse-let* over push-all ;
 
-SYNTAX: [wlet parse-wlet over push-all ;
-
 SYNTAX: :: (::) define-declared ;
 
 SYNTAX: M:: (M::) define ;

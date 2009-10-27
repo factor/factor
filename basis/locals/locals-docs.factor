@@ -19,29 +19,13 @@ HELP: [let*
 
 { POSTPONE: [let POSTPONE: [let* } related-words
 
-HELP: [wlet
-{ $syntax "[wlet | binding1 [ body1... ]\n        binding2 [ body2... ]\n        ... |\n     body... ]" }
-{ $description "Introduces a set of lexically-scoped non-recursive local functions. The bodies may not refer to other bindings within the same " { $link POSTPONE: [wlet } " form." }
-{ $examples
-    { $example
-        "USING: locals math prettyprint sequences ;"
-        "IN: scratchpad"
-        ":: quuxify ( n seq -- newseq )"
-        "    [wlet | add-n [| m | m n + ] |"
-        "        seq [ add-n ] map ] ;"
-        "2 { 1 2 3 } quuxify ."
-        "{ 3 4 5 }"
-    }
-} ;
-
 HELP: :>
 { $syntax ":> var" ":> var!" }
 { $description "Binds the value on the top of the datastack to a new local variable named " { $snippet "var" } ", lexically scoped to the enclosing quotation or definition."
 $nl
 "If the " { $snippet "var" } " name is followed by an exclamation point (" { $snippet "!" } "), the new variable will be mutable. See " { $link "locals-mutable" } " for more information on mutable local bindings." }
 { $notes
-    "This syntax can only be used inside a " { $link POSTPONE: :: } " word, " { $link POSTPONE: [let } ", " { $link POSTPONE: [let* } ",  or " { $link POSTPONE: [wlet } " form, or inside a quotation literal inside one of those forms."
-}
+    "This syntax can only be used inside a " { $link POSTPONE: :: } " word, " { $link POSTPONE: [let } " or " { $link POSTPONE: [let* } " form, or inside a quotation literal inside one of those forms." }
 { $examples "See " { $link "locals-examples" } "." } ;
 
 HELP: ::
@@ -301,7 +285,6 @@ ARTICLE: "locals" "Lexical variables and closures"
     POSTPONE: :>
     POSTPONE: [let
     POSTPONE: [let*
-    POSTPONE: [wlet
 }
 "Quotation literals where the inputs are named local variables:"
 { $subsections POSTPONE: [| }
