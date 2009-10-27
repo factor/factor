@@ -6,7 +6,6 @@ static const cell free_list_count = 32;
 struct free_heap_block
 {
 	cell header;
-	free_heap_block *next_free;
 
 	bool free_p() const
 	{
@@ -24,9 +23,18 @@ struct free_heap_block
 	}
 };
 
+struct block_size_compare {
+	bool operator()(free_heap_block *a, free_heap_block *b)
+	{
+		return a->size() < b->size();
+	}
+};
+
+typedef std::multiset<free_heap_block *, block_size_compare> large_block_set;
+
 struct free_list {
-	free_heap_block *small_blocks[free_list_count];
-	free_heap_block *large_blocks;
+	std::vector<free_heap_block *> small_blocks[free_list_count];
+	large_block_set large_blocks;
 	cell free_block_count;
 	cell free_space;
 
