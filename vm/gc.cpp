@@ -128,13 +128,40 @@ gc_state::~gc_state()
 	event = NULL;
 }
 
-void gc_state::start_again(gc_op op_, factor_vm *parent)
+void factor_vm::end_gc()
 {
-	event->ended_gc(parent);
-	if(parent->verbose_gc) std::cout << event << std::endl;
-	delete event;
-	event = new gc_event(op_,parent);
-	op = op_;
+	current_gc->event->ended_gc(this);
+	if(verbose_gc) std::cout << current_gc->event << std::endl;
+	if(gc_events) gc_events->push_back(*current_gc->event);
+	delete current_gc->event;
+	current_gc->event = NULL;
+}
+
+void factor_vm::start_gc_again()
+{
+	end_gc();
+
+	switch(current_gc->op)
+	{
+	case collect_nursery_op:
+		current_gc->op = collect_aging_op;
+		break;
+	case collect_aging_op:
+		current_gc->op = collect_to_tenured_op;
+		break;
+	case collect_to_tenured_op:
+		current_gc->op = collect_full_op;
+		break;
+	case collect_full_op:
+	case collect_compact_op:
+		current_gc->op = collect_growing_heap_op;
+		break;
+	default:
+		critical_error("Bad GC op",current_gc->op);
+		break;
+	}
+
+	current_gc->event = new gc_event(current_gc->op,this);
 }
 
 void factor_vm::update_code_heap_for_minor_gc(std::set<code_block *> *remembered_set)
@@ -160,25 +187,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 	if(setjmp(current_gc->gc_unwind))
 	{
 		/* We come back here if a generation is full */
-		switch(current_gc->op)
-		{
-		case collect_nursery_op:
-			current_gc->start_again(collect_aging_op,this);
-			break;
-		case collect_aging_op:
-			current_gc->start_again(collect_to_tenured_op,this);
-			break;
-		case collect_to_tenured_op:
-			current_gc->start_again(collect_full_op,this);
-			break;
-		case collect_full_op:
-		case collect_compact_op:
-			current_gc->start_again(collect_growing_heap_op,this);
-			break;
-		default:
-			critical_error("Bad GC op",current_gc->op);
-			break;
-		}
+		start_gc_again();
 	}
 
 	switch(current_gc->op)
@@ -209,9 +218,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 		break;
 	}
 
-	current_gc->event->ended_gc(this);
-
-	if(verbose_gc) std::cout << current_gc->event << std::endl;
+	end_gc();
 
 	delete current_gc;
 	current_gc = NULL;
@@ -336,6 +343,25 @@ object *factor_vm::allot_object(header header, cell size)
 
 	obj->h = header;
 	return obj;
+}
+
+void factor_vm::primitive_enable_gc_events()
+{
+	gc_events = new std::vector<gc_event>();
+}
+
+void factor_vm::primitive_disable_gc_events()
+{
+	if(gc_events)
+	{
+		byte_array *data = byte_array_from_values(&gc_events->front(),gc_events->size());
+		dpush(tag<byte_array>(data));
+
+		delete gc_events;
+		gc_events = NULL;
+	}
+	else
+		dpush(false_object);
 }
 
 }
