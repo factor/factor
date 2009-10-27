@@ -51,6 +51,7 @@ namespace factor
 #include "code_block.hpp"
 #include "bump_allocator.hpp"
 #include "mark_bits.hpp"
+#include "free_list.hpp"
 #include "free_list_allocator.hpp"
 #include "write_barrier.hpp"
 #include "object_start_map.hpp"

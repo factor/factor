@@ -22,8 +22,6 @@ void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 		p->aging_size,
 		p->tenured_size);
 
-	clear_gc_stats();
-
 	fixnum bytes_read = fread((void*)data->tenured->start,1,h->data_size,file);
 
 	if((cell)bytes_read != h->data_size)
@@ -280,9 +278,9 @@ bool factor_vm::save_image(const vm_char *filename)
 	h.magic = image_magic;
 	h.version = image_version;
 	h.data_relocation_base = data->tenured->start;
-	h.data_size = data->tenured->occupied();
+	h.data_size = data->tenured->occupied_space();
 	h.code_relocation_base = code->seg->start;
-	h.code_size = code->allocator->occupied();
+	h.code_size = code->allocator->occupied_space();
 
 	h.true_object = true_object;
 	h.bignum_zero = bignum_zero;

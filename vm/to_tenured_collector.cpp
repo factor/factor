@@ -6,7 +6,6 @@ namespace factor
 to_tenured_collector::to_tenured_collector(factor_vm *myvm_) :
 	collector<tenured_space,to_tenured_policy>(
 		myvm_,
-		&myvm_->gc_stats.aging_stats,
 		myvm_->data->tenured,
 		to_tenured_policy(myvm_)) {}
 

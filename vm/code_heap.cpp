@@ -199,13 +199,11 @@ void factor_vm::primitive_code_room()
 {
 	growable_array a(this);
 
-	cell used, total_free, max_free;
-	code->allocator->usage(&used,&total_free,&max_free);
-
-	a.add(tag_fixnum(code->seg->size >> 10));
-	a.add(tag_fixnum(used >> 10));
-	a.add(tag_fixnum(total_free >> 10));
-	a.add(tag_fixnum(max_free >> 10));
+	a.add(tag_fixnum(code->allocator->size));
+	a.add(tag_fixnum(code->allocator->occupied_space()));
+	a.add(tag_fixnum(code->allocator->free_space()));
+	a.add(tag_fixnum(code->allocator->free_blocks.largest_free_block()));
+	a.add(tag_fixnum(code->allocator->free_blocks.free_block_count));
 
 	a.trim();
 	dpush(a.elements.value());

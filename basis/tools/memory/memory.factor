@@ -9,35 +9,50 @@ IN: tools.memory
 <PRIVATE
 
 : kilobytes ( n -- str )
-    number>string
+    1024 /i number>string
     dup length 4 > [ 3 cut* "," glue ] when
     " KB" append ;
 
-: memory-table. ( sizes seq -- )
-    swap [ kilobytes ] map zip simple-table. ;
+: fancy-table. ( seq alist -- )
+    [ [ nip first ] [ second call( obj -- str ) ] 2bi 2array ] 2map
+    simple-table. ;
 
 : young-room. ( seq -- )
-    { "Total:" "Allocated:" "Free:" } memory-table. ;
+    {
+        { "Total:" [ kilobytes ] }
+        { "Allocated:" [ kilobytes ] }
+        { "Free:" [ kilobytes ] }
+    } fancy-table. ;
 
 : nursery-room. ( seq -- ) "- Nursery space" print young-room. ;
 
 : aging-room. ( seq -- ) "- Aging space" print young-room. ;
 
 : mark-sweep-table. ( sizes -- )
-    { "Total:" "Allocated:" "Contiguous free:" "Total free:" } memory-table. ;
+    {
+        { "Total:" [ kilobytes ] }
+        { "Allocated:" [ kilobytes ] }
+        { "Total free:" [ kilobytes ] }
+        { "Contiguous free:" [ kilobytes ] }
+        { "Free list entries:" [ number>string ] }
+    } fancy-table. ;
 
 : tenured-room. ( seq -- ) "- Tenured space" print mark-sweep-table. ;
 
 : misc-room. ( seq -- )
     "- Miscellaneous buffers" print
-    { "Card array:" "Deck array:" "Mark stack:" } memory-table. ;
+    {
+        { "Card array:" [ kilobytes ] }
+        { "Deck array:" [ kilobytes ] }
+        { "Mark stack:" [ kilobytes ] }
+    } fancy-table. ;
 
 : data-room. ( -- )
     "==== DATA HEAP" print nl
     data-room
     3 cut [ nursery-room. nl ] dip
     3 cut [ aging-room. nl ] dip
-    4 cut [ tenured-room. nl ] dip
+    5 cut [ tenured-room. nl ] dip
     misc-room. ;
 
 : code-room. ( -- )
