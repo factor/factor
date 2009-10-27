@@ -5,7 +5,11 @@ namespace factor
 
 void free_list::clear_free_list()
 {
-	memset(this,0,sizeof(free_list));
+	for(cell i = 0; i < free_list_count; i++)
+		small_blocks[i].clear();
+	large_blocks.clear();
+	free_block_count = 0;
+	free_space = 0;
 }
 
 void free_list::initial_free_list(cell start, cell end, cell occupied)
@@ -27,59 +31,40 @@ void free_list::add_to_free_list(free_heap_block *block)
 	free_space += size;
 
 	if(size < free_list_count * block_granularity)
-	{
-		int index = size / block_granularity;
-		block->next_free = small_blocks[index];
-		small_blocks[index] = block;
-	}
+		small_blocks[size / block_granularity].push_back(block);
 	else
-	{
-		block->next_free = large_blocks;
-		large_blocks = block;
-	}
+		large_blocks.insert(block);
 }
 
 free_heap_block *free_list::find_free_block(cell size)
 {
-	cell attempt = size;
-
-	while(attempt < free_list_count * block_granularity)
+	/* Check small free lists */
+	for(cell i = size / block_granularity; i < free_list_count; i++)
 	{
-		int index = attempt / block_granularity;
-		free_heap_block *block = small_blocks[index];
-		if(block)
+		std::vector<free_heap_block *> &blocks = small_blocks[i];
+		if(blocks.size())
 		{
-			small_blocks[index] = block->next_free;
-
-			free_block_count--;
-			free_space -= block->size();
-
+			free_heap_block *block = blocks.back();
+			blocks.pop_back();
 			return block;
 		}
-
-		attempt++;
 	}
 
-	free_heap_block *prev = NULL;
-	free_heap_block *block = large_blocks;
+	/* Check large free lists */
+	free_heap_block key;
+	key.make_free(size);
+	large_block_set::iterator iter = large_blocks.lower_bound(&key);
+	large_block_set::iterator end = large_blocks.end();
 
-	while(block)
+	if(iter != end)
 	{
-		if(block->size() >= size)
-		{
-			if(prev)
-				prev->next_free = block->next_free;
-			else
-				large_blocks = block->next_free;
+		free_heap_block *block = *iter;
+		large_blocks.erase(iter);
 
-			free_block_count--;
-			free_space -= block->size();
+		free_block_count--;
+		free_space -= block->size();
 
-			return block;
-		}
-
-		prev = block;
-		block = block->next_free;
+		return block;
 	}
 
 	return NULL;
@@ -92,7 +77,6 @@ free_heap_block *free_list::split_free_block(free_heap_block *block, cell size)
 		/* split the block in two */
 		free_heap_block *split = (free_heap_block *)((cell)block + size);
 		split->make_free(block->size() - size);
-		split->next_free = block->next_free;
 		block->make_free(size);
 		add_to_free_list(split);
 	}
@@ -102,20 +86,19 @@ free_heap_block *free_list::split_free_block(free_heap_block *block, cell size)
 
 bool free_list::can_allot_p(cell size)
 {
-	cell attempt = size;
-
-	while(attempt < free_list_count * block_granularity)
+	/* Check small free lists */
+	for(cell i = size / block_granularity; i < free_list_count; i++)
 	{
-		int index = attempt / block_granularity;
-		if(small_blocks[index]) return true;
-		attempt++;
+		if(small_blocks[i].size()) return true;
 	}
 
-	free_heap_block *block = large_blocks;
-	while(block)
+	/* Check large free lists */
+	large_block_set::const_iterator iter = large_blocks.begin();
+	large_block_set::const_iterator end = large_blocks.end();
+
+	for(; iter != end; iter++)
 	{
-		if(block->size() >= size) return true;
-		block = block->next_free;
+		if((*iter)->size() >= size) return true;
 	}
 
 	return false;
@@ -123,16 +106,23 @@ bool free_list::can_allot_p(cell size)
 
 cell free_list::largest_free_block()
 {
-	cell largest = 0;
-	free_heap_block *scan = large_blocks;
-
-	while(scan)
+	if(large_blocks.size())
 	{
-		largest = std::max(largest,scan->size());
-		scan = scan->next_free;
+		large_block_set::iterator end = large_blocks.end();
+		free_heap_block *block = *end;
+		large_blocks.erase(end);
+		return block->size();
 	}
+	else
+	{
+		for(int i = free_list_count - 1; i >= 0; i--)
+		{
+			if(small_blocks[i].size())
+				return small_blocks[i].back()->size();
+		}
 
-	return largest;
+		return 0;
+	}
 }
 
 }
