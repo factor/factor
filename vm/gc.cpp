@@ -3,14 +3,14 @@
 namespace factor
 {
 
-gc_state::gc_state(gc_op op_) : op(op_), start_time(current_micros()) {}
-
-gc_state::~gc_state() {}
-
 gc_event::gc_event(gc_op op_, factor_vm *parent) :
 	op(op_),
+	cards_scanned(0),
+	decks_scanned(0),
+	code_blocks_scanned(0),
 	start_time(current_micros()),
 	card_scan_time(0),
+	code_scan_time(0),
 	data_sweep_time(0),
 	code_sweep_time(0),
 	compaction_time(0)
@@ -33,7 +33,7 @@ void gc_event::ended_card_scan(cell cards_scanned_, cell decks_scanned_)
 {
 	cards_scanned += cards_scanned_;
 	decks_scanned += decks_scanned_;
-	card_scan_time = (card_scan_time - current_micros());
+	card_scan_time = (current_micros() - card_scan_time);
 }
 
 void gc_event::started_code_scan()
@@ -44,7 +44,7 @@ void gc_event::started_code_scan()
 void gc_event::ended_code_scan(cell code_blocks_scanned_)
 {
 	code_blocks_scanned += code_blocks_scanned_;
-	code_scan_time = (code_scan_time - current_micros());
+	code_scan_time = (current_micros() - code_scan_time);
 }
 
 void gc_event::started_data_sweep()
@@ -54,7 +54,7 @@ void gc_event::started_data_sweep()
 
 void gc_event::ended_data_sweep()
 {
-	data_sweep_time = (data_sweep_time - current_micros());
+	data_sweep_time = (current_micros() - data_sweep_time);
 }
 
 void gc_event::started_code_sweep()
@@ -64,7 +64,7 @@ void gc_event::started_code_sweep()
 
 void gc_event::ended_code_sweep()
 {
-	code_sweep_time = (code_sweep_time - current_micros());
+	code_sweep_time = (current_micros() - code_sweep_time);
 }
 
 void gc_event::started_compaction()
@@ -74,7 +74,7 @@ void gc_event::started_compaction()
 
 void gc_event::ended_compaction()
 {
-	compaction_time = (compaction_time - current_micros());
+	compaction_time = (current_micros() - compaction_time);
 }
 
 void gc_event::ended_gc(factor_vm *parent)
@@ -86,6 +86,55 @@ void gc_event::ended_gc(factor_vm *parent)
 	code_size_after = parent->code->allocator->occupied_space();
 	code_free_block_count_after = parent->code->allocator->free_blocks.free_block_count;
 	total_time = current_micros() - start_time;
+}
+
+std::ostream &operator<<(std::ostream &out, const gc_event *event)
+{
+	out << "<event\n"
+	    << " op                              = '" << event->op                              << "'\n"
+	    << " nursery_size_before             = '" << event->nursery_size_before             << "'\n"
+	    << " aging_size_before               = '" << event->aging_size_before               << "'\n"
+	    << " tenured_size_before             = '" << event->tenured_size_before             << "'\n"
+	    << " tenured_free_block_count_before = '" << event->tenured_free_block_count_before << "'\n"
+	    << " code_size_before                = '" << event->code_size_before                << "'\n"
+	    << " code_free_block_count_before    = '" << event->code_free_block_count_before    << "'\n"
+	    << " nursery_size_after              = '" << event->nursery_size_after              << "'\n"
+	    << " aging_size_after                = '" << event->aging_size_after                << "'\n"
+	    << " tenured_size_after              = '" << event->tenured_size_after              << "'\n"
+	    << " tenured_free_block_count_after  = '" << event->tenured_free_block_count_after  << "'\n"
+	    << " code_size_after                 = '" << event->code_size_after                 << "'\n"
+	    << " code_free_block_count_after     = '" << event->code_free_block_count_after     << "'\n"
+	    << " cards_scanned                   = '" << event->cards_scanned                   << "'\n"
+	    << " decks_scanned                   = '" << event->decks_scanned                   << "'\n"
+	    << " code_blocks_scanned             = '" << event->code_blocks_scanned             << "'\n"
+	    << " start_time                      = '" << event->start_time                      << "'\n"
+	    << " total_time                      = '" << event->total_time                      << "'\n"
+	    << " card_scan_time                  = '" << event->card_scan_time                  << "'\n"
+	    << " code_scan_time                  = '" << event->code_scan_time                  << "'\n"
+	    << " data_sweep_time                 = '" << event->data_sweep_time                 << "'\n"
+	    << " code_sweep_time                 = '" << event->code_sweep_time                 << "'\n"
+	    << " compaction_time                 = '" << event->compaction_time                 << "' />";
+	return out;
+}
+
+gc_state::gc_state(gc_op op_, factor_vm *parent) : op(op_), start_time(current_micros())
+{
+	event = new gc_event(op,parent);
+}
+
+gc_state::~gc_state()
+{
+	delete event;
+	event = NULL;
+}
+
+void gc_state::start_again(gc_op op_, factor_vm *parent)
+{
+	event->ended_gc(parent);
+	if(parent->verbose_gc) std::cout << event << std::endl;
+	delete event;
+	event = new gc_event(op_,parent);
+	op = op_;
 }
 
 void factor_vm::update_code_heap_for_minor_gc(std::set<code_block *> *remembered_set)
@@ -104,10 +153,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 
 	save_stacks();
 
-	current_gc = new gc_state(op);
-
-	if(verbose_gc)
-		std::cout << "GC requested, op=" << op << std::endl;
+	current_gc = new gc_state(op,this);
 
 	/* Keep trying to GC higher and higher generations until we don't run out
 	of space */
@@ -117,25 +163,22 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 		switch(current_gc->op)
 		{
 		case collect_nursery_op:
-			current_gc->op = collect_aging_op;
+			current_gc->start_again(collect_aging_op,this);
 			break;
 		case collect_aging_op:
-			current_gc->op = collect_to_tenured_op;
+			current_gc->start_again(collect_to_tenured_op,this);
 			break;
 		case collect_to_tenured_op:
-			current_gc->op = collect_full_op;
+			current_gc->start_again(collect_full_op,this);
 			break;
 		case collect_full_op:
 		case collect_compact_op:
-			current_gc->op = collect_growing_heap_op;
+			current_gc->start_again(collect_growing_heap_op,this);
 			break;
 		default:
 			critical_error("Bad GC op",current_gc->op);
 			break;
 		}
-
-		if(verbose_gc)
-			std::cout << "GC rewind, op=" << current_gc->op << std::endl;
 	}
 
 	switch(current_gc->op)
@@ -166,8 +209,9 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 		break;
 	}
 
-	if(verbose_gc)
-		std::cout << "GC done, op=" << current_gc->op << std::endl;
+	current_gc->event->ended_gc(this);
+
+	if(verbose_gc) std::cout << current_gc->event << std::endl;
 
 	delete current_gc;
 	current_gc = NULL;
