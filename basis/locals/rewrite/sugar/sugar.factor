@@ -6,7 +6,7 @@ locals.errors locals.types make quotations sequences vectors
 words ;
 IN: locals.rewrite.sugar
 
-! Step 1: rewrite [| [let [let* into :> forms, turn
+! Step 1: rewrite [| into :> forms, turn
 ! literals with locals in them into code which constructs
 ! the literal after pushing locals on the stack
 
@@ -73,7 +73,7 @@ M: quotation rewrite-element rewrite-sugar* ;
 
 M: lambda rewrite-element rewrite-sugar* ;
 
-M: binding-form rewrite-element binding-form-in-literal-error ;
+M: let rewrite-element let-form-in-literal-error ;
 
 M: local rewrite-element , ;
 
@@ -115,12 +115,5 @@ M: word rewrite-sugar*
 
 M: object rewrite-sugar* , ;
 
-: let-rewrite ( body bindings -- )
-    [ quotation-rewrite % <def> , ] assoc-each
-    quotation-rewrite % ;
-
 M: let rewrite-sugar*
-    [ body>> ] [ bindings>> ] bi let-rewrite ;
-
-M: let* rewrite-sugar*
-    [ body>> ] [ bindings>> ] bi let-rewrite ;
+    body>> quotation-rewrite % ;

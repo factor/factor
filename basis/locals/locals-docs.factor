@@ -8,16 +8,9 @@ HELP: [|
 { $examples "See " { $link "locals-examples" } "." } ;
 
 HELP: [let
-{ $syntax "[let | var-1 [ value-1... ]\n        var-2 [ value-2... ]\n        ... |\n    body... ]" }
-{ $description "Evaluates each " { $snippet "value-n" } " form and binds its result to a new local variable named " { $snippet "var-n" } " lexically scoped to the " { $snippet "body" } ", then evaluates " { $snippet "body" } ". The " { $snippet "value-n" } " forms are evaluated in parallel, so a " { $snippet "value-n" } " form may not refer to previous " { $snippet "var-n" } " definitions inside the same " { $link POSTPONE: [let } " form, unlike " { $link POSTPONE: [let* } "." }
+{ $syntax "[let code :> var code :> var code... ]" }
+{ $description "Establishes a new lexical scope for local variable bindings. Variables bound with " { $link POSTPONE: :> } " within the body of the " { $snippet "[let" } " will be lexically scoped to the body of the " { $snippet "[let" } " form." }
 { $examples "See " { $link "locals-examples" } "." } ;
-
-HELP: [let*
-{ $syntax "[let* | var-1 [ value-1... ]\n        var-2 [ value-2... ]\n        ... |\n    body... ]" }
-{ $description "Evaluates each " { $snippet "value-n" } " form and binds its result to a new local variable named " { $snippet "var-n" } " lexically scoped to the " { $snippet "body" } ", then evaluates " { $snippet "body" } ". The " { $snippet "value-n" } " forms are evaluated sequentially, so a " { $snippet "value-n" } " form may refer to previous " { $snippet "var-n" } " definitions inside the same " { $link POSTPONE: [let* } " form." }
-{ $examples "See " { $link "locals-examples" } "." } ;
-
-{ POSTPONE: [let POSTPONE: [let* } related-words
 
 HELP: :>
 { $syntax ":> var" ":> var!" }
@@ -25,12 +18,16 @@ HELP: :>
 $nl
 "If the " { $snippet "var" } " name is followed by an exclamation point (" { $snippet "!" } "), the new variable will be mutable. See " { $link "locals-mutable" } " for more information on mutable local bindings." }
 { $notes
-    "This syntax can only be used inside a " { $link POSTPONE: :: } " word, " { $link POSTPONE: [let } " or " { $link POSTPONE: [let* } " form, or inside a quotation literal inside one of those forms." }
+    "This syntax can only be used inside a lexical scope established by a " { $link POSTPONE: :: } " definition, " { $link POSTPONE: [let } " form, or " { $link POSTPONE: [| } " quotation. Definition forms such as " { $link POSTPONE: : } " do not establish a lexical scope by themselves, nor is there a lexical scope available at the top level of source files or in the listener. To use local variable bindings in these situations, use " { $link POSTPONE: [let } " to provide a scope for them." }
 { $examples "See " { $link "locals-examples" } "." } ;
 
+{ POSTPONE: [let POSTPONE: :> } related-words
+
 HELP: ::
-{ $syntax ":: word ( bindings... -- outputs... ) body... ;" }
-{ $description "Defines a word with named inputs; it reads datastack values into local variable bindings from left to right, then executes the body with those bindings in lexical scope." }
+{ $syntax ":: word ( vars... -- outputs... ) body... ;" }
+{ $description "Defines a word with named inputs; it reads datastack values into local variable bindings from left to right, then executes the body with those bindings in lexical scope."
+$nl
+"If any of the " { $snippet "vars" } "' names is followed by an exclamation point (" { $snippet "!" } "), that variable will be mutable. See " { $link "locals-mutable" } " for more information on mutable local bindings." }
 { $notes "The names of the " { $snippet "outputs" } " do not affect the word's behavior. However, the compiler verifies that the stack effect accurately represents the number of outputs as with " { $link POSTPONE: : } " definitions." }
 { $examples "See " { $link "locals-examples" } "." } ;
 
@@ -38,21 +35,27 @@ HELP: ::
 
 HELP: MACRO::
 { $syntax "MACRO:: word ( bindings... -- outputs... ) body... ;" }
-{ $description "Defines a macro with named inputs; it reads datastack values into local variable bindings from left to right, then executes the body with those bindings in lexical scope." }
+{ $description "Defines a macro with named inputs; it reads datastack values into local variable bindings from left to right, then executes the body with those bindings in lexical scope."
+$nl
+"If any of the " { $snippet "vars" } "' names is followed by an exclamation point (" { $snippet "!" } "), that variable will be mutable. See " { $link "locals-mutable" } " for more information on mutable local bindings." }
 { $examples "See " { $link "locals-examples" } "." } ;
 
 { POSTPONE: MACRO: POSTPONE: MACRO:: } related-words
 
 HELP: MEMO::
 { $syntax "MEMO:: word ( bindings... -- outputs... ) body... ;" }
-{ $description "Defines a macro with named inputs; it reads datastack values into local variable bindings from left to right, then executes the body with those bindings in lexical scope." }
+{ $description "Defines a memoized word with named inputs; it reads datastack values into local variable bindings from left to right, then executes the body with those bindings in lexical scope."
+$nl
+"If any of the " { $snippet "vars" } "' names is followed by an exclamation point (" { $snippet "!" } "), that variable will be mutable. See " { $link "locals-mutable" } " for more information on mutable local bindings." }
 { $examples "See " { $link "locals-examples" } "." } ;
 
 { POSTPONE: MEMO: POSTPONE: MEMO:: } related-words
                                           
 HELP: M::
 { $syntax "M:: class generic ( bindings... -- outputs... ) body... ;" }
-{ $description "Defines a macro with named inputs; it reads datastack values into local variable bindings from left to right, then executes the body with those bindings in lexical scope." }
+{ $description "Defines a new method on " { $snippet "generic" } " for " { $snippet "class" } " with named inputs; it reads datastack values into local variable bindings from left to right, then executes the body with those bindings in lexical scope."
+$nl
+"If any of the " { $snippet "vars" } "' names is followed by an exclamation point (" { $snippet "!" } "), that variable will be mutable. See " { $link "locals-mutable" } " for more information on mutable local bindings." }
 { $notes "The names of the " { $snippet "outputs" } " do not affect the word's behavior. However, the compiler verifies that the stack effect accurately represents the number of outputs as with " { $link POSTPONE: M: } " definitions." }
 { $examples "See " { $link "locals-examples" } "." } ;
 
@@ -70,14 +73,13 @@ IN: scratchpad
 """2.0
 -3.0"""
 }
-{ $snippet "quadratic-roots" } " can also be expressed with " { $link POSTPONE: [let } ":"
+"If you wanted to perform the quadratic formula interactively from the listener, you could use " { $link POSTPONE: [let } " to provide a scope for the local variables:"
 { $example """USING: locals math math.functions kernel ;
 IN: scratchpad
-:: quadratic-roots ( a b c -- x y )
-    [let | disc [ b sq 4 a c * * - sqrt ] |
-        b neg disc [ + ] [ - ] 2bi [ 2 a * / ] bi@
-    ] ;
-1.0 1.0 -6.0 quadratic-roots [ . ] bi@"""
+[let 1.0 :> a 1.0 :> b -6.0 :> c
+    b sq 4 a c * * - sqrt :> disc
+    b neg disc [ + ] [ - ] 2bi [ 2 a * / ] bi@
+] [ . ] bi@"""
 """2.0
 -3.0"""
 }
@@ -200,11 +202,11 @@ $nl
 "One exception to the above rule is that array instances containing free local variables (that is, immutable local variables not referenced in a closure) do retain identity. This allows macros such as " { $link cond } " to recognize that the array is constant and expand at compile time." ;
 
 ARTICLE: "locals-mutable" "Mutable locals"
-"In the list of bindings supplied to " { $link POSTPONE: :: } ", " { $link POSTPONE: [let } ", " { $link POSTPONE: [let* } " or " { $link POSTPONE: [| } ", a mutable binding may be introduced by suffixing its named with " { $snippet "!" } ". Mutable bindings are read by giving their name as usual; the suffix is not part of the binding's name. To write to a mutable binding, use the binding's name with the " { $snippet "!" } " suffix."
+"Whenever a local variable is bound using " { $link POSTPONE: :> } ", " { $link POSTPONE: :: } ", or " { $link POSTPONE: [| } ", the variable may be made mutable by suffixing its name with an exclamation point (" { $snippet "!" } ") when it is bound. The variable's value can be read by giving its name without the exclamation point as usual. To write to the variable, use its name with the " { $snippet "!" } " suffix."
 $nl
 "Mutable bindings are implemented in a manner similar to the ML language; each mutable binding is actually an immutable binding of a mutable cell (in Factor's case, a 1-element array); reading the binding automatically dereferences the array, and writing to the binding stores into the array."
 $nl
-"Writing to mutable locals in outer scopes is fully supported and has the expected semantics. See " { $link "locals-examples" } " for examples of mutable local variables in action." ;
+"Writing to mutable locals in outer scopes is fully supported and has full closure semantics. See " { $link "locals-examples" } " for examples of mutable local variables in action." ;
 
 ARTICLE: "locals-fry" "Locals and fry"
 "Locals integrate with " { $link "fry" } " so that mixing locals with fried quotations gives intuitive results."
@@ -280,11 +282,10 @@ ARTICLE: "locals" "Lexical variables and closures"
     POSTPONE: MEMO::
     POSTPONE: MACRO::
 }
-"Lexical binding forms:"
+"Lexical scoping and binding forms:"
 { $subsections
-    POSTPONE: :>
     POSTPONE: [let
-    POSTPONE: [let*
+    POSTPONE: :>
 }
 "Quotation literals where the inputs are named local variables:"
 { $subsections POSTPONE: [| }
