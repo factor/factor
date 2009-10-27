@@ -118,8 +118,10 @@ struct word_and_literal_code_heap_updater {
 
 void factor_vm::update_code_heap_words_and_literals()
 {
+	current_gc->event->started_code_sweep();
 	word_and_literal_code_heap_updater updater(this);
 	code->allocator->sweep(updater);
+	current_gc->event->ended_code_sweep();
 }
 
 /* After growing the heap, we have to perform a full relocation to update

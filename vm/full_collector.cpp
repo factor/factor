@@ -75,9 +75,11 @@ void factor_vm::collect_mark_impl(bool trace_contexts_p)
 
 void factor_vm::collect_sweep_impl()
 {
+	current_gc->event->started_data_sweep();
 	data->tenured->starts.clear_object_start_offsets();
 	object_start_map_updater updater(&data->tenured->starts);
 	data->tenured->sweep(updater);
+	current_gc->event->ended_data_sweep();
 }
 
 void factor_vm::collect_growing_heap(cell requested_bytes, bool trace_contexts_p)

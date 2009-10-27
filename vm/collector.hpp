@@ -79,7 +79,6 @@ template<typename TargetGeneration, typename Policy> struct collector {
 	slot_visitor<collector_workhorse<TargetGeneration,Policy> > workhorse;
 	cell cards_scanned;
 	cell decks_scanned;
-	cell card_scan_time;
 	cell code_blocks_scanned;
 
 	explicit collector(factor_vm *parent_, TargetGeneration *target_, Policy policy_) :
@@ -90,7 +89,6 @@ template<typename TargetGeneration, typename Policy> struct collector {
 		workhorse(make_collector_workhorse(parent_,target_,policy_)),
 		cards_scanned(0),
 		decks_scanned(0),
-		card_scan_time(0),
 		code_blocks_scanned(0) {}
 
 	void trace_handle(cell *handle)
@@ -179,8 +177,6 @@ template<typename TargetGeneration, typename Policy> struct collector {
 	template<typename SourceGeneration, typename Unmarker>
 	void trace_cards(SourceGeneration *gen, card mask, Unmarker unmarker)
 	{
-		u64 start_time = current_micros();
-	
 		card_deck *decks = data->decks;
 		card_deck *cards = data->cards;
 	
@@ -238,15 +234,13 @@ scan_next_object:				{
 	
 						unmarker(&cards[card_index]);
 	
-						if(!start) goto end;
+						if(!start) return;
 					}
 				}
 	
 				unmarker(&decks[deck_index]);
 			}
 		}
-
-end:		card_scan_time += (current_micros() - start_time);
 	}
 };
 

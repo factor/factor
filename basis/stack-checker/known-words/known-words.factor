@@ -501,8 +501,6 @@ M: bad-executable summary
 
 \ compact-gc { } { } define-primitive
 
-\ gc-stats { } { array } define-primitive
-
 \ (save-image) { byte-array } { } define-primitive
 
 \ (save-image-and-exit) { byte-array } { } define-primitive
@@ -700,10 +698,6 @@ M: bad-executable summary
 \ modify-code-heap { array } { } define-primitive
 
 \ unimplemented { } { } define-primitive
-
-\ gc-reset { } { } define-primitive
-
-\ gc-stats { } { array } define-primitive
 
 \ jit-compile { quotation } { } define-primitive
 
