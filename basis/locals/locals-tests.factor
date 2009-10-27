@@ -55,29 +55,6 @@ IN: locals.tests
 
 [ -1 ] [ -1 let-test-3 call ] unit-test
 
-[ 5 ] [
-    [let | a [ 3 ] | [wlet | func [ a + ] | 2 func ] ]
-] unit-test
-
-:: wlet-test-2 ( a b -- seq )
-    [wlet | add-b [ b + ] |
-        a [ add-b ] map ] ;
-
-
-[ { 4 5 6 } ] [ { 2 3 4 } 2 wlet-test-2 ] unit-test
-    
-:: wlet-test-3 ( a -- b )
-    [wlet | add-a [ a + ] | [ add-a ] ]
-    [let | a [ 3 ] | a swap call ] ;
-
-[ 5 ] [ 2 wlet-test-3 ] unit-test
-
-:: wlet-test-4 ( a -- b )
-    [wlet | sub-a [| b | b a - ] |
-        3 sub-a ] ;
-
-[ -7 ] [ 10 wlet-test-4 ] unit-test
-
 :: write-test-1 ( n! -- q )
     [| i | n i + dup n! ] ;
 
@@ -119,12 +96,6 @@ write-test-2 "q" set
 :: write-test-4 ( x! -- q ) [ [let | y! [ 0 ] | f x! ] ] ;
 
 [ ] [ 5 write-test-4 drop ] unit-test
-
-! Not really a write test; just enforcing consistency
-:: write-test-5 ( x -- y )
-    [wlet | fun! [ x + ] | 5 fun! ] ;
-
-[ 9 ] [ 4 write-test-5 ] unit-test
 
 :: let-let-test ( n -- n ) [let | n [ n 3 + ] | n ] ;
 
@@ -168,12 +139,6 @@ M:: string lambda-generic ( a b -- c ) a b lambda-generic-2 ;
 
 [ "[let | a! [ 3 ] | ]" ] [
     \ unparse-test-1 "lambda" word-prop body>> first unparse
-] unit-test
-
-:: unparse-test-2 ( -- ) [wlet | a! [ ] | ] ;
-
-[ "[wlet | a! [ ] | ]" ] [
-    \ unparse-test-2 "lambda" word-prop body>> first unparse
 ] unit-test
 
 :: unparse-test-3 ( -- b ) [| a! | ] ;
@@ -486,13 +451,9 @@ M:: integer lambda-method-forget-test ( a -- b ) a ;
 
 [ "USE: locals [| | { [let | a [ 0 ] | a ] } ]" eval( -- ) ] must-fail
 
-[ "USE: locals [| | { [wlet | a [ 0 ] | a ] } ]" eval( -- ) ] must-fail
-
 [ "USE: locals [| | { [let* | a [ 0 ] | a ] } ]" eval( -- ) ] must-fail
 
 [ "USE: locals [| | [let | a! [ 0 ] | { a! } ] ]" eval( -- ) ] must-fail
-
-[ "USE: locals [| | [wlet | a [ 0 ] | { a } ] ]" eval( -- ) ] must-fail
 
 [ "USE: locals [| | { :> a } ]" eval( -- ) ] must-fail
 
@@ -503,19 +464,6 @@ M:: integer lambda-method-forget-test ( a -- b ) a ;
 [ 3 ] [ 3 [| | :> a! a ] call ] unit-test
 
 [ 3 ] [ 2 [| | :> a! a 1 + a! a ] call ] unit-test
-
-:: wlet-&&-test ( a -- ? )
-    [wlet | is-integer? [ a integer? ]
-            is-even? [ a even? ]
-            >10? [ a 10 > ] |
-        { [ is-integer? ] [ is-even? ] [ >10? ] } &&
-    ] ;
-
-\ wlet-&&-test def>> must-infer
-[ f ] [ 1.5 wlet-&&-test ] unit-test
-[ f ] [ 3 wlet-&&-test ] unit-test
-[ f ] [ 8 wlet-&&-test ] unit-test
-[ t ] [ 12 wlet-&&-test ] unit-test
 
 : fry-locals-test-1 ( -- n )
     [let | | 6 '[ [let | A [ 4 ] | A _ + ] ] call ] ;

@@ -12,7 +12,7 @@ M: >r/r>-in-lambda-error summary
 ERROR: binding-form-in-literal-error ;
 
 M: binding-form-in-literal-error summary
-    drop "[let, [let* and [wlet not permitted inside literals" ;
+    drop "[let and [let* not permitted inside literals" ;
 
 ERROR: local-writer-in-literal-error ;
 
