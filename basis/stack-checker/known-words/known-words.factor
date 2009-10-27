@@ -505,10 +505,10 @@ M: bad-executable summary
 
 \ (save-image-and-exit) { byte-array } { } define-primitive
 
-\ data-room { } { array } define-primitive
+\ data-room { } { byte-array } define-primitive
 \ data-room make-flushable
 
-\ code-room { } { array } define-primitive
+\ code-room { } { byte-array } define-primitive
 \ code-room  make-flushable
 
 \ micros { } { integer } define-primitive
@@ -713,3 +713,6 @@ M: bad-executable summary
 \ strip-stack-traces { } { } define-primitive
 
 \ <callback> { word } { alien } define-primitive
+
+\ enable-gc-events { } { } define-primitive
+\ disable-gc-events { } { object } define-primitive

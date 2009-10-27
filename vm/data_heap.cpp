@@ -201,31 +201,26 @@ void factor_vm::primitive_size()
 	box_unsigned_cell(object_size(dpop()));
 }
 
-/* Push memory usage statistics in data heap */
 void factor_vm::primitive_data_room()
 {
-	growable_array a(this);
+	data_heap_room room;
 
-	a.add(tag_fixnum(nursery.size));
-	a.add(tag_fixnum(nursery.occupied_space()));
-	a.add(tag_fixnum(nursery.free_space()));
+	room.nursery_size             = nursery.size;
+	room.nursery_occupied         = nursery.occupied_space();
+	room.nursery_free             = nursery.free_space();
+	room.aging_size               = data->aging->size;
+	room.aging_occupied           = data->aging->occupied_space();
+	room.aging_free               = data->aging->free_space();
+	room.tenured_size             = data->tenured->size;
+	room.tenured_occupied         = data->tenured->occupied_space();
+	room.tenured_total_free       = data->tenured->free_space();
+	room.tenured_contiguous_free  = data->tenured->free_blocks.largest_free_block();
+	room.tenured_free_block_count = data->tenured->free_blocks.free_block_count;
+	room.cards                    = data->cards_end - data->cards;
+	room.decks                    = data->decks_end - data->decks;
+	room.mark_stack               = data->tenured->mark_stack.capacity();
 
-	a.add(tag_fixnum(data->aging->size));
-	a.add(tag_fixnum(data->aging->occupied_space()));
-	a.add(tag_fixnum(data->aging->free_space()));
-
-	a.add(tag_fixnum(data->tenured->size));
-	a.add(tag_fixnum(data->tenured->occupied_space()));
-	a.add(tag_fixnum(data->tenured->free_space()));
-	a.add(tag_fixnum(data->tenured->free_blocks.largest_free_block()));
-	a.add(tag_fixnum(data->tenured->free_blocks.free_block_count));
-
-	a.add(tag_fixnum(data->cards_end - data->cards));
-	a.add(tag_fixnum(data->decks_end - data->decks));
-	a.add(tag_fixnum(data->tenured->mark_stack.capacity()));
-
-	a.trim();
-	dpush(a.elements.value());
+	dpush(tag<byte_array>(byte_array_from_value(&room)));
 }
 
 /* Disables GC and activates next-object ( -- obj ) primitive */

@@ -196,19 +196,17 @@ void factor_vm::primitive_modify_code_heap()
 	update_code_heap_words();
 }
 
-/* Push the free space and total size of the code heap */
 void factor_vm::primitive_code_room()
 {
-	growable_array a(this);
+	code_heap_room room;
 
-	a.add(tag_fixnum(code->allocator->size));
-	a.add(tag_fixnum(code->allocator->occupied_space()));
-	a.add(tag_fixnum(code->allocator->free_space()));
-	a.add(tag_fixnum(code->allocator->free_blocks.largest_free_block()));
-	a.add(tag_fixnum(code->allocator->free_blocks.free_block_count));
+	room.size             = code->allocator->size;
+	room.occupied_space   = code->allocator->occupied_space();
+	room.total_free       = code->allocator->free_space();
+	room.contiguous_free  = code->allocator->free_blocks.largest_free_block();
+	room.free_block_count = code->allocator->free_blocks.free_block_count;
 
-	a.trim();
-	dpush(a.elements.value());
+	dpush(tag<byte_array>(byte_array_from_value(&room)));
 }
 
 struct stack_trace_stripper {

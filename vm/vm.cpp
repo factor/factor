@@ -8,6 +8,7 @@ factor_vm::factor_vm() :
 	profiling_p(false),
 	gc_off(false),
 	current_gc(NULL),
+	gc_events(NULL),
 	fep_disabled(false),
 	full_output(false)
 	{ }
