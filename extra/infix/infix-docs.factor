@@ -61,7 +61,7 @@ $nl
 $nl
 "You can access " { $vocab-link "sequences" } " inside infix expressions with the familiar " { $snippet "arr[index]" } " notation."
 { $example
-    "USING: arrays infix ;"
+    "USING: arrays locals infix ;"
     "[let { 1 2 3 4 } :> myarr [infix myarr[4/2]*3 infix] ] ."
     "9"
 }
