@@ -101,7 +101,7 @@ SYNTAX: HINTS:
 { { fixnum fixnum string } { fixnum fixnum array } }
 "specializer" set-word-prop
 
-\ reverse-here
+\ reverse!
 { { string } { array } }
 "specializer" set-word-prop
 
