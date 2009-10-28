@@ -46,9 +46,6 @@ struct factor_vm
 	/* GC is off during heap walking */
 	bool gc_off;
 
-	/* GC logging */
-	bool verbose_gc;
-
 	/* Data heap */
 	data_heap *data;
 
@@ -223,6 +220,7 @@ struct factor_vm
 	void set_data_heap(data_heap *data_);
 	void init_data_heap(cell young_size, cell aging_size, cell tenured_size);
 	void primitive_size();
+	data_heap_room data_room();
 	void primitive_data_room();
 	void begin_scan();
 	void end_scan();
@@ -502,6 +500,7 @@ struct factor_vm
 	void update_code_heap_words_and_literals();
 	void relocate_code_heap();
 	void primitive_modify_code_heap();
+	code_heap_room code_room();
 	void primitive_code_room();
 	void primitive_strip_stack_traces();
 

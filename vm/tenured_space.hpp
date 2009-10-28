@@ -20,30 +20,16 @@ struct tenured_space : free_list_allocator<object> {
 			return NULL;
 	}
 
-	object *first_allocated_block_after(object *block)
-	{
-		while(block != this->last_block() && block->free_p())
-		{
-			free_heap_block *free_block = (free_heap_block *)block;
-			block = (object *)((cell)free_block + free_block->size());
-		}
-
-		if(block == this->last_block())
-			return NULL;
-		else
-			return block;
-	}
-
 	cell first_object()
 	{
-		return (cell)first_allocated_block_after(this->first_block());
+		return (cell)next_allocated_block_after(this->first_block());
 	}
 
 	cell next_object_after(cell scan)
 	{
 		cell size = ((object *)scan)->size();
 		object *next = (object *)(scan + size);
-		return (cell)first_allocated_block_after(next);
+		return (cell)next_allocated_block_after(next);
 	}
 
 	void clear_mark_bits()

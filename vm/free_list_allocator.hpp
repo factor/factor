@@ -14,6 +14,7 @@ template<typename Block> struct free_list_allocator {
 	Block *first_block();
 	Block *last_block();
 	Block *next_block_after(Block *block);
+	Block *next_allocated_block_after(Block *block);
 	bool can_allot_p(cell size);
 	Block *allot(cell size);
 	void free(Block *block);
@@ -56,6 +57,20 @@ template<typename Block> Block *free_list_allocator<Block>::last_block()
 template<typename Block> Block *free_list_allocator<Block>::next_block_after(Block *block)
 {
 	return (Block *)((cell)block + block->size());
+}
+
+template<typename Block> Block *free_list_allocator<Block>::next_allocated_block_after(Block *block)
+{
+	while(block != this->last_block() && block->free_p())
+	{
+		free_heap_block *free_block = (free_heap_block *)block;
+		block = (object *)((cell)free_block + free_block->size());
+	}
+
+	if(block == this->last_block())
+		return NULL;
+	else
+		return block;
 }
 
 template<typename Block> bool free_list_allocator<Block>::can_allot_p(cell size)

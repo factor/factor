@@ -154,6 +154,20 @@ template<typename Block> struct mark_bits {
 #endif
 		return new_block;
 	}
+
+	/* Find the next allocated block without calling size() on unmarked
+	objects. */
+	cell unmarked_space_starting_at(Block *original)
+	{
+		char *start = (char *)original;
+		char *scan = start;
+		char *end = (char *)(this->start + this->size);
+
+		while(scan != end && !marked_p((Block *)scan))
+			scan += block_granularity;
+
+		return scan - start;
+	}
 };
 
 }

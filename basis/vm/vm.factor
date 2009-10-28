@@ -29,31 +29,6 @@ collect-full-op
 collect-compact-op
 collect-growing-heap-op ;
 
-STRUCT: gc-event
-{ op uint }
-{ nursery-size-before cell }
-{ aging-size-before cell }
-{ tenured-size-before cell }
-{ tenured-free-block-count-before cell }
-{ code-size-before cell }
-{ code-free-block-count-before cell }
-{ nursery-size-after cell }
-{ aging-size-after cell }
-{ tenured-size-after cell }
-{ tenured-free-block-count-after cell }
-{ code-size-after cell }
-{ code-free-block-count-after cell }
-{ cards-scanned cell }
-{ decks-scanned cell }
-{ code-blocks-scanned cell }
-{ start-time ulonglong }
-{ total-time cell }
-{ card-scan-time cell }
-{ code-scan-time cell }
-{ data-sweep-time cell }
-{ code-sweep-time cell }
-{ compaction-time cell } ;
-
 STRUCT: copying-sizes
 { size cell }
 { occupied cell }
@@ -73,3 +48,20 @@ STRUCT: data-heap-room
 { cards cell }
 { decks cell }
 { mark-stack cell } ;
+
+STRUCT: gc-event
+{ op uint }
+{ data-heap-before data-heap-room }
+{ code-heap-before mark-sweep-sizes }
+{ data-heap-after data-heap-room }
+{ code-heap-after mark-sweep-sizes }
+{ cards-scanned cell }
+{ decks-scanned cell }
+{ code-blocks-scanned cell }
+{ start-time ulonglong }
+{ total-time cell }
+{ card-scan-time cell }
+{ code-scan-time cell }
+{ data-sweep-time cell }
+{ code-sweep-time cell }
+{ compaction-time cell } ;
