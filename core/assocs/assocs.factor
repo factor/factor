@@ -135,9 +135,6 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : assoc-diff ( assoc1 assoc2 -- diff )
     [ nip key? not ] curry assoc-filter ;
 
-: remove-all ( assoc seq -- subseq )
-    swap [ key? not ] curry filter ;
-
 : substitute-here ( seq assoc -- )
     substituter map! drop ;
 
