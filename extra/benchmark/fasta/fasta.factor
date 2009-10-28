@@ -78,7 +78,8 @@ CONSTANT: homo-sapiens
 : write-repeat-fasta ( n alu desc id -- )
     write-description
     [let
-        0 :> k! :> alu
+        :> alu
+        0 :> k!
         [| len | k len alu make-repeat-fasta k! ] split-lines
     ] ; inline
 
@@ -86,12 +87,7 @@ CONSTANT: homo-sapiens
     homo-sapiens make-cumulative
     IUB make-cumulative
     [let
-        :> homo-sapiens-floats
-        :> homo-sapiens-chars
-        :> IUB-floats
-        :> IUB-chars
-        :> out
-        :> n
+        :> ( n out IUB-chars IUB-floats homo-sapiens-chars homo-sapiens-floats )
         initial-seed :> seed
 
         out ascii [

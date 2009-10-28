@@ -95,8 +95,8 @@ MACRO: all-enabled-client-state ( seq quot -- )
     #! We use GL_LINE_STRIP with a duplicated first vertex
     #! instead of GL_LINE_LOOP to work around a bug in Apple's
     #! X3100 driver.
-    loc first2 :> y :> x
-    dim first2 :> h :> w
+    loc first2 :> ( x y )
+    dim first2 :> ( w h )
     [
         x 0.5 +     y 0.5 +
         x w + 0.3 - y 0.5 +
@@ -115,8 +115,8 @@ MACRO: all-enabled-client-state ( seq quot -- )
     rect-vertices (gl-rect) ;
 
 :: (fill-rect-vertices) ( loc dim -- vertices )
-    loc first2 :> y :> x
-    dim first2 :> h :> w
+    loc first2 :> ( x y )
+    dim first2 :> ( w h )
     [
         x      y
         x w +  y

@@ -12,7 +12,7 @@ M:: full-node (new-at) ( shift value key hashcode full-node -- node' added-leaf 
     hashcode full-node shift>> mask :> idx
     idx nodes nth-unsafe :> n
 
-    shift radix-bits + value key hashcode n (new-at) :> new-leaf :> n'
+    shift radix-bits + value key hashcode n (new-at) :> ( n' new-leaf )
     n n' eq? [
         full-node
     ] [

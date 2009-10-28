@@ -614,7 +614,7 @@ ERROR: parse-failed input word ;
 
 SYNTAX: PEG:
     [let
-        (:) :> effect :> def :> word
+        (:) :> ( word def effect )
         [
           [
             def call compile :> compiled-def

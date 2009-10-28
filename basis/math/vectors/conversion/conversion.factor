@@ -81,8 +81,8 @@ ERROR: bad-vconvert-input value expected-type ;
 PRIVATE>
 
 MACRO:: vconvert ( from-type to-type -- )
-    from-type new [ element-type ] [ byte-length ] bi :> from-length :> from-element
-    to-type   new [ element-type ] [ byte-length ] bi :> to-length   :> to-element
+    from-type new [ element-type ] [ byte-length ] bi :> ( from-element from-length )
+    to-type   new [ element-type ] [ byte-length ] bi :> ( to-element   to-length   )
     from-element heap-size :> from-size
     to-element   heap-size :> to-size   
 

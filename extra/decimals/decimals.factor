@@ -75,8 +75,8 @@ M: decimal before?
 
 :: D/ ( D1 D2 a -- D3 )
     D1 D2 guard-decimals 2drop
-    D1 >decimal< :> e1 :> m1
-    D2 >decimal< :> e2 :> m2
+    D1 >decimal< :> ( m1 e1 )
+    D2 >decimal< :> ( m2 e2 )
     m1 a 10^ *
     m2 /i
     
