@@ -107,7 +107,7 @@ UNIFORM-TUPLE: loading-uniforms
     [
         numbers {
             { [ dup length 5 = ] [ <bunny-vertex> pick push ] }
-            { [ dup first 3 = ] [ rest over push-all ] }
+            { [ dup first 3 = ] [ rest append! ] }
             [ drop ]
         } cond
     ] each-line-tokens ; inline

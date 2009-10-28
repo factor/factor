@@ -23,7 +23,7 @@ M: model hashcode* drop model hashcode* ;
     dependencies>> push ;
 
 : remove-dependency ( dep model -- )
-    dependencies>> delete ;
+    dependencies>> remove! drop ;
 
 DEFER: add-connection
 
@@ -63,7 +63,7 @@ GENERIC: model-changed ( model observer -- )
     connections>> push ;
 
 : remove-connection ( observer model -- )
-    [ connections>> delete ] keep
+    [ connections>> remove! drop ] keep
     dup connections>> empty? [ dup deactivate-model ] when
     drop ;
 

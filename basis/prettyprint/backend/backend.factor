@@ -119,7 +119,7 @@ M: pathname pprint*
         "~" over class name>> "~" 3append
         swap present-text
     ] [
-        over recursion-check get memq? [
+        over recursion-check get member-eq? [
             drop "~circularity~" swap present-text
         ] [
             over recursion-check get push

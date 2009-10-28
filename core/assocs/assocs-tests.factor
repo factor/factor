@@ -79,8 +79,6 @@ H{ } clone "cache-test" set
     H{ { 1 f } } H{ { 1 f } } assoc-intersect
 ] unit-test
 
-[ { 1 3 } ] [ H{ { 2 2 } } { 1 2 3 } remove-all ] unit-test
-
 [ H{ { "hi" 2 } { 3 4 } } ]
 [ "hi" 1 H{ { 1 2 } { 3 4 } } clone [ rename-at ] keep ]
 unit-test

@@ -20,7 +20,7 @@ IN: bit-arrays.tests
 [
     { t f t } { f t f }
 ] [
-    { t f t } >bit-array dup clone dup [ not ] change-each
+    { t f t } >bit-array dup clone [ not ] map!
     [ >array ] bi@
 ] unit-test
 

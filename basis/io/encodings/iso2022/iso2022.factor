@@ -31,7 +31,7 @@ M: iso2022 <encoder>
 M: iso2022 <decoder>
     make-iso-coder <decoder> ;
 
-<< SYNTAX: ESC HEX: 16 parsed ; >>
+<< SYNTAX: ESC HEX: 16 suffix! ; >>
 
 CONSTANT: switch-ascii B{ ESC CHAR: ( CHAR: B }
 CONSTANT: switch-jis201 B{ ESC CHAR: ( CHAR: J }

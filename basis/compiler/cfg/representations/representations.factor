@@ -209,7 +209,7 @@ RENAMING: convert [ converted-value ] [ converted-value ] [ ]
 
 : perform-renaming ( insn -- )
     needs-renaming? get [
-        renaming-set get reverse-here
+        renaming-set get reverse! drop
         [ convert-insn-uses ] [ convert-insn-defs ] bi
         renaming-set get length 0 assert=
     ] [ drop ] if ;

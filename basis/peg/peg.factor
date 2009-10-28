@@ -624,7 +624,7 @@ SYNTAX: PEG:
             ]
             word swap effect define-declared
           ] with-compilation-unit
-        ] over push-all
+        ] append!
     ] ;
 
 USING: vocabs vocabs.loader ;

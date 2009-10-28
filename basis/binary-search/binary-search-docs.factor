@@ -25,11 +25,11 @@ HELP: sorted-member?
 
 { member? sorted-member? } related-words
 
-HELP: sorted-memq?
+HELP: sorted-member-eq?
 { $values { "obj" object } { "seq" "a sorted sequence" } { "?" "a boolean" } }
 { $description "Tests if the sorted sequence contains " { $snippet "elt" } ". Equality is tested with " { $link eq? } "." } ;
 
-{ memq? sorted-memq? } related-words
+{ member-eq? sorted-member-eq? } related-words
 
 ARTICLE: "binary-search" "Binary search"
 "The " { $emphasis "binary search" } " algorithm allows elements to be located in sorted sequence in " { $snippet "O(log n)" } " time."
@@ -38,7 +38,7 @@ ARTICLE: "binary-search" "Binary search"
 { $subsections
     sorted-index
     sorted-member?
-    sorted-memq?
+    sorted-member-eq?
 }
 { $see-also "order-specifiers" "sequences-sorting" } ;
 

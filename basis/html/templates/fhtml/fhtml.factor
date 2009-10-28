@@ -31,14 +31,14 @@ DEFER: <% delimiter
 : found-<% ( accum lexer col -- accum )
     [
         over line-text>>
-        [ column>> ] 2dip subseq parsed
-        \ write parsed
+        [ column>> ] 2dip subseq suffix!
+        \ write suffix!
     ] 2keep 2 + >>column drop ;
 
 : still-looking ( accum lexer -- accum )
     [
         [ line-text>> ] [ column>> ] bi tail
-        parsed \ print parsed
+        suffix! \ print suffix!
     ] keep next-line ;
 
 : parse-%> ( accum lexer -- accum )

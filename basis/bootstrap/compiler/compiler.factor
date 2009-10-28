@@ -94,7 +94,7 @@ gc
     "." write flush
 
     {
-        memq? split harvest sift cut cut-slice start index clone
+        member-eq? split harvest sift cut cut-slice start index clone
         set-at reverse push-all class number>string string>number
         like clone-like
     } compile-unoptimized

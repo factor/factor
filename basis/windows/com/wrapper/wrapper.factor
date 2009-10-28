@@ -159,7 +159,7 @@ PRIVATE>
 
 M: com-wrapper dispose*
     [ [ free ] each f ] change-vtbls
-    +live-wrappers+ get-global delete ;
+    +live-wrappers+ get-global remove! drop ;
 
 : com-wrap ( object wrapper -- wrapped-object )
     [ vtbls>> ] [ (malloc-wrapped-object) ] bi

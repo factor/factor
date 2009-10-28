@@ -306,7 +306,7 @@ M: gadget remove-gadget 2drop ;
             [ remove-gadget ] [
                 over (unparent)
                 [ unfocus-gadget ]
-                [ children>> delete ]
+                [ children>> remove! drop ]
                 [ nip relayout ]
                 2tri
             ] 2bi

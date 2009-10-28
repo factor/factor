@@ -42,85 +42,85 @@ M: fake-call-next-method (fake-quotations>)
 M: object (fake-quotations>) , ;
 
 : parse-definition* ( accum -- accum )
-    parse-definition >fake-quotations parsed
-    [ fake-quotations> first ] over push-all ;
+    parse-definition >fake-quotations suffix!
+    [ fake-quotations> first ] append! ;
 
 : parse-declared* ( accum -- accum )
     complete-effect
     [ parse-definition* ] dip
-    parsed ;
+    suffix! ;
 
 FUNCTOR-SYNTAX: TUPLE:
-    scan-param parsed
+    scan-param suffix!
     scan {
-        { ";" [ tuple parsed f parsed ] }
-        { "<" [ scan-param parsed [ parse-tuple-slots ] { } make parsed ] }
+        { ";" [ tuple suffix! f suffix! ] }
+        { "<" [ scan-param suffix! [ parse-tuple-slots ] { } make suffix! ] }
         [
-            [ tuple parsed ] dip
+            [ tuple suffix! ] dip
             [ parse-slot-name [ parse-tuple-slots ] when ] { }
-            make parsed
+            make suffix!
         ]
     } case
-    \ define-tuple-class parsed ;
+    \ define-tuple-class suffix! ;
 
 FUNCTOR-SYNTAX: SINGLETON:
-    scan-param parsed
-    \ define-singleton-class parsed ;
+    scan-param suffix!
+    \ define-singleton-class suffix! ;
 
 FUNCTOR-SYNTAX: MIXIN:
-    scan-param parsed
-    \ define-mixin-class parsed ;
+    scan-param suffix!
+    \ define-mixin-class suffix! ;
 
 FUNCTOR-SYNTAX: M:
-    scan-param parsed
-    scan-param parsed
-    [ create-method-in dup method-body set ] over push-all
+    scan-param suffix!
+    scan-param suffix!
+    [ create-method-in dup method-body set ] append! 
     parse-definition*
-    \ define* parsed ;
+    \ define* suffix! ;
 
 FUNCTOR-SYNTAX: C:
-    scan-param parsed
-    scan-param parsed
+    scan-param suffix!
+    scan-param suffix!
     complete-effect
-    [ [ [ boa ] curry ] over push-all ] dip parsed
-    \ define-declared* parsed ;
+    [ [ [ boa ] curry ] append! ] dip suffix!
+    \ define-declared* suffix! ;
 
 FUNCTOR-SYNTAX: :
-    scan-param parsed
+    scan-param suffix!
     parse-declared*
-    \ define-declared* parsed ;
+    \ define-declared* suffix! ;
 
 FUNCTOR-SYNTAX: SYMBOL:
-    scan-param parsed
-    \ define-symbol parsed ;
+    scan-param suffix!
+    \ define-symbol suffix! ;
 
 FUNCTOR-SYNTAX: SYNTAX:
-    scan-param parsed
+    scan-param suffix!
     parse-definition*
-    \ define-syntax parsed ;
+    \ define-syntax suffix! ;
 
 FUNCTOR-SYNTAX: INSTANCE:
-    scan-param parsed
-    scan-param parsed
-    \ add-mixin-instance parsed ;
+    scan-param suffix!
+    scan-param suffix!
+    \ add-mixin-instance suffix! ;
 
 FUNCTOR-SYNTAX: GENERIC:
-    scan-param parsed
-    complete-effect parsed
-    \ define-simple-generic* parsed ;
+    scan-param suffix!
+    complete-effect suffix!
+    \ define-simple-generic* suffix! ;
 
 FUNCTOR-SYNTAX: MACRO:
-    scan-param parsed
+    scan-param suffix!
     parse-declared*
-    \ define-macro parsed ;
+    \ define-macro suffix! ;
 
-FUNCTOR-SYNTAX: inline [ word make-inline ] over push-all ;
+FUNCTOR-SYNTAX: inline [ word make-inline ] append! ;
 
-FUNCTOR-SYNTAX: call-next-method T{ fake-call-next-method } parsed ;
+FUNCTOR-SYNTAX: call-next-method T{ fake-call-next-method } suffix! ;
 
 : (INTERPOLATE) ( accum quot -- accum )
     [ scan interpolate-locals ] dip
-    '[ _ with-string-writer @ ] parsed ;
+    '[ _ with-string-writer @ ] suffix! ;
 
 PRIVATE>
 

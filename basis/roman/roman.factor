@@ -69,4 +69,4 @@ ROMAN-OP: *
 ROMAN-OP: /i
 ROMAN-OP: /mod
 
-SYNTAX: ROMAN: scan roman> parsed ;
+SYNTAX: ROMAN: scan roman> suffix! ;

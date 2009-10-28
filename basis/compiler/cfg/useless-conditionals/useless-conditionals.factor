@@ -13,7 +13,7 @@ IN: compiler.cfg.useless-conditionals
                 ##compare-imm-branch
                 ##compare-float-ordered-branch
                 ##compare-float-unordered-branch
-            } memq?
+            } member-eq?
         ]
         [ successors>> first2 [ skip-empty-blocks ] bi@ eq? ]
     } 1&& ;

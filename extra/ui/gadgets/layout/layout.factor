@@ -26,8 +26,8 @@ DEFER: with-interface
 : insertion-quot ( quot -- quot' ) make:building get [ [ placeholder? ] find-last nip [ <placeholder> dup , ] unless*
     templates get spin '[ [ _ templates set _ , @ ] with-interface ] ] when* ;
 
-SYNTAX: ,% scan string>number [ <layout> , ] curry over push-all ;
-SYNTAX: ->% scan string>number '[ [ _ <layout> , ] [ output-model ] bi ] over push-all ;
+SYNTAX: ,% scan string>number [ <layout> , ] curry append! ;
+SYNTAX: ->% scan string>number '[ [ _ <layout> , ] [ output-model ] bi ] append! ;
 
 GENERIC: -> ( uiitem -- model )
 M: gadget -> dup , output-model ;
@@ -55,7 +55,7 @@ M: model -> dup , ;
 ERROR: not-in-template word ;
 SYNTAX: $ CREATE-WORD dup
     [ [ dup templates get at [ nip , ] [ not-in-template ] if* ] curry (( -- )) define-declared "$" expect ]
-    [ [ <placeholder> [ swap templates get set-at ] keep , ] curry ] bi over push-all ;
+    [ [ <placeholder> [ swap templates get set-at ] keep , ] curry ] bi append! ;
 
 : insert-gadget ( number parent gadget -- ) -rot [ but-last insert-nth ] change-children drop ;
 : insert-size ( number parent size -- ) -rot [ but-last insert-nth ] change-sizes drop ;

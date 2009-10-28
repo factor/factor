@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image.private kernel kernel.private namespaces system
-layouts compiler.units math math.private compiler.constants vocabs
-slots.private words locals.backend make sequences combinators arrays
- cpu.x86.assembler cpu.x86.assembler.operands ;
+USING: bootstrap.image.private compiler.constants
+compiler.units cpu.x86.assembler cpu.x86.assembler.operands
+kernel kernel.private layouts locals.backend make math
+math.private namespaces sequences slots.private vocabs ;
 IN: bootstrap.x86
 
 big-endian off

@@ -42,7 +42,7 @@ M: ##load-constant >expr obj>> <constant> ;
 <<
 
 : input-values ( slot-specs -- slot-specs' )
-    [ type>> { use literal constant } memq? ] filter ;
+    [ type>> { use literal constant } member-eq? ] filter ;
 
 : expr-class ( insn -- expr )
     name>> "##" ?head drop "-expr" append create-class-in ;

@@ -34,7 +34,7 @@ TUPLE: document < model locs undos redos inside-undo? ;
 
 : add-loc ( loc document -- ) locs>> push ;
 
-: remove-loc ( loc document -- ) locs>> delete ;
+: remove-loc ( loc document -- ) locs>> remove! drop ;
 
 : update-locs ( loc document -- )
     locs>> [ set-model ] with each ;
