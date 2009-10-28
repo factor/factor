@@ -632,8 +632,8 @@ PRIVATE>
 : filter-here ( seq quot -- )
     swap [ 0 0 ] dip (filter-here) ; inline
 
-: delete ( elt seq -- )
-    [ = not ] with filter-here ;
+: remove! ( elt seq -- seq )
+    [ [ = not ] with filter-here ] keep ;
 
 : delq ( elt seq -- )
     [ eq? not ] with filter-here ;

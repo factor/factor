@@ -126,11 +126,11 @@ unit-test
 [ 4 [ CHAR: a <string> ] map ]
 unit-test
 
-[ V{ } ] [ "f" V{ } clone [ delete ] keep ] unit-test
-[ V{ } ] [ "f" V{ "f" } clone [ delete ] keep ] unit-test
-[ V{ } ] [ "f" V{ "f" "f" } clone [ delete ] keep ] unit-test
-[ V{ "x" } ] [ "f" V{ "f" "x" "f" } clone [ delete ] keep ] unit-test
-[ V{ "y" "x" } ] [ "f" V{ "y" "f" "x" "f" } clone [ delete ] keep ] unit-test
+[ V{ } ] [ "f" V{ } clone remove! ] unit-test
+[ V{ } ] [ "f" V{ "f" } clone remove! ] unit-test
+[ V{ } ] [ "f" V{ "f" "f" } clone remove! ] unit-test
+[ V{ "x" } ] [ "f" V{ "f" "x" "f" } clone remove! ] unit-test
+[ V{ "y" "x" } ] [ "f" V{ "y" "f" "x" "f" } clone remove! ] unit-test
 
 [ V{ 0 1 4 5 } ] [ 6 >vector 2 4 pick delete-slice ] unit-test
 
