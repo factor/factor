@@ -13,10 +13,14 @@ HELP: [let
 { $examples "See " { $link "locals-examples" } "." } ;
 
 HELP: :>
-{ $syntax ":> var" ":> var!" }
-{ $description "Binds the value on the top of the datastack to a new local variable named " { $snippet "var" } ", lexically scoped to the enclosing quotation or definition."
+{ $syntax ":> var" ":> var!" ":> ( var-1 var-2 ... )" }
+{ $description "Binds one or more new local variables. In the " { $snippet ":> var" } " form, the value on the top of the datastack to a new local variable named " { $snippet "var" } ", lexically scoped to the enclosing quotation, " { $link POSTPONE: [let } " form, or " { $link POSTPONE: :: } " definition."
 $nl
-"If the " { $snippet "var" } " name is followed by an exclamation point (" { $snippet "!" } "), the new variable will be mutable. See " { $link "locals-mutable" } " for more information on mutable local bindings." }
+"The " { $snippet ":> ( var-1 ... )" } " form binds multiple local variables from the top of the datastack in left to right order. These two snippets would have the same effect:"
+{ $code ":> c :> b :> a" }
+{ $code ":> ( a b c )" }
+$nl
+"If any " { $snippet "var" } " name is followed by an exclamation point (" { $snippet "!" } "), that new variable will be mutable. See " { $link "locals-mutable" } " for more information on mutable local bindings." }
 { $notes
     "This syntax can only be used inside a lexical scope established by a " { $link POSTPONE: :: } " definition, " { $link POSTPONE: [let } " form, or " { $link POSTPONE: [| } " quotation. Definition forms such as " { $link POSTPONE: : } " do not establish a lexical scope by themselves, nor is there a lexical scope available at the top level of source files or in the listener. To use local variable bindings in these situations, use " { $link POSTPONE: [let } " to provide a scope for them." }
 { $examples "See " { $link "locals-examples" } "." } ;
