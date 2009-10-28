@@ -44,7 +44,7 @@ HELP: nths
 { $values
      { "indices" sequence } { "seq" sequence }
      { "seq'" sequence } }
-{ $description "Ouptuts a sequence of elements from the input sequence indexed by the indices." }
+{ $description "Outputs a sequence of elements from the input sequence indexed by the indices." }
 { $examples 
     { $example "USING: prettyprint sequences ;"
                "{ 0 2 } { \"a\" \"b\" \"c\" } nths ."
@@ -526,6 +526,21 @@ HELP: suffix
 { $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq1" } "." }
 { $examples
     { $example "USING: prettyprint sequences ;" "{ 1 2 3 } 4 suffix ." "{ 1 2 3 4 }" }
+} ;
+
+HELP: suffix!
+{ $values { "seq" sequence } { "elt" object } { "seq" sequence } }
+{ $description "Modifiers a sequence in-place by adding " { $snippet "elt" } " to the end of " { $snippet "seq" } ". Outputs " { $snippet "seq" } "." }
+{ $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq" } "." }
+{ $examples
+    { $example "USING: prettyprint sequences ;" "V{ 1 2 3 } 4 suffix! ." "V{ 1 2 3 4 }" }
+} ;
+
+HELP: append!
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq1" sequence } }
+{ $description "Modifiers " { $snippet "seq1" } " in-place by adding the elements from " { $snippet "seq2" } " to the end and outputs " { $snippet "seq1" } "." }
+{ $examples
+    { $example "USING: prettyprint sequences ;" "V{ 1 2 3 } { 4 5 6 } append! ." "V{ 1 2 3 4 5 6 }" }
 } ;
 
 HELP: prefix
@@ -1611,14 +1626,14 @@ ARTICLE: "sequences-destructive" "Destructive operations"
 "Many operations have constructive and destructive variants:"
 { $table
     { "Constructive" "Destructive" }
-    { { $link suffix } { $link push } }
+    { { $link suffix } { $link suffix! } }
     { { $link but-last } { $link pop* } }
     { { $link unclip-last } { $link pop } }
     { { $link remove } { $link remove! } }
     { { $link remove-eq } { $link remove-eq! } }
     { { $link remove-nth } { $link remove-nth! } }
     { { $link reverse } { $link reverse-here } }
-    { { $link append } { $link push-all } }
+    { { $link append } { $link append! } }
     { { $link map } { $link map! } }
     { { $link filter } { $link filter! } }
 }
