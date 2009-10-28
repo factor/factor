@@ -650,6 +650,10 @@ PRIVATE>
         [ 0 swap copy ] keep
     ] new-like ;
 
+: suffix! ( seq elt -- seq ) over push ;
+
+: append! ( seq1 seq2 -- seq1 ) over push-all ;
+
 : last ( seq -- elt ) [ length 1 - ] [ nth ] bi ;
 
 : set-last ( elt seq -- ) [ length 1 - ] keep set-nth ;

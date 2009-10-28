@@ -73,9 +73,9 @@ IN: bootstrap.syntax
     "OCT:" [ 8 parse-base ] define-core-syntax
     "BIN:" [ 2 parse-base ] define-core-syntax
 
-    "NAN:" [ 16 scan-base <fp-nan> parsed ] define-core-syntax
+    "NAN:" [ 16 scan-base <fp-nan> suffix! ] define-core-syntax
 
-    "f" [ f parsed ] define-core-syntax
+    "f" [ f suffix! ] define-core-syntax
     "t" "syntax" lookup define-singleton-class
 
     "CHAR:" [
@@ -83,31 +83,31 @@ IN: bootstrap.syntax
             { [ dup length 1 = ] [ first ] }
             { [ "\\" ?head ] [ next-escape >string "" assert= ] }
             [ name>char-hook get call( name -- char ) ]
-        } cond parsed
+        } cond suffix!
     ] define-core-syntax
 
-    "\"" [ parse-multiline-string parsed ] define-core-syntax
+    "\"" [ parse-multiline-string suffix! ] define-core-syntax
 
     "SBUF\"" [
-        lexer get skip-blank parse-string >sbuf parsed
+        lexer get skip-blank parse-string >sbuf suffix!
     ] define-core-syntax
 
     "P\"" [
-        lexer get skip-blank parse-string <pathname> parsed
+        lexer get skip-blank parse-string <pathname> suffix!
     ] define-core-syntax
 
-    "[" [ parse-quotation parsed ] define-core-syntax
+    "[" [ parse-quotation suffix! ] define-core-syntax
     "{" [ \ } [ >array ] parse-literal ] define-core-syntax
     "V{" [ \ } [ >vector ] parse-literal ] define-core-syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-core-syntax
     "BV{" [ \ } [ >byte-vector ] parse-literal ] define-core-syntax
     "H{" [ \ } [ >hashtable ] parse-literal ] define-core-syntax
-    "T{" [ parse-tuple-literal parsed ] define-core-syntax
+    "T{" [ parse-tuple-literal suffix! ] define-core-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-core-syntax
 
-    "POSTPONE:" [ scan-word parsed ] define-core-syntax
-    "\\" [ scan-word <wrapper> parsed ] define-core-syntax
-    "M\\" [ scan-word scan-word method <wrapper> parsed ] define-core-syntax
+    "POSTPONE:" [ scan-word suffix! ] define-core-syntax
+    "\\" [ scan-word <wrapper> suffix! ] define-core-syntax
+    "M\\" [ scan-word scan-word method <wrapper> suffix! ] define-core-syntax
     "inline" [ word make-inline ] define-core-syntax
     "recursive" [ word make-recursive ] define-core-syntax
     "foldable" [ word make-foldable ] define-core-syntax
@@ -227,7 +227,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "((" [
-        "))" parse-effect parsed
+        "))" parse-effect suffix!
     ] define-core-syntax
 
     "MAIN:" [ scan-word current-vocab (>>main) ] define-core-syntax
@@ -240,8 +240,8 @@ IN: bootstrap.syntax
 
     "call-next-method" [
         current-method get [
-            literalize parsed
-            \ (call-next-method) parsed
+            literalize suffix!
+            \ (call-next-method) suffix!
         ] [
             not-in-a-method-error
         ] if*

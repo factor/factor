@@ -20,7 +20,7 @@ TUPLE: decimal { mantissa read-only } { exponent read-only } ;
 
 : parse-decimal ( -- decimal ) scan string>decimal ;
 
-SYNTAX: D: parse-decimal parsed ;
+SYNTAX: D: parse-decimal suffix! ;
 
 : decimal>ratio ( decimal -- ratio ) >decimal< 10^ * ;
 : decimal>float ( decimal -- ratio ) decimal>ratio >float ;

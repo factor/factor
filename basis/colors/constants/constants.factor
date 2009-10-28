@@ -30,4 +30,4 @@ ERROR: no-such-color name ;
 : named-color ( name -- color )
     dup colors at [ ] [ no-such-color ] ?if ;
 
-SYNTAX: COLOR: scan named-color parsed ;
+SYNTAX: COLOR: scan named-color suffix! ;
