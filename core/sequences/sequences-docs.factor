@@ -1630,6 +1630,7 @@ ARTICLE: "sequences-destructive" "Destructive operations"
 "Other destructive words:"
 { $subsections
     reverse!
+    append!
     push-all
     move
     exchange
