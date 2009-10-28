@@ -105,9 +105,9 @@ USE: tools.walker
     ! [ dump-to-file ] keep
     write flush ; inline
 
-: build-query-object ( query -- selector )
+:: build-query-object ( query -- selector )
     H{ } clone :> selector
-    { [ orderby>> [ "orderby" selector set-at ] when* ]
+    query { [ orderby>> [ "orderby" selector set-at ] when* ]
       [ explain>> [ "$explain" selector set-at ] when* ]
       [ hint>> [ "$hint" selector set-at ] when* ] 
       [ query>> "query" selector set-at ]

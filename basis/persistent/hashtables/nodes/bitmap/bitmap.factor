@@ -36,17 +36,16 @@ M:: bitmap-node (new-at) ( shift value key hashcode bitmap-node -- node' added-l
         new-leaf
     ] [
         idx nodes nth :> n
-            shift radix-bits + value key hashcode n (new-at) :> new-leaf :> n'
-            n n' eq? [
-                bitmap-node
-            ] [
-                bitmap
-                n' idx nodes new-nth
-                shift
-                <bitmap-node>
-            ] if
-            new-leaf
-        ]
+        shift radix-bits + value key hashcode n (new-at) :> new-leaf :> n'
+        n n' eq? [
+            bitmap-node
+        ] [
+            bitmap
+            n' idx nodes new-nth
+            shift
+            <bitmap-node>
+        ] if
+        new-leaf
     ] if ;
 
 M:: bitmap-node (pluck-at) ( key hashcode bitmap-node -- node' )

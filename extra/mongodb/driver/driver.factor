@@ -151,14 +151,16 @@ M: mdb-collection create-collection
     [ "$cmd" = ] [ "system" head? ] bi or ;
 
 : check-collection ( collection -- fq-collection )
-    mdb-instance :> instance
-    instance name>> :> instance-name
-    dup mdb-collection? [ name>> ] when
-    "." split1 over instance-name =
-    [ nip ] [ drop ] if
-    [ ] [ reserved-namespace? ] bi
-    [ instance (ensure-collection) ] unless
-    [ instance-name ] dip "." glue ; 
+    [let
+        mdb-instance :> instance
+        instance name>> :> instance-name
+        dup mdb-collection? [ name>> ] when
+        "." split1 over instance-name =
+        [ nip ] [ drop ] if
+        [ ] [ reserved-namespace? ] bi
+        [ instance (ensure-collection) ] unless
+        [ instance-name ] dip "." glue
+    ] ;
 
 : fix-query-collection ( mdb-query -- mdb-query )
     [ check-collection ] change-collection ; inline
