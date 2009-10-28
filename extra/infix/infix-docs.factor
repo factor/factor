@@ -25,25 +25,10 @@ HELP: [infix
     }
 } ;
 
-HELP: [infix|
-{ $syntax "[infix| binding1 [ value1... ]\n        binding2 [ value2... ]\n        ... |\n    infix-expression infix]" }
-{ $description "Introduces a set of lexical bindings and evaluates the body as a snippet of infix code. The values are evaluated in parallel, and may not refer to other bindings within the same " { $link POSTPONE: [infix| } " form, as it is based on " { $link POSTPONE: [let } "." }
-{ $examples
-    { $example
-        "USING: infix prettyprint ;"
-        "IN: scratchpad"
-        "[infix| pi [ 3.14 ] r [ 12 ] | r*r*pi infix] ."
-        "452.16"
-    }
-} ;
-
-{ POSTPONE: [infix POSTPONE: [infix| } related-words
-
 ARTICLE: "infix" "Infix notation"
 "The " { $vocab-link "infix" } " vocabulary implements support for infix notation in Factor source code."
 { $subsections
     POSTPONE: [infix
-    POSTPONE: [infix|
 }
 $nl
 "The usual infix math operators are supported:"
@@ -77,7 +62,7 @@ $nl
 "You can access " { $vocab-link "sequences" } " inside infix expressions with the familiar " { $snippet "arr[index]" } " notation."
 { $example
     "USING: arrays infix ;"
-    "[infix| myarr [ { 1 2 3 4 } ] | myarr[4/2]*3 infix] ."
+    "[let { 1 2 3 4 } :> myarr [infix myarr[4/2]*3 infix] ] ."
     "9"
 }
 "Please note: in Factor " { $emphasis "fixnums are sequences too." } " If you are not careful with sequence accesses you may introduce subtle bugs:"

@@ -15,43 +15,39 @@ M:: collision-node (entry-at) ( key hashcode collision-node -- leaf-node )
 
 M:: collision-node (pluck-at) ( key hashcode collision-node -- leaf-node )
     hashcode collision-node hashcode>> eq? [
-        [let | idx [ key hashcode collision-node find-index drop ] |
-            idx [
-                idx collision-node leaves>> smash [
-                    collision-node hashcode>>
-                    <collision-node>
-                ] when
-            ] [ collision-node ] if
-        ]
+        key hashcode collision-node find-index drop :> idx
+        idx [
+            idx collision-node leaves>> smash [
+                collision-node hashcode>>
+                <collision-node>
+            ] when
+        ] [ collision-node ] if
     ] [ collision-node ] if ;
 
 M:: collision-node (new-at) ( shift value key hashcode collision-node -- node' added-leaf )
     hashcode collision-node hashcode>> eq? [
-        key hashcode collision-node find-index
-        [let | leaf-node [ ] idx [ ] |
-            idx [
-                value leaf-node value>> = [
-                    collision-node f
-                ] [
-                    hashcode
-                    value key hashcode <leaf-node>
-                    idx
-                    collision-node leaves>>
-                    new-nth
-                    <collision-node>
-                    f
-                ] if
+        key hashcode collision-node find-index :> leaf-node :> idx
+        idx [
+            value leaf-node value>> = [
+                collision-node f
             ] [
-                [let | new-leaf-node [ value key hashcode <leaf-node> ] |
-                    hashcode
-                    collision-node leaves>>
-                    new-leaf-node
-                    suffix
-                    <collision-node>
-                    new-leaf-node
-                ]
+                hashcode
+                value key hashcode <leaf-node>
+                idx
+                collision-node leaves>>
+                new-nth
+                <collision-node>
+                f
             ] if
-        ]
+        ] [
+            value key hashcode <leaf-node> :> new-leaf-node
+            hashcode
+            collision-node leaves>>
+            new-leaf-node
+            suffix
+            <collision-node>
+            new-leaf-node
+        ] if
     ] [
         shift collision-node value key hashcode make-bitmap-node
     ] if ;

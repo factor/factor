@@ -48,18 +48,17 @@ ERROR: unix-error errno message ;
 ERROR: unix-system-call-error args errno message word ;
 
 MACRO:: unix-system-call ( quot -- )
-    [let | n [ quot infer in>> ]
-           word [ quot first ] |
-        [
-            n ndup quot call dup 0 < [
-                drop
-                n narray
-                errno dup strerror
-                word unix-system-call-error
-            ] [
-                n nnip
-            ] if
-        ]
+    quot infer in>> :> n
+    quot first :> word
+    [
+        n ndup quot call dup 0 < [
+            drop
+            n narray
+            errno dup strerror
+            word unix-system-call-error
+        ] [
+            n nnip
+        ] if
     ] ;
 
 HOOK: open-file os ( path flags mode -- fd )

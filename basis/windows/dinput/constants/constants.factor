@@ -56,13 +56,12 @@ M: array array-base-type first ;
     DIOBJECTDATAFORMAT <struct-boa> ;
 
 :: make-DIOBJECTDATAFORMAT-array ( struct array -- alien )
-    [let | alien [ array length malloc-DIOBJECTDATAFORMAT-array ] |
-        array [| args i |
-            struct args <DIOBJECTDATAFORMAT>
-            i alien set-nth
-        ] each-index
-        alien
-    ] ;
+    array length malloc-DIOBJECTDATAFORMAT-array :> alien
+    array [| args i |
+        struct args <DIOBJECTDATAFORMAT>
+        i alien set-nth
+    ] each-index
+    alien ;
 
 : <DIDATAFORMAT> ( dwFlags dwDataSize struct rgodf-array -- alien )
     [ DIDATAFORMAT heap-size DIOBJECTDATAFORMAT heap-size ] 4 ndip

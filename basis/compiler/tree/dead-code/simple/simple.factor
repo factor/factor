@@ -71,14 +71,13 @@ M: #alien-indirect compute-live-values* nip look-at-inputs ;
     filter-corresponding zip #data-shuffle ; inline
 
 :: drop-dead-values ( outputs -- #shuffle )
-    [let* | new-outputs [ outputs make-values ]
-            live-outputs [ outputs filter-live ] |
-        new-outputs
-        live-outputs
-        outputs
-        new-outputs
-        drop-values
-    ] ;
+    outputs make-values :> new-outputs
+    outputs filter-live :> live-outputs
+    new-outputs
+    live-outputs
+    outputs
+    new-outputs
+    drop-values ;
 
 : drop-dead-outputs ( node -- #shuffle )
     dup out-d>> drop-dead-values [ in-d>> >>out-d drop ] keep ;
