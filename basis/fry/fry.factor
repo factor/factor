@@ -53,4 +53,4 @@ M: callable deep-fry
 
 M: object deep-fry , ;
 
-SYNTAX: '[ parse-quotation fry over push-all ;
+SYNTAX: '[ parse-quotation fry append! ;
