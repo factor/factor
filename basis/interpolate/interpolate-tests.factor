@@ -16,7 +16,8 @@ IN: interpolate.tests
 ] unit-test
 
 [ "Oops, I accidentally the whole economy..." ] [
-    [let | noun [ "economy" ] |
+    [let
+        "economy" :> noun
         [ I[ Oops, I accidentally the whole ${noun}...]I ] with-string-writer
     ]
 ] unit-test

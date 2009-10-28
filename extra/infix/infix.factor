@@ -83,14 +83,3 @@ PRIVATE>
 
 SYNTAX: [infix
     "infix]" [infix-parse suffix! \ call suffix! ;
-
-<PRIVATE
-
-: parse-infix-locals ( assoc end -- quot )
-    '[ _ [infix-parse prepare-operand ] ((parse-lambda)) ;
-
-PRIVATE>
-
-SYNTAX: [infix|
-    "|" parse-bindings "infix]" parse-infix-locals <let>
-    ?rewrite-closures append! ;

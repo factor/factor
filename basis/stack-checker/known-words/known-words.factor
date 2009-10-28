@@ -192,17 +192,17 @@ M: bad-executable summary
 
 \ load-local [ infer-load-local ] "special" set-word-prop
 
-: infer-get-local ( -- )
-    [let* | n [ pop-literal nip 1 swap - ]
-            in-r [ n consume-r ]
-            out-d [ in-r first copy-value 1array ]
-            out-r [ in-r copy-values ] |
-         out-d output-d
-         out-r output-r
-         f out-d in-r out-r
-         out-r in-r zip out-d first in-r first 2array suffix
-         #shuffle,
-    ] ;
+:: infer-get-local ( -- )
+    pop-literal nip 1 swap - :> n
+    n consume-r :> in-r
+    in-r first copy-value 1array :> out-d
+    in-r copy-values :> out-r
+
+    out-d output-d
+    out-r output-r
+    f out-d in-r out-r
+    out-r in-r zip out-d first in-r first 2array suffix
+    #shuffle, ;
 
 \ get-local [ infer-get-local ] "special" set-word-prop
 

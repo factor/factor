@@ -119,16 +119,16 @@ GENERIC: easter ( obj -- obj' )
 
 :: easter-month-day ( year -- month day )
     year 19 mod :> a
-    year 100 /mod :> c :> b
-    b 4 /mod :> e :> d
+    year 100 /mod :> ( b c )
+    b 4 /mod :> ( d e )
     b 8 + 25 /i :> f
     b f - 1 + 3 /i :> g
     19 a * b + d - g - 15 + 30 mod :> h
-    c 4 /mod :> k :> i
+    c 4 /mod :> ( i k )
     32 2 e * + 2 i * + h - k - 7 mod :> l
     a 11 h * + 22 l * + 451 /i :> m
 
-    h l + 7 m * - 114 + 31 /mod 1 + :> day :> month
+    h l + 7 m * - 114 + 31 /mod 1 + :> ( month day )
     month day ;
 
 M: integer easter ( year -- timestamp )

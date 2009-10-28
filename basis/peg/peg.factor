@@ -172,9 +172,7 @@ TUPLE: peg-head rule-id involved-set eval-set ;
   l lrstack get (setup-lr) ;
 
 :: lr-answer ( r p m -- ast )
-  [let* |
-          h [ m ans>> head>> ]
-        |
+    m ans>> head>> :> h
     h rule-id>> r rule-id eq? [
       m ans>> seed>> m (>>ans)
       m ans>> failed? [
@@ -184,14 +182,11 @@ TUPLE: peg-head rule-id involved-set eval-set ;
       ] if
     ] [
       m ans>> seed>>
-    ] if
-  ] ; inline
+    ] if ; inline
 
 :: recall ( r p -- memo-entry )
-  [let* |
-          m [ p r rule-id memo ]
-          h [ p heads at ]
-        |
+    p r rule-id memo :> m
+    p heads at :> h
     h [
       m r rule-id h involved-set>> h rule-id>> suffix member? not and [
         fail p memo-entry boa
@@ -207,15 +202,12 @@ TUPLE: peg-head rule-id involved-set eval-set ;
       ] if
     ] [
       m
-    ] if
-  ] ; inline
+    ] if ; inline
 
 :: apply-non-memo-rule ( r p -- ast )
-  [let* |
-          lr  [ fail r rule-id f lrstack get left-recursion boa ]
-          m   [ lr lrstack set lr p memo-entry boa dup p r rule-id set-memo ]
-          ans [ r eval-rule ]
-        |
+    fail r rule-id f lrstack get left-recursion boa :> lr
+    lr lrstack set lr p memo-entry boa dup p r rule-id set-memo :> m
+    r eval-rule :> ans
     lrstack get next>> lrstack set
     pos get m (>>pos)
     lr head>> [
@@ -226,8 +218,7 @@ TUPLE: peg-head rule-id involved-set eval-set ;
     ] [
       ans m (>>ans)
       ans
-    ] if
-  ] ; inline
+    ] if ; inline
 
 : apply-memo-rule ( r m -- ast )
   [ ans>> ] [ pos>> ] bi pos set
@@ -622,20 +613,19 @@ PRIVATE>
 ERROR: parse-failed input word ;
 
 SYNTAX: PEG:
-  (:)
-  [let | effect [ ] def [ ] word [ ] |
-    [
-      [
-        [let | compiled-def [ def call compile ] |
+    [let
+        (:) :> ( word def effect )
+        [
           [
-            dup compiled-def compiled-parse
-            [ ast>> ] [ word parse-failed ] ?if
-          ]
-          word swap effect define-declared
-        ]
-      ] with-compilation-unit
-    ] append!
-  ] ;
+            def call compile :> compiled-def
+            [
+              dup compiled-def compiled-parse
+              [ ast>> ] [ word parse-failed ] ?if
+            ]
+            word swap effect define-declared
+          ] with-compilation-unit
+        ] append!
+    ] ;
 
 USING: vocabs vocabs.loader ;
 

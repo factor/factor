@@ -35,10 +35,9 @@ TUPLE: openssl-context < secure-context aliens sessions ;
     [| buf size rwflag password! |
         password [ B{ 0 } password! ] unless
 
-        [let | len [ password strlen ] |
-            buf password len 1 + size min memcpy
-            len
-        ]
+        password strlen :> len
+        buf password len 1 + size min memcpy
+        len
     ] alien-callback ;
 
 : default-pasword ( ctx -- alien )
