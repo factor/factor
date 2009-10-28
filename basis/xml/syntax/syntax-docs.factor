@@ -75,11 +75,11 @@ $nl
 { $example
 """USING: locals urls xml.syntax xml.writer ;
 [let
-    3 :> number [ 3 ]
-    f :> false [ f ]
+    3 :> number
+    f :> false
     URL" http://factorcode.org/" :> url
     "hello" :> string
-    \\ drop :> world
+    \\ drop :> word
     <XML
         <x
             number=<-number->
