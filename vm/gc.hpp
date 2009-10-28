@@ -12,18 +12,10 @@ enum gc_op {
 
 struct gc_event {
 	gc_op op;
-	cell nursery_size_before;
-	cell aging_size_before;
-	cell tenured_size_before;
-	cell tenured_free_block_count_before;
-	cell code_size_before;
-	cell code_free_block_count_before;
-	cell nursery_size_after;
-	cell aging_size_after;
-	cell tenured_size_after;
-	cell tenured_free_block_count_after;
-	cell code_size_after;
-	cell code_free_block_count_after;
+	data_heap_room data_heap_before;
+	code_heap_room code_heap_before;
+	data_heap_room data_heap_after;
+	code_heap_room code_heap_after;
 	cell cards_scanned;
 	cell decks_scanned;
 	cell code_blocks_scanned;

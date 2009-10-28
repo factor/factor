@@ -196,7 +196,7 @@ void factor_vm::primitive_modify_code_heap()
 	update_code_heap_words();
 }
 
-void factor_vm::primitive_code_room()
+code_heap_room factor_vm::code_room()
 {
 	code_heap_room room;
 
@@ -206,6 +206,12 @@ void factor_vm::primitive_code_room()
 	room.contiguous_free  = code->allocator->free_blocks.largest_free_block();
 	room.free_block_count = code->allocator->free_blocks.free_block_count;
 
+	return room;
+}
+
+void factor_vm::primitive_code_room()
+{
+	code_heap_room room = code_room();
 	dpush(tag<byte_array>(byte_array_from_value(&room)));
 }
 

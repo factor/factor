@@ -201,7 +201,7 @@ void factor_vm::primitive_size()
 	box_unsigned_cell(object_size(dpop()));
 }
 
-void factor_vm::primitive_data_room()
+data_heap_room factor_vm::data_room()
 {
 	data_heap_room room;
 
@@ -220,6 +220,12 @@ void factor_vm::primitive_data_room()
 	room.decks                    = data->decks_end - data->decks;
 	room.mark_stack               = data->tenured->mark_stack.capacity();
 
+	return room;
+}
+
+void factor_vm::primitive_data_room()
+{
+	data_heap_room room = data_room();
 	dpush(tag<byte_array>(byte_array_from_value(&room)));
 }
 
