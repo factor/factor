@@ -254,7 +254,7 @@ CONSTANT: have-byte-regs { EAX ECX EDX EBX }
 
 M: x86.32 has-small-reg?
     {
-        { 8 [ have-byte-regs memq? ] }
+        { 8 [ have-byte-regs member-eq? ] }
         { 16 [ drop t ] }
         { 32 [ drop t ] }
     } case ;
@@ -264,7 +264,7 @@ M: x86.64 has-small-reg? 2drop t ;
 : small-reg-that-isn't ( exclude -- reg' )
     [ have-byte-regs ] dip
     [ native-version-of ] map
-    '[ _ memq? not ] find nip ;
+    '[ _ member-eq? not ] find nip ;
 
 : with-save/restore ( reg quot -- )
     [ drop PUSH ] [ call ] [ drop POP ] 2tri ; inline
@@ -356,7 +356,7 @@ M: x86 %set-alien-float [ [+] ] dip MOVSS ;
 M: x86 %set-alien-double [ [+] ] dip MOVSD ;
 M: x86 %set-alien-vector [ [+] ] 2dip %copy ;
 
-: shift-count? ( reg -- ? ) { ECX RCX } memq? ;
+: shift-count? ( reg -- ? ) { ECX RCX } member-eq? ;
 
 :: emit-shift ( dst src quot -- )
     src shift-count? [
@@ -893,7 +893,7 @@ M: x86 %compare-vector ( dst src1 src2 rep cc -- )
 
 M: x86 %compare-vector-reps
     {
-        { [ dup { cc= cc/= cc/<>= cc<>= } memq? ] [ drop %compare-vector-eq-reps ] }
+        { [ dup { cc= cc/= cc/<>= cc<>= } member-eq? ] [ drop %compare-vector-eq-reps ] }
         [ drop %compare-vector-ord-reps ]
     } cond ;
 

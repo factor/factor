@@ -152,7 +152,7 @@ M: mdb-collection mdb-index-map
 
 : slot-option? ( tuple slot option -- ? )
     [ swap mdb-slot-map at ] dip
-    '[ _ swap memq? ] [ f ] if* ;
+    '[ _ swap member-eq? ] [ f ] if* ;
   
 PRIVATE>
 

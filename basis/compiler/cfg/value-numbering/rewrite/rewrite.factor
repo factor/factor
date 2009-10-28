@@ -111,7 +111,7 @@ M: ##compare-imm rewrite-tagged-comparison
     {
         [ src1>> vreg>expr general-compare-expr? ]
         [ src2>> \ f tag-number = ]
-        [ cc>> { cc= cc/= } memq? ]
+        [ cc>> { cc= cc/= } member-eq? ]
     } 1&& ; inline
 
 : rewrite-redundant-comparison ( insn -- insn' )
@@ -174,7 +174,7 @@ M: ##compare-imm-branch rewrite
     [ src1>> ] [ src2>> ] bi [ vreg>vn ] bi@ = ; inline
 
 : (rewrite-self-compare) ( insn -- ? )
-    cc>> { cc= cc<= cc>= } memq? ;
+    cc>> { cc= cc<= cc>= } member-eq? ;
 
 : rewrite-self-compare-branch ( insn -- insn' )
     (rewrite-self-compare) fold-branch ;
@@ -279,7 +279,7 @@ M: ##not rewrite
         ##sub-imm
         ##mul
         ##mul-imm
-    } memq? ;
+    } member-eq? ;
 
 : immediate? ( value op -- ? )
     arithmetic-op? [ immediate-arithmetic? ] [ immediate-bitwise? ] if ;

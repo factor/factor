@@ -477,7 +477,7 @@ SYMBOL: deploy-vocab
     next-method ;
 
 : calls-next-method? ( method -- ? )
-    def>> flatten \ (call-next-method) swap memq? ;
+    def>> flatten \ (call-next-method) swap member-eq? ;
 
 : compute-next-methods ( -- )
     [ standard-generic? ] instances [

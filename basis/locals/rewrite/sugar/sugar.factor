@@ -110,7 +110,7 @@ M: wrapper rewrite-sugar*
     rewrite-wrapper ;
 
 M: word rewrite-sugar*
-    dup { load-locals get-local drop-locals } memq?
+    dup { load-locals get-local drop-locals } member-eq?
     [ >r/r>-in-lambda-error ] [ call-next-method ] if ;
 
 M: object rewrite-sugar* , ;
