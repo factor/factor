@@ -471,7 +471,7 @@ HELP: remove
 { $description "Outputs a new sequence containing all elements of the input sequence except for given element." }
 { $notes "This word uses equality comparison (" { $link = } ")." } ;
 
-HELP: remq
+HELP: remove-eq
 { $values { "elt" object } { "seq" sequence } { "newseq" "a new sequence" } }
 { $description "Outputs a new sequence containing all elements of the input sequence except those equal to the given element." }
 { $notes "This word uses identity comparison (" { $link eq? } ")." } ;
@@ -497,8 +497,8 @@ HELP: remove!
 { $notes "This word uses equality comparison (" { $link = } ")." }
 { $side-effects "seq" } ;
 
-HELP: delq
-{ $values { "elt" object } { "seq" "a resizable mutable sequence" } }
+HELP: remove-eq!
+{ $values { "elt" object } { "seq" "a resizable mutable sequence" } { "seq" "a resizable mutable sequence" } }
 { $description "Outputs a new sequence containing all elements of the input sequence except the given element." }
 { $notes "This word uses identity comparison (" { $link eq? } ")." }
 { $side-effects "seq" } ;
@@ -861,7 +861,7 @@ HELP: tail?
 { $values { "seq" sequence } { "end" sequence } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "seq" } " ends with " { $snippet "end" } ". If " { $snippet "end" } " is longer than " { $snippet "seq" } ", this word outputs " { $link f } "." } ;
 
-{ remove remove-nth remq delq remove! remove-nth! } related-words
+{ remove remove-nth remove-eq remove-eq! remove! remove-nth! } related-words
 
 HELP: cut-slice
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "before-slice" sequence } { "after-slice" "a slice" } }
@@ -1416,7 +1416,7 @@ ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
 "Adding elements:"
 { $subsections prefix suffix insert-nth }
 "Removing elements:"
-{ $subsections remove remq remove-nth } ;
+{ $subsections remove remove-eq remove-nth } ;
 
 ARTICLE: "sequences-reshape" "Reshaping sequences"
 "A " { $emphasis "repetition" } " is a virtual sequence consisting of a single element repeated multiple times:"
@@ -1594,7 +1594,7 @@ ARTICLE: "sequences-destructive" "Destructive operations"
 "Deleting elements:"
 { $subsections
     remove!
-    delq
+    remove-eq!
     remove-nth!
     delete-slice
     delete-all
@@ -1615,7 +1615,7 @@ ARTICLE: "sequences-destructive" "Destructive operations"
     { { $link but-last } { $link pop* } }
     { { $link unclip-last } { $link pop } }
     { { $link remove } { $link remove! } }
-    { { $link remq } { $link delq } }
+    { { $link remove-eq } { $link remove-eq! } }
     { { $link remove-nth } { $link remove-nth! } }
     { { $link reverse } { $link reverse-here } }
     { { $link append } { $link push-all } }

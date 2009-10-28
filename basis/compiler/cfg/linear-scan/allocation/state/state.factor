@@ -33,7 +33,7 @@ SYMBOL: active-intervals
     dup vreg>> active-intervals-for push ;
 
 : delete-active ( live-interval -- )
-    dup vreg>> active-intervals-for delq ;
+    dup vreg>> active-intervals-for remove-eq! drop ;
 
 : assign-free-register ( new registers -- )
     pop >>reg add-active ;
@@ -48,7 +48,7 @@ SYMBOL: inactive-intervals
     dup vreg>> inactive-intervals-for push ;
 
 : delete-inactive ( live-interval -- )
-    dup vreg>> inactive-intervals-for delq ;
+    dup vreg>> inactive-intervals-for remove-eq! drop ;
 
 ! Vector of handled live intervals
 SYMBOL: handled-intervals
