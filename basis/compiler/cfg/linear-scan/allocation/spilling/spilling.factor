@@ -18,13 +18,13 @@ ERROR: bad-live-ranges interval ;
 
 : trim-before-ranges ( live-interval -- )
     [ ranges>> ] [ uses>> last 1 + ] bi
-    [ '[ from>> _ <= ] filter-here ]
+    [ '[ from>> _ <= ] filter! drop ]
     [ swap last (>>to) ]
     2bi ;
 
 : trim-after-ranges ( live-interval -- )
     [ ranges>> ] [ uses>> first ] bi
-    [ '[ to>> _ >= ] filter-here ]
+    [ '[ to>> _ >= ] filter! drop ]
     [ swap first (>>from) ]
     2bi ;
 
@@ -114,7 +114,7 @@ ERROR: bad-live-ranges interval ;
                 new start>> spill f
             ] [ drop t ] if
         ] [ drop t ] if
-    ] filter-here ;
+    ] filter! drop ;
 
 : spill-intersecting ( new reg -- )
     ! Split and spill all active and inactive intervals

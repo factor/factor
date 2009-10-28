@@ -42,7 +42,7 @@ IN: compiler.cfg.linear-scan.allocation
 
 : handle-sync-point ( n -- )
     [ active-intervals get values ] dip
-    '[ [ _ spill-at-sync-point ] filter-here ] each ;
+    '[ [ _ spill-at-sync-point ] filter! drop ] each ;
 
 :: handle-progress ( n sync? -- )
     n {

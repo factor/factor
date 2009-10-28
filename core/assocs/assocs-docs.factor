@@ -97,7 +97,6 @@ ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
     assoc-union
     assoc-diff
     substitute
-    substitute-here
     extract-keys
 }
 { $see-also key? assoc-any? assoc-all? "sets" } ;
@@ -347,12 +346,6 @@ HELP: assoc-diff
 { $values { "assoc1" assoc } { "assoc2" assoc } { "diff" "a new assoc" } }
 { $description "Outputs an assoc consisting of all entries from " { $snippet "assoc1" } " whose key is not contained in " { $snippet "assoc2" } "." } 
 ;
-
-HELP: substitute-here
-{ $values { "seq" "a mutable sequence" } { "assoc" assoc } }
-{ $description "Replaces elements of " { $snippet "seq" } " which appear as keys in " { $snippet "assoc" } " with the corresponding values, acting as the identity on all other elements." }
-{ $errors "Throws an error if " { $snippet "assoc" } " contains values whose types are not permissible in " { $snippet "seq" } "." }
-{ $side-effects "seq" } ;
 
 HELP: substitute
 { $values { "seq" sequence } { "assoc" assoc } { "newseq" sequence } }
