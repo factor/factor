@@ -55,7 +55,7 @@ HELP: clear-bits
 { $values { "bit-array" bit-array } }
 { $description "Sets all elements of the bit array to " { $link f } "." }
 { $notes "Calling this word is more efficient than the following:"
-    { $code "[ drop f ] change-each" }
+    { $code "[ drop f ] map! drop" }
 }
 { $side-effects "bit-array" } ;
 
@@ -63,7 +63,7 @@ HELP: set-bits
 { $values { "bit-array" bit-array } }
 { $description "Sets all elements of the bit array to " { $link t } "." }
 { $notes "Calling this word is more efficient than the following:"
-    { $code "[ drop t ] change-each" }
+    { $code "[ drop t ] map! drop" }
 }
 { $side-effects "bit-array" } ;
 

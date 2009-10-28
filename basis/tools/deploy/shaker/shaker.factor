@@ -258,7 +258,7 @@ IN: tools.deploy.shaker
             ! otherwise do nothing
             [ 2drop ]
         } cond
-    ] change-each ;
+    ] map! drop ;
 
 : strip-default-method ( generic new-default -- )
     [
@@ -477,7 +477,7 @@ SYMBOL: deploy-vocab
     next-method ;
 
 : calls-next-method? ( method -- ? )
-    def>> flatten \ (call-next-method) swap memq? ;
+    def>> flatten \ (call-next-method) swap member-eq? ;
 
 : compute-next-methods ( -- )
     [ standard-generic? ] instances [

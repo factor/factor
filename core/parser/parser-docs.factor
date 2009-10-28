@@ -66,7 +66,7 @@ $nl
 $nl
 "Parsing words can read input, add word definitions to the dictionary, and do anything an ordinary word can."
 $nl
-"Because of the stack restriction, parsing words cannot pass data to other words by leaving values on the stack; instead, use " { $link parsed } " to add the data to the parse tree so that it can be evaluated later."
+"Because of the stack restriction, parsing words cannot pass data to other words by leaving values on the stack; instead, use " { $link suffix! } " to add the data to the parse tree so that it can be evaluated later."
 $nl
 "Parsing words cannot be called from the same source file where they are defined, because new definitions are only compiled at the end of the source file. An attempt to use a parsing word in its own source file raises an error:"
 { $subsections staging-violation }
@@ -171,11 +171,6 @@ HELP: parse-until
 $parsing-note ;
 
 { parse-tokens (parse-until) parse-until } related-words
-
-HELP: parsed
-{ $values { "accum" vector } { "obj" object } }
-{ $description "Convenience word for parsing words. It behaves exactly the same as " { $link push } ", except the accumulator remains on the stack." }
-$parsing-note ;
 
 HELP: (parse-lines)
 { $values { "lexer" lexer } { "quot" "a new " { $link quotation } } }

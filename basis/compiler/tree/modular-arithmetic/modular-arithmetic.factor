@@ -75,7 +75,7 @@ M: #push compute-modular-candidates*
     0 cell-bits tag-bits get - 1 - [a,b] interval-subset? ;
 
 : modular-word? ( #call -- ? )
-    dup word>> { shift fixnum-shift bignum-shift } memq?
+    dup word>> { shift fixnum-shift bignum-shift } member-eq?
     [ node-input-infos second interval>> small-shift? ]
     [ word>> "modular-arithmetic" word-prop ]
     if ;
@@ -178,10 +178,10 @@ MEMO: fixnum-coercion ( flags -- nodes )
     ] when ;
 
 : like->fixnum? ( #call -- ? )
-    word>> { >fixnum bignum>fixnum float>fixnum } memq? ;
+    word>> { >fixnum bignum>fixnum float>fixnum } member-eq? ;
 
 : like->integer? ( #call -- ? )
-    word>> { >integer >bignum fixnum>bignum } memq? ;
+    word>> { >integer >bignum fixnum>bignum } member-eq? ;
 
 M: #call optimize-modular-arithmetic*
     {

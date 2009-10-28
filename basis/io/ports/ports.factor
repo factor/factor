@@ -53,7 +53,7 @@ M: input-port stream-read-partial ( max stream -- byte-array/f )
 : read-loop ( count port accum -- )
     pick over length - dup 0 > [
         pick read-step dup [
-            over push-all read-loop
+            append! read-loop
         ] [
             2drop 2drop
         ] if
@@ -78,7 +78,7 @@ M: input-port stream-read
 
 : read-until-loop ( seps port buf -- separator/f )
     2over read-until-step over [
-        [ over push-all ] dip dup [
+        [ append! ] dip dup [
             [ 3drop ] dip
         ] [
             drop read-until-loop

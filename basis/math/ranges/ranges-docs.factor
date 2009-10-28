@@ -23,6 +23,6 @@ $nl
 { $code "3 10 [a,b] [ sqrt ] map" }
 "Computing the factorial of 100 with a descending range:"
 { $code "100 1 [a,b] product" }
-"A range can be converted into a concrete sequence using a word such as " { $link >array } ". In most cases this is unnecessary since ranges implement the sequence protocol already. It is necessary if a mutable sequence is needed, for use with words such as " { $link set-nth } " or " { $link change-each } "." ;
+"A range can be converted into a concrete sequence using a word such as " { $link >array } ". In most cases this is unnecessary since ranges implement the sequence protocol already. It is necessary if a mutable sequence is needed, for use with words such as " { $link set-nth } " or " { $link map! } "." ;
   
 ABOUT: "math.ranges"

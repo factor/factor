@@ -86,7 +86,7 @@ unit-test
 ] unit-test
 
 ! Make sure we clear aux vector when storing octets
-[ "\u123456hi" ] [ "ih\u123456" clone dup reverse-here ] unit-test
+[ "\u123456hi" ] [ "ih\u123456" clone reverse! ] unit-test
 
 ! Make sure aux vector is not shared
 [ "\udeadbe" ] [

@@ -66,4 +66,4 @@ SYNTAX: ADVISE: ! word adname location => word adname quot loc
     scan-word scan scan-word parse-definition swap [ spin ] dip advise ;
     
 SYNTAX: UNADVISE:    
-    scan-word parsed \ unadvise parsed ;
+    scan-word suffix! \ unadvise suffix! ;

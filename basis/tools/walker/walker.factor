@@ -167,4 +167,4 @@ SYMBOL: +stopped+
 ! For convenience
 IN: syntax
 
-SYNTAX: B \ break parsed ;
+SYNTAX: B \ break suffix! ;

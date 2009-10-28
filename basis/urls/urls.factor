@@ -181,7 +181,7 @@ PRIVATE>
     clone dup protocol>> '[ _ protocol-port or ] change-port ;
 
 ! Literal syntax
-SYNTAX: URL" lexer get skip-blank parse-string >url parsed ;
+SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;
 
 USING: vocabs vocabs.loader ;
 
