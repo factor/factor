@@ -139,7 +139,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     swap [ key? not ] curry filter ;
 
 : substitute-here ( seq assoc -- )
-    substituter change-each ;
+    substituter map! drop ;
 
 : substitute ( seq assoc -- newseq )
     substituter map ;

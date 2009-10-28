@@ -351,7 +351,7 @@ M: f '
     [ ] [ "Not in image: " word-error ] ?if ;
 
 : fixup-words ( -- )
-    image get [ dup word? [ fixup-word ] when ] change-each ;
+    image get [ dup word? [ fixup-word ] when ] map! drop ;
 
 M: word ' ;
 

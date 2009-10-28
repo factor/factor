@@ -162,7 +162,7 @@ unit-test
     { "a" } 0 2 { 1 2 3 } replace-slice
 ] unit-test
 
-[ { 1 4 9 } ] [ { 1 2 3 } clone dup [ sq ] change-each ] unit-test
+[ { 1 4 9 } ] [ { 1 2 3 } clone [ sq ] map! ] unit-test
 
 [ 5 ] [ 1 >bignum { 1 5 7 } nth-unsafe ] unit-test
 [ 5 ] [ 1 >bignum { 1 5 7 } nth-unsafe ] unit-test
