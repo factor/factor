@@ -106,14 +106,13 @@ USE: tools.walker
     write flush ; inline
 
 : build-query-object ( query -- selector )
-    [let | selector [ H{ } clone ] |
-        { [ orderby>> [ "orderby" selector set-at ] when* ]
-          [ explain>> [ "$explain" selector set-at ] when* ]
-          [ hint>> [ "$hint" selector set-at ] when* ] 
-          [ query>> "query" selector set-at ]
-        } cleave
-        selector
-    ] ;     
+    H{ } clone :> selector
+    { [ orderby>> [ "orderby" selector set-at ] when* ]
+      [ explain>> [ "$explain" selector set-at ] when* ]
+      [ hint>> [ "$hint" selector set-at ] when* ] 
+      [ query>> "query" selector set-at ]
+    } cleave
+    selector ;
 
 PRIVATE>
 

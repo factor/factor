@@ -25,12 +25,11 @@ IN: channels.examples
     ] 3keep filter ;
 
 :: (sieve) ( prime c -- )
-    [let | p [ c from ] 
-           newc [ <channel> ] |
-        p prime to
-        [ newc p c filter ] "Filter" spawn drop
-        prime newc (sieve)
-    ] ;
+    c from :> p
+    <channel> :> newc
+    p prime to
+    [ newc p c filter ] "Filter" spawn drop
+    prime newc (sieve) ;
 
 : sieve ( prime -- ) 
     #! Send prime numbers to 'prime' channel

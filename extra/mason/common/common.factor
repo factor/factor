@@ -33,13 +33,12 @@ M: unix really-delete-tree delete-tree ;
     '[ drop @ f ] attempt-all drop ; inline
 
 :: upload-safely ( local username host remote -- )
-    [let* | temp [ remote ".incomplete" append ]
-            scp-remote [ { username "@" host ":" temp } concat ]
-            scp [ scp-command get ]
-            ssh [ ssh-command get ] |
-        5 [ { scp local scp-remote } short-running-process ] retry
-        5 [ { ssh host "-l" username "mv" temp remote } short-running-process ] retry
-    ] ;
+    remote ".incomplete" append :> temp
+    { username "@" host ":" temp } concat :> scp-remote
+    scp-command get :> scp
+    ssh-command get :> ssh
+    5 [ { scp local scp-remote } short-running-process ] retry
+    5 [ { ssh host "-l" username "mv" temp remote } short-running-process ] retry ;
 
 : eval-file ( file -- obj )
     dup utf8 file-lines parse-fresh

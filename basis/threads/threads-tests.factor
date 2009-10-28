@@ -32,13 +32,12 @@ yield
 [ [ 3 throw ] "A" suspend ] [ 3 = ] must-fail-with
 
 :: spawn-namespace-test ( -- ? )
-    [let | p [ <promise> ] g [ gensym ] |
-        [
-            g "x" set
-            [ "x" get p fulfill ] "B" spawn drop
-        ] with-scope
-        p ?promise g eq?
-    ] ;
+    <promise> :> p gensym :> g
+    [
+        g "x" set
+        [ "x" get p fulfill ] "B" spawn drop
+    ] with-scope
+    p ?promise g eq? ;
 
 [ t ] [ spawn-namespace-test ] unit-test
 

@@ -125,14 +125,15 @@ concurrency.promises threads unix.process ;
 
 ! Killed processes were exiting with code 0 on FreeBSD
 [ f ] [
-    [let | p [ <promise> ]
-           s [ <promise> ] |
-       [
-           "sleep 1000" run-detached
-           [ p fulfill ] [ wait-for-process s fulfill ] bi
-       ] in-thread
+    [let 
+        <promise> :> p
+        <promise> :> s
+        [
+            "sleep 1000" run-detached
+            [ p fulfill ] [ wait-for-process s fulfill ] bi
+        ] in-thread
 
-       p ?promise handle>> 9 kill drop
-       s ?promise 0 =
+        p ?promise handle>> 9 kill drop
+        s ?promise 0 =
     ]
 ] unit-test
