@@ -573,7 +573,7 @@ PRIVATE>
 : remove ( elt seq -- newseq )
     [ = not ] with filter ;
 
-: remq ( elt seq -- newseq )
+: remove-eq ( elt seq -- newseq )
     [ eq? not ] with filter ;
 
 : sift ( seq -- newseq )
@@ -635,8 +635,8 @@ PRIVATE>
 : remove! ( elt seq -- seq )
     [ [ = not ] with filter-here ] keep ;
 
-: delq ( elt seq -- )
-    [ eq? not ] with filter-here ;
+: remove-eq! ( elt seq -- seq )
+    [ [ eq? not ] with filter-here ] keep ;
 
 : prefix ( seq elt -- newseq )
     over [ over length 1 + ] dip [

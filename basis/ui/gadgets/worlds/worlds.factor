@@ -152,7 +152,7 @@ M: world children-on nip children>> ;
 
 M: world remove-gadget
     2dup layers>> memq?
-    [ layers>> delq ] [ call-next-method ] if ;
+    [ layers>> remove-eq! drop ] [ call-next-method ] if ;
 
 SYMBOL: flush-layout-cache-hook
 
