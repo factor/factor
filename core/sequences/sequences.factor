@@ -619,24 +619,24 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 
 <PRIVATE
 
-: (filter-here) ( quot: ( elt -- ? ) store scan seq -- )
+: (filter!) ( quot: ( elt -- ? ) store scan seq -- )
     2dup length < [
         [ move ] 3keep
         [ nth-unsafe pick call [ 1 + ] when ] 2keep
         [ 1 + ] dip
-        (filter-here)
+        (filter!)
     ] [ nip set-length drop ] if ; inline recursive
 
 PRIVATE>
 
-: filter-here ( seq quot -- )
-    swap [ 0 0 ] dip (filter-here) ; inline
+: filter! ( seq quot -- seq )
+    swap [ [ 0 0 ] dip (filter!) ] keep ; inline
 
 : remove! ( elt seq -- seq )
-    [ [ = not ] with filter-here ] keep ;
+    [ = not ] with filter! ;
 
 : remove-eq! ( elt seq -- seq )
-    [ [ eq? not ] with filter-here ] keep ;
+    [ eq? not ] with filter! ;
 
 : prefix ( seq elt -- newseq )
     over [ over length 1 + ] dip [

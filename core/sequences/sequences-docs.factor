@@ -430,8 +430,8 @@ HELP: filter-as
 { $values { "seq" sequence } { "quot" { $quotation "( elt -- ? )" } } { "exemplar" sequence } { "subseq" "a new sequence" } }
 { $description "Applies the quotation to each element in turn, and outputs a new sequence of the same type as " { $snippet "exemplar" } " containing the elements of the original sequence for which the quotation output a true value." } ;
 
-HELP: filter-here
-{ $values { "seq" "a resizable mutable sequence" } { "quot" { $quotation "( elt -- ? )" } } }
+HELP: filter!
+{ $values { "seq" "a resizable mutable sequence" } { "quot" { $quotation "( elt -- ? )" } } { "seq" "a resizable mutable sequence" } }
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a false value." }
 { $side-effects "seq" } ;
 
@@ -1065,7 +1065,7 @@ HELP: harvest
     }
 } ;
 
-{ filter filter-here sift harvest } related-words
+{ filter filter! sift harvest } related-words
 
 HELP: set-first
 { $values
@@ -1598,7 +1598,7 @@ ARTICLE: "sequences-destructive" "Destructive operations"
     remove-nth!
     delete-slice
     delete-all
-    filter-here
+    filter!
 }
 "Other destructive words:"
 { $subsections
@@ -1620,7 +1620,7 @@ ARTICLE: "sequences-destructive" "Destructive operations"
     { { $link reverse } { $link reverse-here } }
     { { $link append } { $link push-all } }
     { { $link map } { $link map! } }
-    { { $link filter } { $link filter-here } }
+    { { $link filter } { $link filter! } }
 }
 { $heading "Related Articles" }
 { $subsections
