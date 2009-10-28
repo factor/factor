@@ -295,6 +295,17 @@ $nl
     { $example "USING: math prettyprint sequences ;" "{ 2 2 2 2 2 } 0 [ + ] accumulate . ." "{ 0 2 4 6 8 }\n10" }
 } ;
 
+HELP: accumulate!
+{ $values { "seq" sequence } { "identity" object } { "quot" { $quotation "( prev elt -- next )" } } { "final" "the final result" } { "seq" sequence } }
+{ $description "Combines successive elements of the sequence using a binary operation, and outputs the original sequence of intermediate results, together with the final result."
+$nl
+"The first element of the new sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the old sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the old sequence."
+$nl
+"When given the empty sequence, outputs an empty sequence together with the " { $snippet "identity" } "." }
+{ $examples
+    { $example "USING: math prettyprint sequences ;" "{ 2 2 2 2 2 } 0 [ + ] accumulate! . ." "{ 0 2 4 6 8 }\n10" }
+} ;
+
 HELP: map
 { $values { "seq" sequence } { "quot" { $quotation "( old -- new )" } } { "newseq" "a new sequence" } }
 { $description "Applies the quotation to each element of the sequence in order. The new elements are collected into a sequence of the same class as the input sequence." } ;
@@ -1525,6 +1536,7 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
     map-reduce
     accumulate
     accumulate-as
+    accumulate!
     produce
     produce-as
 }
