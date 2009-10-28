@@ -13,17 +13,6 @@ IN: infix.tests
      -5*
      0 infix] ] unit-test
 
-[ 452.16 ] [ [infix| r [ 12 ] pi [ 3.14 ] |
-    r*r*pi infix] ] unit-test
-[ 0 ] [ [infix| a [ 3 ] | 0 infix] ] unit-test
-[ 4/5 ] [ [infix| x [ 3 ] f [ 12 ] | f/(f+x) infix] ] unit-test
-[ 144 ] [ [infix| a [ 0 ] b [ 12 ] | b*b-a infix] ] unit-test
-
-[ 0 ] [ [infix| a [ { 0 1 2 3 } ] | a[0] infix] ] unit-test
-[ 0 ] [ [infix| a [ { 0 1 2 3 } ] | 3*a[0]*2*a[1] infix] ] unit-test
-[ 6 ] [ [infix| a [ { 0 1 2 3 } ] | a[0]+a[10%3]+a[3-1]+a[18/6] infix] ] unit-test
-[ -1 ] [ [infix| a [ { 0 1 2 3 } ] | -a[+1] infix] ] unit-test
-
 [ 0.0 ] [ [infix sin(0) infix] ] unit-test
 [ 10 ] [ [infix lcm(2,5) infix] ] unit-test
 [ 1.0 ] [ [infix +cos(-0*+3) infix] ] unit-test
@@ -42,4 +31,4 @@ IN: infix.tests
 [ t ] [ 5 \ stupid_function check-word ] unit-test
 [ 10 ] [ [infix stupid_function (0, 1, 2, 3, 4) infix] ] unit-test
 
-[ -1 ] [ [let | a [ 1 ] | [infix -a infix] ] ] unit-test
+[ -1 ] [ [let 1 :> a [infix -a infix] ] ] unit-test

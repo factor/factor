@@ -24,7 +24,7 @@ PRIVATE>
 
 :: hmac-stream ( stream key checksum -- value )
     checksum initialize-checksum-state :> checksum-state
-    checksum key checksum-state init-key :> Ki :> Ko
+    checksum key checksum-state init-key :> ( Ko Ki )
     checksum-state Ki add-checksum-bytes
     stream add-checksum-stream get-checksum
     checksum initialize-checksum-state

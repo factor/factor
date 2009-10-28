@@ -11,11 +11,10 @@ TUPLE: macosx-monitor < monitor handle ;
     '[ first { +modify-file+ } _ queue-change ] each ;
 
 M:: macosx (monitor) ( path recursive? mailbox -- monitor )
-    [let | path [ path normalize-path ] |
-        path mailbox macosx-monitor new-monitor
-        dup [ enqueue-notifications ] curry
-        path 1array 0 0 <event-stream> >>handle
-    ] ;
+    path normalize-path :> path
+    path mailbox macosx-monitor new-monitor
+    dup [ enqueue-notifications ] curry
+    path 1array 0 0 <event-stream> >>handle ;
 
 M: macosx-monitor dispose* handle>> dispose ;
 

@@ -504,11 +504,11 @@ M: ppc %compare [ (%compare) ] 2dip %boolean ;
 M: ppc %compare-imm [ (%compare-imm) ] 2dip %boolean ;
 
 M:: ppc %compare-float-ordered ( dst src1 src2 cc temp -- )
-    src1 src2 cc negate-cc \ (%compare-float-ordered) (%compare-float) :> branch2 :> branch1
+    src1 src2 cc negate-cc \ (%compare-float-ordered) (%compare-float) :> ( branch1 branch2 )
     dst temp branch1 branch2 (%boolean) ;
 
 M:: ppc %compare-float-unordered ( dst src1 src2 cc temp -- )
-    src1 src2 cc negate-cc \ (%compare-float-unordered) (%compare-float) :> branch2 :> branch1
+    src1 src2 cc negate-cc \ (%compare-float-unordered) (%compare-float) :> ( branch1 branch2 )
     dst temp branch1 branch2 (%boolean) ;
 
 :: %branch ( label cc -- )
@@ -534,11 +534,11 @@ M:: ppc %compare-imm-branch ( label src1 src2 cc -- )
     branch2 [ label branch2 execute( label -- ) ] when ; inline
 
 M:: ppc %compare-float-ordered-branch ( label src1 src2 cc -- )
-    src1 src2 cc \ (%compare-float-ordered) (%compare-float) :> branch2 :> branch1
+    src1 src2 cc \ (%compare-float-ordered) (%compare-float) :> ( branch1 branch2 )
     label branch1 branch2 (%branch) ;
 
 M:: ppc %compare-float-unordered-branch ( label src1 src2 cc -- )
-    src1 src2 cc \ (%compare-float-unordered) (%compare-float) :> branch2 :> branch1
+    src1 src2 cc \ (%compare-float-unordered) (%compare-float) :> ( branch1 branch2 )
     label branch1 branch2 (%branch) ;
 
 : load-from-frame ( dst n rep -- )

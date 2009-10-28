@@ -22,12 +22,10 @@ IN: compiler.cfg.intrinsics.alien
     ] [ emit-primitive ] if ;
 
 :: inline-alien ( node quot test -- )
-    [let | infos [ node node-input-infos ] |
-        infos test call
-        [ infos quot call ]
-        [ node emit-primitive ]
-        if
-    ] ; inline
+    node node-input-infos :> infos
+    infos test call
+    [ infos quot call ]
+    [ node emit-primitive ] if ; inline
 
 : inline-alien-getter? ( infos -- ? )
     [ first class>> c-ptr class<= ]
