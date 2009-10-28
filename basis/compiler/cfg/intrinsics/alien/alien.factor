@@ -25,7 +25,7 @@ IN: compiler.cfg.intrinsics.alien
     node node-input-infos :> infos
     infos test call
     [ infos quot call ]
-    [ node emit-primitive ] if ;
+    [ node emit-primitive ] if ; inline
 
 : inline-alien-getter? ( infos -- ? )
     [ first class>> c-ptr class<= ]

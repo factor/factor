@@ -445,7 +445,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
       drop 
     ] [ 
       [
-        "FROM: locals => [let ; FROM: sequences => nth ; [let " %
+        "FROM: locals => [let :> ; FROM: sequences => nth ; [let " %
           dup length [
             over ebnf-var? [
               " " % # " over nth :> " %
@@ -463,7 +463,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
 
 M: ebnf-var build-locals ( code ast -- )
   [
-    "FROM: locals => [let ; FROM: kernel => dup nip ; [let " %
+    "FROM: locals => [let :> ; FROM: kernel => dup nip ; [let " %
     " dup :> " % name>> %
     " " %
     %  

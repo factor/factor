@@ -192,7 +192,7 @@ M: bad-executable summary
 
 \ load-local [ infer-load-local ] "special" set-word-prop
 
-: infer-get-local ( -- )
+:: infer-get-local ( -- )
     pop-literal nip 1 swap - :> n
     n consume-r :> in-r
     in-r first copy-value 1array :> out-d
