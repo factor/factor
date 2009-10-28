@@ -22,6 +22,10 @@ TUPLE: def local ;
 
 C: <def> def
 
+TUPLE: multi-def locals ;
+
+C: <multi-def> multi-def
+
 PREDICATE: local < word "local?" word-prop ;
 
 : <local> ( name -- word )

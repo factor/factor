@@ -488,3 +488,6 @@ M: integer ed's-bug neg ;
    { [ a ed's-bug ] } && ;
 
 [ t ] [ \ ed's-test-case optimized? ] unit-test
+
+! multiple bind
+[ 3 1 2 ] [ [let 1 2 3 :> ( a b c ) c a b ] ] unit-test
