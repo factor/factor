@@ -80,7 +80,7 @@ SYMBOL: error-observers
     [
         [ swap file>> = ] [ swap error-type = ]
         bi-curry* bi and not
-    ] 2curry filter-here
+    ] 2curry filter! drop
     notify-error-observers ;
 
 : delete-definition-errors ( definition -- )

@@ -59,10 +59,10 @@ IN: sequences.tests
 
 [ [ 3 ] ] [ [ 1 2 3 ] 2 [ swap < ] curry filter ] unit-test
 
-[ V{ 1 2 3 } ] [ V{ 1 4 2 5 3 6 } clone [ [ 4 < ] filter-here ] keep ] unit-test
-[ V{ 4 2 6 } ] [ V{ 1 4 2 5 3 6 } clone [ [ 2 mod 0 = ] filter-here ] keep ] unit-test
+[ V{ 1 2 3 } ] [ V{ 1 4 2 5 3 6 } clone [ 4 < ] filter! ] unit-test
+[ V{ 4 2 6 } ] [ V{ 1 4 2 5 3 6 } clone [ 2 mod 0 = ] filter! ] unit-test
 
-[ V{ 3 } ] [ V{ 1 2 3 } clone [ 2 [ swap < ] curry filter-here ] keep ] unit-test
+[ V{ 3 } ] [ V{ 1 2 3 } clone 2 [ swap < ] curry filter! ] unit-test
 
 [ "hello world how are you" ]
 [ { "hello" "world" "how" "are" "you" } " " join ]

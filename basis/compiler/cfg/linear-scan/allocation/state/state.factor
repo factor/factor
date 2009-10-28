@@ -83,7 +83,7 @@ ERROR: register-already-used live-interval ;
 ! Moving intervals between active and inactive sets
 : process-intervals ( n symbol quots -- )
     ! symbol stores an alist mapping register classes to vectors
-    [ get values ] dip '[ [ _ cond ] with filter-here ] with each ; inline
+    [ get values ] dip '[ [ _ cond ] with filter! drop ] with each ; inline
 
 : deactivate-intervals ( n -- )
     ! Any active intervals which have ended are moved to handled
