@@ -429,8 +429,8 @@ PRIVATE>
 : replicate-as ( seq quot exemplar -- newseq )
     [ [ drop ] prepose ] dip map-as ; inline
 
-: change-each ( seq quot -- )
-    over map-into ; inline
+: map! ( seq quot -- seq )
+    over [ map-into ] keep ; inline
 
 : accumulate-as ( seq identity quot exemplar -- final newseq )
     [ [ swap ] dip [ curry keep ] curry ] dip map-as ; inline
