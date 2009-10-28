@@ -104,6 +104,8 @@ M: tuple rewrite-sugar* rewrite-element ;
 
 M: def rewrite-sugar* , ;
 
+M: multi-def rewrite-sugar* locals>> <reversed> [ <def> , ] each ;
+
 M: hashtable rewrite-sugar* rewrite-element ;
 
 M: wrapper rewrite-sugar*
