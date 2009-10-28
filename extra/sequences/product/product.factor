@@ -49,7 +49,7 @@ M: product-sequence nth
     product@ nths ;
 
 :: product-each ( sequences quot -- )
-    sequences start-product-iter :> lengths :> ns
+    sequences start-product-iter :> ( ns lengths )
     lengths [ 0 = ] any? [
         [ ns lengths end-product-iter? ]
         [ ns sequences nths quot call ns lengths product-iter ] until

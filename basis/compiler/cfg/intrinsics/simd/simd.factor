@@ -156,18 +156,18 @@ MACRO: if-literals-match ( quots -- )
     [ [ ^^fill-vector ] [ ^^xor-vector ] bi ] if ;
 
 :: ((generate-compare-vector)) ( src1 src2 rep {cc,swap} -- dst )
-    {cc,swap} first2 :> swap? :> cc
+    {cc,swap} first2 :> ( cc swap? )
     swap?
     [ src2 src1 rep cc ^^compare-vector ]
     [ src1 src2 rep cc ^^compare-vector ] if ;
 
 :: (generate-compare-vector) ( src1 src2 rep orig-cc -- dst )
-    rep orig-cc %compare-vector-ccs :> not? :> ccs
+    rep orig-cc %compare-vector-ccs :> ( ccs not? )
 
     ccs empty?
     [ rep not? [ ^^fill-vector ] [ ^^zero-vector ] if ]
     [
-        ccs unclip :> first-cc :> rest-ccs
+        ccs unclip :> ( rest-ccs first-cc )
         src1 src2 rep first-cc ((generate-compare-vector)) :> first-dst
 
         rest-ccs first-dst
