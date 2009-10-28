@@ -77,28 +77,34 @@ CONSTANT: homo-sapiens
 
 : write-repeat-fasta ( n alu desc id -- )
     write-description
-    0 :> k! :> alu
-    [| len | k len alu make-repeat-fasta k! ] split-lines ; inline
+    [let
+        0 :> k! :> alu
+        [| len | k len alu make-repeat-fasta k! ] split-lines
+    ] ; inline
 
 : fasta ( n out -- )
     homo-sapiens make-cumulative
     IUB make-cumulative
-    :> homo-sapiens-floats
-    :> homo-sapiens-chars
-    :> IUB-floats
-    :> IUB-chars
-    :> out
-    :> n
-    initial-seed :> seed
+    [let
+        :> homo-sapiens-floats
+        :> homo-sapiens-chars
+        :> IUB-floats
+        :> IUB-chars
+        :> out
+        :> n
+        initial-seed :> seed
 
-    out ascii [
-        n 2 * ALU "Homo sapiens alu" "ONE" write-repeat-fasta
+        out ascii [
+            n 2 * ALU "Homo sapiens alu" "ONE" write-repeat-fasta
 
-        initial-seed
-        n 3 * homo-sapiens-chars homo-sapiens-floats "IUB ambiguity codes" "TWO" write-random-fasta
-        n 5 * IUB-chars IUB-floats "Homo sapiens frequency" "THREE" write-random-fasta
-        drop
-    ] with-file-writer ;
+            initial-seed
+            n 3 * homo-sapiens-chars homo-sapiens-floats
+            "IUB ambiguity codes" "TWO" write-random-fasta
+            n 5 * IUB-chars IUB-floats
+            "Homo sapiens frequency" "THREE" write-random-fasta
+            drop
+        ] with-file-writer
+    ] ;
 
 : run-fasta ( -- ) 2500000 reverse-complement-in fasta ;
 
