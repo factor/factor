@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes.mixin classes.parser
+USING: accessors arrays assocs classes.mixin classes.parser
 classes.singleton classes.tuple classes.tuple.parser
 combinators effects.parser fry functors.backend generic
 generic.parser interpolate io.streams.string kernel lexer
@@ -144,10 +144,31 @@ DEFER: ;FUNCTOR delimiter
 : pop-functor-words ( -- )
     functor-words unuse-words ;
 
+: (parse-bindings) ( end -- )
+    dup parse-binding dup [
+        first2 [ make-local ] dip 2array ,
+        (parse-bindings)
+    ] [ 2drop ] if ;
+
+: with-bindings ( quot -- words assoc )
+    '[
+        in-lambda? on
+        _ H{ } make-assoc
+    ] { } make swap ; inline
+
+: parse-bindings ( end -- words assoc )
+    [
+        namespace use-words
+        (parse-bindings)
+        namespace unuse-words
+    ] with-bindings ;
+
 : parse-functor-body ( -- form )
     push-functor-words
-    "WHERE" parse-bindings*
-    [ \ ;FUNCTOR parse-until >quotation ] ((parse-lambda)) <let*> 1quotation
+    "WHERE" parse-bindings
+    [ [ swap <def> suffix ] { } assoc>map concat ]
+    [ [ \ ;FUNCTOR parse-until >quotation ] ((parse-lambda)) ] bi*
+    [ ] append-as
     pop-functor-words ;
 
 : (FUNCTOR:) ( -- word def effect )

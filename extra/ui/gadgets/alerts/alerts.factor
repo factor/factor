@@ -12,12 +12,13 @@ IN: ui.gadgets.alerts
 : alert* ( str -- ) [ ] swap alert ;
 
 :: ask-user ( string -- model' )
-   [ [let | lbl  [ string <label>  T{ font { name "sans-serif" } { size 14 } } >>font dup , ]
-            fldm [ <model-field*> ->% 1 ]
-            btn  [ "okay" <model-border-btn> ] |
-         btn -> [ fldm swap updates ]
-                [ [ drop lbl close-window ] $> , ] bi
-   ] ] <vbox> { 161 86 } >>pref-dim "" open-window ;
+    [
+        string <label>  T{ font { name "sans-serif" } { size 14 } } >>font dup , :> lbl
+        <model-field*> ->% 1 :> fldm
+        "okay" <model-border-btn> :> btn
+        btn -> [ fldm swap updates ]
+               [ [ drop lbl close-window ] $> , ] bi
+    ] <vbox> { 161 86 } >>pref-dim "" open-window ;
 
 MACRO: ask-buttons ( buttons -- quot ) dup length [
       [ swap

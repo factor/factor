@@ -43,17 +43,15 @@ IN: compiler.cfg.intrinsics.allot
     2 + cells array ^^allot ;
 
 :: emit-<array> ( node -- )
-    [let | len [ node node-input-infos first literal>> ] |
-        len expand-<array>? [
-            [let | elt [ ds-pop ]
-                   reg [ len ^^allot-array ] |
-                ds-drop
-                len reg array store-length
-                len reg elt array store-initial-element
-                reg ds-push
-            ]
-        ] [ node emit-primitive ] if
-    ] ;
+    node node-input-infos first literal>> :> len
+    len expand-<array>? [
+        ds-pop :> elt
+        len ^^allot-array :> reg
+        ds-drop
+        len reg array store-length
+        len reg elt array store-initial-element
+        reg ds-push
+    ] [ node emit-primitive ] if ;
 
 : expand-(byte-array)? ( obj -- ? )
     dup integer? [ 0 1024 between? ] [ drop f ] if ;
