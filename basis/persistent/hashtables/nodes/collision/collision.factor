@@ -26,7 +26,7 @@ M:: collision-node (pluck-at) ( key hashcode collision-node -- leaf-node )
 
 M:: collision-node (new-at) ( shift value key hashcode collision-node -- node' added-leaf )
     hashcode collision-node hashcode>> eq? [
-        key hashcode collision-node find-index :> leaf-node :> idx
+        key hashcode collision-node find-index :> ( idx leaf-node )
         idx [
             value leaf-node value>> = [
                 collision-node f

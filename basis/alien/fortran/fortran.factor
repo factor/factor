@@ -333,7 +333,7 @@ M: character-type (<fortran-result>)
     ] if-empty ;
 
 :: [fortran-invoke] ( [args>args] return library function parameters -- [args>args] quot ) 
-    return parameters fortran-sig>c-sig :> c-parameters :> c-return
+    return parameters fortran-sig>c-sig :> ( c-return c-parameters )
     function fortran-name>symbol-name :> c-function
     [args>args] 
     c-return library c-function c-parameters \ alien-invoke
