@@ -503,8 +503,8 @@ HELP: delq
 { $notes "This word uses identity comparison (" { $link eq? } ")." }
 { $side-effects "seq" } ;
 
-HELP: delete-nth
-{ $values { "n" "a non-negative integer" } { "seq" "a resizable mutable sequence" } }
+HELP: remove-nth!
+{ $values { "n" "a non-negative integer" } { "seq" "a resizable mutable sequence" } { "seq" "a resizable mutable sequence" } }
 { $description "Removes the " { $snippet "n" } "th element from the sequence, shifting all other elements down and reducing its length by one." }
 { $side-effects "seq" } ;
 
@@ -861,7 +861,7 @@ HELP: tail?
 { $values { "seq" sequence } { "end" sequence } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "seq" } " ends with " { $snippet "end" } ". If " { $snippet "end" } " is longer than " { $snippet "seq" } ", this word outputs " { $link f } "." } ;
 
-{ remove remove-nth remq delq remove! delete-nth } related-words
+{ remove remove-nth remq delq remove! remove-nth! } related-words
 
 HELP: cut-slice
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "before-slice" sequence } { "after-slice" "a slice" } }
@@ -1595,7 +1595,7 @@ ARTICLE: "sequences-destructive" "Destructive operations"
 { $subsections
     remove!
     delq
-    delete-nth
+    remove-nth!
     delete-slice
     delete-all
     filter-here
@@ -1616,7 +1616,7 @@ ARTICLE: "sequences-destructive" "Destructive operations"
     { { $link unclip-last } { $link pop } }
     { { $link remove } { $link remove! } }
     { { $link remq } { $link delq } }
-    { { $link remove-nth } { $link delete-nth } }
+    { { $link remove-nth } { $link remove-nth! } }
     { { $link reverse } { $link reverse-here } }
     { { $link append } { $link push-all } }
     { { $link map } { $link map! } }

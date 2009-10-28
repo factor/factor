@@ -211,7 +211,7 @@ ERROR: topological-sort-failed ;
 : sort-classes ( seq -- newseq )
     [ name>> ] sort-with >vector
     [ dup empty? not ]
-    [ dup largest-class [ over delete-nth ] dip ]
+    [ dup largest-class [ over remove-nth! drop ] dip ]
     produce nip ;
 
 : smallest-class ( classes -- class/f )

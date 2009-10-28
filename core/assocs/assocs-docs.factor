@@ -28,7 +28,7 @@ ARTICLE: "enums" "Enumerations"
 HELP: enum
 { $class-description "An associative structure which wraps a sequence and maps integers to the corresponding elements of the sequence."
 $nl
-"Enumerations are mutable; note that deleting a key calls " { $link delete-nth } ", which results in all subsequent elements being shifted down." } ;
+"Enumerations are mutable; note that deleting a key calls " { $link remove-nth! } ", which results in all subsequent elements being shifted down." } ;
 
 HELP: <enum>
 { $values { "seq" sequence } { "enum" enum } }
