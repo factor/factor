@@ -119,7 +119,7 @@ ARTICLE: "current-directory" "Current working directory"
     with-directory
 }
 "This variable is independent of the operating system notion of “current working directory”. While all Factor I/O operations use the variable and not the operating system's value, care must be taken when making FFI calls which expect a pathname. The first option is to resolve relative paths:"
-{ $subsections (normalize-path) }
+{ $subsections absolute-path }
 "The second is to change the working directory of the current process:"
 { $subsections
     cd
