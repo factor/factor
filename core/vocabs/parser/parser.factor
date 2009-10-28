@@ -172,7 +172,7 @@ TUPLE: rename word vocab words ;
 
 : use-words ( assoc -- ) (use-words) push ;
 
-: unuse-words ( assoc -- ) (use-words) delete ;
+: unuse-words ( assoc -- ) (use-words) remove! drop ;
 
 TUPLE: ambiguous-use-error words ;
 

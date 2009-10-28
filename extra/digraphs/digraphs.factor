@@ -21,10 +21,10 @@ TUPLE: vertex value edges ;
 
 : @edges ( from to digraph -- to edges ) swapd at edges>> ;
 : add-edge ( from to digraph -- ) @edges push ;
-: delete-edge ( from to digraph -- ) @edges delete ;
+: delete-edge ( from to digraph -- ) @edges remove! drop ;
 
 : delete-to-edges ( to digraph -- )
-    [ nip dupd edges>> delete ] assoc-each drop ;
+    [ nip dupd edges>> remove! drop ] assoc-each drop ;
 
 : delete-vertex ( key digraph -- )
     2dup delete-at delete-to-edges ;
