@@ -365,10 +365,10 @@ SYNTAX: UNION-STRUCT:
     parse-struct-definition define-union-struct-class ;
 
 SYNTAX: S{
-    scan-word dup struct-slots parse-tuple-literal-slots parsed ;
+    scan-word dup struct-slots parse-tuple-literal-slots suffix! ;
 
 SYNTAX: S@
-    scan-word scan-object swap memory>struct parsed ;
+    scan-word scan-object swap memory>struct suffix! ;
 
 ! functor support
 
@@ -389,7 +389,7 @@ SYNTAX: S@
 PRIVATE>
 
 FUNCTOR-SYNTAX: STRUCT:
-    scan-param parsed
+    scan-param suffix!
     [ 8 <vector> ] over push-all
     [ parse-struct-slots` ] [ ] while
     [ >array define-struct-class ] over push-all ;

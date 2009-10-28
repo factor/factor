@@ -2,5 +2,5 @@
 USING: arrays kernel parser sequences ;
 IN: pair-rocket
 
-SYNTAX: => dup pop scan-object 2array parsed ;
+SYNTAX: => dup pop scan-object 2array suffix! ;
 
