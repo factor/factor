@@ -7,7 +7,7 @@ IN: locals
 
 SYNTAX: :>
     scan locals get [ :>-outside-lambda-error ] unless*
-    [ make-local ] bind <def> parsed ;
+    parse-def parsed ;
 
 SYNTAX: [| parse-lambda over push-all ;
 
