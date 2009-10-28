@@ -23,7 +23,7 @@ HOOK: really-delete-tree os ( path -- )
 M: windows really-delete-tree
     #! Workaround: Cygwin GIT creates read-only files for
     #! some reason.
-    [ { "chmod" "ug+rw" "-R" } swap (normalize-path) suffix short-running-process ]
+    [ { "chmod" "ug+rw" "-R" } swap absolute-path suffix short-running-process ]
     [ delete-tree ]
     bi ;
 

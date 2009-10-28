@@ -12,7 +12,7 @@ IN: compiler.tests.alien
 
 <<
 : libfactor-ffi-tests-path ( -- string )
-    "resource:" (normalize-path)
+    "resource:" absolute-path
     {
         { [ os winnt? ]  [ "libfactor-ffi-test.dll" ] }
         { [ os macosx? ] [ "libfactor-ffi-test.dylib" ] }

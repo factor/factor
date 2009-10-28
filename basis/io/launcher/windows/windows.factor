@@ -129,7 +129,7 @@ M: windows current-process-handle ( -- handle )
 
 M: windows run-process* ( process -- handle )
     [
-        current-directory get (normalize-path) cd
+        current-directory get absolute-path cd
 
         dup make-CreateProcess-args
         tuck fill-redirection

@@ -95,7 +95,7 @@ M: recursive-monitor dispose*
     ready>> ?promise ?linked drop ;
 
 : <recursive-monitor> ( path mailbox -- monitor )
-    [ (normalize-path) ] dip
+    [ absolute-path ] dip
     recursive-monitor new-monitor
         H{ } clone >>children
         <promise> >>ready
