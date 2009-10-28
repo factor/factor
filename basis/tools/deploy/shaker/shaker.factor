@@ -258,7 +258,7 @@ IN: tools.deploy.shaker
             ! otherwise do nothing
             [ 2drop ]
         } cond
-    ] change-each ;
+    ] map! drop ;
 
 : strip-default-method ( generic new-default -- )
     [

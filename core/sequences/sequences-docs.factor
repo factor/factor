@@ -332,9 +332,9 @@ HELP: change-nth
 { $errors "Throws an error if the sequence is immutable, if the index is out of bounds, or the sequence cannot hold elements of the type output by " { $snippet "quot" } "." }
 { $side-effects "seq" } ;
 
-HELP: change-each
-{ $values { "seq" "a mutable sequence" } { "quot" { $quotation "( old -- new )" } } }
-{ $description "Applies the quotation to each element yielding a new element, storing the new elements back in the original sequence." }
+HELP: map!
+{ $values { "seq" "a mutable sequence" } { "quot" { $quotation "( old -- new )" } } { "seq" "a mutable sequence" } }
+{ $description "Applies the quotation to each element yielding a new element, storing the new elements back in the original sequence. Returns the original sequence." }
 { $errors "Throws an error if the sequence is immutable, or the sequence cannot hold elements of the type output by " { $snippet "quot" } "." }
 { $side-effects "seq" } ;
 
@@ -1590,7 +1590,7 @@ ARTICLE: "sequences-destructive-discussion" "When to use destructive operations"
 
 ARTICLE: "sequences-destructive" "Destructive operations"
 "Changing elements:"
-{ $subsections change-each change-nth }
+{ $subsections map! change-nth }
 "Deleting elements:"
 { $subsections
     delete
@@ -1619,7 +1619,7 @@ ARTICLE: "sequences-destructive" "Destructive operations"
     { { $link remove-nth } { $link delete-nth } }
     { { $link reverse } { $link reverse-here } }
     { { $link append } { $link push-all } }
-    { { $link map } { $link change-each } }
+    { { $link map } { $link map! } }
     { { $link filter } { $link filter-here } }
 }
 { $heading "Related Articles" }
