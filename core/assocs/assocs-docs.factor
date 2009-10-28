@@ -96,7 +96,6 @@ ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
     update
     assoc-union
     assoc-diff
-    remove-all
     substitute
     substitute-here
     extract-keys
@@ -348,11 +347,6 @@ HELP: assoc-diff
 { $values { "assoc1" assoc } { "assoc2" assoc } { "diff" "a new assoc" } }
 { $description "Outputs an assoc consisting of all entries from " { $snippet "assoc1" } " whose key is not contained in " { $snippet "assoc2" } "." } 
 ;
-HELP: remove-all
-{ $values { "assoc" assoc } { "seq" "a sequence" } { "subseq" "a new sequence" } }
-{ $description "Constructs a sequence consisting of all elements in " { $snippet "seq" } " which do not appear as keys in " { $snippet "assoc" } "." }
-{ $notes "The values of the keys in the assoc are disregarded, so this word is usually used for set-theoretic calculations where the assoc in question either has dummy sentinels as values, or the values equal the keys." }
-{ $side-effects "assoc" } ;
 
 HELP: substitute-here
 { $values { "seq" "a mutable sequence" } { "assoc" assoc } }
