@@ -72,7 +72,7 @@ SYMBOL: error-observers
 
 : add-error-observer ( observer -- ) error-observers get push ;
 
-: remove-error-observer ( observer -- ) error-observers get delq ;
+: remove-error-observer ( observer -- ) error-observers get remove-eq! drop ;
 
 : notify-error-observers ( -- ) error-observers get [ errors-changed ] each ;
 
