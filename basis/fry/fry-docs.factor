@@ -68,10 +68,10 @@ ARTICLE: "fry.philosophy" "Fried quotation philosophy"
     "'[ [ _ key? ] all? ] filter"
     "[ [ key? ] curry all? ] curry filter"
 }
-"There is a mapping from fried quotations to lexical closures as defined in the " { $vocab-link "locals" } " vocabulary. Namely, a fried quotation is equivalent to a “let” form where each local binding is only used once, and bindings are used in the same order in which they are defined. The following two lines are equivalent:"
+"There is a mapping from fried quotations to lexical closures as defined in the " { $vocab-link "locals" } " vocabulary. Namely, a fried quotation is equivalent to a " { $snippet "[| | ]" } " form where each local binding is only used once, and bindings are used in the same order in which they are defined. The following two lines are equivalent:"
 { $code
     "'[ 3 _ + 4 _ / ]"
-    "[let | a [ ] b [ ] | [ 3 a + 4 b / ] ]"
+    "[| a b | 3 a + 4 b / ]"
 } ;
 
 ARTICLE: "fry" "Fried quotations"

@@ -61,37 +61,33 @@ CONSTANT: AES_BLOCK_SIZE 16
     bitor bitor bitor 32 bits ;
 
 :: set-t ( T i -- )
-    [let* |
-        a1 [ i sbox nth ]
-        a2 [ a1 xtime ]
-        a3 [ a1 a2 bitxor ] |
-            a2 a1 a1 a3 ui32 i T set-nth
-            a3 a2 a1 a1 ui32 i HEX: 100 + T set-nth
-            a1 a3 a2 a1 ui32 i HEX: 200 + T set-nth
-            a1 a1 a3 a2 ui32 i HEX: 300 + T set-nth
-        ] ;
+    i sbox nth :> a1
+    a1 xtime :> a2
+    a1 a2 bitxor :> a3
 
+    a2 a1 a1 a3 ui32 i T set-nth
+    a3 a2 a1 a1 ui32 i HEX: 100 + T set-nth
+    a1 a3 a2 a1 ui32 i HEX: 200 + T set-nth
+    a1 a1 a3 a2 ui32 i HEX: 300 + T set-nth ;
 
 MEMO:: t-table ( -- array )
     1024 0 <array>
     dup 256 [ set-t ] with each ;
 
 :: set-d ( D i -- )
-    [let* |
-        a1 [ i inv-sbox nth ]
-        a2 [ a1 xtime ]
-        a4 [ a2 xtime ]
-        a8 [ a4 xtime ]
-        a9 [ a8 a1 bitxor ]
-        ab [ a9 a2 bitxor ]
-        ad [ a9 a4 bitxor ]
-        ae [ a8 a4 a2 bitxor bitxor ]
-        |
-            ae a9 ad ab ui32 i D set-nth
-            ab ae a9 ad ui32 i HEX: 100 + D set-nth
-            ad ab ae a9 ui32 i HEX: 200 + D set-nth
-            a9 ad ab ae ui32 i HEX: 300 + D set-nth
-        ] ;
+    i inv-sbox nth :> a1
+    a1 xtime :> a2
+    a2 xtime :> a4
+    a4 xtime :> a8
+    a8 a1 bitxor :> a9
+    a9 a2 bitxor :> ab
+    a9 a4 bitxor :> ad
+    a8 a4 a2 bitxor bitxor :> ae
+
+    ae a9 ad ab ui32 i D set-nth
+    ab ae a9 ad ui32 i HEX: 100 + D set-nth
+    ad ab ae a9 ui32 i HEX: 200 + D set-nth
+    a9 ad ab ae ui32 i HEX: 300 + D set-nth ;
     
 MEMO:: d-table ( -- array )
     1024 0 <array>
