@@ -82,7 +82,7 @@ M: ast-function infix-codegen
 PRIVATE>
 
 SYNTAX: [infix
-    "infix]" [infix-parse parsed \ call parsed ;
+    "infix]" [infix-parse suffix! \ call suffix! ;
 
 <PRIVATE
 

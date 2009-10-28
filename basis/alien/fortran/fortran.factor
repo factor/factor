@@ -205,9 +205,6 @@ M: fortran-type (fortran-ret-type>c-type) (fortran-type>c-type) ;
 M: real-type (fortran-ret-type>c-type)
     drop real-functions-return-double? [ "double" ] [ "float" ] if ;
 
-: suffix! ( seq   elt   -- seq   ) over push     ; inline
-: append! ( seq-a seq-b -- seq-a ) over push-all ; inline
-
 GENERIC: (fortran-arg>c-args) ( type -- main-quot added-quot )
 
 : args?dims ( type quot -- main-quot added-quot )

@@ -20,7 +20,7 @@ MACRO: shuffle-effect ( effect -- )
     ] [ ] make ;
 
 SYNTAX: shuffle(
-    ")" parse-effect parsed \ shuffle-effect parsed ;
+    ")" parse-effect suffix! \ shuffle-effect suffix! ;
 
 : 2swap ( x y z t -- z t x y ) 2 2 mnswap ; inline
 
