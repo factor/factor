@@ -42,7 +42,7 @@ IN: sequences.tests
 [ t ] [ 2 [ 1 2 ] member? ] unit-test
 
 [ t ]
-[ [ "hello" "world" ] [ second ] keep memq? ] unit-test
+[ [ "hello" "world" ] [ second ] keep member-eq? ] unit-test
 
 [ 4 ] [ CHAR: x "tuvwxyz" >vector index ] unit-test 
 

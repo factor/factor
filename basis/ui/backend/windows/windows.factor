@@ -537,7 +537,7 @@ SYMBOL: nc-buttons
     COLOR_BTNFACE GetSysColor RGB>color ;
 
 : ?make-glass ( world hwnd -- )
-    over window-controls>> textured-background swap memq? [
+    over window-controls>> textured-background swap member-eq? [
         composition-enabled? [
             full-window-margins DwmExtendFrameIntoClientArea drop
             T{ rgba f 0.0 0.0 0.0 0.0 }

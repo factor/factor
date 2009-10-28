@@ -567,7 +567,7 @@ PRIVATE>
 : member? ( elt seq -- ? )
     [ = ] with any? ;
 
-: memq? ( elt seq -- ? )
+: member-eq? ( elt seq -- ? )
     [ eq? ] with any? ;
 
 : remove ( elt seq -- newseq )

@@ -65,7 +65,7 @@ M: indirect extended? base>> extended? ;
 ERROR: bad-index indirect ;
 
 : check-ESP ( indirect -- indirect )
-    dup index>> { ESP RSP } memq? [ bad-index ] when ;
+    dup index>> { ESP RSP } member-eq? [ bad-index ] when ;
 
 : canonicalize ( indirect -- indirect )
     #! Modify the indirect to work around certain addressing mode
@@ -103,7 +103,7 @@ TUPLE: byte value ;
 C: <byte> byte
 
 : extended-8-bit-register? ( register -- ? )
-    { SPL BPL SIL DIL } memq? ;
+    { SPL BPL SIL DIL } member-eq? ;
 
 : n-bit-version-of ( register n -- register' )
     ! Certain 8-bit registers don't exist in 32-bit mode...

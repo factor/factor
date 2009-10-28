@@ -90,5 +90,5 @@ SYMBOLS:
         { cc/>   { +lt+ +eq+      +unordered+ } }
         { cc/<>  {      +eq+      +unordered+ } }
         { cc/<>= {                +unordered+ } }
-    } at memq? ;
+    } at member-eq? ;
 

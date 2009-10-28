@@ -461,7 +461,7 @@ HELP: member?
 { $description "Tests if the sequence contains an element equal to the object." }
 { $notes "This word uses equality comparison (" { $link = } ")." } ;
 
-HELP: memq?
+HELP: member-eq?
 { $values { "elt" object } { "seq" sequence } { "?" "a boolean" } }
 { $description "Tests if the sequence contains the object." }
 { $notes "This word uses identity comparison (" { $link eq? } ")." } ;
@@ -1566,7 +1566,7 @@ ARTICLE: "sequences-tests" "Testing sequences"
 "Testing indices:"
 { $subsections bounds-check? }
 "Testing if a sequence contains an object:"
-{ $subsections member? memq? }
+{ $subsections member? member-eq? }
 "Testing if a sequence contains a subsequence:"
 { $subsections head? tail? subseq? } ;
 
