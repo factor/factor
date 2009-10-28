@@ -82,7 +82,7 @@ PRIVATE>
     '[ _ dup random _ _ next-sample ] replicate ;
 
 : delete-random ( seq -- elt )
-    [ length random-integer ] keep [ nth ] 2keep delete-nth ;
+    [ length random-integer ] keep [ nth ] 2keep remove-nth! drop ;
 
 : with-random ( tuple quot -- )
     random-generator swap with-variable ; inline

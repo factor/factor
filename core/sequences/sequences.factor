@@ -695,8 +695,8 @@ PRIVATE>
 : delete-slice ( from to seq -- )
     check-slice [ over [ - ] dip ] dip open-slice ;
 
-: delete-nth ( n seq -- )
-    [ dup 1 + ] dip delete-slice ;
+: remove-nth! ( n seq -- seq )
+    [ [ dup 1 + ] dip delete-slice ] keep ;
 
 : snip ( from to seq -- head tail )
     [ swap head ] [ swap tail ] bi-curry bi* ; inline

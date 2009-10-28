@@ -207,7 +207,7 @@ unit-test
 [ 10 "hi" "bye" copy ] must-fail
 
 [ V{ 1 2 3 5 6 } ] [
-    3 V{ 1 2 3 4 5 6 } clone [ delete-nth ] keep
+    3 V{ 1 2 3 4 5 6 } clone remove-nth!
 ] unit-test
 
 ! erg's random tester found this one
@@ -227,7 +227,7 @@ unit-test
 [ -3 10 nth ] must-fail
 [ 11 10 nth ] must-fail
 
-[ -1/0. 0 delete-nth ] must-fail
+[ -1/0. 0 remove-nth! ] must-fail
 [ "" ] [ "" [ CHAR: \s = ] trim ] unit-test
 [ "" ] [ "" [ CHAR: \s = ] trim-head ] unit-test
 [ "" ] [ "" [ CHAR: \s = ] trim-tail ] unit-test

@@ -195,7 +195,7 @@ M: sequence clear-assoc delete-all ; inline
 
 M: sequence delete-at
     [ nip ] [ search-alist nip ] 2bi
-    [ swap delete-nth ] [ drop ] if* ;
+    [ swap remove-nth! drop ] [ drop ] if* ;
 
 M: sequence assoc-size length ; inline
 
@@ -224,7 +224,7 @@ M: enum at*
 
 M: enum set-at seq>> set-nth ; inline
 
-M: enum delete-at seq>> delete-nth ; inline
+M: enum delete-at seq>> remove-nth! drop ; inline
 
 M: enum >alist ( enum -- alist )
     seq>> [ length ] keep zip ; inline
