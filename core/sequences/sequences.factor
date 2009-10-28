@@ -432,11 +432,17 @@ PRIVATE>
 : map! ( seq quot -- seq )
     over [ map-into ] keep ; inline
 
+: (accumulate) ( seq identity quot -- seq identity quot )
+    [ swap ] dip [ curry keep ] curry ; inline
+
 : accumulate-as ( seq identity quot exemplar -- final newseq )
-    [ [ swap ] dip [ curry keep ] curry ] dip map-as ; inline
+    [ (accumulate) ] dip map-as ; inline
 
 : accumulate ( seq identity quot -- final newseq )
     { } accumulate-as ; inline
+
+: accumulate! ( seq identity quot -- final seq )
+    (accumulate) map! ; inline
 
 : 2each ( seq1 seq2 quot -- )
     (2each) each-integer ; inline
