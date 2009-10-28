@@ -93,4 +93,4 @@ PRIVATE>
 
 SYNTAX: [infix|
     "|" parse-bindings "infix]" parse-infix-locals <let>
-    ?rewrite-closures over push-all ;
+    ?rewrite-closures append! ;

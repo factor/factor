@@ -43,7 +43,7 @@ M: object (fake-quotations>) , ;
 
 : parse-definition* ( accum -- accum )
     parse-definition >fake-quotations suffix!
-    [ fake-quotations> first ] over push-all ;
+    [ fake-quotations> first ] append! ;
 
 : parse-declared* ( accum -- accum )
     complete-effect
@@ -74,7 +74,7 @@ FUNCTOR-SYNTAX: MIXIN:
 FUNCTOR-SYNTAX: M:
     scan-param suffix!
     scan-param suffix!
-    [ create-method-in dup method-body set ] over push-all
+    [ create-method-in dup method-body set ] append! 
     parse-definition*
     \ define* suffix! ;
 
@@ -82,7 +82,7 @@ FUNCTOR-SYNTAX: C:
     scan-param suffix!
     scan-param suffix!
     complete-effect
-    [ [ [ boa ] curry ] over push-all ] dip suffix!
+    [ [ [ boa ] curry ] append! ] dip suffix!
     \ define-declared* suffix! ;
 
 FUNCTOR-SYNTAX: :
@@ -114,7 +114,7 @@ FUNCTOR-SYNTAX: MACRO:
     parse-declared*
     \ define-macro suffix! ;
 
-FUNCTOR-SYNTAX: inline [ word make-inline ] over push-all ;
+FUNCTOR-SYNTAX: inline [ word make-inline ] append! ;
 
 FUNCTOR-SYNTAX: call-next-method T{ fake-call-next-method } suffix! ;
 

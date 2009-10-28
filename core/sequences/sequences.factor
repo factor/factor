@@ -741,7 +741,7 @@ PRIVATE>
 : concat-as ( seq exemplar -- newseq )
     swap [ { } ] [
         [ sum-lengths over new-resizable ] keep
-        [ over push-all ] each
+        [ append! ] each
     ] if-empty swap like ;
 
 : concat ( seq -- newseq )

@@ -35,4 +35,4 @@ ERROR: stack-effect-omits-dashes effect ;
     "(" expect ")" parse-effect ;
 
 : parse-call( ( accum word -- accum )
-    [ ")" parse-effect ] dip 2array over push-all ;
+    [ ")" parse-effect ] dip 2array append! ;

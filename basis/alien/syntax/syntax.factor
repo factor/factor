@@ -37,7 +37,7 @@ ERROR: no-such-symbol name library ;
     2dup load-library dlsym [ 2nip ] [ no-such-symbol ] if* ;
 
 SYNTAX: &:
-    scan "c-library" get '[ _ _ address-of ] over push-all ;
+    scan "c-library" get '[ _ _ address-of ] append! ;
 
 : global-quot ( type word -- quot )
     name>> "c-library" get '[ _ _ address-of 0 ]
