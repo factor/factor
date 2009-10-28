@@ -9,7 +9,7 @@ IN: benchmark.reverse-complement
 TR: trans-map ch>upper "ACGTUMRYKVHDB" "TGCAAKYRMBDHV" ;
 
 : translate-seq ( seq -- str )
-    concat dup reverse-here dup trans-map-fast ;
+    concat reverse! dup trans-map-fast ;
 
 : show-seq ( seq -- )
     translate-seq 60 <groups> [ print ] each ;

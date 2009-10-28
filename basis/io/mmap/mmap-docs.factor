@@ -81,7 +81,7 @@ ARTICLE: "io.mmap.examples" "Memory-mapped file examples"
     ""
     "\"mydata.dat\" char ["
     "    4 <sliced-groups>"
-    "    [ reverse-here ] map! drop"
+    "    [ reverse! drop ] map! drop"
     "] with-mapped-array"
 }
 "Normalize a file containing packed quadrupes of floats:"
