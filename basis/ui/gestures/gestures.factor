@@ -297,7 +297,7 @@ SYMBOL: drag-timer
 
 : send-button-up ( gesture loc world -- )
     move-hand
-    dup #>> hand-buttons get-global delete
+    dup #>> hand-buttons get-global remove! drop
     stop-drag-timer
     button-gesture ;
 

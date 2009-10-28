@@ -8,7 +8,7 @@ TUPLE: rect { loc initial: { 0 0 } } { dim initial: { 0 0 } } ;
 
 : <rect> ( loc dim -- rect ) rect boa ; inline
 
-SYNTAX: RECT: scan-object scan-object <rect> parsed ;
+SYNTAX: RECT: scan-object scan-object <rect> suffix! ;
 
 : <zero-rect> ( -- rect ) rect new ; inline
 

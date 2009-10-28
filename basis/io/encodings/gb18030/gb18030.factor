@@ -67,7 +67,7 @@ TUPLE: range ufirst ulast bfirst blast ;
     126 /mod HEX: 81 + swap
     10 /mod HEX: 30 + swap
     HEX: 81 +
-    4byte-array dup reverse-here ;
+    4byte-array reverse! ;
 
 : >interval-map-by ( start-quot end-quot value-quot seq -- interval-map )
     '[ _ [ @ 2array ] _ tri ] { } map>assoc <interval-map> ; inline

@@ -72,7 +72,7 @@ SYMBOL: error-observers
 
 : add-error-observer ( observer -- ) error-observers get push ;
 
-: remove-error-observer ( observer -- ) error-observers get delq ;
+: remove-error-observer ( observer -- ) error-observers get remove-eq! drop ;
 
 : notify-error-observers ( -- ) error-observers get [ errors-changed ] each ;
 
@@ -80,7 +80,7 @@ SYMBOL: error-observers
     [
         [ swap file>> = ] [ swap error-type = ]
         bi-curry* bi and not
-    ] 2curry filter-here
+    ] 2curry filter! drop
     notify-error-observers ;
 
 : delete-definition-errors ( definition -- )

@@ -24,13 +24,13 @@ M: word quot-uses over crossref? [ conjoin ] [ 2drop ] if ;
     [ quot-uses ] curry each ;
 
 : seq-uses ( seq assoc -- )
-    over visited get memq? [ 2drop ] [
+    over visited get member-eq? [ 2drop ] [
         over visited get push
         (seq-uses)
     ] if ;
 
 : assoc-uses ( assoc' assoc -- )
-    over visited get memq? [ 2drop ] [
+    over visited get member-eq? [ 2drop ] [
         over visited get push
         [ >alist ] dip (seq-uses)
     ] if ;

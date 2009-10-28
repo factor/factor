@@ -193,7 +193,7 @@ M: response clone
     [ cookies>> ] dip '[ [ _ ] dip name>> = ] find nip ;
 
 : delete-cookie ( request/response name -- )
-    over cookies>> [ get-cookie ] dip delete ;
+    over cookies>> [ get-cookie ] dip remove! drop ;
 
 : put-cookie ( request/response cookie -- request/response )
     [ name>> dupd get-cookie [ dupd delete-cookie ] when* ] keep

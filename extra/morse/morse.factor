@@ -109,7 +109,7 @@ PRIVATE>
 : morse> ( morse -- plain )
     replace-underscores morse>sentence ;
 
-SYNTAX: [MORSE "MORSE]" parse-multiline-string morse> parsed ; 
+SYNTAX: [MORSE "MORSE]" parse-multiline-string morse> suffix! ; 
     
 <PRIVATE
     

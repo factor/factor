@@ -867,8 +867,8 @@ SYMBOL: not-an-assoc
 [ t ] [ [ { 1 2 3 } member? ] { member? } inlined? ] unit-test
 [ f ] [ [ { 1 2 3 } swap member? ] { member? } inlined? ] unit-test
 
-[ t ] [ [ { 1 2 3 } memq? ] { memq? } inlined? ] unit-test
-[ f ] [ [ { 1 2 3 } swap memq? ] { memq? } inlined? ] unit-test
+[ t ] [ [ { 1 2 3 } member-eq? ] { member-eq? } inlined? ] unit-test
+[ f ] [ [ { 1 2 3 } swap member-eq? ] { member-eq? } inlined? ] unit-test
 
 [ t ] [ [ V{ } clone ] { clone (clone) } inlined? ] unit-test
 [ f ] [ [ { } clone ] { clone (clone) } inlined? ] unit-test

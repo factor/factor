@@ -7,4 +7,4 @@ SYNTAX: HEX{
     "}" parse-tokens "" join
     [ blank? not ] filter
     2 group [ hex> ] B{ } map-as
-    parsed ;
+    suffix! ;

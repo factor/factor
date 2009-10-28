@@ -200,7 +200,7 @@ PRIVATE>
 
 : parsing-regexp ( accum end -- accum )
     lexer get [ take-until ] [ parse-noblank-token ] bi
-    <optioned-regexp> compile-next-match parsed ;
+    <optioned-regexp> compile-next-match suffix! ;
 
 PRIVATE>
 

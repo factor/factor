@@ -49,7 +49,7 @@ ERROR: bad-kill-insn bb ;
 ERROR: bad-successors ;
 
 : check-successors ( bb -- )
-    dup successors>> [ predecessors>> memq? ] with all?
+    dup successors>> [ predecessors>> member-eq? ] with all?
     [ bad-successors ] unless ;
 
 : check-basic-block ( bb -- )

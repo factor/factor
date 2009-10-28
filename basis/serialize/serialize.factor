@@ -222,7 +222,7 @@ SYMBOL: deserialized
 :: (deserialize-seq) ( exemplar quot -- seq )
     deserialize-cell exemplar new-sequence
     [ intern-object ]
-    [ dup [ drop quot call ] change-each ] bi ; inline
+    [ [ drop quot call ] map! ] bi ; inline
 
 : deserialize-array ( -- array )
     { } [ (deserialize) ] (deserialize-seq) ;

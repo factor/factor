@@ -547,12 +547,12 @@ PRIVATE>
 SYNTAX: <EBNF
   "EBNF>"
   reset-tokenizer parse-multiline-string parse-ebnf main swap at  
-  parsed reset-tokenizer ;
+  suffix! reset-tokenizer ;
 
 SYNTAX: [EBNF
   "EBNF]"
   reset-tokenizer parse-multiline-string ebnf>quot nip 
-  parsed \ call parsed reset-tokenizer ;
+  suffix! \ call suffix! reset-tokenizer ;
 
 SYNTAX: EBNF: 
   reset-tokenizer CREATE-WORD dup ";EBNF" parse-multiline-string  

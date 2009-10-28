@@ -833,7 +833,7 @@ SYMBOL: vreg-insn
 [
     vreg-insn
     insn-classes get [
-        "insn-slots" word-prop [ type>> { def use temp } memq? ] any?
+        "insn-slots" word-prop [ type>> { def use temp } member-eq? ] any?
     ] filter
     define-union-class
 ] with-compilation-unit

@@ -123,7 +123,7 @@ M: limited-stream stream-read-partial
 <PRIVATE
 
 : (read-until) ( stream seps buf -- stream seps buf sep/f )
-    3dup [ [ stream-read1 dup ] dip memq? ] dip
+    3dup [ [ stream-read1 dup ] dip member-eq? ] dip
     swap [ drop ] [ push (read-until) ] if ;
 
 :: limited-stream-seek ( n seek-type stream -- )

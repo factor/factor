@@ -44,8 +44,8 @@ M: value-word definition drop f ;
     def>> first (>>obj) ;
 
 SYNTAX: to:
-    scan-word literalize parsed
-    \ set-value parsed ;
+    scan-word literalize suffix!
+    \ set-value suffix! ;
 
 : get-value ( word -- value )
     def>> first obj>> ;

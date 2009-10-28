@@ -121,7 +121,7 @@ ARTICLE: "prettyprint-literal" "Literal prettyprinting protocol"
     "    scan-word \\ * assert="
     "    scan-word"
     "    scan-word \\ ] assert="
-    "    <rect> parsed ;"
+    "    <rect> suffix! ;"
 }
 "An example literal might be:"
 { $code "RECT[ 100 * 200 ]" }
