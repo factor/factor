@@ -103,7 +103,7 @@ ERROR: bad-live-ranges interval ;
     ! most one) are split and spilled and removed from the inactive
     ! set.
     new vreg>> active-intervals-for [ [ reg>> reg = ] find swap dup ] keep
-    '[ _ delete-nth new start>> spill ] [ 2drop ] if ;
+    '[ _ remove-nth! drop  new start>> spill ] [ 2drop ] if ;
 
 :: spill-intersecting-inactive ( new reg -- )
     ! Any inactive intervals using 'reg' are split and spilled
