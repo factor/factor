@@ -11,9 +11,9 @@ ERROR: bad-vconvert-input value expected-type ;
 <PRIVATE
 
 : float-type? ( c-type -- ? )
-    { float double } memq? ;
+    { float double } member-eq? ;
 : unsigned-type? ( c-type -- ? )
-    { uchar ushort uint ulonglong } memq? ;
+    { uchar ushort uint ulonglong } member-eq? ;
 
 : check-vconvert-type ( value expected-type -- value )
     2dup instance? [ drop ] [ bad-vconvert-input ] if ; inline

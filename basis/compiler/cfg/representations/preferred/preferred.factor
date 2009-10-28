@@ -26,7 +26,7 @@ GENERIC: uses-vreg-reps ( insn -- reps )
     bi define ;
 
 : reps-getter-quot ( reps -- quot )
-    dup [ rep>> { f scalar-rep } memq? not ] all? [
+    dup [ rep>> { f scalar-rep } member-eq? not ] all? [
         [ rep>> ] map [ drop ] swap suffix
     ] [
         [ rep>> rep-getter-quot ] map dup length {

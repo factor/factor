@@ -40,7 +40,7 @@ SYMBOL: visited
 :: insert-basic-block ( froms to bb -- )
     bb froms V{ } like >>predecessors drop
     bb to 1vector >>successors drop
-    to predecessors>> [ dup froms memq? [ drop bb ] when ] map! drop
+    to predecessors>> [ dup froms member-eq? [ drop bb ] when ] map! drop
     froms [ successors>> [ dup to eq? [ drop bb ] when ] map! drop ] each ;
 
 : add-instructions ( bb quot -- )

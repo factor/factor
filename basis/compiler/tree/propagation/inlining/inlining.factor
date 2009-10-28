@@ -90,7 +90,7 @@ M: callable splicing-nodes splicing-body ;
 ! Method body inlining
 SYMBOL: history
 
-: already-inlined? ( obj -- ? ) history get memq? ;
+: already-inlined? ( obj -- ? ) history get member-eq? ;
 
 : add-to-history ( obj -- ) history [ swap suffix ] change ;
 
@@ -104,7 +104,7 @@ SYMBOL: history
     ] if ;
 
 : always-inline-word? ( word -- ? )
-    { curry compose } memq? ;
+    { curry compose } member-eq? ;
 
 : never-inline-word? ( word -- ? )
     { [ deferred? ] [ "default" word-prop ] [ \ call eq? ] } 1|| ;

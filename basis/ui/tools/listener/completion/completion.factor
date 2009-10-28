@@ -64,7 +64,7 @@ M: definition-completion row-columns
 M: word-completion row-color
     [ vocabulary>> ] [ manifest>> ] bi* {
         { [ dup not ] [ COLOR: black ] }
-        { [ 2dup search-vocabs>> memq? ] [ COLOR: black ] }
+        { [ 2dup search-vocabs>> member-eq? ] [ COLOR: black ] }
         { [ over ".private" tail? ] [ COLOR: dark-red ] }
         [ COLOR: dark-gray ]
     } cond 2nip ;

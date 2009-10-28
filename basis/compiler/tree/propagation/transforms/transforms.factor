@@ -213,12 +213,12 @@ ERROR: bad-partial-eval quot word ;
     ] [ drop f ] if
 ] 1 define-partial-eval
 
-: memq-quot ( seq -- newquot )
+: member-eq-quot ( seq -- newquot )
     [ [ dupd eq? ] curry [ drop t ] ] { } map>assoc
     [ drop f ] suffix [ cond ] curry ;
 
-\ memq? [
-    dup sequence? [ memq-quot ] [ drop f ] if
+\ member-eq? [
+    dup sequence? [ member-eq-quot ] [ drop f ] if
 ] 1 define-partial-eval
 
 ! Membership testing

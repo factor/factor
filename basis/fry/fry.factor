@@ -28,7 +28,7 @@ M: >r/r>-in-fry-error summary
     dup { load-local load-locals get-local drop-locals } intersect
     [ >r/r>-in-fry-error ] unless-empty ;
 
-PREDICATE: fry-specifier < word { _ @ } memq? ;
+PREDICATE: fry-specifier < word { _ @ } member-eq? ;
 
 GENERIC: count-inputs ( quot -- n )
 
