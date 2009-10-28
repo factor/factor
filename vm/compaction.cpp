@@ -55,10 +55,12 @@ struct compaction_sizer {
 
 	cell operator()(object *obj)
 	{
-		if(obj->free_p() || obj->h.hi_tag() != TUPLE_TYPE)
-			return obj->size();
-		else
+		if(!forwarding_map->marked_p(obj))
+			return forwarding_map->unmarked_space_starting_at(obj);
+		else if(obj->h.hi_tag() == TUPLE_TYPE)
 			return align(tuple_size_with_forwarding(forwarding_map,obj),data_alignment);
+		else
+			return obj->size();
 	}
 };
 

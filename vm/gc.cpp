@@ -15,12 +15,8 @@ gc_event::gc_event(gc_op op_, factor_vm *parent) :
 	code_sweep_time(0),
 	compaction_time(0)
 {
-	nursery_size_before = parent->nursery.occupied_space();
-	aging_size_before = parent->data->aging->occupied_space();
-	tenured_size_before = parent->data->tenured->occupied_space();
-	tenured_free_block_count_before = parent->data->tenured->free_blocks.free_block_count;
-	code_size_before = parent->code->allocator->occupied_space();
-	code_free_block_count_before = parent->code->allocator->free_blocks.free_block_count;
+	data_heap_before = parent->data_room();
+	code_heap_before = parent->code_room();
 	start_time = current_micros();
 }
 
@@ -79,42 +75,9 @@ void gc_event::ended_compaction()
 
 void gc_event::ended_gc(factor_vm *parent)
 {
-	nursery_size_after = parent->nursery.occupied_space();
-	aging_size_after = parent->data->aging->occupied_space();
-	tenured_size_after = parent->data->tenured->occupied_space();
-	tenured_free_block_count_after = parent->data->tenured->free_blocks.free_block_count;
-	code_size_after = parent->code->allocator->occupied_space();
-	code_free_block_count_after = parent->code->allocator->free_blocks.free_block_count;
+	data_heap_after = parent->data_room();
+	code_heap_after = parent->code_room();
 	total_time = current_micros() - start_time;
-}
-
-std::ostream &operator<<(std::ostream &out, const gc_event *event)
-{
-	out << "<event\n"
-	    << " op                              = '" << event->op                              << "'\n"
-	    << " nursery_size_before             = '" << event->nursery_size_before             << "'\n"
-	    << " aging_size_before               = '" << event->aging_size_before               << "'\n"
-	    << " tenured_size_before             = '" << event->tenured_size_before             << "'\n"
-	    << " tenured_free_block_count_before = '" << event->tenured_free_block_count_before << "'\n"
-	    << " code_size_before                = '" << event->code_size_before                << "'\n"
-	    << " code_free_block_count_before    = '" << event->code_free_block_count_before    << "'\n"
-	    << " nursery_size_after              = '" << event->nursery_size_after              << "'\n"
-	    << " aging_size_after                = '" << event->aging_size_after                << "'\n"
-	    << " tenured_size_after              = '" << event->tenured_size_after              << "'\n"
-	    << " tenured_free_block_count_after  = '" << event->tenured_free_block_count_after  << "'\n"
-	    << " code_size_after                 = '" << event->code_size_after                 << "'\n"
-	    << " code_free_block_count_after     = '" << event->code_free_block_count_after     << "'\n"
-	    << " cards_scanned                   = '" << event->cards_scanned                   << "'\n"
-	    << " decks_scanned                   = '" << event->decks_scanned                   << "'\n"
-	    << " code_blocks_scanned             = '" << event->code_blocks_scanned             << "'\n"
-	    << " start_time                      = '" << event->start_time                      << "'\n"
-	    << " total_time                      = '" << event->total_time                      << "'\n"
-	    << " card_scan_time                  = '" << event->card_scan_time                  << "'\n"
-	    << " code_scan_time                  = '" << event->code_scan_time                  << "'\n"
-	    << " data_sweep_time                 = '" << event->data_sweep_time                 << "'\n"
-	    << " code_sweep_time                 = '" << event->code_sweep_time                 << "'\n"
-	    << " compaction_time                 = '" << event->compaction_time                 << "' />";
-	return out;
 }
 
 gc_state::gc_state(gc_op op_, factor_vm *parent) : op(op_), start_time(current_micros())
@@ -131,7 +94,6 @@ gc_state::~gc_state()
 void factor_vm::end_gc()
 {
 	current_gc->event->ended_gc(this);
-	if(verbose_gc) std::cout << current_gc->event << std::endl;
 	if(gc_events) gc_events->push_back(*current_gc->event);
 	delete current_gc->event;
 	current_gc->event = NULL;
@@ -354,7 +316,7 @@ void factor_vm::primitive_disable_gc_events()
 {
 	if(gc_events)
 	{
-		byte_array *data = byte_array_from_values(&gc_events->front(),gc_events->size());
+		byte_array *data = byte_array_from_values(&gc_events->first(),gc_events->size());
 		dpush(tag<byte_array>(data));
 
 		delete gc_events;

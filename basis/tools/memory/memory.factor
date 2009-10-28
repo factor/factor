@@ -10,10 +10,15 @@ IN: tools.memory
 
 <PRIVATE
 
+: commas ( n -- str )
+    number>string
+    reverse 3 group "," join reverse ;
+
 : kilobytes ( n -- str )
-    1024 /i number>string
-    dup length 4 > [ 3 cut* "," glue ] when
-    " KB" append ;
+    1024 /i commas " KB" append ;
+
+: micros>string ( n -- str )
+    commas " microseconds" append ;
 
 : fancy-table. ( obj alist -- )
     [ [ nip first ] [ second call( obj -- str ) ] 2bi 2array ] with map
@@ -97,50 +102,23 @@ PRIVATE>
     enable-gc-events [ ] [ disable-gc-events drop ] cleanup
     disable-gc-events byte-array>gc-event-array ; inline
 
-: generation-sizes-before ( events -- sizes )
-    [
-        {
-            [ start-time>> ]
-            [ nursery-size-before>> ]
-            [ aging-size-before>> ]
-            [ tenured-size-before>> ]
-            [ code-size-before>> ]
-        } cleave 5 narray
-    ] { } map-as ;
+: gc-op-string ( op -- string )
+    {
+        { collect-nursery-op      [ "copying from nursery" ] }
+        { collect-aging-op        [ "copying from aging"   ] }
+        { collect-to-tenured-op   [ "copying to tenured"   ] }
+        { collect-full-op         [ "mark and sweep"       ] }
+        { collect-compact-op      [ "mark and compact"     ] }
+        { collect-growing-heap-op [ "grow heap"            ] }
+    } case ;
 
-: generation-sizes-after ( events -- sizes )
-    [
-        {
-            [ start-time>> ]
-            [ nursery-size-after>> ]
-            [ aging-size-after>> ]
-            [ tenured-size-after>> ]
-            [ code-size-after>> ]
-        } cleave 5 narray
-    ] { } map-as ;
+: space-reclaimed ( event -- bytes )
+    [ data-heap-before>> ] [ data-heap-after>> ] bi
+    [ [ nursery>> ] [ aging>> ] [ tenured>> ] tri [ occupied>> ] tri@ + + ] bi@ - ;
 
-: reclaimed-space ( events -- sizes )
-    [
-        [ start-time>> ] [
-            {
-                [ [ nursery-size-before>> ] [ nursery-size-after>> ] bi - ]
-                [ [   aging-size-before>> ] [   aging-size-after>> ] bi - ]
-                [ [ tenured-size-before>> ] [ tenured-size-after>> ] bi - ]
-                [ [    code-size-before>> ] [    code-size-after>> ] bi - ]
-            } cleave
-            + + +
-        ] bi 2array
-    ] { } map-as ;
-
-: allocated-space ( events -- sizes )
-    2 <sliced-clumps> [
-        [ second start-time>> ] [
-            {
-                [ [ second nursery-size-before>> ] [ first nursery-size-after>> ] bi - ]
-                [ [ second   aging-size-before>> ] [ first   aging-size-after>> ] bi - ]
-                [ [ second tenured-size-before>> ] [ first tenured-size-after>> ] bi - ]
-                [ [ second    code-size-before>> ] [ first    code-size-after>> ] bi - ]
-            } cleave
-            + + +
-        ] bi 2array
-    ] { } map-as ;
+: gc-event. ( event -- )
+    {
+        { "Event type:" [ op>> gc-op-string ] }
+        { "Total time:" [ total-time>> micros>string ] }
+        { "Space reclaimed:" [ space-reclaimed kilobytes ] }
+    } fancy-table. ;

@@ -108,10 +108,8 @@ cell free_list::largest_free_block()
 {
 	if(large_blocks.size())
 	{
-		large_block_set::iterator end = large_blocks.end();
-		free_heap_block *block = *end;
-		large_blocks.erase(end);
-		return block->size();
+		large_block_set::reverse_iterator last = large_blocks.rbegin();
+		return (*last)->size();
 	}
 	else
 	{
