@@ -613,17 +613,19 @@ PRIVATE>
 ERROR: parse-failed input word ;
 
 SYNTAX: PEG:
-    (:) :> effect :> def :> word
-    [
-      [
-        def call compile :> compiled-def
+    [let
+        (:) :> effect :> def :> word
         [
-          dup compiled-def compiled-parse
-          [ ast>> ] [ word parse-failed ] ?if
-        ]
-        word swap effect define-declared
-      ] with-compilation-unit
-    ] over push-all ;
+          [
+            def call compile :> compiled-def
+            [
+              dup compiled-def compiled-parse
+              [ ast>> ] [ word parse-failed ] ?if
+            ]
+            word swap effect define-declared
+          ] with-compilation-unit
+        ] over push-all
+    ] ;
 
 USING: vocabs vocabs.loader ;
 
