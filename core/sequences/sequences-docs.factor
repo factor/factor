@@ -605,9 +605,9 @@ HELP: exchange
 { $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
 { $description "Exchanges the " { $snippet "m" } "th and " { $snippet "n" } "th elements of " { $snippet "seq" } "." } ;
 
-HELP: reverse-here
+HELP: reverse!
 { $values { "seq" "a mutable sequence" } }
-{ $description "Reverses a sequence in-place." }
+{ $description "Reverses a sequence in-place and outputs that sequence." }
 { $side-effects "seq" } ;
 
 HELP: padding
@@ -635,7 +635,7 @@ HELP: reverse
 { $values { "seq" sequence } { "newseq" "a new sequence" } }
 { $description "Outputs a new sequence having the same elements as " { $snippet "seq" } " but in reverse order." } ;
 
-{ reverse <reversed> reverse-here } related-words
+{ reverse <reversed> reverse! } related-words
 
 HELP: <reversed>
 { $values { "seq" sequence } { "reversed" "a new sequence" } }
@@ -1617,7 +1617,7 @@ ARTICLE: "sequences-destructive" "Destructive operations"
 }
 "Other destructive words:"
 { $subsections
-    reverse-here
+    reverse!
     push-all
     move
     exchange
@@ -1632,7 +1632,7 @@ ARTICLE: "sequences-destructive" "Destructive operations"
     { { $link remove } { $link remove! } }
     { { $link remove-eq } { $link remove-eq! } }
     { { $link remove-nth } { $link remove-nth! } }
-    { { $link reverse } { $link reverse-here } }
+    { { $link reverse } { $link reverse! } }
     { { $link append } { $link append! } }
     { { $link map } { $link map! } }
     { { $link filter } { $link filter! } }

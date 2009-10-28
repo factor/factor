@@ -12,7 +12,7 @@ IN: benchmark.fannkuch
 : count-flips ( perm -- flip# )
     '[
         _ dup first dup 1 =
-        [ 2drop f ] [ head-slice reverse-here t ] if
+        [ 2drop f ] [ head-slice reverse! drop t ] if
     ] count ; inline
 
 : write-permutation ( perm -- )

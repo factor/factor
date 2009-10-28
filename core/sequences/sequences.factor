@@ -723,15 +723,16 @@ PRIVATE>
     [ exchange-unsafe ]
     3tri ;
 
-: reverse-here ( seq -- )
-    [ length 2/ iota ] [ length ] [ ] tri
-    [ [ over - 1 - ] dip exchange-unsafe ] 2curry each ;
+: reverse! ( seq -- seq )
+    [
+        [ length 2/ iota ] [ length ] [ ] tri
+        [ [ over - 1 - ] dip exchange-unsafe ] 2curry each
+    ] keep ;
 
 : reverse ( seq -- newseq )
     [
         dup [ length ] keep new-sequence
-        [ 0 swap copy ] keep
-        [ reverse-here ] keep
+        [ 0 swap copy ] keep reverse!
     ] keep like ;
 
 : sum-lengths ( seq -- n )
