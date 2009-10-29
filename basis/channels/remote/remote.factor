@@ -53,12 +53,12 @@ C: <remote-channel> remote-channel
 
 M: remote-channel to ( value remote-channel -- )
     [ [ \ to , id>> , , ] { } make ] keep
-    node>> "remote-channels" <remote-process> 
+    node>> "remote-channels" swap <remote-process> 
     send-synchronous no-channel = [ no-channel throw ] when ;
 
 M: remote-channel from ( remote-channel -- value )
     [ [ \ from , id>> , ] { } make ] keep
-    node>> "remote-channels" <remote-process> 
+    node>> "remote-channels" swap <remote-process> 
     send-synchronous dup no-channel = [ no-channel throw ] when* ;
 
 [
