@@ -975,13 +975,12 @@ HELP: produce-as
 { $description "Calls " { $snippet "pred" } " repeatedly. If the predicate yields " { $link f } ", stops, otherwise, calls " { $snippet "quot" } " to yield a value. Values are accumulated and returned in a sequence of type " { $snippet "exemplar" } " at the end." }
 { $examples "See " { $link produce } " for examples." } ;
 
-HELP: sigma
+HELP: map-sum
 { $values { "seq" sequence } { "quot" quotation } { "n" number } }
 { $description "Like map sum, but without creating an intermediate sequence." }
 { $example
-    "! Find the sum of the squares [0,99]"
     "USING: math math.ranges sequences prettyprint ;"
-    "100 [1,b] [ sq ] sigma ."
+    "100 [1,b] [ sq ] map-sum ."
     "338350"
 } ;
 

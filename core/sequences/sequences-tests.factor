@@ -243,7 +243,7 @@ unit-test
 [ "asdf " ] [ " asdf " [ CHAR: \s = ] trim-head ] unit-test
 [ " asdf" ] [ " asdf " [ CHAR: \s = ] trim-tail ] unit-test
 
-[ 328350 ] [ 100 [ sq ] sigma ] unit-test
+[ 328350 ] [ 100 [ sq ] map-sum ] unit-test
 
 [ 50 ] [ 100 [ even? ] count ] unit-test
 [ 50 ] [ 100 [ odd?  ] count ] unit-test
