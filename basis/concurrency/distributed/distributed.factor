@@ -8,25 +8,25 @@ IN: concurrency.distributed
 
 <PRIVATE
 
-: registered-processes ( -- hash )
-   \ registered-processes get-global ;
+: registered-remote-threads ( -- hash )
+   \ registered-remote-threads get-global ;
 
 PRIVATE>
 
-: register-process ( name process -- )
-    swap registered-processes set-at ;
+: register-remote-thread ( thread name -- )
+    registered-remote-threads set-at ;
 
-: unregister-process ( name -- )
-    registered-processes delete-at ;
+: unregister-remote-thread ( name -- )
+    registered-remote-threads delete-at ;
 
-: get-process ( name -- process )
-    dup registered-processes at [ ] [ thread ] ?if ;
+: get-remote-thread ( name -- thread )
+    dup registered-remote-threads at [ ] [ thread ] ?if ;
 
 SYMBOL: local-node
 
 : handle-node-client ( -- )
     deserialize
-    [ first2 get-process send ] [ stop-this-server ] if* ;
+    [ first2 get-remote-thread send ] [ stop-this-server ] if* ;
 
 : <node-server> ( addrspec -- threaded-server )
     binary <threaded-server>
@@ -40,26 +40,26 @@ SYMBOL: local-node
 : start-node ( port -- )
     host-name over <inet> (start-node) ;
 
-TUPLE: remote-process id node ;
+TUPLE: remote-thread node id ;
 
-C: <remote-process> remote-process
+C: <remote-thread> remote-thread
 
 : send-remote-message ( message node -- )
     binary [ serialize ] with-client ;
 
-M: remote-process send ( message thread -- )
+M: remote-thread send ( message thread -- )
     [ id>> 2array ] [ node>> ] bi
     send-remote-message ;
 
 M: thread (serialize) ( obj -- )
-    id>> local-node get-global <remote-process>
+    id>> [ local-node get-global ] dip <remote-thread>
     (serialize) ;
 
 : stop-node ( node -- )
     f swap send-remote-message ;
 
 [
-    H{ } clone \ registered-processes set-global
+    H{ } clone \ registered-remote-threads set-global
 ] "remote-thread-registry" add-init-hook
 
 
