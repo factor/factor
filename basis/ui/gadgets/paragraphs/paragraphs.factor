@@ -46,7 +46,7 @@ TUPLE: line words height ;
     [ words>> line-width ] [ max ] map-reduce ;
 
 : sum-line-heights ( wrapped-paragraph -- y )
-    [ height>> ] sigma ;
+    [ height>> ] map-sum ;
 
 M: paragraph pref-dim*
     wrap-paragraph [ max-line-width ] [ sum-line-heights ] bi 2array ;
