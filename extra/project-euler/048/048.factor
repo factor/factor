@@ -18,7 +18,7 @@ IN: project-euler.048
 ! --------
 
 : euler048 ( -- answer )
-    1000 [1,b] [ dup ^ ] sigma 10 10^ mod ;
+    1000 [1,b] [ dup ^ ] map-sum 10 10^ mod ;
 
 ! [ euler048 ] 100 ave-time
 ! 276 ms run / 1 ms GC ave time - 100 trials

@@ -934,10 +934,10 @@ PRIVATE>
 
 : supremum ( seq -- n ) [ ] [ max ] map-reduce ;
 
-: sigma ( seq quot -- n )
+: map-sum ( seq quot -- n )
     [ 0 ] 2dip [ dip + ] curry [ swap ] prepose each ; inline
 
-: count ( seq quot -- n ) [ 1 0 ? ] compose sigma ; inline
+: count ( seq quot -- n ) [ 1 0 ? ] compose map-sum ; inline
 
 ! We hand-optimize flip to such a degree because type hints
 ! cannot express that an array is an array of arrays yet, and

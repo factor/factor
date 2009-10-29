@@ -92,7 +92,7 @@ PRIVATE>
 PRIVATE>
 
 : euler043a ( -- answer )
-    interesting-pandigitals [ 10 digits>integer ] sigma ;
+    interesting-pandigitals [ 10 digits>integer ] map-sum ;
 
 ! [ euler043a ] 100 ave-time
 ! 10 ms ave run time - 1.37 SD (100 trials)

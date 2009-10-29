@@ -40,7 +40,7 @@ TUPLE: line words height ;
     dup wrap-words [ <line> ] map ;
 
 : line-width ( wrapped-line -- n )
-    [ break?>> ] trim-tail-slice [ width>> ] sigma ;
+    [ break?>> ] trim-tail-slice [ width>> ] map-sum ;
 
 : max-line-width ( wrapped-paragraph -- x )
     [ words>> line-width ] [ max ] map-reduce ;
