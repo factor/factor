@@ -127,38 +127,38 @@ PRIVATE>
 : path-components ( path -- seq )
     normalize-path path-separator split harvest ;
 
-HOOK: canonicalize-path os ( path -- path' )
+HOOK: resolve-symlinks os ( path -- path' )
 
-M: object canonicalize-path normalize-path ;
+M: object resolve-symlinks normalize-path ;
 
 : resource-path ( path -- newpath )
     "resource-path" get prepend-path ;
 
 GENERIC: vocab-path ( path -- newpath )
 
-GENERIC: (normalize-path) ( path -- path' )
+GENERIC: absolute-path ( path -- path' )
 
-M: string (normalize-path)
+M: string absolute-path
     "resource:" ?head [
         trim-head-separators resource-path
-        (normalize-path)
+        absolute-path
     ] [
         "vocab:" ?head [
             trim-head-separators vocab-path
-            (normalize-path)
+            absolute-path
         ] [
             current-directory get prepend-path
         ] if
     ] if ;
 
 M: object normalize-path ( path -- path' )
-    (normalize-path) ;
+    absolute-path ;
 
 TUPLE: pathname string ;
 
 C: <pathname> pathname
 
-M: pathname (normalize-path) string>> (normalize-path) ;
+M: pathname absolute-path string>> absolute-path ;
 
 M: pathname <=> [ string>> ] compare ;
 

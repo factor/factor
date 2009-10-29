@@ -71,7 +71,7 @@ IN: io.launcher.unix
 : spawn-process ( process -- * )
     [ setup-priority ] [ 250 _exit ] recover
     [ setup-redirection ] [ 251 _exit ] recover
-    [ current-directory get (normalize-path) cd ] [ 252 _exit ] recover
+    [ current-directory get absolute-path cd ] [ 252 _exit ] recover
     [ setup-environment ] [ 253 _exit ] recover
     [ get-arguments exec-args-with-path ] [ 254 _exit ] recover
     255 _exit ;
