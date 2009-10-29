@@ -12,7 +12,7 @@ IN: math.statistics
     [ length ] [ product ] bi nth-root ;
 
 : harmonic-mean ( seq -- x )
-    [ recip ] sigma recip ;
+    [ recip ] map-sum recip ;
 
 :: kth-smallest ( seq k -- elt )
     #! Wirth's method, Algorithm's + Data structues = Programs p. 84
@@ -75,7 +75,7 @@ IN: math.statistics
     dup length 1 <= [
         drop 0
     ] [
-        [ [ mean ] keep [ - sq ] with sigma ]
+        [ [ mean ] keep [ - sq ] with map-sum ]
         [ length 1 - ] bi /
     ] if ;
 

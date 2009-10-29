@@ -14,7 +14,7 @@ TUPLE-ARRAY: point
             [ 1 + ] change-x
             [ 1 - ] change-y
             [ 1 + 2 / ] change-z
-        ] map [ z>> ] sigma
-    ] sigma . ;
+        ] map [ z>> ] map-sum
+    ] map-sum . ;
 
 MAIN: tuple-array-benchmark
