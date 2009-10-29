@@ -65,7 +65,7 @@ CONSTANT: SOUND-WALK4        7
 CONSTANT: SOUND-UFO-HIT      8 
 
 : init-sound ( index cpu filename  -- )
-  absolte-path swapd [ sounds>> nth AL_BUFFER ] dip
+  absolute-path swapd [ sounds>> nth AL_BUFFER ] dip
   create-buffer-from-wav set-source-param ; 
 
 : init-sounds ( cpu -- )
