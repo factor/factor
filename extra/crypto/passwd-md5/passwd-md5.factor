@@ -18,7 +18,7 @@ PRIVATE>
 
 :: passwd-md5 ( magic salt password -- bytes )
     password magic salt 3append
-    password salt password 3append md5 checksum-bytes
+    salt password dup surround md5 checksum-bytes
     password length
     [ 16 / ceiling swap <repetition> concat ] keep
     head-slice append
