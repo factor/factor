@@ -28,7 +28,7 @@ MATCH-VARS: ?from ?tag ?id ?value ;
 
 SYMBOL: no-channel
 
-: channel-process ( -- )
+: channel-thread ( -- )
     [
         {
             { { to ?id ?value  }
@@ -41,10 +41,9 @@ SYMBOL: no-channel
 PRIVATE>
 
 : start-channel-node ( -- )
-    "remote-channels" get-process [
-        "remote-channels" 
-        [ channel-process t ] "Remote channels" spawn-server
-        register-process 
+    "remote-channels" get-remote-thread [
+        [ channel-thread t ] "Remote channels" spawn-server
+        "remote-channels" register-remote-thread 
     ] unless ;
 
 TUPLE: remote-channel node id ;
@@ -53,12 +52,12 @@ C: <remote-channel> remote-channel
 
 M: remote-channel to ( value remote-channel -- )
     [ [ \ to , id>> , , ] { } make ] keep
-    node>> "remote-channels" swap <remote-process> 
+    node>> "remote-channels" <remote-thread> 
     send-synchronous no-channel = [ no-channel throw ] when ;
 
 M: remote-channel from ( remote-channel -- value )
     [ [ \ from , id>> , ] { } make ] keep
-    node>> "remote-channels" swap <remote-process> 
+    node>> "remote-channels" <remote-thread> 
     send-synchronous dup no-channel = [ no-channel throw ] when* ;
 
 [

@@ -25,7 +25,7 @@ IN: concurrency.distributed.tests
 
 [ 8 ] [
     5 self 2array
-    "thread-a" test-node <remote-process> send
+    test-node "thread-a" <remote-thread> send
 
     receive
 ] unit-test
