@@ -1,10 +1,26 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: serialize sequences concurrency.messaging threads io
-io.servers.connection io.encodings.binary
+io.servers.connection io.encodings.binary assocs init
 arrays namespaces kernel accessors ;
 FROM: io.sockets => host-name <inet> with-client ;
 IN: concurrency.distributed
+
+<PRIVATE
+
+: registered-processes ( -- hash )
+   \ registered-processes get-global ;
+
+PRIVATE>
+
+: register-process ( name process -- )
+    swap registered-processes set-at ;
+
+: unregister-process ( name -- )
+    registered-processes delete-at ;
+
+: get-process ( name -- process )
+    dup registered-processes at [ ] [ thread ] ?if ;
 
 SYMBOL: local-node
 
@@ -41,3 +57,9 @@ M: thread (serialize) ( obj -- )
 
 : stop-node ( node -- )
     f swap send-remote-message ;
+
+[
+    H{ } clone \ registered-processes set-global
+] "remote-thread-registry" add-init-hook
+
+
