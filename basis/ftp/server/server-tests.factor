@@ -11,7 +11,7 @@ IN: ftp.server.tests
 : create-test-file ( -- path )
     test-file-contents
     "ftp.server" "test" make-unique-file
-    [ ascii set-file-contents ] keep canonicalize-path ;
+    [ ascii set-file-contents ] [ normalize-path ] bi ;
 
 : test-ftp-server ( quot -- )
     '[

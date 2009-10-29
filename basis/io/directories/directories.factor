@@ -6,10 +6,10 @@ sequences system vocabs.loader fry ;
 IN: io.directories
 
 : set-current-directory ( path -- )
-    (normalize-path) current-directory set ;
+    absolute-path current-directory set ;
 
 : with-directory ( path quot -- )
-    [ (normalize-path) current-directory ] dip with-variable ; inline
+    [ absolute-path current-directory ] dip with-variable ; inline
 
 ! Creating directories
 HOOK: make-directory io-backend ( path -- )
