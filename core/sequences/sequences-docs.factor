@@ -979,7 +979,6 @@ HELP: sigma
 { $values { "seq" sequence } { "quot" quotation } { "n" number } }
 { $description "Like map sum, but without creating an intermediate sequence." }
 { $example
-    "! Find the sum of the squares [0,99]"
     "USING: math math.ranges sequences prettyprint ;"
     "100 [1,b] [ sq ] sigma ."
     "338350"
