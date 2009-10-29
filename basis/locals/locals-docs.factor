@@ -274,8 +274,8 @@ $nl
 }
 "The reason is that locals are rewritten into stack code at parse time, whereas macro expansion is performed later during compile time. To circumvent this problem, the " { $vocab-link "macros.expander" } " vocabulary is used to rewrite simple macro usages prior to local transformation. However, " { $vocab-link "macros.expander" } " cannot deal with more complicated cases where the literal inputs to the macro do not immediately precede the macro call in the source." ;
 
-ARTICLE: "locals" "Lexical variables and closures"
-"The " { $vocab-link "locals" } " vocabulary provides lexically scoped local variables. Full closure semantics, both downward and upward, are supported. Mutable variable bindings are also provided, supporting assignment to bindings in the current scope or outer scopes."
+ARTICLE: "locals" "Lexical variables"
+"The " { $vocab-link "locals" } " vocabulary provides lexically scoped local variables. Full closure semantics, both downward and upward, are supported. Mutable variable bindings are also provided, supporting assignment to bindings in the current scope or in outer scopes."
 { $subsections
     "locals-examples"
 }
@@ -300,6 +300,6 @@ ARTICLE: "locals" "Lexical variables and closures"
     "locals-fry"
     "locals-limitations"
 }
-"Locals complement dynamically scoped variables implemented in the " { $vocab-link "namespaces" } " vocabulary." ;
+"Local variables complement " { $link "namespaces" } "." ;
 
 ABOUT: "locals"
