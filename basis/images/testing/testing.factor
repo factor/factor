@@ -3,7 +3,7 @@
 USING: fry images.loader images.normalization images.viewer io
 io.directories io.encodings.binary io.files io.pathnames
 io.streams.byte-array kernel locals namespaces quotations
-sequences serialize tools.test ;
+sequences serialize tools.test io.backend ;
 IN: images.testing
 
 <PRIVATE
