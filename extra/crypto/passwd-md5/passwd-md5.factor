@@ -18,7 +18,7 @@ PRIVATE>
 
 :: passwd-md5 ( magic salt password -- bytes )
     password magic salt 3append
-    salt password tuck 3append md5 checksum-bytes
+    password salt password 3append md5 checksum-bytes
     password length
     [ 16 / ceiling swap <repetition> concat ] keep
     head-slice append
@@ -42,7 +42,7 @@ PRIVATE>
     11 final nth 2 to64 3append ;
         
 : parse-shadow-password ( string -- magic salt password )
-    "$" split harvest first3 [ "$" tuck 3append ] 2dip ;
+    "$" split harvest first3 [ "$" dup surround ] 2dip ;
     
 : authenticate-password ( shadow password -- ? )
     '[ parse-shadow-password drop _ passwd-md5 ] keep = ;
