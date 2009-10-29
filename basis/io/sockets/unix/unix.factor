@@ -163,7 +163,7 @@ M: local sockaddr-size drop sockaddr-un heap-size ;
 M: local empty-sockaddr drop sockaddr-un <struct> ;
 
 M: local make-sockaddr
-    path>> (normalize-path)
+    path>> absolute-path
     dup length 1 + max-un-path > [ "Path too long" throw ] when
     sockaddr-un <struct>
         AF_UNIX >>family

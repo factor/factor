@@ -11,7 +11,7 @@ IN: fuel.xref
 <PRIVATE
 
 : normalize-loc ( seq -- path line )
-    [ dup length 0 > [ first (normalize-path) ] [ drop f ] if ]
+    [ dup length 0 > [ first absolute-path ] [ drop f ] if ]
     [ dup length 1 > [ second ] [ drop 1 ] if ] bi ;
 
 : get-loc ( object -- loc ) normalize-loc 2array ;
