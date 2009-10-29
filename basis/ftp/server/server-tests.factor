@@ -1,7 +1,7 @@
 USING: calendar ftp.server io.encodings.ascii io.files
 io.files.unique namespaces threads tools.test kernel
 io.servers.connection ftp.client accessors urls
-io.pathnames io.directories sequences fry ;
+io.pathnames io.directories sequences fry io.backend ;
 FROM: ftp.client => ftp-get ;
 IN: ftp.server.tests
 
