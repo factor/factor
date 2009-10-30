@@ -1,24 +1,26 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences arrays generic assocs io math
-namespaces parser prettyprint strings io.styles words
-system sorting splitting grouping math.parser classes memory
-combinators fry vm specialized-arrays accessors continuations
-classes.struct generalizations ;
+USING: accessors arrays assocs classes classes.struct
+combinators combinators.smart continuations fry generalizations
+generic grouping io io.styles kernel make math math.parser
+math.statistics memory namespaces parser prettyprint sequences
+sorting specialized-arrays splitting strings system vm words ;
 SPECIALIZED-ARRAY: gc-event
 IN: tools.memory
 
 <PRIVATE
 
 : commas ( n -- str )
-    number>string
-    reverse 3 group "," join reverse ;
+    dup 0 < [ neg commas "-" prepend ] [
+        number>string
+        reverse 3 group "," join reverse
+    ] if ;
 
 : kilobytes ( n -- str )
     1024 /i commas " KB" append ;
 
 : micros>string ( n -- str )
-    commas " microseconds" append ;
+    commas " µs" append ;
 
 : fancy-table. ( obj alist -- )
     [ [ nip first ] [ second call( obj -- str ) ] 2bi 2array ] with map
@@ -102,19 +104,88 @@ PRIVATE>
     enable-gc-events [ ] [ disable-gc-events drop ] cleanup
     disable-gc-events byte-array>gc-event-array ; inline
 
+<PRIVATE
+
 : gc-op-string ( op -- string )
     {
-        { collect-nursery-op      [ "copying from nursery" ] }
-        { collect-aging-op        [ "copying from aging"   ] }
-        { collect-to-tenured-op   [ "copying to tenured"   ] }
-        { collect-full-op         [ "mark and sweep"       ] }
-        { collect-compact-op      [ "mark and compact"     ] }
-        { collect-growing-heap-op [ "grow heap"            ] }
+        { collect-nursery-op      [ "Copying from nursery" ] }
+        { collect-aging-op        [ "Copying from aging"   ] }
+        { collect-to-tenured-op   [ "Copying to tenured"   ] }
+        { collect-full-op         [ "Mark and sweep"       ] }
+        { collect-compact-op      [ "Mark and compact"     ] }
+        { collect-growing-heap-op [ "Grow heap"            ] }
     } case ;
 
+: (space-occupied) ( data-heap-room code-heap-room -- n )
+    [
+        [ [ nursery>> ] [ aging>> ] [ tenured>> ] tri [ occupied>> ] tri@ ]
+        [ occupied>> ]
+        bi*
+    ] sum-outputs ;
+
+: space-occupied-before ( event -- bytes )
+    [ data-heap-before>> ] [ code-heap-before>> ] bi (space-occupied) ;
+
+: space-occupied-after ( event -- bytes )
+    [ data-heap-after>> ] [ code-heap-after>> ] bi (space-occupied) ;
+
 : space-reclaimed ( event -- bytes )
-    [ data-heap-before>> ] [ data-heap-after>> ] bi
-    [ [ nursery>> ] [ aging>> ] [ tenured>> ] tri [ occupied>> ] tri@ + + ] bi@ - ;
+    [ space-occupied-before ] [ space-occupied-after ] bi - ;
+
+TUPLE: gc-stats collections times ;
+
+: <gc-stats> ( -- stats )
+    gc-stats new
+        0 >>collections
+        V{ } clone >>times ; inline
+
+: compute-gc-stats ( events -- stats )
+    V{ } clone [
+        '[
+            dup op>> _ [ drop <gc-stats> ] cache
+            [ 1 + ] change-collections
+            [ total-time>> ] dip times>> push
+        ] each
+    ] keep sort-keys ;
+
+: gc-stats-table-row ( pair -- row )
+    [
+        [ first gc-op-string ] [
+            second
+            [ collections>> ]
+            [
+                times>> {
+                    [ sum micros>string ]
+                    [ mean >integer micros>string ]
+                    [ median >integer micros>string ]
+                    [ infimum micros>string ]
+                    [ supremum micros>string ]
+                } cleave
+            ] bi
+        ] bi
+    ] output>array ;
+
+: gc-stats-table ( stats -- table )
+    [ gc-stats-table-row ] map
+    { "" "Number" "Total" "Mean" "Median" "Min" "Max" } prefix ;
+
+: heap-sizes ( events -- seq )
+    [
+        [
+            [ [ start-time>> ] [ space-occupied-before ] bi 2array , ]
+            [ [ [ start-time>> ] [ total-time>> ] bi + ] [ space-occupied-after ] bi 2array , ]
+            bi
+        ] each
+    ] { } make ;
+
+: aggregate-stats-table ( stats -- table )
+    [ { "Total collections:" "Total GC time:" } ] dip
+    values
+    [ [ collections>> ] sigma ]
+    [ [ times>> sum ] sigma micros>string ]
+    bi 2array zip ;
+
+PRIVATE>
 
 : gc-event. ( event -- )
     {
@@ -122,3 +193,12 @@ PRIVATE>
         { "Total time:" [ total-time>> micros>string ] }
         { "Space reclaimed:" [ space-reclaimed kilobytes ] }
     } fancy-table. ;
+
+: gc-stats. ( events -- )
+    compute-gc-stats
+    [ gc-stats-table simple-table. nl ]
+    [ aggregate-stats-table simple-table. ]
+    bi ;
+
+: heap-sizes. ( events -- )
+    heap-sizes simple-table. ;
