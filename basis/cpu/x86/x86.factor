@@ -1155,18 +1155,18 @@ M: x86 %horizontal-add-vector-reps
         { sse3? { float-4-rep double-2-rep } }
     } available-reps ;
 
-M: x86 %horizontal-shl-vector ( dst src1 src2 rep -- )
+M: x86 %horizontal-shl-vector-imm ( dst src1 src2 rep -- )
     two-operand PSLLDQ ;
 
-M: x86 %horizontal-shl-vector-reps
+M: x86 %horizontal-shl-vector-imm-reps
     {
         { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-M: x86 %horizontal-shr-vector ( dst src1 src2 rep -- )
+M: x86 %horizontal-shr-vector-imm ( dst src1 src2 rep -- )
     two-operand PSRLDQ ;
 
-M: x86 %horizontal-shr-vector-reps
+M: x86 %horizontal-shr-vector-imm-reps
     {
         { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
@@ -1281,6 +1281,11 @@ M: x86 %shr-vector-reps
     {
         { sse2? { short-8-rep ushort-8-rep int-4-rep uint-4-rep ulonglong-2-rep } }
     } available-reps ;
+
+M: x86 %shl-vector-imm %shl-vector ;
+M: x86 %shl-vector-imm-reps %shl-vector-reps ;
+M: x86 %shr-vector-imm %shr-vector ;
+M: x86 %shr-vector-imm-reps %shr-vector-reps ;
 
 : scalar-sized-reg ( reg rep -- reg' )
     rep-size 8 * n-bit-version-of ;

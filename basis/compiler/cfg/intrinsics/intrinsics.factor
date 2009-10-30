@@ -187,10 +187,10 @@ IN: compiler.cfg.intrinsics
         { math.vectors.simd.intrinsics:(simd-vany?) [ [ vcc-any ^^test-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vall?) [ [ vcc-all ^^test-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vnone?) [ [ vcc-none ^^test-vector ] emit-unary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-vlshift) [ [ ^^shl-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-vrshift) [ [ ^^shr-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-hlshift) [ [ ^^horizontal-shl-vector ] emit-horizontal-shift ] }
-        { math.vectors.simd.intrinsics:(simd-hrshift) [ [ ^^horizontal-shr-vector ] emit-horizontal-shift ] }
+        { math.vectors.simd.intrinsics:(simd-vlshift) [ [ ^^shl-vector-imm ] [ ^^shl-vector ] emit-shift-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-vrshift) [ [ ^^shr-vector-imm ] [ ^^shr-vector ] emit-shift-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-hlshift) [ [ ^^horizontal-shl-vector-imm ] emit-shift-vector-imm-op ] }
+        { math.vectors.simd.intrinsics:(simd-hrshift) [ [ ^^horizontal-shr-vector-imm ] emit-shift-vector-imm-op ] }
         { math.vectors.simd.intrinsics:(simd-with) [ [ ^^with-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-gather-2) [ emit-gather-vector-2 ] }
         { math.vectors.simd.intrinsics:(simd-gather-4) [ emit-gather-vector-4 ] }
