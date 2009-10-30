@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions ;
+USING: kernel locals math math.functions ;
 IN: math.quadratic
 
 : monic ( c b a -- c' b' ) tuck [ / ] 2bi@ ;
@@ -12,9 +12,7 @@ IN: math.quadratic
 : +- ( x y -- x+y x-y ) [ + ] [ - ] 2bi ;
 
 : quadratic ( c b a -- alpha beta )
-    #! Solve a quadratic equation ax^2 + bx + c = 0
     monic discriminant critical +- ;
 
-: qeval ( x c b a -- y )
-    #! Evaluate ax^2 + bx + c
-    [ pick * ] dip roll sq * + + ;
+:: qeval ( x c b a -- y )
+    c b x * + a x sq * + ;
