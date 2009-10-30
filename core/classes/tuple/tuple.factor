@@ -118,7 +118,7 @@ ERROR: bad-superclass class ;
     } case define-predicate ;
 
 : class-size ( class -- n )
-    superclasses [ "slots" word-prop length ] sigma ;
+    superclasses [ "slots" word-prop length ] map-sum ;
 
 : (instance-check-quot) ( class -- quot )
     [
