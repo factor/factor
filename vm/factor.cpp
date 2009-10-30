@@ -15,25 +15,14 @@ void factor_vm::default_parameters(vm_parameters *p)
 {
 	p->image_path = NULL;
 
-	/* We make a wild guess here that if we're running on ARM, we don't
-	have a lot of memory. */
-#ifdef FACTOR_ARM
-	p->ds_size = 8 * sizeof(cell);
-	p->rs_size = 8 * sizeof(cell);
-
-	p->code_size = 4;
-	p->young_size = 1;
-	p->aging_size = 1;
-	p->tenured_size = 6;
-#else
 	p->ds_size = 32 * sizeof(cell);
 	p->rs_size = 32 * sizeof(cell);
 
 	p->code_size = 8 * sizeof(cell);
 	p->young_size = sizeof(cell) / 4;
 	p->aging_size = sizeof(cell) / 2;
-	p->tenured_size = 16 * sizeof(cell);
-#endif
+	p->tenured_size = 24 * sizeof(cell);
+	p->promotion_threshold = 8 * sizeof(cell);
 
 	p->max_pic_size = 3;
 
@@ -81,6 +70,7 @@ void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **
 		else if(factor_arg(arg,STRING_LITERAL("-young=%d"),&p->young_size));
 		else if(factor_arg(arg,STRING_LITERAL("-aging=%d"),&p->aging_size));
 		else if(factor_arg(arg,STRING_LITERAL("-tenured=%d"),&p->tenured_size));
+		else if(factor_arg(arg,STRING_LITERAL("-promote=%d"),&p->promotion_threshold));
 		else if(factor_arg(arg,STRING_LITERAL("-codeheap=%d"),&p->code_size));
 		else if(factor_arg(arg,STRING_LITERAL("-pic=%d"),&p->max_pic_size));
 		else if(factor_arg(arg,STRING_LITERAL("-callbacks=%d"),&p->callback_size));
@@ -114,6 +104,7 @@ void factor_vm::init_factor(vm_parameters *p)
 	p->young_size <<= 20;
 	p->aging_size <<= 20;
 	p->tenured_size <<= 20;
+	p->promotion_threshold <<= 20;
 	p->code_size <<= 20;
 
 	/* Disable GC during init as a sanity check */

@@ -203,8 +203,8 @@ code_heap_room factor_vm::code_room()
 	room.size             = code->allocator->size;
 	room.occupied_space   = code->allocator->occupied_space();
 	room.total_free       = code->allocator->free_space();
-	room.contiguous_free  = code->allocator->free_blocks.largest_free_block();
-	room.free_block_count = code->allocator->free_blocks.free_block_count;
+	room.contiguous_free  = code->allocator->largest_free_block();
+	room.free_block_count = code->allocator->free_block_count();
 
 	return room;
 }
