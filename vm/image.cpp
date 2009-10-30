@@ -20,7 +20,8 @@ void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 
 	init_data_heap(p->young_size,
 		p->aging_size,
-		p->tenured_size);
+		p->tenured_size,
+		p->promotion_threshold);
 
 	fixnum bytes_read = fread((void*)data->tenured->start,1,h->data_size,file);
 

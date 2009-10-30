@@ -5,6 +5,7 @@ template<typename Block> struct free_list_allocator {
 	cell size;
 	cell start;
 	cell end;
+	cell high_water_mark;
 	free_list free_blocks;
 	mark_bits<Block> state;
 
@@ -20,6 +21,8 @@ template<typename Block> struct free_list_allocator {
 	void free(Block *block);
 	cell occupied_space();
 	cell free_space();
+	cell largest_free_block();
+	cell free_block_count();
 	void sweep();
 	template<typename Iterator> void sweep(Iterator &iter);
 	template<typename Iterator, typename Sizer> void compact(Iterator &iter, Sizer &sizer);
@@ -29,7 +32,10 @@ template<typename Block> struct free_list_allocator {
 
 template<typename Block>
 free_list_allocator<Block>::free_list_allocator(cell size_, cell start_) :
-	size(size_), start(start_), end(start_ + size_), state(mark_bits<Block>(size_,start_))
+	size(size_),
+	start(start_),
+	end(start_ + size_),
+	state(mark_bits<Block>(size_,start_))
 {
 	initial_free_list(0);
 }
@@ -37,6 +43,7 @@ free_list_allocator<Block>::free_list_allocator(cell size_, cell start_) :
 template<typename Block> void free_list_allocator<Block>::initial_free_list(cell occupied)
 {
 	free_blocks.initial_free_list(start,end,occupied);
+	high_water_mark = free_blocks.free_space;
 }
 
 template<typename Block> bool free_list_allocator<Block>::contains_p(Block *block)
@@ -109,6 +116,16 @@ template<typename Block> cell free_list_allocator<Block>::occupied_space()
 	return size - free_blocks.free_space;
 }
 
+template<typename Block> cell free_list_allocator<Block>::largest_free_block()
+{
+	return free_blocks.largest_free_block();
+}
+
+template<typename Block> cell free_list_allocator<Block>::free_block_count()
+{
+	return free_blocks.free_block_count;
+}
+
 template<typename Block>
 void free_list_allocator<Block>::sweep()
 {
@@ -158,6 +175,8 @@ void free_list_allocator<Block>::sweep()
 
 	if(prev && prev->free_p())
 		free_blocks.add_to_free_list((free_heap_block *)prev);
+
+	high_water_mark = free_blocks.free_space;
 }
 
 template<typename Block>
@@ -211,6 +230,8 @@ void free_list_allocator<Block>::sweep(Iterator &iter)
 
 	if(prev && prev->free_p())
 		free_blocks.add_to_free_list((free_heap_block *)prev);
+
+	high_water_mark = free_blocks.free_space;
 }
 
 template<typename Block, typename Iterator> struct heap_compactor {

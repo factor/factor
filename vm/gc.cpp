@@ -152,6 +152,19 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 		start_gc_again();
 	}
 
+	if(current_gc->op == collect_aging_op
+		|| current_gc->op == collect_to_tenured_op
+		|| current_gc->op == collect_full_op)
+	{
+		if(data->tenured->largest_free_block() <= data->nursery->size + data->aging->size)
+			current_gc->op = collect_compact_op;
+	
+		if(data->tenured->high_water_mark - data->tenured->free_space() >= data->promotion_threshold)
+			current_gc->op = collect_full_op;
+	}
+
+	current_gc->event->op = current_gc->op;
+
 	switch(current_gc->op)
 	{
 	case collect_nursery_op:
@@ -316,7 +329,7 @@ void factor_vm::primitive_disable_gc_events()
 {
 	if(gc_events)
 	{
-		byte_array *data = byte_array_from_values(&gc_events->first(),gc_events->size());
+		byte_array *data = byte_array_from_values(&gc_events->front(),gc_events->size());
 		dpush(tag<byte_array>(data));
 
 		delete gc_events;

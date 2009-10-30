@@ -46,6 +46,10 @@ free_heap_block *free_list::find_free_block(cell size)
 		{
 			free_heap_block *block = blocks.back();
 			blocks.pop_back();
+
+			free_block_count--;
+			free_space -= block->size();
+
 			return block;
 		}
 	}

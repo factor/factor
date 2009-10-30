@@ -33,6 +33,7 @@ struct vm_parameters {
 	const vm_char *executable_path;
 	cell ds_size, rs_size;
 	cell young_size, aging_size, tenured_size;
+	cell promotion_threshold;
 	cell code_size;
 	bool fep;
 	bool console;
