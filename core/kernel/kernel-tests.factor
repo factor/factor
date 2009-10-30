@@ -113,7 +113,7 @@ IN: kernel.tests
     < [ [ 1 + ] 3dip (loop) ] [ 2drop 2drop ] if ; inline recursive
 
 : loop ( obj -- )
-    H{ } values swap [ dup length swap ] dip 0 -roll (loop) ;
+    H{ } values swap [ dup length swap ] dip [ 0 ] 3dip (loop) ;
 
 [ loop ] must-fail
 

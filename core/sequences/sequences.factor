@@ -271,7 +271,8 @@ ERROR: integer-length-expected obj ;
     dup integer? [ integer-length-expected ] unless ; inline
 
 : ((copy)) ( dst i src j n -- )
-    dup -roll + swap nth-unsafe -roll + swap set-nth-unsafe ; inline
+    [ + swap nth-unsafe [ ] curry 2dip ] keep
+    + swap set-nth-unsafe ; inline
 
 : 5bi ( a b c d e x y -- )
     bi-curry bi-curry bi-curry bi-curry bi ; inline
@@ -281,9 +282,9 @@ ERROR: integer-length-expected obj ;
     inline recursive
 
 : prepare-subseq ( from to seq -- dst i src j n )
-    #! The check-length call forces partial dispatch
-    [ [ swap - ] dip new-sequence dup 0 ] 3keep
-    -rot drop roll length check-length ; inline
+    [ over - ] dip
+    [ new-sequence 0 rot ] 2keep
+    [ ] curry 2dip check-length ; inline
 
 : check-copy ( src n dst -- )
     over 0 < [ bounds-error ] when
