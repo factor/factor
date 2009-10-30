@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman, Michael Judge.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators kernel math math.analysis
-math.functions math.order sequences sorting locals
-sequences.private assocs fry ;
+USING: arrays combinators kernel math math.functions
+math.order sequences sorting locals sequences.private
+assocs fry ;
 IN: math.statistics
 
 : mean ( seq -- x )
@@ -33,7 +33,7 @@ IN: math.statistics
             [ i seq nth-unsafe x < ] [ i 1 + i! ] while
             [ x j seq nth-unsafe < ] [ j 1 - j! ] while
             i j <= [
-                i j seq exchange
+                i j seq exchange-unsafe
                 i 1 + i!
                 j 1 - j!
             ] when

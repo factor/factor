@@ -106,6 +106,8 @@ PRIVATE>
         [ ^complex ]
     } cond ; inline
 
+: nth-root ( n x -- y ) swap recip ^ ; inline
+
 : gcd ( x y -- a d )
     [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; foldable
 
@@ -304,4 +306,3 @@ M: real atan >float atan ; inline
     [ [ / floor ] [ * ] bi ] unless-zero ;
 
 : lerp ( a b t -- a_t ) [ over - ] dip * + ; inline
-
