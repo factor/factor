@@ -53,11 +53,11 @@ $nl
 " to be accessed remotely. " { $link publish } " returns an id which a remote node "
 "needs to know to access the channel."
 $nl
-{ $snippet "channel [ from . ] spawn drop dup publish" }
+{ $snippet "<channel> dup [ from . flush ] curry \"test\" spawn drop publish" }
 $nl
-"Given the id from the snippet above, a remote node can put items in the channel."
+"Given the id from the snippet above, a remote node can put items in the channel (where 123456 is the id):"
 $nl
-{ $snippet "\"myhost.com\" 9001 <node> \"ID123456\" <remote-channel>\n\"hello\" over to" } 
+{ $snippet "\"myhost.com\" 9001 <node> 123456 <remote-channel>\n\"hello\" over to" } 
 ;
 
 ABOUT: { "remote-channels" "remote-channels" }
