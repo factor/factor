@@ -2,7 +2,7 @@ USING: accessors arrays combinators.short-circuit grouping kernel lists
 lists.lazy locals math math.functions math.parser math.ranges
 models.product monads random sequences sets ui ui.gadgets.controls
 ui.gadgets.layout models.combinators ui.gadgets.alerts vectors fry
-ui.gadgets.labels ;
+ui.gadgets.labels shuffle ;
 IN: sudokus
 
 : row ( index -- row ) 1 + 9 / ceiling ;
