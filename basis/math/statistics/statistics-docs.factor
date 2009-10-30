@@ -4,7 +4,7 @@ IN: math.statistics
 
 HELP: geometric-mean
 { $values { "seq" sequence } { "x" "a non-negative real number"} }
-{ $description "Computes the geometric mean of all elements in " { $snippet "seq" } ". The geometric mean measures the central tendency of a data set that minimizes the effects of extreme values." }
+{ $description "Computes the geometric mean of all elements in " { $snippet "seq" } ". The geometric mean measures the central tendency of a data set and minimizes the effects of extreme values." }
 { $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } geometric-mean ." "1.81712059283214" } }
 { $errors "Throws a " { $link signal-error. } " (square-root of 0) if the sequence is empty." } ;
 
@@ -43,10 +43,6 @@ HELP: minmax
     { $example "USING: arrays math.statistics prettyprint ;"
         "{ 1 2 3 } minmax 2array ."
         "{ 1 3 }"
-    }
-    { $example "USING: arrays math.statistics prettyprint ;"
-        "{ 1 2 3 4 } minmax 2array ."
-        "{ 1 4 }"
     }
 } ;
 
