@@ -30,7 +30,7 @@ IN: project-euler.021
     { [ = not ] [ sum-proper-divisors = ] } 2&& ;
 
 : euler021 ( -- answer )
-    10000 [1,b] [ dup amicable? [ drop 0 ] unless ] sigma ;
+    10000 [1,b] [ dup amicable? [ drop 0 ] unless ] map-sum ;
 
 ! [ euler021 ] 100 ave-time
 ! 335 ms ave run time - 18.63 SD (100 trials)

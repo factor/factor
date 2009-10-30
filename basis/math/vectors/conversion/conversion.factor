@@ -11,9 +11,9 @@ ERROR: bad-vconvert-input value expected-type ;
 <PRIVATE
 
 : float-type? ( c-type -- ? )
-    { float double } memq? ;
+    { float double } member-eq? ;
 : unsigned-type? ( c-type -- ? )
-    { uchar ushort uint ulonglong } memq? ;
+    { uchar ushort uint ulonglong } member-eq? ;
 
 : check-vconvert-type ( value expected-type -- value )
     2dup instance? [ drop ] [ bad-vconvert-input ] if ; inline
@@ -81,8 +81,8 @@ ERROR: bad-vconvert-input value expected-type ;
 PRIVATE>
 
 MACRO:: vconvert ( from-type to-type -- )
-    from-type new [ element-type ] [ byte-length ] bi :> from-length :> from-element
-    to-type   new [ element-type ] [ byte-length ] bi :> to-length   :> to-element
+    from-type new [ element-type ] [ byte-length ] bi :> ( from-element from-length )
+    to-type   new [ element-type ] [ byte-length ] bi :> ( to-element   to-length   )
     from-element heap-size :> from-size
     to-element   heap-size :> to-size   
 

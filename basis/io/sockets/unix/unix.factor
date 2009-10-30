@@ -120,7 +120,7 @@ CONSTANT: packet-size 65536
 [ packet-size malloc receive-buffer set-global ] "io.sockets.unix" add-init-hook
 
 :: do-receive ( port -- packet sockaddr )
-    port addr>> empty-sockaddr/size :> len :> sockaddr
+    port addr>> empty-sockaddr/size :> ( sockaddr len )
     port handle>> handle-fd ! s
     receive-buffer get-global ! buf
     packet-size ! nbytes
@@ -163,7 +163,7 @@ M: local sockaddr-size drop sockaddr-un heap-size ;
 M: local empty-sockaddr drop sockaddr-un <struct> ;
 
 M: local make-sockaddr
-    path>> (normalize-path)
+    path>> absolute-path
     dup length 1 + max-un-path > [ "Path too long" throw ] when
     sockaddr-un <struct>
         AF_UNIX >>family

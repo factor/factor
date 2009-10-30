@@ -2,7 +2,7 @@ USING: help.markup help.syntax strings words compiler.units ;
 IN: vocabs
 
 ARTICLE: "vocabularies" "Vocabularies"
-"A " { $emphasis "vocabulary" } " is a named collection of words. Vocabularies are defined in the " { $vocab-link "vocabs" } " vocabulary."
+"A " { $emphasis "vocabulary" } " is a named collection of " { $link "words" } ". Vocabularies are defined in the " { $vocab-link "vocabs" } " vocabulary."
 $nl
 "Vocabularies are stored in a global hashtable:"
 { $subsections dictionary }

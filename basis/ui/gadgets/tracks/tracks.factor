@@ -61,7 +61,7 @@ PRIVATE>
     pick sizes>> push add-gadget ;
 
 M: track remove-gadget
-    [ [ children>> index ] [  sizes>> ] bi delete-nth ]
+    [ [ children>> index ] [  sizes>> ] bi remove-nth! drop ]
     [ call-next-method ] 2bi ;
 
 : clear-track ( track -- ) [ sizes>> delete-all ] [ clear-gadget ] bi ;

@@ -101,7 +101,7 @@ SYNTAX: COM-INTERFACE:
     dup save-com-interface-definition
     define-words-for-com-interface ;
 
-SYNTAX: GUID: scan string>guid parsed ;
+SYNTAX: GUID: scan string>guid suffix! ;
 
 USING: vocabs vocabs.loader ;
 

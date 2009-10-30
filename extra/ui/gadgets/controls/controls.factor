@@ -59,9 +59,9 @@ M: model-field model-changed 2dup model*>> =
 : <slider> ( init page min max step -- slider ) <range> horizontal slider:<slider> ;
 
 : image-prep ( -- image ) scan current-vocab name>> "vocab:" "/icons/" surround ".tiff" surround <image-name> dup cached-image drop ;
-SYNTAX: IMG-MODEL-BTN: image-prep [ <model-btn> ] curry over push-all ;
+SYNTAX: IMG-MODEL-BTN: image-prep [ <model-btn> ] curry append! ;
 
-SYNTAX: IMG-BTN: image-prep [ swap <button> ] curry over push-all ;
+SYNTAX: IMG-BTN: image-prep [ swap <button> ] curry append! ;
 
 GENERIC: output-model ( gadget -- model )
 M: gadget output-model model>> ;

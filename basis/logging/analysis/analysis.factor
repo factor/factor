@@ -12,7 +12,7 @@ SYMBOL: word-histogram
 SYMBOL: message-histogram
 
 : analyze-entry ( entry -- )
-    dup level>> { ERROR CRITICAL } memq? [ dup errors get push ] when
+    dup level>> { ERROR CRITICAL } member-eq? [ dup errors get push ] when
     dup word-name>> word-histogram get inc-at
     dup word-name>> word-names get member? [
         dup [ level>> ] [ word-name>> ] [ message>> ] tri 3array

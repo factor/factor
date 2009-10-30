@@ -46,6 +46,12 @@ SYMBOL: locals
     (parse-lambda) <lambda>
     ?rewrite-closures ;
 
+: parse-multi-def ( locals -- multi-def )
+    ")" parse-tokens swap [ [ make-local ] map ] bind <multi-def> ;
+
+: parse-def ( name/paren locals -- def )
+    over "(" = [ nip parse-multi-def ] [ [ make-local ] bind <def> ] if ;
+
 M: lambda-parser parse-quotation ( -- quotation )
     H{ } clone (parse-lambda) ;
 
@@ -56,48 +62,8 @@ M: lambda-parser parse-quotation ( -- quotation )
         [ nip scan-object 2array ]
     } cond ;
 
-: (parse-bindings) ( end -- )
-    dup parse-binding dup [
-        first2 [ make-local ] dip 2array ,
-        (parse-bindings)
-    ] [ 2drop ] if ;
-
-: with-bindings ( quot -- words assoc )
-    '[
-        in-lambda? on
-        _ H{ } make-assoc
-    ] { } make swap ; inline
-
-: parse-bindings ( end -- bindings vars )
-    [ (parse-bindings) ] with-bindings ;
-
 : parse-let ( -- form )
-    "|" expect "|" parse-bindings
-    (parse-lambda) <let> ?rewrite-closures ;
-
-: parse-bindings* ( end -- words assoc )
-    [
-        namespace use-words
-        (parse-bindings)
-        namespace unuse-words
-    ] with-bindings ;
-
-: parse-let* ( -- form )
-    "|" expect "|" parse-bindings*
-    (parse-lambda) <let*> ?rewrite-closures ;
-
-: (parse-wbindings) ( end -- )
-    dup parse-binding dup [
-        first2 [ make-local-word ] keep 2array ,
-        (parse-wbindings)
-    ] [ 2drop ] if ;
-
-: parse-wbindings ( end -- bindings vars )
-    [ (parse-wbindings) ] with-bindings ;
-
-: parse-wlet ( -- form )
-    "|" expect "|" parse-wbindings
-    (parse-lambda) <wlet> ?rewrite-closures ;
+    H{ } clone (parse-lambda) <let> ?rewrite-closures ;
 
 : parse-locals ( -- effect vars assoc )
     complete-effect

@@ -350,7 +350,7 @@ PRIVATE>
 : parse-struct-slots ( slots -- slots' more? )
     scan {
         { ";" [ f ] }
-        { "{" [ parse-struct-slot over push t ] }
+        { "{" [ parse-struct-slot suffix! t ] }
         { f [ unexpected-eof ] }
         [ invalid-struct-slot ]
     } case ;
@@ -365,10 +365,10 @@ SYNTAX: UNION-STRUCT:
     parse-struct-definition define-union-struct-class ;
 
 SYNTAX: S{
-    scan-word dup struct-slots parse-tuple-literal-slots parsed ;
+    scan-word dup struct-slots parse-tuple-literal-slots suffix! ;
 
 SYNTAX: S@
-    scan-word scan-object swap memory>struct parsed ;
+    scan-word scan-object swap memory>struct suffix! ;
 
 ! functor support
 
@@ -378,7 +378,7 @@ SYNTAX: S@
 
 : parse-struct-slot` ( accum -- accum )
     scan-string-param scan-c-type` \ } parse-until
-    [ <struct-slot-spec> over push ] 3curry over push-all ;
+    [ <struct-slot-spec> suffix! ] 3curry append! ;
 
 : parse-struct-slots` ( accum -- accum more? )
     scan {
@@ -389,10 +389,10 @@ SYNTAX: S@
 PRIVATE>
 
 FUNCTOR-SYNTAX: STRUCT:
-    scan-param parsed
-    [ 8 <vector> ] over push-all
+    scan-param suffix!
+    [ 8 <vector> ] append!
     [ parse-struct-slots` ] [ ] while
-    [ >array define-struct-class ] over push-all ;
+    [ >array define-struct-class ] append! ;
 
 USING: vocabs vocabs.loader ;
 

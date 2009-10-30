@@ -354,7 +354,7 @@ SINGLETONS: YUV420 YUV444 Y MAGIC! ;
     [ decode-macroblock 2array ] accumulator 
     [ all-macroblocks ] dip
     jpeg> setup-bitmap draw-macroblocks 
-    jpeg> bitmap>> 3 <groups> [ color-transform ] change-each
+    jpeg> bitmap>> 3 <groups> [ color-transform ] map! drop
     jpeg> [ >byte-array ] change-bitmap drop ;
 
 ERROR: not-a-jpeg-image ;

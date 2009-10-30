@@ -99,7 +99,7 @@ TUPLE: slides < book ;
     ] with map ;
 
 SYNTAX: STRIP-TEASE:
-    parse-definition strip-tease [ parsed ] each ;
+    parse-definition strip-tease [ suffix! ] each ;
 
 \ slides H{
     { T{ button-down } [ request-focus ] }

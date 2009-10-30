@@ -278,7 +278,7 @@ TUPLE: single-texture < disposable image dim loc texture-coords texture display-
     ] unless ;
 
 :: tex-image ( image bitmap -- )
-    image image-format :> type :> format :> internal-format
+    image image-format :> ( internal-format format type )
     GL_TEXTURE_2D 0 internal-format
     image dim>> adjust-texture-dim first2 0
     format type bitmap glTexImage2D ;

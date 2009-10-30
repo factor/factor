@@ -81,8 +81,6 @@ M: wrapper noise wrapped>> noise ;
 
 M: let noise body>> noise ;
 
-M: wlet noise body>> noise ;
-
 M: lambda noise body>> noise ;
 
 M: object noise drop { 0 0 } ;

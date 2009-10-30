@@ -27,7 +27,7 @@ IN: project-euler.053
 ! --------
 
 : euler053 ( -- answer )
-    23 100 [a,b] [ dup [ nCk 1000000 > ] with count ] sigma ;
+    23 100 [a,b] [ dup [ nCk 1000000 > ] with count ] map-sum ;
 
 ! [ euler053 ] 100 ave-time
 ! 52 ms ave run time - 4.44 SD (100 trials)

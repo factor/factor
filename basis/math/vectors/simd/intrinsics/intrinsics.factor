@@ -181,8 +181,8 @@ M: vector-rep supported-simd-op?
         { \ (simd-vnot)          [ %xor-vector-reps            ] }
         { \ (simd-vlshift)       [ %shl-vector-reps            ] }
         { \ (simd-vrshift)       [ %shr-vector-reps            ] }
-        { \ (simd-hlshift)       [ %horizontal-shl-vector-reps ] }
-        { \ (simd-hrshift)       [ %horizontal-shr-vector-reps ] }
+        { \ (simd-hlshift)       [ %horizontal-shl-vector-imm-reps ] }
+        { \ (simd-hrshift)       [ %horizontal-shr-vector-imm-reps ] }
         { \ (simd-vshuffle-elements) [ (%shuffle-imm-reps)         ] }
         { \ (simd-vshuffle-bytes)    [ %shuffle-vector-reps        ] }
         { \ (simd-(vmerge-head)) [ %merge-vector-reps          ] }

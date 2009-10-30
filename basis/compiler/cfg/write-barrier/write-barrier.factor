@@ -37,7 +37,7 @@ M: insn eliminate-write-barrier drop t ;
 : write-barriers-step ( bb -- )
     H{ } clone fresh-allocations set
     H{ } clone mutated-objects set
-    instructions>> [ eliminate-write-barrier ] filter-here ;
+    instructions>> [ eliminate-write-barrier ] filter! drop ;
 
 : eliminate-write-barriers ( cfg -- cfg' )
     dup [ write-barriers-step ] each-basic-block ;

@@ -10,36 +10,6 @@ IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
 "Various conventions are used throughout the Factor documentation and source code."
-{ $heading "Documentation conventions" }
-"Factor documentation consists of two distinct bodies of text. There is a hierarchy of articles, much like this one, and there is word documentation. Help articles reference word documentation, and vice versa, but not every documented word is referenced from some help article."
-$nl
-"Every article has links to parent articles at the top. Explore these if the article you are reading is too specific."
-$nl
-"Some generic words have " { $strong "Description" } " headings, and others have " { $strong "Contract" } " headings. A distinction is made between words which are not intended to be extended with user-defined methods, and those that are."
-{ $heading "Vocabulary naming conventions" }
-"A vocabulary name ending in " { $snippet ".private" } " contains words which are either implementation detail, unsafe, or both. For example, the " { $snippet "sequence.private" } " vocabulary contains words which access sequence elements without bounds checking (" { $link "sequences-unsafe" } ")."
-$nl
-"You should avoid using internal words from the Factor library unless absolutely necessary. Similarly, your own code can place words in internal vocabularies if you do not want other people to use them unless they have a good reason."
-{ $heading "Word naming conventions" }
-"These conventions are not hard and fast, but are usually a good first step in understanding a word's behavior:"
-{ $table
-    { "General form" "Description" "Examples" }
-    { { $snippet { $emphasis "foo" } "?" } "outputs a boolean" { { $link empty? } } }
-    { { $snippet "?" { $emphasis "foo" } } { "conditionally performs " { $snippet { $emphasis "foo" } } } { { $links ?nth } } }
-    { { $snippet "<" { $emphasis "foo" } ">" } { "creates a new " { $snippet "foo" } } { { $link <array> } } }
-    { { $snippet ">" { $emphasis "foo" } } { "converts the top of the stack into a " { $snippet "foo" } } { { $link >array } } }
-    { { $snippet { $emphasis "foo" } ">" { $emphasis "bar" } } { "converts a " { $snippet "foo" } " into a " { $snippet "bar" } } { { $link number>string } } }
-    { { $snippet "new-" { $emphasis "foo" } } { "creates a new " { $snippet "foo" } ", taking some kind of parameter from the stack which determines the type of the object to be created" } { { $link new-sequence } ", " { $link new-lexer } ", " { $link new } } }
-    { { $snippet { $emphasis "foo" } "*" } { "alternative form of " { $snippet "foo" } ", or a generic word called by " { $snippet "foo" } } { { $links at* pprint* } } }
-    { { $snippet "(" { $emphasis "foo" } ")" } { "implementation detail word used by " { $snippet "foo" } } { { $link (clone) } } }
-    { { $snippet "set-" { $emphasis "foo" } } { "sets " { $snippet "foo" } " to a new value" } { $links set-length } }
-    { { $snippet { $emphasis "foo" } ">>" } { "gets the " { $snippet "foo" } " slot of the tuple at the top of the stack; see " { $link "accessors" } } { { $link name>> } } }
-    { { $snippet ">>" { $emphasis "foo" } } { "sets the " { $snippet "foo" } " slot of the tuple at the top of the stack; see " { $link "accessors" } } { { $link >>name } } }
-    { { $snippet "with-" { $emphasis "foo" } } { "performs some kind of initialization and cleanup related to " { $snippet "foo" } ", usually in a new dynamic scope" } { $links with-scope with-input-stream with-output-stream } }
-    { { $snippet "$" { $emphasis "foo" } } { "help markup" } { $links $heading $emphasis } }
-}
-{ $heading "Stack effect conventions" }
-"Stack effect conventions are documented in " { $link "effects" } "."
 { $heading "Glossary of terms" }
 "Common terminology and abbreviations used throughout Factor and its documentation:"
 { $table
@@ -62,10 +32,41 @@ $nl
     { "slot"                  { "a component of an object which can store a value" } }
     { "stack effect"          { "a pictorial representation of a word's inputs and outputs, for example " { $snippet "+ ( x y -- z )" } ". See " { $link "effects" } } }
     { "true value"            { "any object not equal to " { $link f } } }
-    { "vocabulary" { "a named set of words. See " { $link "vocabularies" } } }
+    { { "vocabulary " { $strong "or" } " vocab" } { "a named set of words. See " { $link "vocabularies" } } }
     { "vocabulary specifier"  { "a " { $link vocab } ", " { $link vocab-link } " or a string naming a vocabulary" } }
     { "word"                  { "the basic unit of code, analogous to a function or procedure in other programming languages. See " { $link "words" } } }
-} ;
+} 
+{ $heading "Documentation conventions" }
+"Factor documentation consists of two distinct bodies of text. There is a hierarchy of articles, much like this one, and there is word documentation. Help articles reference word documentation, and vice versa, but not every documented word is referenced from some help article."
+$nl
+"The browser, completion popups and other tools use a common set of " { $link "definitions.icons" } "."
+$nl
+"Every article has links to parent articles at the top. Explore these if the article you are reading is too specific."
+$nl
+"Some generic words have " { $strong "Description" } " headings, and others have " { $strong "Contract" } " headings. A distinction is made between words which are not intended to be extended with user-defined methods, and those that are."
+{ $heading "Vocabulary naming conventions" }
+"A vocabulary name ending in " { $snippet ".private" } " contains words which are either implementation details, unsafe, or both. For example, the " { $snippet "sequence.private" } " vocabulary contains words which access sequence elements without bounds checking (" { $link "sequences-unsafe" } "). You should avoid using private words from the Factor library unless absolutely necessary. Similarly, your own code can place words in private vocabularies using " { $link POSTPONE: <PRIVATE } " if you do not want other people using them without good reason."
+{ $heading "Word naming conventions" }
+"These conventions are not hard and fast, but are usually a good first step in understanding a word's behavior:"
+{ $table
+    { "General form" "Description" "Examples" }
+    { { $snippet { $emphasis "foo" } "?" } "outputs a boolean" { { $link empty? } } }
+    { { $snippet "?" { $emphasis "foo" } } { "conditionally performs " { $snippet { $emphasis "foo" } } } { { $links ?nth } } }
+    { { $snippet "<" { $emphasis "foo" } ">" } { "creates a new " { $snippet "foo" } } { { $link <array> } } }
+    { { $snippet ">" { $emphasis "foo" } } { "converts the top of the stack into a " { $snippet "foo" } } { { $link >array } } }
+    { { $snippet { $emphasis "foo" } ">" { $emphasis "bar" } } { "converts a " { $snippet "foo" } " into a " { $snippet "bar" } } { { $link number>string } } }
+    { { $snippet "new-" { $emphasis "foo" } } { "creates a new " { $snippet "foo" } ", taking some kind of parameter from the stack which determines the type of the object to be created" } { { $link new-sequence } ", " { $link new-lexer } ", " { $link new } } }
+    { { $snippet { $emphasis "foo" } "*" } { "alternative form of " { $snippet "foo" } ", or a generic word called by " { $snippet "foo" } } { { $links at* pprint* } } }
+    { { $snippet "(" { $emphasis "foo" } ")" } { "implementation detail word used by " { $snippet "foo" } } { { $link (clone) } } }
+    { { $snippet "set-" { $emphasis "foo" } } { "sets " { $snippet "foo" } " to a new value" } { $links set-length } }
+    { { $snippet { $emphasis "foo" } ">>" } { "gets the " { $snippet "foo" } " slot of the tuple at the top of the stack; see " { $link "accessors" } } { { $link name>> } } }
+    { { $snippet ">>" { $emphasis "foo" } } { "sets the " { $snippet "foo" } " slot of the tuple at the top of the stack; see " { $link "accessors" } } { { $link >>name } } }
+    { { $snippet "with-" { $emphasis "foo" } } { "performs some kind of initialization and cleanup related to " { $snippet "foo" } ", usually in a new dynamic scope" } { $links with-scope with-input-stream with-output-stream } }
+    { { $snippet "$" { $emphasis "foo" } } { "help markup" } { $links $heading $emphasis } }
+}
+{ $heading "Stack effect conventions" }
+"Stack effect conventions are documented in " { $link "effects" } "."
+;
 
 ARTICLE: "tail-call-opt" "Tail-call optimization"
 "If the last action performed is the execution of a word, the current quotation is not saved on the call stack; this is known as " { $emphasis "tail-call optimization" } " and the Factor implementation guarantees that it will be performed."
@@ -363,7 +364,7 @@ ARTICLE: "handbook-library-reference" "Libraries"
 { $index [ orphan-articles { "help.home" "handbook" } diff ] } ;
 
 ARTICLE: "handbook" "Factor handbook"
-{ $heading "Getting Started" }
+{ $heading "Getting started" }
 { $subsections
     "cookbook"
     "first-program"
@@ -379,14 +380,14 @@ ARTICLE: "handbook" "Factor handbook"
     "alien"
     "handbook-library-reference"
 }
-{ $heading "Explore loaded libraries" }
+{ $heading "Index" }
 { $subsections
-    "article-index"
-    "primitive-index"
-    "error-index"
-    "class-index"
+  "vocab-index"
+  "article-index"
+  "primitive-index"
+  "error-index"
+  "class-index"
 }
-{ $heading "Explore the code base" }
-{ $subsections "vocab-index" } ;
+;
 
 ABOUT: "handbook"

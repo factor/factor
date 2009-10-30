@@ -25,7 +25,7 @@ TUPLE: openssl-context < secure-context aliens sessions ;
 
 : load-certificate-chain ( ctx -- )
     dup config>> key-file>> [
-        [ handle>> ] [ config>> key-file>> (normalize-path) ] bi
+        [ handle>> ] [ config>> key-file>> absolute-path ] bi
         SSL_CTX_use_certificate_chain_file
         ssl-error
     ] [ drop ] if ;
@@ -35,10 +35,9 @@ TUPLE: openssl-context < secure-context aliens sessions ;
     [| buf size rwflag password! |
         password [ B{ 0 } password! ] unless
 
-        [let | len [ password strlen ] |
-            buf password len 1 + size min memcpy
-            len
-        ]
+        password strlen :> len
+        buf password len 1 + size min memcpy
+        len
     ] alien-callback ;
 
 : default-pasword ( ctx -- alien )
@@ -56,7 +55,7 @@ TUPLE: openssl-context < secure-context aliens sessions ;
 
 : use-private-key-file ( ctx -- )
     dup config>> key-file>> [
-        [ handle>> ] [ config>> key-file>> (normalize-path) ] bi
+        [ handle>> ] [ config>> key-file>> absolute-path ] bi
         SSL_FILETYPE_PEM SSL_CTX_use_PrivateKey_file
         ssl-error
     ] [ drop ] if ;
@@ -66,8 +65,8 @@ TUPLE: openssl-context < secure-context aliens sessions ;
         [ handle>> ]
         [
             config>>
-            [ ca-file>> dup [ (normalize-path) ] when ]
-            [ ca-path>> dup [ (normalize-path) ] when ] bi
+            [ ca-file>> dup [ absolute-path ] when ]
+            [ ca-path>> dup [ absolute-path ] when ] bi
         ] bi
         SSL_CTX_load_verify_locations
     ] [ handle>> SSL_CTX_set_default_verify_paths ] if ssl-error ;

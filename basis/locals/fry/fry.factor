@@ -6,7 +6,7 @@ IN: locals.fry
 
 ! Support for mixing locals with fry
 
-M: binding-form count-inputs body>> count-inputs ;
+M: let count-inputs body>> count-inputs ;
 
 M: lambda count-inputs body>> count-inputs ;
 
@@ -14,5 +14,5 @@ M: lambda deep-fry
     clone [ shallow-fry swap ] change-body
     [ [ vars>> length ] keep '[ _ _ mnswap @ ] , ] [ drop [ncurry] % ] 2bi ;
 
-M: binding-form deep-fry
+M: let deep-fry
     clone [ fry '[ @ call ] ] change-body , ;

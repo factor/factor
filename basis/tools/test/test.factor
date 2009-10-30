@@ -96,9 +96,9 @@ MACRO: <experiment> ( word -- )
     ] [ drop ] if ; inline
 
 : parse-test ( accum word -- accum )
-    literalize parsed
-    lexer get line>> parsed
-    \ experiment parsed ; inline
+    literalize suffix!
+    lexer get line>> suffix!
+    \ experiment suffix! ; inline
 
 <<
 

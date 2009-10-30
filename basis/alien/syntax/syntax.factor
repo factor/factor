@@ -7,11 +7,11 @@ effects assocs combinators lexer strings.parser alien.parser
 fry vocabs.parser words.constant alien.libraries ;
 IN: alien.syntax
 
-SYNTAX: DLL" lexer get skip-blank parse-string dlopen parsed ;
+SYNTAX: DLL" lexer get skip-blank parse-string dlopen suffix! ;
 
-SYNTAX: ALIEN: 16 scan-base <alien> parsed ;
+SYNTAX: ALIEN: 16 scan-base <alien> suffix! ;
 
-SYNTAX: BAD-ALIEN <bad-alien> parsed ;
+SYNTAX: BAD-ALIEN <bad-alien> suffix! ;
 
 SYNTAX: LIBRARY: scan "c-library" set ;
 
@@ -37,7 +37,7 @@ ERROR: no-such-symbol name library ;
     2dup load-library dlsym [ 2nip ] [ no-such-symbol ] if* ;
 
 SYNTAX: &:
-    scan "c-library" get '[ _ _ address-of ] over push-all ;
+    scan "c-library" get '[ _ _ address-of ] append! ;
 
 : global-quot ( type word -- quot )
     name>> "c-library" get '[ _ _ address-of 0 ]

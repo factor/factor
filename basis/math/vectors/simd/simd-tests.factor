@@ -391,8 +391,8 @@ TUPLE: inconsistent-vector-test bool branch ;
     2dup = [ drop ] [ inconsistent-vector-test boa ] if ;
 
 :: test-vector-tests ( vector decl -- none? any? all? )
-    vector decl test-vector-tests-bool :> bool-all :> bool-any :> bool-none
-    vector decl test-vector-tests-branch :> branch-all :> branch-any :> branch-none
+    vector decl test-vector-tests-bool :> ( bool-none bool-any bool-all )
+    vector decl test-vector-tests-branch :> ( branch-none branch-any branch-all )
     
     bool-none branch-none ?inconsistent
     bool-any  branch-any  ?inconsistent

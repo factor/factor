@@ -19,7 +19,7 @@ IN: tools.profiler
     [ dup counter>> ] map-counters ;
 
 : cumulative-counters ( obj quot -- alist )
-    '[ dup @ [ counter>> ] sigma ] map-counters ; inline
+    '[ dup @ [ counter>> ] map-sum ] map-counters ; inline
 
 : vocab-counters ( -- alist )
     vocabs [ words [ predicate? not ] filter ] cumulative-counters ;
