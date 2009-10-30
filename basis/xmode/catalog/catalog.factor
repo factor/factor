@@ -48,7 +48,7 @@ SYMBOL: rule-sets
 
 : get-rule-set ( name -- rule-sets rules )
     dup "::" split1 [ swap (load-mode) ] [ rule-sets get ] if*
-    dup -roll at* [ nip ] [ drop no-such-rule-set ] if ;
+    [ at* [ nip ] [ drop no-such-rule-set ] if ] keep swap ;
 
 DEFER: finalize-rule-set
 
