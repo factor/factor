@@ -9,10 +9,6 @@ HELP: gammaln
 { $values { "x" number } { "gamma[x]" number } }
 { $description "An alternative to " { $link gamma } " when gamma(x)'s range varies too widely." } ;
 
-HELP: nth-root
-{ $values { "n" integer } { "x" number } { "y" number } }
-{ $description "Calculates the nth root of a number, such that " { $snippet "y^n=x" } "." } ;
-
 HELP: exp-int
 { $values { "x" number } { "y" number } }
 { $description "Exponential integral function." }
