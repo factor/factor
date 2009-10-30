@@ -1,16 +1,6 @@
 namespace factor
 {
 
-struct dummy_unmarker {
-	void operator()(card *ptr) {}
-};
-
-struct simple_unmarker {
-	card unmask;
-	explicit simple_unmarker(card unmask_) : unmask(unmask_) {}
-	void operator()(card *ptr) { *ptr &= ~unmask; }
-};
-
 template<typename TargetGeneration, typename Policy>
 struct copying_collector : collector<TargetGeneration,Policy> {
 	cell scan;

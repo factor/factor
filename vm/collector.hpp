@@ -71,6 +71,21 @@ inline static slot_visitor<collector_workhorse<TargetGeneration,Policy> > make_c
 		collector_workhorse<TargetGeneration,Policy>(parent,target,policy));
 }
 
+struct dummy_unmarker {
+	void operator()(card *ptr) {}
+};
+
+struct simple_unmarker {
+	card unmask;
+	explicit simple_unmarker(card unmask_) : unmask(unmask_) {}
+	void operator()(card *ptr) { *ptr &= ~unmask; }
+};
+
+struct full_unmarker {
+	explicit full_unmarker() {}
+	void operator()(card *ptr) { *ptr = 0; }
+};
+
 template<typename TargetGeneration, typename Policy> struct collector {
 	factor_vm *parent;
 	data_heap *data;

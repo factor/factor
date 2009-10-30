@@ -24,7 +24,7 @@ void factor_vm::collect_nursery()
 		simple_unmarker(card_points_to_nursery));
 	collector.trace_cards(data->aging,
 		card_points_to_nursery,
-		simple_unmarker(card_mark_mask));
+		full_unmarker());
 	current_gc->event->ended_card_scan(collector.cards_scanned,collector.decks_scanned);
 
 	current_gc->event->started_code_scan();

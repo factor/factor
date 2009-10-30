@@ -25,7 +25,7 @@ void factor_vm::collect_aging()
 		current_gc->event->started_code_scan();
 		collector.trace_cards(data->tenured,
 			card_points_to_aging,
-			simple_unmarker(card_mark_mask));
+			full_unmarker());
 		current_gc->event->ended_card_scan(collector.cards_scanned,collector.decks_scanned);
 
 		collector.tenure_reachable_objects();
