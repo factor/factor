@@ -3,13 +3,13 @@
 USING: fry images.loader images.normalization images.viewer io
 io.directories io.encodings.binary io.files io.pathnames
 io.streams.byte-array kernel locals namespaces quotations
-sequences serialize tools.test ;
+sequences serialize tools.test io.backend ;
 IN: images.testing
 
 <PRIVATE
 
 : fig-name ( path -- newpath )
-    [ parent-directory canonicalize-path ]
+    [ parent-directory normalize-path ]
     [ file-stem ".fig" append ] bi
     append-path ;
 

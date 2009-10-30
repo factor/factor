@@ -25,11 +25,11 @@ IN: lcs
     [ [ + ] curry map ] with map ;
 
 :: run-lcs ( old new init step -- matrix )
-    [let | matrix [ old length 1 + new length 1 + init call ] |
-        old length [| i |
-            new length
-            [| j | i j matrix old new step loop-step ] each
-        ] each matrix ] ; inline
+    old length 1 + new length 1 + init call :> matrix
+    old length [| i |
+        new length
+        [| j | i j matrix old new step loop-step ] each
+    ] each matrix ; inline
 PRIVATE>
 
 : levenshtein ( old new -- n )

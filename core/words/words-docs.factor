@@ -26,7 +26,7 @@ $nl
 } ;
 
 ARTICLE: "colon-definition" "Colon definitions"
-"Every word has an associated quotation definition that is called when the word is executed. A " { $emphasis "colon definition" } " is a word where this quotation is supplied directly by the user. This is the simplest and most common type of word definition."
+"All words have associated definition " { $link "quotations" } ". A word's definition quotation is called when the word is executed. A " { $emphasis "colon definition" } " is a word where this quotation is supplied directly by the user. This is the simplest and most common type of word definition."
 $nl
 "Defining words at parse time:"
 { $subsections
@@ -160,7 +160,7 @@ $nl
 } ;
 
 ARTICLE: "words" "Words"
-"Words are the Factor equivalent of functions or procedures; a word is essentially a named quotation."
+"Words are the Factor equivalent of functions or procedures in other languages. Words are essentially named " { $link "quotations" } "."
 $nl
 "There are two ways of creating word definitions:"
 { $list

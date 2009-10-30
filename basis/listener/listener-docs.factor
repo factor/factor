@@ -48,10 +48,12 @@ $nl
 "Multi-line expressions are supported:"
 { $example "{ 1 2 3 } [\n    .\n] each" "1\n2\n3" }
 "The listener knows when to expect more input by looking at the height of the stack. Parsing words such as " { $link POSTPONE: { } " leave elements on the parser stack, and corresponding words such as " { $link POSTPONE: } } " pop them."
+$nl
+"The listener will display the current contents of the datastack after every expression is evaluated. The listener can additionally watch dynamic variables:"
 { $subsections "listener-watch" }
 "To start a nested listener:"
 { $subsections listener }
-"To exit the listener, invoke the " { $link return } " word."
+"To exit a listener, invoke the " { $link return } " word."
 $nl
 "Multi-line quotations can be read independently of the rest of the listener:"
 { $subsections read-quot } ;

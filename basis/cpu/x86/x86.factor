@@ -254,7 +254,7 @@ CONSTANT: have-byte-regs { EAX ECX EDX EBX }
 
 M: x86.32 has-small-reg?
     {
-        { 8 [ have-byte-regs memq? ] }
+        { 8 [ have-byte-regs member-eq? ] }
         { 16 [ drop t ] }
         { 32 [ drop t ] }
     } case ;
@@ -264,7 +264,7 @@ M: x86.64 has-small-reg? 2drop t ;
 : small-reg-that-isn't ( exclude -- reg' )
     [ have-byte-regs ] dip
     [ native-version-of ] map
-    '[ _ memq? not ] find nip ;
+    '[ _ member-eq? not ] find nip ;
 
 : with-save/restore ( reg quot -- )
     [ drop PUSH ] [ call ] [ drop POP ] 2tri ; inline
@@ -356,7 +356,7 @@ M: x86 %set-alien-float [ [+] ] dip MOVSS ;
 M: x86 %set-alien-double [ [+] ] dip MOVSD ;
 M: x86 %set-alien-vector [ [+] ] 2dip %copy ;
 
-: shift-count? ( reg -- ? ) { ECX RCX } memq? ;
+: shift-count? ( reg -- ? ) { ECX RCX } member-eq? ;
 
 :: emit-shift ( dst src quot -- )
     src shift-count? [
@@ -893,7 +893,7 @@ M: x86 %compare-vector ( dst src1 src2 rep cc -- )
 
 M: x86 %compare-vector-reps
     {
-        { [ dup { cc= cc/= cc/<>= cc<>= } memq? ] [ drop %compare-vector-eq-reps ] }
+        { [ dup { cc= cc/= cc/<>= cc<>= } member-eq? ] [ drop %compare-vector-eq-reps ] }
         [ drop %compare-vector-ord-reps ]
     } cond ;
 
@@ -1155,18 +1155,18 @@ M: x86 %horizontal-add-vector-reps
         { sse3? { float-4-rep double-2-rep } }
     } available-reps ;
 
-M: x86 %horizontal-shl-vector ( dst src1 src2 rep -- )
+M: x86 %horizontal-shl-vector-imm ( dst src1 src2 rep -- )
     two-operand PSLLDQ ;
 
-M: x86 %horizontal-shl-vector-reps
+M: x86 %horizontal-shl-vector-imm-reps
     {
         { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-M: x86 %horizontal-shr-vector ( dst src1 src2 rep -- )
+M: x86 %horizontal-shr-vector-imm ( dst src1 src2 rep -- )
     two-operand PSRLDQ ;
 
-M: x86 %horizontal-shr-vector-reps
+M: x86 %horizontal-shr-vector-imm-reps
     {
         { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
@@ -1281,6 +1281,11 @@ M: x86 %shr-vector-reps
     {
         { sse2? { short-8-rep ushort-8-rep int-4-rep uint-4-rep ulonglong-2-rep } }
     } available-reps ;
+
+M: x86 %shl-vector-imm %shl-vector ;
+M: x86 %shl-vector-imm-reps %shl-vector-reps ;
+M: x86 %shr-vector-imm %shr-vector ;
+M: x86 %shr-vector-imm-reps %shr-vector-reps ;
 
 : scalar-sized-reg ( reg rep -- reg' )
     rep-size 8 * n-bit-version-of ;

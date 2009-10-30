@@ -3,10 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>content</key>
-	<string>
-   [let | $1 [ $2 ] $3|
-      $0
-   ]</string>
+	<string>[let $0 ]</string>
 	<key>name</key>
 	<string>let</string>
 	<key>scope</key>

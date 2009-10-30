@@ -6,11 +6,11 @@ locals math sequences sorting system unicode.case vocabs.loader ;
 IN: io.directories.search
 
 : qualified-directory-entries ( path -- seq )
-    (normalize-path)
+    absolute-path
     dup directory-entries [ [ append-path ] change-name ] with map ;
 
 : qualified-directory-files ( path -- seq )
-    (normalize-path)
+    absolute-path
     dup directory-files [ append-path ] with map ;
 
 : with-qualified-directory-files ( path quot -- )

@@ -96,7 +96,7 @@ HELP: delete-random
 { $values
      { "seq" sequence }
      { "elt" object } }
-{ $description "Deletes a random number from a sequence using " { $link delete-nth } " and returns the deleted object." } ;
+{ $description "Deletes a random number from a sequence using " { $link remove-nth! } " and returns the deleted object." } ;
 
 ARTICLE: "random-protocol" "Random protocol"
 "A random number generator must implement one of these two words:"

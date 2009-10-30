@@ -50,7 +50,7 @@ CONSTANT: objects
         B{ 50 13 55 64 1 }
         ?{ t f t f f t f }
         double-array{ 1.0 3.0 4.0 1.0 2.35 0.33 }
-        << 1 [ 2 ] curry parsed >>
+        << 1 [ 2 ] curry suffix! >>
         { { "a" "bc" } { "de" "fg" } }
         H{ { "a" "bc" } { "de" "fg" } }
     }

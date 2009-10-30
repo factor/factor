@@ -20,7 +20,7 @@ M: matrix4 new-sequence 2drop matrix4 (struct) ; inline
 <PRIVATE
 
 : columns ( a -- a1 a2 a3 a4 )
-    columns>> 4 firstn ; inline
+    columns>> first4 ; inline
 
 :: set-columns ( c1 c2 c3 c4 c -- c )
     c columns>> :> columns
@@ -35,8 +35,8 @@ M: matrix4 new-sequence 2drop matrix4 (struct) ; inline
 
 :: 2map-columns ( a b quot -- c )
     [
-        a columns :> a4 :> a3 :> a2 :> a1
-        b columns :> b4 :> b3 :> b2 :> b1
+        a columns :> ( a1 a2 a3 a4 )
+        b columns :> ( b1 b2 b3 b4 )
 
         a1 b1 quot call
         a2 b2 quot call
@@ -61,8 +61,8 @@ TYPED: n/m4 ( a: float b: matrix4 -- c: matrix4 ) [ n/v ] with map-columns ;
 
 TYPED:: m4. ( a: matrix4 b: matrix4 -- c: matrix4 )
     [
-        a columns :> a4 :> a3 :> a2 :> a1
-        b columns :> b4 :> b3 :> b2 :> b1
+        a columns :> ( a1 a2 a3 a4 )
+        b columns :> ( b1 b2 b3 b4 )
 
         b1 first  a1 n*v :> c1a
         b2 first  a1 n*v :> c2a
@@ -86,7 +86,7 @@ TYPED:: m4. ( a: matrix4 b: matrix4 -- c: matrix4 )
     ] make-matrix4 ;
 
 TYPED:: m4.v ( m: matrix4 v: float-4 -- v': float-4 )
-    m columns :> m4 :> m3 :> m2 :> m1
+    m columns :> ( m1 m2 m3 m4 )
     
     v first  m1 n*v
     v second m2 n*v v+

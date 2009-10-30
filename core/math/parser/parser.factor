@@ -66,10 +66,10 @@ SYMBOL: negative?
     0 over push B{ } like (string>float) ;
 
 : hex>float-parts ( str -- neg? mantissa-str expt )
-    "-" ?head swap "p" split1 [ 10 base> ] [ 0 ] if* ;
+    "-" ?head swap "p" split1 [ 10 base> ] [ 0 ] if* ; inline
 
 : make-mantissa ( str -- bits )
-    16 base> dup log2 52 swap - shift ;
+    16 base> dup log2 52 swap - shift ; inline
 
 : combine-hex-float-parts ( neg? mantissa expt -- float )
     dup 2046 > [ 2drop -1/0. 1/0. ? ] [
@@ -78,7 +78,7 @@ SYMBOL: negative?
         [ 52 2^ 1 - bitand ]
         [ 52 shift ] tri* bitor bitor
         bits>double 
-    ] if ;
+    ] if ; inline
 
 : hex>float ( str -- n/f )
     hex>float-parts
@@ -138,7 +138,7 @@ PRIVATE>
 : positive>base ( num radix -- str )
     dup 1 <= [ "Invalid radix" throw ] when
     [ dup 0 > ] swap [ /mod >digit ] curry "" produce-as nip
-    dup reverse-here ; inline
+    reverse! ; inline
 
 PRIVATE>
 

@@ -56,9 +56,6 @@ PRIVATE>
         [ abs gammaln-lanczos6 ] keep dup 0 > [ drop ] [ gamma-neg ] if
     ] if ;
 
-: nth-root ( n x -- y )
-    swap recip ^ ;
-
 ! Forth Scientific Library Algorithm #1
 !
 ! Evaluates the Real Exponential Integral,

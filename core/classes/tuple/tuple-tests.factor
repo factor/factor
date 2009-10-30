@@ -110,7 +110,7 @@ TUPLE: yo-momma ;
     [ t ] [ \ yo-momma class? ] unit-test
     [ ] [ \ yo-momma forget ] unit-test
     [ ] [ \ <yo-momma> forget ] unit-test
-    [ f ] [ \ yo-momma update-map get values memq? ] unit-test
+    [ f ] [ \ yo-momma update-map get values member-eq? ] unit-test
 ] with-compilation-unit
 
 TUPLE: loc-recording ;

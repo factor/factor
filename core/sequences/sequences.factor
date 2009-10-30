@@ -170,13 +170,13 @@ PRIVATE>
     4 swap [ (4sequence) ] new-like ; inline
 
 : first2 ( seq -- first second )
-    1 swap bounds-check nip first2-unsafe ; flushable
+    1 swap bounds-check nip first2-unsafe ; inline
 
 : first3 ( seq -- first second third )
-    2 swap bounds-check nip first3-unsafe ; flushable
+    2 swap bounds-check nip first3-unsafe ; inline
 
 : first4 ( seq -- first second third fourth )
-    3 swap bounds-check nip first4-unsafe ; flushable
+    3 swap bounds-check nip first4-unsafe ; inline
 
 : ?nth ( n seq -- elt/f )
     2dup bounds-check? [ nth-unsafe ] [ 2drop f ] if ; inline
@@ -268,18 +268,16 @@ INSTANCE: repetition immutable-sequence
 ERROR: integer-length-expected obj ;
 
 : check-length ( n -- n )
-    #! Ricing.
     dup integer? [ integer-length-expected ] unless ; inline
 
-: ((copy)) ( dst i src j n -- dst i src j n )
-    dup -roll [
-        + swap nth-unsafe -roll [
-            + swap set-nth-unsafe
-        ] 3keep drop
-    ] 3keep ; inline
+: ((copy)) ( dst i src j n -- )
+    dup -roll + swap nth-unsafe -roll + swap set-nth-unsafe ; inline
+
+: 5bi ( a b c d e x y -- )
+    bi-curry bi-curry bi-curry bi-curry bi ; inline
 
 : (copy) ( dst i src j n -- dst )
-    dup 0 <= [ 2drop 2drop ] [ 1 - ((copy)) (copy) ] if ;
+    dup 0 <= [ 2drop 2drop ] [ 1 - [ ((copy)) ] [ (copy) ] 5bi ] if ;
     inline recursive
 
 : prepare-subseq ( from to seq -- dst i src j n )
@@ -429,14 +427,20 @@ PRIVATE>
 : replicate-as ( seq quot exemplar -- newseq )
     [ [ drop ] prepose ] dip map-as ; inline
 
-: change-each ( seq quot -- )
-    over map-into ; inline
+: map! ( seq quot -- seq )
+    over [ map-into ] keep ; inline
+
+: (accumulate) ( seq identity quot -- seq identity quot )
+    [ swap ] dip [ curry keep ] curry ; inline
 
 : accumulate-as ( seq identity quot exemplar -- final newseq )
-    [ [ swap ] dip [ curry keep ] curry ] dip map-as ; inline
+    [ (accumulate) ] dip map-as ; inline
 
 : accumulate ( seq identity quot -- final newseq )
     { } accumulate-as ; inline
+
+: accumulate! ( seq identity quot -- final seq )
+    (accumulate) map! ; inline
 
 : 2each ( seq1 seq2 quot -- )
     (2each) each-integer ; inline
@@ -567,13 +571,13 @@ PRIVATE>
 : member? ( elt seq -- ? )
     [ = ] with any? ;
 
-: memq? ( elt seq -- ? )
+: member-eq? ( elt seq -- ? )
     [ eq? ] with any? ;
 
 : remove ( elt seq -- newseq )
     [ = not ] with filter ;
 
-: remq ( elt seq -- newseq )
+: remove-eq ( elt seq -- newseq )
     [ eq? not ] with filter ;
 
 : sift ( seq -- newseq )
@@ -619,24 +623,24 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 
 <PRIVATE
 
-: (filter-here) ( quot: ( elt -- ? ) store scan seq -- )
+: (filter!) ( quot: ( elt -- ? ) store scan seq -- )
     2dup length < [
         [ move ] 3keep
         [ nth-unsafe pick call [ 1 + ] when ] 2keep
         [ 1 + ] dip
-        (filter-here)
+        (filter!)
     ] [ nip set-length drop ] if ; inline recursive
 
 PRIVATE>
 
-: filter-here ( seq quot -- )
-    swap [ 0 0 ] dip (filter-here) ; inline
+: filter! ( seq quot -- seq )
+    swap [ [ 0 0 ] dip (filter!) ] keep ; inline
 
-: delete ( elt seq -- )
-    [ = not ] with filter-here ;
+: remove! ( elt seq -- seq )
+    [ = not ] with filter! ;
 
-: delq ( elt seq -- )
-    [ eq? not ] with filter-here ;
+: remove-eq! ( elt seq -- seq )
+    [ eq? not ] with filter! ;
 
 : prefix ( seq elt -- newseq )
     over [ over length 1 + ] dip [
@@ -649,6 +653,10 @@ PRIVATE>
         [ [ over length ] dip set-nth-unsafe ] keep
         [ 0 swap copy ] keep
     ] new-like ;
+
+: suffix! ( seq elt -- seq ) over push ;
+
+: append! ( seq1 seq2 -- seq1 ) over push-all ;
 
 : last ( seq -- elt ) [ length 1 - ] [ nth ] bi ;
 
@@ -695,8 +703,8 @@ PRIVATE>
 : delete-slice ( from to seq -- )
     check-slice [ over [ - ] dip ] dip open-slice ;
 
-: delete-nth ( n seq -- )
-    [ dup 1 + ] dip delete-slice ;
+: remove-nth! ( n seq -- seq )
+    [ [ dup 1 + ] dip delete-slice ] keep ;
 
 : snip ( from to seq -- head tail )
     [ swap head ] [ swap tail ] bi-curry bi* ; inline
@@ -719,15 +727,16 @@ PRIVATE>
     [ exchange-unsafe ]
     3tri ;
 
-: reverse-here ( seq -- )
-    [ length 2/ iota ] [ length ] [ ] tri
-    [ [ over - 1 - ] dip exchange-unsafe ] 2curry each ;
+: reverse! ( seq -- seq )
+    [
+        [ length 2/ iota ] [ length ] [ ] tri
+        [ [ over - 1 - ] dip exchange-unsafe ] 2curry each
+    ] keep ;
 
 : reverse ( seq -- newseq )
     [
         dup [ length ] keep new-sequence
-        [ 0 swap copy ] keep
-        [ reverse-here ] keep
+        [ 0 swap copy ] keep reverse!
     ] keep like ;
 
 : sum-lengths ( seq -- n )
@@ -736,7 +745,7 @@ PRIVATE>
 : concat-as ( seq exemplar -- newseq )
     swap [ { } ] [
         [ sum-lengths over new-resizable ] keep
-        [ over push-all ] each
+        [ append! ] each
     ] if-empty swap like ;
 
 : concat ( seq -- newseq )
@@ -923,10 +932,10 @@ PRIVATE>
 
 : supremum ( seq -- n ) [ ] [ max ] map-reduce ;
 
-: sigma ( seq quot -- n )
+: map-sum ( seq quot -- n )
     [ 0 ] 2dip [ dip + ] curry [ swap ] prepose each ; inline
 
-: count ( seq quot -- n ) [ 1 0 ? ] compose sigma ; inline
+: count ( seq quot -- n ) [ 1 0 ? ] compose map-sum ; inline
 
 ! We hand-optimize flip to such a degree because type hints
 ! cannot express that an array is an array of arrays yet, and

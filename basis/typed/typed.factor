@@ -79,7 +79,8 @@ DEFER: make-boxer
     [ drop [ ] ] if ;
 
 : make-boxer ( types -- quot )
-    [ boxer ] [ swap '[ @ _ dip ] ] map-reduce ;
+    [ [ ] ]
+    [ [ boxer ] [ swap '[ @ _ dip ] ] map-reduce ] if-empty ;
 
 ! defining typed words
 

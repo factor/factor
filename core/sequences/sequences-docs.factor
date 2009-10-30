@@ -44,7 +44,7 @@ HELP: nths
 { $values
      { "indices" sequence } { "seq" sequence }
      { "seq'" sequence } }
-{ $description "Ouptuts a sequence of elements from the input sequence indexed by the indices." }
+{ $description "Outputs a sequence of elements from the input sequence indexed by the indices." }
 { $examples 
     { $example "USING: prettyprint sequences ;"
                "{ 0 2 } { \"a\" \"b\" \"c\" } nths ."
@@ -295,6 +295,17 @@ $nl
     { $example "USING: math prettyprint sequences ;" "{ 2 2 2 2 2 } 0 [ + ] accumulate . ." "{ 0 2 4 6 8 }\n10" }
 } ;
 
+HELP: accumulate!
+{ $values { "seq" sequence } { "identity" object } { "quot" { $quotation "( prev elt -- next )" } } { "final" "the final result" } { "seq" sequence } }
+{ $description "Combines successive elements of the sequence using a binary operation, and outputs the original sequence of intermediate results, together with the final result."
+$nl
+"The first element of the new sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the old sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the old sequence."
+$nl
+"When given the empty sequence, outputs an empty sequence together with the " { $snippet "identity" } "." }
+{ $examples
+    { $example "USING: math prettyprint sequences ;" "{ 2 2 2 2 2 } 0 [ + ] accumulate! . ." "{ 0 2 4 6 8 }\n10" }
+} ;
+
 HELP: map
 { $values { "seq" sequence } { "quot" { $quotation "( old -- new )" } } { "newseq" "a new sequence" } }
 { $description "Applies the quotation to each element of the sequence in order. The new elements are collected into a sequence of the same class as the input sequence." } ;
@@ -332,9 +343,9 @@ HELP: change-nth
 { $errors "Throws an error if the sequence is immutable, if the index is out of bounds, or the sequence cannot hold elements of the type output by " { $snippet "quot" } "." }
 { $side-effects "seq" } ;
 
-HELP: change-each
-{ $values { "seq" "a mutable sequence" } { "quot" { $quotation "( old -- new )" } } }
-{ $description "Applies the quotation to each element yielding a new element, storing the new elements back in the original sequence." }
+HELP: map!
+{ $values { "seq" "a mutable sequence" } { "quot" { $quotation "( old -- new )" } } { "seq" "a mutable sequence" } }
+{ $description "Applies the quotation to each element yielding a new element, storing the new elements back in the original sequence. Returns the original sequence." }
 { $errors "Throws an error if the sequence is immutable, or the sequence cannot hold elements of the type output by " { $snippet "quot" } "." }
 { $side-effects "seq" } ;
 
@@ -430,8 +441,8 @@ HELP: filter-as
 { $values { "seq" sequence } { "quot" { $quotation "( elt -- ? )" } } { "exemplar" sequence } { "subseq" "a new sequence" } }
 { $description "Applies the quotation to each element in turn, and outputs a new sequence of the same type as " { $snippet "exemplar" } " containing the elements of the original sequence for which the quotation output a true value." } ;
 
-HELP: filter-here
-{ $values { "seq" "a resizable mutable sequence" } { "quot" { $quotation "( elt -- ? )" } } }
+HELP: filter!
+{ $values { "seq" "a resizable mutable sequence" } { "quot" { $quotation "( elt -- ? )" } } { "seq" "a resizable mutable sequence" } }
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a false value." }
 { $side-effects "seq" } ;
 
@@ -461,7 +472,7 @@ HELP: member?
 { $description "Tests if the sequence contains an element equal to the object." }
 { $notes "This word uses equality comparison (" { $link = } ")." } ;
 
-HELP: memq?
+HELP: member-eq?
 { $values { "elt" object } { "seq" sequence } { "?" "a boolean" } }
 { $description "Tests if the sequence contains the object." }
 { $notes "This word uses identity comparison (" { $link eq? } ")." } ;
@@ -471,7 +482,7 @@ HELP: remove
 { $description "Outputs a new sequence containing all elements of the input sequence except for given element." }
 { $notes "This word uses equality comparison (" { $link = } ")." } ;
 
-HELP: remq
+HELP: remove-eq
 { $values { "elt" object } { "seq" sequence } { "newseq" "a new sequence" } }
 { $description "Outputs a new sequence containing all elements of the input sequence except those equal to the given element." }
 { $notes "This word uses identity comparison (" { $link eq? } ")." } ;
@@ -491,20 +502,20 @@ HELP: move
 { $description "Sets the element with index " { $snippet "m" } " to the element with index " { $snippet "n" } "." }
 { $side-effects "seq" } ;
 
-HELP: delete
-{ $values { "elt" object } { "seq" "a resizable mutable sequence" } }
-{ $description "Removes all elements equal to " { $snippet "elt" } " from " { $snippet "seq" } "." }
+HELP: remove!
+{ $values { "elt" object } { "seq" "a resizable mutable sequence" } { "elt" object } }
+{ $description "Removes all elements equal to " { $snippet "elt" } " from " { $snippet "seq" } " and returns " { $snippet "seq" } "." }
 { $notes "This word uses equality comparison (" { $link = } ")." }
 { $side-effects "seq" } ;
 
-HELP: delq
-{ $values { "elt" object } { "seq" "a resizable mutable sequence" } }
+HELP: remove-eq!
+{ $values { "elt" object } { "seq" "a resizable mutable sequence" } { "seq" "a resizable mutable sequence" } }
 { $description "Outputs a new sequence containing all elements of the input sequence except the given element." }
 { $notes "This word uses identity comparison (" { $link eq? } ")." }
 { $side-effects "seq" } ;
 
-HELP: delete-nth
-{ $values { "n" "a non-negative integer" } { "seq" "a resizable mutable sequence" } }
+HELP: remove-nth!
+{ $values { "n" "a non-negative integer" } { "seq" "a resizable mutable sequence" } { "seq" "a resizable mutable sequence" } }
 { $description "Removes the " { $snippet "n" } "th element from the sequence, shifting all other elements down and reducing its length by one." }
 { $side-effects "seq" } ;
 
@@ -526,6 +537,21 @@ HELP: suffix
 { $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq1" } "." }
 { $examples
     { $example "USING: prettyprint sequences ;" "{ 1 2 3 } 4 suffix ." "{ 1 2 3 4 }" }
+} ;
+
+HELP: suffix!
+{ $values { "seq" sequence } { "elt" object } { "seq" sequence } }
+{ $description "Modifiers a sequence in-place by adding " { $snippet "elt" } " to the end of " { $snippet "seq" } ". Outputs " { $snippet "seq" } "." }
+{ $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq" } "." }
+{ $examples
+    { $example "USING: prettyprint sequences ;" "V{ 1 2 3 } 4 suffix! ." "V{ 1 2 3 4 }" }
+} ;
+
+HELP: append!
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq1" sequence } }
+{ $description "Modifiers " { $snippet "seq1" } " in-place by adding the elements from " { $snippet "seq2" } " to the end and outputs " { $snippet "seq1" } "." }
+{ $examples
+    { $example "USING: prettyprint sequences ;" "V{ 1 2 3 } { 4 5 6 } append! ." "V{ 1 2 3 4 5 6 }" }
 } ;
 
 HELP: prefix
@@ -590,9 +616,9 @@ HELP: exchange
 { $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
 { $description "Exchanges the " { $snippet "m" } "th and " { $snippet "n" } "th elements of " { $snippet "seq" } "." } ;
 
-HELP: reverse-here
+HELP: reverse!
 { $values { "seq" "a mutable sequence" } }
-{ $description "Reverses a sequence in-place." }
+{ $description "Reverses a sequence in-place and outputs that sequence." }
 { $side-effects "seq" } ;
 
 HELP: padding
@@ -620,7 +646,7 @@ HELP: reverse
 { $values { "seq" sequence } { "newseq" "a new sequence" } }
 { $description "Outputs a new sequence having the same elements as " { $snippet "seq" } " but in reverse order." } ;
 
-{ reverse <reversed> reverse-here } related-words
+{ reverse <reversed> reverse! } related-words
 
 HELP: <reversed>
 { $values { "seq" sequence } { "reversed" "a new sequence" } }
@@ -861,7 +887,7 @@ HELP: tail?
 { $values { "seq" sequence } { "end" sequence } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "seq" } " ends with " { $snippet "end" } ". If " { $snippet "end" } " is longer than " { $snippet "seq" } ", this word outputs " { $link f } "." } ;
 
-{ remove remove-nth remq delq delete delete-nth } related-words
+{ remove remove-nth remove-eq remove-eq! remove! remove-nth! } related-words
 
 HELP: cut-slice
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "before-slice" sequence } { "after-slice" "a slice" } }
@@ -949,13 +975,12 @@ HELP: produce-as
 { $description "Calls " { $snippet "pred" } " repeatedly. If the predicate yields " { $link f } ", stops, otherwise, calls " { $snippet "quot" } " to yield a value. Values are accumulated and returned in a sequence of type " { $snippet "exemplar" } " at the end." }
 { $examples "See " { $link produce } " for examples." } ;
 
-HELP: sigma
+HELP: map-sum
 { $values { "seq" sequence } { "quot" quotation } { "n" number } }
 { $description "Like map sum, but without creating an intermediate sequence." }
 { $example
-    "! Find the sum of the squares [0,99]"
     "USING: math math.ranges sequences prettyprint ;"
-    "100 [1,b] [ sq ] sigma ."
+    "100 [1,b] [ sq ] map-sum ."
     "338350"
 } ;
 
@@ -1065,7 +1090,7 @@ HELP: harvest
     }
 } ;
 
-{ filter filter-here sift harvest } related-words
+{ filter filter! sift harvest } related-words
 
 HELP: set-first
 { $values
@@ -1416,7 +1441,7 @@ ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
 "Adding elements:"
 { $subsections prefix suffix insert-nth }
 "Removing elements:"
-{ $subsections remove remq remove-nth } ;
+{ $subsections remove remove-eq remove-nth } ;
 
 ARTICLE: "sequences-reshape" "Reshaping sequences"
 "A " { $emphasis "repetition" } " is a virtual sequence consisting of a single element repeated multiple times:"
@@ -1510,6 +1535,7 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
     map-reduce
     accumulate
     accumulate-as
+    accumulate!
     produce
     produce-as
 }
@@ -1551,7 +1577,7 @@ ARTICLE: "sequences-tests" "Testing sequences"
 "Testing indices:"
 { $subsections bounds-check? }
 "Testing if a sequence contains an object:"
-{ $subsections member? memq? }
+{ $subsections member? member-eq? }
 "Testing if a sequence contains a subsequence:"
 { $subsections head? tail? subseq? } ;
 
@@ -1590,19 +1616,20 @@ ARTICLE: "sequences-destructive-discussion" "When to use destructive operations"
 
 ARTICLE: "sequences-destructive" "Destructive operations"
 "Changing elements:"
-{ $subsections change-each change-nth }
+{ $subsections map! change-nth }
 "Deleting elements:"
 { $subsections
-    delete
-    delq
-    delete-nth
+    remove!
+    remove-eq!
+    remove-nth!
     delete-slice
     delete-all
-    filter-here
+    filter!
 }
 "Other destructive words:"
 { $subsections
-    reverse-here
+    reverse!
+    append!
     push-all
     move
     exchange
@@ -1611,16 +1638,16 @@ ARTICLE: "sequences-destructive" "Destructive operations"
 "Many operations have constructive and destructive variants:"
 { $table
     { "Constructive" "Destructive" }
-    { { $link suffix } { $link push } }
+    { { $link suffix } { $link suffix! } }
     { { $link but-last } { $link pop* } }
     { { $link unclip-last } { $link pop } }
-    { { $link remove } { $link delete } }
-    { { $link remq } { $link delq } }
-    { { $link remove-nth } { $link delete-nth } }
-    { { $link reverse } { $link reverse-here } }
-    { { $link append } { $link push-all } }
-    { { $link map } { $link change-each } }
-    { { $link filter } { $link filter-here } }
+    { { $link remove } { $link remove! } }
+    { { $link remove-eq } { $link remove-eq! } }
+    { { $link remove-nth } { $link remove-nth! } }
+    { { $link reverse } { $link reverse! } }
+    { { $link append } { $link append! } }
+    { { $link map } { $link map! } }
+    { { $link filter } { $link filter! } }
 }
 { $heading "Related Articles" }
 { $subsections

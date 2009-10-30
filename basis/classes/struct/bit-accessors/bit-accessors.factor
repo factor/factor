@@ -10,7 +10,7 @@ IN: classes.struct.bit-accessors
     [ 2^ 1 - ] bi@ swap bitnot bitand ;
 
 :: manipulate-bits ( offset bits step-quot -- quot shift-amount offset' bits' )
-    offset 8 /mod :> start-bit :> i
+    offset 8 /mod :> ( i start-bit )
     start-bit bits + 8 min :> end-bit
     start-bit end-bit ones-between :> mask
     end-bit start-bit - :> used-bits

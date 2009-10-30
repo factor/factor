@@ -501,9 +501,9 @@ M: double-2-rep rep-component-type drop double ;
 
 : c-type-interval ( c-type -- from to )
     {
-        { [ dup { float double } memq? ] [ drop -1/0. 1/0. ] }
-        { [ dup { char short int long longlong } memq? ] [ signed-interval ] }
-        { [ dup { uchar ushort uint ulong ulonglong } memq? ] [ unsigned-interval ] }
+        { [ dup { float double } member-eq? ] [ drop -1/0. 1/0. ] }
+        { [ dup { char short int long longlong } member-eq? ] [ signed-interval ] }
+        { [ dup { uchar ushort uint ulong ulonglong } member-eq? ] [ unsigned-interval ] }
     } cond ; foldable
 
 : c-type-clamp ( value c-type -- value' ) c-type-interval clamp ; inline

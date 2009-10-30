@@ -14,20 +14,21 @@ HELP: 3drop ( x y z -- )             $shuffle ;
 HELP: dup   ( x -- x x )             $shuffle ;
 HELP: 2dup  ( x y -- x y x y )       $shuffle ;
 HELP: 3dup  ( x y z -- x y z x y z ) $shuffle ;
-HELP: rot   ( x y z -- y z x )       $shuffle ;
-HELP: -rot  ( x y z -- z x y )       $shuffle ;
-HELP: dupd  ( x y -- x x y )         $shuffle ;
-HELP: swapd ( x y z -- y x z )       $shuffle ;
 HELP: nip   ( x y -- y )             $shuffle ;
 HELP: 2nip  ( x y z -- z )           $shuffle ;
-HELP: tuck  ( x y -- y x y )         $shuffle ;
 HELP: over  ( x y -- x y x )         $shuffle ;
 HELP: 2over                          $shuffle ;
 HELP: pick  ( x y z -- x y z x )     $shuffle ;
 HELP: swap  ( x y -- y x )           $shuffle ;
-HELP: spin                           $shuffle ;
-HELP: roll                           $shuffle ;
-HELP: -roll                          $shuffle ;
+
+HELP: spin                     $complex-shuffle ;
+HELP: rot   ( x y z -- y z x ) $complex-shuffle ;
+HELP: -rot  ( x y z -- z x y ) $complex-shuffle ;
+HELP: dupd  ( x y -- x x y )   $complex-shuffle ;
+HELP: swapd ( x y z -- y x z ) $complex-shuffle ;
+HELP: tuck  ( x y -- y x y )   $complex-shuffle ;
+HELP: roll  $complex-shuffle ;
+HELP: -roll $complex-shuffle ;
 
 HELP: datastack ( -- ds )
 { $values { "ds" array } }
@@ -821,10 +822,26 @@ HELP: assert=
 { $values { "a" object } { "b" object } }
 { $description "Throws an " { $link assert } " error if " { $snippet "a" } " does not equal " { $snippet "b" } "." } ;
 
-ARTICLE: "shuffle-words" "Shuffle words"
-"Shuffle words rearrange items at the top of the data stack. They control the flow of data between words that perform actions."
+ARTICLE: "shuffle-words-complex" "Complex shuffle words"
+"These shuffle words tend to make code difficult to read and to reason about. Code that uses them should almost always be rewritten using " { $link "locals" } " or " { $link "dataflow-combinators" } "."
 $nl
-"The " { $link "cleave-combinators" } ", " { $link "spread-combinators" } " and " { $link "apply-combinators" } " are closely related to shuffle words and should be used instead where possible because they can result in clearer code; also, see the advice in " { $link "cookbook-philosophy" } "."
+"Duplicating stack elements deep in the stack:"
+{ $subsections
+    dupd
+    tuck
+}
+"Permuting stack elements deep in the stack:"
+{ $subsections
+    swapd
+    rot
+    -rot
+    roll
+    -roll
+    spin
+} ;
+
+ARTICLE: "shuffle-words" "Shuffle words"
+"Shuffle words rearrange items at the top of the data stack as indicated by their stack effects. They provide simple data flow control between words. More complex data flow control is available with the " { $link "dataflow-combinators" } " and with " { $link "locals" } "."
 $nl
 "Removing stack elements:"
 { $subsections
@@ -839,21 +856,17 @@ $nl
     dup
     2dup
     3dup
-    dupd
     over
     2over
     pick
-    tuck
 }
 "Permuting stack elements:"
 { $subsections
     swap
-    swapd
-    rot
-    -rot
-    spin
-    roll
-    -roll
+}
+"There are additional, more complex stack shuffling words whose use is not recommended."
+{ $subsections
+    "shuffle-words-complex"
 } ;
 
 ARTICLE: "equality" "Equality"

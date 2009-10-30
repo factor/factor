@@ -102,7 +102,7 @@ M: ##phi prepare-insn
             [ rename-insn-defs ]
             [ rename-insn-uses ]
             [ [ useless-copy? ] [ ##phi? ] bi or not ] tri
-        ] filter-here
+        ] filter! drop
     ] each-basic-block ;
 
 : destruct-ssa ( cfg -- cfg' )

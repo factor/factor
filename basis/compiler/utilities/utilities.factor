@@ -36,13 +36,11 @@ yield-hook [ [ ] ] initialize
 : penultimate ( seq -- elt ) [ length 2 - ] keep nth ;
 
 :: compress-path ( source assoc -- destination )
-    [let | destination [ source assoc at ] |
-        source destination = [ source ] [
-            [let | destination' [ destination assoc compress-path ] |
-                destination' destination = [
-                    destination' source assoc set-at
-                ] unless
-                destination'
-            ]
-        ] if
-    ] ;
+    source assoc at :> destination
+    source destination = [ source ] [
+        destination assoc compress-path :> destination'
+        destination' destination = [
+            destination' source assoc set-at
+        ] unless
+        destination'
+    ] if ;
