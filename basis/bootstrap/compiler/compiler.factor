@@ -4,7 +4,7 @@ USING: accessors cpu.architecture vocabs.loader system
 sequences namespaces parser kernel kernel.private classes
 classes.private arrays hashtables vectors classes.tuple sbufs
 hashtables.private sequences.private math classes.tuple.private
-growable namespaces.private assocs words command-line vocabs io
+growable namespaces.private shuffle assocs words command-line vocabs io
 io.encodings.string libc splitting math.parser memory compiler.units
 math.order quotations quotations.private assocs.private ;
 FROM: compiler => enable-optimizer ;
