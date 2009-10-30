@@ -32,7 +32,7 @@ PREDICATE: fry-specifier < word { _ @ } member-eq? ;
 
 GENERIC: count-inputs ( quot -- n )
 
-M: callable count-inputs [ count-inputs ] sigma ;
+M: callable count-inputs [ count-inputs ] map-sum ;
 M: fry-specifier count-inputs drop 1 ;
 M: object count-inputs drop 0 ;
 

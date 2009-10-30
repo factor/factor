@@ -162,7 +162,7 @@ IN: compiler.cfg.builder.tests
 
 : count-insns ( quot insn-check -- ? )
     [ test-mr [ instructions>> ] map ] dip
-    '[ _ count ] sigma ; inline
+    '[ _ count ] map-sum ; inline
 
 : contains-insn? ( quot insn-check -- ? )
     count-insns 0 > ; inline

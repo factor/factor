@@ -26,7 +26,7 @@ M: ##box-alien allocation-size* drop 4 cells ;
 M: ##box-displaced-alien allocation-size* drop 4 cells ;
 
 : allocation-size ( bb -- n )
-    instructions>> [ ##allocation? ] filter [ allocation-size* ] sigma ;
+    instructions>> [ ##allocation? ] filter [ allocation-size* ] map-sum ;
 
 : insert-gc-check ( bb -- )
     dup dup '[

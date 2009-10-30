@@ -57,7 +57,7 @@ IN: project-euler.common
 PRIVATE>
 
 : alpha-value ( str -- n )
-    >lower [ CHAR: a - 1 + ] sigma ;
+    >lower [ CHAR: a - 1 + ] map-sum ;
 
 : cartesian-product ( seq1 seq2 -- seq1xseq2 )
     [ [ 2array ] with map ] curry map concat ;
