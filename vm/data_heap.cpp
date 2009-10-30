@@ -9,7 +9,10 @@ void factor_vm::init_card_decks()
 	decks_offset = (cell)data->decks - addr_to_deck(data->start);
 }
 
-data_heap::data_heap(cell young_size_, cell aging_size_, cell tenured_size_)
+data_heap::data_heap(cell young_size_,
+	cell aging_size_,
+	cell tenured_size_,
+	cell promotion_threshold_)
 {
 	young_size_ = align(young_size_,deck_size);
 	aging_size_ = align(aging_size_,deck_size);
@@ -18,15 +21,12 @@ data_heap::data_heap(cell young_size_, cell aging_size_, cell tenured_size_)
 	young_size = young_size_;
 	aging_size = aging_size_;
 	tenured_size = tenured_size_;
+	promotion_threshold = promotion_threshold_;
 
-	cell total_size = young_size + 2 * aging_size + tenured_size;
-
-	total_size += deck_size;
-
+	cell total_size = young_size + 2 * aging_size + tenured_size + deck_size;
 	seg = new segment(total_size,false);
 
 	cell cards_size = addr_to_card(total_size);
-
 	cards = new card[cards_size];
 	cards_end = cards + cards_size;
 	memset(cards,0,cards_size);
@@ -62,7 +62,10 @@ data_heap::~data_heap()
 data_heap *data_heap::grow(cell requested_bytes)
 {
 	cell new_tenured_size = (tenured_size * 2) + requested_bytes;
-	return new data_heap(young_size,aging_size,new_tenured_size);
+	return new data_heap(young_size,
+		aging_size,
+		new_tenured_size,
+		promotion_threshold * 1.25);
 }
 
 template<typename Generation> void data_heap::clear_cards(Generation *gen)
@@ -105,9 +108,9 @@ void factor_vm::set_data_heap(data_heap *data_)
 	init_card_decks();
 }
 
-void factor_vm::init_data_heap(cell young_size, cell aging_size, cell tenured_size)
+void factor_vm::init_data_heap(cell young_size, cell aging_size, cell tenured_size, cell promotion_threshold)
 {
-	set_data_heap(new data_heap(young_size,aging_size,tenured_size));
+	set_data_heap(new data_heap(young_size,aging_size,tenured_size,promotion_threshold));
 }
 
 /* Size of the object pointed to by a tagged pointer */
@@ -214,8 +217,8 @@ data_heap_room factor_vm::data_room()
 	room.tenured_size             = data->tenured->size;
 	room.tenured_occupied         = data->tenured->occupied_space();
 	room.tenured_total_free       = data->tenured->free_space();
-	room.tenured_contiguous_free  = data->tenured->free_blocks.largest_free_block();
-	room.tenured_free_block_count = data->tenured->free_blocks.free_block_count;
+	room.tenured_contiguous_free  = data->tenured->largest_free_block();
+	room.tenured_free_block_count = data->tenured->free_block_count();
 	room.cards                    = data->cards_end - data->cards;
 	room.decks                    = data->decks_end - data->decks;
 	room.mark_stack               = data->tenured->mark_stack.capacity();
