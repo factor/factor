@@ -445,16 +445,16 @@ M: ebnf-sequence build-locals ( code ast -- code )
       drop 
     ] [ 
       [
-        "FROM: locals => [let* ; FROM: sequences => nth ; [let* | " %
-          dup length swap [
-            dup ebnf-var? [
+        "FROM: locals => [let :> ; FROM: sequences => nth ; [let " %
+          dup length [
+            over ebnf-var? [
+              " " % # " over nth :> " %
               name>> % 
-              " [ " % # " over nth ] " %
             ] [
               2drop
             ] if
           ] 2each
-          " | " %
+          " " %
           %  
           " nip ]" %     
       ] "" make 
@@ -463,9 +463,9 @@ M: ebnf-sequence build-locals ( code ast -- code )
 
 M: ebnf-var build-locals ( code ast -- )
   [
-    "FROM: locals => [let* ; FROM: kernel => dup nip ; [let* | " %
-    name>> % " [ dup ] " %
-    " | " %
+    "FROM: locals => [let :> ; FROM: kernel => dup nip ; [let " %
+    " dup :> " % name>> %
+    " " %
     %  
     " nip ]" %     
   ] "" make ;
@@ -547,12 +547,12 @@ PRIVATE>
 SYNTAX: <EBNF
   "EBNF>"
   reset-tokenizer parse-multiline-string parse-ebnf main swap at  
-  parsed reset-tokenizer ;
+  suffix! reset-tokenizer ;
 
 SYNTAX: [EBNF
   "EBNF]"
   reset-tokenizer parse-multiline-string ebnf>quot nip 
-  parsed \ call parsed reset-tokenizer ;
+  suffix! \ call suffix! reset-tokenizer ;
 
 SYNTAX: EBNF: 
   reset-tokenizer CREATE-WORD dup ";EBNF" parse-multiline-string  

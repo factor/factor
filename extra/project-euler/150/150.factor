@@ -54,17 +54,16 @@ IN: project-euler.150
     0 1000 [1,b] [ [ next ] replicate partial-sums ] map nip ;
 
 :: (euler150) ( m -- n )
-    [let | table [ sums-triangle ] |
-        m [| x |
-            x 1 + [| y |
-                m x - [0,b) [| z |
-                    x z + table nth-unsafe
-                    [ y z + 1 + swap nth-unsafe ]
-                    [ y        swap nth-unsafe ] bi -
-                ] map partial-sum-infimum
-            ] map-infimum
+    sums-triangle :> table
+    m [| x |
+        x 1 + [| y |
+            m x - [0,b) [| z |
+                x z + table nth-unsafe
+                [ y z + 1 + swap nth-unsafe ]
+                [ y        swap nth-unsafe ] bi -
+            ] map partial-sum-infimum
         ] map-infimum
-    ] ;
+    ] map-infimum ;
 
 HINTS: (euler150) fixnum ;
 

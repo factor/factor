@@ -470,7 +470,7 @@ SYMBOL: nc-buttons
 : handle-wm-ncbutton ( hWnd uMsg wParam lParam -- )
     2drop nip
     message>button nc-buttons get
-    swap [ push ] [ delete ] if ;
+    swap [ push ] [ remove! drop ] if ;
 
 : mouse-wheel ( wParam -- array ) >lo-hi [ sgn neg ] map ;
 
@@ -498,13 +498,13 @@ SYMBOL: nc-buttons
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
     [
         over set-capture
-        dup message>button drop nc-buttons get delete
+        dup message>button drop nc-buttons get remove! drop
     ] 2dip prepare-mouse send-button-down ;
 
 : handle-wm-buttonup ( hWnd uMsg wParam lParam -- )
     mouse-captured get [ release-capture ] when
     pick message>button drop dup nc-buttons get member? [
-        nc-buttons get delete 4drop
+        nc-buttons get remove! drop 4drop
     ] [
         drop prepare-mouse send-button-up
     ] if ;
@@ -537,7 +537,7 @@ SYMBOL: nc-buttons
     COLOR_BTNFACE GetSysColor RGB>color ;
 
 : ?make-glass ( world hwnd -- )
-    over window-controls>> textured-background swap memq? [
+    over window-controls>> textured-background swap member-eq? [
         composition-enabled? [
             full-window-margins DwmExtendFrameIntoClientArea drop
             T{ rgba f 0.0 0.0 0.0 0.0 }

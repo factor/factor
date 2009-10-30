@@ -97,7 +97,7 @@ MACRO: pack ( str -- quot )
     packed-length-table at ; inline
 
 : packed-length ( str -- n )
-    [ ch>packed-length ] sigma ;
+    [ ch>packed-length ] map-sum ;
  
 : pack-native ( seq str -- seq )
     '[ _ _ pack ] with-native-endian ; inline

@@ -192,7 +192,7 @@ MEMO: array-capacity-interval ( -- interval )
 : interval-sq ( i1 -- i2 ) dup interval* ;
 
 : special-interval? ( interval -- ? )
-    { empty-interval full-interval } memq? ;
+    { empty-interval full-interval } member-eq? ;
 
 : interval-singleton? ( int -- ? )
     dup special-interval? [

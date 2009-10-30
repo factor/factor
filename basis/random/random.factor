@@ -19,7 +19,7 @@ M: object random-bytes* ( n tuple -- byte-array )
     [ pick '[ _ random-32* 4 >le _ push-all ] times ]
     [
         over zero?
-        [ 2drop ] [ random-32* 4 >le swap head over push-all ] if
+        [ 2drop ] [ random-32* 4 >le swap head append! ] if
     ] bi-curry bi* ;
 
 M: object random-32* ( tuple -- r ) 4 swap random-bytes* le> ;
@@ -82,7 +82,7 @@ PRIVATE>
     '[ _ dup random _ _ next-sample ] replicate ;
 
 : delete-random ( seq -- elt )
-    [ length random-integer ] keep [ nth ] 2keep delete-nth ;
+    [ length random-integer ] keep [ nth ] 2keep remove-nth! drop ;
 
 : with-random ( tuple quot -- )
     random-generator swap with-variable ; inline

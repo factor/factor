@@ -15,7 +15,7 @@ IN: benchmark.simd-1
     iota [ <point> ] float-4-array{ } map-as ; inline
 
 : normalize-points ( points -- )
-    [ normalize ] change-each ; inline
+    [ normalize ] map! drop ; inline
 
 : max-points ( points -- point )
     [ ] [ vmax ] map-reduce ; inline

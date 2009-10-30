@@ -34,7 +34,7 @@ M: graph num-vertices
     vertices length ;
 
 M: graph num-edges
-   [ vertices ] [ '[ _ adjlist length ] sigma ] bi ;
+   [ vertices ] [ '[ _ adjlist length ] map-sum ] bi ;
 
 M: graph adjlist
     [ vertices ] [ swapd '[ _ swap _ adj? ] filter ] bi ;

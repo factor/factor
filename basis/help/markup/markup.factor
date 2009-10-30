@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes colors colors.constants
-combinators definitions definitions.icons effects fry generic
-hashtables help.stylesheet help.topics io io.styles kernel make
-math namespaces parser present prettyprint
+combinators combinators.smart definitions definitions.icons effects
+fry generic hashtables help.stylesheet help.topics io io.styles
+kernel make math namespaces parser present prettyprint
 prettyprint.stylesheet quotations see sequences sets slots
 sorting splitting strings vectors vocabs vocabs.loader words
 words.symbol ;
@@ -398,7 +398,12 @@ M: f ($instance)
 
 : $shuffle ( element -- )
     drop
-    "Shuffle word. Re-arranges the stack according to the stack effect pattern." $description ;
+    "Shuffle word. Rearranges the top of the datastack as indicated in the stack effect pattern." $description ;
+
+: $complex-shuffle ( element -- )
+    drop
+    "Shuffle word. Rearranges the top of the datastack as indicated in the stack effect pattern." $description
+    { "The data flow represented by this shuffle word can be more clearly expressed using " { $link "locals" } "." } $deprecated ;
 
 : $low-level-note ( children -- )
     drop

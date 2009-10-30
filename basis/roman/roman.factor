@@ -43,7 +43,7 @@ PRIVATE>
 : >ROMAN ( n -- str ) >roman >upper ;
 
 : roman> ( str -- n )
-    >lower [ roman>= ] monotonic-split [ (roman>) ] sigma ;
+    >lower [ roman>= ] monotonic-split [ (roman>) ] map-sum ;
 
 <PRIVATE
 
@@ -69,4 +69,4 @@ ROMAN-OP: *
 ROMAN-OP: /i
 ROMAN-OP: /mod
 
-SYNTAX: ROMAN: scan roman> parsed ;
+SYNTAX: ROMAN: scan roman> suffix! ;

@@ -332,13 +332,13 @@ DEFER: [bind-uniform-tuple]
     ] [
         { [ ] }
         name "." append 1array
-    ] if* :> name-prefixes :> quot-prefixes
+    ] if* :> ( quot-prefixes name-prefixes )
     type all-uniform-tuple-slots :> uniforms
 
     texture-unit quot-prefixes name-prefixes [| quot-prefix name-prefix |
         uniforms name-prefix [bind-uniform-tuple]
         quot-prefix prepend
-    ] 2map :> value-cleave :> texture-unit'
+    ] 2map :> ( texture-unit' value-cleave )
 
     texture-unit' 
     value>>-quot { value-cleave 2cleave } append ;
@@ -356,7 +356,7 @@ DEFER: [bind-uniform-tuple]
     } cond ;
 
 :: [bind-uniform-tuple] ( texture-unit uniforms prefix -- texture-unit' quot )
-    texture-unit uniforms [ prefix [bind-uniform] ] map :> uniforms-cleave :> texture-unit'
+    texture-unit uniforms [ prefix [bind-uniform] ] map :> ( texture-unit' uniforms-cleave )
 
     texture-unit'
     { uniforms-cleave 2cleave } >quotation ;

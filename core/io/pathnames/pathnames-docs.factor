@@ -101,15 +101,15 @@ HELP: normalize-path
   }
 } ;
 
-HELP: (normalize-path)
+HELP: absolute-path
 { $values
     { "path" "a pathname string" }
     { "path'" "a pathname string" }
 }
 { $description "Prepends the " { $link current-directory } " to the pathname and resolves a " { $snippet "resource:" } " prefix, if present." }
-{ $notes "On Windows NT platforms, this word does not prepend the Unicode path prefix." } ;
+{ $notes "This word is exaclty the same as " { $link normalize-path } ", except on Windows NT platforms, where it does not prepend the Unicode path prefix. Most code should call " { $link normalize-path } " instead." } ;
 
-HELP: canonicalize-path
+HELP: resolve-symlinks
 { $values { "path" "a pathname string" } { "path'" "a new pathname string" } }
 { $description "Outputs a path where none of the path components are symlinks. This word is useful for determining the actual path on disk where a file is stored; the root of this absolute path is a mount point in the file-system." }
 { $notes "Most code should not need to call this word except in very special circumstances. One use case is finding the actual file-system on which a file is stored." } ;
@@ -150,11 +150,11 @@ ARTICLE: "io.pathnames" "Pathnames"
 }
 "Literal pathnames:"
 { $subsections POSTPONE: P" }
-"Low-level words:"
-{ $subsections
-    normalize-path
-    (normalize-path)
-    canonicalize-path
-} ;
+"Normalizing pathnames for use with native APIs:"
+{ $subsections normalize-path }
+"Outputting an absolute path from a path:"
+{ $subsection absolute-path }
+"Removing symlinks from a path:"
+{ $subsections resolve-symlinks } ;
 
 ABOUT: "io.pathnames"

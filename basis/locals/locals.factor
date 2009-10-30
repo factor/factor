@@ -7,15 +7,11 @@ IN: locals
 
 SYNTAX: :>
     scan locals get [ :>-outside-lambda-error ] unless*
-    [ make-local ] bind <def> parsed ;
+    parse-def suffix! ;
 
-SYNTAX: [| parse-lambda over push-all ;
+SYNTAX: [| parse-lambda append! ;
 
-SYNTAX: [let parse-let over push-all ;
-
-SYNTAX: [let* parse-let* over push-all ;
-
-SYNTAX: [wlet parse-wlet over push-all ;
+SYNTAX: [let parse-let append! ;
 
 SYNTAX: :: (::) define-declared ;
 

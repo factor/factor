@@ -10,7 +10,7 @@ tips [ V{ } clone ] initialize
 
 TUPLE: tip < identity-tuple content loc ;
 
-M: tip forget* tips get delq ;
+M: tip forget* tips get remove-eq! drop ;
 
 M: tip where loc>> ;
 

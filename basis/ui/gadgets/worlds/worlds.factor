@@ -120,7 +120,7 @@ M: world request-focus-on ( child gadget -- )
         V{ } clone >>window-resources ;
 
 : initial-background-color ( attributes -- color )
-    window-controls>> textured-background swap memq?
+    window-controls>> textured-background swap member-eq?
     [ T{ rgba f 0.0 0.0 0.0 0.0 } ]
     [ T{ rgba f 1.0 1.0 1.0 1.0 } ] if ;
 
@@ -151,8 +151,8 @@ M: world focusable-child* children>> [ t ] [ first ] if-empty ;
 M: world children-on nip children>> ;
 
 M: world remove-gadget
-    2dup layers>> memq?
-    [ layers>> delq ] [ call-next-method ] if ;
+    2dup layers>> member-eq?
+    [ layers>> remove-eq! drop ] [ call-next-method ] if ;
 
 SYMBOL: flush-layout-cache-hook
 
