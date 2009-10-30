@@ -10,10 +10,6 @@ DEFER: 3dip
 ! Stack stuff
 : spin ( x y z -- z y x ) swap rot ; inline
 
-: roll ( x y z t -- y z t x ) [ rot ] dip swap ; inline
-
-: -roll ( x y z t -- t x y z ) swap [ -rot ] dip ; inline
-
 : 2over ( x y z -- x y z x y ) pick pick ; inline
 
 : clear ( -- ) { } set-datastack ;
@@ -63,9 +59,9 @@ DEFER: if
 
 : dip ( x quot -- x ) swap [ call ] dip ;
 
-: 2dip ( x y quot -- x y ) -rot [ call ] 2dip ;
+: 2dip ( x y quot -- x y ) swap [ dip ] dip ;
 
-: 3dip ( x y z quot -- x y z ) -roll [ call ] 3dip ;
+: 3dip ( x y z quot -- x y z ) swap [ 2dip ] dip ;
 
 : 4dip ( w x y z quot -- w x y z ) swap [ 3dip ] dip ; inline
 
