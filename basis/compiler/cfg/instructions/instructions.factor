@@ -417,12 +417,12 @@ def: dst/scalar-rep
 use: src
 literal: rep ;
 
-PURE-INSN: ##horizontal-shl-vector
+PURE-INSN: ##horizontal-shl-vector-imm
 def: dst
 use: src1
 literal: src2 rep ;
 
-PURE-INSN: ##horizontal-shr-vector
+PURE-INSN: ##horizontal-shr-vector-imm
 def: dst
 use: src1
 literal: src2 rep ;
@@ -461,6 +461,16 @@ PURE-INSN: ##not-vector
 def: dst
 use: src
 literal: rep ;
+
+PURE-INSN: ##shl-vector-imm
+def: dst
+use: src1
+literal: src2 rep ;
+
+PURE-INSN: ##shr-vector-imm
+def: dst
+use: src1
+literal: src2 rep ;
 
 PURE-INSN: ##shl-vector
 def: dst

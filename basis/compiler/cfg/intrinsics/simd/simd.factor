@@ -55,9 +55,14 @@ MACRO: if-literals-match ( quots -- )
 : [unary/param] ( quot -- quot' )
     '[ [ -2 inc-d ds-pop ] 2dip @ ds-push ] ; inline
 
-: emit-horizontal-shift ( node quot -- )
+: emit-shift-vector-imm-op ( node quot -- )
     [unary/param]
     { [ integer? ] [ representation? ] } if-literals-match ; inline
+
+:: emit-shift-vector-op ( node imm-quot var-quot -- )
+    node node-input-infos 2 tail-slice* first literal>> integer?
+    [ node imm-quot emit-shift-vector-imm-op ]
+    [ node var-quot emit-binary-vector-op ] if ; inline
 
 : emit-gather-vector-2 ( node -- )
     [ ^^gather-vector-2 ] emit-binary-vector-op ;
@@ -241,6 +246,14 @@ MACRO: if-literals-match ( quots -- )
                 src zero rep ^^merge-vector-head
             ]
         }
+        {
+            [ rep widen-vector-rep %shr-vector-imm-reps member? ]
+            [
+                src src rep ^^merge-vector-head
+                rep rep-component-type
+                heap-size 8 * rep widen-vector-rep ^^shr-vector-imm
+            ]
+        }
         [
             rep ^^zero-vector :> zero
             zero src rep cc> ^^compare-vector :> sign
@@ -266,6 +279,14 @@ MACRO: if-literals-match ( quots -- )
             [
                 rep ^^zero-vector :> zero
                 src zero rep ^^merge-vector-tail
+            ]
+        }
+        {
+            [ rep widen-vector-rep %shr-vector-imm-reps member? ]
+            [
+                src src rep ^^merge-vector-tail
+                rep rep-component-type
+                heap-size 8 * rep widen-vector-rep ^^shr-vector-imm
             ]
         }
         [
