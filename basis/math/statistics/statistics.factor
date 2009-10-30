@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman, Michael Judge.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators kernel math math.analysis
-math.functions math.order sequences sorting locals
-sequences.private assocs fry ;
+USING: arrays combinators kernel math math.functions
+math.order sequences sorting locals sequences.private
+assocs fry ;
 IN: math.statistics
 
 : mean ( seq -- x )
@@ -33,7 +33,7 @@ IN: math.statistics
             [ i seq nth-unsafe x < ] [ i 1 + i! ] while
             [ x j seq nth-unsafe < ] [ j 1 - j! ] while
             i j <= [
-                i j seq exchange
+                i j seq exchange-unsafe
                 i 1 + i!
                 j 1 - j!
             ] when
@@ -45,7 +45,8 @@ IN: math.statistics
     k seq nth ; inline
 
 : lower-median ( seq -- elt )
-    dup dup length odd? [ midpoint@ ] [ midpoint@ 1 - ] if kth-smallest ;
+    [ ] [ ] [ length odd? ] tri
+    [ midpoint@ ] [ midpoint@ 1 - ] if kth-smallest ;
 
 : upper-median ( seq -- elt )
     dup midpoint@ kth-smallest ;
@@ -54,13 +55,35 @@ IN: math.statistics
     [ lower-median ] [ upper-median ] bi ;
 
 : median ( seq -- x )
-    dup length odd? [ lower-median ] [ medians + 2 / ] if ;
+    [ ] [ length odd? ] bi [ lower-median ] [ medians + 2 / ] if ;
 
-: frequency ( seq -- hashtable )
-    H{ } clone [ '[ _ inc-at ] each ] keep ;
+<PRIVATE
+
+: (sequence>assoc) ( seq quot assoc -- assoc )
+    [ swap curry each ] keep ; inline
+
+PRIVATE>
+
+: sequence>assoc* ( assoc seq quot: ( obj assoc -- ) -- assoc )
+    rot (sequence>assoc) ; inline
+
+: sequence>assoc ( seq quot: ( obj assoc -- ) exemplar -- assoc )
+    clone (sequence>assoc) ; inline
+
+: sequence>hashtable ( seq quot: ( obj hashtable -- ) -- hashtable )
+    H{ } sequence>assoc ; inline
+
+: histogram* ( hashtable seq -- hashtable )
+    [ inc-at ] sequence>assoc* ;
+
+: histogram ( seq -- hashtable )
+    [ inc-at ] sequence>hashtable ;
+
+: collect-values ( seq quot: ( obj hashtable -- ) -- hash )
+    '[ [ dup @ ] dip push-at ] sequence>hashtable ; inline
 
 : mode ( seq -- x )
-    frequency >alist
+    histogram >alist
     [ ] [ [ [ second ] bi@ > ] 2keep ? ] map-reduce first ;
 
 : minmax ( seq -- min max )
