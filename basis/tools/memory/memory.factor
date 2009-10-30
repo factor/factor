@@ -181,8 +181,8 @@ TUPLE: gc-stats collections times ;
 : aggregate-stats-table ( stats -- table )
     [ { "Total collections:" "Total GC time:" } ] dip
     values
-    [ [ collections>> ] sigma ]
-    [ [ times>> sum ] sigma micros>string ]
+    [ [ collections>> ] map-sum ]
+    [ [ times>> sum ] map-sum micros>string ]
     bi 2array zip ;
 
 PRIVATE>
