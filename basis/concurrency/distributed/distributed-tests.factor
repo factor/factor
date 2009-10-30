@@ -18,9 +18,9 @@ IN: concurrency.distributed.tests
 [ ] [
     [
         receive first2 [ 3 + ] dip send
-        "thread-a" unregister-process
+        "thread-a" unregister-remote-thread
     ] "Thread A" spawn
-    "thread-a" swap register-process
+    "thread-a" register-remote-thread
 ] unit-test
 
 [ 8 ] [
