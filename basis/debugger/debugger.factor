@@ -22,7 +22,7 @@ M: source-file-error error-help error>> error-help ;
 
 GENERIC: error. ( error -- )
 
-M: object error. . ;
+M: object error. short. ;
 
 M: string error. print ;
 
