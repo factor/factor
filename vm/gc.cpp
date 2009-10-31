@@ -271,50 +271,30 @@ VM_C_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *pare
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
  */
-object *factor_vm::allot_object(header header, cell size)
+object *factor_vm::allot_large_object(header header, cell size)
 {
-#ifdef GC_DEBUG
-	if(!gc_off)
-		primitive_full_gc();
-#endif
-
-	object *obj;
-
-	/* If the object is smaller than the nursery, allocate it in the nursery,
-	after a GC if needed */
-	if(size < nursery.size)
+	/* If tenured space does not have enough room, collect and compact */
+	if(!data->tenured->can_allot_p(size))
 	{
-		/* If there is insufficient room, collect the nursery */
-		if(nursery.here + size > nursery.end)
-			primitive_minor_gc();
+		primitive_compact_gc();
 
-		obj = nursery.allot(size);
-	}
-	else
-	{
-		/* If tenured space does not have enough room, collect and compact */
+		/* If it still won't fit, grow the heap */
 		if(!data->tenured->can_allot_p(size))
 		{
-			primitive_compact_gc();
-
-			/* If it still won't fit, grow the heap */
-			if(!data->tenured->can_allot_p(size))
-			{
-				gc(collect_growing_heap_op,
-					size, /* requested size */
-					true /* trace contexts? */);
-			}
+			gc(collect_growing_heap_op,
+				size, /* requested size */
+				true /* trace contexts? */);
 		}
-
-		obj = data->tenured->allot(size);
-
-		/* Allows initialization code to store old->new pointers
-		without hitting the write barrier in the common case of
-		a nursery allocation */
-		char *start = (char *)obj;
-		for(cell offset = 0; offset < size; offset += card_size)
-			write_barrier((cell *)(start + offset));
 	}
+
+	object *obj = data->tenured->allot(size);
+
+	/* Allows initialization code to store old->new pointers
+	without hitting the write barrier in the common case of
+	a nursery allocation */
+	char *start = (char *)obj;
+	for(cell offset = 0; offset < size; offset += card_size)
+		write_barrier((cell *)(start + offset));
 
 	obj->h = header;
 	return obj;
