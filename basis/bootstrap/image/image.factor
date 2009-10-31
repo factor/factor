@@ -1,14 +1,16 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays byte-arrays generic hashtables hashtables.private
-io io.binary io.files io.encodings.binary io.pathnames kernel
-kernel.private math namespaces make parser prettyprint sequences
-strings sbufs vectors words quotations assocs system layouts splitting
-grouping growable classes classes.builtin classes.tuple
-classes.tuple.private vocabs vocabs.loader source-files definitions
-debugger quotations.private combinators math.order math.private
-accessors slots.private generic.single.private compiler.units
-compiler.constants fry bootstrap.image.syntax ;
+USING: alien arrays byte-arrays generic hashtables
+hashtables.private io io.binary io.files io.encodings.binary
+io.pathnames kernel kernel.private math namespaces make parser
+prettyprint sequences strings sbufs vectors words quotations
+assocs system layouts splitting grouping growable classes
+classes.builtin classes.tuple classes.tuple.private vocabs
+vocabs.loader source-files definitions debugger
+quotations.private combinators combinators.short-circuit
+math.order math.private accessors slots.private
+generic.single.private compiler.units compiler.constants fry
+bootstrap.image.syntax ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
@@ -38,7 +40,7 @@ IN: bootstrap.image
 
 ! Object cache; we only consider numbers equal if they have the
 ! same type
-TUPLE: eql-wrapper obj ;
+TUPLE: eql-wrapper { obj read-only } ;
 
 C: <eql-wrapper> eql-wrapper
 
@@ -47,25 +49,22 @@ M: eql-wrapper hashcode* obj>> hashcode* ;
 GENERIC: (eql?) ( obj1 obj2 -- ? )
 
 : eql? ( obj1 obj2 -- ? )
-    [ (eql?) ] [ [ class ] bi@ = ] 2bi and ;
+    { [ [ class ] bi@ = ] [ (eql?) ] } 2&& ;
 
-M: integer (eql?) = ;
+M: fixnum (eql?) eq? ;
 
-M: float (eql?)
-    over float? [ fp-bitwise= ] [ 2drop f ] if ;
+M: bignum (eql?) = ;
 
-M: sequence (eql?)
-    over sequence? [
-        2dup [ length ] bi@ =
-        [ [ eql? ] 2all? ] [ 2drop f ] if
-    ] [ 2drop f ] if ;
+M: float (eql?) fp-bitwise= ;
+
+M: sequence (eql?) 2dup [ length ] bi@ = [ [ eql? ] 2all? ] [ 2drop f ] if ;
 
 M: object (eql?) = ;
 
 M: eql-wrapper equal?
     over eql-wrapper? [ [ obj>> ] bi@ eql? ] [ 2drop f ] if ;
 
-TUPLE: eq-wrapper obj ;
+TUPLE: eq-wrapper { obj read-only } ;
 
 C: <eq-wrapper> eq-wrapper
 
