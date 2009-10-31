@@ -1607,14 +1607,26 @@ ARTICLE: "sequences-trimming" "Trimming sequences"
 { $subsections trim-slice trim-head-slice trim-tail-slice } ;
 
 ARTICLE: "sequences-destructive-discussion" "When to use destructive operations"
-"Constructive (non-destructive) operations should be preferred where possible because code without side-effects is usually more re-usable and easier to reason about. There are two main reasons to use destructive operations:"
+"Constructive (non-destructive) operations should be preferred where possible because code without side-effects is usually more reusable and easier to reason about. There are two main reasons to use destructive operations:"
 { $list
     "For the side-effect. Some code is simpler to express with destructive operations; constructive operations return new objects, and sometimes ``threading'' the objects through the program manually complicates stack shuffling."
-    { "As an optimization. Some code can be written to use constructive operations, however would suffer from worse performance. An example is a loop which adds an element to a sequence on each iteration; one could use either " { $link suffix } " or " { $link push } ", however the former copies the entire sequence first, which would cause the loop to run in quadratic time." }
+    { "As an optimization. Some code written to use constructive operations suffers from worse performance. An example is a loop which adds an element to a sequence on each iteration. Either " { $link suffix } " or " { $link suffix! } " could be used; however, the former copies the entire sequence each time, which would cause the loop to run in quadratic time." }
 }
 "The second reason is much weaker than the first one. In particular, many combinators (see " { $link map } ", " { $link produce } " and " { $link "namespaces-make" } ") as well as more advanced data structures (such as " { $vocab-link "persistent.vectors" } ") alleviate the need for explicit use of side effects." ;
 
 ARTICLE: "sequences-destructive" "Destructive operations"
+"Many operations have constructive and destructive variants:"
+{ $table
+    { "Constructive" "Destructive" }
+    { { $link suffix } { $link suffix! } }
+    { { $link remove } { $link remove! } }
+    { { $link remove-eq } { $link remove-eq! } }
+    { { $link remove-nth } { $link remove-nth! } }
+    { { $link reverse } { $link reverse! } }
+    { { $link append } { $link append! } }
+    { { $link map } { $link map! } }
+    { { $link filter } { $link filter! } }
+}
 "Changing elements:"
 { $subsections map! change-nth }
 "Deleting elements:"
@@ -1630,35 +1642,20 @@ ARTICLE: "sequences-destructive" "Destructive operations"
 { $subsections
     reverse!
     append!
-    push-all
     move
     exchange
     copy
-}
-"Many operations have constructive and destructive variants:"
-{ $table
-    { "Constructive" "Destructive" }
-    { { $link suffix } { $link suffix! } }
-    { { $link but-last } { $link pop* } }
-    { { $link unclip-last } { $link pop } }
-    { { $link remove } { $link remove! } }
-    { { $link remove-eq } { $link remove-eq! } }
-    { { $link remove-nth } { $link remove-nth! } }
-    { { $link reverse } { $link reverse! } }
-    { { $link append } { $link append! } }
-    { { $link map } { $link map! } }
-    { { $link filter } { $link filter! } }
 }
 { $heading "Related Articles" }
 { $subsections
     "sequences-destructive-discussion"
     "sequences-stacks"
 }
-{ $see-also set-nth push pop } ;
+{ $see-also set-nth push push-all pop pop* } ;
 
 ARTICLE: "sequences-stacks" "Treating sequences as stacks"
 "The classical stack operations, modifying a sequence in place:"
-{ $subsections push pop pop* }
+{ $subsections push push-all pop pop* }
 { $see-also empty? } ;
 
 ARTICLE: "sequences-comparing" "Comparing sequences"
