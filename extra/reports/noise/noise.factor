@@ -10,7 +10,6 @@ IN: reports.noise
 : badness ( word -- n )
     H{
         { -nrot 5 }
-        { -roll 4 }
         { -rot 3 }
         { bi@ 1 }
         { 2curry 1 }
@@ -54,7 +53,6 @@ IN: reports.noise
         { nwith 4 }
         { over 2 }
         { pick 4 }
-        { roll 4 }
         { rot 3 }
         { spin 3 }
         { swap 1 }

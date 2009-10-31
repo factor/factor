@@ -49,7 +49,7 @@ gc
     {
         not ?
 
-        2over roll -roll
+        2over
 
         array? hashtable? vector?
         tuple? sbuf? tombstone?

@@ -48,9 +48,6 @@ IN: kernel.tests
 
 [ -7 <byte-array> ] must-fail
 
-[ 2 3 4 1 ] [ 1 2 3 4 roll ] unit-test
-[ 1 2 3 4 ] [ 2 3 4 1 -roll ] unit-test
-
 [ 3 ] [ t 3 and ] unit-test
 [ f ] [ f 3 and ] unit-test
 [ f ] [ 3 f and ] unit-test
@@ -113,7 +110,7 @@ IN: kernel.tests
     < [ [ 1 + ] 3dip (loop) ] [ 2drop 2drop ] if ; inline recursive
 
 : loop ( obj -- )
-    H{ } values swap [ dup length swap ] dip 0 -roll (loop) ;
+    H{ } values swap [ dup length swap ] dip [ 0 ] 3dip (loop) ;
 
 [ loop ] must-fail
 

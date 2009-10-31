@@ -4,7 +4,7 @@ sbufs strings tools.test vectors words sequences.private
 quotations classes classes.algebra classes.tuple.private
 continuations growable namespaces hints alien.accessors
 compiler.tree.builder compiler.tree.optimizer sequences.deep
-compiler definitions generic.single ;
+compiler definitions generic.single shuffle ;
 IN: compiler.tests.optimizer
 
 GENERIC: xyz ( obj -- obj )
