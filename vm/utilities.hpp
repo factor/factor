@@ -18,7 +18,7 @@ inline static void memset_cell(void *dst, cell pattern, size_t size)
 		cell *end = (cell *)((cell)dst + size);
 		while(start < end)
 		{
-			*start = fill;
+			*start = pattern;
 			start++;
 		}
 	}
