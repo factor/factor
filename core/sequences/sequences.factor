@@ -270,30 +270,34 @@ ERROR: integer-length-expected obj ;
 : check-length ( n -- n )
     dup integer? [ integer-length-expected ] unless ; inline
 
-: ((copy)) ( dst i src j n -- )
-    [ + swap nth-unsafe [ ] curry 2dip ] keep
-    + swap set-nth-unsafe ; inline
+TUPLE: copy-state
+    { src-i integer read-only }
+    { src sequence read-only }
+    { dst-i integer read-only }
+    { dst sequence read-only } ;
 
-: 5bi ( a b c d e x y -- )
-    bi-curry bi-curry bi-curry bi-curry bi ; inline
+C: <copy> copy-state
 
-: (copy) ( dst i src j n -- dst )
-    dup 0 <= [ 2drop 2drop ] [ 1 - [ ((copy)) ] [ (copy) ] 5bi ] if ;
+: ((copy)) ( n copy -- )
+    [ [ src-i>> + ] [ src>> ] bi nth-unsafe ]
+    [ [ dst-i>> + ] [ dst>> ] bi set-nth-unsafe ] 2bi ; inline
+
+: (copy) ( n copy -- dst )
+    over 0 <= [ nip dst>> ] [ [ 1 - ] dip [ ((copy)) ] [ (copy) ] 2bi ] if ;
     inline recursive
 
-: prepare-subseq ( from to seq -- dst i src j n )
-    [ over - ] dip
-    [ new-sequence 0 rot ] 2keep
-    [ ] curry 2dip check-length ; inline
+: subseq>copy ( from to seq -- n copy )
+    [ over - check-length swap ] dip
+    3dup nip new-sequence 0 swap <copy> ; inline
 
-: check-copy ( src n dst -- )
-    over 0 < [ bounds-error ] when
+: check-copy ( src n dst -- src n dst )
+    3dup over 0 < [ bounds-error ] when
     [ swap length + ] dip lengthen ; inline
 
 PRIVATE>
 
 : subseq ( from to seq -- subseq )
-    [ check-slice prepare-subseq (copy) ] keep like ;
+    [ check-slice subseq>copy (copy) ] keep like ;
 
 : head ( seq n -- headseq ) (head) subseq ;
 
@@ -309,8 +313,8 @@ PRIVATE>
 
 : copy ( src i dst -- )
     #! The check-length call forces partial dispatch
-    pick length check-length [ 3dup check-copy spin 0 ] dip
-    (copy) drop ; inline
+    [ [ length check-length 0 ] keep ] 2dip
+    check-copy <copy> (copy) drop ; inline
 
 M: sequence clone-like
     [ dup length ] dip new-sequence [ 0 swap copy ] keep ; inline
