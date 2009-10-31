@@ -58,7 +58,21 @@ inline double factor_vm::fixnum_to_float(cell tagged)
 	return (double)untag_fixnum(tagged);
 }
 
-// defined in assembler
+inline cell factor_vm::unbox_array_size()
+{
+	cell obj = dpeek();
+	if(TAG(obj) == FIXNUM_TYPE)
+	{
+		fixnum n = untag_fixnum(obj);
+		if(n >= 0 && n < (fixnum)array_size_max)
+		{
+			dpop();
+			return n;
+		}
+	}
+
+	return unbox_array_size_slow();
+}
 
 VM_C_API void box_float(float flo, factor_vm *vm);
 VM_C_API float to_float(cell value, factor_vm *vm);

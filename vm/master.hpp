@@ -85,6 +85,7 @@ namespace factor
 #include "code_heap.hpp"
 #include "callbacks.hpp"
 #include "vm.hpp"
+#include "allot.hpp"
 #include "tagged.hpp"
 #include "local_roots.hpp"
 #include "collector.hpp"
