@@ -257,9 +257,10 @@ struct factor_vm
 	void primitive_compact_gc();
 	void primitive_become();
 	void inline_gc(cell *gc_roots_base, cell gc_roots_size);
-	object *allot_object(header header, cell size);
 	void primitive_enable_gc_events();
 	void primitive_disable_gc_events();
+	object *allot_object(header header, cell size);
+	object *allot_large_object(header header, cell size);
 
 	template<typename Type> Type *allot(cell size)
 	{
@@ -345,7 +346,6 @@ struct factor_vm
 	template<typename T> byte_array *byte_array_from_values(T *values, cell len);
 
 	//tuples
-	tuple *allot_tuple(cell layout_);
 	void primitive_tuple();
 	void primitive_tuple_boa();
 
@@ -392,7 +392,8 @@ struct factor_vm
 	void primitive_bignum_log2();
 	unsigned int bignum_producer(unsigned int digit);
 	void primitive_byte_array_to_bignum();
-	cell unbox_array_size();
+	inline cell unbox_array_size();
+	cell unbox_array_size_slow();
 	void primitive_fixnum_to_float();
 	void primitive_bignum_to_float();
 	void primitive_str_to_float();
@@ -610,7 +611,6 @@ struct factor_vm
 	cell nth_hashcode(tuple_layout *layout, fixnum echelon);
 	cell lookup_tuple_method(cell obj, cell methods);
 	cell lookup_hi_tag_method(cell obj, cell methods);
-	cell lookup_hairy_method(cell obj, cell methods);
 	cell lookup_method(cell obj, cell methods);
 	void primitive_lookup_method();
 	cell object_class(cell obj);

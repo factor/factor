@@ -8,17 +8,7 @@ array *factor_vm::allot_array(cell capacity, cell fill_)
 {
 	gc_root<object> fill(fill_,this);
 	gc_root<array> new_array(allot_uninitialized_array<array>(capacity),this);
-
-	if(fill.value() == tag_fixnum(0))
-		memset(new_array->data(),'\0',capacity * sizeof(cell));
-	else
-	{
-		/* No need for write barrier here. Either the object is in
-		the nursery, or it was allocated directly in tenured space
-		and the write barrier is already hit for us in that case. */
-		for(cell i = 0; i < capacity; i++)
-			new_array->data()[i] = fill.value();
-	}
+	memset_cell(new_array->data(),fill.value(),capacity * sizeof(cell));
 	return new_array.untagged();
 }
 

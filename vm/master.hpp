@@ -71,6 +71,7 @@ namespace factor
 #include "alien.hpp"
 #include "callbacks.hpp"
 #include "vm.hpp"
+#include "allot.hpp"
 #include "tagged.hpp"
 #include "local_roots.hpp"
 #include "slot_visitor.hpp"
