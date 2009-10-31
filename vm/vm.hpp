@@ -363,7 +363,6 @@ struct factor_vm
 	void primitive_resize_byte_array();
 
 	//tuples
-	tuple *allot_tuple(cell layout_);
 	void primitive_tuple();
 	void primitive_tuple_boa();
 
