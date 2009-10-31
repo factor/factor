@@ -41,7 +41,7 @@ CONSTANT: bignum/f-threshold HEX: 20,0000,0000,0000
     [ >float ] bi@ float/f ; inline
 
 M: fixnum /f
-    2dup [ bignum/f-threshold >= ] either?
+    2dup [ abs bignum/f-threshold >= ] either?
     [ bignum/f ] [ fixnum/f ] if ; inline
 
 M: fixnum mod fixnum-mod ; inline
