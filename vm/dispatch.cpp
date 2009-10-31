@@ -22,10 +22,10 @@ cell factor_vm::search_lookup_hash(cell table, cell klass, cell hashcode)
 {
 	array *buckets = untag<array>(table);
 	cell bucket = array_nth(buckets,hashcode & (array_capacity(buckets) - 1));
-	if(tagged<object>(bucket).type_p(WORD_TYPE) || !to_boolean(bucket))
-		return bucket;
-	else
+	if(TAG(bucket) == ARRAY_TYPE)
 		return search_lookup_alist(bucket,klass);
+	else
+		return bucket;
 }
 
 cell factor_vm::nth_superclass(tuple_layout *layout, fixnum echelon)
@@ -46,10 +46,8 @@ cell factor_vm::lookup_tuple_method(cell obj, cell methods)
 
 	array *echelons = untag<array>(methods);
 
-	fixnum echelon = untag_fixnum(layout->echelon);
-	fixnum max_echelon = array_capacity(echelons) - 1;
-	if(echelon > max_echelon) echelon = max_echelon;
-       
+	fixnum echelon = std::min(untag_fixnum(layout->echelon),(fixnum)array_capacity(echelons) - 1);
+
 	while(echelon >= 0)
 	{
 		cell echelon_methods = array_nth(echelons,echelon);
@@ -82,35 +80,27 @@ cell factor_vm::lookup_hi_tag_method(cell obj, cell methods)
 	return array_nth(hi_tag_methods,tag);
 }
 
-cell factor_vm::lookup_hairy_method(cell obj, cell methods)
-{
-	cell method = array_nth(untag<array>(methods),TAG(obj));
-	if(tagged<object>(method).type_p(WORD_TYPE))
-		return method;
-	else
-	{
-		switch(TAG(obj))
-		{
-		case TUPLE_TYPE:
-			return lookup_tuple_method(obj,method);
-			break;
-		case OBJECT_TYPE:
-			return lookup_hi_tag_method(obj,method);
-			break;
-		default:
-			critical_error("Bad methods array",methods);
-			return 0;
-		}
-	}
-}
-
 cell factor_vm::lookup_method(cell obj, cell methods)
 {
 	cell tag = TAG(obj);
-	if(tag == TUPLE_TYPE || tag == OBJECT_TYPE)
-		return lookup_hairy_method(obj,methods);
+	cell method = array_nth(untag<array>(methods),tag);
+
+	if(tag == TUPLE_TYPE)
+	{
+		if(TAG(method) == ARRAY_TYPE)
+			return lookup_tuple_method(obj,method);
+		else
+			return method;
+	}
+	else if(tag == OBJECT_TYPE)
+	{
+		if(TAG(method) == ARRAY_TYPE)
+			return lookup_hi_tag_method(obj,method);
+		else
+			return method;
+	}
 	else
-		return array_nth(untag<array>(methods),TAG(obj));
+		return method;
 }
 
 void factor_vm::primitive_lookup_method()
