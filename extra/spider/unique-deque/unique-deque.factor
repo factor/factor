@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs deques dlists kernel ;
+USING: accessors assocs deques dlists kernel locals ;
 IN: spider.unique-deque
 
 TUPLE: todo-url url depth ;
@@ -30,8 +30,9 @@ TUPLE: unique-deque assoc deque ;
 
 : peek-url ( unique-deque -- todo-url ) deque>> peek-front ;
 
-: slurp-deque-when ( deque quot1 quot2: ( value -- ) -- )
-    pick deque-empty? [ 3drop ] [
-        [ [ pop-front dup ] 2dip [ call ] dip [ t ] compose [ drop f ] if ]
-        [ roll [ slurp-deque-when ] [ 3drop ] if ] 3bi
-    ] if ; inline recursive
+:: slurp-deque-when ( deque quot1 quot2: ( value -- ) -- )
+    deque deque-empty? [
+        deque pop-front dup quot1 call
+        [ quot2 call t ] [ drop f ] if
+        [ deque quot1 quot2 slurp-deque-when ] when
+    ] unless ; inline recursive

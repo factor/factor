@@ -27,8 +27,6 @@ HELP: -rot  ( x y z -- z x y ) $complex-shuffle ;
 HELP: dupd  ( x y -- x x y )   $complex-shuffle ;
 HELP: swapd ( x y z -- y x z ) $complex-shuffle ;
 HELP: tuck  ( x y -- y x y )   $complex-shuffle ;
-HELP: roll  $complex-shuffle ;
-HELP: -roll $complex-shuffle ;
 
 HELP: datastack ( -- ds )
 { $values { "ds" array } }
@@ -279,11 +277,6 @@ HELP: 3bi
     { $code
         "[ p ] [ q ] 3bi"
         "3dup p q"
-    }
-    "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x y z -- w )" } ", then the following two lines are equivalent:"
-    { $code
-        "[ p ] [ q ] 3bi"
-        "3dup p -roll q"
     }
     "In general, the following two lines are equivalent:"
     { $code
@@ -835,8 +828,6 @@ $nl
     swapd
     rot
     -rot
-    roll
-    -roll
     spin
 } ;
 
