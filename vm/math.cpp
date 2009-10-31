@@ -231,32 +231,18 @@ void factor_vm::primitive_byte_array_to_bignum()
 	drepl(tag<bignum>(result));
 }
 
-cell factor_vm::unbox_array_size()
+cell factor_vm::unbox_array_size_slow()
 {
-	switch(tagged<object>(dpeek()).type())
+	if(tagged<object>(dpeek()).type() == BIGNUM_TYPE)
 	{
-	case FIXNUM_TYPE:
+		bignum *zero = untag<bignum>(bignum_zero);
+		bignum *max = cell_to_bignum(array_size_max);
+		bignum *n = untag<bignum>(dpeek());
+		if(bignum_compare(n,zero) != bignum_comparison_less
+			&& bignum_compare(n,max) == bignum_comparison_less)
 		{
-			fixnum n = untag_fixnum(dpeek());
-			if(n >= 0 && n < (fixnum)array_size_max)
-			{
-				dpop();
-				return n;
-			}
-			break;
-		}
-	case BIGNUM_TYPE:
-		{
-			bignum * zero = untag<bignum>(bignum_zero);
-			bignum * max = cell_to_bignum(array_size_max);
-			bignum * n = untag<bignum>(dpeek());
-			if(bignum_compare(n,zero) != bignum_comparison_less
-				&& bignum_compare(n,max) == bignum_comparison_less)
-			{
-				dpop();
-				return bignum_to_cell(n);
-			}
-			break;
+			dpop();
+			return bignum_to_cell(n);
 		}
 	}
 

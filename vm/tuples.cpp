@@ -12,14 +12,13 @@ tuple *factor_vm::allot_tuple(cell layout_)
 	return t.untagged();
 }
 
+/* push a new tuple on the stack, filling its slots with f */
 void factor_vm::primitive_tuple()
 {
 	gc_root<tuple_layout> layout(dpop(),this);
 	tuple *t = allot_tuple(layout.value());
-	fixnum i;
-	for(i = tuple_size(layout.untagged()) - 1; i >= 0; i--)
-		t->data()[i] = false_object;
-
+	cell size = (tuple_size(layout.untagged()) - 1) * sizeof(cell);
+	memset_cell(t->data(),false_object,size);
 	dpush(tag<tuple>(t));
 }
 
