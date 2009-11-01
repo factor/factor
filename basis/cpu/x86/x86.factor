@@ -4,7 +4,7 @@ USING: accessors assocs alien alien.c-types arrays strings
 cpu.x86.assembler cpu.x86.assembler.private cpu.x86.assembler.operands
 cpu.x86.features cpu.x86.features.private cpu.architecture kernel
 kernel.private math memory namespaces make sequences words system
-layouts combinators math.order fry locals compiler.constants
+layouts combinators math.order math.vectors fry locals compiler.constants
 byte-arrays io macros quotations compiler compiler.units init vm
 compiler.cfg.registers
 compiler.cfg.instructions
@@ -142,19 +142,27 @@ M: x86 %neg     int-rep one-operand NEG ;
 M: x86 %log2    BSR ;
 
 GENERIC: copy-register* ( dst src rep -- )
+GENERIC: copy-unaligned* ( dst src rep -- )
 
 M: int-rep copy-register* drop MOV ;
 M: tagged-rep copy-register* drop MOV ;
-M: float-rep copy-register* drop MOVSS ;
-M: double-rep copy-register* drop MOVSD ;
-M: float-4-rep copy-register* drop MOVUPS ;
-M: double-2-rep copy-register* drop MOVUPD ;
-M: vector-rep copy-register* drop MOVDQU ;
+M: float-rep copy-register* drop MOVAPS ;
+M: double-rep copy-register* drop MOVAPS ;
+M: float-4-rep copy-register* drop MOVAPS ;
+M: double-2-rep copy-register* drop MOVAPS ;
+M: vector-rep copy-register* drop MOVDQA ;
+
+M: object copy-unaligned* copy-register* ;
+M: float-rep copy-unaligned* drop MOVSS ;
+M: double-rep copy-unaligned* drop MOVSD ;
+M: float-4-rep copy-unaligned* drop MOVUPS ;
+M: double-2-rep copy-unaligned* drop MOVUPS ;
+M: vector-rep copy-unaligned* drop MOVDQU ;
 
 M: x86 %copy ( dst src rep -- )
     2over eq? [ 3drop ] [
         [ [ dup spill-slot? [ n>> spill@ ] when ] bi@ ] dip
-        copy-register*
+        2over [ register? ] both? [ copy-register* ] [ copy-unaligned* ] if
     ] if ;
 
 M: x86 %fixnum-add ( label dst src1 src2 -- )
@@ -583,7 +591,7 @@ M: x86 %alien-vector-reps
 
 M: x86 %zero-vector
     {
-        { double-2-rep [ dup XORPD ] }
+        { double-2-rep [ dup XORPS ] }
         { float-4-rep [ dup XORPS ] }
         [ drop dup PXOR ]
     } case ;
@@ -596,7 +604,7 @@ M: x86 %zero-vector-reps
 
 M: x86 %fill-vector
     {
-        { double-2-rep [ dup [ XORPD ] [ CMPEQPD ] 2bi ] }
+        { double-2-rep [ dup [ XORPS ] [ CMPEQPS ] 2bi ] }
         { float-4-rep  [ dup [ XORPS ] [ CMPEQPS ] 2bi ] }
         [ drop dup PCMPEQB ]
     } case ;
@@ -671,7 +679,7 @@ M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
     rep unsign-rep {
         { double-2-rep [
             dst src1 double-2-rep %copy
-            dst src2 UNPCKLPD
+            dst src2 MOVLHPS
         ] }
         { longlong-2-rep [
             dst src1 longlong-2-rep %copy
@@ -683,14 +691,6 @@ M: x86 %gather-vector-2-reps
     {
         { sse2? { double-2-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
-
-: double-2-shuffle ( dst shuffle -- )
-    {
-        { { 0 1 } [ drop ] }
-        { { 0 0 } [ dup UNPCKLPD ] }
-        { { 1 1 } [ dup UNPCKHPD ] }
-        [ dupd SHUFPD ]
-    } case ;
 
 : sse1-float-4-shuffle ( dst shuffle -- )
     {
@@ -724,10 +724,13 @@ M: x86 %gather-vector-2-reps
 : longlong-2-shuffle ( dst shuffle -- )
     first2 [ 2 * dup 1 + ] bi@ 4array int-4-shuffle ;
 
+: >float-4-shuffle ( double-2-shuffle -- float-4-shuffle )
+    [ 2 * { 0 1 } n+v ] map concat ;
+
 M:: x86 %shuffle-vector-imm ( dst src shuffle rep -- )
     dst src rep %copy
     dst shuffle rep unsign-rep {
-        { double-2-rep [ double-2-shuffle ] }
+        { double-2-rep [ >float-4-shuffle float-4-shuffle ] }
         { float-4-rep [ float-4-shuffle ] }
         { int-4-rep [ int-4-shuffle ] }
         { longlong-2-rep [ longlong-2-shuffle ] }
@@ -750,7 +753,7 @@ M: x86 %shuffle-vector-reps
 M: x86 %merge-vector-head
     [ two-operand ] keep
     unsign-rep {
-        { double-2-rep   [ UNPCKLPD ] }
+        { double-2-rep   [ MOVLHPS ] }
         { float-4-rep    [ UNPCKLPS ] }
         { longlong-2-rep [ PUNPCKLQDQ ] }
         { int-4-rep      [ PUNPCKLDQ ] }
@@ -802,8 +805,8 @@ M: x86 %unsigned-pack-vector-reps
 
 M: x86 %tail>head-vector ( dst src rep -- )
     dup {
-        { float-4-rep [ drop MOVHLPS ] }
-        { double-2-rep [ [ %copy ] [ drop UNPCKHPD ] 3bi ] }
+        { float-4-rep [ drop UNPCKHPD ] }
+        { double-2-rep [ drop UNPCKHPD ] }
         [ drop [ %copy ] [ drop PUNPCKHQDQ ] 3bi ]
     } case ;
 
@@ -942,7 +945,7 @@ M: x86 %compare-vector-ccs
 
 : %move-vector-mask ( dst src rep -- mask )
     {
-        { double-2-rep [ MOVMSKPD HEX: 3 ] }
+        { double-2-rep [ MOVMSKPS HEX: f ] }
         { float-4-rep  [ MOVMSKPS HEX: f ] }
         [ drop PMOVMSKB HEX: ffff ]
     } case ;
@@ -1199,7 +1202,7 @@ M: x86 %and-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
     {
         { float-4-rep [ ANDPS ] }
-        { double-2-rep [ ANDPD ] }
+        { double-2-rep [ ANDPS ] }
         [ drop PAND ]
     } case ;
 
@@ -1213,7 +1216,7 @@ M: x86 %andn-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
     {
         { float-4-rep [ ANDNPS ] }
-        { double-2-rep [ ANDNPD ] }
+        { double-2-rep [ ANDNPS ] }
         [ drop PANDN ]
     } case ;
 
@@ -1227,7 +1230,7 @@ M: x86 %or-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
     {
         { float-4-rep [ ORPS ] }
-        { double-2-rep [ ORPD ] }
+        { double-2-rep [ ORPS ] }
         [ drop POR ]
     } case ;
 
@@ -1241,7 +1244,7 @@ M: x86 %xor-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
     {
         { float-4-rep [ XORPS ] }
-        { double-2-rep [ XORPD ] }
+        { double-2-rep [ XORPS ] }
         [ drop PXOR ]
     } case ;
 
