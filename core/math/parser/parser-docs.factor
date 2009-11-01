@@ -111,13 +111,6 @@ HELP: >hex
     }
 } ;
 
-HELP: string>float ( str -- n/f )
-{ $values { "str" string } { "n/f" "a real number or " { $link f } } }
-{ $description "Primitive for creating a float from a string representation." }
-{ $notes "The " { $link string>number } " word is more general."
-$nl
-"Outputs " { $link f } " if the string does not represent a float." } ;
-
 HELP: float>string
 { $values { "n" real } { "str" string } }
 { $description "Primitive for getting a string representation of a float." }
