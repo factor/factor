@@ -88,7 +88,7 @@ void factor_vm::collect_growing_heap(cell requested_bytes, bool trace_contexts_p
 	data_heap *old = data;
 	set_data_heap(data->grow(requested_bytes));
 	collect_mark_impl(trace_contexts_p);
-	collect_compact_impl(trace_contexts_p);
+	collect_compact_code_impl();
 	delete old;
 }
 

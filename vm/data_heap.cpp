@@ -276,25 +276,28 @@ void factor_vm::primitive_end_scan()
 	gc_off = false;
 }
 
-template<typename Iterator> void factor_vm::each_object(Iterator &iterator)
-{
-	begin_scan();
-	cell obj;
-	while(to_boolean(obj = next_object()))
-		iterator(tagged<object>(obj));
-	end_scan();
-}
-
 struct word_counter {
 	cell count;
+
 	explicit word_counter() : count(0) {}
-	void operator()(tagged<object> obj) { if(obj.type_p(WORD_TYPE)) count++; }
+
+	void operator()(cell obj)
+	{
+		if(tagged<object>(obj).type_p(WORD_TYPE))
+			count++;
+	}
 };
 
 struct word_accumulator {
 	growable_array words;
+
 	explicit word_accumulator(int count,factor_vm *vm) : words(vm,count) {}
-	void operator()(tagged<object> obj) { if(obj.type_p(WORD_TYPE)) words.add(obj.value()); }
+
+	void operator()(cell obj)
+	{
+		if(tagged<object>(obj).type_p(WORD_TYPE))
+			words.add(obj);
+	}
 };
 
 cell factor_vm::find_all_words()
