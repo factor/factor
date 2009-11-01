@@ -60,8 +60,8 @@ template<typename Block> struct mark_bits {
 
 	bool bitmap_elt(u64 *bits, Block *address)
 	{
-		std::pair<cell,cell> pair = bitmap_deref(address);
-		return (bits[pair.first] & ((u64)1 << pair.second)) != 0;
+		std::pair<cell,cell> position = bitmap_deref(address);
+		return (bits[position.first] & ((u64)1 << position.second)) != 0;
 	}
 
 	Block *next_block_after(Block *block)
@@ -142,12 +142,12 @@ template<typename Block> struct mark_bits {
 #ifdef FACTOR_DEBUG
 		assert(marked_p(original));
 #endif
-		std::pair<cell,cell> pair = bitmap_deref(original);
+		std::pair<cell,cell> position = bitmap_deref(original);
 
-		cell approx_popcount = forwarding[pair.first];
-		u64 mask = ((u64)1 << pair.second) - 1;
+		cell approx_popcount = forwarding[position.first];
+		u64 mask = ((u64)1 << position.second) - 1;
 
-		cell new_line_number = approx_popcount + popcount(marked[pair.first] & mask);
+		cell new_line_number = approx_popcount + popcount(marked[position.first] & mask);
 		Block *new_block = line_block(new_line_number);
 #ifdef FACTOR_DEBUG
 		assert(new_block <= original);
@@ -155,18 +155,78 @@ template<typename Block> struct mark_bits {
 		return new_block;
 	}
 
-	/* Find the next allocated block without calling size() on unmarked
-	objects. */
-	cell unmarked_space_starting_at(Block *original)
+	cell rightmost_clear_bit(u64 x)
 	{
-		char *start = (char *)original;
-		char *scan = start;
+		cell n = 0;
+		while(x & 1)
+		{
+			n++;
+			x >>= 1;
+		}
+		return n;
+	}
+
+	Block *next_unmarked_block_after_slow(Block *original)
+	{
+		char *scan = (char *)original;
+		char *end = (char *)(this->start + this->size);
+
+		while(scan != end && marked_p((Block *)scan))
+			scan += block_granularity;
+
+		return (Block *)scan;
+	}
+
+	Block *next_unmarked_block_after_fast(Block *original)
+	{
+		std::pair<cell,cell> position = bitmap_deref(original);
+		cell bit_index = position.second;
+
+		for(cell index = position.first; index < bits_size; index++)
+		{
+			u64 mask = ((s64)marked[index] >> bit_index);
+			if(~mask)
+			{
+				/* Found an unmarked block on this page.
+				Stop, it's hammer time */
+				cell clear_bit = rightmost_clear_bit(mask);
+				return line_block(index * 64 + bit_index + clear_bit);
+			}
+			else
+			{
+				/* No unmarked blocks on this page.
+				Keep looking */
+				bit_index = 0;
+			}
+		}
+
+		/* No unmarked blocks were found */
+		return (Block *)(this->start + this->size);
+	}
+
+	Block *next_unmarked_block_after(Block *original)
+	{
+		Block *first_result = next_unmarked_block_after_slow(original);
+		Block *second_result = next_unmarked_block_after_fast(original);
+		assert(first_result == second_result);
+		return second_result;
+	}
+
+	Block *next_marked_block_after(Block *original)
+	{
+		char *scan = (char *)original;
 		char *end = (char *)(this->start + this->size);
 
 		while(scan != end && !marked_p((Block *)scan))
 			scan += block_granularity;
 
-		return scan - start;
+		return (Block *)scan;
+	}
+
+	cell unmarked_block_size(Block *original)
+	{
+		Block *next_marked = next_marked_block_after(original);
+		return ((char *)next_marked - (char *)original);
 	}
 };
 
