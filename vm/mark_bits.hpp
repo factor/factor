@@ -166,18 +166,7 @@ template<typename Block> struct mark_bits {
 		return n;
 	}
 
-	Block *next_unmarked_block_after_slow(Block *original)
-	{
-		char *scan = (char *)original;
-		char *end = (char *)(this->start + this->size);
-
-		while(scan != end && marked_p((Block *)scan))
-			scan += block_granularity;
-
-		return (Block *)scan;
-	}
-
-	Block *next_unmarked_block_after_fast(Block *original)
+	Block *next_unmarked_block_after(Block *original)
 	{
 		std::pair<cell,cell> position = bitmap_deref(original);
 		cell bit_index = position.second;
@@ -204,23 +193,42 @@ template<typename Block> struct mark_bits {
 		return (Block *)(this->start + this->size);
 	}
 
-	Block *next_unmarked_block_after(Block *original)
+	cell rightmost_set_bit(u64 x)
 	{
-		Block *first_result = next_unmarked_block_after_slow(original);
-		Block *second_result = next_unmarked_block_after_fast(original);
-		assert(first_result == second_result);
-		return second_result;
+		cell n = 0;
+		while(!(x & 1))
+		{
+			n++;
+			x >>= 1;
+		}
+		return n;
 	}
 
 	Block *next_marked_block_after(Block *original)
 	{
-		char *scan = (char *)original;
-		char *end = (char *)(this->start + this->size);
+		std::pair<cell,cell> position = bitmap_deref(original);
+		cell bit_index = position.second;
 
-		while(scan != end && !marked_p((Block *)scan))
-			scan += block_granularity;
+		for(cell index = position.first; index < bits_size; index++)
+		{
+			u64 mask = (marked[index] >> bit_index);
+			if(mask)
+			{
+				/* Found an marked block on this page.
+				Stop, it's hammer time */
+				cell set_bit = rightmost_set_bit(mask);
+				return line_block(index * 64 + bit_index + set_bit);
+			}
+			else
+			{
+				/* No marked blocks on this page.
+				Keep looking */
+				bit_index = 0;
+			}
+		}
 
-		return (Block *)scan;
+		/* No marked blocks were found */
+		return (Block *)(this->start + this->size);
 	}
 
 	cell unmarked_block_size(Block *original)

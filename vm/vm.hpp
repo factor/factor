@@ -258,7 +258,7 @@ struct factor_vm
 	void collect_mark_impl(bool trace_contexts_p);
 	void collect_sweep_impl();
 	void collect_compact_impl(bool trace_contexts_p);
-	void collect_compact_code_impl();
+	void collect_compact_code_impl(bool trace_contexts_p);
 	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p);
 	void gc(gc_op op, cell requested_bytes, bool trace_contexts_p);
 	void primitive_minor_gc();
