@@ -234,31 +234,37 @@ void factor_vm::dump_generations()
 	std::cout << "size=" << (cell)(data->cards_end - data->cards) << std::endl;
 }
 
-void factor_vm::dump_objects(cell type)
-{
-	primitive_full_gc();
-	begin_scan();
+struct object_dumper {
+	factor_vm *parent;
+	cell type;
 
-	cell obj;
-	while(to_boolean(obj = next_object()))
+	explicit object_dumper(factor_vm *parent_, cell type_) :
+		parent(parent_), type(type_) {}
+
+	void operator()(cell obj)
 	{
 		if(type == TYPE_COUNT || tagged<object>(obj).type_p(type))
 		{
 			std::cout << padded_address(obj) << " ";
-			print_nested_obj(obj,2);
+			parent->print_nested_obj(obj,2);
 			std::cout << std::endl;
 		}
 	}
+};
 
-	end_scan();
+void factor_vm::dump_objects(cell type)
+{
+	primitive_full_gc();
+	object_dumper dumper(this,type);
+	each_object(dumper);
 }
 
-struct data_references_finder {
+struct data_reference_slot_visitor {
 	cell look_for, obj;
 	factor_vm *parent;
 
-	explicit data_references_finder(cell look_for_, cell obj_, factor_vm *parent_)
-		: look_for(look_for_), obj(obj_), parent(parent_) { }
+	explicit data_reference_slot_visitor(cell look_for_, cell obj_, factor_vm *parent_) :
+		look_for(look_for_), obj(obj_), parent(parent_) { }
 
 	void operator()(cell *scan)
 	{
@@ -271,19 +277,24 @@ struct data_references_finder {
 	}
 };
 
+struct data_reference_object_visitor {
+	cell look_for;
+	factor_vm *parent;
+
+	explicit data_reference_object_visitor(cell look_for_, factor_vm *parent_) :
+		look_for(look_for_), parent(parent_) {}
+
+	void operator()(cell obj)
+	{
+		data_reference_slot_visitor visitor(look_for,obj,parent);
+		parent->do_slots(UNTAG(obj),visitor);
+	}
+};
+
 void factor_vm::find_data_references(cell look_for)
 {
-	begin_scan();
-
-	cell obj;
-
-	while(to_boolean(obj = next_object()))
-	{
-		data_references_finder finder(look_for,obj,this);
-		do_slots(UNTAG(obj),finder);
-	}
-
-	end_scan();
+	data_reference_object_visitor visitor(look_for,this);
+	each_object(visitor);
 }
 
 struct code_block_printer {

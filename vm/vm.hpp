@@ -228,9 +228,17 @@ struct factor_vm
 	cell next_object();
 	void primitive_next_object();
 	void primitive_end_scan();
-	template<typename Iterator> void each_object(Iterator &iterator);
 	cell find_all_words();
 	cell object_size(cell tagged);
+
+	template<typename Iterator> inline void each_object(Iterator &iterator)
+	{
+		begin_scan();
+		cell obj;
+		while(to_boolean(obj = next_object()))
+			iterator(obj);
+		end_scan();
+	}
 
 	/* the write barrier must be called any time we are potentially storing a
 	   pointer from an older generation to a younger one */
@@ -250,6 +258,7 @@ struct factor_vm
 	void collect_mark_impl(bool trace_contexts_p);
 	void collect_sweep_impl();
 	void collect_compact_impl(bool trace_contexts_p);
+	void collect_compact_code_impl();
 	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p);
 	void gc(gc_op op, cell requested_bytes, bool trace_contexts_p);
 	void primitive_minor_gc();

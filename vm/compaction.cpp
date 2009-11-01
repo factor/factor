@@ -97,11 +97,11 @@ struct object_compaction_updater {
 	}
 };
 
-struct code_block_compaction_updater {
+template<typename SlotForwarder> struct code_block_compaction_updater {
 	factor_vm *parent;
-	slot_visitor<object_slot_forwarder> slot_forwarder;
+	SlotForwarder slot_forwarder;
 
-	explicit code_block_compaction_updater(factor_vm *parent_, slot_visitor<object_slot_forwarder> slot_forwarder_) :
+	explicit code_block_compaction_updater(factor_vm *parent_, SlotForwarder slot_forwarder_) :
 		parent(parent_), slot_forwarder(slot_forwarder_) {}
 
 	void operator()(code_block *old_address, code_block *new_address, cell size)
@@ -112,6 +112,7 @@ struct code_block_compaction_updater {
 	}
 };
 
+/* Compact data and code heaps */
 void factor_vm::collect_compact_impl(bool trace_contexts_p)
 {
 	current_gc->event->started_compaction();
@@ -139,7 +140,7 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p)
 
 	/* Slide everything in the code heap up, and update data and code heap
 	pointers inside code blocks. */
-	code_block_compaction_updater code_block_updater(this,slot_forwarder);
+	code_block_compaction_updater<slot_visitor<object_slot_forwarder> > code_block_updater(this,slot_forwarder);
 	standard_sizer<code_block> code_block_sizer;
 	code->allocator->compact(code_block_updater,code_block_sizer);
 
@@ -152,6 +153,45 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p)
 	}
 
 	current_gc->event->ended_compaction();
+}
+
+struct object_code_block_updater {
+	code_block_visitor<code_block_forwarder> *forwarder;
+
+	explicit object_code_block_updater(code_block_visitor<code_block_forwarder> *forwarder_) :
+		forwarder(forwarder_) {}
+
+	void operator()(cell obj)
+	{
+		forwarder->visit_object_code_block(tagged<object>(obj).untagged());
+	}
+};
+
+struct dummy_slot_forwarder {
+	void visit_literal_references(code_block *compiled) {}
+};
+
+/* Compact just the code heap */
+void factor_vm::collect_compact_code_impl()
+{
+	mark_bits<code_block> *code_forwarding_map = &code->allocator->state;
+
+	/* Figure out where blocks are going to go */
+	code_forwarding_map->compute_forwarding();
+
+	/* Update root pointers */
+	code_block_visitor<code_block_forwarder> code_forwarder(this,code_block_forwarder(code_forwarding_map));
+
+	/* Slide everything in the code heap up, and update code heap
+	pointers inside code blocks. */
+	dummy_slot_forwarder slot_forwarder;
+	code_block_compaction_updater<dummy_slot_forwarder> code_block_updater(this,slot_forwarder);
+	standard_sizer<code_block> code_block_sizer;
+	code->allocator->compact(code_block_updater,code_block_sizer);
+
+	/* Update code heap references in data heap */
+	object_code_block_updater updater(&code_forwarder);
+	each_object(updater);
 }
 
 }
