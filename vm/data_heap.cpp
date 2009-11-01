@@ -11,8 +11,7 @@ void factor_vm::init_card_decks()
 
 data_heap::data_heap(cell young_size_,
 	cell aging_size_,
-	cell tenured_size_,
-	cell promotion_threshold_)
+	cell tenured_size_)
 {
 	young_size_ = align(young_size_,deck_size);
 	aging_size_ = align(aging_size_,deck_size);
@@ -21,7 +20,6 @@ data_heap::data_heap(cell young_size_,
 	young_size = young_size_;
 	aging_size = aging_size_;
 	tenured_size = tenured_size_;
-	promotion_threshold = promotion_threshold_;
 
 	cell total_size = young_size + 2 * aging_size + tenured_size + deck_size;
 	seg = new segment(total_size,false);
@@ -64,8 +62,7 @@ data_heap *data_heap::grow(cell requested_bytes)
 	cell new_tenured_size = (tenured_size * 2) + requested_bytes;
 	return new data_heap(young_size,
 		aging_size,
-		new_tenured_size,
-		promotion_threshold * 1.25);
+		new_tenured_size);
 }
 
 template<typename Generation> void data_heap::clear_cards(Generation *gen)
@@ -108,9 +105,9 @@ void factor_vm::set_data_heap(data_heap *data_)
 	init_card_decks();
 }
 
-void factor_vm::init_data_heap(cell young_size, cell aging_size, cell tenured_size, cell promotion_threshold)
+void factor_vm::init_data_heap(cell young_size, cell aging_size, cell tenured_size)
 {
-	set_data_heap(new data_heap(young_size,aging_size,tenured_size,promotion_threshold));
+	set_data_heap(new data_heap(young_size,aging_size,tenured_size));
 }
 
 /* Size of the object pointed to by a tagged pointer */

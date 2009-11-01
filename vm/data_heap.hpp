@@ -8,8 +8,6 @@ struct data_heap {
 	cell aging_size;
 	cell tenured_size;
 
-	cell promotion_threshold;
-
 	segment *seg;
 
 	nursery_space *nursery;
@@ -23,7 +21,7 @@ struct data_heap {
 	card_deck *decks;
 	card_deck *decks_end;
 	
-	explicit data_heap(cell young_size, cell aging_size, cell tenured_size, cell promotion_threshold);
+	explicit data_heap(cell young_size, cell aging_size, cell tenured_size);
 	~data_heap();
 	data_heap *grow(cell requested_size);
 	template<typename Generation> void clear_cards(Generation *gen);

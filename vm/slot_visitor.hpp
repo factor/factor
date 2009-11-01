@@ -15,7 +15,7 @@ template<typename Visitor> struct slot_visitor {
 		if(immediate_p(pointer)) return;
 
 		object *untagged = untag<object>(pointer);
-		untagged = visitor.visit_object(untagged);
+		untagged = visitor(untagged);
 		*handle = RETAG(untagged,TAG(pointer));
 	}
 
@@ -61,7 +61,7 @@ template<typename Visitor> struct slot_visitor {
 			cell *handle = (cell *)(*iter);
 
 			if(*handle)
-				*handle = (cell)visitor.visit_object(*(object **)handle);
+				*handle = (cell)visitor(*(object **)handle);
 		}
 	}
 
