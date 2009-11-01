@@ -218,7 +218,7 @@ struct factor_vm
 	//data heap
 	void init_card_decks();
 	void set_data_heap(data_heap *data_);
-	void init_data_heap(cell young_size, cell aging_size, cell tenured_size, cell promotion_threshold);
+	void init_data_heap(cell young_size, cell aging_size, cell tenured_size);
 	void primitive_size();
 	data_heap_room data_room();
 	void primitive_data_room();
@@ -351,8 +351,8 @@ struct factor_vm
 	void primitive_uninitialized_byte_array();
 	void primitive_resize_byte_array();
 
-	template<typename T> byte_array *byte_array_from_value(T *value);
-	template<typename T> byte_array *byte_array_from_values(T *values, cell len);
+	template<typename Type> byte_array *byte_array_from_value(Type *value);
+	template<typename Type> byte_array *byte_array_from_values(Type *values, cell len);
 
 	//tuples
 	void primitive_tuple();
