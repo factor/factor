@@ -159,15 +159,22 @@ struct dummy_slot_forwarder {
 };
 
 /* Compact just the code heap */
-void factor_vm::collect_compact_code_impl()
+void factor_vm::collect_compact_code_impl(bool trace_contexts_p)
 {
-	mark_bits<code_block> *code_forwarding_map = &code->allocator->state;
-
 	/* Figure out where blocks are going to go */
+	mark_bits<code_block> *code_forwarding_map = &code->allocator->state;
 	code_forwarding_map->compute_forwarding();
-
-	/* Update root pointers */
 	code_block_visitor<forwarder<code_block> > code_forwarder(this,forwarder<code_block>(code_forwarding_map));
+
+	if(trace_contexts_p)
+	{
+		code_forwarder.visit_context_code_blocks();
+		code_forwarder.visit_callback_code_blocks();
+	}
+
+	/* Update code heap references in data heap */
+	object_code_block_updater updater(&code_forwarder);
+	each_object(updater);
 
 	/* Slide everything in the code heap up, and update code heap
 	pointers inside code blocks. */
@@ -175,10 +182,6 @@ void factor_vm::collect_compact_code_impl()
 	code_block_compaction_updater<dummy_slot_forwarder> code_block_updater(this,slot_forwarder);
 	standard_sizer<code_block> code_block_sizer;
 	code->allocator->compact(code_block_updater,code_block_sizer);
-
-	/* Update code heap references in data heap */
-	object_code_block_updater updater(&code_forwarder);
-	each_object(updater);
 }
 
 }
