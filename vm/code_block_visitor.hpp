@@ -39,6 +39,7 @@ template<typename Visitor> struct code_block_visitor {
 
 	explicit code_block_visitor(factor_vm *parent_, Visitor visitor_) :
 		parent(parent_), visitor(visitor_) {}
+
 	void visit_object_code_block(object *obj)
 	{
 		switch(obj->h.hi_tag())

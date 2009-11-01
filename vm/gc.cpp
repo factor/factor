@@ -152,15 +152,13 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 		start_gc_again();
 	}
 
-	if(current_gc->op == collect_aging_op
-		|| current_gc->op == collect_to_tenured_op
-		|| current_gc->op == collect_full_op)
+	if(current_gc->op == collect_aging_op || current_gc->op == collect_to_tenured_op)
 	{
-		if(data->tenured->largest_free_block() <= data->nursery->size + data->aging->size)
-			current_gc->op = collect_compact_op;
-	
-		if(data->tenured->high_water_mark - data->tenured->free_space() >= data->promotion_threshold)
+		if(data->tenured->free_space() <= data->nursery->size + data->aging->size)
+		{
+			printf("upgrade\n");
 			current_gc->op = collect_full_op;
+		}
 	}
 
 	current_gc->event->op = current_gc->op;
@@ -179,7 +177,13 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 	case collect_full_op:
 		collect_mark_impl(trace_contexts_p);
 		collect_sweep_impl();
-		update_code_heap_words_and_literals();
+		if(data->tenured->largest_free_block() <= data->nursery->size + data->aging->size)
+		{
+			printf("forced compaction\n");
+			collect_compact_impl(trace_contexts_p);
+		}
+		else
+			update_code_heap_words_and_literals();
 		break;
 	case collect_compact_op:
 		collect_mark_impl(trace_contexts_p);
