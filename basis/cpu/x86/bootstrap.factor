@@ -222,9 +222,16 @@ big-endian off
 [
     ! cache = ...
     temp0 0 MOV rc-absolute-cell rt-immediate jit-rel
-    ! key = class
+    ! key = hashcode(class)
     temp2 temp1 MOV
-    bootstrap-cell 8 = [ temp2 1 SHL ] when
+    temp2 3 SHR
+    temp3 temp1 MOV
+    temp3 8 SHR
+    temp2 temp3 ADD
+    temp3 temp1 MOV
+    temp3 13 SHR
+    temp2 temp3 ADD
+    temp2 bootstrap-cell 4 = 3 4 ? SHL
     ! key &= cache.length - 1
     temp2 mega-cache-size get 1 - bootstrap-cell * AND
     ! cache += array-start-offset

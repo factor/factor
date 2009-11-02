@@ -126,7 +126,7 @@ cell factor_vm::object_class(cell obj)
 cell factor_vm::method_cache_hashcode(cell klass, array *array)
 {
 	cell capacity = (array_capacity(array) >> 1) - 1;
-	return ((klass >> TAG_BITS) & capacity) << 1;
+	return (((klass >> 3) + (klass >> 8) + (klass >> 13)) & capacity) << 1;
 }
 
 void factor_vm::update_method_cache(cell cache, cell klass, cell method)
