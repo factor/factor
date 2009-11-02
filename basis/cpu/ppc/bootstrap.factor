@@ -224,8 +224,13 @@ CONSTANT: rs-reg 14
 [
     ! cache = ...
     0 3 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
-    ! key = class
-    5 4 MR
+    ! key = hashcode(class)
+    5 4 3 SRAWI
+    6 4 8 SRAWI
+    5 5 6 ADD
+    6 4 13 SRAWI
+    5 5 6 ADD
+    5 5 3 SLWI
     ! key &= cache.length - 1
     5 5 mega-cache-size get 1 - bootstrap-cell * ANDI
     ! cache += array-start-offset
