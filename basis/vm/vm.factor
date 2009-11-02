@@ -64,4 +64,5 @@ STRUCT: gc-event
 { code-scan-time cell }
 { data-sweep-time cell }
 { code-sweep-time cell }
-{ compaction-time cell } ;
+{ compaction-time cell }
+{ temp-time cell } ;

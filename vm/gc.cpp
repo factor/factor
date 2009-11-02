@@ -22,55 +22,55 @@ gc_event::gc_event(gc_op op_, factor_vm *parent) :
 
 void gc_event::started_card_scan()
 {
-	card_scan_time = current_micros();
+	temp_time = current_micros();
 }
 
 void gc_event::ended_card_scan(cell cards_scanned_, cell decks_scanned_)
 {
 	cards_scanned += cards_scanned_;
 	decks_scanned += decks_scanned_;
-	card_scan_time = (current_micros() - card_scan_time);
+	card_scan_time = (current_micros() - temp_time);
 }
 
 void gc_event::started_code_scan()
 {
-	code_scan_time = current_micros();
+	temp_time = current_micros();
 }
 
 void gc_event::ended_code_scan(cell code_blocks_scanned_)
 {
 	code_blocks_scanned += code_blocks_scanned_;
-	code_scan_time = (current_micros() - code_scan_time);
+	code_scan_time = (current_micros() - temp_time);
 }
 
 void gc_event::started_data_sweep()
 {
-	data_sweep_time = current_micros();
+	temp_time = current_micros();
 }
 
 void gc_event::ended_data_sweep()
 {
-	data_sweep_time = (current_micros() - data_sweep_time);
+	data_sweep_time = (current_micros() - temp_time);
 }
 
 void gc_event::started_code_sweep()
 {
-	code_sweep_time = current_micros();
+	temp_time = current_micros();
 }
 
 void gc_event::ended_code_sweep()
 {
-	code_sweep_time = (current_micros() - code_sweep_time);
+	code_sweep_time = (current_micros() - temp_time);
 }
 
 void gc_event::started_compaction()
 {
-	compaction_time = current_micros();
+	temp_time = current_micros();
 }
 
 void gc_event::ended_compaction()
 {
-	compaction_time = (current_micros() - compaction_time);
+	compaction_time = (current_micros() - temp_time);
 }
 
 void gc_event::ended_gc(factor_vm *parent)

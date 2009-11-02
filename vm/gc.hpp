@@ -26,6 +26,7 @@ struct gc_event {
 	cell data_sweep_time;
 	cell code_sweep_time;
 	cell compaction_time;
+	cell temp_time;
 
 	explicit gc_event(gc_op op_, factor_vm *parent);
 	void started_card_scan();
