@@ -8,7 +8,7 @@ compiler.cfg.instructions compiler.cfg.utilities
 compiler.cfg.builder.blocks compiler.constants ;
 IN: compiler.cfg.intrinsics.slots
 
-: value-tag ( info -- n ) class>> type-number ; inline
+: value-tag ( info -- n ) class>> class-type ; inline
 
 : ^^tag-offset>slot ( slot tag -- vreg' )
     [ ^^offset>slot ] dip ^^sub-imm ;
