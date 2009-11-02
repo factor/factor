@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences assocs fry math
-cpu.architecture layouts
+cpu.architecture layouts namespaces
 compiler.cfg.rpo
 compiler.cfg.registers
 compiler.cfg.instructions
@@ -28,7 +28,7 @@ M: ##box-displaced-alien allocation-size* drop 5 cells ;
 : allocation-size ( bb -- n )
     instructions>>
     [ ##allocation? ] filter
-    [ allocation-size* data-alignment align ] map-sum ;
+    [ allocation-size* data-alignment get align ] map-sum ;
 
 : insert-gc-check ( bb -- )
     dup dup '[
