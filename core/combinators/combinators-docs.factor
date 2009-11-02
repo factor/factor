@@ -4,29 +4,8 @@ math assocs sequences sequences.private combinators.private
 effects words ;
 IN: combinators
 
-ARTICLE: "cleave-shuffle-equivalence" "Expressing shuffle words with cleave combinators"
-"Cleave combinators are defined in terms of shuffle words, and mappings from certain shuffle idioms to cleave combinators are discussed in the documentation for " { $link bi } ", " { $link 2bi } ", " { $link 3bi } ", " { $link tri } ", " { $link 2tri } " and " { $link 3tri } "."
-$nl
-"Certain shuffle words can also be expressed in terms of the cleave combinators. Internalizing such identities can help with understanding and writing code using cleave combinators:"
-{ $code
-    ": keep  [ ] bi ;"
-    ": 2keep [ ] 2bi ;"
-    ": 3keep [ ] 3bi ;"
-    ""
-    ": dup   [ ] [ ] bi ;"
-    ": 2dup  [ ] [ ] 2bi ;"
-    ": 3dup  [ ] [ ] 3bi ;"
-    ""
-    ": tuck  [ nip ] [ ] 2bi ;"
-    ": swap  [ nip ] [ drop ] 2bi ;"
-    ""
-    ": over  [ ] [ drop ] 2bi ;"
-    ": pick  [ ] [ 2drop ] 3bi ;"
-    ": 2over [ ] [ drop ] 3bi ;"
-} ;
-
 ARTICLE: "cleave-combinators" "Cleave combinators"
-"The cleave combinators apply multiple quotations to a single value."
+"The cleave combinators apply multiple quotations to a single value or set of values."
 $nl
 "Two quotations:"
 { $subsections
@@ -46,54 +25,21 @@ $nl
     2cleave
     3cleave
 }
-$nl
-"Technically, the cleave combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on the top of the stack can be written in one of two ways:"
+"Cleave combinators provide a more readable alternative to repeated applications of the " { $link keep } " combinators. The following example using " { $link keep } ":"
 { $code
-    "! First alternative; uses keep"
     "[ 1 + ] keep"
     "[ 1 - ] keep"
     "2 *"
-    "! Second alternative: uses tri"
+}
+"can be more clearly written using " { $link tri } ":"
+{ $code
     "[ 1 + ]"
     "[ 1 - ]"
     "[ 2 * ] tri"
-}
-"The latter is more aesthetically pleasing than the former."
-$nl
-{ $subsections "cleave-shuffle-equivalence" } ;
-
-ARTICLE: "spread-shuffle-equivalence" "Expressing shuffle words with spread combinators"
-"Spread combinators are defined in terms of shuffle words, and mappings from certain shuffle idioms to spread combinators are discussed in the documentation for " { $link bi* } ", " { $link 2bi* } ", " { $link tri* } ", and " { $link 2tri* } "."
-$nl
-"Certain shuffle words can also be expressed in terms of the spread combinators. Internalizing such identities can help with understanding and writing code using spread combinators:"
-{ $code
-    ": dip   [ ] bi* ;"
-    ": 2dip  [ ] [ ] tri* ;"
-    ""
-    ": nip   [ drop ] [ ] bi* ;"
-    ": 2nip  [ drop ] [ drop ] [ ] tri* ;"
-    ""
-    ": rot"
-    "    [ [ drop ] [      ] [ drop ] tri* ]"
-    "    [ [ drop ] [ drop ] [      ] tri* ]"
-    "    [ [      ] [ drop ] [ drop ] tri* ]"
-    "    3tri ;"
-    ""
-    ": -rot"
-    "    [ [ drop ] [ drop ] [      ] tri* ]"
-    "    [ [      ] [ drop ] [ drop ] tri* ]"
-    "    [ [ drop ] [      ] [ drop ] tri* ]"
-    "    3tri ;"
-    ""
-    ": spin"
-    "    [ [ drop ] [ drop ] [      ] tri* ]"
-    "    [ [ drop ] [      ] [ drop ] tri* ]"
-    "    [ [      ] [ drop ] [ drop ] tri* ]"
-    "    3tri ;"
 } ;
 
 ARTICLE: "spread-combinators" "Spread combinators"
-"The spread combinators apply multiple quotations to multiple values. In this case, " { $snippet "*" } " suffix signify spreading."
+"The spread combinators apply multiple quotations to multiple values. The asterisk (" { $snippet "*" } ") suffixed to these words' names signifies that they are spread combinators."
 $nl
 "Two quotations:"
 { $subsections bi* 2bi* }
@@ -101,26 +47,26 @@ $nl
 { $subsections tri* 2tri* }
 "An array of quotations:"
 { $subsections spread }
-"Technically, the spread combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on three related values can be written in one of two ways:"
+"Spread combinators provide a more readable alternative to repeated applications of the " { $link dip } " combinators. The following example using " { $link dip } ":"
 { $code
-    "! First alternative; uses dip"
     "[ [ 1 + ] dip 1 - ] dip 2 *"
-    "! Second alternative: uses tri*"
+}
+"can be more clearly written using " { $link tri* } ":"
+{ $code
     "[ 1 + ] [ 1 - ] [ 2 * ] tri*"
 }
-"A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "."
-$nl
-{ $subsections "spread-shuffle-equivalence" } ;
+"A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "." ;
 
 ARTICLE: "apply-combinators" "Apply combinators"
-"The apply combinators apply a single quotation to multiple values. The " { $snippet "@" } " suffix signifies application."
+"The apply combinators apply a single quotation to multiple values. The asterisk (" { $snippet "*" } ") suffixed to these words' names signifies that they are apply combinators."
 $nl
 "Two quotations:"
 { $subsections bi@ 2bi@ }
 "Three quotations:"
 { $subsections tri@ 2tri@ }
-"A pair of utility words built from " { $link bi@ } ":"
-{ $subsections both? either? } ;
+"A pair of condition words built from " { $link bi@ } " to test two values:"
+{ $subsections both? either? }
+"All of the apply combinators are equivalent to using the corresponding " { $link "spread-combinators" } " with the same quotation supplied for every value." ;
 
 ARTICLE: "dip-keep-combinators" "Preserving combinators"
 "Sometimes it is necessary to temporarily hide values on the datastack. The " { $snippet "dip" } " combinators invoke the quotation at the top of the stack, hiding some number of values underneath:"
