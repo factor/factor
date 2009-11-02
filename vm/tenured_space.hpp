@@ -52,6 +52,12 @@ struct tenured_space : free_list_allocator<object> {
 		this->state.set_marked_p(obj);
 		this->mark_stack.push_back(obj);
 	}
+
+	void sweep()
+	{
+		free_list_allocator<object>::sweep();
+		starts.update_for_sweep(&this->state);
+	}
 };
 
 }

@@ -55,4 +55,36 @@ void object_start_map::clear_object_start_offsets()
 	memset(object_start_offsets,card_starts_inside_object,addr_to_card(size));
 }
 
+void object_start_map::update_card_for_sweep(cell index, u16 mask)
+{
+	cell offset = object_start_offsets[index];
+	if(offset != card_starts_inside_object)
+	{
+		mask >>= (offset / block_granularity);
+
+		if(mask == 0)
+		{
+			/* The rest of the block after the old object start is free */
+			object_start_offsets[index] = card_starts_inside_object;
+		}
+		else
+		{
+			/* Move the object start forward if necessary */
+			object_start_offsets[index] = offset + (rightmost_set_bit(mask) * block_granularity);
+		}
+	}
+}
+
+void object_start_map::update_for_sweep(mark_bits<object> *state)
+{
+	for(cell index = 0; index < state->bits_size; index++)
+	{
+		u64 mask = state->marked[index];
+		update_card_for_sweep(index * 4,      mask        & 0xffff);
+		update_card_for_sweep(index * 4 + 1, (mask >> 16) & 0xffff);
+		update_card_for_sweep(index * 4 + 2, (mask >> 32) & 0xffff);
+		update_card_for_sweep(index * 4 + 3, (mask >> 48) & 0xffff);
+	}
+}
+
 }

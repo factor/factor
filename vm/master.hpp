@@ -50,6 +50,7 @@ namespace factor
 #include "bignum.hpp"
 #include "code_block.hpp"
 #include "bump_allocator.hpp"
+#include "bitwise_hacks.hpp"
 #include "mark_bits.hpp"
 #include "free_list.hpp"
 #include "free_list_allocator.hpp"

@@ -109,21 +109,6 @@ template<typename Block> struct mark_bits {
 		set_bitmap_range(marked,address);
 	}
 
-	/* From http://chessprogramming.wikispaces.com/Population+Count */
-	cell popcount(u64 x)
-	{
-		u64 k1 = 0x5555555555555555ll;
-		u64 k2 = 0x3333333333333333ll;
-		u64 k4 = 0x0f0f0f0f0f0f0f0fll;
-		u64 kf = 0x0101010101010101ll;
-		x =  x       - ((x >> 1)  & k1); // put count of each 2 bits into those 2 bits
-		x = (x & k2) + ((x >> 2)  & k2); // put count of each 4 bits into those 4 bits
-		x = (x       +  (x >> 4)) & k4 ; // put count of each 8 bits into those 8 bits
-		x = (x * kf) >> 56; // returns 8 most significant bits of x + (x<<8) + (x<<16) + (x<<24) + ...
-
-		return (cell)x;
-	}
-
 	/* The eventual destination of a block after compaction is just the number
 	of marked blocks before it. Live blocks must be marked on entry. */
 	void compute_forwarding()
@@ -155,17 +140,6 @@ template<typename Block> struct mark_bits {
 		return new_block;
 	}
 
-	cell rightmost_clear_bit(u64 x)
-	{
-		cell n = 0;
-		while(x & 1)
-		{
-			n++;
-			x >>= 1;
-		}
-		return n;
-	}
-
 	Block *next_unmarked_block_after(Block *original)
 	{
 		std::pair<cell,cell> position = bitmap_deref(original);
@@ -191,17 +165,6 @@ template<typename Block> struct mark_bits {
 
 		/* No unmarked blocks were found */
 		return (Block *)(this->start + this->size);
-	}
-
-	cell rightmost_set_bit(u64 x)
-	{
-		cell n = 0;
-		while(!(x & 1))
-		{
-			n++;
-			x >>= 1;
-		}
-		return n;
 	}
 
 	Block *next_marked_block_after(Block *original)
