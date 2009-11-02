@@ -65,11 +65,9 @@ enum special_object {
 	/* Polymorphic inline cache generation in inline_cache.c */
 	PIC_LOAD            = 47,
 	PIC_TAG,
-	PIC_HI_TAG,
 	PIC_TUPLE,
-	PIC_HI_TAG_TUPLE,
 	PIC_CHECK_TAG,
-	PIC_CHECK,
+	PIC_CHECK_TUPLE,
 	PIC_HIT,
 	PIC_MISS_WORD,
 	PIC_MISS_TAIL_WORD,
@@ -77,7 +75,7 @@ enum special_object {
 	/* Megamorphic cache generation in dispatch.c */
 	MEGA_LOOKUP         = 57,
 	MEGA_LOOKUP_WORD,
-        MEGA_MISS_WORD,
+	MEGA_MISS_WORD,
 
 	OBJ_UNDEFINED       = 60, /* default quotation for undefined words */
 

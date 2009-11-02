@@ -9,7 +9,8 @@ void factor_vm::init_inline_caching(int max_size)
 	cold_call_to_ic_transitions = 0;
 	ic_to_pic_transitions = 0;
 	pic_to_mega_transitions = 0;
-	for(int i = 0; i < 4; i++) pic_counts[i] = 0;
+	pic_counts[0] = 0;
+	pic_counts[1] = 0;
 }
 
 void factor_vm::deallocate_inline_cache(cell return_address)
@@ -29,39 +30,20 @@ void factor_vm::deallocate_inline_cache(cell return_address)
 it contains */
 cell factor_vm::determine_inline_cache_type(array *cache_entries)
 {
-	bool seen_hi_tag = false, seen_tuple = false;
+	bool seen_tuple = false;
 
 	cell i;
 	for(i = 0; i < array_capacity(cache_entries); i += 2)
 	{
-		cell klass = array_nth(cache_entries,i);
-
 		/* Is it a tuple layout? */
-		switch(TAG(klass))
+		if(TAG(array_nth(cache_entries,i)) == ARRAY_TYPE)
 		{
-		case FIXNUM_TYPE:
-			{
-				fixnum type = untag_fixnum(klass);
-				if(type >= HEADER_TYPE)
-					seen_hi_tag = true;
-			}
-			break;
-		case ARRAY_TYPE:
 			seen_tuple = true;
-			break;
-		default:
-			critical_error("Expected a fixnum or array",klass);
 			break;
 		}
 	}
 
-	if(seen_hi_tag && seen_tuple) return PIC_HI_TAG_TUPLE;
-	if(seen_hi_tag && !seen_tuple) return PIC_HI_TAG;
-	if(!seen_hi_tag && seen_tuple) return PIC_TUPLE;
-	if(!seen_hi_tag && !seen_tuple) return PIC_TAG;
-
-	critical_error("Oops",0);
-	return 0;
+	return seen_tuple ? PIC_TUPLE : PIC_TAG;
 }
 
 void factor_vm::update_pic_count(cell type)
@@ -85,10 +67,10 @@ struct inline_cache_jit : public jit {
 void inline_cache_jit::emit_check(cell klass)
 {
 	cell code_template;
-	if(TAG(klass) == FIXNUM_TYPE && untag_fixnum(klass) < HEADER_TYPE)
+	if(TAG(klass) == FIXNUM_TYPE)
 		code_template = parent->special_objects[PIC_CHECK_TAG];
 	else
-		code_template = parent->special_objects[PIC_CHECK];
+		code_template = parent->special_objects[PIC_CHECK_TUPLE];
 
 	emit_with(code_template,klass);
 }
@@ -250,8 +232,8 @@ VM_C_API void *inline_cache_miss(cell return_address, factor_vm *parent)
 void factor_vm::primitive_reset_inline_cache_stats()
 {
 	cold_call_to_ic_transitions = ic_to_pic_transitions = pic_to_mega_transitions = 0;
-	cell i;
-	for(i = 0; i < 4; i++) pic_counts[i] = 0;
+	pic_counts[0] = 0;
+	pic_counts[1] = 0;
 }
 
 void factor_vm::primitive_inline_cache_stats()
@@ -260,9 +242,8 @@ void factor_vm::primitive_inline_cache_stats()
 	stats.add(allot_cell(cold_call_to_ic_transitions));
 	stats.add(allot_cell(ic_to_pic_transitions));
 	stats.add(allot_cell(pic_to_mega_transitions));
-	cell i;
-	for(i = 0; i < 4; i++)
-		stats.add(allot_cell(pic_counts[i]));
+	stats.add(allot_cell(pic_counts[0]));
+	stats.add(allot_cell(pic_counts[1]));
 	stats.trim();
 	dpush(stats.elements.value());
 }

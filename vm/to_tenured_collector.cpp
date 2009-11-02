@@ -16,7 +16,7 @@ void to_tenured_collector::tenure_reachable_objects()
 	{
 		object *obj = mark_stack->back();
 		mark_stack->pop_back();
-		this->trace_slots(obj);
+		this->trace_object(obj);
 	}
 }
 

@@ -52,7 +52,7 @@ void factor_vm::collect_mark_impl(bool trace_contexts_p)
 	{
 		object *obj = mark_stack->back();
 		mark_stack->pop_back();
-		collector.trace_slots(obj);
+		collector.trace_object(obj);
 		code_marker.visit_object_code_block(obj);
 	}
 

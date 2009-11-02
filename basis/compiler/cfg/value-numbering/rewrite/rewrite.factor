@@ -37,7 +37,7 @@ M: insn rewrite drop f ;
     dup ##compare-imm-branch? [
         {
             [ cc>> cc/= eq? ]
-            [ src2>> \ f tag-number eq? ]
+            [ src2>> \ f type-number eq? ]
         } 1&&
     ] [ drop f ] if ; inline
 
@@ -110,7 +110,7 @@ M: ##compare-imm rewrite-tagged-comparison
 : rewrite-redundant-comparison? ( insn -- ? )
     {
         [ src1>> vreg>expr general-compare-expr? ]
-        [ src2>> \ f tag-number = ]
+        [ src2>> \ f type-number = ]
         [ cc>> { cc= cc/= } member-eq? ]
     } 1&& ; inline
 
@@ -204,7 +204,7 @@ M: ##compare-branch rewrite
     [ dst>> ] dip
     {
         { t [ t \ ##load-constant new-insn ] }
-        { f [ \ f tag-number \ ##load-immediate new-insn ] }
+        { f [ \ f type-number \ ##load-immediate new-insn ] }
     } case ;
 
 : rewrite-self-compare ( insn -- insn' )

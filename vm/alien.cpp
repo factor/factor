@@ -14,7 +14,10 @@ char *factor_vm::pinned_alien_offset(cell obj)
 			alien *ptr = untag<alien>(obj);
 			if(to_boolean(ptr->expired))
 				general_error(ERROR_EXPIRED,obj,false_object,NULL);
-			return pinned_alien_offset(ptr->base) + ptr->displacement;
+			if(to_boolean(ptr->base))
+				type_error(ALIEN_TYPE,obj);
+			else
+				return (char *)ptr->address;
 		}
 	case F_TYPE:
 		return NULL;
@@ -41,6 +44,7 @@ cell factor_vm::allot_alien(cell delegate_, cell displacement)
 
 	new_alien->displacement = displacement;
 	new_alien->expired = false_object;
+	new_alien->update_address();
 
 	return new_alien.value();
 }
@@ -168,12 +172,7 @@ char *factor_vm::alien_offset(cell obj)
 	case BYTE_ARRAY_TYPE:
 		return untag<byte_array>(obj)->data<char>();
 	case ALIEN_TYPE:
-		{
-			alien *ptr = untag<alien>(obj);
-			if(to_boolean(ptr->expired))
-				general_error(ERROR_EXPIRED,obj,false_object,NULL);
-			return alien_offset(ptr->base) + ptr->displacement;
-		}
+		return (char *)untag<alien>(obj)->address;
 	case F_TYPE:
 		return NULL;
 	default:

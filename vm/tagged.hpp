@@ -3,12 +3,12 @@ namespace factor
 
 template<typename Type> cell tag(Type *value)
 {
-	return RETAG(value,tag_for(Type::type_number));
+	return RETAG(value,Type::type_number);
 }
 
 inline static cell tag_dynamic(object *value)
 {
-	return RETAG(value,tag_for(value->h.hi_tag()));
+	return RETAG(value,value->h.hi_tag());
 }
 
 template<typename Type>
@@ -17,11 +17,7 @@ struct tagged
 	cell value_;
 
 	cell type() const {
-		cell tag = TAG(value_);
-		if(tag == OBJECT_TYPE)
-			return ((object *)UNTAG(value_))->h.hi_tag();
-		else
-			return tag;
+		return TAG(value_);
 	}
 
 	bool type_p(cell type_) const

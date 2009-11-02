@@ -179,46 +179,37 @@ M: x86 %unbox-alien ( dst src -- )
 
 M:: x86 %unbox-any-c-ptr ( dst src temp -- )
     [
-        { "is-byte-array" "end" "start" } [ define-label ] each
-        dst 0 MOV
+        "end" define-label
+        ! Compute tag in temp register
         temp src MOV
-        ! We come back here with displaced aliens
-        "start" resolve-label
+        temp tag-mask get AND
+        dst 0 MOV
         ! Is the object f?
-        temp \ f tag-number CMP
+        src \ f type-number CMP
         "end" get JE
-        ! Is the object an alien?
-        temp header-offset [+] alien type-number tag-fixnum CMP
-        "is-byte-array" get JNE
-        ! If so, load the offset and add it to the address
-        dst temp alien-offset [+] ADD
-        ! Now recurse on the underlying alien
-        temp temp underlying-alien-offset [+] MOV
-        "start" get JMP
-        "is-byte-array" resolve-label
-        ! Add byte array address to address being computed
-        dst temp ADD
         ! Add an offset to start of byte array's data
-        dst byte-array-offset ADD
+        dst src byte-array-offset [+] LEA
+        ! Is the object an alien?
+        temp alien type-number CMP
+        "end" get JNE
+        ! If so, load the offset and add it to the address
+        dst src alien-offset [+] MOV
         "end" resolve-label
     ] with-scope ;
 
-: alien@ ( reg n -- op ) cells alien tag-number - [+] ;
-
-:: %allot-alien ( dst displacement base temp -- )
-    dst 4 cells alien temp %allot
-    dst 1 alien@ base MOV ! alien
-    dst 2 alien@ \ f tag-number MOV ! expired
-    dst 3 alien@ displacement MOV ! displacement
-    ;
+: alien@ ( reg n -- op ) cells alien type-number - [+] ;
 
 M:: x86 %box-alien ( dst src temp -- )
     [
         "end" define-label
-        dst \ f tag-number MOV
+        dst \ f type-number MOV
         src 0 CMP
         "end" get JE
-        dst src \ f tag-number temp %allot-alien
+        dst 5 cells alien temp %allot
+        dst 1 alien@ \ f type-number MOV ! base
+        dst 2 alien@ \ f type-number MOV ! expired
+        dst 3 alien@ displacement MOV ! displacement
+        dst 4 alien@ displacement MOV ! address
         "end" resolve-label
     ] with-scope ;
 
@@ -235,9 +226,10 @@ M:: x86 %box-displaced-alien ( dst displacement base displacement' base' base-cl
         ! If base is already a displaced alien, unpack it
         base' base MOV
         displacement' displacement MOV
-        base \ f tag-number CMP
+        base \ f type-number CMP
         "ok" get JE
-        base header-offset [+] alien type-number tag-fixnum CMP
+        ! XXX
+        base 0 [+] alien type-number tag-fixnum CMP
         "ok" get JNE
         ! displacement += base.displacement
         displacement' base 3 alien@ ADD
@@ -245,7 +237,7 @@ M:: x86 %box-displaced-alien ( dst displacement base displacement' base' base-cl
         base' base 1 alien@ MOV
         "ok" resolve-label
         dst 1 alien@ base' MOV ! alien
-        dst 2 alien@ \ f tag-number MOV ! expired
+        dst 2 alien@ \ f type-number MOV ! expired
         dst 3 alien@ displacement' MOV ! displacement
         "end" resolve-label
     ] with-scope ;
@@ -402,7 +394,7 @@ M: x86 %vm-field-ptr ( dst field -- )
     [ [] ] [ type-number tag-fixnum ] bi* MOV ;
 
 : store-tagged ( dst tag -- )
-    tag-number OR ;
+    type-number OR ;
 
 M:: x86 %allot ( dst size class nursery-ptr -- )
     nursery-ptr dst load-allot-ptr
@@ -444,7 +436,7 @@ M: x86 %alien-global ( dst symbol library -- )
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
 :: %boolean ( dst temp word -- )
-    dst \ f tag-number MOV
+    dst \ f type-number MOV
     temp 0 MOV \ t rc-absolute-cell rel-immediate
     dst temp word execute ; inline
 

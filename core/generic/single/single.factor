@@ -112,15 +112,6 @@ TUPLE: tuple-dispatch-engine echelons ;
     tuple bootstrap-word
     \ <tuple-dispatch-engine> convert-methods ;
 
-! 2.2 Convert hi-tag methods
-TUPLE: hi-tag-dispatch-engine methods ;
-
-C: <hi-tag-dispatch-engine> hi-tag-dispatch-engine
-
-: convert-hi-tag-methods ( assoc -- assoc' )
-    \ hi-tag bootstrap-word
-    \ <hi-tag-dispatch-engine> convert-methods ;
-
 ! 3 Tag methods
 TUPLE: tag-dispatch-engine methods ;
 
@@ -129,7 +120,6 @@ C: <tag-dispatch-engine> tag-dispatch-engine
 : <engine> ( assoc -- engine )
     flatten-methods
     convert-tuple-methods
-    convert-hi-tag-methods
     <tag-dispatch-engine> ;
 
 ! ! ! Compile engine ! ! !
@@ -144,23 +134,12 @@ GENERIC: compile-engine ( engine -- obj )
 : direct-dispatch-table ( assoc n -- table )
     default get <array> [ <enum> swap update ] keep ;
 
-: lo-tag-number ( class -- n )
-    "type" word-prop dup num-tags get iota member?
-    [ drop object tag-number ] unless ;
+: tag-number ( class -- n ) "type" word-prop ;
 
 M: tag-dispatch-engine compile-engine
     methods>> compile-engines*
-    [ [ lo-tag-number ] dip ] assoc-map
-    num-tags get direct-dispatch-table ;
-
-: num-hi-tags ( -- n ) num-types get num-tags get - ;
-
-: hi-tag-number ( class -- n ) "type" word-prop ;
-
-M: hi-tag-dispatch-engine compile-engine
-    methods>> compile-engines*
-    [ [ hi-tag-number num-tags get - ] dip ] assoc-map
-    num-hi-tags direct-dispatch-table ;
+    [ [ tag-number ] dip ] assoc-map
+    num-types get direct-dispatch-table ;
 
 : build-fast-hash ( methods -- buckets )
     >alist V{ } clone [ hashcode 1array ] distribute-buckets

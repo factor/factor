@@ -25,7 +25,7 @@ DEF(void,primitive_fixnum_multiply,(void *myvm)):
 	mov (DS_REG),ARITH_TEMP_1
 	mov ARITH_TEMP_1,DIV_RESULT
 	mov -CELL_SIZE(DS_REG),ARITH_TEMP_2
-	sar $3,ARITH_TEMP_2
+	sar $4,ARITH_TEMP_2
 	sub $CELL_SIZE,DS_REG
 	imul ARITH_TEMP_2
 	jo multiply_overflow

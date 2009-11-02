@@ -90,9 +90,12 @@ void factor_vm::fixup_quotation(quotation *quot, cell code_relocation_base)
 		quot->xt = (void *)lazy_jit_compile;
 }
 
-void factor_vm::fixup_alien(alien *d)
+void factor_vm::fixup_alien(alien *ptr)
 {
-	if(!to_boolean(d->base)) d->expired = true_object;
+	if(!to_boolean(ptr->base))
+		ptr->expired = true_object;
+	else
+		ptr->update_address();
 }
 
 struct stack_frame_fixupper {
