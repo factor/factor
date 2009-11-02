@@ -495,7 +495,7 @@ M: x86 %sqrt SQRTSD ;
 M: x86 %single>double-float [ %clear-unless-in-place ] [ CVTSS2SD ] 2bi ;
 M: x86 %double>single-float [ %clear-unless-in-place ] [ CVTSD2SS ] 2bi ;
 
-M: x86 %integer>float [ dup XORPS ] [ CVTSI2SD ] 2bi ;
+M: x86 %integer>float [ drop dup XORPS ] [ CVTSI2SD ] 2bi ;
 M: x86 %float>integer CVTTSD2SI ;
 
 : %cmov-float= ( dst src -- )
