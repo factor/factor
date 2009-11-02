@@ -929,7 +929,8 @@ PRIVATE>
 : trim ( seq quot -- newseq )
     [ trim-slice ] [ drop ] 2bi like ; inline
 
-: sum ( seq -- n ) 0 [ + ] binary-reduce ;
+GENERIC: sum ( seq -- n )
+M: object sum 0 [ + ] binary-reduce ; inline
 
 : product ( seq -- n ) 1 [ * ] binary-reduce ;
 
