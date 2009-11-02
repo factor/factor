@@ -1370,7 +1370,6 @@ M: x86 immediate-bitwise? ( n -- ? )
     #! set up by the caller.
     stack-frame get total-size>> + stack@ ;
 
-enable-simd
 enable-min/max
 enable-fixnum-log2
 

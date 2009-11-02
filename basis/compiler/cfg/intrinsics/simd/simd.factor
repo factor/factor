@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien byte-arrays fry classes.algebra
 cpu.architecture kernel math sequences math.vectors
-math.vectors.simd.intrinsics macros generalizations combinators
+math.vectors.simd macros generalizations combinators
 combinators.short-circuit arrays locals
 compiler.tree.propagation.info compiler.cfg.builder.blocks
 compiler.cfg.comparisons
@@ -351,3 +351,63 @@ MACRO: if-literals-match ( quots -- )
         [ generate-blend-vector ] 3bi
     ] if ;
 
+: enable-simd ( -- )
+    {
+        { math.vectors.simd:assert-positive [ drop ] }
+        { math.vectors.simd:(simd-v+) [ [ ^^add-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vs+) [ [ ^^saturated-add-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-v+-) [ [ ^^add-sub-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-v-) [ [ ^^sub-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vs-) [ [ ^^saturated-sub-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vneg) [ [ generate-neg-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd:(simd-v*) [ [ ^^mul-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vs*) [ [ ^^saturated-mul-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-v/) [ [ ^^div-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vmin) [ [ generate-min-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vmax) [ [ generate-max-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-v.) [ [ ^^dot-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vabs) [ [ generate-abs-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd:(simd-vsqrt) [ [ ^^sqrt-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd:(simd-vbitand) [ [ ^^and-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vbitandn) [ [ ^^andn-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vbitor) [ [ ^^or-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vbitxor) [ [ ^^xor-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vbitnot) [ [ generate-not-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd:(simd-vand) [ [ ^^and-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vandn) [ [ ^^andn-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vor) [ [ ^^or-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vxor) [ [ ^^xor-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vnot) [ [ generate-not-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd:(simd-v<=) [ [ cc<= generate-compare-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-v<) [ [ cc< generate-compare-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-v=) [ [ cc= generate-compare-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-v>) [ [ cc> generate-compare-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-v>=) [ [ cc>= generate-compare-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vunordered?) [ [ cc/<>= generate-compare-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vany?) [ [ vcc-any ^^test-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd:(simd-vall?) [ [ vcc-all ^^test-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd:(simd-vnone?) [ [ vcc-none ^^test-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd:(simd-vlshift) [ [ ^^shl-vector-imm ] [ ^^shl-vector ] emit-shift-vector-op ] }
+        { math.vectors.simd:(simd-vrshift) [ [ ^^shr-vector-imm ] [ ^^shr-vector ] emit-shift-vector-op ] }
+        { math.vectors.simd:(simd-hlshift) [ [ ^^horizontal-shl-vector-imm ] emit-shift-vector-imm-op ] }
+        { math.vectors.simd:(simd-hrshift) [ [ ^^horizontal-shr-vector-imm ] emit-shift-vector-imm-op ] }
+        { math.vectors.simd:(simd-with) [ [ ^^with-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd:(simd-gather-2) [ emit-gather-vector-2 ] }
+        { math.vectors.simd:(simd-gather-4) [ emit-gather-vector-4 ] }
+        { math.vectors.simd:(simd-vshuffle-elements) [ emit-shuffle-vector ] }
+        { math.vectors.simd:(simd-vshuffle-bytes) [ emit-shuffle-vector-var ] }
+        { math.vectors.simd:(simd-vmerge-head) [ [ ^^merge-vector-head ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vmerge-tail) [ [ ^^merge-vector-tail ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-v>float) [ [ ^^integer>float-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd:(simd-v>integer) [ [ ^^float>integer-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd:(simd-vpack-signed) [ [ ^^signed-pack-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vpack-unsigned) [ [ ^^unsigned-pack-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd:(simd-vunpack-head) [ [ generate-unpack-vector-head ] emit-unary-vector-op ] }
+        { math.vectors.simd:(simd-vunpack-tail) [ [ generate-unpack-vector-tail ] emit-unary-vector-op ] }
+        { math.vectors.simd:(simd-select) [ emit-select-vector ] }
+        { math.vectors.simd:(simd-sum) [ [ ^^horizontal-add-vector ] emit-unary-vector-op ] }
+        { math.vectors.simd:alien-vector [ emit-alien-vector ] }
+        { math.vectors.simd:set-alien-vector [ emit-set-alien-vector ] }
+    } enable-intrinsics ;
+
+enable-simd
