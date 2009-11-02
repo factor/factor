@@ -28,17 +28,6 @@ struct code_block_marker {
 	}
 };
 
-struct object_start_map_updater {
-	object_start_map *starts;
-
-	explicit object_start_map_updater(object_start_map *starts_) : starts(starts_) {}
-
-	void operator()(object *obj, cell size)
-	{
-		starts->record_object_start_offset(obj);
-	}
-};
-
 void factor_vm::collect_mark_impl(bool trace_contexts_p)
 {
 	full_collector collector(this);

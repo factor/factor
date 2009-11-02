@@ -178,13 +178,6 @@ TUPLE: gc-stats collections times ;
         ] each
     ] { } make ;
 
-: aggregate-stats-table ( stats -- table )
-    [ { "Total collections:" "Total GC time:" } ] dip
-    values
-    [ [ collections>> ] map-sum ]
-    [ [ times>> sum ] map-sum micros>string ]
-    bi 2array zip ;
-
 PRIVATE>
 
 : gc-event. ( event -- )
@@ -195,10 +188,21 @@ PRIVATE>
     } fancy-table. ;
 
 : gc-stats. ( events -- )
-    compute-gc-stats
-    [ gc-stats-table simple-table. nl ]
-    [ aggregate-stats-table simple-table. ]
-    bi ;
+    compute-gc-stats gc-stats-table simple-table. ;
+
+: gc-summary. ( events -- )
+    {
+        { "Collections:" [ length commas ] }
+        { "Cards scanned:" [ [ cards-scanned>> ] map-sum commas ] }
+        { "Decks scanned:" [ [ decks-scanned>> ] map-sum commas ] }
+        { "Code blocks scanned:" [ [ code-blocks-scanned>> ] map-sum commas ] }
+        { "Total time:" [ [ total-time>> ] map-sum micros>string ] }
+        { "Card scan time:" [ [ card-scan-time>> ] map-sum micros>string ] }
+        { "Code block scan time:" [ [ code-scan-time>> ] map-sum micros>string ] }
+        { "Data heap sweep time:" [ [ data-sweep-time>> ] map-sum micros>string ] }
+        { "Code heap sweep time:" [ [ code-sweep-time>> ] map-sum micros>string ] }
+        { "Compaction time:" [ [ compaction-time>> ] map-sum micros>string ] }
+    } fancy-table. ;
 
 : heap-sizes. ( events -- )
     heap-sizes simple-table. ;
