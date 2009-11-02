@@ -28,7 +28,15 @@ void factor_vm::collect_aging()
 			full_unmarker());
 		current_gc->event->ended_card_scan(collector.cards_scanned,collector.decks_scanned);
 
+		current_gc->event->started_code_scan();
+		collector.trace_code_heap_roots(&code->points_to_aging);
+		current_gc->event->ended_code_scan(collector.code_blocks_scanned);
+
 		collector.tenure_reachable_objects();
+
+		current_gc->event->started_code_sweep();
+		update_code_heap_for_minor_gc(&code->points_to_aging);
+		current_gc->event->ended_code_sweep();
 	}
 	{
 		/* If collection fails here, do a to_tenured collection. */
@@ -42,18 +50,11 @@ void factor_vm::collect_aging()
 		collector.trace_roots();
 		collector.trace_contexts();
 
-		current_gc->event->started_code_scan();
-		collector.trace_code_heap_roots(&code->points_to_aging);
-		current_gc->event->ended_code_scan(collector.code_blocks_scanned);
-
 		collector.cheneys_algorithm();
-
-		current_gc->event->started_code_sweep();
-		update_code_heap_for_minor_gc(&code->points_to_aging);
-		current_gc->event->ended_code_sweep();
 
 		data->reset_generation(&nursery);
 		code->points_to_nursery.clear();
+		code->points_to_aging.clear();
 	}
 }
 
