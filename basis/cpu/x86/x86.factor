@@ -489,10 +489,13 @@ M: x86 %min-float double-rep two-operand MINSD ;
 M: x86 %max-float double-rep two-operand MAXSD ;
 M: x86 %sqrt SQRTSD ;
 
-M: x86 %single>double-float CVTSS2SD ;
-M: x86 %double>single-float CVTSD2SS ;
+: %clear-unless-in-place ( dst src -- )
+    over = [ drop ] [ dup XORPS ] if ;
 
-M: x86 %integer>float CVTSI2SD ;
+M: x86 %single>double-float [ %clear-unless-in-place ] [ CVTSS2SD ] 2bi ;
+M: x86 %double>single-float [ %clear-unless-in-place ] [ CVTSD2SS ] 2bi ;
+
+M: x86 %integer>float [ dup XORPS ] [ CVTSI2SD ] 2bi ;
 M: x86 %float>integer CVTTSD2SI ;
 
 : %cmov-float= ( dst src -- )
