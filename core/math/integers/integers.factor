@@ -33,7 +33,16 @@ M: fixnum + fixnum+ ; inline
 M: fixnum - fixnum- ; inline
 M: fixnum * fixnum* ; inline
 M: fixnum /i fixnum/i ; inline
-M: fixnum /f [ >float ] dip >float float/f ; inline
+
+DEFER: bignum/f
+CONSTANT: bignum/f-threshold HEX: 20,0000,0000,0000
+
+: fixnum/f ( m n -- m/n )
+    [ >float ] bi@ float/f ; inline
+
+M: fixnum /f
+    2dup [ abs bignum/f-threshold >= ] either?
+    [ bignum/f ] [ fixnum/f ] if ; inline
 
 M: fixnum mod fixnum-mod ; inline
 
@@ -144,5 +153,8 @@ M: bignum (log2) bignum-log2 ; inline
         ] if-zero
     ] if ; inline
 
-M: bignum /f ( m n -- f )
+: bignum/f ( m n -- f )
     [ [ abs ] bi@ /f-abs ] [ [ 0 < ] bi@ xor ] 2bi [ neg ] when ;
+
+M: bignum /f ( m n -- f )
+    bignum/f ;

@@ -226,3 +226,7 @@ unit-test
         [ >float / ] [ /f ] 2bi 0.1 ~
     ] all?
 ] unit-test
+
+! Ensure that /f is accurate for fixnums > 2^53 on 64-bit platforms
+[ HEX: 1.758bec11492f9p-54 ] [ 1 12345678901234567 /f ] unit-test
+[ HEX: -1.758bec11492f9p-54 ] [ 1 -12345678901234567 /f ] unit-test
