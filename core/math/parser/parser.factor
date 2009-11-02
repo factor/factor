@@ -140,8 +140,6 @@ PRIVATE>
     [ dup 0 > ] swap [ /mod >digit ] curry "" produce-as nip
     reverse! ; inline
 
-PRIVATE>
-
 GENERIC# >base 1 ( n radix -- str )
 
 <PRIVATE
