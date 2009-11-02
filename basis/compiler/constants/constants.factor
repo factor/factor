@@ -12,19 +12,18 @@ CONSTANT: deck-bits 18
 ! These constants must match vm/layouts.h
 : slot-offset ( slot tag -- n ) [ bootstrap-cells ] dip - ; inline
 
-: header-offset ( -- n ) 0 object tag-number slot-offset ; inline
-: float-offset ( -- n ) 8 float tag-number - ; inline
-: string-offset ( -- n ) 4 string tag-number slot-offset ; inline
-: string-aux-offset ( -- n ) 2 string tag-number slot-offset ; inline
-: profile-count-offset ( -- n ) 8 \ word tag-number slot-offset ; inline
-: byte-array-offset ( -- n ) 16 byte-array tag-number - ; inline
-: alien-offset ( -- n ) 3 alien tag-number slot-offset ; inline
-: underlying-alien-offset ( -- n ) 1 alien tag-number slot-offset ; inline
-: tuple-class-offset ( -- n ) 1 tuple tag-number slot-offset ; inline
-: word-xt-offset ( -- n ) 10 \ word tag-number slot-offset ; inline
-: quot-xt-offset ( -- n ) 4 quotation tag-number slot-offset ; inline
-: word-code-offset ( -- n ) 11 \ word tag-number slot-offset ; inline
-: array-start-offset ( -- n ) 2 array tag-number slot-offset ; inline
+: float-offset ( -- n ) 8 float type-number - ; inline
+: string-offset ( -- n ) 4 string type-number slot-offset ; inline
+: string-aux-offset ( -- n ) 2 string type-number slot-offset ; inline
+: profile-count-offset ( -- n ) 8 \ word type-number slot-offset ; inline
+: byte-array-offset ( -- n ) 16 byte-array type-number - ; inline
+: alien-offset ( -- n ) 4 alien type-number slot-offset ; inline
+: underlying-alien-offset ( -- n ) 1 alien type-number slot-offset ; inline
+: tuple-class-offset ( -- n ) 1 tuple type-number slot-offset ; inline
+: word-xt-offset ( -- n ) 10 \ word type-number slot-offset ; inline
+: quot-xt-offset ( -- n ) 4 quotation type-number slot-offset ; inline
+: word-code-offset ( -- n ) 11 \ word type-number slot-offset ; inline
+: array-start-offset ( -- n ) 2 array type-number slot-offset ; inline
 : compiled-header-size ( -- n ) 4 bootstrap-cells ; inline
 
 ! Relocation classes

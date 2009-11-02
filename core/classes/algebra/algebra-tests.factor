@@ -95,8 +95,6 @@ UNION: z1 b1 c1 ;
 
 [ f ] [ a1 c1 class-or b1 c1 class-or class-and a1 b1 class-or classes-intersect? ] unit-test
 
-[ f ] [ growable \ hi-tag classes-intersect? ] unit-test
-
 [ t ] [
     growable tuple sequence class-and class<=
 ] unit-test

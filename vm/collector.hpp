@@ -111,9 +111,11 @@ template<typename TargetGeneration, typename Policy> struct collector {
 		workhorse.visit_handle(handle);
 	}
 
-	void trace_slots(object *ptr)
+	void trace_object(object *ptr)
 	{
 		workhorse.visit_slots(ptr);
+		if(ptr->h.hi_tag() == ALIEN_TYPE)
+			((alien *)ptr)->update_address();
 	}
 
 	void trace_roots()

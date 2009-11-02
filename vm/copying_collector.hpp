@@ -12,7 +12,7 @@ struct copying_collector : collector<TargetGeneration,Policy> {
 	{
 		while(scan && scan < this->target->here)
 		{
-			this->trace_slots((object *)scan);
+			this->trace_object((object *)scan);
 			scan = this->target->next_object_after(scan);
 		}
 	}

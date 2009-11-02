@@ -60,7 +60,7 @@ big-endian off
     ! pop boolean
     ds-reg bootstrap-cell SUB
     ! compare boolean with f
-    temp0 \ f tag-number CMP
+    temp0 \ f type-number CMP
     ! jump to true branch if not equal
     0 JNE rc-relative rt-xt jit-rel
     ! jump to false branch if equal
@@ -154,7 +154,7 @@ big-endian off
 
 ! ! ! Polymorphic inline caches
 
-! The PIC and megamorphic code stubs are not permitted to touch temp3.
+! The PIC stubs are not permitted to touch temp3.
 
 ! Load a value from a stack position
 [
@@ -171,40 +171,14 @@ big-endian off
 ! The 'make' trick lets us compute the jump distance for the
 ! conditional branches there
 
-! Hi-tag
-[
-    temp0 temp1 MOV
-    load-tag
-    temp1 object tag-number tag-fixnum CMP
-    [ temp1 temp0 object tag-number neg [+] MOV ] { } make
-    [ length JNE ] [ % ] bi
-] pic-hi-tag jit-define
-
 ! Tuple
 [
     temp0 temp1 MOV
     load-tag
-    temp1 tuple tag-number tag-fixnum CMP
-    [ temp1 temp0 tuple tag-number neg bootstrap-cell + [+] MOV ] { } make
+    temp1 tuple type-number tag-fixnum CMP
+    [ temp1 temp0 tuple type-number neg bootstrap-cell + [+] MOV ] { } make
     [ length JNE ] [ % ] bi
 ] pic-tuple jit-define
-
-! Hi-tag and tuple
-[
-    temp0 temp1 MOV
-    load-tag
-    ! If bits 2 and 3 are set, the tag is either 6 (object) or 7 (tuple)
-    temp1 BIN: 110 tag-fixnum CMP
-    [
-        ! Untag temp0
-        temp0 tag-mask get bitnot AND
-        ! Set temp1 to 0 for objects, and bootstrap-cell for tuples
-        temp1 1 tag-fixnum AND
-        bootstrap-cell 4 = [ temp1 1 SHR ] when
-        ! Load header cell or tuple layout cell
-        temp1 temp0 temp1 [+] MOV
-    ] [ ] make [ length JL ] [ % ] bi
-] pic-hi-tag-tuple jit-define
 
 [
     temp1 HEX: ffffffff CMP rc-absolute rt-immediate jit-rel
@@ -213,7 +187,7 @@ big-endian off
 [
     temp2 HEX: ffffffff MOV rc-absolute-cell rt-immediate jit-rel
     temp1 temp2 CMP
-] pic-check jit-define
+] pic-check-tuple jit-define
 
 [ 0 JE rc-relative rt-xt jit-rel ] pic-hit jit-define
 
@@ -224,14 +198,7 @@ big-endian off
     temp0 0 MOV rc-absolute-cell rt-immediate jit-rel
     ! key = hashcode(class)
     temp2 temp1 MOV
-    temp2 3 SHR
-    temp3 temp1 MOV
-    temp3 8 SHR
-    temp2 temp3 ADD
-    temp3 temp1 MOV
-    temp3 13 SHR
-    temp2 temp3 ADD
-    temp2 bootstrap-cell 4 = 3 4 ? SHL
+    bootstrap-cell 4 = [ temp2 1 SHR ] when
     ! key &= cache.length - 1
     temp2 mega-cache-size get 1 - bootstrap-cell * AND
     ! cache += array-start-offset
@@ -417,7 +384,7 @@ big-endian off
     t jit-literal
     temp3 0 MOV rc-absolute-cell rt-immediate jit-rel
     ! load f
-    temp1 \ f tag-number MOV
+    temp1 \ f type-number MOV
     ! load first value
     temp0 ds-reg [] MOV
     ! adjust stack pointer
@@ -547,7 +514,7 @@ big-endian off
     ds-reg bootstrap-cell SUB
     temp0 ds-reg [] OR
     temp0 tag-mask get AND
-    temp0 \ f tag-number MOV
+    temp0 \ f type-number MOV
     temp1 1 tag-fixnum MOV
     temp0 temp1 CMOVE
     ds-reg [] temp0 MOV

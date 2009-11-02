@@ -7,32 +7,26 @@ kernel.private ;
 
 16 data-alignment set
 
-BIN: 111 tag-mask set
-8 num-tags set
-3 tag-bits set
+BIN: 1111 tag-mask set
+4 tag-bits set
 
-15 num-types set
+14 num-types set
 
 32 mega-cache-size set
 
 H{
-    { fixnum      BIN: 000 }
-    { bignum      BIN: 001 }
-    { array       BIN: 010 }
-    { float       BIN: 011 }
-    { quotation   BIN: 100 }
-    { POSTPONE: f BIN: 101 }
-    { object      BIN: 110 }
-    { hi-tag      BIN: 110 }
-    { tuple       BIN: 111 }
-} tag-numbers set
-
-tag-numbers get H{
+    { fixnum 0 }
+    { bignum 1 }
+    { array 2 }
+    { float 3 }
+    { quotation 4 }
+    { POSTPONE: f 5 }
+    { alien 6 }
+    { tuple 7 }
     { wrapper 8 }
     { byte-array 9 }
     { callstack 10 }
     { string 11 }
     { word 12 }
     { dll 13 }
-    { alien 14 }
-} assoc-union type-numbers set
+} type-numbers set

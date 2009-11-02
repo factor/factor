@@ -50,7 +50,7 @@ IN: compiler.tests.low-level-ir
 ! one of the sources
 [ t ] [
     V{
-        T{ ##load-immediate f 1 $[ 2 cell log2 shift array tag-number - ] }
+        T{ ##load-immediate f 1 $[ 2 cell log2 shift array type-number - ] }
         T{ ##load-reference f 0 { t f t } }
         T{ ##slot f 0 0 1 }
     } compile-test-bb
@@ -59,13 +59,13 @@ IN: compiler.tests.low-level-ir
 [ t ] [
     V{
         T{ ##load-reference f 0 { t f t } }
-        T{ ##slot-imm f 0 0 2 $[ array tag-number ] }
+        T{ ##slot-imm f 0 0 2 $[ array type-number ] }
     } compile-test-bb
 ] unit-test
 
 [ t ] [
     V{
-        T{ ##load-immediate f 1 $[ 2 cell log2 shift array tag-number - ] }
+        T{ ##load-immediate f 1 $[ 2 cell log2 shift array type-number - ] }
         T{ ##load-reference f 0 { t f t } }
         T{ ##set-slot f 0 0 1 }
     } compile-test-bb
@@ -75,7 +75,7 @@ IN: compiler.tests.low-level-ir
 [ t ] [
     V{
         T{ ##load-reference f 0 { t f t } }
-        T{ ##set-slot-imm f 0 0 2 $[ array tag-number ] }
+        T{ ##set-slot-imm f 0 0 2 $[ array type-number ] }
     } compile-test-bb
     dup first eq?
 ] unit-test

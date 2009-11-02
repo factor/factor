@@ -13,18 +13,18 @@ IN: tools.time
 
 : dispatch-stats. ( stats -- )
     "== Megamorphic caches ==" print nl
-    { "Hits" "Misses" } swap zip simple-table. ;
+    [ { "Hits" "Misses" } ] dip zip simple-table. ;
 
 : inline-cache-stats. ( stats -- )
     "== Polymorphic inline caches ==" print nl
     3 cut
     [
         "- Transitions:" print
-        { "Cold to monomorphic" "Mono to polymorphic" "Poly to megamorphic" } swap zip
+        [ { "Cold to monomorphic" "Mono to polymorphic" "Poly to megamorphic" } ] dip zip
         simple-table. nl
     ] [
         "- Type check stubs:" print
-        { "Tag only" "Hi-tag" "Tuple" "Hi-tag and tuple" } swap zip
+        [ { "Tag" "Tuple" } ] dip zip
         simple-table.
     ] bi* ;
 

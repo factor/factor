@@ -266,7 +266,7 @@ M:: ppc %unbox-any-c-ptr ( dst src temp -- )
         ! We come back here with displaced aliens
         "start" resolve-label
         ! Is the object f?
-        0 scratch-reg \ f tag-number CMPI
+        0 scratch-reg \ f type-number CMPI
         ! If so, done
         "end" get BEQ
         ! Is the object an alien?
@@ -288,25 +288,20 @@ M:: ppc %unbox-any-c-ptr ( dst src temp -- )
         "end" resolve-label
     ] with-scope ;
 
-: alien@ ( n -- n' ) cells object tag-number - ;
-
-:: %allot-alien ( dst displacement base temp -- )
-    dst 4 cells alien temp %allot
-    temp \ f tag-number %load-immediate
-    ! Store underlying-alien slot
-    base dst 1 alien@ STW
-    ! Store expired slot
-    temp dst 2 alien@ STW
-    ! Store offset
-    displacement dst 3 alien@ STW ;
+: alien@ ( n -- n' ) cells alien type-number - ;
 
 M:: ppc %box-alien ( dst src temp -- )
     [
         "f" define-label
-        dst \ f tag-number %load-immediate
+        dst  %load-immediate
         0 src 0 CMPI
         "f" get BEQ
-        dst src temp temp %allot-alien
+        dst 5 cells alien temp %allot
+        temp \ f type-number %load-immediate
+        temp dst 1 alien@ STW
+        temp dst 2 alien@ STW
+        displacement dst 3 alien@ STW
+        displacement dst 4 alien@ STW
         "f" resolve-label
     ] with-scope ;
 
@@ -323,7 +318,7 @@ M:: ppc %box-displaced-alien ( dst displacement base displacement' base' base-cl
         displacement' :> temp
         dst 4 cells alien temp %allot
         ! If base is already a displaced alien, unpack it
-        0 base \ f tag-number CMPI
+        0 base \ f type-number CMPI
         "simple-case" get BEQ
         temp base header-offset LWZ
         0 temp alien type-number tag-fixnum CMPI
@@ -343,7 +338,7 @@ M:: ppc %box-displaced-alien ( dst displacement base displacement' base' base-cl
         ! Store offset
         displacement' dst 3 alien@ STW
         ! Store expired slot (its ok to clobber displacement')
-        temp \ f tag-number %load-immediate
+        temp \ f type-number %load-immediate
         temp dst 2 alien@ STW
         "end" resolve-label
     ] with-scope ;
@@ -382,7 +377,7 @@ M: ppc %set-alien-double -rot STFD ;
     scratch-reg dst 0 STW ;
 
 : store-tagged ( dst tag -- )
-    dupd tag-number ORI ;
+    dupd type-number ORI ;
 
 M:: ppc %allot ( dst size class nursery-ptr -- )
     nursery-ptr dst load-allot-ptr
@@ -460,7 +455,7 @@ M: ppc %epilogue ( n -- )
 
 :: (%boolean) ( dst temp branch1 branch2 -- )
     "end" define-label
-    dst \ f tag-number %load-immediate
+    dst \ f type-number %load-immediate
     "end" get branch1 execute( label -- )
     branch2 [ "end" get branch2 execute( label -- ) ] when
     dst \ t %load-reference
