@@ -208,8 +208,8 @@ M:: x86 %box-alien ( dst src temp -- )
         dst 5 cells alien temp %allot
         dst 1 alien@ \ f type-number MOV ! base
         dst 2 alien@ \ f type-number MOV ! expired
-        dst 3 alien@ displacement MOV ! displacement
-        dst 4 alien@ displacement MOV ! address
+        dst 3 alien@ src MOV ! displacement
+        dst 4 alien@ src MOV ! address
         "end" resolve-label
     ] with-scope ;
 
