@@ -6,29 +6,47 @@ byte-arrays accessors locals ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors
 
-MIXIN: simd-128
-MIXIN: simd-256
+GENERIC: vneg ( u -- v )
+M: object vneg [ neg ] map ;
 
-GENERIC: element-type ( obj -- c-type )
-M: object element-type drop f ; inline
+GENERIC# v+n 1 ( u n -- v )
+M: object v+n [ + ] curry map ;
 
-: vneg ( u -- v ) [ neg ] map ;
+GENERIC: n+v ( n v -- w )
+M: object n+v [ + ] with map ;
 
-: v+n ( u n -- v ) [ + ] curry map ;
-: n+v ( n u -- v ) [ + ] with map ;
-: v-n ( u n -- v ) [ - ] curry map ;
-: n-v ( n u -- v ) [ - ] with map ;
+GENERIC# v-n 1 ( u n -- w )
+M: object v-n [ - ] curry map ;
 
-: v*n ( u n -- v ) [ * ] curry map ;
-: n*v ( n u -- v ) [ * ] with map ;
-: v/n ( u n -- v ) [ / ] curry map ;
-: n/v ( n u -- v ) [ / ] with map ;
+GENERIC: n-v ( n v -- w )
+M: object n-v [ - ] with map ;
 
-: v+   ( u v -- w ) [ + ] 2map ;
-: v-   ( u v -- w ) [ - ] 2map ;
-: [v-] ( u v -- w ) [ [-] ] 2map ;
-: v*   ( u v -- w ) [ * ] 2map ;
-: v/   ( u v -- w ) [ / ] 2map ;
+GENERIC# v*n 1 ( u n -- v )
+M: object v*n [ * ] curry map ;
+
+GENERIC: n*v ( n v -- w )
+M: object n*v [ * ] with map ;
+
+GENERIC# v/n 1 ( u n -- v )
+M: object v/n [ / ] curry map ;
+
+GENERIC: n/v ( n v -- w )
+M: object n/v [ / ] with map ;
+
+GENERIC: v+  ( u v -- w )
+M: object v+ [ + ] 2map ;
+
+GENERIC: v-  ( u v -- w )
+M: object v- [ - ] 2map ;
+
+GENERIC: [v-] ( u v -- w )
+M: object [v-] [ [-] ] 2map ;
+
+GENERIC: v* ( u v -- w )
+M: object v* [ * ] 2map ;
+
+GENERIC: v/ ( u v -- w )
+M: object v/ [ / ] 2map ;
 
 <PRIVATE
 
@@ -37,69 +55,60 @@ M: object element-type drop f ; inline
 
 PRIVATE>
 
-: vmax ( u v -- w ) [ [ float-max ] [ max ] if-both-floats ] 2map ;
-: vmin ( u v -- w ) [ [ float-min ] [ min ] if-both-floats ] 2map ;
+GENERIC: vmax ( u v -- w )
+M: object vmax [ [ float-max ] [ max ] if-both-floats ] 2map ;
 
-: v+- ( u v -- w )
+GENERIC: vmin ( u v -- w )
+M: object vmin [ [ float-min ] [ min ] if-both-floats ] 2map ;
+
+GENERIC: v+- ( u v -- w )
+M: object v+-
     [ t ] 2dip
     [ [ not ] 2dip pick [ + ] [ - ] if ] 2map
     nip ;
 
+GENERIC: vs+ ( u v -- w )
+M: object vs+ [ + ] 2map ;
+
+GENERIC: vs- ( u v -- w )
+M: object vs- [ - ] 2map ;
+
+GENERIC: vs* ( u v -- w )
+M: object vs* [ * ] 2map ;
+
+GENERIC: vabs ( u -- v )
+M: object vabs [ abs ] map ;
+
+GENERIC: vsqrt ( u -- v )
+M: object vsqrt [ >float fsqrt ] map ;
+
 <PRIVATE
-
-: 2saturate-map ( u v quot -- w )
-    pick element-type '[ @ _ c-type-clamp ] 2map ; inline
-
-PRIVATE>
-
-: vs+ ( u v -- w ) [ + ] 2saturate-map ;
-: vs- ( u v -- w ) [ - ] 2saturate-map ;
-: vs* ( u v -- w ) [ * ] 2saturate-map ;
-
-: vabs ( u -- v ) [ abs ] map ;
-: vsqrt ( u -- v ) [ >float fsqrt ] map ;
-
-<PRIVATE
-
-: fp-bitwise-op ( x y seq quot -- z )
-    swap element-type {
-        { c:double [ [ [ double>bits ] bi@ ] dip call bits>double ] }
-        { c:float  [ [ [ float>bits ] bi@ ] dip call bits>float   ] }
-        [ drop call ]
-    } case ; inline
-
-: fp-bitwise-unary ( x seq quot -- z )
-    swap element-type {
-        { c:double [ [ double>bits ] dip call bits>double ] }
-        { c:float  [ [ float>bits  ] dip call bits>float  ] }
-        [ drop call ]
-    } case ; inline
-
-: element>bool ( x seq -- ? )
-    element-type [ [ f ] when-zero ] when ; inline
 
 : bitandn ( x y -- z ) [ bitnot ] dip bitand ; inline
 
-GENERIC: new-underlying ( underlying seq -- seq' )
-
-: change-underlying ( seq quot -- seq' )
-    '[ underlying>> @ ] keep new-underlying ; inline
-
 PRIVATE>
 
-: vbitand ( u v -- w ) over '[ _ [ bitand ] fp-bitwise-op ] 2map ;
-: vbitandn ( u v -- w ) over '[ _ [ bitandn ] fp-bitwise-op ] 2map ;
-: vbitor ( u v -- w ) over '[ _ [ bitor ] fp-bitwise-op ] 2map ;
-: vbitxor ( u v -- w ) over '[ _ [ bitxor ] fp-bitwise-op ] 2map ;
-: vbitnot ( u -- w ) dup '[ _ [ bitnot ] fp-bitwise-unary ] map ;
+GENERIC: vbitand ( u v -- w )
+M: object vbitand [ bitand ] 2map ;
+GENERIC: vbitandn ( u v -- w )
+M: object vbitandn [ bitandn ] 2map ;
+GENERIC: vbitor ( u v -- w )
+M: object vbitor [ bitor ] 2map ;
+GENERIC: vbitxor ( u v -- w )
+M: object vbitxor [ bitxor ] 2map ;
+GENERIC: vbitnot ( u -- w )
+M: object vbitnot [ bitnot ] 2map ;
 
-:: vbroadcast ( u n -- v ) u length n u nth <repetition> u like ;
+GENERIC# vbroadcast 1 ( u n -- v )
+M:: object vbroadcast ( u n -- v ) u length n u nth <repetition> u like ;
 
-: vshuffle-elements ( u perm -- v )
+GENERIC# vshuffle-elements 1 ( u perm -- v )
+M: object vshuffle-elements
     over length 0 pad-tail
     swap [ '[ _ nth ] ] keep map-as ;
 
-: vshuffle-bytes ( u perm -- v )
+GENERIC# vshuffle-bytes 1 ( u perm -- v )
+M: object vshuffle-bytes
     underlying>> [
         swap [ '[ 15 bitand _ nth ] ] keep map-as
     ] curry change-underlying ;
@@ -107,43 +116,72 @@ PRIVATE>
 GENERIC: vshuffle ( u perm -- v )
 M: array vshuffle ( u perm -- v )
     vshuffle-elements ; inline
-M: simd-128 vshuffle ( u perm -- v )
-    vshuffle-bytes ; inline
 
-: vlshift ( u n -- w ) '[ _ shift ] map ;
-: vrshift ( u n -- w ) neg '[ _ shift ] map ;
+GENERIC# vlshift 1 ( u n -- w )
+M: object vlshift '[ _ shift ] map ;
+GENERIC# vrshift 1 ( u n -- w )
+M: object vrshift neg '[ _ shift ] map ;
 
-: hlshift ( u n -- w ) '[ _ <byte-array> prepend 16 head ] change-underlying ;
-: hrshift ( u n -- w ) '[ _ <byte-array> append 16 tail* ] change-underlying ;
+GENERIC# hlshift 1 ( u n -- w )
+M: object hlshift '[ _ <byte-array> prepend 16 head ] change-underlying ;
+GENERIC# hrshift 1 ( u n -- w )
+M: object hrshift '[ _ <byte-array> append 16 tail* ] change-underlying ;
 
-: (vmerge-head) ( u v -- h )
-    over length 2 /i '[ _ head-slice ] bi@ [ zip ] keep concat-as ;
-: (vmerge-tail) ( u v -- t )
-    over length 2 /i '[ _ tail-slice ] bi@ [ zip ] keep concat-as ;
+GENERIC: (vmerge-head) ( u v -- h )
+M: object (vmerge-head) over length 2 /i '[ _ head-slice ] bi@ [ zip ] keep concat-as ;
+GENERIC: (vmerge-tail) ( u v -- t )
+M: object (vmerge-tail) over length 2 /i '[ _ tail-slice ] bi@ [ zip ] keep concat-as ;
 
-: (vmerge) ( u v -- h t )
+GENERIC: (vmerge) ( u v -- h t )
     [ (vmerge-head) ] [ (vmerge-tail) ] 2bi ; inline
 
-: vmerge ( u v -- w ) [ zip ] keep concat-as ;
+GENERIC: vmerge ( u v -- w )
+M: object vmerge [ zip ] keep concat-as ;
 
-: vand ( u v -- w )  over '[ [ _ element>bool ] bi@ and ] 2map ;
-: vandn ( u v -- w ) over '[ [ _ element>bool ] bi@ [ not ] dip and ] 2map ;
-: vor  ( u v -- w )  over '[ [ _ element>bool ] bi@ or  ] 2map ;
-: vxor ( u v -- w )  over '[ [ _ element>bool ] bi@ xor ] 2map ;
-: vnot ( u -- w )    dup '[ _ element>bool not ] map ;
+GENERIC: vand ( u v -- w )
+M: object vand [ and ] 2map ;
 
-: vall? ( v -- ? ) dup '[ _ element>bool ] all? ;
-: vany? ( v -- ? ) dup '[ _ element>bool ] any? ;
-: vnone? ( v -- ? ) dup '[ _ element>bool not ] all? ;
+GENERIC: vandn ( u v -- w )
+M: object vandn [ [ not ] dip and ] 2map ;
 
-: v<  ( u v -- w ) [ <   ] 2map ;
-: v<= ( u v -- w ) [ <=  ] 2map ;
-: v>= ( u v -- w ) [ >=  ] 2map ;
-: v>  ( u v -- w ) [ >   ] 2map ;
-: vunordered? ( u v -- w ) [ unordered? ] 2map ;
-: v=  ( u v -- w ) [ =   ] 2map ;
+GENERIC: vor  ( u v -- w )
+M: object vor  [ or  ] 2map ;
 
-: v? ( mask true false -- result )
+GENERIC: vxor ( u v -- w )
+M: object vxor [ xor ] 2map ;
+
+GENERIC: vnot ( u -- w )
+M: object vnot [ not ] map ;
+
+GENERIC: vall? ( v -- ? )
+M: object vall? [ ] all? ;
+
+GENERIC: vany? ( v -- ? )
+M: object vany? [ ] any? ;
+
+GENERIC: vnone? ( v -- ? )
+M: object vnone? [ not ] all? ;
+
+GENERIC: v<  ( u v -- w )
+M: object v<  [ <   ] 2map ;
+
+GENERIC: v<= ( u v -- w )
+M: object v<= [ <=  ] 2map ;
+
+GENERIC: v>= ( u v -- w )
+M: object v>= [ >=  ] 2map ;
+
+GENERIC: v>  ( u v -- w )
+M: object v>  [ >   ] 2map ;
+
+GENERIC: vunordered? ( u v -- w )
+M: object vunordered? [ unordered? ] 2map ;
+
+GENERIC: v=  ( u v -- w )
+M: object v=  [ =   ] 2map ;
+
+GENERIC: v? ( mask true false -- result )
+M: object v? 
     [ vand ] [ vandn ] bi-curry* bi vor ; inline
 
 :: vif ( mask true-quot false-quot -- result )
@@ -157,15 +195,22 @@ M: simd-128 vshuffle ( u perm -- v )
 : vceiling  ( u -- v ) [ ceiling ] map ;
 : vtruncate ( u -- v ) [ truncate ] map ;
 
-: vsupremum ( seq -- vmax ) [ ] [ vmax ] map-reduce ; 
-: vinfimum ( seq -- vmin ) [ ] [ vmin ] map-reduce ; 
+: vsupremum ( seq -- vmax ) [ ] [ vmax ] map-reduce ; inline
+: vinfimum ( seq -- vmin ) [ ] [ vmin ] map-reduce ; inline
 
-: v. ( u v -- x ) [ conjugate * ] [ + ] 2map-reduce ;
-: norm-sq ( v -- x ) [ absq ] [ + ] map-reduce ;
-: norm ( v -- x ) norm-sq sqrt ;
-: normalize ( u -- v ) dup norm v/n ;
+GENERIC: v. ( u v -- x )
+M: object v. [ conjugate * ] [ + ] 2map-reduce ;
 
-: distance ( u v -- x ) [ - absq ] [ + ] 2map-reduce sqrt ;
+GENERIC: norm-sq ( v -- x )
+M: object norm-sq [ absq ] [ + ] map-reduce ;
+
+GENERIC: norm ( v -- x )
+M: object norm norm-sq sqrt ;
+
+: normalize ( u -- v ) dup norm v/n ; inline
+
+GENERIC: distance ( u v -- x )
+M: object distance [ - absq ] [ + ] 2map-reduce sqrt ;
 
 : set-axis ( u v axis -- w )
     [ [ zero? 2over ? ] dip swap nth ] map-index 2nip ;
@@ -198,27 +243,27 @@ PRIVATE>
 : v~ ( a b epsilon -- ? )
     [ ~ ] curry 2all? ; inline
 
-HINTS: vneg { array } ;
-HINTS: norm-sq { array } ;
-HINTS: norm { array } ;
-HINTS: normalize { array } ;
-HINTS: distance { array array } ;
+HINTS: M\ object vneg { array } ;
+HINTS: M\ object norm-sq { array } ;
+HINTS: M\ object norm { array } ;
+HINTS: M\ object distance { array array } ;
 
-HINTS: n*v { object array } ;
-HINTS: v*n { array object } ;
-HINTS: n/v { array } ;
-HINTS: v/n { array object } ;
+HINTS: M\ object n*v { object array } ;
+HINTS: M\ object v*n { array object } ;
+HINTS: M\ object n/v { object array } ;
+HINTS: M\ object v/n { array object } ;
 
-HINTS: v+ { array array } ;
-HINTS: v- { array array } ;
-HINTS: v* { array array } ;
-HINTS: v/ { array array } ;
-HINTS: vmax { array array } ;
-HINTS: vmin { array array } ;
-HINTS: v. { array array } ;
+HINTS: M\ object v+ { array array } ;
+HINTS: M\ object v- { array array } ;
+HINTS: M\ object v* { array array } ;
+HINTS: M\ object v/ { array array } ;
+HINTS: M\ object vmax { array array } ;
+HINTS: M\ object vmin { array array } ;
+HINTS: M\ object v. { array array } ;
 
 HINTS: vlerp { array array array } ;
 HINTS: vnlerp { array array object } ;
 
 HINTS: bilerp { object object object object array } ;
 HINTS: trilerp { object object object object object object object object array } ;
+
