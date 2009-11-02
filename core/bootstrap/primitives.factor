@@ -177,10 +177,6 @@ bi
 
 "object?" "kernel" vocab-words delete-at
 
-! Class of objects with object tag
-"hi-tag" "kernel.private" create
-builtins get num-tags get tail define-union-class
-
 ! Empty class with no instances
 "null" "kernel" create
 [ f { } f union-class define-class ]

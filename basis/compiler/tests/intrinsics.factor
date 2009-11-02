@@ -419,7 +419,7 @@ cell 8 = [
 "b" get [
     [ 3 ] [ "b" get 2 [ alien-unsigned-1 ] compile-call ] unit-test
     [ 3 ] [ "b" get [ { alien } declare 2 alien-unsigned-1 ] compile-call ] unit-test
-    [ 3 ] [ "b" get 2 [ { simple-alien fixnum } declare alien-unsigned-1 ] compile-call ] unit-test
+    [ 3 ] [ "b" get 2 [ { alien fixnum } declare alien-unsigned-1 ] compile-call ] unit-test
     [ 3 ] [ "b" get 2 [ { c-ptr fixnum } declare alien-unsigned-1 ] compile-call ] unit-test
 
     [ ] [ "b" get free ] unit-test

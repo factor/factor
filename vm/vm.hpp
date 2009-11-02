@@ -83,8 +83,8 @@ struct factor_vm
 	cell cold_call_to_ic_transitions;
 	cell ic_to_pic_transitions;
 	cell pic_to_mega_transitions;
-	/* Indexed by PIC_TAG, PIC_HI_TAG, PIC_TUPLE, PIC_HI_TAG_TUPLE */
-	cell pic_counts[4];
+	/* Indexed by PIC_TAG, PIC_TUPLE */
+	cell pic_counts[2];
 
 	/* Number of entries in a polymorphic inline cache */
 	cell max_pic_size;
@@ -619,7 +619,6 @@ struct factor_vm
 	cell nth_superclass(tuple_layout *layout, fixnum echelon);
 	cell nth_hashcode(tuple_layout *layout, fixnum echelon);
 	cell lookup_tuple_method(cell obj, cell methods);
-	cell lookup_hi_tag_method(cell obj, cell methods);
 	cell lookup_method(cell obj, cell methods);
 	void primitive_lookup_method();
 	cell object_class(cell obj);

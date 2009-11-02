@@ -70,16 +70,6 @@ cell factor_vm::lookup_tuple_method(cell obj, cell methods)
 	return false_object;
 }
 
-cell factor_vm::lookup_hi_tag_method(cell obj, cell methods)
-{
-	array *hi_tag_methods = untag<array>(methods);
-	cell tag = untag<object>(obj)->h.hi_tag() - HEADER_TYPE;
-#ifdef FACTOR_DEBUG
-	assert(tag < TYPE_COUNT - HEADER_TYPE);
-#endif
-	return array_nth(hi_tag_methods,tag);
-}
-
 cell factor_vm::lookup_method(cell obj, cell methods)
 {
 	cell tag = TAG(obj);
@@ -89,13 +79,6 @@ cell factor_vm::lookup_method(cell obj, cell methods)
 	{
 		if(TAG(method) == ARRAY_TYPE)
 			return lookup_tuple_method(obj,method);
-		else
-			return method;
-	}
-	else if(tag == OBJECT_TYPE)
-	{
-		if(TAG(method) == ARRAY_TYPE)
-			return lookup_hi_tag_method(obj,method);
 		else
 			return method;
 	}
@@ -112,21 +95,17 @@ void factor_vm::primitive_lookup_method()
 
 cell factor_vm::object_class(cell obj)
 {
-	switch(TAG(obj))
-	{
-	case TUPLE_TYPE:
+	cell tag = TAG(obj);
+	if(tag == TUPLE_TYPE)
 		return untag<tuple>(obj)->layout;
-	case OBJECT_TYPE:
-		return untag<object>(obj)->h.value;
-	default:
-		return tag_fixnum(TAG(obj));
-	}
+	else
+		return tag_fixnum(tag);
 }
 
 cell factor_vm::method_cache_hashcode(cell klass, array *array)
 {
 	cell capacity = (array_capacity(array) >> 1) - 1;
-	return (((klass >> 3) + (klass >> 8) + (klass >> 13)) & capacity) << 1;
+	return ((klass >> TAG_BITS) & capacity) << 1;
 }
 
 void factor_vm::update_method_cache(cell cache, cell klass, cell method)
@@ -174,7 +153,7 @@ void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index, cell cac
 	gc_root<array> cache(cache_,parent);
 
 	/* Generate machine code to determine the object's class. */
-	emit_class_lookup(index,PIC_HI_TAG_TUPLE);
+	emit_class_lookup(index,PIC_TUPLE);
 
 	/* Do a cache lookup. */
 	emit_with(parent->special_objects[MEGA_LOOKUP],cache.value());

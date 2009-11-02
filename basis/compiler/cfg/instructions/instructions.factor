@@ -530,7 +530,7 @@ use: src/int-rep ;
 : ##unbox-c-ptr ( dst src class temp -- )
     {
         { [ over \ f class<= ] [ 2drop ##unbox-f ] }
-        { [ over simple-alien class<= ] [ 2drop ##unbox-alien ] }
+        { [ over alien class<= ] [ 2drop ##unbox-alien ] }
         { [ over byte-array class<= ] [ 2drop ##unbox-byte-array ] }
         [ nip ##unbox-any-c-ptr ]
     } cond ;

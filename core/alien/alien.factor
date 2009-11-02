@@ -4,19 +4,9 @@ USING: accessors assocs kernel math namespaces sequences system
 kernel.private byte-arrays arrays init ;
 IN: alien
 
-! Some predicate classes used by the compiler for optimization
-! purposes
-PREDICATE: simple-alien < alien underlying>> not ;
+PREDICATE: pinned-alien < alien underlying>> not ;
 
-UNION: simple-c-ptr
-simple-alien POSTPONE: f byte-array ;
-
-DEFER: pinned-c-ptr?
-
-PREDICATE: pinned-alien < alien underlying>> pinned-c-ptr? ;
-
-UNION: pinned-c-ptr
-    pinned-alien POSTPONE: f ;
+UNION: pinned-c-ptr pinned-alien POSTPONE: f ;
 
 GENERIC: >c-ptr ( obj -- c-ptr )
 
@@ -33,7 +23,7 @@ M: alien expired? expired>> ;
 M: f expired? drop t ;
 
 : <alien> ( address -- alien )
-    f <displaced-alien> { simple-c-ptr } declare ; inline
+    f <displaced-alien> { pinned-c-ptr } declare ; inline
 
 : <bad-alien> ( -- alien )
     -1 <alien> t >>expired ; inline

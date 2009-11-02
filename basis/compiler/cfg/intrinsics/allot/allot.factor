@@ -8,7 +8,7 @@ compiler.cfg.utilities compiler.cfg.builder.blocks ;
 IN: compiler.cfg.intrinsics.allot
 
 : ##set-slots ( regs obj class -- )
-    '[ _ swap 1 + _ tag-number ##set-slot-imm ] each-index ;
+    '[ _ swap 1 + _ type-number ##set-slot-imm ] each-index ;
 
 : emit-simple-allot ( node -- )
     [ in-d>> length ] [ node-output-infos first class>> ] bi
@@ -31,10 +31,10 @@ IN: compiler.cfg.intrinsics.allot
     ] [ drop emit-primitive ] if ;
 
 : store-length ( len reg class -- )
-    [ [ ^^load-literal ] dip 1 ] dip tag-number ##set-slot-imm ;
+    [ [ ^^load-literal ] dip 1 ] dip type-number ##set-slot-imm ;
 
 :: store-initial-element ( len reg elt class -- )
-    len [ [ elt reg ] dip 2 + class tag-number ##set-slot-imm ] each ;
+    len [ [ elt reg ] dip 2 + class type-number ##set-slot-imm ] each ;
 
 : expand-<array>? ( obj -- ? )
     dup integer? [ 0 8 between? ] [ drop f ] if ;

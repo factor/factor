@@ -592,7 +592,7 @@ M: bad-executable summary
 
 \ set-alien-double { float c-ptr integer } { } define-primitive
 
-\ alien-cell { c-ptr integer } { simple-c-ptr } define-primitive
+\ alien-cell { c-ptr integer } { pinned-c-ptr } define-primitive
 \ alien-cell make-flushable
 
 \ set-alien-cell { c-ptr c-ptr integer } { } define-primitive

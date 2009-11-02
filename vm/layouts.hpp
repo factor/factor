@@ -27,8 +27,8 @@ static const cell data_alignment = 16;
 
 #define WORD_SIZE (signed)(sizeof(cell)*8)
 
-#define TAG_MASK 7
-#define TAG_BITS 3
+#define TAG_MASK 15
+#define TAG_BITS 4
 #define TAG(x) ((cell)(x) & TAG_MASK)
 #define UNTAG(x) ((cell)(x) & ~TAG_MASK)
 #define RETAG(x,tag) (UNTAG(x) | (tag))
@@ -40,23 +40,18 @@ static const cell data_alignment = 16;
 #define FLOAT_TYPE 3
 #define QUOTATION_TYPE 4
 #define F_TYPE 5
-#define OBJECT_TYPE 6
+#define ALIEN_TYPE 6
 #define TUPLE_TYPE 7
-
-#define HEADER_TYPE 8 /* anything less than this is a tag */
-
-#define GC_COLLECTED 5 /* can be anything other than FIXNUM_TYPE */
-
-/*** Header types ***/
 #define WRAPPER_TYPE 8
 #define BYTE_ARRAY_TYPE 9
 #define CALLSTACK_TYPE 10
 #define STRING_TYPE 11
 #define WORD_TYPE 12
 #define DLL_TYPE 13
-#define ALIEN_TYPE 14
 
-#define TYPE_COUNT 15
+#define TYPE_COUNT 14
+
+#define GC_COLLECTED 5 /* can be anything other than FIXNUM_TYPE */
 
 enum code_block_type
 {
@@ -95,11 +90,6 @@ inline static fixnum untag_fixnum(cell tagged)
 inline static cell tag_fixnum(fixnum untagged)
 {
 	return RETAG(untagged << TAG_BITS,FIXNUM_TYPE);
-}
-
-inline static cell tag_for(cell type)
-{
-	return type < HEADER_TYPE ? type : OBJECT_TYPE;
 }
 
 struct object;
@@ -334,6 +324,16 @@ struct alien : public object {
 	cell expired;
 	/* untagged */
 	cell displacement;
+	/* untagged */
+	cell address;
+
+	void update_address()
+	{
+		if(base == false_object)
+			address = displacement;
+		else
+			address = UNTAG(base) + sizeof(byte_array) + displacement;
+	}
 };
 
 struct dll : public object {
