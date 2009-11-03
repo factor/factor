@@ -16,11 +16,11 @@ BIN: 1111 tag-mask set
 
 H{
     { fixnum 0 }
-    { bignum 1 }
+    { POSTPONE: f 1 }
     { array 2 }
     { float 3 }
     { quotation 4 }
-    { POSTPONE: f 5 }
+    { bignum 5 }
     { alien 6 }
     { tuple 7 }
     { wrapper 8 }
