@@ -52,7 +52,7 @@ void factor_vm::primitive_load_locals()
 
 cell factor_vm::clone_object(cell obj_)
 {
-	gc_root<object> obj(obj_,this);
+	data_root<object> obj(obj_,this);
 
 	if(immediate_p(obj.value()))
 		return obj.value();

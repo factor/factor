@@ -23,7 +23,7 @@ inline void factor_vm::set_array_nth(array *array, cell slot, cell value)
 
 struct growable_array {
 	cell count;
-	gc_root<array> elements;
+	data_root<array> elements;
 
 	explicit growable_array(factor_vm *parent, cell capacity = 10) :
 		count(0), elements(parent->allot_array(capacity,false_object),parent) {}

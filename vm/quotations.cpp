@@ -110,7 +110,7 @@ bool quotation_jit::trivial_quotation_p(array *elements)
 
 void quotation_jit::emit_quot(cell quot_)
 {
-	gc_root<quotation> quot(quot_,parent);
+	data_root<quotation> quot(quot_,parent);
 
 	array *elements = untag<array>(quot->array);
 
@@ -143,7 +143,7 @@ void quotation_jit::iterate_quotation()
 	{
 		set_position(i);
 
-		gc_root<object> obj(array_nth(elements.untagged(),i),parent);
+		data_root<object> obj(array_nth(elements.untagged(),i),parent);
 
 		switch(obj.type())
 		{
@@ -290,7 +290,7 @@ void factor_vm::set_quot_xt(quotation *quot, code_block *code)
 /* Allocates memory */
 void factor_vm::jit_compile(cell quot_, bool relocating)
 {
-	gc_root<quotation> quot(quot_,this);
+	data_root<quotation> quot(quot_,this);
 	if(quot->code) return;
 
 	quotation_jit compiler(quot.value(),true,relocating,this);
@@ -327,13 +327,13 @@ void factor_vm::primitive_quotation_xt()
 
 void factor_vm::compile_all_words()
 {
-	gc_root<array> words(find_all_words(),this);
+	data_root<array> words(find_all_words(),this);
 
 	cell i;
 	cell length = array_capacity(words.untagged());
 	for(i = 0; i < length; i++)
 	{
-		gc_root<word> word(array_nth(words.untagged(),i),this);
+		data_root<word> word(array_nth(words.untagged(),i),this);
 
 		if(!word->code || !word->code->optimized_p())
 			jit_compile_word(word.value(),word->def,false);
@@ -348,8 +348,8 @@ void factor_vm::compile_all_words()
 /* Allocates memory */
 fixnum factor_vm::quot_code_offset_to_scan(cell quot_, cell offset)
 {
-	gc_root<quotation> quot(quot_,this);
-	gc_root<array> array(quot->array,this);
+	data_root<quotation> quot(quot_,this);
+	data_root<array> array(quot->array,this);
 
 	quotation_jit compiler(quot.value(),false,false,this);
 	compiler.compute_position(offset);
@@ -360,7 +360,7 @@ fixnum factor_vm::quot_code_offset_to_scan(cell quot_, cell offset)
 
 cell factor_vm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
 {
-	gc_root<quotation> quot(quot_,this);
+	data_root<quotation> quot(quot_,this);
 	ctx->callstack_top = stack;
 	jit_compile(quot.value(),true);
 	return quot.value();

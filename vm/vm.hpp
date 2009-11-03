@@ -2,6 +2,7 @@ namespace factor
 {
 
 struct growable_array;
+struct code_root;
 
 struct factor_vm
 {
@@ -62,10 +63,12 @@ struct factor_vm
 	std::vector<gc_event> *gc_events;
 
 	/* If a runtime function needs to call another function which potentially
-	   allocates memory, it must wrap any local variable references to Factor
-	   objects in gc_root instances */
-	std::vector<cell> gc_locals;
-	std::vector<cell> gc_bignums;
+	   allocates memory, it must wrap any references to the data and code
+	   heaps with data_root and code_root smart pointers, which register
+	   themselves here. See data_roots.hpp and code_roots.hpp */
+	std::vector<cell> data_roots;
+	std::vector<cell> bignum_roots;
+	std::vector<code_root *> code_roots;
 
 	/* Debugger */
 	bool fep_disabled;
@@ -255,6 +258,8 @@ struct factor_vm
 	void collect_nursery();
 	void collect_aging();
 	void collect_to_tenured();
+	void update_code_roots_for_sweep();
+	void update_code_roots_for_compaction();
 	void collect_mark_impl(bool trace_contexts_p);
 	void collect_sweep_impl();
 	void collect_compact_impl(bool trace_contexts_p);
@@ -265,7 +270,7 @@ struct factor_vm
 	void primitive_full_gc();
 	void primitive_compact_gc();
 	void primitive_become();
-	void inline_gc(cell *gc_roots_base, cell gc_roots_size);
+	void inline_gc(cell *data_roots_base, cell data_roots_size);
 	void primitive_enable_gc_events();
 	void primitive_disable_gc_events();
 	object *allot_object(header header, cell size);

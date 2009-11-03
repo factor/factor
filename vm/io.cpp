@@ -33,8 +33,8 @@ void factor_vm::io_error()
 
 void factor_vm::primitive_fopen()
 {
-	gc_root<byte_array> mode(dpop(),this);
-	gc_root<byte_array> path(dpop(),this);
+	data_root<byte_array> mode(dpop(),this);
+	data_root<byte_array> path(dpop(),this);
 	mode.untag_check(this);
 	path.untag_check(this);
 
@@ -88,7 +88,7 @@ void factor_vm::primitive_fread()
 		return;
 	}
 
-	gc_root<byte_array> buf(allot_uninitialized_array<byte_array>(size),this);
+	data_root<byte_array> buf(allot_uninitialized_array<byte_array>(size),this);
 
 	for(;;)
 	{

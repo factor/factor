@@ -6,7 +6,7 @@ namespace factor
 /* push a new tuple on the stack, filling its slots with f */
 void factor_vm::primitive_tuple()
 {
-	gc_root<tuple_layout> layout(dpop(),this);
+	data_root<tuple_layout> layout(dpop(),this);
 	tagged<tuple> t(allot<tuple>(tuple_size(layout.untagged())));
 	t->layout = layout.value();
 
@@ -18,7 +18,7 @@ void factor_vm::primitive_tuple()
 /* push a new tuple on the stack, filling its slots from the stack */
 void factor_vm::primitive_tuple_boa()
 {
-	gc_root<tuple_layout> layout(dpop(),this);
+	data_root<tuple_layout> layout(dpop(),this);
 	tagged<tuple> t(allot<tuple>(tuple_size(layout.untagged())));
 	t->layout = layout.value();
 

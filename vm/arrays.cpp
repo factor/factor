@@ -6,8 +6,8 @@ namespace factor
 /* make a new array with an initial element */
 array *factor_vm::allot_array(cell capacity, cell fill_)
 {
-	gc_root<object> fill(fill_,this);
-	gc_root<array> new_array(allot_uninitialized_array<array>(capacity),this);
+	data_root<object> fill(fill_,this);
+	data_root<array> new_array(allot_uninitialized_array<array>(capacity),this);
 	memset_cell(new_array->data(),fill.value(),capacity * sizeof(cell));
 	return new_array.untagged();
 }
@@ -22,17 +22,17 @@ void factor_vm::primitive_array()
 
 cell factor_vm::allot_array_1(cell obj_)
 {
-	gc_root<object> obj(obj_,this);
-	gc_root<array> a(allot_uninitialized_array<array>(1),this);
+	data_root<object> obj(obj_,this);
+	data_root<array> a(allot_uninitialized_array<array>(1),this);
 	set_array_nth(a.untagged(),0,obj.value());
 	return a.value();
 }
 
 cell factor_vm::allot_array_2(cell v1_, cell v2_)
 {
-	gc_root<object> v1(v1_,this);
-	gc_root<object> v2(v2_,this);
-	gc_root<array> a(allot_uninitialized_array<array>(2),this);
+	data_root<object> v1(v1_,this);
+	data_root<object> v2(v2_,this);
+	data_root<array> a(allot_uninitialized_array<array>(2),this);
 	set_array_nth(a.untagged(),0,v1.value());
 	set_array_nth(a.untagged(),1,v2.value());
 	return a.value();
@@ -40,11 +40,11 @@ cell factor_vm::allot_array_2(cell v1_, cell v2_)
 
 cell factor_vm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
 {
-	gc_root<object> v1(v1_,this);
-	gc_root<object> v2(v2_,this);
-	gc_root<object> v3(v3_,this);
-	gc_root<object> v4(v4_,this);
-	gc_root<array> a(allot_uninitialized_array<array>(4),this);
+	data_root<object> v1(v1_,this);
+	data_root<object> v2(v2_,this);
+	data_root<object> v3(v3_,this);
+	data_root<object> v4(v4_,this);
+	data_root<array> a(allot_uninitialized_array<array>(4),this);
 	set_array_nth(a.untagged(),0,v1.value());
 	set_array_nth(a.untagged(),1,v2.value());
 	set_array_nth(a.untagged(),2,v3.value());
@@ -62,7 +62,7 @@ void factor_vm::primitive_resize_array()
 void growable_array::add(cell elt_)
 {
 	factor_vm *parent = elements.parent;
-	gc_root<object> elt(elt_,parent);
+	data_root<object> elt(elt_,parent);
 	if(count == array_capacity(elements.untagged()))
 		elements = parent->reallot_array(elements.untagged(),count * 2);
 
@@ -72,7 +72,7 @@ void growable_array::add(cell elt_)
 void growable_array::append(array *elts_)
 {
 	factor_vm *parent = elements.parent;
-	gc_root<array> elts(elts_,parent);
+	data_root<array> elts(elts_,parent);
 	cell capacity = array_capacity(elts.untagged());
 	if(count + capacity > array_capacity(elements.untagged()))
 	{

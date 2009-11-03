@@ -311,7 +311,7 @@ void factor_vm::primitive_save_image()
 	/* do a full GC to push everything into tenured space */
 	primitive_compact_gc();
 
-	gc_root<byte_array> path(dpop(),this);
+	data_root<byte_array> path(dpop(),this);
 	path.untag_check(this);
 	save_image((vm_char *)(path.untagged() + 1));
 }
@@ -321,7 +321,7 @@ void factor_vm::primitive_save_image_and_exit()
 	/* We unbox this before doing anything else. This is the only point
 	where we might throw an error, so we have to throw an error here since
 	later steps destroy the current image. */
-	gc_root<byte_array> path(dpop(),this);
+	data_root<byte_array> path(dpop(),this);
 	path.untag_check(this);
 
 	/* strip out special_objects data which is set on startup anyway */
