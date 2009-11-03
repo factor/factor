@@ -59,7 +59,7 @@ IN: compiler.cfg.intrinsics
     { byte-arrays:<byte-array> [ emit-<byte-array> ] }
     { byte-arrays:(byte-array) [ emit-(byte-array) ] }
     { kernel:<wrapper> [ emit-simple-allot ] }
-    ! { alien:<displaced-alien> [ emit-<displaced-alien> ] }
+    { alien:<displaced-alien> [ emit-<displaced-alien> ] }
     { alien.accessors:alien-unsigned-1 [ 1 emit-alien-unsigned-getter ] }
     { alien.accessors:set-alien-unsigned-1 [ 1 emit-alien-integer-setter ] }
     { alien.accessors:alien-signed-1 [ 1 emit-alien-signed-getter ] }
