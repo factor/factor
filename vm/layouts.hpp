@@ -35,11 +35,11 @@ static const cell data_alignment = 16;
 
 /*** Tags ***/
 #define FIXNUM_TYPE 0
-#define BIGNUM_TYPE 1
+#define F_TYPE 1
 #define ARRAY_TYPE 2
 #define FLOAT_TYPE 3
 #define QUOTATION_TYPE 4
-#define F_TYPE 5
+#define BIGNUM_TYPE 5
 #define ALIEN_TYPE 6
 #define TUPLE_TYPE 7
 #define WRAPPER_TYPE 8
@@ -76,7 +76,8 @@ static const cell false_object = F_TYPE;
 
 inline static bool immediate_p(cell obj)
 {
-	return (obj == false_object || TAG(obj) == FIXNUM_TYPE);
+	/* We assume that fixnums have tag 0 and false_object has tag 1 */
+	return TAG(obj) <= F_TYPE;
 }
 
 inline static fixnum untag_fixnum(cell tagged)
