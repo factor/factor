@@ -16,7 +16,8 @@ struct tagged
 {
 	cell value_;
 
-	cell type() const {
+	cell type() const
+	{
 		return TAG(value_);
 	}
 
@@ -33,20 +34,24 @@ struct tagged
 			return type_p(Type::type_number);
 	}
 
-	cell value() const {
+	cell value() const
+	{
 #ifdef FACTOR_DEBUG
 		assert(type_p());
 #endif
 		return value_;
 	}
-	Type *untagged() const {
+
+	Type *untagged() const
+	{
 #ifdef FACTOR_DEBUG
 		assert(type_p());
 #endif
 		return (Type *)(UNTAG(value_));
 	}
 
-	Type *untag_check(factor_vm *parent) const {
+	Type *untag_check(factor_vm *parent) const
+	{
 		if(!type_p())
 			parent->type_error(Type::type_number,value_);
 		return untagged();

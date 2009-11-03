@@ -3,7 +3,7 @@ namespace factor
 
 struct growable_byte_array {
 	cell count;
-	gc_root<byte_array> elements;
+	data_root<byte_array> elements;
 
 	explicit growable_byte_array(factor_vm *parent,cell capacity = 40) : count(0), elements(parent->allot_byte_array(capacity),parent) { }
 

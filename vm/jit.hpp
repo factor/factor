@@ -3,7 +3,7 @@ namespace factor
 
 struct jit {
 	code_block_type type;
-	gc_root<object> owner;
+	data_root<object> owner;
 	growable_byte_array code;
 	growable_byte_array relocation;
 	growable_array literals;
@@ -28,7 +28,7 @@ struct jit {
 
 	void word_jump(cell word_)
 	{
-		gc_root<word> word(word_,parent);
+		data_root<word> word(word_,parent);
 		literal(tag_fixnum(xt_tail_pic_offset));
 		literal(word.value());
 		emit(parent->special_objects[JIT_WORD_JUMP]);
@@ -46,8 +46,8 @@ struct jit {
 
 	void emit_subprimitive(cell word_)
 	{
-		gc_root<word> word(word_,parent);
-		gc_root<array> code_pair(word->subprimitive,parent);
+		data_root<word> word(word_,parent);
+		data_root<array> code_pair(word->subprimitive,parent);
 		literals.append(untag<array>(array_nth(code_pair.untagged(),0)));
 		emit(array_nth(code_pair.untagged(),1));
 	}

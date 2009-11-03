@@ -30,8 +30,8 @@ char *factor_vm::pinned_alien_offset(cell obj)
 /* make an alien */
 cell factor_vm::allot_alien(cell delegate_, cell displacement)
 {
-	gc_root<object> delegate(delegate_,this);
-	gc_root<alien> new_alien(allot<alien>(sizeof(alien)),this);
+	data_root<object> delegate(delegate_,this);
+	data_root<alien> new_alien(allot<alien>(sizeof(alien)),this);
 
 	if(delegate.type_p(ALIEN_TYPE))
 	{
@@ -117,9 +117,9 @@ DEFINE_ALIEN_ACCESSOR(cell,void *,box_alien,pinned_alien_offset)
 /* open a native library and push a handle */
 void factor_vm::primitive_dlopen()
 {
-	gc_root<byte_array> path(dpop(),this);
+	data_root<byte_array> path(dpop(),this);
 	path.untag_check(this);
-	gc_root<dll> library(allot<dll>(sizeof(dll)),this);
+	data_root<dll> library(allot<dll>(sizeof(dll)),this);
 	library->path = path.value();
 	ffi_dlopen(library.untagged());
 	dpush(library.value());
@@ -128,8 +128,8 @@ void factor_vm::primitive_dlopen()
 /* look up a symbol in a native library */
 void factor_vm::primitive_dlsym()
 {
-	gc_root<object> library(dpop(),this);
-	gc_root<byte_array> name(dpop(),this);
+	data_root<object> library(dpop(),this);
+	data_root<byte_array> name(dpop(),this);
 	name.untag_check(this);
 
 	symbol_char *sym = name->data<symbol_char>();

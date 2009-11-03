@@ -37,8 +37,8 @@ void factor_vm::throw_error(cell error, stack_frame *callstack_top)
 		gc_off = false;
 
 		/* Reset local roots */
-		gc_locals.clear();
-		gc_bignums.clear();
+		data_roots.clear();
+		bignum_roots.clear();
 
 		/* If we had an underflow or overflow, stack pointers might be
 		out of bounds */

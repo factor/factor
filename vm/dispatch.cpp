@@ -149,8 +149,8 @@ void factor_vm::primitive_dispatch_stats()
 
 void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index, cell cache_)
 {
-	gc_root<array> methods(methods_,parent);
-	gc_root<array> cache(cache_,parent);
+	data_root<array> methods(methods_,parent);
+	data_root<array> cache(cache_,parent);
 
 	/* Generate machine code to determine the object's class. */
 	emit_class_lookup(index,PIC_TUPLE);

@@ -51,7 +51,7 @@ static const cell data_alignment = 16;
 
 #define TYPE_COUNT 14
 
-#define GC_COLLECTED 5 /* can be anything other than FIXNUM_TYPE */
+#define FORWARDING_POINTER 5 /* can be anything other than FIXNUM_TYPE */
 
 enum code_block_type
 {
@@ -117,7 +117,7 @@ struct header {
 
 	bool forwarding_pointer_p() const
 	{
-		return TAG(value) == GC_COLLECTED;
+		return TAG(value) == FORWARDING_POINTER;
 	}
 
 	object *forwarding_pointer() const
@@ -127,7 +127,7 @@ struct header {
 
 	void forward_to(object *pointer)
 	{
-		value = RETAG(pointer,GC_COLLECTED);
+		value = RETAG(pointer,FORWARDING_POINTER);
 	}
 };
 
@@ -344,8 +344,7 @@ struct dll : public object {
 	void *dll;
 };
 
-struct stack_frame
-{
+struct stack_frame {
 	void *xt;
 	/* Frame size in bytes */
 	cell size;

@@ -9,6 +9,56 @@ full_collector::full_collector(factor_vm *parent_) :
 		parent_->data->tenured,
 		full_policy(parent_)) {}
 
+/* After a sweep, invalidate any code heap roots which are not marked,
+so that if a block makes a tail call to a generic word, and the PIC
+compiler triggers a GC, and the caller block gets gets GCd as a result,
+the PIC code won't try to overwrite the call site */
+void factor_vm::update_code_roots_for_sweep()
+{
+	std::vector<code_root *>::const_iterator iter = code_roots.begin();
+	std::vector<code_root *>::const_iterator end = code_roots.end();
+
+	mark_bits<code_block> *state = &code->allocator->state;
+
+	for(; iter < end; iter++)
+	{
+		printf("We have a code root!\n");
+		code_root *root = *iter;
+		code_block *block = (code_block *)(root->value & -block_granularity);
+		if(root->valid && !state->marked_p(block))
+			root->valid = false;
+	}
+}
+
+/* After a compaction, invalidate any code heap roots which are not
+marked as above, and also slide the valid roots up so that call sites
+can be updated correctly. */
+void factor_vm::update_code_roots_for_compaction()
+{
+	std::vector<code_root *>::const_iterator iter = code_roots.begin();
+	std::vector<code_root *>::const_iterator end = code_roots.end();
+
+	mark_bits<code_block> *state = &code->allocator->state;
+
+	for(; iter < end; iter++)
+	{
+		printf("We have a code root - compaction!\n");
+		code_root *root = *iter;
+		code_block *block = (code_block *)(root->value & -block_granularity);
+
+		/* Offset of return address within 16-byte allocation line */
+		cell offset = root->value - (cell)block;
+
+		if(root->valid && state->marked_p((code_block *)root->value))
+		{
+			block = state->forward_block(block);
+			root->value = (cell)block + offset;
+		}
+		else
+			root->valid = false;
+	}
+}
+
 struct code_block_marker {
 	code_heap *code;
 	full_collector *collector;
@@ -66,6 +116,7 @@ void factor_vm::collect_sweep_impl()
 {
 	current_gc->event->started_data_sweep();
 	data->tenured->sweep();
+	update_code_roots_for_sweep();
 	current_gc->event->ended_data_sweep();
 }
 
