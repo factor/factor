@@ -177,20 +177,20 @@ M: x86 %fixnum-mul ( label dst src1 src2 -- )
 M: x86 %unbox-alien ( dst src -- )
     alien-offset [+] MOV ;
 
-M:: x86 %unbox-any-c-ptr ( dst src temp -- )
+M:: x86 %unbox-any-c-ptr ( dst src -- )
     [
         "end" define-label
-        ! Compute tag in temp register
-        temp src MOV
-        temp tag-mask get AND
-        dst 0 MOV
+        dst dst XOR
         ! Is the object f?
         src \ f type-number CMP
         "end" get JE
+        ! Compute tag in dst register
+        dst src MOV
+        dst tag-mask get AND
+        ! Is the object an alien?
+        dst alien type-number CMP
         ! Add an offset to start of byte array's data
         dst src byte-array-offset [+] LEA
-        ! Is the object an alien?
-        temp alien type-number CMP
         "end" get JNE
         ! If so, load the offset and add it to the address
         dst src alien-offset [+] MOV
@@ -203,7 +203,7 @@ M:: x86 %box-alien ( dst src temp -- )
     [
         "end" define-label
         dst \ f type-number MOV
-        src 0 CMP
+        src src TEST
         "end" get JE
         dst 5 cells alien temp %allot
         dst 1 alien@ \ f type-number MOV ! base
@@ -213,32 +213,73 @@ M:: x86 %box-alien ( dst src temp -- )
         "end" resolve-label
     ] with-scope ;
 
-M:: x86 %box-displaced-alien ( dst displacement base displacement' base' base-class -- )
+M:: x86 %box-displaced-alien ( dst displacement base temp base-class -- )
+    ! This is ridiculous
     [
         "end" define-label
-        "ok" define-label
+        "not-f" define-label
+        "not-alien" define-label
+
         ! If displacement is zero, return the base
         dst base MOV
-        displacement 0 CMP
+        displacement displacement TEST
         "end" get JE
-        ! Quickly use displacement' before its needed for real, as allot temporary
-        dst 4 cells alien displacement' %allot
-        ! If base is already a displaced alien, unpack it
-        base' base MOV
-        displacement' displacement MOV
+
+        ! Displacement is non-zero, we're going to be allocating a new
+        ! object
+        dst 5 cells alien temp %allot
+
+        ! Set expired to f
+        dst 2 alien@ \ f type-number MOV
+
+        ! Is base f?
         base \ f type-number CMP
-        "ok" get JE
-        ! XXX
-        base 0 [+] alien type-number tag-fixnum CMP
-        "ok" get JNE
-        ! displacement += base.displacement
-        displacement' base 3 alien@ ADD
-        ! base = base.base
-        base' base 1 alien@ MOV
-        "ok" resolve-label
-        dst 1 alien@ base' MOV ! alien
-        dst 2 alien@ \ f type-number MOV ! expired
-        dst 3 alien@ displacement' MOV ! displacement
+        "not-f" get JNE
+
+        ! Yes, it is f. Fill in new object
+        dst 1 alien@ base MOV
+        dst 3 alien@ displacement MOV
+        dst 4 alien@ displacement MOV
+
+        "end" get JMP
+
+        "not-f" resolve-label
+
+        ! Check base type
+        temp base MOV
+        temp tag-mask get AND
+
+        ! Is base an alien?
+        temp alien type-number CMP
+        "not-alien" get JNE
+
+        ! Yes, it is an alien. Set new alien's base to base.base
+        temp base 1 alien@ MOV
+        dst 1 alien@ temp MOV
+
+        ! Compute displacement
+        temp base 3 alien@ MOV
+        temp displacement ADD
+        dst 3 alien@ temp MOV
+
+        ! Compute address
+        temp base 4 alien@ MOV
+        temp displacement ADD
+        dst 4 alien@ temp MOV
+
+        ! We are done
+        "end" get JMP
+
+        ! Is base a byte array? It has to be, by now...
+        "not-alien" resolve-label
+
+        dst 1 alien@ base MOV
+        dst 3 alien@ displacement MOV
+        temp base MOV
+        temp byte-array-offset ADD
+        temp displacement ADD
+        dst 4 alien@ temp MOV
+
         "end" resolve-label
     ] with-scope ;
 

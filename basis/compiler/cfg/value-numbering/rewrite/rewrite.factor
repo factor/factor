@@ -440,7 +440,7 @@ M: ##sar rewrite \ ##sar-imm rewrite-arithmetic ;
 :: rewrite-unbox-displaced-alien ( insn expr -- insns )
     [
         next-vreg :> temp
-        temp expr base>> vn>vreg expr base-class>> insn temp>> ##unbox-c-ptr
+        temp expr base>> vn>vreg expr base-class>> ##unbox-c-ptr
         insn dst>> temp expr displacement>> vn>vreg ##add
     ] { } make ;
 
