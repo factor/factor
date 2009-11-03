@@ -67,9 +67,9 @@ void factor_vm::update_word_xt(word *w_)
 	{
 		if(!w->profiling)
 		{
-			/* Note: can't do w->profiling = ... since if LHS
-			evaluates before RHS, since in that case if RHS does a
-			GC, we will have an invalid pointer on the LHS */
+			/* Note: can't do w->profiling = ... since LHS evaluates
+			before RHS, and if RHS does a GC, we will have an
+			invalid pointer on the LHS */
 			code_block *profiling = compile_profiling_stub(w.value());
 			w->profiling = profiling;
 		}
