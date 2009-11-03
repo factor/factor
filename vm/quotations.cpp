@@ -6,11 +6,11 @@ namespace factor
 /* Simple non-optimizing compiler.
 
 This is one of the two compilers implementing Factor; the second one is written
-in Factor and performs advanced optimizations. See core/compiler/compiler.factor.
+in Factor and performs advanced optimizations. See basis/compiler/compiler.factor.
 
 The non-optimizing compiler compiles a quotation at a time by concatenating
 machine code chunks; prolog, epilog, call word, jump to word, etc. These machine
-code chunks are generated from Factor code in core/cpu/.../bootstrap.factor.
+code chunks are generated from Factor code in basis/cpu/.../bootstrap.factor.
 
 Calls to words and constant quotations (referenced by conditionals and dips)
 are direct jumps to machine code blocks. Literals are also referenced directly
