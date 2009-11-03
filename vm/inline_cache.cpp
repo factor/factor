@@ -139,7 +139,7 @@ code_block *factor_vm::compile_inline_cache(fixnum index,
 	return code;
 }
 
-/* A generic word's definition performs general method lookup. Allocates memory */
+/* A generic word's definition performs general method lookup. */
 void *factor_vm::megamorphic_call_stub(cell generic_word)
 {
 	return untag<word>(generic_word)->xt;
@@ -174,7 +174,7 @@ void factor_vm::update_pic_transitions(cell pic_size)
 		ic_to_pic_transitions++;
 }
 
-/* The cache_entries parameter is either f (on cold call site) or an array
+/* The cache_entries parameter is empty (on cold call site) or has entries
 (on cache miss). Called from assembly with the actual return address.
 Compilation of the inline cache may trigger a GC, which may trigger a compaction;
 also, the block containing the return address may now be dead. Use a code_root
