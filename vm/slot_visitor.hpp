@@ -42,19 +42,19 @@ template<typename Visitor> struct slot_visitor {
 			visit_handle(ptr);
 	}
 
-	void visit_registered_locals()
+	void visit_data_roots()
 	{
-		std::vector<cell>::const_iterator iter = parent->gc_locals.begin();
-		std::vector<cell>::const_iterator end = parent->gc_locals.end();
+		std::vector<cell>::const_iterator iter = parent->data_roots.begin();
+		std::vector<cell>::const_iterator end = parent->data_roots.end();
 
 		for(; iter < end; iter++)
 			visit_handle((cell *)(*iter));
 	}
 
-	void visit_registered_bignums()
+	void visit_bignum_roots()
 	{
-		std::vector<cell>::const_iterator iter = parent->gc_bignums.begin();
-		std::vector<cell>::const_iterator end = parent->gc_bignums.end();
+		std::vector<cell>::const_iterator iter = parent->bignum_roots.begin();
+		std::vector<cell>::const_iterator end = parent->bignum_roots.end();
 
 		for(; iter < end; iter++)
 		{
@@ -72,8 +72,8 @@ template<typename Visitor> struct slot_visitor {
 		visit_handle(&parent->bignum_pos_one);
 		visit_handle(&parent->bignum_neg_one);
 
-		visit_registered_locals();
-		visit_registered_bignums();
+		visit_data_roots();
+		visit_bignum_roots();
 
 		for(cell i = 0; i < special_object_count; i++)
 			visit_handle(&parent->special_objects[i]);

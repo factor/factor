@@ -249,20 +249,20 @@ void factor_vm::primitive_become()
 	compile_all_words();
 }
 
-void factor_vm::inline_gc(cell *gc_roots_base, cell gc_roots_size)
+void factor_vm::inline_gc(cell *data_roots_base, cell data_roots_size)
 {
-	for(cell i = 0; i < gc_roots_size; i++)
-		gc_locals.push_back((cell)&gc_roots_base[i]);
+	for(cell i = 0; i < data_roots_size; i++)
+		data_roots.push_back((cell)&data_roots_base[i]);
 
 	primitive_minor_gc();
 
-	for(cell i = 0; i < gc_roots_size; i++)
-		gc_locals.pop_back();
+	for(cell i = 0; i < data_roots_size; i++)
+		data_roots.pop_back();
 }
 
-VM_C_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *parent)
+VM_C_API void inline_gc(cell *data_roots_base, cell data_roots_size, factor_vm *parent)
 {
-	parent->inline_gc(gc_roots_base,gc_roots_size);
+	parent->inline_gc(data_roots_base,data_roots_size);
 }
 
 /*

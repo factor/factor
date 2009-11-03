@@ -467,11 +467,11 @@ code_block *factor_vm::allot_code_block(cell size, code_block_type type)
 /* Might GC */
 code_block *factor_vm::add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_)
 {
-	gc_root<byte_array> code(code_,this);
-	gc_root<object> labels(labels_,this);
-	gc_root<object> owner(owner_,this);
-	gc_root<byte_array> relocation(relocation_,this);
-	gc_root<array> literals(literals_,this);
+	data_root<byte_array> code(code_,this);
+	data_root<object> labels(labels_,this);
+	data_root<object> owner(owner_,this);
+	data_root<byte_array> relocation(relocation_,this);
+	data_root<array> literals(literals_,this);
 
 	cell code_length = array_capacity(code.untagged());
 	code_block *compiled = allot_code_block(code_length,type);

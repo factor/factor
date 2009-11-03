@@ -139,6 +139,8 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p)
 		code_forwarder.visit_callback_code_blocks();
 	}
 
+	update_code_roots_for_compaction();
+
 	current_gc->event->ended_compaction();
 }
 
@@ -182,6 +184,8 @@ void factor_vm::collect_compact_code_impl(bool trace_contexts_p)
 	code_block_compaction_updater<dummy_slot_forwarder> code_block_updater(this,slot_forwarder);
 	standard_sizer<code_block> code_block_sizer;
 	code->allocator->compact(code_block_updater,code_block_sizer);
+
+	update_code_roots_for_compaction();
 }
 
 }

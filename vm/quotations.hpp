@@ -2,7 +2,7 @@ namespace factor
 {
 
 struct quotation_jit : public jit {
-	gc_root<array> elements;
+	data_root<array> elements;
 	bool compiling, relocate;
 
 	explicit quotation_jit(cell quot, bool compiling_, bool relocate_, factor_vm *vm)

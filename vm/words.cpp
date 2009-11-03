@@ -5,10 +5,10 @@ namespace factor
 
 word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 {
-	gc_root<object> vocab(vocab_,this);
-	gc_root<object> name(name_,this);
+	data_root<object> vocab(vocab_,this);
+	data_root<object> name(name_,this);
 
-	gc_root<word> new_word(allot<word>(sizeof(word)),this);
+	data_root<word> new_word(allot<word>(sizeof(word)),this);
 
 	new_word->hashcode = hashcode_;
 	new_word->vocabulary = vocab.value();
@@ -43,7 +43,7 @@ void factor_vm::primitive_word()
 /* word-xt ( word -- start end ) */
 void factor_vm::primitive_word_xt()
 {
-	gc_root<word> w(dpop(),this);
+	data_root<word> w(dpop(),this);
 	w.untag_check(this);
 
 	if(profiling_p)
@@ -61,7 +61,7 @@ void factor_vm::primitive_word_xt()
 /* Allocates memory */
 void factor_vm::update_word_xt(word *w_)
 {
-	gc_root<word> w(w_,this);
+	data_root<word> w(w_,this);
 
 	if(profiling_p)
 	{
