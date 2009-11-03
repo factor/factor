@@ -11,6 +11,10 @@ GENERIC: defs-vreg ( insn -- vreg/f )
 GENERIC: temp-vregs ( insn -- seq )
 GENERIC: uses-vregs ( insn -- seq )
 
+M: insn defs-vreg drop f ;
+M: insn temp-vregs drop { } ;
+M: insn uses-vregs drop { } ;
+
 M: ##phi uses-vregs inputs>> values ;
 
 <PRIVATE
@@ -24,19 +28,25 @@ M: ##phi uses-vregs inputs>> values ;
     } case ;
 
 : define-defs-vreg-method ( insn -- )
-    [ \ defs-vreg create-method ]
-    [ insn-def-slot [ name>> reader-word 1quotation ] [ [ drop f ] ] if* ] bi
-    define ;
+    dup insn-def-slot dup [
+        [ \ defs-vreg create-method ]
+        [ name>> reader-word 1quotation ] bi*
+        define
+    ] [ 2drop ] if ;
 
 : define-uses-vregs-method ( insn -- )
-    [ \ uses-vregs create-method ]
-    [ insn-use-slots [ name>> ] map slot-array-quot ] bi
-    define ;
+    dup insn-use-slots [ drop ] [
+        [ \ uses-vregs create-method ]
+        [ [ name>> ] map slot-array-quot ] bi*
+        define
+    ] if-empty ;
 
 : define-temp-vregs-method ( insn -- )
-    [ \ temp-vregs create-method ]
-    [ insn-temp-slots [ name>> ] map slot-array-quot ] bi
-    define ;
+    dup insn-temp-slots [ drop ] [
+        [ \ temp-vregs create-method ]
+        [ [ name>> ] map slot-array-quot ] bi*
+        define
+    ] if-empty ;
 
 PRIVATE>
 
