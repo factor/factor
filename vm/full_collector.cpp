@@ -22,7 +22,6 @@ void factor_vm::update_code_roots_for_sweep()
 
 	for(; iter < end; iter++)
 	{
-		printf("We have a code root!\n");
 		code_root *root = *iter;
 		code_block *block = (code_block *)(root->value & -block_granularity);
 		if(root->valid && !state->marked_p(block))
@@ -42,7 +41,6 @@ void factor_vm::update_code_roots_for_compaction()
 
 	for(; iter < end; iter++)
 	{
-		printf("We have a code root - compaction!\n");
 		code_root *root = *iter;
 		code_block *block = (code_block *)(root->value & -block_granularity);
 
