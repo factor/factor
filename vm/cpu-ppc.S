@@ -43,7 +43,7 @@ DEF(void,primitive_fixnum_multiply,(void *vm)):
 	stw r6,0(DS_REG)
 	blr
 multiply_overflow:
-	srawi r4,r4,3
+	srawi r4,r4,4
 	b MANGLE(overflow_fixnum_multiply)
 	
 /* Note that the XT is passed to the quotation in r11 */
