@@ -98,6 +98,11 @@ void data_heap::reset_generation(tenured_space *gen)
 	clear_decks(gen);
 }
 
+bool data_heap::low_memory_p()
+{
+	return (tenured->free_space() <= nursery->size + aging->size);
+}
+
 void factor_vm::set_data_heap(data_heap *data_)
 {
 	data = data_;

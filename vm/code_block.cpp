@@ -127,9 +127,8 @@ void *factor_vm::get_rel_symbol(array *literals, cell index)
 		}
 	case ARRAY_TYPE:
 		{
-			cell i;
 			array *names = untag<array>(symbol);
-			for(i = 0; i < array_capacity(names); i++)
+			for(cell i = 0; i < array_capacity(names); i++)
 			{
 				symbol_char *name = alien_offset(array_nth(names,i));
 				void *sym = ffi_dlsym(d,name);
