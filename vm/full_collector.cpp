@@ -118,6 +118,22 @@ void factor_vm::collect_sweep_impl()
 	current_gc->event->ended_data_sweep();
 }
 
+void factor_vm::collect_full(bool trace_contexts_p)
+{
+	collect_mark_impl(trace_contexts_p);
+	collect_sweep_impl();
+	if(data->tenured->largest_free_block() <= data->nursery->size + data->aging->size)
+		collect_compact_impl(trace_contexts_p);
+	else
+		update_code_heap_words_and_literals();
+}
+
+void factor_vm::collect_compact(bool trace_contexts_p)
+{
+	collect_mark_impl(trace_contexts_p);
+	collect_compact_impl(trace_contexts_p);
+}
+
 void factor_vm::collect_growing_heap(cell requested_bytes, bool trace_contexts_p)
 {
 	/* Grow the data heap and copy all live objects to the new heap. */
