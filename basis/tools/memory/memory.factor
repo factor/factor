@@ -60,7 +60,7 @@ IN: tools.memory
     } fancy-table. ;
 
 : data-room. ( -- )
-    "==== DATA HEAP" print nl
+    "== Data heap ==" print nl
     data-room data-heap-room memory>struct {
         [ nursery-room. nl ]
         [ aging-room. nl ]
@@ -69,7 +69,7 @@ IN: tools.memory
     } cleave ;
 
 : code-room. ( -- )
-    "==== CODE HEAP" print nl
+    "== Code heap ==" print nl
     code-room mark-sweep-sizes memory>struct mark-sweep-table. ;
 
 PRIVATE>
