@@ -202,7 +202,7 @@ USE: binary-search.private
     dup length 1 <= [
         from>>
     ] [
-        [ midpoint swap call ] 3keep roll dup zero?
+        [ midpoint swap call ] 3keep [ rot ] dip swap dup zero?
         [ drop dup from>> swap midpoint@ + ]
         [ drop dup midpoint@ head-slice old-binsearch ] if
     ] if ; inline recursive

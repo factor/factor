@@ -53,7 +53,7 @@ SYMBOL: mega-cache-size
     first-bignum neg >fixnum ; inline
 
 : (max-array-capacity) ( b -- n )
-    5 - 2^ 1 - ; inline
+    6 - 2^ 1 - ; inline
 
 : max-array-capacity ( -- n )
     cell-bits (max-array-capacity) ; inline
