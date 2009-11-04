@@ -65,8 +65,8 @@ GENERIC: new-underlying ( underlying seq -- seq' )
 : (simd-vnone?)            ( a   rep -- ? ) \ vnone? bad-simd-call ;
 : (simd-v>float)           ( a   rep -- c ) \ vconvert bad-simd-call ;
 : (simd-v>integer)         ( a   rep -- c ) \ vconvert bad-simd-call ;
-: (simd-vpack-signed)      ( a   rep -- c ) \ vconvert bad-simd-call ;
-: (simd-vpack-unsigned)    ( a   rep -- c ) \ vconvert bad-simd-call ;
+: (simd-vpack-signed)      ( a b rep -- c ) \ vconvert bad-simd-call ;
+: (simd-vpack-unsigned)    ( a b rep -- c ) \ vconvert bad-simd-call ;
 : (simd-vunpack-head)      ( a   rep -- c ) \ vconvert bad-simd-call ;
 : (simd-vunpack-tail)      ( a   rep -- c ) \ vconvert bad-simd-call ;
 : (simd-with)              (   n rep -- v ) \ simd-with bad-simd-call ;
@@ -337,3 +337,5 @@ M: simd-128 distance  v- norm ; inline
 M: simd-128 vshuffle ( u perm -- v )
     vshuffle-bytes ; inline
 
+"compiler.tree.propagation.simd" require
+"compiler.cfg.intrinsics.simd" require
