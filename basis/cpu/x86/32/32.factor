@@ -11,9 +11,6 @@ cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
 cpu.architecture ;
 IN: cpu.x86.32
 
-! We implement the FFI for Linux, OS X and Windows all at once.
-! OS X requires that the stack be 16-byte aligned.
-
 M: x86.32 machine-registers
     {
         { int-regs { EAX ECX EDX EBP EBX } }
