@@ -285,8 +285,8 @@ cell 8 = [
 
 ! 64-bit overflow
 cell 8 = [
-    [ t ] [ 1 59 fixnum-shift dup [ fixnum+ ] compile-call 1 60 fixnum-shift = ] unit-test
-    [ -1152921504606846977 ] [ 1 60 shift neg >fixnum [ -1 fixnum+ ] compile-call ] unit-test
+    [ t ] [ 1 58 fixnum-shift dup [ fixnum+ ] compile-call 1 59 fixnum-shift = ] unit-test
+    [ -576460752303423489 ] [ 1 59 shift neg >fixnum [ -1 fixnum+ ] compile-call ] unit-test
     
     [ t ] [ 1 40 shift 1 40 shift [ fixnum* ] compile-call 1 80 shift = ] unit-test
     [ t ] [ 1 40 shift neg 1 40 shift [ fixnum* ] compile-call 1 80 shift neg = ] unit-test
@@ -301,9 +301,9 @@ cell 8 = [
     [ -18446744073709551616 ] [ -1 [ 64 fixnum-shift ] compile-call ] unit-test
     [ -18446744073709551616 ] [ -1 [ 32 fixnum-shift 32 fixnum-shift ] compile-call ] unit-test
     
-    [ 1152921504606846976 ] [ -1152921504606846976 >fixnum -1 [ fixnum/i ] compile-call ] unit-test
+    [ 576460752303423488 ] [ -576460752303423488 >fixnum -1 [ fixnum/i ] compile-call ] unit-test
 
-    [ 1152921504606846976 0 ] [ -1152921504606846976 >fixnum -1 [ fixnum/mod ] compile-call ] unit-test
+    [ 576460752303423488 0 ] [ -576460752303423488 >fixnum -1 [ fixnum/mod ] compile-call ] unit-test
 
     [ -268435457 ] [ 28 2^ [ fixnum-bitnot ] compile-call ] unit-test
 ] when
@@ -311,12 +311,14 @@ cell 8 = [
 ! Some randomized tests
 : compiled-fixnum* ( a b -- c ) fixnum* ;
 
+ERROR: bug-in-fixnum* x y a b ;
+
 [ ] [
     10000 [ 
-        32 random-bits >fixnum 32 random-bits >fixnum
-        2dup
-        [ fixnum* ] 2keep compiled-fixnum* =
-        [ 2drop ] [ "Oops" throw ] if
+        32 random-bits >fixnum
+        32 random-bits >fixnum
+        2dup [ fixnum* ] [ compiled-fixnum* ] 2bi 2dup =
+        [ 2drop 2drop ] [ bug-in-fixnum* ] if
     ] times
 ] unit-test
 
