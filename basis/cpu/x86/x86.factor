@@ -45,8 +45,7 @@ HOOK: extra-stack-space cpu ( stack-frame -- n )
 : incr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap ADD ] if ;
 
-: align-stack ( n -- n' )
-    os macosx? cpu x86.64? or [ 16 align ] when ;
+: align-stack ( n -- n' ) 16 align ;
 
 M: x86 stack-frame-size ( stack-frame -- i )
     [ (stack-frame-size) ]
@@ -141,8 +140,10 @@ M: x86 %not     int-rep one-operand NOT ;
 M: x86 %neg     int-rep one-operand NEG ;
 M: x86 %log2    BSR ;
 
+! A bit of logic to avoid using MOVSS/MOVSD for reg-reg moves
+! since this induces partial register stalls
 GENERIC: copy-register* ( dst src rep -- )
-GENERIC: copy-unaligned* ( dst src rep -- )
+GENERIC: copy-memory* ( dst src rep -- )
 
 M: int-rep copy-register* drop MOV ;
 M: tagged-rep copy-register* drop MOV ;
@@ -152,17 +153,14 @@ M: float-4-rep copy-register* drop MOVAPS ;
 M: double-2-rep copy-register* drop MOVAPS ;
 M: vector-rep copy-register* drop MOVDQA ;
 
-M: object copy-unaligned* copy-register* ;
-M: float-rep copy-unaligned* drop MOVSS ;
-M: double-rep copy-unaligned* drop MOVSD ;
-M: float-4-rep copy-unaligned* drop MOVUPS ;
-M: double-2-rep copy-unaligned* drop MOVUPS ;
-M: vector-rep copy-unaligned* drop MOVDQU ;
+M: object copy-memory* copy-register* ;
+M: float-rep copy-memory* drop MOVSS ;
+M: double-rep copy-memory* drop MOVSD ;
 
 M: x86 %copy ( dst src rep -- )
     2over eq? [ 3drop ] [
         [ [ dup spill-slot? [ n>> spill@ ] when ] bi@ ] dip
-        2over [ register? ] both? [ copy-register* ] [ copy-unaligned* ] if
+        2over [ register? ] both? [ copy-register* ] [ copy-memory* ] if
     ] if ;
 
 M: x86 %fixnum-add ( label dst src1 src2 -- )

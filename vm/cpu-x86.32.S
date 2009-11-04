@@ -19,11 +19,9 @@
 
 #define PUSH_NONVOLATILE \
 	push %ebx ; \
-	push %ebp ; \
 	push %ebp
 
 #define POP_NONVOLATILE \
-	pop %ebp ; \
 	pop %ebp ; \
 	pop %ebx
 
