@@ -62,7 +62,7 @@ IN: compiler.cfg.intrinsics.allot
 : bytes>cells ( m -- n ) cell align cell /i ;
 
 : ^^allot-byte-array ( n -- dst )
-    2 cells + byte-array ^^allot ;
+    16 + byte-array ^^allot ;
 
 : emit-allot-byte-array ( len -- dst )
     ds-drop
