@@ -1134,14 +1134,25 @@ M: x86 %dot-vector
         { float-4-rep [
             sse4.1?
             [ HEX: ff DPPS ]
-            [ [ MULPS ] [ drop dup float-4-rep %horizontal-add-vector ] 2bi ]
-            if
+            [
+                [ MULPS ] [
+                    drop 2dup float-4-rep
+                    [ %horizontal-add-vector ]
+                    [ %horizontal-add-vector ]
+                    [ nip %vector>scalar ] 3tri
+                ] 2bi
+            ] if
         ] }
         { double-2-rep [
             sse4.1?
             [ HEX: ff DPPD ]
-            [ [ MULPD ] [ drop dup double-2-rep %horizontal-add-vector ] 2bi ]
-            if
+            [
+                [ MULPD ] [
+                    drop 2dup double-2-rep
+                    [ %horizontal-add-vector ]
+                    [ nip %vector>scalar ] 3bi
+                ] 2bi
+            ] if
         ] }
     } case ;
 
@@ -1150,15 +1161,19 @@ M: x86 %dot-vector-reps
         { sse3? { float-4-rep double-2-rep } }
     } available-reps ;
 
-M: x86 %horizontal-add-vector ( dst src rep -- )
-    {
-        { float-4-rep [ [ float-4-rep %copy ] [ HADDPS ] [ HADDPS ] 2tri ] }
-        { double-2-rep [ [ double-2-rep %copy ] [ HADDPD ] 2bi ] }
+M: x86 %horizontal-add-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
+    unsign-rep {
+        { float-4-rep  [ HADDPS ] }
+        { double-2-rep [ HADDPD ] }
+        { int-4-rep    [ PHADDD ] }
+        { short-8-rep  [ PHADDW ] }
     } case ;
 
 M: x86 %horizontal-add-vector-reps
     {
         { sse3? { float-4-rep double-2-rep } }
+        { ssse3? { int-4-rep uint-4-rep short-8-rep ushort-8-rep } }
     } available-reps ;
 
 M: x86 %horizontal-shl-vector-imm ( dst src1 src2 rep -- )
