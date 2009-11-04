@@ -1166,7 +1166,7 @@ M: x86 %horizontal-shl-vector-imm ( dst src1 src2 rep -- )
 
 M: x86 %horizontal-shl-vector-imm-reps
     {
-        { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+        { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep float-4-rep double-2-rep } }
     } available-reps ;
 
 M: x86 %horizontal-shr-vector-imm ( dst src1 src2 rep -- )
@@ -1174,7 +1174,7 @@ M: x86 %horizontal-shr-vector-imm ( dst src1 src2 rep -- )
 
 M: x86 %horizontal-shr-vector-imm-reps
     {
-        { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+        { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep float-4-rep double-2-rep } }
     } available-reps ;
 
 M: x86 %abs-vector ( dst src rep -- )
