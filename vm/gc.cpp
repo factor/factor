@@ -152,12 +152,6 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 		start_gc_again();
 	}
 
-	if(current_gc->op == collect_aging_op || current_gc->op == collect_to_tenured_op)
-	{
-		if(data->tenured->free_space() <= data->nursery->size + data->aging->size)
-			current_gc->op = collect_full_op;
-	}
-
 	current_gc->event->op = current_gc->op;
 
 	switch(current_gc->op)
@@ -167,21 +161,27 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 		break;
 	case collect_aging_op:
 		collect_aging();
+		if(data->low_memory_p())
+		{
+			current_gc->op = collect_full_op;
+			current_gc->event->op = collect_full_op;
+			collect_full(trace_contexts_p);
+		}
 		break;
 	case collect_to_tenured_op:
 		collect_to_tenured();
+		if(data->low_memory_p())
+		{
+			current_gc->op = collect_full_op;
+			current_gc->event->op = collect_full_op;
+			collect_full(trace_contexts_p);
+		}
 		break;
 	case collect_full_op:
-		collect_mark_impl(trace_contexts_p);
-		collect_sweep_impl();
-		if(data->tenured->largest_free_block() <= data->nursery->size + data->aging->size)
-			collect_compact_impl(trace_contexts_p);
-		else
-			update_code_heap_words_and_literals();
+		collect_full(trace_contexts_p);
 		break;
 	case collect_compact_op:
-		collect_mark_impl(trace_contexts_p);
-		collect_compact_impl(trace_contexts_p);
+		collect_compact(trace_contexts_p);
 		break;
 	case collect_growing_heap_op:
 		collect_growing_heap(requested_bytes,trace_contexts_p);
