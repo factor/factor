@@ -33,7 +33,7 @@ DEF(void,primitive_fixnum_multiply,(void *myvm)):
 	pop ARG2
 	ret
 multiply_overflow:
-	sar $3,ARITH_TEMP_1
+	sar $4,ARITH_TEMP_1
 	mov ARITH_TEMP_1,ARG0
 	mov ARITH_TEMP_2,ARG1
 	pop ARG2
