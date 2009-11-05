@@ -4,15 +4,13 @@ USING: namespaces math words kernel assocs classes
 math.order kernel.private ;
 IN: layouts
 
-SYMBOL: tag-mask
+SYMBOL: data-alignment
 
-SYMBOL: num-tags
+SYMBOL: tag-mask
 
 SYMBOL: tag-bits
 
 SYMBOL: num-types
-
-SYMBOL: tag-numbers
 
 SYMBOL: type-numbers
 
@@ -20,9 +18,6 @@ SYMBOL: mega-cache-size
 
 : type-number ( class -- n )
     type-numbers get at ;
-
-: tag-number ( class -- n )
-    type-number dup num-tags get >= [ drop object tag-number ] when ;
 
 : tag-fixnum ( n -- tagged )
     tag-bits get shift ;
@@ -58,7 +53,7 @@ SYMBOL: mega-cache-size
     first-bignum neg >fixnum ; inline
 
 : (max-array-capacity) ( b -- n )
-    5 - 2^ 1 - ; inline
+    6 - 2^ 1 - ; inline
 
 : max-array-capacity ( -- n )
     cell-bits (max-array-capacity) ; inline

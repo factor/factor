@@ -21,7 +21,7 @@ void factor_vm::init_callbacks(cell size)
 
 void callback_heap::update(callback *stub)
 {
-	tagged<array> code_template(parent->userenv[CALLBACK_STUB]);
+	tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
 
 	cell rel_class = untag_fixnum(array_nth(code_template.untagged(),1));
 	cell offset = untag_fixnum(array_nth(code_template.untagged(),3));
@@ -35,18 +35,18 @@ void callback_heap::update(callback *stub)
 
 callback *callback_heap::add(code_block *compiled)
 {
-	tagged<array> code_template(parent->userenv[CALLBACK_STUB]);
+	tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
 	tagged<byte_array> insns(array_nth(code_template.untagged(),0));
 	cell size = array_capacity(insns.untagged());
 
-	cell bump = align8(size) + sizeof(callback);
+	cell bump = align(size,sizeof(cell)) + sizeof(callback);
 	if(here + bump > seg->end) fatal_error("Out of callback space",0);
 
 	callback *stub = (callback *)here;
 	stub->compiled = compiled;
 	memcpy(stub + 1,insns->data<void>(),size);
 
-	stub->size = align8(size);
+	stub->size = align(size,sizeof(cell));
 	here += bump;
 
 	update(stub);

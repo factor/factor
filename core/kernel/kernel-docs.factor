@@ -651,7 +651,7 @@ HELP: declare
 
 HELP: tag ( object -- n )
 { $values { "object" object } { "n" "a tag number" } }
-{ $description "Outputs an object's tag number, between zero and one less than " { $link num-tags } ". This is implementation detail and user code should call " { $link class } " instead." } ;
+{ $description "Outputs an object's tag number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class } " instead." } ;
 
 HELP: getenv ( n -- obj )
 { $values { "n" "a non-negative integer" } { "obj" object } }

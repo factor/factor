@@ -76,7 +76,7 @@ code_block *factor_vm::frame_code(stack_frame *frame)
 	return (code_block *)frame->xt - 1;
 }
 
-cell factor_vm::frame_type(stack_frame *frame)
+code_block_type factor_vm::frame_type(stack_frame *frame)
 {
 	return frame_code(frame)->type();
 }
@@ -97,7 +97,7 @@ cell factor_vm::frame_scan(stack_frame *frame)
 {
 	switch(frame_type(frame))
 	{
-	case QUOTATION_TYPE:
+	case code_block_unoptimized:
 		{
 			cell quot = frame_executing(frame);
 			if(to_boolean(quot))
@@ -111,7 +111,7 @@ cell factor_vm::frame_scan(stack_frame *frame)
 			else
 				return false_object;
 		}
-	case WORD_TYPE:
+	case code_block_optimized:
 		return false_object;
 	default:
 		critical_error("Bad frame type",frame_type(frame));
@@ -130,8 +130,8 @@ struct stack_frame_accumulator {
 
 	void operator()(stack_frame *frame)
 	{
-		gc_root<object> executing(parent->frame_executing(frame),parent);
-		gc_root<object> scan(parent->frame_scan(frame),parent);
+		data_root<object> executing(parent->frame_executing(frame),parent);
+		data_root<object> scan(parent->frame_scan(frame),parent);
 
 		frames.add(executing.value());
 		frames.add(scan.value());
@@ -142,7 +142,7 @@ struct stack_frame_accumulator {
 
 void factor_vm::primitive_callstack_to_array()
 {
-	gc_root<callstack> callstack(dpop(),this);
+	data_root<callstack> callstack(dpop(),this);
 
 	stack_frame_accumulator accum(this);
 	iterate_callstack_object(callstack.untagged(),accum);
@@ -184,8 +184,8 @@ void factor_vm::primitive_innermost_stack_frame_scan()
 
 void factor_vm::primitive_set_innermost_stack_frame_quot()
 {
-	gc_root<callstack> callstack(dpop(),this);
-	gc_root<quotation> quot(dpop(),this);
+	data_root<callstack> callstack(dpop(),this);
+	data_root<quotation> quot(dpop(),this);
 
 	callstack.untag_check(this);
 	quot.untag_check(this);

@@ -99,6 +99,7 @@ bootstrapping? on
     "system"
     "system.private"
     "threads.private"
+    "tools.dispatch.private"
     "tools.profiler.private"
     "words"
     "words.private"
@@ -176,10 +177,6 @@ define-predicate-class
 bi
 
 "object?" "kernel" vocab-words delete-at
-
-! Class of objects with object tag
-"hi-tag" "kernel.private" create
-builtins get num-tags get tail define-union-class
 
 ! Empty class with no instances
 "null" "kernel" create
@@ -423,7 +420,6 @@ tuple
     { "minor-gc" "memory" (( -- )) }
     { "gc" "memory" (( -- )) }
     { "compact-gc" "memory" (( -- )) }
-    { "gc-stats" "memory" f }
     { "(save-image)" "memory.private" (( path -- )) }
     { "(save-image-and-exit)" "memory.private" (( path -- )) }
     { "datastack" "kernel" (( -- ds )) }
@@ -433,8 +429,8 @@ tuple
     { "set-retainstack" "kernel" (( rs -- )) }
     { "set-callstack" "kernel" (( cs -- )) }
     { "exit" "system" (( n -- )) }
-    { "data-room" "memory" (( -- cards decks generations )) }
-    { "code-room" "memory" (( -- code-total code-used code-free largest-free-block )) }
+    { "data-room" "memory" (( -- data-room )) }
+    { "code-room" "memory" (( -- code-room )) }
     { "micros" "system" (( -- us )) }
     { "modify-code-heap" "compiler.units" (( alist -- )) }
     { "(dlopen)" "alien.libraries" (( path -- dll )) }
@@ -509,7 +505,6 @@ tuple
     { "resize-byte-array" "byte-arrays" (( n byte-array -- newbyte-array )) }
     { "dll-valid?" "alien.libraries" (( dll -- ? )) }
     { "unimplemented" "kernel.private" (( -- * )) }
-    { "gc-reset" "memory" (( -- )) }
     { "jit-compile" "quotations" (( quot -- )) }
     { "load-locals" "locals.backend" (( ... n -- )) }
     { "check-datastack" "kernel.private" (( array in# out# -- ? )) }
@@ -517,15 +512,15 @@ tuple
     { "inline-cache-miss-tail" "generic.single.private" (( generic methods index cache -- )) }
     { "mega-cache-miss" "generic.single.private" (( methods index cache -- method )) }
     { "lookup-method" "generic.single.private" (( object methods -- method )) }
-    { "reset-dispatch-stats" "generic.single" (( -- )) }
-    { "dispatch-stats" "generic.single" (( -- stats )) }
-    { "reset-inline-cache-stats" "generic.single" (( -- )) }
-    { "inline-cache-stats" "generic.single" (( -- stats )) }
+    { "reset-dispatch-stats" "tools.dispatch.private" (( -- )) }
+    { "dispatch-stats" "tools.dispatch.private" (( -- stats )) }
     { "optimized?" "words" (( word -- ? )) }
     { "quot-compiled?" "quotations" (( quot -- ? )) }
     { "vm-ptr" "vm" (( -- ptr )) }
     { "strip-stack-traces" "kernel.private" (( -- )) }
     { "<callback>" "alien" (( word -- alien )) }
+    { "enable-gc-events" "memory" (( -- )) }
+    { "disable-gc-events" "memory" (( -- events )) }
 } [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number

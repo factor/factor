@@ -890,10 +890,10 @@ M: tuple-with-read-only-slot clone
     [ { 1 2 3 } dup tuple-with-read-only-slot boa clone x>> eq? ] final-classes
 ] unit-test
 
-! alien-cell outputs a simple-alien or f
+! alien-cell outputs a alien or f
 [ t ] [
     [ { byte-array fixnum } declare alien-cell dup [ "OOPS" throw ] unless ] final-classes
-    first simple-alien class=
+    first alien class=
 ] unit-test
 
 ! Don't crash if bad literal inputs are passed to unsafe words

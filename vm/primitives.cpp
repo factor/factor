@@ -55,7 +55,6 @@ PRIMITIVE_FORWARD(existsp)
 PRIMITIVE_FORWARD(minor_gc)
 PRIMITIVE_FORWARD(full_gc)
 PRIMITIVE_FORWARD(compact_gc)
-PRIMITIVE_FORWARD(gc_stats)
 PRIMITIVE_FORWARD(save_image)
 PRIMITIVE_FORWARD(save_image_and_exit)
 PRIMITIVE_FORWARD(datastack)
@@ -115,7 +114,6 @@ PRIMITIVE_FORWARD(call_clear)
 PRIMITIVE_FORWARD(resize_byte_array)
 PRIMITIVE_FORWARD(dll_validp)
 PRIMITIVE_FORWARD(unimplemented)
-PRIMITIVE_FORWARD(clear_gc_stats)
 PRIMITIVE_FORWARD(jit_compile)
 PRIMITIVE_FORWARD(load_locals)
 PRIMITIVE_FORWARD(check_datastack)
@@ -123,13 +121,13 @@ PRIMITIVE_FORWARD(mega_cache_miss)
 PRIMITIVE_FORWARD(lookup_method)
 PRIMITIVE_FORWARD(reset_dispatch_stats)
 PRIMITIVE_FORWARD(dispatch_stats)
-PRIMITIVE_FORWARD(reset_inline_cache_stats)
-PRIMITIVE_FORWARD(inline_cache_stats)
 PRIMITIVE_FORWARD(optimized_p)
 PRIMITIVE_FORWARD(quot_compiled_p)
 PRIMITIVE_FORWARD(vm_ptr)
 PRIMITIVE_FORWARD(strip_stack_traces)
 PRIMITIVE_FORWARD(callback)
+PRIMITIVE_FORWARD(enable_gc_events)
+PRIMITIVE_FORWARD(disable_gc_events)
 
 const primitive_type primitives[] = {
 	primitive_bignum_to_fixnum,
@@ -193,7 +191,6 @@ const primitive_type primitives[] = {
 	primitive_minor_gc,
 	primitive_full_gc,
 	primitive_compact_gc,
-	primitive_gc_stats,
 	primitive_save_image,
 	primitive_save_image_and_exit,
 	primitive_datastack,
@@ -279,7 +276,6 @@ const primitive_type primitives[] = {
 	primitive_resize_byte_array,
 	primitive_dll_validp,
 	primitive_unimplemented,
-	primitive_clear_gc_stats,
 	primitive_jit_compile,
 	primitive_load_locals,
 	primitive_check_datastack,
@@ -289,13 +285,13 @@ const primitive_type primitives[] = {
 	primitive_lookup_method,
 	primitive_reset_dispatch_stats,
 	primitive_dispatch_stats,
-	primitive_reset_inline_cache_stats,
-	primitive_inline_cache_stats,
 	primitive_optimized_p,
 	primitive_quot_compiled_p,
 	primitive_vm_ptr,
 	primitive_strip_stack_traces,
 	primitive_callback,
+	primitive_enable_gc_events,
+	primitive_disable_gc_events,
 };
 
 }
