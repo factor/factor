@@ -737,14 +737,3 @@ USE: vocabs.loader
 } cond
 
 "complex-double" c-type t >>return-in-registers? drop
-
-[
-    <c-type>
-        [ alien-unsigned-4 c-bool> ] >>getter
-        [ [ >c-bool ] 2dip set-alien-unsigned-4 ] >>setter
-        4 >>size
-        4 >>align
-        "box_boolean" >>boxer
-        "to_boolean" >>unboxer
-    bool define-primitive-type
-] with-compilation-unit
