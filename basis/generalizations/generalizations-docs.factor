@@ -332,12 +332,6 @@ HELP: nappend-as
 
 { nappend nappend-as } related-words
 
-HELP: ntuck
-{ $values
-     { "n" integer }
-}
-{ $description "A generalization of " { $link tuck } " that can work for any stack depth. The top item will be copied and placed " { $snippet "n" } " items down on the stack." } ;
-
 ARTICLE: "sequence-generalizations" "Generalized sequence operations"
 { $subsections
     narray
@@ -357,7 +351,6 @@ ARTICLE: "shuffle-generalizations" "Generalized shuffle words"
     -nrot
     nnip
     ndrop
-    ntuck
     mnswap
     nweave
 } ;
