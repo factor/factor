@@ -18,7 +18,7 @@ IN: bootstrap.x86
 : stack-reg ( -- reg ) RSP ;
 : ds-reg ( -- reg ) R14 ;
 : rs-reg ( -- reg ) R15 ;
-: fixnum>slot@ ( -- ) ;
+: fixnum>slot@ ( -- ) temp0 1 SAR ;
 : rex-length ( -- n ) 1 ;
 
 [

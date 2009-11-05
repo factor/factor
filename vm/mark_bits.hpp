@@ -1,43 +1,34 @@
 namespace factor
 {
 
-const int forwarding_granularity = 128;
+const int block_granularity = 16;
+const int forwarding_granularity = 64;
 
-template<typename Block, int Granularity> struct mark_bits {
-	cell start;
+template<typename Block> struct mark_bits {
 	cell size;
+	cell start;
 	cell bits_size;
-	unsigned int *marked;
-	unsigned int *freed;
-	cell forwarding_size;
+	u64 *marked;
 	cell *forwarding;
 
 	void clear_mark_bits()
 	{
-		memset(marked,0,bits_size * sizeof(unsigned int));
-	}
-
-	void clear_free_bits()
-	{
-		memset(freed,0,bits_size * sizeof(unsigned int));
+		memset(marked,0,bits_size * sizeof(u64));
 	}
 
 	void clear_forwarding()
 	{
-		memset(forwarding,0,forwarding_size * sizeof(cell));
+		memset(forwarding,0,bits_size * sizeof(cell));
 	}
 
-	explicit mark_bits(cell start_, cell size_) :
-		start(start_),
+	explicit mark_bits(cell size_, cell start_) :
 		size(size_),
-		bits_size(size / Granularity / 32),
-		marked(new unsigned int[bits_size]),
-		freed(new unsigned int[bits_size]),
-		forwarding_size(size / Granularity / forwarding_granularity),
-		forwarding(new cell[forwarding_size])
+		start(start_),
+		bits_size(size / block_granularity / forwarding_granularity),
+		marked(new u64[bits_size]),
+		forwarding(new cell[bits_size])
 	{
 		clear_mark_bits();
-		clear_free_bits();
 		clear_forwarding();
 	}
 
@@ -45,58 +36,168 @@ template<typename Block, int Granularity> struct mark_bits {
 	{
 		delete[] marked;
 		marked = NULL;
-		delete[] freed;
-		freed = NULL;
 		delete[] forwarding;
 		forwarding = NULL;
 	}
 
+	cell block_line(Block *address)
+	{
+		return (((cell)address - start) / block_granularity);
+	}
+
+	Block *line_block(cell line)
+	{
+		return (Block *)(line * block_granularity + start);
+	}
+
 	std::pair<cell,cell> bitmap_deref(Block *address)
 	{
-		cell word_number = (((cell)address - start) / Granularity);
-		cell word_index = (word_number >> 5);
-		cell word_shift = (word_number & 31);
-
-#ifdef FACTOR_DEBUG
-		assert(word_index < bits_size);
-#endif
-
+		cell line_number = block_line(address);
+		cell word_index = (line_number >> 6);
+		cell word_shift = (line_number & 63);
 		return std::make_pair(word_index,word_shift);
 	}
 
-	bool bitmap_elt(unsigned int *bits, Block *address)
+	bool bitmap_elt(u64 *bits, Block *address)
 	{
-		std::pair<cell,cell> pair = bitmap_deref(address);
-		return (bits[pair.first] & (1 << pair.second)) != 0;
+		std::pair<cell,cell> position = bitmap_deref(address);
+		return (bits[position.first] & ((u64)1 << position.second)) != 0;
 	}
 
-	void set_bitmap_elt(unsigned int *bits, Block *address, bool flag)
+	Block *next_block_after(Block *block)
 	{
-		std::pair<cell,cell> pair = bitmap_deref(address);
-		if(flag)
-			bits[pair.first] |= (1 << pair.second);
+		return (Block *)((cell)block + block->size());
+	}
+
+	void set_bitmap_range(u64 *bits, Block *address)
+	{
+		std::pair<cell,cell> start = bitmap_deref(address);
+		std::pair<cell,cell> end = bitmap_deref(next_block_after(address));
+
+		u64 start_mask = ((u64)1 << start.second) - 1;
+		u64 end_mask = ((u64)1 << end.second) - 1;
+
+		if(start.first == end.first)
+			bits[start.first] |= start_mask ^ end_mask;
 		else
-			bits[pair.first] &= ~(1 << pair.second);
+		{
+#ifdef FACTOR_DEBUG
+			assert(start.first < bits_size);
+#endif
+			bits[start.first] |= ~start_mask;
+
+			for(cell index = start.first + 1; index < end.first; index++)
+				bits[index] = (u64)-1;
+
+			if(end_mask != 0)
+			{
+#ifdef FACTOR_DEBUG
+				assert(end.first < bits_size);
+#endif
+				bits[end.first] |= end_mask;
+			}
+		}
 	}
 
-	bool is_marked_p(Block *address)
+	bool marked_p(Block *address)
 	{
 		return bitmap_elt(marked,address);
 	}
 
-	void set_marked_p(Block *address, bool marked_p)
+	void set_marked_p(Block *address)
 	{
-		set_bitmap_elt(marked,address,marked_p);
+		set_bitmap_range(marked,address);
 	}
 
-	bool is_free_p(Block *address)
+	/* The eventual destination of a block after compaction is just the number
+	of marked blocks before it. Live blocks must be marked on entry. */
+	void compute_forwarding()
 	{
-		return bitmap_elt(freed,address);
+		cell accum = 0;
+		for(cell index = 0; index < bits_size; index++)
+		{
+			forwarding[index] = accum;
+			accum += popcount(marked[index]);
+		}
 	}
 
-	void set_free_p(Block *address, bool free_p)
+	/* We have the popcount for every 64 entries; look up and compute the rest */
+	Block *forward_block(Block *original)
 	{
-		set_bitmap_elt(freed,address,free_p);
+#ifdef FACTOR_DEBUG
+		assert(marked_p(original));
+#endif
+		std::pair<cell,cell> position = bitmap_deref(original);
+
+		cell approx_popcount = forwarding[position.first];
+		u64 mask = ((u64)1 << position.second) - 1;
+
+		cell new_line_number = approx_popcount + popcount(marked[position.first] & mask);
+		Block *new_block = line_block(new_line_number);
+#ifdef FACTOR_DEBUG
+		assert(new_block <= original);
+#endif
+		return new_block;
+	}
+
+	Block *next_unmarked_block_after(Block *original)
+	{
+		std::pair<cell,cell> position = bitmap_deref(original);
+		cell bit_index = position.second;
+
+		for(cell index = position.first; index < bits_size; index++)
+		{
+			u64 mask = ((s64)marked[index] >> bit_index);
+			if(~mask)
+			{
+				/* Found an unmarked block on this page.
+				Stop, it's hammer time */
+				cell clear_bit = rightmost_clear_bit(mask);
+				return line_block(index * 64 + bit_index + clear_bit);
+			}
+			else
+			{
+				/* No unmarked blocks on this page.
+				Keep looking */
+				bit_index = 0;
+			}
+		}
+
+		/* No unmarked blocks were found */
+		return (Block *)(this->start + this->size);
+	}
+
+	Block *next_marked_block_after(Block *original)
+	{
+		std::pair<cell,cell> position = bitmap_deref(original);
+		cell bit_index = position.second;
+
+		for(cell index = position.first; index < bits_size; index++)
+		{
+			u64 mask = (marked[index] >> bit_index);
+			if(mask)
+			{
+				/* Found an marked block on this page.
+				Stop, it's hammer time */
+				cell set_bit = rightmost_set_bit(mask);
+				return line_block(index * 64 + bit_index + set_bit);
+			}
+			else
+			{
+				/* No marked blocks on this page.
+				Keep looking */
+				bit_index = 0;
+			}
+		}
+
+		/* No marked blocks were found */
+		return (Block *)(this->start + this->size);
+	}
+
+	cell unmarked_block_size(Block *original)
+	{
+		Block *next_marked = next_marked_block_after(original);
+		return ((char *)next_marked - (char *)original);
 	}
 };
 
