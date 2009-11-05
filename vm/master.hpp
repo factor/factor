@@ -25,26 +25,10 @@
 
 /* C++ headers */
 #include <algorithm>
+#include <map>
 #include <set>
 #include <vector>
-
-#if __GNUC__ == 4
-        #include <tr1/unordered_map>
-
-	namespace factor
-	{
-		using std::tr1::unordered_map;
-	}
-#elif __GNUC__ == 3
-        #include <boost/unordered_map.hpp>
-
-	namespace factor
-	{
-		using boost::unordered_map;
-	}
-#else
-        #error Factor requires GCC 3.x or later
-#endif
+#include <iostream>
 
 /* Forward-declare this since it comes up in function prototypes */
 namespace factor
@@ -65,12 +49,18 @@ namespace factor
 #include "bignumint.hpp"
 #include "bignum.hpp"
 #include "code_block.hpp"
-#include "zone.hpp"
+#include "bump_allocator.hpp"
+#include "bitwise_hacks.hpp"
+#include "mark_bits.hpp"
+#include "free_list.hpp"
+#include "free_list_allocator.hpp"
 #include "write_barrier.hpp"
-#include "old_space.hpp"
+#include "object_start_map.hpp"
+#include "nursery_space.hpp"
 #include "aging_space.hpp"
 #include "tenured_space.hpp"
 #include "data_heap.hpp"
+#include "code_heap.hpp"
 #include "gc.hpp"
 #include "debug.hpp"
 #include "strings.hpp"
@@ -78,21 +68,23 @@ namespace factor
 #include "words.hpp"
 #include "float_bits.hpp"
 #include "io.hpp"
-#include "mark_bits.hpp"
-#include "heap.hpp"
 #include "image.hpp"
 #include "alien.hpp"
-#include "code_heap.hpp"
 #include "callbacks.hpp"
+#include "dispatch.hpp"
 #include "vm.hpp"
 #include "allot.hpp"
 #include "tagged.hpp"
-#include "local_roots.hpp"
+#include "data_roots.hpp"
+#include "code_roots.hpp"
+#include "slot_visitor.hpp"
 #include "collector.hpp"
 #include "copying_collector.hpp"
 #include "nursery_collector.hpp"
 #include "aging_collector.hpp"
 #include "to_tenured_collector.hpp"
+#include "code_block_visitor.hpp"
+#include "compaction.hpp"
 #include "full_collector.hpp"
 #include "callstack.hpp"
 #include "generic_arrays.hpp"
@@ -102,7 +94,6 @@ namespace factor
 #include "byte_arrays.hpp"
 #include "jit.hpp"
 #include "quotations.hpp"
-#include "dispatch.hpp"
 #include "inline_cache.hpp"
 #include "factor.hpp"
 #include "utilities.hpp"

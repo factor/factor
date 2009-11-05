@@ -13,7 +13,7 @@ words.private definitions assocs summary compiler.units
 system.private combinators combinators.short-circuit locals
 locals.backend locals.types combinators.private
 stack-checker.values generic.single generic.single.private
-alien.libraries
+alien.libraries tools.dispatch.private tools.profiler.private
 stack-checker.alien
 stack-checker.state
 stack-checker.errors
@@ -501,16 +501,14 @@ M: bad-executable summary
 
 \ compact-gc { } { } define-primitive
 
-\ gc-stats { } { array } define-primitive
-
 \ (save-image) { byte-array } { } define-primitive
 
 \ (save-image-and-exit) { byte-array } { } define-primitive
 
-\ data-room { } { integer integer array } define-primitive
+\ data-room { } { byte-array } define-primitive
 \ data-room make-flushable
 
-\ code-room { } { integer integer integer integer } define-primitive
+\ code-room { } { byte-array } define-primitive
 \ code-room  make-flushable
 
 \ micros { } { integer } define-primitive
@@ -594,7 +592,7 @@ M: bad-executable summary
 
 \ set-alien-double { float c-ptr integer } { } define-primitive
 
-\ alien-cell { c-ptr integer } { simple-c-ptr } define-primitive
+\ alien-cell { c-ptr integer } { pinned-c-ptr } define-primitive
 \ alien-cell make-flushable
 
 \ set-alien-cell { c-ptr c-ptr integer } { } define-primitive
@@ -701,21 +699,20 @@ M: bad-executable summary
 
 \ unimplemented { } { } define-primitive
 
-\ gc-reset { } { } define-primitive
-
-\ gc-stats { } { array } define-primitive
-
 \ jit-compile { quotation } { } define-primitive
 
 \ lookup-method { object array } { word } define-primitive
 
 \ reset-dispatch-stats { } { } define-primitive
 \ dispatch-stats { } { array } define-primitive
-\ reset-inline-cache-stats { } { } define-primitive
-\ inline-cache-stats { } { array } define-primitive
 
 \ optimized? { word } { object } define-primitive
 
 \ strip-stack-traces { } { } define-primitive
 
 \ <callback> { word } { alien } define-primitive
+
+\ enable-gc-events { } { } define-primitive
+\ disable-gc-events { } { object } define-primitive
+
+\ profiling { object } { } define-primitive

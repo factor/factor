@@ -12,6 +12,7 @@ IN: bootstrap.tools
     "tools.deploy"
     "tools.destructors"
     "tools.disassembler"
+    "tools.dispatch"
     "tools.memory"
     "tools.profiler"
     "tools.test"

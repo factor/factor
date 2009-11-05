@@ -1,4 +1,4 @@
-USING: help.markup help.syntax memory sequences ;
+USING: help.markup help.syntax memory sequences vm ;
 IN: tools.memory
 
 ARTICLE: "tools.memory" "Object memory tools"
@@ -39,3 +39,15 @@ HELP: heap-stats.
 { $description "For each class, prints the number of instances and total memory consumed by those instances." } ;
 
 { heap-stats heap-stats. } related-words
+
+HELP: gc-events.
+{ $description "Prints all garbage collection events that took place during the last call to " { $link collect-gc-events } "." } ;
+
+HELP: gc-stats.
+{ $description "Prints a breakdown of different garbage collection events that took place during the last call to " { $link collect-gc-events } "." } ;
+
+HELP: gc-summary.
+{ $description "Prints aggregate garbage collection statistics from the last call to " { $link collect-gc-events } "." } ;
+
+HELP: gc-events
+{ $var-description "A sequence of " { $link gc-event } " instances, set by " { $link collect-gc-events } ". Can be inspected directly, or with the " { $link gc-events. } ", " { $link gc-stats. } " and " { $link gc-summary. } " words." } ;
