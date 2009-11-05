@@ -84,7 +84,7 @@ static void call_fault_handler(
 {
 	THREADHANDLE thread_id = pthread_from_mach_thread_np(thread);
 	assert(thread_id);
-	unordered_map<THREADHANDLE, factor_vm*>::const_iterator vm = thread_vms.find(thread_id);
+	std::map<THREADHANDLE, factor_vm*>::const_iterator vm = thread_vms.find(thread_id);
 	if (vm != thread_vms.end())
 	    vm->second->call_fault_handler(exception,code,exc_state,thread_state,float_state);
 }

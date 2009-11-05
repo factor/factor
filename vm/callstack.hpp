@@ -12,7 +12,7 @@ VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom, factor_vm *
 keep the callstack in a GC root and use relative offsets */
 template<typename Iterator> void factor_vm::iterate_callstack_object(callstack *stack_, Iterator &iterator)
 {
-	gc_root<callstack> stack(stack_,this);
+	data_root<callstack> stack(stack_,this);
 	fixnum frame_offset = untag_fixnum(stack->length) - sizeof(stack_frame);
 
 	while(frame_offset >= 0)

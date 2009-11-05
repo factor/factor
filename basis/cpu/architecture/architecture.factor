@@ -386,9 +386,9 @@ M: object %horizontal-shl-vector-imm-reps { } ;
 M: object %horizontal-shr-vector-imm-reps { } ;
 
 HOOK: %unbox-alien cpu ( dst src -- )
-HOOK: %unbox-any-c-ptr cpu ( dst src temp -- )
+HOOK: %unbox-any-c-ptr cpu ( dst src -- )
 HOOK: %box-alien cpu ( dst src temp -- )
-HOOK: %box-displaced-alien cpu ( dst displacement base temp1 temp2 base-class -- )
+HOOK: %box-displaced-alien cpu ( dst displacement base temp base-class -- )
 
 HOOK: %alien-unsigned-1 cpu ( dst src offset -- )
 HOOK: %alien-unsigned-2 cpu ( dst src offset -- )

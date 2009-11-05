@@ -176,14 +176,12 @@ USERENV: callback-stub 45
 ! PIC stubs
 USERENV: pic-load 47
 USERENV: pic-tag 48
-USERENV: pic-hi-tag 49
-USERENV: pic-tuple 50
-USERENV: pic-hi-tag-tuple 51
-USERENV: pic-check-tag 52
-USERENV: pic-check 53
-USERENV: pic-hit 54
-USERENV: pic-miss-word 55
-USERENV: pic-miss-tail-word 56
+USERENV: pic-tuple 49
+USERENV: pic-check-tag 50
+USERENV: pic-check-tuple 51
+USERENV: pic-hit 52
+USERENV: pic-miss-word 53
+USERENV: pic-miss-tail-word 54
 
 ! Megamorphic dispatch
 USERENV: mega-lookup 57
@@ -217,13 +215,18 @@ USERENV: undefined-quot 60
 
 : here-as ( tag -- pointer ) here bitor ;
 
+: (align-here) ( alignment -- )
+    [ here neg ] dip rem
+    [ bootstrap-cell /i [ 0 emit ] times ] unless-zero ;
+
 : align-here ( -- )
-    here 8 mod 4 = [ 0 emit ] when ;
+    data-alignment get (align-here) ;
 
 : emit-fixnum ( n -- ) tag-fixnum emit ;
 
 : emit-object ( class quot -- addr )
-    over tag-number here-as [ swap type-number tag-fixnum emit call align-here ] dip ;
+    [ type-number ] dip over here-as
+    [ swap tag-fixnum emit call align-here ] dip ;
     inline
 
 ! Write an object to the image.
@@ -292,7 +295,7 @@ M: fake-bignum ' n>> tag-fixnum ;
 M: float '
     [
         float [
-            align-here double>bits emit-64
+            8 (align-here) double>bits emit-64
         ] emit-object
     ] cache-eql-object ;
 
@@ -304,7 +307,7 @@ M: float '
 
 M: f '
     #! f is #define F RETAG(0,F_TYPE)
-    drop \ f tag-number ;
+    drop \ f type-number ;
 
 :  0, ( -- )  0 >bignum '  0-offset fixup ;
 :  1, ( -- )  1 >bignum '  1-offset fixup ;
@@ -410,6 +413,7 @@ M: byte-array '
     [
         byte-array [
             dup length emit-fixnum
+            bootstrap-cell 4 = [ 0 emit 0 emit ] when
             pad-bytes emit-bytes
         ] emit-object
     ] cache-eq-object ;

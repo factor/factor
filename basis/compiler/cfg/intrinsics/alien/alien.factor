@@ -33,7 +33,7 @@ IN: compiler.cfg.intrinsics.alien
     bi and ;
 
 : ^^unbox-c-ptr ( src class -- dst )
-    [ next-vreg dup ] 2dip next-vreg ##unbox-c-ptr ;
+    [ next-vreg dup ] 2dip ##unbox-c-ptr ;
 
 : prepare-alien-accessor ( info -- ptr-vreg offset )
     class>> [ 2inputs ^^untag-fixnum swap ] dip ^^unbox-c-ptr ^^add 0 ;
