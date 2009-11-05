@@ -178,7 +178,7 @@ cell factor_vm::compute_relocation(relocation_entry rel, cell index, code_block 
 	case RT_UNTAGGED:
 		return untag_fixnum(ARG);
 	case RT_MEGAMORPHIC_CACHE_HITS:
-		return (cell)&megamorphic_cache_hits;
+		return (cell)&dispatch_stats.megamorphic_cache_hits;
 	case RT_VM:
 		return (cell)this + untag_fixnum(ARG);
 	case RT_CARDS_OFFSET:

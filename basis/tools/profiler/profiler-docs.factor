@@ -25,7 +25,7 @@ $nl
     method-profile.
     "profiler-limitations"
 }
-{ $see-also "ui.tools.profiler" } ;
+{ $see-also "ui.tools.profiler" "tools.annotations" "timing" } ;
 
 ABOUT: "profiling"
 

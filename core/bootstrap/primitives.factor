@@ -99,6 +99,7 @@ bootstrapping? on
     "system"
     "system.private"
     "threads.private"
+    "tools.dispatch.private"
     "tools.profiler.private"
     "words"
     "words.private"
@@ -511,10 +512,8 @@ tuple
     { "inline-cache-miss-tail" "generic.single.private" (( generic methods index cache -- )) }
     { "mega-cache-miss" "generic.single.private" (( methods index cache -- method )) }
     { "lookup-method" "generic.single.private" (( object methods -- method )) }
-    { "reset-dispatch-stats" "generic.single" (( -- )) }
-    { "dispatch-stats" "generic.single" (( -- stats )) }
-    { "reset-inline-cache-stats" "generic.single" (( -- )) }
-    { "inline-cache-stats" "generic.single" (( -- stats )) }
+    { "reset-dispatch-stats" "tools.dispatch.private" (( -- )) }
+    { "dispatch-stats" "tools.dispatch.private" (( -- stats )) }
     { "optimized?" "words" (( word -- ? )) }
     { "quot-compiled?" "quotations" (( quot -- ? )) }
     { "vm-ptr" "vm" (( -- ptr )) }

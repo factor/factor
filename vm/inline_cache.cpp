@@ -6,11 +6,6 @@ namespace factor
 void factor_vm::init_inline_caching(int max_size)
 {
 	max_pic_size = max_size;
-	cold_call_to_ic_transitions = 0;
-	ic_to_pic_transitions = 0;
-	pic_to_mega_transitions = 0;
-	pic_counts[0] = 0;
-	pic_counts[1] = 0;
 }
 
 void factor_vm::deallocate_inline_cache(cell return_address)
@@ -48,7 +43,10 @@ cell factor_vm::determine_inline_cache_type(array *cache_entries)
 
 void factor_vm::update_pic_count(cell type)
 {
-	pic_counts[type - PIC_TAG]++;
+	if(type == PIC_TAG)
+		dispatch_stats.pic_tag_count++;
+	else
+		dispatch_stats.pic_tuple_count++;
 }
 
 struct inline_cache_jit : public jit {
@@ -167,11 +165,11 @@ cell factor_vm::add_inline_cache_entry(cell cache_entries_, cell klass_, cell me
 void factor_vm::update_pic_transitions(cell pic_size)
 {
 	if(pic_size == max_pic_size)
-		pic_to_mega_transitions++;
+		dispatch_stats.pic_to_mega_transitions++;
 	else if(pic_size == 0)
-		cold_call_to_ic_transitions++;
+		dispatch_stats.cold_call_to_ic_transitions++;
 	else if(pic_size == 1)
-		ic_to_pic_transitions++;
+		dispatch_stats.ic_to_pic_transitions++;
 }
 
 /* The cache_entries parameter is empty (on cold call site) or has entries
@@ -239,25 +237,6 @@ void *factor_vm::inline_cache_miss(cell return_address_)
 VM_C_API void *inline_cache_miss(cell return_address, factor_vm *parent)
 {
 	return parent->inline_cache_miss(return_address);
-}
-
-void factor_vm::primitive_reset_inline_cache_stats()
-{
-	cold_call_to_ic_transitions = ic_to_pic_transitions = pic_to_mega_transitions = 0;
-	pic_counts[0] = 0;
-	pic_counts[1] = 0;
-}
-
-void factor_vm::primitive_inline_cache_stats()
-{
-	growable_array stats(this);
-	stats.add(allot_cell(cold_call_to_ic_transitions));
-	stats.add(allot_cell(ic_to_pic_transitions));
-	stats.add(allot_cell(pic_to_mega_transitions));
-	stats.add(allot_cell(pic_counts[0]));
-	stats.add(allot_cell(pic_counts[1]));
-	stats.trim();
-	dpush(stats.elements.value());
 }
 
 }
