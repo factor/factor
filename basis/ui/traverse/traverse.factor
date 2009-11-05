@@ -20,8 +20,9 @@ TUPLE: node value children ;
         ] [
             [
                 [ children>> swap first head-slice % ]
-                [ tuck traverse-step traverse-to-path ]
-                2bi
+                [ nip ]
+                [ traverse-step traverse-to-path ]
+                2tri
             ] make-node
         ] if
     ] if ;
@@ -35,7 +36,9 @@ TUPLE: node value children ;
         ] [
             [
                 [ traverse-step traverse-from-path ]
-                [ tuck children>> swap first 1 + tail-slice % ] 2bi
+                [ nip ]
+                [ children>> swap first 1 + tail-slice % ]
+                2tri
             ] make-node
         ] if
     ] if ;

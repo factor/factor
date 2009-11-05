@@ -110,7 +110,7 @@ ERROR: mutually-recursive-rulesets ruleset ;
     dup [ glob-matches? ] [ 2drop f ] if ;
 
 : suitable-mode? ( file-name first-line mode -- ? )
-    tuck first-line-glob>> ?glob-matches
+    [ nip ] 2keep first-line-glob>> ?glob-matches
     [ 2drop t ] [ file-name-glob>> ?glob-matches ] if ;
 
 : find-mode ( file-name first-line -- mode )

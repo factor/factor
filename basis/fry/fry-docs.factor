@@ -59,7 +59,6 @@ $nl
     { { $link literalize } { $snippet ": literalize '[ _ ] ;" } }
     { { $link curry } { $snippet ": curry '[ _ @ ] ;" } }
     { { $link compose } { $snippet ": compose '[ @ @ ] ;" } }
-    { { $link bi@ } { $snippet ": bi@ tuck '[ _ @ _ @ ] call ;" } }
 } ;
 
 ARTICLE: "fry.philosophy" "Fried quotation philosophy"
