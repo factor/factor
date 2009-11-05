@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays hashtables assocs io kernel math
+USING: accessors arrays hashtables assocs io kernel locals math
 math.vectors math.matrices math.matrices.elimination namespaces
 parser prettyprint sequences words combinators math.parser
 splitting sorting shuffle sets math.order ;
@@ -191,12 +191,12 @@ DEFER: (d)
     [ ?nth ?nth ] 3keep [ [ 2 + ] dip 1 - ] dip ?nth ?nth
     dim-im/ker-d ;
 
-: bigraded-ker/im-d ( bigraded-basis -- seq )
-    dup length [
-        over first length [
-            [ 2dup ] dip spin (bigraded-ker/im-d)
-        ] map 2nip
-    ] with map ;
+:: bigraded-ker/im-d ( basis -- seq )
+    basis length iota [| z |
+         basis first length iota [| u |
+            u z basis (bigraded-ker/im-d)
+        ] map
+    ] map ;
 
 : bigraded-betti ( u-generators z-generators -- seq )
     [ basis graded ] bi@ tensor bigraded-ker/im-d
@@ -270,12 +270,12 @@ DEFER: (d)
     3tri
     3array ;
 
-: bigraded-triples ( grid -- triples )
-    dup length [
-        over first length [
-            [ 2dup ] dip spin bigraded-triple
-        ] map 2nip
-    ] with map ;
+:: bigraded-triples ( grid -- triples )
+    grid length [| z |
+        grid first length [| u |
+            u z grid bigraded-triple
+        ] map
+    ] map ;
 
 : bigraded-laplacian ( u-generators z-generators quot -- seq )
     [ [ basis graded ] bi@ tensor bigraded-triples ] dip

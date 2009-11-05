@@ -21,7 +21,7 @@ IN: sudokus
 : solution ( puzzle random? -- solution ) dupd solutions dup +nil+ = [ drop "Unsolvable" alert* ] [ nip car ] if ;
 : hint ( puzzle -- puzzle' ) [ [ f swap indices random dup ] [ f solution ] bi nth ] keep swapd >vector [ set-nth ] keep ;
 : create ( difficulty -- puzzle ) 81 [ f ] replicate
-    40 random solution [ [ dup length random f spin set-nth ] curry times ] keep ;
+    40 random solution [ [ f swap [ length random ] keep set-nth ] curry times ] keep ;
 
 : do-sudoku ( -- ) [ [
         [

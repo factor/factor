@@ -93,11 +93,11 @@ ERROR: header-file-missing path ;
     skip-whitespace/comments
     [ current { [ blank? ] [ CHAR: ( = ] } 1|| ] take-until ;
 
-: handle-define ( preprocessor-state sequence-parser -- )
-    [ take-define-identifier ]
-    [ skip-whitespace/comments take-rest ] bi 
-    "\\" ?tail [ readlns append ] when
-    spin symbol-table>> set-at ;
+:: handle-define ( preprocessor-state sequence-parser -- )
+    sequence-parser take-define-identifier :> ident
+    sequence-parser skip-whitespace/comments take-rest :> def
+    def "\\" ?tail [ readlns append ] when :> def
+    def ident preprocessor-state symbol-table>> set-at ;
 
 : handle-undef ( preprocessor-state sequence-parser -- )
     take-token swap symbol-table>> delete-at ;

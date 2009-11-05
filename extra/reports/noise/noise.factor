@@ -54,7 +54,6 @@ IN: reports.noise
         { over 2 }
         { pick 4 }
         { rot 3 }
-        { spin 3 }
         { swap 1 }
         { swapd 3 }
         { tuck 2 }

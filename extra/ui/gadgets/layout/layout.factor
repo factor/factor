@@ -23,8 +23,9 @@ TUPLE: placeholder < gadget members ;
 ! Just take the previous mentioned placeholder and use it
 ! If there is no previously mentioned placeholder, we're probably making a box, and will create the placeholder ourselves
 DEFER: with-interface
-: insertion-quot ( quot -- quot' ) make:building get [ [ placeholder? ] find-last nip [ <placeholder> dup , ] unless*
-    templates get spin '[ [ _ templates set _ , @ ] with-interface ] ] when* ;
+: insertion-quot ( quot -- quot' )
+    make:building get [ [ placeholder? ] find-last nip [ <placeholder> dup , ] unless*
+    [ templates get ] 2dip swap '[ [ _ templates set _ , @ ] with-interface ] ] when* ;
 
 SYNTAX: ,% scan string>number [ <layout> , ] curry append! ;
 SYNTAX: ->% scan string>number '[ [ _ <layout> , ] [ output-model ] bi ] append! ;
