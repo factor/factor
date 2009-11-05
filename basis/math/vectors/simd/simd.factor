@@ -77,9 +77,6 @@ GENERIC: new-underlying ( underlying seq -- seq' )
 : alien-vector     ( c-ptr n rep -- value ) \ alien-vector bad-simd-call ;
 : set-alien-vector ( c-ptr n rep -- value ) \ set-alien-vector bad-simd-call ;
 
-: alien-vector-aligned     ( c-ptr n rep -- value ) \ alien-vector-aligned bad-simd-call ;
-: set-alien-vector-aligned ( c-ptr n rep -- value ) \ set-alien-vector-aligned bad-simd-call ;
-
 ! Helper for boolean vector literals
 
 : vector-true-value ( class -- value )

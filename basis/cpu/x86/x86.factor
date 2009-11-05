@@ -1131,34 +1131,13 @@ M: x86 %max-vector-reps
 M: x86 %dot-vector
     [ two-operand ] keep
     {
-        { float-4-rep [
-            sse4.1?
-            [ HEX: ff DPPS ]
-            [
-                [ MULPS ] [
-                    drop 2dup float-4-rep
-                    [ %horizontal-add-vector ]
-                    [ %horizontal-add-vector ]
-                    [ nip %vector>scalar ] 3tri
-                ] 2bi
-            ] if
-        ] }
-        { double-2-rep [
-            sse4.1?
-            [ HEX: ff DPPD ]
-            [
-                [ MULPD ] [
-                    drop 2dup double-2-rep
-                    [ %horizontal-add-vector ]
-                    [ nip %vector>scalar ] 3bi
-                ] 2bi
-            ] if
-        ] }
+        { float-4-rep [ HEX: ff DPPS ] }
+        { double-2-rep [ HEX: ff DPPD ] }
     } case ;
 
 M: x86 %dot-vector-reps
     {
-        { sse3? { float-4-rep double-2-rep } }
+        { sse4.1? { float-4-rep double-2-rep } }
     } available-reps ;
 
 M: x86 %horizontal-add-vector ( dst src1 src2 rep -- )
