@@ -63,7 +63,7 @@ TUPLE: predicate-engine class methods ;
 
 C: <predicate-engine> predicate-engine
 
-: push-method ( method specializer atomic assoc -- )
+: push-method ( specializer method atomic assoc -- )
     dupd [
         [ ] [ H{ } clone <predicate-engine> ] ?if
         [ methods>> set-at ] keep
@@ -71,7 +71,7 @@ C: <predicate-engine> predicate-engine
 
 : flatten-method ( class method assoc -- )
     [ [ flatten-class keys ] keep ] 2dip [
-        [ spin ] dip push-method
+        [ swap rot ] dip push-method
     ] 3curry each ;
 
 : flatten-methods ( assoc -- assoc' )
