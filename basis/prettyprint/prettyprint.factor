@@ -110,3 +110,7 @@ SYMBOL: pprint-string-cells?
             ] with-row
         ] each
     ] tabular-output nl ;
+
+: object-table. ( obj alist -- )
+    [ [ nip first ] [ second call( obj -- str ) ] 2bi 2array ] with map
+    simple-table. ;

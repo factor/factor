@@ -17,7 +17,6 @@ ARTICLE: "class-operations" "Class operations"
     flatten-class
     flatten-builtin-class
     class-types
-    class-tags
 } ;
 
 ARTICLE: "class-linearization" "Class linearization"

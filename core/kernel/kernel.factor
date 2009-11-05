@@ -230,8 +230,6 @@ ERROR: assert got expect ;
 
 : declare ( spec -- ) drop ;
 
-: hi-tag ( obj -- n ) { hi-tag } declare 0 slot ; inline
-
 : do-primitive ( number -- ) "Improper primitive call" throw ;
 
 PRIVATE>

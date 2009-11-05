@@ -10,7 +10,7 @@ namespace factor
 - polymorphic inline caches (inline_cache.cpp) */
 
 /* Allocates memory */
-jit::jit(cell type_, cell owner_, factor_vm *vm)
+jit::jit(code_block_type type_, cell owner_, factor_vm *vm)
 	: type(type_),
 	  owner(owner_,vm),
 	  code(vm),
@@ -24,7 +24,7 @@ jit::jit(cell type_, cell owner_, factor_vm *vm)
 
 void jit::emit_relocation(cell code_template_)
 {
-	gc_root<array> code_template(code_template_,parent);
+	data_root<array> code_template(code_template_,parent);
 	cell capacity = array_capacity(code_template.untagged());
 	for(cell i = 1; i < capacity; i += 3)
 	{
@@ -43,11 +43,11 @@ void jit::emit_relocation(cell code_template_)
 /* Allocates memory */
 void jit::emit(cell code_template_)
 {
-	gc_root<array> code_template(code_template_,parent);
+	data_root<array> code_template(code_template_,parent);
 
 	emit_relocation(code_template.value());
 
-	gc_root<byte_array> insns(array_nth(code_template.untagged(),0),parent);
+	data_root<byte_array> insns(array_nth(code_template.untagged(),0),parent);
 
 	if(computing_offset_p)
 	{
@@ -71,16 +71,16 @@ void jit::emit(cell code_template_)
 }
 
 void jit::emit_with(cell code_template_, cell argument_) {
-	gc_root<array> code_template(code_template_,parent);
-	gc_root<object> argument(argument_,parent);
+	data_root<array> code_template(code_template_,parent);
+	data_root<object> argument(argument_,parent);
 	literal(argument.value());
 	emit(code_template.value());
 }
 
 void jit::emit_class_lookup(fixnum index, cell type)
 {
-	emit_with(parent->userenv[PIC_LOAD],tag_fixnum(-index * sizeof(cell)));
-	emit(parent->userenv[type]);
+	emit_with(parent->special_objects[PIC_LOAD],tag_fixnum(-index * sizeof(cell)));
+	emit(parent->special_objects[type]);
 }
 
 /* Facility to convert compiled code offsets to quotation offsets.

@@ -37,13 +37,13 @@ DEF(void,primitive_fixnum_multiply,(void *vm)):
 	lwz r3,0(DS_REG)
 	lwz r4,-4(DS_REG)
 	subi DS_REG,DS_REG,4
-	srawi r3,r3,3
+	srawi r3,r3,4
 	mullwo. r6,r3,r4
 	bso multiply_overflow
 	stw r6,0(DS_REG)
 	blr
 multiply_overflow:
-	srawi r4,r4,3
+	srawi r4,r4,4
 	b MANGLE(overflow_fixnum_multiply)
 	
 /* Note that the XT is passed to the quotation in r11 */
