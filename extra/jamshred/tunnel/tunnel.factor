@@ -77,10 +77,10 @@ CONSTANT: default-segment-radius 1
     find 2drop ;
     
 : nearest-segment-forward ( segments oint start -- segment )
-    rot dup length swap <slice> find-nearest-segment ;
+    rot tail-slice find-nearest-segment ;
 
 : nearest-segment-backward ( segments oint start -- segment )
-    swapd 1 + 0 spin <slice> <reversed> find-nearest-segment ;
+    1 + rot head-slice <reversed> find-nearest-segment ;
 
 : nearest-segment ( segments oint start-segment -- segment )
     #! find the segment nearest to 'oint', and return it.

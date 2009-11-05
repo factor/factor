@@ -44,7 +44,7 @@ DEFER: (topological-sort)
     ] if ;
 
 : topological-sort ( digraph -- seq )
-    dup clone V{ } clone spin
+    [ V{ } clone ] dip [ clone ] keep
     [ drop (topological-sort) ] assoc-each drop reverse ;
 
 : topological-sorted-values ( digraph -- seq )
