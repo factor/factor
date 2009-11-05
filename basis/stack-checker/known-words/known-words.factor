@@ -13,7 +13,7 @@ words.private definitions assocs summary compiler.units
 system.private combinators combinators.short-circuit locals
 locals.backend locals.types combinators.private
 stack-checker.values generic.single generic.single.private
-alien.libraries
+alien.libraries tools.dispatch.private tools.profiler.private
 stack-checker.alien
 stack-checker.state
 stack-checker.errors
@@ -705,8 +705,6 @@ M: bad-executable summary
 
 \ reset-dispatch-stats { } { } define-primitive
 \ dispatch-stats { } { array } define-primitive
-\ reset-inline-cache-stats { } { } define-primitive
-\ inline-cache-stats { } { array } define-primitive
 
 \ optimized? { word } { object } define-primitive
 
@@ -716,3 +714,5 @@ M: bad-executable summary
 
 \ enable-gc-events { } { } define-primitive
 \ disable-gc-events { } { object } define-primitive
+
+\ profiling { object } { } define-primitive

@@ -118,7 +118,7 @@ void factor_vm::update_method_cache(cell cache, cell klass, cell method)
 
 void factor_vm::primitive_mega_cache_miss()
 {
-	megamorphic_cache_misses++;
+	dispatch_stats.megamorphic_cache_misses++;
 
 	cell cache = dpop();
 	fixnum index = untag_fixnum(dpop());
@@ -135,16 +135,12 @@ void factor_vm::primitive_mega_cache_miss()
 
 void factor_vm::primitive_reset_dispatch_stats()
 {
-	megamorphic_cache_hits = megamorphic_cache_misses = 0;
+	memset(&dispatch_stats,0,sizeof(dispatch_statistics));
 }
 
 void factor_vm::primitive_dispatch_stats()
 {
-	growable_array stats(this);
-	stats.add(allot_cell(megamorphic_cache_hits));
-	stats.add(allot_cell(megamorphic_cache_misses));
-	stats.trim();
-	dpush(stats.elements.value());
+	dpush(tag<byte_array>(byte_array_from_value(&dispatch_stats)));
 }
 
 void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index, cell cache_)

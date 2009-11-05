@@ -22,16 +22,12 @@ IN: tools.memory
 : micros>string ( n -- str )
     commas " µs" append ;
 
-: fancy-table. ( obj alist -- )
-    [ [ nip first ] [ second call( obj -- str ) ] 2bi 2array ] with map
-    simple-table. ;
-
 : copying-room. ( copying-sizes -- )
     {
         { "Size:" [ size>> kilobytes ] }
         { "Occupied:" [ occupied>> kilobytes ] }
         { "Free:" [ free>> kilobytes ] }
-    } fancy-table. ;
+    } object-table. ;
 
 : nursery-room. ( data-room -- )
     "- Nursery space" print nursery>> copying-room. ;
@@ -46,7 +42,7 @@ IN: tools.memory
         { "Total free:" [ total-free>> kilobytes ] }
         { "Contiguous free:" [ contiguous-free>> kilobytes ] }
         { "Free block count:" [ free-block-count>> number>string ] }
-    } fancy-table. ;
+    } object-table. ;
 
 : tenured-room. ( data-room -- )
     "- Tenured space" print tenured>> mark-sweep-table. ;
@@ -57,7 +53,7 @@ IN: tools.memory
         { "Card array:" [ cards>> kilobytes ] }
         { "Deck array:" [ decks>> kilobytes ] }
         { "Mark stack:" [ mark-stack>> kilobytes ] }
-    } fancy-table. ;
+    } object-table. ;
 
 : data-room. ( -- )
     "== Data heap ==" print nl
@@ -100,9 +96,12 @@ PRIVATE>
         ] each 2drop
     ] tabular-output nl ;
 
-: collect-gc-events ( quot -- events )
-    enable-gc-events [ ] [ disable-gc-events drop ] cleanup
-    disable-gc-events byte-array>gc-event-array ; inline
+SYMBOL: gc-events
+
+: collect-gc-events ( quot -- )
+    enable-gc-events
+    [ ] [ disable-gc-events drop ] cleanup
+    disable-gc-events byte-array>gc-event-array gc-events set ; inline
 
 <PRIVATE
 
@@ -169,15 +168,6 @@ TUPLE: gc-stats collections times ;
     [ gc-stats-table-row ] map
     { "" "Number" "Total" "Mean" "Median" "Min" "Max" } prefix ;
 
-: heap-sizes ( events -- seq )
-    [
-        [
-            [ [ start-time>> ] [ space-occupied-before ] bi 2array , ]
-            [ [ [ start-time>> ] [ total-time>> ] bi + ] [ space-occupied-after ] bi 2array , ]
-            bi
-        ] each
-    ] { } make ;
-
 PRIVATE>
 
 : gc-event. ( event -- )
@@ -185,13 +175,16 @@ PRIVATE>
         { "Event type:" [ op>> gc-op-string ] }
         { "Total time:" [ total-time>> micros>string ] }
         { "Space reclaimed:" [ space-reclaimed kilobytes ] }
-    } fancy-table. ;
+    } object-table. ;
 
-: gc-stats. ( events -- )
-    compute-gc-stats gc-stats-table simple-table. ;
+: gc-events. ( -- )
+    gc-events get [ gc-event. nl ] each ;
 
-: gc-summary. ( events -- )
-    {
+: gc-stats. ( -- )
+    gc-events get compute-gc-stats gc-stats-table simple-table. ;
+
+: gc-summary. ( -- )
+    gc-events get {
         { "Collections:" [ length commas ] }
         { "Cards scanned:" [ [ cards-scanned>> ] map-sum commas ] }
         { "Decks scanned:" [ [ decks-scanned>> ] map-sum commas ] }
@@ -202,7 +195,4 @@ PRIVATE>
         { "Data heap sweep time:" [ [ data-sweep-time>> ] map-sum micros>string ] }
         { "Code heap sweep time:" [ [ code-sweep-time>> ] map-sum micros>string ] }
         { "Compaction time:" [ [ compaction-time>> ] map-sum micros>string ] }
-    } fancy-table. ;
-
-: heap-sizes. ( events -- )
-    heap-sizes simple-table. ;
+    } object-table. ;
