@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien byte-arrays fry classes.algebra
 cpu.architecture kernel math sequences math.vectors
@@ -15,6 +15,28 @@ SPECIALIZED-ARRAYS: char short int longlong float double ;
 IN: compiler.cfg.intrinsics.simd
 
 ! compound vector ops
+
+: sign-bit-mask ( rep -- byte-array )
+    unsign-rep {
+        { char-16-rep [ uchar-array{
+            HEX: 80 HEX: 80 HEX: 80 HEX: 80
+            HEX: 80 HEX: 80 HEX: 80 HEX: 80
+            HEX: 80 HEX: 80 HEX: 80 HEX: 80
+            HEX: 80 HEX: 80 HEX: 80 HEX: 80
+        } underlying>> ] }
+        { short-8-rep [ ushort-array{
+            HEX: 8000 HEX: 8000 HEX: 8000 HEX: 8000
+            HEX: 8000 HEX: 8000 HEX: 8000 HEX: 8000
+        } underlying>> ] }
+        { int-4-rep [ uint-array{
+            HEX: 8000,0000 HEX: 8000,0000
+            HEX: 8000,0000 HEX: 8000,0000
+        } underlying>> ] }
+        { longlong-2-rep [ ulonglong-array{
+            HEX: 8000,0000,0000,0000
+            HEX: 8000,0000,0000,0000
+        } underlying>> ] }
+    } case ;
 
 : ^load-neg-zero-vector ( rep -- dst )
     {
@@ -46,11 +68,163 @@ IN: compiler.cfg.intrinsics.simd
     mask false rep ^^andn-vector
     rep ^^or-vector ;
 
-: ^compare-vector ( src1 src2 rep cc -- dst )
-    ... ;
+: ^minmax-compare-vector ( src1 src2 rep cc -- dst )
+    order-cc {
+        { cc<  [ src1 src2 rep ^^max-vector src1 rep cc/= ^^compare-vector ] }
+        { cc<= [ src1 src2 rep ^^min-vector src1 rep cc=  ^^compare-vector ] }
+        { cc>  [ src1 src2 rep ^^min-vector src1 rep cc/= ^^compare-vector ] }
+        { cc>= [ src1 src2 rep ^^max-vector src1 rep cc=  ^^compare-vector ] }
+    } case ;
 
-: ^widened-shr-vector-imm ( src shift rep -- dst )
-    widen-vector-rep ^^shr-vector-imm ;
+: ^compare-vector ( src1 src2 rep cc -- dst )
+    {
+        [ ^^compare-vector ]
+        [ ^minmax-compare-vector ]
+        { unsigned-int-vector-rep [| src1 src2 rep cc |
+            rep sign-bit-mask ^^load-constant :> sign-bits
+            src1 sign-bits rep ^^xor-vector
+            src2 sign-bits rep ^^xor-vector
+            rep unsign-rep cc ^^compare-vector
+        ] }
+    } vv-cc-vector-op ;
+
+: ^unpack-vector-head ( src rep -- dst )
+    {
+        [ ^^unpack-vector-head ]
+        { unsigned-int-vector-rep [ [ ^^zero-vector ] [ ^^merge-vector-head ] bi ] }
+        { signed-int-vector-rep [| src rep |
+            src src rep ^^merge-vector-head :> merged
+            rep rep-component-type heap-size 8 * :> bits
+            merged bits rep ^widened-shr-vector-imm
+        ] }
+        { signed-int-vector-rep [| src rep |
+            rep ^^zero-vector :> zero
+            zero src rep cc> ^compare-vector :> sign
+            src sign rep ^^merge-vector-head
+        ] }
+    } v-vector-op ;
+
+: ^unpack-vector-tail ( src rep -- dst )
+    {
+        [ ^^unpack-vector-tail ]
+        [ [ ^^tail>head-vector ] [ ^^unpack-vector-head ] bi ]
+        { unsigned-int-vector-rep [ [ ^^zero-vector ] [ ^^merge-vector-tail ] bi ] }
+        { signed-int-vector-rep [| src rep |
+            src src rep ^^merge-vector-tail :> merged
+            rep rep-component-type heap-size 8 * :> bits
+            merged bits rep ^widened-shr-vector-imm
+        ] }
+        { signed-int-vector-rep [| src rep |
+            rep ^^zero-vector :> zero
+            zero src rep cc> ^compare-vector :> sign
+            src sign rep ^^merge-vector-tail
+        ] }
+    } v-vector-op ;
+
+: ^(sum-2) ( src rep -- dst )
+    {
+        [ dupd ^^horizontal-add-vector ]
+        [| src rep | 
+            src src rep ^^merge-vector-head :> head
+            src src rep ^^merge-vector-tail :> tail
+            head tail rep ^^add-vector
+        ]
+    } v-vector-op ;
+
+: ^(sum-4) ( src rep -- dst )
+    {
+        [
+            [ dupd ^^horizontal-add-vector ]
+            [ dupd ^^horizontal-add-vector ] bi
+        ]
+        [| src rep | 
+            src src rep ^^merge-vector-head :> head
+            src src rep ^^merge-vector-tail :> tail
+            head tail rep ^^add-vector :> src'
+
+            rep widen-rep :> rep'
+            src' src' rep' ^^merge-vector-head :> head'
+            src' src' rep' ^^merge-vector-tail :> tail'
+            head' tail' rep ^^add-vector
+        ]
+    } v-vector-op ;
+
+: ^(sum-8) ( src rep -- dst )
+    {
+        [
+            [ dupd ^^horizontal-add-vector ]
+            [ dupd ^^horizontal-add-vector ]
+            [ dupd ^^horizontal-add-vector ] tri
+        ]
+        [| src rep | 
+            src src rep ^^merge-vector-head :> head
+            src src rep ^^merge-vector-tail :> tail
+            head tail rep ^^add-vector :> src'
+
+            rep widen-rep :> rep'
+            src' src' rep' ^^merge-vector-head :> head'
+            src' src' rep' ^^merge-vector-tail :> tail'
+            head' tail' rep ^^add-vector :> src''
+
+            rep' widen-rep :> rep''
+            src'' src'' rep'' ^^merge-vector-head :> head''
+            src'' src'' rep'' ^^merge-vector-tail :> tail''
+            head'' tail'' rep ^^add-vector
+        ]
+    } v-vector-op ;
+
+: ^(sum-16) ( src rep -- dst )
+    {
+        [
+            {
+                [ dupd ^^horizontal-add-vector ]
+                [ dupd ^^horizontal-add-vector ]
+                [ dupd ^^horizontal-add-vector ]
+                [ dupd ^^horizontal-add-vector ]
+            } cleave
+        ]
+        [| src rep | 
+            src src rep ^^merge-vector-head :> head
+            src src rep ^^merge-vector-tail :> tail
+            head tail rep ^^add-vector :> src'
+
+            rep widen-rep :> rep'
+            src' src' rep' ^^merge-vector-head :> head'
+            src' src' rep' ^^merge-vector-tail :> tail'
+            head' tail' rep ^^add-vector :> src''
+
+            rep' widen-rep :> rep''
+            src'' src'' rep'' ^^merge-vector-head :> head''
+            src'' src'' rep'' ^^merge-vector-tail :> tail''
+            head'' tail'' rep ^^add-vector :> src'''
+
+            rep'' widen-rep :> rep'''
+            src''' src''' rep''' ^^merge-vector-head :> head'''
+            src''' src''' rep''' ^^merge-vector-tail :> tail'''
+            head''' tail''' rep ^^add-vector
+        ]
+    } v-vector-op ;
+
+: ^(sum-vector) ( src rep -- dst )
+    [
+        rep-length {
+            {  2 [ ^(sum-2) ] }
+            {  4 [ ^(sum-4) ] }
+            {  8 [ ^(sum-8) ] }
+            { 16 [ ^(sum-16) ] }
+        } case
+    ] [ ^^vector>scalar ] bi ;
+
+: ^sum-vector ( src rep -- dst )
+    unsign-rep {
+        { float-vector-rep [ ^(sum-vector) ] }
+        { int-vector-rep [| src rep |
+            src rep ^unpack-vector-head :> head
+            src rep ^unpack-vector-tail :> tail
+            rep widen-rep :> wide-rep
+            head tail wide-rep ^^add-vector wide-rep ^(sum-vector)
+        ] }
+    } v-vector-op ;
 
 ! intrinsic emitters
 
@@ -135,12 +309,7 @@ IN: compiler.cfg.intrinsics.simd
 : emit-simd-v. ( node -- )
     {
         [ ^^dot-vector ]
-        { float-vector-rep [| src1 src2 rep |
-            
-        ] }
-        { int-vector-rep [| src1 src2 rep |
-            ...
-        ] }
+        [ [ ^^mul-vector ] [ ^sum-vector ] bi ]
     } emit-vv-vector-op ;
 
 : emit-simd-vsqrt ( node -- )
@@ -149,7 +318,9 @@ IN: compiler.cfg.intrinsics.simd
     } emit-v-vector-op ;
 
 : emit-simd-sum ( node -- )
-    ... ;
+    {
+        [ ^sum-vector ]
+    } emit-v-vector-op ;
 
 : emit-simd-vabs ( node -- )
     {
@@ -195,30 +366,32 @@ IN: compiler.cfg.intrinsics.simd
         [ ^^shl-vector ]
     } {
         [ ^^shl-vector-imm ]
-    } emit-vn-or-vl-vector-op ;
+    } [ integer? ] emit-vv-or-vl-vector-op ;
 
 : emit-simd-vrshift ( node -- )
     {
         [ ^^shr-vector ]
     } {
         [ ^^shr-vector-imm ]
-    } emit-vn-or-vl-vector-op ;
+    } [ integer? ] emit-vv-or-vl-vector-op ;
 
 : emit-simd-hlshift ( node -- )
     {
         [ ^^horizontal-shl-vector-imm ]
-    } emit-vl-vector-op ;
+    } [ integer? ] emit-vl-vector-op ;
 
 : emit-simd-hrshift ( node -- )
     {
         [ ^^horizontal-shr-vector-imm ]
-    } emit-vl-vector-op ;
+    } [ integer? ] emit-vl-vector-op ;
+
+: shuffle? ( obj -- ? ) { [ array? ] [ [ integer? ] all? ] } 1&& ;
 
 : emit-simd-vshuffle-elements ( node -- )
     {
         [ ^^shuffle-vector-imm ]
         [ [ ^load-immediate-shuffle ] [ ^^shuffle-vector ] ]
-    } emit-vl-vector-op ;
+    } [ shuffle? ] emit-vl-vector-op ;
 
 : emit-simd-vshuffle-bytes ( node -- )
     {
@@ -236,24 +409,42 @@ IN: compiler.cfg.intrinsics.simd
     } emit-vv-vector-op ;
 
 : emit-simd-v<= ( node -- )
-    [ cc<= ^compare-vector ] (emit-vv-vector-op) ;
+    {
+        [ cc<= ^compare-vector ]
+    } emit-vv-vector-op ;
 : emit-simd-v< ( node -- )
-    [ cc< ^compare-vector ] (emit-vv-vector-op) ;
+    {
+        [ cc< ^compare-vector ]
+    } emit-vv-vector-op ;
 : emit-simd-v= ( node -- )
-    [ cc= ^compare-vector ] (emit-vv-vector-op) ;
+    {
+        [ cc=  ^compare-vector ]
+    } emit-vv-vector-op ;
 : emit-simd-v> ( node -- )
-    [ cc> ^compare-vector ] (emit-vv-vector-op) ;
+    {
+        [ cc>  ^compare-vector ]
+    } emit-vv-vector-op ;
 : emit-simd-v>= ( node -- )
-    [ cc>= ^compare-vector ] (emit-vv-vector-op) ;
+    {
+        [ cc>= ^compare-vector ]
+    } emit-vv-vector-op ;
 : emit-simd-vunordered? ( node -- )
-    [ cc/<>= ^compare-vector ] (emit-vv-vector-op) ;
+    {
+        [ cc/<>= ^compare-vector ]
+    } emit-vv-vector-op ;
 
 : emit-simd-vany? ( node -- )
-    [ vcc-any ^test-vector ] (emit-vv-vector-op) ;
+    {
+        [ vcc-any ^test-vector ]
+    } emit-vv-vector-op ;
 : emit-simd-vall? ( node -- )
-    [ vcc-all ^test-vector ] (emit-vv-vector-op) ;
+    {
+        [ vcc-all ^test-vector ]
+    } emit-vv-vector-op ;
 : emit-simd-vnone? ( node -- )
-    [ vcc-none ^test-vector ] (emit-vv-vector-op) ;
+    {
+        [ vcc-none ^test-vector ]
+    } emit-vv-vector-op ;
 
 : emit-simd-v>float ( node -- )
     {
@@ -277,48 +468,45 @@ IN: compiler.cfg.intrinsics.simd
         [ ^^unsigned-pack-vector ]
     } emit-vv-vector-op ;
 
-! XXX shr vector rep is widened!
 : emit-simd-vunpack-head ( node -- )
     {
-        [ ^^unpack-vector-head ]
-        { unsigned-int-vector-rep [ [ ^^zero-vector ] [ ^^merge-vector-head ] bi ] }
-        { signed-int-vector-rep [| src rep |
-            src src rep ^^merge-vector-head :> merged
-            rep rep-component-type heap-size 8 * :> bits
-            merged bits rep ^widened-shr-vector-imm
-        ] }
-        { signed-int-vector-rep [| src rep |
-            rep ^^zero-vector :> zero
-            zero src rep cc> ^compare-vector :> sign
-            src sign rep ^^merge-vector-head
-        ] }
+        [ ^unpack-vector-head ]
     } emit-v-vector-op ;
 
 : emit-simd-vunpack-tail ( node -- )
     {
-        [ ^^unpack-vector-tail ]
-        [ [ ^^tail>head-vector ] [ ^^unpack-vector-head ] bi ]
-        { unsigned-int-vector-rep [ [ ^^zero-vector ] [ ^^merge-vector-tail ] bi ] }
-        { signed-int-vector-rep [| src rep |
-            src src rep ^^merge-vector-tail :> merged
-            rep rep-component-type heap-size 8 * :> bits
-            merged bits rep widen-vector-rep ^widened-shr-vector-imm
-        ] }
-        { signed-int-vector-rep [| src rep |
-            rep ^^zero-vector :> zero
-            zero src rep cc> ^compare-vector :> sign
-            src sign rep ^^merge-vector-tail
-        ] }
+        [ ^unpack-vector-tail ]
     } emit-v-vector-op ;
 
 : emit-simd-with ( node -- )
+    {
+        [ ^^with-vector ]
+    } emit-v-vector-op ;
+
 : emit-simd-gather-2 ( node -- )
+    {
+        [ ^^gather-vector-2 ]
+    } emit-vv-vector-op ;
+
 : emit-simd-gather-4 ( node -- )
+    {
+        [ ^^gather-vector-4 ]
+    } emit-vvvv-vector-op ;
+
 : emit-simd-select ( node -- )
+    {
+        [ ^^select-vector ]
+    } [ integer? ] emit-vl-vector-op ;
+
 : emit-alien-vector ( node -- )
+    {
+        [ ^^alien-vector ]
+    } emit-alien-vector-op ;
+    
 : emit-set-alien-vector ( node -- )
-: emit-alien-vector-aligned ( node -- )
-: emit-set-alien-vector-aligned ( node -- )
+    {
+        [ ^^set-alien-vector ]
+    } emit-set-alien-vector-op ;
 
 : enable-simd ( -- )
     {
@@ -376,8 +564,6 @@ IN: compiler.cfg.intrinsics.simd
         { (simd-select)            [ emit-simd-select              ] }
         { alien-vector             [ emit-alien-vector             ] }
         { set-alien-vector         [ emit-set-alien-vector         ] }
-        { alien-vector-aligned     [ emit-alien-vector             ] }
-        { set-alien-vector-aligned [ emit-set-alien-vector         ] }
     } enable-intrinsics ;
 
 enable-simd
