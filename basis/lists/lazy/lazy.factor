@@ -114,7 +114,7 @@ M: lazy-until car ( lazy-until -- car )
      cons>> car ;
 
 M: lazy-until cdr ( lazy-until -- cdr )
-     [ cons>> unswons ] keep quot>> tuck call( elt -- ? )
+     [ quot>> ] [ cons>> unswons ] bi over call( elt -- ? )
      [ 2drop nil ] [ luntil ] if ;
 
 M: lazy-until nil? ( lazy-until -- ? )
