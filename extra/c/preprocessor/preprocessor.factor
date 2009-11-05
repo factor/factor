@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequence-parser io io.encodings.utf8 io.files
+USING: sequences.parser io io.encodings.utf8 io.files
 io.streams.string kernel combinators accessors io.pathnames
 fry sequences arrays locals namespaces io.directories
 assocs math splitting make unicode.categories
