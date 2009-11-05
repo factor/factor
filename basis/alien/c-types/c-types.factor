@@ -292,7 +292,7 @@ M: long-long-type box-return ( c-type -- )
 
 : define-out ( name -- )
     [ "alien.c-types" constructor-word ]
-    [ dup c-setter '[ _ heap-size <byte-array> [ 0 @ ] keep ] ] bi
+    [ dup c-setter '[ _ heap-size (byte-array) [ 0 @ ] keep ] ] bi
     (( value -- c-ptr )) define-inline ;
 
 : define-primitive-type ( c-type name -- )
