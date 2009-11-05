@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit
 generalizations kernel locals math.order math.ranges
-sequence-parser sequences sorting.functor sorting.slots
+sequences.parser sequences sorting.functor sorting.slots
 unicode.categories ;
 IN: c.lexer
 
