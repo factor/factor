@@ -324,10 +324,4 @@ M: x86.32 dummy-fp-params? f ;
 ! Dreadful
 M: object flatten-value-type (flatten-int-type) ;
 
-os windows? [
-    cell longlong c-type (>>align)
-    cell ulonglong c-type (>>align)
-    4 double c-type (>>align)
-] unless
-
 check-sse
