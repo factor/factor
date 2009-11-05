@@ -78,10 +78,10 @@ PRIVATE>
 : n*V+V ( alpha x y -- alpha*x+y ) clone n*V+V! ; inline
 : n*V ( alpha x -- alpha*x ) clone n*V! ; inline
 
-: V+ ( x y -- x+y )
-    1.0 -rot n*V+V ; inline
-: V- ( x y -- x-y )
-    -1.0 spin n*V+V ; inline
+:: V+ ( x y -- x+y )
+    1.0 x y n*V+V ; inline
+:: V- ( x y -- x-y )
+    -1.0 y x n*V+V ; inline
 
 : Vneg ( x -- -x )
     -1.0 swap n*V ; inline
