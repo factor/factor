@@ -11,6 +11,8 @@ factor_vm::factor_vm() :
 	gc_events(NULL),
 	fep_disabled(false),
 	full_output(false)
-	{ }
+{
+	primitive_reset_dispatch_stats();
+}
 
 }

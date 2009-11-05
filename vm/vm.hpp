@@ -80,14 +80,7 @@ struct factor_vm
 	cell bignum_neg_one;
 
 	/* Method dispatch statistics */
-	cell megamorphic_cache_hits;
-	cell megamorphic_cache_misses;
-
-	cell cold_call_to_ic_transitions;
-	cell ic_to_pic_transitions;
-	cell pic_to_mega_transitions;
-	/* Indexed by PIC_TAG, PIC_TUPLE */
-	cell pic_counts[2];
+	dispatch_statistics dispatch_stats;
 
 	/* Number of entries in a polymorphic inline cache */
 	cell max_pic_size;
@@ -646,8 +639,6 @@ struct factor_vm
 	cell add_inline_cache_entry(cell cache_entries_, cell klass_, cell method_);
 	void update_pic_transitions(cell pic_size);
 	void *inline_cache_miss(cell return_address);
-	void primitive_reset_inline_cache_stats();
-	void primitive_inline_cache_stats();
 
 	//factor
 	void default_parameters(vm_parameters *p);

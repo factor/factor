@@ -1,38 +1,22 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math memory io io.styles prettyprint
-namespaces system sequences splitting grouping assocs strings
-generic.single combinators ;
+USING: system kernel math io prettyprint tools.memory
+tools.dispatch ;
 IN: tools.time
 
 : benchmark ( quot -- runtime )
     micros [ call micros ] dip - ; inline
 
 : time. ( time -- )
-    "== Running time ==" print nl 1000000 /f pprint " seconds" print ;
+    "Running time: " write 1000000 /f pprint " seconds" print ;
 
-: dispatch-stats. ( stats -- )
-    "== Megamorphic caches ==" print nl
-    [ { "Hits" "Misses" } ] dip zip simple-table. ;
-
-: inline-cache-stats. ( stats -- )
-    "== Polymorphic inline caches ==" print nl
-    3 cut
-    [
-        "- Transitions:" print
-        [ { "Cold to monomorphic" "Mono to polymorphic" "Poly to megamorphic" } ] dip zip
-        simple-table. nl
-    ] [
-        "- Type check stubs:" print
-        [ { "Tag" "Tuple" } ] dip zip
-        simple-table.
-    ] bi* ;
+: time-banner. ( -- )
+    "Additional information was collected." print
+    "dispatch-stats.  - Print method dispatch statistics" print
+    "gc-events.       - Print all garbage collection events" print
+    "gc-stats.        - Print breakdown of different garbage collection events" print
+    "gc-summary.      - Print aggregate garbage collection statistics" print ;
 
 : time ( quot -- )
-    reset-dispatch-stats
-    reset-inline-cache-stats
-    benchmark dispatch-stats inline-cache-stats
-    [ time. nl ]
-    [ dispatch-stats. nl ]
-    [ inline-cache-stats. ]
-    tri* ; inline
+    [ [ benchmark ] collect-dispatch-stats ] collect-gc-events
+    time. nl time-banner. ; inline

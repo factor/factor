@@ -121,8 +121,6 @@ PRIMITIVE_FORWARD(mega_cache_miss)
 PRIMITIVE_FORWARD(lookup_method)
 PRIMITIVE_FORWARD(reset_dispatch_stats)
 PRIMITIVE_FORWARD(dispatch_stats)
-PRIMITIVE_FORWARD(reset_inline_cache_stats)
-PRIMITIVE_FORWARD(inline_cache_stats)
 PRIMITIVE_FORWARD(optimized_p)
 PRIMITIVE_FORWARD(quot_compiled_p)
 PRIMITIVE_FORWARD(vm_ptr)
@@ -287,8 +285,6 @@ const primitive_type primitives[] = {
 	primitive_lookup_method,
 	primitive_reset_dispatch_stats,
 	primitive_dispatch_stats,
-	primitive_reset_inline_cache_stats,
-	primitive_inline_cache_stats,
 	primitive_optimized_p,
 	primitive_quot_compiled_p,
 	primitive_vm_ptr,

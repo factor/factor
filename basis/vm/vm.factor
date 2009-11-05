@@ -7,17 +7,17 @@ TYPEDEF: intptr_t cell
 C-TYPE: context
 
 STRUCT: zone
-    { start cell }
-    { here cell }
-    { size cell }
-    { end cell } ;
+{ start cell }
+{ here cell }
+{ size cell }
+{ end cell } ;
 
 STRUCT: vm
-    { stack_chain context* }
-    { nursery zone }
-    { cards_offset cell }
-    { decks_offset cell }
-    { userenv cell[70] } ;
+{ stack_chain context* }
+{ nursery zone }
+{ cards_offset cell }
+{ decks_offset cell }
+{ userenv cell[70] } ;
 
 : vm-field-offset ( field -- offset ) vm offset-of ; inline
 
@@ -66,3 +66,14 @@ STRUCT: gc-event
 { code-sweep-time cell }
 { compaction-time cell }
 { temp-time cell } ;
+
+STRUCT: dispatch-statistics
+{ megamorphic-cache-hits cell }
+{ megamorphic-cache-misses cell }
+
+{ cold-call-to-ic-transitions cell }
+{ ic-to-pic-transitions cell }
+{ pic-to-mega-transitions cell }
+
+{ pic-tag-count cell }
+{ pic-tuple-count cell } ;
