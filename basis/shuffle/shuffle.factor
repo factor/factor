@@ -22,6 +22,8 @@ MACRO: shuffle-effect ( effect -- )
 SYNTAX: shuffle(
     ")" parse-effect suffix! \ shuffle-effect suffix! ;
 
+: spin ( x y z -- z y x ) swap rot ; inline deprecated
+
 : roll ( x y z t -- y z t x ) [ rot ] dip swap ; inline deprecated
 
 : -roll ( x y z t -- t x y z ) swap [ -rot ] dip ; inline deprecated
