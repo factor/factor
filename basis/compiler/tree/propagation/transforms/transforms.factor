@@ -3,7 +3,7 @@
 USING: kernel sequences words fry generic accessors
 classes.tuple classes classes.algebra definitions
 stack-checker.state quotations classes.tuple.private math
-math.partial-dispatch math.private math.intervals
+math.partial-dispatch math.private math.intervals sets.private
 math.floats.private math.integers.private layouts math.order
 vectors hashtables combinators effects generalizations assocs
 sets combinators.short-circuit sequences.private locals
@@ -290,3 +290,13 @@ CONSTANT: lookup-table-at-max 256
     ] [ drop f ] if ;
 
 \ at* [ at-quot ] 1 define-partial-eval
+
+: diff-quot ( seq -- quot: ( seq' -- seq'' ) )
+    tester '[ [ @ not ] filter ] ;
+
+\ diff [ diff-quot ] 1 define-partial-eval
+
+: intersect-quot ( seq -- quot: ( seq' -- seq'' ) )
+    tester '[ _ filter ] ;
+
+\ intersect [ intersect-quot ] 1 define-partial-eval
