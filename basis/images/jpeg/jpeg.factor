@@ -295,7 +295,7 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
     binary [
         [
             { HEX: FF } read-until
-            read1 tuck HEX: 00 = and
+            read1 [ HEX: 00 = and ] keep swap
         ]
         [ drop ] produce
         swap >marker {  EOI } assert=

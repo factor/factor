@@ -98,7 +98,7 @@ M: bad-developer-name summary
     [ main-file-string ] dip utf8 set-file-contents ;
 
 : scaffold-main ( vocab-root vocab -- )
-    tuck ".factor" vocab-root/vocab/suffix>path scaffolding? [
+    [ ".factor" vocab-root/vocab/suffix>path ] keep swap scaffolding? [
         set-scaffold-main-file
     ] [
         2drop
