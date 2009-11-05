@@ -40,12 +40,13 @@ CONSTANT: game-height 256
   #! Point is a {x y}.
   first2 game-width 3 * * swap 3 * + ;
 
-: set-bitmap-pixel ( color point array -- )
-  #! 'color' is a {r g b}. Point is {x y}.
-  [ bitmap-index ] dip ! color index array
-  [ [ first ] 2dip set-nth ] 3keep
-  [ [ second ] 2dip [ 1 + ] dip set-nth ] 3keep
-  [ third ] 2dip [ 2 + ] dip set-nth ;
+:: set-bitmap-pixel ( bitmap point color -- )
+    color point bitmap
+
+    point color :> index
+    color first  index     bitmap set-nth
+    color second index 1 + bitmap set-nth
+    color third  index 2 + bitmap set-nth ;
 
 : get-bitmap-pixel ( point array -- color )
   #! Point is a {x y}. color is a {r g b} 
@@ -317,7 +318,7 @@ CONSTANT: red   { 255 0 0 }
 
 : plot-bitmap-pixel ( bitmap point color -- )
   #! point is a {x y}. color is a {r g b}.
-  spin set-bitmap-pixel ;
+  set-bitmap-pixel ;
 
 : within ( n a b -- bool )
   #! n >= a and n <= b
