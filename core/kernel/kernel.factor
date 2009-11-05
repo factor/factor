@@ -8,8 +8,6 @@ DEFER: 2dip
 DEFER: 3dip
 
 ! Stack stuff
-: spin ( x y z -- z y x ) swap rot ; inline
-
 : 2over ( x y z -- x y z x y ) pick pick ; inline
 
 : clear ( -- ) { } set-datastack ;
