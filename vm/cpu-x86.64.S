@@ -27,11 +27,9 @@
 		push %rdi ; \
 		push %rsi ; \
 		push %rbx ; \
-		push %rbp ; \
 		push %rbp
 
 	#define POP_NONVOLATILE \
-		pop %rbp ; \
 		pop %rbp ; \
 		pop %rbx ; \
 		pop %rsi ; \
@@ -50,11 +48,9 @@
 		push %rbx ; \
 		push %rbp ; \
 		push %r12 ; \
-		push %r13 ; \
 		push %r13
 
 	#define POP_NONVOLATILE \
-		pop %r13 ; \
 		pop %r13 ; \
 		pop %r12 ; \
 		pop %rbp ; \

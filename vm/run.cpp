@@ -6,14 +6,14 @@ namespace factor
 void factor_vm::primitive_getenv()
 {
 	fixnum e = untag_fixnum(dpeek());
-	drepl(userenv[e]);
+	drepl(special_objects[e]);
 }
 
 void factor_vm::primitive_setenv()
 {
 	fixnum e = untag_fixnum(dpop());
 	cell value = dpop();
-	userenv[e] = value;
+	special_objects[e] = value;
 }
 
 void factor_vm::primitive_exit()
@@ -52,7 +52,7 @@ void factor_vm::primitive_load_locals()
 
 cell factor_vm::clone_object(cell obj_)
 {
-	gc_root<object> obj(obj_,this);
+	data_root<object> obj(obj_,this);
 
 	if(immediate_p(obj.value()))
 		return obj.value();

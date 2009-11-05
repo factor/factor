@@ -47,7 +47,7 @@ M:: vector-rep emit-box ( dst src rep -- )
     int-rep next-vreg-rep :> temp
     dst 16 2 cells + byte-array int-rep next-vreg-rep ##allot
     temp 16 tag-fixnum ##load-immediate
-    temp dst 1 byte-array tag-number ##set-slot-imm
+    temp dst 1 byte-array type-number ##set-slot-imm
     dst byte-array-offset src rep ##set-alien-vector ;
 
 M: vector-rep emit-unbox

@@ -27,6 +27,7 @@ CONSTANT: mappings {
     { "latin9" "ISO-8859-15" "8859-15" }
     { "latin10" "ISO-8859-16" "8859-16" }
     { "koi8-r" "KOI8-R" "KOI8-R" }
+    { "windows-1250" "windows-1250" "CP1250" }
     { "windows-1252" "windows-1252" "CP1252" }
     { "ebcdic" "IBM037" "CP037" }
     { "mac-roman" "macintosh" "ROMAN" }

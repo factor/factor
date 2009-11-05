@@ -14,7 +14,10 @@ char *factor_vm::pinned_alien_offset(cell obj)
 			alien *ptr = untag<alien>(obj);
 			if(to_boolean(ptr->expired))
 				general_error(ERROR_EXPIRED,obj,false_object,NULL);
-			return pinned_alien_offset(ptr->base) + ptr->displacement;
+			if(to_boolean(ptr->base))
+				type_error(ALIEN_TYPE,obj);
+			else
+				return (char *)ptr->address;
 		}
 	case F_TYPE:
 		return NULL;
@@ -27,8 +30,8 @@ char *factor_vm::pinned_alien_offset(cell obj)
 /* make an alien */
 cell factor_vm::allot_alien(cell delegate_, cell displacement)
 {
-	gc_root<object> delegate(delegate_,this);
-	gc_root<alien> new_alien(allot<alien>(sizeof(alien)),this);
+	data_root<object> delegate(delegate_,this);
+	data_root<alien> new_alien(allot<alien>(sizeof(alien)),this);
 
 	if(delegate.type_p(ALIEN_TYPE))
 	{
@@ -41,6 +44,7 @@ cell factor_vm::allot_alien(cell delegate_, cell displacement)
 
 	new_alien->displacement = displacement;
 	new_alien->expired = false_object;
+	new_alien->update_address();
 
 	return new_alien.value();
 }
@@ -113,9 +117,9 @@ DEFINE_ALIEN_ACCESSOR(cell,void *,box_alien,pinned_alien_offset)
 /* open a native library and push a handle */
 void factor_vm::primitive_dlopen()
 {
-	gc_root<byte_array> path(dpop(),this);
+	data_root<byte_array> path(dpop(),this);
 	path.untag_check(this);
-	gc_root<dll> library(allot<dll>(sizeof(dll)),this);
+	data_root<dll> library(allot<dll>(sizeof(dll)),this);
 	library->path = path.value();
 	ffi_dlopen(library.untagged());
 	dpush(library.value());
@@ -124,8 +128,8 @@ void factor_vm::primitive_dlopen()
 /* look up a symbol in a native library */
 void factor_vm::primitive_dlsym()
 {
-	gc_root<object> library(dpop(),this);
-	gc_root<byte_array> name(dpop(),this);
+	data_root<object> library(dpop(),this);
+	data_root<byte_array> name(dpop(),this);
 	name.untag_check(this);
 
 	symbol_char *sym = name->data<symbol_char>();
@@ -168,12 +172,7 @@ char *factor_vm::alien_offset(cell obj)
 	case BYTE_ARRAY_TYPE:
 		return untag<byte_array>(obj)->data<char>();
 	case ALIEN_TYPE:
-		{
-			alien *ptr = untag<alien>(obj);
-			if(to_boolean(ptr->expired))
-				general_error(ERROR_EXPIRED,obj,false_object,NULL);
-			return alien_offset(ptr->base) + ptr->displacement;
-		}
+		return (char *)untag<alien>(obj)->address;
 	case F_TYPE:
 		return NULL;
 	default:
