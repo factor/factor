@@ -212,7 +212,7 @@ HELP: nwith
 } ;
 
 HELP: napply
-{ $values { "n" integer } }
+{ $values { "quot" quotation } { "n" integer } }
 { $description "A generalization of " { $link bi@ } " and " { $link tri@ } " that can work for any stack depth."
 } 
 { $examples
