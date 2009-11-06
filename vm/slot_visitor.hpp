@@ -8,15 +8,18 @@ template<typename Visitor> struct slot_visitor {
 	explicit slot_visitor<Visitor>(factor_vm *parent_, Visitor visitor_) :
 		parent(parent_), visitor(visitor_) {}
 
+	cell visit_pointer(cell pointer)
+	{
+		object *untagged = untag<object>(pointer);
+		untagged = visitor(untagged);
+		return RETAG(untagged,TAG(pointer));
+	}
+
 	void visit_handle(cell *handle)
 	{
 		cell pointer = *handle;
-
-		if(immediate_p(pointer)) return;
-
-		object *untagged = untag<object>(pointer);
-		untagged = visitor(untagged);
-		*handle = RETAG(untagged,TAG(pointer));
+		if(!immediate_p(pointer))
+			*handle = visit_pointer(pointer);
 	}
 
 	void visit_slots(object *ptr, cell payload_start)
@@ -47,8 +50,13 @@ template<typename Visitor> struct slot_visitor {
 		std::vector<cell>::const_iterator iter = parent->data_roots.begin();
 		std::vector<cell>::const_iterator end = parent->data_roots.end();
 
-		for(; iter < end; iter++)
-			visit_handle((cell *)(*iter));
+		while(iter < end)
+		{
+			cell start = *iter++;
+			cell len = *iter++;
+			for(cell index = 0; index < len; index++)
+				visit_handle((cell *)start + index);
+		}
 	}
 
 	void visit_bignum_roots()
