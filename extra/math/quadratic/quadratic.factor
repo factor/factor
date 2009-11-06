@@ -3,9 +3,9 @@
 USING: kernel locals math math.functions ;
 IN: math.quadratic
 
-: monic ( c b a -- c' b' ) tuck [ / ] 2bi@ ;
+: monic ( c b a -- c' b' ) [ / ] curry bi@ ;
 
-: discriminant ( c b -- b d ) tuck sq 4 / swap - sqrt ;
+: discriminant ( c b -- b d ) [ nip ] [ sq 4 / swap - sqrt ] 2bi ;
 
 : critical ( b d -- -b/2 d ) [ -2 / ] dip ;
 

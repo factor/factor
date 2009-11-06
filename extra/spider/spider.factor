@@ -57,7 +57,7 @@ fetched-in parsed-html links processed-in fetched-at ;
     [ filter-base-links ] 2keep
     depth>> 1 + swap
     [ add-nonmatching ]
-    [ tuck [ apply-filters ] 2dip add-todo ] 2bi ;
+    [ dup '[ _ apply-filters ] curry 2dip add-todo ] 2bi ;
 
 : normalize-hrefs ( base links -- links' )
     [ derive-url ] with map ;

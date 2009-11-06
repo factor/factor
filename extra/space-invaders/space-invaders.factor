@@ -14,7 +14,9 @@ USING:
     io.files
     io.pathnames
     kernel 
+    locals
     math
+    math.order
     openal
     opengl.gl
     sequences
@@ -41,9 +43,7 @@ CONSTANT: game-height 256
   first2 game-width 3 * * swap 3 * + ;
 
 :: set-bitmap-pixel ( bitmap point color -- )
-    color point bitmap
-
-    point color :> index
+    point bitmap-index :> index
     color first  index     bitmap set-nth
     color second index 1 + bitmap set-nth
     color third  index 2 + bitmap set-nth ;
@@ -140,8 +140,8 @@ M: space-invaders read-port ( port cpu -- byte )
   #! Setting this value affects the value read from port 3
   (>>port2o) ;
 
-: bit-newly-set? ( old-value new-value bit -- bool )
-  tuck bit? [ bit? not ] dip and ;
+:: bit-newly-set? ( old-value new-value bit -- bool )
+  new-value bit bit? [ old-value bit bit? not ] dip and ;
 
 : port3-newly-set? ( new-value cpu bit -- bool )
   [ port3o>> swap ] dip bit-newly-set? ;
@@ -320,17 +320,13 @@ CONSTANT: red   { 255 0 0 }
   #! point is a {x y}. color is a {r g b}.
   set-bitmap-pixel ;
 
-: within ( n a b -- bool )
-  #! n >= a and n <= b
-  rot tuck swap <= [ swap >= ] dip and ;
-
 : get-point-color ( point -- color )
   #! Return the color to use for the given x/y position.
   first2
   {
-    { [ dup 184 238 within pick 0 223 within and ] [ 2drop green ] }
-    { [ dup 240 247 within pick 16 133 within and ] [ 2drop green ] }
-    { [ dup 247 215 - 247 184 - within pick 0 223 within and ] [ 2drop red ] }
+    { [ dup 184 238 between? pick 0 223 between? and ] [ 2drop green ] }
+    { [ dup 240 247 between? pick 16 133 between? and ] [ 2drop green ] }
+    { [ dup 247 215 - 247 184 - between? pick 0 223 between? and ] [ 2drop red ] }
     [ 2drop white ]
   } cond ;
 

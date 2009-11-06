@@ -22,7 +22,7 @@ IN: blum-blum-shub.tests
 
 [ 3716213681 ]
 [
-    100 T{ blum-blum-shub f 200352954495 846054538649 } clone tuck [
+    T{ blum-blum-shub f 200352954495 846054538649 } clone 100 over [
         random-32* drop
     ] curry times
     random-32*

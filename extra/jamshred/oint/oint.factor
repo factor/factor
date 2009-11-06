@@ -53,13 +53,13 @@ C: <oint> oint
 
 : scalar-projection ( v1 v2 -- n )
     #! the scalar projection of v1 onto v2
-    tuck v. swap norm / ;
+    [ v. ] [ norm ] bi / ;
 
 : proj-perp ( u v -- w )
     dupd proj v- ;
 
 : perpendicular-distance ( oint oint -- distance )
-    tuck distance-vector swap 2dup left>> scalar-projection abs
+    [ distance-vector ] keep 2dup left>> scalar-projection abs
     -rot up>> scalar-projection abs + ;
 
 :: reflect ( v n -- v' )
