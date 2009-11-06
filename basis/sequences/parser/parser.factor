@@ -3,7 +3,7 @@
 USING: accessors circular combinators.short-circuit fry io
 kernel locals math math.order sequences sorting.functor
 sorting.slots unicode.categories ;
-IN: sequence-parser
+IN: sequences.parser
 
 TUPLE: sequence-parser sequence n ;
 
