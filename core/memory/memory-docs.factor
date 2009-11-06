@@ -9,13 +9,13 @@ HELP: instances
 HELP: gc ( -- )
 { $description "Performs a full garbage collection." } ;
 
-HELP: data-room ( -- cards decks generations )
-{ $values { "cards" "number of kilobytes reserved for card marking" } { "decks" "number of kilobytes reserved for decks of cards" } { "generations" "array of free/total kilobytes pairs" } }
-{ $description "Queries the runtime for memory usage information." } ;
+HELP: data-room ( -- data-room )
+{ $values { "data-room" data-room } }
+{ $description "Queries the VM for memory usage information." } ;
 
-HELP: code-room ( -- code-total code-used code-free largest-free-block )
-{ $values { "code-total" "total kilobytes in the code heap" } { "code-used" "kilobytes used in the code heap" } { "code-free" "kilobytes free in the code heap" } { "largest-free-block" "size of largest free block" } }
-{ $description "Queries the runtime for memory usage information." } ;
+HELP: code-room ( -- code-room )
+{ $values { "code-room" code-room } }
+{ $description "Queries the VM for memory usage information." } ;
 
 HELP: size ( obj -- n )
 { $values { "obj" "an object" } { "n" "a size in bytes" } }
