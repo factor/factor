@@ -50,7 +50,7 @@ template<typename Visitor> struct code_block_visitor {
 				if(w->code)
 					w->code = visitor(w->code);
 				if(w->profiling)
-					w->code = visitor(w->profiling);
+					w->profiling = visitor(w->profiling);
 	
 				parent->update_word_xt(w);
 				break;
