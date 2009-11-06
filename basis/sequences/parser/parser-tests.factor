@@ -1,6 +1,6 @@
 USING: tools.test sequence-parser unicode.categories kernel
 accessors ;
-IN: sequence-parser.tests
+IN: sequences.parser.tests
 
 [ "hello" ]
 [ "hello" [ take-rest ] parse-sequence ] unit-test

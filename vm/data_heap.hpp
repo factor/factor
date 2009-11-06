@@ -30,6 +30,7 @@ struct data_heap {
 	void reset_generation(aging_space *gen);
 	void reset_generation(tenured_space *gen);
 	bool low_memory_p();
+	void mark_all_cards();
 };
 
 struct data_heap_room {

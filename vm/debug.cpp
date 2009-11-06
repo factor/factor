@@ -241,12 +241,12 @@ struct object_dumper {
 	explicit object_dumper(factor_vm *parent_, cell type_) :
 		parent(parent_), type(type_) {}
 
-	void operator()(cell obj)
+	void operator()(object *obj)
 	{
-		if(type == TYPE_COUNT || tagged<object>(obj).type_p(type))
+		if(type == TYPE_COUNT || obj->h.hi_tag() == type)
 		{
-			std::cout << padded_address(obj) << " ";
-			parent->print_nested_obj(obj,2);
+			std::cout << padded_address((cell)obj) << " ";
+			parent->print_nested_obj(tag_dynamic(obj),2);
 			std::cout << std::endl;
 		}
 	}
@@ -260,18 +260,19 @@ void factor_vm::dump_objects(cell type)
 }
 
 struct data_reference_slot_visitor {
-	cell look_for, obj;
+	cell look_for;
+	object *obj;
 	factor_vm *parent;
 
-	explicit data_reference_slot_visitor(cell look_for_, cell obj_, factor_vm *parent_) :
+	explicit data_reference_slot_visitor(cell look_for_, object *obj_, factor_vm *parent_) :
 		look_for(look_for_), obj(obj_), parent(parent_) { }
 
 	void operator()(cell *scan)
 	{
 		if(look_for == *scan)
 		{
-			std::cout << padded_address(obj) << " ";
-			parent->print_nested_obj(obj,2);
+			std::cout << padded_address((cell)obj) << " ";
+			parent->print_nested_obj(tag_dynamic(obj),2);
 			std::cout << std::endl;
 		}
 	}
@@ -284,10 +285,10 @@ struct data_reference_object_visitor {
 	explicit data_reference_object_visitor(cell look_for_, factor_vm *parent_) :
 		look_for(look_for_), parent(parent_) {}
 
-	void operator()(cell obj)
+	void operator()(object *obj)
 	{
 		data_reference_slot_visitor visitor(look_for,obj,parent);
-		parent->do_slots(UNTAG(obj),visitor);
+		parent->do_slots(obj,visitor);
 	}
 };
 

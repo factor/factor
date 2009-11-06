@@ -86,6 +86,7 @@ void factor_vm::do_stage1_init()
 	fflush(stdout);
 
 	compile_all_words();
+	update_code_heap_words();
 	special_objects[OBJ_STAGE2] = true_object;
 
 	std::cout << "done\n";
