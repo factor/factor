@@ -14,12 +14,12 @@ struct free_heap_block
 
 	cell size() const
 	{
-		return header >> 3;
+		return header & ~7;
 	}
 
 	void make_free(cell size)
 	{
-		header = (size << 3) | 1;
+		header = size | 1;
 	}
 };
 
