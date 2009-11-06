@@ -17,3 +17,4 @@ IN: sequences.merged.tests
 [ 4 ] [ 4 { 1 2 } { 3 4 } { 5 6 } 3merge nth ] unit-test
 
 [ "" ] [ "abcdefg" "" 2merge ] unit-test
+[ "a1b2" ] [ "abc" "12" <2merged> "" like ] unit-test
