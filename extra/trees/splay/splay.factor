@@ -1,7 +1,7 @@
 ! Copyright (c) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math namespaces sequences assocs parser
-trees generic math.order accessors prettyprint.custom ;
+trees generic math.order accessors prettyprint.custom shuffle ;
 IN: trees.splay
 
 TUPLE: splay < tree ;

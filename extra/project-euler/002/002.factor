@@ -31,7 +31,7 @@ PRIVATE>
     V{ 0 } clone 1 rot (fib-upto) ;
 
 : euler002 ( -- answer )
-    4000000 fib-upto [ even? ] filter sum ;
+    4,000,000 fib-upto [ even? ] filter sum ;
 
 ! [ euler002 ] 100 ave-time
 ! 0 ms ave run time - 0.22 SD (100 trials)
@@ -41,11 +41,11 @@ PRIVATE>
 ! -------------------
 
 : fib-upto* ( n -- seq )
-    0 1 [ pick over >= ] [ tuck + dup ] produce [ 3drop ] dip
+    0 1 [ pick over >= ] [ [ nip ] 2keep + dup ] produce [ 3drop ] dip
     but-last-slice { 0 1 } prepend ;
 
 : euler002a ( -- answer )
-    4000000 fib-upto* [ even? ] filter sum ;
+    4,000,000 fib-upto* [ even? ] filter sum ;
 
 ! [ euler002a ] 100 ave-time
 ! 0 ms ave run time - 0.2 SD (100 trials)
@@ -54,7 +54,7 @@ PRIVATE>
 <PRIVATE
 
 : next-fibs ( x y -- y x+y )
-    tuck + ;
+    [ nip ] [ + ] 2bi ;
 
 : ?retotal ( total fib- fib+ -- retotal fib- fib+ )
     dup even? [ [ nip + ] 2keep ] when ;

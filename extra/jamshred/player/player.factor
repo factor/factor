@@ -31,8 +31,9 @@ CONSTANT: max-speed 30.0
     forward-pivot ;
 
 : to-tunnel-start ( player -- )
-    [ tunnel>> first dup location>> ]
-    [ tuck (>>location) (>>nearest-segment) ] bi ;
+    dup tunnel>> first
+    [ >>nearest-segment ]
+    [ location>> >>location ] bi drop ;
 
 : play-in-tunnel ( player segments -- )
     >>tunnel to-tunnel-start ;
