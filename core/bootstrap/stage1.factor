@@ -17,25 +17,19 @@ load-help? off
 ! Create a boot quotation for the target
 [
     [
-        ! Rehash hashtables, since bootstrap.image creates them
-        ! using the host image's hashing algorithms. We don't
-        ! use each-object here since the catch stack isn't yet
-        ! set up.
-        gc
-        begin-scan
-        [ hashtable? ] pusher [ (each-object) ] dip
-        end-scan
-        [ rehash ] each
+        ! Rehash hashtables first, since bootstrap.image creates
+        ! them using the host image's hashing algorithms.
+        [ hashtable? ] instances [ rehash ] each
         boot
     ] %
 
     "math.integers" require
     "math.floats" require
     "memory" require
-    
+
     "io.streams.c" require
     "vocabs.loader" require
-    
+
     "syntax" require
     "bootstrap.layouts" require
 

@@ -49,8 +49,8 @@ PRIMITIVE_FORWARD(float_greater)
 PRIMITIVE_FORWARD(float_greatereq)
 PRIMITIVE_FORWARD(word)
 PRIMITIVE_FORWARD(word_xt)
-PRIMITIVE_FORWARD(getenv)
-PRIMITIVE_FORWARD(setenv)
+PRIMITIVE_FORWARD(special_object)
+PRIMITIVE_FORWARD(set_special_object)
 PRIMITIVE_FORWARD(existsp)
 PRIMITIVE_FORWARD(minor_gc)
 PRIMITIVE_FORWARD(full_gc)
@@ -82,9 +82,7 @@ PRIMITIVE_FORWARD(set_string_nth_slow)
 PRIMITIVE_FORWARD(resize_array)
 PRIMITIVE_FORWARD(resize_string)
 PRIMITIVE_FORWARD(array)
-PRIMITIVE_FORWARD(begin_scan)
-PRIMITIVE_FORWARD(next_object)
-PRIMITIVE_FORWARD(end_scan)
+PRIMITIVE_FORWARD(all_instances)
 PRIMITIVE_FORWARD(size)
 PRIMITIVE_FORWARD(die)
 PRIMITIVE_FORWARD(fopen)
@@ -185,8 +183,8 @@ const primitive_type primitives[] = {
 	primitive_float_greatereq,
 	primitive_word,
 	primitive_word_xt,
-	primitive_getenv,
-	primitive_setenv,
+	primitive_special_object,
+	primitive_set_special_object,
 	primitive_existsp,
 	primitive_minor_gc,
 	primitive_full_gc,
@@ -244,9 +242,7 @@ const primitive_type primitives[] = {
 	primitive_resize_array,
 	primitive_resize_string,
 	primitive_array,
-	primitive_begin_scan,
-	primitive_next_object,
-	primitive_end_scan,
+	primitive_all_instances,
 	primitive_size,
 	primitive_die,
 	primitive_fopen,
