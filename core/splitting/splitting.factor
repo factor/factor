@@ -55,17 +55,21 @@ PRIVATE>
 
 <PRIVATE
 
-: (split) ( separators n seq -- )
-    3dup rot [ member? ] curry find-from drop
-    [ [ swap subseq , ] 2keep 1 + swap (split) ]
-    [ swap [ tail ] unless-zero , drop ] if* ; inline recursive
+: (split) ( n seq quot: ( elt -- ? ) -- )
+    [ find-from drop ]
+    [ [ [ 3dup swapd subseq , ] dip [ drop 1 + ] 2dip (split) ] 3curry ]
+    [ drop [ swap [ tail ] unless-zero , ] 2curry ]
+    3tri if* ; inline recursive
 
-: split, ( seq separators -- ) 0 rot (split) ;
+: split, ( seq quot -- ) [ 0 ] 2dip (split) ; inline
 
 PRIVATE>
 
 : split ( seq separators -- pieces )
-    [ split, ] { } make ;
+    [ [ member? ] curry split, ] { } make ;
+
+: split-when ( seq quot -- pieces )
+    [ split, ] { } make ; inline
 
 GENERIC: string-lines ( str -- seq )
 
