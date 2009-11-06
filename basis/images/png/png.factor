@@ -290,6 +290,14 @@ ERROR: invalid-color-type/bit-depth loading-png ;
 : validate-truecolor-alpha ( loading-png -- loading-png )
     { 8 16 } validate-bit-depth ;
 
+: pad-bitmap ( image -- image )
+    dup dim>> first 4 divisor? [
+        dup [ bytes-per-pixel ]
+        [ dim>> first * ]
+        [ dim>> first 4 mod ] tri
+        '[ _ group [ _ 0 <array> append ] map B{ } concat-as ] change-bitmap
+    ] unless ;
+
 : loading-png>bitmap ( loading-png -- bytes component-order )
     dup color-type>> {
         { greyscale [
@@ -315,7 +323,7 @@ ERROR: invalid-color-type/bit-depth loading-png ;
         [ loading-png>bitmap [ >>bitmap ] [ >>component-order ] bi* ]
         [ [ width>> ] [ height>> ] bi 2array >>dim ]
         [ png-component >>component-type ]
-    } cleave ;
+    } cleave pad-bitmap ;
 
 : load-png ( stream -- loading-png )
     [
