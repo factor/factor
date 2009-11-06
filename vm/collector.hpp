@@ -183,11 +183,8 @@ template<typename TargetGeneration, typename Policy> struct collector {
 			cell *slot_ptr = (cell *)start;
 			cell *end_ptr = (cell *)end;
 
-			if(slot_ptr != end_ptr)
-			{
-				for(; slot_ptr < end_ptr; slot_ptr++)
-					workhorse.visit_handle(slot_ptr);
-			}
+			for(; slot_ptr < end_ptr; slot_ptr++)
+				workhorse.visit_handle(slot_ptr);
 		}
 	}
 
