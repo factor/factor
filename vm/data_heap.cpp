@@ -103,6 +103,12 @@ bool data_heap::low_memory_p()
 	return (tenured->free_space() <= nursery->size + aging->size);
 }
 
+void data_heap::mark_all_cards()
+{
+	memset(cards,-1,cards_end - cards);
+	memset(decks,-1,decks_end - decks);
+}
+
 void factor_vm::set_data_heap(data_heap *data_)
 {
 	data = data_;
@@ -113,15 +119,6 @@ void factor_vm::set_data_heap(data_heap *data_)
 void factor_vm::init_data_heap(cell young_size, cell aging_size, cell tenured_size)
 {
 	set_data_heap(new data_heap(young_size,aging_size,tenured_size));
-}
-
-/* Size of the object pointed to by a tagged pointer */
-cell factor_vm::object_size(cell tagged)
-{
-	if(immediate_p(tagged))
-		return 0;
-	else
-		return untag<object>(tagged)->size();
 }
 
 /* Size of the object pointed to by an untagged pointer */
@@ -199,11 +196,6 @@ cell object::binary_payload_start() const
 		critical_error("Invalid header",(cell)this);
                 return 0; /* can't happen */
 	}
-}
-
-void factor_vm::primitive_size()
-{
-	box_unsigned_cell(object_size(dpop()));
 }
 
 data_heap_room factor_vm::data_room()

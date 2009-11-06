@@ -341,8 +341,6 @@ void factor_vm::compile_all_words()
 		update_word_xt(word.untagged());
 
 	}
-
-	update_code_heap_words();
 }
 
 /* Allocates memory */

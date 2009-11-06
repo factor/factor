@@ -49,8 +49,8 @@ PRIMITIVE_FORWARD(float_greater)
 PRIMITIVE_FORWARD(float_greatereq)
 PRIMITIVE_FORWARD(word)
 PRIMITIVE_FORWARD(word_xt)
-PRIMITIVE_FORWARD(getenv)
-PRIMITIVE_FORWARD(setenv)
+PRIMITIVE_FORWARD(special_object)
+PRIMITIVE_FORWARD(set_special_object)
 PRIMITIVE_FORWARD(existsp)
 PRIMITIVE_FORWARD(minor_gc)
 PRIMITIVE_FORWARD(full_gc)
@@ -185,8 +185,8 @@ const primitive_type primitives[] = {
 	primitive_float_greatereq,
 	primitive_word,
 	primitive_word_xt,
-	primitive_getenv,
-	primitive_setenv,
+	primitive_special_object,
+	primitive_set_special_object,
 	primitive_existsp,
 	primitive_minor_gc,
 	primitive_full_gc,
