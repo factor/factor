@@ -38,13 +38,13 @@ inline cell log2(cell x)
 #else
 	cell n = 0;
 #ifdef FACTOR_64
-	if (x >= (u64)1 << 32) { x >>= 32; n += 32; }
+	if (x >= (cell)1 << 32) { x >>= 32; n += 32; }
 #endif
-	if (x >= (u32)1 << 16) { x >>= 16; n += 16; }
-	if (x >= (u32)1 <<  8) { x >>=  8; n +=  8; }
-	if (x >= (u32)1 <<  4) { x >>=  4; n +=  4; }
-	if (x >= (u32)1 <<  2) { x >>=  2; n +=  2; }
-	if (x >= (u32)1 <<  1) {           n +=  1; }
+	if (x >= (cell)1 << 16) { x >>= 16; n += 16; }
+	if (x >= (cell)1 <<  8) { x >>=  8; n +=  8; }
+	if (x >= (cell)1 <<  4) { x >>=  4; n +=  4; }
+	if (x >= (cell)1 <<  2) { x >>=  2; n +=  2; }
+	if (x >= (cell)1 <<  1) {           n +=  1; }
 #endif
 	return n;
 }
