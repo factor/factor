@@ -141,7 +141,6 @@ MACRO: undo ( quot -- ) [undo] ;
 \ 2dup [ over =/fail over =/fail ] define-inverse
 \ 3dup [ pick =/fail pick =/fail pick =/fail ] define-inverse
 \ pick [ [ pick ] dip =/fail ] define-inverse
-\ tuck [ swapd [ =/fail ] keep ] define-inverse
 
 \ bi@ 1 [ [undo] '[ _ bi@ ] ] define-pop-inverse
 \ tri@ 1 [ [undo] '[ _ tri@ ] ] define-pop-inverse

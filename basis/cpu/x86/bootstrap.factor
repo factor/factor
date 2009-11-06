@@ -337,15 +337,6 @@ big-endian off
 
 [
     temp0 ds-reg [] MOV
-    temp1 ds-reg -1 bootstrap-cells [+] MOV
-    ds-reg bootstrap-cell ADD
-    ds-reg [] temp0 MOV
-    ds-reg -1 bootstrap-cells [+] temp1 MOV
-    ds-reg -2 bootstrap-cells [+] temp0 MOV
-] \ tuck define-sub-primitive
-
-[
-    temp0 ds-reg [] MOV
     temp1 ds-reg bootstrap-cell neg [+] MOV
     ds-reg bootstrap-cell neg [+] temp0 MOV
     ds-reg [] temp1 MOV
