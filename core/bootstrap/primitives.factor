@@ -340,7 +340,6 @@ tuple
     { "swapd" "kernel" (( x y z -- y x z )) }
     { "nip" "kernel" (( x y -- y )) }
     { "2nip" "kernel" (( x y z -- z )) }
-    { "tuck" "kernel" (( x y -- y x y )) }
     { "over" "kernel" (( x y -- x y x )) }
     { "pick" "kernel" (( x y z -- x y z x )) }
     { "swap" "kernel" (( x y -- y x )) }

@@ -43,7 +43,6 @@ IN: stack-checker.known-words
     { swapd (( x y z -- y x z       )) }
     { nip   (( x y   -- y           )) }
     { 2nip  (( x y z -- z           )) }
-    { tuck  (( x y   -- y x y       )) }
     { over  (( x y   -- x y x       )) }
     { pick  (( x y z -- x y z x     )) }
     { swap  (( x y   -- y x         )) }

@@ -21,7 +21,6 @@ IN: compiler.tests.intrinsics
 [ 2 1 3 ] [ 1 2 3 [ swapd ] compile-call ] unit-test
 [ 2 ] [ 1 2 [ nip ] compile-call ] unit-test
 [ 3 ] [ 1 2 3 [ 2nip ] compile-call ] unit-test
-[ 2 1 2 ] [ 1 2 [ tuck ] compile-call ] unit-test
 [ 1 2 1 ] [ 1 2 [ over ] compile-call ] unit-test
 [ 1 2 3 1 ] [ 1 2 3 [ pick ] compile-call ] unit-test
 [ 2 1 ] [ 1 2 [ swap ] compile-call ] unit-test
