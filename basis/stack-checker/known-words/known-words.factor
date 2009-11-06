@@ -623,11 +623,7 @@ M: bad-executable summary
 \ <array> { integer object } { array } define-primitive
 \ <array> make-flushable
 
-\ begin-scan { } { } define-primitive
-
-\ next-object { } { object } define-primitive
-
-\ end-scan { } { } define-primitive
+\ all-instances { } { array } define-primitive
 
 \ size { object } { fixnum } define-primitive
 \ size make-flushable

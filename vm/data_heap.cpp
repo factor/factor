@@ -103,6 +103,12 @@ bool data_heap::low_memory_p()
 	return (tenured->free_space() <= nursery->size + aging->size);
 }
 
+void data_heap::mark_all_cards()
+{
+	memset(cards,-1,cards_end - cards);
+	memset(decks,-1,decks_end - decks);
+}
+
 void factor_vm::set_data_heap(data_heap *data_)
 {
 	data = data_;
@@ -113,15 +119,6 @@ void factor_vm::set_data_heap(data_heap *data_)
 void factor_vm::init_data_heap(cell young_size, cell aging_size, cell tenured_size)
 {
 	set_data_heap(new data_heap(young_size,aging_size,tenured_size));
-}
-
-/* Size of the object pointed to by a tagged pointer */
-cell factor_vm::object_size(cell tagged)
-{
-	if(immediate_p(tagged))
-		return 0;
-	else
-		return untag<object>(tagged)->size();
 }
 
 /* Size of the object pointed to by an untagged pointer */
@@ -201,11 +198,6 @@ cell object::binary_payload_start() const
 	}
 }
 
-void factor_vm::primitive_size()
-{
-	box_unsigned_cell(object_size(dpop()));
-}
-
 data_heap_room factor_vm::data_room()
 {
 	data_heap_room room;
@@ -234,82 +226,42 @@ void factor_vm::primitive_data_room()
 	dpush(tag<byte_array>(byte_array_from_value(&room)));
 }
 
-/* Disables GC and activates next-object ( -- obj ) primitive */
-void factor_vm::begin_scan()
+struct object_accumulator {
+	cell type;
+	std::vector<cell> objects;
+
+	explicit object_accumulator(cell type_) : type(type_) {}
+
+	void operator()(object *obj)
+	{
+		if(type == TYPE_COUNT || obj->h.hi_tag() == type)
+			objects.push_back(tag_dynamic(obj));
+	}
+};
+
+cell factor_vm::instances(cell type)
 {
-	heap_scan_ptr = data->tenured->first_object();
+	object_accumulator accum(type);
+	each_object(accum);
+	cell object_count = accum.objects.size();
+
 	gc_off = true;
-}
-
-void factor_vm::end_scan()
-{
+	array *objects = allot_array(object_count,false_object);
+	memcpy(objects->data(),&accum.objects[0],object_count * sizeof(cell));
 	gc_off = false;
+
+	return tag<array>(objects);
 }
 
-void factor_vm::primitive_begin_scan()
+void factor_vm::primitive_all_instances()
 {
-	begin_scan();
+	primitive_full_gc();
+	dpush(instances(TYPE_COUNT));
 }
-
-cell factor_vm::next_object()
-{
-	if(!gc_off)
-		general_error(ERROR_HEAP_SCAN,false_object,false_object,NULL);
-
-	if(heap_scan_ptr)
-	{
-		cell current = heap_scan_ptr;
-		heap_scan_ptr = data->tenured->next_object_after(heap_scan_ptr);
-		return tag_dynamic((object *)current);
-	}
-	else
-		return false_object;
-}
-
-/* Push object at heap scan cursor and advance; pushes f when done */
-void factor_vm::primitive_next_object()
-{
-	dpush(next_object());
-}
-
-/* Re-enables GC */
-void factor_vm::primitive_end_scan()
-{
-	gc_off = false;
-}
-
-struct word_counter {
-	cell count;
-
-	explicit word_counter() : count(0) {}
-
-	void operator()(cell obj)
-	{
-		if(tagged<object>(obj).type_p(WORD_TYPE))
-			count++;
-	}
-};
-
-struct word_accumulator {
-	growable_array words;
-
-	explicit word_accumulator(int count,factor_vm *vm) : words(vm,count) {}
-
-	void operator()(cell obj)
-	{
-		if(tagged<object>(obj).type_p(WORD_TYPE))
-			words.add(obj);
-	}
-};
 
 cell factor_vm::find_all_words()
 {
-	word_counter counter;
-	each_object(counter);
-	word_accumulator accum(counter.count,this);
-	each_object(accum);
-	accum.words.trim();
-	return accum.words.elements.value();
+	return instances(WORD_TYPE);
 }
 
 }

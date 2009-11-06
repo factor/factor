@@ -473,9 +473,7 @@ tuple
     { "resize-array" "arrays" (( n array -- newarray )) }
     { "resize-string" "strings" (( n str -- newstr )) }
     { "<array>" "arrays" (( n elt -- array )) }
-    { "begin-scan" "memory" (( -- )) }
-    { "next-object" "memory" (( -- obj )) }
-    { "end-scan" "memory" (( -- )) }
+    { "all-instances" "memory" (( -- array )) }
     { "size" "memory" (( obj -- n )) }
     { "die" "kernel" (( -- )) }
     { "(fopen)" "io.streams.c" (( path mode -- alien )) }

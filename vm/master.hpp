@@ -44,6 +44,7 @@ namespace factor
 #include "segments.hpp"
 #include "contexts.hpp"
 #include "run.hpp"
+#include "objects.hpp"
 #include "profiler.hpp"
 #include "errors.hpp"
 #include "bignumint.hpp"
