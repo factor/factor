@@ -373,4 +373,12 @@ struct tuple : public object {
 	cell *data() const { return (cell *)(this + 1); }
 };
 
+struct data_root_range {
+	cell *start;
+	cell len;
+
+	explicit data_root_range(cell *start_, cell len_) :
+		start(start_), len(len_) {}
+};
+
 }
