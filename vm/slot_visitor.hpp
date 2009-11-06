@@ -43,15 +43,14 @@ template<typename Visitor> struct slot_visitor {
 
 	void visit_data_roots()
 	{
-		std::vector<cell>::const_iterator iter = parent->data_roots.begin();
-		std::vector<cell>::const_iterator end = parent->data_roots.end();
+		std::vector<data_root_range>::const_iterator iter = parent->data_roots.begin();
+		std::vector<data_root_range>::const_iterator end = parent->data_roots.end();
 
-		while(iter < end)
+		for(; iter < end; iter++)
 		{
-			cell start = *iter++;
-			cell len = *iter++;
-			for(cell index = 0; index < len; index++)
-				visit_handle((cell *)start + index);
+			data_root_range r = *iter;
+			for(cell index = 0; index < r.len; index++)
+				visit_handle(r.start + index);
 		}
 	}
 

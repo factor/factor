@@ -62,7 +62,7 @@ struct factor_vm
 	   allocates memory, it must wrap any references to the data and code
 	   heaps with data_root and code_root smart pointers, which register
 	   themselves here. See data_roots.hpp and code_roots.hpp */
-	std::vector<cell> data_roots;
+	std::vector<data_root_range> data_roots;
 	std::vector<cell> bignum_roots;
 	std::vector<code_root *> code_roots;
 
@@ -281,7 +281,7 @@ struct factor_vm
 	void primitive_minor_gc();
 	void primitive_full_gc();
 	void primitive_compact_gc();
-	void inline_gc(cell data_roots_base, cell data_roots_size);
+	void inline_gc(cell *data_roots_base, cell data_roots_size);
 	void primitive_enable_gc_events();
 	void primitive_disable_gc_events();
 	object *allot_object(header header, cell size);
