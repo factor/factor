@@ -129,9 +129,6 @@ HELP: c-string-error.
 HELP: ffi-error.
 { $error-description "Thrown by " { $link dlopen } " and " { $link dlsym } " if a problem occurs while loading a native library or looking up a symbol. See " { $link "alien" } "." } ;
 
-HELP: heap-scan-error.
-{ $error-description "Thrown if " { $link next-object } " is called outside of a " { $link begin-scan } "/" { $link end-scan } " pair." } ;
-
 HELP: undefined-symbol-error.
 { $error-description "Thrown if a previously-compiled " { $link alien-invoke } " call refers to a native library symbol which no longer exists." } ;
 
