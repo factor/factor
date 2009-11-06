@@ -229,14 +229,12 @@ DEFER: (d)
 : laplacian-betti ( basis1 basis2 basis3 -- n )
     laplacian-matrix null/rank drop ;
 
-: laplacian-kernel ( basis1 basis2 basis3 -- basis )
-    [ tuck ] dip
-    laplacian-matrix dup empty-matrix? [
-        2drop f
-    ] [
-        nullspace [
-            [ [ wedge (alt+) ] 2each ] with-terms
-        ] with map
+:: laplacian-kernel ( basis1 basis2 basis3 -- basis )
+    basis1 basis2 basis3 laplacian-matrix :> lap
+    lap empty-matrix? [ f ] [
+        lap nullspace [| x |
+            basis2 x [ [ wedge (alt+) ] 2each ] with-terms
+        ] map
     ] if ;
 
 : graded-triple ( seq n -- triple )

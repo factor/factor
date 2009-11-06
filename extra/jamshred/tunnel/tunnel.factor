@@ -63,9 +63,10 @@ CONSTANT: default-segment-radius 1
     #! valid values
     [ '[ _ clamp-length ] bi@ ] keep <slice> ;
 
-: nearer-segment ( segment segment oint -- segment )
-    #! return whichever of the two segments is nearer to the oint
-    [ 2dup ] dip tuck distance [ distance ] dip < -rot ? ;
+:: nearer-segment ( seg-a seg-b oint -- segment )
+    seg-a oint distance
+    seg-b oint distance <
+    seg-a seg-b ? ;
 
 : (find-nearest-segment) ( nearest next oint -- nearest ? )
     #! find the nearest of 'next' and 'nearest' to 'oint', and return
