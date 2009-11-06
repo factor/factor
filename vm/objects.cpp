@@ -83,9 +83,9 @@ struct object_become_visitor {
 	explicit object_become_visitor(slot_visitor<slot_become_visitor> *workhorse_) :
 		workhorse(workhorse_) {}
 
-	void operator()(cell obj)
+	void operator()(object *obj)
 	{
-		workhorse->visit_slots(tagged<object>(obj).untagged());
+		workhorse->visit_slots(obj);
 	}
 };
 
@@ -123,6 +123,7 @@ void factor_vm::primitive_become()
 	/* Since we may have introduced old->new references, need to revisit
 	all objects on a minor GC. */
 	data->mark_all_cards();
+	primitive_minor_gc();
 
 	/* If a word's definition quotation was in old_objects and the
 	   quotation in new_objects is not compiled, we might leak memory

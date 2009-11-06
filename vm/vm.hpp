@@ -40,10 +40,6 @@ struct factor_vm
 	unsigned int signal_fpu_status;
 	stack_frame *signal_callstack_top;
 
-	/* A heap walk allows useful things to be done, like finding all
-	   references to an object for debugging purposes. */
-	cell heap_scan_ptr;
-
 	/* GC is off during heap walking */
 	bool gc_off;
 
@@ -224,10 +220,8 @@ struct factor_vm
 	void primitive_data_room();
 	void begin_scan();
 	void end_scan();
-	void primitive_begin_scan();
-	cell next_object();
-	void primitive_next_object();
-	void primitive_end_scan();
+	cell instances(cell type);
+	void primitive_all_instances();
 	cell find_all_words();
 
 	template<typename Generation, typename Iterator>
@@ -236,7 +230,7 @@ struct factor_vm
 		cell obj = gen->first_object();
 		while(obj)
 		{
-			iterator(obj);
+			iterator((object *)obj);
 			obj = gen->next_object_after(obj);
 		}
 	}
@@ -589,11 +583,11 @@ struct factor_vm
 	/* Every object has a regular representation in the runtime, which makes GC
 	much simpler. Every slot of the object until binary_payload_start is a pointer
 	to some other object. */
-	template<typename Iterator> void do_slots(cell obj, Iterator &iter)
+	template<typename Iterator> void do_slots(object *obj, Iterator &iter)
 	{
-		cell scan = obj;
-		cell payload_start = ((object *)obj)->binary_payload_start();
-		cell end = obj + payload_start;
+		cell scan = (cell)obj;
+		cell payload_start = obj->binary_payload_start();
+		cell end = scan + payload_start;
 
 		scan += sizeof(cell);
 

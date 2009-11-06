@@ -13,11 +13,8 @@ ARTICLE: "tools.memory" "Object memory tools"
     data-room
     code-room
 }
-"There are a pair of combinators, analogous to " { $link each } " and " { $link filter } ", which operate on the entire collection of objects in the object heap:"
-{ $subsections
-    each-object
-    instances
-}
+"A combinator to get objects from the heap:"
+{ $subsections instances }
 "You can check an object's the heap memory usage:"
 { $subsections size }
 "The garbage collector can be invoked manually:"
