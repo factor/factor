@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel math sequences ;
+USING: accessors arrays kernel math math.order sequences
+sequences.private ;
 IN: sequences.merged
 
 TUPLE: merged seqs ;
@@ -10,18 +11,19 @@ C: <merged> merged
 : <3merged> ( seq1 seq2 seq3 -- merged ) 3array <merged> ;
 
 : merge ( seqs -- seq )
-    dup <merged> swap first like ;
+    [ <merged> ] keep first like ;
 
 : 2merge ( seq1 seq2 -- seq )
-    dupd <2merged> swap like ;
+    [ <2merged> ] 2keep drop like ;
 
 : 3merge ( seq1 seq2 seq3 -- seq )
-    pick [ <3merged> ] dip like ;
+    [ <3merged> ] 3keep 2drop like ;
 
-M: merged length seqs>> [ length ] map sum ;
+M: merged length
+    seqs>> [ [ length ] [ min ] map-reduce ] [ length ] bi * ;
 
 M: merged virtual@ ( n seq -- n' seq' )
-    seqs>> [ length /mod ] [ nth ] bi ;
+    seqs>> [ length /mod ] [ nth-unsafe ] bi ;
 
 M: merged virtual-seq ( merged -- seq ) [ ] { } map-as ;
 
