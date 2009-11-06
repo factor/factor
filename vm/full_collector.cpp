@@ -116,6 +116,10 @@ void factor_vm::collect_sweep_impl()
 	data->tenured->sweep();
 	update_code_roots_for_sweep();
 	current_gc->event->ended_data_sweep();
+
+	current_gc->event->started_code_sweep();
+	code->allocator->sweep();
+	current_gc->event->ended_code_sweep();
 }
 
 void factor_vm::collect_full(bool trace_contexts_p)

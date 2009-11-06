@@ -102,6 +102,7 @@ struct factor_vm
 	void primitive_set_datastack();
 	void primitive_set_retainstack();
 	void primitive_check_datastack();
+	void primitive_load_locals();
 
 	template<typename Iterator> void iterate_active_frames(Iterator &iter)
 	{
@@ -116,15 +117,18 @@ struct factor_vm
 	}
 
 	// run
-	void primitive_getenv();
-	void primitive_setenv();
 	void primitive_exit();
 	void primitive_micros();
 	void primitive_sleep();
 	void primitive_set_slot();
-	void primitive_load_locals();
+
+	// objects
+	void primitive_special_object();
+	void primitive_set_special_object();
+	cell object_size(cell tagged);
 	cell clone_object(cell obj_);
 	void primitive_clone();
+	void primitive_become();
 
 	// profiler
 	void init_profiler();
@@ -225,15 +229,27 @@ struct factor_vm
 	void primitive_next_object();
 	void primitive_end_scan();
 	cell find_all_words();
-	cell object_size(cell tagged);
+
+	template<typename Generation, typename Iterator>
+	inline void each_object(Generation *gen, Iterator &iterator)
+	{
+		cell obj = gen->first_object();
+		while(obj)
+		{
+			iterator(obj);
+			obj = gen->next_object_after(obj);
+		}
+	}
 
 	template<typename Iterator> inline void each_object(Iterator &iterator)
 	{
-		begin_scan();
-		cell obj;
-		while(to_boolean(obj = next_object()))
-			iterator(obj);
-		end_scan();
+		gc_off = true;
+
+		each_object(data->tenured,iterator);
+		each_object(data->aging,iterator);
+		each_object(data->nursery,iterator);
+
+		gc_off = false;
 	}
 
 	/* the write barrier must be called any time we are potentially storing a
@@ -242,6 +258,13 @@ struct factor_vm
 	{
 		*(char *)(cards_offset + ((cell)slot_ptr >> card_bits)) = card_mark_mask;
 		*(char *)(decks_offset + ((cell)slot_ptr >> deck_bits)) = card_mark_mask;
+	}
+
+	inline void write_barrier(object *obj, cell size)
+	{
+		char *start = (char *)obj;
+		for(cell offset = 0; offset < size; offset += card_size)
+			write_barrier((cell *)(start + offset));
 	}
 
 	// gc
@@ -264,7 +287,6 @@ struct factor_vm
 	void primitive_minor_gc();
 	void primitive_full_gc();
 	void primitive_compact_gc();
-	void primitive_become();
 	void inline_gc(cell *data_roots_base, cell data_roots_size);
 	void primitive_enable_gc_events();
 	void primitive_disable_gc_events();
