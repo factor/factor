@@ -1,4 +1,4 @@
-USING: tools.test sequence-parser unicode.categories kernel
+USING: tools.test sequences.parser unicode.categories kernel
 accessors ;
 IN: sequences.parser.tests
 

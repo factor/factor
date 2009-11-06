@@ -29,7 +29,7 @@ USING: arrays kernel math roman roman.private sequences tools.test ;
 [ 3444 ] [ 3444 >roman roman> ] unit-test
 [ 3999 ] [ 3999 >roman roman> ] unit-test
 [ 0 >roman ] must-fail
-[ 4000 >roman ] must-fail
+[ 40000 >roman ] must-fail
 [ "vi" ] [ "iii" "iii"  roman+ ] unit-test
 [ "viii" ] [ "x" "ii"  roman- ] unit-test
 [ "ix" ] [ "iii" "iii"  roman* ] unit-test
