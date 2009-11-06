@@ -246,7 +246,7 @@ struct code_block
 
 	cell size() const
 	{
-		return header >> 3;
+		return header & ~7;
 	}
 
 	void *xt() const

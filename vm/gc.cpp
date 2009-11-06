@@ -187,7 +187,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 		collect_growing_heap(requested_bytes,trace_contexts_p);
 		break;
 	default:
-		critical_error("Bad GC op\n",current_gc->op);
+		critical_error("Bad GC op",current_gc->op);
 		break;
 	}
 
