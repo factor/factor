@@ -281,7 +281,7 @@ struct factor_vm
 	void primitive_minor_gc();
 	void primitive_full_gc();
 	void primitive_compact_gc();
-	void inline_gc(cell *data_roots_base, cell data_roots_size);
+	void inline_gc(cell data_roots_base, cell data_roots_size);
 	void primitive_enable_gc_events();
 	void primitive_disable_gc_events();
 	object *allot_object(header header, cell size);

@@ -218,18 +218,18 @@ void factor_vm::primitive_compact_gc()
 		true /* trace contexts? */);
 }
 
-void factor_vm::inline_gc(cell *data_roots_base, cell data_roots_size)
+void factor_vm::inline_gc(cell data_roots_base, cell data_roots_size)
 {
-	for(cell i = 0; i < data_roots_size; i++)
-		data_roots.push_back((cell)&data_roots_base[i]);
+	data_roots.push_back(data_roots_base);
+	data_roots.push_back(data_roots_size);
 
 	primitive_minor_gc();
 
-	for(cell i = 0; i < data_roots_size; i++)
-		data_roots.pop_back();
+	data_roots.pop_back();
+	data_roots.pop_back();
 }
 
-VM_C_API void inline_gc(cell *data_roots_base, cell data_roots_size, factor_vm *parent)
+VM_C_API void inline_gc(cell data_roots_base, cell data_roots_size, factor_vm *parent)
 {
 	parent->inline_gc(data_roots_base,data_roots_size);
 }
