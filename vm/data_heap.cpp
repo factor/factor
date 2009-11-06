@@ -245,10 +245,14 @@ cell factor_vm::instances(cell type)
 	each_object(accum);
 	cell object_count = accum.objects.size();
 
-	gc_off = true;
+	data_roots.push_back(accum.objects[0]);
+	data_roots.push_back(object_count);
+
 	array *objects = allot_array(object_count,false_object);
 	memcpy(objects->data(),&accum.objects[0],object_count * sizeof(cell));
-	gc_off = false;
+
+	data_roots.pop_back();
+	data_roots.pop_back();
 
 	return tag<array>(objects);
 }
