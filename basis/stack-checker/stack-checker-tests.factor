@@ -319,7 +319,7 @@ FORGET: erg's-inference-bug
 [ [ bad-recursion-3 ] infer ] must-fail
 FORGET: bad-recursion-3
 
-: bad-recursion-4 ( -- ) 4 [ dup call roll ] times ; inline recursive
+: bad-recursion-4 ( -- ) 4 [ dup call [ rot ] dip swap ] times ; inline recursive
 [ [ [ ] [ 1 2 3 ] over dup bad-recursion-4 ] infer ] must-fail
 
 : bad-recursion-5 ( obj quot: ( -- ) -- ) dup call swap bad-recursion-5 ; inline recursive
