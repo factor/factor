@@ -699,7 +699,7 @@ M: bad-executable summary
 \ lookup-method { object array } { word } define-primitive
 
 \ reset-dispatch-stats { } { } define-primitive
-\ dispatch-stats { } { array } define-primitive
+\ dispatch-stats { } { byte-array } define-primitive
 
 \ optimized? { word } { object } define-primitive
 
