@@ -20,11 +20,12 @@ C: <merged> merged
     [ <3merged> ] 3keep 2drop like ;
 
 M: merged length
-    seqs>> [ [ length ] [ min ] map-reduce ] [ length ] bi * ;
+    seqs>> [ [ length ] [ min ] map-reduce ] [ length ] bi * ; inline
 
 M: merged virtual@ ( n seq -- n' seq' )
-    seqs>> [ length /mod ] [ nth-unsafe ] bi ;
+    seqs>> [ length /mod ] [ nth-unsafe ] bi ; inline
 
-M: merged virtual-seq ( merged -- seq ) [ ] { } map-as ;
+M: merged virtual-exemplar ( merged -- seq )
+    seqs>> [ f ] [ first ] if-empty ; inline
 
 INSTANCE: merged virtual-sequence
