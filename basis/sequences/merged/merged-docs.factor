@@ -20,7 +20,7 @@ HELP: merged
 
 HELP: <merged> ( seqs -- merged )
 { $values { "seqs" "a sequence of sequences to merge" } { "merged" "a virtual sequence" } }
-{ $description "Creates an instance of the " { $link merged } " virtual sequence." }
+{ $description "Creates an instance of the " { $link merged } " virtual sequence. The length of the created virtual sequences is the minimum length of the input sequences times the number of input sequences." }
 { $see-also <2merged> <3merged> merge } ;
 
 HELP: <2merged> ( seq1 seq2 -- merged )
