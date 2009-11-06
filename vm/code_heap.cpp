@@ -135,12 +135,6 @@ struct code_heap_relocator {
 	}
 };
 
-void factor_vm::relocate_code_heap()
-{
-	code_heap_relocator relocator(this);
-	code->allocator->sweep(relocator);
-}
-
 void factor_vm::primitive_modify_code_heap()
 {
 	data_root<array> alist(dpop(),this);
