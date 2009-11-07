@@ -1,18 +1,21 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry fry.private generalizations kernel
-locals.types make sequences ;
+locals.types sequences ;
 IN: locals.fry
 
 ! Support for mixing locals with fry
 
 M: let count-inputs body>> count-inputs ;
-
 M: lambda count-inputs body>> count-inputs ;
 
-M: lambda deep-fry
-    clone [ shallow-fry swap ] change-body
-    [ [ vars>> length ] keep '[ _ _ mnswap @ ] , ] [ drop [ncurry] % ] 2bi ;
+M: lambda fry
+    clone [ [ count-inputs ] [ fry ] bi ] change-body
+    [ [ vars>> length ] keep '[ _ _ mnswap _ call ] ]
+    [ drop [ncurry] [ call ] compose ] 2bi ;
 
-M: let deep-fry
-    clone [ fry '[ @ call ] ] change-body , ;
+M: let fry
+    clone [ fry ] change-body ;
+
+INSTANCE: lambda fried
+INSTANCE: let    fried
