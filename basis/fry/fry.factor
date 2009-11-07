@@ -8,7 +8,7 @@ IN: fry
 
 ERROR: >r/r>-in-fry-error ;
 
-DEFER: fry
+GENERIC: fry ( quot -- quot' )
 
 <PRIVATE
 
@@ -24,8 +24,10 @@ M: callable count-inputs [ count-inputs ] map-sum ;
 M: fry-specifier count-inputs drop 1 ;
 M: object count-inputs drop 0 ;
 
+MIXIN: fried
 PREDICATE: fried-callable < callable
     count-inputs 0 > ;
+INSTANCE: fried-callable fried
 
 : convert-curry ( quot -- quot' )
     [ [ [ ] curry compose ] ] [
@@ -42,6 +44,15 @@ PREDICATE: fried-callable < callable
     [ dup \ @ = [ drop [ _ @ ] ] [ 1quotation ] if ] map concat
     { _ } split convert-curries
     spread>quot ;
+
+: [ncurry] ( quot n -- quot )
+    {
+        { 0 [ [ ] ] }
+        { 1 [ [ curry ] ] }
+        { 2 [ [ 2curry ] ] }
+        { 3 [ [ 3curry ] ] }
+        [ \ curry <repetition> ]
+    } case curry ;
 
 : [ndip] ( quot n -- quot' )
     {
@@ -85,13 +96,13 @@ TUPLE: dredge-fry-state
     [ in-quot>> swap tail-slice ] [ quot>> ] bi push-all ; inline recursive
 
 : dredge-fry ( n dredge-fry -- )
-    2dup in-quot>> [ fried-callable? ] find-from
+    2dup in-quot>> [ fried? ] find-from
     [ (dredge-fry-subquot) ]
     [ drop (dredge-fry-simple) ] if* ; inline recursive
 
 PRIVATE>
 
-: fry ( quot -- quot' )
+M: callable fry ( quot -- quot' )
     0 swap <dredge-fry>
     [ dredge-fry ] [
         [ prequot>> >quotation ]
