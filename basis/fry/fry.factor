@@ -29,30 +29,14 @@ PREDICATE: fried-callable < callable
     count-inputs 0 > ;
 INSTANCE: fried-callable fried
 
-: convert-curry ( quot -- quot' )
-    [ [ [ ] curry compose ] ] [
-        dup first \ @ =
-        [ rest >quotation \ compose \ compose [ ] 3sequence ]
-        [ >quotation \ curry \ compose [ ] 3sequence ] if
-    ] if-empty ;
-
-: convert-curries ( seq -- seq' )
-    unclip-slice [ [ convert-curry ] map ] [ >quotation 1quotation ] bi* prefix ;
-
-: shallow-fry ( quot -- quot' )
-    check-fry
-    [ dup \ @ = [ drop [ _ @ ] ] [ 1quotation ] if ] map concat
-    { _ } split convert-curries
-    spread>quot ;
-
-: [ncurry] ( quot n -- quot )
+: [ncurry] ( n -- quot )
     {
         { 0 [ [ ] ] }
         { 1 [ [ curry ] ] }
         { 2 [ [ 2curry ] ] }
         { 3 [ [ 3curry ] ] }
-        [ \ curry <repetition> ]
-    } case curry ;
+        [ \ curry <repetition> >quotation ]
+    } case ;
 
 : [ndip] ( quot n -- quot' )
     {
@@ -62,6 +46,39 @@ INSTANCE: fried-callable fried
         { 3 [ \ 3dip [ ] 2sequence ] }
         [ [ \ dip [ ] 2sequence ] times ]
     } case ;
+
+: (make-curry) ( tail quot -- quot' )
+    swap [ncurry] curry [ compose ] compose ;
+
+: make-compose ( consecutive quot -- consecutive quot' )
+    [
+        [ [ ] ]
+        [ [ncurry] ] if-zero
+    ] [
+        [ [ compose ] ]
+        [ [ compose compose ] curry ] if-empty
+    ] bi* compose
+    0 swap ;
+
+: make-curry ( consecutive quot -- consecutive' quot' )
+    [ 1 + ] dip
+    [ [ ] ] [ (make-curry) 0 swap ] if-empty ;
+
+: convert-curry ( consecutive quot -- consecutive' quot' )
+    [ [ ] make-curry ] [
+        dup first \ @ =
+        [ rest >quotation make-compose ]
+        [ >quotation make-curry ] if
+    ] if-empty ;
+
+: convert-curries ( seq -- tail seq' )
+    unclip-slice [ 0 swap [ convert-curry ] map ] [ >quotation 1quotation ] bi* prefix ;
+
+: shallow-fry ( quot -- quot' )
+    check-fry
+    [ dup \ @ = [ drop [ _ @ ] ] [ 1quotation ] if ] map concat
+    { _ } split convert-curries
+    spread>quot swap [ [ ] (make-curry) compose ] unless-zero ;
 
 DEFER: dredge-fry
 
