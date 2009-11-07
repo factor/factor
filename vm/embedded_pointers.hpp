@@ -64,6 +64,75 @@ static const cell rel_indirect_arm_mask = 0xfff;
 static const cell rel_relative_arm_3_mask = 0xffffff;
 
 /* code relocation table consists of a table of entries for each fixup */
-typedef u32 relocation_entry;
+struct relocation_entry {
+	u32 value;
+
+	relocation_entry(u32 value_) : value(value_) {}
+
+	relocation_entry(relocation_type rel_type,
+		relocation_class rel_class,
+		cell offset)
+	{
+		value = (rel_type << 28) | (rel_class << 24) | offset;
+	}
+
+	relocation_type rel_type()
+	{
+		return (relocation_type)((value & 0xf0000000) >> 28);
+	}
+
+	relocation_class rel_class()
+	{
+		return (relocation_class)((value & 0x0f000000) >> 24);
+	}
+
+	cell rel_offset()
+	{
+		return (value & 0x00ffffff);
+	}
+
+	int number_of_parameters()
+	{
+		switch(rel_type())
+		{
+		case RT_PRIMITIVE:
+		case RT_XT:
+		case RT_XT_PIC:
+		case RT_XT_PIC_TAIL:
+		case RT_IMMEDIATE:
+		case RT_HERE:
+		case RT_UNTAGGED:
+		case RT_VM:
+			return 1;
+		case RT_DLSYM:
+			return 2;
+		case RT_THIS:
+		case RT_CONTEXT:
+		case RT_MEGAMORPHIC_CACHE_HITS:
+		case RT_CARDS_OFFSET:
+		case RT_DECKS_OFFSET:
+			return 0;
+		default:
+			critical_error("Bad rel type",rel_type());
+			return -1; /* Can't happen */
+		}
+	}
+};
+
+struct embedded_pointer {
+	cell rel_class;
+	cell pointer;
+
+	embedded_pointer(cell rel_class_, cell pointer_) :
+		rel_class(rel_class_), pointer(pointer_) {}
+
+	fixnum load_address_2_2();
+	fixnum load_address_masked(cell mask, fixnum shift);
+	fixnum load_address();
+
+	void store_address_2_2(fixnum value);
+	void store_address_masked(fixnum value, cell mask, fixnum shift);
+	void store_address(fixnum value);
+};
 
 }

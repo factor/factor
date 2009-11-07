@@ -32,10 +32,10 @@ void jit::emit_relocation(cell code_template_)
 		cell rel_type = array_nth(code_template.untagged(),i + 1);
 		cell offset = array_nth(code_template.untagged(),i + 2);
 
-		relocation_entry new_entry
-			= (untag_fixnum(rel_type) << 28)
-			| (untag_fixnum(rel_class) << 24)
-			| ((code.count + untag_fixnum(offset)));
+		relocation_entry new_entry(
+			(relocation_type)untag_fixnum(rel_type),
+			(relocation_class)untag_fixnum(rel_class),
+			code.count + untag_fixnum(offset));
 		relocation.append_bytes(&new_entry,sizeof(relocation_entry));
 	}
 }

@@ -8,14 +8,18 @@ template<typename Visitor> struct slot_visitor {
 	explicit slot_visitor<Visitor>(factor_vm *parent_, Visitor visitor_) :
 		parent(parent_), visitor(visitor_) {}
 
-	void visit_handle(cell *handle)
+	cell visit_pointer(cell pointer)
 	{
-		cell pointer = *handle;
-		if(immediate_p(pointer)) return;
+		if(immediate_p(pointer)) return pointer;
 
 		object *untagged = untag<object>(pointer);
 		untagged = visitor(untagged);
-		*handle = RETAG(untagged,TAG(pointer));
+		return RETAG(untagged,TAG(pointer));
+	}
+
+	void visit_handle(cell *handle)
+	{
+		*handle = visit_pointer(*handle);
 	}
 
 	void visit_slots(object *ptr, cell payload_start)

@@ -3,51 +3,9 @@
 namespace factor
 {
 
-relocation_type factor_vm::relocation_type_of(relocation_entry r)
-{
-	return (relocation_type)((r & 0xf0000000) >> 28);
-}
-
-relocation_class factor_vm::relocation_class_of(relocation_entry r)
-{
-	return (relocation_class)((r & 0x0f000000) >> 24);
-}
-
-cell factor_vm::relocation_offset_of(relocation_entry r)
-{
-	return (r & 0x00ffffff);
-}
-
 void factor_vm::flush_icache_for(code_block *block)
 {
 	flush_icache((cell)block,block->size());
-}
-
-int factor_vm::number_of_parameters(relocation_type type)
-{
-	switch(type)
-	{
-	case RT_PRIMITIVE:
-	case RT_XT:
-	case RT_XT_PIC:
-	case RT_XT_PIC_TAIL:
-	case RT_IMMEDIATE:
-	case RT_HERE:
-	case RT_UNTAGGED:
-	case RT_VM:
-		return 1;
-	case RT_DLSYM:
-		return 2;
-	case RT_THIS:
-	case RT_CONTEXT:
-	case RT_MEGAMORPHIC_CACHE_HITS:
-	case RT_CARDS_OFFSET:
-	case RT_DECKS_OFFSET:
-		return 0;
-	default:
-		critical_error("Bad rel type",type);
-		return -1; /* Can't happen */
-	}
 }
 
 void *factor_vm::object_xt(cell obj)
@@ -148,11 +106,11 @@ cell factor_vm::compute_relocation(relocation_entry rel, cell index, code_block 
 {
 	array *literals = (to_boolean(compiled->literals)
 		? untag<array>(compiled->literals) : NULL);
-	cell offset = relocation_offset_of(rel) + (cell)compiled->xt();
+	cell offset = rel.rel_offset() + (cell)compiled->xt();
 
 #define ARG array_nth(literals,index)
 
-	switch(relocation_type_of(rel))
+	switch(rel.rel_type())
 	{
 	case RT_PRIMITIVE:
 		return (cell)primitives[untag_fixnum(ARG)];
@@ -186,7 +144,7 @@ cell factor_vm::compute_relocation(relocation_entry rel, cell index, code_block 
 	case RT_DECKS_OFFSET:
 		return decks_offset;
 	default:
-		critical_error("Bad rel type",rel);
+		critical_error("Bad rel type",rel.rel_type());
 		return 0; /* Can't happen */
 	}
 
@@ -206,72 +164,8 @@ template<typename Iterator> void factor_vm::iterate_relocations(code_block *comp
 		{
 			relocation_entry rel = relocation->data<relocation_entry>()[i];
 			iter(rel,index,compiled);
-			index += number_of_parameters(relocation_type_of(rel));			
+			index += rel.number_of_parameters();
 		}
-	}
-}
-
-/* Store a 32-bit value into a PowerPC LIS/ORI sequence */
-void factor_vm::store_address_2_2(cell *ptr, cell value)
-{
-	ptr[-1] = ((ptr[-1] & ~0xffff) | ((value >> 16) & 0xffff));
-	ptr[ 0] = ((ptr[ 0] & ~0xffff) | (value & 0xffff));
-}
-
-/* Store a value into a bitfield of a PowerPC instruction */
-void factor_vm::store_address_masked(cell *ptr, fixnum value, cell mask, fixnum shift)
-{
-	/* This is unaccurate but good enough */
-	fixnum test = (fixnum)mask >> 1;
-	if(value <= -test || value >= test)
-		critical_error("Value does not fit inside relocation",0);
-
-	*ptr = ((*ptr & ~mask) | ((value >> shift) & mask));
-}
-
-/* Perform a fixup on a code block */
-void factor_vm::store_address_in_code_block(cell klass, cell offset, fixnum absolute_value)
-{
-	fixnum relative_value = absolute_value - offset;
-
-	switch(klass)
-	{
-	case RC_ABSOLUTE_CELL:
-		*(cell *)offset = absolute_value;
-		break;
-	case RC_ABSOLUTE:
-		*(u32*)offset = absolute_value;
-		break;
-	case RC_RELATIVE:
-		*(u32*)offset = relative_value - sizeof(u32);
-		break;
-	case RC_ABSOLUTE_PPC_2_2:
-		store_address_2_2((cell *)offset,absolute_value);
-		break;
-	case RC_ABSOLUTE_PPC_2:
-		store_address_masked((cell *)offset,absolute_value,rel_absolute_ppc_2_mask,0);
-		break;
-	case RC_RELATIVE_PPC_2:
-		store_address_masked((cell *)offset,relative_value,rel_relative_ppc_2_mask,0);
-		break;
-	case RC_RELATIVE_PPC_3:
-		store_address_masked((cell *)offset,relative_value,rel_relative_ppc_3_mask,0);
-		break;
-	case RC_RELATIVE_ARM_3:
-		store_address_masked((cell *)offset,relative_value - sizeof(cell) * 2,
-			rel_relative_arm_3_mask,2);
-		break;
-	case RC_INDIRECT_ARM:
-		store_address_masked((cell *)offset,relative_value - sizeof(cell),
-			rel_indirect_arm_mask,0);
-		break;
-	case RC_INDIRECT_ARM_PC:
-		store_address_masked((cell *)offset,relative_value - sizeof(cell) * 2,
-			rel_indirect_arm_mask,0);
-		break;
-	default:
-		critical_error("Bad rel class",klass);
-		break;
 	}
 }
 
@@ -282,12 +176,11 @@ struct literal_references_updater {
 
 	void operator()(relocation_entry rel, cell index, code_block *compiled)
 	{
-		if(parent->relocation_type_of(rel) == RT_IMMEDIATE)
+		if(rel.rel_type() == RT_IMMEDIATE)
 		{
-			cell offset = parent->relocation_offset_of(rel) + (cell)(compiled + 1);
+			embedded_pointer ptr(rel.rel_class(),rel.rel_offset() + (cell)(compiled + 1));
 			array *literals = untag<array>(compiled->literals);
-			fixnum absolute_value = array_nth(literals,index);
-			parent->store_address_in_code_block(parent->relocation_class_of(rel),offset,absolute_value);
+			ptr.store_address(array_nth(literals,index));
 		}
 	}
 };
@@ -313,9 +206,8 @@ void factor_vm::relocate_code_block_step(relocation_entry rel, cell index, code_
 		tagged<byte_array>(compiled->relocation).untag_check(this);
 #endif
 
-	store_address_in_code_block(relocation_class_of(rel),
-		relocation_offset_of(rel) + (cell)compiled->xt(),
-		compute_relocation(rel,index,compiled));
+	embedded_pointer ptr(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
+	ptr.store_address(compute_relocation(rel,index,compiled));
 }
 
 struct word_references_updater {
@@ -324,7 +216,7 @@ struct word_references_updater {
 	explicit word_references_updater(factor_vm *parent_) : parent(parent_) {}
 	void operator()(relocation_entry rel, cell index, code_block *compiled)
 	{
-		relocation_type type = parent->relocation_type_of(rel);
+		relocation_type type = rel.rel_type();
 		if(type == RT_XT || type == RT_XT_PIC || type == RT_XT_PIC_TAIL)
 			parent->relocate_code_block_step(rel,index,compiled);
 	}
@@ -363,7 +255,8 @@ struct literal_and_word_references_updater {
 
 	void operator()(relocation_entry rel, cell index, code_block *compiled)
 	{
-		relocation_type type = parent->relocation_type_of(rel);
+		relocation_type type = rel.rel_type();
+
 		switch(type)
 		{
 		case RT_IMMEDIATE:
@@ -425,13 +318,12 @@ void factor_vm::fixup_labels(array *labels, code_block *compiled)
 
 	for(i = 0; i < size; i += 3)
 	{
-		cell klass = untag_fixnum(array_nth(labels,i));
+		cell rel_class = untag_fixnum(array_nth(labels,i));
 		cell offset = untag_fixnum(array_nth(labels,i + 1));
 		cell target = untag_fixnum(array_nth(labels,i + 2));
 
-		store_address_in_code_block(klass,
-			offset + (cell)(compiled + 1),
-			target + (cell)(compiled + 1));
+		embedded_pointer ptr(rel_class,offset + (cell)(compiled + 1));
+		ptr.store_address(target + (cell)(compiled + 1));
 	}
 }
 
