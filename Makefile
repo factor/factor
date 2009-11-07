@@ -39,13 +39,14 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/byte_arrays.o \
 	vm/callbacks.o \
 	vm/callstack.o \
-	vm/code_block.o \
+	vm/code_blocks.o \
 	vm/code_heap.o \
 	vm/compaction.o \
 	vm/contexts.o \
 	vm/data_heap.o \
 	vm/debug.o \
 	vm/dispatch.o \
+	vm/embedded_pointers.o \
 	vm/errors.o \
 	vm/factor.o \
 	vm/free_list.o \

@@ -485,11 +485,7 @@ struct factor_vm
 	void primitive_fclose();
 
 	//code_block
-	relocation_type relocation_type_of(relocation_entry r);
-	relocation_class relocation_class_of(relocation_entry r);
-	cell relocation_offset_of(relocation_entry r);
 	void flush_icache_for(code_block *block);
-	int number_of_parameters(relocation_type type);
 	void *object_xt(cell obj);
 	void *xt_pic(word *w, cell tagged_quot);
 	void *word_xt_pic(word *w);
@@ -498,9 +494,6 @@ struct factor_vm
 	void *get_rel_symbol(array *literals, cell index);
 	cell compute_relocation(relocation_entry rel, cell index, code_block *compiled);
 	template<typename Iterator> void iterate_relocations(code_block *compiled, Iterator &iter);
-	void store_address_2_2(cell *ptr, cell value);
-	void store_address_masked(cell *ptr, fixnum value, cell mask, fixnum shift);
-	void store_address_in_code_block(cell klass, cell offset, fixnum absolute_value);
 	void update_literal_references(code_block *compiled);
 	void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled);
 	void update_word_references(code_block *compiled);
