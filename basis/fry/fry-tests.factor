@@ -1,5 +1,5 @@
 ! (c)2009 Slava Pestov, Eduardo Cavazos, Joe Groff bsd license
-USING: new.fry tools.test math prettyprint kernel io arrays
+USING: fry tools.test math prettyprint kernel io arrays
 sequences eval accessors ;
 IN: fry.tests
 
@@ -77,7 +77,7 @@ SYMBOLS: a b c d e f g h ;
     3 '[ [ [ _ 1array ] call 1array ] call 1array ] call
 ] unit-test
 
-[ "USING: new.fry locals.backend ; f '[ load-local _ ]" eval( -- quot ) ]
+[ "USING: fry locals.backend ; f '[ load-local _ ]" eval( -- quot ) ]
 [ error>> >r/r>-in-fry-error? ] must-fail-with
 
 [ { { "a" 1 } { "b" 2 } { "c" 3 } { "d" 4 } } ] [
