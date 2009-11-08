@@ -8,7 +8,7 @@ strings accessors destructors ;
     [ length ] dip buffer-reset ;
 
 : string>buffer ( string -- buffer )
-    dup length <buffer> tuck buffer-set ;
+    dup length <buffer> [ buffer-set ] keep ;
 
 : buffer-read-all ( buffer -- byte-array )
     [ [ pos>> ] [ ptr>> ] bi <displaced-alien> ]

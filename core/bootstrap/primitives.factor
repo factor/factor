@@ -340,7 +340,6 @@ tuple
     { "swapd" "kernel" (( x y z -- y x z )) }
     { "nip" "kernel" (( x y -- y )) }
     { "2nip" "kernel" (( x y z -- z )) }
-    { "tuck" "kernel" (( x y -- y x y )) }
     { "over" "kernel" (( x y -- x y x )) }
     { "pick" "kernel" (( x y z -- x y z x )) }
     { "swap" "kernel" (( x y -- y x )) }
@@ -473,9 +472,7 @@ tuple
     { "resize-array" "arrays" (( n array -- newarray )) }
     { "resize-string" "strings" (( n str -- newstr )) }
     { "<array>" "arrays" (( n elt -- array )) }
-    { "begin-scan" "memory" (( -- )) }
-    { "next-object" "memory" (( -- obj )) }
-    { "end-scan" "memory" (( -- )) }
+    { "all-instances" "memory" (( -- array )) }
     { "size" "memory" (( obj -- n )) }
     { "die" "kernel" (( -- )) }
     { "(fopen)" "io.streams.c" (( path mode -- alien )) }

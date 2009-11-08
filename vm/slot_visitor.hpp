@@ -11,7 +11,6 @@ template<typename Visitor> struct slot_visitor {
 	void visit_handle(cell *handle)
 	{
 		cell pointer = *handle;
-
 		if(immediate_p(pointer)) return;
 
 		object *untagged = untag<object>(pointer);
@@ -44,11 +43,15 @@ template<typename Visitor> struct slot_visitor {
 
 	void visit_data_roots()
 	{
-		std::vector<cell>::const_iterator iter = parent->data_roots.begin();
-		std::vector<cell>::const_iterator end = parent->data_roots.end();
+		std::vector<data_root_range>::const_iterator iter = parent->data_roots.begin();
+		std::vector<data_root_range>::const_iterator end = parent->data_roots.end();
 
 		for(; iter < end; iter++)
-			visit_handle((cell *)(*iter));
+		{
+			data_root_range r = *iter;
+			for(cell index = 0; index < r.len; index++)
+				visit_handle(r.start + index);
+		}
 	}
 
 	void visit_bignum_roots()

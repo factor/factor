@@ -32,6 +32,23 @@ template<typename Block> struct bump_allocator {
 	{
 		return end - here;
 	}
+
+	cell next_object_after(cell scan)
+	{
+		cell size = ((Block *)scan)->size();
+		if(scan + size < here)
+			return scan + size;
+		else
+			return 0;
+	}
+
+	cell first_object()
+	{
+		if(start != here)
+			return start;
+		else
+			return 0;
+	}
 };
 
 }

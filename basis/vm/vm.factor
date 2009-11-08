@@ -3,7 +3,7 @@
 USING: classes.struct alien.c-types alien.syntax ;
 IN: vm
 
-TYPEDEF: intptr_t cell
+TYPEDEF: uintptr_t cell
 C-TYPE: context
 
 STRUCT: zone

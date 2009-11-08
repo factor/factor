@@ -43,7 +43,6 @@ IN: stack-checker.known-words
     { swapd (( x y z -- y x z       )) }
     { nip   (( x y   -- y           )) }
     { 2nip  (( x y z -- z           )) }
-    { tuck  (( x y   -- y x y       )) }
     { over  (( x y   -- x y x       )) }
     { pick  (( x y z -- x y z x     )) }
     { swap  (( x y   -- y x         )) }
@@ -623,11 +622,7 @@ M: bad-executable summary
 \ <array> { integer object } { array } define-primitive
 \ <array> make-flushable
 
-\ begin-scan { } { } define-primitive
-
-\ next-object { } { object } define-primitive
-
-\ end-scan { } { } define-primitive
+\ all-instances { } { array } define-primitive
 
 \ size { object } { fixnum } define-primitive
 \ size make-flushable
@@ -704,7 +699,7 @@ M: bad-executable summary
 \ lookup-method { object array } { word } define-primitive
 
 \ reset-dispatch-stats { } { } define-primitive
-\ dispatch-stats { } { array } define-primitive
+\ dispatch-stats { } { byte-array } define-primitive
 
 \ optimized? { word } { object } define-primitive
 

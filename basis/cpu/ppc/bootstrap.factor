@@ -332,14 +332,6 @@ CONSTANT: rs-reg 14
 [
     3 ds-reg 0 LWZ
     4 ds-reg -4 LWZ
-    3 ds-reg 4 STWU
-    4 ds-reg -4 STW
-    3 ds-reg -8 STW
-] \ tuck define-sub-primitive
-
-[
-    3 ds-reg 0 LWZ
-    4 ds-reg -4 LWZ
     3 ds-reg -4 STW
     4 ds-reg 0 STW
 ] \ swap define-sub-primitive

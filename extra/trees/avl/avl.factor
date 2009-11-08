@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel generic math math.functions
-math.parser namespaces io sequences trees
+math.parser namespaces io sequences trees shuffle
 assocs parser accessors math.order prettyprint.custom ;
 IN: trees.avl
 

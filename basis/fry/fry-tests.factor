@@ -1,18 +1,41 @@
+! (c)2009 Slava Pestov, Eduardo Cavazos, Joe Groff bsd license
 USING: fry tools.test math prettyprint kernel io arrays
 sequences eval accessors ;
 IN: fry.tests
+
+SYMBOLS: a b c d e f g h ;
+
+[ [ 1 ] ] [ 1 '[ _ ] ] unit-test
+[ [ 1 ] ] [ [ 1 ] '[ @ ] ] unit-test
+[ [ 1 2 ] ] [ [ 1 ] [ 2 ] '[ @ @ ] ] unit-test
+
+[ [ 1 2 a ] ] [ 1 2 '[ _ _ a ] ] unit-test
+[ [ 1 2 ] ] [ 1 2 '[ _ _ ] ] unit-test
+[ [ a 1 2 ] ] [ 1 2 '[ a _ _ ] ] unit-test
+[ [ 1 2 a ] ] [ [ 1 ] [ 2 ] '[ @ @ a ] ] unit-test
+[ [ 1 a 2 b ] ] [ 1 2 '[ _ a _ b ] ] unit-test
+[ [ 1 a 2 b ] ] [ 1 [ 2 ] '[ _ a @ b ] ] unit-test
+[ [ a 1 b ] ] [ 1 '[ a _ b ] ] unit-test
+
+[ [ a 1 b ] ] [ [ 1 ] '[ a @ b ] ] unit-test
+[ [ a 1 2 ] ] [ [ 1 ] [ 2 ] '[ a @ @ ] ] unit-test
+
+[ [ a [ 1 ] b ] ] [ 1 '[ a [ _ ] b ] ] unit-test
+[ [ a 1 b [ c 2 d ] e 3 f ] ] [ 1 2 3 '[ a _ b [ c _ d ] e _ f ] ] unit-test
+[ [ a 1 b [ c 2 d [ e 3 f ] ] g 4 h ] ] [ 1 2 3 4 '[ a _ b [ c _ d [ e _ f ] ] g _ h ] ] unit-test
+[ [ a 1 b [ [ c 2 d ] e 3 f ] g 4 h ] ] [ 1 2 3 4 '[ a _ b [ [ c _ d ] e _ f ] g _ h ] ] unit-test
 
 [ [ 3 + ] ] [ 3 '[ _ + ] ] unit-test
 
 [ [ 1 3 + ] ] [ 1 3 '[ _ _ + ] ] unit-test
 
-[ [ 1 [ + ] call ] ] [ 1 [ + ] '[ _ @ ] ] unit-test
+[ [ 1 + ] ] [ 1 [ + ] '[ _ @ ] ] unit-test
 
-[ [ 1 [ + ] call . ] ] [ 1 [ + ] '[ _ @ . ] ] unit-test
+[ [ 1 + . ] ] [ 1 [ + ] '[ _ @ . ] ] unit-test
 
-[ [ [ + ] [ - ] [ call ] dip call ] ] [ [ + ] [ - ] '[ @ @ ] ] unit-test
+[ [ + - ] ] [ [ + ] [ - ] '[ @ @ ] ] unit-test
 
-[ [ "a" "b" [ write ] dip print ] ]
+[ [ "a" write "b" print ] ]
 [ "a" "b" '[ _ write _ print ] ] unit-test
 
 [ 1/2 ] [

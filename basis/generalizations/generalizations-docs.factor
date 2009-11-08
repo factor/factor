@@ -212,7 +212,7 @@ HELP: nwith
 } ;
 
 HELP: napply
-{ $values { "n" integer } }
+{ $values { "quot" quotation } { "n" integer } }
 { $description "A generalization of " { $link bi@ } " and " { $link tri@ } " that can work for any stack depth."
 } 
 { $examples
@@ -332,18 +332,6 @@ HELP: nappend-as
 
 { nappend nappend-as } related-words
 
-HELP: ntuck
-{ $values
-     { "n" integer }
-}
-{ $description "A generalization of " { $link tuck } " that can work for any stack depth. The top item will be copied and placed " { $snippet "n" } " items down on the stack." } ;
-
-HELP: nspin
-{ $values
-    { "n" integer }
-}
-{ $description "A generalization of " { $link spin } " that can work for any stack depth. The top " { $snippet "n" } " items will be reversed in order." } ;
-
 ARTICLE: "sequence-generalizations" "Generalized sequence operations"
 { $subsections
     narray
@@ -363,8 +351,6 @@ ARTICLE: "shuffle-generalizations" "Generalized shuffle words"
     -nrot
     nnip
     ndrop
-    ntuck
-    nspin
     mnswap
     nweave
 } ;

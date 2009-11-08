@@ -79,6 +79,9 @@ PRIVATE>
 : histogram ( seq -- hashtable )
     [ inc-at ] sequence>hashtable ;
 
+: sorted-histogram ( seq -- alist )
+    histogram >alist sort-values ;
+
 : collect-values ( seq quot: ( obj hashtable -- ) -- hash )
     '[ [ dup @ ] dip push-at ] sequence>hashtable ; inline
 

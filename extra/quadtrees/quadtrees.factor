@@ -1,5 +1,5 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: assocs kernel math.rectangles combinators accessors
+USING: assocs kernel math.rectangles combinators accessors locals
 math.vectors vectors sequences math combinators.short-circuit arrays fry ;
 IN: quadtrees
 
@@ -89,8 +89,9 @@ DEFER: in-rect*
 : insert ( value point tree -- )
     dup leaf?>> [ leaf-insert ] [ node-insert ] if ;
 
-: leaf-at-point ( point leaf -- value/f ? )
-    tuck point>> = [ value>> t ] [ drop f f ] if ;
+:: leaf-at-point ( point leaf -- value/f ? )
+    point leaf point>> =
+    [ leaf value>> t ] [ f f ] if ;
 
 : node-at-point ( point node -- value/f ? )
     descend at-point ;
@@ -103,15 +104,15 @@ DEFER: in-rect*
 : node-in-rect* ( values rect node -- values )
     [ (node-in-rect*) ] with each-quadrant ;
 
-: leaf-in-rect* ( values rect leaf -- values ) 
-    tuck { [ nip point>> ] [ point>> swap contains-point? ] } 2&&
-    [ value>> over push ] [ drop ] if ;
+:: leaf-in-rect* ( values rect leaf -- values ) 
+    { [ leaf point>> ] [ leaf point>> rect contains-point? ] } 0&&
+    [ values leaf value>> suffix! ] [ values ] if ;
 
 : in-rect* ( values rect tree -- values )
     dup leaf?>> [ leaf-in-rect* ] [ node-in-rect* ] if ;
 
-: leaf-erase ( point leaf -- )
-    tuck point>> = [ f >>point f >>value ] when drop ;
+:: leaf-erase ( point leaf -- )
+    point leaf point>> = [ leaf f >>point f >>value drop ] when ;
 
 : node-erase ( point node -- )
     descend erase ;

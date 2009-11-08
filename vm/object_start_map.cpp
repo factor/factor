@@ -79,11 +79,16 @@ void object_start_map::update_for_sweep(mark_bits<object> *state)
 {
 	for(cell index = 0; index < state->bits_size; index++)
 	{
-		u64 mask = state->marked[index];
+		cell mask = state->marked[index];
+#ifdef FACTOR_64
 		update_card_for_sweep(index * 4,      mask        & 0xffff);
 		update_card_for_sweep(index * 4 + 1, (mask >> 16) & 0xffff);
 		update_card_for_sweep(index * 4 + 2, (mask >> 32) & 0xffff);
 		update_card_for_sweep(index * 4 + 3, (mask >> 48) & 0xffff);
+#else
+		update_card_for_sweep(index * 2,      mask        & 0xffff);
+		update_card_for_sweep(index * 2 + 1, (mask >> 16) & 0xffff);
+#endif
 	}
 }
 

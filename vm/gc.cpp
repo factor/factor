@@ -187,7 +187,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 		collect_growing_heap(requested_bytes,trace_contexts_p);
 		break;
 	default:
-		critical_error("Bad GC op\n",current_gc->op);
+		critical_error("Bad GC op",current_gc->op);
 		break;
 	}
 
@@ -218,46 +218,11 @@ void factor_vm::primitive_compact_gc()
 		true /* trace contexts? */);
 }
 
-/* classes.tuple uses this to reshape tuples; tools.deploy.shaker uses this
-   to coalesce equal but distinct quotations and wrappers. */
-void factor_vm::primitive_become()
-{
-	array *new_objects = untag_check<array>(dpop());
-	array *old_objects = untag_check<array>(dpop());
-
-	cell capacity = array_capacity(new_objects);
-	if(capacity != array_capacity(old_objects))
-		critical_error("bad parameters to become",0);
-
-	cell i;
-
-	for(i = 0; i < capacity; i++)
-	{
-		tagged<object> old_obj(array_nth(old_objects,i));
-		tagged<object> new_obj(array_nth(new_objects,i));
-
-		if(old_obj != new_obj)
-			old_obj->h.forward_to(new_obj.untagged());
-	}
-
-	primitive_full_gc();
-
-	/* If a word's definition quotation was in old_objects and the
-	   quotation in new_objects is not compiled, we might leak memory
-	   by referencing the old quotation unless we recompile all
-	   unoptimized words. */
-	compile_all_words();
-}
-
 void factor_vm::inline_gc(cell *data_roots_base, cell data_roots_size)
 {
-	for(cell i = 0; i < data_roots_size; i++)
-		data_roots.push_back((cell)&data_roots_base[i]);
-
+	data_roots.push_back(data_root_range(data_roots_base,data_roots_size));
 	primitive_minor_gc();
-
-	for(cell i = 0; i < data_roots_size; i++)
-		data_roots.pop_back();
+	data_roots.pop_back();
 }
 
 VM_C_API void inline_gc(cell *data_roots_base, cell data_roots_size, factor_vm *parent)
@@ -290,9 +255,7 @@ object *factor_vm::allot_large_object(header header, cell size)
 	/* Allows initialization code to store old->new pointers
 	without hitting the write barrier in the common case of
 	a nursery allocation */
-	char *start = (char *)obj;
-	for(cell offset = 0; offset < size; offset += card_size)
-		write_barrier((cell *)(start + offset));
+	write_barrier(obj,size);
 
 	obj->h = header;
 	return obj;

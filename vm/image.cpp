@@ -154,7 +154,7 @@ void factor_vm::relocate_object(object *object,
 	else
 	{
 		object_fixupper fixupper(this,data_relocation_base);
-		do_slots((cell)object,fixupper);
+		do_slots(object,fixupper);
 
 		switch(hi_tag)
 		{

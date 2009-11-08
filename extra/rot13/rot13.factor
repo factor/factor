@@ -3,7 +3,7 @@
 USING: kernel math sequences strings io combinators ascii ;
 IN: rot13
 
-: rotate ( ch base -- ch ) tuck - 13 + 26 mod + ;
+: rotate ( ch base -- ch ) [ - 13 + 26 mod ] [ + ] bi ;
 
 : rot-letter ( ch -- ch )
     {
