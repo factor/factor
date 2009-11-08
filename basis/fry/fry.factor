@@ -43,7 +43,7 @@ INSTANCE: fried-callable fried
 
 : [ndip] ( quot n -- quot' )
     {
-        { 0 [ \ call [ ] 2sequence ] }
+        { 0 [ ] }
         { 1 [ \ dip  [ ] 2sequence ] }
         { 2 [ \ 2dip [ ] 2sequence ] }
         { 3 [ \ 3dip [ ] 2sequence ] }
