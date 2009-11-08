@@ -177,7 +177,7 @@ M: winnt file-system-info ( path -- file-system-info )
     handle buf buf-length FindNextVolume :> ret
     ret 0 = [
         GetLastError ERROR_NO_MORE_FILES =
-        [ drop f ] [ win32-error-string throw ] if
+        [ f ] [ win32-error-string throw ] if
     ] [
         buf utf16n alien>string
     ] if ;
