@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors math.vectors classes.tuple math.rectangles colors
-kernel sequences models opengl math math.order namespaces
+kernel locals sequences models opengl math math.order namespaces
 ui.commands ui.gestures ui.render ui.gadgets ui.gadgets.labels
 ui.gadgets.scrollers ui.gadgets.presentations ui.gadgets.viewports
 ui.gadgets.packs ;
@@ -78,7 +78,7 @@ M: list focusable-child* drop t ;
     dup list-empty? [
         2drop
     ] [
-        tuck control-value length rem >>index
+        [ control-value length rem ] [ (>>index) ] [ ] tri
         [ relayout-1 ] [ scroll>selected ] bi
     ] if ;
 
@@ -95,9 +95,9 @@ M: list focusable-child* drop t ;
         [ index>> ] keep nth-gadget invoke-secondary
     ] if ;
 
-: select-gadget ( gadget list -- )
-    tuck children>> index
-    [ swap select-index ] [ drop ] if* ;
+:: select-gadget ( gadget list -- )
+    gadget list children>> index
+    [ list select-index ] when* ;
 
 : clamp-loc ( point max -- point )
     vmin { 0 0 } vmax ;

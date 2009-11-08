@@ -7,9 +7,9 @@ namespace factor
 array *factor_vm::allot_array(cell capacity, cell fill_)
 {
 	data_root<object> fill(fill_,this);
-	data_root<array> new_array(allot_uninitialized_array<array>(capacity),this);
+	array *new_array = allot_uninitialized_array<array>(capacity);
 	memset_cell(new_array->data(),fill.value(),capacity * sizeof(cell));
-	return new_array.untagged();
+	return new_array;
 }
 
 /* push a new array on the stack */

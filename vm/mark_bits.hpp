@@ -2,18 +2,19 @@ namespace factor
 {
 
 const int block_granularity = 16;
-const int forwarding_granularity = 64;
+const int mark_bits_granularity = sizeof(cell) * 8;
+const int mark_bits_mask = sizeof(cell) * 8 - 1;
 
 template<typename Block> struct mark_bits {
 	cell size;
 	cell start;
 	cell bits_size;
-	u64 *marked;
+	cell *marked;
 	cell *forwarding;
 
 	void clear_mark_bits()
 	{
-		memset(marked,0,bits_size * sizeof(u64));
+		memset(marked,0,bits_size * sizeof(cell));
 	}
 
 	void clear_forwarding()
@@ -24,8 +25,8 @@ template<typename Block> struct mark_bits {
 	explicit mark_bits(cell size_, cell start_) :
 		size(size_),
 		start(start_),
-		bits_size(size / block_granularity / forwarding_granularity),
-		marked(new u64[bits_size]),
+		bits_size(size / block_granularity / mark_bits_granularity),
+		marked(new cell[bits_size]),
 		forwarding(new cell[bits_size])
 	{
 		clear_mark_bits();
@@ -53,15 +54,15 @@ template<typename Block> struct mark_bits {
 	std::pair<cell,cell> bitmap_deref(Block *address)
 	{
 		cell line_number = block_line(address);
-		cell word_index = (line_number >> 6);
-		cell word_shift = (line_number & 63);
+		cell word_index = (line_number / mark_bits_granularity);
+		cell word_shift = (line_number & mark_bits_mask);
 		return std::make_pair(word_index,word_shift);
 	}
 
-	bool bitmap_elt(u64 *bits, Block *address)
+	bool bitmap_elt(cell *bits, Block *address)
 	{
 		std::pair<cell,cell> position = bitmap_deref(address);
-		return (bits[position.first] & ((u64)1 << position.second)) != 0;
+		return (bits[position.first] & ((cell)1 << position.second)) != 0;
 	}
 
 	Block *next_block_after(Block *block)
@@ -69,13 +70,13 @@ template<typename Block> struct mark_bits {
 		return (Block *)((cell)block + block->size());
 	}
 
-	void set_bitmap_range(u64 *bits, Block *address)
+	void set_bitmap_range(cell *bits, Block *address)
 	{
 		std::pair<cell,cell> start = bitmap_deref(address);
 		std::pair<cell,cell> end = bitmap_deref(next_block_after(address));
 
-		u64 start_mask = ((u64)1 << start.second) - 1;
-		u64 end_mask = ((u64)1 << end.second) - 1;
+		cell start_mask = ((cell)1 << start.second) - 1;
+		cell end_mask = ((cell)1 << end.second) - 1;
 
 		if(start.first == end.first)
 			bits[start.first] |= start_mask ^ end_mask;
@@ -87,7 +88,7 @@ template<typename Block> struct mark_bits {
 			bits[start.first] |= ~start_mask;
 
 			for(cell index = start.first + 1; index < end.first; index++)
-				bits[index] = (u64)-1;
+				bits[index] = (cell)-1;
 
 			if(end_mask != 0)
 			{
@@ -121,7 +122,8 @@ template<typename Block> struct mark_bits {
 		}
 	}
 
-	/* We have the popcount for every 64 entries; look up and compute the rest */
+	/* We have the popcount for every mark_bits_granularity entries; look
+	up and compute the rest */
 	Block *forward_block(Block *original)
 	{
 #ifdef FACTOR_DEBUG
@@ -130,7 +132,7 @@ template<typename Block> struct mark_bits {
 		std::pair<cell,cell> position = bitmap_deref(original);
 
 		cell approx_popcount = forwarding[position.first];
-		u64 mask = ((u64)1 << position.second) - 1;
+		cell mask = ((cell)1 << position.second) - 1;
 
 		cell new_line_number = approx_popcount + popcount(marked[position.first] & mask);
 		Block *new_block = line_block(new_line_number);
@@ -147,13 +149,13 @@ template<typename Block> struct mark_bits {
 
 		for(cell index = position.first; index < bits_size; index++)
 		{
-			u64 mask = ((s64)marked[index] >> bit_index);
+			cell mask = ((fixnum)marked[index] >> bit_index);
 			if(~mask)
 			{
 				/* Found an unmarked block on this page.
 				Stop, it's hammer time */
 				cell clear_bit = rightmost_clear_bit(mask);
-				return line_block(index * 64 + bit_index + clear_bit);
+				return line_block(index * mark_bits_granularity + bit_index + clear_bit);
 			}
 			else
 			{
@@ -174,13 +176,13 @@ template<typename Block> struct mark_bits {
 
 		for(cell index = position.first; index < bits_size; index++)
 		{
-			u64 mask = (marked[index] >> bit_index);
+			cell mask = (marked[index] >> bit_index);
 			if(mask)
 			{
 				/* Found an marked block on this page.
 				Stop, it's hammer time */
 				cell set_bit = rightmost_set_bit(mask);
-				return line_block(index * 64 + bit_index + set_bit);
+				return line_block(index * mark_bits_granularity + bit_index + set_bit);
 			}
 			else
 			{

@@ -96,9 +96,9 @@ C: <combo> combo
     initial-values [ over 0 > ] [ next-values ] produce
     [ 3drop ] dip ;
 
-: combination-indices ( m combo -- seq )
-    [ tuck dual-index combinadic ] keep
-    seq>> length 1 - swap [ - ] with map ;
+:: combination-indices ( m combo -- seq )
+    combo m combo dual-index combinadic
+    combo seq>> length 1 - swap [ - ] with map ;
 
 : apply-combination ( m combo -- seq )
     [ combination-indices ] keep seq>> nths ;

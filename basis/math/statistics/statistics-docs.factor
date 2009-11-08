@@ -98,6 +98,19 @@ HELP: histogram*
 }
 { $description "Takes an existing hashtable and uses " { $link histogram } " to continue counting the number of occurences of each element." } ;
 
+HELP: sorted-histogram
+{ $values
+    { "seq" sequence }
+    { "alist" "an array of key/value pairs" }
+}
+{ $description "Outputs a " { $link histogram } " of a sequence sorted by number of occurences from lowest to highest." }
+{ $examples
+    { $example "USING: prettyprint math.statistics ;"
+        """"abababbbbbbc" sorted-histogram ."""
+        "{ { 99 1 } { 97 3 } { 98 8 } }"
+    }
+} ;
+
 HELP: sequence>assoc
 { $values
     { "seq" sequence } { "quot" quotation } { "exemplar" "an exemplar assoc" }
@@ -145,6 +158,7 @@ ARTICLE: "histogram" "Computing histograms"
 { $subsections
     histogram
     histogram*
+    sorted-histogram
 }
 "Combinators for implementing histogram:"
 { $subsections

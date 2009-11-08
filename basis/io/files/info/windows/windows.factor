@@ -151,12 +151,16 @@ PRIVATE>
 M: winnt file-system-info ( path -- file-system-info )
     normalize-path root-directory (file-system-info) ;
 
-: volume>paths ( string -- array )
-    16384 <ushort-array> tuck dup length
-    0 <uint> dup [ GetVolumePathNamesForVolumeName 0 = ] dip swap [
-        win32-error-string throw
+:: volume>paths ( string -- array )
+    16384 :> names-buf-length
+    names-buf-length <ushort-array> :> names
+    0 <uint> :> names-length
+
+    string names names-buf-length names-length GetVolumePathNamesForVolumeName :> ret
+    ret 0 = [
+        ret win32-error-string throw
     ] [
-        *uint "ushort" heap-size * head
+        names names-length *uint "ushort" heap-size * head
         utf16n alien>string CHAR: \0 split
     ] if ;
 
@@ -166,13 +170,16 @@ M: winnt file-system-info ( path -- file-system-info )
     FindFirstVolume dup win32-error=0/f
     [ utf16n alien>string ] dip ;
 
-: find-next-volume ( handle -- string/f )
-    MAX_PATH 1 + [ <ushort-array> tuck ] keep
-    FindNextVolume 0 = [
+:: find-next-volume ( handle -- string/f )
+    MAX_PATH 1 + :> buf-length
+    buf-length <ushort-array> :> buf
+
+    handle buf buf-length FindNextVolume :> ret
+    ret 0 = [
         GetLastError ERROR_NO_MORE_FILES =
         [ drop f ] [ win32-error-string throw ] if
     ] [
-        utf16n alien>string
+        buf utf16n alien>string
     ] if ;
 
 : find-volumes ( -- array )

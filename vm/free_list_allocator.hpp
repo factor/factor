@@ -23,7 +23,6 @@ template<typename Block> struct free_list_allocator {
 	cell largest_free_block();
 	cell free_block_count();
 	void sweep();
-	template<typename Iterator> void sweep(Iterator &iter);
 	template<typename Iterator, typename Sizer> void compact(Iterator &iter, Sizer &sizer);
 	template<typename Iterator, typename Sizer> void iterate(Iterator &iter, Sizer &sizer);
 	template<typename Iterator> void iterate(Iterator &iter);
@@ -150,59 +149,6 @@ void free_list_allocator<Block>::sweep()
 			start = (Block *)((char *)start + size);
 		}
 	}
-}
-
-template<typename Block>
-template<typename Iterator>
-void free_list_allocator<Block>::sweep(Iterator &iter)
-{
-	free_blocks.clear_free_list();
-
-	Block *prev = NULL;
-	Block *scan = this->first_block();
-	Block *end = this->last_block();
-
-	while(scan != end)
-	{
-		cell size = scan->size();
-
-		if(scan->free_p())
-		{
-			if(prev && prev->free_p())
-			{
-				free_heap_block *free_prev = (free_heap_block *)prev;
-				free_prev->make_free(free_prev->size() + size);
-			}
-			else
-				prev = scan;
-		}
-		else if(this->state.marked_p(scan))
-		{
-			if(prev && prev->free_p())
-				free_blocks.add_to_free_list((free_heap_block *)prev);
-			prev = scan;
-			iter(scan,size);
-		}
-		else
-		{
-			if(prev && prev->free_p())
-			{
-				free_heap_block *free_prev = (free_heap_block *)prev;
-				free_prev->make_free(free_prev->size() + size);
-			}
-			else
-			{
-				free_heap_block *free_block = (free_heap_block *)scan;
-				free_block->make_free(size);
-				prev = scan;
-			}
-		}
-
-		scan = (Block *)((cell)scan + size);
-	}
-
-	if(prev && prev->free_p())
-		free_blocks.add_to_free_list((free_heap_block *)prev);
 }
 
 template<typename Block, typename Iterator> struct heap_compactor {

@@ -150,9 +150,9 @@ struct object_code_block_updater {
 	explicit object_code_block_updater(code_block_visitor<forwarder<code_block> > *visitor_) :
 		visitor(visitor_) {}
 
-	void operator()(cell obj)
+	void operator()(object *obj)
 	{
-		visitor->visit_object_code_block(tagged<object>(obj).untagged());
+		visitor->visit_object_code_block(obj);
 	}
 };
 

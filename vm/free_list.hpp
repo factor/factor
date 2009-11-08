@@ -9,17 +9,17 @@ struct free_heap_block
 
 	bool free_p() const
 	{
-		return header & 1 == 1;
+		return (header & 1) == 1;
 	}
 
 	cell size() const
 	{
-		return header >> 3;
+		return header & ~7;
 	}
 
 	void make_free(cell size)
 	{
-		header = (size << 3) | 1;
+		header = size | 1;
 	}
 };
 
