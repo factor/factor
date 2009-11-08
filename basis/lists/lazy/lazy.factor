@@ -111,14 +111,15 @@ C: <lazy-until> lazy-until
     over nil? [ drop ] [ <lazy-until> ] if ;
 
 M: lazy-until car ( lazy-until -- car )
-     cons>> car ;
+    cons>> car ;
 
 M: lazy-until cdr ( lazy-until -- cdr )
-     [ cons>> unswons ] keep quot>> tuck call( elt -- ? )
-     [ 2drop nil ] [ luntil ] if ;
+    [ [ cons>> cdr ] [ quot>> ] bi ]
+    [ [ cons>> car ] [ quot>> ] bi call( elt -- ? ) ] bi
+    [ 2drop nil ] [ luntil ] if ;
 
 M: lazy-until nil? ( lazy-until -- ? )
-     drop f ;
+    drop f ;
 
 TUPLE: lazy-while cons quot ;
 
@@ -128,13 +129,13 @@ C: <lazy-while> lazy-while
     over nil? [ drop ] [ <lazy-while> ] if ;
 
 M: lazy-while car ( lazy-while -- car )
-     cons>> car ;
+    cons>> car ;
 
 M: lazy-while cdr ( lazy-while -- cdr )
-     [ cons>> cdr ] keep quot>> lwhile ;
+    [ cons>> cdr ] keep quot>> lwhile ;
 
 M: lazy-while nil? ( lazy-while -- ? )
-     [ car ] keep quot>> call( elt -- ? ) not ;
+    [ car ] keep quot>> call( elt -- ? ) not ;
 
 TUPLE: lazy-filter cons quot ;
 

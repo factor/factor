@@ -183,11 +183,8 @@ template<typename TargetGeneration, typename Policy> struct collector {
 			cell *slot_ptr = (cell *)start;
 			cell *end_ptr = (cell *)end;
 
-			if(slot_ptr != end_ptr)
-			{
-				for(; slot_ptr < end_ptr; slot_ptr++)
-					workhorse.visit_handle(slot_ptr);
-			}
+			for(; slot_ptr < end_ptr; slot_ptr++)
+				workhorse.visit_handle(slot_ptr);
 		}
 	}
 
@@ -196,14 +193,14 @@ template<typename TargetGeneration, typename Policy> struct collector {
 	{
 		card_deck *decks = data->decks;
 		card_deck *cards = data->cards;
-	
+
 		cell gen_start_card = addr_to_card(gen->start - data->start);
 
 		cell first_deck = card_deck_for_address(gen->start);
 		cell last_deck = card_deck_for_address(gen->end);
-	
+
 		cell start = 0, binary_start = 0, end = 0;
-	
+
 		for(cell deck_index = first_deck; deck_index < last_deck; deck_index++)
 		{
 			if(decks[deck_index] & mask)
@@ -212,7 +209,7 @@ template<typename TargetGeneration, typename Policy> struct collector {
 
 				cell first_card = first_card_in_deck(deck_index);
 				cell last_card = last_card_in_deck(deck_index);
-	
+
 				for(cell card_index = first_card; card_index < last_card; card_index++)
 				{
 					if(cards[card_index] & mask)
@@ -225,13 +222,9 @@ template<typename TargetGeneration, typename Policy> struct collector {
 							binary_start = start + ((object *)start)->binary_payload_start();
 							end = start + ((object *)start)->size();
 						}
-	
-#ifdef FACTOR_DEBUG
-						assert(addr_to_card(start - data->start) <= card_index);
-						assert(start < card_end_address(card_index));
-#endif
 
-scan_next_object:				{
+scan_next_object:				if(start < card_end_address(card_index))
+						{
 							trace_partial_objects(
 								start,
 								binary_start,
@@ -248,13 +241,13 @@ scan_next_object:				{
 								}
 							}
 						}
-	
+
 						unmarker(&cards[card_index]);
-	
+
 						if(!start) return;
 					}
 				}
-	
+
 				unmarker(&decks[deck_index]);
 			}
 		}

@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.vectors math.matrices namespaces
-sequences ;
+USING: kernel locals math math.vectors math.matrices
+namespaces sequences ;
 IN: math.matrices.elimination
 
 SYMBOL: matrix
@@ -85,12 +85,11 @@ SYMBOL: matrix
         ] each
     ] with-matrix ;
 
-: basis-vector ( row col# -- )
-    [ clone ] dip
-    [ swap nth neg recip ] 2keep
-    [ 0 spin set-nth ] 2keep
-    [ n*v ] dip
-    matrix get set-nth ;
+:: basis-vector ( row col# -- )
+    row clone :> row'
+    col# row' nth neg recip :> a
+    0 col# row' set-nth
+    a row n*v col# matrix get set-nth ;
 
 : nullspace ( matrix -- seq )
     echelon reduced dup empty? [

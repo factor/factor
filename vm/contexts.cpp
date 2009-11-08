@@ -196,4 +196,12 @@ void factor_vm::primitive_check_datastack()
 	}
 }
 
+void factor_vm::primitive_load_locals()
+{
+	fixnum count = untag_fixnum(dpop());
+	memcpy((cell *)(rs + sizeof(cell)),(cell *)(ds - sizeof(cell) * (count - 1)),sizeof(cell) * count);
+	ds -= sizeof(cell) * count;
+	rs += sizeof(cell) * count;
+}
+
 }

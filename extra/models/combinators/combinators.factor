@@ -1,5 +1,5 @@
 USING: accessors arrays kernel models models.product monads
-sequences sequences.extras ;
+sequences sequences.extras shuffle ;
 FROM: syntax => >> ;
 IN: models.combinators
 

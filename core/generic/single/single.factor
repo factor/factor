@@ -63,19 +63,18 @@ TUPLE: predicate-engine class methods ;
 
 C: <predicate-engine> predicate-engine
 
-: push-method ( method specializer atomic assoc -- )
+: push-method ( method class atomic assoc -- )
     dupd [
         [ ] [ H{ } clone <predicate-engine> ] ?if
         [ methods>> set-at ] keep
     ] change-at ;
 
-: flatten-method ( class method assoc -- )
-    [ [ flatten-class keys ] keep ] 2dip [
-        [ spin ] dip push-method
-    ] 3curry each ;
+: flatten-method ( method class assoc -- )
+    over flatten-class keys
+    [ swap push-method ] with with with each ;
 
 : flatten-methods ( assoc -- assoc' )
-    H{ } clone [ [ flatten-method ] curry assoc-each ] keep ;
+    H{ } clone [ [ swapd flatten-method ] curry assoc-each ] keep ;
 
 ! 2. Convert methods
 : split-methods ( assoc class -- first second )

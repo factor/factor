@@ -123,8 +123,10 @@ PRIVATE>
 : curses-writef ( window string -- )
     [ window-ptr dup ] dip (curses-wprint) (curses-window-refresh) ;
 
-: (curses-read) ( window-ptr n encoding -- string )
-    [ [ <byte-array> tuck ] keep wgetnstr curses-error ] dip alien>string ;
+:: (curses-read) ( window-ptr n encoding -- string )
+    n <byte-array> :> buf
+    window-ptr buf n wgetnstr curses-error
+    buf encoding alien>string ;
 
 : curses-read ( window n -- string )
     utf8 [ window-ptr ] 2dip (curses-read) ;

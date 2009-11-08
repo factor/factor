@@ -1,4 +1,4 @@
-USING: kernel io io.files splitting strings io.encodings.ascii
+USING: kernel locals io io.files splitting strings io.encodings.ascii
        hashtables sequences assocs math namespaces prettyprint
        math.parser combinators arrays sorting unicode.case ;
 
@@ -21,10 +21,7 @@ IN: benchmark.knucleotide
     CHAR: \n swap remove >upper ;
 
 : tally ( x exemplar -- b )
-    clone tuck
-    [
-      [ [ 1 + ] [ 1 ] if* ] change-at
-    ] curry each ;
+    clone [ [ inc-at ] curry each ] keep ;
 
 : small-groups ( x n -- b )
     swap
@@ -42,10 +39,10 @@ IN: benchmark.knucleotide
     ] each
     drop ;
 
-: handle-n ( inputs x -- )
-    tuck length
-    small-groups H{ } tally
-    at [ 0 ] unless*
+:: handle-n ( inputs x -- )
+    inputs x length small-groups :> groups
+    groups H{ } tally :> b
+    x b at [ 0 ] unless*
     number>string 8 CHAR: \s pad-tail write ;
 
 : process-input ( input -- )

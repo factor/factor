@@ -25,17 +25,16 @@ void factor_vm::set_profiling(bool profiling)
 	if(profiling == profiling_p)
 		return;
 
-	profiling_p = profiling;
-
 	/* Push everything to tenured space so that we can heap scan
 	and allocate profiling blocks if necessary */
 	primitive_full_gc();
 
 	data_root<array> words(find_all_words(),this);
 
-	cell i;
+	profiling_p = profiling;
+
 	cell length = array_capacity(words.untagged());
-	for(i = 0; i < length; i++)
+	for(cell i = 0; i < length; i++)
 	{
 		tagged<word> word(array_nth(words.untagged(),i));
 		if(profiling)

@@ -13,11 +13,11 @@ IN: kernel.tests
 [ ] [ 10000 [ [ -1 f <array> ] ignore-errors ] times ] unit-test
 
 ! Make sure we report the correct error on stack underflow
-[ clear drop ] [ { "kernel-error" 11 f f } = ] must-fail-with
+[ clear drop ] [ { "kernel-error" 10 f f } = ] must-fail-with
 
 [ ] [ :c ] unit-test
 
-[ 3 [ { } set-retainstack ] dip ] [ { "kernel-error" 13 f f } = ] must-fail-with
+[ 3 [ { } set-retainstack ] dip ] [ { "kernel-error" 12 f f } = ] must-fail-with
 
 [ ] [ :c ] unit-test
 
@@ -34,15 +34,15 @@ IN: kernel.tests
 [ t "no-compile" set-word-prop ] each
 >>
 
-[ overflow-d ] [ { "kernel-error" 12 f f } = ] must-fail-with
+[ overflow-d ] [ { "kernel-error" 11 f f } = ] must-fail-with
 
 [ ] [ :c ] unit-test
 
-[ overflow-d-alt ] [ { "kernel-error" 12 f f } = ] must-fail-with
+[ overflow-d-alt ] [ { "kernel-error" 11 f f } = ] must-fail-with
 
 [ ] [ [ :c ] with-string-writer drop ] unit-test
 
-[ overflow-r ] [ { "kernel-error" 14 f f } = ] must-fail-with
+[ overflow-r ] [ { "kernel-error" 13 f f } = ] must-fail-with
 
 [ ] [ :c ] unit-test
 

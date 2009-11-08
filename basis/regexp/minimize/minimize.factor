@@ -85,7 +85,7 @@ IN: regexp.minimize
     '[ _ delete-duplicates ] change-transitions ;
 
 : combine-state-transitions ( hash -- hash )
-    H{ } clone tuck '[
+    [ H{ } clone ] dip over '[
         _ [ 2array <or-class> ] change-at
     ] assoc-each [ swap ] assoc-map ;
 
