@@ -42,10 +42,10 @@ compiled-generic-crossref [ H{ } clone ] initialize
     [ (compiled-generic-usages) ] { } assoc>map ;
 
 : (compiled-xref) ( word dependencies word-prop variable -- )
-    [ concat set-word-prop ] [ get add-vertex* ] bi-curry* 2bi ;
+    [ [ concat ] dip set-word-prop ] [ get add-vertex* ] bi-curry* 2bi ;
 
 : compiled-xref ( word dependencies generic-dependencies -- )
-    [ [ drop crossref? ] { } assoc-filter-as f like ] bi@
+    [ [ drop crossref? ] { } assoc-filter-as ] bi@
     [ "compiled-uses" compiled-crossref (compiled-xref) ]
     [ "compiled-generic-uses" compiled-generic-crossref (compiled-xref) ]
     bi-curry* bi ;
@@ -65,4 +65,3 @@ compiled-generic-crossref [ H{ } clone ] initialize
     [ compiled-crossref get delete-at ]
     [ compiled-generic-crossref get delete-at ]
     tri ;
-
