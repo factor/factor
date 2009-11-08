@@ -74,14 +74,24 @@ INSTANCE: fried-callable fried
         [ >quotation make-curry ] if
     ] if-empty ;
 
+: prune-curries ( seq -- seq' )
+    dup [ empty? not ] find 
+    [ [ 1 + tail ] dip but-last prefix ]
+    [ 2drop { } ] if* ;
+
 : convert-curries ( seq -- tail seq' )
-    unclip-slice [ 0 swap [ convert-curry ] map ] [ >quotation 1quotation ] bi* prefix ;
+    unclip-slice [ 0 swap [ convert-curry ] map ] dip
+    [ prune-curries ]
+    [ >quotation 1quotation prefix ] if-empty ;
+
+: mark-composes ( quot -- quot' )
+    [ dup \ @ = [ drop [ _ @ ] ] [ 1quotation ] if ] map concat ; inline
 
 : shallow-fry ( quot -- quot' )
-    check-fry
-    [ dup \ @ = [ drop [ _ @ ] ] [ 1quotation ] if ] map concat
+    check-fry mark-composes
     { _ } split convert-curries
-    spread>quot swap [ [ ] (make-curry) compose ] unless-zero ;
+    [ [ [ ] ] [ [ ] (make-curry) but-last ] if-zero ]
+    [ spread>quot swap [ [ ] (make-curry) compose ] unless-zero ] if-empty ;
 
 DEFER: dredge-fry
 
