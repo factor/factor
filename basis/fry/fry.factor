@@ -29,14 +29,17 @@ PREDICATE: fried-callable < callable
     count-inputs 0 > ;
 INSTANCE: fried-callable fried
 
-: [ncurry] ( n -- quot )
+: (ncurry) ( quot n -- quot )
     {
-        { 0 [ [ ] ] }
-        { 1 [ [ curry ] ] }
-        { 2 [ [ 2curry ] ] }
-        { 3 [ [ 3curry ] ] }
-        [ \ curry <repetition> >quotation ]
+        { 0 [ ] }
+        { 1 [ \ curry  suffix! ] }
+        { 2 [ \ 2curry suffix! ] }
+        { 3 [ \ 3curry suffix! ] }
+        [ [ \ 3curry suffix! ] dip 3 - (ncurry) ]
     } case ;
+
+: [ncurry] ( n -- quot )
+    [ V{ } clone ] dip (ncurry) >quotation ;
 
 : [ndip] ( quot n -- quot' )
     {
@@ -44,7 +47,7 @@ INSTANCE: fried-callable fried
         { 1 [ \ dip  [ ] 2sequence ] }
         { 2 [ \ 2dip [ ] 2sequence ] }
         { 3 [ \ 3dip [ ] 2sequence ] }
-        [ [ \ dip [ ] 2sequence ] times ]
+        [ [ \ 3dip [ ] 2sequence ] dip 3 - [ndip] ]
     } case ;
 
 : (make-curry) ( tail quot -- quot' )
