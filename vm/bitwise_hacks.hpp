@@ -1,7 +1,29 @@
 namespace factor
 {
 
-/* These algorithms were snarfed from various places. I did not come up with them myself */
+inline cell log2(cell x)
+{
+	cell n;
+#if defined(FACTOR_X86) || defined(FACTOR_AMD64)
+	asm ("bsr %1, %0;":"=r"(n):"r"(x));
+#elif defined(FACTOR_PPC)
+	asm ("cntlzw %1, %0;":"=r"(n):"r"(x));
+	n = (31 - n);
+#else
+	#error Unsupported CPU
+#endif
+	return n;
+}
+
+inline cell rightmost_clear_bit(cell x)
+{
+	return log2(~x & (x + 1));
+}
+
+inline cell rightmost_set_bit(cell x)
+{
+	return log2(x & -x);
+}
 
 inline cell popcount(cell x)
 {
@@ -24,39 +46,7 @@ inline cell popcount(cell x)
 	x = (x       +  (x >> 4)) & k4 ; // put count of each 8 bits into those 8 bits
 	x = (x * kf) >> ks; // returns 8 most significant bits of x + (x<<8) + (x<<16) + (x<<24) + ...
 
-	return (cell)x;
-}
-
-inline cell log2(cell x)
-{
-#if defined(FACTOR_X86)
-	cell n;
-	asm ("bsr %1, %0;":"=r"(n):"r"(x));
-#elif defined(FACTOR_AMD64)
-	cell n;
-	asm ("bsr %1, %0;":"=r"(n):"r"(x));
-#else
-	cell n = 0;
-#ifdef FACTOR_64
-	if (x >= (cell)1 << 32) { x >>= 32; n += 32; }
-#endif
-	if (x >= (cell)1 << 16) { x >>= 16; n += 16; }
-	if (x >= (cell)1 <<  8) { x >>=  8; n +=  8; }
-	if (x >= (cell)1 <<  4) { x >>=  4; n +=  4; }
-	if (x >= (cell)1 <<  2) { x >>=  2; n +=  2; }
-	if (x >= (cell)1 <<  1) {           n +=  1; }
-#endif
-	return n;
-}
-
-inline cell rightmost_clear_bit(cell x)
-{
-	return log2(~x & (x + 1));
-}
-
-inline cell rightmost_set_bit(cell x)
-{
-	return log2(x & -x);
+	return x;
 }
 
 }
