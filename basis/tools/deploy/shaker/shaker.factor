@@ -9,6 +9,7 @@ compiler.units definitions generic generic.standard
 generic.single tools.deploy.config combinators classes
 classes.builtin slots.private grouping command-line ;
 QUALIFIED: bootstrap.stage2
+QUALIFIED: compiler.crossref
 QUALIFIED: compiler.errors
 QUALIFIED: continuations
 QUALIFIED: definitions
@@ -340,8 +341,8 @@ IN: tools.deploy.shaker
                 implementors-map
                 update-map
                 main-vocab-hook
-                compiled-crossref
-                compiled-generic-crossref
+                compiler.crossref:compiled-crossref
+                compiler.crossref:compiled-generic-crossref
                 compiler-impl
                 compiler.errors:compiler-errors
                 lexer-factory

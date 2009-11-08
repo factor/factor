@@ -40,8 +40,19 @@ SYMBOL: compiler-impl
 
 HOOK: recompile compiler-impl ( words -- alist )
 
+HOOK: to-recompile compiler-impl ( -- words )
+
+HOOK: process-forgotten-words compiler-impl ( words -- )
+
 ! Non-optimizing compiler
-M: f recompile [ dup def>> ] { } map>assoc ;
+M: f recompile
+    [ dup def>> ] { } map>assoc ;
+
+M: f to-recompile
+    changed-definitions get [ drop word? ] assoc-filter
+    changed-generics get assoc-union keys ;
+
+M: f process-forgotten-words drop ;
 
 : without-optimizer ( quot -- )
     [ f compiler-impl ] dip with-variable ; inline
@@ -50,7 +61,11 @@ M: f recompile [ dup def>> ] { } map>assoc ;
 ! during stage1 bootstrap, it would just waste time.
 SINGLETON: dummy-compiler
 
+M: dummy-compiler to-recompile f ;
+
 M: dummy-compiler recompile drop { } ;
+
+M: dummy-compiler process-forgotten-words drop ;
 
 : <definitions> ( -- pair ) { H{ } H{ } } [ clone ] map ;
 
@@ -89,59 +104,9 @@ GENERIC: definitions-changed ( assoc obj -- )
 
 : compile ( words -- ) recompile modify-code-heap ;
 
-: index>= ( obj1 obj2 seq -- ? )
-    [ index ] curry bi@ >= ;
-
-: dependency>= ( how1 how2 -- ? )
-    { called-dependency flushed-dependency inlined-dependency }
-    index>= ;
-
-: strongest-dependency ( how1 how2 -- how )
-    [ called-dependency or ] bi@ [ dependency>= ] most ;
-
-: weakest-dependency ( how1 how2 -- how )
-    [ inlined-dependency or ] bi@ [ dependency>= not ] most ;
-
-: compiled-usage ( word -- assoc )
-    compiled-crossref get at ;
-
-: (compiled-usages) ( word -- assoc )
-    #! If the word is not flushable anymore, we have to recompile
-    #! all words which flushable away a call (presumably when the
-    #! word was still flushable). If the word is flushable, we
-    #! don't have to recompile words that folded this away.
-    [ compiled-usage ]
-    [ "flushable" word-prop inlined-dependency flushed-dependency ? ] bi
-    [ dependency>= nip ] curry assoc-filter ;
-
-: compiled-usages ( assoc -- assocs )
-    [ drop word? ] assoc-filter
-    [ [ drop (compiled-usages) ] { } assoc>map ] keep suffix ;
-
-: compiled-generic-usage ( word -- assoc )
-    compiled-generic-crossref get at ;
-
-: (compiled-generic-usages) ( generic class -- assoc )
-    [ compiled-generic-usage ] dip
-    [
-        2dup [ valid-class? ] both?
-        [ classes-intersect? ] [ 2drop f ] if nip
-    ] curry assoc-filter ;
-
-: compiled-generic-usages ( assoc -- assocs )
-    [ (compiled-generic-usages) ] { } assoc>map ;
-
-: words-only ( assoc -- assoc' )
-    [ drop word? ] assoc-filter ;
-
-: to-recompile ( -- seq )
-    changed-definitions get compiled-usages
-    changed-generics get compiled-generic-usages
-    append assoc-combine keys ;
-
 : process-forgotten-definitions ( -- )
     forgotten-definitions get keys
-    [ [ word? ] filter [ delete-compiled-xref ] each ]
+    [ [ word? ] filter process-forgotten-words ]
     [ [ delete-definition-errors ] each ]
     bi ;
 
