@@ -147,7 +147,7 @@ struct object {
 	to do anything with it if its free */
 	bool free_p() const
 	{
-		return h.value & 1 == 1;
+		return (h.value & 1) == 1;
 	}
 };
 
@@ -221,7 +221,7 @@ struct code_block
 
 	bool free_p() const
 	{
-		return header & 1 == 1;
+		return (header & 1) == 1;
 	}
 
 	code_block_type type() const
