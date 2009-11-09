@@ -61,7 +61,7 @@ INSTANCE: curry immutable-sequence
 M: compose length
     [ first>> length ] [ second>> length ] bi + ;
 
-M: compose virtual-seq first>> ;
+M: compose virtual-exemplar first>> ;
 
 M: compose virtual@
     2dup first>> length < [
