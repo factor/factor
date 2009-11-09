@@ -21,6 +21,7 @@ stack-checker.visitor
 stack-checker.backend
 stack-checker.branches
 stack-checker.transforms
+stack-checker.dependencies
 stack-checker.recursive-state ;
 IN: stack-checker.known-words
 

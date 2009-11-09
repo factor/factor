@@ -5,7 +5,7 @@ parser sequences strings vectors words quotations effects classes
 continuations assocs combinators compiler.errors accessors math.order
 definitions sets hints macros stack-checker.state
 stack-checker.visitor stack-checker.errors stack-checker.values
-stack-checker.recursive-state summary ;
+stack-checker.recursive-state stack-checker.dependencies summary ;
 IN: stack-checker.backend
 
 : push-d ( obj -- ) meta-d push ;

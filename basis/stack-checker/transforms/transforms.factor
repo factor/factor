@@ -7,7 +7,8 @@ classes.tuple.private effects summary hashtables classes sets
 definitions generic.standard slots.private continuations locals
 sequences.private generalizations stack-checker.backend
 stack-checker.state stack-checker.visitor stack-checker.errors
-stack-checker.values stack-checker.recursive-state ;
+stack-checker.values stack-checker.recursive-state
+stack-checker.dependencies ;
 IN: stack-checker.transforms
 
 : call-transformer ( word stack quot -- newquot )
