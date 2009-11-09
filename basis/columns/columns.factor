@@ -8,7 +8,7 @@ TUPLE: column seq col ;
 
 C: <column> column
 
-M: column virtual-seq seq>> ;
+M: column virtual-exemplar seq>> ;
 M: column virtual@ [ col>> swap ] [ seq>> ] bi nth bounds-check ;
 M: column length seq>> length ;
 
