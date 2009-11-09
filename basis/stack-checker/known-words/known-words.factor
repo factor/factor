@@ -98,8 +98,8 @@ M: composed infer-call*
     1 infer->r infer-call
     terminated? get [ 1 infer-r> infer-call ] unless ;
 
-M: object infer-call*
-    "literal quotation" literal-expected ;
+M: input-parameter infer-call* \ call unknown-macro-input ;
+M: object infer-call* \ call bad-macro-input ;
 
 : infer-ndip ( word n -- )
     [ literals get ] 2dip
@@ -231,7 +231,7 @@ M: bad-executable summary
 \ alien-callback [ infer-alien-callback ] "special" set-word-prop
 
 : infer-special ( word -- )
-    "special" word-prop call( -- ) ;
+    [ current-word set ] [ "special" word-prop call( -- ) ] bi ;
 
 : infer-local-reader ( word -- )
     (( -- value )) apply-word/effect ;

@@ -26,6 +26,9 @@ M: object error. short. ;
 
 M: string error. print ;
 
+: traceback-link. ( continuation -- )
+    "[" write [ "Traceback" ] dip write-object "]" print ;
+
 : :s ( -- )
     error-continuation get data>> stack. ;
 

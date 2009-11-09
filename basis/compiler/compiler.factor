@@ -63,17 +63,23 @@ M: method-body no-compile? "method-generic" word-prop no-compile? ;
 M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
 
 M: word no-compile?
-    {
-        [ macro? ]
-        [ inline? ]
-        [ "special" word-prop ]
-        [ "no-compile" word-prop ]
-    } 1|| ;
+    { [ macro? ] [ "special" word-prop ] [ "no-compile" word-prop ] } 1|| ;
+
+GENERIC: combinator? ( word -- ? )
+
+M: method-body combinator? "method-generic" word-prop combinator? ;
+
+M: predicate-engine-word combinator? "owner-generic" word-prop combinator? ;
+
+M: word combinator? inline? ;
 
 : ignore-error? ( word error -- ? )
     #! Ignore some errors on inline combinators, macros, and special
     #! words such as 'call'.
-    [ no-compile? ] [ { [ do-not-compile? ] [ literal-expected? ] } 1|| ] bi* and ;
+    {
+        [ drop no-compile? ]
+        [ [ combinator? ] [ unknown-macro-input? ] bi* and ]
+    } 2|| ;
 
 : finish ( word -- )
     #! Recompile callers if the word's stack effect changed, then
