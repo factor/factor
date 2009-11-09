@@ -93,11 +93,5 @@ PRIVATE>
 : list>array ( list -- array )  
     [ ] lmap>array ;
 
-:: traverse ( list pred quot: ( list/elt -- result ) -- result )
-    list [| elt |
-        elt dup pred call [ quot call ] when
-        dup list? [ pred quot traverse ] when
-    ] lmap ; inline recursive
-
 INSTANCE: cons list
 INSTANCE: +nil+ list
