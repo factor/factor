@@ -10,10 +10,14 @@ IN: stack-checker.backend
 
 : push-d ( obj -- ) meta-d push ;
 
+: introduce-values ( values -- )
+    [ [ [ input-parameter ] dip set-known ] each ]
+    [ length input-count +@ ]
+    [ #introduce, ]
+    tri ;
+
 : pop-d  ( -- obj )
-    meta-d [
-        <value> dup 1array #introduce, d-in inc
-    ] [ pop ] if-empty ;
+    meta-d [ <value> dup 1array introduce-values ] [ pop ] if-empty ;
 
 : peek-d ( -- obj ) pop-d dup push-d ;
 
@@ -24,7 +28,7 @@ IN: stack-checker.backend
     meta-d 2dup length > [
         2dup
         [ nip >array ] [ length - make-values ] [ nip delete-all ] 2tri
-        [ length d-in +@ ] [ #introduce, ] [ meta-d push-all ] tri
+        [ introduce-values ] [ meta-d push-all ] bi
         meta-d push-all
     ] when swap tail* ;
 

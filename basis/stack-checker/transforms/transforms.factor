@@ -11,37 +11,45 @@ stack-checker.values stack-checker.recursive-state
 stack-checker.dependencies ;
 IN: stack-checker.transforms
 
-: call-transformer ( word stack quot -- newquot )
-    '[ _ _ with-datastack [ length 1 assert= ] [ first ] bi nip ]
-    [ transform-expansion-error ]
+: call-transformer ( stack quot -- newquot )
+    '[ _ _ with-datastack [ length 1 assert= ] [ first ] bi ]
+    [ error-continuation get current-word get transform-expansion-error ]
     recover ;
 
-:: ((apply-transform)) ( word quot values stack rstate -- )
-    rstate recursive-state
-    [ word stack quot call-transformer ] with-variable
-    [
-        values [ length meta-d shorten-by ] [ #drop, ] bi
-        rstate infer-quot
-    ] [ word infer-word ] if* ;
+:: ((apply-transform)) ( quot values stack rstate -- )
+    rstate recursive-state [ stack quot call-transformer ] with-variable
+    values [ length meta-d shorten-by ] [ #drop, ] bi
+    rstate infer-quot ;
 
-: literals? ( values -- ? ) [ literal-value? ] all? ;
+: literal-values? ( values -- ? ) [ literal-value? ] all? ;
 
-: (apply-transform) ( word quot n -- )
-    ensure-d dup literals? [
-        dup empty? [ dup recursive-state get ] [
-            [ ]
-            [ [ literal value>> ] map ]
-            [ first literal recursion>> ] tri
-        ] if
-        ((apply-transform))
-    ] [ 2drop infer-word ] if ;
+: input-values? ( values -- ? )
+    [ { [ literal-value? ] [ input-value? ] } 1|| ] all? ;
+
+: (apply-transform) ( quot n -- )
+    ensure-d {
+        { [ dup literal-values? ] [
+            dup empty? [ dup recursive-state get ] [
+                [ ]
+                [ [ literal value>> ] map ]
+                [ first literal recursion>> ] tri
+            ] if
+            ((apply-transform))
+        ] }
+        { [ dup input-values? ] [ drop current-word get unknown-macro-input ] }
+        [ drop current-word get bad-macro-input ]
+    } cond ;
 
 : apply-transform ( word -- )
-    [ ] [ "transform-quot" word-prop ] [ "transform-n" word-prop ] tri
+    [ current-word set ]
+    [ "transform-quot" word-prop ]
+    [ "transform-n" word-prop ] tri
     (apply-transform) ;
 
 : apply-macro ( word -- )
-    [ ] [ "macro" word-prop ] [ "declared-effect" word-prop in>> length ] tri
+    [ current-word set ]
+    [ "macro" word-prop ]
+    [ "declared-effect" word-prop in>> length ] tri
     (apply-transform) ;
 
 : define-transform ( word quot n -- )
