@@ -1175,17 +1175,17 @@ HELP: partition
     }
 } ;
 
-HELP: virtual-seq
+HELP: virtual-exemplar
 { $values
      { "seq" sequence }
      { "seq'" sequence } }
-{ $description "Part of the virtual sequence protocol, this word is used to return an underlying array from which to look up a value at an index given by " { $link virtual@ } "." } ;
+{ $description "Part of the virtual sequence protocol, this word is used to return an exemplar of the underlying storage. This is used in words like " { $link new-sequence } "." } ;
 
 HELP: virtual@
 { $values
      { "n" integer } { "seq" sequence }
      { "n'" integer } { "seq'" sequence } }
-{ $description "Part of the sequence protocol, this word translates the input index " { $snippet "n" } " into an index into the underlying storage returned by " { $link virtual-seq } "." } ;
+{ $description "Part of the sequence protocol, this word translates the input index " { $snippet "n" } " into an index and the underlying storage this index points into." } ;
 
 HELP: 2map-reduce
 { $values
@@ -1397,9 +1397,9 @@ $nl
 ARTICLE: "virtual-sequences-protocol" "Virtual sequence protocol"
 "Virtual sequences must know their length:"
 { $subsections length }
-"The underlying sequence to look up a value in:"
-{ $subsections virtual-seq }
-"The index of the value in the underlying sequence:"
+"An exemplar of the underlying storage:"
+{ $subsections virtual-exemplar }
+"The index and the underlying storage where the value is located:"
 { $subsections virtual@ } ;
 
 ARTICLE: "virtual-sequences" "Virtual sequences"
