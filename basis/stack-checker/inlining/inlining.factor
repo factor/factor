@@ -82,7 +82,7 @@ SYMBOL: enter-out
     bi ;
 
 : recursive-word-inputs ( label -- n )
-    entry-stack-height d-in get + ;
+    entry-stack-height input-count get + ;
 
 : (inline-recursive-word) ( word -- label in out visitor terminated? )
     dup prepare-stack
