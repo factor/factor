@@ -64,41 +64,6 @@ GENERIC: crossref? ( word -- ? )
 M: word crossref?
     dup "forgotten" word-prop [ drop f ] [ vocabulary>> >boolean ] if ;
 
-SYMBOL: compiled-crossref
-
-compiled-crossref [ H{ } clone ] initialize
-
-SYMBOL: compiled-generic-crossref
-
-compiled-generic-crossref [ H{ } clone ] initialize
-
-: (compiled-xref) ( word dependencies word-prop variable -- )
-    [ [ set-word-prop ] curry ]
-    [ [ get add-vertex* ] curry ]
-    bi* 2bi ;
-
-: compiled-xref ( word dependencies generic-dependencies -- )
-    [ [ drop crossref? ] { } assoc-filter-as f like ] bi@
-    [ "compiled-uses" compiled-crossref (compiled-xref) ]
-    [ "compiled-generic-uses" compiled-generic-crossref (compiled-xref) ]
-    bi-curry* bi ;
-
-: (compiled-unxref) ( word word-prop variable -- )
-    [ [ [ dupd word-prop ] dip get remove-vertex* ] 2curry ]
-    [ drop [ remove-word-prop ] curry ]
-    2bi bi ;
-
-: compiled-unxref ( word -- )
-    [ "compiled-uses" compiled-crossref (compiled-unxref) ]
-    [ "compiled-generic-uses" compiled-generic-crossref (compiled-unxref) ]
-    bi ;
-
-: delete-compiled-xref ( word -- )
-    [ compiled-unxref ]
-    [ compiled-crossref get delete-at ]
-    [ compiled-generic-crossref get delete-at ]
-    tri ;
-
 : inline? ( word -- ? ) "inline" word-prop ; inline
 
 GENERIC: subwords ( word -- seq )

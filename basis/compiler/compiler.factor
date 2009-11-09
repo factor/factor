@@ -12,6 +12,8 @@ compiler.errors compiler.units compiler.utilities
 compiler.tree.builder
 compiler.tree.optimizer
 
+compiler.crossref
+
 compiler.cfg
 compiler.cfg.builder
 compiler.cfg.optimizer
@@ -192,6 +194,14 @@ M: optimizing-compiler recompile ( words -- alist )
         compiled get >alist
     ] with-scope
     "--- compile done" compiler-message ;
+
+M: optimizing-compiler to-recompile ( -- words )
+    changed-definitions get compiled-usages
+    changed-generics get compiled-generic-usages
+    append assoc-combine keys ;
+
+M: optimizing-compiler process-forgotten-words
+    [ delete-compiled-xref ] each ;
 
 : with-optimizer ( quot -- )
     [ optimizing-compiler compiler-impl ] dip with-variable ; inline

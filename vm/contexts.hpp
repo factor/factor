@@ -46,6 +46,8 @@ struct context {
 	cell current_callback_save;
 
 	context *next;
+
+	context(cell ds_size, cell rs_size);
 };
 
 #define ds_bot (ctx->datastack_region->start)
