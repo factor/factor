@@ -126,7 +126,7 @@ void factor_vm::collect_full(bool trace_contexts_p)
 {
 	collect_mark_impl(trace_contexts_p);
 	collect_sweep_impl();
-	if(data->tenured->largest_free_block() <= data->nursery->size + data->aging->size)
+	if(data->low_memory_p())
 		collect_compact_impl(trace_contexts_p);
 	else
 		update_code_heap_words_and_literals();
