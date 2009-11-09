@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays definitions graphs kernel
-kernel.private slots.private math namespaces sequences
-strings vectors sbufs quotations assocs hashtables sorting vocabs
-math.order sets words.private ;
+USING: accessors arrays definitions kernel kernel.private
+slots.private math namespaces sequences strings vectors sbufs
+quotations assocs hashtables sorting vocabs math.order sets
+words.private ;
 IN: words
 
 : word ( -- word ) \ word get-global ;

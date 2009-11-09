@@ -8,7 +8,7 @@ classes.algebra combinators generic.math splitting fry locals
 classes.tuple alien.accessors classes.tuple.private
 slots.private definitions strings.private vectors hashtables
 generic quotations alien
-stack-checker.state
+stack-checker.dependencies
 compiler.tree.comparisons
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes

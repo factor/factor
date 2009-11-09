@@ -10,6 +10,7 @@ stack-checker.visitor
 stack-checker.backend
 stack-checker.branches
 stack-checker.known-words
+stack-checker.dependencies
 stack-checker.recursive-state ;
 IN: stack-checker.inlining
 

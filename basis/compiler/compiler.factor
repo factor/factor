@@ -5,7 +5,8 @@ continuations vocabs assocs dlists definitions math graphs generic
 generic.single combinators deques search-deques macros
 source-files.errors combinators.short-circuit
 
-stack-checker stack-checker.state stack-checker.inlining stack-checker.errors
+stack-checker stack-checker.dependencies stack-checker.inlining
+stack-checker.errors
 
 compiler.errors compiler.units compiler.utilities
 
