@@ -38,12 +38,15 @@ INSTANCE: fried-callable fried
         [ [ \ 3curry suffix! ] dip 3 - (ncurry) ]
     } case ;
 
+: wrap-non-callable ( obj -- quot )
+    dup callable? [ ] [ [ call ] curry ] if ; inline
+
 : [ncurry] ( n -- quot )
     [ V{ } clone ] dip (ncurry) >quotation ;
 
 : [ndip] ( quot n -- quot' )
     {
-        { 0 [ ] }
+        { 0 [ wrap-non-callable ] }
         { 1 [ \ dip  [ ] 2sequence ] }
         { 2 [ \ 2dip [ ] 2sequence ] }
         { 3 [ \ 3dip [ ] 2sequence ] }
