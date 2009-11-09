@@ -1,7 +1,7 @@
 USING: arrays generic assocs kernel math namespaces
 sequences tools.test words definitions parser quotations
 vocabs continuations classes.tuple compiler.units
-io.streams.string accessors eval words.symbol ;
+io.streams.string accessors eval words.symbol grouping ;
 IN: words.tests
 
 [ 4 ] [
@@ -121,7 +121,7 @@ DEFER: x
 [ { } ]
 [
     all-words [
-        "compiled-uses" word-prop
+        "compiled-uses" word-prop 2 <groups>
         keys [ "forgotten" word-prop ] filter
     ] map harvest
 ] unit-test
