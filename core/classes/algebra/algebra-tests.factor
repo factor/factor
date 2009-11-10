@@ -7,36 +7,37 @@ stack-checker effects kernel.private sbufs math.order
 classes.tuple accessors generic.private ;
 IN: classes.algebra.tests
 
-: class-and* ( cls1 cls2 cls3 -- ? ) [ class-and ] dip class= ;
-
-: class-or* ( cls1 cls2 cls3 -- ? ) [ class-or ] dip class= ;
-
-[ t ] [ object  object  object class-and* ] unit-test
-[ t ] [ fixnum  object  fixnum class-and* ] unit-test
-[ t ] [ object  fixnum  fixnum class-and* ] unit-test
-[ t ] [ fixnum  fixnum  fixnum class-and* ] unit-test
-[ t ] [ fixnum  integer fixnum class-and* ] unit-test
-[ t ] [ integer fixnum  fixnum class-and* ] unit-test
-
-[ t ] [ vector    fixnum   null   class-and* ] unit-test
-[ t ] [ number    object   number class-and* ] unit-test
-[ t ] [ object    number   number class-and* ] unit-test
-[ t ] [ slice     reversed null   class-and* ] unit-test
-[ t ] [ \ f class-not \ f      null   class-and* ] unit-test
-[ t ] [ \ f class-not \ f      object class-or*  ] unit-test
-
 TUPLE: first-one ;
 TUPLE: second-one ;
 UNION: both first-one union-class ;
 
-[ t ] [ both tuple classes-intersect? ] unit-test
-[ t ] [ vector virtual-sequence null class-and* ] unit-test
-[ f ] [ vector virtual-sequence classes-intersect? ] unit-test
+PREDICATE: no-docs < word "documentation" word-prop not ;
 
-[ t ] [ number vector class-or sequence classes-intersect? ] unit-test
+UNION: no-docs-union no-docs integer ;
 
-[ f ] [ number vector class-and sequence classes-intersect? ] unit-test
+TUPLE: a ;
+TUPLE: b ;
+UNION: c a b ;
 
+TUPLE: tuple-example ;
+
+TUPLE: a1 ;
+TUPLE: b1 ;
+TUPLE: c1 ;
+
+UNION: x1 a1 b1 ;
+UNION: y1 a1 c1 ;
+UNION: z1 b1 c1 ;
+
+SINGLETON: sa
+SINGLETON: sb
+SINGLETON: sc
+
+INTERSECTION: empty-intersection ;
+
+INTERSECTION: generic-class generic class ;
+
+! class<=
 [ t ] [ \ fixnum \ integer class<= ] unit-test
 [ t ] [ \ fixnum \ fixnum class<= ] unit-test
 [ f ] [ \ integer \ fixnum class<= ] unit-test
@@ -50,16 +51,8 @@ UNION: both first-one union-class ;
 [ f ] [ \ reversed \ slice class<= ] unit-test
 [ f ] [ \ slice \ reversed class<= ] unit-test
 
-PREDICATE: no-docs < word "documentation" word-prop not ;
-
-UNION: no-docs-union no-docs integer ;
-
 [ t ] [ no-docs no-docs-union class<= ] unit-test
 [ f ] [ no-docs-union no-docs class<= ] unit-test
-
-TUPLE: a ;
-TUPLE: b ;
-UNION: c a b ;
 
 [ t ] [ \ c \ tuple class<= ] unit-test
 [ f ] [ \ tuple \ c class<= ] unit-test
@@ -67,53 +60,31 @@ UNION: c a b ;
 [ t ] [ \ tuple-class \ class class<= ] unit-test
 [ f ] [ \ class \ tuple-class class<= ] unit-test
 
-TUPLE: tuple-example ;
-
 [ t ] [ \ null \ tuple-example class<= ] unit-test
 [ f ] [ \ object \ tuple-example class<= ] unit-test
 [ f ] [ \ object \ tuple-example class<= ] unit-test
 [ t ] [ \ tuple-example \ tuple class<= ] unit-test
 [ f ] [ \ tuple \ tuple-example class<= ] unit-test
 
-TUPLE: a1 ;
-TUPLE: b1 ;
-TUPLE: c1 ;
-
-UNION: x1 a1 b1 ;
-UNION: y1 a1 c1 ;
-UNION: z1 b1 c1 ;
-
 [ f ] [ z1 x1 y1 class-and class<= ] unit-test
 
 [ t ] [ x1 y1 class-and a1 class<= ] unit-test
-
-[ f ] [ y1 z1 class-and x1 classes-intersect? ] unit-test
 
 [ f ] [ b1 c1 class-or a1 b1 class-or a1 c1 class-and class-and class<= ] unit-test
 
 [ t ] [ a1 b1 class-or a1 c1 class-or class-and a1 class<= ] unit-test
 
-[ f ] [ a1 c1 class-or b1 c1 class-or class-and a1 b1 class-or classes-intersect? ] unit-test
+[ t ] [ growable tuple sequence class-and class<= ] unit-test
 
-[ t ] [
-    growable tuple sequence class-and class<=
-] unit-test
-
-[ t ] [
-    growable assoc class-and tuple class<=
-] unit-test
+[ t ] [ growable assoc class-and tuple class<= ] unit-test
 
 [ t ] [ object \ f \ f class-not class-or class<= ] unit-test
 
 [ t ] [ fixnum class-not integer class-and bignum class= ] unit-test
 
-[ f ] [ integer integer class-not classes-intersect? ] unit-test
-
 [ t ] [ array number class-not class<= ] unit-test
 
 [ f ] [ bignum number class-not class<= ] unit-test
-
-[ vector ] [ vector class-not class-not ] unit-test
 
 [ t ] [ fixnum fixnum bignum class-or class<= ] unit-test
 
@@ -127,12 +98,80 @@ UNION: z1 b1 c1 ;
 
 [ t ] [ number class-not integer class-not class<= ] unit-test
 
-[ t ] [ vector array class-not class-and vector class= ] unit-test
+[ f ] [ fixnum class-not integer class<= ] unit-test
+
+[ t ] [ object empty-intersection class<= ] unit-test
+[ t ] [ empty-intersection object class<= ] unit-test
+[ t ] [ \ f class-not empty-intersection class<= ] unit-test
+[ f ] [ empty-intersection \ f class-not class<= ] unit-test
+[ t ] [ \ number empty-intersection class<= ] unit-test
+[ t ] [ empty-intersection class-not null class<= ] unit-test
+[ t ] [ null empty-intersection class-not class<= ] unit-test
+
+[ t ] [ \ f class-not \ f class-or empty-intersection class<= ] unit-test
+[ t ] [ empty-intersection \ f class-not \ f class-or class<= ] unit-test
+
+[ t ] [ object \ f class-not \ f class-or class<= ] unit-test
+
+[ t ] [
+    fixnum class-not
+    fixnum fixnum class-not class-or
+    class<=
+] unit-test
+
+[ t ] [ generic-class generic class<= ] unit-test
+[ t ] [ generic-class \ class class<= ] unit-test
+
+! class-and
+: class-and* ( cls1 cls2 cls3 -- ? ) [ class-and ] dip class= ;
+
+[ t ] [ object  object  object class-and* ] unit-test
+[ t ] [ fixnum  object  fixnum class-and* ] unit-test
+[ t ] [ object  fixnum  fixnum class-and* ] unit-test
+[ t ] [ fixnum  fixnum  fixnum class-and* ] unit-test
+[ t ] [ fixnum  integer fixnum class-and* ] unit-test
+[ t ] [ integer fixnum  fixnum class-and* ] unit-test
+
+[ t ] [ vector    fixnum   null   class-and* ] unit-test
+[ t ] [ number    object   number class-and* ] unit-test
+[ t ] [ object    number   number class-and* ] unit-test
+[ t ] [ slice     reversed null   class-and* ] unit-test
+[ t ] [ \ f class-not \ f      null   class-and* ] unit-test
+
+[ t ] [ vector virtual-sequence null class-and* ] unit-test
+
+[ t ] [ vector array class-not vector class-and* ] unit-test
+
+! class-or
+: class-or* ( cls1 cls2 cls3 -- ? ) [ class-or ] dip class= ;
+
+[ t ] [ \ f class-not \ f      object class-or*  ] unit-test
+
+! class-not
+[ vector ] [ vector class-not class-not ] unit-test
+
+! classes-intersect?
+[ t ] [ both tuple classes-intersect? ] unit-test
+[ f ] [ vector virtual-sequence classes-intersect? ] unit-test
+
+[ t ] [ number vector class-or sequence classes-intersect? ] unit-test
+
+[ f ] [ number vector class-and sequence classes-intersect? ] unit-test
+
+[ f ] [ y1 z1 class-and x1 classes-intersect? ] unit-test
+
+[ f ] [ a1 c1 class-or b1 c1 class-or class-and a1 b1 class-or classes-intersect? ] unit-test
+
+[ f ] [ integer integer class-not classes-intersect? ] unit-test
 
 [ f ] [ fixnum class-not number class-and array classes-intersect? ] unit-test
 
-[ f ] [ fixnum class-not integer class<= ] unit-test
+[ t ] [ \ word generic-class classes-intersect? ] unit-test
+[ f ] [ number generic-class classes-intersect? ] unit-test
 
+[ f ] [ sa sb classes-intersect? ] unit-test
+
+! class=
 [ t ] [ null class-not object class= ] unit-test
 
 [ t ] [ object class-not null class= ] unit-test
@@ -141,13 +180,14 @@ UNION: z1 b1 c1 ;
 
 [ f ] [ null class-not null class= ] unit-test
 
-[ t ] [
-    fixnum class-not
-    fixnum fixnum class-not class-or
-    class<=
-] unit-test
+! class<=>
 
-! Test method inlining
+[ +lt+ ] [ integer sequence class<=> ] unit-test
+[ +lt+ ] [ sequence object class<=> ] unit-test
+[ +gt+ ] [ object sequence class<=> ] unit-test
+[ +eq+ ] [ integer integer class<=> ] unit-test
+
+! smallest-class etc
 [ real ] [ { real sequence } smallest-class ] unit-test
 [ real ] [ { sequence real } smallest-class ] unit-test
 
@@ -266,59 +306,10 @@ TUPLE: xh < xb ;
 
 [ t ] [ { xa xb xc xd xe xf xg xh } sort-classes dup sort-classes = ] unit-test
 
-INTERSECTION: generic-class generic class ;
-
-[ t ] [ generic-class generic class<= ] unit-test
-[ t ] [ generic-class \ class class<= ] unit-test
-
-! Later
-[
-    [ t ] [ \ class generic class-and generic-class class<= ] unit-test
-    [ t ] [ \ class generic class-and generic-class swap class<= ] unit-test
-] drop
-
-[ t ] [ \ word generic-class classes-intersect? ] unit-test
-[ f ] [ number generic-class classes-intersect? ] unit-test
-
 [ H{ { word word } } ] [ 
     generic-class flatten-class
 ] unit-test
 
-[ \ + flatten-class ] must-fail
-
-INTERSECTION: empty-intersection ;
-
-[ t ] [ object empty-intersection class<= ] unit-test
-[ t ] [ empty-intersection object class<= ] unit-test
-[ t ] [ \ f class-not empty-intersection class<= ] unit-test
-[ f ] [ empty-intersection \ f class-not class<= ] unit-test
-[ t ] [ \ number empty-intersection class<= ] unit-test
-[ t ] [ empty-intersection class-not null class<= ] unit-test
-[ t ] [ null empty-intersection class-not class<= ] unit-test
-
-[ t ] [ \ f class-not \ f class-or empty-intersection class<= ] unit-test
-[ t ] [ empty-intersection \ f class-not \ f class-or class<= ] unit-test
-
-[ t ] [ object \ f class-not \ f class-or class<= ] unit-test
-
-[ ] [ object flatten-builtin-class drop ] unit-test
-
-SINGLETON: sa
-SINGLETON: sb
-SINGLETON: sc
-
 [ sa ] [ sa { sa sb sc } min-class ] unit-test
 
-[ f ] [ sa sb classes-intersect? ] unit-test
-
-[ +lt+ ] [ integer sequence class<=> ] unit-test
-[ +lt+ ] [ sequence object class<=> ] unit-test
-[ +gt+ ] [ object sequence class<=> ] unit-test
-[ +eq+ ] [ integer integer class<=> ] unit-test
-
-! Limitations:
-
-! UNION: u1 sa sb ;
-! UNION: u2 sc ;
-
-! [ f ] [ u1 u2 classes-intersect? ] unit-test
+[ \ + flatten-class ] must-fail
