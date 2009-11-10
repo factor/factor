@@ -463,8 +463,8 @@ SYMBOLS:
             1 >>align
             "box_boolean" >>boxer
             "to_boolean" >>unboxer
-        \ bool define-primitive-type
     ] if
+    \ bool define-primitive-type
 
     <c-type>
         math:float >>class

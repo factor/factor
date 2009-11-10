@@ -470,7 +470,7 @@ CONSTANT: rs-reg 14
 
 [
     3 ds-reg 0 LWZ
-    3 3 1 SRAWI
+    3 3 2 SRAWI
     rs-reg 3 3 LWZX
     3 ds-reg 0 STW
 ] \ get-local define-sub-primitive
@@ -478,7 +478,7 @@ CONSTANT: rs-reg 14
 [
     3 ds-reg 0 LWZ
     ds-reg ds-reg 4 SUBI
-    3 3 1 SRAWI
+    3 3 2 SRAWI
     rs-reg 3 rs-reg SUBF
 ] \ drop-locals define-sub-primitive
 
