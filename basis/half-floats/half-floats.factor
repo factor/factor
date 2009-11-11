@@ -39,6 +39,7 @@ SYMBOL: half
     [ [ >float half>bits ] 2dip set-alien-unsigned-2 ] >>setter
     2 >>size
     2 >>align
+    2 >>align-first
     [ >float ] >>unboxer-quot
 \ half define-primitive-type
 
