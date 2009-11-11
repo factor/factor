@@ -518,7 +518,8 @@ tuple
     { "<callback>" "alien" (( word -- alien )) }
     { "enable-gc-events" "memory" (( -- )) }
     { "disable-gc-events" "memory" (( -- events )) }
-    { "identity-hashcode" "kernel" (( obj -- code )) }
+    { "(identity-hashcode)" "kernel.private" (( obj -- code )) }
+    { "compute-identity-hashcode" "kernel.private" (( obj -- )) }
 } [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number
