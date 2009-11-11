@@ -81,6 +81,9 @@ struct factor_vm
 	/* Number of entries in a polymorphic inline cache */
 	cell max_pic_size;
 
+	/* Incrementing object counter for identity hashing */
+	cell object_counter;
+
 	// contexts
 	void reset_datastack();
 	void reset_retainstack();
@@ -122,6 +125,8 @@ struct factor_vm
 	void primitive_special_object();
 	void primitive_set_special_object();
 	void primitive_identity_hashcode();
+	void compute_identity_hashcode(object *obj);
+	void primitive_compute_identity_hashcode();
 	cell object_size(cell tagged);
 	cell clone_object(cell obj_);
 	void primitive_clone();

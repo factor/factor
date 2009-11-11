@@ -19,18 +19,21 @@ void factor_vm::primitive_set_special_object()
 void factor_vm::primitive_identity_hashcode()
 {
 	cell tagged = dpeek();
-	if(immediate_p(tagged))
-		drepl(tagged & ~TAG_MASK);
-	else
-	{
-		object *obj = untag<object>(tagged);
-		if(obj->hashcode() == 0)
-		{
-			/* Use megamorphic_cache_misses as a random source of randomness */
-			obj->set_hashcode(((cell)obj / block_granularity) ^ dispatch_stats.megamorphic_cache_hits);
-		}
-		drepl(tag_fixnum(obj->hashcode()));
-	}
+	object *obj = untag<object>(tagged);
+	drepl(tag_fixnum(obj->hashcode()));
+}
+
+void factor_vm::compute_identity_hashcode(object *obj)
+{
+	object_counter++;
+	if(object_counter == 0) object_counter++;
+	obj->set_hashcode((cell)obj ^ object_counter);
+}
+
+void factor_vm::primitive_compute_identity_hashcode()
+{
+	object *obj = untag<object>(dpop());
+	compute_identity_hashcode(obj);
 }
 
 void factor_vm::primitive_set_slot()
