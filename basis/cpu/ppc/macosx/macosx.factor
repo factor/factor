@@ -4,12 +4,6 @@ USING: accessors system kernel layouts
 alien.c-types cpu.architecture cpu.ppc ;
 IN: cpu.ppc.macosx
 
-<<
-4 "longlong" c-type (>>align)
-4 "ulonglong" c-type (>>align)
-4 "double" c-type (>>align)
->>
-
 M: macosx reserved-area-size 6 cells ;
 
 M: macosx lr-save 2 cells ;
