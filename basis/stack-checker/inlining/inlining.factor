@@ -29,8 +29,6 @@ fixed-point
 introductions
 loop? ;
 
-M: inline-recursive hashcode* id>> hashcode* ;
-
 : inlined-block? ( word -- ? ) "inlined-block" word-prop ;
 
 : <inline-recursive> ( word -- label )

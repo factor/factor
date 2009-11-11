@@ -16,6 +16,23 @@ void factor_vm::primitive_set_special_object()
 	special_objects[e] = value;
 }
 
+void factor_vm::primitive_identity_hashcode()
+{
+	cell tagged = dpeek();
+	if(immediate_p(tagged))
+		drepl(tagged & ~TAG_MASK);
+	else
+	{
+		object *obj = untag<object>(tagged);
+		if(obj->hashcode() == 0)
+		{
+			/* Use megamorphic_cache_misses as a random source of randomness */
+			obj->set_hashcode(((cell)obj / block_granularity) ^ dispatch_stats.megamorphic_cache_hits);
+		}
+		drepl(tag_fixnum(obj->hashcode()));
+	}
+}
+
 void factor_vm::primitive_set_slot()
 {
 	fixnum slot = untag_fixnum(dpop());
@@ -36,8 +53,9 @@ cell factor_vm::clone_object(cell obj_)
 	else
 	{
 		cell size = object_size(obj.value());
-		object *new_obj = allot_object(header(obj.type()),size);
+		object *new_obj = allot_object(obj.type(),size);
 		memcpy(new_obj,obj.untagged(),size);
+		new_obj->set_hashcode(0);
 		return tag_dynamic(new_obj);
 	}
 }

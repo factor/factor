@@ -135,12 +135,12 @@ void factor_vm::relocate_object(object *object,
 	cell data_relocation_base,
 	cell code_relocation_base)
 {
-	cell hi_tag = object->h.hi_tag();
+	cell type = object->type();
 	
 	/* Tuple relocation is a bit trickier; we have to fix up the
 	layout object before we can get the tuple size, so do_slots is
 	out of the question */
-	if(hi_tag == TUPLE_TYPE)
+	if(type == TUPLE_TYPE)
 	{
 		tuple *t = (tuple *)object;
 		data_fixup(&t->layout,data_relocation_base);
@@ -156,7 +156,7 @@ void factor_vm::relocate_object(object *object,
 		object_fixupper fixupper(this,data_relocation_base);
 		do_slots(object,fixupper);
 
-		switch(hi_tag)
+		switch(type)
 		{
 		case WORD_TYPE:
 			fixup_word((word *)object,code_relocation_base);
