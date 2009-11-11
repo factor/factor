@@ -7,7 +7,6 @@ compiler.cfg.intrinsics.alien
 compiler.cfg.intrinsics.allot
 compiler.cfg.intrinsics.fixnum
 compiler.cfg.intrinsics.float
-compiler.cfg.intrinsics.simd
 compiler.cfg.intrinsics.slots
 compiler.cfg.intrinsics.misc
 compiler.cfg.comparisons ;
@@ -23,7 +22,6 @@ QUALIFIED: classes.tuple.private
 QUALIFIED: math.private
 QUALIFIED: math.integers.private
 QUALIFIED: math.floats.private
-QUALIFIED: math.vectors.simd.intrinsics
 QUALIFIED: math.libm
 IN: compiler.cfg.intrinsics
 

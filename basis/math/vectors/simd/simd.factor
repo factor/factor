@@ -320,7 +320,7 @@ M: simd-128 n+v [ simd-with ] keep v+ ; inline
 M: simd-128 n-v [ simd-with ] keep v- ; inline
 M: simd-128 n*v [ simd-with ] keep v* ; inline
 M: simd-128 n/v [ simd-with ] keep v/ ; inline
-M: simd-128 v+n over simd-with v+
+M: simd-128 v+n over simd-with v+ ; inline
 M: simd-128 v-n over simd-with v- ; inline
 M: simd-128 v*n over simd-with v* ; inline
 M: simd-128 v/n over simd-with v/ ; inline
@@ -336,3 +336,8 @@ M: simd-128 vshuffle ( u perm -- v )
 
 "compiler.tree.propagation.simd" require
 "compiler.cfg.intrinsics.simd" require
+"compiler.cfg.value-numbering.simd" require
+
+"mirrors" vocab [
+    "math.vectors.simd.mirrors" require
+] when
