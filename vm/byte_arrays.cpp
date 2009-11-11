@@ -24,9 +24,10 @@ void factor_vm::primitive_uninitialized_byte_array()
 
 void factor_vm::primitive_resize_byte_array()
 {
-	byte_array *array = untag_check<byte_array>(dpop());
+	data_root<byte_array> array(dpop(),this);
+	array.untag_check(this);
 	cell capacity = unbox_array_size();
-	dpush(tag<byte_array>(reallot_array(array,capacity)));
+	dpush(tag<byte_array>(reallot_array(array.untagged(),capacity)));
 }
 
 void growable_byte_array::append_bytes(void *elts, cell len)
