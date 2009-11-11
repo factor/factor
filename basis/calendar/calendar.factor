@@ -157,6 +157,18 @@ M: timestamp easter ( timestamp -- timestamp )
 : microseconds ( x -- duration ) 1000000 / seconds ;
 : nanoseconds ( x -- duration ) 1000000000 / seconds ;
 
+GENERIC: year ( obj -- n )
+M: integer year ;
+M: timestamp year year>> ;
+
+GENERIC: month ( obj -- n )
+M: integer month ;
+M: timestamp month month>> ;
+
+GENERIC: day ( obj -- n )
+M: integer day ;
+M: timestamp day day>> ;
+
 GENERIC: leap-year? ( obj -- ? )
 
 M: integer leap-year? ( year -- ? )
@@ -420,7 +432,49 @@ M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
     dup timestamp [ month>> ] bi@ = [ 1 weeks time+ ] unless
     n 1 - [ weeks time+ ] unless-zero ;
 
+: last-day-this-month ( timestamp day -- new-timestamp )
+    [ 1 months time+ 1 ] dip nth-day-this-month 1 weeks time- ;
+
 PRIVATE>
+
+GENERIC: january ( obj -- timestamp )
+GENERIC: february ( obj -- timestamp )
+GENERIC: march ( obj -- timestamp )
+GENERIC: april ( obj -- timestamp )
+GENERIC: may ( obj -- timestamp )
+GENERIC: june ( obj -- timestamp )
+GENERIC: july ( obj -- timestamp )
+GENERIC: august ( obj -- timestamp )
+GENERIC: september ( obj -- timestamp )
+GENERIC: october ( obj -- timestamp )
+GENERIC: november ( obj -- timestamp )
+GENERIC: december ( obj -- timestamp )
+
+M: integer january 1 1 <date> ;
+M: integer february 2 1 <date> ;
+M: integer march 3 1 <date> ;
+M: integer april 4 1 <date> ;
+M: integer may 5 1 <date> ;
+M: integer june 6 1 <date> ;
+M: integer july 7 1 <date> ;
+M: integer august 8 1 <date> ;
+M: integer september 9 1 <date> ;
+M: integer october 10 1 <date> ;
+M: integer november 11 1 <date> ;
+M: integer december 12 1 <date> ;
+
+M: timestamp january clone 1 >>month ;
+M: timestamp february clone 2 >>month ;
+M: timestamp march clone 3 >>month ;
+M: timestamp april clone 4 >>month ;
+M: timestamp may clone 5 >>month ;
+M: timestamp june clone 6 >>month ;
+M: timestamp july clone 7 >>month ;
+M: timestamp august clone 8 >>month ;
+M: timestamp september clone 9 >>month ;
+M: timestamp october clone 10 >>month ;
+M: timestamp november clone 11 >>month ;
+M: timestamp december clone 12 >>month ;
 
 : sunday ( timestamp -- new-timestamp ) 0 day-this-week ;
 : monday ( timestamp -- new-timestamp ) 1 day-this-week ;
@@ -437,6 +491,14 @@ PRIVATE>
 : thursday-of-month ( timestamp n -- new-timestamp ) 4 nth-day-this-month ;
 : friday-of-month ( timestamp n -- new-timestamp ) 5 nth-day-this-month ;
 : saturday-of-month ( timestamp n -- new-timestamp ) 6 nth-day-this-month ;
+
+: last-sunday-of-month ( timestamp -- new-timestamp ) 0 last-day-this-month ;
+: last-monday-of-month ( timestamp -- new-timestamp ) 1 last-day-this-month ;
+: last-tuesday-of-month ( timestamp -- new-timestamp ) 2 last-day-this-month ;
+: last-wednesday-of-month ( timestamp -- new-timestamp ) 3 last-day-this-month ;
+: last-thursday-of-month ( timestamp -- new-timestamp ) 4 last-day-this-month ;
+: last-friday-of-month ( timestamp -- new-timestamp ) 5 last-day-this-month ;
+: last-saturday-of-month ( timestamp -- new-timestamp ) 6 last-day-this-month ;
 
 : beginning-of-week ( timestamp -- new-timestamp )
     midnight sunday ;
