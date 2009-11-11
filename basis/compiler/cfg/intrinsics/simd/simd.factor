@@ -9,6 +9,7 @@ compiler.cfg.comparisons
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.cfg.hats
 compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.intrinsics.alien
+compiler.cfg.intrinsics.simd.backend
 specialized-arrays ;
 FROM: alien.c-types => heap-size char short int longlong float double ;
 SPECIALIZED-ARRAYS: char short int longlong float double ;
@@ -76,15 +77,37 @@ IN: compiler.cfg.intrinsics.simd
         { cc>= [ src1 src2 rep ^^max-vector src1 rep cc=  ^^compare-vector ] }
     } case ;
 
+:: ^((compare-vector)) ( src1 src2 rep {cc,swap} -- dst )
+    {cc,swap} first2 :> ( cc swap? )
+    swap?
+    [ src2 src1 rep cc ^^compare-vector ]
+    [ src1 src2 rep cc ^^compare-vector ] if ;
+
+:: ^(compare-vector) ( src1 src2 rep orig-cc -- dst )
+    rep orig-cc %compare-vector-ccs :> ( ccs not? )
+
+    ccs empty?
+    [ rep not? [ ^^fill-vector ] [ ^^zero-vector ] if ]
+    [
+        ccs unclip :> ( rest-ccs first-cc )
+        src1 src2 rep first-cc ^((compare-vector)) :> first-dst
+
+        rest-ccs first-dst
+        [ [ src1 src2 rep ] dip ^((compare-vector)) rep ^^or-vector ]
+        reduce
+
+        not? [ rep generate-not-vector ] when
+    ] if ;
+
 : ^compare-vector ( src1 src2 rep cc -- dst )
     {
-        [ ^^compare-vector ]
+        [ ^(compare-vector) ]
         [ ^minmax-compare-vector ]
         { unsigned-int-vector-rep [| src1 src2 rep cc |
             rep sign-bit-mask ^^load-constant :> sign-bits
             src1 sign-bits rep ^^xor-vector
             src2 sign-bits rep ^^xor-vector
-            rep unsign-rep cc ^^compare-vector
+            rep unsign-rep cc ^(compare-vector)
         ] }
     } vv-cc-vector-op ;
 
@@ -95,7 +118,7 @@ IN: compiler.cfg.intrinsics.simd
         { signed-int-vector-rep [| src rep |
             src src rep ^^merge-vector-head :> merged
             rep rep-component-type heap-size 8 * :> bits
-            merged bits rep ^widened-shr-vector-imm
+            merged bits rep widen-rep ^shr-vector-imm
         ] }
         { signed-int-vector-rep [| src rep |
             rep ^^zero-vector :> zero
@@ -499,14 +522,23 @@ IN: compiler.cfg.intrinsics.simd
     } [ integer? ] emit-vl-vector-op ;
 
 : emit-alien-vector ( node -- )
-    {
-        [ ^^alien-vector ]
-    } emit-alien-vector-op ;
-    
+    dup [
+        '[
+            ds-drop prepare-alien-getter
+            _ ^^alien-vector ds-push
+        ]
+        [ inline-alien-getter? ] inline-alien
+    ] with { [ %alien-vector-reps member? ] } if-literals-match ;
+
 : emit-set-alien-vector ( node -- )
-    {
-        [ ^^set-alien-vector ]
-    } emit-set-alien-vector-op ;
+    dup [
+        '[
+            ds-drop prepare-alien-setter ds-pop
+            _ ##set-alien-vector
+        ]
+        [ byte-array inline-alien-setter? ]
+        inline-alien
+    ] with { [ %alien-vector-reps member? ] } if-literals-match ;
 
 : enable-simd ( -- )
     {
