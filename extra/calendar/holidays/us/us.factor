@@ -16,7 +16,7 @@ SYNTAX: us-federal
     january 3 monday-of-month ; us-federal
 
 : inauguration-day ( timestamp/n -- timestamp )
-    year dup 4 mod + january 20 >>day ; us-federal
+    year dup neg 4 rem + january 20 >>day ; us-federal
 
 : washington's-birthday ( timestamp/n -- timestamp )
     february 3 monday-of-month ; us-federal
