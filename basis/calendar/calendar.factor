@@ -398,12 +398,28 @@ M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
 : day-of-year ( timestamp -- n )
     >date< (day-of-year) ;
 
+: midnight ( timestamp -- new-timestamp )
+    clone 0 >>hour 0 >>minute 0 >>second ; inline
+
+: noon ( timestamp -- new-timestamp )
+    midnight 12 >>hour ; inline
+
+: beginning-of-month ( timestamp -- new-timestamp )
+    midnight 1 >>day ;
+
 <PRIVATE
-: day-offset ( timestamp m -- timestamp n )
+
+: day-offset ( timestamp m -- new-timestamp n )
     over day-of-week - ; inline
 
-: day-this-week ( timestamp n -- timestamp )
+: day-this-week ( timestamp n -- new-timestamp )
     day-offset days time+ ;
+
+:: nth-day-this-month ( timestamp n day -- new-timestamp )
+    timestamp beginning-of-month day day-this-week
+    dup timestamp [ month>> ] bi@ = [ 1 weeks time+ ] unless
+    n 1 - [ weeks time+ ] unless-zero ;
+
 PRIVATE>
 
 : sunday ( timestamp -- new-timestamp ) 0 day-this-week ;
@@ -414,14 +430,13 @@ PRIVATE>
 : friday ( timestamp -- new-timestamp ) 5 day-this-week ;
 : saturday ( timestamp -- new-timestamp ) 6 day-this-week ;
 
-: midnight ( timestamp -- new-timestamp )
-    clone 0 >>hour 0 >>minute 0 >>second ; inline
-
-: noon ( timestamp -- new-timestamp )
-    midnight 12 >>hour ; inline
-
-: beginning-of-month ( timestamp -- new-timestamp )
-    midnight 1 >>day ;
+: sunday-of-month ( timestamp n -- new-timestamp ) 0 nth-day-this-month ;
+: monday-of-month ( timestamp n -- new-timestamp ) 1 nth-day-this-month ;
+: tuesday-of-month ( timestamp n -- new-timestamp ) 2 nth-day-this-month ;
+: wednesday-of-month ( timestamp n -- new-timestamp ) 3 nth-day-this-month ;
+: thursday-of-month ( timestamp n -- new-timestamp ) 4 nth-day-this-month ;
+: friday-of-month ( timestamp n -- new-timestamp ) 5 nth-day-this-month ;
+: saturday-of-month ( timestamp n -- new-timestamp ) 6 nth-day-this-month ;
 
 : beginning-of-week ( timestamp -- new-timestamp )
     midnight sunday ;
