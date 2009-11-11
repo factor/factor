@@ -333,6 +333,8 @@ M: not-found-in-roots summary drop "Cannot resolve vocab: path" ;
 
 M: wrong-values summary drop "Quotation called with wrong stack effect" ;
 
+M: stack-effect-omits-dashes summary drop "Stack effect must contain “--”" ;
+
 {
     { [ os windows? ] [ "debugger.windows" require ] }
     { [ os unix? ] [ "debugger.unix" require ] }
