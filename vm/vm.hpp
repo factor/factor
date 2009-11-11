@@ -374,7 +374,6 @@ struct factor_vm
 	void primitive_resize_byte_array();
 
 	template<typename Type> byte_array *byte_array_from_value(Type *value);
-	template<typename Type> byte_array *byte_array_from_values(Type *values, cell len);
 
 	//tuples
 	void primitive_tuple();
