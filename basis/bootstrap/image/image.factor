@@ -71,6 +71,9 @@ C: <eq-wrapper> eq-wrapper
 M: eq-wrapper equal?
     over eq-wrapper? [ [ obj>> ] bi@ eq? ] [ 2drop f ] if ;
 
+M: eq-wrapper hashcode*
+    nip obj>> identity-hashcode ;
+
 SYMBOL: objects
 
 : cache-eql-object ( obj quot -- value )
@@ -224,9 +227,11 @@ USERENV: undefined-quot 60
 
 : emit-fixnum ( n -- ) tag-fixnum emit ;
 
+: emit-header ( n -- ) tag-header emit ;
+
 : emit-object ( class quot -- addr )
     [ type-number ] dip over here-as
-    [ swap tag-fixnum emit call align-here ] dip ;
+    [ swap emit-header call align-here ] dip ;
     inline
 
 ! Write an object to the image.
@@ -234,7 +239,7 @@ GENERIC: ' ( obj -- ptr )
 
 ! Image header
 
-: emit-header ( -- )
+: emit-image-header ( -- )
     image-magic emit
     image-version emit
     data-base emit ! relocation base at end of header
@@ -518,7 +523,7 @@ M: quotation '
 : build-image ( -- image )
     800000 <vector> image set
     20000 <hashtable> objects set
-    emit-header t, 0, 1, -1,
+    emit-image-header t, 0, 1, -1,
     "Building generic words..." print flush
     remake-generics
     "Serializing words..." print flush

@@ -243,7 +243,7 @@ struct object_dumper {
 
 	void operator()(object *obj)
 	{
-		if(type == TYPE_COUNT || obj->h.hi_tag() == type)
+		if(type == TYPE_COUNT || obj->type() == type)
 		{
 			std::cout << padded_address((cell)obj) << " ";
 			parent->print_nested_obj(tag_dynamic(obj),2);

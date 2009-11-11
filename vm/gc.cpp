@@ -234,7 +234,7 @@ VM_C_API void inline_gc(cell *data_roots_base, cell data_roots_size, factor_vm *
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
  */
-object *factor_vm::allot_large_object(header header, cell size)
+object *factor_vm::allot_large_object(cell type, cell size)
 {
 	/* If tenured space does not have enough room, collect and compact */
 	if(!data->tenured->can_allot_p(size))
@@ -257,7 +257,7 @@ object *factor_vm::allot_large_object(header header, cell size)
 	a nursery allocation */
 	write_barrier(obj,size);
 
-	obj->h = header;
+	obj->initialize(type);
 	return obj;
 }
 

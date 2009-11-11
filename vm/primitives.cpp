@@ -126,6 +126,7 @@ PRIMITIVE_FORWARD(strip_stack_traces)
 PRIMITIVE_FORWARD(callback)
 PRIMITIVE_FORWARD(enable_gc_events)
 PRIMITIVE_FORWARD(disable_gc_events)
+PRIMITIVE_FORWARD(identity_hashcode)
 
 const primitive_type primitives[] = {
 	primitive_bignum_to_fixnum,
@@ -288,6 +289,7 @@ const primitive_type primitives[] = {
 	primitive_callback,
 	primitive_enable_gc_events,
 	primitive_disable_gc_events,
+	primitive_identity_hashcode,
 };
 
 }

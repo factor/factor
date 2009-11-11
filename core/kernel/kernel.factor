@@ -200,6 +200,8 @@ TUPLE: identity-tuple ;
 
 M: identity-tuple equal? 2drop f ; inline
 
+M: identity-tuple hashcode* nip identity-hashcode ; inline
+
 : = ( obj1 obj2 -- ? )
     2dup eq? [ 2drop t ] [
         2dup both-fixnums? [ 2drop f ] [ equal? ] if
