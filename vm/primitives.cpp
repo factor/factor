@@ -127,6 +127,7 @@ PRIMITIVE_FORWARD(callback)
 PRIMITIVE_FORWARD(enable_gc_events)
 PRIMITIVE_FORWARD(disable_gc_events)
 PRIMITIVE_FORWARD(identity_hashcode)
+PRIMITIVE_FORWARD(compute_identity_hashcode)
 
 const primitive_type primitives[] = {
 	primitive_bignum_to_fixnum,
@@ -290,6 +291,7 @@ const primitive_type primitives[] = {
 	primitive_enable_gc_events,
 	primitive_disable_gc_events,
 	primitive_identity_hashcode,
+	primitive_compute_identity_hashcode,
 };
 
 }

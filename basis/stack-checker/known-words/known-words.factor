@@ -713,4 +713,6 @@ M: bad-executable summary
 
 \ profiling { object } { } define-primitive
 
-\ identity-hashcode { object } { fixnum } define-primitive
+\ (identity-hashcode) { object } { fixnum } define-primitive
+
+\ compute-identity-hashcode { object } { } define-primitive
