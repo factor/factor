@@ -134,7 +134,7 @@ $nl
 "If a pathname begins with " { $snippet "vocab:" } ", then it will be searched for in all current vocabulary roots (see " { $link "add-vocab-roots" } ")." ;
 
 ARTICLE: "io.pathnames.presentations" "Pathname presentations"
-"Pathname presentations are objects that wrap a pathname string.  Clicking a pathname presentation in the UI brings up the file in one of the supported editors. See " { $link "editor" } " for more details."
+"Pathname presentations are objects that wrap a pathname string. Clicking a pathname presentation in the UI brings up the file in one of the supported editors. See " { $link "editor" } " for more details."
 { $subsections
     pathname
     <pathname>
