@@ -5,7 +5,7 @@ namespace factor
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
  */
-inline object *factor_vm::allot_object(header header, cell size)
+inline object *factor_vm::allot_object(cell type, cell size)
 {
 	/* If the object is smaller than the nursery, allocate it in the nursery,
 	after a GC if needed */
@@ -17,13 +17,13 @@ inline object *factor_vm::allot_object(header header, cell size)
 
 		object *obj = nursery.allot(size);
 
-		obj->h = header;
+		obj->initialize(type);
 		return obj;
 	}
 	/* If the object is bigger than the nursery, allocate it in
 	tenured space */
 	else
-		return allot_large_object(header,size);
+		return allot_large_object(type,size);
 }
 
 }

@@ -22,6 +22,9 @@ SYMBOL: mega-cache-size
 : tag-fixnum ( n -- tagged )
     tag-bits get shift ;
 
+: tag-header ( n -- tagged )
+    2 shift ;
+
 : untag-fixnum ( n -- tagged )
     tag-bits get neg shift ;
 

@@ -4,20 +4,16 @@ USING: kernel math vectors arrays accessors namespaces ;
 IN: compiler.cfg
 
 TUPLE: basic-block < identity-tuple
-{ id integer }
 number
 { instructions vector }
 { successors vector }
 { predecessors vector } ;
 
-M: basic-block hashcode* nip id>> ;
-
 : <basic-block> ( -- bb )
     basic-block new
         V{ } clone >>instructions
         V{ } clone >>successors
-        V{ } clone >>predecessors
-        \ basic-block counter >>id ;
+        V{ } clone >>predecessors ;
 
 TUPLE: cfg { entry basic-block } word label
 spill-area-size reps

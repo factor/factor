@@ -373,7 +373,7 @@ M: ppc %set-alien-double -rot STFD ;
     scratch-reg nursery-ptr 0 STW ;
 
 :: store-header ( dst class -- )
-    class type-number tag-fixnum scratch-reg LI
+    class type-number tag-header scratch-reg LI
     scratch-reg dst 0 STW ;
 
 : store-tagged ( dst tag -- )

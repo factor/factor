@@ -121,6 +121,7 @@ struct factor_vm
 	// objects
 	void primitive_special_object();
 	void primitive_set_special_object();
+	void primitive_identity_hashcode();
 	cell object_size(cell tagged);
 	cell clone_object(cell obj_);
 	void primitive_clone();
@@ -284,12 +285,12 @@ struct factor_vm
 	void inline_gc(cell *data_roots_base, cell data_roots_size);
 	void primitive_enable_gc_events();
 	void primitive_disable_gc_events();
-	object *allot_object(header header, cell size);
-	object *allot_large_object(header header, cell size);
+	object *allot_object(cell type, cell size);
+	object *allot_large_object(cell type, cell size);
 
 	template<typename Type> Type *allot(cell size)
 	{
-		return (Type *)allot_object(header(Type::type_number),size);
+		return (Type *)allot_object(Type::type_number,size);
 	}
 
 	inline void check_data_pointer(object *pointer)

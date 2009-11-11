@@ -16,11 +16,10 @@ template<typename TargetGeneration, typename Policy> struct collector_workhorse 
 		parent->check_data_pointer(untagged);
 
 		/* is there another forwarding pointer? */
-		while(untagged->h.forwarding_pointer_p())
-			untagged = untagged->h.forwarding_pointer();
+		while(untagged->forwarding_pointer_p())
+			untagged = untagged->forwarding_pointer();
 
 		/* we've found the destination */
-		untagged->h.check_header();
 		return untagged;
 	}
 
@@ -32,7 +31,7 @@ template<typename TargetGeneration, typename Policy> struct collector_workhorse 
 		if(!newpointer) longjmp(parent->current_gc->gc_unwind,1);
 
 		memcpy(newpointer,untagged,size);
-		untagged->h.forward_to(newpointer);
+		untagged->forward_to(newpointer);
 
 		policy.promoted_object(newpointer);
 
@@ -114,7 +113,7 @@ template<typename TargetGeneration, typename Policy> struct collector {
 	void trace_object(object *ptr)
 	{
 		workhorse.visit_slots(ptr);
-		if(ptr->h.hi_tag() == ALIEN_TYPE)
+		if(ptr->type() == ALIEN_TYPE)
 			((alien *)ptr)->update_address();
 	}
 
