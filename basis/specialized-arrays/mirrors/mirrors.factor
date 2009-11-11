@@ -4,5 +4,3 @@ USING: mirrors specialized-arrays math.vectors ;
 IN: specialized-arrays.mirrors
 
 INSTANCE: specialized-array enumerated-sequence
-INSTANCE: simd-128          enumerated-sequence
-INSTANCE: simd-256          enumerated-sequence

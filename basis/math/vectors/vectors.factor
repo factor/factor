@@ -97,7 +97,7 @@ M: object vbitor [ bitor ] 2map ;
 GENERIC: vbitxor ( u v -- w )
 M: object vbitxor [ bitxor ] 2map ;
 GENERIC: vbitnot ( u -- w )
-M: object vbitnot [ bitnot ] 2map ;
+M: object vbitnot [ bitnot ] map ;
 
 GENERIC# vbroadcast 1 ( u n -- v )
 M:: object vbroadcast ( u n -- v ) u length n u nth <repetition> u like ;
@@ -133,6 +133,7 @@ GENERIC: (vmerge-tail) ( u v -- t )
 M: object (vmerge-tail) over length 2 /i '[ _ tail-slice ] bi@ [ zip ] keep concat-as ;
 
 GENERIC: (vmerge) ( u v -- h t )
+M: object (vmerge)
     [ (vmerge-head) ] [ (vmerge-tail) ] 2bi ; inline
 
 GENERIC: vmerge ( u v -- w )

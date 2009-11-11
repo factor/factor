@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.parser
 assocs byte-arrays classes compiler.units functors kernel lexer
-libc math math.vectors math.vectors.private
-math.vectors.specialization namespaces
+libc math math.vectors math.vectors.private namespaces
 parser prettyprint.custom sequences sequences.private strings
 summary vocabs vocabs.loader vocabs.parser vocabs.generated
 words fry combinators make ;
@@ -69,8 +68,6 @@ TUPLE: A
     [ drop \ T bad-byte-array-length ] unless
     <direct-A> ; inline
 
-M: A new-underlying drop byte-array>A ;
-
 M: A clone [ underlying>> clone ] [ length>> ] bi <direct-A> ; inline
 
 M: A length length>> ; inline
@@ -96,8 +93,6 @@ M: A resize
 
 M: A byte-length length \ T heap-size * ; inline
 
-M: A element-type drop \ T ; inline
-
 M: A direct-array-syntax drop \ A@ ;
 
 M: A pprint-delims drop \ A{ \ } ;
@@ -108,8 +103,6 @@ SYNTAX: A{ \ } [ >A ] parse-literal ;
 SYNTAX: A@ scan-object scan-object <direct-A> suffix! ;
 
 INSTANCE: A specialized-array
-
-A T c-type-boxed-class f specialize-vector-words
 
 ;FUNCTOR
 
