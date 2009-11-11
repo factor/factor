@@ -65,7 +65,7 @@ STRUCT: gc-event
 { data-sweep-time cell }
 { code-sweep-time cell }
 { compaction-time cell }
-{ temp-time ulonglong } ;
+{ temp-time cell } ;
 
 STRUCT: dispatch-statistics
 { megamorphic-cache-hits cell }
