@@ -262,10 +262,15 @@ struct factor_vm
 
 	inline void write_barrier(object *obj, cell size)
 	{
-		char *start = (char *)obj;
-		for(cell offset = 0; offset < size; offset += card_size)
-			write_barrier((cell *)(start + offset));
+		cell start = (cell)obj & -card_size;
+		cell end = ((cell)obj + size + card_size - 1) & -card_size;
+
+		for(cell offset = start; offset < end; offset += card_size)
+			write_barrier((cell *)offset);
 	}
+
+	// data heap checker
+	void check_data_heap();
 
 	// gc
 	void end_gc();
@@ -374,7 +379,6 @@ struct factor_vm
 	void primitive_resize_byte_array();
 
 	template<typename Type> byte_array *byte_array_from_value(Type *value);
-	template<typename Type> byte_array *byte_array_from_values(Type *values, cell len);
 
 	//tuples
 	void primitive_tuple();
@@ -585,24 +589,6 @@ struct factor_vm
 	void primitive_set_innermost_stack_frame_quot();
 	void save_callstack_bottom(stack_frame *callstack_bottom);
 	template<typename Iterator> void iterate_callstack(context *ctx, Iterator &iterator);
-
-	/* Every object has a regular representation in the runtime, which makes GC
-	much simpler. Every slot of the object until binary_payload_start is a pointer
-	to some other object. */
-	template<typename Iterator> void do_slots(object *obj, Iterator &iter)
-	{
-		cell scan = (cell)obj;
-		cell payload_start = obj->binary_payload_start();
-		cell end = scan + payload_start;
-
-		scan += sizeof(cell);
-
-		while(scan < end)
-		{
-			iter((cell *)scan);
-			scan += sizeof(cell);
-		}
-	}
 
 	//alien
 	char *pinned_alien_offset(cell obj);

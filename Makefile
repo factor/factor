@@ -44,6 +44,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/compaction.o \
 	vm/contexts.o \
 	vm/data_heap.o \
+	vm/data_heap_checker.o \
 	vm/debug.o \
 	vm/dispatch.o \
 	vm/errors.o \

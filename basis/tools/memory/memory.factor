@@ -4,8 +4,7 @@ USING: accessors arrays assocs classes classes.struct
 combinators combinators.smart continuations fry generalizations
 generic grouping io io.styles kernel make math math.parser
 math.statistics memory namespaces parser prettyprint sequences
-sorting specialized-arrays splitting strings system vm words ;
-SPECIALIZED-ARRAY: gc-event
+sorting splitting strings system vm words ;
 IN: tools.memory
 
 <PRIVATE
@@ -101,7 +100,7 @@ SYMBOL: gc-events
 : collect-gc-events ( quot -- )
     enable-gc-events
     [ ] [ disable-gc-events drop ] cleanup
-    disable-gc-events byte-array>gc-event-array gc-events set ; inline
+    disable-gc-events [ gc-event memory>struct ] map gc-events set ; inline
 
 <PRIVATE
 
