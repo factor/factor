@@ -51,8 +51,16 @@ CONSTANT: month-names
         "July" "August" "September" "October" "November" "December"
     }
 
-: month-name ( n -- string )
-    check-month 1 - month-names nth ;
+<PRIVATE
+
+: (month-name) ( n -- string ) 1 - month-names nth ;
+
+PRIVATE>
+
+GENERIC: month-name ( obj -- string )
+
+M: integer month-name check-month 1 - month-names nth ;
+M: timestamp month-name month>> 1 - month-names nth ;
 
 CONSTANT: month-abbreviations
     {
@@ -65,12 +73,8 @@ CONSTANT: month-abbreviations
 
 CONSTANT: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 }
 
-: day-names ( -- array )
-    {
-        "Sunday" "Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday"
-    } ;
-
-: day-name ( n -- string ) day-names nth ;
+CONSTANT: day-names
+    { "Sunday" "Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday" }
 
 CONSTANT: day-abbreviations2
     { "Su" "Mo" "Tu" "We" "Th" "Fr" "Sa" }
@@ -317,6 +321,9 @@ GENERIC: time- ( time1 time2 -- time3 )
 M: timestamp <=> ( ts1 ts2 -- n )
     [ >gmt tuple-slots ] compare ;
 
+: same-day? ( ts1 ts2 -- ? )
+    [ >gmt >date< <date> ] bi@ = ;
+
 : (time-) ( timestamp timestamp -- n )
     [ >gmt ] bi@
     [ [ >date< julian-day-number ] bi@ - 86400 * ] 2keep
@@ -398,6 +405,10 @@ M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
 
 : day-of-week ( timestamp -- n )
     >date< zeller-congruence ;
+
+GENERIC: day-name ( obj -- string )
+M: integer day-name day-names nth ;
+M: timestamp day-name day-of-week day-names nth ;
 
 :: (day-of-year) ( year month day -- n )
     day-counts month head-slice sum day +
@@ -483,6 +494,14 @@ M: timestamp december clone 12 >>month ;
 : thursday ( timestamp -- new-timestamp ) 4 day-this-week ;
 : friday ( timestamp -- new-timestamp ) 5 day-this-week ;
 : saturday ( timestamp -- new-timestamp ) 6 day-this-week ;
+
+: sunday? ( timestamp -- ? ) day-of-week 0 = ;
+: monday? ( timestamp -- ? ) day-of-week 1 = ;
+: tuesday? ( timestamp -- ? ) day-of-week 2 = ;
+: wednesday? ( timestamp -- ? ) day-of-week 3 = ;
+: thursday? ( timestamp -- ? ) day-of-week 4 = ;
+: friday? ( timestamp -- ? ) day-of-week 5 = ;
+: saturday? ( timestamp -- ? ) day-of-week 6 = ;
 
 : sunday-of-month ( timestamp n -- new-timestamp ) 0 nth-day-this-month ;
 : monday-of-month ( timestamp n -- new-timestamp ) 1 nth-day-this-month ;
