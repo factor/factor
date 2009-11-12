@@ -131,6 +131,22 @@ M: #phi propagate-before ( #phi -- )
             ]
         }
         {
+            { { t f } { t } }
+            [
+                first =t
+                condition-value get =t /\
+                swap f-->
+            ]
+        }
+        {
+            { { t } { t f } }
+            [
+                second =t
+                condition-value get =f /\
+                swap f-->
+            ]
+        }
+        {
             { { t f } { } }
             [
                 first
