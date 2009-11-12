@@ -135,6 +135,18 @@ struct code_heap_relocator {
 	}
 };
 
+void factor_vm::increment_definition_counter()
+{
+	/* Increment redefinition counter for call( */
+	cell counter_ = special_objects[REDEFINITION_COUNTER];
+	cell counter;
+	if(counter_ == false_object)
+		counter = 0;
+	else
+		counter = untag_fixnum(counter_) + 1;
+	special_objects[REDEFINITION_COUNTER] = tag_fixnum(counter);
+}
+
 void factor_vm::primitive_modify_code_heap()
 {
 	data_root<array> alist(dpop(),this);
@@ -185,6 +197,7 @@ void factor_vm::primitive_modify_code_heap()
 	}
 
 	update_code_heap_words();
+	increment_definition_counter();
 }
 
 code_heap_room factor_vm::code_room()

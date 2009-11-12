@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.private effects fry
 kernel kernel.private make sequences continuations quotations
-words math stack-checker stack-checker.transforms
-compiler.tree.propagation.info
+words math stack-checker combinators.short-circuit
+stack-checker.transforms compiler.tree.propagation.info
 compiler.tree.propagation.inlining ;
 IN: compiler.tree.propagation.call-effect
 
@@ -18,10 +18,20 @@ IN: compiler.tree.propagation.call-effect
 
 ! execute( uses a similar strategy.
 
-TUPLE: inline-cache value ;
+: definition-counter ( -- n ) 46 getenv ; inline
 
-: cache-hit? ( word/quot ic -- ? )
-    [ value>> eq? ] [ value>> ] bi and ; inline
+TUPLE: inline-cache value counter ;
+
+: inline-cache-hit? ( word/quot ic -- ? )
+    {
+        [ nip value>> ]
+        [ value>> eq? ]
+        [ nip counter>> definition-counter eq? ]
+    } 2&& ; inline
+
+: update-inline-cache ( word/quot ic -- )
+    [ definition-counter ] dip
+    [ (>>value) ] [ (>>counter) ] bi-curry bi* ; inline
 
 SINGLETON: +unknown+
 
@@ -53,9 +63,16 @@ M: compose cached-effect
 : safe-infer ( quot -- effect )
     [ infer ] [ 2drop +unknown+ ] recover ;
 
+: cached-effect-valid? ( quot -- ? )
+    cache-counter>> definition-counter eq? ; inline
+
+: save-effect ( effect quot -- )
+    [ definition-counter ] dip
+    [ (>>cached-effect) ] [ (>>cache-counter) ] bi-curry bi* ;
+
 M: quotation cached-effect
-    dup cached-effect>>
-    [ ] [ [ safe-infer dup ] keep (>>cached-effect) ] ?if ;
+    dup cached-effect-valid?
+    [ cached-effect>> ] [ [ safe-infer dup ] keep save-effect ] if ;
 
 : call-effect-unsafe? ( quot effect -- ? )
     [ cached-effect ] dip
@@ -82,12 +99,12 @@ M: quotation cached-effect
 
 : call-effect-fast ( quot effect inline-cache -- )
     2over call-effect-unsafe?
-    [ [ nip (>>value) ] [ drop call-effect-unsafe ] 3bi ]
+    [ [ nip update-inline-cache ] [ drop call-effect-unsafe ] 3bi ]
     [ drop call-effect-slow ]
     if ; inline
 
 : call-effect-ic ( quot effect inline-cache -- )
-    3dup nip cache-hit?
+    3dup nip inline-cache-hit?
     [ drop call-effect-unsafe ]
     [ call-effect-fast ]
     if ; inline
@@ -103,12 +120,12 @@ M: quotation cached-effect
 
 : execute-effect-fast ( word effect inline-cache -- )
     2over execute-effect-unsafe?
-    [ [ nip (>>value) ] [ drop execute-effect-unsafe ] 3bi ]
+    [ [ nip update-inline-cache ] [ drop execute-effect-unsafe ] 3bi ]
     [ drop execute-effect-slow ]
     if ; inline
 
 : execute-effect-ic ( word effect inline-cache -- )
-    3dup nip cache-hit?
+    3dup nip inline-cache-hit?
     [ drop execute-effect-unsafe ]
     [ execute-effect-fast ]
     if ; inline
