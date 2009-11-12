@@ -1,12 +1,11 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs calendar combinators.short-circuit fry
-kernel lexer math namespaces parser sequences shuffle vocabs
-words ;
+USING: accessors assocs calendar combinators
+combinators.short-circuit fry kernel lexer math namespaces
+parser sequences shuffle vocabs words ;
 IN: calendar.holidays.us
 
-SYMBOLS: world us us-federal canada
-commonwealth-of-nations ;
+SINGLETONS: world us us-federal canada commonwealth-of-nations ;
 
 <<
 SYNTAX: HOLIDAY:
@@ -18,37 +17,38 @@ SYNTAX: HOLIDAY-NAME:
     scan-word "holiday" word-prop scan-word scan-object spin set-at ;
 >>
 
-: holiday>timestamp ( n word -- timestamp )
-    execute( timestamp -- timestamp' ) ;
+GENERIC: holidays ( n symbol -- seq )
 
-: find-holidays ( n symbol -- seq )
-    all-words swap '[ "holiday" word-prop _ swap key? ] filter
-    [ holiday>timestamp ] with map ;
+<PRIVATE
+
+: (holidays) ( singleton -- seq )
+    all-words swap '[ "holiday" word-prop _ swap key? ] filter ;
 
 : adjust-federal-holiday ( timestamp -- timestamp' )
-    dup saturday? [
-        1 days time-
-    ] [
-        dup sunday? [
-            1 days time+
-        ] when 
-    ] if ;
+    {
+        { [ dup saturday? ] [ 1 days time- ] }
+        { [ dup sunday? ] [ 1 days time+ ] }
+        [ ]
+    } cond ;
 
-: us-federal-holidays ( timestamp/n -- seq )
-    us-federal find-holidays [ adjust-federal-holiday ] map ;
+M: us-federal holidays
+    (holidays)
+    [ execute( timestamp -- timestamp' ) adjust-federal-holiday ] with map ;
 
-: us-federal-holiday? ( timestamp/n -- ? )
-    dup us-federal-holidays [ same-day? ] with any? ;
+M: object holidays
+    (holidays) [ execute( timestamp -- timestamp' ) ] with map ;
 
-: canadian-holidays ( timestamp/n -- seq )
-    canada find-holidays ;
+PRIVATE>
 
-: post-office-open? ( timestamp -- ? )
-    { [ sunday? not ] [ us-federal-holiday? not ] } 1&& ;
+: holiday? ( timestamp/n singleton -- ? )
+    [ holidays ] [ drop ] 2bi '[ _ same-day? ] any? ;
 
-HOLIDAY: new-year's-day january 1 >>day ;
-HOLIDAY-NAME: new-year's-day world "New Year's Day"
-HOLIDAY-NAME: new-year's-day us-federal "New Year's Day"
+: us-post-office-open? ( timestamp -- ? )
+    { [ sunday? not ] [ us-federal holiday? not ] } 1&& ;
+
+HOLIDAY: new-years-day january 1 >>day ;
+HOLIDAY-NAME: new-years-day world "New Year's Day"
+HOLIDAY-NAME: new-years-day us-federal "New Year's Day"
 
 HOLIDAY: martin-luther-king-day january 3 monday-of-month ;
 HOLIDAY-NAME: martin-luther-king-day us-federal "Martin Luther King Day"
@@ -56,8 +56,8 @@ HOLIDAY-NAME: martin-luther-king-day us-federal "Martin Luther King Day"
 HOLIDAY: inauguration-day year dup 4 neg rem + january 20 >>day ;
 HOLIDAY-NAME: inauguration-day us "Inauguration Day"
 
-HOLIDAY: washington's-birthday february 3 monday-of-month ;
-HOLIDAY-NAME: washington's-birthday us-federal "Washington's Birthday"
+HOLIDAY: washingtons-birthday february 3 monday-of-month ;
+HOLIDAY-NAME: washingtons-birthday us-federal "Washington's Birthday"
 
 HOLIDAY: memorial-day may last-monday-of-month ;
 HOLIDAY-NAME: memorial-day us-federal "Memorial Day"
@@ -90,11 +90,11 @@ HOLIDAY: belly-laugh-day january 24 >>day ;
 
 HOLIDAY: groundhog-day february 2 >>day ;
 
-HOLIDAY: lincoln's-birthday february 12 >>day ;
+HOLIDAY: lincolns-birthday february 12 >>day ;
 
-HOLIDAY: valentine's-day february 14 >>day ;
+HOLIDAY: valentines-day february 14 >>day ;
 
-HOLIDAY: st-patrick's-day march 17 >>day ;
+HOLIDAY: st-patricks-day march 17 >>day ;
 
 HOLIDAY: ash-wednesday easter 46 days time- ;
 
@@ -108,19 +108,19 @@ HOLIDAY: tax-day april 15 >>day ;
 
 HOLIDAY: earth-day april 22 >>day ;
 
-HOLIDAY: administrative-professionals'-day april last-saturday-of-month wednesday ;
+HOLIDAY: administrative-professionals-day april last-saturday-of-month wednesday ;
 
 HOLIDAY: cinco-de-mayo may 5 >>day ;
 
-HOLIDAY: mother's-day may 2 sunday-of-month ;
+HOLIDAY: mothers-day may 2 sunday-of-month ;
 
 HOLIDAY: armed-forces-day may 3 saturday-of-month ;
 
 HOLIDAY: flag-day june 14 >>day ;
 
-HOLIDAY: parents'-day july 4 sunday-of-month ;
+HOLIDAY: parents-day july 4 sunday-of-month ;
 
-HOLIDAY: grandparents'-day labor-day 1 weeks time+ ;
+HOLIDAY: grandparents-day labor-day 1 weeks time+ ;
 
 HOLIDAY: patriot-day september 11 >>day ;
 
@@ -128,7 +128,7 @@ HOLIDAY: stepfamily-day september 16 >>day ;
 
 HOLIDAY: citizenship-day september 17 >>day ;
 
-HOLIDAY: boss's-day october 16 >>day ;
+HOLIDAY: bosss-day october 16 >>day ;
 
 HOLIDAY: sweetest-day october 3 saturday-of-month ;
 
@@ -140,4 +140,4 @@ HOLIDAY: black-friday thanksgiving-day 1 days time+ ;
 
 HOLIDAY: pearl-harbor-remembrance-day december 7 >>day ;
 
-HOLIDAY: new-year's-eve december 31 >>day ;
+HOLIDAY: new-years-eve december 31 >>day ;
