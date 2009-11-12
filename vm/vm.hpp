@@ -534,6 +534,7 @@ struct factor_vm
 	void jit_compile_word(cell word_, cell def_, bool relocate);
 	void update_code_heap_words();
 	void update_code_heap_words_and_literals();
+	void increment_definition_counter();
 	void primitive_modify_code_heap();
 	code_heap_room code_room();
 	void primitive_code_room();
