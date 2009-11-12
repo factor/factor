@@ -15,7 +15,7 @@ SYNTAX: HOLIDAY:
     parse-definition (( timestamp/n -- timestamp )) define-declared ;
 
 SYNTAX: HOLIDAY-NAME:
-    scan-word "holiday" word-prop scan-word scan-object >at drop ;
+    scan-word "holiday" word-prop scan-word scan-object spin set-at ;
 >>
 
 : holiday>timestamp ( n word -- timestamp )
