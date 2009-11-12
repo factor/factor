@@ -61,6 +61,10 @@ enum special_object {
 
 	/* Callback stub generation in callbacks.c */
 	CALLBACK_STUB       = 45,
+	
+	/* Incremented on every modify-code-heap call; invalidates call( inline
+	caching */
+	REDEFINITION_COUNTER = 46,
 
 	/* Polymorphic inline cache generation in inline_cache.c */
 	PIC_LOAD            = 47,
