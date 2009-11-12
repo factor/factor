@@ -102,7 +102,9 @@ struct object {
 	cell size() const;
 	cell binary_payload_start() const;
 
-	cell *slots()  const { return (cell *)this; }
+	cell *slots() const { return (cell *)this; }
+
+	template<typename Iterator> void each_slot(Iterator &iter);
 
 	/* Only valid for objects in tenured space; must cast to free_heap_block
 	to do anything with it if its free */
