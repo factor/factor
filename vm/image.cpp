@@ -138,7 +138,7 @@ void factor_vm::relocate_object(object *object,
 	cell type = object->type();
 	
 	/* Tuple relocation is a bit trickier; we have to fix up the
-	layout object before we can get the tuple size, so do_slots is
+	layout object before we can get the tuple size, so each_slot is
 	out of the question */
 	if(type == TUPLE_TYPE)
 	{
@@ -154,7 +154,7 @@ void factor_vm::relocate_object(object *object,
 	else
 	{
 		object_fixupper fixupper(this,data_relocation_base);
-		do_slots(object,fixupper);
+		object->each_slot(fixupper);
 
 		switch(type)
 		{
