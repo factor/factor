@@ -37,8 +37,14 @@ SYNTAX: HOLIDAY-NAME:
 : us-federal-holidays ( timestamp/n -- seq )
     us-federal find-holidays [ adjust-federal-holiday ] map ;
 
+: us-federal-holiday? ( timestamp/n -- ? )
+    dup us-federal-holidays [ same-day? ] with any? ;
+
 : canadian-holidays ( timestamp/n -- seq )
     canada find-holidays ;
+
+: post-office-open? ( timestamp -- ? )
+    { [ sunday? not ] [ us-federal-holiday? not ] } 1&& ;
 
 HOLIDAY: new-year's-day january 1 >>day ;
 HOLIDAY-NAME: new-year's-day world "New Year's Day"
@@ -135,9 +141,3 @@ HOLIDAY: black-friday thanksgiving-day 1 days time+ ;
 HOLIDAY: pearl-harbor-remembrance-day december 7 >>day ;
 
 HOLIDAY: new-year's-eve december 31 >>day ;
-
-: post-office-open? ( timestamp -- ? )
-    {
-        [ sunday? not ]
-        [ dup us-federal-holidays [ same-day? ] with any? not ]
-    } 1&& ;
