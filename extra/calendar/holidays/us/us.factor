@@ -1,130 +1,143 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar kernel math words ;
+USING: accessors assocs calendar combinators.short-circuit fry
+kernel lexer math namespaces parser sequences shuffle vocabs
+words ;
 IN: calendar.holidays.us
 
+SYMBOLS: world us us-federal canada
+commonwealth-of-nations ;
+
 <<
-SYNTAX: us-federal
-    word "us-federal" dup set-word-prop ;
+SYNTAX: HOLIDAY:
+    CREATE-WORD
+    dup H{ } clone "holiday" set-word-prop
+    parse-definition (( timestamp/n -- timestamp )) define-declared ;
+
+SYNTAX: HOLIDAY-NAME:
+    scan-word "holiday" word-prop scan-word scan-object spin set-at ;
 >>
 
-! Federal Holidays
-: new-years-day ( timestamp/n -- timestamp )
-    january 1 >>day ; us-federal
+: holiday>timestamp ( n word -- timestamp )
+    execute( timestamp -- timestamp' ) ;
 
-: martin-luther-king-day ( timestamp/n -- timestamp )
-    january 3 monday-of-month ; us-federal
+: find-holidays ( n symbol -- seq )
+    all-words swap '[ "holiday" word-prop _ swap key? ] filter
+    [ holiday>timestamp ] with map ;
 
-: inauguration-day ( timestamp/n -- timestamp )
-    year dup neg 4 rem + january 20 >>day ; us-federal
+: adjust-federal-holiday ( timestamp -- timestamp' )
+    dup saturday? [
+        1 days time-
+    ] [
+        dup sunday? [
+            1 days time+
+        ] when 
+    ] if ;
 
-: washington's-birthday ( timestamp/n -- timestamp )
-    february 3 monday-of-month ; us-federal
+: us-federal-holidays ( timestamp/n -- seq )
+    us-federal find-holidays [ adjust-federal-holiday ] map ;
 
-ALIAS: presidents-day washington's-birthday us-federal
+: us-federal-holiday? ( timestamp/n -- ? )
+    dup us-federal-holidays [ same-day? ] with any? ;
 
-: memorial-day ( timestamp/n -- timestamp )
-    may last-monday-of-month ; us-federal
+: canadian-holidays ( timestamp/n -- seq )
+    canada find-holidays ;
 
-: independence-day ( timestamp/n -- timestamp )
-    july 4 >>day ; us-federal
+: post-office-open? ( timestamp -- ? )
+    { [ sunday? not ] [ us-federal-holiday? not ] } 1&& ;
 
-: labor-day ( timestamp/n -- timestamp )
-    september 1 monday-of-month ; us-federal
+HOLIDAY: new-year's-day january 1 >>day ;
+HOLIDAY-NAME: new-year's-day world "New Year's Day"
+HOLIDAY-NAME: new-year's-day us-federal "New Year's Day"
 
-: columbus-day ( timestamp/n -- timestamp )
-    october 2 monday-of-month ; us-federal
+HOLIDAY: martin-luther-king-day january 3 monday-of-month ;
+HOLIDAY-NAME: martin-luther-king-day us-federal "Martin Luther King Day"
 
-: veterans'-day ( timestamp/n -- timestamp )
-    november 11 >>day ; us-federal
+HOLIDAY: inauguration-day year dup 4 neg rem + january 20 >>day ;
+HOLIDAY-NAME: inauguration-day us "Inauguration Day"
 
-: thanksgiving-day ( timestamp/n -- timestamp )
-    november 4 thursday-of-month ; us-federal
+HOLIDAY: washington's-birthday february 3 monday-of-month ;
+HOLIDAY-NAME: washington's-birthday us-federal "Washington's Birthday"
 
-: christmas-day ( timestamp/n -- timestamp )
-    december 25 >>day ; us-federal
+HOLIDAY: memorial-day may last-monday-of-month ;
+HOLIDAY-NAME: memorial-day us-federal "Memorial Day"
 
-! Other Holidays
+HOLIDAY: independence-day july 4 >>day ;
+HOLIDAY-NAME: independence-day us-federal "Independence Day"
 
-: belly-laugh-day ( timestamp/n -- timestamp )
-    january 24 >>day ;
+HOLIDAY: labor-day september 1 monday-of-month ;
+HOLIDAY-NAME: labor-day us-federal "Labor Day"
 
-: groundhog-day ( timestamp/n -- timestamp )
-    february 2 >>day ;
+HOLIDAY: columbus-day october 2 monday-of-month ;
+HOLIDAY-NAME: columbus-day us-federal "Columbus Day"
 
-: lincoln's-birthday ( timestamp/n -- timestamp )
-    february 12 >>day ;
+HOLIDAY: veterans-day november 11 >>day ;
+HOLIDAY-NAME: veterans-day us-federal "Veterans Day"
+HOLIDAY-NAME: veterans-day world "Armistice Day"
+HOLIDAY-NAME: veterans-day commonwealth-of-nations "Remembrance Day"
 
-: valentine's-day ( timestamp/n -- timestamp )
-    february 14 >>day ;
+HOLIDAY: thanksgiving-day november 4 thursday-of-month ;
+HOLIDAY-NAME: thanksgiving-day us-federal "Thanksgiving Day"
 
-: st-patrick's-day ( timestamp/n -- timestamp )
-    march 17 >>day ;
+HOLIDAY: canadian-thanksgiving-day october 2 monday-of-month ;
+HOLIDAY-NAME: canadian-thanksgiving-day canada "Thanksgiving Day"
 
-: ash-wednesday ( timestamp/n -- timestamp )
-    easter 46 days time- ;
+HOLIDAY: christmas-day december 25 >>day ;
+HOLIDAY-NAME: christmas-day world "Christmas Day"
+HOLIDAY-NAME: christmas-day us-federal "Christmas Day"
+
+HOLIDAY: belly-laugh-day january 24 >>day ;
+
+HOLIDAY: groundhog-day february 2 >>day ;
+
+HOLIDAY: lincoln's-birthday february 12 >>day ;
+
+HOLIDAY: valentine's-day february 14 >>day ;
+
+HOLIDAY: st-patrick's-day march 17 >>day ;
+
+HOLIDAY: ash-wednesday easter 46 days time- ;
 
 ALIAS: first-day-of-lent ash-wednesday
 
-: fat-tuesday ( timestamp/n -- timestamp )
-    ash-wednesday 1 days time- ;
+HOLIDAY: fat-tuesday ash-wednesday 1 days time- ;
 
-: good-friday ( timestamp/n -- timestamp )
-    easter 2 days time- ;
+HOLIDAY: good-friday easter 2 days time- ;
 
-: tax-day ( timestamp/n -- timestamp )
-    april 15 >>day ;
+HOLIDAY: tax-day april 15 >>day ;
 
-: earth-day ( timestamp/n -- timestamp )
-    april 22 >>day ;
+HOLIDAY: earth-day april 22 >>day ;
 
-: administrative-professionals'-day ( timestamp/n -- timestamp )
-    april last-saturday-of-month wednesday ;
+HOLIDAY: administrative-professionals'-day april last-saturday-of-month wednesday ;
 
-: cinco-de-mayo ( timestamp/n -- timestamp )
-    may 5 >>day ;
+HOLIDAY: cinco-de-mayo may 5 >>day ;
 
-: mother's-day ( timestamp/n -- timestamp )
-    may 2 sunday-of-month ;
+HOLIDAY: mother's-day may 2 sunday-of-month ;
 
-: armed-forces-day ( timestamp/n -- timestamp )
-    may 3 saturday-of-month ;
+HOLIDAY: armed-forces-day may 3 saturday-of-month ;
 
-: flag-day ( timestamp/n -- timestamp )
-    june 14 >>day ;
+HOLIDAY: flag-day june 14 >>day ;
 
-: parents'-day ( timestamp/n -- timestamp )
-    july 4 sunday-of-month ;
+HOLIDAY: parents'-day july 4 sunday-of-month ;
 
-: grandparents'-day ( timestamp/n -- timestamp )
-    labor-day 1 weeks time+ ;
+HOLIDAY: grandparents'-day labor-day 1 weeks time+ ;
 
-: patriot-day ( timestamp/n -- timestamp )
-    september 11 >>day ;
+HOLIDAY: patriot-day september 11 >>day ;
 
-: stepfamily-day ( timestamp/n -- timestamp )
-    september 16 >>day ;
+HOLIDAY: stepfamily-day september 16 >>day ;
 
-: citizenship-day ( timestamp/n -- timestamp )
-    september 17 >>day ;
+HOLIDAY: citizenship-day september 17 >>day ;
 
-: boss's-day ( timestamp/n -- timestamp )
-    october 16 >>day ;
+HOLIDAY: boss's-day october 16 >>day ;
 
-: sweetest-day ( timestamp/n -- timestamp )
-    october 3 saturday-of-month ;
+HOLIDAY: sweetest-day october 3 saturday-of-month ;
 
-: halloween ( timestamp/n -- timestamp )
-    october 31 >>day ;
+HOLIDAY: halloween october 31 >>day ;
 
-: election-day ( timestamp/n -- timestamp )
-    november 1 monday-of-month 1 days time+ ;
+HOLIDAY: election-day november 1 monday-of-month 1 days time+ ;
 
-: black-friday ( timestamp/n -- timestamp )
-    thanksgiving-day 1 days time+ ;
+HOLIDAY: black-friday thanksgiving-day 1 days time+ ;
 
-: pearl-harbor-remembrance-day ( timestamp/n -- timestamp )
-    december 7 >>day ;
+HOLIDAY: pearl-harbor-remembrance-day december 7 >>day ;
 
-: new-year's-eve ( timestamp/n -- timestamp )
-    december 31 >>day ;
+HOLIDAY: new-year's-eve december 31 >>day ;
