@@ -9,11 +9,14 @@ IN: classes.algebra
 
 TUPLE: anonymous-union { members read-only } ;
 
-C: <anonymous-union> anonymous-union
+: <anonymous-union> ( members -- class )
+    [ null eq? not ] filter prune
+    dup length 1 = [ first ] [ anonymous-union boa ] if ;
 
 TUPLE: anonymous-intersection { participants read-only } ;
 
-C: <anonymous-intersection> anonymous-intersection
+: <anonymous-intersection> ( participants -- class )
+    prune dup length 1 = [ first ] [ anonymous-intersection boa ] if ;
 
 TUPLE: anonymous-complement { class read-only } ;
 
@@ -114,6 +117,7 @@ M: word valid-class? drop f ;
             [ class-not normalize-class ] map
             <anonymous-union>
         ] }
+        [ <anonymous-complement> ]
     } cond ;
 
 : left-anonymous-complement<= ( first second -- ? )
@@ -133,8 +137,10 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
 
 : (class<=) ( first second -- ? )
     2dup eq? [ 2drop t ] [
+        [ normalize-class ] bi@
         2dup superclass<= [ 2drop t ] [
-            [ normalize-class ] bi@ {
+            {
+                { [ 2dup eq? ] [ 2drop t ] }
                 { [ dup empty-intersection? ] [ 2drop t ] }
                 { [ over empty-union? ] [ 2drop t ] }
                 { [ 2dup [ anonymous-complement? ] both? ] [ anonymous-complement<= ] }
