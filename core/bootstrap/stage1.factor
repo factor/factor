@@ -14,7 +14,8 @@ IN: bootstrap.stage1
 load-help? off
 { "resource:core" } vocab-roots set
 
-! Create a boot quotation for the target
+! Create a boot quotation for the target by collecting all top-level
+! forms into a quotation, surrounded by some boilerplate.
 [
     [
         ! Rehash hashtables first, since bootstrap.image creates
