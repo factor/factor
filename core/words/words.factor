@@ -135,10 +135,13 @@ M: word reset-word
     ] tri ;
 
 : <word> ( name vocab -- word )
-    2dup [ hashcode ] bi@ bitxor >fixnum (word) ;
+    2dup [ hashcode ] bi@ bitxor >fixnum (word) dup new-word ;
+
+: <uninterned-word> ( name -- word )
+    f \ <uninterned-word> counter >fixnum (word) ;
 
 : gensym ( -- word )
-    "( gensym )" f \ gensym counter >fixnum (word) ;
+    "( gensym )" <uninterned-word> ;
 
 : define-temp ( quot effect -- word )
     [ gensym dup ] 2dip define-declared ;

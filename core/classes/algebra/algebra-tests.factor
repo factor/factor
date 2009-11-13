@@ -37,6 +37,8 @@ INTERSECTION: empty-intersection ;
 
 INTERSECTION: generic-class generic class ;
 
+UNION: union-with-one-member a ;
+
 ! class<=
 [ t ] [ \ fixnum \ integer class<= ] unit-test
 [ t ] [ \ fixnum \ fixnum class<= ] unit-test
@@ -121,6 +123,9 @@ INTERSECTION: generic-class generic class ;
 
 [ t ] [ generic-class generic class<= ] unit-test
 [ t ] [ generic-class \ class class<= ] unit-test
+
+[ t ] [ a union-with-one-member class<= ] unit-test
+[ f ] [ union-with-one-member class-not integer class<= ] unit-test
 
 ! class-and
 : class-and* ( cls1 cls2 cls3 -- ? ) [ class-and ] dip class= ;
