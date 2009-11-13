@@ -135,7 +135,7 @@ M: word reset-word
     ] tri ;
 
 : <word> ( name vocab -- word )
-    2dup [ hashcode ] bi@ bitxor >fixnum (word) ;
+    2dup [ hashcode ] bi@ bitxor >fixnum (word) dup new-word ;
 
 : gensym ( -- word )
     "( gensym )" f \ gensym counter >fixnum (word) ;

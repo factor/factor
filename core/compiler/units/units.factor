@@ -127,8 +127,8 @@ M: object bump-effect-counter* drop f ;
     bi ;
 
 : bump-effect-counter? ( -- ? )
-    changed-effects get old-definitions get first assoc-intersect assoc-empty? not
-    new-definitions get first [ drop bump-effect-counter* ] assoc-any?
+    changed-effects get new-words get assoc-diff assoc-empty? not
+    changed-definitions get [ drop bump-effect-counter* ] assoc-any?
     or ;
 
 : bump-effect-counter ( -- )
@@ -156,6 +156,7 @@ PRIVATE>
         H{ } clone changed-effects set
         H{ } clone outdated-generics set
         H{ } clone outdated-tuples set
+        H{ } clone new-words set
         H{ } clone new-classes set
         [ finish-compilation-unit ] [ ] cleanup
     ] with-scope ; inline
@@ -168,6 +169,7 @@ PRIVATE>
         H{ } clone outdated-generics set
         H{ } clone forgotten-definitions set
         H{ } clone outdated-tuples set
+        H{ } clone new-words set
         H{ } clone new-classes set
         <definitions> new-definitions set
         <definitions> old-definitions set
