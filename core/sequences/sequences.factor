@@ -659,9 +659,9 @@ PRIVATE>
         [ 0 swap copy ] keep
     ] new-like ;
 
-: suffix! ( seq elt -- seq ) over push ;
+: suffix! ( seq elt -- seq ) over push ; inline
 
-: append! ( seq1 seq2 -- seq1 ) over push-all ;
+: append! ( seq1 seq2 -- seq1 ) over push-all ; inline
 
 : last ( seq -- elt ) [ length 1 - ] [ nth ] bi ;
 
