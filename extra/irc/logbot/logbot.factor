@@ -3,7 +3,7 @@
 USING: accessors calendar calendar.format destructors fry io io.encodings.8-bit
 io.files io.pathnames irc.client irc.client.chats irc.messages
 irc.messages.base kernel make namespaces sequences threads
-irc.logbot.log-line ;
+irc.logbot.log-line io.encodings.8-bit.latin1 ;
 IN: irc.logbot
 
 CONSTANT: bot-channel "#concatenative"
