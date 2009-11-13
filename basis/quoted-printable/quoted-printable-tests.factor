@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test quoted-printable io.encodings.string
-sequences io.encodings.8-bit splitting kernel ;
+sequences splitting kernel ;
 IN: quoted-printable.tests
 
 [ """José was the
