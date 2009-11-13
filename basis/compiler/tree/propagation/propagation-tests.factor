@@ -226,9 +226,25 @@ IN: compiler.tree.propagation.tests
 
 [ V{ fixnum } ] [
     [
+        [ { fixnum } declare ] [ drop f ] if
+        dup [ dup 13 eq? [ t ] [ f ] if ] [ t ] if
+        [ "Oops" throw ] when
+    ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [
         >fixnum
         dup [ 10 < ] [ -10 > ] bi and not [ 2 * ] unless
     ] final-classes
+] unit-test
+
+[ ] [
+    [
+        dup dup dup [ 100 < ] [ drop f ] if dup
+        [ 2drop f ] [ 2drop f ] if
+        [ ] [ dup [ ] [ ] if ] if
+    ] final-info drop
 ] unit-test
 
 [ V{ fixnum } ] [
@@ -925,3 +941,4 @@ M: tuple-with-read-only-slot clone
 
 ! Could be bignum not integer but who cares
 [ V{ integer } ] [ [ 10 >bignum bitand ] final-classes ] unit-test
+
