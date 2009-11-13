@@ -132,7 +132,7 @@ M: object bump-effect-counter* drop f ;
     or ;
 
 : bump-effect-counter ( -- )
-    bump-effect-counter? [ 46 getenv 1 + 46 setenv ] when ;
+    bump-effect-counter? [ 46 getenv 0 or 1 + 46 setenv ] when ;
 
 : notify-observers ( -- )
     updated-definitions dup assoc-empty?

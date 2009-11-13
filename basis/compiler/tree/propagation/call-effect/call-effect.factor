@@ -24,11 +24,7 @@ IN: compiler.tree.propagation.call-effect
 TUPLE: inline-cache value counter ;
 
 : inline-cache-hit? ( word/quot ic -- ? )
-    {
-        [ nip value>> ]
-        [ value>> eq? ]
-        [ nip counter>> effect-counter eq? ]
-    } 2&& ; inline
+    { [ value>> eq? ] [ nip counter>> effect-counter eq? ] } 2&& ; inline
 
 : update-inline-cache ( word/quot ic -- )
     [ effect-counter ] dip
