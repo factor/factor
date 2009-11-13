@@ -4,7 +4,7 @@ USING: accessors combinators combinators.private effects fry
 kernel kernel.private make sequences continuations quotations
 words math stack-checker combinators.short-circuit
 stack-checker.transforms compiler.tree.propagation.info
-compiler.tree.propagation.inlining ;
+compiler.tree.propagation.inlining compiler.units ;
 IN: compiler.tree.propagation.call-effect
 
 ! call( and execute( have complex expansions.
@@ -15,10 +15,11 @@ IN: compiler.tree.propagation.call-effect
 !   and compare it with declaration. If matches, call it unsafely.
 ! - Fallback. If the above doesn't work, call it and compare the datastack before
 !   and after to make sure it didn't mess anything up.
+! - Inline caches and cached effects are invalidated whenever a macro is redefined, or
+!   a word's effect changes, by comparing a global counter against the counter value
+!   last observed. The counter is incremented by compiler.units.
 
 ! execute( uses a similar strategy.
-
-: definition-counter ( -- n ) 46 getenv ; inline
 
 TUPLE: inline-cache value counter ;
 
@@ -26,11 +27,11 @@ TUPLE: inline-cache value counter ;
     {
         [ nip value>> ]
         [ value>> eq? ]
-        [ nip counter>> definition-counter eq? ]
+        [ nip counter>> effect-counter eq? ]
     } 2&& ; inline
 
 : update-inline-cache ( word/quot ic -- )
-    [ definition-counter ] dip
+    [ effect-counter ] dip
     [ (>>value) ] [ (>>counter) ] bi-curry bi* ; inline
 
 SINGLETON: +unknown+
@@ -64,10 +65,10 @@ M: compose cached-effect
     [ infer ] [ 2drop +unknown+ ] recover ;
 
 : cached-effect-valid? ( quot -- ? )
-    cache-counter>> definition-counter eq? ; inline
+    cache-counter>> effect-counter eq? ; inline
 
 : save-effect ( effect quot -- )
-    [ definition-counter ] dip
+    [ effect-counter ] dip
     [ (>>cached-effect) ] [ (>>cache-counter) ] bi-curry bi* ;
 
 M: quotation cached-effect
