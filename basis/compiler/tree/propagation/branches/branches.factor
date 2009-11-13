@@ -97,7 +97,7 @@ M: #phi propagate-before ( #phi -- )
     constraints get last update-constraints ;
 
 : branch-phi-constraints ( output values booleans -- )
-     {
+    {
         {
             { { t } { f } }
             [

@@ -239,6 +239,14 @@ IN: compiler.tree.propagation.tests
     ] final-classes
 ] unit-test
 
+[ ] [
+    [
+        dup dup dup [ 100 < ] [ drop f ] if dup
+        [ 2drop f ] [ 2drop f ] if
+        [ ] [ dup [ ] [ ] if ] if
+    ] final-info drop
+] unit-test
+
 [ V{ fixnum } ] [
     [ { fixnum } declare (clone) ] final-classes
 ] unit-test
