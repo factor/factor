@@ -13,6 +13,7 @@ IN: io.encodings.8-bit
     "vocab:io/encodings/8-bit/" ".TXT" surround ;
 
 SYMBOL: 8-bit-encodings
+8-bit-encodings [ H{ } clone ] initialize
 
 TUPLE: 8-bit biassoc ;
 
@@ -38,7 +39,7 @@ M: 8-bit-encoding <decoder>
     8-bit-encodings get-global at <decoder> ;
 
 : create-encoding ( name -- word )
-    "io.encodings.8-bit" create
+    create-in
     [ define-singleton-class ]
     [ 8-bit-encoding add-mixin-instance ]
     [ ] tri ;
