@@ -133,7 +133,7 @@ M: #phi propagate-before ( #phi -- )
         {
             { { t f } { t } }
             [
-                first =t
+                first =f
                 condition-value get =t /\
                 swap f-->
             ]
@@ -141,7 +141,7 @@ M: #phi propagate-before ( #phi -- )
         {
             { { t } { t f } }
             [
-                second =t
+                second =f
                 condition-value get =f /\
                 swap f-->
             ]
