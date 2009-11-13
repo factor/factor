@@ -37,19 +37,19 @@ M: all holidays
 : holiday? ( timestamp/n singleton -- ? )
     [ holidays ] [ drop ] 2bi '[ _ same-day? ] any? ;
 
-: holiday-assoc ( timestamp/n singleton -- assoc )
-    [ >gmt midnight ] dip
-    [ dup (holidays) ] [ drop ] 2bi
-    '[ [ _ swap execute( ts -- ts' ) >gmt midnight ] keep ] { } map>assoc
-    rot '[ drop _ same-day? ] assoc-filter
-    values [ "holiday" word-prop at ] with map ;
+: holiday-assoc ( timestamp singleton -- assoc )
+    (holidays) swap
+    '[ [ _ swap execute( ts -- ts' ) >gmt midnight ] keep ] { } map>assoc ;
 
 : holiday-name ( singleton word -- string/f )
     "holiday" word-prop at ;
 
 : holiday-names ( timestamp/n singleton -- seq )
-    [ nip ] [ holiday-assoc ] 2bi
-    [ holiday-name ] with map ;
+    [
+        [ >gmt midnight ] dip
+        [ drop ] [ holiday-assoc ] 2bi swap
+        '[ drop _ same-day? ] assoc-filter values
+    ] keep '[ _ swap "holiday" word-prop at ] map ;
 
 HOLIDAY: armistice-day november 11 >>day ;
 HOLIDAY-NAME: armistice-day world "Armistice Day"
