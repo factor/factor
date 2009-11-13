@@ -1,28 +1,14 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs calendar combinators
-combinators.short-circuit fry kernel lexer math namespaces
-parser sequences shuffle vocabs words ;
+USING: accessors assocs calendar calendar.holidays
+calendar.holidays.private combinators combinators.short-circuit
+fry kernel lexer math namespaces parser sequences shuffle
+vocabs words ;
 IN: calendar.holidays.us
 
-SINGLETONS: world us us-federal canada commonwealth-of-nations ;
-
-<<
-SYNTAX: HOLIDAY:
-    CREATE-WORD
-    dup H{ } clone "holiday" set-word-prop
-    parse-definition (( timestamp/n -- timestamp )) define-declared ;
-
-SYNTAX: HOLIDAY-NAME:
-    scan-word "holiday" word-prop scan-word scan-object spin set-at ;
->>
-
-GENERIC: holidays ( n symbol -- seq )
+SINGLETONS: us us-federal ;
 
 <PRIVATE
-
-: (holidays) ( singleton -- seq )
-    all-words swap '[ "holiday" word-prop _ swap key? ] filter ;
 
 : adjust-federal-holiday ( timestamp -- timestamp' )
     {
@@ -31,17 +17,11 @@ GENERIC: holidays ( n symbol -- seq )
         [ ]
     } cond ;
 
+PRIVATE>
+
 M: us-federal holidays
     (holidays)
     [ execute( timestamp -- timestamp' ) adjust-federal-holiday ] with map ;
-
-M: object holidays
-    (holidays) [ execute( timestamp -- timestamp' ) ] with map ;
-
-PRIVATE>
-
-: holiday? ( timestamp/n singleton -- ? )
-    [ holidays ] [ drop ] 2bi '[ _ same-day? ] any? ;
 
 : us-post-office-open? ( timestamp -- ? )
     { [ sunday? not ] [ us-federal holiday? not ] } 1&& ;
@@ -71,16 +51,10 @@ HOLIDAY-NAME: labor-day us-federal "Labor Day"
 HOLIDAY: columbus-day october 2 monday-of-month ;
 HOLIDAY-NAME: columbus-day us-federal "Columbus Day"
 
-HOLIDAY: veterans-day november 11 >>day ;
-HOLIDAY-NAME: veterans-day us-federal "Veterans Day"
-HOLIDAY-NAME: veterans-day world "Armistice Day"
-HOLIDAY-NAME: veterans-day commonwealth-of-nations "Remembrance Day"
+HOLIDAY-NAME: armistice-day us-federal "Veterans Day"
 
 HOLIDAY: thanksgiving-day november 4 thursday-of-month ;
 HOLIDAY-NAME: thanksgiving-day us-federal "Thanksgiving Day"
-
-HOLIDAY: canadian-thanksgiving-day october 2 monday-of-month ;
-HOLIDAY-NAME: canadian-thanksgiving-day canada "Thanksgiving Day"
 
 HOLIDAY: christmas-day december 25 >>day ;
 HOLIDAY-NAME: christmas-day world "Christmas Day"
