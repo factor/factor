@@ -238,7 +238,8 @@ $low-level-note
 
 HELP: <word> ( name vocab -- word )
 { $values { "name" string } { "vocab" string } { "word" word } }
-{ $description "Allocates an uninterned word with the specified name and vocabulary, and a blank word property hashtable. User code should call " { $link gensym } " to create uninterned words and " { $link create } " to create interned words." } ;
+{ $description "Allocates an uninterned word with the specified name and vocabulary, and a blank word property hashtable. User code should call " { $link gensym } " to create uninterned words and " { $link create } " to create interned words." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: gensym
 { $values { "word" word } }
@@ -279,12 +280,14 @@ HELP: check-create
 
 HELP: create
 { $values { "name" string } { "vocab" string } { "word" word } }
-{ $description "Creates a new word. If the vocabulary already contains a word with the requested name, outputs the existing word. The vocabulary must exist already; if it does not, you must call " { $link create-vocab } " first." } ;
+{ $description "Creates a new word. If the vocabulary already contains a word with the requested name, outputs the existing word. The vocabulary must exist already; if it does not, you must call " { $link create-vocab } " first." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } ". Parsing words should call " { $link create-in } " instead of this word." } ;
 
 HELP: constructor-word
 { $values { "name" string } { "vocab" string } { "word" word } }
 { $description "Creates a new word, surrounding " { $snippet "name" } " in angle brackets." }
-{ $examples { $example "USING: prettyprint words ;" "\"salmon\" \"scratchpad\" constructor-word ." "<salmon>" } } ;
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
+{ $examples { $example "USING: compiler.units prettyprint words ;" "[ \"salmon\" \"scratchpad\" constructor-word ] with-compilation-unit ." "<salmon>" } } ;
 
 { POSTPONE: FORGET: forget forget* forget-vocab } related-words
 
