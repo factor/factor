@@ -39,6 +39,9 @@ INTERSECTION: generic-class generic class ;
 
 UNION: union-with-one-member a ;
 
+MIXIN: mixin-with-one-member
+INSTANCE: union-with-one-member mixin-with-one-member
+
 ! class<=
 [ t ] [ \ fixnum \ integer class<= ] unit-test
 [ t ] [ \ fixnum \ fixnum class<= ] unit-test
@@ -175,6 +178,22 @@ UNION: union-with-one-member a ;
 [ f ] [ number generic-class classes-intersect? ] unit-test
 
 [ f ] [ sa sb classes-intersect? ] unit-test
+
+[ t ] [ a union-with-one-member classes-intersect? ] unit-test
+[ f ] [ fixnum union-with-one-member classes-intersect? ] unit-test
+[ t ] [ object union-with-one-member classes-intersect? ] unit-test
+
+[ t ] [ union-with-one-member a classes-intersect? ] unit-test
+[ f ] [ union-with-one-member fixnum classes-intersect? ] unit-test
+[ t ] [ union-with-one-member object classes-intersect? ] unit-test
+
+[ t ] [ a mixin-with-one-member classes-intersect? ] unit-test
+[ f ] [ fixnum mixin-with-one-member classes-intersect? ] unit-test
+[ t ] [ object mixin-with-one-member classes-intersect? ] unit-test
+
+[ t ] [ mixin-with-one-member a classes-intersect? ] unit-test
+[ f ] [ mixin-with-one-member fixnum classes-intersect? ] unit-test
+[ t ] [ mixin-with-one-member object classes-intersect? ] unit-test
 
 ! class=
 [ t ] [ null class-not object class= ] unit-test
