@@ -36,8 +36,8 @@ GENERIC: (flatten-class) ( class -- )
 
 : normalize-class ( class -- class' )
     {
-        { [ dup members ] [ members <anonymous-union> ] }
-        { [ dup participants ] [ participants <anonymous-intersection> ] }
+        { [ dup members ] [ members <anonymous-union> normalize-class ] }
+        { [ dup participants ] [ participants <anonymous-intersection> normalize-class ] }
         [ ]
     } cond ;
 
