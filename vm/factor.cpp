@@ -174,7 +174,7 @@ void factor_vm::start_factor(vm_parameters *p)
 void factor_vm::stop_factor()
 {
 	nest_stacks(NULL);
-	c_to_factor_toplevel(userenv[SHUTDOWN_ENV]);
+	c_to_factor_toplevel(special_objects[OBJ_SHUTDOWN]);
 	unnest_stacks();
 }
 
