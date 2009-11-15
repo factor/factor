@@ -115,9 +115,7 @@ M: hashtable assoc-size ( hash -- n )
     [ count>> ] [ deleted>> ] bi - ; inline
 
 : rehash ( hash -- )
-    dup >alist [
-    dup clear-assoc
-    ] dip (rehash) ;
+    dup >alist [ dup clear-assoc ] dip (rehash) ;
 
 M: hashtable set-at ( value key hash -- )
     dup ?grow-hash
