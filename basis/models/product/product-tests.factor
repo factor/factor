@@ -27,11 +27,12 @@ TUPLE: an-observer { i integer } ;
 M: an-observer model-changed nip [ 1 + ] change-i drop ;
 
 [ 1 0 ] [
-    [let* | m1 [ 1 <model> ]
-            m2 [ 2 <model> ]
-            c [ { m1 m2 } <product> ]
-            o1 [ an-observer new ]
-            o2 [ an-observer new ] |
+    [let
+        1 <model> :> m1
+        2 <model> :> m2
+        { m1 m2 } <product> :> c
+        an-observer new :> o1
+        an-observer new :> o2
         
         o1 m1 add-connection
         o2 m2 add-connection

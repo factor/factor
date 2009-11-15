@@ -49,7 +49,7 @@ M: c-reader stream-read1 dup check-disposed handle>> fgetc ;
 
 : read-until-loop ( stream delim -- ch )
     over stream-read1 dup [
-        dup pick memq? [ 2nip ] [ , read-until-loop ] if
+        dup pick member-eq? [ 2nip ] [ , read-until-loop ] if
     ] [
         2nip
     ] if ;

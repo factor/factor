@@ -76,10 +76,9 @@ ducet insert-helpers
     drop [ 0 ] unless* tail-slice ;
 
 :: ?combine ( char slice i -- ? )
-    [let | str [ i slice nth char suffix ] |
-        str ducet key? dup
-        [ str i slice set-nth ] when
-    ] ;
+    i slice nth char suffix :> str
+    str ducet key? dup
+    [ str i slice set-nth ] when ;
 
 : add ( char -- )
     dup blocked? [ 1string , ] [

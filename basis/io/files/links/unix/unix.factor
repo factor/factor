@@ -13,6 +13,6 @@ M: unix make-hard-link ( path1 path2 -- )
 M: unix read-link ( path -- path' )
     normalize-path read-symbolic-link ;
 
-M: unix canonicalize-path ( path -- path' )
+M: unix resolve-symlinks ( path -- path' )
     path-components "/"
     [ append-path dup exists? [ follow-links ] when ] reduce ;

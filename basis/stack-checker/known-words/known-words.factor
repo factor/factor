@@ -13,7 +13,7 @@ words.private definitions assocs summary compiler.units
 system.private combinators combinators.short-circuit locals
 locals.backend locals.types combinators.private
 stack-checker.values generic.single generic.single.private
-alien.libraries
+alien.libraries tools.dispatch.private tools.profiler.private
 stack-checker.alien
 stack-checker.state
 stack-checker.errors
@@ -21,6 +21,7 @@ stack-checker.visitor
 stack-checker.backend
 stack-checker.branches
 stack-checker.transforms
+stack-checker.dependencies
 stack-checker.recursive-state ;
 IN: stack-checker.known-words
 
@@ -43,7 +44,6 @@ IN: stack-checker.known-words
     { swapd (( x y z -- y x z       )) }
     { nip   (( x y   -- y           )) }
     { 2nip  (( x y z -- z           )) }
-    { tuck  (( x y   -- y x y       )) }
     { over  (( x y   -- x y x       )) }
     { pick  (( x y z -- x y z x     )) }
     { swap  (( x y   -- y x         )) }
@@ -98,8 +98,8 @@ M: composed infer-call*
     1 infer->r infer-call
     terminated? get [ 1 infer-r> infer-call ] unless ;
 
-M: object infer-call*
-    "literal quotation" literal-expected ;
+M: input-parameter infer-call* \ call unknown-macro-input ;
+M: object infer-call* \ call bad-macro-input ;
 
 : infer-ndip ( word n -- )
     [ literals get ] 2dip
@@ -192,17 +192,17 @@ M: bad-executable summary
 
 \ load-local [ infer-load-local ] "special" set-word-prop
 
-: infer-get-local ( -- )
-    [let* | n [ pop-literal nip 1 swap - ]
-            in-r [ n consume-r ]
-            out-d [ in-r first copy-value 1array ]
-            out-r [ in-r copy-values ] |
-         out-d output-d
-         out-r output-r
-         f out-d in-r out-r
-         out-r in-r zip out-d first in-r first 2array suffix
-         #shuffle,
-    ] ;
+:: infer-get-local ( -- )
+    pop-literal nip 1 swap - :> n
+    n consume-r :> in-r
+    in-r first copy-value 1array :> out-d
+    in-r copy-values :> out-r
+
+    out-d output-d
+    out-r output-r
+    f out-d in-r out-r
+    out-r in-r zip out-d first in-r first 2array suffix
+    #shuffle, ;
 
 \ get-local [ infer-get-local ] "special" set-word-prop
 
@@ -231,7 +231,7 @@ M: bad-executable summary
 \ alien-callback [ infer-alien-callback ] "special" set-word-prop
 
 : infer-special ( word -- )
-    "special" word-prop call( -- ) ;
+    [ current-word set ] [ "special" word-prop call( -- ) ] bi ;
 
 : infer-local-reader ( word -- )
     (( -- value )) apply-word/effect ;
@@ -501,16 +501,14 @@ M: bad-executable summary
 
 \ compact-gc { } { } define-primitive
 
-\ gc-stats { } { array } define-primitive
-
 \ (save-image) { byte-array } { } define-primitive
 
 \ (save-image-and-exit) { byte-array } { } define-primitive
 
-\ data-room { } { integer integer array } define-primitive
+\ data-room { } { byte-array } define-primitive
 \ data-room make-flushable
 
-\ code-room { } { integer integer integer integer } define-primitive
+\ code-room { } { byte-array } define-primitive
 \ code-room  make-flushable
 
 \ micros { } { integer } define-primitive
@@ -594,7 +592,7 @@ M: bad-executable summary
 
 \ set-alien-double { float c-ptr integer } { } define-primitive
 
-\ alien-cell { c-ptr integer } { simple-c-ptr } define-primitive
+\ alien-cell { c-ptr integer } { pinned-c-ptr } define-primitive
 \ alien-cell make-flushable
 
 \ set-alien-cell { c-ptr c-ptr integer } { } define-primitive
@@ -625,11 +623,7 @@ M: bad-executable summary
 \ <array> { integer object } { array } define-primitive
 \ <array> make-flushable
 
-\ begin-scan { } { } define-primitive
-
-\ next-object { } { object } define-primitive
-
-\ end-scan { } { } define-primitive
+\ all-instances { } { array } define-primitive
 
 \ size { object } { fixnum } define-primitive
 \ size make-flushable
@@ -701,21 +695,24 @@ M: bad-executable summary
 
 \ unimplemented { } { } define-primitive
 
-\ gc-reset { } { } define-primitive
-
-\ gc-stats { } { array } define-primitive
-
 \ jit-compile { quotation } { } define-primitive
 
 \ lookup-method { object array } { word } define-primitive
 
 \ reset-dispatch-stats { } { } define-primitive
-\ dispatch-stats { } { array } define-primitive
-\ reset-inline-cache-stats { } { } define-primitive
-\ inline-cache-stats { } { array } define-primitive
+\ dispatch-stats { } { byte-array } define-primitive
 
 \ optimized? { word } { object } define-primitive
 
 \ strip-stack-traces { } { } define-primitive
 
 \ <callback> { word } { alien } define-primitive
+
+\ enable-gc-events { } { } define-primitive
+\ disable-gc-events { } { object } define-primitive
+
+\ profiling { object } { } define-primitive
+
+\ (identity-hashcode) { object } { fixnum } define-primitive
+
+\ compute-identity-hashcode { object } { } define-primitive

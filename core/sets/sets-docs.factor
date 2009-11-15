@@ -32,7 +32,7 @@ $nl
     conjoin
     conjoin-at
 }
-{ $see-also member? memq? any? all? "assocs-sets" } ;
+{ $see-also member? member-eq? any? all? "assocs-sets" } ;
 
 ABOUT: "sets"
 

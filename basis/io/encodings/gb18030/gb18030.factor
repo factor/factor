@@ -48,7 +48,8 @@ TUPLE: range ufirst ulast bfirst blast ;
     ] dip set-at ;
 
 : xml>gb-data ( stream -- mapping ranges )
-    [let | mapping [ H{ } clone ] ranges [ V{ } clone ] |
+    [let
+        H{ } clone :> mapping V{ } clone :> ranges
         [
             dup contained? [ 
                 dup name>> main>> {
@@ -57,7 +58,7 @@ TUPLE: range ufirst ulast bfirst blast ;
                     [ 2drop ]
                 } case
             ] [ drop ] if
-        ] each-element mapping ranges 
+        ] each-element mapping ranges
     ] ;
 
 : unlinear ( num -- bytes )
@@ -66,7 +67,7 @@ TUPLE: range ufirst ulast bfirst blast ;
     126 /mod HEX: 81 + swap
     10 /mod HEX: 30 + swap
     HEX: 81 +
-    4byte-array dup reverse-here ;
+    4byte-array reverse! ;
 
 : >interval-map-by ( start-quot end-quot value-quot seq -- interval-map )
     '[ _ [ @ 2array ] _ tri ] { } map>assoc <interval-map> ; inline

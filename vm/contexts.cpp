@@ -3,6 +3,20 @@
 namespace factor
 {
 
+context::context(cell ds_size, cell rs_size) :
+	callstack_top(NULL),
+	callstack_bottom(NULL),
+	datastack(0),
+	retainstack(0),
+	datastack_save(0),
+	retainstack_save(0),
+	magic_frame(NULL),
+	datastack_region(new segment(ds_size,false)),
+	retainstack_region(new segment(rs_size,false)),
+	catchstack_save(0),
+	current_callback_save(0),
+	next(NULL) {}
+
 void factor_vm::reset_datastack()
 {
 	ds = ds_bot - sizeof(cell);
@@ -42,11 +56,7 @@ context *factor_vm::alloc_context()
 		unused_contexts = unused_contexts->next;
 	}
 	else
-	{
-		new_context = new context;
-		new_context->datastack_region = new segment(ds_size,false);
-		new_context->retainstack_region = new segment(rs_size,false);
-	}
+		new_context = new context(ds_size,rs_size);
 
 	return new_context;
 }
@@ -80,9 +90,9 @@ void factor_vm::nest_stacks(stack_frame *magic_frame)
 
 	new_ctx->magic_frame = magic_frame;
 
-	/* save per-callback userenv */
-	new_ctx->current_callback_save = userenv[CURRENT_CALLBACK_ENV];
-	new_ctx->catchstack_save = userenv[CATCHSTACK_ENV];
+	/* save per-callback special_objects */
+	new_ctx->current_callback_save = special_objects[OBJ_CURRENT_CALLBACK];
+	new_ctx->catchstack_save = special_objects[OBJ_CATCHSTACK];
 
 	new_ctx->next = ctx;
 	ctx = new_ctx;
@@ -102,9 +112,9 @@ void factor_vm::unnest_stacks()
 	ds = ctx->datastack_save;
 	rs = ctx->retainstack_save;
 
-	/* restore per-callback userenv */
-	userenv[CURRENT_CALLBACK_ENV] = ctx->current_callback_save;
-	userenv[CATCHSTACK_ENV] = ctx->catchstack_save;
+	/* restore per-callback special_objects */
+	special_objects[OBJ_CURRENT_CALLBACK] = ctx->current_callback_save;
+	special_objects[OBJ_CATCHSTACK] = ctx->catchstack_save;
 
 	context *old_ctx = ctx;
 	ctx = old_ctx->next;
@@ -133,7 +143,7 @@ bool factor_vm::stack_to_array(cell bottom, cell top)
 		return false;
 	else
 	{
-		array *a = allot_array_internal<array>(depth / sizeof(cell));
+		array *a = allot_uninitialized_array<array>(depth / sizeof(cell));
 		memcpy(a + 1,(void*)bottom,depth);
 		dpush(tag<array>(a));
 		return true;
@@ -194,6 +204,14 @@ void factor_vm::primitive_check_datastack()
 		}
 		dpush(true_object);
 	}
+}
+
+void factor_vm::primitive_load_locals()
+{
+	fixnum count = untag_fixnum(dpop());
+	memcpy((cell *)(rs + sizeof(cell)),(cell *)(ds - sizeof(cell) * (count - 1)),sizeof(cell) * count);
+	ds -= sizeof(cell) * count;
+	rs += sizeof(cell) * count;
 }
 
 }

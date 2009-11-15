@@ -30,4 +30,4 @@ ERROR: not-an-integer x ;
     ] keep length
     10^ / + swap [ neg ] when ;
 
-SYNTAX: DECIMAL: scan parse-decimal parsed ;
+SYNTAX: DECIMAL: scan parse-decimal suffix! ;

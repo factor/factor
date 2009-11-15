@@ -10,8 +10,6 @@ IN: compiler.tree
 
 TUPLE: node < identity-tuple ;
 
-M: node hashcode* drop node hashcode* ;
-
 TUPLE: #introduce < node out-d ;
 
 : #introduce ( out-d -- node )

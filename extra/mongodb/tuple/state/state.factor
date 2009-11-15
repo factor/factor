@@ -10,7 +10,7 @@ CONSTANT: MDB_TUPLE_INFO       "_mfd_t_info"
 PRIVATE>
 
 : <tuple-info> ( tuple -- tuple-info )
-    class V{ } clone tuck  
+    class [ V{ } clone ] dip over
     [ [ name>> ] dip push ]
     [ [ vocabulary>> ] dip push ] 2bi ; inline
 

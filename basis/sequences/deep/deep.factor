@@ -48,10 +48,10 @@ M: object branch? drop f ;
         _ swap dup branch? [ subseq? ] [ 2drop f ] if
     ] deep-find >boolean ;
 
-: deep-change-each ( obj quot: ( elt -- elt' ) -- )
+: deep-map! ( obj quot: ( elt -- elt' ) -- obj )
     over branch? [
-        '[ _ [ call ] keep over [ deep-change-each ] dip ] change-each
-    ] [ 2drop ] if ; inline recursive
+        '[ _ [ call ] keep over [ deep-map! drop ] dip ] map!
+    ] [ drop ] if ; inline recursive
 
 : flatten ( obj -- seq )
     [ branch? not ] deep-filter ;

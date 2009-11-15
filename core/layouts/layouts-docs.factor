@@ -7,18 +7,11 @@ HELP: tag-bits
 { $var-description "Number of least significant bits reserved for a type tag in a tagged pointer." }
 { $see-also tag } ;
 
-HELP: num-tags
-{ $var-description "Number of distinct pointer tags. This is one more than the maximum value from the " { $link tag } " primitive." } ;
-
 HELP: tag-mask
 { $var-description "Taking the bitwise and of a tagged pointer with this mask leaves the tag." } ;
 
 HELP: num-types
-{ $var-description "Number of distinct built-in types. This is one more than the maximum value from the " { $link hi-tag } " primitive." } ;
-
-HELP: tag-number
-{ $values { "class" class } { "n" "an integer or " { $link f } } }
-{ $description "Outputs the pointer tag for pointers to instances of " { $link class } ". Will output " { $link f } " if instances of this class are not identified by a distinct pointer tag." } ;
+{ $var-description "Number of distinct built-in types. This is one more than the maximum value from the " { $link tag } " primitive." } ;
 
 HELP: type-number
 { $values { "class" class } { "n" "an integer or " { $link f } } }
@@ -76,7 +69,7 @@ HELP: bootstrap-cell-bits
 
 ARTICLE: "layouts-types" "Type numbers"
 "Corresponding to every built-in class is a built-in type number. An object can be asked for its built-in type number:"
-{ $subsections hi-tag }
+{ $subsections tag }
 "Built-in type numbers can be converted to classes, and vice versa:"
 { $subsections
     type>class
@@ -88,14 +81,10 @@ ARTICLE: "layouts-types" "Type numbers"
 ARTICLE: "layouts-tags" "Tagged pointers"
 "Every pointer stored on the stack or in the heap has a " { $emphasis "tag" } ", which is a small integer identifying the type of the pointer. If the tag is not equal to one of the two special tags, the remaining bits contain the memory address of a heap-allocated object. The two special tags are the " { $link fixnum } " tag and the " { $link f } " tag."
 $nl
-"Getting the tag of an object:"
-{ $link tag }
 "Words for working with tagged pointers:"
 { $subsections
     tag-bits
-    num-tags
     tag-mask
-    tag-number
 }
 "The Factor VM does not actually expose any words for working with tagged pointers directly. The above words operate on integers; they are used in the bootstrap image generator and the optimizing compiler." ;
 

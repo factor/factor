@@ -533,8 +533,8 @@ PRIVATE>
 
 : join-lines ( string -- string' )
     "\n" split
-    [ rest-slice [ [ blank? ] trim-head-slice ] change-each ]
-    [ but-last-slice [ [ blank? ] trim-tail-slice ] change-each ]
+    [ rest-slice [ [ blank? ] trim-head-slice ] map! drop ]
+    [ but-last-slice [ [ blank? ] trim-tail-slice ] map! drop ]
     [ " " join ]
     tri ;
 

@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors words sequences math prettyprint kernel arrays io
-io.styles namespaces assocs kernel.private strings combinators
-sorting math.parser vocabs definitions tools.profiler.private
-tools.crossref continuations generic compiler.units sets classes fry ;
+USING: accessors words sequences math prettyprint kernel arrays
+io io.styles namespaces assocs kernel.private strings
+combinators sorting math.parser vocabs definitions
+tools.profiler.private tools.crossref continuations generic
+compiler.units compiler.crossref sets classes fry ;
 IN: tools.profiler
 
 : profile ( quot -- )
@@ -19,7 +20,7 @@ IN: tools.profiler
     [ dup counter>> ] map-counters ;
 
 : cumulative-counters ( obj quot -- alist )
-    '[ dup @ [ counter>> ] sigma ] map-counters ; inline
+    '[ dup @ [ counter>> ] map-sum ] map-counters ; inline
 
 : vocab-counters ( -- alist )
     vocabs [ words [ predicate? not ] filter ] cumulative-counters ;

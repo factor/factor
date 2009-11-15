@@ -27,6 +27,9 @@ C: <reference> reference-expr
 M: reference-expr equal?
     over reference-expr? [ [ value>> ] bi@ eq? ] [ 2drop f ] if ;
 
+M: reference-expr hashcode*
+    nip value>> identity-hashcode ;
+
 : constant>vn ( constant -- vn ) <constant> expr>vn ; inline
 
 GENERIC: >expr ( insn -- expr )
@@ -42,7 +45,7 @@ M: ##load-constant >expr obj>> <constant> ;
 <<
 
 : input-values ( slot-specs -- slot-specs' )
-    [ type>> { use literal constant } memq? ] filter ;
+    [ type>> { use literal constant } member-eq? ] filter ;
 
 : expr-class ( insn -- expr )
     name>> "##" ?head drop "-expr" append create-class-in ;

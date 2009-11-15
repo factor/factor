@@ -196,7 +196,7 @@ DEFER: parse-error-file
         "    {"
         "        { [ dup continuation? ] [ append ] }"
         "        { [ dup not ] [ drop reverse ] }"
-        "        { [ dup pair? ] [ [ delete ] keep ] }"
+        "        { [ dup pair? ] [ [ remove! drop ] keep ] }"
         "    } cond ;"
     } ;
 

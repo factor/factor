@@ -16,7 +16,7 @@ H{ } clone sub-primitives set
 
 "vocab:bootstrap/syntax.factor" parse-file
 
-"vocab:cpu/" architecture get {
+architecture get {
     { "x86.32" "x86/32" }
     { "winnt-x86.64" "x86/64/winnt" }
     { "unix-x86.64" "x86/64/unix" }
@@ -24,7 +24,7 @@ H{ } clone sub-primitives set
     { "macosx-ppc" "ppc/macosx" }
     { "arm" "arm" }
 } ?at [ "Bad architecture: " prepend throw ] unless
-"/bootstrap.factor" 3append parse-file
+"vocab:cpu/" "/bootstrap.factor" surround parse-file
 
 "vocab:bootstrap/layouts/layouts.factor" parse-file
 
@@ -54,6 +54,8 @@ call( -- )
 num-types get f <array> builtins set
 
 bootstrapping? on
+
+[
 
 ! Create some empty vocabs where the below primitives and
 ! classes will go
@@ -99,6 +101,7 @@ bootstrapping? on
     "system"
     "system.private"
     "threads.private"
+    "tools.dispatch.private"
     "tools.profiler.private"
     "words"
     "words.private"
@@ -176,10 +179,6 @@ define-predicate-class
 bi
 
 "object?" "kernel" vocab-words delete-at
-
-! Class of objects with object tag
-"hi-tag" "kernel.private" create
-builtins get num-tags get tail define-union-class
 
 ! Empty class with no instances
 "null" "kernel" create
@@ -343,7 +342,6 @@ tuple
     { "swapd" "kernel" (( x y z -- y x z )) }
     { "nip" "kernel" (( x y -- y )) }
     { "2nip" "kernel" (( x y z -- z )) }
-    { "tuck" "kernel" (( x y -- y x y )) }
     { "over" "kernel" (( x y -- x y x )) }
     { "pick" "kernel" (( x y z -- x y z x )) }
     { "swap" "kernel" (( x y -- y x )) }
@@ -423,7 +421,6 @@ tuple
     { "minor-gc" "memory" (( -- )) }
     { "gc" "memory" (( -- )) }
     { "compact-gc" "memory" (( -- )) }
-    { "gc-stats" "memory" f }
     { "(save-image)" "memory.private" (( path -- )) }
     { "(save-image-and-exit)" "memory.private" (( path -- )) }
     { "datastack" "kernel" (( -- ds )) }
@@ -433,8 +430,8 @@ tuple
     { "set-retainstack" "kernel" (( rs -- )) }
     { "set-callstack" "kernel" (( cs -- )) }
     { "(exit)" "system" (( n -- )) }
-    { "data-room" "memory" (( -- cards decks generations )) }
-    { "code-room" "memory" (( -- code-total code-used code-free largest-free-block )) }
+    { "data-room" "memory" (( -- data-room )) }
+    { "code-room" "memory" (( -- code-room )) }
     { "micros" "system" (( -- us )) }
     { "modify-code-heap" "compiler.units" (( alist -- )) }
     { "(dlopen)" "alien.libraries" (( path -- dll )) }
@@ -477,9 +474,7 @@ tuple
     { "resize-array" "arrays" (( n array -- newarray )) }
     { "resize-string" "strings" (( n str -- newstr )) }
     { "<array>" "arrays" (( n elt -- array )) }
-    { "begin-scan" "memory" (( -- )) }
-    { "next-object" "memory" (( -- obj )) }
-    { "end-scan" "memory" (( -- )) }
+    { "all-instances" "memory" (( -- array )) }
     { "size" "memory" (( obj -- n )) }
     { "die" "kernel" (( -- )) }
     { "(fopen)" "io.streams.c" (( path mode -- alien )) }
@@ -509,7 +504,6 @@ tuple
     { "resize-byte-array" "byte-arrays" (( n byte-array -- newbyte-array )) }
     { "dll-valid?" "alien.libraries" (( dll -- ? )) }
     { "unimplemented" "kernel.private" (( -- * )) }
-    { "gc-reset" "memory" (( -- )) }
     { "jit-compile" "quotations" (( quot -- )) }
     { "load-locals" "locals.backend" (( ... n -- )) }
     { "check-datastack" "kernel.private" (( array in# out# -- ? )) }
@@ -517,16 +511,20 @@ tuple
     { "inline-cache-miss-tail" "generic.single.private" (( generic methods index cache -- )) }
     { "mega-cache-miss" "generic.single.private" (( methods index cache -- method )) }
     { "lookup-method" "generic.single.private" (( object methods -- method )) }
-    { "reset-dispatch-stats" "generic.single" (( -- )) }
-    { "dispatch-stats" "generic.single" (( -- stats )) }
-    { "reset-inline-cache-stats" "generic.single" (( -- )) }
-    { "inline-cache-stats" "generic.single" (( -- stats )) }
+    { "reset-dispatch-stats" "tools.dispatch.private" (( -- )) }
+    { "dispatch-stats" "tools.dispatch.private" (( -- stats )) }
     { "optimized?" "words" (( word -- ? )) }
     { "quot-compiled?" "quotations" (( quot -- ? )) }
     { "vm-ptr" "vm" (( -- ptr )) }
     { "strip-stack-traces" "kernel.private" (( -- )) }
     { "<callback>" "alien" (( word -- alien )) }
+    { "enable-gc-events" "memory" (( -- )) }
+    { "disable-gc-events" "memory" (( -- events )) }
+    { "(identity-hashcode)" "kernel.private" (( obj -- code )) }
+    { "compute-identity-hashcode" "kernel.private" (( obj -- )) }
 } [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number
 "build" "kernel" create build 1 + [ ] curry (( -- n )) define-declared
+
+] with-compilation-unit

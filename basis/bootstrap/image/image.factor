@@ -1,14 +1,16 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays byte-arrays generic hashtables hashtables.private
-io io.binary io.files io.encodings.binary io.pathnames kernel
-kernel.private math namespaces make parser prettyprint sequences
-strings sbufs vectors words quotations assocs system layouts splitting
-grouping growable classes classes.builtin classes.tuple
-classes.tuple.private vocabs vocabs.loader source-files definitions
-debugger quotations.private combinators math.order math.private
-accessors slots.private generic.single.private compiler.units
-compiler.constants fry bootstrap.image.syntax ;
+USING: alien arrays byte-arrays generic hashtables
+hashtables.private io io.binary io.files io.encodings.binary
+io.pathnames kernel kernel.private math namespaces make parser
+prettyprint sequences strings sbufs vectors words quotations
+assocs system layouts splitting grouping growable classes
+classes.builtin classes.tuple classes.tuple.private vocabs
+vocabs.loader source-files definitions debugger
+quotations.private combinators combinators.short-circuit
+math.order math.private accessors slots.private
+generic.single.private compiler.units compiler.constants fry
+bootstrap.image.syntax ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
@@ -38,7 +40,7 @@ IN: bootstrap.image
 
 ! Object cache; we only consider numbers equal if they have the
 ! same type
-TUPLE: eql-wrapper obj ;
+TUPLE: eql-wrapper { obj read-only } ;
 
 C: <eql-wrapper> eql-wrapper
 
@@ -47,30 +49,30 @@ M: eql-wrapper hashcode* obj>> hashcode* ;
 GENERIC: (eql?) ( obj1 obj2 -- ? )
 
 : eql? ( obj1 obj2 -- ? )
-    [ (eql?) ] [ [ class ] bi@ = ] 2bi and ;
+    { [ [ class ] bi@ = ] [ (eql?) ] } 2&& ;
 
-M: integer (eql?) = ;
+M: fixnum (eql?) eq? ;
 
-M: float (eql?)
-    over float? [ fp-bitwise= ] [ 2drop f ] if ;
+M: bignum (eql?) = ;
 
-M: sequence (eql?)
-    over sequence? [
-        2dup [ length ] bi@ =
-        [ [ eql? ] 2all? ] [ 2drop f ] if
-    ] [ 2drop f ] if ;
+M: float (eql?) fp-bitwise= ;
+
+M: sequence (eql?) 2dup [ length ] bi@ = [ [ eql? ] 2all? ] [ 2drop f ] if ;
 
 M: object (eql?) = ;
 
 M: eql-wrapper equal?
     over eql-wrapper? [ [ obj>> ] bi@ eql? ] [ 2drop f ] if ;
 
-TUPLE: eq-wrapper obj ;
+TUPLE: eq-wrapper { obj read-only } ;
 
 C: <eq-wrapper> eq-wrapper
 
 M: eq-wrapper equal?
     over eq-wrapper? [ [ obj>> ] bi@ eq? ] [ 2drop f ] if ;
+
+M: eq-wrapper hashcode*
+    nip obj>> identity-hashcode ;
 
 SYMBOL: objects
 
@@ -177,14 +179,12 @@ USERENV: callback-stub 45
 ! PIC stubs
 USERENV: pic-load 47
 USERENV: pic-tag 48
-USERENV: pic-hi-tag 49
-USERENV: pic-tuple 50
-USERENV: pic-hi-tag-tuple 51
-USERENV: pic-check-tag 52
-USERENV: pic-check 53
-USERENV: pic-hit 54
-USERENV: pic-miss-word 55
-USERENV: pic-miss-tail-word 56
+USERENV: pic-tuple 49
+USERENV: pic-check-tag 50
+USERENV: pic-check-tuple 51
+USERENV: pic-hit 52
+USERENV: pic-miss-word 53
+USERENV: pic-miss-tail-word 54
 
 ! Megamorphic dispatch
 USERENV: mega-lookup 57
@@ -218,13 +218,20 @@ USERENV: undefined-quot 60
 
 : here-as ( tag -- pointer ) here bitor ;
 
+: (align-here) ( alignment -- )
+    [ here neg ] dip rem
+    [ bootstrap-cell /i [ 0 emit ] times ] unless-zero ;
+
 : align-here ( -- )
-    here 8 mod 4 = [ 0 emit ] when ;
+    data-alignment get (align-here) ;
 
 : emit-fixnum ( n -- ) tag-fixnum emit ;
 
+: emit-header ( n -- ) tag-header emit ;
+
 : emit-object ( class quot -- addr )
-    over tag-number here-as [ swap type-number tag-fixnum emit call align-here ] dip ;
+    [ type-number ] dip over here-as
+    [ swap emit-header call align-here ] dip ;
     inline
 
 ! Write an object to the image.
@@ -232,7 +239,7 @@ GENERIC: ' ( obj -- ptr )
 
 ! Image header
 
-: emit-header ( -- )
+: emit-image-header ( -- )
     image-magic emit
     image-version emit
     data-base emit ! relocation base at end of header
@@ -293,7 +300,7 @@ M: fake-bignum ' n>> tag-fixnum ;
 M: float '
     [
         float [
-            align-here double>bits emit-64
+            8 (align-here) double>bits emit-64
         ] emit-object
     ] cache-eql-object ;
 
@@ -305,7 +312,7 @@ M: float '
 
 M: f '
     #! f is #define F RETAG(0,F_TYPE)
-    drop \ f tag-number ;
+    drop \ f type-number ;
 
 :  0, ( -- )  0 >bignum '  0-offset fixup ;
 :  1, ( -- )  1 >bignum '  1-offset fixup ;
@@ -351,7 +358,7 @@ M: f '
     [ ] [ "Not in image: " word-error ] ?if ;
 
 : fixup-words ( -- )
-    image get [ dup word? [ fixup-word ] when ] change-each ;
+    image get [ dup word? [ fixup-word ] when ] map! drop ;
 
 M: word ' ;
 
@@ -411,6 +418,7 @@ M: byte-array '
     [
         byte-array [
             dup length emit-fixnum
+            bootstrap-cell 4 = [ 0 emit 0 emit ] when
             pad-bytes emit-bytes
         ] emit-object
     ] cache-eq-object ;
@@ -515,7 +523,7 @@ M: quotation '
 : build-image ( -- image )
     800000 <vector> image set
     20000 <hashtable> objects set
-    emit-header t, 0, 1, -1,
+    emit-image-header t, 0, 1, -1,
     "Building generic words..." print flush
     remake-generics
     "Serializing words..." print flush

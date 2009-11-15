@@ -135,12 +135,6 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : assoc-diff ( assoc1 assoc2 -- diff )
     [ nip key? not ] curry assoc-filter ;
 
-: remove-all ( assoc seq -- subseq )
-    swap [ key? not ] curry filter ;
-
-: substitute-here ( seq assoc -- )
-    substituter change-each ;
-
 : substitute ( seq assoc -- newseq )
     substituter map ;
 
@@ -195,7 +189,7 @@ M: sequence clear-assoc delete-all ; inline
 
 M: sequence delete-at
     [ nip ] [ search-alist nip ] 2bi
-    [ swap delete-nth ] [ drop ] if* ;
+    [ swap remove-nth! drop ] [ drop ] if* ;
 
 M: sequence assoc-size length ; inline
 
@@ -208,6 +202,10 @@ M: sequence assoc-like
 M: sequence >alist ; inline
 
 ! Override sequence => assoc instance for f
+M: f at* 2drop f f ; inline
+
+M: f assoc-size drop 0 ; inline
+
 M: f clear-assoc drop ; inline
 
 M: f assoc-like drop dup assoc-empty? [ drop f ] when ; inline
@@ -224,7 +222,7 @@ M: enum at*
 
 M: enum set-at seq>> set-nth ; inline
 
-M: enum delete-at seq>> delete-nth ; inline
+M: enum delete-at seq>> remove-nth! drop ; inline
 
 M: enum >alist ( enum -- alist )
     seq>> [ length ] keep zip ; inline

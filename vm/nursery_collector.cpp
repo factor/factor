@@ -6,7 +6,6 @@ namespace factor
 nursery_collector::nursery_collector(factor_vm *parent_) :
 	copying_collector<aging_space,nursery_policy>(
 		parent_,
-		&parent_->gc_stats.nursery_stats,
 		parent_->data->aging,
 		nursery_policy(parent_)) {}
 
@@ -18,17 +17,30 @@ void factor_vm::collect_nursery()
 
 	collector.trace_roots();
 	collector.trace_contexts();
+
+	current_gc->event->started_card_scan();
 	collector.trace_cards(data->tenured,
 		card_points_to_nursery,
 		simple_unmarker(card_points_to_nursery));
-	collector.trace_cards(data->aging,
-		card_points_to_nursery,
-		simple_unmarker(card_mark_mask));
-	collector.trace_code_heap_roots(&code->points_to_nursery);
-	collector.cheneys_algorithm();
-	update_code_heap_for_minor_gc(&code->points_to_nursery);
+	if(data->aging->here != data->aging->start)
+	{
+		collector.trace_cards(data->aging,
+			card_points_to_nursery,
+			full_unmarker());
+	}
+	current_gc->event->ended_card_scan(collector.cards_scanned,collector.decks_scanned);
 
-	nursery.here = nursery.start;
+	current_gc->event->started_code_scan();
+	collector.trace_code_heap_roots(&code->points_to_nursery);
+	current_gc->event->ended_code_scan(collector.code_blocks_scanned);
+
+	collector.cheneys_algorithm();
+
+	current_gc->event->started_code_sweep();
+	update_code_heap_for_minor_gc(&code->points_to_nursery);
+	current_gc->event->ended_code_sweep();
+
+	data->reset_generation(&nursery);
 	code->points_to_nursery.clear();
 }
 

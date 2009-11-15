@@ -20,15 +20,19 @@ WHERE
 
 GENERIC: rename-insn-defs ( insn -- )
 
-insn-classes get [
+M: insn rename-insn-defs drop ;
+
+insn-classes get [ insn-def-slot ] filter [
     [ \ rename-insn-defs create-method-in ]
-    [ insn-def-slot dup [ name>> 1array ] when DEF-QUOT slot-change-quot ] bi
+    [ insn-def-slot name>> 1array DEF-QUOT slot-change-quot ] bi
     define
 ] each
 
 GENERIC: rename-insn-uses ( insn -- )
 
-insn-classes get { ##phi } diff [
+M: insn rename-insn-uses drop ;
+
+insn-classes get { ##phi } diff [ insn-use-slots empty? not ] filter [
     [ \ rename-insn-uses create-method-in ]
     [ insn-use-slots [ name>> ] map USE-QUOT slot-change-quot ] bi
     define
@@ -39,7 +43,9 @@ M: ##phi rename-insn-uses
 
 GENERIC: rename-insn-temps ( insn -- )
 
-insn-classes get [
+M: insn rename-insn-temps drop ;
+
+insn-classes get [ insn-temp-slots empty? not ] filter [
     [ \ rename-insn-temps create-method-in ]
     [ insn-temp-slots [ name>> ] map TEMP-QUOT slot-change-quot ] bi
     define

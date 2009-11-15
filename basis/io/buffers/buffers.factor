@@ -8,7 +8,7 @@ IN: io.buffers
 
 TUPLE: buffer
 { size fixnum }
-{ ptr simple-alien }
+{ ptr alien }
 { fill fixnum }
 { pos fixnum }
 disposed ;
@@ -73,7 +73,7 @@ HINTS: >buffer byte-array buffer ;
     bi ; inline
 
 : search-buffer-until ( pos fill ptr separators -- n )
-    [ [ swap alien-unsigned-1 ] dip memq? ] 2curry find-from drop ; inline
+    [ [ swap alien-unsigned-1 ] dip member-eq? ] 2curry find-from drop ; inline
 
 : finish-buffer-until ( buffer n -- byte-array separator )
     [

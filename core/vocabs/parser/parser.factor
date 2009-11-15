@@ -129,7 +129,7 @@ TUPLE: no-current-vocab ;
 : unuse-vocab ( vocab -- )
     dup using-vocab? [
         manifest get
-        [ [ load-vocab ] dip search-vocabs>> delq ]
+        [ [ load-vocab ] dip search-vocabs>> remove-eq! drop ]
         [ [ vocab-name ] dip search-vocab-names>> delete-at ]
         2bi
     ] [ drop ] if ;
@@ -172,7 +172,7 @@ TUPLE: rename word vocab words ;
 
 : use-words ( assoc -- ) (use-words) push ;
 
-: unuse-words ( assoc -- ) (use-words) delete ;
+: unuse-words ( assoc -- ) (use-words) remove! drop ;
 
 TUPLE: ambiguous-use-error words ;
 

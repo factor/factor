@@ -14,14 +14,14 @@ SYMBOL: sent-messages
 : remember-send ( selector -- )
     sent-messages (remember-send) ;
 
-SYNTAX: -> scan dup remember-send parsed \ send parsed ;
+SYNTAX: -> scan dup remember-send suffix! \ send suffix! ;
 
 SYMBOL: super-sent-messages
 
 : remember-super-send ( selector -- )
     super-sent-messages (remember-send) ;
 
-SYNTAX: SUPER-> scan dup remember-super-send parsed \ super-send parsed ;
+SYNTAX: SUPER-> scan dup remember-super-send suffix! \ super-send suffix! ;
 
 SYMBOL: frameworks
 

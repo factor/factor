@@ -129,7 +129,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 
 SYMBOL: help-hook
 
-help-hook [ [ print-topic ] ] initialize
+help-hook [ [ print-topic nl ] ] initialize
 
 : help ( topic -- )
     help-hook get call( topic -- ) ;

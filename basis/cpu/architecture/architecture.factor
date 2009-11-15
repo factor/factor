@@ -107,6 +107,16 @@ scalar-rep ;
         { ulonglong-scalar-rep longlong-scalar-rep }
     } ?at drop ;
 
+: widen-vector-rep ( rep -- rep' )
+    {
+        { char-16-rep     short-8-rep     }
+        { short-8-rep     int-4-rep       }
+        { int-4-rep       longlong-2-rep  }
+        { uchar-16-rep    ushort-8-rep    }
+        { ushort-8-rep    uint-4-rep      }
+        { uint-4-rep      ulonglong-2-rep }
+    } at ;
+
 ! Register classes
 SINGLETONS: int-regs float-regs ;
 
@@ -277,8 +287,10 @@ HOOK: %xor-vector cpu ( dst src1 src2 rep -- )
 HOOK: %not-vector cpu ( dst src rep -- )
 HOOK: %shl-vector cpu ( dst src1 src2 rep -- )
 HOOK: %shr-vector cpu ( dst src1 src2 rep -- )
-HOOK: %horizontal-shl-vector cpu ( dst src1 src2 rep -- )
-HOOK: %horizontal-shr-vector cpu ( dst src1 src2 rep -- )
+HOOK: %shl-vector-imm cpu ( dst src1 src2 rep -- )
+HOOK: %shr-vector-imm cpu ( dst src1 src2 rep -- )
+HOOK: %horizontal-shl-vector-imm cpu ( dst src1 src2 rep -- )
+HOOK: %horizontal-shr-vector-imm cpu ( dst src1 src2 rep -- )
 
 HOOK: %integer>scalar cpu ( dst src rep -- )
 HOOK: %scalar>integer cpu ( dst src rep -- )
@@ -324,8 +336,10 @@ HOOK: %xor-vector-reps cpu ( -- reps )
 HOOK: %not-vector-reps cpu ( -- reps )
 HOOK: %shl-vector-reps cpu ( -- reps )
 HOOK: %shr-vector-reps cpu ( -- reps )
-HOOK: %horizontal-shl-vector-reps cpu ( -- reps )
-HOOK: %horizontal-shr-vector-reps cpu ( -- reps )
+HOOK: %shl-vector-imm-reps cpu ( -- reps )
+HOOK: %shr-vector-imm-reps cpu ( -- reps )
+HOOK: %horizontal-shl-vector-imm-reps cpu ( -- reps )
+HOOK: %horizontal-shr-vector-imm-reps cpu ( -- reps )
 
 M: object %zero-vector-reps { } ;
 M: object %fill-vector-reps { } ;
@@ -366,13 +380,15 @@ M: object %xor-vector-reps { } ;
 M: object %not-vector-reps { } ;
 M: object %shl-vector-reps { } ;
 M: object %shr-vector-reps { } ;
-M: object %horizontal-shl-vector-reps { } ;
-M: object %horizontal-shr-vector-reps { } ;
+M: object %shl-vector-imm-reps { } ;
+M: object %shr-vector-imm-reps { } ;
+M: object %horizontal-shl-vector-imm-reps { } ;
+M: object %horizontal-shr-vector-imm-reps { } ;
 
 HOOK: %unbox-alien cpu ( dst src -- )
-HOOK: %unbox-any-c-ptr cpu ( dst src temp -- )
+HOOK: %unbox-any-c-ptr cpu ( dst src -- )
 HOOK: %box-alien cpu ( dst src temp -- )
-HOOK: %box-displaced-alien cpu ( dst displacement base temp1 temp2 base-class -- )
+HOOK: %box-displaced-alien cpu ( dst displacement base temp base-class -- )
 
 HOOK: %alien-unsigned-1 cpu ( dst src offset -- )
 HOOK: %alien-unsigned-2 cpu ( dst src offset -- )

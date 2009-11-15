@@ -157,10 +157,13 @@ M: renderbuffer framebuffer-attachment-dim
     [ swap depth-attachment>>   [ swap call ] [ drop ] if* ]
     [ swap stencil-attachment>> [ swap call ] [ drop ] if* ] 2tri ; inline
 
-: each-attachment-target ( framebuffer quot: ( attachment-target attachment -- ) -- )
-    [ [ color-attachments>> ] dip [ GL_COLOR_ATTACHMENT0 + swap ] prepose each-index ]
-    [ swap depth-attachment>>   [ GL_DEPTH_ATTACHMENT   spin call ] [ drop ] if* ]
-    [ swap stencil-attachment>> [ GL_STENCIL_ATTACHMENT spin call ] [ drop ] if* ] 2tri ; inline
+:: each-attachment-target ( framebuffer quot: ( attachment-target attachment -- ) -- )
+    framebuffer color-attachments>>
+    [| attachment n | n GL_COLOR_ATTACHMENT0 + attachment quot call ] each-index
+    framebuffer depth-attachment>>
+    [| attachment | GL_DEPTH_ATTACHMENT attachment quot call ] when*
+    framebuffer stencil-attachment>>
+    [| attachment | GL_STENCIL_ATTACHMENT attachment quot call ] when* ; inline
 
 GENERIC: bind-framebuffer-attachment ( attachment-target attachment -- )
 

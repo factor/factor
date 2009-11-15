@@ -68,21 +68,3 @@ M: cannot-send-synchronous-to-self summary
     receive [
         data>> swap call
     ] keep reply-synchronous ; inline
-
-<PRIVATE
-
-: registered-processes ( -- hash )
-   \ registered-processes get-global ;
-
-PRIVATE>
-
-: register-process ( name process -- )
-    swap registered-processes set-at ;
-
-: unregister-process ( name -- )
-    registered-processes delete-at ;
-
-: get-process ( name -- process )
-    dup registered-processes at [ ] [ thread ] ?if ;
-
-\ registered-processes [ H{ } clone ] initialize

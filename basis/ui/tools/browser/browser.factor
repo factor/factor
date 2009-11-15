@@ -13,7 +13,7 @@ IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
 
-{ 650 400 } browser-gadget set-tool-dim
+{ 650 700 } browser-gadget set-tool-dim
 
 M: browser-gadget history-value
     [ control-value ] [ scroller>> scroll-position ]
@@ -121,13 +121,17 @@ M: browser-gadget focusable-child* search-field>> ;
 
 : browser-help ( -- ) "ui-browser" com-browse ;
 
+: glossary ( -- ) "conventions" com-browse ;
+
 \ browser-help H{ { +nullary+ t } } define-command
+\ glossary H{ { +nullary+ t } } define-command
 
 browser-gadget "toolbar" f {
     { T{ key-down f { A+ } "LEFT" } com-back }
     { T{ key-down f { A+ } "RIGHT" } com-forward }
     { T{ key-down f { A+ } "H" } com-home }
     { T{ key-down f f "F1" } browser-help }
+    { T{ key-down f { A+ } "F1" } glossary }
 } define-command-map
 
 : ?show-help ( link browser -- )

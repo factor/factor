@@ -7,13 +7,11 @@ M: lambda expand-macros clone [ expand-macros ] change-body ;
 
 M: lambda expand-macros* expand-macros literal ;
 
-M: binding-form expand-macros
-    clone
-        [ [ expand-macros ] assoc-map ] change-bindings
-        [ expand-macros ] change-body ;
+M: let expand-macros
+    clone [ expand-macros ] change-body ;
 
-M: binding-form expand-macros* expand-macros literal ;
+M: let expand-macros* expand-macros literal ;
 
 M: lambda condomize? drop t ;
 
-M: lambda condomize '[ @ ] ;
+M: lambda condomize [ call ] curry ;

@@ -1,15 +1,9 @@
 IN: stack-checker.transforms.tests
 USING: sequences stack-checker.transforms tools.test math kernel
-quotations stack-checker stack-checker.errors accessors combinators words arrays
-classes classes.tuple ;
+quotations stack-checker stack-checker.errors accessors
+combinators words arrays classes classes.tuple macros ;
 
-: compose-n ( quot n -- ) "OOPS" throw ;
-
-<<
-: compose-n-quot ( n word -- quot' ) <repetition> >quotation ;
-\ compose-n [ compose-n-quot ] 2 define-transform
-\ compose-n t "no-compile" set-word-prop
->>
+MACRO: compose-n ( n word -- quot' ) <repetition> >quotation ;
 
 : compose-n-test ( a b c -- x ) 2 \ + compose-n ;
 
@@ -64,13 +58,15 @@ DEFER: smart-combo ( quot -- )
 [ [ [ "a" "b" ] very-smart-combo "c" ] very-smart-combo ] must-infer
 
 ! Caveat found by Doug
-DEFER: curry-folding-test ( quot -- )
-
-\ curry-folding-test [ length \ drop <repetition> >quotation ] 1 define-transform
+MACRO: curry-folding-test ( quot -- )
+    length \ drop <repetition> >quotation ;
 
 { 3 0 } [ [ 1 2 3 ] curry-folding-test ] must-infer-as
 { 3 0 } [ 1 [ 2 3 ] curry curry-folding-test ] must-infer-as
 { 3 0 } [ [ 1 2 ] 3 [ ] curry compose curry-folding-test ] must-infer-as
+
+[ [ curry curry-folding-test ] infer ]
+[ T{ unknown-macro-input f curry-folding-test } = ] must-fail-with
 
 : member?-test ( a -- ? ) { 1 2 3 10 7 58 } member? ;
 
@@ -82,4 +78,8 @@ DEFER: curry-folding-test ( quot -- )
 
 \ bad-macro [ "OOPS" throw ] 0 define-transform
 
-[ [ bad-macro ] infer ] [ inference-error? ] must-fail-with
+[ [ bad-macro ] infer ] [ f >>continuation T{ transform-expansion-error f "OOPS" f bad-macro } = ] must-fail-with
+
+MACRO: two-params ( a b -- c ) + 1quotation ;
+
+[ [ 3 two-params ] infer ] [ T{ unknown-macro-input f two-params } = ] must-fail-with

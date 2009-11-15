@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! Remote Channels
-USING: kernel init namespaces make assocs arrays random
+USING: kernel init namespaces assocs arrays random
 sequences channels match concurrency.messaging
 concurrency.distributed threads accessors ;
 IN: channels.remote
@@ -27,39 +27,44 @@ PRIVATE>
 MATCH-VARS: ?from ?tag ?id ?value ;
 
 SYMBOL: no-channel
+TUPLE: to-message id value ;
+TUPLE: from-message id ;
 
-: channel-process ( -- )
+: channel-thread ( -- )
     [
         {
-            { { to ?id ?value  }
+            { T{ to-message f ?id ?value  }
             [ ?value ?id get-channel dup [ to f ] [ 2drop no-channel ] if ] }
-            { { from ?id }
+            { T{ from-message f ?id }
             [ ?id get-channel [ from ] [ no-channel ] if* ] }
         } match-cond
     ] handle-synchronous ;
 
-PRIVATE>
-
 : start-channel-node ( -- )
-    "remote-channels" get-process [
-        "remote-channels" 
-        [ channel-process t ] "Remote channels" spawn-server
-        register-process 
+    "remote-channels" get-remote-thread [
+        [ channel-thread t ] "Remote channels" spawn-server
+        "remote-channels" register-remote-thread 
     ] unless ;
+
+PRIVATE>
 
 TUPLE: remote-channel node id ;
 
 C: <remote-channel> remote-channel 
 
+<PRIVATE
+
+: send-message ( message remote-channel -- value )
+    node>> "remote-channels" <remote-thread> 
+    send-synchronous dup no-channel = [ no-channel throw ] when* ;
+    
+PRIVATE>
+
 M: remote-channel to ( value remote-channel -- )
-    [ [ \ to , id>> , , ] { } make ] keep
-    node>> "remote-channels" <remote-process> 
-    send-synchronous no-channel = [ no-channel throw ] when ;
+    [ id>> swap to-message boa ] keep send-message drop ;
 
 M: remote-channel from ( remote-channel -- value )
-    [ [ \ from , id>> , ] { } make ] keep
-    node>> "remote-channels" <remote-process> 
-    send-synchronous dup no-channel = [ no-channel throw ] when* ;
+    [ id>> from-message boa ] keep send-message ;
 
 [
     H{ } clone \ remote-channels set-global

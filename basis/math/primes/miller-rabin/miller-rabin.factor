@@ -8,7 +8,7 @@ IN: math.primes.miller-rabin
 
 :: (miller-rabin) ( n trials -- ? )
     n 1 - :> n-1
-    n-1 factor-2s :> s :> r
+    n-1 factor-2s :> ( r s )
     0 :> a!
     trials [
         drop
