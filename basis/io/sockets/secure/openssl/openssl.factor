@@ -5,7 +5,7 @@ math.order combinators init alien alien.c-types alien.data
 alien.strings libc continuations destructors summary splitting
 assocs random math.parser locals unicode.case openssl
 openssl.libcrypto openssl.libssl io.backend io.ports io.pathnames
-io.encodings.8-bit io.timeouts io.sockets.secure ;
+io.encodings.8-bit.latin1 io.timeouts io.sockets.secure ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )

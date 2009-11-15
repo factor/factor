@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays definitions graphs kernel
-kernel.private slots.private math namespaces sequences
-strings vectors sbufs quotations assocs hashtables sorting vocabs
-math.order sets words.private ;
+USING: accessors arrays definitions kernel kernel.private
+slots.private math namespaces sequences strings vectors sbufs
+quotations assocs hashtables sorting vocabs math.order sets
+words.private ;
 IN: words
 
 : word ( -- word ) \ word get-global ;
@@ -135,10 +135,13 @@ M: word reset-word
     ] tri ;
 
 : <word> ( name vocab -- word )
-    2dup [ hashcode ] bi@ bitxor >fixnum (word) ;
+    2dup [ hashcode ] bi@ bitxor >fixnum (word) dup new-word ;
+
+: <uninterned-word> ( name -- word )
+    f \ <uninterned-word> counter >fixnum (word) ;
 
 : gensym ( -- word )
-    "( gensym )" f \ gensym counter >fixnum (word) ;
+    "( gensym )" <uninterned-word> ;
 
 : define-temp ( quot effect -- word )
     [ gensym dup ] 2dip define-declared ;

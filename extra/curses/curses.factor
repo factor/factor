@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.strings assocs byte-arrays
 combinators continuations destructors fry io.encodings.8-bit
-io io.encodings.string io.encodings.utf8 kernel math
+io io.encodings.string io.encodings.utf8 kernel locals math
 namespaces prettyprint sequences classes.struct
 strings threads curses.ffi ;
 IN: curses

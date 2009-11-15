@@ -5,32 +5,32 @@ io.launcher arrays namespaces continuations layouts accessors
 urls math.parser io.directories tools.deploy.test ;
 IN: tools.deploy.tests
 
-[ t ] [ "hello-world" shake-and-bake 500000 small-enough? ] unit-test
+[ ] [ "hello-world" shake-and-bake 500000 small-enough? ] unit-test
 
-[ t ] [ "sudoku" shake-and-bake 800000 small-enough? ] unit-test
+[ ] [ "sudoku" shake-and-bake 800000 small-enough? ] unit-test
 
-[ t ] [ "hello-ui" shake-and-bake 1300000 small-enough? ] unit-test
+[ ] [ "hello-ui" shake-and-bake 1300000 small-enough? ] unit-test
 
 [ "staging.math-threads-compiler-ui.image" ] [
     "hello-ui" deploy-config
     [ bootstrap-profile staging-image-name file-name ] bind
 ] unit-test
 
-[ t ] [ "maze" shake-and-bake 1200000 small-enough? ] unit-test
+[ ] [ "maze" shake-and-bake 1200000 small-enough? ] unit-test
 
-[ t ] [ "tetris" shake-and-bake 1500000 small-enough? ] unit-test
+[ ] [ "tetris" shake-and-bake 1500000 small-enough? ] unit-test
 
-[ t ] [ "spheres" shake-and-bake 1500000 small-enough? ] unit-test
+[ ] [ "spheres" shake-and-bake 1500000 small-enough? ] unit-test
 
-[ t ] [ "terrain" shake-and-bake 1700000 small-enough? ] unit-test
+[ ] [ "terrain" shake-and-bake 1700000 small-enough? ] unit-test
 
-[ t ] [ "bunny" shake-and-bake 2500000 small-enough? ] unit-test
+[ ] [ "bunny" shake-and-bake 2500000 small-enough? ] unit-test
 
 os macosx? [
-    [ t ] [ "webkit-demo" shake-and-bake 500000 small-enough? ] unit-test
+    [ ] [ "webkit-demo" shake-and-bake 500000 small-enough? ] unit-test
 ] when
 
-[ t ] [ "benchmark.regex-dna" shake-and-bake 900000 small-enough? ] unit-test
+[ ] [ "benchmark.regex-dna" shake-and-bake 900000 small-enough? ] unit-test
 
 {
     "tools.deploy.test.1"
