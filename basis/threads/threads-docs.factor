@@ -16,7 +16,7 @@ ARTICLE: "threads-start/stop" "Starting and stopping threads"
 }
 "Threads stop either when the quotation given to " { $link spawn } " returns, or when the following word is called:"
 { $subsections stop }
-"If the image is saved and started again, all runnable threads are stopped. Vocabularies wishing to have a background thread always running should use " { $link add-init-hook } "." ;
+"If the image is saved and started again, all runnable threads are stopped. Vocabularies wishing to have a background thread always running should use " { $link add-startup-hook } "." ;
 
 ARTICLE: "threads-yield" "Yielding and suspending threads"
 "Yielding to other threads:"

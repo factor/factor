@@ -225,4 +225,4 @@ GENERIC: error-in-thread ( error thread -- )
 
 PRIVATE>
 
-[ init-threads ] "threads" add-init-hook
+[ init-threads ] "threads" add-startup-hook

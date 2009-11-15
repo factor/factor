@@ -75,7 +75,7 @@ ERROR: bad-alarm-frequency frequency ;
     [ alarm-thread-loop t ] "Alarms" spawn-server
     alarm-thread set-global ;
 
-[ init-alarms ] "alarms" add-init-hook
+[ init-alarms ] "alarms" add-startup-hook
 
 PRIVATE>
 

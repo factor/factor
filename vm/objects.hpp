@@ -34,6 +34,7 @@ enum special_object {
 
 	OBJ_BOOT            = 20, /* boot quotation */
 	OBJ_GLOBAL,               /* global namespace */
+	OBJ_SHUTDOWN,
 
 	/* Quotation compilation in quotations.c */
 	JIT_PROLOG          = 23,
