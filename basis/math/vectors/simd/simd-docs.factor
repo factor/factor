@@ -1,6 +1,6 @@
 USING: classes.tuple.private cpu.architecture help.markup
 help.syntax kernel.private math math.vectors
-math.vectors.simd.intrinsics sequences ;
+sequences ;
 IN: math.vectors.simd
 
 ARTICLE: "math.vectors.simd.intro" "Introduction to SIMD support"
@@ -23,7 +23,7 @@ $nl
 $nl
 "SSE2 introduces double-precision SIMD (" { $snippet "double-2" } " and " { $snippet "double-4" } ") and integer SIMD (all types). Integer SIMD is missing a few features, in particular the " { $link vmin } " and " { $link vmax } " operations only work on " { $snippet "uchar-16" } " and " { $snippet "short-8" } "."
 $nl
-"SSE3 introduces horizontal adds (summing all components of a single vector register), which is useful for computing dot products. Where available, SSE3 operations are used to speed up " { $link sum } ", " { $link v. } ", " { $link norm-sq } ", " { $link norm } ", and " { $link distance } "."
+"SSE3 introduces horizontal adds (summing all components of a single vector register), which are useful for computing dot products. Where available, SSE3 operations are used to speed up " { $link sum } ", " { $link v. } ", " { $link norm-sq } ", " { $link norm } ", and " { $link distance } "."
 $nl
 "SSSE3 introduces " { $link vabs } " for " { $snippet "char-16" } ", " { $snippet "short-8" } " and " { $snippet "int-4" } "."
 $nl
@@ -36,26 +36,7 @@ $nl
 ARTICLE: "math.vectors.simd.types" "SIMD vector types"
 "Each SIMD vector type is named " { $snippet "scalar-count" } ", where " { $snippet "scalar" } " is a scalar C type and " { $snippet "count" } " is a vector dimension."
 $nl
-"To use a SIMD vector type, a parsing word is used to generate the relevant code and bring it into the vocabulary search path; this is the same idea as with " { $link "specialized-arrays" } ":"
-{ $subsections
-    POSTPONE: SIMD:
-    POSTPONE: SIMDS:
-}
-"The following scalar types are supported:"
-{ $code
-    "char"
-    "uchar"
-    "short"
-    "ushort"
-    "int"
-    "uint"
-    "longlong"
-    "ulonglong"
-    "float"
-    "double"
-}
-
-"The following vector types are generated from the above scalar types:"
+"The following vector types are available:"
 { $code
     "char-16"
     "uchar-16"
@@ -217,17 +198,5 @@ ARTICLE: "math.vectors.simd" "Hardware vector arithmetic (SIMD)"
     "math.vectors.simd.alien"
     "math.vectors.simd.intrinsics"
 } ;
-
-HELP: SIMD:
-{ $syntax "SIMD: type" }
-{ $values { "type" "a scalar C type" } }
-{ $description "Defines 128-bit and 256-bit SIMD arrays for holding elements of " { $snippet "type" } " into the vocabulary search path. The allowed scalar types, and the auto-generated type/length vector combinations that result, are listed in " { $link "math.vectors.simd.types" } ". Generated words are documented in " { $link "math.vectors.simd.words" } "." } ;
-
-HELP: SIMDS:
-{ $syntax "SIMDS: type type type ... ;" }
-{ $values { "type" "a scalar C type" } }
-{ $description "Defines 128-bit and 256-bit SIMD arrays for holding elements of each " { $snippet "type" } " into the vocabulary search path. The possible type/length combinations are listed in " { $link "math.vectors.simd.types" } " and the generated words are documented in " { $link "math.vectors.simd.words" } "." } ;
-
-{ POSTPONE: SIMD: POSTPONE: SIMDS: } related-words
 
 ABOUT: "math.vectors.simd"

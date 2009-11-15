@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators fry sequences
 compiler.tree.propagation.info cpu.architecture kernel words math
-math.intervals math.vectors.simd ;
+math.intervals math.vectors.simd math.vectors.simd.private ;
 IN: compiler.tree.propagation.simd
 
 {
@@ -51,7 +51,6 @@ IN: compiler.tree.propagation.simd
     (simd-gather-2)
     (simd-gather-4)
     alien-vector
-    alien-vector-aligned
 } [ { byte-array } "default-output-classes" set-word-prop ] each
 
 : scalar-output-class ( rep -- class )

@@ -1,5 +1,9 @@
-! (c)2009 Slava Pestov, Joe Groff bsd license
-USING: math.vectors math.vectors.private ;
+USING: accessors alien.c-types byte-arrays classes combinators
+cpu.architecture fry functors generalizations generic
+generic.parser kernel lexer literals macros math math.functions
+math.vectors math.vectors.private namespaces parser
+prettyprint.custom quotations sequences sequences.private vocabs
+vocabs.loader ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd
 
@@ -8,8 +12,11 @@ DEFER: simd-with
 DEFER: simd-boa
 DEFER: simd-cast
 
-<PRIVATE
+ERROR: bad-simd-call word ;
+ERROR: bad-simd-length got expected ;
 
+<<
+<PRIVATE
 ! Primitive SIMD constructors
 
 GENERIC: new-underlying ( underlying seq -- seq' )
@@ -18,6 +25,10 @@ GENERIC: new-underlying ( underlying seq -- seq' )
     dip new-underlying ; inline
 : change-underlying ( seq quot -- seq' )
     '[ underlying>> @ ] keep new-underlying ; inline
+PRIVATE>
+>>
+
+<PRIVATE
 
 ! SIMD intrinsics
 
@@ -34,18 +45,18 @@ GENERIC: new-underlying ( underlying seq -- seq' )
 : (simd-vmax)              ( a b rep -- c ) \ vmax bad-simd-call ;
 : (simd-v.)                ( a b rep -- n ) \ v. bad-simd-call ;
 : (simd-vsqrt)             ( a   rep -- c ) \ vsqrt bad-simd-call ;
-: (simd-sum)               ( a b rep -- n ) \ sum bad-simd-call ;
+: (simd-sum)               ( a   rep -- n ) \ sum bad-simd-call ;
 : (simd-vabs)              ( a   rep -- c ) \ vabs bad-simd-call ;
 : (simd-vbitand)           ( a b rep -- c ) \ vbitand bad-simd-call ;
 : (simd-vbitandn)          ( a b rep -- c ) \ vbitandn bad-simd-call ;
 : (simd-vbitor)            ( a b rep -- c ) \ vbitor bad-simd-call ;
 : (simd-vbitxor)           ( a b rep -- c ) \ vbitxor bad-simd-call ;
-: (simd-vbitnot)           ( a b rep -- c ) \ vbitnot bad-simd-call ;
+: (simd-vbitnot)           ( a   rep -- c ) \ vbitnot bad-simd-call ;
 : (simd-vand)              ( a b rep -- c ) \ vand bad-simd-call ;
 : (simd-vandn)             ( a b rep -- c ) \ vandn bad-simd-call ;
 : (simd-vor)               ( a b rep -- c ) \ vor bad-simd-call ;
 : (simd-vxor)              ( a b rep -- c ) \ vxor bad-simd-call ;
-: (simd-vnot)              ( a b rep -- c ) \ vnot bad-simd-call ;
+: (simd-vnot)              ( a   rep -- c ) \ vnot bad-simd-call ;
 : (simd-vlshift)           ( a n rep -- c ) \ vlshift bad-simd-call ;
 : (simd-vrshift)           ( a n rep -- c ) \ vrshift bad-simd-call ;
 : (simd-hlshift)           ( a n rep -- c ) \ hlshift bad-simd-call ;
@@ -74,8 +85,12 @@ GENERIC: new-underlying ( underlying seq -- seq' )
 : (simd-gather-4)          ( m n o p rep -- v ) \ simd-boa bad-simd-call ;
 : (simd-select)            ( a n rep -- n ) \ nth bad-simd-call ;
 
+PRIVATE>
+
 : alien-vector     ( c-ptr n rep -- value ) \ alien-vector bad-simd-call ;
 : set-alien-vector ( c-ptr n rep -- value ) \ set-alien-vector bad-simd-call ;
+
+<PRIVATE
 
 ! Helper for boolean vector literals
 
@@ -102,10 +117,11 @@ TUPLE: simd-128
 GENERIC: simd-element-type ( obj -- c-type )
 GENERIC: simd-rep ( simd -- rep )
 
+<<
 : rep-length ( rep -- n )
     16 swap rep-component-type heap-size /i ; foldable
 
-<< <PRIVATE
+<PRIVATE
 
 ! SIMD concrete type functor
 
@@ -161,9 +177,11 @@ c:<c-type>
 ;FUNCTOR
 
 SYNTAX: SIMD-128:
-    scan scan-word define-simd-128 ;
+    scan define-simd-128 ;
 
-PRIVATE> >>
+PRIVATE>
+
+>>
 
 SIMD-128: char-16
 SIMD-128: uchar-16
@@ -176,16 +194,14 @@ SIMD-128: ulonglong-2
 SIMD-128: float-4
 SIMD-128: double-2
 
-ERROR: bad-simd-call word ;
-ERROR: bad-simd-length got expected ;
-
 : assert-positive ( x -- y ) ;
 
 ! SIMD vectors as sequences
 
+M: simd-128 hashcode* underlying>> hashcode* ; inline
 M: simd-128 clone [ clone ] change-underlying ; inline
 M: simd-128 length simd-rep rep-length ; inline
-M: simd-128 nth-unsafe tuck simd-rep (simd-select) ; inline
+M: simd-128 nth-unsafe [ nip ] 2keep simd-rep (simd-select) ; inline
 M: simd-128 c:byte-length drop 16 ; inline
 
 M: simd-128 new-sequence
@@ -193,16 +209,13 @@ M: simd-128 new-sequence
     [ nip [ 16 (byte-array) ] make-underlying ]
     [ length bad-simd-length ] if ; inline
 
-M: simd-128 equal?
-    [ v= vall? ] [ 2drop f ] if-vectors-match ; inline
-
 M: simd-128 >pprint-sequence ;
 M: simd-128 pprint* pprint-object ;
 
 INSTANCE: simd-128 sequence
 
 ! Unboxers for SIMD operations
-
+<<
 <PRIVATE
 
 : if-both-vectors ( a b t f -- )
@@ -220,6 +233,9 @@ INSTANCE: simd-128 sequence
 
 : simd-v->v-op ( a quot: ( (a) rep -- (c) ) -- c )
     [ simd-unbox ] dip 2curry make-underlying ; inline
+
+: simd-vn->v-op ( a n quot: ( (a) n rep -- (c) ) -- c )
+    [ simd-unbox ] [ swap ] [ 3curry ] tri* make-underlying ; inline
 
 : simd-v->n-op ( a quot: ( (a) rep -- n ) -- n )
     [ [ underlying>> ] [ simd-rep ] bi ] dip call ; inline
@@ -241,7 +257,7 @@ INSTANCE: simd-128 sequence
     [ '[ _ ((simd-vv->n-op)) ] ] dip if-both-vectors-match ; inline
 
 : (simd-method-fallback) ( accum word -- accum )
-    [ current-method get \ (call-next-method) [ ] 2sequence suffix! ]
+    [ current-method get literalize \ (call-next-method) [ ] 2sequence suffix! ]
     dip suffix! ; 
 
 SYNTAX: simd-vv->v-op
@@ -252,6 +268,10 @@ SYNTAX: simd-vv->n-op
     \ (simd-vv->n-op) (simd-method-fallback) ; 
 
 PRIVATE>
+>>
+
+M: simd-128 equal?
+    [ v= vall? ] [ 2drop f ] if-both-vectors-match ; inline
 
 ! SIMD constructors
 
@@ -283,26 +303,26 @@ M: simd-128 vmin               [ (simd-vmin)               ] simd-vv->v-op ; inl
 M: simd-128 vmax               [ (simd-vmax)               ] simd-vv->v-op ; inline
 M: simd-128 v.                 [ (simd-v.)                 ] simd-vv->n-op ; inline
 M: simd-128 vsqrt              [ (simd-vsqrt)              ] simd-v->v-op  ; inline
-M: simd-128 sum                [ (simd-sum)                ] simd-vv->n-op ; inline
+M: simd-128 sum                [ (simd-sum)                ] simd-v->n-op  ; inline
 M: simd-128 vabs               [ (simd-vabs)               ] simd-v->v-op  ; inline
 M: simd-128 vbitand            [ (simd-vbitand)            ] simd-vv->v-op ; inline
 M: simd-128 vbitandn           [ (simd-vbitandn)           ] simd-vv->v-op ; inline
 M: simd-128 vbitor             [ (simd-vbitor)             ] simd-vv->v-op ; inline
 M: simd-128 vbitxor            [ (simd-vbitxor)            ] simd-vv->v-op ; inline
-M: simd-128 vbitnot            [ (simd-vbitnot)            ] simd-vv->v-op ; inline
+M: simd-128 vbitnot            [ (simd-vbitnot)            ] simd-v->v-op  ; inline
 M: simd-128 vand               [ (simd-vand)               ] simd-vv->v-op ; inline
 M: simd-128 vandn              [ (simd-vandn)              ] simd-vv->v-op ; inline
 M: simd-128 vor                [ (simd-vor)                ] simd-vv->v-op ; inline
 M: simd-128 vxor               [ (simd-vxor)               ] simd-vv->v-op ; inline
-M: simd-128 vnot               [ (simd-vnot)               ] simd-vv->v-op ; inline
+M: simd-128 vnot               [ (simd-vnot)               ] simd-v->v-op  ; inline
 M: simd-128 vlshift            [ (simd-vlshift)            ] simd-vn->v-op ; inline
 M: simd-128 vrshift            [ (simd-vrshift)            ] simd-vn->v-op ; inline
 M: simd-128 hlshift            [ (simd-hlshift)            ] simd-vn->v-op ; inline
 M: simd-128 hrshift            [ (simd-hrshift)            ] simd-vn->v-op ; inline
 M: simd-128 vshuffle-elements  [ (simd-vshuffle-elements)  ] simd-vn->v-op ; inline
 M: simd-128 vshuffle-bytes     [ (simd-vshuffle-bytes)     ] simd-vv->v-op ; inline
-M: simd-128 vmerge-head        [ (simd-vmerge-head)        ] simd-vv->v-op ; inline
-M: simd-128 vmerge-tail        [ (simd-vmerge-tail)        ] simd-vv->v-op ; inline
+M: simd-128 (vmerge-head)      [ (simd-vmerge-head)        ] simd-vv->v-op ; inline
+M: simd-128 (vmerge-tail)      [ (simd-vmerge-tail)        ] simd-vv->v-op ; inline
 M: simd-128 v<=                [ (simd-v<=)                ] simd-vv->v-op ; inline
 M: simd-128 v<                 [ (simd-v<)                 ] simd-vv->v-op ; inline
 M: simd-128 v=                 [ (simd-v=)                 ] simd-vv->v-op ; inline
@@ -326,7 +346,6 @@ M: simd-128 v*n over simd-with v* ; inline
 M: simd-128 v/n over simd-with v/ ; inline
 M: simd-128 norm-sq dup v. assert-positive ; inline
 M: simd-128 norm      norm-sq sqrt ; inline
-M: simd-128 normalize dup norm v/n ; inline
 M: simd-128 distance  v- norm ; inline
 
 ! misc
