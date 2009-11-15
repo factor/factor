@@ -17,6 +17,8 @@ TUPLE: duration
 
 C: <duration> duration
 
+: instant ( -- duration ) 0 0 0 0 0 0 <duration> ;
+
 TUPLE: timestamp
     { year integer }
     { month integer }
@@ -33,6 +35,15 @@ C: <timestamp> timestamp
 
 : <date> ( year month day -- timestamp )
     0 0 0 gmt-offset-duration <timestamp> ;
+
+: <date-gmt> ( year month day -- timestamp )
+    0 0 0 instant <timestamp> ;
+
+: <year> ( year -- timestamp )
+    1 1 <date> ;
+
+: <year-gmt> ( year -- timestamp )
+    1 1 <date-gmt> ;
 
 ERROR: not-a-month ;
 M: not-a-month summary
@@ -149,7 +160,6 @@ M: timestamp easter ( timestamp -- timestamp )
 : >time< ( timestamp -- hour minute second )
     [ hour>> ] [ minute>> ] [ second>> ] tri ;
 
-: instant ( -- duration ) 0 0 0 0 0 0 <duration> ;
 : years ( x -- duration ) instant clone swap >>year ;
 : months ( x -- duration ) instant clone swap >>month ;
 : days ( x -- duration ) instant clone swap >>day ;
@@ -430,6 +440,9 @@ M: timestamp day-name day-of-week day-names nth ;
 : beginning-of-month ( timestamp -- new-timestamp )
     midnight 1 >>day ;
 
+: end-of-month ( timestamp -- new-timestamp )
+    [ midnight ] [ days-in-month ] bi >>day ;
+
 <PRIVATE
 
 : day-offset ( timestamp m -- new-timestamp n )
@@ -522,14 +535,25 @@ M: timestamp december clone 12 >>month ;
 : beginning-of-week ( timestamp -- new-timestamp )
     midnight sunday ;
 
-: beginning-of-year ( timestamp -- new-timestamp )
-    beginning-of-month 1 >>month ;
+GENERIC: beginning-of-year ( object -- new-timestamp )
+M: timestamp beginning-of-year beginning-of-month 1 >>month ;
+M: integer beginning-of-year <year> ;
+
+GENERIC: end-of-year ( object -- new-timestamp )
+M: timestamp end-of-year 12 >>month 31 >>day ;
+M: integer end-of-year 12 31 <date> ;
 
 : time-since-midnight ( timestamp -- duration )
     dup midnight time- ;
 
 : since-1970 ( duration -- timestamp )
     unix-1970 time+ >local-time ;
+
+: timestamp>unix-time ( timestamp -- seconds )
+    unix-1970 time- second>> ;
+
+: unix-time>timestamp ( seconds -- timestamp )
+    seconds unix-1970 time+ ;
 
 M: timestamp sleep-until timestamp>micros sleep-until ;
 
