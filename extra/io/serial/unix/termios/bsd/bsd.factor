@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax classes.struct kernel sequences system ;
+USING: alien.c-types alien.syntax classes.struct kernel
+sequences system ;
 IN: io.serial.unix.termios
 
 CONSTANT: NCCS 20
