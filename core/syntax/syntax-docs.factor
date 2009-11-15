@@ -106,7 +106,7 @@ ARTICLE: "syntax-numbers" "Number syntax"
 } ;
 
 ARTICLE: "syntax-words" "Word syntax"
-"A word occurring inside a quotation is executed when the quotation is called. Sometimes a word needs to be pushed on the data stack instead. The canonical use-case for this is passing the word to the " { $link execute } " combinator, or alternatively, reflectively accessing word properties (" { $link "word-props" } ")."
+"A word occurring inside a quotation is executed when the quotation is called. Sometimes a word needs to be pushed on the data stack instead. The canonical use case for this is passing the word to the " { $link execute } " combinator, or alternatively, reflectively accessing word properties (" { $link "word-props" } ")."
 { $subsections
     POSTPONE: \
     POSTPONE: POSTPONE:

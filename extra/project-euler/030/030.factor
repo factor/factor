@@ -33,7 +33,7 @@ IN: project-euler.030
 <PRIVATE
 
 : sum-fifth-powers ( n -- sum )
-    number>digits [ 5 ^ ] sigma ;
+    number>digits [ 5 ^ ] map-sum ;
 
 PRIVATE>
 

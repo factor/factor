@@ -1,7 +1,8 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien alien.c-types alien.data alien.parser arrays
 byte-arrays combinators effects.parser fry generalizations grouping kernel
-lexer locals macros make math math.ranges parser sequences sequences.private ;
+lexer locals macros make math math.ranges parser sequences
+sequences.generalizations sequences.private ;
 FROM: alien.arrays => array-length ;
 IN: alien.data.map
 
@@ -117,14 +118,14 @@ MACRO: data-map! ( ins outs -- )
 
 : parse-data-map-effect ( accum -- accum )
     ")" parse-effect
-    [ in>>  [ (parse-c-type) ] map parsed ]
-    [ out>> [ (parse-c-type) ] map parsed ] bi ;
+    [ in>>  [ (parse-c-type) ] map suffix! ]
+    [ out>> [ (parse-c-type) ] map suffix! ] bi ;
 
 PRIVATE>
 
 SYNTAX: data-map(
-    parse-data-map-effect \ data-map parsed ;
+    parse-data-map-effect \ data-map suffix! ;
 
 SYNTAX: data-map!(
-    parse-data-map-effect \ data-map! parsed ;
+    parse-data-map-effect \ data-map! suffix! ;
 

@@ -379,12 +379,16 @@ interactor "completion" f {
     { T{ key-down f { C+ } "r" } history-completion-popup }
 } define-command-map
 
+: introduction. ( -- )
+    tip-of-the-day. nl
+    { $strong "Press " { $snippet "F1" } " at any time for help." } print-content nl nl ;
+
 : listener-thread ( listener -- )
     dup listener-streams [
         [ com-browse ] help-hook set
         '[ [ _ input>> ] 2dip debugger-popup ] error-hook set
         error-summary? off
-        tip-of-the-day. nl
+        introduction.
         listener
         nl
         "The listener has exited. To start it again, click “Restart Listener”." print

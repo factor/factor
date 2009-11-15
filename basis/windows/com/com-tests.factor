@@ -44,8 +44,8 @@ C: <test-implementation> test-implementation
         [ >>x drop ] ! IInherited::setX
     } }
     { IUnrelated {
-        [ swap x>> + ] ! IUnrelated::xPlus
-        [ spin x>> * + ] ! IUnrelated::xMulAdd
+        [ [ x>> ] [ + ] bi* ] ! IUnrelated::xPlus
+        [ [ x>> ] [ * ] [ + ] tri* ] ! IUnrelated::xMulAdd
     } }
 } <com-wrapper>
 dup +test-wrapper+ set [

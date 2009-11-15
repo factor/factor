@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.strings assocs byte-arrays
 combinators continuations destructors fry io.encodings.8-bit
-io io.encodings.string io.encodings.utf8 kernel math
+io io.encodings.string io.encodings.utf8 kernel locals math
 namespaces prettyprint sequences classes.struct
 strings threads curses.ffi ;
 IN: curses
@@ -123,8 +123,10 @@ PRIVATE>
 : curses-writef ( window string -- )
     [ window-ptr dup ] dip (curses-wprint) (curses-window-refresh) ;
 
-: (curses-read) ( window-ptr n encoding -- string )
-    [ [ <byte-array> tuck ] keep wgetnstr curses-error ] dip alien>string ;
+:: (curses-read) ( window-ptr n encoding -- string )
+    n <byte-array> :> buf
+    window-ptr buf n wgetnstr curses-error
+    buf encoding alien>string ;
 
 : curses-read ( window n -- string )
     utf8 [ window-ptr ] 2dip (curses-read) ;

@@ -23,7 +23,7 @@ GENERIC: contract ( len seq -- )
 M: growable contract ( len seq -- )
     [ length ] keep
     [ [ 0 ] 2dip set-nth-unsafe ] curry
-    (each-integer) ;
+    (each-integer) ; inline
 
 : growable-check ( n seq -- n seq )
     over 0 < [ bounds-error ] when ; inline
@@ -65,5 +65,7 @@ M: growable shorten ( n seq -- )
         2dup contract
         2dup (>>length)
     ] when 2drop ; inline
+
+M: growable new-resizable new-sequence 0 over set-length ; inline
 
 INSTANCE: growable sequence

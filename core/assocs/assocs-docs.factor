@@ -28,7 +28,7 @@ ARTICLE: "enums" "Enumerations"
 HELP: enum
 { $class-description "An associative structure which wraps a sequence and maps integers to the corresponding elements of the sequence."
 $nl
-"Enumerations are mutable; note that deleting a key calls " { $link delete-nth } ", which results in all subsequent elements being shifted down." } ;
+"Enumerations are mutable; note that deleting a key calls " { $link remove-nth! } ", which results in all subsequent elements being shifted down." } ;
 
 HELP: <enum>
 { $values { "seq" sequence } { "enum" enum } }
@@ -96,9 +96,7 @@ ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
     update
     assoc-union
     assoc-diff
-    remove-all
     substitute
-    substitute-here
     extract-keys
 }
 { $see-also key? assoc-any? assoc-all? "sets" } ;
@@ -348,17 +346,6 @@ HELP: assoc-diff
 { $values { "assoc1" assoc } { "assoc2" assoc } { "diff" "a new assoc" } }
 { $description "Outputs an assoc consisting of all entries from " { $snippet "assoc1" } " whose key is not contained in " { $snippet "assoc2" } "." } 
 ;
-HELP: remove-all
-{ $values { "assoc" assoc } { "seq" "a sequence" } { "subseq" "a new sequence" } }
-{ $description "Constructs a sequence consisting of all elements in " { $snippet "seq" } " which do not appear as keys in " { $snippet "assoc" } "." }
-{ $notes "The values of the keys in the assoc are disregarded, so this word is usually used for set-theoretic calculations where the assoc in question either has dummy sentinels as values, or the values equal the keys." }
-{ $side-effects "assoc" } ;
-
-HELP: substitute-here
-{ $values { "seq" "a mutable sequence" } { "assoc" assoc } }
-{ $description "Replaces elements of " { $snippet "seq" } " which appear as keys in " { $snippet "assoc" } " with the corresponding values, acting as the identity on all other elements." }
-{ $errors "Throws an error if " { $snippet "assoc" } " contains values whose types are not permissible in " { $snippet "seq" } "." }
-{ $side-effects "seq" } ;
 
 HELP: substitute
 { $values { "seq" sequence } { "assoc" assoc } { "newseq" sequence } }

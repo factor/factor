@@ -3,7 +3,7 @@
 USING: kernel accessors sequences combinators fry
 classes.algebra namespaces assocs words math math.private
 math.partial-dispatch math.intervals classes classes.tuple
-classes.tuple.private layouts definitions stack-checker.state
+classes.tuple.private layouts definitions stack-checker.dependencies
 stack-checker.branches
 compiler.utilities
 compiler.tree
@@ -20,7 +20,7 @@ IN: compiler.tree.cleanup
 GENERIC: delete-node ( node -- )
 
 M: #call-recursive delete-node
-    dup label>> calls>> [ node>> eq? not ] with filter-here ;
+    dup label>> calls>> [ node>> eq? not ] with filter! drop ;
 
 M: #return-recursive delete-node
     label>> f >>return drop ;

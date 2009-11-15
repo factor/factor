@@ -33,6 +33,7 @@ IN: compiler.cfg.intrinsics
 {
     { kernel.private:tag [ drop emit-tag ] }
     { kernel.private:getenv [ emit-getenv ] }
+    { kernel.private:(identity-hashcode) [ drop emit-identity-hashcode ] }
     { math.private:both-fixnums? [ drop emit-both-fixnums? ] }
     { math.private:fixnum+ [ drop emit-fixnum+ ] }
     { math.private:fixnum- [ drop emit-fixnum- ] }
@@ -163,8 +164,8 @@ IN: compiler.cfg.intrinsics
         { math.vectors.simd.intrinsics:(simd-v*) [ [ ^^mul-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vs*) [ [ ^^saturated-mul-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-v/) [ [ ^^div-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-vmin) [ [ ^^min-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-vmax) [ [ ^^max-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-vmin) [ [ generate-min-vector ] emit-binary-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-vmax) [ [ generate-max-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-v.) [ [ ^^dot-vector ] emit-binary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vabs) [ [ generate-abs-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vsqrt) [ [ ^^sqrt-vector ] emit-unary-vector-op ] }
@@ -187,10 +188,10 @@ IN: compiler.cfg.intrinsics
         { math.vectors.simd.intrinsics:(simd-vany?) [ [ vcc-any ^^test-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vall?) [ [ vcc-all ^^test-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-vnone?) [ [ vcc-none ^^test-vector ] emit-unary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-vlshift) [ [ ^^shl-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-vrshift) [ [ ^^shr-vector ] emit-binary-vector-op ] }
-        { math.vectors.simd.intrinsics:(simd-hlshift) [ [ ^^horizontal-shl-vector ] emit-horizontal-shift ] }
-        { math.vectors.simd.intrinsics:(simd-hrshift) [ [ ^^horizontal-shr-vector ] emit-horizontal-shift ] }
+        { math.vectors.simd.intrinsics:(simd-vlshift) [ [ ^^shl-vector-imm ] [ ^^shl-vector ] emit-shift-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-vrshift) [ [ ^^shr-vector-imm ] [ ^^shr-vector ] emit-shift-vector-op ] }
+        { math.vectors.simd.intrinsics:(simd-hlshift) [ [ ^^horizontal-shl-vector-imm ] emit-shift-vector-imm-op ] }
+        { math.vectors.simd.intrinsics:(simd-hrshift) [ [ ^^horizontal-shr-vector-imm ] emit-shift-vector-imm-op ] }
         { math.vectors.simd.intrinsics:(simd-with) [ [ ^^with-vector ] emit-unary-vector-op ] }
         { math.vectors.simd.intrinsics:(simd-gather-2) [ emit-gather-vector-2 ] }
         { math.vectors.simd.intrinsics:(simd-gather-4) [ emit-gather-vector-4 ] }

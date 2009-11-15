@@ -41,11 +41,13 @@ struct context {
 	/* memory region holding current retain stack */
 	segment *retainstack_region;
 
-	/* saved userenv slots on entry to callback */
+	/* saved special_objects slots on entry to callback */
 	cell catchstack_save;
 	cell current_callback_save;
 
 	context *next;
+
+	context(cell ds_size, cell rs_size);
 };
 
 #define ds_bot (ctx->datastack_region->start)

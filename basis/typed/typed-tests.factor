@@ -1,4 +1,5 @@
-USING: accessors effects eval kernel layouts math quotations tools.test typed words ;
+USING: accessors effects eval kernel layouts math namespaces
+quotations tools.test typed words ;
 IN: typed.tests
 
 TYPED: f+ ( a: float b: float -- c: float )
@@ -71,3 +72,28 @@ IN: typed.tests
 T{ unboxable f 12 3 4.0 } unboxy xy>>
 """ eval( -- xy )
 ] unit-test
+
+TYPED: no-inputs ( -- out: integer )
+    1 ;
+
+[ 1 ] [ no-inputs ] unit-test
+
+TUPLE: unboxable3
+    { x read-only } ;
+
+TYPED: no-inputs-unboxable-output ( -- out: unboxable3 )
+    T{ unboxable3 } ;
+
+[ T{ unboxable3 } ] [ no-inputs-unboxable-output ] unit-test
+
+SYMBOL: buh
+
+TYPED: no-outputs ( x: integer -- )
+    buh set ;
+
+[ 2 ] [ 2 no-outputs buh get ] unit-test
+
+TYPED: no-outputs-unboxable-input ( x: unboxable3 -- )
+    buh set ;
+
+[ T{ unboxable3 } ] [ T{ unboxable3 } no-outputs-unboxable-input buh get ] unit-test

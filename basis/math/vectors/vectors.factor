@@ -96,6 +96,7 @@ PRIVATE>
 :: vbroadcast ( u n -- v ) u length n u nth <repetition> u like ;
 
 : vshuffle-elements ( u perm -- v )
+    over length 0 pad-tail
     swap [ '[ _ nth ] ] keep map-as ;
 
 : vshuffle-bytes ( u perm -- v )
@@ -142,8 +143,15 @@ M: simd-128 vshuffle ( u perm -- v )
 : vunordered? ( u v -- w ) [ unordered? ] 2map ;
 : v=  ( u v -- w ) [ =   ] 2map ;
 
-: v? ( mask true false -- w )
+: v? ( mask true false -- result )
     [ vand ] [ vandn ] bi-curry* bi vor ; inline
+
+:: vif ( mask true-quot false-quot -- result )
+    {
+        { [ mask vall?  ] [ true-quot  call ] }
+        { [ mask vnone? ] [ false-quot call ] }
+        [ mask true-quot call false-quot call v? ]
+    } cond ; inline
 
 : vfloor    ( u -- v ) [ floor ] map ;
 : vceiling  ( u -- v ) [ ceiling ] map ;
@@ -175,20 +183,20 @@ PRIVATE>
 
 : bilerp ( aa ba ab bb {t,u} -- a_tu )
     [ first lerp ] [ second lerp ] bi-curry
-    [ 2bi@ ] [ call ] bi* ;
+    [ 2bi@ ] [ call ] bi* ; inline
 
 : vlerp ( a b t -- a_t )
-    [ lerp ] 3map ;
+    [ over v- ] dip v* v+ ; inline
 
 : vnlerp ( a b t -- a_t )
-    [ lerp ] curry 2map ;
+    [ over v- ] dip v*n v+ ; inline
 
 : vbilerp ( aa ba ab bb {t,u} -- a_tu )
     [ first vnlerp ] [ second vnlerp ] bi-curry
-    [ 2bi@ ] [ call ] bi* ;
+    [ 2bi@ ] [ call ] bi* ; inline
 
 : v~ ( a b epsilon -- ? )
-    [ ~ ] curry 2all? ;
+    [ ~ ] curry 2all? ; inline
 
 HINTS: vneg { array } ;
 HINTS: norm-sq { array } ;

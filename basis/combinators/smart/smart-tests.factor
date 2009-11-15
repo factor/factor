@@ -47,3 +47,9 @@ IN: combinators.smart.tests
 [ { { 1 2 } { 3 4 } } ] [ nested-smart-combo-test ] unit-test
 
 [ 14 ] [ [ 1 2 3 ] [ sq ] [ + ] map-reduce-outputs ] unit-test
+
+{ 2 3 } [ [ + ] preserving ] must-infer-as
+
+{ 2 0 } [ [ + ] nullary ] must-infer-as
+
+{ 2 2 } [ [ [ + ] nullary ] preserving ] must-infer-as

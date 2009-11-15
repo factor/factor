@@ -17,13 +17,11 @@ value connections dependencies ref locked? ;
 : <model> ( value -- model )
     model new-model ;
 
-M: model hashcode* drop model hashcode* ;
-
 : add-dependency ( dep model -- )
     dependencies>> push ;
 
 : remove-dependency ( dep model -- )
-    dependencies>> delete ;
+    dependencies>> remove! drop ;
 
 DEFER: add-connection
 
@@ -63,7 +61,7 @@ GENERIC: model-changed ( model observer -- )
     connections>> push ;
 
 : remove-connection ( observer model -- )
-    [ connections>> delete ] keep
+    [ connections>> remove! drop ] keep
     dup connections>> empty? [ dup deactivate-model ] when
     drop ;
 

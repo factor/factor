@@ -18,7 +18,7 @@ HELP: pheap-peek
 { $description "Gets the object in the heap with minumum priority." } ;
 
 HELP: pheap-push
-{ $values { "heap" "a persistent heap" } { "value" object } { "prio" "a priority" } { "newheap" "a new persistent heap" } }
+{ $values { "value" object } { "prio" "a priority" } { "heap" "a persistent heap" } { "newheap" "a new persistent heap" } }
 { $description "Creates a new persistent heap also containing the given object of the given priority." } ;
 
 HELP: pheap-pop*

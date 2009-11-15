@@ -1,4 +1,4 @@
-USING: splitting tools.test kernel sequences arrays strings ;
+USING: splitting tools.test kernel sequences arrays strings ascii ;
 IN: splitting.tests
 
 [ "hello" "world ." ] [ "hello world ." " " split1 ] unit-test
@@ -57,3 +57,6 @@ unit-test
 [ { "hello" "hi" } ] [ "hello\nhi" string-lines ] unit-test
 [ { "hello" "hi" } ] [ "hello\rhi" string-lines ] unit-test
 [ { "hello" "hi" } ] [ "hello\r\nhi" string-lines ] unit-test
+
+[ { "hey" "world" "what's" "happening" } ]
+[ "heyAworldBwhat'sChappening" [ LETTER? ] split-when ] unit-test

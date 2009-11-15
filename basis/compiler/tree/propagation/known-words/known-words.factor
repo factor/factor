@@ -8,7 +8,7 @@ classes.algebra combinators generic.math splitting fry locals
 classes.tuple alien.accessors classes.tuple.private
 slots.private definitions strings.private vectors hashtables
 generic quotations alien
-stack-checker.state
+stack-checker.dependencies
 compiler.tree.comparisons
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
@@ -140,20 +140,30 @@ IN: compiler.tree.propagation.known-words
     '[ _ _ 2bi ] "outputs" set-word-prop
 ] each
 
-\ shift [ [ interval-shift-safe ] [ may-overflow integer-valued ] binary-op ] each-derived-op
-\ shift [ [ interval-shift-safe ] [ integer-valued ] binary-op ] each-fast-derived-op
+: shift-op-class ( info1 info2 -- newclass )
+    [ class>> ] bi@
+    2dup [ null-class? ] either? [ 2drop null ] [ drop math-closure ] if ;
+
+: shift-op ( word interval-quot post-proc-quot -- )
+    '[
+        [ shift-op-class ] [ _ binary-op-interval ] 2bi
+        @
+        <class/interval-info>
+    ] "outputs" set-word-prop ;
+
+\ shift [ [ interval-shift-safe ] [ may-overflow integer-valued ] shift-op ] each-derived-op
+\ shift [ [ interval-shift-safe ] [ integer-valued ] shift-op ] each-fast-derived-op
 
 \ bitand [ [ interval-bitand ] [ integer-valued ] binary-op ] each-derived-op
 \ bitor [ [ interval-bitor ] [ integer-valued ] binary-op ] each-derived-op
 \ bitxor [ [ interval-bitxor ] [ integer-valued ] binary-op ] each-derived-op
 
 :: (comparison-constraints) ( in1 in2 op -- constraint )
-    [let | i1 [ in1 value-info interval>> ]
-           i2 [ in2 value-info interval>> ] |
-       in1 i1 i2 op assumption is-in-interval
-       in2 i2 i1 op swap-comparison assumption is-in-interval
-       /\
-    ] ;
+    in1 value-info interval>> :> i1
+    in2 value-info interval>> :> i2
+    in1 i1 i2 op assumption is-in-interval
+    in2 i2 i1 op swap-comparison assumption is-in-interval
+    /\ ;
 
 :: comparison-constraints ( in1 in2 out op -- constraint )
     in1 in2 op (comparison-constraints) out t-->
@@ -269,7 +279,7 @@ generic-comparison-ops [
 ] each
 
 \ alien-cell [
-    2drop simple-alien \ f class-or <class-info>
+    2drop alien \ f class-or <class-info>
 ] "outputs" set-word-prop
 
 { <tuple> <tuple-boa> } [

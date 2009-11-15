@@ -20,7 +20,7 @@ HELP: specialized-def
 { $description "Outputs the definition of a word after it has been split into specialized branches. This is the definition which will actually be compiled by the compiler." } ;
 
 HELP: HINTS:
-{ $values { "defspec" "a definition specifier" } { "hints..." "a list of sequences of classes or literals" } }
+{ $values { "defspec" "a word or method" } { "hints..." "a list of sequences of classes or literals" } }
 { $description "Defines specialization hints for a word or a method."
 $nl
 "Each sequence in the list will cause a specialized version of the word to be compiled. Classes are tested for using their predicate, and literals are tested using " { $link eq? } "." }
@@ -35,8 +35,8 @@ $nl
     "M: assoc count-occurrences"
     "    swap [ = nip ] curry assoc-filter assoc-size ;"
     ""
-    "HINTS: { sequence count-occurrences } { object array } ;"
-    "HINTS: { assoc count-occurrences } { object hashtable } ;"
+    "HINTS: M\ sequence count-occurrences { object array } ;"
+    "HINTS: M\ assoc count-occurrences { object hashtable } ;"
 }
 } ;
 

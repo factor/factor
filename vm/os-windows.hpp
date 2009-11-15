@@ -37,8 +37,6 @@ typedef wchar_t vm_char;
 #define OPEN_READ(path) _wfopen(path,L"rb")
 #define OPEN_WRITE(path) _wfopen(path,L"wb")
 
-#define print_native_string(string) wprintf(L"%s",string)
-
 /* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
 #define EPOCH_OFFSET 0x019db1ded53e8000LL
 

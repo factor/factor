@@ -3,7 +3,8 @@
 USING: accessors arrays kernel continuations assocs namespaces
 sequences words vocabs definitions hashtables init sets
 math math.order classes classes.algebra classes.tuple
-classes.tuple.private generic source-files.errors ;
+classes.tuple.private generic source-files.errors
+kernel.private ;
 IN: compiler.units
 
 SYMBOL: old-definitions
@@ -15,11 +16,15 @@ TUPLE: redefine-error def ;
     \ redefine-error boa
     { { "Continue" t } } throw-restarts drop ;
 
+<PRIVATE
+
 : add-once ( key assoc -- )
     2dup key? [ over redefine-error ] when conjoin ;
 
 : (remember-definition) ( definition loc assoc -- )
     [ over set-where ] dip add-once ;
+
+PRIVATE>
 
 : remember-definition ( definition loc -- )
     new-definitions get first (remember-definition) ;
@@ -40,8 +45,21 @@ SYMBOL: compiler-impl
 
 HOOK: recompile compiler-impl ( words -- alist )
 
+HOOK: to-recompile compiler-impl ( -- words )
+
+HOOK: process-forgotten-words compiler-impl ( words -- )
+
+: compile ( words -- ) recompile modify-code-heap ;
+
 ! Non-optimizing compiler
-M: f recompile [ dup def>> ] { } map>assoc ;
+M: f recompile
+    [ dup def>> ] { } map>assoc ;
+
+M: f to-recompile
+    changed-definitions get [ drop word? ] assoc-filter
+    changed-generics get assoc-union keys ;
+
+M: f process-forgotten-words drop ;
 
 : without-optimizer ( quot -- )
     [ f compiler-impl ] dip with-variable ; inline
@@ -50,7 +68,11 @@ M: f recompile [ dup def>> ] { } map>assoc ;
 ! during stage1 bootstrap, it would just waste time.
 SINGLETON: dummy-compiler
 
+M: dummy-compiler to-recompile f ;
+
 M: dummy-compiler recompile drop { } ;
+
+M: dummy-compiler process-forgotten-words drop ;
 
 : <definitions> ( -- pair ) { H{ } H{ } } [ clone ] map ;
 
@@ -69,11 +91,22 @@ GENERIC: definitions-changed ( assoc obj -- )
     definition-observers get push ;
 
 : remove-definition-observer ( obj -- )
-    definition-observers get delq ;
+    definition-observers get remove-eq! drop ;
 
 : notify-definition-observers ( assoc -- )
     definition-observers get
     [ definitions-changed ] with each ;
+
+! Incremented each time stack effects potentially changed, used
+! by compiler.tree.propagation.call-effect for call( and execute(
+! inline caching
+: effect-counter ( -- n ) 46 getenv ; inline
+
+GENERIC: bump-effect-counter* ( defspec -- ? )
+
+M: object bump-effect-counter* drop f ;
+
+<PRIVATE
 
 : changed-vocabs ( assoc -- vocabs )
     [ drop word? ] assoc-filter
@@ -87,63 +120,23 @@ GENERIC: definitions-changed ( assoc obj -- )
     dup changed-definitions get update
     dup dup changed-vocabs update ;
 
-: compile ( words -- ) recompile modify-code-heap ;
-
-: index>= ( obj1 obj2 seq -- ? )
-    [ index ] curry bi@ >= ;
-
-: dependency>= ( how1 how2 -- ? )
-    { called-dependency flushed-dependency inlined-dependency }
-    index>= ;
-
-: strongest-dependency ( how1 how2 -- how )
-    [ called-dependency or ] bi@ [ dependency>= ] most ;
-
-: weakest-dependency ( how1 how2 -- how )
-    [ inlined-dependency or ] bi@ [ dependency>= not ] most ;
-
-: compiled-usage ( word -- assoc )
-    compiled-crossref get at ;
-
-: (compiled-usages) ( word -- assoc )
-    #! If the word is not flushable anymore, we have to recompile
-    #! all words which flushable away a call (presumably when the
-    #! word was still flushable). If the word is flushable, we
-    #! don't have to recompile words that folded this away.
-    [ compiled-usage ]
-    [ "flushable" word-prop inlined-dependency flushed-dependency ? ] bi
-    [ dependency>= nip ] curry assoc-filter ;
-
-: compiled-usages ( assoc -- assocs )
-    [ drop word? ] assoc-filter
-    [ [ drop (compiled-usages) ] { } assoc>map ] keep suffix ;
-
-: compiled-generic-usage ( word -- assoc )
-    compiled-generic-crossref get at ;
-
-: (compiled-generic-usages) ( generic class -- assoc )
-    [ compiled-generic-usage ] dip
-    [
-        2dup [ valid-class? ] both?
-        [ classes-intersect? ] [ 2drop f ] if nip
-    ] curry assoc-filter ;
-
-: compiled-generic-usages ( assoc -- assocs )
-    [ (compiled-generic-usages) ] { } assoc>map ;
-
-: words-only ( assoc -- assoc' )
-    [ drop word? ] assoc-filter ;
-
-: to-recompile ( -- seq )
-    changed-definitions get compiled-usages
-    changed-generics get compiled-generic-usages
-    append assoc-combine keys ;
-
 : process-forgotten-definitions ( -- )
     forgotten-definitions get keys
-    [ [ word? ] filter [ delete-compiled-xref ] each ]
+    [ [ word? ] filter process-forgotten-words ]
     [ [ delete-definition-errors ] each ]
     bi ;
+
+: bump-effect-counter? ( -- ? )
+    changed-effects get new-words get assoc-diff assoc-empty? not
+    changed-definitions get [ drop bump-effect-counter* ] assoc-any?
+    or ;
+
+: bump-effect-counter ( -- )
+    bump-effect-counter? [ 46 getenv 0 or 1 + 46 setenv ] when ;
+
+: notify-observers ( -- )
+    updated-definitions dup assoc-empty?
+    [ drop ] [ notify-definition-observers notify-error-observers ] if ;
 
 : finish-compilation-unit ( -- )
     remake-generics
@@ -151,8 +144,10 @@ GENERIC: definitions-changed ( assoc obj -- )
     update-tuples
     process-forgotten-definitions
     modify-code-heap
-    updated-definitions dup assoc-empty?
-    [ drop ] [ notify-definition-observers notify-error-observers ] if ;
+    bump-effect-counter
+    notify-observers ;
+
+PRIVATE>
 
 : with-nested-compilation-unit ( quot -- )
     [
@@ -161,6 +156,7 @@ GENERIC: definitions-changed ( assoc obj -- )
         H{ } clone changed-effects set
         H{ } clone outdated-generics set
         H{ } clone outdated-tuples set
+        H{ } clone new-words set
         H{ } clone new-classes set
         [ finish-compilation-unit ] [ ] cleanup
     ] with-scope ; inline
@@ -173,6 +169,7 @@ GENERIC: definitions-changed ( assoc obj -- )
         H{ } clone outdated-generics set
         H{ } clone forgotten-definitions set
         H{ } clone outdated-tuples set
+        H{ } clone new-words set
         H{ } clone new-classes set
         <definitions> new-definitions set
         <definitions> old-definitions set

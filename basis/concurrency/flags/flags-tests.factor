@@ -3,46 +3,41 @@ kernel threads locals accessors calendar ;
 IN: concurrency.flags.tests
 
 :: flag-test-1 ( -- val )
-    [let | f [ <flag> ] |
-        [ f raise-flag ] "Flag test" spawn drop
-        f lower-flag
-        f value>>
-    ] ;
+    <flag> :> f
+    [ f raise-flag ] "Flag test" spawn drop
+    f lower-flag
+    f value>> ;
 
 [ f ] [ flag-test-1 ] unit-test
 
 :: flag-test-2 ( -- ? )
-    [let | f [ <flag> ] |
-        [ 1 seconds sleep f raise-flag ] "Flag test" spawn drop
-        f lower-flag
-        f value>>
-    ] ;
+    <flag> :> f
+    [ 1 seconds sleep f raise-flag ] "Flag test" spawn drop
+    f lower-flag
+    f value>> ;
 
 [ f ] [ flag-test-2 ] unit-test
 
 :: flag-test-3 ( -- val )
-    [let | f [ <flag> ] |
-        f raise-flag
-        f value>>
-    ] ;
+    <flag> :> f
+    f raise-flag
+    f value>> ;
 
 [ t ] [ flag-test-3 ] unit-test
 
 :: flag-test-4 ( -- val )
-    [let | f [ <flag> ] |
-        [ f raise-flag ] "Flag test" spawn drop
-        f wait-for-flag
-        f value>>
-    ] ;
+    <flag> :> f
+    [ f raise-flag ] "Flag test" spawn drop
+    f wait-for-flag
+    f value>> ;
 
 [ t ] [ flag-test-4 ] unit-test
 
 :: flag-test-5 ( -- val )
-    [let | f [ <flag> ] |
-        [ 1 seconds sleep f raise-flag ] "Flag test" spawn drop
-        f wait-for-flag
-        f value>>
-    ] ;
+    <flag> :> f
+    [ 1 seconds sleep f raise-flag ] "Flag test" spawn drop
+    f wait-for-flag
+    f value>> ;
 
 [ t ] [ flag-test-5 ] unit-test
 

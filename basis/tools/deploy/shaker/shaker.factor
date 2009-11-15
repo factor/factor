@@ -9,6 +9,7 @@ compiler.units definitions generic generic.standard
 generic.single tools.deploy.config combinators classes
 classes.builtin slots.private grouping command-line ;
 QUALIFIED: bootstrap.stage2
+QUALIFIED: compiler.crossref
 QUALIFIED: compiler.errors
 QUALIFIED: continuations
 QUALIFIED: definitions
@@ -258,7 +259,7 @@ IN: tools.deploy.shaker
             ! otherwise do nothing
             [ 2drop ]
         } cond
-    ] change-each ;
+    ] map! drop ;
 
 : strip-default-method ( generic new-default -- )
     [
@@ -340,8 +341,8 @@ IN: tools.deploy.shaker
                 implementors-map
                 update-map
                 main-vocab-hook
-                compiled-crossref
-                compiled-generic-crossref
+                compiler.crossref:compiled-crossref
+                compiler.crossref:compiled-generic-crossref
                 compiler-impl
                 compiler.errors:compiler-errors
                 lexer-factory
@@ -477,7 +478,7 @@ SYMBOL: deploy-vocab
     next-method ;
 
 : calls-next-method? ( method -- ? )
-    def>> flatten \ (call-next-method) swap memq? ;
+    def>> flatten \ (call-next-method) swap member-eq? ;
 
 : compute-next-methods ( -- )
     [ standard-generic? ] instances [

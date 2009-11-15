@@ -17,4 +17,4 @@ IN: mason.platform
     target-os get target-cpu get arch ;
 
 : boot-image-name ( -- string )
-    "boot." boot-image-arch ".image" 3append ;
+    boot-image-arch "boot." ".image" surround ;

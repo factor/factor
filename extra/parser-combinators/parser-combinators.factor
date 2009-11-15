@@ -1,7 +1,7 @@
 ! Copyright (C) 2004 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: lists lists.lazy promises kernel sequences strings math
-arrays splitting quotations combinators namespaces
+arrays splitting quotations combinators namespaces locals
 unicode.case unicode.categories sequences.deep accessors ;
 IN: parser-combinators
 
@@ -58,9 +58,11 @@ C: <token-parser> token-parser
 
 : case-insensitive-token ( string -- parser ) t <token-parser> ;
 
-M: token-parser parse ( input parser -- list )
-    [ string>> ] [ ignore-case?>> ] bi
-    [ tuck ] dip ?string-head
+M:: token-parser parse ( input parser -- list )
+    parser string>> :> str
+    parser ignore-case?>> :> case?
+
+    str input str case? ?string-head
     [ <parse-results> ] [ 2drop nil ] if ;
 
 : 1token ( n -- parser ) 1string token ;
@@ -319,7 +321,7 @@ LAZY: <(+)> ( parser -- parser )
     <& &> ;
 
 : nonempty-list-of ( items separator -- parser )
-    [ over &> <*> <&:> ] keep <?> tuck pack ;
+    [ over &> <*> <&:> ] keep <?> [ nip ] 2keep pack ;
 
 : list-of ( items separator -- parser )
     #! Given a parser for the separator and for the

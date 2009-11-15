@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel namespaces system
 layouts vocabs parser compiler.constants math
-cpu.x86.assembler cpu.x86.assembler.operands ;
+cpu.x86.assembler cpu.x86.assembler.operands sequences ;
 IN: bootstrap.x86
 
 8 \ cell set
@@ -18,7 +18,7 @@ IN: bootstrap.x86
 : stack-reg ( -- reg ) RSP ;
 : ds-reg ( -- reg ) R14 ;
 : rs-reg ( -- reg ) R15 ;
-: fixnum>slot@ ( -- ) ;
+: fixnum>slot@ ( -- ) temp0 1 SAR ;
 : rex-length ( -- n ) 1 ;
 
 [
@@ -35,5 +35,5 @@ IN: bootstrap.x86
     temp1 JMP
 ] jit-primitive jit-define
 
-<< "vocab:cpu/x86/bootstrap.factor" parse-file parsed >>
+<< "vocab:cpu/x86/bootstrap.factor" parse-file suffix! >>
 call

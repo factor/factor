@@ -28,7 +28,7 @@ IN: project-euler.040
 
 : (concat-upto) ( n limit str -- str )
     2dup length > [
-        pick number>string over push-all rot 1 + -rot (concat-upto)
+        pick number>string append! [ 1 + ] 2dip (concat-upto)
     ] [
         2nip
     ] if ;

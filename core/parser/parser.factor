@@ -79,8 +79,6 @@ HOOK: parse-quotation quotation-parser ( -- quot )
 
 M: f parse-quotation \ ] parse-until >quotation ;
 
-: parsed ( accum obj -- accum ) over push ;
-
 : (parse-lines) ( lexer -- quot )
     [ f parse-until >quotation ] with-lexer ;
 
@@ -88,7 +86,7 @@ M: f parse-quotation \ ] parse-until >quotation ;
     lexer-factory get call( lines -- lexer ) (parse-lines) ;
 
 : parse-literal ( accum end quot -- accum )
-    [ parse-until ] dip call parsed ; inline
+    [ parse-until ] dip call suffix! ; inline
 
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
@@ -104,7 +102,7 @@ ERROR: bad-number ;
     scan swap base> [ bad-number ] unless* ;
 
 : parse-base ( parsed base -- parsed )
-    scan-base parsed ;
+    scan-base suffix! ;
 
 SYMBOL: bootstrap-syntax
 

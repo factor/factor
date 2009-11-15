@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays definitions graphs kernel
-kernel.private slots.private math namespaces sequences
-strings vectors sbufs quotations assocs hashtables sorting vocabs
-math.order sets words.private ;
+USING: accessors arrays definitions kernel kernel.private
+slots.private math namespaces sequences strings vectors sbufs
+quotations assocs hashtables sorting vocabs math.order sets
+words.private ;
 IN: words
 
 : word ( -- word ) \ word get-global ;
@@ -63,41 +63,6 @@ GENERIC: crossref? ( word -- ? )
 
 M: word crossref?
     dup "forgotten" word-prop [ drop f ] [ vocabulary>> >boolean ] if ;
-
-SYMBOL: compiled-crossref
-
-compiled-crossref [ H{ } clone ] initialize
-
-SYMBOL: compiled-generic-crossref
-
-compiled-generic-crossref [ H{ } clone ] initialize
-
-: (compiled-xref) ( word dependencies word-prop variable -- )
-    [ [ set-word-prop ] curry ]
-    [ [ get add-vertex* ] curry ]
-    bi* 2bi ;
-
-: compiled-xref ( word dependencies generic-dependencies -- )
-    [ [ drop crossref? ] { } assoc-filter-as f like ] bi@
-    [ "compiled-uses" compiled-crossref (compiled-xref) ]
-    [ "compiled-generic-uses" compiled-generic-crossref (compiled-xref) ]
-    bi-curry* bi ;
-
-: (compiled-unxref) ( word word-prop variable -- )
-    [ [ [ dupd word-prop ] dip get remove-vertex* ] 2curry ]
-    [ drop [ remove-word-prop ] curry ]
-    2bi bi ;
-
-: compiled-unxref ( word -- )
-    [ "compiled-uses" compiled-crossref (compiled-unxref) ]
-    [ "compiled-generic-uses" compiled-generic-crossref (compiled-unxref) ]
-    bi ;
-
-: delete-compiled-xref ( word -- )
-    [ compiled-unxref ]
-    [ compiled-crossref get delete-at ]
-    [ compiled-generic-crossref get delete-at ]
-    tri ;
 
 : inline? ( word -- ? ) "inline" word-prop ; inline
 
@@ -170,10 +135,13 @@ M: word reset-word
     ] tri ;
 
 : <word> ( name vocab -- word )
-    2dup [ hashcode ] bi@ bitxor >fixnum (word) ;
+    2dup [ hashcode ] bi@ bitxor >fixnum (word) dup new-word ;
+
+: <uninterned-word> ( name -- word )
+    f \ <uninterned-word> counter >fixnum (word) ;
 
 : gensym ( -- word )
-    "( gensym )" f \ gensym counter >fixnum (word) ;
+    "( gensym )" <uninterned-word> ;
 
 : define-temp ( quot effect -- word )
     [ gensym dup ] 2dip define-declared ;

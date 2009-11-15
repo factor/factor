@@ -105,7 +105,7 @@ M: A pprint-delims drop \ A{ \ } ;
 M: A >pprint-sequence ;
 
 SYNTAX: A{ \ } [ >A ] parse-literal ;
-SYNTAX: A@ scan-object scan-object <direct-A> parsed ;
+SYNTAX: A@ scan-object scan-object <direct-A> suffix! ;
 
 INSTANCE: A specialized-array
 
@@ -167,4 +167,8 @@ SYNTAX: SPECIALIZED-ARRAY:
 
 "prettyprint" vocab [
     "specialized-arrays.prettyprint" require
+] when
+
+"mirrors" vocab [
+    "specialized-arrays.mirrors" require
 ] when

@@ -11,6 +11,10 @@ GENERIC: defs-vreg-rep ( insn -- rep/f )
 GENERIC: temp-vreg-reps ( insn -- reps )
 GENERIC: uses-vreg-reps ( insn -- reps )
 
+M: insn defs-vreg-rep drop f ;
+M: insn temp-vreg-reps drop { } ;
+M: insn uses-vreg-reps drop { } ;
+
 <PRIVATE
 
 : rep-getter-quot ( rep -- quot )
@@ -21,12 +25,14 @@ GENERIC: uses-vreg-reps ( insn -- reps )
     } case ;
 
 : define-defs-vreg-rep-method ( insn -- )
-    [ \ defs-vreg-rep create-method ]
-    [ insn-def-slot [ rep>> rep-getter-quot ] [ [ drop f ] ] if* ]
-    bi define ;
+    dup insn-def-slot dup [
+        [ \ defs-vreg-rep create-method ]
+        [ rep>> rep-getter-quot ]
+        bi* define
+    ] [ 2drop ] if ;
 
 : reps-getter-quot ( reps -- quot )
-    dup [ rep>> { f scalar-rep } memq? not ] all? [
+    dup [ rep>> { f scalar-rep } member-eq? not ] all? [
         [ rep>> ] map [ drop ] swap suffix
     ] [
         [ rep>> rep-getter-quot ] map dup length {
@@ -38,14 +44,18 @@ GENERIC: uses-vreg-reps ( insn -- reps )
     ] if ;
 
 : define-uses-vreg-reps-method ( insn -- )
-    [ \ uses-vreg-reps create-method ]
-    [ insn-use-slots reps-getter-quot ]
-    bi define ;
+    dup insn-use-slots [ drop ] [
+        [ \ uses-vreg-reps create-method ]
+        [ reps-getter-quot ]
+        bi* define
+    ] if-empty ;
 
 : define-temp-vreg-reps-method ( insn -- )
-    [ \ temp-vreg-reps create-method ]
-    [ insn-temp-slots reps-getter-quot ]
-    bi define ;
+    dup insn-temp-slots [ drop ] [
+        [ \ temp-vreg-reps create-method ]
+        [ reps-getter-quot ]
+        bi* define
+    ] if-empty ;
 
 PRIVATE>
 

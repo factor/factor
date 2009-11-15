@@ -7,7 +7,7 @@ sorting assocs definitions prettyprint io inspector
 classes.tuple classes.union classes.predicate debugger
 threads.private io.streams.string io.timeouts io.thread
 sequences.private destructors combinators eval locals.backend
-system compiler.units ;
+system compiler.units shuffle ;
 IN: stack-checker.tests
 
 [ 1234 infer ] must-fail
@@ -16,14 +16,18 @@ IN: stack-checker.tests
 { 1 2 } [ dup ] must-infer-as
 
 { 1 2 } [ [ dup ] call ] must-infer-as
-[ [ call ] infer ] must-fail
+[ [ call ] infer ] [ T{ unknown-macro-input f call } = ] must-fail-with
+[ [ curry call ] infer ] [ T{ unknown-macro-input f call } = ] must-fail-with
+[ [ { } >quotation call ] infer ] [ T{ bad-macro-input f call } = ] must-fail-with
+[ [ append curry call ] infer ] [ T{ bad-macro-input f call } = ] must-fail-with
 
 { 2 4 } [ 2dup ] must-infer-as
 
 { 1 0 } [ [ ] [ ] if ] must-infer-as
-[ [ if ] infer ] must-fail
-[ [ [ ] if ] infer ] must-fail
-[ [ [ 2 ] [ ] if ] infer ] must-fail
+[ [ if ] infer ] [ T{ unknown-macro-input f if } = ] must-fail-with
+[ [ { } >quotation { } >quotation if ] infer ] [ T{ bad-macro-input f if } = ] must-fail-with
+[ [ [ ] if ] infer ] [ T{ unknown-macro-input f if } = ] must-fail-with
+[ [ [ 2 ] [ ] if ] infer ] [ unbalanced-branches-error? ] must-fail-with
 { 4 3 } [ [ rot ] [ -rot ] if ] must-infer-as
 
 { 4 3 } [
@@ -46,7 +50,7 @@ IN: stack-checker.tests
 
 [
     [ [ [ 2 2 fixnum+ ] ] [ [ 2 2 fixnum* ] ] if call ] infer
-] must-fail
+] [ T{ bad-macro-input f call } = ] must-fail-with
 
 ! Test inference of termination of control flow
 : termination-test-1 ( -- * ) "foo" throw ;
@@ -198,42 +202,42 @@ DEFER: blah4
 
 ! This used to hang
 [ [ [ dup call ] dup call ] infer ]
-[ inference-error? ] must-fail-with
+[ recursive-quotation-error? ] must-fail-with
 
 : m ( q -- ) dup call ; inline
 
-[ [ [ m ] m ] infer ] [ inference-error? ] must-fail-with
+[ [ [ m ] m ] infer ] [ recursive-quotation-error? ] must-fail-with
 
 : m' ( quot -- ) dup curry call ; inline
 
-[ [ [ m' ] m' ] infer ] [ inference-error? ] must-fail-with
+[ [ [ m' ] m' ] infer ] [ recursive-quotation-error? ] must-fail-with
 
 : m'' ( -- q ) [ dup curry ] ; inline
 
 : m''' ( -- ) m'' call call ; inline
 
-[ [ [ m''' ] m''' ] infer ] [ inference-error? ] must-fail-with
+[ [ [ m''' ] m''' ] infer ] [ recursive-quotation-error? ] must-fail-with
 
-: m-if ( a b c -- ) t over if ; inline
+: m-if ( a b c -- ) t over when ; inline
 
-[ [ [ m-if ] m-if ] infer ] [ inference-error? ] must-fail-with
+[ [ [ m-if ] m-if ] infer ] [ recursive-quotation-error? ] must-fail-with
 
 ! This doesn't hang but it's also an example of the
 ! undedicable case
 [ [ [ [ drop 3 ] swap call ] dup call ] infer ]
-[ inference-error? ] must-fail-with
+[ recursive-quotation-error? ] must-fail-with
 
-[ [ 1 drop-locals ] infer ] [ inference-error? ] must-fail-with
+[ [ 1 drop-locals ] infer ] [ too-many-r>? ] must-fail-with
 
 ! Regression
-[ [ cleave ] infer ] [ inference-error? ] must-fail-with
+[ [ cleave ] infer ] [ T{ unknown-macro-input f cleave } = ] must-fail-with
 
 ! Test some curry stuff
 { 1 1 } [ 3 [ ] curry 4 [ ] curry if ] must-infer-as
 
 { 2 1 } [ [ ] curry 4 [ ] curry if ] must-infer-as
 
-[ [ 3 [ ] curry 1 2 [ ] 2curry if ] infer ] must-fail
+[ [ 3 [ ] curry 1 2 [ ] 2curry if ] infer ] [ unbalanced-branches-error? ] must-fail-with
 
 { 1 3 } [ [ 2drop f ] assoc-find ] must-infer-as
 
@@ -304,7 +308,7 @@ ERROR: custom-error ;
 ] unit-test
 
 ! Regression
-[ [ 1 load-locals ] infer ] must-fail
+[ [ 1 load-locals ] infer ] [ too-many->r? ] must-fail-with
 
 ! Corner case
 [ [ [ f dup ] [ dup ] produce ] infer ] must-fail
@@ -319,7 +323,7 @@ FORGET: erg's-inference-bug
 [ [ bad-recursion-3 ] infer ] must-fail
 FORGET: bad-recursion-3
 
-: bad-recursion-4 ( -- ) 4 [ dup call roll ] times ; inline recursive
+: bad-recursion-4 ( -- ) 4 [ dup call [ rot ] dip swap ] times ; inline recursive
 [ [ [ ] [ 1 2 3 ] over dup bad-recursion-4 ] infer ] must-fail
 
 : bad-recursion-5 ( obj quot: ( -- ) -- ) dup call swap bad-recursion-5 ; inline recursive
@@ -328,6 +332,8 @@ FORGET: bad-recursion-3
 : bad-recursion-6 ( quot: ( -- ) -- )
     dup bad-recursion-6 call ; inline recursive
 [ [ [ drop f ] bad-recursion-6 ] infer ] must-fail
+
+[ ] [ [ \ bad-recursion-6 forget ] with-compilation-unit ] unit-test
 
 { 3 0 } [ [ 2drop "A" throw ] [ ] if 2drop ] must-infer-as
 { 2 0 } [ drop f f [ 2drop "A" throw ] [ ] if 2drop ] must-infer-as
@@ -345,6 +351,9 @@ DEFER: eee'
 : eee' ( ? -- ) [ swap [ ] ] dip ddd' call ; inline recursive
 
 [ [ eee' ] infer ] [ inference-error? ] must-fail-with
+
+[ ] [ [ \ ddd' forget ] with-compilation-unit ] unit-test
+[ ] [ [ \ eee' forget ] with-compilation-unit ] unit-test
 
 : bogus-error ( x -- )
     dup "A" throw [ bogus-error ] [ drop ] if ; inline recursive
@@ -367,9 +376,9 @@ DEFER: eee'
 [ ] [ [ \ forget-test forget ] with-compilation-unit ] unit-test
 [ forget-test ] must-infer
 
-[ [ cond ] infer ] must-fail
-[ [ bi ] infer ] must-fail
-[ at ] must-infer
+[ [ cond ] infer ] [ T{ unknown-macro-input f cond } = ] must-fail-with
+[ [ bi ] infer ] [ T{ unknown-macro-input f call } = ] must-fail-with
+[ [ each ] infer ] [ T{ unknown-macro-input f call } = ] must-fail-with
 
 [ [ [ "OOPS" throw ] dip ] [ drop ] if ] must-infer
 
@@ -380,5 +389,5 @@ DEFER: eee'
 { 3 1 } [ call( a b -- c ) ] must-infer-as
 { 3 1 } [ execute( a b -- c ) ] must-infer-as
 
-[ [ call-effect ] infer ] must-fail
-[ [ execute-effect ] infer ] must-fail
+[ [ call-effect ] infer ] [ T{ unknown-macro-input f call-effect } = ] must-fail-with
+[ [ execute-effect ] infer ] [ T{ unknown-macro-input f execute-effect } = ] must-fail-with

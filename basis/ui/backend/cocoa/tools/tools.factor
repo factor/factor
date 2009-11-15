@@ -1,11 +1,12 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.syntax cocoa cocoa.nibs cocoa.application
-cocoa.classes cocoa.dialogs cocoa.pasteboard cocoa.subclassing
-core-foundation core-foundation.strings help.topics kernel
-memory namespaces parser system ui ui.tools.browser
-ui.tools.listener ui.backend.cocoa eval locals
-vocabs.refresh ;
+cocoa.classes cocoa.dialogs cocoa.pasteboard cocoa.runtime
+cocoa.subclassing core-foundation core-foundation.strings
+help.topics kernel memory namespaces parser system ui
+ui.tools.browser ui.tools.listener ui.backend.cocoa eval
+locals vocabs.refresh ;
+FROM: alien.c-types => int void ;
 IN: ui.backend.cocoa.tools
 
 : finder-run-files ( alien -- )
@@ -25,43 +26,43 @@ CLASS: {
     { +name+ "FactorWorkspaceApplicationDelegate" }
 }
 
-{ "application:openFiles:" "void" { "id" "SEL" "id" "id" }
+{ "application:openFiles:" void { id SEL id id }
     [ [ 3drop ] dip finder-run-files ]
 }
 
-{ "applicationShouldHandleReopen:hasVisibleWindows:" "int" { "id" "SEL" "id" "int" }
+{ "applicationShouldHandleReopen:hasVisibleWindows:" int { id SEL id int }
     [ [ 3drop ] dip 0 = [ show-listener ] when 1 ]
 }
 
-{ "factorListener:" "id" { "id" "SEL" "id" }
+{ "factorListener:" id { id SEL id }
     [ 3drop show-listener f ]
 }
 
-{ "factorBrowser:" "id" { "id" "SEL" "id" }
+{ "factorBrowser:" id { id SEL id }
     [ 3drop show-browser f ]
 }
 
-{ "newFactorListener:" "id" { "id" "SEL" "id" }
+{ "newFactorListener:" id { id SEL id }
     [ 3drop listener-window f ]
 }
 
-{ "newFactorBrowser:" "id" { "id" "SEL" "id" }
+{ "newFactorBrowser:" id { id SEL id }
     [ 3drop browser-window f ]
 }
 
-{ "runFactorFile:" "id" { "id" "SEL" "id" }
+{ "runFactorFile:" id { id SEL id }
     [ 3drop menu-run-files f ]
 }
 
-{ "saveFactorImage:" "id" { "id" "SEL" "id" }
+{ "saveFactorImage:" id { id SEL id }
     [ 3drop save f ]
 }
 
-{ "saveFactorImageAs:" "id" { "id" "SEL" "id" }
+{ "saveFactorImageAs:" id { id SEL id }
     [ 3drop menu-save-image f ]
 }
 
-{ "refreshAll:" "id" { "id" "SEL" "id" }
+{ "refreshAll:" id { id SEL id }
     [ 3drop [ refresh-all ] \ refresh-all call-listener f ]
 } ;
 
@@ -79,13 +80,13 @@ CLASS: {
     { +name+ "FactorServiceProvider" }
 } {
     "evalInListener:userData:error:"
-    "void"
-    { "id" "SEL" "id" "id" "id" }
+    void
+    { id SEL id id id }
     [ nip [ eval-listener f ] do-service 2drop ]
 } {
     "evalToString:userData:error:"
-    "void"
-    { "id" "SEL" "id" "id" "id" }
+    void
+    { id SEL id id id }
     [ nip [ eval>string ] do-service 2drop ]
 } ;
 

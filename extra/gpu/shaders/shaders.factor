@@ -277,7 +277,7 @@ padding-no [ 0 ] initialize
     ] [ nip ] if ":" join ;
 
 : replace-log-line-numbers ( object log -- log' )
-    "\n" split [ empty? not ] filter
+    "\n" split harvest
     [ replace-log-line-number ] with map
     "\n" join ;
 

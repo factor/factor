@@ -11,7 +11,6 @@ IN: classes.tests
 [ f ] [ 3 float instance? ] unit-test
 [ t ] [ 3 number instance? ] unit-test
 [ f ] [ 3 null instance? ] unit-test
-[ t ] [ "hi" \ hi-tag instance? ] unit-test
 
 ! Regression
 GENERIC: method-forget-test ( obj -- obj )

@@ -11,7 +11,6 @@ CONSTANT: horizontal { 1 0 }
 CONSTANT: vertical { 0 1 }
 
 TUPLE: gadget < rect
-id
 pref-dim
 parent
 children
@@ -29,7 +28,7 @@ model ;
 
 M: gadget equal? 2drop f ;
 
-M: gadget hashcode* nip [ [ \ gadget counter ] unless* ] change-id id>> ;
+M: gadget hashcode* nip identity-hashcode ;
 
 M: gadget model-changed 2drop ;
 
@@ -306,7 +305,7 @@ M: gadget remove-gadget 2drop ;
             [ remove-gadget ] [
                 over (unparent)
                 [ unfocus-gadget ]
-                [ children>> delete ]
+                [ children>> remove! drop ]
                 [ nip relayout ]
                 2tri
             ] 2bi

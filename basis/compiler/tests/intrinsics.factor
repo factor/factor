@@ -21,7 +21,6 @@ IN: compiler.tests.intrinsics
 [ 2 1 3 ] [ 1 2 3 [ swapd ] compile-call ] unit-test
 [ 2 ] [ 1 2 [ nip ] compile-call ] unit-test
 [ 3 ] [ 1 2 3 [ 2nip ] compile-call ] unit-test
-[ 2 1 2 ] [ 1 2 [ tuck ] compile-call ] unit-test
 [ 1 2 1 ] [ 1 2 [ over ] compile-call ] unit-test
 [ 1 2 3 1 ] [ 1 2 3 [ pick ] compile-call ] unit-test
 [ 2 1 ] [ 1 2 [ swap ] compile-call ] unit-test
@@ -244,20 +243,20 @@ IN: compiler.tests.intrinsics
 [ -4294967296 ] [ -1 [ 16 fixnum-shift 16 fixnum-shift ] compile-call ] unit-test
 
 [ HEX: 10000000 ] [ HEX: 1000000 HEX: 10 [ fixnum* ] compile-call ] unit-test
-[ HEX: 10000000 ] [ HEX: -10000000 >fixnum [ 0 swap fixnum- ] compile-call ] unit-test
-[ HEX: 10000000 ] [ HEX: -fffffff >fixnum [ 1 swap fixnum- ] compile-call ] unit-test
+[ HEX: 8000000 ] [ HEX: -8000000 >fixnum [ 0 swap fixnum- ] compile-call ] unit-test
+[ HEX: 8000000 ] [ HEX: -7ffffff >fixnum [ 1 swap fixnum- ] compile-call ] unit-test
 
-[ t ] [ 1 27 fixnum-shift dup [ fixnum+ ] compile-call 1 28 fixnum-shift = ] unit-test
-[ -268435457 ] [ 1 28 shift neg >fixnum [ -1 fixnum+ ] compile-call ] unit-test
+[ t ] [ 1 26 fixnum-shift dup [ fixnum+ ] compile-call 1 27 fixnum-shift = ] unit-test
+[ -134217729 ] [ 1 27 shift neg >fixnum [ -1 fixnum+ ] compile-call ] unit-test
 
 [ t ] [ 1 20 shift 1 20 shift [ fixnum* ] compile-call 1 40 shift = ] unit-test
 [ t ] [ 1 20 shift neg 1 20 shift [ fixnum* ] compile-call 1 40 shift neg = ] unit-test
 [ t ] [ 1 20 shift neg 1 20 shift neg [ fixnum* ] compile-call 1 40 shift = ] unit-test
 [ -351382792 ] [ -43922849 [ 3 fixnum-shift ] compile-call ] unit-test
 
-[ 268435456 ] [ -268435456 >fixnum -1 [ fixnum/i ] compile-call ] unit-test
+[ 134217728 ] [ -134217728 >fixnum -1 [ fixnum/i ] compile-call ] unit-test
 
-[ 268435456 0 ] [ -268435456 >fixnum -1 [ fixnum/mod ] compile-call ] unit-test
+[ 134217728 0 ] [ -134217728 >fixnum -1 [ fixnum/mod ] compile-call ] unit-test
 
 [ t ] [ f [ f eq? ] compile-call ] unit-test
 
@@ -285,8 +284,8 @@ cell 8 = [
 
 ! 64-bit overflow
 cell 8 = [
-    [ t ] [ 1 59 fixnum-shift dup [ fixnum+ ] compile-call 1 60 fixnum-shift = ] unit-test
-    [ -1152921504606846977 ] [ 1 60 shift neg >fixnum [ -1 fixnum+ ] compile-call ] unit-test
+    [ t ] [ 1 58 fixnum-shift dup [ fixnum+ ] compile-call 1 59 fixnum-shift = ] unit-test
+    [ -576460752303423489 ] [ 1 59 shift neg >fixnum [ -1 fixnum+ ] compile-call ] unit-test
     
     [ t ] [ 1 40 shift 1 40 shift [ fixnum* ] compile-call 1 80 shift = ] unit-test
     [ t ] [ 1 40 shift neg 1 40 shift [ fixnum* ] compile-call 1 80 shift neg = ] unit-test
@@ -301,9 +300,9 @@ cell 8 = [
     [ -18446744073709551616 ] [ -1 [ 64 fixnum-shift ] compile-call ] unit-test
     [ -18446744073709551616 ] [ -1 [ 32 fixnum-shift 32 fixnum-shift ] compile-call ] unit-test
     
-    [ 1152921504606846976 ] [ -1152921504606846976 >fixnum -1 [ fixnum/i ] compile-call ] unit-test
+    [ 576460752303423488 ] [ -576460752303423488 >fixnum -1 [ fixnum/i ] compile-call ] unit-test
 
-    [ 1152921504606846976 0 ] [ -1152921504606846976 >fixnum -1 [ fixnum/mod ] compile-call ] unit-test
+    [ 576460752303423488 0 ] [ -576460752303423488 >fixnum -1 [ fixnum/mod ] compile-call ] unit-test
 
     [ -268435457 ] [ 28 2^ [ fixnum-bitnot ] compile-call ] unit-test
 ] when
@@ -311,12 +310,14 @@ cell 8 = [
 ! Some randomized tests
 : compiled-fixnum* ( a b -- c ) fixnum* ;
 
+ERROR: bug-in-fixnum* x y a b ;
+
 [ ] [
     10000 [ 
-        32 random-bits >fixnum 32 random-bits >fixnum
-        2dup
-        [ fixnum* ] 2keep compiled-fixnum* =
-        [ 2drop ] [ "Oops" throw ] if
+        32 random-bits >fixnum
+        32 random-bits >fixnum
+        2dup [ fixnum* ] [ compiled-fixnum* ] 2bi 2dup =
+        [ 2drop 2drop ] [ bug-in-fixnum* ] if
     ] times
 ] unit-test
 
@@ -419,7 +420,7 @@ cell 8 = [
 "b" get [
     [ 3 ] [ "b" get 2 [ alien-unsigned-1 ] compile-call ] unit-test
     [ 3 ] [ "b" get [ { alien } declare 2 alien-unsigned-1 ] compile-call ] unit-test
-    [ 3 ] [ "b" get 2 [ { simple-alien fixnum } declare alien-unsigned-1 ] compile-call ] unit-test
+    [ 3 ] [ "b" get 2 [ { alien fixnum } declare alien-unsigned-1 ] compile-call ] unit-test
     [ 3 ] [ "b" get 2 [ { c-ptr fixnum } declare alien-unsigned-1 ] compile-call ] unit-test
 
     [ ] [ "b" get free ] unit-test
@@ -584,16 +585,16 @@ TUPLE: alien-accessor-regression { b byte-array } { i fixnum } ;
     swap [
         { tuple } declare 1 slot
     ] [
-        0 slot
+        1 slot
     ] if ;
 
-[ t ] [ f B{ } mutable-value-bug-1 byte-array type-number = ] unit-test
+[ 0 ] [ f { } mutable-value-bug-1 ] unit-test
 
 : mutable-value-bug-2 ( a b -- c )
     swap [
-        0 slot
+        1 slot
     ] [
         { tuple } declare 1 slot
     ] if ;
 
-[ t ] [ t B{ } mutable-value-bug-2 byte-array type-number = ] unit-test
+[ 0 ] [ t { } mutable-value-bug-2 ] unit-test

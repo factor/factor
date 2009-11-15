@@ -3,8 +3,9 @@
 USING: arrays definitions hashtables kernel kernel.private math
 namespaces make sequences sequences.private strings vectors
 words quotations memory combinators generic classes
-classes.algebra classes.builtin classes.private slots.private
-slots math.private accessors assocs effects ;
+classes.algebra classes.algebra.private classes.builtin
+classes.private slots.private slots math.private accessors
+assocs effects ;
 IN: classes.tuple
 
 PREDICATE: tuple-class < class
@@ -118,7 +119,7 @@ ERROR: bad-superclass class ;
     } case define-predicate ;
 
 : class-size ( class -- n )
-    superclasses [ "slots" word-prop length ] sigma ;
+    superclasses [ "slots" word-prop length ] map-sum ;
 
 : (instance-check-quot) ( class -- quot )
     [

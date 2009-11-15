@@ -22,12 +22,10 @@ IN: compiler.cfg.intrinsics.alien
     ] [ emit-primitive ] if ;
 
 :: inline-alien ( node quot test -- )
-    [let | infos [ node node-input-infos ] |
-        infos test call
-        [ infos quot call ]
-        [ node emit-primitive ]
-        if
-    ] ; inline
+    node node-input-infos :> infos
+    infos test call
+    [ infos quot call ]
+    [ node emit-primitive ] if ; inline
 
 : inline-alien-getter? ( infos -- ? )
     [ first class>> c-ptr class<= ]
@@ -35,7 +33,7 @@ IN: compiler.cfg.intrinsics.alien
     bi and ;
 
 : ^^unbox-c-ptr ( src class -- dst )
-    [ next-vreg dup ] 2dip next-vreg ##unbox-c-ptr ;
+    [ next-vreg dup ] 2dip ##unbox-c-ptr ;
 
 : prepare-alien-accessor ( info -- ptr-vreg offset )
     class>> [ 2inputs ^^untag-fixnum swap ] dip ^^unbox-c-ptr ^^add 0 ;

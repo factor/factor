@@ -61,7 +61,7 @@ IN: io.pathnames.tests
     "." current-directory set
     ".." "resource-path" set
     [ "../core/bootstrap/stage2.factor" ]
-    [ "resource:core/bootstrap/stage2.factor" (normalize-path) ]
+    [ "resource:core/bootstrap/stage2.factor" absolute-path ]
     unit-test
 ] with-scope
 

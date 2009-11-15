@@ -256,95 +256,108 @@ M: ppc %double>single-float FRSP ;
 M: ppc %unbox-alien ( dst src -- )
     alien-offset LWZ ;
 
-M:: ppc %unbox-any-c-ptr ( dst src temp -- )
+M:: ppc %unbox-any-c-ptr ( dst src -- )
     [
-        { "is-byte-array" "end" "start" } [ define-label ] each
-        ! Address is computed in dst
+        "end" define-label
         0 dst LI
-        ! Load object into scratch-reg
-        scratch-reg src MR
-        ! We come back here with displaced aliens
-        "start" resolve-label
         ! Is the object f?
-        0 scratch-reg \ f tag-number CMPI
-        ! If so, done
+        0 src \ f type-number CMPI
         "end" get BEQ
+        ! Compute tag in dst register
+        dst src tag-mask get ANDI
         ! Is the object an alien?
-        0 scratch-reg header-offset LWZ
-        0 0 alien type-number tag-fixnum CMPI
-        "is-byte-array" get BNE
-        ! If so, load the offset
-        0 scratch-reg alien-offset LWZ
-        ! Add it to address being computed
-        dst dst 0 ADD
-        ! Now recurse on the underlying alien
-        scratch-reg scratch-reg underlying-alien-offset LWZ
-        "start" get B
-        "is-byte-array" resolve-label
-        ! Add byte array address to address being computed
-        dst dst scratch-reg ADD
-        ! Add an offset to start of byte array's data area
-        dst dst byte-array-offset ADDI
+        0 dst alien type-number CMPI
+        ! Add an offset to start of byte array's data
+        dst src byte-array-offset ADDI
+        "end" get BNE
+        ! If so, load the offset and add it to the address
+        dst src alien-offset LWZ
         "end" resolve-label
     ] with-scope ;
 
-: alien@ ( n -- n' ) cells object tag-number - ;
-
-:: %allot-alien ( dst displacement base temp -- )
-    dst 4 cells alien temp %allot
-    temp \ f tag-number %load-immediate
-    ! Store underlying-alien slot
-    base dst 1 alien@ STW
-    ! Store expired slot
-    temp dst 2 alien@ STW
-    ! Store offset
-    displacement dst 3 alien@ STW ;
+: alien@ ( n -- n' ) cells alien type-number - ;
 
 M:: ppc %box-alien ( dst src temp -- )
     [
         "f" define-label
-        dst \ f tag-number %load-immediate
+        dst \ f type-number %load-immediate
         0 src 0 CMPI
         "f" get BEQ
-        dst src temp temp %allot-alien
+        dst 5 cells alien temp %allot
+        temp \ f type-number %load-immediate
+        temp dst 1 alien@ STW
+        temp dst 2 alien@ STW
+        src dst 3 alien@ STW
+        src dst 4 alien@ STW
         "f" resolve-label
     ] with-scope ;
 
-M:: ppc %box-displaced-alien ( dst displacement base displacement' base' base-class -- )
+M:: ppc %box-displaced-alien ( dst displacement base temp base-class -- )
+    ! This is ridiculous
     [
         "end" define-label
-        "alloc" define-label
-        "simple-case" define-label
+        "not-f" define-label
+        "not-alien" define-label
+
         ! If displacement is zero, return the base
         dst base MR
         0 displacement 0 CMPI
         "end" get BEQ
-        ! Quickly use displacement' before its needed for real, as allot temporary
-        displacement' :> temp
-        dst 4 cells alien temp %allot
-        ! If base is already a displaced alien, unpack it
-        0 base \ f tag-number CMPI
-        "simple-case" get BEQ
-        temp base header-offset LWZ
-        0 temp alien type-number tag-fixnum CMPI
-        "simple-case" get BNE
-        ! displacement += base.displacement
-        temp base 3 alien@ LWZ
-        displacement' displacement temp ADD
-        ! base = base.base
-        base' base 1 alien@ LWZ
-        "alloc" get B
-        "simple-case" resolve-label
-        displacement' displacement MR
-        base' base MR
-        "alloc" resolve-label
-        ! Store underlying-alien slot
-        base' dst 1 alien@ STW
-        ! Store offset
-        displacement' dst 3 alien@ STW
-        ! Store expired slot (its ok to clobber displacement')
-        temp \ f tag-number %load-immediate
+
+        ! Displacement is non-zero, we're going to be allocating a new
+        ! object
+        dst 5 cells alien temp %allot
+
+        ! Set expired to f
+        temp \ f type-number %load-immediate
         temp dst 2 alien@ STW
+
+        ! Is base f?
+        0 base \ f type-number CMPI
+        "not-f" get BNE
+
+        ! Yes, it is f. Fill in new object
+        base dst 1 alien@ STW
+        displacement dst 3 alien@ STW
+        displacement dst 4 alien@ STW
+
+        "end" get B
+
+        "not-f" resolve-label
+
+        ! Check base type
+        temp base tag-mask get ANDI
+
+        ! Is base an alien?
+        0 temp alien type-number CMPI
+        "not-alien" get BNE
+
+        ! Yes, it is an alien. Set new alien's base to base.base
+        temp base 1 alien@ LWZ
+        temp dst 1 alien@ STW
+
+        ! Compute displacement
+        temp base 3 alien@ LWZ
+        temp temp displacement ADD
+        temp dst 3 alien@ STW
+
+        ! Compute address
+        temp base 4 alien@ LWZ
+        temp temp displacement ADD
+        temp dst 4 alien@ STW
+
+        ! We are done
+        "end" get B
+
+        ! Is base a byte array? It has to be, by now...
+        "not-alien" resolve-label
+
+        base dst 1 alien@ STW
+        displacement dst 3 alien@ STW
+        temp base byte-array-offset ADDI
+        temp temp displacement ADD
+        temp dst 4 alien@ STW
+
         "end" resolve-label
     ] with-scope ;
 
@@ -374,15 +387,15 @@ M: ppc %set-alien-double -rot STFD ;
     [ drop load-zone-ptr ] [ swap 0 LWZ ] 2bi ;
 
 :: inc-allot-ptr ( nursery-ptr allot-ptr n -- )
-    scratch-reg allot-ptr n 8 align ADDI
+    scratch-reg allot-ptr n data-alignment get align ADDI
     scratch-reg nursery-ptr 0 STW ;
 
 :: store-header ( dst class -- )
-    class type-number tag-fixnum scratch-reg LI
+    class type-number tag-header scratch-reg LI
     scratch-reg dst 0 STW ;
 
 : store-tagged ( dst tag -- )
-    dupd tag-number ORI ;
+    dupd type-number ORI ;
 
 M:: ppc %allot ( dst size class nursery-ptr -- )
     nursery-ptr dst load-allot-ptr
@@ -460,7 +473,7 @@ M: ppc %epilogue ( n -- )
 
 :: (%boolean) ( dst temp branch1 branch2 -- )
     "end" define-label
-    dst \ f tag-number %load-immediate
+    dst \ f type-number %load-immediate
     "end" get branch1 execute( label -- )
     branch2 [ "end" get branch2 execute( label -- ) ] when
     dst \ t %load-reference
@@ -504,11 +517,11 @@ M: ppc %compare [ (%compare) ] 2dip %boolean ;
 M: ppc %compare-imm [ (%compare-imm) ] 2dip %boolean ;
 
 M:: ppc %compare-float-ordered ( dst src1 src2 cc temp -- )
-    src1 src2 cc negate-cc \ (%compare-float-ordered) (%compare-float) :> branch2 :> branch1
+    src1 src2 cc negate-cc \ (%compare-float-ordered) (%compare-float) :> ( branch1 branch2 )
     dst temp branch1 branch2 (%boolean) ;
 
 M:: ppc %compare-float-unordered ( dst src1 src2 cc temp -- )
-    src1 src2 cc negate-cc \ (%compare-float-unordered) (%compare-float) :> branch2 :> branch1
+    src1 src2 cc negate-cc \ (%compare-float-unordered) (%compare-float) :> ( branch1 branch2 )
     dst temp branch1 branch2 (%boolean) ;
 
 :: %branch ( label cc -- )
@@ -534,11 +547,11 @@ M:: ppc %compare-imm-branch ( label src1 src2 cc -- )
     branch2 [ label branch2 execute( label -- ) ] when ; inline
 
 M:: ppc %compare-float-ordered-branch ( label src1 src2 cc -- )
-    src1 src2 cc \ (%compare-float-ordered) (%compare-float) :> branch2 :> branch1
+    src1 src2 cc \ (%compare-float-ordered) (%compare-float) :> ( branch1 branch2 )
     label branch1 branch2 (%branch) ;
 
 M:: ppc %compare-float-unordered-branch ( label src1 src2 cc -- )
-    src1 src2 cc \ (%compare-float-unordered) (%compare-float) :> branch2 :> branch1
+    src1 src2 cc \ (%compare-float-unordered) (%compare-float) :> ( branch1 branch2 )
     label branch1 branch2 (%branch) ;
 
 : load-from-frame ( dst n rep -- )
@@ -742,14 +755,3 @@ USE: vocabs.loader
 } cond
 
 "complex-double" c-type t >>return-in-registers? drop
-
-[
-    <c-type>
-        [ alien-unsigned-4 c-bool> ] >>getter
-        [ [ >c-bool ] 2dip set-alien-unsigned-4 ] >>setter
-        4 >>size
-        4 >>align
-        "box_boolean" >>boxer
-        "to_boolean" >>unboxer
-    bool define-primitive-type
-] with-compilation-unit

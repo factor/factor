@@ -27,8 +27,8 @@ COM-INTERFACE: IUnrelated IUnknown {b06ac3f4-30e4-406b-a7cd-c29cead4552c}
         [ >>x drop ]     ! IInherited::setX
     } }
     { "IUnrelated" {
-        [ swap x>> + ]   ! IUnrelated::xPlus
-        [ spin x>> * + ] ! IUnrealted::xMulAdd
+        [ [ x>> ] [ + ] bi* ]   ! IUnrelated::xPlus
+        [ [ x>> ] [ * ] [ + ] tri* ] ! IUnrealted::xMulAdd
     } }
 } <com-wrapper>""" } ;
 

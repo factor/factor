@@ -13,6 +13,7 @@ ARTICLE: "sequences-split" "Splitting sequences"
     split1-last
     split1-last-slice
     split
+    split-when
 }
 "Splitting a string into lines:"
 { $subsections string-lines } ;
@@ -37,9 +38,14 @@ HELP: split1-last-slice
 
 { split1 split1-slice split1-last split1-last-slice } related-words
 
+HELP: split-when
+{ $values { "seq" "a sequence" } { "quot" { $quotation "( elt -- ? )" } } { "pieces" "a new array" } }
+{ $description "Splits " { $snippet "seq" } " at each occurrence of an element for which " { $snippet "quot" } " gives a true output and outputs an array of pieces. The pieces do not include the elements along which the sequence was split." }
+{ $examples { $example "USING: ascii kernel prettyprint splitting ;" "\"hello,world-how.are:you\" [ letter? not ] split-when ." "{ \"hello\" \"world\" \"how\" \"are\" \"you\" }" } } ;
+
 HELP: split
 { $values { "seq" "a sequence" } { "separators" "a sequence" } { "pieces" "a new array" } }
-{ $description "Splits " { $snippet "seq" } " at each occurrence of an element of " { $snippet "separators" } ", and outputs an array of pieces. The pieces do not include the elements along which the sequence was split." }
+{ $description "Splits " { $snippet "seq" } " at each occurrence of an element of " { $snippet "separators" } " and outputs an array of pieces. The pieces do not include the elements along which the sequence was split." }
 { $examples { $example "USING: prettyprint splitting ;" "\"hello world-how are you?\" \" -\" split ." "{ \"hello\" \"world\" \"how\" \"are\" \"you?\" }" } } ;
 
 HELP: ?head

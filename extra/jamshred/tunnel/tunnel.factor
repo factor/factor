@@ -63,32 +63,6 @@ CONSTANT: default-segment-radius 1
     #! valid values
     [ '[ _ clamp-length ] bi@ ] keep <slice> ;
 
-: nearer-segment ( segment segment oint -- segment )
-    #! return whichever of the two segments is nearer to the oint
-    [ 2dup ] dip tuck distance [ distance ] dip < -rot ? ;
-
-: (find-nearest-segment) ( nearest next oint -- nearest ? )
-    #! find the nearest of 'next' and 'nearest' to 'oint', and return
-    #! t if the nearest hasn't changed
-    pick [ nearer-segment dup ] dip = ;
-
-: find-nearest-segment ( oint segments -- segment )
-    dup first swap rest-slice rot [ (find-nearest-segment) ] curry
-    find 2drop ;
-    
-: nearest-segment-forward ( segments oint start -- segment )
-    rot dup length swap <slice> find-nearest-segment ;
-
-: nearest-segment-backward ( segments oint start -- segment )
-    swapd 1 + 0 spin <slice> <reversed> find-nearest-segment ;
-
-: nearest-segment ( segments oint start-segment -- segment )
-    #! find the segment nearest to 'oint', and return it.
-    #! start looking at segment 'start-segment'
-    number>> over [
-        [ nearest-segment-forward ] 3keep nearest-segment-backward
-    ] dip nearer-segment ;
-
 : get-segment ( segments n -- segment )
     over clamp-length swap nth ;
 
@@ -107,13 +81,13 @@ CONSTANT: default-segment-radius 1
     } case ;
 
 :: distance-to-next-segment ( current next location heading -- distance )
-    [let | cf [ current forward>> ] |
-        cf next location>> v. cf location v. - cf heading v. / ] ;
+    current forward>> :> cf
+    cf next location>> v. cf location v. - cf heading v. / ;
 
 :: distance-to-next-segment-area ( current next location heading -- distance )
-    [let | cf [ current forward>> ]
-           h [ next current half-way-between-oints ] |
-        cf h v. cf location v. - cf heading v. / ] ;
+    current forward>> :> cf
+    next current half-way-between-oints :> h
+    cf h v. cf location v. - cf heading v. / ;
 
 : vector-to-centre ( seg loc -- v )
     over location>> swap v- swap forward>> proj-perp ;
@@ -138,10 +112,10 @@ CONSTANT: distant 1000
     v norm 0 = [
         distant
     ] [
-        [let* | a [ v dup v. ]
-                b [ v w v. 2 * ]
-                c [ w dup v. r sq - ] |
-            c b a quadratic max-real ]
+        v dup v. :> a
+        v w v. 2 * :> b
+        w dup v. r sq - :> c
+        c b a quadratic max-real
     ] if ;
 
 : sideways-heading ( oint segment -- v )

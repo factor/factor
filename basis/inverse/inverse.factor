@@ -97,7 +97,7 @@ SYMBOL: visited
         [
             dup flattenable? [
                 def>>
-                [ visited get memq? [ no-recursive-inverse ] when ]
+                [ visited get member-eq? [ no-recursive-inverse ] when ]
                 [ flatten ]
                 bi
             ] [ 1quotation ] if
@@ -141,7 +141,6 @@ MACRO: undo ( quot -- ) [undo] ;
 \ 2dup [ over =/fail over =/fail ] define-inverse
 \ 3dup [ pick =/fail pick =/fail pick =/fail ] define-inverse
 \ pick [ [ pick ] dip =/fail ] define-inverse
-\ tuck [ swapd [ =/fail ] keep ] define-inverse
 
 \ bi@ 1 [ [undo] '[ _ bi@ ] ] define-pop-inverse
 \ tri@ 1 [ [undo] '[ _ tri@ ] ] define-pop-inverse
@@ -149,7 +148,7 @@ MACRO: undo ( quot -- ) [undo] ;
 \ tri* 3 [ [ [undo] ] tri@ '[ _ _ _ tri* ] ] define-pop-inverse
 
 \ not define-involution
-\ >boolean [ dup { t f } memq? assure ] define-inverse
+\ >boolean [ dup { t f } member-eq? assure ] define-inverse
 
 \ tuple>array \ >tuple define-dual
 \ reverse define-involution

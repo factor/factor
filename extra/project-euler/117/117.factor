@@ -31,7 +31,7 @@ IN: project-euler.117
     [ 4 short tail* sum ] keep push ;
 
 : (euler117) ( n -- m )
-    V{ 1 } clone tuck [ next ] curry times last ;
+    [ V{ 1 } clone ] dip over [ next ] curry times last ;
 
 PRIVATE>
 

@@ -26,7 +26,7 @@ IN: compiler.cfg.hats
 
 : hat-effect ( insn -- effect )
     "insn-slots" word-prop
-    [ type>> { def temp } memq? not ] filter [ name>> ] map
+    [ type>> { def temp } member-eq? not ] filter [ name>> ] map
     { "vreg" } <effect> ;
 
 : define-hat ( insn -- )
@@ -43,14 +43,14 @@ insn-classes get [
 
 : ^^load-literal ( obj -- dst )
     [ next-vreg dup ] dip {
-        { [ dup not ] [ drop \ f tag-number ##load-immediate ] }
+        { [ dup not ] [ drop \ f type-number ##load-immediate ] }
         { [ dup fixnum? ] [ tag-fixnum ##load-immediate ] }
         { [ dup float? ] [ ##load-constant ] }
         [ ##load-reference ]
     } cond ;
 
 : ^^offset>slot ( slot -- vreg' )
-    cell 4 = [ 1 ^^shr-imm ] [ any-rep ^^copy ] if ;
+    cell 4 = 2 1 ? ^^shr-imm ;
 
 : ^^tag-fixnum ( src -- dst )
     tag-bits get ^^shl-imm ;

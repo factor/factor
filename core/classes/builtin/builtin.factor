@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes classes.algebra words kernel
-kernel.private namespaces sequences math math.private
-combinators assocs quotations ;
+USING: accessors classes classes.algebra classes.algebra.private
+words kernel kernel.private namespaces sequences math
+math.private combinators assocs quotations ;
 IN: classes.builtin
 
 SYMBOL: builtins
@@ -12,15 +12,9 @@ PREDICATE: builtin-class < class
 
 : class>type ( class -- n ) "type" word-prop ; foldable
 
-PREDICATE: lo-tag-class < builtin-class class>type 7 <= ;
-
-PREDICATE: hi-tag-class < builtin-class class>type 7 > ;
-
 : type>class ( n -- class ) builtins get-global nth ;
 
 : bootstrap-type>class ( n -- class ) builtins get nth ;
-
-M: hi-tag class hi-tag type>class ; inline
 
 M: object class tag type>class ; inline
 
@@ -28,18 +22,10 @@ M: builtin-class rank-class drop 0 ;
 
 GENERIC: define-builtin-predicate ( class -- )
 
-M: lo-tag-class define-builtin-predicate
+M: builtin-class define-builtin-predicate
     dup class>type [ eq? ] curry [ tag ] prepend define-predicate ;
 
-M: hi-tag-class define-builtin-predicate
-    dup class>type [ eq? ] curry [ hi-tag ] prepend 1quotation
-    [ dup tag 6 eq? ] [ [ drop f ] if ] surround
-    define-predicate ;
-
-M: lo-tag-class instance? [ tag ] [ class>type ] bi* eq? ;
-
-M: hi-tag-class instance?
-    over tag 6 eq? [ [ hi-tag ] [ class>type ] bi* eq? ] [ 2drop f ] if ;
+M: builtin-class instance? [ tag ] [ class>type ] bi* eq? ;
 
 M: builtin-class (flatten-class) dup set ;
 
@@ -50,6 +36,6 @@ M: builtin-class (classes-intersect?)
         [ swap classes-intersect? ]
     } cond ;
 
-: full-cover ( -- ) builtins get sift [ (flatten-class) ] each ;
+: full-cover ( -- ) builtins get [ (flatten-class) ] each ;
 
 M: anonymous-complement (flatten-class) drop full-cover ;

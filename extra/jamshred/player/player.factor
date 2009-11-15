@@ -31,15 +31,12 @@ CONSTANT: max-speed 30.0
     forward-pivot ;
 
 : to-tunnel-start ( player -- )
-    [ tunnel>> first dup location>> ]
-    [ tuck (>>location) (>>nearest-segment) ] bi ;
+    dup tunnel>> first
+    [ >>nearest-segment ]
+    [ location>> >>location ] bi drop ;
 
 : play-in-tunnel ( player segments -- )
     >>tunnel to-tunnel-start ;
-
-: update-nearest-segment ( player -- )
-    [ tunnel>> ] [ dup nearest-segment>> nearest-segment ]
-    [ (>>nearest-segment) ] tri ;
 
 : update-time ( player -- seconds-passed )
     millis swap [ last-move>> - 1000 / ] [ (>>last-move) ] 2bi ;
@@ -101,11 +98,12 @@ CONSTANT: max-speed 30.0
     ] if ;
 
 :: move-player-on-heading ( d-left player distance heading -- d-left' player )
-    [let* | d-to-move [ d-left distance min ]
-            move-v [ d-to-move heading n*v ] |
-        move-v player location+
-        heading player update-nearest-segment2
-        d-left d-to-move - player ] ;
+    d-left distance min :> d-to-move
+    d-to-move heading n*v :> move-v
+
+    move-v player location+
+    heading player update-nearest-segment2
+    d-left d-to-move - player ;
 
 : distance-to-move-freely ( player -- distance )
     [ almost-to-collision ]

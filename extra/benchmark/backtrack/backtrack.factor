@@ -38,9 +38,9 @@ MEMO: 24-from-4 ( a b c d -- ? )
                 1 10 [a,b] [| d |
                     a b c d 24-from-4
                 ] count
-            ] sigma
-        ] sigma
-    ] sigma ;
+            ] map-sum
+        ] map-sum
+    ] map-sum ;
 
 CONSTANT: words { 24-from-1 24-from-2 24-from-3 24-from-4 }
 

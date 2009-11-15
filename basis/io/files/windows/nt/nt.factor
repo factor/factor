@@ -38,7 +38,7 @@ M: winnt root-directory? ( path -- ? )
 TR: normalize-separators "/" "\\" ;
 
 M: winnt normalize-path ( string -- string' )
-    (normalize-path)
+    absolute-path
     normalize-separators
     prepend-prefix ;
 

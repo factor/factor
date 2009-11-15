@@ -47,7 +47,7 @@ IN: project-euler.116
     V{ 1 } clone [ [ next ] 2curry times ] keep last 1 - ;
 
 : (euler116) ( length -- permutations )
-    3 [1,b] [ ways ] with sigma ;
+    3 [1,b] [ ways ] with map-sum ;
 
 PRIVATE>
 

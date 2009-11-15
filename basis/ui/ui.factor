@@ -34,7 +34,7 @@ SYMBOL: windows
 : raised-window ( world -- )
     windows get-global
     [ [ second eq? ] with find drop ] keep
-    [ nth ] [ delete-nth ] [ nip ] 2tri push ;
+    [ nth ] [ remove-nth! drop ] [ nip ] 2tri push ;
 
 : focus-gestures ( new old -- )
     drop-prefix <reversed>

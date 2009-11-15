@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences words fry generic accessors
 classes.tuple classes classes.algebra definitions
-stack-checker.state quotations classes.tuple.private math
-math.partial-dispatch math.private math.intervals
+stack-checker.dependencies quotations classes.tuple.private math
+math.partial-dispatch math.private math.intervals sets.private
 math.floats.private math.integers.private layouts math.order
 vectors hashtables combinators effects generalizations assocs
-sets combinators.short-circuit sequences.private locals
+sets combinators.short-circuit sequences.private locals growable
 stack-checker namespaces compiler.tree.propagation.info ;
 IN: compiler.tree.propagation.transforms
 
@@ -42,29 +42,26 @@ IN: compiler.tree.propagation.transforms
 : positive-fixnum? ( obj -- ? )
     { [ fixnum? ] [ 0 >= ] } 1&& ;
 
-: simplify-bitand? ( value -- ? )
-    value-info literal>> positive-fixnum? ;
+: simplify-bitand? ( value1 value2 -- ? )
+    [ literal>> positive-fixnum? ]
+    [ class>> fixnum swap class<= ]
+    bi* and ;
 
-: all-ones? ( int -- ? )
-    dup 1 + bitand zero? ; inline
+: all-ones? ( n -- ? ) dup 1 + bitand zero? ; inline
 
-: redundant-bitand? ( var 111... -- ? )
-    [ value-info ] bi@ [ interval>> ] [ literal>> ] bi* {
+: redundant-bitand? ( value1 value2 -- ? )
+    [ interval>> ] [ literal>> ] bi* {
         [ nip integer? ]
         [ nip all-ones? ]
         [ 0 swap [a,b] interval-subset? ]
     } 2&& ;
 
-: (zero-bitand?) ( value-info value-info' -- ? )
+: zero-bitand? ( value1 value2 -- ? )
     [ interval>> ] [ literal>> ] bi* {
         [ nip integer? ]
         [ nip bitnot all-ones? ]
         [ 0 swap bitnot [a,b] interval-subset? ]
     } 2&& ;
-
-: zero-bitand? ( var1 var2 -- ? )
-    [ value-info ] bi@
-    { [ (zero-bitand?) ] [ swap (zero-bitand?) ] } 2|| ;
 
 {
     bitand-integer-integer
@@ -73,35 +70,45 @@ IN: compiler.tree.propagation.transforms
     bitand
 } [
     [
-        {
+        in-d>> first2 [ value-info ] bi@ {
             {
-                [ dup in-d>> first2 zero-bitand? ]
-                [ drop [ 2drop 0 ] ]
+                [ 2dup zero-bitand? ]
+                [ 2drop [ 2drop 0 ] ]
             }
             {
-                [ dup in-d>> first2 redundant-bitand? ]
-                [ drop [ drop ] ]
+                [ 2dup swap zero-bitand? ]
+                [ 2drop [ 2drop 0 ] ]
             }
             {
-                [ dup in-d>> first2 swap redundant-bitand? ]
-                [ drop [ nip ] ]
+                [ 2dup redundant-bitand? ]
+                [ 2drop [ drop ] ]
             }
             {
-                [ dup in-d>> first simplify-bitand? ]
-                [ drop [ >fixnum fixnum-bitand ] ]
+                [ 2dup swap redundant-bitand? ]
+                [ 2drop [ nip ] ]
             }
             {
-                [ dup in-d>> second simplify-bitand? ]
-                [ drop [ [ >fixnum ] dip fixnum-bitand ] ]
+                [ 2dup simplify-bitand? ]
+                [ 2drop [ >fixnum fixnum-bitand ] ]
             }
-            [ drop f ]
+            {
+                [ 2dup swap simplify-bitand? ]
+                [ 2drop [ [ >fixnum ] dip fixnum-bitand ] ]
+            }
+            [ 2drop f ]
         } cond
     ] "custom-inlining" set-word-prop
 ] each
 
 ! Speeds up 2^
+: 2^? ( #call -- ? )
+    in-d>> first2 [ value-info ] bi@
+    [ { [ literal>> 1 = ] [ class>> fixnum class<= ] } 1&& ]
+    [ class>> fixnum class<= ]
+    bi* and ;
+
 \ shift [
-    in-d>> first value-info literal>> 1 = [
+     2^? [
         cell-bits tag-bits get - 1 -
         '[
             >fixnum dup 0 < [ 2drop 0 ] [
@@ -206,12 +213,12 @@ ERROR: bad-partial-eval quot word ;
     ] [ drop f ] if
 ] 1 define-partial-eval
 
-: memq-quot ( seq -- newquot )
+: member-eq-quot ( seq -- newquot )
     [ [ dupd eq? ] curry [ drop t ] ] { } map>assoc
     [ drop f ] suffix [ cond ] curry ;
 
-\ memq? [
-    dup sequence? [ memq-quot ] [ drop f ] if
+\ member-eq? [
+    dup sequence? [ member-eq-quot ] [ drop f ] if
 ] 1 define-partial-eval
 
 ! Membership testing
@@ -283,3 +290,20 @@ CONSTANT: lookup-table-at-max 256
     ] [ drop f ] if ;
 
 \ at* [ at-quot ] 1 define-partial-eval
+
+: diff-quot ( seq -- quot: ( seq' -- seq'' ) )
+    tester '[ [ @ not ] filter ] ;
+
+\ diff [ diff-quot ] 1 define-partial-eval
+
+: intersect-quot ( seq -- quot: ( seq' -- seq'' ) )
+    tester '[ _ filter ] ;
+
+\ intersect [ intersect-quot ] 1 define-partial-eval
+
+! Speeds up sum-file, sort and reverse-complement benchmarks by
+! compiling decoder-readln better
+\ push [
+    in-d>> second value-info class>> growable class<=
+    [ \ push def>> ] [ f ] if
+] "custom-inlining" set-word-prop

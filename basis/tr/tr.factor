@@ -33,7 +33,7 @@ M: bad-tr summary
     tr-quot (( seq -- translated )) define-declared ;
 
 : fast-tr-quot ( mapping -- quot )
-    '[ [ _ tr-nth ] change-each ] ;
+    '[ [ _ tr-nth ] map! drop ] ;
 
 : define-fast-tr ( word mapping -- )
     fast-tr-quot (( seq -- )) define-declared ;

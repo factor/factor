@@ -15,7 +15,7 @@ ERROR: bad-base-type type ;
     name>> "math.vectors.simd.instances." prepend ;
 
 : parse-base-type ( c-type -- c-type )
-    dup { c:char c:uchar c:short c:ushort c:int c:uint c:longlong c:ulonglong c:float c:double } memq?
+    dup { c:char c:uchar c:short c:ushort c:int c:uint c:longlong c:ulonglong c:float c:double } member-eq?
     [ bad-base-type ] unless ;
 
 : forget-instances ( -- )
