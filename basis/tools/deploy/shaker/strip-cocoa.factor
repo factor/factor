@@ -17,7 +17,7 @@ IN: cocoa.application
 
 : objc-error ( error -- ) die ;
 
-[ [ die ] 19 setenv ] "cocoa.application" add-init-hook
+[ [ die ] 19 setenv ] "cocoa.application" add-startup-hook
 
 H{ } clone \ pool [
     global [

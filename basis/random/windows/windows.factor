@@ -65,5 +65,11 @@ M: windows-rng random-bytes* ( n tuple -- bytes )
     [ MS_STRONG_PROV PROV_RSA_FULL <windows-rng> ]
     [ drop MS_ENH_RSA_AES_PROV PROV_RSA_AES <windows-rng> ] recover
     secure-random-generator set-global
+] "random.windows" add-startup-hook
 
-] "random.windows" add-init-hook
+[
+    [
+        system-random-generator get-global &dispose drop
+        secure-random-generator get-global &dispose drop
+    ] with-destructors
+] "random.windows" add-shutdown-hook

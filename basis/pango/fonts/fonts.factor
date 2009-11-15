@@ -111,4 +111,4 @@ MEMO: (cache-font-description) ( font -- description )
 : cache-font-description ( font -- description )
     strip-font-colors (cache-font-description) ;
 
-[ \ (cache-font-description) reset-memoized ] "pango.fonts" add-init-hook
+[ \ (cache-font-description) reset-memoized ] "pango.fonts" add-startup-hook
