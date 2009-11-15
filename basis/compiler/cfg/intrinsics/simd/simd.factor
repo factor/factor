@@ -481,15 +481,15 @@ IN: compiler.cfg.intrinsics.simd
 : emit-simd-vany? ( node -- )
     {
         [ vcc-any ^^test-vector ]
-    } emit-vv-vector-op ;
+    } emit-v-vector-op ;
 : emit-simd-vall? ( node -- )
     {
         [ vcc-all ^^test-vector ]
-    } emit-vv-vector-op ;
+    } emit-v-vector-op ;
 : emit-simd-vnone? ( node -- )
     {
         [ vcc-none ^^test-vector ]
-    } emit-vv-vector-op ;
+    } emit-v-vector-op ;
 
 : emit-simd-v>float ( node -- )
     {
@@ -500,7 +500,7 @@ IN: compiler.cfg.intrinsics.simd
 : emit-simd-v>integer ( node -- )
     {
         { float-vector-rep [ ^^float>integer-vector ] }
-        { int-vector-rep [ dup ] }
+        { int-vector-rep [ drop ] }
     } emit-v-vector-op ;
 
 : emit-simd-vpack-signed ( node -- )
