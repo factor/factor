@@ -16,14 +16,22 @@ SYMBOL: type-numbers
 
 SYMBOL: mega-cache-size
 
+SYMBOL: header-bits
+
 : type-number ( class -- n )
     type-numbers get at ;
 
 : tag-fixnum ( n -- tagged )
     tag-bits get shift ;
 
+: tag-header ( n -- tagged )
+    header-bits get shift ;
+
 : untag-fixnum ( n -- tagged )
     tag-bits get neg shift ;
+
+: hashcode-shift ( -- n )
+    tag-bits get header-bits get + ;
 
 ! We do this in its own compilation unit so that they can be
 ! folded below

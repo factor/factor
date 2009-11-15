@@ -1,5 +1,5 @@
-IN: stack-checker.state.tests
-USING: tools.test stack-checker.state words kernel namespaces
+IN: stack-checker.dependencies.tests
+USING: tools.test stack-checker.dependencies words kernel namespaces
 definitions ;
 
 : computing-dependencies ( quot -- dependencies )
@@ -35,4 +35,3 @@ SYMBOL: b
 [ inlined-dependency ] [ called-dependency inlined-dependency strongest-dependency ] unit-test
 [ flushed-dependency ] [ called-dependency flushed-dependency strongest-dependency ] unit-test
 [ called-dependency ] [ called-dependency f strongest-dependency ] unit-test
-

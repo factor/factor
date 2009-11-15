@@ -4,7 +4,7 @@ USING: fry accessors kernel sequences sequences.private assocs
 words namespaces classes.algebra combinators
 combinators.short-circuit classes classes.tuple
 classes.tuple.private continuations arrays alien.c-types math
-math.private slots generic definitions stack-checker.state
+math.private slots generic definitions stack-checker.dependencies
 compiler.tree
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes

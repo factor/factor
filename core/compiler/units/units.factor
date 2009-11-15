@@ -3,7 +3,8 @@
 USING: accessors arrays kernel continuations assocs namespaces
 sequences words vocabs definitions hashtables init sets
 math math.order classes classes.algebra classes.tuple
-classes.tuple.private generic source-files.errors ;
+classes.tuple.private generic source-files.errors
+kernel.private ;
 IN: compiler.units
 
 SYMBOL: old-definitions
@@ -15,11 +16,15 @@ TUPLE: redefine-error def ;
     \ redefine-error boa
     { { "Continue" t } } throw-restarts drop ;
 
+<PRIVATE
+
 : add-once ( key assoc -- )
     2dup key? [ over redefine-error ] when conjoin ;
 
 : (remember-definition) ( definition loc assoc -- )
     [ over set-where ] dip add-once ;
+
+PRIVATE>
 
 : remember-definition ( definition loc -- )
     new-definitions get first (remember-definition) ;
@@ -43,6 +48,8 @@ HOOK: recompile compiler-impl ( words -- alist )
 HOOK: to-recompile compiler-impl ( -- words )
 
 HOOK: process-forgotten-words compiler-impl ( words -- )
+
+: compile ( words -- ) recompile modify-code-heap ;
 
 ! Non-optimizing compiler
 M: f recompile
@@ -90,6 +97,17 @@ GENERIC: definitions-changed ( assoc obj -- )
     definition-observers get
     [ definitions-changed ] with each ;
 
+! Incremented each time stack effects potentially changed, used
+! by compiler.tree.propagation.call-effect for call( and execute(
+! inline caching
+: effect-counter ( -- n ) 46 getenv ; inline
+
+GENERIC: bump-effect-counter* ( defspec -- ? )
+
+M: object bump-effect-counter* drop f ;
+
+<PRIVATE
+
 : changed-vocabs ( assoc -- vocabs )
     [ drop word? ] assoc-filter
     [ drop vocabulary>> dup [ vocab ] when dup ] assoc-map ;
@@ -102,13 +120,23 @@ GENERIC: definitions-changed ( assoc obj -- )
     dup changed-definitions get update
     dup dup changed-vocabs update ;
 
-: compile ( words -- ) recompile modify-code-heap ;
-
 : process-forgotten-definitions ( -- )
     forgotten-definitions get keys
     [ [ word? ] filter process-forgotten-words ]
     [ [ delete-definition-errors ] each ]
     bi ;
+
+: bump-effect-counter? ( -- ? )
+    changed-effects get new-words get assoc-diff assoc-empty? not
+    changed-definitions get [ drop bump-effect-counter* ] assoc-any?
+    or ;
+
+: bump-effect-counter ( -- )
+    bump-effect-counter? [ 46 getenv 0 or 1 + 46 setenv ] when ;
+
+: notify-observers ( -- )
+    updated-definitions dup assoc-empty?
+    [ drop ] [ notify-definition-observers notify-error-observers ] if ;
 
 : finish-compilation-unit ( -- )
     remake-generics
@@ -116,8 +144,10 @@ GENERIC: definitions-changed ( assoc obj -- )
     update-tuples
     process-forgotten-definitions
     modify-code-heap
-    updated-definitions dup assoc-empty?
-    [ drop ] [ notify-definition-observers notify-error-observers ] if ;
+    bump-effect-counter
+    notify-observers ;
+
+PRIVATE>
 
 : with-nested-compilation-unit ( quot -- )
     [
@@ -126,6 +156,7 @@ GENERIC: definitions-changed ( assoc obj -- )
         H{ } clone changed-effects set
         H{ } clone outdated-generics set
         H{ } clone outdated-tuples set
+        H{ } clone new-words set
         H{ } clone new-classes set
         [ finish-compilation-unit ] [ ] cleanup
     ] with-scope ; inline
@@ -138,6 +169,7 @@ GENERIC: definitions-changed ( assoc obj -- )
         H{ } clone outdated-generics set
         H{ } clone forgotten-definitions set
         H{ } clone outdated-tuples set
+        H{ } clone new-words set
         H{ } clone new-classes set
         <definitions> new-definitions set
         <definitions> old-definitions set

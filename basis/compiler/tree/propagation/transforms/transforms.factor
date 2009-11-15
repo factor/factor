@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences words fry generic accessors
 classes.tuple classes classes.algebra definitions
-stack-checker.state quotations classes.tuple.private math
+stack-checker.dependencies quotations classes.tuple.private math
 math.partial-dispatch math.private math.intervals sets.private
 math.floats.private math.integers.private layouts math.order
 vectors hashtables combinators effects generalizations assocs
-sets combinators.short-circuit sequences.private locals
+sets combinators.short-circuit sequences.private locals growable
 stack-checker namespaces compiler.tree.propagation.info ;
 IN: compiler.tree.propagation.transforms
 
@@ -300,3 +300,10 @@ CONSTANT: lookup-table-at-max 256
     tester '[ _ filter ] ;
 
 \ intersect [ intersect-quot ] 1 define-partial-eval
+
+! Speeds up sum-file, sort and reverse-complement benchmarks by
+! compiling decoder-readln better
+\ push [
+    in-d>> second value-info class>> growable class<=
+    [ \ push def>> ] [ f ] if
+] "custom-inlining" set-word-prop

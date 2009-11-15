@@ -24,7 +24,7 @@ IN: benchmark.fannkuch
 
 : fannkuch ( n -- )
     [
-        [ 0 0 ] dip [ 1 + ] B{ } map-as
+        [ 0 0 ] dip iota [ 1 + ] B{ } map-as
         [ fannkuch-step ] each-permutation nip
     ] keep
     "Pfannkuchen(" write pprint ") = " write . ;

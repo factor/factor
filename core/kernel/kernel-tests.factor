@@ -169,3 +169,7 @@ IN: kernel.tests
 [ 3 -1 5/6 ] [ 1 2 3 4 5 6 [ + ] [ - ] [ / ] 2tri* ] unit-test
 
 [ { 1 2 } { 3 4 } { 5 6 } ] [ 1 2 3 4 5 6 [ 2array ] 2tri@ ] unit-test
+
+[ t ] [ { } identity-hashcode fixnum? ] unit-test
+[ 123 ] [ 123 identity-hashcode ] unit-test
+[ t ] [ f identity-hashcode fixnum? ] unit-test

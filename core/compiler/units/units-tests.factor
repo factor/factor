@@ -7,7 +7,7 @@ IN: compiler.units.tests
 
 ! Non-optimizing compiler bugs
 [ 1 1 ] [
-    "A" "B" <word> [ [ [ 1 ] dip ] 2array 1array modify-code-heap ] keep
+    "A" <uninterned-word> [ [ [ 1 ] dip ] 2array 1array modify-code-heap ] keep
     1 swap execute
 ] unit-test
 

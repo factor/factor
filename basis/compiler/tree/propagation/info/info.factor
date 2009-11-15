@@ -294,8 +294,11 @@ DEFER: (value-info-union)
 ! Assoc stack of current value --> info mapping
 SYMBOL: value-infos
 
+: value-info* ( value -- info ? )
+    resolve-copy value-infos get assoc-stack [ null-info or ] [ >boolean ] bi ; inline
+
 : value-info ( value -- info )
-    resolve-copy value-infos get assoc-stack null-info or ;
+    value-info* drop ;
 
 : set-value-info ( info value -- )
     resolve-copy value-infos get last set-at ;

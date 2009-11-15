@@ -430,7 +430,7 @@ M: x86 %vm-field-ptr ( dst field -- )
     [ [] ] dip data-alignment get align ADD ;
 
 : store-header ( temp class -- )
-    [ [] ] [ type-number tag-fixnum ] bi* MOV ;
+    [ [] ] [ type-number tag-header ] bi* MOV ;
 
 : store-tagged ( dst tag -- )
     type-number OR ;

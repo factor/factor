@@ -10,6 +10,7 @@ stack-checker.visitor
 stack-checker.backend
 stack-checker.branches
 stack-checker.known-words
+stack-checker.dependencies
 stack-checker.recursive-state ;
 IN: stack-checker.inlining
 
@@ -27,8 +28,6 @@ return calls
 fixed-point
 introductions
 loop? ;
-
-M: inline-recursive hashcode* id>> hashcode* ;
 
 : inlined-block? ( word -- ? ) "inlined-block" word-prop ;
 
@@ -81,7 +80,7 @@ SYMBOL: enter-out
     bi ;
 
 : recursive-word-inputs ( label -- n )
-    entry-stack-height d-in get + ;
+    entry-stack-height input-count get + ;
 
 : (inline-recursive-word) ( word -- label in out visitor terminated? )
     dup prepare-stack

@@ -117,7 +117,7 @@ M: blas-vector-base equal?
 
 M: blas-vector-base length
     length>> ;
-M: blas-vector-base virtual-seq
+M: blas-vector-base virtual-exemplar
     (blas-direct-array) ;
 M: blas-vector-base virtual@
     [ inc>> * ] [ nip (blas-direct-array) ] 2bi ;

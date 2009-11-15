@@ -26,7 +26,7 @@ IN: irc.client.internals
     irc> [ connect>> ] [ reconnect-attempts>> ] bi do-connect ;
 
 : /JOIN ( channel password -- )
-    [ " :" swap 3append ] when* "JOIN " prepend irc-print ;
+    [ " :" glue ] when* "JOIN " prepend irc-print ;
 
 : try-connect ( -- stream/f )
     irc> profile>> [ server>> ] [ port>> ] bi /CONNECT ;

@@ -182,15 +182,15 @@ PRIVATE>
     2dup bounds-check? [ nth-unsafe ] [ 2drop f ] if ; inline
 
 MIXIN: virtual-sequence
-GENERIC: virtual-seq ( seq -- seq' )
+GENERIC: virtual-exemplar ( seq -- seq' )
 GENERIC: virtual@ ( n seq -- n' seq' )
 
 M: virtual-sequence nth virtual@ nth ; inline
 M: virtual-sequence set-nth virtual@ set-nth ; inline
 M: virtual-sequence nth-unsafe virtual@ nth-unsafe ; inline
 M: virtual-sequence set-nth-unsafe virtual@ set-nth-unsafe ; inline
-M: virtual-sequence like virtual-seq like ; inline
-M: virtual-sequence new-sequence virtual-seq new-sequence ; inline
+M: virtual-sequence like virtual-exemplar like ; inline
+M: virtual-sequence new-sequence virtual-exemplar new-sequence ; inline
 
 INSTANCE: virtual-sequence sequence
 
@@ -199,7 +199,7 @@ TUPLE: reversed { seq read-only } ;
 
 C: <reversed> reversed
 
-M: reversed virtual-seq seq>> ; inline
+M: reversed virtual-exemplar seq>> ; inline
 M: reversed virtual@ seq>> [ length swap - 1 - ] keep ; inline
 M: reversed length seq>> length ; inline
 
@@ -231,7 +231,7 @@ TUPLE: slice-error from to seq reason ;
     check-slice
     slice boa ; inline
 
-M: slice virtual-seq seq>> ; inline
+M: slice virtual-exemplar seq>> ; inline
 
 M: slice virtual@ [ from>> + ] [ seq>> ] bi ; inline
 
@@ -659,9 +659,9 @@ PRIVATE>
         [ 0 swap copy ] keep
     ] new-like ;
 
-: suffix! ( seq elt -- seq ) over push ;
+: suffix! ( seq elt -- seq ) over push ; inline
 
-: append! ( seq1 seq2 -- seq1 ) over push-all ;
+: append! ( seq1 seq2 -- seq1 ) over push-all ; inline
 
 : last ( seq -- elt ) [ length 1 - ] [ nth ] bi ;
 

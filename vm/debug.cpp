@@ -243,7 +243,7 @@ struct object_dumper {
 
 	void operator()(object *obj)
 	{
-		if(type == TYPE_COUNT || obj->h.hi_tag() == type)
+		if(type == TYPE_COUNT || obj->type() == type)
 		{
 			std::cout << padded_address((cell)obj) << " ";
 			parent->print_nested_obj(tag_dynamic(obj),2);
@@ -288,7 +288,7 @@ struct data_reference_object_visitor {
 	void operator()(object *obj)
 	{
 		data_reference_slot_visitor visitor(look_for,obj,parent);
-		parent->do_slots(obj,visitor);
+		obj->each_slot(visitor);
 	}
 };
 
