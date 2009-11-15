@@ -25,7 +25,7 @@ struct image_header {
 	/* tagged pointer to bignum -1 */
 	cell bignum_neg_one;
 	/* Initial user environment */
-	cell userenv[USER_ENV];
+	cell special_objects[special_object_count];
 };
 
 struct vm_parameters {
@@ -34,7 +34,6 @@ struct vm_parameters {
 	cell ds_size, rs_size;
 	cell young_size, aging_size, tenured_size;
 	cell code_size;
-	bool secure_gc;
 	bool fep;
 	bool console;
 	bool signals;

@@ -107,7 +107,7 @@ M: method-renderer column-titles drop { "" "Method" "Count" } ;
 : method-matches? ( method generic class -- ? )
     [ first ] 2dip
     {
-        [ drop dup [ subwords memq? ] [ 2drop t ] if ]
+        [ drop dup [ subwords member-eq? ] [ 2drop t ] if ]
         [ nip dup [ swap "method-class" word-prop = ] [ 2drop t ] if ]
     } 3&& ;
 

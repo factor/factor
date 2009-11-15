@@ -54,6 +54,8 @@ ARTICLE: "power-functions" "Powers and logarithms"
 { $subsections log1+ log10 }
 "Raising a number to a power:"
 { $subsections ^ 10^ }
+"Finding the root of a number:"
+{ $subsections nth-root }
 "Converting between rectangular and polar form:"
 { $subsections
     abs
@@ -239,7 +241,7 @@ HELP: cis
 { cis exp } related-words
 
 HELP: polar>
-{ $values { "z" number } { "abs" "a non-negative real number" } { "arg" real } }
+{ $values { "abs" "a non-negative real number" } { "arg" real } { "z" number } }
 { $description "Converts an absolute value and argument (polar form) to a complex number." } ;
 
 HELP: [-1,1]?
@@ -258,6 +260,10 @@ HELP: ^
 { $values { "x" number } { "y" number } { "z" number } }
 { $description "Raises " { $snippet "x" } " to the power of " { $snippet "y" } ". If " { $snippet "y" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." }
 { $errors "Throws an error if " { $snippet "x" } " and " { $snippet "y" } " are both integer 0." } ;
+
+HELP: nth-root
+{ $values { "n" integer } { "x" number } { "y" number } }
+{ $description "Calculates the nth root of a number, such that " { $snippet "y^n=x" } "." } ;
 
 HELP: 10^
 { $values { "x" number } { "y" number } }

@@ -23,8 +23,8 @@ IN: math.integers.tests
 
 [ -1 ] [ 1 neg ] unit-test
 [ -1 ] [ 1 >bignum neg ] unit-test
-[ 268435456 ] [ -268435456 >fixnum -1 * ] unit-test
-[ 268435456 ] [ -268435456 >fixnum neg ] unit-test
+[ 134217728 ] [ -134217728 >fixnum -1 * ] unit-test
+[ 134217728 ] [ -134217728 >fixnum neg ] unit-test
 
 [ 9 3 ] [ 93 10 /mod ] unit-test
 [ 9 3 ] [ 93 >bignum 10 /mod ] unit-test
@@ -100,12 +100,12 @@ unit-test
 [ 16 ] [ 13 next-power-of-2 ] unit-test
 [ 16 ] [ 16 next-power-of-2 ] unit-test
 
-[ 268435456 ] [ -268435456 >fixnum -1 /i ] unit-test
-[ 268435456 0 ] [ -268435456 >fixnum -1 /mod ] unit-test
-[ 0 ] [ -1 -268435456 >fixnum /i ] unit-test
+[ 134217728 ] [ -134217728 >fixnum -1 /i ] unit-test
+[ 134217728 0 ] [ -134217728 >fixnum -1 /mod ] unit-test
+[ 0 ] [ -1 -134217728 >fixnum /i ] unit-test
 [ 4420880996869850977 ] [ 13262642990609552931 3 /i ] unit-test
-[ 0 -1 ] [ -1 -268435456 >fixnum /mod ] unit-test
-[ 0 -1 ] [ -1 -268435456 >bignum /mod ] unit-test
+[ 0 -1 ] [ -1 -134217728 >fixnum /mod ] unit-test
+[ 0 -1 ] [ -1 -134217728 >bignum /mod ] unit-test
 [ 14355 ] [ 1591517158873146351817850880000000 32769 mod ] unit-test
 [ 8 530505719624382123 ] [ 13262642990609552931 1591517158873146351 /mod ] unit-test
 [ 8 ] [ 13262642990609552931 1591517158873146351 /i ] unit-test
@@ -117,7 +117,7 @@ unit-test
 [ f ] [ 30 zero? ] unit-test
 [ t ] [ 0 >bignum zero? ] unit-test
 
-[ 4294967280 ] [ 268435455 >fixnum 16 fixnum* ] unit-test
+[ 2147483632 ] [ 134217727 >fixnum 16 fixnum* ] unit-test
 
 [ 23603949310011464311086123800853779733506160743636399259558684142844552151041 ]
 [
@@ -156,7 +156,7 @@ unit-test
 [ 4294967296 ] [ 1 32 shift ] unit-test
 [ 1267650600228229401496703205376 ] [ 1 100 shift ] unit-test
 
-[ t ] [ 1 27 shift fixnum? ] unit-test
+[ t ] [ 1 26 shift fixnum? ] unit-test
 
 [ t ] [
     t
@@ -226,3 +226,7 @@ unit-test
         [ >float / ] [ /f ] 2bi 0.1 ~
     ] all?
 ] unit-test
+
+! Ensure that /f is accurate for fixnums > 2^53 on 64-bit platforms
+[ HEX: 1.758bec11492f9p-54 ] [ 1 12345678901234567 /f ] unit-test
+[ HEX: -1.758bec11492f9p-54 ] [ 1 -12345678901234567 /f ] unit-test

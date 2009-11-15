@@ -21,16 +21,19 @@ $nl
 { $example "[ 2 + ] infer." "( object -- object )" } ;
 
 ARTICLE: "inference-combinators" "Combinator stack effects"
-"If a word, call it " { $snippet "W" } ", calls a combinator, one of the following two conditions must hold:"
+"If a word calls a combinator, one of the following two conditions must hold for the stack checker to succeed:"
 { $list
-  { "The combinator may be called with a quotation that is either a literal, or built from literals, " { $link curry } " and " { $link compose } "." }
-  { "The combinator must be called on an input parameter, or be built from input parameters, literals, " { $link curry } " and " { $link compose } ", " { $strong "if" } " the word " { $snippet "W" } " must be declared " { $link POSTPONE: inline } ". Then " { $snippet "W" } " is itself considered to be a combinator, and its callers must satisfy one of these two conditions." }
+  { "The combinator must be called with a quotation that is either literal or built from literal quotations, " { $link curry } ", and " { $link compose } ". (Note that quotations that use " { $vocab-link "fry" } " or " { $vocab-link "locals" } " use " { $link curry } " and " { $link compose } " from the perspective of the stack checker.)" }
+  { "If the word is declared " { $link POSTPONE: inline } ", the combinator may additionally be called on one of the word's input parameters or with quotations built from the word's input parameters, literal quotations, " { $link curry } ", and " { $link compose } ". When inline, a word is itself considered to be a combinator, and its callers must in turn satisfy these conditions." }
 }
-"If neither condition holds, the stack checker throws a " { $link literal-expected } " error, and an escape hatch such as " { $link POSTPONE: call( } " must be used instead. See " { $link "inference-escape" } " for details. An inline combinator can be called with an unknown quotation by currying the quotation onto a literal quotation that uses " { $link POSTPONE: call( } "."
+"If neither condition holds, the stack checker throws a " { $link unknown-macro-input } " or " { $link bad-macro-input } " error. To make the code compile, a runtime checking combinator such as " { $link POSTPONE: call( } " must be used instead. See " { $link "inference-escape" } " for details. An inline combinator can be called with an unknown quotation by " { $link curry } "ing the quotation onto a literal quotation that uses " { $link POSTPONE: call( } "."
 { $heading "Examples" }
 { $subheading "Calling a combinator" }
 "The following usage of " { $link map } " passes the stack checker, because the quotation is the result of " { $link curry } ":"
-{ $example "[ [ + ] curry map ] infer." "( object object -- object )" }
+{ $example "USING: math sequences ;" "[ [ + ] curry map ] infer." "( object object -- object )" }
+"The equivalent code using " { $vocab-link "fry" } " and " { $vocab-link "locals" } " likewise passes the stack checker:"
+{ $example "USING: fry math sequences ;" "[ '[ _ + ] map ] infer." "( object object -- object )" }
+{ $example "USING: locals math sequences ;" "[| a | [ a + ] map ] infer." "( object object -- object )" }
 { $subheading "Defining an inline combinator" }
 "The following word calls a quotation twice; the word is declared " { $link POSTPONE: inline } ", since it invokes " { $link call } " on the result of " { $link compose } " on an input parameter:"
 { $code ": twice ( value quot -- result ) dup compose call ; inline" }
@@ -48,15 +51,15 @@ ARTICLE: "inference-combinators" "Combinator stack effects"
 "However this fails to pass the stack checker since there is no guarantee the quotation has the right stack effect for " { $link map } ". It can be wrapped in a new quotation with a declaration:"
 { $code ": perform ( values action -- results )" "    quot>> [ call( value -- result ) ] curry map ;" }
 { $heading "Explanation" }
-"This restriction exists because without further information, one cannot say what the stack effect of " { $link call } " is; it depends on the given quotation. If the stack checker encounters a " { $link call } " without further information, a " { $link literal-expected } " error is raised."
+"This restriction exists because without further information, one cannot say what the stack effect of " { $link call } " is; it depends on the given quotation. If the stack checker encounters a " { $link call } " without further information, a " { $link unknown-macro-input } " or " { $link bad-macro-input } " error is raised."
 $nl
 "On the other hand, the stack effect of applying " { $link call } " to a literal quotation or a " { $link curry } " of a literal quotation is easy to compute; it behaves as if the quotation was substituted at that point."
 { $heading "Limitations" }
-"Passing a literal quotation on the data stack through an inlined recursive combinator nullifies its literal status. For example, the following will not infer:"
+"The stack checker cannot guarantee that a literal quotation is still literal if it is passed on the data stack to an inlined recursive combinator such as " { $link each } " or " { $link map } ". For example, the following will not infer:"
 { $example
-  "[ [ reverse ] swap [ reverse ] map swap call ] infer." "Got a computed value where a literal quotation was expected"
+  "[ [ reverse ] swap [ reverse ] map swap call ] infer." "Cannot apply “call” to a run-time computed value\nmacro call"
 }
-"To make this work, pass the quotation on the retain stack instead:"
+"To make this work, use " { $link dip } " to pass the quotation instead:"
 { $example
   "[ [ reverse ] [ [ reverse ] map ] dip call ] infer." "( object -- object )"
 } ;
@@ -74,7 +77,7 @@ $nl
 "Combinators which are recursive require additional care. In addition to being declared " { $link POSTPONE: inline } ", they must be declared " { $link POSTPONE: recursive } ". There are three restrictions that only apply to combinators with this declaration:"
 { $heading "Input quotation declaration" }
 "Input parameters which are quotations must be annotated as much in the stack effect. For example, the following will not infer:"
-{ $example ": bad ( quot -- ) [ call ] keep bad ; inline recursive" "[ [ ] bad ] infer." "Got a computed value where a literal quotation was expected" }
+{ $unchecked-example ": bad ( quot -- ) [ call ] keep bad ; inline recursive" "[ [ ] bad ] infer." "Cannot apply “call” to a run-time computed value\nmacro call" }
 "The following is correct:"
 { $example ": good ( quot: ( -- ) -- ) [ call ] keep good ; inline recursive" "[ [ ] good ] infer." "( -- )" }
 "The effect of the nested quotation itself is only present for documentation purposes; the mere presence of a nested effect is sufficient to mark that value as a quotation parameter."
@@ -82,7 +85,7 @@ $nl
 "The stack checker does not trace data flow in two instances."
 $nl
 "An inline recursive word cannot pass a quotation on the data stack through the recursive call. For example, the following will not infer:"
-{ $example ": bad ( ? quot: ( ? -- ) -- ) 2dup [ not ] dip bad call ; inline recursive" "[ [ drop ] bad ] infer." "Got a computed value where a literal quotation was expected" }
+{ $unchecked-example ": bad ( ? quot: ( ? -- ) -- ) 2dup [ not ] dip bad call ; inline recursive" "[ [ drop ] bad ] infer." "Cannot apply “call” to a run-time computed value\nmacro call" }
 "However a small change can be made:"
 { $example ": good ( ? quot: ( ? -- ) -- ) [ good ] 2keep [ not ] dip call ; inline recursive" "[ [ drop ] good ] infer." "( object -- )" }
 "An inline recursive word must have a fixed stack effect in its base case. The following will not infer:"

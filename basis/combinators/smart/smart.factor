@@ -46,5 +46,8 @@ MACRO: append-outputs ( quot -- seq )
 MACRO: preserving ( quot -- )
     [ infer in>> length ] keep '[ _ ndup @ ] ;
 
+MACRO: nullary ( quot -- quot' )
+    dup infer out>> length '[ @ _ ndrop ] ;
+
 MACRO: smart-if ( pred true false -- )
     '[ _ preserving _ _ if ] ; inline

@@ -1,5 +1,5 @@
-USING: help.markup help.syntax io.backend io.files io.directories strings
-sequences io.pathnames.private ;
+USING: help.markup help.syntax io.backend io.files
+io.directories strings system sequences io.pathnames.private ;
 IN: io.pathnames
 
 HELP: path-separator?
@@ -90,7 +90,7 @@ HELP: pathname
 
 HELP: normalize-path
 { $values { "path" "a pathname string" } { "path'" "a new pathname string" } }
-{ $description "Prepends the " { $link current-directory } " to the pathname, resolves a " { $snippet "resource:" } " or " { $snippet "voacb:" } " prefix, if present, and performs any platform-specific pathname normalization." }
+{ $description "Prepends the " { $link current-directory } " to the pathname, resolves a " { $snippet "resource:" } " or " { $snippet "vocab:" } " prefix, if present (see " { $link "io.pathnames.special" } "). Also converts the path into a UNC path on Windows." }
 { $notes "High-level words, such as " { $link <file-reader> } " and " { $link delete-file } " call this word for you. It only needs to be called directly when passing pathnames to C functions or external processes. This is because Factor does not use the operating system's notion of a current directory, and instead maintains its own dynamically-scoped " { $link current-directory } " variable." }
 { $notes "On Windows NT platforms, this word does prepends the Unicode path prefix." }
 { $examples
@@ -101,15 +101,15 @@ HELP: normalize-path
   }
 } ;
 
-HELP: (normalize-path)
+HELP: absolute-path
 { $values
     { "path" "a pathname string" }
     { "path'" "a pathname string" }
 }
-{ $description "Prepends the " { $link current-directory } " to the pathname and resolves a " { $snippet "resource:" } " prefix, if present." }
-{ $notes "On Windows NT platforms, this word does not prepend the Unicode path prefix." } ;
+{ $description "Prepends the " { $link current-directory } " to the pathname and resolves a " { $snippet "resource:" } " or " { $snippet "voacb:" } " prefix, if present (see " { $link "io.pathnames.special" } ")." }
+{ $notes "This word is exaclty the same as " { $link normalize-path } ", except on Windows NT platforms, where it does not prepend the Unicode path prefix. Most code should call " { $link normalize-path } " instead." } ;
 
-HELP: canonicalize-path
+HELP: resolve-symlinks
 { $values { "path" "a pathname string" } { "path'" "a new pathname string" } }
 { $description "Outputs a path where none of the path components are symlinks. This word is useful for determining the actual path on disk where a file is stored; the root of this absolute path is a mount point in the file-system." }
 { $notes "Most code should not need to call this word except in very special circumstances. One use case is finding the actual file-system on which a file is stored." } ;
@@ -128,8 +128,24 @@ HELP: home
     }
 } ;
 
+ARTICLE: "io.pathnames.special" "Special pathnames"
+"If a pathname begins with " { $snippet "resource:" } ", it is resolved relative to the directory containing the current image (see " { $link image } ")."
+$nl
+"If a pathname begins with " { $snippet "vocab:" } ", then it will be searched for in all current vocabulary roots (see " { $link "add-vocab-roots" } ")." ;
+
+ARTICLE: "io.pathnames.presentations" "Pathname presentations"
+"Pathname presentations are objects that wrap a pathname string. Clicking a pathname presentation in the UI brings up the file in one of the supported editors. See " { $link "editor" } " for more details."
+{ $subsections
+    pathname
+    <pathname>
+}
+"Literal pathname presentations:"
+{ $subsections POSTPONE: P" }
+"Many words that accept pathname strings can also work on pathname presentations." ;
+    
 ARTICLE: "io.pathnames" "Pathnames"
-"Pathnames are objects that contain a string representing the path to a file on disk. Pathnames are cross-platform; Windows accepts both forward and backward slashes as directory separators and new separators are added as a forward slash on all platforms. Clicking a pathname object in the UI brings up the file in one of the supported editors, but otherwise, pathnames and strings are interchangeable. See " { $link "editor" } " for more details." $nl
+"Pathnames are strings that refer to a file on disk. Pathname semantics are platform-specific, and Factor makes no attempt to abstract away the differences. Note that on Windows, both forward and backward slashes are accepted as directory separators."
+$nl
 "Pathname introspection:"
 { $subsections
     parent-directory
@@ -143,18 +159,9 @@ ARTICLE: "io.pathnames" "Pathnames"
     prepend-path
     append-path
 }
-"Pathname presentations:"
-{ $subsections
-    pathname
-    <pathname>
-}
-"Literal pathnames:"
-{ $subsections POSTPONE: P" }
-"Low-level words:"
-{ $subsections
-    normalize-path
-    (normalize-path)
-    canonicalize-path
-} ;
+"Normalizing pathnames:"
+{ $subsections normalize-path absolute-path resolve-symlinks }
+"Additional topics:"
+{ $subsections "io.pathnames.presentations" "io.pathnames.special" } ;
 
 ABOUT: "io.pathnames"

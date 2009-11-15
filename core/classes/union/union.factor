@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words sequences kernel assocs combinators classes
-classes.algebra namespaces arrays math quotations ;
+classes.algebra classes.algebra.private namespaces arrays math
+quotations ;
 IN: classes.union
 
 PREDICATE: union-class < class

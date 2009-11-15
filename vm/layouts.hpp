@@ -23,47 +23,41 @@ inline static cell align(cell a, cell b)
 	return (a + (b-1)) & ~(b-1);
 }
 
-inline static cell align8(cell a)
-{
-	return align(a,8);
-}
+static const cell data_alignment = 16;
 
 #define WORD_SIZE (signed)(sizeof(cell)*8)
 
-#define TAG_MASK 7
-#define TAG_BITS 3
+#define TAG_MASK 15
+#define TAG_BITS 4
 #define TAG(x) ((cell)(x) & TAG_MASK)
 #define UNTAG(x) ((cell)(x) & ~TAG_MASK)
 #define RETAG(x,tag) (UNTAG(x) | (tag))
 
 /*** Tags ***/
 #define FIXNUM_TYPE 0
-#define BIGNUM_TYPE 1
+#define F_TYPE 1
 #define ARRAY_TYPE 2
 #define FLOAT_TYPE 3
 #define QUOTATION_TYPE 4
-#define F_TYPE 5
-#define OBJECT_TYPE 6
+#define BIGNUM_TYPE 5
+#define ALIEN_TYPE 6
 #define TUPLE_TYPE 7
-
-#define HEADER_TYPE 8 /* anything less than this is a tag */
-
-#define GC_COLLECTED 5 /* can be anything other than FIXNUM_TYPE */
-
-/*** Header types ***/
 #define WRAPPER_TYPE 8
 #define BYTE_ARRAY_TYPE 9
 #define CALLSTACK_TYPE 10
 #define STRING_TYPE 11
 #define WORD_TYPE 12
 #define DLL_TYPE 13
-#define ALIEN_TYPE 14
 
-#define TYPE_COUNT 15
+#define TYPE_COUNT 14
 
-/* Not real types, but code_block's type can be set to this */
-#define PIC_TYPE 16
-#define FREE_BLOCK_TYPE 17
+enum code_block_type
+{
+	code_block_unoptimized,
+	code_block_optimized,
+	code_block_profiling,
+	code_block_pic
+};
 
 /* Constants used when floating-point trap exceptions are thrown */
 enum
@@ -80,7 +74,8 @@ static const cell false_object = F_TYPE;
 
 inline static bool immediate_p(cell obj)
 {
-	return (obj == false_object || TAG(obj) == FIXNUM_TYPE);
+	/* We assume that fixnums have tag 0 and false_object has tag 1 */
+	return TAG(obj) <= F_TYPE;
 }
 
 inline static fixnum untag_fixnum(cell tagged)
@@ -96,51 +91,62 @@ inline static cell tag_fixnum(fixnum untagged)
 	return RETAG(untagged << TAG_BITS,FIXNUM_TYPE);
 }
 
-inline static cell tag_for(cell type)
-{
-	return type < HEADER_TYPE ? type : OBJECT_TYPE;
-}
-
 struct object;
-
-struct header {
-	cell value;
-
-        /* Default ctor to make gcc 3.x happy */
-        explicit header() { abort(); }
-
-	explicit header(cell value_) : value(value_ << TAG_BITS) {}
-
-	void check_header() {
-#ifdef FACTOR_DEBUG
-		assert(TAG(value) == FIXNUM_TYPE && untag_fixnum(value) < TYPE_COUNT);
-#endif
-	}
-
-	cell hi_tag() {
-		check_header();
-		return value >> TAG_BITS;
-	}
-
-	bool forwarding_pointer_p() {
-		return TAG(value) == GC_COLLECTED;
-	}
-
-	object *forwarding_pointer() {
-		return (object *)UNTAG(value);
-	}
-
-	void forward_to(object *pointer) {
-		value = RETAG(pointer,GC_COLLECTED);
-	}
-};
 
 #define NO_TYPE_CHECK static const cell type_number = TYPE_COUNT
 
 struct object {
 	NO_TYPE_CHECK;
-	header h;
-	cell *slots() { return (cell *)this; }
+	cell header;
+
+	cell size() const;
+	cell binary_payload_start() const;
+
+	cell *slots() const { return (cell *)this; }
+
+	template<typename Iterator> void each_slot(Iterator &iter);
+
+	/* Only valid for objects in tenured space; must cast to free_heap_block
+	to do anything with it if its free */
+	bool free_p() const
+	{
+		return (header & 1) == 1;
+	}
+
+	cell type() const
+	{
+		return (header >> 2) & TAG_MASK;
+	}
+
+	void initialize(cell type)
+	{
+		header = type << 2;
+	}
+
+	cell hashcode() const
+	{
+		return (header >> 6);
+	}
+
+	void set_hashcode(cell hashcode)
+	{
+		header = (header & 0x3f) | (hashcode << 6);
+	}
+
+	bool forwarding_pointer_p() const
+	{
+		return (header & 2) == 2;
+	}
+
+	object *forwarding_pointer() const
+	{
+		return (object *)UNTAG(header);
+	}
+
+	void forward_to(object *pointer)
+	{
+		header = ((cell)pointer | 2);
+	}
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
@@ -150,7 +156,7 @@ struct array : public object {
 	/* tagged */
 	cell capacity;
 
-	cell *data() { return (cell *)(this + 1); }
+	cell *data() const { return (cell *)(this + 1); }
 };
 
 /* These are really just arrays, but certain elements have special
@@ -171,7 +177,7 @@ struct bignum : public object {
 	/* tagged */
 	cell capacity;
 
-	cell *data() { return (cell *)(this + 1); }
+	cell *data() const { return (cell *)(this + 1); }
 };
 
 struct byte_array : public object {
@@ -180,7 +186,12 @@ struct byte_array : public object {
 	/* tagged */
 	cell capacity;
 
-	template<typename Scalar> Scalar *data() { return (Scalar *)(this + 1); }
+#ifndef FACTOR_64
+	cell padding0;
+	cell padding1;
+#endif
+
+	template<typename Scalar> Scalar *data() const { return (Scalar *)(this + 1); }
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
@@ -193,39 +204,53 @@ struct string : public object {
 	/* tagged */
 	cell hashcode;
 
-	u8 *data() { return (u8 *)(this + 1); }
+	u8 *data() const { return (u8 *)(this + 1); }
+
+	cell nth(cell i) const;
 };
 
 /* The compiled code heap is structured into blocks. */
-struct heap_block
+struct code_block
 {
 	cell header;
-
-	cell type() { return (header >> 1) & 0x1f; }
-	void set_type(cell type)
-	{
-		header = ((header & ~(0x1f << 1)) | (type << 1));
-	}
-
-	cell size() { return (header >> 6); }
-	void set_size(cell size)
-	{
-		header = (header & 0x2f) | (size << 6);
-	}
-};
-
-struct free_heap_block : public heap_block
-{
-	free_heap_block *next_free;
-};
-
-struct code_block : public heap_block
-{
 	cell owner; /* tagged pointer to word, quotation or f */
 	cell literals; /* tagged pointer to array or f */
 	cell relocation; /* tagged pointer to byte-array or f */
 
-	void *xt() { return (void *)(this + 1); }
+	bool free_p() const
+	{
+		return (header & 1) == 1;
+	}
+
+	code_block_type type() const
+	{
+		return (code_block_type)((header >> 1) & 0x3);
+	}
+
+	void set_type(code_block_type type)
+	{
+		header = ((header & ~0x7) | (type << 1));
+	}
+
+	bool pic_p() const
+	{
+		return type() == code_block_pic;
+	}
+
+	bool optimized_p() const
+	{
+		return type() == code_block_optimized;
+	}
+
+	cell size() const
+	{
+		return header & ~7;
+	}
+
+	void *xt() const
+	{
+		return (void *)(this + 1);
+	}
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
@@ -298,6 +323,16 @@ struct alien : public object {
 	cell expired;
 	/* untagged */
 	cell displacement;
+	/* untagged */
+	cell address;
+
+	void update_address()
+	{
+		if(base == false_object)
+			address = displacement;
+		else
+			address = UNTAG(base) + sizeof(byte_array) + displacement;
+	}
 };
 
 struct dll : public object {
@@ -308,8 +343,7 @@ struct dll : public object {
 	void *dll;
 };
 
-struct stack_frame
-{
+struct stack_frame {
 	void *xt;
 	/* Frame size in bytes */
 	cell size;
@@ -320,13 +354,13 @@ struct callstack : public object {
 	/* tagged */
 	cell length;
 	
-	stack_frame *frame_at(cell offset)
+	stack_frame *frame_at(cell offset) const
 	{
 		return (stack_frame *)((char *)(this + 1) + offset);
 	}
 
-	stack_frame *top() { return (stack_frame *)(this + 1); }
-	stack_frame *bottom() { return (stack_frame *)((cell)(this + 1) + untag_fixnum(length)); }
+	stack_frame *top() const { return (stack_frame *)(this + 1); }
+	stack_frame *bottom() const { return (stack_frame *)((cell)(this + 1) + untag_fixnum(length)); }
 };
 
 struct tuple : public object {
@@ -334,7 +368,15 @@ struct tuple : public object {
 	/* tagged layout */
 	cell layout;
 
-	cell *data() { return (cell *)(this + 1); }
+	cell *data() const { return (cell *)(this + 1); }
+};
+
+struct data_root_range {
+	cell *start;
+	cell len;
+
+	explicit data_root_range(cell *start_, cell len_) :
+		start(start_), len(len_) {}
 };
 
 }

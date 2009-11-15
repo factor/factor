@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays hashtables sequence-parser
+USING: accessors arrays hashtables sequences.parser
 html.parser.utils kernel namespaces sequences math
 unicode.case unicode.categories combinators.short-circuit
 quoting fry ;

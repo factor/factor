@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: sequences kernel arrays vectors accessors assocs sorting math math.functions ;
+USING: sequences kernel arrays vectors accessors assocs shuffle sorting locals math math.functions ;
 
 IN: math.binpack 
 
@@ -9,10 +9,12 @@ IN: math.binpack
     [ [ values sum ] map ] keep
     zip sort-keys values first push ;
 
-: binpack ( assoc n -- bins )
-    [ sort-values <reversed> dup length ] dip
-    tuck / ceiling <array> [ <vector> ] map
-    tuck [ (binpack) ] curry each ;
+:: binpack ( assoc n -- bins )
+    assoc sort-values <reversed> :> values
+    values length :> #values
+    n #values n / ceiling <array> [ <vector> ] map :> bins
+    values [ bins (binpack) ] each
+    bins ;
 
 : binpack* ( items n -- bins )
     [ dup zip ] dip binpack [ keys ] map ;

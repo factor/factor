@@ -139,11 +139,11 @@ PRIVATE>
 
 : fuel-scaffold-vocab ( root name devname -- )
     [ fuel-scaffold-name dup [ scaffold-vocab ] dip ] with-scope
-    dup require vocab-source-path (normalize-path) fuel-eval-set-result ;
+    dup require vocab-source-path absolute-path fuel-eval-set-result ;
 
 : fuel-scaffold-help ( name devname -- )
     [ fuel-scaffold-name dup require dup scaffold-help ] with-scope
-    vocab-docs-path (normalize-path) fuel-eval-set-result ;
+    vocab-docs-path absolute-path fuel-eval-set-result ;
 
 : fuel-scaffold-get-root ( name -- ) find-vocab-root fuel-eval-set-result ;
 

@@ -5,7 +5,7 @@ USING: alien alien.c-types alien.syntax kernel libc
 sequences continuations byte-arrays strings math namespaces
 system combinators vocabs.loader accessors
 stack-checker macros locals generalizations unix.types
-io vocabs classes.struct unix.time ;
+io vocabs classes.struct unix.time alien.libraries ;
 IN: unix
 
 CONSTANT: PROT_NONE   0
@@ -48,18 +48,17 @@ ERROR: unix-error errno message ;
 ERROR: unix-system-call-error args errno message word ;
 
 MACRO:: unix-system-call ( quot -- )
-    [let | n [ quot infer in>> ]
-           word [ quot first ] |
-        [
-            n ndup quot call dup 0 < [
-                drop
-                n narray
-                errno dup strerror
-                word unix-system-call-error
-            ] [
-                n nnip
-            ] if
-        ]
+    quot infer in>> :> n
+    quot first :> word
+    [
+        n ndup quot call dup 0 < [
+            drop
+            n narray
+            errno dup strerror
+            word unix-system-call-error
+        ] [
+            n nnip
+        ] if
     ] ;
 
 HOOK: open-file os ( path flags mode -- fd )
@@ -221,3 +220,4 @@ FUNCTION: int utimes ( char* path, timeval[2] times ) ;
 
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
 
+"librt" "librt.so" "cdecl" add-library

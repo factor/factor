@@ -88,7 +88,7 @@ FUNCTION: HINSTANCE ShellExecuteW ( HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFi
 ALIAS: ShellExecute ShellExecuteW
 
 : open-in-explorer ( dir -- )
-    [ f "open" ] dip (normalize-path) f f SW_SHOWNORMAL ShellExecute drop ;
+    [ f "open" ] dip absolute-path f f SW_SHOWNORMAL ShellExecute drop ;
 
 : shell32-directory ( n -- str )
     f swap f SHGFP_TYPE_DEFAULT

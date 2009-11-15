@@ -60,7 +60,7 @@ TUPLE: nurbs-curve
 
 :: (eval-bases) ( curve t interval values order -- values' )
     order 2 - curve (knot-constants)>> nth :> all-knot-constants
-    interval order interval + all-knot-constants clip-range :> to :> from
+    interval order interval + all-knot-constants clip-range :> ( from to )
     from to all-knot-constants subseq :> knot-constants
     values { 0.0 } { 0.0 } surround 2 <clumps> :> bases
 

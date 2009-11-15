@@ -66,7 +66,7 @@ $nl
 $nl
 "Parsing words can read input, add word definitions to the dictionary, and do anything an ordinary word can."
 $nl
-"Because of the stack restriction, parsing words cannot pass data to other words by leaving values on the stack; instead, use " { $link parsed } " to add the data to the parse tree so that it can be evaluated later."
+"Because of the stack restriction, parsing words cannot pass data to other words by leaving values on the stack; instead, use " { $link suffix! } " to add the data to the parse tree so that it can be evaluated later."
 $nl
 "Parsing words cannot be called from the same source file where they are defined, because new definitions are only compiled at the end of the source file. An attempt to use a parsing word in its own source file raises an error:"
 { $subsections staging-violation }
@@ -172,11 +172,6 @@ $parsing-note ;
 
 { parse-tokens (parse-until) parse-until } related-words
 
-HELP: parsed
-{ $values { "accum" vector } { "obj" object } }
-{ $description "Convenience word for parsing words. It behaves exactly the same as " { $link push } ", except the accumulator remains on the stack." }
-$parsing-note ;
-
 HELP: (parse-lines)
 { $values { "lexer" lexer } { "quot" "a new " { $link quotation } } }
 { $description "Parses Factor source code using a custom lexer. The vocabulary search path is taken from the current scope." }
@@ -188,7 +183,7 @@ HELP: parse-lines
 { $errors "Throws a " { $link lexer-error } " if the input is malformed." } ;
 
 HELP: parse-base
-{ $values { "base" "an integer between 2 and 36" } { "parsed" integer } }
+{ $values { "parsed" integer } { "base" "an integer between 2 and 36" } { "parsed" integer } }
 { $description "Reads an integer in a specific numerical base from the parser input." }
 $parsing-note ;
 
@@ -221,7 +216,7 @@ HELP: filter-moved
 { $description "Removes all definitions from " { $snippet "assoc2" } " which are in " { $snippet "assoc1" } " or are are no longer present in the current " { $link file } "." } ;
 
 HELP: forget-smudged
-{ $description "Forgets removed definitions and prints a warning message if any of them are still referenced from other source files." } ;
+{ $description "Forgets removed definitions." } ;
 
 HELP: finish-parsing
 { $values { "lines" "the lines of text just parsed" } { "quot" "the quotation just parsed" } }

@@ -13,11 +13,11 @@ IN: kernel.tests
 [ ] [ 10000 [ [ -1 f <array> ] ignore-errors ] times ] unit-test
 
 ! Make sure we report the correct error on stack underflow
-[ clear drop ] [ { "kernel-error" 11 f f } = ] must-fail-with
+[ clear drop ] [ { "kernel-error" 10 f f } = ] must-fail-with
 
 [ ] [ :c ] unit-test
 
-[ 3 [ { } set-retainstack ] dip ] [ { "kernel-error" 13 f f } = ] must-fail-with
+[ 3 [ { } set-retainstack ] dip ] [ { "kernel-error" 12 f f } = ] must-fail-with
 
 [ ] [ :c ] unit-test
 
@@ -34,22 +34,19 @@ IN: kernel.tests
 [ t "no-compile" set-word-prop ] each
 >>
 
-[ overflow-d ] [ { "kernel-error" 12 f f } = ] must-fail-with
+[ overflow-d ] [ { "kernel-error" 11 f f } = ] must-fail-with
 
 [ ] [ :c ] unit-test
 
-[ overflow-d-alt ] [ { "kernel-error" 12 f f } = ] must-fail-with
+[ overflow-d-alt ] [ { "kernel-error" 11 f f } = ] must-fail-with
 
 [ ] [ [ :c ] with-string-writer drop ] unit-test
 
-[ overflow-r ] [ { "kernel-error" 14 f f } = ] must-fail-with
+[ overflow-r ] [ { "kernel-error" 13 f f } = ] must-fail-with
 
 [ ] [ :c ] unit-test
 
 [ -7 <byte-array> ] must-fail
-
-[ 2 3 4 1 ] [ 1 2 3 4 roll ] unit-test
-[ 1 2 3 4 ] [ 2 3 4 1 -roll ] unit-test
 
 [ 3 ] [ t 3 and ] unit-test
 [ f ] [ f 3 and ] unit-test
@@ -113,7 +110,7 @@ IN: kernel.tests
     < [ [ 1 + ] 3dip (loop) ] [ 2drop 2drop ] if ; inline recursive
 
 : loop ( obj -- )
-    H{ } values swap [ dup length swap ] dip 0 -roll (loop) ;
+    H{ } values swap [ dup length swap ] dip [ 0 ] 3dip (loop) ;
 
 [ loop ] must-fail
 
@@ -172,3 +169,7 @@ IN: kernel.tests
 [ 3 -1 5/6 ] [ 1 2 3 4 5 6 [ + ] [ - ] [ / ] 2tri* ] unit-test
 
 [ { 1 2 } { 3 4 } { 5 6 } ] [ 1 2 3 4 5 6 [ 2array ] 2tri@ ] unit-test
+
+[ t ] [ { } identity-hashcode fixnum? ] unit-test
+[ 123 ] [ 123 identity-hashcode ] unit-test
+[ t ] [ f identity-hashcode fixnum? ] unit-test

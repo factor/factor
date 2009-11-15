@@ -1,41 +1,19 @@
-! Copyright (C) 2008 Daniel Ehrenberg
+! Copyright (C) 2008 Daniel Ehrenberg, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math.parser arrays io.encodings sequences kernel assocs
 hashtables io.encodings.ascii generic parser classes.tuple words
 words.symbol io io.files splitting namespaces math
 compiler.units accessors classes.singleton classes.mixin
-io.encodings.iana fry simple-flat-file ;
+io.encodings.iana fry simple-flat-file lexer ;
 IN: io.encodings.8-bit
 
 <PRIVATE
-
-CONSTANT: mappings {
-    ! encoding-name iana-name file-name
-    { "latin1" "ISO_8859-1:1987" "8859-1" }
-    { "latin2" "ISO_8859-2:1987" "8859-2" }
-    { "latin3" "ISO_8859-3:1988" "8859-3" }
-    { "latin4" "ISO_8859-4:1988" "8859-4" }
-    { "latin/cyrillic" "ISO_8859-5:1988" "8859-5" }
-    { "latin/arabic" "ISO_8859-6:1987" "8859-6" }
-    { "latin/greek" "ISO_8859-7:1987" "8859-7" }
-    { "latin/hebrew" "ISO_8859-8:1988" "8859-8" }
-    { "latin5" "ISO_8859-9:1989" "8859-9" }
-    { "latin6" "ISO-8859-10" "8859-10" }
-    { "latin/thai" "TIS-620" "8859-11" }
-    { "latin7" "ISO-8859-13" "8859-13" }
-    { "latin8" "ISO-8859-14" "8859-14" }
-    { "latin9" "ISO-8859-15" "8859-15" }
-    { "latin10" "ISO-8859-16" "8859-16" }
-    { "koi8-r" "KOI8-R" "KOI8-R" }
-    { "windows-1252" "windows-1252" "CP1252" }
-    { "ebcdic" "IBM037" "CP037" }
-    { "mac-roman" "macintosh" "ROMAN" }
-}
 
 : encoding-file ( file-name -- stream )
     "vocab:io/encodings/8-bit/" ".TXT" surround ;
 
 SYMBOL: 8-bit-encodings
+8-bit-encodings [ H{ } clone ] initialize
 
 TUPLE: 8-bit biassoc ;
 
@@ -61,20 +39,17 @@ M: 8-bit-encoding <decoder>
     8-bit-encodings get-global at <decoder> ;
 
 : create-encoding ( name -- word )
-    "io.encodings.8-bit" create
+    create-in
     [ define-singleton-class ]
     [ 8-bit-encoding add-mixin-instance ]
     [ ] tri ;
 
+: load-encoding ( name iana-name file-name -- )
+    [ create-encoding dup ]
+    [ register-encoding ]
+    [ encoding-file flat-file>biassoc 8-bit boa ] tri*
+    swap 8-bit-encodings get-global set-at ;
+
 PRIVATE>
 
-[
-    mappings [
-        first3
-        [ create-encoding ]
-        [ dupd register-encoding ]
-        [ encoding-file flat-file>biassoc 8-bit boa ]
-        tri*
-    ] H{ } map>assoc
-    8-bit-encodings set-global
-] with-compilation-unit
+SYNTAX: 8-BIT: scan scan scan load-encoding ;

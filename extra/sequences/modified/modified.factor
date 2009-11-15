@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel math math.order
+USING: accessors arrays kernel locals math math.order
 sequences sequences.private shuffle ;
 IN: sequences.modified
 
@@ -21,7 +21,7 @@ TUPLE: 1modified < modified seq ;
 M: modified length seq>> length ;
 M: modified set-length seq>> set-length ;
 
-M: 1modified virtual-seq seq>> ;
+M: 1modified virtual-exemplar seq>> ;
 
 TUPLE: scaled < 1modified c ;
 C: <scaled> scaled
@@ -32,9 +32,9 @@ C: <scaled> scaled
 M: scaled modified-nth ( n seq -- elt )
     [ seq>> nth ] [ c>> * ] bi ;
 
-M: scaled modified-set-nth ( elt n seq -- elt )
+M:: scaled modified-set-nth ( elt n seq -- elt )
     ! don't set c to 0!
-    tuck [ c>> / ] 2dip seq>> set-nth ;
+    elt seq c>> / n seq seq>> set-nth ;
 
 TUPLE: offset < 1modified n ;
 C: <offset> offset
@@ -45,8 +45,8 @@ C: <offset> offset
 M: offset modified-nth ( n seq -- elt )
     [ seq>> nth ] [ n>> + ] bi ;
 
-M: offset modified-set-nth ( elt n seq -- )
-    tuck [ n>> - ] 2dip seq>> set-nth ;
+M:: offset modified-set-nth ( elt n seq -- )
+    elt seq n>> - n seq seq>> set-nth ;
 
 TUPLE: summed < modified seqs ;
 C: <summed> summed
@@ -71,7 +71,8 @@ M: summed modified-set-nth ( elt n seq -- ) immutable ;
 M: summed set-length ( n seq -- )
     seqs>> [ set-length ] with each ;
 
-M: summed virtual-seq ( summed -- seq ) [ ] { } map-as ;
+M: summed virtual-exemplar ( summed -- seq )
+    seqs>> [ f ] [ first ] if-empty ;
 
 : <2summed> ( seq seq -- summed-seq ) 2array <summed> ;
 : <3summed> ( seq seq seq -- summed-seq ) 3array <summed> ;

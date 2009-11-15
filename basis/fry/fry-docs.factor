@@ -2,17 +2,20 @@ USING: help.markup help.syntax quotations kernel ;
 IN: fry
 
 HELP: _
-{ $description "Fry specifier. Inserts a literal value into the fried quotation." } ;
+{ $description "Fry specifier. Inserts a literal value into the fried quotation." }
+{ $examples "See " { $link "fry.examples" } "." } ;
 
 HELP: @
-{ $description "Fry specifier. Splices a quotation into the fried quotation." } ;
+{ $description "Fry specifier. Splices a quotation into the fried quotation." }
+{ $examples "See " { $link "fry.examples" } "." } ;
 
 HELP: fry
 { $values { "quot" quotation } { "quot'" quotation } }
 { $description "Outputs a quotation that when called, fries " { $snippet "quot" } " by taking values from the stack and substituting them in." }
 { $notes "This word is used to implement " { $link POSTPONE: '[ } "; the following two lines are equivalent:"
     { $code "[ X ] fry call" "'[ X ]" }
-} ;
+}
+{ $examples "See " { $link "fry.examples" } "." } ;
 
 HELP: '[
 { $syntax "'[ code... ]" }
@@ -59,7 +62,6 @@ $nl
     { { $link literalize } { $snippet ": literalize '[ _ ] ;" } }
     { { $link curry } { $snippet ": curry '[ _ @ ] ;" } }
     { { $link compose } { $snippet ": compose '[ @ @ ] ;" } }
-    { { $link bi@ } { $snippet ": bi@ tuck '[ _ @ _ @ ] call ;" } }
 } ;
 
 ARTICLE: "fry.philosophy" "Fried quotation philosophy"
@@ -68,10 +70,10 @@ ARTICLE: "fry.philosophy" "Fried quotation philosophy"
     "'[ [ _ key? ] all? ] filter"
     "[ [ key? ] curry all? ] curry filter"
 }
-"There is a mapping from fried quotations to lexical closures as defined in the " { $vocab-link "locals" } " vocabulary. Namely, a fried quotation is equivalent to a “let” form where each local binding is only used once, and bindings are used in the same order in which they are defined. The following two lines are equivalent:"
+"There is a mapping from fried quotations to lexical closures as defined in the " { $vocab-link "locals" } " vocabulary. Namely, a fried quotation is equivalent to a " { $snippet "[| | ]" } " form where each local binding is only used once, and bindings are used in the same order in which they are defined. The following two lines are equivalent:"
 { $code
     "'[ 3 _ + 4 _ / ]"
-    "[let | a [ ] b [ ] | [ 3 a + 4 b / ] ]"
+    "[| a b | 3 a + 4 b / ]"
 } ;
 
 ARTICLE: "fry" "Fried quotations"

@@ -48,7 +48,7 @@ M:: lagged-fibonacci seed-random ( lagged-fibonacci seed! -- lagged-fibonacci )
             t 0.5 * t!
         ] times
         s
-    ] change-each
+    ] map! drop
     lagged-fibonacci p-r >>pt0
         q-r >>pt1 ; inline
 

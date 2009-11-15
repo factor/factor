@@ -69,7 +69,7 @@ CONSTANT: rs-reg 14
 [
     3 ds-reg 0 LWZ
     ds-reg dup 4 SUBI
-    0 3 \ f tag-number CMPI
+    0 3 \ f type-number CMPI
     2 BEQ
     0 B rc-relative-ppc-3 rt-xt jit-rel
     0 B rc-relative-ppc-3 rt-xt jit-rel
@@ -174,39 +174,14 @@ CONSTANT: rs-reg 14
 
 [ load-tag ] pic-tag jit-define
 
-! Hi-tag
-[
-    3 4 MR
-    load-tag
-    0 4 object tag-number tag-fixnum CMPI
-    2 BNE
-    4 3 object tag-number neg LWZ
-] pic-hi-tag jit-define
-
 ! Tuple
 [
     3 4 MR
     load-tag
-    0 4 tuple tag-number tag-fixnum CMPI
+    0 4 tuple type-number tag-fixnum CMPI
     2 BNE
-    4 3 tuple tag-number neg bootstrap-cell + LWZ
+    4 3 tuple type-number neg bootstrap-cell + LWZ
 ] pic-tuple jit-define
-
-! Hi-tag and tuple
-[
-    3 4 MR
-    load-tag
-    ! If bits 2 and 3 are set, the tag is either 6 (object) or 7 (tuple)
-    0 4 BIN: 110 tag-fixnum CMPI
-    5 BLT
-    ! Untag r3
-    3 3 0 0 31 tag-bits get - RLWINM
-    ! Set r4 to 0 for objects, and bootstrap-cell for tuples
-    4 4 1 tag-fixnum ANDI
-    4 4 1 SRAWI
-    ! Load header cell or tuple layout cell
-    4 4 3 LWZX
-] pic-hi-tag-tuple jit-define
 
 [
     0 4 0 CMPI rc-absolute-ppc-2 rt-immediate jit-rel
@@ -215,7 +190,7 @@ CONSTANT: rs-reg 14
 [
     0 5 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
     4 0 5 CMP
-] pic-check jit-define
+] pic-check-tuple jit-define
 
 [ 2 BNE 0 B rc-relative-ppc-3 rt-xt jit-rel ] pic-hit jit-define
 
@@ -224,8 +199,8 @@ CONSTANT: rs-reg 14
 [
     ! cache = ...
     0 3 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
-    ! key = class
-    5 4 MR
+    ! key = hashcode(class)
+    5 4 1 SRAWI
     ! key &= cache.length - 1
     5 5 mega-cache-size get 1 - bootstrap-cell * ANDI
     ! cache += array-start-offset
@@ -278,7 +253,7 @@ CONSTANT: rs-reg 14
 [
     3 ds-reg 0 LWZ
     4 ds-reg -4 LWZU
-    3 3 1 SRAWI
+    3 3 2 SRAWI
     4 4 0 0 31 tag-bits get - RLWINM
     4 3 3 LWZX
     3 ds-reg 0 STW
@@ -352,14 +327,6 @@ CONSTANT: rs-reg 14
 [
     3 ds-reg 0 LWZ
     4 ds-reg -4 LWZ
-    3 ds-reg 4 STWU
-    4 ds-reg -4 STW
-    3 ds-reg -8 STW
-] \ tuck define-sub-primitive
-
-[
-    3 ds-reg 0 LWZ
-    4 ds-reg -4 LWZ
     3 ds-reg -4 STW
     4 ds-reg 0 STW
 ] \ swap define-sub-primitive
@@ -399,7 +366,7 @@ CONSTANT: rs-reg 14
     5 ds-reg -4 LWZU
     5 0 4 CMP
     2 swap execute( offset -- ) ! magic number
-    \ f tag-number 3 LI
+    \ f type-number 3 LI
     3 ds-reg 0 STW ;
 
 : define-jit-compare ( insn word -- )
@@ -418,7 +385,7 @@ CONSTANT: rs-reg 14
     4 ds-reg 0 LWZ
     3 3 4 OR
     3 3 tag-mask get ANDI
-    \ f tag-number 4 LI
+    \ f type-number 4 LI
     0 3 0 CMPI
     2 BNE
     1 tag-fixnum 4 LI
@@ -503,7 +470,7 @@ CONSTANT: rs-reg 14
 
 [
     3 ds-reg 0 LWZ
-    3 3 1 SRAWI
+    3 3 2 SRAWI
     rs-reg 3 3 LWZX
     3 ds-reg 0 STW
 ] \ get-local define-sub-primitive
@@ -511,7 +478,7 @@ CONSTANT: rs-reg 14
 [
     3 ds-reg 0 LWZ
     ds-reg ds-reg 4 SUBI
-    3 3 1 SRAWI
+    3 3 2 SRAWI
     rs-reg 3 rs-reg SUBF
 ] \ drop-locals define-sub-primitive
 

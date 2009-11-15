@@ -27,14 +27,16 @@ IN: compiler.tree.propagation.recursive.tests
 ] unit-test
 
 [ t ] [
+    T{ interval f { -268435456 t } { 268435455 t } }
     T{ interval f { 1 t } { 268435455 t } }
-    T{ interval f { -268435456 t } { 268435455 t } } tuck
+    over
     integer generalize-counter-interval =
 ] unit-test
 
 [ t ] [
+    T{ interval f { -268435456 t } { 268435455 t } }
     T{ interval f { 1 t } { 268435455 t } }
-    T{ interval f { -268435456 t } { 268435455 t } } tuck
+    over
     fixnum generalize-counter-interval =
 ] unit-test
 

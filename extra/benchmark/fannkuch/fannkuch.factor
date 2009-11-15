@@ -12,7 +12,7 @@ IN: benchmark.fannkuch
 : count-flips ( perm -- flip# )
     '[
         _ dup first dup 1 =
-        [ 2drop f ] [ head-slice reverse-here t ] if
+        [ 2drop f ] [ head-slice reverse! drop t ] if
     ] count ; inline
 
 : write-permutation ( perm -- )
@@ -24,7 +24,7 @@ IN: benchmark.fannkuch
 
 : fannkuch ( n -- )
     [
-        [ 0 0 ] dip [ 1 + ] B{ } map-as
+        [ 0 0 ] dip iota [ 1 + ] B{ } map-as
         [ fannkuch-step ] each-permutation nip
     ] keep
     "Pfannkuchen(" write pprint ") = " write . ;

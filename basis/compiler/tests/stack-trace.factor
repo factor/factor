@@ -19,7 +19,7 @@ IN: compiler.tests.stack-trace
 
 : bleh ( seq -- seq' ) [ 3 + ] map [ 0 > ] filter ;
 
-: stack-trace-any? ( word -- ? ) symbolic-stack-trace memq? ;
+: stack-trace-any? ( word -- ? ) symbolic-stack-trace member-eq? ;
 
 [ t ] [
     [ { 1 "hi" } bleh ] ignore-errors \ + stack-trace-any?

@@ -87,42 +87,51 @@ SYMBOL: error-stream
 
 : bl ( -- ) " " write ;
 
-<PRIVATE
-
 : each-morsel ( handler: ( data -- ) reader: ( -- data ) -- )
     [ dup ] compose swap while drop ; inline
 
-: stream-element-exemplar ( type -- exemplar )
+<PRIVATE
+
+: (stream-element-exemplar) ( type -- exemplar )
     {
         { +byte+ [ B{ } ] }
         { +character+ [ "" ] }
-    } case ;
+    } case ; inline
+
+: stream-element-exemplar ( stream -- exemplar )
+    stream-element-type (stream-element-exemplar) ;
 
 : element-exemplar ( -- exemplar )
-    input-stream get
-    stream-element-type
-    stream-element-exemplar ;
+    input-stream get stream-element-exemplar ; inline
 
 PRIVATE>
 
-: each-line ( quot -- )
-    [ readln ] each-morsel ; inline
+: each-stream-line ( stream quot -- )
+    swap [ stream-readln ] curry each-morsel ; inline
 
-: lines ( -- seq )
-    [ ] accumulator [ each-line ] dip { } like ;
+: each-line ( quot -- )
+    input-stream get swap each-stream-line ; inline
 
 : stream-lines ( stream -- seq )
-    [ lines ] with-input-stream ;
+    [ [ ] accumulator [ each-stream-line ] dip { } like ] with-disposal ;
 
-: contents ( -- seq )
-    [ 65536 read-partial dup ] [ ] produce nip
-    element-exemplar concat-as ;
+: lines ( -- seq )
+    input-stream get stream-lines ; inline
 
 : stream-contents ( stream -- seq )
-    [ contents ] with-input-stream ;
+    [
+        [ [ 65536 swap stream-read-partial dup ] curry [ ] produce nip ]
+        [ stream-element-exemplar concat-as ] bi
+    ] with-disposal ;
+
+: contents ( -- seq )
+    input-stream get stream-contents ; inline
+
+: each-stream-block ( stream quot: ( block -- ) -- )
+    swap [ 8192 swap stream-read-partial ] curry each-morsel ; inline
 
 : each-block ( quot: ( block -- ) -- )
-    [ 8192 read-partial ] each-morsel ; inline
+    input-stream get swap each-stream-block ; inline
 
 : stream-copy ( in out -- )
     [ [ [ write ] each-block ] with-output-stream ]

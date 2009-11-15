@@ -3,7 +3,7 @@ USING: accessors arrays classes classes.tuple combinators
 combinators.short-circuit definitions effects fry hints
 math kernel kernel.private namespaces parser quotations
 sequences slots words locals 
-locals.parser macros stack-checker.state ;
+locals.parser macros stack-checker.dependencies ;
 IN: typed
 
 ERROR: type-mismatch-error word expected-types ;
@@ -79,7 +79,8 @@ DEFER: make-boxer
     [ drop [ ] ] if ;
 
 : make-boxer ( types -- quot )
-    [ boxer ] [ swap '[ @ _ dip ] ] map-reduce ;
+    [ [ ] ]
+    [ [ boxer ] [ swap '[ @ _ dip ] ] map-reduce ] if-empty ;
 
 ! defining typed words
 

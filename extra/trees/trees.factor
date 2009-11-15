@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel generic math sequences arrays io namespaces
 prettyprint.private kernel.private assocs random combinators
-parser math.order accessors deques make prettyprint.custom ;
+parser math.order accessors deques make prettyprint.custom 
+shuffle ;
 IN: trees
 
 TUPLE: tree root count ;

@@ -17,7 +17,7 @@ CONSTANT: roman-values
 ERROR: roman-range-error n ;
 
 : roman-range-check ( n -- n )
-    dup 1 3999 between? [ roman-range-error ] unless ;
+    dup 1 10000 between? [ roman-range-error ] unless ;
 
 : roman-digit-index ( ch -- n )
     1string roman-digits index ; inline
@@ -43,7 +43,7 @@ PRIVATE>
 : >ROMAN ( n -- str ) >roman >upper ;
 
 : roman> ( str -- n )
-    >lower [ roman>= ] monotonic-split [ (roman>) ] sigma ;
+    >lower [ roman>= ] monotonic-split [ (roman>) ] map-sum ;
 
 <PRIVATE
 
@@ -69,4 +69,4 @@ ROMAN-OP: *
 ROMAN-OP: /i
 ROMAN-OP: /mod
 
-SYNTAX: ROMAN: scan roman> parsed ;
+SYNTAX: ROMAN: scan roman> suffix! ;

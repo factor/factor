@@ -45,7 +45,7 @@ SPECIALIZED-ARRAYS: bool ushort char uint float ulonglong ;
 
 [ ushort-array{ 0 0 0 } ] [
     3 ALIEN: 123 100 <direct-ushort-array> new-sequence
-    dup [ drop 0 ] change-each
+    [ drop 0 ] map!
 ] unit-test
 
 STRUCT: test-struct

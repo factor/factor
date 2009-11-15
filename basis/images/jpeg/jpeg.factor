@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays combinators
-grouping compression.huffman images
+grouping compression.huffman images fry
 images.processing io io.binary io.encodings.binary io.files
 io.streams.byte-array kernel locals math math.bitwise
 math.constants math.functions math.matrices math.order
@@ -232,7 +232,7 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
     block dup length>> sqrt >fixnum group flip
     dup matrix-dim coord-matrix flip
     [
-        [ first2 spin nth nth ]
+        [ '[ _ [ second ] [ first ] bi ] dip nth nth ]
         [ x,y v+ color-id jpeg-image draw-color ] bi
     ] with each^2 ;
 
@@ -295,7 +295,7 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
     binary [
         [
             { HEX: FF } read-until
-            read1 tuck HEX: 00 = and
+            read1 [ HEX: 00 = and ] keep swap
         ]
         [ drop ] produce
         swap >marker {  EOI } assert=
@@ -354,7 +354,7 @@ SINGLETONS: YUV420 YUV444 Y MAGIC! ;
     [ decode-macroblock 2array ] accumulator 
     [ all-macroblocks ] dip
     jpeg> setup-bitmap draw-macroblocks 
-    jpeg> bitmap>> 3 <groups> [ color-transform ] change-each
+    jpeg> bitmap>> 3 <groups> [ color-transform ] map! drop
     jpeg> [ >byte-array ] change-bitmap drop ;
 
 ERROR: not-a-jpeg-image ;

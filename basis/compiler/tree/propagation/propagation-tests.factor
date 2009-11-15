@@ -226,9 +226,25 @@ IN: compiler.tree.propagation.tests
 
 [ V{ fixnum } ] [
     [
+        [ { fixnum } declare ] [ drop f ] if
+        dup [ dup 13 eq? [ t ] [ f ] if ] [ t ] if
+        [ "Oops" throw ] when
+    ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [
         >fixnum
         dup [ 10 < ] [ -10 > ] bi and not [ 2 * ] unless
     ] final-classes
+] unit-test
+
+[ ] [
+    [
+        dup dup dup [ 100 < ] [ drop f ] if dup
+        [ 2drop f ] [ 2drop f ] if
+        [ ] [ dup [ ] [ ] if ] if
+    ] final-info drop
 ] unit-test
 
 [ V{ fixnum } ] [
@@ -408,7 +424,15 @@ IN: compiler.tree.propagation.tests
 ] unit-test
 
 [ V{ fixnum } ] [
+    [ { fixnum fixnum } declare 7 bitand neg >bignum shift ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
     [ { fixnum } declare 1 swap 7 bitand shift ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [ { fixnum } declare 1 swap 7 bitand >bignum shift ] final-classes
 ] unit-test
 
 cell-bits 32 = [
@@ -859,8 +883,8 @@ SYMBOL: not-an-assoc
 [ t ] [ [ { 1 2 3 } member? ] { member? } inlined? ] unit-test
 [ f ] [ [ { 1 2 3 } swap member? ] { member? } inlined? ] unit-test
 
-[ t ] [ [ { 1 2 3 } memq? ] { memq? } inlined? ] unit-test
-[ f ] [ [ { 1 2 3 } swap memq? ] { memq? } inlined? ] unit-test
+[ t ] [ [ { 1 2 3 } member-eq? ] { member-eq? } inlined? ] unit-test
+[ f ] [ [ { 1 2 3 } swap member-eq? ] { member-eq? } inlined? ] unit-test
 
 [ t ] [ [ V{ } clone ] { clone (clone) } inlined? ] unit-test
 [ f ] [ [ { } clone ] { clone (clone) } inlined? ] unit-test
@@ -882,10 +906,10 @@ M: tuple-with-read-only-slot clone
     [ { 1 2 3 } dup tuple-with-read-only-slot boa clone x>> eq? ] final-classes
 ] unit-test
 
-! alien-cell outputs a simple-alien or f
+! alien-cell outputs a alien or f
 [ t ] [
     [ { byte-array fixnum } declare alien-cell dup [ "OOPS" throw ] unless ] final-classes
-    first simple-alien class=
+    first alien class=
 ] unit-test
 
 ! Don't crash if bad literal inputs are passed to unsafe words
@@ -900,9 +924,21 @@ M: tuple-with-read-only-slot clone
 [ t ] [ [ void* <c-direct-array> ] { <c-direct-array> } inlined? ] unit-test
 [ V{ void*-array } ] [ [ void* <c-direct-array> ] final-classes ] unit-test
 
+! bitand identities
 [ t ] [ [ alien-unsigned-1 255 bitand ] { bitand fixnum-bitand } inlined? ] unit-test
 [ t ] [ [ alien-unsigned-1 255 swap bitand ] { bitand fixnum-bitand } inlined? ] unit-test
 
 [ t ] [ [ { fixnum } declare 256 rem -256 bitand ] { fixnum-bitand } inlined? ] unit-test
 [ t ] [ [ { fixnum } declare 250 rem -256 bitand ] { fixnum-bitand } inlined? ] unit-test
 [ f ] [ [ { fixnum } declare 257 rem -256 bitand ] { fixnum-bitand } inlined? ] unit-test
+
+[ V{ fixnum } ] [ [ >bignum 10 mod 2^ ] final-classes ] unit-test
+[ V{ bignum } ] [ [ >bignum 10 bitand ] final-classes ] unit-test
+[ V{ bignum } ] [ [ >bignum 10 >bignum bitand ] final-classes ] unit-test
+[ V{ bignum } ] [ [ >bignum 10 mod ] final-classes ] unit-test
+[ V{ bignum } ] [ [ { fixnum } declare -1 >bignum bitand ] final-classes ] unit-test
+[ V{ bignum } ] [ [ { fixnum } declare -1 >bignum swap bitand ] final-classes ] unit-test
+
+! Could be bignum not integer but who cares
+[ V{ integer } ] [ [ 10 >bignum bitand ] final-classes ] unit-test
+

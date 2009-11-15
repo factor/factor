@@ -491,7 +491,7 @@ cell-bits 32 = [
 ] unit-test
 
 [ t ] [
-    [ { array } declare 2 <groups> [ . . ] assoc-each ]
+    [ { array } declare 2 <sliced-groups> [ . . ] assoc-each ]
     \ nth-unsafe inlined?
 ] unit-test
 

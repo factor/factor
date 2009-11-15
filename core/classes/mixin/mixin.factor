@@ -34,7 +34,7 @@ TUPLE: check-mixin-class class ;
     ] unless ;
 
 : if-mixin-member? ( class mixin true false -- )
-    [ check-mixin-class 2dup members memq? ] 2dip if ; inline
+    [ check-mixin-class 2dup members member-eq? ] 2dip if ; inline
 
 : change-mixin-class ( class mixin quot -- )
     [ [ members swap bootstrap-word ] dip call ] [ drop ] 2bi

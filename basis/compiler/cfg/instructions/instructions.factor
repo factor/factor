@@ -417,12 +417,12 @@ def: dst/scalar-rep
 use: src
 literal: rep ;
 
-PURE-INSN: ##horizontal-shl-vector
+PURE-INSN: ##horizontal-shl-vector-imm
 def: dst
 use: src1
 literal: src2 rep ;
 
-PURE-INSN: ##horizontal-shr-vector
+PURE-INSN: ##horizontal-shr-vector-imm
 def: dst
 use: src1
 literal: src2 rep ;
@@ -461,6 +461,16 @@ PURE-INSN: ##not-vector
 def: dst
 use: src
 literal: rep ;
+
+PURE-INSN: ##shl-vector-imm
+def: dst
+use: src1
+literal: src2 rep ;
+
+PURE-INSN: ##shr-vector-imm
+def: dst
+use: src1
+literal: src2 rep ;
 
 PURE-INSN: ##shl-vector
 def: dst
@@ -502,13 +512,12 @@ temp: temp/int-rep ;
 PURE-INSN: ##box-displaced-alien
 def: dst/int-rep
 use: displacement/int-rep base/int-rep
-temp: temp1/int-rep temp2/int-rep
+temp: temp/int-rep
 literal: base-class ;
 
 PURE-INSN: ##unbox-any-c-ptr
 def: dst/int-rep
-use: src/int-rep
-temp: temp/int-rep ;
+use: src/int-rep ;
 
 : ##unbox-f ( dst src -- ) drop 0 ##load-immediate ;
 : ##unbox-byte-array ( dst src -- ) byte-array-offset ##add-imm ;
@@ -517,12 +526,12 @@ PURE-INSN: ##unbox-alien
 def: dst/int-rep
 use: src/int-rep ;
 
-: ##unbox-c-ptr ( dst src class temp -- )
+: ##unbox-c-ptr ( dst src class -- )
     {
-        { [ over \ f class<= ] [ 2drop ##unbox-f ] }
-        { [ over simple-alien class<= ] [ 2drop ##unbox-alien ] }
-        { [ over byte-array class<= ] [ 2drop ##unbox-byte-array ] }
-        [ nip ##unbox-any-c-ptr ]
+        { [ dup \ f class<= ] [ drop ##unbox-f ] }
+        { [ dup alien class<= ] [ drop ##unbox-alien ] }
+        { [ dup byte-array class<= ] [ drop ##unbox-byte-array ] }
+        [ drop ##unbox-any-c-ptr ]
     } cond ;
 
 ! Alien accessors
@@ -833,7 +842,7 @@ SYMBOL: vreg-insn
 [
     vreg-insn
     insn-classes get [
-        "insn-slots" word-prop [ type>> { def use temp } memq? ] any?
+        "insn-slots" word-prop [ type>> { def use temp } member-eq? ] any?
     ] filter
     define-union-class
 ] with-compilation-unit

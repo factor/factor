@@ -75,9 +75,8 @@ SYMBOLS:
     get-controllers [ product-id = ] with filter ;
 : find-controller-instance ( product-id instance-id -- controller/f )
     get-controllers [
-        tuck
         [ product-id  = ]
-        [ instance-id = ] 2bi* and
+        [ instance-id = ] bi-curry bi* and
     ] with with find nip ;
 
 TUPLE: keyboard-state keys ;

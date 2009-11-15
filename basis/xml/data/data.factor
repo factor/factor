@@ -66,7 +66,7 @@ M: attrs clear-assoc
     f >>alist drop ;
 M: attrs delete-at
     [ nip ] [ attr@ drop ] 2bi
-    [ swap alist>> delete-nth ] [ drop ] if* ;
+    [ swap alist>> remove-nth! drop ] [ drop ] if* ;
 
 M: attrs clone
     alist>> clone <attrs> ;

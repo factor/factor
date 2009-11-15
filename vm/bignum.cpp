@@ -1299,7 +1299,7 @@ bignum *factor_vm::bignum_digit_to_bignum(bignum_digit_type digit, int negative_
 bignum *factor_vm::allot_bignum(bignum_length_type length, int negative_p)
 {
 	BIGNUM_ASSERT ((length >= 0) || (length < BIGNUM_RADIX));
-	bignum * result = allot_array_internal<bignum>(length + 1);
+	bignum * result = allot_uninitialized_array<bignum>(length + 1);
 	BIGNUM_SET_NEGATIVE_P (result, negative_p);
 	return (result);
 }

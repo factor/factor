@@ -42,10 +42,10 @@ M: TYPE assoc-size ( db -- size ) handle>> DBRNUM ;
     ] while 3drop ;
 
 M: TYPE >alist ( db -- alist )
-    [ DBKEYS dup ] keep '[ dup _ at 2array ] change-each ;
+    [ DBKEYS dup ] keep '[ dup _ at 2array ] map! drop ;
 
 M: TYPE set-at ( value key db -- )
-    handle>> spin [ object>bytes dup length ] bi@ DBPUT drop ;
+    handle>> swap rot [ object>bytes dup length ] bi@ DBPUT drop ;
 
 M: TYPE delete-at ( key db -- )
     handle>> swap object>bytes dup length DBOUT drop ;

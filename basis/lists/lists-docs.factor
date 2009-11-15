@@ -44,7 +44,6 @@ ARTICLE: { "lists" "combinators" } "Combinators for lists"
     foldl
     foldr
     lmap>array
-    traverse
 } ;
 
 ARTICLE: { "lists" "manipulation" } "Manipulating lists"
@@ -122,7 +121,7 @@ HELP: uncons
 { $description "Put the head and tail of the list on the stack." } ;
 
 HELP: unswons
-{ $values { "cons" list } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
+{ $values { "cons" list } { "cdr" "the tail of the list" } { "car" "the head of the list" } }
 { $description "Put the head and tail of the list on the stack." } ;
 
 { leach foldl lmap>array } related-words
@@ -150,12 +149,6 @@ HELP: lreverse
 HELP: list>array    
 { $values { "list" list } { "array" array } }
 { $description "Convert a list into an array." } ;
-
-HELP: traverse    
-{ $values { "list"  list } { "pred" { $quotation "( list/elt -- ? )" } }
-          { "quot" { $quotation "( list/elt -- result)" } }  { "result" "a new cons object" } }
-{ $description "Recursively traverses the list object, replacing any elements (which can themselves be sublists) that pred" 
- " returns true for with the result of applying quot to." } ;
 
 HELP: list
 { $class-description "The class of lists. All lists are expected to conform to " { $link { "lists" "protocol" } } "." } ;

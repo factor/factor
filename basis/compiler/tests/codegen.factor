@@ -175,20 +175,6 @@ TUPLE: my-tuple ;
     ] compile-call
 ] unit-test
 
-[ 1 t ] [
-    B{ 1 2 3 4 } [
-        { c-ptr } declare
-        [ 0 alien-unsigned-1 ] keep hi-tag
-    ] compile-call byte-array type-number =
-] unit-test
-
-[ t ] [
-    B{ 1 2 3 4 } [
-        { c-ptr } declare
-        0 alien-cell hi-tag
-    ] compile-call alien type-number =
-] unit-test
-
 [ 2 1 ] [
     2 1
     [ 2dup fixnum< [ [ die ] dip ] when ] compile-call
@@ -270,8 +256,8 @@ TUPLE: id obj ;
     { float } declare dup 0 =
     [ drop 1 ] [
         dup 0 >=
-        [ 2 "double" "libm" "pow" { "double" "double" } alien-invoke ]
-        [ -0.5 "double" "libm" "pow" { "double" "double" } alien-invoke ]
+        [ 2 double "libm" "pow" { double double } alien-invoke ]
+        [ -0.5 double "libm" "pow" { double double } alien-invoke ]
         if
     ] if ;
 

@@ -163,8 +163,8 @@ M: vector-rep supported-simd-op?
         { \ (simd-v*)            [ %mul-vector-reps            ] }
         { \ (simd-vs*)           [ %saturated-mul-vector-reps  ] }
         { \ (simd-v/)            [ %div-vector-reps            ] }
-        { \ (simd-vmin)          [ %min-vector-reps            ] }
-        { \ (simd-vmax)          [ %max-vector-reps            ] }
+        { \ (simd-vmin)          [ %min-vector-reps cc< %compare-vector-reps union ] }
+        { \ (simd-vmax)          [ %max-vector-reps cc> %compare-vector-reps union ] }
         { \ (simd-v.)            [ %dot-vector-reps            ] }
         { \ (simd-vsqrt)         [ %sqrt-vector-reps           ] }
         { \ (simd-sum)           [ %horizontal-add-vector-reps ] }
@@ -181,8 +181,8 @@ M: vector-rep supported-simd-op?
         { \ (simd-vnot)          [ %xor-vector-reps            ] }
         { \ (simd-vlshift)       [ %shl-vector-reps            ] }
         { \ (simd-vrshift)       [ %shr-vector-reps            ] }
-        { \ (simd-hlshift)       [ %horizontal-shl-vector-reps ] }
-        { \ (simd-hrshift)       [ %horizontal-shr-vector-reps ] }
+        { \ (simd-hlshift)       [ %horizontal-shl-vector-imm-reps ] }
+        { \ (simd-hrshift)       [ %horizontal-shr-vector-imm-reps ] }
         { \ (simd-vshuffle-elements) [ (%shuffle-imm-reps)         ] }
         { \ (simd-vshuffle-bytes)    [ %shuffle-vector-reps        ] }
         { \ (simd-(vmerge-head)) [ %merge-vector-reps          ] }
@@ -193,12 +193,12 @@ M: vector-rep supported-simd-op?
         { \ (simd-(vpack-unsigned)) [ %unsigned-pack-vector-reps ] }
         { \ (simd-(vunpack-head))   [ (%unpack-reps)             ] }
         { \ (simd-(vunpack-tail))   [ (%unpack-reps)             ] }
-        { \ (simd-v<=)           [ cc<= %compare-vector-reps   ] }
-        { \ (simd-v<)            [ cc< %compare-vector-reps    ] }
-        { \ (simd-v=)            [ cc= %compare-vector-reps    ] }
-        { \ (simd-v>)            [ cc> %compare-vector-reps    ] }
-        { \ (simd-v>=)           [ cc>= %compare-vector-reps   ] }
-        { \ (simd-vunordered?)   [ cc/<>= %compare-vector-reps ] }
+        { \ (simd-v<=)           [ unsign-rep cc<= %compare-vector-reps   ] }
+        { \ (simd-v<)            [ unsign-rep cc< %compare-vector-reps    ] }
+        { \ (simd-v=)            [ unsign-rep cc= %compare-vector-reps    ] }
+        { \ (simd-v>)            [ unsign-rep cc> %compare-vector-reps    ] }
+        { \ (simd-v>=)           [ unsign-rep cc>= %compare-vector-reps   ] }
+        { \ (simd-vunordered?)   [ unsign-rep cc/<>= %compare-vector-reps ] }
         { \ (simd-gather-2)      [ %gather-vector-2-reps       ] }
         { \ (simd-gather-4)      [ %gather-vector-4-reps       ] }
         { \ (simd-vany?)         [ %test-vector-reps           ] }

@@ -82,7 +82,7 @@ IN: compiler.cfg.value-numbering.tests
         T{ ##load-reference f 1 + }
         T{ ##peek f 2 D 0 }
         T{ ##compare f 4 2 1 cc> }
-        T{ ##compare-imm f 6 4 5 cc/= }
+        T{ ##compare-imm f 6 4 $[ \ f type-number ] cc/= }
         T{ ##replace f 6 D 0 }
     } value-numbering-step trim-temps
 ] unit-test
@@ -100,7 +100,7 @@ IN: compiler.cfg.value-numbering.tests
         T{ ##load-reference f 1 + }
         T{ ##peek f 2 D 0 }
         T{ ##compare f 4 2 1 cc<= }
-        T{ ##compare-imm f 6 4 5 cc= }
+        T{ ##compare-imm f 6 4 $[ \ f type-number ] cc= }
         T{ ##replace f 6 D 0 }
     } value-numbering-step trim-temps
 ] unit-test
@@ -118,7 +118,7 @@ IN: compiler.cfg.value-numbering.tests
         T{ ##peek f 8 D 0 }
         T{ ##peek f 9 D -1 }
         T{ ##compare-float-unordered f 12 8 9 cc< }
-        T{ ##compare-imm f 14 12 5 cc= }
+        T{ ##compare-imm f 14 12 $[ \ f type-number ] cc= }
         T{ ##replace f 14 D 0 }
     } value-numbering-step trim-temps
 ] unit-test
@@ -135,7 +135,7 @@ IN: compiler.cfg.value-numbering.tests
         T{ ##peek f 29 D -1 }
         T{ ##peek f 30 D -2 }
         T{ ##compare f 33 29 30 cc<= }
-        T{ ##compare-imm-branch f 33 5 cc/= }
+        T{ ##compare-imm-branch f 33 $[ \ f type-number ] cc/= }
     } value-numbering-step trim-temps
 ] unit-test
 
@@ -149,7 +149,7 @@ IN: compiler.cfg.value-numbering.tests
     {
         T{ ##peek f 1 D -1 }
         T{ ##test-vector f 2 1 f float-4-rep vcc-any }
-        T{ ##compare-imm-branch f 2 5 cc/= }
+        T{ ##compare-imm-branch f 2 $[ \ f type-number ] cc/= }
     } value-numbering-step trim-temps
 ] unit-test
 
@@ -1071,14 +1071,14 @@ cell 8 = [
 ! Branch folding
 [
     {
-        T{ ##load-immediate f 1 1 }
-        T{ ##load-immediate f 2 2 }
-        T{ ##load-immediate f 3 5 }
+        T{ ##load-immediate f 1 10 }
+        T{ ##load-immediate f 2 20 }
+        T{ ##load-immediate f 3 $[ \ f type-number ] }
     }
 ] [
     {
-        T{ ##load-immediate f 1 1 }
-        T{ ##load-immediate f 2 2 }
+        T{ ##load-immediate f 1 10 }
+        T{ ##load-immediate f 2 20 }
         T{ ##compare f 3 1 2 cc= }
     } value-numbering-step
 ] unit-test
@@ -1113,14 +1113,14 @@ cell 8 = [
 
 [
     {
-        T{ ##load-immediate f 1 1 }
-        T{ ##load-immediate f 2 2 }
-        T{ ##load-immediate f 3 5 }
+        T{ ##load-immediate f 1 10 }
+        T{ ##load-immediate f 2 20 }
+        T{ ##load-immediate f 3 $[ \ f type-number ] }
     }
 ] [
     {
-        T{ ##load-immediate f 1 1 }
-        T{ ##load-immediate f 2 2 }
+        T{ ##load-immediate f 1 10 }
+        T{ ##load-immediate f 2 20 }
         T{ ##compare f 3 2 1 cc< }
     } value-numbering-step
 ] unit-test
@@ -1128,7 +1128,7 @@ cell 8 = [
 [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##load-immediate f 1 5 }
+        T{ ##load-immediate f 1 $[ \ f type-number ] }
     }
 ] [
     {
@@ -1152,7 +1152,7 @@ cell 8 = [
 [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##load-immediate f 1 5 }
+        T{ ##load-immediate f 1 $[ \ f type-number ] }
     }
 ] [
     {
@@ -1176,7 +1176,7 @@ cell 8 = [
 [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##load-immediate f 1 5 }
+        T{ ##load-immediate f 1 $[ \ f type-number ] }
     }
 ] [
     {
@@ -1280,6 +1280,128 @@ cell 8 = [
         T{ ##xor-vector f 2 1 1 float-4-rep }
     } value-numbering-step
 ] unit-test
+
+! NOT x AND y => x ANDN y
+
+[
+    {
+        T{ ##fill-vector f 3 float-4-rep }
+        T{ ##xor-vector  f 4 0 3 float-4-rep }
+        T{ ##andn-vector f 5 0 1 float-4-rep }
+    }
+] [
+    {
+        T{ ##fill-vector f 3 float-4-rep }
+        T{ ##xor-vector  f 4 0 3 float-4-rep }
+        T{ ##and-vector  f 5 4 1 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##not-vector  f 4 0 float-4-rep }
+        T{ ##andn-vector f 5 0 1 float-4-rep }
+    }
+] [
+    {
+        T{ ##not-vector  f 4 0 float-4-rep }
+        T{ ##and-vector  f 5 4 1 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+! x AND NOT y => y ANDN x
+
+[
+    {
+        T{ ##fill-vector f 3 float-4-rep }
+        T{ ##xor-vector  f 4 0 3 float-4-rep }
+        T{ ##andn-vector f 5 0 1 float-4-rep }
+    }
+] [
+    {
+        T{ ##fill-vector f 3 float-4-rep }
+        T{ ##xor-vector  f 4 0 3 float-4-rep }
+        T{ ##and-vector  f 5 1 4 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##not-vector  f 4 0 float-4-rep }
+        T{ ##andn-vector f 5 0 1 float-4-rep }
+    }
+] [
+    {
+        T{ ##not-vector  f 4 0 float-4-rep }
+        T{ ##and-vector  f 5 1 4 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+! NOT x ANDN y => x AND y
+
+[
+    {
+        T{ ##fill-vector f 3 float-4-rep }
+        T{ ##xor-vector  f 4 0 3 float-4-rep }
+        T{ ##and-vector  f 5 0 1 float-4-rep }
+    }
+] [
+    {
+        T{ ##fill-vector f 3 float-4-rep }
+        T{ ##xor-vector  f 4 0 3 float-4-rep }
+        T{ ##andn-vector f 5 4 1 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##not-vector  f 4 0 float-4-rep }
+        T{ ##and-vector  f 5 0 1 float-4-rep }
+    }
+] [
+    {
+        T{ ##not-vector  f 4 0 float-4-rep }
+        T{ ##andn-vector f 5 4 1 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+! AND <=> ANDN
+
+[
+    {
+        T{ ##fill-vector f 3 float-4-rep }
+        T{ ##xor-vector  f 4 0 3 float-4-rep }
+        T{ ##andn-vector f 5 0 1 float-4-rep }
+        T{ ##and-vector  f 6 0 2 float-4-rep }
+        T{ ##or-vector   f 7 5 6 float-4-rep }
+    }
+] [
+    {
+        T{ ##fill-vector f 3 float-4-rep }
+        T{ ##xor-vector  f 4 0 3 float-4-rep }
+        T{ ##and-vector  f 5 4 1 float-4-rep }
+        T{ ##andn-vector f 6 4 2 float-4-rep }
+        T{ ##or-vector   f 7 5 6 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##not-vector  f 4 0   float-4-rep }
+        T{ ##andn-vector f 5 0 1 float-4-rep }
+        T{ ##and-vector  f 6 0 2 float-4-rep }
+        T{ ##or-vector   f 7 5 6 float-4-rep }
+    }
+] [
+    {
+        T{ ##not-vector  f 4 0   float-4-rep }
+        T{ ##and-vector  f 5 4 1 float-4-rep }
+        T{ ##andn-vector f 6 4 2 float-4-rep }
+        T{ ##or-vector   f 7 5 6 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+! branch folding
 
 : test-branch-folding ( insns -- insns' n )
     <basic-block>
@@ -1435,7 +1557,7 @@ cell 8 = [
     {
         T{ ##peek f 0 D 0 }
         T{ ##compare f 1 0 0 cc<= }
-        T{ ##compare-imm-branch f 1 5 cc/= }
+        T{ ##compare-imm-branch f 1 $[ \ f type-number ] cc/= }
     } test-branch-folding
 ] unit-test
 
@@ -1537,7 +1659,7 @@ V{
     T{ ##copy { dst 21 } { src 20 } { rep any-rep } }
     T{ ##compare-imm-branch
         { src1 21 }
-        { src2 5 }
+        { src2 $[ \ f type-number ] }
         { cc cc/= }
     }
 } 1 test-bb

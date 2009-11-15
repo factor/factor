@@ -117,5 +117,5 @@ M: insn live-insn? defs-vreg [ live-vreg? ] [ t ] if* ;
     dup
     [ [ instructions>> [ build-liveness-graph ] each ] each-basic-block ]
     [ [ instructions>> [ compute-live-vregs ] each ] each-basic-block ]
-    [ [ instructions>> [ live-insn? ] filter-here ] each-basic-block ]
+    [ [ instructions>> [ live-insn? ] filter! drop ] each-basic-block ]
     tri ;

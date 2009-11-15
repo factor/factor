@@ -88,8 +88,8 @@ CONSTANT: simd-classes
         {
             [ "print-mr" get [ nip test-mr mr. ] [ 2drop ] if ]
             [ "print-checks" get [ [ . ] bi@ ] [ 2drop ] if ]
-            [ [ call ] dip call ]
-            [ [ call ] dip compile-call ]
+            [ [ [ call ] dip call ] call( quot quot -- result ) ]
+            [ [ [ call ] dip compile-call ] call( quot quot -- result ) ]
         } 2cleave
         @ not
     ] filter ; inline
@@ -233,7 +233,7 @@ simd-classes&reps [
     ] [ ] map-as
     word '[ _ execute ] ;
 
-: check-boolean-ops ( class elt-class compare-quot -- )
+: check-boolean-ops ( class elt-class compare-quot -- seq )
     [
         [ boolean-ops [ dup word-schema ] { } map>assoc ] 2dip
         '[ first2 inputs _ _ check-boolean-op ]
@@ -357,13 +357,15 @@ simd-classes [
     new [ drop 16 random ] map ;
 
 :: test-shift-vector ( class -- ? )
-    class random-int-vector :> src
-    char-16 random-shift-vector :> perm
-    { class char-16 } :> decl
-
-    src perm vshuffle
-    src perm [ decl declare vshuffle ] compile-call
-    = ; inline
+    [
+        class random-int-vector :> src
+        char-16 random-shift-vector :> perm
+        { class char-16 } :> decl
+    
+        src perm vshuffle
+        src perm [ decl declare vshuffle ] compile-call
+        =
+    ] call( -- ? ) ;
 
 { char-16 uchar-16 short-8 ushort-8 int-4 uint-4 longlong-2 ulonglong-2 }
 [ 10 swap '[ [ t ] [ _ test-shift-vector ] unit-test ] times ] each
@@ -371,19 +373,23 @@ simd-classes [
 "== Checking vector tests" print
 
 :: test-vector-tests-bool ( vector declaration -- none? any? all? )
-    vector
-    [ [ declaration declare vnone? ] compile-call ]
-    [ [ declaration declare vany?  ] compile-call ]
-    [ [ declaration declare vall?  ] compile-call ] tri ; inline
+    [
+        vector
+        [ [ declaration declare vnone? ] compile-call ]
+        [ [ declaration declare vany?  ] compile-call ]
+        [ [ declaration declare vall?  ] compile-call ] tri
+    ] call( -- none? any? all? ) ;
 
 : yes ( -- x ) t ;
 : no ( -- x ) f ;
 
 :: test-vector-tests-branch ( vector declaration -- none? any? all? )
-    vector
-    [ [ declaration declare vnone? [ yes ] [ no ] if ] compile-call ]
-    [ [ declaration declare vany?  [ yes ] [ no ] if ] compile-call ]
-    [ [ declaration declare vall?  [ yes ] [ no ] if ] compile-call ] tri ; inline
+    [
+        vector
+        [ [ declaration declare vnone? [ yes ] [ no ] if ] compile-call ]
+        [ [ declaration declare vany?  [ yes ] [ no ] if ] compile-call ]
+        [ [ declaration declare vall?  [ yes ] [ no ] if ] compile-call ] tri
+    ] call( -- none? any? all? ) ;
 
 TUPLE: inconsistent-vector-test bool branch ;
 
@@ -391,12 +397,14 @@ TUPLE: inconsistent-vector-test bool branch ;
     2dup = [ drop ] [ inconsistent-vector-test boa ] if ;
 
 :: test-vector-tests ( vector decl -- none? any? all? )
-    vector decl test-vector-tests-bool :> bool-all :> bool-any :> bool-none
-    vector decl test-vector-tests-branch :> branch-all :> branch-any :> branch-none
-    
-    bool-none branch-none ?inconsistent
-    bool-any  branch-any  ?inconsistent
-    bool-all  branch-all  ?inconsistent ; inline
+    [
+        vector decl test-vector-tests-bool :> ( bool-none bool-any bool-all )
+        vector decl test-vector-tests-branch :> ( branch-none branch-any branch-all )
+        
+        bool-none branch-none ?inconsistent
+        bool-any  branch-any  ?inconsistent
+        bool-all  branch-all  ?inconsistent
+    ] call( -- none? any? all? ) ;
 
 [ f t t ]
 [ float-4{ t t t t } { float-4 } test-vector-tests ] unit-test
@@ -470,7 +478,7 @@ TUPLE: inconsistent-vector-test bool branch ;
 "== Checking broadcast" print
 : test-broadcast ( seq -- failures )
     [ length >array ] keep
-    '[ [ _ 1quotation ] dip '[ _ vbroadcast ] ] [ = ] check-optimizer ; inline
+    '[ [ _ 1quotation ] dip '[ _ vbroadcast ] ] [ = ] check-optimizer ;
 
 [ { } ] [ float-4{ 1.0 2.0 3.0 4.0 } test-broadcast ] unit-test
 [ { } ] [ int-4{ HEX: 7fffffff 3 4 -8 } test-broadcast ] unit-test
@@ -582,3 +590,20 @@ STRUCT: simd-struct
     float-4{ 1.0 0.0 1.0 0.0 } pi [ broken 3array ]
     [ compile-call ] [ call ] 3bi =
 ] unit-test
+
+! Spilling SIMD values -- this basically just tests that the
+! stack was aligned properly by the runtime
+
+: simd-spill-test-1 ( a b c -- v )
+    { float-4 float-4 float } declare 
+    [ v+ ] dip sin v*n ;
+
+[ float-4{ 0 0 0 0 } ]
+[ float-4{ 1 2 3 4 } float-4{ 4 5 6 7 } 0.0 simd-spill-test-1 ] unit-test
+
+: simd-spill-test-2 ( a b d c -- v )
+    { float float-4 float-4 float } declare 
+    [ [ 3.0 + ] 2dip v+ ] dip sin v*n n*v ;
+
+[ float-4{ 0 0 0 0 } ]
+[ 5.0 float-4{ 1 2 3 4 } float-4{ 4 5 6 7 } 0.0 simd-spill-test-2 ] unit-test

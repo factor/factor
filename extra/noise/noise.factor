@@ -56,7 +56,7 @@ ERROR: invalid-perlin-noise-table table ;
     dup { [ byte-array? ] [ length 512 >= ] } 1&&
     [ invalid-perlin-noise-table ] unless ;
 
-! XXX doesn't work for NaNs or floats > 2^31
+! XXX doesn't work when v is nan or |v| >= 2^31
 : floor-vector ( v -- v' )
     [ float-4 int-4 vconvert int-4 float-4 vconvert ]
     [ [ v> -1.0 float-4-with vand ] curry keep v+ ] bi ; inline

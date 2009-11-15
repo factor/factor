@@ -49,5 +49,5 @@ HINTS: natural-search array ;
 : sorted-member? ( obj seq -- ? )
     dupd natural-search nip = ;
 
-: sorted-memq? ( obj seq -- ? )
+: sorted-member-eq? ( obj seq -- ? )
     dupd natural-search nip eq? ;

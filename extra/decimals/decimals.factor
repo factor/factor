@@ -20,7 +20,7 @@ TUPLE: decimal { mantissa read-only } { exponent read-only } ;
 
 : parse-decimal ( -- decimal ) scan string>decimal ;
 
-SYNTAX: D: parse-decimal parsed ;
+SYNTAX: D: parse-decimal suffix! ;
 
 : decimal>ratio ( decimal -- ratio ) >decimal< 10^ * ;
 : decimal>float ( decimal -- ratio ) decimal>ratio >float ;
@@ -37,8 +37,7 @@ SYNTAX: D: parse-decimal parsed ;
     ] 2bi ;
 
 : scale-decimals ( D1 D2 -- D1' D2' )
-    [ drop ]
-    [ scale-mantissas <decimal> nip ] 2bi ;
+    scale-mantissas [ <decimal> ] curry bi@ ;
 
 ERROR: decimal-types-expected d1 d2 ;
 
@@ -76,10 +75,13 @@ M: decimal before?
 
 :: D/ ( D1 D2 a -- D3 )
     D1 D2 guard-decimals 2drop
-    D1 >decimal< :> e1 :> m1
-    D2 >decimal< :> e2 :> m2
+    D1 >decimal< :> ( m1 e1 )
+    D2 >decimal< :> ( m2 e2 )
     m1 a 10^ *
     m2 /i
     
     e1
     e2 a + - <decimal> ;
+
+M: decimal <=>
+    2dup before? [ 2drop +lt+ ] [ equal? +eq+ +gt+ ? ] if ; inline

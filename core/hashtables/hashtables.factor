@@ -101,7 +101,7 @@ M: hashtable at* ( key hash -- value ? )
     key@ [ 3 fixnum+fast slot t ] [ 2drop f f ] if ;
 
 M: hashtable clear-assoc ( hash -- )
-    [ init-hash ] [ array>> [ drop ((empty)) ] change-each ] bi ;
+    [ init-hash ] [ array>> [ drop ((empty)) ] map! drop ] bi ;
 
 M: hashtable delete-at ( key hash -- )
     [ nip ] [ key@ ] 2bi [
@@ -115,9 +115,7 @@ M: hashtable assoc-size ( hash -- n )
     [ count>> ] [ deleted>> ] bi - ; inline
 
 : rehash ( hash -- )
-    dup >alist [
-    dup clear-assoc
-    ] dip (rehash) ;
+    dup >alist [ dup clear-assoc ] dip (rehash) ;
 
 M: hashtable set-at ( value key hash -- )
     dup ?grow-hash

@@ -3,13 +3,13 @@
 USING: accessors assocs byte-arrays calendar classes
 combinators combinators.short-circuit concurrency.promises
 continuations destructors ftp io io.backend io.directories
-io.encodings io.encodings.8-bit io.encodings.binary
+io.encodings io.encodings.binary
 tools.files io.encodings.utf8 io.files io.files.info
 io.pathnames io.launcher.unix.parser io.servers.connection
 io.sockets io.streams.duplex io.streams.string io.timeouts
 kernel make math math.bitwise math.parser namespaces sequences
 splitting threads unicode.case logging calendar.format
-strings io.files.links io.files.types ;
+strings io.files.links io.files.types io.encodings.8-bit.latin1 ;
 IN: ftp.server
 
 SYMBOL: server
@@ -58,7 +58,7 @@ C: <ftp-disconnect> ftp-disconnect
     send-response ;
 
 : serving? ( path -- ? )
-    canonicalize-path server get serving-directory>> head? ;
+    normalize-path server get serving-directory>> head? ;
 
 : can-serve-directory? ( path -- ? )
     { [ exists? ] [ file-info directory? ] [ serving? ] } 1&& ;
@@ -343,7 +343,7 @@ M: ftp-server handle-client* ( server -- )
 : <ftp-server> ( directory port -- server )
     latin1 ftp-server new-threaded-server
         swap >>insecure
-        swap canonicalize-path >>serving-directory
+        swap normalize-path >>serving-directory
         "ftp.server" >>name
         5 minutes >>timeout ;
 

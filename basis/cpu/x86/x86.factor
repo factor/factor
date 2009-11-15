@@ -4,7 +4,7 @@ USING: accessors assocs alien alien.c-types arrays strings
 cpu.x86.assembler cpu.x86.assembler.private cpu.x86.assembler.operands
 cpu.x86.features cpu.x86.features.private cpu.architecture kernel
 kernel.private math memory namespaces make sequences words system
-layouts combinators math.order fry locals compiler.constants
+layouts combinators math.order math.vectors fry locals compiler.constants
 byte-arrays io macros quotations compiler compiler.units init vm
 compiler.cfg.registers
 compiler.cfg.instructions
@@ -45,8 +45,7 @@ HOOK: extra-stack-space cpu ( stack-frame -- n )
 : incr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap ADD ] if ;
 
-: align-stack ( n -- n' )
-    os macosx? cpu x86.64? or [ 16 align ] when ;
+: align-stack ( n -- n' ) 16 align ;
 
 M: x86 stack-frame-size ( stack-frame -- i )
     [ (stack-frame-size) ]
@@ -141,20 +140,27 @@ M: x86 %not     int-rep one-operand NOT ;
 M: x86 %neg     int-rep one-operand NEG ;
 M: x86 %log2    BSR ;
 
+! A bit of logic to avoid using MOVSS/MOVSD for reg-reg moves
+! since this induces partial register stalls
 GENERIC: copy-register* ( dst src rep -- )
+GENERIC: copy-memory* ( dst src rep -- )
 
 M: int-rep copy-register* drop MOV ;
 M: tagged-rep copy-register* drop MOV ;
-M: float-rep copy-register* drop MOVSS ;
-M: double-rep copy-register* drop MOVSD ;
-M: float-4-rep copy-register* drop MOVUPS ;
-M: double-2-rep copy-register* drop MOVUPD ;
-M: vector-rep copy-register* drop MOVDQU ;
+M: float-rep copy-register* drop MOVAPS ;
+M: double-rep copy-register* drop MOVAPS ;
+M: float-4-rep copy-register* drop MOVAPS ;
+M: double-2-rep copy-register* drop MOVAPS ;
+M: vector-rep copy-register* drop MOVDQA ;
+
+M: object copy-memory* copy-register* ;
+M: float-rep copy-memory* drop MOVSS ;
+M: double-rep copy-memory* drop MOVSD ;
 
 M: x86 %copy ( dst src rep -- )
     2over eq? [ 3drop ] [
         [ [ dup spill-slot? [ n>> spill@ ] when ] bi@ ] dip
-        copy-register*
+        2over [ register? ] both? [ copy-register* ] [ copy-memory* ] if
     ] if ;
 
 M: x86 %fixnum-add ( label dst src1 src2 -- )
@@ -169,76 +175,109 @@ M: x86 %fixnum-mul ( label dst src1 src2 -- )
 M: x86 %unbox-alien ( dst src -- )
     alien-offset [+] MOV ;
 
-M:: x86 %unbox-any-c-ptr ( dst src temp -- )
+M:: x86 %unbox-any-c-ptr ( dst src -- )
     [
-        { "is-byte-array" "end" "start" } [ define-label ] each
-        dst 0 MOV
-        temp src MOV
-        ! We come back here with displaced aliens
-        "start" resolve-label
+        "end" define-label
+        dst dst XOR
         ! Is the object f?
-        temp \ f tag-number CMP
+        src \ f type-number CMP
         "end" get JE
+        ! Compute tag in dst register
+        dst src MOV
+        dst tag-mask get AND
         ! Is the object an alien?
-        temp header-offset [+] alien type-number tag-fixnum CMP
-        "is-byte-array" get JNE
-        ! If so, load the offset and add it to the address
-        dst temp alien-offset [+] ADD
-        ! Now recurse on the underlying alien
-        temp temp underlying-alien-offset [+] MOV
-        "start" get JMP
-        "is-byte-array" resolve-label
-        ! Add byte array address to address being computed
-        dst temp ADD
+        dst alien type-number CMP
         ! Add an offset to start of byte array's data
-        dst byte-array-offset ADD
+        dst src byte-array-offset [+] LEA
+        "end" get JNE
+        ! If so, load the offset and add it to the address
+        dst src alien-offset [+] MOV
         "end" resolve-label
     ] with-scope ;
 
-: alien@ ( reg n -- op ) cells alien tag-number - [+] ;
-
-:: %allot-alien ( dst displacement base temp -- )
-    dst 4 cells alien temp %allot
-    dst 1 alien@ base MOV ! alien
-    dst 2 alien@ \ f tag-number MOV ! expired
-    dst 3 alien@ displacement MOV ! displacement
-    ;
+: alien@ ( reg n -- op ) cells alien type-number - [+] ;
 
 M:: x86 %box-alien ( dst src temp -- )
     [
         "end" define-label
-        dst \ f tag-number MOV
-        src 0 CMP
+        dst \ f type-number MOV
+        src src TEST
         "end" get JE
-        dst src \ f tag-number temp %allot-alien
+        dst 5 cells alien temp %allot
+        dst 1 alien@ \ f type-number MOV ! base
+        dst 2 alien@ \ f type-number MOV ! expired
+        dst 3 alien@ src MOV ! displacement
+        dst 4 alien@ src MOV ! address
         "end" resolve-label
     ] with-scope ;
 
-M:: x86 %box-displaced-alien ( dst displacement base displacement' base' base-class -- )
+M:: x86 %box-displaced-alien ( dst displacement base temp base-class -- )
+    ! This is ridiculous
     [
         "end" define-label
-        "ok" define-label
+        "not-f" define-label
+        "not-alien" define-label
+
         ! If displacement is zero, return the base
         dst base MOV
-        displacement 0 CMP
+        displacement displacement TEST
         "end" get JE
-        ! Quickly use displacement' before its needed for real, as allot temporary
-        dst 4 cells alien displacement' %allot
-        ! If base is already a displaced alien, unpack it
-        base' base MOV
-        displacement' displacement MOV
-        base \ f tag-number CMP
-        "ok" get JE
-        base header-offset [+] alien type-number tag-fixnum CMP
-        "ok" get JNE
-        ! displacement += base.displacement
-        displacement' base 3 alien@ ADD
-        ! base = base.base
-        base' base 1 alien@ MOV
-        "ok" resolve-label
-        dst 1 alien@ base' MOV ! alien
-        dst 2 alien@ \ f tag-number MOV ! expired
-        dst 3 alien@ displacement' MOV ! displacement
+
+        ! Displacement is non-zero, we're going to be allocating a new
+        ! object
+        dst 5 cells alien temp %allot
+
+        ! Set expired to f
+        dst 2 alien@ \ f type-number MOV
+
+        ! Is base f?
+        base \ f type-number CMP
+        "not-f" get JNE
+
+        ! Yes, it is f. Fill in new object
+        dst 1 alien@ base MOV
+        dst 3 alien@ displacement MOV
+        dst 4 alien@ displacement MOV
+
+        "end" get JMP
+
+        "not-f" resolve-label
+
+        ! Check base type
+        temp base MOV
+        temp tag-mask get AND
+
+        ! Is base an alien?
+        temp alien type-number CMP
+        "not-alien" get JNE
+
+        ! Yes, it is an alien. Set new alien's base to base.base
+        temp base 1 alien@ MOV
+        dst 1 alien@ temp MOV
+
+        ! Compute displacement
+        temp base 3 alien@ MOV
+        temp displacement ADD
+        dst 3 alien@ temp MOV
+
+        ! Compute address
+        temp base 4 alien@ MOV
+        temp displacement ADD
+        dst 4 alien@ temp MOV
+
+        ! We are done
+        "end" get JMP
+
+        ! Is base a byte array? It has to be, by now...
+        "not-alien" resolve-label
+
+        dst 1 alien@ base MOV
+        dst 3 alien@ displacement MOV
+        temp base MOV
+        temp byte-array-offset ADD
+        temp displacement ADD
+        dst 4 alien@ temp MOV
+
         "end" resolve-label
     ] with-scope ;
 
@@ -254,7 +293,7 @@ CONSTANT: have-byte-regs { EAX ECX EDX EBX }
 
 M: x86.32 has-small-reg?
     {
-        { 8 [ have-byte-regs memq? ] }
+        { 8 [ have-byte-regs member-eq? ] }
         { 16 [ drop t ] }
         { 32 [ drop t ] }
     } case ;
@@ -264,7 +303,7 @@ M: x86.64 has-small-reg? 2drop t ;
 : small-reg-that-isn't ( exclude -- reg' )
     [ have-byte-regs ] dip
     [ native-version-of ] map
-    '[ _ memq? not ] find nip ;
+    '[ _ member-eq? not ] find nip ;
 
 : with-save/restore ( reg quot -- )
     [ drop PUSH ] [ call ] [ drop POP ] 2tri ; inline
@@ -356,7 +395,7 @@ M: x86 %set-alien-float [ [+] ] dip MOVSS ;
 M: x86 %set-alien-double [ [+] ] dip MOVSD ;
 M: x86 %set-alien-vector [ [+] ] 2dip %copy ;
 
-: shift-count? ( reg -- ? ) { ECX RCX } memq? ;
+: shift-count? ( reg -- ? ) { ECX RCX } member-eq? ;
 
 :: emit-shift ( dst src quot -- )
     src shift-count? [
@@ -388,13 +427,13 @@ M: x86 %vm-field-ptr ( dst field -- )
     [ drop "nursery" %vm-field-ptr ] [ swap [] MOV ] 2bi ;
 
 : inc-allot-ptr ( nursery-ptr n -- )
-    [ [] ] dip 8 align ADD ;
+    [ [] ] dip data-alignment get align ADD ;
 
 : store-header ( temp class -- )
-    [ [] ] [ type-number tag-fixnum ] bi* MOV ;
+    [ [] ] [ type-number tag-header ] bi* MOV ;
 
 : store-tagged ( dst tag -- )
-    tag-number OR ;
+    type-number OR ;
 
 M:: x86 %allot ( dst size class nursery-ptr -- )
     nursery-ptr dst load-allot-ptr
@@ -436,7 +475,7 @@ M: x86 %alien-global ( dst symbol library -- )
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
 :: %boolean ( dst temp word -- )
-    dst \ f tag-number MOV
+    dst \ f type-number MOV
     temp 0 MOV \ t rc-absolute-cell rel-immediate
     dst temp word execute ; inline
 
@@ -481,10 +520,13 @@ M: x86 %min-float double-rep two-operand MINSD ;
 M: x86 %max-float double-rep two-operand MAXSD ;
 M: x86 %sqrt SQRTSD ;
 
-M: x86 %single>double-float CVTSS2SD ;
-M: x86 %double>single-float CVTSD2SS ;
+: %clear-unless-in-place ( dst src -- )
+    over = [ drop ] [ dup XORPS ] if ;
 
-M: x86 %integer>float CVTSI2SD ;
+M: x86 %single>double-float [ %clear-unless-in-place ] [ CVTSS2SD ] 2bi ;
+M: x86 %double>single-float [ %clear-unless-in-place ] [ CVTSD2SS ] 2bi ;
+
+M: x86 %integer>float [ drop dup XORPS ] [ CVTSI2SD ] 2bi ;
 M: x86 %float>integer CVTTSD2SI ;
 
 : %cmov-float= ( dst src -- )
@@ -583,7 +625,7 @@ M: x86 %alien-vector-reps
 
 M: x86 %zero-vector
     {
-        { double-2-rep [ dup XORPD ] }
+        { double-2-rep [ dup XORPS ] }
         { float-4-rep [ dup XORPS ] }
         [ drop dup PXOR ]
     } case ;
@@ -596,7 +638,7 @@ M: x86 %zero-vector-reps
 
 M: x86 %fill-vector
     {
-        { double-2-rep [ dup [ XORPD ] [ CMPEQPD ] 2bi ] }
+        { double-2-rep [ dup [ XORPS ] [ CMPEQPS ] 2bi ] }
         { float-4-rep  [ dup [ XORPS ] [ CMPEQPS ] 2bi ] }
         [ drop dup PCMPEQB ]
     } case ;
@@ -671,7 +713,7 @@ M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
     rep unsign-rep {
         { double-2-rep [
             dst src1 double-2-rep %copy
-            dst src2 UNPCKLPD
+            dst src2 MOVLHPS
         ] }
         { longlong-2-rep [
             dst src1 longlong-2-rep %copy
@@ -683,14 +725,6 @@ M: x86 %gather-vector-2-reps
     {
         { sse2? { double-2-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
-
-: double-2-shuffle ( dst shuffle -- )
-    {
-        { { 0 1 } [ drop ] }
-        { { 0 0 } [ dup UNPCKLPD ] }
-        { { 1 1 } [ dup UNPCKHPD ] }
-        [ dupd SHUFPD ]
-    } case ;
 
 : sse1-float-4-shuffle ( dst shuffle -- )
     {
@@ -724,10 +758,13 @@ M: x86 %gather-vector-2-reps
 : longlong-2-shuffle ( dst shuffle -- )
     first2 [ 2 * dup 1 + ] bi@ 4array int-4-shuffle ;
 
+: >float-4-shuffle ( double-2-shuffle -- float-4-shuffle )
+    [ 2 * { 0 1 } n+v ] map concat ;
+
 M:: x86 %shuffle-vector-imm ( dst src shuffle rep -- )
     dst src rep %copy
     dst shuffle rep unsign-rep {
-        { double-2-rep [ double-2-shuffle ] }
+        { double-2-rep [ >float-4-shuffle float-4-shuffle ] }
         { float-4-rep [ float-4-shuffle ] }
         { int-4-rep [ int-4-shuffle ] }
         { longlong-2-rep [ longlong-2-shuffle ] }
@@ -750,7 +787,7 @@ M: x86 %shuffle-vector-reps
 M: x86 %merge-vector-head
     [ two-operand ] keep
     unsign-rep {
-        { double-2-rep   [ UNPCKLPD ] }
+        { double-2-rep   [ MOVLHPS ] }
         { float-4-rep    [ UNPCKLPS ] }
         { longlong-2-rep [ PUNPCKLQDQ ] }
         { int-4-rep      [ PUNPCKLDQ ] }
@@ -802,8 +839,8 @@ M: x86 %unsigned-pack-vector-reps
 
 M: x86 %tail>head-vector ( dst src rep -- )
     dup {
-        { float-4-rep [ drop MOVHLPS ] }
-        { double-2-rep [ [ %copy ] [ drop UNPCKHPD ] 3bi ] }
+        { float-4-rep [ drop UNPCKHPD ] }
+        { double-2-rep [ drop UNPCKHPD ] }
         [ drop [ %copy ] [ drop PUNPCKHQDQ ] 3bi ]
     } case ;
 
@@ -888,12 +925,12 @@ M: x86 %compare-vector ( dst src1 src2 rep cc -- )
     {
         { sse? { float-4-rep } }
         { sse2? { double-2-rep char-16-rep short-8-rep int-4-rep } }
-        { sse4.1? { longlong-2-rep } }
+        { sse4.2? { longlong-2-rep } }
     } available-reps ;
 
 M: x86 %compare-vector-reps
     {
-        { [ dup { cc= cc/= } memq? ] [ drop %compare-vector-eq-reps ] }
+        { [ dup { cc= cc/= cc/<>= cc<>= } member-eq? ] [ drop %compare-vector-eq-reps ] }
         [ drop %compare-vector-ord-reps ]
     } cond ;
 
@@ -942,7 +979,7 @@ M: x86 %compare-vector-ccs
 
 : %move-vector-mask ( dst src rep -- mask )
     {
-        { double-2-rep [ MOVMSKPD HEX: 3 ] }
+        { double-2-rep [ MOVMSKPS HEX: f ] }
         { float-4-rep  [ MOVMSKPS HEX: f ] }
         [ drop PMOVMSKB HEX: ffff ]
     } case ;
@@ -1098,7 +1135,7 @@ M: x86 %min-vector ( dst src1 src2 rep -- )
 M: x86 %min-vector-reps
     {
         { sse? { float-4-rep } }
-        { sse2? { uchar-16-rep short-8-rep double-2-rep short-8-rep uchar-16-rep } }
+        { sse2? { uchar-16-rep short-8-rep double-2-rep } }
         { sse4.1? { char-16-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
@@ -1118,7 +1155,7 @@ M: x86 %max-vector ( dst src1 src2 rep -- )
 M: x86 %max-vector-reps
     {
         { sse? { float-4-rep } }
-        { sse2? { uchar-16-rep short-8-rep double-2-rep short-8-rep uchar-16-rep } }
+        { sse2? { uchar-16-rep short-8-rep double-2-rep } }
         { sse4.1? { char-16-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
@@ -1155,18 +1192,18 @@ M: x86 %horizontal-add-vector-reps
         { sse3? { float-4-rep double-2-rep } }
     } available-reps ;
 
-M: x86 %horizontal-shl-vector ( dst src1 src2 rep -- )
+M: x86 %horizontal-shl-vector-imm ( dst src1 src2 rep -- )
     two-operand PSLLDQ ;
 
-M: x86 %horizontal-shl-vector-reps
+M: x86 %horizontal-shl-vector-imm-reps
     {
         { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-M: x86 %horizontal-shr-vector ( dst src1 src2 rep -- )
+M: x86 %horizontal-shr-vector-imm ( dst src1 src2 rep -- )
     two-operand PSRLDQ ;
 
-M: x86 %horizontal-shr-vector-reps
+M: x86 %horizontal-shr-vector-imm-reps
     {
         { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
@@ -1199,7 +1236,7 @@ M: x86 %and-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
     {
         { float-4-rep [ ANDPS ] }
-        { double-2-rep [ ANDPD ] }
+        { double-2-rep [ ANDPS ] }
         [ drop PAND ]
     } case ;
 
@@ -1213,7 +1250,7 @@ M: x86 %andn-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
     {
         { float-4-rep [ ANDNPS ] }
-        { double-2-rep [ ANDNPD ] }
+        { double-2-rep [ ANDNPS ] }
         [ drop PANDN ]
     } case ;
 
@@ -1227,7 +1264,7 @@ M: x86 %or-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
     {
         { float-4-rep [ ORPS ] }
-        { double-2-rep [ ORPD ] }
+        { double-2-rep [ ORPS ] }
         [ drop POR ]
     } case ;
 
@@ -1241,7 +1278,7 @@ M: x86 %xor-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
     {
         { float-4-rep [ XORPS ] }
-        { double-2-rep [ XORPD ] }
+        { double-2-rep [ XORPS ] }
         [ drop PXOR ]
     } case ;
 
@@ -1281,6 +1318,11 @@ M: x86 %shr-vector-reps
     {
         { sse2? { short-8-rep ushort-8-rep int-4-rep uint-4-rep ulonglong-2-rep } }
     } available-reps ;
+
+M: x86 %shl-vector-imm %shl-vector ;
+M: x86 %shl-vector-imm-reps %shl-vector-reps ;
+M: x86 %shr-vector-imm %shr-vector ;
+M: x86 %shr-vector-imm-reps %shr-vector-reps ;
 
 : scalar-sized-reg ( reg rep -- reg' )
     rep-size 8 * n-bit-version-of ;
