@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax classes.struct kernel system unix ;
+USING: alien.c-types alien.syntax classes.struct kernel system unix ;
 IN: io.serial.unix.termios
 
 CONSTANT: NCCS 32
