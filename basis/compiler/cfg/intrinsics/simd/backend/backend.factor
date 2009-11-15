@@ -13,6 +13,9 @@ IN: compiler.cfg.intrinsics.simd.backend
 : can-has? ( quot -- ? )
     [ t \ can-has? ] dip '[ @ drop \ can-has? get ] with-variable ; inline
 
+: can-has-rep? ( rep reps -- )
+    member? \ can-has? [ and ] change ; inline
+
 GENERIC: create-can-has ( word -- word' )
 
 PREDICATE: vector-op-word < word
@@ -27,19 +30,22 @@ PREDICATE: vector-op-word < word
 
 :: can-has-^^-quot ( word def effect -- quot )
     effect in>> { "rep" } split1 [ length ] bi@ 1 +
-    word reps-word
+    word reps-word 1quotation
     effect out>> length f <array> >quotation
-    '[ [ _ ndrop ] _ ndip _ execute member? \ can-has? [ and ] change @ ] ;
+    '[ [ _ ndrop ] _ ndip @ can-has-rep? @ ] ;
 
 :: can-has-^-quot ( word def effect -- quot )
-    def create-can-has ;
+    def create-can-has first ;
+
+: map-concat-like ( seq quot -- seq' )
+    '[ _ map ] [ concat-as ] bi ; inline
 
 M: object create-can-has 1quotation ;
 
 M: array create-can-has
-    [ create-can-has ] map concat ;
+    [ create-can-has ] map-concat-like 1quotation ;
 M: callable create-can-has
-    [ create-can-has ] map concat ;
+    [ create-can-has ] map-concat-like 1quotation ;
 
 : (can-has-word) ( word -- word' )
     name>> "can-has-" prepend "compiler.cfg.intrinsics.simd.backend" lookup ;
@@ -56,12 +62,12 @@ M: vector-op-word create-can-has
 
 GENERIC# >can-has-cond 2 ( quot #pick #dup -- quotpair )
 M:: callable >can-has-cond ( quot #pick #dup -- quotpair )
-    #dup quot create-can-has '[ _ ndup _ can-has? ] quot 2array ;
+    #dup quot create-can-has '[ _ ndup @ can-has? ] quot 2array ;
 
 M:: pair >can-has-cond ( pair #pick #dup -- quotpair )
     pair first2 :> ( class quot )
     #pick class #dup quot create-can-has
-    '[ _ npick _ instance? [ _ ndup _ can-has? ] dip and ]
+    '[ _ npick _ instance? [ _ ndup @ can-has? ] dip and ]
     quot 2array ;
 
 MACRO: v-vector-op ( trials -- )
@@ -79,6 +85,11 @@ MACRO: vvvv-vector-op ( trials -- )
 
 : can-has-^(compare-vector) ( src1 src2 rep cc -- dst )
     [ 2drop ] 2dip %compare-vector-reps member?
+    \ can-has? [ and ] change
+    f ;
+
+: can-has-^^test-vector ( src rep vcc -- dst )
+    [ drop ] 2dip drop %test-vector-reps member?
     \ can-has? [ and ] change
     f ;
 
