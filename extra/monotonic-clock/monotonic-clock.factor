@@ -6,7 +6,7 @@ IN: monotonic-clock
 HOOK: monotonic-count os ( -- n )
 
 {
+    { [ os macosx? ] [ "monotonic-clock.unix.macosx" ] }
     { [ os unix? ] [ "monotonic-clock.unix" ] }
     { [ os windows? ] [ "monotonic-clock.windows" ] }
-    { [ os macosx? ] [ "monotonic-clock.unix.macosx" ] }
 } cond require
