@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences words fry generic accessors
+USING: alien.c-types kernel sequences words fry generic accessors
 classes.tuple classes classes.algebra definitions
 stack-checker.dependencies quotations classes.tuple.private math
 math.partial-dispatch math.private math.intervals sets.private
@@ -8,6 +8,7 @@ math.floats.private math.integers.private layouts math.order
 vectors hashtables combinators effects generalizations assocs
 sets combinators.short-circuit sequences.private locals growable
 stack-checker namespaces compiler.tree.propagation.info ;
+FROM: math => float ;
 IN: compiler.tree.propagation.transforms
 
 \ equal? [
@@ -307,3 +308,11 @@ CONSTANT: lookup-table-at-max 256
     in-d>> second value-info class>> growable class<=
     [ \ push def>> ] [ f ] if
 ] "custom-inlining" set-word-prop
+
+! We want to constant-fold calls to heap-size, and recompile those
+! calls when a C type is redefined
+\ heap-size [
+    dup word? [
+        [ inlined-dependency depends-on ] [ heap-size '[ _ ] ] bi
+    ] [ drop f ] if
+] 1 define-partial-eval
