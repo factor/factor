@@ -171,6 +171,10 @@ M: timestamp easter ( timestamp -- timestamp )
 : microseconds ( x -- duration ) 1000000 / seconds ;
 : nanoseconds ( x -- duration ) 1000000000 / seconds ;
 
+GENERIC: >duration ( obj -- duration )
+M: duration >duration ;
+M: integer >duration seconds ;
+
 GENERIC: year ( obj -- n )
 M: integer year ;
 M: timestamp year year>> ;
