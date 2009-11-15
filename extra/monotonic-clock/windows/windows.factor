@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data fry kernel monotonic-clock
-system windows.errors windows.kernel32 ;
+system windows.errors windows.kernel32 math ;
 IN: monotonic-clock.windows
 
 <PRIVATE
@@ -12,8 +12,9 @@ IN: monotonic-clock.windows
 
 PRIVATE>
 
-M: windows monotonic-count  ( -- n )
-    \ QueryPerformanceCounter execute-performance-query ;
-
 : cpu-frequency ( -- n )
     \ QueryPerformanceFrequency execute-performance-query ;
+
+M: windows monotonic-count  ( -- n )
+    \ QueryPerformanceCounter execute-performance-query
+    1000000000 * cpu-frequency /i ;
