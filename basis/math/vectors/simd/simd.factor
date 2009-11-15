@@ -1,9 +1,9 @@
-USING: accessors alien.c-types byte-arrays classes combinators
-cpu.architecture fry functors generalizations generic
+USING: accessors alien.c-types arrays byte-arrays classes combinators
+cpu.architecture effects fry functors generalizations generic
 generic.parser kernel lexer literals macros math math.functions
 math.vectors math.vectors.private namespaces parser
 prettyprint.custom quotations sequences sequences.private vocabs
-vocabs.loader ;
+vocabs.loader words ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd
 
@@ -140,6 +140,8 @@ N     [ A-rep rep-length ]
 
 SET-NTH [ ELT dup c:c-setter c:array-accessor ]
 
+BOA-EFFECT [ N "n" <repetition> >array { "v" } <effect> ]
+
 WHERE
 
 TUPLE: A < simd-128 ;
@@ -159,10 +161,11 @@ M: A like drop dup \ A instance? [ >A ] unless ; inline
 
 : A-with ( n -- v ) \ A new simd-with ; inline
 : A-cast ( v -- v' ) \ A new simd-cast ; inline
-: A-boa ( ...n -- v ) \ A new simd-boa ; inline
 
-M: A pprint-delims drop \ A{ \ } ;
-SYNTAX: A{ \ } [ >A ] parse-literal ;
+\ A-boa { \ A simd-boa } >quotation BOA-EFFECT define-inline
+
+! M: A pprint-delims drop \ A{ \ } ;
+! SYNTAX: A{ \ } [ >A ] parse-literal ;
 
 c:<c-type>
     byte-array >>class
@@ -209,8 +212,8 @@ M: simd-128 new-sequence
     [ nip [ 16 (byte-array) ] make-underlying ]
     [ length bad-simd-length ] if ; inline
 
-M: simd-128 >pprint-sequence ;
-M: simd-128 pprint* pprint-object ;
+! M: simd-128 >pprint-sequence ;
+! M: simd-128 pprint* pprint-object ;
 
 INSTANCE: simd-128 sequence
 
@@ -278,11 +281,11 @@ M: simd-128 equal?
 : simd-with ( n seq -- v )
     [ (simd-with) ] simd-construct-op ; inline
 
-MACRO: simd-boa ( seq -- )
-    dup length {
-        { 2 [ '[ _ dup [ (simd-gather-2) ] simd-construct-op ] ] }
-        { 4 [ '[ _ dup [ (simd-gather-4) ] simd-construct-op ] ] }
-        [ '[ _ _ nsequence ] ]
+MACRO: simd-boa ( class -- )
+    new dup length {
+        { 2 [ '[ _ [ (simd-gather-2) ] simd-construct-op ] ] }
+        { 4 [ '[ _ [ (simd-gather-4) ] simd-construct-op ] ] }
+        [ swap '[ _ _ nsequence ] ]
     } case ;
 
 : simd-cast ( v seq -- v' )
