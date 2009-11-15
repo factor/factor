@@ -234,7 +234,7 @@ VM_C_API void inline_gc(cell *data_roots_base, cell data_roots_size, factor_vm *
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
  */
-object *factor_vm::allot_large_object(header header, cell size)
+object *factor_vm::allot_large_object(cell type, cell size)
 {
 	/* If tenured space does not have enough room, collect and compact */
 	if(!data->tenured->can_allot_p(size))
@@ -257,7 +257,7 @@ object *factor_vm::allot_large_object(header header, cell size)
 	a nursery allocation */
 	write_barrier(obj,size);
 
-	obj->h = header;
+	obj->initialize(type);
 	return obj;
 }
 
@@ -270,11 +270,25 @@ void factor_vm::primitive_disable_gc_events()
 {
 	if(gc_events)
 	{
-		byte_array *data = byte_array_from_values(&gc_events->front(),gc_events->size());
-		dpush(tag<byte_array>(data));
+		growable_array result(this);
 
-		delete gc_events;
-		gc_events = NULL;
+		std::vector<gc_event> *gc_events = this->gc_events;
+		this->gc_events = NULL;
+
+		std::vector<gc_event>::const_iterator iter = gc_events->begin();
+		std::vector<gc_event>::const_iterator end = gc_events->end();
+
+		for(; iter != end; iter++)
+		{
+			gc_event event = *iter;
+			byte_array *obj = byte_array_from_value(&event);
+			result.add(tag<byte_array>(obj));
+		}
+
+		result.trim();
+		dpush(result.elements.value());
+
+		delete this->gc_events;
 	}
 	else
 		dpush(false_object);

@@ -1,7 +1,8 @@
 USING: arrays debugger.threads destructors io io.directories
-io.encodings.8-bit io.encodings.ascii io.encodings.binary
+io.encodings.ascii io.encodings.binary
 io.files io.files.private io.files.temp io.files.unique kernel
-make math sequences system threads tools.test generic.single ;
+make math sequences system threads tools.test generic.single
+io.encodings.8-bit.latin1 ;
 IN: io.files.tests
 
 [ ] [ "append-test" temp-file dup exists? [ delete-file ] [ drop ] if ] unit-test

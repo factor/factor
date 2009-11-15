@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs classes.algebra compiler.units definitions graphs
-grouping kernel namespaces sequences words stack-checker.state ;
+grouping kernel namespaces sequences words
+stack-checker.dependencies ;
 IN: compiler.crossref
 
 SYMBOL: compiled-crossref

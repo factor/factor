@@ -102,8 +102,8 @@ PRIVATE>
             [ 2 head ] dip append
         ] }
         [
-            [ trim-tail-separators "/" ] dip
-            trim-head-separators 3append
+            [ trim-tail-separators ]
+            [ trim-head-separators ] bi* "/" glue
         ]
     } cond ;
 

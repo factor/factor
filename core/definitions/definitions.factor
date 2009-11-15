@@ -21,7 +21,15 @@ SYMBOL: changed-generics
 
 SYMBOL: outdated-generics
 
+SYMBOL: new-words
+
 SYMBOL: new-classes
+
+: new-word ( word -- )
+    dup new-words get set-in-unit ;
+
+: new-word? ( word -- ? )
+    new-words get key? ;
 
 : new-class ( word -- )
     dup new-classes get set-in-unit ;

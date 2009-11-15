@@ -26,15 +26,11 @@ SLOT: continuation
 PRIVATE>
 
 TUPLE: disposable < identity-tuple
-{ id integer }
 { disposed boolean }
 continuation ;
 
-M: disposable hashcode* nip id>> ;
-
 : new-disposable ( class -- disposable )
-    new \ disposable counter >>id
-    dup register-disposable ; inline
+    new dup register-disposable ; inline
 
 GENERIC: dispose* ( disposable -- )
 

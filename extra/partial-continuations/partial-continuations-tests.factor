@@ -1,12 +1,12 @@
 USING: namespaces math partial-continuations tools.test
-kernel sequences ;
+kernel sequences fry ;
 IN: partial-continuations.tests
 
 SYMBOL: sum
 
 : range ( r from to -- n )
     over - 1 + rot [ 
-        -rot [ over + pick call drop ] each 2drop f  
+        '[ over + @ drop ] each drop f
     ] bshift 2nip ; inline
 
 [ 55 ] [

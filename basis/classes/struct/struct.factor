@@ -208,27 +208,32 @@ M: struct-c-type c-struct? drop t ;
         slots >>fields
         size >>size
         align >>align
+        align >>align-first
         class (unboxer-quot) >>unboxer-quot
-        class (boxer-quot)   >>boxer-quot ;
-    
-GENERIC: align-offset ( offset class -- offset' )
+        class (boxer-quot) >>boxer-quot ;
 
-M: struct-slot-spec align-offset
-    [ type>> c-type-align 8 * align ] keep
+GENERIC: compute-slot-offset ( offset class -- offset' )
+
+: c-type-align-at ( class offset -- n )
+    0 = [ c-type-align-first ] [ c-type-align ] if ;
+
+M: struct-slot-spec compute-slot-offset
+    [ type>> over c-type-align-at 8 * align ] keep
     [ [ 8 /i ] dip (>>offset) ] [ type>> heap-size 8 * + ] 2bi ;
 
-M: struct-bit-slot-spec align-offset
+M: struct-bit-slot-spec compute-slot-offset
     [ (>>offset) ] [ bits>> + ] 2bi ;
 
-: struct-offsets ( slots -- size )
-    0 [ align-offset ] reduce 8 align 8 /i ;
+: compute-struct-offsets ( slots -- size )
+    0 [ compute-slot-offset ] reduce 8 align 8 /i ;
 
-: union-struct-offsets ( slots -- size )
+: compute-union-offsets ( slots -- size )
     1 [ 0 >>offset type>> heap-size max ] reduce ;
 
-: struct-align ( slots -- align )
+: struct-alignment ( slots -- align )
     [ struct-bit-slot-spec? not ] filter
-    1 [ type>> c-type-align max ] reduce ;
+    1 [ [ type>> ] [ offset>> ] bi c-type-align-at max ] reduce ;
+
 PRIVATE>
 
 M: struct byte-length class "struct-size" word-prop ; foldable
@@ -240,10 +245,8 @@ GENERIC: binary-zero? ( value -- ? )
 
 M: object binary-zero? drop f ;
 M: f binary-zero? drop t ;
-M: number binary-zero? zero? ;
-M: struct binary-zero?
-    [ byte-length iota ] [ >c-ptr ] bi
-    [ <displaced-alien> *uchar zero? ] curry all? ;
+M: number binary-zero? 0 = ;
+M: struct binary-zero? >c-ptr [ 0 = ] all? ;
 
 : struct-needs-prototype? ( class -- ? )
     struct-slots [ initial>> binary-zero? ] all? not ;
@@ -275,7 +278,7 @@ M: struct binary-zero?
     slots empty? [ struct-must-have-slots ] when
     class redefine-struct-tuple-class
     slots make-slots dup check-struct-slots :> slot-specs
-    slot-specs struct-align :> alignment
+    slot-specs struct-alignment :> alignment
     slot-specs offsets-quot call alignment align :> size
 
     class  slot-specs  size  alignment  c-type-for-class :> c-type
@@ -288,10 +291,10 @@ M: struct binary-zero?
 PRIVATE>
 
 : define-struct-class ( class slots -- )
-    [ struct-offsets ] (define-struct-class) ;
+    [ compute-struct-offsets ] (define-struct-class) ;
 
 : define-union-struct-class ( class slots -- )
-    [ union-struct-offsets ] (define-struct-class) ;
+    [ compute-union-offsets ] (define-struct-class) ;
 
 M: struct-class reset-class
     [ call-next-method ] [ name>> c-types get delete-at ] bi ;

@@ -61,6 +61,10 @@ enum special_object {
 
 	/* Callback stub generation in callbacks.c */
 	CALLBACK_STUB       = 45,
+	
+	/* Incremented on every modify-code-heap call; invalidates call( inline
+	caching */
+	REDEFINITION_COUNTER = 46,
 
 	/* Polymorphic inline cache generation in inline_cache.c */
 	PIC_LOAD            = 47,
@@ -96,6 +100,21 @@ enum special_object {
 inline static bool save_env_p(cell i)
 {
 	return (i >= OBJ_FIRST_SAVE && i <= OBJ_LAST_SAVE);
+}
+
+template<typename Iterator> void object::each_slot(Iterator &iter)
+{
+	cell scan = (cell)this;
+	cell payload_start = binary_payload_start();
+	cell end = scan + payload_start;
+
+	scan += sizeof(cell);
+
+	while(scan < end)
+	{
+		iter((cell *)scan);
+		scan += sizeof(cell);
+	}
 }
 
 }

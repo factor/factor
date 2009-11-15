@@ -16,6 +16,26 @@ void factor_vm::primitive_set_special_object()
 	special_objects[e] = value;
 }
 
+void factor_vm::primitive_identity_hashcode()
+{
+	cell tagged = dpeek();
+	object *obj = untag<object>(tagged);
+	drepl(tag_fixnum(obj->hashcode()));
+}
+
+void factor_vm::compute_identity_hashcode(object *obj)
+{
+	object_counter++;
+	if(object_counter == 0) object_counter++;
+	obj->set_hashcode((cell)obj ^ object_counter);
+}
+
+void factor_vm::primitive_compute_identity_hashcode()
+{
+	object *obj = untag<object>(dpop());
+	compute_identity_hashcode(obj);
+}
+
 void factor_vm::primitive_set_slot()
 {
 	fixnum slot = untag_fixnum(dpop());
@@ -36,8 +56,9 @@ cell factor_vm::clone_object(cell obj_)
 	else
 	{
 		cell size = object_size(obj.value());
-		object *new_obj = allot_object(header(obj.type()),size);
+		object *new_obj = allot_object(obj.type(),size);
 		memcpy(new_obj,obj.untagged(),size);
+		new_obj->set_hashcode(0);
 		return tag_dynamic(new_obj);
 	}
 }

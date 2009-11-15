@@ -82,8 +82,6 @@ SYMBOL: wait-flag
     V{ } clone swap processes get set-at
     wait-flag get-global raise-flag ;
 
-M: process hashcode* handle>> hashcode* ;
-
 : pass-environment? ( process -- ? )
     dup environment>> assoc-empty? not
     swap environment-mode>> +replace-environment+ eq? or ;
