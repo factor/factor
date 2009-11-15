@@ -218,13 +218,13 @@ M: c-type-name unbox-return c-type unbox-return ;
 
 : little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
 
-GENERIC: heap-size ( name -- size ) foldable
+GENERIC: heap-size ( name -- size )
 
 M: c-type-name heap-size c-type heap-size ;
 
 M: abstract-c-type heap-size size>> ;
 
-GENERIC: stack-size ( name -- size ) foldable
+GENERIC: stack-size ( name -- size )
 
 M: c-type-name stack-size c-type stack-size ;
 
