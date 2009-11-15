@@ -1,5 +1,10 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors fry generalizations kernel locals math sequences
+USING: accessors arrays classes combinators
+combinators.short-circuit compiler.cfg.builder.blocks
+compiler.cfg.registers compiler.cfg.stacks
+compiler.cfg.stacks.local compiler.tree.propagation.info
+cpu.architecture effects fry generalizations help.lint.checks
+kernel locals macros math namespaces quotations sequences
 splitting words ;
 IN: compiler.cfg.intrinsics.simd.backend
 
@@ -8,55 +13,51 @@ IN: compiler.cfg.intrinsics.simd.backend
 : can-has? ( quot -- ? )
     [ t \ can-has? ] dip '[ @ drop \ can-has? get ] with-variable ; inline
 
-GENERIC: create-can-has-word ( word -- word' )
+GENERIC: create-can-has ( word -- word' )
 
-PREDICATE: vector-op-word
+PREDICATE: vector-op-word < word
     {
         [ name>> { [ { [ "^" head? ] [ "##" head? ] } 1|| ] [ "-vector" swap subseq? ] } 1&& ]
-        [ vocabulary>> { "compiler.cfg.intrinsics.simd" "cpu.architecture" } member? ]
+        [ vocabulary>> { "compiler.cfg.intrinsics.simd" "compiler.cfg.hats" } member? ]
     } 1&& ;
 
 : reps-word ( word -- word' )
     name>> "^^" ?head drop "##" ?head drop
     "%" "-reps" surround "cpu.architecture" lookup ;
 
-:: can-has-^^-quot ( word def effect -- def' )
+:: can-has-^^-quot ( word def effect -- quot )
     effect in>> { "rep" } split1 [ length ] bi@ 1 +
     word reps-word
     effect out>> length f <array> >quotation
     '[ [ _ ndrop ] _ ndip _ execute member? \ can-has? [ and ] change @ ] ;
 
-:: can-has-^-quot ( word def effect -- def' )
+:: can-has-^-quot ( word def effect -- quot )
     def create-can-has ;
 
-M: object create-can-has ;
+M: object create-can-has 1quotation ;
 
-M: sequence create-can-has
-    [ create-can-has-word ] map ;
+M: array create-can-has
+    [ create-can-has ] map concat ;
+M: callable create-can-has
+    [ create-can-has ] map concat ;
 
-: (create-can-has-word) ( word -- word' created? )
-    name>> "can-has-" prepend "compiler.cfg.intrinsics.simd.backend"
-    2dup lookup
-    [ 2nip f ] [ create t ] if* ;
+: (can-has-word) ( word -- word' )
+    name>> "can-has-" prepend "compiler.cfg.intrinsics.simd.backend" lookup ;
 
-: (create-can-has-quot) ( word -- def effect )
-    [ ] [ def>> ] [ stack-effect ] tri [
-        {
-            { [ pick "^^" head? ] [ can-has-^^-quot ] }
-            { [ pick "##" head? ] [ can-has-^^-quot ] }
-            { [ pick "^"  head? ] [ can-has-^-quot  ] }
-        } cond
-    ] keep ;
+: (can-has-quot) ( word -- quot )
+    [ ] [ def>> ] [ stack-effect ] tri {
+        { [ pick name>> "^^" head? ] [ can-has-^^-quot ] }
+        { [ pick name>> "##" head? ] [ can-has-^^-quot ] }
+        { [ pick name>> "^"  head? ] [ can-has-^-quot  ] }
+    } cond ;
 
 M: vector-op-word create-can-has
-    [ (create-can-has-word) ] keep
-    '[ _ (create-can-has-quot) define-declared ]
-    [ nip ] if ;
+    dup (can-has-word) [ 1quotation ] [ (can-has-quot) ] ?if ;
 
 GENERIC# >can-has-cond 2 ( quot #pick #dup -- quotpair )
-M:: callable >can-has-cond
+M:: callable >can-has-cond ( quot #pick #dup -- quotpair )
     #dup quot create-can-has '[ _ ndup _ can-has? ] quot 2array ;
-    
+
 M:: pair >can-has-cond ( pair #pick #dup -- quotpair )
     pair first2 :> ( class quot )
     #pick class #dup quot create-can-has
@@ -113,7 +114,7 @@ CONSTANT: [quaternary]
         -4 inc-d
     ]
 
-:: [emit-vector-op] ( trials params-quot op-quot literal-preds -- quot ) ;
+:: [emit-vector-op] ( trials params-quot op-quot literal-preds -- quot )
     params-quot trials op-quot literal-preds 
     '[ [ _ dip _ @ ds-push ] _ if-literals-match ] ;
 
@@ -126,10 +127,11 @@ MACRO: emit-vv-vector-op ( trials -- )
 MACRO: emit-vvvv-vector-op ( trials -- )
     [quaternary] [ vvvv-vector-op ] { [ representation? ] } [emit-vector-op] ;
 
-MACRO:: emit-vv-or-vl-vector-op ( trials literal-pred -- )
-    literal-pred trials literal-pred trials
+MACRO:: emit-vv-or-vl-vector-op ( var-trials imm-trials literal-pred -- )
+    literal-pred imm-trials literal-pred var-trials
     '[
         dup node-input-infos 2 tail-slice* first literal>> @
         [ _ _ emit-vl-vector-op ]
         [ _   emit-vv-vector-op ] if 
     ] ;
+
