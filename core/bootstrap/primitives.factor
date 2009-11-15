@@ -55,6 +55,8 @@ num-types get f <array> builtins set
 
 bootstrapping? on
 
+[
+
 ! Create some empty vocabs where the below primitives and
 ! classes will go
 {
@@ -524,3 +526,5 @@ tuple
 
 ! Bump build number
 "build" "kernel" create build 1 + [ ] curry (( -- n )) define-declared
+
+] with-compilation-unit
