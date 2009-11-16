@@ -1,5 +1,5 @@
-USING: init command-line system namespaces kernel vocabs.loader
-io ;
+USING: destructors init command-line system namespaces kernel
+vocabs.loader io ;
 
 [
     boot
