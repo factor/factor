@@ -113,5 +113,5 @@ SYMBOL: cached-script-strings
 : cached-script-string ( font string -- script-string )
     cached-script-strings get-global [ <script-string> ] 2cache ;
 
-[ <cache-assoc> cached-script-strings set-global ]
-"windows.uniscribe" add-init-hook
+[ <cache-assoc> &dispose cached-script-strings set-global ]
+"windows.uniscribe" add-startup-hook

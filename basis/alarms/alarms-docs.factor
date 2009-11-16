@@ -5,16 +5,16 @@ HELP: alarm
 { $class-description "An alarm. Can be passed to " { $link cancel-alarm } "." } ;
 
 HELP: add-alarm
-{ $values { "quot" quotation } { "time" timestamp } { "frequency" { $maybe duration } } { "alarm" alarm } }
-{ $description "Creates and registers an alarm to start at " { $snippet "time" } ". If " { $snippet "frequency" } " is " { $link f } ", this will be a one-time alarm, otherwise it will fire with the given frequency. The quotation will be called from the alarm thread." } ;
+{ $values { "quot" quotation } { "start" duration } { "interval" { $maybe "duration/f" } } { "alarm" alarm } }
+{ $description "Creates and registers an alarm to start at " { $snippet "start" } " offset from the current time. If " { $snippet "interval" } " is " { $link f } ", this will be a one-time alarm, otherwise it will fire with the given frequency, with scheduling happening before the quotation is called in order to ensure that the next event will happen on time. The quotation will be called from the alarm thread." } ;
 
 HELP: later
 { $values { "quot" quotation } { "duration" duration } { "alarm" alarm } }
-{ $description "Creates and registers an alarm which calls the quotation once at " { $snippet "time" } " from now." }
+{ $description "Creates and registers an alarm which calls the quotation once at " { $snippet "duration" } " offset from now." }
 { $examples
     { $unchecked-example
         "USING: alarms io calendar ;"
-        """[ "GET BACK TO WORK, Guy." print flush ] 10 minutes later drop"""
+        """[ "Break's over!" print flush ] 15 minutes drop"""
         ""
     }
 } ;
@@ -37,11 +37,9 @@ HELP: every
 } ;
 
 ARTICLE: "alarms" "Alarms"
-"The " { $vocab-link "alarms" } " vocabulary provides a lightweight way to schedule one-time and recurring tasks without spawning a new thread." $nl
+"The " { $vocab-link "alarms" } " vocabulary provides a lightweight way to schedule one-time and recurring tasks without spawning a new thread. Alarms use " { $vocab-link "monotonic-clock" } ", so they continue to work across system clock changes." $nl
 "The alarm class:"
-{ $subsections
-    alarm
-}
+{ $subsections alarm }
 "Register a recurring alarm:"
 { $subsections every }
 "Register a one-time alarm:"

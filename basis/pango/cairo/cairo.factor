@@ -240,4 +240,4 @@ SYMBOL: cached-layouts
 : cached-line ( font string -- line )
     cached-layout layout>> first-line ;
 
-[ <cache-assoc> cached-layouts set-global ] "pango.cairo" add-init-hook
+[ <cache-assoc> cached-layouts set-global ] "pango.cairo" add-startup-hook

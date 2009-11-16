@@ -171,6 +171,13 @@ void factor_vm::start_factor(vm_parameters *p)
 	unnest_stacks();
 }
 
+void factor_vm::stop_factor()
+{
+	nest_stacks(NULL);
+	c_to_factor_toplevel(special_objects[OBJ_SHUTDOWN]);
+	unnest_stacks();
+}
+
 char *factor_vm::factor_eval_string(char *string)
 {
 	char *(*callback)(char *) = (char *(*)(char *))alien_offset(special_objects[OBJ_EVAL_CALLBACK]);
