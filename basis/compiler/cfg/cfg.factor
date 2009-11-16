@@ -4,7 +4,7 @@ USING: kernel math vectors arrays accessors namespaces ;
 IN: compiler.cfg
 
 TUPLE: basic-block < identity-tuple
-id
+{ id integer }
 number
 { instructions vector }
 { successors vector }
