@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs boxes calendar
 combinators.short-circuit fry heaps init kernel math.order
-namespaces quotations threads ;
+namespaces quotations threads math monotonic-clock ;
 IN: alarms
 
 TUPLE: alarm
     { quot callable initial: [ ] }
-    { time timestamp }
+    { start integer }
     interval
     { entry box } ;
 
@@ -19,30 +19,33 @@ SYMBOL: alarm-thread
 : notify-alarm-thread ( -- )
     alarm-thread get-global interrupt ;
 
-ERROR: bad-alarm-frequency frequency ;
-: check-alarm ( frequency/f -- frequency/f )
-    dup { [ duration? ] [ not ] } 1|| [ bad-alarm-frequency ] unless ;
+: normalize-argument ( obj -- nanoseconds )
+    >duration duration>nanoseconds >integer ;
 
-: <alarm> ( quot time frequency -- alarm )
-    check-alarm <box> alarm boa ;
+: <alarm> ( quot start interval -- alarm )
+    alarm new
+        swap dup [ normalize-argument ] when >>interval
+        swap dup [ normalize-argument monotonic-count + ] when >>start
+        swap >>quot
+        <box> >>entry ;
 
 : register-alarm ( alarm -- )
-    [ dup time>> alarms get-global heap-push* ]
+    [ dup start>> alarms get-global heap-push* ]
     [ entry>> >box ] bi
     notify-alarm-thread ;
 
-: alarm-expired? ( alarm now -- ? )
-    [ time>> ] dip before=? ;
+: alarm-expired? ( alarm n -- ? )
+    [ start>> ] dip <= ;
 
 : reschedule-alarm ( alarm -- )
-    dup '[ _ interval>> time+ now max ] change-time register-alarm ;
+    dup interval>> monotonic-count + >>start register-alarm ;
 
 : call-alarm ( alarm -- )
     [ entry>> box> drop ]
-    [ quot>> "Alarm execution" spawn drop ]
-    [ dup interval>> [ reschedule-alarm ] [ drop ] if ] tri ;
+    [ dup interval>> [ reschedule-alarm ] [ drop ] if ]
+    [ quot>> "Alarm execution" spawn drop ] tri ;
 
-: (trigger-alarms) ( alarms now -- )
+: (trigger-alarms) ( alarms n -- )
     over heap-empty? [
         2drop
     ] [
@@ -54,11 +57,11 @@ ERROR: bad-alarm-frequency frequency ;
     ] if ;
 
 : trigger-alarms ( alarms -- )
-    now (trigger-alarms) ;
+    monotonic-count (trigger-alarms) ;
 
 : next-alarm ( alarms -- timestamp/f )
     dup heap-empty?
-    [ drop f ] [ heap-peek drop time>> ] if ;
+    [ drop f ] [ heap-peek drop start>> ] if ;
 
 : alarm-thread-loop ( -- )
     alarms get-global
@@ -75,18 +78,16 @@ ERROR: bad-alarm-frequency frequency ;
     [ alarm-thread-loop t ] "Alarms" spawn-server
     alarm-thread set-global ;
 
-[ init-alarms ] "alarms" add-init-hook
+[ init-alarms ] "alarms2" add-startup-hook
 
 PRIVATE>
 
-: add-alarm ( quot time frequency -- alarm )
+: add-alarm ( quot start interval -- alarm )
     <alarm> [ register-alarm ] keep ;
 
-: later ( quot duration -- alarm )
-    hence f add-alarm ;
+: later ( quot duration -- alarm ) f add-alarm ;
 
-: every ( quot duration -- alarm )
-    [ hence ] keep add-alarm ;
+: every ( quot duration -- alarm ) dup add-alarm ;
 
 : cancel-alarm ( alarm -- )
     entry>> [ alarms get-global heap-delete ] if-box? ;

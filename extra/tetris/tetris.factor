@@ -13,8 +13,9 @@ M: tetris-gadget pref-dim* drop { 200 400 } ;
 
 : update-status ( gadget -- )
     dup tetris>> [
-        "Level: " % dup level>> #
-        " Score: " % score>> #
+        [ "Level: " % level>> # ]
+        [ " Score: " % score>> # ]
+        [ paused?>> [ " (Paused)" % ] when ] tri
     ] "" make swap show-status ;
 
 M: tetris-gadget draw-gadget* ( gadget -- )
@@ -25,17 +26,24 @@ M: tetris-gadget draw-gadget* ( gadget -- )
 : new-tetris ( gadget -- gadget )
     [ <new-tetris> ] change-tetris ;
 
+: unless-paused ( tetris quot -- )
+    over tetris>> paused?>> [
+        2drop
+    ] [
+        call
+    ] if ; inline
+
 tetris-gadget H{
     { T{ button-down f f 1 }     [ request-focus ] }
-    { T{ key-down f f "UP" }     [ tetris>> rotate-right ] }
-    { T{ key-down f f "d" }      [ tetris>> rotate-left ] }
-    { T{ key-down f f "f" }      [ tetris>> rotate-right ] }
-    { T{ key-down f f "e" }      [ tetris>> rotate-left ] } ! dvorak d
-    { T{ key-down f f "u" }      [ tetris>> rotate-right ] } ! dvorak f
-    { T{ key-down f f "LEFT" }   [ tetris>> move-left ] }
-    { T{ key-down f f "RIGHT" }  [ tetris>> move-right ] }
-    { T{ key-down f f "DOWN" }   [ tetris>> move-down ] }
-    { T{ key-down f f " " }      [ tetris>> move-drop ] }
+    { T{ key-down f f "UP" }     [ [ tetris>> rotate-right ] unless-paused ] }
+    { T{ key-down f f "d" }      [ [ tetris>> rotate-left ] unless-paused ] }
+    { T{ key-down f f "f" }      [ [ tetris>> rotate-right ] unless-paused ] }
+    { T{ key-down f f "e" }      [ [ tetris>> rotate-left ] unless-paused ] }
+    { T{ key-down f f "u" }      [ [ tetris>> rotate-right ] unless-paused ] }
+    { T{ key-down f f "LEFT" }   [ [ tetris>> move-left ] unless-paused ] }
+    { T{ key-down f f "RIGHT" }  [ [ tetris>> move-right ] unless-paused ] }
+    { T{ key-down f f "DOWN" }   [ [ tetris>> move-down ] unless-paused ] }
+    { T{ key-down f f " " }      [ [ tetris>> move-drop ] unless-paused ] }
     { T{ key-down f f "p" }      [ tetris>> toggle-pause ] }
     { T{ key-down f f "n" }      [ new-tetris drop ] }
 } set-gestures

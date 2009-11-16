@@ -429,7 +429,7 @@ tuple
     { "set-datastack" "kernel" (( ds -- )) }
     { "set-retainstack" "kernel" (( rs -- )) }
     { "set-callstack" "kernel" (( cs -- )) }
-    { "exit" "system" (( n -- )) }
+    { "(exit)" "system" (( n -- )) }
     { "data-room" "memory" (( -- data-room )) }
     { "code-room" "memory" (( -- code-room )) }
     { "micros" "system" (( -- us )) }
