@@ -442,4 +442,7 @@ CONSTANT: WSAID_CONNECTEX GUID: {25a207b9-ddf3-4660-8ee9-76e58c74063e}
 : init-winsock ( -- )
     HEX: 0202 <wsadata> WSAStartup winsock-return-check ;
 
-[ init-winsock ] "windows.winsock" add-init-hook
+: shutdown-winsock ( -- ) WSACleanup winsock-return-check ;
+
+[ init-winsock ] "windows.winsock" add-startup-hook
+[ shutdown-winsock ] "windows.winsock" add-shutdown-hook

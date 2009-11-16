@@ -1413,7 +1413,7 @@ enable-fixnum-log2
             flush
             1 exit
         ] when
-    ] "cpu.x86" add-init-hook ;
+    ] "cpu.x86" add-startup-hook ;
 
 : enable-sse2 ( version -- )
     20 >= [

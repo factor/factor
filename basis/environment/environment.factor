@@ -32,4 +32,4 @@ HOOK: (set-os-envs) os ( seq -- )
         os windows? ";" ":" ? split
         [ add-vocab-root ] each
     ] when*    
-] "environment" add-init-hook
+] "environment" add-startup-hook
