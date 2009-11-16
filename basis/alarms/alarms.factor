@@ -60,8 +60,11 @@ SYMBOL: alarm-thread
     monotonic-count (trigger-alarms) ;
 
 : next-alarm ( alarms -- timestamp/f )
-    dup heap-empty?
-    [ drop f ] [ heap-peek drop start>> ] if ;
+    dup heap-empty? [ drop f ] [
+        heap-peek drop start>>
+        monotonic-count swap -
+        nanoseconds hence
+    ] if ;
 
 : alarm-thread-loop ( -- )
     alarms get-global
@@ -78,7 +81,7 @@ SYMBOL: alarm-thread
     [ alarm-thread-loop t ] "Alarms" spawn-server
     alarm-thread set-global ;
 
-[ init-alarms ] "alarms2" add-startup-hook
+[ init-alarms ] "alarms" add-startup-hook
 
 PRIVATE>
 
