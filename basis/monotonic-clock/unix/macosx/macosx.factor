@@ -21,4 +21,4 @@ M: macosx monotonic-count
     mach_absolute_time
     \ mach_timebase_info <struct> [
         mach_timebase_info [ mach-timebase-info ] unless-zero
-    ] keep [ numer>> ] [ denom>> ] bi / * ;
+    ] keep [ numer>> ] [ denom>> ] bi [ * ] dip /i ;
