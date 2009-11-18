@@ -35,7 +35,7 @@ const char *default_image_path()
 	return new_path;
 }
 
-u64 current_nanos()
+u64 nano_count()
 {
 	struct timespec t;
 	int ret;

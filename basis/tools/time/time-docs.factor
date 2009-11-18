@@ -10,7 +10,7 @@ ARTICLE: "timing" "Timing code and collecting statistics"
 "A lower-level word puts timings on the stack, intead of printing:"
 { $subsections benchmark }
 "You can also read the system clock directly:"
-{ $subsections micros }
+{ $subsections system-micros }
 { $see-also "profiling" "calendar" } ;
 
 ABOUT: "timing"
@@ -25,7 +25,7 @@ HELP: time
 { $values { "quot" quotation } }
 { $description "Runs a quotation, gathering statistics about method dispatch and garbage collection, and then prints the total run time." } ;
 
-{ benchmark micros time } related-words
+{ benchmark system-micros system-millis time } related-words
 
 HELP: collect-gc-events
 { $values { "quot" quotation } }

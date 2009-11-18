@@ -104,10 +104,10 @@ CONSTANT: default-height 20
     dup { 0 1 } tetris-move [ move-drop ] [ lock-piece ] if ;
 
 : update ( tetris -- )
-    millis over last-update>> -
+    system-millis over last-update>> -
     over update-interval > [
         dup move-down
-        millis >>last-update
+        system-millis >>last-update
     ] when drop ;
 
 : ?update ( tetris -- )

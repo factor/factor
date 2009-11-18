@@ -52,9 +52,10 @@ void unix_init_signals();
 void signal_handler(int signal, siginfo_t* siginfo, void* uap);
 void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap);
 
-s64 current_micros();
-u64 current_nanos();
+u64 system_micros();
+u64 nano_count();
 void sleep_micros(cell usec);
+void sleep_nanos(cell nsec);
 
 void init_platform_globals();
 

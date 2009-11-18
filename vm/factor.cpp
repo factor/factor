@@ -119,7 +119,7 @@ void factor_vm::init_factor(vm_parameters *p)
 	if(p->image_path == NULL)
 		p->image_path = default_image_path();
 
-	srand(current_micros());
+	srand(system_micros());
 	init_ffi();
 	init_stacks(p->ds_size,p->rs_size);
 	init_callbacks(p->callback_size);

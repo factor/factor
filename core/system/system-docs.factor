@@ -16,8 +16,8 @@ ARTICLE: "system" "System interface"
 }
 "Getting the current time:"
 { $subsections
-    micros
-    millis
+    system-micros
+    system-micros
 }
 "Exiting the Factor VM:"
 { $subsections exit } ;
@@ -77,12 +77,12 @@ HELP: exit ( n -- )
 { $values { "n" "an integer exit code" } }
 { $description "Exits the Factor process." } ;
 
-HELP: micros ( -- us )
+HELP: system-micros ( -- us )
 { $values { "us" integer } }
 { $description "Outputs the number of microseconds ellapsed since midnight January 1, 1970." }
 { $notes "This is a low-level word. The " { $vocab-link "calendar" } " vocabulary provides features for date/time arithmetic and formatting." } ;
 
-HELP: millis ( -- ms )
+HELP: system-millis ( -- ms )
 { $values { "ms" integer } }
 { $description "Outputs the number of milliseconds ellapsed since midnight January 1, 1970." }
 { $notes "This is a low-level word. The " { $vocab-link "calendar" } " vocabulary provides features for date/time arithmetic and formatting." } ;

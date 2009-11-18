@@ -43,8 +43,8 @@ typedef wchar_t vm_char;
 inline static void init_signals() {}
 inline static void early_init() {}
 
-s64 current_micros();
-u64 current_nanos();
+u64 system_micros();
+u64 nano_count();
 long getpagesize();
 
 }

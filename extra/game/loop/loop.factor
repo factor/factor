@@ -21,7 +21,7 @@ GENERIC: draw* ( tick-slice delegate -- )
 SYMBOL: game-loop
 
 : since-last-tick ( loop -- milliseconds )
-    last-tick>> millis swap - ;
+    last-tick>> system-millis swap - ;
 
 : tick-slice ( loop -- slice )
     [ since-last-tick ] [ tick-length>> ] bi /f 1.0 min ;
@@ -53,7 +53,7 @@ TUPLE: game-loop-error game-loop error ;
     drop ;
 
 : ?tick ( loop count -- )
-    [ millis >>last-tick drop ] [
+    [ system-millis >>last-tick drop ] [
         over [ since-last-tick ] [ tick-length>> ] bi >=
         [ [ drop increment-tick ] [ drop tick ] [ 1 - ?tick ] 2tri ]
         [ 2drop ] if
@@ -70,12 +70,12 @@ TUPLE: game-loop-error game-loop error ;
     with-variable ;
 
 : benchmark-millis ( loop -- millis )
-    millis swap benchmark-time>> - ;
+    system-millis swap benchmark-time>> - ;
 
 PRIVATE>
 
 : reset-loop-benchmark ( loop -- )
-    millis >>benchmark-time
+    system-millis >>benchmark-time
     dup tick-number>> >>benchmark-tick-number
     dup frame-number>> >>benchmark-frame-number
     drop ;
@@ -86,7 +86,7 @@ PRIVATE>
     [ frame-number>> ] [ benchmark-frame-number>> - ] [ benchmark-millis ] tri /f ;
 
 : start-loop ( loop -- )
-    millis >>last-tick
+    system-millis >>last-tick
     t >>running?
     [ reset-loop-benchmark ]
     [ [ run-loop ] curry "game loop" spawn ]
@@ -98,7 +98,7 @@ PRIVATE>
     drop ;
 
 : <game-loop> ( tick-length delegate -- loop )
-    millis f f 0 0 millis 0 0
+    system-millis f f 0 0 system-millis 0 0
     game-loop boa ;
 
 M: game-loop dispose
