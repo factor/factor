@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private io
 threads.private continuations init quotations strings
-assocs heaps boxes namespaces deques dlists ;
+assocs heaps boxes namespaces deques dlists system ;
 IN: threads
 
 ARTICLE: "threads-start/stop" "Starting and stopping threads"
@@ -123,8 +123,8 @@ HELP: yield
 { $description "Adds the current thread to the end of the run queue, and switches to the next runnable thread." } ;
 
 HELP: sleep-until
-{ $values { "time/f" "a non-negative integer or " { $link f } } }
-{ $description "Suspends the current thread until the given time, or indefinitely if a value of " { $link f } " is passed in."
+{ $values { "n/f" "a non-negative integer or " { $link f } } }
+{ $description "Suspends the current thread until the given nanosecond count, returned by " { $link nano-count } ", is reached, or indefinitely if a value of " { $link f } " is passed in."
 $nl
 "Other threads may interrupt the sleep by calling " { $link interrupt } "." } ;
 
