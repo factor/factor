@@ -391,7 +391,7 @@ M: duration time-
 
 : gmt ( -- timestamp )
     #! GMT time, right now
-    unix-1970 micros microseconds time+ ;
+    unix-1970 system-micros microseconds time+ ;
 
 : now ( -- timestamp ) gmt >local-time ;
 : hence ( duration -- timestamp ) now swap time+ ;

@@ -85,7 +85,7 @@ Protocol *objc_getProtocol(char *name)
 		return nil;
 }
 
-u64 current_nanos()
+u64 nano_count()
 {
 	u64 t;
 	mach_timebase_info_data_t info;

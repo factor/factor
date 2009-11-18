@@ -14,7 +14,7 @@ IN: tools.threads
     ] with-cell
     [
         sleep-entry>> [
-            key>> micros [-] number>string write
+            key>> nano-count 1000 /i [-] number>string write
             " us" write
         ] when*
     ] with-cell ;

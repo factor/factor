@@ -358,8 +358,8 @@ M: space-invaders update-video ( value addr cpu -- )
 
 : sync-frame ( millis -- millis )
   #! Sleep until the time for the next frame arrives.
-  1000 60 / >fixnum + system:millis - dup 0 >
-  [ milliseconds threads:sleep ] [ drop threads:yield ] if system:millis ;
+  1000 60 / >fixnum + system:system-millis - dup 0 >
+  [ milliseconds threads:sleep ] [ drop threads:yield ] if system:system-millis ;
 
 : invaders-process ( millis gadget -- )
   #! Run a space invaders gadget inside a 
@@ -377,7 +377,7 @@ M: space-invaders update-video ( value addr cpu -- )
 M: invaders-gadget graft* ( gadget -- )
   dup cpu>> init-sounds
   f over (>>quit?)
-  [ system:millis swap invaders-process ] curry
+  [ system:system-millis swap invaders-process ] curry
   "Space invaders" threads:spawn drop ;
 
 M: invaders-gadget ungraft* ( gadget -- )

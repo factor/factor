@@ -432,8 +432,8 @@ tuple
     { "(exit)" "system" (( n -- )) }
     { "data-room" "memory" (( -- data-room )) }
     { "code-room" "memory" (( -- code-room )) }
-    { "micros" "system" (( -- us )) }
-    { "nanos" "system" (( -- us )) }
+    { "system-micros" "system" (( -- us )) }
+    { "nano-count" "system" (( -- ns )) }
     { "modify-code-heap" "compiler.units" (( alist -- )) }
     { "(dlopen)" "alien.libraries" (( path -- dll )) }
     { "(dlsym)" "alien.libraries" (( name dll -- alien )) }
