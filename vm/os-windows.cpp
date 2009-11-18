@@ -131,6 +131,11 @@ void factor_vm::sleep_micros(u64 usec)
 	Sleep((DWORD)(usec / 1000));
 }
 
+void factor_vm::sleep_nanos(u64 nsec)
+{
+	Sleep((DWORD)(nsec / 1000000));
+}
+
 long getpagesize()
 {
 	static long g_pagesize = 0;

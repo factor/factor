@@ -514,6 +514,9 @@ M: bad-executable summary
 \ micros { } { integer } define-primitive
 \ micros make-flushable
 
+\ nanos { } { integer } define-primitive
+\ nanos make-flushable
+
 \ tag { object } { fixnum } define-primitive
 \ tag make-foldable
 

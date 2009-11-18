@@ -34,4 +34,14 @@ const char *default_image_path()
 	return new_path;
 }
 
+u64 current_nanos()
+{
+	struct timespec t;
+	int ret;
+	ret = clock_gettime(CLOCK_MONOTONIC,&t);
+	if(ret != 0)
+		fatal_error("clock_gettime failed", 0);
+	return (u64)t.tv_sec * 1000000000 + t.tv_nsec;
+}
+
 }

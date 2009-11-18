@@ -52,6 +52,11 @@ void sleep_micros(cell usec)
 	usleep(usec);
 }
 
+void sleep_nanos(cell nsec)
+{
+	//nanosleep(n
+}
+
 void factor_vm::init_ffi()
 {
 	/* NULL_DLL is "libfactor.dylib" for OS X and NULL for generic unix */

@@ -118,6 +118,7 @@ struct factor_vm
 	// run
 	void primitive_exit();
 	void primitive_micros();
+	void primitive_nanos();
 	void primitive_sleep();
 	void primitive_set_slot();
 
@@ -674,6 +675,7 @@ struct factor_vm
 	// os-windows
   #if defined(WINDOWS)
 	void sleep_micros(u64 usec);
+	void sleep_nanos(u64 nsec);
 	const vm_char *vm_executable_path();
 	const vm_char *default_image_path();
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);
