@@ -1,4 +1,5 @@
 #include "master.hpp"
+#include <time.h>
 
 namespace factor
 {
