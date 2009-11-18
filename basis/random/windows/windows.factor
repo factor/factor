@@ -4,7 +4,7 @@ locals namespaces random windows.advapi32 windows.errors
 windows.kernel32 math.bitwise ;
 IN: random.windows
 
-TUPLE: windows-rng < disposable provider type ;
+TUPLE: windows-rng provider type ;
 C: <windows-rng> windows-rng
 
 TUPLE: windows-crypto-context handle ;
