@@ -115,6 +115,7 @@ scalar-rep ;
         { uchar-16-rep    ushort-8-rep    }
         { ushort-8-rep    uint-4-rep      }
         { uint-4-rep      ulonglong-2-rep }
+        { float-4-rep     double-2-rep    }
     } at ;
 
 ! Register classes
@@ -384,6 +385,10 @@ M: object %shl-vector-imm-reps { } ;
 M: object %shr-vector-imm-reps { } ;
 M: object %horizontal-shl-vector-imm-reps { } ;
 M: object %horizontal-shr-vector-imm-reps { } ;
+
+ALIAS: %merge-vector-head-reps %merge-vector-reps
+ALIAS: %merge-vector-tail-reps %merge-vector-reps
+ALIAS: %tail>head-vector-reps %unpack-vector-head-reps
 
 HOOK: %unbox-alien cpu ( dst src -- )
 HOOK: %unbox-any-c-ptr cpu ( dst src -- )
