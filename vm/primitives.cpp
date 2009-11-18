@@ -66,8 +66,8 @@ PRIMITIVE_FORWARD(set_callstack)
 PRIMITIVE_FORWARD(exit)
 PRIMITIVE_FORWARD(data_room)
 PRIMITIVE_FORWARD(code_room)
-PRIMITIVE_FORWARD(micros)
-PRIMITIVE_FORWARD(nanos)
+PRIMITIVE_FORWARD(system_micros)
+PRIMITIVE_FORWARD(nano_count)
 PRIMITIVE_FORWARD(modify_code_heap)
 PRIMITIVE_FORWARD(dlopen)
 PRIMITIVE_FORWARD(dlsym)
@@ -203,8 +203,8 @@ const primitive_type primitives[] = {
 	primitive_exit,
 	primitive_data_room,
 	primitive_code_room,
-	primitive_micros,
-	primitive_nanos,
+	primitive_system_micros,
+	primitive_nano_count,
 	primitive_modify_code_heap,
 	primitive_dlopen,
 	primitive_dlsym,

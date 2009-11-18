@@ -22,7 +22,7 @@ server-state f
 
 : expire-state ( class -- )
     new
-        -1/0. millis [a,b] >>expires
+        -1/0. system-millis [a,b] >>expires
     delete-tuples ;
 
 TUPLE: server-state-manager < filter-responder timeout ;

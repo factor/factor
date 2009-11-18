@@ -3,7 +3,7 @@
 namespace factor
 {
 
-s64 current_micros()
+u64 system_micros()
 {
 	SYSTEMTIME st;
 	FILETIME ft;

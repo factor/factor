@@ -59,7 +59,7 @@ SYMBOL: bootstrap-time
 
 [
     ! We time bootstrap
-    millis
+    system-millis
 
     default-image-name "output-image" set-global
 
@@ -84,14 +84,14 @@ SYMBOL: bootstrap-time
 
     load-components
 
-    millis over - core-bootstrap-time set-global
+    system-millis over - core-bootstrap-time set-global
 
     run-bootstrap-init
 
     f error set-global
     f error-continuation set-global
 
-    millis swap - bootstrap-time set-global
+    system-millis swap - bootstrap-time set-global
     print-report
 
     "deploy-vocab" get [

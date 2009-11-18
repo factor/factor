@@ -28,15 +28,15 @@ factor_vm *tls_vm()
 	return vm;
 }
 
-s64 current_micros()
+u64 system_micros()
 {
 	FILETIME t;
 	GetSystemTimeAsFileTime(&t);
-	return (((s64)t.dwLowDateTime | (s64)t.dwHighDateTime<<32)
+	return (((u64)t.dwLowDateTime | (u64)t.dwHighDateTime<<32)
 		- EPOCH_OFFSET) / 10;
 }
 
-u64 current_nanos()
+u64 nano_count()
 {
 	LARGE_INTEGER count;
 	LARGE_INTEGER frequency;
