@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs boxes calendar
 combinators.short-circuit fry heaps init kernel math.order
-namespaces quotations threads math monotonic-clock ;
+namespaces quotations threads math system ;
 IN: alarms
 
 TUPLE: alarm
@@ -25,7 +25,7 @@ SYMBOL: alarm-thread
 : <alarm> ( quot start interval -- alarm )
     alarm new
         swap dup [ normalize-argument ] when >>interval
-        swap dup [ normalize-argument monotonic-count + ] when >>start
+        swap dup [ normalize-argument nano-count + ] when >>start
         swap >>quot
         <box> >>entry ;
 
@@ -38,7 +38,7 @@ SYMBOL: alarm-thread
     [ start>> ] dip <= ;
 
 : reschedule-alarm ( alarm -- )
-    dup interval>> monotonic-count + >>start register-alarm ;
+    dup interval>> nano-count + >>start register-alarm ;
 
 : call-alarm ( alarm -- )
     [ entry>> box> drop ]
@@ -57,13 +57,12 @@ SYMBOL: alarm-thread
     ] if ;
 
 : trigger-alarms ( alarms -- )
-    monotonic-count (trigger-alarms) ;
+    nano-count (trigger-alarms) ;
 
 : next-alarm ( alarms -- timestamp/f )
     dup heap-empty? [ drop f ] [
         heap-peek drop start>>
-        monotonic-count swap -
-        nanoseconds hence
+        nano-count swap -
     ] if ;
 
 : alarm-thread-loop ( -- )
