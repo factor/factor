@@ -36,6 +36,21 @@ s64 current_micros()
 		- EPOCH_OFFSET) / 10;
 }
 
+u64 current_nanos()
+{
+	LARGE_INTEGER count;
+	LARGE_INTEGER frequency;
+	BOOL ret;
+	ret = QueryPerformanceCounter(&count);
+	if(ret == 0)
+		fatal_error("QueryPerformanceCounter", 0);
+	ret = QueryPerformanceFrequency(&frequency);
+	if(ret == 0)
+		fatal_error("QueryPerformanceFrequency", 0);
+	
+	return (ulonglong)count*(1000000000/frequency);
+}
+
 LONG factor_vm::exception_handler(PEXCEPTION_POINTERS pe)
 {
 	PEXCEPTION_RECORD e = (PEXCEPTION_RECORD)pe->ExceptionRecord;

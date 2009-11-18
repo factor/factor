@@ -67,6 +67,7 @@ PRIMITIVE_FORWARD(exit)
 PRIMITIVE_FORWARD(data_room)
 PRIMITIVE_FORWARD(code_room)
 PRIMITIVE_FORWARD(micros)
+PRIMITIVE_FORWARD(nanos)
 PRIMITIVE_FORWARD(modify_code_heap)
 PRIMITIVE_FORWARD(dlopen)
 PRIMITIVE_FORWARD(dlsym)
@@ -203,6 +204,7 @@ const primitive_type primitives[] = {
 	primitive_data_room,
 	primitive_code_room,
 	primitive_micros,
+	primitive_nanos,
 	primitive_modify_code_heap,
 	primitive_dlopen,
 	primitive_dlsym,
