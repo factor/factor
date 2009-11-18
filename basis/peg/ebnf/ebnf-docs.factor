@@ -435,9 +435,11 @@ ARTICLE: "peg.ebnf" "EBNF"
 "The " { $vocab-link "peg.ebnf" } " vocabulary provides a DSL that allows writing PEG parsers that look like "
 "EBNF syntax. It provides three parsing words described below. These words all "
 "accept the same EBNF syntax. The difference is in how they are used. "
-{ $subsection POSTPONE: <EBNF }
-{ $subsection POSTPONE: [EBNF }
-{ $subsection POSTPONE: EBNF: }
+{ $subsections
+    POSTPONE: <EBNF
+    POSTPONE: [EBNF
+    POSTPONE: EBNF:
+}
 "The EBNF syntax is composed of a series of rules of the form: "
 { $code 
   "rule1 = ..."
@@ -447,20 +449,20 @@ ARTICLE: "peg.ebnf" "EBNF"
 "and it is expected that the remaining rules are used by that rule. Rules may be "
 "left recursive. "
 "Each rule can contain the following: "
-{ $subsection "peg.ebnf.strings" }
-{ $subsection "peg.ebnf.any" }
-{ $subsection "peg.ebnf.sequence" }
-{ $subsection "peg.ebnf.choice" }
-{ $subsection "peg.ebnf.option" }
-{ $subsection "peg.ebnf.one-or-more" }
-{ $subsection "peg.ebnf.zero-or-more" }
-{ $subsection "peg.ebnf.and" }
-{ $subsection "peg.ebnf.not" }
-{ $subsection "peg.ebnf.character-class" }
-{ $subsection "peg.ebnf.foreign-rules" }
-{ $subsection "peg.ebnf.action" }
-{ $subsection "peg.ebnf.semantic-action" }
-{ $subsection "peg.ebnf.variable" }
+{ $subsections "peg.ebnf.strings"
+"peg.ebnf.any"
+"peg.ebnf.sequence"
+"peg.ebnf.choice"
+"peg.ebnf.option"
+"peg.ebnf.one-or-more"
+"peg.ebnf.zero-or-more"
+"peg.ebnf.and"
+"peg.ebnf.not"
+"peg.ebnf.character-class"
+"peg.ebnf.foreign-rules"
+"peg.ebnf.action"
+"peg.ebnf.semantic-action"
+"peg.ebnf.variable" }
 "Grammars defined in EBNF need to handle each character, or sequence of "
 "characters in the input. This can be tedious for dealing with whitespace in "
 "grammars that have 'tokens' separated by whitespace. You can define your "
@@ -468,7 +470,7 @@ ARTICLE: "peg.ebnf" "EBNF"
 "those tokens, allowing you to ignore the whitespace issue. The tokenizer "
 "can be changed at various parts in the grammar as needed. The JavaScript grammar "
 "does this to define the optional semicolon rule for example." 
-{ $subsection "peg.ebnf.tokenizers" }
+{ $subsections "peg.ebnf.tokenizers" }
 ;
 
 ABOUT: "peg.ebnf"
