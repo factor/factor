@@ -1,4 +1,4 @@
-USING: help.markup help.syntax calendar quotations ;
+USING: help.markup help.syntax calendar quotations system ;
 IN: alarms
 
 HELP: alarm
@@ -37,7 +37,7 @@ HELP: every
 } ;
 
 ARTICLE: "alarms" "Alarms"
-"The " { $vocab-link "alarms" } " vocabulary provides a lightweight way to schedule one-time and recurring tasks without spawning a new thread. Alarms use " { $vocab-link "monotonic-clock" } ", so they continue to work across system clock changes." $nl
+"The " { $vocab-link "alarms" } " vocabulary provides a lightweight way to schedule one-time and recurring tasks without spawning a new thread. Alarms use " { $link nano-count } ", so they continue to work across system clock changes." $nl
 "The alarm class:"
 { $subsections alarm }
 "Register a recurring alarm:"

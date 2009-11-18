@@ -173,7 +173,7 @@ PRIVATE>
 
 : yield ( -- ) [ resume ] f suspend drop ;
 
-GENERIC: sleep-until ( time/f -- )
+GENERIC: sleep-until ( n/f -- )
 
 M: integer sleep-until
     '[ _ schedule-sleep ] "sleep" suspend drop ;
