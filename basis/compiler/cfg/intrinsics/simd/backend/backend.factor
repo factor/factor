@@ -1,11 +1,11 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors arrays classes combinators
+USING: accessors arrays assocs classes combinators
 combinators.short-circuit compiler.cfg.builder.blocks
 compiler.cfg.registers compiler.cfg.stacks
 compiler.cfg.stacks.local compiler.tree.propagation.info
 cpu.architecture effects fry generalizations help.lint.checks
 kernel locals macros math namespaces quotations sequences
-splitting words ;
+splitting stack-checker words ;
 IN: compiler.cfg.intrinsics.simd.backend
 
 ! Selection of implementation based on available CPU instructions
@@ -18,20 +18,25 @@ IN: compiler.cfg.intrinsics.simd.backend
 
 GENERIC: create-can-has ( word -- word' )
 
-PREDICATE: vector-op-word < word
+PREDICATE: hat-word < word
     {
-        [ name>> { [ { [ "^" head? ] [ "##" head? ] } 1|| ] [ "-vector" swap subseq? ] } 1&& ]
+        [ name>> { [ "^" head? ] [ "##" head? ] } 1|| ]
         [ vocabulary>> { "compiler.cfg.intrinsics.simd" "compiler.cfg.hats" } member? ]
     } 1&& ;
+
+PREDICATE: vector-op-word < hat-word
+    name>> "-vector" swap subseq? ;
 
 : reps-word ( word -- word' )
     name>> "^^" ?head drop "##" ?head drop
     "%" "-reps" surround "cpu.architecture" lookup ;
 
+SYMBOL: blub
+
 :: can-has-^^-quot ( word def effect -- quot )
     effect in>> { "rep" } split1 [ length ] bi@ 1 +
     word reps-word 1quotation
-    effect out>> length f <array> >quotation
+    effect out>> length blub <array> >quotation
     '[ [ _ ndrop ] _ ndip @ can-has-rep? @ ] ;
 
 :: can-has-^-quot ( word def effect -- quot )
@@ -56,6 +61,17 @@ M: callable create-can-has
         { [ pick name>> "##" head? ] [ can-has-^^-quot ] }
         { [ pick name>> "^"  head? ] [ can-has-^-quot  ] }
     } cond ;
+
+: (can-has-nop-quot) ( word -- quot )
+    stack-effect in>> length '[ _ ndrop blub ] ;
+
+DEFER: can-has-words
+
+M: word create-can-has
+    can-has-words ?at drop 1quotation ;
+
+M: hat-word create-can-has
+    (can-has-nop-quot) ;
 
 M: vector-op-word create-can-has
     dup (can-has-word) [ 1quotation ] [ (can-has-quot) ] ?if ;
@@ -86,12 +102,46 @@ MACRO: vvvv-vector-op ( trials -- )
 : can-has-^(compare-vector) ( src1 src2 rep cc -- dst )
     [ 2drop ] 2dip %compare-vector-reps member?
     \ can-has? [ and ] change
-    f ;
+    blub ;
 
 : can-has-^^test-vector ( src rep vcc -- dst )
     [ drop ] 2dip drop %test-vector-reps member?
     \ can-has? [ and ] change
-    f ;
+    blub ;
+
+MACRO: can-has-case ( cases -- )
+    dup first second infer in>> length 1 +
+    '[ _ ndrop f ] suffix '[ _ case ] ;
+
+GENERIC# >can-has-trial 1 ( obj #pick -- quot )
+
+M: callable >can-has-trial
+    drop '[ _ can-has? ] ;
+M: pair >can-has-trial
+    swap first2 dup infer in>> length
+    '[ _ npick _ instance? [ _ can-has? ] [ _ ndrop blub ] if ] ; 
+
+MACRO: can-has-vector-op ( trials #pick #dup -- )
+    [ '[ _ >can-has-trial ] map ] dip '[ _ _ n|| \ can-has? [ and ] change blub ] ;
+
+: can-has-v-vector-op ( trials -- ? )
+    1 2 can-has-vector-op ; inline
+: can-has-vv-vector-op ( trials -- ? )
+    1 3 can-has-vector-op ; inline
+: can-has-vv-cc-vector-op ( trials -- ? )
+    2 4 can-has-vector-op ; inline
+: can-has-vvvv-vector-op ( trials -- ? )
+    1 5 can-has-vector-op ; inline
+
+CONSTANT: can-has-words
+    H{
+        { case can-has-case }
+        { v-vector-op     can-has-v-vector-op  }
+        { vl-vector-op    can-has-vv-vector-op }
+        { vv-vector-op    can-has-vv-vector-op }
+        { vv-cc-vector-op can-has-vv-cc-vector-op }
+        { vvvv-vector-op  can-has-vvvv-vector-op }
+    }
 
 ! Intrinsic code emission
 

@@ -44,14 +44,14 @@ IN: compiler.cfg.intrinsics.simd.tests
 
 : 1test-emit ( cpu rep quot -- node )
     [
-        [ new cpu ] 2dip '[
+        [ new \ cpu ] 2dip '[
             test-compiler-env [ _ 1test-node @ ] bind
         ] with-variable
     ] make-classes ; inline
 
 : 2test-emit ( cpu rep cc quot -- node )
     [
-        [ new cpu ] 3dip '[
+        [ new \ cpu ] 3dip '[
             test-compiler-env [ _ _ 2test-node @ ] bind
         ] with-variable
     ] make-classes ; inline
@@ -64,6 +64,11 @@ M: simple-ops-cpu %add-vector-reps  { int-4-rep float-4-rep } ;
 M: simple-ops-cpu %sub-vector-reps  { int-4-rep float-4-rep } ;
 M: simple-ops-cpu %mul-vector-reps  { int-4-rep float-4-rep } ;
 M: simple-ops-cpu %div-vector-reps  {           float-4-rep } ;
+M: simple-ops-cpu %not-vector-reps  { int-4-rep float-4-rep } ;
+M: simple-ops-cpu %andn-vector-reps { int-4-rep float-4-rep } ;
+M: simple-ops-cpu %and-vector-reps  { int-4-rep float-4-rep } ;
+M: simple-ops-cpu %or-vector-reps   { int-4-rep float-4-rep } ;
+M: simple-ops-cpu %xor-vector-reps  { int-4-rep float-4-rep } ;
 
 ! v+
 [ { ##add-vector } ]
