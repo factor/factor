@@ -48,7 +48,7 @@ u64 current_nanos()
 	if(ret == 0)
 		fatal_error("QueryPerformanceFrequency", 0);
 	
-	return (ulonglong)count*(1000000000/frequency);
+	return count.QuadPart*(1000000000/frequency.QuadPart);
 }
 
 LONG factor_vm::exception_handler(PEXCEPTION_POINTERS pe)
