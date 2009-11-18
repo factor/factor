@@ -433,6 +433,7 @@ tuple
     { "data-room" "memory" (( -- data-room )) }
     { "code-room" "memory" (( -- code-room )) }
     { "micros" "system" (( -- us )) }
+    { "nanos" "system" (( -- us )) }
     { "modify-code-heap" "compiler.units" (( alist -- )) }
     { "(dlopen)" "alien.libraries" (( path -- dll )) }
     { "(dlsym)" "alien.libraries" (( name dll -- alien )) }
