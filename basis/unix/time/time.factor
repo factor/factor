@@ -18,8 +18,8 @@ STRUCT: timespec
         swap >>usec
         swap >>sec ;
 
-: make-timespec ( us -- timespec )
-    1000000 /mod 1000 *
+: make-timespec ( nanos -- timespec )
+    1000000000 /mod
     timespec <struct>
         swap >>nsec
         swap >>sec ;

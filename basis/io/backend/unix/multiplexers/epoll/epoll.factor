@@ -51,8 +51,8 @@ M: epoll-mx remove-output-callbacks ( fd mx -- seq )
         [ EPOLLOUT do-epoll-del ] [ call-next-method ] 2bi
     ] [ 2drop f ] if ;
 
-: wait-event ( mx us -- n )
-    [ [ fd>> ] [ events>> ] bi dup length ] [ 1000 /i ] bi*
+: wait-event ( mx nanos -- n )
+    [ [ fd>> ] [ events>> ] bi dup length ] [ 1000000 /i ] bi*
     epoll_wait multiplexer-error ;
 
 : handle-event ( event mx -- )
@@ -63,5 +63,5 @@ M: epoll-mx remove-output-callbacks ( fd mx -- seq )
 : handle-events ( mx n -- )
     [ dup events>> ] dip head-slice swap '[ _ handle-event ] each ;
 
-M: epoll-mx wait-for-events ( us mx -- )
+M: epoll-mx wait-for-events ( nanos mx -- )
     swap 60000000 or dupd wait-event handle-events ;

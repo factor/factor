@@ -495,7 +495,7 @@ tuple
     { "<tuple>" "classes.tuple.private" (( layout -- tuple )) }
     { "profiling" "tools.profiler.private" (( ? -- )) }
     { "become" "kernel.private" (( old new -- )) }
-    { "(sleep)" "threads.private" (( us -- )) }
+    { "(sleep)" "threads.private" (( nanos -- )) }
     { "<tuple-boa>" "classes.tuple.private" (( ... layout -- tuple )) }
     { "callstack>array" "kernel" (( callstack -- array )) }
     { "innermost-frame-executing" "kernel.private" (( callstack -- obj )) }
