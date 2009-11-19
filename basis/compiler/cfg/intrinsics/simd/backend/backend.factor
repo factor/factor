@@ -3,7 +3,7 @@ USING: accessors arrays assocs classes combinators
 combinators.short-circuit compiler.cfg.builder.blocks
 compiler.cfg.registers compiler.cfg.stacks
 compiler.cfg.stacks.local compiler.tree.propagation.info
-cpu.architecture effects fry generalizations help.lint.checks
+cpu.architecture effects fry generalizations
 kernel locals macros math namespaces quotations sequences
 splitting stack-checker words ;
 IN: compiler.cfg.intrinsics.simd.backend
@@ -144,6 +144,12 @@ CONSTANT: can-has-words
     }
 
 ! Intrinsic code emission
+
+MACRO: check-elements ( quots -- )
+    [ length '[ _ firstn ] ]
+    [ '[ _ spread ] ]
+    [ length 1 - \ and <repetition> [ ] like ]
+    tri 3append ;
 
 MACRO: if-literals-match ( quots -- )
     [ length ] [ ] [ length ] tri
