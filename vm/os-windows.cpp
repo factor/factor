@@ -126,14 +126,9 @@ segment::~segment()
 		fatal_error("Segment deallocation failed",0);
 }
 
-void factor_vm::sleep_micros(u64 usec)
+void sleep_nanos(u64 nsec)
 {
-	Sleep((DWORD)(usec / 1000));
-}
-
-void factor_vm::sleep_nanos(u64 nsec)
-{
-	Sleep((DWORD)(nsec / 1000000));
+	Sleep((DWORD)(nsec/1000000));
 }
 
 long getpagesize()
