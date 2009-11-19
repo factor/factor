@@ -91,7 +91,7 @@ PRIVATE>
     f >>state
     check-registered 2array run-queue push-front ;
 
-: sleep-time ( -- us/f )
+: sleep-time ( -- nanos/f )
     {
         { [ run-queue deque-empty? not ] [ 0 ] }
         { [ sleep-queue heap-empty? ] [ f ] }
@@ -184,8 +184,7 @@ M: f sleep-until
 GENERIC: sleep ( dt -- )
 
 M: real sleep
-    >integer 1000 *
-    nano-count + sleep-until ;
+    >integer nano-count + sleep-until ;
 
 : interrupt ( thread -- )
     dup state>> [

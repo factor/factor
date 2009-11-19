@@ -113,8 +113,8 @@ HELP: sleep-queue
 { $var-description "A " { $link min-heap } " storing the queue of sleeping threads." } ;
 
 HELP: sleep-time
-{ $values { "us/f" "a non-negative integer or " { $link f } } }
-{ $description "Outputs the time until the next sleeping thread is scheduled to wake up, which could be zero if there are threads in the run queue, or threads which need to wake up right now. If there are no runnable or sleeping threads, outputs " { $link f } "." } ;
+{ $values { "nanos/f" "a non-negative integer or " { $link f } } }
+{ $description "Returns the time until the next sleeping thread is scheduled to wake up, which could be zero if there are threads in the run queue, or threads which need to wake up right now. If there are no runnable or sleeping threads, returns " { $link f } "." } ;
 
 HELP: stop
 { $description "Stops the current thread. The thread may be started again from another thread using " { $link (spawn) } "." } ;
