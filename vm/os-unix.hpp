@@ -54,8 +54,7 @@ void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap);
 
 u64 system_micros();
 u64 nano_count();
-void sleep_micros(cell usec);
-void sleep_nanos(cell nsec);
+void sleep_nanos(u64 nsec);
 
 void init_platform_globals();
 
