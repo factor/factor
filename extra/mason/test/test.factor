@@ -52,7 +52,7 @@ M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
     do-step ;
 
 : benchmark-ms ( quot -- ms )
-    benchmark 1000 /i ; inline
+    benchmark 1000000 /i ; inline
 
 : check-boot-image ( -- )
     "" to-refresh drop 2dup [ empty? not ] either?
