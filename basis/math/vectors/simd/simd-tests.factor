@@ -3,21 +3,12 @@ effects fry io kernel kernel.private math math.functions
 math.private math.vectors math.vectors.simd
 math.vectors.simd.private prettyprint random sequences system
 tools.test vocabs assocs compiler.cfg.debugger words
-locals math.vectors.specialization combinators cpu.architecture
-math.vectors.conversion.backend
-math.vectors.simd.intrinsics namespaces byte-arrays alien
+locals combinators cpu.architecture namespaces byte-arrays alien
 specialized-arrays classes.struct eval classes.algebra sets
 quotations math.constants compiler.units ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
-SIMD: c:char
-SIMDS: c:uchar c:short c:ushort c:int c:uint c:longlong c:ulonglong c:float c:double ;
 IN: math.vectors.simd.tests
-
-! Make sure the functor doesn't generate bogus vocabularies
-2 [ [ "USE: math.vectors.simd SIMD: rubinius" eval( -- ) ] must-fail ] times
-
-[ f ] [ "math.vectors.simd.instances.rubinius" vocab ] unit-test
 
 ! Test type propagation
 [ V{ float } ] [ [ { float-4 } declare norm-sq ] final-classes ] unit-test
@@ -38,10 +29,6 @@ IN: math.vectors.simd.tests
 
 [ V{ integer } ] [ [ { longlong-2 } declare second ] final-classes ] unit-test
 
-[ V{ int-8 } ] [ [ { int-8 int-8 } declare v+ ] final-classes ] unit-test
-
-[ t ] [ [ { int-8 } declare second ] final-classes first integer class<= ] unit-test
-
 ! Test puns; only on x86
 cpu x86? [
     [ double-2{ 4 1024 } ] [
@@ -55,25 +42,75 @@ CONSTANT: simd-classes
     {
         char-16
         uchar-16
-        char-32
-        uchar-32
         short-8
         ushort-8
-        short-16
-        ushort-16
         int-4
         uint-4
-        int-8
-        uint-8
         longlong-2
         ulonglong-2
-        longlong-4
-        ulonglong-4
         float-4
-        float-8
         double-2
-        double-4
     }
+
+SYMBOLS: -> +vector+ +any-vector+ +scalar+ +boolean+ +nonnegative+ +literal+ ;
+
+CONSTANT: vector-words
+    H{
+        { [v-] { +vector+ +vector+ -> +vector+ } }
+        { distance { +vector+ +vector+ -> +nonnegative+ } }
+        { n*v { +scalar+ +vector+ -> +vector+ } }
+        { n+v { +scalar+ +vector+ -> +vector+ } }
+        { n-v { +scalar+ +vector+ -> +vector+ } }
+        { n/v { +scalar+ +vector+ -> +vector+ } }
+        { norm { +vector+ -> +nonnegative+ } }
+        { norm-sq { +vector+ -> +nonnegative+ } }
+        { normalize { +vector+ -> +vector+ } }
+        { v* { +vector+ +vector+ -> +vector+ } }
+        { vs* { +vector+ +vector+ -> +vector+ } }
+        { v*n { +vector+ +scalar+ -> +vector+ } }
+        { v+ { +vector+ +vector+ -> +vector+ } }
+        { vs+ { +vector+ +vector+ -> +vector+ } }
+        { v+- { +vector+ +vector+ -> +vector+ } }
+        { v+n { +vector+ +scalar+ -> +vector+ } }
+        { v- { +vector+ +vector+ -> +vector+ } }
+        { vneg { +vector+ -> +vector+ } }
+        { vs- { +vector+ +vector+ -> +vector+ } }
+        { v-n { +vector+ +scalar+ -> +vector+ } }
+        { v. { +vector+ +vector+ -> +scalar+ } }
+        { v/ { +vector+ +vector+ -> +vector+ } }
+        { v/n { +vector+ +scalar+ -> +vector+ } }
+        { vceiling { +vector+ -> +vector+ } }
+        { vfloor { +vector+ -> +vector+ } }
+        { vmax { +vector+ +vector+ -> +vector+ } }
+        { vmin { +vector+ +vector+ -> +vector+ } }
+        { vneg { +vector+ -> +vector+ } }
+        { vtruncate { +vector+ -> +vector+ } }
+        { sum { +vector+ -> +scalar+ } }
+        { vabs { +vector+ -> +vector+ } }
+        { vsqrt { +vector+ -> +vector+ } }
+        { vbitand { +vector+ +vector+ -> +vector+ } }
+        { vbitandn { +vector+ +vector+ -> +vector+ } }
+        { vbitor { +vector+ +vector+ -> +vector+ } }
+        { vbitxor { +vector+ +vector+ -> +vector+ } }
+        { vbitnot { +vector+ -> +vector+ } }
+        { vand { +vector+ +vector+ -> +vector+ } }
+        { vandn { +vector+ +vector+ -> +vector+ } }
+        { vor { +vector+ +vector+ -> +vector+ } }
+        { vxor { +vector+ +vector+ -> +vector+ } }
+        { vnot { +vector+ -> +vector+ } }
+        { vlshift { +vector+ +scalar+ -> +vector+ } }
+        { vrshift { +vector+ +scalar+ -> +vector+ } }
+        { (vmerge-head) { +vector+ +vector+ -> +vector+ } }
+        { (vmerge-tail) { +vector+ +vector+ -> +vector+ } }
+        { v<= { +vector+ +vector+ -> +vector+ } }
+        { v< { +vector+ +vector+ -> +vector+ } }
+        { v= { +vector+ +vector+ -> +vector+ } }
+        { v> { +vector+ +vector+ -> +vector+ } }
+        { v>= { +vector+ +vector+ -> +vector+ } }
+        { vunordered? { +vector+ +vector+ -> +vector+ } }
+    }
+
+: vector-word-inputs ( schema -- seq ) { -> } split first ;
 
 : with-ctors ( -- seq )
     simd-classes [ [ name>> "-with" append ] [ vocabulary>> ] bi lookup ] map ;
@@ -166,26 +203,15 @@ CONSTANT: simd-classes
 : remove-boolean-words ( alist -- alist' )
     boolean-ops unique assoc-diff ;
 
-: remove-special-words ( alist -- alist' )
-    ! These have their own tests later
-    {
-        hlshift hrshift vshuffle-bytes vshuffle-elements vbroadcast
-        vany? vall? vnone?
-        (v>float) (v>integer)
-        (vpack-signed) (vpack-unsigned)
-        (vunpack-head) (vunpack-tail)
-    } unique assoc-diff ;
-
 : ops-to-check ( elt-class -- alist )
     [ vector-words >alist ] dip
     float = [ remove-integer-words ] [ remove-float-words ] if
-    remove-boolean-words
-    remove-special-words ;
+    remove-boolean-words ;
 
 : check-vector-ops ( class elt-class compare-quot -- )
     [
         [ nip ops-to-check ] 2keep
-        '[ first2 inputs _ _ check-vector-op ]
+        '[ first2 vector-word-inputs _ _ check-vector-op ]
     ] dip check-optimizer ; inline
 
 : (approx=) ( x y -- ? )
@@ -427,27 +453,6 @@ TUPLE: inconsistent-vector-test bool branch ;
 [ t f f ]
 [ int-4{ f f f f } { int-4 } test-vector-tests ] unit-test
 
-[ f t t ]
-[ float-8{ t t t t t t t t } { float-8 } test-vector-tests ] unit-test
-[ f t f ]
-[ float-8{ f t t t t f t t } { float-8 } test-vector-tests ] unit-test
-[ t f f ]
-[ float-8{ f f f f f f f f } { float-8 } test-vector-tests ] unit-test
-
-[ f t t ]
-[ double-4{ t t t t } { double-4 } test-vector-tests ] unit-test
-[ f t f ]
-[ double-4{ f t t f } { double-4 } test-vector-tests ] unit-test
-[ t f f ]
-[ double-4{ f f f f } { double-4 } test-vector-tests ] unit-test
-
-[ f t t ]
-[ int-8{ t t t t t t t t } { int-8 } test-vector-tests ] unit-test
-[ f t f ]
-[ int-8{ f t t t t f f f } { int-8 } test-vector-tests ] unit-test
-[ t f f ]
-[ int-8{ f f f f f f f f } { int-8 } test-vector-tests ] unit-test
-
 "== Checking element access" print
 
 ! Test element access -- it should box bignums for int-4 on x86
@@ -467,14 +472,6 @@ TUPLE: inconsistent-vector-test bool branch ;
 [ { } ] [ longlong-2{ 1 2 } test-accesses ] unit-test
 [ { } ] [ ulonglong-2{ 1 2 } test-accesses ] unit-test
 
-[ { } ] [ float-8{ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 } test-accesses ] unit-test
-[ { } ] [ int-8{ 1 2 3 4 5 6 7 8 } test-accesses ] unit-test
-[ { } ] [ uint-8{ 1 2 3 4 5 6 7 8 } test-accesses ] unit-test
-
-[ { } ] [ double-4{ 1.0 2.0 3.0 4.0 } test-accesses ] unit-test
-[ { } ] [ longlong-4{ 1 2 3 4 } test-accesses ] unit-test
-[ { } ] [ ulonglong-4{ 1 2 3 4 } test-accesses ] unit-test
-
 "== Checking broadcast" print
 : test-broadcast ( seq -- failures )
     [ length >array ] keep
@@ -487,14 +484,6 @@ TUPLE: inconsistent-vector-test bool branch ;
 [ { } ] [ double-2{ 1.0 2.0 } test-broadcast ] unit-test
 [ { } ] [ longlong-2{ 1 2 } test-broadcast ] unit-test
 [ { } ] [ ulonglong-2{ 1 2 } test-broadcast ] unit-test
-
-[ { } ] [ float-8{ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 } test-broadcast ] unit-test
-[ { } ] [ int-8{ 1 2 3 4 5 6 7 8 } test-broadcast ] unit-test
-[ { } ] [ uint-8{ 1 2 3 4 5 6 7 8 } test-broadcast ] unit-test
-
-[ { } ] [ double-4{ 1.0 2.0 3.0 4.0 } test-broadcast ] unit-test
-[ { } ] [ longlong-4{ 1 2 3 4 } test-broadcast ] unit-test
-[ { } ] [ ulonglong-4{ 1 2 3 4 } test-broadcast ] unit-test
 
 ! Make sure we use the fallback in the correct situations
 [ int-4{ 3 3 3 3 } ] [ int-4{ 12 34 3 17 } 2 [ { int-4 fixnum } declare vbroadcast ] compile-call ] unit-test
@@ -529,37 +518,37 @@ TUPLE: inconsistent-vector-test bool branch ;
 STRUCT: simd-struct
 { x float-4 }
 { y longlong-2 }
-{ z double-4 }
-{ w int-8 } ;
+{ z double-2 }
+{ w int-4 } ;
 
 [ t ] [ [ simd-struct <struct> ] compile-call >c-ptr [ 0 = ] all? ] unit-test
 
 [
     float-4{ 1 2 3 4 }
     longlong-2{ 2 1 }
-    double-4{ 4 3 2 1 }
-    int-8{ 1 2 3 4 5 6 7 8 }
+    double-2{ 4 3 }
+    int-4{ 1 2 3 4 }
 ] [
     simd-struct <struct>
     float-4{ 1 2 3 4 } >>x
     longlong-2{ 2 1 } >>y
-    double-4{ 4 3 2 1 } >>z
-    int-8{ 1 2 3 4 5 6 7 8 } >>w
+    double-2{ 4 3 } >>z
+    int-4{ 1 2 3 4 } >>w
     { [ x>> ] [ y>> ] [ z>> ] [ w>> ] } cleave
 ] unit-test
 
 [
     float-4{ 1 2 3 4 }
     longlong-2{ 2 1 }
-    double-4{ 4 3 2 1 }
-    int-8{ 1 2 3 4 5 6 7 8 }
+    double-2{ 4 3 }
+    int-4{ 1 2 3 4 }
 ] [
     [
         simd-struct <struct>
         float-4{ 1 2 3 4 } >>x
         longlong-2{ 2 1 } >>y
-        double-4{ 4 3 2 1 } >>z
-        int-8{ 1 2 3 4 5 6 7 8 } >>w
+        double-2{ 4 3 } >>z
+        int-4{ 1 2 3 4 } >>w
         { [ x>> ] [ y>> ] [ z>> ] [ w>> ] } cleave
     ] compile-call
 ] unit-test
@@ -570,8 +559,8 @@ STRUCT: simd-struct
 
 ! CSSA bug
 [ 8000000 ] [
-    int-8{ 1000 1000 1000 1000 1000 1000 1000 1000 }
-    [ { int-8 } declare dup [ * ] [ + ] 2map-reduce ] compile-call
+    int-4{ 1000 1000 1000 1000 }
+    [ { int-4 } declare dup [ * ] [ + ] 2map-reduce ] compile-call
 ] unit-test
 
 ! Coalescing was too aggressive
