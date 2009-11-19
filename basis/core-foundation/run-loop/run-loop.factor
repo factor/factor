@@ -121,8 +121,8 @@ PRIVATE>
 : init-thread-timer ( -- )
     timer-callback <CFTimer> add-timer-to-run-loop ;
 
-: run-one-iteration ( us -- handled? )
+: run-one-iteration ( nanos -- handled? )
     reset-run-loop
     CFRunLoopDefaultMode
-    swap [ microseconds ] [ 5 minutes ] if* >CFTimeInterval
+    swap [ nanoseconds ] [ 5 minutes ] if* >CFTimeInterval
     t CFRunLoopRunInMode kCFRunLoopRunHandledSource = ;
