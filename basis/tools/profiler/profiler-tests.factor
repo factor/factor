@@ -64,3 +64,11 @@ IN: tools.profiler.tests
 : crash-bug-2 ( -- ) 100000 [ crash-bug-1 drop ] times ;
 
 [ ] [ [ crash-bug-2 ] profile ] unit-test
+
+[ 1 ] [
+    [
+        [ [ ] (( -- )) define-temp ] with-compilation-unit
+        dup execute( -- )
+    ] profile
+    counter>>
+] unit-test
