@@ -123,6 +123,8 @@ GENERIC: simd-rep ( simd -- rep )
 
 <PRIVATE
 
+DEFER: simd-construct-op
+
 ! SIMD concrete type functor
 
 FUNCTOR: define-simd-128 ( T -- )
@@ -149,7 +151,6 @@ TUPLE: A < simd-128 ;
 M: A new-underlying    drop \ A boa ; inline
 M: A simd-rep          drop A-rep ; inline
 M: A simd-element-type drop ELT ; inline
-M: A length            drop N ; inline
 
 M: A set-nth-unsafe
     [ ELT boolean>element ] 2dip
@@ -162,10 +163,14 @@ M: A like drop dup \ A instance? [ >A ] unless ; inline
 : A-with ( n -- v ) \ A new simd-with ; inline
 : A-cast ( v -- v' ) \ A new simd-cast ; inline
 
-\ A-boa { \ A simd-boa } >quotation BOA-EFFECT define-inline
+\ A-boa \ A new N {
+    { 2 [ '[ _ [ (simd-gather-2) ] simd-construct-op ] ] }
+    { 4 [ '[ _ [ (simd-gather-4) ] simd-construct-op ] ] }
+    [ swap '[ _ _ nsequence ] ]
+} case BOA-EFFECT define-inline
 
-! M: A pprint-delims drop \ A{ \ } ;
-! SYNTAX: A{ \ } [ >A ] parse-literal ;
+M: A pprint-delims drop \ A{ \ } ;
+SYNTAX: A{ \ } [ >A ] parse-literal ;
 
 c:<c-type>
     byte-array >>class
@@ -185,17 +190,6 @@ SYNTAX: SIMD-128:
 PRIVATE>
 
 >>
-
-SIMD-128: char-16
-SIMD-128: uchar-16
-SIMD-128: short-8
-SIMD-128: ushort-8
-SIMD-128: int-4
-SIMD-128: uint-4
-SIMD-128: longlong-2
-SIMD-128: ulonglong-2
-SIMD-128: float-4
-SIMD-128: double-2
 
 : assert-positive ( x -- y ) ;
 
@@ -350,6 +344,19 @@ M: simd-128 v/n over simd-with v/ ; inline
 M: simd-128 norm-sq dup v. assert-positive ; inline
 M: simd-128 norm      norm-sq sqrt ; inline
 M: simd-128 distance  v- norm ; inline
+
+! SIMD instances
+
+SIMD-128: char-16
+SIMD-128: uchar-16
+SIMD-128: short-8
+SIMD-128: ushort-8
+SIMD-128: int-4
+SIMD-128: uint-4
+SIMD-128: longlong-2
+SIMD-128: ulonglong-2
+SIMD-128: float-4
+SIMD-128: double-2
 
 ! misc
 
