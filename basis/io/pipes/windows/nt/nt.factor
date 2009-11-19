@@ -35,7 +35,7 @@ IN: io.pipes.windows.nt
         "-" %
         32 random-bits #
         "-" %
-        micros #
+        system-micros #
     ] "" make ;
 
 M: winnt (pipe) ( -- pipe )
