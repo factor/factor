@@ -41,21 +41,6 @@ TUPLE: leap ;
         [ string>number ]
     } case ;
 
-/*
-: rule-on ( string -- obj )
-    {
-        { [ dup string>number ] [ ] }
-        { [ "last" ?head ] [ month-abbreviation>n ] }
-        { [ ] [ month-abbreviation>n ] }
-    } cond ;
-*/
-
-            ! [ string>number -1/0. or ]
-            ! [ rule-to ]
-            
-            ! [ month-abbreviation>n ]
-            ! [ rule-on ]
-
 : raw-rule>rule ( raw-rule -- rule )
     ;
 
