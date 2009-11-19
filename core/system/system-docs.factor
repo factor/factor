@@ -17,7 +17,6 @@ ARTICLE: "system" "System interface"
 "Getting the current time:"
 { $subsections
     system-micros
-    system-millis
 }
 "Getting a monotonically increasing nanosecond count:"
 { $subsections nano-count }
@@ -83,11 +82,6 @@ HELP: system-micros ( -- us )
 { $values { "us" integer } }
 { $description "Outputs the number of microseconds elapsed since midnight January 1, 1970." }
 { $notes "This is a low-level word. The " { $vocab-link "calendar" } " vocabulary provides features for date/time arithmetic and formatting. For timing code, use " { $link nano-count } "." } ;
-
-HELP: system-millis ( -- ms )
-{ $values { "ms" integer } }
-{ $description "Outputs the number of milliseconds elapsed since midnight January 1, 1970." }
-{ $notes "This is a low-level word. The " { $vocab-link "calendar" } " vocabulary provides features for date/time arithmetic and formatting." } ;
 
 HELP: nano-count ( -- ns )
 { $values { "ns" integer } }

@@ -55,6 +55,4 @@ PRIVATE>
 
 : embedded? ( -- ? ) 15 getenv ;
 
-: system-millis ( -- ms ) system-micros 1000 /i ;
-
 : exit ( n -- ) do-shutdown-hooks (exit) ;
