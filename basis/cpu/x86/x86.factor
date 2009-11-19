@@ -1323,8 +1323,15 @@ M: x86 %shr-vector-imm-reps %shr-vector-reps ;
 
 M: x86 %integer>scalar drop MOVD ;
 
+! XXX the longlong versions won't work on x86.32
 M:: x86 %scalar>integer ( dst src rep -- )
     rep {
+        { longlong-scalar-rep [
+            dst src MOVD
+        ] }
+        { ulonglong-scalar-rep [
+            dst src MOVD
+        ] }
         { int-scalar-rep [
             dst 32-bit-version-of src MOVD
             dst dst 32-bit-version-of
