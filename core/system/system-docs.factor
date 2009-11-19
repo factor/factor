@@ -1,6 +1,5 @@
 USING: generic help.markup help.syntax kernel math memory
-namespaces sequences kernel.private strings classes.singleton
-tools.time ;
+namespaces sequences kernel.private strings classes.singleton ;
 IN: system
 
 ABOUT: "system"
@@ -18,7 +17,7 @@ ARTICLE: "system" "System interface"
 "Getting the current time:"
 { $subsections
     system-micros
-    system-micros
+    system-millis
 }
 "Getting a monotonically increasing nanosecond count:"
 { $subsections nano-count }
@@ -93,7 +92,7 @@ HELP: system-millis ( -- ms )
 HELP: nano-count ( -- ns )
 { $values { "ns" integer } }
 { $description "Outputs a monotonically increasing count of nanoseconds elapsed since an arbitrary starting time. The difference of two calls to this word allows timing. This word is unaffected by system clock changes." }
-{ $notes "This is a low-level word. The " { $link time } " word may be used to time code execution time. For system time, use " { $link system-micros } "." } ;
+{ $notes "This is a low-level word. The " { $vocab-link "tools.time" } " vocabulary defines words to time code execution time. For system time, use " { $link system-micros } "." } ;
 
 HELP: image
 { $values { "path" "a pathname string" } }
