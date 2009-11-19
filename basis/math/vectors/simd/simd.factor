@@ -1,18 +1,12 @@
 USING: accessors alien.c-types arrays byte-arrays classes combinators
 cpu.architecture effects fry functors generalizations generic
 generic.parser kernel lexer literals macros math math.functions
-math.vectors math.vectors.private namespaces parser
+math.vectors math.vectors.private math.vectors.simd.intrinsics namespaces parser
 prettyprint.custom quotations sequences sequences.private vocabs
 vocabs.loader words ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd
 
-DEFER: vconvert
-DEFER: simd-with
-DEFER: simd-boa
-DEFER: simd-cast
-
-ERROR: bad-simd-call word ;
 ERROR: bad-simd-length got expected ;
 
 <<
@@ -27,68 +21,6 @@ GENERIC: new-underlying ( underlying seq -- seq' )
     '[ underlying>> @ ] keep new-underlying ; inline
 PRIVATE>
 >>
-
-<PRIVATE
-
-! SIMD intrinsics
-
-: (simd-v+)                ( a b rep -- c ) \ v+ bad-simd-call ;
-: (simd-v-)                ( a b rep -- c ) \ v- bad-simd-call ;
-: (simd-vneg)              ( a   rep -- c ) \ vneg bad-simd-call ;
-: (simd-v+-)               ( a b rep -- c ) \ v+- bad-simd-call ;
-: (simd-vs+)               ( a b rep -- c ) \ vs+ bad-simd-call ;
-: (simd-vs-)               ( a b rep -- c ) \ vs- bad-simd-call ;
-: (simd-vs*)               ( a b rep -- c ) \ vs* bad-simd-call ;
-: (simd-v*)                ( a b rep -- c ) \ v* bad-simd-call ;
-: (simd-v/)                ( a b rep -- c ) \ v/ bad-simd-call ;
-: (simd-vmin)              ( a b rep -- c ) \ vmin bad-simd-call ;
-: (simd-vmax)              ( a b rep -- c ) \ vmax bad-simd-call ;
-: (simd-v.)                ( a b rep -- n ) \ v. bad-simd-call ;
-: (simd-vsqrt)             ( a   rep -- c ) \ vsqrt bad-simd-call ;
-: (simd-sum)               ( a   rep -- n ) \ sum bad-simd-call ;
-: (simd-vabs)              ( a   rep -- c ) \ vabs bad-simd-call ;
-: (simd-vbitand)           ( a b rep -- c ) \ vbitand bad-simd-call ;
-: (simd-vbitandn)          ( a b rep -- c ) \ vbitandn bad-simd-call ;
-: (simd-vbitor)            ( a b rep -- c ) \ vbitor bad-simd-call ;
-: (simd-vbitxor)           ( a b rep -- c ) \ vbitxor bad-simd-call ;
-: (simd-vbitnot)           ( a   rep -- c ) \ vbitnot bad-simd-call ;
-: (simd-vand)              ( a b rep -- c ) \ vand bad-simd-call ;
-: (simd-vandn)             ( a b rep -- c ) \ vandn bad-simd-call ;
-: (simd-vor)               ( a b rep -- c ) \ vor bad-simd-call ;
-: (simd-vxor)              ( a b rep -- c ) \ vxor bad-simd-call ;
-: (simd-vnot)              ( a   rep -- c ) \ vnot bad-simd-call ;
-: (simd-vlshift)           ( a n rep -- c ) \ vlshift bad-simd-call ;
-: (simd-vrshift)           ( a n rep -- c ) \ vrshift bad-simd-call ;
-: (simd-hlshift)           ( a n rep -- c ) \ hlshift bad-simd-call ;
-: (simd-hrshift)           ( a n rep -- c ) \ hrshift bad-simd-call ;
-: (simd-vshuffle-elements) ( a n rep -- c ) \ vshuffle-elements bad-simd-call ;
-: (simd-vshuffle-bytes)    ( a b rep -- c ) \ vshuffle-bytes bad-simd-call ;
-: (simd-vmerge-head)       ( a b rep -- c ) \ (vmerge-head) bad-simd-call ;
-: (simd-vmerge-tail)       ( a b rep -- c ) \ (vmerge-tail) bad-simd-call ;
-: (simd-v<=)               ( a b rep -- c ) \ v<= bad-simd-call ;
-: (simd-v<)                ( a b rep -- c ) \ v< bad-simd-call ;
-: (simd-v=)                ( a b rep -- c ) \ v= bad-simd-call ;
-: (simd-v>)                ( a b rep -- c ) \ v> bad-simd-call ;
-: (simd-v>=)               ( a b rep -- c ) \ v>= bad-simd-call ;
-: (simd-vunordered?)       ( a b rep -- c ) \ vunordered? bad-simd-call ;
-: (simd-vany?)             ( a   rep -- ? ) \ vany? bad-simd-call ;
-: (simd-vall?)             ( a   rep -- ? ) \ vall? bad-simd-call ;
-: (simd-vnone?)            ( a   rep -- ? ) \ vnone? bad-simd-call ;
-: (simd-v>float)           ( a   rep -- c ) \ vconvert bad-simd-call ;
-: (simd-v>integer)         ( a   rep -- c ) \ vconvert bad-simd-call ;
-: (simd-vpack-signed)      ( a b rep -- c ) \ vconvert bad-simd-call ;
-: (simd-vpack-unsigned)    ( a b rep -- c ) \ vconvert bad-simd-call ;
-: (simd-vunpack-head)      ( a   rep -- c ) \ vconvert bad-simd-call ;
-: (simd-vunpack-tail)      ( a   rep -- c ) \ vconvert bad-simd-call ;
-: (simd-with)              (   n rep -- v ) \ simd-with bad-simd-call ;
-: (simd-gather-2)          ( m n rep -- v ) \ simd-boa bad-simd-call ;
-: (simd-gather-4)          ( m n o p rep -- v ) \ simd-boa bad-simd-call ;
-: (simd-select)            ( a n rep -- n ) \ nth bad-simd-call ;
-
-PRIVATE>
-
-: alien-vector     (       c-ptr n rep -- value ) \ alien-vector bad-simd-call ;
-: set-alien-vector ( value c-ptr n rep --       ) \ set-alien-vector bad-simd-call ;
 
 <PRIVATE
 
@@ -116,13 +48,6 @@ TUPLE: simd-128
 
 GENERIC: simd-element-type ( obj -- c-type )
 GENERIC: simd-rep ( simd -- rep )
-
-<<
-: assert-positive ( x -- y ) ;
-
-: rep-length ( rep -- n )
-    16 swap rep-component-type heap-size /i ; foldable
->>
 
 <<
 <PRIVATE
@@ -216,7 +141,25 @@ M: A like drop dup \ A instance? [ >A ] unless ; inline
 M: A hashcode* underlying>> hashcode* ; inline
 M: A clone [ clone ] change-underlying ; inline
 M: A length drop N ; inline
-M: A nth-unsafe swap \ A-rep (simd-select) ; inline
+M: A nth-unsafe
+    swap {
+        {  0 [  0 \ A-rep (simd-select) ] }
+        {  1 [  1 \ A-rep (simd-select) ] }
+        {  2 [  2 \ A-rep (simd-select) ] }
+        {  3 [  3 \ A-rep (simd-select) ] }
+        {  4 [  4 \ A-rep (simd-select) ] }
+        {  5 [  5 \ A-rep (simd-select) ] }
+        {  6 [  6 \ A-rep (simd-select) ] }
+        {  7 [  7 \ A-rep (simd-select) ] }
+        {  8 [  8 \ A-rep (simd-select) ] }
+        {  9 [  9 \ A-rep (simd-select) ] }
+        { 10 [ 10 \ A-rep (simd-select) ] }
+        { 11 [ 11 \ A-rep (simd-select) ] }
+        { 12 [ 12 \ A-rep (simd-select) ] }
+        { 13 [ 13 \ A-rep (simd-select) ] }
+        { 14 [ 14 \ A-rep (simd-select) ] }
+        { 15 [ 15 \ A-rep (simd-select) ] }
+    } case ; inline 
 M: A c:byte-length drop 16 ; inline
 
 M: A new-sequence
@@ -352,10 +295,6 @@ SIMD-128: double-2
 
 M: simd-128 vshuffle ( u perm -- v )
     vshuffle-bytes ; inline
-
-"compiler.tree.propagation.simd" require
-"compiler.cfg.intrinsics.simd" require
-"compiler.cfg.value-numbering.simd" require
 
 "mirrors" vocab [
     "math.vectors.simd.mirrors" require
