@@ -118,12 +118,60 @@ GENERIC: simd-element-type ( obj -- c-type )
 GENERIC: simd-rep ( simd -- rep )
 
 <<
+: assert-positive ( x -- y ) ;
+
 : rep-length ( rep -- n )
     16 swap rep-component-type heap-size /i ; foldable
+>>
 
+<<
 <PRIVATE
 
 DEFER: simd-construct-op
+
+! Unboxers for SIMD operations
+: if-both-vectors ( a b rep t f -- )
+    [ 2over [ simd-128? ] both? ] 2dip if ; inline
+
+: if-both-vectors-match ( a b rep t f -- )
+    [ 3dup [ drop [ simd-128? ] both? ] [ '[ simd-rep _ eq? ] both? ] 3bi and ]
+    2dip if ; inline
+
+: simd-construct-op ( exemplar quot: ( rep -- v ) -- v )
+    [ dup simd-rep ] dip curry make-underlying ; inline
+
+: simd-unbox ( a -- a (a) )
+    [ ] [ underlying>> ] bi ; inline
+
+: v->v-op ( a rep quot: ( (a) rep -- (c) ) fallback-quot -- c )
+    drop [ simd-unbox ] 2dip 2curry make-underlying ; inline
+
+: vn->v-op ( a n rep quot: ( (a) n rep -- (c) ) fallback-quot -- c )
+    drop [ simd-unbox ] 3dip 3curry make-underlying ; inline
+
+: v->n-op ( a rep quot: ( (a) rep -- n ) fallback-quot -- n )
+    drop [ underlying>> ] 2dip call ; inline
+
+: (vv->v-op) ( a b rep quot: ( (a) (b) rep -- (c) ) -- c )
+    [ [ simd-unbox ] [ underlying>> ] bi* ] 2dip 3curry make-underlying ; inline
+
+: (vv->n-op) ( a b rep quot: ( (a) (b) rep -- n ) -- n )
+    [ [ underlying>> ] bi@ ] 2dip 3curry call ; inline
+    
+: vv->v-op ( a b rep quot: ( (a) (b) rep -- (c) ) fallback-quot -- c )
+    [ '[ _ (vv->v-op) ] ] [ '[ drop @ ] ] bi* if-both-vectors-match ; inline
+
+: vv'->v-op ( a b rep quot: ( (a) (b) rep -- (c) ) fallback-quot -- c )
+    [ '[ _ (vv->v-op) ] ] [ '[ drop @ ] ] bi* if-both-vectors ; inline
+
+: vv->n-op ( a b rep quot: ( (a) (b) rep -- n ) fallback-quot -- n )
+    [ '[ _ (vv->n-op) ] ] [ '[ drop @ ] ] bi* if-both-vectors-match ; inline
+
+PRIVATE>
+>>
+
+<<
+<PRIVATE
 
 ! SIMD concrete type functor
 
@@ -163,6 +211,85 @@ M: A like drop dup \ A instance? [ >A ] unless ; inline
 : A-with ( n -- v ) \ A new simd-with ; inline
 : A-cast ( v -- v' ) \ A new simd-cast ; inline
 
+! SIMD vectors as sequences
+
+M: A hashcode* underlying>> hashcode* ; inline
+M: A clone [ clone ] change-underlying ; inline
+M: A length drop N ; inline
+M: A nth-unsafe swap \ A-rep (simd-select) ; inline
+M: A c:byte-length drop 16 ; inline
+
+M: A new-sequence
+    2dup length =
+    [ nip [ 16 (byte-array) ] make-underlying ]
+    [ length bad-simd-length ] if ; inline
+
+M: A equal?
+    \ A [ drop v= vall? ] [ 3drop f ] if-both-vectors-match ; inline
+
+! SIMD primitive operations
+
+M: A v+                \ A [ (simd-v+)                ] [ call-next-method ] vv->v-op ; inline
+M: A v-                \ A [ (simd-v-)                ] [ call-next-method ] vv->v-op ; inline
+M: A vneg              \ A [ (simd-vneg)              ] [ call-next-method ] v->v-op  ; inline
+M: A v+-               \ A [ (simd-v+-)               ] [ call-next-method ] vv->v-op ; inline
+M: A vs+               \ A [ (simd-vs+)               ] [ call-next-method ] vv->v-op ; inline
+M: A vs-               \ A [ (simd-vs-)               ] [ call-next-method ] vv->v-op ; inline
+M: A vs*               \ A [ (simd-vs*)               ] [ call-next-method ] vv->v-op ; inline
+M: A v*                \ A [ (simd-v*)                ] [ call-next-method ] vv->v-op ; inline
+M: A v/                \ A [ (simd-v/)                ] [ call-next-method ] vv->v-op ; inline
+M: A vmin              \ A [ (simd-vmin)              ] [ call-next-method ] vv->v-op ; inline
+M: A vmax              \ A [ (simd-vmax)              ] [ call-next-method ] vv->v-op ; inline
+M: A v.                \ A [ (simd-v.)                ] [ call-next-method ] vv->n-op ; inline
+M: A vsqrt             \ A [ (simd-vsqrt)             ] [ call-next-method ] v->v-op  ; inline
+M: A sum               \ A [ (simd-sum)               ] [ call-next-method ] v->n-op  ; inline
+M: A vabs              \ A [ (simd-vabs)              ] [ call-next-method ] v->v-op  ; inline
+M: A vbitand           \ A [ (simd-vbitand)           ] [ call-next-method ] vv->v-op ; inline
+M: A vbitandn          \ A [ (simd-vbitandn)          ] [ call-next-method ] vv->v-op ; inline
+M: A vbitor            \ A [ (simd-vbitor)            ] [ call-next-method ] vv->v-op ; inline
+M: A vbitxor           \ A [ (simd-vbitxor)           ] [ call-next-method ] vv->v-op ; inline
+M: A vbitnot           \ A [ (simd-vbitnot)           ] [ call-next-method ] v->v-op  ; inline
+M: A vand              \ A [ (simd-vand)              ] [ call-next-method ] vv->v-op ; inline
+M: A vandn             \ A [ (simd-vandn)             ] [ call-next-method ] vv->v-op ; inline
+M: A vor               \ A [ (simd-vor)               ] [ call-next-method ] vv->v-op ; inline
+M: A vxor              \ A [ (simd-vxor)              ] [ call-next-method ] vv->v-op ; inline
+M: A vnot              \ A [ (simd-vnot)              ] [ call-next-method ] v->v-op  ; inline
+M: A vlshift           \ A [ (simd-vlshift)           ] [ call-next-method ] vn->v-op ; inline
+M: A vrshift           \ A [ (simd-vrshift)           ] [ call-next-method ] vn->v-op ; inline
+M: A hlshift           \ A [ (simd-hlshift)           ] [ call-next-method ] vn->v-op ; inline
+M: A hrshift           \ A [ (simd-hrshift)           ] [ call-next-method ] vn->v-op ; inline
+M: A vshuffle-elements \ A [ (simd-vshuffle-elements) ] [ call-next-method ] vn->v-op ; inline
+M: A vshuffle-bytes    \ A [ (simd-vshuffle-bytes)    ] [ call-next-method ] vv->v-op ; inline
+M: A (vmerge-head)     \ A [ (simd-vmerge-head)       ] [ call-next-method ] vv->v-op ; inline
+M: A (vmerge-tail)     \ A [ (simd-vmerge-tail)       ] [ call-next-method ] vv->v-op ; inline
+M: A v<=               \ A [ (simd-v<=)               ] [ call-next-method ] vv->v-op ; inline
+M: A v<                \ A [ (simd-v<)                ] [ call-next-method ] vv->v-op ; inline
+M: A v=                \ A [ (simd-v=)                ] [ call-next-method ] vv->v-op ; inline
+M: A v>                \ A [ (simd-v>)                ] [ call-next-method ] vv->v-op ; inline
+M: A v>=               \ A [ (simd-v>=)               ] [ call-next-method ] vv->v-op ; inline
+M: A vunordered?       \ A [ (simd-vunordered?)       ] [ call-next-method ] vv->v-op ; inline
+M: A vany?             \ A [ (simd-vany?)             ] [ call-next-method ] v->n-op  ; inline
+M: A vall?             \ A [ (simd-vall?)             ] [ call-next-method ] v->n-op  ; inline
+M: A vnone?            \ A [ (simd-vnone?)            ] [ call-next-method ] v->n-op  ; inline
+
+! SIMD high-level specializations
+
+M: A vbroadcast [ swap nth ] keep simd-with ; inline
+M: A n+v [ simd-with ] keep v+ ; inline
+M: A n-v [ simd-with ] keep v- ; inline
+M: A n*v [ simd-with ] keep v* ; inline
+M: A n/v [ simd-with ] keep v/ ; inline
+M: A v+n over simd-with v+ ; inline
+M: A v-n over simd-with v- ; inline
+M: A v*n over simd-with v* ; inline
+M: A v/n over simd-with v/ ; inline
+M: A norm-sq dup v. assert-positive ; inline
+M: A norm      norm-sq sqrt ; inline
+M: A distance  v- norm ; inline
+
+! M: simd-128 >pprint-sequence ;
+! M: simd-128 pprint* pprint-object ;
+
 \ A-boa \ A new N {
     { 2 [ '[ _ [ (simd-gather-2) ] simd-construct-op ] ] }
     { 4 [ '[ _ [ (simd-gather-4) ] simd-construct-op ] ] }
@@ -191,84 +318,7 @@ PRIVATE>
 
 >>
 
-: assert-positive ( x -- y ) ;
-
-! SIMD vectors as sequences
-
-M: simd-128 hashcode* underlying>> hashcode* ; inline
-M: simd-128 clone [ clone ] change-underlying ; inline
-M: simd-128 length simd-rep rep-length ; inline
-M: simd-128 nth-unsafe [ nip ] 2keep simd-rep (simd-select) ; inline
-M: simd-128 c:byte-length drop 16 ; inline
-
-M: simd-128 new-sequence
-    2dup length =
-    [ nip [ 16 (byte-array) ] make-underlying ]
-    [ length bad-simd-length ] if ; inline
-
-! M: simd-128 >pprint-sequence ;
-! M: simd-128 pprint* pprint-object ;
-
 INSTANCE: simd-128 sequence
-
-! Unboxers for SIMD operations
-<<
-<PRIVATE
-
-: if-both-vectors ( a b t f -- )
-    [ 2dup [ simd-128? ] both? ] 2dip if ; inline
-
-: if-both-vectors-match ( a b t f -- )
-    [ 2dup [ [ simd-128? ] both? ] [ [ simd-rep ] bi@ eq? ] 2bi and ]
-    2dip if ; inline
-
-: simd-construct-op ( exemplar quot: ( rep -- v ) -- v )
-    [ dup simd-rep ] dip curry make-underlying ; inline
-
-: simd-unbox ( a -- a (a) a-rep )
-    [ ] [ underlying>> ] [ simd-rep ] tri ; inline
-
-: simd-v->v-op ( a quot: ( (a) rep -- (c) ) -- c )
-    [ simd-unbox ] dip 2curry make-underlying ; inline
-
-: simd-vn->v-op ( a n quot: ( (a) n rep -- (c) ) -- c )
-    [ simd-unbox ] [ swap ] [ 3curry ] tri* make-underlying ; inline
-
-: simd-v->n-op ( a quot: ( (a) rep -- n ) -- n )
-    [ [ underlying>> ] [ simd-rep ] bi ] dip call ; inline
-
-: ((simd-vv->v-op)) ( a b quot: ( (a) (b) rep -- (c) ) -- c )
-    [ simd-unbox ] [ underlying>> swap ] [ 3curry ] tri* make-underlying ; inline
-
-: ((simd-vv->n-op)) ( a b quot: ( (a) (b) rep -- n ) -- n )
-    [ [ underlying>> ] [ simd-rep ] bi ]
-    [ underlying>> swap ] [ ] tri* call ; inline
-    
-: (simd-vv->v-op) ( a b quot: ( (a) (b) rep -- (c) ) fallback-quot -- c )
-    [ '[ _ ((simd-vv->v-op)) ] ] dip if-both-vectors-match ; inline
-
-: (simd-vv'->v-op) ( a b quot: ( (a) (b) rep -- (c) ) fallback-quot -- c )
-    [ '[ _ ((simd-vv->v-op)) ] ] dip if-both-vectors ; inline
-
-: (simd-vv->n-op) ( a b quot: ( (a) (b) rep -- n ) fallback-quot -- n )
-    [ '[ _ ((simd-vv->n-op)) ] ] dip if-both-vectors-match ; inline
-
-: (simd-method-fallback) ( accum word -- accum )
-    [ current-method get literalize \ (call-next-method) [ ] 2sequence suffix! ]
-    dip suffix! ; 
-
-SYNTAX: simd-vv->v-op
-    \ (simd-vv->v-op) (simd-method-fallback) ; 
-SYNTAX: simd-vv'->v-op
-    \ (simd-vv'->v-op) (simd-method-fallback) ;
-SYNTAX: simd-vv->n-op
-    \ (simd-vv->n-op) (simd-method-fallback) ; 
-
-PRIVATE>
->>
-
-M: simd-128 equal?
-    [ v= vall? ] [ 2drop f ] if-both-vectors-match ; inline
 
 ! SIMD constructors
 
@@ -284,66 +334,6 @@ MACRO: simd-boa ( class -- )
 
 : simd-cast ( v seq -- v' )
     [ underlying>> ] dip new-underlying ; inline
-
-! SIMD primitive operations
-
-M: simd-128 v+                 [ (simd-v+)                 ] simd-vv->v-op ; inline
-M: simd-128 v-                 [ (simd-v-)                 ] simd-vv->v-op ; inline
-M: simd-128 vneg               [ (simd-vneg)               ] simd-v->v-op  ; inline
-M: simd-128 v+-                [ (simd-v+-)                ] simd-vv->v-op ; inline
-M: simd-128 vs+                [ (simd-vs+)                ] simd-vv->v-op ; inline
-M: simd-128 vs-                [ (simd-vs-)                ] simd-vv->v-op ; inline
-M: simd-128 vs*                [ (simd-vs*)                ] simd-vv->v-op ; inline
-M: simd-128 v*                 [ (simd-v*)                 ] simd-vv->v-op ; inline
-M: simd-128 v/                 [ (simd-v/)                 ] simd-vv->v-op ; inline
-M: simd-128 vmin               [ (simd-vmin)               ] simd-vv->v-op ; inline
-M: simd-128 vmax               [ (simd-vmax)               ] simd-vv->v-op ; inline
-M: simd-128 v.                 [ (simd-v.)                 ] simd-vv->n-op ; inline
-M: simd-128 vsqrt              [ (simd-vsqrt)              ] simd-v->v-op  ; inline
-M: simd-128 sum                [ (simd-sum)                ] simd-v->n-op  ; inline
-M: simd-128 vabs               [ (simd-vabs)               ] simd-v->v-op  ; inline
-M: simd-128 vbitand            [ (simd-vbitand)            ] simd-vv->v-op ; inline
-M: simd-128 vbitandn           [ (simd-vbitandn)           ] simd-vv->v-op ; inline
-M: simd-128 vbitor             [ (simd-vbitor)             ] simd-vv->v-op ; inline
-M: simd-128 vbitxor            [ (simd-vbitxor)            ] simd-vv->v-op ; inline
-M: simd-128 vbitnot            [ (simd-vbitnot)            ] simd-v->v-op  ; inline
-M: simd-128 vand               [ (simd-vand)               ] simd-vv->v-op ; inline
-M: simd-128 vandn              [ (simd-vandn)              ] simd-vv->v-op ; inline
-M: simd-128 vor                [ (simd-vor)                ] simd-vv->v-op ; inline
-M: simd-128 vxor               [ (simd-vxor)               ] simd-vv->v-op ; inline
-M: simd-128 vnot               [ (simd-vnot)               ] simd-v->v-op  ; inline
-M: simd-128 vlshift            [ (simd-vlshift)            ] simd-vn->v-op ; inline
-M: simd-128 vrshift            [ (simd-vrshift)            ] simd-vn->v-op ; inline
-M: simd-128 hlshift            [ (simd-hlshift)            ] simd-vn->v-op ; inline
-M: simd-128 hrshift            [ (simd-hrshift)            ] simd-vn->v-op ; inline
-M: simd-128 vshuffle-elements  [ (simd-vshuffle-elements)  ] simd-vn->v-op ; inline
-M: simd-128 vshuffle-bytes     [ (simd-vshuffle-bytes)     ] simd-vv->v-op ; inline
-M: simd-128 (vmerge-head)      [ (simd-vmerge-head)        ] simd-vv->v-op ; inline
-M: simd-128 (vmerge-tail)      [ (simd-vmerge-tail)        ] simd-vv->v-op ; inline
-M: simd-128 v<=                [ (simd-v<=)                ] simd-vv->v-op ; inline
-M: simd-128 v<                 [ (simd-v<)                 ] simd-vv->v-op ; inline
-M: simd-128 v=                 [ (simd-v=)                 ] simd-vv->v-op ; inline
-M: simd-128 v>                 [ (simd-v>)                 ] simd-vv->v-op ; inline
-M: simd-128 v>=                [ (simd-v>=)                ] simd-vv->v-op ; inline
-M: simd-128 vunordered?        [ (simd-vunordered?)        ] simd-vv->v-op ; inline
-M: simd-128 vany?              [ (simd-vany?)              ] simd-v->n-op  ; inline
-M: simd-128 vall?              [ (simd-vall?)              ] simd-v->n-op  ; inline
-M: simd-128 vnone?             [ (simd-vnone?)             ] simd-v->n-op  ; inline
-
-! SIMD high-level specializations
-
-M: simd-128 vbroadcast [ swap nth ] keep simd-with ; inline
-M: simd-128 n+v [ simd-with ] keep v+ ; inline
-M: simd-128 n-v [ simd-with ] keep v- ; inline
-M: simd-128 n*v [ simd-with ] keep v* ; inline
-M: simd-128 n/v [ simd-with ] keep v/ ; inline
-M: simd-128 v+n over simd-with v+ ; inline
-M: simd-128 v-n over simd-with v- ; inline
-M: simd-128 v*n over simd-with v* ; inline
-M: simd-128 v/n over simd-with v/ ; inline
-M: simd-128 norm-sq dup v. assert-positive ; inline
-M: simd-128 norm      norm-sq sqrt ; inline
-M: simd-128 distance  v- norm ; inline
 
 ! SIMD instances
 
