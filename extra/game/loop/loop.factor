@@ -20,8 +20,8 @@ GENERIC: draw* ( tick-slice delegate -- )
 
 SYMBOL: game-loop
 
-: since-last-tick ( loop -- milliseconds )
-    last-tick>> system-millis swap - ;
+: since-last-tick ( loop -- microseconds )
+    last-tick>> system-micros swap - ;
 
 : tick-slice ( loop -- slice )
     [ since-last-tick ] [ tick-length>> ] bi /f 1.0 min ;
@@ -53,7 +53,7 @@ TUPLE: game-loop-error game-loop error ;
     drop ;
 
 : ?tick ( loop count -- )
-    [ system-millis >>last-tick drop ] [
+    [ system-micros >>last-tick drop ] [
         over [ since-last-tick ] [ tick-length>> ] bi >=
         [ [ drop increment-tick ] [ drop tick ] [ 1 - ?tick ] 2tri ]
         [ 2drop ] if
@@ -69,24 +69,24 @@ TUPLE: game-loop-error game-loop error ;
     [ [ (run-loop) ] [ game-loop-error ] recover ]
     with-variable ;
 
-: benchmark-millis ( loop -- millis )
-    system-millis swap benchmark-time>> - ;
+: benchmark-micros ( loop -- micros )
+    system-micros swap benchmark-time>> - ;
 
 PRIVATE>
 
 : reset-loop-benchmark ( loop -- )
-    system-millis >>benchmark-time
+    system-micros >>benchmark-time
     dup tick-number>> >>benchmark-tick-number
     dup frame-number>> >>benchmark-frame-number
     drop ;
 
 : benchmark-ticks-per-second ( loop -- n )
-    [ tick-number>> ] [ benchmark-tick-number>> - ] [ benchmark-millis ] tri /f ;
+    [ tick-number>> ] [ benchmark-tick-number>> - ] [ benchmark-micros ] tri /f ;
 : benchmark-frames-per-second ( loop -- n )
-    [ frame-number>> ] [ benchmark-frame-number>> - ] [ benchmark-millis ] tri /f ;
+    [ frame-number>> ] [ benchmark-frame-number>> - ] [ benchmark-micros ] tri /f ;
 
 : start-loop ( loop -- )
-    system-millis >>last-tick
+    system-micros >>last-tick
     t >>running?
     [ reset-loop-benchmark ]
     [ [ run-loop ] curry "game loop" spawn ]
@@ -98,7 +98,7 @@ PRIVATE>
     drop ;
 
 : <game-loop> ( tick-length delegate -- loop )
-    system-millis f f 0 0 system-millis 0 0
+    system-micros f f 0 0 system-micros 0 0
     game-loop boa ;
 
 M: game-loop dispose

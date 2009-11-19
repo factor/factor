@@ -22,7 +22,7 @@ server-state f
 
 : expire-state ( class -- )
     new
-        -1/0. system-millis [a,b] >>expires
+        -1/0. system-micros [a,b] >>expires
     delete-tuples ;
 
 TUPLE: server-state-manager < filter-responder timeout ;
@@ -33,4 +33,4 @@ TUPLE: server-state-manager < filter-responder timeout ;
         20 minutes >>timeout ; inline
 
 : touch-state ( state manager -- )
-    timeout>> hence timestamp>millis >>expires drop ;
+    timeout>> hence timestamp>micros >>expires drop ;
