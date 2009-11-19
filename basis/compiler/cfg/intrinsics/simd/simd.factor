@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types byte-arrays fry
 classes.algebra cpu.architecture kernel math sequences
-math.vectors math.vectors.simd math.vectors.simd.private
+math.vectors math.vectors.simd.intrinsics
 macros generalizations combinators combinators.short-circuit
 arrays locals compiler.tree.propagation.info
 compiler.cfg.builder.blocks

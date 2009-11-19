@@ -4,7 +4,7 @@ USING: accessors combinators combinators.short-circuit arrays
 fry kernel layouts math namespaces sequences cpu.architecture
 math.bitwise math.order classes
 vectors locals make alien.c-types io.binary grouping
-math.vectors.simd
+math.vectors.simd.intrinsics
 compiler.cfg
 compiler.cfg.registers
 compiler.cfg.comparisons
