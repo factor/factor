@@ -1,9 +1,9 @@
 ! (c)2009 Joe Groff bsd license
 USING: arrays assocs biassocs byte-arrays byte-arrays.hex
-classes compiler.cfg.comparisons compiler.cfg.instructions
+classes compiler.cfg compiler.cfg.comparisons compiler.cfg.instructions
 compiler.cfg.intrinsics.simd compiler.cfg.registers
-compiler.cfg.stacks.local compiler.tree
-compiler.tree.propagation.info cpu.architecture fry kernel
+compiler.cfg.stacks.height compiler.cfg.stacks.local compiler.tree
+compiler.tree.propagation.info cpu.architecture fry hashtables kernel
 locals make namespaces sequences system tools.test words ;
 IN: compiler.cfg.intrinsics.simd.tests
 
@@ -34,8 +34,25 @@ IN: compiler.cfg.intrinsics.simd.tests
         } }
     } ;
 
+: test-node-nonliteral-rep ( -- node )
+    T{ #call
+        { in-d  { 1 2 3 4 } }
+        { out-d { 5 } }
+        { info H{
+            { 1 T{ value-info { class byte-array } } }
+            { 2 T{ value-info { class byte-array } } }
+            { 3 T{ value-info { class byte-array } } }
+            { 4 T{ value-info { class object } } }
+            { 5 T{ value-info { class byte-array } } }
+        } }
+    } ;
+
 : test-compiler-env ( -- x )
     H{ } clone
+        T{ basic-block { id 0 } }
+            [ \ basic-block pick set-at ]
+            [ 0 swap associate \ ds-heights pick set-at ]
+            [ 0 swap associate \ rs-heights pick set-at ] tri
         T{ current-height { d 0 } { r 0 } { emit-d 0 } { emit-r 0 } } \ current-height pick set-at
         H{ } clone \ local-peek-set pick set-at
         H{ } clone \ replace-mapping pick set-at
@@ -58,6 +75,13 @@ IN: compiler.cfg.intrinsics.simd.tests
     [
         [ new \ cpu ] 3dip '[
             test-compiler-env [ _ _ test-node-literal @ ] bind
+        ] with-variable
+    ] make-classes ; inline
+
+: test-emit-nonliteral-rep ( cpu quot -- node )
+    [
+        [ new \ cpu ] dip '[
+            test-compiler-env [ test-node-nonliteral-rep @ ] bind
         ] with-variable
     ] make-classes ; inline
 
@@ -504,5 +528,19 @@ unit-test
 
 ! select
 [ { ##shuffle-vector-imm ##vector>scalar } ]
-[ shuffle-imm-cpu int-4-rep [ emit-simd-select ] test-emit ]
+[ shuffle-imm-cpu 1 int-4-rep [ emit-simd-select ] test-emit-literal ]
 unit-test
+
+! test with nonliteral/invalid reps
+[ { ##inc-d ##branch } ]
+[ simple-ops-cpu [ emit-simd-v+ ] test-emit-nonliteral-rep ]
+unit-test
+
+[ { ##branch } ]
+[ simple-ops-cpu f [ emit-simd-v+ ] test-emit ]
+unit-test
+
+[ { ##branch } ]
+[ simple-ops-cpu 3 [ emit-simd-v+ ] test-emit ]
+unit-test
+
