@@ -87,8 +87,8 @@ PRIVATE>
 
 PRIVATE>
 
-: alien-vector     ( c-ptr n rep -- value ) \ alien-vector bad-simd-call ;
-: set-alien-vector ( c-ptr n rep -- value ) \ set-alien-vector bad-simd-call ;
+: alien-vector     (       c-ptr n rep -- value ) \ alien-vector bad-simd-call ;
+: set-alien-vector ( value c-ptr n rep --       ) \ set-alien-vector bad-simd-call ;
 
 <PRIVATE
 
