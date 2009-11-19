@@ -93,7 +93,7 @@ M: raytrace-world draw-world*
     } <render-set> render ;
 
 M: raytrace-world pref-dim* drop { 1024 768 } ;
-M: raytrace-world tick-length drop 1000 30 /i ;
+M: raytrace-world tick-length drop 1000000 30 /i ;
 M: raytrace-world wasd-movement-speed drop 1/4. ;
 
 : raytrace-window ( -- )
