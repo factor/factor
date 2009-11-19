@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators fry sequences
 compiler.tree.propagation.info cpu.architecture kernel words math
-math.intervals math.vectors.simd math.vectors.simd.private ;
+math.intervals math.vectors.simd.intrinsics ;
 IN: compiler.tree.propagation.simd
 
 {
