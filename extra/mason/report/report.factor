@@ -67,7 +67,7 @@ IN: mason.report
         benchmark-time-file
         html-help-time-file
     } [
-        dup eval-file milli-seconds>time
+        dup eval-file nanos>time
         [XML <tr><td><-></td><td><-></td></tr> XML]
     ] map [XML <h2>Timings</h2> <table><-></table> XML] ;
 
