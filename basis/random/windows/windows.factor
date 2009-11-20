@@ -16,7 +16,7 @@ M: windows-crypto-context dispose ( tuple -- )
 CONSTANT: factor-crypto-container "FactorCryptoContainer"
 
 :: (acquire-crypto-context) ( provider type flags -- handle ret )
-    "HCRYPTPROV" <c-object> :> handle
+    HCRYPTPROV <c-object> :> handle
     handle
     factor-crypto-container
     provider

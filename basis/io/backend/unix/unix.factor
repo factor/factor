@@ -5,7 +5,7 @@ kernel.private math io.ports sequences strings sbufs threads
 unix vectors io.buffers io.backend io.encodings math.parser
 continuations system libc namespaces make io.timeouts
 io.encodings.utf8 destructors destructors.private accessors
-summary combinators locals unix.time fry
+summary combinators locals unix.time unix.types fry
 io.backend.unix.multiplexers ;
 QUALIFIED: io
 IN: io.backend.unix
@@ -151,7 +151,7 @@ M: stdin dispose*
 
 : wait-for-stdin ( stdin -- n )
     [ control>> CHAR: X over io:stream-write1 io:stream-flush ]
-    [ size>> "ssize_t" heap-size swap io:stream-read *int ]
+    [ size>> ssize_t heap-size swap io:stream-read *int ]
     bi ;
 
 :: refill-stdin ( buffer stdin size -- )

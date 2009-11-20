@@ -16,7 +16,7 @@ ERROR: cairo-error message ;
 
 : check-surface ( surface -- ) cairo_surface_status (check-cairo) ;
 
-: width>stride ( width -- stride ) "uint" heap-size * ; inline
+: width>stride ( width -- stride ) uint heap-size * ; inline
 
 : <image-surface> ( data dim -- surface )
     [ CAIRO_FORMAT_ARGB32 ] dip first2 over width>stride

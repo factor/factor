@@ -20,7 +20,7 @@ SPECIALIZED-ARRAYS: bool ushort char uint float ulonglong ;
 
 [ t ] [
     { t f t } >bool-array underlying>>
-    { 1 0 1 } "bool" heap-size {
+    { 1 0 1 } bool heap-size {
         { 1 [ >char-array ] }
         { 4 [ >uint-array ] }
     } case underlying>> =

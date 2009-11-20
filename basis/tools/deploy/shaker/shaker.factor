@@ -31,7 +31,6 @@ IN: tools.deploy.shaker
     {
         "alien.strings"
         "cpu.x86"
-        "destructors"
         "environment"
         "libc"
     }
