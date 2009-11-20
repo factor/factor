@@ -45,6 +45,7 @@ inline static void early_init() {}
 
 u64 system_micros();
 u64 nano_count();
+void sleep_nanos(u64 nsec);
 long getpagesize();
 
 }

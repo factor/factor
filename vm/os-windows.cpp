@@ -126,11 +126,6 @@ segment::~segment()
 		fatal_error("Segment deallocation failed",0);
 }
 
-void sleep_nanos(u64 nsec)
-{
-	Sleep((DWORD)(nsec/1000000));
-}
-
 long getpagesize()
 {
 	static long g_pagesize = 0;

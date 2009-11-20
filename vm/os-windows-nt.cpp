@@ -51,6 +51,11 @@ u64 nano_count()
 	return count.QuadPart*(1000000000/frequency.QuadPart);
 }
 
+void sleep_nanos(u64 nsec)
+{
+	Sleep((DWORD)(nsec/1000000));
+}
+
 LONG factor_vm::exception_handler(PEXCEPTION_POINTERS pe)
 {
 	PEXCEPTION_RECORD e = (PEXCEPTION_RECORD)pe->ExceptionRecord;
