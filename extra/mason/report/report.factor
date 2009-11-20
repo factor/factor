@@ -7,12 +7,16 @@ prettyprint sequences xml.syntax xml.writer combinators.short-circuit
 literals splitting ;
 IN: mason.report
 
+: git-link ( id -- link )
+    [ "http://github.com/slavapestov/factor/commit/" prepend ] keep
+    [XML <a href=<->><-></a> XML] ;
+
 : common-report ( -- xml )
     target-os get
     target-cpu get
     short-host-name
     build-dir
-    current-git-id get
+    current-git-id get git-link
     [XML
     <h1>Build report for <->/<-></h1>
     <table>
