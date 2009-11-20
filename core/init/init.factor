@@ -27,12 +27,12 @@ shutdown-hooks global [ drop V{ } clone ] cache drop
 
 : boot ( -- ) init-namespaces init-catchstack init-error-handler ;
 
-: boot-quot ( -- quot ) 20 getenv ;
+: startup-quot ( -- quot ) 20 getenv ;
 
-: set-boot-quot ( quot -- ) 20 setenv ;
+: set-startup-quot ( quot -- ) 20 setenv ;
 
-: shutdown-quot ( -- quot ) 67 getenv ;
+: shutdown-quot ( -- quot ) 22 getenv ;
 
-: set-shutdown-quot ( quot -- ) 67 setenv ;
+: set-shutdown-quot ( quot -- ) 22 setenv ;
 
 [ do-shutdown-hooks ] set-shutdown-quot

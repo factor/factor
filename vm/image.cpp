@@ -291,7 +291,7 @@ bool factor_vm::save_image(const vm_char *filename)
 	h.bignum_neg_one = bignum_neg_one;
 
 	for(cell i = 0; i < special_object_count; i++)
-		h.special_objects[i] = (save_env_p(i) ? special_objects[i] : false_object);
+		h.special_objects[i] = (save_special_p(i) ? special_objects[i] : false_object);
 
 	bool ok = true;
 
@@ -326,7 +326,7 @@ void factor_vm::primitive_save_image_and_exit()
 
 	/* strip out special_objects data which is set on startup anyway */
 	for(cell i = 0; i < special_object_count; i++)
-		if(!save_env_p(i)) special_objects[i] = false_object;
+		if(!save_special_p(i)) special_objects[i] = false_object;
 
 	gc(collect_compact_op,
 		0, /* requested size */
