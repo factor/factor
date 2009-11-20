@@ -156,7 +156,7 @@ SYMBOL: hand-click#
 SYMBOL: hand-last-button
 SYMBOL: hand-last-time
 0 hand-last-button set-global
-nano-count hand-last-time set-global
+0 hand-last-time set-global
 
 SYMBOL: hand-buttons
 V{ } clone hand-buttons set-global
