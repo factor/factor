@@ -20,7 +20,7 @@ void factor_vm::primitive_nano_count()
 
 void factor_vm::primitive_sleep()
 {
-	sleep_nanos(factor_vm::to_unsigned_8(dpop()));
+	sleep_nanos(to_unsigned_8(dpop()));
 }
 
 }

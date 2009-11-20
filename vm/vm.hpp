@@ -674,7 +674,6 @@ struct factor_vm
 
 	// os-windows
   #if defined(WINDOWS)
-	void sleep_nanos(u64 nsec);
 	const vm_char *vm_executable_path();
 	const vm_char *default_image_path();
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);
