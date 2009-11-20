@@ -140,7 +140,7 @@ IN: calendar.tests
 [ +gt+ ] [ 2005 1 1 12 30 0 instant <timestamp>
         2004 1 1 13 30 0 instant <timestamp> <=> ] unit-test
 
-[ t ] [ now timestamp>micros micros - 1000000 < ] unit-test
+[ t ] [ now timestamp>micros system-micros - 1000000 < ] unit-test
 [ t ] [ 0 micros>timestamp unix-1970 = ] unit-test
 [ t ] [ 123456789000000 [ micros>timestamp timestamp>micros ] keep = ] unit-test
 [ t ] [ 123456789123456000 [ micros>timestamp timestamp>micros ] keep = ] unit-test
