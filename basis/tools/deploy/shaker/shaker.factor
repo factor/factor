@@ -446,7 +446,7 @@ SYMBOL: deploy-vocab
 
 : [print-error] ( -- word ) "print-error" "debugger" lookup ;
 
-: deploy-boot-quot ( word -- )
+: deploy-startup-quot ( word -- )
     [
         [ boot ] %
         startup-hooks get values concat %
@@ -466,7 +466,7 @@ SYMBOL: deploy-vocab
         strip-io? [ [ flush ] % ] unless
         [ 0 exit ] %
     ] [ ] make
-    set-boot-quot ;
+    set-startup-quot ;
 
 : startup-stripper ( -- )
     t "quiet" set-global
@@ -521,7 +521,7 @@ SYMBOL: deploy-vocab
     strip-default-methods
     strip-compiler-classes
     f 5 setenv ! we can't use the Factor debugger or Factor I/O anymore
-    deploy-vocab get vocab-main deploy-boot-quot
+    deploy-vocab get vocab-main deploy-startup-quot
     find-megamorphic-caches
     stripped-word-props
     stripped-globals strip-globals

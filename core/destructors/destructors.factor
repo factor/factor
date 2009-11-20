@@ -6,8 +6,6 @@ IN: destructors
 
 SYMBOL: disposables
 
-[ H{ } clone disposables set-global ] "destructors" add-startup-hook
-
 ERROR: already-unregistered disposable ;
 
 SYMBOL: debug-leaks?
@@ -89,6 +87,12 @@ PRIVATE>
     ] with-scope ; inline
 
 [
-    always-destructors get-global
-    error-destructors get-global append dispose-each
-] "destructors.global" add-shutdown-hook
+    H{ } clone disposables set-global
+    V{ } clone always-destructors set-global
+    V{ } clone error-destructors set-global
+] "destructors" add-startup-hook
+
+[
+    do-always-destructors
+    do-error-destructors
+] "destructors" add-shutdown-hook

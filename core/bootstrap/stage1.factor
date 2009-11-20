@@ -37,7 +37,7 @@ load-help? off
     [
         "resource:basis/bootstrap/stage2.factor"
         dup exists? [
-            [ run-file ] with-destructors
+            run-file
         ] [
             "Cannot find " write write "." print
             "Please move " write image write " to the same directory as the Factor sources," print
@@ -46,4 +46,4 @@ load-help? off
         ] if
     ] %
 ] [ ] make
-bootstrap.image.private:bootstrap-boot-quot set
+bootstrap.image.private:bootstrap-startup-quot set
