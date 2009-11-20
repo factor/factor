@@ -16,10 +16,10 @@ M: winnt WSASocket-flags ( -- DWORD )
     SIO_GET_EXTENSION_FUNCTION_POINTER
     WSAID_CONNECTEX
     GUID heap-size
-    "void*" <c-object>
+    void* <c-object>
     [
-        "void*" heap-size
-        "DWORD" <c-object>
+        void* heap-size
+        DWORD <c-object>
         f
         f
         WSAIoctl SOCKET_ERROR = [

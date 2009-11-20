@@ -20,7 +20,7 @@ IN: io.files.info.windows
 TUPLE: windows-file-info < file-info attributes ;
 
 : get-compressed-file-size ( path -- n )
-    "DWORD" <c-object> [ GetCompressedFileSize ] keep
+    DWORD <c-object> [ GetCompressedFileSize ] keep
     over INVALID_FILE_SIZE = [
         win32-error-string throw
     ] [
@@ -100,9 +100,9 @@ M: windows link-info ( path -- info )
 
 : volume-information ( normalized-path -- volume-name volume-serial max-component flags type )
     MAX_PATH 1 + [ <ushort-array> ] keep
-    "DWORD" <c-object>
-    "DWORD" <c-object>
-    "DWORD" <c-object>
+    DWORD <c-object>
+    DWORD <c-object>
+    DWORD <c-object>
     MAX_PATH 1 + [ <ushort-array> ] keep
     [ GetVolumeInformation win32-error=0/f ] 7 nkeep
     drop 5 nrot drop
@@ -110,9 +110,9 @@ M: windows link-info ( path -- info )
     utf16n alien>string ;
 
 : file-system-space ( normalized-path -- available-space total-space free-space )
-    "ULARGE_INTEGER" <c-object>
-    "ULARGE_INTEGER" <c-object>
-    "ULARGE_INTEGER" <c-object>
+    ULARGE_INTEGER <c-object>
+    ULARGE_INTEGER <c-object>
+    ULARGE_INTEGER <c-object>
     [ GetDiskFreeSpaceEx win32-error=0/f ] 3keep ;
 
 : calculate-file-system-info ( file-system-info -- file-system-info' )
@@ -160,7 +160,7 @@ M: winnt file-system-info ( path -- file-system-info )
     ret 0 = [
         ret win32-error-string throw
     ] [
-        names names-length *uint "ushort" heap-size * head
+        names names-length *uint ushort heap-size * head
         utf16n alien>string CHAR: \0 split
     ] if ;
 

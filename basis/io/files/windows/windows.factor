@@ -64,7 +64,7 @@ C: <FileArgs> FileArgs
         [ handle>> handle>> ]
         [ buffer>> ]
         [ buffer>> buffer-length ]
-        [ drop "DWORD" <c-object> ]
+        [ drop DWORD <c-object> ]
         [ FileArgs-overlapped ]
     } cleave <FileArgs> ;
 

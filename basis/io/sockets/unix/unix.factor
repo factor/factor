@@ -17,7 +17,7 @@ IN: io.sockets.unix
     0 socket dup io-error <fd> init-fd |dispose ;
 
 : set-socket-option ( fd level opt -- )
-    [ handle-fd ] 2dip 1 <int> "int" heap-size setsockopt io-error ;
+    [ handle-fd ] 2dip 1 <int> dup byte-length setsockopt io-error ;
 
 M: unix addrinfo-error ( n -- )
     [ gai_strerror throw ] unless-zero ;
