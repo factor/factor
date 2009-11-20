@@ -59,7 +59,7 @@ SYMBOL: bootstrap-time
 
 [
     ! We time bootstrap
-    system-micros 1000 /i
+    nano-count
 
     default-image-name "output-image" set-global
 
@@ -84,14 +84,14 @@ SYMBOL: bootstrap-time
 
     load-components
 
-    system-micros 1000 /i over - core-bootstrap-time set-global
+    nano-count over - 1000000 /i core-bootstrap-time set-global
 
     run-bootstrap-init
 
     f error set-global
     f error-continuation set-global
 
-    system-micros 1000 /i swap - bootstrap-time set-global
+    nano-count swap - 1000000 /i bootstrap-time set-global
     print-report
 
     "deploy-vocab" get [
