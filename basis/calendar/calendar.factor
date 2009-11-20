@@ -143,8 +143,7 @@ GENERIC: easter ( obj -- obj' )
     32 2 e * + 2 i * + h - k - 7 mod :> l
     a 11 h * + 22 l * + 451 /i :> m
 
-    h l + 7 m * - 114 + 31 /mod 1 + :> ( month day )
-    month day ;
+    h l + 7 m * - 114 + 31 /mod 1 + ;
 
 M: integer easter ( year -- timestamp )
     dup easter-month-day <date> ;
