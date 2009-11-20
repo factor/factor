@@ -36,7 +36,7 @@ SYMBOL: bootstrap-time
     all-words swap count number>string write ; inline
 
 : print-time ( us -- )
-    1000 /i
+    1,000,000,000 /i
     60 /mod swap
     number>string write
     " minutes and " write number>string write " seconds." print ;
@@ -84,14 +84,14 @@ SYMBOL: bootstrap-time
 
     load-components
 
-    nano-count over - 1000000 /i core-bootstrap-time set-global
+    nano-count over - core-bootstrap-time set-global
 
     run-bootstrap-init
 
     f error set-global
     f error-continuation set-global
 
-    nano-count swap - 1000000 /i bootstrap-time set-global
+    nano-count swap - bootstrap-time set-global
     print-report
 
     "deploy-vocab" get [
