@@ -51,7 +51,7 @@ M: inconsistent-recursive-call-error summary
     " calls itself with a different set of quotation parameters than were input" surround ;
 
 M: unknown-primitive-error summary
-    word>> name>> "The " " word cannot be called from optimized words" surround ;
+    drop "The do-primitive word cannot be called from here" ;
 
 M: transform-expansion-error summary
     word>> name>> "Macro expansion of " " threw an error" surround ;
