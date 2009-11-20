@@ -297,11 +297,11 @@ M: long-long-type box-parameter ( n c-type -- )
 M: long-long-type box-return ( c-type -- )
     f swap box-parameter ;
 
-: define-deref ( name -- )
+: define-deref ( c-type -- )
     [ name>> CHAR: * prefix "alien.c-types" create ] [ c-getter 0 prefix ] bi
     (( c-ptr -- value )) define-inline ;
 
-: define-out ( word -- )
+: define-out ( c-type -- )
     [ name>> "alien.c-types" constructor-word ]
     [ dup c-setter '[ _ heap-size (byte-array) [ 0 @ ] keep ] ] bi
     (( value -- c-ptr )) define-inline ;
