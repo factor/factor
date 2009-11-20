@@ -397,9 +397,6 @@ M: duration time-
 : hence ( duration -- timestamp ) now swap time+ ;
 : ago ( duration -- timestamp ) now swap time- ;
 
-: nano-count>timestamp ( x -- timestamp )
-    nano-count - nanoseconds now time+ ;
-
 : zeller-congruence ( year month day -- n )
     #! Zeller Congruence
     #! http://web.textfiles.com/computers/formulas.txt
