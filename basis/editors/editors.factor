@@ -49,7 +49,7 @@ M: cannot-find-source error.
 
 : edit-error ( error -- )
     [ error-file ] [ error-line ] bi
-    2dup and [ edit-location ] [ 2drop ] if ;
+    over [ 1 or edit-location ] [ 2drop ] if ;
 
 : :edit ( -- )
     error get edit-error ;
