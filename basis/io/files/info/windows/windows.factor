@@ -2,10 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays math io.backend io.files.info
 io.files.windows io.files.windows.nt kernel windows.kernel32
-windows.time windows accessors alien.c-types combinators
-generalizations system alien.strings io.encodings.utf16n
-sequences splitting windows.errors fry continuations destructors
-calendar ascii combinators.short-circuit locals classes.struct
+windows.time windows.types windows accessors alien.c-types
+combinators generalizations system alien.strings
+io.encodings.utf16n sequences splitting windows.errors fry
+continuations destructors calendar ascii
+combinators.short-circuit locals classes.struct
 specialized-arrays alien.data ;
 SPECIALIZED-ARRAY: ushort
 IN: io.files.info.windows
