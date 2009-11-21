@@ -11,7 +11,7 @@ person "PEOPLE" {
     { "occupation" "OCCUPATION" { VARCHAR 256 } +not-null+ }
 } define-persistent
 
-: db-deploy-test ( -- ) ;
+: db-deploy-test ( -- )
     "test.db" temp-file <sqlite-db> [
         person recreate-table
         
