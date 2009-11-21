@@ -59,11 +59,8 @@ SYMBOL: alarm-thread
 : trigger-alarms ( alarms -- )
     nano-count (trigger-alarms) ;
 
-: next-alarm ( alarms -- timestamp/f )
-    dup heap-empty? [ drop f ] [
-        heap-peek drop start>>
-        nano-count swap -
-    ] if ;
+: next-alarm ( alarms -- nanos/f )
+    dup heap-empty? [ drop f ] [ heap-peek drop start>> ] if ;
 
 : alarm-thread-loop ( -- )
     alarms get-global
