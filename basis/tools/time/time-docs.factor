@@ -9,8 +9,7 @@ ARTICLE: "timing" "Timing code and collecting statistics"
 { $subsections dispatch-stats. gc-events. gc-stats. gc-summary. }
 "A lower-level word puts timings on the stack, intead of printing:"
 { $subsections benchmark }
-"You can also read the system clock directly:"
-{ $subsections system-micros }
+"You can also read the system clock directly; see " { $link "system" } "."
 { $see-also "profiling" "calendar" } ;
 
 ABOUT: "timing"
