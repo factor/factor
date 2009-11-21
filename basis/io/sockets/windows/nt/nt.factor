@@ -3,7 +3,8 @@ continuations destructors io.ports io.timeouts io.sockets
 io.sockets.private io namespaces io.streams.duplex
 io.backend.windows io.sockets.windows io.backend.windows.nt
 windows.winsock kernel libc math sequences threads system
-combinators accessors classes.struct windows.kernel32 ;
+combinators accessors classes.struct windows.kernel32
+windows.types ;
 IN: io.sockets.windows.nt
 
 : malloc-int ( n -- alien )
