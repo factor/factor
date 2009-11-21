@@ -1,7 +1,7 @@
 USING: accessors alien.c-types alien.data byte-arrays
 combinators.short-circuit continuations destructors init kernel
 locals namespaces random windows.advapi32 windows.errors
-windows.kernel32 math.bitwise ;
+windows.kernel32 windows.types math.bitwise ;
 IN: random.windows
 
 TUPLE: windows-rng provider type ;
