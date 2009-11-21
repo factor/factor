@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel locals math math.vectors math.matrices
-namespaces sequences ;
+namespaces sequences fry sorting ;
 IN: math.matrices.elimination
 
 SYMBOL: matrix
@@ -52,11 +52,8 @@ SYMBOL: matrix
     [ first-col ] keep
     dup 1 + rows-from clear-col ;
 
-: find-row ( row# quot -- i elt )
-    [ rows-from ] dip find ; inline
-
 : pivot-row ( col# row# -- n )
-    [ dupd nth-row nth zero? not ] find-row 2nip ;
+    rows-from swap '[ [ _ ] dip nth-row nth abs ] sort-with last ;
 
 : (echelon) ( col# row# -- )
     over cols < over rows < and [
