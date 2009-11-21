@@ -86,9 +86,16 @@ IN: mason.report
 
 : benchmarks-table ( assoc -- xml )
     [
-        1000000 /f
+        1,000,000,000 /f
         [XML <tr><td><-></td><td><-></td></tr> XML]
-    ] { } assoc>map [XML <h2>Benchmarks</h2> <table><-></table> XML] ;
+    ] { } assoc>map
+    [XML
+        <h2>Benchmarks</h2>
+        <table>
+            <tr><th>Benchmark</th><th>Time (seconds)</th></tr>
+            <->
+        </table>
+    XML] ;
 
 : successful-report ( -- )
     [
