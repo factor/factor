@@ -151,51 +151,6 @@ cell factor_vm::compute_relocation(relocation_entry rel, cell index, code_block 
 #undef ARG
 }
 
-template<typename Iterator> void factor_vm::iterate_relocations(code_block *compiled, Iterator &iter)
-{
-	if(to_boolean(compiled->relocation))
-	{
-		byte_array *relocation = untag<byte_array>(compiled->relocation);
-
-		cell index = 0;
-		cell length = array_capacity(relocation) / sizeof(relocation_entry);
-
-		for(cell i = 0; i < length; i++)
-		{
-			relocation_entry rel = relocation->data<relocation_entry>()[i];
-			iter(rel,index,compiled);
-			index += rel.number_of_parameters();
-		}
-	}
-}
-
-struct literal_references_updater {
-	factor_vm *parent;
-
-	explicit literal_references_updater(factor_vm *parent_) : parent(parent_) {}
-
-	void operator()(relocation_entry rel, cell index, code_block *compiled)
-	{
-		if(rel.rel_type() == RT_IMMEDIATE)
-		{
-			embedded_pointer ptr(rel.rel_class(),rel.rel_offset() + (cell)(compiled + 1));
-			array *literals = untag<array>(compiled->literals);
-			ptr.store_address(array_nth(literals,index));
-		}
-	}
-};
-
-/* Update pointers to literals from compiled code. */
-void factor_vm::update_literal_references(code_block *compiled)
-{
-	if(!code->needs_fixup_p(compiled))
-	{
-		literal_references_updater updater(this);
-		iterate_relocations(compiled,updater);
-		flush_icache_for(compiled);
-	}
-}
-
 /* Compute an address to store at a relocation */
 void factor_vm::relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled)
 {

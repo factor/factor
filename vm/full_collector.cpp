@@ -114,8 +114,9 @@ void factor_vm::collect_sweep_impl()
 {
 	current_gc->event->started_data_sweep();
 	data->tenured->sweep();
-	update_code_roots_for_sweep();
 	current_gc->event->ended_data_sweep();
+
+	update_code_roots_for_sweep();
 
 	current_gc->event->started_code_sweep();
 	code->allocator->sweep();
