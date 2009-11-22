@@ -126,15 +126,6 @@ void factor_vm::start_gc_again()
 	current_gc->event = new gc_event(current_gc->op,this);
 }
 
-void factor_vm::update_code_heap_for_minor_gc(std::set<code_block *> *remembered_set)
-{
-	/* The youngest generation that any code block can now reference */
-	std::set<code_block *>::const_iterator iter = remembered_set->begin();
-	std::set<code_block *>::const_iterator end = remembered_set->end();
-
-	for(; iter != end; iter++) update_literal_references(*iter);
-}
-
 void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 {
 	assert(!gc_off);

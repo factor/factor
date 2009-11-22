@@ -42,10 +42,6 @@ void factor_vm::collect_to_tenured()
 
 	collector.tenure_reachable_objects();
 
-	current_gc->event->started_code_sweep();
-	update_code_heap_for_minor_gc(&code->points_to_aging);
-	current_gc->event->ended_code_sweep();
-
 	data->reset_generation(&nursery);
 	data->reset_generation(data->aging);
 	code->clear_remembered_set();
