@@ -504,8 +504,25 @@ struct factor_vm
 	void undefined_symbol();
 	void *get_rel_symbol(array *literals, cell index);
 	cell compute_relocation(relocation_entry rel, cell index, code_block *compiled);
-	template<typename Iterator> void iterate_relocations(code_block *compiled, Iterator &iter);
-	void update_literal_references(code_block *compiled);
+
+	template<typename Iterator> void iterate_relocations(code_block *compiled, Iterator &iter)
+	{
+		if(to_boolean(compiled->relocation))
+		{
+			byte_array *relocation = (byte_array *)UNTAG(compiled->relocation);
+
+			cell index = 0;
+			cell length = (relocation->capacity >> TAG_BITS) / sizeof(relocation_entry);
+
+			for(cell i = 0; i < length; i++)
+			{
+				relocation_entry rel = relocation->data<relocation_entry>()[i];
+				iter(rel,index,compiled);
+				index += rel.number_of_parameters();
+			}
+		}
+	}
+
 	void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled);
 	void update_word_references(code_block *compiled);
 	void update_code_block_words_and_literals(code_block *compiled);
