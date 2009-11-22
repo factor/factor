@@ -51,9 +51,6 @@ M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
     compiler-error-messages-file
     do-step ;
 
-: benchmark-ms ( quot -- ms )
-    benchmark 1000 /i ; inline
-
 : check-boot-image ( -- )
     "" to-refresh drop 2dup [ empty? not ] either?
     [
@@ -67,11 +64,11 @@ M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
     ".." [
         bootstrap-time get boot-time-file to-file
         check-boot-image
-        [ do-load ] benchmark-ms load-time-file to-file
-        [ generate-help ] benchmark-ms html-help-time-file to-file
-        [ do-tests ] benchmark-ms test-time-file to-file
-        [ do-help-lint ] benchmark-ms help-lint-time-file to-file
-        [ do-benchmarks ] benchmark-ms benchmark-time-file to-file
+        [ do-load ] benchmark load-time-file to-file
+        [ generate-help ] benchmark html-help-time-file to-file
+        [ do-tests ] benchmark test-time-file to-file
+        [ do-help-lint ] benchmark help-lint-time-file to-file
+        [ do-benchmarks ] benchmark benchmark-time-file to-file
         do-compile-errors
     ] with-directory ;
 

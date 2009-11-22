@@ -7,15 +7,13 @@ MIXIN: definition
 
 ERROR: no-compilation-unit definition ;
 
-SYMBOLS: inlined-dependency flushed-dependency called-dependency ;
-
 : set-in-unit ( value key assoc -- )
     [ set-at ] [ no-compilation-unit ] if* ;
 
 SYMBOL: changed-definitions
 
 : changed-definition ( defspec -- )
-    inlined-dependency swap changed-definitions get set-in-unit ;
+    dup changed-definitions get set-in-unit ;
 
 SYMBOL: changed-effects
 
@@ -23,7 +21,15 @@ SYMBOL: changed-generics
 
 SYMBOL: outdated-generics
 
+SYMBOL: new-words
+
 SYMBOL: new-classes
+
+: new-word ( word -- )
+    dup new-words get set-in-unit ;
+
+: new-word? ( word -- ? )
+    new-words get key? ;
 
 : new-class ( word -- )
     dup new-classes get set-in-unit ;

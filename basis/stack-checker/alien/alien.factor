@@ -69,6 +69,6 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
     pop-literal nip >>abi
     pop-literal nip >>parameters
     pop-literal nip >>return
-    "( callback )" f <word> >>xt
+    "( callback )" <uninterned-word> >>xt
     dup callback-bottom
     #alien-callback, ;

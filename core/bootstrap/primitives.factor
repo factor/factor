@@ -16,7 +16,7 @@ H{ } clone sub-primitives set
 
 "vocab:bootstrap/syntax.factor" parse-file
 
-"vocab:cpu/" architecture get {
+architecture get {
     { "x86.32" "x86/32" }
     { "winnt-x86.64" "x86/64/winnt" }
     { "unix-x86.64" "x86/64/unix" }
@@ -24,7 +24,7 @@ H{ } clone sub-primitives set
     { "macosx-ppc" "ppc/macosx" }
     { "arm" "arm" }
 } ?at [ "Bad architecture: " prepend throw ] unless
-"/bootstrap.factor" 3append parse-file
+"vocab:cpu/" "/bootstrap.factor" surround parse-file
 
 "vocab:bootstrap/layouts/layouts.factor" parse-file
 
@@ -54,6 +54,8 @@ call( -- )
 num-types get f <array> builtins set
 
 bootstrapping? on
+
+[
 
 ! Create some empty vocabs where the below primitives and
 ! classes will go
@@ -427,10 +429,11 @@ tuple
     { "set-datastack" "kernel" (( ds -- )) }
     { "set-retainstack" "kernel" (( rs -- )) }
     { "set-callstack" "kernel" (( cs -- )) }
-    { "exit" "system" (( n -- )) }
+    { "(exit)" "system" (( n -- )) }
     { "data-room" "memory" (( -- data-room )) }
     { "code-room" "memory" (( -- code-room )) }
-    { "micros" "system" (( -- us )) }
+    { "system-micros" "system" (( -- us )) }
+    { "nano-count" "system" (( -- ns )) }
     { "modify-code-heap" "compiler.units" (( alist -- )) }
     { "(dlopen)" "alien.libraries" (( path -- dll )) }
     { "(dlsym)" "alien.libraries" (( name dll -- alien )) }
@@ -492,7 +495,7 @@ tuple
     { "<tuple>" "classes.tuple.private" (( layout -- tuple )) }
     { "profiling" "tools.profiler.private" (( ? -- )) }
     { "become" "kernel.private" (( old new -- )) }
-    { "(sleep)" "threads.private" (( us -- )) }
+    { "(sleep)" "threads.private" (( nanos -- )) }
     { "<tuple-boa>" "classes.tuple.private" (( ... layout -- tuple )) }
     { "callstack>array" "kernel" (( callstack -- array )) }
     { "innermost-frame-executing" "kernel.private" (( callstack -- obj )) }
@@ -518,7 +521,11 @@ tuple
     { "<callback>" "alien" (( word -- alien )) }
     { "enable-gc-events" "memory" (( -- )) }
     { "disable-gc-events" "memory" (( -- events )) }
+    { "(identity-hashcode)" "kernel.private" (( obj -- code )) }
+    { "compute-identity-hashcode" "kernel.private" (( obj -- )) }
 } [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number
 "build" "kernel" create build 1 + [ ] curry (( -- n )) define-declared
+
+] with-compilation-unit

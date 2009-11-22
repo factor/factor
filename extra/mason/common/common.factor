@@ -3,7 +3,7 @@
 USING: kernel namespaces sequences splitting system accessors
 math.functions make io io.files io.pathnames io.directories
 io.directories.hierarchy io.launcher io.encodings.utf8 prettyprint
-combinators.short-circuit parser combinators calendar
+combinators.short-circuit parser combinators math calendar
 calendar.format arrays mason.config locals debugger fry
 continuations strings io.sockets ;
 IN: mason.common
@@ -57,10 +57,8 @@ M: unix really-delete-tree delete-tree ;
         } cleave
     ] { } make [ pad-00 ] map "-" join ;
 
-: milli-seconds>time ( n -- string )
-    millis>timestamp
-    [ hour>> ] [ minute>> ] [ second>> floor ] tri 3array
-    [ pad-00 ] map ":" join ;
+: nanos>time ( n -- string )
+    1,000,000,000 /i 60 /mod [ 60 /mod ] dip 3array [ pad-00 ] map ":" join ;
 
 SYMBOL: stamp
 

@@ -216,7 +216,7 @@ HELP: filter-moved
 { $description "Removes all definitions from " { $snippet "assoc2" } " which are in " { $snippet "assoc1" } " or are are no longer present in the current " { $link file } "." } ;
 
 HELP: forget-smudged
-{ $description "Forgets removed definitions and prints a warning message if any of them are still referenced from other source files." } ;
+{ $description "Forgets removed definitions." } ;
 
 HELP: finish-parsing
 { $values { "lines" "the lines of text just parsed" } { "quot" "the quotation just parsed" } }

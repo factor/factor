@@ -14,4 +14,4 @@ M: let expand-macros* expand-macros literal ;
 
 M: lambda condomize? drop t ;
 
-M: lambda condomize '[ @ ] ;
+M: lambda condomize [ call ] curry ;

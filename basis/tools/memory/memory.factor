@@ -4,8 +4,7 @@ USING: accessors arrays assocs classes classes.struct
 combinators combinators.smart continuations fry generalizations
 generic grouping io io.styles kernel make math math.parser
 math.statistics memory namespaces parser prettyprint sequences
-sorting specialized-arrays splitting strings system vm words ;
-SPECIALIZED-ARRAY: gc-event
+sorting splitting strings system vm words ;
 IN: tools.memory
 
 <PRIVATE
@@ -19,8 +18,8 @@ IN: tools.memory
 : kilobytes ( n -- str )
     1024 /i commas " KB" append ;
 
-: micros>string ( n -- str )
-    commas " µs" append ;
+: nanos>string ( n -- str )
+    1000 /i commas " µs" append ;
 
 : copying-room. ( copying-sizes -- )
     {
@@ -101,7 +100,7 @@ SYMBOL: gc-events
 : collect-gc-events ( quot -- )
     enable-gc-events
     [ ] [ disable-gc-events drop ] cleanup
-    disable-gc-events byte-array>gc-event-array gc-events set ; inline
+    disable-gc-events [ gc-event memory>struct ] map gc-events set ; inline
 
 <PRIVATE
 
@@ -154,11 +153,11 @@ TUPLE: gc-stats collections times ;
             [ collections>> ]
             [
                 times>> {
-                    [ sum micros>string ]
-                    [ mean >integer micros>string ]
-                    [ median >integer micros>string ]
-                    [ infimum micros>string ]
-                    [ supremum micros>string ]
+                    [ sum nanos>string ]
+                    [ mean >integer nanos>string ]
+                    [ median >integer nanos>string ]
+                    [ infimum nanos>string ]
+                    [ supremum nanos>string ]
                 } cleave
             ] bi
         ] bi
@@ -173,7 +172,7 @@ PRIVATE>
 : gc-event. ( event -- )
     {
         { "Event type:" [ op>> gc-op-string ] }
-        { "Total time:" [ total-time>> micros>string ] }
+        { "Total time:" [ total-time>> nanos>string ] }
         { "Space reclaimed:" [ space-reclaimed kilobytes ] }
     } object-table. ;
 
@@ -189,10 +188,10 @@ PRIVATE>
         { "Cards scanned:" [ [ cards-scanned>> ] map-sum commas ] }
         { "Decks scanned:" [ [ decks-scanned>> ] map-sum commas ] }
         { "Code blocks scanned:" [ [ code-blocks-scanned>> ] map-sum commas ] }
-        { "Total time:" [ [ total-time>> ] map-sum micros>string ] }
-        { "Card scan time:" [ [ card-scan-time>> ] map-sum micros>string ] }
-        { "Code block scan time:" [ [ code-scan-time>> ] map-sum micros>string ] }
-        { "Data heap sweep time:" [ [ data-sweep-time>> ] map-sum micros>string ] }
-        { "Code heap sweep time:" [ [ code-sweep-time>> ] map-sum micros>string ] }
-        { "Compaction time:" [ [ compaction-time>> ] map-sum micros>string ] }
+        { "Total time:" [ [ total-time>> ] map-sum nanos>string ] }
+        { "Card scan time:" [ [ card-scan-time>> ] map-sum nanos>string ] }
+        { "Code block scan time:" [ [ code-scan-time>> ] map-sum nanos>string ] }
+        { "Data heap sweep time:" [ [ data-sweep-time>> ] map-sum nanos>string ] }
+        { "Code heap sweep time:" [ [ code-sweep-time>> ] map-sum nanos>string ] }
+        { "Compaction time:" [ [ compaction-time>> ] map-sum nanos>string ] }
     } object-table. ;

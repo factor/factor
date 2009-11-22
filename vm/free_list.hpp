@@ -2,6 +2,7 @@ namespace factor
 {
 
 static const cell free_list_count = 32;
+static const cell allocation_page_size = 1024;
 
 struct free_heap_block
 {
@@ -9,7 +10,7 @@ struct free_heap_block
 
 	bool free_p() const
 	{
-		return header & 1 == 1;
+		return (header & 1) == 1;
 	}
 
 	cell size() const

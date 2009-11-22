@@ -1,4 +1,5 @@
 #include "master.hpp"
+#include <time.h>
 
 namespace factor
 {
@@ -32,6 +33,16 @@ const char *default_image_path()
 	memcpy(new_path + len,SUFFIX,SUFFIX_LEN + 1);
 	free(const_cast<char *>(path));
 	return new_path;
+}
+
+u64 nano_count()
+{
+	struct timespec t;
+	int ret;
+	ret = clock_gettime(CLOCK_MONOTONIC,&t);
+	if(ret != 0)
+		fatal_error("clock_gettime failed", 0);
+	return (u64)t.tv_sec * 1000000000 + t.tv_nsec;
 }
 
 }

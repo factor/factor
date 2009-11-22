@@ -11,12 +11,7 @@ ARTICLE: "class-operations" "Class operations"
     class-and
     class-or
     classes-intersect?
-}
-"Low-level implementation detail:"
-{ $subsections
     flatten-class
-    flatten-builtin-class
-    class-types
 } ;
 
 ARTICLE: "class-linearization" "Class linearization"
@@ -45,17 +40,9 @@ $nl
 "Metaclass order:"
 { $subsections rank-class } ;
 
-HELP: flatten-builtin-class
-{ $values { "class" class } { "assoc" "an assoc whose keys are classes" } }
-{ $description "Outputs a set of tuple classes whose union is the smallest cover of " { $snippet "class" } " intersected with " { $link tuple } "." } ;
-
 HELP: flatten-class
 { $values { "class" class } { "assoc" "an assoc whose keys are classes" } }
 { $description "Outputs a set of builtin and tuple classes whose union is the smallest cover of " { $snippet "class" } "." } ;
-
-HELP: class-types
-{ $values { "class" class } { "seq" "an increasing sequence of integers" } }
-{ $description "Outputs a sequence of builtin type numbers whose instances can possibly be instances of the given class." } ;
 
 HELP: class<=
 { $values { "first" "a class" } { "second" "a class" } { "?" "a boolean" } }

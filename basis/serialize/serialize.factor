@@ -26,7 +26,7 @@ TUPLE: id obj ;
 
 C: <id> id
 
-M: id hashcode* obj>> hashcode* ;
+M: id hashcode* nip obj>> identity-hashcode ;
 
 M: id equal? over id? [ [ obj>> ] bi@ eq? ] [ 2drop f ] if ;
 

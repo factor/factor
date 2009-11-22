@@ -17,7 +17,7 @@ MEMO: sse-version ( -- n )
     sse_version
     "sse-version" get string>number [ min ] when* ;
 
-[ \ sse-version reset-memoized ] "cpu.x86.features" add-init-hook
+[ \ sse-version reset-memoized ] "cpu.x86.features" add-startup-hook
 
 : sse? ( -- ? ) sse-version 10 >= ;
 : sse2? ( -- ? ) sse-version 20 >= ;

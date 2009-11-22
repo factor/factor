@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors words assocs sequences arrays namespaces
 fry locals definitions classes classes.algebra generic
-stack-checker.state
+stack-checker.dependencies
 stack-checker.backend
 compiler.tree
 compiler.tree.propagation.info

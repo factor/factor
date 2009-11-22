@@ -4,10 +4,11 @@ USING: accessors kernel prettyprint io debugger
 sequences assocs stack-checker.errors summary effects ;
 IN: stack-checker.errors.prettyprint
 
-M: literal-expected summary
-    what>> "Got a computed value where a " " was expected" surround ;
+M: unknown-macro-input summary
+    macro>> name>> "Cannot apply “" "” to an input parameter of a non-inline word" surround ;
 
-M: literal-expected error. summary print ;
+M: bad-macro-input summary
+    macro>> name>> "Cannot apply “" "” to a run-time computed value" surround ;
 
 M: unbalanced-branches-error summary
     drop "Unbalanced branches" ;
@@ -50,13 +51,16 @@ M: inconsistent-recursive-call-error summary
     " calls itself with a different set of quotation parameters than were input" surround ;
 
 M: unknown-primitive-error summary
-    word>> name>> "The " " word cannot be called from optimized words" surround ;
+    drop "The do-primitive word cannot be called from here" ;
 
 M: transform-expansion-error summary
     word>> name>> "Macro expansion of " " threw an error" surround ;
 
 M: transform-expansion-error error.
-    [ summary print ] [ error>> error. ] bi ;
+    [ summary print ]
+    [ nl "The error was:" print error>> error. nl ]
+    [ continuation>> traceback-link. ]
+    tri ;
 
 M: do-not-compile summary
     word>> name>> "Cannot compile call to " prepend ;

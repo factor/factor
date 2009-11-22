@@ -1,5 +1,6 @@
 #import <Cocoa/Cocoa.h>
 
+#include <mach/mach_time.h>
 #include "master.hpp"
 
 namespace factor
@@ -82,6 +83,18 @@ Protocol *objc_getProtocol(char *name)
 		return @protocol(NSTextInput);
 	else
 		return nil;
+}
+
+u64 nano_count()
+{
+	u64 t;
+	mach_timebase_info_data_t info;
+	kern_return_t ret;
+	t = mach_absolute_time();
+	ret = mach_timebase_info(&info);
+	if(ret != 0)
+		fatal_error("mach_timebase_info failed",ret);
+	return t * (info.numer/info.denom);
 }
 
 }
