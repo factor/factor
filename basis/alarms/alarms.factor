@@ -19,13 +19,15 @@ SYMBOL: alarm-thread
 : notify-alarm-thread ( -- )
     alarm-thread get-global interrupt ;
 
-: normalize-argument ( obj -- nanoseconds )
-    >duration duration>nanoseconds >integer ;
+GENERIC: >nanoseconds ( obj -- duration/f )
+M: f >nanoseconds ;
+M: real >nanoseconds >integer ;
+M: duration >nanoseconds duration>nanoseconds >integer ;
 
 : <alarm> ( quot start interval -- alarm )
     alarm new
-        swap dup [ normalize-argument ] when >>interval
-        swap dup [ normalize-argument nano-count + ] when >>start
+        swap >nanoseconds >>interval
+        swap >nanoseconds nano-count + >>start
         swap >>quot
         <box> >>entry ;
 
