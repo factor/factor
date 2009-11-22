@@ -35,7 +35,7 @@ FUNCTION: void ReleaseStgMedium ( LPSTGMEDIUM pmedium ) ;
 
 : com-query-interface ( interface iid -- interface' )
     [
-        "void*" malloc-object &free
+        void* malloc-object &free
         [ IUnknown::QueryInterface ole32-error ] keep *void*
     ] with-destructors ;
 

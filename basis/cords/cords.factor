@@ -12,7 +12,7 @@ TUPLE: simple-cord
 M: simple-cord length
     [ first>> length ] [ second>> length ] bi + ; inline
 
-M: simple-cord virtual-seq first>> ; inline
+M: simple-cord virtual-exemplar first>> ; inline
 
 M: simple-cord virtual@
     2dup first>> length <
@@ -28,7 +28,7 @@ M: multi-cord virtual@
     seqs>> [ first <=> ] with search nip
     [ first - ] [ second ] bi ; inline
 
-M: multi-cord virtual-seq
+M: multi-cord virtual-exemplar
     seqs>> [ f ] [ first second ] if-empty ; inline
 
 : <cord> ( seqs -- cord )

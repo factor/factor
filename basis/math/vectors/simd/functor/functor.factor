@@ -147,6 +147,7 @@ TUPLE: simd class elt-class ops special-wrappers schema-wrappers ctor rep ;
         [ [ underlying>> ] 2dip rep set-alien-vector ] >>setter
         16 >>size
         16 >>align
+        16 >>align-first
         rep >>rep
     class c:typedef ;
 
@@ -316,6 +317,7 @@ SLOT: underlying2
         ] >>setter
         32 >>size
         16 >>align
+        16 >>align-first
         rep >>rep
     class c:typedef ;
 

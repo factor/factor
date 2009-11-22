@@ -130,7 +130,7 @@ CONSTANT: _UTX_HOSTSIZE   256
 CONSTANT: _SS_MAXSIZE 128
 
 : _SS_ALIGNSIZE ( -- n )
-    "__int64_t" heap-size ; inline
+    __int64_t heap-size ; inline
     
 : _SS_PAD1SIZE ( -- n )
     _SS_ALIGNSIZE 2 - ; inline

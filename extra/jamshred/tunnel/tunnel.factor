@@ -63,33 +63,6 @@ CONSTANT: default-segment-radius 1
     #! valid values
     [ '[ _ clamp-length ] bi@ ] keep <slice> ;
 
-:: nearer-segment ( seg-a seg-b oint -- segment )
-    seg-a oint distance
-    seg-b oint distance <
-    seg-a seg-b ? ;
-
-: (find-nearest-segment) ( nearest next oint -- nearest ? )
-    #! find the nearest of 'next' and 'nearest' to 'oint', and return
-    #! t if the nearest hasn't changed
-    pick [ nearer-segment dup ] dip = ;
-
-: find-nearest-segment ( oint segments -- segment )
-    dup first swap rest-slice rot [ (find-nearest-segment) ] curry
-    find 2drop ;
-    
-: nearest-segment-forward ( segments oint start -- segment )
-    rot tail-slice find-nearest-segment ;
-
-: nearest-segment-backward ( segments oint start -- segment )
-    1 + rot head-slice <reversed> find-nearest-segment ;
-
-: nearest-segment ( segments oint start-segment -- segment )
-    #! find the segment nearest to 'oint', and return it.
-    #! start looking at segment 'start-segment'
-    number>> over [
-        [ nearest-segment-forward ] 3keep nearest-segment-backward
-    ] dip nearer-segment ;
-
 : get-segment ( segments n -- segment )
     over clamp-length swap nth ;
 

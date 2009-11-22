@@ -33,6 +33,7 @@ IN: compiler.cfg.intrinsics
 {
     { kernel.private:tag [ drop emit-tag ] }
     { kernel.private:getenv [ emit-getenv ] }
+    { kernel.private:(identity-hashcode) [ drop emit-identity-hashcode ] }
     { math.private:both-fixnums? [ drop emit-both-fixnums? ] }
     { math.private:fixnum+ [ drop emit-fixnum+ ] }
     { math.private:fixnum- [ drop emit-fixnum- ] }

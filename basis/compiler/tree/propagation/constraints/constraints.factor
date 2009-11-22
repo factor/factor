@@ -39,8 +39,8 @@ M: true-constraint assume*
     bi ;
 
 M: true-constraint satisfied?
-    value>> value-info class>>
-    { [ true-class? ] [ null-class? not ] } 1&& ;
+    value>> value-info*
+    [ class>> true-class? ] [ drop f ] if ;
 
 TUPLE: false-constraint value ;
 
@@ -52,8 +52,8 @@ M: false-constraint assume*
     bi ;
 
 M: false-constraint satisfied?
-    value>> value-info class>>
-    { [ false-class? ] [ null-class? not ] } 1&& ;
+    value>> value-info*
+    [ class>> false-class? ] [ drop f ] if ;
 
 ! Class constraints
 TUPLE: class-constraint value class ;

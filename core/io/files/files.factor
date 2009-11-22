@@ -60,4 +60,4 @@ PRIVATE>
     13 getenv alien>native-string cwd prepend-path \ image set-global
     14 getenv alien>native-string cwd prepend-path \ vm set-global
     image parent-directory "resource-path" set-global
-] "io.files" add-init-hook
+] "io.files" add-startup-hook

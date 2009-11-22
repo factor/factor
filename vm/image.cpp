@@ -135,12 +135,12 @@ void factor_vm::relocate_object(object *object,
 	cell data_relocation_base,
 	cell code_relocation_base)
 {
-	cell hi_tag = object->h.hi_tag();
+	cell type = object->type();
 	
 	/* Tuple relocation is a bit trickier; we have to fix up the
-	layout object before we can get the tuple size, so do_slots is
+	layout object before we can get the tuple size, so each_slot is
 	out of the question */
-	if(hi_tag == TUPLE_TYPE)
+	if(type == TUPLE_TYPE)
 	{
 		tuple *t = (tuple *)object;
 		data_fixup(&t->layout,data_relocation_base);
@@ -154,9 +154,9 @@ void factor_vm::relocate_object(object *object,
 	else
 	{
 		object_fixupper fixupper(this,data_relocation_base);
-		do_slots(object,fixupper);
+		object->each_slot(fixupper);
 
-		switch(hi_tag)
+		switch(type)
 		{
 		case WORD_TYPE:
 			fixup_word((word *)object,code_relocation_base);
@@ -291,7 +291,7 @@ bool factor_vm::save_image(const vm_char *filename)
 	h.bignum_neg_one = bignum_neg_one;
 
 	for(cell i = 0; i < special_object_count; i++)
-		h.special_objects[i] = (save_env_p(i) ? special_objects[i] : false_object);
+		h.special_objects[i] = (save_special_p(i) ? special_objects[i] : false_object);
 
 	bool ok = true;
 
@@ -326,7 +326,7 @@ void factor_vm::primitive_save_image_and_exit()
 
 	/* strip out special_objects data which is set on startup anyway */
 	for(cell i = 0; i < special_object_count; i++)
-		if(!save_env_p(i)) special_objects[i] = false_object;
+		if(!save_special_p(i)) special_objects[i] = false_object;
 
 	gc(collect_compact_op,
 		0, /* requested size */

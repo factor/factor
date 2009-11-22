@@ -5,17 +5,43 @@ vectors assocs namespaces words sorting layouts math hashtables
 kernel.private sets math.order ;
 IN: classes.algebra
 
-TUPLE: anonymous-union members ;
+<PRIVATE
 
-C: <anonymous-union> anonymous-union
+TUPLE: anonymous-union { members read-only } ;
 
-TUPLE: anonymous-intersection participants ;
+: <anonymous-union> ( members -- class )
+    [ null eq? not ] filter prune
+    dup length 1 = [ first ] [ anonymous-union boa ] if ;
 
-C: <anonymous-intersection> anonymous-intersection
+TUPLE: anonymous-intersection { participants read-only } ;
 
-TUPLE: anonymous-complement class ;
+: <anonymous-intersection> ( participants -- class )
+    prune dup length 1 = [ first ] [ anonymous-intersection boa ] if ;
+
+TUPLE: anonymous-complement { class read-only } ;
 
 C: <anonymous-complement> anonymous-complement
+
+DEFER: (class<=)
+
+DEFER: (class-not)
+
+GENERIC: (classes-intersect?) ( first second -- ? )
+
+DEFER: (class-and)
+
+DEFER: (class-or)
+
+GENERIC: (flatten-class) ( class -- )
+
+: normalize-class ( class -- class' )
+    {
+        { [ dup members ] [ members <anonymous-union> normalize-class ] }
+        { [ dup participants ] [ participants <anonymous-intersection> normalize-class ] }
+        [ ]
+    } cond ;
+
+PRIVATE>
 
 GENERIC: valid-class? ( obj -- ? )
 
@@ -25,39 +51,41 @@ M: anonymous-intersection valid-class? participants>> [ valid-class? ] all? ;
 M: anonymous-complement valid-class? class>> valid-class? ;
 M: word valid-class? drop f ;
 
-DEFER: (class<=)
-
 : class<= ( first second -- ? )
     class<=-cache get [ (class<=) ] 2cache ;
 
-DEFER: (class-not)
+: class< ( first second -- ? )
+    {
+        { [ 2dup class<= not ] [ 2drop f ] }
+        { [ 2dup swap class<= not ] [ 2drop t ] }
+        [ [ rank-class ] bi@ < ]
+    } cond ;
+
+: class<=> ( first second -- ? )
+    {
+        { [ 2dup class<= not ] [ 2drop +gt+ ] }
+        { [ 2dup swap class<= not ] [ 2drop +lt+ ] }
+        [ [ rank-class ] bi@ <=> ]
+    } cond ;
+
+: class= ( first second -- ? )
+    [ class<= ] [ swap class<= ] 2bi and ;
 
 : class-not ( class -- complement )
     class-not-cache get [ (class-not) ] cache ;
-
-GENERIC: (classes-intersect?) ( first second -- ? )
-
-: normalize-class ( class -- class' )
-    {
-        { [ dup members ] [ members <anonymous-union> ] }
-        { [ dup participants ] [ participants <anonymous-intersection> ] }
-        [ ]
-    } cond ;
 
 : classes-intersect? ( first second -- ? )
     classes-intersect-cache get [
         normalize-class (classes-intersect?)
     ] 2cache ;
 
-DEFER: (class-and)
-
 : class-and ( first second -- class )
     class-and-cache get [ (class-and) ] 2cache ;
 
-DEFER: (class-or)
-
 : class-or ( first second -- class )
     class-or-cache get [ (class-or) ] 2cache ;
+
+<PRIVATE
 
 : superclass<= ( first second -- ? )
     swap superclass dup [ swap class<= ] [ 2drop f ] if ;
@@ -89,6 +117,7 @@ DEFER: (class-or)
             [ class-not normalize-class ] map
             <anonymous-union>
         ] }
+        [ <anonymous-complement> ]
     } cond ;
 
 : left-anonymous-complement<= ( first second -- ? )
@@ -108,8 +137,10 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
 
 : (class<=) ( first second -- ? )
     2dup eq? [ 2drop t ] [
+        [ normalize-class ] bi@
         2dup superclass<= [ 2drop t ] [
-            [ normalize-class ] bi@ {
+            {
+                { [ 2dup eq? ] [ 2drop t ] }
                 { [ dup empty-intersection? ] [ 2drop t ] }
                 { [ over empty-union? ] [ 2drop t ] }
                 { [ 2dup [ anonymous-complement? ] both? ] [ anonymous-complement<= ] }
@@ -185,22 +216,10 @@ M: anonymous-complement (classes-intersect?)
         [ <anonymous-complement> ]
     } cond ;
 
-: class< ( first second -- ? )
-    {
-        { [ 2dup class<= not ] [ 2drop f ] }
-        { [ 2dup swap class<= not ] [ 2drop t ] }
-        [ [ rank-class ] bi@ < ]
-    } cond ;
+M: anonymous-union (flatten-class)
+    members>> [ (flatten-class) ] each ;
 
-: class<=> ( first second -- ? )
-    {
-        { [ 2dup class<= not ] [ 2drop +gt+ ] }
-        { [ 2dup swap class<= not ] [ 2drop +lt+ ] }
-        [ [ rank-class ] bi@ <=> ]
-    } cond ;
-
-: class= ( first second -- ? )
-    [ class<= ] [ swap class<= ] 2bi and ;
+PRIVATE>
 
 ERROR: topological-sort-failed ;
 
@@ -211,7 +230,7 @@ ERROR: topological-sort-failed ;
 : sort-classes ( seq -- newseq )
     [ name>> ] sort-with >vector
     [ dup empty? not ]
-    [ dup largest-class [ over remove-nth! drop ] dip ]
+    [ dup largest-class [ swap remove-nth! ] dip ]
     produce nip ;
 
 : smallest-class ( classes -- class/f )
@@ -220,22 +239,5 @@ ERROR: topological-sort-failed ;
         [ ] [ [ class<= ] most ] map-reduce
     ] if-empty ;
 
-GENERIC: (flatten-class) ( class -- )
-
-M: anonymous-union (flatten-class)
-    members>> [ (flatten-class) ] each ;
-
 : flatten-class ( class -- assoc )
     [ (flatten-class) ] H{ } make-assoc ;
-
-: flatten-builtin-class ( class -- assoc )
-    flatten-class [
-        dup tuple class<= [ 2drop tuple tuple ] when
-    ] assoc-map ;
-
-: class-types ( class -- seq )
-    flatten-builtin-class keys
-    [ "type" word-prop ] map natural-sort ;
-
-: class-type ( class -- tag/f )
-    class-types dup length 1 = [ first ] [ drop f ] if ;

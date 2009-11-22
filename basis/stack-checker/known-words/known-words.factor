@@ -21,6 +21,7 @@ stack-checker.visitor
 stack-checker.backend
 stack-checker.branches
 stack-checker.transforms
+stack-checker.dependencies
 stack-checker.recursive-state ;
 IN: stack-checker.known-words
 
@@ -97,8 +98,8 @@ M: composed infer-call*
     1 infer->r infer-call
     terminated? get [ 1 infer-r> infer-call ] unless ;
 
-M: object infer-call*
-    "literal quotation" literal-expected ;
+M: input-parameter infer-call* \ call unknown-macro-input ;
+M: object infer-call* \ call bad-macro-input ;
 
 : infer-ndip ( word n -- )
     [ literals get ] 2dip
@@ -230,7 +231,7 @@ M: bad-executable summary
 \ alien-callback [ infer-alien-callback ] "special" set-word-prop
 
 : infer-special ( word -- )
-    "special" word-prop call( -- ) ;
+    [ current-word set ] [ "special" word-prop call( -- ) ] bi ;
 
 : infer-local-reader ( word -- )
     (( -- value )) apply-word/effect ;
@@ -510,8 +511,11 @@ M: bad-executable summary
 \ code-room { } { byte-array } define-primitive
 \ code-room  make-flushable
 
-\ micros { } { integer } define-primitive
-\ micros make-flushable
+\ system-micros { } { integer } define-primitive
+\ system-micros make-flushable
+
+\ nano-count { } { integer } define-primitive
+\ nano-count make-flushable
 
 \ tag { object } { fixnum } define-primitive
 \ tag make-foldable
@@ -711,3 +715,7 @@ M: bad-executable summary
 \ disable-gc-events { } { object } define-primitive
 
 \ profiling { object } { } define-primitive
+
+\ (identity-hashcode) { object } { fixnum } define-primitive
+
+\ compute-identity-hashcode { object } { } define-primitive

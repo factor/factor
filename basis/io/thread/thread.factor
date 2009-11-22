@@ -17,4 +17,4 @@ SYMBOL: io-thread-running?
 [
     t io-thread-running? set-global
     start-io-thread
-] "io.thread" add-init-hook
+] "io.thread" add-startup-hook

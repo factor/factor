@@ -66,7 +66,8 @@ PRIMITIVE_FORWARD(set_callstack)
 PRIMITIVE_FORWARD(exit)
 PRIMITIVE_FORWARD(data_room)
 PRIMITIVE_FORWARD(code_room)
-PRIMITIVE_FORWARD(micros)
+PRIMITIVE_FORWARD(system_micros)
+PRIMITIVE_FORWARD(nano_count)
 PRIMITIVE_FORWARD(modify_code_heap)
 PRIMITIVE_FORWARD(dlopen)
 PRIMITIVE_FORWARD(dlsym)
@@ -126,6 +127,8 @@ PRIMITIVE_FORWARD(strip_stack_traces)
 PRIMITIVE_FORWARD(callback)
 PRIMITIVE_FORWARD(enable_gc_events)
 PRIMITIVE_FORWARD(disable_gc_events)
+PRIMITIVE_FORWARD(identity_hashcode)
+PRIMITIVE_FORWARD(compute_identity_hashcode)
 
 const primitive_type primitives[] = {
 	primitive_bignum_to_fixnum,
@@ -200,7 +203,8 @@ const primitive_type primitives[] = {
 	primitive_exit,
 	primitive_data_room,
 	primitive_code_room,
-	primitive_micros,
+	primitive_system_micros,
+	primitive_nano_count,
 	primitive_modify_code_heap,
 	primitive_dlopen,
 	primitive_dlsym,
@@ -288,6 +292,8 @@ const primitive_type primitives[] = {
 	primitive_callback,
 	primitive_enable_gc_events,
 	primitive_disable_gc_events,
+	primitive_identity_hashcode,
+	primitive_compute_identity_hashcode,
 };
 
 }

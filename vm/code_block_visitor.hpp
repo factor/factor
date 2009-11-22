@@ -42,7 +42,7 @@ template<typename Visitor> struct code_block_visitor {
 
 	void visit_object_code_block(object *obj)
 	{
-		switch(obj->h.hi_tag())
+		switch(obj->type())
 		{
 		case WORD_TYPE:
 			{

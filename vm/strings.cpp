@@ -157,9 +157,10 @@ string* factor_vm::reallot_string(string *str_, cell capacity)
 
 void factor_vm::primitive_resize_string()
 {
-	string* str = untag_check<string>(dpop());
+	data_root<string> str(dpop(),this);
+	str.untag_check(this);
 	cell capacity = unbox_array_size();
-	dpush(tag<string>(reallot_string(str,capacity)));
+	dpush(tag<string>(reallot_string(str.untagged(),capacity)));
 }
 
 void factor_vm::primitive_string_nth()

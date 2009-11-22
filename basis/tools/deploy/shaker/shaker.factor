@@ -9,6 +9,7 @@ compiler.units definitions generic generic.standard
 generic.single tools.deploy.config combinators classes
 classes.builtin slots.private grouping command-line ;
 QUALIFIED: bootstrap.stage2
+QUALIFIED: compiler.crossref
 QUALIFIED: compiler.errors
 QUALIFIED: continuations
 QUALIFIED: definitions
@@ -23,28 +24,27 @@ IN: tools.deploy.shaker
 
 : add-command-line-hook ( -- )
     [ (command-line) command-line set-global ] "command-line"
-    init-hooks get set-at ;
+    startup-hooks get set-at ;
 
-: strip-init-hooks ( -- )
+: strip-startup-hooks ( -- )
     "Stripping startup hooks" show
     {
         "alien.strings"
         "cpu.x86"
-        "destructors"
         "environment"
         "libc"
     }
-    [ init-hooks get delete-at ] each
+    [ startup-hooks get delete-at ] each
     deploy-threads? get [
-        "threads" init-hooks get delete-at
+        "threads" startup-hooks get delete-at
     ] unless
     native-io? [
-        "io.thread" init-hooks get delete-at
+        "io.thread" startup-hooks get delete-at
     ] unless
     strip-io? [
-        "io.files" init-hooks get delete-at
-        "io.backend" init-hooks get delete-at
-        "io.thread" init-hooks get delete-at
+        "io.files" startup-hooks get delete-at
+        "io.backend" startup-hooks get delete-at
+        "io.thread" startup-hooks get delete-at
     ] when
     strip-dictionary? [
         {
@@ -52,7 +52,7 @@ IN: tools.deploy.shaker
             "vocabs"
             "vocabs.cache"
             "source-files.errors"
-        } [ init-hooks get delete-at ] each
+        } [ startup-hooks get delete-at ] each
     ] when ;
 
 : strip-debugger ( -- )
@@ -293,7 +293,7 @@ IN: tools.deploy.shaker
             continuations:error-continuation
             continuations:error-thread
             continuations:restarts
-            init:init-hooks
+            init:startup-hooks
             source-files:source-files
             input-stream
             output-stream
@@ -340,8 +340,8 @@ IN: tools.deploy.shaker
                 implementors-map
                 update-map
                 main-vocab-hook
-                compiled-crossref
-                compiled-generic-crossref
+                compiler.crossref:compiled-crossref
+                compiler.crossref:compiled-generic-crossref
                 compiler-impl
                 compiler.errors:compiler-errors
                 lexer-factory
@@ -445,10 +445,10 @@ SYMBOL: deploy-vocab
 
 : [print-error] ( -- word ) "print-error" "debugger" lookup ;
 
-: deploy-boot-quot ( word -- )
+: deploy-startup-quot ( word -- )
     [
         [ boot ] %
-        init-hooks get values concat %
+        startup-hooks get values concat %
         strip-debugger? [ , ] [
             ! Don't reference 'try' directly since we don't want
             ! to pull in the debugger and prettyprinter into every
@@ -465,9 +465,9 @@ SYMBOL: deploy-vocab
         strip-io? [ [ flush ] % ] unless
         [ 0 exit ] %
     ] [ ] make
-    set-boot-quot ;
+    set-startup-quot ;
 
-: init-stripper ( -- )
+: startup-stripper ( -- )
     t "quiet" set-global
     f output-stream set-global ;
 
@@ -506,7 +506,7 @@ SYMBOL: deploy-vocab
     [ clear-megamorphic-cache ] each ;
 
 : strip ( -- )
-    init-stripper
+    startup-stripper
     strip-libc
     strip-destructors
     strip-call
@@ -514,13 +514,13 @@ SYMBOL: deploy-vocab
     strip-debugger
     strip-specialized-arrays
     compute-next-methods
-    strip-init-hooks
+    strip-startup-hooks
     add-command-line-hook
     strip-c-io
     strip-default-methods
     strip-compiler-classes
     f 5 setenv ! we can't use the Factor debugger or Factor I/O anymore
-    deploy-vocab get vocab-main deploy-boot-quot
+    deploy-vocab get vocab-main deploy-startup-quot
     find-megamorphic-caches
     stripped-word-props
     stripped-globals strip-globals

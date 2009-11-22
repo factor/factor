@@ -116,8 +116,7 @@ M: pathname pprint*
 : check-recursion ( obj quot -- )
     nesting-limit? [
         drop
-        "~" over class name>> "~" 3append
-        swap present-text
+        [ class name>> "~" dup surround ] keep present-text 
     ] [
         over recursion-check get member-eq? [
             drop "~circularity~" swap present-text
@@ -175,7 +174,7 @@ M: tuple pprint*
 : pprint-elements ( seq -- )
     do-length-limit
     [ [ pprint* ] each ] dip
-    [ "~" swap number>string " more~" 3append text ] when* ;
+    [ number>string "~" " more~" surround text ] when* ;
 
 M: quotation pprint-delims drop \ [ \ ] ;
 M: curry pprint-delims drop \ [ \ ] ;
