@@ -45,7 +45,7 @@ struct compaction_sizer {
 	{
 		if(!forwarding_map->marked_p(obj))
 			return forwarding_map->unmarked_block_size(obj);
-		else if(obj->h.hi_tag() == TUPLE_TYPE)
+		else if(obj->type() == TUPLE_TYPE)
 			return align(tuple_size_with_forwarding(forwarding_map,obj),data_alignment);
 		else
 			return obj->size();
@@ -72,7 +72,7 @@ struct object_compaction_updater {
 	void operator()(object *old_address, object *new_address, cell size)
 	{
 		cell payload_start;
-		if(old_address->h.hi_tag() == TUPLE_TYPE)
+		if(old_address->type() == TUPLE_TYPE)
 			payload_start = tuple_size_with_forwarding(data_forwarding_map,old_address);
 		else
 			payload_start = old_address->binary_payload_start();

@@ -2,14 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs arrays namespaces sequences kernel definitions
 math effects accessors words fry classes.algebra
-compiler.units stack-checker.values stack-checker.visitor ;
+compiler.units stack-checker.values stack-checker.visitor
+stack-checker.errors ;
 IN: stack-checker.state
 
 ! Did the current control-flow path throw an error?
 SYMBOL: terminated?
 
 ! Number of inputs current word expects from the stack
-SYMBOL: d-in
+SYMBOL: input-count
 
 DEFER: commit-literals
 
@@ -34,33 +35,13 @@ SYMBOL: literals
         [ [ (push-literal) ] each ] [ delete-all ] bi
     ] unless-empty ;
 
-: current-stack-height ( -- n ) meta-d length d-in get - ;
+: current-stack-height ( -- n ) meta-d length input-count get - ;
 
 : current-effect ( -- effect )
-    d-in get meta-d length terminated? get effect boa ;
+    input-count get meta-d length terminated? get effect boa ;
 
 : init-inference ( -- )
     terminated? off
     V{ } clone \ meta-d set
     V{ } clone literals set
-    0 d-in set ;
-
-! Words that the current quotation depends on
-SYMBOL: dependencies
-
-: depends-on ( word how -- )
-    over primitive? [ 2drop ] [
-        dependencies get dup [
-            swap '[ _ strongest-dependency ] change-at
-        ] [ 3drop ] if
-    ] if ;
-
-! Generic words that the current quotation depends on
-SYMBOL: generic-dependencies
-
-: ?class-or ( class/f class -- class' )
-    swap [ class-or ] when* ;
-
-: depends-on-generic ( generic class -- )
-    generic-dependencies get dup
-    [ swap '[ _ ?class-or ] change-at ] [ 3drop ] if ;
+    0 input-count set ;

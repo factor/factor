@@ -21,7 +21,7 @@ TUPLE: 1modified < modified seq ;
 M: modified length seq>> length ;
 M: modified set-length seq>> set-length ;
 
-M: 1modified virtual-seq seq>> ;
+M: 1modified virtual-exemplar seq>> ;
 
 TUPLE: scaled < 1modified c ;
 C: <scaled> scaled
@@ -71,7 +71,8 @@ M: summed modified-set-nth ( elt n seq -- ) immutable ;
 M: summed set-length ( n seq -- )
     seqs>> [ set-length ] with each ;
 
-M: summed virtual-seq ( summed -- seq ) [ ] { } map-as ;
+M: summed virtual-exemplar ( summed -- seq )
+    seqs>> [ f ] [ first ] if-empty ;
 
 : <2summed> ( seq seq -- summed-seq ) 2array <summed> ;
 : <3summed> ( seq seq seq -- summed-seq ) 3array <summed> ;

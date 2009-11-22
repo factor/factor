@@ -102,7 +102,7 @@ HELP: load-docs
 
 HELP: reload
 { $values { "name" "a vocabulary name" } }
-{ $description "Loads it's source code and documentation." }
+{ $description "Reloads the source code and documentation for a vocabulary." }
 { $errors "Throws a " { $link no-vocab } " error if the vocabulary does not exist on disk." } ;
 
 HELP: require

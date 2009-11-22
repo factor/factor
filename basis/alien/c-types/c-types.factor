@@ -30,8 +30,9 @@ TUPLE: abstract-c-type
 { unboxer-quot callable }
 { getter callable }
 { setter callable }
-size
-align ;
+{ size integer }
+{ align integer }
+{ align-first integer } ;
 
 TUPLE: c-type < abstract-c-type
 boxer
@@ -104,10 +105,9 @@ M: word c-type
 
 GENERIC: c-struct? ( c-type -- ? )
 
-M: object c-struct?
-    drop f ;
-M: c-type-name c-struct?
-    dup void? [ drop f ] [ c-type c-struct? ] if ;
+M: object c-struct? drop f ;
+
+M: c-type-name c-struct? dup void? [ drop f ] [ c-type c-struct? ] if ;
 
 ! These words being foldable means that words need to be
 ! recompiled if a C type is redefined. Even so, folding the
@@ -172,6 +172,12 @@ M: abstract-c-type c-type-align align>> ;
 
 M: c-type-name c-type-align c-type c-type-align ;
 
+GENERIC: c-type-align-first ( name -- n )
+
+M: c-type-name c-type-align-first c-type c-type-align-first ;
+
+M: abstract-c-type c-type-align-first align-first>> ;
+
 GENERIC: c-type-stack-align? ( name -- ? )
 
 M: c-type c-type-stack-align? stack-align?>> ;
@@ -212,13 +218,13 @@ M: c-type-name unbox-return c-type unbox-return ;
 
 : little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
 
-GENERIC: heap-size ( name -- size ) foldable
+GENERIC: heap-size ( name -- size )
 
 M: c-type-name heap-size c-type heap-size ;
 
 M: abstract-c-type heap-size size>> ;
 
-GENERIC: stack-size ( name -- size ) foldable
+GENERIC: stack-size ( name -- size )
 
 M: c-type-name stack-size c-type stack-size ;
 
@@ -291,20 +297,17 @@ M: long-long-type box-parameter ( n c-type -- )
 M: long-long-type box-return ( c-type -- )
     f swap box-parameter ;
 
-: define-deref ( name -- )
-    [ CHAR: * prefix "alien.c-types" create ] [ c-getter 0 prefix ] bi
+: define-deref ( c-type -- )
+    [ name>> CHAR: * prefix "alien.c-types" create ] [ c-getter 0 prefix ] bi
     (( c-ptr -- value )) define-inline ;
 
-: define-out ( name -- )
-    [ "alien.c-types" constructor-word ]
+: define-out ( c-type -- )
+    [ name>> "alien.c-types" constructor-word ]
     [ dup c-setter '[ _ heap-size (byte-array) [ 0 @ ] keep ] ] bi
     (( value -- c-ptr )) define-inline ;
 
 : define-primitive-type ( c-type name -- )
-    [ typedef ]
-    [ name>> define-deref ]
-    [ name>> define-out ]
-    tri ;
+    [ typedef ] [ define-deref ] [ define-out ] tri ;
 
 : if-void ( c-type true false -- )
     pick void? [ drop nip call ] [ nip call ] if ; inline
@@ -324,6 +327,13 @@ SYMBOLS:
     ptrdiff_t intptr_t uintptr_t size_t
     char* uchar* ;
 
+: 8-byte-alignment ( c-type -- c-type )
+    {
+        { [ cpu ppc? os macosx? and ] [ 4 >>align 8 >>align-first ] }
+        { [ cpu x86.32? os windows? not and ] [ 4 >>align 4 >>align-first ] }
+        [ 8 >>align 8 >>align-first ]
+    } cond ;
+
 [
     <c-type>
         c-ptr >>class
@@ -332,6 +342,7 @@ SYMBOLS:
         [ [ >c-ptr ] 2dip set-alien-cell ] >>setter
         bootstrap-cell >>size
         bootstrap-cell >>align
+        bootstrap-cell >>align-first
         [ >c-ptr ] >>unboxer-quot
         "box_alien" >>boxer
         "alien_offset" >>unboxer
@@ -343,7 +354,7 @@ SYMBOLS:
         [ alien-signed-8 ] >>getter
         [ set-alien-signed-8 ] >>setter
         8 >>size
-        cpu x86.32? os windows? not and 4 8 ? >>align
+        8-byte-alignment
         "box_signed_8" >>boxer
         "to_signed_8" >>unboxer
     \ longlong define-primitive-type
@@ -354,7 +365,7 @@ SYMBOLS:
         [ alien-unsigned-8 ] >>getter
         [ set-alien-unsigned-8 ] >>setter
         8 >>size
-        cpu x86.32? os windows? not and 4 8 ? >>align
+        8-byte-alignment
         "box_unsigned_8" >>boxer
         "to_unsigned_8" >>unboxer
     \ ulonglong define-primitive-type
@@ -366,6 +377,7 @@ SYMBOLS:
         [ set-alien-signed-cell ] >>setter
         bootstrap-cell >>size
         bootstrap-cell >>align
+        bootstrap-cell >>align-first
         "box_signed_cell" >>boxer
         "to_fixnum" >>unboxer
     \ long define-primitive-type
@@ -377,6 +389,7 @@ SYMBOLS:
         [ set-alien-unsigned-cell ] >>setter
         bootstrap-cell >>size
         bootstrap-cell >>align
+        bootstrap-cell >>align-first
         "box_unsigned_cell" >>boxer
         "to_cell" >>unboxer
     \ ulong define-primitive-type
@@ -388,6 +401,7 @@ SYMBOLS:
         [ set-alien-signed-4 ] >>setter
         4 >>size
         4 >>align
+        4 >>align-first
         "box_signed_4" >>boxer
         "to_fixnum" >>unboxer
     \ int define-primitive-type
@@ -399,6 +413,7 @@ SYMBOLS:
         [ set-alien-unsigned-4 ] >>setter
         4 >>size
         4 >>align
+        4 >>align-first
         "box_unsigned_4" >>boxer
         "to_cell" >>unboxer
     \ uint define-primitive-type
@@ -410,6 +425,7 @@ SYMBOLS:
         [ set-alien-signed-2 ] >>setter
         2 >>size
         2 >>align
+        2 >>align-first
         "box_signed_2" >>boxer
         "to_fixnum" >>unboxer
     \ short define-primitive-type
@@ -421,6 +437,7 @@ SYMBOLS:
         [ set-alien-unsigned-2 ] >>setter
         2 >>size
         2 >>align
+        2 >>align-first
         "box_unsigned_2" >>boxer
         "to_cell" >>unboxer
     \ ushort define-primitive-type
@@ -432,6 +449,7 @@ SYMBOLS:
         [ set-alien-signed-1 ] >>setter
         1 >>size
         1 >>align
+        1 >>align-first
         "box_signed_1" >>boxer
         "to_fixnum" >>unboxer
     \ char define-primitive-type
@@ -443,6 +461,7 @@ SYMBOLS:
         [ set-alien-unsigned-1 ] >>setter
         1 >>size
         1 >>align
+        1 >>align-first
         "box_unsigned_1" >>boxer
         "to_cell" >>unboxer
     \ uchar define-primitive-type
@@ -453,6 +472,7 @@ SYMBOLS:
             [ [ >c-bool ] 2dip set-alien-unsigned-4 ] >>setter
             4 >>size
             4 >>align
+            4 >>align-first
             "box_boolean" >>boxer
             "to_boolean" >>unboxer
     ] [
@@ -461,10 +481,11 @@ SYMBOLS:
             [ [ >c-bool ] 2dip set-alien-unsigned-1 ] >>setter
             1 >>size
             1 >>align
+            1 >>align-first
             "box_boolean" >>boxer
             "to_boolean" >>unboxer
-        \ bool define-primitive-type
     ] if
+    \ bool define-primitive-type
 
     <c-type>
         math:float >>class
@@ -473,6 +494,7 @@ SYMBOLS:
         [ [ >float ] 2dip set-alien-float ] >>setter
         4 >>size
         4 >>align
+        4 >>align-first
         "box_float" >>boxer
         "to_float" >>unboxer
         float-rep >>rep
@@ -485,7 +507,7 @@ SYMBOLS:
         [ alien-double ] >>getter
         [ [ >float ] 2dip set-alien-double ] >>setter
         8 >>size
-        cpu x86.32? os windows? not and 4 8 ? >>align
+        8-byte-alignment
         "box_double" >>boxer
         "to_double" >>unboxer
         double-rep >>rep

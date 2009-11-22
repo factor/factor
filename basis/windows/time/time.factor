@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types kernel math windows.errors
-windows.kernel32 namespaces calendar math.bitwise accessors
-classes.struct ;
+windows.kernel32 windows.types namespaces calendar math.bitwise
+accessors classes.struct ;
 IN: windows.time
 
 : >64bit ( lo hi -- n )

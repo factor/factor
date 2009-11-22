@@ -15,14 +15,8 @@ struct growable_byte_array {
 
 template<typename Type> byte_array *factor_vm::byte_array_from_value(Type *value)
 {
-	return byte_array_from_values(value,1);
-}
-
-template<typename Type> byte_array *factor_vm::byte_array_from_values(Type *values, cell len)
-{
-	cell size = sizeof(Type) * len;
-	byte_array *data = allot_uninitialized_array<byte_array>(size);
-	memcpy(data->data<char>(),values,size);
+	byte_array *data = allot_uninitialized_array<byte_array>(sizeof(Type));
+	memcpy(data->data<char>(),value,sizeof(Type));
 	return data;
 }
 

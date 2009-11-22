@@ -126,7 +126,7 @@ cell object::size() const
 {
 	if(free_p()) return ((free_heap_block *)this)->size();
 
-	switch(h.hi_tag())
+	switch(type())
 	{
 	case ARRAY_TYPE:
 		return align(array_size((array*)this),data_alignment);
@@ -166,7 +166,9 @@ the GC. Some types have a binary payload at the end (string, word, DLL) which
 we ignore. */
 cell object::binary_payload_start() const
 {
-	switch(h.hi_tag())
+	if(free_p()) return 0;
+
+	switch(type())
 	{
 	/* these objects do not refer to other objects at all */
 	case FLOAT_TYPE:
@@ -234,7 +236,7 @@ struct object_accumulator {
 
 	void operator()(object *obj)
 	{
-		if(type == TYPE_COUNT || obj->h.hi_tag() == type)
+		if(type == TYPE_COUNT || obj->type() == type)
 			objects.push_back(tag_dynamic(obj));
 	}
 };

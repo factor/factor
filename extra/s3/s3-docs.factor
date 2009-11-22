@@ -108,13 +108,14 @@ $nl
 "To use the api you must set the variables " { $link key-id } " and " 
 { $link secret-key } " to your Amazon S3 key and secret key respectively. Once "
 "this is done you can call any of the words below."
-{ $subsection buckets }
-{ $subsection create-bucket }
-{ $subsection delete-bucket }
-{ $subsection keys }
-{ $subsection get-object }
-{ $subsection put-object }
-{ $subsection delete-object }
+{ $subsections buckets
+    create-bucket
+    delete-bucket
+    keys
+    get-object
+    put-object
+    delete-object
+}
 ;
 
 ABOUT: "s3"

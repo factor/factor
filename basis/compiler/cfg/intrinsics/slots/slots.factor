@@ -1,14 +1,17 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: layouts namespaces kernel accessors sequences math
-classes.algebra locals combinators cpu.architecture
-compiler.tree.propagation.info compiler.cfg.stacks
-compiler.cfg.hats compiler.cfg.registers
+classes.algebra classes.builtin locals combinators
+cpu.architecture compiler.tree.propagation.info
+compiler.cfg.stacks compiler.cfg.hats compiler.cfg.registers
 compiler.cfg.instructions compiler.cfg.utilities
 compiler.cfg.builder.blocks compiler.constants ;
 IN: compiler.cfg.intrinsics.slots
 
-: value-tag ( info -- n ) class>> class-type ; inline
+: class-tag ( class -- tag/f )
+    builtins get [ class<= ] with find drop ;
+
+: value-tag ( info -- n ) class>> class-tag ;
 
 : ^^tag-offset>slot ( slot tag -- vreg' )
     [ ^^offset>slot ] dip ^^sub-imm ;

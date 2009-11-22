@@ -35,8 +35,8 @@ SYMBOL: bootstrap-time
 : count-words ( pred -- )
     all-words swap count number>string write ; inline
 
-: print-time ( ms -- )
-    1000 /i
+: print-time ( us -- )
+    1,000,000,000 /i
     60 /mod swap
     number>string write
     " minutes and " write number>string write " seconds." print ;
@@ -56,9 +56,10 @@ SYMBOL: bootstrap-time
     error-continuation set-global
     error set-global ; inline
 
+
 [
     ! We time bootstrap
-    millis
+    nano-count
 
     default-image-name "output-image" set-global
 
@@ -83,14 +84,14 @@ SYMBOL: bootstrap-time
 
     load-components
 
-    millis over - core-bootstrap-time set-global
+    nano-count over - core-bootstrap-time set-global
 
     run-bootstrap-init
 
     f error set-global
     f error-continuation set-global
 
-    millis swap - bootstrap-time set-global
+    nano-count swap - bootstrap-time set-global
     print-report
 
     "deploy-vocab" get [

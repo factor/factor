@@ -81,6 +81,9 @@ struct factor_vm
 	/* Number of entries in a polymorphic inline cache */
 	cell max_pic_size;
 
+	/* Incrementing object counter for identity hashing */
+	cell object_counter;
+
 	// contexts
 	void reset_datastack();
 	void reset_retainstack();
@@ -114,13 +117,17 @@ struct factor_vm
 
 	// run
 	void primitive_exit();
-	void primitive_micros();
+	void primitive_system_micros();
+	void primitive_nano_count();
 	void primitive_sleep();
 	void primitive_set_slot();
 
 	// objects
 	void primitive_special_object();
 	void primitive_set_special_object();
+	void primitive_identity_hashcode();
+	void compute_identity_hashcode(object *obj);
+	void primitive_compute_identity_hashcode();
 	cell object_size(cell tagged);
 	cell clone_object(cell obj_);
 	void primitive_clone();
@@ -256,10 +263,15 @@ struct factor_vm
 
 	inline void write_barrier(object *obj, cell size)
 	{
-		char *start = (char *)obj;
-		for(cell offset = 0; offset < size; offset += card_size)
-			write_barrier((cell *)(start + offset));
+		cell start = (cell)obj & -card_size;
+		cell end = ((cell)obj + size + card_size - 1) & -card_size;
+
+		for(cell offset = start; offset < end; offset += card_size)
+			write_barrier((cell *)offset);
 	}
+
+	// data heap checker
+	void check_data_heap();
 
 	// gc
 	void end_gc();
@@ -284,12 +296,12 @@ struct factor_vm
 	void inline_gc(cell *data_roots_base, cell data_roots_size);
 	void primitive_enable_gc_events();
 	void primitive_disable_gc_events();
-	object *allot_object(header header, cell size);
-	object *allot_large_object(header header, cell size);
+	object *allot_object(cell type, cell size);
+	object *allot_large_object(cell type, cell size);
 
 	template<typename Type> Type *allot(cell size)
 	{
-		return (Type *)allot_object(header(Type::type_number),size);
+		return (Type *)allot_object(Type::type_number,size);
 	}
 
 	inline void check_data_pointer(object *pointer)
@@ -368,7 +380,6 @@ struct factor_vm
 	void primitive_resize_byte_array();
 
 	template<typename Type> byte_array *byte_array_from_value(Type *value);
-	template<typename Type> byte_array *byte_array_from_values(Type *values, cell len);
 
 	//tuples
 	void primitive_tuple();
@@ -573,24 +584,6 @@ struct factor_vm
 	void save_callstack_bottom(stack_frame *callstack_bottom);
 	template<typename Iterator> void iterate_callstack(context *ctx, Iterator &iterator);
 
-	/* Every object has a regular representation in the runtime, which makes GC
-	much simpler. Every slot of the object until binary_payload_start is a pointer
-	to some other object. */
-	template<typename Iterator> void do_slots(object *obj, Iterator &iter)
-	{
-		cell scan = (cell)obj;
-		cell payload_start = obj->binary_payload_start();
-		cell end = scan + payload_start;
-
-		scan += sizeof(cell);
-
-		while(scan < end)
-		{
-			iter((cell *)scan);
-			scan += sizeof(cell);
-		}
-	}
-
 	//alien
 	char *pinned_alien_offset(cell obj);
 	cell allot_alien(cell delegate_, cell displacement);
@@ -656,6 +649,7 @@ struct factor_vm
 	void init_factor(vm_parameters *p);
 	void pass_args_to_factor(int argc, vm_char **argv);
 	void start_factor(vm_parameters *p);
+	void stop_factor();
 	void start_embedded_factor(vm_parameters *p);
 	void start_standalone_factor(int argc, vm_char **argv);
 	char *factor_eval_string(char *string);
@@ -673,7 +667,6 @@ struct factor_vm
 
 	// os-windows
   #if defined(WINDOWS)
-	void sleep_micros(u64 usec);
 	const vm_char *vm_executable_path();
 	const vm_char *default_image_path();
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);

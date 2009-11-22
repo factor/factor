@@ -20,7 +20,7 @@ SPECIALIZED-ARRAYS: bool ushort char uint float ulonglong ;
 
 [ t ] [
     { t f t } >bool-array underlying>>
-    { 1 0 1 } "bool" heap-size {
+    { 1 0 1 } bool heap-size {
         { 1 [ >char-array ] }
         { 4 [ >uint-array ] }
     } case underlying>> =
@@ -153,3 +153,22 @@ SPECIALIZED-ARRAY: __does_not_exist__
         __does_not_exist__ specialized-array-vocab forget-vocab
     ] with-compilation-unit
 ] unit-test
+
+STRUCT: struct-resize-test { x int } ;
+
+SPECIALIZED-ARRAY: struct-resize-test
+
+[ 40 ] [ 10 <struct-resize-test-array> byte-length ] unit-test
+
+: struct-resize-test-usage ( seq -- seq )
+    [ struct-resize-test <struct> swap >>x ] map
+    >struct-resize-test-array
+    [ x>> ] { } map-as ;
+    
+[ { 10 20 30 } ] [ { 10 20 30 } struct-resize-test-usage ] unit-test
+
+[ ] [ "IN: specialized-arrays.tests USE: classes.struct USE: alien.c-types STRUCT: struct-resize-test { x int } { y int } ;" eval( -- ) ] unit-test
+
+[ 80 ] [ 10 <struct-resize-test-array> byte-length ] unit-test
+
+[ { 10 20 30 } ] [ { 10 20 30 } struct-resize-test-usage ] unit-test

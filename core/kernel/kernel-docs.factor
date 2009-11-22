@@ -72,7 +72,11 @@ HELP: hashcode
 { $values { "obj" object } { "code" fixnum } }
 { $description "Computes the hashcode of an object with a default hashing depth. See " { $link hashcode* } " for the hashcode contract." } ;
 
-{ hashcode hashcode* } related-words
+HELP: identity-hashcode
+{ $values { "obj" object } { "code" fixnum } }
+{ $description "Outputs the identity hashcode of an object. The identity hashcode is not guaranteed to be unique, however it will not change during the object's lifetime." } ;
+
+{ hashcode hashcode* identity-hashcode } related-words
 
 HELP: =
 { $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }

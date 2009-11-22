@@ -430,7 +430,7 @@ M: x86 %vm-field-ptr ( dst field -- )
     [ [] ] dip data-alignment get align ADD ;
 
 : store-header ( temp class -- )
-    [ [] ] [ type-number tag-fixnum ] bi* MOV ;
+    [ [] ] [ type-number tag-header ] bi* MOV ;
 
 : store-tagged ( dst tag -- )
     type-number OR ;
@@ -1413,7 +1413,7 @@ enable-fixnum-log2
             flush
             1 exit
         ] when
-    ] "cpu.x86" add-init-hook ;
+    ] "cpu.x86" add-startup-hook ;
 
 : enable-sse2 ( version -- )
     20 >= [

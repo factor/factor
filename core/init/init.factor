@@ -4,19 +4,35 @@ USING: continuations continuations.private kernel
 kernel.private sequences assocs namespaces namespaces.private ;
 IN: init
 
-SYMBOL: init-hooks
+SYMBOL: startup-hooks
+SYMBOL: shutdown-hooks
 
-init-hooks global [ drop V{ } clone ] cache drop
+startup-hooks global [ drop V{ } clone ] cache drop
+shutdown-hooks global [ drop V{ } clone ] cache drop
 
-: do-init-hooks ( -- )
-    init-hooks get [ nip call( -- ) ] assoc-each ;
+: do-hooks ( symbol -- )
+    get [ nip call( -- ) ] assoc-each ;
 
-: add-init-hook ( quot name -- )
-    dup init-hooks get at [ over call( -- ) ] unless
-    init-hooks get set-at ;
+: do-startup-hooks ( -- ) startup-hooks do-hooks ;
+
+: do-shutdown-hooks ( -- ) shutdown-hooks do-hooks ;
+
+: add-startup-hook ( quot name -- )
+    startup-hooks get
+    [ at [ drop ] [ call( -- ) ] if ]
+    [ set-at ] 3bi ;
+
+: add-shutdown-hook ( quot name -- )
+    shutdown-hooks get set-at ;
 
 : boot ( -- ) init-namespaces init-catchstack init-error-handler ;
 
-: boot-quot ( -- quot ) 20 getenv ;
+: startup-quot ( -- quot ) 20 getenv ;
 
-: set-boot-quot ( quot -- ) 20 setenv ;
+: set-startup-quot ( quot -- ) 20 setenv ;
+
+: shutdown-quot ( -- quot ) 22 getenv ;
+
+: set-shutdown-quot ( quot -- ) 22 setenv ;
+
+[ do-shutdown-hooks ] set-shutdown-quot

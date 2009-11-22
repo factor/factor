@@ -585,16 +585,16 @@ TUPLE: alien-accessor-regression { b byte-array } { i fixnum } ;
     swap [
         { tuple } declare 1 slot
     ] [
-        0 slot
+        1 slot
     ] if ;
 
-[ t ] [ f B{ } mutable-value-bug-1 byte-array type-number = ] unit-test
+[ 0 ] [ f { } mutable-value-bug-1 ] unit-test
 
 : mutable-value-bug-2 ( a b -- c )
     swap [
-        0 slot
+        1 slot
     ] [
         { tuple } declare 1 slot
     ] if ;
 
-[ t ] [ t B{ } mutable-value-bug-2 byte-array type-number = ] unit-test
+[ 0 ] [ t { } mutable-value-bug-2 ] unit-test

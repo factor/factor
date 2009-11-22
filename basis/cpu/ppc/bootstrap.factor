@@ -200,12 +200,7 @@ CONSTANT: rs-reg 14
     ! cache = ...
     0 3 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
     ! key = hashcode(class)
-    5 4 3 SRAWI
-    6 4 8 SRAWI
-    5 5 6 ADD
-    6 4 13 SRAWI
-    5 5 6 ADD
-    5 5 3 SLWI
+    5 4 1 SRAWI
     ! key &= cache.length - 1
     5 5 mega-cache-size get 1 - bootstrap-cell * ANDI
     ! cache += array-start-offset
@@ -475,7 +470,7 @@ CONSTANT: rs-reg 14
 
 [
     3 ds-reg 0 LWZ
-    3 3 1 SRAWI
+    3 3 2 SRAWI
     rs-reg 3 3 LWZX
     3 ds-reg 0 STW
 ] \ get-local define-sub-primitive
@@ -483,7 +478,7 @@ CONSTANT: rs-reg 14
 [
     3 ds-reg 0 LWZ
     ds-reg ds-reg 4 SUBI
-    3 3 1 SRAWI
+    3 3 2 SRAWI
     rs-reg 3 rs-reg SUBF
 ] \ drop-locals define-sub-primitive
 

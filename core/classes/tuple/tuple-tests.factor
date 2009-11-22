@@ -6,7 +6,7 @@ io.streams.string kernel kernel.private math math.constants
 math.order namespaces parser parser.notes prettyprint
 quotations random see sequences sequences.private slots
 slots.private splitting strings summary threads tools.test
-vectors vocabs words words.symbol ;
+vectors vocabs words words.symbol fry ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -734,3 +734,11 @@ ERROR: base-error x y ;
 ERROR: derived-error < base-error z ;
 
 [ (( x y z -- * )) ] [ \ derived-error stack-effect ] unit-test
+
+USE: classes.struct
+
+[ { } ] [
+    classes
+    [ "prototype" word-prop ] map
+    [ '[ _ hashcode drop f ] [ drop t ] recover ] filter
+] unit-test

@@ -17,7 +17,7 @@ IN: io.sockets.unix
     0 socket dup io-error <fd> init-fd |dispose ;
 
 : set-socket-option ( fd level opt -- )
-    [ handle-fd ] 2dip 1 <int> "int" heap-size setsockopt io-error ;
+    [ handle-fd ] 2dip 1 <int> dup byte-length setsockopt io-error ;
 
 M: unix addrinfo-error ( n -- )
     [ gai_strerror throw ] unless-zero ;
@@ -117,7 +117,7 @@ SYMBOL: receive-buffer
 
 CONSTANT: packet-size 65536
 
-[ packet-size malloc receive-buffer set-global ] "io.sockets.unix" add-init-hook
+[ packet-size malloc &free receive-buffer set-global ] "io.sockets.unix" add-startup-hook
 
 :: do-receive ( port -- packet sockaddr )
     port addr>> empty-sockaddr/size :> ( sockaddr len )

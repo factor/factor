@@ -141,11 +141,11 @@ unless
     dup callbacks>> (callbacks>vtbls) >>vtbls
     f >>disposed drop ;
 
-: (init-hook) ( -- )
+: com-startup-hook ( -- )
     +live-wrappers+ get-global [ (allocate-wrapper) ] each
     H{ } +wrapped-objects+ set-global ;
 
-[ (init-hook) ] "windows.com.wrapper" add-init-hook
+[ com-startup-hook ] "windows.com.wrapper" add-startup-hook
 
 PRIVATE>
 

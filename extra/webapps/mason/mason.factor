@@ -83,10 +83,6 @@ CONSTANT: cpus
     [ validate-os/cpu ] >>init
     [ current-builder last-report>> "text/html" <content> ] >>display ;
 
-: git-link ( id -- link )
-    [ "http://github.com/slavapestov/factor/commit/" prepend ] keep
-    [XML <a href=<->><-></a> XML] ;
-
 : building ( builder string -- xml )
     swap current-git-id>> git-link
     [XML <-> for <-> XML] ;

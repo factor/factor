@@ -26,6 +26,9 @@ M: object error. short. ;
 
 M: string error. print ;
 
+: traceback-link. ( continuation -- )
+    "[" write [ "Traceback" ] dip write-object "]" print ;
+
 : :s ( -- )
     error-continuation get data>> stack. ;
 
@@ -329,6 +332,8 @@ M: check-mixin-class summary drop "Not a mixin class" ;
 M: not-found-in-roots summary drop "Cannot resolve vocab: path" ;
 
 M: wrong-values summary drop "Quotation called with wrong stack effect" ;
+
+M: stack-effect-omits-dashes summary drop "Stack effect must contain “--”" ;
 
 {
     { [ os windows? ] [ "debugger.windows" require ] }

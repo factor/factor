@@ -5,12 +5,15 @@ continuations vocabs assocs dlists definitions math graphs generic
 generic.single combinators deques search-deques macros
 source-files.errors combinators.short-circuit
 
-stack-checker stack-checker.state stack-checker.inlining stack-checker.errors
+stack-checker stack-checker.dependencies stack-checker.inlining
+stack-checker.errors
 
 compiler.errors compiler.units compiler.utilities
 
 compiler.tree.builder
 compiler.tree.optimizer
+
+compiler.crossref
 
 compiler.cfg
 compiler.cfg.builder
@@ -60,17 +63,23 @@ M: method-body no-compile? "method-generic" word-prop no-compile? ;
 M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
 
 M: word no-compile?
-    {
-        [ macro? ]
-        [ inline? ]
-        [ "special" word-prop ]
-        [ "no-compile" word-prop ]
-    } 1|| ;
+    { [ macro? ] [ "special" word-prop ] [ "no-compile" word-prop ] } 1|| ;
+
+GENERIC: combinator? ( word -- ? )
+
+M: method-body combinator? "method-generic" word-prop combinator? ;
+
+M: predicate-engine-word combinator? "owner-generic" word-prop combinator? ;
+
+M: word combinator? inline? ;
 
 : ignore-error? ( word error -- ? )
     #! Ignore some errors on inline combinators, macros, and special
     #! words such as 'call'.
-    [ no-compile? ] [ { [ do-not-compile? ] [ literal-expected? ] } 1|| ] bi* and ;
+    {
+        [ drop no-compile? ]
+        [ [ combinator? ] [ unknown-macro-input? ] bi* and ]
+    } 2|| ;
 
 : finish ( word -- )
     #! Recompile callers if the word's stack effect changed, then
@@ -192,6 +201,14 @@ M: optimizing-compiler recompile ( words -- alist )
         compiled get >alist
     ] with-scope
     "--- compile done" compiler-message ;
+
+M: optimizing-compiler to-recompile ( -- words )
+    changed-definitions get compiled-usages
+    changed-generics get compiled-generic-usages
+    append assoc-combine keys ;
+
+M: optimizing-compiler process-forgotten-words
+    [ delete-compiled-xref ] each ;
 
 : with-optimizer ( quot -- )
     [ optimizing-compiler compiler-impl ] dip with-variable ; inline
