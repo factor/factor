@@ -3,7 +3,7 @@ USING: io.files io.files.temp io.directories io.pathnames
 tools.test io.launcher arrays io namespaces continuations math
 io.encodings.binary io.encodings.ascii accessors kernel
 sequences io.encodings.utf8 destructors io.streams.duplex locals
-concurrency.promises threads unix.process ;
+concurrency.promises threads unix.process calendar ;
 
 [ ] [
     [ "launcher-test-1" temp-file delete-file ] ignore-errors
@@ -128,12 +128,13 @@ concurrency.promises threads unix.process ;
     [let 
         <promise> :> p
         <promise> :> s
+
         [
             "sleep 1000" run-detached
             [ p fulfill ] [ wait-for-process s fulfill ] bi
         ] in-thread
 
-        p ?promise handle>> 9 kill drop
+        p 1 seconds ?promise-timeout handle>> 9 kill drop
         s ?promise 0 =
     ]
 ] unit-test
