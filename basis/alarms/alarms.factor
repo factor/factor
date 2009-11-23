@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs boxes calendar
-combinators.short-circuit fry heaps init kernel math.order
+USING: accessors assocs boxes calendar combinators.short-circuit
+continuations fry heaps init kernel math.order
 namespaces quotations threads math system ;
 IN: alarms
 
@@ -11,10 +11,13 @@ TUPLE: alarm
     interval
     { entry box } ;
 
-<PRIVATE
-
 SYMBOL: alarms
 SYMBOL: alarm-thread
+
+: cancel-alarm ( alarm -- )
+    entry>> [ alarms get-global heap-delete ] if-box? ;
+
+<PRIVATE
 
 : notify-alarm-thread ( -- )
     alarm-thread get-global interrupt ;
@@ -45,7 +48,11 @@ M: duration >nanoseconds duration>nanoseconds >integer ;
 : call-alarm ( alarm -- )
     [ entry>> box> drop ]
     [ dup interval>> [ reschedule-alarm ] [ drop ] if ]
-    [ quot>> "Alarm execution" spawn drop ] tri ;
+    [
+        [ quot>> ] [ ] bi
+        '[ _ [ _ dup interval>> [ cancel-alarm ] [ drop ] if rethrow ] recover ]
+        "Alarm execution" spawn drop
+    ] tri ;
 
 : (trigger-alarms) ( alarms n -- )
     over heap-empty? [
@@ -89,6 +96,3 @@ PRIVATE>
 : later ( quot duration -- alarm ) f add-alarm ;
 
 : every ( quot duration -- alarm ) dup add-alarm ;
-
-: cancel-alarm ( alarm -- )
-    entry>> [ alarms get-global heap-delete ] if-box? ;
