@@ -3,20 +3,20 @@
 namespace factor
 {
 
-to_tenured_collector::to_tenured_collector(factor_vm *myvm_) :
+to_tenured_collector::to_tenured_collector(factor_vm *parent_) :
 	collector<tenured_space,to_tenured_policy>(
-		myvm_,
-		myvm_->data->tenured,
-		to_tenured_policy(myvm_)) {}
+		parent_,
+		parent_->data->tenured,
+		to_tenured_policy(parent_)) {}
 
 void to_tenured_collector::tenure_reachable_objects()
 {
-	std::vector<object *> *mark_stack = &this->target->mark_stack;
+	std::vector<cell> *mark_stack = &parent->mark_stack;
 	while(!mark_stack->empty())
 	{
-		object *obj = mark_stack->back();
+		cell ptr = mark_stack->back();
 		mark_stack->pop_back();
-		this->trace_object(obj);
+		this->trace_object((object *)ptr);
 	}
 }
 
@@ -25,7 +25,7 @@ void factor_vm::collect_to_tenured()
 	/* Copy live objects from aging space to tenured space. */
 	to_tenured_collector collector(this);
 
-	data->tenured->clear_mark_stack();
+	mark_stack.clear();
 
 	collector.trace_roots();
 	collector.trace_contexts();

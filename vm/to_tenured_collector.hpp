@@ -2,10 +2,10 @@ namespace factor
 {
 
 struct to_tenured_policy {
-	factor_vm *myvm;
+	factor_vm *parent;
 	tenured_space *tenured;
 
-	explicit to_tenured_policy(factor_vm *myvm_) : myvm(myvm_), tenured(myvm->data->tenured) {}
+	explicit to_tenured_policy(factor_vm *parent_) : parent(parent_), tenured(parent->data->tenured) {}
 
 	bool should_copy_p(object *untagged)
 	{
@@ -14,14 +14,14 @@ struct to_tenured_policy {
 
 	void promoted_object(object *obj)
 	{
-		tenured->mark_stack.push_back(obj);
+		parent->mark_stack.push_back((cell)obj);
 	}
 
 	void visited_object(object *obj) {}
 };
 
 struct to_tenured_collector : collector<tenured_space,to_tenured_policy> {
-	explicit to_tenured_collector(factor_vm *myvm_);
+	explicit to_tenured_collector(factor_vm *parent_);
 	void tenure_reachable_objects();
 };
 

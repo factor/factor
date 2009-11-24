@@ -161,8 +161,8 @@ void factor_vm::relocate_code_block_step(relocation_entry rel, cell index, code_
 		tagged<byte_array>(compiled->relocation).untag_check(this);
 #endif
 
-	embedded_pointer ptr(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
-	ptr.store_address(compute_relocation(rel,index,compiled));
+	instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
+	op.store_value(compute_relocation(rel,index,compiled));
 }
 
 struct word_references_updater {
@@ -197,42 +197,6 @@ void factor_vm::update_word_references(code_block *compiled)
 	else
 	{
 		word_references_updater updater(this);
-		iterate_relocations(compiled,updater);
-		flush_icache_for(compiled);
-	}
-}
-
-/* This runs after a full collection */
-struct literal_and_word_references_updater {
-	factor_vm *parent;
-
-	explicit literal_and_word_references_updater(factor_vm *parent_) : parent(parent_) {}
-
-	void operator()(relocation_entry rel, cell index, code_block *compiled)
-	{
-		relocation_type type = rel.rel_type();
-
-		switch(type)
-		{
-		case RT_IMMEDIATE:
-		case RT_XT:
-		case RT_XT_PIC:
-		case RT_XT_PIC_TAIL:
-			parent->relocate_code_block_step(rel,index,compiled);
-			break;
-		default:
-			break;
-		}
-	}
-};
-
-void factor_vm::update_code_block_words_and_literals(code_block *compiled)
-{
-	if(code->needs_fixup_p(compiled))
-		relocate_code_block(compiled);
-	else
-	{
-		literal_and_word_references_updater updater(this);
 		iterate_relocations(compiled,updater);
 		flush_icache_for(compiled);
 	}
@@ -277,8 +241,8 @@ void factor_vm::fixup_labels(array *labels, code_block *compiled)
 		cell offset = untag_fixnum(array_nth(labels,i + 1));
 		cell target = untag_fixnum(array_nth(labels,i + 2));
 
-		embedded_pointer ptr(rel_class,offset + (cell)(compiled + 1));
-		ptr.store_address(target + (cell)(compiled + 1));
+		instruction_operand op(rel_class,offset + (cell)(compiled + 1));
+		op.store_value(target + (cell)(compiled + 1));
 	}
 }
 

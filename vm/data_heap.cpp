@@ -217,7 +217,7 @@ data_heap_room factor_vm::data_room()
 	room.tenured_free_block_count = data->tenured->free_block_count();
 	room.cards                    = data->cards_end - data->cards;
 	room.decks                    = data->decks_end - data->decks;
-	room.mark_stack               = data->tenured->mark_stack.capacity() * sizeof(cell);
+	room.mark_stack               = mark_stack.capacity() * sizeof(cell);
 
 	return room;
 }
