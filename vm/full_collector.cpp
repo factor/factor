@@ -3,11 +3,38 @@
 namespace factor
 {
 
+inline static code_block_visitor<code_workhorse> make_code_visitor(factor_vm *parent)
+{
+	return code_block_visitor<code_workhorse>(parent,code_workhorse(parent));
+}
+
 full_collector::full_collector(factor_vm *parent_) :
 	collector<tenured_space,full_policy>(
 		parent_,
 		parent_->data->tenured,
-		full_policy(parent_)) {}
+		full_policy(parent_)),
+	code_visitor(make_code_visitor(parent_)) {}
+
+void full_collector::trace_code_block(code_block *compiled)
+{
+	data_visitor.visit_referenced_literals(compiled);
+	code_visitor.visit_referenced_code_blocks(compiled);
+}
+
+void full_collector::trace_context_code_blocks()
+{
+	code_visitor.visit_context_code_blocks();
+}
+
+void full_collector::trace_callback_code_blocks()
+{
+	code_visitor.visit_callback_code_blocks();
+}
+
+void full_collector::trace_object_code_block(object *obj)
+{
+	code_visitor.visit_object_code_block(obj);
+}
 
 /* After a sweep, invalidate any code heap roots which are not marked,
 so that if a block makes a tail call to a generic word, and the PIC
@@ -57,51 +84,39 @@ void factor_vm::update_code_roots_for_compaction()
 	}
 }
 
-struct code_block_marker {
-	code_heap *code;
-	full_collector *collector;
-
-	explicit code_block_marker(code_heap *code_, full_collector *collector_) :
-		code(code_), collector(collector_) {}
-
-	code_block *operator()(code_block *compiled)
-	{
-		if(!code->marked_p(compiled))
-		{
-			code->set_marked_p(compiled);
-			collector->trace_literal_references(compiled);
-		}
-
-		return compiled;
-	}
-};
-
 void factor_vm::collect_mark_impl(bool trace_contexts_p)
 {
 	full_collector collector(this);
 
+	mark_stack.clear();
+
 	code->clear_mark_bits();
 	data->tenured->clear_mark_bits();
-	data->tenured->clear_mark_stack();
-
-	code_block_visitor<code_block_marker> code_marker(this,code_block_marker(code,&collector));
 
 	collector.trace_roots();
         if(trace_contexts_p)
 	{
 		collector.trace_contexts();
-		code_marker.visit_context_code_blocks();
-		code_marker.visit_callback_code_blocks();
+		collector.trace_context_code_blocks();
+		collector.trace_callback_code_blocks();
 	}
 
-	std::vector<object *> *mark_stack = &data->tenured->mark_stack;
-
-	while(!mark_stack->empty())
+	while(!mark_stack.empty())
 	{
-		object *obj = mark_stack->back();
-		mark_stack->pop_back();
-		collector.trace_object(obj);
-		code_marker.visit_object_code_block(obj);
+		cell ptr = mark_stack.back();
+		mark_stack.pop_back();
+
+		if(ptr & 1)
+		{
+			code_block *compiled = (code_block *)(ptr - 1);
+			collector.trace_code_block(compiled);
+		}
+		else
+		{
+			object *obj = (object *)ptr;
+			collector.trace_object(obj);
+			collector.trace_object_code_block(obj);
+		}
 	}
 
 	data->reset_generation(data->tenured);
@@ -133,8 +148,6 @@ void factor_vm::collect_full(bool trace_contexts_p)
 		current_gc->event->op = collect_compact_op;
 		collect_compact_impl(trace_contexts_p);
 	}
-	else
-		update_code_heap_words_and_literals();
 }
 
 void factor_vm::collect_compact(bool trace_contexts_p)

@@ -103,25 +103,6 @@ void factor_vm::update_code_heap_words()
 	iterate_code_heap(updater);
 }
 
-/* After a full GC that did not grow the heap, we have to update references
-to literals and other words. */
-struct word_and_literal_code_heap_updater {
-	factor_vm *parent;
-
-	explicit word_and_literal_code_heap_updater(factor_vm *parent_) : parent(parent_) {}
-
-	void operator()(code_block *block, cell size)
-	{
-		parent->update_code_block_words_and_literals(block);
-	}
-};
-
-void factor_vm::update_code_heap_words_and_literals()
-{
-	word_and_literal_code_heap_updater updater(this);
-	iterate_code_heap(updater);
-}
-
 /* After growing the heap, we have to perform a full relocation to update
 references to card and deck arrays. */
 struct code_heap_relocator {

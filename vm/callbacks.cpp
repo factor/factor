@@ -26,8 +26,8 @@ void callback_heap::update(callback *stub)
 	cell rel_class = untag_fixnum(array_nth(code_template.untagged(),1));
 	cell offset = untag_fixnum(array_nth(code_template.untagged(),3));
 
-	embedded_pointer ptr(rel_class,offset + (cell)(stub + 1));
-	ptr.store_address((cell)(stub->compiled + 1));
+	instruction_operand op(rel_class,offset + (cell)(stub + 1));
+	op.store_value((cell)(stub->compiled + 1));
 
 	flush_icache((cell)stub,stub->size);
 }

@@ -95,7 +95,7 @@ template<typename SlotForwarder> struct code_block_compaction_updater {
 	void operator()(code_block *old_address, code_block *new_address, cell size)
 	{
 		memmove(new_address,old_address,size);
-		slot_forwarder.visit_literal_references(new_address);
+		slot_forwarder.visit_referenced_literals(new_address);
 		parent->relocate_code_block(new_address);
 	}
 };
@@ -157,7 +157,7 @@ struct object_code_block_updater {
 };
 
 struct dummy_slot_forwarder {
-	void visit_literal_references(code_block *compiled) {}
+	void visit_referenced_literals(code_block *compiled) {}
 };
 
 /* Compact just the code heap */

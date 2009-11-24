@@ -47,7 +47,6 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/data_heap_checker.o \
 	vm/debug.o \
 	vm/dispatch.o \
-	vm/embedded_pointers.o \
 	vm/errors.o \
 	vm/factor.o \
 	vm/free_list.o \
@@ -55,6 +54,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/gc.o \
 	vm/image.o \
 	vm/inline_cache.o \
+	vm/instruction_operands.o \
 	vm/io.o \
 	vm/jit.o \
 	vm/math.o \

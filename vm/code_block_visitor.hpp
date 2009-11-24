@@ -1,7 +1,21 @@
 namespace factor
 {
 
-template<typename Visitor> struct call_frame_code_block_visitor {
+template<typename Visitor> struct code_block_visitor {
+	factor_vm *parent;
+	Visitor visitor;
+
+	explicit code_block_visitor(factor_vm *parent_, Visitor visitor_) :
+		parent(parent_), visitor(visitor_) {}
+
+	void visit_object_code_block(object *obj);
+	void visit_referenced_code_blocks(code_block *compiled);
+	void visit_context_code_blocks();
+	void visit_callback_code_blocks();
+};
+
+template<typename Visitor>
+struct call_frame_code_block_visitor {
 	factor_vm *parent;
 	Visitor visitor;
 
@@ -19,7 +33,79 @@ template<typename Visitor> struct call_frame_code_block_visitor {
 	}
 };
 
-template<typename Visitor> struct callback_code_block_visitor {
+template<typename Visitor>
+void code_block_visitor<Visitor>::visit_object_code_block(object *obj)
+{
+	switch(obj->type())
+	{
+	case WORD_TYPE:
+		{
+			word *w = (word *)obj;
+			if(w->code)
+				w->code = visitor(w->code);
+			if(w->profiling)
+				w->profiling = visitor(w->profiling);
+
+			parent->update_word_xt(w);
+			break;
+		}
+	case QUOTATION_TYPE:
+		{
+			quotation *q = (quotation *)obj;
+			if(q->code)
+				parent->set_quot_xt(q,visitor(q->code));
+			break;
+		}
+	case CALLSTACK_TYPE:
+		{
+			callstack *stack = (callstack *)obj;
+			call_frame_code_block_visitor<Visitor> call_frame_visitor(parent,visitor);
+			parent->iterate_callstack_object(stack,call_frame_visitor);
+			break;
+		}
+	}
+}
+
+template<typename Visitor>
+struct referenced_code_blocks_visitor {
+	Visitor visitor;
+
+	explicit referenced_code_blocks_visitor(Visitor visitor_) : visitor(visitor_) {}
+
+	void operator()(relocation_entry rel, cell index, code_block *compiled)
+	{
+		relocation_type type = rel.rel_type();
+		if(type == RT_XT || type == RT_XT_PIC || type == RT_XT_PIC_TAIL)
+		{
+			instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)(compiled + 1));
+			cell literal = op.load_value();
+			code_block *compiled = ((code_block *)literal - 1);
+			compiled = visitor(compiled);
+			literal = (cell)compiled->xt();
+			op.store_value(literal);
+		}
+	}
+};
+
+template<typename Visitor>
+void code_block_visitor<Visitor>::visit_referenced_code_blocks(code_block *compiled)
+{
+	if(!parent->code->needs_fixup_p(compiled))
+	{
+		referenced_code_blocks_visitor<Visitor> visitor(this->visitor);
+		parent->iterate_relocations(compiled,visitor);
+	}
+}
+
+template<typename Visitor>
+void code_block_visitor<Visitor>::visit_context_code_blocks()
+{
+	call_frame_code_block_visitor<Visitor> call_frame_visitor(parent,visitor);
+	parent->iterate_active_frames(call_frame_visitor);
+}
+
+template<typename Visitor>
+struct callback_code_block_visitor {
 	callback_heap *callbacks;
 	Visitor visitor;
 
@@ -33,57 +119,11 @@ template<typename Visitor> struct callback_code_block_visitor {
 	}
 };
 
-template<typename Visitor> struct code_block_visitor {
-	factor_vm *parent;
-	Visitor visitor;
-
-	explicit code_block_visitor(factor_vm *parent_, Visitor visitor_) :
-		parent(parent_), visitor(visitor_) {}
-
-	void visit_object_code_block(object *obj)
-	{
-		switch(obj->type())
-		{
-		case WORD_TYPE:
-			{
-				word *w = (word *)obj;
-				if(w->code)
-					w->code = visitor(w->code);
-				if(w->profiling)
-					w->profiling = visitor(w->profiling);
-	
-				parent->update_word_xt(w);
-				break;
-			}
-		case QUOTATION_TYPE:
-			{
-				quotation *q = (quotation *)obj;
-				if(q->code)
-					parent->set_quot_xt(q,visitor(q->code));
-				break;
-			}
-		case CALLSTACK_TYPE:
-			{
-				callstack *stack = (callstack *)obj;
-				call_frame_code_block_visitor<Visitor> call_frame_visitor(parent,visitor);
-				parent->iterate_callstack_object(stack,call_frame_visitor);
-				break;
-			}
-		}
-	}
-
-	void visit_context_code_blocks()
-	{
-		call_frame_code_block_visitor<Visitor> call_frame_visitor(parent,visitor);
-		parent->iterate_active_frames(call_frame_visitor);
-	}
-
-	void visit_callback_code_blocks()
-	{
-		callback_code_block_visitor<Visitor> callback_visitor(parent->callbacks,visitor);
-		parent->callbacks->iterate(callback_visitor);
-	}
-
-};
+template<typename Visitor>
+void code_block_visitor<Visitor>::visit_callback_code_blocks()
+{
+	callback_code_block_visitor<Visitor> callback_visitor(parent->callbacks,visitor);
+	parent->callbacks->iterate(callback_visitor);
+}
 
 }
