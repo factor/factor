@@ -1,10 +1,11 @@
 ! (c)2009 Joe Groff bsd license
 USING: arrays assocs biassocs byte-arrays byte-arrays.hex
 classes compiler.cfg compiler.cfg.comparisons compiler.cfg.instructions
-compiler.cfg.intrinsics.simd compiler.cfg.registers
-compiler.cfg.stacks.height compiler.cfg.stacks.local compiler.tree
-compiler.tree.propagation.info cpu.architecture fry hashtables kernel
-locals make namespaces sequences system tools.test words ;
+compiler.cfg.intrinsics.simd compiler.cfg.intrinsics.simd.backend
+compiler.cfg.registers compiler.cfg.stacks.height
+compiler.cfg.stacks.local compiler.tree compiler.tree.propagation.info
+cpu.architecture fry hashtables kernel locals make namespaces sequences
+system tools.test words ;
 IN: compiler.cfg.intrinsics.simd.tests
 
 :: test-node ( rep -- node ) 
@@ -532,15 +533,12 @@ unit-test
 unit-test
 
 ! test with nonliteral/invalid reps
-[ { ##inc-d ##branch } ]
 [ simple-ops-cpu [ emit-simd-v+ ] test-emit-nonliteral-rep ]
-unit-test
+[ bad-simd-intrinsic? ] must-fail-with
 
-[ { ##branch } ]
 [ simple-ops-cpu f [ emit-simd-v+ ] test-emit ]
-unit-test
+[ bad-simd-intrinsic? ] must-fail-with
 
-[ { ##branch } ]
 [ simple-ops-cpu 3 [ emit-simd-v+ ] test-emit ]
-unit-test
+[ bad-simd-intrinsic? ] must-fail-with
 
