@@ -105,7 +105,7 @@ scalar-rep ;
         { ushort-scalar-rep    short-scalar-rep }
         { uint-scalar-rep      int-scalar-rep }
         { ulonglong-scalar-rep longlong-scalar-rep }
-    } ?at drop ;
+    } ?at drop ; foldable
 
 : widen-vector-rep ( rep -- rep' )
     {
@@ -116,7 +116,18 @@ scalar-rep ;
         { ushort-8-rep    uint-4-rep      }
         { uint-4-rep      ulonglong-2-rep }
         { float-4-rep     double-2-rep    }
-    } at ;
+    } at ; foldable
+
+: narrow-vector-rep ( rep -- rep' )
+    {
+        { short-8-rep     char-16-rep     }
+        { int-4-rep       short-8-rep     }
+        { longlong-2-rep  int-4-rep       }
+        { ushort-8-rep    uchar-16-rep    }
+        { uint-4-rep      ushort-8-rep    }
+        { ulonglong-2-rep uint-4-rep      }
+        { double-2-rep    float-4-rep     }
+    } at ; foldable
 
 ! Register classes
 SINGLETONS: int-regs float-regs ;

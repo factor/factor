@@ -1,5 +1,5 @@
 USING: classes.tuple.private cpu.architecture help.markup
-help.syntax kernel.private math math.vectors
+help.syntax kernel.private math math.vectors math.vectors.simd.intrinsics
 sequences ;
 IN: math.vectors.simd
 
@@ -163,7 +163,6 @@ ARTICLE: "math.vectors.simd.intrinsics" "Low-level SIMD primitives"
 { $list
     "They operate on raw byte arrays, with a separate “representation” parameter passed in to determine the type of the operands and result."
     "They are unsafe; passing values which are not byte arrays, or byte arrays with the wrong size, will dereference invalid memory and possibly crash Factor."
-    { "They do not have software fallbacks; if the current CPU does not have SIMD support, a " { $link bad-simd-call } " error will be thrown." }
 }
 "The compiler converts " { $link "math-vectors" } " into SIMD primitives automatically in cases where it is safe; this means that the input types are known to be SIMD vectors, and the CPU supports SIMD."
 $nl
