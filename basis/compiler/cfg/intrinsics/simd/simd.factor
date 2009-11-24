@@ -77,14 +77,6 @@ IN: compiler.cfg.intrinsics.simd
         [ [ ^^fill-vector ] [ ^^xor-vector ] bi ]
     } v-vector-op ;
 
-:: ^minmax-compare-vector ( src1 src2 rep cc -- dst )
-    cc order-cc {
-        { cc<  [ src1 src2 rep ^^max-vector src1 rep cc/= ^^compare-vector ] }
-        { cc<= [ src1 src2 rep ^^min-vector src1 rep cc=  ^^compare-vector ] }
-        { cc>  [ src1 src2 rep ^^min-vector src1 rep cc/= ^^compare-vector ] }
-        { cc>= [ src1 src2 rep ^^max-vector src1 rep cc=  ^^compare-vector ] }
-    } case ;
-
 :: ^((compare-vector)) ( src1 src2 rep {cc,swap} -- dst )
     {cc,swap} first2 :> ( cc swap? )
     swap?
@@ -106,6 +98,14 @@ IN: compiler.cfg.intrinsics.simd
 
         not? [ rep ^not-vector ] when
     ] if ;
+
+:: ^minmax-compare-vector ( src1 src2 rep cc -- dst )
+    cc order-cc {
+        { cc<  [ src1 src2 rep ^^max-vector src1 rep cc/= ^(compare-vector) ] }
+        { cc<= [ src1 src2 rep ^^min-vector src1 rep cc=  ^(compare-vector) ] }
+        { cc>  [ src1 src2 rep ^^min-vector src1 rep cc/= ^(compare-vector) ] }
+        { cc>= [ src1 src2 rep ^^max-vector src1 rep cc=  ^(compare-vector) ] }
+    } case ;
 
 : ^compare-vector ( src1 src2 rep cc -- dst )
     {
