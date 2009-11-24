@@ -95,6 +95,9 @@ DEFER: simd-construct-op
 PRIVATE>
 >>
 
+DEFER: simd-with
+DEFER: simd-cast
+
 <<
 <PRIVATE
 
