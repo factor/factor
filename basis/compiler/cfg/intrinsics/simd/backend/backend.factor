@@ -151,6 +151,8 @@ MACRO: check-elements ( quots -- )
     [ length 1 - \ and <repetition> [ ] like ]
     tri 3append ;
 
+ERROR: bad-simd-intrinsic node ;
+
 MACRO: if-literals-match ( quots -- )
     [ length ] [ ] [ length ] tri
     ! n quots n
@@ -165,7 +167,7 @@ MACRO: if-literals-match ( quots -- )
             ! node literals quot
             [ _ firstn ] dip call
             drop
-        ] [ 2drop emit-primitive ] if
+        ] [ 2drop bad-simd-intrinsic ] if
     ] ;
 
 CONSTANT: [unary]       [ ds-drop  ds-pop ]
