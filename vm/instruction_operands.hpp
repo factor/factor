@@ -119,20 +119,20 @@ struct relocation_entry {
 	}
 };
 
-struct embedded_pointer {
+struct instruction_operand {
 	cell rel_class;
 	cell pointer;
 
-	embedded_pointer(cell rel_class_, cell pointer_) :
+	instruction_operand(cell rel_class_, cell pointer_) :
 		rel_class(rel_class_), pointer(pointer_) {}
 
-	fixnum load_address_2_2();
-	fixnum load_address_masked(cell mask, fixnum shift);
-	fixnum load_address();
+	fixnum load_value_2_2();
+	fixnum load_value_masked(cell mask, fixnum shift);
+	fixnum load_value();
 
-	void store_address_2_2(fixnum value);
-	void store_address_masked(fixnum value, cell mask, fixnum shift);
-	void store_address(fixnum value);
+	void store_value_2_2(fixnum value);
+	void store_value_masked(fixnum value, cell mask, fixnum shift);
+	void store_value(fixnum value);
 };
 
 }

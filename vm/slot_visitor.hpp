@@ -17,7 +17,7 @@ template<typename Visitor> struct slot_visitor {
 	void visit_bignum_roots();
 	void visit_roots();
 	void visit_contexts();
-	void visit_literal_references(code_block *compiled);
+	void visit_referenced_literals(code_block *compiled);
 };
 
 template<typename Visitor>
@@ -125,33 +125,34 @@ void slot_visitor<Visitor>::visit_contexts()
 
 template<typename Visitor>
 struct literal_references_visitor {
-	factor_vm *parent;
 	slot_visitor<Visitor> *visitor;
 
-	explicit literal_references_visitor(factor_vm *parent_, slot_visitor<Visitor> *visitor_)
-		: parent(parent_), visitor(visitor_) {}
+	explicit literal_references_visitor(slot_visitor<Visitor> *visitor_) : visitor(visitor_) {}
 
 	void operator()(relocation_entry rel, cell index, code_block *compiled)
 	{
 		if(rel.rel_type() == RT_IMMEDIATE)
 		{
-			embedded_pointer ptr(rel.rel_class(),rel.rel_offset() + (cell)(compiled + 1));
-			cell literal = ptr.load_address();
+			instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)(compiled + 1));
+			cell literal = op.load_address();
 			literal = visitor->visit_pointer(literal);
-			ptr.store_address(literal);
+			op.store_address(literal);
 		}
 	}
 };
 
 template<typename Visitor>
-void slot_visitor<Visitor>::visit_literal_references(code_block *compiled)
+void slot_visitor<Visitor>::visit_referenced_literals(code_block *compiled)
 {
 	visit_handle(&compiled->owner);
 	visit_handle(&compiled->literals);
 	visit_handle(&compiled->relocation);
 
-	literal_references_visitor<Visitor> visitor(parent,this);
-	parent->iterate_relocations(compiled,visitor);
+	if(!parent->code->needs_fixup_p(compiled))
+	{
+		literal_references_visitor<Visitor> visitor(this);
+		parent->iterate_relocations(compiled,visitor);
+	}
 }
 
 }

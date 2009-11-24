@@ -55,6 +55,9 @@ struct factor_vm
 	/* Only set if we're performing a GC */
 	gc_state *current_gc;
 
+	/* Mark stack */
+	std::vector<cell> mark_stack;
+
 	/* If not NULL, we push GC events here */
 	std::vector<gc_event> *gc_events;
 
@@ -525,7 +528,6 @@ struct factor_vm
 
 	void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled);
 	void update_word_references(code_block *compiled);
-	void update_code_block_words_and_literals(code_block *compiled);
 	void check_code_address(cell address);
 	void relocate_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
@@ -544,7 +546,6 @@ struct factor_vm
 	bool in_code_heap_p(cell ptr);
 	void jit_compile_word(cell word_, cell def_, bool relocate);
 	void update_code_heap_words();
-	void update_code_heap_words_and_literals();
 	void primitive_modify_code_heap();
 	code_heap_room code_room();
 	void primitive_code_room();

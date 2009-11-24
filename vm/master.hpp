@@ -49,7 +49,7 @@ namespace factor
 #include "errors.hpp"
 #include "bignumint.hpp"
 #include "bignum.hpp"
-#include "embedded_pointers.hpp"
+#include "instruction_operands.hpp"
 #include "code_blocks.hpp"
 #include "bump_allocator.hpp"
 #include "bitwise_hacks.hpp"
