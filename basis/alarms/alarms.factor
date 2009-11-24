@@ -13,6 +13,7 @@ TUPLE: alarm
 
 SYMBOL: alarms
 SYMBOL: alarm-thread
+SYMBOL: current-alarm
 
 : cancel-alarm ( alarm -- )
     entry>> [ alarms get-global heap-delete ] if-box? ;
@@ -49,9 +50,14 @@ M: duration >nanoseconds duration>nanoseconds >integer ;
     [ entry>> box> drop ]
     [ dup interval>> [ reschedule-alarm ] [ drop ] if ]
     [
-        [ quot>> ] [ ] bi
-        '[ _ [ _ dup interval>> [ cancel-alarm ] [ drop ] if rethrow ] recover ]
-        "Alarm execution" spawn drop
+        [ ] [ quot>> ] [ ] tri
+        '[
+            _ current-alarm
+            [
+                _ [ _ dup interval>> [ cancel-alarm ] [ drop ] if rethrow ]
+                recover
+            ] with-variable
+        ] "Alarm execution" spawn drop
     ] tri ;
 
 : (trigger-alarms) ( alarms n -- )
