@@ -5,7 +5,8 @@ math.vectors.simd.private prettyprint random sequences system
 tools.test vocabs assocs compiler.cfg.debugger words
 locals combinators cpu.architecture namespaces byte-arrays alien
 specialized-arrays classes.struct eval classes.algebra sets
-quotations math.constants compiler.units ;
+quotations math.constants compiler.units splitting ;
+FROM: math.vectors.simd.intrinsics => alien-vector set-alien-vector ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
 IN: math.vectors.simd.tests
@@ -261,8 +262,8 @@ simd-classes&reps [
 
 : check-boolean-ops ( class elt-class compare-quot -- seq )
     [
-        [ boolean-ops [ dup word-schema ] { } map>assoc ] 2dip
-        '[ first2 inputs _ _ check-boolean-op ]
+        [ boolean-ops [ dup vector-words at ] { } map>assoc ] 2dip
+        '[ first2 vector-word-inputs _ _ check-boolean-op ]
     ] dip check-optimizer ; inline
 
 simd-classes&reps [
@@ -558,7 +559,7 @@ STRUCT: simd-struct
 [ ] [ char-16 new 1array stack. ] unit-test
 
 ! CSSA bug
-[ 8000000 ] [
+[ 4000000 ] [
     int-4{ 1000 1000 1000 1000 }
     [ { int-4 } declare dup [ * ] [ + ] 2map-reduce ] compile-call
 ] unit-test
