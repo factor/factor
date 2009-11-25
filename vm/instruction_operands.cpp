@@ -20,7 +20,7 @@ fixnum instruction_operand::load_value_masked(cell mask, fixnum shift)
 	return (*ptr & mask) << shift;
 }
 
-fixnum instruction_operand::load_value()
+fixnum instruction_operand::load_value(cell relative_to)
 {
 	switch(rel_class)
 	{
@@ -29,25 +29,30 @@ fixnum instruction_operand::load_value()
 	case RC_ABSOLUTE:
 		return *(u32*)pointer;
 	case RC_RELATIVE:
-		return *(s32*)pointer + pointer + sizeof(u32);
+		return *(s32*)pointer + relative_to + sizeof(u32);
 	case RC_ABSOLUTE_PPC_2_2:
 		return load_value_2_2();
 	case RC_ABSOLUTE_PPC_2:
 		return load_value_masked(rel_absolute_ppc_2_mask,0);
 	case RC_RELATIVE_PPC_2:
-		return load_value_masked(rel_relative_ppc_2_mask,0) + pointer;
+		return load_value_masked(rel_relative_ppc_2_mask,0) + relative_to;
 	case RC_RELATIVE_PPC_3:
-		return load_value_masked(rel_relative_ppc_3_mask,0) + pointer;
+		return load_value_masked(rel_relative_ppc_3_mask,0) + relative_to;
 	case RC_RELATIVE_ARM_3:
-		return load_value_masked(rel_relative_arm_3_mask,2) + pointer + sizeof(cell) * 2;
+		return load_value_masked(rel_relative_arm_3_mask,2) + relative_to + sizeof(cell) * 2;
 	case RC_INDIRECT_ARM:
-		return load_value_masked(rel_indirect_arm_mask,0) + pointer + sizeof(cell);
+		return load_value_masked(rel_indirect_arm_mask,0) + relative_to + sizeof(cell);
 	case RC_INDIRECT_ARM_PC:
-		return load_value_masked(rel_indirect_arm_mask,0) + pointer + sizeof(cell) * 2;
+		return load_value_masked(rel_indirect_arm_mask,0) + relative_to + sizeof(cell) * 2;
 	default:
 		critical_error("Bad rel class",rel_class);
 		return 0;
 	}
+}
+
+fixnum instruction_operand::load_value()
+{
+	return load_value(pointer);
 }
 
 /* Store a 32-bit value into a PowerPC LIS/ORI sequence */

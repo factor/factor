@@ -288,6 +288,7 @@ struct factor_vm
 	void collect_mark_impl(bool trace_contexts_p);
 	void collect_sweep_impl();
 	void collect_full(bool trace_contexts_p);
+	void update_fixup_set_for_compaction(mark_bits<code_block> *forwarding_map);
 	void collect_compact_impl(bool trace_contexts_p);
 	void collect_compact_code_impl(bool trace_contexts_p);
 	void collect_compact(bool trace_contexts_p);

@@ -128,10 +128,14 @@ struct collector {
 		data_visitor.visit_contexts();
 	}
 
-	/* Trace all literals referenced from a code block. Only for aging and nursery collections */
-	void trace_referenced_literals(code_block *compiled)
+	void trace_code_block_objects(code_block *compiled)
 	{
-		data_visitor.visit_referenced_literals(compiled);
+		data_visitor.visit_code_block_objects(compiled);
+	}
+
+	void trace_embedded_literals(code_block *compiled)
+	{
+		data_visitor.visit_embedded_literals(compiled);
 	}
 
 	void trace_code_heap_roots(std::set<code_block *> *remembered_set)
@@ -141,7 +145,8 @@ struct collector {
 
 		for(; iter != end; iter++)
 		{
-			trace_referenced_literals(*iter);
+			trace_code_block_objects(*iter);
+			trace_embedded_literals(*iter);
 			code_blocks_scanned++;
 		}
 	}

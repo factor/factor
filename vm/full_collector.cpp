@@ -17,8 +17,9 @@ full_collector::full_collector(factor_vm *parent_) :
 
 void full_collector::trace_code_block(code_block *compiled)
 {
-	data_visitor.visit_referenced_literals(compiled);
-	code_visitor.visit_referenced_code_blocks(compiled);
+	data_visitor.visit_code_block_objects(compiled);
+	data_visitor.visit_embedded_literals(compiled);
+	code_visitor.visit_embedded_code_pointers(compiled);
 }
 
 void full_collector::trace_context_code_blocks()
