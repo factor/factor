@@ -52,8 +52,11 @@ SYMBOL: matrix
     [ first-col ] keep
     dup 1 + rows-from clear-col ;
 
+: find-row ( row# quot -- i elt )
+    [ rows-from ] dip find ; inline
+
 : pivot-row ( col# row# -- n )
-    rows-from swap '[ [ _ ] dip nth-row nth abs ] sort-with last ;
+    [ dupd nth-row nth zero? not ] find-row 2nip ;
 
 : (echelon) ( col# row# -- )
     over cols < over rows < and [
