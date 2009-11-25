@@ -1,7 +1,7 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien.c-types arrays assocs classes combinators
 combinators.short-circuit cords fry kernel locals math
-math.vectors math.vectors.conversion.backend sequences ;
+math.vectors math.vectors.simd math.vectors.simd.intrinsics sequences ;
 FROM: alien.c-types => char uchar short ushort int uint longlong ulonglong float double ;
 IN: math.vectors.conversion
 
@@ -30,11 +30,11 @@ ERROR: bad-vconvert-input value expected-type ;
         }
         {
             [ from-element float-type? ]
-            [ [ to-type (v>integer) ] ]
+            [ from-type new simd-rep '[ underlying>> _ (simd-v>integer) to-type boa ] ]
         }
         {
             [ to-element   float-type? ]
-            [ [ to-type (v>float)   ] ]
+            [ from-type new simd-rep '[ underlying>> _ (simd-v>float)   to-type boa ] ]
         }
     } cond
     [ from-type check-vconvert-type ] prepose ;
@@ -47,10 +47,18 @@ ERROR: bad-vconvert-input value expected-type ;
     } 0|| [ from-type to-type bad-vconvert ] when ;
 
 :: [[vpack-unsigned]] ( from-type to-type -- quot )
-    [ [ from-type check-vconvert-type ] bi@ to-type (vpack-unsigned) ] ;
+    from-type new simd-rep
+    '[
+        [ from-type check-vconvert-type underlying>> ] bi@
+        _ (simd-vpack-unsigned) to-type boa
+    ] ;
 
 :: [[vpack-signed]] ( from-type to-type -- quot )
-    [ [ from-type check-vconvert-type ] bi@ to-type (vpack-signed) ] ;
+    from-type new simd-rep
+    '[
+        [ from-type check-vconvert-type underlying>> ] bi@
+        _ (simd-vpack-signed)   to-type boa
+    ] ;
 
 :: [vpack] ( from-element to-element from-size to-size from-type to-type -- quot )
     from-size to-size /i log2 :> steps
@@ -68,9 +76,11 @@ ERROR: bad-vconvert-input value expected-type ;
     } 0|| [ from-type to-type bad-vconvert ] when ;
 
 :: [[vunpack]] ( from-type to-type -- quot )
-    [
-        from-type check-vconvert-type
-        [ to-type (vunpack-head) ] [ to-type (vunpack-tail) ] bi
+    from-type new simd-rep
+    '[
+        from-type check-vconvert-type underlying>> _
+        [ (simd-vunpack-head) to-type boa ]
+        [ (simd-vunpack-tail) to-type boa ] 2bi
     ] ;
 
 :: [vunpack] ( from-element to-element from-size to-size from-type to-type -- quot )
@@ -81,8 +91,8 @@ ERROR: bad-vconvert-input value expected-type ;
 PRIVATE>
 
 MACRO:: vconvert ( from-type to-type -- )
-    from-type new [ element-type ] [ byte-length ] bi :> ( from-element from-length )
-    to-type   new [ element-type ] [ byte-length ] bi :> ( to-element   to-length   )
+    from-type new [ simd-element-type ] [ byte-length ] bi :> ( from-element from-length )
+    to-type   new [ simd-element-type ] [ byte-length ] bi :> ( to-element   to-length   )
     from-element heap-size :> from-size
     to-element   heap-size :> to-size   
 
