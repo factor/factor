@@ -149,12 +149,14 @@ void factor_vm::collect_full(bool trace_contexts_p)
 		current_gc->event->op = collect_compact_op;
 		collect_compact_impl(trace_contexts_p);
 	}
+	flush_icache(code->seg->start,code->seg->size);
 }
 
 void factor_vm::collect_compact(bool trace_contexts_p)
 {
 	collect_mark_impl(trace_contexts_p);
 	collect_compact_impl(trace_contexts_p);
+	flush_icache(code->seg->start,code->seg->size);
 }
 
 void factor_vm::collect_growing_heap(cell requested_bytes, bool trace_contexts_p)
@@ -164,6 +166,7 @@ void factor_vm::collect_growing_heap(cell requested_bytes, bool trace_contexts_p
 	set_data_heap(data->grow(requested_bytes));
 	collect_mark_impl(trace_contexts_p);
 	collect_compact_code_impl(trace_contexts_p);
+	flush_icache(code->seg->start,code->seg->size);
 	delete old;
 }
 

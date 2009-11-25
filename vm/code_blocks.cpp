@@ -3,11 +3,6 @@
 namespace factor
 {
 
-void factor_vm::flush_icache_for(code_block *block)
-{
-	flush_icache((cell)block,block->size());
-}
-
 void *factor_vm::object_xt(cell obj)
 {
 	switch(tagged<object>(obj).type())
@@ -196,7 +191,7 @@ void factor_vm::update_word_references(code_block *compiled)
 	{
 		word_references_updater updater(this);
 		iterate_relocations(compiled,updater);
-		flush_icache_for(compiled);
+		compiled->flush_icache();
 	}
 }
 
@@ -224,7 +219,7 @@ void factor_vm::relocate_code_block(code_block *compiled)
 	code->needs_fixup.erase(compiled);
 	code_block_relocator relocator(this);
 	iterate_relocations(compiled,relocator);
-	flush_icache_for(compiled);
+	compiled->flush_icache();
 }
 
 /* Fixup labels. This is done at compile time, not image load time */

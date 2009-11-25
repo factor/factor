@@ -43,6 +43,11 @@ struct code_block
 	{
 		return (void *)(this + 1);
 	}
+
+	void flush_icache()
+	{
+		factor::flush_icache((cell)this,size());
+	}
 };
 
 }
