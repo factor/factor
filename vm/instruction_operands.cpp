@@ -55,6 +55,11 @@ fixnum instruction_operand::load_value()
 	return load_value(pointer);
 }
 
+code_block *instruction_operand::load_code_block()
+{
+	return ((code_block *)load_value() - 1);
+}
+
 /* Store a 32-bit value into a PowerPC LIS/ORI sequence */
 void instruction_operand::store_value_2_2(fixnum value)
 {
@@ -116,6 +121,11 @@ void instruction_operand::store_value(fixnum absolute_value)
 		critical_error("Bad rel class",rel_class);
 		break;
 	}
+}
+
+void instruction_operand::store_code_block(code_block *compiled)
+{
+	store_value((cell)compiled->xt());
 }
 
 }

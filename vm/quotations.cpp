@@ -295,7 +295,7 @@ void factor_vm::set_quot_xt(quotation *quot, code_block *code)
 /* Allocates memory */
 code_block *factor_vm::jit_compile_quot(cell owner_, cell quot_, bool relocating)
 {
-	data_root<word> owner(owner_,this);
+	data_root<object> owner(owner_,this);
 	data_root<quotation> quot(quot_,this);
 
 	quotation_jit compiler(owner.value(),true,relocating,this);

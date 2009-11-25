@@ -504,6 +504,7 @@ struct factor_vm
 	void *xt_pic(word *w, cell tagged_quot);
 	void *word_xt_pic(word *w);
 	void *word_xt_pic_tail(word *w);
+	cell code_block_owner(code_block *compiled);
 	void undefined_symbol();
 	void *get_rel_symbol(array *literals, cell index);
 	cell compute_relocation(relocation_entry rel, cell index, code_block *compiled);
@@ -526,7 +527,6 @@ struct factor_vm
 		}
 	}
 
-	void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled);
 	void update_word_references(code_block *compiled);
 	void check_code_address(cell address);
 	void relocate_code_block(code_block *compiled);
