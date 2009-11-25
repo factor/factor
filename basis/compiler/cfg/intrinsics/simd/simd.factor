@@ -20,7 +20,7 @@ IN: compiler.cfg.intrinsics.simd
 ! compound vector ops
 
 : sign-bit-mask ( rep -- byte-array )
-    unsign-rep {
+    signed-rep {
         { char-16-rep [ uchar-array{
             HEX: 80 HEX: 80 HEX: 80 HEX: 80
             HEX: 80 HEX: 80 HEX: 80 HEX: 80
@@ -48,7 +48,7 @@ IN: compiler.cfg.intrinsics.simd
     } case ;
 
 : ^load-add-sub-vector ( rep -- dst )
-    unsign-rep {
+    signed-rep {
         { float-4-rep    [ float-array{ -0.0  0.0 -0.0  0.0 } underlying>> ^^load-constant ] }
         { double-2-rep   [ double-array{ -0.0  0.0 } underlying>> ^^load-constant ] }
         { char-16-rep    [ char-array{ -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 } underlying>> ^^load-constant ] }
@@ -115,7 +115,7 @@ IN: compiler.cfg.intrinsics.simd
             rep sign-bit-mask ^^load-constant :> sign-bits
             src1 sign-bits rep ^^xor-vector
             src2 sign-bits rep ^^xor-vector
-            rep unsign-rep cc ^(compare-vector)
+            rep signed-rep cc ^(compare-vector)
         ] }
     } vv-cc-vector-op ;
 
@@ -247,7 +247,7 @@ IN: compiler.cfg.intrinsics.simd
     ] [ ^^vector>scalar ] bi ;
 
 : ^sum-vector ( src rep -- dst )
-    unsign-rep {
+    signed-rep {
         { float-vector-rep [ ^(sum-vector) ] }
         { int-vector-rep [| src rep |
             src rep ^unpack-vector-head :> head
