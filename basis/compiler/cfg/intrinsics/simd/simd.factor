@@ -253,14 +253,15 @@ IN: compiler.cfg.intrinsics.simd
             src rep ^unpack-vector-head :> head
             src rep ^unpack-vector-tail :> tail
             rep widen-vector-rep :> wide-rep
-            head tail wide-rep ^^add-vector wide-rep ^(sum-vector)
+            head tail wide-rep ^^add-vector wide-rep
+            ^(sum-vector)
         ] }
     } v-vector-op ;
 
 : shuffle? ( obj -- ? ) { [ array? ] [ [ integer? ] all? ] } 1&& ;
 
-: ^shuffle-vector-imm ( src1 src2 rep -- dst )
-    {
+: ^shuffle-vector-imm ( src1 shuffle rep -- dst )
+    [ rep-length 0 pad-tail ] keep {
         [ ^^shuffle-vector-imm ]
         [ [ ^load-immediate-shuffle ] [ ^^shuffle-vector ] bi ]
     } vl-vector-op ;
@@ -358,7 +359,7 @@ IN: compiler.cfg.intrinsics.simd
 : emit-simd-v. ( node -- )
     {
         [ ^^dot-vector ]
-        [ [ ^^mul-vector ] [ ^sum-vector ] bi ]
+        { float-vector-rep [ [ ^^mul-vector ] [ ^sum-vector ] bi ] }
     } emit-vv-vector-op ;
 
 : emit-simd-vsqrt ( node -- )
