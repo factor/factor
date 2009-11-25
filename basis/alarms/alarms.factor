@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs boxes calendar
-combinators.short-circuit fry heaps init kernel math.order
+USING: accessors assocs boxes calendar combinators.short-circuit
+continuations fry heaps init kernel math.order
 namespaces quotations threads math system ;
 IN: alarms
 
@@ -11,21 +11,27 @@ TUPLE: alarm
     interval
     { entry box } ;
 
-<PRIVATE
-
 SYMBOL: alarms
 SYMBOL: alarm-thread
+SYMBOL: current-alarm
+
+: cancel-alarm ( alarm -- )
+    entry>> [ alarms get-global heap-delete ] if-box? ;
+
+<PRIVATE
 
 : notify-alarm-thread ( -- )
     alarm-thread get-global interrupt ;
 
-: normalize-argument ( obj -- nanoseconds )
-    >duration duration>nanoseconds >integer ;
+GENERIC: >nanoseconds ( obj -- duration/f )
+M: f >nanoseconds ;
+M: real >nanoseconds >integer ;
+M: duration >nanoseconds duration>nanoseconds >integer ;
 
 : <alarm> ( quot start interval -- alarm )
     alarm new
-        swap dup [ normalize-argument ] when >>interval
-        swap dup [ normalize-argument nano-count + ] when >>start
+        swap >nanoseconds >>interval
+        swap >nanoseconds nano-count + >>start
         swap >>quot
         <box> >>entry ;
 
@@ -43,7 +49,16 @@ SYMBOL: alarm-thread
 : call-alarm ( alarm -- )
     [ entry>> box> drop ]
     [ dup interval>> [ reschedule-alarm ] [ drop ] if ]
-    [ quot>> "Alarm execution" spawn drop ] tri ;
+    [
+        [ ] [ quot>> ] [ ] tri
+        '[
+            _ current-alarm
+            [
+                _ [ _ dup interval>> [ cancel-alarm ] [ drop ] if rethrow ]
+                recover
+            ] with-variable
+        ] "Alarm execution" spawn drop
+    ] tri ;
 
 : (trigger-alarms) ( alarms n -- )
     over heap-empty? [
@@ -87,6 +102,3 @@ PRIVATE>
 : later ( quot duration -- alarm ) f add-alarm ;
 
 : every ( quot duration -- alarm ) dup add-alarm ;
-
-: cancel-alarm ( alarm -- )
-    entry>> [ alarms get-global heap-delete ] if-box? ;
