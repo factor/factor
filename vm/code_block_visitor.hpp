@@ -9,7 +9,7 @@ template<typename Visitor> struct code_block_visitor {
 		parent(parent_), visitor(visitor_) {}
 
 	void visit_object_code_block(object *obj);
-	void visit_referenced_code_blocks(code_block *compiled);
+	void visit_embedded_code_pointers(code_block *compiled);
 	void visit_context_code_blocks();
 	void visit_callback_code_blocks();
 };
@@ -67,17 +67,17 @@ void code_block_visitor<Visitor>::visit_object_code_block(object *obj)
 }
 
 template<typename Visitor>
-struct referenced_code_blocks_visitor {
+struct embedded_code_pointers_visitor {
 	Visitor visitor;
 
-	explicit referenced_code_blocks_visitor(Visitor visitor_) : visitor(visitor_) {}
+	explicit embedded_code_pointers_visitor(Visitor visitor_) : visitor(visitor_) {}
 
 	void operator()(relocation_entry rel, cell index, code_block *compiled)
 	{
 		relocation_type type = rel.rel_type();
 		if(type == RT_XT || type == RT_XT_PIC || type == RT_XT_PIC_TAIL)
 		{
-			instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)(compiled + 1));
+			instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
 			cell literal = op.load_value();
 			code_block *compiled = ((code_block *)literal - 1);
 			compiled = visitor(compiled);
@@ -88,11 +88,11 @@ struct referenced_code_blocks_visitor {
 };
 
 template<typename Visitor>
-void code_block_visitor<Visitor>::visit_referenced_code_blocks(code_block *compiled)
+void code_block_visitor<Visitor>::visit_embedded_code_pointers(code_block *compiled)
 {
 	if(!parent->code->needs_fixup_p(compiled))
 	{
-		referenced_code_blocks_visitor<Visitor> visitor(this->visitor);
+		embedded_code_pointers_visitor<Visitor> visitor(this->visitor);
 		parent->iterate_relocations(compiled,visitor);
 	}
 }

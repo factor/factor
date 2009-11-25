@@ -17,7 +17,8 @@ template<typename Visitor> struct slot_visitor {
 	void visit_bignum_roots();
 	void visit_roots();
 	void visit_contexts();
-	void visit_referenced_literals(code_block *compiled);
+	void visit_code_block_objects(code_block *compiled);
+	void visit_embedded_literals(code_block *compiled);
 };
 
 template<typename Visitor>
@@ -133,21 +134,25 @@ struct literal_references_visitor {
 	{
 		if(rel.rel_type() == RT_IMMEDIATE)
 		{
-			instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)(compiled + 1));
-			cell literal = op.load_address();
+			instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
+			cell literal = op.load_value();
 			literal = visitor->visit_pointer(literal);
-			op.store_address(literal);
+			op.store_value(literal);
 		}
 	}
 };
 
 template<typename Visitor>
-void slot_visitor<Visitor>::visit_referenced_literals(code_block *compiled)
+void slot_visitor<Visitor>::visit_code_block_objects(code_block *compiled)
 {
 	visit_handle(&compiled->owner);
 	visit_handle(&compiled->literals);
 	visit_handle(&compiled->relocation);
+}
 
+template<typename Visitor>
+void slot_visitor<Visitor>::visit_embedded_literals(code_block *compiled)
+{
 	if(!parent->code->needs_fixup_p(compiled))
 	{
 		literal_references_visitor<Visitor> visitor(this);
