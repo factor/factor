@@ -217,8 +217,8 @@ M: A norm-sq dup v. assert-positive ; inline
 M: A norm      norm-sq sqrt ; inline
 M: A distance  v- norm ; inline
 
-! M: simd-128 >pprint-sequence ;
-! M: simd-128 pprint* pprint-object ;
+M: A >pprint-sequence ;
+M: A pprint* pprint-object ;
 
 \ A-boa
 [ COERCER N napply ] N {

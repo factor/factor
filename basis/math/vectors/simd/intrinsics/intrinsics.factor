@@ -201,16 +201,16 @@ PRIVATE>
 : (simd-vall?)             ( a   rep -- ? ) [ bitand ] bitwise-components-reduce zero? not ;
 : (simd-vnone?)            ( a   rep -- ? ) [ bitor  ] bitwise-components-reduce zero?     ;
 : (simd-v>float)           ( a   rep -- c )
-    [ >rep-array ] [ >float-vector-rep [>rep-array] ] bi call( i -- f ) underlying>> ;
+    [ >rep-array [ >float ] ] [ >float-vector-rep <rep-array> ] bi map-as underlying>> ;
 : (simd-v>integer)         ( a   rep -- c )
-    [ >rep-array ] [ >int-vector-rep [>rep-array] ] bi call( i -- f ) underlying>> ;
+    [ >rep-array [ >integer ] ] [ >int-vector-rep <rep-array> ] bi map-as underlying>> ;
 : (simd-vpack-signed)      ( a b rep -- c )
     [ 2>rep-array cord-append ]
-    [ narrow-vector-rep [ [<rep-array>] ] [ rep-component-type ] bi ] bi
+    [ narrow-vector-rep [ <rep-array> ] [ rep-component-type ] bi ] bi
     '[ _ c-type-clamp ] swap map-as underlying>> ;
 : (simd-vpack-unsigned)    ( a b rep -- c )
     [ 2>rep-array cord-append ]
-    [ narrow-vector-rep >uint-vector-rep [ [<rep-array>] ] [ rep-component-type ] bi ] bi
+    [ narrow-vector-rep >uint-vector-rep [ <rep-array> ] [ rep-component-type ] bi ] bi
     '[ _ c-type-clamp ] swap map-as underlying>> ;
 : (simd-vunpack-head)      ( a   rep -- c ) 
     [ >rep-array ] [ widen-vector-rep [ rep-length ] [ [>rep-array] ] bi ] bi
