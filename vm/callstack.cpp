@@ -99,14 +99,17 @@ cell factor_vm::frame_scan(stack_frame *frame)
 	{
 	case code_block_unoptimized:
 		{
-			cell quot = frame_executing(frame);
-			if(to_boolean(quot))
+			tagged<object> obj(frame_executing(frame));
+			if(obj.type_p(WORD_TYPE))
+				obj = obj.as<word>()->def;
+
+			if(obj.type_p(QUOTATION_TYPE))
 			{
 				char *return_addr = (char *)FRAME_RETURN_ADDRESS(frame,this);
 				char *quot_xt = (char *)(frame_code(frame) + 1);
 
 				return tag_fixnum(quot_code_offset_to_scan(
-					quot,(cell)(return_addr - quot_xt)));
+					obj.value(),(cell)(return_addr - quot_xt)));
 			}    
 			else
 				return false_object;
@@ -190,7 +193,7 @@ void factor_vm::primitive_set_innermost_stack_frame_quot()
 	callstack.untag_check(this);
 	quot.untag_check(this);
 
-	jit_compile(quot.value(),true);
+	jit_compile_quot(quot.value(),true);
 
 	stack_frame *inner = innermost_stack_frame_quot(callstack.untagged());
 	cell offset = (char *)FRAME_RETURN_ADDRESS(inner,this) - (char *)inner->xt;

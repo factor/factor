@@ -544,7 +544,6 @@ struct factor_vm
 
 	void init_code_heap(cell size);
 	bool in_code_heap_p(cell ptr);
-	void jit_compile_word(cell word_, cell def_, bool relocate);
 	void update_code_heap_words();
 	void primitive_modify_code_heap();
 	code_heap_room code_room();
@@ -626,7 +625,9 @@ struct factor_vm
 	void primitive_array_to_quotation();
 	void primitive_quotation_xt();
 	void set_quot_xt(quotation *quot, code_block *code);
-	void jit_compile(cell quot_, bool relocating);
+	code_block *jit_compile_quot(cell owner_, cell quot_, bool relocating);
+	void jit_compile_quot(cell quot_, bool relocating);
+	void jit_compile_word(cell word_, cell def_, bool relocating);
 	void compile_all_words();
 	fixnum quot_code_offset_to_scan(cell quot_, cell offset);
 	cell lazy_jit_compile_impl(cell quot_, stack_frame *stack);
