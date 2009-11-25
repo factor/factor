@@ -70,20 +70,6 @@ bool factor_vm::in_code_heap_p(cell ptr)
 	return (ptr >= code->seg->start && ptr <= code->seg->end);
 }
 
-/* Compile a word definition with the non-optimizing compiler. Allocates memory */
-void factor_vm::jit_compile_word(cell word_, cell def_, bool relocate)
-{
-	data_root<word> word(word_,this);
-	data_root<quotation> def(def_,this);
-
-	jit_compile(def.value(),relocate);
-
-	word->code = def->code;
-
-	if(to_boolean(word->pic_def)) jit_compile(word->pic_def,relocate);
-	if(to_boolean(word->pic_tail_def)) jit_compile(word->pic_tail_def,relocate);
-}
-
 struct word_updater {
 	factor_vm *parent;
 

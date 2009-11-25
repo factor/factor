@@ -36,6 +36,11 @@ includes stack shufflers, some fixnum arithmetic words, and words such as tag,
 slot and eq?. A primitive call is relatively expensive (two subroutine calls)
 so this results in a big speedup for relatively little effort. */
 
+void quotation_jit::init_quotation(cell quot)
+{
+	elements = untag<quotation>(quot)->array;
+}
+
 bool quotation_jit::primitive_call_p(cell i, cell length)
 {
 	return (i + 2) == length && array_nth(elements.untagged(),i + 1) == parent->special_objects[JIT_PRIMITIVE_WORD];
@@ -120,7 +125,7 @@ void quotation_jit::emit_quot(cell quot_)
 		literal(array_nth(elements,0));
 	else
 	{
-		if(compiling) parent->jit_compile(quot.value(),relocate);
+		if(compiling) parent->jit_compile_quot(quot.value(),relocate);
 		literal(quot.value());
 	}
 }
@@ -288,23 +293,35 @@ void factor_vm::set_quot_xt(quotation *quot, code_block *code)
 }
 
 /* Allocates memory */
-void factor_vm::jit_compile(cell quot_, bool relocating)
+code_block *factor_vm::jit_compile_quot(cell owner_, cell quot_, bool relocating)
 {
+	data_root<word> owner(owner_,this);
 	data_root<quotation> quot(quot_,this);
-	if(quot->code) return;
 
-	quotation_jit compiler(quot.value(),true,relocating,this);
+	quotation_jit compiler(owner.value(),true,relocating,this);
+	compiler.init_quotation(quot.value());
 	compiler.iterate_quotation();
 
 	code_block *compiled = compiler.to_code_block();
-	set_quot_xt(quot.untagged(),compiled);
 
 	if(relocating) relocate_code_block(compiled);
+
+	return compiled;
+}
+
+void factor_vm::jit_compile_quot(cell quot_, bool relocating)
+{
+	data_root<quotation> quot(quot_,this);
+
+	if(quot->code) return;
+
+	code_block *compiled = jit_compile_quot(quot.value(),quot.value(),relocating);
+	set_quot_xt(quot.untagged(),compiled);
 }
 
 void factor_vm::primitive_jit_compile()
 {
-	jit_compile(dpop(),true);
+	jit_compile_quot(dpop(),true);
 }
 
 /* push a new quotation on the stack */
@@ -323,6 +340,19 @@ void factor_vm::primitive_quotation_xt()
 {
 	quotation *quot = untag_check<quotation>(dpeek());
 	drepl(allot_cell((cell)quot->xt));
+}
+
+/* Compile a word definition with the non-optimizing compiler. Allocates memory */
+void factor_vm::jit_compile_word(cell word_, cell def_, bool relocating)
+{
+	data_root<word> word(word_,this);
+	data_root<quotation> def(def_,this);
+
+	code_block *compiled = jit_compile_quot(word.value(),def.value(),relocating);
+	word->code = compiled;
+
+	if(to_boolean(word->pic_def)) jit_compile_quot(word->pic_def,relocating);
+	if(to_boolean(word->pic_tail_def)) jit_compile_quot(word->pic_tail_def,relocating);
 }
 
 void factor_vm::compile_all_words()
@@ -350,6 +380,7 @@ fixnum factor_vm::quot_code_offset_to_scan(cell quot_, cell offset)
 	data_root<array> array(quot->array,this);
 
 	quotation_jit compiler(quot.value(),false,false,this);
+	compiler.init_quotation(quot.value());
 	compiler.compute_position(offset);
 	compiler.iterate_quotation();
 
@@ -360,7 +391,7 @@ cell factor_vm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
 {
 	data_root<quotation> quot(quot_,this);
 	ctx->callstack_top = stack;
-	jit_compile(quot.value(),true);
+	jit_compile_quot(quot.value(),true);
 	return quot.value();
 }
 
