@@ -500,7 +500,6 @@ struct factor_vm
 	void primitive_fclose();
 
 	//code_block
-	void flush_icache_for(code_block *block);
 	void *object_xt(cell obj);
 	void *xt_pic(word *w, cell tagged_quot);
 	void *word_xt_pic(word *w);

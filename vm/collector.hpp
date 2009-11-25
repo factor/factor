@@ -145,8 +145,10 @@ struct collector {
 
 		for(; iter != end; iter++)
 		{
-			trace_code_block_objects(*iter);
-			trace_embedded_literals(*iter);
+			code_block *compiled = *iter;
+			trace_code_block_objects(compiled);
+			trace_embedded_literals(compiled);
+			compiled->flush_icache();
 			code_blocks_scanned++;
 		}
 	}
