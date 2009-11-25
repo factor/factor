@@ -79,9 +79,7 @@ void *factor_vm::get_rel_symbol(array *literals, cell index)
 			if(sym)
 				return sym;
 			else
-			{
 				return (void *)factor::undefined_symbol;
-			}
 		}
 	case ARRAY_TYPE:
 		{
