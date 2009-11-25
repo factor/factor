@@ -108,10 +108,6 @@ M: object vshuffle-elements
     swap [ '[ _ nth ] ] keep map-as ;
 
 GENERIC# vshuffle-bytes 1 ( u perm -- v )
-M: object vshuffle-bytes
-    underlying>> [
-        swap [ '[ 15 bitand _ nth ] ] keep map-as
-    ] curry change-underlying ;
 
 GENERIC: vshuffle ( u perm -- v )
 M: array vshuffle ( u perm -- v )
@@ -123,9 +119,7 @@ GENERIC# vrshift 1 ( u n -- w )
 M: object vrshift neg '[ _ shift ] map ;
 
 GENERIC# hlshift 1 ( u n -- w )
-M: object hlshift '[ _ <byte-array> prepend 16 head ] change-underlying ;
 GENERIC# hrshift 1 ( u n -- w )
-M: object hrshift '[ _ <byte-array> append 16 tail* ] change-underlying ;
 
 GENERIC: (vmerge-head) ( u v -- h )
 M: object (vmerge-head) over length 2 /i '[ _ head-slice ] bi@ [ zip ] keep concat-as ;

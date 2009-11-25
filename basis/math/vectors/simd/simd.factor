@@ -49,6 +49,9 @@ TUPLE: simd-128
 GENERIC: simd-element-type ( obj -- c-type )
 GENERIC: simd-rep ( simd -- rep )
 
+M: object simd-element-type drop f ;
+M: object simd-rep drop f ;
+
 <<
 <PRIVATE
 
@@ -62,9 +65,6 @@ DEFER: simd-construct-op
     [ 3dup [ drop [ simd-128? ] both? ] [ '[ simd-rep _ eq? ] both? ] 3bi and ]
     2dip if ; inline
 
-: simd-construct-op ( exemplar quot: ( rep -- v ) -- v )
-    [ dup simd-rep ] dip curry make-underlying ; inline
-
 : simd-unbox ( a -- a (a) )
     [ ] [ underlying>> ] bi ; inline
 
@@ -73,6 +73,9 @@ DEFER: simd-construct-op
 
 : vn->v-op ( a n rep quot: ( (a) n rep -- (c) ) fallback-quot -- c )
     drop [ simd-unbox ] 3dip 3curry make-underlying ; inline
+
+: vn->n-op ( a n rep quot: ( (a) n rep -- n ) fallback-quot -- n )
+    drop [ underlying>> ] 3dip call ; inline
 
 : v->n-op ( a rep quot: ( (a) rep -- n ) fallback-quot -- n )
     drop [ underlying>> ] 2dip call ; inline
@@ -95,9 +98,6 @@ DEFER: simd-construct-op
 PRIVATE>
 >>
 
-DEFER: simd-with
-DEFER: simd-cast
-
 <<
 <PRIVATE
 
@@ -113,8 +113,9 @@ A-with DEFINES       ${T}-with
 A-cast DEFINES       ${T}-cast
 A{     DEFINES       ${T}{
 
-ELT   [ A-rep rep-component-type ]
-N     [ A-rep rep-length ]
+ELT     [ A-rep rep-component-type ]
+N       [ A-rep rep-length ]
+COERCER [ ELT c-type-class "coercer" word-prop [ ] or ]
 
 SET-NTH [ ELT dup c:c-setter c:array-accessor ]
 
@@ -136,8 +137,8 @@ M: A set-nth-unsafe
 
 M: A like drop dup \ A instance? [ >A ] unless ; inline
 
-: A-with ( n -- v ) \ A new simd-with ; inline
-: A-cast ( v -- v' ) \ A new simd-cast ; inline
+: A-with ( n -- v ) COERCER call \ A-rep (simd-with) \ A boa ; inline
+: A-cast ( v -- v' ) underlying>> \ A boa ; inline
 
 ! SIMD vectors as sequences
 
@@ -145,24 +146,7 @@ M: A hashcode* underlying>> hashcode* ; inline
 M: A clone [ clone ] change-underlying ; inline
 M: A length drop N ; inline
 M: A nth-unsafe
-    swap {
-        {  0 [  0 \ A-rep (simd-select) ] }
-        {  1 [  1 \ A-rep (simd-select) ] }
-        {  2 [  2 \ A-rep (simd-select) ] }
-        {  3 [  3 \ A-rep (simd-select) ] }
-        {  4 [  4 \ A-rep (simd-select) ] }
-        {  5 [  5 \ A-rep (simd-select) ] }
-        {  6 [  6 \ A-rep (simd-select) ] }
-        {  7 [  7 \ A-rep (simd-select) ] }
-        {  8 [  8 \ A-rep (simd-select) ] }
-        {  9 [  9 \ A-rep (simd-select) ] }
-        { 10 [ 10 \ A-rep (simd-select) ] }
-        { 11 [ 11 \ A-rep (simd-select) ] }
-        { 12 [ 12 \ A-rep (simd-select) ] }
-        { 13 [ 13 \ A-rep (simd-select) ] }
-        { 14 [ 14 \ A-rep (simd-select) ] }
-        { 15 [ 15 \ A-rep (simd-select) ] }
-    } case ; inline 
+    swap \ A-rep [ (simd-select) ] [ call-next-method ] vn->n-op ; inline
 M: A c:byte-length drop 16 ; inline
 
 M: A new-sequence
@@ -171,7 +155,7 @@ M: A new-sequence
     [ length bad-simd-length ] if ; inline
 
 M: A equal?
-    \ A [ drop v= vall? ] [ 3drop f ] if-both-vectors-match ; inline
+    \ A-rep [ drop v= vall? ] [ 3drop f ] if-both-vectors-match ; inline
 
 ! SIMD primitive operations
 
@@ -205,7 +189,7 @@ M: A vrshift           \ A-rep [ (simd-vrshift)           ] [ call-next-method ]
 M: A hlshift           \ A-rep [ (simd-hlshift)           ] [ call-next-method ] vn->v-op ; inline
 M: A hrshift           \ A-rep [ (simd-hrshift)           ] [ call-next-method ] vn->v-op ; inline
 M: A vshuffle-elements \ A-rep [ (simd-vshuffle-elements) ] [ call-next-method ] vn->v-op ; inline
-M: A vshuffle-bytes    \ A-rep [ (simd-vshuffle-bytes)    ] [ call-next-method ] vv->v-op ; inline
+M: A vshuffle-bytes    \ A-rep [ (simd-vshuffle-bytes)    ] [ call-next-method ] vv'->v-op ; inline
 M: A (vmerge-head)     \ A-rep [ (simd-vmerge-head)       ] [ call-next-method ] vv->v-op ; inline
 M: A (vmerge-tail)     \ A-rep [ (simd-vmerge-tail)       ] [ call-next-method ] vv->v-op ; inline
 M: A v<=               \ A-rep [ (simd-v<=)               ] [ call-next-method ] vv->v-op ; inline
@@ -220,15 +204,15 @@ M: A vnone?            \ A-rep [ (simd-vnone?)            ] [ call-next-method ]
 
 ! SIMD high-level specializations
 
-M: A vbroadcast [ swap nth ] keep simd-with ; inline
-M: A n+v [ simd-with ] keep v+ ; inline
-M: A n-v [ simd-with ] keep v- ; inline
-M: A n*v [ simd-with ] keep v* ; inline
-M: A n/v [ simd-with ] keep v/ ; inline
-M: A v+n over simd-with v+ ; inline
-M: A v-n over simd-with v- ; inline
-M: A v*n over simd-with v* ; inline
-M: A v/n over simd-with v/ ; inline
+M: A vbroadcast swap nth A-with ; inline
+M: A n+v [ A-with ] dip v+ ; inline
+M: A n-v [ A-with ] dip v- ; inline
+M: A n*v [ A-with ] dip v* ; inline
+M: A n/v [ A-with ] dip v/ ; inline
+M: A v+n A-with v+ ; inline
+M: A v-n A-with v- ; inline
+M: A v*n A-with v* ; inline
+M: A v/n A-with v/ ; inline
 M: A norm-sq dup v. assert-positive ; inline
 M: A norm      norm-sq sqrt ; inline
 M: A distance  v- norm ; inline
@@ -236,11 +220,13 @@ M: A distance  v- norm ; inline
 ! M: simd-128 >pprint-sequence ;
 ! M: simd-128 pprint* pprint-object ;
 
-\ A-boa \ A new N {
-    { 2 [ '[ _ [ (simd-gather-2) ] simd-construct-op ] ] }
-    { 4 [ '[ _ [ (simd-gather-4) ] simd-construct-op ] ] }
-    [ swap '[ _ _ nsequence ] ]
-} case BOA-EFFECT define-inline
+\ A-boa
+[ COERCER N napply ] N {
+    { 2 [ [ A-rep (simd-gather-2) A boa ] ] }
+    { 4 [ [ A-rep (simd-gather-4) A boa ] ] }
+    [ \ A new '[ _ _ nsequence ] ]
+} case compose
+BOA-EFFECT define-inline
 
 M: A pprint-delims drop \ A{ \ } ;
 SYNTAX: A{ \ } [ >A ] parse-literal ;
@@ -248,7 +234,7 @@ SYNTAX: A{ \ } [ >A ] parse-literal ;
 c:<c-type>
     byte-array >>class
     A >>boxed-class
-    [ A-rep alien-vector \ A boa ] >>getter
+    [ A-rep alien-vector A boa ] >>getter
     [ [ underlying>> ] 2dip A-rep set-alien-vector ] >>setter
     16 >>size
     16 >>align
@@ -265,21 +251,6 @@ PRIVATE>
 >>
 
 INSTANCE: simd-128 sequence
-
-! SIMD constructors
-
-: simd-with ( n seq -- v )
-    [ (simd-with) ] simd-construct-op ; inline
-
-MACRO: simd-boa ( class -- )
-    new dup length {
-        { 2 [ '[ _ [ (simd-gather-2) ] simd-construct-op ] ] }
-        { 4 [ '[ _ [ (simd-gather-4) ] simd-construct-op ] ] }
-        [ swap '[ _ _ nsequence ] ]
-    } case ;
-
-: simd-cast ( v seq -- v' )
-    [ underlying>> ] dip new-underlying ; inline
 
 ! SIMD instances
 

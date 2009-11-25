@@ -112,8 +112,8 @@ IN: math.vectors.simd.intrinsics
     a rep >rep-array :> a'
     rep <rep-array> :> c'
     elts [| from to |
-        from a' nth-unsafe
-        rep rep-length 1 - bitand
+        from rep rep-length 1 - bitand
+           a' nth-unsafe
         to c' set-nth-unsafe
     ] each-index
     c' underlying>> ; inline
@@ -134,9 +134,12 @@ PRIVATE>
         n 1 + c' set-nth-unsafe
     ] each
     c' underlying>> ;
-: (simd-vs+)               ( a b rep -- c ) dup '[ + _ c-type-clamp ] components-2map ;
-: (simd-vs-)               ( a b rep -- c ) dup '[ - _ c-type-clamp ] components-2map ;
-: (simd-vs*)               ( a b rep -- c ) dup '[ - _ c-type-clamp ] components-2map ;
+: (simd-vs+)               ( a b rep -- c )
+    dup rep-component-type '[ + _ c-type-clamp ] components-2map ;
+: (simd-vs-)               ( a b rep -- c )
+    dup rep-component-type '[ - _ c-type-clamp ] components-2map ;
+: (simd-vs*)               ( a b rep -- c )
+    dup rep-component-type '[ * _ c-type-clamp ] components-2map ;
 : (simd-v*)                ( a b rep -- c ) [ * ] components-2map ;
 : (simd-v/)                ( a b rep -- c ) [ / ] components-2map ;
 : (simd-vmin)              ( a b rep -- c ) [ min ] components-2map ;
@@ -160,9 +163,9 @@ PRIVATE>
 : (simd-vlshift)           ( a n rep -- c ) swap '[ _ shift ] bitwise-components-map ;
 : (simd-vrshift)           ( a n rep -- c ) swap '[ _ neg shift ] bitwise-components-map ;
 : (simd-hlshift)           ( a n rep -- c )
-    drop tail-slice 16 0 pad-tail ;
+    drop head-slice* 16 0 pad-head ;
 : (simd-hrshift)           ( a n rep -- c )
-    drop head-slice 16 0 pad-head ;
+    drop tail-slice 16 0 pad-tail ;
 : (simd-vshuffle-elements) ( a n rep -- c ) [ rep-length 0 pad-tail ] keep (vshuffle) ;
 : (simd-vshuffle-bytes)    ( a b rep -- c ) drop uchar-16-rep (vshuffle) ;
 :: (simd-vmerge-head)      ( a b rep -- c )
@@ -198,17 +201,17 @@ PRIVATE>
 : (simd-vall?)             ( a   rep -- ? ) [ bitand ] bitwise-components-reduce zero? not ;
 : (simd-vnone?)            ( a   rep -- ? ) [ bitor  ] bitwise-components-reduce zero?     ;
 : (simd-v>float)           ( a   rep -- c )
-    [ >rep-array ] [ >float-vector-rep [>rep-array] ] bi call( i -- f ) ;
+    [ >rep-array ] [ >float-vector-rep [>rep-array] ] bi call( i -- f ) underlying>> ;
 : (simd-v>integer)         ( a   rep -- c )
-    [ >rep-array ] [ >int-vector-rep [>rep-array] ] bi call( i -- f ) ;
+    [ >rep-array ] [ >int-vector-rep [>rep-array] ] bi call( i -- f ) underlying>> ;
 : (simd-vpack-signed)      ( a b rep -- c )
     [ 2>rep-array cord-append ]
     [ narrow-vector-rep [ [<rep-array>] ] [ rep-component-type ] bi ] bi
-    '[ _ c-type-clamp ] swap map-as ;
+    '[ _ c-type-clamp ] swap map-as underlying>> ;
 : (simd-vpack-unsigned)    ( a b rep -- c )
     [ 2>rep-array cord-append ]
     [ narrow-vector-rep >uint-vector-rep [ [<rep-array>] ] [ rep-component-type ] bi ] bi
-    '[ _ c-type-clamp ] swap map-as ;
+    '[ _ c-type-clamp ] swap map-as underlying>> ;
 : (simd-vunpack-head)      ( a   rep -- c ) 
     [ >rep-array ] [ widen-vector-rep [ rep-length ] [ [>rep-array] ] bi ] bi
     [ head-slice ] dip call( a' -- c' ) underlying>> ;
@@ -216,7 +219,8 @@ PRIVATE>
     [ >rep-array ] [ widen-vector-rep [ rep-length ] [ [>rep-array] ] bi ] bi
     [ tail-slice ] dip call( a' -- c' ) underlying>> ;
 : (simd-with)              (   n rep -- v )
-    [ rep-length iota swap '[ _ ] ] [ <rep-array> ] bi replicate-as ;
+    [ rep-length iota swap '[ _ ] ] [ <rep-array> ] bi replicate-as 
+    underlying>> ;
 : (simd-gather-2)          ( m n rep -- v ) <rep-array> [ 2 set-firstn ] keep underlying>> ;
 : (simd-gather-4)          ( m n o p rep -- v ) <rep-array> [ 4 set-firstn ] keep underlying>> ;
 : (simd-select)            ( a n rep -- x ) [ swap ] dip >rep-array nth-unsafe ;
