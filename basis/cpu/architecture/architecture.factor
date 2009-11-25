@@ -95,7 +95,7 @@ double-rep
 vector-rep
 scalar-rep ;
 
-: unsign-rep ( rep -- rep' )
+: signed-rep ( rep -- rep' )
     {
         { uint-4-rep           int-4-rep }
         { ulonglong-2-rep      longlong-2-rep }

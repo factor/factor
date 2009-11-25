@@ -650,7 +650,7 @@ M: x86 %fill-vector-reps
     } available-reps ;
 
 ! M:: x86 %broadcast-vector ( dst src rep -- )
-!     rep unsign-rep {
+!     rep signed-rep {
 !         { float-4-rep [
 !             dst src float-4-rep %copy
 !             dst dst { 0 0 0 0 } SHUFPS
@@ -687,7 +687,7 @@ M: x86 %fill-vector-reps
 !     } available-reps ;
 
 M:: x86 %gather-vector-4 ( dst src1 src2 src3 src4 rep -- )
-    rep unsign-rep {
+    rep signed-rep {
         { float-4-rep [
             dst src1 float-4-rep %copy
             dst src2 UNPCKLPS
@@ -710,7 +710,7 @@ M: x86 %gather-vector-4-reps
     } available-reps ;
 
 M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
-    rep unsign-rep {
+    rep signed-rep {
         { double-2-rep [
             dst src1 double-2-rep %copy
             dst src2 MOVLHPS
@@ -763,7 +763,7 @@ M: x86 %gather-vector-2-reps
 
 M:: x86 %shuffle-vector-imm ( dst src shuffle rep -- )
     dst src rep %copy
-    dst shuffle rep unsign-rep {
+    dst shuffle rep signed-rep {
         { double-2-rep [ >float-4-shuffle float-4-shuffle ] }
         { float-4-rep [ float-4-shuffle ] }
         { int-4-rep [ int-4-shuffle ] }
@@ -786,7 +786,7 @@ M: x86 %shuffle-vector-reps
 
 M: x86 %merge-vector-head
     [ two-operand ] keep
-    unsign-rep {
+    signed-rep {
         { double-2-rep   [ MOVLHPS ] }
         { float-4-rep    [ UNPCKLPS ] }
         { longlong-2-rep [ PUNPCKLQDQ ] }
@@ -797,7 +797,7 @@ M: x86 %merge-vector-head
 
 M: x86 %merge-vector-tail
     [ two-operand ] keep
-    unsign-rep {
+    signed-rep {
         { double-2-rep   [ UNPCKHPD ] }
         { float-4-rep    [ UNPCKHPS ] }
         { longlong-2-rep [ PUNPCKHQDQ ] }
@@ -826,7 +826,7 @@ M: x86 %signed-pack-vector-reps
 
 M: x86 %unsigned-pack-vector
     [ two-operand ] keep
-    unsign-rep {
+    signed-rep {
         { int-4-rep   [ PACKUSDW ] }
         { short-8-rep [ PACKUSWB ] }
     } case ;
@@ -896,7 +896,7 @@ M: x86 %float>integer-vector-reps
     } case ;
 
 :: (%compare-int-vector) ( dst src rep int64 int32 int16 int8 -- )
-    rep unsign-rep :> rep'
+    rep signed-rep :> rep'
     dst src rep' {
         { longlong-2-rep [ int64 call ] }
         { int-4-rep      [ int32 call ] }
@@ -1173,7 +1173,7 @@ M: x86 %dot-vector-reps
 
 M: x86 %horizontal-add-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
-    unsign-rep {
+    signed-rep {
         { float-4-rep  [ HADDPS ] }
         { double-2-rep [ HADDPD ] }
         { int-4-rep    [ PHADDD ] }
