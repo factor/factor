@@ -224,15 +224,15 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
       [ index>> bchar ] keep
       lasterror>> bchar
       trial-size ] dip
-    1000000 / /i
-    "%-18s: {batch:%s,index:%s;errchk:%s} %10s docs/s"
+      1000000000 / [ /i ] [ result get batch>> [ [ batch-size /i ] dip ] when /i ] 2bi
+    "%-18s: {batch:%s,index:%s;errchk:%s} %10s docs/s %10s ops/s"
     sprintf print flush ; 
 
 : print-separator ( -- )
-    "----------------------------------------------------------------" print flush ; inline
+    "---------------------------------------------------------------------------------" print flush ; inline
 
 : print-separator-bold ( -- )
-    "================================================================" print flush ; inline
+    "=================================================================================" print flush ; inline
 
 : print-header ( -- )
     trial-size
