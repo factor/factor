@@ -1,72 +1,43 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sequences sorting binary-search math
-math.order arrays combinators kernel ;
+math.order arrays classes combinators kernel functors ;
 IN: sequences.cords
 
-<PRIVATE
+MIXIN: cord
 
-TUPLE: simple-cord
-    { first read-only } { second read-only } ;
+TUPLE: generic-cord
+    { head read-only } { tail read-only } ;
+INSTANCE: generic-cord cord
 
-M: simple-cord length
-    [ first>> length ] [ second>> length ] bi + ; inline
+M: cord length
+    [ head>> length ] [ tail>> length ] bi + ; inline
 
-M: simple-cord virtual-exemplar first>> ; inline
+M: cord virtual-exemplar head>> ; inline
 
-M: simple-cord virtual@
-    2dup first>> length <
-    [ first>> ] [ [ first>> length - ] [ second>> ] bi ] if ; inline
-
-TUPLE: multi-cord
-    { count read-only } { seqs read-only } ;
-
-M: multi-cord length count>> ; inline
-
-M: multi-cord virtual@
-    dupd
-    seqs>> [ first <=> ] with search nip
-    [ first - ] [ second ] bi ; inline
-
-M: multi-cord virtual-exemplar
-    seqs>> [ f ] [ first second ] if-empty ; inline
-
-: <cord> ( seqs -- cord )
-    dup length 2 = [
-        first2 simple-cord boa
-    ] [
-        [ 0 [ length + ] accumulate ] keep zip multi-cord boa
-    ] if ; inline
-
-PRIVATE>
-
-UNION: cord simple-cord multi-cord ;
+M: cord virtual@
+    2dup head>> length <
+    [ head>> ] [ [ head>> length - ] [ tail>> ] bi ] if ; inline
 
 INSTANCE: cord virtual-sequence
 
-INSTANCE: multi-cord virtual-sequence
+GENERIC: cord-append ( seq1 seq2 -- cord )
 
-: cord-append ( seq1 seq2 -- cord )
-    {
-        { [ over empty? ] [ nip ] }
-        { [ dup empty? ] [ drop ] }
-        { [ 2dup [ cord? ] both? ] [ [ seqs>> values ] bi@ append <cord> ] }
-        { [ over cord? ] [ [ seqs>> values ] dip suffix <cord> ] }
-        { [ dup cord? ] [ seqs>> values swap prefix <cord> ] }
-        [ 2array <cord> ]
-    } cond ; inline
+M: object cord-append
+    generic-cord boa ; inline
 
-: cord-concat ( seqs -- cord )
-    {
-        { [ dup empty? ] [ drop f ] }
-        { [ dup length 1 = ] [ first ] }
-        [
-            [
-                {
-                    { [ dup cord? ] [ seqs>> values ] }
-                    { [ dup empty? ] [ drop { } ] }
-                    [ 1array ]
-                } cond
-            ] map concat <cord>
-        ]
-    } cond ; inline
+FUNCTOR: define-specialized-cord ( T C -- )
+
+T-cord DEFINES-CLASS ${C}
+
+WHERE
+
+TUPLE: T-cord
+    { head T read-only } { tail T read-only } ;
+INSTANCE: T-cord cord
+
+M: T cord-append
+    2dup [ T instance? ] both?
+    [ T-cord boa ] [ generic-cord boa ] if ; inline
+
+;FUNCTOR
