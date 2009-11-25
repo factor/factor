@@ -41,6 +41,94 @@ void *factor_vm::word_xt_pic_tail(word *w)
 	return xt_pic(w,w->pic_tail_def);
 }
 
+cell factor_vm::code_block_owner(code_block *compiled)
+{
+	tagged<object> owner(compiled->owner);
+
+	/* Cold generic word call sites point to quotations that call the
+	inline-cache-miss and inline-cache-miss-tail primitives. */
+	if(owner.type_p(QUOTATION_TYPE))
+	{
+		tagged<quotation> quot(owner.as<quotation>());
+		tagged<array> elements(quot->array);
+#ifdef FACTOR_DEBUG
+		assert(array_capacity(elements.untagged()) == 5);
+		assert(array_nth(elements.untagged(),4) == special_objects[PIC_MISS_WORD]
+			|| array_nth(elements.untagged(),4) == special_objects[PIC_MISS_TAIL_WORD]);
+#endif
+		tagged<wrapper> word_wrapper(array_nth(elements.untagged(),0));
+		return word_wrapper->object;
+	}
+	else
+	{
+#ifdef FACTOR_DEBUG
+		assert(owner.type_p(WORD_TYPE));
+#endif
+		return compiled->owner;
+	}
+}
+
+struct word_references_updater {
+	factor_vm *parent;
+
+	word_references_updater(factor_vm *parent_) : parent(parent_) {}
+
+	void operator()(relocation_entry rel, cell index, code_block *compiled)
+	{
+		relocation_type type = rel.rel_type();
+		instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
+
+		switch(type)
+		{
+		case RT_XT:
+			{
+				code_block *compiled = op.load_code_block();
+				op.store_value((cell)parent->object_xt(compiled->owner));
+				break;
+			}
+		case RT_XT_PIC:
+			{
+				code_block *compiled = op.load_code_block();
+				op.store_value((cell)parent->word_xt_pic(untag<word>(parent->code_block_owner(compiled))));
+				break;
+			}
+		case RT_XT_PIC_TAIL:
+			{
+				code_block *compiled = op.load_code_block();
+				op.store_value((cell)parent->word_xt_pic_tail(untag<word>(parent->code_block_owner(compiled))));
+				break;
+			}
+		default:
+			break;
+		}
+	}
+};
+
+/* Relocate new code blocks completely; updating references to literals,
+dlsyms, and words. For all other words in the code heap, we only need
+to update references to other words, without worrying about literals
+or dlsyms. */
+void factor_vm::update_word_references(code_block *compiled)
+{
+	if(code->needs_fixup_p(compiled))
+		relocate_code_block(compiled);
+	/* update_word_references() is always applied to every block in
+	   the code heap. Since it resets all call sites to point to
+	   their canonical XT (cold entry point for non-tail calls,
+	   standard entry point for tail calls), it means that no PICs
+	   are referenced after this is done. So instead of polluting
+	   the code heap with dead PICs that will be freed on the next
+	   GC, we add them to the free list immediately. */
+	else if(compiled->pic_p())
+		code->code_heap_free(compiled);
+	else
+	{
+		word_references_updater updater(this);
+		iterate_relocations(compiled,updater);
+		compiled->flush_icache();
+	}
+}
+
 /* References to undefined symbols are patched up to call this function on
 image load */
 void factor_vm::undefined_symbol()
@@ -144,57 +232,6 @@ cell factor_vm::compute_relocation(relocation_entry rel, cell index, code_block 
 #undef ARG
 }
 
-/* Compute an address to store at a relocation */
-void factor_vm::relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled)
-{
-#ifdef FACTOR_DEBUG
-	if(to_boolean(compiled->literals))
-		tagged<array>(compiled->literals).untag_check(this);
-	if(to_boolean(compiled->relocation))
-		tagged<byte_array>(compiled->relocation).untag_check(this);
-#endif
-
-	instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
-	op.store_value(compute_relocation(rel,index,compiled));
-}
-
-struct word_references_updater {
-	factor_vm *parent;
-
-	explicit word_references_updater(factor_vm *parent_) : parent(parent_) {}
-	void operator()(relocation_entry rel, cell index, code_block *compiled)
-	{
-		relocation_type type = rel.rel_type();
-		if(type == RT_XT || type == RT_XT_PIC || type == RT_XT_PIC_TAIL)
-			parent->relocate_code_block_step(rel,index,compiled);
-	}
-};
-
-/* Relocate new code blocks completely; updating references to literals,
-dlsyms, and words. For all other words in the code heap, we only need
-to update references to other words, without worrying about literals
-or dlsyms. */
-void factor_vm::update_word_references(code_block *compiled)
-{
-	if(code->needs_fixup_p(compiled))
-		relocate_code_block(compiled);
-	/* update_word_references() is always applied to every block in
-	   the code heap. Since it resets all call sites to point to
-	   their canonical XT (cold entry point for non-tail calls,
-	   standard entry point for tail calls), it means that no PICs
-	   are referenced after this is done. So instead of polluting
-	   the code heap with dead PICs that will be freed on the next
-	   GC, we add them to the free list immediately. */
-	else if(compiled->pic_p())
-		code->code_heap_free(compiled);
-	else
-	{
-		word_references_updater updater(this);
-		iterate_relocations(compiled,updater);
-		compiled->flush_icache();
-	}
-}
-
 void factor_vm::check_code_address(cell address)
 {
 #ifdef FACTOR_DEBUG
@@ -209,7 +246,8 @@ struct code_block_relocator {
 
 	void operator()(relocation_entry rel, cell index, code_block *compiled)
 	{
-		parent->relocate_code_block_step(rel,index,compiled);
+		instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
+		op.store_value(parent->compute_relocation(rel,index,compiled));
 	}
 };
 
