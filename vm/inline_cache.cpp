@@ -183,22 +183,17 @@ void *factor_vm::inline_cache_miss(cell return_address_)
 
 	check_code_pointer(return_address.value);
 
-	/* Since each PIC is only referenced from a single call site,
-	   if the old call target was a PIC, we can deallocate it immediately,
-	   instead of leaving dead PICs around until the next GC. */
-	deallocate_inline_cache(return_address.value);
-
 	data_root<array> cache_entries(dpop(),this);
 	fixnum index = untag_fixnum(dpop());
 	data_root<array> methods(dpop(),this);
 	data_root<word> generic_word(dpop(),this);
 	data_root<object> object(((cell *)ds)[-index],this);
 
-	void *xt;
-
 	cell pic_size = inline_cache_size(cache_entries.value());
 
 	update_pic_transitions(pic_size);
+
+	void *xt;
 
 	if(pic_size >= max_pic_size)
 		xt = megamorphic_call_stub(generic_word.value());
@@ -221,13 +216,17 @@ void *factor_vm::inline_cache_miss(cell return_address_)
 	/* Install the new stub. */
 	if(return_address.valid)
 	{
+		/* Since each PIC is only referenced from a single call site,
+		   if the old call target was a PIC, we can deallocate it immediately,
+		   instead of leaving dead PICs around until the next GC. */
+		deallocate_inline_cache(return_address.value);
 		set_call_target(return_address.value,xt);
 
 #ifdef PIC_DEBUG
 		std::cout << "Updated "
-			<< (tail_call_site_p(return_address) ? "tail" : "non-tail")
-			<< " call site 0x" << std::hex << return_address << std::dec
-			<< " with " << std::hex << (cell)xt << std::dec;
+			<< (tail_call_site_p(return_address.value) ? "tail" : "non-tail")
+			<< " call site 0x" << std::hex << return_address.value << std::dec
+			<< " with " << std::hex << (cell)xt << std::dec << "\n";
 #endif
 	}
 
