@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sequences sorting binary-search math
 math.order arrays combinators kernel ;
-IN: cords
+IN: sequences.cords
 
 <PRIVATE
 
