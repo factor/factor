@@ -103,19 +103,6 @@ void factor_vm::update_code_heap_words()
 	iterate_code_heap(updater);
 }
 
-/* After growing the heap, we have to perform a full relocation to update
-references to card and deck arrays. */
-struct code_heap_relocator {
-	factor_vm *parent;
-
-	explicit code_heap_relocator(factor_vm *parent_) : parent(parent_) {}
-
-	void operator()(code_block *block, cell size)
-	{
-		parent->relocate_code_block(block);
-	}
-};
-
 void factor_vm::primitive_modify_code_heap()
 {
 	data_root<array> alist(dpop(),this);

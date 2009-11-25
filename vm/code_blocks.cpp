@@ -127,10 +127,10 @@ cell factor_vm::compute_relocation(relocation_entry rel, cell index, code_block 
 	case RT_HERE:
 	{
 		fixnum arg = untag_fixnum(ARG);
-		return (arg >= 0 ? offset + arg : (cell)(compiled + 1) - arg);
+		return (arg >= 0 ? offset + arg : (cell)compiled->xt() - arg);
 	}
 	case RT_THIS:
-		return (cell)(compiled + 1);
+		return (cell)compiled->xt();
 	case RT_CONTEXT:
 		return (cell)&ctx;
 	case RT_UNTAGGED:
@@ -241,8 +241,8 @@ void factor_vm::fixup_labels(array *labels, code_block *compiled)
 		cell offset = untag_fixnum(array_nth(labels,i + 1));
 		cell target = untag_fixnum(array_nth(labels,i + 2));
 
-		instruction_operand op(rel_class,offset + (cell)(compiled + 1));
-		op.store_value(target + (cell)(compiled + 1));
+		instruction_operand op(rel_class,offset + (cell)compiled->xt());
+		op.store_value(target + (cell)compiled->xt());
 	}
 }
 

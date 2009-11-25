@@ -2,6 +2,21 @@
 
 namespace factor {
 
+void factor_vm::update_fixup_set_for_compaction(mark_bits<code_block> *forwarding_map)
+{
+	std::set<code_block *>::const_iterator iter = code->needs_fixup.begin();
+	std::set<code_block *>::const_iterator end = code->needs_fixup.end();
+
+	std::set<code_block *> new_needs_fixup;
+	for(; iter != end; iter++)
+	{
+		printf("a block needs fixup\n");
+		new_needs_fixup.insert(forwarding_map->forward_block(*iter));
+	}
+
+	code->needs_fixup = new_needs_fixup;
+}
+
 template<typename Block> struct forwarder {
 	mark_bits<Block> *forwarding_map;
 
@@ -85,18 +100,50 @@ struct object_compaction_updater {
 	}
 };
 
-template<typename SlotForwarder> struct code_block_compaction_updater {
+struct relative_address_updater {
 	factor_vm *parent;
-	SlotForwarder slot_forwarder;
+	code_block *old_address;
 
-	explicit code_block_compaction_updater(factor_vm *parent_, SlotForwarder slot_forwarder_) :
-		parent(parent_), slot_forwarder(slot_forwarder_) {}
+	explicit relative_address_updater(factor_vm *parent_, code_block *old_address_) :
+		parent(parent_), old_address(old_address_) {}
+
+	void operator()(relocation_entry rel, cell index, code_block *compiled)
+	{
+		instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
+
+		relocation_type type = rel.rel_type();
+		cell value;
+		if(type == RT_HERE || type == RT_THIS)
+			value = parent->compute_relocation(rel,index,compiled);
+		else
+			value = op.load_value(rel.rel_offset() + (cell)old_address->xt());
+
+		op.store_value(value);
+	}
+};
+
+template<typename SlotForwarder, typename CodeBlockForwarder>
+struct code_block_compaction_updater {
+	factor_vm *parent;
+	slot_visitor<forwarder<object> > slot_forwarder;
+	code_block_visitor<forwarder<code_block> > code_forwarder;
+
+	explicit code_block_compaction_updater(factor_vm *parent_,
+		slot_visitor<forwarder<object> > slot_forwarder_,
+		code_block_visitor<forwarder<code_block> > code_forwarder_) :
+		parent(parent_), slot_forwarder(slot_forwarder_), code_forwarder(code_forwarder_) {}
 
 	void operator()(code_block *old_address, code_block *new_address, cell size)
 	{
 		memmove(new_address,old_address,size);
-		slot_forwarder.visit_referenced_literals(new_address);
-		parent->relocate_code_block(new_address);
+
+		slot_forwarder.visit_code_block_objects(new_address);
+
+		relative_address_updater updater(parent,old_address);
+		parent->iterate_relocations(new_address,updater);
+
+		slot_forwarder.visit_embedded_literals(new_address);
+		code_forwarder.visit_embedded_code_pointers(new_address);
 	}
 };
 
@@ -113,6 +160,8 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p)
 	data_forwarding_map->compute_forwarding();
 	code_forwarding_map->compute_forwarding();
 
+	update_fixup_set_for_compaction(code_forwarding_map);
+
 	slot_visitor<forwarder<object> > slot_forwarder(this,forwarder<object>(data_forwarding_map));
 	code_block_visitor<forwarder<code_block> > code_forwarder(this,forwarder<code_block>(code_forwarding_map));
 
@@ -127,7 +176,7 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p)
 
 	/* Slide everything in the code heap up, and update data and code heap
 	pointers inside code blocks. */
-	code_block_compaction_updater<slot_visitor<forwarder<object> > > code_block_updater(this,slot_forwarder);
+	code_block_compaction_updater<slot_visitor<forwarder<object> >, code_block_visitor<forwarder<code_block> > > code_block_updater(this,slot_forwarder,code_forwarder);
 	standard_sizer<code_block> code_block_sizer;
 	code->allocator->compact(code_block_updater,code_block_sizer);
 
@@ -145,27 +194,38 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p)
 }
 
 struct object_code_block_updater {
-	code_block_visitor<forwarder<code_block> > *visitor;
+	code_block_visitor<forwarder<code_block> > code_forwarder;
 
-	explicit object_code_block_updater(code_block_visitor<forwarder<code_block> > *visitor_) :
-		visitor(visitor_) {}
+	explicit object_code_block_updater(code_block_visitor<forwarder<code_block> > code_forwarder_) :
+		code_forwarder(code_forwarder_) {}
 
 	void operator()(object *obj)
 	{
-		visitor->visit_object_code_block(obj);
+		code_forwarder.visit_object_code_block(obj);
 	}
 };
 
-struct dummy_slot_forwarder {
-	void visit_referenced_literals(code_block *compiled) {}
+struct code_block_grow_heap_updater {
+	factor_vm *parent;
+
+	explicit code_block_grow_heap_updater(factor_vm *parent_) : parent(parent_) {}
+
+	void operator()(code_block *old_address, code_block *new_address, cell size)
+	{
+		memmove(new_address,old_address,size);
+		parent->relocate_code_block(new_address);
+	}
 };
 
-/* Compact just the code heap */
+/* Compact just the code heap, after growing the data heap */
 void factor_vm::collect_compact_code_impl(bool trace_contexts_p)
 {
 	/* Figure out where blocks are going to go */
 	mark_bits<code_block> *code_forwarding_map = &code->allocator->state;
 	code_forwarding_map->compute_forwarding();
+
+	update_fixup_set_for_compaction(code_forwarding_map);
+
 	code_block_visitor<forwarder<code_block> > code_forwarder(this,forwarder<code_block>(code_forwarding_map));
 
 	if(trace_contexts_p)
@@ -175,13 +235,12 @@ void factor_vm::collect_compact_code_impl(bool trace_contexts_p)
 	}
 
 	/* Update code heap references in data heap */
-	object_code_block_updater updater(&code_forwarder);
+	object_code_block_updater updater(code_forwarder);
 	each_object(updater);
 
 	/* Slide everything in the code heap up, and update code heap
 	pointers inside code blocks. */
-	dummy_slot_forwarder slot_forwarder;
-	code_block_compaction_updater<dummy_slot_forwarder> code_block_updater(this,slot_forwarder);
+	code_block_grow_heap_updater code_block_updater(this);
 	standard_sizer<code_block> code_block_sizer;
 	code->allocator->compact(code_block_updater,code_block_sizer);
 
