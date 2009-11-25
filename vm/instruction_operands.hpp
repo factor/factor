@@ -130,10 +130,12 @@ struct instruction_operand {
 	fixnum load_value_masked(cell mask, fixnum shift);
 	fixnum load_value(cell relative_to);
 	fixnum load_value();
+	code_block *load_code_block();
 
 	void store_value_2_2(fixnum value);
 	void store_value_masked(fixnum value, cell mask, fixnum shift);
 	void store_value(fixnum value);
+	void store_code_block(code_block *compiled);
 };
 
 }

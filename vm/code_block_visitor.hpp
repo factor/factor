@@ -78,11 +78,7 @@ struct embedded_code_pointers_visitor {
 		if(type == RT_XT || type == RT_XT_PIC || type == RT_XT_PIC_TAIL)
 		{
 			instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
-			cell literal = op.load_value();
-			code_block *compiled = ((code_block *)literal - 1);
-			compiled = visitor(compiled);
-			literal = (cell)compiled->xt();
-			op.store_value(literal);
+			op.store_code_block(visitor(op.load_code_block()));
 		}
 	}
 };
