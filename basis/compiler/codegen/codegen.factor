@@ -40,7 +40,7 @@ SYMBOL: labels
     V{ } clone calls set ;
 
 : generate-insns ( asm -- code )
-    dup word>> [
+    dup label>> [
         init-generator
         instructions>> [
             [ class insn-counts get inc-at ]
