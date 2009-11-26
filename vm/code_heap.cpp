@@ -113,17 +113,16 @@ void factor_vm::primitive_modify_code_heap()
 		case ARRAY_TYPE:
 			{
 				array *compiled_data = data.as<array>().untagged();
-				cell owner = array_nth(compiled_data,0);
-				cell literals = array_nth(compiled_data,1);
-				cell relocation = array_nth(compiled_data,2);
-				cell labels = array_nth(compiled_data,3);
-				cell code = array_nth(compiled_data,4);
+				cell literals = array_nth(compiled_data,0);
+				cell relocation = array_nth(compiled_data,1);
+				cell labels = array_nth(compiled_data,2);
+				cell code = array_nth(compiled_data,3);
 
 				code_block *compiled = add_code_block(
 					code_block_optimized,
 					code,
 					labels,
-					owner,
+					word.value(),
 					relocation,
 					literals);
 
