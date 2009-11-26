@@ -126,7 +126,7 @@ PRIVATE>
 :: (simd-v+-)              ( a b rep -- c ) 
     a b rep 2>rep-array :> ( a' b' )
     rep <rep-array> :> c'
-    0  rep length 1 -  2 <range> [| n |
+    0  rep rep-length 1 -  2 <range> [| n |
         n     a' nth-unsafe n     b' nth-unsafe -
         n     c' set-nth-unsafe
 
@@ -151,12 +151,12 @@ PRIVATE>
 : (simd-sum)               ( a   rep -- n ) [ + ] components-reduce ;
 : (simd-vabs)              ( a   rep -- c ) [ abs ] components-map ;
 : (simd-vbitand)           ( a b rep -- c ) [ bitand ] bitwise-components-2map ;
-: (simd-vbitandn)          ( a b rep -- c ) [ [ not ] dip bitand ] bitwise-components-2map ;
+: (simd-vbitandn)          ( a b rep -- c ) [ [ bitnot ] dip bitand ] bitwise-components-2map ;
 : (simd-vbitor)            ( a b rep -- c ) [ bitor ] bitwise-components-2map ;
 : (simd-vbitxor)           ( a b rep -- c ) [ bitxor ] bitwise-components-2map ;
 : (simd-vbitnot)           ( a   rep -- c ) [ bitnot ] bitwise-components-map ;
 : (simd-vand)              ( a b rep -- c ) [ bitand ] bitwise-components-2map ;
-: (simd-vandn)             ( a b rep -- c ) [ [ not ] dip bitand ] bitwise-components-2map ;
+: (simd-vandn)             ( a b rep -- c ) [ [ bitnot ] dip bitand ] bitwise-components-2map ;
 : (simd-vor)               ( a b rep -- c ) [ bitor ] bitwise-components-2map ;
 : (simd-vxor)              ( a b rep -- c ) [ bitxor ] bitwise-components-2map ;
 : (simd-vnot)              ( a   rep -- c ) [ bitnot ] bitwise-components-map ;
