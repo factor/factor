@@ -214,8 +214,7 @@ M: A v-n A-with v- ; inline
 M: A v*n A-with v* ; inline
 M: A v/n A-with v/ ; inline
 M: A norm-sq dup v. assert-positive ; inline
-M: A norm      norm-sq sqrt ; inline
-M: A distance  v- norm ; inline
+M: A distance v- norm ; inline
 
 M: A >pprint-sequence ;
 M: A pprint* pprint-object ;
