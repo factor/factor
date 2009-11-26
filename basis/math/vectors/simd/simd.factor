@@ -234,8 +234,8 @@ SYNTAX: A{ \ } [ >A ] parse-literal ;
 c:<c-type>
     byte-array >>class
     A >>boxed-class
-    [ A-rep alien-vector A boa ] >>getter
-    [ [ underlying>> ] 2dip A-rep set-alien-vector ] >>setter
+    { A-rep alien-vector A boa } >quotation >>getter
+    { [ underlying>> ] 2dip A-rep set-alien-vector } >quotation >>setter
     16 >>size
     16 >>align
     A-rep >>rep
