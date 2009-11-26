@@ -87,7 +87,6 @@ ARTICLE: "io.mmap.examples" "Memory-mapped file examples"
 "Normalize a file containing packed quadrupes of floats:"
 { $code
     "USING: kernel io.mmap math.vectors math.vectors.simd" "sequences specialized-arrays ;"
-    "SIMD: float"
     "SPECIALIZED-ARRAY: float-4"
     ""
     "\"mydata.dat\" float-4 ["

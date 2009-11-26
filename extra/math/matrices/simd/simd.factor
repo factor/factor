@@ -4,7 +4,6 @@ math math.combinatorics math.functions math.matrices.simd math.vectors
 math.vectors.simd sequences sequences.private specialized-arrays
 typed ;
 QUALIFIED-WITH: alien.c-types c
-SIMD: c:float
 SPECIALIZED-ARRAY: float-4
 IN: math.matrices.simd
 

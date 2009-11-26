@@ -41,7 +41,6 @@ CONSTANT: b 2
 [ 0 ] [ BIN: 0 bit-count ] unit-test
 [ 1 ] [ BIN: 1 bit-count ] unit-test
 
-SIMD: uint
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: uint-4
 
