@@ -3,7 +3,7 @@
 USING: accessors assocs byte-arrays combinators compiler.cfg.builder
 continuations fry sequences compiler.tree.propagation.info
 cpu.architecture kernel words make math math.intervals
-math.vectors.simd.intrinsics ;
+math.vectors.simd.intrinsics namespaces ;
 IN: compiler.tree.propagation.simd
 
 CONSTANT: vector>vector-intrinsics
@@ -112,9 +112,10 @@ vector>vector-intrinsics [ { byte-array } "default-output-classes" set-word-prop
 : inline-unless-intrinsic ( word -- )
     dup '[
         _ swap over "intrinsic" word-prop
+        "always-inline-simd-intrinsics" get not swap and
         ! word node intrinsic
         [ try-intrinsic [ drop f ] [ def>> ] if ]
-        [ def>> ] if*
+        [ drop def>> ] if*
     ]
     "custom-inlining" set-word-prop ;
 

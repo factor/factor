@@ -247,7 +247,7 @@ IN: compiler.cfg.intrinsics.simd
     ] [ ^^vector>scalar ] bi ;
 
 : ^sum-vector ( src rep -- dst )
-    signed-rep {
+    {
         { float-vector-rep [ ^(sum-vector) ] }
         { int-vector-rep [| src rep |
             src rep ^unpack-vector-head :> head
@@ -290,8 +290,8 @@ IN: compiler.cfg.intrinsics.simd
 
 : emit-simd-vneg ( node -- )
     {
-        { float-vector-rep [ [ ^load-neg-zero-vector ] [ ^^sub-vector ] bi ] }
-        { int-vector-rep   [ [ ^^zero-vector         ] [ ^^sub-vector ] bi ] }
+        { float-vector-rep [ [ ^load-neg-zero-vector swap ] [ ^^sub-vector ] bi ] }
+        { int-vector-rep   [ [ ^^zero-vector         swap ] [ ^^sub-vector ] bi ] }
     } emit-v-vector-op ;
 
 : emit-simd-v+- ( node -- )
