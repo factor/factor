@@ -47,12 +47,20 @@ M: insn rewrite drop f ;
         [ compare-imm-expr? ]
         [ compare-float-unordered-expr? ]
         [ compare-float-ordered-expr? ]
+    } 1|| ;
+
+: general-or-vector-compare-expr? ( insn -- ? )
+    {
+        [ compare-expr? ]
+        [ compare-imm-expr? ]
+        [ compare-float-unordered-expr? ]
+        [ compare-float-ordered-expr? ]
         [ test-vector-expr? ]
     } 1|| ;
 
 : rewrite-boolean-comparison? ( insn -- ? )
     dup ##branch-t? [
-        src1>> vreg>expr general-compare-expr?
+        src1>> vreg>expr general-or-vector-compare-expr?
     ] [ drop f ] if ; inline
  
 : >compare-expr< ( expr -- in1 in2 cc )
