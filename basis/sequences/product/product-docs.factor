@@ -44,6 +44,10 @@ HELP: product-map
 { $description "Calls " { $snippet "quot" } " for every element of the cartesian product of " { $snippet "sequences" } " and collects the results from " { $snippet "quot" } " into an output sequence." }
 { $notes { $snippet "[ ... ] product-map" } " is equivalent to, but more efficient than, " { $snippet "<product-sequence> [ ... ] map" } "." } ;
 
+HELP: product-map-as
+{ $values { "sequences" sequence } { "quot" { $quotation "( sequence -- value )" } } { "exemplar" sequence } { "sequence" sequence } }
+{ $description "Calls " { $snippet "quot" } " for every element of the cartesian product of " { $snippet "sequences" } " and collects the results from " { $snippet "quot" } " into an output sequence the same type as the " { $snippet "exemplar" } " sequence." } ;
+
 HELP: product-each
 { $values { "sequences" sequence } { "quot" { $quotation "( sequence -- )" } } }
 { $description "Calls " { $snippet "quot" } " for every element of the cartesian product of " { $snippet "sequences" } "." }
@@ -57,6 +61,7 @@ ARTICLE: "sequences.product" "Product sequences"
     product-sequence
     <product-sequence>
     product-map
+    product-map-as
     product-each
 } ;
 
