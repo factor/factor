@@ -74,7 +74,6 @@ $nl
 { $code
 """USING: compiler.tree.debugger math.vectors
 math.vectors.simd ;
-SIMD: double
 SYMBOLS: x y ;
 
 [
@@ -86,7 +85,6 @@ SYMBOLS: x y ;
 { $code
 """USING: compiler.tree.debugger kernel.private
 math.vectors math.vectors.simd ;
-SIMD: float
 IN: simd-demo
 
 : interpolate ( v a b -- w )
@@ -100,7 +98,6 @@ $nl
 { $code
 """USING: compiler.tree.debugger hints
 math.vectors math.vectors.simd ;
-SIMD: float
 IN: simd-demo
 
 : interpolate ( v a b -- w )
@@ -116,7 +113,6 @@ $nl
 "In the " { $snippet "interpolate" } " word, there is still a call to the " { $link <tuple-boa> } " primitive, because the return value at the end is being boxed on the heap. In the next example, no memory allocation occurs at all because the SIMD vectors are stored inside a struct class (see " { $link "classes.struct" } "); also note the use of inlining:"
 { $code
 """USING: compiler.tree.debugger math.vectors math.vectors.simd ;
-SIMD: float
 IN: simd-demo
 
 STRUCT: actor
