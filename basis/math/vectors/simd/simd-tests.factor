@@ -120,7 +120,7 @@ CONSTANT: vector-words
     simd-classes [ [ name>> "-boa" append ] [ vocabulary>> ] bi lookup ] map ;
 
 : check-optimizer ( seq quot eq-quot -- failures )
-    '[
+    dup '[
         @
         [ dup [ class ] { } map-as ] dip '[ _ declare @ ]
         {
@@ -128,8 +128,9 @@ CONSTANT: vector-words
             [ "print-checks" get [ [ . ] bi@ ] [ 2drop ] if ]
             [ [ [ call ] dip call ] call( quot quot -- result ) ]
             [ [ [ call ] dip compile-call ] call( quot quot -- result ) ]
+            [ [ t "always-inline-simd-intrinsics" [ [ call ] dip compile-call ] with-variable ] call( quot quot -- result ) ]
         } 2cleave
-        @ not
+        [ drop @ ] [ nip @ ] 3bi and not
     ] filter ; inline
 
 "== Checking -new constructors" print
