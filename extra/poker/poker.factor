@@ -202,8 +202,9 @@ TUPLE: deck
     { cards sequence } ;
 
 : <deck> ( -- deck )
-    RANK_STR SUIT_STR 2array [ concat >ckf ] product-map deck boa ;
+    RANK_STR SUIT_STR 2array [ concat >ckf ] V{ } product-map-as deck boa ;
 
 : shuffle ( deck -- deck )
     [ randomize ] change-cards ;
 
+: draw-card ( deck -- card ) cards>> pop ;
