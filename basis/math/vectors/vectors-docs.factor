@@ -436,7 +436,6 @@ HELP: vshuffle
     { $example
         "USING: alien.c-types combinators math.vectors math.vectors.simd"
         "namespaces prettyprint prettyprint.config ;"
-        "SIMDS: int uchar ;"
         "IN: scratchpad"
         ""
         ": endian-swap ( size -- vector )"
