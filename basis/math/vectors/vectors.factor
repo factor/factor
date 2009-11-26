@@ -199,8 +199,7 @@ M: object v. [ conjugate * ] [ + ] 2map-reduce ;
 GENERIC: norm-sq ( v -- x )
 M: object norm-sq [ absq ] [ + ] map-reduce ;
 
-GENERIC: norm ( v -- x )
-M: object norm norm-sq sqrt ;
+: norm ( v -- x ) norm-sq sqrt ; inline
 
 : normalize ( u -- v ) dup norm v/n ; inline
 
@@ -240,7 +239,7 @@ PRIVATE>
 
 HINTS: M\ object vneg { array } ;
 HINTS: M\ object norm-sq { array } ;
-HINTS: M\ object norm { array } ;
+HINTS: norm { array } ;
 HINTS: M\ object distance { array array } ;
 
 HINTS: M\ object n*v { object array } ;
