@@ -14,5 +14,5 @@ SINGLETON: updater
 
 M: updater errors-changed drop f (error-list-model) get-global set-model ;
 
-[ updater add-error-observer ] "ui.tools.error-list" add-init-hook
+[ updater add-error-observer ] "ui.tools.error-list" add-startup-hook
 

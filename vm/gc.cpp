@@ -8,7 +8,7 @@ gc_event::gc_event(gc_op op_, factor_vm *parent) :
 	cards_scanned(0),
 	decks_scanned(0),
 	code_blocks_scanned(0),
-	start_time(current_micros()),
+	start_time(nano_count()),
 	card_scan_time(0),
 	code_scan_time(0),
 	data_sweep_time(0),
@@ -17,70 +17,70 @@ gc_event::gc_event(gc_op op_, factor_vm *parent) :
 {
 	data_heap_before = parent->data_room();
 	code_heap_before = parent->code_room();
-	start_time = current_micros();
+	start_time = nano_count();
 }
 
 void gc_event::started_card_scan()
 {
-	temp_time = current_micros();
+	temp_time = nano_count();
 }
 
 void gc_event::ended_card_scan(cell cards_scanned_, cell decks_scanned_)
 {
 	cards_scanned += cards_scanned_;
 	decks_scanned += decks_scanned_;
-	card_scan_time = (current_micros() - temp_time);
+	card_scan_time = (nano_count() - temp_time);
 }
 
 void gc_event::started_code_scan()
 {
-	temp_time = current_micros();
+	temp_time = nano_count();
 }
 
 void gc_event::ended_code_scan(cell code_blocks_scanned_)
 {
 	code_blocks_scanned += code_blocks_scanned_;
-	code_scan_time = (current_micros() - temp_time);
+	code_scan_time = (nano_count() - temp_time);
 }
 
 void gc_event::started_data_sweep()
 {
-	temp_time = current_micros();
+	temp_time = nano_count();
 }
 
 void gc_event::ended_data_sweep()
 {
-	data_sweep_time = (current_micros() - temp_time);
+	data_sweep_time = (nano_count() - temp_time);
 }
 
 void gc_event::started_code_sweep()
 {
-	temp_time = current_micros();
+	temp_time = nano_count();
 }
 
 void gc_event::ended_code_sweep()
 {
-	code_sweep_time = (current_micros() - temp_time);
+	code_sweep_time = (nano_count() - temp_time);
 }
 
 void gc_event::started_compaction()
 {
-	temp_time = current_micros();
+	temp_time = nano_count();
 }
 
 void gc_event::ended_compaction()
 {
-	compaction_time = (current_micros() - temp_time);
+	compaction_time = (nano_count() - temp_time);
 }
 
 void gc_event::ended_gc(factor_vm *parent)
 {
 	data_heap_after = parent->data_room();
 	code_heap_after = parent->code_room();
-	total_time = current_micros() - start_time;
+	total_time = nano_count() - start_time;
 }
 
-gc_state::gc_state(gc_op op_, factor_vm *parent) : op(op_), start_time(current_micros())
+gc_state::gc_state(gc_op op_, factor_vm *parent) : op(op_), start_time(nano_count())
 {
 	event = new gc_event(op,parent);
 }

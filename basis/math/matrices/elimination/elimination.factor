@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel locals math math.vectors math.matrices
-namespaces sequences ;
+namespaces sequences fry sorting ;
 IN: math.matrices.elimination
 
 SYMBOL: matrix

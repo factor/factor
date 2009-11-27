@@ -511,8 +511,11 @@ M: bad-executable summary
 \ code-room { } { byte-array } define-primitive
 \ code-room  make-flushable
 
-\ micros { } { integer } define-primitive
-\ micros make-flushable
+\ system-micros { } { integer } define-primitive
+\ system-micros make-flushable
+
+\ nano-count { } { integer } define-primitive
+\ nano-count make-flushable
 
 \ tag { object } { fixnum } define-primitive
 \ tag make-foldable

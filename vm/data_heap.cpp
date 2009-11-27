@@ -166,6 +166,8 @@ the GC. Some types have a binary payload at the end (string, word, DLL) which
 we ignore. */
 cell object::binary_payload_start() const
 {
+	if(free_p()) return 0;
+
 	switch(type())
 	{
 	/* these objects do not refer to other objects at all */

@@ -37,7 +37,7 @@ MEMO:: (cache-font) ( font -- HFONT )
 
 : cache-font ( font -- HFONT ) strip-font-colors (cache-font) ;
 
-[ \ (cache-font) reset-memoized ] "windows.fonts" add-init-hook
+[ \ (cache-font) reset-memoized ] "windows.fonts" add-startup-hook
 
 : TEXTMETRIC>metrics ( TEXTMETRIC -- metrics )
     [ metrics new 0 >>width ] dip {

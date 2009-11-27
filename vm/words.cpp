@@ -23,10 +23,14 @@ word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 	new_word->code = NULL;
 
 	jit_compile_word(new_word.value(),new_word->def,true);
-	update_word_xt(new_word.untagged());
-
 	if(profiling_p)
+	{
+		code_block *profiling_block = compile_profiling_stub(new_word.value());
+		new_word->profiling = profiling_block;
 		relocate_code_block(new_word->profiling);
+	}
+
+	update_word_xt(new_word.untagged());
 
 	return new_word.untagged();
 }
@@ -58,24 +62,10 @@ void factor_vm::primitive_word_xt()
 	}
 }
 
-/* Allocates memory */
-void factor_vm::update_word_xt(word *w_)
+void factor_vm::update_word_xt(word *w)
 {
-	data_root<word> w(w_,this);
-
-	if(profiling_p)
-	{
-		if(!w->profiling)
-		{
-			/* Note: can't do w->profiling = ... since LHS evaluates
-			before RHS, and if RHS does a GC, we will have an
-			invalid pointer on the LHS */
-			code_block *profiling = compile_profiling_stub(w.value());
-			w->profiling = profiling;
-		}
-
+	if(profiling_p && w->profiling)
 		w->xt = w->profiling->xt();
-	}
 	else
 		w->xt = w->code->xt();
 }

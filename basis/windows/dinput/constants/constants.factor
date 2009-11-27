@@ -831,7 +831,7 @@ M: array array-base-type first ;
     define-guid-constants
     define-format-constants ;
 
-[ define-constants ] "windows.dinput.constants" add-init-hook
+[ define-constants ] "windows.dinput.constants" add-startup-hook
 
 : uninitialize ( variable quot -- )
     '[ _ when* f ] change-global ; inline

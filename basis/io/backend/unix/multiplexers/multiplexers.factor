@@ -26,7 +26,7 @@ GENERIC: remove-output-callbacks ( fd mx -- callbacks )
 
 M: mx remove-output-callbacks writes>> delete-at* drop ;
 
-GENERIC: wait-for-events ( ms mx -- )
+GENERIC: wait-for-events ( nanos mx -- )
 
 : input-available ( fd mx -- )
     reads>> delete-at* drop [ resume ] each ;

@@ -5,7 +5,7 @@ USING: alien alien.c-types alien.syntax kernel libc
 sequences continuations byte-arrays strings math namespaces
 system combinators vocabs.loader accessors
 stack-checker macros locals generalizations unix.types
-io vocabs classes.struct unix.time ;
+io vocabs classes.struct unix.time alien.libraries ;
 IN: unix
 
 CONSTANT: PROT_NONE   0
@@ -220,3 +220,4 @@ FUNCTION: int utimes ( char* path, timeval[2] times ) ;
 
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
 
+"librt" "librt.so" "cdecl" add-library

@@ -37,8 +37,21 @@ void factor_vm::set_profiling(bool profiling)
 	for(cell i = 0; i < length; i++)
 	{
 		tagged<word> word(array_nth(words.untagged(),i));
+
+		/* Note: can't do w->profiling = ... since LHS evaluates
+		before RHS, and if RHS does a GC, we will have an
+		invalid pointer on the LHS */
 		if(profiling)
+		{
+			if(!word->profiling)
+			{
+				code_block *profiling_block = compile_profiling_stub(word.value());
+				word->profiling = profiling_block;
+			}
+
 			word->counter = tag_fixnum(0);
+		}
+
 		update_word_xt(word.untagged());
 	}
 

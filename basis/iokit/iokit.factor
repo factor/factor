@@ -1,6 +1,6 @@
 USING: alien.syntax alien.c-types core-foundation
 core-foundation.bundles core-foundation.dictionaries system
-combinators kernel sequences io accessors ;
+combinators kernel sequences io accessors unix.types ;
 IN: iokit
 
 <<
@@ -98,19 +98,6 @@ CONSTANT: kIOBootDeviceSizeKey "IOBootDeviceSize"
 CONSTANT: kOSBuildVersionKey   "OS Build Version"
 
 CONSTANT: kNilOptions 0
-
-TYPEDEF: uint mach_port_t
-TYPEDEF: int kern_return_t
-TYPEDEF: int boolean_t
-TYPEDEF: mach_port_t io_object_t
-TYPEDEF: io_object_t io_iterator_t
-TYPEDEF: io_object_t io_registry_entry_t
-TYPEDEF: io_object_t io_service_t
-TYPEDEF: char[128] io_name_t
-TYPEDEF: char[512] io_string_t
-TYPEDEF: kern_return_t IOReturn
-
-TYPEDEF: uint IOOptionBits
 
 CONSTANT: MACH_PORT_NULL 0
 CONSTANT: KERN_SUCCESS 0

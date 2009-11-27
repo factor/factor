@@ -236,7 +236,7 @@ M: object close-window
 [
     f \ ui-running set-global
     <flag> ui-notify-flag set-global
-] "ui" add-init-hook
+] "ui" add-startup-hook
 
 : with-ui ( quot -- )
     ui-running? [ call( -- ) ] [ '[ init-ui @ ] (with-ui) ] if ;

@@ -1,6 +1,6 @@
 include vm/Config.unix
 PLAF_DLL_OBJS += vm/os-genunix.o vm/os-solaris.o
 CFLAGS += -D_STDC_C99 -Drestrict="" -export-dynamic
-LIBS += -ldl -lsocket -lnsl -lm -R/opt/PM/lib -R/opt/csw/lib \
+LIBS += -ldl -lsocket -lnsl -lm -lrt -R/opt/PM/lib -R/opt/csw/lib \
 	-R/usr/local/lib -R/usr/sfw/lib -R/usr/X11R6/lib \
 	-R/opt/sfw/lib $(X11_UI_LIBS)

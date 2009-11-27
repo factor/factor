@@ -60,6 +60,4 @@ M: thread (serialize) ( obj -- )
 
 [
     H{ } clone \ registered-remote-threads set-global
-] "remote-thread-registry" add-init-hook
-
-
+] "remote-thread-registry" add-startup-hook

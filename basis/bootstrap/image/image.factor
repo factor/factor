@@ -145,7 +145,7 @@ SYMBOL: architecture
 RESET
 
 ! Boot quotation, set in stage1.factor
-USERENV: bootstrap-boot-quot 20
+USERENV: bootstrap-startup-quot 20
 
 ! Bootstrap global namesapce
 USERENV: bootstrap-global 21
