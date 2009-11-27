@@ -1622,8 +1622,8 @@ FUNCTION: HANDLE OpenProcess ( DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD
 ! FUNCTION: QueryDosDeviceW
 ! FUNCTION: QueryInformationJobObject
 ! FUNCTION: QueryMemoryResourceNotification
-! FUNCTION: QueryPerformanceCounter
-! FUNCTION: QueryPerformanceFrequency
+FUNCTION: BOOL QueryPerformanceCounter ( LARGE_INTEGER* lpPerformanceCount ) ;
+FUNCTION: BOOL QueryPerformanceFrequency ( LARGE_INTEGER* lpFrequency ) ;
 ! FUNCTION: QueryWin31IniFilesMappedToRegistry
 ! FUNCTION: QueueUserAPC
 ! FUNCTION: QueueUserWorkItem

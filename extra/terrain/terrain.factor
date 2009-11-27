@@ -56,7 +56,7 @@ TUPLE: terrain-world < game-world
         VELOCITY-MODIFIER-NORMAL >>velocity-modifier ;
 
 M: terrain-world tick-length
-    drop 1000 30 /i ;
+    drop 1000000 30 /i ;
 
 : frustum ( dim -- -x x -y y near far )
     dup first2 min v/n

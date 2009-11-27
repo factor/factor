@@ -18,4 +18,4 @@ M: cache-observer vocabs-changed drop reset-cache ;
 [
     f changed-vocabs set-global
     cache-observer add-vocab-observer
-] "vocabs.cache" add-init-hook
+] "vocabs.cache" add-startup-hook

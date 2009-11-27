@@ -7,12 +7,16 @@ prettyprint sequences xml.syntax xml.writer combinators.short-circuit
 literals splitting ;
 IN: mason.report
 
+: git-link ( id -- link )
+    [ "http://github.com/slavapestov/factor/commit/" prepend ] keep
+    [XML <a href=<->><-></a> XML] ;
+
 : common-report ( -- xml )
     target-os get
     target-cpu get
     short-host-name
     build-dir
-    current-git-id get
+    current-git-id get git-link
     [XML
     <h1>Build report for <->/<-></h1>
     <table>
@@ -67,7 +71,7 @@ IN: mason.report
         benchmark-time-file
         html-help-time-file
     } [
-        dup eval-file milli-seconds>time
+        dup eval-file nanos>time
         [XML <tr><td><-></td><td><-></td></tr> XML]
     ] map [XML <h2>Timings</h2> <table><-></table> XML] ;
 
@@ -82,9 +86,16 @@ IN: mason.report
 
 : benchmarks-table ( assoc -- xml )
     [
-        1000000 /f
+        1,000,000,000 /f
         [XML <tr><td><-></td><td><-></td></tr> XML]
-    ] { } assoc>map [XML <h2>Benchmarks</h2> <table><-></table> XML] ;
+    ] { } assoc>map
+    [XML
+        <h2>Benchmarks</h2>
+        <table>
+            <tr><th>Benchmark</th><th>Time (seconds)</th></tr>
+            <->
+        </table>
+    XML] ;
 
 : successful-report ( -- )
     [

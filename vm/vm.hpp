@@ -117,7 +117,8 @@ struct factor_vm
 
 	// run
 	void primitive_exit();
-	void primitive_micros();
+	void primitive_system_micros();
+	void primitive_nano_count();
 	void primitive_sleep();
 	void primitive_set_slot();
 
@@ -655,6 +656,7 @@ struct factor_vm
 	void init_factor(vm_parameters *p);
 	void pass_args_to_factor(int argc, vm_char **argv);
 	void start_factor(vm_parameters *p);
+	void stop_factor();
 	void start_embedded_factor(vm_parameters *p);
 	void start_standalone_factor(int argc, vm_char **argv);
 	char *factor_eval_string(char *string);
@@ -672,7 +674,6 @@ struct factor_vm
 
 	// os-windows
   #if defined(WINDOWS)
-	void sleep_micros(u64 usec);
 	const vm_char *vm_executable_path();
 	const vm_char *default_image_path();
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);

@@ -10,7 +10,7 @@ IN: images.memory
 
 <PRIVATE
 
-: bitmap-size ( dim -- n ) product "uint" heap-size * ;
+: bitmap-size ( dim -- n ) product uint heap-size * ;
 
 : malloc-bitmap-data ( dim -- alien ) bitmap-size 1 calloc &free ;
 

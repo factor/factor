@@ -1,5 +1,6 @@
 USING: arrays calendar kernel math sequences tools.test
-continuations system math.order threads accessors ;
+continuations system math.order threads accessors
+random ;
 IN: calendar.tests
 
 [ f ] [ 2004 12 32 0   0  0 instant <timestamp> valid-timestamp? ] unit-test
@@ -139,7 +140,7 @@ IN: calendar.tests
 [ +gt+ ] [ 2005 1 1 12 30 0 instant <timestamp>
         2004 1 1 13 30 0 instant <timestamp> <=> ] unit-test
 
-[ t ] [ now timestamp>micros micros - 1000000 < ] unit-test
+[ t ] [ now timestamp>micros system-micros - 1000000 < ] unit-test
 [ t ] [ 0 micros>timestamp unix-1970 = ] unit-test
 [ t ] [ 123456789000000 [ micros>timestamp timestamp>micros ] keep = ] unit-test
 [ t ] [ 123456789123456000 [ micros>timestamp timestamp>micros ] keep = ] unit-test
@@ -170,3 +171,8 @@ IN: calendar.tests
 [ f ] [ now dup midnight eq? ] unit-test
 [ f ] [ now dup easter eq? ] unit-test
 [ f ] [ now dup beginning-of-year eq? ] unit-test
+
+[ t ] [ 1325376000 unix-time>timestamp 2012 <year-gmt> = ] unit-test
+[ t ] [ 1356998399 unix-time>timestamp 2013 <year-gmt> 1 seconds time- = ] unit-test
+
+[ t ] [ 1500000000 random [ unix-time>timestamp timestamp>unix-time ] keep = ] unit-test

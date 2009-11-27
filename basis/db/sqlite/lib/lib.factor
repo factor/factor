@@ -32,14 +32,14 @@ ERROR: sqlite-sql-error < sql-error n string ;
 
 : sqlite-open ( path -- db )
     normalize-path
-    "void*" <c-object>
+    void* <c-object>
     [ sqlite3_open sqlite-check-result ] keep *void* ;
 
 : sqlite-close ( db -- )
     sqlite3_close sqlite-check-result ;
 
 : sqlite-prepare ( db sql -- handle )
-    utf8 encode dup length "void*" <c-object> "void*" <c-object>
+    utf8 encode dup length void* <c-object> void* <c-object>
     [ sqlite3_prepare_v2 sqlite-check-result ] 2keep
     drop *void* ;
 

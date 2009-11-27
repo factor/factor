@@ -3,10 +3,10 @@
 USING: alien.c-types io.binary io.backend io.files
 io.files.types io.buffers io.encodings.utf16n io.ports
 io.backend.windows kernel math splitting fry alien.strings
-windows windows.kernel32 windows.time calendar combinators
-math.functions sequences namespaces make words system
-destructors accessors math.bitwise continuations windows.errors
-arrays byte-arrays generalizations alien.data ;
+windows windows.kernel32 windows.time windows.types calendar
+combinators math.functions sequences namespaces make words
+system destructors accessors math.bitwise continuations
+windows.errors arrays byte-arrays generalizations alien.data ;
 IN: io.files.windows
 
 : open-file ( path access-mode create-mode flags -- handle )
@@ -64,7 +64,7 @@ C: <FileArgs> FileArgs
         [ handle>> handle>> ]
         [ buffer>> ]
         [ buffer>> buffer-length ]
-        [ drop "DWORD" <c-object> ]
+        [ drop DWORD <c-object> ]
         [ FileArgs-overlapped ]
     } cleave <FileArgs> ;
 

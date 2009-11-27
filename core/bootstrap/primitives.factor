@@ -429,10 +429,11 @@ tuple
     { "set-datastack" "kernel" (( ds -- )) }
     { "set-retainstack" "kernel" (( rs -- )) }
     { "set-callstack" "kernel" (( cs -- )) }
-    { "exit" "system" (( n -- )) }
+    { "(exit)" "system" (( n -- )) }
     { "data-room" "memory" (( -- data-room )) }
     { "code-room" "memory" (( -- code-room )) }
-    { "micros" "system" (( -- us )) }
+    { "system-micros" "system" (( -- us )) }
+    { "nano-count" "system" (( -- ns )) }
     { "modify-code-heap" "compiler.units" (( alist -- )) }
     { "(dlopen)" "alien.libraries" (( path -- dll )) }
     { "(dlsym)" "alien.libraries" (( name dll -- alien )) }
@@ -494,7 +495,7 @@ tuple
     { "<tuple>" "classes.tuple.private" (( layout -- tuple )) }
     { "profiling" "tools.profiler.private" (( ? -- )) }
     { "become" "kernel.private" (( old new -- )) }
-    { "(sleep)" "threads.private" (( us -- )) }
+    { "(sleep)" "threads.private" (( nanos -- )) }
     { "<tuple-boa>" "classes.tuple.private" (( ... layout -- tuple )) }
     { "callstack>array" "kernel" (( callstack -- array )) }
     { "innermost-frame-executing" "kernel.private" (( callstack -- obj )) }

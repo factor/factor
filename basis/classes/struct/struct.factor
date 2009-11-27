@@ -278,8 +278,9 @@ M: struct binary-zero? >c-ptr [ 0 = ] all? ;
     slots empty? [ struct-must-have-slots ] when
     class redefine-struct-tuple-class
     slots make-slots dup check-struct-slots :> slot-specs
+    slot-specs offsets-quot call :> unaligned-size
     slot-specs struct-alignment :> alignment
-    slot-specs offsets-quot call alignment align :> size
+    unaligned-size alignment align :> size
 
     class  slot-specs  size  alignment  c-type-for-class :> c-type
 

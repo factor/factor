@@ -22,7 +22,7 @@ char *getenv(char *name);
 #define snprintf _snprintf
 #define snwprintf _snwprintf
 
-s64 current_micros();
+u64 system_micros();
 void c_to_factor_toplevel(cell quot);
 void open_console();
 

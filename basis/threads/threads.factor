@@ -91,11 +91,11 @@ PRIVATE>
     f >>state
     check-registered 2array run-queue push-front ;
 
-: sleep-time ( -- us/f )
+: sleep-time ( -- nanos/f )
     {
         { [ run-queue deque-empty? not ] [ 0 ] }
         { [ sleep-queue heap-empty? ] [ f ] }
-        [ sleep-queue heap-peek nip micros [-] ]
+        [ sleep-queue heap-peek nip nano-count [-] ]
     } cond ;
 
 DEFER: stop
@@ -108,7 +108,7 @@ DEFER: stop
 
 : expire-sleep? ( heap -- ? )
     dup heap-empty?
-    [ drop f ] [ heap-peek nip micros <= ] if ;
+    [ drop f ] [ heap-peek nip nano-count <= ] if ;
 
 : expire-sleep ( thread -- )
     f >>sleep-entry resume ;
@@ -173,7 +173,7 @@ PRIVATE>
 
 : yield ( -- ) [ resume ] f suspend drop ;
 
-GENERIC: sleep-until ( time/f -- )
+GENERIC: sleep-until ( n/f -- )
 
 M: integer sleep-until
     '[ _ schedule-sleep ] "sleep" suspend drop ;
@@ -184,7 +184,7 @@ M: f sleep-until
 GENERIC: sleep ( dt -- )
 
 M: real sleep
-    micros + >integer sleep-until ;
+    >integer nano-count + sleep-until ;
 
 : interrupt ( thread -- )
     dup state>> [
@@ -225,4 +225,4 @@ GENERIC: error-in-thread ( error thread -- )
 
 PRIVATE>
 
-[ init-threads ] "threads" add-init-hook
+[ init-threads ] "threads" add-startup-hook
