@@ -119,7 +119,7 @@ void factor_vm::init_factor(vm_parameters *p)
 	if(p->image_path == NULL)
 		p->image_path = default_image_path();
 
-	srand(current_micros());
+	srand(system_micros());
 	init_ffi();
 	init_stacks(p->ds_size,p->rs_size);
 	init_callbacks(p->callback_size);
@@ -167,7 +167,14 @@ void factor_vm::start_factor(vm_parameters *p)
 	if(p->fep) factorbug();
 
 	nest_stacks(NULL);
-	c_to_factor_toplevel(special_objects[OBJ_BOOT]);
+	c_to_factor_toplevel(special_objects[OBJ_STARTUP_QUOT]);
+	unnest_stacks();
+}
+
+void factor_vm::stop_factor()
+{
+	nest_stacks(NULL);
+	c_to_factor_toplevel(special_objects[OBJ_SHUTDOWN_QUOT]);
 	unnest_stacks();
 }
 

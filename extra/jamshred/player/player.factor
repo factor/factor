@@ -39,9 +39,9 @@ CONSTANT: max-speed 30.0
     >>tunnel to-tunnel-start ;
 
 : update-time ( player -- seconds-passed )
-    millis swap [ last-move>> - 1000 / ] [ (>>last-move) ] 2bi ;
+    system-micros swap [ last-move>> - 1000000 / ] [ (>>last-move) ] 2bi ;
 
-: moved ( player -- ) millis swap (>>last-move) ;
+: moved ( player -- ) system-micros swap (>>last-move) ;
 
 : speed-range ( -- range )
     max-speed [0,b] ;

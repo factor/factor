@@ -294,7 +294,7 @@ AFTER: bunny-world resize-world
     [ sobel>> framebuffer>> ] [ dim>> ] bi resize-framebuffer ;
 
 M: bunny-world pref-dim* drop { 1024 768 } ;
-M: bunny-world tick-length drop 1000 30 /i ;
+M: bunny-world tick-length drop 1000000 30 /i ;
 M: bunny-world wasd-movement-speed drop 1/160. ;
 M: bunny-world wasd-near-plane drop 1/32. ;
 M: bunny-world wasd-far-plane drop 256.0 ;

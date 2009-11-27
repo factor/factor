@@ -6,7 +6,7 @@ TUPLE: game-world < world
     game-loop
     { tick-slice float initial: 0.0 } ;
 
-GENERIC: tick-length ( world -- millis )
+GENERIC: tick-length ( world -- micros )
 
 M: game-world draw*
     swap >>tick-slice relayout-1 yield ;

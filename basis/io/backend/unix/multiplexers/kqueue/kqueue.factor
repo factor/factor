@@ -73,6 +73,6 @@ M: kqueue-mx remove-output-callbacks ( fd mx -- seq )
     [ dup events>> ] dip head-slice
     [ handle-kevent ] with each ;
 
-M: kqueue-mx wait-for-events ( us mx -- )
+M: kqueue-mx wait-for-events ( nanos mx -- )
     swap dup [ make-timespec ] when
     dupd wait-kevent handle-kevents ;

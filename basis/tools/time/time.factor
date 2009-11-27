@@ -5,10 +5,10 @@ tools.dispatch ;
 IN: tools.time
 
 : benchmark ( quot -- runtime )
-    micros [ call micros ] dip - ; inline
+    nano-count [ call nano-count ] dip - ; inline
 
 : time. ( time -- )
-    "Running time: " write 1000000 /f pprint " seconds" print ;
+    "Running time: " write 1000000000 /f pprint " seconds" print ;
 
 : time-banner. ( -- )
     "Additional information was collected." print

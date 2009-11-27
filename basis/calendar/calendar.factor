@@ -17,6 +17,8 @@ TUPLE: duration
 
 C: <duration> duration
 
+: instant ( -- duration ) 0 0 0 0 0 0 <duration> ;
+
 TUPLE: timestamp
     { year integer }
     { month integer }
@@ -33,6 +35,15 @@ C: <timestamp> timestamp
 
 : <date> ( year month day -- timestamp )
     0 0 0 gmt-offset-duration <timestamp> ;
+
+: <date-gmt> ( year month day -- timestamp )
+    0 0 0 instant <timestamp> ;
+
+: <year> ( year -- timestamp )
+    1 1 <date> ;
+
+: <year-gmt> ( year -- timestamp )
+    1 1 <date-gmt> ;
 
 ERROR: not-a-month ;
 M: not-a-month summary
@@ -132,8 +143,7 @@ GENERIC: easter ( obj -- obj' )
     32 2 e * + 2 i * + h - k - 7 mod :> l
     a 11 h * + 22 l * + 451 /i :> m
 
-    h l + 7 m * - 114 + 31 /mod 1 + :> ( month day )
-    month day ;
+    h l + 7 m * - 114 + 31 /mod 1 + ;
 
 M: integer easter ( year -- timestamp )
     dup easter-month-day <date> ;
@@ -149,7 +159,6 @@ M: timestamp easter ( timestamp -- timestamp )
 : >time< ( timestamp -- hour minute second )
     [ hour>> ] [ minute>> ] [ second>> ] tri ;
 
-: instant ( -- duration ) 0 0 0 0 0 0 <duration> ;
 : years ( x -- duration ) instant clone swap >>year ;
 : months ( x -- duration ) instant clone swap >>month ;
 : days ( x -- duration ) instant clone swap >>day ;
@@ -376,7 +385,7 @@ M: duration time-
 
 : gmt ( -- timestamp )
     #! GMT time, right now
-    unix-1970 micros microseconds time+ ;
+    unix-1970 system-micros microseconds time+ ;
 
 : now ( -- timestamp ) gmt >local-time ;
 : hence ( duration -- timestamp ) now swap time+ ;
@@ -429,6 +438,9 @@ M: timestamp day-name day-of-week day-names nth ;
 
 : beginning-of-month ( timestamp -- new-timestamp )
     midnight 1 >>day ;
+
+: end-of-month ( timestamp -- new-timestamp )
+    [ midnight ] [ days-in-month ] bi >>day ;
 
 <PRIVATE
 
@@ -522,8 +534,13 @@ M: timestamp december clone 12 >>month ;
 : beginning-of-week ( timestamp -- new-timestamp )
     midnight sunday ;
 
-: beginning-of-year ( timestamp -- new-timestamp )
-    beginning-of-month 1 >>month ;
+GENERIC: beginning-of-year ( object -- new-timestamp )
+M: timestamp beginning-of-year beginning-of-month 1 >>month ;
+M: integer beginning-of-year <year> ;
+
+GENERIC: end-of-year ( object -- new-timestamp )
+M: timestamp end-of-year 12 >>month 31 >>day ;
+M: integer end-of-year 12 31 <date> ;
 
 : time-since-midnight ( timestamp -- duration )
     dup midnight time- ;
@@ -531,9 +548,13 @@ M: timestamp december clone 12 >>month ;
 : since-1970 ( duration -- timestamp )
     unix-1970 time+ >local-time ;
 
-M: timestamp sleep-until timestamp>micros sleep-until ;
+: timestamp>unix-time ( timestamp -- seconds )
+    unix-1970 time- second>> ;
 
-M: duration sleep hence sleep-until ;
+: unix-time>timestamp ( seconds -- timestamp )
+    seconds unix-1970 time+ ;
+
+M: duration sleep duration>nanoseconds nano-count + sleep-until ;
 
 {
     { [ os unix? ] [ "calendar.unix" ] }

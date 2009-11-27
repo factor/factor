@@ -174,7 +174,7 @@ HELP: hand-last-button
 { $var-description "Global variable. The mouse button most recently pressed." } ;
 
 HELP: hand-last-time
-{ $var-description "Global variable. The timestamp of the most recent mouse button click. This timestamp has the same format as the output value of " { $link micros } "." } ;
+{ $var-description "Global variable. The timestamp of the most recent mouse button click. This timestamp has the same format as the output value of " { $link system-micros } "." } ;
 
 HELP: hand-buttons
 { $var-description "Global variable. A vector of mouse buttons currently held down." } ;

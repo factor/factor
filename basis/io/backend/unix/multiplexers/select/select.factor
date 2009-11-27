@@ -48,9 +48,9 @@ TUPLE: select-mx < mx read-fdset write-fdset ;
     [ write-fdset/tasks [ init-fdset ] keep ] tri
     f ;
 
-M:: select-mx wait-for-events ( us mx -- )
+M:: select-mx wait-for-events ( nanos mx -- )
     mx
-    [ init-fdsets us dup [ make-timeval ] when select multiplexer-error drop ]
+    [ init-fdsets nanos 1000 /i dup [ make-timeval ] when select multiplexer-error drop ]
     [ [ read-fdset/tasks ] keep [ input-available ] check-fdset ]
     [ [ write-fdset/tasks ] keep [ output-available ] check-fdset ]
     tri ;

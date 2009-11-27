@@ -40,16 +40,29 @@ factor_vm *tls_vm()
 
 static void *null_dll;
 
-s64 current_micros()
+u64 system_micros()
 {
 	struct timeval t;
 	gettimeofday(&t,NULL);
-	return (s64)t.tv_sec * 1000000 + t.tv_usec;
+	return (u64)t.tv_sec * 1000000 + t.tv_usec;
 }
 
-void sleep_micros(cell usec)
+void sleep_nanos(u64 nsec)
 {
-	usleep(usec);
+	timespec ts;
+	timespec ts_rem;
+	int ret;
+	ts.tv_sec = nsec / 1000000000;
+	ts.tv_nsec = nsec % 1000000000;
+	ret = nanosleep(&ts,&ts_rem);
+	while(ret == -1 && errno == EINTR)
+	{
+		memcpy(&ts, &ts_rem, sizeof(ts));
+		ret = nanosleep(&ts, &ts_rem);
+	}
+
+	if(ret == -1)
+		fatal_error("nanosleep failed", 0);
 }
 
 void factor_vm::init_ffi()

@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private io
 threads.private continuations init quotations strings
-assocs heaps boxes namespaces deques dlists ;
+assocs heaps boxes namespaces deques dlists system ;
 IN: threads
 
 ARTICLE: "threads-start/stop" "Starting and stopping threads"
@@ -16,7 +16,7 @@ ARTICLE: "threads-start/stop" "Starting and stopping threads"
 }
 "Threads stop either when the quotation given to " { $link spawn } " returns, or when the following word is called:"
 { $subsections stop }
-"If the image is saved and started again, all runnable threads are stopped. Vocabularies wishing to have a background thread always running should use " { $link add-init-hook } "." ;
+"If the image is saved and started again, all runnable threads are stopped. Vocabularies wishing to have a background thread always running should use " { $link add-startup-hook } "." ;
 
 ARTICLE: "threads-yield" "Yielding and suspending threads"
 "Yielding to other threads:"
@@ -113,8 +113,8 @@ HELP: sleep-queue
 { $var-description "A " { $link min-heap } " storing the queue of sleeping threads." } ;
 
 HELP: sleep-time
-{ $values { "us/f" "a non-negative integer or " { $link f } } }
-{ $description "Outputs the time until the next sleeping thread is scheduled to wake up, which could be zero if there are threads in the run queue, or threads which need to wake up right now. If there are no runnable or sleeping threads, outputs " { $link f } "." } ;
+{ $values { "nanos/f" "a non-negative integer or " { $link f } } }
+{ $description "Returns the time until the next sleeping thread is scheduled to wake up, which could be zero if there are threads in the run queue, or threads which need to wake up right now. If there are no runnable or sleeping threads, returns " { $link f } "." } ;
 
 HELP: stop
 { $description "Stops the current thread. The thread may be started again from another thread using " { $link (spawn) } "." } ;
@@ -123,8 +123,8 @@ HELP: yield
 { $description "Adds the current thread to the end of the run queue, and switches to the next runnable thread." } ;
 
 HELP: sleep-until
-{ $values { "time/f" "a non-negative integer or " { $link f } } }
-{ $description "Suspends the current thread until the given time, or indefinitely if a value of " { $link f } " is passed in."
+{ $values { "n/f" "a non-negative integer or " { $link f } } }
+{ $description "Suspends the current thread until the given nanosecond count, returned by " { $link nano-count } ", is reached, or indefinitely if a value of " { $link f } " is passed in."
 $nl
 "Other threads may interrupt the sleep by calling " { $link interrupt } "." } ;
 
