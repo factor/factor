@@ -135,9 +135,7 @@ struct literal_references_visitor {
 		if(rel.rel_type() == RT_IMMEDIATE)
 		{
 			instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
-			cell literal = op.load_value();
-			literal = visitor->visit_pointer(literal);
-			op.store_value(literal);
+			op.store_value(visitor->visit_pointer(op.load_value()));
 		}
 	}
 };

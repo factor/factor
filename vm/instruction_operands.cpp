@@ -55,9 +55,14 @@ fixnum instruction_operand::load_value()
 	return load_value(pointer);
 }
 
+code_block *instruction_operand::load_code_block(cell relative_to)
+{
+	return ((code_block *)load_value(relative_to) - 1);
+}
+
 code_block *instruction_operand::load_code_block()
 {
-	return ((code_block *)load_value() - 1);
+	return load_code_block(pointer);
 }
 
 /* Store a 32-bit value into a PowerPC LIS/ORI sequence */
