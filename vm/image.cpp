@@ -183,7 +183,7 @@ struct code_block_updater {
 		array *literals = (parent->to_boolean(compiled->literals)
 			? untag<array>(compiled->literals) : NULL);
 
-		cell old_offset = (cell)compiled - code_offset;
+		cell old_offset = (cell)rel.rel_offset() + (cell)compiled->xt() - code_offset;
 
 		switch(type)
 		{
@@ -212,6 +212,7 @@ struct code_block_updater {
 			break;
 		case RT_UNTAGGED:
 			op.store_value(untag_fixnum(array_nth(literals,index)));
+			break;
 		case RT_MEGAMORPHIC_CACHE_HITS:
 			op.store_value((cell)&parent->dispatch_stats.megamorphic_cache_hits);
 			break;
