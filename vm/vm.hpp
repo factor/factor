@@ -500,14 +500,17 @@ struct factor_vm
 	void primitive_fclose();
 
 	//code_block
-	void *object_xt(cell obj);
-	void *xt_pic(word *w, cell tagged_quot);
-	void *word_xt_pic(word *w);
-	void *word_xt_pic_tail(word *w);
-	cell code_block_owner(code_block *compiled);
+	cell compute_primitive_relocation(cell arg);
 	void undefined_symbol();
-	void *get_rel_symbol(array *literals, cell index);
-	cell compute_relocation(relocation_entry rel, cell index, code_block *compiled);
+	cell compute_dlsym_relocation(array *literals, cell index);
+	cell compute_xt_relocation(cell obj);
+	cell compute_xt_pic_relocation(word *w, cell tagged_quot);
+	cell compute_xt_pic_relocation(cell w_);
+	cell compute_xt_pic_tail_relocation(cell w_);
+	cell compute_here_relocation(cell arg, cell offset, code_block *compiled);
+	cell compute_context_relocation();
+	cell compute_vm_relocation(cell arg);
+	cell code_block_owner(code_block *compiled);
 
 	template<typename Iterator> void iterate_relocations(code_block *compiled, Iterator &iter)
 	{
@@ -528,6 +531,7 @@ struct factor_vm
 	}
 
 	void update_word_references(code_block *compiled);
+	cell compute_relocation(relocation_entry rel, cell index, code_block *compiled);
 	void check_code_address(cell address);
 	void relocate_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
@@ -567,16 +571,8 @@ struct factor_vm
 	bool save_image(const vm_char *filename);
 	void primitive_save_image();
 	void primitive_save_image_and_exit();
-	void data_fixup(cell *handle, cell data_relocation_base);
-	template<typename Type> void code_fixup(Type **handle, cell code_relocation_base);
-	void fixup_word(word *word, cell code_relocation_base);
-	void fixup_quotation(quotation *quot, cell code_relocation_base);
-	void fixup_alien(alien *d);
-	void fixup_callstack_object(callstack *stack, cell code_relocation_base);
-	void relocate_object(object *object, cell data_relocation_base, cell code_relocation_base);
-	void relocate_data(cell data_relocation_base, cell code_relocation_base);
-	void fixup_code_block(code_block *compiled, cell data_relocation_base);
-	void relocate_code(cell data_relocation_base);
+	void fixup_data(cell data_offset, cell code_offset);
+	void fixup_code(cell data_offset, cell code_offset);
 	void load_image(vm_parameters *p);
 
 	//callstack
