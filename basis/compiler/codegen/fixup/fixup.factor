@@ -4,7 +4,7 @@ USING: arrays byte-arrays byte-vectors generic assocs hashtables
 io.binary kernel kernel.private math namespaces make sequences
 words quotations strings alien.accessors alien.strings layouts
 system combinators math.bitwise math.order
-accessors growable fry generalizations compiler.constants ;
+accessors growable fry compiler.constants ;
 IN: compiler.codegen.fixup
 
 ! Owner
@@ -114,8 +114,7 @@ SYMBOL: relocation-table
         init-fixup
         @
         label-table [ resolve-labels ] change
-        compiling-word get
         literal-table get >array
         relocation-table get >byte-array
         label-table get
-    ] B{ } make 5 narray ; inline
+    ] B{ } make 4array ; inline
