@@ -5,7 +5,7 @@
 USING: accessors arrays ascii assocs binary-search combinators
 fry kernel locals math math.bitwise math.combinatorics
 math.order math.statistics poker.arrays random sequences
-sequences.product splitting grouping lexer ;
+sequences.product splitting grouping lexer strings ;
 IN: poker
 
 ! The algorithm used is based on Cactus Kev's Poker Hand Evaluator with
@@ -110,9 +110,11 @@ CONSTANT: VALUE_STR { "Straight Flush" "Four of a Kind" "Full House" "Flush"
 :: (>ckf) ( rank suit -- n )
     rank rank suit rank card-bitfield ;
 
-: >ckf ( string -- n )
-    #! Cactus Kev Format
-    >upper 1 cut (>ckf) ;
+#! Cactus Kev Format
+GENERIC: >ckf ( string -- n )
+
+M: string >ckf >upper 1 cut (>ckf) ;
+M: integer >ckf ;
 
 : parse-cards ( string -- seq )
     " " split [ >ckf ] map ;
