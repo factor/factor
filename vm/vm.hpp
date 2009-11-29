@@ -531,7 +531,6 @@ struct factor_vm
 	}
 
 	void update_word_references(code_block *compiled);
-	cell compute_relocation(relocation_entry rel, cell index, code_block *compiled);
 	void check_code_address(cell address);
 	void relocate_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
