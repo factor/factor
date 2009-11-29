@@ -145,10 +145,10 @@ cell factor_vm::code_block_owner(code_block *compiled)
 	}
 }
 
-struct word_references_updater {
+struct update_word_references_relocation_visitor {
 	factor_vm *parent;
 
-	word_references_updater(factor_vm *parent_) : parent(parent_) {}
+	explicit update_word_references_relocation_visitor(factor_vm *parent_) : parent(parent_) {}
 
 	void operator()(relocation_entry rel, cell index, code_block *compiled)
 	{
@@ -200,55 +200,10 @@ void factor_vm::update_word_references(code_block *compiled)
 		code->code_heap_free(compiled);
 	else
 	{
-		word_references_updater updater(this);
-		iterate_relocations(compiled,updater);
+		update_word_references_relocation_visitor visitor(this);
+		iterate_relocations(compiled,visitor);
 		compiled->flush_icache();
 	}
-}
-
-cell factor_vm::compute_relocation(relocation_entry rel, cell index, code_block *compiled)
-{
-	array *literals = (to_boolean(compiled->literals)
-		? untag<array>(compiled->literals) : NULL);
-
-#define ARG array_nth(literals,index)
-
-	switch(rel.rel_type())
-	{
-	case RT_PRIMITIVE:
-		return compute_primitive_relocation(ARG);
-	case RT_DLSYM:
-		return compute_dlsym_relocation(literals,index);
-	case RT_IMMEDIATE:
-		return ARG;
-	case RT_XT:
-		return compute_xt_relocation(ARG);
-	case RT_XT_PIC:
-		return compute_xt_pic_relocation(ARG);
-	case RT_XT_PIC_TAIL:
-		return compute_xt_pic_tail_relocation(ARG);
-	case RT_HERE:
-		return compute_here_relocation(ARG,rel.rel_offset(),compiled);
-	case RT_THIS:
-		return (cell)compiled->xt();
-	case RT_CONTEXT:
-		return compute_context_relocation();
-	case RT_UNTAGGED:
-		return untag_fixnum(ARG);
-	case RT_MEGAMORPHIC_CACHE_HITS:
-		return (cell)&dispatch_stats.megamorphic_cache_hits;
-	case RT_VM:
-		return compute_vm_relocation(ARG);
-	case RT_CARDS_OFFSET:
-		return cards_offset;
-	case RT_DECKS_OFFSET:
-		return decks_offset;
-	default:
-		critical_error("Bad rel type",rel.rel_type());
-		return 0; /* Can't happen */
-	}
-
-#undef ARG
 }
 
 void factor_vm::check_code_address(cell address)
@@ -258,15 +213,65 @@ void factor_vm::check_code_address(cell address)
 #endif
 }
 
-struct code_block_relocator {
+struct relocate_code_block_relocation_visitor {
 	factor_vm *parent;
 
-	explicit code_block_relocator(factor_vm *parent_) : parent(parent_) {}
+	explicit relocate_code_block_relocation_visitor(factor_vm *parent_) : parent(parent_) {}
 
 	void operator()(relocation_entry rel, cell index, code_block *compiled)
 	{
 		instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
-		op.store_value(parent->compute_relocation(rel,index,compiled));
+		array *literals = (parent->to_boolean(compiled->literals)
+			? untag<array>(compiled->literals) : NULL);
+
+		switch(rel.rel_type())
+		{
+		case RT_PRIMITIVE:
+			op.store_value(parent->compute_primitive_relocation(array_nth(literals,index)));
+			break;
+		case RT_DLSYM:
+			op.store_value(parent->compute_dlsym_relocation(literals,index));
+			break;
+		case RT_IMMEDIATE:
+			op.store_value(array_nth(literals,index));
+			break;
+		case RT_XT:
+			op.store_value(parent->compute_xt_relocation(array_nth(literals,index)));
+			break;
+		case RT_XT_PIC:
+			op.store_value(parent->compute_xt_pic_relocation(array_nth(literals,index)));
+			break;
+		case RT_XT_PIC_TAIL:
+			op.store_value(parent->compute_xt_pic_tail_relocation(array_nth(literals,index)));
+			break;
+		case RT_HERE:
+			op.store_value(parent->compute_here_relocation(array_nth(literals,index),rel.rel_offset(),compiled));
+			break;
+		case RT_THIS:
+			op.store_value((cell)compiled->xt());
+			break;
+		case RT_CONTEXT:
+			op.store_value(parent->compute_context_relocation());
+			break;
+		case RT_UNTAGGED:
+			op.store_value(untag_fixnum(array_nth(literals,index)));
+			break;
+		case RT_MEGAMORPHIC_CACHE_HITS:
+			op.store_value((cell)&parent->dispatch_stats.megamorphic_cache_hits);
+			break;
+		case RT_VM:
+			op.store_value(parent->compute_vm_relocation(array_nth(literals,index)));
+			break;
+		case RT_CARDS_OFFSET:
+			op.store_value(parent->cards_offset);
+			break;
+		case RT_DECKS_OFFSET:
+			op.store_value(parent->decks_offset);
+			break;
+		default:
+			critical_error("Bad rel type",rel.rel_type());
+			break;
+		}
 	}
 };
 
@@ -274,8 +279,8 @@ struct code_block_relocator {
 void factor_vm::relocate_code_block(code_block *compiled)
 {
 	code->needs_fixup.erase(compiled);
-	code_block_relocator relocator(this);
-	iterate_relocations(compiled,relocator);
+	relocate_code_block_relocation_visitor visitor(this);
+	iterate_relocations(compiled,visitor);
 	compiled->flush_icache();
 }
 

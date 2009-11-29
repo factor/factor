@@ -163,13 +163,13 @@ void factor_vm::fixup_data(cell data_offset, cell code_offset)
 	data->tenured->iterate(fixupper,sizer);
 }
 
-struct code_block_updater {
+struct code_block_fixup_relocation_visitor {
 	factor_vm *parent;
 	cell code_offset;
 	slot_visitor<data_fixupper> data_visitor;
 	code_fixupper code_visitor;
 
-	code_block_updater(factor_vm *parent_, cell data_offset_, cell code_offset_) :
+	code_block_fixup_relocation_visitor(factor_vm *parent_, cell data_offset_, cell code_offset_) :
 		parent(parent_),
 		code_offset(code_offset_),
 		data_visitor(slot_visitor<data_fixupper>(parent_,data_fixupper(data_offset_))),
@@ -247,8 +247,8 @@ struct code_block_fixupper {
 		slot_visitor<data_fixupper> data_visitor(parent,data_fixupper(data_offset));
 		data_visitor.visit_code_block_objects(compiled);
 
-		code_block_updater updater(parent,data_offset,code_offset);
-		parent->iterate_relocations(compiled,updater);
+		code_block_fixup_relocation_visitor code_visitor(parent,data_offset,code_offset);
+		parent->iterate_relocations(compiled,code_visitor);
 	}
 };
 

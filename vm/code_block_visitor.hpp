@@ -8,11 +8,18 @@ template<typename Visitor> struct code_block_visitor {
 	explicit code_block_visitor(factor_vm *parent_, Visitor visitor_) :
 		parent(parent_), visitor(visitor_) {}
 
+	code_block *visit_code_block(code_block *compiled);
 	void visit_object_code_block(object *obj);
 	void visit_embedded_code_pointers(code_block *compiled);
 	void visit_context_code_blocks();
 	void visit_callback_code_blocks();
 };
+
+template<typename Visitor>
+code_block *code_block_visitor<Visitor>::visit_code_block(code_block *compiled)
+{
+	return visitor(compiled);
+}
 
 template<typename Visitor>
 struct call_frame_code_block_visitor {
