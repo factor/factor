@@ -1,9 +1,11 @@
 ! Copyright (c) 2009 Aaron Schaefer. All rights reserved.
+! Copyright (c) 2009 Doug Coleman.
 ! The contents of this file are licensed under the Simplified BSD License
 ! A copy of the license is available at http://factorcode.org/license.txt
-USING: accessors arrays ascii binary-search combinators kernel locals math
-    math.bitwise math.combinatorics math.order poker.arrays random sequences
-    sequences.product splitting ;
+USING: accessors arrays ascii assocs binary-search combinators
+fry kernel locals math math.bitwise math.combinatorics
+math.order math.statistics poker.arrays random sequences
+sequences.product splitting grouping lexer ;
 IN: poker
 
 ! The algorithm used is based on Cactus Kev's Poker Hand Evaluator with
@@ -108,11 +110,11 @@ CONSTANT: VALUE_STR { "Straight Flush" "Four of a Kind" "Full House" "Flush"
 :: (>ckf) ( rank suit -- n )
     rank rank suit rank card-bitfield ;
 
-: >ckf ( str -- n )
+: >ckf ( string -- n )
     #! Cactus Kev Format
     >upper 1 cut (>ckf) ;
 
-: parse-cards ( str -- seq )
+: parse-cards ( string -- seq )
     " " split [ >ckf ] map ;
 
 : flush? ( cards -- ? )
@@ -148,10 +150,10 @@ CONSTANT: VALUE_STR { "Straight Flush" "Four of a Kind" "Full House" "Flush"
         ] if
     ] if ;
 
-: >card-rank ( card -- str )
+: >card-rank ( card -- string )
     -8 shift HEX: F bitand RANK_STR nth ;
 
-: >card-suit ( card -- str )
+: >card-suit ( card -- string )
     {
         { [ dup 15 bit? ] [ drop "C" ] }
         { [ dup 14 bit? ] [ drop "D" ] }
@@ -159,7 +161,7 @@ CONSTANT: VALUE_STR { "Straight Flush" "Four of a Kind" "Full House" "Flush"
         [ drop "S" ]
     } cond ;
 
-: hand-rank ( value -- rank )
+: value>rank ( value -- rank )
     {
         { [ dup 6185 > ] [ drop HIGH_CARD ] }        ! 1277 high card
         { [ dup 3325 > ] [ drop ONE_PAIR ] }         ! 2860 one pair
@@ -172,39 +174,92 @@ CONSTANT: VALUE_STR { "Straight Flush" "Four of a Kind" "Full House" "Flush"
         [ drop STRAIGHT_FLUSH ]                      !   10 straight-flushes
     } cond ;
 
-: card>string ( card -- str )
+: card>string ( n -- string )
     [ >card-rank ] [ >card-suit ] bi append ;
 
 PRIVATE>
 
-TUPLE: hand
-    { cards sequence }
-    { value integer initial: 9999 } ;
-
-M: hand <=> [ value>> ] compare ;
-M: hand equal?
-    over hand? [ [ value>> ] bi@ = ] [ 2drop f ] if ;
-
-: <hand> ( str -- hand )
-    parse-cards dup hand-value hand boa ;
-
-: best-hand ( str -- hand )
-    parse-cards 5 hand new
-    [ dup hand-value hand boa min ] reduce-combinations ;
-
-: >cards ( hand -- str )
-    cards>> [ card>string ] map " " join ;
-
-: >value ( hand -- str )
-    value>> hand-rank VALUE_STR nth ;
-
-TUPLE: deck
-    { cards sequence } ;
-
 : <deck> ( -- deck )
-    RANK_STR SUIT_STR 2array [ concat >ckf ] V{ } product-map-as deck boa ;
+    RANK_STR SUIT_STR 2array
+    [ concat >ckf ] V{ } product-map-as ;
+
+: best-holdem-hand ( hand -- n cards )
+    5 [ [ hand-value ] [ ] bi ] { } map>assoc-combinations
+    infimum first2 ;
+
+: value>string ( n -- string )
+    value>rank VALUE_STR nth ;
+
+: hand>card-names ( hand -- string )
+    [ card>string ] map ;
+
+: string>value ( string -- value )
+    parse-cards best-holdem-hand drop ;
 
 : shuffle ( deck -- deck )
     [ randomize ] change-cards ;
 
-: draw-card ( deck -- card ) cards>> pop ;
+ERROR: no-card card deck ;
+
+: draw-specific-card ( card deck -- card )
+    [ >ckf ] dip
+    2dup index [ swap remove-nth! drop ] [ no-card ] if* ;
+
+: start-hands ( seq -- seq' deck )
+    <deck> [ '[ [ _ draw-specific-card ] map ] map ] keep ;
+
+:: holdem-hand% ( hole1 deck community n -- x )
+    community length 5 swap - 2 + :> #samples
+    n [
+        drop
+        deck #samples sample :> sampled
+        sampled 2 cut :> ( hole2 community2 )
+        hole1 community community2 3append :> hand1
+        hole2 community community2 3append :> hand2
+        hand1 hand2 [ best-holdem-hand 2array ] bi@ <=> +lt+ =
+    ] count ;
+
+:: compare-holdem-hands ( holes deck n -- seq )
+    n [
+        holes deck 5 sample '[
+            [ _ append best-holdem-hand drop ] keep
+        ] { } map>assoc infimum second
+    ] replicate histogram ;
+
+: (best-omaha-hand) ( seq -- pair )
+    4 cut
+    [ 2 all-combinations ] [ 3 all-combinations ] bi*
+    2array [ concat [ best-holdem-hand drop ] keep ] { } product-map>assoc ;
+
+: best-omaha-hand ( seq -- n cards ) (best-omaha-hand) infimum first2 ;
+
+:: compare-omaha-hands ( holes deck n -- seq )
+    n [
+        holes deck 5 sample '[
+            [ _ append best-omaha-hand drop ] keep
+        ] { } map>assoc infimum second
+    ] replicate histogram ;
+
+ERROR: bad-suit-symbol ch ;
+
+: symbol>suit ( ch -- ch' )
+    ch>upper
+    H{
+        { CHAR: ♠ CHAR: S }
+        { CHAR: ♦ CHAR: D }
+        { CHAR: ♥ CHAR: H }
+        { CHAR: ♣ CHAR: C }
+        { CHAR: S CHAR: S }
+        { CHAR: D CHAR: D }
+        { CHAR: H CHAR: H }
+        { CHAR: C CHAR: C }
+    } ?at [ bad-suit-symbol ] unless ;
+
+: card> ( string -- card )
+    1 over [ symbol>suit ] change-nth >ckf ;
+
+: value>hand-name ( value -- string )
+    value>rank VALUE_STR nth ;
+
+SYNTAX: HAND{
+    "}" parse-tokens [ card> ] { } map-as suffix! ;
