@@ -4,7 +4,7 @@ locals namespaces random windows.advapi32 windows.errors
 windows.kernel32 math.bitwise ;
 IN: random.windows
 
-TUPLE: windows-rng provider type ;
+TUPLE: windows-rng < disposable provider type ;
 C: <windows-rng> windows-rng
 
 TUPLE: windows-crypto-context handle ;
@@ -69,7 +69,7 @@ M: windows-rng random-bytes* ( n tuple -- bytes )
 
 [
     [
-        system-random-generator get-global &dispose drop
-        secure-random-generator get-global &dispose drop
+        ! system-random-generator get-global &dispose drop
+        ! secure-random-generator get-global &dispose drop
     ] with-destructors
 ] "random.windows" add-shutdown-hook
