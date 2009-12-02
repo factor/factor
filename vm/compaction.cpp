@@ -117,6 +117,8 @@ struct code_block_compaction_relocation_visitor {
 			op.store_code_block(code_forwarder.visit_code_block(op.load_code_block(old_offset)));
 			break;
 		case RT_HERE:
+			op.store_value(op.load_value(old_offset) - (cell)old_address + (cell)op.parent_code_block());
+			break;
 		case RT_THIS:
 		case RT_CARDS_OFFSET:
 		case RT_DECKS_OFFSET:

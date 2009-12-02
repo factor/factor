@@ -194,11 +194,6 @@ cell factor_vm::compute_dlsym_address(array *literals, cell index)
 		return (cell)factor::undefined_symbol;
 	}
 }
-cell factor_vm::compute_here_address(cell arg, cell offset, code_block *compiled)
-{
-	fixnum n = untag_fixnum(arg);
-	return n >= 0 ? ((cell)compiled->xt() + offset + n) : ((cell)compiled->xt() - n);
-}
 
 cell factor_vm::compute_context_address()
 {
@@ -224,9 +219,6 @@ void factor_vm::store_external_address(instruction_operand op)
 	case RT_DLSYM:
 		op.store_value(compute_dlsym_address(parameters,index));
 		break;
-	case RT_HERE:
-		op.store_value(compute_here_address(array_nth(parameters,index),op.rel_offset(),compiled));
-		break;
 	case RT_THIS:
 		op.store_value((cell)compiled->xt());
 		break;
@@ -249,6 +241,12 @@ void factor_vm::store_external_address(instruction_operand op)
 		critical_error("Bad rel type",op.rel_type());
 		break;
 	}
+}
+
+cell factor_vm::compute_here_address(cell arg, cell offset, code_block *compiled)
+{
+	fixnum n = untag_fixnum(arg);
+	return n >= 0 ? ((cell)compiled->xt() + offset + n) : ((cell)compiled->xt() - n);
 }
 
 struct initial_code_block_visitor {
@@ -279,6 +277,9 @@ struct initial_code_block_visitor {
 			break;
 		case RT_XT_PIC_TAIL:
 			op.store_value(parent->compute_xt_pic_tail_address(next_literal()));
+			break;
+		case RT_HERE:
+			op.store_value(parent->compute_here_address(next_literal(),op.rel_offset(),op.parent_code_block()));
 			break;
 		case RT_UNTAGGED:
 			op.store_value(untag_fixnum(next_literal()));
