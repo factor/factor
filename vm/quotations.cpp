@@ -93,7 +93,7 @@ bool quotation_jit::stack_frame_p()
 		switch(tagged<object>(obj).type())
 		{
 		case WORD_TYPE:
-			if(!parent->to_boolean(untag<word>(obj)->subprimitive))
+			if(!to_boolean(untag<word>(obj)->subprimitive))
 				return true;
 			break;
 		case QUOTATION_TYPE:
@@ -154,7 +154,7 @@ void quotation_jit::iterate_quotation()
 		{
 		case WORD_TYPE:
 			/* Intrinsics */
-			if(parent->to_boolean(obj.as<word>()->subprimitive))
+			if(to_boolean(obj.as<word>()->subprimitive))
 				emit_subprimitive(obj.value());
 			/* The (execute) primitive is special-cased */
 			else if(obj.value() == parent->special_objects[JIT_EXECUTE_WORD])

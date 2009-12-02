@@ -1,6 +1,17 @@
 namespace factor
 {
 
+/* Code block visitors iterate over sets of code blocks, applying a functor to
+each one. The functor returns a new code_block pointer, which may or may not
+equal the old one. This is stored back to the original location.
+
+This is used by GC's sweep and compact phases, and the implementation of the
+modify-code-heap primitive.
+
+Iteration is driven by visit_*() methods. Some of them define GC roots:
+- visit_context_code_blocks()
+- visit_callback_code_blocks() */
+ 
 template<typename Visitor> struct code_block_visitor {
 	factor_vm *parent;
 	Visitor visitor;
@@ -12,7 +23,6 @@ template<typename Visitor> struct code_block_visitor {
 	void visit_object_code_block(object *obj);
 	void visit_embedded_code_pointers(code_block *compiled);
 	void visit_context_code_blocks();
-	void visit_callback_code_blocks();
 };
 
 template<typename Visitor>
@@ -81,14 +91,11 @@ struct embedded_code_pointers_visitor {
 
 	explicit embedded_code_pointers_visitor(Visitor visitor_) : visitor(visitor_) {}
 
-	void operator()(relocation_entry rel, cell index, code_block *compiled)
+	void operator()(instruction_operand op)
 	{
-		relocation_type type = rel.rel_type();
+		relocation_type type = op.rel_type();
 		if(type == RT_XT || type == RT_XT_PIC || type == RT_XT_PIC_TAIL)
-		{
-			instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
 			op.store_code_block(visitor(op.load_code_block()));
-		}
 	}
 };
 
@@ -98,7 +105,7 @@ void code_block_visitor<Visitor>::visit_embedded_code_pointers(code_block *compi
 	if(!parent->code->needs_fixup_p(compiled))
 	{
 		embedded_code_pointers_visitor<Visitor> visitor(this->visitor);
-		parent->iterate_relocations(compiled,visitor);
+		compiled->each_instruction_operand(visitor);
 	}
 }
 
@@ -107,28 +114,6 @@ void code_block_visitor<Visitor>::visit_context_code_blocks()
 {
 	call_frame_code_block_visitor<Visitor> call_frame_visitor(parent,visitor);
 	parent->iterate_active_frames(call_frame_visitor);
-}
-
-template<typename Visitor>
-struct callback_code_block_visitor {
-	callback_heap *callbacks;
-	Visitor visitor;
-
-	explicit callback_code_block_visitor(callback_heap *callbacks_, Visitor visitor_) :
-		callbacks(callbacks_), visitor(visitor_) {}
-
-	void operator()(callback *stub)
-	{
-		stub->compiled = visitor(stub->compiled);
-		callbacks->update(stub);
-	}
-};
-
-template<typename Visitor>
-void code_block_visitor<Visitor>::visit_callback_code_blocks()
-{
-	callback_code_block_visitor<Visitor> callback_visitor(parent->callbacks,visitor);
-	parent->callbacks->iterate(callback_visitor);
 }
 
 }

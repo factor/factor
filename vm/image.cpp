@@ -122,10 +122,10 @@ struct object_fixupper {
 
 				alien *ptr = (alien *)obj;
 
-				if(!parent->to_boolean(ptr->base))
-					ptr->expired = parent->true_object;
-				else
+				if(to_boolean(ptr->base))
 					ptr->update_address();
+				else
+					ptr->expired = parent->true_object;
 				break;
 			}
 		case DLL_TYPE:
@@ -175,17 +175,15 @@ struct code_block_fixup_relocation_visitor {
 		data_visitor(slot_visitor<data_fixupper>(parent_,data_fixupper(data_offset_))),
 		code_visitor(code_fixupper(code_offset_)) {}
 
-	void operator()(relocation_entry rel, cell index, code_block *compiled)
+	void operator()(instruction_operand op)
 	{
-		relocation_type type = rel.rel_type();
-		instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
-	
-		array *literals = (parent->to_boolean(compiled->literals)
-			? untag<array>(compiled->literals) : NULL);
+		code_block *compiled = op.parent_code_block();
+		array *literals = (to_boolean(compiled->literals) ? untag<array>(compiled->literals) : NULL);
+		cell index = op.parameter_index();
 
-		cell old_offset = (cell)rel.rel_offset() + (cell)compiled->xt() - code_offset;
+		cell old_offset = op.rel_offset() + (cell)compiled->xt() - code_offset;
 
-		switch(type)
+		switch(op.rel_type())
 		{
 		case RT_IMMEDIATE:
 			op.store_value(data_visitor.visit_pointer(op.load_value(old_offset)));
@@ -202,7 +200,7 @@ struct code_block_fixup_relocation_visitor {
 			op.store_value(parent->compute_dlsym_relocation(literals,index));
 			break;
 		case RT_HERE:
-			op.store_value(parent->compute_here_relocation(array_nth(literals,index),rel.rel_offset(),compiled));
+			op.store_value(parent->compute_here_relocation(array_nth(literals,index),op.rel_offset(),compiled));
 			break;
 		case RT_THIS:
 			op.store_value((cell)compiled->xt());
@@ -226,7 +224,7 @@ struct code_block_fixup_relocation_visitor {
 			op.store_value(parent->decks_offset);
 			break;
 		default:
-			critical_error("Bad rel type",rel.rel_type());
+			critical_error("Bad rel type",op.rel_type());
 			break;
 		}
 	}
@@ -248,7 +246,7 @@ struct code_block_fixupper {
 		data_visitor.visit_code_block_objects(compiled);
 
 		code_block_fixup_relocation_visitor code_visitor(parent,data_offset,code_offset);
-		parent->iterate_relocations(compiled,code_visitor);
+		compiled->each_instruction_operand(code_visitor);
 	}
 };
 

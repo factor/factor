@@ -30,8 +30,8 @@ void free_list::add_to_free_list(free_heap_block *block)
 	free_block_count++;
 	free_space += size;
 
-	if(size < free_list_count * block_granularity)
-		small_blocks[size / block_granularity].push_back(block);
+	if(size < free_list_count * data_alignment)
+		small_blocks[size / data_alignment].push_back(block);
 	else
 		large_blocks.insert(block);
 }
@@ -39,9 +39,9 @@ void free_list::add_to_free_list(free_heap_block *block)
 free_heap_block *free_list::find_free_block(cell size)
 {
 	/* Check small free lists */
-	if(size / block_granularity < free_list_count)
+	if(size / data_alignment < free_list_count)
 	{
-		std::vector<free_heap_block *> &blocks = small_blocks[size / block_granularity];
+		std::vector<free_heap_block *> &blocks = small_blocks[size / data_alignment];
 		if(blocks.size() == 0)
 		{
 			/* Round up to a multiple of 'size' */

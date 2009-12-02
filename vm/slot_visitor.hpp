@@ -1,6 +1,22 @@
 namespace factor
 {
 
+/* Slot visitors iterate over the slots of an object, applying a functor to
+each one that is a non-immediate slot. The pointer is untagged first. The
+functor returns a new untagged object pointer. The return value may or may not equal the old one,
+however the new pointer receives the same tag before being stored back to the
+original location.
+
+Slots storing immediate values are left unchanged and the visitor does inspect
+them.
+
+This is used by GC's copying, sweep and compact phases, and the implementation
+of the become primitive.
+
+Iteration is driven by visit_*() methods. Some of them define GC roots:
+- visit_roots()
+- visit_contexts() */
+
 template<typename Visitor> struct slot_visitor {
 	factor_vm *parent;
 	Visitor visitor;
@@ -15,6 +31,7 @@ template<typename Visitor> struct slot_visitor {
 	void visit_stack_elements(segment *region, cell *top);
 	void visit_data_roots();
 	void visit_bignum_roots();
+	void visit_callback_roots();
 	void visit_roots();
 	void visit_contexts();
 	void visit_code_block_objects(code_block *compiled);
@@ -93,6 +110,28 @@ void slot_visitor<Visitor>::visit_bignum_roots()
 }
 
 template<typename Visitor>
+struct callback_slot_visitor {
+	callback_heap *callbacks;
+	slot_visitor<Visitor> *visitor;
+
+	explicit callback_slot_visitor(callback_heap *callbacks_, slot_visitor<Visitor> *visitor_) :
+		callbacks(callbacks_), visitor(visitor_) {}
+
+	void operator()(code_block *stub)
+	{
+		visitor->visit_handle(&stub->owner);
+		callbacks->update(stub);
+	}
+};
+
+template<typename Visitor>
+void slot_visitor<Visitor>::visit_callback_roots()
+{
+	callback_slot_visitor<Visitor> callback_visitor(parent->callbacks,this);
+	parent->callbacks->each_callback(callback_visitor);
+}
+
+template<typename Visitor>
 void slot_visitor<Visitor>::visit_roots()
 {
 	visit_handle(&parent->true_object);
@@ -102,6 +141,7 @@ void slot_visitor<Visitor>::visit_roots()
 
 	visit_data_roots();
 	visit_bignum_roots();
+	visit_callback_roots();
 
 	for(cell i = 0; i < special_object_count; i++)
 		visit_handle(&parent->special_objects[i]);
@@ -130,13 +170,10 @@ struct literal_references_visitor {
 
 	explicit literal_references_visitor(slot_visitor<Visitor> *visitor_) : visitor(visitor_) {}
 
-	void operator()(relocation_entry rel, cell index, code_block *compiled)
+	void operator()(instruction_operand op)
 	{
-		if(rel.rel_type() == RT_IMMEDIATE)
-		{
-			instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
+		if(op.rel_type() == RT_IMMEDIATE)
 			op.store_value(visitor->visit_pointer(op.load_value()));
-		}
 	}
 };
 
@@ -154,7 +191,7 @@ void slot_visitor<Visitor>::visit_embedded_literals(code_block *compiled)
 	if(!parent->code->needs_fixup_p(compiled))
 	{
 		literal_references_visitor<Visitor> visitor(this);
-		parent->iterate_relocations(compiled,visitor);
+		compiled->each_instruction_operand(visitor);
 	}
 }
 

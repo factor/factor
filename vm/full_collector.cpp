@@ -27,11 +27,6 @@ void full_collector::trace_context_code_blocks()
 	code_visitor.visit_context_code_blocks();
 }
 
-void full_collector::trace_callback_code_blocks()
-{
-	code_visitor.visit_callback_code_blocks();
-}
-
 void full_collector::trace_object_code_block(object *obj)
 {
 	code_visitor.visit_object_code_block(obj);
@@ -51,7 +46,7 @@ void factor_vm::update_code_roots_for_sweep()
 	for(; iter < end; iter++)
 	{
 		code_root *root = *iter;
-		code_block *block = (code_block *)(root->value & -block_granularity);
+		code_block *block = (code_block *)(root->value & -data_alignment);
 		if(root->valid && !state->marked_p(block))
 			root->valid = false;
 	}
@@ -70,7 +65,7 @@ void factor_vm::update_code_roots_for_compaction()
 	for(; iter < end; iter++)
 	{
 		code_root *root = *iter;
-		code_block *block = (code_block *)(root->value & -block_granularity);
+		code_block *block = (code_block *)(root->value & -data_alignment);
 
 		/* Offset of return address within 16-byte allocation line */
 		cell offset = root->value - (cell)block;
@@ -99,7 +94,6 @@ void factor_vm::collect_mark_impl(bool trace_contexts_p)
 	{
 		collector.trace_contexts();
 		collector.trace_context_code_blocks();
-		collector.trace_callback_code_blocks();
 	}
 
 	while(!mark_stack.empty())
@@ -149,25 +143,7 @@ void factor_vm::collect_full(bool trace_contexts_p)
 		current_gc->event->op = collect_compact_op;
 		collect_compact_impl(trace_contexts_p);
 	}
-	flush_icache(code->seg->start,code->seg->size);
-}
-
-void factor_vm::collect_compact(bool trace_contexts_p)
-{
-	collect_mark_impl(trace_contexts_p);
-	collect_compact_impl(trace_contexts_p);
-	flush_icache(code->seg->start,code->seg->size);
-}
-
-void factor_vm::collect_growing_heap(cell requested_bytes, bool trace_contexts_p)
-{
-	/* Grow the data heap and copy all live objects to the new heap. */
-	data_heap *old = data;
-	set_data_heap(data->grow(requested_bytes));
-	collect_mark_impl(trace_contexts_p);
-	collect_compact_code_impl(trace_contexts_p);
-	flush_icache(code->seg->start,code->seg->size);
-	delete old;
+	code->flush_icache();
 }
 
 }

@@ -374,8 +374,11 @@ struct factor_vm
 
 	//booleans
 	void box_boolean(bool value);
-	bool to_boolean(cell value);
-	inline cell tag_boolean(cell untagged);
+
+	inline cell tag_boolean(cell untagged)
+	{
+		return (untagged ? true_object : false_object);
+	}
 
 	//byte arrays
 	byte_array *allot_byte_array(cell size);
@@ -511,25 +514,6 @@ struct factor_vm
 	cell compute_context_relocation();
 	cell compute_vm_relocation(cell arg);
 	cell code_block_owner(code_block *compiled);
-
-	template<typename Iterator> void iterate_relocations(code_block *compiled, Iterator &iter)
-	{
-		if(to_boolean(compiled->relocation))
-		{
-			byte_array *relocation = (byte_array *)UNTAG(compiled->relocation);
-
-			cell index = 0;
-			cell length = (relocation->capacity >> TAG_BITS) / sizeof(relocation_entry);
-
-			for(cell i = 0; i < length; i++)
-			{
-				relocation_entry rel = relocation->data<relocation_entry>()[i];
-				iter(rel,index,compiled);
-				index += rel.number_of_parameters();
-			}
-		}
-	}
-
 	void update_word_references(code_block *compiled);
 	void check_code_address(cell address);
 	void relocate_code_block(code_block *compiled);
@@ -553,8 +537,7 @@ struct factor_vm
 	void primitive_code_room();
 	void primitive_strip_stack_traces();
 
-	/* Apply a function to every code block */
-	template<typename Iterator> void iterate_code_heap(Iterator &iter)
+	template<typename Iterator> void each_code_block(Iterator &iter)
 	{
 		code->allocator->iterate(iter);
 	}
