@@ -31,9 +31,9 @@ void code_heap::clear_remembered_set()
 	points_to_aging.clear();
 }
 
-bool code_heap::needs_fixup_p(code_block *compiled)
+bool code_heap::uninitialized_p(code_block *compiled)
 {
-	return needs_fixup.count(compiled) > 0;
+	return uninitialized_blocks.count(compiled) > 0;
 }
 
 bool code_heap::marked_p(code_block *compiled)
@@ -55,7 +55,7 @@ void code_heap::code_heap_free(code_block *compiled)
 {
 	points_to_nursery.erase(compiled);
 	points_to_aging.erase(compiled);
-	needs_fixup.erase(compiled);
+	uninitialized_blocks.erase(compiled);
 	allocator->free(compiled);
 }
 
@@ -118,10 +118,11 @@ void factor_vm::primitive_modify_code_heap()
 		case ARRAY_TYPE:
 			{
 				array *compiled_data = data.as<array>().untagged();
-				cell literals = array_nth(compiled_data,0);
-				cell relocation = array_nth(compiled_data,1);
-				cell labels = array_nth(compiled_data,2);
-				cell code = array_nth(compiled_data,3);
+				cell parameters = array_nth(compiled_data,0);
+				cell literals = array_nth(compiled_data,1);
+				cell relocation = array_nth(compiled_data,2);
+				cell labels = array_nth(compiled_data,3);
+				cell code = array_nth(compiled_data,4);
 
 				code_block *compiled = add_code_block(
 					code_block_optimized,
@@ -129,6 +130,7 @@ void factor_vm::primitive_modify_code_heap()
 					labels,
 					word.value(),
 					relocation,
+					parameters,
 					literals);
 
 				word->code = compiled;

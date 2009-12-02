@@ -288,7 +288,6 @@ struct factor_vm
 	void collect_mark_impl(bool trace_contexts_p);
 	void collect_sweep_impl();
 	void collect_full(bool trace_contexts_p);
-	void update_fixup_set_for_compaction(mark_bits<code_block> *forwarding_map);
 	void collect_compact_impl(bool trace_contexts_p);
 	void collect_compact_code_impl(bool trace_contexts_p);
 	void collect_compact(bool trace_contexts_p);
@@ -520,7 +519,7 @@ struct factor_vm
 	void initialize_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
 	code_block *allot_code_block(cell size, code_block_type type);
-	code_block *add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_);
+	code_block *add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell parameters_, cell literals_);
 
 	//code heap
 	inline void check_code_pointer(cell ptr)

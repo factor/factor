@@ -300,10 +300,10 @@ void factor_vm::find_data_references(cell look_for)
 
 struct code_block_printer {
 	factor_vm *parent;
-	cell reloc_size, literal_size;
+	cell reloc_size, parameter_size;
 
 	explicit code_block_printer(factor_vm *parent_) :
-		parent(parent_), reloc_size(0), literal_size(0) {}
+		parent(parent_), reloc_size(0), parameter_size(0) {}
 
 	void operator()(code_block *scan, cell size)
 	{
@@ -313,7 +313,7 @@ struct code_block_printer {
 		else
 		{
 			reloc_size += parent->object_size(scan->relocation);
-			literal_size += parent->object_size(scan->literals);
+			parameter_size += parent->object_size(scan->parameters);
 
 			if(parent->code->marked_p(scan))
 				status = "marked";
@@ -332,8 +332,8 @@ void factor_vm::dump_code_heap()
 {
 	code_block_printer printer(this);
 	code->allocator->iterate(printer);
-	std::cout << printer.reloc_size << " bytes of relocation data\n";
-	std::cout << printer.literal_size << " bytes of literal data\n";
+	std::cout << printer.reloc_size << " bytes used by relocation tables\n";
+	std::cout << printer.parameter_size << " bytes used by parameter tables\n";
 }
 
 void factor_vm::factorbug()

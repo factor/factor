@@ -152,7 +152,7 @@ void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index, cell cac
 	emit_class_lookup(index,PIC_TUPLE);
 
 	/* Do a cache lookup. */
-	emit_with(parent->special_objects[MEGA_LOOKUP],cache.value());
+	emit_with_literal(parent->special_objects[MEGA_LOOKUP],cache.value());
 	
 	/* If we end up here, the cache missed. */
 	emit(parent->special_objects[JIT_PROLOG]);
