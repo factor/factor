@@ -40,9 +40,9 @@ fixnum instruction_operand::load_value(cell relative_to)
 	case RC_RELATIVE_PPC_2:
 		return load_value_masked(rel_relative_ppc_2_mask,16,0) + relative_to;
 	case RC_RELATIVE_PPC_3:
-		return load_value_masked(rel_relative_ppc_3_mask,10,0) + relative_to;
+		return load_value_masked(rel_relative_ppc_3_mask,6,0) + relative_to;
 	case RC_RELATIVE_ARM_3:
-		return load_value_masked(rel_relative_arm_3_mask,10,2) + relative_to + sizeof(cell) * 2;
+		return load_value_masked(rel_relative_arm_3_mask,6,2) + relative_to + sizeof(cell) * 2;
 	case RC_INDIRECT_ARM:
 		return load_value_masked(rel_indirect_arm_mask,20,0) + relative_to + sizeof(cell);
 	case RC_INDIRECT_ARM_PC:
