@@ -116,10 +116,6 @@ struct code_block_compaction_relocation_visitor {
 
 	void operator()(instruction_operand op)
 	{
-		code_block *compiled = op.parent_code_block();
-		array *literals = (to_boolean(compiled->literals) ? untag<array>(compiled->literals) : NULL);
-		cell index = op.parameter_index();
-
 		cell old_offset = op.rel_offset() + (cell)old_address->xt();
 
 		switch(op.rel_type())
@@ -133,16 +129,10 @@ struct code_block_compaction_relocation_visitor {
 			op.store_code_block(code_forwarder.visit_code_block(op.load_code_block(old_offset)));
 			break;
 		case RT_HERE:
-			op.store_value(parent->compute_here_relocation(array_nth(literals,index),op.rel_offset(),compiled));
-			break;
 		case RT_THIS:
-			op.store_value((cell)compiled->xt());
-			break;
 		case RT_CARDS_OFFSET:
-			op.store_value(parent->cards_offset);
-			break;
 		case RT_DECKS_OFFSET:
-			op.store_value(parent->decks_offset);
+			parent->store_external_address(op);
 			break;
 		default:
 			op.store_value(op.load_value(old_offset));

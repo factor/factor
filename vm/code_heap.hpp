@@ -8,7 +8,7 @@ struct code_heap {
 	/* Memory allocator */
 	free_list_allocator<code_block> *allocator;
 
-	/* Set of blocks which need full relocation. */
+	/* Set of blocks which need to be initialized by initialize_code_block(). */
 	std::set<code_block *> needs_fixup;
 
 	/* Code blocks which may reference objects in the nursery */

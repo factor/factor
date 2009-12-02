@@ -310,22 +310,20 @@ struct code_block_printer {
 		const char *status;
 		if(scan->free_p())
 			status = "free";
-		else if(parent->code->marked_p(scan))
-		{
-			reloc_size += parent->object_size(scan->relocation);
-			literal_size += parent->object_size(scan->literals);
-			status = "marked";
-		}
 		else
 		{
 			reloc_size += parent->object_size(scan->relocation);
 			literal_size += parent->object_size(scan->literals);
-			status = "allocated";
-		}
 
-		std::cout << std::hex << (cell)scan << std::dec << " ";
-		std::cout << std::hex << size << std::dec << " ";
-		std::cout << status << std::endl;
+			if(parent->code->marked_p(scan))
+				status = "marked";
+			else
+				status = "allocated";
+
+			std::cout << std::hex << (cell)scan << std::dec << " ";
+			std::cout << std::hex << size << std::dec << " ";
+			std::cout << status << std::endl;
+		}
 	}
 };
 
