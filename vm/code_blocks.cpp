@@ -3,66 +3,7 @@
 namespace factor
 {
 
-cell factor_vm::compute_primitive_relocation(cell arg)
-{
-	return (cell)primitives[untag_fixnum(arg)];
-}
-
-/* References to undefined symbols are patched up to call this function on
-image load */
-void factor_vm::undefined_symbol()
-{
-	general_error(ERROR_UNDEFINED_SYMBOL,false_object,false_object,NULL);
-}
-
-void undefined_symbol()
-{
-	return tls_vm()->undefined_symbol();
-}
-
-/* Look up an external library symbol referenced by a compiled code block */
-cell factor_vm::compute_dlsym_relocation(array *literals, cell index)
-{
-	cell symbol = array_nth(literals,index);
-	cell library = array_nth(literals,index + 1);
-
-	dll *d = (to_boolean(library) ? untag<dll>(library) : NULL);
-
-	if(d != NULL && !d->dll)
-		return (cell)factor::undefined_symbol;
-
-	switch(tagged<object>(symbol).type())
-	{
-	case BYTE_ARRAY_TYPE:
-		{
-			symbol_char *name = alien_offset(symbol);
-			void *sym = ffi_dlsym(d,name);
-
-			if(sym)
-				return (cell)sym;
-			else
-				return (cell)factor::undefined_symbol;
-		}
-	case ARRAY_TYPE:
-		{
-			array *names = untag<array>(symbol);
-			for(cell i = 0; i < array_capacity(names); i++)
-			{
-				symbol_char *name = alien_offset(array_nth(names,i));
-				void *sym = ffi_dlsym(d,name);
-
-				if(sym)
-					return (cell)sym;
-			}
-			return (cell)factor::undefined_symbol;
-		}
-	default:
-		critical_error("Bad symbol specifier",symbol);
-		return (cell)factor::undefined_symbol;
-	}
-}
-
-cell factor_vm::compute_xt_relocation(cell obj)
+cell factor_vm::compute_xt_address(cell obj)
 {
 	switch(tagged<object>(obj).type())
 	{
@@ -76,7 +17,7 @@ cell factor_vm::compute_xt_relocation(cell obj)
 	}
 }
 
-cell factor_vm::compute_xt_pic_relocation(word *w, cell tagged_quot)
+cell factor_vm::compute_xt_pic_address(word *w, cell tagged_quot)
 {
 	if(!to_boolean(tagged_quot) || max_pic_size == 0)
 		return (cell)w->xt;
@@ -90,32 +31,16 @@ cell factor_vm::compute_xt_pic_relocation(word *w, cell tagged_quot)
 	}
 }
 
-cell factor_vm::compute_xt_pic_relocation(cell w_)
+cell factor_vm::compute_xt_pic_address(cell w_)
 {
 	tagged<word> w(w_);
-	return compute_xt_pic_relocation(w.untagged(),w->pic_def);
+	return compute_xt_pic_address(w.untagged(),w->pic_def);
 }
 
-cell factor_vm::compute_xt_pic_tail_relocation(cell w_)
+cell factor_vm::compute_xt_pic_tail_address(cell w_)
 {
 	tagged<word> w(w_);
-	return compute_xt_pic_relocation(w.untagged(),w->pic_tail_def);
-}
-
-cell factor_vm::compute_here_relocation(cell arg, cell offset, code_block *compiled)
-{
-	fixnum n = untag_fixnum(arg);
-	return n >= 0 ? ((cell)compiled->xt() + offset + n) : ((cell)compiled->xt() - n);
-}
-
-cell factor_vm::compute_context_relocation()
-{
-	return (cell)&ctx;
-}
-
-cell factor_vm::compute_vm_relocation(cell arg)
-{
-	return (cell)this + untag_fixnum(arg);
+	return compute_xt_pic_address(w.untagged(),w->pic_tail_def);
 }
 
 cell factor_vm::code_block_owner(code_block *compiled)
@@ -157,19 +82,19 @@ struct update_word_references_relocation_visitor {
 		case RT_XT:
 			{
 				code_block *compiled = op.load_code_block();
-				op.store_value(parent->compute_xt_relocation(compiled->owner));
+				op.store_value(parent->compute_xt_address(compiled->owner));
 				break;
 			}
 		case RT_XT_PIC:
 			{
 				code_block *compiled = op.load_code_block();
-				op.store_value(parent->compute_xt_pic_relocation(parent->code_block_owner(compiled)));
+				op.store_value(parent->compute_xt_pic_address(parent->code_block_owner(compiled)));
 				break;
 			}
 		case RT_XT_PIC_TAIL:
 			{
 				code_block *compiled = op.load_code_block();
-				op.store_value(parent->compute_xt_pic_tail_relocation(parent->code_block_owner(compiled)));
+				op.store_value(parent->compute_xt_pic_tail_address(parent->code_block_owner(compiled)));
 				break;
 			}
 		default:
@@ -185,7 +110,7 @@ or dlsyms. */
 void factor_vm::update_word_references(code_block *compiled)
 {
 	if(code->needs_fixup_p(compiled))
-		relocate_code_block(compiled);
+		initialize_code_block(compiled);
 	/* update_word_references() is always applied to every block in
 	   the code heap. Since it resets all call sites to point to
 	   their canonical XT (cold entry point for non-tail calls,
@@ -210,7 +135,82 @@ void factor_vm::check_code_address(cell address)
 #endif
 }
 
-void factor_vm::store_external_relocation(instruction_operand op)
+
+cell factor_vm::compute_primitive_address(cell arg)
+{
+	return (cell)primitives[untag_fixnum(arg)];
+}
+
+/* References to undefined symbols are patched up to call this function on
+image load */
+void factor_vm::undefined_symbol()
+{
+	general_error(ERROR_UNDEFINED_SYMBOL,false_object,false_object,NULL);
+}
+
+void undefined_symbol()
+{
+	return tls_vm()->undefined_symbol();
+}
+
+/* Look up an external library symbol referenced by a compiled code block */
+cell factor_vm::compute_dlsym_address(array *literals, cell index)
+{
+	cell symbol = array_nth(literals,index);
+	cell library = array_nth(literals,index + 1);
+
+	dll *d = (to_boolean(library) ? untag<dll>(library) : NULL);
+
+	if(d != NULL && !d->dll)
+		return (cell)factor::undefined_symbol;
+
+	switch(tagged<object>(symbol).type())
+	{
+	case BYTE_ARRAY_TYPE:
+		{
+			symbol_char *name = alien_offset(symbol);
+			void *sym = ffi_dlsym(d,name);
+
+			if(sym)
+				return (cell)sym;
+			else
+				return (cell)factor::undefined_symbol;
+		}
+	case ARRAY_TYPE:
+		{
+			array *names = untag<array>(symbol);
+			for(cell i = 0; i < array_capacity(names); i++)
+			{
+				symbol_char *name = alien_offset(array_nth(names,i));
+				void *sym = ffi_dlsym(d,name);
+
+				if(sym)
+					return (cell)sym;
+			}
+			return (cell)factor::undefined_symbol;
+		}
+	default:
+		critical_error("Bad symbol specifier",symbol);
+		return (cell)factor::undefined_symbol;
+	}
+}
+cell factor_vm::compute_here_address(cell arg, cell offset, code_block *compiled)
+{
+	fixnum n = untag_fixnum(arg);
+	return n >= 0 ? ((cell)compiled->xt() + offset + n) : ((cell)compiled->xt() - n);
+}
+
+cell factor_vm::compute_context_address()
+{
+	return (cell)&ctx;
+}
+
+cell factor_vm::compute_vm_address(cell arg)
+{
+	return (cell)this + untag_fixnum(arg);
+}
+
+void factor_vm::store_external_address(instruction_operand op)
 {
 	code_block *compiled = op.parent_code_block();
 	array *literals = (to_boolean(compiled->literals) ? untag<array>(compiled->literals) : NULL);
@@ -219,34 +219,34 @@ void factor_vm::store_external_relocation(instruction_operand op)
 	switch(op.rel_type())
 	{
 	case RT_PRIMITIVE:
-		op.store_value(parent->compute_primitive_relocation(array_nth(literals,index)));
+		op.store_value(compute_primitive_address(array_nth(literals,index)));
 		break;
 	case RT_DLSYM:
-		op.store_value(parent->compute_dlsym_relocation(literals,index));
+		op.store_value(compute_dlsym_address(literals,index));
 		break;
 	case RT_HERE:
-		op.store_value(parent->compute_here_relocation(array_nth(literals,index),op.rel_offset(),compiled));
+		op.store_value(compute_here_address(array_nth(literals,index),op.rel_offset(),compiled));
 		break;
 	case RT_THIS:
 		op.store_value((cell)compiled->xt());
 		break;
 	case RT_CONTEXT:
-		op.store_value(parent->compute_context_relocation());
+		op.store_value(compute_context_address());
 		break;
 	case RT_UNTAGGED:
 		op.store_value(untag_fixnum(array_nth(literals,index)));
 		break;
 	case RT_MEGAMORPHIC_CACHE_HITS:
-		op.store_value((cell)&parent->dispatch_stats.megamorphic_cache_hits);
+		op.store_value((cell)&dispatch_stats.megamorphic_cache_hits);
 		break;
 	case RT_VM:
-		op.store_value(parent->compute_vm_relocation(array_nth(literals,index)));
+		op.store_value(compute_vm_address(array_nth(literals,index)));
 		break;
 	case RT_CARDS_OFFSET:
-		op.store_value(parent->cards_offset);
+		op.store_value(cards_offset);
 		break;
 	case RT_DECKS_OFFSET:
-		op.store_value(parent->decks_offset);
+		op.store_value(decks_offset);
 		break;
 	default:
 		critical_error("Bad rel type",op.rel_type());
@@ -254,10 +254,10 @@ void factor_vm::store_external_relocation(instruction_operand op)
 	}
 }
 
-struct relocate_code_block_relocation_visitor {
+struct initial_code_block_visitor {
 	factor_vm *parent;
 
-	explicit relocate_code_block_relocation_visitor(factor_vm *parent_) : parent(parent_) {}
+	explicit initial_code_block_visitor(factor_vm *parent_) : parent(parent_) {}
 
 	void operator()(instruction_operand op)
 	{
@@ -271,26 +271,26 @@ struct relocate_code_block_relocation_visitor {
 			op.store_value(array_nth(literals,index));
 			break;
 		case RT_XT:
-			op.store_value(parent->compute_xt_relocation(array_nth(literals,index)));
+			op.store_value(parent->compute_xt_address(array_nth(literals,index)));
 			break;
 		case RT_XT_PIC:
-			op.store_value(parent->compute_xt_pic_relocation(array_nth(literals,index)));
+			op.store_value(parent->compute_xt_pic_address(array_nth(literals,index)));
 			break;
 		case RT_XT_PIC_TAIL:
-			op.store_value(parent->compute_xt_pic_tail_relocation(array_nth(literals,index)));
+			op.store_value(parent->compute_xt_pic_tail_address(array_nth(literals,index)));
 			break;
 		default:
-			parent->store_external_relocation(op);
+			parent->store_external_address(op);
 			break;
 		}
 	}
 };
 
 /* Perform all fixups on a code block */
-void factor_vm::relocate_code_block(code_block *compiled)
+void factor_vm::initialize_code_block(code_block *compiled)
 {
 	code->needs_fixup.erase(compiled);
-	relocate_code_block_relocation_visitor visitor(this);
+	initial_code_block_visitor visitor(this);
 	compiled->each_instruction_operand(visitor);
 	compiled->flush_icache();
 }

@@ -503,21 +503,21 @@ struct factor_vm
 	void primitive_fclose();
 
 	//code_block
-	cell compute_primitive_relocation(cell arg);
-	void undefined_symbol();
-	cell compute_dlsym_relocation(array *literals, cell index);
-	cell compute_xt_relocation(cell obj);
-	cell compute_xt_pic_relocation(word *w, cell tagged_quot);
-	cell compute_xt_pic_relocation(cell w_);
-	cell compute_xt_pic_tail_relocation(cell w_);
-	cell compute_here_relocation(cell arg, cell offset, code_block *compiled);
-	cell compute_context_relocation();
-	cell compute_vm_relocation(cell arg);
+	cell compute_xt_address(cell obj);
+	cell compute_xt_pic_address(word *w, cell tagged_quot);
+	cell compute_xt_pic_address(cell w_);
+	cell compute_xt_pic_tail_address(cell w_);
 	cell code_block_owner(code_block *compiled);
 	void update_word_references(code_block *compiled);
 	void check_code_address(cell address);
-	void store_external_relocation(instruction_operand op);
-	void relocate_code_block(code_block *compiled);
+	cell compute_primitive_address(cell arg);
+	void undefined_symbol();
+	cell compute_dlsym_address(array *literals, cell index);
+	cell compute_here_address(cell arg, cell offset, code_block *compiled);
+	cell compute_context_address();
+	cell compute_vm_address(cell arg);
+	void store_external_address(instruction_operand op);
+	void initialize_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
 	code_block *allot_code_block(cell size, code_block_type type);
 	code_block *add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_);

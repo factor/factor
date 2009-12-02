@@ -304,7 +304,7 @@ code_block *factor_vm::jit_compile_quot(cell owner_, cell quot_, bool relocating
 
 	code_block *compiled = compiler.to_code_block();
 
-	if(relocating) relocate_code_block(compiled);
+	if(relocating) initialize_code_block(compiled);
 
 	return compiled;
 }
