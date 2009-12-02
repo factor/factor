@@ -36,10 +36,6 @@ void factor_vm::collect_nursery()
 
 	collector.cheneys_algorithm();
 
-	current_gc->event->started_code_sweep();
-	update_code_heap_for_minor_gc(&code->points_to_nursery);
-	current_gc->event->ended_code_sweep();
-
 	data->reset_generation(&nursery);
 	code->points_to_nursery.clear();
 }

@@ -151,9 +151,7 @@ void factor_vm::primitive_become()
 	   by referencing the old quotation unless we recompile all
 	   unoptimized words. */
 	compile_all_words();
-
-	/* Update references to old objects in the code heap */
-	update_code_heap_words_and_literals();
+	update_code_heap_words();
 }
 
 }

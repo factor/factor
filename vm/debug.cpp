@@ -300,32 +300,30 @@ void factor_vm::find_data_references(cell look_for)
 
 struct code_block_printer {
 	factor_vm *parent;
-	cell reloc_size, literal_size;
+	cell reloc_size, parameter_size;
 
 	explicit code_block_printer(factor_vm *parent_) :
-		parent(parent_), reloc_size(0), literal_size(0) {}
+		parent(parent_), reloc_size(0), parameter_size(0) {}
 
 	void operator()(code_block *scan, cell size)
 	{
 		const char *status;
 		if(scan->free_p())
 			status = "free";
-		else if(parent->code->marked_p(scan))
-		{
-			reloc_size += parent->object_size(scan->relocation);
-			literal_size += parent->object_size(scan->literals);
-			status = "marked";
-		}
 		else
 		{
 			reloc_size += parent->object_size(scan->relocation);
-			literal_size += parent->object_size(scan->literals);
-			status = "allocated";
-		}
+			parameter_size += parent->object_size(scan->parameters);
 
-		std::cout << std::hex << (cell)scan << std::dec << " ";
-		std::cout << std::hex << size << std::dec << " ";
-		std::cout << status << std::endl;
+			if(parent->code->marked_p(scan))
+				status = "marked";
+			else
+				status = "allocated";
+
+			std::cout << std::hex << (cell)scan << std::dec << " ";
+			std::cout << std::hex << size << std::dec << " ";
+			std::cout << status << std::endl;
+		}
 	}
 };
 
@@ -334,8 +332,8 @@ void factor_vm::dump_code_heap()
 {
 	code_block_printer printer(this);
 	code->allocator->iterate(printer);
-	std::cout << printer.reloc_size << " bytes of relocation data\n";
-	std::cout << printer.literal_size << " bytes of literal data\n";
+	std::cout << printer.reloc_size << " bytes used by relocation tables\n";
+	std::cout << printer.parameter_size << " bytes used by parameter tables\n";
 }
 
 void factor_vm::factorbug()

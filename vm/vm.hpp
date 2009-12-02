@@ -55,6 +55,9 @@ struct factor_vm
 	/* Only set if we're performing a GC */
 	gc_state *current_gc;
 
+	/* Mark stack */
+	std::vector<cell> mark_stack;
+
 	/* If not NULL, we push GC events here */
 	std::vector<gc_event> *gc_events;
 
@@ -370,8 +373,11 @@ struct factor_vm
 
 	//booleans
 	void box_boolean(bool value);
-	bool to_boolean(cell value);
-	inline cell tag_boolean(cell untagged);
+
+	inline cell tag_boolean(cell untagged)
+	{
+		return (untagged ? true_object : false_object);
+	}
 
 	//byte arrays
 	byte_array *allot_byte_array(cell size);
@@ -496,31 +502,24 @@ struct factor_vm
 	void primitive_fclose();
 
 	//code_block
-	relocation_type relocation_type_of(relocation_entry r);
-	relocation_class relocation_class_of(relocation_entry r);
-	cell relocation_offset_of(relocation_entry r);
-	void flush_icache_for(code_block *block);
-	int number_of_parameters(relocation_type type);
-	void *object_xt(cell obj);
-	void *xt_pic(word *w, cell tagged_quot);
-	void *word_xt_pic(word *w);
-	void *word_xt_pic_tail(word *w);
-	void undefined_symbol();
-	void *get_rel_symbol(array *literals, cell index);
-	cell compute_relocation(relocation_entry rel, cell index, code_block *compiled);
-	template<typename Iterator> void iterate_relocations(code_block *compiled, Iterator &iter);
-	void store_address_2_2(cell *ptr, cell value);
-	void store_address_masked(cell *ptr, fixnum value, cell mask, fixnum shift);
-	void store_address_in_code_block(cell klass, cell offset, fixnum absolute_value);
-	void update_literal_references(code_block *compiled);
-	void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled);
+	cell compute_xt_address(cell obj);
+	cell compute_xt_pic_address(word *w, cell tagged_quot);
+	cell compute_xt_pic_address(cell w_);
+	cell compute_xt_pic_tail_address(cell w_);
+	cell code_block_owner(code_block *compiled);
 	void update_word_references(code_block *compiled);
-	void update_code_block_words_and_literals(code_block *compiled);
 	void check_code_address(cell address);
-	void relocate_code_block(code_block *compiled);
+	cell compute_primitive_address(cell arg);
+	void undefined_symbol();
+	cell compute_dlsym_address(array *literals, cell index);
+	cell compute_context_address();
+	cell compute_vm_address(cell arg);
+	void store_external_address(instruction_operand op);
+	cell compute_here_address(cell arg, cell offset, code_block *compiled);
+	void initialize_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
 	code_block *allot_code_block(cell size, code_block_type type);
-	code_block *add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_);
+	code_block *add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell parameters_, cell literals_);
 
 	//code heap
 	inline void check_code_pointer(cell ptr)
@@ -532,16 +531,13 @@ struct factor_vm
 
 	void init_code_heap(cell size);
 	bool in_code_heap_p(cell ptr);
-	void jit_compile_word(cell word_, cell def_, bool relocate);
 	void update_code_heap_words();
-	void update_code_heap_words_and_literals();
 	void primitive_modify_code_heap();
 	code_heap_room code_room();
 	void primitive_code_room();
 	void primitive_strip_stack_traces();
 
-	/* Apply a function to every code block */
-	template<typename Iterator> void iterate_code_heap(Iterator &iter)
+	template<typename Iterator> void each_code_block(Iterator &iter)
 	{
 		code->allocator->iterate(iter);
 	}
@@ -557,16 +553,8 @@ struct factor_vm
 	bool save_image(const vm_char *filename);
 	void primitive_save_image();
 	void primitive_save_image_and_exit();
-	void data_fixup(cell *handle, cell data_relocation_base);
-	template<typename Type> void code_fixup(Type **handle, cell code_relocation_base);
-	void fixup_word(word *word, cell code_relocation_base);
-	void fixup_quotation(quotation *quot, cell code_relocation_base);
-	void fixup_alien(alien *d);
-	void fixup_callstack_object(callstack *stack, cell code_relocation_base);
-	void relocate_object(object *object, cell data_relocation_base, cell code_relocation_base);
-	void relocate_data(cell data_relocation_base, cell code_relocation_base);
-	void fixup_code_block(code_block *compiled, cell data_relocation_base);
-	void relocate_code(cell data_relocation_base);
+	void fixup_data(cell data_offset, cell code_offset);
+	void fixup_code(cell data_offset, cell code_offset);
 	void load_image(vm_parameters *p);
 
 	//callstack
@@ -615,7 +603,9 @@ struct factor_vm
 	void primitive_array_to_quotation();
 	void primitive_quotation_xt();
 	void set_quot_xt(quotation *quot, code_block *code);
-	void jit_compile(cell quot_, bool relocating);
+	code_block *jit_compile_quot(cell owner_, cell quot_, bool relocating);
+	void jit_compile_quot(cell quot_, bool relocating);
+	void jit_compile_word(cell word_, cell def_, bool relocating);
 	void compile_all_words();
 	fixnum quot_code_offset_to_scan(cell quot_, cell offset);
 	cell lazy_jit_compile_impl(cell quot_, stack_frame *stack);

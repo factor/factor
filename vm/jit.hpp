@@ -6,6 +6,7 @@ struct jit {
 	data_root<object> owner;
 	growable_byte_array code;
 	growable_byte_array relocation;
+	growable_array parameters;
 	growable_array literals;
 	bool computing_offset_p;
 	fixnum position;
@@ -18,12 +19,15 @@ struct jit {
 	void emit_relocation(cell code_template);
 	void emit(cell code_template);
 
+	void parameter(cell parameter) { parameters.add(parameter); }
+	void emit_with_parameter(cell code_template_, cell parameter_);
+
 	void literal(cell literal) { literals.add(literal); }
-	void emit_with(cell code_template_, cell literal_);
+	void emit_with_literal(cell code_template_, cell literal_);
 
 	void push(cell literal)
 	{
-		emit_with(parent->special_objects[JIT_PUSH_IMMEDIATE],literal);
+		emit_with_literal(parent->special_objects[JIT_PUSH_IMMEDIATE],literal);
 	}
 
 	void word_jump(cell word_)
@@ -36,20 +40,21 @@ struct jit {
 
 	void word_call(cell word)
 	{
-		emit_with(parent->special_objects[JIT_WORD_CALL],word);
+		emit_with_literal(parent->special_objects[JIT_WORD_CALL],word);
 	}
 
 	void word_special(cell word)
 	{
-		emit_with(parent->special_objects[JIT_WORD_SPECIAL],word);
+		emit_with_literal(parent->special_objects[JIT_WORD_SPECIAL],word);
 	}
 
 	void emit_subprimitive(cell word_)
 	{
 		data_root<word> word(word_,parent);
-		data_root<array> code_pair(word->subprimitive,parent);
-		literals.append(untag<array>(array_nth(code_pair.untagged(),0)));
-		emit(array_nth(code_pair.untagged(),1));
+		data_root<array> code_triple(word->subprimitive,parent);
+		parameters.append(untag<array>(array_nth(code_triple.untagged(),0)));
+		literals.append(untag<array>(array_nth(code_triple.untagged(),1)));
+		emit(array_nth(code_triple.untagged(),2));
 	}
 
 	void emit_class_lookup(fixnum index, cell type);

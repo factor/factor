@@ -31,9 +31,9 @@ void code_heap::clear_remembered_set()
 	points_to_aging.clear();
 }
 
-bool code_heap::needs_fixup_p(code_block *compiled)
+bool code_heap::uninitialized_p(code_block *compiled)
 {
-	return needs_fixup.count(compiled) > 0;
+	return uninitialized_blocks.count(compiled) > 0;
 }
 
 bool code_heap::marked_p(code_block *compiled)
@@ -51,12 +51,17 @@ void code_heap::clear_mark_bits()
 	allocator->state.clear_mark_bits();
 }
 
-void code_heap::code_heap_free(code_block *compiled)
+void code_heap::free(code_block *compiled)
 {
+	assert(!uninitialized_p(compiled));
 	points_to_nursery.erase(compiled);
 	points_to_aging.erase(compiled);
-	needs_fixup.erase(compiled);
 	allocator->free(compiled);
+}
+
+void code_heap::flush_icache()
+{
+	factor::flush_icache(seg->start,seg->size);
 }
 
 /* Allocate a code heap during startup */
@@ -68,20 +73,6 @@ void factor_vm::init_code_heap(cell size)
 bool factor_vm::in_code_heap_p(cell ptr)
 {
 	return (ptr >= code->seg->start && ptr <= code->seg->end);
-}
-
-/* Compile a word definition with the non-optimizing compiler. Allocates memory */
-void factor_vm::jit_compile_word(cell word_, cell def_, bool relocate)
-{
-	data_root<word> word(word_,this);
-	data_root<quotation> def(def_,this);
-
-	jit_compile(def.value(),relocate);
-
-	word->code = def->code;
-
-	if(to_boolean(word->pic_def)) jit_compile(word->pic_def,relocate);
-	if(to_boolean(word->pic_tail_def)) jit_compile(word->pic_tail_def,relocate);
 }
 
 struct word_updater {
@@ -100,40 +91,8 @@ defining a new word. */
 void factor_vm::update_code_heap_words()
 {
 	word_updater updater(this);
-	iterate_code_heap(updater);
+	each_code_block(updater);
 }
-
-/* After a full GC that did not grow the heap, we have to update references
-to literals and other words. */
-struct word_and_literal_code_heap_updater {
-	factor_vm *parent;
-
-	explicit word_and_literal_code_heap_updater(factor_vm *parent_) : parent(parent_) {}
-
-	void operator()(code_block *block, cell size)
-	{
-		parent->update_code_block_words_and_literals(block);
-	}
-};
-
-void factor_vm::update_code_heap_words_and_literals()
-{
-	word_and_literal_code_heap_updater updater(this);
-	iterate_code_heap(updater);
-}
-
-/* After growing the heap, we have to perform a full relocation to update
-references to card and deck arrays. */
-struct code_heap_relocator {
-	factor_vm *parent;
-
-	explicit code_heap_relocator(factor_vm *parent_) : parent(parent_) {}
-
-	void operator()(code_block *block, cell size)
-	{
-		parent->relocate_code_block(block);
-	}
-};
 
 void factor_vm::primitive_modify_code_heap()
 {
@@ -159,7 +118,7 @@ void factor_vm::primitive_modify_code_heap()
 		case ARRAY_TYPE:
 			{
 				array *compiled_data = data.as<array>().untagged();
-				cell owner = array_nth(compiled_data,0);
+				cell parameters = array_nth(compiled_data,0);
 				cell literals = array_nth(compiled_data,1);
 				cell relocation = array_nth(compiled_data,2);
 				cell labels = array_nth(compiled_data,3);
@@ -169,8 +128,9 @@ void factor_vm::primitive_modify_code_heap()
 					code_block_optimized,
 					code,
 					labels,
-					owner,
+					word.value(),
 					relocation,
+					parameters,
 					literals);
 
 				word->code = compiled;
@@ -218,7 +178,7 @@ struct stack_trace_stripper {
 void factor_vm::primitive_strip_stack_traces()
 {
 	stack_trace_stripper stripper;
-	iterate_code_heap(stripper);
+	each_code_block(stripper);
 }
 
 }

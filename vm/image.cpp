@@ -55,177 +55,177 @@ void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 	code->allocator->initial_free_list(h->code_size);
 }
 
-void factor_vm::data_fixup(cell *handle, cell data_relocation_base)
-{
-	if(immediate_p(*handle))
-		return;
+struct data_fixupper {
+	cell offset;
 
-	*handle += (data->tenured->start - data_relocation_base);
-}
+	explicit data_fixupper(cell offset_) : offset(offset_) {}
 
-template<typename Type> void factor_vm::code_fixup(Type **handle, cell code_relocation_base)
-{
-	Type *ptr = *handle;
-	Type *new_ptr = (Type *)(((cell)ptr) + (code->seg->start - code_relocation_base));
-	*handle = new_ptr;
-}
-
-void factor_vm::fixup_word(word *word, cell code_relocation_base)
-{
-	if(word->code)
-		code_fixup(&word->code,code_relocation_base);
-	if(word->profiling)
-		code_fixup(&word->profiling,code_relocation_base);
-	code_fixup(&word->xt,code_relocation_base);
-}
-
-void factor_vm::fixup_quotation(quotation *quot, cell code_relocation_base)
-{
-	if(quot->code)
+	object *operator()(object *obj)
 	{
-		code_fixup(&quot->xt,code_relocation_base);
-		code_fixup(&quot->code,code_relocation_base);
-	}
-	else
-		quot->xt = (void *)lazy_jit_compile;
-}
-
-void factor_vm::fixup_alien(alien *ptr)
-{
-	if(!to_boolean(ptr->base))
-		ptr->expired = true_object;
-	else
-		ptr->update_address();
-}
-
-struct stack_frame_fixupper {
-	factor_vm *parent;
-	cell code_relocation_base;
-
-	explicit stack_frame_fixupper(factor_vm *parent_, cell code_relocation_base_) :
-		parent(parent_), code_relocation_base(code_relocation_base_) {}
-	void operator()(stack_frame *frame)
-	{
-		parent->code_fixup(&frame->xt,code_relocation_base);
-		parent->code_fixup(&FRAME_RETURN_ADDRESS(frame,parent),code_relocation_base);
+		return (object *)((char *)obj + offset);
 	}
 };
 
-void factor_vm::fixup_callstack_object(callstack *stack, cell code_relocation_base)
+struct code_fixupper {
+	cell offset;
+
+	explicit code_fixupper(cell offset_) : offset(offset_) {}
+
+	code_block *operator()(code_block *compiled)
+	{
+		return (code_block *)((char *)compiled + offset);
+	}
+};
+
+static inline cell tuple_size_with_fixup(cell offset, object *obj)
 {
-	stack_frame_fixupper fixupper(this,code_relocation_base);
-	iterate_callstack_object(stack,fixupper);
+	tuple_layout *layout = (tuple_layout *)((char *)UNTAG(((tuple *)obj)->layout) + offset);
+	return tuple_size(layout);
 }
+
+struct fixup_sizer {
+	cell offset;
+
+	explicit fixup_sizer(cell offset_) : offset(offset_) {}
+
+	cell operator()(object *obj)
+	{
+		if(obj->type() == TUPLE_TYPE)
+			return align(tuple_size_with_fixup(offset,obj),data_alignment);
+		else
+			return obj->size();
+	}
+};
 
 struct object_fixupper {
 	factor_vm *parent;
-	cell data_relocation_base;
+	cell data_offset;
+	slot_visitor<data_fixupper> data_visitor;
+	code_block_visitor<code_fixupper> code_visitor;
 
-	explicit object_fixupper(factor_vm *parent_, cell data_relocation_base_) :
-		parent(parent_), data_relocation_base(data_relocation_base_) { }
+	object_fixupper(factor_vm *parent_, cell data_offset_, cell code_offset_) :
+		parent(parent_),
+		data_offset(data_offset_),
+		data_visitor(slot_visitor<data_fixupper>(parent_,data_fixupper(data_offset_))),
+		code_visitor(code_block_visitor<code_fixupper>(parent_,code_fixupper(code_offset_))) {}
 
-	void operator()(cell *scan)
+	void operator()(object *obj, cell size)
 	{
-		parent->data_fixup(scan,data_relocation_base);
+		parent->data->tenured->starts.record_object_start_offset(obj);
+
+		switch(obj->type())
+		{
+		case ALIEN_TYPE:
+			{
+				cell payload_start = obj->binary_payload_start();
+				data_visitor.visit_slots(obj,payload_start);
+
+				alien *ptr = (alien *)obj;
+
+				if(to_boolean(ptr->base))
+					ptr->update_address();
+				else
+					ptr->expired = parent->true_object;
+				break;
+			}
+		case DLL_TYPE:
+			{
+				cell payload_start = obj->binary_payload_start();
+				data_visitor.visit_slots(obj,payload_start);
+
+				parent->ffi_dlopen((dll *)obj);
+				break;
+			}
+		case TUPLE_TYPE:
+			{
+				cell payload_start = tuple_size_with_fixup(data_offset,obj);
+				data_visitor.visit_slots(obj,payload_start);
+				break;
+			}
+		default:
+			{
+				cell payload_start = obj->binary_payload_start();
+				data_visitor.visit_slots(obj,payload_start);
+				code_visitor.visit_object_code_block(obj);
+				break;
+			}
+		}
 	}
 };
 
-/* Initialize an object in a newly-loaded image */
-void factor_vm::relocate_object(object *object,
-	cell data_relocation_base,
-	cell code_relocation_base)
+void factor_vm::fixup_data(cell data_offset, cell code_offset)
 {
-	cell type = object->type();
-	
-	/* Tuple relocation is a bit trickier; we have to fix up the
-	layout object before we can get the tuple size, so each_slot is
-	out of the question */
-	if(type == TUPLE_TYPE)
+	slot_visitor<data_fixupper> data_workhorse(this,data_fixupper(data_offset));
+	data_workhorse.visit_roots();
+
+	object_fixupper fixupper(this,data_offset,code_offset);
+	fixup_sizer sizer(data_offset);
+	data->tenured->iterate(fixupper,sizer);
+}
+
+struct code_block_fixup_relocation_visitor {
+	factor_vm *parent;
+	cell code_offset;
+	slot_visitor<data_fixupper> data_visitor;
+	code_fixupper code_visitor;
+
+	code_block_fixup_relocation_visitor(factor_vm *parent_, cell data_offset_, cell code_offset_) :
+		parent(parent_),
+		code_offset(code_offset_),
+		data_visitor(slot_visitor<data_fixupper>(parent_,data_fixupper(data_offset_))),
+		code_visitor(code_fixupper(code_offset_)) {}
+
+	void operator()(instruction_operand op)
 	{
-		tuple *t = (tuple *)object;
-		data_fixup(&t->layout,data_relocation_base);
+		code_block *compiled = op.parent_code_block();
+		cell old_offset = op.rel_offset() + (cell)compiled->xt() - code_offset;
 
-		cell *scan = t->data();
-		cell *end = (cell *)((cell)object + object->size());
-
-		for(; scan < end; scan++)
-			data_fixup(scan,data_relocation_base);
-	}
-	else
-	{
-		object_fixupper fixupper(this,data_relocation_base);
-		object->each_slot(fixupper);
-
-		switch(type)
+		switch(op.rel_type())
 		{
-		case WORD_TYPE:
-			fixup_word((word *)object,code_relocation_base);
+		case RT_IMMEDIATE:
+			op.store_value(data_visitor.visit_pointer(op.load_value(old_offset)));
 			break;
-		case QUOTATION_TYPE:
-			fixup_quotation((quotation *)object,code_relocation_base);
+		case RT_XT:
+		case RT_XT_PIC:
+		case RT_XT_PIC_TAIL:
+			op.store_code_block(code_visitor(op.load_code_block(old_offset)));
 			break;
-		case DLL_TYPE:
-			ffi_dlopen((dll *)object);
+		case RT_HERE:
+			op.store_value(op.load_value(old_offset) + code_offset);
 			break;
-		case ALIEN_TYPE:
-			fixup_alien((alien *)object);
+		case RT_UNTAGGED:
 			break;
-		case CALLSTACK_TYPE:
-			fixup_callstack_object((callstack *)object,code_relocation_base);
+		default:
+			parent->store_external_address(op);
 			break;
 		}
 	}
-}
-
-/* Since the image might have been saved with a different base address than
-where it is loaded, we need to fix up pointers in the image. */
-void factor_vm::relocate_data(cell data_relocation_base, cell code_relocation_base)
-{
-	for(cell i = 0; i < special_object_count; i++)
-		data_fixup(&special_objects[i],data_relocation_base);
-
-	data_fixup(&true_object,data_relocation_base);
-	data_fixup(&bignum_zero,data_relocation_base);
-	data_fixup(&bignum_pos_one,data_relocation_base);
-	data_fixup(&bignum_neg_one,data_relocation_base);
-
-	cell obj = data->tenured->start;
-
-	while(obj)
-	{
-		relocate_object((object *)obj,data_relocation_base,code_relocation_base);
-		data->tenured->starts.record_object_start_offset((object *)obj);
-		obj = data->tenured->next_object_after(obj);
-	}
-}
-
-void factor_vm::fixup_code_block(code_block *compiled, cell data_relocation_base)
-{
-	/* relocate literal table data */
-	data_fixup(&compiled->owner,data_relocation_base);
-	data_fixup(&compiled->literals,data_relocation_base);
-	data_fixup(&compiled->relocation,data_relocation_base);
-
-	relocate_code_block(compiled);
-}
+};
 
 struct code_block_fixupper {
 	factor_vm *parent;
-	cell data_relocation_base;
+	cell data_offset;
+	cell code_offset;
 
-	explicit code_block_fixupper(factor_vm *parent_, cell data_relocation_base_) :
-		parent(parent_), data_relocation_base(data_relocation_base_) { }
+	code_block_fixupper(factor_vm *parent_, cell data_offset_, cell code_offset_) :
+		parent(parent_),
+		data_offset(data_offset_),
+		code_offset(code_offset_) {}
 
 	void operator()(code_block *compiled, cell size)
 	{
-		parent->fixup_code_block(compiled,data_relocation_base);
+		slot_visitor<data_fixupper> data_visitor(parent,data_fixupper(data_offset));
+		data_visitor.visit_code_block_objects(compiled);
+
+		code_block_fixup_relocation_visitor code_visitor(parent,data_offset,code_offset);
+		compiled->each_instruction_operand(code_visitor);
 	}
 };
 
-void factor_vm::relocate_code(cell data_relocation_base)
+void factor_vm::fixup_code(cell data_offset, cell code_offset)
 {
-	code_block_fixupper fixupper(this,data_relocation_base);
-	iterate_code_heap(fixupper);
+	code_block_fixupper fixupper(this,data_offset,code_offset);
+	code->allocator->iterate(fixupper);
 }
 
 /* Read an image file from disk, only done once during startup */
@@ -257,8 +257,11 @@ void factor_vm::load_image(vm_parameters *p)
 
 	init_objects(&h);
 
-	relocate_data(h.data_relocation_base,h.code_relocation_base);
-	relocate_code(h.data_relocation_base);
+	cell data_offset = data->tenured->start - h.data_relocation_base;
+	cell code_offset = code->seg->start - h.code_relocation_base;
+
+	fixup_data(data_offset,code_offset);
+	fixup_code(data_offset,code_offset);
 
 	/* Store image path name */
 	special_objects[OBJ_IMAGE] = allot_alien(false_object,(cell)p->image_path);
