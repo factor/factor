@@ -206,6 +206,7 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p)
 	}
 
 	update_code_roots_for_compaction();
+	callbacks->update();
 
 	current_gc->event->ended_compaction();
 }
@@ -252,6 +253,7 @@ void factor_vm::collect_compact_code_impl(bool trace_contexts_p)
 	code->allocator->compact(code_block_updater,code_block_sizer);
 
 	update_code_roots_for_compaction();
+	callbacks->update();
 }
 
 void factor_vm::collect_compact(bool trace_contexts_p)
