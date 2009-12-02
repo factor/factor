@@ -109,7 +109,7 @@ to update references to other words, without worrying about literals
 or dlsyms. */
 void factor_vm::update_word_references(code_block *compiled)
 {
-	if(code->needs_fixup_p(compiled))
+	if(code->uninitialized_p(compiled))
 		initialize_code_block(compiled);
 	/* update_word_references() is always applied to every block in
 	   the code heap. Since it resets all call sites to point to
@@ -213,19 +213,19 @@ cell factor_vm::compute_vm_address(cell arg)
 void factor_vm::store_external_address(instruction_operand op)
 {
 	code_block *compiled = op.parent_code_block();
-	array *literals = (to_boolean(compiled->literals) ? untag<array>(compiled->literals) : NULL);
+	array *parameters = (to_boolean(compiled->parameters) ? untag<array>(compiled->parameters) : NULL);
 	cell index = op.parameter_index();
 
 	switch(op.rel_type())
 	{
 	case RT_PRIMITIVE:
-		op.store_value(compute_primitive_address(array_nth(literals,index)));
+		op.store_value(compute_primitive_address(array_nth(parameters,index)));
 		break;
 	case RT_DLSYM:
-		op.store_value(compute_dlsym_address(literals,index));
+		op.store_value(compute_dlsym_address(parameters,index));
 		break;
 	case RT_HERE:
-		op.store_value(compute_here_address(array_nth(literals,index),op.rel_offset(),compiled));
+		op.store_value(compute_here_address(array_nth(parameters,index),op.rel_offset(),compiled));
 		break;
 	case RT_THIS:
 		op.store_value((cell)compiled->xt());
@@ -233,14 +233,11 @@ void factor_vm::store_external_address(instruction_operand op)
 	case RT_CONTEXT:
 		op.store_value(compute_context_address());
 		break;
-	case RT_UNTAGGED:
-		op.store_value(untag_fixnum(array_nth(literals,index)));
-		break;
 	case RT_MEGAMORPHIC_CACHE_HITS:
 		op.store_value((cell)&dispatch_stats.megamorphic_cache_hits);
 		break;
 	case RT_VM:
-		op.store_value(compute_vm_address(array_nth(literals,index)));
+		op.store_value(compute_vm_address(array_nth(parameters,index)));
 		break;
 	case RT_CARDS_OFFSET:
 		op.store_value(cards_offset);
@@ -256,28 +253,35 @@ void factor_vm::store_external_address(instruction_operand op)
 
 struct initial_code_block_visitor {
 	factor_vm *parent;
+	cell literals;
+	cell literal_index;
 
-	explicit initial_code_block_visitor(factor_vm *parent_) : parent(parent_) {}
+	explicit initial_code_block_visitor(factor_vm *parent_, cell literals_)
+		: parent(parent_), literals(literals_), literal_index(0) {}
+
+	cell next_literal()
+	{
+		return array_nth(untag<array>(literals),literal_index++);
+	}
 
 	void operator()(instruction_operand op)
 	{
-		code_block *compiled = op.parent_code_block();
-		array *literals = (to_boolean(compiled->literals) ? untag<array>(compiled->literals) : NULL);
-		cell index = op.parameter_index();
-
 		switch(op.rel_type())
 		{
 		case RT_IMMEDIATE:
-			op.store_value(array_nth(literals,index));
+			op.store_value(next_literal());
 			break;
 		case RT_XT:
-			op.store_value(parent->compute_xt_address(array_nth(literals,index)));
+			op.store_value(parent->compute_xt_address(next_literal()));
 			break;
 		case RT_XT_PIC:
-			op.store_value(parent->compute_xt_pic_address(array_nth(literals,index)));
+			op.store_value(parent->compute_xt_pic_address(next_literal()));
 			break;
 		case RT_XT_PIC_TAIL:
-			op.store_value(parent->compute_xt_pic_tail_address(array_nth(literals,index)));
+			op.store_value(parent->compute_xt_pic_tail_address(next_literal()));
+			break;
+		case RT_UNTAGGED:
+			op.store_value(untag_fixnum(next_literal()));
 			break;
 		default:
 			parent->store_external_address(op);
@@ -289,10 +293,11 @@ struct initial_code_block_visitor {
 /* Perform all fixups on a code block */
 void factor_vm::initialize_code_block(code_block *compiled)
 {
-	code->needs_fixup.erase(compiled);
-	initial_code_block_visitor visitor(this);
+	std::map<code_block *,cell>::iterator iter = code->uninitialized_blocks.find(compiled);
+	initial_code_block_visitor visitor(this,iter->second);
 	compiled->each_instruction_operand(visitor);
 	compiled->flush_icache();
+	code->uninitialized_blocks.erase(iter);
 }
 
 /* Fixup labels. This is done at compile time, not image load time */
@@ -342,12 +347,13 @@ code_block *factor_vm::allot_code_block(cell size, code_block_type type)
 }
 
 /* Might GC */
-code_block *factor_vm::add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_)
+code_block *factor_vm::add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell parameters_, cell literals_)
 {
 	data_root<byte_array> code(code_,this);
 	data_root<object> labels(labels_,this);
 	data_root<object> owner(owner_,this);
 	data_root<byte_array> relocation(relocation_,this);
+	data_root<array> parameters(parameters_,this);
 	data_root<array> literals(literals_,this);
 
 	cell code_length = array_capacity(code.untagged());
@@ -361,10 +367,10 @@ code_block *factor_vm::add_code_block(code_block_type type, cell code_, cell lab
 	else
 		compiled->relocation = relocation.value();
 
-	if(literals.type() == ARRAY_TYPE && array_capacity(literals.untagged()) == 0)
-		compiled->literals = false_object;
+	if(parameters.type() == ARRAY_TYPE && array_capacity(parameters.untagged()) == 0)
+		compiled->parameters = false_object;
 	else
-		compiled->literals = literals.value();
+		compiled->parameters = parameters.value();
 
 	/* code */
 	memcpy(compiled + 1,code.untagged() + 1,code_length);
@@ -376,7 +382,7 @@ code_block *factor_vm::add_code_block(code_block_type type, cell code_, cell lab
 	/* next time we do a minor GC, we have to scan the code heap for
 	literals */
 	this->code->write_barrier(compiled);
-	this->code->needs_fixup.insert(compiled);
+	this->code->uninitialized_blocks.insert(std::make_pair(compiled,literals.value()));
 
 	return compiled;
 }

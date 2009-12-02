@@ -70,7 +70,7 @@ void inline_cache_jit::emit_check(cell klass)
 	else
 		code_template = parent->special_objects[PIC_CHECK_TUPLE];
 
-	emit_with(code_template,klass);
+	emit_with_literal(code_template,klass);
 }
 
 /* index: 0 = top of stack, 1 = item underneath, etc
@@ -101,7 +101,7 @@ void inline_cache_jit::compile_inline_cache(fixnum index,
 
 		/* Yes? Jump to method */
 		cell method = array_nth(cache_entries.untagged(),i + 1);
-		emit_with(parent->special_objects[PIC_HIT],method);
+		emit_with_literal(parent->special_objects[PIC_HIT],method);
 	}
 
 	/* Generate machine code to handle a cache miss, which ultimately results in

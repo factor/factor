@@ -23,6 +23,7 @@ template<typename Visitor> struct code_block_visitor {
 	void visit_object_code_block(object *obj);
 	void visit_embedded_code_pointers(code_block *compiled);
 	void visit_context_code_blocks();
+	void visit_uninitialized_code_blocks();
 };
 
 template<typename Visitor>
@@ -102,7 +103,7 @@ struct embedded_code_pointers_visitor {
 template<typename Visitor>
 void code_block_visitor<Visitor>::visit_embedded_code_pointers(code_block *compiled)
 {
-	if(!parent->code->needs_fixup_p(compiled))
+	if(!parent->code->uninitialized_p(compiled))
 	{
 		embedded_code_pointers_visitor<Visitor> visitor(this->visitor);
 		compiled->each_instruction_operand(visitor);
@@ -114,6 +115,24 @@ void code_block_visitor<Visitor>::visit_context_code_blocks()
 {
 	call_frame_code_block_visitor<Visitor> call_frame_visitor(parent,visitor);
 	parent->iterate_active_frames(call_frame_visitor);
+}
+
+template<typename Visitor>
+void code_block_visitor<Visitor>::visit_uninitialized_code_blocks()
+{
+	std::map<code_block *, cell> *uninitialized_blocks = &parent->code->uninitialized_blocks;
+	std::map<code_block *, cell>::const_iterator iter = uninitialized_blocks->begin();
+	std::map<code_block *, cell>::const_iterator end = uninitialized_blocks->end();
+
+	std::map<code_block *, cell> new_uninitialized_blocks;
+	for(; iter != end; iter++)
+	{
+		new_uninitialized_blocks.insert(std::make_pair(
+			visitor(iter->first),
+			iter->second));
+	}
+
+	parent->code->uninitialized_blocks = new_uninitialized_blocks;
 }
 
 }
