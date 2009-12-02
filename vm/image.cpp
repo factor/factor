@@ -178,9 +178,6 @@ struct code_block_fixup_relocation_visitor {
 	void operator()(instruction_operand op)
 	{
 		code_block *compiled = op.parent_code_block();
-		array *literals = (to_boolean(compiled->literals) ? untag<array>(compiled->literals) : NULL);
-		cell index = op.parameter_index();
-
 		cell old_offset = op.rel_offset() + (cell)compiled->xt() - code_offset;
 
 		switch(op.rel_type())
@@ -194,7 +191,7 @@ struct code_block_fixup_relocation_visitor {
 			op.store_code_block(code_visitor(op.load_code_block(old_offset)));
 			break;
 		default:
-			parent->store_external_relocation(op);
+			parent->store_external_address(op);
 			break;
 		}
 	}

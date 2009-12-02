@@ -133,7 +133,7 @@ code_block *factor_vm::compile_inline_cache(fixnum index,
 				 cache_entries.value(),
 				 tail_call_p);
 	code_block *code = jit.to_code_block();
-	relocate_code_block(code);
+	initialize_code_block(code);
 	return code;
 }
 
