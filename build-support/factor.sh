@@ -11,7 +11,7 @@ ECHO=echo
 OS=
 ARCH=
 WORD=
-NO_UI=
+NO_UI=${NO_UI-}
 GIT_PROTOCOL=${GIT_PROTOCOL:="git"}
 GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://factorcode.org/git/factor.git"}
 SCRIPT_ARGS="$*"
@@ -132,9 +132,11 @@ check_library_exists() {
 }
 
 check_X11_libraries() {
-    check_library_exists GL
-    check_library_exists X11
-    check_library_exists pango-1.0
+    if [ -z "$NO_UI" ]; then
+        check_library_exists GL
+        check_library_exists X11
+        check_library_exists pango-1.0
+    fi
 }
 
 check_libraries() {
