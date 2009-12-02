@@ -32,6 +32,7 @@ template<typename Visitor> struct slot_visitor {
 	void visit_data_roots();
 	void visit_bignum_roots();
 	void visit_callback_roots();
+	void visit_literal_table_roots();
 	void visit_roots();
 	void visit_contexts();
 	void visit_code_block_objects(code_block *compiled);
@@ -131,6 +132,24 @@ void slot_visitor<Visitor>::visit_callback_roots()
 }
 
 template<typename Visitor>
+void slot_visitor<Visitor>::visit_literal_table_roots()
+{
+	std::map<code_block *, cell> *uninitialized_blocks = &parent->code->uninitialized_blocks;
+	std::map<code_block *, cell>::const_iterator iter = uninitialized_blocks->begin();
+	std::map<code_block *, cell>::const_iterator end = uninitialized_blocks->end();
+
+	std::map<code_block *, cell> new_uninitialized_blocks;
+	for(; iter != end; iter++)
+	{
+		new_uninitialized_blocks.insert(std::make_pair(
+			iter->first,
+			visit_pointer(iter->second)));
+	}
+
+	parent->code->uninitialized_blocks = new_uninitialized_blocks;
+}
+
+template<typename Visitor>
 void slot_visitor<Visitor>::visit_roots()
 {
 	visit_handle(&parent->true_object);
@@ -141,6 +160,7 @@ void slot_visitor<Visitor>::visit_roots()
 	visit_data_roots();
 	visit_bignum_roots();
 	visit_callback_roots();
+	visit_literal_table_roots();
 
 	for(cell i = 0; i < special_object_count; i++)
 		visit_handle(&parent->special_objects[i]);
@@ -180,14 +200,14 @@ template<typename Visitor>
 void slot_visitor<Visitor>::visit_code_block_objects(code_block *compiled)
 {
 	visit_handle(&compiled->owner);
-	visit_handle(&compiled->literals);
+	visit_handle(&compiled->parameters);
 	visit_handle(&compiled->relocation);
 }
 
 template<typename Visitor>
 void slot_visitor<Visitor>::visit_embedded_literals(code_block *compiled)
 {
-	if(!parent->code->needs_fixup_p(compiled))
+	if(!parent->code->uninitialized_p(compiled))
 	{
 		literal_references_visitor<Visitor> visitor(this);
 		compiled->each_instruction_operand(visitor);

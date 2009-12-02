@@ -96,16 +96,16 @@ struct relocation_entry {
 		switch(rel_type())
 		{
 		case RT_PRIMITIVE:
-		case RT_XT:
-		case RT_XT_PIC:
-		case RT_XT_PIC_TAIL:
-		case RT_IMMEDIATE:
 		case RT_HERE:
-		case RT_UNTAGGED:
 		case RT_VM:
 			return 1;
 		case RT_DLSYM:
 			return 2;
+		case RT_XT:
+		case RT_XT_PIC:
+		case RT_XT_PIC_TAIL:
+		case RT_IMMEDIATE:
+		case RT_UNTAGGED:
 		case RT_THIS:
 		case RT_CONTEXT:
 		case RT_MEGAMORPHIC_CACHE_HITS:

@@ -2,18 +2,6 @@
 
 namespace factor {
 
-void factor_vm::update_fixup_set_for_compaction(mark_bits<code_block> *forwarding_map)
-{
-	std::set<code_block *>::const_iterator iter = code->needs_fixup.begin();
-	std::set<code_block *>::const_iterator end = code->needs_fixup.end();
-
-	std::set<code_block *> new_needs_fixup;
-	for(; iter != end; iter++)
-		new_needs_fixup.insert(forwarding_map->forward_block(*iter));
-
-	code->needs_fixup = new_needs_fixup;
-}
-
 template<typename Block> struct forwarder {
 	mark_bits<Block> *forwarding_map;
 
@@ -178,10 +166,10 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p)
 	data_forwarding_map->compute_forwarding();
 	code_forwarding_map->compute_forwarding();
 
-	update_fixup_set_for_compaction(code_forwarding_map);
-
 	slot_visitor<forwarder<object> > slot_forwarder(this,forwarder<object>(data_forwarding_map));
 	code_block_visitor<forwarder<code_block> > code_forwarder(this,forwarder<code_block>(code_forwarding_map));
+
+	code_forwarder.visit_uninitialized_code_blocks();
 
 	/* Object start offsets get recomputed by the object_compaction_updater */
 	data->tenured->starts.clear_object_start_offsets();
@@ -234,10 +222,10 @@ void factor_vm::collect_compact_code_impl(bool trace_contexts_p)
 	mark_bits<code_block> *code_forwarding_map = &code->allocator->state;
 	code_forwarding_map->compute_forwarding();
 
-	update_fixup_set_for_compaction(code_forwarding_map);
-
 	slot_visitor<dummy_slot_forwarder> slot_forwarder(this,dummy_slot_forwarder());
 	code_block_visitor<forwarder<code_block> > code_forwarder(this,forwarder<code_block>(code_forwarding_map));
+
+	code_forwarder.visit_uninitialized_code_blocks();
 
 	if(trace_contexts_p)
 		code_forwarder.visit_context_code_blocks();

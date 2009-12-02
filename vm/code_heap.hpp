@@ -8,8 +8,10 @@ struct code_heap {
 	/* Memory allocator */
 	free_list_allocator<code_block> *allocator;
 
-	/* Set of blocks which need to be initialized by initialize_code_block(). */
-	std::set<code_block *> needs_fixup;
+	/* Keys are blocks which need to be initialized by initialize_code_block().
+	Values are literal tables. Literal table arrays are GC roots until the
+	time the block is initialized, after which point they are discarded. */
+	std::map<code_block *, cell> uninitialized_blocks;
 
 	/* Code blocks which may reference objects in the nursery */
 	std::set<code_block *> points_to_nursery;
@@ -21,7 +23,7 @@ struct code_heap {
 	~code_heap();
 	void write_barrier(code_block *compiled);
 	void clear_remembered_set();
-	bool needs_fixup_p(code_block *compiled);
+	bool uninitialized_p(code_block *compiled);
 	bool marked_p(code_block *compiled);
 	void set_marked_p(code_block *compiled);
 	void clear_mark_bits();

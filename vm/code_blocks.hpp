@@ -6,7 +6,7 @@ struct code_block
 {
 	cell header;
 	cell owner; /* tagged pointer to word, quotation or f */
-	cell literals; /* tagged pointer to array or f */
+	cell parameters; /* tagged pointer to array or f */
 	cell relocation; /* tagged pointer to byte-array or f */
 
 	bool free_p() const

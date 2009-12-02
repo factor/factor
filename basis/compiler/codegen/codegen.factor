@@ -63,7 +63,7 @@ M: ##no-tco generate-insn drop ;
 
 M: ##call generate-insn
     word>> dup sub-primitive>>
-    [ second first % ] [ [ add-call ] [ %call ] bi ] ?if ;
+    [ third first % ] [ [ add-call ] [ %call ] bi ] ?if ;
 
 M: ##jump generate-insn word>> [ add-call ] [ %jump ] bi ;
 

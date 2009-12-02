@@ -204,8 +204,8 @@ void quotation_jit::iterate_quotation()
 			/* Primitive calls */
 			if(primitive_call_p(i,length))
 			{
-				literal(tag_fixnum(0));
-				literal(obj.value());
+				parameter(tag_fixnum(0));
+				parameter(obj.value());
 				emit(parent->special_objects[JIT_PRIMITIVE]);
 
 				i++;

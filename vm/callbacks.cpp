@@ -53,7 +53,7 @@ code_block *callback_heap::add(cell owner)
 
 	code_block *stub = (code_block *)free_block;
 	stub->owner = owner;
-	stub->literals = false_object;
+	stub->parameters = false_object;
 	stub->relocation = false_object;
 
 	memcpy(stub->xt(),insns->data<void>(),size);
