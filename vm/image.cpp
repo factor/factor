@@ -193,38 +193,8 @@ struct code_block_fixup_relocation_visitor {
 		case RT_XT_PIC_TAIL:
 			op.store_code_block(code_visitor(op.load_code_block(old_offset)));
 			break;
-		case RT_PRIMITIVE:
-			op.store_value(parent->compute_primitive_relocation(array_nth(literals,index)));
-			break;
-		case RT_DLSYM:
-			op.store_value(parent->compute_dlsym_relocation(literals,index));
-			break;
-		case RT_HERE:
-			op.store_value(parent->compute_here_relocation(array_nth(literals,index),op.rel_offset(),compiled));
-			break;
-		case RT_THIS:
-			op.store_value((cell)compiled->xt());
-			break;
-		case RT_CONTEXT:
-			op.store_value(parent->compute_context_relocation());
-			break;
-		case RT_UNTAGGED:
-			op.store_value(untag_fixnum(array_nth(literals,index)));
-			break;
-		case RT_MEGAMORPHIC_CACHE_HITS:
-			op.store_value((cell)&parent->dispatch_stats.megamorphic_cache_hits);
-			break;
-		case RT_VM:
-			op.store_value(parent->compute_vm_relocation(array_nth(literals,index)));
-			break;
-		case RT_CARDS_OFFSET:
-			op.store_value(parent->cards_offset);
-			break;
-		case RT_DECKS_OFFSET:
-			op.store_value(parent->decks_offset);
-			break;
 		default:
-			critical_error("Bad rel type",op.rel_type());
+			parent->store_external_relocation(op);
 			break;
 		}
 	}
