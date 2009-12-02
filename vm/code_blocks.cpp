@@ -62,12 +62,7 @@ cell factor_vm::code_block_owner(code_block *compiled)
 		return word_wrapper->object;
 	}
 	else
-	{
-#ifdef FACTOR_DEBUG
-		assert(owner.type_p(WORD_TYPE));
-#endif
 		return compiled->owner;
-	}
 }
 
 struct update_word_references_relocation_visitor {
@@ -82,19 +77,22 @@ struct update_word_references_relocation_visitor {
 		case RT_XT:
 			{
 				code_block *compiled = op.load_code_block();
-				op.store_value(parent->compute_xt_address(compiled->owner));
+				cell owner = compiled->owner;
+				if(to_boolean(owner)) op.store_value(parent->compute_xt_address(owner));
 				break;
 			}
 		case RT_XT_PIC:
 			{
 				code_block *compiled = op.load_code_block();
-				op.store_value(parent->compute_xt_pic_address(parent->code_block_owner(compiled)));
+				cell owner = parent->code_block_owner(compiled);
+				if(to_boolean(owner)) op.store_value(parent->compute_xt_pic_address(owner));
 				break;
 			}
 		case RT_XT_PIC_TAIL:
 			{
 				code_block *compiled = op.load_code_block();
-				op.store_value(parent->compute_xt_pic_tail_address(parent->code_block_owner(compiled)));
+				cell owner = parent->code_block_owner(compiled);
+				if(to_boolean(owner)) op.store_value(parent->compute_xt_pic_tail_address(owner));
 				break;
 			}
 		default:
@@ -119,7 +117,7 @@ void factor_vm::update_word_references(code_block *compiled)
 	   the code heap with dead PICs that will be freed on the next
 	   GC, we add them to the free list immediately. */
 	else if(compiled->pic_p())
-		code->code_heap_free(compiled);
+		code->free(compiled);
 	else
 	{
 		update_word_references_relocation_visitor visitor(this);
