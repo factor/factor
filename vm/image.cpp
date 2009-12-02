@@ -190,6 +190,9 @@ struct code_block_fixup_relocation_visitor {
 		case RT_XT_PIC_TAIL:
 			op.store_code_block(code_visitor(op.load_code_block(old_offset)));
 			break;
+		case RT_HERE:
+			op.store_value(op.load_value(old_offset) + code_offset);
+			break;
 		case RT_UNTAGGED:
 			break;
 		default:
