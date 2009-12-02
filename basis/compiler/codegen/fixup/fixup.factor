@@ -80,7 +80,7 @@ SYMBOL: relocation-table
     rt-this rel-fixup ;
 
 : rel-here ( offset class -- )
-    [ add-parameter ] dip rt-here rel-fixup ;
+    [ add-literal ] dip rt-here rel-fixup ;
 
 : rel-vm ( offset class -- )
     [ add-parameter ] dip rt-vm rel-fixup ;
@@ -96,7 +96,7 @@ SYMBOL: relocation-table
     label>> offset>> [ "Unresolved label" throw ] unless* ;
 
 : resolve-absolute-label ( label-fixup -- )
-    dup resolve-offset neg add-parameter
+    dup resolve-offset neg add-literal
     [ rt-here ] dip [ class>> ] [ offset>> ] bi add-relocation-entry ;
 
 : resolve-relative-label ( label-fixup -- label )

@@ -33,8 +33,9 @@ struct jit {
 	void word_jump(cell word_)
 	{
 		data_root<word> word(word_,parent);
-		parameter(tag_fixnum(xt_tail_pic_offset));
-		emit_with_literal(parent->special_objects[JIT_WORD_JUMP],word.value());
+		literal(tag_fixnum(xt_tail_pic_offset));
+		literal(word.value());
+		emit(parent->special_objects[JIT_WORD_JUMP]);
 	}
 
 	void word_call(cell word)
