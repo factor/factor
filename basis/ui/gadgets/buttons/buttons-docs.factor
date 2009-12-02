@@ -33,10 +33,10 @@ HELP: button-pen
         { { $snippet "plain"    } " - the button is inactive" }
         { { $snippet "rollover" } " - the button is under the mouse" }
         { { $snippet "pressed"  } " - the button is under the mouse and a mouse button is held down" }
-        { { $snippet "selected" } " - the button is selected (see " { $link checkbox }  }
-        { { $snippet "selected" } " - the button is selected and a mouse button is being held down (see " { $link checkbox }  }
+        { { $snippet "selected" } " - the button is selected (see " { $link checkbox } ")" }
+        { { $snippet "pressed-selected" } " - the button is selected and a mouse button is being held down (see " { $link checkbox } ")" }
     }
-"The " { $link <roll-button> } " and " { $link <border-button> } " words create " { $link button } " instances with specific " { $link button-pen } "." } ;
+"The " { $link <roll-button> } " and " { $link <border-button> } " words create " { $link button } " instances with specific " { $link button-pen } "s." } ;
 
 HELP: <command-button>
 { $values { "target" object } { "gesture" "a gesture" } { "command" "a command" } { "button" "a new " { $link button } } }
