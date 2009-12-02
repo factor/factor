@@ -210,6 +210,50 @@ void factor_vm::check_code_address(cell address)
 #endif
 }
 
+void factor_vm::store_external_relocation(instruction_operand op)
+{
+	code_block *compiled = op.parent_code_block();
+	array *literals = (to_boolean(compiled->literals) ? untag<array>(compiled->literals) : NULL);
+	cell index = op.parameter_index();
+
+	switch(op.rel_type())
+	{
+	case RT_PRIMITIVE:
+		op.store_value(parent->compute_primitive_relocation(array_nth(literals,index)));
+		break;
+	case RT_DLSYM:
+		op.store_value(parent->compute_dlsym_relocation(literals,index));
+		break;
+	case RT_HERE:
+		op.store_value(parent->compute_here_relocation(array_nth(literals,index),op.rel_offset(),compiled));
+		break;
+	case RT_THIS:
+		op.store_value((cell)compiled->xt());
+		break;
+	case RT_CONTEXT:
+		op.store_value(parent->compute_context_relocation());
+		break;
+	case RT_UNTAGGED:
+		op.store_value(untag_fixnum(array_nth(literals,index)));
+		break;
+	case RT_MEGAMORPHIC_CACHE_HITS:
+		op.store_value((cell)&parent->dispatch_stats.megamorphic_cache_hits);
+		break;
+	case RT_VM:
+		op.store_value(parent->compute_vm_relocation(array_nth(literals,index)));
+		break;
+	case RT_CARDS_OFFSET:
+		op.store_value(parent->cards_offset);
+		break;
+	case RT_DECKS_OFFSET:
+		op.store_value(parent->decks_offset);
+		break;
+	default:
+		critical_error("Bad rel type",op.rel_type());
+		break;
+	}
+}
+
 struct relocate_code_block_relocation_visitor {
 	factor_vm *parent;
 
@@ -223,12 +267,6 @@ struct relocate_code_block_relocation_visitor {
 
 		switch(op.rel_type())
 		{
-		case RT_PRIMITIVE:
-			op.store_value(parent->compute_primitive_relocation(array_nth(literals,index)));
-			break;
-		case RT_DLSYM:
-			op.store_value(parent->compute_dlsym_relocation(literals,index));
-			break;
 		case RT_IMMEDIATE:
 			op.store_value(array_nth(literals,index));
 			break;
@@ -241,32 +279,8 @@ struct relocate_code_block_relocation_visitor {
 		case RT_XT_PIC_TAIL:
 			op.store_value(parent->compute_xt_pic_tail_relocation(array_nth(literals,index)));
 			break;
-		case RT_HERE:
-			op.store_value(parent->compute_here_relocation(array_nth(literals,index),op.rel_offset(),compiled));
-			break;
-		case RT_THIS:
-			op.store_value((cell)compiled->xt());
-			break;
-		case RT_CONTEXT:
-			op.store_value(parent->compute_context_relocation());
-			break;
-		case RT_UNTAGGED:
-			op.store_value(untag_fixnum(array_nth(literals,index)));
-			break;
-		case RT_MEGAMORPHIC_CACHE_HITS:
-			op.store_value((cell)&parent->dispatch_stats.megamorphic_cache_hits);
-			break;
-		case RT_VM:
-			op.store_value(parent->compute_vm_relocation(array_nth(literals,index)));
-			break;
-		case RT_CARDS_OFFSET:
-			op.store_value(parent->cards_offset);
-			break;
-		case RT_DECKS_OFFSET:
-			op.store_value(parent->decks_offset);
-			break;
 		default:
-			critical_error("Bad rel type",op.rel_type());
+			parent->store_external_relocation(op);
 			break;
 		}
 	}
