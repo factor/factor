@@ -120,7 +120,6 @@ struct callback_slot_visitor {
 	void operator()(code_block *stub)
 	{
 		visitor->visit_handle(&stub->owner);
-		callbacks->update(stub);
 	}
 };
 

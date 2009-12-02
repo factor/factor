@@ -41,6 +41,8 @@ struct callback_heap {
 	void update(code_block *stub);
 	code_block *add(cell owner);
 
+	void update();
+
 	code_block *next(code_block *stub)
 	{
 		return (code_block *)((cell)stub + stub->size());
