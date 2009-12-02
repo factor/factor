@@ -16,11 +16,11 @@ fixnum instruction_operand::load_value_2_2()
 }
 
 /* Load a value from a bitfield of a PowerPC instruction */
-fixnum instruction_operand::load_value_masked(cell mask, fixnum shift)
+fixnum instruction_operand::load_value_masked(cell mask, cell bits, cell shift)
 {
-	cell *ptr = (cell *)pointer;
+	fixnum *ptr = (fixnum *)pointer;
 
-	return (*ptr & mask) << shift;
+	return (((*ptr & mask) << bits) >> bits) << shift;
 }
 
 fixnum instruction_operand::load_value(cell relative_to)
@@ -36,17 +36,17 @@ fixnum instruction_operand::load_value(cell relative_to)
 	case RC_ABSOLUTE_PPC_2_2:
 		return load_value_2_2();
 	case RC_ABSOLUTE_PPC_2:
-		return load_value_masked(rel_absolute_ppc_2_mask,0);
+		return load_value_masked(rel_absolute_ppc_2_mask,0,0);
 	case RC_RELATIVE_PPC_2:
-		return load_value_masked(rel_relative_ppc_2_mask,0) + relative_to;
+		return load_value_masked(rel_relative_ppc_2_mask,16,0) + relative_to;
 	case RC_RELATIVE_PPC_3:
-		return load_value_masked(rel_relative_ppc_3_mask,0) + relative_to;
+		return load_value_masked(rel_relative_ppc_3_mask,10,0) + relative_to;
 	case RC_RELATIVE_ARM_3:
-		return load_value_masked(rel_relative_arm_3_mask,2) + relative_to + sizeof(cell) * 2;
+		return load_value_masked(rel_relative_arm_3_mask,10,2) + relative_to + sizeof(cell) * 2;
 	case RC_INDIRECT_ARM:
-		return load_value_masked(rel_indirect_arm_mask,0) + relative_to + sizeof(cell);
+		return load_value_masked(rel_indirect_arm_mask,20,0) + relative_to + sizeof(cell);
 	case RC_INDIRECT_ARM_PC:
-		return load_value_masked(rel_indirect_arm_mask,0) + relative_to + sizeof(cell) * 2;
+		return load_value_masked(rel_indirect_arm_mask,20,0) + relative_to + sizeof(cell) * 2;
 	default:
 		critical_error("Bad rel class",rel.rel_class());
 		return 0;
@@ -77,7 +77,7 @@ void instruction_operand::store_value_2_2(fixnum value)
 }
 
 /* Store a value into a bitfield of a PowerPC instruction */
-void instruction_operand::store_value_masked(fixnum value, cell mask, fixnum shift)
+void instruction_operand::store_value_masked(fixnum value, cell mask, cell shift)
 {
 	cell *ptr = (cell *)pointer;
 
