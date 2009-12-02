@@ -62,6 +62,23 @@ code_block *callback_heap::add(cell owner)
 	return stub;
 }
 
+struct callback_updater {
+	callback_heap *callbacks;
+
+	explicit callback_updater(callback_heap *callbacks_) : callbacks(callbacks_) {}
+
+	void operator()(code_block *stub)
+	{
+		callbacks->update(stub);
+	}
+};
+
+void callback_heap::update()
+{
+	callback_updater updater(this);
+	each_callback(updater);
+}
+
 void factor_vm::primitive_callback()
 {
 	tagged<word> w(dpop());
