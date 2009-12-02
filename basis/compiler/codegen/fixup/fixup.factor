@@ -3,12 +3,17 @@
 USING: arrays byte-arrays byte-vectors generic assocs hashtables
 io.binary kernel kernel.private math namespaces make sequences
 words quotations strings alien.accessors alien.strings layouts
-system combinators math.bitwise math.order
-accessors growable fry generalizations compiler.constants ;
+system combinators math.bitwise math.order generalizations
+accessors growable fry compiler.constants ;
 IN: compiler.codegen.fixup
 
 ! Owner
 SYMBOL: compiling-word
+
+! Parameter table
+SYMBOL: parameter-table
+
+: add-parameter ( obj -- ) parameter-table get push ;
 
 ! Literal table
 SYMBOL: literal-table
@@ -50,11 +55,11 @@ SYMBOL: relocation-table
 : rel-fixup ( class type -- )
     swap dup offset-for-class add-relocation-entry ;
 
-: add-dlsym-literals ( symbol dll -- )
-    [ string>symbol add-literal ] [ add-literal ] bi* ;
+: add-dlsym-parameters ( symbol dll -- )
+    [ string>symbol add-parameter ] [ add-parameter ] bi* ;
 
 : rel-dlsym ( name dll class -- )
-    [ add-dlsym-literals ] dip rt-dlsym rel-fixup ;
+    [ add-dlsym-parameters ] dip rt-dlsym rel-fixup ;
 
 : rel-word ( word class -- )
     [ add-literal ] dip rt-xt rel-fixup ;
@@ -66,7 +71,7 @@ SYMBOL: relocation-table
     [ add-literal ] dip rt-xt-pic-tail rel-fixup ;
 
 : rel-primitive ( word class -- )
-    [ def>> first add-literal ] dip rt-primitive rel-fixup ;
+    [ def>> first add-parameter ] dip rt-primitive rel-fixup ;
 
 : rel-immediate ( literal class -- )
     [ add-literal ] dip rt-immediate rel-fixup ;
@@ -78,7 +83,7 @@ SYMBOL: relocation-table
     [ add-literal ] dip rt-here rel-fixup ;
 
 : rel-vm ( offset class -- )
-    [ add-literal ] dip rt-vm rel-fixup ;
+    [ add-parameter ] dip rt-vm rel-fixup ;
 
 : rel-cards-offset ( class -- )
     rt-cards-offset rel-fixup ;
@@ -105,6 +110,7 @@ SYMBOL: relocation-table
 
 : init-fixup ( word -- )
     compiling-word set
+    V{ } clone parameter-table set
     V{ } clone literal-table set
     V{ } clone label-table set
     BV{ } clone relocation-table set ;
@@ -114,7 +120,7 @@ SYMBOL: relocation-table
         init-fixup
         @
         label-table [ resolve-labels ] change
-        compiling-word get
+        parameter-table get >array
         literal-table get >array
         relocation-table get >byte-array
         label-table get

@@ -64,6 +64,100 @@ static const cell rel_indirect_arm_mask = 0xfff;
 static const cell rel_relative_arm_3_mask = 0xffffff;
 
 /* code relocation table consists of a table of entries for each fixup */
-typedef u32 relocation_entry;
+struct relocation_entry {
+	u32 value;
+
+	explicit relocation_entry(u32 value_) : value(value_) {}
+
+	relocation_entry(relocation_type rel_type,
+		relocation_class rel_class,
+		cell offset)
+	{
+		value = (rel_type << 28) | (rel_class << 24) | offset;
+	}
+
+	relocation_type rel_type()
+	{
+		return (relocation_type)((value & 0xf0000000) >> 28);
+	}
+
+	relocation_class rel_class()
+	{
+		return (relocation_class)((value & 0x0f000000) >> 24);
+	}
+
+	cell rel_offset()
+	{
+		return (value & 0x00ffffff);
+	}
+
+	int number_of_parameters()
+	{
+		switch(rel_type())
+		{
+		case RT_PRIMITIVE:
+		case RT_VM:
+			return 1;
+		case RT_DLSYM:
+			return 2;
+		case RT_XT:
+		case RT_XT_PIC:
+		case RT_XT_PIC_TAIL:
+		case RT_IMMEDIATE:
+		case RT_HERE:
+		case RT_UNTAGGED:
+		case RT_THIS:
+		case RT_CONTEXT:
+		case RT_MEGAMORPHIC_CACHE_HITS:
+		case RT_CARDS_OFFSET:
+		case RT_DECKS_OFFSET:
+			return 0;
+		default:
+			critical_error("Bad rel type",rel_type());
+			return -1; /* Can't happen */
+		}
+	}
+};
+
+struct instruction_operand {
+	relocation_entry rel;
+	code_block *compiled;
+	cell index;
+	cell pointer;
+
+	instruction_operand(relocation_entry rel_, code_block *compiled_, cell index_);
+
+	relocation_type rel_type()
+	{
+		return rel.rel_type();
+	}
+
+	cell rel_offset()
+	{
+		return rel.rel_offset();
+	}
+
+	cell parameter_index()
+	{
+		return index;
+	}
+
+	code_block *parent_code_block()
+	{
+		return compiled;
+	}
+
+	fixnum load_value_2_2();
+	fixnum load_value_masked(cell mask, cell bits, cell shift);
+	fixnum load_value(cell relative_to);
+	fixnum load_value();
+	code_block *load_code_block(cell relative_to);
+	code_block *load_code_block();
+
+	void store_value_2_2(fixnum value);
+	void store_value_masked(fixnum value, cell mask, cell shift);
+	void store_value(fixnum value);
+	void store_code_block(code_block *compiled);
+};
 
 }

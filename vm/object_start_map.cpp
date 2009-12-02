@@ -60,7 +60,7 @@ void object_start_map::update_card_for_sweep(cell index, u16 mask)
 	cell offset = object_start_offsets[index];
 	if(offset != card_starts_inside_object)
 	{
-		mask >>= (offset / block_granularity);
+		mask >>= (offset / data_alignment);
 
 		if(mask == 0)
 		{
@@ -70,7 +70,7 @@ void object_start_map::update_card_for_sweep(cell index, u16 mask)
 		else
 		{
 			/* Move the object start forward if necessary */
-			object_start_offsets[index] = offset + (rightmost_set_bit(mask) * block_granularity);
+			object_start_offsets[index] = offset + (rightmost_set_bit(mask) * data_alignment);
 		}
 	}
 }

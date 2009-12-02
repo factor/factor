@@ -1,12 +1,12 @@
 namespace factor
 {
 
-template<typename TargetGeneration, typename Policy> struct collector_workhorse {
+template<typename TargetGeneration, typename Policy> struct data_workhorse {
 	factor_vm *parent;
 	TargetGeneration *target;
 	Policy policy;
 
-	explicit collector_workhorse(factor_vm *parent_, TargetGeneration *target_, Policy policy_) :
+	explicit data_workhorse(factor_vm *parent_, TargetGeneration *target_, Policy policy_) :
 		parent(parent_),
 		target(target_),
 		policy(policy_) {}
@@ -61,13 +61,13 @@ template<typename TargetGeneration, typename Policy> struct collector_workhorse 
 };
 
 template<typename TargetGeneration, typename Policy>
-inline static slot_visitor<collector_workhorse<TargetGeneration,Policy> > make_collector_workhorse(
+inline static slot_visitor<data_workhorse<TargetGeneration,Policy> > make_data_visitor(
 	factor_vm *parent,
 	TargetGeneration *target,
 	Policy policy)
 {
-	return slot_visitor<collector_workhorse<TargetGeneration,Policy> >(parent,
-		collector_workhorse<TargetGeneration,Policy>(parent,target,policy));
+	return slot_visitor<data_workhorse<TargetGeneration,Policy> >(parent,
+		data_workhorse<TargetGeneration,Policy>(parent,target,policy));
 }
 
 struct dummy_unmarker {
@@ -85,12 +85,13 @@ struct full_unmarker {
 	void operator()(card *ptr) { *ptr = 0; }
 };
 
-template<typename TargetGeneration, typename Policy> struct collector {
+template<typename TargetGeneration, typename Policy>
+struct collector {
 	factor_vm *parent;
 	data_heap *data;
 	code_heap *code;
 	TargetGeneration *target;
-	slot_visitor<collector_workhorse<TargetGeneration,Policy> > workhorse;
+	slot_visitor<data_workhorse<TargetGeneration,Policy> > data_visitor;
 	cell cards_scanned;
 	cell decks_scanned;
 	cell code_blocks_scanned;
@@ -100,37 +101,41 @@ template<typename TargetGeneration, typename Policy> struct collector {
 		data(parent_->data),
 		code(parent_->code),
 		target(target_),
-		workhorse(make_collector_workhorse(parent_,target_,policy_)),
+		data_visitor(make_data_visitor(parent_,target_,policy_)),
 		cards_scanned(0),
 		decks_scanned(0),
 		code_blocks_scanned(0) {}
 
 	void trace_handle(cell *handle)
 	{
-		workhorse.visit_handle(handle);
+		data_visitor.visit_handle(handle);
 	}
 
 	void trace_object(object *ptr)
 	{
-		workhorse.visit_slots(ptr);
+		data_visitor.visit_slots(ptr);
 		if(ptr->type() == ALIEN_TYPE)
 			((alien *)ptr)->update_address();
 	}
 
 	void trace_roots()
 	{
-		workhorse.visit_roots();
+		data_visitor.visit_roots();
 	}
 
 	void trace_contexts()
 	{
-		workhorse.visit_contexts();
+		data_visitor.visit_contexts();
 	}
 
-	/* Trace all literals referenced from a code block. Only for aging and nursery collections */
-	void trace_literal_references(code_block *compiled)
+	void trace_code_block_objects(code_block *compiled)
 	{
-		workhorse.visit_literal_references(compiled);
+		data_visitor.visit_code_block_objects(compiled);
+	}
+
+	void trace_embedded_literals(code_block *compiled)
+	{
+		data_visitor.visit_embedded_literals(compiled);
 	}
 
 	void trace_code_heap_roots(std::set<code_block *> *remembered_set)
@@ -140,7 +145,10 @@ template<typename TargetGeneration, typename Policy> struct collector {
 
 		for(; iter != end; iter++)
 		{
-			trace_literal_references(*iter);
+			code_block *compiled = *iter;
+			trace_code_block_objects(compiled);
+			trace_embedded_literals(compiled);
+			compiled->flush_icache();
 			code_blocks_scanned++;
 		}
 	}
@@ -183,7 +191,7 @@ template<typename TargetGeneration, typename Policy> struct collector {
 			cell *end_ptr = (cell *)end;
 
 			for(; slot_ptr < end_ptr; slot_ptr++)
-				workhorse.visit_handle(slot_ptr);
+				data_visitor.visit_handle(slot_ptr);
 		}
 	}
 

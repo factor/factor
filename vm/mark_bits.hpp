@@ -1,7 +1,6 @@
 namespace factor
 {
 
-const int block_granularity = 16;
 const int mark_bits_granularity = sizeof(cell) * 8;
 const int mark_bits_mask = sizeof(cell) * 8 - 1;
 
@@ -25,7 +24,7 @@ template<typename Block> struct mark_bits {
 	explicit mark_bits(cell size_, cell start_) :
 		size(size_),
 		start(start_),
-		bits_size(size / block_granularity / mark_bits_granularity),
+		bits_size(size / data_alignment / mark_bits_granularity),
 		marked(new cell[bits_size]),
 		forwarding(new cell[bits_size])
 	{
@@ -43,12 +42,12 @@ template<typename Block> struct mark_bits {
 
 	cell block_line(Block *address)
 	{
-		return (((cell)address - start) / block_granularity);
+		return (((cell)address - start) / data_alignment);
 	}
 
 	Block *line_block(cell line)
 	{
-		return (Block *)(line * block_granularity + start);
+		return (Block *)(line * data_alignment + start);
 	}
 
 	std::pair<cell,cell> bitmap_deref(Block *address)

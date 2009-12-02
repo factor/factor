@@ -54,18 +54,15 @@ struct compaction_sizer {
 
 struct object_compaction_updater {
 	factor_vm *parent;
-	slot_visitor<forwarder<object> > slot_forwarder;
-	code_block_visitor<forwarder<code_block> > code_forwarder;
+	mark_bits<code_block> *code_forwarding_map;
 	mark_bits<object> *data_forwarding_map;
 	object_start_map *starts;
 
 	explicit object_compaction_updater(factor_vm *parent_,
-		slot_visitor<forwarder<object> > slot_forwarder_,
-		code_block_visitor<forwarder<code_block> > code_forwarder_,
-		mark_bits<object> *data_forwarding_map_) :
+		mark_bits<object> *data_forwarding_map_,
+		mark_bits<code_block> *code_forwarding_map_) :
 		parent(parent_),
-		slot_forwarder(slot_forwarder_),
-		code_forwarder(code_forwarder_),
+		code_forwarding_map(code_forwarding_map_),
 		data_forwarding_map(data_forwarding_map_),
 		starts(&parent->data->tenured->starts) {}
 
@@ -79,24 +76,82 @@ struct object_compaction_updater {
 
 		memmove(new_address,old_address,size);
 
+		slot_visitor<forwarder<object> > slot_forwarder(parent,forwarder<object>(data_forwarding_map));
 		slot_forwarder.visit_slots(new_address,payload_start);
+
+		code_block_visitor<forwarder<code_block> > code_forwarder(parent,forwarder<code_block>(code_forwarding_map));
 		code_forwarder.visit_object_code_block(new_address);
+
 		starts->record_object_start_offset(new_address);
 	}
 };
 
-template<typename SlotForwarder> struct code_block_compaction_updater {
+template<typename SlotForwarder>
+struct code_block_compaction_relocation_visitor {
 	factor_vm *parent;
-	SlotForwarder slot_forwarder;
+	code_block *old_address;
+	slot_visitor<SlotForwarder> slot_forwarder;
+	code_block_visitor<forwarder<code_block> > code_forwarder;
 
-	explicit code_block_compaction_updater(factor_vm *parent_, SlotForwarder slot_forwarder_) :
-		parent(parent_), slot_forwarder(slot_forwarder_) {}
+	explicit code_block_compaction_relocation_visitor(factor_vm *parent_,
+		code_block *old_address_,
+		slot_visitor<SlotForwarder> slot_forwarder_,
+		code_block_visitor<forwarder<code_block> > code_forwarder_) :
+		parent(parent_),
+		old_address(old_address_),
+		slot_forwarder(slot_forwarder_),
+		code_forwarder(code_forwarder_) {}
+
+	void operator()(instruction_operand op)
+	{
+		cell old_offset = op.rel_offset() + (cell)old_address->xt();
+
+		switch(op.rel_type())
+		{
+		case RT_IMMEDIATE:
+			op.store_value(slot_forwarder.visit_pointer(op.load_value(old_offset)));
+			break;
+		case RT_XT:
+		case RT_XT_PIC:
+		case RT_XT_PIC_TAIL:
+			op.store_code_block(code_forwarder.visit_code_block(op.load_code_block(old_offset)));
+			break;
+		case RT_HERE:
+			op.store_value(op.load_value(old_offset) - (cell)old_address + (cell)op.parent_code_block());
+			break;
+		case RT_THIS:
+		case RT_CARDS_OFFSET:
+		case RT_DECKS_OFFSET:
+			parent->store_external_address(op);
+			break;
+		default:
+			op.store_value(op.load_value(old_offset));
+			break;
+		}
+	}
+};
+
+template<typename SlotForwarder>
+struct code_block_compaction_updater {
+	factor_vm *parent;
+	slot_visitor<SlotForwarder> slot_forwarder;
+	code_block_visitor<forwarder<code_block> > code_forwarder;
+
+	explicit code_block_compaction_updater(factor_vm *parent_,
+		slot_visitor<SlotForwarder> slot_forwarder_,
+		code_block_visitor<forwarder<code_block> > code_forwarder_) :
+		parent(parent_),
+		slot_forwarder(slot_forwarder_),
+		code_forwarder(code_forwarder_) {}
 
 	void operator()(code_block *old_address, code_block *new_address, cell size)
 	{
 		memmove(new_address,old_address,size);
-		slot_forwarder.visit_literal_references(new_address);
-		parent->relocate_code_block(new_address);
+
+		slot_forwarder.visit_code_block_objects(new_address);
+
+		code_block_compaction_relocation_visitor<SlotForwarder> visitor(parent,old_address,slot_forwarder,code_forwarder);
+		new_address->each_instruction_operand(visitor);
 	}
 };
 
@@ -116,18 +171,20 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p)
 	slot_visitor<forwarder<object> > slot_forwarder(this,forwarder<object>(data_forwarding_map));
 	code_block_visitor<forwarder<code_block> > code_forwarder(this,forwarder<code_block>(code_forwarding_map));
 
+	code_forwarder.visit_uninitialized_code_blocks();
+
 	/* Object start offsets get recomputed by the object_compaction_updater */
 	data->tenured->starts.clear_object_start_offsets();
 
 	/* Slide everything in tenured space up, and update data and code heap
 	pointers inside objects. */
-	object_compaction_updater object_updater(this,slot_forwarder,code_forwarder,data_forwarding_map);
+	object_compaction_updater object_updater(this,data_forwarding_map,code_forwarding_map);
 	compaction_sizer object_sizer(data_forwarding_map);
 	tenured->compact(object_updater,object_sizer);
 
 	/* Slide everything in the code heap up, and update data and code heap
 	pointers inside code blocks. */
-	code_block_compaction_updater<slot_visitor<forwarder<object> > > code_block_updater(this,slot_forwarder);
+	code_block_compaction_updater<forwarder<object> > code_block_updater(this,slot_forwarder,code_forwarder);
 	standard_sizer<code_block> code_block_sizer;
 	code->allocator->compact(code_block_updater,code_block_sizer);
 
@@ -136,56 +193,75 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p)
 	{
 		slot_forwarder.visit_contexts();
 		code_forwarder.visit_context_code_blocks();
-		code_forwarder.visit_callback_code_blocks();
 	}
 
 	update_code_roots_for_compaction();
+	callbacks->update();
 
 	current_gc->event->ended_compaction();
 }
 
-struct object_code_block_updater {
-	code_block_visitor<forwarder<code_block> > *visitor;
+struct object_grow_heap_updater {
+	code_block_visitor<forwarder<code_block> > code_forwarder;
 
-	explicit object_code_block_updater(code_block_visitor<forwarder<code_block> > *visitor_) :
-		visitor(visitor_) {}
+	explicit object_grow_heap_updater(code_block_visitor<forwarder<code_block> > code_forwarder_) :
+		code_forwarder(code_forwarder_) {}
 
 	void operator()(object *obj)
 	{
-		visitor->visit_object_code_block(obj);
+		code_forwarder.visit_object_code_block(obj);
 	}
 };
 
 struct dummy_slot_forwarder {
-	void visit_literal_references(code_block *compiled) {}
+	object *operator()(object *obj) { return obj; }
 };
 
-/* Compact just the code heap */
+/* Compact just the code heap, after growing the data heap */
 void factor_vm::collect_compact_code_impl(bool trace_contexts_p)
 {
 	/* Figure out where blocks are going to go */
 	mark_bits<code_block> *code_forwarding_map = &code->allocator->state;
 	code_forwarding_map->compute_forwarding();
+
+	slot_visitor<dummy_slot_forwarder> slot_forwarder(this,dummy_slot_forwarder());
 	code_block_visitor<forwarder<code_block> > code_forwarder(this,forwarder<code_block>(code_forwarding_map));
 
+	code_forwarder.visit_uninitialized_code_blocks();
+
 	if(trace_contexts_p)
-	{
 		code_forwarder.visit_context_code_blocks();
-		code_forwarder.visit_callback_code_blocks();
-	}
 
 	/* Update code heap references in data heap */
-	object_code_block_updater updater(&code_forwarder);
+	object_grow_heap_updater updater(code_forwarder);
 	each_object(updater);
 
 	/* Slide everything in the code heap up, and update code heap
 	pointers inside code blocks. */
-	dummy_slot_forwarder slot_forwarder;
-	code_block_compaction_updater<dummy_slot_forwarder> code_block_updater(this,slot_forwarder);
+	code_block_compaction_updater<dummy_slot_forwarder> code_block_updater(this,slot_forwarder,code_forwarder);
 	standard_sizer<code_block> code_block_sizer;
 	code->allocator->compact(code_block_updater,code_block_sizer);
 
 	update_code_roots_for_compaction();
+	callbacks->update();
+}
+
+void factor_vm::collect_compact(bool trace_contexts_p)
+{
+	collect_mark_impl(trace_contexts_p);
+	collect_compact_impl(trace_contexts_p);
+	code->flush_icache();
+}
+
+void factor_vm::collect_growing_heap(cell requested_bytes, bool trace_contexts_p)
+{
+	/* Grow the data heap and copy all live objects to the new heap. */
+	data_heap *old = data;
+	set_data_heap(data->grow(requested_bytes));
+	collect_mark_impl(trace_contexts_p);
+	collect_compact_code_impl(trace_contexts_p);
+	code->flush_icache();
+	delete old;
 }
 
 }

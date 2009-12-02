@@ -15,6 +15,7 @@ jit::jit(code_block_type type_, cell owner_, factor_vm *vm)
 	  owner(owner_,vm),
 	  code(vm),
 	  relocation(vm),
+	  parameters(vm),
 	  literals(vm),
 	  computing_offset_p(false),
 	  position(0),
@@ -28,14 +29,11 @@ void jit::emit_relocation(cell code_template_)
 	cell capacity = array_capacity(code_template.untagged());
 	for(cell i = 1; i < capacity; i += 3)
 	{
-		cell rel_class = array_nth(code_template.untagged(),i);
-		cell rel_type = array_nth(code_template.untagged(),i + 1);
+		relocation_class rel_class = (relocation_class)untag_fixnum(array_nth(code_template.untagged(),i));
+		relocation_type rel_type = (relocation_type)untag_fixnum(array_nth(code_template.untagged(),i + 1));
 		cell offset = array_nth(code_template.untagged(),i + 2);
 
-		relocation_entry new_entry
-			= (untag_fixnum(rel_type) << 28)
-			| (untag_fixnum(rel_class) << 24)
-			| ((code.count + untag_fixnum(offset)));
+		relocation_entry new_entry(rel_type,rel_class,code.count + untag_fixnum(offset));
 		relocation.append_bytes(&new_entry,sizeof(relocation_entry));
 	}
 }
@@ -70,16 +68,23 @@ void jit::emit(cell code_template_)
 	code.append_byte_array(insns.value());
 }
 
-void jit::emit_with(cell code_template_, cell argument_) {
+void jit::emit_with_literal(cell code_template_, cell argument_) {
 	data_root<array> code_template(code_template_,parent);
 	data_root<object> argument(argument_,parent);
 	literal(argument.value());
 	emit(code_template.value());
 }
 
+void jit::emit_with_parameter(cell code_template_, cell argument_) {
+	data_root<array> code_template(code_template_,parent);
+	data_root<object> argument(argument_,parent);
+	parameter(argument.value());
+	emit(code_template.value());
+}
+
 void jit::emit_class_lookup(fixnum index, cell type)
 {
-	emit_with(parent->special_objects[PIC_LOAD],tag_fixnum(-index * sizeof(cell)));
+	emit_with_literal(parent->special_objects[PIC_LOAD],tag_fixnum(-index * sizeof(cell)));
 	emit(parent->special_objects[type]);
 }
 
@@ -98,6 +103,7 @@ code_block *jit::to_code_block()
 {
 	code.trim();
 	relocation.trim();
+	parameters.trim();
 	literals.trim();
 
 	return parent->add_code_block(
@@ -106,6 +112,7 @@ code_block *jit::to_code_block()
 		false_object, /* no labels */
 		owner.value(),
 		relocation.elements.value(),
+		parameters.elements.value(),
 		literals.elements.value());
 }
 
