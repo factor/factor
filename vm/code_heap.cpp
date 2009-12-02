@@ -51,11 +51,11 @@ void code_heap::clear_mark_bits()
 	allocator->state.clear_mark_bits();
 }
 
-void code_heap::code_heap_free(code_block *compiled)
+void code_heap::free(code_block *compiled)
 {
+	assert(!uninitialized_p(compiled));
 	points_to_nursery.erase(compiled);
 	points_to_aging.erase(compiled);
-	uninitialized_blocks.erase(compiled);
 	allocator->free(compiled);
 }
 
