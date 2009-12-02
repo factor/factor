@@ -22,7 +22,7 @@ void factor_vm::collect_aging()
 
 		to_tenured_collector collector(this);
 
-		current_gc->event->started_code_scan();
+		current_gc->event->started_card_scan();
 		collector.trace_cards(data->tenured,
 			card_points_to_aging,
 			full_unmarker());
@@ -33,10 +33,6 @@ void factor_vm::collect_aging()
 		current_gc->event->ended_code_scan(collector.code_blocks_scanned);
 
 		collector.tenure_reachable_objects();
-
-		current_gc->event->started_code_sweep();
-		update_code_heap_for_minor_gc(&code->points_to_aging);
-		current_gc->event->ended_code_sweep();
 	}
 	{
 		/* If collection fails here, do a to_tenured collection. */

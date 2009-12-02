@@ -231,7 +231,7 @@ big-endian off
     ! pop stack
     ds-reg bootstrap-cell SUB
     ! pass vm pointer
-    arg2 0 MOV 0 jit-literal rc-absolute-cell rt-vm jit-rel
+    arg2 0 MOV 0 jit-parameter rc-absolute-cell rt-vm jit-rel
     ! call quotation
     arg1 quot-xt-offset [+] JMP
 ] \ (call) define-sub-primitive

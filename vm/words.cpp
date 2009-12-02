@@ -27,7 +27,7 @@ word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 	{
 		code_block *profiling_block = compile_profiling_stub(new_word.value());
 		new_word->profiling = profiling_block;
-		relocate_code_block(new_word->profiling);
+		initialize_code_block(new_word->profiling);
 	}
 
 	update_word_xt(new_word.untagged());

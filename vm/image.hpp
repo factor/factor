@@ -7,12 +7,11 @@ static const cell image_version = 4;
 struct image_header {
 	cell magic;
 	cell version;
-	/* all pointers in the image file are relocated from
-	   relocation_base to here when the image is loaded */
+	/* base address of data heap when image was saved */
 	cell data_relocation_base;
 	/* size of heap */
 	cell data_size;
-	/* code relocation base */
+	/* base address of code heap when image was saved */
 	cell code_relocation_base;
 	/* size of code heap */
 	cell code_size;
