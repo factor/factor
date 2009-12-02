@@ -71,6 +71,7 @@ DEFER: ?make-staging-image
         "-output-image=" over staging-image-name append ,
         "-include=" swap " " join append ,
         "-no-user-init" ,
+        "-pic=0" ,
     ] { } make ;
 
 : run-factor ( vm flags -- )
@@ -99,6 +100,7 @@ DEFER: ?make-staging-image
             [ "-deploy-vocab=" prepend , ]
             [ make-deploy-config "-deploy-config=" prepend , ] bi
             "-output-image=" prepend ,
+            "-pic=0" ,
         ] { } make
     ] bind ;
 
