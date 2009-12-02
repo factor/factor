@@ -59,6 +59,11 @@ void code_heap::code_heap_free(code_block *compiled)
 	allocator->free(compiled);
 }
 
+void code_heap::flush_icache()
+{
+	factor::flush_icache(seg->start,seg->size);
+}
+
 /* Allocate a code heap during startup */
 void factor_vm::init_code_heap(cell size)
 {
@@ -86,7 +91,7 @@ defining a new word. */
 void factor_vm::update_code_heap_words()
 {
 	word_updater updater(this);
-	iterate_code_heap(updater);
+	each_code_block(updater);
 }
 
 void factor_vm::primitive_modify_code_heap()
@@ -171,7 +176,7 @@ struct stack_trace_stripper {
 void factor_vm::primitive_strip_stack_traces()
 {
 	stack_trace_stripper stripper;
-	iterate_code_heap(stripper);
+	each_code_block(stripper);
 }
 
 }

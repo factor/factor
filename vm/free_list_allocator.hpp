@@ -84,7 +84,7 @@ template<typename Block> bool free_list_allocator<Block>::can_allot_p(cell size)
 
 template<typename Block> Block *free_list_allocator<Block>::allot(cell size)
 {
-	size = align(size,block_granularity);
+	size = align(size,data_alignment);
 
 	free_heap_block *block = free_blocks.find_free_block(size);
 	if(block)

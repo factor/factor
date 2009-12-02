@@ -15,7 +15,7 @@ VM_C_API void box_boolean(bool value, factor_vm *parent)
 
 VM_C_API bool to_boolean(cell value, factor_vm *parent)
 {
-	return parent->to_boolean(value);
+	return to_boolean(value);
 }
 
 }
