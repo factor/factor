@@ -3,6 +3,9 @@
 namespace factor
 {
 
+instruction_operand::instruction_operand(relocation_entry rel_, code_block *compiled_, cell index_) :
+	rel(rel_), compiled(compiled_), index(index_), pointer((cell)compiled_->xt() + rel_.rel_offset()) {}
+
 /* Load a 32-bit value from a PowerPC LIS/ORI sequence */
 fixnum instruction_operand::load_value_2_2()
 {
@@ -22,7 +25,7 @@ fixnum instruction_operand::load_value_masked(cell mask, fixnum shift)
 
 fixnum instruction_operand::load_value(cell relative_to)
 {
-	switch(rel_class)
+	switch(rel.rel_class())
 	{
 	case RC_ABSOLUTE_CELL:
 		return *(cell *)pointer;
@@ -45,7 +48,7 @@ fixnum instruction_operand::load_value(cell relative_to)
 	case RC_INDIRECT_ARM_PC:
 		return load_value_masked(rel_indirect_arm_mask,0) + relative_to + sizeof(cell) * 2;
 	default:
-		critical_error("Bad rel class",rel_class);
+		critical_error("Bad rel class",rel.rel_class());
 		return 0;
 	}
 }
@@ -90,7 +93,7 @@ void instruction_operand::store_value(fixnum absolute_value)
 {
 	fixnum relative_value = absolute_value - pointer;
 
-	switch(rel_class)
+	switch(rel.rel_class())
 	{
 	case RC_ABSOLUTE_CELL:
 		*(cell *)pointer = absolute_value;
@@ -123,7 +126,7 @@ void instruction_operand::store_value(fixnum absolute_value)
 		store_value_masked(relative_value - sizeof(cell) * 2,rel_indirect_arm_mask,0);
 		break;
 	default:
-		critical_error("Bad rel class",rel_class);
+		critical_error("Bad rel class",rel.rel_class());
 		break;
 	}
 }

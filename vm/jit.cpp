@@ -28,14 +28,11 @@ void jit::emit_relocation(cell code_template_)
 	cell capacity = array_capacity(code_template.untagged());
 	for(cell i = 1; i < capacity; i += 3)
 	{
-		cell rel_class = array_nth(code_template.untagged(),i);
-		cell rel_type = array_nth(code_template.untagged(),i + 1);
+		relocation_class rel_class = (relocation_class)untag_fixnum(array_nth(code_template.untagged(),i));
+		relocation_type rel_type = (relocation_type)untag_fixnum(array_nth(code_template.untagged(),i + 1));
 		cell offset = array_nth(code_template.untagged(),i + 2);
 
-		relocation_entry new_entry(
-			(relocation_type)untag_fixnum(rel_type),
-			(relocation_class)untag_fixnum(rel_class),
-			code.count + untag_fixnum(offset));
+		relocation_entry new_entry(rel_type,rel_class,code.count + untag_fixnum(offset));
 		relocation.append_bytes(&new_entry,sizeof(relocation_entry));
 	}
 }

@@ -150,12 +150,9 @@ struct update_word_references_relocation_visitor {
 
 	explicit update_word_references_relocation_visitor(factor_vm *parent_) : parent(parent_) {}
 
-	void operator()(relocation_entry rel, cell index, code_block *compiled)
+	void operator()(instruction_operand op)
 	{
-		relocation_type type = rel.rel_type();
-		instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
-
-		switch(type)
+		switch(op.rel_type())
 		{
 		case RT_XT:
 			{
@@ -201,7 +198,7 @@ void factor_vm::update_word_references(code_block *compiled)
 	else
 	{
 		update_word_references_relocation_visitor visitor(this);
-		iterate_relocations(compiled,visitor);
+		compiled->each_instruction_operand(visitor);
 		compiled->flush_icache();
 	}
 }
@@ -218,13 +215,13 @@ struct relocate_code_block_relocation_visitor {
 
 	explicit relocate_code_block_relocation_visitor(factor_vm *parent_) : parent(parent_) {}
 
-	void operator()(relocation_entry rel, cell index, code_block *compiled)
+	void operator()(instruction_operand op)
 	{
-		instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
-		array *literals = (parent->to_boolean(compiled->literals)
-			? untag<array>(compiled->literals) : NULL);
+		code_block *compiled = op.parent_code_block();
+		array *literals = (to_boolean(compiled->literals) ? untag<array>(compiled->literals) : NULL);
+		cell index = op.parameter_index();
 
-		switch(rel.rel_type())
+		switch(op.rel_type())
 		{
 		case RT_PRIMITIVE:
 			op.store_value(parent->compute_primitive_relocation(array_nth(literals,index)));
@@ -245,7 +242,7 @@ struct relocate_code_block_relocation_visitor {
 			op.store_value(parent->compute_xt_pic_tail_relocation(array_nth(literals,index)));
 			break;
 		case RT_HERE:
-			op.store_value(parent->compute_here_relocation(array_nth(literals,index),rel.rel_offset(),compiled));
+			op.store_value(parent->compute_here_relocation(array_nth(literals,index),op.rel_offset(),compiled));
 			break;
 		case RT_THIS:
 			op.store_value((cell)compiled->xt());
@@ -269,7 +266,7 @@ struct relocate_code_block_relocation_visitor {
 			op.store_value(parent->decks_offset);
 			break;
 		default:
-			critical_error("Bad rel type",rel.rel_type());
+			critical_error("Bad rel type",op.rel_type());
 			break;
 		}
 	}
@@ -280,23 +277,24 @@ void factor_vm::relocate_code_block(code_block *compiled)
 {
 	code->needs_fixup.erase(compiled);
 	relocate_code_block_relocation_visitor visitor(this);
-	iterate_relocations(compiled,visitor);
+	compiled->each_instruction_operand(visitor);
 	compiled->flush_icache();
 }
 
 /* Fixup labels. This is done at compile time, not image load time */
 void factor_vm::fixup_labels(array *labels, code_block *compiled)
 {
-	cell i;
 	cell size = array_capacity(labels);
 
-	for(i = 0; i < size; i += 3)
+	for(cell i = 0; i < size; i += 3)
 	{
-		cell rel_class = untag_fixnum(array_nth(labels,i));
+		relocation_class rel_class = (relocation_class)untag_fixnum(array_nth(labels,i));
 		cell offset = untag_fixnum(array_nth(labels,i + 1));
 		cell target = untag_fixnum(array_nth(labels,i + 2));
 
-		instruction_operand op(rel_class,offset + (cell)compiled->xt());
+		relocation_entry new_entry(RT_HERE,rel_class,offset);
+
+		instruction_operand op(new_entry,compiled,0);
 		op.store_value(target + (cell)compiled->xt());
 	}
 }

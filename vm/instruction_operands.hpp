@@ -67,7 +67,7 @@ static const cell rel_relative_arm_3_mask = 0xffffff;
 struct relocation_entry {
 	u32 value;
 
-	relocation_entry(u32 value_) : value(value_) {}
+	explicit relocation_entry(u32 value_) : value(value_) {}
 
 	relocation_entry(relocation_type rel_type,
 		relocation_class rel_class,
@@ -120,11 +120,32 @@ struct relocation_entry {
 };
 
 struct instruction_operand {
-	cell rel_class;
+	relocation_entry rel;
+	code_block *compiled;
+	cell index;
 	cell pointer;
 
-	instruction_operand(cell rel_class_, cell pointer_) :
-		rel_class(rel_class_), pointer(pointer_) {}
+	instruction_operand(relocation_entry rel_, code_block *compiled_, cell index_);
+
+	relocation_type rel_type()
+	{
+		return rel.rel_type();
+	}
+
+	cell rel_offset()
+	{
+		return rel.rel_offset();
+	}
+
+	cell parameter_index()
+	{
+		return index;
+	}
+
+	code_block *parent_code_block()
+	{
+		return compiled;
+	}
 
 	fixnum load_value_2_2();
 	fixnum load_value_masked(cell mask, fixnum shift);

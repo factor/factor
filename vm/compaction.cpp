@@ -114,17 +114,15 @@ struct code_block_compaction_relocation_visitor {
 		slot_forwarder(slot_forwarder_),
 		code_forwarder(code_forwarder_) {}
 
-	void operator()(relocation_entry rel, cell index, code_block *compiled)
+	void operator()(instruction_operand op)
 	{
-		relocation_type type = rel.rel_type();
-		instruction_operand op(rel.rel_class(),rel.rel_offset() + (cell)compiled->xt());
+		code_block *compiled = op.parent_code_block();
+		array *literals = (to_boolean(compiled->literals) ? untag<array>(compiled->literals) : NULL);
+		cell index = op.parameter_index();
 
-		array *literals = (parent->to_boolean(compiled->literals)
-			? untag<array>(compiled->literals) : NULL);
+		cell old_offset = op.rel_offset() + (cell)old_address->xt();
 
-		cell old_offset = rel.rel_offset() + (cell)old_address->xt();
-
-		switch(type)
+		switch(op.rel_type())
 		{
 		case RT_IMMEDIATE:
 			op.store_value(slot_forwarder.visit_pointer(op.load_value(old_offset)));
@@ -135,7 +133,7 @@ struct code_block_compaction_relocation_visitor {
 			op.store_code_block(code_forwarder.visit_code_block(op.load_code_block(old_offset)));
 			break;
 		case RT_HERE:
-			op.store_value(parent->compute_here_relocation(array_nth(literals,index),rel.rel_offset(),compiled));
+			op.store_value(parent->compute_here_relocation(array_nth(literals,index),op.rel_offset(),compiled));
 			break;
 		case RT_THIS:
 			op.store_value((cell)compiled->xt());
@@ -173,7 +171,7 @@ struct code_block_compaction_updater {
 		slot_forwarder.visit_code_block_objects(new_address);
 
 		code_block_compaction_relocation_visitor<SlotForwarder> visitor(parent,old_address,slot_forwarder,code_forwarder);
-		parent->iterate_relocations(new_address,visitor);
+		new_address->each_instruction_operand(visitor);
 	}
 };
 
@@ -215,7 +213,6 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p)
 	{
 		slot_forwarder.visit_contexts();
 		code_forwarder.visit_context_code_blocks();
-		code_forwarder.visit_callback_code_blocks();
 	}
 
 	update_code_roots_for_compaction();
@@ -252,10 +249,7 @@ void factor_vm::collect_compact_code_impl(bool trace_contexts_p)
 	code_block_visitor<forwarder<code_block> > code_forwarder(this,forwarder<code_block>(code_forwarding_map));
 
 	if(trace_contexts_p)
-	{
 		code_forwarder.visit_context_code_blocks();
-		code_forwarder.visit_callback_code_blocks();
-	}
 
 	/* Update code heap references in data heap */
 	object_grow_heap_updater updater(code_forwarder);
@@ -268,6 +262,24 @@ void factor_vm::collect_compact_code_impl(bool trace_contexts_p)
 	code->allocator->compact(code_block_updater,code_block_sizer);
 
 	update_code_roots_for_compaction();
+}
+
+void factor_vm::collect_compact(bool trace_contexts_p)
+{
+	collect_mark_impl(trace_contexts_p);
+	collect_compact_impl(trace_contexts_p);
+	code->flush_icache();
+}
+
+void factor_vm::collect_growing_heap(cell requested_bytes, bool trace_contexts_p)
+{
+	/* Grow the data heap and copy all live objects to the new heap. */
+	data_heap *old = data;
+	set_data_heap(data->grow(requested_bytes));
+	collect_mark_impl(trace_contexts_p);
+	collect_compact_code_impl(trace_contexts_p);
+	code->flush_icache();
+	delete old;
 }
 
 }
