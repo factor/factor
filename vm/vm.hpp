@@ -516,6 +516,7 @@ struct factor_vm
 	cell code_block_owner(code_block *compiled);
 	void update_word_references(code_block *compiled);
 	void check_code_address(cell address);
+	void store_external_relocation(instruction_operand op);
 	void relocate_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
 	code_block *allot_code_block(cell size, code_block_type type);
