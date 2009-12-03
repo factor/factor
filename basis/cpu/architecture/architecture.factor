@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays assocs generic kernel kernel.private
+USING: accessors arrays assocs generic kernel kernel.private
 math memory namespaces make sequences layouts system hashtables
 classes alien byte-arrays combinators words sets fry ;
 IN: cpu.architecture
@@ -170,9 +170,6 @@ M: longlong-scalar-rep rep-size drop 8 ;
 M: ulonglong-scalar-rep rep-size drop 8 ;
 
 GENERIC: rep-component-type ( rep -- n )
-
-: rep-length ( rep -- n )
-    16 swap rep-component-type heap-size /i ; foldable
 
 ! Methods defined in alien.c-types
 
