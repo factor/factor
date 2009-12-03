@@ -136,10 +136,12 @@ TUPLE: dredge-fry-state
 PRIVATE>
 
 M: callable fry ( quot -- quot' )
-    0 swap <dredge-fry>
-    [ dredge-fry ] [
-        [ prequot>> >quotation ]
-        [ quot>> >quotation shallow-fry ] bi append
-    ] bi ;
+    [ [ [ ] ] ] [
+        0 swap <dredge-fry>
+        [ dredge-fry ] [
+            [ prequot>> >quotation ]
+            [ quot>> >quotation shallow-fry ] bi append
+        ] bi
+    ] if-empty ;
 
 SYNTAX: '[ parse-quotation fry append! ;
