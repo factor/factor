@@ -5,6 +5,8 @@ IN: fry.tests
 
 SYMBOLS: a b c d e f g h ;
 
+[ [ ] ] [ '[ ] ] unit-test
+[ [ + ] ] [ '[ + ] ] unit-test
 [ [ 1 ] ] [ 1 '[ _ ] ] unit-test
 [ [ 1 ] ] [ [ 1 ] '[ @ ] ] unit-test
 [ [ 1 2 ] ] [ [ 1 ] [ 2 ] '[ @ @ ] ] unit-test

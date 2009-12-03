@@ -86,6 +86,15 @@ cell factor_vm::frame_executing(stack_frame *frame)
 	return frame_code(frame)->owner;
 }
 
+cell factor_vm::frame_executing_quot(stack_frame *frame)
+{
+	tagged<object> executing(frame_executing(frame));
+	code_block *compiled = frame_code(frame);
+	if(!compiled->optimized_p() && executing->type() == WORD_TYPE)
+		executing = executing.as<word>()->def;
+	return executing.value();
+}
+
 stack_frame *factor_vm::frame_successor(stack_frame *frame)
 {
 	check_frame(frame);
@@ -133,7 +142,7 @@ struct stack_frame_accumulator {
 
 	void operator()(stack_frame *frame)
 	{
-		data_root<object> executing(parent->frame_executing(frame),parent);
+		data_root<object> executing(parent->frame_executing_quot(frame),parent);
 		data_root<object> scan(parent->frame_scan(frame),parent);
 
 		frames.add(executing.value());
@@ -166,23 +175,18 @@ stack_frame *factor_vm::innermost_stack_frame(callstack *stack)
 	return frame;
 }
 
-stack_frame *factor_vm::innermost_stack_frame_quot(callstack *callstack)
-{
-	stack_frame *inner = innermost_stack_frame(callstack);
-	tagged<quotation>(frame_executing(inner)).untag_check(this);
-	return inner;
-}
-
 /* Some primitives implementing a limited form of callstack mutation.
 Used by the single stepper. */
 void factor_vm::primitive_innermost_stack_frame_executing()
 {
-	dpush(frame_executing(innermost_stack_frame(untag_check<callstack>(dpop()))));
+	stack_frame *frame = innermost_stack_frame(untag_check<callstack>(dpop()));
+	dpush(frame_executing_quot(frame));
 }
 
 void factor_vm::primitive_innermost_stack_frame_scan()
 {
-	dpush(frame_scan(innermost_stack_frame_quot(untag_check<callstack>(dpop()))));
+	stack_frame *frame = innermost_stack_frame(untag_check<callstack>(dpop()));
+	dpush(frame_scan(frame));
 }
 
 void factor_vm::primitive_set_innermost_stack_frame_quot()
@@ -195,7 +199,7 @@ void factor_vm::primitive_set_innermost_stack_frame_quot()
 
 	jit_compile_quot(quot.value(),true);
 
-	stack_frame *inner = innermost_stack_frame_quot(callstack.untagged());
+	stack_frame *inner = innermost_stack_frame(callstack.untagged());
 	cell offset = (char *)FRAME_RETURN_ADDRESS(inner,this) - (char *)inner->xt;
 	inner->xt = quot->xt;
 	FRAME_RETURN_ADDRESS(inner,this) = (char *)quot->xt + offset;

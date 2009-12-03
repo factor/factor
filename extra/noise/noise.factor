@@ -4,7 +4,6 @@ math.libm math.matrices.simd math.vectors math.vectors.conversion math.vectors.s
 memoize random random.mersenne-twister sequences sequences.private specialized-arrays
 typed ;
 QUALIFIED-WITH: alien.c-types c
-SIMDS: c:float c:int c:short c:ushort c:uchar ;
 SPECIALIZED-ARRAYS: c:float c:uchar float-4 uchar-16 ;
 IN: noise
 
