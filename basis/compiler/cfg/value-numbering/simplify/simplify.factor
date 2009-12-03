@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors combinators classes math layouts
-sequences math.vectors.simd.intrinsics
+sequences 
 compiler.cfg.instructions
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.expressions ;
@@ -129,16 +129,6 @@ M: box-displaced-alien-expr simplify*
         { [ dup vn>expr expr-zero? ] [ drop ] }
         [ 2drop f ]
     } cond ;
-
-M: scalar>vector-expr simplify*
-    src>> vn>expr {
-        { [ dup vector>scalar-expr? ] [ src>> ] }
-        [ drop f ]
-    } cond ;
-
-M: shuffle-vector-imm-expr simplify*
-    [ src>> ] [ shuffle>> ] [ rep>> rep-components iota ] tri
-    sequence= [ drop f ] unless ;
 
 M: expr simplify* drop f ;
 

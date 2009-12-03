@@ -16,8 +16,7 @@ compiler.tree.propagation.slots
 compiler.tree.propagation.simple
 compiler.tree.propagation.constraints
 compiler.tree.propagation.call-effect
-compiler.tree.propagation.transforms
-compiler.tree.propagation.simd ;
+compiler.tree.propagation.transforms ;
 FROM: alien.c-types => (signed-interval) (unsigned-interval) ;
 IN: compiler.tree.propagation.known-words
 

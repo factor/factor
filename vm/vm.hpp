@@ -568,11 +568,11 @@ struct factor_vm
 	code_block *frame_code(stack_frame *frame);
 	code_block_type frame_type(stack_frame *frame);
 	cell frame_executing(stack_frame *frame);
+	cell frame_executing_quot(stack_frame *frame);
 	stack_frame *frame_successor(stack_frame *frame);
 	cell frame_scan(stack_frame *frame);
 	void primitive_callstack_to_array();
 	stack_frame *innermost_stack_frame(callstack *stack);
-	stack_frame *innermost_stack_frame_quot(callstack *callstack);
 	void primitive_innermost_stack_frame_executing();
 	void primitive_innermost_stack_frame_scan();
 	void primitive_set_innermost_stack_frame_quot();
