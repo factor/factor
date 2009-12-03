@@ -20,7 +20,7 @@ fixnum instruction_operand::load_value_masked(cell mask, cell bits, cell shift)
 {
 	fixnum *ptr = (fixnum *)pointer;
 
-	return (((*ptr & mask) << bits) >> bits) << shift;
+	return (((*ptr & (fixnum)mask) << bits) >> bits) << shift;
 }
 
 fixnum instruction_operand::load_value(cell relative_to)
@@ -36,7 +36,7 @@ fixnum instruction_operand::load_value(cell relative_to)
 	case RC_ABSOLUTE_PPC_2_2:
 		return load_value_2_2();
 	case RC_ABSOLUTE_PPC_2:
-		return load_value_masked(rel_absolute_ppc_2_mask,0,0);
+		return load_value_masked(rel_absolute_ppc_2_mask,16,0);
 	case RC_RELATIVE_PPC_2:
 		return load_value_masked(rel_relative_ppc_2_mask,16,0) + relative_to;
 	case RC_RELATIVE_PPC_3:
@@ -80,12 +80,6 @@ void instruction_operand::store_value_2_2(fixnum value)
 void instruction_operand::store_value_masked(fixnum value, cell mask, cell shift)
 {
 	cell *ptr = (cell *)pointer;
-
-	/* This is unaccurate but good enough */
-	fixnum test = (fixnum)mask >> 1;
-	if(value <= -test || value >= test)
-		critical_error("Value does not fit inside relocation",0);
-
 	*ptr = ((*ptr & ~mask) | ((value >> shift) & mask));
 }
 

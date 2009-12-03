@@ -45,6 +45,12 @@ SYMBOL: loops
         end-stack-analysis
     ] with-scope ; inline
 
+: with-dummy-cfg-builder ( node quot -- )
+    [
+        [ V{ } clone procedures ] 2dip
+        '[ _ t t [ _ call( node -- ) ] with-cfg-builder ] with-variable
+    ] { } make drop ;
+
 GENERIC: emit-node ( node -- )
 
 : emit-nodes ( nodes -- )
