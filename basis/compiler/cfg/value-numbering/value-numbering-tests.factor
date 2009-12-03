@@ -4,7 +4,7 @@ cpu.architecture tools.test kernel math combinators.short-circuit
 accessors sequences compiler.cfg.predecessors locals compiler.cfg.dce
 compiler.cfg.ssa.destruction compiler.cfg.loop-detection
 compiler.cfg.representations compiler.cfg assocs vectors arrays
-layouts literals namespaces alien ;
+layouts literals namespaces alien compiler.cfg.value-numbering.simd ;
 IN: compiler.cfg.value-numbering.tests
 
 : trim-temps ( insns -- insns )

@@ -189,9 +189,6 @@ M: struct-c-type c-struct? drop t ;
     \ cleave [ ] 2sequence
     \ output>array [ ] 2sequence ;
 
-: define-inline-method ( class generic quot -- )
-    [ create-method-in ] dip [ define ] [ drop make-inline ] 2bi ;
-
 : (define-struct-slot-values-method) ( class -- )
     [ \ struct-slot-values ] [ struct-slot-values-quot ] bi
     define-inline-method ;

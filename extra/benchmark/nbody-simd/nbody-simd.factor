@@ -2,9 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types fry kernel locals math
 math.constants math.functions math.vectors math.vectors.simd
-prettyprint combinators.smart sequences hints classes.struct
-specialized-arrays ;
-SIMD: double
+math.vectors.simd.cords prettyprint combinators.smart sequences
+hints classes.struct specialized-arrays ;
 IN: benchmark.nbody-simd
 
 : solar-mass ( -- x ) 4 pi sq * ; inline

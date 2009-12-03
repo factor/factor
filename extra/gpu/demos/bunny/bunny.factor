@@ -11,7 +11,6 @@ specialized-vectors ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-VECTOR: uint
-SIMD: float
 IN: gpu.demos.bunny
 
 GLSL-SHADER-FILE: bunny-vertex-shader vertex-shader "bunny.v.glsl"

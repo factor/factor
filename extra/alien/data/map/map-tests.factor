@@ -3,7 +3,6 @@ USING: alien.data.map fry generalizations kernel locals math.vectors
 math.vectors.conversion math math.vectors.simd sequences
 specialized-arrays tools.test ;
 FROM: alien.c-types => uchar short int float ;
-SIMDS: float int short uchar ;
 SPECIALIZED-ARRAYS: int float float-4 uchar-16 ;
 IN: alien.data.map.tests
 
