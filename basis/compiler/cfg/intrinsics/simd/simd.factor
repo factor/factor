@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types byte-arrays fry
-classes.algebra cpu.architecture kernel math sequences
+classes.algebra cpu.architecture kernel layouts math sequences
 math.vectors math.vectors.simd.intrinsics
 macros generalizations combinators combinators.short-circuit
 arrays locals compiler.tree.propagation.info
@@ -152,6 +152,9 @@ IN: compiler.cfg.intrinsics.simd
         ] }
     } v-vector-op ;
 
+PREDICATE: fixnum-vector-rep < int-vector-rep
+    rep-component-type heap-size cell < ;
+
 : ^(sum-vector-2) ( src rep -- dst )
     {
         [ dupd ^^horizontal-add-vector ]
@@ -249,7 +252,7 @@ IN: compiler.cfg.intrinsics.simd
 : ^sum-vector ( src rep -- dst )
     {
         { float-vector-rep [ ^(sum-vector) ] }
-        { int-vector-rep [| src rep |
+        { fixnum-vector-rep [| src rep |
             src rep ^unpack-vector-head :> head
             src rep ^unpack-vector-tail :> tail
             rep widen-vector-rep :> wide-rep
@@ -526,22 +529,26 @@ IN: compiler.cfg.intrinsics.simd
 
 : emit-simd-with ( node -- )
     {
-        [ ^with-vector ]
+        { fixnum-vector-rep [ ^with-vector ] }
+        { float-vector-rep  [ ^with-vector ] }
     } emit-v-vector-op ;
 
 : emit-simd-gather-2 ( node -- )
     {
-        [ ^^gather-vector-2 ]
+        { fixnum-vector-rep [ ^^gather-vector-2 ] }
+        { float-vector-rep  [ ^^gather-vector-2 ] }
     } emit-vv-vector-op ;
 
 : emit-simd-gather-4 ( node -- )
     {
-        [ ^^gather-vector-4 ]
+        { fixnum-vector-rep [ ^^gather-vector-4 ] }
+        { float-vector-rep  [ ^^gather-vector-4 ] }
     } emit-vvvv-vector-op ;
 
 : emit-simd-select ( node -- )
     {
-        [ ^select-vector ]
+        { fixnum-vector-rep [ ^select-vector ] }
+        { float-vector-rep  [ ^select-vector ] }
     } [ integer? ] emit-vl-vector-op ;
 
 : emit-alien-vector ( node -- )
