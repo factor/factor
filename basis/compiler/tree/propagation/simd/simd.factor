@@ -1,57 +1,77 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays combinators fry sequences
-compiler.tree.propagation.info cpu.architecture kernel words math
-math.intervals math.vectors.simd.intrinsics ;
+USING: accessors assocs byte-arrays combinators compiler.cfg.builder
+continuations fry sequences compiler.tree.propagation.info
+cpu.architecture kernel words make math math.intervals
+math.vectors.simd.intrinsics namespaces ;
 IN: compiler.tree.propagation.simd
 
-{
-    (simd-v+)
-    (simd-v-)
-    (simd-vneg)
-    (simd-vabs)
-    (simd-v+-)
-    (simd-v*)
-    (simd-v/)
-    (simd-vmin)
-    (simd-vmax)
-    (simd-sum)
-    (simd-vsqrt)
-    (simd-vbitand)
-    (simd-vbitandn)
-    (simd-vbitor)
-    (simd-vbitxor)
-    (simd-vbitnot)
-    (simd-vand)
-    (simd-vandn)
-    (simd-vor)
-    (simd-vxor)
-    (simd-vnot)
-    (simd-vlshift)
-    (simd-vrshift)
-    (simd-hlshift)
-    (simd-hrshift)
-    (simd-vshuffle-bytes)
-    (simd-vshuffle-elements)
-    (simd-(vmerge-head))
-    (simd-(vmerge-tail))
-    (simd-(v>float))
-    (simd-(v>integer))
-    (simd-(vpack-signed))
-    (simd-(vpack-unsigned))
-    (simd-(vunpack-head))
-    (simd-(vunpack-tail))
-    (simd-v<=)
-    (simd-v<)
-    (simd-v=)
-    (simd-v>)
-    (simd-v>=)
-    (simd-vunordered?)
-    (simd-with)
-    (simd-gather-2)
-    (simd-gather-4)
-    alien-vector
-} [ { byte-array } "default-output-classes" set-word-prop ] each
+CONSTANT: vector>vector-intrinsics
+    {
+        (simd-v+)
+        (simd-v-)
+        (simd-vneg)
+        (simd-v+-)
+        (simd-vs+)
+        (simd-vs-)
+        (simd-vs*)
+        (simd-v*)
+        (simd-v/)
+        (simd-vmin)
+        (simd-vmax)
+        (simd-vsqrt)
+        (simd-vabs)
+        (simd-vbitand)
+        (simd-vbitandn)
+        (simd-vbitor)
+        (simd-vbitxor)
+        (simd-vbitnot)
+        (simd-vand)
+        (simd-vandn)
+        (simd-vor)
+        (simd-vxor)
+        (simd-vnot)
+        (simd-vlshift)
+        (simd-vrshift)
+        (simd-hlshift)
+        (simd-hrshift)
+        (simd-vshuffle-elements)
+        (simd-vshuffle-bytes)
+        (simd-vmerge-head)
+        (simd-vmerge-tail)
+        (simd-v<=)
+        (simd-v<)
+        (simd-v=)
+        (simd-v>)
+        (simd-v>=)
+        (simd-vunordered?)
+        (simd-v>float)
+        (simd-v>integer)
+        (simd-vpack-signed)
+        (simd-vpack-unsigned)
+        (simd-vunpack-head)
+        (simd-vunpack-tail)
+        (simd-with)
+        (simd-gather-2)
+        (simd-gather-4)
+        alien-vector
+    }
+
+CONSTANT: vector-other-intrinsics
+    {
+        (simd-v.)
+        (simd-sum)
+        (simd-vany?)
+        (simd-vall?)
+        (simd-vnone?)
+        (simd-select)
+        set-alien-vector
+    }
+
+: vector-intrinsics ( -- x )
+    vector>vector-intrinsics vector-other-intrinsics append ;
+
+vector>vector-intrinsics [ { byte-array } "default-output-classes" set-word-prop ] each
 
 : scalar-output-class ( rep -- class )
     dup literal?>> [
@@ -79,12 +99,24 @@ IN: compiler.tree.propagation.simd
     real [0,inf] <class/interval-info> value-info-intersect
 ] "outputs" set-word-prop
 
-! If SIMD is not available, inline alien-vector and set-alien-vector
-! to get a speedup
+: clone-with-value-infos ( node -- node' )
+    clone dup in-d>> [ dup value-info ] H{ } map>assoc >>info ;
+
+: try-intrinsic ( node intrinsic-quot -- ? )
+    '[
+        _ clone-with-value-infos
+        _ with-dummy-cfg-builder
+        t
+    ] [ drop f ] recover ;
+
 : inline-unless-intrinsic ( word -- )
-    dup '[ drop _ dup "intrinsic" word-prop [ drop f ] [ def>> ] if ]
+    dup '[
+        _ swap over "intrinsic" word-prop
+        "always-inline-simd-intrinsics" get not swap and
+        ! word node intrinsic
+        [ try-intrinsic [ drop f ] [ def>> ] if ]
+        [ drop def>> ] if*
+    ]
     "custom-inlining" set-word-prop ;
 
-\ alien-vector inline-unless-intrinsic
-
-\ set-alien-vector inline-unless-intrinsic
+vector-intrinsics [ inline-unless-intrinsic ] each

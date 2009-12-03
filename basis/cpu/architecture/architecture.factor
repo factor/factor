@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs generic kernel kernel.private
+USING: accessors alien.c-types arrays assocs generic kernel kernel.private
 math memory namespaces make sequences layouts system hashtables
 classes alien byte-arrays combinators words sets fry ;
 IN: cpu.architecture
@@ -95,7 +95,7 @@ double-rep
 vector-rep
 scalar-rep ;
 
-: unsign-rep ( rep -- rep' )
+: signed-rep ( rep -- rep' )
     {
         { uint-4-rep           int-4-rep }
         { ulonglong-2-rep      longlong-2-rep }
@@ -105,7 +105,7 @@ scalar-rep ;
         { ushort-scalar-rep    short-scalar-rep }
         { uint-scalar-rep      int-scalar-rep }
         { ulonglong-scalar-rep longlong-scalar-rep }
-    } ?at drop ;
+    } ?at drop ; foldable
 
 : widen-vector-rep ( rep -- rep' )
     {
@@ -115,7 +115,19 @@ scalar-rep ;
         { uchar-16-rep    ushort-8-rep    }
         { ushort-8-rep    uint-4-rep      }
         { uint-4-rep      ulonglong-2-rep }
-    } at ;
+        { float-4-rep     double-2-rep    }
+    } at ; foldable
+
+: narrow-vector-rep ( rep -- rep' )
+    {
+        { short-8-rep     char-16-rep     }
+        { int-4-rep       short-8-rep     }
+        { longlong-2-rep  int-4-rep       }
+        { ushort-8-rep    uchar-16-rep    }
+        { uint-4-rep      ushort-8-rep    }
+        { ulonglong-2-rep uint-4-rep      }
+        { double-2-rep    float-4-rep     }
+    } at ; foldable
 
 ! Register classes
 SINGLETONS: int-regs float-regs ;
@@ -158,6 +170,9 @@ M: longlong-scalar-rep rep-size drop 8 ;
 M: ulonglong-scalar-rep rep-size drop 8 ;
 
 GENERIC: rep-component-type ( rep -- n )
+
+: rep-length ( rep -- n )
+    16 swap rep-component-type heap-size /i ; foldable
 
 ! Methods defined in alien.c-types
 
@@ -277,8 +292,8 @@ HOOK: %min-vector cpu ( dst src1 src2 rep -- )
 HOOK: %max-vector cpu ( dst src1 src2 rep -- )
 HOOK: %dot-vector cpu ( dst src1 src2 rep -- )
 HOOK: %sqrt-vector cpu ( dst src rep -- )
-HOOK: %horizontal-add-vector cpu ( dst src rep -- )
-HOOK: %horizontal-sub-vector cpu ( dst src rep -- )
+HOOK: %horizontal-add-vector cpu ( dst src1 src2 rep -- )
+HOOK: %horizontal-sub-vector cpu ( dst src1 src2 rep -- )
 HOOK: %abs-vector cpu ( dst src rep -- )
 HOOK: %and-vector cpu ( dst src1 src2 rep -- )
 HOOK: %andn-vector cpu ( dst src1 src2 rep -- )
@@ -384,6 +399,10 @@ M: object %shl-vector-imm-reps { } ;
 M: object %shr-vector-imm-reps { } ;
 M: object %horizontal-shl-vector-imm-reps { } ;
 M: object %horizontal-shr-vector-imm-reps { } ;
+
+ALIAS: %merge-vector-head-reps %merge-vector-reps
+ALIAS: %merge-vector-tail-reps %merge-vector-reps
+ALIAS: %tail>head-vector-reps %unpack-vector-head-reps
 
 HOOK: %unbox-alien cpu ( dst src -- )
 HOOK: %unbox-any-c-ptr cpu ( dst src -- )

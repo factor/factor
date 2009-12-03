@@ -550,4 +550,6 @@ M: double-2-rep rep-component-type drop double ;
         { [ dup { uchar ushort uint ulong ulonglong } member-eq? ] [ unsigned-interval ] }
     } cond ; foldable
 
-: c-type-clamp ( value c-type -- value' ) c-type-interval clamp ; inline
+: c-type-clamp ( value c-type -- value' )
+    dup { float double } member-eq?
+    [ drop ] [ c-type-interval clamp ] if ; inline

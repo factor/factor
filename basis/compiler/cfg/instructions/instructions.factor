@@ -408,13 +408,13 @@ use: src1 src2
 literal: rep ;
 
 PURE-INSN: ##horizontal-add-vector
-def: dst/scalar-rep
-use: src
+def: dst
+use: src1 src2
 literal: rep ;
 
 PURE-INSN: ##horizontal-sub-vector
-def: dst/scalar-rep
-use: src
+def: dst
+use: src1 src2
 literal: rep ;
 
 PURE-INSN: ##horizontal-shl-vector-imm
