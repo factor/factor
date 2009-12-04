@@ -104,6 +104,10 @@ SYNTAX: A@ scan-object scan-object <direct-A> suffix! ;
 
 INSTANCE: A specialized-array
 
+M: A vs+ [ + T c-type-clamp ] 2map ;
+M: A vs- [ - T c-type-clamp ] 2map ;
+M: A vs* [ * T c-type-clamp ] 2map ;
+
 ;FUNCTOR
 
 GENERIC: (underlying-type) ( c-type -- c-type' )
