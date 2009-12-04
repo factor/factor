@@ -100,7 +100,7 @@ void data_heap::reset_generation(tenured_space *gen)
 
 bool data_heap::low_memory_p()
 {
-	return (tenured->free_space() <= nursery->size + aging->size);
+	return (tenured->largest_free_block() <= nursery->size + aging->size);
 }
 
 void data_heap::mark_all_cards()
