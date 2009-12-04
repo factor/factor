@@ -230,6 +230,8 @@ BOA-EFFECT define-inline
 M: A pprint-delims drop \ A{ \ } ;
 SYNTAX: A{ \ } [ >A ] parse-literal ;
 
+INSTANCE: A sequence
+
 c:<c-type>
     byte-array >>class
     A >>boxed-class
@@ -248,8 +250,6 @@ SYNTAX: SIMD-128:
 PRIVATE>
 
 >>
-
-INSTANCE: simd-128 sequence
 
 ! SIMD instances
 
