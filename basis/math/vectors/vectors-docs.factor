@@ -125,8 +125,6 @@ ARTICLE: "math-vectors-simd-logic" "Componentwise logic with SIMD vectors"
 "Processor SIMD units supported by the " { $vocab-link "math.vectors.simd" } " vocabulary represent boolean values as bitmasks, where a true result's binary representation is all ones and a false representation is all zeroes. This is the format in which results from comparison words such as " { $link v= } " return their results and in which logic and test words such as " { $link vand } " and " { $link vall? } " take their inputs when working with SIMD types. For a float vector, false will manifest itself as " { $snippet "0.0" } " and true as a " { $link POSTPONE: NAN: } " literal with a string of set bits in its payload:"
 { $example
 """USING: math.vectors math.vectors.simd prettyprint ;
-FROM: alien.c-types => float ;
-SIMD: float
 
 float-4{ 1.0 2.0 3.0 0/0. } float-4{ 1.0 -2.0 3.0 0/0. } v= ."""
 """float-4{ NAN: fffffe0000000 0.0 NAN: fffffe0000000 0.0 }"""
@@ -134,8 +132,6 @@ float-4{ 1.0 2.0 3.0 0/0. } float-4{ 1.0 -2.0 3.0 0/0. } v= ."""
 "For an integer vector, false will manifest as " { $snippet "0" } " and true as " { $snippet "-1" } " (for signed vectors) or the largest representable value of the element type (for unsigned vectors):"
 { $example
 """USING: math.vectors math.vectors.simd prettyprint alien.c-types ;
-SIMD: int
-SIMD: uchar
 
 int-4{ 1 2 3 0 } int-4{ 1 -2 3 4 } v=
 uchar-16{  0  1  2  3  4  5 6 7 8 9 10 11 12 13 14 15 }
@@ -147,7 +143,6 @@ uchar-16{ 255 255 255 255 255 255 255 255 0 0 0 0 0 0 0 0 }"""
 "This differs from Factor's native representation of boolean values, where " { $link f } " is false and every other value (including " { $snippet "0" } " and " { $snippet "0.0" } ") is true. To make it easy to construct literal SIMD masks, " { $link t } " and " { $link f } " are accepted inside SIMD literal syntax and expand to the proper true or false representation for the underlying type:"
 { $example
 """USING: math.vectors math.vectors.simd prettyprint alien.c-types ;
-SIMD: int
 
 int-4{ f f t f } ."""
 """int-4{ 0 0 -1 0 }""" }
@@ -216,36 +211,36 @@ HELP: vtruncate
 { $description "Truncates each element of " { $snippet "u" } "." } ;
 
 HELP: n+v
-{ $values { "n" "a number" } { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
+{ $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Adds " { $snippet "n" } " to each element of " { $snippet "u" } "." } ;
 
 HELP: v+n
-{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "v" "a sequence of numbers" } }
+{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
 { $description "Adds " { $snippet "n" } " to each element of " { $snippet "u" } "." } ;
 
 HELP: n-v
-{ $values { "n" "a number" } { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
+{ $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Subtracts each element of " { $snippet "u" } " from " { $snippet "n" } "." } ;
 
 HELP: v-n
-{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "v" "a sequence of numbers" } }
+{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
 { $description "Subtracts " { $snippet "n" } " from each element of " { $snippet "u" } "." } ;
 
 HELP: n*v
-{ $values { "n" "a number" } { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
+{ $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Multiplies each element of " { $snippet "u" } " by " { $snippet "n" } "." } ;
 
 HELP: v*n
-{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "v" "a sequence of numbers" } }
+{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
 { $description "Multiplies each element of " { $snippet "u" } " by " { $snippet "n" } "." } ;
 
 HELP: n/v
-{ $values { "n" "a number" } { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
+{ $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Divides " { $snippet "n" } " by each element of " { $snippet "u" } "." }
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
 
 HELP: v/n
-{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "v" "a sequence of numbers" } }
+{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
 { $description "Divides each element of " { $snippet "u" } " by " { $snippet "n" } "." }
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
 
@@ -259,7 +254,7 @@ HELP: v-
 
 HELP: v+-
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
-{ $description "Adds and subtracts alternate elements of " { $snippet "v" } " and " { $snippet "u" } " component-wise." }
+{ $description "Adds and subtracts alternate elements of " { $snippet "v" } " and " { $snippet "u" } " component-wise. Elements at even indexes are subtracted, while elements at odd indexes are added." }
 { $examples
     { $example
         "USING: math.vectors prettyprint ;"
@@ -413,7 +408,6 @@ HELP: vbroadcast
 { $examples
     { $example
         "USING: alien.c-types math.vectors math.vectors.simd" "prettyprint ;"
-        "SIMD: int"
         "int-4{ 69 42 911 13 } 2 vbroadcast ."
         "int-4{ 911 911 911 911 }"
     }
@@ -429,7 +423,6 @@ HELP: vshuffle
 { $examples
     { $example
         "USING: alien.c-types math.vectors math.vectors.simd" "prettyprint ;"
-        "SIMD: int"
         "int-4{ 69 42 911 13 } { 1 3 2 3 } vshuffle ."
         "int-4{ 42 13 911 13 }"
     }
