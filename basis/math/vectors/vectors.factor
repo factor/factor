@@ -9,7 +9,7 @@ IN: math.vectors
 GENERIC: vneg ( u -- v )
 M: object vneg [ neg ] map ;
 
-GENERIC# v+n 1 ( u n -- v )
+GENERIC# v+n 1 ( u n -- w )
 M: object v+n [ + ] curry map ;
 
 GENERIC: n+v ( n v -- w )
@@ -21,13 +21,13 @@ M: object v-n [ - ] curry map ;
 GENERIC: n-v ( n v -- w )
 M: object n-v [ - ] with map ;
 
-GENERIC# v*n 1 ( u n -- v )
+GENERIC# v*n 1 ( u n -- w )
 M: object v*n [ * ] curry map ;
 
 GENERIC: n*v ( n v -- w )
 M: object n*v [ * ] with map ;
 
-GENERIC# v/n 1 ( u n -- v )
+GENERIC# v/n 1 ( u n -- w )
 M: object v/n [ / ] curry map ;
 
 GENERIC: n/v ( n v -- w )
