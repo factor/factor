@@ -69,6 +69,8 @@ CONSTANT: vector-words
         { v* { +vector+ +vector+ -> +vector+ } }
         { vs* { +vector+ +vector+ -> +vector+ } }
         { v*n { +vector+ +scalar+ -> +vector+ } }
+        { v*high { +vector+ +vector+ -> +vector+ } }
+        { v*hs+ { +vector+ +vector+ -> +vector+ } }
         { v+ { +vector+ +vector+ -> +vector+ } }
         { vs+ { +vector+ +vector+ -> +vector+ } }
         { v+- { +vector+ +vector+ -> +vector+ } }
@@ -78,12 +80,14 @@ CONSTANT: vector-words
         { vs- { +vector+ +vector+ -> +vector+ } }
         { v-n { +vector+ +scalar+ -> +vector+ } }
         { v. { +vector+ +vector+ -> +scalar+ } }
+        { vsad { +vector+ +vector+ -> +scalar+ } }
         { v/ { +vector+ +vector+ -> +vector+ } }
         { v/n { +vector+ +scalar+ -> +vector+ } }
         { vceiling { +vector+ -> +vector+ } }
         { vfloor { +vector+ -> +vector+ } }
         { vmax { +vector+ +vector+ -> +vector+ } }
         { vmin { +vector+ +vector+ -> +vector+ } }
+        { vavg { +vector+ +vector+ -> +vector+ } }
         { vneg { +vector+ -> +vector+ } }
         { vtruncate { +vector+ -> +vector+ } }
         { sum { +vector+ -> +scalar+ } }
@@ -197,7 +201,7 @@ CONSTANT: vector-words
     { vsqrt n/v v/n v/ normalize } unique assoc-diff ;
 
 : remove-integer-words ( alist -- alist' )
-    { vlshift vrshift } unique assoc-diff ;
+    { vlshift vrshift v*high } unique assoc-diff ;
 
 : boolean-ops ( -- words )
     { vand vandn vor vxor vnot } ;
