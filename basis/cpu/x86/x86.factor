@@ -1374,7 +1374,7 @@ M: x86 %shr-vector-imm-reps %shr-vector-reps ;
 
 M: x86 %integer>scalar drop MOVD ;
 
-M:: x86 %scalar>integer ( dst src rep -- )
+:: %scalar>integer-32 ( dst src rep -- )
     rep {
         { int-scalar-rep [
             dst 32-bit-version-of src MOVD
@@ -1408,6 +1408,14 @@ M:: x86 %scalar>integer ( dst src rep -- )
                 dst tmp-dst int-rep %copy
             ] with-small-register
         ] }
+    } case ;
+
+M: x86.32 %scalar>integer ( dst src rep -- ) %scalar>integer-32 ;
+M: x86.64 %scalar>integer ( dst src rep -- )
+    {
+        { longlong-scalar-rep  [ MOVD ] }
+        { ulonglong-scalar-rep [ MOVD ] }
+        [ %scalar>integer-32 ]
     } case ;
 
 M: x86 %vector>scalar %copy ;
