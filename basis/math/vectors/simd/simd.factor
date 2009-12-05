@@ -168,7 +168,6 @@ M: A vs-               \ A-rep [ (simd-vs-)               ] [ call-next-method ]
 M: A vs*               \ A-rep [ (simd-vs*)               ] [ call-next-method ] vv->v-op ; inline
 M: A v*                \ A-rep [ (simd-v*)                ] [ call-next-method ] vv->v-op ; inline
 M: A v*high            \ A-rep [ (simd-v*high)            ] [ call-next-method ] vv->v-op ; inline
-M: A v*hs+             \ A-rep [ (simd-v*hs+)             ] [ call-next-method ] vv->v-op ; inline
 M: A v/                \ A-rep [ (simd-v/)                ] [ call-next-method ] vv->v-op ; inline
 M: A vavg              \ A-rep [ (simd-vavg)              ] [ call-next-method ] vv->v-op ; inline
 M: A vmin              \ A-rep [ (simd-vmin)              ] [ call-next-method ] vv->v-op ; inline
@@ -272,6 +271,19 @@ SIMD-128: double-2
 
 M: simd-128 vshuffle ( u perm -- v )
     vshuffle-bytes ; inline
+
+M: uchar-16 v*hs+
+    uchar-16-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op ushort-8-cast ; inline
+M: ushort-8 v*hs+
+    ushort-8-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op uint-4-cast ; inline
+M: uint-4 v*hs+
+    uint-4-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op ulonglong-2-cast ; inline
+M: char-16 v*hs+
+    char-16-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op short-8-cast ; inline
+M: short-8 v*hs+
+    short-8-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op int-4-cast ; inline
+M: int-4 v*hs+
+    int-4-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op longlong-2-cast ; inline
 
 "mirrors" vocab [
     "math.vectors.simd.mirrors" require
