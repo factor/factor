@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien.c-types assocs kernel sequences math math.functions
-hints math.order math.libm math.floats.private fry combinators
+grouping hints math.order math.libm math.floats.private fry combinators
 byte-arrays accessors locals ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors

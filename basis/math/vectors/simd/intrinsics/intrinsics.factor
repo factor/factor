@@ -1,8 +1,9 @@
 ! (c)2009 Slava Pestov, Joe Groff bsd license
 USING: accessors alien alien.c-types alien.data combinators
-sequences.cords cpu.architecture fry generalizations kernel
-libc locals math math.libm math.order math.ranges math.vectors
-sequences sequences.private specialized-arrays vocabs.loader ;
+sequences.cords cpu.architecture fry generalizations grouping
+kernel libc locals math math.libm math.order math.ranges
+math.vectors sequences sequences.private specialized-arrays
+vocabs.loader ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAYS:
     c:char c:short c:int c:longlong
