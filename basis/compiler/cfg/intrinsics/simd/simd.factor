@@ -57,6 +57,12 @@ IN: compiler.cfg.intrinsics.simd
         { longlong-2-rep [ longlong-array{ -1 0 } underlying>> ^^load-constant ] }
     } case ;
 
+: ^load-half-vector ( rep -- dst )
+    {
+        { float-4-rep  [ float-array{  0.5 0.5 0.5 0.5 } underlying>> ^^load-constant ] }
+        { double-2-rep [ double-array{ 0.5 0.5 }         underlying>> ^^load-constant ] }
+    } case ;
+
 : >variable-shuffle ( shuffle rep -- shuffle' )
     rep-component-type heap-size
     [ dup <repetition> >byte-array ]
@@ -336,6 +342,16 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         [ ^^mul-vector ]
     } emit-vv-vector-op ;
 
+: emit-simd-v*high ( node -- )
+    {
+        [ ^^mul-high-vector ]
+    } emit-vv-vector-op ;
+
+: emit-simd-v*hs+ ( node -- )
+    {
+        [ ^^mul-horizontal-add-vector ]
+    } emit-vv-vector-op ;
+
 : emit-simd-v/ ( node -- )
     {
         [ ^^div-vector ]
@@ -359,10 +375,24 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         ]
     } emit-vv-vector-op ;
 
+: emit-simd-vavg ( node -- )
+    {
+        [ ^^avg-vector ]
+        { float-vector-rep [| src1 src2 rep |
+            src1 src2 rep ^^add-vector
+            rep ^load-half-vector rep ^^mul-vector
+        ] }
+    } emit-vv-vector-op ;
+
 : emit-simd-v. ( node -- )
     {
         [ ^^dot-vector ]
         { float-vector-rep [ [ ^^mul-vector ] [ ^sum-vector ] bi ] }
+    } emit-vv-vector-op ;
+
+: emit-simd-vsad ( node -- )
+    {
+        [ [ ^^sad-vector ] [ widen-vector-rep ^^vector>scalar ] bi ]
     } emit-vv-vector-op ;
 
 : emit-simd-vsqrt ( node -- )
@@ -580,10 +610,14 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         { (simd-vs-)               [ emit-simd-vs-                 ] }
         { (simd-vs*)               [ emit-simd-vs*                 ] }
         { (simd-v*)                [ emit-simd-v*                  ] }
+        { (simd-v*high)            [ emit-simd-v*high              ] }
+        { (simd-v*hs+)             [ emit-simd-v*hs+               ] }
         { (simd-v/)                [ emit-simd-v/                  ] }
         { (simd-vmin)              [ emit-simd-vmin                ] }
         { (simd-vmax)              [ emit-simd-vmax                ] }
+        { (simd-vavg)              [ emit-simd-vavg                ] }
         { (simd-v.)                [ emit-simd-v.                  ] }
+        { (simd-vsad)              [ emit-simd-vsad                ] }
         { (simd-vsqrt)             [ emit-simd-vsqrt               ] }
         { (simd-sum)               [ emit-simd-sum                 ] }
         { (simd-vabs)              [ emit-simd-vabs                ] }
