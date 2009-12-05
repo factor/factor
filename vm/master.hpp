@@ -40,7 +40,6 @@ namespace factor
 #include "layouts.hpp"
 #include "platform.hpp"
 #include "primitives.hpp"
-#include "stacks.hpp"
 #include "segments.hpp"
 #include "contexts.hpp"
 #include "run.hpp"
