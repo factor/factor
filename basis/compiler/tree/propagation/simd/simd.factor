@@ -16,9 +16,12 @@ CONSTANT: vector>vector-intrinsics
         (simd-vs-)
         (simd-vs*)
         (simd-v*)
+        (simd-v*high)
+        (simd-v*hs+)
         (simd-v/)
         (simd-vmin)
         (simd-vmax)
+        (simd-vavg)
         (simd-vsqrt)
         (simd-vabs)
         (simd-vbitand)
@@ -60,6 +63,7 @@ CONSTANT: vector>vector-intrinsics
 CONSTANT: vector-other-intrinsics
     {
         (simd-v.)
+        (simd-vsad)
         (simd-sum)
         (simd-vany?)
         (simd-vall?)
