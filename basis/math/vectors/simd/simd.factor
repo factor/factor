@@ -167,10 +167,14 @@ M: A vs+               \ A-rep [ (simd-vs+)               ] [ call-next-method ]
 M: A vs-               \ A-rep [ (simd-vs-)               ] [ call-next-method ] vv->v-op ; inline
 M: A vs*               \ A-rep [ (simd-vs*)               ] [ call-next-method ] vv->v-op ; inline
 M: A v*                \ A-rep [ (simd-v*)                ] [ call-next-method ] vv->v-op ; inline
+M: A v*high            \ A-rep [ (simd-v*high)            ] [ call-next-method ] vv->v-op ; inline
+M: A v*hs+             \ A-rep [ (simd-v*hs+)             ] [ call-next-method ] vv->v-op ; inline
 M: A v/                \ A-rep [ (simd-v/)                ] [ call-next-method ] vv->v-op ; inline
+M: A vavg              \ A-rep [ (simd-vavg)              ] [ call-next-method ] vv->v-op ; inline
 M: A vmin              \ A-rep [ (simd-vmin)              ] [ call-next-method ] vv->v-op ; inline
 M: A vmax              \ A-rep [ (simd-vmax)              ] [ call-next-method ] vv->v-op ; inline
 M: A v.                \ A-rep [ (simd-v.)                ] [ call-next-method ] vv->n-op ; inline
+M: A vsad              \ A-rep [ (simd-vsad)              ] [ call-next-method ] vv->n-op ; inline
 M: A vsqrt             \ A-rep [ (simd-vsqrt)             ] [ call-next-method ] v->v-op  ; inline
 M: A sum               \ A-rep [ (simd-sum)               ] [ call-next-method ] v->n-op  ; inline
 M: A vabs              \ A-rep [ (simd-vabs)              ] [ call-next-method ] v->v-op  ; inline
