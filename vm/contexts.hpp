@@ -55,11 +55,30 @@ struct context {
 #define rs_bot (ctx->retainstack_region->start)
 #define rs_top (ctx->retainstack_region->end)
 
-DEFPUSHPOP(d,ds)
-DEFPUSHPOP(r,rs)
+inline cell dpeek()
+{
+	return *(cell *)ds;
+}
+
+inline void drepl(cell tagged)
+{
+	*(cell *)ds = tagged;
+}
+
+inline cell dpop()
+{
+	cell value = dpeek();
+	ds -= sizeof(cell);
+	return value;
+}
+
+inline void dpush(cell tagged)
+{
+	ds += sizeof(cell);
+	drepl(tagged);
+}
 
 VM_C_API void nest_stacks(stack_frame *magic_frame, factor_vm *vm);
 VM_C_API void unnest_stacks(factor_vm *vm);
 
 }
-
