@@ -53,7 +53,7 @@ HELP: circular-while
     { "sequence" sequence }
     { "quot" quotation }
 }
-{ $description "Calls " { $snippet "quot" } " on each element of the sequence until each call yields yields " { $link f } " in succession." } ;
+{ $description "Calls " { $snippet "quot" } " on each element of the sequence until each call yields " { $link f } " in succession." } ;
 
 ARTICLE: "circular" "Circular sequences"
 "The " { $vocab-link "circular" } " vocabulary implements the " { $link "sequence-protocol" } " to allow an arbitrary start index and wrap-around indexing." $nl
