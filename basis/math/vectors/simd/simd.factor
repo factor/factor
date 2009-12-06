@@ -50,6 +50,7 @@ TUPLE: simd-128
 
 GENERIC: simd-element-type ( obj -- c-type )
 GENERIC: simd-rep ( simd -- rep )
+GENERIC: simd-with ( n exemplar -- v )
 
 M: object simd-element-type drop f ;
 M: object simd-rep drop f ;
@@ -101,6 +102,131 @@ PRIVATE>
 >>
 
 <<
+
+! SIMD vectors as sequences
+
+M: simd-128 hashcode* underlying>> hashcode* ; inline
+M: simd-128 clone [ clone ] change-underlying ; inline
+M: simd-128 c:byte-length drop 16 ; inline
+
+M: simd-128 new-sequence
+    2dup length =
+    [ nip [ 16 (byte-array) ] make-underlying ]
+    [ length bad-simd-length ] if ; inline
+
+M: simd-128 equal?
+    dup simd-rep [ drop v= vall? ] [ 3drop f ] if-both-vectors-match ; inline
+
+! SIMD primitive operations
+
+M: simd-128 v+
+    dup simd-rep [ (simd-v+)                ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 v-
+    dup simd-rep [ (simd-v-)                ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vneg
+    dup simd-rep [ (simd-vneg)              ] [ call-next-method ] v->v-op  ; inline
+M: simd-128 v+-
+    dup simd-rep [ (simd-v+-)               ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vs+
+    dup simd-rep [ (simd-vs+)               ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vs-
+    dup simd-rep [ (simd-vs-)               ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vs*
+    dup simd-rep [ (simd-vs*)               ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 v*
+    dup simd-rep [ (simd-v*)                ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 v*high
+    dup simd-rep [ (simd-v*high)            ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 v/
+    dup simd-rep [ (simd-v/)                ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vavg
+    dup simd-rep [ (simd-vavg)              ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vmin
+    dup simd-rep [ (simd-vmin)              ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vmax
+    dup simd-rep [ (simd-vmax)              ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 v.
+    dup simd-rep [ (simd-v.)                ] [ call-next-method ] vv->n-op ; inline
+M: simd-128 vsad
+    dup simd-rep [ (simd-vsad)              ] [ call-next-method ] vv->n-op ; inline
+M: simd-128 vsqrt
+    dup simd-rep [ (simd-vsqrt)             ] [ call-next-method ] v->v-op  ; inline
+M: simd-128 sum
+    dup simd-rep [ (simd-sum)               ] [ call-next-method ] v->n-op  ; inline
+M: simd-128 vabs
+    dup simd-rep [ (simd-vabs)              ] [ call-next-method ] v->v-op  ; inline
+M: simd-128 vbitand
+    dup simd-rep [ (simd-vbitand)           ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vbitandn
+    dup simd-rep [ (simd-vbitandn)          ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vbitor
+    dup simd-rep [ (simd-vbitor)            ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vbitxor
+    dup simd-rep [ (simd-vbitxor)           ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vbitnot
+    dup simd-rep [ (simd-vbitnot)           ] [ call-next-method ] v->v-op  ; inline
+M: simd-128 vand
+    dup simd-rep [ (simd-vand)              ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vandn
+    dup simd-rep [ (simd-vandn)             ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vor
+    dup simd-rep [ (simd-vor)               ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vxor
+    dup simd-rep [ (simd-vxor)              ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vnot
+    dup simd-rep [ (simd-vnot)              ] [ call-next-method ] v->v-op  ; inline
+M: simd-128 vlshift
+    over simd-rep [ (simd-vlshift)           ] [ call-next-method ] vn->v-op ; inline
+M: simd-128 vrshift
+    over simd-rep [ (simd-vrshift)           ] [ call-next-method ] vn->v-op ; inline
+M: simd-128 hlshift
+    over simd-rep [ (simd-hlshift)           ] [ call-next-method ] vn->v-op ; inline
+M: simd-128 hrshift
+    over simd-rep [ (simd-hrshift)           ] [ call-next-method ] vn->v-op ; inline
+M: simd-128 vshuffle-elements
+    over simd-rep [ (simd-vshuffle-elements) ] [ call-next-method ] vn->v-op ; inline
+M: simd-128 vshuffle-bytes
+    dup simd-rep [ (simd-vshuffle-bytes)    ] [ call-next-method ] vv'->v-op ; inline
+M: simd-128 (vmerge-head)
+    dup simd-rep [ (simd-vmerge-head)       ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 (vmerge-tail)
+    dup simd-rep [ (simd-vmerge-tail)       ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 v<=
+    dup simd-rep [ (simd-v<=)               ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 v<
+    dup simd-rep [ (simd-v<)                ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 v=
+    dup simd-rep [ (simd-v=)                ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 v>
+    dup simd-rep [ (simd-v>)                ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 v>=
+    dup simd-rep [ (simd-v>=)               ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vunordered?
+    dup simd-rep [ (simd-vunordered?)       ] [ call-next-method ] vv->v-op ; inline
+M: simd-128 vany?
+    dup simd-rep [ (simd-vany?)             ] [ call-next-method ] v->n-op  ; inline
+M: simd-128 vall?
+    dup simd-rep [ (simd-vall?)             ] [ call-next-method ] v->n-op  ; inline
+M: simd-128 vnone?
+    dup simd-rep [ (simd-vnone?)            ] [ call-next-method ] v->n-op  ; inline
+
+! SIMD high-level specializations
+
+M: simd-128 vbroadcast swap [ nth ] [ simd-with ] bi ; inline
+M: simd-128 n+v [ simd-with ] keep v+ ; inline
+M: simd-128 n-v [ simd-with ] keep v- ; inline
+M: simd-128 n*v [ simd-with ] keep v* ; inline
+M: simd-128 n/v [ simd-with ] keep v/ ; inline
+M: simd-128 v+n over simd-with v+ ; inline
+M: simd-128 v-n over simd-with v- ; inline
+M: simd-128 v*n over simd-with v* ; inline
+M: simd-128 v/n over simd-with v/ ; inline
+M: simd-128 norm-sq dup v. assert-positive ; inline
+M: simd-128 distance v- norm ; inline
+
+M: simd-128 >pprint-sequence ;
+M: simd-128 pprint* pprint-object ;
+
 <PRIVATE
 
 ! SIMD concrete type functor
@@ -130,7 +256,10 @@ TUPLE: A < simd-128 ;
 M: A new-underlying    drop \ A boa ; inline
 M: A simd-rep          drop A-rep ; inline
 M: A simd-element-type drop ELT ; inline
+M: A simd-with         drop A-with ; inline
 
+M: A nth-unsafe
+    swap \ A-rep [ (simd-select) ] [ call-next-method ] vn->n-op ; inline
 M: A set-nth-unsafe
     [ ELT boolean>element ] 2dip
     underlying>> SET-NTH call ; inline
@@ -142,87 +271,7 @@ M: A like drop dup \ A instance? [ >A ] unless ; inline
 : A-with ( n -- v ) COERCER call \ A-rep (simd-with) \ A boa ; inline
 : A-cast ( v -- v' ) underlying>> \ A boa ; inline
 
-! SIMD vectors as sequences
-
-M: A hashcode* underlying>> hashcode* ; inline
-M: A clone [ clone ] change-underlying ; inline
 M: A length drop N ; inline
-M: A nth-unsafe
-    swap \ A-rep [ (simd-select) ] [ call-next-method ] vn->n-op ; inline
-M: A c:byte-length drop 16 ; inline
-
-M: A new-sequence
-    2dup length =
-    [ nip [ 16 (byte-array) ] make-underlying ]
-    [ length bad-simd-length ] if ; inline
-
-M: A equal?
-    \ A-rep [ drop v= vall? ] [ 3drop f ] if-both-vectors-match ; inline
-
-! SIMD primitive operations
-
-M: A v+                \ A-rep [ (simd-v+)                ] [ call-next-method ] vv->v-op ; inline
-M: A v-                \ A-rep [ (simd-v-)                ] [ call-next-method ] vv->v-op ; inline
-M: A vneg              \ A-rep [ (simd-vneg)              ] [ call-next-method ] v->v-op  ; inline
-M: A v+-               \ A-rep [ (simd-v+-)               ] [ call-next-method ] vv->v-op ; inline
-M: A vs+               \ A-rep [ (simd-vs+)               ] [ call-next-method ] vv->v-op ; inline
-M: A vs-               \ A-rep [ (simd-vs-)               ] [ call-next-method ] vv->v-op ; inline
-M: A vs*               \ A-rep [ (simd-vs*)               ] [ call-next-method ] vv->v-op ; inline
-M: A v*                \ A-rep [ (simd-v*)                ] [ call-next-method ] vv->v-op ; inline
-M: A v*high            \ A-rep [ (simd-v*high)            ] [ call-next-method ] vv->v-op ; inline
-M: A v/                \ A-rep [ (simd-v/)                ] [ call-next-method ] vv->v-op ; inline
-M: A vavg              \ A-rep [ (simd-vavg)              ] [ call-next-method ] vv->v-op ; inline
-M: A vmin              \ A-rep [ (simd-vmin)              ] [ call-next-method ] vv->v-op ; inline
-M: A vmax              \ A-rep [ (simd-vmax)              ] [ call-next-method ] vv->v-op ; inline
-M: A v.                \ A-rep [ (simd-v.)                ] [ call-next-method ] vv->n-op ; inline
-M: A vsad              \ A-rep [ (simd-vsad)              ] [ call-next-method ] vv->n-op ; inline
-M: A vsqrt             \ A-rep [ (simd-vsqrt)             ] [ call-next-method ] v->v-op  ; inline
-M: A sum               \ A-rep [ (simd-sum)               ] [ call-next-method ] v->n-op  ; inline
-M: A vabs              \ A-rep [ (simd-vabs)              ] [ call-next-method ] v->v-op  ; inline
-M: A vbitand           \ A-rep [ (simd-vbitand)           ] [ call-next-method ] vv->v-op ; inline
-M: A vbitandn          \ A-rep [ (simd-vbitandn)          ] [ call-next-method ] vv->v-op ; inline
-M: A vbitor            \ A-rep [ (simd-vbitor)            ] [ call-next-method ] vv->v-op ; inline
-M: A vbitxor           \ A-rep [ (simd-vbitxor)           ] [ call-next-method ] vv->v-op ; inline
-M: A vbitnot           \ A-rep [ (simd-vbitnot)           ] [ call-next-method ] v->v-op  ; inline
-M: A vand              \ A-rep [ (simd-vand)              ] [ call-next-method ] vv->v-op ; inline
-M: A vandn             \ A-rep [ (simd-vandn)             ] [ call-next-method ] vv->v-op ; inline
-M: A vor               \ A-rep [ (simd-vor)               ] [ call-next-method ] vv->v-op ; inline
-M: A vxor              \ A-rep [ (simd-vxor)              ] [ call-next-method ] vv->v-op ; inline
-M: A vnot              \ A-rep [ (simd-vnot)              ] [ call-next-method ] v->v-op  ; inline
-M: A vlshift           \ A-rep [ (simd-vlshift)           ] [ call-next-method ] vn->v-op ; inline
-M: A vrshift           \ A-rep [ (simd-vrshift)           ] [ call-next-method ] vn->v-op ; inline
-M: A hlshift           \ A-rep [ (simd-hlshift)           ] [ call-next-method ] vn->v-op ; inline
-M: A hrshift           \ A-rep [ (simd-hrshift)           ] [ call-next-method ] vn->v-op ; inline
-M: A vshuffle-elements \ A-rep [ (simd-vshuffle-elements) ] [ call-next-method ] vn->v-op ; inline
-M: A vshuffle-bytes    \ A-rep [ (simd-vshuffle-bytes)    ] [ call-next-method ] vv'->v-op ; inline
-M: A (vmerge-head)     \ A-rep [ (simd-vmerge-head)       ] [ call-next-method ] vv->v-op ; inline
-M: A (vmerge-tail)     \ A-rep [ (simd-vmerge-tail)       ] [ call-next-method ] vv->v-op ; inline
-M: A v<=               \ A-rep [ (simd-v<=)               ] [ call-next-method ] vv->v-op ; inline
-M: A v<                \ A-rep [ (simd-v<)                ] [ call-next-method ] vv->v-op ; inline
-M: A v=                \ A-rep [ (simd-v=)                ] [ call-next-method ] vv->v-op ; inline
-M: A v>                \ A-rep [ (simd-v>)                ] [ call-next-method ] vv->v-op ; inline
-M: A v>=               \ A-rep [ (simd-v>=)               ] [ call-next-method ] vv->v-op ; inline
-M: A vunordered?       \ A-rep [ (simd-vunordered?)       ] [ call-next-method ] vv->v-op ; inline
-M: A vany?             \ A-rep [ (simd-vany?)             ] [ call-next-method ] v->n-op  ; inline
-M: A vall?             \ A-rep [ (simd-vall?)             ] [ call-next-method ] v->n-op  ; inline
-M: A vnone?            \ A-rep [ (simd-vnone?)            ] [ call-next-method ] v->n-op  ; inline
-
-! SIMD high-level specializations
-
-M: A vbroadcast swap nth A-with ; inline
-M: A n+v [ A-with ] dip v+ ; inline
-M: A n-v [ A-with ] dip v- ; inline
-M: A n*v [ A-with ] dip v* ; inline
-M: A n/v [ A-with ] dip v/ ; inline
-M: A v+n A-with v+ ; inline
-M: A v-n A-with v- ; inline
-M: A v*n A-with v* ; inline
-M: A v/n A-with v/ ; inline
-M: A norm-sq dup v. assert-positive ; inline
-M: A distance v- norm ; inline
-
-M: A >pprint-sequence ;
-M: A pprint* pprint-object ;
 
 \ A-boa
 [ COERCER N napply ] N {
