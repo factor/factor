@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax io.streams.string sequences
-math kernel ;
+math kernel quotations ;
 IN: circular
 
 HELP: <circular-string>
@@ -33,12 +33,12 @@ HELP: circular
 HELP: growing-circular
 { $description "A circular sequence that is growable." } ;
 
-HELP: push-circular
+HELP: circular-push
 { $values
      { "elt" object } { "circular" circular } }
 { $description "Pushes an element to a " { $link circular } " object." } ;
 
-HELP: push-growing-circular
+HELP: growing-circular-push
 { $values
      { "elt" object } { "circular" circular } }
 { $description "Pushes an element onto a " { $link growing-circular } " object." } ;
@@ -47,6 +47,13 @@ HELP: rotate-circular
 { $values
     { "circular" circular } }
 { $description "Advances the start index of a circular object by one." } ;
+
+HELP: circular-while
+{ $values
+    { "sequence" sequence }
+    { "quot" quotation }
+}
+{ $description "Calls " { $snippet "quot" } " on each element of the sequence until each call yields yields " { $link f } " in succession." } ;
 
 ARTICLE: "circular" "Circular sequences"
 "The " { $vocab-link "circular" } " vocabulary implements the " { $link "sequence-protocol" } " to allow an arbitrary start index and wrap-around indexing." $nl
@@ -63,8 +70,10 @@ ARTICLE: "circular" "Circular sequences"
 }
 "Pushing new elements:"
 { $subsections
-    push-circular
-    push-growing-circular
-} ;
+    circular-push
+    growing-circular-push
+}
+"Iterating over a circular until a stop condition:"
+{ $subsections circular-while } ;
 
 ABOUT: "circular"
