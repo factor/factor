@@ -152,7 +152,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 		break;
 	case collect_aging_op:
 		collect_aging();
-		if(data->low_memory_p())
+		if(data->high_fragmentation_p())
 		{
 			current_gc->op = collect_full_op;
 			current_gc->event->op = collect_full_op;
@@ -161,7 +161,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 		break;
 	case collect_to_tenured_op:
 		collect_to_tenured();
-		if(data->low_memory_p())
+		if(data->high_fragmentation_p())
 		{
 			current_gc->op = collect_full_op;
 			current_gc->event->op = collect_full_op;
