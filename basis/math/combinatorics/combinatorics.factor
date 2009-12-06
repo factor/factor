@@ -1,7 +1,7 @@
 ! Copyright (c) 2007-2009 Slava Pestov, Doug Coleman, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs binary-search fry kernel locals math math.order
-    math.ranges mirrors namespaces sequences sorting ;
+    math.ranges namespaces sequences sorting ;
 IN: math.combinatorics
 
 <PRIVATE

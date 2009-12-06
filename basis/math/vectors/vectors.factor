@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien.c-types assocs kernel sequences math math.functions
-hints math.order math.libm math.floats.private fry combinators
+grouping hints math.order math.libm math.floats.private fry combinators
 byte-arrays accessors locals ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors
@@ -9,7 +9,7 @@ IN: math.vectors
 GENERIC: vneg ( u -- v )
 M: object vneg [ neg ] map ;
 
-GENERIC# v+n 1 ( u n -- v )
+GENERIC# v+n 1 ( u n -- w )
 M: object v+n [ + ] curry map ;
 
 GENERIC: n+v ( n v -- w )
@@ -21,13 +21,13 @@ M: object v-n [ - ] curry map ;
 GENERIC: n-v ( n v -- w )
 M: object n-v [ - ] with map ;
 
-GENERIC# v*n 1 ( u n -- v )
+GENERIC# v*n 1 ( u n -- w )
 M: object v*n [ * ] curry map ;
 
 GENERIC: n*v ( n v -- w )
 M: object n*v [ * ] with map ;
 
-GENERIC# v/n 1 ( u n -- v )
+GENERIC# v/n 1 ( u n -- w )
 M: object v/n [ / ] curry map ;
 
 GENERIC: n/v ( n v -- w )
@@ -45,6 +45,16 @@ M: object [v-] [ [-] ] 2map ;
 GENERIC: v* ( u v -- w )
 M: object v* [ * ] 2map ;
 
+GENERIC: v*high ( u v -- w )
+
+<PRIVATE
+: (h+) ( u -- w ) 2 <groups> [ first2 + ] map ;
+: (h-) ( u -- w ) 2 <groups> [ first2 - ] map ;
+PRIVATE>
+
+GENERIC: v*hs+ ( u v -- w )
+M: object v*hs+ [ * ] 2map (h+) ;
+
 GENERIC: v/ ( u v -- w )
 M: object v/ [ / ] 2map ;
 
@@ -54,6 +64,9 @@ M: object v/ [ / ] 2map ;
     [ 2dup [ float? ] both? ] 2dip if ; inline
 
 PRIVATE>
+
+GENERIC: vavg ( u v -- w )
+M: object vavg [ + 2 / ] 2map ;
 
 GENERIC: vmax ( u v -- w )
 M: object vmax [ [ float-max ] [ max ] if-both-floats ] 2map ;
@@ -81,6 +94,9 @@ M: object vabs [ abs ] map ;
 
 GENERIC: vsqrt ( u -- v )
 M: object vsqrt [ >float fsqrt ] map ;
+
+GENERIC: vsad ( u v -- n )
+M: object vsad [ - abs ] [ + ] 2map-reduce ;
 
 <PRIVATE
 
