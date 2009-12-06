@@ -98,9 +98,14 @@ void data_heap::reset_generation(tenured_space *gen)
 	clear_decks(gen);
 }
 
-bool data_heap::low_memory_p()
+bool data_heap::high_fragmentation_p()
 {
 	return (tenured->largest_free_block() <= nursery->size + aging->size);
+}
+
+bool data_heap::low_memory_p()
+{
+	return (tenured->free_space() <= nursery->size + aging->size);
 }
 
 void data_heap::mark_all_cards()
