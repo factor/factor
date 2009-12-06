@@ -29,6 +29,7 @@ struct data_heap {
 	void reset_generation(nursery_space *gen);
 	void reset_generation(aging_space *gen);
 	void reset_generation(tenured_space *gen);
+	bool high_fragmentation_p();
 	bool low_memory_p();
 	void mark_all_cards();
 };
