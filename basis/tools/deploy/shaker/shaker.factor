@@ -180,7 +180,6 @@ IN: tools.deploy.shaker
                 "slots"
                 "special"
                 "specializer"
-                "specializations"
                 "struct-slots"
                 ! UI needs this
                 ! "superclass"

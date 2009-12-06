@@ -9,6 +9,8 @@ IN: math.vectors.simd
 
 ERROR: bad-simd-length got expected ;
 
+ERROR: bad-simd-vector obj ;
+
 <<
 <PRIVATE
 ! Primitive SIMD constructors
@@ -239,7 +241,10 @@ c:<c-type>
     byte-array >>class
     A >>boxed-class
     { A-rep alien-vector A boa } >quotation >>getter
-    { [ underlying>> ] 2dip A-rep set-alien-vector } >quotation >>setter
+    {
+        [ dup simd-128? [ bad-simd-vector ] unless underlying>> ] 2dip
+        A-rep set-alien-vector
+    } >quotation >>setter
     16 >>size
     16 >>align
     A-rep >>rep
