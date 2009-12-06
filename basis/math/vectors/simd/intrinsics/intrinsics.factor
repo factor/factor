@@ -145,24 +145,28 @@ PRIVATE>
 : (simd-v*high)            ( a b rep -- c )
     dup rep-component-type heap-size -8 * '[ * _ shift ] components-2map ;
 :: (simd-v*hs+)            ( a b rep -- c )
-    rep widen-vector-rep signed-rep :> wide-rep
+    rep { char-16-rep uchar-16-rep } member-eq?
+    [ uchar-16-rep char-16-rep ]
+    [ rep rep ] if :> ( a-rep b-rep )
+    b-rep widen-vector-rep signed-rep :> wide-rep
     wide-rep rep-component-type :> wide-type
-    a rep >rep-array 2 <groups> :> a'
-    b rep >rep-array 2 <groups> :> b'
+    a a-rep >rep-array 2 <groups> :> a'
+    b b-rep >rep-array 2 <groups> :> b'
     a' b' [
         [ [ first  ] bi@ * ]
         [ [ second ] bi@ * ] 2bi +
         wide-type c-type-clamp
-    ] wide-rep <rep-array> 2map-as ;
+    ] wide-rep <rep-array> 2map-as underlying>> ;
 : (simd-v/)                ( a b rep -- c ) [ / ] components-2map ;
-: (simd-vavg)              ( a b rep -- c ) [ + 2 / ] components-2map ;
+: (simd-vavg)              ( a b rep -- c )
+    [ + dup integer? [ 1 + -1 shift ] [ 0.5 * ] if ] components-2map ;
 : (simd-vmin)              ( a b rep -- c ) [ min ] components-2map ;
 : (simd-vmax)              ( a b rep -- c ) [ max ] components-2map ;
 : (simd-v.)                ( a b rep -- n )
     [ 2>rep-array [ [ first ] bi@ * ] 2keep ] keep
     1 swap rep-length [a,b) [ '[ _ swap nth-unsafe ] bi@ * + ] with with each ;
 : (simd-vsqrt)             ( a   rep -- c ) [ fsqrt ] components-map ;
-: (simd-vsad)              ( a b rep -- n ) 2>rep-array [ - abs ] [ + ] 2map-reduce ;
+: (simd-vsad)              ( a b rep -- c ) 2>rep-array [ - abs ] [ + ] 2map-reduce ;
 : (simd-sum)               ( a   rep -- n ) [ + ] components-reduce ;
 : (simd-vabs)              ( a   rep -- c ) [ abs ] components-map ;
 : (simd-vbitand)           ( a b rep -- c ) [ bitand ] bitwise-components-2map ;

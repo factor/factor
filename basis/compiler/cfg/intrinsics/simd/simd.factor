@@ -392,7 +392,10 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 
 : emit-simd-vsad ( node -- )
     {
-        [ [ ^^sad-vector ] [ widen-vector-rep ^^vector>scalar ] bi ]
+        [
+            [ ^^sad-vector dup { 2 3 0 1 } int-4-rep ^^shuffle-vector-imm int-4-rep ^^add-vector ]
+            [ widen-vector-rep ^^vector>scalar ] bi
+        ]
     } emit-vv-vector-op ;
 
 : emit-simd-vsqrt ( node -- )
