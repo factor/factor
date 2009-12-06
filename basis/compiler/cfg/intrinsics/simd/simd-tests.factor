@@ -275,14 +275,6 @@ unit-test
 
 [ {
     ##unpack-vector-head ##unpack-vector-tail ##add-vector
-    ##horizontal-add-vector
-    ##vector>scalar
-} ]
-[ horizontal-cpu int-4-rep [ emit-simd-sum ] test-emit ]
-unit-test
-
-[ {
-    ##unpack-vector-head ##unpack-vector-tail ##add-vector
     ##horizontal-add-vector ##horizontal-add-vector
     ##vector>scalar
 } ]
@@ -514,22 +506,22 @@ unit-test
 
 ! with
 [ { ##scalar>vector ##shuffle-vector-imm } ]
-[ shuffle-imm-cpu int-4-rep [ emit-simd-with ] test-emit ]
+[ shuffle-imm-cpu float-4-rep [ emit-simd-with ] test-emit ]
 unit-test
 
 ! gather-2
 [ { ##gather-vector-2 } ]
-[ simple-ops-cpu longlong-2-rep [ emit-simd-gather-2 ] test-emit ]
+[ simple-ops-cpu double-2-rep [ emit-simd-gather-2 ] test-emit ]
 unit-test
 
 ! gather-4
 [ { ##gather-vector-4 } ]
-[ simple-ops-cpu int-4-rep [ emit-simd-gather-4 ] test-emit ]
+[ simple-ops-cpu float-4-rep [ emit-simd-gather-4 ] test-emit ]
 unit-test
 
 ! select
 [ { ##shuffle-vector-imm ##vector>scalar } ]
-[ shuffle-imm-cpu 1 int-4-rep [ emit-simd-select ] test-emit-literal ]
+[ shuffle-imm-cpu 1 float-4-rep [ emit-simd-select ] test-emit-literal ]
 unit-test
 
 ! test with nonliteral/invalid reps

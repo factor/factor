@@ -1106,6 +1106,32 @@ M: x86 %mul-vector-reps
         { sse4.1? { int-4-rep uint-4-rep } }
     } available-reps ;
 
+M: x86 %mul-high-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
+    {
+        { short-8-rep  [ PMULHW ] }
+        { ushort-8-rep [ PMULHUW ] }
+    } case ;
+
+M: x86 %mul-high-vector-reps
+    {
+        { sse2? { short-8-rep ushort-8-rep } }
+    } available-reps ;
+
+M: x86 %mul-horizontal-add-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
+    {
+        { char-16-rep  [ PMADDUBSW ] }
+        { uchar-16-rep [ PMADDUBSW ] }
+        { short-8-rep  [ PMADDWD ] }
+    } case ;
+
+M: x86 %mul-horizontal-add-vector-reps
+    {
+        { sse2?  { short-8-rep } }
+        { ssse3? { char-16-rep uchar-16-rep } }
+    } available-reps ;
+
 M: x86 %div-vector ( dst src1 src2 rep -- )
     [ two-operand ] keep
     {
@@ -1159,6 +1185,18 @@ M: x86 %max-vector-reps
         { sse4.1? { char-16-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
+M: x86 %avg-vector ( dst src1 src2 rep -- )
+    [ two-operand ] keep
+    {
+        { uchar-16-rep [ PAVGB ] }
+        { ushort-8-rep [ PAVGW ] }
+    } case ;
+
+M: x86 %avg-vector-reps
+    {
+        { sse2? { uchar-16-rep ushort-8-rep } }
+    } available-reps ;
+
 M: x86 %dot-vector
     [ two-operand ] keep
     {
@@ -1169,6 +1207,17 @@ M: x86 %dot-vector
 M: x86 %dot-vector-reps
     {
         { sse4.1? { float-4-rep double-2-rep } }
+    } available-reps ;
+
+M: x86 %sad-vector
+    [ two-operand ] keep
+    {
+        { uchar-16-rep [ PSADBW ] }
+    } case ;
+
+M: x86 %sad-vector-reps
+    {
+        { sse2? { uchar-16-rep } }
     } available-reps ;
 
 M: x86 %horizontal-add-vector ( dst src1 src2 rep -- )
@@ -1323,7 +1372,7 @@ M: x86 %shr-vector-imm-reps %shr-vector-reps ;
 
 M: x86 %integer>scalar drop MOVD ;
 
-M:: x86 %scalar>integer ( dst src rep -- )
+:: %scalar>integer-32 ( dst src rep -- )
     rep {
         { int-scalar-rep [
             dst 32-bit-version-of src MOVD
@@ -1357,6 +1406,14 @@ M:: x86 %scalar>integer ( dst src rep -- )
                 dst tmp-dst int-rep %copy
             ] with-small-register
         ] }
+    } case ;
+
+M: x86.32 %scalar>integer ( dst src rep -- ) %scalar>integer-32 ;
+M: x86.64 %scalar>integer ( dst src rep -- )
+    {
+        { longlong-scalar-rep  [ MOVD ] }
+        { ulonglong-scalar-rep [ MOVD ] }
+        [ %scalar>integer-32 ]
     } case ;
 
 M: x86 %vector>scalar %copy ;
