@@ -143,12 +143,20 @@ void factor_vm::collect_full(bool trace_contexts_p)
 {
 	collect_mark_impl(trace_contexts_p);
 	collect_sweep_impl();
+
 	if(data->low_memory_p())
+	{
+		current_gc->op = collect_growing_heap_op;
+		current_gc->event->op = collect_growing_heap_op;
+		collect_growing_heap(0,trace_contexts_p);
+	}
+	else if(data->high_fragmentation_p())
 	{
 		current_gc->op = collect_compact_op;
 		current_gc->event->op = collect_compact_op;
 		collect_compact_impl(trace_contexts_p);
 	}
+
 	code->flush_icache();
 }
 
