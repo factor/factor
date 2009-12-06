@@ -201,7 +201,7 @@ CONSTANT: vector-words
     { vsqrt n/v v/n v/ normalize } unique assoc-diff ;
 
 : remove-integer-words ( alist -- alist' )
-    { vlshift vrshift v*high } unique assoc-diff ;
+    { vlshift vrshift v*high v*hs+ } unique assoc-diff ;
 
 : boolean-ops ( -- words )
     { vand vandn vor vxor vnot } ;
