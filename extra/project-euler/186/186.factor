@@ -45,7 +45,7 @@ IN: project-euler.186
     55 [1,b] [ (generator) ] map <circular> ;
 
 : advance ( lag -- )
-    [ { 0 31 } swap nths sum 1000000 rem ] keep push-circular ;
+    [ { 0 31 } swap nths sum 1000000 rem ] keep circular-push ;
 
 : next ( lag -- n )
     [ first ] [ advance ] bi ;
