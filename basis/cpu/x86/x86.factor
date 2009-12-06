@@ -1124,12 +1124,11 @@ M: x86 %mul-horizontal-add-vector ( dst src1 src2 rep -- )
         { char-16-rep  [ PMADDUBSW ] }
         { uchar-16-rep [ PMADDUBSW ] }
         { short-8-rep  [ PMADDWD ] }
-        { ushort-8-rep [ PMADDWD ] }
     } case ;
 
 M: x86 %mul-horizontal-add-vector-reps
     {
-        { sse2?  { short-8-rep ushort-8-rep } }
+        { sse2?  { short-8-rep } }
         { ssse3? { char-16-rep uchar-16-rep } }
     } available-reps ;
 
@@ -1213,13 +1212,12 @@ M: x86 %dot-vector-reps
 M: x86 %sad-vector
     [ two-operand ] keep
     {
-        { char-16-rep [ PSADBW ] }
         { uchar-16-rep [ PSADBW ] }
     } case ;
 
 M: x86 %sad-vector-reps
     {
-        { sse2? { char-16-rep uchar-16-rep } }
+        { sse2? { uchar-16-rep } }
     } available-reps ;
 
 M: x86 %horizontal-add-vector ( dst src1 src2 rep -- )

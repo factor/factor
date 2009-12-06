@@ -273,7 +273,7 @@ M: simd-128 vshuffle ( u perm -- v )
     vshuffle-bytes ; inline
 
 M: uchar-16 v*hs+
-    uchar-16-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op ushort-8-cast ; inline
+    uchar-16-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op short-8-cast ; inline
 M: ushort-8 v*hs+
     ushort-8-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op uint-4-cast ; inline
 M: uint-4 v*hs+
