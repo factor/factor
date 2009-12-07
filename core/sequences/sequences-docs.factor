@@ -1002,7 +1002,7 @@ HELP: pusher
            "10 [ even? ] pusher [ each ] dip ."
            "V{ 0 2 4 6 8 }"
 }
-{ $notes "Used to implement the " { $link filter } " word." } ;
+{ $notes "Used to implement the " { $link filter } " word. Compare this word with " { $link accumulator } ", which is an unfiltering version." } ;
 
 HELP: trim-head
 { $values
@@ -1671,6 +1671,19 @@ ARTICLE: "sequences-comparing" "Comparing sequences"
 ARTICLE: "sequences-f" "The f object as a sequence"
 "The " { $link f } " object supports the sequence protocol in a trivial way. It responds with a length of zero and throws an out of bounds error when an attempt is made to access elements." ;
 
+ARTICLE: "sequences-combinator-implementation" "Implementing sequence combinators"
+"Creating a new sequence unconditionally:"
+{ $subsections
+    accumulator
+    accumulator-for
+}
+"Creating a new sequence conditionally:"
+{ $subsections
+    pusher
+    pusher-for
+    2pusher
+} ;
+
 ARTICLE: "sequences" "Sequence operations"
 "A " { $emphasis "sequence" } " is a finite, linearly-ordered collection of elements. Words for working with sequences are in the " { $vocab-link "sequences" } " vocabulary."
 $nl
@@ -1708,6 +1721,8 @@ $nl
 "Using sequences for control flow:"
 { $subsections "sequences-if" }
 "For inner loops:"
-{ $subsections "sequences-unsafe" } ;
+{ $subsections "sequences-unsafe" }
+"Implemeting sequence combinators:"
+{ $subsections "sequences-combinator-implementation" } ;
 
 ABOUT: "sequences"
