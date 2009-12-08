@@ -50,7 +50,7 @@ HELP: rotate-circular
 
 HELP: circular-while
 { $values
-    { "sequence" sequence }
+    { "circular" circular }
     { "quot" quotation }
 }
 { $description "Calls " { $snippet "quot" } " on each element of the sequence until each call yields " { $link f } " in succession." } ;

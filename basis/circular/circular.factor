@@ -59,27 +59,21 @@ PRIVATE>
 TUPLE: circular-iterator
     { circular read-only } { n integer } { last-start integer } ;
 
-: <circular-iterator> ( sequence -- obj )
-    <circular> 0 0 circular-iterator boa ; inline
+: <circular-iterator> ( circular -- obj )
+    0 0 circular-iterator boa ; inline
 
 <PRIVATE
 
 : (circular-while) ( iterator quot: ( obj -- ? ) -- )
-    [ [ [ n>> ] [ circular>> ] bi nth ] dip call ] 2keep rot [
-        [
-            [ 1 + ] change-n
-            dup n>> >>last-start
-        ] dip (circular-while)
+    [ [ [ n>> ] [ circular>> ] bi nth ] dip call ] 2keep
+    rot [ [ dup n>> >>last-start ] dip ] when
+    over [ n>> ] [ [ last-start>> ] [ circular>> length ] bi + 1 - ] bi = [
+        2drop
     ] [
-        over [ 1 + ] change-n
-        [ n>> ] [ [ last-start>> ] [ circular>> length ] bi + ] bi = [
-            2drop
-        ] [
-            (circular-while)
-        ] if
+        [ [ 1 + ] change-n ] dip (circular-while)
     ] if ; inline recursive
 
 PRIVATE>
 
-: circular-while ( sequence quot: ( obj -- ? ) -- )
-    [ <circular-iterator> ] dip (circular-while) ; inline
+: circular-while ( circular quot: ( obj -- ? ) -- )
+    [ clone ] dip [ <circular-iterator> ] dip (circular-while) ; inline
