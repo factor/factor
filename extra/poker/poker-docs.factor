@@ -13,4 +13,4 @@ HELP: best-holdem-hand
 
 HELP: <deck>
 { $values { "deck" sequence } }
-{ $description "Returns a vector containing a standard, unshuffled deck of 52 cards." } ;
+{ $description "Returns a vector containing a standard, shuffled deck of 52 cards." } ;

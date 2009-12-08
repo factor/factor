@@ -183,7 +183,7 @@ PRIVATE>
 
 : <deck> ( -- deck )
     RANK_STR SUIT_STR 2array
-    [ concat >ckf ] V{ } product-map-as ;
+    [ concat >ckf ] V{ } product-map-as randomize ;
 
 : best-holdem-hand ( hand -- n cards )
     5 [ [ hand-value ] [ ] bi ] { } map>assoc-combinations
@@ -197,9 +197,6 @@ PRIVATE>
 
 : string>value ( string -- value )
     parse-cards best-holdem-hand drop ;
-
-: shuffle ( deck -- deck )
-    [ randomize ] change-cards ;
 
 ERROR: no-card card deck ;
 
