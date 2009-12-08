@@ -38,7 +38,7 @@ M: circular virtual-exemplar seq>> ; inline
 
 INSTANCE: circular virtual-sequence
 
-TUPLE: growing-circular < circular length ;
+TUPLE: growing-circular < circular { length integer } ;
 
 M: growing-circular length length>> ; inline
 
