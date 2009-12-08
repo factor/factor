@@ -260,5 +260,8 @@ ERROR: bad-suit-symbol ch ;
 : value>hand-name ( value -- string )
     value>rank VALUE_STR nth ;
 
+: string>hand-name ( string -- string' )
+    string>value value>hand-name ;
+
 SYNTAX: HAND{
     "}" parse-tokens [ card> ] { } map-as suffix! ;
