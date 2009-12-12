@@ -23,7 +23,7 @@ IN: circular.tests
 [ "boo" ] [ "foo" <circular> CHAR: b 3 pick set-nth-unsafe >string ] unit-test
 [ "ornact" ] [ "factor" <circular> 4 over change-circular-start CHAR: n 2 pick set-nth >string ] unit-test
 
-[ "bcd" ] [ 3 <circular-string> "abcd" [ over push-circular ] each >string ] unit-test
+[ "bcd" ] [ 3 <circular-string> "abcd" [ over circular-push ] each >string ] unit-test
 
 [ { 0 0 } ] [ { 0 0 } <circular> -1 over change-circular-start >array ] unit-test
 
@@ -34,11 +34,11 @@ IN: circular.tests
 [ { } ] [ 3 <growing-circular> >array ] unit-test
 [ { 1 2 } ] [
     3 <growing-circular>
-    [ 1 swap push-growing-circular ] keep
-    [ 2 swap push-growing-circular ] keep >array
+    [ 1 swap growing-circular-push ] keep
+    [ 2 swap growing-circular-push ] keep >array
 ] unit-test
 [ { 3 4 5 } ] [
     3 <growing-circular> dup { 1 2 3 4 5 } [
-        swap push-growing-circular
+        swap growing-circular-push
     ] with each >array
 ] unit-test

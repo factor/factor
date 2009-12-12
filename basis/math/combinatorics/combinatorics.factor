@@ -103,23 +103,26 @@ C: <combo> combo
 : apply-combination ( m combo -- seq )
     [ combination-indices ] keep seq>> nths ;
 
+: combinations-quot ( seq k quot -- seq quot )
+    [ <combo> [ choose [0,b) ] keep ] dip
+    '[ _ apply-combination @ ] ; inline
+
 PRIVATE>
+
+: each-combination ( seq k quot -- )
+    combinations-quot each ; inline
+
+: map-combinations ( seq k quot -- )
+    combinations-quot map ; inline
+
+: map>assoc-combinations ( seq k quot exemplar -- )
+    [ combinations-quot ] dip map>assoc ; inline
 
 : combination ( m seq k -- seq )
     <combo> apply-combination ;
 
 : all-combinations ( seq k -- seq )
-    <combo> [ choose [0,b) ] keep
-    '[ _ apply-combination ] map ;
-
-: each-combination ( seq k quot -- )
-    [ <combo> [ choose [0,b) ] keep ] dip
-    '[ _ apply-combination @ ] each ; inline
-
-: map-combinations ( seq k quot -- )
-    [ <combo> [ choose [0,b) ] keep ] dip
-    '[ _ apply-combination @ ] map ; inline
+    [ ] combinations-quot map ;
 
 : reduce-combinations ( seq k identity quot -- result )
     [ -rot ] dip each-combination ; inline
-

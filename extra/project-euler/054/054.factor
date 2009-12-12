@@ -76,7 +76,7 @@ IN: project-euler.054
 PRIVATE>
 
 : euler054 ( -- answer )
-    source-054 [ [ <hand> ] map first2 before? ] count ;
+    source-054 [ [ string>value ] map first2 before? ] count ;
 
 ! [ euler054 ] 100 ave-time
 ! 34 ms ave run time - 2.65 SD (100 trials)
