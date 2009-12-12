@@ -89,9 +89,14 @@ PRIVATE>
     histogram >alist
     [ ] [ [ [ second ] bi@ > ] 2keep ? ] map-reduce first ;
 
+ERROR: empty-sequence ;
+
 : minmax ( seq -- min max )
-    #! find the min and max of a seq in one pass
-    [ 1/0. -1/0. ] dip [ [ min ] [ max ] bi-curry bi* ] each ;
+    [
+        empty-sequence
+    ] [
+        [ first dup ] keep [ [ min ] [ max ] bi-curry bi* ] each
+    ] if-empty ;
 
 : range ( seq -- x )
     minmax swap - ;

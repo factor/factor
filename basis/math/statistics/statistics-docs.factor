@@ -38,7 +38,7 @@ HELP: range
 
 HELP: minmax
 { $values { "seq" sequence } { "min" real } { "max" real } }
-{ $description "Finds the minimum and maximum elements of " { $snippet "seq" } " in one pass." }
+{ $description "Finds the minimum and maximum elements of " { $snippet "seq" } " in one pass. Throws an error on an empty sequence." }
 { $examples
     { $example "USING: arrays math.statistics prettyprint ;"
         "{ 1 2 3 } minmax 2array ."

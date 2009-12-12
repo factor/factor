@@ -1,5 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors arrays kernel locals math sequences ;
+USING: accessors arrays assocs kernel locals math sequences ;
 IN: sequences.product
 
 TUPLE: product-sequence { sequences array read-only } { lengths array read-only } ;
@@ -55,11 +55,21 @@ M: product-sequence nth
         [ ns sequences nths quot call ns lengths product-iter ] until
     ] unless ; inline
 
-:: product-map ( sequences quot -- sequence )
+:: product-map-as ( sequences quot exemplar -- sequence )
     0 :> i!
-    sequences [ length ] [ * ] map-reduce sequences
+    sequences [ length ] [ * ] map-reduce exemplar
     [| result |
         sequences [ quot call i result set-nth i 1 + i! ] product-each
         result
     ] new-like ; inline
 
+: product-map ( sequences quot -- sequence )
+    over product-map-as ; inline
+
+:: product-map>assoc ( sequences quot exemplar -- assoc )
+    0 :> i!
+    sequences [ length ] [ * ] map-reduce { }
+    [| result |
+        sequences [ quot call 2array i result set-nth i 1 + i! ] product-each
+        result
+    ] new-like exemplar assoc-like ; inline
