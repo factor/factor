@@ -11,7 +11,7 @@ struct code_block
 
 	bool free_p() const
 	{
-		return header & 1 == 1;
+		return (header & 1) == 1;
 	}
 
 	code_block_type type() const
