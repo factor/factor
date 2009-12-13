@@ -27,7 +27,7 @@ TUPLE: buffered-port < port { buffer buffer } ;
 
 TUPLE: input-port < buffered-port ;
 
-M: input-port stream-element-type drop +byte+ ;
+M: input-port stream-element-type drop +byte+ ; inline
 
 : <input-port> ( handle -- input-port )
     input-port <buffered-port> ;
@@ -104,7 +104,7 @@ TUPLE: output-port < buffered-port ;
     [ nip ] [ buffer>> buffer-capacity <= ] 2bi
     [ drop ] [ stream-flush ] if ; inline
 
-M: output-port stream-element-type stream>> stream-element-type ;
+M: output-port stream-element-type stream>> stream-element-type ; inline
 
 M: output-port stream-write1
     dup check-disposed
