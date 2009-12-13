@@ -3,8 +3,9 @@
 namespace factor
 {
 
-THREADHANDLE start_thread(void *(*start_routine)(void *),void *args){
-    return (void*) CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, args, 0, 0); 
+THREADHANDLE start_thread(void *(*start_routine)(void *), void *args)
+{
+	return (void *)CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, args, 0, 0);
 }
 
 DWORD dwTlsIndex; 
@@ -47,7 +48,7 @@ u64 nano_count()
 	ret = QueryPerformanceFrequency(&frequency);
 	if(ret == 0)
 		fatal_error("QueryPerformanceFrequency", 0);
-	
+
 	return count.QuadPart*(1000000000/frequency.QuadPart);
 }
 
