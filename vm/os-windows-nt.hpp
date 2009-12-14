@@ -23,8 +23,13 @@ FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe);
 
 // SSE traps raise these exception codes, which are defined in internal NT headers
 // but not winbase.h
+#ifndef STATUS_FLOAT_MULTIPLE_FAULTS
 #define STATUS_FLOAT_MULTIPLE_FAULTS 0xC00002B4
+#endif
+
+#ifndef STATUS_FLOAT_MULTIPLE_TRAPS
 #define STATUS_FLOAT_MULTIPLE_TRAPS  0xC00002B5
+#endif
 
 typedef HANDLE THREADHANDLE;
 
