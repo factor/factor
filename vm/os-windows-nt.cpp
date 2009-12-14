@@ -3,8 +3,9 @@
 namespace factor
 {
 
-THREADHANDLE start_thread(void *(*start_routine)(void *),void *args){
-    return (void*) CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, args, 0, 0); 
+THREADHANDLE start_thread(void *(*start_routine)(void *), void *args)
+{
+	return (void *)CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, args, 0, 0);
 }
 
 DWORD dwTlsIndex; 
