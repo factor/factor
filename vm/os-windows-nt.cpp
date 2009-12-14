@@ -37,10 +37,15 @@ u64 system_micros()
 		- EPOCH_OFFSET) / 10;
 }
 
+/* On VirtualBox, QueryPerformanceCounter does not increment
+the high part every time the low part overflows.  Workaround. */
 u64 nano_count()
 {
 	LARGE_INTEGER count;
 	LARGE_INTEGER frequency;
+	static u32 hi_correction = 0;
+	static u32 hi = 0xffffffff;
+	static u32 lo = 0xffffffff;
 	BOOL ret;
 	ret = QueryPerformanceCounter(&count);
 	if(ret == 0)
@@ -48,6 +53,13 @@ u64 nano_count()
 	ret = QueryPerformanceFrequency(&frequency);
 	if(ret == 0)
 		fatal_error("QueryPerformanceFrequency", 0);
+
+	if((u32)count.LowPart < lo && (u32)count.HighPart == hi)
+		hi_correction++;
+
+	hi = count.HighPart;
+	lo = count.LowPart;
+	count.HighPart += hi_correction;
 
 	return count.QuadPart*(1000000000/frequency.QuadPart);
 }
