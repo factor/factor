@@ -193,7 +193,7 @@ USERENV: jit-if 29
 USERENV: jit-epilog 30
 USERENV: jit-return 31
 USERENV: jit-profiling 32
-USERENV: jit-push-immediate 33
+USERENV: jit-push 33
 USERENV: jit-dip-word 34
 USERENV: jit-dip 35
 USERENV: jit-2dip-word 36
