@@ -82,18 +82,23 @@ bool quotation_jit::declare_p(cell i, cell length)
 		&& array_nth(elements.untagged(),i + 1) == parent->special_objects[JIT_DECLARE_WORD];
 }
 
+bool quotation_jit::word_stack_frame_p(cell obj)
+{
+	return to_boolean(untag<word>(obj)->subprimitive)
+		|| obj == parent->special_objects[JIT_PRIMITIVE_WORD];
+}
+
 bool quotation_jit::stack_frame_p()
 {
 	fixnum length = array_capacity(elements.untagged());
-	fixnum i;
 
-	for(i = 0; i < length - 1; i++)
+	for(fixnum i = 0; i < length; i++)
 	{
 		cell obj = array_nth(elements.untagged(),i);
 		switch(tagged<object>(obj).type())
 		{
 		case WORD_TYPE:
-			if(!to_boolean(untag<word>(obj)->subprimitive))
+			if(i != length - 1 || word_stack_frame_p(obj))
 				return true;
 			break;
 		case QUOTATION_TYPE:
@@ -153,49 +158,22 @@ void quotation_jit::iterate_quotation()
 		switch(obj.type())
 		{
 		case WORD_TYPE:
-			/* Intrinsics */
+			/* Sub-primitives */
 			if(to_boolean(obj.as<word>()->subprimitive))
-				emit_subprimitive(obj.value());
-			/* The (execute) primitive is special-cased */
-			else if(obj.value() == parent->special_objects[JIT_EXECUTE_WORD])
 			{
-				if(i == length - 1)
-				{
-					if(stack_frame) emit(parent->special_objects[JIT_EPILOG]);
-					tail_call = true;
-					emit(parent->special_objects[JIT_EXECUTE_JUMP]);
-				}
-				else
-					emit(parent->special_objects[JIT_EXECUTE_CALL]);
+				tail_call = emit_subprimitive(obj.value(), /* word */
+					i == length - 1, /* tail_call_p */
+					stack_frame); /* stack_frame_p */
 			}
 			/* Everything else */
-			else
+			else if(i == length - 1)
 			{
-				if(i == length - 1)
-				{
-					if(stack_frame) emit(parent->special_objects[JIT_EPILOG]);
-					tail_call = true;
-					/* Inline cache misses are special-cased.
-					   The calling convention for tail
-					   calls stores the address of the next
-					   instruction in a register. However,
-					   PIC miss stubs themselves tail-call
-					   the inline cache miss primitive, and
-					   we don't want to clobber the saved
-					   address. */
-					if(obj.value() == parent->special_objects[PIC_MISS_WORD]
-					   || obj.value() == parent->special_objects[PIC_MISS_TAIL_WORD])
-					{
-						word_special(obj.value());
-					}
-					else
-					{
-						word_jump(obj.value());
-					}
-				}
-				else
-					word_call(obj.value());
+				if(stack_frame) emit(parent->special_objects[JIT_EPILOG]);
+				tail_call = true;
+				word_jump(obj.value());
 			}
+			else
+				word_call(obj.value());
 			break;
 		case WRAPPER_TYPE:
 			push(obj.as<wrapper>()->object);
@@ -209,8 +187,6 @@ void quotation_jit::iterate_quotation()
 				emit(parent->special_objects[JIT_PRIMITIVE]);
 
 				i++;
-
-				tail_call = true;
 			}
 			else
 				push(obj.value());
@@ -257,12 +233,13 @@ void quotation_jit::iterate_quotation()
 			/* Method dispatch */
 			if(mega_lookup_p(i,length))
 			{
+				if(stack_frame) emit(parent->special_objects[JIT_EPILOG]);
+				tail_call = true;
 				emit_mega_cache_lookup(
 					array_nth(elements.untagged(),i),
 					untag_fixnum(array_nth(elements.untagged(),i + 1)),
 					array_nth(elements.untagged(),i + 2));
 				i += 3;
-				tail_call = true;
 			}
 			/* Non-optimizing compiler ignores declarations */
 			else if(declare_p(i,length))
@@ -280,8 +257,7 @@ void quotation_jit::iterate_quotation()
 	{
 		set_position(length);
 
-		if(stack_frame)
-			emit(parent->special_objects[JIT_EPILOG]);
+		if(stack_frame) emit(parent->special_objects[JIT_EPILOG]);
 		emit(parent->special_objects[JIT_RETURN]);
 	}
 }
@@ -340,37 +316,6 @@ void factor_vm::primitive_quotation_xt()
 {
 	quotation *quot = untag_check<quotation>(dpeek());
 	drepl(allot_cell((cell)quot->xt));
-}
-
-/* Compile a word definition with the non-optimizing compiler. Allocates memory */
-void factor_vm::jit_compile_word(cell word_, cell def_, bool relocating)
-{
-	data_root<word> word(word_,this);
-	data_root<quotation> def(def_,this);
-
-	code_block *compiled = jit_compile_quot(word.value(),def.value(),relocating);
-	word->code = compiled;
-
-	if(to_boolean(word->pic_def)) jit_compile_quot(word->pic_def,relocating);
-	if(to_boolean(word->pic_tail_def)) jit_compile_quot(word->pic_tail_def,relocating);
-}
-
-void factor_vm::compile_all_words()
-{
-	data_root<array> words(find_all_words(),this);
-
-	cell i;
-	cell length = array_capacity(words.untagged());
-	for(i = 0; i < length; i++)
-	{
-		data_root<word> word(array_nth(words.untagged(),i),this);
-
-		if(!word->code || !word->code->optimized_p())
-			jit_compile_word(word.value(),word->def,false);
-
-		update_word_xt(word.untagged());
-
-	}
 }
 
 /* Allocates memory */

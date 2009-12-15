@@ -75,7 +75,7 @@ void factor_vm::update_code_roots_for_compaction()
 		/* Offset of return address within 16-byte allocation line */
 		cell offset = root->value - (cell)block;
 
-		if(root->valid && state->marked_p((code_block *)root->value))
+		if(root->valid && state->marked_p(block))
 		{
 			block = state->forward_block(block);
 			root->value = (cell)block + offset;

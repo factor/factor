@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays byte-arrays generic hashtables
+USING: alien alien.strings arrays byte-arrays generic hashtables
 hashtables.private io io.binary io.files io.encodings.binary
 io.pathnames kernel kernel.private math namespaces make parser
 prettyprint sequences strings sbufs vectors words quotations
@@ -10,7 +10,7 @@ vocabs.loader source-files definitions debugger
 quotations.private combinators combinators.short-circuit
 math.order math.private accessors slots.private
 generic.single.private compiler.units compiler.constants fry
-bootstrap.image.syntax ;
+locals bootstrap.image.syntax generalizations ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
@@ -107,8 +107,11 @@ SYMBOL: sub-primitives
 
 SYMBOL: jit-relocations
 
+SYMBOL: jit-offset
+
 : compute-offset ( rc -- offset )
-    [ building get length ] dip rc-absolute-cell = bootstrap-cell 4 ? - ;
+    [ building get length jit-offset get + ] dip
+    rc-absolute-cell = bootstrap-cell 4 ? - ;
 
 : jit-rel ( rc rt -- )
     over compute-offset 3array jit-relocations get push-all ;
@@ -123,8 +126,21 @@ SYMBOL: jit-literals
 : jit-literal ( literal -- )
     jit-literals get push ;
 
-: make-jit ( quot -- jit-parameters jit-literals jit-data )
+: jit-vm ( offset rc -- )
+    [ jit-parameter ] dip rt-vm jit-rel ;
+
+: jit-dlsym ( name library rc -- )
+    rt-dlsym jit-rel [ string>symbol jit-parameter ] bi@ ;
+
+:: jit-conditional ( test-quot false-quot -- )
+    [ 0 test-quot call ] B{ } make length :> len
+    building get length jit-offset get + len +
+    [ jit-offset set false-quot call ] B{ } make
+    [ length test-quot call ] [ % ] bi ; inline
+
+: make-jit ( quot -- jit-parameters jit-literals jit-code )
     [
+        0 jit-offset set
         V{ } clone jit-parameters set
         V{ } clone jit-literals set
         V{ } clone jit-relocations set
@@ -139,6 +155,15 @@ SYMBOL: jit-literals
 
 : define-sub-primitive ( quot word -- )
     [ make-jit 3array ] dip sub-primitives get set-at ;
+
+: define-sub-primitive* ( quot non-tail-quot tail-quot word -- )
+    [
+        [ make-jit ]
+        [ make-jit 2nip ]
+        [ make-jit 2nip ]
+        tri* 5 narray
+    ] dip
+    sub-primitives get set-at ;
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -163,35 +188,32 @@ USERENV: jit-primitive-word 24
 USERENV: jit-primitive 25
 USERENV: jit-word-jump 26
 USERENV: jit-word-call 27
-USERENV: jit-word-special 28
-USERENV: jit-if-word 29
-USERENV: jit-if 30
-USERENV: jit-epilog 31
-USERENV: jit-return 32
-USERENV: jit-profiling 33
-USERENV: jit-push-immediate 34
-USERENV: jit-dip-word 35
-USERENV: jit-dip 36
-USERENV: jit-2dip-word 37
-USERENV: jit-2dip 38
-USERENV: jit-3dip-word 39
-USERENV: jit-3dip 40
-USERENV: jit-execute-word 41
-USERENV: jit-execute-jump 42
-USERENV: jit-execute-call 43
-USERENV: jit-declare-word 44
+USERENV: jit-if-word 28
+USERENV: jit-if 29
+USERENV: jit-epilog 30
+USERENV: jit-return 31
+USERENV: jit-profiling 32
+USERENV: jit-push-immediate 33
+USERENV: jit-dip-word 34
+USERENV: jit-dip 35
+USERENV: jit-2dip-word 36
+USERENV: jit-2dip 37
+USERENV: jit-3dip-word 38
+USERENV: jit-3dip 39
+USERENV: jit-execute 40
+USERENV: jit-declare-word 41
 
-USERENV: callback-stub 45
+USERENV: callback-stub 48
 
 ! PIC stubs
-USERENV: pic-load 47
-USERENV: pic-tag 48
-USERENV: pic-tuple 49
-USERENV: pic-check-tag 50
-USERENV: pic-check-tuple 51
-USERENV: pic-hit 52
-USERENV: pic-miss-word 53
-USERENV: pic-miss-tail-word 54
+USERENV: pic-load 49
+USERENV: pic-tag 50
+USERENV: pic-tuple 51
+USERENV: pic-check-tag 52
+USERENV: pic-check-tuple 53
+USERENV: pic-hit 54
+USERENV: pic-miss-word 55
+USERENV: pic-miss-tail-word 56
 
 ! Megamorphic dispatch
 USERENV: mega-lookup 57
@@ -513,7 +535,6 @@ M: quotation '
     \ dip jit-dip-word set
     \ 2dip jit-2dip-word set
     \ 3dip jit-3dip-word set
-    \ (execute) jit-execute-word set
     \ inline-cache-miss \ pic-miss-word set
     \ inline-cache-miss-tail \ pic-miss-tail-word set
     \ mega-cache-lookup \ mega-lookup-word set

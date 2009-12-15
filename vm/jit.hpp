@@ -43,19 +43,7 @@ struct jit {
 		emit_with_literal(parent->special_objects[JIT_WORD_CALL],word);
 	}
 
-	void word_special(cell word)
-	{
-		emit_with_literal(parent->special_objects[JIT_WORD_SPECIAL],word);
-	}
-
-	void emit_subprimitive(cell word_)
-	{
-		data_root<word> word(word_,parent);
-		data_root<array> code_triple(word->subprimitive,parent);
-		parameters.append(untag<array>(array_nth(code_triple.untagged(),0)));
-		literals.append(untag<array>(array_nth(code_triple.untagged(),1)));
-		emit(array_nth(code_triple.untagged(),2));
-	}
+	bool emit_subprimitive(cell word_, bool tail_call_p, bool stack_frame_p);
 
 	void emit_class_lookup(fixnum index, cell type);
 

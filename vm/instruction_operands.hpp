@@ -18,8 +18,8 @@ enum relocation_type {
 	RT_HERE,
 	/* current code block */
 	RT_THIS,
-	/* immediate literal */
-	RT_IMMEDIATE,
+	/* data heap literal */
+	RT_LITERAL,
 	/* address of ctx var */
 	RT_CONTEXT,
 	/* untagged fixnum literal */
@@ -103,7 +103,7 @@ struct relocation_entry {
 		case RT_XT:
 		case RT_XT_PIC:
 		case RT_XT_PIC_TAIL:
-		case RT_IMMEDIATE:
+		case RT_LITERAL:
 		case RT_HERE:
 		case RT_UNTAGGED:
 		case RT_THIS:

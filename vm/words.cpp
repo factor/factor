@@ -3,6 +3,41 @@
 namespace factor
 {
 
+/* Compile a word definition with the non-optimizing compiler. Allocates memory */
+void factor_vm::jit_compile_word(cell word_, cell def_, bool relocating)
+{
+	data_root<word> word(word_,this);
+	data_root<quotation> def(def_,this);
+
+	code_block *compiled = jit_compile_quot(word.value(),def.value(),relocating);
+	word->code = compiled;
+
+	if(to_boolean(word->pic_def)) jit_compile_quot(word->pic_def,relocating);
+	if(to_boolean(word->pic_tail_def)) jit_compile_quot(word->pic_tail_def,relocating);
+}
+
+cell factor_vm::find_all_words()
+{
+	return instances(WORD_TYPE);
+}
+
+void factor_vm::compile_all_words()
+{
+	data_root<array> words(find_all_words(),this);
+
+	cell length = array_capacity(words.untagged());
+	for(cell i = 0; i < length; i++)
+	{
+		data_root<word> word(array_nth(words.untagged(),i),this);
+
+		if(!word->code || !word->code->optimized_p())
+			jit_compile_word(word.value(),word->def,false);
+
+		update_word_xt(word.untagged());
+
+	}
+}
+
 word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 {
 	data_root<object> vocab(vocab_,this);
