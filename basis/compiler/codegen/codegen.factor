@@ -61,9 +61,7 @@ SYMBOL: labels
 ! Special cases
 M: ##no-tco generate-insn drop ;
 
-M: ##call generate-insn
-    word>> dup sub-primitive>>
-    [ third first % ] [ [ add-call ] [ %call ] bi ] ?if ;
+M: ##call generate-insn word>> [ add-call ] [ %call ] bi ;
 
 M: ##jump generate-insn word>> [ add-call ] [ %jump ] bi ;
 

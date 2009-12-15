@@ -42,7 +42,6 @@ enum special_object {
 	JIT_PRIMITIVE,
 	JIT_WORD_JUMP,
 	JIT_WORD_CALL,
-	JIT_WORD_SPECIAL,
 	JIT_IF_WORD,
 	JIT_IF,
 	JIT_EPILOG,
@@ -55,20 +54,18 @@ enum special_object {
 	JIT_2DIP,
 	JIT_3DIP_WORD,
 	JIT_3DIP,
-	JIT_EXECUTE_WORD,
-	JIT_EXECUTE_JUMP,
-	JIT_EXECUTE_CALL,
+	JIT_EXECUTE,
 	JIT_DECLARE_WORD,
 
-	/* Callback stub generation in callbacks.c */
-	CALLBACK_STUB = 45,
-	
 	/* Incremented on every modify-code-heap call; invalidates call( inline
 	caching */
-	REDEFINITION_COUNTER = 46,
+	REDEFINITION_COUNTER = 47,
 
+	/* Callback stub generation in callbacks.c */
+	CALLBACK_STUB = 48,
+	
 	/* Polymorphic inline cache generation in inline_cache.c */
-	PIC_LOAD = 47,
+	PIC_LOAD = 49,
 	PIC_TAG,
 	PIC_TUPLE,
 	PIC_CHECK_TAG,

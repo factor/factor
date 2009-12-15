@@ -74,7 +74,7 @@ SYMBOL: relocation-table
     [ def>> first add-parameter ] dip rt-primitive rel-fixup ;
 
 : rel-immediate ( literal class -- )
-    [ add-literal ] dip rt-immediate rel-fixup ;
+    [ add-literal ] dip rt-literal rel-fixup ;
 
 : rel-this ( class -- )
     rt-this rel-fixup ;

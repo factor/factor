@@ -10,10 +10,6 @@
 #define NV0 %rbp
 #define NV1 %r12
 
-#define ARITH_TEMP_1 %r8
-#define ARITH_TEMP_2 %r9
-#define DIV_RESULT %rax
-
 #ifdef WINDOWS
 
 	#define ARG0 %rcx
@@ -69,41 +65,6 @@ DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, voi
 	call *ARG3                         /* call memcpy */
 	ret                                /* return _with new stack_ */
 
-DEF(long long,read_timestamp_counter,(void)):
-	mov $0,%rax
-	rdtsc
-	shl $32,%rdx
-	or %rdx,%rax
-	ret
-
-DEF(void,primitive_inline_cache_miss,(void *vm)):
-	mov (%rsp),%rbx
-DEF(void,primitive_inline_cache_miss_tail,(void *vm)):
-	sub $STACK_PADDING,%rsp
-	mov ARG0,ARG1
-	mov %rbx,ARG0
-	call MANGLE(inline_cache_miss)
-	add $STACK_PADDING,%rsp
-	jmp *%rax
-
-DEF(void,get_sse_env,(void*)):
-	stmxcsr (%rdi)
-	ret
-
-DEF(void,set_sse_env,(const void*)):
-	ldmxcsr (%rdi)
-	ret
-
-DEF(void,get_x87_env,(void*)):
-	fnstsw (%rdi)
-	fnstcw 2(%rdi)
-	ret
-
-DEF(void,set_x87_env,(const void*)):
-	fnclex
-	fldcw 2(%rdi)
-	ret
-
 DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to, void *vm)):
 	/* clear x87 stack, but preserve rounding mode and exception flags */
 	sub $2,STACK_REG
@@ -124,5 +85,29 @@ DEF(F_FASTCALL void,lazy_jit_compile,(CELL quot, void *vm)):
 	add $STACK_PADDING,STACK_REG
         jmp *QUOT_XT_OFFSET(ARG0)    /* Call the quotation */
 
+DEF(long long,read_timestamp_counter,(void)):
+	mov $0,%rax
+	rdtsc
+	shl $32,%rdx
+	or %rdx,%rax
+	ret
+
+DEF(void,get_sse_env,(void*)):
+	stmxcsr (%rdi)
+	ret
+
+DEF(void,set_sse_env,(const void*)):
+	ldmxcsr (%rdi)
+	ret
+
+DEF(void,get_x87_env,(void*)):
+	fnstsw (%rdi)
+	fnstcw 2(%rdi)
+	ret
+
+DEF(void,set_x87_env,(const void*)):
+	fnclex
+	fldcw 2(%rdi)
+	ret
 	
 #include "cpu-x86.S"

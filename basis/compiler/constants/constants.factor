@@ -47,8 +47,8 @@ CONSTANT: rt-xt-pic 4
 CONSTANT: rt-xt-pic-tail 5
 CONSTANT: rt-here 6
 CONSTANT: rt-this 7
-CONSTANT: rt-immediate 8
-CONSTANT: rt-stack-chain 9
+CONSTANT: rt-literal 8
+CONSTANT: rt-context 9
 CONSTANT: rt-untagged 10
 CONSTANT: rt-megamorphic-cache-hits 11
 CONSTANT: rt-vm 12

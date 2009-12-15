@@ -8,6 +8,7 @@ IN: bootstrap.x86
 : stack-frame-size ( -- n ) 8 bootstrap-cells ;
 : arg1 ( -- reg ) RCX ;
 : arg2 ( -- reg ) RDX ;
+: arg3 ( -- reg ) R8 ;
 
 << "vocab:cpu/x86/64/bootstrap.factor" parse-file suffix! >>
 call
