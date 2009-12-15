@@ -87,6 +87,10 @@ struct factor_vm
 	/* Incrementing object counter for identity hashing */
 	cell object_counter;
 
+	/* Sanity check to ensure that monotonic counter doesn't
+	decrease */
+	u64 last_nano_count;
+
 	// contexts
 	void reset_datastack();
 	void reset_retainstack();

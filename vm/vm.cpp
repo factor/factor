@@ -10,7 +10,8 @@ factor_vm::factor_vm() :
 	current_gc(NULL),
 	gc_events(NULL),
 	fep_disabled(false),
-	full_output(false)
+	full_output(false),
+	last_nano_count(0)
 {
 	primitive_reset_dispatch_stats();
 }
