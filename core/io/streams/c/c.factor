@@ -73,7 +73,8 @@ M: c-io-backend init-io ;
 
 M: c-io-backend init-stdio init-c-stdio ;
 
-M: c-io-backend io-multiplex 60 60 * 1000 * 1000 * or (sleep) ;
+M: c-io-backend io-multiplex
+    dup 0 = [ drop ] [ 60 60 * 1000 * 1000 * or (sleep) ] if ;
 
 : fopen ( path mode -- alien )
     [ utf8 string>alien ] bi@ (fopen) ;
