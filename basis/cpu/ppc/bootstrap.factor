@@ -21,7 +21,7 @@ CONSTANT: rs-reg 14
 : next-save ( -- n ) stack-frame bootstrap-cell - ;
 : xt-save ( -- n ) stack-frame 2 bootstrap-cells - ;
 
-: jit-conditional* ( test-quot true-quot -- )
+: jit-conditional* ( test-quot false-quot -- )
     [ '[ bootstrap-cell /i 1 + @ ] ] dip jit-conditional ; inline
 
 : jit-save-context ( -- )
@@ -53,14 +53,14 @@ CONSTANT: rs-reg 14
 [
     0 3 LOAD32 rc-absolute-ppc-2/2 rt-literal jit-rel
     3 ds-reg 4 STWU
-] jit-push-immediate jit-define
+] jit-push jit-define
 
 [
     jit-save-context
-    4 0 swap LOAD32 rc-absolute-ppc-2/2 rt-vm jit-rel
-    0 5 LOAD32 rc-absolute-ppc-2/2 rt-primitive jit-rel
-    5 MTCTR
-    BCTR
+    0 3 LOAD32 rc-absolute-ppc-2/2 rt-vm jit-rel
+    0 4 LOAD32 rc-absolute-ppc-2/2 rt-primitive jit-rel
+    4 MTLR
+    BLRL
 ] jit-primitive jit-define
 
 [ 0 BL rc-relative-ppc-3 rt-xt-pic jit-rel ] jit-word-call jit-define
@@ -235,7 +235,7 @@ CONSTANT: rs-reg 14
 [
     3 ds-reg 0 LWZ
     ds-reg dup 4 SUBI
-    4 0 swap LOAD32 0 jit-parameter rc-absolute-ppc-2/2 rt-vm jit-rel
+    0 4 LOAD32 0 rc-absolute-ppc-2/2 jit-vm
     5 3 quot-xt-offset LWZ
 ]
 [ 5 MTLR BLRL ]
@@ -502,35 +502,39 @@ CONSTANT: rs-reg 14
 : jit-inline-cache-miss ( -- )
     jit-save-context
     3 6 MR
-    4 0 LOAD32 0 rc-absolute-ppc-2/2 jit-vm
-    5 0 LOAD32 "inline_cache_miss" f rc-absolute-ppc-2/2 jit-dlsym ;
+    0 4 LOAD32 0 rc-absolute-ppc-2/2 jit-vm
+    0 5 LOAD32 "inline_cache_miss" f rc-absolute-ppc-2/2 jit-dlsym
+    5 MTLR
+    BLRL ;
 
 [ jit-load-return-address jit-inline-cache-miss ]
-[ 5 MTLR BLRL ]
-[ 5 MTCTR BCTR ]
+[ 3 MTLR BLRL ]
+[ 3 MTCTR BCTR ]
 \ inline-cache-miss define-sub-primitive*
 
 [ jit-inline-cache-miss ]
-[ 5 MTLR BLRL ]
-[ 5 MTCTR BCTR ]
+[ 3 MTLR BLRL ]
+[ 3 MTCTR BCTR ]
 \ inline-cache-miss-tail define-sub-primitive*
 
 ! Overflowing fixnum arithmetic
 :: jit-overflow ( insn func -- )
     jit-save-context
-    3 ds-reg 0 LWZ
-    4 ds-reg -4 LWZ
+    3 ds-reg -4 LWZ
+    4 ds-reg 0 LWZ
     ds-reg ds-reg 4 SUBI
     0 0 LI
     0 MTXER
-    6 3 4 insn call( d a s -- )
+    6 4 3 insn call( d a s -- )
     6 ds-reg 0 STW
     [ BNO ]
     [
        0 5 LOAD32 0 rc-absolute-ppc-2/2 jit-vm
        0 6 LOAD32 func f rc-absolute-ppc-2/2 jit-dlsym
+       6 MTLR
+       BLRL
     ]
-    jit-conditional ;
+    jit-conditional* ;
 
 [ [ ADDO. ] "overflow_fixnum_add" jit-overflow ] \ fixnum+ define-sub-primitive
 
@@ -554,7 +558,7 @@ CONSTANT: rs-reg 14
         6 MTLR
         BLRL
     ]
-    jit-conditional
+    jit-conditional*
 ] \ fixnum* define-sub-primitive
 
 [ "bootstrap.ppc" forget-vocab ] with-compilation-unit

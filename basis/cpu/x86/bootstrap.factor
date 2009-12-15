@@ -28,7 +28,7 @@ big-endian off
     ds-reg bootstrap-cell ADD
     ! store literal on datastack
     ds-reg [] temp0 MOV
-] jit-push-immediate jit-define
+] jit-push jit-define
 
 [
     temp3 0 MOV rc-absolute-cell rt-here jit-rel
