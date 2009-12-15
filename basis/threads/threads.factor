@@ -140,7 +140,11 @@ DEFER: next
     !
     ! And if sleep-time outputs f, there are no sleeping
     ! threads either... so WTF.
-    sleep-time [ die 0 ] unless* (sleep) next ;
+    sleep-time {
+        { [ dup not ] [ drop die ] }
+        { [ dup 0 = ] [ drop ] }
+        [ (sleep) ]
+    } cond next ;
 
 : (next) ( arg thread -- * )
     f >>state
