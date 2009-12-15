@@ -82,6 +82,27 @@ void jit::emit_with_parameter(cell code_template_, cell argument_) {
 	emit(code_template.value());
 }
 
+bool jit::emit_subprimitive(cell word_, bool tail_call_p, bool stack_frame_p)
+{
+	data_root<word> word(word_,parent);
+	data_root<array> code_template(word->subprimitive,parent);
+	parameters.append(untag<array>(array_nth(code_template.untagged(),0)));
+	literals.append(untag<array>(array_nth(code_template.untagged(),1)));
+	emit(array_nth(code_template.untagged(),2));
+	if(array_capacity(code_template.untagged()) == 5)
+	{
+		if(tail_call_p)
+		{
+			if(stack_frame_p) emit(parent->special_objects[JIT_EPILOG]);
+			emit(array_nth(code_template.untagged(),4));
+			return true;
+		}
+		else
+			emit(array_nth(code_template.untagged(),3));
+	}
+	return false;
+}
+	
 void jit::emit_class_lookup(fixnum index, cell type)
 {
 	emit_with_literal(parent->special_objects[PIC_LOAD],tag_fixnum(-index * sizeof(cell)));

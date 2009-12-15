@@ -232,7 +232,6 @@ struct factor_vm
 	void end_scan();
 	cell instances(cell type);
 	void primitive_all_instances();
-	cell find_all_words();
 
 	template<typename Generation, typename Iterator>
 	inline void each_object(Generation *gen, Iterator &iterator)
@@ -398,6 +397,9 @@ struct factor_vm
 	void update_word_xt(word *w_);
 	void primitive_optimized_p();
 	void primitive_wrapper();
+	void jit_compile_word(cell word_, cell def_, bool relocating);
+	cell find_all_words();
+	void compile_all_words();
 
 	//math
 	void primitive_bignum_to_fixnum();
@@ -562,7 +564,7 @@ struct factor_vm
 	void check_frame(stack_frame *frame);
 	callstack *allot_callstack(cell size);
 	stack_frame *fix_callstack_top(stack_frame *top, stack_frame *bottom);
-	stack_frame *capture_start();
+	stack_frame *second_from_top_stack_frame();
 	void primitive_callstack();
 	void primitive_set_callstack();
 	code_block *frame_code(stack_frame *frame);
@@ -605,8 +607,6 @@ struct factor_vm
 	void set_quot_xt(quotation *quot, code_block *code);
 	code_block *jit_compile_quot(cell owner_, cell quot_, bool relocating);
 	void jit_compile_quot(cell quot_, bool relocating);
-	void jit_compile_word(cell word_, cell def_, bool relocating);
-	void compile_all_words();
 	fixnum quot_code_offset_to_scan(cell quot_, cell offset);
 	cell lazy_jit_compile_impl(cell quot_, stack_frame *stack);
 	void primitive_quot_compiled_p();

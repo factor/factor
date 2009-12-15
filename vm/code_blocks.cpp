@@ -264,7 +264,7 @@ struct initial_code_block_visitor {
 	{
 		switch(op.rel_type())
 		{
-		case RT_IMMEDIATE:
+		case RT_LITERAL:
 			op.store_value(next_literal());
 			break;
 		case RT_XT:

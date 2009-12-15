@@ -268,9 +268,4 @@ void factor_vm::primitive_all_instances()
 	dpush(instances(TYPE_COUNT));
 }
 
-cell factor_vm::find_all_words()
-{
-	return instances(WORD_TYPE);
-}
-
 }

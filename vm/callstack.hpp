@@ -6,7 +6,7 @@ inline static cell callstack_size(cell size)
 	return sizeof(callstack) + size;
 }
 
-VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom, factor_vm *vm);
+VM_ASM_API void save_callstack_bottom(stack_frame *callstack_bottom, factor_vm *parent);
 
 /* This is a little tricky. The iterator may allocate memory, so we
 keep the callstack in a GC root and use relative offsets */
@@ -25,12 +25,9 @@ template<typename Iterator> void factor_vm::iterate_callstack_object(callstack *
 
 template<typename Iterator> void factor_vm::iterate_callstack(context *ctx, Iterator &iterator)
 {
-	cell top = (cell)ctx->callstack_top;
-	cell bottom = (cell)ctx->callstack_bottom;
+	stack_frame *frame = ctx->callstack_bottom - 1;
 
-	stack_frame *frame = (stack_frame *)bottom - 1;
-
-	while((cell)frame >= top)
+	while(frame >= ctx->callstack_top)
 	{
 		iterator(frame);
 		frame = frame_successor(frame);

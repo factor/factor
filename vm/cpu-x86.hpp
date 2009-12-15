@@ -47,7 +47,12 @@ inline static void set_call_target(cell return_address, void *target)
 
 inline static bool tail_call_site_p(cell return_address)
 {
-	return call_site_opcode(return_address) == jmp_opcode;
+	switch(call_site_opcode(return_address))
+	{
+	case jmp_opcode: return true;
+	case call_opcode: return false;
+	default: abort(); return false;
+	}
 }
 
 inline static unsigned int fpu_status(unsigned int status)
@@ -74,8 +79,8 @@ VM_ASM_API void throw_impl(cell quot, stack_frame *rewind_to, void *vm);
 VM_ASM_API void lazy_jit_compile(cell quot, void *vm);
 
 VM_C_API void set_callstack(stack_frame *to,
-			      stack_frame *from,
-			      cell length,
-			      void *(*memcpy)(void*,const void*, size_t));
+	stack_frame *from,
+	cell length,
+	void *(*memcpy)(void*,const void*, size_t));
 
 }

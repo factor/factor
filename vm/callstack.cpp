@@ -28,29 +28,32 @@ stack_frame *factor_vm::fix_callstack_top(stack_frame *top, stack_frame *bottom)
 	return frame + 1;
 }
 
-/* We ignore the topmost frame, the one calling 'callstack',
+/* We ignore the two topmost frames, the 'callstack' primitive
+frame itself, and the frame calling the 'callstack' primitive,
 so that set-callstack doesn't get stuck in an infinite loop.
 
 This means that if 'callstack' is called in tail position, we
 will have popped a necessary frame... however this word is only
 called by continuation implementation, and user code shouldn't
 be calling it at all, so we leave it as it is for now. */
-stack_frame *factor_vm::capture_start()
+stack_frame *factor_vm::second_from_top_stack_frame()
 {
 	stack_frame *frame = ctx->callstack_bottom - 1;
-	while(frame >= ctx->callstack_top && frame_successor(frame) >= ctx->callstack_top)
+	while(frame >= ctx->callstack_top
+		&& frame_successor(frame) >= ctx->callstack_top
+		&& frame_successor(frame_successor(frame)) >= ctx->callstack_top)
+	{
 		frame = frame_successor(frame);
+	}
 	return frame + 1;
 }
 
 void factor_vm::primitive_callstack()
 {
-	stack_frame *top = capture_start();
+	stack_frame *top = second_from_top_stack_frame();
 	stack_frame *bottom = ctx->callstack_bottom;
 
-	fixnum size = (cell)bottom - (cell)top;
-	if(size < 0)
-		size = 0;
+	fixnum size = std::max((fixnum)0,(fixnum)bottom - (fixnum)top);
 
 	callstack *stack = allot_callstack(size);
 	memcpy(stack->top(),top,size);

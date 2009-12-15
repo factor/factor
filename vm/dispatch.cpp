@@ -166,7 +166,7 @@ void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index, cell cac
 	/* Now the new method has been stored into the cache, and its on
 	   the stack. */
 	emit(parent->special_objects[JIT_EPILOG]);
-	emit(parent->special_objects[JIT_EXECUTE_JUMP]);
+	emit(parent->special_objects[JIT_EXECUTE]);
 }
 
 }

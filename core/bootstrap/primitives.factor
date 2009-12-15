@@ -326,6 +326,9 @@ tuple
     { "fixnum-shift-fast" "math.private" (( x y -- z )) }
     { "fixnum/i-fast" "math.private" (( x y -- z )) }
     { "fixnum/mod-fast" "math.private" (( x y -- z w )) }
+    { "fixnum+" "math.private" (( x y -- z )) }
+    { "fixnum-" "math.private" (( x y -- z )) }
+    { "fixnum*" "math.private" (( x y -- z )) }
     { "fixnum<" "math.private" (( x y -- ? )) }
     { "fixnum<=" "math.private" (( x y -- z )) }
     { "fixnum>" "math.private" (( x y -- ? )) }
@@ -352,6 +355,8 @@ tuple
     { "load-local" "locals.backend" (( obj -- )) }
     { "drop-locals" "locals.backend" (( n -- )) }
     { "mega-cache-lookup" "generic.single.private" (( methods index cache -- )) }
+    { "inline-cache-miss" "generic.single.private" (( generic methods index cache -- )) }
+    { "inline-cache-miss-tail" "generic.single.private" (( generic methods index cache -- )) }
 } [ first3 make-sub-primitive ] each
 
 ! Primitive words
@@ -374,9 +379,6 @@ tuple
     { "double>bits" "math" (( x -- n )) }
     { "bits>float" "math" (( n -- x )) }
     { "bits>double" "math" (( n -- x )) }
-    { "fixnum+" "math.private" (( x y -- z )) }
-    { "fixnum-" "math.private" (( x y -- z )) }
-    { "fixnum*" "math.private" (( x y -- z )) }
     { "fixnum/i" "math.private" (( x y -- z )) }
     { "fixnum/mod" "math.private" (( x y -- z w )) }
     { "fixnum-shift" "math.private" (( x y -- z )) }
@@ -508,8 +510,6 @@ tuple
     { "jit-compile" "quotations" (( quot -- )) }
     { "load-locals" "locals.backend" (( ... n -- )) }
     { "check-datastack" "kernel.private" (( array in# out# -- ? )) }
-    { "inline-cache-miss" "generic.single.private" (( generic methods index cache -- )) }
-    { "inline-cache-miss-tail" "generic.single.private" (( generic methods index cache -- )) }
     { "mega-cache-miss" "generic.single.private" (( methods index cache -- method )) }
     { "lookup-method" "generic.single.private" (( object methods -- method )) }
     { "reset-dispatch-stats" "tools.dispatch.private" (( -- )) }

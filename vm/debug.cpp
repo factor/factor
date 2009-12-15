@@ -10,7 +10,7 @@ std::ostream &operator<<(std::ostream &out, const string *str)
 	return out;
 }
 
-void factor_vm::print_word(word* word, cell nesting)
+void factor_vm::print_word(word *word, cell nesting)
 {
 	if(tagged<object>(word->vocabulary).type_p(STRING_TYPE))
 		std::cout << untag<string>(word->vocabulary) << ":";
@@ -30,7 +30,7 @@ void factor_vm::print_factor_string(string *str)
 	std::cout << '"' << str << '"';
 }
 
-void factor_vm::print_array(array* array, cell nesting)
+void factor_vm::print_array(array *array, cell nesting)
 {
 	cell length = array_capacity(array);
 	cell i;
@@ -160,8 +160,11 @@ struct stack_frame_printer {
 	explicit stack_frame_printer(factor_vm *parent_) : parent(parent_) {}
 	void operator()(stack_frame *frame)
 	{
+		std::cout << "frame: " << std::hex << (cell)frame << std::dec << std::endl;
+		std::cout << "executing: ";
 		parent->print_obj(parent->frame_executing(frame));
 		std::cout << std::endl;
+		std::cout << "scan: ";
 		parent->print_obj(parent->frame_scan(frame));
 		std::cout << std::endl;
 		std::cout << "word/quot addr: ";

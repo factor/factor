@@ -22,8 +22,7 @@ UNION: stack-frame-insn
 M: stack-frame-insn compute-stack-frame*
     stack-frame>> request-stack-frame ;
 
-M: ##call compute-stack-frame*
-    word>> sub-primitive>> [ frame-required? on ] unless ;
+M: ##call compute-stack-frame* drop frame-required? on ;
 
 M: ##gc compute-stack-frame*
     frame-required? on

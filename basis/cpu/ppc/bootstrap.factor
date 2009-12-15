@@ -1,9 +1,9 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.ppc.assembler compiler.codegen.fixup compiler.units
-compiler.constants math math.private layouts words
-vocabs slots.private locals.backend ;
+compiler.constants math math.private layouts words vocabs
+slots.private locals locals.backend generic.single.private fry ;
 FROM: cpu.ppc.assembler => B ;
 IN: bootstrap.ppc
 
@@ -21,8 +21,16 @@ CONSTANT: rs-reg 14
 : next-save ( -- n ) stack-frame bootstrap-cell - ;
 : xt-save ( -- n ) stack-frame 2 bootstrap-cells - ;
 
+: jit-conditional* ( test-quot true-quot -- )
+    [ '[ bootstrap-cell /i 1 + @ ] ] dip jit-conditional ; inline
+
+: jit-save-context ( -- )
+    0 3 LOAD32 rc-absolute-ppc-2/2 rt-context jit-rel
+    4 3 0 LWZ
+    1 4 0 STW ;
+
 [
-    0 3 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
+    0 3 LOAD32 rc-absolute-ppc-2/2 rt-literal jit-rel
     11 3 profile-count-offset LWZ
     11 11 1 tag-fixnum ADDI
     11 3 profile-count-offset STW
@@ -43,14 +51,12 @@ CONSTANT: rs-reg 14
 ] jit-prolog jit-define
 
 [
-    0 3 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
+    0 3 LOAD32 rc-absolute-ppc-2/2 rt-literal jit-rel
     3 ds-reg 4 STWU
 ] jit-push-immediate jit-define
 
 [
-    0 3 LOAD32 rc-absolute-ppc-2/2 rt-stack-chain jit-rel
-    4 3 0 LWZ
-    1 4 0 STW
+    jit-save-context
     4 0 swap LOAD32 rc-absolute-ppc-2/2 rt-vm jit-rel
     0 5 LOAD32 rc-absolute-ppc-2/2 rt-primitive jit-rel
     5 MTCTR
@@ -64,14 +70,11 @@ CONSTANT: rs-reg 14
     0 B rc-relative-ppc-3 rt-xt-pic-tail jit-rel
 ] jit-word-jump jit-define
 
-[ 0 B rc-relative-ppc-3 rt-xt jit-rel ] jit-word-special jit-define
-
 [
     3 ds-reg 0 LWZ
     ds-reg dup 4 SUBI
     0 3 \ f type-number CMPI
-    2 BEQ
-    0 B rc-relative-ppc-3 rt-xt jit-rel
+    [ BEQ ] [ 0 B rc-relative-ppc-3 rt-xt jit-rel ] jit-conditional*
     0 B rc-relative-ppc-3 rt-xt jit-rel
 ] jit-if jit-define
 
@@ -139,16 +142,6 @@ CONSTANT: rs-reg 14
     jit-3r>
 ] jit-3dip jit-define
 
-: prepare-(execute) ( -- operand )
-    3 ds-reg 0 LWZ
-    ds-reg dup 4 SUBI
-    4 3 word-xt-offset LWZ
-    4 ;
-
-[ prepare-(execute) MTCTR BCTR ] jit-execute-jump jit-define
-
-[ prepare-(execute) MTLR BLRL ] jit-execute-call jit-define
-
 [
     0 1 lr-save stack-frame + LWZ
     1 1 stack-frame ADDI
@@ -179,26 +172,29 @@ CONSTANT: rs-reg 14
     3 4 MR
     load-tag
     0 4 tuple type-number tag-fixnum CMPI
-    2 BNE
-    4 3 tuple type-number neg bootstrap-cell + LWZ
+    [ BNE ]
+    [ 4 3 tuple type-number neg bootstrap-cell + LWZ ]
+    jit-conditional*
 ] pic-tuple jit-define
 
 [
-    0 4 0 CMPI rc-absolute-ppc-2 rt-immediate jit-rel
+    0 4 0 CMPI rc-absolute-ppc-2 rt-literal jit-rel
 ] pic-check-tag jit-define
 
 [
-    0 5 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
+    0 5 LOAD32 rc-absolute-ppc-2/2 rt-literal jit-rel
     4 0 5 CMP
 ] pic-check-tuple jit-define
 
-[ 2 BNE 0 B rc-relative-ppc-3 rt-xt jit-rel ] pic-hit jit-define
+[
+    [ BNE ] [ 0 B rc-relative-ppc-3 rt-xt jit-rel ] jit-conditional*
+] pic-hit jit-define
 
 ! ! ! Megamorphic caches
 
 [
     ! cache = ...
-    0 3 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
+    0 3 LOAD32 rc-absolute-ppc-2/2 rt-literal jit-rel
     ! key = hashcode(class)
     5 4 1 SRAWI
     ! key &= cache.length - 1
@@ -210,17 +206,20 @@ CONSTANT: rs-reg 14
     ! if(get(cache) == class)
     6 3 0 LWZ
     6 0 4 CMP
-    10 BNE
-    ! megamorphic_cache_hits++
-    0 4 LOAD32 rc-absolute-ppc-2/2 rt-megamorphic-cache-hits jit-rel
-    5 4 0 LWZ
-    5 5 1 ADDI
-    5 4 0 STW
-    ! ... goto get(cache + bootstrap-cell)
-    3 3 4 LWZ
-    3 3 word-xt-offset LWZ
-    3 MTCTR
-    BCTR
+    [ BNE ]
+    [
+        ! megamorphic_cache_hits++
+        0 4 LOAD32 rc-absolute-ppc-2/2 rt-megamorphic-cache-hits jit-rel
+        5 4 0 LWZ
+        5 5 1 ADDI
+        5 4 0 STW
+        ! ... goto get(cache + bootstrap-cell)
+        3 3 4 LWZ
+        3 3 word-xt-offset LWZ
+        3 MTCTR
+        BCTR
+    ]
+    jit-conditional*
     ! fall-through on miss
 ] mega-lookup jit-define
 
@@ -238,9 +237,24 @@ CONSTANT: rs-reg 14
     ds-reg dup 4 SUBI
     4 0 swap LOAD32 0 jit-parameter rc-absolute-ppc-2/2 rt-vm jit-rel
     5 3 quot-xt-offset LWZ
-    5 MTCTR
-    BCTR
-] \ (call) define-sub-primitive
+]
+[ 5 MTLR BLRL ]
+[ 5 MTCTR BCTR ] \ (call) define-sub-primitive*
+
+[
+    3 ds-reg 0 LWZ
+    ds-reg dup 4 SUBI
+    4 3 word-xt-offset LWZ
+]
+[ 4 MTLR BLRL ]
+[ 4 MTCTR BCTR ] \ (execute) define-sub-primitive*
+
+[
+    3 ds-reg 0 LWZ
+    ds-reg dup 4 SUBI
+    4 3 word-xt-offset LWZ
+    4 MTCTR BCTR
+] jit-execute jit-define
 
 ! Objects
 [
@@ -361,7 +375,7 @@ CONSTANT: rs-reg 14
 ! Comparisons
 : jit-compare ( insn -- )
     t jit-literal
-    0 3 LOAD32 rc-absolute-ppc-2/2 rt-immediate jit-rel
+    0 3 LOAD32 rc-absolute-ppc-2/2 rt-literal jit-rel
     4 ds-reg 0 LWZ
     5 ds-reg -4 LWZU
     5 0 4 CMP
@@ -387,8 +401,7 @@ CONSTANT: rs-reg 14
     3 3 tag-mask get ANDI
     \ f type-number 4 LI
     0 3 0 CMPI
-    2 BNE
-    1 tag-fixnum 4 LI
+    [ BNE ] [ 1 tag-fixnum 4 LI ] jit-conditional*
     4 ds-reg 0 STW
 ] \ both-fixnums? define-sub-primitive
 
@@ -433,8 +446,7 @@ CONSTANT: rs-reg 14
     7 4 6 SRAW
     7 7 0 0 31 tag-bits get - RLWINM
     0 3 0 CMPI
-    2 BGT
-    5 7 MR
+    [ BGT ] [ 5 7 MR ] jit-conditional*
     5 ds-reg 0 STW
 ] \ fixnum-shift-fast define-sub-primitive
 
@@ -481,5 +493,68 @@ CONSTANT: rs-reg 14
     3 3 2 SRAWI
     rs-reg 3 rs-reg SUBF
 ] \ drop-locals define-sub-primitive
+
+! Inline cache miss entry points
+: jit-load-return-address ( -- ) 6 MFLR ;
+
+! These are always in tail position with an existing stack
+! frame, and the stack. The frame setup takes this into account.
+: jit-inline-cache-miss ( -- )
+    jit-save-context
+    3 6 MR
+    4 0 LOAD32 0 rc-absolute-ppc-2/2 jit-vm
+    5 0 LOAD32 "inline_cache_miss" f rc-absolute-ppc-2/2 jit-dlsym ;
+
+[ jit-load-return-address jit-inline-cache-miss ]
+[ 5 MTLR BLRL ]
+[ 5 MTCTR BCTR ]
+\ inline-cache-miss define-sub-primitive*
+
+[ jit-inline-cache-miss ]
+[ 5 MTLR BLRL ]
+[ 5 MTCTR BCTR ]
+\ inline-cache-miss-tail define-sub-primitive*
+
+! Overflowing fixnum arithmetic
+:: jit-overflow ( insn func -- )
+    jit-save-context
+    3 ds-reg 0 LWZ
+    4 ds-reg -4 LWZ
+    ds-reg ds-reg 4 SUBI
+    0 0 LI
+    0 MTXER
+    6 3 4 insn call( d a s -- )
+    6 ds-reg 0 STW
+    [ BNO ]
+    [
+       0 5 LOAD32 0 rc-absolute-ppc-2/2 jit-vm
+       0 6 LOAD32 func f rc-absolute-ppc-2/2 jit-dlsym
+    ]
+    jit-conditional ;
+
+[ [ ADDO. ] "overflow_fixnum_add" jit-overflow ] \ fixnum+ define-sub-primitive
+
+[ [ SUBFO. ] "overflow_fixnum_subtract" jit-overflow ] \ fixnum- define-sub-primitive
+
+[
+    jit-save-context
+    3 ds-reg 0 LWZ
+    3 3 tag-bits get SRAWI
+    4 ds-reg -4 LWZ
+    ds-reg ds-reg 4 SUBI
+    0 0 LI
+    0 MTXER
+    6 3 4 MULLWO.
+    6 ds-reg 0 STW
+    [ BNO ]
+    [
+        4 4 tag-bits get SRAWI
+        0 5 LOAD32 0 rc-absolute-ppc-2/2 jit-vm
+        0 6 LOAD32 "overflow_fixnum_multiply" f rc-absolute-ppc-2/2 jit-dlsym
+        6 MTLR
+        BLRL
+    ]
+    jit-conditional
+] \ fixnum* define-sub-primitive
 
 [ "bootstrap.ppc" forget-vocab ] with-compilation-unit

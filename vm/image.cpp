@@ -182,7 +182,7 @@ struct code_block_fixup_relocation_visitor {
 
 		switch(op.rel_type())
 		{
-		case RT_IMMEDIATE:
+		case RT_LITERAL:
 			op.store_value(data_visitor.visit_pointer(op.load_value(old_offset)));
 			break;
 		case RT_XT:

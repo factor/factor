@@ -10,10 +10,6 @@
 #define NV0 %ebx
 #define NV1 %ebp
 
-#define ARITH_TEMP_1 %ebp
-#define ARITH_TEMP_2 %ebx
-#define DIV_RESULT %eax
-
 #define CELL_SIZE 4
 #define STACK_PADDING 12
 
@@ -44,19 +40,31 @@ DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, voi
 	add $12,%esp                       /* pop args from the stack */
 	ret                                /* return _with new stack_ */
 
+DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to, void *vm)):
+	mov ARG2,NV0  /* remember vm ptr in case quot_xt = lazy_jit_compile */		
+	/* clear x87 stack, but preserve rounding mode and exception flags */
+	sub $2,STACK_REG
+	fnstcw (STACK_REG)
+	fninit
+	fldcw (STACK_REG)
+	/* rewind_to */
+	mov ARG1,STACK_REG
+	mov NV0,ARG1
+	jmp *QUOT_XT_OFFSET(ARG0)
+
+DEF(F_FASTCALL void,lazy_jit_compile,(CELL quot, void *vm)):
+	mov ARG1,ARG2
+	mov STACK_REG,ARG1           /* Save stack pointer */
+	sub $STACK_PADDING,STACK_REG
+	call MANGLE(lazy_jit_compile_impl)
+	mov RETURN_REG,ARG0          /* No-op on 32-bit */
+	add $STACK_PADDING,STACK_REG
+    jmp *QUOT_XT_OFFSET(ARG0)    /* Call the quotation */
+
+
 DEF(long long,read_timestamp_counter,(void)):
 	rdtsc
 	ret
-
-DEF(void,primitive_inline_cache_miss,(void *vm)):
-	mov (%esp),%ebx
-DEF(void,primitive_inline_cache_miss_tail,(void *vm)):
-	sub $4,%esp
-	push ARG0   /* push vm ptr */
-	push %ebx
-	call MANGLE(inline_cache_miss)
-	add $12,%esp
-	jmp *%eax
 
 DEF(void,get_sse_env,(void*)):
 	movl 4(%esp), %eax
@@ -80,28 +88,6 @@ DEF(void,set_x87_env,(const void*)):
 	fldcw 2(%eax)
 	ret
 
-DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to, void *vm)):
-	mov ARG2,NV0  /* remember vm ptr in case quot_xt = lazy_jit_compile */		
-	/* clear x87 stack, but preserve rounding mode and exception flags */
-	sub $2,STACK_REG
-	fnstcw (STACK_REG)
-	fninit
-	fldcw (STACK_REG)
-	/* rewind_to */
-	mov ARG1,STACK_REG
-	mov NV0,ARG1
-	jmp *QUOT_XT_OFFSET(ARG0)
-
-DEF(F_FASTCALL void,lazy_jit_compile,(CELL quot, void *vm)):
-	mov ARG1,ARG2
-	mov STACK_REG,ARG1           /* Save stack pointer */
-	sub $STACK_PADDING,STACK_REG
-	call MANGLE(lazy_jit_compile_impl)
-	mov RETURN_REG,ARG0          /* No-op on 32-bit */
-	add $STACK_PADDING,STACK_REG
-    jmp *QUOT_XT_OFFSET(ARG0)    /* Call the quotation */
-
-	
 #include "cpu-x86.S"
 
 #ifdef WINDOWS

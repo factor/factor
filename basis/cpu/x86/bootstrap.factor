@@ -10,7 +10,7 @@ big-endian off
 
 [
     ! Load word
-    temp0 0 MOV rc-absolute-cell rt-immediate jit-rel
+    temp0 0 MOV rc-absolute-cell rt-literal jit-rel
     ! Bump profiling counter
     temp0 profile-count-offset [+] 1 tag-fixnum ADD
     ! Load word->code
@@ -22,19 +22,8 @@ big-endian off
 ] jit-profiling jit-define
 
 [
-    ! load XT
-    temp0 0 MOV rc-absolute-cell rt-this jit-rel
-    ! save stack frame size
-    stack-frame-size PUSH
-    ! push XT
-    temp0 PUSH
-    ! alignment
-    stack-reg stack-frame-size 3 bootstrap-cells - SUB
-] jit-prolog jit-define
-
-[
     ! load literal
-    temp0 0 MOV rc-absolute-cell rt-immediate jit-rel
+    temp0 0 MOV rc-absolute-cell rt-literal jit-rel
     ! increment datastack pointer
     ds-reg bootstrap-cell ADD
     ! store literal on datastack
@@ -49,10 +38,6 @@ big-endian off
 [
     0 CALL rc-relative rt-xt-pic jit-rel
 ] jit-word-call jit-define
-
-[
-    0 JMP rc-relative rt-xt jit-rel
-] jit-word-special jit-define
 
 [
     ! load boolean
@@ -133,20 +118,35 @@ big-endian off
     jit-3r>
 ] jit-3dip jit-define
 
-: prepare-(execute) ( -- operand )
+[
     ! load from stack
-    temp0 ds-reg [] MOV
+    arg1 ds-reg [] MOV
     ! pop stack
     ds-reg bootstrap-cell SUB
-    ! execute word
-    temp0 word-xt-offset [+] ;
-
-[ prepare-(execute) JMP ] jit-execute-jump jit-define
-
-[ prepare-(execute) CALL ] jit-execute-call jit-define
+    ! pass vm pointer
+    arg2 0 MOV 0 rc-absolute-cell jit-vm
+]
+[ arg1 quot-xt-offset [+] CALL ]
+[ arg1 quot-xt-offset [+] JMP ]
+\ (call) define-sub-primitive*
 
 [
-    ! unwind stack frame
+    ! load from stack
+    arg1 ds-reg [] MOV
+    ! pop stack
+    ds-reg bootstrap-cell SUB
+]
+[ arg1 word-xt-offset [+] CALL ]
+[ arg1 word-xt-offset [+] JMP ]
+\ (execute) define-sub-primitive*
+
+[
+    arg1 ds-reg [] MOV
+    ds-reg bootstrap-cell SUB
+    arg1 word-xt-offset [+] JMP
+] jit-execute jit-define
+
+[
     stack-reg stack-frame-size bootstrap-cell - ADD
 ] jit-epilog jit-define
 
@@ -176,16 +176,17 @@ big-endian off
     temp0 temp1 MOV
     load-tag
     temp1 tuple type-number tag-fixnum CMP
-    [ temp1 temp0 tuple type-number neg bootstrap-cell + [+] MOV ] { } make
-    [ length JNE ] [ % ] bi
+    [ JNE ]
+    [ temp1 temp0 tuple type-number neg bootstrap-cell + [+] MOV ]
+    jit-conditional
 ] pic-tuple jit-define
 
 [
-    temp1 HEX: ffffffff CMP rc-absolute rt-immediate jit-rel
+    temp1 HEX: ffffffff CMP rc-absolute rt-literal jit-rel
 ] pic-check-tag jit-define
 
 [
-    temp2 HEX: ffffffff MOV rc-absolute-cell rt-immediate jit-rel
+    temp2 HEX: ffffffff MOV rc-absolute-cell rt-literal jit-rel
     temp1 temp2 CMP
 ] pic-check-tuple jit-define
 
@@ -195,7 +196,7 @@ big-endian off
 
 [
     ! cache = ...
-    temp0 0 MOV rc-absolute-cell rt-immediate jit-rel
+    temp0 0 MOV rc-absolute-cell rt-literal jit-rel
     ! key = hashcode(class)
     temp2 temp1 MOV
     bootstrap-cell 4 = [ temp2 1 SHR ] when
@@ -223,18 +224,6 @@ big-endian off
 ] callback-stub jit-define
 
 ! ! ! Sub-primitives
-
-! Quotations and words
-[
-    ! load from stack
-    arg1 ds-reg [] MOV
-    ! pop stack
-    ds-reg bootstrap-cell SUB
-    ! pass vm pointer
-    arg2 0 MOV 0 jit-parameter rc-absolute-cell rt-vm jit-rel
-    ! call quotation
-    arg1 quot-xt-offset [+] JMP
-] \ (call) define-sub-primitive
 
 ! Objects
 [
@@ -373,7 +362,7 @@ big-endian off
 : jit-compare ( insn -- )
     ! load t
     t jit-literal
-    temp3 0 MOV rc-absolute-cell rt-immediate jit-rel
+    temp3 0 MOV rc-absolute-cell rt-literal jit-rel
     ! load f
     temp1 \ f type-number MOV
     ! load first value
