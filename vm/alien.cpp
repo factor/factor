@@ -27,9 +27,17 @@ char *factor_vm::pinned_alien_offset(cell obj)
 	}
 }
 
+VM_C_API char *pinned_alien_offset(cell obj, factor_vm *parent)
+{
+	return parent->pinned_alien_offset(obj);
+}
+
 /* make an alien */
 cell factor_vm::allot_alien(cell delegate_, cell displacement)
 {
+	if(delegate_ == false_object && displacement == 0)
+		return false_object;
+
 	data_root<object> delegate(delegate_,this);
 	data_root<alien> new_alien(allot<alien>(sizeof(alien)),this);
 
@@ -49,27 +57,32 @@ cell factor_vm::allot_alien(cell delegate_, cell displacement)
 	return new_alien.value();
 }
 
+cell factor_vm::allot_alien(void *address)
+{
+	return allot_alien(false_object,(cell)address);
+}
+
+VM_C_API cell allot_alien(void *address, factor_vm *vm)
+{
+	return vm->allot_alien(address);
+}
+
 /* make an alien pointing at an offset of another alien */
 void factor_vm::primitive_displaced_alien()
 {
-	cell alien = dpop();
-	cell displacement = to_cell(dpop());
+	cell alien = ctx->pop();
+	cell displacement = to_cell(ctx->pop());
 
-	if(!to_boolean(alien) && displacement == 0)
-		dpush(false_object);
-	else
+	switch(tagged<object>(alien).type())
 	{
-		switch(tagged<object>(alien).type())
-		{
-		case BYTE_ARRAY_TYPE:
-		case ALIEN_TYPE:
-		case F_TYPE:
-			dpush(allot_alien(alien,displacement));
-			break;
-		default:
-			type_error(ALIEN_TYPE,alien);
-			break;
-		}
+	case BYTE_ARRAY_TYPE:
+	case ALIEN_TYPE:
+	case F_TYPE:
+		ctx->push(allot_alien(alien,displacement));
+		break;
+	default:
+		type_error(ALIEN_TYPE,alien);
+		break;
 	}
 }
 
@@ -77,59 +90,59 @@ void factor_vm::primitive_displaced_alien()
 if the object is a byte array, as a sanity check. */
 void factor_vm::primitive_alien_address()
 {
-	box_unsigned_cell((cell)pinned_alien_offset(dpop()));
+	ctx->push(allot_cell((cell)pinned_alien_offset(ctx->pop())));
 }
 
 /* pop ( alien n ) from datastack, return alien's address plus n */
 void *factor_vm::alien_pointer()
 {
-	fixnum offset = to_fixnum(dpop());
-	return unbox_alien() + offset;
+	fixnum offset = to_fixnum(ctx->pop());
+	return alien_offset(ctx->pop()) + offset;
 }
 
 /* define words to read/write values at an alien address */
-#define DEFINE_ALIEN_ACCESSOR(name,type,boxer,to) \
+#define DEFINE_ALIEN_ACCESSOR(name,type,from,to) \
 	PRIMITIVE(alien_##name) \
 	{ \
-		parent->boxer(*(type*)(parent->alien_pointer())); \
+		parent->ctx->push(from(*(type*)(parent->alien_pointer()),parent)); \
 	} \
 	PRIMITIVE(set_alien_##name) \
 	{ \
 		type *ptr = (type *)parent->alien_pointer(); \
-		type value = parent->to(dpop()); \
+		type value = to(parent->ctx->pop(),parent); \
 		*ptr = value; \
 	}
 
-DEFINE_ALIEN_ACCESSOR(signed_cell,fixnum,box_signed_cell,to_fixnum)
-DEFINE_ALIEN_ACCESSOR(unsigned_cell,cell,box_unsigned_cell,to_cell)
-DEFINE_ALIEN_ACCESSOR(signed_8,s64,box_signed_8,to_signed_8)
-DEFINE_ALIEN_ACCESSOR(unsigned_8,u64,box_unsigned_8,to_unsigned_8)
-DEFINE_ALIEN_ACCESSOR(signed_4,s32,box_signed_4,to_fixnum)
-DEFINE_ALIEN_ACCESSOR(unsigned_4,u32,box_unsigned_4,to_cell)
-DEFINE_ALIEN_ACCESSOR(signed_2,s16,box_signed_2,to_fixnum)
-DEFINE_ALIEN_ACCESSOR(unsigned_2,u16,box_unsigned_2,to_cell)
-DEFINE_ALIEN_ACCESSOR(signed_1,s8,box_signed_1,to_fixnum)
-DEFINE_ALIEN_ACCESSOR(unsigned_1,u8,box_unsigned_1,to_cell)
-DEFINE_ALIEN_ACCESSOR(float,float,box_float,to_float)
-DEFINE_ALIEN_ACCESSOR(double,double,box_double,to_double)
-DEFINE_ALIEN_ACCESSOR(cell,void *,box_alien,pinned_alien_offset)
+DEFINE_ALIEN_ACCESSOR(signed_cell,fixnum,from_signed_cell,to_fixnum)
+DEFINE_ALIEN_ACCESSOR(unsigned_cell,cell,from_unsigned_cell,to_cell)
+DEFINE_ALIEN_ACCESSOR(signed_8,s64,from_signed_8,to_signed_8)
+DEFINE_ALIEN_ACCESSOR(unsigned_8,u64,from_unsigned_8,to_unsigned_8)
+DEFINE_ALIEN_ACCESSOR(signed_4,s32,from_signed_4,to_fixnum)
+DEFINE_ALIEN_ACCESSOR(unsigned_4,u32,from_unsigned_4,to_cell)
+DEFINE_ALIEN_ACCESSOR(signed_2,s16,from_signed_2,to_fixnum)
+DEFINE_ALIEN_ACCESSOR(unsigned_2,u16,from_unsigned_2,to_cell)
+DEFINE_ALIEN_ACCESSOR(signed_1,s8,from_signed_1,to_fixnum)
+DEFINE_ALIEN_ACCESSOR(unsigned_1,u8,from_unsigned_1,to_cell)
+DEFINE_ALIEN_ACCESSOR(float,float,from_float,to_float)
+DEFINE_ALIEN_ACCESSOR(double,double,from_double,to_double)
+DEFINE_ALIEN_ACCESSOR(cell,void *,allot_alien,pinned_alien_offset)
 
 /* open a native library and push a handle */
 void factor_vm::primitive_dlopen()
 {
-	data_root<byte_array> path(dpop(),this);
+	data_root<byte_array> path(ctx->pop(),this);
 	path.untag_check(this);
 	data_root<dll> library(allot<dll>(sizeof(dll)),this);
 	library->path = path.value();
 	ffi_dlopen(library.untagged());
-	dpush(library.value());
+	ctx->push(library.value());
 }
 
 /* look up a symbol in a native library */
 void factor_vm::primitive_dlsym()
 {
-	data_root<object> library(dpop(),this);
-	data_root<byte_array> name(dpop(),this);
+	data_root<object> library(ctx->pop(),this);
+	data_root<byte_array> name(ctx->pop(),this);
 	name.untag_check(this);
 
 	symbol_char *sym = name->data<symbol_char>();
@@ -139,29 +152,29 @@ void factor_vm::primitive_dlsym()
 		dll *d = untag_check<dll>(library.value());
 
 		if(d->dll == NULL)
-			dpush(false_object);
+			ctx->push(false_object);
 		else
-			box_alien(ffi_dlsym(d,sym));
+			ctx->push(allot_alien(ffi_dlsym(d,sym)));
 	}
 	else
-		box_alien(ffi_dlsym(NULL,sym));
+		ctx->push(allot_alien(ffi_dlsym(NULL,sym)));
 }
 
 /* close a native library handle */
 void factor_vm::primitive_dlclose()
 {
-	dll *d = untag_check<dll>(dpop());
+	dll *d = untag_check<dll>(ctx->pop());
 	if(d->dll != NULL)
 		ffi_dlclose(d);
 }
 
 void factor_vm::primitive_dll_validp()
 {
-	cell library = dpop();
+	cell library = ctx->pop();
 	if(to_boolean(library))
-		dpush(tag_boolean(untag_check<dll>(library)->dll != NULL));
+		ctx->push(tag_boolean(untag_check<dll>(library)->dll != NULL));
 	else
-		dpush(true_object);
+		ctx->push(true_object);
 }
 
 /* gets the address of an object representing a C pointer */
@@ -186,32 +199,7 @@ VM_C_API char *alien_offset(cell obj, factor_vm *parent)
 	return parent->alien_offset(obj);
 }
 
-/* pop an object representing a C pointer */
-char *factor_vm::unbox_alien()
-{
-	return alien_offset(dpop());
-}
-
-VM_C_API char *unbox_alien(factor_vm *parent)
-{
-	return parent->unbox_alien();
-}
-
-/* make an alien and push */
-void factor_vm::box_alien(void *ptr)
-{
-	if(ptr == NULL)
-		dpush(false_object);
-	else
-		dpush(allot_alien(false_object,(cell)ptr));
-}
-
-VM_C_API void box_alien(void *ptr, factor_vm *parent)
-{
-	return parent->box_alien(ptr);
-}
-
-/* for FFI calls passing structs by value */
+/* For FFI calls passing structs by value. Cannot allocate */
 void factor_vm::to_value_struct(cell src, void *dest, cell size)
 {
 	memcpy(dest,alien_offset(src),size);
@@ -222,12 +210,12 @@ VM_C_API void to_value_struct(cell src, void *dest, cell size, factor_vm *parent
 	return parent->to_value_struct(src,dest,size);
 }
 
-/* for FFI callbacks receiving structs by value */
+/* For FFI callbacks receiving structs by value */
 void factor_vm::box_value_struct(void *src, cell size)
 {
 	byte_array *bytes = allot_byte_array(size);
 	memcpy(bytes->data<void>(),src,size);
-	dpush(tag<byte_array>(bytes));
+	ctx->push(tag<byte_array>(bytes));
 }
 
 VM_C_API void box_value_struct(void *src, cell size,factor_vm *parent)
@@ -267,7 +255,7 @@ VM_C_API void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size, f
 
 void factor_vm::primitive_vm_ptr()
 {
-	box_alien(this);
+	ctx->push(allot_alien(this));
 }
 
 }

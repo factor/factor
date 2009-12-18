@@ -92,10 +92,6 @@ struct factor_vm
 	u64 last_nano_count;
 
 	// contexts
-	void reset_datastack();
-	void reset_retainstack();
-	void fix_stacks();
-	void save_stacks();
 	context *alloc_context();
 	void dealloc_context(context *old_context);
 	void nest_stacks(stack_frame *magic_frame);
@@ -375,9 +371,7 @@ struct factor_vm
 	void primitive_set_string_nth_slow();
 
 	//booleans
-	void box_boolean(bool value);
-
-	inline cell tag_boolean(cell untagged)
+	cell tag_boolean(cell untagged)
 	{
 		return (untagged ? true_object : false_object);
 	}
@@ -462,21 +456,19 @@ struct factor_vm
 	void primitive_bits_double();
 	fixnum to_fixnum(cell tagged);
 	cell to_cell(cell tagged);
-	void box_signed_1(s8 n);
-	void box_unsigned_1(u8 n);
-	void box_signed_2(s16 n);
-	void box_unsigned_2(u16 n);
-	void box_signed_4(s32 n);
-	void box_unsigned_4(u32 n);
-	void box_signed_cell(fixnum integer);
-	void box_unsigned_cell(cell cell);
-	void box_signed_8(s64 n);
+	cell from_signed_1(s8 n);
+	cell from_unsigned_1(u8 n);
+	cell from_signed_2(s16 n);
+	cell from_unsigned_2(u16 n);
+	cell from_signed_4(s32 n);
+	cell from_unsigned_4(u32 n);
+	cell from_signed_cell(fixnum integer);
+	cell from_unsigned_cell(cell integer);
+	cell from_signed_8(s64 n);
 	s64 to_signed_8(cell obj);
-	void box_unsigned_8(u64 n);
+	cell from_unsigned_8(u64 n);
 	u64 to_unsigned_8(cell obj);
-	void box_float(float flo);
 	float to_float(cell value);
-	void box_double(double flo);
 	double to_double(cell value);
 	inline void overflow_fixnum_add(fixnum x, fixnum y);
 	inline void overflow_fixnum_subtract(fixnum x, fixnum y);
@@ -498,6 +490,7 @@ struct factor_vm
 	void init_c_io();
 	void io_error();
 	void primitive_fopen();
+	FILE *pop_file_handle();
 	void primitive_fgetc();
 	void primitive_fread();
 	void primitive_fputc();
@@ -582,12 +575,12 @@ struct factor_vm
 	void primitive_innermost_stack_frame_executing();
 	void primitive_innermost_stack_frame_scan();
 	void primitive_set_innermost_stack_frame_quot();
-	void save_callstack_bottom(stack_frame *callstack_bottom);
 	template<typename Iterator> void iterate_callstack(context *ctx, Iterator &iterator);
 
 	//alien
 	char *pinned_alien_offset(cell obj);
 	cell allot_alien(cell delegate_, cell displacement);
+	cell allot_alien(void *address);
 	void primitive_displaced_alien();
 	void primitive_alien_address();
 	void *alien_pointer();
@@ -597,8 +590,6 @@ struct factor_vm
 	void primitive_dll_validp();
 	void primitive_vm_ptr();
 	char *alien_offset(cell obj);
-	char *unbox_alien();
-	void box_alien(void *ptr);
 	void to_value_struct(cell src, void *dest, cell size);
 	void box_value_struct(void *src, cell size);
 	void box_small_struct(cell x, cell y, cell size);
@@ -612,7 +603,7 @@ struct factor_vm
 	code_block *jit_compile_quot(cell owner_, cell quot_, bool relocating);
 	void jit_compile_quot(cell quot_, bool relocating);
 	fixnum quot_code_offset_to_scan(cell quot_, cell offset);
-	cell lazy_jit_compile_impl(cell quot_, stack_frame *stack);
+	cell lazy_jit_compile_impl(cell quot);
 	void primitive_quot_compiled_p();
 
 	//dispatch
