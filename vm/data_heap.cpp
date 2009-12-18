@@ -230,7 +230,7 @@ data_heap_room factor_vm::data_room()
 void factor_vm::primitive_data_room()
 {
 	data_heap_room room = data_room();
-	dpush(tag<byte_array>(byte_array_from_value(&room)));
+	ctx->push(tag<byte_array>(byte_array_from_value(&room)));
 }
 
 struct object_accumulator {
@@ -265,7 +265,7 @@ cell factor_vm::instances(cell type)
 void factor_vm::primitive_all_instances()
 {
 	primitive_full_gc();
-	dpush(instances(TYPE_COUNT));
+	ctx->push(instances(TYPE_COUNT));
 }
 
 }

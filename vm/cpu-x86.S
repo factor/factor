@@ -12,9 +12,18 @@ DEF(F_FASTCALL void,c_to_factor,(CELL quot, void *vm)):
 	/* Create register shadow area for Win64 */
 	sub $32,STACK_REG
 
-	/* Save stack pointer */
-	lea -CELL_SIZE(STACK_REG),ARG0
-	call MANGLE(save_callstack_bottom)
+	/* Load context */
+    mov (NV1),ARG0
+
+    /* Save ctx->callstack_bottom */
+	lea -CELL_SIZE(STACK_REG),ARG1
+    mov ARG1,CELL_SIZE(ARG0)
+
+    /* Load ctx->datastack */
+    mov (CELL_SIZE * 2)(ARG0),DS_REG
+
+    /* Load ctx->retainstack */
+    mov (CELL_SIZE * 3)(ARG0),RS_REG
 
 	/* Call quot-xt */
 	mov NV0,ARG0

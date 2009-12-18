@@ -297,25 +297,25 @@ void factor_vm::jit_compile_quot(cell quot_, bool relocating)
 
 void factor_vm::primitive_jit_compile()
 {
-	jit_compile_quot(dpop(),true);
+	jit_compile_quot(ctx->pop(),true);
 }
 
 /* push a new quotation on the stack */
 void factor_vm::primitive_array_to_quotation()
 {
 	quotation *quot = allot<quotation>(sizeof(quotation));
-	quot->array = dpeek();
+	quot->array = ctx->peek();
 	quot->cached_effect = false_object;
 	quot->cache_counter = false_object;
 	quot->xt = (void *)lazy_jit_compile;
 	quot->code = NULL;
-	drepl(tag<quotation>(quot));
+	ctx->replace(tag<quotation>(quot));
 }
 
 void factor_vm::primitive_quotation_xt()
 {
-	quotation *quot = untag_check<quotation>(dpeek());
-	drepl(allot_cell((cell)quot->xt));
+	quotation *quot = untag_check<quotation>(ctx->peek());
+	ctx->replace(allot_cell((cell)quot->xt));
 }
 
 /* Allocates memory */
@@ -332,24 +332,23 @@ fixnum factor_vm::quot_code_offset_to_scan(cell quot_, cell offset)
 	return compiler.get_position();
 }
 
-cell factor_vm::lazy_jit_compile_impl(cell quot_, stack_frame *stack)
+cell factor_vm::lazy_jit_compile_impl(cell quot_)
 {
 	data_root<quotation> quot(quot_,this);
-	ctx->callstack_top = stack;
 	jit_compile_quot(quot.value(),true);
 	return quot.value();
 }
 
-VM_ASM_API cell lazy_jit_compile_impl(cell quot_, stack_frame *stack, factor_vm *parent)
+VM_C_API cell lazy_jit_compile_impl(cell quot, factor_vm *parent)
 {
-	return parent->lazy_jit_compile_impl(quot_,stack);
+	return parent->lazy_jit_compile_impl(quot);
 }
 
 void factor_vm::primitive_quot_compiled_p()
 {
-	tagged<quotation> quot(dpop());
+	tagged<quotation> quot(ctx->pop());
 	quot.untag_check(this);
-	dpush(tag_boolean(quot->code != NULL));
+	ctx->push(tag_boolean(quot->code != NULL));
 }
 
 }
