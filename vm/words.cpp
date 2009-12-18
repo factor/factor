@@ -73,27 +73,27 @@ word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 /* (word) ( name vocabulary hashcode -- word ) */
 void factor_vm::primitive_word()
 {
-	cell hashcode = dpop();
-	cell vocab = dpop();
-	cell name = dpop();
-	dpush(tag<word>(allot_word(name,vocab,hashcode)));
+	cell hashcode = ctx->pop();
+	cell vocab = ctx->pop();
+	cell name = ctx->pop();
+	ctx->push(tag<word>(allot_word(name,vocab,hashcode)));
 }
 
 /* word-xt ( word -- start end ) */
 void factor_vm::primitive_word_xt()
 {
-	data_root<word> w(dpop(),this);
+	data_root<word> w(ctx->pop(),this);
 	w.untag_check(this);
 
 	if(profiling_p)
 	{
-		dpush(allot_cell((cell)w->profiling->xt()));
-		dpush(allot_cell((cell)w->profiling + w->profiling->size()));
+		ctx->push(allot_cell((cell)w->profiling->xt()));
+		ctx->push(allot_cell((cell)w->profiling + w->profiling->size()));
 	}
 	else
 	{
-		dpush(allot_cell((cell)w->code->xt()));
-		dpush(allot_cell((cell)w->code + w->code->size()));
+		ctx->push(allot_cell((cell)w->code->xt()));
+		ctx->push(allot_cell((cell)w->code + w->code->size()));
 	}
 }
 
@@ -107,15 +107,15 @@ void factor_vm::update_word_xt(word *w)
 
 void factor_vm::primitive_optimized_p()
 {
-	word *w = untag_check<word>(dpeek());
-	drepl(tag_boolean(w->code->optimized_p()));
+	word *w = untag_check<word>(ctx->peek());
+	ctx->replace(tag_boolean(w->code->optimized_p()));
 }
 
 void factor_vm::primitive_wrapper()
 {
 	wrapper *new_wrapper = allot<wrapper>(sizeof(wrapper));
-	new_wrapper->object = dpeek();
-	drepl(tag<wrapper>(new_wrapper));
+	new_wrapper->object = ctx->peek();
+	ctx->replace(tag<wrapper>(new_wrapper));
 }
 
 }

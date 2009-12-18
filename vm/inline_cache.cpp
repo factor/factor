@@ -198,11 +198,11 @@ void *factor_vm::inline_cache_miss(cell return_address_)
 		<< std::endl;
 #endif
 
-	data_root<array> cache_entries(dpop(),this);
-	fixnum index = untag_fixnum(dpop());
-	data_root<array> methods(dpop(),this);
-	data_root<word> generic_word(dpop(),this);
-	data_root<object> object(((cell *)ds)[-index],this);
+	data_root<array> cache_entries(ctx->pop(),this);
+	fixnum index = untag_fixnum(ctx->pop());
+	data_root<array> methods(ctx->pop(),this);
+	data_root<word> generic_word(ctx->pop(),this);
+	data_root<object> object(((cell *)ctx->datastack)[-index],this);
 
 	cell pic_size = inline_cache_size(cache_entries.value());
 

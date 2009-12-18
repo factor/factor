@@ -60,7 +60,7 @@ void factor_vm::set_profiling(bool profiling)
 
 void factor_vm::primitive_profiling()
 {
-	set_profiling(to_boolean(dpop()));
+	set_profiling(to_boolean(ctx->pop()));
 }
 
 }

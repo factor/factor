@@ -81,9 +81,9 @@ void callback_heap::update()
 
 void factor_vm::primitive_callback()
 {
-	tagged<word> w(dpop());
+	tagged<word> w(ctx->pop());
 	w.untag_check(this);
-	box_alien(callbacks->add(w.value())->xt());
+	ctx->push(allot_alien(callbacks->add(w.value())->xt()));
 }
 
 }

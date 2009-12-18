@@ -1,11 +1,7 @@
 namespace factor
 {
 
-/* Assembly code makes assumptions about the layout of this struct:
-   - callstack_top field is 0
-   - callstack_bottom field is 1
-   - datastack field is 2
-   - retainstack field is 3 */
+/* Assembly code makes assumptions about the layout of this struct */
 struct context {
 	/* C stack pointer on entry */
 	stack_frame *callstack_top;
@@ -16,12 +12,6 @@ struct context {
 
 	/* current retain stack top pointer */
 	cell retainstack;
-
-	/* saved contents of ds register on entry to callback */
-	cell datastack_save;
-
-	/* saved contents of rs register on entry to callback */
-	cell retainstack_save;
 
 	/* callback-bottom stack frame, or NULL for top-level context.
 	When nest_stacks() is called, callstack layout with callbacks
@@ -48,35 +38,53 @@ struct context {
 	context *next;
 
 	context(cell ds_size, cell rs_size);
+
+	cell peek()
+	{
+		return *(cell *)datastack;
+	}
+
+	void replace(cell tagged)
+	{
+		*(cell *)datastack = tagged;
+	}
+
+	cell pop()
+	{
+		cell value = peek();
+		datastack -= sizeof(cell);
+		return value;
+	}
+
+	void push(cell tagged)
+	{
+		datastack += sizeof(cell);
+		replace(tagged);
+	}
+
+	void reset_datastack()
+	{
+		datastack = datastack_region->start - sizeof(cell);
+	}
+
+	void reset_retainstack()
+	{
+		retainstack = retainstack_region->start - sizeof(cell);
+	}
+
+	static const cell stack_reserved = (64 * sizeof(cell));
+
+	void fix_stacks()
+	{
+		if(datastack + sizeof(cell) < datastack_region->start
+			|| datastack + stack_reserved >= datastack_region->end)
+			reset_datastack();
+
+		if(retainstack + sizeof(cell) < retainstack_region->start
+			|| retainstack + stack_reserved >= retainstack_region->end)
+			reset_retainstack();
+	}
 };
-
-#define ds_bot (ctx->datastack_region->start)
-#define ds_top (ctx->datastack_region->end)
-#define rs_bot (ctx->retainstack_region->start)
-#define rs_top (ctx->retainstack_region->end)
-
-inline cell dpeek()
-{
-	return *(cell *)ds;
-}
-
-inline void drepl(cell tagged)
-{
-	*(cell *)ds = tagged;
-}
-
-inline cell dpop()
-{
-	cell value = dpeek();
-	ds -= sizeof(cell);
-	return value;
-}
-
-inline void dpush(cell tagged)
-{
-	ds += sizeof(cell);
-	drepl(tagged);
-}
 
 VM_C_API void nest_stacks(stack_frame *magic_frame, factor_vm *vm);
 VM_C_API void unnest_stacks(factor_vm *vm);

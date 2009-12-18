@@ -8,42 +8,15 @@ context::context(cell ds_size, cell rs_size) :
 	callstack_bottom(NULL),
 	datastack(0),
 	retainstack(0),
-	datastack_save(0),
-	retainstack_save(0),
 	magic_frame(NULL),
 	datastack_region(new segment(ds_size,false)),
 	retainstack_region(new segment(rs_size,false)),
 	catchstack_save(0),
 	current_callback_save(0),
-	next(NULL) {}
-
-void factor_vm::reset_datastack()
+	next(NULL)
 {
-	ds = ds_bot - sizeof(cell);
-}
-
-void factor_vm::reset_retainstack()
-{
-	rs = rs_bot - sizeof(cell);
-}
-
-static const cell stack_reserved = (64 * sizeof(cell));
-
-void factor_vm::fix_stacks()
-{
-	if(ds + sizeof(cell) < ds_bot || ds + stack_reserved >= ds_top) reset_datastack();
-	if(rs + sizeof(cell) < rs_bot || rs + stack_reserved >= rs_top) reset_retainstack();
-}
-
-/* called before entry into foreign C code. Note that ds and rs might
-be stored in registers, so callbacks must save and restore the correct values */
-void factor_vm::save_stacks()
-{
-	if(ctx)
-	{
-		ctx->datastack = ds;
-		ctx->retainstack = rs;
-	}
+	reset_datastack();
+	reset_retainstack();
 }
 
 context *factor_vm::alloc_context()
@@ -75,19 +48,6 @@ void factor_vm::nest_stacks(stack_frame *magic_frame)
 	new_ctx->callstack_bottom = (stack_frame *)-1;
 	new_ctx->callstack_top = (stack_frame *)-1;
 
-	/* note that these register values are not necessarily valid stack
-	pointers. they are merely saved non-volatile registers, and are
-	restored in unnest_stacks(). consider this scenario:
-	- factor code calls C function
-	- C function saves ds/cs registers (since they're non-volatile)
-	- C function clobbers them
-	- C function calls Factor callback
-	- Factor callback returns
-	- C function restores registers
-	- C function returns to Factor code */
-	new_ctx->datastack_save = ds;
-	new_ctx->retainstack_save = rs;
-
 	new_ctx->magic_frame = magic_frame;
 
 	/* save per-callback special_objects */
@@ -96,9 +56,6 @@ void factor_vm::nest_stacks(stack_frame *magic_frame)
 
 	new_ctx->next = ctx;
 	ctx = new_ctx;
-
-	reset_datastack();
-	reset_retainstack();
 }
 
 void nest_stacks(stack_frame *magic_frame, factor_vm *parent)
@@ -109,9 +66,6 @@ void nest_stacks(stack_frame *magic_frame, factor_vm *parent)
 /* called when leaving a compiled callback */
 void factor_vm::unnest_stacks()
 {
-	ds = ctx->datastack_save;
-	rs = ctx->retainstack_save;
-
 	/* restore per-callback special_objects */
 	special_objects[OBJ_CURRENT_CALLBACK] = ctx->current_callback_save;
 	special_objects[OBJ_CATCHSTACK] = ctx->catchstack_save;
@@ -145,20 +99,20 @@ bool factor_vm::stack_to_array(cell bottom, cell top)
 	{
 		array *a = allot_uninitialized_array<array>(depth / sizeof(cell));
 		memcpy(a + 1,(void*)bottom,depth);
-		dpush(tag<array>(a));
+		ctx->push(tag<array>(a));
 		return true;
 	}
 }
 
 void factor_vm::primitive_datastack()
 {
-	if(!stack_to_array(ds_bot,ds))
+	if(!stack_to_array(ctx->datastack_region->start,ctx->datastack))
 		general_error(ERROR_DS_UNDERFLOW,false_object,false_object,NULL);
 }
 
 void factor_vm::primitive_retainstack()
 {
-	if(!stack_to_array(rs_bot,rs))
+	if(!stack_to_array(ctx->retainstack_region->start,ctx->retainstack))
 		general_error(ERROR_RS_UNDERFLOW,false_object,false_object,NULL);
 }
 
@@ -172,46 +126,48 @@ cell factor_vm::array_to_stack(array *array, cell bottom)
 
 void factor_vm::primitive_set_datastack()
 {
-	ds = array_to_stack(untag_check<array>(dpop()),ds_bot);
+	ctx->datastack = array_to_stack(untag_check<array>(ctx->pop()),ctx->datastack_region->start);
 }
 
 void factor_vm::primitive_set_retainstack()
 {
-	rs = array_to_stack(untag_check<array>(dpop()),rs_bot);
+	ctx->retainstack = array_to_stack(untag_check<array>(ctx->pop()),ctx->retainstack_region->start);
 }
 
 /* Used to implement call( */
 void factor_vm::primitive_check_datastack()
 {
-	fixnum out = to_fixnum(dpop());
-	fixnum in = to_fixnum(dpop());
+	fixnum out = to_fixnum(ctx->pop());
+	fixnum in = to_fixnum(ctx->pop());
 	fixnum height = out - in;
-	array *saved_datastack = untag_check<array>(dpop());
+	array *saved_datastack = untag_check<array>(ctx->pop());
 	fixnum saved_height = array_capacity(saved_datastack);
-	fixnum current_height = (ds - ds_bot + sizeof(cell)) / sizeof(cell);
+	fixnum current_height = (ctx->datastack - ctx->datastack_region->start + sizeof(cell)) / sizeof(cell);
 	if(current_height - height != saved_height)
-		dpush(false_object);
+		ctx->push(false_object);
 	else
 	{
-		fixnum i;
-		for(i = 0; i < saved_height - in; i++)
+		cell *ds_bot = (cell *)ctx->datastack_region->start;
+		for(fixnum i = 0; i < saved_height - in; i++)
 		{
-			if(((cell *)ds_bot)[i] != array_nth(saved_datastack,i))
+			if(ds_bot[i] != array_nth(saved_datastack,i))
 			{
-				dpush(false_object);
+				ctx->push(false_object);
 				return;
 			}
 		}
-		dpush(true_object);
+		ctx->push(true_object);
 	}
 }
 
 void factor_vm::primitive_load_locals()
 {
-	fixnum count = untag_fixnum(dpop());
-	memcpy((cell *)(rs + sizeof(cell)),(cell *)(ds - sizeof(cell) * (count - 1)),sizeof(cell) * count);
-	ds -= sizeof(cell) * count;
-	rs += sizeof(cell) * count;
+	fixnum count = untag_fixnum(ctx->pop());
+	memcpy((cell *)(ctx->retainstack + sizeof(cell)),
+		(cell *)(ctx->datastack - sizeof(cell) * (count - 1)),
+		sizeof(cell) * count);
+	ctx->datastack -= sizeof(cell) * count;
+	ctx->retainstack += sizeof(cell) * count;
 }
 
 }

@@ -13,11 +13,11 @@ array *factor_vm::allot_array(cell capacity, cell fill_)
 
 void factor_vm::primitive_array()
 {
-	data_root<object> fill(dpop(),this);
+	data_root<object> fill(ctx->pop(),this);
 	cell capacity = unbox_array_size();
 	array *new_array = allot_uninitialized_array<array>(capacity);
 	memset_cell(new_array->data(),fill.value(),capacity * sizeof(cell));
-	dpush(tag<array>(new_array));
+	ctx->push(tag<array>(new_array));
 }
 
 cell factor_vm::allot_array_1(cell obj_)
@@ -54,10 +54,10 @@ cell factor_vm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
 
 void factor_vm::primitive_resize_array()
 {
-	data_root<array> a(dpop(),this);
+	data_root<array> a(ctx->pop(),this);
 	a.untag_check(this);
 	cell capacity = unbox_array_size();
-	dpush(tag<array>(reallot_array(a.untagged(),capacity)));
+	ctx->push(tag<array>(reallot_array(a.untagged(),capacity)));
 }
 
 void growable_array::add(cell elt_)
