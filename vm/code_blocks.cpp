@@ -293,10 +293,17 @@ struct initial_code_block_visitor {
 void factor_vm::initialize_code_block(code_block *compiled)
 {
 	std::map<code_block *,cell>::iterator iter = code->uninitialized_blocks.find(compiled);
+
 	initial_code_block_visitor visitor(this,iter->second);
 	compiled->each_instruction_operand(visitor);
 	compiled->flush_icache();
+
 	code->uninitialized_blocks.erase(iter);
+
+	/* next time we do a minor GC, we have to trace this code block, since
+	the newly-installed instruction operands might point to literals in
+	nursery or aging */
+	code->write_barrier(compiled);
 }
 
 /* Fixup labels. This is done at compile time, not image load time */
@@ -378,10 +385,15 @@ code_block *factor_vm::add_code_block(code_block_type type, cell code_, cell lab
 	if(to_boolean(labels.value()))
 		fixup_labels(labels.as<array>().untagged(),compiled);
 
-	/* next time we do a minor GC, we have to scan the code heap for
-	literals */
-	this->code->write_barrier(compiled);
+	/* Once we are ready, fill in literal and word references in this code
+	block's instruction operands. In most cases this is done right after this
+	method returns, except when compiling words with the non-optimizing
+	compiler at the beginning of bootstrap */
 	this->code->uninitialized_blocks.insert(std::make_pair(compiled,literals.value()));
+
+	/* next time we do a minor GC, we have to trace this code block, since
+	the fields of the code_block struct might point into nursery or aging */
+	this->code->write_barrier(compiled);
 
 	return compiled;
 }
