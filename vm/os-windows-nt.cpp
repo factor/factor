@@ -53,8 +53,6 @@ u64 nano_count()
 	if(ret == 0)
 		fatal_error("QueryPerformanceFrequency", 0);
 
-	printf("hi = %u, lo = %u\n", hi, lo);
-
 	if(count.LowPart < lo)
 		hi += 1;
 	lo = count.LowPart;
