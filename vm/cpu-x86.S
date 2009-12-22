@@ -3,27 +3,30 @@ DEF(F_FASTCALL void,c_to_factor,(CELL quot, void *vm)):
 	mov ARG0,NV0
 	mov ARG1,NV1
 
-    /* Save old stack pointer and align */
-    mov STACK_REG,ARG0
-    and $-16,STACK_REG
-    add $CELL_SIZE,STACK_REG
-    push ARG0
+	push ARG0
+	push ARG1
 
-	/* Create register shadow area for Win64 */
+	/* Save old stack pointer and align */
+	mov STACK_REG,ARG0
+	and $-16,STACK_REG
+	add $CELL_SIZE,STACK_REG
+	push ARG0
+
+	/* Create register shadow area (required for Win64 only) */
 	sub $32,STACK_REG
 
 	/* Load context */
-    mov (NV1),ARG0
+	mov (NV1),ARG0
 
-    /* Save ctx->callstack_bottom */
+	/* Save ctx->callstack_bottom */
 	lea -CELL_SIZE(STACK_REG),ARG1
-    mov ARG1,CELL_SIZE(ARG0)
+	mov ARG1,CELL_SIZE(ARG0)
 
-    /* Load ctx->datastack */
-    mov (CELL_SIZE * 2)(ARG0),DS_REG
+	/* Load ctx->datastack */
+	mov (CELL_SIZE * 2)(ARG0),DS_REG
 
-    /* Load ctx->retainstack */
-    mov (CELL_SIZE * 3)(ARG0),RS_REG
+	/* Load ctx->retainstack */
+	mov (CELL_SIZE * 3)(ARG0),RS_REG
 
 	/* Call quot-xt */
 	mov NV0,ARG0
@@ -33,8 +36,19 @@ DEF(F_FASTCALL void,c_to_factor,(CELL quot, void *vm)):
 	/* Tear down register shadow area */
 	add $32,STACK_REG
 
-    /* Undo stack alignment */
-    mov (STACK_REG),STACK_REG
+	/* Undo stack alignment */
+	mov (STACK_REG),STACK_REG
+
+	/* Load context */
+	pop ARG1
+	pop ARG0
+	mov (ARG1),ARG0
+
+	/* Save ctx->datastack */
+	mov DS_REG,(CELL_SIZE * 2)(ARG0)
+
+	/* Save ctx->retainstack */
+	mov RS_REG,(CELL_SIZE * 3)(ARG0)
 
 	POP_NONVOLATILE
 	ret
