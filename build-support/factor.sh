@@ -25,9 +25,9 @@ test_program_installed() {
 
 exit_script() {
     if [[ $FIND_MAKE_TARGET -eq true ]] ; then
-		echo $MAKE_TARGET;
-	fi
-	exit $1
+        echo $MAKE_TARGET;
+    fi
+    exit $1
 }
 
 ensure_program_installed() {
@@ -347,7 +347,7 @@ update_script_name() {
 
 update_script() {
     update_script=`update_script_name`
-	bash_path=`which bash`
+    bash_path=`which bash`
     echo "#!$bash_path" >"$update_script"
     echo "git pull \"$GIT_URL\" master" >>"$update_script"
     echo "if [[ \$? -eq 0 ]]; then exec \"$0\" $SCRIPT_ARGS; else echo \"git pull failed\"; exit 2; fi" \
@@ -433,7 +433,7 @@ make_factor() {
 update_boot_images() {
     echo "Deleting old images..."
     $DELETE checksums.txt* > /dev/null 2>&1
-	# delete boot images with one or two characters after the dot
+    # delete boot images with one or two characters after the dot
     $DELETE $BOOT_IMAGE.{?,??} > /dev/null 2>&1
     $DELETE temp/staging.*.image > /dev/null 2>&1
     if [[ -f $BOOT_IMAGE ]] ; then
