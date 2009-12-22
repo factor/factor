@@ -590,7 +590,7 @@ M:: ppc %save-param-reg ( stack reg rep -- )
 M:: ppc %load-param-reg ( stack reg rep -- )
     reg stack local@ rep load-from-frame ;
 
-M: ppc %prepare-unbox ( n -- )
+M: ppc %pop-stack ( n -- )
     [ 3 ] dip <ds-loc> loc>operand LWZ ;
 
 M: ppc %unbox ( n rep func -- )
@@ -650,13 +650,13 @@ M: ppc %box-large-struct ( n c-type -- )
     [ [ 3 1 ] dip struct-return@ ADDI ] [ heap-size 4 LI ] bi*
     5 %load-vm-addr
     ! Call the function
-    "box_value_struct" f %alien-invoke ;
+    "from_value_struct" f %alien-invoke ;
 
 M:: ppc %save-context ( temp1 temp2 callback-allowed? -- )
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    temp1 "stack_chain" %load-vm-field-addr
+    temp1 "ctx" %load-vm-field-addr
     temp1 temp1 0 LWZ
     1 temp1 0 STW
     callback-allowed? [
@@ -703,7 +703,7 @@ M: ppc %box-small-struct ( c-type -- )
     #! Box a <= 16-byte struct returned in r3:r4:r5:r6
     heap-size 7 LI
     8 %load-vm-addr
-    "box_medium_struct" f %alien-invoke ;
+    "from_medium_struct" f %alien-invoke ;
 
 : %unbox-struct-1 ( -- )
     ! Alien must be in r3.

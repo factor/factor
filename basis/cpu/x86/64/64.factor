@@ -88,7 +88,7 @@ M: x86 %load-param-reg [ swap param@ ] dip %copy ;
         call
     ] with-scope ; inline
 
-M: x86.64 %prepare-unbox ( n -- )
+M: x86.64 %pop-stack ( n -- )
     param-reg-1 swap ds-reg reg-stack MOV ;
 
 M:: x86.64 %unbox ( n rep func -- )
@@ -167,7 +167,7 @@ M: x86.64 %box-small-struct ( c-type -- )
         param-reg-1 0 box-struct-field@ MOV
         param-reg-2 1 box-struct-field@ MOV
         param-reg-4 %mov-vm-ptr
-        "box_small_struct" f %alien-invoke
+        "from_small_struct" f %alien-invoke
     ] with-return-regs ;
 
 : struct-return@ ( n -- operand )
@@ -180,7 +180,7 @@ M: x86.64 %box-large-struct ( n c-type -- )
     param-reg-1 swap struct-return@ LEA
     param-reg-3 %mov-vm-ptr
     ! Copy the struct from the C stack
-    "box_value_struct" f %alien-invoke ;
+    "from_value_struct" f %alien-invoke ;
 
 M: x86.64 %prepare-box-struct ( -- )
     ! Compute target address for value struct return
@@ -219,7 +219,7 @@ M: x86.64 %alien-callback ( quot -- )
     "c_to_factor" f %alien-invoke ;
 
 M: x86.64 %callback-value ( ctype -- )
-    0 %prepare-unbox
+    0 %pop-stack
     RSP 8 SUB
     param-reg-1 PUSH
     param-reg-1 %mov-vm-ptr

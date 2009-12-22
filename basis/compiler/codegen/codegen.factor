@@ -283,7 +283,7 @@ M: ##gc generate-insn
         [ [ uninitialized-locs>> ] [ temp1>> ] bi wipe-locs ]
         [ data-values>> save-data-regs ]
         [ [ tagged-values>> ] [ temp1>> ] bi save-gc-roots ]
-        [ [ temp1>> ] [ temp2>> ] bi t %save-context ]
+        [ [ temp1>> ] [ temp2>> ] bi %save-context ]
         [ [ tagged-values>> length ] [ temp1>> ] bi %call-gc ]
         [ [ tagged-values>> ] [ temp1>> ] bi load-gc-roots ]
         [ data-values>> load-data-regs ]
@@ -384,7 +384,7 @@ M: c-type-name flatten-value-type c-type flatten-value-type ;
 
 : unbox-parameters ( offset node -- )
     parameters>> swap
-    '[ prepare-unbox-parameters [ %prepare-unbox [ _ + ] dip unbox-parameter ] 3each ]
+    '[ prepare-unbox-parameters [ %pop-stack [ _ + ] dip unbox-parameter ] 3each ]
     [ length neg %inc-d ]
     bi ;
 
@@ -407,7 +407,7 @@ M: c-type-name flatten-value-type c-type flatten-value-type ;
     ] with-param-regs ;
 
 : box-return* ( node -- )
-    return>> [ ] [ box-return ] if-void ;
+    return>> [ ] [ box-return %push-stack ] if-void ;
 
 : check-dlsym ( symbols dll -- )
     dup dll-valid? [
@@ -452,7 +452,7 @@ M: ##alien-indirect generate-insn
 
 ! ##alien-callback
 : box-parameters ( params -- )
-    alien-parameters [ box-parameter ] each-parameter ;
+    alien-parameters [ box-parameter %push-context-stack ] each-parameter ;
 
 : registers>objects ( node -- )
     ! Generate code for boxing input parameters in a callback.

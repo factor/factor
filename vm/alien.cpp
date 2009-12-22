@@ -211,46 +211,46 @@ VM_C_API void to_value_struct(cell src, void *dest, cell size, factor_vm *parent
 }
 
 /* For FFI callbacks receiving structs by value */
-void factor_vm::box_value_struct(void *src, cell size)
+cell factor_vm::from_value_struct(void *src, cell size)
 {
 	byte_array *bytes = allot_byte_array(size);
 	memcpy(bytes->data<void>(),src,size);
-	ctx->push(tag<byte_array>(bytes));
+	return tag<byte_array>(bytes);
 }
 
-VM_C_API void box_value_struct(void *src, cell size,factor_vm *parent)
+VM_C_API cell from_value_struct(void *src, cell size, factor_vm *parent)
 {
-	return parent->box_value_struct(src,size);
+	return parent->from_value_struct(src,size);
 }
 
 /* On some x86 OSes, structs <= 8 bytes are returned in registers. */
-void factor_vm::box_small_struct(cell x, cell y, cell size)
+cell factor_vm::from_small_struct(cell x, cell y, cell size)
 {
 	cell data[2];
 	data[0] = x;
 	data[1] = y;
-	box_value_struct(data,size);
+	return from_value_struct(data,size);
 }
 
-VM_C_API void box_small_struct(cell x, cell y, cell size, factor_vm *parent)
+VM_C_API cell from_small_struct(cell x, cell y, cell size, factor_vm *parent)
 {
-	return parent->box_small_struct(x,y,size);
+	return parent->from_small_struct(x,y,size);
 }
 
 /* On OS X/PPC, complex numbers are returned in registers. */
-void factor_vm::box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size)
+cell factor_vm::from_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size)
 {
 	cell data[4];
 	data[0] = x1;
 	data[1] = x2;
 	data[2] = x3;
 	data[3] = x4;
-	box_value_struct(data,size);
+	return from_value_struct(data,size);
 }
 
-VM_C_API void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size, factor_vm *parent)
+VM_C_API cell from_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size, factor_vm *parent)
 {
-	return parent->box_medium_struct(x1, x2, x3, x4, size);
+	return parent->from_medium_struct(x1, x2, x3, x4, size);
 }
 
 void factor_vm::primitive_vm_ptr()
