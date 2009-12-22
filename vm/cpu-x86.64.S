@@ -2,6 +2,7 @@
 
 #define STACK_REG %rsp
 #define DS_REG %r14
+#define RS_REG %r15
 #define RETURN_REG %rax
 
 #define CELL_SIZE 8
@@ -18,6 +19,8 @@
 	#define ARG3 %r9
 
 	#define PUSH_NONVOLATILE \
+		push %r15 ; \
+		push %r14 ; \
 		push %r12 ; \
 		push %r13 ; \
 		push %rdi ; \
@@ -31,7 +34,9 @@
 		pop %rsi ; \
 		pop %rdi ; \
 		pop %r13 ; \
-		pop %r12
+		pop %r12 ; \
+		pop %r14 ; \
+		pop %r15
 
 #else
 
@@ -44,9 +49,13 @@
 		push %rbx ; \
 		push %rbp ; \
 		push %r12 ; \
-		push %r13
+		push %r13 ; \
+		push %r14 ; \
+		push %r15
 
 	#define POP_NONVOLATILE \
+		pop %r15 ; \
+		pop %r14 ; \
 		pop %r13 ; \
 		pop %r12 ; \
 		pop %rbp ; \

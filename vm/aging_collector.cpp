@@ -49,8 +49,7 @@ void factor_vm::collect_aging()
 		collector.cheneys_algorithm();
 
 		data->reset_generation(&nursery);
-		code->points_to_nursery.clear();
-		code->points_to_aging.clear();
+		code->clear_remembered_set();
 	}
 }
 

@@ -136,7 +136,7 @@ M:: x86.32 %box-large-struct ( n c-type -- )
     8 save-vm-ptr
     4 stack@ c-type heap-size MOV
     0 stack@ EDX MOV
-    "box_value_struct" f %alien-invoke ;
+    "from_value_struct" f %alien-invoke ;
 
 M: x86.32 %prepare-box-struct ( -- )
     ! Compute target address for value struct return
@@ -150,10 +150,16 @@ M: x86.32 %box-small-struct ( c-type -- )
     8 stack@ swap heap-size MOV
     4 stack@ EDX MOV
     0 stack@ EAX MOV
-    "box_small_struct" f %alien-invoke ;
+    "from_small_struct" f %alien-invoke ;
 
-M: x86.32 %prepare-unbox ( -- )
+M: x86.32 %pop-stack ( n -- )
     EAX swap ds-reg reg-stack MOV ;
+
+M: x86.32 %pop-context-stack ( -- )
+    temp-reg %load-context-datastack
+    EAX temp-reg [] MOV
+    EAX EAX [] MOV
+    temp-reg [] bootstrap-cell SUB ;
 
 : call-unbox-func ( func -- )
     4 save-vm-ptr
@@ -224,21 +230,23 @@ M: x86.32 %unnest-stacks ( -- )
     "unnest_stacks" f %alien-invoke ;
 
 M: x86.32 %prepare-alien-indirect ( -- )
-    0 save-vm-ptr
-    "unbox_alien" f %alien-invoke
+    EAX ds-reg [] MOV
+    ds-reg 4 SUB
+    4 save-vm-ptr
+    0 stack@ EAX MOV
+    "pinned_alien_offset" f %alien-invoke
     EBP EAX MOV ;
 
 M: x86.32 %alien-indirect ( -- )
     EBP CALL ;
 
 M: x86.32 %alien-callback ( quot -- )
-    ! Fastcall
-    param-reg-1 swap %load-reference
-    param-reg-2 %mov-vm-ptr
+    EAX swap %load-reference
+    EDX %mov-vm-ptr
     "c_to_factor" f %alien-invoke ;
 
 M: x86.32 %callback-value ( ctype -- )
-    0 %prepare-unbox
+    %pop-context-stack
     4 stack@ EAX MOV
     0 save-vm-ptr
     ! Restore data/call/retain stacks

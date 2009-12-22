@@ -503,8 +503,27 @@ HOOK: dummy-int-params? cpu ( -- ? )
 ! If t, all int parameters are shadowed by dummy FP parameters
 HOOK: dummy-fp-params? cpu ( -- ? )
 
-HOOK: %prepare-unbox cpu ( n -- )
+! Load a value (from the data stack in the ds register).
+! The value is then passed as a parameter to a VM to_*() function
+HOOK: %pop-stack cpu ( n -- )
 
+! Store a value (to the data stack in the VM's current context)
+! The value is passed to a VM to_*() function -- used for
+! callback returns
+HOOK: %pop-context-stack cpu ( -- )
+
+! Store a value (to the data stack in the ds register).
+! The value was returned from a VM from_*() function
+HOOK: %push-stack cpu ( -- )
+
+! Store a value (to the data stack in the VM's current context)
+! The value is returned from a VM from_*() function -- used for
+! callback parameters
+HOOK: %push-context-stack cpu ( -- )
+
+! Call a function to convert a tagged pointer returned by
+! %pop-stack or %pop-context-stack into a value that can be
+! passed to a C function, or returned from a callback
 HOOK: %unbox cpu ( n rep func -- )
 
 HOOK: %unbox-long-long cpu ( n func -- )
@@ -513,6 +532,10 @@ HOOK: %unbox-small-struct cpu ( c-type -- )
 
 HOOK: %unbox-large-struct cpu ( n c-type -- )
 
+! Call a function to convert a value into a tagged pointer,
+! possibly allocating a bignum, float, or alien instance,
+! which is then pushed on the data stack by %push-stack or
+! %push-context-stack
 HOOK: %box cpu ( n rep func -- )
 
 HOOK: %box-long-long cpu ( n func -- )
@@ -527,7 +550,7 @@ HOOK: %save-param-reg cpu ( stack reg rep -- )
 
 HOOK: %load-param-reg cpu ( stack reg rep -- )
 
-HOOK: %save-context cpu ( temp1 temp2 callback-allowed? -- )
+HOOK: %save-context cpu ( temp1 temp2 -- )
 
 HOOK: %prepare-var-args cpu ( -- )
 

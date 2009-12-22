@@ -54,6 +54,9 @@ void factor_vm::nest_stacks(stack_frame *magic_frame)
 	new_ctx->current_callback_save = special_objects[OBJ_CURRENT_CALLBACK];
 	new_ctx->catchstack_save = special_objects[OBJ_CATCHSTACK];
 
+	new_ctx->reset_datastack();
+	new_ctx->reset_retainstack();
+
 	new_ctx->next = ctx;
 	ctx = new_ctx;
 }
