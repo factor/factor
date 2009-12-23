@@ -32,6 +32,7 @@ CONSTANT: seh-names
         { $ STATUS_CONTROL_C_EXIT             "STATUS_CONTROL_C_EXIT"           }
         { $ STATUS_FLOAT_MULTIPLE_FAULTS      "STATUS_FLOAT_MULTIPLE_FAULTS"    }
         { $ STATUS_FLOAT_MULTIPLE_TRAPS       "STATUS_FLOAT_MULTIPLE_TRAPS"     }
+        { HEX: e06d7363 "Visual C++ exception" }
     }
 
 : seh-name. ( n -- )
