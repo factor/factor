@@ -603,7 +603,7 @@ struct factor_vm
 	code_block *jit_compile_quot(cell owner_, cell quot_, bool relocating);
 	void jit_compile_quot(cell quot_, bool relocating);
 	fixnum quot_code_offset_to_scan(cell quot_, cell offset);
-	cell lazy_jit_compile_impl(cell quot);
+	cell lazy_jit_compile(cell quot);
 	void primitive_quot_compiled_p();
 
 	//dispatch
