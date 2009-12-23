@@ -96,8 +96,8 @@ VM_C_API u64 to_unsigned_8(cell obj, factor_vm *vm);
 VM_C_API fixnum to_fixnum(cell tagged, factor_vm *vm);
 VM_C_API cell to_cell(cell tagged, factor_vm *vm);
 
-VM_ASM_API void overflow_fixnum_add(fixnum x, fixnum y, factor_vm *parent);
-VM_ASM_API void overflow_fixnum_subtract(fixnum x, fixnum y, factor_vm *parent);
-VM_ASM_API void overflow_fixnum_multiply(fixnum x, fixnum y, factor_vm *parent);
+VM_C_API void overflow_fixnum_add(fixnum x, fixnum y, factor_vm *parent);
+VM_C_API void overflow_fixnum_subtract(fixnum x, fixnum y, factor_vm *parent);
+VM_C_API void overflow_fixnum_multiply(fixnum x, fixnum y, factor_vm *parent);
 
 }

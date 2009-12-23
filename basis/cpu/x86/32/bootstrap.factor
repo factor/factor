@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image.private kernel namespaces system
-cpu.x86.assembler cpu.x86.assembler.operands layouts
+USING: bootstrap.image.private kernel kernel.private namespaces
+system cpu.x86.assembler cpu.x86.assembler.operands layouts
 vocabs parser compiler.constants sequences math math.private
 generic.single.private ;
 IN: bootstrap.x86
@@ -12,8 +12,6 @@ IN: bootstrap.x86
 : shift-arg ( -- reg ) ECX ;
 : div-arg ( -- reg ) EAX ;
 : mod-arg ( -- reg ) EDX ;
-: arg1 ( -- reg ) EAX ;
-: arg2 ( -- reg ) EDX ;
 : temp0 ( -- reg ) EAX ;
 : temp1 ( -- reg ) EDX ;
 : temp2 ( -- reg ) ECX ;
@@ -67,6 +65,33 @@ IN: bootstrap.x86
     jit-restore-context
 ] jit-primitive jit-define
 
+[
+    ! load from stack
+    EAX ds-reg [] MOV
+    ! pop stack
+    ds-reg bootstrap-cell SUB
+    ! load VM pointer
+    EDX 0 MOV 0 rc-absolute-cell jit-vm
+]
+[
+    
+    ! pass quotation
+    ESP [] EAX MOV
+    ! pass VM pointer
+    ESP 4 [+] EDX MOV
+    ! call XT
+    EAX quot-xt-offset [+] CALL
+]
+[
+    ! pass quotation
+    ESP 4 [+] EAX MOV
+    ! pass VM pointer
+    ESP 8 [+] EDX MOV
+    ! jump to XT
+    EAX quot-xt-offset [+] JMP
+]
+\ (call) define-sub-primitive*
+
 ! Inline cache miss entry points
 : jit-load-return-address ( -- )
     EBX ESP stack-frame-size bootstrap-cell - [+] MOV ;
@@ -103,7 +128,9 @@ IN: bootstrap.x86
     ds-reg [] ECX MOV
     [ JNO ]
     [
-        ECX EBP MOV
+        ESP [] EAX MOV
+        ESP 4 [+] EDX MOV
+        ESP 8 [+] EBP MOV
         [ 0 CALL ] dip f rc-relative jit-dlsym
     ]
     jit-conditional ;
@@ -124,10 +151,10 @@ IN: bootstrap.x86
     ds-reg [] EAX MOV
     [ JNO ]
     [
-        EAX ECX MOV
-        EAX tag-bits get SAR
-        EDX EBX MOV
-        ECX EBP MOV
+        ECX tag-bits get SAR
+        ESP [] ECX MOV
+        ESP 4 [+] EBX MOV
+        ESP 8 [+] EBP MOV
         0 CALL "overflow_fixnum_multiply" f rc-relative jit-dlsym
     ]
     jit-conditional

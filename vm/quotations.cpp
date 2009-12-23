@@ -307,7 +307,7 @@ void factor_vm::primitive_array_to_quotation()
 	quot->array = ctx->peek();
 	quot->cached_effect = false_object;
 	quot->cache_counter = false_object;
-	quot->xt = (void *)lazy_jit_compile;
+	quot->xt = (void *)lazy_jit_compile_impl;
 	quot->code = NULL;
 	ctx->replace(tag<quotation>(quot));
 }
@@ -332,16 +332,16 @@ fixnum factor_vm::quot_code_offset_to_scan(cell quot_, cell offset)
 	return compiler.get_position();
 }
 
-cell factor_vm::lazy_jit_compile_impl(cell quot_)
+cell factor_vm::lazy_jit_compile(cell quot_)
 {
 	data_root<quotation> quot(quot_,this);
 	jit_compile_quot(quot.value(),true);
 	return quot.value();
 }
 
-VM_C_API cell lazy_jit_compile_impl(cell quot, factor_vm *parent)
+VM_C_API cell lazy_jit_compile(cell quot, factor_vm *parent)
 {
-	return parent->lazy_jit_compile_impl(quot);
+	return parent->lazy_jit_compile(quot);
 }
 
 void factor_vm::primitive_quot_compiled_p()

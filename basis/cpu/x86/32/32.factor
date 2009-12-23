@@ -53,10 +53,6 @@ M:: x86.32 %dispatch ( src temp -- )
     [ align-code ]
     bi ;
 
-! Registers for fastcall
-: param-reg-1 ( -- reg ) EAX ;
-: param-reg-2 ( -- reg ) EDX ;
-
 M: x86.32 pic-tail-reg EBX ;
 
 M: x86.32 reserved-stack-space 4 cells ;
@@ -242,7 +238,8 @@ M: x86.32 %alien-indirect ( -- )
 
 M: x86.32 %alien-callback ( quot -- )
     EAX swap %load-reference
-    EDX %mov-vm-ptr
+    0 stack@ EAX MOV
+    4 save-vm-ptr
     "c_to_factor" f %alien-invoke ;
 
 M: x86.32 %callback-value ( ctype -- )
