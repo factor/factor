@@ -177,7 +177,7 @@ ERROR: unsupported-curses-terminal ;
 : >BOOLEAN ( ? -- TRUE/FALSE ) ffi:TRUE ffi:FALSE ? ; inline
 
 : curses-pointer-error ( ptr/f -- ptr )
-    dup [ curses-failed ] unless ; inline
+    [ curses-failed ] unless* ; inline
 : curses-error ( n -- ) ffi:ERR = [ curses-failed ] when ;
 
 PRIVATE>
@@ -236,8 +236,8 @@ M: curses-window dispose* ( window -- )
 SYMBOL: n-registered-colors
 
 MEMO: register-color ( fg bg -- n )
-    [ n-registered-colors get ] 2dip ffi:init_pair curses-error
-    n-registered-colors [ get ] [ inc ] bi ;
+    [ n-registered-colors get dup ] 2dip ffi:init_pair curses-error
+    n-registered-colors inc ;
 
 : init-colors ( -- )
     ffi:has_colors [
@@ -250,12 +250,9 @@ PRIVATE>
 
 : setup-window ( window -- window )
     [
-        dup
-        dup parent-window>> [
-            ptr>> swap window-params ffi:derwin
-        ] [
-            window-params ffi:newwin
-        ] if* curses-pointer-error >>ptr &dispose
+        dup [ window-params ] keep
+        parent-window>> [ ptr>> ffi:derwin ] [ ffi:newwin ] if*
+        curses-pointer-error >>ptr &dispose
     ] [ apply-window-options ] bi ;
 
 : with-window ( window quot -- )
@@ -280,34 +277,13 @@ PRIVATE>
         ] [ ffi:endwin curses-error ] [ ] cleanup
     ] with-destructors ; inline
 
-TUPLE: curses-terminal < disposable
-    infd outfd ptr ;
-
-: <curses-terminal> ( infd outfd ptr -- curses-terminal )
-    curses-terminal new-disposable
-        swap >>ptr
-        swap >>outfd
-        swap >>infd ;
-
-M: curses-terminal dispose
-    [ outfd>> fclose ] [ infd>> fclose ]
-    [ ptr>> ffi:delscreen ] tri ;
-
-: init-terminal ( terminal -- curses-terminal )
-    "xterm-color" swap [ "rb" fopen ] [ "wb" fopen ] bi
-    [ ffi:newterm curses-pointer-error ] 2keep <curses-terminal> ;
-
-: start-remote-curses ( terminal window -- curses-terminal )
-    [
-        init-terminal
-        ffi:initscr curses-pointer-error drop
-        dup ptr>> ffi:set_term curses-pointer-error drop
-    ] dip [ apply-global-options ] [ apply-window-options ] bi ;
-    
 <PRIVATE
 
-: (wcrefresh) ( window-ptr -- ) ffi:wrefresh curses-error ; inline
-: (wcwrite) ( string window-ptr -- ) swap ffi:waddstr curses-error ; inline
+: (wcrefresh) ( window-ptr -- )
+    ffi:wrefresh curses-error ; inline
+
+: (wcwrite) ( string window-ptr -- )
+    swap ffi:waddstr curses-error ; inline
 
 :: (wcread) ( n encoding window-ptr -- string )
     [
@@ -361,7 +337,7 @@ PRIVATE>
 
 : wcread ( n window -- string )
     [ encoding>> ] [ ptr>> ] bi (wcread) ;
-: curses-read ( n -- string ) current-window get wcread ;
+: cread ( n -- string ) current-window get wcread ;
 
 : wgetch ( window -- key ) ptr>> (wgetch) ;
 : getch ( -- key ) current-window get wgetch ;
@@ -435,12 +411,12 @@ TUPLE: mouse-event
 
 : fill-in-type ( mouse-event substate -- )
     {
-        { BUTTON1_RELEASED       [ +released+ >>type drop ] }
-        { BUTTON1_PRESSED        [ +pressed+  >>type drop ] }
-        { BUTTON1_CLICKED        [ +clicked+  >>type drop ] }
-        { BUTTON1_DOUBLE_CLICKED [ +double+   >>type drop ] }
-        { BUTTON1_TRIPLE_CLICKED [ +triple+   >>type drop ] }
-    } case ; inline
+        { BUTTON1_RELEASED       [ +released+ ] }
+        { BUTTON1_PRESSED        [ +pressed+ ] }
+        { BUTTON1_CLICKED        [ +clicked+ ] }
+        { BUTTON1_DOUBLE_CLICKED [ +double+ ] }
+        { BUTTON1_TRIPLE_CLICKED [ +triple+ ] }
+    } case >>type drop ; inline
 
 : fill-in-bstate ( mouse-event bstate -- )
     2dup {
