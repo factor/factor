@@ -104,11 +104,6 @@ LONG factor_vm::exception_handler(PEXCEPTION_POINTERS pe)
 		this altogether, since that is what happens if SEH is not
 		enabled. Don't really have any idea what this exception means. */
 		break;
-	case 0xe06d7363:
-		/* This exception comes from a Visual Studio C++ app that uses
-		throw. Ignore it.
-		http://support.microsoft.com/kb/185294 */
-		break;
 	default:
 		signal_number = e->ExceptionCode;
 		c->EIP = (cell)factor::misc_signal_handler_impl;
