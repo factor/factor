@@ -225,11 +225,11 @@ DEF(void,throw_impl,(cell quot, F_STACK_FRAME *rewind_to, void *vm)):
 	mtlr r0
 	JUMP_QUOT	   /* call the quotation */
 
-DEF(void,lazy_jit_compile,(cell quot, void *vm)):
+DEF(void,lazy_jit_compile_impl,(cell quot, void *vm)):
 	mr r5,r4	   /* vm ptr is 3rd arg */
 	mr r4,r1	   /* save stack pointer */
 	PROLOGUE
-	bl MANGLE(lazy_jit_compile_impl)
+	bl MANGLE(lazy_jit_compile)
 	EPILOGUE
 	JUMP_QUOT	   /* call the quotation */
 

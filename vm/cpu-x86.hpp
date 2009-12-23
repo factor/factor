@@ -74,9 +74,9 @@ inline static unsigned int fpu_status(unsigned int status)
 }
 
 /* Defined in assembly */
-VM_ASM_API void c_to_factor(cell quot, void *vm);
+VM_C_API void c_to_factor(cell quot, void *vm);
 VM_C_API void throw_impl(cell quot, void *new_stack, void *vm);
-VM_ASM_API void lazy_jit_compile(cell quot, void *vm);
+VM_C_API void lazy_jit_compile_impl(cell quot, void *vm);
 
 VM_C_API void set_callstack(
 	void *vm,
