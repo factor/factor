@@ -15,7 +15,7 @@ IN: json.reader
     ] dip ;
 
 DEFER: j-string
-    
+
 : convert-string ( str -- str )
     read1
     {
@@ -30,17 +30,17 @@ DEFER: j-string
     dup
     [ 1string append j-string append ]
     [ drop ] if ;
-    
+
 : j-string ( -- str )
     "\\\"" read-until CHAR: \" =
     [ convert-string ] unless ;
-    
+
 : second-last ( seq -- second-last )
     [ length 2 - ] keep nth ; inline
 
 : third-last ( seq -- third-last )
     [ length 3 - ] keep nth ; inline
-    
+
 : last2 ( seq -- second-last last )
     [ second-last ] [ last ] bi ; inline
 
@@ -68,12 +68,12 @@ DEFER: j-string
     dup pop >array over push ;
 
 : (close-hash) ( accum -- accum' )
-    dup length 3 >= [ v-over-push ] when
-    dup dup [ pop ] dip pop swap
+    dup [ length 3 >= ] [ last V{ } = not ] bi@ and [ v-over-push ] when
+    dup dup [ pop ] bi@ swap
     zip H{ } assoc-clone-like over push ;
-                                                 
+
 : scan ( accum char -- accum )
-    ! 2dup . . ! Great for debug...
+    ! 2dup 1string swap . . ! Great for debug...
     [
         {
             { CHAR: \" [ j-string over push ] }
@@ -91,13 +91,13 @@ DEFER: j-string
             { CHAR: f  [ 4 read drop f over push ] }
             { CHAR: n  [ 3 read drop json-null over push ] }
             [ value [ over push ] dip [ scan ] when*  ]
-        } case 
+        } case
     ] when* ;
 
 : (json-parser>) ( string -- object )
     [ V{ } clone [ read1 dup ] [ scan ] while drop first ] with-string-reader ;
-    
+
 PRIVATE>
-    
+
 : json> ( string -- object )
     (json-parser>) ;
