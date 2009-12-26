@@ -34,7 +34,6 @@ void factor_vm::compile_all_words()
 			jit_compile_word(word.value(),word->def,false);
 
 		update_word_xt(word.untagged());
-
 	}
 }
 
