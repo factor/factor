@@ -15,11 +15,18 @@ struct free_heap_block
 
 	cell size() const
 	{
-		return header & ~7;
+		cell size = header & ~7;
+#ifdef FACTOR_DEBUG
+		assert(size > 0);
+#endif
+		return size;
 	}
 
 	void make_free(cell size)
 	{
+#ifdef FACTOR_DEBUG
+		assert(size > 0);
+#endif
 		header = size | 1;
 	}
 };

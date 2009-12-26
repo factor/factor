@@ -155,6 +155,34 @@ struct code_block_compaction_updater {
 	}
 };
 
+/* After a compaction, invalidate any code heap roots which are not
+marked, and also slide the valid roots up so that call sites can be updated
+correctly in case an inline cache compilation triggered compaction. */
+void factor_vm::update_code_roots_for_compaction()
+{
+	std::vector<code_root *>::const_iterator iter = code_roots.begin();
+	std::vector<code_root *>::const_iterator end = code_roots.end();
+
+	mark_bits<code_block> *state = &code->allocator->state;
+
+	for(; iter < end; iter++)
+	{
+		code_root *root = *iter;
+		code_block *block = (code_block *)(root->value & -data_alignment);
+
+		/* Offset of return address within 16-byte allocation line */
+		cell offset = root->value - (cell)block;
+
+		if(root->valid && state->marked_p(block))
+		{
+			block = state->forward_block(block);
+			root->value = (cell)block + offset;
+		}
+		else
+			root->valid = false;
+	}
+}
+
 /* Compact data and code heaps */
 void factor_vm::collect_compact_impl(bool trace_contexts_p)
 {

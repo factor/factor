@@ -748,8 +748,7 @@ temp: temp1/int-rep temp2/int-rep
 literal: size data-values tagged-values uninitialized-locs ;
 
 INSN: ##save-context
-temp: temp1/int-rep temp2/int-rep
-literal: callback-allowed? ;
+temp: temp1/int-rep temp2/int-rep ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue

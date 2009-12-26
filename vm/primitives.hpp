@@ -1,29 +1,14 @@
 namespace factor
 {
 
-#if defined(FACTOR_X86)
-  extern "C" __attribute__ ((regparm (1))) typedef void (*primitive_type)(factor_vm *parent);
-  #define PRIMITIVE(name) extern "C" __attribute__ ((regparm (1)))  void primitive_##name(factor_vm *parent)
-  #define PRIMITIVE_FORWARD(name) extern "C" __attribute__ ((regparm (1)))  void primitive_##name(factor_vm *parent) \
-  { \
+extern "C" typedef void (*primitive_type)(factor_vm *parent);
+#define PRIMITIVE(name) extern "C" void primitive_##name(factor_vm *parent)
+#define PRIMITIVE_FORWARD(name) extern "C" void primitive_##name(factor_vm *parent) \
+{ \
 	parent->primitive_##name(); \
-  }
-#else
-  extern "C" typedef void (*primitive_type)(factor_vm *parent);
-  #define PRIMITIVE(name) extern "C" void primitive_##name(factor_vm *parent)
-  #define PRIMITIVE_FORWARD(name) extern "C" void primitive_##name(factor_vm *parent) \
-  { \
-	parent->primitive_##name(); \
-  }
-#endif
-extern const primitive_type primitives[];
+}
 
-/* These are defined in assembly */
-PRIMITIVE(fixnum_add);
-PRIMITIVE(fixnum_subtract);
-PRIMITIVE(fixnum_multiply);
-PRIMITIVE(inline_cache_miss);
-PRIMITIVE(inline_cache_miss_tail);
+extern const primitive_type primitives[];
 
 /* These are generated with macros in alien.c */
 PRIMITIVE(alien_signed_cell);

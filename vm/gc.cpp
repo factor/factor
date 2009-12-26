@@ -131,8 +131,6 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 	assert(!gc_off);
 	assert(!current_gc);
 
-	save_stacks();
-
 	current_gc = new gc_state(op,this);
 
 	/* Keep trying to GC higher and higher generations until we don't run out
@@ -277,12 +275,12 @@ void factor_vm::primitive_disable_gc_events()
 		}
 
 		result.trim();
-		dpush(result.elements.value());
+		ctx->push(result.elements.value());
 
 		delete this->gc_events;
 	}
 	else
-		dpush(false_object);
+		ctx->push(false_object);
 }
 
 }
