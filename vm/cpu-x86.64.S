@@ -1,15 +1,10 @@
 #include "asm.h"
 
-#define STACK_REG %rsp
 #define DS_REG %r14
 #define RS_REG %r15
 #define RETURN_REG %rax
 
-#define CELL_SIZE 8
-#define STACK_PADDING 56
-
-#define NV0 %rbp
-#define NV1 %r12
+#define QUOT_XT_OFFSET 28
 
 #ifdef WINDOWS
 
@@ -63,82 +58,122 @@
 
 #endif
 
-#define QUOT_XT_OFFSET 28
-
-DEF(F_FASTCALL void,c_to_factor,(CELL quot, void *vm)):
+DEF(void,c_to_factor,(cell quot, void *vm)):
 	PUSH_NONVOLATILE
-	mov ARG0,NV0
-	mov ARG1,NV1
 
+	/* Save old stack pointer and align */
+	mov %rsp,%rbp
+	and $-16,%rsp
+	push %rbp
+
+	/* Set up stack frame for the call to the boot quotation */
 	push ARG0
 	push ARG1
 
 	/* Create register shadow area (required for Win64 only) */
-	sub $32,STACK_REG
+	sub $40,%rsp
 
 	/* Load context */
-	mov (NV1),ARG0
+	mov (ARG1),ARG2
 
 	/* Save ctx->callstack_bottom */
-	lea -CELL_SIZE(STACK_REG),ARG1
-	mov ARG1,CELL_SIZE(ARG0)
+	lea -8(%rsp),ARG3
+	mov ARG3,8(ARG2)
 
 	/* Load ctx->datastack */
-	mov (CELL_SIZE * 2)(ARG0),DS_REG
+	mov 16(ARG2),DS_REG
 
 	/* Load ctx->retainstack */
-	mov (CELL_SIZE * 3)(ARG0),RS_REG
+	mov 24(ARG2),RS_REG
 
 	/* Call quot-xt */
-	mov NV0,ARG0
-	mov NV1,ARG1
 	call *QUOT_XT_OFFSET(ARG0)
 
 	/* Tear down register shadow area */
-	add $32,STACK_REG
+	add $40,%rsp
 
-	/* Load context */
+	/* Tear down stack frame for the call to the boot quotation */
 	pop ARG1
 	pop ARG0
-	mov (ARG1),ARG0
+
+	/* Undo stack alignment */
+	pop %rbp
+	mov %rbp,%rsp
+
+	/* Load context */
+	mov (ARG1),ARG2
 
 	/* Save ctx->datastack */
-	mov DS_REG,(CELL_SIZE * 2)(ARG0)
+	mov DS_REG,16(ARG2)
 
 	/* Save ctx->retainstack */
-	mov RS_REG,(CELL_SIZE * 3)(ARG0)
+	mov RS_REG,24(ARG2)
 
 	POP_NONVOLATILE
 	ret
 
-/* We pass a function pointer to memcpy to work around a Mac OS X
-ABI limitation which would otherwise require us to do a bizzaro PC-relative
-trampoline to retrieve the function address */
-DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, void *memcpy)):
-	sub ARG2,ARG0                      /* compute new stack pointer */
-	mov ARG0,%rsp
-	call *ARG3                         /* call memcpy */
-	ret                                /* return _with new stack_ */
+DEF(void,set_callstack,(void *vm, stack_frame *to, stack_frame *from, cell length)):
+	/* save VM pointer in non-volatile register */
+	mov ARG0,%rbp
 
-DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to, void *vm)):
+	/* compute new stack pointer */	
+	sub ARG3,ARG1
+	mov ARG1,%rsp
+
+	/* call memcpy */
+	mov ARG1,ARG0
+	mov ARG2,ARG1
+	mov ARG3,ARG2
+	call MANGLE(memcpy)
+
+	/* load context */
+	mov (%rbp),ARG2
+	/* load datastack */
+	mov 16(ARG2),DS_REG
+	/* load retainstack */
+	mov 24(ARG2),RS_REG
+
+	/* return with new stack */
+	ret
+
+DEF(void,throw_impl,(cell quot, void *new_stack, void *vm)):
 	/* clear x87 stack, but preserve rounding mode and exception flags */
-	sub $2,STACK_REG
-	fnstcw (STACK_REG)
+	sub $2,%rsp
+	fnstcw (%rsp)
 	fninit
-	fldcw (STACK_REG)
-	/* rewind_to */
-	mov ARG1,STACK_REG
-	mov ARG2,ARG1  /* make vm ptr 2nd arg in case quot_xt = lazy_jit_compile_impl */
+	fldcw (%rsp)
+
+	/* shuffle args */
+	mov ARG1,%rsp
+	mov ARG2,ARG1
+
+	/* load context */
+	mov (ARG1),ARG2
+	/* load datastack */
+	mov 16(ARG2),DS_REG
+	/* load retainstack */
+	mov 24(ARG2),RS_REG
+
 	jmp *QUOT_XT_OFFSET(ARG0)
 
-DEF(F_FASTCALL void,lazy_jit_compile_impl,(CELL quot, void *vm)):
-	mov ARG1,ARG2                /* vm is 3rd arg */
-	mov STACK_REG,ARG1           /* Save stack pointer */
-	sub $STACK_PADDING,STACK_REG
+DEF(void,lazy_jit_compile_impl,(cell quot, void *vm)):
+	/* load context */
+	mov (ARG1),ARG2
+	/* save datastack */
+	mov DS_REG,16(ARG2)
+	/* save retainstack */
+	mov RS_REG,24(ARG2)
+	/* save callstack */
+	lea -8(%rsp),%rbp
+	mov %rbp,(ARG2)
+
+	/* compile quotation */
+	sub $8,%rsp
 	call MANGLE(lazy_jit_compile)
-	mov RETURN_REG,ARG0          /* No-op on 32-bit */
-	add $STACK_PADDING,STACK_REG
-        jmp *QUOT_XT_OFFSET(ARG0)    /* Call the quotation */
+	add $8,%rsp
+
+	/* call quotation */
+	jmp *QUOT_XT_OFFSET(RETURN_REG)
 
 DEF(long long,read_timestamp_counter,(void)):
 	mov $0,%rax
