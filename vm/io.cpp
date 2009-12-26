@@ -33,8 +33,8 @@ void factor_vm::io_error()
 
 void factor_vm::primitive_fopen()
 {
-	data_root<byte_array> mode(dpop(),this);
-	data_root<byte_array> path(dpop(),this);
+	data_root<byte_array> mode(ctx->pop(),this);
+	data_root<byte_array> path(ctx->pop(),this);
 	mode.untag_check(this);
 	path.untag_check(this);
 
@@ -46,15 +46,20 @@ void factor_vm::primitive_fopen()
 			io_error();
 		else
 		{
-			box_alien(file);
+			ctx->push(allot_alien(file));
 			break;
 		}
 	}
 }
 
+FILE *factor_vm::pop_file_handle()
+{
+	return (FILE *)alien_offset(ctx->pop());
+}
+
 void factor_vm::primitive_fgetc()
 {
-	FILE *file = (FILE *)unbox_alien();
+	FILE *file = pop_file_handle();
 
 	for(;;)
 	{
@@ -63,7 +68,7 @@ void factor_vm::primitive_fgetc()
 		{
 			if(feof(file))
 			{
-				dpush(false_object);
+				ctx->push(false_object);
 				break;
 			}
 			else
@@ -71,7 +76,7 @@ void factor_vm::primitive_fgetc()
 		}
 		else
 		{
-			dpush(tag_fixnum(c));
+			ctx->push(tag_fixnum(c));
 			break;
 		}
 	}
@@ -79,12 +84,12 @@ void factor_vm::primitive_fgetc()
 
 void factor_vm::primitive_fread()
 {
-	FILE *file = (FILE *)unbox_alien();
+	FILE *file = pop_file_handle();
 	fixnum size = unbox_array_size();
 
 	if(size == 0)
 	{
-		dpush(tag<string>(allot_string(0,0)));
+		ctx->push(tag<string>(allot_string(0,0)));
 		return;
 	}
 
@@ -97,7 +102,7 @@ void factor_vm::primitive_fread()
 		{
 			if(feof(file))
 			{
-				dpush(false_object);
+				ctx->push(false_object);
 				break;
 			}
 			else
@@ -111,7 +116,7 @@ void factor_vm::primitive_fread()
 				memcpy(new_buf + 1, buf.untagged() + 1,c);
 				buf = new_buf;
 			}
-			dpush(buf.value());
+			ctx->push(buf.value());
 			break;
 		}
 	}
@@ -119,8 +124,8 @@ void factor_vm::primitive_fread()
 
 void factor_vm::primitive_fputc()
 {
-	FILE *file = (FILE *)unbox_alien();
-	fixnum ch = to_fixnum(dpop());
+	FILE *file = pop_file_handle();
+	fixnum ch = to_fixnum(ctx->pop());
 
 	for(;;)
 	{
@@ -137,8 +142,8 @@ void factor_vm::primitive_fputc()
 
 void factor_vm::primitive_fwrite()
 {
-	FILE *file = (FILE *)unbox_alien();
-	byte_array *text = untag_check<byte_array>(dpop());
+	FILE *file = pop_file_handle();
+	byte_array *text = untag_check<byte_array>(ctx->pop());
 	cell length = array_capacity(text);
 	char *string = (char *)(text + 1);
 
@@ -166,20 +171,20 @@ void factor_vm::primitive_fwrite()
 
 void factor_vm::primitive_ftell()
 {
-	FILE *file = (FILE *)unbox_alien();
+	FILE *file = pop_file_handle();
 	off_t offset;
 
 	if((offset = FTELL(file)) == -1)
 		io_error();
 
-	box_signed_8(offset);
+	ctx->push(from_signed_8(offset));
 }
 
 void factor_vm::primitive_fseek()
 {
-	int whence = to_fixnum(dpop());
-	FILE *file = (FILE *)unbox_alien();
-	off_t offset = to_signed_8(dpop());
+	int whence = to_fixnum(ctx->pop());
+	FILE *file = pop_file_handle();
+	off_t offset = to_signed_8(ctx->pop());
 
 	switch(whence)
 	{
@@ -202,7 +207,7 @@ void factor_vm::primitive_fseek()
 
 void factor_vm::primitive_fflush()
 {
-	FILE *file = (FILE *)unbox_alien();
+	FILE *file = pop_file_handle();
 	for(;;)
 	{
 		if(fflush(file) == EOF)
@@ -214,7 +219,7 @@ void factor_vm::primitive_fflush()
 
 void factor_vm::primitive_fclose()
 {
-	FILE *file = (FILE *)unbox_alien();
+	FILE *file = pop_file_handle();
 	for(;;)
 	{
 		if(fclose(file) == EOF)

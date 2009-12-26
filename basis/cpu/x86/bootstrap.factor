@@ -120,30 +120,18 @@ big-endian off
 
 [
     ! load from stack
-    arg1 ds-reg [] MOV
-    ! pop stack
-    ds-reg bootstrap-cell SUB
-    ! pass vm pointer
-    arg2 0 MOV 0 rc-absolute-cell jit-vm
-]
-[ arg1 quot-xt-offset [+] CALL ]
-[ arg1 quot-xt-offset [+] JMP ]
-\ (call) define-sub-primitive*
-
-[
-    ! load from stack
-    arg1 ds-reg [] MOV
+    temp0 ds-reg [] MOV
     ! pop stack
     ds-reg bootstrap-cell SUB
 ]
-[ arg1 word-xt-offset [+] CALL ]
-[ arg1 word-xt-offset [+] JMP ]
+[ temp0 word-xt-offset [+] CALL ]
+[ temp0 word-xt-offset [+] JMP ]
 \ (execute) define-sub-primitive*
 
 [
-    arg1 ds-reg [] MOV
+    temp0 ds-reg [] MOV
     ds-reg bootstrap-cell SUB
-    arg1 word-xt-offset [+] JMP
+    temp0 word-xt-offset [+] JMP
 ] jit-execute jit-define
 
 [

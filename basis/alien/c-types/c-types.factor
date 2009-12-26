@@ -344,7 +344,7 @@ SYMBOLS:
         bootstrap-cell >>align
         bootstrap-cell >>align-first
         [ >c-ptr ] >>unboxer-quot
-        "box_alien" >>boxer
+        "allot_alien" >>boxer
         "alien_offset" >>unboxer
     \ void* define-primitive-type
 
@@ -355,7 +355,7 @@ SYMBOLS:
         [ set-alien-signed-8 ] >>setter
         8 >>size
         8-byte-alignment
-        "box_signed_8" >>boxer
+        "from_signed_8" >>boxer
         "to_signed_8" >>unboxer
     \ longlong define-primitive-type
 
@@ -366,7 +366,7 @@ SYMBOLS:
         [ set-alien-unsigned-8 ] >>setter
         8 >>size
         8-byte-alignment
-        "box_unsigned_8" >>boxer
+        "from_unsigned_8" >>boxer
         "to_unsigned_8" >>unboxer
     \ ulonglong define-primitive-type
 
@@ -378,7 +378,7 @@ SYMBOLS:
         bootstrap-cell >>size
         bootstrap-cell >>align
         bootstrap-cell >>align-first
-        "box_signed_cell" >>boxer
+        "from_signed_cell" >>boxer
         "to_fixnum" >>unboxer
     \ long define-primitive-type
 
@@ -390,7 +390,7 @@ SYMBOLS:
         bootstrap-cell >>size
         bootstrap-cell >>align
         bootstrap-cell >>align-first
-        "box_unsigned_cell" >>boxer
+        "from_unsigned_cell" >>boxer
         "to_cell" >>unboxer
     \ ulong define-primitive-type
 
@@ -402,7 +402,7 @@ SYMBOLS:
         4 >>size
         4 >>align
         4 >>align-first
-        "box_signed_4" >>boxer
+        "from_signed_4" >>boxer
         "to_fixnum" >>unboxer
     \ int define-primitive-type
 
@@ -414,7 +414,7 @@ SYMBOLS:
         4 >>size
         4 >>align
         4 >>align-first
-        "box_unsigned_4" >>boxer
+        "from_unsigned_4" >>boxer
         "to_cell" >>unboxer
     \ uint define-primitive-type
 
@@ -426,7 +426,7 @@ SYMBOLS:
         2 >>size
         2 >>align
         2 >>align-first
-        "box_signed_2" >>boxer
+        "from_signed_2" >>boxer
         "to_fixnum" >>unboxer
     \ short define-primitive-type
 
@@ -438,7 +438,7 @@ SYMBOLS:
         2 >>size
         2 >>align
         2 >>align-first
-        "box_unsigned_2" >>boxer
+        "from_unsigned_2" >>boxer
         "to_cell" >>unboxer
     \ ushort define-primitive-type
 
@@ -450,7 +450,7 @@ SYMBOLS:
         1 >>size
         1 >>align
         1 >>align-first
-        "box_signed_1" >>boxer
+        "from_signed_1" >>boxer
         "to_fixnum" >>unboxer
     \ char define-primitive-type
 
@@ -462,7 +462,7 @@ SYMBOLS:
         1 >>size
         1 >>align
         1 >>align-first
-        "box_unsigned_1" >>boxer
+        "from_unsigned_1" >>boxer
         "to_cell" >>unboxer
     \ uchar define-primitive-type
 
@@ -473,7 +473,7 @@ SYMBOLS:
             4 >>size
             4 >>align
             4 >>align-first
-            "box_boolean" >>boxer
+            "from_boolean" >>boxer
             "to_boolean" >>unboxer
     ] [
         <c-type>
@@ -482,7 +482,7 @@ SYMBOLS:
             1 >>size
             1 >>align
             1 >>align-first
-            "box_boolean" >>boxer
+            "from_boolean" >>boxer
             "to_boolean" >>unboxer
     ] if
     \ bool define-primitive-type
@@ -495,7 +495,7 @@ SYMBOLS:
         4 >>size
         4 >>align
         4 >>align-first
-        "box_float" >>boxer
+        "from_float" >>boxer
         "to_float" >>unboxer
         float-rep >>rep
         [ >float ] >>unboxer-quot
@@ -508,7 +508,7 @@ SYMBOLS:
         [ [ >float ] 2dip set-alien-double ] >>setter
         8 >>size
         8-byte-alignment
-        "box_double" >>boxer
+        "from_double" >>boxer
         "to_double" >>unboxer
         double-rep >>rep
         [ >float ] >>unboxer-quot

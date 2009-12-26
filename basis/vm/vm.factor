@@ -4,7 +4,20 @@ USING: classes.struct alien.c-types alien.syntax ;
 IN: vm
 
 TYPEDEF: uintptr_t cell
-C-TYPE: context
+
+STRUCT: context
+{ callstack-top void* }
+{ callstack-bottom void* }
+{ datastack cell }
+{ callstack cell }
+{ magic-frame void* }
+{ datastack-region void* }
+{ retainstack-region void* }
+{ catchstack-save cell }
+{ current-callback-save cell }
+{ next context* } ;
+
+: context-field-offset ( field -- offset ) context offset-of ; inline
 
 STRUCT: zone
 { start cell }
@@ -13,10 +26,10 @@ STRUCT: zone
 { end cell } ;
 
 STRUCT: vm
-{ stack_chain context* }
+{ ctx context* }
 { nursery zone }
-{ cards_offset cell }
-{ decks_offset cell }
+{ cards-offset cell }
+{ decks-offset cell }
 { userenv cell[70] } ;
 
 : vm-field-offset ( field -- offset ) vm offset-of ; inline

@@ -92,8 +92,8 @@ const vm_char *factor_vm::vm_executable_path()
 
 void factor_vm::primitive_existsp()
 {
-	vm_char *path = untag_check<byte_array>(dpop())->data<vm_char>();
-	box_boolean(windows_stat(path));
+	vm_char *path = untag_check<byte_array>(ctx->pop())->data<vm_char>();
+	ctx->push(tag_boolean(windows_stat(path)));
 }
 
 segment::segment(cell size_, bool executable_p)
