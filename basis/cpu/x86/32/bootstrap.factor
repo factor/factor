@@ -73,23 +73,8 @@ IN: bootstrap.x86
     ! load VM pointer
     EDX 0 MOV 0 rc-absolute-cell jit-vm
 ]
-[
-    
-    ! pass quotation
-    ESP [] EAX MOV
-    ! pass VM pointer
-    ESP 4 [+] EDX MOV
-    ! call XT
-    EAX quot-xt-offset [+] CALL
-]
-[
-    ! pass quotation
-    ESP 4 [+] EAX MOV
-    ! pass VM pointer
-    ESP 8 [+] EDX MOV
-    ! jump to XT
-    EAX quot-xt-offset [+] JMP
-]
+[ EAX quot-xt-offset [+] CALL ]
+[ EAX quot-xt-offset [+] JMP ]
 \ (call) define-sub-primitive*
 
 ! Inline cache miss entry points
