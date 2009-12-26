@@ -15,7 +15,7 @@ V{
 
 [
     V{
-        T{ ##save-context f 1 2 f }
+        T{ ##save-context f 1 2 }
         T{ ##unary-float-function f 2 3 "sqrt" }
         T{ ##branch }
     }
