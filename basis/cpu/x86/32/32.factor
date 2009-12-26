@@ -215,7 +215,8 @@ M:: x86.32 %unbox-large-struct ( n c-type -- )
     "to_value_struct" f %alien-invoke ;
 
 M: x86.32 %nest-stacks ( -- )
-    ! Save current frame. See comment in vm/contexts.hpp
+    ! Save current frame to ctx->magic_frame.
+    ! See comment in vm/contexts.hpp.
     EAX stack-reg stack-frame get total-size>> 3 cells - [+] LEA
     4 save-vm-ptr
     0 stack@ EAX MOV

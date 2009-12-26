@@ -40,12 +40,12 @@ DEF(void,c_to_factor,(cell quot, void *vm)):
 	lea -4(%esp),%ebx
 	mov %ebx,4(%ecx)
 
-	/* Call quot-xt. Parameters are already on the stack */
+	/* Call quot-xt */
 	call *QUOT_XT_OFFSET(%eax)
 
 	/* Tear down stack frame for the call to the boot quotation */
-	pop %edx
 	pop %eax
+	pop %edx
 	add $4,%esp
 
 	/* Undo stack alignment */
@@ -120,18 +120,10 @@ DEF(void,throw_impl,(cell quot, void *new_stack, void *vm)):
 	/* load retainstack */
 	mov 12(%ecx),RS_REG
 
-	/* pass arguments to error handler */
-	mov %eax,4(%esp)
-	mov %edx,8(%esp)
-
 	/* call the error handler */
 	jmp *QUOT_XT_OFFSET(%eax)
 
 DEF(void,lazy_jit_compile_impl,(cell quot, void *vm)):
-	/* load arguments */
-	mov 4(%esp),%eax 
-	mov 8(%esp),%edx
-
 	/* load context */
 	mov (%edx),%ecx
 	/* save datastack */
