@@ -46,7 +46,7 @@ HELP: callstack ( -- cs )
 { $values { "cs" callstack } }
 { $description "Outputs a copy of the call stack contents, with the top of the stack at the end of the vector. The stack frame of the caller word is " { $emphasis "not" } " included." } ;
 
-HELP: set-callstack ( cs -- )
+HELP: set-callstack ( cs -- * )
 { $values { "cs" callstack } }
 { $description "Replaces the call stack contents. The end of the vector becomes the top of the stack. Control flow is transferred immediately to the new call stack." } ;
 
@@ -208,7 +208,7 @@ HELP: call
 
 { call POSTPONE: call( } related-words
 
-HELP: call-clear ( quot -- )
+HELP: call-clear ( quot -- * )
 { $values { "quot" callable } }
 { $description "Calls a quotation with an empty call stack. If the quotation returns, Factor will exit.." }
 { $notes "Used to implement " { $link "threads" } "." } ;
