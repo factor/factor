@@ -49,22 +49,6 @@ C: <continuation> continuation
     } cleave ;
 
 : ifcc ( capture restore -- )
-    #! After continuation is being captured, the stacks looks
-    #! like:
-    #! ( f continuation r:capture r:restore )
-    #! so the 'capture' branch is taken.
-    #!
-    #! Note that the continuation itself is not captured as part
-    #! of the datastack.
-    #!
-    #! BUT...
-    #!
-    #! After the continuation is resumed, (continue-with) pushes
-    #! the given value together with f,
-    #! so now, the stacks looks like:
-    #! ( value f r:capture r:restore )
-    #! Execution begins right after the call to 'continuation'.
-    #! The 'restore' branch is taken.
     [ dummy-1 continuation ] 2dip [ dummy-2 ] prepose ?if ; inline
 
 : callcc0 ( quot -- ) [ drop ] ifcc ; inline
