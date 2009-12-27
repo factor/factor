@@ -48,7 +48,7 @@ HELP: callstack ( -- cs )
 
 HELP: set-callstack ( cs -- * )
 { $values { "cs" callstack } }
-{ $description "Replaces the call stack contents. The end of the vector becomes the top of the stack. Control flow is transferred immediately to the new call stack." } ;
+{ $description "Replaces the call stack contents. Control flow is transferred immediately to the innermost frame of the new call stack." } ;
 
 HELP: clear
 { $description "Clears the data stack." } ;
