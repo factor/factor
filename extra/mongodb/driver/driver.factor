@@ -193,6 +193,9 @@ M: mdb-query-msg skip
 : sort ( mdb-query-msg sort-quot -- mdb-query-msg )
     output>array [ 1array >hashtable ] map >>orderby ; inline
 
+: filter-fields ( mdb-query-msg filterseq -- mdb-query-msg )
+    [ asc ] map >hashtable >>returnfields ; inline
+
 : key-spec ( spec-quot -- spec-assoc )
     output>array >hashtable ; inline
 
