@@ -221,18 +221,22 @@ DEF(void,c_to_factor,(cell quot, void *vm)):
 	blr
 
 DEF(void,set_callstack,(void *vm, stack_frame *to, stack_frame *from, cell length, void *memcpy)):
-	/* Compute new stack pointer */
+	/* Save VM pointer in non-volatile register */
+	mr VM_REG,r3
+
+    /* Compute new stack pointer */
 	sub r1,r4,r6
 
 	/* Call memcpy() */
-	mr r4,r1
+	mr r3,r1
+	mr r4,r5
+	mr r5,r6
 	stwu r1,-64(r1)
 	mtlr r7
 	blrl
 	lwz r1,0(r1)
 
 	/* Load context */
-	mr VM_REG,r3
 	lwz r16,0(VM_REG)
 
 	/* Load ctx->datastack */
