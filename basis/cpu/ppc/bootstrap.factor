@@ -28,13 +28,13 @@ CONSTANT: vm-reg 15
 : jit-save-context ( -- )
     4 vm-reg 0 LWZ
     1 4 0 STW
-    ds-reg vm-reg 8 STW
-    rs-reg vm-reg 12 STW ;
+    ds-reg 4 8 STW
+    rs-reg 4 12 STW ;
 
-: jit-load-context ( -- )
+: jit-restore-context ( -- )
     4 vm-reg 0 LWZ
-    ds-reg vm-reg 8 LWZ
-    rs-reg vm-reg 12 LWZ ;
+    ds-reg 4 8 LWZ
+    rs-reg 4 12 LWZ ;
 
 [
     0 3 LOAD32 rc-absolute-ppc-2/2 rt-literal jit-rel
@@ -68,7 +68,7 @@ CONSTANT: vm-reg 15
     0 4 LOAD32 rc-absolute-ppc-2/2 rt-primitive jit-rel
     4 MTLR
     BLRL
-    jit-load-context
+    jit-restore-context
 ] jit-primitive jit-define
 
 [ 0 BL rc-relative-ppc-3 rt-xt-pic jit-rel ] jit-word-call jit-define
@@ -197,6 +197,30 @@ CONSTANT: vm-reg 15
 [
     [ BNE ] [ 0 B rc-relative-ppc-3 rt-xt jit-rel ] jit-conditional*
 ] pic-hit jit-define
+
+! Inline cache miss entry points
+: jit-load-return-address ( -- ) 6 MFLR ;
+
+! These are always in tail position with an existing stack
+! frame, and the stack. The frame setup takes this into account.
+: jit-inline-cache-miss ( -- )
+    jit-save-context
+    3 6 MR
+    4 vm-reg MR
+    0 5 LOAD32 "inline_cache_miss" f rc-absolute-ppc-2/2 jit-dlsym
+    5 MTLR
+    BLRL
+    jit-restore-context ;
+
+[ jit-load-return-address jit-inline-cache-miss ]
+[ 3 MTLR BLRL ]
+[ 3 MTCTR BCTR ]
+\ inline-cache-miss define-sub-primitive*
+
+[ jit-inline-cache-miss ]
+[ 3 MTLR BLRL ]
+[ 3 MTCTR BCTR ]
+\ inline-cache-miss-tail define-sub-primitive*
 
 ! ! ! Megamorphic caches
 
@@ -502,35 +526,12 @@ CONSTANT: vm-reg 15
     rs-reg 3 rs-reg SUBF
 ] \ drop-locals define-sub-primitive
 
-! Inline cache miss entry points
-: jit-load-return-address ( -- ) 6 MFLR ;
-
-! These are always in tail position with an existing stack
-! frame, and the stack. The frame setup takes this into account.
-: jit-inline-cache-miss ( -- )
-    jit-save-context
-    3 6 MR
-    4 vm-reg MR
-    0 5 LOAD32 "inline_cache_miss" f rc-absolute-ppc-2/2 jit-dlsym
-    5 MTLR
-    BLRL ;
-
-[ jit-load-return-address jit-inline-cache-miss ]
-[ 3 MTLR BLRL ]
-[ 3 MTCTR BCTR ]
-\ inline-cache-miss define-sub-primitive*
-
-[ jit-inline-cache-miss ]
-[ 3 MTLR BLRL ]
-[ 3 MTCTR BCTR ]
-\ inline-cache-miss-tail define-sub-primitive*
-
 ! Overflowing fixnum arithmetic
 :: jit-overflow ( insn func -- )
-    jit-save-context
-    3 ds-reg -4 LWZ
-    4 ds-reg 0 LWZ
     ds-reg ds-reg 4 SUBI
+    jit-save-context
+    3 ds-reg 0 LWZ
+    4 ds-reg 4 LWZ
     0 0 LI
     0 MTXER
     6 4 3 insn call( d a s -- )
@@ -549,11 +550,11 @@ CONSTANT: vm-reg 15
 [ [ SUBFO. ] "overflow_fixnum_subtract" jit-overflow ] \ fixnum- define-sub-primitive
 
 [
+    ds-reg ds-reg 4 SUBI
     jit-save-context
     3 ds-reg 0 LWZ
     3 3 tag-bits get SRAWI
-    4 ds-reg -4 LWZ
-    ds-reg ds-reg 4 SUBI
+    4 ds-reg 4 LWZ
     0 0 LI
     0 MTXER
     6 3 4 MULLWO.
