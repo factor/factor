@@ -63,20 +63,6 @@ check_ret() {
     fi
 }
 
-check_gcc_version() {
-    $ECHO -n "Checking gcc version..."
-    GCC_VERSION=`$CC --version`
-    check_ret gcc
-    if [[ $GCC_VERSION == *3.3.* ]] ; then
-        $ECHO "You have a known buggy version of gcc (3.3)"
-        $ECHO "Install gcc 3.4 or higher and try again."
-        exit_script 3
-    elif [[ $GCC_VERSION == *4.3.* ]] ; then
-       MAKE_OPTS="$MAKE_OPTS SITE_CFLAGS=-fno-forward-propagate"
-    fi
-    $ECHO "ok."
-}
-
 set_downloader() {
     test_program_installed wget curl
     if [[ $? -ne 0 ]] ; then
@@ -124,7 +110,6 @@ check_installed_programs() {
     ensure_program_installed make gmake
     ensure_program_installed md5sum md5
     ensure_program_installed cut
-    check_gcc_version
 }
 
 check_library_exists() {

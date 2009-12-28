@@ -101,9 +101,9 @@ string *factor_vm::allot_string(cell capacity, cell fill)
 
 void factor_vm::primitive_string()
 {
-	cell initial = to_cell(dpop());
+	cell initial = to_cell(ctx->pop());
 	cell length = unbox_array_size();
-	dpush(tag<string>(allot_string(length,initial)));
+	ctx->push(tag<string>(allot_string(length,initial)));
 }
 
 bool factor_vm::reallot_string_in_place_p(string *str, cell capacity)
@@ -157,32 +157,32 @@ string* factor_vm::reallot_string(string *str_, cell capacity)
 
 void factor_vm::primitive_resize_string()
 {
-	data_root<string> str(dpop(),this);
+	data_root<string> str(ctx->pop(),this);
 	str.untag_check(this);
 	cell capacity = unbox_array_size();
-	dpush(tag<string>(reallot_string(str.untagged(),capacity)));
+	ctx->push(tag<string>(reallot_string(str.untagged(),capacity)));
 }
 
 void factor_vm::primitive_string_nth()
 {
-	string *str = untag<string>(dpop());
-	cell index = untag_fixnum(dpop());
-	dpush(tag_fixnum(str->nth(index)));
+	string *str = untag<string>(ctx->pop());
+	cell index = untag_fixnum(ctx->pop());
+	ctx->push(tag_fixnum(str->nth(index)));
 }
 
 void factor_vm::primitive_set_string_nth_fast()
 {
-	string *str = untag<string>(dpop());
-	cell index = untag_fixnum(dpop());
-	cell value = untag_fixnum(dpop());
+	string *str = untag<string>(ctx->pop());
+	cell index = untag_fixnum(ctx->pop());
+	cell value = untag_fixnum(ctx->pop());
 	set_string_nth_fast(str,index,value);
 }
 
 void factor_vm::primitive_set_string_nth_slow()
 {
-	string *str = untag<string>(dpop());
-	cell index = untag_fixnum(dpop());
-	cell value = untag_fixnum(dpop());
+	string *str = untag<string>(ctx->pop());
+	cell index = untag_fixnum(ctx->pop());
+	cell value = untag_fixnum(ctx->pop());
 	set_string_nth_slow(str,index,value);
 }
 

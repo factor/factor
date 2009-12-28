@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image.private kernel namespaces system
-cpu.x86.assembler cpu.x86.assembler.operands layouts
+USING: bootstrap.image.private kernel kernel.private namespaces
+system cpu.x86.assembler cpu.x86.assembler.operands layouts
 vocabs parser compiler.constants sequences math math.private
 generic.single.private ;
 IN: bootstrap.x86
@@ -12,8 +12,6 @@ IN: bootstrap.x86
 : shift-arg ( -- reg ) ECX ;
 : div-arg ( -- reg ) EAX ;
 : mod-arg ( -- reg ) EDX ;
-: arg1 ( -- reg ) EAX ;
-: arg2 ( -- reg ) EDX ;
 : temp0 ( -- reg ) EAX ;
 : temp1 ( -- reg ) EDX ;
 : temp2 ( -- reg ) ECX ;
@@ -34,19 +32,50 @@ IN: bootstrap.x86
     ESP stack-frame-size 3 bootstrap-cells - SUB
 ] jit-prolog jit-define
 
+: jit-load-vm ( -- )
+    EBP 0 MOV 0 rc-absolute-cell jit-vm ;
+
 : jit-save-context ( -- )
-    EAX 0 [] MOV rc-absolute-cell rt-context jit-rel
-    ! save stack pointer
-    ECX ESP -4 [+] LEA
-    EAX [] ECX MOV ;
+    ! VM pointer must be in EBP already
+    ECX EBP [] MOV
+    ! save ctx->callstack_top
+    EAX ESP -4 [+] LEA
+    ECX [] EAX MOV
+    ! save ctx->datastack
+    ECX 8 [+] ds-reg MOV
+    ! save ctx->retainstack
+    ECX 12 [+] rs-reg MOV ;
+
+: jit-restore-context ( -- )
+    ! VM pointer must be in EBP already
+    ECX EBP [] MOV
+    ! restore ctx->datastack
+    ds-reg ECX 8 [+] MOV
+    ! restore ctx->retainstack
+    rs-reg ECX 12 [+] MOV ;
 
 [
+    jit-load-vm
+    ! save ds, rs registers
     jit-save-context
-    ! pass vm ptr to primitive
-    EAX 0 MOV rc-absolute-cell rt-vm jit-rel
     ! call the primitive
+    ESP [] EBP MOV
     0 CALL rc-relative rt-primitive jit-rel
+    ! restore ds, rs registers
+    jit-restore-context
 ] jit-primitive jit-define
+
+[
+    ! load from stack
+    EAX ds-reg [] MOV
+    ! pop stack
+    ds-reg bootstrap-cell SUB
+    ! load VM pointer
+    EDX 0 MOV 0 rc-absolute-cell jit-vm
+]
+[ EAX quot-xt-offset [+] CALL ]
+[ EAX quot-xt-offset [+] JMP ]
+\ (call) define-sub-primitive*
 
 ! Inline cache miss entry points
 : jit-load-return-address ( -- )
@@ -55,10 +84,12 @@ IN: bootstrap.x86
 ! These are always in tail position with an existing stack
 ! frame, and the stack. The frame setup takes this into account.
 : jit-inline-cache-miss ( -- )
+    jit-load-vm
     jit-save-context
-    ESP 4 [+] 0 MOV 0 rc-absolute-cell jit-vm
+    ESP 4 [+] EBP MOV
     ESP [] EBX MOV
-    0 CALL "inline_cache_miss" f rc-relative jit-dlsym ;
+    0 CALL "inline_cache_miss" f rc-relative jit-dlsym
+    jit-restore-context ;
 
 [ jit-load-return-address jit-inline-cache-miss ]
 [ EAX CALL ]
@@ -72,16 +103,19 @@ IN: bootstrap.x86
 
 ! Overflowing fixnum arithmetic
 : jit-overflow ( insn func -- )
-    jit-save-context
-    EAX ds-reg -4 [+] MOV
-    EDX ds-reg [] MOV
     ds-reg 4 SUB
+    jit-load-vm
+    jit-save-context
+    EAX ds-reg [] MOV
+    EDX ds-reg 4 [+] MOV
     ECX EAX MOV
     [ [ ECX EDX ] dip call( dst src -- ) ] dip
     ds-reg [] ECX MOV
     [ JNO ]
     [
-        ECX 0 MOV 0 rc-absolute-cell jit-vm
+        ESP [] EAX MOV
+        ESP 4 [+] EDX MOV
+        ESP 8 [+] EBP MOV
         [ 0 CALL ] dip f rc-relative jit-dlsym
     ]
     jit-conditional ;
@@ -91,20 +125,21 @@ IN: bootstrap.x86
 [ [ SUB ] "overflow_fixnum_subtract" jit-overflow ] \ fixnum- define-sub-primitive
 
 [
-    jit-save-context
-    ECX ds-reg -4 [+] MOV
-    EBX ds-reg [] MOV
-    EBX tag-bits get SAR
     ds-reg 4 SUB
+    jit-load-vm
+    jit-save-context
+    ECX ds-reg [] MOV
     EAX ECX MOV
+    EBX ds-reg 4 [+] MOV
+    EBX tag-bits get SAR
     EBX IMUL
     ds-reg [] EAX MOV
     [ JNO ]
     [
-        EAX ECX MOV
-        EAX tag-bits get SAR
-        EDX EBX MOV
-        ECX 0 MOV 0 rc-absolute-cell jit-vm
+        ECX tag-bits get SAR
+        ESP [] ECX MOV
+        ESP 4 [+] EBX MOV
+        ESP 8 [+] EBP MOV
         0 CALL "overflow_fixnum_multiply" f rc-relative jit-dlsym
     ]
     jit-conditional

@@ -12,6 +12,7 @@ big-endian on
 
 CONSTANT: ds-reg 13
 CONSTANT: rs-reg 14
+CONSTANT: vm-reg 15
 
 : factor-area-size ( -- n ) 4 bootstrap-cells ;
 
@@ -25,9 +26,15 @@ CONSTANT: rs-reg 14
     [ '[ bootstrap-cell /i 1 + @ ] ] dip jit-conditional ; inline
 
 : jit-save-context ( -- )
-    0 3 LOAD32 rc-absolute-ppc-2/2 rt-context jit-rel
-    4 3 0 LWZ
-    1 4 0 STW ;
+    4 vm-reg 0 LWZ
+    1 4 0 STW
+    ds-reg 4 8 STW
+    rs-reg 4 12 STW ;
+
+: jit-restore-context ( -- )
+    4 vm-reg 0 LWZ
+    ds-reg 4 8 LWZ
+    rs-reg 4 12 LWZ ;
 
 [
     0 3 LOAD32 rc-absolute-ppc-2/2 rt-literal jit-rel
@@ -57,10 +64,11 @@ CONSTANT: rs-reg 14
 
 [
     jit-save-context
-    0 3 LOAD32 rc-absolute-ppc-2/2 rt-vm jit-rel
+    3 vm-reg MR
     0 4 LOAD32 rc-absolute-ppc-2/2 rt-primitive jit-rel
     4 MTLR
     BLRL
+    jit-restore-context
 ] jit-primitive jit-define
 
 [ 0 BL rc-relative-ppc-3 rt-xt-pic jit-rel ] jit-word-call jit-define
@@ -190,6 +198,30 @@ CONSTANT: rs-reg 14
     [ BNE ] [ 0 B rc-relative-ppc-3 rt-xt jit-rel ] jit-conditional*
 ] pic-hit jit-define
 
+! Inline cache miss entry points
+: jit-load-return-address ( -- ) 6 MFLR ;
+
+! These are always in tail position with an existing stack
+! frame, and the stack. The frame setup takes this into account.
+: jit-inline-cache-miss ( -- )
+    jit-save-context
+    3 6 MR
+    4 vm-reg MR
+    0 5 LOAD32 "inline_cache_miss" f rc-absolute-ppc-2/2 jit-dlsym
+    5 MTLR
+    BLRL
+    jit-restore-context ;
+
+[ jit-load-return-address jit-inline-cache-miss ]
+[ 3 MTLR BLRL ]
+[ 3 MTCTR BCTR ]
+\ inline-cache-miss define-sub-primitive*
+
+[ jit-inline-cache-miss ]
+[ 3 MTLR BLRL ]
+[ 3 MTCTR BCTR ]
+\ inline-cache-miss-tail define-sub-primitive*
+
 ! ! ! Megamorphic caches
 
 [
@@ -235,7 +267,7 @@ CONSTANT: rs-reg 14
 [
     3 ds-reg 0 LWZ
     ds-reg dup 4 SUBI
-    0 4 LOAD32 0 rc-absolute-ppc-2/2 jit-vm
+    4 vm-reg MR
     5 3 quot-xt-offset LWZ
 ]
 [ 5 MTLR BLRL ]
@@ -494,45 +526,22 @@ CONSTANT: rs-reg 14
     rs-reg 3 rs-reg SUBF
 ] \ drop-locals define-sub-primitive
 
-! Inline cache miss entry points
-: jit-load-return-address ( -- ) 6 MFLR ;
-
-! These are always in tail position with an existing stack
-! frame, and the stack. The frame setup takes this into account.
-: jit-inline-cache-miss ( -- )
-    jit-save-context
-    3 6 MR
-    0 4 LOAD32 0 rc-absolute-ppc-2/2 jit-vm
-    0 5 LOAD32 "inline_cache_miss" f rc-absolute-ppc-2/2 jit-dlsym
-    5 MTLR
-    BLRL ;
-
-[ jit-load-return-address jit-inline-cache-miss ]
-[ 3 MTLR BLRL ]
-[ 3 MTCTR BCTR ]
-\ inline-cache-miss define-sub-primitive*
-
-[ jit-inline-cache-miss ]
-[ 3 MTLR BLRL ]
-[ 3 MTCTR BCTR ]
-\ inline-cache-miss-tail define-sub-primitive*
-
 ! Overflowing fixnum arithmetic
 :: jit-overflow ( insn func -- )
-    jit-save-context
-    3 ds-reg -4 LWZ
-    4 ds-reg 0 LWZ
     ds-reg ds-reg 4 SUBI
+    jit-save-context
+    3 ds-reg 0 LWZ
+    4 ds-reg 4 LWZ
     0 0 LI
     0 MTXER
     6 4 3 insn call( d a s -- )
     6 ds-reg 0 STW
     [ BNO ]
     [
-       0 5 LOAD32 0 rc-absolute-ppc-2/2 jit-vm
-       0 6 LOAD32 func f rc-absolute-ppc-2/2 jit-dlsym
-       6 MTLR
-       BLRL
+        5 vm-reg MR
+        0 6 LOAD32 func f rc-absolute-ppc-2/2 jit-dlsym
+        6 MTLR
+        BLRL
     ]
     jit-conditional* ;
 
@@ -541,11 +550,11 @@ CONSTANT: rs-reg 14
 [ [ SUBFO. ] "overflow_fixnum_subtract" jit-overflow ] \ fixnum- define-sub-primitive
 
 [
+    ds-reg ds-reg 4 SUBI
     jit-save-context
     3 ds-reg 0 LWZ
     3 3 tag-bits get SRAWI
-    4 ds-reg -4 LWZ
-    ds-reg ds-reg 4 SUBI
+    4 ds-reg 4 LWZ
     0 0 LI
     0 MTXER
     6 3 4 MULLWO.
@@ -553,7 +562,7 @@ CONSTANT: rs-reg 14
     [ BNO ]
     [
         4 4 tag-bits get SRAWI
-        0 5 LOAD32 0 rc-absolute-ppc-2/2 jit-vm
+        5 vm-reg MR
         0 6 LOAD32 "overflow_fixnum_multiply" f rc-absolute-ppc-2/2 jit-dlsym
         6 MTLR
         BLRL

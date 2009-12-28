@@ -5,22 +5,22 @@ namespace factor
 
 void factor_vm::primitive_special_object()
 {
-	fixnum e = untag_fixnum(dpeek());
-	drepl(special_objects[e]);
+	fixnum e = untag_fixnum(ctx->peek());
+	ctx->replace(special_objects[e]);
 }
 
 void factor_vm::primitive_set_special_object()
 {
-	fixnum e = untag_fixnum(dpop());
-	cell value = dpop();
+	fixnum e = untag_fixnum(ctx->pop());
+	cell value = ctx->pop();
 	special_objects[e] = value;
 }
 
 void factor_vm::primitive_identity_hashcode()
 {
-	cell tagged = dpeek();
+	cell tagged = ctx->peek();
 	object *obj = untag<object>(tagged);
-	drepl(tag_fixnum(obj->hashcode()));
+	ctx->replace(tag_fixnum(obj->hashcode()));
 }
 
 void factor_vm::compute_identity_hashcode(object *obj)
@@ -32,15 +32,15 @@ void factor_vm::compute_identity_hashcode(object *obj)
 
 void factor_vm::primitive_compute_identity_hashcode()
 {
-	object *obj = untag<object>(dpop());
+	object *obj = untag<object>(ctx->pop());
 	compute_identity_hashcode(obj);
 }
 
 void factor_vm::primitive_set_slot()
 {
-	fixnum slot = untag_fixnum(dpop());
-	object *obj = untag<object>(dpop());
-	cell value = dpop();
+	fixnum slot = untag_fixnum(ctx->pop());
+	object *obj = untag<object>(ctx->pop());
+	cell value = ctx->pop();
 
 	cell *slot_ptr = &obj->slots()[slot];
 	*slot_ptr = value;
@@ -65,7 +65,7 @@ cell factor_vm::clone_object(cell obj_)
 
 void factor_vm::primitive_clone()
 {
-	drepl(clone_object(dpeek()));
+	ctx->replace(clone_object(ctx->peek()));
 }
 
 /* Size of the object pointed to by a tagged pointer */
@@ -79,7 +79,7 @@ cell factor_vm::object_size(cell tagged)
 
 void factor_vm::primitive_size()
 {
-	box_unsigned_cell(object_size(dpop()));
+	ctx->push(allot_cell(object_size(ctx->pop())));
 }
 
 struct slot_become_visitor {
@@ -114,8 +114,8 @@ struct object_become_visitor {
    to coalesce equal but distinct quotations and wrappers. */
 void factor_vm::primitive_become()
 {
-	array *new_objects = untag_check<array>(dpop());
-	array *old_objects = untag_check<array>(dpop());
+	array *new_objects = untag_check<array>(ctx->pop());
+	array *old_objects = untag_check<array>(ctx->pop());
 
 	cell capacity = array_capacity(new_objects);
 	if(capacity != array_capacity(old_objects))
