@@ -42,16 +42,16 @@ struct slot_checker {
 		char slot_card_value = *(char *)slot_card_pointer;
 		if((slot_card_value & mask) != mask)
 		{
-			printf("card not marked\n");
-			printf("source generation: %d\n",gen);
-			printf("target generation: %d\n",target);
-			printf("object: 0x%lx\n",(cell)obj);
-			printf("object type: %ld\n",obj->type());
-			printf("slot pointer: 0x%lx\n",(cell)slot_ptr);
-			printf("slot value: 0x%lx\n",*slot_ptr);
-			printf("card of object: 0x%lx\n",object_card_pointer);
-			printf("card of slot: 0x%lx\n",slot_card_pointer);
-			printf("\n");
+			std::cout << "card not marked" << std::endl;
+			std::cout << "source generation: " << gen << std::endl;
+			std::cout << "target generation: " << target << std::endl;
+			std::cout << "object: 0x" << std::hex << (cell)obj << std::dec << std::endl;
+			std::cout << "object type: " << obj->type() << std::endl;
+			std::cout << "slot pointer: 0x" << std::hex << (cell)slot_ptr << std::dec << std::endl;
+			std::cout << "slot value: 0x" << std::hex << *slot_ptr << std::dec << std::endl;
+			std::cout << "card of object: 0x" << std::hex << object_card_pointer << std::dec << std::endl;
+			std::cout << "card of slot: 0x" << std::hex << slot_card_pointer << std::dec << std::endl;
+			std::cout << std::endl;
 			parent->factorbug();
 		}
 	}

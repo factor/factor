@@ -43,9 +43,9 @@ void factor_vm::throw_error(cell error, stack_frame *callstack_top)
 
 		/* If we had an underflow or overflow, stack pointers might be
 		out of bounds */
-		fix_stacks();
+		ctx->fix_stacks();
 
-		dpush(error);
+		ctx->push(error);
 
 		/* Errors thrown from C code pass NULL for this parameter.
 		Errors thrown from Factor code, or signal handlers, pass the
@@ -99,13 +99,13 @@ bool factor_vm::in_page(cell fault, cell area, cell area_size, int offset)
 
 void factor_vm::memory_protection_error(cell addr, stack_frame *native_stack)
 {
-	if(in_page(addr, ds_bot, 0, -1))
+	if(in_page(addr, ctx->datastack_region->start, 0, -1))
 		general_error(ERROR_DS_UNDERFLOW,false_object,false_object,native_stack);
-	else if(in_page(addr, ds_bot, ds_size, 0))
+	else if(in_page(addr, ctx->datastack_region->start, ds_size, 0))
 		general_error(ERROR_DS_OVERFLOW,false_object,false_object,native_stack);
-	else if(in_page(addr, rs_bot, 0, -1))
+	else if(in_page(addr, ctx->retainstack_region->start, 0, -1))
 		general_error(ERROR_RS_UNDERFLOW,false_object,false_object,native_stack);
-	else if(in_page(addr, rs_bot, rs_size, 0))
+	else if(in_page(addr, ctx->retainstack_region->start, rs_size, 0))
 		general_error(ERROR_RS_OVERFLOW,false_object,false_object,native_stack);
 	else if(in_page(addr, nursery.end, 0, 0))
 		critical_error("allot_object() missed GC check",0);
@@ -130,7 +130,7 @@ void factor_vm::fp_trap_error(unsigned int fpu_status, stack_frame *signal_calls
 
 void factor_vm::primitive_call_clear()
 {
-	throw_impl(dpop(),ctx->callstack_bottom,this);
+	throw_impl(ctx->pop(),ctx->callstack_bottom,this);
 }
 
 /* For testing purposes */

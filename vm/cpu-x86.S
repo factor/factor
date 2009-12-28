@@ -1,35 +1,3 @@
-DEF(F_FASTCALL void,c_to_factor,(CELL quot, void *vm)):
-	PUSH_NONVOLATILE
-	mov ARG0,NV0
-	mov ARG1,NV1
-
-    /* Save old stack pointer and align */
-    mov STACK_REG,ARG0
-    and $-16,STACK_REG
-    add $CELL_SIZE,STACK_REG
-    push ARG0
-
-	/* Create register shadow area for Win64 */
-	sub $32,STACK_REG
-
-	/* Save stack pointer */
-	lea -CELL_SIZE(STACK_REG),ARG0
-	call MANGLE(save_callstack_bottom)
-
-	/* Call quot-xt */
-	mov NV0,ARG0
-	mov NV1,ARG1
-	call *QUOT_XT_OFFSET(ARG0)
-
-	/* Tear down register shadow area */
-	add $32,STACK_REG
-
-    /* Undo stack alignment */
-    mov (STACK_REG),STACK_REG
-
-	POP_NONVOLATILE
-	ret
-
 /* cpu.x86.features calls this */
 DEF(bool,sse_version,(void)):
 	mov $0x1,RETURN_REG

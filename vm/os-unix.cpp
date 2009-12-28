@@ -92,8 +92,8 @@ void factor_vm::ffi_dlclose(dll *dll)
 void factor_vm::primitive_existsp()
 {
 	struct stat sb;
-	char *path = (char *)(untag_check<byte_array>(dpop()) + 1);
-	box_boolean(stat(path,&sb) >= 0);
+	char *path = (char *)(untag_check<byte_array>(ctx->pop()) + 1);
+	ctx->push(tag_boolean(stat(path,&sb) >= 0));
 }
 
 segment::segment(cell size_, bool executable_p)

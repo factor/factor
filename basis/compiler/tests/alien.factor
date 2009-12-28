@@ -94,6 +94,8 @@ FUNCTION: TINY ffi_test_17 int x ;
 
 { 1 1 } [ indirect-test-1 ] must-infer-as
 
+[ B{ } indirect-test-1 ] [ { "kernel-error" 3 6 B{ } } = ] must-fail-with
+
 [ 3 ] [ &: ffi_test_1 indirect-test-1 ] unit-test
 
 : indirect-test-1' ( ptr -- )

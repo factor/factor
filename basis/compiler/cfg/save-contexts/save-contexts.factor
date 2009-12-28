@@ -17,19 +17,10 @@ IN: compiler.cfg.save-contexts
         } 1||
     ] any? ;
 
-: needs-callback-context? ( insns -- ? )
-    [
-        {
-            [ ##alien-invoke? ]
-            [ ##alien-indirect? ]
-        } 1||
-    ] any? ;
-
 : insert-save-context ( bb -- )
     dup instructions>> dup needs-save-context? [
         int-rep next-vreg-rep
         int-rep next-vreg-rep
-        pick needs-callback-context?
         \ ##save-context new-insn prefix
         >>instructions drop
     ] [ 2drop ] if ;

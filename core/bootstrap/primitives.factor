@@ -430,7 +430,7 @@ tuple
     { "callstack" "kernel" (( -- cs )) }
     { "set-datastack" "kernel" (( ds -- )) }
     { "set-retainstack" "kernel" (( rs -- )) }
-    { "set-callstack" "kernel" (( cs -- )) }
+    { "set-callstack" "kernel" (( cs -- * )) }
     { "(exit)" "system" (( n -- )) }
     { "data-room" "memory" (( -- data-room )) }
     { "code-room" "memory" (( -- code-room )) }
@@ -503,7 +503,7 @@ tuple
     { "innermost-frame-executing" "kernel.private" (( callstack -- obj )) }
     { "innermost-frame-scan" "kernel.private" (( callstack -- n )) }
     { "set-innermost-frame-quot" "kernel.private" (( n callstack -- )) }
-    { "call-clear" "kernel" (( quot -- )) }
+    { "call-clear" "kernel.private" (( quot -- * )) }
     { "resize-byte-array" "byte-arrays" (( n byte-array -- newbyte-array )) }
     { "dll-valid?" "alien.libraries" (( dll -- ? )) }
     { "unimplemented" "kernel.private" (( -- * )) }
