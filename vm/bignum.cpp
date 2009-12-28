@@ -329,6 +329,7 @@ bignum *factor_vm::bignum_remainder(bignum * numerator, bignum * denominator)
 		}
 }
 
+/* allocates memory */
 #define FOO_TO_BIGNUM(name,type,utype)					\
 bignum * factor_vm::name##_to_bignum(type n)				\
 {									\
@@ -358,13 +359,13 @@ bignum * factor_vm::name##_to_bignum(type n)				\
 		return (result);					\
 	}								\
 }
-  
-/* all below allocate memory */
+
 FOO_TO_BIGNUM(cell,cell,cell)
 FOO_TO_BIGNUM(fixnum,fixnum,cell)
 FOO_TO_BIGNUM(long_long,s64,u64)
 FOO_TO_BIGNUM(ulong_long,u64,u64)
 
+/* cannot allocate memory */
 #define BIGNUM_TO_FOO(name,type,utype)					\
 	type factor_vm::bignum_to_##name(bignum * bignum)		\
 	{								\
@@ -380,7 +381,6 @@ FOO_TO_BIGNUM(ulong_long,u64,u64)
 		}							\
 	}
 
-/* all of the below allocate memory */
 BIGNUM_TO_FOO(cell,cell,cell);
 BIGNUM_TO_FOO(fixnum,fixnum,cell);
 BIGNUM_TO_FOO(long_long,s64,u64)

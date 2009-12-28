@@ -88,9 +88,9 @@ cell factor_vm::lookup_method(cell obj, cell methods)
 
 void factor_vm::primitive_lookup_method()
 {
-	cell methods = dpop();
-	cell obj = dpop();
-	dpush(lookup_method(obj,methods));
+	cell methods = ctx->pop();
+	cell obj = ctx->pop();
+	ctx->push(lookup_method(obj,methods));
 }
 
 cell factor_vm::object_class(cell obj)
@@ -120,17 +120,17 @@ void factor_vm::primitive_mega_cache_miss()
 {
 	dispatch_stats.megamorphic_cache_misses++;
 
-	cell cache = dpop();
-	fixnum index = untag_fixnum(dpop());
-	cell methods = dpop();
+	cell cache = ctx->pop();
+	fixnum index = untag_fixnum(ctx->pop());
+	cell methods = ctx->pop();
 
-	cell object = ((cell *)ds)[-index];
+	cell object = ((cell *)ctx->datastack)[-index];
 	cell klass = object_class(object);
 	cell method = lookup_method(object,methods);
 
 	update_method_cache(cache,klass,method);
 
-	dpush(method);
+	ctx->push(method);
 }
 
 void factor_vm::primitive_reset_dispatch_stats()
@@ -140,7 +140,7 @@ void factor_vm::primitive_reset_dispatch_stats()
 
 void factor_vm::primitive_dispatch_stats()
 {
-	dpush(tag<byte_array>(byte_array_from_value(&dispatch_stats)));
+	ctx->push(tag<byte_array>(byte_array_from_value(&dispatch_stats)));
 }
 
 void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index, cell cache_)
