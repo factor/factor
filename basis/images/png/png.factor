@@ -291,7 +291,7 @@ ERROR: invalid-color-type/bit-depth loading-png ;
     { 8 16 } validate-bit-depth ;
 
 : pad-bitmap ( image -- image )
-    dup dim>> first 4 divisor? [
+    dup dim>> second 4 divisor? [
         dup [ bytes-per-pixel ]
         [ dim>> first * ]
         [ dim>> first 4 mod ] tri
