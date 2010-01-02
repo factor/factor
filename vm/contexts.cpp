@@ -8,7 +8,6 @@ context::context(cell ds_size, cell rs_size) :
 	callstack_bottom(NULL),
 	datastack(0),
 	retainstack(0),
-	magic_frame(NULL),
 	datastack_region(new segment(ds_size,false)),
 	retainstack_region(new segment(rs_size,false)),
 	catchstack_save(0),
@@ -41,14 +40,12 @@ void factor_vm::dealloc_context(context *old_context)
 }
 
 /* called on entry into a compiled callback */
-void factor_vm::nest_stacks(stack_frame *magic_frame)
+void factor_vm::nest_stacks()
 {
 	context *new_ctx = alloc_context();
 
 	new_ctx->callstack_bottom = (stack_frame *)-1;
 	new_ctx->callstack_top = (stack_frame *)-1;
-
-	new_ctx->magic_frame = magic_frame;
 
 	/* save per-callback special_objects */
 	new_ctx->current_callback_save = special_objects[OBJ_CURRENT_CALLBACK];
@@ -61,9 +58,9 @@ void factor_vm::nest_stacks(stack_frame *magic_frame)
 	ctx = new_ctx;
 }
 
-void nest_stacks(stack_frame *magic_frame, factor_vm *parent)
+void nest_stacks(factor_vm *parent)
 {
-	return parent->nest_stacks(magic_frame);
+	return parent->nest_stacks();
 }
 
 /* called when leaving a compiled callback */

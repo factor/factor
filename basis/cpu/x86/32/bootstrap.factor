@@ -18,6 +18,8 @@ IN: bootstrap.x86
 : temp3 ( -- reg ) EBX ;
 : safe-reg ( -- reg ) EAX ;
 : stack-reg ( -- reg ) ESP ;
+: frame-reg ( -- reg ) EBP ;
+: nv-regs ( -- seq ) { ESI EDI EBX } ;
 : ds-reg ( -- reg ) ESI ;
 : rs-reg ( -- reg ) EDI ;
 : fixnum>slot@ ( -- ) temp0 2 SAR ;

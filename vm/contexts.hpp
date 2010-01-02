@@ -13,18 +13,6 @@ struct context {
 	/* current retain stack top pointer */
 	cell retainstack;
 
-	/* callback-bottom stack frame, or NULL for top-level context.
-	When nest_stacks() is called, callstack layout with callbacks
-	is as follows:
-	
-	[ C function ]
-	[ callback stub in code heap ] <-- this is the magic frame
-	[ native frame: c_to_factor() ]
-	[ callback quotation frame ] <-- first call frame in call stack
-	
-	magic frame is retained so that it's XT can be traced and forwarded. */
-	stack_frame *magic_frame;
-
 	/* memory region holding current datastack */
 	segment *datastack_region;
 
@@ -86,7 +74,7 @@ struct context {
 	}
 };
 
-VM_C_API void nest_stacks(stack_frame *magic_frame, factor_vm *vm);
+VM_C_API void nest_stacks(factor_vm *vm);
 VM_C_API void unnest_stacks(factor_vm *vm);
 
 }

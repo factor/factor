@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces make math math.order math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
@@ -495,11 +495,6 @@ TUPLE: callback-context ;
         [ callback-return-quot ] tri 3append ,
         [ callback-context new do-callback ] %
     ] [ ] make ;
-
-M: ##callback-return generate-insn
-    #! All the extra book-keeping for %unwind is only for x86.
-    #! On other platforms its an alias for %return.
-    params>> %callback-return ;
 
 M: ##alien-callback generate-insn
     params>>
