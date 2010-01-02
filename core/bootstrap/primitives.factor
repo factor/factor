@@ -518,7 +518,7 @@ tuple
     { "quot-compiled?" "quotations" (( quot -- ? )) }
     { "vm-ptr" "vm" (( -- ptr )) }
     { "strip-stack-traces" "kernel.private" (( -- )) }
-    { "<callback>" "alien" (( word -- alien )) }
+    { "<callback>" "alien" (( return-rewind word -- alien )) }
     { "enable-gc-events" "memory" (( -- )) }
     { "disable-gc-events" "memory" (( -- events )) }
     { "(identity-hashcode)" "kernel.private" (( obj -- code )) }
