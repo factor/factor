@@ -34,13 +34,10 @@ TUPLE: label offset ;
     dup label? [ get ] unless
     compiled-offset >>offset drop ;
 
-: offset-for-class ( class -- n )
-    rc-absolute-cell = cell 4 ? compiled-offset swap - ;
-
 TUPLE: label-fixup { label label } { class integer } { offset integer } ;
 
 : label-fixup ( label class -- )
-    dup offset-for-class \ label-fixup boa label-table get push ;
+    compiled-offset \ label-fixup boa label-table get push ;
 
 ! Relocation table
 SYMBOL: relocation-table
@@ -53,7 +50,7 @@ SYMBOL: relocation-table
     { 0 24 28 } bitfield relocation-table get push-4 ;
 
 : rel-fixup ( class type -- )
-    swap dup offset-for-class add-relocation-entry ;
+    swap compiled-offset add-relocation-entry ;
 
 : add-dlsym-parameters ( symbol dll -- )
     [ string>symbol add-parameter ] [ add-parameter ] bi* ;

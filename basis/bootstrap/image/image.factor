@@ -109,12 +109,11 @@ SYMBOL: jit-relocations
 
 SYMBOL: jit-offset
 
-: compute-offset ( rc -- offset )
-    [ building get length jit-offset get + ] dip
-    rc-absolute-cell = bootstrap-cell 4 ? - ;
+: compute-offset ( -- offset )
+    building get length jit-offset get + ;
 
 : jit-rel ( rc rt -- )
-    over compute-offset 3array jit-relocations get push-all ;
+    compute-offset 3array jit-relocations get push-all ;
 
 SYMBOL: jit-parameters
 

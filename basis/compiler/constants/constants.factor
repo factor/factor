@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel layouts system strings words quotations byte-arrays
 alien arrays literals sequences ;
@@ -37,6 +37,7 @@ CONSTANT: rc-relative-ppc-3 6
 CONSTANT: rc-relative-arm-3 7
 CONSTANT: rc-indirect-arm 8
 CONSTANT: rc-indirect-arm-pc 9
+CONSTANT: rc-absolute-2 10
 
 ! Relocation types
 CONSTANT: rt-primitive 0

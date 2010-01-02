@@ -18,9 +18,9 @@ DEF(void,c_to_factor,(cell quot, void *vm)):
 	push %edi
 
 	/* Save old stack pointer and align */
-	mov %esp,%ebp
+	mov %esp,%ebx
 	and $-16,%esp
-	push %ebp
+	push %ebx
 
 	/* Set up stack frame for the call to the boot quotation */
 	sub $4,%esp
@@ -49,8 +49,7 @@ DEF(void,c_to_factor,(cell quot, void *vm)):
 	add $4,%esp
 
 	/* Undo stack alignment */
-	pop %ebp
-	mov %ebp,%esp
+	mov (%esp),%esp
 
 	/* Load context */
 	mov (%edx),%ecx

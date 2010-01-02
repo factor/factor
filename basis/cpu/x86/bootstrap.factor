@@ -8,6 +8,49 @@ IN: bootstrap.x86
 
 big-endian off
 
+! C to Factor entry point
+[
+    ! Optimizing compiler's side of callback accesses
+    ! arguments that are on the stack via the frame pointer.
+    ! On x86-64, some arguments are passed in registers, and
+    ! so the only register that is safe for use here is safe-reg.
+    frame-reg PUSH
+    frame-reg stack-reg MOV
+
+    ! Save all non-volatile registers
+    nv-regs [ PUSH ] each
+
+    ! Save old stack pointer and align
+    safe-reg stack-reg MOV
+    stack-reg bootstrap-cell SUB
+    stack-reg -16 AND
+    stack-reg [] safe-reg MOV
+
+    ! Register shadow area - only required on Win64, but doesn't
+    ! hurt on other platforms
+    stack-reg 32 SUB
+
+    ! Call into Factor code
+    safe-reg 0 MOV rc-absolute-cell rt-xt jit-rel
+    safe-reg CALL
+
+    ! Tear down register shadow area
+    stack-reg 32 ADD
+
+    ! Undo stack alignment
+    stack-reg stack-reg [] MOV
+
+    ! Restore non-volatile registers
+    nv-regs <reversed> [ POP ] each
+
+    frame-reg POP
+
+    ! Callbacks which return structs, or use stdcall, need a
+    ! parameter here. See the comment in callback-return-rewind
+    ! in cpu.x86.32
+    HEX: ffff RET rc-absolute-2 rt-untagged jit-rel
+] callback-stub jit-define
+
 [
     ! Load word
     temp0 0 MOV rc-absolute-cell rt-literal jit-rel
@@ -205,11 +248,6 @@ big-endian off
     temp0 word-xt-offset [+] JMP
     ! fall-through on miss
 ] mega-lookup jit-define
-
-[
-    safe-reg 0 MOV rc-absolute-cell rt-xt jit-rel
-    safe-reg JMP
-] callback-stub jit-define
 
 ! ! ! Sub-primitives
 

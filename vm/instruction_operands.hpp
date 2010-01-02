@@ -54,7 +54,9 @@ enum relocation_class {
 	/* pointer to address in an ARM LDR/STR instruction */
 	RC_INDIRECT_ARM,
 	/* pointer to address in an ARM LDR/STR instruction offset by 8 bytes */
-	RC_INDIRECT_ARM_PC
+	RC_INDIRECT_ARM_PC,
+	/* absolute address in a 16-bit location */
+	RC_ABSOLUTE_2
 };
 
 static const cell rel_absolute_ppc_2_mask = 0xffff;

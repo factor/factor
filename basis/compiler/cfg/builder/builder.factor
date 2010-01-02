@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators hashtables kernel
 math fry namespaces make sequences words byte-arrays
@@ -240,9 +240,9 @@ M: #alien-callback emit-node
     dup params>> xt>> dup
     [
         ##prologue
-        dup [ ##alien-callback ] emit-alien-node
+        [ ##alien-callback ] emit-alien-node
         ##epilogue
-        params>> ##callback-return
+        ##return
     ] with-cfg-builder ;
 
 ! No-op nodes
