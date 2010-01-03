@@ -15,7 +15,10 @@ IN: cpu.ppc
 
 ! PowerPC register assignments:
 ! r2-r12: integer vregs
-! r15-r29
+! r13: data stack
+! r14: retain stack
+! r15: VM pointer
+! r16-r29: integer vregs
 ! r30: integer scratch
 ! f0-f29: float vregs
 ! f30: float scratch
@@ -31,18 +34,9 @@ enable-float-intrinsics
 \ ##float>integer t frame-required? set-word-prop
 >>
 
-: %load-vm-addr ( reg -- )
-    0 swap LOAD32 0 rc-absolute-ppc-2/2 rel-vm ;
-
-: %load-vm-field-addr ( reg symbol -- )
-    [ 0 swap LOAD32 ] dip
-    vm-field-offset rc-absolute-ppc-2/2 rel-vm ;
-
-M: ppc %vm-field-ptr ( dst field -- ) %load-vm-field-addr ;
-
 M: ppc machine-registers
     {
-        { int-regs $[ 2 12 [a,b] 15 29 [a,b] append ] }
+        { int-regs $[ 2 12 [a,b] 16 29 [a,b] append ] }
         { float-regs $[ 0 29 [a,b] ] }
     } ;
 
@@ -59,6 +53,14 @@ M: ppc %alien-global ( register symbol dll -- )
 
 CONSTANT: ds-reg 13
 CONSTANT: rs-reg 14
+CONSTANT: vm-reg 15
+
+: %load-vm-addr ( reg -- ) vm-reg MR ;
+
+: %load-vm-field-addr ( reg symbol -- )
+    [ vm-reg ] dip vm-field-offset ADDI ;
+
+M: ppc %vm-field-ptr ( dst field -- ) %load-vm-field-addr ;
 
 GENERIC: loc-reg ( loc -- reg )
 
@@ -593,6 +595,31 @@ M:: ppc %load-param-reg ( stack reg rep -- )
 M: ppc %pop-stack ( n -- )
     [ 3 ] dip <ds-loc> loc>operand LWZ ;
 
+M: ppc %push-stack ( -- )
+    ds-reg ds-reg 4 ADDI
+    int-regs return-reg ds-reg 0 STW ;
+
+:: %load-context-datastack ( dst -- )
+    ! Load context struct
+    dst "ctx" %vm-field-ptr
+    dst dst 0 LWZ
+    ! Load context datastack pointer
+    dst dst "datastack" context-field-offset ADDI ;
+
+M: ppc %push-context-stack ( -- )
+    11 %load-context-datastack
+    12 11 0 LWZ
+    12 12 4 ADDI
+    12 11 0 STW
+    int-regs return-reg 12 0 STW ;
+
+M: ppc %pop-context-stack ( -- )
+    11 %load-context-datastack
+    12 11 0 LWZ
+    int-regs return-reg 12 0 LWZ
+    12 12 4 SUBI
+    12 11 0 STW ;
+
 M: ppc %unbox ( n rep func -- )
     ! Value must be in r3
     4 %load-vm-addr
@@ -652,17 +679,15 @@ M: ppc %box-large-struct ( n c-type -- )
     ! Call the function
     "from_value_struct" f %alien-invoke ;
 
-M:: ppc %save-context ( temp1 temp2 callback-allowed? -- )
+M:: ppc %save-context ( temp1 temp2 -- )
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
     temp1 "ctx" %load-vm-field-addr
     temp1 temp1 0 LWZ
     1 temp1 0 STW
-    callback-allowed? [
-        ds-reg temp1 8 STW
-        rs-reg temp1 12 STW
-    ] when ;
+    ds-reg temp1 8 STW
+    rs-reg temp1 12 STW ;
 
 M: ppc %alien-invoke ( symbol dll -- )
     [ 11 ] 2dip %alien-global 11 MTLR BLRL ;
@@ -674,11 +699,11 @@ M: ppc %alien-callback ( quot -- )
 
 M: ppc %prepare-alien-indirect ( -- )
     3 %load-vm-addr
-    "unbox_alien" f %alien-invoke
-    15 3 MR ;
+    "from_alien" f %alien-invoke
+    16 3 MR ;
 
 M: ppc %alien-indirect ( -- )
-    15 MTLR BLRL ;
+    16 MTLR BLRL ;
 
 M: ppc %callback-value ( ctype -- )
     ! Save top of data stack
