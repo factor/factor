@@ -57,7 +57,7 @@ u64 nano_count()
 		hi += 1;
 	lo = count.LowPart;
 
-	return (((u64)hi << 32) | (u64)lo)*(1000000000/frequency.QuadPart);
+	return (u64)((((u64)hi << 32) | (u64)lo)*(1000000000.0/frequency.QuadPart));
 }
 
 void sleep_nanos(u64 nsec)
