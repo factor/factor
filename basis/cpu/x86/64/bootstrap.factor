@@ -17,6 +17,7 @@ IN: bootstrap.x86
 : temp3 ( -- reg ) RBX ;
 : safe-reg ( -- reg ) RAX ;
 : stack-reg ( -- reg ) RSP ;
+: frame-reg ( -- reg ) RBP ;
 : ds-reg ( -- reg ) R14 ;
 : rs-reg ( -- reg ) R15 ;
 : fixnum>slot@ ( -- ) temp0 1 SAR ;

@@ -24,6 +24,8 @@ M: x86 vector-regs float-regs ;
 
 HOOK: stack-reg cpu ( -- reg )
 
+HOOK: frame-reg cpu ( -- reg )
+
 HOOK: reserved-stack-space cpu ( -- n )
 
 HOOK: extra-stack-space cpu ( stack-frame -- n )
@@ -84,7 +86,7 @@ M: x86 %call ( word -- ) 0 CALL rc-relative rel-word-pic ;
 
 : xt-tail-pic-offset ( -- n )
     #! See the comment in vm/cpu-x86.hpp
-    cell 4 + 1 + ; inline
+    4 1 + ; inline
 
 M: x86 %jump ( word -- )
     pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here
@@ -1408,15 +1410,31 @@ M:: x86 %reload ( dst rep src -- ) dst src rep %copy ;
 
 M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
 
+M:: x86 %load-context ( temp1 temp2 -- )
+    #! Load Factor stack pointers on entry from C to Factor.
+    #! Also save callstack bottom!
+    temp1 "ctx" %vm-field-ptr
+    temp1 temp1 [] MOV
+    ! callstack_bottom
+    temp2 stack-reg stack-frame get total-size>> cell - [+] LEA
+    temp1 1 cells [+] temp2 MOV
+    ! datastack
+    ds-reg temp1 2 cells [+] MOV
+    ! retainstack
+    rs-reg temp1 3 cells [+] MOV ;
+
 M:: x86 %save-context ( temp1 temp2 -- )
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
     temp1 "ctx" %vm-field-ptr
     temp1 temp1 [] MOV
+    ! callstack_top
     temp2 stack-reg cell neg [+] LEA
     temp1 [] temp2 MOV
+    ! datastack
     temp1 2 cells [+] ds-reg MOV
+    ! retainstack
     temp1 3 cells [+] rs-reg MOV ;
 
 M: x86 value-struct? drop t ;
@@ -1432,7 +1450,7 @@ M: x86 immediate-bitwise? ( n -- ? )
     #! input values to callbacks; the callback has its own
     #! stack frame set up, and we want to read the frame
     #! set up by the caller.
-    stack-frame get total-size>> + stack@ ;
+    frame-reg swap 2 cells + [+] ;
 
 enable-min/max
 enable-fixnum-log2

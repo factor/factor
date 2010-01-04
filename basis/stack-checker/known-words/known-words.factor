@@ -709,7 +709,7 @@ M: bad-executable summary
 
 \ strip-stack-traces { } { } define-primitive
 
-\ <callback> { word } { alien } define-primitive
+\ <callback> { integer word } { alien } define-primitive
 
 \ enable-gc-events { } { } define-primitive
 \ disable-gc-events { } { object } define-primitive

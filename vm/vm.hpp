@@ -94,7 +94,7 @@ struct factor_vm
 	// contexts
 	context *alloc_context();
 	void dealloc_context(context *old_context);
-	void nest_stacks(stack_frame *magic_frame);
+	void nest_stacks();
 	void unnest_stacks();
 	void init_stacks(cell ds_size_, cell rs_size_);
 	bool stack_to_array(cell bottom, cell top);
@@ -113,7 +113,6 @@ struct factor_vm
 		while(ctx)
 		{
 			iterate_callstack(ctx,iter);
-			if(ctx->magic_frame) iter(ctx->magic_frame);
 			ctx = ctx->next;
 		}
 	}
