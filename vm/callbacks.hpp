@@ -39,7 +39,7 @@ struct callback_heap {
 	}
 
 	void update(code_block *stub);
-	code_block *add(cell owner);
+	code_block *add(cell owner, cell return_rewind);
 
 	void update();
 

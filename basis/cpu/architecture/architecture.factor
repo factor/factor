@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs generic kernel kernel.private
 math memory namespaces make sequences layouts system hashtables
@@ -550,6 +550,8 @@ HOOK: %save-param-reg cpu ( stack reg rep -- )
 
 HOOK: %load-param-reg cpu ( stack reg rep -- )
 
+HOOK: %load-context cpu ( temp1 temp2 -- )
+
 HOOK: %save-context cpu ( temp1 temp2 -- )
 
 HOOK: %prepare-var-args cpu ( -- )
@@ -574,7 +576,6 @@ HOOK: %nest-stacks cpu ( -- )
 
 HOOK: %unnest-stacks cpu ( -- )
 
-! Return to caller with stdcall unwinding (only for x86)
-HOOK: %callback-return cpu ( params -- )
+HOOK: callback-return-rewind cpu ( params -- n )
 
-M: object %callback-return drop %return ;
+M: object callback-return-rewind drop 0 ;

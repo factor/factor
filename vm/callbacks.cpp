@@ -38,7 +38,7 @@ void callback_heap::update(code_block *stub)
 	stub->flush_icache();
 }
 
-code_block *callback_heap::add(cell owner)
+code_block *callback_heap::add(cell owner, cell return_rewind)
 {
 	tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
 	tagged<byte_array> insns(array_nth(code_template.untagged(),0));
@@ -57,6 +57,24 @@ code_block *callback_heap::add(cell owner)
 	stub->relocation = false_object;
 
 	memcpy(stub->xt(),insns->data<void>(),size);
+
+	/* On x86, the RET instruction takes an argument which depends on
+	the callback's calling convention */
+	if(array_capacity(code_template.untagged()) == 7)
+	{
+		cell rel_class = untag_fixnum(array_nth(code_template.untagged(),4));
+		cell rel_type = untag_fixnum(array_nth(code_template.untagged(),5));
+		cell offset = untag_fixnum(array_nth(code_template.untagged(),6));
+
+		relocation_entry rel(
+			(relocation_type)rel_type,
+			(relocation_class)rel_class,
+			offset);
+
+		instruction_operand op(rel,stub,0);
+		op.store_value(return_rewind);
+	}
+
 	update(stub);
 
 	return stub;
@@ -81,9 +99,11 @@ void callback_heap::update()
 
 void factor_vm::primitive_callback()
 {
+	cell return_rewind = to_cell(ctx->pop());
 	tagged<word> w(ctx->pop());
+
 	w.untag_check(this);
-	ctx->push(allot_alien(callbacks->add(w.value())->xt()));
+	ctx->push(allot_alien(callbacks->add(w.value(),return_rewind)->xt()));
 }
 
 }
