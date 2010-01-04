@@ -49,8 +49,8 @@ MACRO:: slots>constructor ( class slots -- quot )
     reverse? [ reverse ] when
     '[ @ _ [ execute( obj -- obj ) ] each ] effect define-declared ;
 
-: scan-constructor ( -- class word )
-    scan-word [ name>> "<" ">" surround create-in ] keep ;
+: scan-constructor ( -- word class )
+    scan-word [ name>> "<" ">" surround create-in dup reset-generic ] keep ;
 
 : parse-constructor ( -- class word effect def )
     scan-constructor complete-effect parse-definition ;
