@@ -6,9 +6,11 @@ sequences system vocabs ;
 IN: bootstrap.x86
 
 : stack-frame-size ( -- n ) 4 bootstrap-cells ;
+: nv-regs ( -- seq ) { RBX R12 R13 R14 R15 } ;
 : arg1 ( -- reg ) RDI ;
 : arg2 ( -- reg ) RSI ;
 : arg3 ( -- reg ) RDX ;
+: arg4 ( -- reg ) RCX ;
 
 << "vocab:cpu/x86/64/bootstrap.factor" parse-file suffix! >>
 call
