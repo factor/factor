@@ -385,6 +385,11 @@ PRIVATE>
 : FLDS ( operand -- ) { BIN: 000 f HEX: d9 } 1-operand ;
 : FLDL ( operand -- ) { BIN: 000 f HEX: dd } 1-operand ;
 
+: FNSTCW ( operand -- ) { BIN: 111 f HEX: d9 } 1-operand ;
+: FLDCW ( operand -- ) { BIN: 101 f HEX: d9 } 1-operand ;
+
+: FNINIT ( -- ) HEX: db , HEX: e3 , ;
+
 ! SSE multimedia instructions
 
 <PRIVATE

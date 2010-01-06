@@ -77,7 +77,7 @@ IN: bootstrap.x86
 ]
 [ EAX quot-xt-offset [+] CALL ]
 [ EAX quot-xt-offset [+] JMP ]
-\ (call) define-sub-primitive*
+\ (call) define-combinator-primitive
 
 ! Inline cache miss entry points
 : jit-load-return-address ( -- )
@@ -96,12 +96,12 @@ IN: bootstrap.x86
 [ jit-load-return-address jit-inline-cache-miss ]
 [ EAX CALL ]
 [ EAX JMP ]
-\ inline-cache-miss define-sub-primitive*
+\ inline-cache-miss define-combinator-primitive
 
 [ jit-inline-cache-miss ]
 [ EAX CALL ]
 [ EAX JMP ]
-\ inline-cache-miss-tail define-sub-primitive*
+\ inline-cache-miss-tail define-combinator-primitive
 
 ! Overflowing fixnum arithmetic
 : jit-overflow ( insn func -- )

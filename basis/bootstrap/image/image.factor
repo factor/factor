@@ -155,7 +155,7 @@ SYMBOL: jit-literals
 : define-sub-primitive ( quot word -- )
     [ make-jit 3array ] dip sub-primitives get set-at ;
 
-: define-sub-primitive* ( quot non-tail-quot tail-quot word -- )
+: define-combinator-primitive ( quot non-tail-quot tail-quot word -- )
     [
         [ make-jit ]
         [ make-jit 2nip ]
@@ -201,6 +201,10 @@ USERENV: jit-3dip-word 38
 USERENV: jit-3dip 39
 USERENV: jit-execute 40
 USERENV: jit-declare-word 41
+
+USERENV: c-to-factor-word 42
+USERENV: lazy-jit-compile-word 43
+USERENV: unwind-native-frames-word 44
 
 USERENV: callback-stub 48
 
@@ -534,11 +538,14 @@ M: quotation '
     \ dip jit-dip-word set
     \ 2dip jit-2dip-word set
     \ 3dip jit-3dip-word set
-    \ inline-cache-miss \ pic-miss-word set
-    \ inline-cache-miss-tail \ pic-miss-tail-word set
-    \ mega-cache-lookup \ mega-lookup-word set
-    \ mega-cache-miss \ mega-miss-word set
+    \ inline-cache-miss pic-miss-word set
+    \ inline-cache-miss-tail pic-miss-tail-word set
+    \ mega-cache-lookup mega-lookup-word set
+    \ mega-cache-miss mega-miss-word set
     \ declare jit-declare-word set
+    \ c-to-factor c-to-factor-word set
+    \ lazy-jit-compile lazy-jit-compile-word set
+    \ unwind-native-frames unwind-native-frames-word set
     [ undefined ] undefined-quot set ;
 
 : emit-userenvs ( -- )

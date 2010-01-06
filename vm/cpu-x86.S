@@ -38,5 +38,4 @@ sse_1:
 #ifdef WINDOWS
 	.section .drectve
 	.ascii " -export:sse_version"
-	.ascii " -export:c_to_factor"
 #endif
