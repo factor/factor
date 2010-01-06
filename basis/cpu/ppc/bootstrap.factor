@@ -215,12 +215,12 @@ CONSTANT: vm-reg 15
 [ jit-load-return-address jit-inline-cache-miss ]
 [ 3 MTLR BLRL ]
 [ 3 MTCTR BCTR ]
-\ inline-cache-miss define-sub-primitive*
+\ inline-cache-miss define-combinator-primitive
 
 [ jit-inline-cache-miss ]
 [ 3 MTLR BLRL ]
 [ 3 MTCTR BCTR ]
-\ inline-cache-miss-tail define-sub-primitive*
+\ inline-cache-miss-tail define-combinator-primitive
 
 ! ! ! Megamorphic caches
 
@@ -271,7 +271,7 @@ CONSTANT: vm-reg 15
     5 3 quot-xt-offset LWZ
 ]
 [ 5 MTLR BLRL ]
-[ 5 MTCTR BCTR ] \ (call) define-sub-primitive*
+[ 5 MTCTR BCTR ] \ (call) define-combinator-primitive
 
 [
     3 ds-reg 0 LWZ
@@ -279,7 +279,7 @@ CONSTANT: vm-reg 15
     4 3 word-xt-offset LWZ
 ]
 [ 4 MTLR BLRL ]
-[ 4 MTCTR BCTR ] \ (execute) define-sub-primitive*
+[ 4 MTCTR BCTR ] \ (execute) define-combinator-primitive
 
 [
     3 ds-reg 0 LWZ

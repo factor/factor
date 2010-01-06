@@ -117,16 +117,13 @@ FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
 	return tls_vm()->exception_handler(pe);
 }
 
-bool handler_added = 0;
-
 void factor_vm::c_to_factor_toplevel(cell quot)
 {
-	if(!handler_added){
-		if(!AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)factor::exception_handler))
-			fatal_error("AddVectoredExceptionHandler failed", 0);
-		handler_added = 1;
-	}
-	c_to_factor(quot,this);
+	if(!AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)factor::exception_handler))
+		fatal_error("AddVectoredExceptionHandler failed", 0);
+
+	c_to_factor(quot);
+
  	RemoveVectoredExceptionHandler((void *)factor::exception_handler);
 }
 

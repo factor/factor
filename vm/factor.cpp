@@ -87,6 +87,7 @@ void factor_vm::do_stage1_init()
 
 	compile_all_words();
 	update_code_heap_words();
+	initialize_all_quotations();
 	special_objects[OBJ_STAGE2] = true_object;
 
 	std::cout << "done\n";

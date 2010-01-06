@@ -550,7 +550,7 @@ HOOK: %save-param-reg cpu ( stack reg rep -- )
 
 HOOK: %load-param-reg cpu ( stack reg rep -- )
 
-HOOK: %load-context cpu ( temp1 temp2 -- )
+HOOK: %restore-context cpu ( temp1 temp2 -- )
 
 HOOK: %save-context cpu ( temp1 temp2 -- )
 

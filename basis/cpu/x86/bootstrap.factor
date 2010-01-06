@@ -169,7 +169,7 @@ big-endian off
 ]
 [ temp0 word-xt-offset [+] CALL ]
 [ temp0 word-xt-offset [+] JMP ]
-\ (execute) define-sub-primitive*
+\ (execute) define-combinator-primitive
 
 [
     temp0 ds-reg [] MOV

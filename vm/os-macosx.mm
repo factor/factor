@@ -11,7 +11,7 @@ void factor_vm::c_to_factor_toplevel(cell quot)
 	for(;;)
 	{
 NS_DURING
-		c_to_factor(quot,this);
+		c_to_factor(quot);
 		NS_VOIDRETURN;
 NS_HANDLER
 		ctx->push(allot_alien(false_object,(cell)localException));
