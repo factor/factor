@@ -1,6 +1,6 @@
 USING: namespaces io tools.test threads kernel
 concurrency.combinators concurrency.promises locals math
-words ;
+words calendar ;
 IN: threads.tests
 
 3 "x" set
@@ -42,3 +42,5 @@ yield
 [ t ] [ spawn-namespace-test ] unit-test
 
 [ "a" [ 1 1 + ] spawn 100 sleep ] must-fail
+
+[ ] [ 0.1 seconds sleep ] unit-test
