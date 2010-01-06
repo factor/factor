@@ -9,7 +9,7 @@ STRUCT: context
 { callstack-top void* }
 { callstack-bottom void* }
 { datastack cell }
-{ callstack cell }
+{ retainstack cell }
 { magic-frame void* }
 { datastack-region void* }
 { retainstack-region void* }

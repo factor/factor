@@ -223,7 +223,7 @@ M: x86.64 %alien-indirect ( -- )
     RBP CALL ;
 
 M: x86.64 %alien-callback ( quot -- )
-    param-reg-0 param-reg-1 %load-context
+    param-reg-0 param-reg-1 %restore-context
     param-reg-0 swap %load-reference
     param-reg-1 %mov-vm-ptr
     param-reg-0 quot-xt-offset [+] CALL

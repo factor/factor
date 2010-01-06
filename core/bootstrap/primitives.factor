@@ -312,8 +312,36 @@ tuple
     [ create dup 1quotation ] dip define-declared ;
 
 {
+    { "mega-cache-lookup" "generic.single.private" (( methods index cache -- )) }
+    { "inline-cache-miss" "generic.single.private" (( generic methods index cache -- )) }
+    { "inline-cache-miss-tail" "generic.single.private" (( generic methods index cache -- )) }
+    { "drop" "kernel" (( x -- )) }
+    { "2drop" "kernel" (( x y -- )) }
+    { "3drop" "kernel" (( x y z -- )) }
+    { "dup" "kernel" (( x -- x x )) }
+    { "2dup" "kernel" (( x y -- x y x y )) }
+    { "3dup" "kernel" (( x y z -- x y z x y z )) }
+    { "rot" "kernel" (( x y z -- y z x )) }
+    { "-rot" "kernel" (( x y z -- z x y )) }
+    { "dupd" "kernel" (( x y -- x x y )) }
+    { "swapd" "kernel" (( x y z -- y x z )) }
+    { "nip" "kernel" (( x y -- y )) }
+    { "2nip" "kernel" (( x y z -- z )) }
+    { "over" "kernel" (( x y -- x y x )) }
+    { "pick" "kernel" (( x y z -- x y z x )) }
+    { "swap" "kernel" (( x y -- y x )) }
+    { "eq?" "kernel" (( obj1 obj2 -- ? )) }
+    { "tag" "kernel.private" (( object -- n )) }
     { "(execute)" "kernel.private" (( word -- )) }
     { "(call)" "kernel.private" (( quot -- )) }
+    { "unwind-native-frames" "kernel.private" (( -- )) }
+    { "set-callstack" "kernel.private" (( cs -- * )) }
+    { "lazy-jit-compile" "kernel.private" (( -- )) }
+    { "c-to-factor" "kernel.private" (( -- )) }
+    { "slot" "slots.private" (( obj m -- value )) }
+    { "get-local" "locals.backend" (( n -- obj )) }
+    { "load-local" "locals.backend" (( obj -- )) }
+    { "drop-locals" "locals.backend" (( n -- )) }
     { "both-fixnums?" "math.private" (( x y -- ? )) }
     { "fixnum+fast" "math.private" (( x y -- z )) }
     { "fixnum-fast" "math.private" (( x y -- z )) }
@@ -333,30 +361,6 @@ tuple
     { "fixnum<=" "math.private" (( x y -- z )) }
     { "fixnum>" "math.private" (( x y -- ? )) }
     { "fixnum>=" "math.private" (( x y -- ? )) }
-    { "drop" "kernel" (( x -- )) }
-    { "2drop" "kernel" (( x y -- )) }
-    { "3drop" "kernel" (( x y z -- )) }
-    { "dup" "kernel" (( x -- x x )) }
-    { "2dup" "kernel" (( x y -- x y x y )) }
-    { "3dup" "kernel" (( x y z -- x y z x y z )) }
-    { "rot" "kernel" (( x y z -- y z x )) }
-    { "-rot" "kernel" (( x y z -- z x y )) }
-    { "dupd" "kernel" (( x y -- x x y )) }
-    { "swapd" "kernel" (( x y z -- y x z )) }
-    { "nip" "kernel" (( x y -- y )) }
-    { "2nip" "kernel" (( x y z -- z )) }
-    { "over" "kernel" (( x y -- x y x )) }
-    { "pick" "kernel" (( x y z -- x y z x )) }
-    { "swap" "kernel" (( x y -- y x )) }
-    { "eq?" "kernel" (( obj1 obj2 -- ? )) }
-    { "tag" "kernel.private" (( object -- n )) }
-    { "slot" "slots.private" (( obj m -- value )) }
-    { "get-local" "locals.backend" (( n -- obj )) }
-    { "load-local" "locals.backend" (( obj -- )) }
-    { "drop-locals" "locals.backend" (( n -- )) }
-    { "mega-cache-lookup" "generic.single.private" (( methods index cache -- )) }
-    { "inline-cache-miss" "generic.single.private" (( generic methods index cache -- )) }
-    { "inline-cache-miss-tail" "generic.single.private" (( generic methods index cache -- )) }
 } [ first3 make-sub-primitive ] each
 
 ! Primitive words
@@ -428,9 +432,8 @@ tuple
     { "datastack" "kernel" (( -- ds )) }
     { "retainstack" "kernel" (( -- rs )) }
     { "callstack" "kernel" (( -- cs )) }
-    { "set-datastack" "kernel" (( ds -- )) }
-    { "set-retainstack" "kernel" (( rs -- )) }
-    { "set-callstack" "kernel" (( cs -- * )) }
+    { "set-datastack" "kernel.private" (( ds -- )) }
+    { "set-retainstack" "kernel.private" (( rs -- )) }
     { "(exit)" "system" (( n -- )) }
     { "data-room" "memory" (( -- data-room )) }
     { "code-room" "memory" (( -- code-room )) }

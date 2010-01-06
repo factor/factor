@@ -73,8 +73,8 @@ SYMBOL: ->
 
 : remove-breakpoints ( quot pos -- quot' )
     over quotation? [
-        1 + cut [ (remove-breakpoints) ] bi@
-        [ -> ] glue 
+        1 + short cut [ (remove-breakpoints) ] bi@
+        [ -> ] glue
     ] [
         drop
     ] if ;

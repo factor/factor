@@ -25,6 +25,8 @@ CONSTANT: deck-bits 18
 : word-code-offset ( -- n ) 11 \ word type-number slot-offset ; inline
 : array-start-offset ( -- n ) 2 array type-number slot-offset ; inline
 : compiled-header-size ( -- n ) 4 bootstrap-cells ; inline
+: callstack-length-offset ( -- n ) 1 \ callstack type-number slot-offset ; inline
+: callstack-top-offset ( -- n ) 2 \ callstack type-number slot-offset ; inline
 
 ! Relocation classes
 CONSTANT: rc-absolute-cell 0
