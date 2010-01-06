@@ -606,6 +606,7 @@ struct factor_vm
 	void jit_compile_quot(cell quot_, bool relocating);
 	fixnum quot_code_offset_to_scan(cell quot_, cell offset);
 	cell lazy_jit_compile(cell quot);
+	bool quot_compiled_p(quotation *quot);
 	void primitive_quot_compiled_p();
 	cell find_all_quotations();
 	void initialize_all_quotations();

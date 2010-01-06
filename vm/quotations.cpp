@@ -293,8 +293,7 @@ code_block *factor_vm::jit_compile_quot(cell owner_, cell quot_, bool relocating
 void factor_vm::jit_compile_quot(cell quot_, bool relocating)
 {
 	data_root<quotation> quot(quot_,this);
-
-	if(quot->code == NULL || quot->code == lazy_jit_compile_block())
+	if(!quot_compiled_p(quot.untagged()))
 	{
 		code_block *compiled = jit_compile_quot(quot.value(),quot.value(),relocating);
 		set_quot_xt(quot.untagged(),compiled);
@@ -356,11 +355,16 @@ VM_C_API cell lazy_jit_compile(cell quot, factor_vm *parent)
 	return parent->lazy_jit_compile(quot);
 }
 
+bool factor_vm::quot_compiled_p(quotation *quot)
+{
+	return quot->code != NULL && quot->code != lazy_jit_compile_block();
+}
+
 void factor_vm::primitive_quot_compiled_p()
 {
 	tagged<quotation> quot(ctx->pop());
 	quot.untag_check(this);
-	ctx->push(tag_boolean(quot->code != lazy_jit_compile_block()));
+	ctx->push(tag_boolean(quot_compiled_p(quot.untagged())));
 }
 
 cell factor_vm::find_all_quotations()
