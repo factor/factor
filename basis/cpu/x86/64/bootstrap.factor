@@ -4,7 +4,6 @@ USING: bootstrap.image.private kernel kernel.private namespaces
 system layouts vocabs parser compiler.constants math
 math.private cpu.x86.assembler cpu.x86.assembler.operands
 sequences generic.single.private ;
-FROM: vm => context-field-offset vm-field-offset ;
 IN: bootstrap.x86
 
 8 \ cell set
@@ -43,19 +42,19 @@ IN: bootstrap.x86
 
 : jit-load-context ( -- )
     ! VM pointer must be in vm-reg already
-    ctx-reg vm-reg "ctx" vm-field-offset [+] MOV ;
+    ctx-reg vm-reg vm-context-offset [+] MOV ;
 
 : jit-save-context ( -- )
     jit-load-context
     safe-reg RSP -8 [+] LEA
-    ctx-reg "callstack-top" context-field-offset [+] safe-reg MOV
-    ctx-reg "datastack" context-field-offset [+] ds-reg MOV
-    ctx-reg "retainstack" context-field-offset [+] rs-reg MOV ;
+    ctx-reg context-callstack-top-offset [+] safe-reg MOV
+    ctx-reg context-datastack-offset [+] ds-reg MOV
+    ctx-reg context-retainstack-offset [+] rs-reg MOV ;
 
 : jit-restore-context ( -- )
     jit-load-context
-    ds-reg ctx-reg "datastack" context-field-offset [+] MOV
-    rs-reg ctx-reg "retainstack" context-field-offset [+] MOV ;
+    ds-reg ctx-reg context-datastack-offset [+] MOV
+    rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
 [
     jit-load-vm
@@ -71,8 +70,8 @@ IN: bootstrap.x86
     jit-load-vm
     jit-restore-context
     ! save ctx->callstack_bottom
-    safe-reg stack-reg stack-frame-size bootstrap-cell - [+] LEA
-    ctx-reg "callstack-bottom" context-field-offset [+] safe-reg MOV
+    safe-reg stack-reg stack-frame-size 8 - [+] LEA
+    ctx-reg context-callstack-bottom-offset [+] safe-reg MOV
     ! call the quotation
     arg1 quot-xt-offset [+] CALL
     jit-save-context
@@ -111,7 +110,7 @@ IN: bootstrap.x86
     ! Get ctx->callstack_bottom
     jit-load-vm
     jit-load-context
-    arg1 ctx-reg "callstack-bottom" context-field-offset [+] MOV
+    arg1 ctx-reg context-callstack-bottom-offset [+] MOV
     ! Get top of callstack object -- 'src' for memcpy
     arg2 arg4 callstack-top-offset [+] LEA
     ! Get callstack length, in bytes --- 'len' for memcpy
@@ -119,6 +118,7 @@ IN: bootstrap.x86
     arg3 tag-bits get SHR
     ! Compute new stack pointer -- 'dst' for memcpy
     arg1 arg3 SUB
+    ! Install new stack pointer
     RSP arg1 MOV
     ! Call memcpy; arguments are now in the correct registers
     safe-reg 0 MOV "memcpy" f rc-absolute-cell jit-dlsym

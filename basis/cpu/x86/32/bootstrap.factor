@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2009 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.x86.assembler cpu.x86.assembler.operands layouts
@@ -19,6 +19,8 @@ IN: bootstrap.x86
 : safe-reg ( -- reg ) EAX ;
 : stack-reg ( -- reg ) ESP ;
 : frame-reg ( -- reg ) EBP ;
+: vm-reg ( -- reg ) EBP ;
+: ctx-reg ( -- reg ) ECX ;
 : nv-regs ( -- seq ) { ESI EDI EBX } ;
 : ds-reg ( -- reg ) ESI ;
 : rs-reg ( -- reg ) EDI ;
@@ -35,49 +37,119 @@ IN: bootstrap.x86
 ] jit-prolog jit-define
 
 : jit-load-vm ( -- )
-    EBP 0 MOV 0 rc-absolute-cell jit-vm ;
+    vm-reg 0 MOV 0 rc-absolute-cell jit-vm ;
+
+: jit-load-context ( -- )
+    ! VM pointer must be in vm-reg already
+    ctx-reg vm-reg vm-context-offset [+] MOV ;
 
 : jit-save-context ( -- )
-    ! VM pointer must be in EBP already
-    ECX EBP [] MOV
-    ! save ctx->callstack_top
-    EAX ESP -4 [+] LEA
-    ECX [] EAX MOV
-    ! save ctx->datastack
-    ECX 8 [+] ds-reg MOV
-    ! save ctx->retainstack
-    ECX 12 [+] rs-reg MOV ;
+    jit-load-context
+    EDX RSP -4 [+] LEA
+    ctx-reg context-callstack-top-offset [+] EDX MOV
+    ctx-reg context-datastack-offset [+] ds-reg MOV
+    ctx-reg context-retainstack-offset [+] rs-reg MOV ;
 
 : jit-restore-context ( -- )
-    ! VM pointer must be in EBP already
-    ECX EBP [] MOV
-    ! restore ctx->datastack
-    ds-reg ECX 8 [+] MOV
-    ! restore ctx->retainstack
-    rs-reg ECX 12 [+] MOV ;
+    jit-load-context
+    ds-reg ctx-reg context-datastack-offset [+] MOV
+    rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
 [
     jit-load-vm
-    ! save ds, rs registers
     jit-save-context
     ! call the primitive
-    ESP [] EBP MOV
+    ESP [] vm-reg MOV
     0 CALL rc-relative rt-primitive jit-rel
     ! restore ds, rs registers
     jit-restore-context
 ] jit-primitive jit-define
 
 [
-    ! load from stack
+    ! Load quotation
+    EAX EBP 8 [+] MOV
+    ! save ctx->callstack_bottom, load ds, rs registers
+    jit-load-vm
+    jit-restore-context
+    EDX stack-reg stack-frame-size 4 - [+] LEA
+    ctx-reg context-callstack-bottom-offset [+] EDX MOV
+    ! call the quotation
+    EAX quot-xt-offset [+] CALL
+    ! save ds, rs registers
+    jit-save-context
+] \ c-to-factor define-sub-primitive
+
+[
     EAX ds-reg [] MOV
-    ! pop stack
     ds-reg bootstrap-cell SUB
-    ! load VM pointer
-    EDX 0 MOV 0 rc-absolute-cell jit-vm
 ]
 [ EAX quot-xt-offset [+] CALL ]
 [ EAX quot-xt-offset [+] JMP ]
 \ (call) define-combinator-primitive
+
+[
+    ! Clear x87 stack, but preserve rounding mode and exception flags
+    ESP 2 SUB
+    ESP [] FNSTCW
+    FNINIT
+    ESP [] FLDCW
+    ESP 2 ADD
+
+    ! Load arguments
+    EAX ESP stack-frame-size [+] MOV
+    EDX ESP stack-frame-size 4 + [+] MOV
+
+    ! Unwind stack frames
+    ESP EDX MOV
+
+    ! Load ds and rs registers
+    jit-load-vm
+    jit-restore-context
+
+    ! Call quotation
+    EAX quot-xt-offset [+] JMP
+] \ unwind-native-frames define-sub-primitive
+
+[
+    ! Load callstack object
+    EBX ds-reg [] MOV
+    ds-reg bootstrap-cell SUB
+    ! Get ctx->callstack_bottom
+    jit-load-vm
+    jit-load-context
+    EAX ctx-reg context-callstack-bottom-offset [+] MOV
+    ! Get top of callstack object -- 'src' for memcpy
+    EBP EBX callstack-top-offset [+] LEA
+    ! Get callstack length, in bytes --- 'len' for memcpy
+    EDX EBX callstack-length-offset [+] MOV
+    EDX tag-bits get SHR
+    ! Compute new stack pointer -- 'dst' for memcpy
+    EAX EDX SUB
+    ! Install new stack pointer
+    RSP EAX MOV
+    ! Call memcpy
+    ESP 8 [+] EDX MOV
+    ESP 4 [+] EBP MOV
+    ESP [] EAX MOV
+    0 CALL "memcpy" f rc-relative jit-dlsym
+    ! Return with new callstack
+    0 RET
+] \ set-callstack define-sub-primitive
+
+[
+    jit-load-vm
+    jit-save-context
+
+    ! Store arguments
+    ESP [] EAX MOV
+    ESP 4 [+] vm-reg MOV
+
+    ! Call VM
+    0 CALL "lazy_jit_compile" f rc-relative jit-dlsym
+]
+[ EAX quot-xt-offset [+] CALL ]
+[ EAX quot-xt-offset [+] JMP ]
+\ lazy-jit-compile define-combinator-primitive
 
 ! Inline cache miss entry points
 : jit-load-return-address ( -- )
@@ -88,7 +160,7 @@ IN: bootstrap.x86
 : jit-inline-cache-miss ( -- )
     jit-load-vm
     jit-save-context
-    ESP 4 [+] EBP MOV
+    ESP 4 [+] vm-reg MOV
     ESP [] EBX MOV
     0 CALL "inline_cache_miss" f rc-relative jit-dlsym
     jit-restore-context ;
