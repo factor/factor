@@ -68,4 +68,4 @@ M: integer uncompiled-generic-test 1 + ;
 
 [ 4 ] [ 3 "q" get call ] unit-test
 
-FORGET: uncompiled-generic-test
+[ ] [ [ \ uncompiled-generic-test forget ] with-compilation-unit ] unit-test
