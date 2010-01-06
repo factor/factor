@@ -237,7 +237,6 @@ M: x86.32 %alien-indirect ( -- )
 M: x86.32 %alien-callback ( quot -- )
     EAX EDX %restore-context
     EAX swap %load-reference
-    EDX %mov-vm-ptr
     EAX quot-xt-offset [+] CALL
     EAX EDX %save-context ;
 
