@@ -138,7 +138,7 @@ M: joystick-demo-gadget ungraft*
 : joystick-demo ( -- )
     [
         open-game-input
-        0.1 seconds sleep ! It might take a moment to find devices...
+        100 milliseconds sleep ! It might take a moment to find devices...
         get-controllers [ joystick-window ] each
     ] with-ui ;
 
