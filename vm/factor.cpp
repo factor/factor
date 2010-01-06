@@ -79,8 +79,8 @@ void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **
 	}
 }
 
-/* Do some initialization that we do once only */
-void factor_vm::do_stage1_init()
+/* Compile code in boot image so that we can execute the startup quotation */
+void factor_vm::prepare_boot_image()
 {
 	std::cout << "*** Stage 2 early init... ";
 	fflush(stdout);
@@ -146,7 +146,7 @@ void factor_vm::init_factor(vm_parameters *p)
 	gc_off = false;
 
 	if(!to_boolean(special_objects[OBJ_STAGE2]))
-		do_stage1_init();
+		prepare_boot_image();
 }
 
 /* May allocate memory */
