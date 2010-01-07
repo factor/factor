@@ -28,9 +28,7 @@ M: method-body flushable? "method-generic" word-prop flushable? ;
 M: #call mark-live-values*
     dup flushable-call? [ drop ] [ look-at-inputs ] if ;
 
-M: #alien-invoke mark-live-values* look-at-inputs ;
-
-M: #alien-indirect mark-live-values* look-at-inputs ;
+M: #alien-node mark-live-values* look-at-inputs ;
 
 M: #return mark-live-values* look-at-inputs ;
 
@@ -47,9 +45,7 @@ M: #call compute-live-values* nip look-at-inputs ;
 M: #shuffle compute-live-values*
     mapping>> at look-at-value ;
 
-M: #alien-invoke compute-live-values* nip look-at-inputs ;
-
-M: #alien-indirect compute-live-values* nip look-at-inputs ;
+M: #alien-node compute-live-values* nip look-at-inputs ;
 
 : filter-mapping ( assoc -- assoc' )
     live-values get '[ drop _ key? ] assoc-filter ;
@@ -127,8 +123,5 @@ M: #terminate remove-dead-code*
     [ filter-live ] change-in-d
     [ filter-live ] change-in-r ;
 
-M: #alien-invoke remove-dead-code*
-    maybe-drop-dead-outputs ;
-
-M: #alien-indirect remove-dead-code*
+M: #alien-node remove-dead-code*
     maybe-drop-dead-outputs ;

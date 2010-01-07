@@ -185,9 +185,7 @@ M: #recursive check-stack-flow*
 
 M: #copy check-stack-flow* [ check-in-d ] [ check-out-d ] bi ;
 
-M: #alien-invoke check-stack-flow* [ check-in-d ] [ check-out-d ] bi ;
-
-M: #alien-indirect check-stack-flow* [ check-in-d ] [ check-out-d ] bi ;
+M: #alien-node check-stack-flow* [ check-in-d ] [ check-out-d ] bi ;
 
 M: #alien-callback check-stack-flow* drop ;
 
