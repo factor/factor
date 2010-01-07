@@ -375,6 +375,7 @@ PRIVATE>
 : NOP ( -- ) HEX: 90 , ;
 : PAUSE ( -- ) HEX: f3 , HEX: 90 , ;
 
+: RDTSC ( -- ) HEX: 0f , HEX: 31 , ;
 : RDPMC ( -- ) HEX: 0f , HEX: 33 , ;
 
 ! x87 Floating Point Unit
@@ -386,8 +387,10 @@ PRIVATE>
 : FLDL ( operand -- ) { BIN: 000 f HEX: dd } 1-operand ;
 
 : FNSTCW ( operand -- ) { BIN: 111 f HEX: d9 } 1-operand ;
+: FNSTSW ( operand -- ) { BIN: 111 f HEX: dd } 1-operand ;
 : FLDCW ( operand -- ) { BIN: 101 f HEX: d9 } 1-operand ;
 
+: FNCLEX ( -- ) HEX: db , HEX: e2 , ;
 : FNINIT ( -- ) HEX: db , HEX: e3 , ;
 
 ! SSE multimedia instructions
