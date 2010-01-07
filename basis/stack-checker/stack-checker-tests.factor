@@ -392,5 +392,5 @@ DEFER: eee'
 [ [ call-effect ] infer ] [ T{ unknown-macro-input f call-effect } = ] must-fail-with
 [ [ execute-effect ] infer ] [ T{ unknown-macro-input f execute-effect } = ] must-fail-with
 
-[ \ set-callstack def>> infer ] [ T{ unknown-primitive-error } = ] must-fail-with
-[ ] [ [ \ set-callstack def>> infer ] try ] unit-test
+[ \ set-datastack def>> infer ] [ T{ unknown-primitive-error } = ] must-fail-with
+[ ] [ [ \ set-datastack def>> infer ] try ] unit-test
