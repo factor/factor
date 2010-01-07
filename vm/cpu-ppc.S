@@ -1,6 +1,21 @@
 /* Parts of this file were snarfed from SBCL src/runtime/ppc-assem.S, which is
 in the public domain. */
-#include "asm.h"
+#if defined(__APPLE__) || (defined(WINDOWS) && !defined(__arm__))
+	#define MANGLE(sym) _##sym
+#else
+	#define MANGLE(sym) sym
+#endif
+
+/* Apple's PPC assembler is out of date? */
+#if defined(__APPLE__) && defined(__ppc__)
+	#define XX @
+#else
+	#define XX ;
+#endif
+
+/* The returns and args are just for documentation */
+#define DEF(returns,symbol,args) .globl MANGLE(symbol) XX \
+MANGLE(symbol)
 
 #define DS_REG r13
 #define RS_REG r14
