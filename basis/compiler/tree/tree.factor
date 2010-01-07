@@ -149,7 +149,7 @@ TUPLE: #alien-indirect < #alien-node in-d out-d ;
 : #alien-indirect ( params -- node )
     \ #alien-indirect new-alien-node ;
 
-TUPLE: #alien-callback < #alien-node ;
+TUPLE: #alien-callback < node params ;
 
 : #alien-callback ( params -- node )
     \ #alien-callback new
