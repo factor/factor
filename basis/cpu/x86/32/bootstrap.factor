@@ -126,12 +126,13 @@ IN: bootstrap.x86
     ! Compute new stack pointer -- 'dst' for memcpy
     EAX EDX SUB
     ! Install new stack pointer
-    RSP EAX MOV
+    ESP EAX MOV
     ! Call memcpy
-    ESP 8 [+] EDX MOV
-    ESP 4 [+] EBP MOV
-    ESP [] EAX MOV
-    0 CALL "memcpy" f rc-relative jit-dlsym
+    EDX PUSH
+    EBP PUSH
+    EAX PUSH
+    0 CALL "factor_memcpy" f rc-relative jit-dlsym
+    ESP 12 ADD
     ! Return with new callstack
     0 RET
 ] \ set-callstack define-sub-primitive

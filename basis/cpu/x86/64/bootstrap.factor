@@ -121,8 +121,12 @@ IN: bootstrap.x86
     ! Install new stack pointer
     RSP arg1 MOV
     ! Call memcpy; arguments are now in the correct registers
-    safe-reg 0 MOV "memcpy" f rc-absolute-cell jit-dlsym
+    ! Create register shadow area for Win64
+    RSP 32 SUB
+    safe-reg 0 MOV "factor_memcpy" f rc-absolute-cell jit-dlsym
     safe-reg CALL
+    ! Tear down register shadow area
+    RSP 32 ADD
     ! Return with new callstack
     0 RET
 ] \ set-callstack define-sub-primitive
