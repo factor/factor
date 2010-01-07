@@ -1469,6 +1469,6 @@ enable-fixnum-log2
     ] when ;
 
 : check-sse ( -- )
-    [ { sse_version } compile ] with-optimizer
+    [ { (sse-version) } compile ] with-optimizer
     "Checking for multimedia extensions: " write sse-version
     [ sse-string write " detected" print ] [ enable-sse2 ] bi ;
