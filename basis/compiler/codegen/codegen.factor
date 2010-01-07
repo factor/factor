@@ -436,6 +436,16 @@ M: ##alien-invoke generate-insn
     dup %cleanup
     box-return* ;
 
+M: ##alien-assembly generate-insn
+    params>>
+    ! Unbox parameters
+    dup objects>registers
+    %prepare-var-args
+    ! Generate assembly
+    dup quot>> call( -- )
+    ! Box return value
+    box-return* ;
+
 ! ##alien-indirect
 M: ##alien-indirect generate-insn
     params>>

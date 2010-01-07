@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: stack-checker.visitor kernel ;
 IN: stack-checker.visitor.dummy
@@ -24,4 +24,5 @@ M: f #copy, 2drop ;
 M: f #drop, drop ;
 M: f #alien-invoke, drop ;
 M: f #alien-indirect, drop ;
+M: f #alien-assembly, drop ;
 M: f #alien-callback, drop ;

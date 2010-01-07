@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2004, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors alien alien.accessors arrays byte-arrays
 classes continuations.private effects generic hashtables
@@ -228,6 +228,7 @@ M: bad-executable summary
 
 \ alien-invoke [ infer-alien-invoke ] "special" set-word-prop
 \ alien-indirect [ infer-alien-indirect ] "special" set-word-prop
+\ alien-assembly [ infer-alien-assembly ] "special" set-word-prop
 \ alien-callback [ infer-alien-callback ] "special" set-word-prop
 
 : infer-special ( word -- )
