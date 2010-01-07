@@ -1,8 +1,8 @@
 USING: accessors alien alien.c-types alien.syntax arrays assocs
-biassocs classes.struct combinators cpu.x86.64
+biassocs classes.struct combinators cpu.architecture
 cpu.x86.assembler cpu.x86.assembler.operands cpu.x86.features
 kernel literals math math.bitwise math.floats.env
-math.floats.env.private system ;
+math.floats.env.private sequences system ;
 IN: math.floats.env.x86
 
 STRUCT: sse-env
@@ -48,24 +48,24 @@ M: x86.32 set-x87-env
 ! 64-bit
 M: x86.64 get-sse-env
     void { void* } "cdecl" [
-        param-reg-0 [] STMXCSR
+        int-regs param-regs first [] STMXCSR
     ] alien-assembly ;
 
 M: x86.64 set-sse-env
     void { void* } "cdecl" [
-        param-reg-0 [] LDMXCSR
+        int-regs param-regs first [] LDMXCSR
     ] alien-assembly ;
 
 M: x86.64 get-x87-env
     void { void* } "cdecl" [
-        param-reg-0 [] FNSTSW
-        param-reg-0 2 [+] FNSTCW
+        int-regs param-regs first [] FNSTSW
+        int-regs param-regs first 2 [+] FNSTCW
     ] alien-assembly ;
 
 M: x86.64 set-x87-env
     void { void* } "cdecl" [
         FNCLEX
-        param-reg-0 2 [+] FLDCW
+        int-regs param-regs first 2 [+] FLDCW
     ] alien-assembly ;
 
 : <sse-env> ( -- sse-env )
