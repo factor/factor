@@ -59,7 +59,7 @@ ERROR: alien-invoke-error library symbol ;
 
 ERROR: alien-assembly-error code ;
 
-: alien-assembly ( ... return library parameters abi quot -- ... )
+: alien-assembly ( ... return parameters abi quot -- ... )
     dup alien-assembly-error ;
 
 ! Callbacks are registered in a global hashtable. Note that they
