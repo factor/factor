@@ -1,5 +1,5 @@
 USING: compiler definitions compiler.units tools.test arrays sequences words kernel
-accessors namespaces fry eval ;
+accessors namespaces fry eval quotations math ;
 IN: compiler.units.tests
 
 [ [ [ ] define-temp ] with-compilation-unit ] must-infer
@@ -56,3 +56,16 @@ DEFER: nesting-test
 [ ] [ "IN: compiler.units.tests << : nesting-test ( -- ) ; >>" eval( -- ) ] unit-test
 
 observer remove-definition-observer
+
+! Make sure that non-optimized calls to a generic word which
+! hasn't been compiled yet work properly
+GENERIC: uncompiled-generic-test ( a -- b )
+
+M: integer uncompiled-generic-test 1 + ;
+
+<< [ uncompiled-generic-test ] [ jit-compile ] [ suffix! ] bi >>
+"q" set
+
+[ 4 ] [ 3 "q" get call ] unit-test
+
+[ ] [ [ \ uncompiled-generic-test forget ] with-compilation-unit ] unit-test

@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry arrays generic assocs kernel math namespaces parser
 sequences words vectors math.intervals classes
@@ -149,7 +149,12 @@ TUPLE: #alien-indirect < #alien-node in-d out-d ;
 : #alien-indirect ( params -- node )
     \ #alien-indirect new-alien-node ;
 
-TUPLE: #alien-callback < #alien-node ;
+TUPLE: #alien-assembly < #alien-node in-d out-d ;
+
+: #alien-assembly ( params -- node )
+    \ #alien-assembly new-alien-node ;
+
+TUPLE: #alien-callback < node params ;
 
 : #alien-callback ( params -- node )
     \ #alien-callback new
@@ -187,4 +192,5 @@ M: vector #recursive, #recursive node, ;
 M: vector #copy, #copy node, ;
 M: vector #alien-invoke, #alien-invoke node, ;
 M: vector #alien-indirect, #alien-indirect node, ;
+M: vector #alien-assembly, #alien-assembly node, ;
 M: vector #alien-callback, #alien-callback node, ;
