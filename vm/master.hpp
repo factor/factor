@@ -74,6 +74,7 @@ namespace factor
 #include "alien.hpp"
 #include "callbacks.hpp"
 #include "dispatch.hpp"
+#include "entry_points.hpp"
 #include "vm.hpp"
 #include "allot.hpp"
 #include "tagged.hpp"

@@ -24,7 +24,7 @@ cell factor_vm::compute_xt_pic_address(word *w, cell tagged_quot)
 	else
 	{
 		quotation *quot = untag<quotation>(tagged_quot);
-		if(quot->code)
+		if(quot_compiled_p(quot))
 			return (cell)quot->xt;
 		else
 			return (cell)w->xt;

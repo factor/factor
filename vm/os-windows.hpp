@@ -23,15 +23,9 @@ typedef wchar_t vm_char;
 #define FSEEK fseeko64
 
 #ifdef WIN64
-	#define CELL_FORMAT "%Iu"
 	#define CELL_HEX_FORMAT "%Ix"
-	#define CELL_HEX_PAD_FORMAT "%016Ix"
-	#define FIXNUM_FORMAT "%Id"
 #else
-	#define CELL_FORMAT "%lu"
 	#define CELL_HEX_FORMAT "%lx"
-	#define CELL_HEX_PAD_FORMAT "%08lx"
-	#define FIXNUM_FORMAT "%ld"
 #endif
 
 #define OPEN_READ(path) _wfopen(path,L"rb")
