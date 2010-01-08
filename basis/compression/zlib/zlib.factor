@@ -20,7 +20,7 @@ ERROR: zlib-failed n string ;
         drop errno "native libc error"
     ] [
         dup
-        -1 * ! zlib error codes are negative
+        neg ! zlib error codes are negative
         {
             "no error" "libc_error"
             "stream error" "data error"
