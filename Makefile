@@ -212,6 +212,9 @@ vm/ffi_test.o: vm/ffi_test.c
 .cpp.o:
 	$(TOOLCHAIN_PREFIX)$(CPP) -c $(CFLAGS) -o $@ $<
 
+.S.o:
+	$(TOOLCHAIN_PREFIX)$(CC) -x assembler-with-cpp -c $(CFLAGS) -o $@ $<
+
 .mm.o:
 	$(TOOLCHAIN_PREFIX)$(CPP) -c $(CFLAGS) -o $@ $<
 
