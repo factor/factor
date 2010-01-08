@@ -145,13 +145,6 @@ void factor_vm::primitive_become()
 	all objects on a minor GC. */
 	data->mark_all_cards();
 	primitive_minor_gc();
-
-	/* If a word's definition quotation was in old_objects and the
-	   quotation in new_objects is not compiled, we might leak memory
-	   by referencing the old quotation unless we recompile all
-	   unoptimized words. */
-	compile_all_words();
-	update_code_heap_words();
 }
 
 }

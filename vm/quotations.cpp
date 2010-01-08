@@ -293,11 +293,11 @@ code_block *factor_vm::jit_compile_quot(cell owner_, cell quot_, bool relocating
 void factor_vm::jit_compile_quot(cell quot_, bool relocating)
 {
 	data_root<quotation> quot(quot_,this);
-
-	if(quot->code) return;
-
-	code_block *compiled = jit_compile_quot(quot.value(),quot.value(),relocating);
-	set_quot_xt(quot.untagged(),compiled);
+	if(!quot_compiled_p(quot.untagged()))
+	{
+		code_block *compiled = jit_compile_quot(quot.value(),quot.value(),relocating);
+		set_quot_xt(quot.untagged(),compiled);
+	}
 }
 
 void factor_vm::primitive_jit_compile()
@@ -305,15 +305,21 @@ void factor_vm::primitive_jit_compile()
 	jit_compile_quot(ctx->pop(),true);
 }
 
+code_block *factor_vm::lazy_jit_compile_block()
+{
+	return untag<word>(special_objects[LAZY_JIT_COMPILE_WORD])->code;
+}
+
 /* push a new quotation on the stack */
 void factor_vm::primitive_array_to_quotation()
 {
 	quotation *quot = allot<quotation>(sizeof(quotation));
+
 	quot->array = ctx->peek();
 	quot->cached_effect = false_object;
 	quot->cache_counter = false_object;
-	quot->xt = (void *)lazy_jit_compile_impl;
-	quot->code = NULL;
+	set_quot_xt(quot,lazy_jit_compile_block());
+
 	ctx->replace(tag<quotation>(quot));
 }
 
@@ -349,11 +355,34 @@ VM_C_API cell lazy_jit_compile(cell quot, factor_vm *parent)
 	return parent->lazy_jit_compile(quot);
 }
 
+bool factor_vm::quot_compiled_p(quotation *quot)
+{
+	return quot->code != NULL && quot->code != lazy_jit_compile_block();
+}
+
 void factor_vm::primitive_quot_compiled_p()
 {
 	tagged<quotation> quot(ctx->pop());
 	quot.untag_check(this);
-	ctx->push(tag_boolean(quot->code != NULL));
+	ctx->push(tag_boolean(quot_compiled_p(quot.untagged())));
+}
+
+cell factor_vm::find_all_quotations()
+{
+	return instances(QUOTATION_TYPE);
+}
+
+void factor_vm::initialize_all_quotations()
+{
+	data_root<array> quotations(find_all_quotations(),this);
+
+	cell length = array_capacity(quotations.untagged());
+	for(cell i = 0; i < length; i++)
+	{
+		data_root<quotation> quot(array_nth(quotations.untagged(),i),this);
+		if(!quot->code)
+			set_quot_xt(quot.untagged(),lazy_jit_compile_block());
+	}
 }
 
 }

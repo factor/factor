@@ -591,3 +591,8 @@ FUNCTION: short ffi_test_48 ( bool-field-test x ) ;
 FUNCTION: void this_does_not_exist ( ) ;
 
 [ this_does_not_exist ] [ { "kernel-error" 9 f f } = ] must-fail-with
+
+! More alien-assembly tests are in cpu.* vocabs
+: assembly-test-1 ( -- ) void { } "cdecl" [ ] alien-assembly ;
+
+[ ] [ assembly-test-1 ] unit-test

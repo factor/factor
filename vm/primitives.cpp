@@ -62,7 +62,6 @@ PRIMITIVE_FORWARD(retainstack)
 PRIMITIVE_FORWARD(callstack)
 PRIMITIVE_FORWARD(set_datastack)
 PRIMITIVE_FORWARD(set_retainstack)
-PRIMITIVE_FORWARD(set_callstack)
 PRIMITIVE_FORWARD(exit)
 PRIMITIVE_FORWARD(data_room)
 PRIMITIVE_FORWARD(code_room)
@@ -196,7 +195,6 @@ const primitive_type primitives[] = {
 	primitive_callstack,
 	primitive_set_datastack,
 	primitive_set_retainstack,
-	primitive_set_callstack,
 	primitive_exit,
 	primitive_data_room,
 	primitive_code_room,

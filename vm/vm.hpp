@@ -30,6 +30,9 @@ struct factor_vm
 	/* Canonical truth value. In Factor, 't' */
 	cell true_object;
 
+	/* External entry points */
+	c_to_factor_func_type c_to_factor_func;
+
 	/* Is call counting enabled? */
 	bool profiling_p;
 
@@ -562,7 +565,6 @@ struct factor_vm
 	stack_frame *fix_callstack_top(stack_frame *top, stack_frame *bottom);
 	stack_frame *second_from_top_stack_frame();
 	void primitive_callstack();
-	void primitive_set_callstack();
 	code_block *frame_code(stack_frame *frame);
 	code_block_type frame_type(stack_frame *frame);
 	cell frame_executing(stack_frame *frame);
@@ -596,6 +598,7 @@ struct factor_vm
 
 	//quotations
 	void primitive_jit_compile();
+	code_block *lazy_jit_compile_block();
 	void primitive_array_to_quotation();
 	void primitive_quotation_xt();
 	void set_quot_xt(quotation *quot, code_block *code);
@@ -603,7 +606,10 @@ struct factor_vm
 	void jit_compile_quot(cell quot_, bool relocating);
 	fixnum quot_code_offset_to_scan(cell quot_, cell offset);
 	cell lazy_jit_compile(cell quot);
+	bool quot_compiled_p(quotation *quot);
 	void primitive_quot_compiled_p();
+	cell find_all_quotations();
+	void initialize_all_quotations();
 
 	//dispatch
 	cell search_lookup_alist(cell table, cell klass);
@@ -632,11 +638,15 @@ struct factor_vm
 	void update_pic_transitions(cell pic_size);
 	void *inline_cache_miss(cell return_address);
 
+	//entry points
+	void c_to_factor(cell quot);
+	void unwind_native_frames(cell quot, stack_frame *to);
+
 	//factor
 	void default_parameters(vm_parameters *p);
-	bool factor_arg(const vm_char* str, const vm_char* arg, cell* value);
+	bool factor_arg(const vm_char *str, const vm_char *arg, cell *value);
 	void init_parameters_from_args(vm_parameters *p, int argc, vm_char **argv);
-	void do_stage1_init();
+	void prepare_boot_image();
 	void init_factor(vm_parameters *p);
 	void pass_args_to_factor(int argc, vm_char **argv);
 	void start_factor(vm_parameters *p);

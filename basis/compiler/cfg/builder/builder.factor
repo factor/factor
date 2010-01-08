@@ -236,6 +236,9 @@ M: #alien-invoke emit-node
 M: #alien-indirect emit-node
     [ ##alien-indirect ] emit-alien-node ;
 
+M: #alien-assembly emit-node
+    [ ##alien-assembly ] emit-alien-node ;
+
 M: #alien-callback emit-node
     dup params>> xt>> dup
     [
