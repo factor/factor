@@ -76,6 +76,7 @@ IN: bootstrap.x86
     ! call the quotation
     EAX quot-xt-offset [+] CALL
     ! save ds, rs registers
+    jit-load-vm
     jit-save-context
 ] \ c-to-factor define-sub-primitive
 
