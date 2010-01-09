@@ -74,6 +74,7 @@ IN: bootstrap.x86
     ctx-reg context-callstack-bottom-offset [+] safe-reg MOV
     ! call the quotation
     arg1 quot-xt-offset [+] CALL
+    jit-load-vm
     jit-save-context
 ] \ c-to-factor define-sub-primitive
 
