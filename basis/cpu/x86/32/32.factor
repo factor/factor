@@ -8,7 +8,8 @@ compiler.codegen compiler.codegen.fixup
 compiler.cfg.instructions compiler.cfg.builder
 compiler.cfg.intrinsics compiler.cfg.stack-frame
 cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
-cpu.architecture ;
+cpu.architecture vm ;
+FROM: layouts => cell ;
 IN: cpu.x86.32
 
 M: x86.32 machine-registers
@@ -22,6 +23,12 @@ M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
 M: x86.32 frame-reg EBP ;
 M: x86.32 temp-reg ECX ;
+
+M: x86.32 %mov-vm-ptr ( reg -- )
+    0 MOV 0 rc-absolute-cell rel-vm ;
+
+M: x86.32 %vm-field-ptr ( dst field -- )
+    [ 0 MOV ] dip vm-field-offset rc-absolute-cell rel-vm ;
 
 : local@ ( n -- op )
     stack-frame get extra-stack-space dup 16 assert= + stack@ ;

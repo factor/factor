@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2009 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private compiler.constants
 compiler.units cpu.x86.assembler cpu.x86.assembler.operands
@@ -29,6 +29,9 @@ big-endian off
     ! Register shadow area - only required on Win64, but doesn't
     ! hurt on other platforms
     stack-reg 32 SUB
+
+    ! Load VM into vm-reg
+    vm-reg 0 MOV rc-absolute-cell rt-vm jit-rel
 
     ! Call into Factor code
     safe-reg 0 MOV rc-absolute-cell rt-xt jit-rel

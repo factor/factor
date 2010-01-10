@@ -38,7 +38,10 @@ struct callback_heap {
 		return w->xt;
 	}
 
+	void store_callback_operand(code_block *stub, cell index, cell value);
+
 	void update(code_block *stub);
+
 	code_block *add(cell owner, cell return_rewind);
 
 	void update();

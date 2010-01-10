@@ -7,7 +7,8 @@ compiler.codegen compiler.codegen.fixup
 compiler.cfg.instructions compiler.cfg.builder
 compiler.cfg.intrinsics compiler.cfg.stack-frame
 cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
-cpu.architecture ;
+cpu.architecture vm ;
+FROM: layouts => cell cells ;
 IN: cpu.x86.64
 
 : param-reg-0 ( -- reg ) 0 int-regs param-reg ; inline
@@ -29,12 +30,20 @@ M: x86.64 extra-stack-space drop 0 ;
 
 M: x86.64 machine-registers
     {
-        { int-regs { RAX RCX RDX RBX RBP RSI RDI R8 R9 R10 R11 R12 R13 } }
+        { int-regs { RAX RCX RDX RBX RBP RSI RDI R8 R9 R10 R11 R12 } }
         { float-regs {
             XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7
             XMM8 XMM9 XMM10 XMM11 XMM12 XMM13 XMM14 XMM15
         } }
     } ;
+
+: vm-reg ( -- reg ) R13 ; inline
+
+M: x86.64 %mov-vm-ptr ( reg -- )
+    vm-reg MOV ;
+
+M: x86.64 %vm-field-ptr ( dst field -- )
+    [ vm-reg ] dip vm-field-offset [+] LEA ;
 
 : param@ ( n -- op ) reserved-stack-space + stack@ ;
 
