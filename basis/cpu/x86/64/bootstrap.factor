@@ -19,8 +19,8 @@ IN: bootstrap.x86
 : safe-reg ( -- reg ) RAX ;
 : stack-reg ( -- reg ) RSP ;
 : frame-reg ( -- reg ) RBP ;
-: vm-reg ( -- reg ) R12 ;
-: ctx-reg ( -- reg ) R13 ;
+: ctx-reg ( -- reg ) R12 ;
+: vm-reg ( -- reg ) R13 ;
 : ds-reg ( -- reg ) R14 ;
 : rs-reg ( -- reg ) R15 ;
 : fixnum>slot@ ( -- ) temp0 1 SAR ;
@@ -37,11 +37,7 @@ IN: bootstrap.x86
     RSP stack-frame-size 3 bootstrap-cells - SUB
 ] jit-prolog jit-define
 
-: jit-load-vm ( -- )
-    vm-reg 0 MOV 0 rc-absolute-cell jit-vm ;
-
 : jit-load-context ( -- )
-    ! VM pointer must be in vm-reg already
     ctx-reg vm-reg vm-context-offset [+] MOV ;
 
 : jit-save-context ( -- )
@@ -57,7 +53,6 @@ IN: bootstrap.x86
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
 [
-    jit-load-vm
     jit-save-context
     ! call the primitive
     arg1 vm-reg MOV
@@ -67,14 +62,12 @@ IN: bootstrap.x86
 ] jit-primitive jit-define
 
 [
-    jit-load-vm
     jit-restore-context
     ! save ctx->callstack_bottom
     safe-reg stack-reg stack-frame-size 8 - [+] LEA
     ctx-reg context-callstack-bottom-offset [+] safe-reg MOV
     ! call the quotation
     arg1 quot-xt-offset [+] CALL
-    jit-load-vm
     jit-save-context
 ] \ c-to-factor define-sub-primitive
 
@@ -97,7 +90,6 @@ IN: bootstrap.x86
     RSP arg2 MOV
 
     ! Load ds and rs registers
-    jit-load-vm
     jit-restore-context
 
     ! Call quotation
@@ -109,7 +101,6 @@ IN: bootstrap.x86
     arg4 ds-reg [] MOV
     ds-reg bootstrap-cell SUB
     ! Get ctx->callstack_bottom
-    jit-load-vm
     jit-load-context
     arg1 ctx-reg context-callstack-bottom-offset [+] MOV
     ! Get top of callstack object -- 'src' for memcpy
@@ -133,7 +124,6 @@ IN: bootstrap.x86
 ] \ set-callstack define-sub-primitive
 
 [
-    jit-load-vm
     jit-save-context
     arg2 vm-reg MOV
     safe-reg 0 MOV "lazy_jit_compile" f rc-absolute-cell jit-dlsym
@@ -150,7 +140,6 @@ IN: bootstrap.x86
 ! These are always in tail position with an existing stack
 ! frame, and the stack. The frame setup takes this into account.
 : jit-inline-cache-miss ( -- )
-    jit-load-vm
     jit-save-context
     arg1 RBX MOV
     arg2 vm-reg MOV
@@ -171,7 +160,6 @@ IN: bootstrap.x86
 ! Overflowing fixnum arithmetic
 : jit-overflow ( insn func -- )
     ds-reg 8 SUB
-    jit-load-vm
     jit-save-context
     arg1 ds-reg [] MOV
     arg2 ds-reg 8 [+] MOV
@@ -192,7 +180,6 @@ IN: bootstrap.x86
 
 [
     ds-reg 8 SUB
-    jit-load-vm
     jit-save-context
     RCX ds-reg [] MOV
     RBX ds-reg 8 [+] MOV
