@@ -347,8 +347,8 @@ update_script_name() {
 
 update_script() {
     update_script=`update_script_name`
-    
-    echo "#!/bin/sh" >"$update_script"
+	bash_path=`which bash`
+    echo "#!$bash_path" >"$update_script"
     echo "git pull \"$GIT_URL\" master" >>"$update_script"
     echo "if [[ \$? -eq 0 ]]; then exec \"$0\" $SCRIPT_ARGS; else echo \"git pull failed\"; exit 2; fi" \
         >>"$update_script"
