@@ -64,7 +64,7 @@ CONSTANT: ctx-reg 16
     nv-fp-regs [ 8 * 80 + save-fp ] each-index
     nv-vec-regs [ 16 * 224 + save-vec ] each-index
 
-    0 vm-reg LOAD32 rt-vm rc-absolute-ppc-2/2 jit-rel
+    0 vm-reg LOAD32 rc-absolute-ppc-2/2 rt-vm jit-rel
 
     0 2 LOAD32 rc-absolute-ppc-2/2 rt-xt jit-rel
     2 MTLR
@@ -88,7 +88,7 @@ CONSTANT: ctx-reg 16
 
 : jit-save-context ( -- )
     jit-load-context
-    1 2 context-callstack-top-offset STW
+    1 ctx-reg context-callstack-top-offset STW
     ds-reg ctx-reg context-datastack-offset STW
     rs-reg ctx-reg context-retainstack-offset STW ;
 
@@ -109,12 +109,12 @@ CONSTANT: ctx-reg 16
 ] jit-profiling jit-define
 
 [
-    0 3 LOAD32 rc-absolute-ppc-2/2 rt-this jit-rel
+    0 2 LOAD32 rc-absolute-ppc-2/2 rt-this jit-rel
     0 MFLR
     1 1 stack-frame SUBI
-    3 1 xt-save STW
-    stack-frame 3 LI
-    3 1 next-save STW
+    2 1 xt-save STW
+    stack-frame 2 LI
+    2 1 next-save STW
     0 1 lr-save stack-frame + STW
 ] jit-prolog jit-define
 
@@ -384,7 +384,7 @@ CONSTANT: ctx-reg 16
     5 6 callstack-length-offset LWZ
     5 5 tag-bits get SRAWI
     ! Compute new stack pointer -- 'dst' for memcpy
-    3 3 5 SUBF
+    3 5 3 SUBF
     ! Install new stack pointer
     1 3 MR
     ! Call memcpy; arguments are now in the correct registers
@@ -394,7 +394,7 @@ CONSTANT: ctx-reg 16
     BLRL
     1 1 0 LWZ
     ! Return with new callstack
-    0 1 lr-save stack-frame + LWZ
+    0 1 lr-save LWZ
     0 MTLR
     BLR
 ] \ set-callstack define-sub-primitive
@@ -402,7 +402,7 @@ CONSTANT: ctx-reg 16
 [
     jit-save-context
     4 vm-reg MR
-    2 0 LOAD32 "lazy_jit_compile" f rc-absolute-ppc-2/2 jit-dlsym
+    0 2 LOAD32 "lazy_jit_compile" f rc-absolute-ppc-2/2 jit-dlsym
     2 MTLR
     BLRL
     5 3 quot-xt-offset LWZ
