@@ -19,8 +19,8 @@ IN: bootstrap.x86
 : safe-reg ( -- reg ) EAX ;
 : stack-reg ( -- reg ) ESP ;
 : frame-reg ( -- reg ) EBP ;
-: vm-reg ( -- reg ) EBP ;
-: ctx-reg ( -- reg ) ECX ;
+: vm-reg ( -- reg ) ECX ;
+: ctx-reg ( -- reg ) EBP ;
 : nv-regs ( -- seq ) { ESI EDI EBX } ;
 : ds-reg ( -- reg ) ESI ;
 : rs-reg ( -- reg ) EDI ;
@@ -44,19 +44,18 @@ IN: bootstrap.x86
     ctx-reg vm-reg vm-context-offset [+] MOV ;
 
 : jit-save-context ( -- )
-    jit-load-context
     EDX RSP -4 [+] LEA
     ctx-reg context-callstack-top-offset [+] EDX MOV
     ctx-reg context-datastack-offset [+] ds-reg MOV
     ctx-reg context-retainstack-offset [+] rs-reg MOV ;
 
 : jit-restore-context ( -- )
-    jit-load-context
     ds-reg ctx-reg context-datastack-offset [+] MOV
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
 [
     jit-load-vm
+    jit-load-context
     jit-save-context
     ! call the primitive
     ESP [] vm-reg MOV
@@ -70,13 +69,13 @@ IN: bootstrap.x86
     EAX EBP 8 [+] MOV
     ! save ctx->callstack_bottom, load ds, rs registers
     jit-load-vm
+    jit-load-context
     jit-restore-context
     EDX stack-reg stack-frame-size 4 - [+] LEA
     ctx-reg context-callstack-bottom-offset [+] EDX MOV
     ! call the quotation
     EAX quot-xt-offset [+] CALL
     ! save ds, rs registers
-    jit-load-vm
     jit-save-context
 ] \ c-to-factor define-sub-primitive
 
@@ -105,6 +104,7 @@ IN: bootstrap.x86
 
     ! Load ds and rs registers
     jit-load-vm
+    jit-load-context
     jit-restore-context
 
     ! Call quotation
@@ -140,6 +140,7 @@ IN: bootstrap.x86
 
 [
     jit-load-vm
+    jit-load-context
     jit-save-context
 
     ! Store arguments
@@ -161,6 +162,7 @@ IN: bootstrap.x86
 ! frame, and the stack. The frame setup takes this into account.
 : jit-inline-cache-miss ( -- )
     jit-load-vm
+    jit-load-context
     jit-save-context
     ESP 4 [+] vm-reg MOV
     ESP [] EBX MOV
@@ -181,17 +183,18 @@ IN: bootstrap.x86
 : jit-overflow ( insn func -- )
     ds-reg 4 SUB
     jit-load-vm
+    jit-load-context
     jit-save-context
     EAX ds-reg [] MOV
     EDX ds-reg 4 [+] MOV
-    ECX EAX MOV
-    [ [ ECX EDX ] dip call( dst src -- ) ] dip
-    ds-reg [] ECX MOV
+    EBX EAX MOV
+    [ [ EBX EDX ] dip call( dst src -- ) ] dip
+    ds-reg [] EBX MOV
     [ JNO ]
     [
         ESP [] EAX MOV
         ESP 4 [+] EDX MOV
-        ESP 8 [+] EBP MOV
+        ESP 8 [+] vm-reg MOV
         [ 0 CALL ] dip f rc-relative jit-dlsym
     ]
     jit-conditional ;
@@ -203,19 +206,20 @@ IN: bootstrap.x86
 [
     ds-reg 4 SUB
     jit-load-vm
+    jit-load-context
     jit-save-context
-    ECX ds-reg [] MOV
-    EAX ECX MOV
-    EBX ds-reg 4 [+] MOV
-    EBX tag-bits get SAR
-    EBX IMUL
+    EBX ds-reg [] MOV
+    EAX EBX MOV
+    EBP ds-reg 4 [+] MOV
+    EBP tag-bits get SAR
+    EBP IMUL
     ds-reg [] EAX MOV
     [ JNO ]
     [
-        ECX tag-bits get SAR
-        ESP [] ECX MOV
-        ESP 4 [+] EBX MOV
-        ESP 8 [+] EBP MOV
+        EBX tag-bits get SAR
+        ESP [] EBX MOV
+        ESP 4 [+] EBP MOV
+        ESP 8 [+] vm-reg MOV
         0 CALL "overflow_fixnum_multiply" f rc-relative jit-dlsym
     ]
     jit-conditional

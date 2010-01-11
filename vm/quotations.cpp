@@ -182,10 +182,10 @@ void quotation_jit::iterate_quotation()
 			/* Primitive calls */
 			if(primitive_call_p(i,length))
 			{
-				/* On PowerPC, the VM pointer is stored as a register; on other
-				   platforms, the RT_VM relocation is used and it needs an offset
-				   parameter */
-#ifndef FACTOR_PPC
+				/* On x86-64 and PowerPC, the VM pointer is stored in
+				a register; on other platforms, the RT_VM relocation
+				is used and it needs an offset parameter */
+#ifdef FACTOR_X86
 				parameter(tag_fixnum(0));
 #endif
 				parameter(obj.value());
