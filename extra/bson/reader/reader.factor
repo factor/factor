@@ -1,10 +1,10 @@
-USING: accessors assocs bson.constants calendar fry io io.binary
-io.encodings io.encodings.utf8 kernel math math.bitwise namespaces
-sequences serialize locals ;
-
-FROM: kernel.private => declare ;
-FROM: io.encodings.private => (read-until) ;
-
+! Copyright (C) 2010 Sascha Matzke.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors assocs bson.constants calendar combinators
+combinators.short-circuit fry io io.binary kernel locals math
+namespaces sequences serialize tools.continuations strings ;
+FROM: io.encodings.binary => binary ;
+FROM: io.streams.byte-array => with-byte-reader ;
 IN: bson.reader
 
 <PRIVATE
@@ -40,10 +40,6 @@ PREDICATE: bson-binary-function < integer T_Binary_Function = ;
 PREDICATE: bson-binary-uuid < integer T_Binary_UUID = ;
 PREDICATE: bson-binary-custom < integer T_Binary_Custom = ;
 
-GENERIC: element-read ( type -- cont? )
-GENERIC: element-data-read ( type -- object )
-GENERIC: element-binary-read ( length type -- object )
-
 : get-state ( -- state )
     state get ; inline
 
@@ -57,16 +53,16 @@ GENERIC: element-binary-read ( length type -- object )
     8 read le> bits>double ; inline
 
 : read-byte-raw ( -- byte-raw )
-    1 read ; inline
+    1 read ;
 
 : read-byte ( -- byte )
     read-byte-raw first ; inline
 
 : read-cstring ( -- string )
-    "\0" read-until drop "" like ; inline
+    "\0" read-until drop >string ; inline
 
 : read-sized-string ( length -- string )
-    read 1 head-slice* "" like ; inline
+    read 1 head-slice* >string ; inline
 
 : read-element-type ( -- type )
     read-byte ; inline
@@ -80,106 +76,75 @@ GENERIC: element-binary-read ( length type -- object )
 : peek-scope ( -- ht )
     get-state scope>> last ; inline
 
-: read-elements ( -- )
-    read-element-type
-    element-read 
-    [ read-elements ] when ; inline recursive
+: bson-object-data-read ( -- object )
+    read-int32 drop get-state 
+    [ exemplar>> clone ] [ scope>> ] bi
+    [ push ] keep ; inline
 
-GENERIC: fix-result ( assoc type -- result )
+: bson-binary-read ( -- binary )
+   read-int32 read-byte 
+   bson-binary-bytes? [ read ] [ read bytes>object ] if ; inline
 
-M: bson-object fix-result ( assoc type -- result )
-    drop ;
+: bson-regexp-read ( -- mdbregexp )
+   mdbregexp new
+   read-cstring >>regexp read-cstring >>options ; inline
 
-M: bson-array fix-result ( assoc type -- result )
-    drop values ;
+: bson-oid-read ( -- oid )
+    read-longlong read-int32 oid boa ; inline
 
-GENERIC: end-element ( type -- )
+: element-data-read ( type -- object )
+    {
+        { T_OID [ bson-oid-read ] }
+        { T_String [ read-int32 read-sized-string ] }
+        { T_Integer [ read-int32 ] }
+        { T_Binary [ bson-binary-read ] }
+        { T_Object [ bson-object-data-read ] }
+        { T_Array [ bson-object-data-read ] }
+        { T_Double [ read-double ] }
+        { T_Boolean [ read-byte 1 = ] }
+        { T_Date [ read-longlong millis>timestamp ] }
+        { T_Regexp [ bson-regexp-read ] }
+        { T_NULL [ f ] }
+    } case ; inline
 
-M: bson-object end-element ( type -- )
-    drop ;
+: fix-result ( assoc type -- result )
+    {
+        { [ dup T_Array = ] [ drop values ] }
+        {
+            [ dup T_Object = ]
+            [ drop dup dbref-assoc? [ assoc>dbref ] when ]
+        }
+    } cond ; inline
 
-M: bson-array end-element ( type -- )
-    drop ;
+: end-element ( type -- )
+    { [ bson-object? ] [ bson-array? ] } 1||
+    [ pop-element drop ] unless ; inline
 
-M: object end-element ( type -- )
-    pop-element 2drop ;
-
-M:: bson-eoo element-read ( type -- cont? )
+:: bson-eoo-element-read ( type -- cont? )
     pop-element :> element
     get-state scope>>
     [ pop element type>> fix-result ] [ empty? ] bi
     [ [ get-state ] dip >>result drop f ]
-    [ element name>> peek-scope set-at t ] if ;
+    [ element name>> peek-scope set-at t ] if ; inline
 
-M:: bson-not-eoo element-read ( type -- cont? )
+:: bson-not-eoo-element-read ( type -- cont? )
     peek-scope :> scope
     type read-cstring [ push-element ] 2keep
     [ [ element-data-read ] [ end-element ] bi ]
-    [ scope set-at t ] bi* ;
+    [ scope set-at t ] bi* ; inline
 
-: [scope-changer] ( state -- state quot )
-    dup exemplar>> '[ [ [ _ clone ] dip push ] keep ] ; inline
+: (element-read) ( type -- cont? )
+    dup bson-not-eoo? 
+    [ bson-not-eoo-element-read ]
+    [ bson-eoo-element-read ] if ; inline
 
-: (object-data-read) ( type -- object )
-    drop
-    read-int32 drop
-    get-state
-    [scope-changer] change-scope
-    scope>> last ; inline
-    
-M: bson-object element-data-read ( type -- object )
-    (object-data-read) ;
-
-M: bson-string element-data-read ( type -- object )
-    drop
-    read-int32 read-sized-string ;
-
-M: bson-array element-data-read ( type -- object )
-    (object-data-read) ;
-    
-M: bson-integer element-data-read ( type -- object )
-    drop
-    read-int32 ;
-
-M: bson-double element-data-read ( type -- double )
-    drop
-    read-double ;
-
-M: bson-boolean element-data-read ( type -- boolean )
-   drop
-   read-byte 1 = ;
-
-M: bson-date element-data-read ( type -- timestamp )
-   drop
-   read-longlong millis>timestamp ;
-
-M: bson-binary element-data-read ( type -- binary )
-   drop
-   read-int32 read-byte element-binary-read ;
-
-M: bson-regexp element-data-read ( type -- mdbregexp )
-   drop mdbregexp new
-   read-cstring >>regexp read-cstring >>options ;
- 
-M: bson-null element-data-read ( type -- bf  )
-    drop f ;
-
-M: bson-oid element-data-read ( type -- oid )
-    drop
-    read-longlong
-    read-int32 oid boa ;
-
-M: bson-binary-bytes element-binary-read ( size type -- bytes )
-    drop read ;
-
-M: bson-binary-custom element-binary-read ( size type -- quot )
-    drop read bytes>object ;
+: read-elements ( -- )
+    read-element-type
+    (element-read) [ read-elements ] when ; inline recursive
 
 PRIVATE>
 
-USE: tools.continuations
-
 : stream>assoc ( exemplar -- assoc )
     <state> dup state
-    [ read-int32 >>size read-elements ] with-variable 
-    result>> ; 
+    [ read-int32 >>size read-elements ] with-variable
+    result>> ; inline

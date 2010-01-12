@@ -4,7 +4,10 @@ io.encodings.private io.encodings.binary io.encodings.string
 io.encodings.utf8 io.encodings.utf8.private io.files kernel
 locals math mongodb.msg namespaces sequences uuid
 bson.writer.private ;
+
 IN: mongodb.operations
+
+M: byte-vector byte-length length ;
 
 <PRIVATE
 
@@ -15,12 +18,6 @@ PREDICATE: mdb-update-op < integer OP_Update = ;
 PREDICATE: mdb-delete-op < integer OP_Delete = ;
 PREDICATE: mdb-getmore-op < integer OP_GetMore = ;
 PREDICATE: mdb-killcursors-op < integer OP_KillCursors = ;
-
-PRIVATE>
-
-GENERIC: write-message ( message -- )
-
-<PRIVATE
 
 CONSTANT: MSG-HEADER-SIZE 16
 
@@ -40,34 +37,26 @@ SYMBOL: msg-bytes-read
 : read-byte-raw ( -- byte-raw ) 1 [ read le> ] [ change-bytes-read ] bi ; inline
 : read-byte ( -- byte ) read-byte-raw first ; inline
 
-: (read-cstring) ( acc -- )
-    [ read-byte ] dip ! b acc
-    2dup push             ! b acc
-    [ 0 = ] dip      ! bool acc
-    '[ _ (read-cstring) ] unless ; inline recursive
-
-: read-cstring ( -- string )
-    BV{ } clone
-    [ (read-cstring) ] keep
-    [ zero? ] trim-tail
-    >byte-array utf8 decode ; inline
-
-GENERIC: (read-message) ( message opcode -- message )
-
 : copy-header ( message msg-stub -- message )
-    [ length>> ] keep [ >>length ] dip
-    [ req-id>> ] keep [ >>req-id ] dip
-    [ resp-id>> ] keep [ >>resp-id ] dip
-    [ opcode>> ] keep [ >>opcode ] dip
-    flags>> >>flags ;
+    {
+        [ length>> >>length ]
+        [ req-id>> >>req-id ]
+        [ resp-id>> >>resp-id ]
+        [ opcode>> >>opcode ]
+        [ flags>> >>flags ]
+    } cleave ; inline
 
-M: mdb-reply-op (read-message) ( msg-stub opcode -- message )
-    drop
+: reply-read-message ( msg-stub -- message )
     [ <mdb-reply-msg> ] dip copy-header
     read-longlong >>cursor
     read-int32 >>start#
     read-int32 [ >>returned# ] keep
     [ H{ } stream>assoc ] collector [ times ] dip >>objects ;    
+
+: (read-message) ( message opcode -- message )
+    OP_Reply = 
+    [ reply-read-message ]
+    [ "unknown message type" throw ] if ; inline
 
 : read-header ( message -- message )
     read-int32 >>length
@@ -77,94 +66,97 @@ M: mdb-reply-op (read-message) ( msg-stub opcode -- message )
     read-int32 >>flags ; inline
 
 : write-header ( message -- )
-    [ req-id>> write-int32 ] keep
-    [ resp-id>> write-int32 ] keep 
-    opcode>> write-int32 ; inline
+    [ req-id>> write-int32 ]
+    [ resp-id>> write-int32 ]
+    [ opcode>> write-int32 ] tri ; inline
 
 PRIVATE>
 
 : read-message ( -- message )
-    mdb-msg new
-    0 >bytes-read
-    read-header
-    [ ] [ opcode>> ] bi (read-message) ;
+    [
+        mdb-msg new 0 >bytes-read read-header
+        [ ] [ opcode>> ] bi (read-message)
+    ] with-scope ;
 
 <PRIVATE
 
-USE: tools.walker
-
-: dump-to-file ( array -- )
-    [ uuid1 "/tmp/mfb/%s.dump" sprintf binary ] dip
-    '[ _ write ] with-file-writer ;
-
-: (write-message) ( message quot -- )    
-    '[ [ [ _ write-header ] dip _ call ] with-length-prefix ] with-buffer
-    ! [ dump-to-file ] keep
-    write flush ; inline
+: (write-message) ( message quot -- )
+    [ connection-buffer dup ] 2dip
+    '[
+        [ _ [ write-header ] [ @ ] bi ] with-length-prefix
+    ] with-output-stream* write flush ; inline
 
 :: build-query-object ( query -- selector )
     H{ } clone :> selector
-    query { [ orderby>> [ "$orderby" selector set-at ] when* ]
-      [ explain>> [ "$explain" selector set-at ] when* ]
-      [ hint>> [ "$hint" selector set-at ] when* ] 
-      [ query>> "query" selector set-at ]
-    } cleave
-    selector ;
+    query {
+        [ orderby>> [ "$orderby" selector set-at ] when* ]
+        [ explain>> [ "$explain" selector set-at ] when* ]
+        [ hint>> [ "$hint" selector set-at ] when* ]
+        [ query>> "query" selector set-at ]
+    } cleave selector ; inline
+
+: query-write-message ( message -- )
+    [
+        {
+            [ flags>> write-int32 ]
+            [ collection>> write-cstring ]
+            [ skip#>> write-int32 ]
+            [ return#>> write-int32 ]
+            [ build-query-object assoc>stream ]
+            [ returnfields>> [ assoc>stream ] when* ]
+        } cleave
+    ] (write-message) ; inline
+
+: insert-write-message ( message -- )
+    [ 
+       [ flags>> write-int32 ]
+       [ collection>> write-cstring ]
+       [ objects>> [ assoc>stream ] each ] tri
+    ] (write-message) ; inline
+
+: update-write-message ( message -- )
+    [
+        { 
+            [ flags>> write-int32 ]
+            [ collection>> write-cstring ]
+            [ upsert?>> write-int32 ]
+            [ selector>> assoc>stream ]
+            [ object>> assoc>stream ]
+        } cleave
+    ] (write-message) ; inline
+
+: delete-write-message ( message -- )
+    [
+       [ flags>> write-int32 ]
+       [ collection>> write-cstring ]
+       [ 0 write-int32 selector>> assoc>stream ] tri
+    ] (write-message) ; inline
+
+: getmore-write-message ( message -- )
+    [
+        {
+           [ flags>> write-int32 ]
+           [ collection>> write-cstring ]
+           [ return#>> write-int32 ]
+           [ cursor>> write-longlong ]
+        } cleave
+    ] (write-message) ; inline
+
+: killcursors-write-message ( message -- )
+    [
+       [ flags>> write-int32 ]
+       [ cursors#>> write-int32 ]
+       [ cursors>> [ write-longlong ] each ] tri
+    ] (write-message) ; inline
 
 PRIVATE>
 
-M: mdb-query-msg write-message ( message -- )
-     dup
-     '[ _ 
-        [ flags>> write-int32 ] keep 
-        [ collection>> write-cstring ] keep
-        [ skip#>> write-int32 ] keep
-        [ return#>> write-int32 ] keep
-        [ build-query-object assoc>stream ] keep
-        returnfields>> [ assoc>stream ] when* 
-     ] (write-message) ;
- 
-M: mdb-insert-msg write-message ( message -- )
-    dup
-    '[ _
-       [ flags>> write-int32 ] keep
-       [ collection>> write-cstring ] keep
-       objects>> [ assoc>stream ] each
-    ] (write-message) ;
-
-M: mdb-update-msg write-message ( message -- )
-    dup
-    '[ _
-       [ flags>> write-int32 ] keep
-       [ collection>> write-cstring ] keep
-       [ upsert?>> write-int32 ] keep
-       [ selector>> assoc>stream ] keep
-       object>> assoc>stream
-    ] (write-message) ;
-
-M: mdb-delete-msg write-message ( message -- )
-    dup
-    '[ _
-       [ flags>> write-int32 ] keep
-       [ collection>> write-cstring ] keep
-       0 write-int32
-       selector>> assoc>stream
-    ] (write-message) ;
-
-M: mdb-getmore-msg write-message ( message -- )
-    dup
-    '[ _
-       [ flags>> write-int32 ] keep
-       [ collection>> write-cstring ] keep
-       [ return#>> write-int32 ] keep
-       cursor>> write-longlong
-    ] (write-message) ;
-
-M: mdb-killcursors-msg write-message ( message -- )
-    dup
-    '[ _
-       [ flags>> write-int32 ] keep
-       [ cursors#>> write-int32 ] keep
-       cursors>> [ write-longlong ] each
-    ] (write-message) ;
-
+: write-message ( message -- )
+    {  
+        { [ dup mdb-query-msg? ] [ query-write-message ] }
+        { [ dup mdb-insert-msg? ] [ insert-write-message ] }
+        { [ dup mdb-update-msg? ] [ update-write-message ] }
+        { [ dup mdb-delete-msg? ] [ delete-write-message ] }
+        { [ dup mdb-getmore-msg? ] [ getmore-write-message ] }
+        { [ dup mdb-killcursors-msg? ] [ killcursors-write-message ] }
+    } cond ;

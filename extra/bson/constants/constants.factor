@@ -1,5 +1,8 @@
-USING: accessors constructors kernel strings uuid ;
-
+! Copyright (C) 2010 Sascha Matzke.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors assocs calendar combinators
+combinators.short-circuit constructors kernel linked-assocs
+math math.bitwise random strings uuid ;
 IN: bson.constants
 
 : <objid> ( -- objid )
@@ -7,9 +10,33 @@ IN: bson.constants
 
 TUPLE: oid { a initial: 0 } { b initial: 0 } ;
 
-TUPLE: objref ns objid ;
+: <oid> ( -- oid )
+    oid new
+    now timestamp>micros >>a
+    8 random-bits 16 shift HEX: FF0000 mask
+    16 random-bits HEX: FFFF mask
+    bitor >>b ;
 
-CONSTRUCTOR: objref ( ns objid -- objref ) ;
+TUPLE: dbref ref id db ;
+
+CONSTRUCTOR: dbref ( ref id -- dbref ) ;
+
+: dbref>assoc ( dbref -- assoc )
+    [ <linked-hash> ] dip over
+    {
+        [ [ ref>> "$ref" ] [ set-at ] bi* ]
+        [ [ id>> "$id" ] [ set-at ] bi* ]
+        [ over db>> [
+                [ db>> "$db" ] [ set-at ] bi*
+            ] [ 2drop ] if ]
+    } 2cleave ; inline
+
+: assoc>dbref ( assoc -- dbref )
+    [ "$ref" swap at ] [ "$id" swap at ] [ "$db" swap at ] tri
+    dbref boa ; inline
+
+: dbref-assoc? ( assoc -- ? )
+    { [ "$ref" swap key? ] [ "$id" swap key? ] } 1&& ; inline
 
 TUPLE: mdbregexp { regexp string } { options string } ;
 
