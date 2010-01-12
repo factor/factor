@@ -54,7 +54,7 @@ CONSTRUCTOR: cond-value ( value quot -- cond-value ) ;
    over [ call( tuple -- assoc ) ] dip 
    [ [ tuple-collection name>> ] [ >toid ] bi ] keep
    [ add-storable ] dip
-   [ tuple-collection name>> ] [ id>> ] bi <objref> ;
+   [ tuple-collection name>> ] [ id>> ] bi <dbref> ;
 
 : write-field ( value quot -- value' )
    <cond-value> {
@@ -79,7 +79,7 @@ CONSTRUCTOR: cond-value ( value quot -- cond-value ) ;
    H{ } clone swap [ <mirror> ] keep pick ; inline
 
 : ensure-mdb-info ( tuple -- tuple )    
-   dup id>> [ <objid> >>id ] unless ; inline
+   dup id>> [ <oid> >>id ] unless ; inline
 
 : with-object-map ( quot: ( -- ) -- store-assoc )
    [ H{ } clone dup object-map ] dip with-variable ; inline

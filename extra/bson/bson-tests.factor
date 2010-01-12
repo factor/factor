@@ -1,4 +1,4 @@
-USING: bson.reader bson.writer byte-arrays io.encodings.binary
+USING: bson.reader bson.writer bson.constants byte-arrays io.encodings.binary
 io.streams.byte-array tools.test literals calendar kernel math ;
 
 IN: bson.tests
@@ -17,6 +17,9 @@ IN: bson.tests
 [ H{ { "a quotation" [ 1 2 + ] } } ]
 [ H{ { "a quotation" [ 1 2 + ] } } turnaround ] unit-test
 
+[ H{ { "ref" T{ dbref f "a" "b" "c" } } } ]
+[ H{ { "ref" T{ dbref f "a" "b" "c" } } } turnaround ] unit-test
+
 [ H{ { "a date" T{ timestamp { year 2009 }
                    { month 7 }
                    { day 11 }
@@ -34,10 +37,12 @@ IN: bson.tests
 ] unit-test
                    
 [ H{ { "nested" H{ { "a" "a string" } { "b" H{ { "a" "a string" } } } } }
+     { "ref" T{ dbref f "a" "b" "c" } }
      { "array" H{ { "a list" { 1 2.234 "hello world" } } } }
      { "quot" [ 1 2 + ] } }
 ]     
 [ H{ { "nested" H{ { "a" "a string" } { "b" H{ { "a" "a string" } } } } }
+     { "ref" T{ dbref f "a" "b" "c" } }
      { "array" H{ { "a list" { 1 2.234 "hello world" } } } }
      { "quot" [ 1 2 + ] } } turnaround ] unit-test
      
