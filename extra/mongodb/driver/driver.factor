@@ -1,10 +1,10 @@
 USING: accessors arrays assocs bson.constants combinators
-combinators.smart constructors destructors formatting fry hashtables
-io io.pools io.sockets kernel linked-assocs math mongodb.connection
-mongodb.msg parser prettyprint prettyprint.custom prettyprint.sections
-sequences sets splitting strings
-tools.continuations uuid memoize locals ;
-
+combinators.smart constructors destructors fry hashtables io
+io.pools io.sockets kernel linked-assocs locals math
+mongodb.cmd mongodb.connection mongodb.msg namespaces parser
+prettyprint prettyprint.custom prettyprint.sections sequences
+sets splitting strings ;
+FROM: ascii => ascii? ;
 IN: mongodb.driver
 
 TUPLE: mdb-pool < pool mdb ;
@@ -13,9 +13,9 @@ TUPLE: mdb-cursor id query ;
 
 TUPLE: mdb-collection
 { name string }
-{ capped boolean initial: f }
-{ size integer initial: -1 }
-{ max integer initial: -1 } ;
+{ capped boolean }
+{ size integer }
+{ max integer } ;
 
 CONSTRUCTOR: mdb-collection ( name -- collection ) ;
 
@@ -61,7 +61,7 @@ M: mdb-getmore-msg update-query
     query>> update-query ; 
       
 : make-cursor ( mdb-result-msg mdb-query-msg/mdb-getmore-msg -- mdb-cursor/f )
-    over cursor>> 0 > 
+    over cursor>> 0 >
     [ [ update-query ]
       [ [ cursor>> ] dip <mdb-cursor> ] 2bi
     ] [ 2drop f ] if ;
@@ -84,23 +84,23 @@ M: mdb-getmore-msg verify-query-result
     [ make-cursor ] 2tri
     swap objects>> ;
 
-: make-collection-assoc ( collection assoc -- )
-    [ [ name>> "create" ] dip set-at ]
-    [ [ [ capped>> ] keep ] dip
-      '[ _ _
-         [ [ drop t "capped" ] dip set-at ]
-         [ [ size>> "size" ] dip set-at ]
-         [ [ max>> "max" ] dip set-at ] 2tri ] when
-    ] 2bi ; 
 
 PRIVATE>
 
 SYNTAX: r/ ( token -- mdbregexp )
     \ / [ >mdbregexp ] parse-literal ; 
 
-: with-db ( mdb quot -- * )
+: with-db ( mdb quot -- )
     '[ _ mdb-open &dispose _ with-connection ] with-destructors ; inline
-  
+
+: with-mdb ( mdb quot -- )
+    [ <mdb-pool> ] dip
+    [ mdb-pool swap with-variable ] curry with-disposal ; inline
+
+: with-mdb-connection ( quot -- )
+    [ mdb-pool get ] dip 
+    '[ _ with-connection ] with-pooled-connection ; inline
+
 : >id-selector ( assoc -- selector )
     [ MDB_OID_FIELD swap at ] keep
     H{ } clone [ set-at ] keep ;
@@ -115,11 +115,16 @@ GENERIC: create-collection ( name/collection -- )
 M: string create-collection
     <mdb-collection> create-collection ;
 
-M: mdb-collection create-collection
-    [ [ cmd-collection ] dip
-      <linked-hash> [ make-collection-assoc ] keep
-      <mdb-query-msg> 1 >>return# send-query-plain drop ] keep
-      [ ] [ name>> ] bi mdb-instance collections>> set-at ;
+M: mdb-collection create-collection ( collection -- )
+    create-cmd make-cmd over
+    {
+        [ name>> "create" set-cmd-opt ]
+        [ capped>> [ "capped" set-cmd-opt ] when* ]
+        [ max>> [ "max" set-cmd-opt ] when* ]
+        [ size>> [ "size" set-cmd-opt ] when* ]
+    } cleave send-cmd check-ok
+    [ drop [ ] [ name>> ] bi mdb-instance collections>> set-at ]
+    [ throw ] if ;
   
 : load-collection-list ( -- collection-list )
     namespaces-collection
@@ -128,8 +133,12 @@ M: mdb-collection create-collection
 <PRIVATE
 
 : ensure-valid-collection-name ( collection -- )
-    [ ";$." intersect length 0 > ] keep
-    '[ _ "contains invalid characters ( . $ ; )" "." glue throw ] when ; inline
+    [
+        [ ";$." intersect length 0 > ] keep
+        '[ _ "contains invalid characters ( . $ ; )" ":" glue throw ] when
+    ] [
+        [ ascii? ] all? [ "collection names must only contain ascii characters" throw ] unless
+    ] bi ; inline
 
 : build-collection-map ( -- assoc )
     H{ } clone load-collection-list      
@@ -215,21 +224,21 @@ M: mdb-cursor find
     dup empty? [ drop f ] [ first ] if ;
 
 : count ( mdb-query-msg -- result )
-    [ collection>> "count" H{ } clone [ set-at ] keep ] keep
-    query>> [ over [ "query" ] dip set-at ] when*
-    [ cmd-collection ] dip <mdb-query-msg> find-one 
+    [ count-cmd make-cmd ] dip
+    [ collection>> "count" set-cmd-opt ]
+    [ query>> "query" set-cmd-opt ] bi send-cmd 
     [ check-ok nip ] keep '[ "n" _ at >fixnum ] [ f ] if ;
 
 : lasterror ( -- error )
-    cmd-collection H{ { "getlasterror" 1 } } <mdb-query-msg>
-    find-one [ "err" ] dip at ;
+    getlasterror-cmd make-cmd send-cmd
+    [ "err" ] dip at ;
 
 GENERIC: validate. ( collection -- )
 
 M: string validate.
-    [ cmd-collection ] dip
-    "validate" H{ } clone [ set-at ] keep
-    <mdb-query-msg> find-one [ check-ok nip ] keep
+    [ validate-cmd make-cmd ] dip
+    "validate" set-cmd-opt send-cmd
+    [ check-ok nip ] keep
     '[ "result" _ at print ] [  ] if ;
 
 M: mdb-collection validate.
@@ -251,7 +260,7 @@ PRIVATE>
     <mdb-insert-msg> send-message ;
 
 : ensure-index ( index-spec -- )
-    <linked-hash> [ [ uuid1 "_id" ] dip set-at ] keep
+    <linked-hash> [ [ <oid> "_id" ] dip set-at ] keep
     [ { [ [ name>> "name" ] dip set-at ]
         [ [ ns>> index-ns "ns" ] dip set-at ]
         [ [ key>> "key" ] dip set-at ]
@@ -261,11 +270,9 @@ PRIVATE>
     [ index-collection ] dip save ;
 
 : drop-index ( collection name -- )
-    H{ } clone
-    [ [ "index" ] dip set-at ] keep
-    [ [ "deleteIndexes" ] dip set-at ] keep
-    [ cmd-collection ] dip <mdb-query-msg>
-    find-one drop ;
+    [ delete-index-cmd make-cmd ] 2dip
+    [ "deleteIndexes" set-cmd-opt ]
+    [ "index" set-cmd-opt ] bi* send-cmd drop ;
 
 : <update> ( collection selector object -- mdb-update-msg )
     [ check-collection ] 2dip <mdb-update-msg> ;
@@ -278,7 +285,16 @@ PRIVATE>
 
 : update-unsafe ( mdb-update-msg -- )
     send-message ;
- 
+
+: find-and-modify ( collection selector modifier -- mongodb-cmd )
+    [ findandmodify-cmd make-cmd ] 3dip
+    [ "findandmodify" set-cmd-opt ]
+    [ "query" set-cmd-opt ]
+    [ "update" set-cmd-opt ] tri* ; inline
+
+: run-cmd ( cmd -- result )
+    send-cmd ; inline
+
 : delete ( collection selector -- )
     [ check-collection ] dip
     <mdb-delete-msg> send-message-check-error ;
@@ -298,8 +314,7 @@ PRIVATE>
     check-collection drop ;
 
 : drop-collection ( name -- )
-    [ cmd-collection ] dip
-    "drop" H{ } clone [ set-at ] keep
-    <mdb-query-msg> find-one drop ;
+    [ drop-cmd make-cmd ] dip
+    "drop" set-cmd-opt send-cmd drop ;
 
 
