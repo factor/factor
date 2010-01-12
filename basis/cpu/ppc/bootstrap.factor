@@ -60,7 +60,7 @@ CONSTANT: ctx-reg 16
     1 1 callback-frame-size neg STWU
     0 1 callback-frame-size lr-save + STW
 
-    nv-int-regs [ cells save-int ] each-index
+    nv-int-regs [ 4 * save-int ] each-index
     nv-fp-regs [ 8 * 80 + save-fp ] each-index
     nv-vec-regs [ 16 * 224 + save-vec ] each-index
 
@@ -72,7 +72,7 @@ CONSTANT: ctx-reg 16
 
     nv-vec-regs [ 16 * 224 + restore-vec ] each-index
     nv-fp-regs [ 8 * 80 + restore-fp ] each-index
-    nv-int-regs [ cells restore-int ] each-index
+    nv-int-regs [ 4 * restore-int ] each-index
 
     0 1 callback-frame-size lr-save + LWZ
     1 1 0 LWZ
@@ -366,7 +366,7 @@ CONSTANT: ctx-reg 16
     jit-restore-context
 
     ! We have changed the stack; load return address again
-    0 1 stack-frame lr-save + LWZ
+    0 1 lr-save LWZ
     0 MTLR
 
     ! Call quotation
