@@ -377,9 +377,7 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
 [ f ] [ namespace global eq? ] unit-test
 
 : callback-8 ( -- callback )
-    void { } "cdecl" [
-        [ continue ] callcc0
-    ] alien-callback ;
+    void { } "cdecl" [ [ ] in-thread yield ] alien-callback ;
 
 [ ] [ callback-8 callback_test_1 ] unit-test
 
