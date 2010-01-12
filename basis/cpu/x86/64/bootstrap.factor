@@ -89,6 +89,10 @@ IN: bootstrap.x86
     ! Unwind stack frames
     RSP arg2 MOV
 
+    ! Load VM pointer into vm-reg, since we're entering from
+    ! C code
+    vm-reg 0 MOV 0 rc-absolute-cell jit-vm
+
     ! Load ds and rs registers
     jit-restore-context
 
