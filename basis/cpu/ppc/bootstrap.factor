@@ -358,6 +358,10 @@ CONSTANT: ctx-reg 16
     ! Unwind stack frames
     1 4 MR
 
+    ! Load VM pointer into vm-reg, since we're entering from
+    ! C code
+    0 vm-reg LOAD32 0 rc-absolute-ppc-2/2 jit-vm
+
     ! Load ds and rs registers
     jit-restore-context
 
