@@ -18,7 +18,6 @@ typedef wchar_t vm_char;
 #define STRCMP wcscmp
 #define STRNCMP wcsncmp
 #define STRDUP _wcsdup
-#define MIN(a,b) ((a)>(b)?(b):(a))
 #define FTELL ftello64
 #define FSEEK fseeko64
 
