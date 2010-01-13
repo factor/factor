@@ -393,7 +393,7 @@ IN: tools.deploy.shaker
         '[ drop _ member? not ] assoc-filter
         [ drop string? not ] assoc-filter ! strip CLI args
         sift-assoc
-        21 setenv
+        21 set-special-object
     ] [ drop ] if ;
 
 : strip-c-io ( -- )
@@ -518,7 +518,7 @@ SYMBOL: deploy-vocab
     strip-c-io
     strip-default-methods
     strip-compiler-classes
-    f 5 setenv ! we can't use the Factor debugger or Factor I/O anymore
+    f 5 set-special-object ! we can't use the Factor debugger or Factor I/O anymore
     deploy-vocab get vocab-main deploy-startup-quot
     find-megamorphic-caches
     stripped-word-props

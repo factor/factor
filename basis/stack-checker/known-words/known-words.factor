@@ -489,10 +489,10 @@ M: bad-executable summary
 \ word-xt { word } { integer integer } define-primitive
 \ word-xt make-flushable
 
-\ getenv { fixnum } { object } define-primitive
-\ getenv make-flushable
+\ special-object { fixnum } { object } define-primitive
+\ special-object make-flushable
 
-\ setenv { object fixnum } { } define-primitive
+\ set-special-object { object fixnum } { } define-primitive
 
 \ (exists?) { string } { object } define-primitive
 

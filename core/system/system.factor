@@ -53,6 +53,6 @@ PRIVATE>
 
 : vm ( -- path ) \ vm get-global ;
 
-: embedded? ( -- ? ) 15 getenv ;
+: embedded? ( -- ? ) 15 special-object ;
 
 : exit ( n -- ) do-shutdown-hooks (exit) ;

@@ -100,7 +100,7 @@ GENERIC: definitions-changed ( assoc obj -- )
 ! Incremented each time stack effects potentially changed, used
 ! by compiler.tree.propagation.call-effect for call( and execute(
 ! inline caching
-: effect-counter ( -- n ) 47 getenv ; inline
+: effect-counter ( -- n ) 47 special-object ; inline
 
 GENERIC: bump-effect-counter* ( defspec -- ? )
 
@@ -132,7 +132,11 @@ M: object bump-effect-counter* drop f ;
     or ;
 
 : bump-effect-counter ( -- )
-    bump-effect-counter? [ 47 getenv 0 or 1 + 47 setenv ] when ;
+    bump-effect-counter? [
+        47 special-object 0 or
+        1 +
+        47 set-special-object
+    ] when ;
 
 : notify-observers ( -- )
     updated-definitions dup assoc-empty?

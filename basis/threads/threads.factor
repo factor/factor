@@ -21,7 +21,7 @@ mailbox
 variables
 sleep-entry ;
 
-: self ( -- thread ) 63 getenv ; inline
+: self ( -- thread ) 63 special-object ; inline
 
 ! Thread-local storage
 : tnamespace ( -- assoc )
@@ -36,7 +36,7 @@ sleep-entry ;
 : tchange ( key quot -- )
     tnamespace swap change-at ; inline
 
-: threads ( -- assoc ) 64 getenv ;
+: threads ( -- assoc ) 64 special-object ;
 
 : thread ( id -- thread ) threads at ;
 
@@ -61,7 +61,7 @@ ERROR: not-running thread ;
 : unregister-thread ( thread -- )
     check-registered id>> threads delete-at ;
 
-: set-self ( thread -- ) 63 setenv ; inline
+: set-self ( thread -- ) 63 set-special-object ; inline
 
 PRIVATE>
 
@@ -75,9 +75,9 @@ PRIVATE>
 : <thread> ( quot name -- thread )
     \ thread new-thread ;
 
-: run-queue ( -- dlist ) 65 getenv ;
+: run-queue ( -- dlist ) 65 special-object ;
 
-: sleep-queue ( -- heap ) 66 getenv ;
+: sleep-queue ( -- heap ) 66 special-object ;
 
 : resume ( thread -- )
     f >>state
@@ -216,9 +216,9 @@ GENERIC: error-in-thread ( error thread -- )
 <PRIVATE
 
 : init-threads ( -- )
-    H{ } clone 64 setenv
-    <dlist> 65 setenv
-    <min-heap> 66 setenv
+    H{ } clone 64 set-special-object
+    <dlist> 65 set-special-object
+    <min-heap> 66 set-special-object
     initial-thread global
     [ drop [ ] "Initial" <thread> ] cache
     <box> >>continuation

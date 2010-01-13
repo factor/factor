@@ -474,7 +474,7 @@ M: ##alien-indirect generate-insn
 
 TUPLE: callback-context ;
 
-: current-callback ( -- id ) 2 getenv ;
+: current-callback ( -- id ) 2 special-object ;
 
 : wait-to-return ( token -- )
     dup current-callback eq? [
@@ -485,7 +485,7 @@ TUPLE: callback-context ;
 
 : do-callback ( quot token -- )
     init-catchstack
-    [ 2 setenv call ] keep
+    [ 2 set-special-object call ] keep
     wait-to-return ; inline
 
 : callback-return-quot ( ctype -- quot )
