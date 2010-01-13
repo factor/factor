@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Phil Dawes.
+! Copyright (C) 2009, 2010 Phil Dawes, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes.struct alien.c-types alien.syntax ;
 IN: vm
@@ -30,7 +30,7 @@ STRUCT: vm
 { nursery zone }
 { cards-offset cell }
 { decks-offset cell }
-{ userenv cell[70] } ;
+{ special-objects cell[70] } ;
 
 : vm-field-offset ( field -- offset ) vm offset-of ; inline
 

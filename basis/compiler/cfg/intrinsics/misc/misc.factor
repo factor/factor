@@ -9,8 +9,8 @@ IN: compiler.cfg.intrinsics.misc
 : emit-tag ( -- )
     ds-pop tag-mask get ^^and-imm ^^tag-fixnum ds-push ;
 
-: emit-getenv ( node -- )
-    "userenv" ^^vm-field-ptr
+: emit-special-object ( node -- )
+    "special-objects" ^^vm-field-ptr
     swap node-input-infos first literal>>
     [ ds-drop 0 ^^slot-imm ] [ ds-pop ^^offset>slot ^^slot ] if*
     ds-push ;

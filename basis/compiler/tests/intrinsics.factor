@@ -54,8 +54,8 @@ IN: compiler.tests.intrinsics
 [ HEX: 123456 ] [ 1 [ "a\u123456c" string-nth ] compile-call ] unit-test
 [ HEX: 123456 ] [ [ 1 "a\u123456c" string-nth ] compile-call ] unit-test
 
-[ ] [ [ 0 getenv ] compile-call drop ] unit-test
-[ ] [ 1 getenv [ 1 setenv ] compile-call ] unit-test
+[ ] [ [ 0 special-object ] compile-call drop ] unit-test
+[ ] [ 1 special-object [ 1 set-special-object ] compile-call ] unit-test
 
 [ ] [ 1 [ drop ] compile-call ] unit-test
 [ ] [ [ 1 drop ] compile-call ] unit-test
