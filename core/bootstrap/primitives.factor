@@ -421,8 +421,8 @@ tuple
     { "float-u>=" "math.private" (( x y -- ? )) }
     { "(word)" "words.private" (( name vocab -- word )) }
     { "word-xt" "words" (( word -- start end )) }
-    { "getenv" "kernel.private" (( n -- obj )) }
-    { "setenv" "kernel.private" (( obj n -- )) }
+    { "special-object" "kernel.private" (( n -- obj )) }
+    { "set-special-object" "kernel.private" (( obj n -- )) }
     { "(exists?)" "io.files.private" (( path -- ? )) }
     { "minor-gc" "memory" (( -- )) }
     { "gc" "memory" (( -- )) }
