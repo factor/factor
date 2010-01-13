@@ -1,5 +1,6 @@
-USING: kernel math math.functions namespaces prettyprint
-math.private continuations tools.test sequences random ;
+USING: kernel math math.functions math.order namespaces
+prettyprint math.private continuations tools.test sequences
+random ;
 IN: math.integers.tests
 
 [ "-8" ] [ -8 unparse ] unit-test
@@ -230,3 +231,6 @@ unit-test
 ! Ensure that /f is accurate for fixnums > 2^53 on 64-bit platforms
 [ HEX: 1.758bec11492f9p-54 ] [ 1 12345678901234567 /f ] unit-test
 [ HEX: -1.758bec11492f9p-54 ] [ 1 -12345678901234567 /f ] unit-test
+
+[ 17 ] [ 17 >bignum 5 max ] unit-test
+[ 5 ] [ 17 >bignum 5 min ] unit-test
