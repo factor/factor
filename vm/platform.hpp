@@ -1,20 +1,3 @@
-#if defined(__arm__)
-	#define FACTOR_ARM
-#elif defined(__amd64__) || defined(__x86_64__)
-	#define FACTOR_AMD64
-	#define FACTOR_64
-#elif defined(i386) || defined(__i386) || defined(__i386__) || defined(WIN32)
-	#define FACTOR_X86
-#elif defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)
-	#define FACTOR_PPC
-#else
-	#error "Unsupported architecture"
-#endif
-
-#ifdef WIN32
-	#define WINDOWS
-#endif
-
 #if defined(WINDOWS)
 	#if defined(WINCE)
 		#include "os-windows-ce.hpp"
