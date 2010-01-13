@@ -58,21 +58,14 @@ M: object v*hs+ [ * ] 2map (h+) ;
 GENERIC: v/ ( u v -- w )
 M: object v/ [ / ] 2map ;
 
-<PRIVATE
-
-: if-both-floats ( x y p q -- )
-    [ 2dup [ float? ] both? ] 2dip if ; inline
-
-PRIVATE>
-
 GENERIC: vavg ( u v -- w )
 M: object vavg [ + 2 / ] 2map ;
 
 GENERIC: vmax ( u v -- w )
-M: object vmax [ [ float-max ] [ max ] if-both-floats ] 2map ;
+M: object vmax [ max ] 2map ;
 
 GENERIC: vmin ( u v -- w )
-M: object vmin [ [ float-min ] [ min ] if-both-floats ] 2map ;
+M: object vmin [ min ] 2map ;
 
 GENERIC: v+- ( u v -- w )
 M: object v+-

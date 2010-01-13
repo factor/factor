@@ -1,14 +1,13 @@
 USING: kernel compiler.tree.builder compiler.tree
 compiler.tree.propagation compiler.tree.recursive
-compiler.tree.normalization tools.test math math.order
-accessors sequences arrays kernel.private vectors
-alien.accessors alien.c-types sequences.private
-byte-arrays classes.algebra classes.tuple.private
-math.functions math.private strings layouts
-compiler.tree.propagation.info compiler.tree.def-use
-compiler.tree.debugger compiler.tree.checker
-slots.private words hashtables classes assocs locals
-specialized-arrays system sorting math.libm
+compiler.tree.normalization tools.test math math.order accessors
+sequences arrays kernel.private vectors alien.accessors
+alien.c-types sequences.private byte-arrays classes.algebra
+classes.tuple.private math.functions math.private strings
+layouts compiler.tree.propagation.info compiler.tree.def-use
+compiler.tree.debugger compiler.tree.checker slots.private words
+hashtables classes assocs locals specialized-arrays system
+sorting math.libm math.floats.private math.integers.private
 math.intervals quotations effects alien alien.data ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
@@ -942,3 +941,14 @@ M: tuple-with-read-only-slot clone
 ! Could be bignum not integer but who cares
 [ V{ integer } ] [ [ 10 >bignum bitand ] final-classes ] unit-test
 
+[ t ] [ [ { fixnum fixnum } declare min ] { min } inlined? ] unit-test
+[ f ] [ [ { fixnum fixnum } declare min ] { fixnum-min } inlined? ] unit-test
+
+[ t ] [ [ { float float } declare min ] { min } inlined? ] unit-test
+[ f ] [ [ { float float } declare min ] { float-min } inlined? ] unit-test
+
+[ t ] [ [ { fixnum fixnum } declare max ] { max } inlined? ] unit-test
+[ f ] [ [ { fixnum fixnum } declare max ] { fixnum-max } inlined? ] unit-test
+
+[ t ] [ [ { float float } declare max ] { max } inlined? ] unit-test
+[ f ] [ [ { float float } declare max ] { float-max } inlined? ] unit-test
