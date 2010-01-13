@@ -132,26 +132,6 @@ IN: compiler.tree.propagation.transforms
     ] "custom-inlining" set-word-prop
 ] each
 
-! Integrate this with generic arithmetic optimization instead?
-: both-inputs? ( #call class -- ? )
-    [ in-d>> first2 ] dip '[ value-info class>> _ class<= ] both? ;
-
-\ min [
-    {
-        { [ dup fixnum both-inputs? ] [ [ fixnum-min ] ] }
-        { [ dup float both-inputs? ] [ [ float-min ] ] }
-        [ f ]
-    } cond nip
-] "custom-inlining" set-word-prop
-
-\ max [
-    {
-        { [ dup fixnum both-inputs? ] [ [ fixnum-max ] ] }
-        { [ dup float both-inputs? ] [ [ float-max ] ] }
-        [ f ]
-    } cond nip
-] "custom-inlining" set-word-prop
-
 ! Generate more efficient code for common idiom
 \ clone [
     in-d>> first value-info literal>> {

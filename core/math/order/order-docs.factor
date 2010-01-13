@@ -44,18 +44,18 @@ HELP: compare
 } ;
 
 HELP: max
-{ $values { "x" object } { "y" object } { "z" object } }
+{ $values { "obj1" object } { "obj2" object } { "obj" object } }
 { $description "Outputs the greatest of two ordered values." }
 { $notes "If one value is a floating point positive zero and the other is a negative zero, the result is undefined." } ;
 
 HELP: min
-{ $values { "x" object } { "y" object } { "z" object } }
+{ $values { "obj1" object } { "obj2" object } { "obj" object } }
 { $description "Outputs the smallest of two ordered values." }
 { $notes "If one value is a floating point positive zero and the other is a negative zero, the result is undefined." } ;
 
 HELP: clamp
 { $values { "x" object } { "min" object } { "max" object } { "y" object } }
-{ $description "Outputs " { $snippet "x" } " if contained in the interval " { $snippet "[min,max]" } " or outputs one of the endpoints." } ;
+{ $description "Outputs " { $snippet "x" } " if contained in the interval " { $snippet "[min,max]" } " or else outputs one of the endpoints." } ;
 
 HELP: between?
 { $values { "x" object } { "y" object } { "z" real } { "?" "a boolean" } }
