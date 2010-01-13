@@ -1,10 +1,10 @@
-! Copyright (C) 2007, 2009 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays byte-arrays byte-vectors generic assocs hashtables
 io.binary kernel kernel.private math namespaces make sequences
 words quotations strings alien.accessors alien.strings layouts
 system combinators math.bitwise math.order generalizations
-accessors growable fry compiler.constants ;
+accessors growable fry compiler.constants memoize ;
 IN: compiler.codegen.fixup
 
 ! Owner
@@ -52,8 +52,11 @@ SYMBOL: relocation-table
 : rel-fixup ( class type -- )
     swap compiled-offset add-relocation-entry ;
 
+! Caching common symbol names reduces image size a bit
+MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
+
 : add-dlsym-parameters ( symbol dll -- )
-    [ string>symbol add-parameter ] [ add-parameter ] bi* ;
+    [ cached-string>symbol add-parameter ] [ add-parameter ] bi* ;
 
 : rel-dlsym ( name dll class -- )
     [ add-dlsym-parameters ] dip rt-dlsym rel-fixup ;
