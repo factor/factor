@@ -3,10 +3,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax kernel libc sequences
 continuations byte-arrays strings math namespaces system
-combinators combinators.smart combinators.smart.private
-vocabs.loader accessors stack-checker macros locals
-generalizations unix.types io vocabs classes.struct unix.time
-alien.libraries ;
+combinators combinators.smart vocabs.loader accessors
+stack-checker macros locals generalizations unix.types io vocabs
+classes.struct unix.time alien.libraries ;
 IN: unix
 
 CONSTANT: PROT_NONE   0
