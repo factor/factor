@@ -78,7 +78,7 @@ PRIVATE>
     >odd (find-relative-prime) ;
 
 : find-relative-prime ( n -- p )
-    dup random find-relative-prime* ;
+    dup iota random find-relative-prime* ;
 
 ERROR: too-few-primes n numbits ;
 

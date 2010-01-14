@@ -108,7 +108,8 @@ PRIVATE>
 
 : exclusions ( -- set )
     exclusions-file utf8 file-lines
-    [ "#" split1 drop [ blank? ] trim-tail hex> ] map harvest ;
+    [ "#" split1 drop [ blank? ] trim-tail hex> ] map
+    [ 0 = not ] filter ;
 
 : remove-exclusions ( alist -- alist )
     exclusions [ dup ] H{ } map>assoc assoc-diff ;

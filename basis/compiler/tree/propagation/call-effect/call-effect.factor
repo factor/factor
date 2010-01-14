@@ -1,8 +1,8 @@
-! Copyright (C) 2009 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2009, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.private effects fry
-kernel kernel.private make sequences continuations quotations
-words math stack-checker combinators.short-circuit
+USING: accessors arrays combinators combinators.private effects
+fry kernel kernel.private make sequences continuations
+quotations words math stack-checker combinators.short-circuit
 stack-checker.transforms compiler.tree.propagation.info
 compiler.tree.propagation.inlining compiler.units ;
 IN: compiler.tree.propagation.call-effect
@@ -43,7 +43,7 @@ M: +unknown+ curry-effect ;
 M: effect curry-effect
     [ in>> length ] [ out>> length ] [ terminated?>> ] tri
     pick 0 = [ [ 1 + ] dip ] [ [ 1 - ] 2dip ] if
-    effect boa ;
+    [ [ "x" <array> ] bi@ ] dip effect boa ;
 
 M: curry cached-effect
     quot>> cached-effect curry-effect ;

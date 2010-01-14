@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 combinators definitions effects fry generic generic.single
@@ -24,7 +24,7 @@ M: object specializer-declaration class ;
     "specializer" word-prop ;
 
 : make-specializer ( specs -- quot )
-    dup length <reversed>
+    dup length iota <reversed>
     [ (picker) 2array ] 2map
     [ drop object eq? not ] assoc-filter
     [ [ t ] ] [

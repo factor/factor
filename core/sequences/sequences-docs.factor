@@ -1140,9 +1140,9 @@ HELP: set-fourth
 
 HELP: replicate
 { $values
-     { "seq" sequence } { "quot" { $quotation "( -- elt )" } }
+     { "len" integer } { "quot" { $quotation "( -- elt )" } }
      { "newseq" sequence } }
-{ $description "Calls the quotation for every element of the sequence in order. However, the element is not passed to the quotation -- it is dropped, and the quotation produces an element of its own that is collected into a sequence of the same class as the input sequence." }
+     { $description "Calls the quotation " { $snippet "len" } " times, collecting results into a new array." }
 { $examples 
     { $unchecked-example "USING: kernel prettyprint random sequences ;"
         "5 [ 100 random ] replicate ."
@@ -1152,15 +1152,16 @@ HELP: replicate
 
 HELP: replicate-as
 { $values
-     { "seq" sequence } { "quot" quotation } { "exemplar" sequence }
+     { "len" integer } { "quot" quotation } { "exemplar" sequence }
      { "newseq" sequence } }
-{ $description "Calls the quotation for every element of the sequence in order. However, the element is not passed to the quotation -- it is dropped, and the quotation produces an element of its own that is collected into a sequence of the same class as the exemplar sequence." }
+ { $description "Calls the quotation " { $snippet "len" } " times, collecting results into a new sequence of the same type as the exemplar sequence." }
 { $examples 
     { $unchecked-example "USING: prettyprint kernel sequences ;"
         "5 [ 100 random ] B{ } replicate-as ."
         "B{ 44 8 2 33 18 }"
     }
 } ;
+
 { replicate replicate-as } related-words
 
 HELP: partition

@@ -250,7 +250,7 @@ IN: math.intervals.tests
     dup full-interval eq? [
         drop 32 random-bits 31 2^ -
     ] [
-        [ ] [ from>> first ] [ to>> first ] tri over - random +
+        [ ] [ from>> first ] [ to>> first ] tri over - iota random +
         2dup swap interval-contains? [
             nip
         ] [
@@ -259,10 +259,10 @@ IN: math.intervals.tests
     ] if ;
 
 : random-interval ( -- interval )
-    10 random 0 = [ full-interval ] [
-        2000 random 1000 - dup 2 1000 random + +
-        1 random zero? [ [ neg ] bi@ swap ] when
-        4 random {
+    10 iota random 0 = [ full-interval ] [
+        2000 iota random 1000 - dup 2 1000 iota random + +
+        1 iota random zero? [ [ neg ] bi@ swap ] when
+        4 iota random {
             { 0 [ [a,b] ] }
             { 1 [ [a,b) ] }
             { 2 [ (a,b) ] }
@@ -291,7 +291,7 @@ IN: math.intervals.tests
     ] if ;
 
 unary-ops [
-    [ [ t ] ] dip '[ 8000 iota [ drop _ unary-test ] all? ] unit-test
+    [ [ t ] ] dip '[ 8000 [ drop _ unary-test ] all-integers? ] unit-test
 ] each
 
 : binary-ops ( -- alist )
@@ -366,7 +366,7 @@ comparison-ops [
 
 ! Test that commutative interval ops really are
 : random-interval-or-empty ( -- obj )
-    10 random 0 = [ empty-interval ] [ random-interval ] if ;
+    10 iota random 0 = [ empty-interval ] [ random-interval ] if ;
 
 : commutative-ops ( -- seq )
     {

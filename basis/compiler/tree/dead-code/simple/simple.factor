@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors words assocs sequences arrays namespaces
 fry locals definitions classes classes.algebra generic
@@ -67,7 +67,7 @@ M: #alien-node compute-live-values* nip look-at-inputs ;
     filter-corresponding zip #data-shuffle ; inline
 
 :: drop-dead-values ( outputs -- #shuffle )
-    outputs make-values :> new-outputs
+    outputs length make-values :> new-outputs
     outputs filter-live :> live-outputs
     new-outputs
     live-outputs

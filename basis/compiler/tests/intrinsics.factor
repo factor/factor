@@ -337,7 +337,7 @@ ERROR: bug-in-fixnum* x y a b ;
 
 [ ] [
     10000 [
-        5 random [ drop 32 random-bits ] map product >bignum
+        5 iota random iota [ drop 32 random-bits ] map product >bignum
         dup [ bignum>fixnum ] keep compiled-bignum>fixnum =
         [ drop ] [ "Oops" throw ] if
     ] times

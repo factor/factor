@@ -153,7 +153,7 @@ M: bad-executable summary
 
 : infer-<tuple-boa> ( -- )
     \ <tuple-boa>
-    peek-d literal value>> second 1 + { tuple } <effect>
+    peek-d literal value>> second 1 + "obj" <array> { tuple } <effect>
     apply-word/effect ;
 
 \ <tuple-boa> [ infer-<tuple-boa> ] "special" set-word-prop

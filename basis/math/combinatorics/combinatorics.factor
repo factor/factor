@@ -1,4 +1,4 @@
-! Copyright (c) 2007-2009 Slava Pestov, Doug Coleman, Aaron Schaefer.
+! Copyright (c) 2007-2010 Slava Pestov, Doug Coleman, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs binary-search fry kernel locals math math.order
     math.ranges namespaces sequences sorting ;
@@ -15,7 +15,7 @@ IN: math.combinatorics
 PRIVATE>
 
 : factorial ( n -- n! )
-    1 [ 1 + * ] reduce ;
+    iota 1 [ 1 + * ] reduce ;
 
 : nPk ( n k -- nPk )
     2dup possible? [ dupd - [a,b) product ] [ 2drop 0 ] if ;
@@ -46,11 +46,11 @@ PRIVATE>
     [ permutation-indices ] keep nths ;
 
 : all-permutations ( seq -- seq )
-    [ length factorial ] keep
+    [ length factorial iota ] keep
     '[ _ permutation ] map ;
 
 : each-permutation ( seq quot -- )
-    [ [ length factorial ] keep ] dip
+    [ [ length factorial iota ] keep ] dip
     '[ _ permutation @ ] each ; inline
 
 : reduce-permutations ( seq identity quot -- result )

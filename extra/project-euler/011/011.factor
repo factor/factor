@@ -72,12 +72,12 @@ IN: project-euler.011
 
 : pad-front ( matrix -- matrix )
     [
-        length [ 0 <repetition> ] map
+        length iota [ 0 <repetition> ] map
     ] keep [ append ] 2map ;
 
 : pad-back ( matrix -- matrix )
     <reversed> [
-        length [ 0 <repetition> ] map
+        length iota [ 0 <repetition> ] map
     ] keep [ <reversed> append ] 2map ;
 
 : diagonal/ ( -- matrix )

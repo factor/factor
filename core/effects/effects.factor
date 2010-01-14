@@ -1,34 +1,33 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.parser math.order namespaces make sequences strings
 words assocs combinators accessors arrays quotations ;
 IN: effects
 
-TUPLE: effect { in read-only } { out read-only } { terminated? read-only } ;
-
-GENERIC: effect-length ( obj -- n )
-M: sequence effect-length length ;
-M: integer effect-length ;
+TUPLE: effect
+{ in array read-only }
+{ out array read-only }
+{ terminated? read-only } ;
 
 : <effect> ( in out -- effect )
-    dup { "*" } sequence= [ drop { } t ] [ f ] if
+    dup { "*" } = [ drop { } t ] [ f ] if
     effect boa ;
 
 : effect-height ( effect -- n )
-    [ out>> effect-length ] [ in>> effect-length ] bi - ; inline
+    [ out>> length ] [ in>> length ] bi - ; inline
 
 : effect<= ( effect1 effect2 -- ? )
     {
         { [ over terminated?>> ] [ t ] }
         { [ dup terminated?>> ] [ f ] }
-        { [ 2dup [ in>> effect-length ] bi@ > ] [ f ] }
+        { [ 2dup [ in>> length ] bi@ > ] [ f ] }
         { [ 2dup [ effect-height ] bi@ = not ] [ f ] }
         [ t ]
     } cond 2nip ; inline
 
 : effect= ( effect1 effect2 -- ? )
-    [ [ in>> effect-length ] bi@ = ]
-    [ [ out>> effect-length ] bi@ = ]
+    [ [ in>> length ] bi@ = ]
+    [ [ out>> length ] bi@ = ]
     [ [ terminated?>> ] bi@ = ]
     2tri and and ;
 
@@ -40,7 +39,6 @@ M: integer effect>string number>string ;
 M: pair effect>string first2 [ effect>string ] bi@ ": " glue ;
 
 : stack-picture ( seq -- string )
-    dup integer? [ "object" <repetition> ] when
     [ [ effect>string % CHAR: \s , ] each ] "" make ;
 
 M: effect effect>string ( effect -- string )
@@ -56,9 +54,13 @@ M: effect effect>string ( effect -- string )
 GENERIC: effect>type ( obj -- type )
 M: object effect>type drop object ;
 M: word effect>type ;
-! attempting to specialize on callable breaks compiling
-! M: effect effect>type drop callable ;
 M: pair effect>type second effect>type ;
+
+: effect-in-types ( effect -- input-types )
+    in>> [ effect>type ] map ;
+
+: effect-out-types ( effect -- input-types )
+    out>> [ effect>type ] map ;
 
 GENERIC: stack-effect ( word -- effect/f )
 
@@ -73,7 +75,7 @@ M: effect clone
     stack-effect effect-height ;
 
 : split-shuffle ( stack shuffle -- stack1 stack2 )
-    in>> effect-length cut* ;
+    in>> length cut* ;
 
 : shuffle-mapping ( effect -- mapping )
     [ out>> ] [ in>> ] bi [ index ] curry map ;
@@ -88,14 +90,9 @@ M: effect clone
     over terminated?>> [
         drop
     ] [
-        [ [ [ in>> effect-length ] [ out>> effect-length ] bi ] [ in>> effect-length ] bi* swap [-] + ]
-        [ [ out>> effect-length ] [ [ in>> effect-length ] [ out>> effect-length ] bi ] bi* [ [-] ] dip + ]
+        [ [ [ in>> length ] [ out>> length ] bi ] [ in>> length ] bi* swap [-] + ]
+        [ [ out>> length ] [ [ in>> length ] [ out>> length ] bi ] bi* [ [-] ] dip + ]
         [ nip terminated?>> ] 2tri
-        [ [ [ "obj" ] replicate ] bi@ ] dip
+        [ [ "x" <array> ] bi@ ] dip
         effect boa
     ] if ; inline
-
-: effect-in-types ( effect -- input-types )
-    in>> [ effect>type ] map ;
-: effect-out-types ( effect -- input-types )
-    out>> [ effect>type ] map ;
