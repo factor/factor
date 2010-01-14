@@ -50,7 +50,11 @@ PRIVATE>
 : random-bits* ( numbits -- n )
     1 - [ random-bits ] keep set-bit ;
 
-: random ( seq -- elt )
+GENERIC: random ( obj -- elt )
+
+M: integer random random-integer ;
+
+M: sequence random
     [ f ] [
         [ length random-integer ] keep nth
     ] if-empty ;
