@@ -90,6 +90,8 @@ IN: compiler.tree.propagation.tests
 
 [ float ] [ [ { float float } declare mod ] final-math-class ] unit-test
 
+[ V{ integer float } ] [ [ { float float } declare [ /i ] keep ] final-classes ] unit-test
+
 [ V{ fixnum } ] [ [ 255 bitand ] final-classes ] unit-test
 
 [ V{ fixnum } ] [
