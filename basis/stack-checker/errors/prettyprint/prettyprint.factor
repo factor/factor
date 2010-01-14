@@ -15,7 +15,7 @@ M: unbalanced-branches-error summary
 
 M: unbalanced-branches-error error.
     dup summary print
-    [ quots>> ] [ branches>> [ length "x" <array> <effect> ] { } assoc>map ] bi zip
+    [ quots>> ] [ branches>> [ length [ "x" <array> ] bi@ <effect> ] { } assoc>map ] bi zip
     [ [ first pprint-short bl ] [ second effect>string print ] bi ] each ;
 
 M: too-many->r summary
