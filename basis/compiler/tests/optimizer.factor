@@ -4,7 +4,7 @@ sbufs strings tools.test vectors words sequences.private
 quotations classes classes.algebra classes.tuple.private
 continuations growable namespaces hints alien.accessors
 compiler.tree.builder compiler.tree.optimizer sequences.deep
-compiler definitions generic.single shuffle ;
+compiler definitions generic.single shuffle math.order ;
 IN: compiler.tests.optimizer
 
 GENERIC: xyz ( obj -- obj )
@@ -445,5 +445,17 @@ M: object bad-dispatch-position-test* ;
 
 [ 1024 bignum ] [ 10 [ 1 >bignum swap >fixnum shift ] compile-call dup class ] unit-test
 
-! Not sure if I want to fix this...
-! [ t [ [ f ] [ 3 ] if >fixnum ] compile-call ] [ no-method? ] must-fail-with
+TUPLE: grid-mesh-tuple { length read-only } { step read-only } ;
+
+: grid-mesh-test-case ( -- vertices )
+    1.0 1.0 { 2 } first /f [ /i 1 + ] keep grid-mesh-tuple boa
+    1 f <array>
+    [
+        [ drop length>> >fixnum 2 min ] 2keep
+        [
+            [ step>> 1 * ] dip
+            0 swap set-nth-unsafe
+        ] 2curry times
+    ] keep ;
+
+[ { 0.5 } ] [ grid-mesh-test-case ] unit-test
