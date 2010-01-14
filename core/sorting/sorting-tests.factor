@@ -11,7 +11,7 @@ unit-test
 [ t ] [
     100 [
         drop
-        100 [ 20 iota random [ 1000 iota random ] replicate ] replicate
+        100 [ 20 random [ 1000 random ] replicate ] replicate
         dup natural-sort
         [ set= ] [ nip [ before=? ] monotonic? ] 2bi and
     ] all-integers?

@@ -57,7 +57,7 @@ test-2 "TEST2" {
 } define-persistent
 
 : test-1-tuple ( -- tuple )
-    f 100 iota random 100 iota random 100 iota random [ number>string ] tri@
+    f 100 random 100 random 100 random [ number>string ] tri@
     test-1 boa ;
 
 : db-tester ( test-db -- )

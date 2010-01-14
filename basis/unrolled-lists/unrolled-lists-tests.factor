@@ -49,7 +49,7 @@ IN: unrolled-lists.tests
 
 [ t ] [
     <unrolled-list>
-    1000 [ 1000 iota random ] replicate
+    1000 [ 1000 random ] replicate
     [ [ over push-front ] each ]
     [ length [ dup pop-back ] replicate ]
     [ ]
@@ -60,7 +60,7 @@ IN: unrolled-lists.tests
 
 [ t ] [
     <unrolled-list>
-    1000 [ 1000 iota random ] replicate
+    1000 [ 1000 random ] replicate
     [
         10 group [
             [ [ over push-front ] each ]

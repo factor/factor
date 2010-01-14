@@ -9,7 +9,7 @@ SPECIALIZED-ARRAY: double
 IN: serialize.tests
 
 : test-serialize-cell ( a -- ? )
-    2^ iota random dup
+    2^ random dup
     binary [ serialize-cell ] with-byte-writer
     binary [ deserialize-cell ] with-byte-reader = ;
 

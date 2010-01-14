@@ -52,7 +52,7 @@ PRIVATE>
 
 GENERIC: random ( obj -- elt )
 
-M: integer random random-integer ;
+M: integer random [ f ] [ random-integer ] if-zero ;
 
 M: sequence random
     [ f ] [
@@ -63,7 +63,7 @@ M: sequence random
 
 : randomize ( seq -- seq )
     dup length [ dup 1 > ]
-    [ [ iota random ] [ 1 - ] bi [ pick exchange ] keep ]
+    [ [ random ] [ 1 - ] bi [ pick exchange ] keep ]
     while drop ;
 
 ERROR: too-many-samples seq n ;
