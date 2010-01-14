@@ -26,11 +26,11 @@ SYMBOL: unique-retries
 <PRIVATE
 
 : random-letter ( -- ch )
-    26 iota random { CHAR: a CHAR: A } random + ;
+    26 random { CHAR: a CHAR: A } random + ;
 
 : random-ch ( -- ch )
     { t f } random
-    [ 10 iota random CHAR: 0 + ] [ random-letter ] if ;
+    [ 10 random CHAR: 0 + ] [ random-letter ] if ;
 
 : random-name ( -- string )
     unique-length get [ random-ch ] "" replicate-as ;

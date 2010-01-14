@@ -70,7 +70,7 @@ IN: bloom-filters.tests
 ] unit-test
 
 ! We shouldn't have more than 0.01 false-positive rate.
-[ t ] [ 1000 iota [ drop most-positive-fixnum iota random 1000 + ] map
+[ t ] [ 1000 iota [ drop most-positive-fixnum random 1000 + ] map
         full-bloom-filter
         [ bloom-filter-member? ] curry map
         [ ] count

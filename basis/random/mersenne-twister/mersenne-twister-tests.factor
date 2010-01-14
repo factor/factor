@@ -3,12 +3,12 @@ random.mersenne-twister sequences tools.test math.order ;
 IN: random.mersenne-twister.tests
 
 : check-random ( max -- ? )
-    [ iota random 0 ] keep between? ;
+    [ random 0 ] keep between? ;
 
 [ t ] [ 100 [ drop 674 check-random ] all-integers? ] unit-test
 
 : randoms ( -- seq )
-    100 [ 100 iota random ] replicate ;
+    100 [ 100 random ] replicate ;
 
 : test-rng ( seed quot -- )
     [ <mersenne-twister> ] dip with-random ; inline

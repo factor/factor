@@ -10,7 +10,7 @@ IN: decimals.tests
 ] unit-test
 
 : random-test-int ( -- n )
-    10 iota random 2 iota random 0 = [ neg ] when ;
+    10 random 2 random 0 = [ neg ] when ;
 
 : random-test-decimal ( -- decimal )
     random-test-int random-test-int <decimal> ;
