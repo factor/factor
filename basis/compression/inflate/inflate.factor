@@ -70,7 +70,7 @@ MEMO: static-huffman-tables ( -- obj )
         280 287 [a,b] length [ 8 ] replicate append
     ] append-outputs
     0 31 [a,b] length [ 5 ] replicate 2array
-    [ [ length>> [0,b) ] [ ] bi get-table ] map ;
+    [ [ length>> iota ] [ ] bi get-table ] map ;
 
 CONSTANT: length-table
     {

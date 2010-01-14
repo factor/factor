@@ -77,7 +77,7 @@ C: <combo> combo
     dup 0 = [
         drop 1 - nip
     ] [
-        [ [0,b) ] 2dip '[ _ nCk _ >=< ] search nip
+        [ iota ] 2dip '[ _ nCk _ >=< ] search nip
     ] if ;
 
 :: next-values ( a b x -- a' b' x' v )
@@ -104,7 +104,7 @@ C: <combo> combo
     [ combination-indices ] keep seq>> nths ;
 
 : combinations-quot ( seq k quot -- seq quot )
-    [ <combo> [ choose [0,b) ] keep ] dip
+    [ <combo> [ choose iota ] keep ] dip
     '[ _ apply-combination @ ] ; inline
 
 PRIVATE>
