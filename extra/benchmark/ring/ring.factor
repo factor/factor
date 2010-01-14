@@ -13,7 +13,7 @@ SYMBOL: done
     ] times ;
 
 : send-messages ( messages target -- )
-    dupd [ send ] curry each [ receive drop ] times ; 
+    [ dup iota ] dip [ send ] curry each [ receive drop ] times ; 
 
 : destroy-ring ( target -- )
     done swap send [ done eq? ] receive-if drop ;

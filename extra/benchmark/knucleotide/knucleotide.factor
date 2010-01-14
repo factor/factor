@@ -25,7 +25,7 @@ IN: benchmark.knucleotide
 
 : small-groups ( x n -- b )
     swap
-    [ length swap - 1 + ] 2keep
+    [ length swap - 1 + iota ] 2keep
     [ [ over + ] dip subseq ] 2curry map ;
 
 : handle-table ( inputs n -- )
