@@ -16,7 +16,7 @@ TUPLE: gradient < caching-pen colors last-vertices last-colors ;
 
 :: gradient-vertices ( direction dim colors -- seq )
     direction dim v* dim over v- swap
-    colors length dup 1 - v/n [ v*n ] with map
+    colors length [ iota ] [ 1 - ] bi v/n [ v*n ] with map
     swap [ over v+ 2array ] curry map
     concat concat >float-array ;
 
