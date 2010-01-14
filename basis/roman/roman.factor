@@ -48,7 +48,7 @@ PRIVATE>
 <PRIVATE
 
 MACRO: binary-roman-op ( quot -- quot' )
-    [ infer in>> length ] [ ] [ infer out>> length ] tri
+    [ inputs ] [ ] [ outputs ] tri
     '[ [ roman> ] _ napply @ [ >roman ] _ napply ] ;
 
 PRIVATE>

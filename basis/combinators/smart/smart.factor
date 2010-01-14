@@ -4,14 +4,6 @@ USING: accessors fry generalizations kernel macros math.order
 stack-checker math sequences ;
 IN: combinators.smart
 
-<PRIVATE
-
-: inputs ( quot -- n ) infer in>> length ;
-
-: outputs ( quot -- n ) infer out>> length ;
-
-PRIVATE>
-
 MACRO: drop-outputs ( quot -- quot' )
     dup outputs '[ @ _ ndrop ] ;
 

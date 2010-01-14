@@ -68,7 +68,7 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
 
 : enough? ( stack word -- ? )
     dup deferred? [ 2drop f ] [
-        [ [ length ] [ 1quotation infer in>> length ] bi* >= ]
+        [ [ length ] [ 1quotation inputs ] bi* >= ]
         [ 3drop f ] recover
     ] if ;
 
