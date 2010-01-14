@@ -999,7 +999,7 @@ HELP: pusher
      { "quot" quotation } { "accum" vector } }
 { $description "Creates a new vector to accumulate the values which return true for a predicate.  Returns a new quotation which accepts an object to be tested and stored in the accumulator if the test yields true. The accumulator is left on the stack for convenience." }
 { $example "! Find all the even numbers:" "USING: prettyprint sequences math kernel ;"
-           "10 [ even? ] pusher [ each ] dip ."
+           "10 iota [ even? ] pusher [ each ] dip ."
            "V{ 0 2 4 6 8 }"
 }
 { $notes "Used to implement the " { $link filter } " word. Compare this word with " { $link accumulator } ", which is an unfiltering version." } ;
@@ -1241,7 +1241,7 @@ HELP: binary-reduce
 { $description "Like " { $link reduce } ", but splits the sequence in half recursively until each sequence is small enough, and calls the quotation on these smaller sequences. If the quotation computes values that depend on the size of their input, such as bignum arithmetic, then this algorithm can be more efficient than using " { $link reduce } "." }
 { $examples "Computing factorial:"
     { $example "USING: prettyprint sequences math ;"
-    "40 rest-slice 1 [ * ] binary-reduce ."
+    "40 iota rest-slice 1 [ * ] binary-reduce ."
     "20397882081197443358640281739902897356800000000" }
 } ;
 
@@ -1413,13 +1413,11 @@ $nl
 "Virtual sequences can be implemented with the " { $link "virtual-sequences-protocol" } ", by translating an index in the virtual sequence into an index in another sequence." ;
 
 ARTICLE: "sequences-integers" "Counted loops"
-"Integers support the sequence protocol in a trivial fashion; a non-negative integer presents its non-negative predecessors as elements. For example, the integer 3, when viewed as a sequence, contains the elements 0, 1, and 2. This is very useful for performing counted loops."
+"Integers do not support the sequence protocol, but can be turned into virtual sequences using the " { $link iota } " word. For example, the integer 3, when wrapped in an " { $link iota } ", contains the elements 0, 1, and 2. This is very useful for performing counted loops. Note that since this is a virtual sequence, the elements of the sequence are not actually stored, but calculated on demand."
 $nl
-"For example, the " { $link each } " combinator, given an integer, simply calls a quotation that number of times, pushing a counter on each iteration that ranges from 0 up to that integer:"
-{ $example "3 [ . ] each" "0\n1\n2" }
+"As another example, the " { $link each } " combinator, given a sequence, simply calls a quotation on each element of the sequence, ranging from 0 up to the integer wrapped by iota:"
+{ $example "3 iota [ . ] each" "0\n1\n2" }
 "A common idiom is to iterate over a sequence, while also maintaining a loop counter. This can be done using " { $link each-index } ", " { $link map-index } " and " { $link reduce-index } "."
-$nl
-"Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an integer."
 $nl
 "More elaborate counted loops can be performed with " { $link "math.ranges" } "." ;
 
