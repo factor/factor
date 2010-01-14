@@ -1409,15 +1409,20 @@ ARTICLE: "virtual-sequences" "Virtual sequences"
 "A virtual sequence is an implementation of the " { $link "sequence-protocol" } " which does not store its own elements, and instead computes them, either from scratch or by retrieving them from another sequence."
 $nl
 "Implementations include the following:"
-{ $subsections reversed slice iota }
-"Virtual sequences can be implemented with the " { $link "virtual-sequences-protocol" } ", by translating an index in the virtual sequence into an index in another sequence." ;
+{ $subsections reversed slice }
+"Virtual sequences can be implemented with the " { $link "virtual-sequences-protocol" } ", by translating an index in the virtual sequence into an index in another sequence."
+{ $see-also "sequences-integers" } ;
 
 ARTICLE: "sequences-integers" "Counted loops"
-"Integers do not support the sequence protocol, but can be turned into virtual sequences using the " { $link iota } " word. For example, the integer 3, when wrapped in an " { $link iota } ", contains the elements 0, 1, and 2. This is very useful for performing counted loops. Note that since this is a virtual sequence, the elements of the sequence are not actually stored, but calculated on demand."
+"A virtual sequence is defined for iterating over integers from zero."
+{ $subsection iota }
+"For example, calling " { $link iota } " on the integer 3 produces a sequence containing the elements 0, 1, and 2. This is very useful for performing counted loops."
 $nl
-"As another example, the " { $link each } " combinator, given a sequence, simply calls a quotation on each element of the sequence, ranging from 0 up to the integer wrapped by iota:"
+"This means the " { $link each } " combinator, given an integer, simply calls a quotation that number of times, pushing a counter on each iteration that ranges from 0 up to that integer:"
 { $example "3 iota [ . ] each" "0\n1\n2" }
 "A common idiom is to iterate over a sequence, while also maintaining a loop counter. This can be done using " { $link each-index } ", " { $link map-index } " and " { $link reduce-index } "."
+$nl
+"Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an instance of " { $link iota } "."
 $nl
 "More elaborate counted loops can be performed with " { $link "math.ranges" } "." ;
 

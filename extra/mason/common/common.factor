@@ -30,6 +30,7 @@ M: windows really-delete-tree
 M: unix really-delete-tree delete-tree ;
 
 : retry ( n quot -- )
+    [ iota ] dip
     '[ drop @ f ] attempt-all drop ; inline
 
 :: upload-safely ( local username host remote -- )
