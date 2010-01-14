@@ -216,8 +216,8 @@ unit-test
 
 : random-integer ( -- n )
     32 random-bits
-    1 iota random zero? [ neg ] when
-    1 iota random zero? [ >bignum ] when ;
+    1 random zero? [ neg ] when
+    1 random zero? [ >bignum ] when ;
 
 [ t ] [
     1000 [

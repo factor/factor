@@ -186,7 +186,7 @@ link-no-follow? off
 
 : random-markup ( -- string )
     10 [
-        2 iota random 1 = [
+        2 random 1 = [
             {
                 "[["
                 "*"

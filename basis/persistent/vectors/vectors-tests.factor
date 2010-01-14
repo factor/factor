@@ -27,7 +27,7 @@ vectors math math.order ;
 [ t ] [
     3000 iota [
         drop
-        16 random-bits 10000 iota random
+        16 random-bits 10000 random
         [ "1" [ new-nth ] change ]
         [ "2" [ new-nth ] change ] 2bi
         "1" get "2" get sequence=
@@ -62,10 +62,10 @@ vectors math math.order ;
 [ t ] [
     100 iota [
         drop
-        100 iota random [
+        100 random [
             16 random-bits [ "1" [ ppush ] change ] [ "2" get push ] bi
         ] times
-        100 iota random "1" get length min [
+        100 random "1" get length min [
             "1" [ ppop ] change
             "2" get pop*
         ] times
