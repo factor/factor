@@ -68,9 +68,9 @@ $nl
 "Please note: in Factor " { $emphasis "fixnums are sequences too." } " If you are not careful with sequence accesses you may introduce subtle bugs:"
 { $example
     "USING: arrays infix locals ;"
-    ":: add-2nd-element ( x y -- res )"
+    ":: add-2nd-elements ( x y -- res )"
     "    [infix x[1] + y[1] infix] ;"
-    "{ 1 2 3 } 5 add-2nd-element ."
+    "{ 1 2 3 } { 0 1 2 3 } add-2nd-elements ."
     "3"
 }
 ;
