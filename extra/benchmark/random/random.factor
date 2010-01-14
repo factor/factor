@@ -1,5 +1,5 @@
 USING: io io.files io.files.temp io.encodings.ascii random
-math.parser math ;
+math.parser math sequences ;
 IN: benchmark.random
 
 : random-numbers-path ( -- path )
@@ -7,7 +7,7 @@ IN: benchmark.random
 
 : write-random-numbers ( n -- )
     random-numbers-path ascii [
-        [ 200 random 100 - number>string print ] times
+        [ 200 iota random 100 - number>string print ] times
     ] with-file-writer ;
 
 : random-main ( -- )

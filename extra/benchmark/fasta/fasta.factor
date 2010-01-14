@@ -56,7 +56,7 @@ CONSTANT: homo-sapiens
     chars nth-unsafe ; inline
 
 : make-random-fasta ( seed len chars floats -- seed )
-    [ rot drop select-random ] 2curry "" map-as print ; inline
+    [ iota ] 2dip [ [ drop ] 2dip select-random ] 2curry "" map-as print ; inline
 
 : write-description ( desc id -- )
     ">" write write bl print ; inline
@@ -72,7 +72,7 @@ CONSTANT: homo-sapiens
 
 :: make-repeat-fasta ( k len alu -- k' )
     alu length :> kn
-    len [ k + kn mod alu nth-unsafe ] "" map-as print
+    len iota [ k + kn mod alu nth-unsafe ] "" map-as print
     k len + ; inline
 
 : write-repeat-fasta ( n alu desc id -- )
