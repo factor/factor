@@ -70,11 +70,11 @@ IN: bloom-filters.tests
 ] unit-test
 
 ! We shouldn't have more than 0.01 false-positive rate.
-[ t ] [ 1000 iota [ drop most-positive-fixnum random 1000 + ] map
+[ t ] [ 1000 iota [ drop most-positive-fixnum iota random 1000 + ] map
         full-bloom-filter
         [ bloom-filter-member? ] curry map
-        [ ] filter
+        [ ] count
         ! TODO: This should be 10, but the false positive rate is currently very
         ! high.  300 is large enough not to prevent builds from succeeding.
-        length 300 <=
+        300 <=
 ] unit-test

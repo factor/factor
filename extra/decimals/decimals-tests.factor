@@ -10,7 +10,7 @@ IN: decimals.tests
 ] unit-test
 
 : random-test-int ( -- n )
-    10 random 2 random 0 = [ neg ] when ;
+    10 iota random 2 iota random 0 = [ neg ] when ;
 
 : random-test-decimal ( -- decimal )
     random-test-int random-test-int <decimal> ;
@@ -26,15 +26,15 @@ ERROR: decimal-test-failure D1 D2 quot ;
 : test-decimal-op ( quot1 quot2 -- ? )
     [ random-test-decimal random-test-decimal ] 2dip (test-decimal-op) ; inline
 
-[ t ] [ 1000 [ drop [ D+ ] [ + ] test-decimal-op ] all? ] unit-test
-[ t ] [ 1000 [ drop [ D- ] [ - ] test-decimal-op ] all? ] unit-test
-[ t ] [ 1000 [ drop [ D* ] [ * ] test-decimal-op ] all? ] unit-test
+[ t ] [ 1000 [ drop [ D+ ] [ + ] test-decimal-op ] all-integers? ] unit-test
+[ t ] [ 1000 [ drop [ D- ] [ - ] test-decimal-op ] all-integers? ] unit-test
+[ t ] [ 1000 [ drop [ D* ] [ * ] test-decimal-op ] all-integers? ] unit-test
 [ t ] [
     1000 [
         drop
         [ [ 100 D/ ] [ /f ] test-decimal-op ]
         [ { "kernel-error" 4 f f } = ] recover
-    ] all?
+    ] all-integers?
 ] unit-test
 
 [ t ] [ 

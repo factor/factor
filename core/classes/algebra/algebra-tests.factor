@@ -206,7 +206,6 @@ INSTANCE: union-with-one-member mixin-with-one-member
 
 ! class<=>
 
-[ +lt+ ] [ integer sequence class<=> ] unit-test
 [ +lt+ ] [ sequence object class<=> ] unit-test
 [ +gt+ ] [ object sequence class<=> ] unit-test
 [ +eq+ ] [ integer integer class<=> ] unit-test
@@ -266,7 +265,7 @@ INSTANCE: union-with-one-member mixin-with-one-member
 10 [
     [ ] [
         20 [ random-op ] [ ] replicate-as
-        [ infer in>> [ random-class ] times ] keep
+        [ infer in>> length [ random-class ] times ] keep
         call
         drop
     ] unit-test
@@ -300,7 +299,7 @@ INSTANCE: union-with-one-member mixin-with-one-member
 20 [
     [ t ] [
         20 [ random-boolean-op ] [ ] replicate-as dup .
-        [ infer in>> [ random-boolean ] replicate dup . ] keep
+        [ infer in>> length [ random-boolean ] replicate dup . ] keep
         
         [ [ [ ] each ] dip call ] 2keep
         

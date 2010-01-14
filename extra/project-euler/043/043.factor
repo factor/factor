@@ -40,13 +40,13 @@ IN: project-euler.043
 
 : interesting? ( seq -- ? )
     {
-        [ 17 8 rot subseq-divisible? ]
-        [ 13 7 rot subseq-divisible? ]
-        [ 11 6 rot subseq-divisible? ]
-        [ 7  5 rot subseq-divisible? ]
-        [ 5  4 rot subseq-divisible? ]
-        [ 3  3 rot subseq-divisible? ]
-        [ 2  2 rot subseq-divisible? ]
+        [ [ 17 8 ] dip subseq-divisible? ]
+        [ [ 13 7 ] dip subseq-divisible? ]
+        [ [ 11 6 ] dip subseq-divisible? ]
+        [ [ 7  5 ] dip subseq-divisible? ]
+        [ [ 5  4 ] dip subseq-divisible? ]
+        [ [ 3  3 ] dip subseq-divisible? ]
+        [ [ 2  2 ] dip subseq-divisible? ]
     } 1&& ;
 
 PRIVATE>
@@ -82,7 +82,7 @@ PRIVATE>
     [ unclip 1 head prefix concat ] map [ all-unique? ] filter ;
 
 : add-missing-digit ( seq -- seq )
-    dup natural-sort 10 swap diff prepend ;
+    dup natural-sort 10 iota swap diff prepend ;
 
 : interesting-pandigitals ( -- seq )
     17 candidates { 13 11 7 5 3 2 } [

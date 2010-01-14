@@ -22,7 +22,7 @@ IN: continuations.tests
         ] with-scope
     ] callcc0 "x" get 5 = ;
 
-[ t ] [ 10 callcc1-test 10 reverse >vector = ] unit-test
+[ t ] [ 10 callcc1-test 10 iota reverse >vector = ] unit-test
 [ t ] [ callcc-namespace-test ] unit-test
 
 [ 5 throw ] [ 5 = ] must-fail-with

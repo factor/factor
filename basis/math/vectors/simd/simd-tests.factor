@@ -151,7 +151,7 @@ CONSTANT: vector-words
 
 [ { } ] [
     with-ctors [
-        [ 1000 random '[ _ ] ] dip '[ _ execute ]
+        [ 1000 iota random '[ _ ] ] dip '[ _ execute ]
     ] [ = ] check-optimizer
 ] unit-test
 
@@ -165,7 +165,7 @@ CONSTANT: vector-words
 
 [ { } ] [
     boa-ctors [
-        [ stack-effect in>> length [ 1000 random ] [ ] replicate-as ] keep
+        [ stack-effect in>> length [ 1000 iota random ] [ ] replicate-as ] keep
         '[ _ execute ]
     ] [ = ] check-optimizer
 ] unit-test
@@ -175,11 +175,12 @@ CONSTANT: vector-words
 "== Checking vector operations" print
 
 : random-int-vector ( class -- vec )
-    new [ drop 1,000 random ] map ;
+    new [ drop 1000 iota random ] map ;
+
 : random-float-vector ( class -- vec )
     new [
         drop
-        1000 random
+        1000 iota random
         10 swap <array> 0/0. suffix random
     ] map ;
 
@@ -192,7 +193,7 @@ CONSTANT: vector-words
     inputs [
         {
             { +vector+ [ class elt-class random-vector ] }
-            { +scalar+ [ 1000 random elt-class float = [ >float ] when ] }
+            { +scalar+ [ 1000 iota random elt-class float = [ >float ] when ] }
         } case
     ] [ ] map-as
     word '[ _ execute ] ;
@@ -254,13 +255,13 @@ simd-classes&reps [
 "== Checking boolean operations" print
 
 : random-boolean-vector ( class -- vec )
-    new [ drop 2 random zero? ] map ;
+    new [ drop 2 iota random zero? ] map ;
 
 :: check-boolean-op ( word inputs class elt-class -- inputs quot )
     inputs [
         {
             { +vector+ [ class random-boolean-vector ] }
-            { +scalar+ [ 1000 random elt-class float = [ >float ] when ] }
+            { +scalar+ [ 1000 iota random elt-class float = [ >float ] when ] }
         } case
     ] [ ] map-as
     word '[ _ execute ] ;
@@ -371,7 +372,7 @@ simd-classes&reps [
             [ [ 4 + ] map ] map
             [ append ] 2map
         ] }
-        [ dup '[ _ random ] replicate 1array ]
+        [ dup '[ _ iota random ] replicate 1array ]
     } case ;
 
 simd-classes [
@@ -386,7 +387,7 @@ simd-classes [
 "== Checking variable shuffles" print
 
 : random-shift-vector ( class -- vec )
-    new [ drop 16 random ] map ;
+    new [ drop 16 iota random ] map ;
 
 :: test-shift-vector ( class -- ? )
     [
@@ -463,7 +464,7 @@ TUPLE: inconsistent-vector-test bool branch ;
 
 ! Test element access -- it should box bignums for int-4 on x86
 : test-accesses ( seq -- failures )
-    [ length >array ] keep
+    [ length iota >array ] keep
     '[ [ _ 1quotation ] dip '[ _ swap nth ] ] [ = ] check-optimizer ; inline
 
 [ { } ] [ float-4{ 1.0 2.0 3.0 4.0 } test-accesses ] unit-test
@@ -480,7 +481,7 @@ TUPLE: inconsistent-vector-test bool branch ;
 
 "== Checking broadcast" print
 : test-broadcast ( seq -- failures )
-    [ length >array ] keep
+    [ length iota >array ] keep
     '[ [ _ 1quotation ] dip '[ _ vbroadcast ] ] [ = ] check-optimizer ;
 
 [ { } ] [ float-4{ 1.0 2.0 3.0 4.0 } test-broadcast ] unit-test

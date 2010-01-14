@@ -9,19 +9,19 @@ SPECIALIZED-ARRAY: double
 IN: serialize.tests
 
 : test-serialize-cell ( a -- ? )
-    2^ random dup
+    2^ iota random dup
     binary [ serialize-cell ] with-byte-writer
     binary [ deserialize-cell ] with-byte-reader = ;
 
 [ t ] [
     100 [
         drop
-        40 [        test-serialize-cell ] all?
-         4 [ 40 *   test-serialize-cell ] all?
-         4 [ 400 *  test-serialize-cell ] all?
-         4 [ 4000 * test-serialize-cell ] all?
+        40 [        test-serialize-cell ] all-integers?
+         4 [ 40 *   test-serialize-cell ] all-integers?
+         4 [ 400 *  test-serialize-cell ] all-integers?
+         4 [ 4000 * test-serialize-cell ] all-integers?
         and and and
-    ] all?
+    ] all-integers?
 ] unit-test
 
 TUPLE: serialize-test a b ;

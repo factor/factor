@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data accessors math alien.accessors kernel
 kernel.private sequences sequences.private byte-arrays
@@ -25,7 +25,7 @@ TUPLE: bit-array
 
 : (set-bits) ( bit-array n -- )
     [ [ length bits>cells ] keep ] dip swap underlying>>
-    '[ 2 shift [ _ _ ] dip set-alien-unsigned-4 ] each ; inline
+    '[ 2 shift [ _ _ ] dip set-alien-unsigned-4 ] each-integer ; inline
 
 : clean-up ( bit-array -- )
     ! Zero bits after the end.
@@ -99,7 +99,7 @@ SYNTAX: ?{ \ } [ >bit-array ] parse-literal ;
     ] if ;
 
 : bit-array>integer ( bit-array -- n )
-    0 swap underlying>> dup length <reversed> [
+    0 swap underlying>> dup length iota <reversed> [
         alien-unsigned-1 swap 8 shift bitor
     ] with each ;
 

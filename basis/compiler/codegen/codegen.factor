@@ -380,7 +380,7 @@ M: c-type-name flatten-value-type c-type flatten-value-type ;
     [ [ parameter-offsets nip ] keep ] dip 2reverse-each ; inline
 
 : prepare-unbox-parameters ( parameters -- offsets types indices )
-    [ parameter-offsets nip ] [ ] [ length iota reverse ] tri ;
+    [ parameter-offsets nip ] [ ] [ length iota <reversed> ] tri ;
 
 : unbox-parameters ( offset node -- )
     parameters>> swap

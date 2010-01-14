@@ -57,7 +57,7 @@ test-2 "TEST2" {
 } define-persistent
 
 : test-1-tuple ( -- tuple )
-    f 100 random 100 random 100 random [ number>string ] tri@
+    f 100 iota random 100 iota random 100 iota random [ number>string ] tri@
     test-1 boa ;
 
 : db-tester ( test-db -- )
@@ -67,7 +67,7 @@ test-2 "TEST2" {
             test-2 ensure-table
         ] with-db
     ] [
-        10 [
+        10 iota [
             drop
             10 [
                 dup [
@@ -85,7 +85,7 @@ test-2 "TEST2" {
         ] with-db
     ] [
         <db-pool> [
-            10 [
+            10 iota [
                 10 [
                     test-1-tuple insert-tuple yield
                 ] times

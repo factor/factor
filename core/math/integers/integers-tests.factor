@@ -216,8 +216,8 @@ unit-test
 
 : random-integer ( -- n )
     32 random-bits
-    1 random zero? [ neg ] when
-    1 random zero? [ >bignum ] when ;
+    1 iota random zero? [ neg ] when
+    1 iota random zero? [ >bignum ] when ;
 
 [ t ] [
     1000 [
@@ -225,7 +225,7 @@ unit-test
         random-integer
         random-integer
         [ >float / ] [ /f ] 2bi 0.1 ~
-    ] all?
+    ] all-integers?
 ] unit-test
 
 ! Ensure that /f is accurate for fixnums > 2^53 on 64-bit platforms

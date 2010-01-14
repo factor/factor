@@ -83,7 +83,7 @@ SYMBOL: and-needed?
         first 3digits>text
     ] [
         [ set-conjunction "" ] [ length ] [ ] tri
-        [ (recombine) ] curry each
+        [ (recombine) ] curry each-integer
     ] if ;
 
 : (number>text) ( n -- str )

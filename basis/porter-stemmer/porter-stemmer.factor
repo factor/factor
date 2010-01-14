@@ -33,10 +33,10 @@ IN: porter-stemmer
     ] if ;
 
 : consonant-seq ( str -- n )
-    0 0 rot skip-consonants (consonant-seq) ;
+    [ 0 0 ] dip skip-consonants (consonant-seq) ;
 
 : stem-vowel? ( str -- ? )
-    [ length ] keep [ consonant? ] curry all? not ;
+    [ length iota ] keep [ consonant? ] curry all? not ;
 
 : double-consonant? ( i str -- ? )
     over 1 < [

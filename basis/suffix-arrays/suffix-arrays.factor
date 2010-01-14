@@ -7,7 +7,7 @@ IN: suffix-arrays
 <PRIVATE
 
 : suffixes ( string -- suffixes-seq )
-    dup length [ tail-slice ] with map ;
+    dup length iota [ tail-slice ] with map ;
 
 : prefix<=> ( begin seq -- <=> )
     [ <=> ] [ swap head? ] 2bi [ drop +eq+ ] when ;

@@ -32,7 +32,7 @@ PRIVATE>
     2dup [ length ] bi@ + 1 - 2pad-tail [ >vector ] bi@ ;
 
 : p* ( p q -- r )
-    2unempty pextend-conv <reversed> dup length
+    2unempty pextend-conv <reversed> dup length iota
     [ over length pick <slice> pick [ * ] 2map sum ] map 2nip reverse ;
 
 : p-sq ( p -- p^2 )

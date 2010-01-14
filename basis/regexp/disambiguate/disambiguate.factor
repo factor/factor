@@ -11,9 +11,7 @@ TUPLE: parts in out ;
     zip [ first ] partition [ values ] bi@ parts boa ;
 
 : powerset-partition ( sequence -- partitions )
-    [ length [ 2^ ] keep ] keep '[
-        _ <bits> _ make-partition
-    ] map rest ;
+    [ length [ 2^ iota ] keep ] keep '[ _ <bits> _ make-partition ] map rest ;
 
 : partition>class ( parts -- class )
     [ out>> [ <not-class> ] map ]

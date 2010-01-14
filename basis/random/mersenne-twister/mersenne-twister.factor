@@ -30,8 +30,8 @@ CONSTANT: a uint-array{ 0 HEX: 9908b0df }
 : mt-generate ( mt -- )
     [
         seq>>
-        [ [ n m - ] dip '[ [ m ] dip _ mt[k] ] each ]
-        [ [ m 1 - ] dip '[ [ m n - ] [ n m - + ] bi* _ mt[k] ] each ]
+        [ [ n m - ] dip '[ [ m ] dip _ mt[k] ] each-integer ]
+        [ [ m 1 - ] dip '[ [ m n - ] [ n m - + ] bi* _ mt[k] ] each-integer ]
         bi
     ] [ 0 >>i drop ] bi ; inline
 
@@ -41,7 +41,7 @@ CONSTANT: a uint-array{ 0 HEX: 9908b0df }
 : init-mt-rest ( seq -- )
     n 1 - swap '[
         _ [ init-mt-formula ] [ [ 1 + ] dip set-nth ] 2bi
-    ] each ; inline
+    ] each-integer ; inline
 
 : init-mt-seq ( seed -- seq )
     32 bits n <uint-array>
