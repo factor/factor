@@ -55,8 +55,11 @@ ERROR: staging-violation word ;
     execute( accum -- accum ) ;
 
 : scan-object ( -- object )
-    scan-word dup parsing-word?
-    [ V{ } clone swap execute-parsing first ] when ;
+    scan-word {
+        { [ dup not ] [ unexpected-eof ] }
+        { [ dup parsing-word? ] [ V{ } clone swap execute-parsing first ] }
+        [ ]
+    } cond  ;
 
 : parse-step ( accum end -- accum ? )
     scan-word {

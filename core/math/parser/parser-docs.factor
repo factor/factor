@@ -29,12 +29,12 @@ $nl
 ABOUT: "number-strings"
 
 HELP: digits>integer
-{ $values { "seq" "a sequence of integers" } { "radix" "an integer between 2 and 36" } { "n/f" { $maybe integer } } }
+{ $values { "seq" "a sequence of integers" } { "radix" "an integer between 2 and 16" } { "n/f" { $maybe integer } } }
 { $description "Converts a sequence of digits (with most significant digit first) into an integer." }
 { $notes "This is one of the factors of " { $link string>number } "." } ;
 
 HELP: >digit
-{ $values { "n" "an integer between 0 and 35" } { "ch" "a character" } }
+{ $values { "n" "an integer between 0 and 15" } { "ch" "a character" } }
 { $description "Outputs a character representation of a digit." }
 { $notes "This is one of the factors of " { $link number>string } "." } ;
 
@@ -44,7 +44,7 @@ HELP: digit>
 { $notes "This is one of the factors of " { $link string>number } "." } ;
 
 HELP: base>
-{ $values { "str" string } { "radix" "an integer between 2 and 36" } { "n/f" "a real number or " { $link f } } }
+{ $values { "str" string } { "radix" "an integer between 2 and 16" } { "n/f" "a real number or " { $link f } } }
 { $description "Creates a real number from a string representation with the given radix. The radix is ignored for floating point literals; they are always taken to be in base 10."
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
@@ -84,7 +84,7 @@ $nl
 { >hex POSTPONE: HEX: hex> .h } related-words
 
 HELP: >base
-{ $values { "n" real } { "radix" "an integer between 2 and 36" } { "str" string } }
+{ $values { "n" real } { "radix" "an integer between 2 and 16" } { "str" string } }
 { $description "Converts a real number into a string representation using the given radix. If the number is a float, the radix is ignored and the output is always in base 10." } ;
 
 HELP: >bin

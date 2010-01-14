@@ -11,15 +11,13 @@ $nl
 { $code
     "GENERIC: explain ( object -- )"
     "M: object explain drop \"an object\" print ;"
-    "M: number explain drop \"a number\" print ;"
-    "M: sequence explain drop \"a sequence\" print ;"
+    "M: generic explain drop \"a class word\" print ;"
+    "M: class explain drop \"a generic word\" print ;"
 }
 "The linear order is the following, from least-specific to most-specific:"
-{ $code "{ object sequence number }" }
-"Neither " { $link number } " nor " { $link sequence } " are subclasses of each other, yet their intersection is the non-empty " { $link integer } " class. Calling " { $snippet "explain" } " with an integer on the stack will print " { $snippet "a number" } " because " { $link number } " precedes " { $link sequence } " in the class linearization order. If this was not the desired outcome, define a method on the intersection:"
-{ $code "M: integer explain drop \"an integer\" print ;" }
-"Now, the linear order is the following, from least-specific to most-specific:"
-{ $code "{ object sequence number integer }" }
+{ $code "{ object generic class }" }
+"Neither " { $link class } " nor " { $link generic } " are subclasses of each other, and their intersection is non-empty. Calling " { $snippet "explain" } " with a word on the stack that is both a class and a generic word will print " { $snippet "a generic word" } " because " { $link class } " precedes " { $link generic } " in the class linearization order. (One example of a word which is both a class and a generic word is the class of classes, " { $link class } ", which is also a word to get the class of an object.)"
+$nl
 "The " { $link order } " word can be useful to clarify method dispatch order:"
 { $subsections order } ;
 
