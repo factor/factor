@@ -44,7 +44,7 @@ CONSTANT: wall-drawing-offset 0.15
 
 : equally-spaced-radians ( n -- seq )
     #! return a sequence of n numbers between 0 and 2pi
-    dup [ / pi 2 * * ] curry map ;
+    [ iota ] keep [ / pi 2 * * ] curry map ;
 
 : draw-segment-vertex ( segment theta -- )
     over color>> gl-color segment-vertex-and-normal
