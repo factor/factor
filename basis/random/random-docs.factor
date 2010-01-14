@@ -19,9 +19,8 @@ HELP: random-bytes*
 { $description "Generates a byte-array of random bytes." } ;
 
 HELP: random
-{ $values { "seq" sequence } { "elt" "a random element" } }
-{ $description "Outputs a random element of the input sequence. Outputs " { $link f } " if the sequence is empty." }
-{ $notes "Since integers are sequences, passing an integer " { $snippet "n" } " outputs an integer in the interval " { $snippet "[0,n)" } "." }
+{ $values { "obj" object } { "elt" "a random element" } }
+{ $description "Outputs a random element of the input object, or outputs " { $link f } " if the object contains no elements." }
 { $examples
     { $unchecked-example "USING: random prettyprint ;"
         "10 random ."
