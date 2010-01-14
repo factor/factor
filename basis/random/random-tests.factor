@@ -29,7 +29,7 @@ IN: random.tests
 [ { 1 2 } 3 sample ] [ too-many-samples?  ] must-fail-with
 
 [ 3 ] [ { 1 2 3 4 } 3 sample prune length ] unit-test
-[ 99 ] [ 100 99 sample prune length ] unit-test
+[ 99 ] [ 100 iota 99 sample prune length ] unit-test
 
 [ ]
 [ [ 100 random-bytes ] with-system-random drop ] unit-test
