@@ -1,6 +1,6 @@
 ! (c)Joe Groff bsd license
 USING: alien.data.map fry generalizations kernel locals math.vectors
-math.vectors.conversion math math.vectors.simd sequences
+math.vectors.conversion math math.vectors.simd math.ranges sequences
 specialized-arrays tools.test ;
 FROM: alien.c-types => uchar short int float ;
 SPECIALIZED-ARRAYS: int float float-4 uchar-16 ;
@@ -145,3 +145,11 @@ CONSTANT: plane-count 4
     B{  15  25  35  45  55  65  75  85  95 105 115 125 135 145 155 165 }
     fold-rgba-planes
 ] unit-test
+
+: data-map-compiler-bug-test ( n -- byte-array )
+    [ 0.0 1.0 1.0 ] dip /f <range>
+    [ ] data-map( object -- float ) ;
+
+[ float-array{ 0.0 0.5 1.0 } ]
+[ 2 data-map-compiler-bug-test byte-array>float-array ]
+unit-test
