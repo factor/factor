@@ -238,7 +238,7 @@ PRIVATE>
     [ >rep-array ] [ widen-vector-rep [ rep-length ] [ [>rep-array] ] bi ] bi
     [ tail-slice ] dip call( a' -- c' ) underlying>> ;
 : (simd-with)              (   n rep -- v )
-    [ rep-length iota swap '[ _ ] ] [ <rep-array> ] bi replicate-as 
+    [ rep-length swap '[ _ ] ] [ <rep-array> ] bi replicate-as 
     underlying>> ;
 : (simd-gather-2)          ( m n rep -- v ) <rep-array> [ 2 set-firstn ] keep underlying>> ;
 : (simd-gather-4)          ( m n o p rep -- v ) <rep-array> [ 4 set-firstn ] keep underlying>> ;

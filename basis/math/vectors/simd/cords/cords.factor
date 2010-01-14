@@ -22,7 +22,7 @@ A-cast DEFINES       ${A}-cast
 A{     DEFINES       ${A}{
 
 N       [ A-rep rep-length ]
-BOA-EFFECT [ N 2 * "n" <repetition> >array { "v" } <effect> ]
+BOA-EFFECT [ N 2 * "n" <array> { "v" } <effect> ]
 
 WHERE
 

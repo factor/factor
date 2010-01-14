@@ -80,7 +80,7 @@ M: #declare propagate-before
 : (fold-call) ( #call word -- info )
     [ [ out-d>> ] [ in-d>> [ value-info literal>> ] map ] bi ] [ '[ _ execute ] ] bi*
     '[ _ _ with-datastack [ <literal-info> ] map nip ]
-    [ drop [ object-info ] replicate ]
+    [ drop length [ object-info ] replicate ]
     recover ;
 
 : fold-call ( #call word -- )

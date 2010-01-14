@@ -164,7 +164,7 @@ FUNCTION: void ffi_test_20 double x1, double x2, double x3,
     { int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int }
     alien-invoke gc 3 ;
 
-[ 861 3 ] [ 42 [ ] each ffi_test_31 ] unit-test
+[ 861 3 ] [ 42 [ ] each-integer ffi_test_31 ] unit-test
 
 : ffi_test_31_point_5 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result )
     float
@@ -172,7 +172,7 @@ FUNCTION: void ffi_test_20 double x1, double x2, double x3,
     { float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float }
     alien-invoke ;
 
-[ 861.0 ] [ 42 [ >float ] each ffi_test_31_point_5 ] unit-test
+[ 861.0 ] [ 42 [ >float ] each-integer ffi_test_31_point_5 ] unit-test
 
 FUNCTION: longlong ffi_test_21 long x long y ;
 
@@ -316,7 +316,7 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
 
 : callback-1 ( -- callback ) void { } "cdecl" [ ] alien-callback ;
 
-[ 0 1 ] [ [ callback-1 ] infer [ in>> ] [ out>> ] bi ] unit-test
+[ 0 1 ] [ [ callback-1 ] infer [ in>> length ] [ out>> length ] bi ] unit-test
 
 [ t ] [ callback-1 alien? ] unit-test
 

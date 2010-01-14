@@ -64,7 +64,7 @@ TUPLE: shuffle-node { effect effect } ;
 M: shuffle-node pprint* effect>> effect>string text ;
  
 : (shuffle-effect) ( in out #shuffle -- effect )
-    mapping>> '[ _ at ] map <effect> ;
+    mapping>> '[ _ at ] map [ >array ] bi@ <effect> ;
 
 : shuffle-effect ( #shuffle -- effect )
     [ in-d>> ] [ out-d>> ] [ ] tri (shuffle-effect) ;

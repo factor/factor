@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.strings arrays assocs
 classes.struct continuations combinators compiler compiler.alien
@@ -202,7 +202,7 @@ ERROR: no-objc-type name ;
     (free) ;
 
 : method-arg-types ( method -- args )
-    dup method_getNumberOfArguments
+    dup method_getNumberOfArguments iota
     [ method-arg-type ] with map ;
 
 : method-return-type ( method -- ctype )

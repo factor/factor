@@ -289,21 +289,21 @@ DEFER: an-inline-word
 
 ERROR: custom-error ;
 
-[ T{ effect f 0 0 t } ] [
+[ T{ effect f { } { } t } ] [
     [ custom-error ] infer
 ] unit-test
 
 : funny-throw ( a -- * ) throw ; inline
 
-[ T{ effect f 0 0 t } ] [
+[ T{ effect f { } { } t } ] [
     [ 3 funny-throw ] infer
 ] unit-test
 
-[ T{ effect f 0 0 t } ] [
+[ T{ effect f { } { } t } ] [
     [ custom-error inference-error ] infer
 ] unit-test
 
-[ T{ effect f 1 2 t } ] [
+[ T{ effect f { "x" } { "x" "x" } t } ] [
     [ dup [ 3 throw ] dip ] infer
 ] unit-test
 

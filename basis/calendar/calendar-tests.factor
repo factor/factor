@@ -175,4 +175,4 @@ IN: calendar.tests
 [ t ] [ 1325376000 unix-time>timestamp 2012 <year-gmt> = ] unit-test
 [ t ] [ 1356998399 unix-time>timestamp 2013 <year-gmt> 1 seconds time- = ] unit-test
 
-[ t ] [ 1500000000 random [ unix-time>timestamp timestamp>unix-time ] keep = ] unit-test
+[ t ] [ 1500000000 iota random [ unix-time>timestamp timestamp>unix-time ] keep = ] unit-test

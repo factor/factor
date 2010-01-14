@@ -56,7 +56,7 @@ HELP: effect>string
 { $values { "obj" object } { "str" string } }
 { $description "Turns a stack effect object into a string mnemonic." }
 { $examples
-    { $example "USING: effects io ;" "1 2 <effect> effect>string print" "( object -- object object )" }
+    { $example "USING: effects io ;" "{ \"x\" } { \"y\" \"z\" } <effect> effect>string print" "( x -- y z )" }
 } ;
 
 HELP: stack-effect

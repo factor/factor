@@ -64,7 +64,7 @@ SYMBOLS: a b c d e f g h ;
 [ "hi" 3 ] [ "h" "i" 3 [ append ] funny-dip ] unit-test
 
 [ { 1 2 3 } ] [
-    3 1 '[ _ [ _ + ] map ] call
+    3 1 '[ _ iota [ _ + ] map ] call
 ] unit-test
 
 [ { 1 { 2 { 3 } } } ] [

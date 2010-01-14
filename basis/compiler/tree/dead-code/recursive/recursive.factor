@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs sequences kernel locals fry
 combinators stack-checker.backend
@@ -24,7 +24,7 @@ M: #call-recursive compute-live-values*
 
 :: drop-dead-inputs ( inputs outputs -- #shuffle )
     inputs filter-live
-    outputs inputs filter-corresponding make-values
+    outputs inputs filter-corresponding length make-values
     outputs
     inputs
     drop-values ;
@@ -39,7 +39,7 @@ M: #enter-recursive remove-dead-code*
     2bi ;
 
 :: (drop-call-recursive-outputs) ( inputs outputs -- #shuffle )
-    inputs outputs filter-corresponding make-values :> new-live-outputs
+    inputs outputs filter-corresponding length make-values :> new-live-outputs
     outputs filter-live :> live-outputs
     new-live-outputs
     live-outputs

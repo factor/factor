@@ -11,18 +11,18 @@ IN: concurrency.combinators.tests
 
 [ { 1 4 9 } ] [ { 1 2 3 } [ sq ] parallel-map ] unit-test
 
-[ { 1 4 9 } ] [ { 1 2 3 } [ 1000000 random sleep sq ] parallel-map ] unit-test
+[ { 1 4 9 } ] [ { 1 2 3 } [ 1000000 iota random sleep sq ] parallel-map ] unit-test
 
 [ { 1 2 3 } [ dup 2 mod 0 = [ "Even" throw ] when ] parallel-map ]
 [ error>> "Even" = ] must-fail-with
 
 [ V{ 0 3 6 9 } ]
-[ 10 [ 3 mod zero? ] parallel-filter ] unit-test
+[ 10 iota [ 3 mod zero? ] parallel-filter ] unit-test
 
 [ 10 ]
 [
     V{ } clone
-    10 over [ push ] curry parallel-each
+    10 iota over [ push ] curry parallel-each
     length
 ] unit-test
 
@@ -41,7 +41,7 @@ IN: concurrency.combinators.tests
 [ 20 ]
 [
     V{ } clone
-    10 10 pick [ [ push ] [ push ] bi ] curry 2parallel-each
+    10 iota 10 iota pick [ [ push ] [ push ] bi ] curry 2parallel-each
     length
 ] unit-test
 

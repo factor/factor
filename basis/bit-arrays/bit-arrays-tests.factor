@@ -38,9 +38,9 @@ IN: bit-arrays.tests
 
 [ t ] [
     100 [
-        drop 100 [ 2 random zero? ] replicate
+        drop 100 [ 2 iota random zero? ] replicate
         dup >bit-array >array =
-    ] all?
+    ] all-integers?
 ] unit-test
 
 [ ?{ f } ] [
