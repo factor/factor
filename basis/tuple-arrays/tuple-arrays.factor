@@ -10,7 +10,7 @@ IN: tuple-arrays
 
 MACRO: boa-unsafe ( class -- quot ) tuple-layout '[ _ <tuple-boa> ] ;
 
-MACRO: infer-in ( class -- quot ) infer in>> length '[ _ ] ;
+MACRO: infer-in ( class -- quot ) inputs '[ _ ] ;
 
 : tuple-arity ( class -- quot ) '[ _ boa ] infer-in ; inline
 
