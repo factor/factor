@@ -6,18 +6,21 @@ TUPLE: game-world < world
     game-loop
     { tick-slice float initial: 0.0 } ;
 
-GENERIC: tick-length ( world -- micros )
+GENERIC: tick-interval-micros ( world -- micros )
 
 M: game-world draw*
     swap >>tick-slice relayout-1 yield ;
 
 M: game-world begin-world
     open-game-input 
-    dup [ tick-length ] [ ] bi <game-loop> [ >>game-loop ] keep start-loop
+    dup [ tick-interval-micros ] [ ] bi <game-loop> [ >>game-loop ] keep start-loop
     drop ;
 
 M: game-world end-world
     [ [ stop-loop ] when* f ] change-game-loop
     close-game-input
     drop ;
+
+TUPLE: game-attributes < world-attributes
+    { tick-interval-micros fixnum read-only } ;
 

@@ -55,7 +55,7 @@ TUPLE: terrain-world < game-world
         float-4{ 0.0 0.0 0.0 1.0 } >>velocity
         VELOCITY-MODIFIER-NORMAL >>velocity-modifier ;
 
-M: terrain-world tick-length
+M: terrain-world tick-interval-micros
     drop 1000000 60 /i ;
 
 : frustum ( dim -- -x x -y y near far )
