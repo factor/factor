@@ -59,7 +59,7 @@ CONSTANT: window-vertexes
 : <window-vertex-buffer> ( -- buffer )
     window-vertexes 
     static-upload draw-usage vertex-buffer
-    byte-array>buffer ;
+    byte-array>buffer ; inline
 
 : <window-vertex-array> ( program-instance -- vertex-array )
-    [ <window-vertex-buffer> ] dip window-vertex buffer>vertex-array ;
+    [ <window-vertex-buffer> ] dip window-vertex buffer>vertex-array ; inline
