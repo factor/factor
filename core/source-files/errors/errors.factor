@@ -20,7 +20,7 @@ M: source-file-error error-line [ error>> error-line ] [ line#>> ] bi or ;
 M: source-file-error compute-restarts error>> compute-restarts ;
 
 : sort-errors ( errors -- alist )
-    [ [ line#>> ] sort-with ] { } assoc-map-as sort-keys ;
+    [ [ line#>> 0 or ] sort-with ] { } assoc-map-as sort-keys ;
 
 : group-by-source-file ( errors -- assoc )
     H{ } clone [ [ push-at ] curry [ dup file>> ] prepose each ] keep ;

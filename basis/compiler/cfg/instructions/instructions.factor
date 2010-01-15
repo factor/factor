@@ -671,6 +671,9 @@ literal: params stack-frame ;
 INSN: ##alien-indirect
 literal: params stack-frame ;
 
+INSN: ##alien-assembly
+literal: params stack-frame ;
+
 INSN: ##alien-callback
 literal: params stack-frame ;
 

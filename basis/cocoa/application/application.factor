@@ -49,7 +49,7 @@ TUPLE: objc-error alien reason ;
 M: objc-error summary ( error -- )
     drop "Objective C exception" ;
 
-[ [ objc-error ] 19 setenv ] "cocoa.application" add-startup-hook
+[ [ objc-error ] 19 set-special-object ] "cocoa.application" add-startup-hook
 
 : running.app? ( -- ? )
     #! Test if we're running a .app.

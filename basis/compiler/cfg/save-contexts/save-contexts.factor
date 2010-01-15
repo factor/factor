@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit
 compiler.cfg.instructions compiler.cfg.registers
@@ -14,6 +14,7 @@ IN: compiler.cfg.save-contexts
             [ ##binary-float-function? ]
             [ ##alien-invoke? ]
             [ ##alien-indirect? ]
+            [ ##alien-assembly? ]
         } 1||
     ] any? ;
 

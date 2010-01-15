@@ -301,7 +301,7 @@ GENERIC: pad-initial-bytes ( string sha2 -- padded-string )
         M cloned-H sha2 T1-256
         cloned-H T2-256
         cloned-H update-H
-    ] each
+    ] each-integer
     sha2 [ cloned-H [ w+ ] 2map ] change-H drop ; inline
 
 M: sha2-short checksum-block
@@ -391,7 +391,7 @@ M: sha-256 checksum-stream ( stream checksum -- byte-array )
         b H nth-unsafe 30 bitroll-32 c H set-nth-unsafe
         a H nth-unsafe b H set-nth-unsafe
         a H set-nth-unsafe
-    ] each
+    ] each-integer
     state [ H [ w+ ] 2map ] change-H drop ; inline
 
 M:: sha1-state checksum-block ( bytes state -- )

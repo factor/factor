@@ -2,11 +2,11 @@ USING: effects kernel tools.test prettyprint accessors
 quotations sequences ;
 IN: effects.tests
 
-[ t ] [ 1 1 <effect> 2 2 <effect> effect<= ] unit-test
-[ f ] [ 1 0 <effect> 2 2 <effect> effect<= ] unit-test
-[ t ] [ 2 2 <effect> 2 2 <effect> effect<= ] unit-test
-[ f ] [ 3 3 <effect> 2 2 <effect> effect<= ] unit-test
-[ f ] [ 2 3 <effect> 2 2 <effect> effect<= ] unit-test
+[ t ] [ { "a" } { "a" } <effect> { "a" "b" } { "a" "b" } <effect> effect<= ] unit-test
+[ f ] [ { "a" } { } <effect> { "a" "b" } { "a" "b" } <effect> effect<= ] unit-test
+[ t ] [ { "a" "b" } { "a" "b" } <effect> { "a" "b" } { "a" "b" } <effect> effect<= ] unit-test
+[ f ] [ { "a" "b" "c" } { "a" "b" "c" } <effect> { "a" "b" } { "a" "b" } <effect> effect<= ] unit-test
+[ f ] [ { "a" "b" } { "a" "b" "c" } <effect> { "a" "b" } { "a" "b" } <effect> effect<= ] unit-test
 [ 2 ] [ (( a b -- c )) in>> length ] unit-test
 [ 1 ] [ (( a b -- c )) out>> length ] unit-test
 

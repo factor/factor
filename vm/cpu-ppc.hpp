@@ -9,8 +9,8 @@ namespace factor
    B blah
 
    the offset from the immediate operand to LOAD32 to the instruction after
-   the branch is two instructions. */
-static const fixnum xt_tail_pic_offset = 4 * 2;
+   the branch is one instruction. */
+static const fixnum xt_tail_pic_offset = 4;
 
 inline static void check_call_site(cell return_address)
 {
@@ -77,16 +77,6 @@ inline static unsigned int fpu_status(unsigned int status)
 }
 
 /* Defined in assembly */
-VM_C_API void c_to_factor(cell quot, void *vm);
-VM_C_API void throw_impl(cell quot, void *new_stack, void *vm);
-VM_C_API void lazy_jit_compile_impl(cell quot, void *vm);
 VM_C_API void flush_icache(cell start, cell len);
-
-VM_C_API void set_callstack(
-	void *vm,
-	stack_frame *to,
-	stack_frame *from,
-	cell length,
-	void *(*memcpy)(void*,const void*, size_t));
 
 }

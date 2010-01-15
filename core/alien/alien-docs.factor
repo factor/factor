@@ -1,7 +1,7 @@
 USING: byte-arrays arrays help.syntax help.markup
 alien.syntax compiler definitions math libc eval
 debugger parser io io.backend system alien.accessors
-alien.libraries ;
+alien.libraries alien.c-types quotations ;
 IN: alien
 
 HELP: alien
@@ -44,17 +44,26 @@ HELP: <alien>
 HELP: c-ptr
 { $class-description "Class of objects consisting of aliens, byte arrays and " { $link f } ". These objects can convert to pointer C types, which are all aliases of " { $snippet "void*" } "." } ;
 
+HELP: alien-invoke-error
+{ $error-description "Thrown if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
+    { $list
+        { "This can happen when experimenting with " { $link alien-invoke } " in this listener. To fix the problem, place the " { $link alien-invoke } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
+        { "The return type or parameter list references an unknown C type." }
+        { "The symbol or library could not be found." }
+        { "One of the four inputs to " { $link alien-invoke } " is not a literal value. To call functions which are not known at compile-time, use " { $link alien-indirect } "." }
+    }
+} ;
+
 HELP: alien-invoke
 { $values { "..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "library" "a logical library name" } { "function" "a C function name" } { "parameters" "a sequence of C parameter types" } }
-{ $description "Calls a C library function with the given name. Input parameters are taken from the data stack, and the return value is pushed on the data stack after the function returns. A return type of " { $snippet "\"void\"" } " indicates that no value is to be expected." }
+{ $description "Calls a C library function with the given name. Input parameters are taken from the data stack, and the return value is pushed on the data stack after the function returns. A return type of " { $link void } " indicates that no value is to be expected." }
 { $notes "C type names are documented in " { $link "c-types-specs" } "." }
 { $errors "Throws an " { $link alien-invoke-error } " if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler." } ;
 
 HELP: alien-indirect-error
-{ $error-description "Thrown if the word calling " { $link alien-indirect } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
+{ $error-description "Thrown if the word calling " { $link alien-indirect } " was not compiled with the optimizing compiler. This may be a result of one of two failure conditions:"
     { $list
         { "This can happen when experimenting with " { $link alien-indirect } " in this listener. To fix the problem, place the " { $link alien-indirect } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
-        { "The return type or parameter list references an unknown C type." }
         { "One of the three inputs to " { $link alien-indirect } " is not a literal value." }
     }
 } ;
@@ -62,22 +71,21 @@ HELP: alien-indirect-error
 HELP: alien-indirect
 { $values { "..." "zero or more objects passed to the C function" } { "funcptr" "a C function pointer" } { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } }
 { $description
-    "Invokes a C function pointer passed on the data stack. Input parameters are taken from the data stack following the function pointer, and the return value is pushed on the data stack after the function returns. A return type of " { $snippet "\"void\"" } " indicates that no value is to be expected."
+    "Invokes a C function pointer passed on the data stack. Input parameters are taken from the data stack following the function pointer, and the return value is pushed on the data stack after the function returns. A return type of " { $link void } " indicates that no value is to be expected."
 }
 { $notes "C type names are documented in " { $link "c-types-specs" } "." }
 { $errors "Throws an " { $link alien-indirect-error } " if the word calling " { $link alien-indirect } " is not compiled." } ;
 
 HELP: alien-callback-error
-{ $error-description "Thrown if the word calling " { $link alien-callback } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
+{ $error-description "Thrown if the word calling " { $link alien-callback } " was not compiled with the optimizing compiler. This may be a result of one of two failure conditions:"
     { $list
         { "This can happen when experimenting with " { $link alien-callback } " in this listener. To fix the problem, place the " { $link alien-callback } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
-        { "The return type or parameter list references an unknown C type." }
         { "One of the four inputs to " { $link alien-callback } " is not a literal value." }
     }
 } ;
 
 HELP: alien-callback
-{ $values { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "quot" "a quotation" } { "alien" alien } }
+{ $values { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "quot" quotation } { "alien" alien } }
 { $description
     "Defines a callback from C to Factor which accepts the given set of parameters from the C caller, pushes them on the data stack, calls the quotation, and passes a return value back to the C caller. A return type of " { $snippet "void" } " indicates that no value is to be returned."
     $nl
@@ -95,7 +103,23 @@ HELP: alien-callback
 }
 { $errors "Throws an " { $link alien-callback-error } " if the word calling " { $link alien-callback } " is not compiled." } ;
 
-{ alien-invoke alien-indirect alien-callback } related-words
+HELP: alien-assembly-error
+{ $error-description "Thrown if the word calling " { $link alien-assembly } " was not compiled with the optimizing compiler. This may be a result of one of two failure conditions:"
+    { $list
+        { "This can happen when experimenting with " { $link alien-assembly } " in this listener. To fix the problem, place the " { $link alien-assembly } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
+        { "One of the four inputs to " { $link alien-assembly } " is not a literal value." }
+    }
+} ;
+
+HELP: alien-assembly
+{ $values { "..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "quot" quotation } }
+{ $description
+    "Invokes arbitrary machine code, generated at compile-time by the quotation. Input parameters are taken from the data stack, and the return value is pushed on the data stack after the function returns. A return type of " { $link void } " indicates that no value is to be expected."
+}
+{ $notes "C type names are documented in " { $link "c-types-specs" } "." }
+{ $errors "Throws an " { $link alien-assembly-error } " if the word calling " { $link alien-assembly } " is not compiled." } ;
+
+{ alien-invoke alien-indirect alien-assembly alien-callback } related-words
 
 ARTICLE: "alien-expiry" "Alien expiry"
 "When an image is loaded, any alien objects which persisted from the previous session are marked as having expired. This is because the C pointers they contain are almost certainly no longer valid."
@@ -165,16 +189,6 @@ ARTICLE: "alien-invoke" "Calling C from Factor"
 { $subsections alien-indirect }
 "There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-data" } "." ;
 
-HELP: alien-invoke-error
-{ $error-description "Thrown if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
-    { $list
-        { "This can happen when experimenting with " { $link alien-invoke } " in this listener. To fix the problem, place the " { $link alien-invoke } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
-        { "The return type or parameter list references an unknown C type." }
-        { "The symbol or library could not be found." }
-        { "One of the four inputs to " { $link alien-invoke } " is not a literal value. To call functions which are not known at compile-time, use " { $link alien-indirect } "." }
-    }
-} ;
-
 ARTICLE: "alien-callback" "Calling Factor from C"
 "Callbacks can be defined and passed to C code as function pointers; the C code can then invoke the callback and run Factor code:"
 { $subsections
@@ -190,6 +204,18 @@ ARTICLE: "alien-globals" "Accessing C global variables"
     POSTPONE: C-GLOBAL:
     POSTPONE: &:
 } ;
+
+ARTICLE: "alien-assembly" "Calling arbitrary assembly code"
+"It is possible to write a word whose body consists of arbitrary assembly code. The assembly receives parameters and returns values as per the platform's ABI; marshalling and unmarshalling Factor values is taken care of by the C library interface, as with " { $link alien-invoke } "."
+$nl
+"Assembler opcodes are defined in CPU-specific vocabularies:"
+{ $list
+    { $vocab-link "cpu.arm.assembler" }
+    { $vocab-link "cpu.ppc.assembler" }
+    { $vocab-link "cpu.x86.assembler" }
+}
+"The combinator for generating arbitrary assembly by calling a quotation at compile time:"
+{ $subsection alien-assembly } ;
 
 ARTICLE: "dll.private" "DLL handles"
 "DLL handles are a built-in class of objects which represent loaded native libraries. DLL handles are instances of the " { $link dll } " class, and have a literal syntax used for debugging prinouts; see " { $link "syntax-aliens" } "."
@@ -281,6 +307,7 @@ $nl
     "c-data"
     "classes.struct"
     "alien-globals"
+    "alien-assembly"
     "dll.private"
     "embedding"
 } ;

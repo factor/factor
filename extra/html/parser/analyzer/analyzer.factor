@@ -61,10 +61,10 @@ TUPLE: link attributes clickable ;
     ] map ;
 
 : find-by-id ( vector id -- vector' elt/f )
-    '[ attributes>> "id" at _ = ] find ;
+    '[ attributes>> "id" swap at _ = ] find ;
     
 : find-by-class ( vector id -- vector' elt/f )
-    '[ attributes>> "class" at _ = ] find ;
+    '[ attributes>> "class" swap at _ = ] find ;
 
 : find-by-name ( vector string -- vector elt/f )
     >lower '[ name>> _ = ] find ;

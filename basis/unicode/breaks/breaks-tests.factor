@@ -27,7 +27,12 @@ IN: unicode.breaks.tests
     utf8 file-lines
     [ "#" split1 drop ] map harvest [
         "÷" split
-        [ "×" split [ [ blank? ] trim hex> ] map harvest >string ] map
+        [
+            "×" split
+            [ [ blank? ] trim hex> ] map
+            [ { f 0 } member? not ] filter
+            >string
+        ] map
         harvest
     ] map ;
 
@@ -46,4 +51,4 @@ IN: unicode.breaks.tests
 grapheme-break-test parse-test-file [ >graphemes ] test
 word-break-test parse-test-file [ >words ] test
 
-[ { t f t t f t } ] [ 6 [ "as df" word-break-at? ] map ] unit-test
+[ { t f t t f t } ] [ 6 iota [ "as df" word-break-at? ] map ] unit-test

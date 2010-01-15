@@ -164,9 +164,7 @@ M: #branch unbox-tuples* dup in-d>> assert-not-unboxed ;
 
 M: #return unbox-tuples* dup in-d>> assert-not-unboxed ;
 
-M: #alien-invoke unbox-tuples* dup in-d>> assert-not-unboxed ;
-
-M: #alien-indirect unbox-tuples* dup in-d>> assert-not-unboxed ;
+M: #alien-node unbox-tuples* dup in-d>> assert-not-unboxed ;
 
 M: #alien-callback unbox-tuples* ;
 

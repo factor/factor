@@ -1,6 +1,6 @@
 USING: accessors assocs bson.constants calendar fry io io.binary
 io.encodings io.encodings.utf8 kernel math math.bitwise namespaces
-sequences serialize ;
+sequences serialize locals ;
 
 FROM: kernel.private => declare ;
 FROM: io.encodings.private => (read-until) ;
@@ -62,22 +62,17 @@ GENERIC: element-binary-read ( length type -- object )
 : read-byte ( -- byte )
     read-byte-raw first ; inline
 
-: utf8-read-until ( seps stream encoding -- string/f sep/f )
-    [ { utf8 } declare decode-char dup [ dup rot member? ] [ 2drop f t ] if ]
-    3curry (read-until) ;
-
 : read-cstring ( -- string )
-    "\0" input-stream get utf8 utf8-read-until drop ; inline
+    "\0" read-until drop "" like ; inline
 
 : read-sized-string ( length -- string )
-    drop read-cstring ; inline
+    read 1 head-slice* "" like ; inline
 
 : read-element-type ( -- type )
     read-byte ; inline
 
-: push-element ( type name -- element )
-    element boa
-    [ get-state element>> push ] keep ; inline
+: push-element ( type name -- )
+    element boa get-state element>> push ; inline
 
 : pop-element ( -- element )
     get-state element>> pop ; inline
@@ -96,8 +91,7 @@ M: bson-object fix-result ( assoc type -- result )
     drop ;
 
 M: bson-array fix-result ( assoc type -- result )
-    drop
-    values ;
+    drop values ;
 
 GENERIC: end-element ( type -- )
 
@@ -108,25 +102,20 @@ M: bson-array end-element ( type -- )
     drop ;
 
 M: object end-element ( type -- )
-    drop
-    pop-element drop ;
+    pop-element 2drop ;
 
-M: bson-eoo element-read ( type -- cont? )
-    drop
-    get-state scope>> [ pop ] keep swap ! vec assoc
-    pop-element [ type>> ] keep       ! vec assoc element
-    [ fix-result ] dip
-    rot length 0 >                      ! assoc element 
-    [ name>> peek-scope set-at t ]
-    [ drop [ get-state ] dip >>result drop f ] if ;
+M:: bson-eoo element-read ( type -- cont? )
+    pop-element :> element
+    get-state scope>>
+    [ pop element type>> fix-result ] [ empty? ] bi
+    [ [ get-state ] dip >>result drop f ]
+    [ element name>> peek-scope set-at t ] if ;
 
-M: bson-not-eoo element-read ( type -- cont? )
-    [ peek-scope ] dip                                 ! scope type 
-    '[ _ read-cstring push-element [ name>> ] [ type>> ] bi 
-       [ element-data-read ] keep
-       end-element
-       swap
-    ] dip set-at t ;
+M:: bson-not-eoo element-read ( type -- cont? )
+    peek-scope :> scope
+    type read-cstring [ push-element ] 2keep
+    [ [ element-data-read ] [ end-element ] bi ]
+    [ scope set-at t ] bi* ;
 
 : [scope-changer] ( state -- state quot )
     dup exemplar>> '[ [ [ _ clone ] dip push ] keep ] ; inline
@@ -173,8 +162,7 @@ M: bson-regexp element-data-read ( type -- mdbregexp )
    read-cstring >>regexp read-cstring >>options ;
  
 M: bson-null element-data-read ( type -- bf  )
-    drop
-    f ;
+    drop f ;
 
 M: bson-oid element-data-read ( type -- oid )
     drop

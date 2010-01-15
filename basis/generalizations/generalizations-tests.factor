@@ -64,7 +64,7 @@ IN: generalizations.tests
 { 3 5 } [ 2 nweave ] must-infer-as
 
 [ { 0 1 2 } { 3 5 4 } { 7 8 6 } ]
-[ 9 [ ] each { [ 3array ] [ swap 3array ] [ rot 3array ] } 3 nspread ] unit-test
+[ 9 [ ] each-integer { [ 3array ] [ swap 3array ] [ rot 3array ] } 3 nspread ] unit-test
 
 [ 1 2 3 4 1 2 3 ] [ 1 2 3 4 3 nover ] unit-test
 

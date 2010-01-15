@@ -5,10 +5,10 @@ sequences random sets make grouping ;
 IN: trees.splay.tests
 
 : randomize-numeric-splay-tree ( splay-tree -- )
-    100 [ drop 100 random swap at drop ] with each ;
+    100 iota [ drop 100 random swap at drop ] with each ;
 
 : make-numeric-splay-tree ( n -- splay-tree )
-    <splay> [ [ conjoin ] curry each ] keep ;
+    iota <splay> [ [ conjoin ] curry each ] keep ;
 
 [ t ] [
     100 make-numeric-splay-tree dup randomize-numeric-splay-tree

@@ -19,7 +19,9 @@ ERROR: zlib-failed n string ;
     dup compression.zlib.ffi:Z_ERRNO = [
         drop errno "native libc error"
     ] [
-        dup {
+        dup
+        neg ! zlib error codes are negative
+        {
             "no error" "libc_error"
             "stream error" "data error"
             "memory error" "buffer error" "zlib version error"

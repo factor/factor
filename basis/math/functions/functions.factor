@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel math.constants math.private math.bits
 math.libm combinators math.order sequences ;
@@ -62,7 +62,7 @@ M: float exp fexp ; inline
 
 M: real exp >float exp ; inline
 
-M: complex exp >rect swap fexp swap polar> ; inline
+M: complex exp >rect swap exp swap polar> ; inline
 
 <PRIVATE
 

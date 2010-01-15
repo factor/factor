@@ -8,7 +8,8 @@ IN: command-line
 SYMBOL: script
 SYMBOL: command-line
 
-: (command-line) ( -- args ) 10 getenv sift [ alien>native-string ] map ;
+: (command-line) ( -- args )
+    10 special-object sift [ alien>native-string ] map ;
 
 : rc-path ( name -- path )
     os windows? [ "." prepend ] unless

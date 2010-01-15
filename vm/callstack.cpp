@@ -60,20 +60,6 @@ void factor_vm::primitive_callstack()
 	ctx->push(tag<callstack>(stack));
 }
 
-void factor_vm::primitive_set_callstack()
-{
-	callstack *stack = untag_check<callstack>(ctx->pop());
-
-	set_callstack(this,
-		ctx->callstack_bottom,
-		stack->top(),
-		untag_fixnum(stack->length),
-		memcpy);
-
-	/* We cannot return here ... */
-	critical_error("Bug in set_callstack()",0);
-}
-
 code_block *factor_vm::frame_code(stack_frame *frame)
 {
 	check_frame(frame);

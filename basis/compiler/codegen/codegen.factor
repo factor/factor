@@ -380,7 +380,7 @@ M: c-type-name flatten-value-type c-type flatten-value-type ;
     [ [ parameter-offsets nip ] keep ] dip 2reverse-each ; inline
 
 : prepare-unbox-parameters ( parameters -- offsets types indices )
-    [ parameter-offsets nip ] [ ] [ length iota reverse ] tri ;
+    [ parameter-offsets nip ] [ ] [ length iota <reversed> ] tri ;
 
 : unbox-parameters ( offset node -- )
     parameters>> swap
@@ -436,6 +436,16 @@ M: ##alien-invoke generate-insn
     dup %cleanup
     box-return* ;
 
+M: ##alien-assembly generate-insn
+    params>>
+    ! Unbox parameters
+    dup objects>registers
+    %prepare-var-args
+    ! Generate assembly
+    dup quot>> call( -- )
+    ! Box return value
+    box-return* ;
+
 ! ##alien-indirect
 M: ##alien-indirect generate-insn
     params>>
@@ -464,7 +474,7 @@ M: ##alien-indirect generate-insn
 
 TUPLE: callback-context ;
 
-: current-callback ( -- id ) 2 getenv ;
+: current-callback ( -- id ) 2 special-object ;
 
 : wait-to-return ( token -- )
     dup current-callback eq? [
@@ -475,7 +485,7 @@ TUPLE: callback-context ;
 
 : do-callback ( quot token -- )
     init-catchstack
-    [ 2 setenv call ] keep
+    [ 2 set-special-object call ] keep
     wait-to-return ; inline
 
 : callback-return-quot ( ctype -- quot )

@@ -4,7 +4,7 @@ USING: help.markup help.syntax kernel math strings ;
 IN: roman
 
 HELP: >roman
-{ $values { "n" "an integer" } { "str" "a string" } }
+{ $values { "n" integer } { "str" string } }
 { $description "Converts a number to its lower-case Roman Numeral equivalent." }
 { $notes "The range for this word is 1-3999, inclusive." }
 { $examples 
@@ -15,7 +15,7 @@ HELP: >roman
 } ;
 
 HELP: >ROMAN
-{ $values { "n" "an integer" } { "str" "a string" } }
+{ $values { "n" integer } { "str" string } }
 { $description "Converts a number to its upper-case Roman numeral equivalent." }
 { $notes "The range for this word is 1-3999, inclusive." }
 { $examples 
@@ -26,7 +26,7 @@ HELP: >ROMAN
 } ;
 
 HELP: roman>
-{ $values { "str" "a string" } { "n" "an integer" } }
+{ $values { "str" string } { "n" integer } }
 { $description "Converts a Roman numeral to an integer." }
 { $notes "The range for this word is i-mmmcmxcix, inclusive." }
 { $examples 
@@ -39,7 +39,7 @@ HELP: roman>
 { >roman >ROMAN roman> } related-words
 
 HELP: roman+
-{ $values { "string" string } { "string" string } { "string" string } }
+{ $values { "x" string } { "x" string } { "x" string } }
 { $description "Adds two Roman numerals." }
 { $examples 
     { $example "USING: io roman ;"
@@ -49,7 +49,7 @@ HELP: roman+
 } ;
 
 HELP: roman-
-{ $values { "string" string } { "string" string } { "string" string } }
+{ $values { "x" string } { "x" string } { "x" string } }
 { $description "Subtracts two Roman numerals." }
 { $examples 
     { $example "USING: io roman ;"
@@ -61,7 +61,7 @@ HELP: roman-
 { roman+ roman- } related-words
 
 HELP: roman*
-{ $values { "string" string } { "string" string } { "string" string } }
+{ $values { "x" string } { "x" string } { "x" string } }
 { $description "Multiplies two Roman numerals." }
 { $examples 
     { $example "USING: io roman ;"
@@ -71,7 +71,7 @@ HELP: roman*
 } ;
 
 HELP: roman/i
-{ $values { "string" string } { "string" string } { "string" string } }
+{ $values { "x" string } { "x" string } { "x" string } }
 { $description "Computes the integer division of two Roman numerals." }
 { $examples 
     { $example "USING: io roman ;"
@@ -81,7 +81,7 @@ HELP: roman/i
 } ;
 
 HELP: roman/mod
-{ $values { "string" string } { "string" string } { "string" string } { "string" string } }
+{ $values { "x" string } { "x" string } { "x" string } { "x" string } }
 { $description "Computes the quotient and remainder of two Roman numerals." }
 { $examples 
     { $example "USING: kernel io roman ;"

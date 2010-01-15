@@ -6,13 +6,13 @@ IN: sequences.tests
 [ "empty" ] [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
 [ { 1 } "not empty" ] [ { 1 } [ "empty" ] [ "not empty" ] if-empty ] unit-test
 
-[ V{ 1 2 3 4 } ] [ 1 5 dup <slice> >vector ] unit-test
-[ 3 ] [ 1 4 dup <slice> length ] unit-test
+[ V{ 1 2 3 4 } ] [ 1 5 dup iota <slice> >vector ] unit-test
+[ 3 ] [ 1 4 dup iota <slice> length ] unit-test
 [ 2 ] [ 1 3 { 1 2 3 4 } <slice> length ] unit-test
 [ V{ 2 3 } ] [ 1 3 { 1 2 3 4 } <slice> >vector ] unit-test
 [ V{ 4 5 } ] [ { 1 2 3 4 5 } 2 tail-slice* >vector ] unit-test
-[ V{ 3 4 } ] [ 2 4 1 10 dup <slice> subseq >vector ] unit-test
-[ V{ 3 4 } ] [ 0 2 2 4 1 10 dup <slice> <slice> subseq >vector ] unit-test
+[ V{ 3 4 } ] [ 2 4 1 10 dup iota <slice> subseq >vector ] unit-test
+[ V{ 3 4 } ] [ 0 2 2 4 1 10 dup iota <slice> <slice> subseq >vector ] unit-test
 [ 0 10 "hello" <slice> ] must-fail
 [ -10 3 "hello" <slice> ] must-fail
 [ 2 1 "hello" <slice> ] must-fail
@@ -129,7 +129,7 @@ unit-test
 [ { 1 3 2 4 } ] [ { 1 2 3 4 } clone 1 2 pick exchange ] unit-test
 
 [ { "" "a" "aa" "aaa" } ]
-[ 4 [ CHAR: a <string> ] map ]
+[ 4 [ CHAR: a <string> ] { } map-integers ]
 unit-test
 
 [ V{ } ] [ "f" V{ } clone remove! ] unit-test
@@ -138,11 +138,11 @@ unit-test
 [ V{ "x" } ] [ "f" V{ "f" "x" "f" } clone remove! ] unit-test
 [ V{ "y" "x" } ] [ "f" V{ "y" "f" "x" "f" } clone remove! ] unit-test
 
-[ V{ 0 1 4 5 } ] [ 6 >vector 2 4 pick delete-slice ] unit-test
+[ V{ 0 1 4 5 } ] [ 6 iota >vector 2 4 pick delete-slice ] unit-test
 
 [ 6 >vector 2 8 pick delete-slice ] must-fail
 
-[ V{ } ] [ 6 >vector 0 6 pick delete-slice ] unit-test
+[ V{ } ] [ 6 iota >vector 0 6 pick delete-slice ] unit-test
 
 [ { 1 2 "a" "b" 5 6 7 } ] [
     { "a" "b" } 2 4 { 1 2 3 4 5 6 7 }
@@ -228,10 +228,10 @@ unit-test
 
 [ 0 ] [ f length ] unit-test
 [ f first ] must-fail
-[ 3 ] [ 3 10 nth ] unit-test
-[ 3 ] [ 3 10 nth-unsafe ] unit-test
-[ -3 10 nth ] must-fail
-[ 11 10 nth ] must-fail
+[ 3 ] [ 3 10 iota nth ] unit-test
+[ 3 ] [ 3 10 iota nth-unsafe ] unit-test
+[ -3 10 iota nth ] must-fail
+[ 11 10 iota nth ] must-fail
 
 [ -1/0. 0 remove-nth! ] must-fail
 [ "" ] [ "" [ CHAR: \s = ] trim ] unit-test
@@ -243,10 +243,10 @@ unit-test
 [ "asdf " ] [ " asdf " [ CHAR: \s = ] trim-head ] unit-test
 [ " asdf" ] [ " asdf " [ CHAR: \s = ] trim-tail ] unit-test
 
-[ 328350 ] [ 100 [ sq ] map-sum ] unit-test
+[ 328350 ] [ 100 iota [ sq ] map-sum ] unit-test
 
-[ 50 ] [ 100 [ even? ] count ] unit-test
-[ 50 ] [ 100 [ odd?  ] count ] unit-test
+[ 50 ] [ 100 iota [ even? ] count ] unit-test
+[ 50 ] [ 100 iota [ odd?  ] count ] unit-test
 
 [ { "b" "d" } ] [ { 1 3 } { "a" "b" "c" "d" } nths ] unit-test
 [ { "a" "b" "c" "d" } ] [ { 0 1 2 3 } { "a" "b" "c" "d" } nths ] unit-test

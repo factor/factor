@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math sequences kernel namespaces accessors biassocs compiler.cfg
 compiler.cfg.instructions compiler.cfg.registers compiler.cfg.hats
@@ -33,7 +33,7 @@ IN: compiler.cfg.stacks
 : ds-load ( n -- vregs )
     dup 0 =
     [ drop f ]
-    [ [ <reversed> [ <ds-loc> peek-loc ] map ] [ neg inc-d ] bi ] if ;
+    [ [ iota <reversed> [ <ds-loc> peek-loc ] map ] [ neg inc-d ] bi ] if ;
 
 : ds-store ( vregs -- )
     [

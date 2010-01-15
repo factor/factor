@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2005, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private slots.private math
 math.private math.order ;
@@ -97,12 +97,6 @@ M: f nth-unsafe nip ; inline
 M: f like drop [ f ] when-empty ; inline
 
 INSTANCE: f immutable-sequence
-
-! Integers used to support the sequence protocol
-M: integer length ; inline
-M: integer nth-unsafe drop ; inline
-
-INSTANCE: integer immutable-sequence
 
 PRIVATE>
 
@@ -426,11 +420,11 @@ PRIVATE>
 : map ( seq quot -- newseq )
     over map-as ; inline
 
-: replicate ( seq quot -- newseq )
-    [ drop ] prepose map ; inline
+: replicate-as ( len quot exemplar -- newseq )
+    [ [ drop ] prepose ] dip map-integers ; inline
 
-: replicate-as ( seq quot exemplar -- newseq )
-    [ [ drop ] prepose ] dip map-as ; inline
+: replicate ( len quot -- newseq )
+    { } replicate-as ; inline
 
 : map! ( seq quot -- seq )
     over [ map-into ] keep ; inline
@@ -466,7 +460,7 @@ PRIVATE>
     (2each) all-integers? ; inline
 
 : 3each ( seq1 seq2 seq3 quot -- )
-    (3each) each ; inline
+    (3each) each-integer ; inline
 
 : 3map-as ( seq1 seq2 seq3 quot exemplar -- newseq )
     [ (3each) ] dip map-integers ; inline

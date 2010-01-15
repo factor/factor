@@ -38,9 +38,9 @@ fixnum instruction_operand::load_value(cell relative_to)
 	case RC_ABSOLUTE_PPC_2:
 		return load_value_masked(rel_absolute_ppc_2_mask,16,0);
 	case RC_RELATIVE_PPC_2:
-		return load_value_masked(rel_relative_ppc_2_mask,16,0) + relative_to;
+		return load_value_masked(rel_relative_ppc_2_mask,16,0) + relative_to - sizeof(cell);
 	case RC_RELATIVE_PPC_3:
-		return load_value_masked(rel_relative_ppc_3_mask,6,0) + relative_to;
+		return load_value_masked(rel_relative_ppc_3_mask,6,0) + relative_to - sizeof(cell);
 	case RC_RELATIVE_ARM_3:
 		return load_value_masked(rel_relative_arm_3_mask,6,2) + relative_to + sizeof(cell);
 	case RC_INDIRECT_ARM:
@@ -107,10 +107,10 @@ void instruction_operand::store_value(fixnum absolute_value)
 		store_value_masked(absolute_value,rel_absolute_ppc_2_mask,0);
 		break;
 	case RC_RELATIVE_PPC_2:
-		store_value_masked(relative_value,rel_relative_ppc_2_mask,0);
+		store_value_masked(relative_value + sizeof(cell),rel_relative_ppc_2_mask,0);
 		break;
 	case RC_RELATIVE_PPC_3:
-		store_value_masked(relative_value,rel_relative_ppc_3_mask,0);
+		store_value_masked(relative_value + sizeof(cell),rel_relative_ppc_3_mask,0);
 		break;
 	case RC_RELATIVE_ARM_3:
 		store_value_masked(relative_value - sizeof(cell),rel_relative_arm_3_mask,2);

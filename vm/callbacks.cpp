@@ -19,13 +19,13 @@ void factor_vm::init_callbacks(cell size)
 	callbacks = new callback_heap(size,this);
 }
 
-void callback_heap::update(code_block *stub)
+void callback_heap::store_callback_operand(code_block *stub, cell index, cell value)
 {
 	tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
 
-	cell rel_class = untag_fixnum(array_nth(code_template.untagged(),1));
-	cell rel_type = untag_fixnum(array_nth(code_template.untagged(),2));
-	cell offset = untag_fixnum(array_nth(code_template.untagged(),3));
+	cell rel_class = untag_fixnum(array_nth(code_template.untagged(),3 * index + 1));
+	cell rel_type  = untag_fixnum(array_nth(code_template.untagged(),3 * index + 2));
+	cell offset    = untag_fixnum(array_nth(code_template.untagged(),3 * index + 3));
 
 	relocation_entry rel(
 		(relocation_type)rel_type,
@@ -33,8 +33,12 @@ void callback_heap::update(code_block *stub)
 		offset);
 
 	instruction_operand op(rel,stub,0);
-	op.store_value((cell)callback_xt(stub));
+	op.store_value(value);
+}
 
+void callback_heap::update(code_block *stub)
+{
+	store_callback_operand(stub,1,(cell)callback_xt(stub));
 	stub->flush_icache();
 }
 
@@ -58,22 +62,14 @@ code_block *callback_heap::add(cell owner, cell return_rewind)
 
 	memcpy(stub->xt(),insns->data<void>(),size);
 
+	/* Store VM pointer */
+	store_callback_operand(stub,0,(cell)parent);
+
 	/* On x86, the RET instruction takes an argument which depends on
 	the callback's calling convention */
-	if(array_capacity(code_template.untagged()) == 7)
-	{
-		cell rel_class = untag_fixnum(array_nth(code_template.untagged(),4));
-		cell rel_type = untag_fixnum(array_nth(code_template.untagged(),5));
-		cell offset = untag_fixnum(array_nth(code_template.untagged(),6));
-
-		relocation_entry rel(
-			(relocation_type)rel_type,
-			(relocation_class)rel_class,
-			offset);
-
-		instruction_operand op(rel,stub,0);
-		op.store_value(return_rewind);
-	}
+#if defined(FACTOR_X86) || defined(FACTOR_AMD64)
+	store_callback_operand(stub,2,return_rewind);
+#endif
 
 	update(stub);
 

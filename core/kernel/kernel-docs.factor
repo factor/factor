@@ -655,13 +655,13 @@ HELP: tag ( object -- n )
 { $values { "object" object } { "n" "a tag number" } }
 { $description "Outputs an object's tag number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class } " instead." } ;
 
-HELP: getenv ( n -- obj )
+HELP: special-object ( n -- obj )
 { $values { "n" "a non-negative integer" } { "obj" object } }
-{ $description "Reads an object from the Factor VM's environment table. User code never has to read the environment table directly; instead, use one of the callers of this word." } ;
+{ $description "Reads an object from the Factor VM's special object table. User code never has to read the special object table directly; instead, use one of the callers of this word." } ;
 
-HELP: setenv ( obj n -- )
+HELP: set-special-object ( obj n -- )
 { $values { "obj" object } { "n" "a non-negative integer" } }
-{ $description "Writes an object to the Factor VM's environment table. User code never has to write to the environment table directly; instead, use one of the callers of this word." } ;
+{ $description "Writes an object to the Factor VM's special object table. User code never has to write to the special object table directly; instead, use one of the callers of this word." } ;
 
 HELP: object
 { $class-description

@@ -52,7 +52,7 @@ HELP: <groups>
 { $examples
     { $example
         "USING: arrays kernel prettyprint sequences grouping ;"
-        "9 >array 3 <groups> reverse! concat >array ." "{ 6 7 8 3 4 5 0 1 2 }"
+        "9 iota >array 3 <groups> reverse! concat >array ." "{ 6 7 8 3 4 5 0 1 2 }"
     }
     { $example
         "USING: kernel prettyprint sequences grouping ;"
@@ -67,7 +67,7 @@ HELP: <sliced-groups>
 { $examples
     { $example
         "USING: arrays kernel prettyprint sequences grouping ;"
-        "9 >array 3 <sliced-groups>"
+        "9 iota >array 3 <sliced-groups>"
         "dup [ reverse! drop ] each concat >array ."
         "{ 2 1 0 5 4 3 8 7 6 }"
     }

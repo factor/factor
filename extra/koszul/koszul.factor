@@ -71,10 +71,10 @@ SYMBOL: terms
     [ natural-sort ] keep [ index ] curry map ;
 
 : (inversions) ( n seq -- n )
-    [ > ] with filter length ;
+    [ > ] with count ;
 
 : inversions ( seq -- n )
-    0 swap [ length ] keep [
+    0 swap [ length iota ] keep [
         [ nth ] 2keep swap 1 + tail-slice (inversions) +
     ] curry each ;
 
@@ -145,12 +145,12 @@ DEFER: (d)
     [ dup length pick nth push ] reduce ;
 
 : nth-basis-elt ( generators n -- elt )
-    over length [
+    over length iota [
         3dup bit? [ nth ] [ 2drop f ] if
     ] map sift 2nip ;
 
 : basis ( generators -- seq )
-    natural-sort dup length 2^ [ nth-basis-elt ] with map ;
+    natural-sort dup length 2^ iota [ nth-basis-elt ] with map ;
 
 : (tensor) ( seq1 seq2 -- seq )
     [
@@ -180,7 +180,7 @@ DEFER: (d)
     dim-im/ker-d ;
 
 : graded-ker/im-d ( graded-basis -- seq )
-    [ length ] keep [ (graded-ker/im-d) ] curry map ;
+    [ length iota ] keep [ (graded-ker/im-d) ] curry map ;
 
 : graded-betti ( generators -- seq )
     basis graded graded-ker/im-d unzip but-last 0 prefix v- ;
@@ -269,8 +269,8 @@ DEFER: (d)
     3array ;
 
 :: bigraded-triples ( grid -- triples )
-    grid length [| z |
-        grid first length [| u |
+    grid length iota [| z |
+        grid first length iota [| u |
             u z grid bigraded-triple
         ] map
     ] map ;

@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel sequences words fry generic accessors
 classes.tuple classes classes.algebra definitions
@@ -132,26 +132,6 @@ IN: compiler.tree.propagation.transforms
     ] "custom-inlining" set-word-prop
 ] each
 
-! Integrate this with generic arithmetic optimization instead?
-: both-inputs? ( #call class -- ? )
-    [ in-d>> first2 ] dip '[ value-info class>> _ class<= ] both? ;
-
-\ min [
-    {
-        { [ dup fixnum both-inputs? ] [ [ fixnum-min ] ] }
-        { [ dup float both-inputs? ] [ [ float-min ] ] }
-        [ f ]
-    } cond nip
-] "custom-inlining" set-word-prop
-
-\ max [
-    {
-        { [ dup fixnum both-inputs? ] [ [ fixnum-max ] ] }
-        { [ dup float both-inputs? ] [ [ float-max ] ] }
-        [ f ]
-    } cond nip
-] "custom-inlining" set-word-prop
-
 ! Generate more efficient code for common idiom
 \ clone [
     in-d>> first value-info literal>> {
@@ -209,7 +189,7 @@ ERROR: bad-partial-eval quot word ;
 \ index [
     dup sequence? [
         dup length 4 >= [
-            dup length zip >hashtable '[ _ at ]
+            dup length iota zip >hashtable '[ _ at ]
         ] [ drop f ] if
     ] [ drop f ] if
 ] 1 define-partial-eval
@@ -248,7 +228,7 @@ CONSTANT: lookup-table-at-max 256
     } 1&& ;
 
 : lookup-table-seq ( assoc -- table )
-    [ keys supremum 1 + ] keep '[ _ at ] { } map-as ;
+    [ keys supremum 1 + iota ] keep '[ _ at ] { } map-as ;
 
 : lookup-table-quot ( seq -- newquot )
     lookup-table-seq
