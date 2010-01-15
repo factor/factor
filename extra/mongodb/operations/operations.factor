@@ -107,7 +107,7 @@ USE: tools.walker
 
 :: build-query-object ( query -- selector )
     H{ } clone :> selector
-    query { [ orderby>> [ "orderby" selector set-at ] when* ]
+    query { [ orderby>> [ "$orderby" selector set-at ] when* ]
       [ explain>> [ "$explain" selector set-at ] when* ]
       [ hint>> [ "$hint" selector set-at ] when* ] 
       [ query>> "query" selector set-at ]

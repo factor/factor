@@ -165,9 +165,7 @@ M: mdb-collection create-collection
 : fix-query-collection ( mdb-query -- mdb-query )
     [ check-collection ] change-collection ; inline
 
-GENERIC: get-more ( mdb-cursor -- mdb-cursor seq )
-
-M: mdb-cursor get-more 
+: get-more ( mdb-cursor -- mdb-cursor seq )
     [ [ query>> dup [ collection>> ] [ return#>> ] bi ]
       [ id>> ] bi <mdb-getmore-msg> swap >>query send-query ] 
     [ f f ] if* ;
@@ -177,21 +175,20 @@ PRIVATE>
 : <query> ( collection assoc -- mdb-query-msg )
     <mdb-query-msg> ; inline
 
-GENERIC# limit 1 ( mdb-query-msg limit# -- mdb-query-msg )
-
-M: mdb-query-msg limit 
+: limit ( mdb-query-msg limit# -- mdb-query-msg )
     >>return# ; inline
 
-GENERIC# skip 1 ( mdb-query-msg skip# -- mdb-query-msg )
-
-M: mdb-query-msg skip 
+: skip ( mdb-query-msg skip# -- mdb-query-msg )
     >>skip# ; inline
 
 : asc ( key -- spec ) 1 2array ; inline
 : desc ( key -- spec ) -1 2array ; inline
 
 : sort ( mdb-query-msg sort-quot -- mdb-query-msg )
-    output>array [ 1array >hashtable ] map >>orderby ; inline
+    output>array >hashtable >>orderby ; inline
+
+: filter-fields ( mdb-query-msg filterseq -- mdb-query-msg )
+    [ asc ] map >hashtable >>returnfields ; inline
 
 : key-spec ( spec-quot -- spec-assoc )
     output>array >hashtable ; inline
@@ -209,21 +206,15 @@ M: mdb-query-msg find
 M: mdb-cursor find
     get-more ;
 
-GENERIC: explain. ( mdb-query-msg -- )
-
-M: mdb-query-msg explain.
+: explain. ( mdb-query-msg -- )
     t >>explain find nip . ;
 
-GENERIC: find-one ( mdb-query-msg -- result/f )
-
-M: mdb-query-msg find-one
+: find-one ( mdb-query-msg -- result/f )
     fix-query-collection 
     1 >>return# send-query-plain objects>>
     dup empty? [ drop f ] [ first ] if ;
 
-GENERIC: count ( mdb-query-msg -- result )
-
-M: mdb-query-msg count    
+: count ( mdb-query-msg -- result )
     [ collection>> "count" H{ } clone [ set-at ] keep ] keep
     query>> [ over [ "query" ] dip set-at ] when*
     [ cmd-collection ] dip <mdb-query-msg> find-one 
@@ -251,18 +242,15 @@ M: mdb-collection validate.
 
 PRIVATE>
 
-GENERIC: save ( collection assoc -- )
-M: assoc save
+: save ( collection assoc -- )
     [ check-collection ] dip
     <mdb-insert-msg> send-message-check-error ;
 
-GENERIC: save-unsafe ( collection assoc -- )
-M: assoc save-unsafe
+: save-unsafe ( collection assoc -- )
     [ check-collection ] dip
     <mdb-insert-msg> send-message ;
 
-GENERIC: ensure-index ( index-spec -- )
-M: index-spec ensure-index
+: ensure-index ( index-spec -- )
     <linked-hash> [ [ uuid1 "_id" ] dip set-at ] keep
     [ { [ [ name>> "name" ] dip set-at ]
         [ [ ns>> index-ns "ns" ] dip set-at ]
@@ -285,23 +273,22 @@ M: index-spec ensure-index
 : >upsert ( mdb-update-msg -- mdb-update-msg )
     1 >>upsert? ; 
 
-GENERIC: update ( mdb-update-msg -- )
-M: mdb-update-msg update
+: update ( mdb-update-msg -- )
     send-message-check-error ;
 
-GENERIC: update-unsafe ( mdb-update-msg -- )
-M: mdb-update-msg update-unsafe
+: update-unsafe ( mdb-update-msg -- )
     send-message ;
  
-GENERIC: delete ( collection selector -- )
-M: assoc delete
+: delete ( collection selector -- )
     [ check-collection ] dip
     <mdb-delete-msg> send-message-check-error ;
 
-GENERIC: delete-unsafe ( collection selector -- )
-M: assoc delete-unsafe
+: delete-unsafe ( collection selector -- )
     [ check-collection ] dip
     <mdb-delete-msg> send-message ;
+
+: kill-cursor ( mdb-cursor -- )
+    id>> <mdb-killcursors-msg> send-message ;
 
 : load-index-list ( -- index-list )
     index-collection
