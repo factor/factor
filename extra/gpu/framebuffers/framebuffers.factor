@@ -3,7 +3,7 @@ USING: accessors alien.c-types arrays byte-arrays combinators
 destructors gpu gpu.buffers gpu.private gpu.textures
 gpu.textures.private images kernel locals math math.rectangles opengl
 opengl.framebuffers opengl.gl opengl.textures sequences
-specialized-arrays ui.gadgets.worlds variants ;
+specialized-arrays typed ui.gadgets.worlds variants ;
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: uint
 IN: gpu.framebuffers
@@ -22,7 +22,7 @@ TUPLE: renderbuffer < gpu-object
 
 PRIVATE>
 
-:: allocate-renderbuffer ( renderbuffer dim -- )
+TYPED:: allocate-renderbuffer ( renderbuffer: renderbuffer dim -- )
     GL_RENDERBUFFER renderbuffer handle>> glBindRenderbuffer
     GL_RENDERBUFFER
     renderbuffer samples>> dup zero?
@@ -30,12 +30,17 @@ PRIVATE>
     [ renderbuffer texture-gl-internal-format dim first2 glRenderbufferStorageMultisample ]
     if ;
 
-:: renderbuffer-dim ( renderbuffer -- dim )
+TYPED:: renderbuffer-dim ( renderbuffer: renderbuffer -- dim: array )
     GL_RENDERBUFFER renderbuffer handle>> glBindRenderbuffer
     GL_RENDERBUFFER_WIDTH get-framebuffer-int
     GL_RENDERBUFFER_HEIGHT get-framebuffer-int 2array ;
 
-: <renderbuffer> ( component-order component-type samples dim -- renderbuffer )
+TYPED: <renderbuffer> ( component-order: component-order
+                        component-type: component-type
+                        samples
+                        dim
+                        --
+                        renderbuffer )
     [ [ gen-renderbuffer ] 3dip renderbuffer boa dup ] dip
     [ allocate-renderbuffer ] [ drop ] if*
     window-resource ;
@@ -121,7 +126,10 @@ TUPLE: framebuffer-rect
 
 C: <framebuffer-rect> framebuffer-rect
 
-: framebuffer-attachment-at ( framebuffer attachment-ref -- attachment )
+TYPED: framebuffer-attachment-at ( framebuffer: framebuffer
+                                   attachment-ref: attachment-ref
+                                   --
+                                   attachment: framebuffer-attachment )
     {
         { default-attachment [ color-attachments>> first ] }
         { color-attachment [ swap color-attachments>> nth ] }
@@ -288,32 +296,42 @@ M: opengl-3 (clear-integer-color-attachment)
 
 PRIVATE>
 
-: <full-framebuffer-rect> ( framebuffer attachment -- framebuffer-rect )
+TYPED: <full-framebuffer-rect> ( framebuffer: any-framebuffer
+                                 attachment: attachment-ref
+                                 --
+                                 framebuffer-rect: framebuffer-rect )
     2dup framebuffer-attachment-at
     { 0 0 } swap framebuffer-attachment-dim <rect>
     <framebuffer-rect> ;
 
-: resize-framebuffer ( framebuffer dim -- )
+TYPED: resize-framebuffer ( framebuffer: framebuffer dim -- )
     [ allocate-framebuffer-attachment ] curry each-attachment ;
 
 :: attach-framebuffer-attachments ( framebuffer -- )
     GL_DRAW_FRAMEBUFFER framebuffer handle>> glBindFramebuffer
-    framebuffer [ bind-framebuffer-attachment ] each-attachment-target ;
+    framebuffer [ bind-framebuffer-attachment ] each-attachment-target ; inline
 
 M: framebuffer dispose
     [ [ delete-framebuffer ] when* f ] change-handle drop ;
 
-: dispose-framebuffer-attachments ( framebuffer -- )
+TYPED: dispose-framebuffer-attachments ( framebuffer: framebuffer -- )
     [ [ dispose ] when* ] each-attachment ;
 
-: <framebuffer> ( color-attachments depth-attachment stencil-attachment dim -- framebuffer )
+: <framebuffer> ( color-attachments
+                  depth-attachment: framebuffer-attachment
+                  stencil-attachment: framebuffer-attachment
+                  dim
+                  --
+                  framebuffer: framebuffer )
     [ [ 0 ] 3dip framebuffer boa dup ] dip
     [ resize-framebuffer ] [ drop ] if*
     gen-framebuffer >>handle
     dup attach-framebuffer-attachments
     window-resource ;
 
-:: clear-framebuffer-attachment ( framebuffer attachment-ref value -- )
+TYPED:: clear-framebuffer-attachment ( framebuffer: any-framebuffer
+                                       attachment-ref: attachment-ref
+                                       value -- )
     GL_DRAW_FRAMEBUFFER framebuffer framebuffer-handle glBindFramebuffer
     attachment-ref {
         { system-attachment [| side face |
@@ -335,9 +353,10 @@ M: framebuffer dispose
     } match ;
 
 : clear-framebuffer ( framebuffer alist -- )
-    [ first2 clear-framebuffer-attachment ] with each ;
+    [ first2 clear-framebuffer-attachment ] with each ; inline
 
-:: read-framebuffer-to ( framebuffer-rect gpu-data-ptr -- )
+TYPED:: read-framebuffer-to ( framebuffer-rect: framebuffer-rect
+                              gpu-data-ptr -- )
     GL_READ_FRAMEBUFFER framebuffer-rect framebuffer>> framebuffer-handle glBindFramebuffer
     framebuffer-rect [ framebuffer>> ] [ attachment>> ] bi gl-attachment glReadBuffer
     framebuffer-rect rect>> [ loc>> first2 ] [ dim>> first2 ] bi 
@@ -345,9 +364,9 @@ M: framebuffer dispose
     gpu-data-ptr pixel-pack-buffer [ glReadPixels ] with-gpu-data-ptr ;
     
 : read-framebuffer ( framebuffer-rect -- byte-array )
-    dup framebuffer-rect-size <byte-array> [ read-framebuffer-to ] keep ;
+    dup framebuffer-rect-size <byte-array> [ read-framebuffer-to ] keep ; inline
 
-: read-framebuffer-image ( framebuffer-rect -- image )
+TYPED: read-framebuffer-image ( framebuffer-rect -- image )
     [ <image> ] dip {
         [ rect>> dim>> >>dim ]
         [
@@ -357,7 +376,9 @@ M: framebuffer dispose
         [ read-framebuffer >>bitmap ] 
     } cleave ;
 
-:: copy-framebuffer ( to-fb-rect from-fb-rect depth? stencil? filter -- )
+TYPED:: copy-framebuffer ( to-fb-rect: framebuffer-rect
+                           from-fb-rect: framebuffer-rect
+                           depth? stencil? filter: texture-filter -- )
     GL_DRAW_FRAMEBUFFER to-fb-rect framebuffer>> framebuffer-handle glBindFramebuffer
     to-fb-rect [ framebuffer>> ] [ attachment>> ] bi gl-attachment glDrawBuffer
     GL_READ_FRAMEBUFFER from-fb-rect framebuffer>> framebuffer-handle glBindFramebuffer
