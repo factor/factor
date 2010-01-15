@@ -116,7 +116,7 @@ unit-test
     1 1.0 2.5 try-breaking-dispatch "bye" = [ 3.5 = ] dip and ;
 
 [ t ] [
-    10000000 [ drop try-breaking-dispatch-2 ] all?
+    10000000 [ drop try-breaking-dispatch-2 ] all-integers?
 ] unit-test
 
 ! Regression
@@ -314,7 +314,7 @@ cell 4 = [
 
 ! Bug with ##return node construction
 : return-recursive-bug ( nodes -- ? )
-    { fixnum } declare [
+    { fixnum } declare iota [
         dup 3 bitand 1 = [ drop t ] [
             dup 3 bitand 2 = [
                 return-recursive-bug

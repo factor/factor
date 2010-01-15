@@ -50,7 +50,11 @@ PRIVATE>
 : random-bits* ( numbits -- n )
     1 - [ random-bits ] keep set-bit ;
 
-: random ( seq -- elt )
+GENERIC: random ( obj -- elt )
+
+M: integer random [ f ] [ random-integer ] if-zero ;
+
+M: sequence random
     [ f ] [
         [ length random-integer ] keep nth
     ] if-empty ;
@@ -59,7 +63,7 @@ PRIVATE>
 
 : randomize ( seq -- seq )
     dup length [ dup 1 > ]
-    [ [ iota random ] [ 1 - ] bi [ pick exchange ] keep ]
+    [ [ random ] [ 1 - ] bi [ pick exchange ] keep ]
     while drop ;
 
 ERROR: too-many-samples seq n ;

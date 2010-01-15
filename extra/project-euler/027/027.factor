@@ -46,7 +46,7 @@ IN: project-euler.027
 <PRIVATE
 
 : source-027 ( -- seq )
-    1000 [0,b) [ prime? ] filter [ dup [ neg ] map append ] keep
+    1000 iota [ prime? ] filter [ dup [ neg ] map append ] keep
     cartesian-product [ first2 < ] filter ;
 
 : quadratic ( b a n -- m )

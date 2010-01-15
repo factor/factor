@@ -12,7 +12,7 @@ IN: ui.gadgets.panes.tests
 [ ] [ #children "num-children" set ] unit-test
 
 [ ] [
-    "pane" get <pane-stream> [ 100 [ . ] each ] with-output-stream*
+    "pane" get <pane-stream> [ 100 [ . ] each-integer ] with-output-stream*
 ] unit-test
 
 [ t ] [ #children "num-children" get = ] unit-test

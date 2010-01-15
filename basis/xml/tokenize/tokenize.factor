@@ -95,7 +95,7 @@ HINTS: next* { spot } ;
     get-char [ missing-close ] unless next ;
 
 : expect ( string -- )
-    dup spot get '[ _ [ char>> ] keep next* ] replicate
+    dup length spot get '[ _ [ char>> ] keep next* ] "" replicate-as
     2dup = [ 2drop ] [ expected ] if ;
 
 ! Suddenly XML-specific

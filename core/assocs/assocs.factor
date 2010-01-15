@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2009 Daniel Ehrenberg, Slava Pestov
+! Copyright (C) 2007, 2010 Daniel Ehrenberg, Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences arrays math sequences.private vectors
 accessors ;
@@ -225,7 +225,7 @@ M: enum set-at seq>> set-nth ; inline
 M: enum delete-at seq>> remove-nth! drop ; inline
 
 M: enum >alist ( enum -- alist )
-    seq>> [ length ] keep zip ; inline
+    seq>> [ length iota ] keep zip ; inline
 
 M: enum assoc-size seq>> length ; inline
 

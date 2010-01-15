@@ -29,7 +29,7 @@ TUPLE: mdb-query-msg < mdb-msg
 { return# integer initial: 0 }
 { query assoc }
 { returnfields assoc }
-{ orderby sequence }
+{ orderby assoc }
 explain hint ;
 
 TUPLE: mdb-insert-msg < mdb-msg

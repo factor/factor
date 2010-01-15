@@ -13,7 +13,7 @@ SYMBOL: restarts
 <PRIVATE
 
 : catchstack* ( -- catchstack )
-    1 getenv { vector } declare ; inline
+    1 special-object { vector } declare ; inline
 
 : >c ( continuation -- ) catchstack* push ;
 
@@ -23,13 +23,13 @@ SYMBOL: restarts
 : dummy-1 ( -- obj ) f ;
 : dummy-2 ( obj -- obj ) dup drop ;
 
-: init-catchstack ( -- ) V{ } clone 1 setenv ;
+: init-catchstack ( -- ) V{ } clone 1 set-special-object ;
 
 PRIVATE>
 
 : catchstack ( -- catchstack ) catchstack* clone ; inline
 
-: set-catchstack ( catchstack -- ) >vector 1 setenv ; inline
+: set-catchstack ( catchstack -- ) >vector 1 set-special-object ; inline
 
 TUPLE: continuation data call retain name catch ;
 
@@ -71,12 +71,12 @@ PRIVATE>
 
 : continue-with ( obj continuation -- * )
     [
-        swap 4 setenv
+        swap 4 set-special-object
         >continuation<
         set-catchstack
         set-namestack
         set-retainstack
-        [ set-datastack drop 4 getenv f 4 setenv f ] dip
+        [ set-datastack drop 4 special-object f 4 set-special-object f ] dip
         set-callstack
     ] (( obj continuation -- * )) call-effect-unsafe ;
 
@@ -173,12 +173,12 @@ M: condition compute-restarts
     ! VM calls on error
     [
         ! 63 = self
-        63 getenv error-thread set-global
+        63 special-object error-thread set-global
         continuation error-continuation set-global
         rethrow
-    ] 5 setenv
+    ] 5 set-special-object
     ! VM adds this to kernel errors, so that user-space
     ! can identify them
-    "kernel-error" 6 setenv ;
+    "kernel-error" 6 set-special-object ;
 
 PRIVATE>

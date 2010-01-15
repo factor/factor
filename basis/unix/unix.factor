@@ -1,11 +1,11 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! Copyright (C) 2008 Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax kernel libc
-sequences continuations byte-arrays strings math namespaces
-system combinators vocabs.loader accessors
-stack-checker macros locals generalizations unix.types
-io vocabs classes.struct unix.time alien.libraries ;
+USING: alien alien.c-types alien.syntax kernel libc sequences
+continuations byte-arrays strings math namespaces system
+combinators combinators.smart vocabs.loader accessors
+stack-checker macros locals generalizations unix.types io vocabs
+classes.struct unix.time alien.libraries ;
 IN: unix
 
 CONSTANT: PROT_NONE   0
@@ -48,7 +48,7 @@ ERROR: unix-error errno message ;
 ERROR: unix-system-call-error args errno message word ;
 
 MACRO:: unix-system-call ( quot -- )
-    quot infer in>> :> n
+    quot inputs :> n
     quot first :> word
     [
         n ndup quot call dup 0 < [

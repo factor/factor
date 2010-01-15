@@ -6,7 +6,7 @@ SYMBOL: sum
 
 : range ( r from to -- n )
     over - 1 + rot [ 
-        '[ over + @ drop ] each drop f
+        '[ over + @ drop ] each-integer drop f
     ] bshift 2nip ; inline
 
 [ 55 ] [

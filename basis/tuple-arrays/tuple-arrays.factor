@@ -10,7 +10,7 @@ IN: tuple-arrays
 
 MACRO: boa-unsafe ( class -- quot ) tuple-layout '[ _ <tuple-boa> ] ;
 
-MACRO: infer-in ( class -- quot ) infer in>> '[ _ ] ;
+MACRO: infer-in ( class -- quot ) inputs '[ _ ] ;
 
 : tuple-arity ( class -- quot ) '[ _ boa ] infer-in ; inline
 
@@ -28,7 +28,7 @@ MACRO: infer-in ( class -- quot ) infer in>> '[ _ ] ;
 
 MACRO: write-tuple ( class -- quot )
     [ '[ [ _ boa ] undo ] ]
-    [ tuple-arity <reversed> [ '[ [ _ ] dip set-nth-unsafe ] ] map '[ _ cleave ] ]
+    [ tuple-arity iota <reversed> [ '[ [ _ ] dip set-nth-unsafe ] ] map '[ _ cleave ] ]
     bi '[ _ dip @ ] ;
 
 PRIVATE>

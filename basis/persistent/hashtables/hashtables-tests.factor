@@ -81,7 +81,8 @@ M: hash-0-b hashcode* 2drop 0 ;
 ] unit-test
 
 : random-string ( -- str )
-    1000000 random ; ! [ CHAR: a CHAR: z [a,b] random ] "" replicate-as ;
+    1000000 random ;
+    ! [ CHAR: a CHAR: z [a,b] random ] "" replicate-as ;
 
 : random-assocs ( n -- hash phash )
     [ random-string ] replicate

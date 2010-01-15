@@ -28,4 +28,4 @@ IN: io.encodings.utf8.tests
 
 [ 3 ] [ 2 "lápis" >utf8-index ] unit-test
 
-[ V{ } ] [ 100000 [ [ code-point-length ] [ 1string utf8 encode length ] bi = not ] filter ] unit-test
+[ V{ } ] [ 100000 iota [ [ code-point-length ] [ 1string utf8 encode length ] bi = not ] filter ] unit-test

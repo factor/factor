@@ -205,7 +205,7 @@ link-no-follow? off
     100 [
         drop random-markup
         [ convert-farkup drop t ] [ drop print f ] recover
-    ] all?
+    ] all-integers?
 ] unit-test
 
 [ "<p><a href=\"http://foo.com/~foo\">http://foo.com/~foo</a></p>" ] [ "[[http://foo.com/~foo]]" convert-farkup ] unit-test

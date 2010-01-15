@@ -291,7 +291,7 @@ IN: math.intervals.tests
     ] if ;
 
 unary-ops [
-    [ [ t ] ] dip '[ 8000 iota [ drop _ unary-test ] all? ] unit-test
+    [ [ t ] ] dip '[ 8000 [ drop _ unary-test ] all-integers? ] unit-test
 ] each
 
 : binary-ops ( -- alist )

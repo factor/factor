@@ -12,6 +12,8 @@ TUPLE: alien-invoke-params < alien-node-params library function ;
 
 TUPLE: alien-indirect-params < alien-node-params ;
 
+TUPLE: alien-assembly-params < alien-node-params quot ;
+
 TUPLE: alien-callback-params < alien-node-params quot xt ;
 
 : param-prep-quot ( node -- quot )
@@ -55,6 +57,22 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
     dup 1 alien-stack
     ! Add node to IR
     dup #alien-indirect,
+    ! Quotation which coerces return value to required type
+    return-prep-quot infer-quot-here ;
+
+: infer-alien-assembly ( -- )
+    alien-assembly-params new
+    ! Compile-time parameters
+    pop-literal nip >>quot
+    pop-literal nip >>abi
+    pop-literal nip >>parameters
+    pop-literal nip >>return
+    ! Quotation which coerces parameters to required types
+    dup param-prep-quot infer-quot-here
+    ! Magic #: consume exactly the number of inputs
+    dup 0 alien-stack
+    ! Add node to IR
+    dup #alien-assembly,
     ! Quotation which coerces return value to required type
     return-prep-quot infer-quot-here ;
 

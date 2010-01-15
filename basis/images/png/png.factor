@@ -120,7 +120,7 @@ ERROR: unimplemented-color-type image ;
     prev width tail-slice :> b
     curr :> a
     curr width tail-slice :> x
-    x length [0,b)
+    x length iota
     filter {
         { filter-none [ drop ] }
         { filter-sub [ [| n | n x nth n a nth + 256 wrap n x set-nth ] each ] }

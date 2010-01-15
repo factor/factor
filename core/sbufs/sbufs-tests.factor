@@ -21,4 +21,4 @@ IN: sbufs.tests
 
 [ fixnum ] [ 1 >bignum SBUF" " new-sequence length class ] unit-test
 
-[ fixnum ] [ 1 >bignum [ ] SBUF" " map-as length class ] unit-test
+[ fixnum ] [ 1 >bignum iota [ ] SBUF" " map-as length class ] unit-test

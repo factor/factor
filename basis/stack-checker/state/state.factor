@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs arrays namespaces sequences kernel definitions
 math effects accessors words fry classes.algebra
@@ -38,7 +38,9 @@ SYMBOL: literals
 : current-stack-height ( -- n ) meta-d length input-count get - ;
 
 : current-effect ( -- effect )
-    input-count get meta-d length terminated? get effect boa ;
+    input-count get "x" <array>
+    meta-d length "x" <array>
+    terminated? get effect boa ;
 
 : init-inference ( -- )
     terminated? off

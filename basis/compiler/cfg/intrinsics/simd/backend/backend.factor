@@ -110,7 +110,7 @@ MACRO: vvvv-vector-op ( trials -- )
     blub ;
 
 MACRO: can-has-case ( cases -- )
-    dup first second infer in>> length 1 +
+    dup first second inputs 1 +
     '[ _ ndrop f ] suffix '[ _ case ] ;
 
 GENERIC# >can-has-trial 1 ( obj #pick -- quot )
@@ -118,7 +118,7 @@ GENERIC# >can-has-trial 1 ( obj #pick -- quot )
 M: callable >can-has-trial
     drop '[ _ can-has? ] ;
 M: pair >can-has-trial
-    swap first2 dup infer in>> length
+    swap first2 dup inputs
     '[ _ npick _ instance? [ _ can-has? ] [ _ ndrop blub ] if ] ; 
 
 MACRO: can-has-vector-op ( trials #pick #dup -- )

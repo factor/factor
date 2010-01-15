@@ -47,6 +47,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/data_heap_checker.o \
 	vm/debug.o \
 	vm/dispatch.o \
+	vm/entry_points.o \
 	vm/errors.o \
 	vm/factor.o \
 	vm/free_list.o \

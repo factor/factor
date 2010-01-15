@@ -13,7 +13,8 @@ ERROR: malformed-base64 ;
     read1 2dup swap member? [ drop read1-ignoring ] [ nip ] if ;
 
 : read-ignoring ( ignoring n -- str )
-    [ drop read1-ignoring ] with map harvest
+    [ drop read1-ignoring ] with { } map-integers
+    [ { f 0 } member? not ] filter
     [ f ] [ >string ] if-empty ;
 
 : ch>base64 ( ch -- ch )
@@ -42,7 +43,7 @@ SYMBOL: column
     [ write1-lines ] each ;
 
 : encode3 ( seq -- )
-    be> 4 <reversed> [
+    be> 4 iota <reversed> [
         -6 * shift HEX: 3f bitand ch>base64 write1-lines
     ] with each ; inline
 

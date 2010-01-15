@@ -11,14 +11,14 @@ IN: stack-checker
 ARTICLE: "inference-simple" "Straight-line stack effects"
 "The simplest case is when a piece of code does not have any branches or recursion, and just pushes literals and calls words."
 $nl
-"Pushing a literal has stack effect " { $snippet "( -- object )" } ". The stack effect of a most words is always known statically from the declaration. Stack effects of " { $link POSTPONE: inline } " words and " { $link "macros" } ", may depend on literals pushed on the stack prior to the call, and this case is discussed in " { $link "inference-combinators" } "."
+"Pushing a literal has stack effect " { $snippet "( -- x )" } ". The stack effect of a most words is always known statically from the declaration. Stack effects of " { $link POSTPONE: inline } " words and " { $link "macros" } ", may depend on literals pushed on the stack prior to the call, and this case is discussed in " { $link "inference-combinators" } "."
 $nl
 "The stack effect of each element in a code snippet is composed. The result is then the stack effect of the snippet."
 $nl
 "An example:"
-{ $example "[ 1 2 3 ] infer." "( -- object object object )" }
+{ $example "[ 1 2 3 ] infer." "( -- x x x )" }
 "Another example:"
-{ $example "[ 2 + ] infer." "( object -- object )" } ;
+{ $example "[ 2 + ] infer." "( x -- x )" } ;
 
 ARTICLE: "inference-combinators" "Combinator stack effects"
 "If a word calls a combinator, one of the following two conditions must hold for the stack checker to succeed:"
@@ -30,15 +30,15 @@ ARTICLE: "inference-combinators" "Combinator stack effects"
 { $heading "Examples" }
 { $subheading "Calling a combinator" }
 "The following usage of " { $link map } " passes the stack checker, because the quotation is the result of " { $link curry } ":"
-{ $example "USING: math sequences ;" "[ [ + ] curry map ] infer." "( object object -- object )" }
+{ $example "USING: math sequences ;" "[ [ + ] curry map ] infer." "( x x -- x )" }
 "The equivalent code using " { $vocab-link "fry" } " and " { $vocab-link "locals" } " likewise passes the stack checker:"
-{ $example "USING: fry math sequences ;" "[ '[ _ + ] map ] infer." "( object object -- object )" }
-{ $example "USING: locals math sequences ;" "[| a | [ a + ] map ] infer." "( object object -- object )" }
+{ $example "USING: fry math sequences ;" "[ '[ _ + ] map ] infer." "( x x -- x )" }
+{ $example "USING: locals math sequences ;" "[| a | [ a + ] map ] infer." "( x x -- x )" }
 { $subheading "Defining an inline combinator" }
 "The following word calls a quotation twice; the word is declared " { $link POSTPONE: inline } ", since it invokes " { $link call } " on the result of " { $link compose } " on an input parameter:"
 { $code ": twice ( value quot -- result ) dup compose call ; inline" }
 "The following code now passes the stack checker; it would fail were " { $snippet "twice" } " not declared " { $link POSTPONE: inline } ":"
-{ $unchecked-example "USE: math.functions" "[ [ sqrt ] twice ] infer." "( object -- object )" }
+{ $unchecked-example "USE: math.functions" "[ [ sqrt ] twice ] infer." "( x -- x )" }
 { $subheading "Defining a combinator for unknown quotations" }
 "In the next example, " { $link POSTPONE: call( } " must be used because the quotation the result of calling a runtime accessor, and the compiler cannot make any static assumptions about this quotation at all:"
 { $code
@@ -61,14 +61,14 @@ $nl
 }
 "To make this work, use " { $link dip } " to pass the quotation instead:"
 { $example
-  "[ [ reverse ] [ [ reverse ] map ] dip call ] infer." "( object -- object )"
+  "[ [ reverse ] [ [ reverse ] map ] dip call ] infer." "( x -- x )"
 } ;
 
 ARTICLE: "inference-branches" "Branch stack effects"
 "Conditionals such as " { $link if } " and combinators built on top have the same restrictions as " { $link POSTPONE: inline } " combinators (see " { $link "inference-combinators" } ") with the additional requirement that all branches leave the stack at the same height. If this is not the case, the stack checker throws a " { $link unbalanced-branches-error } "."
 $nl
 "If all branches leave the stack at the same height, then the stack effect of the conditional is just the maximum of the stack effect of each branch. For example,"
-{ $example "[ [ + ] [ drop ] if ] infer." "( object object object -- object )" }
+{ $example "[ [ + ] [ drop ] if ] infer." "( x x x -- x )" }
 "The call to " { $link if } " takes one value from the stack, a generalized boolean. The first branch " { $snippet "[ + ]" } " has stack effect " { $snippet "( x x -- x )" } " and the second has stack effect " { $snippet "( x -- )" } ". Since both branches decrease the height of the stack by one, we say that the stack effect of the two branches is " { $snippet "( x x -- x )" } ", and together with the boolean popped off the stack by " { $link if } ", this gives a total stack effect of " { $snippet "( x x x -- x )" } "." ;
 
 ARTICLE: "inference-recursive-combinators" "Recursive combinator stack effects"
@@ -87,7 +87,7 @@ $nl
 "An inline recursive word cannot pass a quotation on the data stack through the recursive call. For example, the following will not infer:"
 { $unchecked-example ": bad ( ? quot: ( ? -- ) -- ) 2dup [ not ] dip bad call ; inline recursive" "[ [ drop ] bad ] infer." "Cannot apply “call” to a run-time computed value\nmacro call" }
 "However a small change can be made:"
-{ $example ": good ( ? quot: ( ? -- ) -- ) [ good ] 2keep [ not ] dip call ; inline recursive" "[ [ drop ] good ] infer." "( object -- )" }
+{ $example ": good ( ? quot: ( ? -- ) -- ) [ good ] 2keep [ not ] dip call ; inline recursive" "[ [ drop ] good ] infer." "( x -- )" }
 "An inline recursive word must have a fixed stack effect in its base case. The following will not infer:"
 { $code
     ": foo ( quot ? -- ) [ f foo ] [ call ] if ; inline"

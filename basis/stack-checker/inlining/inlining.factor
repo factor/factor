@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry namespaces assocs kernel sequences words accessors
 definitions math math.order effects classes arrays combinators
@@ -42,7 +42,7 @@ loop? ;
 : make-copies ( values effect-in -- values' )
     [ length cut* ] keep
     [ quotation-param? [ copy-value ] [ drop <value> ] if ] 2map
-    [ make-values ] dip append ;
+    [ length make-values ] dip append ;
 
 SYMBOL: enter-in
 SYMBOL: enter-out

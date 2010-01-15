@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors arrays bit-arrays classes
-classes.tuple.private fry kernel locals parser
+classes.tuple.private fry kernel locals math parser
 sequences sequences.private vectors words ;
 IN: memory.pools
 
@@ -10,7 +10,7 @@ TUPLE: pool
 
 : <pool> ( size class -- pool )
     [ nip new ]
-    [ [ iota ] dip '[ _ new ] V{ } replicate-as ] 2bi
+    [ '[ _ new ] V{ } replicate-as ] 2bi
     pool boa ;
 
 : pool-size ( pool -- size )
@@ -20,7 +20,7 @@ TUPLE: pool
 
 :: copy-tuple ( from to -- to )
     from tuple-size :> size
-    size [| n | n from array-nth n to set-array-nth ] each
+    size [| n | n from array-nth n to set-array-nth ] each-integer
     to ; inline
 
 : (pool-new) ( pool -- object )
