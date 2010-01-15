@@ -48,7 +48,7 @@ PRIVATE>
 <PRIVATE
 
 MACRO: binary-roman-op ( quot -- quot' )
-    [ infer in>> ] [ ] [ infer out>> ] tri
+    [ inputs ] [ ] [ outputs ] tri
     '[ [ roman> ] _ napply @ [ >roman ] _ napply ] ;
 
 PRIVATE>
@@ -58,8 +58,7 @@ PRIVATE>
 SYNTAX: ROMAN-OP:
     scan-word [ name>> "roman" prepend create-in ] keep
     1quotation '[ _ binary-roman-op ]
-    dup infer [ in>> ] [ out>> ] bi
-    [ "string" <repetition> ] bi@ <effect> define-declared ;
+    dup infer define-declared ;
 
 >>
 

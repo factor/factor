@@ -123,7 +123,7 @@ M: mock-gadget ungraft*
             <mock-gadget> over <model> >>model
             "g" get over add-gadget drop
             swap 1 + number>string set
-        ] each ;
+        ] each-integer ;
 
     : status-flags ( -- seq )
         { "g" "1" "2" "3" } [ get graft-state>> ] map prune ;

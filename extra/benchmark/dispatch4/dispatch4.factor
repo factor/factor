@@ -54,14 +54,14 @@ IN: benchmark.dispatch4
     20000000 [
         20 [
             foobar-1 drop
-        ] each
+        ] each-integer
     ] times ;
 
 : foobar-test-2 ( -- )
     20000000 [
         20 [
             foobar-2 drop
-        ] each
+        ] each-integer
     ] times ;
 
 MAIN: foobar-test-1

@@ -13,4 +13,4 @@ PRIVATE>
 
 : insertion-sort ( seq quot -- )
     ! quot is a transformation on elements
-    over length [ insert ] with with each ; inline
+    over length [ insert ] with with each-integer ; inline

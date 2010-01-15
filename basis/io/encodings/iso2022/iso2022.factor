@@ -18,7 +18,7 @@ VALUE: jis212
 "vocab:io/encodings/iso2022/212.txt" flat-file>biassoc to: jis212
 
 VALUE: ascii
-128 unique >biassoc to: ascii
+128 iota unique >biassoc to: ascii
 
 TUPLE: iso2022-state type ;
 

@@ -554,7 +554,8 @@ M: integer end-of-year 12 31 <date> ;
 : unix-time>timestamp ( seconds -- timestamp )
     seconds unix-1970 time+ ;
 
-M: duration sleep duration>nanoseconds nano-count + sleep-until ;
+M: duration sleep
+    duration>nanoseconds >integer nano-count + sleep-until ;
 
 {
     { [ os unix? ] [ "calendar.unix" ] }

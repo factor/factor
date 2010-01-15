@@ -54,8 +54,8 @@ IN: compiler.tests.intrinsics
 [ HEX: 123456 ] [ 1 [ "a\u123456c" string-nth ] compile-call ] unit-test
 [ HEX: 123456 ] [ [ 1 "a\u123456c" string-nth ] compile-call ] unit-test
 
-[ ] [ [ 0 getenv ] compile-call drop ] unit-test
-[ ] [ 1 getenv [ 1 setenv ] compile-call ] unit-test
+[ ] [ [ 0 special-object ] compile-call drop ] unit-test
+[ ] [ 1 special-object [ 1 set-special-object ] compile-call ] unit-test
 
 [ ] [ 1 [ drop ] compile-call ] unit-test
 [ ] [ [ 1 drop ] compile-call ] unit-test
@@ -337,7 +337,7 @@ ERROR: bug-in-fixnum* x y a b ;
 
 [ ] [
     10000 [
-        5 random [ drop 32 random-bits ] map product >bignum
+        5 random iota [ drop 32 random-bits ] map product >bignum
         dup [ bignum>fixnum ] keep compiled-bignum>fixnum =
         [ drop ] [ "Oops" throw ] if
     ] times

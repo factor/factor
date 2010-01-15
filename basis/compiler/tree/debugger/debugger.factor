@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel assocs match fry accessors namespaces make effects
 sequences sequences.private quotations generic macros arrays
@@ -64,7 +64,7 @@ TUPLE: shuffle-node { effect effect } ;
 M: shuffle-node pprint* effect>> effect>string text ;
  
 : (shuffle-effect) ( in out #shuffle -- effect )
-    mapping>> '[ _ at ] map <effect> ;
+    mapping>> '[ _ at ] map [ >array ] bi@ <effect> ;
 
 : shuffle-effect ( #shuffle -- effect )
     [ in-d>> ] [ out-d>> ] [ ] tri (shuffle-effect) ;
@@ -125,6 +125,8 @@ M: #dispatch node>quot
 M: #alien-invoke node>quot params>> , \ #alien-invoke , ;
 
 M: #alien-indirect node>quot params>> , \ #alien-indirect , ;
+
+M: #alien-assembly node>quot params>> , \ #alien-assembly , ;
 
 M: #alien-callback node>quot params>> , \ #alien-callback , ;
 

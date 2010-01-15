@@ -1,8 +1,8 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! Copyright (C) 2008, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private sequences
-sequences.private math math.private combinators ;
+USING: kernel kernel.private sequences sequences.private math
+math.private math.order combinators ;
 IN: math.integers.private
 
 : fixnum-min ( x y -- z ) [ fixnum< ] most ; foldable
@@ -28,6 +28,9 @@ M: fixnum u< fixnum< ; inline
 M: fixnum u<= fixnum<= ; inline
 M: fixnum u> fixnum> ; inline
 M: fixnum u>= fixnum>= ; inline
+
+M: fixnum min over fixnum? [ fixnum-min ] [ call-next-method ] if ; inline
+M: fixnum max over fixnum? [ fixnum-max ] [ call-next-method ] if ; inline
 
 M: fixnum + fixnum+ ; inline
 M: fixnum - fixnum- ; inline

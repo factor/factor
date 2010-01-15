@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel math namespaces sequences system
 kernel.private byte-arrays arrays init ;
@@ -49,13 +49,18 @@ ERROR: alien-callback-error ;
 
 ERROR: alien-indirect-error ;
 
-: alien-indirect ( ... funcptr return parameters abi -- )
+: alien-indirect ( ... funcptr return parameters abi -- ... )
     alien-indirect-error ;
 
 ERROR: alien-invoke-error library symbol ;
 
 : alien-invoke ( ... return library function parameters -- ... )
     2over alien-invoke-error ;
+
+ERROR: alien-assembly-error code ;
+
+: alien-assembly ( ... return parameters abi quot -- ... )
+    dup alien-assembly-error ;
 
 ! Callbacks are registered in a global hashtable. Note that they
 ! are also pinned in a special callback area, so clearing this

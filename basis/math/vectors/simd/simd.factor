@@ -247,7 +247,7 @@ COERCER [ ELT c-type-class "coercer" word-prop [ ] or ]
 
 SET-NTH [ ELT dup c:c-setter c:array-accessor ]
 
-BOA-EFFECT [ N "n" <repetition> >array { "v" } <effect> ]
+BOA-EFFECT [ N "n" <array> { "v" } <effect> ]
 
 WHERE
 

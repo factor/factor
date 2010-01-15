@@ -56,7 +56,7 @@ IN: math.combinatorics.tests
 [ 0 ] [ 9 5 iota 3 <combo> dual-index ] unit-test
 [ 179 ] [ 72 10 iota 5 <combo> dual-index ] unit-test
 
-[ { 5 3 2 1 } ] [ 7 4 <combo> 8 combinadic ] unit-test
+[ { 5 3 2 1 } ] [ 7 iota 4 <combo> 8 combinadic ] unit-test
 [ { 4 3 2 1 0 } ] [ 10 iota 5 <combo> 0 combinadic ] unit-test
 [ { 8 6 3 1 0 } ] [ 10 iota 5 <combo> 72 combinadic ] unit-test
 [ { 9 8 7 6 5 } ] [ 10 iota 5 <combo> 251 combinadic ] unit-test

@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays columns kernel locals math math.bits
 math.functions math.order math.vectors sequences
@@ -11,7 +11,7 @@ IN: math.matrices
 
 : identity-matrix ( n -- matrix )
     #! Make a nxn identity matrix.
-    dup [ [ = 1 0 ? ] with map ] curry map ;
+    iota dup [ [ = 1 0 ? ] with map ] curry map ;
 
 :: rotation-matrix3 ( axis theta -- matrix )
     theta cos :> c

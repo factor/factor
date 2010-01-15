@@ -83,8 +83,8 @@ HOOK: reserved-area-size os ( -- n )
 ! The start of the stack frame contains the size of this frame
 ! as well as the currently executing XT
 : factor-area-size ( -- n ) 2 cells ; foldable
-: next-save ( n -- i ) cell - ;
-: xt-save ( n -- i ) 2 cells - ;
+: next-save ( n -- i ) cell - ; foldable
+: xt-save ( n -- i ) 2 cells - ; foldable
 
 ! Next, we have the spill area as well as the FFI parameter area.
 ! It is safe for them to overlap, since basic blocks with FFI calls
@@ -126,7 +126,7 @@ M: ppc stack-frame-size ( stack-frame -- i )
 M: ppc %call ( word -- ) 0 BL rc-relative-ppc-3 rel-word-pic ;
 
 M: ppc %jump ( word -- )
-    0 6 LOAD32 8 rc-absolute-ppc-2/2 rel-here
+    0 6 LOAD32 4 rc-absolute-ppc-2/2 rel-here
     0 B rc-relative-ppc-3 rel-word-pic-tail ;
 
 M: ppc %jump-label ( label -- ) B ;
@@ -134,7 +134,7 @@ M: ppc %return ( -- ) BLR ;
 
 M:: ppc %dispatch ( src temp -- )
     0 temp LOAD32
-    4 cells rc-absolute-ppc-2/2 rel-here
+    3 cells rc-absolute-ppc-2/2 rel-here
     temp temp src LWZX
     temp MTCTR
     BCTR ;
@@ -564,14 +564,16 @@ M:: ppc %compare-float-unordered-branch ( label src1 src2 cc -- )
         { stack-params [ [ 0 1 ] dip LWZ [ 0 1 ] dip param@ STW ] }
     } case ;
 
-: next-param@ ( n -- x ) param@ stack-frame get total-size>> + ;
+: next-param@ ( n -- reg x )
+    2 1 stack-frame get total-size>> LWZ
+    [ 2 ] dip param@ ;
 
 : store-to-frame ( src n rep -- )
     {
         { int-rep [ [ 1 ] dip STW ] }
         { float-rep [ [ 1 ] dip STFS ] }
         { double-rep [ [ 1 ] dip STFD ] }
-        { stack-params [ [ [ 0 1 ] dip next-param@ LWZ 0 1 ] dip STW ] }
+        { stack-params [ [ [ 0 ] dip next-param@ LWZ 0 1 ] dip STW ] }
     } case ;
 
 M: ppc %spill ( src rep dst -- )
@@ -679,10 +681,15 @@ M: ppc %box-large-struct ( n c-type -- )
     ! Call the function
     "from_value_struct" f %alien-invoke ;
 
+M:: ppc %restore-context ( temp1 temp2 -- )
+    temp1 "ctx" %load-vm-field-addr
+    temp1 temp1 0 LWZ
+    temp2 1 stack-frame get total-size>> ADDI
+    temp2 temp1 "callstack-bottom" context-field-offset STW
+    ds-reg temp1 8 LWZ
+    rs-reg temp1 12 LWZ ;
+
 M:: ppc %save-context ( temp1 temp2 -- )
-    #! Save Factor stack pointers in case the C code calls a
-    #! callback which does a GC, which must reliably trace
-    #! all roots.
     temp1 "ctx" %load-vm-field-addr
     temp1 temp1 0 LWZ
     1 temp1 0 STW
@@ -693,13 +700,18 @@ M: ppc %alien-invoke ( symbol dll -- )
     [ 11 ] 2dip %alien-global 11 MTLR BLRL ;
 
 M: ppc %alien-callback ( quot -- )
+    3 4 %restore-context
     3 swap %load-reference
-    4 %load-vm-addr
-    "c_to_factor" f %alien-invoke ;
+    4 3 quot-xt-offset LWZ
+    4 MTLR
+    BLRL
+    3 4 %save-context ;
 
 M: ppc %prepare-alien-indirect ( -- )
-    3 %load-vm-addr
-    "from_alien" f %alien-invoke
+    3 ds-reg 0 LWZ
+    ds-reg ds-reg 4 SUBI
+    4 %load-vm-addr
+    "pinned_alien_offset" f %alien-invoke
     16 3 MR ;
 
 M: ppc %alien-indirect ( -- )
@@ -753,9 +765,7 @@ M: ppc %box-small-struct ( c-type -- )
     3 3 0 LWZ ;
 
 M: ppc %nest-stacks ( -- )
-    ! Save current frame. See comment in vm/contexts.hpp
-    3 1 stack-frame get total-size>> 2 cells - ADDI
-    4 %load-vm-addr
+    3 %load-vm-addr
     "nest_stacks" f %alien-invoke ;
 
 M: ppc %unnest-stacks ( -- )
@@ -763,7 +773,6 @@ M: ppc %unnest-stacks ( -- )
     "unnest_stacks" f %alien-invoke ;
 
 M: ppc %unbox-small-struct ( size -- )
-    #! Alien must be in EAX.
     heap-size cell align cell /i {
         { 1 [ %unbox-struct-1 ] }
         { 2 [ %unbox-struct-2 ] }

@@ -11,7 +11,7 @@ enum special_object {
 	OBJ_WALKER_HOOK,           /* non-local exit hook, used by library only */
 	OBJ_CALLCC_1,              /* used to pass the value in callcc1 */
 
-	OBJ_BREAK = 5,             /* quotation called by throw primitive */
+	ERROR_HANDLER_QUOT = 5,    /* quotation called when VM throws an error */
 	OBJ_ERROR,                 /* a marker consed onto kernel errors */
 
 	OBJ_CELL_SIZE = 7,         /* sizeof(cell) */
@@ -56,6 +56,11 @@ enum special_object {
 	JIT_3DIP,
 	JIT_EXECUTE,
 	JIT_DECLARE_WORD,
+
+	/* External entry points */
+	C_TO_FACTOR_WORD,
+	LAZY_JIT_COMPILE_WORD,
+	UNWIND_NATIVE_FRAMES_WORD,
 
 	/* Incremented on every modify-code-heap call; invalidates call( inline
 	caching */

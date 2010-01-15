@@ -34,7 +34,7 @@ C: <oint> oint
 
 : random-float+- ( n -- m )
     #! find a random float between -n/2 and n/2
-    dup 10000 * >fixnum random 10000 / swap 2 / - ;
+    dup 10000 * >integer random 10000 / swap 2 / - ;
 
 : random-turn ( oint theta -- )
     2 / 2dup random-float+- left-pivot random-float+- up-pivot ;

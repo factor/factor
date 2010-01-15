@@ -175,7 +175,8 @@ CONSTANT: vector-words
 "== Checking vector operations" print
 
 : random-int-vector ( class -- vec )
-    new [ drop 1,000 random ] map ;
+    new [ drop 1000 random ] map ;
+
 : random-float-vector ( class -- vec )
     new [
         drop
@@ -463,7 +464,7 @@ TUPLE: inconsistent-vector-test bool branch ;
 
 ! Test element access -- it should box bignums for int-4 on x86
 : test-accesses ( seq -- failures )
-    [ length >array ] keep
+    [ length iota >array ] keep
     '[ [ _ 1quotation ] dip '[ _ swap nth ] ] [ = ] check-optimizer ; inline
 
 [ { } ] [ float-4{ 1.0 2.0 3.0 4.0 } test-accesses ] unit-test
@@ -480,7 +481,7 @@ TUPLE: inconsistent-vector-test bool branch ;
 
 "== Checking broadcast" print
 : test-broadcast ( seq -- failures )
-    [ length >array ] keep
+    [ length iota >array ] keep
     '[ [ _ 1quotation ] dip '[ _ vbroadcast ] ] [ = ] check-optimizer ;
 
 [ { } ] [ float-4{ 1.0 2.0 3.0 4.0 } test-broadcast ] unit-test

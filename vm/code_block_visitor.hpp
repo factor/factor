@@ -72,8 +72,6 @@ void code_block_visitor<Visitor>::visit_object_code_block(object *obj)
 			quotation *q = (quotation *)obj;
 			if(q->code)
 				parent->set_quot_xt(q,visitor(q->code));
-			else
-				q->xt = (void *)lazy_jit_compile_impl;
 			break;
 		}
 	case CALLSTACK_TYPE:

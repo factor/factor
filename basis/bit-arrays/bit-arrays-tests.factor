@@ -40,7 +40,7 @@ IN: bit-arrays.tests
     100 [
         drop 100 [ 2 random zero? ] replicate
         dup >bit-array >array =
-    ] all?
+    ] all-integers?
 ] unit-test
 
 [ ?{ f } ] [

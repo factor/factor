@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs alien alien.c-types arrays strings
 cpu.x86.assembler cpu.x86.assembler.private cpu.x86.assembler.operands
@@ -419,11 +419,7 @@ M: x86 %shl int-rep two-operand [ SHL ] emit-shift ;
 M: x86 %shr int-rep two-operand [ SHR ] emit-shift ;
 M: x86 %sar int-rep two-operand [ SAR ] emit-shift ;
 
-: %mov-vm-ptr ( reg -- )
-    0 MOV 0 rc-absolute-cell rel-vm ;
-
-M: x86 %vm-field-ptr ( dst field -- )
-    [ 0 MOV ] dip vm-field-offset rc-absolute-cell rel-vm ;
+HOOK: %mov-vm-ptr cpu ( reg -- )
 
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
     [ drop "nursery" %vm-field-ptr ] [ swap [] MOV ] 2bi ;
@@ -1410,18 +1406,15 @@ M:: x86 %reload ( dst rep src -- ) dst src rep %copy ;
 
 M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
 
-M:: x86 %load-context ( temp1 temp2 -- )
+M:: x86 %restore-context ( temp1 temp2 -- )
     #! Load Factor stack pointers on entry from C to Factor.
     #! Also save callstack bottom!
     temp1 "ctx" %vm-field-ptr
     temp1 temp1 [] MOV
-    ! callstack_bottom
     temp2 stack-reg stack-frame get total-size>> cell - [+] LEA
-    temp1 1 cells [+] temp2 MOV
-    ! datastack
-    ds-reg temp1 2 cells [+] MOV
-    ! retainstack
-    rs-reg temp1 3 cells [+] MOV ;
+    temp1 "callstack-bottom" context-field-offset [+] temp2 MOV
+    ds-reg temp1 "datastack" context-field-offset [+] MOV
+    rs-reg temp1 "retainstack" context-field-offset [+] MOV ;
 
 M:: x86 %save-context ( temp1 temp2 -- )
     #! Save Factor stack pointers in case the C code calls a
@@ -1429,13 +1422,10 @@ M:: x86 %save-context ( temp1 temp2 -- )
     #! all roots.
     temp1 "ctx" %vm-field-ptr
     temp1 temp1 [] MOV
-    ! callstack_top
     temp2 stack-reg cell neg [+] LEA
-    temp1 [] temp2 MOV
-    ! datastack
-    temp1 2 cells [+] ds-reg MOV
-    ! retainstack
-    temp1 3 cells [+] rs-reg MOV ;
+    temp1 "callstack-top" context-field-offset [+] temp2 MOV
+    temp1 "datastack" context-field-offset [+] ds-reg MOV
+    temp1 "retainstack" context-field-offset [+] rs-reg MOV ;
 
 M: x86 value-struct? drop t ;
 
@@ -1475,6 +1465,6 @@ enable-fixnum-log2
     ] when ;
 
 : check-sse ( -- )
-    [ { sse_version } compile ] with-optimizer
+    [ { (sse-version) } compile ] with-optimizer
     "Checking for multimedia extensions: " write sse-version
     [ sse-string write " detected" print ] [ enable-sse2 ] bi ;

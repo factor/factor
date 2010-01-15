@@ -1,7 +1,7 @@
-USING: accessors alien.c-types alien.syntax arrays assocs
-biassocs classes.struct combinators cpu.x86.features kernel
-literals math math.bitwise math.floats.env
-math.floats.env.private system ;
+USING: accessors alien.c-types arrays assocs biassocs
+classes.struct combinators cpu.x86.features kernel literals
+math math.bitwise math.floats.env math.floats.env.private
+system vocabs.loader ;
 IN: math.floats.env.x86
 
 STRUCT: sse-env
@@ -11,24 +11,23 @@ STRUCT: x87-env
     { status ushort }
     { control ushort } ;
 
-! defined in the vm, cpu-x86*.S
-FUNCTION: void get_sse_env ( sse-env* env ) ;
-FUNCTION: void set_sse_env ( sse-env* env ) ;
+HOOK: get-sse-env cpu ( sse-env -- )
+HOOK: set-sse-env cpu ( sse-env -- )
 
-FUNCTION: void get_x87_env ( x87-env* env ) ;
-FUNCTION: void set_x87_env ( x87-env* env ) ;
+HOOK: get-x87-env cpu ( x87-env -- )
+HOOK: set-x87-env cpu ( x87-env -- )
 
 : <sse-env> ( -- sse-env )
-    sse-env (struct) [ get_sse_env ] keep ;
+    sse-env (struct) [ get-sse-env ] keep ;
 
 M: sse-env (set-fp-env-register)
-    set_sse_env ;
+    set-sse-env ;
 
 : <x87-env> ( -- x87-env )
-    x87-env (struct) [ get_x87_env ] keep ;
+    x87-env (struct) [ get-x87-env ] keep ;
 
 M: x87-env (set-fp-env-register)
-    set_x87_env ;
+    set-x87-env ;
 
 M: x86 (fp-env-registers)
     sse2? [ <sse-env> <x87-env> 2array ] [ <x87-env> 1array ] if ;
@@ -128,3 +127,7 @@ M: x87-env (get-denormal-mode) ( register -- mode )
 M: x87-env (set-denormal-mode) ( register mode -- register' )
     drop ;
 
+cpu {
+    { x86.32 [ "math.floats.env.x86.32" ] }
+    { x86.64 [ "math.floats.env.x86.64" ] }
+} case require
