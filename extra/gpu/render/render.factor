@@ -120,7 +120,7 @@ ERROR: invalid-uniform-type uniform ;
         { ubyte-indexes  [ GL_UNSIGNED_BYTE  ] }
         { ushort-indexes [ GL_UNSIGNED_SHORT ] }
         { uint-indexes   [ GL_UNSIGNED_INT   ] }
-    } case ;
+    } case ; inline
 
 : gl-primitive-mode ( primitive-mode -- gl-primitive-mode ) 
     {
@@ -131,7 +131,7 @@ ERROR: invalid-uniform-type uniform ;
         { triangles-mode      [ GL_TRIANGLES      ] }
         { triangle-strip-mode [ GL_TRIANGLE_STRIP ] }
         { triangle-fan-mode   [ GL_TRIANGLE_FAN   ] }
-    } case ;
+    } case ; inline
 
 GENERIC: render-vertex-indexes ( primitive-mode vertex-indexes -- )
 
