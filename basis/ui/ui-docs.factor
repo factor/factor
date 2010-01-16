@@ -2,7 +2,7 @@ USING: help.markup help.syntax strings quotations debugger
 namespaces ui.backend ui.gadgets ui.gadgets.worlds
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids
 ui.gadgets.private math.rectangles colors ui.text fonts
-kernel ui.private classes sequences ;
+kernel ui.private vocabs.loader classes sequences ;
 IN: ui
 
 HELP: windows
@@ -324,6 +324,20 @@ HELP: normal-title-bar
 
 HELP: textured-background
 { $description "Asks for a window to have a background that blends seamlessly with the window frame. Factor will leave the window background transparent and pass mouse button gestures not handled directly by a gadget through to the window system so that the window can be dragged from anywhere on its background." } ;
+
+HELP: MAIN-WINDOW:
+{ $syntax "MAIN-WINDOW: window-word { attributes }
+    attribute-code ;" }
+{ $description "Defines a " { $link POSTPONE: MAIN: } " word for the current vocabulary named " { $snippet "window-word" } " that opens a UI window when the vocabulary is " { $link run } ". The " { $snippet "attributes" } " specify the key-value pairs of the window's " { $link world-attributes } ". The " { $snippet "attribute-code" } " is run with the " { $snippet "world-attributes" } " on the stack; this allows the word to construct gadget objects to place in the " { $snippet "gadget" } " slot or set other runtime-dependent world attributes." }
+{ $examples
+"From the " { $vocab-link "hello-ui" } " vocabulary. Creates a window with the title \"Hi\" containing a label reading \"Hello world\":"
+{ $code
+"""USING: accessors ui ui.gadgets.labels ;
+IN: hello-ui
+
+MAIN-WINDOW: hello { { title "Hi" } }
+    "Hello world" <label> >>gadgets ;"""
+} } ;
 
 ARTICLE: "ui.gadgets.worlds-window-controls" "Window controls"
 "The following window controls can be placed in a " { $link world } " window:"
