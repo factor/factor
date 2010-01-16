@@ -16,7 +16,6 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <math.h>
-#include <stdbool.h>
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,7 +35,7 @@
 #elif defined(__amd64__) || defined(__x86_64__)
 	#define FACTOR_AMD64
 	#define FACTOR_64
-#elif defined(i386) || defined(__i386) || defined(__i386__) || defined(WIN32)
+#elif defined(i386) || defined(__i386) || defined(__i386__) || defined(WIN32) || defined(_MSC_VER)
 	#define FACTOR_X86
 #elif defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)
 	#define FACTOR_PPC
@@ -44,8 +43,15 @@
 	#error "Unsupported architecture"
 #endif
 
-#ifdef WIN32
+#if defined(_MSC_VER)
 	#define WINDOWS
+	#define WINNT
+#elif defined(WIN32)
+	#define WINDOWS
+#endif
+
+#ifndef _MSC_VER
+	#include <stdbool.h>
 #endif
 
 /* Forward-declare this since it comes up in function prototypes */

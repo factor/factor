@@ -159,7 +159,7 @@ cell factor_vm::compute_dlsym_address(array *literals, cell index)
 
 	dll *d = (to_boolean(library) ? untag<dll>(library) : NULL);
 
-	if(d != NULL && !d->dll)
+	if(d != NULL && !d->handle)
 		return (cell)factor::undefined_symbol;
 
 	switch(tagged<object>(symbol).type())

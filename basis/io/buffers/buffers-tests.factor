@@ -58,3 +58,7 @@ strings accessors destructors ;
 100 <buffer> "b" set
 [ 1000 "b" get n>buffer >string ] must-fail
 "b" get dispose
+
+"hello world" string>buffer "b" set
+[ "hello" CHAR: \s ] [ " " "b" get buffer-until [ >string ] dip ] unit-test
+"b" get dispose

@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions hashtables kernel kernel.private math
 namespaces make sequences sequences.private strings vectors
@@ -120,25 +120,6 @@ ERROR: bad-superclass class ;
 
 : class-size ( class -- n )
     superclasses [ "slots" word-prop length ] map-sum ;
-
-: (instance-check-quot) ( class -- quot )
-    [
-        \ dup ,
-        [ "predicate" word-prop % ]
-        [ [ literalize , \ bad-slot-value , ] [ ] make , ] bi
-        \ unless ,
-    ] [ ] make ;
-
-: (fixnum-check-quot) ( class -- quot )
-    (instance-check-quot) fixnum "coercer" word-prop prepend ;
-
-: instance-check-quot ( class -- quot )
-    {
-        { [ dup object bootstrap-word eq? ] [ drop [ ] ] }
-        { [ dup "coercer" word-prop ] [ "coercer" word-prop ] }
-        { [ dup \ fixnum class<= ] [ (fixnum-check-quot) ] }
-        [ (instance-check-quot) ]
-    } cond ;
 
 : boa-check-quot ( class -- quot )
     all-slots [ class>> instance-check-quot ] map spread>quot

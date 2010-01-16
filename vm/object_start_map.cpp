@@ -70,7 +70,7 @@ void object_start_map::update_card_for_sweep(cell index, u16 mask)
 		else
 		{
 			/* Move the object start forward if necessary */
-			object_start_offsets[index] = offset + (rightmost_set_bit(mask) * data_alignment);
+			object_start_offsets[index] = (card)(offset + (rightmost_set_bit(mask) * data_alignment));
 		}
 	}
 }

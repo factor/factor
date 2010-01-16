@@ -162,7 +162,7 @@ M: winnt file-system-info ( path -- file-system-info )
         ret win32-error-string throw
     ] [
         names names-length *uint ushort heap-size * head
-        utf16n alien>string CHAR: \0 split
+        utf16n alien>string { CHAR: \0 } split
     ] if ;
 
 : find-first-volume ( -- string handle )

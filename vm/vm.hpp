@@ -267,8 +267,8 @@ struct factor_vm
 
 	inline void write_barrier(object *obj, cell size)
 	{
-		cell start = (cell)obj & -card_size;
-		cell end = ((cell)obj + size + card_size - 1) & -card_size;
+		cell start = (cell)obj & (~card_size + 1);
+		cell end = ((cell)obj + size + card_size - 1) & (~card_size + 1);
 
 		for(cell offset = start; offset < end; offset += card_size)
 			write_barrier((cell *)offset);
@@ -671,7 +671,7 @@ struct factor_vm
 	const vm_char *vm_executable_path();
 	const vm_char *default_image_path();
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);
-	bool windows_stat(vm_char *path);
+	BOOL windows_stat(vm_char *path);
 
   #if defined(WINNT)
 	void open_console();
