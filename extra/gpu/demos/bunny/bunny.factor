@@ -7,7 +7,7 @@ io io.encodings.ascii io.files io.files.temp kernel locals math
 math.matrices math.vectors.simd math.parser math.vectors
 method-chains namespaces sequences splitting threads ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats specialized-arrays
-specialized-vectors ;
+specialized-vectors literals ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-VECTOR: uint
@@ -293,24 +293,19 @@ M: bunny-world draw-world*
 AFTER: bunny-world resize-world
     [ sobel>> framebuffer>> ] [ dim>> ] bi resize-framebuffer ;
 
-M: bunny-world pref-dim* drop { 1024 768 } ;
-M: bunny-world tick-interval-micros drop 1000000 60 /i ;
 M: bunny-world wasd-movement-speed drop 1/160. ;
 M: bunny-world wasd-near-plane drop 1/32. ;
 M: bunny-world wasd-far-plane drop 256.0 ;
 
-: bunny-window ( -- )
-    [
-        f T{ world-attributes
-            { world-class bunny-world }
-            { title "Bunny" }
-            { pixel-format-attributes {
-                windowed
-                double-buffered
-                T{ depth-bits { value 24 } }
-            } }
-            { grab-input? t }
-        } open-window
-    ] with-ui ;
-
-MAIN: bunny-window
+GAME: bunny-game {
+        { world-class bunny-world }
+        { title "Bunny" }
+        { pixel-format-attributes {
+            windowed
+            double-buffered
+            T{ depth-bits { value 24 } }
+        } }
+        { grab-input? t }
+        { pref-dim { 1024 768 } }
+        { tick-interval-micros $[ 1,000,000 60 /i ] }
+    }

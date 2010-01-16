@@ -92,21 +92,16 @@ M: raytrace-world draw-world*
         { "vertex-array"   [ vertex-array>>              ] }
     } <render-set> render ;
 
-M: raytrace-world pref-dim* drop { 1024 768 } ;
-M: raytrace-world tick-interval-micros drop 1000000 60 /i ;
 M: raytrace-world wasd-movement-speed drop 1/4. ;
 
-: raytrace-window ( -- )
-    [
-        f T{ world-attributes
-            { world-class raytrace-world }
-            { title "Raytracing" }
-            { pixel-format-attributes {
-                windowed
-                double-buffered
-            } }
-            { grab-input? t }
-        } open-window
-    ] with-ui ;
-
-MAIN: raytrace-window
+GAME: raytrace-game {
+        { world-class raytrace-world }
+        { title "Raytracing" }
+        { pixel-format-attributes {
+            windowed
+            double-buffered
+        } }
+        { grab-input? t }
+        { pref-dim { 1024 768 } }
+        { tick-interval-micros $[ 1,000,000 60 /i ] }
+    }
