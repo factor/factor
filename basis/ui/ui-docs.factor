@@ -152,7 +152,7 @@ ARTICLE: "ui-windows" "Top-level windows"
 "The root of the gadget hierarchy in a window is a special gadget which is rarely operated on directly, but it is helpful to know it exists:"
 { $subsections world }
 "There is also syntax for defining a main window as the entry point for a vocabulary:"
-{ $subsections POSTPONE: MAIN-WINDOW: }
+{ $subsections POSTPONE: MAIN-WINDOW: } ;
 
 ARTICLE: "ui-backend" "Developing UI backends"
 "None of the words documented in this section should be called directly by user code. They are only of interest when developing new UI backends."
