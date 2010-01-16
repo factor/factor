@@ -150,7 +150,9 @@ ARTICLE: "ui-windows" "Top-level windows"
 "When the gadget is removed from a parent shown in a top-level window, or when the top-level window is closed, a corresponding generic word is called to clean up:"
 { $subsections ungraft* }
 "The root of the gadget hierarchy in a window is a special gadget which is rarely operated on directly, but it is helpful to know it exists:"
-{ $subsections world } ;
+{ $subsections world }
+"There is also syntax for defining a main window as the entry point for a vocabulary:"
+{ $subsections POSTPONE: MAIN-WINDOW: }
 
 ARTICLE: "ui-backend" "Developing UI backends"
 "None of the words documented in this section should be called directly by user code. They are only of interest when developing new UI backends."
