@@ -406,9 +406,9 @@ backup_factor() {
 }
 
 check_makefile_exists() {
-    if [[ ! -e "Makefile" ]] ; then
+    if [[ ! -e "GNUmakefile" ]] ; then
         echo ""
-        echo "***Makefile not found***"
+        echo "***GNUmakefile not found***"
         echo "You are likely in the wrong directory."
         echo "Run this script from your factor directory:"
         echo "     ./build-support/factor.sh"

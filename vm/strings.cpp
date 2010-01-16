@@ -24,7 +24,7 @@ cell string::nth(cell index) const
 
 void factor_vm::set_string_nth_fast(string *str, cell index, cell ch)
 {
-	str->data()[index] = ch;
+	str->data()[index] = (u8)ch;
 }
 
 void factor_vm::set_string_nth_slow(string *str_, cell index, cell ch)
@@ -51,7 +51,7 @@ void factor_vm::set_string_nth_slow(string *str_, cell index, cell ch)
 		write_barrier(&str->aux);
 	}
 
-	aux->data<u16>()[index] = ((ch >> 7) ^ 1);
+	aux->data<u16>()[index] = (u16)((ch >> 7) ^ 1);
 }
 
 /* allocates memory */

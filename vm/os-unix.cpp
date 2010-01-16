@@ -73,20 +73,20 @@ void factor_vm::init_ffi()
 
 void factor_vm::ffi_dlopen(dll *dll)
 {
-	dll->dll = dlopen(alien_offset(dll->path), RTLD_LAZY);
+	dll->handle = dlopen(alien_offset(dll->path), RTLD_LAZY);
 }
 
 void *factor_vm::ffi_dlsym(dll *dll, symbol_char *symbol)
 {
-	void *handle = (dll == NULL ? null_dll : dll->dll);
+	void *handle = (dll == NULL ? null_dll : dll->handle);
 	return dlsym(handle,symbol);
 }
 
 void factor_vm::ffi_dlclose(dll *dll)
 {
-	if(dlclose(dll->dll))
+	if(dlclose(dll->handle))
 		general_error(ERROR_FFI,false_object,false_object,NULL);
-	dll->dll = NULL;
+	dll->handle = NULL;
 }
 
 void factor_vm::primitive_existsp()
