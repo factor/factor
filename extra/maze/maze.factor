@@ -61,7 +61,7 @@ M: maze draw-gadget* [ n draw-maze ] draw-canvas ;
 
 M: maze pref-dim* drop { 400 400 } ;
 
-: maze-window ( -- )
-    [ <maze> "Maze" open-window ] with-ui ;
+MAIN-WINDOW: maze-window { { title "Maze" } }
+    <maze> >>gadgets ;
 
 MAIN: maze-window

@@ -1,5 +1,5 @@
 USING: arrays kernel math opengl opengl.gl opengl.glu
-opengl.demo-support ui ui.gadgets ui.render ;
+opengl.demo-support ui ui.gadgets ui.render literals accessors ;
 IN: nehe.2
 
 TUPLE: nehe2-gadget < gadget ;
@@ -9,9 +9,6 @@ CONSTANT: height 256
 
 : <nehe2-gadget> (  -- gadget )
   nehe2-gadget new ;
-
-M: nehe2-gadget pref-dim* ( gadget -- dim )
-  drop width height 2array ;
 
 M: nehe2-gadget draw-gadget* ( gadget -- )
   drop
@@ -42,5 +39,5 @@ M: nehe2-gadget draw-gadget* ( gadget -- )
     -1.0 -1.0 0.0 glVertex3f
   ] do-state ;
 
-: run2 ( -- )
-  <nehe2-gadget> "NeHe Tutorial 2" open-window ;
+MAIN-WINDOW: run2 { { title "NeHe Tutorial 2" } { pref-dim { $ width $ height } } }
+  <nehe2-gadget> >>gadgets ;
