@@ -299,17 +299,12 @@ M: spheres-world draw-world*
         ]
     } cleave ;
 
-: spheres-window ( -- )
-    [
-        f T{ world-attributes
-            { world-class spheres-world }
-            { title "Spheres" }
-            { pixel-format-attributes {
-                windowed
-                double-buffered
-                T{ depth-bits { value 16 } }
-            } }
-        } open-window
-    ] with-ui ;
-
-MAIN: spheres-window
+MAIN-WINDOW: spheres-window {
+        { world-class spheres-world }
+        { title "Spheres" }
+        { pixel-format-attributes {
+            windowed
+            double-buffered
+            T{ depth-bits { value 16 } }
+        } }
+    } ;
