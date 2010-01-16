@@ -12,7 +12,6 @@ typedef wchar_t symbol_char;
 
 #define FACTOR_OS_STRING "wince"
 #define FACTOR_DLL L"factor-ce.dll"
-#define FACTOR_DLL_NAME "factor-ce.dll"
 
 int errno;
 char *strerror(int err);

@@ -109,7 +109,7 @@ void *factor_vm::alien_pointer()
 	PRIMITIVE(set_alien_##name) \
 	{ \
 		type *ptr = (type *)parent->alien_pointer(); \
-		type value = to(parent->ctx->pop(),parent); \
+		type value = (type)to(parent->ctx->pop(),parent); \
 		*ptr = value; \
 	}
 
@@ -151,7 +151,7 @@ void factor_vm::primitive_dlsym()
 	{
 		dll *d = untag_check<dll>(library.value());
 
-		if(d->dll == NULL)
+		if(d->handle == NULL)
 			ctx->push(false_object);
 		else
 			ctx->push(allot_alien(ffi_dlsym(d,sym)));
@@ -164,7 +164,7 @@ void factor_vm::primitive_dlsym()
 void factor_vm::primitive_dlclose()
 {
 	dll *d = untag_check<dll>(ctx->pop());
-	if(d->dll != NULL)
+	if(d->handle != NULL)
 		ffi_dlclose(d);
 }
 
@@ -172,7 +172,7 @@ void factor_vm::primitive_dll_validp()
 {
 	cell library = ctx->pop();
 	if(to_boolean(library))
-		ctx->push(tag_boolean(untag_check<dll>(library)->dll != NULL));
+		ctx->push(tag_boolean(untag_check<dll>(library)->handle != NULL));
 	else
 		ctx->push(true_object);
 }

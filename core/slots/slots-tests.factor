@@ -1,5 +1,5 @@
 USING: math accessors slots strings generic.single kernel
-tools.test generic words parser eval math.functions ;
+tools.test generic words parser eval math.functions arrays ;
 IN: slots.tests
 
 TUPLE: r/w-test foo ;
@@ -8,9 +8,9 @@ TUPLE: r/o-test { foo read-only } ;
 
 [ r/o-test new 123 >>foo ] [ no-method? ] must-fail-with
 
-TUPLE: decl-test { foo integer } ;
+TUPLE: decl-test { foo array } ;
 
-[ decl-test new 1.0 >>foo ] [ bad-slot-value? ] must-fail-with
+[ decl-test new "" >>foo ] [ bad-slot-value? ] must-fail-with
 
 TUPLE: hello length ;
 
