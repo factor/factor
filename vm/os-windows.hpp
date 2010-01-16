@@ -1,8 +1,8 @@
 #include <ctype.h>
 
 #ifndef wcslen
-  /* for cygwin */
-  #include <wchar.h>
+	/* for cygwin */
+	#include <wchar.h>
 #endif
 
 namespace factor
@@ -18,8 +18,18 @@ typedef wchar_t vm_char;
 #define STRCMP wcscmp
 #define STRNCMP wcsncmp
 #define STRDUP _wcsdup
-#define FTELL ftello64
-#define FSEEK fseeko64
+
+#ifdef _MSC_VER
+	#define FTELL ftell
+	#define FSEEK fseek
+	#define SNPRINTF _snprintf
+	#define SNWPRINTF _snwprintf
+#else
+	#define FTELL ftello64
+	#define FSEEK fseeko64
+	#define SNPRINTF snprintf
+	#define SNWPRINTF snwprintf
+#endif
 
 #ifdef WIN64
 	#define CELL_HEX_FORMAT "%Ix"
@@ -40,5 +50,9 @@ u64 system_micros();
 u64 nano_count();
 void sleep_nanos(u64 nsec);
 long getpagesize();
+
+/* Used by-main-windows-*.cpp */
+VM_C_API int parse_tokens(wchar_t* string, wchar_t*** tokens, int length);
+VM_C_API void parse_args(int *argc, wchar_t ***argv, wchar_t *cmdlinePtrW);
 
 }

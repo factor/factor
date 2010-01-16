@@ -22,6 +22,7 @@ typedef char symbol_char;
 #define STRCMP strcmp
 #define STRNCMP strncmp
 #define STRDUP strdup
+#define SNPRINTF snprintf
 
 #define FTELL ftello
 #define FSEEK fseeko

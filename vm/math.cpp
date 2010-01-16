@@ -277,7 +277,7 @@ void factor_vm::primitive_str_to_float()
 void factor_vm::primitive_float_to_str()
 {
 	byte_array *array = allot_byte_array(33);
-	snprintf((char *)(array + 1),32,"%.16g",untag_float_check(ctx->pop()));
+	SNPRINTF((char *)(array + 1),32,"%.16g",untag_float_check(ctx->pop()));
 	ctx->push(tag<byte_array>(array));
 }
 
@@ -347,7 +347,7 @@ void factor_vm::primitive_float_greatereq()
 
 void factor_vm::primitive_float_bits()
 {
-	ctx->push(from_unsigned_4(float_bits(untag_float_check(ctx->pop()))));
+	ctx->push(from_unsigned_4(float_bits((float)untag_float_check(ctx->pop()))));
 }
 
 void factor_vm::primitive_bits_float()
@@ -480,7 +480,7 @@ cell factor_vm::from_signed_8(s64 n)
 	if(n < fixnum_min || n > fixnum_max)
 		return tag<bignum>(long_long_to_bignum(n));
 	else
-		return tag_fixnum(n);
+		return tag_fixnum((fixnum)n);
 }
 
 VM_C_API cell from_signed_8(s64 n, factor_vm *parent)
@@ -513,7 +513,7 @@ cell factor_vm::from_unsigned_8(u64 n)
 	if(n > (u64)fixnum_max)
 		return tag<bignum>(ulong_long_to_bignum(n));
 	else
-		return tag_fixnum(n);
+		return tag_fixnum((fixnum)n);
 }
 
 VM_C_API cell from_unsigned_8(u64 n, factor_vm *parent)
@@ -549,7 +549,7 @@ VM_C_API cell from_float(float flo, factor_vm *parent)
 /* Cannot allocate */
 float factor_vm::to_float(cell value)
 {
-	return untag_float_check(value);
+	return (float)untag_float_check(value);
 }
 
 VM_C_API float to_float(cell value, factor_vm *parent)

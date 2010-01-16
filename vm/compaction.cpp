@@ -168,7 +168,7 @@ void factor_vm::update_code_roots_for_compaction()
 	for(; iter < end; iter++)
 	{
 		code_root *root = *iter;
-		code_block *block = (code_block *)(root->value & -data_alignment);
+		code_block *block = (code_block *)(root->value & (~data_alignment + 1));
 
 		/* Offset of return address within 16-byte allocation line */
 		cell offset = root->value - (cell)block;
