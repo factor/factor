@@ -112,7 +112,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_POINTERS pe)
 	return EXCEPTION_CONTINUE_EXECUTION;
 }
 
-FACTOR_STDCALL LONG exception_handler(PEXCEPTION_POINTERS pe)
+FACTOR_STDCALL(LONG) exception_handler(PEXCEPTION_POINTERS pe)
 {
 	return tls_vm()->exception_handler(pe);
 }

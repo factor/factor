@@ -122,7 +122,7 @@ void instruction_operand::store_value(fixnum absolute_value)
 		store_value_masked(relative_value - sizeof(cell),rel_indirect_arm_mask,0);
 		break;
 	case RC_ABSOLUTE_2:
-		*(u16 *)(pointer - sizeof(u16)) = absolute_value;
+		*(u16 *)(pointer - sizeof(u16)) = (u16)absolute_value;
 		break;
 	default:
 		critical_error("Bad rel class",rel.rel_class());

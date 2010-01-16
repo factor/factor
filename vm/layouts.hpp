@@ -298,7 +298,7 @@ struct dll : public object {
 	/* tagged byte array holding a C string */
 	cell path;
 	/* OS-specific handle */
-	void *dll;
+	void *handle;
 };
 
 struct stack_frame {

@@ -3,7 +3,6 @@
 namespace factor
 {
 
-factor_vm *vm;
 std::map<THREADHANDLE, factor_vm*> thread_vms;
 
 void init_globals()
@@ -31,11 +30,7 @@ void factor_vm::default_parameters(vm_parameters *p)
 #ifdef WINDOWS
 	p->console = false;
 #else
-	if (this == vm)
-		p->console = true;
-	else		
-		p->console = false;
-	
+	p->console = true;
 #endif
 
 	p->callback_size = 256;
@@ -120,7 +115,7 @@ void factor_vm::init_factor(vm_parameters *p)
 	if(p->image_path == NULL)
 		p->image_path = default_image_path();
 
-	srand(system_micros());
+	srand((unsigned int)system_micros());
 	init_ffi();
 	init_stacks(p->ds_size,p->rs_size);
 	init_callbacks(p->callback_size);
@@ -225,7 +220,7 @@ factor_vm *new_factor_vm()
 }
 
 // arg must be new'ed because we're going to delete it!
-void* start_standalone_factor_thread(void *arg) 
+void *start_standalone_factor_thread(void *arg) 
 {
 	factor_vm *newvm = new_factor_vm();
 	startargs *args = (startargs*) arg;
@@ -238,7 +233,6 @@ void* start_standalone_factor_thread(void *arg)
 VM_C_API void start_standalone_factor(int argc, vm_char **argv)
 {
 	factor_vm *newvm = new_factor_vm();
-	vm = newvm;
 	return newvm->start_standalone_factor(argc,argv);
 }
 
