@@ -312,16 +312,12 @@ SYMBOL: value-infos
     value-info >literal< ;
 
 : possible-boolean-values ( info -- values )
-    dup literal?>> [
-        literal>> 1array
-    ] [
-        class>> {
-            { [ dup null-class? ] [ { } ] }
-            { [ dup true-class? ] [ { t } ] }
-            { [ dup false-class? ] [ { f } ] }
-            [ { t f } ]
-        } cond nip
-    ] if ;
+    class>> {
+        { [ dup null-class? ] [ { } ] }
+        { [ dup true-class? ] [ { t } ] }
+        { [ dup false-class? ] [ { f } ] }
+        [ { t f } ]
+    } cond nip ;
 
 : node-value-info ( node value -- info )
     swap info>> at* [ drop null-info ] unless ;
