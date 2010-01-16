@@ -6,7 +6,7 @@ io.streams.string kernel kernel.private math math.constants
 math.order namespaces parser parser.notes prettyprint
 quotations random see sequences sequences.private slots
 slots.private splitting strings summary threads tools.test
-vectors vocabs words words.symbol fry ;
+vectors vocabs words words.symbol fry literals ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -577,8 +577,31 @@ unit-test
 [ T{ bad-slot-value f "hi" fixnum } = ]
 must-fail-with
 
-[ T{ declared-types f 0 "hi" } ]
-[ 0.0 "hi" declared-types boa ] unit-test
+! Check fixnum coercer
+[ 0 ] [ 0.0 "hi" declared-types boa n>> ] unit-test
+
+[ 0 ] [ declared-types new 0.0 >>n n>> ] unit-test
+
+! Check bignum coercer
+TUPLE: bignum-coercer { n bignum initial: $[ 0 >bignum ] } ;
+
+[ 13 bignum ] [ 13.5 bignum-coercer boa n>> dup class ] unit-test
+
+[ 13 bignum ] [ bignum-coercer new 13.5 >>n n>> dup class ] unit-test
+
+! Check float coercer
+TUPLE: float-coercer { n float } ;
+
+[ 13.0 float ] [ 13 float-coercer boa n>> dup class ] unit-test
+
+[ 13.0 float ] [ float-coercer new 13 >>n n>> dup class ] unit-test
+
+! Check integer coercer
+TUPLE: integer-coercer { n integer } ;
+
+[ 13 fixnum ] [ 13.5 integer-coercer boa n>> dup class ] unit-test
+
+[ 13 fixnum ] [ integer-coercer new 13.5 >>n n>> dup class ] unit-test
 
 : foo ( a b -- c ) declared-types boa ;
 
