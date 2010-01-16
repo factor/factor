@@ -298,4 +298,4 @@ GAME: terrain-game {
         { grab-input? t }
         { pref-dim { 1024 768 } }
         { tick-interval-micros $[ 1,000,000 60 /i ] }
-    }
+    } ;
