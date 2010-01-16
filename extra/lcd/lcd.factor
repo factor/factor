@@ -24,7 +24,5 @@ IN: lcd
     "99:99:99" lcd >>string
     monospace-font >>font ;
 
-: time-window ( -- )
-    [ time get <time-display> "Time" open-window ] with-ui ;
-
-MAIN: time-window
+MAIN-WINDOW: time-window { { title "Time" } }
+    time get <time-display> >>gadgets ;

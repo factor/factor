@@ -4,7 +4,11 @@ ui.gadgets ui.gadgets.buttons ui.gadgets.labeled
 ui.gadgets.tracks ui.gadgets.labels ui.gadgets.glass
 math.rectangles cocoa.dialogs ;
 IN: merger
-: main ( -- ) [
+
+MAIN-WINDOW: merger-window {
+        { title "Merging" }
+        { pref-dim { 300 220 } }
+    }
    vertical <track>
     { "From:" "To:" } f <model> f <model> 2array
     [
@@ -25,7 +29,5 @@ IN: merger
          ] with-directory
       ] keep hide-glass
     ] [ drop ] if ]
-    "merge" swap <border-button> 0.4 track-add { 300 220 } >>pref-dim "Merging" open-window
-] with-ui ;
-
-MAIN: main
+    "merge" swap <border-button> 0.4 track-add
+    >>gadgets ;
