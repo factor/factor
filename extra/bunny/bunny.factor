@@ -48,8 +48,7 @@ bunny-world H{
     { T{ key-down f f "TAB" } [ next-draw ] }
 } set-gestures
 
-MAIN-WINDOW: bunny-window
-    {
+MAIN-WINDOW: bunny-window {
         { world-class bunny-world }
         { title "Bunny" }
         { pixel-format-attributes {
