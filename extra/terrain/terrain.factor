@@ -55,9 +55,6 @@ TUPLE: terrain-world < game-world
         float-4{ 0.0 0.0 0.0 1.0 } >>velocity
         VELOCITY-MODIFIER-NORMAL >>velocity-modifier ;
 
-M: terrain-world tick-interval-micros
-    drop 1000000 60 /i ;
-
 : frustum ( dim -- -x x -y y near far )
     dup first2 min v/n
     NEAR-PLANE FOV / v*n first2 [ [ neg ] keep ] bi@
@@ -290,20 +287,15 @@ M: terrain-world draw-world*
         ] with-gl-program ]
     } cleave gl-error ;
 
-M: terrain-world pref-dim* drop { 1024 768 } ;
-
-: terrain-window ( -- )
-    [
-        f T{ world-attributes
-            { world-class terrain-world }
-            { title "Terrain" }
-            { pixel-format-attributes {
-                windowed
-                double-buffered
-                T{ depth-bits { value 24 } }
-            } }
-            { grab-input? t }
-        } open-window
-    ] with-ui ;
-
-MAIN: terrain-window
+GAME: terrain-game {
+        { world-class terrain-world }
+        { title "Terrain" }
+        { pixel-format-attributes {
+            windowed
+            double-buffered
+            T{ depth-bits { value 24 } }
+        } }
+        { grab-input? t }
+        { pref-dim { 1024 768 } }
+        { tick-interval-micros $[ 1,000,000 60 /i ] }
+    }

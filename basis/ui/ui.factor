@@ -243,9 +243,8 @@ M: object close-window
 
 HOOK: beep ui-backend ( -- )
 
-: parse-main-window ( class -- attributes quot )
-    "{" expect dup all-slots parse-tuple-literal-slots
-    parse-definition ;
+: parse-main-window-attributes ( class -- attributes )
+    "{" expect dup all-slots parse-tuple-literal-slots ;
 
 : define-main-window ( word attributes quot -- )
     [
@@ -253,4 +252,7 @@ HOOK: beep ui-backend ( -- )
     ] [ 2drop current-vocab (>>main) ] 3bi ;
 
 SYNTAX: MAIN-WINDOW:
-    CREATE world-attributes parse-main-window define-main-window ;
+    CREATE
+    world-attributes parse-main-window-attributes
+    parse-definition
+    define-main-window ;
