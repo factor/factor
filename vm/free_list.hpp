@@ -32,7 +32,7 @@ struct free_heap_block
 };
 
 struct block_size_compare {
-	bool operator()(free_heap_block *a, free_heap_block *b)
+	bool operator()(free_heap_block *a, free_heap_block *b) const
 	{
 		return a->size() < b->size();
 	}

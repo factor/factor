@@ -1,8 +1,8 @@
 USING: arrays debugger.threads destructors io io.directories
-io.encodings.ascii io.encodings.binary
-io.files io.files.private io.files.temp io.files.unique kernel
-make math sequences system threads tools.test generic.single
-io.encodings.8-bit.latin1 ;
+io.encodings.ascii io.encodings.binary io.encodings.string
+io.encodings.8-bit.latin1 io.files io.files.private
+io.files.temp io.files.unique kernel make math sequences system
+threads tools.test generic.single ;
 IN: io.files.tests
 
 [ ] [ "append-test" temp-file dup exists? [ delete-file ] [ drop ] if ] unit-test
@@ -21,6 +21,20 @@ IN: io.files.tests
 ] [
     "vocab:io/test/binary.txt" latin1
     [ read1 ] with-file-reader >fixnum
+] unit-test
+
+[
+    "This" CHAR: \s
+] [
+    "vocab:io/test/read-until-test.txt" ascii
+    [ " " read-until ] with-file-reader
+] unit-test
+
+[
+    "This" CHAR: \s
+] [
+    "vocab:io/test/read-until-test.txt" binary
+    [ " " read-until [ ascii decode ] dip ] with-file-reader
 ] unit-test
 
 [ ] [

@@ -1,5 +1,5 @@
 USING: accessors http.server http.server.filters io.pools kernel
-mongodb.driver mongodb.connection namespaces unix destructors continuations ;
+mongodb.driver mongodb.connection namespaces ;
 
 IN: furnace.mongodb
 

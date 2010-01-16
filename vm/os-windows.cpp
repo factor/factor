@@ -9,26 +9,26 @@ void factor_vm::init_ffi()
 {
 	hFactorDll = GetModuleHandle(FACTOR_DLL);
 	if(!hFactorDll)
-		fatal_error("GetModuleHandle(\"" FACTOR_DLL_NAME "\") failed", 0);
+		fatal_error("GetModuleHandle() failed", 0);
 }
 
 void factor_vm::ffi_dlopen(dll *dll)
 {
-	dll->dll = LoadLibraryEx((WCHAR *)alien_offset(dll->path), NULL, 0);
+	dll->handle = LoadLibraryEx((WCHAR *)alien_offset(dll->path), NULL, 0);
 }
 
 void *factor_vm::ffi_dlsym(dll *dll, symbol_char *symbol)
 {
-	return (void *)GetProcAddress(dll ? (HMODULE)dll->dll : hFactorDll, symbol);
+	return (void *)GetProcAddress(dll ? (HMODULE)dll->handle : hFactorDll, symbol);
 }
 
 void factor_vm::ffi_dlclose(dll *dll)
 {
-	FreeLibrary((HMODULE)dll->dll);
-	dll->dll = NULL;
+	FreeLibrary((HMODULE)dll->handle);
+	dll->handle = NULL;
 }
 
-bool factor_vm::windows_stat(vm_char *path)
+BOOL factor_vm::windows_stat(vm_char *path)
 {
 	BY_HANDLE_FILE_INFORMATION bhfi;
 	HANDLE h = CreateFileW(path,
@@ -50,15 +50,14 @@ bool factor_vm::windows_stat(vm_char *path)
 		FindClose(h);
 		return true;
 	}
-	bool ret;
-	ret = GetFileInformationByHandle(h, &bhfi);
+	BOOL ret = GetFileInformationByHandle(h, &bhfi);
 	CloseHandle(h);
 	return ret;
 }
 
 void factor_vm::windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length)
 {
-	snwprintf(temp_path, length-1, L"%s.image", full_path); 
+	SNWPRINTF(temp_path, length-1, L"%s.image", full_path); 
 	temp_path[length - 1] = 0;
 }
 
@@ -75,7 +74,7 @@ const vm_char *factor_vm::default_image_path()
 	if((ptr = wcsrchr(full_path, '.')))
 		*ptr = 0;
 
-	snwprintf(temp_path, MAX_UNICODE_PATH-1, L"%s.image", full_path); 
+	SNWPRINTF(temp_path, MAX_UNICODE_PATH-1, L"%s.image", full_path); 
 	temp_path[MAX_UNICODE_PATH - 1] = 0;
 
 	return safe_strdup(temp_path);
@@ -136,6 +135,122 @@ long getpagesize()
 		g_pagesize = system_info.dwPageSize;
 	}
 	return g_pagesize;
+}
+
+/* 
+	Windows argument parsing ported to work on
+	int main(int argc, wchar_t **argv).
+
+	Based on MinGW's public domain char** version.
+
+	Used by WinMain() implementation in main-windows-ce.cpp
+	and main-windows-nt.cpp.
+
+*/
+
+VM_C_API int parse_tokens(wchar_t *string, wchar_t ***tokens, int length)
+{
+	/* Extract whitespace- and quotes- delimited tokens from the given string
+	   and put them into the tokens array. Returns number of tokens
+	   extracted. Length specifies the current size of tokens[].
+	   THIS METHOD MODIFIES string.  */
+
+	const wchar_t *whitespace = L" \t\r\n";
+	wchar_t *tokenEnd = 0;
+	const wchar_t *quoteCharacters = L"\"\'";
+	wchar_t *end = string + wcslen(string);
+
+	if (string == NULL)
+		return length;
+
+	while (1)
+	{
+		const wchar_t *q;
+		/* Skip over initial whitespace.  */
+		string += wcsspn(string, whitespace);
+		if (*string == '\0')
+			break;
+
+		for (q = quoteCharacters; *q; ++q)
+		{
+			if (*string == *q)
+				break;
+		}
+		if (*q)
+		{
+			/* Token is quoted.  */
+			wchar_t quote = *string++;
+			tokenEnd = wcschr(string, quote);
+			/* If there is no endquote, the token is the rest of the string.  */
+			if (!tokenEnd)
+				tokenEnd = end;
+		}
+		else
+		{
+			tokenEnd = string + wcscspn(string, whitespace);
+		}
+
+		*tokenEnd = '\0';
+
+		{
+			wchar_t **new_tokens;
+			int newlen = length + 1;
+			new_tokens = (wchar_t **)realloc (*tokens, sizeof (wchar_t**) * newlen);
+			if (!new_tokens)
+			{
+				/* Out of memory.  */
+				return -1;
+			}
+
+			*tokens = new_tokens;
+			(*tokens)[length] = string;
+			length = newlen;
+		}
+		if (tokenEnd == end)
+			break;
+		string = tokenEnd + 1;
+	}
+	return length;
+}
+
+VM_C_API void parse_args(int *argc, wchar_t ***argv, wchar_t *cmdlinePtrW)
+{
+	wchar_t cmdnameBufW[MAX_UNICODE_PATH];
+	int cmdlineLen = 0;
+	int modlen;
+
+	/* argv[0] is the path of invoked program - get this from CE.  */
+	cmdnameBufW[0] = 0;
+	modlen = GetModuleFileNameW(NULL, cmdnameBufW, sizeof (cmdnameBufW)/sizeof (cmdnameBufW[0]));
+
+	if (!cmdlinePtrW)
+		cmdlineLen = 0;
+	else
+		cmdlineLen = wcslen(cmdlinePtrW);
+
+	/* gets realloc()'d later */
+	*argv = (wchar_t **)malloc (sizeof (wchar_t**) * 1);
+	if (!*argv)
+		ExitProcess(1);
+
+	(*argv)[0] = wcsdup(cmdnameBufW);
+	if(!(*argv[0]))
+		ExitProcess(1);
+	/* Add one to account for argv[0] */
+	(*argc)++;
+
+	if (cmdlineLen > 0)
+	{
+		wchar_t *argv1 = (*argv)[0] + wcslen((*argv)[0]) + 1;
+		argv1 = wcsdup(cmdlinePtrW);
+		if(!argv1)
+			ExitProcess(1);
+		*argc = parse_tokens(argv1, argv, 1);
+		if (*argc < 0)
+			ExitProcess(1);
+	}
+	(*argv)[*argc] = 0;
+	return;
 }
 
 }

@@ -946,3 +946,9 @@ M: tuple-with-read-only-slot clone
 
 [ t ] [ [ { float float } declare max ] { max } inlined? ] unit-test
 [ f ] [ [ { float float } declare max ] { float-max } inlined? ] unit-test
+
+! Propagation should not call equal?, hashcode, etc on literals in user code
+[ V{ } ] [ [ 4 <reversed> [ 2drop ] with each ] final-info ] unit-test
+
+! Reduction
+[ 1 ] [ [ 4 <reversed> [ nth-unsafe ] [ ] unless ] final-info length ] unit-test
