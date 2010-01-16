@@ -30,7 +30,6 @@ M: bad-byte-array-length summary
 FUNCTOR: define-array ( T -- )
 
 A            DEFINES-CLASS ${T}-array
-S            DEFINES-CLASS ${T}-sequence
 <A>          DEFINES <${A}>
 (A)          DEFINES (${A})
 <direct-A>   DEFINES <direct-${A}>
@@ -45,8 +44,6 @@ NTH          [ T dup c-type-getter-boxer array-accessor ]
 SET-NTH      [ T dup c-setter array-accessor ]
 
 WHERE
-
-MIXIN: S
 
 TUPLE: A
 { underlying c-ptr read-only }
