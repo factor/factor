@@ -39,6 +39,9 @@ TUPLE: game-loop-error game-loop error ;
 : game-loop-error ( game-loop error -- )
     [ drop stop-loop ] [ \ game-loop-error boa ?ui-error ] 2bi ;
 
+: fps ( fps -- micros )
+    1,000,000 swap /i ; inline
+
 <PRIVATE
 
 : redraw ( loop -- )
