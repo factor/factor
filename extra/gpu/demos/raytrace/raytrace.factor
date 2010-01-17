@@ -69,7 +69,7 @@ CONSTANT: initial-spheres {
     T{ sphere f { 1.0 0.0  0.0 } {  0.0 5.0 0.0 } 0.025 1.0 { 1.0 1.0 0.0 1.0 } }
 }
 
-BEFORE: raytrace-world begin-world
+M: raytrace-world begin-game-world
     init-gpu
     { -2.0 6.25 10.0 } 0.19 0.55 set-wasd-view
     initial-spheres [ clone ] map >>spheres    
