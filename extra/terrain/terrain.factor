@@ -6,7 +6,7 @@ math.vectors opengl opengl.capabilities opengl.gl
 opengl.shaders opengl.textures opengl.textures.private
 sequences sequences.product specialized-arrays
 terrain.generation terrain.shaders typed ui ui.gadgets
-ui.gadgets.worlds ui.pixel-formats game.worlds method-chains
+ui.gadgets.worlds ui.pixel-formats game.worlds
 math.matrices.simd noise ui.gestures combinators.short-circuit
 destructors grid-meshes math.vectors.simd ;
 QUALIFIED-WITH: alien.c-types c
@@ -233,7 +233,7 @@ M: terrain-world tick*
 : sky-theta ( world -- theta )
     game-loop>> tick-number>> SKY-SPEED * ;
 
-BEFORE: terrain-world begin-world
+M: terrain-world begin-game-world
     "2.0" { "GL_ARB_vertex_buffer_object" "GL_ARB_shader_objects" }
     require-gl-version-or-extensions
     GL_DEPTH_TEST glEnable
@@ -254,7 +254,7 @@ BEFORE: terrain-world begin-world
     terrain-vertex-size <grid-mesh> >>terrain-mesh
     drop ;
 
-AFTER: terrain-world end-world
+M: terrain-world end-game-world
     {
         [ terrain-mesh>> dispose ]
         [ terrain-program>> delete-gl-program ]

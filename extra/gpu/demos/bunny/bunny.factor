@@ -214,7 +214,7 @@ CONSTANT: bunny-model-url "http://factorcode.org/bun_zipper.ply"
         dup 0 "vocab:gpu/demos/bunny/loading.tiff" load-image allocate-texture-image
         >>texture ;
 
-BEFORE: bunny-world begin-world
+M: bunny-world begin-game-world
     init-gpu
     
     { -0.2 0.13 0.1 } 1.1 0.2 set-wasd-view
