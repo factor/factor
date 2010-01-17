@@ -1,3 +1,4 @@
+! (c)2009 Joe Groff bsd license
 USING: accessors calendar continuations destructors kernel math
 math.order namespaces system threads ui ui.gadgets.worlds
 sequences ;
