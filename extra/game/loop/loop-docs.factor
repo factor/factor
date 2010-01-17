@@ -2,6 +2,10 @@
 USING: help.markup help.syntax kernel math ui.gadgets.worlds ;
 IN: game.loop
 
+HELP: fps
+{ $values { "fps" real } { "micros" integer } }
+{ $description "Converts a frames per second value into an interval length in microseconds." } ;
+
 HELP: <game-loop>
 { $values
     { "tick-interval-micros" integer } { "delegate" "a " { $link "game.loop-delegates" } }
