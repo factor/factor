@@ -1,8 +1,9 @@
-LINK_CLFAGS =
-CL_FLAGS = /O2 /W3
+LINK_CLFAGS = /nologo
+CL_FLAGS = /nologo /O2 /W3
 
-OBJS = vm\main-windows-nt.obj \
-	vm\os-windows-nt.obj \
+EXE_OBJS = factor.dll.lib vm\main-windows-nt.obj vm\factor.res
+
+DLL_OBJS = vm\os-windows-nt.obj \
 	vm\os-windows.obj \
 	vm\aging_collector.obj \
 	vm\alien.obj \
@@ -47,19 +48,29 @@ OBJS = vm\main-windows-nt.obj \
 	vm\words.obj
 
 .cpp.obj:
-	cl /nologo /EHsc $(CL_FLAGS) /Fo$@ /c $<
+	cl /EHsc $(CL_FLAGS) /Fo$@ /c $<
+
+.rs.res:
+	rc $<
 
 all: factor.com factor.exe
 
-factor.com: $(OBJS)
-	link $(LINK_FLAGS) /nologo /out:factor.com /SUBSYSTEM:console $(OBJS)
+factor.dll.lib: $(DLL_OBJS)
+	link $(LINK_FLAGS) /implib:factor.dll.lib /out:factor.dll /dll $(DLL_OBJS)
 
-factor.exe: $(OBJS)
-	link $(LINK_FLAGS) /nologo /out:factor.exe /SUBSYSTEM:windows $(OBJS)
+factor.com: $(EXE_OBJS)
+	link $(LINK_FLAGS) /out:factor.com /SUBSYSTEM:console $(EXE_OBJS)
+
+factor.exe: $(EXE_OBJS)
+	link $(LINK_FLAGS) /out:factor.exe /SUBSYSTEM:windows $(EXE_OBJS)
 
 clean:
 	del vm\*.obj
 	del factor.com
 	del factor.exe
+	del factor.dll
+	del factor.dll.lib
 
 .PHONY: clean
+
+.SUFFIXES: .rs
