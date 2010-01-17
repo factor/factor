@@ -1,5 +1,6 @@
 ! (c)2009 Joe Groff bsd license
-USING: game.loop help.markup help.syntax kernel math ui ui.gadgets.worlds words ;
+USING: game.loop help.markup help.syntax kernel math method-chains
+ui ui.gadgets.worlds words ;
 IN: game.worlds
 
 HELP: GAME:
@@ -14,7 +15,17 @@ HELP: game-attributes
 } ;
 
 HELP: game-world
-{ $class-description "" } ;
+{ $class-description "A subclass of " { $link world } " that automatically sets up and manages connections to the " { $vocab-link "game.loop" } " and " { $vocab-link "game.input" } " libraries. It does this by providing methods on " { $link begin-world } ", " { $link end-world } ", and " { $link draw* } ". Subclasses can provide their own world setup and teardown code by adding methods to the " { $link begin-game-world } " and " { $link end-game-world } " generic words." } ;
+
+HELP: begin-game-world
+{ $values { "world" game-world } }
+{ $description "This generic word is called by the " { $link begin-world } " method for " { $link game-world } " subclasses immediately before the game world starts the game loop." } ;
+
+HELP: end-game-world
+{ $values { "world" game-world } }
+{ $description "This generic word is called by the " { $link end-world } " method for " { $link game-world } " subclasses immediately after the game world stops the game loop." } ;
+
+{ game-world begin-game-world end-game-world } related-words
 
 HELP: tick-interval-micros
 { $values
@@ -30,6 +41,10 @@ ARTICLE: "game.worlds" "Game worlds"
     game-attributes
     POSTPONE: GAME:
 }
-;
+"Subclasses of " { $link game-world } " can provide their own setup and teardown code by providing methods for these generic words:"
+{ $subsections
+    begin-game-world
+    end-game-world
+} ;
 
 ABOUT: "game.worlds"
