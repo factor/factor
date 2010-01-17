@@ -215,13 +215,7 @@ VM_C_API int parse_tokens(wchar_t *string, wchar_t ***tokens, int length)
 
 VM_C_API void parse_args(int *argc, wchar_t ***argv, wchar_t *cmdlinePtrW)
 {
-	wchar_t cmdnameBufW[MAX_UNICODE_PATH];
 	int cmdlineLen = 0;
-	int modlen;
-
-	/* argv[0] is the path of invoked program - get this from CE.  */
-	cmdnameBufW[0] = 0;
-	modlen = GetModuleFileNameW(NULL, cmdnameBufW, sizeof (cmdnameBufW)/sizeof (cmdnameBufW[0]));
 
 	if (!cmdlinePtrW)
 		cmdlineLen = 0;
@@ -229,23 +223,32 @@ VM_C_API void parse_args(int *argc, wchar_t ***argv, wchar_t *cmdlinePtrW)
 		cmdlineLen = wcslen(cmdlinePtrW);
 
 	/* gets realloc()'d later */
-	*argv = (wchar_t **)malloc (sizeof (wchar_t**) * 1);
+	*argc = 0;
+	*argv = (wchar_t **)malloc (sizeof (wchar_t**));
+
 	if (!*argv)
 		ExitProcess(1);
+
+#ifdef WINCE
+	wchar_t cmdnameBufW[MAX_UNICODE_PATH];
+
+	/* argv[0] is the path of invoked program - get this from CE.  */
+	cmdnameBufW[0] = 0;
+	GetModuleFileNameW(NULL, cmdnameBufW, sizeof (cmdnameBufW)/sizeof (cmdnameBufW[0]));
 
 	(*argv)[0] = wcsdup(cmdnameBufW);
 	if(!(*argv[0]))
 		ExitProcess(1);
 	/* Add one to account for argv[0] */
 	(*argc)++;
+#endif
 
 	if (cmdlineLen > 0)
 	{
-		wchar_t *argv1 = (*argv)[0] + wcslen((*argv)[0]) + 1;
-		argv1 = wcsdup(cmdlinePtrW);
+		wchar_t *argv1 = wcsdup(cmdlinePtrW);
 		if(!argv1)
 			ExitProcess(1);
-		*argc = parse_tokens(argv1, argv, 1);
+		*argc = parse_tokens(argv1, argv, *argc);
 		if (*argc < 0)
 			ExitProcess(1);
 	}
