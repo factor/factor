@@ -20,11 +20,11 @@ typedef char symbol_char;
 
 #define FACTOR_OS_STRING "winnt"
 
+#define FACTOR_DLL L"factor.dll"
+
 #ifdef _MSC_VER
-	#define FACTOR_DLL NULL
 	#define FACTOR_STDCALL(return_type) return_type __stdcall
 #else
-	#define FACTOR_DLL L"factor.dll"
 	#define FACTOR_STDCALL(return_type) __attribute__((stdcall)) return_type
 #endif
 
