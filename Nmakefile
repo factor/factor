@@ -1,4 +1,4 @@
-LINK_CLFAGS = /nologo
+LINK_FLAGS = /nologo shell32.lib
 CL_FLAGS = /nologo /O2 /W3
 
 EXE_OBJS = factor.dll.lib vm\main-windows-nt.obj vm\factor.res
@@ -66,6 +66,7 @@ factor.exe: $(EXE_OBJS)
 
 clean:
 	del vm\*.obj
+	del factor.lib
 	del factor.com
 	del factor.exe
 	del factor.dll

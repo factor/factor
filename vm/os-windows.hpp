@@ -51,8 +51,4 @@ u64 nano_count();
 void sleep_nanos(u64 nsec);
 long getpagesize();
 
-/* Used by-main-windows-*.cpp */
-VM_C_API int parse_tokens(wchar_t* string, wchar_t*** tokens, int length);
-VM_C_API void parse_args(int *argc, wchar_t ***argv, wchar_t *cmdlinePtrW);
-
 }
