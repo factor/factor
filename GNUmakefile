@@ -177,14 +177,19 @@ macosx.app: factor
 		@executable_path/../Frameworks/libfactor.dylib \
 		Factor.app/Contents/MacOS/factor
 
-$(EXECUTABLE): $(DLL_OBJS) $(EXE_OBJS)
+factor.dll:
 	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
+
+$(EXECUTABLE): $(DLL_OBJS) $(EXE_OBJS)
+	$(MAKE) factor.dll
 	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
 
 $(CONSOLE_EXECUTABLE): $(DLL_OBJS) $(EXE_OBJS)
+	$(MAKE) factor.dll
 	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) $(CFLAGS_CONSOLE) -o factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION) $(EXE_OBJS)
+
 
 $(TEST_LIBRARY): vm/ffi_test.o
 	$(TOOLCHAIN_PREFIX)$(CC) $(LIBPATH) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o libfactor-ffi-test$(SHARED_DLL_EXTENSION) $(TEST_OBJS)
