@@ -33,7 +33,7 @@ void factor_vm::compile_all_words()
 		if(!word->code || !word->code->optimized_p())
 			jit_compile_word(word.value(),word->def,false);
 
-		update_word_xt(word.untagged());
+		update_word_entry_point(word.untagged());
 	}
 }
 
@@ -64,7 +64,7 @@ word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 		initialize_code_block(new_word->profiling);
 	}
 
-	update_word_xt(new_word.untagged());
+	update_word_entry_point(new_word.untagged());
 
 	return new_word.untagged();
 }
@@ -78,30 +78,30 @@ void factor_vm::primitive_word()
 	ctx->push(tag<word>(allot_word(name,vocab,hashcode)));
 }
 
-/* word-xt ( word -- start end ) */
-void factor_vm::primitive_word_xt()
+/* word-code ( word -- start end ) */
+void factor_vm::primitive_word_code()
 {
 	data_root<word> w(ctx->pop(),this);
 	w.untag_check(this);
 
 	if(profiling_p)
 	{
-		ctx->push(allot_cell((cell)w->profiling->xt()));
+		ctx->push(allot_cell((cell)w->profiling->entry_point()));
 		ctx->push(allot_cell((cell)w->profiling + w->profiling->size()));
 	}
 	else
 	{
-		ctx->push(allot_cell((cell)w->code->xt()));
+		ctx->push(allot_cell((cell)w->code->entry_point()));
 		ctx->push(allot_cell((cell)w->code + w->code->size()));
 	}
 }
 
-void factor_vm::update_word_xt(word *w)
+void factor_vm::update_word_entry_point(word *w)
 {
 	if(profiling_p && w->profiling)
-		w->xt = w->profiling->xt();
+		w->entry_point = w->profiling->entry_point();
 	else
-		w->xt = w->code->xt();
+		w->entry_point = w->code->entry_point();
 }
 
 void factor_vm::primitive_optimized_p()

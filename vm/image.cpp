@@ -178,16 +178,16 @@ struct code_block_fixup_relocation_visitor {
 	void operator()(instruction_operand op)
 	{
 		code_block *compiled = op.parent_code_block();
-		cell old_offset = op.rel_offset() + (cell)compiled->xt() - code_offset;
+		cell old_offset = op.rel_offset() + (cell)compiled->entry_point() - code_offset;
 
 		switch(op.rel_type())
 		{
 		case RT_LITERAL:
 			op.store_value(data_visitor.visit_pointer(op.load_value(old_offset)));
 			break;
-		case RT_XT:
-		case RT_XT_PIC:
-		case RT_XT_PIC_TAIL:
+		case RT_ENTRY_POINT:
+		case RT_ENTRY_POINT_PIC:
+		case RT_ENTRY_POINT_PIC_TAIL:
 			op.store_code_block(code_visitor(op.load_code_block(old_offset)));
 			break;
 		case RT_HERE:

@@ -141,7 +141,7 @@ void factor_vm::primitive_modify_code_heap()
 			break;
 		}
 
-		update_word_xt(word.untagged());
+		update_word_entry_point(word.untagged());
 	}
 
 	update_code_heap_words();

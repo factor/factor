@@ -6,22 +6,18 @@ enum relocation_type {
 	RT_PRIMITIVE,
 	/* arg is a literal table index, holding an array pair (symbol/dll) */
 	RT_DLSYM,
-	/* a pointer to a compiled word reference */
-	RT_DISPATCH,
 	/* a word or quotation's general entry point */
-	RT_XT,
+	RT_ENTRY_POINT,
 	/* a word's PIC entry point */
-	RT_XT_PIC,
+	RT_ENTRY_POINT_PIC,
 	/* a word's tail-call PIC entry point */
-	RT_XT_PIC_TAIL,
+	RT_ENTRY_POINT_PIC_TAIL,
 	/* current offset */
 	RT_HERE,
 	/* current code block */
 	RT_THIS,
 	/* data heap literal */
 	RT_LITERAL,
-	/* address of ctx var */
-	RT_CONTEXT,
 	/* untagged fixnum literal */
 	RT_UNTAGGED,
 	/* address of megamorphic_cache_hits var */
@@ -102,14 +98,13 @@ struct relocation_entry {
 			return 1;
 		case RT_DLSYM:
 			return 2;
-		case RT_XT:
-		case RT_XT_PIC:
-		case RT_XT_PIC_TAIL:
+		case RT_ENTRY_POINT:
+		case RT_ENTRY_POINT_PIC:
+		case RT_ENTRY_POINT_PIC_TAIL:
 		case RT_LITERAL:
 		case RT_HERE:
 		case RT_UNTAGGED:
 		case RT_THIS:
-		case RT_CONTEXT:
 		case RT_MEGAMORPHIC_CACHE_HITS:
 		case RT_CARDS_OFFSET:
 		case RT_DECKS_OFFSET:
