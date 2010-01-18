@@ -2,13 +2,13 @@ USING: accessors arrays binary-search kernel math math.order
 math.parser namespaces sequences sorting splitting vectors vocabs words ;
 IN: tools.disassembler.utils
 
-SYMBOL: words-xt
+SYMBOL: word-entry-points
 SYMBOL: smallest-xt
 SYMBOL: greatest-xt
 
-: (words-xt) ( -- assoc )
-    vocabs [ words ] map concat [ [ word-xt ] keep 3array ] map
-    [ [ first ] bi@ <=> ] sort >vector ;
+: (word-entry-points) ( -- assoc )
+    vocabs [ words ] map concat [ [ word-code ] keep 3array ] map
+    [ first ] sort-with ;
 
 : complete-address ( n seq -- str )
     [ first - ] [ third name>> ] bi
@@ -18,7 +18,7 @@ SYMBOL: greatest-xt
     dup [ smallest-xt get < ] [ greatest-xt get > ] bi or [
         drop f
     ] [
-        words-xt get over [ swap first <=> ] curry search nip
+        word-entry-points get over [ swap first <=> ] curry search nip
         2dup second <= [
             [ complete-address ] [ drop f ] if*
         ] [
@@ -33,9 +33,11 @@ SYMBOL: greatest-xt
 : resolve-call ( str -- str' )
     "0x" split1-last [ resolve-xt "0x" glue ] when* ;
 
-: with-words-xt ( quot -- )
-    [ (words-xt)
-      [ words-xt set ]
-      [ first first smallest-xt set ]
-      [ last second greatest-xt set ] tri
-    ] prepose with-scope ; inline
+: with-word-entry-points ( quot -- )
+    [
+        (word-entry-points)
+        [ word-entry-points set ]
+        [ first first smallest-xt set ]
+        [ last second greatest-xt set ] tri
+        call
+    ] with-scope ; inline

@@ -42,12 +42,12 @@ struct call_frame_code_block_visitor {
 
 	void operator()(stack_frame *frame)
 	{
-		cell offset = (cell)FRAME_RETURN_ADDRESS(frame,parent) - (cell)frame->xt;
+		cell offset = (cell)FRAME_RETURN_ADDRESS(frame,parent) - (cell)frame->entry_point;
 
 		code_block *new_block = visitor(parent->frame_code(frame));
-		frame->xt = new_block->xt();
+		frame->entry_point = new_block->entry_point();
 
-		FRAME_RETURN_ADDRESS(frame,parent) = (void *)((cell)frame->xt + offset);
+		FRAME_RETURN_ADDRESS(frame,parent) = (void *)((cell)frame->entry_point + offset);
 	}
 };
 
@@ -64,14 +64,14 @@ void code_block_visitor<Visitor>::visit_object_code_block(object *obj)
 			if(w->profiling)
 				w->profiling = visitor(w->profiling);
 
-			parent->update_word_xt(w);
+			parent->update_word_entry_point(w);
 			break;
 		}
 	case QUOTATION_TYPE:
 		{
 			quotation *q = (quotation *)obj;
 			if(q->code)
-				parent->set_quot_xt(q,visitor(q->code));
+				parent->set_quot_entry_point(q,visitor(q->code));
 			break;
 		}
 	case CALLSTACK_TYPE:
@@ -93,7 +93,9 @@ struct embedded_code_pointers_visitor {
 	void operator()(instruction_operand op)
 	{
 		relocation_type type = op.rel_type();
-		if(type == RT_XT || type == RT_XT_PIC || type == RT_XT_PIC_TAIL)
+		if(type == RT_ENTRY_POINT
+			|| type == RT_ENTRY_POINT_PIC
+			|| type == RT_ENTRY_POINT_PIC_TAIL)
 			op.store_code_block(visitor(op.load_code_block()));
 	}
 };

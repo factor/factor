@@ -486,8 +486,8 @@ M: bad-executable summary
 \ (word) { object object object } { word } define-primitive
 \ (word) make-flushable
 
-\ word-xt { word } { integer integer } define-primitive
-\ word-xt make-flushable
+\ word-code { word } { integer integer } define-primitive
+\ word-code make-flushable
 
 \ special-object { fixnum } { object } define-primitive
 \ special-object make-flushable
@@ -662,8 +662,8 @@ M: bad-executable summary
 \ array>quotation { array } { quotation } define-primitive
 \ array>quotation make-flushable
 
-\ quotation-xt { quotation } { integer } define-primitive
-\ quotation-xt make-flushable
+\ quotation-code { quotation } { integer integer } define-primitive
+\ quotation-code make-flushable
 
 \ <tuple> { tuple-layout } { tuple } define-primitive
 \ <tuple> make-flushable

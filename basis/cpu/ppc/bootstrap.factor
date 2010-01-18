@@ -1,10 +1,9 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel kernel.private namespaces
-system cpu.ppc.assembler compiler.codegen.fixup compiler.units
-compiler.constants math math.private math.ranges layouts words vocabs
-slots.private locals locals.backend generic.single.private fry
-sequences ;
+system cpu.ppc.assembler compiler.units compiler.constants math
+math.private math.ranges layouts words vocabs slots.private
+locals locals.backend generic.single.private fry sequences ;
 FROM: cpu.ppc.assembler => B ;
 IN: bootstrap.ppc
 
@@ -66,7 +65,7 @@ CONSTANT: ctx-reg 16
 
     0 vm-reg LOAD32 rc-absolute-ppc-2/2 rt-vm jit-rel
 
-    0 2 LOAD32 rc-absolute-ppc-2/2 rt-xt jit-rel
+    0 2 LOAD32 rc-absolute-ppc-2/2 rt-entry-point jit-rel
     2 MTLR
     BLRL
 
@@ -132,19 +131,19 @@ CONSTANT: ctx-reg 16
     jit-restore-context
 ] jit-primitive jit-define
 
-[ 0 BL rc-relative-ppc-3 rt-xt-pic jit-rel ] jit-word-call jit-define
+[ 0 BL rc-relative-ppc-3 rt-entry-point-pic jit-rel ] jit-word-call jit-define
 
 [
     0 6 LOAD32 rc-absolute-ppc-2/2 rt-here jit-rel
-    0 B rc-relative-ppc-3 rt-xt-pic-tail jit-rel
+    0 B rc-relative-ppc-3 rt-entry-point-pic-tail jit-rel
 ] jit-word-jump jit-define
 
 [
     3 ds-reg 0 LWZ
     ds-reg dup 4 SUBI
     0 3 \ f type-number CMPI
-    [ BEQ ] [ 0 B rc-relative-ppc-3 rt-xt jit-rel ] jit-conditional*
-    0 B rc-relative-ppc-3 rt-xt jit-rel
+    [ BEQ ] [ 0 B rc-relative-ppc-3 rt-entry-point jit-rel ] jit-conditional*
+    0 B rc-relative-ppc-3 rt-entry-point jit-rel
 ] jit-if jit-define
 
 : jit->r ( -- )
@@ -195,19 +194,19 @@ CONSTANT: ctx-reg 16
 
 [
     jit->r
-    0 BL rc-relative-ppc-3 rt-xt jit-rel
+    0 BL rc-relative-ppc-3 rt-entry-point jit-rel
     jit-r>
 ] jit-dip jit-define
 
 [
     jit-2>r
-    0 BL rc-relative-ppc-3 rt-xt jit-rel
+    0 BL rc-relative-ppc-3 rt-entry-point jit-rel
     jit-2r>
 ] jit-2dip jit-define
 
 [
     jit-3>r
-    0 BL rc-relative-ppc-3 rt-xt jit-rel
+    0 BL rc-relative-ppc-3 rt-entry-point jit-rel
     jit-3r>
 ] jit-3dip jit-define
 
@@ -256,7 +255,7 @@ CONSTANT: ctx-reg 16
 ] pic-check-tuple jit-define
 
 [
-    [ BNE ] [ 0 B rc-relative-ppc-3 rt-xt jit-rel ] jit-conditional*
+    [ BNE ] [ 0 B rc-relative-ppc-3 rt-entry-point jit-rel ] jit-conditional*
 ] pic-hit jit-define
 
 ! Inline cache miss entry points
@@ -308,7 +307,7 @@ CONSTANT: ctx-reg 16
         5 4 0 STW
         ! ... goto get(cache + 4)
         3 3 4 LWZ
-        3 3 word-xt-offset LWZ
+        3 3 word-entry-point-offset LWZ
         3 MTCTR
         BCTR
     ]
@@ -322,7 +321,7 @@ CONSTANT: ctx-reg 16
 [
     3 ds-reg 0 LWZ
     ds-reg dup 4 SUBI
-    5 3 quot-xt-offset LWZ
+    5 3 quot-entry-point-offset LWZ
 ]
 [ 5 MTLR BLRL ]
 [ 5 MTCTR BCTR ] \ (call) define-combinator-primitive
@@ -330,7 +329,7 @@ CONSTANT: ctx-reg 16
 [
     3 ds-reg 0 LWZ
     ds-reg dup 4 SUBI
-    4 3 word-xt-offset LWZ
+    4 3 word-entry-point-offset LWZ
 ]
 [ 4 MTLR BLRL ]
 [ 4 MTCTR BCTR ] \ (execute) define-combinator-primitive
@@ -338,7 +337,7 @@ CONSTANT: ctx-reg 16
 [
     3 ds-reg 0 LWZ
     ds-reg dup 4 SUBI
-    4 3 word-xt-offset LWZ
+    4 3 word-entry-point-offset LWZ
     4 MTCTR BCTR
 ] jit-execute jit-define
 
@@ -348,7 +347,7 @@ CONSTANT: ctx-reg 16
     ! Save ctx->callstack_bottom
     1 ctx-reg context-callstack-bottom-offset STW
     ! Call quotation
-    5 3 quot-xt-offset LWZ
+    5 3 quot-entry-point-offset LWZ
     5 MTLR
     BLRL
     jit-save-context
@@ -370,7 +369,7 @@ CONSTANT: ctx-reg 16
     0 MTLR
 
     ! Call quotation
-    4 3 quot-xt-offset LWZ
+    4 3 quot-entry-point-offset LWZ
     4 MTCTR
     BCTR
 ] \ unwind-native-frames define-sub-primitive
@@ -409,7 +408,7 @@ CONSTANT: ctx-reg 16
     0 2 LOAD32 "lazy_jit_compile" f rc-absolute-ppc-2/2 jit-dlsym
     2 MTLR
     BLRL
-    5 3 quot-xt-offset LWZ
+    5 3 quot-entry-point-offset LWZ
 ]
 [ 5 MTLR BLRL ]
 [ 5 MTCTR BCTR ]

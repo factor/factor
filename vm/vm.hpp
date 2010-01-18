@@ -393,8 +393,8 @@ struct factor_vm
 	//words
 	word *allot_word(cell name_, cell vocab_, cell hashcode_);
 	void primitive_word();
-	void primitive_word_xt();
-	void update_word_xt(word *w_);
+	void primitive_word_code();
+	void update_word_entry_point(word *w_);
 	void primitive_optimized_p();
 	void primitive_wrapper();
 	void jit_compile_word(cell word_, cell def_, bool relocating);
@@ -503,17 +503,16 @@ struct factor_vm
 	void primitive_fclose();
 
 	//code_block
-	cell compute_xt_address(cell obj);
-	cell compute_xt_pic_address(word *w, cell tagged_quot);
-	cell compute_xt_pic_address(cell w_);
-	cell compute_xt_pic_tail_address(cell w_);
+	cell compute_entry_point_address(cell obj);
+	cell compute_entry_point_pic_address(word *w, cell tagged_quot);
+	cell compute_entry_point_pic_address(cell w_);
+	cell compute_entry_point_pic_tail_address(cell w_);
 	cell code_block_owner(code_block *compiled);
 	void update_word_references(code_block *compiled);
 	void check_code_address(cell address);
 	cell compute_primitive_address(cell arg);
 	void undefined_symbol();
 	cell compute_dlsym_address(array *literals, cell index);
-	cell compute_context_address();
 	cell compute_vm_address(cell arg);
 	void store_external_address(instruction_operand op);
 	cell compute_here_address(cell arg, cell offset, code_block *compiled);
@@ -600,8 +599,8 @@ struct factor_vm
 	void primitive_jit_compile();
 	code_block *lazy_jit_compile_block();
 	void primitive_array_to_quotation();
-	void primitive_quotation_xt();
-	void set_quot_xt(quotation *quot, code_block *code);
+	void primitive_quotation_code();
+	void set_quot_entry_point(quotation *quot, code_block *code);
 	code_block *jit_compile_quot(cell owner_, cell quot_, bool relocating);
 	void jit_compile_quot(cell quot_, bool relocating);
 	fixnum quot_code_offset_to_scan(cell quot_, cell offset);

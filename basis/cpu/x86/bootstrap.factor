@@ -34,7 +34,7 @@ big-endian off
     vm-reg 0 MOV rc-absolute-cell rt-vm jit-rel
 
     ! Call into Factor code
-    safe-reg 0 MOV rc-absolute-cell rt-xt jit-rel
+    safe-reg 0 MOV rc-absolute-cell rt-entry-point jit-rel
     safe-reg CALL
 
     ! Tear down register shadow area
@@ -61,9 +61,9 @@ big-endian off
     temp0 profile-count-offset [+] 1 tag-fixnum ADD
     ! Load word->code
     temp0 temp0 word-code-offset [+] MOV
-    ! Compute word XT
+    ! Compute word entry point
     temp0 compiled-header-size ADD
-    ! Jump to XT
+    ! Jump to entry point
     temp0 JMP
 ] jit-profiling jit-define
 
@@ -78,11 +78,11 @@ big-endian off
 
 [
     temp3 0 MOV rc-absolute-cell rt-here jit-rel
-    0 JMP rc-relative rt-xt-pic-tail jit-rel
+    0 JMP rc-relative rt-entry-point-pic-tail jit-rel
 ] jit-word-jump jit-define
 
 [
-    0 CALL rc-relative rt-xt-pic jit-rel
+    0 CALL rc-relative rt-entry-point-pic jit-rel
 ] jit-word-call jit-define
 
 [
@@ -93,9 +93,9 @@ big-endian off
     ! compare boolean with f
     temp0 \ f type-number CMP
     ! jump to true branch if not equal
-    0 JNE rc-relative rt-xt jit-rel
+    0 JNE rc-relative rt-entry-point jit-rel
     ! jump to false branch if equal
-    0 JMP rc-relative rt-xt jit-rel
+    0 JMP rc-relative rt-entry-point jit-rel
 ] jit-if jit-define
 
 : jit->r ( -- )
@@ -148,19 +148,19 @@ big-endian off
 
 [
     jit->r
-    0 CALL rc-relative rt-xt jit-rel
+    0 CALL rc-relative rt-entry-point jit-rel
     jit-r>
 ] jit-dip jit-define
 
 [
     jit-2>r
-    0 CALL rc-relative rt-xt jit-rel
+    0 CALL rc-relative rt-entry-point jit-rel
     jit-2r>
 ] jit-2dip jit-define
 
 [
     jit-3>r
-    0 CALL rc-relative rt-xt jit-rel
+    0 CALL rc-relative rt-entry-point jit-rel
     jit-3r>
 ] jit-3dip jit-define
 
@@ -170,14 +170,14 @@ big-endian off
     ! pop stack
     ds-reg bootstrap-cell SUB
 ]
-[ temp0 word-xt-offset [+] CALL ]
-[ temp0 word-xt-offset [+] JMP ]
+[ temp0 word-entry-point-offset [+] CALL ]
+[ temp0 word-entry-point-offset [+] JMP ]
 \ (execute) define-combinator-primitive
 
 [
     temp0 ds-reg [] MOV
     ds-reg bootstrap-cell SUB
-    temp0 word-xt-offset [+] JMP
+    temp0 word-entry-point-offset [+] JMP
 ] jit-execute jit-define
 
 [
@@ -224,7 +224,7 @@ big-endian off
     temp1 temp2 CMP
 ] pic-check-tuple jit-define
 
-[ 0 JE rc-relative rt-xt jit-rel ] pic-hit jit-define
+[ 0 JE rc-relative rt-entry-point jit-rel ] pic-hit jit-define
 
 ! ! ! Megamorphic caches
 
@@ -248,7 +248,7 @@ big-endian off
     temp1 [] 1 ADD
     ! goto get(cache + bootstrap-cell)
     temp0 temp0 bootstrap-cell [+] MOV
-    temp0 word-xt-offset [+] JMP
+    temp0 word-entry-point-offset [+] JMP
     ! fall-through on miss
 ] mega-lookup jit-define
 

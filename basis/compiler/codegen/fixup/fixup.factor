@@ -62,13 +62,13 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
     [ add-dlsym-parameters ] dip rt-dlsym rel-fixup ;
 
 : rel-word ( word class -- )
-    [ add-literal ] dip rt-xt rel-fixup ;
+    [ add-literal ] dip rt-entry-point rel-fixup ;
 
 : rel-word-pic ( word class -- )
-    [ add-literal ] dip rt-xt-pic rel-fixup ;
+    [ add-literal ] dip rt-entry-point-pic rel-fixup ;
 
 : rel-word-pic-tail ( word class -- )
-    [ add-literal ] dip rt-xt-pic-tail rel-fixup ;
+    [ add-literal ] dip rt-entry-point-pic-tail rel-fixup ;
 
 : rel-primitive ( word class -- )
     [ def>> first add-parameter ] dip rt-primitive rel-fixup ;

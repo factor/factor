@@ -171,7 +171,7 @@ struct stack_frame_printer {
 		std::cout << std::hex << (cell)parent->frame_executing(frame) << std::dec;
 		std::cout << std::endl;
 		std::cout << "word/quot xt: ";
-		std::cout << std::hex << (cell)frame->xt << std::dec;
+		std::cout << std::hex << (cell)frame->entry_point << std::dec;
 		std::cout << std::endl;
 		std::cout << "return address: ";
 		std::cout << std::hex << (cell)FRAME_RETURN_ADDRESS(frame,parent) << std::dec;
