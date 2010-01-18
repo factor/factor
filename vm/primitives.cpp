@@ -48,7 +48,7 @@ PRIMITIVE_FORWARD(float_lesseq)
 PRIMITIVE_FORWARD(float_greater)
 PRIMITIVE_FORWARD(float_greatereq)
 PRIMITIVE_FORWARD(word)
-PRIMITIVE_FORWARD(word_xt)
+PRIMITIVE_FORWARD(word_code)
 PRIMITIVE_FORWARD(special_object)
 PRIMITIVE_FORWARD(set_special_object)
 PRIMITIVE_FORWARD(existsp)
@@ -98,7 +98,7 @@ PRIMITIVE_FORWARD(wrapper)
 PRIMITIVE_FORWARD(clone)
 PRIMITIVE_FORWARD(string)
 PRIMITIVE_FORWARD(array_to_quotation)
-PRIMITIVE_FORWARD(quotation_xt)
+PRIMITIVE_FORWARD(quotation_code)
 PRIMITIVE_FORWARD(tuple)
 PRIMITIVE_FORWARD(profiling)
 PRIMITIVE_FORWARD(become)
@@ -181,7 +181,7 @@ const primitive_type primitives[] = {
 	primitive_float_greater,
 	primitive_float_greatereq,
 	primitive_word,
-	primitive_word_xt,
+	primitive_word_code,
 	primitive_special_object,
 	primitive_set_special_object,
 	primitive_existsp,
@@ -257,7 +257,7 @@ const primitive_type primitives[] = {
 	primitive_clone,
 	primitive_string,
 	primitive_array_to_quotation,
-	primitive_quotation_xt,
+	primitive_quotation_code,
 	primitive_tuple,
 	primitive_profiling,
 	primitive_become,

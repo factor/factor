@@ -232,8 +232,8 @@ struct word : public object {
 	cell counter;
 	/* TAGGED machine code for sub-primitive */
 	cell subprimitive;
-	/* UNTAGGED execution token: jump here to execute word */
-	void *xt;
+	/* UNTAGGED entry point: jump here to execute word */
+	void *entry_point;
 	/* UNTAGGED compiled code block */
 	code_block *code;
 	/* UNTAGGED profiler stub */
@@ -266,8 +266,8 @@ struct quotation : public object {
 	cell cached_effect;
 	/* tagged */
 	cell cache_counter;
-	/* UNTAGGED */
-	void *xt;
+	/* UNTAGGED entry point; jump here to call quotation */
+	void *entry_point;
 	/* UNTAGGED compiled code block */
 	code_block *code;
 };
@@ -302,7 +302,8 @@ struct dll : public object {
 };
 
 struct stack_frame {
-	void *xt;
+	/* Updated by procedure prologue with procedure start address */
+	void *entry_point;
 	/* Frame size in bytes */
 	cell size;
 };

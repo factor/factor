@@ -7,11 +7,15 @@ IN: tools.disassembler
 
 GENERIC: disassemble ( obj -- )
 
+<PRIVATE
+
 SYMBOL: disassembler-backend
 
 HOOK: disassemble* disassembler-backend ( from to -- lines )
 
 TR: tabs>spaces "\t" "\s" ;
+
+PRIVATE>
 
 M: byte-array disassemble 
     [
@@ -22,7 +26,7 @@ M: byte-array disassemble
 
 M: pair disassemble first2 disassemble* [ tabs>spaces print ] each ;
 
-M: word disassemble word-xt 2array disassemble ;
+M: word disassemble word-code 2array disassemble ;
 
 M: quotation disassemble [ dup infer define-temp ] with-compilation-unit disassemble ;
 

@@ -127,4 +127,4 @@ DEFER: x
     ] map harvest
 ] unit-test
 
-[ "hi" word-xt ] must-fail
+[ "hi" word-code ] must-fail

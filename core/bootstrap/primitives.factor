@@ -420,7 +420,7 @@ tuple
     { "float-u>" "math.private" (( x y -- ? )) }
     { "float-u>=" "math.private" (( x y -- ? )) }
     { "(word)" "words.private" (( name vocab -- word )) }
-    { "word-xt" "words" (( word -- start end )) }
+    { "word-code" "words" (( word -- start end )) }
     { "special-object" "kernel.private" (( n -- obj )) }
     { "set-special-object" "kernel.private" (( obj n -- )) }
     { "(exists?)" "io.files.private" (( path -- ? )) }
@@ -496,7 +496,7 @@ tuple
     { "(clone)" "kernel" (( obj -- newobj )) }
     { "<string>" "strings" (( n ch -- string )) }
     { "array>quotation" "quotations.private" (( array -- quot )) }
-    { "quotation-xt" "quotations" (( quot -- xt )) }
+    { "quotation-code" "quotations" (( quot -- start end )) }
     { "<tuple>" "classes.tuple.private" (( layout -- tuple )) }
     { "profiling" "tools.profiler.private" (( ? -- )) }
     { "become" "kernel.private" (( old new -- )) }

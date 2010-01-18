@@ -3,44 +3,44 @@
 namespace factor
 {
 
-cell factor_vm::compute_xt_address(cell obj)
+cell factor_vm::compute_entry_point_address(cell obj)
 {
 	switch(tagged<object>(obj).type())
 	{
 	case WORD_TYPE:
-		return (cell)untag<word>(obj)->xt;
+		return (cell)untag<word>(obj)->entry_point;
 	case QUOTATION_TYPE:
-		return (cell)untag<quotation>(obj)->xt;
+		return (cell)untag<quotation>(obj)->entry_point;
 	default:
 		critical_error("Expected word or quotation",obj);
 		return 0;
 	}
 }
 
-cell factor_vm::compute_xt_pic_address(word *w, cell tagged_quot)
+cell factor_vm::compute_entry_point_pic_address(word *w, cell tagged_quot)
 {
 	if(!to_boolean(tagged_quot) || max_pic_size == 0)
-		return (cell)w->xt;
+		return (cell)w->entry_point;
 	else
 	{
 		quotation *quot = untag<quotation>(tagged_quot);
 		if(quot_compiled_p(quot))
-			return (cell)quot->xt;
+			return (cell)quot->entry_point;
 		else
-			return (cell)w->xt;
+			return (cell)w->entry_point;
 	}
 }
 
-cell factor_vm::compute_xt_pic_address(cell w_)
+cell factor_vm::compute_entry_point_pic_address(cell w_)
 {
 	tagged<word> w(w_);
-	return compute_xt_pic_address(w.untagged(),w->pic_def);
+	return compute_entry_point_pic_address(w.untagged(),w->pic_def);
 }
 
-cell factor_vm::compute_xt_pic_tail_address(cell w_)
+cell factor_vm::compute_entry_point_pic_tail_address(cell w_)
 {
 	tagged<word> w(w_);
-	return compute_xt_pic_address(w.untagged(),w->pic_tail_def);
+	return compute_entry_point_pic_address(w.untagged(),w->pic_tail_def);
 }
 
 cell factor_vm::code_block_owner(code_block *compiled)
@@ -74,25 +74,28 @@ struct update_word_references_relocation_visitor {
 	{
 		switch(op.rel_type())
 		{
-		case RT_XT:
+		case RT_ENTRY_POINT:
 			{
 				code_block *compiled = op.load_code_block();
 				cell owner = compiled->owner;
-				if(to_boolean(owner)) op.store_value(parent->compute_xt_address(owner));
+				if(to_boolean(owner))
+					op.store_value(parent->compute_entry_point_address(owner));
 				break;
 			}
-		case RT_XT_PIC:
+		case RT_ENTRY_POINT_PIC:
 			{
 				code_block *compiled = op.load_code_block();
 				cell owner = parent->code_block_owner(compiled);
-				if(to_boolean(owner)) op.store_value(parent->compute_xt_pic_address(owner));
+				if(to_boolean(owner))
+					op.store_value(parent->compute_entry_point_pic_address(owner));
 				break;
 			}
-		case RT_XT_PIC_TAIL:
+		case RT_ENTRY_POINT_PIC_TAIL:
 			{
 				code_block *compiled = op.load_code_block();
 				cell owner = parent->code_block_owner(compiled);
-				if(to_boolean(owner)) op.store_value(parent->compute_xt_pic_tail_address(owner));
+				if(to_boolean(owner))
+					op.store_value(parent->compute_entry_point_pic_tail_address(owner));
 				break;
 			}
 		default:
@@ -111,7 +114,7 @@ void factor_vm::update_word_references(code_block *compiled)
 		initialize_code_block(compiled);
 	/* update_word_references() is always applied to every block in
 	   the code heap. Since it resets all call sites to point to
-	   their canonical XT (cold entry point for non-tail calls,
+	   their canonical entry point (cold entry point for non-tail calls,
 	   standard entry point for tail calls), it means that no PICs
 	   are referenced after this is done. So instead of polluting
 	   the code heap with dead PICs that will be freed on the next
@@ -193,11 +196,6 @@ cell factor_vm::compute_dlsym_address(array *literals, cell index)
 	}
 }
 
-cell factor_vm::compute_context_address()
-{
-	return (cell)&ctx;
-}
-
 cell factor_vm::compute_vm_address(cell arg)
 {
 	return (cell)this + untag_fixnum(arg);
@@ -218,10 +216,7 @@ void factor_vm::store_external_address(instruction_operand op)
 		op.store_value(compute_dlsym_address(parameters,index));
 		break;
 	case RT_THIS:
-		op.store_value((cell)compiled->xt());
-		break;
-	case RT_CONTEXT:
-		op.store_value(compute_context_address());
+		op.store_value((cell)compiled->entry_point());
 		break;
 	case RT_MEGAMORPHIC_CACHE_HITS:
 		op.store_value((cell)&dispatch_stats.megamorphic_cache_hits);
@@ -244,7 +239,10 @@ void factor_vm::store_external_address(instruction_operand op)
 cell factor_vm::compute_here_address(cell arg, cell offset, code_block *compiled)
 {
 	fixnum n = untag_fixnum(arg);
-	return n >= 0 ? ((cell)compiled->xt() + offset + n) : ((cell)compiled->xt() - n);
+	if(n >= 0)
+		return (cell)compiled->entry_point() + offset + n;
+	else
+		return (cell)compiled->entry_point() - n;
 }
 
 struct initial_code_block_visitor {
@@ -267,14 +265,14 @@ struct initial_code_block_visitor {
 		case RT_LITERAL:
 			op.store_value(next_literal());
 			break;
-		case RT_XT:
-			op.store_value(parent->compute_xt_address(next_literal()));
+		case RT_ENTRY_POINT:
+			op.store_value(parent->compute_entry_point_address(next_literal()));
 			break;
-		case RT_XT_PIC:
-			op.store_value(parent->compute_xt_pic_address(next_literal()));
+		case RT_ENTRY_POINT_PIC:
+			op.store_value(parent->compute_entry_point_pic_address(next_literal()));
 			break;
-		case RT_XT_PIC_TAIL:
-			op.store_value(parent->compute_xt_pic_tail_address(next_literal()));
+		case RT_ENTRY_POINT_PIC_TAIL:
+			op.store_value(parent->compute_entry_point_pic_tail_address(next_literal()));
 			break;
 		case RT_HERE:
 			op.store_value(parent->compute_here_address(next_literal(),op.rel_offset(),op.parent_code_block()));
@@ -320,7 +318,7 @@ void factor_vm::fixup_labels(array *labels, code_block *compiled)
 		relocation_entry new_entry(RT_HERE,rel_class,offset);
 
 		instruction_operand op(new_entry,compiled,0);
-		op.store_value(target + (cell)compiled->xt());
+		op.store_value(target + (cell)compiled->entry_point());
 	}
 }
 
