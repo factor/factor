@@ -22,7 +22,7 @@ void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 		p->aging_size,
 		p->tenured_size);
 
-	fixnum bytes_read = fread((void*)data->tenured->start,1,h->data_size,file);
+	fixnum bytes_read = safe_fread((void*)data->tenured->start,1,h->data_size,file);
 
 	if((cell)bytes_read != h->data_size)
 	{
@@ -43,7 +43,7 @@ void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 
 	if(h->code_size != 0)
 	{
-		size_t bytes_read = fread(code->allocator->first_block(),1,h->code_size,file);
+		size_t bytes_read = safe_fread(code->allocator->first_block(),1,h->code_size,file);
 		if(bytes_read != h->code_size)
 		{
 			std::cout << "truncated image: " << bytes_read << " bytes read, ";
@@ -241,7 +241,7 @@ void factor_vm::load_image(vm_parameters *p)
 	}
 
 	image_header h;
-	if(fread(&h,sizeof(image_header),1,file) != 1)
+	if(safe_fread(&h,sizeof(image_header),1,file) != 1)
 		fatal_error("Cannot read image header",0);
 
 	if(h.magic != image_magic)
@@ -253,7 +253,7 @@ void factor_vm::load_image(vm_parameters *p)
 	load_data_heap(file,&h,p);
 	load_code_heap(file,&h,p);
 
-	fclose(file);
+	safe_fclose(file);
 
 	init_objects(&h);
 
@@ -298,10 +298,10 @@ bool factor_vm::save_image(const vm_char *filename)
 
 	bool ok = true;
 
-	if(fwrite(&h,sizeof(image_header),1,file) != 1) ok = false;
-	if(fwrite((void*)data->tenured->start,h.data_size,1,file) != 1) ok = false;
-	if(fwrite(code->allocator->first_block(),h.code_size,1,file) != 1) ok = false;
-	if(fclose(file)) ok = false;
+	if(safe_fwrite(&h,sizeof(image_header),1,file) != 1) ok = false;
+	if(safe_fwrite((void*)data->tenured->start,h.data_size,1,file) != 1) ok = false;
+	if(safe_fwrite(code->allocator->first_block(),h.code_size,1,file) != 1) ok = false;
+	if(safe_fclose(file)) ok = false;
 
 	if(!ok)
 		std::cout << "save-image failed: " << strerror(errno) << std::endl;
