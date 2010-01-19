@@ -121,7 +121,7 @@ CONSTANT: fov 0.7
 : wasd-mouse-input ( world -- )
     read-mouse rotate-with-mouse ;
 
-M: wasd-world tick*
+M: wasd-world tick-game-world
     dup focused?>> [
         [ wasd-keyboard-input ] [ wasd-mouse-input ] bi
         reset-mouse
