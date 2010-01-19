@@ -648,6 +648,8 @@ M: bad-executable summary
 
 \ fseek { alien integer integer } { } define-primitive
 
+\ ftell { alien } { integer } define-primitive
+
 \ fclose { alien } { } define-primitive
 
 \ <wrapper> { object } { wrapper } define-primitive

@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions kernel kernel.private
 slots.private math namespaces sequences strings vectors sbufs
@@ -21,20 +21,6 @@ M: word definer drop \ : \ ; ;
 
 M: word definition def>> ;
 
-ERROR: undefined ;
-
-PREDICATE: deferred < word ( obj -- ? )
-    def>> [ undefined ] = ;
-M: deferred definer drop \ DEFER: f ;
-M: deferred definition drop f ;
-
-PREDICATE: primitive < word ( obj -- ? )
-    [ def>> [ do-primitive ] tail? ]
-    [ sub-primitive>> >boolean ]
-    bi or ;
-M: primitive definer drop \ PRIMITIVE: f ;
-M: primitive definition drop f ;
-
 : word-prop ( word name -- value ) swap props>> at ;
 
 : remove-word-prop ( word name -- ) swap props>> delete-at ;
@@ -45,6 +31,16 @@ M: primitive definition drop f ;
     [ nip remove-word-prop ] if ;
 
 : reset-props ( word seq -- ) [ remove-word-prop ] with each ;
+
+ERROR: undefined ;
+
+PREDICATE: deferred < word ( obj -- ? ) def>> [ undefined ] = ;
+M: deferred definer drop \ DEFER: f ;
+M: deferred definition drop f ;
+
+PREDICATE: primitive < word ( obj -- ? ) "primitive" word-prop ;
+M: primitive definer drop \ PRIMITIVE: f ;
+M: primitive definition drop f ;
 
 : lookup ( name vocab -- word ) vocab-words at ;
 

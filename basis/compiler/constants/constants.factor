@@ -47,19 +47,18 @@ CONSTANT: rc-indirect-arm-pc 9
 CONSTANT: rc-absolute-2 10
 
 ! Relocation types
-CONSTANT: rt-primitive 0
-CONSTANT: rt-dlsym 1
-CONSTANT: rt-entry-point 2
-CONSTANT: rt-entry-point-pic 3
-CONSTANT: rt-entry-point-pic-tail 4
-CONSTANT: rt-here 5
-CONSTANT: rt-this 6
-CONSTANT: rt-literal 7
-CONSTANT: rt-untagged 8
-CONSTANT: rt-megamorphic-cache-hits 9
-CONSTANT: rt-vm 10
-CONSTANT: rt-cards-offset 11
-CONSTANT: rt-decks-offset 12
+CONSTANT: rt-dlsym 0
+CONSTANT: rt-entry-point 1
+CONSTANT: rt-entry-point-pic 2
+CONSTANT: rt-entry-point-pic-tail 3
+CONSTANT: rt-here 4
+CONSTANT: rt-this 5
+CONSTANT: rt-literal 6
+CONSTANT: rt-untagged 7
+CONSTANT: rt-megamorphic-cache-hits 8
+CONSTANT: rt-vm 9
+CONSTANT: rt-cards-offset 10
+CONSTANT: rt-decks-offset 11
 
 : rc-absolute? ( n -- ? )
     ${ rc-absolute-ppc-2/2 rc-absolute-cell rc-absolute } member? ;

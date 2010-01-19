@@ -2,9 +2,7 @@ namespace factor
 {
 
 enum relocation_type {
-	/* arg is a primitive number */
-	RT_PRIMITIVE,
-	/* arg is a literal table index, holding an array pair (symbol/dll) */
+	/* arg is a literal table index, holding a pair (symbol/dll) */
 	RT_DLSYM,
 	/* a word or quotation's general entry point */
 	RT_ENTRY_POINT,
@@ -93,7 +91,6 @@ struct relocation_entry {
 	{
 		switch(rel_type())
 		{
-		case RT_PRIMITIVE:
 		case RT_VM:
 			return 1;
 		case RT_DLSYM:

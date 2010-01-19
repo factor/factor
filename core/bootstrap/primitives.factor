@@ -1,11 +1,11 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays byte-arrays generic hashtables
-hashtables.private io kernel math math.private math.order
-namespaces make parser sequences strings vectors words
-quotations assocs layouts classes classes.builtin classes.tuple
-classes.tuple.private kernel.private vocabs vocabs.loader
-source-files definitions slots classes.union
+USING: alien alien.strings arrays byte-arrays generic hashtables
+hashtables.private io io.encodings.ascii kernel math
+math.private math.order namespaces make parser sequences strings
+vectors words quotations assocs layouts classes classes.builtin
+classes.tuple classes.tuple.private kernel.private vocabs
+vocabs.loader source-files definitions slots classes.union
 classes.intersection classes.predicate compiler.units
 bootstrap.image.private io.files accessors combinators ;
 IN: bootstrap.primitives
@@ -309,7 +309,11 @@ tuple
 
 ! Sub-primitive words
 : make-sub-primitive ( word vocab effect -- )
-    [ create dup 1quotation ] dip define-declared ;
+    [
+        create
+        dup t "primitive" set-word-prop
+        dup 1quotation
+    ] dip define-declared ;
 
 {
     { "mega-cache-lookup" "generic.single.private" (( methods index cache -- )) }
@@ -364,169 +368,173 @@ tuple
 } [ first3 make-sub-primitive ] each
 
 ! Primitive words
-: make-primitive ( word vocab n effect -- )
+: make-primitive ( word vocab function effect -- )
     [
-        [ create dup reset-word ] dip
-        [ do-primitive ] curry
+        [
+            create
+            dup reset-word
+            dup t "primitive" set-word-prop
+        ] dip
+        ascii string>alien [ do-primitive ] curry
     ] dip define-declared ;
 
 {
-    { "bignum>fixnum" "math.private" (( x -- y )) }
-    { "float>fixnum" "math.private" (( x -- y )) }
-    { "fixnum>bignum" "math.private" (( x -- y )) }
-    { "float>bignum" "math.private" (( x -- y )) }
-    { "fixnum>float" "math.private" (( x -- y )) }
-    { "bignum>float" "math.private" (( x -- y )) }
-    { "(string>float)" "math.parser.private" (( str -- n/f )) }
-    { "(float>string)" "math.parser.private" (( n -- str )) }
-    { "float>bits" "math" (( x -- n )) }
-    { "double>bits" "math" (( x -- n )) }
-    { "bits>float" "math" (( n -- x )) }
-    { "bits>double" "math" (( n -- x )) }
-    { "fixnum/i" "math.private" (( x y -- z )) }
-    { "fixnum/mod" "math.private" (( x y -- z w )) }
-    { "fixnum-shift" "math.private" (( x y -- z )) }
-    { "bignum=" "math.private" (( x y -- ? )) }
-    { "bignum+" "math.private" (( x y -- z )) }
-    { "bignum-" "math.private" (( x y -- z )) }
-    { "bignum*" "math.private" (( x y -- z )) }
-    { "bignum/i" "math.private" (( x y -- z )) }
-    { "bignum-mod" "math.private" (( x y -- z )) }
-    { "bignum/mod" "math.private" (( x y -- z w )) }
-    { "bignum-bitand" "math.private" (( x y -- z )) }
-    { "bignum-bitor" "math.private" (( x y -- z )) }
-    { "bignum-bitxor" "math.private" (( x y -- z )) }
-    { "bignum-bitnot" "math.private" (( x -- y )) }
-    { "bignum-shift" "math.private" (( x y -- z )) }
-    { "bignum<" "math.private" (( x y -- ? )) }
-    { "bignum<=" "math.private" (( x y -- ? )) }
-    { "bignum>" "math.private" (( x y -- ? )) }
-    { "bignum>=" "math.private" (( x y -- ? )) }
-    { "bignum-bit?" "math.private" (( n x -- ? )) }
-    { "bignum-log2" "math.private" (( x -- n )) }
-    { "byte-array>bignum" "math" (( x -- y ))  }
-    { "float=" "math.private" (( x y -- ? )) }
-    { "float+" "math.private" (( x y -- z )) }
-    { "float-" "math.private" (( x y -- z )) }
-    { "float*" "math.private" (( x y -- z )) }
-    { "float/f" "math.private" (( x y -- z )) }
-    { "float-mod" "math.private" (( x y -- z )) }
-    { "float<" "math.private" (( x y -- ? )) }
-    { "float<=" "math.private" (( x y -- ? )) }
-    { "float>" "math.private" (( x y -- ? )) }
-    { "float>=" "math.private" (( x y -- ? )) }
-    { "float-u<" "math.private" (( x y -- ? )) }
-    { "float-u<=" "math.private" (( x y -- ? )) }
-    { "float-u>" "math.private" (( x y -- ? )) }
-    { "float-u>=" "math.private" (( x y -- ? )) }
-    { "(word)" "words.private" (( name vocab -- word )) }
-    { "word-code" "words" (( word -- start end )) }
-    { "special-object" "kernel.private" (( n -- obj )) }
-    { "set-special-object" "kernel.private" (( obj n -- )) }
-    { "(exists?)" "io.files.private" (( path -- ? )) }
-    { "minor-gc" "memory" (( -- )) }
-    { "gc" "memory" (( -- )) }
-    { "compact-gc" "memory" (( -- )) }
-    { "(save-image)" "memory.private" (( path -- )) }
-    { "(save-image-and-exit)" "memory.private" (( path -- )) }
-    { "datastack" "kernel" (( -- ds )) }
-    { "retainstack" "kernel" (( -- rs )) }
-    { "callstack" "kernel" (( -- cs )) }
-    { "set-datastack" "kernel.private" (( ds -- )) }
-    { "set-retainstack" "kernel.private" (( rs -- )) }
-    { "(exit)" "system" (( n -- )) }
-    { "data-room" "memory" (( -- data-room )) }
-    { "code-room" "memory" (( -- code-room )) }
-    { "system-micros" "system" (( -- us )) }
-    { "nano-count" "system" (( -- ns )) }
-    { "modify-code-heap" "compiler.units" (( alist -- )) }
-    { "(dlopen)" "alien.libraries" (( path -- dll )) }
-    { "(dlsym)" "alien.libraries" (( name dll -- alien )) }
-    { "dlclose" "alien.libraries" (( dll -- )) }
-    { "<byte-array>" "byte-arrays" (( n -- byte-array )) }
-    { "(byte-array)" "byte-arrays" (( n -- byte-array )) }
-    { "<displaced-alien>" "alien" (( displacement c-ptr -- alien )) }
-    { "alien-signed-cell" "alien.accessors" (( c-ptr n -- value )) }
-    { "set-alien-signed-cell" "alien.accessors" (( value c-ptr n -- )) }
-    { "alien-unsigned-cell" "alien.accessors" (( c-ptr n -- value )) }
-    { "set-alien-unsigned-cell" "alien.accessors" (( value c-ptr n -- )) }
-    { "alien-signed-8" "alien.accessors" (( c-ptr n -- value )) }
-    { "set-alien-signed-8" "alien.accessors" (( value c-ptr n -- )) }
-    { "alien-unsigned-8" "alien.accessors" (( c-ptr n -- value )) }
-    { "set-alien-unsigned-8" "alien.accessors" (( value c-ptr n -- )) }
-    { "alien-signed-4" "alien.accessors" (( c-ptr n -- value )) }
-    { "set-alien-signed-4" "alien.accessors" (( value c-ptr n -- )) }
-    { "alien-unsigned-4" "alien.accessors" (( c-ptr n -- value )) }
-    { "set-alien-unsigned-4" "alien.accessors" (( value c-ptr n -- )) }
-    { "alien-signed-2" "alien.accessors" (( c-ptr n -- value )) }
-    { "set-alien-signed-2" "alien.accessors" (( value c-ptr n -- )) }
-    { "alien-unsigned-2" "alien.accessors" (( c-ptr n -- value )) }
-    { "set-alien-unsigned-2" "alien.accessors" (( value c-ptr n -- )) }
-    { "alien-signed-1" "alien.accessors" (( c-ptr n -- value )) }
-    { "set-alien-signed-1" "alien.accessors" (( value c-ptr n -- )) }
-    { "alien-unsigned-1" "alien.accessors" (( c-ptr n -- value )) }
-    { "set-alien-unsigned-1" "alien.accessors" (( value c-ptr n -- )) }
-    { "alien-float" "alien.accessors" (( c-ptr n -- value )) }
-    { "set-alien-float" "alien.accessors" (( value c-ptr n -- )) }
-    { "alien-double" "alien.accessors" (( c-ptr n -- value )) }
-    { "set-alien-double" "alien.accessors" (( value c-ptr n -- )) }
-    { "alien-cell" "alien.accessors" (( c-ptr n -- value )) }
-    { "set-alien-cell" "alien.accessors" (( value c-ptr n -- )) }
-    { "alien-address" "alien" (( c-ptr -- addr )) }
-    { "set-slot" "slots.private" (( value obj n -- )) }
-    { "string-nth" "strings.private" (( n string -- ch )) }
-    { "set-string-nth-fast" "strings.private" (( ch n string -- )) }
-    { "set-string-nth-slow" "strings.private" (( ch n string -- )) }
-    { "resize-array" "arrays" (( n array -- newarray )) }
-    { "resize-string" "strings" (( n str -- newstr )) }
-    { "<array>" "arrays" (( n elt -- array )) }
-    { "all-instances" "memory" (( -- array )) }
-    { "size" "memory" (( obj -- n )) }
-    { "die" "kernel" (( -- )) }
-    { "(fopen)" "io.streams.c" (( path mode -- alien )) }
-    { "fgetc" "io.streams.c" (( alien -- ch/f )) }
-    { "fread" "io.streams.c" (( n alien -- str/f )) }
-    { "fputc" "io.streams.c" (( ch alien -- )) }
-    { "fwrite" "io.streams.c" (( string alien -- )) }
-    { "fflush" "io.streams.c" (( alien -- )) }
-    { "ftell" "io.streams.c" (( alien -- n )) }
-    { "fseek" "io.streams.c" (( alien offset whence -- )) }
-    { "fclose" "io.streams.c" (( alien -- )) }
-    { "<wrapper>" "kernel" (( obj -- wrapper )) }
-    { "(clone)" "kernel" (( obj -- newobj )) }
-    { "<string>" "strings" (( n ch -- string )) }
-    { "array>quotation" "quotations.private" (( array -- quot )) }
-    { "quotation-code" "quotations" (( quot -- start end )) }
-    { "<tuple>" "classes.tuple.private" (( layout -- tuple )) }
-    { "profiling" "tools.profiler.private" (( ? -- )) }
-    { "become" "kernel.private" (( old new -- )) }
-    { "(sleep)" "threads.private" (( nanos -- )) }
-    { "<tuple-boa>" "classes.tuple.private" (( ... layout -- tuple )) }
-    { "callstack>array" "kernel" (( callstack -- array )) }
-    { "innermost-frame-executing" "kernel.private" (( callstack -- obj )) }
-    { "innermost-frame-scan" "kernel.private" (( callstack -- n )) }
-    { "set-innermost-frame-quot" "kernel.private" (( n callstack -- )) }
-    { "call-clear" "kernel.private" (( quot -- * )) }
-    { "resize-byte-array" "byte-arrays" (( n byte-array -- newbyte-array )) }
-    { "dll-valid?" "alien.libraries" (( dll -- ? )) }
-    { "unimplemented" "kernel.private" (( -- * )) }
-    { "jit-compile" "quotations" (( quot -- )) }
-    { "load-locals" "locals.backend" (( ... n -- )) }
-    { "check-datastack" "kernel.private" (( array in# out# -- ? )) }
-    { "mega-cache-miss" "generic.single.private" (( methods index cache -- method )) }
-    { "lookup-method" "generic.single.private" (( object methods -- method )) }
-    { "reset-dispatch-stats" "tools.dispatch.private" (( -- )) }
-    { "dispatch-stats" "tools.dispatch.private" (( -- stats )) }
-    { "optimized?" "words" (( word -- ? )) }
-    { "quot-compiled?" "quotations" (( quot -- ? )) }
-    { "vm-ptr" "vm" (( -- ptr )) }
-    { "strip-stack-traces" "kernel.private" (( -- )) }
-    { "<callback>" "alien" (( return-rewind word -- alien )) }
-    { "enable-gc-events" "memory" (( -- )) }
-    { "disable-gc-events" "memory" (( -- events )) }
-    { "(identity-hashcode)" "kernel.private" (( obj -- code )) }
-    { "compute-identity-hashcode" "kernel.private" (( obj -- )) }
-} [ [ first3 ] dip swap make-primitive ] each-index
+    { "<callback>" "alien" "primitive_callback" (( return-rewind word -- alien )) }
+    { "<displaced-alien>" "alien" "primitive_displaced_alien" (( displacement c-ptr -- alien )) }
+    { "alien-address" "alien" "primitive_alien_address" (( c-ptr -- addr )) }
+    { "alien-cell" "alien.accessors" "primitive_alien_cell" (( c-ptr n -- value )) }
+    { "alien-double" "alien.accessors" "primitive_alien_double" (( c-ptr n -- value )) }
+    { "alien-float" "alien.accessors" "primitive_alien_float" (( c-ptr n -- value )) }
+    { "alien-signed-1" "alien.accessors" "primitive_alien_signed_1" (( c-ptr n -- value )) }
+    { "alien-signed-2" "alien.accessors" "primitive_alien_signed_2" (( c-ptr n -- value )) }
+    { "alien-signed-4" "alien.accessors" "primitive_alien_signed_4" (( c-ptr n -- value )) }
+    { "alien-signed-8" "alien.accessors" "primitive_alien_signed_8" (( c-ptr n -- value )) }
+    { "alien-signed-cell" "alien.accessors" "primitive_alien_signed_cell" (( c-ptr n -- value )) }
+    { "alien-unsigned-1" "alien.accessors" "primitive_alien_unsigned_1" (( c-ptr n -- value )) }
+    { "alien-unsigned-2" "alien.accessors" "primitive_alien_unsigned_2" (( c-ptr n -- value )) }
+    { "alien-unsigned-4" "alien.accessors" "primitive_alien_unsigned_4" (( c-ptr n -- value )) }
+    { "alien-unsigned-8" "alien.accessors" "primitive_alien_unsigned_8" (( c-ptr n -- value )) }
+    { "alien-unsigned-cell" "alien.accessors" "primitive_alien_unsigned_cell" (( c-ptr n -- value )) }
+    { "set-alien-cell" "alien.accessors" "primitive_set_alien_cell" (( value c-ptr n -- )) }
+    { "set-alien-double" "alien.accessors" "primitive_set_alien_double" (( value c-ptr n -- )) }
+    { "set-alien-float" "alien.accessors" "primitive_set_alien_float" (( value c-ptr n -- )) }
+    { "set-alien-signed-1" "alien.accessors" "primitive_set_alien_signed_1" (( value c-ptr n -- )) }
+    { "set-alien-signed-2" "alien.accessors" "primitive_set_alien_signed_2" (( value c-ptr n -- )) }
+    { "set-alien-signed-4" "alien.accessors" "primitive_set_alien_signed_4" (( value c-ptr n -- )) }
+    { "set-alien-signed-8" "alien.accessors" "primitive_set_alien_signed_8" (( value c-ptr n -- )) }
+    { "set-alien-signed-cell" "alien.accessors" "primitive_set_alien_signed_cell" (( value c-ptr n -- )) }
+    { "set-alien-unsigned-1" "alien.accessors" "primitive_set_alien_unsigned_1" (( value c-ptr n -- )) }
+    { "set-alien-unsigned-2" "alien.accessors" "primitive_set_alien_unsigned_2" (( value c-ptr n -- )) }
+    { "set-alien-unsigned-4" "alien.accessors" "primitive_set_alien_unsigned_4" (( value c-ptr n -- )) }
+    { "set-alien-unsigned-8" "alien.accessors" "primitive_set_alien_unsigned_8" (( value c-ptr n -- )) }
+    { "set-alien-unsigned-cell" "alien.accessors" "primitive_set_alien_unsigned_cell" (( value c-ptr n -- )) }
+    { "(dlopen)" "alien.libraries" "primitive_dlopen" (( path -- dll )) }
+    { "(dlsym)" "alien.libraries" "primitive_dlsym" (( name dll -- alien )) }
+    { "dlclose" "alien.libraries" "primitive_dlclose" (( dll -- )) }
+    { "dll-valid?" "alien.libraries" "primitive_dll_validp" (( dll -- ? )) }
+    { "<array>" "arrays" "primitive_array" (( n elt -- array )) }
+    { "resize-array" "arrays" "primitive_resize_array" (( n array -- newarray )) }
+    { "(byte-array)" "byte-arrays" "primitive_uninitialized_byte_array" (( n -- byte-array )) }
+    { "<byte-array>" "byte-arrays" "primitive_byte_array" (( n -- byte-array )) }
+    { "resize-byte-array" "byte-arrays" "primitive_resize_byte_array" (( n byte-array -- newbyte-array )) }
+    { "<tuple-boa>" "classes.tuple.private" "primitive_tuple_boa" (( ... layout -- tuple )) }
+    { "<tuple>" "classes.tuple.private" "primitive_tuple" (( layout -- tuple )) }
+    { "modify-code-heap" "compiler.units" "primitive_modify_code_heap" (( alist -- )) }
+    { "lookup-method" "generic.single.private" "primitive_lookup_method" (( object methods -- method )) }
+    { "mega-cache-miss" "generic.single.private" "primitive_mega_cache_miss" (( methods index cache -- method )) }
+    { "(exists?)" "io.files.private" "primitive_existsp" (( path -- ? )) }
+    { "(fopen)" "io.streams.c" "primitive_fopen" (( path mode -- alien )) }
+    { "fclose" "io.streams.c" "primitive_fclose" (( alien -- )) }
+    { "fflush" "io.streams.c" "primitive_fflush" (( alien -- )) }
+    { "fgetc" "io.streams.c" "primitive_fgetc" (( alien -- ch/f )) }
+    { "fputc" "io.streams.c" "primitive_fputc" (( ch alien -- )) }
+    { "fread" "io.streams.c" "primitive_fread" (( n alien -- str/f )) }
+    { "fseek" "io.streams.c" "primitive_fseek" (( alien offset whence -- )) }
+    { "ftell" "io.streams.c" "primitive_ftell" (( alien -- n )) }
+    { "fwrite" "io.streams.c" "primitive_fwrite" (( string alien -- )) }
+    { "(clone)" "kernel" "primitive_clone" (( obj -- newobj )) }
+    { "<wrapper>" "kernel" "primitive_wrapper" (( obj -- wrapper )) }
+    { "callstack" "kernel" "primitive_callstack" (( -- cs )) }
+    { "callstack>array" "kernel" "primitive_callstack_to_array" (( callstack -- array )) }
+    { "datastack" "kernel" "primitive_datastack" (( -- ds )) }
+    { "die" "kernel" "primitive_die" (( -- )) }
+    { "retainstack" "kernel" "primitive_retainstack" (( -- rs )) }
+    { "(identity-hashcode)" "kernel.private" "primitive_identity_hashcode" (( obj -- code )) }
+    { "become" "kernel.private" "primitive_become" (( old new -- )) }
+    { "call-clear" "kernel.private" "primitive_call_clear" (( quot -- * )) }
+    { "check-datastack" "kernel.private" "primitive_check_datastack" (( array in# out# -- ? )) }
+    { "compute-identity-hashcode" "kernel.private" "primitive_compute_identity_hashcode" (( obj -- )) }
+    { "innermost-frame-executing" "kernel.private" "primitive_innermost_stack_frame_executing" (( callstack -- obj )) }
+    { "innermost-frame-scan" "kernel.private" "primitive_innermost_stack_frame_scan" (( callstack -- n )) }
+    { "set-datastack" "kernel.private" "primitive_set_datastack" (( ds -- )) }
+    { "set-innermost-frame-quot" "kernel.private" "primitive_set_innermost_stack_frame_quot" (( n callstack -- )) }
+    { "set-retainstack" "kernel.private" "primitive_set_retainstack" (( rs -- )) }
+    { "set-special-object" "kernel.private" "primitive_set_special_object" (( obj n -- )) }
+    { "special-object" "kernel.private" "primitive_special_object" (( n -- obj )) }
+    { "strip-stack-traces" "kernel.private" "primitive_strip_stack_traces" (( -- )) }
+    { "unimplemented" "kernel.private" "primitive_unimplemented" (( -- * )) }
+    { "load-locals" "locals.backend" "primitive_load_locals" (( ... n -- )) }
+    { "bits>double" "math" "primitive_bits_double" (( n -- x )) }
+    { "bits>float" "math" "primitive_bits_float" (( n -- x )) }
+    { "byte-array>bignum" "math" "primitive_byte_array_to_bignum" (( x -- y )) }
+    { "double>bits" "math" "primitive_double_bits" (( x -- n )) }
+    { "float>bits" "math" "primitive_float_bits" (( x -- n )) }
+    { "(float>string)" "math.parser.private" "primitive_float_to_str" (( n -- str )) }
+    { "(string>float)" "math.parser.private" "primitive_str_to_float" (( str -- n/f )) }
+    { "bignum*" "math.private" "primitive_bignum_multiply" (( x y -- z )) }
+    { "bignum+" "math.private" "primitive_bignum_add" (( x y -- z )) }
+    { "bignum-" "math.private" "primitive_bignum_subtract" (( x y -- z )) }
+    { "bignum-bit?" "math.private" "primitive_bignum_bitp" (( n x -- ? )) }
+    { "bignum-bitand" "math.private" "primitive_bignum_and" (( x y -- z )) }
+    { "bignum-bitnot" "math.private" "primitive_bignum_not" (( x -- y )) }
+    { "bignum-bitor" "math.private" "primitive_bignum_or" (( x y -- z )) }
+    { "bignum-bitxor" "math.private" "primitive_bignum_xor" (( x y -- z )) }
+    { "bignum-log2" "math.private" "primitive_bignum_log2" (( x -- n )) }
+    { "bignum-mod" "math.private" "primitive_bignum_mod" (( x y -- z )) }
+    { "bignum-shift" "math.private" "primitive_bignum_shift" (( x y -- z )) }
+    { "bignum/i" "math.private" "primitive_bignum_divint" (( x y -- z )) }
+    { "bignum/mod" "math.private" "primitive_bignum_divmod" (( x y -- z w )) }
+    { "bignum<" "math.private" "primitive_bignum_less" (( x y -- ? )) }
+    { "bignum<=" "math.private" "primitive_bignum_lesseq" (( x y -- ? )) }
+    { "bignum=" "math.private" "primitive_bignum_eq" (( x y -- ? )) }
+    { "bignum>" "math.private" "primitive_bignum_greater" (( x y -- ? )) }
+    { "bignum>=" "math.private" "primitive_bignum_greatereq" (( x y -- ? )) }
+    { "bignum>fixnum" "math.private" "primitive_bignum_to_fixnum" (( x -- y )) }
+    { "bignum>float" "math.private" "primitive_bignum_to_float" (( x -- y )) }
+    { "fixnum-shift" "math.private" "primitive_fixnum_shift" (( x y -- z )) }
+    { "fixnum/i" "math.private" "primitive_fixnum_divint" (( x y -- z )) }
+    { "fixnum/mod" "math.private" "primitive_fixnum_divmod" (( x y -- z w )) }
+    { "fixnum>bignum" "math.private" "primitive_fixnum_to_bignum" (( x -- y )) }
+    { "fixnum>float" "math.private" "primitive_fixnum_to_float" (( x -- y )) }
+    { "float*" "math.private" "primitive_float_multiply" (( x y -- z )) }
+    { "float+" "math.private" "primitive_float_add" (( x y -- z )) }
+    { "float-" "math.private" "primitive_float_subtract" (( x y -- z )) }
+    { "float-mod" "math.private" "primitive_float_mod" (( x y -- z )) }
+    { "float-u<" "math.private" "primitive_float_less" (( x y -- ? )) }
+    { "float-u<=" "math.private" "primitive_float_lesseq" (( x y -- ? )) }
+    { "float-u>" "math.private" "primitive_float_greater" (( x y -- ? )) }
+    { "float-u>=" "math.private" "primitive_float_greatereq" (( x y -- ? )) }
+    { "float/f" "math.private" "primitive_float_divfloat" (( x y -- z )) }
+    { "float<" "math.private" "primitive_float_less" (( x y -- ? )) }
+    { "float<=" "math.private" "primitive_float_lesseq" (( x y -- ? )) }
+    { "float=" "math.private" "primitive_float_eq" (( x y -- ? )) }
+    { "float>" "math.private" "primitive_float_greater" (( x y -- ? )) }
+    { "float>=" "math.private" "primitive_float_greatereq" (( x y -- ? )) }
+    { "float>bignum" "math.private" "primitive_float_to_bignum" (( x -- y )) }
+    { "float>fixnum" "math.private" "primitive_float_to_fixnum" (( x -- y )) }
+    { "all-instances" "memory" "primitive_all_instances" (( -- array )) }
+    { "code-room" "memory" "primitive_code_room" (( -- code-room )) }
+    { "compact-gc" "memory" "primitive_compact_gc" (( -- )) }
+    { "data-room" "memory" "primitive_data_room" (( -- data-room )) }
+    { "disable-gc-events" "memory" "primitive_disable_gc_events" (( -- events )) }
+    { "enable-gc-events" "memory" "primitive_enable_gc_events" (( -- )) }
+    { "gc" "memory" "primitive_full_gc" (( -- )) }
+    { "minor-gc" "memory" "primitive_minor_gc" (( -- )) }
+    { "size" "memory" "primitive_size" (( obj -- n )) }
+    { "(save-image)" "memory.private" "primitive_save_image" (( path -- )) }
+    { "(save-image-and-exit)" "memory.private" "primitive_save_image_and_exit" (( path -- )) }
+    { "jit-compile" "quotations" "primitive_jit_compile" (( quot -- )) }
+    { "quot-compiled?" "quotations" "primitive_quot_compiled_p" (( quot -- ? )) }
+    { "quotation-code" "quotations" "primitive_quotation_code" (( quot -- start end )) }
+    { "array>quotation" "quotations.private" "primitive_array_to_quotation" (( array -- quot )) }
+    { "set-slot" "slots.private" "primitive_set_slot" (( value obj n -- )) }
+    { "<string>" "strings" "primitive_string" (( n ch -- string )) }
+    { "resize-string" "strings" "primitive_resize_string" (( n str -- newstr )) }
+    { "set-string-nth-fast" "strings.private" "primitive_set_string_nth_fast" (( ch n string -- )) }
+    { "set-string-nth-slow" "strings.private" "primitive_set_string_nth_slow" (( ch n string -- )) }
+    { "string-nth" "strings.private" "primitive_string_nth" (( n string -- ch )) }
+    { "(exit)" "system" "primitive_exit" (( n -- )) }
+    { "nano-count" "system" "primitive_nano_count" (( -- ns )) }
+    { "system-micros" "system" "primitive_system_micros" (( -- us )) }
+    { "(sleep)" "threads.private" "primitive_sleep" (( nanos -- )) }
+    { "dispatch-stats" "tools.dispatch.private" "primitive_dispatch_stats" (( -- stats )) }
+    { "reset-dispatch-stats" "tools.dispatch.private" "primitive_reset_dispatch_stats" (( -- )) }
+    { "profiling" "tools.profiler.private" "primitive_profiling" (( ? -- )) }
+    { "vm-ptr" "vm" "primitive_vm_ptr" (( -- ptr )) }
+    { "optimized?" "words" "primitive_optimized_p" (( word -- ? )) }
+    { "word-code" "words" "primitive_word_code" (( word -- start end )) }
+    { "(word)" "words.private" "primitive_word" (( name vocab -- word )) }
+} [ first4 make-primitive ] each
 
 ! Bump build number
 "build" "kernel" create build 1 + [ ] curry (( -- n )) define-declared
