@@ -133,8 +133,8 @@ $nl
 ARTICLE: "word.private" "Word implementation details"
 "The " { $snippet "def" } " slot of a word holds a " { $link quotation } " instance that is called when the word is executed."
 $nl
-"An " { $emphasis "XT" } " (execution token) is the machine code address of a word:"
-{ $subsections word-xt } ;
+"A primitive to get the memory range storing the machine code for a word:"
+{ $subsections word-code } ;
 
 ARTICLE: "words.introspection" "Word introspection"
 "Word introspection facilities and implementation details are found in the " { $vocab-link "words" } " vocabulary."
@@ -209,9 +209,9 @@ HELP: remove-word-prop
 { $description "Removes a word property, so future lookups will output " { $link f } " until it is set again. Word property names are conventionally strings." }
 { $side-effects "word" } ;
 
-HELP: word-xt ( word -- start end )
+HELP: word-code ( word -- start end )
 { $values { "word" word } { "start" "the word's start address" } { "end" "the word's end address" } }
-{ $description "Outputs the machine code address of the word's definition." } ;
+{ $description "Outputs the memory range containing the word's machine code." } ;
 
 HELP: define
 { $values { "word" word } { "def" quotation } }

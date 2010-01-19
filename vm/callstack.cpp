@@ -6,7 +6,7 @@ namespace factor
 void factor_vm::check_frame(stack_frame *frame)
 {
 #ifdef FACTOR_DEBUG
-	check_code_pointer((cell)frame->xt);
+	check_code_pointer((cell)frame->entry_point);
 	assert(frame->size != 0);
 #endif
 }
@@ -63,7 +63,7 @@ void factor_vm::primitive_callstack()
 code_block *factor_vm::frame_code(stack_frame *frame)
 {
 	check_frame(frame);
-	return (code_block *)frame->xt - 1;
+	return (code_block *)frame->entry_point - 1;
 }
 
 code_block_type factor_vm::frame_type(stack_frame *frame)
@@ -105,10 +105,10 @@ cell factor_vm::frame_scan(stack_frame *frame)
 			if(obj.type_p(QUOTATION_TYPE))
 			{
 				char *return_addr = (char *)FRAME_RETURN_ADDRESS(frame,this);
-				char *quot_xt = (char *)(frame_code(frame) + 1);
+				char *quot_entry_point = (char *)(frame_code(frame) + 1);
 
 				return tag_fixnum(quot_code_offset_to_scan(
-					obj.value(),(cell)(return_addr - quot_xt)));
+					obj.value(),(cell)(return_addr - quot_entry_point)));
 			}    
 			else
 				return false_object;
@@ -190,9 +190,9 @@ void factor_vm::primitive_set_innermost_stack_frame_quot()
 	jit_compile_quot(quot.value(),true);
 
 	stack_frame *inner = innermost_stack_frame(callstack.untagged());
-	cell offset = (char *)FRAME_RETURN_ADDRESS(inner,this) - (char *)inner->xt;
-	inner->xt = quot->xt;
-	FRAME_RETURN_ADDRESS(inner,this) = (char *)quot->xt + offset;
+	cell offset = (char *)FRAME_RETURN_ADDRESS(inner,this) - (char *)inner->entry_point;
+	inner->entry_point = quot->entry_point;
+	FRAME_RETURN_ADDRESS(inner,this) = (char *)quot->entry_point + offset;
 }
 
 }

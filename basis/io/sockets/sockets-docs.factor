@@ -155,7 +155,7 @@ HELP: with-client
 HELP: <server>
 { $values  { "addrspec" "an address specifier" } { "encoding" "an encoding descriptor" } { "server" "a handle" } }
 { $description
-    "Begins listening for network connections to a local address. Server objects responds to two words:"
+    "Begins listening for network connections to a local address. Server objects respond to two words:"
     { $list
         { { $link dispose } " - stops listening on the port and frees all associated resources" }
         { { $link accept } " - blocks until there is a connection, and returns a stream of the encoding passed to the constructor" }

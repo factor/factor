@@ -32,7 +32,6 @@ SYMBOL: compiled
         [ "forgotten" word-prop ]
         [ compiled get key? ]
         [ inlined-block? ]
-        [ primitive? ]
     } 1|| not ;
 
 : queue-compile ( word -- )
@@ -126,7 +125,10 @@ M: word combinator? inline? ;
     } cond ;
 
 : optimize? ( word -- ? )
-    single-generic? not ;
+    {
+        [ single-generic? ]
+        [ primitive? ]
+    } 1|| not ;
 
 : contains-breakpoints? ( -- ? )
     dependencies get keys [ "break?" word-prop ] any? ;

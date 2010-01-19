@@ -81,7 +81,7 @@ M: ppc %inc-r ( n -- ) rs-reg (%inc) ;
 HOOK: reserved-area-size os ( -- n )
 
 ! The start of the stack frame contains the size of this frame
-! as well as the currently executing XT
+! as well as the currently executing code block
 : factor-area-size ( -- n ) 2 cells ; foldable
 : next-save ( n -- i ) cell - ; foldable
 : xt-save ( n -- i ) 2 cells - ; foldable
@@ -702,7 +702,7 @@ M: ppc %alien-invoke ( symbol dll -- )
 M: ppc %alien-callback ( quot -- )
     3 4 %restore-context
     3 swap %load-reference
-    4 3 quot-xt-offset LWZ
+    4 3 quot-entry-point-offset LWZ
     4 MTLR
     BLRL
     3 4 %save-context ;

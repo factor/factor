@@ -1,9 +1,9 @@
-! Copyright (C) 2008 Slava Pestov, Jorge Acereda Macia.
+! Copyright (C) 2008, 2010 Slava Pestov, Jorge Acereda Macia.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files io.files.temp io words alien kernel math.parser
-alien.syntax io.launcher assocs arrays sequences
-namespaces make system math io.encodings.ascii
-accessors tools.disassembler ;
+alien.syntax io.launcher assocs arrays sequences namespaces make
+system math io.encodings.ascii accessors tools.disassembler
+tools.disassembler.private ;
 IN: tools.disassembler.gdb
 
 SINGLETON: gdb-disassembler

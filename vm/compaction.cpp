@@ -104,16 +104,16 @@ struct code_block_compaction_relocation_visitor {
 
 	void operator()(instruction_operand op)
 	{
-		cell old_offset = op.rel_offset() + (cell)old_address->xt();
+		cell old_offset = op.rel_offset() + (cell)old_address->entry_point();
 
 		switch(op.rel_type())
 		{
 		case RT_LITERAL:
 			op.store_value(slot_forwarder.visit_pointer(op.load_value(old_offset)));
 			break;
-		case RT_XT:
-		case RT_XT_PIC:
-		case RT_XT_PIC_TAIL:
+		case RT_ENTRY_POINT:
+		case RT_ENTRY_POINT_PIC:
+		case RT_ENTRY_POINT_PIC_TAIL:
 			op.store_code_block(code_forwarder.visit_code_block(op.load_code_block(old_offset)));
 			break;
 		case RT_HERE:
