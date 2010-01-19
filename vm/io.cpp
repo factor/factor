@@ -31,6 +31,39 @@ void factor_vm::io_error()
 	general_error(ERROR_IO,tag_fixnum(errno),false_object,NULL);
 }
 
+size_t safe_fread(void *ptr, size_t size, size_t nitems, FILE *stream)
+{
+    size_t items_read = 0;
+
+    do {
+        items_read += fread((void*)((int*)ptr+items_read*size),size,nitems-items_read,stream);
+    } while(items_read != nitems && errno == EINTR);
+
+    return items_read;
+}
+
+size_t safe_fwrite(void *ptr, size_t size, size_t nitems, FILE *stream)
+{
+    size_t items_written = 0;
+
+    do {
+        items_written += fwrite((void*)((int*)ptr+items_written*size),size,nitems-items_written,stream);
+    } while(items_written != nitems && errno == EINTR);
+
+    return items_written;
+}
+
+int safe_fclose(FILE *stream)
+{
+    int ret = 0;
+
+    do {
+        ret = fclose(stream);
+    } while(ret != 0 && errno == EINTR);
+
+    return ret;
+}
+
 void factor_vm::primitive_fopen()
 {
 	data_root<byte_array> mode(ctx->pop(),this);
@@ -38,18 +71,15 @@ void factor_vm::primitive_fopen()
 	mode.untag_check(this);
 	path.untag_check(this);
 
-	for(;;)
-	{
-		FILE *file = fopen((char *)(path.untagged() + 1),
+	FILE *file;
+	do {
+		file = fopen((char *)(path.untagged() + 1),
 				   (char *)(mode.untagged() + 1));
 		if(file == NULL)
 			io_error();
-		else
-		{
-			ctx->push(allot_alien(file));
-			break;
-		}
-	}
+	} while(errno == EINTR);
+
+	ctx->push(allot_alien(file));
 }
 
 FILE *factor_vm::pop_file_handle()
@@ -61,8 +91,7 @@ void factor_vm::primitive_fgetc()
 {
 	FILE *file = pop_file_handle();
 
-	for(;;)
-	{
+	do {
 		int c = fgetc(file);
 		if(c == EOF)
 		{
@@ -79,7 +108,7 @@ void factor_vm::primitive_fgetc()
 			ctx->push(tag_fixnum(c));
 			break;
 		}
-	}
+	} while(errno == EINTR);
 }
 
 void factor_vm::primitive_fread()
@@ -97,8 +126,8 @@ void factor_vm::primitive_fread()
 
 	for(;;)
 	{
-		int c = fread(buf.untagged() + 1,1,size,file);
-		if(c <= 0)
+		int c = safe_fread(buf.untagged() + 1,1,size,file);
+		if(c == 0)
 		{
 			if(feof(file))
 			{
@@ -110,12 +139,13 @@ void factor_vm::primitive_fread()
 		}
 		else
 		{
-			if(c != size)
+			if(feof(file))
 			{
 				byte_array *new_buf = allot_byte_array(c);
 				memcpy(new_buf + 1, buf.untagged() + 1,c);
 				buf = new_buf;
 			}
+
 			ctx->push(buf.value());
 			break;
 		}
@@ -127,17 +157,12 @@ void factor_vm::primitive_fputc()
 	FILE *file = pop_file_handle();
 	fixnum ch = to_fixnum(ctx->pop());
 
-	for(;;)
-	{
+	do {
 		if(fputc(ch,file) == EOF)
-		{
 			io_error();
-
-			/* Still here? EINTR */
-		}
 		else
 			break;
-	}
+	} while(errno == EINTR);
 }
 
 void factor_vm::primitive_fwrite()
@@ -150,23 +175,9 @@ void factor_vm::primitive_fwrite()
 	if(length == 0)
 		return;
 
-	for(;;)
-	{
-		size_t written = fwrite(string,1,length,file);
-		if(written == length)
-			break;
-		else
-		{
-			if(feof(file))
-				break;
-			else
-				io_error();
-
-			/* Still here? EINTR */
-			length -= written;
-			string += written;
-		}
-	}
+	size_t written = safe_fwrite(string,1,length,file);
+	if(written != length)
+		io_error();
 }
 
 void factor_vm::primitive_ftell()
@@ -174,8 +185,12 @@ void factor_vm::primitive_ftell()
 	FILE *file = pop_file_handle();
 	off_t offset;
 
-	if((offset = FTELL(file)) == -1)
-		io_error();
+	do {
+		if((offset = FTELL(file)) == -1)
+			io_error();
+		else
+			break;
+	} while(errno == EINTR);
 
 	ctx->push(from_signed_8(offset));
 }
@@ -196,37 +211,30 @@ void factor_vm::primitive_fseek()
 		break;
 	}
 
-	if(FSEEK(file,offset,whence) == -1)
-	{
-		io_error();
-
-		/* Still here? EINTR */
-		critical_error("Don't know what to do; EINTR from fseek()?",0);
-	}
+	do {
+		if(FSEEK(file,offset,whence) == -1)
+			io_error();
+		else
+			break;
+	} while(errno == EINTR);
 }
 
 void factor_vm::primitive_fflush()
 {
 	FILE *file = pop_file_handle();
-	for(;;)
-	{
+	do {
 		if(fflush(file) == EOF)
 			io_error();
 		else
 			break;
-	}
+	} while(errno == EINTR);
 }
 
 void factor_vm::primitive_fclose()
 {
 	FILE *file = pop_file_handle();
-	for(;;)
-	{
-		if(fclose(file) == EOF)
-			io_error();
-		else
-			break;
-	}
+	if(safe_fclose(file) == EOF)
+		io_error();
 }
 
 /* This function is used by FFI I/O. Accessing the errno global directly is
