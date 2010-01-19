@@ -43,7 +43,7 @@ struct code_block
 		return size;
 	}
 
-	void *xt() const
+	void *entry_point() const
 	{
 		return (void *)(this + 1);
 	}

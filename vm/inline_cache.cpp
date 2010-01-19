@@ -11,10 +11,10 @@ void factor_vm::init_inline_caching(int max_size)
 void factor_vm::deallocate_inline_cache(cell return_address)
 {
 	/* Find the call target. */
-	void *old_xt = get_call_target(return_address);
-	check_code_pointer((cell)old_xt);
+	void *old_entry_point = get_call_target(return_address);
+	check_code_pointer((cell)old_entry_point);
 
-	code_block *old_block = (code_block *)old_xt - 1;
+	code_block *old_block = (code_block *)old_entry_point - 1;
 
 	/* Free the old PIC since we know its unreachable */
 	if(old_block->pic_p())
@@ -148,7 +148,7 @@ code_block *factor_vm::compile_inline_cache(fixnum index,
 /* A generic word's definition performs general method lookup. */
 void *factor_vm::megamorphic_call_stub(cell generic_word)
 {
-	return untag<word>(generic_word)->xt;
+	return untag<word>(generic_word)->entry_point;
 }
 
 cell factor_vm::inline_cache_size(cell cache_entries)
@@ -226,7 +226,7 @@ void *factor_vm::inline_cache_miss(cell return_address_)
 			generic_word.value(),
 			methods.value(),
 			new_cache_entries.value(),
-			tail_call_site)->xt();
+			tail_call_site)->entry_point();
 	}
 
 	/* Install the new stub. */

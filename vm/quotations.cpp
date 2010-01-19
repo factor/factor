@@ -43,7 +43,7 @@ void quotation_jit::init_quotation(cell quot)
 
 bool quotation_jit::primitive_call_p(cell i, cell length)
 {
-	return (i + 2) == length && array_nth(elements.untagged(),i + 1) == parent->special_objects[JIT_PRIMITIVE_WORD];
+	return (i + 2) <= length && array_nth(elements.untagged(),i + 1) == parent->special_objects[JIT_PRIMITIVE_WORD];
 }
 
 bool quotation_jit::fast_if_p(cell i, cell length)
@@ -178,7 +178,7 @@ void quotation_jit::iterate_quotation()
 		case WRAPPER_TYPE:
 			push(obj.as<wrapper>()->object);
 			break;
-		case FIXNUM_TYPE:
+		case BYTE_ARRAY_TYPE:
 			/* Primitive calls */
 			if(primitive_call_p(i,length))
 			{
@@ -189,6 +189,7 @@ void quotation_jit::iterate_quotation()
 				parameter(tag_fixnum(0));
 #endif
 				parameter(obj.value());
+				parameter(false_object);
 				emit(parent->special_objects[JIT_PRIMITIVE]);
 
 				i++;
@@ -267,10 +268,10 @@ void quotation_jit::iterate_quotation()
 	}
 }
 
-void factor_vm::set_quot_xt(quotation *quot, code_block *code)
+void factor_vm::set_quot_entry_point(quotation *quot, code_block *code)
 {
 	quot->code = code;
-	quot->xt = code->xt();
+	quot->entry_point = code->entry_point();
 }
 
 /* Allocates memory */
@@ -296,7 +297,7 @@ void factor_vm::jit_compile_quot(cell quot_, bool relocating)
 	if(!quot_compiled_p(quot.untagged()))
 	{
 		code_block *compiled = jit_compile_quot(quot.value(),quot.value(),relocating);
-		set_quot_xt(quot.untagged(),compiled);
+		set_quot_entry_point(quot.untagged(),compiled);
 	}
 }
 
@@ -318,15 +319,17 @@ void factor_vm::primitive_array_to_quotation()
 	quot->array = ctx->peek();
 	quot->cached_effect = false_object;
 	quot->cache_counter = false_object;
-	set_quot_xt(quot,lazy_jit_compile_block());
+	set_quot_entry_point(quot,lazy_jit_compile_block());
 
 	ctx->replace(tag<quotation>(quot));
 }
 
-void factor_vm::primitive_quotation_xt()
+void factor_vm::primitive_quotation_code()
 {
-	quotation *quot = untag_check<quotation>(ctx->peek());
-	ctx->replace(allot_cell((cell)quot->xt));
+	quotation *quot = untag_check<quotation>(ctx->pop());
+
+	ctx->push(allot_cell((cell)quot->code->entry_point()));
+	ctx->push(allot_cell((cell)quot->code + quot->code->size()));
 }
 
 /* Allocates memory */
@@ -346,7 +349,12 @@ fixnum factor_vm::quot_code_offset_to_scan(cell quot_, cell offset)
 cell factor_vm::lazy_jit_compile(cell quot_)
 {
 	data_root<quotation> quot(quot_,this);
-	jit_compile_quot(quot.value(),true);
+
+	assert(!quot_compiled_p(quot.untagged()));
+
+	code_block *compiled = jit_compile_quot(quot.value(),quot.value(),true);
+	set_quot_entry_point(quot.untagged(),compiled);
+
 	return quot.value();
 }
 
@@ -381,7 +389,7 @@ void factor_vm::initialize_all_quotations()
 	{
 		data_root<quotation> quot(array_nth(quotations.untagged(),i),this);
 		if(!quot->code)
-			set_quot_xt(quot.untagged(),lazy_jit_compile_block());
+			set_quot_entry_point(quot.untagged(),lazy_jit_compile_block());
 	}
 }
 

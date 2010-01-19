@@ -30,7 +30,7 @@ IN: bootstrap.x86
 [
     ! save stack frame size
     stack-frame-size PUSH
-    ! push XT
+    ! push entry point
     0 PUSH rc-absolute-cell rt-this jit-rel
     ! alignment
     ESP stack-frame-size 3 bootstrap-cells - SUB
@@ -59,7 +59,7 @@ IN: bootstrap.x86
     jit-save-context
     ! call the primitive
     ESP [] vm-reg MOV
-    0 CALL rc-relative rt-primitive jit-rel
+    0 CALL rc-relative rt-dlsym jit-rel
     ! restore ds, rs registers
     jit-restore-context
 ] jit-primitive jit-define
@@ -74,7 +74,7 @@ IN: bootstrap.x86
     EDX stack-reg stack-frame-size 4 - [+] LEA
     ctx-reg context-callstack-bottom-offset [+] EDX MOV
     ! call the quotation
-    EAX quot-xt-offset [+] CALL
+    EAX quot-entry-point-offset [+] CALL
     ! save ds, rs registers
     jit-save-context
 ] \ c-to-factor define-sub-primitive
@@ -83,8 +83,8 @@ IN: bootstrap.x86
     EAX ds-reg [] MOV
     ds-reg bootstrap-cell SUB
 ]
-[ EAX quot-xt-offset [+] CALL ]
-[ EAX quot-xt-offset [+] JMP ]
+[ EAX quot-entry-point-offset [+] CALL ]
+[ EAX quot-entry-point-offset [+] JMP ]
 \ (call) define-combinator-primitive
 
 [
@@ -108,7 +108,7 @@ IN: bootstrap.x86
     jit-restore-context
 
     ! Call quotation
-    EAX quot-xt-offset [+] JMP
+    EAX quot-entry-point-offset [+] JMP
 ] \ unwind-native-frames define-sub-primitive
 
 [
@@ -150,8 +150,8 @@ IN: bootstrap.x86
     ! Call VM
     0 CALL "lazy_jit_compile" f rc-relative jit-dlsym
 ]
-[ EAX quot-xt-offset [+] CALL ]
-[ EAX quot-xt-offset [+] JMP ]
+[ EAX quot-entry-point-offset [+] CALL ]
+[ EAX quot-entry-point-offset [+] JMP ]
 \ lazy-jit-compile define-combinator-primitive
 
 ! Inline cache miss entry points

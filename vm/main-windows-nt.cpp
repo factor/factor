@@ -21,7 +21,7 @@ int WINAPI WinMain(
 	int argc;
 	wchar_t **argv;
 
-	factor::parse_args(&argc, &argv, (wchar_t *)GetCommandLine());
+	argv = CommandLineToArgvW(GetCommandLine(),&argc);
 	wmain(argc,argv);
 
 	// memory leak from malloc, wcsdup
