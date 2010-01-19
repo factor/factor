@@ -72,6 +72,6 @@ clean:
 	del factor.dll
 	del factor.dll.lib
 
-.PHONY: clean
+.PHONY: all clean
 
 .SUFFIXES: .rs
