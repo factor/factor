@@ -1,8 +1,9 @@
+! (c)2009 Joe Groff bsd license
 USING: alien.c-types alien.syntax audio combinators endian
 combinators.short-circuit io io.binary io.encodings.binary
 io.files io.streams.byte-array kernel locals math
 sequences alien alien.data classes.struct accessors
-audio.chunked-file ;
+audio.chunked-file audio.loader ;
 IN: audio.wav
 
 CONSTANT: RIFF-MAGIC "RIFF"
@@ -40,6 +41,7 @@ STRUCT: wav-data-chunk
     [ {
         { [ dup FMT-MAGIC  wav-fmt-chunk  check-chunk ] [ wav-fmt-chunk  memory>struct fmt!  ] }
         { [ dup DATA-MAGIC wav-data-chunk check-chunk ] [ wav-data-chunk memory>struct data! ] }
+        [ drop ]
     } cond ] while drop
     fmt data 2dup and [ invalid-audio-file ] unless ;
 
@@ -68,3 +70,5 @@ STRUCT: wav-data-chunk
             read-riff-chunk verify-wav (read-wav)
         ] with-file-reader
     ] with-endianness ;
+
+"wav" [ read-wav ] register-audio-extension
