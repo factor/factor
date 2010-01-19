@@ -6,7 +6,7 @@ math.vectors opengl opengl.capabilities opengl.gl
 opengl.shaders opengl.textures opengl.textures.private
 sequences sequences.product specialized-arrays
 terrain.generation terrain.shaders typed ui ui.gadgets
-ui.gadgets.worlds ui.pixel-formats game.loop game.worlds
+ui.gadgets.worlds ui.pixel-formats game.worlds
 math.matrices.simd noise ui.gestures combinators.short-circuit
 destructors grid-meshes math.vectors.simd ;
 QUALIFIED-WITH: alien.c-types c
