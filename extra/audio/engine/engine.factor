@@ -1,3 +1,4 @@
+! (c)2009 Joe Groff bsd license
 USING: accessors alien audio classes.struct fry calendar alarms
 combinators combinators.short-circuit destructors generalizations
 kernel literals locals math openal sequences specialized-arrays strings ;

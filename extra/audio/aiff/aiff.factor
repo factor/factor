@@ -1,7 +1,9 @@
+! (c)2009 Joe Groff bsd license
 USING: accessors alien alien.c-types alien.data audio
 audio.chunked-file classes.struct combinators
 combinators.short-circuit endian io io.binary
-io.encodings.binary io.files kernel locals math sequences ;
+io.encodings.binary io.files kernel locals math sequences
+audio.loader ;
 IN: audio.aiff
 
 CONSTANT: FORM-MAGIC "FORM"
@@ -79,3 +81,6 @@ STRUCT: sound-data-chunk
             read-form-chunk verify-aiff (read-aiff)
         ] with-file-reader
     ] with-endianness ;
+
+"aif"  [ read-aiff ] register-audio-extension
+"aiff" [ read-aiff ] register-audio-extension

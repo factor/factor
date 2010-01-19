@@ -1,3 +1,4 @@
+! (c)2009 Joe Groff bsd license
 USING: accessors alien.c-types combinators endian io kernel
 math sequences ;
 IN: audio.chunked-file
