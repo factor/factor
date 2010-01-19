@@ -179,6 +179,9 @@ ERROR: audio-context-not-available device-name ;
         ] times
     ] if ;
 
+: clip-sources ( clips -- length sources )
+    [ length ] [ [ source>> ] uint-array{ } map-as ] bi ;
+
 PRIVATE>
 
 DEFER: update-audio
@@ -258,14 +261,25 @@ M: audio-clip dispose*
     [ update-source ]
     [ al-source>> alSourcePlay ] bi ;
 
+: play-clips ( audio-clips -- )
+    [ [ update-source ] each ]
+    [ clip-sources alSourcePlayv ] bi ;
+
 : <audio-clip> ( audio-engine audio source loop? -- audio-clip/f )
     (audio-clip) dup play-clip ;
 
 : pause-clip ( audio-clip -- )
     al-source>> alSourcePause ;
 
+: pause-clips ( audio-clip -- )
+    clip-sources alSourcePausev ;
+
 : stop-clip ( audio-clip -- )
     dispose ;
+
+: stop-clips ( audio-clip -- )
+    [ clip-sources alSourceStopv ]
+    [ [ dispose ] each ] bi ;
 
 : update-audio ( audio-engine -- )
     {
