@@ -70,9 +70,6 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 : rel-word-pic-tail ( word class -- )
     [ add-literal ] dip rt-entry-point-pic-tail rel-fixup ;
 
-: rel-primitive ( word class -- )
-    [ def>> first add-parameter ] dip rt-primitive rel-fixup ;
-
 : rel-immediate ( literal class -- )
     [ add-literal ] dip rt-literal rel-fixup ;
 

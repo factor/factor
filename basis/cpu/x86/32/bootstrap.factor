@@ -59,7 +59,7 @@ IN: bootstrap.x86
     jit-save-context
     ! call the primitive
     ESP [] vm-reg MOV
-    0 CALL rc-relative rt-primitive jit-rel
+    0 CALL rc-relative rt-dlsym jit-rel
     ! restore ds, rs registers
     jit-restore-context
 ] jit-primitive jit-define

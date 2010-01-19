@@ -1,16 +1,9 @@
 namespace factor
 {
 
-extern "C" typedef void (*primitive_type)(factor_vm *parent);
 #define PRIMITIVE(name) extern "C" void primitive_##name(factor_vm *parent)
-#define PRIMITIVE_FORWARD(name) extern "C" void primitive_##name(factor_vm *parent) \
-{ \
-	parent->primitive_##name(); \
-}
 
-extern const primitive_type primitives[];
-
-/* These are generated with macros in alien.c */
+/* These are generated with macros in alien.cpp */
 PRIMITIVE(alien_signed_cell);
 PRIMITIVE(set_alien_signed_cell);
 PRIMITIVE(alien_unsigned_cell);
