@@ -3,7 +3,7 @@
 USING: kernel accessors arrays alien system combinators
 alien.syntax namespaces alien.c-types sequences vocabs.loader
 shuffle openal.backend alien.libraries generalizations
-specialized-arrays ;
+specialized-arrays alien.destructors ;
 FROM: alien.c-types => float short ;
 SPECIALIZED-ARRAY: uint
 IN: openal
@@ -226,6 +226,9 @@ CONSTANT: ALC_CAPTURE_SAMPLES                      HEX: 312
 FUNCTION: ALCdevice* alcOpenDevice ( ALCchar* deviceSpecifier ) ;
 FUNCTION: ALCboolean alcCloseDevice ( ALCdevice* deviceHandle ) ;
 
+: alcCloseDevice* ( deviceHandle -- )
+    alcCloseDevice drop ;
+
 FUNCTION: ALCcontext* alcCreateContext ( ALCdevice* deviceHandle, ALCint* attrList ) ;
 FUNCTION: ALCboolean alcMakeContextCurrent ( ALCcontext* context ) ;
 FUNCTION: void alcProcessContext ( ALCcontext* context ) ;
@@ -245,6 +248,9 @@ FUNCTION: ALCboolean alcCaptureCloseDevice ( ALCdevice* device ) ;
 FUNCTION: void alcCaptureStart ( ALCdevice* device ) ;
 FUNCTION: void alcCaptureStop ( ALCdevice* device ) ;
 FUNCTION: void alcCaptureSamples ( ALCdevice* device, void* buf, ALCsizei samps ) ;
+
+DESTRUCTOR: alcCloseDevice*
+DESTRUCTOR: alcDestroyContext
 
 LIBRARY: alut
 
