@@ -1,11 +1,12 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! Copyright (C) 2008 Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax kernel libc sequences
-continuations byte-arrays strings math namespaces system
-combinators combinators.smart vocabs.loader accessors
-stack-checker macros locals generalizations unix.types io vocabs
-classes.struct unix.time alien.libraries ;
+USING: accessors alien alien.c-types alien.libraries
+alien.syntax byte-arrays classes.struct combinators
+combinators.short-circuit combinators.smart continuations
+generalizations io kernel libc locals macros math namespaces
+sequences stack-checker strings system unix.time unix.types
+vocabs vocabs.loader ;
 IN: unix
 
 CONSTANT: PROT_NONE   0
@@ -47,17 +48,32 @@ ERROR: unix-error errno message ;
 
 ERROR: unix-system-call-error args errno message word ;
 
+: unix-call-failed? ( ret -- ? )
+    {
+        [ { [ integer? ] [ 0 < ] } 1&& ]
+        [ not ]
+    } 1|| ;
+
 MACRO:: unix-system-call ( quot -- )
     quot inputs :> n
     quot first :> word
+    0 :> ret!
+    f :> failed!
     [
-        n ndup quot call dup 0 < [
-            drop
+        [
+            n ndup quot call ret!
+            ret {
+                [ unix-call-failed? dup failed! ]
+                [ drop errno EINTR = ]
+            } 1&&
+        ] loop
+        failed [
             n narray
             errno dup strerror
             word unix-system-call-error
         ] [
-            n nnip
+            n ndrop
+            ret
         ] if
     ] ;
 

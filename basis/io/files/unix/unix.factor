@@ -6,7 +6,8 @@ destructors system ;
 IN: io.files.unix
 
 M: unix cwd ( -- path )
-    MAXPATHLEN [ <byte-array> ] keep getcwd
+    MAXPATHLEN [ <byte-array> ] keep
+    [ getcwd ] unix-system-call
     [ (io-error) ] unless* ;
 
 M: unix cd ( path -- ) [ chdir ] unix-system-call drop ;
@@ -33,7 +34,7 @@ M: unix (file-writer) ( path -- stream )
 : open-append ( path -- fd )
     [
         append-flags file-mode open-file |dispose
-        dup 0 SEEK_END lseek io-error
+        dup 0 SEEK_END [ lseek ] unix-system-call io-error
     ] with-destructors ;
 
 M: unix (file-appender) ( path -- stream )

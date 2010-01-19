@@ -5,10 +5,10 @@ io.files sequences ;
 IN: io.files.links.unix
 
 M: unix make-link ( path1 path2 -- )
-    normalize-path symlink io-error ;
+    normalize-path [ symlink ] unix-system-call io-error ;
 
 M: unix make-hard-link ( path1 path2 -- )
-    normalize-path link io-error ;
+    normalize-path [ link ] unix-system-call io-error ;
 
 M: unix read-link ( path -- path' )
     normalize-path read-symbolic-link ;
