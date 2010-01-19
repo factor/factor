@@ -59,10 +59,15 @@ M: object (get-remote-address) ( handle local -- sockaddr )
         [ (io-error) ]
     } cond ;
 
-M: object establish-connection ( client-out remote -- )
-    [ drop ] [ [ handle>> handle-fd ] [ make-sockaddr/size ] bi* connect ] 2bi
+M:: object establish-connection ( client-out remote -- )
+    client-out remote
+    [ drop ]
+    [
+        [ handle>> handle-fd ] [ make-sockaddr/size ] bi* connect
+    ] 2bi
     {
         { [ 0 = ] [ drop ] }
+        { [ errno EINTR = ] [ drop client-out remote establish-connection ] }
         { [ errno EINPROGRESS = ] [
             [ +output+ wait-for-port ] [ wait-to-connect ] bi
         ] }
@@ -70,7 +75,12 @@ M: object establish-connection ( client-out remote -- )
     } cond ;
 
 : ?bind-client ( socket -- )
-    bind-local-address get [ [ fd>> ] dip make-sockaddr/size bind io-error ] [ drop ] if* ; inline
+    bind-local-address get [
+        [ fd>> ] dip make-sockaddr/size
+        [ bind ] unix-system-call io-error
+    ] [
+        drop
+    ] if* ; inline
 
 M: object ((client)) ( addrspec -- fd )
     protocol-family SOCK_STREAM socket-fd
@@ -83,7 +93,7 @@ M: object ((client)) ( addrspec -- fd )
 : server-socket-fd ( addrspec type -- fd )
     [ dup protocol-family ] dip socket-fd
     [ init-server-socket ] keep
-    [ handle-fd swap make-sockaddr/size bind io-error ] keep ;
+    [ handle-fd swap make-sockaddr/size [ bind ] unix-system-call io-error ] keep ;
 
 M: object (server) ( addrspec -- handle )
     [
