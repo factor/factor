@@ -121,19 +121,17 @@ ERROR: audio-context-not-available device-name ;
     audio-engine buffer-size>> :> buffer-size
     audio-clip audio>> :> audio
     audio-clip next-data-offset>> :> next-data-offset
-    audio size>> next-data-offset - P :> remaining-audio
+    audio size>> next-data-offset - :> remaining-audio
 
     {
         { [ remaining-audio 0 <= ] [
             audio-clip loop?>> [
-                "queue even wraparound" P drop
                 audio-clip 0 >>next-data-offset
                 al-buffer queue-clip-buffer
             ] when
         ] }
         { [ remaining-audio buffer-size < ] [
             audio-clip loop?>> [
-                "queue wraparound" P drop
                 audio data>>
                 [ next-data-offset swap <displaced-alien> remaining-audio <direct-uchar-array> ]
                 [ buffer-size remaining-audio - <direct-uchar-array> ] bi append :> data
@@ -141,13 +139,11 @@ ERROR: audio-context-not-available device-name ;
 
                 audio-clip [ audio size>> mod ] change-next-data-offset drop
             ] [
-                "queue tail" P drop
                 next-data-offset audio data>> <displaced-alien> :> data
                 audio-clip al-buffer audio data remaining-audio (queue-clip-buffer)
             ] if
         ] }
         [
-            "queue normal" P drop
             next-data-offset audio data>> <displaced-alien> :> data
             audio-clip al-buffer audio data buffer-size (queue-clip-buffer)
         ]
@@ -175,8 +171,8 @@ ERROR: audio-context-not-available device-name ;
     0 c:<uint> :> buffer*
 
     al-source AL_SOURCE_STATE get-source-param AL_STOPPED =
-    [ "stopped" P drop audio-clip dispose ] [
-        al-source AL_BUFFERS_PROCESSED get-source-param P [
+    [ audio-clip dispose ] [
+        al-source AL_BUFFERS_PROCESSED get-source-param [
             al-source 1 buffer* alSourceUnqueueBuffers
             audio-clip buffer* c:*uint queue-clip-buffer
         ] times
