@@ -81,7 +81,7 @@ CONSTANT: fov 0.7
 AFTER: raytrace-world resize-world
     dup dim>> dup first2 min >float v/n fov v*n >>fov drop ;
 
-AFTER: raytrace-world tick*
+AFTER: raytrace-world tick-game-world
     spheres>> [ tick-sphere ] each ;
 
 M: raytrace-world draw-world*
@@ -102,6 +102,7 @@ GAME: raytrace-game {
             double-buffered
         } }
         { grab-input? t }
+        { use-game-input? t }
         { pref-dim { 1024 768 } }
         { tick-interval-micros $[ 60 fps ] }
     } ;
