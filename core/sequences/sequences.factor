@@ -221,8 +221,8 @@ TUPLE: slice-error from to seq reason ;
     3tri ; inline
 
 : <slice> ( from to seq -- slice )
-    dup slice? [ collapse-slice ] when
     check-slice
+    dup slice? [ collapse-slice ] when
     slice boa ; inline
 
 M: slice virtual-exemplar seq>> ; inline
@@ -836,6 +836,12 @@ PRIVATE>
         [ 3dup ] dip [ + swap nth-unsafe ] keep rot nth-unsafe =
     ] all? nip ; inline
 
+: prepare-2map-reduce ( seq1 seq2 map-quot -- initial length seq1 seq2 )
+    [ drop min-length dup 1 < [ "Empty sequence" throw ] when 1 - ]
+    [ drop [ [ 1 + ] 2dip 2nth-unsafe ] 2curry ]
+    [ [ [ first-unsafe ] bi@ ] dip call ]
+    3tri -rot ; inline
+
 PRIVATE>
 
 : start* ( subseq seq n -- i )
@@ -868,8 +874,8 @@ PRIVATE>
     compose reduce ; inline
 
 : 2map-reduce ( seq1 seq2 map-quot reduce-quot -- result )
-    [ [ 2unclip-slice ] dip [ call ] keep ] dip
-    compose 2reduce ; inline
+    [ [ prepare-2map-reduce ] keep ] dip
+    compose compose each-integer ; inline
 
 <PRIVATE
 
