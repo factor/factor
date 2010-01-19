@@ -1,7 +1,8 @@
 USING: alien.c-types alien.syntax audio combinators endian
 combinators.short-circuit io io.binary io.encodings.binary
 io.files io.streams.byte-array kernel locals math
-sequences alien alien.data classes.struct accessors ;
+sequences alien alien.data classes.struct accessors
+audio.chunked-file ;
 IN: audio.wav
 
 CONSTANT: RIFF-MAGIC "RIFF"
@@ -30,23 +31,8 @@ STRUCT: wav-data-chunk
     { header riff-chunk-header }
     { body uchar[0] } ;
 
-ERROR: invalid-audio-file ;
-
-: ensured-read ( count -- output/f )
-    [ read ] keep over length = [ drop f ] unless ;
-: ensured-read* ( count -- output )
-    ensured-read [ invalid-audio-file ] unless* ;
-
-: read-chunk ( -- byte-array/f )
-    4 ensured-read [ 4 ensured-read* dup le> ensured-read* 3append ] [ f ] if* ;
 : read-riff-chunk ( -- byte-array/f )
     riff-chunk heap-size ensured-read* ;
-
-: id= ( chunk id -- ? )
-    [ 4 head ] dip sequence= ; inline
-
-: check-chunk ( chunk id class -- ? )
-    heap-size [ id= ] [ [ length ] dip >= ] bi-curry* bi and ;
 
 :: read-wav-chunks ( -- fmt data )
     f :> fmt! f :> data!
@@ -64,15 +50,6 @@ ERROR: invalid-audio-file ;
     } 1&&
     [ invalid-audio-file ] unless ;
 
-: convert-data-endian ( audio -- audio )
-    little-endian [
-        dup sample-bits>> {
-            { 16 [ [ 2 seq>native-endianness ] change-data ] }
-            { 32 [ [ 4 seq>native-endianness ] change-data ] }
-            [ drop ]
-        } case
-    ] with-endianness ;
-
 : (read-wav) ( -- audio )
     read-wav-chunks
     [
@@ -83,10 +60,11 @@ ERROR: invalid-audio-file ;
         [ header>> size>> 4 memory>byte-array le> dup ]
         [ body>> >c-ptr ] bi swap memory>byte-array
     ] bi*
-    <audio>
-    convert-data-endian ;
+    <audio> convert-data-endian ;
 
 : read-wav ( filename -- audio )
-    binary [
-        read-riff-chunk verify-wav (read-wav)
-    ] with-file-reader ;
+    little-endian [
+        binary [
+            read-riff-chunk verify-wav (read-wav)
+        ] with-file-reader
+    ] with-endianness ;
