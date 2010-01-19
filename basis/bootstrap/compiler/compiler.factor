@@ -76,7 +76,7 @@ gc
     "." write flush
 
     {
-        + 2/ < <= > >= shift
+        + * 2/ < <= > >= shift
     } compile-unoptimized
 
     "." write flush

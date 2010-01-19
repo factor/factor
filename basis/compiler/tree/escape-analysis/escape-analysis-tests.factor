@@ -7,7 +7,7 @@ math.private kernel tools.test accessors slots.private
 quotations.private prettyprint classes.tuple.private classes
 classes.tuple namespaces
 compiler.tree.propagation.info stack-checker.errors
-compiler.tree.checker
+compiler.tree.checker compiler.tree.def-use compiler.tree.dead-code
 kernel.private vectors ;
 IN: compiler.tree.escape-analysis.tests
 
@@ -37,6 +37,8 @@ M: node count-unboxed-allocations* drop ;
     cleanup
     escape-analysis
     dup check-nodes
+    compute-def-use
+    remove-dead-code
     0 swap [ count-unboxed-allocations* ] each-node ;
 
 [ 0 ] [ [ [ + ] curry ] count-unboxed-allocations ] unit-test
@@ -173,12 +175,6 @@ TUPLE: cons { car read-only } { cdr read-only } ;
     [ 10 [ drop ] each-integer ] count-unboxed-allocations
 ] unit-test
 
-[ 2 ] [
-    [
-        1 2 cons boa 10 [ 2drop 1 2 cons boa ] each-integer car>>
-    ] count-unboxed-allocations
-] unit-test
-
 [ 0 ] [
     [
         1 2 cons boa 10 [ drop 2 cons boa ] each-integer car>>
@@ -304,14 +300,6 @@ C: <ro-box> ro-box
 
 [ 0 ] [ [ 1 cons boa "x" get slot ] count-unboxed-allocations ] unit-test
 
-: impeach-node ( quot: ( node -- ) -- )
-    [ call ] keep impeach-node ; inline recursive
-
-: bleach-node ( quot: ( node -- ) -- )
-    [ bleach-node ] curry [ ] compose impeach-node ; inline recursive
-
-[ 3 ] [ [ [ ] bleach-node ] count-unboxed-allocations ] unit-test
-
 [ 0 ] [
     [ dup -1 over >= [ 0 >= [ "A" throw ] unless ] [ drop ] if ]
     count-unboxed-allocations
@@ -320,10 +308,6 @@ C: <ro-box> ro-box
 [ 0 ] [
     [ \ too-many->r boa f f \ inference-error boa ]
     count-unboxed-allocations
-] unit-test
-
-[ 0 ] [
-    [ { null } declare [ 1 ] [ 2 ] if ] count-unboxed-allocations
 ] unit-test
 
 ! Doug found a regression

@@ -38,7 +38,7 @@ void callback_heap::store_callback_operand(code_block *stub, cell index, cell va
 
 void callback_heap::update(code_block *stub)
 {
-	store_callback_operand(stub,1,(cell)callback_xt(stub));
+	store_callback_operand(stub,1,(cell)callback_entry_point(stub));
 	stub->flush_icache();
 }
 
@@ -60,7 +60,7 @@ code_block *callback_heap::add(cell owner, cell return_rewind)
 	stub->parameters = false_object;
 	stub->relocation = false_object;
 
-	memcpy(stub->xt(),insns->data<void>(),size);
+	memcpy(stub->entry_point(),insns->data<void>(),size);
 
 	/* Store VM pointer */
 	store_callback_operand(stub,0,(cell)parent);
@@ -99,7 +99,7 @@ void factor_vm::primitive_callback()
 	tagged<word> w(ctx->pop());
 
 	w.untag_check(this);
-	ctx->push(allot_alien(callbacks->add(w.value(),return_rewind)->xt()));
+	ctx->push(allot_alien(callbacks->add(w.value(),return_rewind)->entry_point()));
 }
 
 }

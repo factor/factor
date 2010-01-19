@@ -3,7 +3,9 @@ vectors kernel combinators ;
 IN: quotations
 
 ARTICLE: "quotations" "Quotations"
-"A quotation is an anonymous function (a value denoting a snippet of code) which can be used as a value and called. Quotations are delimited by square brackets (" { $snippet "[ ]" } "); see " { $link "syntax-quots" } " for details on their syntax."
+"A quotation is an anonymous function (a value denoting a snippet of code) which can be used as a value and called using the " { $link "call" } "."
+$nl
+"Quotation literals appearing in source code are delimited by square brackets, for example " { $snippet "[ 2 + ]" } "; see " { $link "syntax-quots" } " for details on their syntax."
 $nl
 "Quotations form a class of objects:"
 { $subsections

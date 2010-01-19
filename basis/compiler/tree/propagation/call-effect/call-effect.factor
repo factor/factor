@@ -74,7 +74,7 @@ M: quotation cached-effect
 : call-effect-unsafe? ( quot effect -- ? )
     [ cached-effect ] dip
     over +unknown+ eq?
-    [ 2drop f ] [ effect<= ] if ; inline
+    [ 2drop f ] [ [ { effect } declare ] dip effect<= ] if ; inline
 
 : (call-effect-slow>quot) ( in out effect -- quot )
     [

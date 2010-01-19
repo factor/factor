@@ -4,7 +4,7 @@ namespace factor
 {
 
 instruction_operand::instruction_operand(relocation_entry rel_, code_block *compiled_, cell index_) :
-	rel(rel_), compiled(compiled_), index(index_), pointer((cell)compiled_->xt() + rel_.rel_offset()) {}
+	rel(rel_), compiled(compiled_), index(index_), pointer((cell)compiled_->entry_point() + rel_.rel_offset()) {}
 
 /* Load a 32-bit value from a PowerPC LIS/ORI sequence */
 fixnum instruction_operand::load_value_2_2()
@@ -132,7 +132,7 @@ void instruction_operand::store_value(fixnum absolute_value)
 
 void instruction_operand::store_code_block(code_block *compiled)
 {
-	store_value((cell)compiled->xt());
+	store_value((cell)compiled->entry_point());
 }
 
 }
