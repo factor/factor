@@ -136,12 +136,6 @@ void factor_vm::check_code_address(cell address)
 #endif
 }
 
-
-cell factor_vm::compute_primitive_address(cell arg)
-{
-	return (cell)primitives[untag_fixnum(arg)];
-}
-
 /* References to undefined symbols are patched up to call this function on
 image load */
 void factor_vm::undefined_symbol()
@@ -209,9 +203,6 @@ void factor_vm::store_external_address(instruction_operand op)
 
 	switch(op.rel_type())
 	{
-	case RT_PRIMITIVE:
-		op.store_value(compute_primitive_address(array_nth(parameters,index)));
-		break;
 	case RT_DLSYM:
 		op.store_value(compute_dlsym_address(parameters,index));
 		break;

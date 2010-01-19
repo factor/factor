@@ -125,7 +125,7 @@ CONSTANT: ctx-reg 16
 [
     jit-save-context
     3 vm-reg MR
-    0 4 LOAD32 rc-absolute-ppc-2/2 rt-primitive jit-rel
+    0 4 LOAD32 rc-absolute-ppc-2/2 rt-dlsym jit-rel
     4 MTLR
     BLRL
     jit-restore-context

@@ -56,7 +56,7 @@ IN: bootstrap.x86
     jit-save-context
     ! call the primitive
     arg1 vm-reg MOV
-    RAX 0 MOV rc-absolute-cell rt-primitive jit-rel
+    RAX 0 MOV rc-absolute-cell rt-dlsym jit-rel
     RAX CALL
     jit-restore-context
 ] jit-primitive jit-define
