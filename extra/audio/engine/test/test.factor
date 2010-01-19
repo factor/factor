@@ -1,14 +1,14 @@
-USING: accessors alarms audio audio.engine audio.wav calendar
+! (c)2009 Joe Groff bsd license
+USING: accessors alarms audio audio.engine audio.loader calendar
 destructors io kernel locals math math.functions ;
 IN: audio.engine.test
 
-USE: prettyprint
 :: audio-engine-test ( -- )
-    "vocab:audio/engine/test/loop.wav" read-wav :> loop-sound
-    "vocab:audio/engine/test/once.wav" read-wav :> once-sound
+    "vocab:audio/engine/test/loop.aiff" read-audio :> loop-sound
+    "vocab:audio/engine/test/once.wav" read-audio :> once-sound
     0 :> i!
     <standard-audio-engine> :> engine
-    engine dup . start-audio*
+    engine start-audio*
     engine loop-sound T{ audio-source f { 1.0 0.0 0.0 } 1.0 { 0.0 0.0 0.0 } f } t <audio-clip>
         :> loop-clip
 
