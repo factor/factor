@@ -9,6 +9,11 @@ void factor_vm::jit_compile_word(cell word_, cell def_, bool relocating)
 	data_root<word> word(word_,this);
 	data_root<quotation> def(def_,this);
 
+	/* Refuse to compile this word more than once, because quot_compiled_p()
+	depends on the identity of its code block */
+	if(word->code && word.value() == special_objects[LAZY_JIT_COMPILE_WORD])
+		return;
+
 	code_block *compiled = jit_compile_quot(word.value(),def.value(),relocating);
 	word->code = compiled;
 
