@@ -349,7 +349,12 @@ fixnum factor_vm::quot_code_offset_to_scan(cell quot_, cell offset)
 cell factor_vm::lazy_jit_compile(cell quot_)
 {
 	data_root<quotation> quot(quot_,this);
-	jit_compile_quot(quot.value(),true);
+
+	assert(!quot_compiled_p(quot.untagged()));
+
+	code_block *compiled = jit_compile_quot(quot.value(),quot.value(),true);
+	set_quot_entry_point(quot.untagged(),compiled);
+
 	return quot.value();
 }
 
