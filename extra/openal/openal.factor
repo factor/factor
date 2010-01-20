@@ -3,7 +3,7 @@
 USING: kernel accessors arrays alien system combinators
 alien.syntax namespaces alien.c-types sequences vocabs.loader
 shuffle openal.backend alien.libraries generalizations
-specialized-arrays ;
+specialized-arrays alien.destructors ;
 FROM: alien.c-types => float short ;
 SPECIALIZED-ARRAY: uint
 IN: openal
@@ -182,6 +182,75 @@ FUNCTION: void alDopplerFactor ( ALfloat value ) ;
 FUNCTION: void alDopplerVelocity ( ALfloat value ) ;
 FUNCTION: void alSpeedOfSound ( ALfloat value ) ;
 FUNCTION: void alDistanceModel ( ALenum distanceModel ) ;
+
+C-TYPE: ALCdevice
+C-TYPE: ALCcontext
+TYPEDEF: char ALCboolean
+TYPEDEF: char ALCchar
+TYPEDEF: int ALCenum
+TYPEDEF: int ALCint
+TYPEDEF: int ALCsizei
+TYPEDEF: uint ALCuint
+
+CONSTANT: ALC_FALSE                                0
+CONSTANT: ALC_TRUE                                 1
+CONSTANT: ALC_FREQUENCY                            HEX: 1007
+CONSTANT: ALC_REFRESH                              HEX: 1008
+CONSTANT: ALC_SYNC                                 HEX: 1009
+CONSTANT: ALC_MONO_SOURCES                         HEX: 1010
+CONSTANT: ALC_STEREO_SOURCES                       HEX: 1011
+
+CONSTANT: ALC_NO_ERROR                             0
+
+CONSTANT: ALC_INVALID_DEVICE                       HEX: A001
+CONSTANT: ALC_INVALID_CONTEXT                      HEX: A002
+CONSTANT: ALC_INVALID_ENUM                         HEX: A003
+CONSTANT: ALC_INVALID_VALUE                        HEX: A004
+CONSTANT: ALC_OUT_OF_MEMORY                        HEX: A005
+
+CONSTANT: ALC_DEFAULT_DEVICE_SPECIFIER             HEX: 1004
+CONSTANT: ALC_DEVICE_SPECIFIER                     HEX: 1005
+CONSTANT: ALC_EXTENSIONS                           HEX: 1006
+
+CONSTANT: ALC_MAJOR_VERSION                        HEX: 1000
+CONSTANT: ALC_MINOR_VERSION                        HEX: 1001
+
+CONSTANT: ALC_ATTRIBUTES_SIZE                      HEX: 1002
+CONSTANT: ALC_ALL_ATTRIBUTES                       HEX: 1003
+CONSTANT: ALC_DEFAULT_ALL_DEVICES_SPECIFIER        HEX: 1012
+CONSTANT: ALC_ALL_DEVICES_SPECIFIER                HEX: 1013
+CONSTANT: ALC_CAPTURE_DEVICE_SPECIFIER             HEX: 310
+CONSTANT: ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER     HEX: 311
+CONSTANT: ALC_CAPTURE_SAMPLES                      HEX: 312
+
+FUNCTION: ALCdevice* alcOpenDevice ( ALCchar* deviceSpecifier ) ;
+FUNCTION: ALCboolean alcCloseDevice ( ALCdevice* deviceHandle ) ;
+
+: alcCloseDevice* ( deviceHandle -- )
+    alcCloseDevice drop ;
+
+FUNCTION: ALCcontext* alcCreateContext ( ALCdevice* deviceHandle, ALCint* attrList ) ;
+FUNCTION: ALCboolean alcMakeContextCurrent ( ALCcontext* context ) ;
+FUNCTION: void alcProcessContext ( ALCcontext* context ) ;
+FUNCTION: void alcSuspendContext ( ALCcontext* context ) ;
+FUNCTION: void alcDestroyContext ( ALCcontext* context ) ;
+FUNCTION: ALCcontext* alcGetCurrentContext ( ) ;
+FUNCTION: ALCdevice* alcGetContextsDevice ( ALCcontext* context ) ;
+FUNCTION: ALCboolean alcIsExtensionPresent ( ALCdevice* deviceHandle, ALCchar* extName ) ;
+FUNCTION: void* alcGetProcAddress ( ALCdevice* deviceHandle, ALCchar* funcName ) ;
+FUNCTION: ALCenum alcGetEnumValue ( ALCdevice* deviceHandle, ALCchar* enumName ) ;
+FUNCTION: ALCenum alcGetError ( ALCdevice* deviceHandle ) ;
+FUNCTION: ALCchar* alcGetString ( ALCdevice* deviceHandle, ALCenum token ) ;
+FUNCTION: void alcGetIntegerv ( ALCdevice* deviceHandle, ALCenum token, ALCsizei size, ALCint* dest ) ;
+
+FUNCTION: ALCdevice* alcCaptureOpenDevice ( ALCchar* deviceName, ALCuint freq, ALCenum fmt, ALCsizei bufsize ) ;
+FUNCTION: ALCboolean alcCaptureCloseDevice ( ALCdevice* device ) ;
+FUNCTION: void alcCaptureStart ( ALCdevice* device ) ;
+FUNCTION: void alcCaptureStop ( ALCdevice* device ) ;
+FUNCTION: void alcCaptureSamples ( ALCdevice* device, void* buf, ALCsizei samps ) ;
+
+DESTRUCTOR: alcCloseDevice*
+DESTRUCTOR: alcDestroyContext
 
 LIBRARY: alut
 

@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays namespaces ;
 IN: stack-checker.visitor
@@ -29,4 +29,5 @@ HOOK: #recursive, stack-visitor ( label inputs visitor -- )
 HOOK: #copy, stack-visitor ( inputs outputs -- )
 HOOK: #alien-invoke, stack-visitor ( params -- )
 HOOK: #alien-indirect, stack-visitor ( params -- )
+HOOK: #alien-assembly, stack-visitor ( params -- )
 HOOK: #alien-callback, stack-visitor ( params -- )

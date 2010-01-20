@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel effects accessors math math.private
 math.integers.private math.floats.private math.partial-dispatch
@@ -8,7 +8,7 @@ classes.algebra combinators generic.math splitting fry locals
 classes.tuple alien.accessors classes.tuple.private
 slots.private definitions strings.private vectors hashtables
 generic quotations alien
-stack-checker.state
+stack-checker.dependencies
 compiler.tree.comparisons
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
@@ -16,19 +16,17 @@ compiler.tree.propagation.slots
 compiler.tree.propagation.simple
 compiler.tree.propagation.constraints
 compiler.tree.propagation.call-effect
-compiler.tree.propagation.transforms
-compiler.tree.propagation.simd ;
+compiler.tree.propagation.transforms ;
 FROM: alien.c-types => (signed-interval) (unsigned-interval) ;
 IN: compiler.tree.propagation.known-words
 
 { + - * / }
 [ { number number } "input-classes" set-word-prop ] each
 
-{ /f < > <= >= u< u> u<= u>= }
+{ /f /i mod < > <= >= u< u> u<= u>= }
 [ { real real } "input-classes" set-word-prop ] each
 
-{ /i mod /mod }
-[ { rational rational } "input-classes" set-word-prop ] each
+\ /mod { rational rational } "input-classes" set-word-prop
 
 { bitand bitor bitxor bitnot shift }
 [ { integer integer } "input-classes" set-word-prop ] each

@@ -3,7 +3,7 @@
 USING: kernel accessors sequences combinators fry
 classes.algebra namespaces assocs words math math.private
 math.partial-dispatch math.intervals classes classes.tuple
-classes.tuple.private layouts definitions stack-checker.state
+classes.tuple.private layouts definitions stack-checker.dependencies
 stack-checker.branches
 compiler.utilities
 compiler.tree

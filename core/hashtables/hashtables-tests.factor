@@ -3,14 +3,12 @@ sequences.private hashtables io prettyprint assocs
 continuations ;
 IN: hashtables.tests
 
-[ f ] [ "hi" V{ 1 2 3 } at ] unit-test
-
 [ H{ } ] [ { } [ dup ] H{ } map>assoc ] unit-test
 
-[ ] [ 1000 [ dup sq ] H{ } map>assoc "testhash" set ] unit-test
+[ ] [ 1000 iota [ dup sq ] H{ } map>assoc "testhash" set ] unit-test
 
 [ V{ } ]
-[ 1000 [ dup sq swap "testhash" get at = not ] filter ]
+[ 1000 iota [ dup sq swap "testhash" get at = not ] filter ]
 unit-test
 
 [ t ]
@@ -118,7 +116,7 @@ H{ } clone "counting" set
 
 ! Resource leak...
 H{ } "x" set
-100 [ drop "x" get clear-assoc ] each
+100 [ drop "x" get clear-assoc ] each-integer
 
 ! Crash discovered by erg
 [ t ] [ 0.75 <hashtable> dup clone = ] unit-test
@@ -173,4 +171,4 @@ H{ } "x" set
 [ 1 ] [ 2 "h" get at ] unit-test
 
 ! Random test case
-[ "A" ] [ 100 [ dup ] H{ } map>assoc 32 over delete-at "A" 32 pick set-at 32 swap at ] unit-test
+[ "A" ] [ 100 iota [ dup ] H{ } map>assoc 32 over delete-at "A" 32 pick set-at 32 swap at ] unit-test

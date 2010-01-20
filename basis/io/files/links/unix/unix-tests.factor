@@ -4,7 +4,7 @@ io.pathnames namespaces ;
 IN: io.files.links.unix.tests
 
 : make-test-links ( n path -- )
-    [ '[ [ 1 + ] keep [ number>string _ prepend ] bi@ make-link ] each ]
+    [ '[ [ 1 + ] keep [ number>string _ prepend ] bi@ make-link ] each-integer ]
     [ [ number>string ] dip prepend touch-file ] 2bi ; inline
 
 [ t ] [

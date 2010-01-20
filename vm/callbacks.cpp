@@ -19,48 +19,87 @@ void factor_vm::init_callbacks(cell size)
 	callbacks = new callback_heap(size,this);
 }
 
-void callback_heap::update(callback *stub)
+void callback_heap::store_callback_operand(code_block *stub, cell index, cell value)
 {
 	tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
 
-	cell rel_class = untag_fixnum(array_nth(code_template.untagged(),1));
-	cell offset = untag_fixnum(array_nth(code_template.untagged(),3));
+	cell rel_class = untag_fixnum(array_nth(code_template.untagged(),3 * index + 1));
+	cell rel_type  = untag_fixnum(array_nth(code_template.untagged(),3 * index + 2));
+	cell offset    = untag_fixnum(array_nth(code_template.untagged(),3 * index + 3));
 
-	parent->store_address_in_code_block(rel_class,
-		(cell)(stub + 1) + offset,
-		(cell)(stub->compiled + 1));
+	relocation_entry rel(
+		(relocation_type)rel_type,
+		(relocation_class)rel_class,
+		offset);
 
-	flush_icache((cell)stub,stub->size);
+	instruction_operand op(rel,stub,0);
+	op.store_value(value);
 }
 
-callback *callback_heap::add(code_block *compiled)
+void callback_heap::update(code_block *stub)
+{
+	store_callback_operand(stub,1,(cell)callback_entry_point(stub));
+	stub->flush_icache();
+}
+
+code_block *callback_heap::add(cell owner, cell return_rewind)
 {
 	tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
 	tagged<byte_array> insns(array_nth(code_template.untagged(),0));
 	cell size = array_capacity(insns.untagged());
 
-	cell bump = align(size,sizeof(cell)) + sizeof(callback);
+	cell bump = align(size + sizeof(code_block),data_alignment);
 	if(here + bump > seg->end) fatal_error("Out of callback space",0);
 
-	callback *stub = (callback *)here;
-	stub->compiled = compiled;
-	memcpy(stub + 1,insns->data<void>(),size);
-
-	stub->size = align(size,sizeof(cell));
+	free_heap_block *free_block = (free_heap_block *)here;
+	free_block->make_free(bump);
 	here += bump;
+
+	code_block *stub = (code_block *)free_block;
+	stub->owner = owner;
+	stub->parameters = false_object;
+	stub->relocation = false_object;
+
+	memcpy(stub->entry_point(),insns->data<void>(),size);
+
+	/* Store VM pointer */
+	store_callback_operand(stub,0,(cell)parent);
+
+	/* On x86, the RET instruction takes an argument which depends on
+	the callback's calling convention */
+#if defined(FACTOR_X86) || defined(FACTOR_AMD64)
+	store_callback_operand(stub,2,return_rewind);
+#endif
 
 	update(stub);
 
 	return stub;
 }
 
+struct callback_updater {
+	callback_heap *callbacks;
+
+	explicit callback_updater(callback_heap *callbacks_) : callbacks(callbacks_) {}
+
+	void operator()(code_block *stub)
+	{
+		callbacks->update(stub);
+	}
+};
+
+void callback_heap::update()
+{
+	callback_updater updater(this);
+	each_callback(updater);
+}
+
 void factor_vm::primitive_callback()
 {
-	tagged<word> w(dpop());
-	w.untag_check(this);
+	cell return_rewind = to_cell(ctx->pop());
+	tagged<word> w(ctx->pop());
 
-	callback *stub = callbacks->add(w->code);
-	box_alien(stub + 1);
+	w.untag_check(this);
+	ctx->push(allot_alien(callbacks->add(w.value(),return_rewind)->entry_point()));
 }
 
 }

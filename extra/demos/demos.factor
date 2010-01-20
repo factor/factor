@@ -11,6 +11,5 @@ IN: demos
 : <demo-runner> ( -- gadget )
     <pile> 1 >>fill { 2 2 } >>gap demo-vocabs [ <run-vocab-button> add-gadget ] each ;
 
-: demos ( -- ) [ <demo-runner> { 2 2 } <border> <scroller> "Demos" open-window ] with-ui ;
-
-MAIN: demos
+MAIN-WINDOW: demos { { title "Demos" } }
+    <demo-runner> { 2 2 } <border> <scroller> >>gadgets ;

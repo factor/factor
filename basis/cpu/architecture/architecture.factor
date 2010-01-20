@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs generic kernel kernel.private
 math memory namespaces make sequences layouts system hashtables
@@ -95,7 +95,7 @@ double-rep
 vector-rep
 scalar-rep ;
 
-: unsign-rep ( rep -- rep' )
+: signed-rep ( rep -- rep' )
     {
         { uint-4-rep           int-4-rep }
         { ulonglong-2-rep      longlong-2-rep }
@@ -105,7 +105,7 @@ scalar-rep ;
         { ushort-scalar-rep    short-scalar-rep }
         { uint-scalar-rep      int-scalar-rep }
         { ulonglong-scalar-rep longlong-scalar-rep }
-    } ?at drop ;
+    } ?at drop ; foldable
 
 : widen-vector-rep ( rep -- rep' )
     {
@@ -115,7 +115,19 @@ scalar-rep ;
         { uchar-16-rep    ushort-8-rep    }
         { ushort-8-rep    uint-4-rep      }
         { uint-4-rep      ulonglong-2-rep }
-    } at ;
+        { float-4-rep     double-2-rep    }
+    } at ; foldable
+
+: narrow-vector-rep ( rep -- rep' )
+    {
+        { short-8-rep     char-16-rep     }
+        { int-4-rep       short-8-rep     }
+        { longlong-2-rep  int-4-rep       }
+        { ushort-8-rep    uchar-16-rep    }
+        { uint-4-rep      ushort-8-rep    }
+        { ulonglong-2-rep uint-4-rep      }
+        { double-2-rep    float-4-rep     }
+    } at ; foldable
 
 ! Register classes
 SINGLETONS: int-regs float-regs ;
@@ -271,14 +283,18 @@ HOOK: %add-sub-vector cpu ( dst src1 src2 rep -- )
 HOOK: %sub-vector cpu ( dst src1 src2 rep -- )
 HOOK: %saturated-sub-vector cpu ( dst src1 src2 rep -- )
 HOOK: %mul-vector cpu ( dst src1 src2 rep -- )
+HOOK: %mul-high-vector cpu ( dst src1 src2 rep -- )
+HOOK: %mul-horizontal-add-vector cpu ( dst src1 src2 rep -- )
 HOOK: %saturated-mul-vector cpu ( dst src1 src2 rep -- )
 HOOK: %div-vector cpu ( dst src1 src2 rep -- )
 HOOK: %min-vector cpu ( dst src1 src2 rep -- )
 HOOK: %max-vector cpu ( dst src1 src2 rep -- )
+HOOK: %avg-vector cpu ( dst src1 src2 rep -- )
 HOOK: %dot-vector cpu ( dst src1 src2 rep -- )
+HOOK: %sad-vector cpu ( dst src1 src2 rep -- )
 HOOK: %sqrt-vector cpu ( dst src rep -- )
-HOOK: %horizontal-add-vector cpu ( dst src rep -- )
-HOOK: %horizontal-sub-vector cpu ( dst src rep -- )
+HOOK: %horizontal-add-vector cpu ( dst src1 src2 rep -- )
+HOOK: %horizontal-sub-vector cpu ( dst src1 src2 rep -- )
 HOOK: %abs-vector cpu ( dst src rep -- )
 HOOK: %and-vector cpu ( dst src1 src2 rep -- )
 HOOK: %andn-vector cpu ( dst src1 src2 rep -- )
@@ -320,11 +336,15 @@ HOOK: %add-sub-vector-reps cpu ( -- reps )
 HOOK: %sub-vector-reps cpu ( -- reps )
 HOOK: %saturated-sub-vector-reps cpu ( -- reps )
 HOOK: %mul-vector-reps cpu ( -- reps )
+HOOK: %mul-high-vector-reps cpu ( -- reps )
+HOOK: %mul-horizontal-add-vector-reps cpu ( -- reps )
 HOOK: %saturated-mul-vector-reps cpu ( -- reps )
 HOOK: %div-vector-reps cpu ( -- reps )
 HOOK: %min-vector-reps cpu ( -- reps )
 HOOK: %max-vector-reps cpu ( -- reps )
+HOOK: %avg-vector-reps cpu ( -- reps )
 HOOK: %dot-vector-reps cpu ( -- reps )
+HOOK: %sad-vector-reps cpu ( -- reps )
 HOOK: %sqrt-vector-reps cpu ( -- reps )
 HOOK: %horizontal-add-vector-reps cpu ( -- reps )
 HOOK: %horizontal-sub-vector-reps cpu ( -- reps )
@@ -384,6 +404,10 @@ M: object %shl-vector-imm-reps { } ;
 M: object %shr-vector-imm-reps { } ;
 M: object %horizontal-shl-vector-imm-reps { } ;
 M: object %horizontal-shr-vector-imm-reps { } ;
+
+ALIAS: %merge-vector-head-reps %merge-vector-reps
+ALIAS: %merge-vector-tail-reps %merge-vector-reps
+ALIAS: %tail>head-vector-reps %unpack-vector-head-reps
 
 HOOK: %unbox-alien cpu ( dst src -- )
 HOOK: %unbox-any-c-ptr cpu ( dst src -- )
@@ -479,8 +503,27 @@ HOOK: dummy-int-params? cpu ( -- ? )
 ! If t, all int parameters are shadowed by dummy FP parameters
 HOOK: dummy-fp-params? cpu ( -- ? )
 
-HOOK: %prepare-unbox cpu ( n -- )
+! Load a value (from the data stack in the ds register).
+! The value is then passed as a parameter to a VM to_*() function
+HOOK: %pop-stack cpu ( n -- )
 
+! Store a value (to the data stack in the VM's current context)
+! The value is passed to a VM to_*() function -- used for
+! callback returns
+HOOK: %pop-context-stack cpu ( -- )
+
+! Store a value (to the data stack in the ds register).
+! The value was returned from a VM from_*() function
+HOOK: %push-stack cpu ( -- )
+
+! Store a value (to the data stack in the VM's current context)
+! The value is returned from a VM from_*() function -- used for
+! callback parameters
+HOOK: %push-context-stack cpu ( -- )
+
+! Call a function to convert a tagged pointer returned by
+! %pop-stack or %pop-context-stack into a value that can be
+! passed to a C function, or returned from a callback
 HOOK: %unbox cpu ( n rep func -- )
 
 HOOK: %unbox-long-long cpu ( n func -- )
@@ -489,6 +532,10 @@ HOOK: %unbox-small-struct cpu ( c-type -- )
 
 HOOK: %unbox-large-struct cpu ( n c-type -- )
 
+! Call a function to convert a value into a tagged pointer,
+! possibly allocating a bignum, float, or alien instance,
+! which is then pushed on the data stack by %push-stack or
+! %push-context-stack
 HOOK: %box cpu ( n rep func -- )
 
 HOOK: %box-long-long cpu ( n func -- )
@@ -503,7 +550,9 @@ HOOK: %save-param-reg cpu ( stack reg rep -- )
 
 HOOK: %load-param-reg cpu ( stack reg rep -- )
 
-HOOK: %save-context cpu ( temp1 temp2 callback-allowed? -- )
+HOOK: %restore-context cpu ( temp1 temp2 -- )
+
+HOOK: %save-context cpu ( temp1 temp2 -- )
 
 HOOK: %prepare-var-args cpu ( -- )
 
@@ -527,7 +576,6 @@ HOOK: %nest-stacks cpu ( -- )
 
 HOOK: %unnest-stacks cpu ( -- )
 
-! Return to caller with stdcall unwinding (only for x86)
-HOOK: %callback-return cpu ( params -- )
+HOOK: callback-return-rewind cpu ( params -- n )
 
-M: object %callback-return drop %return ;
+M: object callback-return-rewind drop 0 ;

@@ -3,7 +3,8 @@ continuations destructors io.ports io.timeouts io.sockets
 io.sockets.private io namespaces io.streams.duplex
 io.backend.windows io.sockets.windows io.backend.windows.nt
 windows.winsock kernel libc math sequences threads system
-combinators accessors classes.struct windows.kernel32 ;
+combinators accessors classes.struct windows.kernel32
+windows.types ;
 IN: io.sockets.windows.nt
 
 : malloc-int ( n -- alien )
@@ -16,10 +17,10 @@ M: winnt WSASocket-flags ( -- DWORD )
     SIO_GET_EXTENSION_FUNCTION_POINTER
     WSAID_CONNECTEX
     GUID heap-size
-    "void*" <c-object>
+    void* <c-object>
     [
-        "void*" heap-size
-        "DWORD" <c-object>
+        void* heap-size
+        DWORD <c-object>
         f
         f
         WSAIoctl SOCKET_ERROR = [

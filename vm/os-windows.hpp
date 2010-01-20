@@ -1,8 +1,8 @@
 #include <ctype.h>
 
 #ifndef wcslen
-  /* for cygwin */
-  #include <wchar.h>
+	/* for cygwin */
+	#include <wchar.h>
 #endif
 
 namespace factor
@@ -18,20 +18,23 @@ typedef wchar_t vm_char;
 #define STRCMP wcscmp
 #define STRNCMP wcsncmp
 #define STRDUP _wcsdup
-#define MIN(a,b) ((a)>(b)?(b):(a))
-#define FTELL ftello64
-#define FSEEK fseeko64
+
+#ifdef _MSC_VER
+	#define FTELL ftell
+	#define FSEEK fseek
+	#define SNPRINTF _snprintf
+	#define SNWPRINTF _snwprintf
+#else
+	#define FTELL ftello64
+	#define FSEEK fseeko64
+	#define SNPRINTF snprintf
+	#define SNWPRINTF snwprintf
+#endif
 
 #ifdef WIN64
-	#define CELL_FORMAT "%Iu"
 	#define CELL_HEX_FORMAT "%Ix"
-	#define CELL_HEX_PAD_FORMAT "%016Ix"
-	#define FIXNUM_FORMAT "%Id"
 #else
-	#define CELL_FORMAT "%lu"
 	#define CELL_HEX_FORMAT "%lx"
-	#define CELL_HEX_PAD_FORMAT "%08lx"
-	#define FIXNUM_FORMAT "%ld"
 #endif
 
 #define OPEN_READ(path) _wfopen(path,L"rb")
@@ -43,7 +46,9 @@ typedef wchar_t vm_char;
 inline static void init_signals() {}
 inline static void early_init() {}
 
-s64 current_micros();
+u64 system_micros();
+u64 nano_count();
+void sleep_nanos(u64 nsec);
 long getpagesize();
 
 }

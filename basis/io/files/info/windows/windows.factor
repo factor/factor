@@ -2,10 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays math io.backend io.files.info
 io.files.windows io.files.windows.nt kernel windows.kernel32
-windows.time windows accessors alien.c-types combinators
-generalizations system alien.strings io.encodings.utf16n
-sequences splitting windows.errors fry continuations destructors
-calendar ascii combinators.short-circuit locals classes.struct
+windows.time windows.types windows accessors alien.c-types
+combinators generalizations system alien.strings
+io.encodings.utf16n sequences splitting windows.errors fry
+continuations destructors calendar ascii
+combinators.short-circuit locals classes.struct
 specialized-arrays alien.data ;
 SPECIALIZED-ARRAY: ushort
 IN: io.files.info.windows
@@ -20,7 +21,7 @@ IN: io.files.info.windows
 TUPLE: windows-file-info < file-info attributes ;
 
 : get-compressed-file-size ( path -- n )
-    "DWORD" <c-object> [ GetCompressedFileSize ] keep
+    DWORD <c-object> [ GetCompressedFileSize ] keep
     over INVALID_FILE_SIZE = [
         win32-error-string throw
     ] [
@@ -100,9 +101,9 @@ M: windows link-info ( path -- info )
 
 : volume-information ( normalized-path -- volume-name volume-serial max-component flags type )
     MAX_PATH 1 + [ <ushort-array> ] keep
-    "DWORD" <c-object>
-    "DWORD" <c-object>
-    "DWORD" <c-object>
+    DWORD <c-object>
+    DWORD <c-object>
+    DWORD <c-object>
     MAX_PATH 1 + [ <ushort-array> ] keep
     [ GetVolumeInformation win32-error=0/f ] 7 nkeep
     drop 5 nrot drop
@@ -110,9 +111,9 @@ M: windows link-info ( path -- info )
     utf16n alien>string ;
 
 : file-system-space ( normalized-path -- available-space total-space free-space )
-    "ULARGE_INTEGER" <c-object>
-    "ULARGE_INTEGER" <c-object>
-    "ULARGE_INTEGER" <c-object>
+    ULARGE_INTEGER <c-object>
+    ULARGE_INTEGER <c-object>
+    ULARGE_INTEGER <c-object>
     [ GetDiskFreeSpaceEx win32-error=0/f ] 3keep ;
 
 : calculate-file-system-info ( file-system-info -- file-system-info' )
@@ -151,13 +152,17 @@ PRIVATE>
 M: winnt file-system-info ( path -- file-system-info )
     normalize-path root-directory (file-system-info) ;
 
-: volume>paths ( string -- array )
-    16384 <ushort-array> tuck dup length
-    0 <uint> dup [ GetVolumePathNamesForVolumeName 0 = ] dip swap [
-        win32-error-string throw
+:: volume>paths ( string -- array )
+    16384 :> names-buf-length
+    names-buf-length <ushort-array> :> names
+    0 <uint> :> names-length
+
+    string names names-buf-length names-length GetVolumePathNamesForVolumeName :> ret
+    ret 0 = [
+        ret win32-error-string throw
     ] [
-        *uint "ushort" heap-size * head
-        utf16n alien>string CHAR: \0 split
+        names names-length *uint ushort heap-size * head
+        utf16n alien>string { CHAR: \0 } split
     ] if ;
 
 : find-first-volume ( -- string handle )
@@ -166,13 +171,16 @@ M: winnt file-system-info ( path -- file-system-info )
     FindFirstVolume dup win32-error=0/f
     [ utf16n alien>string ] dip ;
 
-: find-next-volume ( handle -- string/f )
-    MAX_PATH 1 + [ <ushort-array> tuck ] keep
-    FindNextVolume 0 = [
+:: find-next-volume ( handle -- string/f )
+    MAX_PATH 1 + :> buf-length
+    buf-length <ushort-array> :> buf
+
+    handle buf buf-length FindNextVolume :> ret
+    ret 0 = [
         GetLastError ERROR_NO_MORE_FILES =
-        [ drop f ] [ win32-error-string throw ] if
+        [ f ] [ win32-error-string throw ] if
     ] [
-        utf16n alien>string
+        buf utf16n alien>string
     ] if ;
 
 : find-volumes ( -- array )

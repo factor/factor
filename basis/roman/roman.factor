@@ -17,7 +17,7 @@ CONSTANT: roman-values
 ERROR: roman-range-error n ;
 
 : roman-range-check ( n -- n )
-    dup 1 3999 between? [ roman-range-error ] unless ;
+    dup 1 10000 between? [ roman-range-error ] unless ;
 
 : roman-digit-index ( ch -- n )
     1string roman-digits index ; inline
@@ -48,7 +48,7 @@ PRIVATE>
 <PRIVATE
 
 MACRO: binary-roman-op ( quot -- quot' )
-    [ infer in>> ] [ ] [ infer out>> ] tri
+    [ inputs ] [ ] [ outputs ] tri
     '[ [ roman> ] _ napply @ [ >roman ] _ napply ] ;
 
 PRIVATE>
@@ -58,8 +58,7 @@ PRIVATE>
 SYNTAX: ROMAN-OP:
     scan-word [ name>> "roman" prepend create-in ] keep
     1quotation '[ _ binary-roman-op ]
-    dup infer [ in>> ] [ out>> ] bi
-    [ "string" <repetition> ] bi@ <effect> define-declared ;
+    dup infer define-declared ;
 
 >>
 

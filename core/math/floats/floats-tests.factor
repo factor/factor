@@ -1,4 +1,4 @@
-USING: kernel math math.constants tools.test sequences
+USING: kernel math math.constants math.order tools.test sequences
 grouping ;
 IN: math.floats.tests
 
@@ -58,7 +58,7 @@ unit-test
 
 [ 0 ] [ 1/0. >bignum ] unit-test
 
-[ t ] [ 64 [ 2^ 0.5 * ] map [ < ] monotonic? ] unit-test
+[ t ] [ 64 iota [ 2^ 0.5 * ] map [ < ] monotonic? ] unit-test
 
 [ 5 ] [ 10.5 1.9 /i ] unit-test
 
@@ -75,3 +75,6 @@ unit-test
 [ t ] [ -0.0 abs 0.0 fp-bitwise= ] unit-test
 [ 1.5 ] [ -1.5 abs ] unit-test
 [ 1.5 ] [ 1.5 abs ] unit-test
+
+[ 5.0 ] [ 3 5.0 max ] unit-test
+[ 3 ] [ 3 5.0 min ] unit-test

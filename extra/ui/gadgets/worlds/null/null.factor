@@ -7,7 +7,6 @@ M: null-world begin-world drop ;
 M: null-world end-world drop ;
 M: null-world draw-world* drop ;
 M: null-world resize-world drop ;
-M: null-world pref-dim* drop { 512 512 } ;
 
 : null-window ( title -- world )
     <world-attributes>
@@ -19,6 +18,7 @@ M: null-world pref-dim* drop { 512 512 } ;
             backing-store
             T{ depth-bits f 24 }
         } >>pixel-format-attributes
+        { 512 512 } >>pref-dim
     f swap open-window* ;
 
 : into-window ( world quot -- world )

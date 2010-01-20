@@ -9,6 +9,7 @@ ERROR: fica-base-unknown ;
 
 : fica-base-rate ( year -- x )
     H{
+        { 2009 106800 }
         { 2008 102000 }
         { 2007  97500 }
     } at [ fica-base-unknown ] unless* ;

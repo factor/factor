@@ -3,7 +3,6 @@ USING: accessors alien.data.map arrays destructors fry grouping
 kernel math math.ranges math.vectors.simd opengl opengl.gl sequences
 sequences.product specialized-arrays ;
 FROM: alien.c-types => float ;
-SIMD: float
 SPECIALIZED-ARRAY: float-4
 IN: grid-meshes
 

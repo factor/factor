@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes classes.algebra words kernel
-kernel.private namespaces sequences math math.private
-combinators assocs quotations ;
+USING: accessors classes classes.algebra classes.algebra.private
+words kernel kernel.private namespaces sequences math
+math.private combinators assocs quotations ;
 IN: classes.builtin
 
 SYMBOL: builtins
@@ -36,6 +36,6 @@ M: builtin-class (classes-intersect?)
         [ swap classes-intersect? ]
     } cond ;
 
-: full-cover ( -- ) builtins get sift [ (flatten-class) ] each ;
+: full-cover ( -- ) builtins get [ (flatten-class) ] each ;
 
 M: anonymous-complement (flatten-class) drop full-cover ;

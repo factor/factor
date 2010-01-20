@@ -7,7 +7,7 @@ IN: suffix-arrays
 <PRIVATE
 
 : suffixes ( string -- suffixes-seq )
-    dup length [ tail-slice ] with map ;
+    dup length iota [ tail-slice ] with map ;
 
 : prefix<=> ( begin seq -- <=> )
     [ <=> ] [ swap head? ] 2bi [ drop +eq+ ] when ;
@@ -22,8 +22,7 @@ IN: suffix-arrays
 
 : <funky-slice> ( from/f to/f seq -- slice )
     [
-        tuck
-        [ drop 0 or ] [ length or ] 2bi*
+        [ drop 0 or ] [ length or ] bi-curry bi*
         [ min ] keep
     ] keep <slice> ; inline
 

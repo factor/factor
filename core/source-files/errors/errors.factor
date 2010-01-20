@@ -20,7 +20,7 @@ M: source-file-error error-line [ error>> error-line ] [ line#>> ] bi or ;
 M: source-file-error compute-restarts error>> compute-restarts ;
 
 : sort-errors ( errors -- alist )
-    [ [ line#>> ] sort-with ] { } assoc-map-as sort-keys ;
+    [ [ line#>> 0 or ] sort-with ] { } assoc-map-as sort-keys ;
 
 : group-by-source-file ( errors -- assoc )
     H{ } clone [ [ push-at ] curry [ dup file>> ] prepose each ] keep ;
@@ -68,7 +68,7 @@ GENERIC: errors-changed ( observer -- )
 
 SYMBOL: error-observers
 
-[ V{ } clone error-observers set-global ] "source-files.errors" add-init-hook
+[ V{ } clone error-observers set-global ] "source-files.errors" add-startup-hook
 
 : add-error-observer ( observer -- ) error-observers get push ;
 

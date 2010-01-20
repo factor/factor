@@ -11,7 +11,7 @@ ECHO=echo
 OS=
 ARCH=
 WORD=
-NO_UI=
+NO_UI=${NO_UI-}
 GIT_PROTOCOL=${GIT_PROTOCOL:="git"}
 GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://factorcode.org/git/factor.git"}
 SCRIPT_ARGS="$*"
@@ -25,9 +25,9 @@ test_program_installed() {
 
 exit_script() {
     if [[ $FIND_MAKE_TARGET -eq true ]] ; then
-		echo $MAKE_TARGET;
-	fi
-	exit $1
+        echo $MAKE_TARGET;
+    fi
+    exit $1
 }
 
 ensure_program_installed() {
@@ -61,20 +61,6 @@ check_ret() {
        $ECHO $1 failed
        exit_script 2
     fi
-}
-
-check_gcc_version() {
-    $ECHO -n "Checking gcc version..."
-    GCC_VERSION=`$CC --version`
-    check_ret gcc
-    if [[ $GCC_VERSION == *3.3.* ]] ; then
-        $ECHO "You have a known buggy version of gcc (3.3)"
-        $ECHO "Install gcc 3.4 or higher and try again."
-        exit_script 3
-    elif [[ $GCC_VERSION == *4.3.* ]] ; then
-       MAKE_OPTS="$MAKE_OPTS SITE_CFLAGS=-fno-forward-propagate"
-    fi
-    $ECHO "ok."
 }
 
 set_downloader() {
@@ -124,7 +110,6 @@ check_installed_programs() {
     ensure_program_installed make gmake
     ensure_program_installed md5sum md5
     ensure_program_installed cut
-    check_gcc_version
 }
 
 check_library_exists() {
@@ -147,9 +132,11 @@ check_library_exists() {
 }
 
 check_X11_libraries() {
-    check_library_exists GL
-    check_library_exists X11
-    check_library_exists pango-1.0
+    if [ -z "$NO_UI" ]; then
+        check_library_exists GL
+        check_library_exists X11
+        check_library_exists pango-1.0
+    fi
 }
 
 check_libraries() {
@@ -360,8 +347,8 @@ update_script_name() {
 
 update_script() {
     update_script=`update_script_name`
-    
-    echo "#!/bin/sh" >"$update_script"
+    bash_path=`which bash`
+    echo "#!$bash_path" >"$update_script"
     echo "git pull \"$GIT_URL\" master" >>"$update_script"
     echo "if [[ \$? -eq 0 ]]; then exec \"$0\" $SCRIPT_ARGS; else echo \"git pull failed\"; exit 2; fi" \
         >>"$update_script"
@@ -419,9 +406,9 @@ backup_factor() {
 }
 
 check_makefile_exists() {
-    if [[ ! -e "Makefile" ]] ; then
+    if [[ ! -e "GNUmakefile" ]] ; then
         echo ""
-        echo "***Makefile not found***"
+        echo "***GNUmakefile not found***"
         echo "You are likely in the wrong directory."
         echo "Run this script from your factor directory:"
         echo "     ./build-support/factor.sh"
@@ -446,7 +433,7 @@ make_factor() {
 update_boot_images() {
     echo "Deleting old images..."
     $DELETE checksums.txt* > /dev/null 2>&1
-	# delete boot images with one or two characters after the dot
+    # delete boot images with one or two characters after the dot
     $DELETE $BOOT_IMAGE.{?,??} > /dev/null 2>&1
     $DELETE temp/staging.*.image > /dev/null 2>&1
     if [[ -f $BOOT_IMAGE ]] ; then

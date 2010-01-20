@@ -16,7 +16,6 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <math.h>
-#include <stdbool.h>
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,6 +29,31 @@
 #include <vector>
 #include <iostream>
 
+/* Detect target CPU type */
+#if defined(__arm__)
+	#define FACTOR_ARM
+#elif defined(__amd64__) || defined(__x86_64__)
+	#define FACTOR_AMD64
+	#define FACTOR_64
+#elif defined(i386) || defined(__i386) || defined(__i386__) || defined(WIN32) || defined(_MSC_VER)
+	#define FACTOR_X86
+#elif defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)
+	#define FACTOR_PPC
+#else
+	#error "Unsupported architecture"
+#endif
+
+#if defined(_MSC_VER)
+	#define WINDOWS
+	#define WINNT
+#elif defined(WIN32)
+	#define WINDOWS
+#endif
+
+#ifndef _MSC_VER
+	#include <stdbool.h>
+#endif
+
 /* Forward-declare this since it comes up in function prototypes */
 namespace factor
 {
@@ -40,15 +64,17 @@ namespace factor
 #include "layouts.hpp"
 #include "platform.hpp"
 #include "primitives.hpp"
-#include "stacks.hpp"
 #include "segments.hpp"
 #include "contexts.hpp"
 #include "run.hpp"
+#include "objects.hpp"
 #include "profiler.hpp"
 #include "errors.hpp"
 #include "bignumint.hpp"
 #include "bignum.hpp"
-#include "code_block.hpp"
+#include "booleans.hpp"
+#include "instruction_operands.hpp"
+#include "code_blocks.hpp"
 #include "bump_allocator.hpp"
 #include "bitwise_hacks.hpp"
 #include "mark_bits.hpp"
@@ -72,11 +98,13 @@ namespace factor
 #include "alien.hpp"
 #include "callbacks.hpp"
 #include "dispatch.hpp"
+#include "entry_points.hpp"
 #include "vm.hpp"
 #include "allot.hpp"
 #include "tagged.hpp"
 #include "data_roots.hpp"
 #include "code_roots.hpp"
+#include "generic_arrays.hpp"
 #include "slot_visitor.hpp"
 #include "collector.hpp"
 #include "copying_collector.hpp"
@@ -87,10 +115,8 @@ namespace factor
 #include "compaction.hpp"
 #include "full_collector.hpp"
 #include "callstack.hpp"
-#include "generic_arrays.hpp"
 #include "arrays.hpp"
 #include "math.hpp"
-#include "booleans.hpp"
 #include "byte_arrays.hpp"
 #include "jit.hpp"
 #include "quotations.hpp"

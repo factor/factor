@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2005, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private slots.private math
 math.private math.order ;
@@ -98,12 +98,6 @@ M: f like drop [ f ] when-empty ; inline
 
 INSTANCE: f immutable-sequence
 
-! Integers used to support the sequence protocol
-M: integer length ; inline
-M: integer nth-unsafe drop ; inline
-
-INSTANCE: integer immutable-sequence
-
 PRIVATE>
 
 ! In the future, this will replace integer sequences
@@ -182,15 +176,15 @@ PRIVATE>
     2dup bounds-check? [ nth-unsafe ] [ 2drop f ] if ; inline
 
 MIXIN: virtual-sequence
-GENERIC: virtual-seq ( seq -- seq' )
+GENERIC: virtual-exemplar ( seq -- seq' )
 GENERIC: virtual@ ( n seq -- n' seq' )
 
 M: virtual-sequence nth virtual@ nth ; inline
 M: virtual-sequence set-nth virtual@ set-nth ; inline
 M: virtual-sequence nth-unsafe virtual@ nth-unsafe ; inline
 M: virtual-sequence set-nth-unsafe virtual@ set-nth-unsafe ; inline
-M: virtual-sequence like virtual-seq like ; inline
-M: virtual-sequence new-sequence virtual-seq new-sequence ; inline
+M: virtual-sequence like virtual-exemplar like ; inline
+M: virtual-sequence new-sequence virtual-exemplar new-sequence ; inline
 
 INSTANCE: virtual-sequence sequence
 
@@ -199,7 +193,7 @@ TUPLE: reversed { seq read-only } ;
 
 C: <reversed> reversed
 
-M: reversed virtual-seq seq>> ; inline
+M: reversed virtual-exemplar seq>> ; inline
 M: reversed virtual@ seq>> [ length swap - 1 - ] keep ; inline
 M: reversed length seq>> length ; inline
 
@@ -227,11 +221,11 @@ TUPLE: slice-error from to seq reason ;
     3tri ; inline
 
 : <slice> ( from to seq -- slice )
-    dup slice? [ collapse-slice ] when
     check-slice
+    dup slice? [ collapse-slice ] when
     slice boa ; inline
 
-M: slice virtual-seq seq>> ; inline
+M: slice virtual-exemplar seq>> ; inline
 
 M: slice virtual@ [ from>> + ] [ seq>> ] bi ; inline
 
@@ -426,11 +420,11 @@ PRIVATE>
 : map ( seq quot -- newseq )
     over map-as ; inline
 
-: replicate ( seq quot -- newseq )
-    [ drop ] prepose map ; inline
+: replicate-as ( len quot exemplar -- newseq )
+    [ [ drop ] prepose ] dip map-integers ; inline
 
-: replicate-as ( seq quot exemplar -- newseq )
-    [ [ drop ] prepose ] dip map-as ; inline
+: replicate ( len quot -- newseq )
+    { } replicate-as ; inline
 
 : map! ( seq quot -- seq )
     over [ map-into ] keep ; inline
@@ -466,7 +460,7 @@ PRIVATE>
     (2each) all-integers? ; inline
 
 : 3each ( seq1 seq2 seq3 quot -- )
-    (3each) each ; inline
+    (3each) each-integer ; inline
 
 : 3map-as ( seq1 seq2 seq3 quot exemplar -- newseq )
     [ (3each) ] dip map-integers ; inline
@@ -659,9 +653,9 @@ PRIVATE>
         [ 0 swap copy ] keep
     ] new-like ;
 
-: suffix! ( seq elt -- seq ) over push ;
+: suffix! ( seq elt -- seq ) over push ; inline
 
-: append! ( seq1 seq2 -- seq1 ) over push-all ;
+: append! ( seq1 seq2 -- seq1 ) over push-all ; inline
 
 : last ( seq -- elt ) [ length 1 - ] [ nth ] bi ;
 
@@ -842,6 +836,12 @@ PRIVATE>
         [ 3dup ] dip [ + swap nth-unsafe ] keep rot nth-unsafe =
     ] all? nip ; inline
 
+: prepare-2map-reduce ( seq1 seq2 map-quot -- initial length seq1 seq2 )
+    [ drop min-length dup 1 < [ "Empty sequence" throw ] when 1 - ]
+    [ drop [ [ 1 + ] 2dip 2nth-unsafe ] 2curry ]
+    [ [ [ first-unsafe ] bi@ ] dip call ]
+    3tri -rot ; inline
+
 PRIVATE>
 
 : start* ( subseq seq n -- i )
@@ -874,8 +874,8 @@ PRIVATE>
     compose reduce ; inline
 
 : 2map-reduce ( seq1 seq2 map-quot reduce-quot -- result )
-    [ [ 2unclip-slice ] dip [ call ] keep ] dip
-    compose 2reduce ; inline
+    [ [ prepare-2map-reduce ] keep ] dip
+    compose compose each-integer ; inline
 
 <PRIVATE
 
@@ -929,7 +929,8 @@ PRIVATE>
 : trim ( seq quot -- newseq )
     [ trim-slice ] [ drop ] 2bi like ; inline
 
-: sum ( seq -- n ) 0 [ + ] binary-reduce ;
+GENERIC: sum ( seq -- n )
+M: object sum 0 [ + ] binary-reduce ; inline
 
 : product ( seq -- n ) 1 [ * ] binary-reduce ;
 

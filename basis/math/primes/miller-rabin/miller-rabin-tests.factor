@@ -8,4 +8,4 @@ IN: math.primes.miller-rabin.tests
 [ t ] [ 37 miller-rabin ] unit-test
 [ t ] [ 2135623355842621559 miller-rabin ] unit-test
 
-[ f ] [ 1000 [ drop 15 miller-rabin ] any? ] unit-test
+[ f ] [ 1000 iota [ drop 15 miller-rabin ] any? ] unit-test

@@ -37,7 +37,7 @@ TUPLE: piece
 
 : modulo ( n m -- n )
   #! -2 7 mod => -2, -2 7 modulo =>  5
-  tuck mod over + swap mod ;
+  [ mod ] [ + ] [ mod ] tri ;
 
 : (rotate-piece) ( rotation inc n-states -- rotation' )
     [ + ] dip modulo ;

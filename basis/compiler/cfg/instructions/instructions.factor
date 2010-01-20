@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors arrays kernel sequences namespaces words
 math math.order layouts classes.algebra classes.union
@@ -382,6 +382,16 @@ def: dst
 use: src1 src2
 literal: rep ;
 
+PURE-INSN: ##mul-high-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##mul-horizontal-add-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
 PURE-INSN: ##saturated-mul-vector
 def: dst
 use: src1 src2
@@ -402,19 +412,29 @@ def: dst
 use: src1 src2
 literal: rep ;
 
+PURE-INSN: ##avg-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
 PURE-INSN: ##dot-vector
 def: dst/scalar-rep
 use: src1 src2
 literal: rep ;
 
+PURE-INSN: ##sad-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
 PURE-INSN: ##horizontal-add-vector
-def: dst/scalar-rep
-use: src
+def: dst
+use: src1 src2
 literal: rep ;
 
 PURE-INSN: ##horizontal-sub-vector
-def: dst/scalar-rep
-use: src
+def: dst
+use: src1 src2
 literal: rep ;
 
 PURE-INSN: ##horizontal-shl-vector-imm
@@ -651,11 +671,11 @@ literal: params stack-frame ;
 INSN: ##alien-indirect
 literal: params stack-frame ;
 
-INSN: ##alien-callback
+INSN: ##alien-assembly
 literal: params stack-frame ;
 
-INSN: ##callback-return
-literal: params ;
+INSN: ##alien-callback
+literal: params stack-frame ;
 
 ! Instructions used by CFG IR only.
 INSN: ##prologue ;
@@ -728,8 +748,7 @@ temp: temp1/int-rep temp2/int-rep
 literal: size data-values tagged-values uninitialized-locs ;
 
 INSN: ##save-context
-temp: temp1/int-rep temp2/int-rep
-literal: callback-allowed? ;
+temp: temp1/int-rep temp2/int-rep ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue

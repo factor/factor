@@ -173,9 +173,5 @@ M: key-caps-gadget ungraft*
 M: key-caps-gadget handle-gesture
     drop [ key-down? ] [ key-up? ] bi or not ;
 
-: key-caps ( -- )
-    [
-        <key-caps-gadget> { 5 5 } <border> "Key Caps" open-window
-    ] with-ui ;
-
-MAIN: key-caps
+MAIN-WINDOW: key-caps { { title "Key Caps" } }
+    <key-caps-gadget> { 5 5 } <border> >>gadgets ;

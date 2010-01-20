@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequence-parser io io.encodings.utf8 io.files
+USING: sequences.parser io io.encodings.utf8 io.files
 io.streams.string kernel combinators accessors io.pathnames
 fry sequences arrays locals namespaces io.directories
 assocs math splitting make unicode.categories
@@ -93,11 +93,11 @@ ERROR: header-file-missing path ;
     skip-whitespace/comments
     [ current { [ blank? ] [ CHAR: ( = ] } 1|| ] take-until ;
 
-: handle-define ( preprocessor-state sequence-parser -- )
-    [ take-define-identifier ]
-    [ skip-whitespace/comments take-rest ] bi 
-    "\\" ?tail [ readlns append ] when
-    spin symbol-table>> set-at ;
+:: handle-define ( preprocessor-state sequence-parser -- )
+    sequence-parser take-define-identifier :> ident
+    sequence-parser skip-whitespace/comments take-rest :> def
+    def "\\" ?tail [ readlns append ] when :> def
+    def ident preprocessor-state symbol-table>> set-at ;
 
 : handle-undef ( preprocessor-state sequence-parser -- )
     take-token swap symbol-table>> delete-at ;

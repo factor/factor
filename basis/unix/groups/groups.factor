@@ -23,7 +23,7 @@ GENERIC: group-struct ( obj -- group/f )
     gr_mem>> utf8 alien>strings ;
 
 : (group-struct) ( id -- group-struct id group-struct byte-array length void* )
-    \ unix:group <struct> tuck 4096
+    [ \ unix:group <struct> ] dip over 4096
     [ <byte-array> ] keep f <void*> ;
 
 : check-group-struct ( group-struct ptr -- group-struct/f )

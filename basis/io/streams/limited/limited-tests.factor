@@ -1,8 +1,9 @@
 USING: accessors continuations destructors io io.encodings
-io.encodings.8-bit io.encodings.ascii io.encodings.binary
+io.encodings.ascii io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files io.pipes
 io.streams.byte-array io.streams.limited io.streams.string
-kernel namespaces strings tools.test system ;
+kernel namespaces strings tools.test system
+io.encodings.8-bit.latin1 ;
 IN: io.streams.limited.tests
 
 [ ] [

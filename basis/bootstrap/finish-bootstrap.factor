@@ -3,7 +3,7 @@ namespaces eval kernel vocabs.loader io ;
 
 [
     boot
-    do-init-hooks
+    do-startup-hooks
     [
         (command-line) parse-command-line
         load-vocab-roots
@@ -14,4 +14,4 @@ namespaces eval kernel vocabs.loader io ;
         output-stream get [ stream-flush ] when*
         0 exit
     ] [ print-error 1 exit ] recover
-] set-boot-quot
+] set-startup-quot

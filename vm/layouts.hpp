@@ -51,8 +51,6 @@ static const cell data_alignment = 16;
 
 #define TYPE_COUNT 14
 
-#define FORWARDING_POINTER 5 /* can be anything other than FIXNUM_TYPE */
-
 enum code_block_type
 {
 	code_block_unoptimized,
@@ -95,59 +93,59 @@ inline static cell tag_fixnum(fixnum untagged)
 
 struct object;
 
-struct header {
-	cell value;
-
-        /* Default ctor to make gcc 3.x happy */
-        explicit header() { abort(); }
-
-	explicit header(cell value_) : value(value_ << TAG_BITS) {}
-
-	void check_header() const
-	{
-#ifdef FACTOR_DEBUG
-		assert(TAG(value) == FIXNUM_TYPE && untag_fixnum(value) < TYPE_COUNT);
-#endif
-	}
-
-	cell hi_tag() const
-	{
-		check_header();
-		return value >> TAG_BITS;
-	}
-
-	bool forwarding_pointer_p() const
-	{
-		return TAG(value) == FORWARDING_POINTER;
-	}
-
-	object *forwarding_pointer() const
-	{
-		return (object *)UNTAG(value);
-	}
-
-	void forward_to(object *pointer)
-	{
-		value = RETAG(pointer,FORWARDING_POINTER);
-	}
-};
-
 #define NO_TYPE_CHECK static const cell type_number = TYPE_COUNT
 
 struct object {
 	NO_TYPE_CHECK;
-	header h;
+	cell header;
 
 	cell size() const;
 	cell binary_payload_start() const;
 
-	cell *slots()  const { return (cell *)this; }
+	cell *slots() const { return (cell *)this; }
 
-	/* Only valid for objects in tenured space; must fast to free_heap_block
+	template<typename Iterator> void each_slot(Iterator &iter);
+
+	/* Only valid for objects in tenured space; must cast to free_heap_block
 	to do anything with it if its free */
 	bool free_p() const
 	{
-		return h.value & 1 == 1;
+		return (header & 1) == 1;
+	}
+
+	cell type() const
+	{
+		return (header >> 2) & TAG_MASK;
+	}
+
+	void initialize(cell type)
+	{
+		header = type << 2;
+	}
+
+	cell hashcode() const
+	{
+		return (header >> 6);
+	}
+
+	void set_hashcode(cell hashcode)
+	{
+		header = (header & 0x3f) | (hashcode << 6);
+	}
+
+	bool forwarding_pointer_p() const
+	{
+		return (header & 2) == 2;
+	}
+
+	object *forwarding_pointer() const
+	{
+		return (object *)UNTAG(header);
+	}
+
+	void forward_to(object *pointer)
+	{
+		header = ((cell)pointer | 2);
 	}
 };
 
@@ -211,49 +209,7 @@ struct string : public object {
 	cell nth(cell i) const;
 };
 
-/* The compiled code heap is structured into blocks. */
-struct code_block
-{
-	cell header;
-	cell owner; /* tagged pointer to word, quotation or f */
-	cell literals; /* tagged pointer to array or f */
-	cell relocation; /* tagged pointer to byte-array or f */
-
-	bool free_p() const
-	{
-		return header & 1 == 1;
-	}
-
-	code_block_type type() const
-	{
-		return (code_block_type)((header >> 1) & 0x3);
-	}
-
-	void set_type(code_block_type type)
-	{
-		header = ((header & ~0x7) | (type << 1));
-	}
-
-	bool pic_p() const
-	{
-		return type() == code_block_pic;
-	}
-
-	bool optimized_p() const
-	{
-		return type() == code_block_optimized;
-	}
-
-	cell size() const
-	{
-		return header >> 3;
-	}
-
-	void *xt() const
-	{
-		return (void *)(this + 1);
-	}
-};
+struct code_block;
 
 /* Assembly code makes assumptions about the layout of this struct */
 struct word : public object {
@@ -276,8 +232,8 @@ struct word : public object {
 	cell counter;
 	/* TAGGED machine code for sub-primitive */
 	cell subprimitive;
-	/* UNTAGGED execution token: jump here to execute word */
-	void *xt;
+	/* UNTAGGED entry point: jump here to execute word */
+	void *entry_point;
 	/* UNTAGGED compiled code block */
 	code_block *code;
 	/* UNTAGGED profiler stub */
@@ -310,8 +266,8 @@ struct quotation : public object {
 	cell cached_effect;
 	/* tagged */
 	cell cache_counter;
-	/* UNTAGGED */
-	void *xt;
+	/* UNTAGGED entry point; jump here to call quotation */
+	void *entry_point;
 	/* UNTAGGED compiled code block */
 	code_block *code;
 };
@@ -342,11 +298,12 @@ struct dll : public object {
 	/* tagged byte array holding a C string */
 	cell path;
 	/* OS-specific handle */
-	void *dll;
+	void *handle;
 };
 
 struct stack_frame {
-	void *xt;
+	/* Updated by procedure prologue with procedure start address */
+	void *entry_point;
 	/* Frame size in bytes */
 	cell size;
 };
@@ -371,6 +328,14 @@ struct tuple : public object {
 	cell layout;
 
 	cell *data() const { return (cell *)(this + 1); }
+};
+
+struct data_root_range {
+	cell *start;
+	cell len;
+
+	explicit data_root_range(cell *start_, cell len_) :
+		start(start_), len(len_) {}
 };
 
 }

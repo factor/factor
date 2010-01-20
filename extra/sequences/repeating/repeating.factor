@@ -16,6 +16,6 @@ M: repeating set-length (>>len) ;
 
 M: repeating virtual@ ( n seq -- n' seq' ) circular>> ;
 
-M: repeating virtual-seq circular>> ;
+M: repeating virtual-exemplar circular>> ;
 
 INSTANCE: repeating virtual-sequence

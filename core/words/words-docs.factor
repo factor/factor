@@ -133,8 +133,8 @@ $nl
 ARTICLE: "word.private" "Word implementation details"
 "The " { $snippet "def" } " slot of a word holds a " { $link quotation } " instance that is called when the word is executed."
 $nl
-"An " { $emphasis "XT" } " (execution token) is the machine code address of a word:"
-{ $subsections word-xt } ;
+"A primitive to get the memory range storing the machine code for a word:"
+{ $subsections word-code } ;
 
 ARTICLE: "words.introspection" "Word introspection"
 "Word introspection facilities and implementation details are found in the " { $vocab-link "words" } " vocabulary."
@@ -209,9 +209,9 @@ HELP: remove-word-prop
 { $description "Removes a word property, so future lookups will output " { $link f } " until it is set again. Word property names are conventionally strings." }
 { $side-effects "word" } ;
 
-HELP: word-xt ( word -- start end )
+HELP: word-code ( word -- start end )
 { $values { "word" word } { "start" "the word's start address" } { "end" "the word's end address" } }
-{ $description "Outputs the machine code address of the word's definition." } ;
+{ $description "Outputs the memory range containing the word's machine code." } ;
 
 HELP: define
 { $values { "word" word } { "def" quotation } }
@@ -238,7 +238,8 @@ $low-level-note
 
 HELP: <word> ( name vocab -- word )
 { $values { "name" string } { "vocab" string } { "word" word } }
-{ $description "Allocates an uninterned word with the specified name and vocabulary, and a blank word property hashtable. User code should call " { $link gensym } " to create uninterned words and " { $link create } " to create interned words." } ;
+{ $description "Allocates an uninterned word with the specified name and vocabulary, and a blank word property hashtable. User code should call " { $link gensym } " to create uninterned words and " { $link create } " to create interned words." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: gensym
 { $values { "word" word } }
@@ -279,12 +280,14 @@ HELP: check-create
 
 HELP: create
 { $values { "name" string } { "vocab" string } { "word" word } }
-{ $description "Creates a new word. If the vocabulary already contains a word with the requested name, outputs the existing word. The vocabulary must exist already; if it does not, you must call " { $link create-vocab } " first." } ;
+{ $description "Creates a new word. If the vocabulary already contains a word with the requested name, outputs the existing word. The vocabulary must exist already; if it does not, you must call " { $link create-vocab } " first." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } ". Parsing words should call " { $link create-in } " instead of this word." } ;
 
 HELP: constructor-word
 { $values { "name" string } { "vocab" string } { "word" word } }
 { $description "Creates a new word, surrounding " { $snippet "name" } " in angle brackets." }
-{ $examples { $example "USING: prettyprint words ;" "\"salmon\" \"scratchpad\" constructor-word ." "<salmon>" } } ;
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
+{ $examples { $example "USING: compiler.units prettyprint words ;" "[ \"salmon\" \"scratchpad\" constructor-word ] with-compilation-unit ." "<salmon>" } } ;
 
 { POSTPONE: FORGET: forget forget* forget-vocab } related-words
 

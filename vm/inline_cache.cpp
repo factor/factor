@@ -11,14 +11,14 @@ void factor_vm::init_inline_caching(int max_size)
 void factor_vm::deallocate_inline_cache(cell return_address)
 {
 	/* Find the call target. */
-	void *old_xt = get_call_target(return_address);
-	check_code_pointer((cell)old_xt);
+	void *old_entry_point = get_call_target(return_address);
+	check_code_pointer((cell)old_entry_point);
 
-	code_block *old_block = (code_block *)old_xt - 1;
+	code_block *old_block = (code_block *)old_entry_point - 1;
 
 	/* Free the old PIC since we know its unreachable */
 	if(old_block->pic_p())
-		code->code_heap_free(old_block);
+		code->free(old_block);
 }
 
 /* Figure out what kind of type check the PIC needs based on the methods
@@ -70,7 +70,7 @@ void inline_cache_jit::emit_check(cell klass)
 	else
 		code_template = parent->special_objects[PIC_CHECK_TUPLE];
 
-	emit_with(code_template,klass);
+	emit_with_literal(code_template,klass);
 }
 
 /* index: 0 = top of stack, 1 = item underneath, etc
@@ -101,19 +101,27 @@ void inline_cache_jit::compile_inline_cache(fixnum index,
 
 		/* Yes? Jump to method */
 		cell method = array_nth(cache_entries.untagged(),i + 1);
-		emit_with(parent->special_objects[PIC_HIT],method);
+		emit_with_literal(parent->special_objects[PIC_HIT],method);
 	}
 
-	/* Generate machine code to handle a cache miss, which ultimately results in
-	   this function being called again.
+	/* If none of the above conditionals tested true, then execution "falls
+	   through" to here. */
 
-	   The inline-cache-miss primitive call receives enough information to
-	   reconstruct the PIC. */
+	/* A stack frame is set up, since the inline-cache-miss sub-primitive
+	makes a subroutine call to the VM. */
+	emit(parent->special_objects[JIT_PROLOG]);
+
+	/* The inline-cache-miss sub-primitive call receives enough information to
+	   reconstruct the PIC with the new entry. */
 	push(generic_word.value());
 	push(methods.value());
 	push(tag_fixnum(index));
 	push(cache_entries.value());
-	word_special(parent->special_objects[tail_call_p ? PIC_MISS_TAIL_WORD : PIC_MISS_WORD]);
+
+	emit_subprimitive(
+		parent->special_objects[tail_call_p ? PIC_MISS_TAIL_WORD : PIC_MISS_WORD],
+		true, /* tail_call_p */
+		true); /* stack_frame_p */
 }
 
 code_block *factor_vm::compile_inline_cache(fixnum index,
@@ -133,14 +141,14 @@ code_block *factor_vm::compile_inline_cache(fixnum index,
 				 cache_entries.value(),
 				 tail_call_p);
 	code_block *code = jit.to_code_block();
-	relocate_code_block(code);
+	initialize_code_block(code);
 	return code;
 }
 
 /* A generic word's definition performs general method lookup. */
 void *factor_vm::megamorphic_call_stub(cell generic_word)
 {
-	return untag<word>(generic_word)->xt;
+	return untag<word>(generic_word)->entry_point;
 }
 
 cell factor_vm::inline_cache_size(cell cache_entries)
@@ -180,25 +188,27 @@ to take care of the details. */
 void *factor_vm::inline_cache_miss(cell return_address_)
 {
 	code_root return_address(return_address_,this);
-
 	check_code_pointer(return_address.value);
+	bool tail_call_site = tail_call_site_p(return_address.value);
 
-	/* Since each PIC is only referenced from a single call site,
-	   if the old call target was a PIC, we can deallocate it immediately,
-	   instead of leaving dead PICs around until the next GC. */
-	deallocate_inline_cache(return_address.value);
+#ifdef PIC_DEBUG
+	std::cout << "Inline cache miss at "
+		<< (tail_call_site ? "tail" : "non-tail")
+		<< " call site 0x" << std::hex << return_address.value << std::dec
+		<< std::endl;
+#endif
 
-	data_root<array> cache_entries(dpop(),this);
-	fixnum index = untag_fixnum(dpop());
-	data_root<array> methods(dpop(),this);
-	data_root<word> generic_word(dpop(),this);
-	data_root<object> object(((cell *)ds)[-index],this);
-
-	void *xt;
+	data_root<array> cache_entries(ctx->pop(),this);
+	fixnum index = untag_fixnum(ctx->pop());
+	data_root<array> methods(ctx->pop(),this);
+	data_root<word> generic_word(ctx->pop(),this);
+	data_root<object> object(((cell *)ctx->datastack)[-index],this);
 
 	cell pic_size = inline_cache_size(cache_entries.value());
 
 	update_pic_transitions(pic_size);
+
+	void *xt;
 
 	if(pic_size >= max_pic_size)
 		xt = megamorphic_call_stub(generic_word.value());
@@ -208,26 +218,31 @@ void *factor_vm::inline_cache_miss(cell return_address_)
 		cell method = lookup_method(object.value(),methods.value());
 
 		data_root<array> new_cache_entries(add_inline_cache_entry(
-							   cache_entries.value(),
-							   klass,
-							   method),this);
+			cache_entries.value(),
+			klass,
+			method),this);
+
 		xt = compile_inline_cache(index,
-					  generic_word.value(),
-					  methods.value(),
-					  new_cache_entries.value(),
-					  tail_call_site_p(return_address.value))->xt();
+			generic_word.value(),
+			methods.value(),
+			new_cache_entries.value(),
+			tail_call_site)->entry_point();
 	}
 
 	/* Install the new stub. */
 	if(return_address.valid)
 	{
+		/* Since each PIC is only referenced from a single call site,
+		   if the old call target was a PIC, we can deallocate it immediately,
+		   instead of leaving dead PICs around until the next GC. */
+		deallocate_inline_cache(return_address.value);
 		set_call_target(return_address.value,xt);
 
 #ifdef PIC_DEBUG
 		std::cout << "Updated "
-			<< (tail_call_site_p(return_address) ? "tail" : "non-tail")
-			<< " call site 0x" << std::hex << return_address << std::dec
-			<< " with " << std::hex << (cell)xt << std::dec;
+			<< (tail_call_site ? "tail" : "non-tail")
+			<< " call site 0x" << std::hex << return_address.value << std::dec
+			<< " with 0x" << std::hex << (cell)xt << std::dec << std::endl;
 #endif
 	}
 

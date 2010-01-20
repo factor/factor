@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.parser
 assocs byte-arrays classes compiler.units functors kernel lexer
-libc math math.vectors math.vectors.private
-math.vectors.specialization namespaces
+libc math math.vectors math.vectors.private namespaces
 parser prettyprint.custom sequences sequences.private strings
 summary vocabs vocabs.loader vocabs.parser vocabs.generated
 words fry combinators make ;
@@ -31,7 +30,6 @@ M: bad-byte-array-length summary
 FUNCTOR: define-array ( T -- )
 
 A            DEFINES-CLASS ${T}-array
-S            DEFINES-CLASS ${T}-sequence
 <A>          DEFINES <${A}>
 (A)          DEFINES (${A})
 <direct-A>   DEFINES <direct-${A}>
@@ -46,8 +44,6 @@ NTH          [ T dup c-type-getter-boxer array-accessor ]
 SET-NTH      [ T dup c-setter array-accessor ]
 
 WHERE
-
-MIXIN: S
 
 TUPLE: A
 { underlying c-ptr read-only }
@@ -68,8 +64,6 @@ TUPLE: A
     >c-ptr dup length \ T heap-size /mod 0 =
     [ drop \ T bad-byte-array-length ] unless
     <direct-A> ; inline
-
-M: A new-underlying drop byte-array>A ;
 
 M: A clone [ underlying>> clone ] [ length>> ] bi <direct-A> ; inline
 
@@ -96,8 +90,6 @@ M: A resize
 
 M: A byte-length length \ T heap-size * ; inline
 
-M: A element-type drop \ T ; inline
-
 M: A direct-array-syntax drop \ A@ ;
 
 M: A pprint-delims drop \ A{ \ } ;
@@ -109,7 +101,11 @@ SYNTAX: A@ scan-object scan-object <direct-A> suffix! ;
 
 INSTANCE: A specialized-array
 
-A T c-type-boxed-class f specialize-vector-words
+M: A vs+ [ + \ T c-type-clamp ] 2map ; inline
+M: A vs- [ - \ T c-type-clamp ] 2map ; inline
+M: A vs* [ * \ T c-type-clamp ] 2map ; inline
+
+M: A v*high [ * \ T heap-size neg shift ] 2map ; inline
 
 ;FUNCTOR
 

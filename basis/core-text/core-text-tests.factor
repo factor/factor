@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test core-text core-text.fonts core-foundation
 core-foundation.dictionaries destructors arrays kernel generalizations
-math accessors core-foundation.utilities combinators hashtables colors
+locals math accessors core-foundation.utilities combinators hashtables colors
 colors.constants ;
 IN: core-text.tests
 
@@ -18,10 +18,11 @@ IN: core-text.tests
     ] with-destructors
 ] unit-test
 
-: test-typographic-bounds ( string font -- ? )
+:: test-typographic-bounds ( string font -- ? )
     [
-        test-font &CFRelease tuck COLOR: white <CTLine> &CFRelease
-        compute-line-metrics {
+        font test-font &CFRelease :> ctfont
+        string ctfont COLOR: white <CTLine> &CFRelease :> ctline
+        ctfont ctline compute-line-metrics {
             [ width>> float? ]
             [ ascent>> float? ]
             [ descent>> float? ]

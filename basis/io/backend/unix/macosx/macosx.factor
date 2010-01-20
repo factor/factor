@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend system namespaces io.backend.unix.bsd
 io.backend.unix.multiplexers io.backend.unix.multiplexers.run-loop ;
-IN: io.backend.macosx
+IN: io.backend.unix.macosx
 
 M: macosx init-io ( -- )
     <run-loop-mx> mx set-global ;

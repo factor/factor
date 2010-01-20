@@ -98,9 +98,20 @@ void data_heap::reset_generation(tenured_space *gen)
 	clear_decks(gen);
 }
 
+bool data_heap::high_fragmentation_p()
+{
+	return (tenured->largest_free_block() <= nursery->size + aging->size);
+}
+
 bool data_heap::low_memory_p()
 {
 	return (tenured->free_space() <= nursery->size + aging->size);
+}
+
+void data_heap::mark_all_cards()
+{
+	memset(cards,-1,cards_end - cards);
+	memset(decks,-1,decks_end - decks);
 }
 
 void factor_vm::set_data_heap(data_heap *data_)
@@ -115,21 +126,12 @@ void factor_vm::init_data_heap(cell young_size, cell aging_size, cell tenured_si
 	set_data_heap(new data_heap(young_size,aging_size,tenured_size));
 }
 
-/* Size of the object pointed to by a tagged pointer */
-cell factor_vm::object_size(cell tagged)
-{
-	if(immediate_p(tagged))
-		return 0;
-	else
-		return untag<object>(tagged)->size();
-}
-
 /* Size of the object pointed to by an untagged pointer */
 cell object::size() const
 {
 	if(free_p()) return ((free_heap_block *)this)->size();
 
-	switch(h.hi_tag())
+	switch(type())
 	{
 	case ARRAY_TYPE:
 		return align(array_size((array*)this),data_alignment);
@@ -169,7 +171,9 @@ the GC. Some types have a binary payload at the end (string, word, DLL) which
 we ignore. */
 cell object::binary_payload_start() const
 {
-	switch(h.hi_tag())
+	if(free_p()) return 0;
+
+	switch(type())
 	{
 	/* these objects do not refer to other objects at all */
 	case FLOAT_TYPE:
@@ -201,11 +205,6 @@ cell object::binary_payload_start() const
 	}
 }
 
-void factor_vm::primitive_size()
-{
-	box_unsigned_cell(object_size(dpop()));
-}
-
 data_heap_room factor_vm::data_room()
 {
 	data_heap_room room;
@@ -223,7 +222,7 @@ data_heap_room factor_vm::data_room()
 	room.tenured_free_block_count = data->tenured->free_block_count();
 	room.cards                    = data->cards_end - data->cards;
 	room.decks                    = data->decks_end - data->decks;
-	room.mark_stack               = data->tenured->mark_stack.capacity();
+	room.mark_stack               = mark_stack.capacity() * sizeof(cell);
 
 	return room;
 }
@@ -231,85 +230,42 @@ data_heap_room factor_vm::data_room()
 void factor_vm::primitive_data_room()
 {
 	data_heap_room room = data_room();
-	dpush(tag<byte_array>(byte_array_from_value(&room)));
+	ctx->push(tag<byte_array>(byte_array_from_value(&room)));
 }
 
-/* Disables GC and activates next-object ( -- obj ) primitive */
-void factor_vm::begin_scan()
-{
-	heap_scan_ptr = data->tenured->first_object();
-	gc_off = true;
-}
+struct object_accumulator {
+	cell type;
+	std::vector<cell> objects;
 
-void factor_vm::end_scan()
-{
-	gc_off = false;
-}
+	explicit object_accumulator(cell type_) : type(type_) {}
 
-void factor_vm::primitive_begin_scan()
-{
-	begin_scan();
-}
-
-cell factor_vm::next_object()
-{
-	if(!gc_off)
-		general_error(ERROR_HEAP_SCAN,false_object,false_object,NULL);
-
-	if(heap_scan_ptr)
+	void operator()(object *obj)
 	{
-		cell current = heap_scan_ptr;
-		heap_scan_ptr = data->tenured->next_object_after(heap_scan_ptr);
-		return tag_dynamic((object *)current);
-	}
-	else
-		return false_object;
-}
-
-/* Push object at heap scan cursor and advance; pushes f when done */
-void factor_vm::primitive_next_object()
-{
-	dpush(next_object());
-}
-
-/* Re-enables GC */
-void factor_vm::primitive_end_scan()
-{
-	gc_off = false;
-}
-
-struct word_counter {
-	cell count;
-
-	explicit word_counter() : count(0) {}
-
-	void operator()(cell obj)
-	{
-		if(tagged<object>(obj).type_p(WORD_TYPE))
-			count++;
+		if(type == TYPE_COUNT || obj->type() == type)
+			objects.push_back(tag_dynamic(obj));
 	}
 };
 
-struct word_accumulator {
-	growable_array words;
-
-	explicit word_accumulator(int count,factor_vm *vm) : words(vm,count) {}
-
-	void operator()(cell obj)
-	{
-		if(tagged<object>(obj).type_p(WORD_TYPE))
-			words.add(obj);
-	}
-};
-
-cell factor_vm::find_all_words()
+cell factor_vm::instances(cell type)
 {
-	word_counter counter;
-	each_object(counter);
-	word_accumulator accum(counter.count,this);
+	object_accumulator accum(type);
 	each_object(accum);
-	accum.words.trim();
-	return accum.words.elements.value();
+	cell object_count = accum.objects.size();
+
+	data_roots.push_back(data_root_range(&accum.objects[0],object_count));
+
+	array *objects = allot_array(object_count,false_object);
+	memcpy(objects->data(),&accum.objects[0],object_count * sizeof(cell));
+
+	data_roots.pop_back();
+
+	return tag<array>(objects);
+}
+
+void factor_vm::primitive_all_instances()
+{
+	primitive_full_gc();
+	ctx->push(instances(TYPE_COUNT));
 }
 
 }

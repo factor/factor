@@ -34,4 +34,4 @@ SYMBOL: ssl-initialized?
         t ssl-initialized? set-global
     ] unless ;
 
-[ f ssl-initialized? set-global ] "openssl" add-init-hook
+[ f ssl-initialized? set-global ] "openssl" add-startup-hook

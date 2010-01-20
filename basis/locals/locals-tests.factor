@@ -389,7 +389,7 @@ M:: integer lambda-method-forget-test ( a -- b ) a ;
     eval( -- ) call
 ] [ error>> >r/r>-in-fry-error? ] must-fail-with
     
-:: (funny-macro-test) ( obj quot -- ? ) obj { quot } 1&& ; inline
+:: (funny-macro-test) ( obj quot -- ? ) obj { [ quot call ] } 1&& ; inline
 : funny-macro-test ( n -- ? ) [ odd? ] (funny-macro-test) ;
 
 \ funny-macro-test def>> must-infer

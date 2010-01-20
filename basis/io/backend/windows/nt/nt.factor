@@ -50,21 +50,22 @@ M: winnt add-completion ( win32-handle -- )
         } cond
     ] with-timeout ;
 
-:: wait-for-overlapped ( us -- bytes-transferred overlapped error? )
+:: wait-for-overlapped ( nanos -- bytes-transferred overlapped error? )
     master-completion-port get-global
-    0 <int> [ ! bytes
-        f <void*> ! key
-        f <void*> [ ! overlapped
-            us [ 1000 /i ] [ INFINITE ] if* ! timeout
-            GetQueuedCompletionStatus zero?
-        ] keep
-        *void* dup [ OVERLAPPED memory>struct ] when
-    ] keep *int spin ;
+    0 <int> :> bytes
+    f <void*> :> key
+    f <void*> :> overlapped
+    nanos [ 1,000,000 /i ] [ INFINITE ] if* :> timeout
+    bytes key overlapped timeout GetQueuedCompletionStatus zero? :> error?
+
+    bytes *int
+    overlapped *void* dup [ OVERLAPPED memory>struct ] when
+    error? ;
 
 : resume-callback ( result overlapped -- )
     >c-ptr pending-overlapped get-global delete-at* drop resume-with ;
 
-: handle-overlapped ( us -- ? )
+: handle-overlapped ( nanos -- ? )
     wait-for-overlapped [
         [
             [ drop GetLastError 1array ] dip resume-callback t
@@ -74,7 +75,7 @@ M: winnt add-completion ( win32-handle -- )
 M: win32-handle cancel-operation
     [ check-disposed ] [ handle>> CancelIo drop ] bi ;
 
-M: winnt io-multiplex ( us -- )
+M: winnt io-multiplex ( nanos -- )
     handle-overlapped [ 0 io-multiplex ] when ;
 
 M: winnt init-io ( -- )

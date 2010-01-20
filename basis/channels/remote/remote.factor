@@ -69,4 +69,4 @@ M: remote-channel from ( remote-channel -- value )
 [
     H{ } clone \ remote-channels set-global
     start-channel-node
-] "channel-registry" add-init-hook
+] "channel-registry" add-startup-hook

@@ -2,6 +2,7 @@ namespace factor
 {
 
 static const cell free_list_count = 32;
+static const cell allocation_page_size = 1024;
 
 struct free_heap_block
 {
@@ -9,22 +10,29 @@ struct free_heap_block
 
 	bool free_p() const
 	{
-		return header & 1 == 1;
+		return (header & 1) == 1;
 	}
 
 	cell size() const
 	{
-		return header >> 3;
+		cell size = header & ~7;
+#ifdef FACTOR_DEBUG
+		assert(size > 0);
+#endif
+		return size;
 	}
 
 	void make_free(cell size)
 	{
-		header = (size << 3) | 1;
+#ifdef FACTOR_DEBUG
+		assert(size > 0);
+#endif
+		header = size | 1;
 	}
 };
 
 struct block_size_compare {
-	bool operator()(free_heap_block *a, free_heap_block *b)
+	bool operator()(free_heap_block *a, free_heap_block *b) const
 	{
 		return a->size() < b->size();
 	}

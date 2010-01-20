@@ -61,9 +61,9 @@ M: c-reader stream-read-until
 
 M: c-io-backend init-io ;
 
-: stdin-handle ( -- alien ) 11 getenv ;
-: stdout-handle ( -- alien ) 12 getenv ;
-: stderr-handle ( -- alien ) 61 getenv ;
+: stdin-handle ( -- alien ) 11 special-object ;
+: stdout-handle ( -- alien ) 12 special-object ;
+: stderr-handle ( -- alien ) 61 special-object ;
 
 : init-c-stdio ( -- )
     stdin-handle <c-reader>
@@ -73,7 +73,8 @@ M: c-io-backend init-io ;
 
 M: c-io-backend init-stdio init-c-stdio ;
 
-M: c-io-backend io-multiplex 60 60 * 1000 * 1000 * or (sleep) ;
+M: c-io-backend io-multiplex
+    dup 0 = [ drop ] [ 60 60 * 1000 * 1000 * or (sleep) ] if ;
 
 : fopen ( path mode -- alien )
     [ utf8 string>alien ] bi@ (fopen) ;

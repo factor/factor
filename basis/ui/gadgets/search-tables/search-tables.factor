@@ -51,7 +51,6 @@ renderer
 action
 hook
 font
-gap
 selection-color
 focus-border-color
 mouse-color

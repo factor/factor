@@ -21,7 +21,7 @@ mailbox
 variables
 sleep-entry ;
 
-: self ( -- thread ) 63 getenv ; inline
+: self ( -- thread ) 63 special-object ; inline
 
 ! Thread-local storage
 : tnamespace ( -- assoc )
@@ -36,7 +36,7 @@ sleep-entry ;
 : tchange ( key quot -- )
     tnamespace swap change-at ; inline
 
-: threads ( -- assoc ) 64 getenv ;
+: threads ( -- assoc ) 64 special-object ;
 
 : thread ( id -- thread ) threads at ;
 
@@ -61,7 +61,7 @@ ERROR: not-running thread ;
 : unregister-thread ( thread -- )
     check-registered id>> threads delete-at ;
 
-: set-self ( thread -- ) 63 setenv ; inline
+: set-self ( thread -- ) 63 set-special-object ; inline
 
 PRIVATE>
 
@@ -75,9 +75,9 @@ PRIVATE>
 : <thread> ( quot name -- thread )
     \ thread new-thread ;
 
-: run-queue ( -- dlist ) 65 getenv ;
+: run-queue ( -- dlist ) 65 special-object ;
 
-: sleep-queue ( -- heap ) 66 getenv ;
+: sleep-queue ( -- heap ) 66 special-object ;
 
 : resume ( thread -- )
     f >>state
@@ -91,11 +91,11 @@ PRIVATE>
     f >>state
     check-registered 2array run-queue push-front ;
 
-: sleep-time ( -- us/f )
+: sleep-time ( -- nanos/f )
     {
         { [ run-queue deque-empty? not ] [ 0 ] }
         { [ sleep-queue heap-empty? ] [ f ] }
-        [ sleep-queue heap-peek nip micros [-] ]
+        [ sleep-queue heap-peek nip nano-count [-] ]
     } cond ;
 
 DEFER: stop
@@ -108,7 +108,7 @@ DEFER: stop
 
 : expire-sleep? ( heap -- ? )
     dup heap-empty?
-    [ drop f ] [ heap-peek nip micros <= ] if ;
+    [ drop f ] [ heap-peek nip nano-count <= ] if ;
 
 : expire-sleep ( thread -- )
     f >>sleep-entry resume ;
@@ -140,7 +140,11 @@ DEFER: next
     !
     ! And if sleep-time outputs f, there are no sleeping
     ! threads either... so WTF.
-    sleep-time [ die 0 ] unless* (sleep) next ;
+    sleep-time {
+        { [ dup not ] [ drop die ] }
+        { [ dup 0 = ] [ drop ] }
+        [ (sleep) ]
+    } cond next ;
 
 : (next) ( arg thread -- * )
     f >>state
@@ -173,7 +177,7 @@ PRIVATE>
 
 : yield ( -- ) [ resume ] f suspend drop ;
 
-GENERIC: sleep-until ( time/f -- )
+GENERIC: sleep-until ( n/f -- )
 
 M: integer sleep-until
     '[ _ schedule-sleep ] "sleep" suspend drop ;
@@ -184,7 +188,7 @@ M: f sleep-until
 GENERIC: sleep ( dt -- )
 
 M: real sleep
-    micros + >integer sleep-until ;
+    >integer nano-count + sleep-until ;
 
 : interrupt ( thread -- )
     dup state>> [
@@ -212,9 +216,9 @@ GENERIC: error-in-thread ( error thread -- )
 <PRIVATE
 
 : init-threads ( -- )
-    H{ } clone 64 setenv
-    <dlist> 65 setenv
-    <min-heap> 66 setenv
+    H{ } clone 64 set-special-object
+    <dlist> 65 set-special-object
+    <min-heap> 66 set-special-object
     initial-thread global
     [ drop [ ] "Initial" <thread> ] cache
     <box> >>continuation
@@ -225,4 +229,4 @@ GENERIC: error-in-thread ( error thread -- )
 
 PRIVATE>
 
-[ init-threads ] "threads" add-init-hook
+[ init-threads ] "threads" add-startup-hook
