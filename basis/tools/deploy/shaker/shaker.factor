@@ -545,6 +545,7 @@ SYMBOL: deploy-vocab
         [
             strip-debugger? [
                 "debugger" require
+                "tools.errors" require
                 "inspector" require
                 deploy-ui? get [
                     "ui.debugger" require
