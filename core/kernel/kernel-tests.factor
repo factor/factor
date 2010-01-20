@@ -164,11 +164,6 @@ IN: kernel.tests
     last-frame
 ] unit-test
 
-: throw-frame-test ( c -- * ) [ gc gc continue ] call-clear ;
-: throw-frame-test' ( -- ) [ throw-frame-test ] callcc0 ;
-
-[ ] [ throw-frame-test' ] unit-test
-
 [ 10 2 3 4 5 ] [ 1 2 3 4 5 [ 10 * ] 4dip ] unit-test
 
 [ 3 -1 5/6 ] [ 1 2 3 4 5 6 [ + ] [ - ] [ / ] 2tri* ] unit-test

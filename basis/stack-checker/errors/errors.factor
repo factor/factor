@@ -30,8 +30,6 @@ ERROR: unbalanced-recursion-error < inference-error word height ;
 
 ERROR: inconsistent-recursive-call-error < inference-error word ;
 
-ERROR: unknown-primitive-error < inference-error ;
-
 ERROR: transform-expansion-error < inference-error error continuation word ;
 
 ERROR: bad-declaration-error < inference-error declaration ;
