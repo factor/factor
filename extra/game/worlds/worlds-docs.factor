@@ -16,7 +16,7 @@ HELP: game-attributes
 } ;
 
 HELP: game-world
-{ $class-description "A subclass of " { $link world } " that automatically sets up and manages connections to the " { $vocab-link "game.loop" } ", " { $vocab-link "game.input" } ", and " { $vocab-link "audio.engine" } " libraries. It does this by providing methods on " { $link begin-world } ", " { $link end-world } ", and " { $link draw* } ". Subclasses can provide their own world setup and teardown code by adding methods to the " { $link begin-game-world } " and " { $link end-game-world } " generic words."
+{ $class-description "A subclass of " { $link world } " that automatically sets up and manages connections to the " { $vocab-link "game.loop" } ", " { $vocab-link "game.input" } ", and " { $vocab-link "audio.engine" } " libraries. It does this by providing methods on " { $link begin-world } ", " { $link end-world } ", and " { $link draw* } ". Subclasses can provide their own world setup, teardown, and update code by adding methods to the " { $link begin-game-world } " and " { $link end-game-world } " generic words. The standard " { $snippet "world" } " generics " { $link draw-world* } " and " { $link resize-world } " can also be given methods to draw the window contents and handle resize events. The " { $snippet "draw-world*" } " method will be invoked in a tight loop by the game loop."
 $nl
 "The game-world tuple has the following publicly accessible slots:"
 { $list
@@ -49,6 +49,7 @@ ARTICLE: "game.worlds" "Game worlds"
     begin-game-world
     end-game-world
     tick-game-world
-} ;
+}
+"Additionally, the standard " { $snippet "world" } " generics " { $link draw-world* } " and " { $link resize-world } " can also be given methods to draw the window contents and handle resize events. The " { $snippet "draw-world*" } " method will be invoked in a tight loop by the game loop." ;
 
 ABOUT: "game.worlds"
