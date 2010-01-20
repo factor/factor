@@ -37,8 +37,11 @@ PREDICATE: class < word "class" word-prop ;
 
 : classes ( -- seq ) implementors-map get keys ;
 
-: predicate-word ( word -- predicate )
+: create-predicate-word ( word -- predicate )
     [ name>> "?" append ] [ vocabulary>> ] bi create ;
+
+: predicate-word ( word -- predicate )
+    "predicate" word-prop first ;
 
 PREDICATE: predicate < word "predicating" word-prop >boolean ;
 
@@ -49,8 +52,7 @@ M: predicate reset-word
     [ call-next-method ] [ f "predicating" set-word-prop ] bi ;
 
 : define-predicate ( class quot -- )
-    [ "predicate" word-prop first ] dip
-    (( object -- ? )) define-declared ;
+    [ predicate-word ] dip (( object -- ? )) define-declared ;
 
 : superclass ( class -- super )
     #! Output f for non-classes to work with algebra code
@@ -144,7 +146,7 @@ M: sequence implementors [ implementors ] gather ;
                 [ ]
             } cleave
         ] dip [ assoc-union ] curry change-props
-        dup predicate-word
+        dup create-predicate-word
         [ 1quotation "predicate" set-word-prop ]
         [ swap "predicating" set-word-prop ]
         [ drop t "class" set-word-prop ]
