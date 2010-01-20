@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes classes.algebra classes.algebra.private
-classes.union words kernel sequences definitions combinators
-arrays assocs generic accessors ;
+classes.union classes.union.private words kernel sequences
+definitions combinators arrays assocs generic accessors ;
 IN: classes.mixin
 
 PREDICATE: mixin-class < union-class "mixin" word-prop ;
@@ -46,40 +46,35 @@ TUPLE: check-mixin-class class ;
     [ [ members swap bootstrap-word ] dip call ] [ drop ] 2bi
     swap redefine-mixin-class ; inline
 
-: update-classes/new ( mixin -- )
+: update-mixin-class ( member mixin -- )
     class-usages
+    [ update-methods ]
     [ [ update-class ] each ]
-    [ implementors [ remake-generic ] each ] bi ;
+    [ implementors [ remake-generic ] each ]
+    tri ;
 
 : (add-mixin-instance) ( class mixin -- )
     [ [ suffix ] change-mixin-class ]
     [ [ f ] 2dip "instances" word-prop set-at ]
-    2bi ;
+    [ update-mixin-class ]
+    2tri ;
 
 GENERIC# add-mixin-instance 1 ( class mixin -- )
 
 M: class add-mixin-instance
-    [ 2drop ] [
-        [ (add-mixin-instance) ] 2keep
-        [ nip ] [ [ new-class? ] either? ] 2bi
-        [ update-classes/new ] [ update-classes ] if
-    ] if-mixin-member? ;
+    [ 2drop ] [ (add-mixin-instance) ] if-mixin-member? ;
 
 : (remove-mixin-instance) ( class mixin -- )
     [ [ swap remove ] change-mixin-class ]
     [ "instances" word-prop delete-at ]
-    2bi ;
+    [ update-mixin-class ]
+    2tri ;
 
 : remove-mixin-instance ( class mixin -- )
     #! The order of the three clauses is important here. The last
     #! one must come after the other two so that the entries it
     #! adds to changed-generics are not overwritten.
-    [
-        [ (remove-mixin-instance) ]
-        [ nip update-classes ]
-        [ class-usages update-methods ]
-        2tri
-    ] [ 2drop ] if-mixin-member? ;
+    [ (remove-mixin-instance) ] [ 2drop ] if-mixin-member? ;
 
 M: mixin-class class-forgotten remove-mixin-instance ;
 
