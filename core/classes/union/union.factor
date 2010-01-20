@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words sequences kernel assocs combinators classes
 classes.algebra classes.algebra.private namespaces arrays math
@@ -33,6 +33,9 @@ M: union-class rank-class drop 2 ;
 
 M: union-class instance?
     "members" word-prop [ instance? ] with any? ;
+
+M: union-class normalize-class
+    members <anonymous-union> normalize-class ;
 
 M: union-class (flatten-class)
     members <anonymous-union> (flatten-class) ;

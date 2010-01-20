@@ -79,9 +79,9 @@ INSTANCE: union-with-one-member mixin-with-one-member
 
 [ t ] [ a1 b1 class-or a1 c1 class-or class-and a1 class<= ] unit-test
 
-[ t ] [ growable tuple sequence class-and class<= ] unit-test
+[ f ] [ growable tuple sequence class-and class<= ] unit-test
 
-[ t ] [ growable assoc class-and tuple class<= ] unit-test
+[ f ] [ growable assoc class-and tuple class<= ] unit-test
 
 [ t ] [ object \ f \ f class-not class-or class<= ] unit-test
 
@@ -130,6 +130,11 @@ INSTANCE: union-with-one-member mixin-with-one-member
 [ t ] [ a union-with-one-member class<= ] unit-test
 [ f ] [ union-with-one-member class-not integer class<= ] unit-test
 
+MIXIN: empty-mixin
+
+[ f ] [ empty-mixin class-not null class<= ] unit-test
+[ f ] [ empty-mixin null class<= ] unit-test
+
 ! class-and
 : class-and* ( cls1 cls2 cls3 -- ? ) [ class-and ] dip class= ;
 
@@ -146,8 +151,6 @@ INSTANCE: union-with-one-member mixin-with-one-member
 [ t ] [ slice     reversed null   class-and* ] unit-test
 [ t ] [ \ f class-not \ f      null   class-and* ] unit-test
 
-[ t ] [ vector virtual-sequence null class-and* ] unit-test
-
 [ t ] [ vector array class-not vector class-and* ] unit-test
 
 ! class-or
@@ -160,7 +163,8 @@ INSTANCE: union-with-one-member mixin-with-one-member
 
 ! classes-intersect?
 [ t ] [ both tuple classes-intersect? ] unit-test
-[ f ] [ vector virtual-sequence classes-intersect? ] unit-test
+
+[ t ] [ vector virtual-sequence classes-intersect? ] unit-test
 
 [ t ] [ number vector class-or sequence classes-intersect? ] unit-test
 
@@ -188,11 +192,11 @@ INSTANCE: union-with-one-member mixin-with-one-member
 [ t ] [ union-with-one-member object classes-intersect? ] unit-test
 
 [ t ] [ a mixin-with-one-member classes-intersect? ] unit-test
-[ f ] [ fixnum mixin-with-one-member classes-intersect? ] unit-test
+[ t ] [ fixnum mixin-with-one-member classes-intersect? ] unit-test
 [ t ] [ object mixin-with-one-member classes-intersect? ] unit-test
 
 [ t ] [ mixin-with-one-member a classes-intersect? ] unit-test
-[ f ] [ mixin-with-one-member fixnum classes-intersect? ] unit-test
+[ t ] [ mixin-with-one-member fixnum classes-intersect? ] unit-test
 [ t ] [ mixin-with-one-member object classes-intersect? ] unit-test
 
 ! class=
