@@ -13,7 +13,7 @@ words.private definitions assocs summary compiler.units
 system.private combinators combinators.short-circuit locals
 locals.backend locals.types combinators.private
 stack-checker.values generic.single generic.single.private
-alien.libraries tools.dispatch.private tools.profiler.private vm
+alien.libraries tools.dispatch.private tools.profiler.private
 stack-checker.alien
 stack-checker.state
 stack-checker.errors
@@ -738,7 +738,5 @@ M: bad-executable summary
 \ compute-identity-hashcode { object } { } define-primitive
 
 \ (exit) { integer } { } define-primitive
-
-\ vm-ptr { } { alien } define-primitive
 
 \ quot-compiled? { quotation } { object } define-primitive

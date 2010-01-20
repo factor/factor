@@ -253,9 +253,4 @@ VM_C_API cell from_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size, 
 	return parent->from_medium_struct(x1, x2, x3, x4, size);
 }
 
-void factor_vm::primitive_vm_ptr()
-{
-	ctx->push(allot_alien(this));
-}
-
 }
