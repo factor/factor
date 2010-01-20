@@ -45,13 +45,17 @@ SYMBOL: compiler-impl
 
 HOOK: update-call-sites compiler-impl ( class generic -- words )
 
+: changed-call-sites ( class generic -- )
+    update-call-sites [ changed-definition ] each ;
+
 M: generic update-generic ( class generic -- )
-    [ update-call-sites [ changed-definition ] each ]
+    [ changed-call-sites ]
     [ remake-generic drop ]
     2bi ;
 
 M: sequence update-methods ( class seq -- )
-    implementors [ update-generic ] with each ;
+    [ [ predicate-word changed-call-sites ] with each ]
+    [ implementors [ update-generic ] with each ] 2bi ;
 
 HOOK: recompile compiler-impl ( words -- alist )
 
