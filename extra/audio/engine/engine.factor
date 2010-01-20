@@ -10,7 +10,9 @@ TUPLE: audio-source
     { position initial: { 0.0 0.0 0.0 } }
     { gain float initial: 1.0 }
     { velocity initial: { 0.0 0.0 0.0 } }
-    { relative? boolean initial: f } ;
+    { relative? boolean initial: f }
+    { distance float initial: 1.0 }
+    { rolloff float initial: 1.0 } ;
 
 TUPLE: audio-orientation
     { forward initial: { 0.0 0.0 -1.0 } }
@@ -32,12 +34,16 @@ GENERIC: audio-position ( source/listener -- position )
 GENERIC: audio-gain ( source/listener -- gain )
 GENERIC: audio-velocity ( source/listener -- velocity )
 GENERIC: audio-relative? ( source -- relative? )
+GENERIC: audio-distance ( source -- distance )
+GENERIC: audio-rolloff ( source -- rolloff )
 GENERIC: audio-orientation ( listener -- orientation )
 
 M: object audio-position drop { 0.0 0.0 0.0 } ; inline
 M: object audio-gain drop 1.0 ; inline
 M: object audio-velocity drop { 0.0 0.0 0.0 } ; inline
 M: object audio-relative? drop f ; inline
+M: object audio-distance drop 1.0 ; inline
+M: object audio-rolloff drop 1.0 ; inline
 M: object audio-orientation drop T{ audio-orientation } ; inline
 
 M: audio-source audio-position position>> ; inline
@@ -188,6 +194,8 @@ ERROR: audio-context-not-available device-name ;
         [ AL_GAIN swap audio-gain alSourcef ]
         [ AL_VELOCITY swap audio-velocity first3 alSource3f ]
         [ AL_SOURCE_RELATIVE swap audio-relative? c:>c-bool alSourcei ]
+        [ AL_REFERENCE_DISTANCE swap audio-distance alSourcef ]
+        [ AL_ROLLOFF_FACTOR swap audio-rolloff alSourcef ]
     } 2cleave ;
 
 :: update-audio-clip ( audio-clip -- )

@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors arrays combinators.tuple game.loop game.worlds
 generalizations gpu gpu.render gpu.shaders gpu.util gpu.util.wasd
-kernel literals math math.matrices math.order math.vectors
+kernel literals math math.libm math.matrices math.order math.vectors
 method-chains sequences ui ui.gadgets ui.gadgets.worlds
 ui.pixel-formats audio.engine audio.loader locals ;
 IN: gpu.demos.raytrace
@@ -50,6 +50,7 @@ TUPLE: raytrace-world < wasd-world
     [ home>> ] bi m.v ;
 
 M: sphere audio-position sphere-center ; inline
+M: sphere audio-distance radius>> fsqrt 2.0 * ; inline
 
 : <sphere-uniforms> ( world -- uniforms )
     [ wasd-mv-inv-matrix ]
