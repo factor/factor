@@ -26,7 +26,7 @@ $nl
 
 HELP: begin-game-world
 { $values { "world" game-world } }
-{ $description "This generic word is called by the " { $link begin-world } " method for " { $link game-world } " subclasses immediately before the game world starts the game loop." } ;
+{ $description "This generic word is called by the " { $link begin-world } " method for " { $link game-world } " subclasses immediately before the game world starts the game loop. If the game world has an " { $link audio-engine } ", it will be initialized and started before " { $snippet "begin-game-world" } " is called." } ;
 
 HELP: end-game-world
 { $values { "world" game-world } }
