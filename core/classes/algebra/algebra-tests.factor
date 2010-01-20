@@ -135,6 +135,9 @@ MIXIN: empty-mixin
 [ f ] [ empty-mixin class-not null class<= ] unit-test
 [ f ] [ empty-mixin null class<= ] unit-test
 
+[ t ] [ array sequence vector class-not class-and class<= ] unit-test
+[ f ] [ vector sequence vector class-not class-and class<= ] unit-test
+
 ! class-and
 : class-and* ( cls1 cls2 cls3 -- ? ) [ class-and ] dip class= ;
 
