@@ -1,0 +1,1 @@
+DirectX 9 bindings. Corresponds to d3dx9effect.h.

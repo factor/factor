@@ -1,0 +1,1 @@
+Bindings to DirectWrite text rendering. Corresponds to dwrite.h.
