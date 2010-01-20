@@ -17,29 +17,19 @@ M: mixin-class reset-class
 
 M: mixin-class rank-class drop 3 ;
 
-: redefine-mixin-class ( class members -- )
-    [ (define-union-class) ]
-    [ drop t "mixin" set-word-prop ]
-    2bi ;
-
-: define-mixin-class ( class -- )
-    dup mixin-class? [
-        drop
-    ] [
-        {
-            [ { } redefine-mixin-class ]
-            [ H{ } clone "instances" set-word-prop ]
-            [ changed-definition ]
-            [ update-classes ]
-        } cleave
-    ] if ;
-
 TUPLE: check-mixin-class class ;
 
 : check-mixin-class ( mixin -- mixin )
     dup mixin-class? [
         \ check-mixin-class boa throw
     ] unless ;
+
+<PRIVATE
+
+: redefine-mixin-class ( class members -- )
+    [ (define-union-class) ]
+    [ drop t "mixin" set-word-prop ]
+    2bi ;
 
 : if-mixin-member? ( class mixin true false -- )
     [ check-mixin-class 2dup members member-eq? ] 2dip if ; inline
@@ -61,11 +51,6 @@ TUPLE: check-mixin-class class ;
         [ 2nip [ update-class ] each ]
     } 3cleave ;
 
-GENERIC# add-mixin-instance 1 ( class mixin -- )
-
-M: class add-mixin-instance
-    [ 2drop ] [ (add-mixin-instance) ] if-mixin-member? ;
-
 : (remove-mixin-instance) ( class mixin -- )
     #! Call update-methods after removing the member:
     #! - Call sites of generics specializing on 'mixin'
@@ -79,10 +64,29 @@ M: class add-mixin-instance
         [ nip update-methods ]
     } 3cleave ;
 
+PRIVATE>
+
+GENERIC# add-mixin-instance 1 ( class mixin -- )
+
+M: class add-mixin-instance
+    [ 2drop ] [ (add-mixin-instance) ] if-mixin-member? ;
+
 : remove-mixin-instance ( class mixin -- )
     [ (remove-mixin-instance) ] [ 2drop ] if-mixin-member? ;
 
 M: mixin-class class-forgotten remove-mixin-instance ;
+
+: define-mixin-class ( class -- )
+    dup mixin-class? [
+        drop
+    ] [
+        {
+            [ { } redefine-mixin-class ]
+            [ H{ } clone "instances" set-word-prop ]
+            [ changed-definition ]
+            [ update-classes ]
+        } cleave
+    ] if ;
 
 ! Definition protocol implementation ensures that removing an
 ! INSTANCE: declaration from a source file updates the mixin.
@@ -90,8 +94,12 @@ TUPLE: mixin-instance class mixin ;
 
 C: <mixin-instance> mixin-instance
 
+<PRIVATE
+
 : >mixin-instance< ( mixin-instance -- class mixin )
     [ class>> ] [ mixin>> ] bi ; inline
+
+PRIVATE>
 
 M: mixin-instance where >mixin-instance< "instances" word-prop at ;
 
