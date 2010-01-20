@@ -217,7 +217,7 @@ terrain-world H{
     [ tick-player-reverse ]
     [ tick-player-forward ] if ;
 
-M: terrain-world tick*
+M: terrain-world tick-game-world
     [ dup focused?>> [ handle-input ] [ drop ] if ]
     [ dup player>> tick-player ] bi ;
 
@@ -295,6 +295,7 @@ GAME: terrain-game {
             double-buffered
             T{ depth-bits { value 24 } }
         } }
+        { use-game-input? t }
         { grab-input? t }
         { pref-dim { 1024 768 } }
         { tick-interval-micros $[ 60 fps ] }
