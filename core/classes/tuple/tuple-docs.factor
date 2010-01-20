@@ -202,6 +202,8 @@ ARTICLE: "tuple-introspection" "Tuple introspection"
 }
 "Tuple classes can also be defined at run time:"
 { $subsections define-tuple-class }
+"Tuples can be compared for slot equality even if the tuple class overrides " { $link equal? } ":"
+{ $subsections tuple= }
 { $see-also "slots" "mirrors" } ;
 
 ARTICLE: "tuple-examples" "Tuple examples"
