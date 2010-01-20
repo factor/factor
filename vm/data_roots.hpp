@@ -7,7 +7,7 @@ struct data_root : public tagged<Type> {
 
 	void push()
 	{
-		parent->data_roots.push_back((cell)this);
+		parent->data_roots.push_back(data_root_range(&this->value_,1));
 	}
 
 	explicit data_root(cell value_, factor_vm *parent_)
@@ -27,9 +27,6 @@ struct data_root : public tagged<Type> {
 
 	~data_root()
 	{
-#ifdef FACTOR_DEBUG
-		assert(parent->data_roots.back() == (cell)this);
-#endif
 		parent->data_roots.pop_back();
 	}
 };

@@ -9,8 +9,7 @@ ARTICLE: "timing" "Timing code and collecting statistics"
 { $subsections dispatch-stats. gc-events. gc-stats. gc-summary. }
 "A lower-level word puts timings on the stack, intead of printing:"
 { $subsections benchmark }
-"You can also read the system clock directly:"
-{ $subsections micros }
+"You can also read the system clock directly; see " { $link "system" } "."
 { $see-also "profiling" "calendar" } ;
 
 ABOUT: "timing"
@@ -25,7 +24,7 @@ HELP: time
 { $values { "quot" quotation } }
 { $description "Runs a quotation, gathering statistics about method dispatch and garbage collection, and then prints the total run time." } ;
 
-{ benchmark micros time } related-words
+{ benchmark system-micros time } related-words
 
 HELP: collect-gc-events
 { $values { "quot" quotation } }

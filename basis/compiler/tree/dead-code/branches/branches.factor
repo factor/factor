@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences namespaces kernel accessors assocs sets fry
 arrays combinators columns stack-checker.backend
@@ -36,7 +36,7 @@ M: #branch remove-dead-code*
 
 : drop-indexed-values ( values indices -- node )
     [ drop filter-live ] [ swap nths ] 2bi
-    [ make-values ] keep
+    [ length make-values ] keep
     [ drop ] [ zip ] 2bi
     #data-shuffle ;
 

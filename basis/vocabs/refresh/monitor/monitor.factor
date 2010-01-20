@@ -56,4 +56,4 @@ TR: convert-separators "/\\" ".." ;
 [
     "-no-monitors" (command-line) member?
     [ start-monitor-thread ] unless
-] "vocabs.refresh.monitor" add-init-hook
+] "vocabs.refresh.monitor" add-startup-hook

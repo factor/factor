@@ -3,21 +3,21 @@
 namespace factor
 {
 
-/* make a new array with an initial element */
 array *factor_vm::allot_array(cell capacity, cell fill_)
 {
 	data_root<object> fill(fill_,this);
-	data_root<array> new_array(allot_uninitialized_array<array>(capacity),this);
+	array *new_array = allot_uninitialized_array<array>(capacity);
 	memset_cell(new_array->data(),fill.value(),capacity * sizeof(cell));
-	return new_array.untagged();
+	return new_array;
 }
 
-/* push a new array on the stack */
 void factor_vm::primitive_array()
 {
-	cell initial = dpop();
-	cell size = unbox_array_size();
-	dpush(tag<array>(allot_array(size,initial)));
+	data_root<object> fill(ctx->pop(),this);
+	cell capacity = unbox_array_size();
+	array *new_array = allot_uninitialized_array<array>(capacity);
+	memset_cell(new_array->data(),fill.value(),capacity * sizeof(cell));
+	ctx->push(tag<array>(new_array));
 }
 
 cell factor_vm::allot_array_1(cell obj_)
@@ -54,9 +54,10 @@ cell factor_vm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_)
 
 void factor_vm::primitive_resize_array()
 {
-	array *a = untag_check<array>(dpop());
+	data_root<array> a(ctx->pop(),this);
+	a.untag_check(this);
 	cell capacity = unbox_array_size();
-	dpush(tag<array>(reallot_array(a,capacity)));
+	ctx->push(tag<array>(reallot_array(a.untagged(),capacity)));
 }
 
 void growable_array::add(cell elt_)

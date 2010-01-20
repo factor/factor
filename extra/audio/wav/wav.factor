@@ -1,7 +1,9 @@
-USING: alien.c-types alien.syntax audio combinators
+! (c)2009 Joe Groff bsd license
+USING: alien.c-types alien.syntax audio combinators endian
 combinators.short-circuit io io.binary io.encodings.binary
 io.files io.streams.byte-array kernel locals math
-sequences alien alien.data classes.struct accessors ;
+sequences alien alien.data classes.struct accessors
+audio.chunked-file audio.loader ;
 IN: audio.wav
 
 CONSTANT: RIFF-MAGIC "RIFF"
@@ -30,23 +32,8 @@ STRUCT: wav-data-chunk
     { header riff-chunk-header }
     { body uchar[0] } ;
 
-ERROR: invalid-wav-file ;
-
-: ensured-read ( count -- output/f )
-    [ read ] keep over length = [ drop f ] unless ;
-: ensured-read* ( count -- output )
-    ensured-read [ invalid-wav-file ] unless* ;
-
-: read-chunk ( -- byte-array/f )
-    4 ensured-read [ 4 ensured-read* dup le> ensured-read* 3append ] [ f ] if* ;
 : read-riff-chunk ( -- byte-array/f )
     riff-chunk heap-size ensured-read* ;
-
-: id= ( chunk id -- ? )
-    [ 4 head ] dip sequence= ; inline
-
-: check-chunk ( chunk id class -- ? )
-    heap-size [ id= ] [ [ length ] dip >= ] bi-curry* bi and ;
 
 :: read-wav-chunks ( -- fmt data )
     f :> fmt! f :> data!
@@ -54,15 +41,16 @@ ERROR: invalid-wav-file ;
     [ {
         { [ dup FMT-MAGIC  wav-fmt-chunk  check-chunk ] [ wav-fmt-chunk  memory>struct fmt!  ] }
         { [ dup DATA-MAGIC wav-data-chunk check-chunk ] [ wav-data-chunk memory>struct data! ] }
+        [ drop ]
     } cond ] while drop
-    fmt data 2dup and [ invalid-wav-file ] unless ;
+    fmt data 2dup and [ invalid-audio-file ] unless ;
 
 : verify-wav ( chunk -- )
     {
         [ RIFF-MAGIC id= ]
         [ riff-chunk memory>struct format>> 4 memory>byte-array WAVE-MAGIC id= ]
     } 1&&
-    [ invalid-wav-file ] unless ;
+    [ invalid-audio-file ] unless ;
 
 : (read-wav) ( -- audio )
     read-wav-chunks
@@ -73,9 +61,14 @@ ERROR: invalid-wav-file ;
     ] [
         [ header>> size>> 4 memory>byte-array le> dup ]
         [ body>> >c-ptr ] bi swap memory>byte-array
-    ] bi* <audio> ;
+    ] bi*
+    <audio> convert-data-endian ;
 
 : read-wav ( filename -- audio )
-    binary [
-        read-riff-chunk verify-wav (read-wav)
-    ] with-file-reader ;
+    little-endian [
+        binary [
+            read-riff-chunk verify-wav (read-wav)
+        ] with-file-reader
+    ] with-endianness ;
+
+"wav" [ read-wav ] register-audio-extension

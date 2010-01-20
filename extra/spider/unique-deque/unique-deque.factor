@@ -30,7 +30,7 @@ TUPLE: unique-deque assoc deque ;
 
 : peek-url ( unique-deque -- todo-url ) deque>> peek-front ;
 
-:: slurp-deque-when ( deque quot1 quot2: ( value -- ) -- )
+:: slurp-deque-when ( deque quot1: ( value -- ) quot2: ( value -- ) -- )
     deque deque-empty? [
         deque pop-front dup quot1 call
         [ quot2 call t ] [ drop f ] if

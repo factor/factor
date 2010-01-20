@@ -14,7 +14,9 @@ USING:
     io.files
     io.pathnames
     kernel 
+    locals
     math
+    math.order
     openal
     opengl.gl
     sequences
@@ -40,12 +42,11 @@ CONSTANT: game-height 256
   #! Point is a {x y}.
   first2 game-width 3 * * swap 3 * + ;
 
-: set-bitmap-pixel ( color point array -- )
-  #! 'color' is a {r g b}. Point is {x y}.
-  [ bitmap-index ] dip ! color index array
-  [ [ first ] 2dip set-nth ] 3keep
-  [ [ second ] 2dip [ 1 + ] dip set-nth ] 3keep
-  [ third ] 2dip [ 2 + ] dip set-nth ;
+:: set-bitmap-pixel ( bitmap point color -- )
+    point bitmap-index :> index
+    color first  index     bitmap set-nth
+    color second index 1 + bitmap set-nth
+    color third  index 2 + bitmap set-nth ;
 
 : get-bitmap-pixel ( point array -- color )
   #! Point is a {x y}. color is a {r g b} 
@@ -71,16 +72,16 @@ CONSTANT: SOUND-UFO-HIT      8
 : init-sounds ( cpu -- )
   init-openal
   [ 9 gen-sources swap (>>sounds) ] keep
-  [ SOUND-SHOT        "resource:extra/space-invaders/resources/Shot.wav" init-sound ] keep 
-  [ SOUND-UFO         "resource:extra/space-invaders/resources/Ufo.wav" init-sound ] keep 
+  [ SOUND-SHOT        "vocab:space-invaders/resources/Shot.wav" init-sound ] keep 
+  [ SOUND-UFO         "vocab:space-invaders/resources/Ufo.wav" init-sound ] keep 
   [ sounds>> SOUND-UFO swap nth AL_LOOPING AL_TRUE set-source-param ] keep
-  [ SOUND-BASE-HIT    "resource:extra/space-invaders/resources/BaseHit.wav" init-sound ] keep 
-  [ SOUND-INVADER-HIT "resource:extra/space-invaders/resources/InvHit.Wav" init-sound ] keep 
-  [ SOUND-WALK1       "resource:extra/space-invaders/resources/Walk1.wav" init-sound ] keep 
-  [ SOUND-WALK2       "resource:extra/space-invaders/resources/Walk2.wav" init-sound ] keep 
-  [ SOUND-WALK3       "resource:extra/space-invaders/resources/Walk3.wav" init-sound ] keep 
-  [ SOUND-WALK4       "resource:extra/space-invaders/resources/Walk4.wav" init-sound ] keep 
-  [ SOUND-UFO-HIT    "resource:extra/space-invaders/resources/UfoHit.wav" init-sound ] keep
+  [ SOUND-BASE-HIT    "vocab:space-invaders/resources/BaseHit.wav" init-sound ] keep 
+  [ SOUND-INVADER-HIT "vocab:space-invaders/resources/InvHit.Wav" init-sound ] keep 
+  [ SOUND-WALK1       "vocab:space-invaders/resources/Walk1.wav" init-sound ] keep 
+  [ SOUND-WALK2       "vocab:space-invaders/resources/Walk2.wav" init-sound ] keep 
+  [ SOUND-WALK3       "vocab:space-invaders/resources/Walk3.wav" init-sound ] keep 
+  [ SOUND-WALK4       "vocab:space-invaders/resources/Walk4.wav" init-sound ] keep 
+  [ SOUND-UFO-HIT    "vocab:space-invaders/resources/UfoHit.wav" init-sound ] keep
   f swap (>>looping?) ;
 
 : cpu-init ( cpu -- cpu )
@@ -139,8 +140,8 @@ M: space-invaders read-port ( port cpu -- byte )
   #! Setting this value affects the value read from port 3
   (>>port2o) ;
 
-: bit-newly-set? ( old-value new-value bit -- bool )
-  tuck bit? [ bit? not ] dip and ;
+:: bit-newly-set? ( old-value new-value bit -- bool )
+  new-value bit bit? [ old-value bit bit? not ] dip and ;
 
 : port3-newly-set? ( new-value cpu bit -- bool )
   [ port3o>> swap ] dip bit-newly-set? ;
@@ -317,19 +318,15 @@ CONSTANT: red   { 255 0 0 }
 
 : plot-bitmap-pixel ( bitmap point color -- )
   #! point is a {x y}. color is a {r g b}.
-  spin set-bitmap-pixel ;
-
-: within ( n a b -- bool )
-  #! n >= a and n <= b
-  rot tuck swap <= [ swap >= ] dip and ;
+  set-bitmap-pixel ;
 
 : get-point-color ( point -- color )
   #! Return the color to use for the given x/y position.
   first2
   {
-    { [ dup 184 238 within pick 0 223 within and ] [ 2drop green ] }
-    { [ dup 240 247 within pick 16 133 within and ] [ 2drop green ] }
-    { [ dup 247 215 - 247 184 - within pick 0 223 within and ] [ 2drop red ] }
+    { [ dup 184 238 between? pick 0 223 between? and ] [ 2drop green ] }
+    { [ dup 240 247 between? pick 16 133 between? and ] [ 2drop green ] }
+    { [ dup 247 215 - 247 184 - between? pick 0 223 between? and ] [ 2drop red ] }
     [ 2drop white ]
   } cond ;
 
@@ -359,12 +356,12 @@ M: space-invaders update-video ( value addr cpu -- )
     3drop
   ] if ;
 
-: sync-frame ( millis -- millis )
+: sync-frame ( micros -- micros )
   #! Sleep until the time for the next frame arrives.
-  1000 60 / >fixnum + system:millis - dup 0 >
-  [ milliseconds threads:sleep ] [ drop threads:yield ] if system:millis ;
+  1000 60 / >fixnum + system:system-micros - dup 0 >
+  [ milliseconds threads:sleep ] [ drop threads:yield ] if system:system-micros ;
 
-: invaders-process ( millis gadget -- )
+: invaders-process ( micros gadget -- )
   #! Run a space invaders gadget inside a 
   #! concurrent process. Messages can be sent to
   #! signal key presses, etc.
@@ -380,7 +377,7 @@ M: space-invaders update-video ( value addr cpu -- )
 M: invaders-gadget graft* ( gadget -- )
   dup cpu>> init-sounds
   f over (>>quit?)
-  [ system:millis swap invaders-process ] curry
+  [ system:system-micros swap invaders-process ] curry
   "Space invaders" threads:spawn drop ;
 
 M: invaders-gadget ungraft* ( gadget -- )

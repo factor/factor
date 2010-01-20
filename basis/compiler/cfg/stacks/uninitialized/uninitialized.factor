@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences byte-arrays namespaces accessors classes math
 math.order fry arrays combinators compiler.cfg.registers
@@ -55,7 +55,7 @@ M: insn visit-insn drop ;
     2dup [ length ] bi@ max '[ _ 1 pad-tail ] bi@ [ bitand ] 2map ;
 
 : (uninitialized-locs) ( seq quot -- seq' )
-    [ dup length [ drop 0 = ] pusher [ 2each ] dip ] dip map ; inline
+    [ [ drop 0 = ] pusher [ each-index ] dip ] dip map ; inline
 
 PRIVATE>
 

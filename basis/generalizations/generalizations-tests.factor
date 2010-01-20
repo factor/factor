@@ -26,8 +26,6 @@ IN: generalizations.tests
 { 0 } [ 0 1 2 3 4 4 ndrop ] unit-test
 [ [ 1 ] 5 ndip ] must-infer
 [ 1 2 3 4 ] [ 2 3 4 [ 1 ] 3 ndip ] unit-test
-[ 5 nspin ] must-infer
-[ 1 5 4 3 2 ] [ 1 2 3 4 5 4 nspin ] unit-test
 
 [ 1 2 3 4 5 [ drop drop drop drop drop 2 ] 5 nkeep ] must-infer
 [ 1 2 3 4 5 2 '[ drop drop drop drop drop _ ] 5 nkeep ] must-infer
@@ -66,7 +64,7 @@ IN: generalizations.tests
 { 3 5 } [ 2 nweave ] must-infer-as
 
 [ { 0 1 2 } { 3 5 4 } { 7 8 6 } ]
-[ 9 [ ] each { [ 3array ] [ swap 3array ] [ rot 3array ] } 3 nspread ] unit-test
+[ 9 [ ] each-integer { [ 3array ] [ swap 3array ] [ rot 3array ] } 3 nspread ] unit-test
 
 [ 1 2 3 4 1 2 3 ] [ 1 2 3 4 3 nover ] unit-test
 

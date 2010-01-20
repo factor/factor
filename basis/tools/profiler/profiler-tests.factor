@@ -60,7 +60,15 @@ IN: tools.profiler.tests
 
 [ [ gensym execute ] profile ] [ T{ undefined } = ] must-fail-with
 
-: crash-bug-1 ( -- x ) "hi" "bye" <word> ;
+: crash-bug-1 ( -- x ) "hi" <uninterned-word> ;
 : crash-bug-2 ( -- ) 100000 [ crash-bug-1 drop ] times ;
 
 [ ] [ [ crash-bug-2 ] profile ] unit-test
+
+[ 1 ] [
+    [
+        [ [ ] (( -- )) define-temp ] with-compilation-unit
+        dup execute( -- )
+    ] profile
+    counter>>
+] unit-test

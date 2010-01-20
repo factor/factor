@@ -2,7 +2,7 @@
 USING: accessors alien.c-types arrays byte-arrays combinators
 destructors fry gpu gpu.buffers images kernel locals math
 opengl opengl.gl opengl.textures sequences
-specialized-arrays ui.gadgets.worlds variants ;
+specialized-arrays typed ui.gadgets.worlds variants ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: gpu.textures
@@ -72,9 +72,9 @@ TUPLE: texture-parameters
 
 GENERIC: texture-object ( texture-data-target -- texture )
 M: cube-map-face texture-object
-    texture>> ;
+    texture>> ; inline
 M: texture texture-object
-    ;
+    ; inline
 
 : gl-wrap ( wrap -- gl-wrap )
     {
@@ -82,20 +82,20 @@ M: texture texture-object
         { clamp-texcoord-to-border [ GL_CLAMP_TO_BORDER ] }
         { repeat-texcoord [ GL_REPEAT ] }
         { repeat-texcoord-mirrored [ GL_MIRRORED_REPEAT ] }
-    } case ;
+    } case ; inline
 
 : set-texture-gl-wrap ( target wraps -- )
     dup sequence? [ 1array ] unless 3 over last pad-tail {
         [ [ GL_TEXTURE_WRAP_S ] dip first  gl-wrap glTexParameteri ]
         [ [ GL_TEXTURE_WRAP_T ] dip second gl-wrap glTexParameteri ]
         [ [ GL_TEXTURE_WRAP_R ] dip third  gl-wrap glTexParameteri ]
-    } 2cleave ;
+    } 2cleave ; inline
 
 : gl-mag-filter ( filter -- gl-filter )
     {
         { filter-nearest [ GL_NEAREST ] }
         { filter-linear [ GL_LINEAR ] }
-    } case ;
+    } case ; inline
 
 : gl-min-filter ( filter mipmap-filter -- gl-filter )
     2array {
@@ -105,25 +105,25 @@ M: texture texture-object
         { { filter-linear  filter-nearest } [ GL_LINEAR_MIPMAP_NEAREST  ] }
         { { filter-linear  filter-linear  } [ GL_LINEAR_MIPMAP_LINEAR   ] }
         { { filter-nearest filter-linear  } [ GL_NEAREST_MIPMAP_LINEAR  ] }
-    } case ;
+    } case ; inline
 
 GENERIC: texture-gl-target ( texture -- target )
 GENERIC: texture-data-gl-target ( texture -- target )
 
-M: texture-1d        texture-gl-target drop GL_TEXTURE_1D ;
-M: texture-2d        texture-gl-target drop GL_TEXTURE_2D ;
-M: texture-rectangle texture-gl-target drop GL_TEXTURE_RECTANGLE ;
-M: texture-3d        texture-gl-target drop GL_TEXTURE_3D ;
-M: texture-cube-map  texture-gl-target drop GL_TEXTURE_CUBE_MAP ;
-M: texture-1d-array  texture-gl-target drop GL_TEXTURE_1D_ARRAY ;
-M: texture-2d-array  texture-gl-target drop GL_TEXTURE_2D_ARRAY ;
+M: texture-1d        texture-gl-target drop GL_TEXTURE_1D ; inline
+M: texture-2d        texture-gl-target drop GL_TEXTURE_2D ; inline
+M: texture-rectangle texture-gl-target drop GL_TEXTURE_RECTANGLE ; inline
+M: texture-3d        texture-gl-target drop GL_TEXTURE_3D ; inline
+M: texture-cube-map  texture-gl-target drop GL_TEXTURE_CUBE_MAP ; inline
+M: texture-1d-array  texture-gl-target drop GL_TEXTURE_1D_ARRAY ; inline
+M: texture-2d-array  texture-gl-target drop GL_TEXTURE_2D_ARRAY ; inline
 
-M: texture-1d        texture-data-gl-target drop GL_TEXTURE_1D ;
-M: texture-2d        texture-data-gl-target drop GL_TEXTURE_2D ;
-M: texture-rectangle texture-data-gl-target drop GL_TEXTURE_RECTANGLE ;
-M: texture-3d        texture-data-gl-target drop GL_TEXTURE_3D ;
-M: texture-1d-array  texture-data-gl-target drop GL_TEXTURE_1D_ARRAY ;
-M: texture-2d-array  texture-data-gl-target drop GL_TEXTURE_2D_ARRAY ;
+M: texture-1d        texture-data-gl-target drop GL_TEXTURE_1D ; inline
+M: texture-2d        texture-data-gl-target drop GL_TEXTURE_2D ; inline
+M: texture-rectangle texture-data-gl-target drop GL_TEXTURE_RECTANGLE ; inline
+M: texture-3d        texture-data-gl-target drop GL_TEXTURE_3D ; inline
+M: texture-1d-array  texture-data-gl-target drop GL_TEXTURE_1D_ARRAY ; inline
+M: texture-2d-array  texture-data-gl-target drop GL_TEXTURE_2D_ARRAY ; inline
 M: cube-map-face     texture-data-gl-target
     axis>> {
         { -X [ GL_TEXTURE_CUBE_MAP_NEGATIVE_X ] }
@@ -132,7 +132,7 @@ M: cube-map-face     texture-data-gl-target
         { +X [ GL_TEXTURE_CUBE_MAP_POSITIVE_X ] }
         { +Y [ GL_TEXTURE_CUBE_MAP_POSITIVE_Y ] }
         { +Z [ GL_TEXTURE_CUBE_MAP_POSITIVE_Z ] }
-    } case ;
+    } case ; inline
 
 : texture-gl-internal-format ( texture -- internal-format )
     [ component-order>> ] [ component-type>> ] bi image-internal-format ; inline
@@ -144,20 +144,20 @@ M: cube-map-face     texture-data-gl-target
         [ ptr>> ] bi
     ] [
         [ component-order>> ] [ component-type>> ] bi image-data-format f
-    ] if* ;
+    ] if* ; inline
 
 :: bind-tdt ( tdt -- texture )
     tdt texture-object :> texture
     texture [ texture-gl-target ] [ handle>> ] bi glBindTexture
-    texture ;
+    texture ; inline
 
 : get-texture-float ( target level enum -- value )
-    0 <float> [ glGetTexLevelParameterfv ] keep *float ;
+    0 <float> [ glGetTexLevelParameterfv ] keep *float ; inline
 : get-texture-int ( target level enum -- value )
-    0 <int> [ glGetTexLevelParameteriv ] keep *int ;
+    0 <int> [ glGetTexLevelParameteriv ] keep *int ; inline
 
 : ?product ( x -- y )
-    dup number? [ product ] unless ;
+    dup number? [ product ] unless ; inline
 
 PRIVATE>
 
@@ -228,39 +228,39 @@ M:: texture-3d-data-target texture-dim ( tdt level -- dim )
     3array ;
 
 : texture-data-size ( tdt level -- size )
-    [ texture-dim ?product ] [ drop texture-object bytes-per-pixel ] 2bi * ;
+    [ texture-dim ?product ] [ drop texture-object bytes-per-pixel ] 2bi * ; inline
 
-:: read-texture-to ( tdt level gpu-data-ptr -- )
+TYPED:: read-texture-to ( tdt: texture-data-target level: integer gpu-data-ptr -- )
     tdt bind-tdt :> texture
     tdt texture-data-gl-target level
     texture [ component-order>> ] [ component-type>> ] bi image-data-format
     gpu-data-ptr pixel-pack-buffer [ glGetTexImage ] with-gpu-data-ptr ;
 
-: read-texture ( tdt level -- byte-array )
+TYPED: read-texture ( tdt: texture-data-target level: integer -- byte-array: byte-array )
     2dup texture-data-size <byte-array>
     [ read-texture-to ] keep ;
 
 : allocate-texture-image ( tdt level image -- )
-    image>texture-data allocate-texture ;
+    image>texture-data allocate-texture ; inline
 
 : update-texture-image ( tdt level loc image -- )
-    image>texture-data update-texture ;
+    image>texture-data update-texture ; inline
 
 : read-texture-image ( tdt level -- image )
     [ texture-dim ]
     [ drop texture-object [ component-order>> ] [ component-type>> ] bi f ]
     [ read-texture ] 2tri
-    image boa ;
+    image boa ; inline
 
 <PRIVATE
 : bind-texture ( texture -- gl-target )
-    [ texture-gl-target dup ] [ handle>> ] bi glBindTexture ;
+    [ texture-gl-target dup ] [ handle>> ] bi glBindTexture ; inline
 PRIVATE>
 
 : generate-mipmaps ( texture -- )
-    bind-texture glGenerateMipmap ;
+    bind-texture glGenerateMipmap ; inline
 
-: set-texture-parameters ( texture parameters -- )
+TYPED: set-texture-parameters ( texture: texture parameters: texture-parameters -- )
     [ bind-texture ] dip {
         [ wrap>> set-texture-gl-wrap ]
         [
@@ -286,17 +286,17 @@ PRIVATE>
 PRIVATE>
 
 : <texture-1d> ( component-order component-type parameters -- texture )
-    texture-1d <texture> ;
+    texture-1d <texture> ; inline
 : <texture-2d> ( component-order component-type parameters -- texture )
-    texture-2d <texture> ;
+    texture-2d <texture> ; inline
 : <texture-3d> ( component-order component-type parameters -- texture )
-    texture-3d <texture> ;
+    texture-3d <texture> ; inline
 : <texture-cube-map> ( component-order component-type parameters -- texture )
-    texture-cube-map <texture> ;
+    texture-cube-map <texture> ; inline
 : <texture-rectangle> ( component-order component-type parameters -- texture )
-    texture-rectangle <texture> ;
+    texture-rectangle <texture> ; inline
 : <texture-1d-array> ( component-order component-type parameters -- texture )
-    texture-1d-array <texture> ;
+    texture-1d-array <texture> ; inline
 : <texture-2d-array> ( component-order component-type parameters -- texture )
-    texture-2d-array <texture> ;
+    texture-2d-array <texture> ; inline
 

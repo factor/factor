@@ -106,4 +106,4 @@ CONSTANT: keep-logs 10
 [
     H{ } clone log-files set-global
     log-server
-] "logging" add-init-hook
+] "logging" add-startup-hook

@@ -39,7 +39,8 @@ TUPLE: track < pack sizes ;
 M: track layout* ( track -- ) dup track-layout pack-layout ;
 
 : track-pref-dims-1 ( track -- dim )
-    children>> pref-dims max-dim ;
+    [ children>> pref-dims max-dim ]
+    [ pref-dim>> { 0 0 } or ] bi vmax ;
 
 : track-pref-dims-2 ( track -- dim )
     [

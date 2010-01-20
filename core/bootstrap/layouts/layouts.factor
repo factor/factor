@@ -30,3 +30,5 @@ H{
     { word 12 }
     { dll 13 }
 } type-numbers set
+
+2 header-bits set

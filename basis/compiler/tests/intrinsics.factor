@@ -21,7 +21,6 @@ IN: compiler.tests.intrinsics
 [ 2 1 3 ] [ 1 2 3 [ swapd ] compile-call ] unit-test
 [ 2 ] [ 1 2 [ nip ] compile-call ] unit-test
 [ 3 ] [ 1 2 3 [ 2nip ] compile-call ] unit-test
-[ 2 1 2 ] [ 1 2 [ tuck ] compile-call ] unit-test
 [ 1 2 1 ] [ 1 2 [ over ] compile-call ] unit-test
 [ 1 2 3 1 ] [ 1 2 3 [ pick ] compile-call ] unit-test
 [ 2 1 ] [ 1 2 [ swap ] compile-call ] unit-test
@@ -55,8 +54,8 @@ IN: compiler.tests.intrinsics
 [ HEX: 123456 ] [ 1 [ "a\u123456c" string-nth ] compile-call ] unit-test
 [ HEX: 123456 ] [ [ 1 "a\u123456c" string-nth ] compile-call ] unit-test
 
-[ ] [ [ 0 getenv ] compile-call drop ] unit-test
-[ ] [ 1 getenv [ 1 setenv ] compile-call ] unit-test
+[ ] [ [ 0 special-object ] compile-call drop ] unit-test
+[ ] [ 1 special-object [ 1 set-special-object ] compile-call ] unit-test
 
 [ ] [ 1 [ drop ] compile-call ] unit-test
 [ ] [ [ 1 drop ] compile-call ] unit-test
@@ -338,7 +337,7 @@ ERROR: bug-in-fixnum* x y a b ;
 
 [ ] [
     10000 [
-        5 random [ drop 32 random-bits ] map product >bignum
+        5 random iota [ drop 32 random-bits ] map product >bignum
         dup [ bignum>fixnum ] keep compiled-bignum>fixnum =
         [ drop ] [ "Oops" throw ] if
     ] times
@@ -586,16 +585,16 @@ TUPLE: alien-accessor-regression { b byte-array } { i fixnum } ;
     swap [
         { tuple } declare 1 slot
     ] [
-        0 slot
+        1 slot
     ] if ;
 
-[ t ] [ f B{ } mutable-value-bug-1 byte-array type-number = ] unit-test
+[ 0 ] [ f { } mutable-value-bug-1 ] unit-test
 
 : mutable-value-bug-2 ( a b -- c )
     swap [
-        0 slot
+        1 slot
     ] [
         { tuple } declare 1 slot
     ] if ;
 
-[ t ] [ t B{ } mutable-value-bug-2 byte-array type-number = ] unit-test
+[ 0 ] [ t { } mutable-value-bug-2 ] unit-test

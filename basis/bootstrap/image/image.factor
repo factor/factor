@@ -1,6 +1,6 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays byte-arrays generic hashtables
+USING: alien alien.strings arrays byte-arrays generic hashtables
 hashtables.private io io.binary io.files io.encodings.binary
 io.pathnames kernel kernel.private math namespaces make parser
 prettyprint sequences strings sbufs vectors words quotations
@@ -10,7 +10,7 @@ vocabs.loader source-files definitions debugger
 quotations.private combinators combinators.short-circuit
 math.order math.private accessors slots.private
 generic.single.private compiler.units compiler.constants fry
-bootstrap.image.syntax ;
+locals bootstrap.image.syntax generalizations ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
@@ -71,6 +71,9 @@ C: <eq-wrapper> eq-wrapper
 M: eq-wrapper equal?
     over eq-wrapper? [ [ obj>> ] bi@ eq? ] [ 2drop f ] if ;
 
+M: eq-wrapper hashcode*
+    nip obj>> identity-hashcode ;
+
 SYMBOL: objects
 
 : cache-eql-object ( obj quot -- value )
@@ -90,7 +93,7 @@ CONSTANT: image-version 4
 
 CONSTANT: data-base 1024
 
-CONSTANT: userenv-size 70
+CONSTANT: special-objects-size 70
 
 CONSTANT: header-size 10
 
@@ -104,31 +107,62 @@ SYMBOL: sub-primitives
 
 SYMBOL: jit-relocations
 
-: compute-offset ( rc -- offset )
-    [ building get length ] dip rc-absolute-cell = bootstrap-cell 4 ? - ;
+SYMBOL: jit-offset
+
+: compute-offset ( -- offset )
+    building get length jit-offset get + ;
 
 : jit-rel ( rc rt -- )
-    over compute-offset 3array jit-relocations get push-all ;
+    compute-offset 3array jit-relocations get push-all ;
+
+SYMBOL: jit-parameters
+
+: jit-parameter ( parameter -- )
+    jit-parameters get push ;
 
 SYMBOL: jit-literals
 
 : jit-literal ( literal -- )
     jit-literals get push ;
 
-: make-jit ( quot -- jit-literals jit-data )
+: jit-vm ( offset rc -- )
+    [ jit-parameter ] dip rt-vm jit-rel ;
+
+: jit-dlsym ( name library rc -- )
+    rt-dlsym jit-rel [ string>symbol jit-parameter ] bi@ ;
+
+:: jit-conditional ( test-quot false-quot -- )
+    [ 0 test-quot call ] B{ } make length :> len
+    building get length jit-offset get + len +
+    [ jit-offset set false-quot call ] B{ } make
+    [ length test-quot call ] [ % ] bi ; inline
+
+: make-jit ( quot -- jit-parameters jit-literals jit-code )
     [
+        0 jit-offset set
+        V{ } clone jit-parameters set
         V{ } clone jit-literals set
         V{ } clone jit-relocations set
         call( -- )
+        jit-parameters get >array
         jit-literals get >array
         jit-relocations get >array
     ] B{ } make prefix ;
 
 : jit-define ( quot name -- )
-    [ make-jit nip ] dip set ;
+    [ make-jit 2nip ] dip set ;
 
 : define-sub-primitive ( quot word -- )
-    [ make-jit 2array ] dip sub-primitives get set-at ;
+    [ make-jit 3array ] dip sub-primitives get set-at ;
+
+: define-combinator-primitive ( quot non-tail-quot tail-quot word -- )
+    [
+        [ make-jit ]
+        [ make-jit 2nip ]
+        [ make-jit 2nip ]
+        tri* 5 narray
+    ] dip
+    sub-primitives get set-at ;
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -142,57 +176,58 @@ SYMBOL: architecture
 RESET
 
 ! Boot quotation, set in stage1.factor
-USERENV: bootstrap-boot-quot 20
+SPECIAL-OBJECT: bootstrap-startup-quot 20
 
 ! Bootstrap global namesapce
-USERENV: bootstrap-global 21
+SPECIAL-OBJECT: bootstrap-global 21
 
 ! JIT parameters
-USERENV: jit-prolog 23
-USERENV: jit-primitive-word 24
-USERENV: jit-primitive 25
-USERENV: jit-word-jump 26
-USERENV: jit-word-call 27
-USERENV: jit-word-special 28
-USERENV: jit-if-word 29
-USERENV: jit-if 30
-USERENV: jit-epilog 31
-USERENV: jit-return 32
-USERENV: jit-profiling 33
-USERENV: jit-push-immediate 34
-USERENV: jit-dip-word 35
-USERENV: jit-dip 36
-USERENV: jit-2dip-word 37
-USERENV: jit-2dip 38
-USERENV: jit-3dip-word 39
-USERENV: jit-3dip 40
-USERENV: jit-execute-word 41
-USERENV: jit-execute-jump 42
-USERENV: jit-execute-call 43
-USERENV: jit-declare-word 44
+SPECIAL-OBJECT: jit-prolog 23
+SPECIAL-OBJECT: jit-primitive-word 24
+SPECIAL-OBJECT: jit-primitive 25
+SPECIAL-OBJECT: jit-word-jump 26
+SPECIAL-OBJECT: jit-word-call 27
+SPECIAL-OBJECT: jit-if-word 28
+SPECIAL-OBJECT: jit-if 29
+SPECIAL-OBJECT: jit-epilog 30
+SPECIAL-OBJECT: jit-return 31
+SPECIAL-OBJECT: jit-profiling 32
+SPECIAL-OBJECT: jit-push 33
+SPECIAL-OBJECT: jit-dip-word 34
+SPECIAL-OBJECT: jit-dip 35
+SPECIAL-OBJECT: jit-2dip-word 36
+SPECIAL-OBJECT: jit-2dip 37
+SPECIAL-OBJECT: jit-3dip-word 38
+SPECIAL-OBJECT: jit-3dip 39
+SPECIAL-OBJECT: jit-execute 40
+SPECIAL-OBJECT: jit-declare-word 41
 
-USERENV: callback-stub 45
+SPECIAL-OBJECT: c-to-factor-word 42
+SPECIAL-OBJECT: lazy-jit-compile-word 43
+SPECIAL-OBJECT: unwind-native-frames-word 44
+
+SPECIAL-OBJECT: callback-stub 48
 
 ! PIC stubs
-USERENV: pic-load 47
-USERENV: pic-tag 48
-USERENV: pic-tuple 49
-USERENV: pic-check-tag 50
-USERENV: pic-check-tuple 51
-USERENV: pic-hit 52
-USERENV: pic-miss-word 53
-USERENV: pic-miss-tail-word 54
+SPECIAL-OBJECT: pic-load 49
+SPECIAL-OBJECT: pic-tag 50
+SPECIAL-OBJECT: pic-tuple 51
+SPECIAL-OBJECT: pic-check-tag 52
+SPECIAL-OBJECT: pic-check-tuple 53
+SPECIAL-OBJECT: pic-hit 54
+SPECIAL-OBJECT: pic-miss-word 55
+SPECIAL-OBJECT: pic-miss-tail-word 56
 
 ! Megamorphic dispatch
-USERENV: mega-lookup 57
-USERENV: mega-lookup-word 58
-USERENV: mega-miss-word 59
+SPECIAL-OBJECT: mega-lookup 57
+SPECIAL-OBJECT: mega-lookup-word 58
+SPECIAL-OBJECT: mega-miss-word 59
 
 ! Default definition for undefined words
-USERENV: undefined-quot 60
+SPECIAL-OBJECT: undefined-quot 60
 
-: userenv-offset ( symbol -- n )
-    userenvs get at header-size + ;
+: special-object-offset ( symbol -- n )
+    special-objects get at header-size + ;
 
 : emit ( cell -- ) image get push ;
 
@@ -208,7 +243,7 @@ USERENV: undefined-quot 60
 : fixup ( value offset -- ) image get set-nth ;
 
 : heap-size ( -- size )
-    image get length header-size - userenv-size -
+    image get length header-size - special-objects-size -
     bootstrap-cells ;
 
 : here ( -- size ) heap-size data-base + ;
@@ -224,9 +259,11 @@ USERENV: undefined-quot 60
 
 : emit-fixnum ( n -- ) tag-fixnum emit ;
 
+: emit-header ( n -- ) tag-header emit ;
+
 : emit-object ( class quot -- addr )
     [ type-number ] dip over here-as
-    [ swap tag-fixnum emit call align-here ] dip ;
+    [ swap emit-header call align-here ] dip ;
     inline
 
 ! Write an object to the image.
@@ -234,7 +271,7 @@ GENERIC: ' ( obj -- ptr )
 
 ! Image header
 
-: emit-header ( -- )
+: emit-image-header ( -- )
     image-magic emit
     image-version emit
     data-base emit ! relocation base at end of header
@@ -245,10 +282,10 @@ GENERIC: ' ( obj -- ptr )
     0 emit ! pointer to bignum 0
     0 emit ! pointer to bignum 1
     0 emit ! pointer to bignum -1
-    userenv-size [ f ' emit ] times ;
+    special-objects-size [ f ' emit ] times ;
 
-: emit-userenv ( symbol -- )
-    [ get ' ] [ userenv-offset ] bi fixup ;
+: emit-special-object ( symbol -- )
+    [ get ' ] [ special-object-offset ] bi fixup ;
 
 ! Bignums
 
@@ -501,16 +538,18 @@ M: quotation '
     \ dip jit-dip-word set
     \ 2dip jit-2dip-word set
     \ 3dip jit-3dip-word set
-    \ (execute) jit-execute-word set
-    \ inline-cache-miss \ pic-miss-word set
-    \ inline-cache-miss-tail \ pic-miss-tail-word set
-    \ mega-cache-lookup \ mega-lookup-word set
-    \ mega-cache-miss \ mega-miss-word set
+    \ inline-cache-miss pic-miss-word set
+    \ inline-cache-miss-tail pic-miss-tail-word set
+    \ mega-cache-lookup mega-lookup-word set
+    \ mega-cache-miss mega-miss-word set
     \ declare jit-declare-word set
+    \ c-to-factor c-to-factor-word set
+    \ lazy-jit-compile lazy-jit-compile-word set
+    \ unwind-native-frames unwind-native-frames-word set
     [ undefined ] undefined-quot set ;
 
-: emit-userenvs ( -- )
-    userenvs get keys [ emit-userenv ] each ;
+: emit-special-objects ( -- )
+    special-objects get keys [ emit-special-object ] each ;
 
 : fixup-header ( -- )
     heap-size data-heap-size-offset fixup ;
@@ -518,7 +557,7 @@ M: quotation '
 : build-image ( -- image )
     800000 <vector> image set
     20000 <hashtable> objects set
-    emit-header t, 0, 1, -1,
+    emit-image-header t, 0, 1, -1,
     "Building generic words..." print flush
     remake-generics
     "Serializing words..." print flush
@@ -527,8 +566,8 @@ M: quotation '
     emit-jit-data
     "Serializing global namespace..." print flush
     emit-global
-    "Serializing user environment..." print flush
-    emit-userenvs
+    "Serializing special object table..." print flush
+    emit-special-objects
     "Performing word fixups..." print flush
     fixup-words
     "Performing header fixups..." print flush

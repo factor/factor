@@ -8,7 +8,7 @@ gc_event::gc_event(gc_op op_, factor_vm *parent) :
 	cards_scanned(0),
 	decks_scanned(0),
 	code_blocks_scanned(0),
-	start_time(current_micros()),
+	start_time(nano_count()),
 	card_scan_time(0),
 	code_scan_time(0),
 	data_sweep_time(0),
@@ -17,70 +17,70 @@ gc_event::gc_event(gc_op op_, factor_vm *parent) :
 {
 	data_heap_before = parent->data_room();
 	code_heap_before = parent->code_room();
-	start_time = current_micros();
+	start_time = nano_count();
 }
 
 void gc_event::started_card_scan()
 {
-	temp_time = current_micros();
+	temp_time = nano_count();
 }
 
 void gc_event::ended_card_scan(cell cards_scanned_, cell decks_scanned_)
 {
 	cards_scanned += cards_scanned_;
 	decks_scanned += decks_scanned_;
-	card_scan_time = (current_micros() - temp_time);
+	card_scan_time = (cell)(nano_count() - temp_time);
 }
 
 void gc_event::started_code_scan()
 {
-	temp_time = current_micros();
+	temp_time = nano_count();
 }
 
 void gc_event::ended_code_scan(cell code_blocks_scanned_)
 {
 	code_blocks_scanned += code_blocks_scanned_;
-	code_scan_time = (current_micros() - temp_time);
+	code_scan_time = (cell)(nano_count() - temp_time);
 }
 
 void gc_event::started_data_sweep()
 {
-	temp_time = current_micros();
+	temp_time = nano_count();
 }
 
 void gc_event::ended_data_sweep()
 {
-	data_sweep_time = (current_micros() - temp_time);
+	data_sweep_time = (cell)(nano_count() - temp_time);
 }
 
 void gc_event::started_code_sweep()
 {
-	temp_time = current_micros();
+	temp_time = nano_count();
 }
 
 void gc_event::ended_code_sweep()
 {
-	code_sweep_time = (current_micros() - temp_time);
+	code_sweep_time = (cell)(nano_count() - temp_time);
 }
 
 void gc_event::started_compaction()
 {
-	temp_time = current_micros();
+	temp_time = nano_count();
 }
 
 void gc_event::ended_compaction()
 {
-	compaction_time = (current_micros() - temp_time);
+	compaction_time = (cell)(nano_count() - temp_time);
 }
 
 void gc_event::ended_gc(factor_vm *parent)
 {
 	data_heap_after = parent->data_room();
 	code_heap_after = parent->code_room();
-	total_time = current_micros() - start_time;
+	total_time = (cell)(nano_count() - start_time);
 }
 
-gc_state::gc_state(gc_op op_, factor_vm *parent) : op(op_), start_time(current_micros())
+gc_state::gc_state(gc_op op_, factor_vm *parent) : op(op_), start_time(nano_count())
 {
 	event = new gc_event(op,parent);
 }
@@ -126,21 +126,10 @@ void factor_vm::start_gc_again()
 	current_gc->event = new gc_event(current_gc->op,this);
 }
 
-void factor_vm::update_code_heap_for_minor_gc(std::set<code_block *> *remembered_set)
-{
-	/* The youngest generation that any code block can now reference */
-	std::set<code_block *>::const_iterator iter = remembered_set->begin();
-	std::set<code_block *>::const_iterator end = remembered_set->end();
-
-	for(; iter != end; iter++) update_literal_references(*iter);
-}
-
 void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 {
 	assert(!gc_off);
 	assert(!current_gc);
-
-	save_stacks();
 
 	current_gc = new gc_state(op,this);
 
@@ -161,7 +150,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 		break;
 	case collect_aging_op:
 		collect_aging();
-		if(data->low_memory_p())
+		if(data->high_fragmentation_p())
 		{
 			current_gc->op = collect_full_op;
 			current_gc->event->op = collect_full_op;
@@ -170,7 +159,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 		break;
 	case collect_to_tenured_op:
 		collect_to_tenured();
-		if(data->low_memory_p())
+		if(data->high_fragmentation_p())
 		{
 			current_gc->op = collect_full_op;
 			current_gc->event->op = collect_full_op;
@@ -187,7 +176,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 		collect_growing_heap(requested_bytes,trace_contexts_p);
 		break;
 	default:
-		critical_error("Bad GC op\n",current_gc->op);
+		critical_error("Bad GC op",current_gc->op);
 		break;
 	}
 
@@ -218,46 +207,11 @@ void factor_vm::primitive_compact_gc()
 		true /* trace contexts? */);
 }
 
-/* classes.tuple uses this to reshape tuples; tools.deploy.shaker uses this
-   to coalesce equal but distinct quotations and wrappers. */
-void factor_vm::primitive_become()
-{
-	array *new_objects = untag_check<array>(dpop());
-	array *old_objects = untag_check<array>(dpop());
-
-	cell capacity = array_capacity(new_objects);
-	if(capacity != array_capacity(old_objects))
-		critical_error("bad parameters to become",0);
-
-	cell i;
-
-	for(i = 0; i < capacity; i++)
-	{
-		tagged<object> old_obj(array_nth(old_objects,i));
-		tagged<object> new_obj(array_nth(new_objects,i));
-
-		if(old_obj != new_obj)
-			old_obj->h.forward_to(new_obj.untagged());
-	}
-
-	primitive_full_gc();
-
-	/* If a word's definition quotation was in old_objects and the
-	   quotation in new_objects is not compiled, we might leak memory
-	   by referencing the old quotation unless we recompile all
-	   unoptimized words. */
-	compile_all_words();
-}
-
 void factor_vm::inline_gc(cell *data_roots_base, cell data_roots_size)
 {
-	for(cell i = 0; i < data_roots_size; i++)
-		data_roots.push_back((cell)&data_roots_base[i]);
-
+	data_roots.push_back(data_root_range(data_roots_base,data_roots_size));
 	primitive_minor_gc();
-
-	for(cell i = 0; i < data_roots_size; i++)
-		data_roots.pop_back();
+	data_roots.pop_back();
 }
 
 VM_C_API void inline_gc(cell *data_roots_base, cell data_roots_size, factor_vm *parent)
@@ -269,7 +223,7 @@ VM_C_API void inline_gc(cell *data_roots_base, cell data_roots_size, factor_vm *
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
  */
-object *factor_vm::allot_large_object(header header, cell size)
+object *factor_vm::allot_large_object(cell type, cell size)
 {
 	/* If tenured space does not have enough room, collect and compact */
 	if(!data->tenured->can_allot_p(size))
@@ -290,11 +244,9 @@ object *factor_vm::allot_large_object(header header, cell size)
 	/* Allows initialization code to store old->new pointers
 	without hitting the write barrier in the common case of
 	a nursery allocation */
-	char *start = (char *)obj;
-	for(cell offset = 0; offset < size; offset += card_size)
-		write_barrier((cell *)(start + offset));
+	write_barrier(obj,size);
 
-	obj->h = header;
+	obj->initialize(type);
 	return obj;
 }
 
@@ -307,14 +259,28 @@ void factor_vm::primitive_disable_gc_events()
 {
 	if(gc_events)
 	{
-		byte_array *data = byte_array_from_values(&gc_events->front(),gc_events->size());
-		dpush(tag<byte_array>(data));
+		growable_array result(this);
 
-		delete gc_events;
-		gc_events = NULL;
+		std::vector<gc_event> *gc_events = this->gc_events;
+		this->gc_events = NULL;
+
+		std::vector<gc_event>::const_iterator iter = gc_events->begin();
+		std::vector<gc_event>::const_iterator end = gc_events->end();
+
+		for(; iter != end; iter++)
+		{
+			gc_event event = *iter;
+			byte_array *obj = byte_array_from_value(&event);
+			result.add(tag<byte_array>(obj));
+		}
+
+		result.trim();
+		ctx->push(result.elements.value());
+
+		delete this->gc_events;
 	}
 	else
-		dpush(false_object);
+		ctx->push(false_object);
 }
 
 }

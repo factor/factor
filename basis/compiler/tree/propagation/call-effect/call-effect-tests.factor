@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: compiler.tree.propagation.call-effect tools.test fry math effects kernel
-compiler.tree.builder compiler.tree.optimizer compiler.tree.debugger sequences ;
+compiler.tree.builder compiler.tree.optimizer compiler.tree.debugger sequences
+eval combinators ;
 IN: compiler.tree.propagation.call-effect.tests
 
 [ t ] [ \ + (( a b -- c )) execute-effect-unsafe? ] unit-test
@@ -59,3 +60,22 @@ IN: compiler.tree.propagation.call-effect.tests
 TUPLE: a-tuple x ;
 
 [ V{ a-tuple } ] [ [ a-tuple '[ _ boa ] call( x -- tuple ) ] final-classes ] unit-test
+
+! See if redefinitions are handled correctly
+: call(-redefine-test ( a -- b ) 1 + ;
+
+: test-quotatation ( -- quot ) [ call(-redefine-test ] ;
+
+[ t ] [ test-quotatation cached-effect (( a -- b )) effect<= ] unit-test
+
+[ ] [ "IN: compiler.tree.propagation.call-effect.tests USE: math : call(-redefine-test ( a b -- c ) + ;" eval( -- ) ] unit-test
+
+[ t ] [ test-quotatation cached-effect (( a b -- c )) effect<= ] unit-test
+
+: inline-cache-invalidation-test ( a b c -- c ) call( a b -- c ) ;
+
+[ 4 ] [ 1 3 test-quotatation inline-cache-invalidation-test ] unit-test
+
+[ ] [ "IN: compiler.tree.propagation.call-effect.tests USE: math : call(-redefine-test ( a -- c ) 1 + ;" eval( -- ) ] unit-test
+
+[ 1 3 test-quotatation inline-cache-invalidation-test ] [ T{ wrong-values f (( a b -- c )) } = ] must-fail-with

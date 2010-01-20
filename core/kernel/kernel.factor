@@ -8,8 +8,6 @@ DEFER: 2dip
 DEFER: 3dip
 
 ! Stack stuff
-: spin ( x y z -- z y x ) swap rot ; inline
-
 : 2over ( x y z -- x y z x y ) pick pick ; inline
 
 : clear ( -- ) { } set-datastack ;
@@ -194,6 +192,16 @@ M: f hashcode* 2drop 31337 ; inline
 
 : hashcode ( obj -- code ) 3 swap hashcode* ; inline
 
+: identity-hashcode ( obj -- code )
+    dup tag 0 eq? [
+        dup tag 1 eq? [ drop 0 ] [
+            dup (identity-hashcode) dup 0 eq? [
+                drop dup compute-identity-hashcode
+                (identity-hashcode)
+            ] [ nip ] if
+        ] if
+    ] unless ; inline
+
 GENERIC: equal? ( obj1 obj2 -- ? )
 
 M: object equal? 2drop f ; inline
@@ -201,6 +209,8 @@ M: object equal? 2drop f ; inline
 TUPLE: identity-tuple ;
 
 M: identity-tuple equal? 2drop f ; inline
+
+M: identity-tuple hashcode* nip identity-hashcode ; inline
 
 : = ( obj1 obj2 -- ? )
     2dup eq? [ 2drop t ] [

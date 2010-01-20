@@ -71,9 +71,6 @@ MACRO: ndrop ( n -- )
 MACRO: nnip ( n -- )
     '[ [ _ ndrop ] dip ] ;
 
-MACRO: ntuck ( n -- )
-    2 + '[ dup _ -nrot ] ;
-
 MACRO: ndip ( n -- )
     [ [ dip ] curry ] n*quot [ call ] compose ;
 
@@ -112,8 +109,8 @@ MACRO: cleave* ( n -- )
     [ 1 - [ [ [ keep ] curry ] dip compose ] n*quot [ call ] compose ] 
     if-zero ;
 
-MACRO: napply ( n -- )
-    [ [ drop ] ] dip [ '[ tuck _ 2dip call ] ] times ;
+: napply ( quot n -- )
+    [ dupn ] [ spread* ] bi ; inline
 
 : apply-curry ( ...a quot n -- )
     [ [curry] ] dip napply ; inline
@@ -138,7 +135,4 @@ MACRO: nbi-curry ( n -- )
     [ narray concat ] dip like ; inline
 
 : nappend ( n -- seq ) narray concat ; inline
-
-MACRO: nspin ( n -- )
-    [ [ ] ] swap [ swap [ ] curry compose ] n*quot [ call ] 3append ;
 

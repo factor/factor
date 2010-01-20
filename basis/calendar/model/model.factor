@@ -16,4 +16,4 @@ SYMBOL: time
     ] "Time model update" spawn drop ;
 
 f <model> time set-global
-[ time-thread ] "calendar.model" add-init-hook
+[ time-thread ] "calendar.model" add-startup-hook

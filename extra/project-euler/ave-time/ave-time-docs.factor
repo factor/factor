@@ -9,14 +9,6 @@ HELP: collect-benchmarks
     $nl
     "A nicer word for interactive use is " { $link ave-time } "." } ;
 
-HELP: nth-place
-{ $values { "x" float } { "n" integer } { "y" float } }
-{ $description "Rounds a floating point number to " { $snippet "n" } " decimal places." }
-{ $examples
-    "This word is useful for display purposes when showing 15 decimal places is not desired:"
-    { $unchecked-example "3.141592653589793 3 nth-place number>string" "\"3.142\"" }
-} ;
-
 HELP: ave-time
 { $values { "quot" quotation } { "n" integer } }
 { $description "Runs a quotation " { $snippet "n" } " times, then prints the average run time and standard deviation." }

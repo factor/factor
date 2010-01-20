@@ -33,9 +33,9 @@ INSTANCE: crc32 checksum
 M: crc32 checksum-bytes
     init-crc32
     [ (crc32) ] each
-    finish-crc32 ;
+    finish-crc32 ; inline
 
 M: crc32 checksum-lines
     init-crc32
     [ [ (crc32) ] each CHAR: \n (crc32) ] each
-    finish-crc32 ;
+    finish-crc32 ; inline

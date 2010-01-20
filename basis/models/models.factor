@@ -17,8 +17,6 @@ value connections dependencies ref locked? ;
 : <model> ( value -- model )
     model new-model ;
 
-M: model hashcode* drop model hashcode* ;
-
 : add-dependency ( dep model -- )
     dependencies>> push ;
 

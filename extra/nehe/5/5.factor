@@ -1,6 +1,6 @@
 USING: arrays kernel math opengl opengl.gl opengl.glu
 opengl.demo-support ui ui.gadgets ui.render threads accessors
-calendar ;
+calendar literals ;
 IN: nehe.5
 
 TUPLE: nehe5-gadget < gadget rtri rquad thread quit? ;
@@ -12,9 +12,6 @@ CONSTANT: height 256
   nehe5-gadget new
     0.0 >>rtri
     0.0 >>rquad ;
-
-M: nehe5-gadget pref-dim* ( gadget -- dim )
-  drop width height 2array ;
 
 M: nehe5-gadget draw-gadget* ( gadget -- )
   GL_PROJECTION glMatrixMode
@@ -123,6 +120,5 @@ M: nehe5-gadget graft* ( gadget -- )
 M: nehe5-gadget ungraft* ( gadget -- )
   t >>quit? drop ;
 
-
-: run5 ( -- )
-  <nehe5-gadget> "NeHe Tutorial 5" open-window ;
+MAIN-WINDOW: run5 { { title "NeHe Tutorial 5" } { pref-dim { $ width $ height } } }
+  <nehe5-gadget> >>gadgets ;

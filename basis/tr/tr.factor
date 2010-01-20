@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays strings sequences sequences.private ascii
 fry kernel words parser lexer assocs math math.order summary ;
@@ -17,7 +17,7 @@ M: bad-tr summary
     [ [ ascii? ] all? ] both? [ bad-tr ] unless ;
 
 : compute-tr ( quot from to -- mapping )
-    [ 128 ] 3dip zip
+    [ 128 iota ] 3dip zip
     '[ [ _ call( x -- y ) _ at ] keep or ] B{ } map-as ; inline
 
 : tr-hints ( word -- )

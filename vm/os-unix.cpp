@@ -40,16 +40,29 @@ factor_vm *tls_vm()
 
 static void *null_dll;
 
-s64 current_micros()
+u64 system_micros()
 {
 	struct timeval t;
 	gettimeofday(&t,NULL);
-	return (s64)t.tv_sec * 1000000 + t.tv_usec;
+	return (u64)t.tv_sec * 1000000 + t.tv_usec;
 }
 
-void sleep_micros(cell usec)
+void sleep_nanos(u64 nsec)
 {
-	usleep(usec);
+	timespec ts;
+	timespec ts_rem;
+	int ret;
+	ts.tv_sec = nsec / 1000000000;
+	ts.tv_nsec = nsec % 1000000000;
+	ret = nanosleep(&ts,&ts_rem);
+	while(ret == -1 && errno == EINTR)
+	{
+		memcpy(&ts, &ts_rem, sizeof(ts));
+		ret = nanosleep(&ts, &ts_rem);
+	}
+
+	if(ret == -1)
+		fatal_error("nanosleep failed", 0);
 }
 
 void factor_vm::init_ffi()
@@ -60,27 +73,27 @@ void factor_vm::init_ffi()
 
 void factor_vm::ffi_dlopen(dll *dll)
 {
-	dll->dll = dlopen(alien_offset(dll->path), RTLD_LAZY);
+	dll->handle = dlopen(alien_offset(dll->path), RTLD_LAZY);
 }
 
 void *factor_vm::ffi_dlsym(dll *dll, symbol_char *symbol)
 {
-	void *handle = (dll == NULL ? null_dll : dll->dll);
+	void *handle = (dll == NULL ? null_dll : dll->handle);
 	return dlsym(handle,symbol);
 }
 
 void factor_vm::ffi_dlclose(dll *dll)
 {
-	if(dlclose(dll->dll))
+	if(dlclose(dll->handle))
 		general_error(ERROR_FFI,false_object,false_object,NULL);
-	dll->dll = NULL;
+	dll->handle = NULL;
 }
 
 void factor_vm::primitive_existsp()
 {
 	struct stat sb;
-	char *path = (char *)(untag_check<byte_array>(dpop()) + 1);
-	box_boolean(stat(path,&sb) >= 0);
+	char *path = (char *)(untag_check<byte_array>(ctx->pop()) + 1);
+	ctx->push(tag_boolean(stat(path,&sb) >= 0));
 }
 
 segment::segment(cell size_, bool executable_p)

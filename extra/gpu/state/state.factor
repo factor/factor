@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien.c-types alien.data arrays byte-arrays
 combinators gpu kernel literals math math.rectangles opengl
-opengl.gl sequences variants specialized-arrays ;
+opengl.gl sequences typed variants specialized-arrays ;
 QUALIFIED-WITH: alien.c-types c
 FROM: math => float ;
 SPECIALIZED-ARRAY: int
@@ -439,15 +439,15 @@ M: mask-state set-gpu-state*
 
 PRIVATE>
 
-: get-viewport-state ( -- viewport-state )
+TYPED: get-viewport-state ( -- viewport-state: viewport-state )
     GL_VIEWPORT get-gl-rect <viewport-state> ;
 
-: get-scissor-state ( -- scissor-state )
+TYPED: get-scissor-state ( -- scissor-state: scissor-state )
     GL_SCISSOR_TEST get-gl-bool
     [ GL_SCISSOR_BOX get-gl-rect ] [ f ] if
     <scissor-state> ;
 
-: get-multisample-state ( -- multisample-state )
+TYPED: get-multisample-state ( -- multisample-state: multisample-state )
     GL_MULTISAMPLE gl-enabled?
     GL_SAMPLE_ALPHA_TO_COVERAGE gl-enabled?
     GL_SAMPLE_ALPHA_TO_ONE gl-enabled?
@@ -457,7 +457,7 @@ PRIVATE>
     ] [ f f ] if
     <multisample-state> ;
 
-: get-stencil-state ( -- stencil-state )
+TYPED: get-stencil-state ( -- stencil-state: stencil-state )
     GL_STENCIL_TEST gl-enabled? [
         GL_STENCIL_REF get-gl-int
         GL_STENCIL_VALUE_MASK get-gl-int
@@ -477,15 +477,15 @@ PRIVATE>
     ] [ f f ] if
     <stencil-state> ;
 
-: get-depth-range-state ( -- depth-range-state )
+TYPED: get-depth-range-state ( -- depth-range-state: depth-range-state )
     GL_DEPTH_RANGE 2 get-gl-floats first2 <depth-range-state> ;
 
-: get-depth-state ( -- depth-state )
+TYPED: get-depth-state ( -- depth-state: depth-state )
     GL_DEPTH_TEST gl-enabled?
     [ GL_DEPTH_FUNC get-gl-int gl-comparison> ] [ f ] if
     <depth-state> ;
 
-: get-blend-state ( -- blend-state )
+TYPED: get-blend-state ( -- blend-state: blend-state )
     GL_BLEND gl-enabled? [
         GL_BLEND_COLOR 4 get-gl-floats
 
@@ -501,34 +501,34 @@ PRIVATE>
     ] [ f f f ] if
     <blend-state> ;
 
-: get-mask-state ( -- mask-state )
+TYPED: get-mask-state ( -- mask-state: mask-state )
     GL_COLOR_WRITEMASK 4 get-gl-bools 
     GL_DEPTH_WRITEMASK get-gl-bool
     GL_STENCIL_WRITEMASK get-gl-int
     GL_STENCIL_BACK_WRITEMASK get-gl-int
     <mask-state> ;
 
-: get-triangle-cull-state ( -- triangle-cull-state )
+TYPED: get-triangle-cull-state ( -- triangle-cull-state: triangle-cull-state )
     GL_FRONT_FACE get-gl-int gl-triangle-face>
     GL_CULL_FACE gl-enabled?
     [ GL_CULL_FACE_MODE get-gl-int gl-triangle-cull> ]
     [ f ] if
     <triangle-cull-state> ;
 
-: get-triangle-state ( -- triangle-state )
+TYPED: get-triangle-state ( -- triangle-state: triangle-state )
     GL_POLYGON_MODE 2 get-gl-ints
     first2 [ gl-triangle-mode> ] bi@
     GL_POLYGON_SMOOTH gl-enabled?
     <triangle-state> ;
 
-: get-point-state ( -- point-state )
+TYPED: get-point-state ( -- point-state: point-state )
     GL_VERTEX_PROGRAM_POINT_SIZE gl-enabled?
     [ f ] [ GL_POINT_SIZE get-gl-float ] if
     GL_POINT_SPRITE_COORD_ORIGIN get-gl-int gl-point-sprite-origin> 
     GL_POINT_FADE_THRESHOLD_SIZE get-gl-float
     <point-state> ;
 
-: get-line-state ( -- line-state )
+TYPED: get-line-state ( -- line-state: line-state )
     GL_LINE_WIDTH get-gl-float
     GL_LINE_SMOOTH gl-enabled?
     <line-state> ;

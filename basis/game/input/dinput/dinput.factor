@@ -4,9 +4,10 @@ continuations game.input game.input.dinput.keys-array
 io.encodings.utf16 io.encodings.utf16n kernel locals math
 math.bitwise math.rectangles namespaces parser sequences
 shuffle specialized-arrays ui.backend.windows vectors
-windows.com windows.dinput windows.dinput.constants
-windows.errors windows.kernel32 windows.messages
-windows.ole32 windows.user32 classes.struct alien.data ;
+windows.com windows.directx.dinput
+windows.directx.dinput.constants .errors windows.kernel32
+windows.messages .ole32 windows.user32 classes.struct
+alien.data ;
 SPECIALIZED-ARRAY: DIDEVICEOBJECTDATA
 IN: game.input.dinput
 

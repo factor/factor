@@ -14,6 +14,9 @@ IN: calendar.unix
 : timespec>seconds ( timespec -- seconds )
     [ sec>> seconds ] [ nsec>> nanoseconds ] bi time+ ;
 
+: timespec>nanoseconds ( timespec -- seconds )
+    [ sec>> 1000000000 * ] [ nsec>> ] bi + ;
+
 : timespec>unix-time ( timespec -- timestamp )
     timespec>seconds since-1970 ;
 

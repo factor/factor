@@ -10,7 +10,7 @@ std::ostream &operator<<(std::ostream &out, const string *str)
 	return out;
 }
 
-void factor_vm::print_word(word* word, cell nesting)
+void factor_vm::print_word(word *word, cell nesting)
 {
 	if(tagged<object>(word->vocabulary).type_p(STRING_TYPE))
 		std::cout << untag<string>(word->vocabulary) << ":";
@@ -30,7 +30,7 @@ void factor_vm::print_factor_string(string *str)
 	std::cout << '"' << str << '"';
 }
 
-void factor_vm::print_array(array* array, cell nesting)
+void factor_vm::print_array(array *array, cell nesting)
 {
 	cell length = array_capacity(array);
 	cell i;
@@ -145,13 +145,13 @@ void factor_vm::print_objects(cell *start, cell *end)
 void factor_vm::print_datastack()
 {
 	std::cout << "==== DATA STACK:\n";
-	print_objects((cell *)ds_bot,(cell *)ds);
+	print_objects((cell *)ctx->datastack_region->start,(cell *)ctx->datastack);
 }
 
 void factor_vm::print_retainstack()
 {
 	std::cout << "==== RETAIN STACK:\n";
-	print_objects((cell *)rs_bot,(cell *)rs);
+	print_objects((cell *)ctx->retainstack_region->start,(cell *)ctx->retainstack);
 }
 
 struct stack_frame_printer {
@@ -160,15 +160,18 @@ struct stack_frame_printer {
 	explicit stack_frame_printer(factor_vm *parent_) : parent(parent_) {}
 	void operator()(stack_frame *frame)
 	{
+		std::cout << "frame: " << std::hex << (cell)frame << std::dec << std::endl;
+		std::cout << "executing: ";
 		parent->print_obj(parent->frame_executing(frame));
 		std::cout << std::endl;
+		std::cout << "scan: ";
 		parent->print_obj(parent->frame_scan(frame));
 		std::cout << std::endl;
 		std::cout << "word/quot addr: ";
 		std::cout << std::hex << (cell)parent->frame_executing(frame) << std::dec;
 		std::cout << std::endl;
 		std::cout << "word/quot xt: ";
-		std::cout << std::hex << (cell)frame->xt << std::dec;
+		std::cout << std::hex << (cell)frame->entry_point << std::dec;
 		std::cout << std::endl;
 		std::cout << "return address: ";
 		std::cout << std::hex << (cell)FRAME_RETURN_ADDRESS(frame,parent) << std::dec;
@@ -241,12 +244,12 @@ struct object_dumper {
 	explicit object_dumper(factor_vm *parent_, cell type_) :
 		parent(parent_), type(type_) {}
 
-	void operator()(cell obj)
+	void operator()(object *obj)
 	{
-		if(type == TYPE_COUNT || tagged<object>(obj).type_p(type))
+		if(type == TYPE_COUNT || obj->type() == type)
 		{
-			std::cout << padded_address(obj) << " ";
-			parent->print_nested_obj(obj,2);
+			std::cout << padded_address((cell)obj) << " ";
+			parent->print_nested_obj(tag_dynamic(obj),2);
 			std::cout << std::endl;
 		}
 	}
@@ -260,18 +263,19 @@ void factor_vm::dump_objects(cell type)
 }
 
 struct data_reference_slot_visitor {
-	cell look_for, obj;
+	cell look_for;
+	object *obj;
 	factor_vm *parent;
 
-	explicit data_reference_slot_visitor(cell look_for_, cell obj_, factor_vm *parent_) :
+	explicit data_reference_slot_visitor(cell look_for_, object *obj_, factor_vm *parent_) :
 		look_for(look_for_), obj(obj_), parent(parent_) { }
 
 	void operator()(cell *scan)
 	{
 		if(look_for == *scan)
 		{
-			std::cout << padded_address(obj) << " ";
-			parent->print_nested_obj(obj,2);
+			std::cout << padded_address((cell)obj) << " ";
+			parent->print_nested_obj(tag_dynamic(obj),2);
 			std::cout << std::endl;
 		}
 	}
@@ -284,10 +288,10 @@ struct data_reference_object_visitor {
 	explicit data_reference_object_visitor(cell look_for_, factor_vm *parent_) :
 		look_for(look_for_), parent(parent_) {}
 
-	void operator()(cell obj)
+	void operator()(object *obj)
 	{
 		data_reference_slot_visitor visitor(look_for,obj,parent);
-		parent->do_slots(UNTAG(obj),visitor);
+		obj->each_slot(visitor);
 	}
 };
 
@@ -299,32 +303,30 @@ void factor_vm::find_data_references(cell look_for)
 
 struct code_block_printer {
 	factor_vm *parent;
-	cell reloc_size, literal_size;
+	cell reloc_size, parameter_size;
 
 	explicit code_block_printer(factor_vm *parent_) :
-		parent(parent_), reloc_size(0), literal_size(0) {}
+		parent(parent_), reloc_size(0), parameter_size(0) {}
 
 	void operator()(code_block *scan, cell size)
 	{
 		const char *status;
 		if(scan->free_p())
 			status = "free";
-		else if(parent->code->marked_p(scan))
-		{
-			reloc_size += parent->object_size(scan->relocation);
-			literal_size += parent->object_size(scan->literals);
-			status = "marked";
-		}
 		else
 		{
 			reloc_size += parent->object_size(scan->relocation);
-			literal_size += parent->object_size(scan->literals);
-			status = "allocated";
-		}
+			parameter_size += parent->object_size(scan->parameters);
 
-		std::cout << std::hex << (cell)scan << std::dec << " ";
-		std::cout << std::hex << size << std::dec << " ";
-		std::cout << status << std::endl;
+			if(parent->code->marked_p(scan))
+				status = "marked";
+			else
+				status = "allocated";
+
+			std::cout << std::hex << (cell)scan << std::dec << " ";
+			std::cout << std::hex << size << std::dec << " ";
+			std::cout << status << std::endl;
+		}
 	}
 };
 
@@ -333,8 +335,8 @@ void factor_vm::dump_code_heap()
 {
 	code_block_printer printer(this);
 	code->allocator->iterate(printer);
-	std::cout << printer.reloc_size << " bytes of relocation data\n";
-	std::cout << printer.literal_size << " bytes of literal data\n";
+	std::cout << printer.reloc_size << " bytes used by relocation tables\n";
+	std::cout << printer.parameter_size << " bytes used by parameter tables\n";
 }
 
 void factor_vm::factorbug()
@@ -419,9 +421,9 @@ void factor_vm::factorbug()
 		else if(strcmp(cmd,"t") == 0)
 			full_output = !full_output;
 		else if(strcmp(cmd,"s") == 0)
-			dump_memory(ds_bot,ds);
+			dump_memory(ctx->datastack_region->start,ctx->datastack);
 		else if(strcmp(cmd,"r") == 0)
-			dump_memory(rs_bot,rs);
+			dump_memory(ctx->retainstack_region->start,ctx->retainstack);
 		else if(strcmp(cmd,".s") == 0)
 			print_datastack();
 		else if(strcmp(cmd,".r") == 0)
@@ -457,7 +459,7 @@ void factor_vm::factorbug()
 		else if(strcmp(cmd,"push") == 0)
 		{
 			cell addr = read_cell_hex();
-			dpush(addr);
+			ctx->push(addr);
 		}
 		else if(strcmp(cmd,"code") == 0)
 			dump_code_heap();

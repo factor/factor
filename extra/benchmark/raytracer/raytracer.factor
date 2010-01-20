@@ -148,7 +148,7 @@ DEFER: create ( level c r -- scene )
     [ oversampling /f ] bi@ 0.0 double-array{ } 3sequence ;
 
 : ss-grid ( -- ss-grid )
-    oversampling [ oversampling [ ss-point ] with map ] map ;
+    oversampling iota [ oversampling iota [ ss-point ] with map ] map ;
 
 : ray-grid ( point ss-grid -- ray-grid )
     [
@@ -160,8 +160,8 @@ DEFER: create ( level c r -- scene )
     [ [ swap cast-ray + ] with each ] with each ;
 
 : pixel-grid ( -- grid )
-    size reverse [
-        size [
+    size iota reverse [
+        size iota [
             [ size 0.5 * - ] bi@ swap size
             double-array{ } 3sequence
         ] with map

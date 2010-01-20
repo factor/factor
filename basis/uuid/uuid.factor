@@ -12,7 +12,7 @@ IN: uuid
     ! 0x01b21dd213814000L is the number of 100-ns intervals
     ! between the UUID epoch 1582-10-15 00:00:00 and the 
     ! Unix epoch 1970-01-01 00:00:00.
-    micros 10 * HEX: 01b21dd213814000 +
+    system-micros 10 * HEX: 01b21dd213814000 +
     [ -48 shift HEX: 0fff bitand ] 
     [ -32 shift HEX: ffff bitand ]
     [ HEX: ffffffff bitand ]

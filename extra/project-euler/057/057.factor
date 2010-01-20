@@ -36,7 +36,7 @@ IN: project-euler.057
     >fraction [ number>string length ] bi@ > ; inline
 
 : euler057 ( -- answer )
-    0 1000 [0,b) [ drop 2 + recip dup 1 + longer-numerator? ] count nip ;
+    0 1000 iota [ drop 2 + recip dup 1 + longer-numerator? ] count nip ;
 
 ! [ euler057 ] 100 ave-time
 ! 1728 ms ave run time - 80.81 SD (100 trials)

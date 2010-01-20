@@ -50,7 +50,7 @@ PRIVATE>
 
 : get-private-key ( -- bin/f )
     ec-key-handle EC_KEY_get0_private_key
-    dup [ dup BN_num_bits bits>bytes <byte-array> tuck BN_bn2bin drop ] when ;
+    dup [ dup BN_num_bits bits>bytes <byte-array> [ BN_bn2bin drop ] keep ] when ;
 
 :: get-public-key ( -- bin/f )
     ec-key-handle :> KEY

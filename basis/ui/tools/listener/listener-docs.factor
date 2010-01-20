@@ -36,7 +36,7 @@ TIP: "You can read documentation by pressing F1." ;
 
 TIP: "The listener tool remembers previous lines of input. Press " { $command interactor "completion" recall-previous } " and " { $command interactor "completion" recall-next } " to cycle through them." ;
 
-TIP: "When you mouse over certain objects, a block border will appear. Left-clicking on such an object will perform the default operation. Right-clicking will show a menu with all operations." ;
+TIP: "When you mouse over certain objects, a black border will appear. Left-clicking on such an object will perform the default operation. Right-clicking will show a menu with all operations." ;
 
 TIP: "The status bar displays stack effects of recognized words as they are being typed in." ;
 

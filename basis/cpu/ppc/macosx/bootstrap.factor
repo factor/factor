@@ -1,10 +1,10 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser layouts system kernel sequences ;
+USING: parser system kernel sequences ;
 IN: bootstrap.ppc
 
-: c-area-size ( -- n ) 14 bootstrap-cells ;
-: lr-save ( -- n ) 2 bootstrap-cells ;
+: reserved-size ( -- n ) 24 ;
+: lr-save ( -- n ) 8 ;
 
 << "vocab:cpu/ppc/bootstrap.factor" parse-file suffix! >>
 call

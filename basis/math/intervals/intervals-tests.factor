@@ -79,7 +79,7 @@ IN: math.intervals.tests
 
 [ t ] [ 1 2 [a,b] dup empty-interval interval-union = ] unit-test
 
-[ t ] [ empty-interval 1 2 [a,b] tuck interval-union = ] unit-test
+[ t ] [ 1 2 [a,b] empty-interval over interval-union = ] unit-test
 
 [ t ] [
     0 1 (a,b) 0 1 [a,b] interval-union 0 1 [a,b] =
@@ -250,7 +250,7 @@ IN: math.intervals.tests
     dup full-interval eq? [
         drop 32 random-bits 31 2^ -
     ] [
-        dup to>> first over from>> first tuck - random +
+        [ ] [ from>> first ] [ to>> first ] tri over - random +
         2dup swap interval-contains? [
             nip
         ] [
@@ -291,7 +291,7 @@ IN: math.intervals.tests
     ] if ;
 
 unary-ops [
-    [ [ t ] ] dip '[ 8000 iota [ drop _ unary-test ] all? ] unit-test
+    [ [ t ] ] dip '[ 8000 [ drop _ unary-test ] all-integers? ] unit-test
 ] each
 
 : binary-ops ( -- alist )

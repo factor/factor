@@ -999,10 +999,10 @@ HELP: pusher
      { "quot" quotation } { "accum" vector } }
 { $description "Creates a new vector to accumulate the values which return true for a predicate.  Returns a new quotation which accepts an object to be tested and stored in the accumulator if the test yields true. The accumulator is left on the stack for convenience." }
 { $example "! Find all the even numbers:" "USING: prettyprint sequences math kernel ;"
-           "10 [ even? ] pusher [ each ] dip ."
+           "10 iota [ even? ] pusher [ each ] dip ."
            "V{ 0 2 4 6 8 }"
 }
-{ $notes "Used to implement the " { $link filter } " word." } ;
+{ $notes "Used to implement the " { $link filter } " word. Compare this word with " { $link accumulator } ", which is an unfiltering version." } ;
 
 HELP: trim-head
 { $values
@@ -1140,9 +1140,9 @@ HELP: set-fourth
 
 HELP: replicate
 { $values
-     { "seq" sequence } { "quot" { $quotation "( -- elt )" } }
+     { "len" integer } { "quot" { $quotation "( -- elt )" } }
      { "newseq" sequence } }
-{ $description "Calls the quotation for every element of the sequence in order. However, the element is not passed to the quotation -- it is dropped, and the quotation produces an element of its own that is collected into a sequence of the same class as the input sequence." }
+     { $description "Calls the quotation " { $snippet "len" } " times, collecting results into a new array." }
 { $examples 
     { $unchecked-example "USING: kernel prettyprint random sequences ;"
         "5 [ 100 random ] replicate ."
@@ -1152,15 +1152,16 @@ HELP: replicate
 
 HELP: replicate-as
 { $values
-     { "seq" sequence } { "quot" quotation } { "exemplar" sequence }
+     { "len" integer } { "quot" quotation } { "exemplar" sequence }
      { "newseq" sequence } }
-{ $description "Calls the quotation for every element of the sequence in order. However, the element is not passed to the quotation -- it is dropped, and the quotation produces an element of its own that is collected into a sequence of the same class as the exemplar sequence." }
+ { $description "Calls the quotation " { $snippet "len" } " times, collecting results into a new sequence of the same type as the exemplar sequence." }
 { $examples 
     { $unchecked-example "USING: prettyprint kernel sequences ;"
         "5 [ 100 random ] B{ } replicate-as ."
         "B{ 44 8 2 33 18 }"
     }
 } ;
+
 { replicate replicate-as } related-words
 
 HELP: partition
@@ -1175,23 +1176,24 @@ HELP: partition
     }
 } ;
 
-HELP: virtual-seq
+HELP: virtual-exemplar
 { $values
      { "seq" sequence }
      { "seq'" sequence } }
-{ $description "Part of the virtual sequence protocol, this word is used to return an underlying array from which to look up a value at an index given by " { $link virtual@ } "." } ;
+{ $description "Part of the virtual sequence protocol, this word is used to return an exemplar of the underlying storage. This is used in words like " { $link new-sequence } "." } ;
 
 HELP: virtual@
 { $values
      { "n" integer } { "seq" sequence }
      { "n'" integer } { "seq'" sequence } }
-{ $description "Part of the sequence protocol, this word translates the input index " { $snippet "n" } " into an index into the underlying storage returned by " { $link virtual-seq } "." } ;
+{ $description "Part of the sequence protocol, this word translates the input index " { $snippet "n" } " into an index and the underlying storage this index points into." } ;
 
 HELP: 2map-reduce
 { $values
      { "seq1" sequence } { "seq2" sequence } { "map-quot" quotation } { "reduce-quot" quotation }
      { "result" object } }
-{ $description "Unclips the first element of each sequence and calls " { $snippet "map-quot" } " on both objects. The result of this calculation is passed, along with the rest of both sequences, to " { $link 2reduce } ", with the computed object as the identity." }
+ { $description "Calls " { $snippet "map-quot" } " on each pair of elements from " { $snippet "seq1" } " and " { $snippet "seq2" } " and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
+{ $errors "Throws an error if the sequence is empty." }
 { $examples { $example "USING: sequences prettyprint math ;"
     "{ 10 30 50 } { 200 400 600 } [ + ] [ + ] 2map-reduce ."
     "1290"
@@ -1239,7 +1241,7 @@ HELP: binary-reduce
 { $description "Like " { $link reduce } ", but splits the sequence in half recursively until each sequence is small enough, and calls the quotation on these smaller sequences. If the quotation computes values that depend on the size of their input, such as bignum arithmetic, then this algorithm can be more efficient than using " { $link reduce } "." }
 { $examples "Computing factorial:"
     { $example "USING: prettyprint sequences math ;"
-    "40 rest-slice 1 [ * ] binary-reduce ."
+    "40 iota rest-slice 1 [ * ] binary-reduce ."
     "20397882081197443358640281739902897356800000000" }
 } ;
 
@@ -1289,7 +1291,8 @@ HELP: map-reduce
 { $values
      { "seq" sequence } { "map-quot" quotation } { "reduce-quot" quotation }
      { "result" object } }
-{ $description "Unclips the first element of the sequence, calls " { $snippet "map-quot" } " on that element, and proceeds like a " { $link reduce } ", where the calculated element is the identity element and the rest of the sequence is the sequence to reduce." }
+{ $description "Calls " { $snippet "map-quot" } " on each element and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
+{ $errors "Throws an error if the sequence is empty." }
 { $examples { $example "USING: sequences prettyprint math ;"
     "{ 1 3 5 } [ sq ] [ + ] map-reduce ."
     "35"
@@ -1397,26 +1400,29 @@ $nl
 ARTICLE: "virtual-sequences-protocol" "Virtual sequence protocol"
 "Virtual sequences must know their length:"
 { $subsections length }
-"The underlying sequence to look up a value in:"
-{ $subsections virtual-seq }
-"The index of the value in the underlying sequence:"
+"An exemplar of the underlying storage:"
+{ $subsections virtual-exemplar }
+"The index and the underlying storage where the value is located:"
 { $subsections virtual@ } ;
 
 ARTICLE: "virtual-sequences" "Virtual sequences"
 "A virtual sequence is an implementation of the " { $link "sequence-protocol" } " which does not store its own elements, and instead computes them, either from scratch or by retrieving them from another sequence."
 $nl
 "Implementations include the following:"
-{ $subsections reversed slice iota }
-"Virtual sequences can be implemented with the " { $link "virtual-sequences-protocol" } ", by translating an index in the virtual sequence into an index in another sequence." ;
+{ $subsections reversed slice }
+"Virtual sequences can be implemented with the " { $link "virtual-sequences-protocol" } ", by translating an index in the virtual sequence into an index in another sequence."
+{ $see-also "sequences-integers" } ;
 
 ARTICLE: "sequences-integers" "Counted loops"
-"Integers support the sequence protocol in a trivial fashion; a non-negative integer presents its non-negative predecessors as elements. For example, the integer 3, when viewed as a sequence, contains the elements 0, 1, and 2. This is very useful for performing counted loops."
+"A virtual sequence is defined for iterating over integers from zero."
+{ $subsection iota }
+"For example, calling " { $link iota } " on the integer 3 produces a sequence containing the elements 0, 1, and 2. This is very useful for performing counted loops."
 $nl
-"For example, the " { $link each } " combinator, given an integer, simply calls a quotation that number of times, pushing a counter on each iteration that ranges from 0 up to that integer:"
-{ $example "3 [ . ] each" "0\n1\n2" }
+"This means the " { $link each } " combinator, given an integer, simply calls a quotation that number of times, pushing a counter on each iteration that ranges from 0 up to that integer:"
+{ $example "3 iota [ . ] each" "0\n1\n2" }
 "A common idiom is to iterate over a sequence, while also maintaining a loop counter. This can be done using " { $link each-index } ", " { $link map-index } " and " { $link reduce-index } "."
 $nl
-"Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an integer."
+"Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an instance of " { $link iota } "."
 $nl
 "More elaborate counted loops can be performed with " { $link "math.ranges" } "." ;
 
@@ -1671,6 +1677,19 @@ ARTICLE: "sequences-comparing" "Comparing sequences"
 ARTICLE: "sequences-f" "The f object as a sequence"
 "The " { $link f } " object supports the sequence protocol in a trivial way. It responds with a length of zero and throws an out of bounds error when an attempt is made to access elements." ;
 
+ARTICLE: "sequences-combinator-implementation" "Implementing sequence combinators"
+"Creating a new sequence unconditionally:"
+{ $subsections
+    accumulator
+    accumulator-for
+}
+"Creating a new sequence conditionally:"
+{ $subsections
+    pusher
+    pusher-for
+    2pusher
+} ;
+
 ARTICLE: "sequences" "Sequence operations"
 "A " { $emphasis "sequence" } " is a finite, linearly-ordered collection of elements. Words for working with sequences are in the " { $vocab-link "sequences" } " vocabulary."
 $nl
@@ -1708,6 +1727,8 @@ $nl
 "Using sequences for control flow:"
 { $subsections "sequences-if" }
 "For inner loops:"
-{ $subsections "sequences-unsafe" } ;
+{ $subsections "sequences-unsafe" }
+"Implemeting sequence combinators:"
+{ $subsections "sequences-combinator-implementation" } ;
 
 ABOUT: "sequences"

@@ -3,7 +3,7 @@
 USING: accessors alien.c-types jamshred.game jamshred.oint
 jamshred.player jamshred.tunnel kernel math math.constants
 math.functions math.vectors opengl opengl.gl opengl.glu
-opengl.demo-support sequences specialized-arrays ;
+opengl.demo-support sequences specialized-arrays locals ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: jamshred.gl
@@ -44,14 +44,15 @@ CONSTANT: wall-drawing-offset 0.15
 
 : equally-spaced-radians ( n -- seq )
     #! return a sequence of n numbers between 0 and 2pi
-    dup [ / pi 2 * * ] curry map ;
+    [ iota ] keep [ / pi 2 * * ] curry map ;
 
 : draw-segment-vertex ( segment theta -- )
     over color>> gl-color segment-vertex-and-normal
     gl-normal gl-vertex ;
 
-: draw-vertex-pair ( theta next-segment segment -- )
-    rot tuck draw-segment-vertex draw-segment-vertex ;
+:: draw-vertex-pair ( theta next-segment segment -- )
+    segment theta draw-segment-vertex
+    next-segment theta draw-segment-vertex ;
 
 : draw-segment ( next-segment segment -- )
     GL_QUAD_STRIP [

@@ -50,13 +50,13 @@ TUPLE: cond-value value quot ;
 
 CONSTRUCTOR: cond-value ( value quot -- cond-value ) ;
 
-: write-mdb-persistent ( value quot: ( tuple -- assoc ) -- value' )
+: write-mdb-persistent ( value quot -- value' )
    over [ call( tuple -- assoc ) ] dip 
    [ [ tuple-collection name>> ] [ >toid ] bi ] keep
    [ add-storable ] dip
-   [ tuple-collection name>> ] [ id>> ] bi <objref> ; inline
+   [ tuple-collection name>> ] [ id>> ] bi <objref> ;
 
-: write-field ( value quot: ( tuple -- assoc ) -- value' )
+: write-field ( value quot -- value' )
    <cond-value> {
       { [ dup value>> mdb-special-value? ] [ value>> ]  }
       { [ dup value>> mdb-persistent? ]
@@ -66,7 +66,7 @@ CONSTRUCTOR: cond-value ( value quot -- cond-value ) ;
       { [ dup value>> [ hashtable? ] [ linked-assoc? ] bi or ]
         [ [ value>> ] [ quot>> ] bi '[ _ write-field ] assoc-map ] }
       [ value>> ]
-   } cond ; inline recursive
+   } cond ;
 
 : write-tuple-fields ( mirror tuple assoc quot: ( tuple -- assoc ) -- )
    swap ! m t q q a 

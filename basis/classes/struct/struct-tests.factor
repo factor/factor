@@ -365,3 +365,18 @@ STRUCT: bit-field-test
 [ -2 ] [ bit-field-test <struct> 2 >>b b>> ] unit-test
 [ 1 ] [ bit-field-test <struct> 257 >>c c>> ] unit-test
 [ 3 ] [ bit-field-test heap-size ] unit-test
+
+cpu ppc? [
+    STRUCT: ppc-align-test-1
+        { x longlong }
+        { y int } ;
+
+    [ 16 ] [ ppc-align-test-1 heap-size ] unit-test
+
+    STRUCT: ppc-align-test-2
+        { y int }
+        { x longlong } ;
+
+    [ 12 ] [ ppc-align-test-2 heap-size ] unit-test
+    [ 4 ] [ "x" ppc-align-test-2 offset-of ] unit-test
+] when

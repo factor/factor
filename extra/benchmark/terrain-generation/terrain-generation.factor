@@ -1,7 +1,6 @@
 ! (c)Joe Groff bsd license
 USING: io kernel math.vectors.simd terrain.generation threads ;
 FROM: alien.c-types => float ;
-SIMD: float
 IN: benchmark.terrain-generation
 
 : terrain-generation-benchmark ( -- )

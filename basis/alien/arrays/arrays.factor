@@ -20,6 +20,8 @@ M: array heap-size unclip [ array-length ] [ heap-size ] bi* * ;
 
 M: array c-type-align first c-type-align ;
 
+M: array c-type-align-first first c-type-align-first ;
+
 M: array c-type-stack-align? drop f ;
 
 M: array unbox-parameter drop void* unbox-parameter ;
@@ -54,6 +56,9 @@ M: string-type heap-size
 
 M: string-type c-type-align
     drop void* c-type-align ;
+
+M: string-type c-type-align-first
+    drop void* c-type-align-first ;
 
 M: string-type c-type-stack-align?
     drop void* c-type-stack-align? ;
@@ -97,5 +102,5 @@ M: string-type c-type-setter
 { char* utf8 } char* typedef
 char* uchar* typedef
 
-char  char*  "pointer-c-type" set-word-prop
+char char* "pointer-c-type" set-word-prop
 uchar uchar* "pointer-c-type" set-word-prop

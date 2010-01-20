@@ -6,7 +6,7 @@ IN: namespaces
 
 <PRIVATE
 
-: namestack* ( -- namestack ) 0 getenv { vector } declare ; inline
+: namestack* ( -- namestack ) 0 special-object { vector } declare ; inline
 : >n ( namespace -- ) namestack* push ;
 : ndrop ( -- ) namestack* pop* ;
 
@@ -14,8 +14,8 @@ PRIVATE>
 
 : namespace ( -- namespace ) namestack* last ; inline
 : namestack ( -- namestack ) namestack* clone ;
-: set-namestack ( namestack -- ) >vector 0 setenv ;
-: global ( -- g ) 21 getenv { hashtable } declare ; inline
+: set-namestack ( namestack -- ) >vector 0 set-special-object ;
+: global ( -- g ) 21 special-object { hashtable } declare ; inline
 : init-namespaces ( -- ) global 1array set-namestack ;
 : get ( variable -- value ) namestack* assoc-stack ; inline
 : set ( value variable -- ) namespace set-at ;

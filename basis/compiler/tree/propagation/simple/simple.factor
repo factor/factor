@@ -4,7 +4,7 @@ USING: fry accessors kernel sequences sequences.private assocs
 words namespaces classes.algebra combinators
 combinators.short-circuit classes classes.tuple
 classes.tuple.private continuations arrays alien.c-types math
-math.private slots generic definitions stack-checker.state
+math.private slots generic definitions stack-checker.dependencies
 compiler.tree
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
@@ -80,7 +80,7 @@ M: #declare propagate-before
 : (fold-call) ( #call word -- info )
     [ [ out-d>> ] [ in-d>> [ value-info literal>> ] map ] bi ] [ '[ _ execute ] ] bi*
     '[ _ _ with-datastack [ <literal-info> ] map nip ]
-    [ drop [ object-info ] replicate ]
+    [ drop length [ object-info ] replicate ]
     recover ;
 
 : fold-call ( #call word -- )
@@ -153,8 +153,6 @@ M: #call propagate-after
     [ out-d>> ] [ params>> return>> ] bi
     [ drop ] [ c-type-class <class-info> swap first set-value-info ] if-void ;
 
-M: #alien-invoke propagate-before propagate-alien-invoke ;
-
-M: #alien-indirect propagate-before propagate-alien-invoke ;
+M: #alien-node propagate-before propagate-alien-invoke ;
 
 M: #return annotate-node dup in-d>> (annotate-node) ;

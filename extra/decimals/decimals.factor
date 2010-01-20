@@ -37,7 +37,7 @@ SYNTAX: D: parse-decimal suffix! ;
     ] 2bi ;
 
 : scale-decimals ( D1 D2 -- D1' D2' )
-    scale-mantissas tuck [ <decimal> ] 2dip <decimal> ;
+    scale-mantissas [ <decimal> ] curry bi@ ;
 
 ERROR: decimal-types-expected d1 d2 ;
 

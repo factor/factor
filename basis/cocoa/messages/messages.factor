@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.strings arrays assocs
 classes.struct continuations combinators compiler compiler.alien
@@ -76,13 +76,13 @@ MACRO: (send) ( selector super? -- quot )
 : super-send ( receiver args... selector -- return... ) t (send) ; inline
 
 ! Runtime introspection
-SYMBOL: class-init-hooks
+SYMBOL: class-startup-hooks
 
-class-init-hooks [ H{ } clone ] initialize
+class-startup-hooks [ H{ } clone ] initialize
 
 : (objc-class) ( name word -- class )
     2dup execute dup [ 2nip ] [
-        drop over class-init-hooks get at [ call( -- ) ] when*
+        drop over class-startup-hooks get at [ call( -- ) ] when*
         2dup execute dup [ 2nip ] [
             2drop "No such class: " prepend throw
         ] if
@@ -202,7 +202,7 @@ ERROR: no-objc-type name ;
     (free) ;
 
 : method-arg-types ( method -- args )
-    dup method_getNumberOfArguments
+    dup method_getNumberOfArguments iota
     [ method-arg-type ] with map ;
 
 : method-return-type ( method -- ctype )
@@ -229,7 +229,7 @@ ERROR: no-objc-type name ;
 : class-exists? ( string -- class ) objc_getClass >boolean ;
 
 : define-objc-class-word ( quot name -- )
-    [ class-init-hooks get set-at ]
+    [ class-startup-hooks get set-at ]
     [
         [ "cocoa.classes" create ] [ '[ _ objc-class ] ] bi
         (( -- class )) define-declared

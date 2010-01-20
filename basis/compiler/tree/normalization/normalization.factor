@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry namespaces sequences math math.order accessors kernel arrays
 combinators assocs
@@ -75,10 +75,9 @@ M: #phi normalize*
     ] with-variable ;
 
 M: #recursive normalize*
-    dup label>> introductions>>
-    [ drop [ child>> first ] [ in-d>> ] bi >>in-d drop ]
-    [ make-values '[ _ (normalize) ] change-child ]
-    2bi ;
+    [ [ child>> first ] [ in-d>> ] bi >>in-d drop ]
+    [ dup label>> introductions>> make-values '[ _ (normalize) ] change-child ]
+    bi ;
 
 M: #enter-recursive normalize*
     [ introduction-stack get prepend ] change-out-d

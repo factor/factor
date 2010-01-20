@@ -46,7 +46,8 @@ $nl
 $nl
 "In certain advanced applications, this cannot be avoided and the best design involves mutating hashtable keys. In this case, a custom " { $link hashcode* } " method must be defined which only depends on immutable slots."
 $nl
-"In addition, the " { $link equal? } " and " { $link hashcode* } " methods must be congruent, and if one is defined the other should be defined also. This is documented in detail in the documentation for these respective words." ;
+"In addition, the " { $link equal? } " and " { $link hashcode* } " methods must be congruent, and if one is defined the other should be defined also. This is documented in detail in the documentation for these respective words."
+{ $subsections hashcode hashcode* identity-hashcode } ;
 
 ARTICLE: "hashtables.utilities" "Hashtable utilities"
 "Utility words to create a new hashtable from a single key/value pair:"

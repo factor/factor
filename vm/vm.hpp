@@ -30,6 +30,9 @@ struct factor_vm
 	/* Canonical truth value. In Factor, 't' */
 	cell true_object;
 
+	/* External entry points */
+	c_to_factor_func_type c_to_factor_func;
+
 	/* Is call counting enabled? */
 	bool profiling_p;
 
@@ -39,10 +42,6 @@ struct factor_vm
 	cell signal_fault_addr;
 	unsigned int signal_fpu_status;
 	stack_frame *signal_callstack_top;
-
-	/* A heap walk allows useful things to be done, like finding all
-	   references to an object for debugging purposes. */
-	cell heap_scan_ptr;
 
 	/* GC is off during heap walking */
 	bool gc_off;
@@ -59,6 +58,9 @@ struct factor_vm
 	/* Only set if we're performing a GC */
 	gc_state *current_gc;
 
+	/* Mark stack */
+	std::vector<cell> mark_stack;
+
 	/* If not NULL, we push GC events here */
 	std::vector<gc_event> *gc_events;
 
@@ -66,7 +68,7 @@ struct factor_vm
 	   allocates memory, it must wrap any references to the data and code
 	   heaps with data_root and code_root smart pointers, which register
 	   themselves here. See data_roots.hpp and code_roots.hpp */
-	std::vector<cell> data_roots;
+	std::vector<data_root_range> data_roots;
 	std::vector<cell> bignum_roots;
 	std::vector<code_root *> code_roots;
 
@@ -85,14 +87,17 @@ struct factor_vm
 	/* Number of entries in a polymorphic inline cache */
 	cell max_pic_size;
 
+	/* Incrementing object counter for identity hashing */
+	cell object_counter;
+
+	/* Sanity check to ensure that monotonic counter doesn't
+	decrease */
+	u64 last_nano_count;
+
 	// contexts
-	void reset_datastack();
-	void reset_retainstack();
-	void fix_stacks();
-	void save_stacks();
 	context *alloc_context();
 	void dealloc_context(context *old_context);
-	void nest_stacks(stack_frame *magic_frame);
+	void nest_stacks();
 	void unnest_stacks();
 	void init_stacks(cell ds_size_, cell rs_size_);
 	bool stack_to_array(cell bottom, cell top);
@@ -102,6 +107,7 @@ struct factor_vm
 	void primitive_set_datastack();
 	void primitive_set_retainstack();
 	void primitive_check_datastack();
+	void primitive_load_locals();
 
 	template<typename Iterator> void iterate_active_frames(Iterator &iter)
 	{
@@ -110,21 +116,27 @@ struct factor_vm
 		while(ctx)
 		{
 			iterate_callstack(ctx,iter);
-			if(ctx->magic_frame) iter(ctx->magic_frame);
 			ctx = ctx->next;
 		}
 	}
 
 	// run
-	void primitive_getenv();
-	void primitive_setenv();
 	void primitive_exit();
-	void primitive_micros();
+	void primitive_system_micros();
+	void primitive_nano_count();
 	void primitive_sleep();
 	void primitive_set_slot();
-	void primitive_load_locals();
+
+	// objects
+	void primitive_special_object();
+	void primitive_set_special_object();
+	void primitive_identity_hashcode();
+	void compute_identity_hashcode(object *obj);
+	void primitive_compute_identity_hashcode();
+	cell object_size(cell tagged);
 	cell clone_object(cell obj_);
 	void primitive_clone();
+	void primitive_become();
 
 	// profiler
 	void init_profiler();
@@ -220,20 +232,29 @@ struct factor_vm
 	void primitive_data_room();
 	void begin_scan();
 	void end_scan();
-	void primitive_begin_scan();
-	cell next_object();
-	void primitive_next_object();
-	void primitive_end_scan();
-	cell find_all_words();
-	cell object_size(cell tagged);
+	cell instances(cell type);
+	void primitive_all_instances();
+
+	template<typename Generation, typename Iterator>
+	inline void each_object(Generation *gen, Iterator &iterator)
+	{
+		cell obj = gen->first_object();
+		while(obj)
+		{
+			iterator((object *)obj);
+			obj = gen->next_object_after(obj);
+		}
+	}
 
 	template<typename Iterator> inline void each_object(Iterator &iterator)
 	{
-		begin_scan();
-		cell obj;
-		while(to_boolean(obj = next_object()))
-			iterator(obj);
-		end_scan();
+		gc_off = true;
+
+		each_object(data->tenured,iterator);
+		each_object(data->aging,iterator);
+		each_object(data->nursery,iterator);
+
+		gc_off = false;
 	}
 
 	/* the write barrier must be called any time we are potentially storing a
@@ -243,6 +264,18 @@ struct factor_vm
 		*(char *)(cards_offset + ((cell)slot_ptr >> card_bits)) = card_mark_mask;
 		*(char *)(decks_offset + ((cell)slot_ptr >> deck_bits)) = card_mark_mask;
 	}
+
+	inline void write_barrier(object *obj, cell size)
+	{
+		cell start = (cell)obj & (~card_size + 1);
+		cell end = ((cell)obj + size + card_size - 1) & (~card_size + 1);
+
+		for(cell offset = start; offset < end; offset += card_size)
+			write_barrier((cell *)offset);
+	}
+
+	// data heap checker
+	void check_data_heap();
 
 	// gc
 	void end_gc();
@@ -264,16 +297,15 @@ struct factor_vm
 	void primitive_minor_gc();
 	void primitive_full_gc();
 	void primitive_compact_gc();
-	void primitive_become();
 	void inline_gc(cell *data_roots_base, cell data_roots_size);
 	void primitive_enable_gc_events();
 	void primitive_disable_gc_events();
-	object *allot_object(header header, cell size);
-	object *allot_large_object(header header, cell size);
+	object *allot_object(cell type, cell size);
+	object *allot_large_object(cell type, cell size);
 
 	template<typename Type> Type *allot(cell size)
 	{
-		return (Type *)allot_object(header(Type::type_number),size);
+		return (Type *)allot_object(Type::type_number,size);
 	}
 
 	inline void check_data_pointer(object *pointer)
@@ -341,9 +373,10 @@ struct factor_vm
 	void primitive_set_string_nth_slow();
 
 	//booleans
-	void box_boolean(bool value);
-	bool to_boolean(cell value);
-	inline cell tag_boolean(cell untagged);
+	cell tag_boolean(cell untagged)
+	{
+		return (untagged ? true_object : false_object);
+	}
 
 	//byte arrays
 	byte_array *allot_byte_array(cell size);
@@ -352,7 +385,6 @@ struct factor_vm
 	void primitive_resize_byte_array();
 
 	template<typename Type> byte_array *byte_array_from_value(Type *value);
-	template<typename Type> byte_array *byte_array_from_values(Type *values, cell len);
 
 	//tuples
 	void primitive_tuple();
@@ -361,10 +393,13 @@ struct factor_vm
 	//words
 	word *allot_word(cell name_, cell vocab_, cell hashcode_);
 	void primitive_word();
-	void primitive_word_xt();
-	void update_word_xt(word *w_);
+	void primitive_word_code();
+	void update_word_entry_point(word *w_);
 	void primitive_optimized_p();
 	void primitive_wrapper();
+	void jit_compile_word(cell word_, cell def_, bool relocating);
+	cell find_all_words();
+	void compile_all_words();
 
 	//math
 	void primitive_bignum_to_fixnum();
@@ -423,21 +458,19 @@ struct factor_vm
 	void primitive_bits_double();
 	fixnum to_fixnum(cell tagged);
 	cell to_cell(cell tagged);
-	void box_signed_1(s8 n);
-	void box_unsigned_1(u8 n);
-	void box_signed_2(s16 n);
-	void box_unsigned_2(u16 n);
-	void box_signed_4(s32 n);
-	void box_unsigned_4(u32 n);
-	void box_signed_cell(fixnum integer);
-	void box_unsigned_cell(cell cell);
-	void box_signed_8(s64 n);
+	cell from_signed_1(s8 n);
+	cell from_unsigned_1(u8 n);
+	cell from_signed_2(s16 n);
+	cell from_unsigned_2(u16 n);
+	cell from_signed_4(s32 n);
+	cell from_unsigned_4(u32 n);
+	cell from_signed_cell(fixnum integer);
+	cell from_unsigned_cell(cell integer);
+	cell from_signed_8(s64 n);
 	s64 to_signed_8(cell obj);
-	void box_unsigned_8(u64 n);
+	cell from_unsigned_8(u64 n);
 	u64 to_unsigned_8(cell obj);
-	void box_float(float flo);
 	float to_float(cell value);
-	void box_double(double flo);
 	double to_double(cell value);
 	inline void overflow_fixnum_add(fixnum x, fixnum y);
 	inline void overflow_fixnum_subtract(fixnum x, fixnum y);
@@ -459,6 +492,7 @@ struct factor_vm
 	void init_c_io();
 	void io_error();
 	void primitive_fopen();
+	FILE *pop_file_handle();
 	void primitive_fgetc();
 	void primitive_fread();
 	void primitive_fputc();
@@ -469,31 +503,22 @@ struct factor_vm
 	void primitive_fclose();
 
 	//code_block
-	relocation_type relocation_type_of(relocation_entry r);
-	relocation_class relocation_class_of(relocation_entry r);
-	cell relocation_offset_of(relocation_entry r);
-	void flush_icache_for(code_block *block);
-	int number_of_parameters(relocation_type type);
-	void *object_xt(cell obj);
-	void *xt_pic(word *w, cell tagged_quot);
-	void *word_xt_pic(word *w);
-	void *word_xt_pic_tail(word *w);
-	void undefined_symbol();
-	void *get_rel_symbol(array *literals, cell index);
-	cell compute_relocation(relocation_entry rel, cell index, code_block *compiled);
-	template<typename Iterator> void iterate_relocations(code_block *compiled, Iterator &iter);
-	void store_address_2_2(cell *ptr, cell value);
-	void store_address_masked(cell *ptr, fixnum value, cell mask, fixnum shift);
-	void store_address_in_code_block(cell klass, cell offset, fixnum absolute_value);
-	void update_literal_references(code_block *compiled);
-	void relocate_code_block_step(relocation_entry rel, cell index, code_block *compiled);
+	cell compute_entry_point_address(cell obj);
+	cell compute_entry_point_pic_address(word *w, cell tagged_quot);
+	cell compute_entry_point_pic_address(cell w_);
+	cell compute_entry_point_pic_tail_address(cell w_);
+	cell code_block_owner(code_block *compiled);
 	void update_word_references(code_block *compiled);
-	void update_code_block_words_and_literals(code_block *compiled);
 	void check_code_address(cell address);
-	void relocate_code_block(code_block *compiled);
+	void undefined_symbol();
+	cell compute_dlsym_address(array *literals, cell index);
+	cell compute_vm_address(cell arg);
+	void store_external_address(instruction_operand op);
+	cell compute_here_address(cell arg, cell offset, code_block *compiled);
+	void initialize_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
 	code_block *allot_code_block(cell size, code_block_type type);
-	code_block *add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell literals_);
+	code_block *add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell parameters_, cell literals_);
 
 	//code heap
 	inline void check_code_pointer(cell ptr)
@@ -505,17 +530,13 @@ struct factor_vm
 
 	void init_code_heap(cell size);
 	bool in_code_heap_p(cell ptr);
-	void jit_compile_word(cell word_, cell def_, bool relocate);
 	void update_code_heap_words();
-	void update_code_heap_words_and_literals();
-	void relocate_code_heap();
 	void primitive_modify_code_heap();
 	code_heap_room code_room();
 	void primitive_code_room();
 	void primitive_strip_stack_traces();
 
-	/* Apply a function to every code block */
-	template<typename Iterator> void iterate_code_heap(Iterator &iter)
+	template<typename Iterator> void each_code_block(Iterator &iter)
 	{
 		code->allocator->iterate(iter);
 	}
@@ -531,16 +552,8 @@ struct factor_vm
 	bool save_image(const vm_char *filename);
 	void primitive_save_image();
 	void primitive_save_image_and_exit();
-	void data_fixup(cell *handle, cell data_relocation_base);
-	template<typename Type> void code_fixup(Type **handle, cell code_relocation_base);
-	void fixup_word(word *word, cell code_relocation_base);
-	void fixup_quotation(quotation *quot, cell code_relocation_base);
-	void fixup_alien(alien *d);
-	void fixup_callstack_object(callstack *stack, cell code_relocation_base);
-	void relocate_object(object *object, cell data_relocation_base, cell code_relocation_base);
-	void relocate_data(cell data_relocation_base, cell code_relocation_base);
-	void fixup_code_block(code_block *compiled, cell data_relocation_base);
-	void relocate_code(cell data_relocation_base);
+	void fixup_data(cell data_offset, cell code_offset);
+	void fixup_code(cell data_offset, cell code_offset);
 	void load_image(vm_parameters *p);
 
 	//callstack
@@ -548,44 +561,25 @@ struct factor_vm
 	void check_frame(stack_frame *frame);
 	callstack *allot_callstack(cell size);
 	stack_frame *fix_callstack_top(stack_frame *top, stack_frame *bottom);
-	stack_frame *capture_start();
+	stack_frame *second_from_top_stack_frame();
 	void primitive_callstack();
-	void primitive_set_callstack();
 	code_block *frame_code(stack_frame *frame);
 	code_block_type frame_type(stack_frame *frame);
 	cell frame_executing(stack_frame *frame);
+	cell frame_executing_quot(stack_frame *frame);
 	stack_frame *frame_successor(stack_frame *frame);
 	cell frame_scan(stack_frame *frame);
 	void primitive_callstack_to_array();
 	stack_frame *innermost_stack_frame(callstack *stack);
-	stack_frame *innermost_stack_frame_quot(callstack *callstack);
 	void primitive_innermost_stack_frame_executing();
 	void primitive_innermost_stack_frame_scan();
 	void primitive_set_innermost_stack_frame_quot();
-	void save_callstack_bottom(stack_frame *callstack_bottom);
 	template<typename Iterator> void iterate_callstack(context *ctx, Iterator &iterator);
-
-	/* Every object has a regular representation in the runtime, which makes GC
-	much simpler. Every slot of the object until binary_payload_start is a pointer
-	to some other object. */
-	template<typename Iterator> void do_slots(cell obj, Iterator &iter)
-	{
-		cell scan = obj;
-		cell payload_start = ((object *)obj)->binary_payload_start();
-		cell end = obj + payload_start;
-
-		scan += sizeof(cell);
-
-		while(scan < end)
-		{
-			iter((cell *)scan);
-			scan += sizeof(cell);
-		}
-	}
 
 	//alien
 	char *pinned_alien_offset(cell obj);
 	cell allot_alien(cell delegate_, cell displacement);
+	cell allot_alien(void *address);
 	void primitive_displaced_alien();
 	void primitive_alien_address();
 	void *alien_pointer();
@@ -593,25 +587,26 @@ struct factor_vm
 	void primitive_dlsym();
 	void primitive_dlclose();
 	void primitive_dll_validp();
-	void primitive_vm_ptr();
 	char *alien_offset(cell obj);
-	char *unbox_alien();
-	void box_alien(void *ptr);
 	void to_value_struct(cell src, void *dest, cell size);
-	void box_value_struct(void *src, cell size);
-	void box_small_struct(cell x, cell y, cell size);
-	void box_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size);
+	cell from_value_struct(void *src, cell size);
+	cell from_small_struct(cell x, cell y, cell size);
+	cell from_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size);
 
 	//quotations
 	void primitive_jit_compile();
+	code_block *lazy_jit_compile_block();
 	void primitive_array_to_quotation();
-	void primitive_quotation_xt();
-	void set_quot_xt(quotation *quot, code_block *code);
-	void jit_compile(cell quot_, bool relocating);
-	void compile_all_words();
+	void primitive_quotation_code();
+	void set_quot_entry_point(quotation *quot, code_block *code);
+	code_block *jit_compile_quot(cell owner_, cell quot_, bool relocating);
+	void jit_compile_quot(cell quot_, bool relocating);
 	fixnum quot_code_offset_to_scan(cell quot_, cell offset);
-	cell lazy_jit_compile_impl(cell quot_, stack_frame *stack);
+	cell lazy_jit_compile(cell quot);
+	bool quot_compiled_p(quotation *quot);
 	void primitive_quot_compiled_p();
+	cell find_all_quotations();
+	void initialize_all_quotations();
 
 	//dispatch
 	cell search_lookup_alist(cell table, cell klass);
@@ -640,14 +635,19 @@ struct factor_vm
 	void update_pic_transitions(cell pic_size);
 	void *inline_cache_miss(cell return_address);
 
+	//entry points
+	void c_to_factor(cell quot);
+	void unwind_native_frames(cell quot, stack_frame *to);
+
 	//factor
 	void default_parameters(vm_parameters *p);
-	bool factor_arg(const vm_char* str, const vm_char* arg, cell* value);
+	bool factor_arg(const vm_char *str, const vm_char *arg, cell *value);
 	void init_parameters_from_args(vm_parameters *p, int argc, vm_char **argv);
-	void do_stage1_init();
+	void prepare_boot_image();
 	void init_factor(vm_parameters *p);
 	void pass_args_to_factor(int argc, vm_char **argv);
 	void start_factor(vm_parameters *p);
+	void stop_factor();
 	void start_embedded_factor(vm_parameters *p);
 	void start_standalone_factor(int argc, vm_char **argv);
 	char *factor_eval_string(char *string);
@@ -665,11 +665,10 @@ struct factor_vm
 
 	// os-windows
   #if defined(WINDOWS)
-	void sleep_micros(u64 usec);
 	const vm_char *vm_executable_path();
 	const vm_char *default_image_path();
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);
-	bool windows_stat(vm_char *path);
+	BOOL windows_stat(vm_char *path);
 
   #if defined(WINNT)
 	void open_console();

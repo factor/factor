@@ -35,5 +35,7 @@ IN: lists.lazy.tests
 [ [ drop ] leach ] must-infer
 [ lnth ] must-infer
 
+[ { 1 2 3 } ] [ { 1 2 3 4 5 } >list [ 2 > ] luntil list>array ] unit-test
+
 [ ] [ "resource:license.txt" utf8 <file-reader> llines list>array drop ] unit-test
 [ ] [ "resource:license.txt" utf8 <file-reader> lcontents list>array drop ] unit-test

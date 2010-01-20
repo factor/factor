@@ -135,6 +135,6 @@ SINGLETON: invalidate-crossref
 
 M: invalidate-crossref definitions-changed 2drop crossref global delete-at ;
 
-[ invalidate-crossref add-definition-observer ] "tools.crossref" add-init-hook
+[ invalidate-crossref add-definition-observer ] "tools.crossref" add-startup-hook
 
 PRIVATE>

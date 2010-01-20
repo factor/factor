@@ -44,7 +44,7 @@ SYMBOL: visited
     line-width 2 - glLineWidth
     line-width 2 - glPointSize
     1.0 1.0 1.0 1.0 glColor4d
-    dup [ drop t <array> ] with map visited set
+    dup iota [ drop t <array> ] with map visited set
     GL_LINE_STRIP glBegin
     { 0 0 } dup vertex (draw-maze)
     glEnd ;
@@ -61,7 +61,7 @@ M: maze draw-gadget* [ n draw-maze ] draw-canvas ;
 
 M: maze pref-dim* drop { 400 400 } ;
 
-: maze-window ( -- )
-    [ <maze> "Maze" open-window ] with-ui ;
+MAIN-WINDOW: maze-window { { title "Maze" } }
+    <maze> >>gadgets ;
 
 MAIN: maze-window

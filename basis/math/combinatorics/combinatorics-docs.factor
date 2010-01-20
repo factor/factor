@@ -31,7 +31,7 @@ HELP: permutation
 { $notes "Permutations are 0-based and a bounds error will be thrown if " { $snippet "n" } " is larger than " { $snippet "seq length factorial 1 -" } "." }
 { $examples
     { $example "USING: math.combinatorics prettyprint ;"
-        "1 3 permutation ." "{ 0 2 1 }" }
+        "1 { 0 1 2 } permutation ." "{ 0 2 1 }" }
     { $example "USING: math.combinatorics prettyprint ;"
         "5 { \"apple\" \"banana\" \"orange\" } permutation ." "{ \"orange\" \"banana\" \"apple\" }" }
 } ;
@@ -41,7 +41,7 @@ HELP: all-permutations
 { $description "Outputs a sequence containing all permutations of " { $snippet "seq" } " in lexicographical order." }
 { $examples
     { $example "USING: math.combinatorics prettyprint ;"
-        "3 all-permutations ." "{ { 0 1 2 } { 0 2 1 } { 1 0 2 } { 1 2 0 } { 2 0 1 } { 2 1 0 } }" }
+        "{ 0 1 2 } all-permutations ." "{ { 0 1 2 } { 0 2 1 } { 1 0 2 } { 1 2 0 } { 2 0 1 } { 2 1 0 } }" }
 } ;
 
 HELP: each-permutation

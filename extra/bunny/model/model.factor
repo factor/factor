@@ -93,7 +93,7 @@ M: bunny-buffers bunny-geom
         { GL_VERTEX_ARRAY GL_NORMAL_ARRAY } [
             GL_FLOAT 0 0 buffer-offset glNormalPointer
             [
-                nv>> "float" heap-size * buffer-offset
+                nv>> c:float heap-size * buffer-offset
                 [ 3 GL_FLOAT 0 ] dip glVertexPointer
             ] [
                 ni>>

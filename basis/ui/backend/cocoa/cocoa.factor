@@ -225,9 +225,9 @@ CLASS: {
 : install-app-delegate ( -- )
     NSApp FactorApplicationDelegate install-delegate ;
 
-SYMBOL: cocoa-init-hook
+SYMBOL: cocoa-startup-hook
 
-cocoa-init-hook [
+cocoa-startup-hook [
     [ "MiniFactor.nib" load-nib install-app-delegate ]
 ] initialize
 
@@ -235,7 +235,7 @@ M: cocoa-ui-backend (with-ui)
     "UI" assert.app [
         [
             init-clipboard
-            cocoa-init-hook get call( -- )
+            cocoa-startup-hook get call( -- )
             start-ui
             f io-thread-running? set-global
             init-thread-timer

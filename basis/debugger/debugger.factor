@@ -26,6 +26,9 @@ M: object error. short. ;
 
 M: string error. print ;
 
+: traceback-link. ( continuation -- )
+    "[" write [ "Traceback" ] dip write-object "]" print ;
+
 : :s ( -- )
     error-continuation get data>> stack. ;
 
@@ -103,9 +106,6 @@ HOOK: signal-error. os ( obj -- )
 : ffi-error. ( obj -- )
     "FFI error" print drop ;
 
-: heap-scan-error. ( obj -- )
-    "Cannot do next-object outside begin/end-scan" print drop ;
-
 : undefined-symbol-error. ( obj -- )
     "The image refers to a library or symbol that was not found at load time"
     print drop ;
@@ -148,14 +148,13 @@ PREDICATE: vm-error < array
         { 6  [ array-size-error.       ] }
         { 7  [ c-string-error.         ] }
         { 8  [ ffi-error.              ] }
-        { 9  [ heap-scan-error.        ] }
-        { 10 [ undefined-symbol-error. ] }
-        { 11 [ datastack-underflow.    ] }
-        { 12 [ datastack-overflow.     ] }
-        { 13 [ retainstack-underflow.  ] }
-        { 14 [ retainstack-overflow.   ] }
-        { 15 [ memory-error.           ] }
-        { 16 [ fp-trap-error.          ] }
+        { 9  [ undefined-symbol-error. ] }
+        { 10 [ datastack-underflow.    ] }
+        { 11 [ datastack-overflow.     ] }
+        { 12 [ retainstack-underflow.  ] }
+        { 13 [ retainstack-overflow.   ] }
+        { 14 [ memory-error.           ] }
+        { 15 [ fp-trap-error.          ] }
     } ; inline
 
 M: vm-error summary drop "VM error" ;
@@ -333,6 +332,8 @@ M: check-mixin-class summary drop "Not a mixin class" ;
 M: not-found-in-roots summary drop "Cannot resolve vocab: path" ;
 
 M: wrong-values summary drop "Quotation called with wrong stack effect" ;
+
+M: stack-effect-omits-dashes summary drop "Stack effect must contain “--”" ;
 
 {
     { [ os windows? ] [ "debugger.windows" require ] }

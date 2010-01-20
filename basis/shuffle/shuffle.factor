@@ -8,7 +8,7 @@ IN: shuffle
 <PRIVATE
 
 : >index-assoc ( sequence -- assoc )
-    dup length zip >hashtable ;
+    dup length iota zip >hashtable ;
 
 PRIVATE>
 
@@ -21,6 +21,10 @@ MACRO: shuffle-effect ( effect -- )
 
 SYNTAX: shuffle(
     ")" parse-effect suffix! \ shuffle-effect suffix! ;
+
+: tuck ( x y -- y x y ) swap over ; inline deprecated
+
+: spin ( x y z -- z y x ) swap rot ; inline deprecated
 
 : roll ( x y z t -- y z t x ) [ rot ] dip swap ; inline deprecated
 

@@ -149,4 +149,4 @@ SYMBOL: cached-lines
 : cached-line ( font string -- line )
     cached-lines get [ <line> ] 2cache ;
 
-[ <cache-assoc> cached-lines set-global ] "core-text" add-init-hook
+[ <cache-assoc> cached-lines set-global ] "core-text" add-startup-hook
