@@ -183,6 +183,7 @@ M: static-audio-clip (update-audio-clip)
     drop ;
 
 M:: streaming-audio-clip (update-audio-clip) ( audio-clip -- )
+    "blip" P drop
     audio-clip al-source>> :> al-source
     0 c:<uint> :> buffer
     al-source AL_BUFFERS_PROCESSED get-source-param [
@@ -246,7 +247,7 @@ M: audio-engine dispose*
     [ [ alcCloseDevice*   ] when* f ] change-al-device
     drop ;
 
-:: <static-audio-clip> ( audio-engine audio source loop? -- audio-clip/f )
+:: <static-audio-clip> ( audio-engine source audio loop? -- audio-clip/f )
     audio-engine get-available-source :> al-source
 
     al-source [
@@ -274,7 +275,7 @@ M: audio-engine dispose*
         buffer-count dup (uint-array) [ alGenBuffers ] keep :> al-buffers
         generator generator-audio-format :> ( channels sample-bits sample-rate )
 
-        audio-clip new-disposable
+        streaming-audio-clip new-disposable
             audio-engine >>audio-engine
             source >>source
             al-source >>al-source
