@@ -164,7 +164,7 @@ MIXIN: empty-mixin
 ! classes-intersect?
 [ t ] [ both tuple classes-intersect? ] unit-test
 
-[ t ] [ vector virtual-sequence classes-intersect? ] unit-test
+[ f ] [ vector virtual-sequence classes-intersect? ] unit-test
 
 [ t ] [ number vector class-or sequence classes-intersect? ] unit-test
 
@@ -192,11 +192,11 @@ MIXIN: empty-mixin
 [ t ] [ union-with-one-member object classes-intersect? ] unit-test
 
 [ t ] [ a mixin-with-one-member classes-intersect? ] unit-test
-[ t ] [ fixnum mixin-with-one-member classes-intersect? ] unit-test
+[ f ] [ fixnum mixin-with-one-member classes-intersect? ] unit-test
 [ t ] [ object mixin-with-one-member classes-intersect? ] unit-test
 
 [ t ] [ mixin-with-one-member a classes-intersect? ] unit-test
-[ t ] [ mixin-with-one-member fixnum classes-intersect? ] unit-test
+[ f ] [ mixin-with-one-member fixnum classes-intersect? ] unit-test
 [ t ] [ mixin-with-one-member object classes-intersect? ] unit-test
 
 ! class=

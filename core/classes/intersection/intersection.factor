@@ -8,6 +8,8 @@ IN: classes.intersection
 PREDICATE: intersection-class < class
     "metaclass" word-prop intersection-class eq? ;
 
+<PRIVATE
+
 : intersection-predicate-quot ( members -- quot )
     [
         [ drop t ]
@@ -22,11 +24,6 @@ PREDICATE: intersection-class < class
     dup participants intersection-predicate-quot define-predicate ;
 
 M: intersection-class update-class define-intersection-predicate ;
-
-: define-intersection-class ( class participants -- )
-    [ [ f f ] dip intersection-class define-class ]
-    [ drop update-classes ]
-    2bi ;
 
 M: intersection-class rank-class drop 2 ;
 
@@ -50,3 +47,10 @@ M: anonymous-intersection (flatten-class)
         [ intersect-flattened-classes ] map-reduce
         [ dup set ] each
     ] if-empty ;
+
+PRIVATE>
+
+: define-intersection-class ( class participants -- )
+    [ [ f f ] dip intersection-class define-class ]
+    [ drop update-classes ]
+    2bi ;
