@@ -1,10 +1,16 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes classes.union words kernel sequences
-definitions combinators arrays assocs generic accessors ;
+USING: classes classes.algebra classes.algebra.private
+classes.union words kernel sequences definitions combinators
+arrays assocs generic accessors ;
 IN: classes.mixin
 
 PREDICATE: mixin-class < union-class "mixin" word-prop ;
+
+M: mixin-class normalize-class ;
+
+M: mixin-class (classes-intersect?)
+    members [ classes-intersect? ] with any? ;
 
 M: mixin-class reset-class
     [ call-next-method ] [ { "mixin" } reset-props ] bi ;
@@ -53,13 +59,6 @@ TUPLE: check-mixin-class class ;
 GENERIC# add-mixin-instance 1 ( class mixin -- )
 
 M: class add-mixin-instance
-    #! Note: we call update-classes on the new member, not the
-    #! mixin. This ensures that we only have to update the
-    #! methods whose specializer intersects the new member, not
-    #! the entire mixin (since the other mixin members are not
-    #! affected at all). Also, all usages of the mixin will get
-    #! updated by transitivity; the mixins usages appear in
-    #! class-usages of the member, now that it's been added.
     [ 2drop ] [
         [ (add-mixin-instance) ] 2keep
         [ nip ] [ [ new-class? ] either? ] 2bi
