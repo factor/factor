@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs classes.algebra compiler.units definitions graphs
-grouping kernel namespaces sequences words
+grouping kernel namespaces sequences words fry
 stack-checker.dependencies ;
 IN: compiler.crossref
 
@@ -23,7 +23,7 @@ compiled-generic-crossref [ H{ } clone ] initialize
     #! don't have to recompile words that folded this away.
     [ compiled-usage ]
     [ "flushable" word-prop inlined-dependency flushed-dependency ? ] bi
-    [ dependency>= nip ] curry assoc-filter ;
+    '[ nip _ dependency>= ] assoc-filter ;
 
 : compiled-usages ( seq -- assocs )
     [ drop word? ] assoc-filter
@@ -42,8 +42,8 @@ compiled-generic-crossref [ H{ } clone ] initialize
     bi-curry* bi ;
 
 : (compiled-unxref) ( word word-prop variable -- )
-    [ [ [ dupd word-prop 2 <groups> ] dip get remove-vertex* ] 2curry ]
-    [ drop [ remove-word-prop ] curry ]
+    [ '[ dup _ word-prop 2 <groups> _ get remove-vertex* ] ]
+    [ drop '[ _ remove-word-prop ] ]
     2bi bi ;
 
 : compiled-unxref ( word -- )
