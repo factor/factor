@@ -3,17 +3,15 @@
 USING: accessors kernel namespaces arrays sequences io words fry
 continuations vocabs assocs dlists definitions math graphs generic
 generic.single combinators deques search-deques macros
-source-files.errors combinators.short-circuit
+source-files.errors combinators.short-circuit classes.algebra
 
 stack-checker stack-checker.dependencies stack-checker.inlining
 stack-checker.errors
 
-compiler.errors compiler.units compiler.utilities
+compiler.errors compiler.units compiler.utilities compiler.crossref
 
 compiler.tree.builder
 compiler.tree.optimizer
-
-compiler.crossref
 
 compiler.cfg
 compiler.cfg.builder
@@ -183,6 +181,12 @@ t compile-dependencies? set-global
 
 SINGLETON: optimizing-compiler
 
+M: optimizing-compiler update-call-sites ( class generic -- words )
+    #! Words containing call sites with inferred type 'class'
+    #! which inlined a method on 'generic'
+    compiled-generic-usage swap
+    '[ nip _ classes-intersect? ] assoc-filter keys ;
+
 M: optimizing-compiler recompile ( words -- alist )
     [
         <hashed-dlist> compile-queue set
@@ -197,9 +201,7 @@ M: optimizing-compiler recompile ( words -- alist )
     "--- compile done" compiler-message ;
 
 M: optimizing-compiler to-recompile ( -- words )
-    changed-definitions get compiled-usages
-    changed-generics get compiled-generic-usages
-    append assoc-combine keys ;
+    changed-definitions get compiled-usages assoc-combine keys ;
 
 M: optimizing-compiler process-forgotten-words
     [ delete-compiled-xref ] each ;

@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences namespaces assocs math accessors ;
 IN: definitions
@@ -17,25 +17,15 @@ SYMBOL: changed-definitions
 
 SYMBOL: changed-effects
 
-SYMBOL: changed-generics
-
 SYMBOL: outdated-generics
 
 SYMBOL: new-words
-
-SYMBOL: new-classes
 
 : new-word ( word -- )
     dup new-words get set-in-unit ;
 
 : new-word? ( word -- ? )
     new-words get key? ;
-
-: new-class ( word -- )
-    dup new-classes get set-in-unit ;
-
-: new-class? ( word -- ? )
-    new-classes get key? ;
 
 GENERIC: where ( defspec -- loc )
 

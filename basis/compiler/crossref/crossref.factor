@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs classes.algebra compiler.units definitions graphs
 grouping kernel namespaces sequences words
@@ -31,16 +31,6 @@ compiled-generic-crossref [ H{ } clone ] initialize
 
 : compiled-generic-usage ( word -- assoc )
     compiled-generic-crossref get at ;
-
-: (compiled-generic-usages) ( generic class -- assoc )
-    [ compiled-generic-usage ] dip
-    [
-        2dup [ valid-class? ] both?
-        [ classes-intersect? ] [ 2drop f ] if nip
-    ] curry assoc-filter ;
-
-: compiled-generic-usages ( assoc -- assocs )
-    [ (compiled-generic-usages) ] { } assoc>map ;
 
 : (compiled-xref) ( word dependencies word-prop variable -- )
     [ [ concat ] dip set-word-prop ] [ get add-vertex* ] bi-curry* 2bi ;
