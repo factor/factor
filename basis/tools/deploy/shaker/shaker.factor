@@ -159,7 +159,6 @@ IN: tools.deploy.shaker
                 "members"
                 "memo-quot"
                 "methods"
-                "mixin"
                 "method-class"
                 "method-generic"
                 "modular-arithmetic"
