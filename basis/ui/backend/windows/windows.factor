@@ -170,6 +170,8 @@ PRIVATE>
 : lo-word ( wparam -- lo ) <short> *short ; inline
 : hi-word ( wparam -- hi ) -16 shift lo-word ; inline
 : >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ;
+: GET_APPCOMMAND_LPARAM ( lParam -- appCommand )
+    hi-word FAPPCOMMAND_MASK lo-word bitnot bitand ; inline
 
 : crlf>lf ( str -- str' )
     CHAR: \r swap remove ;
@@ -495,6 +497,13 @@ SYMBOL: nc-buttons
     ReleaseCapture win32-error=0/f
     mouse-captured off ;
 
+: handle-app-command ( hWnd uMsg wParam lParam -- )
+    GET_APPCOMMAND_LPARAM
+    {
+        { APPCOMMAND_BROWSER_BACKWARD [ pick window left-action send-action ] }
+        { APPCOMMAND_BROWSER_FORWARD [ pick window right-action send-action ] }
+    } case 3drop ;
+    
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
     [
         over set-capture
@@ -570,6 +579,8 @@ H{ } clone wm-handlers set-global
 [ handle-wm-syscommand   ] WM_SYSCOMMAND add-wm-handler
 [ handle-wm-set-focus 0  ] WM_SETFOCUS add-wm-handler
 [ handle-wm-kill-focus 0 ] WM_KILLFOCUS add-wm-handler
+
+[ handle-app-command 0 ] WM_APPCOMMAND add-wm-handler
 
 [ handle-wm-buttondown 0 ] WM_LBUTTONDOWN add-wm-handler
 [ handle-wm-buttondown 0 ] WM_MBUTTONDOWN add-wm-handler
