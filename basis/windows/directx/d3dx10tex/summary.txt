@@ -1,0 +1,1 @@
+Direct3D 10 bindings. Corresponds to d3dx10tex.h.
