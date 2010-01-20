@@ -11,8 +11,6 @@ HELP: game-attributes
 { { $snippet "use-audio-engine?" } " specifies whether the game world should manage an " { $link audio-engine } " instance. False by default." }
 { { $snippet "audio-engine-device" } " specifies the string name of the OpenAL device the audio engine, if any, should try to open. The default value of " { $link POSTPONE: f } " attempts to open the default OpenAL device." }
 { { $snippet "audio-engine-voice-count" } " determines the number of independent voices the audio engine will make available. This determines how many individual audio clips can play simultaneously. This cannot exceed the OpenAL implementation's limit on supported voices." }
-{ { $snippet "audio-engine-buffer-size" } " determines the size in bytes of the audio buffers the audio engine will stream to the sound card." }
-{ { $snippet "audio-engine-buffer-count" } " determines the number of buffers the audio engine will allocate per audio clip played." }
 } ;
 
 HELP: game-world

@@ -12,8 +12,6 @@ TUPLE: game-world < world
     { use-audio-engine? boolean }
     { audio-engine-device initial: f }
     { audio-engine-voice-count initial: 16 }
-    { audio-engine-buffer-size initial: 8192 }
-    { audio-engine-buffer-count initial: 2 }
     { tick-slice float initial: 0.0 } ;
 
 GENERIC: begin-game-world ( world -- )
@@ -38,8 +36,6 @@ M: game-world draw*
     {
         [ audio-engine-device>> ]
         [ audio-engine-voice-count>> ]
-        [ audio-engine-buffer-size>> ]
-        [ audio-engine-buffer-count>> ]
     } cleave <audio-engine>
     [ start-audio* ] keep ; inline
 
@@ -63,9 +59,7 @@ TUPLE: game-attributes < world-attributes
     { use-game-input? boolean initial: f }
     { use-audio-engine? boolean initial: f }
     { audio-engine-device initial: f }
-    { audio-engine-voice-count initial: 16 }
-    { audio-engine-buffer-size initial: 8192 }
-    { audio-engine-buffer-count initial: 2 } ;
+    { audio-engine-voice-count initial: 16 } ;
 
 M: game-world apply-world-attributes
     {
@@ -74,8 +68,6 @@ M: game-world apply-world-attributes
         [ use-audio-engine?>> >>use-audio-engine? ]
         [ audio-engine-device>> >>audio-engine-device ]
         [ audio-engine-voice-count>> >>audio-engine-voice-count ]
-        [ audio-engine-buffer-size>> >>audio-engine-buffer-size ]
-        [ audio-engine-buffer-count>> >>audio-engine-buffer-count ]
         [ call-next-method ]
     } cleave ;
 
