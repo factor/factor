@@ -128,7 +128,7 @@ IN: stack-checker.transforms
     [
         [ "method-class" word-prop ]
         [ "method-generic" word-prop ] bi
-        [ inlined-dependency depends-on ] bi@
+        depends-on-generic
     ] [
         [ next-method-quot ]
         [ '[ _ no-next-method ] ] bi or

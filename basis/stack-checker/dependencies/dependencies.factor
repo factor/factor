@@ -29,9 +29,9 @@ SYMBOLS: inlined-dependency flushed-dependency called-dependency ;
 ! Generic words that the current quotation depends on
 SYMBOL: generic-dependencies
 
-: ?class-or ( class/f class -- class' )
-    swap [ class-or ] when* ;
+: ?class-or ( class class/f -- class' )
+    [ class-or ] when* ;
 
-: depends-on-generic ( generic class -- )
+: depends-on-generic ( class generic -- )
     generic-dependencies get dup
-    [ swap '[ _ ?class-or ] change-at ] [ 3drop ] if ;
+    [ [ ?class-or ] change-at ] [ 3drop ] if ;

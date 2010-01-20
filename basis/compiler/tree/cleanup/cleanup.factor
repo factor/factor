@@ -36,24 +36,34 @@ GENERIC: cleanup* ( node -- node/nodes )
     #! do it since the logic is a bit more involved
     [ cleanup* ] map-flat ;
 
+! Constant folding
 : cleanup-folding? ( #call -- ? )
     node-output-infos
     [ f ] [ [ literal?>> ] all? ] if-empty ;
 
-: cleanup-folding ( #call -- nodes )
+: (cleanup-folding) ( #call -- nodes )
     #! Replace a #call having a known result with a #drop of its
     #! inputs followed by #push nodes for the outputs.
-    [ word>> inlined-dependency depends-on ]
     [
         [ node-output-infos ] [ out-d>> ] bi
         [ [ literal>> ] dip #push ] 2map
     ]
     [ in-d>> #drop ]
-    tri prefix ;
+    bi prefix ;
 
+: record-folding ( #call -- )
+    dup word>> predicate?
+    [ [ node-input-infos first class>> ] [ word>> ] bi depends-on-generic ]
+    [ word>> inlined-dependency depends-on ]
+    if ;
+
+: cleanup-folding ( #call -- nodes )
+    [ (cleanup-folding) ] [ record-folding ] bi ;
+
+! Method inlining
 : add-method-dependency ( #call -- )
     dup method>> word? [
-        [ word>> ] [ class>> ] bi depends-on-generic
+        [ class>> ] [ word>> ] bi depends-on-generic
     ] [ drop ] if ;
 
 : cleanup-inlining ( #call -- nodes )
