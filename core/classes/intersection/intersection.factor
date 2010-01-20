@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words accessors sequences kernel assocs combinators classes
 classes.algebra classes.algebra.private classes.builtin
@@ -32,6 +32,9 @@ M: intersection-class rank-class drop 2 ;
 
 M: intersection-class instance?
     "participants" word-prop [ instance? ] with all? ;
+
+M: intersection-class normalize-class
+    participants <anonymous-intersection> normalize-class ;
 
 M: intersection-class (flatten-class)
     participants <anonymous-intersection> (flatten-class) ;
