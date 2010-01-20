@@ -56,7 +56,7 @@ M: audio-listener audio-gain gain>> ; inline
 M: audio-listener audio-velocity velocity>> ; inline
 M: audio-listener audio-orientation orientation>> ; inline
 
-GENERIC# generate-audio 1 ( generator buffer-size -- c-ptr )
+GENERIC# generate-audio 1 ( generator buffer-size -- c-ptr size )
 GENERIC: generator-audio-format ( generator -- channels sample-bits sample-rate )
 
 TUPLE: audio-engine < disposable
@@ -152,10 +152,12 @@ ERROR: audio-context-not-available device-name ;
     audio-clip al-source>> :> al-source
     audio-clip generator>> :> generator
     audio-clip buffer-size>> :> buffer-size
-    generator buffer-size generate-audio :> data
+    generator buffer-size generate-audio :> ( data size )
 
-    al-buffer audio-clip openal-format data buffer-size audio-clip sample-rate>> alBufferData
-    al-source 1 al-buffer c:<uint> alSourceQueueBuffers ;
+    data [
+        al-buffer audio-clip openal-format data size audio-clip sample-rate>> alBufferData
+        al-source 1 al-buffer c:<uint> alSourceQueueBuffers
+    ] when ;
 
 : update-listener ( audio-engine -- )
     listener>> {
