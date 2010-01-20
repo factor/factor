@@ -10,11 +10,15 @@ TUPLE: audio-source
     { position initial: { 0.0 0.0 0.0 } }
     { gain float initial: 1.0 }
     { velocity initial: { 0.0 0.0 0.0 } }
-    { relative? boolean initial: f } ;
+    { relative? boolean initial: f }
+    { distance float initial: 1.0 }
+    { rolloff float initial: 1.0 } ;
 
 TUPLE: audio-orientation
     { forward initial: { 0.0 0.0 -1.0 } }
     { up initial: { 0.0 1.0 0.0 } } ;
+
+C: <audio-orientation> audio-orientation
 
 : orientation>float-array ( orientation -- float-array )
     [ forward>> first3 ]
@@ -26,6 +30,32 @@ TUPLE: audio-listener
     { velocity initial: { 0.0 0.0 0.0 } }
     { orientation initial: T{ audio-orientation } } ;
 
+GENERIC: audio-position ( source/listener -- position )
+GENERIC: audio-gain ( source/listener -- gain )
+GENERIC: audio-velocity ( source/listener -- velocity )
+GENERIC: audio-relative? ( source -- relative? )
+GENERIC: audio-distance ( source -- distance )
+GENERIC: audio-rolloff ( source -- rolloff )
+GENERIC: audio-orientation ( listener -- orientation )
+
+M: object audio-position drop { 0.0 0.0 0.0 } ; inline
+M: object audio-gain drop 1.0 ; inline
+M: object audio-velocity drop { 0.0 0.0 0.0 } ; inline
+M: object audio-relative? drop f ; inline
+M: object audio-distance drop 1.0 ; inline
+M: object audio-rolloff drop 1.0 ; inline
+M: object audio-orientation drop T{ audio-orientation } ; inline
+
+M: audio-source audio-position position>> ; inline
+M: audio-source audio-gain gain>> ; inline
+M: audio-source audio-velocity velocity>> ; inline
+M: audio-source audio-relative? relative?>> ; inline
+
+M: audio-listener audio-position position>> ; inline
+M: audio-listener audio-gain gain>> ; inline
+M: audio-listener audio-velocity velocity>> ; inline
+M: audio-listener audio-orientation orientation>> ; inline
+
 TUPLE: audio-engine < disposable
     { voice-count integer }
     { buffer-size integer }
@@ -33,7 +63,7 @@ TUPLE: audio-engine < disposable
     { al-device c-ptr }
     { al-context c-ptr }
     al-sources
-    { listener audio-listener }
+    listener
     { next-source integer }
     clips
     update-alarm ;
@@ -41,7 +71,7 @@ TUPLE: audio-engine < disposable
 TUPLE: audio-clip < disposable
     { audio-engine audio-engine }
     { audio audio }
-    { source audio-source }
+    source
     { loop? boolean }
     { al-source integer }
     { al-buffers uint-array }
@@ -152,18 +182,20 @@ ERROR: audio-context-not-available device-name ;
 
 : update-listener ( audio-engine -- )
     listener>> {
-        [ AL_POSITION swap position>> first3 alListener3f ]
-        [ AL_GAIN swap gain>> alListenerf ]
-        [ AL_VELOCITY swap velocity>> first3 alListener3f ]
-        [ AL_ORIENTATION swap orientation>> orientation>float-array alListenerfv ]
+        [ AL_POSITION swap audio-position first3 alListener3f ]
+        [ AL_GAIN swap audio-gain alListenerf ]
+        [ AL_VELOCITY swap audio-velocity first3 alListener3f ]
+        [ AL_ORIENTATION swap audio-orientation orientation>float-array alListenerfv ]
     } cleave ;
 
 : update-source ( audio-clip -- )
     [ al-source>> ] [ source>> ] bi {
-        [ AL_POSITION swap position>> first3 alSource3f ]
-        [ AL_GAIN swap gain>> alSourcef ]
-        [ AL_VELOCITY swap velocity>> first3 alSource3f ]
-        [ AL_SOURCE_RELATIVE swap relative?>> c:>c-bool alSourcei ]
+        [ AL_POSITION swap audio-position first3 alSource3f ]
+        [ AL_GAIN swap audio-gain alSourcef ]
+        [ AL_VELOCITY swap audio-velocity first3 alSource3f ]
+        [ AL_SOURCE_RELATIVE swap audio-relative? c:>c-bool alSourcei ]
+        [ AL_REFERENCE_DISTANCE swap audio-distance alSourcef ]
+        [ AL_ROLLOFF_FACTOR swap audio-rolloff alSourcef ]
     } 2cleave ;
 
 :: update-audio-clip ( audio-clip -- )
@@ -179,8 +211,8 @@ ERROR: audio-context-not-available device-name ;
         ] times
     ] if ;
 
-: clip-sources ( clips -- length sources )
-    [ length ] [ [ source>> ] uint-array{ } map-as ] bi ;
+: clip-al-sources ( clips -- length sources )
+    [ length ] [ [ al-source>> ] uint-array{ } map-as ] bi ;
 
 PRIVATE>
 
@@ -263,7 +295,7 @@ M: audio-clip dispose*
 
 : play-clips ( audio-clips -- )
     [ [ update-source ] each ]
-    [ clip-sources alSourcePlayv ] bi ;
+    [ clip-al-sources alSourcePlayv ] bi ;
 
 : <audio-clip> ( audio-engine audio source loop? -- audio-clip/f )
     (audio-clip) dup play-clip ;
@@ -272,19 +304,19 @@ M: audio-clip dispose*
     al-source>> alSourcePause ;
 
 : pause-clips ( audio-clip -- )
-    clip-sources alSourcePausev ;
+    clip-al-sources alSourcePausev ;
 
 : stop-clip ( audio-clip -- )
     dispose ;
 
 : stop-clips ( audio-clip -- )
-    [ clip-sources alSourceStopv ]
+    [ clip-al-sources alSourceStopv ]
     [ [ dispose ] each ] bi ;
 
 : update-audio ( audio-engine -- )
     {
         [ make-engine-current ]
         [ update-listener ]
-        [ clips>> [ update-audio-clip ] each ]
+        [ clips>> clone [ update-audio-clip ] each ]
     } cleave ;
 

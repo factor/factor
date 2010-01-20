@@ -4,7 +4,7 @@ game.input.scancodes game.loop game.worlds
 gpu.render gpu.state kernel literals
 locals math math.constants math.functions math.matrices
 math.order math.vectors opengl.gl sequences
-ui ui.gadgets.worlds specialized-arrays ;
+ui ui.gadgets.worlds specialized-arrays audio.engine ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: gpu.util.wasd
@@ -87,6 +87,9 @@ CONSTANT: fov 0.7
     [ yaw>> ] [ ?pitch ] [ wasd-movement-speed ] tri
     { 1.0 0.0 0.0 } n*v eye-rotate ;
 
+M: wasd-world audio-position location>> ; inline
+M: wasd-world audio-orientation forward-vector { 0.0 1.0 0.0 } <audio-orientation> ; inline
+
 : walk-forward ( world -- )
     dup forward-vector [ v+ ] curry change-location drop ;
 : walk-backward ( world -- )
@@ -121,7 +124,7 @@ CONSTANT: fov 0.7
 : wasd-mouse-input ( world -- )
     read-mouse rotate-with-mouse ;
 
-M: wasd-world tick*
+M: wasd-world tick-game-world
     dup focused?>> [
         [ wasd-keyboard-input ] [ wasd-mouse-input ] bi
         reset-mouse
