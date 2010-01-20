@@ -1,0 +1,1 @@
+XInput bindings for using the Xbox 360 controller. Corresponds to XInput.h.
