@@ -183,7 +183,6 @@ M: static-audio-clip (update-audio-clip)
     drop ;
 
 M:: streaming-audio-clip (update-audio-clip) ( audio-clip -- )
-    "blip" P drop
     audio-clip al-source>> :> al-source
     0 c:<uint> :> buffer
     al-source AL_BUFFERS_PROCESSED get-source-param [

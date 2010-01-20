@@ -11,7 +11,7 @@ TUPLE: noise-generator ;
 M: noise-generator generator-audio-format
     drop 1 16 8000 ;
 M: noise-generator generate-audio
-    nip P [ -1 shift [ -4096 4096 [a,b] random ] short-array{ } replicate-as ] keep ;
+    nip [ -1 shift [ -4096 4096 [a,b] random ] short-array{ } replicate-as ] keep ;
 
 :: audio-engine-test ( -- )
     "vocab:audio/engine/test/loop.aiff" read-audio :> loop-sound
