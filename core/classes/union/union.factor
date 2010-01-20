@@ -8,6 +8,8 @@ IN: classes.union
 PREDICATE: union-class < class
     "metaclass" word-prop union-class eq? ;
 
+<PRIVATE
+
 : union-predicate-quot ( members -- quot )
     [
         [ drop f ]
@@ -25,6 +27,8 @@ M: union-class update-class define-union-predicate ;
 
 : (define-union-class) ( class members -- )
     f swap f union-class define-class ;
+
+PRIVATE>
 
 : define-union-class ( class members -- )
     [ (define-union-class) ] [ drop update-classes ] 2bi ;
