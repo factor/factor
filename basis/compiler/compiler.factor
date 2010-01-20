@@ -184,8 +184,10 @@ SINGLETON: optimizing-compiler
 M: optimizing-compiler update-call-sites ( class generic -- words )
     #! Words containing call sites with inferred type 'class'
     #! which inlined a method on 'generic'
-    compiled-generic-usage swap
-    '[ nip _ classes-intersect? ] assoc-filter keys ;
+    compiled-generic-usage swap '[
+        nip dup forgotten-class?
+        [ drop f ] [ _ classes-intersect? ] if
+    ] assoc-filter keys ;
 
 M: optimizing-compiler recompile ( words -- alist )
     [

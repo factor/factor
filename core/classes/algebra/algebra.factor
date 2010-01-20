@@ -40,13 +40,12 @@ M: object normalize-class ;
 
 PRIVATE>
 
-GENERIC: valid-class? ( obj -- ? )
+GENERIC: forgotten-class? ( obj -- ? )
 
-M: class valid-class? drop t ;
-M: anonymous-union valid-class? members>> [ valid-class? ] all? ;
-M: anonymous-intersection valid-class? participants>> [ valid-class? ] all? ;
-M: anonymous-complement valid-class? class>> valid-class? ;
-M: word valid-class? drop f ;
+M: word forgotten-class? "forgotten" word-prop ;
+M: anonymous-union forgotten-class? members>> [ forgotten-class? ] any? ;
+M: anonymous-intersection forgotten-class? participants>> [ forgotten-class? ] any? ;
+M: anonymous-complement forgotten-class? class>> forgotten-class? ;
 
 : class<= ( first second -- ? )
     class<=-cache get [ (class<=) ] 2cache ;
