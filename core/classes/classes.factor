@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions assocs kernel kernel.private
 slots.private namespaces make sequences strings words words.symbol
@@ -133,19 +133,24 @@ M: sequence implementors [ implementors ] gather ;
     dup deferred? [ define-symbol ] [ drop ] if ;
 
 : (define-class) ( word props -- )
+    reset-caches
+    [ drop update-map- ]
     [
-        {
-            [ dup class? [ drop ] [ [ implementors-map+ ] [ new-class ] bi ] if ]
-            [ reset-class ]
-            [ ?define-symbol ]
-            [ changed-definition ]
-            [ ]
-        } cleave
-    ] dip [ assoc-union ] curry change-props
-    dup predicate-word
-    [ 1quotation "predicate" set-word-prop ]
-    [ swap "predicating" set-word-prop ]
-    [ drop t "class" set-word-prop ]
+        [
+            {
+                [ dup class? [ drop ] [ implementors-map+ ] if ]
+                [ reset-class ]
+                [ ?define-symbol ]
+                [ ]
+            } cleave
+        ] dip [ assoc-union ] curry change-props
+        dup predicate-word
+        [ 1quotation "predicate" set-word-prop ]
+        [ swap "predicating" set-word-prop ]
+        [ drop t "class" set-word-prop ]
+        2tri
+    ]
+    [ drop update-map+ ]
     2tri ;
 
 PRIVATE>
@@ -161,13 +166,7 @@ GENERIC: update-methods ( class seq -- )
     [ nip [ update-class ] each ] [ update-methods ] 2bi ;
 
 : define-class ( word superclass members participants metaclass -- )
-    #! If it was already a class, update methods after.
-    reset-caches
-    make-class-props
-    [ drop update-map- ]
-    [ (define-class) ]
-    [ drop update-map+ ]
-    2tri ;
+    make-class-props [ (define-class) ] [ drop changed-definition ] 2bi ;
 
 : forget-predicate ( class -- )
     dup "predicate" word-prop

@@ -26,10 +26,12 @@ M: mixin-class rank-class drop 3 ;
     dup mixin-class? [
         drop
     ] [
-        [ { } redefine-mixin-class ]
-        [ H{ } clone "instances" set-word-prop ]
-        [ update-classes ]
-        tri
+        {
+            [ { } redefine-mixin-class ]
+            [ H{ } clone "instances" set-word-prop ]
+            [ changed-definition ]
+            [ update-classes ]
+        } cleave
     ] if ;
 
 TUPLE: check-mixin-class class ;
@@ -46,18 +48,18 @@ TUPLE: check-mixin-class class ;
     [ [ members swap bootstrap-word ] dip call ] [ drop ] 2bi
     swap redefine-mixin-class ; inline
 
-: update-mixin-class ( member mixin -- )
-    class-usages
-    [ update-methods ]
-    [ [ update-class ] each ]
-    [ implementors [ remake-generic ] each ]
-    tri ;
-
 : (add-mixin-instance) ( class mixin -- )
-    [ [ suffix ] change-mixin-class ]
-    [ [ f ] 2dip "instances" word-prop set-at ]
-    [ update-mixin-class ]
-    2tri ;
+    #! Call update-methods before adding the member:
+    #! - Call sites of generics specializing on 'mixin'
+    #! where the inferred type is 'class' are updated,
+    #! - Call sites where the inferred type is a subtype
+    #! of 'mixin' disjoint from 'class' are not updated
+    dup class-usages {
+        [ nip update-methods ]
+        [ drop [ suffix ] change-mixin-class ]
+        [ drop [ f ] 2dip "instances" word-prop set-at ]
+        [ 2nip [ update-class ] each ]
+    } 3cleave ;
 
 GENERIC# add-mixin-instance 1 ( class mixin -- )
 
@@ -65,15 +67,19 @@ M: class add-mixin-instance
     [ 2drop ] [ (add-mixin-instance) ] if-mixin-member? ;
 
 : (remove-mixin-instance) ( class mixin -- )
-    [ [ swap remove ] change-mixin-class ]
-    [ "instances" word-prop delete-at ]
-    [ update-mixin-class ]
-    2tri ;
+    #! Call update-methods after removing the member:
+    #! - Call sites of generics specializing on 'mixin'
+    #! where the inferred type is 'class' are updated,
+    #! - Call sites where the inferred type is a subtype
+    #! of 'mixin' disjoint from 'class' are not updated
+    dup class-usages {
+        [ drop [ swap remove ] change-mixin-class ]
+        [ drop "instances" word-prop delete-at ]
+        [ 2nip [ update-class ] each ]
+        [ nip update-methods ]
+    } 3cleave ;
 
 : remove-mixin-instance ( class mixin -- )
-    #! The order of the three clauses is important here. The last
-    #! one must come after the other two so that the entries it
-    #! adds to changed-generics are not overwritten.
     [ (remove-mixin-instance) ] [ 2drop ] if-mixin-member? ;
 
 M: mixin-class class-forgotten remove-mixin-instance ;

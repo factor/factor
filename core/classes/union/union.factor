@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words sequences kernel assocs combinators classes
-classes.algebra classes.algebra.private namespaces arrays math
-quotations ;
+classes.private classes.algebra classes.algebra.private
+namespaces arrays math quotations definitions ;
 IN: classes.union
 
 PREDICATE: union-class < class
@@ -26,12 +26,15 @@ PREDICATE: union-class < class
 M: union-class update-class define-union-predicate ;
 
 : (define-union-class) ( class members -- )
-    f swap f union-class define-class ;
+    f swap f union-class make-class-props (define-class) ;
 
 PRIVATE>
 
 : define-union-class ( class members -- )
-    [ (define-union-class) ] [ drop update-classes ] 2bi ;
+    [ (define-union-class) ]
+    [ drop changed-definition ]
+    [ drop update-classes ]
+    2tri ;
 
 M: union-class rank-class drop 2 ;
 
