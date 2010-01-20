@@ -9,8 +9,8 @@ IN: audio.engine.test
     0 :> i!
     <standard-audio-engine> :> engine
     engine start-audio*
-    engine loop-sound T{ audio-source f { 1.0 0.0 0.0 } 1.0 { 0.0 0.0 0.0 } f } t <audio-clip>
-        :> loop-clip
+    engine loop-sound T{ audio-source f { 1.0 0.0 0.0 } 1.0 { 0.0 0.0 0.0 } f } t
+        play-static-audio-clip :> loop-clip
 
     [
         i 1 + i!
@@ -19,7 +19,7 @@ IN: audio.engine.test
 
         i 50 mod zero? [
             engine once-sound T{ audio-source f { 0.0 0.0 0.0 } 1.0 { 0.0 0.0 0.0 } f } f
-            <audio-clip> drop
+            play-static-audio-clip drop
         ] when
 
         engine update-audio
