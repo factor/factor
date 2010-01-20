@@ -156,7 +156,7 @@ SYMBOL: event-stream-callbacks
 [
     event-stream-callbacks
     [ [ drop expired? not ] assoc-filter H{ } assoc-like ] change-global
-] "core-foundation" add-init-hook
+] "core-foundation" add-startup-hook
 
 : add-event-source-callback ( quot -- id )
     event-stream-counter <alien>

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes classes.algebra classes.predicate kernel
-sequences words ;
+USING: classes classes.algebra classes.algebra.private
+classes.predicate kernel sequences words ;
 IN: classes.singleton
 
 : singleton-predicate-quot ( class -- quot ) [ eq? ] curry ;

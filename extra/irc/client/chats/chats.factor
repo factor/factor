@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors concurrency.mailboxes kernel calendar io.sockets io.encodings.8-bit
-destructors arrays sequences ;
+USING: accessors concurrency.mailboxes kernel calendar io.sockets
+destructors arrays sequences io.encodings.8-bit.latin1 ;
 IN: irc.client.chats
 
 CONSTANT: irc-port 6667 ! Default irc port

@@ -68,7 +68,7 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
 
 : enough? ( stack word -- ? )
     dup deferred? [ 2drop f ] [
-        [ [ length ] [ 1quotation infer in>> ] bi* >= ]
+        [ [ length ] [ 1quotation inputs ] bi* >= ]
         [ 3drop f ] recover
     ] if ;
 
@@ -141,7 +141,6 @@ MACRO: undo ( quot -- ) [undo] ;
 \ 2dup [ over =/fail over =/fail ] define-inverse
 \ 3dup [ pick =/fail pick =/fail pick =/fail ] define-inverse
 \ pick [ [ pick ] dip =/fail ] define-inverse
-\ tuck [ swapd [ =/fail ] keep ] define-inverse
 
 \ bi@ 1 [ [undo] '[ _ bi@ ] ] define-pop-inverse
 \ tri@ 1 [ [undo] '[ _ tri@ ] ] define-pop-inverse
@@ -274,10 +273,10 @@ DEFER: __
     ] recover ; inline
 
 : true-out ( quot effect -- quot' )
-    out>> '[ @ _ ndrop t ] ;
+    out>> length '[ @ _ ndrop t ] ;
 
 : false-recover ( effect -- quot )
-    in>> [ ndrop f ] curry [ recover-fail ] curry ;
+    in>> length [ ndrop f ] curry [ recover-fail ] curry ;
 
 : [matches?] ( quot -- undoes?-quot )
     [undo] dup infer [ true-out ] [ false-recover ] bi curry ;

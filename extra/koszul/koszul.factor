@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays hashtables assocs io kernel math
+USING: accessors arrays hashtables assocs io kernel locals math
 math.vectors math.matrices math.matrices.elimination namespaces
 parser prettyprint sequences words combinators math.parser
 splitting sorting shuffle sets math.order ;
@@ -71,10 +71,10 @@ SYMBOL: terms
     [ natural-sort ] keep [ index ] curry map ;
 
 : (inversions) ( n seq -- n )
-    [ > ] with filter length ;
+    [ > ] with count ;
 
 : inversions ( seq -- n )
-    0 swap [ length ] keep [
+    0 swap [ length iota ] keep [
         [ nth ] 2keep swap 1 + tail-slice (inversions) +
     ] curry each ;
 
@@ -145,12 +145,12 @@ DEFER: (d)
     [ dup length pick nth push ] reduce ;
 
 : nth-basis-elt ( generators n -- elt )
-    over length [
+    over length iota [
         3dup bit? [ nth ] [ 2drop f ] if
     ] map sift 2nip ;
 
 : basis ( generators -- seq )
-    natural-sort dup length 2^ [ nth-basis-elt ] with map ;
+    natural-sort dup length 2^ iota [ nth-basis-elt ] with map ;
 
 : (tensor) ( seq1 seq2 -- seq )
     [
@@ -180,7 +180,7 @@ DEFER: (d)
     dim-im/ker-d ;
 
 : graded-ker/im-d ( graded-basis -- seq )
-    [ length ] keep [ (graded-ker/im-d) ] curry map ;
+    [ length iota ] keep [ (graded-ker/im-d) ] curry map ;
 
 : graded-betti ( generators -- seq )
     basis graded graded-ker/im-d unzip but-last 0 prefix v- ;
@@ -191,12 +191,12 @@ DEFER: (d)
     [ ?nth ?nth ] 3keep [ [ 2 + ] dip 1 - ] dip ?nth ?nth
     dim-im/ker-d ;
 
-: bigraded-ker/im-d ( bigraded-basis -- seq )
-    dup length [
-        over first length [
-            [ 2dup ] dip spin (bigraded-ker/im-d)
-        ] map 2nip
-    ] with map ;
+:: bigraded-ker/im-d ( basis -- seq )
+    basis length iota [| z |
+         basis first length iota [| u |
+            u z basis (bigraded-ker/im-d)
+        ] map
+    ] map ;
 
 : bigraded-betti ( u-generators z-generators -- seq )
     [ basis graded ] bi@ tensor bigraded-ker/im-d
@@ -229,14 +229,12 @@ DEFER: (d)
 : laplacian-betti ( basis1 basis2 basis3 -- n )
     laplacian-matrix null/rank drop ;
 
-: laplacian-kernel ( basis1 basis2 basis3 -- basis )
-    [ tuck ] dip
-    laplacian-matrix dup empty-matrix? [
-        2drop f
-    ] [
-        nullspace [
-            [ [ wedge (alt+) ] 2each ] with-terms
-        ] with map
+:: laplacian-kernel ( basis1 basis2 basis3 -- basis )
+    basis1 basis2 basis3 laplacian-matrix :> lap
+    lap empty-matrix? [ f ] [
+        lap nullspace [| x |
+            basis2 x [ [ wedge (alt+) ] 2each ] with-terms
+        ] map
     ] if ;
 
 : graded-triple ( seq n -- triple )
@@ -270,12 +268,12 @@ DEFER: (d)
     3tri
     3array ;
 
-: bigraded-triples ( grid -- triples )
-    dup length [
-        over first length [
-            [ 2dup ] dip spin bigraded-triple
-        ] map 2nip
-    ] with map ;
+:: bigraded-triples ( grid -- triples )
+    grid length iota [| z |
+        grid first length iota [| u |
+            u z grid bigraded-triple
+        ] map
+    ] map ;
 
 : bigraded-laplacian ( u-generators z-generators quot -- seq )
     [ [ basis graded ] bi@ tensor bigraded-triples ] dip

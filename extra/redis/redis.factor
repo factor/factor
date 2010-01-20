@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors io io.encodings.8-bit io.sockets
-io.streams.duplex kernel redis.command-writer
-redis.response-parser splitting ;
+USING: accessors io io.sockets io.streams.duplex kernel
+redis.command-writer redis.response-parser splitting
+io.encodings.8-bit.latin1 ;
 IN: redis
 
 #! Connection

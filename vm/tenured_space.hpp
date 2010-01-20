@@ -3,7 +3,6 @@ namespace factor
 
 struct tenured_space : free_list_allocator<object> {
 	object_start_map starts;
-	std::vector<object *> mark_stack;
 
 	explicit tenured_space(cell size, cell start) :
 		free_list_allocator<object>(size,start), starts(size,start) {}
@@ -37,20 +36,14 @@ struct tenured_space : free_list_allocator<object> {
 		state.clear_mark_bits();
 	}
 
-	void clear_mark_stack()
-	{
-		mark_stack.clear();
-	}
-
 	bool marked_p(object *obj)
 	{
 		return this->state.marked_p(obj);
 	}
 
-	void mark_and_push(object *obj)
+	void set_marked_p(object *obj)
 	{
 		this->state.set_marked_p(obj);
-		this->mark_stack.push_back(obj);
 	}
 
 	void sweep()

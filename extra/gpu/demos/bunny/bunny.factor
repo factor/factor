@@ -1,17 +1,16 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien.c-types arrays classes.struct combinators
-combinators.short-circuit game.worlds gpu gpu.buffers
+combinators.short-circuit game.loop game.worlds gpu gpu.buffers
 gpu.util.wasd gpu.framebuffers gpu.render gpu.shaders gpu.state
 gpu.textures gpu.util grouping http.client images images.loader
 io io.encodings.ascii io.files io.files.temp kernel locals math
 math.matrices math.vectors.simd math.parser math.vectors
 method-chains namespaces sequences splitting threads ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats specialized-arrays
-specialized-vectors ;
+specialized-vectors literals ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-VECTOR: uint
-SIMD: float
 IN: gpu.demos.bunny
 
 GLSL-SHADER-FILE: bunny-vertex-shader vertex-shader "bunny.v.glsl"
@@ -215,7 +214,7 @@ CONSTANT: bunny-model-url "http://factorcode.org/bun_zipper.ply"
         dup 0 "vocab:gpu/demos/bunny/loading.tiff" load-image allocate-texture-image
         >>texture ;
 
-BEFORE: bunny-world begin-world
+M: bunny-world begin-game-world
     init-gpu
     
     { -0.2 0.13 0.1 } 1.1 0.2 set-wasd-view
@@ -294,24 +293,20 @@ M: bunny-world draw-world*
 AFTER: bunny-world resize-world
     [ sobel>> framebuffer>> ] [ dim>> ] bi resize-framebuffer ;
 
-M: bunny-world pref-dim* drop { 1024 768 } ;
-M: bunny-world tick-length drop 1000 30 /i ;
 M: bunny-world wasd-movement-speed drop 1/160. ;
 M: bunny-world wasd-near-plane drop 1/32. ;
 M: bunny-world wasd-far-plane drop 256.0 ;
 
-: bunny-window ( -- )
-    [
-        f T{ world-attributes
-            { world-class bunny-world }
-            { title "Bunny" }
-            { pixel-format-attributes {
-                windowed
-                double-buffered
-                T{ depth-bits { value 24 } }
-            } }
-            { grab-input? t }
-        } open-window
-    ] with-ui ;
-
-MAIN: bunny-window
+GAME: bunny-game {
+        { world-class bunny-world }
+        { title "Bunny" }
+        { pixel-format-attributes {
+            windowed
+            double-buffered
+            T{ depth-bits { value 24 } }
+        } }
+        { grab-input? t }
+        { use-game-input? t }
+        { pref-dim { 1024 768 } }
+        { tick-interval-micros $[ 60 fps ] }
+    } ;

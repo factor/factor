@@ -73,11 +73,9 @@ M: word bson-type? ( word -- type ) drop T_Binary ;
 M: quotation bson-type? ( quotation -- type ) drop T_Binary ; 
 M: byte-array bson-type? ( byte-array -- type ) drop T_Binary ; 
 
-: write-utf8-string ( string -- ) output-stream get '[ _ swap char>utf8 ] each ; inline
-
 : write-int32 ( int -- ) INT32-SIZE >le write ; inline
 : write-double ( real -- ) double>bits INT64-SIZE >le write ; inline
-: write-cstring ( string -- ) write-utf8-string 0 write1 ; inline
+: write-cstring ( string -- ) B{ } like write 0 write1 ; inline
 : write-longlong ( object -- ) INT64-SIZE >le write ; inline
 
 : write-eoo ( -- ) T_EOO write1 ; inline
@@ -127,9 +125,11 @@ M: sequence bson-write ( array -- )
    { $[ MDB_OID_FIELD MDB_META_FIELD ] } member? ; inline
 
 M: assoc bson-write ( assoc -- )
-    '[ _  [ write-oid ] keep
-       [ over skip-field? [ 2drop ] [ write-pair ] if ] assoc-each
-       write-eoo ] with-length-prefix ; 
+    '[
+        _  [ write-oid ] keep
+        [ over skip-field? [ 2drop ] [ write-pair ] if ] assoc-each
+        write-eoo
+    ] with-length-prefix ;
 
 : (serialize-code) ( code -- )
     object>bytes [ length write-int32 ] keep

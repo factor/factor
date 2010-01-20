@@ -8,7 +8,7 @@ template<typename Type> cell tag(Type *value)
 
 inline static cell tag_dynamic(object *value)
 {
-	return RETAG(value,value->h.hi_tag());
+	return RETAG(value,value->type());
 }
 
 template<typename Type>

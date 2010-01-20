@@ -31,20 +31,17 @@ CONSTANT: max-speed 30.0
     forward-pivot ;
 
 : to-tunnel-start ( player -- )
-    [ tunnel>> first dup location>> ]
-    [ tuck (>>location) (>>nearest-segment) ] bi ;
+    dup tunnel>> first
+    [ >>nearest-segment ]
+    [ location>> >>location ] bi drop ;
 
 : play-in-tunnel ( player segments -- )
     >>tunnel to-tunnel-start ;
 
-: update-nearest-segment ( player -- )
-    [ tunnel>> ] [ dup nearest-segment>> nearest-segment ]
-    [ (>>nearest-segment) ] tri ;
-
 : update-time ( player -- seconds-passed )
-    millis swap [ last-move>> - 1000 / ] [ (>>last-move) ] 2bi ;
+    system-micros swap [ last-move>> - 1000000 / ] [ (>>last-move) ] 2bi ;
 
-: moved ( player -- ) millis swap (>>last-move) ;
+: moved ( player -- ) system-micros swap (>>last-move) ;
 
 : speed-range ( -- range )
     max-speed [0,b] ;

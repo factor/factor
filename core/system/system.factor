@@ -53,6 +53,6 @@ PRIVATE>
 
 : vm ( -- path ) \ vm get-global ;
 
-: embedded? ( -- ? ) 15 getenv ;
+: embedded? ( -- ? ) 15 special-object ;
 
-: millis ( -- ms ) micros 1000 /i ;
+: exit ( n -- ) do-shutdown-hooks (exit) ;

@@ -26,10 +26,10 @@ IN: tetris.gl
     [ gl-color 2array draw-block ] [ 3drop ] if ;
 
 : draw-row ( y row -- )
-    dup length -rot [ (draw-row) ] 2curry each ;
+    [ length iota swap ] keep [ (draw-row) ] 2curry each ;
 
 : draw-board ( board -- )
-    rows>> dup length swap
+    rows>> [ length iota ] keep
     [ dupd nth draw-row ] curry each ;
 
 : scale-board ( width height board -- )

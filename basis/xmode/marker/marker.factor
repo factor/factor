@@ -86,7 +86,7 @@ M: regexp text-matches?
     [ >string ] dip first-match dup [ to>> ] when ;
 
 : rule-start-matches? ( rule -- match-count/f )
-    dup start>> tuck swap can-match-here? [
+    [ start>> dup ] keep can-match-here? [
         rest-of-line swap text>> text-matches?
     ] [
         drop f
@@ -96,7 +96,7 @@ M: regexp text-matches?
     dup mark-following-rule? [
         dup start>> swap can-match-here? 0 and
     ] [
-        dup end>> tuck swap can-match-here? [
+        [ end>> dup ] keep can-match-here? [
             rest-of-line
             swap text>> context get end>> or
             text-matches?
@@ -170,7 +170,7 @@ M: seq-rule handle-rule-start
     ?end-rule
     mark-token
     add-remaining-token
-    tuck body-token>> next-token,
+    [ body-token>> next-token, ] keep
     delegate>> [ push-context ] when* ;
 
 UNION: abstract-span-rule span-rule eol-span-rule ;
@@ -179,7 +179,7 @@ M: abstract-span-rule handle-rule-start
     ?end-rule
     mark-token
     add-remaining-token
-    tuck rule-match-token* next-token,
+    [ rule-match-token* next-token, ] keep
     ! ... end subst ...
     dup context get (>>in-rule)
     delegate>> push-context ;
@@ -190,7 +190,7 @@ M: span-rule handle-rule-end
 M: mark-following-rule handle-rule-start
     ?end-rule
     mark-token add-remaining-token
-    tuck rule-match-token* next-token,
+    [ rule-match-token* next-token, ] keep
     f context get (>>end)
     context get (>>in-rule) ;
 

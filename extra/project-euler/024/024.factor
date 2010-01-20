@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math.combinatorics math.parser project-euler.common ;
+USING: kernel math.combinatorics math.parser project-euler.common
+sequences ;
 IN: project-euler.024
 
 ! http://projecteuler.net/index.php?section=problems&id=24
@@ -23,7 +24,7 @@ IN: project-euler.024
 ! --------
 
 : euler024 ( -- answer )
-    999999 10 permutation 10 digits>integer ;
+    999999 10 iota permutation 10 digits>integer ;
 
 ! [ euler024 ] 100 ave-time
 ! 0 ms ave run time - 0.27 SD (100 trials)

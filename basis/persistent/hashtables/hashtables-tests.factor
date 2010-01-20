@@ -1,6 +1,6 @@
 IN: persistent.hashtables.tests
 USING: persistent.hashtables persistent.assocs hashtables assocs
-tools.test kernel namespaces random math.ranges sequences fry ;
+tools.test kernel locals namespaces random math.ranges sequences fry ;
 
 [ t ] [ PH{ } assoc-empty? ] unit-test
 
@@ -81,12 +81,13 @@ M: hash-0-b hashcode* 2drop 0 ;
 ] unit-test
 
 : random-string ( -- str )
-    1000000 random ; ! [ CHAR: a CHAR: z [a,b] random ] "" replicate-as ;
+    1000000 random ;
+    ! [ CHAR: a CHAR: z [a,b] random ] "" replicate-as ;
 
 : random-assocs ( n -- hash phash )
     [ random-string ] replicate
     [ H{ } clone [ '[ swap _ set-at ] each-index ] keep ]
-    [ PH{ } clone swap [ spin new-at ] each-index ]
+    [ PH{ } clone swap [| ph elt i | i elt ph new-at ] each-index ]
     bi ;
 
 : ok? ( assoc1 assoc2 -- ? )

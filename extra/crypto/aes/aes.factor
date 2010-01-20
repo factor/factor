@@ -44,7 +44,7 @@ CONSTANT: AES_BLOCK_SIZE 16
 
 : inv-sbox ( -- array )
     256 0 <array>
-    dup 256 [ dup sbox nth rot set-nth ] with each ;
+    dup 256 [ dup sbox nth rot set-nth ] with each-integer ;
 
 : rcon ( -- array )
     {
@@ -72,7 +72,7 @@ CONSTANT: AES_BLOCK_SIZE 16
 
 MEMO:: t-table ( -- array )
     1024 0 <array>
-    dup 256 [ set-t ] with each ;
+    dup 256 [ set-t ] with each-integer ;
 
 :: set-d ( D i -- )
     i inv-sbox nth :> a1
@@ -91,7 +91,7 @@ MEMO:: t-table ( -- array )
     
 MEMO:: d-table ( -- array )
     1024 0 <array>
-    dup 256 [ set-d ] with each ;
+    dup 256 [ set-d ] with each-integer ;
 
 
 USE: multiline

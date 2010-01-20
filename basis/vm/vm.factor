@@ -1,10 +1,23 @@
-! Copyright (C) 2009 Phil Dawes.
+! Copyright (C) 2009, 2010 Phil Dawes, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes.struct alien.c-types alien.syntax ;
 IN: vm
 
-TYPEDEF: intptr_t cell
-C-TYPE: context
+TYPEDEF: uintptr_t cell
+
+STRUCT: context
+{ callstack-top void* }
+{ callstack-bottom void* }
+{ datastack cell }
+{ retainstack cell }
+{ magic-frame void* }
+{ datastack-region void* }
+{ retainstack-region void* }
+{ catchstack-save cell }
+{ current-callback-save cell }
+{ next context* } ;
+
+: context-field-offset ( field -- offset ) context offset-of ; inline
 
 STRUCT: zone
 { start cell }
@@ -13,11 +26,11 @@ STRUCT: zone
 { end cell } ;
 
 STRUCT: vm
-{ stack_chain context* }
+{ ctx context* }
 { nursery zone }
-{ cards_offset cell }
-{ decks_offset cell }
-{ userenv cell[70] } ;
+{ cards-offset cell }
+{ decks-offset cell }
+{ special-objects cell[70] } ;
 
 : vm-field-offset ( field -- offset ) vm offset-of ; inline
 
@@ -65,7 +78,7 @@ STRUCT: gc-event
 { data-sweep-time cell }
 { code-sweep-time cell }
 { compaction-time cell }
-{ temp-time cell } ;
+{ temp-time ulonglong } ;
 
 STRUCT: dispatch-statistics
 { megamorphic-cache-hits cell }

@@ -4,7 +4,7 @@ sbufs strings tools.test vectors words sequences.private
 quotations classes classes.algebra classes.tuple.private
 continuations growable namespaces hints alien.accessors
 compiler.tree.builder compiler.tree.optimizer sequences.deep
-compiler definitions generic.single shuffle ;
+compiler definitions generic.single shuffle math.order ;
 IN: compiler.tests.optimizer
 
 GENERIC: xyz ( obj -- obj )
@@ -90,7 +90,7 @@ TUPLE: pred-test ;
 : double-label-2 ( a -- b )
     dup array? [ ] [ ] if 0 t double-label-1 ;
 
-[ 0 ] [ 10 double-label-2 ] unit-test
+[ 0 ] [ 10 iota double-label-2 ] unit-test
 
 ! regression
 GENERIC: void-generic ( obj -- * )
@@ -208,7 +208,7 @@ USE: binary-search.private
     ] if ; inline recursive
 
 [ 10 ] [
-    10 20 >vector <flat-slice>
+    10 20 iota <flat-slice>
     [ [ - ] swap old-binsearch ] compile-call 2nip
 ] unit-test
 
@@ -349,7 +349,7 @@ TUPLE: some-tuple x ;
 [ 5 ] [ { 1 2 { 3 { 4 5 } } } deep-find-test ] unit-test
 [ f ] [ { 1 2 { 3 { 4 } } } deep-find-test ] unit-test
 
-[ B{ 0 1 2 3 4 5 6 7 } ] [ [ 8 [ ] B{ } map-as ] compile-call ] unit-test
+[ B{ 0 1 2 3 4 5 6 7 } ] [ [ 8 iota [ ] B{ } map-as ] compile-call ] unit-test
 
 [ 0 ] [ 1234 [ { fixnum } declare -64 shift ] compile-call ] unit-test
 
@@ -445,5 +445,17 @@ M: object bad-dispatch-position-test* ;
 
 [ 1024 bignum ] [ 10 [ 1 >bignum swap >fixnum shift ] compile-call dup class ] unit-test
 
-! Not sure if I want to fix this...
-! [ t [ [ f ] [ 3 ] if >fixnum ] compile-call ] [ no-method? ] must-fail-with
+TUPLE: grid-mesh-tuple { length read-only } { step read-only } ;
+
+: grid-mesh-test-case ( -- vertices )
+    1.0 1.0 { 2 } first /f [ /i 1 + ] keep grid-mesh-tuple boa
+    1 f <array>
+    [
+        [ drop length>> >fixnum 2 min ] 2keep
+        [
+            [ step>> 1 * ] dip
+            0 swap set-nth-unsafe
+        ] 2curry times
+    ] keep ;
+
+[ { 0.5 } ] [ grid-mesh-test-case ] unit-test

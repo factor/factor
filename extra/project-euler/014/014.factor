@@ -47,7 +47,7 @@ PRIVATE>
     [ [ dup 1 > ] [ dup , next-collatz ] while , ] { } make ;
 
 : euler014 ( -- answer )
-    1000000 [1,b] 0 [ collatz longest ] reduce first ;
+    1000000 [1,b] { } [ collatz longest ] reduce first ;
 
 ! [ euler014 ] time
 ! 52868 ms run / 483 ms GC time
@@ -64,7 +64,7 @@ PRIVATE>
 PRIVATE>
 
 : euler014a ( -- answer )
-    500000 1000000 [a,b] 1 [
+    500000 1000000 [a,b] { 1 } [
         dup worth-calculating? [ collatz longest ] [ drop ] if
     ] reduce first ;
 

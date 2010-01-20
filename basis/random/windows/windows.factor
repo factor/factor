@@ -1,7 +1,7 @@
 USING: accessors alien.c-types alien.data byte-arrays
 combinators.short-circuit continuations destructors init kernel
 locals namespaces random windows.advapi32 windows.errors
-windows.kernel32 math.bitwise ;
+windows.kernel32 windows.types math.bitwise ;
 IN: random.windows
 
 TUPLE: windows-rng provider type ;
@@ -16,7 +16,7 @@ M: windows-crypto-context dispose ( tuple -- )
 CONSTANT: factor-crypto-container "FactorCryptoContainer"
 
 :: (acquire-crypto-context) ( provider type flags -- handle ret )
-    "HCRYPTPROV" <c-object> :> handle
+    HCRYPTPROV <c-object> :> handle
     handle
     factor-crypto-container
     provider
@@ -65,5 +65,11 @@ M: windows-rng random-bytes* ( n tuple -- bytes )
     [ MS_STRONG_PROV PROV_RSA_FULL <windows-rng> ]
     [ drop MS_ENH_RSA_AES_PROV PROV_RSA_AES <windows-rng> ] recover
     secure-random-generator set-global
+] "random.windows" add-startup-hook
 
-] "random.windows" add-init-hook
+[
+    [
+        ! system-random-generator get-global &dispose drop
+        ! secure-random-generator get-global &dispose drop
+    ] with-destructors
+] "random.windows" add-shutdown-hook

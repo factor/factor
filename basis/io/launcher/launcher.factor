@@ -75,14 +75,12 @@ SYMBOL: wait-flag
 [
     H{ } clone processes set-global
     start-wait-thread
-] "io.launcher" add-init-hook
+] "io.launcher" add-startup-hook
 
 : process-started ( process handle -- )
     >>handle
     V{ } clone swap processes get set-at
     wait-flag get-global raise-flag ;
-
-M: process hashcode* handle>> hashcode* ;
 
 : pass-environment? ( process -- ? )
     dup environment>> assoc-empty? not

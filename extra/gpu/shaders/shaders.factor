@@ -8,7 +8,7 @@ literals locals math math.parser memoize multiline namespaces
 opengl opengl.gl opengl.shaders parser quotations sequences
 specialized-arrays splitting strings tr ui.gadgets.worlds
 variants vectors vocabs vocabs.loader vocabs.parser words
-words.constant half-floats ;
+words.constant half-floats typed ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: void*
@@ -322,13 +322,17 @@ M: vertex-array dispose
     gen-vertex-array
     [ glBindVertexArray [ first2 bind-vertex-format ] with each ]
     [ -rot [ first buffer>> ] map vertex-array boa ] 3bi
-    window-resource ;
+    window-resource ; inline
 
-: buffer>vertex-array ( vertex-buffer program-instance format -- vertex-array )
+TYPED: buffer>vertex-array ( vertex-buffer: buffer
+                             program-instance: program-instance
+                             format: vertex-format
+                             --
+                             vertex-array: vertex-array )
     [ swap ] dip
     [ 0 <buffer-ptr> ] dip 2array 1array <vertex-array> ; inline
 
-: vertex-array-buffer ( vertex-array -- vertex-buffer )
+TYPED: vertex-array-buffer ( vertex-array: vertex-array -- vertex-buffer: buffer )
     vertex-buffers>> first ;
 
 TUPLE: compile-shader-error shader log ;
@@ -406,7 +410,7 @@ DEFER: <shader-instance>
 
 PRIVATE>
 
-:: refresh-program ( program -- )
+TYPED:: refresh-program ( program: program -- )
     program shaders>> [ refresh-shader-source ] each
     program instances>> [| world old-instance |
         old-instance valid-handle? [
@@ -426,10 +430,10 @@ PRIVATE>
     ] assoc-each
     reset-memos ;
 
-: <shader-instance> ( shader -- instance )
+TYPED: <shader-instance> ( shader: shader -- instance: shader-instance )
     [ find-shader-instance dup world get ] keep instances>> set-at ;
 
-: <program-instance> ( program -- instance )
+TYPED: <program-instance> ( program: program -- instance: program-instance )
     [ find-program-instance dup world get ] keep instances>> set-at ;
 
 <PRIVATE

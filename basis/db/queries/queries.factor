@@ -34,7 +34,7 @@ SINGLETON: retryable
     ] 2map >>bind-params ;
     
 M: retryable execute-statement* ( statement type -- )
-    drop [ retries>> ] [
+    drop [ retries>> iota ] [
         [
             nip
             [ query-results dispose t ]

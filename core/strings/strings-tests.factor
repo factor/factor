@@ -116,5 +116,5 @@ unit-test
         drop
         300 100 CHAR: \u123456
         [ <string> clone resize-string first ] keep =
-    ] all?
+    ] all-integers?
 ] unit-test

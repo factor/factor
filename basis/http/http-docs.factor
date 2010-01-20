@@ -103,9 +103,10 @@ HELP: post-data
 $nl
 "Instances contain the following slots:"
 { $table
-    { { $slot "raw" } { "The raw bytes of the POST data" } }
-    { { $slot "content" } { "The POST data. This can be in a higher-level form, such as an assoc of POST parameters, a string, or an XML document" } }
-    { { $slot "content-type" } "A MIME type" }
+    { { $slot "data" } { "The POST data. This can be in a higher-level form, such as an assoc of POST parameters, a string, or an XML document" } }
+    { { $slot "params" } { "Parameters passed in the POST request." } } 
+    { { $slot "content-type" } { "A MIME type" } }
+    { { $slot "content-encoding" } { "Encoding used for the POST data" } }
 } } ;
 
 HELP: set-header

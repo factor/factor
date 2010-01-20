@@ -13,6 +13,9 @@ ERROR: not-in-a-method-error ;
 : create-method-in ( class generic -- method )
     create-method dup set-word dup save-location ;
 
+: define-inline-method ( class generic quot -- )
+    [ create-method-in ] dip [ define ] [ drop make-inline ] 2bi ;
+
 : CREATE-METHOD ( -- method )
     scan-word bootstrap-word scan-word create-method-in ;
 

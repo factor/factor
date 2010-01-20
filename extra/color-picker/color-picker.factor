@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.parser models
+USING: arrays kernel math math.functions math.parser models
 models.arrow models.range models.product sequences ui
 ui.gadgets ui.gadgets.tracks ui.gadgets.labels ui.gadgets.packs
 ui.gadgets.sliders ui.pens.solid ui.render math.rectangles accessors
@@ -45,7 +45,5 @@ M: color-preview model-changed
             ] bi
         ] bi* ;
 
-: color-picker-window ( -- )
-    [ <color-picker> "Color Picker" open-window ] with-ui ;
-
-MAIN: color-picker-window
+MAIN-WINDOW: color-picker-window { { title "Color Picker" } }
+    <color-picker> >>gadgets ;

@@ -18,14 +18,14 @@ vectors math math.order ;
 ] unit-test
 
 { 100 1060 2000 10000 100000 1000000 } [
-    [ t ] swap [ dup >persistent-vector sequence= ] curry unit-test
+    [ t ] swap [ iota dup >persistent-vector sequence= ] curry unit-test
 ] each
 
 [ ] [ 10000 [ 16 random-bits ] PV{ } replicate-as "1" set ] unit-test
 [ ] [ "1" get >vector "2" set ] unit-test
 
 [ t ] [
-    3000 [
+    3000 iota [
         drop
         16 random-bits 10000 random
         [ "1" [ new-nth ] change ]
@@ -56,11 +56,11 @@ vectors math math.order ;
 ] unit-test
 
 [ t ] [
-    10000 >persistent-vector 752 [ ppop ] times dup length sequence=
+    10000 iota >persistent-vector 752 [ ppop ] times dup length iota sequence=
 ] unit-test
 
 [ t ] [
-    100 [
+    100 iota [
         drop
         100 random [
             16 random-bits [ "1" [ ppush ] change ] [ "2" get push ] bi

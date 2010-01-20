@@ -446,14 +446,14 @@ M: ebnf-sequence build-locals ( code ast -- code )
     ] [ 
       [
         "FROM: locals => [let :> ; FROM: sequences => nth ; [let " %
-          dup length [
+          [
             over ebnf-var? [
               " " % # " over nth :> " %
               name>> % 
             ] [
               2drop
             ] if
-          ] 2each
+          ] each-index
           " " %
           %  
           " nip ]" %     

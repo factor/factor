@@ -18,4 +18,11 @@ cell read_cell_hex()
 	return cell;
 }
 
+/* On Windows, memcpy() is in a different DLL and the non-optimizing
+compiler can't find it */
+VM_C_API void *factor_memcpy(void *dst, void *src, size_t len)
+{
+	return memcpy(dst,src,len);
+}
+
 }

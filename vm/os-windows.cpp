@@ -9,26 +9,26 @@ void factor_vm::init_ffi()
 {
 	hFactorDll = GetModuleHandle(FACTOR_DLL);
 	if(!hFactorDll)
-		fatal_error("GetModuleHandle(\"" FACTOR_DLL_NAME "\") failed", 0);
+		fatal_error("GetModuleHandle() failed", 0);
 }
 
 void factor_vm::ffi_dlopen(dll *dll)
 {
-	dll->dll = LoadLibraryEx((WCHAR *)alien_offset(dll->path), NULL, 0);
+	dll->handle = LoadLibraryEx((WCHAR *)alien_offset(dll->path), NULL, 0);
 }
 
 void *factor_vm::ffi_dlsym(dll *dll, symbol_char *symbol)
 {
-	return (void *)GetProcAddress(dll ? (HMODULE)dll->dll : hFactorDll, symbol);
+	return (void *)GetProcAddress(dll ? (HMODULE)dll->handle : hFactorDll, symbol);
 }
 
 void factor_vm::ffi_dlclose(dll *dll)
 {
-	FreeLibrary((HMODULE)dll->dll);
-	dll->dll = NULL;
+	FreeLibrary((HMODULE)dll->handle);
+	dll->handle = NULL;
 }
 
-bool factor_vm::windows_stat(vm_char *path)
+BOOL factor_vm::windows_stat(vm_char *path)
 {
 	BY_HANDLE_FILE_INFORMATION bhfi;
 	HANDLE h = CreateFileW(path,
@@ -50,15 +50,14 @@ bool factor_vm::windows_stat(vm_char *path)
 		FindClose(h);
 		return true;
 	}
-	bool ret;
-	ret = GetFileInformationByHandle(h, &bhfi);
+	BOOL ret = GetFileInformationByHandle(h, &bhfi);
 	CloseHandle(h);
 	return ret;
 }
 
 void factor_vm::windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length)
 {
-	snwprintf(temp_path, length-1, L"%s.image", full_path); 
+	SNWPRINTF(temp_path, length-1, L"%s.image", full_path); 
 	temp_path[length - 1] = 0;
 }
 
@@ -75,7 +74,7 @@ const vm_char *factor_vm::default_image_path()
 	if((ptr = wcsrchr(full_path, '.')))
 		*ptr = 0;
 
-	snwprintf(temp_path, MAX_UNICODE_PATH-1, L"%s.image", full_path); 
+	SNWPRINTF(temp_path, MAX_UNICODE_PATH-1, L"%s.image", full_path); 
 	temp_path[MAX_UNICODE_PATH - 1] = 0;
 
 	return safe_strdup(temp_path);
@@ -92,8 +91,8 @@ const vm_char *factor_vm::vm_executable_path()
 
 void factor_vm::primitive_existsp()
 {
-	vm_char *path = untag_check<byte_array>(dpop())->data<vm_char>();
-	box_boolean(windows_stat(path));
+	vm_char *path = untag_check<byte_array>(ctx->pop())->data<vm_char>();
+	ctx->push(tag_boolean(windows_stat(path)));
 }
 
 segment::segment(cell size_, bool executable_p)
@@ -124,11 +123,6 @@ segment::~segment()
 	GetSystemInfo(&si);
 	if(!VirtualFree((void*)(start - si.dwPageSize), 0, MEM_RELEASE))
 		fatal_error("Segment deallocation failed",0);
-}
-
-void factor_vm::sleep_micros(u64 usec)
-{
-	Sleep((DWORD)(usec / 1000));
 }
 
 long getpagesize()

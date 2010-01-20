@@ -4,7 +4,7 @@ IN: bit-vectors.tests
 [ 0 ] [ 123 <bit-vector> length ] unit-test
 
 : do-it ( seq -- )
-    1234 swap [ [ even? ] dip push ] curry each ;
+    1234 swap [ [ even? ] dip push ] curry each-integer ;
 
 [ t ] [
     3 <bit-vector> dup do-it

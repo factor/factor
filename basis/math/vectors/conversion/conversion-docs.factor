@@ -22,7 +22,7 @@ HELP: vconvert
 }
 { $description "Converts SIMD vectors of " { $snippet "from-type" } " to " { $snippet "to-type" } ". The number of inputs and outputs depends on the relationship of the two types:"
 { $list
-{ "If " { $snippet "to-type" } " is a floating-point vector type with the same byte length and element count as the integer vector type " { $snippet "from-type" } " (for example, from " { $snippet "int-8" } " to " { $snippet "float-8" } " or from " { $snippet "longlong-2" } " to " { $snippet "double-2" } "), " { $snippet "vconvert" } " takes one vector of " { $snippet "from-type" } " and converts its elements to floating-point, outputting one vector of " { $snippet "to-type" } "." }
+{ "If " { $snippet "to-type" } " is a floating-point vector type with the same byte length and element count as the integer vector type " { $snippet "from-type" } " (for example, from " { $snippet "int-4" } " to " { $snippet "float-4" } " or from " { $snippet "longlong-2" } " to " { $snippet "double-2" } "), " { $snippet "vconvert" } " takes one vector of " { $snippet "from-type" } " and converts its elements to floating-point, outputting one vector of " { $snippet "to-type" } "." }
 { "Likewise, if " { $snippet "to-type" } " is an integer vector type with the same byte length and element count as the floating-point vector type " { $snippet "from-type" } ", " { $snippet "vconvert" } " takes one vector of " { $snippet "from-type" } " and truncates its elements to integers, outputting one vector of " { $snippet "to-type" } "." }
 { "If " { $snippet "to-type" } " is a vector type with the same byte length as and twice the element count of the vector type " { $snippet "from-type" } " (for example, from " { $snippet "int-4" } " to " { $snippet "ushort-8" } ", from " { $snippet "double-2" } " to " { $snippet "float-4" } ", or from " { $snippet "short-8" } " to " { $snippet "char-16" } "), " { $snippet "vconvert" } " takes two vectors of " { $snippet "from-type" } " and packs them into one vector of " { $snippet "to-type" } ", saturating values too large or small to be representable as elements of " { $snippet "to-type" } "." }
 { "If " { $snippet "to-type" } " is a vector type with the same byte length as and half the element count of the vector type " { $snippet "from-type" } " (for example, from " { $snippet "ushort-8" } " to " { $snippet "int-4" } ", from " { $snippet "float-4" } " to " { $snippet "double-2" } ", or from " { $snippet "char-16" } " to " { $snippet "short-8" } "), " { $snippet "vconvert" } " takes one vector of " { $snippet "from-type" } " and unpacks it into two vectors of " { $snippet "to-type" } "." }
@@ -39,26 +39,23 @@ HELP: vconvert
 "Conversion between integer and float vectors:"
 { $example """USING: alien.c-types math.vectors.conversion math.vectors.simd
 prettyprint ;
-SIMDS: int float longlong double ;
 
-int-8{ 0 1 2 3 4 5 6 7 } int-8 float-8 vconvert .
+int-4{ 0 1 2 3 } int-4 float-4 vconvert .
 double-2{ 1.25 3.75 } double-2 longlong-2 vconvert ."""
-"""float-8{ 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 }
+"""float-4{ 0.0 1.0 2.0 3.0 }
 longlong-2{ 1 3 }""" }
 "Packing conversions:"
 { $example """USING: alien.c-types math.vectors.conversion math.vectors.simd
 prettyprint ;
-SIMDS: ushort int float double ;
 
 int-4{ -8 70000 6000 50 } int-4{ 4 3 2 -1 } int-4 ushort-8 vconvert .
-double-4{ 0.0 1.5 1.0e100 2.0 }
-double-4{ -1.0e100 0.0 1.0 2.0 } double-4 float-8 vconvert ."""
+double-2{ 0.0 1.0e100 }
+double-2{ -1.0e100 0.0 } double-2 float-4 vconvert ."""
 """ushort-8{ 0 65535 6000 50 4 3 2 0 }
-float-8{ 0.0 1.5 1/0. 2.0 -1/0. 0.0 1.0 2.0 }""" }
+float-4{ 0.0 1/0. -1/0. 0.0 }""" }
 "Unpacking conversions:"
 { $example """USING: alien.c-types kernel math.vectors.conversion
 math.vectors.simd prettyprint ;
-SIMDS: uchar short ;
 
 uchar-16{ 8 70 60 50 4 30 200 1 9 10 110 102 133 143 115 0 }
 uchar-16 short-8 vconvert [ . ] bi@"""

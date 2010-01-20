@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators hashtables kernel
 math fry namespaces make sequences words byte-arrays
@@ -44,6 +44,12 @@ SYMBOL: loops
         @
         end-stack-analysis
     ] with-scope ; inline
+
+: with-dummy-cfg-builder ( node quot -- )
+    [
+        [ V{ } clone procedures ] 2dip
+        '[ _ t t [ _ call( node -- ) ] with-cfg-builder ] with-variable
+    ] { } make drop ;
 
 GENERIC: emit-node ( node -- )
 
@@ -230,13 +236,16 @@ M: #alien-invoke emit-node
 M: #alien-indirect emit-node
     [ ##alien-indirect ] emit-alien-node ;
 
+M: #alien-assembly emit-node
+    [ ##alien-assembly ] emit-alien-node ;
+
 M: #alien-callback emit-node
     dup params>> xt>> dup
     [
         ##prologue
-        dup [ ##alien-callback ] emit-alien-node
+        [ ##alien-callback ] emit-alien-node
         ##epilogue
-        params>> ##callback-return
+        ##return
     ] with-cfg-builder ;
 
 ! No-op nodes

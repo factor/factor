@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry namespaces assocs kernel sequences words accessors
 definitions math math.order effects classes arrays combinators
@@ -10,6 +10,7 @@ stack-checker.visitor
 stack-checker.backend
 stack-checker.branches
 stack-checker.known-words
+stack-checker.dependencies
 stack-checker.recursive-state ;
 IN: stack-checker.inlining
 
@@ -28,8 +29,6 @@ fixed-point
 introductions
 loop? ;
 
-M: inline-recursive hashcode* id>> hashcode* ;
-
 : inlined-block? ( word -- ? ) "inlined-block" word-prop ;
 
 : <inline-recursive> ( word -- label )
@@ -43,7 +42,7 @@ M: inline-recursive hashcode* id>> hashcode* ;
 : make-copies ( values effect-in -- values' )
     [ length cut* ] keep
     [ quotation-param? [ copy-value ] [ drop <value> ] if ] 2map
-    [ make-values ] dip append ;
+    [ length make-values ] dip append ;
 
 SYMBOL: enter-in
 SYMBOL: enter-out
@@ -81,7 +80,7 @@ SYMBOL: enter-out
     bi ;
 
 : recursive-word-inputs ( label -- n )
-    entry-stack-height d-in get + ;
+    entry-stack-height input-count get + ;
 
 : (inline-recursive-word) ( word -- label in out visitor terminated? )
     dup prepare-stack

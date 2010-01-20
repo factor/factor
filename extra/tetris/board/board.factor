@@ -6,7 +6,7 @@ IN: tetris.board
 TUPLE: board { width integer } { height integer } rows ;
 
 : make-rows ( width height -- rows )
-    [ drop f <array> ] with map ;
+    iota [ drop f <array> ] with map ;
 
 : <board> ( width height -- board )
     2dup make-rows board boa ;
@@ -24,8 +24,8 @@ TUPLE: board { width integer } { height integer } rows ;
 : block-free? ( board block -- ? ) block not ;
 
 : block-in-bounds? ( board block -- ? )
-    [ first swap width>> bounds-check? ] 2keep
-    second swap height>> bounds-check? and ;
+    [ first swap width>> iota bounds-check? ]
+    [ second swap height>> iota bounds-check? ] 2bi and ;
 
 : location-valid? ( board block -- ? )
     2dup block-in-bounds? [ block-free? ] [ 2drop f ] if ;

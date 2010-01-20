@@ -4,13 +4,6 @@ IN: compiler.tree.propagation.info.tests
 
 [ f ] [ 0.0 -0.0 eql? ] unit-test
 
-[ t ] [
-    number <class-info>
-    sequence <class-info>
-    value-info-intersect
-    class>> integer class=
-] unit-test
-
 [ t t ] [
     0 10 [a,b] <interval-info>
     5 20 [a,b] <interval-info>

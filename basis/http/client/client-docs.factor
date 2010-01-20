@@ -1,7 +1,7 @@
 USING: http help.markup help.syntax io.pathnames io.streams.string
-io.encodings.8-bit io.encodings.binary kernel urls
+io.encodings.binary kernel urls
 urls.encoding byte-arrays strings assocs sequences destructors
-http.client.post-data.private ;
+http.client.post-data.private io.encodings.8-bit.latin1 ;
 IN: http.client
 
 HELP: download-failed

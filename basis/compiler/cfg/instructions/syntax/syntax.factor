@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes.tuple classes.tuple.parser kernel words
 make fry sequences parser accessors effects namespaces
@@ -61,14 +61,14 @@ TUPLE: insn-slot-spec type name rep ;
     "pure-insn" "compiler.cfg.instructions" lookup ;
 
 : insn-effect ( word -- effect )
-    boa-effect in>> but-last f <effect> ;
+    boa-effect in>> but-last { } <effect> ;
 
 : define-insn-tuple ( class superclass specs -- )
     [ name>> ] map "insn#" suffix define-tuple-class ;
 
 : define-insn-ctor ( class specs -- )
     [ dup '[ _ ] [ f ] [ boa , ] surround ] dip
-    [ name>> ] map f <effect> define-declared ;
+    [ name>> ] map { } <effect> define-declared ;
 
 : define-insn ( class superclass specs -- )
     parse-insn-slot-specs {

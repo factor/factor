@@ -97,7 +97,7 @@ M: #phi propagate-before ( #phi -- )
     constraints get last update-constraints ;
 
 : branch-phi-constraints ( output values booleans -- )
-     {
+    {
         {
             { { t } { f } }
             [
@@ -128,6 +128,22 @@ M: #phi propagate-before ( #phi -- )
                 second =t
                 condition-value get =f /\
                 swap t-->
+            ]
+        }
+        {
+            { { t f } { t } }
+            [
+                first =f
+                condition-value get =t /\
+                swap f-->
+            ]
+        }
+        {
+            { { t } { t f } }
+            [
+                second =f
+                condition-value get =f /\
+                swap f-->
             ]
         }
         {

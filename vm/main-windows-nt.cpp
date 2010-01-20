@@ -1,30 +1,29 @@
 #include "master.hpp"
 
+VM_C_API int wmain(int argc, wchar_t **argv)
+{
+	factor::init_globals();
+#ifdef FACTOR_MULTITHREADED
+	factor::THREADHANDLE thread = factor::start_standalone_factor_in_new_thread(argv,argc);
+	WaitForSingleObject(thread, INFINITE);
+#else
+	factor::start_standalone_factor(argc,argv);
+#endif
+	return 0;
+}
+
 int WINAPI WinMain(
 	HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
 	LPSTR lpCmdLine,
 	int nCmdShow)
 {
-	LPWSTR *szArglist;
-	int nArgs;
+	int argc;
+	wchar_t **argv;
 
-	szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
-	if(NULL == szArglist)
-	{
-		puts("CommandLineToArgvW failed");
-		return 1;
-	}
+	argv = CommandLineToArgvW(GetCommandLine(),&argc);
+	wmain(argc,argv);
 
-	factor::init_globals();
-  #ifdef FACTOR_MULTITHREADED
-	factor::THREADHANDLE thread = factor::start_standalone_factor_in_new_thread(nArgs,szArglist);
-	WaitForSingleObject(thread, INFINITE);
-  #else
-	factor::start_standalone_factor(nArgs,szArglist);
-  #endif
-
-	LocalFree(szArglist);
-
+	// memory leak from malloc, wcsdup
 	return 0;
 }

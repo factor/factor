@@ -156,7 +156,7 @@ SYMBOL: hand-click#
 SYMBOL: hand-last-button
 SYMBOL: hand-last-time
 0 hand-last-button set-global
-<zero> hand-last-time set-global
+0 hand-last-time set-global
 
 SYMBOL: hand-buttons
 V{ } clone hand-buttons set-global
@@ -184,7 +184,7 @@ SYMBOL: drag-timer
 : start-drag-timer ( -- )
     hand-buttons get-global empty? [
         [ drag-gesture ]
-        300 milliseconds hence
+        300 milliseconds
         100 milliseconds
         add-alarm drag-timer get-global >box
     ] when ;
@@ -246,7 +246,8 @@ SYMBOL: drag-timer
     hand-click-loc get-global swap screen-loc v- ;
 
 : multi-click-timeout? ( -- ? )
-    now hand-last-time get time- double-click-timeout get before=? ;
+    nano-count hand-last-time get - nanoseconds
+    double-click-timeout get before=? ;
 
 : multi-click-button? ( button -- button ? )
     dup hand-last-button get = ;
@@ -269,7 +270,7 @@ SYMBOL: drag-timer
             1 hand-click# set
         ] if
         hand-last-button set
-        now hand-last-time set
+        nano-count hand-last-time set
     ] bind ;
 
 : update-clicked ( -- )

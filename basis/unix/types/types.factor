@@ -36,6 +36,7 @@ TYPEDEF: __uint64_t fsfilcnt_t
 TYPEDEF: fsfilcnt_t __fsfilcnt_t
 TYPEDEF: __uint64_t rlim_t
 TYPEDEF: uint32_t id_t
+TYPEDEF: long clockid_t
 
 C-TYPE: DIR
 C-TYPE: FILE

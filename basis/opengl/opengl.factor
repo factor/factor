@@ -56,7 +56,9 @@ TUPLE: gl-error function code string ;
     [ ?execute ] map ;
 
 : (all-enabled) ( seq quot -- )
-    over [ glEnable ] each dip [ glDisable ] each ; inline
+    [ dup [ glEnable ] each ] dip
+    dip
+    [ glDisable ] each ; inline
 
 : (all-enabled-client-state) ( seq quot -- )
     [ dup [ glEnableClientState ] each ] dip

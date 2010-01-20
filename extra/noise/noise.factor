@@ -4,7 +4,6 @@ math.libm math.matrices.simd math.vectors math.vectors.conversion math.vectors.s
 memoize random random.mersenne-twister sequences sequences.private specialized-arrays
 typed ;
 QUALIFIED-WITH: alien.c-types c
-SIMDS: c:float c:int c:short c:ushort c:uchar ;
 SPECIALIZED-ARRAYS: c:float c:uchar float-4 uchar-16 ;
 IN: noise
 
@@ -121,7 +120,7 @@ TYPED:: perlin-noise ( table: byte-array point: float-4 -- value: float )
     faded trilerp ;
 
 MEMO: perlin-noise-map-coords ( dim -- coords )
-    first2 [| x y | x [ y 0.0 0.0 float-4-boa ] float-4-array{ } map-as ] with map concat ; 
+    first2 iota [| x y | x iota [ y 0.0 0.0 float-4-boa ] float-4-array{ } map-as ] with map concat ;
 
 TYPED:: perlin-noise-map ( table: byte-array transform: matrix4 coords: float-4-array -- map: float-array )
     coords [| coord | table transform coord m4.v perlin-noise ] data-map( float-4 -- c:float )

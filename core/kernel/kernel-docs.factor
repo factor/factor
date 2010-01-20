@@ -21,12 +21,10 @@ HELP: 2over                          $shuffle ;
 HELP: pick  ( x y z -- x y z x )     $shuffle ;
 HELP: swap  ( x y -- y x )           $shuffle ;
 
-HELP: spin                     $complex-shuffle ;
 HELP: rot   ( x y z -- y z x ) $complex-shuffle ;
 HELP: -rot  ( x y z -- z x y ) $complex-shuffle ;
 HELP: dupd  ( x y -- x x y )   $complex-shuffle ;
 HELP: swapd ( x y z -- y x z ) $complex-shuffle ;
-HELP: tuck  ( x y -- y x y )   $complex-shuffle ;
 
 HELP: datastack ( -- ds )
 { $values { "ds" array } }
@@ -48,9 +46,9 @@ HELP: callstack ( -- cs )
 { $values { "cs" callstack } }
 { $description "Outputs a copy of the call stack contents, with the top of the stack at the end of the vector. The stack frame of the caller word is " { $emphasis "not" } " included." } ;
 
-HELP: set-callstack ( cs -- )
+HELP: set-callstack ( cs -- * )
 { $values { "cs" callstack } }
-{ $description "Replaces the call stack contents. The end of the vector becomes the top of the stack. Control flow is transferred immediately to the new call stack." } ;
+{ $description "Replaces the call stack contents. Control flow is transferred immediately to the innermost frame of the new call stack." } ;
 
 HELP: clear
 { $description "Clears the data stack." } ;
@@ -74,7 +72,11 @@ HELP: hashcode
 { $values { "obj" object } { "code" fixnum } }
 { $description "Computes the hashcode of an object with a default hashing depth. See " { $link hashcode* } " for the hashcode contract." } ;
 
-{ hashcode hashcode* } related-words
+HELP: identity-hashcode
+{ $values { "obj" object } { "code" fixnum } }
+{ $description "Outputs the identity hashcode of an object. The identity hashcode is not guaranteed to be unique, however it will not change during the object's lifetime." } ;
+
+{ hashcode hashcode* identity-hashcode } related-words
 
 HELP: =
 { $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
@@ -206,7 +208,7 @@ HELP: call
 
 { call POSTPONE: call( } related-words
 
-HELP: call-clear ( quot -- )
+HELP: call-clear ( quot -- * )
 { $values { "quot" callable } }
 { $description "Calls a quotation with an empty call stack. If the quotation returns, Factor will exit.." }
 { $notes "Used to implement " { $link "threads" } "." } ;
@@ -653,13 +655,13 @@ HELP: tag ( object -- n )
 { $values { "object" object } { "n" "a tag number" } }
 { $description "Outputs an object's tag number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class } " instead." } ;
 
-HELP: getenv ( n -- obj )
+HELP: special-object ( n -- obj )
 { $values { "n" "a non-negative integer" } { "obj" object } }
-{ $description "Reads an object from the Factor VM's environment table. User code never has to read the environment table directly; instead, use one of the callers of this word." } ;
+{ $description "Reads an object from the Factor VM's special object table. User code never has to read the special object table directly; instead, use one of the callers of this word." } ;
 
-HELP: setenv ( obj n -- )
+HELP: set-special-object ( obj n -- )
 { $values { "obj" object } { "n" "a non-negative integer" } }
-{ $description "Writes an object to the Factor VM's environment table. User code never has to write to the environment table directly; instead, use one of the callers of this word." } ;
+{ $description "Writes an object to the Factor VM's special object table. User code never has to write to the special object table directly; instead, use one of the callers of this word." } ;
 
 HELP: object
 { $class-description
@@ -821,14 +823,12 @@ $nl
 "Duplicating stack elements deep in the stack:"
 { $subsections
     dupd
-    tuck
 }
 "Permuting stack elements deep in the stack:"
 { $subsections
     swapd
     rot
     -rot
-    spin
 } ;
 
 ARTICLE: "shuffle-words" "Shuffle words"

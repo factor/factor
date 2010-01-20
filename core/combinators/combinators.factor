@@ -11,7 +11,9 @@ IN: combinators
 
 : execute-effect-unsafe ( word effect -- ) drop execute ;
 
-M: object throw 5 getenv [ die ] or (( error -- * )) call-effect-unsafe ;
+M: object throw
+    5 special-object [ die ] or
+    (( error -- * )) call-effect-unsafe ;
 
 PRIVATE>
 

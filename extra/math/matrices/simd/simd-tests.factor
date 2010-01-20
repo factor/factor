@@ -3,7 +3,6 @@ USING: classes.struct math.matrices.simd math.vectors.simd math
 literals math.constants math.functions specialized-arrays tools.test ;
 QUALIFIED-WITH: alien.c-types c
 FROM: math.matrices => m~ ;
-SIMD: c:float
 SPECIALIZED-ARRAY: float-4
 IN: math.matrices.simd.tests
 

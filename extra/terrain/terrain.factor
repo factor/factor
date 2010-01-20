@@ -6,12 +6,11 @@ math.vectors opengl opengl.capabilities opengl.gl
 opengl.shaders opengl.textures opengl.textures.private
 sequences sequences.product specialized-arrays
 terrain.generation terrain.shaders typed ui ui.gadgets
-ui.gadgets.worlds ui.pixel-formats game.worlds method-chains
+ui.gadgets.worlds ui.pixel-formats game.worlds
 math.matrices.simd noise ui.gestures combinators.short-circuit
 destructors grid-meshes math.vectors.simd ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
-SIMD: c:float
 IN: terrain
 
 CONSTANT: FOV $[ 2.0 sqrt 1 + ]
@@ -22,14 +21,14 @@ CONSTANT: VELOCITY-MODIFIER-NORMAL float-4{ 1.0 1.0 1.0 0.0 }
 CONSTANT: VELOCITY-MODIFIER-FAST float-4{ 2.0 1.0 2.0 0.0 }
 CONSTANT: BOUNCE float-4{ 1.0 -0.2 1.0 1.0 }
 CONSTANT: PLAYER-HEIGHT 1/256.
-CONSTANT: GRAVITY float-4{ 0.0 -1/4096. 0.0 0.0 }
-CONSTANT: JUMP 1/1024.
-CONSTANT: MOUSE-SCALE 1/10.
-CONSTANT: MOVEMENT-SPEED 1/16384.
-CONSTANT: FRICTION float-4{ 0.95 0.99 0.95 1.0 }
+CONSTANT: GRAVITY float-4{ 0.0 -1/8192. 0.0 0.0 }
+CONSTANT: JUMP 1/2048.
+CONSTANT: MOUSE-SCALE 1/20.
+CONSTANT: MOVEMENT-SPEED 1/32768.
+CONSTANT: FRICTION float-4{ 0.97 0.995 0.97 1.0 }
 CONSTANT: COMPONENT-SCALE float-4{ 0.5 0.01 0.0005 0.0 }
-CONSTANT: SKY-PERIOD 1200
-CONSTANT: SKY-SPEED 0.0005
+CONSTANT: SKY-PERIOD 2400
+CONSTANT: SKY-SPEED 0.00025
 
 CONSTANT: terrain-vertex-size { 512 512 }
 
@@ -55,9 +54,6 @@ TUPLE: terrain-world < game-world
         0.0 >>pitch
         float-4{ 0.0 0.0 0.0 1.0 } >>velocity
         VELOCITY-MODIFIER-NORMAL >>velocity-modifier ;
-
-M: terrain-world tick-length
-    drop 1000 30 /i ;
 
 : frustum ( dim -- -x x -y y near far )
     dup first2 min v/n
@@ -221,7 +217,7 @@ terrain-world H{
     [ tick-player-reverse ]
     [ tick-player-forward ] if ;
 
-M: terrain-world tick*
+M: terrain-world tick-game-world
     [ dup focused?>> [ handle-input ] [ drop ] if ]
     [ dup player>> tick-player ] bi ;
 
@@ -237,7 +233,7 @@ M: terrain-world tick*
 : sky-theta ( world -- theta )
     game-loop>> tick-number>> SKY-SPEED * ;
 
-BEFORE: terrain-world begin-world
+M: terrain-world begin-game-world
     "2.0" { "GL_ARB_vertex_buffer_object" "GL_ARB_shader_objects" }
     require-gl-version-or-extensions
     GL_DEPTH_TEST glEnable
@@ -258,7 +254,7 @@ BEFORE: terrain-world begin-world
     terrain-vertex-size <grid-mesh> >>terrain-mesh
     drop ;
 
-AFTER: terrain-world end-world
+M: terrain-world end-game-world
     {
         [ terrain-mesh>> dispose ]
         [ terrain-program>> delete-gl-program ]
@@ -291,20 +287,16 @@ M: terrain-world draw-world*
         ] with-gl-program ]
     } cleave gl-error ;
 
-M: terrain-world pref-dim* drop { 1024 768 } ;
-
-: terrain-window ( -- )
-    [
-        f T{ world-attributes
-            { world-class terrain-world }
-            { title "Terrain" }
-            { pixel-format-attributes {
-                windowed
-                double-buffered
-                T{ depth-bits { value 24 } }
-            } }
-            { grab-input? t }
-        } open-window
-    ] with-ui ;
-
-MAIN: terrain-window
+GAME: terrain-game {
+        { world-class terrain-world }
+        { title "Terrain" }
+        { pixel-format-attributes {
+            windowed
+            double-buffered
+            T{ depth-bits { value 24 } }
+        } }
+        { use-game-input? t }
+        { grab-input? t }
+        { pref-dim { 1024 768 } }
+        { tick-interval-micros $[ 60 fps ] }
+    } ;

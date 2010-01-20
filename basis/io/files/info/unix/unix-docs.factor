@@ -4,6 +4,18 @@ USING: classes help.markup help.syntax io.streams.string
 strings math calendar io.files.info io.files.info.unix ;
 IN: io.files.unix
 
+HELP: add-file-permissions
+{ $values
+     { "path" "a pathname string" }
+     { "n" integer } }
+{ $description "Ensures that the bits from " { $snippet "n" } " are set in the Unix file permissions for a given file." } ;
+
+HELP: remove-file-permissions
+{ $values
+     { "path" "a pathname string" }
+     { "n" integer } }
+{ $description "Ensures that the bits from " { $snippet "n" } " are cleared in the Unix file permissions for a given file." } ;
+
 HELP: file-group-id
 { $values
      { "path" "a pathname string" }
@@ -231,8 +243,12 @@ ARTICLE: "unix-file-permissions" "Unix file permissions"
     other-write?
     other-execute?
 }
-"Writing all file permissions:"
-{ $subsections set-file-permissions }
+"Changing file permissions:"
+{ $subsections
+    add-file-permissions
+    remove-file-permissions
+    set-file-permissions
+}
 "Writing individual file permissions:"
 { $subsections
     set-uid

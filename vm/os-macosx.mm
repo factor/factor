@@ -1,5 +1,6 @@
 #import <Cocoa/Cocoa.h>
 
+#include <mach/mach_time.h>
 #include "master.hpp"
 
 namespace factor
@@ -10,15 +11,15 @@ void factor_vm::c_to_factor_toplevel(cell quot)
 	for(;;)
 	{
 NS_DURING
-		c_to_factor(quot,this);
+		c_to_factor(quot);
 		NS_VOIDRETURN;
 NS_HANDLER
-		dpush(allot_alien(false_object,(cell)localException));
+		ctx->push(allot_alien(false_object,(cell)localException));
 		quot = special_objects[OBJ_COCOA_EXCEPTION];
 		if(!tagged<object>(quot).type_p(QUOTATION_TYPE))
 		{
 			/* No Cocoa exception handler was registered, so
-			extra/cocoa/ is not loaded. So we pass the exception
+			basis/cocoa/ is not loaded. So we pass the exception
 			along. */
 			[localException raise];
 		}
@@ -30,7 +31,7 @@ void early_init(void)
 {
 	SInt32 version;
 	Gestalt(gestaltSystemVersion,&version);
-	if(version <= 0x1050)
+	if(version < 0x1050)
 	{
 		printf("Factor requires Mac OS X 10.5 or later.\n");
 		exit(1);
@@ -82,6 +83,18 @@ Protocol *objc_getProtocol(char *name)
 		return @protocol(NSTextInput);
 	else
 		return nil;
+}
+
+u64 nano_count()
+{
+	u64 t;
+	mach_timebase_info_data_t info;
+	kern_return_t ret;
+	t = mach_absolute_time();
+	ret = mach_timebase_info(&info);
+	if(ret != 0)
+		fatal_error("mach_timebase_info failed",ret);
+	return t * (info.numer/info.denom);
 }
 
 }

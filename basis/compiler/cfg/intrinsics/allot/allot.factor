@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.order sequences accessors arrays
 byte-arrays layouts classes.tuple.private fry locals
@@ -34,7 +34,7 @@ IN: compiler.cfg.intrinsics.allot
     [ [ ^^load-literal ] dip 1 ] dip type-number ##set-slot-imm ;
 
 :: store-initial-element ( len reg elt class -- )
-    len [ [ elt reg ] dip 2 + class type-number ##set-slot-imm ] each ;
+    len [ [ elt reg ] dip 2 + class type-number ##set-slot-imm ] each-integer ;
 
 : expand-<array>? ( obj -- ? )
     dup integer? [ 0 8 between? ] [ drop f ] if ;

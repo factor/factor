@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien alien.c-types arrays byte-arrays
 combinators destructors gpu kernel locals math opengl opengl.gl
-ui.gadgets.worlds variants ;
+typed ui.gadgets.worlds variants ;
 IN: gpu.buffers
 
 VARIANT: buffer-upload-pattern
@@ -57,10 +57,10 @@ TUPLE: buffer < gpu-object
     } case ; inline
 
 : get-buffer-int ( target enum -- value )
-    0 <int> [ glGetBufferParameteriv ] keep *int ;
+    0 <int> [ glGetBufferParameteriv ] keep *int ; inline
 
 : bind-buffer ( buffer -- target )
-    [ kind>> gl-target dup ] [ handle>> glBindBuffer ] bi ;
+    [ kind>> gl-target dup ] [ handle>> glBindBuffer ] bi ; inline
 
 PRIVATE>
 
@@ -78,7 +78,7 @@ C: <buffer-range> buffer-range
 
 UNION: gpu-data-ptr buffer-ptr c-ptr ;
 
-: buffer-size ( buffer -- size )
+TYPED: buffer-size ( buffer: buffer -- size: integer )
     bind-buffer GL_BUFFER_SIZE get-buffer-int ;
 
 : buffer-ptr>range ( buffer-ptr -- buffer-range )
@@ -86,31 +86,42 @@ UNION: gpu-data-ptr buffer-ptr c-ptr ;
     2dup [ buffer-size ] dip -
     buffer-range boa ; inline
 
-:: allocate-buffer ( buffer size initial-data -- )
+TYPED:: allocate-buffer ( buffer: buffer size: integer initial-data -- )
     buffer bind-buffer :> target
     target size initial-data buffer gl-buffer-usage glBufferData ;
 
-: <buffer> ( upload usage kind size initial-data -- buffer )
+TYPED: <buffer> ( upload: buffer-upload-pattern
+                  usage: buffer-usage-pattern
+                  kind: buffer-kind
+                  size: integer
+                  initial-data
+                  --
+                  buffer: buffer )
     [ [ gen-gl-buffer ] 3dip buffer boa dup ] 2dip allocate-buffer
     window-resource ;
 
-: byte-array>buffer ( byte-array upload usage kind -- buffer )
+TYPED: byte-array>buffer ( byte-array
+                           upload: buffer-upload-pattern
+                           usage: buffer-usage-pattern
+                           kind: buffer-kind
+                           --
+                           buffer: buffer )
     [ ] 3curry dip
     [ byte-length ] [ ] bi <buffer> ;
 
-:: update-buffer ( buffer-ptr size data -- )
+TYPED:: update-buffer ( buffer-ptr: buffer-ptr size: integer data -- )
     buffer-ptr buffer>> :> buffer
     buffer bind-buffer :> target
     target buffer-ptr offset>> size data glBufferSubData ;
 
-:: read-buffer ( buffer-ptr size -- data )
+TYPED:: read-buffer ( buffer-ptr: buffer-ptr size: integer -- data: byte-array )
     buffer-ptr buffer>> :> buffer
     buffer bind-buffer :> target
     size <byte-array> :> data
     target buffer-ptr offset>> size data glGetBufferSubData
     data ;
 
-:: copy-buffer ( to-buffer-ptr from-buffer-ptr size -- )
+TYPED:: copy-buffer ( to-buffer-ptr: buffer-ptr from-buffer-ptr: buffer-ptr size: integer -- )
     GL_COPY_WRITE_BUFFER to-buffer-ptr buffer>> glBindBuffer
     GL_COPY_READ_BUFFER from-buffer-ptr buffer>> glBindBuffer
 
