@@ -530,7 +530,6 @@ tuple
     { "dispatch-stats" "tools.dispatch.private" "primitive_dispatch_stats" (( -- stats )) }
     { "reset-dispatch-stats" "tools.dispatch.private" "primitive_reset_dispatch_stats" (( -- )) }
     { "profiling" "tools.profiler.private" "primitive_profiling" (( ? -- )) }
-    { "vm-ptr" "vm" "primitive_vm_ptr" (( -- ptr )) }
     { "optimized?" "words" "primitive_optimized_p" (( word -- ? )) }
     { "word-code" "words" "primitive_word_code" (( word -- start end )) }
     { "(word)" "words.private" "primitive_word" (( name vocab -- word )) }
