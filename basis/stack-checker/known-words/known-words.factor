@@ -13,7 +13,7 @@ words.private definitions assocs summary compiler.units
 system.private combinators combinators.short-circuit locals
 locals.backend locals.types combinators.private
 stack-checker.values generic.single generic.single.private
-alien.libraries tools.dispatch.private tools.profiler.private
+alien.libraries tools.dispatch.private tools.profiler.private vm
 stack-checker.alien
 stack-checker.state
 stack-checker.errors
@@ -221,8 +221,6 @@ M: bad-executable summary
     dup '[ _ infer-call-effect ] "special" set-word-prop
 ] each
 
-\ do-primitive [ unknown-primitive-error ] "special" set-word-prop
-
 \ if [ infer-if ] "special" set-word-prop
 \ dispatch [ infer-dispatch ] "special" set-word-prop
 
@@ -230,6 +228,22 @@ M: bad-executable summary
 \ alien-indirect [ infer-alien-indirect ] "special" set-word-prop
 \ alien-assembly [ infer-alien-assembly ] "special" set-word-prop
 \ alien-callback [ infer-alien-callback ] "special" set-word-prop
+
+{
+    do-primitive
+    mega-cache-miss
+    mega-cache-lookup
+    inline-cache-miss
+    inline-cache-miss-tail
+    unwind-native-frames
+    set-datastack
+    set-callstack
+    set-retainstack
+    unwind-native-frames
+    lazy-jit-compile
+    c-to-factor
+    call-clear
+} [ dup '[ _ do-not-compile ] "special" set-word-prop ] each
 
 : infer-special ( word -- )
     [ current-word set ] [ "special" word-prop call( -- ) ] bi ;
@@ -722,3 +736,9 @@ M: bad-executable summary
 \ (identity-hashcode) { object } { fixnum } define-primitive
 
 \ compute-identity-hashcode { object } { } define-primitive
+
+\ (exit) { integer } { } define-primitive
+
+\ vm-ptr { } { alien } define-primitive
+
+\ quot-compiled? { quotation } { object } define-primitive
