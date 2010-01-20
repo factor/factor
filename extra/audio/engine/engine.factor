@@ -148,19 +148,13 @@ ERROR: audio-context-not-available device-name ;
     audio-engine next-source >>next-source drop
     al-source ;
 
-:: (queue-clip-buffer) ( audio-clip al-buffer audio data size -- )
-    al-buffer audio openal-format data size audio sample-rate>> alBufferData
-    audio-clip al-source>> 1 al-buffer c:<uint> alSourceQueueBuffers
-
-    audio-clip [ size + ] change-next-data-offset drop ; inline
-
 :: queue-clip-buffer ( audio-clip al-buffer -- )
     audio-clip al-source>> :> al-source
     audio-clip generator>> :> generator
     audio-clip buffer-size>> :> buffer-size
     generator buffer-size generate-audio :> data
 
-    al-buffer audio-clip openal-format data size audio-clip sample-rate>> alBufferData
+    al-buffer audio-clip openal-format data buffer-size audio-clip sample-rate>> alBufferData
     al-source 1 al-buffer c:<uint> alSourceQueueBuffers ;
 
 : update-listener ( audio-engine -- )
@@ -265,7 +259,8 @@ M: audio-engine dispose*
             audio-engine >>audio-engine
             source >>source
             al-source >>al-source
-            al-buffer >>al-buffer :> clip
+            al-buffer >>al-buffer
+            :> clip
         clip audio-engine clips>> push
         clip
     ] [ f ] if ;
@@ -287,18 +282,19 @@ M: audio-engine dispose*
             sample-bits >>sample-bits
             sample-rate >>sample-rate
             al-buffers >>al-buffers
+            :> clip
         al-buffers [ clip swap queue-clip-buffer ] each
         clip audio-engine clips>> push
         clip
     ] [ f ] if ;
 
 M: audio-clip dispose*
-    [ audio-engine>> clips>> remove! drop ]
+    [ dup audio-engine>> clips>> remove! drop ]
     [ al-source>> flush-source ] bi ;
 
 M: static-audio-clip dispose*
     [ call-next-method ]
-    [ [ 1 ] dip al-buffer>> <uint> alDeleteBuffers ] bi ;
+    [ [ 1 ] dip al-buffer>> c:<uint> alDeleteBuffers ] bi ;
 
 M: streaming-audio-clip dispose*
     [ call-next-method ]
