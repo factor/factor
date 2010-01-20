@@ -1,11 +1,11 @@
-USING: windows.dinput windows.kernel32 windows.ole32 windows.com
+USING: windows.directx.dinput windows.kernel32 windows.ole32 windows.com
 windows.com.syntax alien alien.c-types alien.data alien.syntax
 kernel system namespaces combinators sequences fry math accessors
 macros words quotations libc continuations generalizations
 splitting locals assocs init specialized-arrays memoize
 classes.struct strings arrays ;
 SPECIALIZED-ARRAY: DIOBJECTDATAFORMAT
-IN: windows.dinput.constants
+IN: windows.directx.dinput.constants
 
 ! Some global variables aren't provided by the DirectInput DLL (they're in the
 ! dinput8.lib import library), so we lovingly hand-craft equivalent values here
@@ -831,7 +831,7 @@ M: array array-base-type first ;
     define-guid-constants
     define-format-constants ;
 
-[ define-constants ] "windows.dinput.constants" add-startup-hook
+[ define-constants ] "windows.directx.dinput.constants" add-startup-hook
 
 : uninitialize ( variable quot -- )
     '[ _ when* f ] change-global ; inline
