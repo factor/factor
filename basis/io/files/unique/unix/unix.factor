@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel io.ports io.backend.unix math.bitwise
-unix system io.files.unique ;
+unix system io.files.unique unix.ffi ;
 IN: io.files.unique.unix
 
 : open-unique-flags ( -- flags )
