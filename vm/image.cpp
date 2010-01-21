@@ -268,12 +268,12 @@ void factor_vm::load_image(vm_parameters *p)
 }
 
 /* Save the current image to disk */
-bool factor_vm::save_image(const vm_char *filename)
+bool factor_vm::save_image(const vm_char *saving_filename, const vm_char *filename)
 {
 	FILE* file;
 	image_header h;
 
-	file = OPEN_WRITE(filename);
+	file = OPEN_WRITE(saving_filename);
 	if(file == NULL)
 	{
 		std::cout << "Cannot open image file: " << filename << std::endl;
@@ -303,6 +303,7 @@ bool factor_vm::save_image(const vm_char *filename)
 	if(safe_fwrite(code->allocator->first_block(),h.code_size,1,file) != 1) ok = false;
 	if(safe_fclose(file)) ok = false;
 
+	MOVE_FILE(saving_filename,filename);
 	if(!ok)
 		std::cout << "save-image failed: " << strerror(errno) << std::endl;
 
@@ -314,9 +315,11 @@ void factor_vm::primitive_save_image()
 	/* do a full GC to push everything into tenured space */
 	primitive_compact_gc();
 
-	data_root<byte_array> path(ctx->pop(),this);
-	path.untag_check(this);
-	save_image((vm_char *)(path.untagged() + 1));
+	data_root<byte_array> path1(ctx->pop(),this);
+	path1.untag_check(this);
+	data_root<byte_array> path2(ctx->pop(),this);
+	path2.untag_check(this);
+	save_image((vm_char *)(path1.untagged() + 1 ),(vm_char *)(path2.untagged() + 1));
 }
 
 void factor_vm::primitive_save_image_and_exit()
@@ -324,8 +327,10 @@ void factor_vm::primitive_save_image_and_exit()
 	/* We unbox this before doing anything else. This is the only point
 	where we might throw an error, so we have to throw an error here since
 	later steps destroy the current image. */
-	data_root<byte_array> path(ctx->pop(),this);
-	path.untag_check(this);
+	data_root<byte_array> path1(ctx->pop(),this);
+	path1.untag_check(this);
+	data_root<byte_array> path2(ctx->pop(),this);
+	path2.untag_check(this);
 
 	/* strip out special_objects data which is set on startup anyway */
 	for(cell i = 0; i < special_object_count; i++)
@@ -336,7 +341,7 @@ void factor_vm::primitive_save_image_and_exit()
 		false /* discard objects only reachable from stacks */);
 
 	/* Save the image */
-	if(save_image((vm_char *)(path.untagged() + 1)))
+	if(save_image((vm_char *)(path1.untagged() + 1), (vm_char *)(path2.untagged() + 1)))
 		exit(0);
 	else
 		exit(1);

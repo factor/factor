@@ -511,8 +511,8 @@ tuple
     { "gc" "memory" "primitive_full_gc" (( -- )) }
     { "minor-gc" "memory" "primitive_minor_gc" (( -- )) }
     { "size" "memory" "primitive_size" (( obj -- n )) }
-    { "(save-image)" "memory.private" "primitive_save_image" (( path -- )) }
-    { "(save-image-and-exit)" "memory.private" "primitive_save_image_and_exit" (( path -- )) }
+    { "(save-image)" "memory.private" "primitive_save_image" (( path1 path2 -- )) }
+    { "(save-image-and-exit)" "memory.private" "primitive_save_image_and_exit" (( path1 path2 -- )) }
     { "jit-compile" "quotations" "primitive_jit_compile" (( quot -- )) }
     { "quot-compiled?" "quotations" "primitive_quot_compiled_p" (( quot -- ? )) }
     { "quotation-code" "quotations" "primitive_quotation_code" (( quot -- start end )) }

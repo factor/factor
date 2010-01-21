@@ -442,7 +442,7 @@ void factor_vm::factorbug()
 		else if(strcmp(cmd,"x") == 0)
 			exit(1);
 		else if(strcmp(cmd,"im") == 0)
-			save_image(STRING_LITERAL("fep.image"));
+			save_image(STRING_LITERAL("fep.image.saving"),STRING_LITERAL("fep.image"));
 		else if(strcmp(cmd,"data") == 0)
 			dump_objects(TYPE_COUNT);
 		else if(strcmp(cmd,"refs") == 0)

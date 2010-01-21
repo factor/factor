@@ -37,8 +37,13 @@ typedef wchar_t vm_char;
 	#define CELL_HEX_FORMAT "%lx"
 #endif
 
-#define OPEN_READ(path) _wfopen(path,L"rb")
-#define OPEN_WRITE(path) _wfopen(path,L"wb")
+#define OPEN_READ(path) _wfopen((path),L"rb")
+#define OPEN_WRITE(path) _wfopen((path),L"wb")
+#define MOVE_FILE(path1,path2) \
+do {\
+	if(MoveFile((path1),(path2)) == 0)\
+		general_error(ERROR_IO,tag_fixnum(GetLastError()),false_object,NULL);\
+} while(0)
 
 /* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
 #define EPOCH_OFFSET 0x019db1ded53e8000LL
