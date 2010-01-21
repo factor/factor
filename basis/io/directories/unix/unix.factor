@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.strings combinators
 continuations destructors fry io io.backend io.backend.unix
 io.directories io.encodings.binary io.encodings.utf8 io.files
 io.pathnames io.files.types kernel math.bitwise sequences system
-unix unix.stat vocabs.loader classes.struct ;
+unix unix.stat vocabs.loader classes.struct unix.ffi ;
 IN: io.directories.unix
 
 : touch-mode ( -- n )

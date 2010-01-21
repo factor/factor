@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: unix byte-arrays kernel io.backend.unix math.bitwise
 io.ports io.files io.files.private io.pathnames environment
-destructors system ;
+destructors system unix.ffi ;
 IN: io.files.unix
 
 M: unix cwd ( -- path )

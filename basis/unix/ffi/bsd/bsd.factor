@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax classes.struct combinators
 system unix.types vocabs.loader ;
-IN: unix
+IN: unix.ffi
 
 CONSTANT: MAXPATHLEN 1024
 
@@ -85,8 +85,8 @@ CONSTANT: SEEK_CUR 1
 CONSTANT: SEEK_END 2
 
 os {
-    { macosx  [ "unix.bsd.macosx"  require ] }
-    { freebsd [ "unix.bsd.freebsd" require ] }
-    { openbsd [ "unix.bsd.openbsd" require ] }
-    { netbsd  [ "unix.bsd.netbsd"  require ] }
+    { macosx  [ "unix.ffi.bsd.macosx"  require ] }
+    { freebsd [ "unix.ffi.bsd.freebsd" require ] }
+    { openbsd [ "unix.ffi.bsd.openbsd" require ] }
+    { netbsd  [ "unix.ffi.bsd.netbsd"  require ] }
 } case

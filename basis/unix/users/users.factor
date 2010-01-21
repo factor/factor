@@ -4,9 +4,9 @@ USING: alien alien.c-types alien.strings io.encodings.utf8
 io.backend.unix kernel math sequences splitting strings
 combinators.short-circuit grouping byte-arrays combinators
 accessors math.parser fry assocs namespaces continuations
-vocabs.loader system classes.struct ;
+vocabs.loader system classes.struct unix ;
 IN: unix.users
-QUALIFIED: unix
+QUALIFIED: unix.ffi
 
 TUPLE: passwd user-name password uid gid gecos dir shell ;
 
@@ -31,13 +31,13 @@ M: unix passwd>new-passwd ( passwd -- seq )
     } cleave ;
 
 : with-pwent ( quot -- )
-    [ unix:endpwent ] [ ] cleanup ; inline
+    [ unix.ffi:endpwent ] [ ] cleanup ; inline
 
 PRIVATE>
 
 : all-users ( -- seq )
     [
-        [ unix:getpwent dup ] [ unix:passwd memory>struct passwd>new-passwd ] produce nip
+        [ unix.ffi:getpwent dup ] [ unix.ffi:passwd memory>struct passwd>new-passwd ] produce nip
     ] with-pwent ;
 
 SYMBOL: user-cache
@@ -52,10 +52,10 @@ GENERIC: user-passwd ( obj -- passwd/f )
 
 M: integer user-passwd ( id -- passwd/f )
     user-cache get
-    [ at ] [ unix:getpwuid [ unix:passwd memory>struct passwd>new-passwd ] [ f ] if* ] if* ;
+    [ at ] [ unix.ffi:getpwuid [ unix.ffi:passwd memory>struct passwd>new-passwd ] [ f ] if* ] if* ;
 
 M: string user-passwd ( string -- passwd/f )
-    unix:getpwnam dup [ unix:passwd memory>struct passwd>new-passwd ] when ;
+    unix.ffi:getpwnam dup [ unix.ffi:passwd memory>struct passwd>new-passwd ] when ;
 
 : user-name ( id -- string )
     dup user-passwd
@@ -65,13 +65,13 @@ M: string user-passwd ( string -- passwd/f )
     user-passwd uid>> ;
 
 : real-user-id ( -- id )
-    unix:getuid ; inline
+    unix.ffi:getuid ; inline
 
 : real-user-name ( -- string )
     real-user-id user-name ; inline
 
 : effective-user-id ( -- id )
-    unix:geteuid ; inline
+    unix.ffi:geteuid ; inline
 
 : effective-user-name ( -- string )
     effective-user-id user-name ; inline
@@ -93,10 +93,10 @@ GENERIC: set-effective-user ( string/id -- )
 <PRIVATE
 
 : (set-real-user) ( id -- )
-    unix:setuid unix:io-error ; inline
+    [ unix.ffi:setuid ] unix-system-call io-error ; inline
 
 : (set-effective-user) ( id -- )
-    unix:seteuid unix:io-error ; inline
+    [ unix.ffi:seteuid ] unix-system-call io-error ; inline
 
 PRIVATE>
 
