@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Patrick Mauritz.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax system kernel layouts ;
-IN: unix
+IN: unix.ffi
 
 ! Solaris.
 
@@ -52,7 +52,7 @@ STRUCT: sockaddr-in6
     { addr uchar[16] }
     { scopeid uint } ;
 
-: max-un-path 108 ;
+CONSTANT: max-un-path 108
 
 STRUCT: sockaddr-un
     { family ushort }

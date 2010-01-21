@@ -1,13 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel system math math.bitwise strings arrays
-sequences combinators combinators.short-circuit alien.c-types
-vocabs.loader calendar calendar.unix io.files.info
-io.files.types io.backend io.directories unix unix.stat
-unix.time unix.users unix.groups classes.struct
-specialized-arrays literals ;
-SPECIALIZED-ARRAY: timeval
+USING: accessors alien.c-types arrays calendar calendar.unix
+classes.struct combinators combinators.short-circuit io.backend
+io.directories io.files.info io.files.types kernel literals
+math math.bitwise sequences specialized-arrays strings system
+unix unix.ffi unix.groups unix.stat unix.time unix.users
+vocabs.loader ;
 IN: io.files.info.unix
+SPECIALIZED-ARRAY: timeval
 
 TUPLE: unix-file-system-info < file-system-info
 block-size preferred-block-size
@@ -286,3 +286,5 @@ PRIVATE>
         { +regular-file+ [ file-type>executable ] }
         [ drop file-type>executable ]
     } case ;
+
+"io.files.info.unix." os name>> append require

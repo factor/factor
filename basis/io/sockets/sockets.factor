@@ -11,7 +11,7 @@ IN: io.sockets
 
 << {
     { [ os windows? ] [ "windows.winsock" ] }
-    { [ os unix? ] [ "unix" ] }
+    { [ os unix? ] [ "unix.ffi" ] }
 } cond use-vocab >>
 
 ! Addressing
