@@ -549,7 +549,7 @@ struct factor_vm
 	void init_objects(image_header *h);
 	void load_data_heap(FILE *file, image_header *h, vm_parameters *p);
 	void load_code_heap(FILE *file, image_header *h, vm_parameters *p);
-	bool save_image(const vm_char *filename);
+	bool save_image(const vm_char *saving_filename, const vm_char *filename);
 	void primitive_save_image();
 	void primitive_save_image_and_exit();
 	void fixup_data(cell data_offset, cell code_offset);
