@@ -1,5 +1,5 @@
 USING: alien.c-types alien.syntax classes.struct unix.types ;
-IN: unix
+IN: unix.ffi
 
 CONSTANT: FD_SETSIZE 1024
 

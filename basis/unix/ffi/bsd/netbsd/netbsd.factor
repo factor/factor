@@ -1,12 +1,12 @@
-USING: alien.c-types alien.syntax unix.time unix.types
-unix.types.macosx classes.struct ;
-IN: unix
+USING: alien.syntax alien.c-types math vocabs.loader
+classes.struct unix.types ;
+IN: unix.ffi
 
-CONSTANT: FD_SETSIZE 1024
+CONSTANT: FD_SETSIZE 256
 
 STRUCT: addrinfo
     { flags int }
-    { family int } 
+    { family int }
     { socktype int }
     { protocol int }
     { addrlen socklen_t }
@@ -14,31 +14,12 @@ STRUCT: addrinfo
     { addr void* }
     { next addrinfo* } ;
 
-CONSTANT: _UTX_USERSIZE 256
-CONSTANT: _UTX_LINESIZE 32
-CONSTANT: _UTX_IDSIZE 4
-CONSTANT: _UTX_HOSTSIZE 256
-    
-STRUCT: utmpx
-    { ut_user { char _UTX_USERSIZE } }
-    { ut_id   { char _UTX_IDSIZE   } }
-    { ut_line { char _UTX_LINESIZE } }
-    { ut_pid  pid_t }
-    { ut_type short }
-    { ut_tv   timeval }
-    { ut_host { char _UTX_HOSTSIZE } }
-    { ut_pad  { uint 16 } } ;
-
-CONSTANT: __DARWIN_MAXPATHLEN 1024
-CONSTANT: __DARWIN_MAXNAMELEN 255
-CONSTANT: __DARWIN_MAXNAMELEN+1 255
-
 STRUCT: dirent
-    { d_ino ino_t }
+    { d_fileno __uint32_t }
     { d_reclen __uint16_t }
     { d_type __uint8_t }
     { d_namlen __uint8_t }
-    { d_name { char __DARWIN_MAXNAMELEN+1 } } ;
+    { d_name char[256] } ;
 
 CONSTANT: EPERM 1
 CONSTANT: ENOENT 2
@@ -85,7 +66,7 @@ CONSTANT: EPROTOTYPE 41
 CONSTANT: ENOPROTOOPT 42
 CONSTANT: EPROTONOSUPPORT 43
 CONSTANT: ESOCKTNOSUPPORT 44
-CONSTANT: ENOTSUP 45
+CONSTANT: EOPNOTSUPP 45
 CONSTANT: EPFNOSUPPORT 46
 CONSTANT: EAFNOSUPPORT 47
 CONSTANT: EADDRINUSE 48
@@ -122,25 +103,39 @@ CONSTANT: ENOSYS 78
 CONSTANT: EFTYPE 79
 CONSTANT: EAUTH 80
 CONSTANT: ENEEDAUTH 81
-CONSTANT: EPWROFF 82
-CONSTANT: EDEVERR 83
+CONSTANT: EIDRM 82
+CONSTANT: ENOMSG 83
 CONSTANT: EOVERFLOW 84
-CONSTANT: EBADEXEC 85
-CONSTANT: EBADARCH 86
-CONSTANT: ESHLIBVERS 87
-CONSTANT: EBADMACHO 88
-CONSTANT: ECANCELED 89
-CONSTANT: EIDRM 90
-CONSTANT: ENOMSG 91
-CONSTANT: EILSEQ 92
+CONSTANT: EILSEQ 85
+CONSTANT: ENOTSUP 86
+CONSTANT: ECANCELED 87
+CONSTANT: EBADMSG 88
+CONSTANT: ENODATA 89
+CONSTANT: ENOSR 90
+CONSTANT: ENOSTR 91
+CONSTANT: ETIME 92
 CONSTANT: ENOATTR 93
-CONSTANT: EBADMSG 94
-CONSTANT: EMULTIHOP 95
-CONSTANT: ENODATA 96
-CONSTANT: ENOLINK 97
-CONSTANT: ENOSR 98
-CONSTANT: ENOSTR 99
-CONSTANT: EPROTO 100
-CONSTANT: ETIME 101
-CONSTANT: EOPNOTSUPP 102
-CONSTANT: ENOPOLICY 103
+CONSTANT: EMULTIHOP 94
+CONSTANT: ENOLINK 95
+CONSTANT: EPROTO 96
+CONSTANT: ELAST 96
+
+TYPEDEF: __uint8_t sa_family_t
+
+CONSTANT: _UTX_USERSIZE   32
+CONSTANT: _UTX_LINESIZE   32
+CONSTANT: _UTX_IDSIZE     4
+CONSTANT: _UTX_HOSTSIZE   256
+
+CONSTANT: _SS_MAXSIZE 128
+
+: _SS_ALIGNSIZE ( -- n )
+    __int64_t heap-size ; inline
+    
+: _SS_PAD1SIZE ( -- n )
+    _SS_ALIGNSIZE 2 - ; inline
+    
+: _SS_PAD2SIZE ( -- n )
+    _SS_MAXSIZE 2 - _SS_PAD1SIZE - _SS_ALIGNSIZE - ; inline
+
+"unix.ffi.bsd.netbsd.structs" require
