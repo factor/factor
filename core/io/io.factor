@@ -113,7 +113,7 @@ PRIVATE>
     input-stream get swap each-stream-line ; inline
 
 : stream-lines ( stream -- seq )
-    [ [ ] accumulator [ each-stream-line ] dip { } like ] with-disposal ;
+    [ [ ] collector [ each-stream-line ] dip { } like ] with-disposal ;
 
 : lines ( -- seq )
     input-stream get stream-lines ; inline
