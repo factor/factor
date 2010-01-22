@@ -8,7 +8,7 @@ IN: memory
     [ all-instances ] dip filter ; inline
 
 : saving-path ( path -- saving-path path )
-    [ ".saving" append-path ] keep
+    [ ".saving" append ] keep
     [ native-string>alien ] bi@ ;
 
 : save-image ( path -- )

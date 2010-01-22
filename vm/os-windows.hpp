@@ -39,10 +39,10 @@ typedef wchar_t vm_char;
 
 #define OPEN_READ(path) _wfopen((path),L"rb")
 #define OPEN_WRITE(path) _wfopen((path),L"wb")
-#define MOVE_FILE(path1,path2) \
+#define MOVE_FILE(path1,path2)\
 do {\
-	if(MoveFile((path1),(path2)) == 0)\
-		general_error(ERROR_IO,tag_fixnum(GetLastError()),false_object,NULL);\
+	if(MoveFileEx((path1),(path2),MOVEFILE_REPLACE_EXISTING) == false)\
+		std::cout << "MoveFile() failed: error " << GetLastError() << std::endl;\
 } while(0)
 
 /* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
