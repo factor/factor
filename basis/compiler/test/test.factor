@@ -13,7 +13,7 @@ IN: compiler.test
 : compile-call ( quot -- )
     [ dup infer define-temp ] with-compilation-unit execute ;
 
-\ compile-call t "no-compile" set-word-prop
+<< \ compile-call t "no-compile" set-word-prop >>
 
 : compiler-test ( name -- )
     "resource:basis/compiler/tests/" ".factor" surround run-test-file ;
