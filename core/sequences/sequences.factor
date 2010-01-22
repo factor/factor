@@ -603,11 +603,15 @@ ERROR: assert-sequence got expected ;
 : assert-sequence= ( a b -- )
     2dup sequence= [ 2drop ] [ assert-sequence ] if ;
 
+<PRIVATE
+
 : sequence-hashcode-step ( oldhash newpart -- newhash )
     >fixnum swap [
         [ -2 fixnum-shift-fast ] [ 5 fixnum-shift-fast ] bi
         fixnum+fast fixnum+fast
     ] keep fixnum-bitxor ; inline
+
+PRIVATE>
 
 : sequence-hashcode ( n seq -- x )
     [ 0 ] 2dip [ hashcode* sequence-hashcode-step ] with each ; inline
