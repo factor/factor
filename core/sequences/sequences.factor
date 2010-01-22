@@ -403,6 +403,9 @@ PRIVATE>
     [ 2drop f f ]
     if ; inline
 
+: (accumulate) ( seq identity quot -- seq identity quot )
+    [ swap ] dip [ curry keep ] curry ; inline
+
 PRIVATE>
 
 : each ( seq quot -- )
@@ -428,9 +431,6 @@ PRIVATE>
 
 : map! ( seq quot -- seq )
     over [ map-into ] keep ; inline
-
-: (accumulate) ( seq identity quot -- seq identity quot )
-    [ swap ] dip [ curry keep ] curry ; inline
 
 : accumulate-as ( seq identity quot exemplar -- final newseq )
     [ (accumulate) ] dip map-as ; inline
