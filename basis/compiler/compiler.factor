@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces arrays sequences io words fry
 continuations vocabs assocs dlists definitions math graphs generic
@@ -181,14 +181,6 @@ t compile-dependencies? set-global
 : compile-loop ( deque -- )
     [ compile-word yield-hook get call( -- ) ] slurp-deque ;
 
-: decompile ( word -- )
-    dup def>> 2array 1array modify-code-heap ;
-
-: compile-call ( quot -- )
-    [ dup infer define-temp ] with-compilation-unit execute ;
-
-\ compile-call t "no-compile" set-word-prop
-
 SINGLETON: optimizing-compiler
 
 M: optimizing-compiler recompile ( words -- alist )
@@ -220,6 +212,3 @@ M: optimizing-compiler process-forgotten-words
 
 : disable-optimizer ( -- )
     f compiler-impl set-global ;
-
-: recompile-all ( -- )
-    all-words compile ;

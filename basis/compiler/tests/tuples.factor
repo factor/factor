@@ -1,4 +1,4 @@
-USING: kernel tools.test compiler.units compiler ;
+USING: kernel tools.test compiler.units compiler.test ;
 IN: compiler.tests.tuples
 
 TUPLE: color red green blue ;
