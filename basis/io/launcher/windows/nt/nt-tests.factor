@@ -23,6 +23,20 @@ IN: io.launcher.windows.nt.tests
 
 [ f ] [ "notepad" get process-running? ] unit-test
 
+[
+    <process>
+        "notepad" >>command
+        1/2 seconds >>timeout
+    try-process
+] must-fail
+
+[
+    <process>
+        "notepad" >>command
+        1/2 seconds >>timeout
+    try-output-process
+] must-fail
+
 : console-vm ( -- path )
     vm ".exe" ?tail [ ".com" append ] when ;
 
