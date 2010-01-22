@@ -56,10 +56,6 @@ $nl
 
 ABOUT: "compiler"
 
-HELP: decompile
-{ $values { "word" word } }
-{ $description "Removes a word's optimized definition. The word will be compiled with the non-optimizing compiler until recompiled with the optimizing compiler again." } ;
-
 HELP: compile-word
 { $values { "word" word } }
 { $description "Compile a single word." }
