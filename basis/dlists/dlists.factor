@@ -153,7 +153,7 @@ M: dlist clear-deque ( dlist -- )
     '[ obj>> @ ] dlist-each-node ; inline
 
 : dlist>seq ( dlist -- seq )
-    [ ] accumulator [ dlist-each ] dip ;
+    [ ] collector [ dlist-each ] dip ;
 
 : 1dlist ( obj -- dlist ) <dlist> [ push-front ] keep ;
 

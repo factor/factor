@@ -88,7 +88,7 @@ PRIVATE>
     <reversed> nil [ swons ] reduce ;
 
 : lmap>array ( list quot -- array )
-    accumulator [ leach ] dip { } like ; inline
+    collector [ leach ] dip { } like ; inline
 
 : list>array ( list -- array )  
     [ ] lmap>array ;
