@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax unix.time unix.types
-unix.types.netbsd classes.struct ;
+unix.types.netbsd classes.struct unix.ffi ;
 IN: unix
 
 STRUCT: sockaddr_storage
