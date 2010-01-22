@@ -113,7 +113,7 @@ M: object execute-statement* ( statement type -- )
     ] if ; inline recursive
 
 : query-map ( statement quot -- seq )
-    accumulator [ query-each ] dip { } like ; inline
+    collector [ query-each ] dip { } like ; inline
 
 : with-db ( db quot -- )
     [ db-open db-connection ] dip

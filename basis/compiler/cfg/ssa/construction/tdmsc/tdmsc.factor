@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+!r Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-arrays bit-sets fry
 hashtables hints kernel locals math namespaces sequences sets
@@ -86,7 +86,7 @@ SYMBOLS: visited merge-sets levels again? ;
     cfg get reverse-post-order ; inline
 
 : filter-by ( flags seq -- seq' )
-    [ drop ] pusher [ 2each ] dip ;
+    [ drop ] selector [ 2each ] dip ;
 
 HINTS: filter-by { bit-array object } ;
 

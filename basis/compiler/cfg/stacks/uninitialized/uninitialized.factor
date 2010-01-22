@@ -55,7 +55,7 @@ M: insn visit-insn drop ;
     2dup [ length ] bi@ max '[ _ 1 pad-tail ] bi@ [ bitand ] 2map ;
 
 : (uninitialized-locs) ( seq quot -- seq' )
-    [ [ drop 0 = ] pusher [ each-index ] dip ] dip map ; inline
+    [ [ drop 0 = ] selector [ each-index ] dip ] dip map ; inline
 
 PRIVATE>
 
