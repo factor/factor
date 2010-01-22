@@ -494,11 +494,11 @@ SYMBOLS:
         \ ulonglong define-primitive-type
 
         os windows? [
-            \ int c-type \ long typedef
-            \ uint c-type \ ulong typedef
+            \ int c-type \ long define-primitive-type
+            \ uint c-type \ ulong define-primitive-type
         ] [
-            \ longlong c-type \ long typedef
-            \ ulonglong c-type \ ulong typedef
+            \ longlong c-type \ long define-primitive-type
+            \ ulonglong c-type \ ulong define-primitive-type
         ] if
 
         \ longlong c-type \ ptrdiff_t typedef
@@ -529,11 +529,12 @@ SYMBOLS:
             "to_unsigned_8" >>unboxer
         \ ulonglong define-primitive-type
 
-        \ int c-type \ long typedef
+        \ int c-type \ long define-primitive-type
+        \ uint c-type \ ulong define-primitive-type
+
         \ int c-type \ ptrdiff_t typedef
         \ int c-type \ intptr_t typedef
 
-        \ uint c-type \ ulong typedef
         \ uint c-type \ uintptr_t typedef
         \ uint c-type \ size_t typedef
     ] if
