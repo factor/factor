@@ -1,4 +1,4 @@
-!r Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-arrays bit-sets fry
 hashtables hints kernel locals math namespaces sequences sets
