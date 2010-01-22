@@ -1,5 +1,5 @@
 USING: cocoa cocoa.messages cocoa.subclassing cocoa.types
-compiler kernel namespaces cocoa.classes cocoa.runtime
+compiler.test kernel namespaces cocoa.classes cocoa.runtime
 tools.test memory compiler.units math core-graphics.types ;
 FROM: alien.c-types => int void ;
 IN: cocoa.tests
