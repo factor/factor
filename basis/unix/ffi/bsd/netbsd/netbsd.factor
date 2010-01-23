@@ -1,5 +1,5 @@
 USING: alien.syntax alien.c-types math vocabs.loader
-classes.struct unix.types ;
+classes.struct unix.types unix.time ;
 IN: unix.ffi
 
 CONSTANT: FD_SETSIZE 256
@@ -127,6 +127,8 @@ CONSTANT: _UTX_LINESIZE   32
 CONSTANT: _UTX_IDSIZE     4
 CONSTANT: _UTX_HOSTSIZE   256
 
+<<
+
 CONSTANT: _SS_MAXSIZE 128
 
 : _SS_ALIGNSIZE ( -- n )
@@ -137,6 +139,8 @@ CONSTANT: _SS_MAXSIZE 128
     
 : _SS_PAD2SIZE ( -- n )
     _SS_MAXSIZE 2 - _SS_PAD1SIZE - _SS_ALIGNSIZE - ; inline
+
+>>
 
 STRUCT: sockaddr_storage
     { ss_len __uint8_t }
