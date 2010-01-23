@@ -31,12 +31,12 @@ GENERIC: group-struct ( obj -- group/f )
 
 M: integer group-struct ( id -- group/f )
     (group-struct)
-    [ [ unix.ffi:getgrgid_r ] unix-system-call io-error ] keep
+    [ [ unix.ffi:getgrgid_r ] unix-system-call drop ] keep
     check-group-struct ;
 
 M: string group-struct ( string -- group/f )
     (group-struct)
-    [ [ unix.ffi:getgrnam_r ] unix-system-call io-error ] keep
+    [ [ unix.ffi:getgrnam_r ] unix-system-call drop ] keep
     check-group-struct ;
 
 : group-struct>group ( group-struct -- group )
@@ -69,7 +69,7 @@ PRIVATE>
 : (user-groups) ( string -- seq )
     #! first group is -1337, legacy unix code
     -1337 unix.ffi:NGROUPS_MAX [ 4 * <byte-array> ] keep
-    <int> [ [ unix.ffi:getgrouplist ] unix-system-call io-error ] 2keep
+    <int> [ [ unix.ffi:getgrouplist ] unix-system-call drop ] 2keep
     [ 4 tail-slice ] [ *int 1 - ] bi* >groups ;
 
 PRIVATE>
@@ -115,10 +115,10 @@ GENERIC: set-effective-group ( obj -- )
 <PRIVATE
 
 : (set-real-group) ( id -- )
-    [ unix.ffi:setgid ] unix-system-call io-error ; inline
+    [ unix.ffi:setgid ] unix-system-call drop ; inline
 
 : (set-effective-group) ( id -- )
-    [ unix.ffi:setegid ] unix-system-call io-error ; inline
+    [ unix.ffi:setegid ] unix-system-call drop ; inline
 
 PRIVATE>
     

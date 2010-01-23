@@ -77,7 +77,7 @@ M:: object establish-connection ( client-out remote -- )
 : ?bind-client ( socket -- )
     bind-local-address get [
         [ fd>> ] dip make-sockaddr/size
-        [ bind ] unix-system-call io-error
+        [ bind ] unix-system-call drop
     ] [
         drop
     ] if* ; inline
@@ -93,12 +93,12 @@ M: object ((client)) ( addrspec -- fd )
 : server-socket-fd ( addrspec type -- fd )
     [ dup protocol-family ] dip socket-fd
     [ init-server-socket ] keep
-    [ handle-fd swap make-sockaddr/size [ bind ] unix-system-call io-error ] keep ;
+    [ handle-fd swap make-sockaddr/size [ bind ] unix-system-call drop ] keep ;
 
 M: object (server) ( addrspec -- handle )
     [
         SOCK_STREAM server-socket-fd
-        dup handle-fd 128 listen io-error
+        dup handle-fd 128 [ listen ] unix-system-call drop
     ] with-destructors ;
 
 : do-accept ( server addrspec -- fd sockaddr )

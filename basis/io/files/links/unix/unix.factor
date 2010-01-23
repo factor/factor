@@ -5,10 +5,10 @@ sequences system unix unix.ffi ;
 IN: io.files.links.unix
 
 M: unix make-link ( path1 path2 -- )
-    normalize-path [ symlink ] unix-system-call io-error ;
+    normalize-path [ symlink ] unix-system-call drop ;
 
 M: unix make-hard-link ( path1 path2 -- )
-    normalize-path [ link ] unix-system-call io-error ;
+    normalize-path [ link ] unix-system-call drop ;
 
 M: unix read-link ( path -- path' )
     normalize-path read-symbolic-link ;

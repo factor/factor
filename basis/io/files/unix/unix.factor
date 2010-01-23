@@ -34,7 +34,7 @@ M: unix (file-writer) ( path -- stream )
 : open-append ( path -- fd )
     [
         append-flags file-mode open-file |dispose
-        dup 0 SEEK_END [ lseek ] unix-system-call io-error
+        dup 0 SEEK_END [ lseek ] unix-system-call drop
     ] with-destructors ;
 
 M: unix (file-appender) ( path -- stream )
