@@ -93,10 +93,10 @@ GENERIC: set-effective-user ( string/id -- )
 <PRIVATE
 
 : (set-real-user) ( id -- )
-    [ unix.ffi:setuid ] unix-system-call io-error ; inline
+    [ unix.ffi:setuid ] unix-system-call drop ; inline
 
 : (set-effective-user) ( id -- )
-    [ unix.ffi:seteuid ] unix-system-call io-error ; inline
+    [ unix.ffi:seteuid ] unix-system-call drop ; inline
 
 PRIVATE>
 
