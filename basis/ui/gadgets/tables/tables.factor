@@ -319,7 +319,7 @@ PRIVATE>
 
 : row-action ( table -- )
     dup selected-row
-    [ swap [ action>> call( value -- ) ] [ dup hook>> call( table -- ) ] bi ]
+    [ swap [ dup hook>> call( table -- ) ] [ action>> call( value -- ) ] bi ]
     [ 2drop ]
     if ;
 
