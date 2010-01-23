@@ -33,35 +33,35 @@ void factor_vm::io_error()
 
 size_t safe_fread(void *ptr, size_t size, size_t nitems, FILE *stream)
 {
-    size_t items_read = 0;
+	size_t items_read = 0;
 
-    do {
-        items_read += fread((void*)((int*)ptr+items_read*size),size,nitems-items_read,stream);
-    } while(items_read != nitems && errno == EINTR);
+	do {
+		items_read += fread((void*)((int*)ptr+items_read*size),size,nitems-items_read,stream);
+	} while(items_read != nitems && errno == EINTR);
 
-    return items_read;
+	return items_read;
 }
 
 size_t safe_fwrite(void *ptr, size_t size, size_t nitems, FILE *stream)
 {
-    size_t items_written = 0;
+	size_t items_written = 0;
 
-    do {
-        items_written += fwrite((void*)((int*)ptr+items_written*size),size,nitems-items_written,stream);
-    } while(items_written != nitems && errno == EINTR);
+	do {
+		items_written += fwrite((void*)((int*)ptr+items_written*size),size,nitems-items_written,stream);
+	} while(items_written != nitems && errno == EINTR);
 
-    return items_written;
+	return items_written;
 }
 
 int safe_fclose(FILE *stream)
 {
-    int ret = 0;
+	int ret = 0;
 
-    do {
-        ret = fclose(stream);
-    } while(ret != 0 && errno == EINTR);
+	do {
+		ret = fclose(stream);
+	} while(ret != 0 && errno == EINTR);
 
-    return ret;
+	return ret;
 }
 
 void factor_vm::primitive_fopen()

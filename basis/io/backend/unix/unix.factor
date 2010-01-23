@@ -17,8 +17,8 @@ TUPLE: fd < disposable fd ;
 : init-fd ( fd -- fd )
     [
         |dispose
-        dup fd>> F_SETFL O_NONBLOCK [ fcntl ] unix-system-call io-error
-        dup fd>> F_SETFD FD_CLOEXEC [ fcntl ] unix-system-call io-error
+        dup fd>> F_SETFL O_NONBLOCK [ fcntl ] unix-system-call drop
+        dup fd>> F_SETFD FD_CLOEXEC [ fcntl ] unix-system-call drop
     ] with-destructors ;
 
 : <fd> ( n -- fd )
@@ -59,7 +59,7 @@ M: unix seek-handle ( n seek-type handle -- )
         { io:seek-end [ SEEK_END ] }
         [ io:bad-seek-type ]
     } case
-    [ fd>> swap ] dip [ lseek ] unix-system-call io-error ;
+    [ fd>> swap ] dip [ lseek ] unix-system-call drop ;
 
 SYMBOL: +retry+ ! just try the operation again without blocking
 SYMBOL: +input+

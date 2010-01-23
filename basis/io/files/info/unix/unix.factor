@@ -109,7 +109,7 @@ M: unix stat>type ( stat -- type )
 
 : chmod-set-bit ( path mask ? -- )
     [ dup stat-mode ] 2dip
-    [ bitor ] [ unmask ] if [ chmod ] unix-system-call io-error ;
+    [ bitor ] [ unmask ] if [ chmod ] unix-system-call drop ;
 
 GENERIC# file-mode? 1 ( obj mask -- ? )
 
@@ -174,7 +174,7 @@ CONSTANT: ALL-EXECUTE   OCT: 0000111
 : set-other-execute ( path ? -- ) OTHER-EXECUTE swap chmod-set-bit ;
 
 : set-file-permissions ( path n -- )
-    [ normalize-path ] dip [ chmod ] unix-system-call io-error ;
+    [ normalize-path ] dip [ chmod ] unix-system-call drop ;
 
 : file-permissions ( path -- n )
     normalize-path file-info permissions>> ;
@@ -202,7 +202,7 @@ PRIVATE>
 : set-file-times ( path timestamps -- )
     #! set access, write
     [ normalize-path ] dip
-    timestamps>byte-array [ utimes ] unix-system-call io-error ;
+    timestamps>byte-array [ utimes ] unix-system-call drop ;
 
 : set-file-access-time ( path timestamp -- )
     f 2array set-file-times ;
@@ -212,7 +212,7 @@ PRIVATE>
 
 : set-file-ids ( path uid gid -- )
     [ normalize-path ] 2dip [ -1 or ] bi@
-    [ chown ] unix-system-call io-error ;
+    [ chown ] unix-system-call drop ;
 
 GENERIC: set-file-user ( path string/id -- )
 
