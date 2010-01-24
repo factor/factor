@@ -69,7 +69,7 @@ struct relocation_entry {
 		relocation_class rel_class,
 		cell offset)
 	{
-		value = (rel_type << 28) | (rel_class << 24) | offset;
+		value = (u32)((rel_type << 28) | (rel_class << 24) | offset);
 	}
 
 	relocation_type rel_type()

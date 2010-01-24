@@ -82,7 +82,7 @@ void instruction_operand::store_value_2_2(fixnum value)
 void instruction_operand::store_value_masked(fixnum value, cell mask, cell shift)
 {
 	u32 *ptr = (u32 *)(pointer - sizeof(u32));
-	*ptr = ((*ptr & ~mask) | ((value >> shift) & mask));
+	*ptr = (u32)((*ptr & ~mask) | ((value >> shift) & mask));
 }
 
 void instruction_operand::store_value(fixnum absolute_value)
@@ -95,10 +95,10 @@ void instruction_operand::store_value(fixnum absolute_value)
 		*(cell *)(pointer - sizeof(cell)) = absolute_value;
 		break;
 	case RC_ABSOLUTE:
-		*(u32 *)(pointer - sizeof(u32)) = absolute_value;
+		*(u32 *)(pointer - sizeof(u32)) = (u32)absolute_value;
 		break;
 	case RC_RELATIVE:
-		*(s32 *)(pointer - sizeof(s32)) = relative_value;
+		*(s32 *)(pointer - sizeof(s32)) = (s32)relative_value;
 		break;
 	case RC_ABSOLUTE_PPC_2_2:
 		store_value_2_2(absolute_value);
