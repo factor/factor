@@ -86,7 +86,7 @@ SYMBOLS: visited merge-sets levels again? ;
     cfg get reverse-post-order ; inline
 
 : filter-by ( flags seq -- seq' )
-    [ drop ] pusher [ 2each ] dip ;
+    [ drop ] selector [ 2each ] dip ;
 
 HINTS: filter-by { bit-array object } ;
 

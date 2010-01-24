@@ -314,7 +314,7 @@ CONSTANT: pov-values
     } case ;
 
 : fill-mouse-state ( buffer count -- state )
-    [ +mouse-state+ get ] 2dip swap [ nth (fill-mouse-state) ] curry each ;
+    iota [ +mouse-state+ get ] 2dip swap [ nth (fill-mouse-state) ] curry each ;
 
 : get-device-state ( device DIJOYSTATE2 -- )
     [ dup IDirectInputDevice8W::Poll ole32-error ] dip

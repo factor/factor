@@ -1,7 +1,8 @@
-USING: alien.c-types alien.syntax classes.struct unix.types ;
-IN: unix
+USING: alien.syntax alien.c-types math vocabs.loader
+classes.struct unix.types unix.time ;
+IN: unix.ffi
 
-CONSTANT: FD_SETSIZE 1024
+CONSTANT: FD_SETSIZE 256
 
 STRUCT: addrinfo
     { flags int }
@@ -9,8 +10,8 @@ STRUCT: addrinfo
     { socktype int }
     { protocol int }
     { addrlen socklen_t }
-    { addr void* }
     { canonname char* }
+    { addr void* }
     { next addrinfo* } ;
 
 STRUCT: dirent
@@ -102,10 +103,65 @@ CONSTANT: ENOSYS 78
 CONSTANT: EFTYPE 79
 CONSTANT: EAUTH 80
 CONSTANT: ENEEDAUTH 81
-CONSTANT: EIPSEC 82
-CONSTANT: ENOATTR 83
-CONSTANT: EILSEQ 84
-CONSTANT: ENOMEDIUM 85
-CONSTANT: EMEDIUMTYPE 86
-CONSTANT: EOVERFLOW 87
-CONSTANT: ECANCELED 88
+CONSTANT: EIDRM 82
+CONSTANT: ENOMSG 83
+CONSTANT: EOVERFLOW 84
+CONSTANT: EILSEQ 85
+CONSTANT: ENOTSUP 86
+CONSTANT: ECANCELED 87
+CONSTANT: EBADMSG 88
+CONSTANT: ENODATA 89
+CONSTANT: ENOSR 90
+CONSTANT: ENOSTR 91
+CONSTANT: ETIME 92
+CONSTANT: ENOATTR 93
+CONSTANT: EMULTIHOP 94
+CONSTANT: ENOLINK 95
+CONSTANT: EPROTO 96
+CONSTANT: ELAST 96
+
+TYPEDEF: __uint8_t sa_family_t
+
+CONSTANT: _UTX_USERSIZE   32
+CONSTANT: _UTX_LINESIZE   32
+CONSTANT: _UTX_IDSIZE     4
+CONSTANT: _UTX_HOSTSIZE   256
+
+<<
+
+CONSTANT: _SS_MAXSIZE 128
+
+: _SS_ALIGNSIZE ( -- n )
+    __int64_t heap-size ; inline
+    
+: _SS_PAD1SIZE ( -- n )
+    _SS_ALIGNSIZE 2 - ; inline
+    
+: _SS_PAD2SIZE ( -- n )
+    _SS_MAXSIZE 2 - _SS_PAD1SIZE - _SS_ALIGNSIZE - ; inline
+
+>>
+
+STRUCT: sockaddr_storage
+    { ss_len __uint8_t }
+    { ss_family sa_family_t }
+    { __ss_pad1 { char _SS_PAD1SIZE } }
+    { __ss_align __int64_t }
+    { __ss_pad2 { char _SS_PAD2SIZE } } ;
+
+STRUCT: exit_struct
+    { e_termination uint16_t }
+    { e_exit uint16_t } ;
+
+STRUCT: utmpx
+    { ut_user { char _UTX_USERSIZE } }
+    { ut_id   { char _UTX_IDSIZE   } }
+    { ut_line { char _UTX_LINESIZE } }
+    { ut_host { char _UTX_HOSTSIZE } }
+    { ut_session uint16_t }
+    { ut_type uint16_t }
+    { ut_pid pid_t }
+    { ut_exit exit_struct }
+    { ut_ss sockaddr_storage }
+    { ut_tv timeval }
+    { ut_pad { uint32_t 10 } } ;

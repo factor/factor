@@ -1,4 +1,4 @@
-USING: accessors arrays classes compiler compiler.tree.debugger
+USING: accessors arrays classes compiler.test compiler.tree.debugger
 effects fry io kernel kernel.private math math.functions
 math.private math.vectors math.vectors.simd
 math.vectors.simd.private prettyprint random sequences system

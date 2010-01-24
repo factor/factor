@@ -1,8 +1,7 @@
-USING: alien.syntax alien.c-types math vocabs.loader
-classes.struct unix.types ;
-IN: unix
+USING: alien.c-types alien.syntax classes.struct unix.types ;
+IN: unix.ffi
 
-CONSTANT: FD_SETSIZE 256
+CONSTANT: FD_SETSIZE 1024
 
 STRUCT: addrinfo
     { flags int }
@@ -10,8 +9,8 @@ STRUCT: addrinfo
     { socktype int }
     { protocol int }
     { addrlen socklen_t }
-    { canonname char* }
     { addr void* }
+    { canonname char* }
     { next addrinfo* } ;
 
 STRUCT: dirent
@@ -103,39 +102,10 @@ CONSTANT: ENOSYS 78
 CONSTANT: EFTYPE 79
 CONSTANT: EAUTH 80
 CONSTANT: ENEEDAUTH 81
-CONSTANT: EIDRM 82
-CONSTANT: ENOMSG 83
-CONSTANT: EOVERFLOW 84
-CONSTANT: EILSEQ 85
-CONSTANT: ENOTSUP 86
-CONSTANT: ECANCELED 87
-CONSTANT: EBADMSG 88
-CONSTANT: ENODATA 89
-CONSTANT: ENOSR 90
-CONSTANT: ENOSTR 91
-CONSTANT: ETIME 92
-CONSTANT: ENOATTR 93
-CONSTANT: EMULTIHOP 94
-CONSTANT: ENOLINK 95
-CONSTANT: EPROTO 96
-CONSTANT: ELAST 96
-
-TYPEDEF: __uint8_t sa_family_t
-
-CONSTANT: _UTX_USERSIZE   32
-CONSTANT: _UTX_LINESIZE   32
-CONSTANT: _UTX_IDSIZE     4
-CONSTANT: _UTX_HOSTSIZE   256
-
-CONSTANT: _SS_MAXSIZE 128
-
-: _SS_ALIGNSIZE ( -- n )
-    __int64_t heap-size ; inline
-    
-: _SS_PAD1SIZE ( -- n )
-    _SS_ALIGNSIZE 2 - ; inline
-    
-: _SS_PAD2SIZE ( -- n )
-    _SS_MAXSIZE 2 - _SS_PAD1SIZE - _SS_ALIGNSIZE - ; inline
-
-"unix.bsd.netbsd.structs" require
+CONSTANT: EIPSEC 82
+CONSTANT: ENOATTR 83
+CONSTANT: EILSEQ 84
+CONSTANT: ENOMEDIUM 85
+CONSTANT: EMEDIUMTYPE 86
+CONSTANT: EOVERFLOW 87
+CONSTANT: ECANCELED 88
