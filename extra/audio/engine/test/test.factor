@@ -14,12 +14,14 @@ M: noise-generator generate-audio
     drop
     4096 [ -4096 4096 [a,b] random ] short-array{ } replicate-as
     8192 ;
+M: noise-generator dispose
+    drop ;
 
 :: audio-engine-test ( -- )
     "vocab:audio/engine/test/loop.aiff" read-audio :> loop-sound
     "vocab:audio/engine/test/once.wav" read-audio :> once-sound
     0 :> i!
-    <standard-audio-engine> :> engine
+    f 4 <audio-engine> :> engine
     engine start-audio*
 
     engine T{ audio-source f {  1.0 0.0 0.0 } 1.0 { 0.0 0.0 0.0 } f } loop-sound t
