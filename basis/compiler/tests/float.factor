@@ -1,5 +1,6 @@
-USING: compiler.units compiler kernel kernel.private memory math
-math.private tools.test math.floats.private math.order fry ;
+USING: compiler.units compiler.test kernel kernel.private memory
+math math.private tools.test math.floats.private math.order fry
+;
 IN: compiler.tests.float
 
 [ 5.0 ] [ [ 5.0 ] compile-call gc gc gc ] unit-test

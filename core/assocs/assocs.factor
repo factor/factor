@@ -58,7 +58,7 @@ PRIVATE>
     (assoc-each) each ; inline
 
 : assoc>map ( assoc quot exemplar -- seq )
-    [ accumulator [ assoc-each ] dip ] dip like ; inline
+    [ collector [ assoc-each ] dip ] dip like ; inline
 
 : assoc-map-as ( assoc quot exemplar -- newassoc )
     [ [ 2array ] compose V{ } assoc>map ] dip assoc-like ; inline

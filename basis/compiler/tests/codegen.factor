@@ -1,4 +1,4 @@
-USING: generalizations accessors arrays compiler kernel
+USING: generalizations accessors arrays compiler.test kernel
 kernel.private math hashtables.private math.private namespaces
 sequences tools.test namespaces.private slots.private
 sequences.private byte-arrays alien alien.accessors layouts

@@ -64,17 +64,17 @@ PRIVATE>
     setup-traversal iterate-directory-entries drop ; inline
 
 : recursive-directory-files ( path bfs? -- paths )
-    [ ] accumulator [ each-file ] dip ; inline
+    [ ] collector [ each-file ] dip ; inline
 
 : recursive-directory-entries ( path bfs? -- directory-entries )
-    [ ] accumulator [ each-directory-entry ] dip ; inline
+    [ ] collector [ each-directory-entry ] dip ; inline
 
 : find-file ( path bfs? quot -- path/f )
     [ <directory-iterator> ] dip
     [ keep and ] curry iterate-directory ; inline
 
 : find-all-files ( path quot -- paths/f )
-    [ f <directory-iterator> ] dip pusher
+    [ f <directory-iterator> ] dip selector
     [ [ f ] compose iterate-directory drop ] dip ; inline
 
 ERROR: file-not-found path bfs? quot ;

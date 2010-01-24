@@ -348,52 +348,6 @@ SYMBOLS:
         "alien_offset" >>unboxer
     \ void* define-primitive-type
 
-    <long-long-type>
-        integer >>class
-        integer >>boxed-class
-        [ alien-signed-8 ] >>getter
-        [ set-alien-signed-8 ] >>setter
-        8 >>size
-        8-byte-alignment
-        "from_signed_8" >>boxer
-        "to_signed_8" >>unboxer
-    \ longlong define-primitive-type
-
-    <long-long-type>
-        integer >>class
-        integer >>boxed-class
-        [ alien-unsigned-8 ] >>getter
-        [ set-alien-unsigned-8 ] >>setter
-        8 >>size
-        8-byte-alignment
-        "from_unsigned_8" >>boxer
-        "to_unsigned_8" >>unboxer
-    \ ulonglong define-primitive-type
-
-    <c-type>
-        integer >>class
-        integer >>boxed-class
-        [ alien-signed-cell ] >>getter
-        [ set-alien-signed-cell ] >>setter
-        bootstrap-cell >>size
-        bootstrap-cell >>align
-        bootstrap-cell >>align-first
-        "from_signed_cell" >>boxer
-        "to_fixnum" >>unboxer
-    \ long define-primitive-type
-
-    <c-type>
-        integer >>class
-        integer >>boxed-class
-        [ alien-unsigned-cell ] >>getter
-        [ set-alien-unsigned-cell ] >>setter
-        bootstrap-cell >>size
-        bootstrap-cell >>align
-        bootstrap-cell >>align-first
-        "from_unsigned_cell" >>boxer
-        "to_cell" >>unboxer
-    \ ulong define-primitive-type
-
     <c-type>
         integer >>class
         integer >>boxed-class
@@ -514,16 +468,75 @@ SYMBOLS:
         [ >float ] >>unboxer-quot
     \ double define-primitive-type
 
-    cpu x86.64? os windows? and [
+    cell 8 = [
+        <c-type>
+            integer >>class
+            integer >>boxed-class
+            [ alien-signed-cell ] >>getter
+            [ set-alien-signed-cell ] >>setter
+            bootstrap-cell >>size
+            bootstrap-cell >>align
+            bootstrap-cell >>align-first
+            "from_signed_cell" >>boxer
+            "to_fixnum" >>unboxer
+        \ longlong define-primitive-type
+
+        <c-type>
+            integer >>class
+            integer >>boxed-class
+            [ alien-unsigned-cell ] >>getter
+            [ set-alien-unsigned-cell ] >>setter
+            bootstrap-cell >>size
+            bootstrap-cell >>align
+            bootstrap-cell >>align-first
+            "from_unsigned_cell" >>boxer
+            "to_cell" >>unboxer
+        \ ulonglong define-primitive-type
+
+        os windows? [
+            \ int c-type \ long define-primitive-type
+            \ uint c-type \ ulong define-primitive-type
+        ] [
+            \ longlong c-type \ long define-primitive-type
+            \ ulonglong c-type \ ulong define-primitive-type
+        ] if
+
         \ longlong c-type \ ptrdiff_t typedef
         \ longlong c-type \ intptr_t typedef
+
         \ ulonglong c-type \ uintptr_t typedef
         \ ulonglong c-type \ size_t typedef
     ] [
-        \ long c-type \ ptrdiff_t typedef
-        \ long c-type \ intptr_t typedef
-        \ ulong c-type \ uintptr_t typedef
-        \ ulong c-type \ size_t typedef
+        <long-long-type>
+            integer >>class
+            integer >>boxed-class
+            [ alien-signed-8 ] >>getter
+            [ set-alien-signed-8 ] >>setter
+            8 >>size
+            8-byte-alignment
+            "from_signed_8" >>boxer
+            "to_signed_8" >>unboxer
+        \ longlong define-primitive-type
+
+        <long-long-type>
+            integer >>class
+            integer >>boxed-class
+            [ alien-unsigned-8 ] >>getter
+            [ set-alien-unsigned-8 ] >>setter
+            8 >>size
+            8-byte-alignment
+            "from_unsigned_8" >>boxer
+            "to_unsigned_8" >>unboxer
+        \ ulonglong define-primitive-type
+
+        \ int c-type \ long define-primitive-type
+        \ uint c-type \ ulong define-primitive-type
+
+        \ int c-type \ ptrdiff_t typedef
+        \ int c-type \ intptr_t typedef
+
+        \ uint c-type \ uintptr_t typedef
+        \ uint c-type \ size_t typedef
     ] if
 ] with-compilation-unit
 

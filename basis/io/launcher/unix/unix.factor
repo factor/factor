@@ -5,7 +5,7 @@ continuations environment io io.backend io.backend.unix
 io.files io.files.private io.files.unix io.launcher
 io.launcher.unix.parser io.pathnames io.ports kernel math
 namespaces sequences strings system threads unix
-unix.process ;
+unix.process unix.ffi ;
 IN: io.launcher.unix
 
 : get-arguments ( process -- seq )

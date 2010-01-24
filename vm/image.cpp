@@ -22,7 +22,7 @@ void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 		p->aging_size,
 		p->tenured_size);
 
-	fixnum bytes_read = fread((void*)data->tenured->start,1,h->data_size,file);
+	fixnum bytes_read = safe_fread((void*)data->tenured->start,1,h->data_size,file);
 
 	if((cell)bytes_read != h->data_size)
 	{
@@ -43,7 +43,7 @@ void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 
 	if(h->code_size != 0)
 	{
-		size_t bytes_read = fread(code->allocator->first_block(),1,h->code_size,file);
+		size_t bytes_read = safe_fread(code->allocator->first_block(),1,h->code_size,file);
 		if(bytes_read != h->code_size)
 		{
 			std::cout << "truncated image: " << bytes_read << " bytes read, ";
@@ -241,7 +241,7 @@ void factor_vm::load_image(vm_parameters *p)
 	}
 
 	image_header h;
-	if(fread(&h,sizeof(image_header),1,file) != 1)
+	if(safe_fread(&h,sizeof(image_header),1,file) != 1)
 		fatal_error("Cannot read image header",0);
 
 	if(h.magic != image_magic)
@@ -253,7 +253,7 @@ void factor_vm::load_image(vm_parameters *p)
 	load_data_heap(file,&h,p);
 	load_code_heap(file,&h,p);
 
-	fclose(file);
+	safe_fclose(file);
 
 	init_objects(&h);
 
@@ -268,15 +268,15 @@ void factor_vm::load_image(vm_parameters *p)
 }
 
 /* Save the current image to disk */
-bool factor_vm::save_image(const vm_char *filename)
+bool factor_vm::save_image(const vm_char *saving_filename, const vm_char *filename)
 {
 	FILE* file;
 	image_header h;
 
-	file = OPEN_WRITE(filename);
+	file = OPEN_WRITE(saving_filename);
 	if(file == NULL)
 	{
-		std::cout << "Cannot open image file: " << filename << std::endl;
+		std::cout << "Cannot open image file: " << saving_filename << std::endl;
 		std::cout << strerror(errno) << std::endl;
 		return false;
 	}
@@ -298,13 +298,15 @@ bool factor_vm::save_image(const vm_char *filename)
 
 	bool ok = true;
 
-	if(fwrite(&h,sizeof(image_header),1,file) != 1) ok = false;
-	if(fwrite((void*)data->tenured->start,h.data_size,1,file) != 1) ok = false;
-	if(fwrite(code->allocator->first_block(),h.code_size,1,file) != 1) ok = false;
-	if(fclose(file)) ok = false;
+	if(safe_fwrite(&h,sizeof(image_header),1,file) != 1) ok = false;
+	if(safe_fwrite((void*)data->tenured->start,h.data_size,1,file) != 1) ok = false;
+	if(safe_fwrite(code->allocator->first_block(),h.code_size,1,file) != 1) ok = false;
+	if(safe_fclose(file)) ok = false;
 
 	if(!ok)
 		std::cout << "save-image failed: " << strerror(errno) << std::endl;
+	else
+		MOVE_FILE(saving_filename,filename); 
 
 	return ok;
 }
@@ -314,9 +316,11 @@ void factor_vm::primitive_save_image()
 	/* do a full GC to push everything into tenured space */
 	primitive_compact_gc();
 
-	data_root<byte_array> path(ctx->pop(),this);
-	path.untag_check(this);
-	save_image((vm_char *)(path.untagged() + 1));
+	data_root<byte_array> path2(ctx->pop(),this);
+	path2.untag_check(this);
+	data_root<byte_array> path1(ctx->pop(),this);
+	path1.untag_check(this);
+	save_image((vm_char *)(path1.untagged() + 1 ),(vm_char *)(path2.untagged() + 1));
 }
 
 void factor_vm::primitive_save_image_and_exit()
@@ -324,8 +328,10 @@ void factor_vm::primitive_save_image_and_exit()
 	/* We unbox this before doing anything else. This is the only point
 	where we might throw an error, so we have to throw an error here since
 	later steps destroy the current image. */
-	data_root<byte_array> path(ctx->pop(),this);
-	path.untag_check(this);
+	data_root<byte_array> path2(ctx->pop(),this);
+	path2.untag_check(this);
+	data_root<byte_array> path1(ctx->pop(),this);
+	path1.untag_check(this);
 
 	/* strip out special_objects data which is set on startup anyway */
 	for(cell i = 0; i < special_object_count; i++)
@@ -336,7 +342,7 @@ void factor_vm::primitive_save_image_and_exit()
 		false /* discard objects only reachable from stacks */);
 
 	/* Save the image */
-	if(save_image((vm_char *)(path.untagged() + 1)))
+	if(save_image((vm_char *)(path1.untagged() + 1), (vm_char *)(path2.untagged() + 1)))
 		exit(0);
 	else
 		exit(1);

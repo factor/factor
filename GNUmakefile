@@ -213,6 +213,8 @@ endif
 clean:
 	rm -f vm/*.o
 	rm -f factor.dll
+	rm -f factor.lib
+	rm -f factor.dll.lib
 	rm -f libfactor.*
 	rm -f libfactor-ffi-test.*
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib

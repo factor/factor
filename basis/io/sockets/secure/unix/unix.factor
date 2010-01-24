@@ -6,7 +6,8 @@ alien.strings libc continuations destructors openssl
 openssl.libcrypto openssl.libssl io io.files io.ports
 io.backend.unix io.sockets.unix io.encodings.ascii io.buffers
 io.sockets io.sockets.private io.sockets.secure
-io.sockets.secure.openssl io.timeouts system summary fry ;
+io.sockets.secure.openssl io.timeouts system summary fry
+unix.ffi ;
 FROM: io.ports => shutdown ;
 IN: io.sockets.secure.unix
 

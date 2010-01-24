@@ -1,6 +1,6 @@
 USING: alien.c-types alien.syntax classes.struct windows.com
 windows.com.syntax windows.directx.d3d10
-windows.directx.d3d10misc windows.types ;
+windows.directx.d3d10misc windows.types windows.directx.d3dx10math ;
 IN: windows.directx.d3dx10mesh
 
 LIBRARY: d3dx10

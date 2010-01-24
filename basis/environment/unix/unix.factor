@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.data alien.strings
 alien.syntax kernel layouts sequences system unix
 environment io.encodings.utf8 unix.utilities vocabs.loader
-combinators alien.accessors ;
+combinators alien.accessors unix.ffi ;
 IN: environment.unix
 
 HOOK: environ os ( -- void* )
