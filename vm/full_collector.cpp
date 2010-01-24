@@ -51,7 +51,7 @@ void factor_vm::update_code_roots_for_sweep()
 	for(; iter < end; iter++)
 	{
 		code_root *root = *iter;
-		code_block *block = (code_block *)(root->value & -data_alignment);
+		code_block *block = (code_block *)(root->value & (~data_alignment - 1));
 		if(root->valid && !state->marked_p(block))
 			root->valid = false;
 	}

@@ -149,7 +149,7 @@ struct factor_vm
 	void not_implemented_error();
 	bool in_page(cell fault, cell area, cell area_size, int offset);
 	void memory_protection_error(cell addr, stack_frame *native_stack);
-	void signal_error(int signal, stack_frame *native_stack);
+	void signal_error(cell signal, stack_frame *native_stack);
 	void divide_by_zero_error();
 	void fp_trap_error(unsigned int fpu_status, stack_frame *signal_callstack_top);
 	void primitive_call_clear();
@@ -509,7 +509,6 @@ struct factor_vm
 	cell compute_entry_point_pic_tail_address(cell w_);
 	cell code_block_owner(code_block *compiled);
 	void update_word_references(code_block *compiled);
-	void check_code_address(cell address);
 	void undefined_symbol();
 	cell compute_dlsym_address(array *literals, cell index);
 	cell compute_vm_address(cell arg);
@@ -524,7 +523,7 @@ struct factor_vm
 	inline void check_code_pointer(cell ptr)
 	{
 	#ifdef FACTOR_DEBUG
-		assert(in_code_heap_p(ptr));
+		//assert(in_code_heap_p(ptr));
 	#endif
 	}
 

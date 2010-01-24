@@ -1,4 +1,8 @@
-#include <stdbool.h>
+#ifdef _MSC_VER
+	#define WINDOWS
+#else
+	#include <stdbool.h>
+#endif
 
 #if defined(i386) || defined(__i386) || defined(__i386__) || defined(WIN32)
 	#define F_STDCALL __attribute__((stdcall))

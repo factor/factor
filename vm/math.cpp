@@ -203,7 +203,7 @@ void factor_vm::primitive_bignum_not()
 
 void factor_vm::primitive_bignum_bitp()
 {
-	fixnum bit = to_fixnum(ctx->pop());
+	int bit = (int)to_fixnum(ctx->pop());
 	bignum *x = untag<bignum>(ctx->pop());
 	ctx->push(tag_boolean(bignum_logbitp(bit,x)));
 }
@@ -226,7 +226,7 @@ unsigned int bignum_producer(unsigned int digit, factor_vm *parent)
 
 void factor_vm::primitive_byte_array_to_bignum()
 {
-	cell n_digits = array_capacity(untag_check<byte_array>(ctx->peek()));
+	unsigned int n_digits = (unsigned int)array_capacity(untag_check<byte_array>(ctx->peek()));
 	bignum * result = digit_stream_to_bignum(n_digits,factor::bignum_producer,0x100,0);
 	ctx->replace(tag<bignum>(result));
 }
@@ -352,7 +352,7 @@ void factor_vm::primitive_float_bits()
 
 void factor_vm::primitive_bits_float()
 {
-	ctx->push(allot_float(bits_float(to_cell(ctx->pop()))));
+	ctx->push(allot_float(bits_float((u32)to_cell(ctx->pop()))));
 }
 
 void factor_vm::primitive_double_bits()
