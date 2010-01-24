@@ -403,6 +403,9 @@ PRIVATE>
     [ 2drop f f ]
     if ; inline
 
+: (accumulate) ( seq identity quot -- seq identity quot )
+    [ swap ] dip [ curry keep ] curry ; inline
+
 PRIVATE>
 
 : each ( seq quot -- )
@@ -428,9 +431,6 @@ PRIVATE>
 
 : map! ( seq quot -- seq )
     over [ map-into ] keep ; inline
-
-: (accumulate) ( seq identity quot -- seq identity quot )
-    [ swap ] dip [ curry keep ] curry ; inline
 
 : accumulate-as ( seq identity quot exemplar -- final newseq )
     [ (accumulate) ] dip map-as ; inline
@@ -486,14 +486,14 @@ PRIVATE>
 : push-if ( elt quot accum -- )
     [ keep ] dip rot [ push ] [ 2drop ] if ; inline
 
-: pusher-for ( quot exemplar -- quot accum )
+: selector-for ( quot exemplar -- quot accum )
     [ length ] keep new-resizable [ [ push-if ] 2curry ] keep ; inline
 
-: pusher ( quot -- quot accum )
-    V{ } pusher-for ; inline
+: selector ( quot -- quot accum )
+    V{ } selector-for ; inline
 
 : filter-as ( seq quot exemplar -- subseq )
-    dup [ pusher-for [ each ] dip ] curry dip like ; inline
+    dup [ selector-for [ each ] dip ] curry dip like ; inline
 
 : filter ( seq quot -- subseq )
     over filter-as ; inline
@@ -501,20 +501,20 @@ PRIVATE>
 : push-either ( elt quot accum1 accum2 -- )
     [ keep swap ] 2dip ? push ; inline
 
-: 2pusher ( quot -- quot accum1 accum2 )
+: 2selector ( quot -- quot accum1 accum2 )
     V{ } clone V{ } clone [ [ push-either ] 3curry ] 2keep ; inline
 
 : partition ( seq quot -- trueseq falseseq )
-    over [ 2pusher [ each ] 2dip ] dip [ like ] curry bi@ ; inline
+    over [ 2selector [ each ] 2dip ] dip [ like ] curry bi@ ; inline
 
-: accumulator-for ( quot exemplar -- quot' vec )
+: collector-for ( quot exemplar -- quot' vec )
     [ length ] keep new-resizable [ [ push ] curry compose ] keep ; inline
 
-: accumulator ( quot -- quot' vec )
-    V{ } accumulator-for ; inline
+: collector ( quot -- quot' vec )
+    V{ } collector-for ; inline
 
 : produce-as ( pred quot exemplar -- seq )
-    dup [ accumulator-for [ while ] dip ] curry dip like ; inline
+    dup [ collector-for [ while ] dip ] curry dip like ; inline
 
 : produce ( pred quot -- seq )
     { } produce-as ; inline
@@ -603,11 +603,15 @@ ERROR: assert-sequence got expected ;
 : assert-sequence= ( a b -- )
     2dup sequence= [ 2drop ] [ assert-sequence ] if ;
 
+<PRIVATE
+
 : sequence-hashcode-step ( oldhash newpart -- newhash )
     >fixnum swap [
         [ -2 fixnum-shift-fast ] [ 5 fixnum-shift-fast ] bi
         fixnum+fast fixnum+fast
     ] keep fixnum-bitxor ; inline
+
+PRIVATE>
 
 : sequence-hashcode ( n seq -- x )
     [ 0 ] 2dip [ hashcode* sequence-hashcode-step ] with each ; inline

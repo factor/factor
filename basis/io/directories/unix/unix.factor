@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.strings combinators
 continuations destructors fry io io.backend io.backend.unix
 io.directories io.encodings.binary io.encodings.utf8 io.files
 io.pathnames io.files.types kernel math.bitwise sequences system
-unix unix.stat vocabs.loader classes.struct ;
+unix unix.stat vocabs.loader classes.struct unix.ffi ;
 IN: io.directories.unix
 
 : touch-mode ( -- n )
@@ -17,15 +17,15 @@ M: unix touch-file ( path -- )
     ] if ;
 
 M: unix move-file ( from to -- )
-    [ normalize-path ] bi@ rename io-error ;
+    [ normalize-path ] bi@ [ rename ] unix-system-call drop ;
 
 M: unix delete-file ( path -- ) normalize-path unlink-file ;
 
 M: unix make-directory ( path -- )
-    normalize-path OCT: 777 mkdir io-error ;
+    normalize-path OCT: 777 [ mkdir ] unix-system-call drop ;
 
 M: unix delete-directory ( path -- )
-    normalize-path rmdir io-error ;
+    normalize-path [ rmdir ] unix-system-call drop ;
 
 M: unix copy-file ( from to -- )
     [ normalize-path ] bi@ call-next-method ;
