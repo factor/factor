@@ -56,7 +56,7 @@ M: audio-listener audio-gain gain>> ; inline
 M: audio-listener audio-velocity velocity>> ; inline
 M: audio-listener audio-orientation orientation>> ; inline
 
-GENERIC# generate-audio 1 ( generator buffer-size -- c-ptr size )
+GENERIC: generate-audio ( generator -- c-ptr size )
 GENERIC: generator-audio-format ( generator -- channels sample-bits sample-rate )
 
 TUPLE: audio-engine < disposable
@@ -79,7 +79,6 @@ TUPLE: static-audio-clip < audio-clip
 
 TUPLE: streaming-audio-clip < audio-clip
     generator
-    { buffer-size integer }
     { channels integer }
     { sample-bits integer }
     { sample-rate integer }
@@ -151,8 +150,7 @@ ERROR: audio-context-not-available device-name ;
 :: queue-clip-buffer ( audio-clip al-buffer -- )
     audio-clip al-source>> :> al-source
     audio-clip generator>> :> generator
-    audio-clip buffer-size>> :> buffer-size
-    generator buffer-size generate-audio :> ( data size )
+    generator generate-audio :> ( data size )
 
     data [
         al-buffer audio-clip openal-format data size audio-clip sample-rate>> alBufferData
@@ -267,7 +265,7 @@ M: audio-engine dispose*
         clip
     ] [ f ] if ;
 
-:: <streaming-audio-clip> ( audio-engine source generator buffer-size buffer-count -- audio-clip/f )
+:: <streaming-audio-clip> ( audio-engine source generator buffer-count -- audio-clip/f )
     audio-engine get-available-source :> al-source
 
     al-source [
@@ -279,7 +277,6 @@ M: audio-engine dispose*
             source >>source
             al-source >>al-source
             generator >>generator
-            buffer-size >>buffer-size
             channels >>channels
             sample-bits >>sample-bits
             sample-rate >>sample-rate
@@ -313,7 +310,7 @@ M: streaming-audio-clip dispose*
 : play-static-audio-clip ( audio-engine source audio loop? -- audio-clip/f )
     <static-audio-clip> dup [ play-clip ] when* ;
 
-: play-streaming-audio-clip ( audio-engine source generator buffer-size buffer-count -- audio-clip/f ) 
+: play-streaming-audio-clip ( audio-engine source generator buffer-count -- audio-clip/f ) 
     <streaming-audio-clip> dup [ play-clip ] when* ;
 
 : pause-clip ( audio-clip -- )
