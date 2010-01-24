@@ -5,7 +5,7 @@ namespace factor
 
 void factor_vm::primitive_exit()
 {
-	exit(to_fixnum(ctx->pop()));
+	exit((int)to_fixnum(ctx->pop()));
 }
 
 void factor_vm::primitive_system_micros()

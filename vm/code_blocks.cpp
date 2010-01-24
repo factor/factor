@@ -129,13 +129,6 @@ void factor_vm::update_word_references(code_block *compiled)
 	}
 }
 
-void factor_vm::check_code_address(cell address)
-{
-#ifdef FACTOR_DEBUG
-	assert(address >= code->seg->start && address < code->seg->end);
-#endif
-}
-
 /* References to undefined symbols are patched up to call this function on
 image load */
 void factor_vm::undefined_symbol()

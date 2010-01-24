@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math namespaces make sequences
-system layouts alien alien.c-types alien.accessors slots
-splitting assocs combinators locals compiler.constants
+system layouts alien alien.c-types alien.accessors alien.libraries
+slots splitting assocs combinators locals compiler.constants
 compiler.codegen compiler.codegen.fixup
 compiler.cfg.instructions compiler.cfg.builder
 compiler.cfg.intrinsics compiler.cfg.stack-frame
@@ -118,9 +118,6 @@ M:: x86.64 %unbox ( n rep func -- )
     ! this is the end of alien-callback
     n [ n rep reg-class-of return-reg rep %save-param-reg ] when ;
 
-M: x86.64 %unbox-long-long ( n func -- )
-    [ int-rep ] dip %unbox ;
-
 : %unbox-struct-field ( c-type i -- )
     ! Alien must be in param-reg-0.
     R11 swap cells [+] swap rep>> reg-class-of {
@@ -163,11 +160,10 @@ M:: x86.64 %box ( n rep func -- )
     ] [
         rep load-return-value
     ] if
-    rep int-rep? [ param-reg-1 ] [ param-reg-0 ] if %mov-vm-ptr
+    rep int-rep?
+    cpu x86.64? os windows? and or
+    param-reg-1 param-reg-0 ? %mov-vm-ptr
     func f %alien-invoke ;
-
-M: x86.64 %box-long-long ( n func -- )
-    [ int-rep ] dip %box ;
 
 : box-struct-field@ ( i -- operand ) 1 + cells param@ ;
 
@@ -258,7 +254,7 @@ M: x86.64 %callback-value ( ctype -- )
 
 M:: x86.64 %unary-float-function ( dst src func -- )
     0 src float-function-param
-    func f %alien-invoke
+    func "libm" load-library %alien-invoke
     dst float-function-return ;
 
 M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
@@ -266,7 +262,7 @@ M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
     ! src2 is always a spill slot
     0 src1 float-function-param
     1 src2 float-function-param
-    func f %alien-invoke
+    func "libm" load-library %alien-invoke
     dst float-function-return ;
 
 M:: x86.64 %call-gc ( gc-root-count temp -- )
