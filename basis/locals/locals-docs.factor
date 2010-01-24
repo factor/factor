@@ -209,7 +209,7 @@ $nl
 ARTICLE: "locals-mutable" "Mutable lexical variables"
 "When a lexical variable is bound using " { $link POSTPONE: :> } ", " { $link POSTPONE: :: } ", or " { $link POSTPONE: [| } ", the variable may be made mutable by suffixing its name with an exclamation point (" { $snippet "!" } "). A mutable variable's value is read by giving its name without the exclamation point as usual. To write to the variable, use its name with the " { $snippet "!" } " suffix."
 $nl
-"Mutable bindings are implemented in a manner similar to the ML language; each mutable binding is actually an immutable binding of a mutable cell. Reading the binding automatically unboxes the value from the cell, and writing to the binding stores into it."
+"Mutable bindings are implemented in a manner similar to that taken by the ML language. Each mutable binding is actually an immutable binding of a mutable cell. Reading the binding automatically unboxes the value from the cell, and writing to the binding stores into it."
 $nl
 "Writing to mutable variables from outer lexical scopes is fully supported and has full closure semantics. See " { $link "locals-examples" } " for examples of mutable lexical variables in action." ;
 
