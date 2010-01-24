@@ -120,19 +120,16 @@ ERROR: bad-ipv6-component obj ;
 
 ERROR: bad-ipv4-embedded-prefix obj ;
 
-: ensure-zero-prefix ( seq -- seq )
-    dup [ hex> ] map
-    [ { f 0 } swap member? ] all? [ bad-ipv4-embedded-prefix ] unless ;
+: parse-ipv6-component ( seq -- seq' )
+    [ dup hex> [ nip ] [ bad-ipv6-component ] if* ] { } map-as ;
 
 : parse-inet6 ( string -- seq )
     [ f ] [
         ":" split CHAR: . over last member? [
             unclip-last
-            [ ensure-zero-prefix drop ] [ parse-inet4 ] bi*
+            [ parse-ipv6-component ] [ parse-inet4 ] bi* append
         ] [
-            [
-                dup hex> [ nip ] [ bad-ipv6-component ] if*
-            ] { } map-as
+            parse-ipv6-component
         ] if
     ] if-empty ;
 
