@@ -285,7 +285,7 @@ M: audio-engine dispose*
         al-buffers [ clip swap queue-clip-buffer ] each
         clip audio-engine clips>> push
         clip
-    ] [ f ] if ;
+    ] [ generator dispose f ] if ;
 
 M: audio-clip dispose*
     [ dup audio-engine>> clips>> remove! drop ]
@@ -297,7 +297,8 @@ M: static-audio-clip dispose*
 
 M: streaming-audio-clip dispose*
     [ call-next-method ]
-    [ al-buffers>> [ length ] keep alDeleteBuffers ] bi ;
+    [ generator>> dispose ]
+    [ al-buffers>> [ length ] keep alDeleteBuffers ] tri ;
 
 : play-clip ( audio-clip -- )
     [ update-source ]
