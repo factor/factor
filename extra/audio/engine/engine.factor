@@ -84,7 +84,8 @@ TUPLE: streaming-audio-clip < audio-clip
     { channels integer }
     { sample-bits integer }
     { sample-rate integer }
-    { al-buffers uint-array } ;
+    { al-buffers uint-array }
+    { done? boolean } ;
 
 ERROR: audio-device-not-found device-name ;
 ERROR: audio-context-not-available device-name ;
@@ -150,14 +151,18 @@ ERROR: audio-context-not-available device-name ;
     al-source ;
 
 :: queue-clip-buffer ( audio-clip al-buffer -- )
-    audio-clip al-source>> :> al-source
-    audio-clip generator>> :> generator
-    generator generate-audio :> ( data size )
+    audio-clip done?>> [
+        audio-clip al-source>> :> al-source
+        audio-clip generator>> :> generator
+        generator generate-audio :> ( data size )
 
-    data [
-        al-buffer audio-clip openal-format data size audio-clip sample-rate>> alBufferData
-        al-source 1 al-buffer c:<uint> alSourceQueueBuffers
-    ] when ;
+        size { [ not ] [ zero? ] } 1|| [
+            audio-clip t >>done? drop
+        ] [
+            al-buffer audio-clip openal-format data size audio-clip sample-rate>> alBufferData
+            al-source 1 al-buffer c:<uint> alSourceQueueBuffers
+        ] if
+    ] unless ;
 
 : update-listener ( audio-engine -- )
     listener>> {
