@@ -79,17 +79,6 @@ $nl
     "word-search-parsing"
 } ;
 
-ARTICLE: "parser-files" "Parsing source files"
-"The parser can run source files:"
-{ $subsections
-    run-file
-    parse-file
-}
-"The parser cross-references source files and definitions. This allows it to keep track of removed definitions, and prevent forward references and accidental redefinitions."
-$nl
-"While the above words are useful for one-off experiments, real programs should be written to use the vocabulary system instead; see " { $link "vocabs.loader" } "."
-{ $see-also "source-files" } ;
-
 ARTICLE: "top-level-forms" "Top level forms"
 "Any code outside of a definition is known as a " { $emphasis "top-level form" } "; top-level forms are run after the entire source file has been parsed, regardless of their position in the file."
 $nl
@@ -98,14 +87,19 @@ $nl
 "Also, top-level forms run in a new dynamic scope, so using " { $link set } " to store values is almost always wrong, since the values will be lost after the top-level form completes. To save values computed by a top-level form, either use " { $link set-global } " or define a new word with the value." ;
 
 ARTICLE: "parser" "The parser"
-"This parser is a general facility for reading textual representations of objects and definitions. The parser is implemented in the " { $vocab-link "parser" } " and " { $vocab-link "syntax" } " vocabularies."
+"The Factor parser reading textual representations of objects and definitions, with all syntax determined by " { $link "parsing-words" } ". The parser is implemented in the " { $vocab-link "parser" } " vocabulary, with standard syntax in the " { $vocab-link "syntax" } " vocabulary. See " { $link "syntax" } " for a description of standard syntax."
 $nl
-"This section concerns itself with usage and extension of the parser. Standard syntax is described in " { $link "syntax" } "."
-{ $subsections "parser-files" }
-"The parser can be extended."
-{ $subsections "parser-lexer" }
-"The parser can be invoked reflectively;"
-{ $subsections parse-stream }
+"The parser cross-references " { $link "source-files" } " and " { $link "definitions" } ". This functionality is used for improved error checking, as well as tools such as " { $link "tools.crossref" } " and " { $link "editor" } "."
+$nl
+"The parser can be invoked reflectively, to run strings and source files."
+{ $subsections
+    "eval"
+    run-file
+    parse-file
+}
+"If Factor is run from the command line with a script file supplied as an argument, the script is run using " { $link run-file } ". See " { $link "cli" } "."
+$nl
+"While " { $link run-file } " can be used interactively in the listener to load user code into the session, this should only be done for quick one-off scripts, and real programs should instead rely on the automatic " { $link "vocabs.loader" } "."
 { $see-also "parsing-words" "definitions" "definition-checking" } ;
 
 ABOUT: "parser"
@@ -204,7 +198,7 @@ HELP: bootstrap-syntax
 
 HELP: with-file-vocabs
 { $values { "quot" quotation } }
-{ $description "Calls the quotation in a scope with the initial the vocabulary search path for parsing a file. This consists of just the " { $snippet "syntax" } " vocabulary." } ;
+{ $description "Calls the quotation in a scope with an initial vocabulary search path consisting of just the " { $snippet "syntax" } " vocabulary." } ;
 
 HELP: parse-fresh
 { $values { "lines" "a sequence of strings" } { "quot" quotation } }
