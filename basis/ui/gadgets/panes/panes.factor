@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables io kernel namespaces sequences
 strings quotations math opengl combinators memoize math.vectors
@@ -352,7 +352,8 @@ M: paragraph stream-format
 GENERIC: sloppy-pick-up* ( loc gadget -- n )
 
 M: pack sloppy-pick-up* ( loc gadget -- n )
-    [ orientation>> ] [ children>> ] bi (fast-children-on) ;
+    [ orientation>> ] [ children>> ] bi
+    [ loc>> ] (fast-children-on) ;
 
 M: gadget sloppy-pick-up*
     children>> [ contains-point? ] with find-last drop ;
