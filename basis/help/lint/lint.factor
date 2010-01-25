@@ -69,7 +69,7 @@ PRIVATE>
     '[ _ vocab-help [ article drop ] when* ] check-something ;
 
 : check-vocab ( vocab -- )
-    "Checking " write dup write "..." print
+    "Checking " write dup write "..." print flush
     [ check-about ]
     [ words [ check-word ] each ]
     [ vocab-articles get at [ check-article ] each ]
