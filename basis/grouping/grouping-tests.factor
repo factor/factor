@@ -30,3 +30,5 @@ IN: grouping.tests
 [ f ] [ [ 1.0 1 1 ] all-equal? ] unit-test
 [ t ] [ { 1 2 3 4 } [ < ] monotonic? ] unit-test
 [ f ] [ { 1 2 3 4 } [ > ] monotonic? ] unit-test
+
+[ { 6 7 8 3 4 5 0 1 2 } ] [ 9 iota >array dup 3 <groups> reverse! drop ] unit-test
