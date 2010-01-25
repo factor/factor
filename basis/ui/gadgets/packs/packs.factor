@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences ui.gadgets ui.baseline-alignment
 ui.baseline-alignment.private kernel math math.functions math.vectors
@@ -100,5 +100,4 @@ M: pack layout*
     dup children>> pref-dims pack-layout ;
 
 M: pack children-on ( rect gadget -- seq )
-    [ orientation>> ] [ children>> ] bi
-    [ fast-children-on ] keep <slice> ;
+    [ orientation>> ] [ children>> ] bi [ loc>> ] fast-children-on ;
