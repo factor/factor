@@ -33,7 +33,7 @@ HELP: nmake-tuple
 { make-tuple 2make-tuple 3make-tuple nmake-tuple } related-words
 
 ARTICLE: "combinators.tuple" "Tuple-constructing combinators"
-"The " { $vocab-link "combinators.tuple" } " vocabulary provides dataflow combinators that construct " { $link tuple } " objects."
+"The " { $vocab-link "combinators.tuple" } " vocabulary provides combinators that construct " { $link tuple } " objects. These provide additional functionality above and beyond built-in " { $link "tuple-constructors" } "."
 { $subsections
     make-tuple
     2make-tuple
