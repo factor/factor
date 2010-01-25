@@ -50,6 +50,8 @@ M: audio-source audio-position position>> ; inline
 M: audio-source audio-gain gain>> ; inline
 M: audio-source audio-velocity velocity>> ; inline
 M: audio-source audio-relative? relative?>> ; inline
+M: audio-source audio-distance distance>> ; inline
+M: audio-source audio-rolloff rolloff>> ; inline
 
 M: audio-listener audio-position position>> ; inline
 M: audio-listener audio-gain gain>> ; inline
@@ -317,13 +319,13 @@ M: streaming-audio-clip dispose*
 : pause-clip ( audio-clip -- )
     al-source>> alSourcePause ;
 
-: pause-clips ( audio-clip -- )
+: pause-clips ( audio-clips -- )
     clip-al-sources alSourcePausev ;
 
 : stop-clip ( audio-clip -- )
     dispose ;
 
-: stop-clips ( audio-clip -- )
+: stop-clips ( audio-clips -- )
     [ clip-al-sources alSourceStopv ]
     [ [ dispose ] each ] bi ;
 
