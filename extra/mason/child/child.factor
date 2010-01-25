@@ -1,14 +1,17 @@
-! Copyright (C) 2008, 2009 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar combinators.short-circuit fry
 continuations debugger io.directories io.files io.launcher
 io.pathnames io.encodings.ascii kernel make mason.common mason.config
 mason.platform mason.report mason.notify namespaces sequences
-quotations macros ;
+quotations macros system combinators ;
 IN: mason.child
 
 : make-cmd ( -- args )
-    gnu-make platform 2array ;
+    {
+        { [ target-os get "winnt" = ] [ { "nmake" "/f" "nmakefile" } ] }
+        [ gnu-make platform 2array ]
+    } cond ;
 
 : make-vm ( -- )
     "factor" [
