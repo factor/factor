@@ -1,6 +1,6 @@
 ! (c)2007, 2010 Chris Double, Joe Groff bsd license
 USING: accessors alien.c-types audio.engine byte-arrays classes.struct
-combinators destructors fry gpu.buffers io io.files io.encodings.binary
+combinators destructors fry io io.files io.encodings.binary
 kernel libc locals make math math.order math.parser ogg ogg.vorbis
 sequences specialized-arrays specialized-vectors ;
 FROM: alien.c-types => float short void* ;
@@ -10,6 +10,7 @@ IN: audio.vorbis
 
 TUPLE: vorbis-stream < disposable
     stream
+    { buffer byte-array }
     { packet ogg-packet }
     { sync-state ogg-sync-state }
     { page ogg-page }
@@ -19,8 +20,7 @@ TUPLE: vorbis-stream < disposable
     { block vorbis-block }
     { comment vorbis-comment }
     { temp-state ogg-stream-state }
-    { #vorbis-headers integer initial: 0 }
-    { stream-eof? boolean } ;
+    { #vorbis-headers integer initial: 0 } ;
 
 CONSTANT: stream-buffer-size 4096
 
@@ -61,8 +61,10 @@ ERROR: no-vorbis-in-ogg ;
 : retrieve-page ( vorbis-stream -- ? )
     [ sync-state>> ] [ page>> ] bi ogg_sync_pageout 0 > ; inline
 
-: sync-pages ( vorbis-stream -- )
-    dup retrieve-page [ [ queue-page ] [ sync-pages ] bi ] [ drop ] if ;
+: (sync-pages) ( vorbis-stream ? -- ? )
+    over retrieve-page [ [ drop queue-page ] [ drop t (sync-pages) ] 2bi ] [ nip ] if ;
+: sync-pages ( vorbis-stream -- ? )
+    f (sync-pages) ; inline
 
 : standard-initial-header? ( vorbis-stream -- bool )
     page>> ogg_page_bos zero? not ; inline
@@ -152,23 +154,28 @@ ERROR: no-vorbis-in-ogg ;
 : get-pending-decoded-audio ( vorbis-stream -- pcm len )
     dsp-state>> f <void*> [ vorbis_synthesis_pcmout ] keep *void* swap ;
 
-:: make-pcm-buffer ( vorbis-stream pcm len -- short-array )
-    vorbis-stream info>> channels>> :> #channels
-    pcm #channels <direct-void*-array> :> channel*s
-    #channels len * <short-vector> :> output
+: float>short-sample ( float -- short )
+    -32767.5 * 0.5 - >integer -32768 32767 clamp ; inline
 
-    len iota [| sample |
+:: write-pcm-to-buffer ( vorbis-stream offset pcm len -- offset' )
+    vorbis-stream buffer>> :> buffer
+    buffer length -1 shift :> buffer-length
+    offset -1 shift :> sample-offset
+    buffer buffer-length <direct-short-array> sample-offset short-vector boa :> short-buffer
+    vorbis-stream info>> channels>> :> #channels
+    buffer-length sample-offset - #channels /i :> max-len
+    len max-len min :> len'
+    pcm #channels <direct-void*-array> :> channel*s
+
+    len' iota [| sample |
         #channels iota [| channel |
-            channel channel*s nth len <direct-float-array> :> samples
-            sample samples nth
-            -32767.0 * >integer -32767 32767 clamp
-            output push
+            channel channel*s nth len <direct-float-array>
+            sample swap nth
+            float>short-sample short-buffer push
         ] each
     ] each
-    output >short-array ; inline
-
-: read-samples ( vorbis-stream pcm len -- )
-    [ dsp-state>> ] [ drop ] [ ] tri* vorbis_synthesis_read drop ; inline
+    vorbis-stream dsp-state>> len' vorbis_synthesis_read drop
+    short-buffer length 1 shift ; inline
 
 : queue-audio ( vorbis-stream -- ? )
     dup [ stream-state>> ] [ packet>> ] bi ogg_stream_packetout 0 > [
@@ -177,18 +184,34 @@ ERROR: no-vorbis-in-ogg ;
         ] [ drop ] if t
     ] [ drop f ] if ;
 
-: decode-audio ( vorbis-stream -- short-array/f length/f )
-    dup get-pending-decoded-audio dup 0 > [
-        [ make-pcm-buffer dup byte-length ] [ read-samples ] 3bi
-    ] [
-        2drop dup queue-audio [ decode-audio ] [ drop f f ] if
+: (decode-audio) ( vorbis-stream offset -- offset' )
+    over get-pending-decoded-audio dup 0 > [ write-pcm-to-buffer ] [
+        2drop over queue-audio [ (decode-audio) ] [ nip ] if
     ] if ;
+
+: decode-audio ( vorbis-stream offset -- offset' )
+    2dup (decode-audio) {
+        {
+            [ 3dup [ buffer>> length ] [ drop ] [ ] tri* = ]
+            [ 2nip ]
+        }
+        {
+            [ 2dup = ]
+            [
+                drop
+                [ drop buffer-data-from-stream drop ]
+                [ over sync-pages [ decode-audio ] [ nip ] if ] 2bi
+            ]
+        }
+        [ nip decode-audio ]
+    } cond ;
 PRIVATE>
 
-: <vorbis-stream> ( stream -- vorbis-stream )
+:: <vorbis-stream> ( stream buffer-size -- vorbis-stream )
     [
         vorbis-stream new-disposable
-            swap >>stream
+            stream >>stream
+            buffer-size <byte-array> >>buffer
             ogg-packet malloc-struct |free >>packet
             ogg-sync-state malloc-struct |free >>sync-state
             ogg-page malloc-struct |free >>page
@@ -206,8 +229,8 @@ PRIVATE>
         } cleave
     ] with-destructors ;
 
-: read-vorbis-stream ( filename -- vorbis-stream )
-    binary <file-reader> <vorbis-stream> ; inline
+: read-vorbis-stream ( filename buffer-size -- vorbis-stream )
+    [ binary <file-reader> ] dip <vorbis-stream> ; inline
 
 M: vorbis-stream dispose*
     {
@@ -225,6 +248,4 @@ M: vorbis-stream dispose*
 M: vorbis-stream generator-audio-format
     [ info>> channels>> ] [ drop 16 ] [ info>> rate>> ] tri ;
 M: vorbis-stream generate-audio
-    dup decode-audio
-    [ [ drop ] 2dip ]
-    [ drop [ buffer-data-from-stream drop ] [ sync-pages ] [ decode-audio ] tri ] if* ;
+    [ buffer>> ] [ 0 decode-audio ] bi ;
