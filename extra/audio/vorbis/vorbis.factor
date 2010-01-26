@@ -62,7 +62,11 @@ ERROR: no-vorbis-in-ogg ;
     [ sync-state>> ] [ page>> ] bi ogg_sync_pageout 0 > ; inline
 
 : (sync-pages) ( vorbis-stream ? -- ? )
-    over retrieve-page [ [ drop queue-page ] [ drop t (sync-pages) ] 2bi ] [ nip ] if ;
+    over retrieve-page
+    [ drop [ queue-page ] [ t (sync-pages) ] bi ] [
+        over buffer-data-from-stream
+        [ (sync-pages) ] [ nip ] if
+    ] if ;
 : sync-pages ( vorbis-stream -- ? )
     f (sync-pages) ; inline
 
@@ -199,8 +203,7 @@ ERROR: no-vorbis-in-ogg ;
             [ 2dup = ]
             [
                 drop
-                [ drop buffer-data-from-stream drop ]
-                [ over sync-pages [ decode-audio ] [ nip ] if ] 2bi
+                over sync-pages [ decode-audio ] [ nip ] if
             ]
         }
         [ nip decode-audio ]
