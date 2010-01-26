@@ -59,7 +59,7 @@ M: fixnum shift >fixnum fixnum-shift ; inline
 M: fixnum bitnot fixnum-bitnot ; inline
 
 : fixnum-bit? ( n m -- b )
-    neg shift 1 bitand 0 > ;
+    neg shift 1 bitand 0 > ; inline
 
 M: fixnum bit? fixnum-bit? ; inline
 
