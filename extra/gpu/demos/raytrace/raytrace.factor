@@ -78,14 +78,14 @@ CONSTANT: initial-spheres {
 
     audio-engine world >>listener update-audio
 
-    audio-engine "vocab:gpu/demos/raytrace/mirror-ball.aiff" read-audio
-    spheres first t (audio-clip)
-    audio-engine "vocab:gpu/demos/raytrace/red-ball.aiff" read-audio
-    spheres second t (audio-clip)
-    audio-engine "vocab:gpu/demos/raytrace/green-ball.aiff" read-audio
-    spheres third t (audio-clip)
-    audio-engine "vocab:gpu/demos/raytrace/yellow-ball.aiff" read-audio
-    spheres fourth t (audio-clip)
+    audio-engine spheres first
+    "vocab:gpu/demos/raytrace/mirror-ball.aiff" read-audio t <static-audio-clip>
+    audio-engine spheres second
+    "vocab:gpu/demos/raytrace/red-ball.aiff" read-audio t <static-audio-clip>
+    audio-engine spheres third
+    "vocab:gpu/demos/raytrace/green-ball.aiff" read-audio t <static-audio-clip>
+    audio-engine spheres fourth
+    "vocab:gpu/demos/raytrace/yellow-ball.aiff" read-audio t <static-audio-clip>
     
     4array play-clips ;
 
@@ -124,7 +124,6 @@ GAME: raytrace-game {
         { grab-input? t }
         { use-game-input? t }
         { use-audio-engine? t }
-        { audio-engine-buffer-count 4 }
         { pref-dim { 1024 768 } }
         { tick-interval-micros $[ 60 fps ] }
     } ;

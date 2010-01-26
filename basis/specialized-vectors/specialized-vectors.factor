@@ -24,9 +24,9 @@ WHERE
 
 V A <A> vectors.functor:define-vector
 
-M: V contract 2drop ;
+M: V contract 2drop ; inline
 
-M: V byte-length underlying>> byte-length ;
+M: V byte-length underlying>> byte-length ; inline
 
 M: V pprint-delims drop \ V{ \ } ;
 

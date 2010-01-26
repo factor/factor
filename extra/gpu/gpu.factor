@@ -11,6 +11,8 @@ VARIANT: gpu-api
 
 : set-gpu-api ( -- )
     "2.0" require-gl-version
+    "3.0" { { "GL_ARB_vertex_array_object" "GL_APPLE_vertex_array_object" } }
+    require-gl-version-or-extensions
     "3.0" has-gl-version? opengl-3 opengl-2 ? gpu-api set-global ;
 
 HOOK: init-gpu-api gpu-api ( -- )

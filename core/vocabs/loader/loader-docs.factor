@@ -28,38 +28,44 @@ ARTICLE: "vocabs.roots" "Vocabulary roots"
 { $subsections "add-vocab-roots" } ;
 
 ARTICLE: "vocabs.loader" "Vocabulary loader"
-"The vocabulary loader is defined in the " { $vocab-link "vocabs.loader" } " vocabulary."
+"The vocabulary loader combines the vocabulary system with " { $link "parser" } " in order to implement automatic loading of vocabulary source files. The vocabulary loader is implemented in the " { $vocab-link "vocabs.loader" } " vocabulary."
 $nl
-"Vocabularies are searched for in vocabulary roots."
+"When an attempt is made to use a vocabulary that has not been loaded into the image, the vocabulary loader is asked to locate the vocabulary's source files, and load them."
+$nl
+"The vocabulary loader searches for vocabularies in a set of directories known as vocabulary roots."
 { $subsections "vocabs.roots" }
-"Vocabulary names map directly to source files. A vocabulary named " { $snippet "foo.bar" } " must be defined in a " { $snippet "bar" } " directory nested inside a " { $snippet "foo" } " directory of a vocabulary root. Any level of vocabulary nesting is permitted."
+"Vocabulary names map directly to source files inside these roots. A vocabulary named " { $snippet "foo.bar" } " is defined in " { $snippet "foo/bar/bar.factor" } "; that is, a source file named " { $snippet "bar.factor" } " within a " { $snippet "bar" } " directory nested inside a " { $snippet "foo" } " directory of a vocabulary root. Any level of nesting, separated by dots, is permitted."
 $nl
 "The vocabulary directory - " { $snippet "bar" } " in our example - contains a source file:"
 { $list
-  { { $snippet "foo/bar/bar.factor" } " - the source file, must define words in the " { $snippet "foo.bar" } " vocabulary with an " { $snippet "IN: foo.bar" } " form" }
+  { { $snippet "foo/bar/bar.factor" } " - the source file must define words in the " { $snippet "foo.bar" } " vocabulary with an " { $snippet "IN: foo.bar" } " form" }
 }
-"Two other Factor source files, storing documentation and tests, respectively, are optional:"
+"Two other Factor source files, storing documentation and tests, respectively, may optionally be placed alongside the source file:"
 { $list
     { { $snippet "foo/bar/bar-docs.factor" } " - documentation, see " { $link "writing-help" } }
     { { $snippet "foo/bar/bar-tests.factor" } " - unit tests, see " { $link "tools.test" } }
 }
-"Finally, three text files can contain meta-data:"
+"Finally, optional three text files may contain meta-data:"
 { $list
     { { $snippet "foo/bar/authors.txt" } " - a series of lines, with one author name per line. These are listed under " { $link "vocab-authors" } }
     { { $snippet "foo/bar/summary.txt" } " - a one-line description" }
     { { $snippet "foo/bar/tags.txt" } " - a whitespace-separated list of tags which classify the vocabulary. Consult " { $link "vocab-tags" } " for a list of existing tags you can re-use" }
 }
-"While " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " load vocabularies which have not been loaded before adding them to the search path, it is also possible to load a vocabulary without adding it to the search path:"
+"The " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " words load vocabularies which have not been loaded yet, as needed."
+$nl
+"Vocabularies can also be loaded at run time, without altering the vocabulary search path. This is done by calling a word which loads a vocabulary if it is not in the image, doing nothing if it is:"
 { $subsections require }
-"Forcing a reload of a vocabulary, even if it has already been loaded:"
+"The above word will only ever load a vocabulary once in a given session. There is another word which unconditionally loads vocabulary from disk, regardless of whether or not is has already been loaded:"
 { $subsections reload }
+"For interactive development in the listener, calling " { $link reload } " directly is usually not necessary, since a better facility exists for " { $link "vocabs.refresh" } "."
+$nl
 "Application vocabularies can define a main entry point, giving the user a convenient way to run the application:"
 { $subsections
     POSTPONE: MAIN:
     run
     runnable-vocab
 }
-{ $see-also "vocabularies" "parser-files" "source-files" } ;
+{ $see-also "vocabularies" "parser" "source-files" } ;
 
 ABOUT: "vocabs.loader"
 

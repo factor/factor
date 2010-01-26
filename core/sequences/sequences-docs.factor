@@ -993,16 +993,16 @@ HELP: count
     "50"
 } ;
 
-HELP: pusher
+HELP: selector
 { $values
      { "quot" "a predicate quotation" }
      { "quot" quotation } { "accum" vector } }
-{ $description "Creates a new vector to accumulate the values which return true for a predicate.  Returns a new quotation which accepts an object to be tested and stored in the accumulator if the test yields true. The accumulator is left on the stack for convenience." }
+{ $description "Creates a new vector to accumulate the values which return true for a predicate.  Returns a new quotation which accepts an object to be tested and stored in the collector if the test yields true. The collector is left on the stack for convenience." }
 { $example "! Find all the even numbers:" "USING: prettyprint sequences math kernel ;"
-           "10 iota [ even? ] pusher [ each ] dip ."
+           "10 iota [ even? ] selector [ each ] dip ."
            "V{ 0 2 4 6 8 }"
 }
-{ $notes "Used to implement the " { $link filter } " word. Compare this word with " { $link accumulator } ", which is an unfiltering version." } ;
+{ $notes "Used to implement the " { $link filter } " word. Compare this word with " { $link collector } ", which is an unfiltering version." } ;
 
 HELP: trim-head
 { $values
@@ -1199,7 +1199,7 @@ HELP: 2map-reduce
     "1290"
 } } ;
 
-HELP: 2pusher
+HELP: 2selector
 { $values
      { "quot" quotation }
      { "quot" quotation } { "accum1" vector } { "accum2" vector } }
@@ -1224,13 +1224,13 @@ HELP: 2unclip-slice
     "T{ slice { from 1 } { to 2 } { seq { 1 2 } } }\nT{ slice { from 1 } { to 2 } { seq { 3 4 } } }\n1\n3"
 } } ;
 
-HELP: accumulator
+HELP: collector
 { $values
      { "quot" quotation }
      { "quot'" quotation } { "vec" vector } }
 { $description "Creates a new quotation that pushes its result to a vector and outputs that vector on the stack." }
 { $examples { $example "USING: sequences prettyprint kernel math ;"
-    "{ 1 2 } [ 30 + ] accumulator [ each ] dip ."
+    "{ 1 2 } [ 30 + ] collector [ each ] dip ."
     "V{ 31 32 }"
 } } ;
 
@@ -1680,14 +1680,14 @@ ARTICLE: "sequences-f" "The f object as a sequence"
 ARTICLE: "sequences-combinator-implementation" "Implementing sequence combinators"
 "Creating a new sequence unconditionally:"
 { $subsections
-    accumulator
-    accumulator-for
+    collector
+    collector-for
 }
 "Creating a new sequence conditionally:"
 { $subsections
-    pusher
-    pusher-for
-    2pusher
+    selector
+    selector-for
+    2selector
 } ;
 
 ARTICLE: "sequences" "Sequence operations"

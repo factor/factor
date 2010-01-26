@@ -67,7 +67,4 @@ SYMBOL: main-vocab-hook
         main-vocab "run" set
     ] bind ;
 
-: ignore-cli-args? ( -- ? )
-    os macosx? "run" get "ui" = and ;
-
 [ default-cli-args ] "command-line" add-startup-hook

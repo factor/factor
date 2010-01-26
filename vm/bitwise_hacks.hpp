@@ -12,7 +12,8 @@ inline cell log2(cell x)
 	#endif
 #elif defined(FACTOR_AMD64)
 	#if defined(_MSC_VER)
-		_BitScanReverse64(&n,x);
+		n = 0;
+		_BitScanReverse64((DWORD *)&n,x);
 	#else
 		asm ("bsr %1, %0;":"=r"(n):"r"(x));
 	#endif

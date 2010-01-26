@@ -32,10 +32,10 @@
 /* Detect target CPU type */
 #if defined(__arm__)
 	#define FACTOR_ARM
-#elif defined(__amd64__) || defined(__x86_64__)
+#elif defined(__amd64__) || defined(__x86_64__) || defined(_M_AMD64)
 	#define FACTOR_AMD64
 	#define FACTOR_64
-#elif defined(i386) || defined(__i386) || defined(__i386__) || defined(WIN32) || defined(_MSC_VER)
+#elif defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_IX86)
 	#define FACTOR_X86
 #elif defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)
 	#define FACTOR_PPC
@@ -48,10 +48,6 @@
 	#define WINNT
 #elif defined(WIN32)
 	#define WINDOWS
-#endif
-
-#ifndef _MSC_VER
-	#include <stdbool.h>
 #endif
 
 /* Forward-declare this since it comes up in function prototypes */

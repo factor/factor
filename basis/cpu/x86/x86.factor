@@ -56,8 +56,8 @@ M: x86 stack-frame-size ( stack-frame -- i )
     3 cells +
     align-stack ;
 
-! Must be a volatile register not used for parameter passing, for safe
-! use in calls in and out of C
+! Must be a volatile register not used for parameter passing or
+! integer return
 HOOK: temp-reg cpu ( -- reg )
 
 HOOK: pic-tail-reg cpu ( -- reg )
