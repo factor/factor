@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel io system prettyprint continuations ;
+USING: help.markup help.syntax kernel io system prettyprint continuations quotations ;
 IN: listener
 
 ARTICLE: "listener-watch" "Watching variables in the listener"
@@ -20,6 +20,11 @@ ARTICLE: "listener-watch" "Watching variables in the listener"
 HELP: only-use-vocabs
 { $values { "vocabs" "a sequence of vocabulary specifiers" } }
 { $description "Replaces the current manifest's vocabulary search path with the given set of vocabularies." } ;
+
+HELP: with-interactive-vocabs
+{ $values { "quot" quotation } }
+{ $description "Calls the quotation in a scope with an initial vocabulary search path consisting of all vocabularies from " { $link interactive-vocabs } ", and with the current vocabulary for new definitions set to " { $vocab-link "scratchpad" } "." }
+{ $notes "This is the same initial search path as used by the " { $link "listener" } " tool." } ;
 
 HELP: show-var
 { $values { "var" "a variable name" } }

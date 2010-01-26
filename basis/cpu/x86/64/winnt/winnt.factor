@@ -22,5 +22,5 @@ M: x86.64 dummy-int-params? t ;
 
 M: x86.64 dummy-fp-params? t ;
 
-M: x86.64 temp-reg RAX ;
+M: x86.64 temp-reg R11 ;
 

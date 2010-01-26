@@ -1,7 +1,8 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.order math.matrices namespaces make sequences words io
-math.vectors ui.gadgets ui.baseline-alignment columns accessors strings.tables
+USING: arrays kernel math math.order math.matrices namespaces
+make sequences words io math.vectors ui.gadgets
+ui.baseline-alignment columns accessors strings.tables
 math.rectangles fry ;
 IN: ui.gadgets.grids
 
@@ -115,8 +116,10 @@ M: grid layout* [ grid>> ] [ <grid-layout> ] bi grid-layout ;
 
 M: grid children-on ( rect gadget -- seq )
     dup children>> empty? [ 2drop f ] [
-        [ { 0 1 } ] dip grid>>
-        [ 0 <column> fast-children-on ] [ <slice> concat ] bi
+        [ { 0 1 } ] dip
+        [ grid>> ] [ dim>> ] bi
+        '[ _ [ loc>> vmin ] reduce ] fast-children-on
+        concat
     ] if ;
 
 M: grid gadget-text*

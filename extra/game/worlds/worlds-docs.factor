@@ -11,12 +11,10 @@ HELP: game-attributes
 { { $snippet "use-audio-engine?" } " specifies whether the game world should manage an " { $link audio-engine } " instance. False by default." }
 { { $snippet "audio-engine-device" } " specifies the string name of the OpenAL device the audio engine, if any, should try to open. The default value of " { $link POSTPONE: f } " attempts to open the default OpenAL device." }
 { { $snippet "audio-engine-voice-count" } " determines the number of independent voices the audio engine will make available. This determines how many individual audio clips can play simultaneously. This cannot exceed the OpenAL implementation's limit on supported voices." }
-{ { $snippet "audio-engine-buffer-size" } " determines the size in bytes of the audio buffers the audio engine will stream to the sound card." }
-{ { $snippet "audio-engine-buffer-count" } " determines the number of buffers the audio engine will allocate per audio clip played." }
 } ;
 
 HELP: game-world
-{ $class-description "A subclass of " { $link world } " that automatically sets up and manages connections to the " { $vocab-link "game.loop" } ", " { $vocab-link "game.input" } ", and " { $vocab-link "audio.engine" } " libraries. It does this by providing methods on " { $link begin-world } ", " { $link end-world } ", and " { $link draw* } ". Subclasses can provide their own world setup and teardown code by adding methods to the " { $link begin-game-world } " and " { $link end-game-world } " generic words."
+{ $class-description "A subclass of " { $link world } " that automatically sets up and manages connections to the " { $vocab-link "game.loop" } ", " { $vocab-link "game.input" } ", and " { $vocab-link "audio.engine" } " libraries. It does this by providing methods on " { $link begin-world } ", " { $link end-world } ", and " { $link draw* } ". Subclasses can provide their own world setup, teardown, and update code by adding methods to the " { $link begin-game-world } " and " { $link end-game-world } " generic words. The standard " { $snippet "world" } " generics " { $link draw-world* } " and " { $link resize-world } " can also be given methods to draw the window contents and handle resize events. The " { $snippet "draw-world*" } " method will be invoked in a tight loop by the game loop."
 $nl
 "The game-world tuple has the following publicly accessible slots:"
 { $list
@@ -49,6 +47,7 @@ ARTICLE: "game.worlds" "Game worlds"
     begin-game-world
     end-game-world
     tick-game-world
-} ;
+}
+"The standard " { $snippet "world" } " generics " { $link draw-world* } " and " { $link resize-world } " can also be given methods to draw the window contents and handle resize events. The " { $snippet "draw-world*" } " method will be invoked in a tight loop by the game loop to update the screen." ;
 
 ABOUT: "game.worlds"

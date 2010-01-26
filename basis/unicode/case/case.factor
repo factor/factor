@@ -109,13 +109,13 @@ HINTS: >upper string ;
     lt? [ lithuanian>upper ] when
     [ title>> ] [ ch>title ] map-case ; inline
 
-: title-word ( string -- title )
-    unclip 1string [ >lower ] [ (>title) ] bi* prepend ; inline
-
 PRIVATE>
 
+: capitalize ( string -- title )
+    unclip 1string [ >lower ] [ (>title) ] bi* prepend ; inline
+
 : >title ( string -- title )
-    final-sigma >words [ title-word ] map concat ;
+    final-sigma >words [ capitalize ] map concat ;
 
 HINTS: >title string ;
 

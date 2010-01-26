@@ -50,16 +50,19 @@ M: audio-source audio-position position>> ; inline
 M: audio-source audio-gain gain>> ; inline
 M: audio-source audio-velocity velocity>> ; inline
 M: audio-source audio-relative? relative?>> ; inline
+M: audio-source audio-distance distance>> ; inline
+M: audio-source audio-rolloff rolloff>> ; inline
 
 M: audio-listener audio-position position>> ; inline
 M: audio-listener audio-gain gain>> ; inline
 M: audio-listener audio-velocity velocity>> ; inline
 M: audio-listener audio-orientation orientation>> ; inline
 
+GENERIC: generate-audio ( generator -- c-ptr size )
+GENERIC: generator-audio-format ( generator -- channels sample-bits sample-rate )
+
 TUPLE: audio-engine < disposable
     { voice-count integer }
-    { buffer-size integer }
-    { buffer-count integer }
     { al-device c-ptr }
     { al-context c-ptr }
     al-sources
@@ -70,17 +73,24 @@ TUPLE: audio-engine < disposable
 
 TUPLE: audio-clip < disposable
     { audio-engine audio-engine }
-    { audio audio }
     source
-    { loop? boolean }
-    { al-source integer }
+    { al-source integer } ;
+
+TUPLE: static-audio-clip < audio-clip
+    { al-buffer integer } ;
+
+TUPLE: streaming-audio-clip < audio-clip
+    generator
+    { channels integer }
+    { sample-bits integer }
+    { sample-rate integer }
     { al-buffers uint-array }
-    { next-data-offset integer } ;
+    { done? boolean } ;
 
 ERROR: audio-device-not-found device-name ;
 ERROR: audio-context-not-available device-name ;
 
-:: <audio-engine> ( device-name voice-count buffer-size buffer-count -- engine )
+:: <audio-engine> ( device-name voice-count -- engine )
     [
         device-name alcOpenDevice :> al-device
         al-device [ device-name audio-device-not-found ] unless
@@ -96,12 +106,10 @@ ERROR: audio-context-not-available device-name ;
             voice-count >>voice-count
             al-device >>al-device
             al-context >>al-context
-            buffer-size >>buffer-size
-            buffer-count >>buffer-count
     ] with-destructors ;
 
 : <standard-audio-engine> ( -- engine )
-    f 16 8192 2 <audio-engine> ;
+    f 16 <audio-engine> ;
 
 <PRIVATE
 
@@ -111,12 +119,13 @@ ERROR: audio-context-not-available device-name ;
 : allocate-sources ( audio-engine -- sources )
     voice-count>> dup (uint-array) [ alGenSources ] keep ; inline
 
-:: flush-source ( source -- )
-    source alSourceStop
+:: flush-source ( al-source -- )
+    al-source alSourceStop
     0 c:<uint> :> dummy-buffer
-    source AL_BUFFERS_PROCESSED get-source-param [
-        source 1 dummy-buffer alSourceUnqueueBuffers
-    ] times ;
+    al-source AL_BUFFERS_PROCESSED get-source-param [
+        al-source 1 dummy-buffer alSourceUnqueueBuffers
+    ] times
+    al-source AL_BUFFER 0 alSourcei ;
 
 : free-sources ( sources -- )
     [ length ] keep alDeleteSources ; inline
@@ -141,44 +150,19 @@ ERROR: audio-context-not-available device-name ;
     audio-engine next-source >>next-source drop
     al-source ;
 
-:: (queue-clip-buffer) ( audio-clip al-buffer audio data size -- )
-    al-buffer audio openal-format data size audio sample-rate>> alBufferData
-    audio-clip al-source>> 1 al-buffer c:<uint> alSourceQueueBuffers
-
-    audio-clip [ size + ] change-next-data-offset drop ; inline
-
 :: queue-clip-buffer ( audio-clip al-buffer -- )
-    audio-clip audio-engine>> :> audio-engine
-    audio-engine buffer-size>> :> buffer-size
-    audio-clip audio>> :> audio
-    audio-clip next-data-offset>> :> next-data-offset
-    audio size>> next-data-offset - :> remaining-audio
+    audio-clip done?>> [
+        audio-clip al-source>> :> al-source
+        audio-clip generator>> :> generator
+        generator generate-audio :> ( data size )
 
-    {
-        { [ remaining-audio 0 <= ] [
-            audio-clip loop?>> [
-                audio-clip 0 >>next-data-offset
-                al-buffer queue-clip-buffer
-            ] when
-        ] }
-        { [ remaining-audio buffer-size < ] [
-            audio-clip loop?>> [
-                audio data>>
-                [ next-data-offset swap <displaced-alien> remaining-audio <direct-uchar-array> ]
-                [ buffer-size remaining-audio - <direct-uchar-array> ] bi append :> data
-                audio-clip al-buffer audio data buffer-size (queue-clip-buffer)
-
-                audio-clip [ audio size>> mod ] change-next-data-offset drop
-            ] [
-                next-data-offset audio data>> <displaced-alien> :> data
-                audio-clip al-buffer audio data remaining-audio (queue-clip-buffer)
-            ] if
-        ] }
-        [
-            next-data-offset audio data>> <displaced-alien> :> data
-            audio-clip al-buffer audio data buffer-size (queue-clip-buffer)
-        ]
-    } cond ;
+        size { [ not ] [ zero? ] } 1|| [
+            audio-clip t >>done? drop
+        ] [
+            al-buffer audio-clip openal-format data size audio-clip sample-rate>> alBufferData
+            al-source 1 al-buffer c:<uint> alSourceQueueBuffers
+        ] if
+    ] unless ;
 
 : update-listener ( audio-engine -- )
     listener>> {
@@ -198,18 +182,24 @@ ERROR: audio-context-not-available device-name ;
         [ AL_ROLLOFF_FACTOR swap audio-rolloff alSourcef ]
     } 2cleave ;
 
-:: update-audio-clip ( audio-clip -- )
-    audio-clip update-source
-    audio-clip al-source>> :> al-source
-    0 c:<uint> :> buffer*
+GENERIC: (update-audio-clip) ( audio-clip -- )
 
-    al-source AL_SOURCE_STATE get-source-param AL_STOPPED =
-    [ audio-clip dispose ] [
-        al-source AL_BUFFERS_PROCESSED get-source-param [
-            al-source 1 buffer* alSourceUnqueueBuffers
-            audio-clip buffer* c:*uint queue-clip-buffer
-        ] times
-    ] if ;
+M: static-audio-clip (update-audio-clip)
+    drop ;
+
+M:: streaming-audio-clip (update-audio-clip) ( audio-clip -- )
+    audio-clip al-source>> :> al-source
+    0 c:<uint> :> buffer
+    al-source AL_BUFFERS_PROCESSED get-source-param [
+        al-source 1 buffer alSourceUnqueueBuffers
+        audio-clip buffer c:*uint queue-clip-buffer
+    ] times ;
+
+: update-audio-clip ( audio-clip -- )
+    [ update-source ] [
+        dup al-source>> AL_SOURCE_STATE get-source-param AL_STOPPED = 
+        [ dispose ] [ (update-audio-clip) ] if
+    ] bi ;
 
 : clip-al-sources ( clips -- length sources )
     [ length ] [ [ al-source>> ] uint-array{ } map-as ] bi ;
@@ -261,33 +251,61 @@ M: audio-engine dispose*
     [ [ alcCloseDevice*   ] when* f ] change-al-device
     drop ;
 
-:: (audio-clip) ( audio-engine audio source loop? -- audio-clip/f )
+:: <static-audio-clip> ( audio-engine source audio loop? -- audio-clip/f )
     audio-engine get-available-source :> al-source
 
     al-source [
-        audio-engine buffer-count>> :> buffer-count
-        buffer-count dup (uint-array) [ alGenBuffers ] keep :> al-buffers
+        1 0 c:<uint> [ alGenBuffers ] keep c:*uint :> al-buffer
+        al-buffer audio { [ openal-format ] [ data>> ] [ size>> ] [ sample-rate>> ] } cleave
+            alBufferData
 
-        audio-clip new-disposable
+        al-source AL_BUFFER al-buffer alSourcei
+        al-source AL_LOOPING loop? c:>c-bool alSourcei
+
+        static-audio-clip new-disposable
             audio-engine >>audio-engine
-            audio >>audio
             source >>source
-            loop? >>loop?
             al-source >>al-source
-            al-buffers >>al-buffers
-            0 >>next-data-offset :> clip
-        al-buffers [ clip swap queue-clip-buffer ] each
+            al-buffer >>al-buffer
+            :> clip
         clip audio-engine clips>> push
-
         clip
     ] [ f ] if ;
 
+:: <streaming-audio-clip> ( audio-engine source generator buffer-count -- audio-clip/f )
+    audio-engine get-available-source :> al-source
+
+    al-source [
+        buffer-count dup (uint-array) [ alGenBuffers ] keep :> al-buffers
+        generator generator-audio-format :> ( channels sample-bits sample-rate )
+
+        streaming-audio-clip new-disposable
+            audio-engine >>audio-engine
+            source >>source
+            al-source >>al-source
+            generator >>generator
+            channels >>channels
+            sample-bits >>sample-bits
+            sample-rate >>sample-rate
+            al-buffers >>al-buffers
+            :> clip
+        al-buffers [ clip swap queue-clip-buffer ] each
+        clip audio-engine clips>> push
+        clip
+    ] [ generator dispose f ] if ;
+
 M: audio-clip dispose*
-    {
-        [ al-source>> flush-source ]
-        [ al-buffers>> [ length ] keep alDeleteBuffers ]
-        [ dup audio-engine>> clips>> remove! drop ]
-    } cleave ;
+    [ dup audio-engine>> clips>> remove! drop ]
+    [ al-source>> flush-source ] bi ;
+
+M: static-audio-clip dispose*
+    [ call-next-method ]
+    [ [ 1 ] dip al-buffer>> c:<uint> alDeleteBuffers ] bi ;
+
+M: streaming-audio-clip dispose*
+    [ call-next-method ]
+    [ generator>> dispose ]
+    [ al-buffers>> [ length ] keep alDeleteBuffers ] tri ;
 
 : play-clip ( audio-clip -- )
     [ update-source ]
@@ -297,19 +315,22 @@ M: audio-clip dispose*
     [ [ update-source ] each ]
     [ clip-al-sources alSourcePlayv ] bi ;
 
-: <audio-clip> ( audio-engine audio source loop? -- audio-clip/f )
-    (audio-clip) dup play-clip ;
+: play-static-audio-clip ( audio-engine source audio loop? -- audio-clip/f )
+    <static-audio-clip> dup [ play-clip ] when* ;
+
+: play-streaming-audio-clip ( audio-engine source generator buffer-count -- audio-clip/f ) 
+    <streaming-audio-clip> dup [ play-clip ] when* ;
 
 : pause-clip ( audio-clip -- )
     al-source>> alSourcePause ;
 
-: pause-clips ( audio-clip -- )
+: pause-clips ( audio-clips -- )
     clip-al-sources alSourcePausev ;
 
 : stop-clip ( audio-clip -- )
     dispose ;
 
-: stop-clips ( audio-clip -- )
+: stop-clips ( audio-clips -- )
     [ clip-al-sources alSourceStopv ]
     [ [ dispose ] each ] bi ;
 

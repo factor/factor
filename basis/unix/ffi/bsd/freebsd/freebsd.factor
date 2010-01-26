@@ -1,12 +1,11 @@
-USING: alien.c-types alien.syntax unix.time unix.types
-unix.types.macosx classes.struct ;
-IN: unix
+USING: alien.c-types alien.syntax classes.struct unix.types ;
+IN: unix.ffi
 
 CONSTANT: FD_SETSIZE 1024
 
 STRUCT: addrinfo
     { flags int }
-    { family int } 
+    { family int }
     { socktype int }
     { protocol int }
     { addrlen socklen_t }
@@ -14,31 +13,12 @@ STRUCT: addrinfo
     { addr void* }
     { next addrinfo* } ;
 
-CONSTANT: _UTX_USERSIZE 256
-CONSTANT: _UTX_LINESIZE 32
-CONSTANT: _UTX_IDSIZE 4
-CONSTANT: _UTX_HOSTSIZE 256
-    
-STRUCT: utmpx
-    { ut_user { char _UTX_USERSIZE } }
-    { ut_id   { char _UTX_IDSIZE   } }
-    { ut_line { char _UTX_LINESIZE } }
-    { ut_pid  pid_t }
-    { ut_type short }
-    { ut_tv   timeval }
-    { ut_host { char _UTX_HOSTSIZE } }
-    { ut_pad  { uint 16 } } ;
-
-CONSTANT: __DARWIN_MAXPATHLEN 1024
-CONSTANT: __DARWIN_MAXNAMELEN 255
-CONSTANT: __DARWIN_MAXNAMELEN+1 255
-
 STRUCT: dirent
-    { d_ino ino_t }
-    { d_reclen __uint16_t }
-    { d_type __uint8_t }
-    { d_namlen __uint8_t }
-    { d_name { char __DARWIN_MAXNAMELEN+1 } } ;
+    { d_fileno u_int32_t }
+    { d_reclen u_int16_t }
+    { d_type u_int8_t }
+    { d_namlen u_int8_t }
+    { d_name char[256] } ;
 
 CONSTANT: EPERM 1
 CONSTANT: ENOENT 2
@@ -85,7 +65,8 @@ CONSTANT: EPROTOTYPE 41
 CONSTANT: ENOPROTOOPT 42
 CONSTANT: EPROTONOSUPPORT 43
 CONSTANT: ESOCKTNOSUPPORT 44
-CONSTANT: ENOTSUP 45
+CONSTANT: EOPNOTSUPP 45
+ALIAS: ENOTSUP EOPNOTSUPP
 CONSTANT: EPFNOSUPPORT 46
 CONSTANT: EAFNOSUPPORT 47
 CONSTANT: EADDRINUSE 48
@@ -122,25 +103,14 @@ CONSTANT: ENOSYS 78
 CONSTANT: EFTYPE 79
 CONSTANT: EAUTH 80
 CONSTANT: ENEEDAUTH 81
-CONSTANT: EPWROFF 82
-CONSTANT: EDEVERR 83
+CONSTANT: EIDRM 82
+CONSTANT: ENOMSG 83
 CONSTANT: EOVERFLOW 84
-CONSTANT: EBADEXEC 85
-CONSTANT: EBADARCH 86
-CONSTANT: ESHLIBVERS 87
-CONSTANT: EBADMACHO 88
-CONSTANT: ECANCELED 89
-CONSTANT: EIDRM 90
-CONSTANT: ENOMSG 91
-CONSTANT: EILSEQ 92
-CONSTANT: ENOATTR 93
-CONSTANT: EBADMSG 94
-CONSTANT: EMULTIHOP 95
-CONSTANT: ENODATA 96
-CONSTANT: ENOLINK 97
-CONSTANT: ENOSR 98
-CONSTANT: ENOSTR 99
-CONSTANT: EPROTO 100
-CONSTANT: ETIME 101
-CONSTANT: EOPNOTSUPP 102
-CONSTANT: ENOPOLICY 103
+CONSTANT: ECANCELED 85
+CONSTANT: EILSEQ 86
+CONSTANT: ENOATTR 87
+CONSTANT: EDOOFUS 88
+CONSTANT: EBADMSG 89
+CONSTANT: EMULTIHOP 90
+CONSTANT: ENOLINK 91
+CONSTANT: EPROTO 92

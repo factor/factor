@@ -1,9 +1,10 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words assocs definitions io io.pathnames io.styles kernel
-prettyprint sorting see sets sequences arrays hashtables help.crossref
-help.topics help.markup quotations accessors source-files namespaces
-graphs vocabs generic generic.single threads compiler.units init ;
+prettyprint sorting see sets sequences arrays hashtables help
+help.crossref help.topics help.markup quotations accessors
+source-files namespaces graphs vocabs generic generic.single
+threads compiler.units init combinators.smart ;
 IN: tools.crossref
 
 SYMBOL: crossref
@@ -50,9 +51,15 @@ M: callable uses ( quot -- assoc )
 
 M: word uses def>> uses ;
 
-M: link uses { $subsection $subsections $link $see-also } article-links ;
+M: link uses
+    [ { $subsection $subsections $link $see-also } article-links [ >link ] map ]
+    [ { $vocab-link } article-links [ >vocab-link ] map ]
+    bi append ;
 
 M: pathname uses string>> source-file top-level-form>> [ uses ] [ { } ] if* ;
+
+! To make UI browser happy
+M: vocab uses drop f ;
 
 GENERIC: crossref-def ( defspec -- )
 
@@ -62,18 +69,23 @@ M: object crossref-def
 M: word crossref-def
     [ call-next-method ] [ subwords [ crossref-def ] each ] bi ;
 
+: defs-to-crossref ( -- seq )
+    [
+        all-words
+        all-articles [ >link ] map
+        source-files get keys [ <pathname> ] map
+    ] append-outputs ;
+
 : build-crossref ( -- crossref )
     "Computing usage index... " write flush yield
-    H{ } clone crossref [
-        all-words
-        source-files get keys [ <pathname> ] map
-        [ [ crossref-def ] each ] bi@
-        crossref get
-    ] with-variable
+    H{ } clone [
+        crossref set-global
+        defs-to-crossref [ crossref-def ] each
+    ] keep
     "done" print flush ;
 
 : get-crossref ( -- crossref )
-    crossref global [ drop build-crossref ] cache ;
+    crossref get-global [ build-crossref ] unless* ;
 
 GENERIC: irrelevant? ( defspec -- ? )
 

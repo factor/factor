@@ -516,9 +516,9 @@ M: bad-executable summary
 
 \ compact-gc { } { } define-primitive
 
-\ (save-image) { byte-array } { } define-primitive
+\ (save-image) { byte-array byte-array } { } define-primitive
 
-\ (save-image-and-exit) { byte-array } { } define-primitive
+\ (save-image-and-exit) { byte-array byte-array } { } define-primitive
 
 \ data-room { } { byte-array } define-primitive
 \ data-room make-flushable
