@@ -50,6 +50,8 @@ M: audio-source audio-position position>> ; inline
 M: audio-source audio-gain gain>> ; inline
 M: audio-source audio-velocity velocity>> ; inline
 M: audio-source audio-relative? relative?>> ; inline
+M: audio-source audio-distance distance>> ; inline
+M: audio-source audio-rolloff rolloff>> ; inline
 
 M: audio-listener audio-position position>> ; inline
 M: audio-listener audio-gain gain>> ; inline
@@ -82,7 +84,8 @@ TUPLE: streaming-audio-clip < audio-clip
     { channels integer }
     { sample-bits integer }
     { sample-rate integer }
-    { al-buffers uint-array } ;
+    { al-buffers uint-array }
+    { done? boolean } ;
 
 ERROR: audio-device-not-found device-name ;
 ERROR: audio-context-not-available device-name ;
@@ -148,14 +151,18 @@ ERROR: audio-context-not-available device-name ;
     al-source ;
 
 :: queue-clip-buffer ( audio-clip al-buffer -- )
-    audio-clip al-source>> :> al-source
-    audio-clip generator>> :> generator
-    generator generate-audio :> ( data size )
+    audio-clip done?>> [
+        audio-clip al-source>> :> al-source
+        audio-clip generator>> :> generator
+        generator generate-audio :> ( data size )
 
-    data [
-        al-buffer audio-clip openal-format data size audio-clip sample-rate>> alBufferData
-        al-source 1 al-buffer c:<uint> alSourceQueueBuffers
-    ] when ;
+        size { [ not ] [ zero? ] } 1|| [
+            audio-clip t >>done? drop
+        ] [
+            al-buffer audio-clip openal-format data size audio-clip sample-rate>> alBufferData
+            al-source 1 al-buffer c:<uint> alSourceQueueBuffers
+        ] if
+    ] unless ;
 
 : update-listener ( audio-engine -- )
     listener>> {
@@ -317,13 +324,13 @@ M: streaming-audio-clip dispose*
 : pause-clip ( audio-clip -- )
     al-source>> alSourcePause ;
 
-: pause-clips ( audio-clip -- )
+: pause-clips ( audio-clips -- )
     clip-al-sources alSourcePausev ;
 
 : stop-clip ( audio-clip -- )
     dispose ;
 
-: stop-clips ( audio-clip -- )
+: stop-clips ( audio-clips -- )
     [ clip-al-sources alSourceStopv ]
     [ [ dispose ] each ] bi ;
 
