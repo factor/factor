@@ -233,7 +233,7 @@ PRIVATE>
     ] with-destructors ;
 
 : read-vorbis-stream ( filename buffer-size -- vorbis-stream )
-    [ binary <file-reader> ] dip <vorbis-stream> ; inline
+    [ [ binary <file-reader> |dispose ] dip <vorbis-stream> ] with-destructors ; inline
 
 M: vorbis-stream dispose*
     {
@@ -246,6 +246,7 @@ M: vorbis-stream dispose*
         [ page>>         [ free ] when* ]
         [ sync-state>>   [ free ] when* ]
         [ packet>>       [ free ] when* ]
+        [ stream>>       [ dispose ] when* ]
     } cleave ;
 
 M: vorbis-stream generator-audio-format
