@@ -15,7 +15,6 @@ blas-fortran-abi [
     {
         { [ os macosx?                  ] [ intel-unix-abi ] }
         { [ os windows? cpu x86.32? and ] [ f2c-abi        ] }
-        { [ os netbsd?  cpu x86.64? and ] [ g95-abi        ] }
         { [ os windows? cpu x86.64? and ] [ gfortran-abi   ] }
         { [ os freebsd?                 ] [ gfortran-abi   ] }
         { [ os linux?                   ] [ gfortran-abi   ] }

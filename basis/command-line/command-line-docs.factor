@@ -37,10 +37,6 @@ HELP: main-vocab
 HELP: default-cli-args
 { $description "Sets global variables corresponding to default command line arguments." } ;
 
-HELP: ignore-cli-args?
-{ $values { "?" "a boolean" } }
-{ $description "On Mac OS X, source files to run are supplied by the Cocoa API, so to avoid running them twice the startup code has to call this word." } ;
-
 ARTICLE: "runtime-cli-args" "Command line switches for the VM"
 "A handful of command line switches are processed by the VM and not the library. They control low-level features."
 { $table

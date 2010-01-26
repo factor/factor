@@ -49,6 +49,12 @@ io.streams.string ;
 [ "1:2:0:0:0:0:3:4" ]
 [ B{ 0 1 0 2 0 0 0 0 0 0 0 0 0 3 0 4 } T{ inet6 } inet-ntop ] unit-test
 
+[ B{ 0 0 0 0 0 0 0 0 0 127 0 0 0 0 0 1 } ]
+[ "::127.0.0.1" T{ inet6 } inet-pton ] unit-test
+
+[ B{ 0 2 0 0 0 0 0 9 0 127 0 0 0 0 0 1 } ]
+[ "2::9:127.0.0.1" T{ inet6 } inet-pton ] unit-test
+
 [ "2001:6f8:37a:5:0:0:0:1" ]
 [ "2001:6f8:37a:5::1" T{ inet6 } [ inet-pton ] [ inet-ntop ] bi ] unit-test
 

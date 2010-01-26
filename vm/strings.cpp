@@ -81,7 +81,7 @@ void factor_vm::fill_string(string *str_, cell start, cell capacity, cell fill)
 	data_root<string> str(str_,this);
 
 	if(fill <= 0x7f)
-		memset(&str->data()[start],fill,capacity - start);
+		memset(&str->data()[start],(int)fill,capacity - start);
 	else
 	{
 		cell i;

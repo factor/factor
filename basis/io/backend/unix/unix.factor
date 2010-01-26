@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax generic assocs kernel
 kernel.private math io.ports sequences strings sbufs threads
-unix vectors io.buffers io.backend io.encodings math.parser
+unix unix.ffi vectors io.buffers io.backend io.encodings math.parser
 continuations system libc namespaces make io.timeouts
 io.encodings.utf8 destructors destructors.private accessors
 summary combinators locals unix.time unix.types fry
@@ -17,8 +17,8 @@ TUPLE: fd < disposable fd ;
 : init-fd ( fd -- fd )
     [
         |dispose
-        dup fd>> F_SETFL O_NONBLOCK fcntl io-error
-        dup fd>> F_SETFD FD_CLOEXEC fcntl io-error
+        dup fd>> F_SETFL O_NONBLOCK [ fcntl ] unix-system-call drop
+        dup fd>> F_SETFD FD_CLOEXEC [ fcntl ] unix-system-call drop
     ] with-destructors ;
 
 : <fd> ( n -- fd )
@@ -50,7 +50,7 @@ M: fd cancel-operation ( fd -- )
     ] if ;
 
 M: unix tell-handle ( handle -- n )
-    fd>> 0 SEEK_CUR lseek [ io-error ] [ ] bi ;
+    fd>> 0 SEEK_CUR [ lseek ] unix-system-call [ io-error ] [ ] bi ;
 
 M: unix seek-handle ( n seek-type handle -- )
     swap {
@@ -59,7 +59,7 @@ M: unix seek-handle ( n seek-type handle -- )
         { io:seek-end [ SEEK_END ] }
         [ io:bad-seek-type ]
     } case
-    [ fd>> swap ] dip lseek io-error ;
+    [ fd>> swap ] dip [ lseek ] unix-system-call drop ;
 
 SYMBOL: +retry+ ! just try the operation again without blocking
 SYMBOL: +input+

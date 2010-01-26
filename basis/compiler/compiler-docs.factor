@@ -16,11 +16,7 @@ ARTICLE: "compiler-usage" "Calling the optimizing compiler"
     disable-optimizer
     enable-optimizer
 }
-"Removing a word's optimized definition:"
-{ $subsections decompile }
-"Compiling a single quotation:"
-{ $subsections compile-call }
-"Higher-level words can be found in " { $link "compilation-units" } "." ;
+"More words can be found in " { $link "compilation-units" } "." ;
 
 ARTICLE: "compiler-impl" "Compiler implementation"
 "The " { $vocab-link "compiler" } "vocabulary, in addition to providing the user-visible words of the compiler, implements the main compilation loop."
@@ -60,10 +56,6 @@ $nl
 
 ABOUT: "compiler"
 
-HELP: decompile
-{ $values { "word" word } }
-{ $description "Removes a word's optimized definition. The word will be compiled with the non-optimizing compiler until recompiled with the optimizing compiler again." } ;
-
 HELP: compile-word
 { $values { "word" word } }
 { $description "Compile a single word." }
@@ -72,8 +64,3 @@ HELP: compile-word
 HELP: optimizing-compiler
 { $description "Singleton class implementing " { $link recompile } " to call the optimizing compiler." }
 { $notes "This is an internal word, and user code should call " { $link compile } " instead." } ;
-
-HELP: compile-call
-{ $values { "quot" quotation } }
-{ $description "Compiles and runs a quotation." }
-{ $notes "This word is used by compiler unit tests to test compilation of small pieces of code." } ;

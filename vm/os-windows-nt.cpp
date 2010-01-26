@@ -91,8 +91,12 @@ LONG factor_vm::exception_handler(PEXCEPTION_POINTERS pe)
 	case STATUS_FLOAT_UNDERFLOW:
 	case STATUS_FLOAT_MULTIPLE_FAULTS:
 	case STATUS_FLOAT_MULTIPLE_TRAPS:
+#ifdef FACTOR_AMD64
+		signal_fpu_status = fpu_status(MXCSR(c));
+#else
 		signal_fpu_status = fpu_status(X87SW(c) | MXCSR(c));
 		X87SW(c) = 0;
+#endif
 		MXCSR(c) &= 0xffffffc0;
 		c->EIP = (cell)factor::fp_signal_handler_impl;
 		break;

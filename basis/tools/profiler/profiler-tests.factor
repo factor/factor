@@ -1,6 +1,6 @@
 USING: accessors tools.profiler tools.test kernel memory math
 threads alien alien.c-types tools.profiler.private sequences
-compiler compiler.units words ;
+compiler.test compiler.units words ;
 IN: tools.profiler.tests
 
 [ t ] [

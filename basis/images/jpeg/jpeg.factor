@@ -351,7 +351,7 @@ SINGLETONS: YUV420 YUV444 Y MAGIC! ;
     [ bitstream>> ] 
     [ [ [ <huffman-decoder> ] with map ] change-huff-tables drop ] bi
     jpeg> components>> [ fetch-tables ] each
-    [ decode-macroblock 2array ] accumulator 
+    [ decode-macroblock 2array ] collector 
     [ all-macroblocks ] dip
     jpeg> setup-bitmap draw-macroblocks 
     jpeg> bitmap>> 3 <groups> [ color-transform ] map! drop
