@@ -1,9 +1,9 @@
-! Copyright (C) 2007, 2009 Daniel Ehrenberg, Bruno Deferrari,
+! Copyright (C) 2007, 2010 Daniel Ehrenberg, Bruno Deferrari,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel namespaces sequences
 sets strings vocabs sorting accessors arrays compiler.units
-combinators vectors splitting continuations math
+combinators vectors splitting continuations math words
 parser.notes ;
 IN: vocabs.parser
 
@@ -26,7 +26,6 @@ current-vocab
 { search-vocab-names hashtable }
 { search-vocabs vector }
 { qualified-vocabs vector }
-{ extra-words vector }
 { auto-used vector } ;
 
 : <manifest> ( -- manifest )
@@ -34,7 +33,6 @@ current-vocab
         H{ } clone >>search-vocab-names
         V{ } clone >>search-vocabs
         V{ } clone >>qualified-vocabs
-        V{ } clone >>extra-words
         V{ } clone >>auto-used ;
 
 M: manifest clone
@@ -42,7 +40,6 @@ M: manifest clone
         [ clone ] change-search-vocab-names
         [ clone ] change-search-vocabs
         [ clone ] change-qualified-vocabs
-        [ clone ] change-extra-words
         [ clone ] change-auto-used ;
 
 TUPLE: extra-words words ;
@@ -69,9 +66,15 @@ ERROR: no-word-in-vocab word vocab ;
 : (from) ( vocab words -- vocab words words' vocab )
     2dup swap load-vocab ;
 
-: extract-words ( seq vocab -- assoc' )
+: extract-words ( seq vocab -- assoc )
     [ words>> extract-keys dup ] [ name>> ] bi
     [ swap [ 2drop ] [ no-word-in-vocab ] if ] curry assoc-each ;
+
+: excluding-words ( seq vocab -- assoc )
+    [ nip words>> ] [ extract-words ] 2bi assoc-diff ;
+
+: qualified-words ( prefix vocab -- assoc )
+    words>> swap [ swap [ swap ":" glue ] dip ] curry assoc-map ;
 
 : (lookup) ( name assoc -- word/f )
     at dup forward-reference? [ drop f ] when ;
@@ -83,8 +86,7 @@ PRIVATE>
 
 : set-current-vocab ( name -- )
     create-vocab
-    [ manifest get (>>current-vocab) ]
-    [ words>> <extra-words> (add-qualified) ] bi ;
+    [ manifest get (>>current-vocab) ] [ (add-qualified) ] bi ;
 
 : with-current-vocab ( name quot -- )
     manifest get clone manifest [
@@ -102,11 +104,11 @@ TUPLE: no-current-vocab ;
     manifest get current-vocab>> [ no-current-vocab ] unless* ;
 
 : begin-private ( -- )
-    manifest get current-vocab>> vocab-name ".private" ?tail
+    current-vocab name>> ".private" ?tail
     [ drop ] [ ".private" append set-current-vocab ] if ;
 
 : end-private ( -- )
-    manifest get current-vocab>> vocab-name ".private" ?tail
+    current-vocab name>> ".private" ?tail
     [ set-current-vocab ] [ drop ] if ;
 
 : using-vocab? ( vocab -- ? )
@@ -137,10 +139,7 @@ TUPLE: no-current-vocab ;
 TUPLE: qualified vocab prefix words ;
 
 : <qualified> ( vocab prefix -- qualified )
-    2dup
-    [ load-vocab words>> ] [ CHAR: : suffix ] bi*
-    [ swap [ prepend ] dip ] curry assoc-map
-    qualified boa ;
+    (from) qualified-words qualified boa ;
 
 : add-qualified ( vocab prefix -- )
     <qualified> (add-qualified) ;
@@ -156,7 +155,7 @@ TUPLE: from vocab names words ;
 TUPLE: exclude vocab names words ;
 
 : <exclude> ( vocab words -- from )
-    (from) [ nip words>> ] [ extract-words ] 2bi assoc-diff exclude boa ;
+    (from) excluding-words exclude boa ;
 
 : add-words-excluding ( vocab words -- )
     <exclude> (add-qualified) ;
@@ -207,3 +206,45 @@ PRIVATE>
 
 : search ( name -- word/f )
     manifest get search-manifest ;
+
+<PRIVATE
+
+GENERIC: update ( search-path-elt -- valid? )
+
+: trim-forgotten ( qualified-vocab -- valid? )
+    [ [ nip "forgotten" word-prop not ] assoc-filter ] change-words
+    words>> assoc-empty? not ;
+
+M: from update trim-forgotten ;
+M: rename update trim-forgotten ;
+M: extra-words update trim-forgotten ;
+M: exclude update trim-forgotten ;
+
+M: qualified update
+    dup vocab>> vocab [
+        dup [ prefix>> ] [ vocab>> load-vocab ] bi qualified-words
+        >>words
+    ] [ drop f ] if ;
+
+M: vocab update dup name>> vocab eq? ;
+
+: update-manifest ( manifest -- )
+    [ dup [ name>> vocab ] when ] change-current-vocab
+    [ [ drop vocab ] assoc-filter ] change-search-vocab-names
+    dup search-vocab-names>> keys [ vocab ] V{ } map-as >>search-vocabs
+    qualified-vocabs>> [ update ] filter! drop ;
+
+M: manifest definitions-changed ( assoc manifest -- )
+    nip update-manifest ;
+
+PRIVATE>
+
+: with-manifest ( quot -- )
+    <manifest> manifest [
+        [ call ] [
+            [ manifest get add-definition-observer call ]
+            [ manifest get remove-definition-observer ]
+            [ ]
+            cleanup
+        ] if-bootstrapping
+    ] with-variable ; inline
