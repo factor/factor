@@ -86,8 +86,7 @@ PRIVATE>
 
 : set-current-vocab ( name -- )
     create-vocab
-    [ manifest get (>>current-vocab) ]
-    [ words>> <extra-words> (add-qualified) ] bi ;
+    [ manifest get (>>current-vocab) ] [ (add-qualified) ] bi ;
 
 : with-current-vocab ( name quot -- )
     manifest get clone manifest [
@@ -242,8 +241,10 @@ PRIVATE>
 
 : with-manifest ( quot -- )
     <manifest> manifest [
-        [ manifest get add-definition-observer call ]
-        [ manifest get remove-definition-observer ]
-        [ ]
-        cleanup
+        [ call ] [
+            [ manifest get add-definition-observer call ]
+            [ manifest get remove-definition-observer ]
+            [ ]
+            cleanup
+        ] if-bootstrapping
     ] with-variable ; inline
