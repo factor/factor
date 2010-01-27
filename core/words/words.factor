@@ -155,7 +155,12 @@ ERROR: bad-create name vocab ;
 
 : create ( name vocab -- word )
     check-create 2dup lookup
-    dup [ 2nip ] [ drop vocab-name <word> dup reveal ] if ;
+    dup [ 2nip ] [
+        drop
+        vocab-name <word>
+        dup reveal
+        dup changed-definition
+    ] if ;
 
 : constructor-word ( name vocab -- word )
     [ "<" ">" surround ] dip create ;
