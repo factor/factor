@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.algebra
 combinators definitions generic hashtables kernel
@@ -15,6 +15,8 @@ TUPLE: single-combination ;
 
 PREDICATE: single-generic < generic
     "combination" word-prop single-combination? ;
+
+M: single-generic make-inline cannot-be-inline ;
 
 GENERIC: dispatch# ( word -- n )
 
