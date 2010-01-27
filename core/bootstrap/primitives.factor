@@ -44,7 +44,7 @@ init-caches
 ! Vocabulary for slot accessors
 "accessors" create-vocab drop
 
-dummy-compiler compiler-impl set
+bootstrapping? on
 
 call( -- )
 call( -- )
@@ -52,8 +52,6 @@ call( -- )
 
 ! After we execute bootstrap/layouts
 num-types get f <array> builtins set
-
-bootstrapping? on
 
 [
 
