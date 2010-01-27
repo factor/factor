@@ -110,6 +110,31 @@ struct object_become_visitor {
 	}
 };
 
+struct code_block_become_visitor {
+	slot_visitor<slot_become_visitor> *workhorse;
+
+	explicit code_block_become_visitor(slot_visitor<slot_become_visitor> *workhorse_) :
+		workhorse(workhorse_) {}
+
+	void operator()(code_block *compiled, cell size)
+	{
+		workhorse->visit_code_block_objects(compiled);
+		workhorse->visit_embedded_literals(compiled);
+	}
+};
+
+struct code_block_write_barrier_visitor {
+	code_heap *code;
+
+	explicit code_block_write_barrier_visitor(code_heap *code_) :
+		code(code_) {}
+
+	void operator()(code_block *compiled, cell size)
+	{
+		code->write_barrier(compiled);
+	}
+};
+
 /* classes.tuple uses this to reshape tuples; tools.deploy.shaker uses this
    to coalesce equal but distinct quotations and wrappers. */
 void factor_vm::primitive_become()
@@ -134,17 +159,26 @@ void factor_vm::primitive_become()
 	}
 
 	/* Update all references to old objects to point to new objects */
-	slot_visitor<slot_become_visitor> workhorse(this,slot_become_visitor(&become_map));
-	workhorse.visit_roots();
-	workhorse.visit_contexts();
+	{
+		slot_visitor<slot_become_visitor> workhorse(this,slot_become_visitor(&become_map));
+		workhorse.visit_roots();
+		workhorse.visit_contexts();
 
-	object_become_visitor object_visitor(&workhorse);
-	each_object(object_visitor);
+		object_become_visitor object_visitor(&workhorse);
+		each_object(object_visitor);
+
+		code_block_become_visitor code_block_visitor(&workhorse);
+		each_code_block(code_block_visitor);
+	}
 
 	/* Since we may have introduced old->new references, need to revisit
-	all objects on a minor GC. */
+	all objects and code blocks on a minor GC. */
 	data->mark_all_cards();
-	primitive_minor_gc();
+
+	{
+		code_block_write_barrier_visitor code_block_visitor(code);
+		each_code_block(code_block_visitor);
+	}
 }
 
 }
