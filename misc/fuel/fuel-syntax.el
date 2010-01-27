@@ -159,6 +159,7 @@
                                            "MEMO" "MEMO:" "METHOD"
                                            "SYNTAX"
                                            "PREDICATE" "PRIMITIVE"
+                                           "STRUCT" "TAG" "UNION-STRUCT"
                                            "UNION"))
 
 (defconst fuel-syntax--no-indent-def-starts '("ARTICLE"
