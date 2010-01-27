@@ -193,13 +193,12 @@ SYMBOL: interactive-vocabs
 
 : with-interactive-vocabs ( quot -- )
     [
-        <manifest> manifest set
         "scratchpad" set-current-vocab
         interactive-vocabs get only-use-vocabs
         call
-    ] with-scope ; inline
+    ] with-manifest ; inline
 
 : listener ( -- )
-    [ [ { } (listener) ] with-interactive-vocabs ] with-return ;
+    [ [ { } (listener) ] with-return ] with-interactive-vocabs ;
 
 MAIN: listener

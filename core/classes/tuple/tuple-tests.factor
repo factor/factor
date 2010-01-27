@@ -443,14 +443,14 @@ TUPLE: redefinition-problem-2 ;
 
 [ ] [
     [
-        \ vocab tuple { "xxx" } "slots" get append
+        \ vocab identity-tuple { "xxx" } "slots" get append
         define-tuple-class
     ] with-compilation-unit
 
     all-words drop
 
     [
-        \ vocab tuple "slots" get
+        \ vocab identity-tuple "slots" get
         define-tuple-class
     ] with-compilation-unit
 ] unit-test

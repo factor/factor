@@ -87,7 +87,11 @@ M: word subwords drop f ;
 : make-deprecated ( word -- )
     t "deprecated" set-word-prop ;
 
-: make-inline ( word -- )
+ERROR: cannot-be-inline word ;
+
+GENERIC: make-inline ( word -- )
+
+M: word make-inline
     dup inline? [ drop ] [
         [ t "inline" set-word-prop ]
         [ changed-effect ]
@@ -155,7 +159,12 @@ ERROR: bad-create name vocab ;
 
 : create ( name vocab -- word )
     check-create 2dup lookup
-    dup [ 2nip ] [ drop vocab-name <word> dup reveal ] if ;
+    dup [ 2nip ] [
+        drop
+        vocab-name <word>
+        dup reveal
+        dup changed-definition
+    ] if ;
 
 : constructor-word ( name vocab -- word )
     [ "<" ">" surround ] dip create ;
