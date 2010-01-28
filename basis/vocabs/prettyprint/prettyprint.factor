@@ -64,12 +64,15 @@ M: rename pprint-qualified ( rename -- )
         tri
     ] with-pprint ;
 
+: filter-interesting ( seq -- seq' )
+    [ [ vocab? ] [ extra-words? ] bi or not ] filter ;
+
 PRIVATE>
 
 : (pprint-manifest ( manifest -- quots )
     [
         [ search-vocabs>> [ '[ _ pprint-using ] , ] unless-empty ]
-        [ qualified-vocabs>> [ extra-words? not ] filter [ '[ _ pprint-qualified ] , ] each ]
+        [ qualified-vocabs>> filter-interesting [ '[ _ pprint-qualified ] , ] each ]
         [ current-vocab>> [ '[ _ pprint-in ] , ] when* ]
         tri
     ] { } make ;
