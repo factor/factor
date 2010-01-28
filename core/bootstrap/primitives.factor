@@ -31,29 +31,30 @@ architecture get {
 ! Now we have ( syntax-quot arch-quot layouts-quot ) on the stack
 
 ! Bring up a bare cross-compiling vocabulary.
-"syntax" vocab vocab-words bootstrap-syntax set {
-    dictionary
-    new-classes
-    changed-definitions changed-generics changed-effects
-    outdated-generics forgotten-definitions
-    root-cache source-files update-map implementors-map
-} [ H{ } clone swap set ] each
+"syntax" vocab vocab-words bootstrap-syntax set
+
+H{ } clone dictionary set
+H{ } clone root-cache set
+H{ } clone source-files set
+H{ } clone update-map set
+H{ } clone implementors-map set
 
 init-caches
-
-! Vocabulary for slot accessors
-"accessors" create-vocab drop
 
 bootstrapping? on
 
 call( -- )
 call( -- )
-call( -- )
+
+! Vocabulary for slot accessors
+"accessors" create-vocab drop
 
 ! After we execute bootstrap/layouts
 num-types get f <array> builtins set
 
 [
+
+call( -- )
 
 ! Create some empty vocabs where the below primitives and
 ! classes will go
