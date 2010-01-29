@@ -21,3 +21,5 @@ unit-test
 
 [ ] [ "USING: macros stack-checker kernel ; IN: hanging-macro MACRO: c ( quot -- ) infer drop [ ] ; : a ( -- ) [ a ] c ;" eval( -- ) ] unit-test
 
+[ ] [ "IN: macros.tests USE: macros MACRO: foo ( -- x ) [ ] ;" eval( -- ) ] unit-test
+    [ "IN: macros.tests USE: macros MACRO: foo ( -- x ) [ ] ; inline" eval( -- ) ] must-fail

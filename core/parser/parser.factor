@@ -111,11 +111,10 @@ SYMBOL: bootstrap-syntax
 
 : with-file-vocabs ( quot -- )
     [
-        <manifest> manifest set
         "syntax" use-vocab
         bootstrap-syntax get [ use-words ] when*
         call
-    ] with-scope ; inline
+    ] with-manifest ; inline
 
 SYMBOL: print-use-hook
 

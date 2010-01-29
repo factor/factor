@@ -554,12 +554,19 @@ M: quotation '
 : fixup-header ( -- )
     heap-size data-heap-size-offset fixup ;
 
+: build-generics ( -- )
+    [
+        all-words
+        [ generic? ] filter
+        [ make-generic ] each
+    ] with-compilation-unit ;
+
 : build-image ( -- image )
     800000 <vector> image set
     20000 <hashtable> objects set
     emit-image-header t, 0, 1, -1,
     "Building generic words..." print flush
-    remake-generics
+    build-generics
     "Serializing words..." print flush
     emit-words
     "Serializing JIT data..." print flush

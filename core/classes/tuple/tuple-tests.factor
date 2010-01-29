@@ -6,7 +6,7 @@ io.streams.string kernel kernel.private math math.constants
 math.order namespaces parser parser.notes prettyprint
 quotations random see sequences sequences.private slots
 slots.private splitting strings summary threads tools.test
-vectors vocabs words words.symbol fry literals ;
+vectors vocabs words words.symbol fry literals memory ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -443,14 +443,14 @@ TUPLE: redefinition-problem-2 ;
 
 [ ] [
     [
-        \ vocab tuple { "xxx" } "slots" get append
+        \ vocab identity-tuple { "xxx" } "slots" get append
         define-tuple-class
     ] with-compilation-unit
 
     all-words drop
 
     [
-        \ vocab tuple "slots" get
+        \ vocab identity-tuple "slots" get
         define-tuple-class
     ] with-compilation-unit
 ] unit-test
@@ -765,3 +765,22 @@ USE: classes.struct
     [ "prototype" word-prop ] map
     [ '[ _ hashcode drop f ] [ drop t ] recover ] filter
 ] unit-test
+
+! Make sure that tuple reshaping updates code heap roots
+TUPLE: code-heap-ref ;
+
+: code-heap-ref' ( -- a ) T{ code-heap-ref } ;
+
+! Push foo's literal to tenured space
+[ ] [ gc ] unit-test
+
+! Reshape!
+[ ] [ "IN: classes.tuple.tests USE: math TUPLE: code-heap-ref { x integer initial: 5 } ;" eval( -- ) ] unit-test
+
+! Code heap reference
+[ t ] [ code-heap-ref' code-heap-ref? ] unit-test
+[ 5 ] [ code-heap-ref' x>> ] unit-test
+
+! Data heap reference
+[ t ] [ \ code-heap-ref' def>> first code-heap-ref? ] unit-test
+[ 5 ] [ \ code-heap-ref' def>> first x>> ] unit-test

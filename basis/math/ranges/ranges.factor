@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel layouts math math.order namespaces sequences
 sequences.private accessors classes.tuple arrays ;
@@ -16,10 +16,8 @@ M: range length ( seq -- n ) length>> ; inline
 
 M: range nth-unsafe ( n range -- obj ) [ step>> * ] keep from>> + ; inline
 
-! For ranges with many elements, the default element-wise methods
-! sequences define are unsuitable because they're O(n)
-M: range equal? over range? [ tuple= ] [ 2drop f ] if ;
-
+! We want M\ tuple hashcode, not M\ sequence hashcode here!
+! sequences hashcode is O(n) in number of elements
 M: range hashcode* tuple-hashcode ;
 
 INSTANCE: range immutable-sequence

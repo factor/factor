@@ -64,16 +64,6 @@ M: f process-forgotten-words drop ;
 : without-optimizer ( quot -- )
     [ f compiler-impl ] dip with-variable ; inline
 
-! Trivial compiler. We don't want to touch the code heap
-! during stage1 bootstrap, it would just waste time.
-SINGLETON: dummy-compiler
-
-M: dummy-compiler to-recompile f ;
-
-M: dummy-compiler recompile drop { } ;
-
-M: dummy-compiler process-forgotten-words drop ;
-
 : <definitions> ( -- pair ) { H{ } H{ } } [ clone ] map ;
 
 SYMBOL: definition-observers
@@ -143,13 +133,15 @@ M: object bump-effect-counter* drop f ;
     [ drop ] [ notify-definition-observers notify-error-observers ] if ;
 
 : finish-compilation-unit ( -- )
-    remake-generics
-    to-recompile recompile
-    update-tuples
-    process-forgotten-definitions
-    modify-code-heap
-    bump-effect-counter
-    notify-observers ;
+    [ ] [
+        remake-generics
+        to-recompile recompile
+        update-tuples
+        process-forgotten-definitions
+        modify-code-heap
+        bump-effect-counter
+        notify-observers
+    ] if-bootstrapping ;
 
 PRIVATE>
 
