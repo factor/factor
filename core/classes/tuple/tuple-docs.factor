@@ -200,6 +200,8 @@ ARTICLE: "tuple-introspection" "Tuple introspection"
     tuple>array
     tuple-slots
 }
+"Tuples can be compared for slot equality even if the tuple class overrides " { $link equal? } ":"
+{ $subsections tuple= }
 "Tuple classes can also be defined at run time:"
 { $subsections define-tuple-class }
 { $see-also "slots" "mirrors" } ;
@@ -348,8 +350,7 @@ HELP: tuple-class
 
 HELP: tuple=
 { $values { "tuple1" tuple } { "tuple2" tuple } { "?" "a boolean" } }
-{ $description "Low-level tuple equality test. User code should use " { $link = } " instead." }
-{ $warning "This word is in the " { $vocab-link "classes.tuple.private" } " vocabulary because it does not do any type checking. Passing values which are not tuples can result in memory corruption." } ;
+{ $description "Checks if two tuples have equal slot values. This is the default behavior of " { $link = } " on tuples, unless the tuple class subclasses " { $link identity-tuple } " or implements a method on " { $link equal? } ". In cases where equality has been redefined, this word can be used to get the default semantics if needed." } ;
 
 HELP: tuple
 { $class-description "The class of tuples. This class is further partitioned into disjoint subclasses; each tuple shape defined by " { $link POSTPONE: TUPLE: } " is a new class."

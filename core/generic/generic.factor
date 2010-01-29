@@ -87,27 +87,25 @@ TUPLE: check-method class generic ;
         \ check-method boa throw
     ] unless ; inline
 
-: changed-generic ( class generic -- )
-    changed-generics get
-    [ [ [ class-or ] when* ] change-at ] [ no-compilation-unit ] if* ;
-
 : remake-generic ( generic -- )
     dup outdated-generics get set-in-unit ;
 
 : remake-generics ( -- )
     outdated-generics get keys [ generic? ] filter [ make-generic ] each ;
 
+GENERIC: update-generic ( class generic -- )
+
 : with-methods ( class generic quot -- )
-    [ drop changed-generic ]
-    [ [ "methods" word-prop ] dip call ]
-    [ drop remake-generic drop ]
-    3tri ; inline
+    [ "methods" word-prop ] prepose [ update-generic ] 2bi ; inline
 
 : method-word-name ( class generic -- string )
     [ name>> ] bi@ "=>" glue ;
 
 PREDICATE: method-body < word
     "method-generic" word-prop >boolean ;
+
+M: method-body flushable?
+    "method-generic" word-prop flushable? ;
 
 M: method-body stack-effect
     "method-generic" word-prop stack-effect ;
@@ -173,11 +171,6 @@ M: method-body forget*
         ]
         [ call-next-method ] bi
     ] if ;
-
-M: sequence update-methods ( class seq -- )
-    implementors [
-        [ changed-generic ] [ remake-generic drop ] 2bi
-    ] with each ;
 
 : define-generic ( word combination effect -- )
     [ nip swap set-stack-effect ]

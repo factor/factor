@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel classes combinators accessors sequences arrays
 vectors assocs namespaces words sorting layouts math hashtables
@@ -34,22 +34,18 @@ DEFER: (class-or)
 
 GENERIC: (flatten-class) ( class -- )
 
-: normalize-class ( class -- class' )
-    {
-        { [ dup members ] [ members <anonymous-union> normalize-class ] }
-        { [ dup participants ] [ participants <anonymous-intersection> normalize-class ] }
-        [ ]
-    } cond ;
+GENERIC: normalize-class ( class -- class' )
+
+M: object normalize-class ;
 
 PRIVATE>
 
-GENERIC: valid-class? ( obj -- ? )
+GENERIC: forgotten-class? ( obj -- ? )
 
-M: class valid-class? drop t ;
-M: anonymous-union valid-class? members>> [ valid-class? ] all? ;
-M: anonymous-intersection valid-class? participants>> [ valid-class? ] all? ;
-M: anonymous-complement valid-class? class>> valid-class? ;
-M: word valid-class? drop f ;
+M: word forgotten-class? "forgotten" word-prop ;
+M: anonymous-union forgotten-class? members>> [ forgotten-class? ] any? ;
+M: anonymous-intersection forgotten-class? participants>> [ forgotten-class? ] any? ;
+M: anonymous-complement forgotten-class? class>> forgotten-class? ;
 
 : class<= ( first second -- ? )
     class<=-cache get [ (class<=) ] 2cache ;
@@ -93,6 +89,9 @@ M: word valid-class? drop f ;
 : left-anonymous-union<= ( first second -- ? )
     [ members>> ] dip [ class<= ] curry all? ;
 
+: right-union<= ( first second -- ? )
+    members [ class<= ] with any? ;
+
 : right-anonymous-union<= ( first second -- ? )
     members>> [ class<= ] with any? ;
 
@@ -117,7 +116,7 @@ M: word valid-class? drop f ;
             [ class-not normalize-class ] map
             <anonymous-union>
         ] }
-        [ <anonymous-complement> ]
+        [ drop object ]
     } cond ;
 
 : left-anonymous-complement<= ( first second -- ? )
@@ -147,6 +146,7 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
                 { [ over anonymous-union? ] [ left-anonymous-union<= ] }
                 { [ over anonymous-intersection? ] [ left-anonymous-intersection<= ] }
                 { [ over nontrivial-anonymous-complement? ] [ left-anonymous-complement<= ] }
+                { [ dup members ] [ right-union<= ] }
                 { [ dup anonymous-union? ] [ right-anonymous-union<= ] }
                 { [ dup anonymous-intersection? ] [ right-anonymous-intersection<= ] }
                 { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }

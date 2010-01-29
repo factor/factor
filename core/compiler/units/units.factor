@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel continuations assocs namespaces
 sequences words vocabs definitions hashtables init sets
@@ -43,6 +43,20 @@ PRIVATE>
 
 SYMBOL: compiler-impl
 
+HOOK: update-call-sites compiler-impl ( class generic -- words )
+
+: changed-call-sites ( class generic -- )
+    update-call-sites [ changed-definition ] each ;
+
+M: generic update-generic ( class generic -- )
+    [ changed-call-sites ]
+    [ remake-generic drop ]
+    [ changed-conditionally drop ]
+    2tri ;
+
+M: sequence update-methods ( class seq -- )
+    implementors [ update-generic ] with each ;
+
 HOOK: recompile compiler-impl ( words -- alist )
 
 HOOK: to-recompile compiler-impl ( -- words )
@@ -52,12 +66,14 @@ HOOK: process-forgotten-words compiler-impl ( words -- )
 : compile ( words -- ) recompile modify-code-heap ;
 
 ! Non-optimizing compiler
-M: f recompile
-    [ dup def>> ] { } map>assoc ;
+M: f update-call-sites
+    2drop { } ;
 
 M: f to-recompile
-    changed-definitions get [ drop word? ] assoc-filter
-    changed-generics get assoc-union keys ;
+    changed-definitions get [ drop word? ] assoc-filter keys ;
+
+M: f recompile
+    [ dup def>> ] { } map>assoc ;
 
 M: f process-forgotten-words drop ;
 
@@ -92,9 +108,9 @@ GENERIC: definitions-changed ( assoc obj -- )
 ! inline caching
 : effect-counter ( -- n ) 47 special-object ; inline
 
-GENERIC: bump-effect-counter* ( defspec -- ? )
+GENERIC: always-bump-effect-counter? ( defspec -- ? )
 
-M: object bump-effect-counter* drop f ;
+M: object always-bump-effect-counter? drop f ;
 
 <PRIVATE
 
@@ -108,6 +124,7 @@ M: object bump-effect-counter* drop f ;
     dup new-definitions get first update
     dup new-definitions get second update
     dup changed-definitions get update
+    dup maybe-changed get update
     dup dup changed-vocabs update ;
 
 : process-forgotten-definitions ( -- )
@@ -117,9 +134,10 @@ M: object bump-effect-counter* drop f ;
     bi ;
 
 : bump-effect-counter? ( -- ? )
-    changed-effects get new-words get assoc-diff assoc-empty? not
-    changed-definitions get [ drop bump-effect-counter* ] assoc-any?
-    or ;
+    changed-effects get
+    maybe-changed get
+    changed-definitions get [ drop always-bump-effect-counter? ] assoc-filter
+    3array assoc-combine new-words get assoc-diff assoc-empty? not ;
 
 : bump-effect-counter ( -- )
     bump-effect-counter? [
@@ -148,25 +166,23 @@ PRIVATE>
 : with-nested-compilation-unit ( quot -- )
     [
         H{ } clone changed-definitions set
-        H{ } clone changed-generics set
+        H{ } clone maybe-changed set
         H{ } clone changed-effects set
         H{ } clone outdated-generics set
         H{ } clone outdated-tuples set
         H{ } clone new-words set
-        H{ } clone new-classes set
         [ finish-compilation-unit ] [ ] cleanup
     ] with-scope ; inline
 
 : with-compilation-unit ( quot -- )
     [
         H{ } clone changed-definitions set
-        H{ } clone changed-generics set
+        H{ } clone maybe-changed set
         H{ } clone changed-effects set
         H{ } clone outdated-generics set
         H{ } clone forgotten-definitions set
         H{ } clone outdated-tuples set
         H{ } clone new-words set
-        H{ } clone new-classes set
         <definitions> new-definitions set
         <definitions> old-definitions set
         [ finish-compilation-unit ] [ ] cleanup

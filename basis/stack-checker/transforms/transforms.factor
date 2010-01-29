@@ -124,15 +124,15 @@ IN: stack-checker.transforms
 
 \ 3|| t "no-compile" set-word-prop
 
+: add-next-method-dependency ( method -- )
+    [ "method-class" word-prop ]
+    [ "method-generic" word-prop ] bi
+    2dup next-method
+    depends-on-next-method ;
+
 \ (call-next-method) [
-    [
-        [ "method-class" word-prop ]
-        [ "method-generic" word-prop ] bi
-        [ inlined-dependency depends-on ] bi@
-    ] [
-        [ next-method-quot ]
-        [ '[ _ no-next-method ] ] bi or
-    ] bi
+    [ add-next-method-dependency ]
+    [ [ next-method-quot ] [ '[ _ no-next-method ] ] bi or ] bi
 ] 1 define-transform
 
 \ (call-next-method) t "no-compile" set-word-prop
@@ -140,10 +140,10 @@ IN: stack-checker.transforms
 ! Constructors
 \ boa [
     dup tuple-class? [
-        dup inlined-dependency depends-on
-        [ "boa-check" word-prop [ ] or ]
-        [ tuple-layout '[ _ <tuple-boa> ] ]
-        bi append
+        dup tuple-layout
+        [ depends-on-tuple-layout ]
+        [ [ "boa-check" word-prop [ ] or ] dip ] 2bi
+        '[ @ _ <tuple-boa> ]
     ] [ drop f ] if
 ] 1 define-transform
 
