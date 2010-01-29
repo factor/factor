@@ -124,15 +124,15 @@ IN: stack-checker.transforms
 
 \ 3|| t "no-compile" set-word-prop
 
+: add-next-method-dependency ( method -- )
+    [ "method-class" word-prop ]
+    [ "method-generic" word-prop ] bi
+    2dup next-method
+    depends-on-next-method ;
+
 \ (call-next-method) [
-    [
-        [ "method-class" word-prop ]
-        [ "method-generic" word-prop ] bi
-        depends-on-generic
-    ] [
-        [ next-method-quot ]
-        [ '[ _ no-next-method ] ] bi or
-    ] bi
+    [ add-next-method-dependency ]
+    [ [ next-method-quot ] [ '[ _ no-next-method ] ] bi or ] bi
 ] 1 define-transform
 
 \ (call-next-method) t "no-compile" set-word-prop
