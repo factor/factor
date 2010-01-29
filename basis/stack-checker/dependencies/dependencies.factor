@@ -26,6 +26,15 @@ SYMBOLS: inlined-dependency conditional-dependency flushed-dependency called-dep
         ] [ 3drop ] if
     ] if ;
 
+: depends-on-effect ( word -- )
+    called-dependency depends-on ;
+
+: depends-on-definition ( word -- )
+    inlined-dependency depends-on ;
+
+: depends-on-conditionally ( word -- )
+    conditional-dependency depends-on ;
+
 ! Generic words that the current quotation depends on
 SYMBOL: generic-dependencies
 

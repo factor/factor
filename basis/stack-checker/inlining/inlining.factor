@@ -140,7 +140,7 @@ SYMBOL: enter-out
 
 : inline-word ( word -- )
     commit-literals
-    [ inlined-dependency depends-on ]
+    [ depends-on-definition ]
     [
         dup inline-recursive-label [
             call-recursive-inline-word
