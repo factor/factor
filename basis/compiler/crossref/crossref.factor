@@ -17,13 +17,7 @@ compiled-generic-crossref [ H{ } clone ] initialize
     compiled-crossref get at ;
 
 : (compiled-usages) ( word -- assoc )
-    #! If the word is not flushable anymore, we have to recompile
-    #! all words which flushable away a call (presumably when the
-    #! word was still flushable). If the word is flushable, we
-    #! don't have to recompile words that folded this away.
-    [ compiled-usage ]
-    [ "flushable" word-prop inlined-dependency flushed-dependency ? ] bi
-    '[ nip _ dependency>= ] assoc-filter ;
+    compiled-usage [ nip inlined-dependency dependency>= ] assoc-filter ;
 
 : compiled-usages ( assoc -- assocs )
     [ drop word? ] assoc-filter
@@ -32,7 +26,7 @@ compiled-generic-crossref [ H{ } clone ] initialize
 : dependencies-satisfied? ( word -- ? )
     "conditional-dependencies" word-prop [ satisfied? ] all? ;
 
-: outdated-class-usages ( assoc -- assocs )
+: outdated-conditional-usages ( assoc -- assocs )
     [
         drop
         compiled-usage

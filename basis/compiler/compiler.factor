@@ -203,7 +203,7 @@ M: optimizing-compiler recompile ( words -- alist )
 
 M: optimizing-compiler to-recompile ( -- words )
     changed-definitions get compiled-usages
-    changed-classes get outdated-class-usages
+    maybe-changed get outdated-conditional-usages
     append assoc-combine keys ;
 
 M: optimizing-compiler process-forgotten-words
