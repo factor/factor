@@ -108,3 +108,8 @@ IN: generalizations.tests
     2 1 0 -1 [ + ] [ - ] [ * ] [ / ] 4 spread-curry 4 spread*
 ] unit-test
 
+[ { 1 2 } { 3 4 } { 5 6 } ]
+[ 1 2 3 4 5 6 [ 2array ] 2 3 mnapply ] unit-test
+
+[ { 1 2 3 } { 4 5 6 } ]
+[ 1 2 3 4 5 6 [ 3array ] 3 2 mnapply ] unit-test

@@ -124,6 +124,10 @@ MACRO: cleave* ( n -- )
 MACRO: mnswap ( m n -- )
     1 + '[ _ -nrot ] swap '[ _ _ napply ] ;
 
+MACRO: mnapply ( quot m n -- )
+    swap
+    [ swap '[ _ ] replicate ] dip '[ _ _ nspread ] ;
+
 MACRO: nweave ( n -- )
     [ dup iota <reversed> [ '[ _ _ mnswap ] ] with map ] keep
     '[ _ _ ncleave ] ;
