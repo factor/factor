@@ -318,7 +318,7 @@ generic-comparison-ops [
     dup literal>> class?
     [
         literal>>
-        [ inlined-dependency depends-on ]
+        [ class-dependency depends-on ]
         [ predicate-output-infos ]
         bi
     ] [ 2drop object-info ] if

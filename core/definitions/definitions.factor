@@ -15,6 +15,11 @@ SYMBOL: changed-definitions
 : changed-definition ( defspec -- )
     dup changed-definitions get set-in-unit ;
 
+SYMBOL: changed-classes
+
+: changed-class ( class -- )
+    dup changed-classes get set-in-unit ;
+
 SYMBOL: changed-effects
 
 SYMBOL: outdated-generics

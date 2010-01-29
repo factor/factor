@@ -49,8 +49,7 @@ SYMBOL: compiled
 
 : start ( word -- )
     dup name>> compiler-message
-    H{ } clone dependencies set
-    H{ } clone generic-dependencies set
+    init-dependencies
     clear-compiler-error ;
 
 GENERIC: no-compile? ( word -- ? )
@@ -86,15 +85,15 @@ M: word combinator? inline? ;
     [ compiled-unxref ]
     [
         dup crossref? [
-            dependencies get
-            generic-dependencies get
-            compiled-xref
+            [ dependencies get generic-dependencies get compiled-xref ]
+            [ conditional-dependencies get save-conditional-dependencies ]
+            bi
         ] [ drop ] if
     ] tri ;
 
 : deoptimize-with ( word def -- * )
     #! If the word failed to infer, compile it with the
-    #! non-optimizing compiler. 
+    #! non-optimizing compiler.
     swap [ finish ] [ compiled get set-at ] bi return ;
 
 : not-compiled-def ( word error -- def )
@@ -203,7 +202,9 @@ M: optimizing-compiler recompile ( words -- alist )
     "--- compile done" compiler-message ;
 
 M: optimizing-compiler to-recompile ( -- words )
-    changed-definitions get compiled-usages assoc-combine keys ;
+    changed-definitions get compiled-usages
+    changed-classes get outdated-class-usages
+    append assoc-combine keys ;
 
 M: optimizing-compiler process-forgotten-words
     [ delete-compiled-xref ] each ;

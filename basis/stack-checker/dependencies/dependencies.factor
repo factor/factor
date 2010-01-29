@@ -1,19 +1,19 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs classes.algebra fry kernel math namespaces
-sequences words ;
+USING: assocs accessors classes.algebra fry generic kernel math
+namespaces sequences words ;
 IN: stack-checker.dependencies
 
 ! Words that the current quotation depends on
 SYMBOL: dependencies
 
-SYMBOLS: inlined-dependency flushed-dependency called-dependency ;
+SYMBOLS: inlined-dependency class-dependency flushed-dependency called-dependency ;
 
 : index>= ( obj1 obj2 seq -- ? )
     [ index ] curry bi@ >= ;
 
 : dependency>= ( how1 how2 -- ? )
-    { called-dependency flushed-dependency inlined-dependency }
+    { called-dependency class-dependency flushed-dependency inlined-dependency }
     index>= ;
 
 : strongest-dependency ( how1 how2 -- how )
@@ -35,6 +35,45 @@ SYMBOL: generic-dependencies
 : depends-on-generic ( class generic -- )
     generic-dependencies get dup
     [ [ ?class-or ] change-at ] [ 3drop ] if ;
+
+! Conditional dependencies are re-evaluated when classes change;
+! if any fail, the word is recompiled
+SYMBOL: conditional-dependencies
+
+GENERIC: satisfied? ( dependency -- ? )
+
+: conditional-dependency ( ... class -- )
+    boa conditional-dependencies get
+    dup [ push ] [ 2drop ] if ; inline
+
+TUPLE: depends-on-class<= class1 class2 ;
+
+: depends-on-class<= ( class1 class2 -- )
+    \ depends-on-class<= conditional-dependency ;
+
+M: depends-on-class<= satisfied?
+    [ class1>> ] [ class2>> ] bi class<= ;
+
+TUPLE: depends-on-classes-disjoint class1 class2 ;
+
+: depends-on-classes-disjoint ( class1 class2 -- )
+    \ depends-on-classes-disjoint conditional-dependency ;
+
+M: depends-on-classes-disjoint satisfied?
+    [ class1>> ] [ class2>> ] bi classes-intersect? not ;
+
+TUPLE: depends-on-method class generic method ;
+
+: depends-on-method ( class generic method -- )
+    \ depends-on-method conditional-dependency ;
+
+M: depends-on-method satisfied?
+    [ [ class>> ] [ generic>> ] bi method-for-class ] [ method>> ] bi eq? ;
+
+: init-dependencies ( -- )
+    H{ } clone dependencies set
+    H{ } clone generic-dependencies set
+    V{ } clone conditional-dependencies set ;
 
 : without-dependencies ( quot -- )
     [

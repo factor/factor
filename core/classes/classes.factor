@@ -45,6 +45,8 @@ PREDICATE: class < word "class" word-prop ;
 
 PREDICATE: predicate < word "predicating" word-prop >boolean ;
 
+M: predicate flushable? drop t ;
+
 M: predicate forget*
     [ call-next-method ] [ f "predicating" set-word-prop ] bi ;
 
