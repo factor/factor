@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors classes.algebra fry generic kernel math
 namespaces sequences words ;
+FROM: classes.tuple.private => tuple-layout ;
 IN: stack-checker.dependencies
 
 ! Words that the current quotation depends on
@@ -78,6 +79,15 @@ TUPLE: depends-on-method class generic method ;
 
 M: depends-on-method satisfied?
     [ [ class>> ] [ generic>> ] bi method-for-class ] [ method>> ] bi eq? ;
+
+TUPLE: depends-on-tuple-layout class layout ;
+
+: depends-on-tuple-layout ( class layout -- )
+    [ drop depends-on-conditionally ]
+    [ \ depends-on-tuple-layout add-conditional-dependency ] 2bi ;
+
+M: depends-on-tuple-layout satisfied?
+    [ class>> tuple-layout ] [ layout>> ] bi eq? ;
 
 TUPLE: depends-on-flushable word ;
 
