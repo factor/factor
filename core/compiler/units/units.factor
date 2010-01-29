@@ -51,7 +51,8 @@ HOOK: update-call-sites compiler-impl ( class generic -- words )
 M: generic update-generic ( class generic -- )
     [ changed-call-sites ]
     [ remake-generic drop ]
-    2bi ;
+    [ changed-conditionally drop ]
+    2tri ;
 
 M: sequence update-methods ( class seq -- )
     implementors [ update-generic ] with each ;
