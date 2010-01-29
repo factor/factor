@@ -163,10 +163,12 @@ ERROR: bad-partial-eval quot word ;
 
 : inline-new ( class -- quot/f )
     dup tuple-class? [
-        dup depends-on-conditionally
-        [ all-slots [ initial>> literalize ] map ]
-        [ tuple-layout '[ _ <tuple-boa> ] ]
-        bi append >quotation
+        dup tuple-layout
+        [ depends-on-tuple-layout ]
+        [ drop all-slots [ initial>> literalize ] [ ] map-as ]
+        [ nip ]
+        2tri
+        '[ @ _ <tuple-boa> ]
     ] [ drop f ] if ;
 
 \ new [ inline-new ] 1 define-partial-eval
