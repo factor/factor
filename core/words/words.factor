@@ -110,9 +110,14 @@ M: word make-inline
 : define-inline ( word def effect -- )
     [ define-declared ] [ 2drop make-inline ] 3bi ;
 
+GENERIC: flushable? ( word -- ? )
+
+M: word flushable? "flushable" word-prop ;
+
 GENERIC: reset-word ( word -- )
 
 M: word reset-word
+    dup flushable? [ dup changed-conditionally ] when
     {
         "unannotated-def" "parsing" "inline" "recursive"
         "foldable" "flushable" "reading" "writing" "reader"

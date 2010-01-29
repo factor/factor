@@ -672,6 +672,9 @@ HELP: object
 HELP: null
 { $class-description
     "The canonical empty class with no instances."
+}
+{ $notes
+    "Unlike " { $snippet "null" } " in Java or " { $snippet "NULL" } " in C++, this is not a value signifying empty, or nothing. Use " { $link f } " for this purpose."
 } ;
 
 HELP: most

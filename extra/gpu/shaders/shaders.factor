@@ -128,6 +128,20 @@ TR: hyphens>underscores "-" "_" ;
         [ gl-type vertex-attribute [ component-type>> ] [ dim>> ] bi feedback-type= ]
     } 0&& [ vertex-attribute inaccurate-feedback-attribute-error ] unless ;
 
+:: (bind-float-vertex-attribute) ( program-instance ptr name dim gl-type normalize? stride offset -- )
+    program-instance name attribute-index :> idx
+    idx 0 >= [
+        idx glEnableVertexAttribArray
+        idx dim gl-type normalize? stride offset ptr <displaced-alien> glVertexAttribPointer
+    ] when ; inline
+
+:: (bind-int-vertex-attribute) ( program-instance ptr name dim gl-type stride offset -- )
+    program-instance name attribute-index :> idx
+    idx 0 >= [
+        idx glEnableVertexAttribArray
+        idx dim gl-type stride offset ptr <displaced-alien> glVertexAttribIPointer
+    ] when ; inline
+
 :: [bind-vertex-attribute] ( stride offset vertex-attribute -- stride offset' quot )
     vertex-attribute name>> hyphens>underscores :> name
     vertex-attribute component-type>>           :> type
@@ -141,23 +155,9 @@ TR: hyphens>underscores "-" "_" ;
         { [ name not ] [ [ 2drop ] ] }
         {
             [ type unnormalized-integer-components? ]
-            [
-                {
-                    name attribute-index [ glEnableVertexAttribArray ] keep
-                    dim gl-type stride offset
-                } >quotation :> dip-block
-                
-                { dip-block dip <displaced-alien> glVertexAttribIPointer } >quotation
-            ]
+            [ { name dim gl-type stride offset (bind-int-vertex-attribute) } >quotation ]
         }
-        [
-            {
-                name attribute-index [ glEnableVertexAttribArray ] keep
-                dim gl-type normalize? stride offset
-            } >quotation :> dip-block
-
-            { dip-block dip <displaced-alien> glVertexAttribPointer } >quotation
-        ]
+        [ { name dim gl-type normalize? stride offset (bind-float-vertex-attribute) } >quotation ]
     } cond ;
 
 :: [bind-vertex-format] ( vertex-attributes -- quot )

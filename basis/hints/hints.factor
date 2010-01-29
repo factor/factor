@@ -41,18 +41,13 @@ M: object specializer-declaration class ;
 : specialize-quot ( quot specializer -- quot' )
     [ drop ] [ specializer-cases ] 2bi alist>quot ;
 
-! compiler.tree.propagation.inlining sets this to f
-SYMBOL: specialize-method?
-
-t specialize-method? set-global
-
 : method-declaration ( method -- quot )
     [ "method-generic" word-prop dispatch# object <array> ]
     [ "method-class" word-prop ]
     bi prefix [ declare ] curry [ ] like ;
 
 : specialize-method ( quot method -- quot' )
-    [ specialize-method? get [ method-declaration prepend ] [ drop ] if ]
+    [ method-declaration prepend ]
     [ "method-generic" word-prop ] bi
     specializer [ specialize-quot ] when* ;
 

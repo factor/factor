@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.algebra classes.algebra.private
 words kernel kernel.private namespaces sequences math
@@ -19,11 +19,6 @@ PREDICATE: builtin-class < class
 M: object class tag type>class ; inline
 
 M: builtin-class rank-class drop 0 ;
-
-GENERIC: define-builtin-predicate ( class -- )
-
-M: builtin-class define-builtin-predicate
-    dup class>type [ eq? ] curry [ tag ] prepend define-predicate ;
 
 M: builtin-class instance? [ tag ] [ class>type ] bi* eq? ;
 

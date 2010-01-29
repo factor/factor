@@ -32,4 +32,4 @@ M: macro definition "macro" word-prop ;
 M: macro reset-word
     [ call-next-method ] [ f "macro" set-word-prop ] bi ;
 
-M: macro bump-effect-counter* drop t ;
+M: macro always-bump-effect-counter? drop t ;

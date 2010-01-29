@@ -3,17 +3,15 @@
 USING: accessors kernel namespaces arrays sequences io words fry
 continuations vocabs assocs dlists definitions math graphs generic
 generic.single combinators deques search-deques macros
-source-files.errors combinators.short-circuit
+source-files.errors combinators.short-circuit classes.algebra
 
 stack-checker stack-checker.dependencies stack-checker.inlining
 stack-checker.errors
 
-compiler.errors compiler.units compiler.utilities
+compiler.errors compiler.units compiler.utilities compiler.crossref
 
 compiler.tree.builder
 compiler.tree.optimizer
-
-compiler.crossref
 
 compiler.cfg
 compiler.cfg.builder
@@ -40,19 +38,18 @@ SYMBOL: compiled
 : recompile-callers? ( word -- ? )
     changed-effects get key? ;
 
-: recompile-callers ( words -- )
-    #! If a word's stack effect changed, recompile all words that
-    #! have compiled calls to it.
+: recompile-callers ( word -- )
+    #! If a word's stack effect changed, recompile all words
+    #! that have compiled calls to it.
     dup recompile-callers?
-    [ compiled-usage keys [ queue-compile ] each ] [ drop ] if ;
+    [ effect-dependencies-of keys [ queue-compile ] each ] [ drop ] if ;
 
 : compiler-message ( string -- )
     "trace-compilation" get [ global [ print flush ] bind ] [ drop ] if ;
 
 : start ( word -- )
     dup name>> compiler-message
-    H{ } clone dependencies set
-    H{ } clone generic-dependencies set
+    init-dependencies
     clear-compiler-error ;
 
 GENERIC: no-compile? ( word -- ? )
@@ -88,15 +85,15 @@ M: word combinator? inline? ;
     [ compiled-unxref ]
     [
         dup crossref? [
-            dependencies get
-            generic-dependencies get
-            compiled-xref
+            [ dependencies get generic-dependencies get compiled-xref ]
+            [ conditional-dependencies get save-conditional-dependencies ]
+            bi
         ] [ drop ] if
     ] tri ;
 
 : deoptimize-with ( word def -- * )
     #! If the word failed to infer, compile it with the
-    #! non-optimizing compiler. 
+    #! non-optimizing compiler.
     swap [ finish ] [ compiled get set-at ] bi return ;
 
 : not-compiled-def ( word error -- def )
@@ -183,6 +180,14 @@ t compile-dependencies? set-global
 
 SINGLETON: optimizing-compiler
 
+M: optimizing-compiler update-call-sites ( class generic -- words )
+    #! Words containing call sites with inferred type 'class'
+    #! which inlined a method on 'generic'
+    compiled-generic-usage swap '[
+        nip dup forgotten-class?
+        [ drop f ] [ _ classes-intersect? ] if
+    ] assoc-filter keys ;
+
 M: optimizing-compiler recompile ( words -- alist )
     [
         <hashed-dlist> compile-queue set
@@ -198,7 +203,7 @@ M: optimizing-compiler recompile ( words -- alist )
 
 M: optimizing-compiler to-recompile ( -- words )
     changed-definitions get compiled-usages
-    changed-generics get compiled-generic-usages
+    maybe-changed get outdated-conditional-usages
     append assoc-combine keys ;
 
 M: optimizing-compiler process-forgotten-words

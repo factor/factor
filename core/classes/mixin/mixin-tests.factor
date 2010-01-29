@@ -38,8 +38,8 @@ MIXIN: mx1
 INSTANCE: integer mx1
 
 [ t ] [ integer mx1 class<= ] unit-test
-[ t ] [ mx1 integer class<= ] unit-test
-[ t ] [ mx1 number class<= ] unit-test
+[ f ] [ mx1 integer class<= ] unit-test
+[ f ] [ mx1 number class<= ] unit-test
 
 "IN: classes.mixin.tests USE: arrays INSTANCE: array mx1" eval( -- )
 

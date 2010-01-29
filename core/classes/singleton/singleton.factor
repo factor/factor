@@ -1,10 +1,15 @@
-! Copyright (C) 2008, 2009 Doug Coleman, Slava Pestov.
+! Copyright (C) 2008, 2010 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes classes.algebra classes.algebra.private
-classes.predicate kernel sequences words ;
+classes.predicate classes.predicate.private kernel sequences
+words ;
 IN: classes.singleton
 
+<PRIVATE
+
 : singleton-predicate-quot ( class -- quot ) [ eq? ] curry ;
+
+PRIVATE>
 
 PREDICATE: singleton-class < predicate-class
     [ "predicate-definition" word-prop ]

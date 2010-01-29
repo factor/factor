@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes classes.algebra classes.algebra.private kernel
 namespaces make words sequences quotations arrays kernel.private
@@ -7,6 +7,8 @@ IN: classes.predicate
 
 PREDICATE: predicate-class < class
     "metaclass" word-prop predicate-class eq? ;
+
+<PRIVATE
 
 GENERIC: predicate-quot ( class -- quot )
 
@@ -17,6 +19,8 @@ M: predicate-class predicate-quot
         [ "predicate-definition" word-prop , ] bi
         [ drop f ] , \ if ,
     ] [ ] make ;
+
+PRIVATE>
 
 : define-predicate-class ( class superclass definition -- )
     [ drop f f predicate-class define-class ]
