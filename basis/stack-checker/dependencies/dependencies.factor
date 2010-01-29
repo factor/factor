@@ -8,17 +8,17 @@ IN: stack-checker.dependencies
 ! Words that the current quotation depends on
 SYMBOL: dependencies
 
-SYMBOLS: inlined-dependency conditional-dependency flushed-dependency called-dependency ;
+SYMBOLS: effect-dependency conditional-dependency definition-dependency ;
 
 : index>= ( obj1 obj2 seq -- ? )
     [ index ] curry bi@ >= ;
 
 : dependency>= ( how1 how2 -- ? )
-    { called-dependency conditional-dependency flushed-dependency inlined-dependency }
+    { effect-dependency conditional-dependency definition-dependency }
     index>= ;
 
 : strongest-dependency ( how1 how2 -- how )
-    [ called-dependency or ] bi@ [ dependency>= ] most ;
+    [ effect-dependency or ] bi@ [ dependency>= ] most ;
 
 : depends-on ( word how -- )
     over primitive? [ 2drop ] [
@@ -28,13 +28,13 @@ SYMBOLS: inlined-dependency conditional-dependency flushed-dependency called-dep
     ] if ;
 
 : depends-on-effect ( word -- )
-    called-dependency depends-on ;
-
-: depends-on-definition ( word -- )
-    inlined-dependency depends-on ;
+    effect-dependency depends-on ;
 
 : depends-on-conditionally ( word -- )
     conditional-dependency depends-on ;
+
+: depends-on-definition ( word -- )
+    definition-dependency depends-on ;
 
 ! Generic words that the current quotation depends on
 SYMBOL: generic-dependencies

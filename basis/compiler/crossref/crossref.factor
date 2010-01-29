@@ -13,15 +13,18 @@ SYMBOL: compiled-generic-crossref
 
 compiled-generic-crossref [ H{ } clone ] initialize
 
-: compiled-usage ( word -- assoc )
+: effect-dependencies-of ( word -- assoc )
     compiled-crossref get at ;
 
-: (compiled-usages) ( word -- assoc )
-    compiled-usage [ nip inlined-dependency dependency>= ] assoc-filter ;
+: definition-dependencies-of ( word -- assoc )
+    effect-dependencies-of [ nip definition-dependency dependency>= ] assoc-filter ;
+
+: conditional-dependencies-of ( word -- assoc )
+    effect-dependencies-of [ nip conditional-dependency dependency>= ] assoc-filter ;
 
 : compiled-usages ( assoc -- assocs )
     [ drop word? ] assoc-filter
-    [ [ drop (compiled-usages) ] { } assoc>map ] keep suffix ;
+    [ [ drop definition-dependencies-of ] { } assoc>map ] keep suffix ;
 
 : dependencies-satisfied? ( word cache -- ? )
     [ "dependency-checks" word-prop ] dip
@@ -30,8 +33,7 @@ compiled-generic-crossref [ H{ } clone ] initialize
 : outdated-conditional-usages ( assoc -- assocs )
     H{ } clone '[
         drop
-        compiled-usage
-        [ nip conditional-dependency dependency>= ] assoc-filter
+        conditional-dependencies-of
         [ drop _ dependencies-satisfied? not ] assoc-filter
     ] { } assoc>map ;
 
