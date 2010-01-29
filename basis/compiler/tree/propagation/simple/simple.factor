@@ -36,7 +36,7 @@ M: #declare propagate-before
     #! classes mentioned in the declaration are redefined, since
     #! now we're making assumptions but their definitions.
     declaration>> [
-        [ conditional-dependency depends-on ]
+        [ depends-on-conditionally ]
         [ <class-info> swap refine-value-info ]
         bi
     ] assoc-each ;
@@ -111,7 +111,7 @@ M: #declare propagate-before
     #! class definition itself.
     [ in-d>> first value-info ]
     [ "predicating" word-prop ] bi*
-    [ nip conditional-dependency depends-on ]
+    [ nip depends-on-conditionally ]
     [ predicate-output-infos 1array ] 2bi ;
 
 : default-output-value-infos ( #call word -- infos )

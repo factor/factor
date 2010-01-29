@@ -273,7 +273,7 @@ M: bad-executable summary
 \ clear t "no-compile" set-word-prop
 
 : non-inline-word ( word -- )
-    dup called-dependency depends-on
+    dup depends-on-effect
     {
         { [ dup "shuffle" word-prop ] [ infer-shuffle-word ] }
         { [ dup "special" word-prop ] [ infer-special ] }
