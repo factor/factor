@@ -42,7 +42,7 @@ SYMBOL: compiled
     #! If a word's stack effect changed, recompile all words
     #! that have compiled calls to it.
     dup recompile-callers?
-    [ compiled-usage keys [ queue-compile ] each ] [ drop ] if ;
+    [ effect-dependencies-of keys [ queue-compile ] each ] [ drop ] if ;
 
 : compiler-message ( string -- )
     "trace-compilation" get [ global [ print flush ] bind ] [ drop ] if ;
