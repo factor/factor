@@ -54,8 +54,7 @@ M: generic update-generic ( class generic -- )
     2bi ;
 
 M: sequence update-methods ( class seq -- )
-    [ [ predicate-word changed-call-sites ] with each ]
-    [ implementors [ update-generic ] with each ] 2bi ;
+    implementors [ update-generic ] with each ;
 
 HOOK: recompile compiler-impl ( words -- alist )
 
@@ -108,9 +107,9 @@ GENERIC: definitions-changed ( assoc obj -- )
 ! inline caching
 : effect-counter ( -- n ) 47 special-object ; inline
 
-GENERIC: bump-effect-counter* ( defspec -- ? )
+GENERIC: always-bump-effect-counter? ( defspec -- ? )
 
-M: object bump-effect-counter* drop f ;
+M: object always-bump-effect-counter? drop f ;
 
 <PRIVATE
 
@@ -134,9 +133,10 @@ M: object bump-effect-counter* drop f ;
     bi ;
 
 : bump-effect-counter? ( -- ? )
-    changed-effects get new-words get assoc-diff assoc-empty? not
-    changed-definitions get [ drop bump-effect-counter* ] assoc-any?
-    or ;
+    changed-effects get
+    changed-classes get
+    changed-definitions get [ drop always-bump-effect-counter? ] assoc-filter
+    3array assoc-combine new-words get assoc-diff assoc-empty? not ;
 
 : bump-effect-counter ( -- )
     bump-effect-counter? [

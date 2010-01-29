@@ -36,7 +36,7 @@ compiled-generic-crossref [ H{ } clone ] initialize
     [
         drop
         compiled-usage
-        [ nip class-dependency dependency>= ] assoc-filter
+        [ nip conditional-dependency dependency>= ] assoc-filter
         [ drop dependencies-satisfied? not ] assoc-filter
     ] { } assoc>map ;
 
