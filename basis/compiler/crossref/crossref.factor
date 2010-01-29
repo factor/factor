@@ -24,7 +24,7 @@ compiled-generic-crossref [ H{ } clone ] initialize
     [ [ drop (compiled-usages) ] { } assoc>map ] keep suffix ;
 
 : dependencies-satisfied? ( word -- ? )
-    "conditional-dependencies" word-prop [ satisfied? ] all? ;
+    "dependency-checks" word-prop [ satisfied? ] all? ;
 
 : outdated-conditional-usages ( assoc -- assocs )
     [
@@ -54,7 +54,7 @@ compiled-generic-crossref [ H{ } clone ] initialize
 : compiled-unxref ( word -- )
     [ "compiled-uses" compiled-crossref (compiled-unxref) ]
     [ "compiled-generic-uses" compiled-generic-crossref (compiled-unxref) ]
-    [ f "conditional-dependencies" set-word-prop ]
+    [ f "dependency-checks" set-word-prop ]
     tri ;
 
 : delete-compiled-xref ( word -- )
@@ -64,4 +64,4 @@ compiled-generic-crossref [ H{ } clone ] initialize
     tri ;
 
 : save-conditional-dependencies ( word deps -- )
-    >array f like "conditional-dependencies" set-word-prop ;
+    >array f like "dependency-checks" set-word-prop ;
