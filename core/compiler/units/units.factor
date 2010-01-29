@@ -123,7 +123,7 @@ M: object always-bump-effect-counter? drop f ;
     dup new-definitions get first update
     dup new-definitions get second update
     dup changed-definitions get update
-    dup changed-classes get update
+    dup maybe-changed get update
     dup dup changed-vocabs update ;
 
 : process-forgotten-definitions ( -- )
@@ -134,7 +134,7 @@ M: object always-bump-effect-counter? drop f ;
 
 : bump-effect-counter? ( -- ? )
     changed-effects get
-    changed-classes get
+    maybe-changed get
     changed-definitions get [ drop always-bump-effect-counter? ] assoc-filter
     3array assoc-combine new-words get assoc-diff assoc-empty? not ;
 
@@ -165,7 +165,7 @@ PRIVATE>
 : with-nested-compilation-unit ( quot -- )
     [
         H{ } clone changed-definitions set
-        H{ } clone changed-classes set
+        H{ } clone maybe-changed set
         H{ } clone changed-effects set
         H{ } clone outdated-generics set
         H{ } clone outdated-tuples set
@@ -176,7 +176,7 @@ PRIVATE>
 : with-compilation-unit ( quot -- )
     [
         H{ } clone changed-definitions set
-        H{ } clone changed-classes set
+        H{ } clone maybe-changed set
         H{ } clone changed-effects set
         H{ } clone outdated-generics set
         H{ } clone forgotten-definitions set

@@ -223,7 +223,7 @@ M: tuple-class update-class
         2drop
         [
             [ update-tuples-after ]
-            [ changed-class ]
+            [ changed-conditionally ]
             bi
         ] each-subclass
     ]

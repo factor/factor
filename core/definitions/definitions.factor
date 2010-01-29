@@ -15,10 +15,10 @@ SYMBOL: changed-definitions
 : changed-definition ( defspec -- )
     dup changed-definitions get set-in-unit ;
 
-SYMBOL: changed-classes
+SYMBOL: maybe-changed
 
-: changed-class ( class -- )
-    dup changed-classes get set-in-unit ;
+: changed-conditionally ( class -- )
+    dup maybe-changed get set-in-unit ;
 
 SYMBOL: changed-effects
 

@@ -32,7 +32,7 @@ PRIVATE>
 
 : define-union-class ( class members -- )
     [ (define-union-class) ]
-    [ drop changed-class ]
+    [ drop changed-conditionally ]
     [ drop update-classes ]
     2tri ;
 
