@@ -72,9 +72,19 @@ TUPLE: depends-on-classes-disjoint class1 class2 ;
 M: depends-on-classes-disjoint satisfied?
     [ class1>> ] [ class2>> ] bi classes-intersect? not ;
 
+TUPLE: depends-on-next-method class generic next-method ;
+
+: depends-on-next-method ( class generic next-method -- )
+    over depends-on-conditionally
+    \ depends-on-next-method add-conditional-dependency ;
+
+M: depends-on-next-method satisfied?
+    [ [ class>> ] [ generic>> ] bi next-method ] [ next-method>> ] bi eq? ;
+
 TUPLE: depends-on-method class generic method ;
 
 : depends-on-method ( class generic method -- )
+    over depends-on-conditionally
     \ depends-on-method add-conditional-dependency ;
 
 M: depends-on-method satisfied?
