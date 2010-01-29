@@ -163,7 +163,7 @@ ERROR: bad-partial-eval quot word ;
 
 : inline-new ( class -- quot/f )
     dup tuple-class? [
-        dup conditional-dependency depends-on
+        dup depends-on-conditionally
         [ all-slots [ initial>> literalize ] map ]
         [ tuple-layout '[ _ <tuple-boa> ] ]
         bi append >quotation
@@ -293,6 +293,6 @@ CONSTANT: lookup-table-at-max 256
 ! calls when a C type is redefined
 \ heap-size [
     dup word? [
-        [ inlined-dependency depends-on ] [ heap-size '[ _ ] ] bi
+        [ depends-on-definition ] [ heap-size '[ _ ] ] bi
     ] [ drop f ] if
 ] 1 define-partial-eval

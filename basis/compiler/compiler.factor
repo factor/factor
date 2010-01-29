@@ -38,9 +38,9 @@ SYMBOL: compiled
 : recompile-callers? ( word -- ? )
     changed-effects get key? ;
 
-: recompile-callers ( words -- )
-    #! If a word's stack effect changed, recompile all words that
-    #! have compiled calls to it.
+: recompile-callers ( word -- )
+    #! If a word's stack effect changed, recompile all words
+    #! that have compiled calls to it.
     dup recompile-callers?
     [ compiled-usage keys [ queue-compile ] each ] [ drop ] if ;
 

@@ -140,7 +140,7 @@ IN: stack-checker.transforms
 ! Constructors
 \ boa [
     dup tuple-class? [
-        dup conditional-dependency depends-on
+        dup depends-on-conditionally
         [ "boa-check" word-prop [ ] or ]
         [ tuple-layout '[ _ <tuple-boa> ] ]
         bi append
