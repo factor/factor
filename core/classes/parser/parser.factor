@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser vocabs.parser words kernel classes compiler.units lexer ;
 IN: classes.parser
@@ -9,7 +9,7 @@ IN: classes.parser
 : create-class-in ( string -- word )
     current-vocab create
     dup save-class-location
-    dup predicate-word dup set-word save-location ;
+    dup create-predicate-word dup set-word save-location ;
 
 : CREATE-CLASS ( -- word )
     scan create-class-in ;

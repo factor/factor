@@ -9,14 +9,6 @@ compiler.tree.propagation.info
 compiler.tree.dead-code.liveness ;
 IN: compiler.tree.dead-code.simple
 
-GENERIC: flushable? ( word -- ? )
-
-M: predicate flushable? drop t ;
-
-M: word flushable? "flushable" word-prop ;
-
-M: method-body flushable? "method-generic" word-prop flushable? ;
-
 : flushable-call? ( #call -- ? )
     dup word>> dup flushable? [
         "input-classes" word-prop dup [
@@ -98,7 +90,7 @@ M: #push remove-dead-code*
     ] [ drop f ] if ;
 
 : remove-flushable-call ( #call -- node )
-    [ word>> flushed-dependency depends-on ]
+    [ word>> depends-on-flushable ]
     [ in-d>> #drop remove-dead-code* ]
     bi ;
 

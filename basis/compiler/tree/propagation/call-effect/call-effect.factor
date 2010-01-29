@@ -2,14 +2,19 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.private effects
 fry kernel kernel.private make sequences continuations
-quotations words math stack-checker combinators.short-circuit
-stack-checker.transforms compiler.tree.propagation.info
+quotations words math stack-checker stack-checker.dependencies
+combinators.short-circuit stack-checker.transforms
+compiler.tree.propagation.info
 compiler.tree.propagation.inlining compiler.units ;
 IN: compiler.tree.propagation.call-effect
 
 ! call( and execute( have complex expansions.
 
-! call( uses the following strategy:
+! If the input quotation is a literal, or built up from curry and
+! compose with terminal quotations literal, it is inlined at the
+! call site.
+
+! For dynamic call sites, call( uses the following strategy:
 ! - Inline caching. If the quotation is the same as last time, just call it unsafely
 ! - Effect inference. Infer quotation's effect, caching it in the cached-effect slot,
 !   and compare it with declaration. If matches, call it unsafely.
@@ -58,7 +63,7 @@ M: compose cached-effect
     [ first>> ] [ second>> ] bi [ cached-effect ] bi@ compose-effects* ;
 
 : safe-infer ( quot -- effect )
-    [ infer ] [ 2drop +unknown+ ] recover ;
+    [ [ infer ] [ 2drop +unknown+ ] recover ] without-dependencies ;
 
 : cached-effect-valid? ( quot -- ? )
     cache-counter>> effect-counter eq? ; inline

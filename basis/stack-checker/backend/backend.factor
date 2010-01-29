@@ -74,7 +74,7 @@ GENERIC: apply-object ( obj -- )
 
 M: wrapper apply-object
     wrapped>>
-    [ dup word? [ called-dependency depends-on ] [ drop ] if ]
+    [ dup word? [ depends-on-effect ] [ drop ] if ]
     [ push-literal ]
     bi ;
 

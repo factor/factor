@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.order strings arrays vectors sequences
 sequences.private accessors fry ;
@@ -20,13 +20,15 @@ M: chunking-seq set-nth group@ <slice> 0 swap copy ;
 
 M: chunking-seq like drop { } like ; inline
 
-INSTANCE: chunking-seq sequence
-
 MIXIN: subseq-chunking
+
+INSTANCE: subseq-chunking sequence
 
 M: subseq-chunking nth group@ subseq ; inline
 
 MIXIN: slice-chunking
+
+INSTANCE: slice-chunking sequence
 
 M: slice-chunking nth group@ <slice> ; inline
 
