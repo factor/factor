@@ -79,6 +79,15 @@ TUPLE: depends-on-method class generic method ;
 M: depends-on-method satisfied?
     [ [ class>> ] [ generic>> ] bi method-for-class ] [ method>> ] bi eq? ;
 
+TUPLE: depends-on-flushable word ;
+
+: depends-on-flushable ( word -- )
+    [ depends-on-conditionally ]
+    [ \ depends-on-flushable add-conditional-dependency ] bi ;
+
+M: depends-on-flushable satisfied?
+    word>> flushable? ;
+
 : init-dependencies ( -- )
     H{ } clone dependencies set
     H{ } clone generic-dependencies set

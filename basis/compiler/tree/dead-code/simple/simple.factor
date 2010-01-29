@@ -90,7 +90,7 @@ M: #push remove-dead-code*
     ] [ drop f ] if ;
 
 : remove-flushable-call ( #call -- node )
-    [ word>> flushed-dependency depends-on ]
+    [ word>> depends-on-flushable ]
     [ in-d>> #drop remove-dead-code* ]
     bi ;
 
