@@ -287,7 +287,7 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
 : decode-macroblock ( -- blocks )
     jpeg> components>>
     [
-        [ mb-dim first2 * iota ]
+        [ mb-dim first2 * ]
         [ [ decode-block ] curry replicate ] bi
     ] map concat ;
 
