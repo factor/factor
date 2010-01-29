@@ -4,6 +4,7 @@ combinators.short-circuit definitions effects fry hints
 math kernel kernel.private namespaces parser quotations
 sequences slots words locals 
 locals.parser macros stack-checker.dependencies ;
+FROM: classes.tuple.private => tuple-layout ;
 IN: typed
 
 ERROR: type-mismatch-error word expected-types ;
@@ -31,6 +32,7 @@ PREDICATE: typed-word < word "typed-word" word-prop ;
 
 : (unboxer) ( type -- quot )
     dup unboxable-tuple-class? [
+        dup dup tuple-layout depends-on-tuple-layout
         all-slots [
             [ name>> reader-word 1quotation ]
             [ class>> (unboxer) ] bi compose
@@ -49,7 +51,10 @@ PREDICATE: typed-word < word "typed-word" word-prop ;
 
 : (unboxed-types) ( type -- types )
     dup unboxable-tuple-class?
-    [ all-slots [ class>> (unboxed-types) ] map concat ]
+    [
+        dup dup tuple-layout depends-on-tuple-layout
+        all-slots [ class>> (unboxed-types) ] map concat
+    ]
     [ 1array ] if ;
 
 : unboxed-types ( types -- types' )
@@ -75,7 +80,12 @@ DEFER: make-boxer
 
 : boxer ( type -- quot )
     dup unboxable-tuple-class?
-    [ [ all-slots [ class>> ] map make-boxer ] [ [ boa ] curry ] bi compose ]
+    [
+        dup dup tuple-layout depends-on-tuple-layout
+        [ all-slots [ class>> ] map make-boxer ]
+        [ [ boa ] curry ]
+        bi compose
+    ]
     [ drop [ ] ] if ;
 
 : make-boxer ( types -- quot )
@@ -84,18 +94,15 @@ DEFER: make-boxer
 
 ! defining typed words
 
-: (depends-on) ( types -- types )
-    dup [ inlined-dependency depends-on ] each ; inline
-
 MACRO: (typed) ( word def effect -- quot )
     [ swap ] dip
     [
-        nip effect-in-types (depends-on) swap
+        nip effect-in-types swap
         [ [ unboxed-types ] [ make-boxer ] bi ] dip
         '[ _ declare @ @ ]
     ]
     [
-        effect-out-types (depends-on)
+        effect-out-types
         dup typed-stack-effect? [ typed-outputs ] [ 2drop ] if
     ] 2bi ;
 
@@ -118,9 +125,9 @@ M: typed-gensym crossref?
     [ 2nip ] 3tri define-declared ;
 
 MACRO: typed ( quot word effect -- quot' )
-    [ effect-in-types (depends-on) dup typed-stack-effect? [ typed-inputs ] [ 2drop ] if ] 
+    [ effect-in-types dup typed-stack-effect? [ typed-inputs ] [ 2drop ] if ] 
     [
-        nip effect-out-types (depends-on) dup typed-stack-effect?
+        nip effect-out-types dup typed-stack-effect?
         [ [ unboxed-types ] [ make-boxer ] bi '[ @ _ declare @ ] ] [ drop ] if
     ] 2bi ;
 
