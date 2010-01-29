@@ -40,7 +40,7 @@ IN: tools.profiler
 : profiler-usage ( word -- words )
     [ smart-usage [ word? ] filter ]
     [ compiled-generic-usage keys ]
-    [ compiled-usage keys ]
+    [ effect-dependencies-of keys ]
     tri 3append prune ;
 
 : usage-counters ( word -- alist )
