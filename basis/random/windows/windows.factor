@@ -59,11 +59,11 @@ M: windows-rng random-bytes* ( n tuple -- bytes )
         [ CryptGenRandom win32-error=0/f ] keep
     ] with-destructors ;
 
-ERROR: no-windows-crypto-provider ;
+ERROR: no-windows-crypto-provider error ;
 
 : try-crypto-providers ( seq -- windows-rng )
-    [ first2 <windows-rng> ] try-find drop
-    [ no-windows-crypto-provider ] unless* ;
+    [ first2 <windows-rng> ] attempt-all
+    dup windows-rng? [ no-windows-crypto-provider ] unless ;
 
 [
     {

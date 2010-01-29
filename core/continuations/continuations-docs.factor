@@ -48,10 +48,6 @@ $nl
     recover
     ignore-errors
 }
-"Word for mapping over a sequence with a quotation until an element doesn't throw an exception:"
-{ $subsections
-    try-find
-}
 "Syntax sugar for defining errors:"
 { $subsections POSTPONE: ERROR: }
 "Unhandled errors are reported in the listener and can be debugged using various tools. See " { $link "debugger" } "."
@@ -184,10 +180,6 @@ HELP: cleanup
 HELP: recover
 { $values { "try" quotation } { "recovery" { $quotation "( error -- )" } } }
 { $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the data stack and calls the " { $snippet "recovery" } " quotation to handle the error." } ;
-
-HELP: try-find
-{ $values { "seq" sequence } { "try" quotation } { "result" "the first non-false, non-exception result of the quotation" } { "elt" "the first matching element, or " { $link f } } }
-{ $description "Applies the quotation to each element of the sequence, until the quotation outputs a true value, and attempts the next element if an exception is thrown. If the quotation ever yields a result which is not " { $link f } ", then the value is output, along with the element of the sequence which yielded this." } ;
 
 HELP: ignore-errors
 { $values { "quot" quotation } }
