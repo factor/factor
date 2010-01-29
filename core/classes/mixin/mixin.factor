@@ -28,8 +28,9 @@ TUPLE: check-mixin-class class ;
 
 : redefine-mixin-class ( class members -- )
     [ (define-union-class) ]
+    [ drop changed-class ]
     [ drop t "mixin" set-word-prop ]
-    2bi ;
+    2tri ;
 
 : if-mixin-member? ( class mixin true false -- )
     [ check-mixin-class 2dup members member-eq? ] 2dip if ; inline
@@ -80,12 +81,10 @@ M: mixin-class class-forgotten remove-mixin-instance ;
     dup mixin-class? [
         drop
     ] [
-        {
-            [ { } redefine-mixin-class ]
-            [ H{ } clone "instances" set-word-prop ]
-            [ changed-definition ]
-            [ update-classes ]
-        } cleave
+        [ { } redefine-mixin-class ]
+        [ H{ } clone "instances" set-word-prop ]
+        [ update-classes ]
+        tri
     ] if ;
 
 ! Definition protocol implementation ensures that removing an

@@ -76,8 +76,6 @@ M: object fake-float? drop f ;
 
 [ f ] [ 1.0 my-fake-inline-3 ] unit-test
 
-[ f ] [ 1.0 my-baked-inline-3 ] unit-test
-
 [ f ] [ 1.0 my-inline-4 ] unit-test
 
 [ f ] [ 1.0 my-inline-5 ] unit-test

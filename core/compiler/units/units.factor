@@ -124,6 +124,7 @@ M: object bump-effect-counter* drop f ;
     dup new-definitions get first update
     dup new-definitions get second update
     dup changed-definitions get update
+    dup changed-classes get update
     dup dup changed-vocabs update ;
 
 : process-forgotten-definitions ( -- )
@@ -164,6 +165,7 @@ PRIVATE>
 : with-nested-compilation-unit ( quot -- )
     [
         H{ } clone changed-definitions set
+        H{ } clone changed-classes set
         H{ } clone changed-effects set
         H{ } clone outdated-generics set
         H{ } clone outdated-tuples set
@@ -174,6 +176,7 @@ PRIVATE>
 : with-compilation-unit ( quot -- )
     [
         H{ } clone changed-definitions set
+        H{ } clone changed-classes set
         H{ } clone changed-effects set
         H{ } clone outdated-generics set
         H{ } clone forgotten-definitions set

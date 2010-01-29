@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2009 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays accessors io.backend io.streams.c init fry
 namespaces math make assocs kernel parser parser.notes lexer
@@ -128,6 +128,7 @@ IN: tools.deploy.shaker
                 "combination"
                 "compiled-generic-uses"
                 "compiled-uses"
+                "conditional-dependencies"
                 "constant"
                 "constraints"
                 "custom-inlining"

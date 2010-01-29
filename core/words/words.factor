@@ -182,6 +182,10 @@ M: parsing-word definer drop \ SYNTAX: \ ; ;
 : deprecated? ( obj -- ? )
     dup word? [ "deprecated" word-prop ] [ drop f ] if ;
 
+GENERIC: flushable? ( word -- ? )
+
+M: word flushable? "flushable" word-prop ;
+
 ! Definition protocol
 M: word where "loc" word-prop ;
 
