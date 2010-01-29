@@ -23,15 +23,16 @@ compiled-generic-crossref [ H{ } clone ] initialize
     [ drop word? ] assoc-filter
     [ [ drop (compiled-usages) ] { } assoc>map ] keep suffix ;
 
-: dependencies-satisfied? ( word -- ? )
-    "dependency-checks" word-prop [ satisfied? ] all? ;
+: dependencies-satisfied? ( word cache -- ? )
+    [ "dependency-checks" word-prop ] dip
+    '[ _ [ satisfied? ] cache ] all? ;
 
 : outdated-conditional-usages ( assoc -- assocs )
-    [
+    H{ } clone '[
         drop
         compiled-usage
         [ nip conditional-dependency dependency>= ] assoc-filter
-        [ drop dependencies-satisfied? not ] assoc-filter
+        [ drop _ dependencies-satisfied? not ] assoc-filter
     ] { } assoc>map ;
 
 : compiled-generic-usage ( word -- assoc )
