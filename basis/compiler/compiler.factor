@@ -86,7 +86,7 @@ M: word combinator? inline? ;
     [
         dup crossref? [
             [ dependencies get generic-dependencies get compiled-xref ]
-            [ conditional-dependencies get save-conditional-dependencies ]
+            [ conditional-dependencies get set-dependency-checks ]
             bi
         ] [ drop ] if
     ] tri ;
