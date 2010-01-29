@@ -35,3 +35,10 @@ SYMBOL: generic-dependencies
 : depends-on-generic ( class generic -- )
     generic-dependencies get dup
     [ [ ?class-or ] change-at ] [ 3drop ] if ;
+
+: without-dependencies ( quot -- )
+    [
+        dependencies off
+        generic-dependencies off
+        call
+    ] with-scope ; inline
