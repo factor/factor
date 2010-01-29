@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes.algebra compiler.units definitions
 graphs grouping kernel namespaces sequences words fry
-stack-checker.dependencies ;
+stack-checker.dependencies combinators ;
 IN: compiler.crossref
 
 SYMBOL: compiled-crossref
@@ -40,25 +40,66 @@ compiled-generic-crossref [ H{ } clone ] initialize
 : compiled-generic-usage ( word -- assoc )
     compiled-generic-crossref get at ;
 
-: (compiled-xref) ( word dependencies word-prop variable -- )
-    [ [ concat ] dip set-word-prop ] [ get add-vertex* ] bi-curry* 2bi ;
+: only-xref ( assoc -- assoc' )
+    [ drop crossref? ] { } assoc-filter-as ;
+
+: set-compiled-generic-uses ( word alist -- )
+    concat f like "compiled-generic-uses" set-word-prop ;
+
+: split-dependencies ( assoc -- effect-deps cond-deps def-deps )
+    [ nip effect-dependency eq? ] assoc-partition
+    [ nip conditional-dependency eq? ] assoc-partition ;
+
+: (store-dependencies) ( word assoc prop -- )
+    [ keys f like ] dip set-word-prop ;
+
+: store-dependencies ( word assoc -- )
+    split-dependencies
+    "effect-dependencies" "definition-dependencies" "conditional-dependencies"
+    [ (store-dependencies) ] tri-curry@ tri-curry* tri ;
+
+: (compiled-xref) ( word dependencies generic-dependencies -- )
+    compiled-crossref compiled-generic-crossref
+    [ get add-vertex* ] bi-curry@ bi-curry* bi ;
 
 : compiled-xref ( word dependencies generic-dependencies -- )
-    [ [ drop crossref? ] { } assoc-filter-as ] bi@
-    [ "compiled-uses" compiled-crossref (compiled-xref) ]
-    [ "compiled-generic-uses" compiled-generic-crossref (compiled-xref) ]
-    bi-curry* bi ;
+    [ only-xref ] bi@
+    [ nip set-compiled-generic-uses ]
+    [ drop store-dependencies ]
+    [ (compiled-xref) ]
+    3tri ;
 
-: (compiled-unxref) ( word word-prop variable -- )
-    [ '[ dup _ word-prop 2 <groups> _ get remove-vertex* ] ]
-    [ drop '[ _ remove-word-prop ] ]
-    2bi bi ;
+: set-at-each ( keys assoc value -- )
+    '[ _ [ _ ] 2dip set-at ] each ;
+
+: join-dependencies ( effect-deps cond-deps def-deps -- assoc )
+    H{ } clone [
+        [ effect-dependency set-at-each ]
+        [ conditional-dependency set-at-each ]
+        [ definition-dependency set-at-each ] tri-curry tri*
+    ] keep ;
+
+: load-dependencies ( word -- assoc )
+    [ "effect-dependencies" word-prop ]
+    [ "definition-dependencies" word-prop ]
+    [ "conditional-dependencies" word-prop ] tri
+    join-dependencies ;
+
+: (compiled-unxref) ( word dependencies variable -- )
+    get remove-vertex* ;
+
+: compiled-generic-uses ( word -- alist )
+    "compiled-generic-uses" word-prop 2 <groups> ;
 
 : compiled-unxref ( word -- )
-    [ "compiled-uses" compiled-crossref (compiled-unxref) ]
-    [ "compiled-generic-uses" compiled-generic-crossref (compiled-unxref) ]
-    [ f "dependency-checks" set-word-prop ]
-    tri ;
+    {
+        [ dup load-dependencies compiled-crossref (compiled-unxref) ]
+        [ dup compiled-generic-uses compiled-generic-crossref (compiled-unxref) ]
+        [ "effect-dependencies" remove-word-prop ]
+        [ "definition-dependencies" remove-word-prop ]
+        [ "conditional-dependencies" remove-word-prop ]
+        [ "compiled-generic-uses" remove-word-prop ]
+    } cleave ;
 
 : delete-compiled-xref ( word -- )
     [ compiled-unxref ]
@@ -67,4 +108,4 @@ compiled-generic-crossref [ H{ } clone ] initialize
     tri ;
 
 : save-conditional-dependencies ( word deps -- )
-    >array f like "dependency-checks" set-word-prop ;
+    keys f like "dependency-checks" set-word-prop ;
