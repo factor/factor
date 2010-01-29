@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs classes.algebra compiler.units definitions graphs
-grouping kernel namespaces sequences words fry
+USING: arrays assocs classes.algebra compiler.units definitions
+graphs grouping kernel namespaces sequences words fry
 stack-checker.dependencies ;
 IN: compiler.crossref
 
@@ -25,9 +25,20 @@ compiled-generic-crossref [ H{ } clone ] initialize
     [ "flushable" word-prop inlined-dependency flushed-dependency ? ] bi
     '[ nip _ dependency>= ] assoc-filter ;
 
-: compiled-usages ( seq -- assocs )
+: compiled-usages ( assoc -- assocs )
     [ drop word? ] assoc-filter
     [ [ drop (compiled-usages) ] { } assoc>map ] keep suffix ;
+
+: dependencies-satisfied? ( word -- ? )
+    "conditional-dependencies" word-prop [ satisfied? ] all? ;
+
+: outdated-class-usages ( assoc -- assocs )
+    [
+        drop
+        compiled-usage
+        [ nip class-dependency dependency>= ] assoc-filter
+        [ drop dependencies-satisfied? not ] assoc-filter
+    ] { } assoc>map ;
 
 : compiled-generic-usage ( word -- assoc )
     compiled-generic-crossref get at ;
@@ -49,10 +60,14 @@ compiled-generic-crossref [ H{ } clone ] initialize
 : compiled-unxref ( word -- )
     [ "compiled-uses" compiled-crossref (compiled-unxref) ]
     [ "compiled-generic-uses" compiled-generic-crossref (compiled-unxref) ]
-    bi ;
+    [ f "conditional-dependencies" set-word-prop ]
+    tri ;
 
 : delete-compiled-xref ( word -- )
     [ compiled-unxref ]
     [ compiled-crossref get delete-at ]
     [ compiled-generic-crossref get delete-at ]
     tri ;
+
+: save-conditional-dependencies ( word deps -- )
+    >array f like "conditional-dependencies" set-word-prop ;

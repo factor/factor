@@ -104,6 +104,9 @@ GENERIC: update-generic ( class generic -- )
 PREDICATE: method-body < word
     "method-generic" word-prop >boolean ;
 
+M: method-body flushable?
+    "method-generic" word-prop flushable? ;
+
 M: method-body stack-effect
     "method-generic" word-prop stack-effect ;
 

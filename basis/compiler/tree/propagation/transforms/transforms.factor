@@ -163,7 +163,7 @@ ERROR: bad-partial-eval quot word ;
 
 : inline-new ( class -- quot/f )
     dup tuple-class? [
-        dup inlined-dependency depends-on
+        dup class-dependency depends-on
         [ all-slots [ initial>> literalize ] map ]
         [ tuple-layout '[ _ <tuple-boa> ] ]
         bi append >quotation

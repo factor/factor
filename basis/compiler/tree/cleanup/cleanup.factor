@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences combinators fry
 classes.algebra namespaces assocs words math math.private
@@ -51,9 +51,15 @@ GENERIC: cleanup* ( node -- node/nodes )
     [ in-d>> #drop ]
     bi prefix ;
 
+: record-predicate-folding ( #call -- )
+    [ node-input-infos first class>> ]
+    [ word>> "predicating" word-prop ]
+    [ node-output-infos first literal>> ] tri
+    [ depends-on-class<= ] [ depends-on-classes-disjoint ] if ;
+
 : record-folding ( #call -- )
     dup word>> predicate?
-    [ [ node-input-infos first class>> ] [ word>> ] bi depends-on-generic ]
+    [ record-predicate-folding ]
     [ word>> inlined-dependency depends-on ]
     if ;
 
@@ -63,15 +69,18 @@ GENERIC: cleanup* ( node -- node/nodes )
 ! Method inlining
 : add-method-dependency ( #call -- )
     dup method>> word? [
-        [ class>> ] [ word>> ] bi depends-on-generic
+        [ [ class>> ] [ word>> ] bi depends-on-generic ]
+        [ [ class>> ] [ word>> ] [ method>> ] tri depends-on-method ]
+        bi
     ] [ drop ] if ;
 
+: record-inlining ( #call -- )
+    dup method>>
+    [ add-method-dependency ]
+    [ word>> inlined-dependency depends-on ] if ;
+
 : cleanup-inlining ( #call -- nodes )
-    [
-        dup method>>
-        [ add-method-dependency ]
-        [ word>> inlined-dependency depends-on ] if
-    ] [ body>> cleanup ] bi ;
+    [ record-inlining ] [ body>> cleanup ] bi ;
 
 ! Removing overflow checks
 : (remove-overflow-check?) ( #call -- ? )
