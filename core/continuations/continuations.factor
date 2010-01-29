@@ -128,9 +128,6 @@ SYMBOL: thread-error-hook
 : cleanup ( try cleanup-always cleanup-error -- )
     [ compose [ dip rethrow ] curry recover ] [ drop ] 2bi call ; inline
 
-: try-find ( seq try -- result elt )
-    [ curry [ drop f ] recover ] curry map-find ; inline
-
 ERROR: attempt-all-error ;
 
 : attempt-all ( seq quot -- obj )

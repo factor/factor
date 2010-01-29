@@ -106,15 +106,3 @@ SYMBOL: error-counter
 [ { 4 } ] [ { 2 2 } [ + ] with-datastack ] unit-test
 
 [ with-datastack ] must-infer
-
-[ { t 1 } ]
-[ { 1 1 } [ odd? ] try-find 2array ] unit-test
-
-[ { 9 3 } ]
-[ { 3 3 } [ sq ] try-find 2array ] unit-test
-
-[ { f f } ]
-[ { 1 1 } [ even? ] try-find 2array ] unit-test
-
-[ { f f } ]
-[ { 1 1 } [ "error" throw ] try-find 2array ] unit-test
