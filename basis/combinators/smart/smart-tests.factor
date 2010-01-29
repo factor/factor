@@ -53,3 +53,9 @@ IN: combinators.smart.tests
 { 2 0 } [ [ + ] nullary ] must-infer-as
 
 { 2 2 } [ [ [ + ] nullary ] preserving ] must-infer-as
+
+: smart-if-test ( a b -- b )
+    [ < ] [ swap - ] [ - ] smart-if ;
+
+[ 7 ] [ 10 3 smart-if-test ] unit-test
+[ 16 ] [ 25 41 smart-if-test ] unit-test

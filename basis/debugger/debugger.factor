@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: slots arrays definitions generic hashtables summary io kernel
 math namespaces make prettyprint prettyprint.config sequences assocs
@@ -251,6 +251,8 @@ M: encode-error summary drop "Character encoding error" ;
 M: decode-error summary drop "Character decoding error" ;
 
 M: bad-create summary drop "Bad parameters to create" ;
+
+M: cannot-be-inline summary drop "This type of word cannot be inlined" ;
 
 M: attempt-all-error summary drop "Nothing to attempt" ;
 
