@@ -107,5 +107,5 @@ compiled-generic-crossref [ H{ } clone ] initialize
     [ compiled-generic-crossref get delete-at ]
     tri ;
 
-: save-conditional-dependencies ( word deps -- )
+: set-dependency-checks ( word deps -- )
     keys f like "dependency-checks" set-word-prop ;
