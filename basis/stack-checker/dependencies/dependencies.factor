@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors classes.algebra fry generic kernel math
-namespaces sequences words ;
+namespaces sequences words sets ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: stack-checker.dependencies
 
@@ -54,7 +54,7 @@ GENERIC: satisfied? ( dependency -- ? )
 
 : add-conditional-dependency ( ... class -- )
     boa conditional-dependencies get
-    dup [ push ] [ 2drop ] if ; inline
+    dup [ conjoin ] [ 2drop ] if ; inline
 
 TUPLE: depends-on-class<= class1 class2 ;
 
@@ -111,11 +111,12 @@ M: depends-on-flushable satisfied?
 : init-dependencies ( -- )
     H{ } clone dependencies set
     H{ } clone generic-dependencies set
-    V{ } clone conditional-dependencies set ;
+    H{ } clone conditional-dependencies set ;
 
 : without-dependencies ( quot -- )
     [
         dependencies off
         generic-dependencies off
+        conditional-dependencies off
         call
     ] with-scope ; inline
