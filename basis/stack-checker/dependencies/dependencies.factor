@@ -7,13 +7,13 @@ IN: stack-checker.dependencies
 ! Words that the current quotation depends on
 SYMBOL: dependencies
 
-SYMBOLS: inlined-dependency class-dependency flushed-dependency called-dependency ;
+SYMBOLS: inlined-dependency conditional-dependency flushed-dependency called-dependency ;
 
 : index>= ( obj1 obj2 seq -- ? )
     [ index ] curry bi@ >= ;
 
 : dependency>= ( how1 how2 -- ? )
-    { called-dependency class-dependency flushed-dependency inlined-dependency }
+    { called-dependency conditional-dependency flushed-dependency inlined-dependency }
     index>= ;
 
 : strongest-dependency ( how1 how2 -- how )
@@ -42,14 +42,14 @@ SYMBOL: conditional-dependencies
 
 GENERIC: satisfied? ( dependency -- ? )
 
-: conditional-dependency ( ... class -- )
+: add-conditional-dependency ( ... class -- )
     boa conditional-dependencies get
     dup [ push ] [ 2drop ] if ; inline
 
 TUPLE: depends-on-class<= class1 class2 ;
 
 : depends-on-class<= ( class1 class2 -- )
-    \ depends-on-class<= conditional-dependency ;
+    \ depends-on-class<= add-conditional-dependency ;
 
 M: depends-on-class<= satisfied?
     [ class1>> ] [ class2>> ] bi class<= ;
@@ -57,7 +57,7 @@ M: depends-on-class<= satisfied?
 TUPLE: depends-on-classes-disjoint class1 class2 ;
 
 : depends-on-classes-disjoint ( class1 class2 -- )
-    \ depends-on-classes-disjoint conditional-dependency ;
+    \ depends-on-classes-disjoint add-conditional-dependency ;
 
 M: depends-on-classes-disjoint satisfied?
     [ class1>> ] [ class2>> ] bi classes-intersect? not ;
@@ -65,7 +65,7 @@ M: depends-on-classes-disjoint satisfied?
 TUPLE: depends-on-method class generic method ;
 
 : depends-on-method ( class generic method -- )
-    \ depends-on-method conditional-dependency ;
+    \ depends-on-method add-conditional-dependency ;
 
 M: depends-on-method satisfied?
     [ [ class>> ] [ generic>> ] bi method-for-class ] [ method>> ] bi eq? ;
