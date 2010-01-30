@@ -40,12 +40,12 @@ M: object normalize-class ;
 
 PRIVATE>
 
-GENERIC: forgotten-class? ( obj -- ? )
+GENERIC: classoid? ( obj -- ? )
 
-M: word forgotten-class? "forgotten" word-prop ;
-M: anonymous-union forgotten-class? members>> [ forgotten-class? ] any? ;
-M: anonymous-intersection forgotten-class? participants>> [ forgotten-class? ] any? ;
-M: anonymous-complement forgotten-class? class>> forgotten-class? ;
+M: word classoid? class? ;
+M: anonymous-union classoid? members>> [ classoid? ] all? ;
+M: anonymous-intersection classoid? participants>> [ classoid? ] all? ;
+M: anonymous-complement classoid? class>> classoid? ;
 
 : class<= ( first second -- ? )
     class<=-cache get [ (class<=) ] 2cache ;
