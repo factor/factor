@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel accessors sequences math arrays ;
+USING: combinators kernel locals accessors sequences math arrays ;
 IN: images
 
 SINGLETONS:
@@ -128,18 +128,31 @@ TUPLE: image dim component-order component-type upside-down? bitmap ;
 
 <PRIVATE
 
-: pixel@ ( x y image -- start end bitmap )
-    [ dim>> first * + ]
-    [ bytes-per-pixel [ * dup ] keep + ]
-    [ bitmap>> ] tri ;
+:: pixel@ ( x y w image -- start end bitmap )
+    image dim>> first y * x + :> start
+    start w [ image bytes-per-pixel * ] bi@ :> ( start' w' )
+    start'  start' w' +  image bitmap>> ; inline
 
 : set-subseq ( new-value from to victim -- )
     <slice> 0 swap copy ; inline
 
 PRIVATE>
 
+: pixel-row-at ( x y w image -- pixels )
+    pixel@ subseq ; inline
+
+: pixel-row-slice-at ( x y w image -- pixels )
+    pixel@ <slice> ; inline
+
+: set-pixel-row-at ( pixel x y w image -- )
+    pixel@ set-subseq ; inline
+
 : pixel-at ( x y image -- pixel )
-    pixel@ subseq ;
+    [ 1 ] dip pixel-row-at ; inline
+
+: pixel-slice-at ( x y image -- pixels )
+    [ 1 ] dip pixel-row-slice-at ; inline
 
 : set-pixel-at ( pixel x y image -- )
-    pixel@ set-subseq ;
+    [ 1 ] dip set-pixel-row-at ; inline
+
