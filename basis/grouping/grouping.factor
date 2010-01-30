@@ -6,35 +6,29 @@ IN: grouping
 
 <PRIVATE
 
-TUPLE: chunking-seq { seq read-only } { n read-only } ;
-
-: check-groups ( n -- n )
-    dup 0 <= [ "Invalid group count" throw ] when ; inline
-
-: new-groups ( seq n class -- groups )
-    [ check-groups ] dip boa ; inline
+MIXIN: chunking
+INSTANCE: chunking sequence
 
 GENERIC: group@ ( n groups -- from to seq )
 
-M: chunking-seq set-nth group@ <slice> 0 swap copy ;
-
-M: chunking-seq like drop { } like ; inline
+M: chunking set-nth group@ <slice> 0 swap copy ;
+M: chunking like drop { } like ; inline
 
 MIXIN: subseq-chunking
-
+INSTANCE: subseq-chunking chunking
 INSTANCE: subseq-chunking sequence
 
 M: subseq-chunking nth group@ subseq ; inline
 
 MIXIN: slice-chunking
-
+INSTANCE: slice-chunking chunking
 INSTANCE: slice-chunking sequence
 
 M: slice-chunking nth group@ <slice> ; inline
-
 M: slice-chunking nth-unsafe group@ slice boa ; inline
 
-TUPLE: abstract-groups < chunking-seq ;
+MIXIN: abstract-groups
+INSTANCE: abstract-groups sequence
 
 M: abstract-groups length
     [ seq>> length ] [ n>> ] bi [ + 1 - ] keep /i ; inline
@@ -45,7 +39,8 @@ M: abstract-groups set-length
 M: abstract-groups group@
     [ n>> [ * dup ] keep + ] [ seq>> ] bi [ length min ] keep ; inline
 
-TUPLE: abstract-clumps < chunking-seq ;
+MIXIN: abstract-clumps
+INSTANCE: abstract-clumps sequence
 
 M: abstract-clumps length
     [ seq>> length 1 + ] [ n>> ] bi [-] ; inline
@@ -56,35 +51,43 @@ M: abstract-clumps set-length
 M: abstract-clumps group@
     [ n>> over + ] [ seq>> ] bi ; inline
 
+TUPLE: chunking-seq { seq read-only } { n read-only } ;
+
+: check-groups ( n -- n )
+    dup 0 <= [ "Invalid group count" throw ] when ; inline
+
+: new-groups ( seq n class -- groups )
+    [ check-groups ] dip boa ; inline
+
 PRIVATE>
 
-TUPLE: groups < abstract-groups ;
+TUPLE: groups < chunking-seq ;
+INSTANCE: groups subseq-chunking
+INSTANCE: groups abstract-groups
 
 : <groups> ( seq n -- groups )
     groups new-groups ; inline
 
-INSTANCE: groups subseq-chunking
-
-TUPLE: sliced-groups < abstract-groups ;
+TUPLE: sliced-groups < chunking-seq ;
+INSTANCE: sliced-groups slice-chunking
+INSTANCE: sliced-groups abstract-groups
 
 : <sliced-groups> ( seq n -- groups )
     sliced-groups new-groups ; inline
 
-INSTANCE: sliced-groups slice-chunking
-
-TUPLE: clumps < abstract-clumps ;
+TUPLE: clumps < chunking-seq ;
+INSTANCE: clumps subseq-chunking
+INSTANCE: clumps abstract-clumps
 
 : <clumps> ( seq n -- clumps )
     clumps new-groups ; inline
 
-INSTANCE: clumps subseq-chunking
-
-TUPLE: sliced-clumps < abstract-clumps ;
+TUPLE: sliced-clumps < chunking-seq ;
+INSTANCE: sliced-clumps slice-chunking
+INSTANCE: sliced-clumps abstract-clumps
 
 : <sliced-clumps> ( seq n -- clumps )
     sliced-clumps new-groups ; inline
-
-INSTANCE: sliced-clumps slice-chunking
 
 : group ( seq n -- array ) <groups> { } like ;
 
