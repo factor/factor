@@ -8,7 +8,7 @@ layouts compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker slots.private words
 hashtables classes assocs locals specialized-arrays system
 sorting math.libm math.floats.private math.integers.private
-math.intervals quotations effects alien alien.data ;
+math.intervals quotations effects alien alien.data sets ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
 SPECIALIZED-ARRAY: void*
@@ -952,3 +952,13 @@ M: tuple-with-read-only-slot clone
 
 ! Reduction
 [ 1 ] [ [ 4 <reversed> [ nth-unsafe ] [ ] unless ] final-info length ] unit-test
+
+! Optimization on bit?
+[ t ] [ [ 3 bit? ] { bit? fixnum-bit? } inlined? ] unit-test
+[ f ] [ [ 500 bit? ] { bit? fixnum-bit? } inlined? ] unit-test
+
+[ t ] [ [ { 1 } intersect ] { intersect } inlined? ] unit-test
+[ f ] [ [ { 1 } swap intersect ] { intersect } inlined? ] unit-test ! We could do this
+
+[ t ] [ [ { 1 } diff ] { diff } inlined? ] unit-test
+[ f ] [ [ { 1 } swap diff ] { diff } inlined? ] unit-test ! We could do this
