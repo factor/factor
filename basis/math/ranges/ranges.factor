@@ -45,3 +45,5 @@ PRIVATE>
 : [1,b] ( b -- range ) 1 swap [a,b] ; inline
 
 : [0,b) ( b -- range ) 0 swap [a,b) ; inline
+
+: [1,b) ( b -- range ) 1 swap [a,b) ; inline
