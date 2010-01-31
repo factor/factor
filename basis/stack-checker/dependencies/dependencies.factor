@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors classes.algebra fry generic kernel math
-namespaces sequences words sets ;
+namespaces sequences words sets combinators.short-circuit ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: stack-checker.dependencies
 
@@ -62,7 +62,11 @@ TUPLE: depends-on-class<= class1 class2 ;
     \ depends-on-class<= add-conditional-dependency ;
 
 M: depends-on-class<= satisfied?
-    [ class1>> ] [ class2>> ] bi class<= ;
+    {
+        [ class1>> classoid? ]
+        [ class2>> classoid? ]
+        [ [ class1>> ] [ class2>> ] bi class<= ]
+    } 1&& ;
 
 TUPLE: depends-on-classes-disjoint class1 class2 ;
 
@@ -70,7 +74,11 @@ TUPLE: depends-on-classes-disjoint class1 class2 ;
     \ depends-on-classes-disjoint add-conditional-dependency ;
 
 M: depends-on-classes-disjoint satisfied?
-    [ class1>> ] [ class2>> ] bi classes-intersect? not ;
+    {
+        [ class1>> classoid? ]
+        [ class2>> classoid? ]
+        [ [ class1>> ] [ class2>> ] bi classes-intersect? not ]
+    } 1&& ;
 
 TUPLE: depends-on-next-method class generic next-method ;
 
@@ -79,7 +87,10 @@ TUPLE: depends-on-next-method class generic next-method ;
     \ depends-on-next-method add-conditional-dependency ;
 
 M: depends-on-next-method satisfied?
-    [ [ class>> ] [ generic>> ] bi next-method ] [ next-method>> ] bi eq? ;
+    {
+        [ class>> classoid? ]
+        [ [ [ class>> ] [ generic>> ] bi next-method ] [ next-method>> ] bi eq? ]
+    } 1&& ;
 
 TUPLE: depends-on-method class generic method ;
 
@@ -88,7 +99,10 @@ TUPLE: depends-on-method class generic method ;
     \ depends-on-method add-conditional-dependency ;
 
 M: depends-on-method satisfied?
-    [ [ class>> ] [ generic>> ] bi method-for-class ] [ method>> ] bi eq? ;
+    {
+        [ class>> classoid? ]
+        [ [ [ class>> ] [ generic>> ] bi method-for-class ] [ method>> ] bi eq? ]
+    } 1&& ;
 
 TUPLE: depends-on-tuple-layout class layout ;
 
