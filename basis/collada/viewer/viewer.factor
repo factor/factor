@@ -22,6 +22,7 @@ uniform mat4 mv_matrix, p_matrix;
 uniform vec3 light_position;
 
 attribute vec3 POSITION;
+attribute vec3 NORMAL;
 
 void main()
 {
@@ -33,12 +34,37 @@ void main()
 GLSL-SHADER: collada-fragment-shader fragment-shader
 void main()
 {
-    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    gl_FragColor = vec4(1, 1, 0, 1);
 }
 ;
 
 GLSL-PROGRAM: collada-program
     collada-vertex-shader collada-fragment-shader ;
+
+GLSL-SHADER: debug-vertex-shader vertex-shader
+uniform mat4 mv_matrix, p_matrix;
+uniform vec3 light_position;
+
+attribute vec3 POSITION;
+attribute vec3 COLOR;
+varying vec4 color;
+
+void main()
+{
+    gl_Position = p_matrix * mv_matrix * vec4(POSITION, 1.0);
+    color = vec4(COLOR, 1);
+}
+;
+
+GLSL-SHADER: debug-fragment-shader fragment-shader
+varying vec4 color;
+void main()
+{
+    gl_FragColor = color;
+}
+;
+
+GLSL-PROGRAM: debug-program debug-vertex-shader debug-fragment-shader ;
 
 UNIFORM-TUPLE: collada-uniforms < mvp-uniforms
     { "light-position" vec3-uniform  f } ;
@@ -53,15 +79,17 @@ TUPLE: collada-world < wasd-world
 
 VERTEX-FORMAT: collada-vertex
     { "POSITION" float-components 3 f }
-    { f          float-components 3 f } ;
+    { "NORMAL"   float-components 3 f } ;
 
-:: mymax ( x y -- x ) x third y third > [ x ] [ y ] if ;
+VERTEX-FORMAT: debug-vertex
+    { "POSITION" float-components 3 f }
+    { "COLOR"    float-components 3 f } ;
 
 : <collada-buffers> ( models -- buffers )
-    ! drop
-    ! float-array{ -0.5 0 0 0 0 0 0 1 0 0 0 0 0.5 0 0 0 0 0 }
-    ! uint-array{ 0 1 2 }
-    ! f model boa 1array
+!    drop
+!    float-array{ -0.5 0 0 1 0 0 0 1 0 0 1 0 0.5 0 0 0 0 1 }
+!    uint-array{ 0 1 2 }
+!    f model boa 1array
     [
         [ attribute-buffer>> underlying>> static-upload draw-usage vertex-buffer byte-array>buffer ]
         [ index-buffer>> underlying>> static-upload draw-usage index-buffer byte-array>buffer ]
@@ -84,7 +112,9 @@ VERTEX-FORMAT: collada-vertex
     
 : <collada-state> ( -- collada-state )
     collada-state new
-    "C:/Users/erikc/Downloads/mech.dae" file>xml "mesh" deep-tags-named [ collada-mesh>model ] map flatten >>models ;
+    #! "C:/Users/erikc/Downloads/mech.dae"
+    "/Users/erikc/Documents/mech.dae"
+    file>xml "mesh" deep-tags-named [ mesh>models ] map flatten >>models ;
 
 M: collada-world begin-game-world
     init-gpu
@@ -96,21 +126,53 @@ M: collada-world begin-game-world
     { -10000.0 10000.0 10000.0 } ! light position
     collada-uniforms boa ;
 
+: draw-line ( world from to color -- )
+    [ 3 head ] tri@ dup -rot append -rot append swap append >float-array
+    underlying>> stream-upload draw-usage vertex-buffer byte-array>buffer
+    debug-program <program-instance> debug-vertex buffer>vertex-array
+    
+    { 0 1 } >uint-array stream-upload draw-usage index-buffer byte-array>buffer
+    2 '[ _ 0 <buffer-ptr> _ uint-indexes <index-elements> ] call
+    
+    rot <collada-uniforms>
+
+    {
+        { "primitive-mode"     [ 3drop lines-mode ] }
+        { "uniforms"           [ nip nip ] }
+        { "vertex-array"       [ drop drop ] }
+        { "indexes"            [ drop nip ] }
+    } 3<render-set> render ;
+
+: draw-lines ( world lines -- )
+    3 <groups> [ first3 draw-line ] with each ; inline
+
+: draw-axes ( world -- )
+    { { 0 0 0 } { 1 0 0 } { 1 0 0 }
+      { 0 0 0 } { 0 1 0 } { 0 1 0 }
+      { 0 0 0 } { 0 0 1 } { 0 0 1 } } draw-lines ;
+          
 : draw-collada ( world -- )
     GL_COLOR_BUFFER_BIT glClear
-    triangle-lines dup t <triangle-state> set-gpu-state
-    [ collada>> vertex-arrays>> ]
-    [ collada>> index-vectors>> ]
-    [ <collada-uniforms> ]
-    tri
+
     [
-        {
-            { "primitive-mode"     [ 3drop triangles-mode ] }
-            { "uniforms"           [ swap drop swap drop ] }
-            { "vertex-array"       [ drop drop ] }
-            { "indexes"            [ drop swap drop ] }
-        } 3<render-set> render
-    ] curry 2each ;
+        triangle-lines dup t <triangle-state> set-gpu-state
+        [ collada>> vertex-arrays>> ]
+        [ collada>> index-vectors>> ]
+        [ <collada-uniforms> ]
+        tri
+        [
+            {
+                { "primitive-mode"     [ 3drop triangles-mode ] }
+                { "uniforms"           [ nip nip ] }
+                { "vertex-array"       [ drop drop ] }
+                { "indexes"            [ drop nip ] }
+            } 3<render-set> render
+        ] curry 2each
+    ]
+    [
+        draw-axes
+    ]
+    bi ;
 
 M: collada-world draw-world*
     draw-collada ;
