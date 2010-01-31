@@ -1,5 +1,5 @@
 USING: math tools.test classes.algebra words kernel sequences assocs
-accessors eval definitions compiler.units generic ;
+accessors eval definitions compiler.units generic strings classes ;
 IN: classes.predicate.tests
 
 PREDICATE: negative < integer 0 < ;
@@ -42,3 +42,20 @@ M: tuple-d ptest' drop tuple-d ;
 
 [ tuple-a ] [ tuple-b new ptest' ] unit-test
 [ tuple-d ] [ tuple-b new t >>slot ptest' ] unit-test
+
+PREDICATE: bad-inheritance-predicate < string ;
+[
+    "IN: classes.predicate.tests PREDICATE: bad-inheritance-predicate < bad-inheritance-predicate ;" eval( -- )
+] [ error>> bad-inheritance? ] must-fail-with
+
+PREDICATE: bad-inheritance-predicate2 < string ;
+PREDICATE: bad-inheritance-predicate3 < bad-inheritance-predicate2 ;
+[
+    "IN: classes.predicate.tests PREDICATE: bad-inheritance-predicate2 < bad-inheritance-predicate3 ;" eval( -- )
+] [ error>> bad-inheritance? ] must-fail-with
+
+! This must not fail
+PREDICATE: tup < string ;
+UNION: u tup ;
+
+[ ] [ "IN: classes.predicate.tests PREDICATE: u < tup ;" eval( -- ) ] unit-test
