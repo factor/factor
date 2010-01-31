@@ -111,7 +111,7 @@ M:: sfmt generate ( sfmt -- )
 
 : <sfmt-array> ( sfmt -- uint-array uint-4-array )
     state>>
-    [ n>> 4 * 1 swap [a,b] >uint-array ] [ seed>> ] bi
+    [ n>> 4 * [1,b] >uint-array ] [ seed>> ] bi
     [
         [
             [ -30 shift ] [ ] bi bitxor
