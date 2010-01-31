@@ -153,3 +153,11 @@ TUPLE: bad-inheritance-tuple3 < bad-inheritance-tuple2 ;
 [
     "IN: classes.tuple.parser.tests TUPLE: bad-inheritance-tuple2 < bad-inheritance-tuple3 ;" eval( -- )
 ] [ error>> bad-inheritance? ] must-fail-with
+
+! This must not fail
+TUPLE: tup ;
+UNION: u tup ;
+
+[ ] [ "IN: classes.tuple.parser.tests TUPLE: u < tup ;" eval( -- ) ] unit-test
+
+[ t ] [ u new tup? ] unit-test

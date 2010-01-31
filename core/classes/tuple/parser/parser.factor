@@ -1,8 +1,8 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sets namespaces make sequences parser
 lexer combinators words classes.parser classes.tuple arrays
-slots math assocs parser.notes classes.algebra ;
+slots math assocs parser.notes classes classes.algebra ;
 IN: classes.tuple.parser
 
 : slot-names ( slots -- seq )
@@ -56,18 +56,11 @@ ERROR: invalid-slot-name name ;
 : parse-tuple-slots ( -- )
     ";" parse-tuple-slots-delim ;
 
-ERROR: bad-inheritance class superclass ;
-
-: check-inheritance ( class1 class2 -- class1 class2 )
-    2dup swap class<= [ bad-inheritance ] when ;
-
 : parse-tuple-definition ( -- class superclass slots )
     CREATE-CLASS
-    scan 2dup = [ ] when {
+    scan {
         { ";" [ tuple f ] }
-        { "<" [
-            scan-word check-inheritance [ parse-tuple-slots ] { } make
-        ] }
+        { "<" [ scan-word [ parse-tuple-slots ] { } make ] }
         [ tuple swap [ parse-slot-name [ parse-tuple-slots ] when ] { } make ]
     } case
     dup check-duplicate-slots
