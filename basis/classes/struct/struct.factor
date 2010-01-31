@@ -1,12 +1,13 @@
 ! (c)Joe Groff, Daniel Ehrenberg bsd license
-USING: accessors alien alien.c-types alien.data alien.parser arrays
-byte-arrays classes classes.parser classes.tuple classes.tuple.parser
-classes.tuple.private combinators combinators.short-circuit
-combinators.smart cpu.architecture definitions functors.backend
-fry generalizations generic.parser kernel kernel.private lexer
-libc locals macros make math math.order parser quotations
-sequences slots slots.private specialized-arrays vectors words
-summary namespaces assocs vocabs.parser math.functions
+USING: accessors alien alien.c-types alien.data alien.parser
+arrays byte-arrays classes classes.private classes.parser
+classes.tuple classes.tuple.parser classes.tuple.private
+combinators combinators.short-circuit combinators.smart
+cpu.architecture definitions functors.backend fry
+generalizations generic.parser kernel kernel.private lexer libc
+locals macros make math math.order parser quotations sequences
+slots slots.private specialized-arrays vectors words summary
+namespaces assocs vocabs.parser math.functions
 classes.struct.bit-accessors bit-arrays ;
 QUALIFIED: math
 IN: classes.struct
