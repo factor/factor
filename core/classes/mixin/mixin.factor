@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes classes.algebra classes.algebra.private
-classes.union classes.union.private words kernel sequences
-definitions combinators arrays assocs generic accessors ;
+USING: classes classes.private classes.algebra
+classes.algebra.private classes.union classes.union.private
+words kernel sequences definitions combinators arrays assocs
+generic accessors ;
 IN: classes.mixin
 
 PREDICATE: mixin-class < union-class "mixin" word-prop ;
@@ -75,7 +76,8 @@ M: class add-mixin-instance
 : remove-mixin-instance ( class mixin -- )
     [ (remove-mixin-instance) ] [ 2drop ] if-mixin-member? ;
 
-M: mixin-class class-forgotten remove-mixin-instance ;
+M: mixin-class metaclass-changed
+    over class? [ 2drop ] [ remove-mixin-instance ] if ;
 
 : define-mixin-class ( class -- )
     dup mixin-class? [

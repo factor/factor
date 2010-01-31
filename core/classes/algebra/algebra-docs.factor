@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel classes words
+USING: help.markup help.syntax kernel classes classes.private words
 checksums checksums.crc32 sequences math ;
 IN: classes.algebra
 
