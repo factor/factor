@@ -13,9 +13,6 @@ PREDICATE: tuple-class < class
 
 ERROR: not-a-tuple object ;
 
-: check-tuple ( object -- tuple )
-    dup tuple? [ not-a-tuple ] unless ; inline
-
 : all-slots ( class -- slots )
     superclasses [ "slots" word-prop ] map concat ;
 
@@ -35,6 +32,9 @@ M: tuple class layout-of 2 slot { word } declare ; inline
 : tuple-size ( tuple -- size )
     layout-of 3 slot { fixnum } declare ; inline
 
+: check-tuple ( object -- tuple )
+    dup tuple? [ not-a-tuple ] unless ; inline
+
 : prepare-tuple>array ( tuple -- n tuple layout )
     check-tuple [ tuple-size iota ] [ ] [ layout-of ] tri ;
 
@@ -49,13 +49,13 @@ M: tuple class layout-of 2 slot { word } declare ; inline
         ] 2each
     ] if-bootstrapping ; inline
 
-PRIVATE>
-
 : initial-values ( class -- slots )
     all-slots [ initial>> ] map ;
 
 : pad-slots ( slots class -- slots' class )
     [ initial-values over length tail append ] keep ; inline
+
+PRIVATE>
 
 : tuple>array ( tuple -- array )
     prepare-tuple>array
@@ -247,6 +247,9 @@ M: class valid-superclass? drop f ;
 
 GENERIC# (define-tuple-class) 2 ( class superclass slots -- )
 
+: thrower-effect ( slots -- effect )
+    [ name>> ] map { "*" } <effect> ;
+
 PRIVATE>
 
 : define-tuple-class ( class superclass slots -- )
@@ -260,9 +263,6 @@ M: word (define-tuple-class)
 M: tuple-class (define-tuple-class)
     3dup tuple-class-unchanged?
     [ 2drop ?define-symbol ] [ redefine-tuple-class ] if ;
-
-: thrower-effect ( slots -- effect )
-    [ name>> ] map { "*" } <effect> ;
 
 : define-error-class ( class superclass slots -- )
     [ define-tuple-class ]
@@ -292,6 +292,11 @@ M: tuple-class reset-class
         [ { "layout" "slots" "boa-check" "prototype" } reset-props ]
         bi
     ] bi ;
+
+M: tuple-class metaclass-changed
+    ! Our superclass is no longer a tuple class, redefine with
+    ! default superclass
+    nip tuple over "slots" word-prop define-tuple-class ;
 
 M: tuple-class rank-class drop 0 ;
 
