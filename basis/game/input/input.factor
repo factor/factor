@@ -18,6 +18,7 @@ HOOK: instance-id game-input-backend ( controller -- id )
 
 HOOK: read-controller game-input-backend ( controller -- controller-state )
 HOOK: calibrate-controller game-input-backend ( controller -- )
+HOOK: vibrate-controller game-input-backend ( controller motor1 motor2 -- )
 
 HOOK: read-keyboard game-input-backend ( -- keyboard-state )
 
@@ -90,7 +91,7 @@ M: mouse-state clone
     call-next-method dup buttons>> clone >>buttons ;
 
 {
-    { [ os windows? ] [ "game.input.dinput" require ] }
+    { [ os windows? ] [ "game.input.xinput" require ] }
     { [ os macosx? ] [ "game.input.iokit" require ] }
     { [ t ] [ ] }
 } cond
