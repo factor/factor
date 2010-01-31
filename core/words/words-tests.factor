@@ -122,8 +122,10 @@ DEFER: x
 [ { } ]
 [
     all-words [
-        "compiled-uses" word-prop 2 <groups>
-        keys [ "forgotten" word-prop ] filter
+        [ "effect-dependencies" word-prop ]
+        [ "definition-dependencies" word-prop ]
+        [ "conditional-dependencies" word-prop ] tri
+        3append [ "forgotten" word-prop ] filter
     ] map harvest
 ] unit-test
 

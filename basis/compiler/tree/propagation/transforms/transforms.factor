@@ -284,6 +284,15 @@ CONSTANT: lookup-table-at-max 256
 
 \ intersect [ intersect-quot ] 1 define-partial-eval
 
+: fixnum-bits ( -- n )
+    cell-bits tag-bits get - ;
+
+: bit-quot ( #call -- quot/f )
+    in-d>> second value-info interval>> 0 fixnum-bits [a,b] interval-subset?
+    [ [ >fixnum ] dip fixnum-bit? ] f ? ;
+
+\ bit? [ bit-quot ] "custom-inlining" set-word-prop
+
 ! Speeds up sum-file, sort and reverse-complement benchmarks by
 ! compiling decoder-readln better
 \ push [

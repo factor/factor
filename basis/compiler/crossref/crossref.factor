@@ -55,7 +55,7 @@ compiled-generic-crossref [ H{ } clone ] initialize
 
 : store-dependencies ( word assoc -- )
     split-dependencies
-    "effect-dependencies" "definition-dependencies" "conditional-dependencies"
+    "effect-dependencies" "conditional-dependencies" "definition-dependencies"
     [ (store-dependencies) ] tri-curry@ tri-curry* tri ;
 
 : (compiled-xref) ( word dependencies generic-dependencies -- )
@@ -81,8 +81,8 @@ compiled-generic-crossref [ H{ } clone ] initialize
 
 : load-dependencies ( word -- assoc )
     [ "effect-dependencies" word-prop ]
-    [ "definition-dependencies" word-prop ]
-    [ "conditional-dependencies" word-prop ] tri
+    [ "conditional-dependencies" word-prop ]
+    [ "definition-dependencies" word-prop ] tri
     join-dependencies ;
 
 : (compiled-unxref) ( word dependencies variable -- )
@@ -96,8 +96,8 @@ compiled-generic-crossref [ H{ } clone ] initialize
         [ dup load-dependencies compiled-crossref (compiled-unxref) ]
         [ dup compiled-generic-uses compiled-generic-crossref (compiled-unxref) ]
         [ "effect-dependencies" remove-word-prop ]
-        [ "definition-dependencies" remove-word-prop ]
         [ "conditional-dependencies" remove-word-prop ]
+        [ "definition-dependencies" remove-word-prop ]
         [ "compiled-generic-uses" remove-word-prop ]
     } cleave ;
 
@@ -107,5 +107,5 @@ compiled-generic-crossref [ H{ } clone ] initialize
     [ compiled-generic-crossref get delete-at ]
     tri ;
 
-: save-conditional-dependencies ( word deps -- )
+: set-dependency-checks ( word deps -- )
     keys f like "dependency-checks" set-word-prop ;

@@ -1,0 +1,107 @@
+! (c)2010 Joe Groff bsd license
+USING: accessors byte-arrays fry images kernel locals math
+math.functions math.order math.vectors namespaces sequences
+sorting ;
+IN: images.atlas
+
+! sort rects by height/width/whatever
+! use least power of two greater than k * greatest width for atlas width
+! pack stripes(y 0):
+!   place first rect at x 0
+!   place rects that fit in remaining stripe
+!   pack stripes(y + height)
+! if height > max height 
+
+TUPLE: image-placement
+    { image read-only }
+    loc ;
+
+CONSTANT: atlas-waste-factor 1.25
+CONSTANT: atlas-padding 1
+
+ERROR: atlas-image-formats-dont-match images ;
+
+<PRIVATE
+
+: width  ( dim -- width  ) first  atlas-padding + ; inline
+: height ( dim -- height ) second atlas-padding + ; inline
+: area   ( dim -- area   ) [ width ] [ height ] bi * ; inline
+
+:: (pack-stripe) ( image-placements atlas-width @y -- stripe-height/f )
+    0 :> @x!
+    f :> stripe-height!
+    image-placements [| ip |
+        ip loc>> [
+            ip image>> dim>> :> dim
+            stripe-height [ dim height stripe-height 0 or max stripe-height! ] unless
+            dim width :> w
+            atlas-width w @x + >= [
+                ip { @x @y } >>loc drop
+                @x w + @x!
+            ] when
+        ] unless
+    ] each
+    stripe-height ;
+
+:: (pack-images) ( images atlas-width sort-quot -- placements )
+    images sort-quot inv-sort-with [ f image-placement boa ] map :> image-placements
+    0 :> @y!
+    [ image-placements atlas-width @y (pack-stripe) dup ] [ @y + @y! ] while drop
+    image-placements ; inline
+
+: atlas-image-format ( image-placements -- component-order component-type upside-down? )
+    [ image>> ] map dup unclip '[ _
+        [ [ component-order>> ] bi@ = ]
+        [ [ component-type>>  ] bi@ = ]
+        [ [ upside-down?>>    ] bi@ = ] 2tri and and
+    ] all?
+    [ first [ component-order>> ] [ component-type>> ] [ upside-down?>> ] tri ]
+    [ atlas-image-formats-dont-match ] if ; inline
+
+: atlas-dim ( image-placements -- dim )
+    [ [ loc>> ] [ image>> dim>> ] bi v+ atlas-padding v+n ] [ vmax ] map-reduce
+    [ next-power-of-2 ] map ; inline
+
+:: <atlas-image> ( image-placements component-order component-type upside-down? -- atlas )
+    image-placements atlas-dim :> dim
+    <image>
+        dim >>dim
+        component-order >>component-order
+        component-type >>component-type
+        upside-down? >>upside-down?
+        dim product component-order component-type (bytes-per-pixel) * <byte-array> >>bitmap ; inline
+
+:: copy-image-into-atlas ( image-placement atlas -- )
+    image-placement image>> :> image
+    image dim>> first2 :> ( w h )
+    image-placement loc>> first2 :> ( x y )
+
+    h iota [| row |
+        0  row      w  image pixel-row-slice-at
+        x  y row +  w  atlas set-pixel-row-at
+    ] each ; inline
+
+: copy-images-into-atlas ( image-placements atlas -- )
+    '[ _ copy-image-into-atlas ] each ; inline
+
+PRIVATE>
+
+: (guess-atlas-dim) ( images -- width )
+    [ dim>> area ] [ + ] map-reduce sqrt
+    atlas-waste-factor *
+    .5 + >integer ;
+
+: guess-atlas-dim ( images -- width )
+    [ (guess-atlas-dim) ] [ [ dim>> width ] [ max ] map-reduce ] bi max next-power-of-2 ;
+
+: pack-images ( images atlas-width -- placements )
+    [ dim>> second ] (pack-images) ;
+
+: pack-atlas ( images -- image-placements )
+    dup guess-atlas-dim pack-images ;
+
+: (make-atlas) ( image-placements -- image )
+    dup dup atlas-image-format <atlas-image> [ copy-images-into-atlas ] keep ;
+
+: make-atlas ( images -- image-placements atlas-image )
+    pack-atlas dup (make-atlas) ;
