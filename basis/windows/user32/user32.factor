@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax parser namespaces
 kernel math windows.types generalizations math.bitwise
-classes.struct literals windows.kernel32 ;
+classes.struct literals windows.kernel32 system accessors ;
 IN: windows.user32
 
 ! HKL for ActivateKeyboardLayout
@@ -608,6 +608,181 @@ CONSTANT: MF_HELP            HEX: 4000
 CONSTANT: MF_RIGHTJUSTIFY    HEX: 4000
 CONSTANT: MF_MOUSESELECT     HEX: 8000
 
+TYPEDEF: HANDLE HRAWINPUT
+: GET_RAWINPUT_CODE_WPARAM ( wParam -- n ) HEX: ff bitand ; inline
+
+CONSTANT: RIM_INPUT        0
+CONSTANT: RIM_INPUTSINK    1
+
+CONSTANT: RIM_TYPEMOUSE    0
+CONSTANT: RIM_TYPEKEYBOARD 1
+CONSTANT: RIM_TYPEHID      2
+
+STRUCT: RAWINPUTHEADER
+    { dwType  DWORD  }
+    { dwSize  DWORD  }
+    { hDevice HANDLE }
+    { wParam  WPARAM } ;
+TYPEDEF: RAWINPUTHEADER* PRAWINPUTHEADER
+TYPEDEF: RAWINPUTHEADER* LPRAWINPUTHEADER
+STRUCT: RAWMOUSE_BUTTONS_USBUTTONS
+    { usButtonFlags USHORT }
+    { usButtonData  USHORT } ;
+
+UNION-STRUCT: RAWMOUSE_BUTTONS
+    { ulButtons ULONG                      }
+    { usButtons RAWMOUSE_BUTTONS_USBUTTONS } ;
+STRUCT: RAWMOUSE
+    { usFlags            USHORT            }
+    { uButtons           RAWMOUSE_BUTTONS  }
+    { ulRawButtons       ULONG             }
+    { lLastX             LONG              }
+    { lLastY             LONG              }
+    { ulExtraInformation ULONG             } ;
+TYPEDEF: RAWMOUSE* PRAWMOUSE
+TYPEDEF: RAWMOUSE* LPRAWMOUSE
+
+CONSTANT: RI_MOUSE_LEFT_BUTTON_DOWN   HEX: 0001
+CONSTANT: RI_MOUSE_LEFT_BUTTON_UP     HEX: 0002
+CONSTANT: RI_MOUSE_RIGHT_BUTTON_DOWN  HEX: 0004
+CONSTANT: RI_MOUSE_RIGHT_BUTTON_UP    HEX: 0008
+CONSTANT: RI_MOUSE_MIDDLE_BUTTON_DOWN HEX: 0010
+CONSTANT: RI_MOUSE_MIDDLE_BUTTON_UP   HEX: 0020
+
+: RI_MOUSE_BUTTON_1_DOWN      ( -- n ) RI_MOUSE_LEFT_BUTTON_DOWN ; inline
+: RI_MOUSE_BUTTON_1_UP        ( -- n ) RI_MOUSE_LEFT_BUTTON_UP ; inline
+: RI_MOUSE_BUTTON_2_DOWN      ( -- n ) RI_MOUSE_RIGHT_BUTTON_DOWN ; inline
+: RI_MOUSE_BUTTON_2_UP        ( -- n ) RI_MOUSE_RIGHT_BUTTON_UP ; inline
+: RI_MOUSE_BUTTON_3_DOWN      ( -- n ) RI_MOUSE_MIDDLE_BUTTON_DOWN ; inline
+: RI_MOUSE_BUTTON_3_UP        ( -- n ) RI_MOUSE_MIDDLE_BUTTON_UP ; inline
+
+CONSTANT: RI_MOUSE_BUTTON_4_DOWN      HEX: 0040
+CONSTANT: RI_MOUSE_BUTTON_4_UP        HEX: 0080
+CONSTANT: RI_MOUSE_BUTTON_5_DOWN      HEX: 0100
+CONSTANT: RI_MOUSE_BUTTON_5_UP        HEX: 0200
+CONSTANT: RI_MOUSE_WHEEL              HEX: 0400
+
+CONSTANT: MOUSE_MOVE_RELATIVE      0
+CONSTANT: MOUSE_MOVE_ABSOLUTE      1
+CONSTANT: MOUSE_VIRTUAL_DESKTOP    HEX: 02
+CONSTANT: MOUSE_ATTRIBUTES_CHANGED HEX: 04
+CONSTANT: MOUSE_MOVE_NOCOALESCE    HEX: 08
+
+STRUCT: RAWKEYBOARD
+    { MakeCode         USHORT }
+    { Flags            USHORT }
+    { Reserved         USHORT }
+    { VKey             USHORT }
+    { Message          UINT   }
+    { ExtraInformation ULONG  } ;
+TYPEDEF: RAWKEYBOARD* PRAWKEYBOARD
+TYPEDEF: RAWKEYBOARD* LPRAWKEYBOARD
+
+CONSTANT: KEYBOARD_OVERRUN_MAKE_CODE    HEX: FF
+
+CONSTANT: RI_KEY_MAKE             0
+CONSTANT: RI_KEY_BREAK            1
+CONSTANT: RI_KEY_E0               2
+CONSTANT: RI_KEY_E1               4
+CONSTANT: RI_KEY_TERMSRV_SET_LED  8
+CONSTANT: RI_KEY_TERMSRV_SHADOW   HEX: 10
+
+STRUCT: RAWHID
+    { dwSizeHid DWORD   }
+    { dwCount   DWORD   }
+    { bRawData  BYTE[1] } ;
+TYPEDEF: RAWHID* PRAWHID
+TYPEDEF: RAWHID* LPRAWHID
+
+UNION-STRUCT: RAWINPUT_UNION
+    { mouse    RAWMOUSE }
+    { keyboard RAWKEYBOARD }
+    { hid      RAWHID } ;
+STRUCT: RAWINPUT
+    { header RAWINPUTHEADER }
+    { data   RAWINPUT_UNION } ;
+TYPEDEF: RAWINPUT* PRAWINPUT
+TYPEDEF: RAWINPUT* LPRAWINPUT
+
+: RAWINPUT_ALIGN ( x -- y )
+    cpu x86.32 = [ 4 ] [ 8 ] if align ; inline
+: NEXTRAWINPUTBLOCK ( struct -- next-struct )
+    dup header>> dwSize>> swap <displaced-alien> RAWINPUT_ALIGN RAWINPUT memory>struct ; inline
+
+CONSTANT: RID_INPUT               HEX: 10000003
+CONSTANT: RID_HEADER              HEX: 10000005
+CONSTANT: RIDI_PREPARSEDDATA      HEX: 20000005
+CONSTANT: RIDI_DEVICENAME         HEX: 20000007
+CONSTANT: RIDI_DEVICEINFO         HEX: 2000000b
+
+STRUCT: RID_DEVICE_INFO_MOUSE
+    { dwId                 DWORD }
+    { dwNumberOfButtons    DWORD }
+    { dwSampleRate         DWORD }
+    { fHasHorizontalWheel  BOOL  } ;
+TYPEDEF: RID_DEVICE_INFO_MOUSE* PRID_DEVICE_INFO_MOUSE
+
+STRUCT: RID_DEVICE_INFO_KEYBOARD
+    { dwType                 DWORD }
+    { dwSubType              DWORD }
+    { dwKeyboardMode         DWORD }
+    { dwNumberOfFunctionKeys DWORD }
+    { dwNumberOfIndicators   DWORD }
+    { dwNumberOfKeysTotal    DWORD } ;
+TYPEDEF: RID_DEVICE_INFO_KEYBOARD* PRID_DEVICE_INFO_KEYBOARD
+
+STRUCT: RID_DEVICE_INFO_HID
+    { dwVendorId      DWORD  }
+    { dwProductId     DWORD  }
+    { dwVersionNumber DWORD  }
+    { usUsagePage     USHORT }
+    { usUsage         USHORT } ;
+TYPEDEF: RID_DEVICE_INFO_HID* PRID_DEVICE_INFO_HID
+
+UNION-STRUCT: RID_DEVICE_INFO_UNION
+    { mouse    RID_DEVICE_INFO_MOUSE    }
+    { keyboard RID_DEVICE_INFO_KEYBOARD }
+    { hid      RID_DEVICE_INFO_HID      } ;
+STRUCT: RID_DEVICE_INFO
+    { cbSize DWORD                 }
+    { dwType DWORD                 }
+    { data   RID_DEVICE_INFO_UNION } ;
+TYPEDEF: RID_DEVICE_INFO* PRID_DEVICE_INFO
+TYPEDEF: RID_DEVICE_INFO* LPRID_DEVICE_INFO
+
+STRUCT: RAWINPUTDEVICE
+    { usUsagePage USHORT }
+    { usUsage     USHORT }
+    { dwFlags     DWORD  }
+    { hwndTarget  HWND   } ;
+TYPEDEF: RAWINPUTDEVICE* PRAWINPUTDEVICE
+TYPEDEF: RAWINPUTDEVICE* LPRAWINPUTDEVICE
+TYPEDEF: RAWINPUTDEVICE* PCRAWINPUTDEVICE
+
+CONSTANT: RIDEV_REMOVE            HEX: 00000001
+CONSTANT: RIDEV_EXCLUDE           HEX: 00000010
+CONSTANT: RIDEV_PAGEONLY          HEX: 00000020
+CONSTANT: RIDEV_NOLEGACY          HEX: 00000030
+CONSTANT: RIDEV_INPUTSINK         HEX: 00000100
+CONSTANT: RIDEV_CAPTUREMOUSE      HEX: 00000200
+CONSTANT: RIDEV_NOHOTKEYS         HEX: 00000200
+CONSTANT: RIDEV_APPKEYS           HEX: 00000400
+CONSTANT: RIDEV_EXINPUTSINK       HEX: 00001000
+CONSTANT: RIDEV_DEVNOTIFY         HEX: 00002000
+CONSTANT: RIDEV_EXMODEMASK        HEX: 000000F0
+
+: RIDEV_EXMODE ( mode -- x ) RIDEV_EXMODEMASK bitand ; inline
+
+CONSTANT: GIDC_ARRIVAL             1
+CONSTANT: GIDC_REMOVAL             2
+
+: GET_DEVICE_CHANGE_WPARAM ( wParam -- x ) HEX: ffff bitand ; inline
+
+STRUCT: RAWINPUTDEVICELIST
+    { hDevice HANDLE }
+    { dwType  DWORD  } ;
+TYPEDEF: RAWINPUTDEVICELIST* PRAWINPUTDEVICELIST
+
 LIBRARY: user32
 
 FUNCTION: HKL ActivateKeyboardLayout ( HKL hkl, UINT Flags ) ;
@@ -775,7 +950,7 @@ ALIAS: CreateWindowEx CreateWindowExW
 ! FUNCTION: DefFrameProcW
 ! FUNCTION: DefMDIChildProcA
 ! FUNCTION: DefMDIChildProcW
-! FUNCTION: DefRawInputProc
+FUNCTION: LRESULT DefRawInputProc ( PRAWINPUT* paRawInput, INT nInput, UINT cbSizeHeader ) ;
 FUNCTION: LRESULT DefWindowProcW ( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam ) ;
 ALIAS: DefWindowProc DefWindowProcW
 ! FUNCTION: DeleteMenu
@@ -985,13 +1160,14 @@ FUNCTION: int GetPriorityClipboardFormat ( UINT* paFormatPriorityList, int cForm
 ! FUNCTION: GetPropA
 ! FUNCTION: GetPropW
 ! FUNCTION: GetQueueStatus
-! FUNCTION: GetRawInputBuffer
-! FUNCTION: GetRawInputData
-! FUNCTION: GetRawInputDeviceInfoA
-! FUNCTION: GetRawInputDeviceInfoW
-! FUNCTION: GetRawInputDeviceList
+FUNCTION: UINT GetRawInputBuffer ( PRAWINPUT pData, PUINT pcbSize, UINT cbSizeHeader ) ;
+FUNCTION: UINT GetRawInputData ( HRAWINPUT hRawInput, UINT uiCommand, LPVOID pData, PUINT pcbSize, UINT cbSizeHeader ) ;
+FUNCTION: UINT GetRawInputDeviceInfoA ( HANDLE hDevice, UINT uiCommand, LPVOID pData, PUINT pcbSize ) ;
+FUNCTION: UINT GetRawInputDeviceInfoW ( HANDLE hDevice, UINT uiCommand, LPVOID pData, PUINT pcbSize ) ;
+ALIAS: GetRawInputDeviceInfo GetRawInputDeviceInfoW
+FUNCTION: UINT GetRawInputDeviceList ( PRAWINPUTDEVICELIST pRawInputDeviceList, PUINT puiNumDevices, UINT cbSize ) ;
+FUNCTION: UINT GetRegisteredRawInputDevices ( PRAWINPUTDEVICE pRawInputDevices, PUINT puiNumDevices, UINT cbSize ) ;
 ! FUNCTION: GetReasonTitleFromReasonCode
-! FUNCTION: GetRegisteredRawInputDevices
 ! FUNCTION: GetScrollBarInfo
 ! FUNCTION: GetScrollInfo
 ! FUNCTION: GetScrollPos
@@ -1266,7 +1442,7 @@ ALIAS: RegisterDeviceNotification RegisterDeviceNotificationW
 ! FUNCTION: RegisterHotKey
 ! FUNCTION: RegisterLogonProcess
 ! FUNCTION: RegisterMessagePumpHook
-! FUNCTION: RegisterRawInputDevices
+FUNCTION: BOOL RegisterRawInputDevices ( PCRAWINPUTDEVICE pRawInputDevices, UINT uiNumDevices, UINT cbSize ) ;
 ! FUNCTION: RegisterServicesProcess
 ! FUNCTION: RegisterShellHookWindow
 ! FUNCTION: RegisterSystemThread
