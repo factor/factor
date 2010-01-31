@@ -6,6 +6,8 @@ vectors math quotations combinators sorting effects graphs
 vocabs sets ;
 IN: classes
 
+ERROR: bad-inheritance class superclass ;
+
 SYMBOL: class<=-cache
 SYMBOL: class-not-cache
 SYMBOL: classes-intersect-cache
@@ -169,7 +171,11 @@ GENERIC: update-methods ( class seq -- )
     dup class-usages
     [ nip [ update-class ] each ] [ update-methods ] 2bi ;
 
+: check-inheritance ( subclass superclass -- )
+    2dup superclasses member-eq? [ bad-inheritance ] [ 2drop ] if ;
+
 : define-class ( word superclass members participants metaclass -- )
+    [ 2dup check-inheritance ] 3dip
     make-class-props [ (define-class) ] [ drop changed-definition ] 2bi ;
 
 : forget-predicate ( class -- )
