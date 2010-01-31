@@ -26,9 +26,11 @@ TUPLE: gif-lzw < lzw ;
     dup end-of-information-code>> 1 + initial-uncompress-table >>table
     dup initial-code-size>> >>code-size ;
 
+ERROR: code-size-zero ;
+
 : <lzw-uncompress> ( input code-size class -- obj )
     new
-        swap >>code-size
+        swap [ code-size-zero ] when-zero >>code-size
         dup code-size>> >>initial-code-size
         dup code-size>> 1 - 2^ >>clear-code
         dup clear-code>> 1 + >>end-of-information-code
