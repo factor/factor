@@ -159,13 +159,13 @@
                                            "MEMO" "MEMO:" "METHOD"
                                            "SYNTAX"
                                            "PREDICATE" "PRIMITIVE"
+                                           "STRUCT" "TAG" "TUPLE" "UNION-STRUCT"
                                            "UNION"))
 
 (defconst fuel-syntax--no-indent-def-starts '("ARTICLE"
                                               "HELP"
                                               "SINGLETONS"
                                               "SYMBOLS"
-                                              "TUPLE"
                                               "VARS"))
 
 (defconst fuel-syntax--indent-def-start-regex
