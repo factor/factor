@@ -40,13 +40,6 @@ DEFER: plist>
     [ -> propertyListFromData:mutabilityOption:format:errorDescription: ] keep
     *void* [ -> release "read-plist failed" throw ] when* ;
 
-MACRO: objc-class-case ( alist -- quot )
-    [
-        dup callable?
-        [ first2 [ '[ dup _ execute -> isKindOfClass: c-bool> ] ] dip 2array ]
-        unless
-    ] map '[ _ cond ] ;
-
 PRIVATE>
 
 ERROR: invalid-plist-object object ;

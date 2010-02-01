@@ -48,7 +48,7 @@ IN: stack-checker.transforms
 
 : apply-macro ( word -- )
     [ current-word set ]
-    [ "macro" word-prop ]
+    [ "macro" word-prop '[ _ execute ] ]
     [ "declared-effect" word-prop in>> length ] tri
     (apply-transform) ;
 
