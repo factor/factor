@@ -31,8 +31,10 @@ $nl
     { "The simplest way is to split off the parsing words and macros into sub-vocabularies; perhaps suffixed by " { $snippet ".syntax" } " and " { $snippet ".macros" } "." }
     { "Alternatively, nested compilation units can be created using " { $link "syntax-immediate" } "." }
 }
-"Parsing words which create new definitions at parse time will implicitly add them to the compilation unit of the current source file. Code which creates new definitions at run time will need to explicitly create a compilation unit with a combinator:"
-{ $subsections with-compilation-unit }
+"Parsing words which create new definitions at parse time will implicitly add them to the compilation unit of the current source file."
+$nl
+"Code which creates new definitions at run time will need to explicitly create a compilation unit with a combinator. There is an additional combinator used by the parser to implement " { $link "syntax-immediate" } "."
+{ $subsections with-compilation-unit with-nested-compilation-unit }
 "Additional topics:"
 { $subsections "compilation-units-internals" } ;
 
@@ -56,11 +58,16 @@ HELP: new-definitions
 HELP: with-compilation-unit
 { $values { "quot" quotation } }
 { $description "Calls a quotation in a new compilation unit. The quotation can define new words and classes, as well as forget words. When the quotation returns, any changed words are recompiled, and changes are applied atomically." }
-{ $notes "Compilation units may be nested."
+{ $notes "Calls to " { $link with-compilation-unit } " may be nested."
 $nl
 "The parser wraps every source file in a compilation unit, so parsing words may define new words without having to perform extra work; to define new words at any other time, you must wrap your defining code with this combinator."
 $nl
 "Since compilation is relatively expensive, you should try to batch up as many definitions into one compilation unit as possible." } ;
+
+HELP: with-nested-compilation-unit
+{ $values { "quot" quotation } }
+{ $description "Calls a quotation in a new compilation unit. The only difference between this word and " { $link with-compilation-unit } " is that variables used by the parser to associate definitions with source files are not rebound." }
+{ $notes "This word is used by " { $link "syntax-immediate" } " to ensure that definitions in nested blocks are correctly recorded. User code should not depend on parser internals in such a way that calling this combinator is required." } ;
 
 HELP: recompile
 { $values { "words" "a sequence of words" } { "alist" "an association list mapping words to compiled definitions" } }
@@ -72,12 +79,18 @@ HELP: no-compilation-unit
 { $error-description "Thrown when an attempt is made to define a word outside of a " { $link with-compilation-unit } " combinator." } ;
 
 HELP: modify-code-heap ( alist update-existing? reset-pics? -- )
-{ $values { "alist" "an alist" } { "update-existing?" "a boolean" } { "reset-pics?" "a boolean" } }
-{ $description "Stores compiled code definitions in the code heap. The alist maps words to the following:"
+{ $values { "alist" "an association list with words as keys" } { "update-existing?" "a boolean" } { "reset-pics?" "a boolean" } }
+{ $description "Lowest-level primitive for defining words. Associates words with code blocks in the code heap."
+$nl
+"The alist maps words to the following:"
 { $list
     { "a quotation - in this case, the quotation is compiled with the non-optimizing compiler and the word will call the quotation when executed." }
-    { { $snippet "{ code labels rel words literals }" } " - in this case, a code heap block is allocated with the given data and the word will call the code block when executed." }
-} }
+    { "a 5-element array " { $snippet "{ parameters literals relocation labels code }" } " - in this case, a code heap block is allocated with the given data and the word will call the code block when executed. This is used by the optimizing compiler." }
+}
+"If any of the redefined words may already be referenced by other words in the code heap, from outside of the compilation unit, then a scan of the code heap must be performed to update all word call sites. Passing " { $link t } " as the " { $snippet "update-existing?" } " parameter enables this code path."
+$nl
+"If classes, methods or generic words were redefined, then inline cache call sites need to be updated as well. Passing " { $link t } " as the " { $snippet "reset-pics?" } " parameter enables this code path."
+}
 { $notes "This word is called at the end of " { $link with-compilation-unit } "." } ;
 
 HELP: compile
