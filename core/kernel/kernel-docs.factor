@@ -820,6 +820,10 @@ HELP: assert=
 { $values { "a" object } { "b" object } }
 { $description "Throws an " { $link assert } " error if " { $snippet "a" } " does not equal " { $snippet "b" } "." } ;
 
+HELP: become
+{ $values { "old" array } { "new" array } }
+{ $description "Replaces all references to objects in " { $snippet "old" } " with the corresponding object in " { $snippet "new" } ". This word is used to implement tuple reshaping. See " { $link "tuple-redefinition" } "." } ;
+
 ARTICLE: "shuffle-words-complex" "Complex shuffle words"
 "These shuffle words tend to make code difficult to read and to reason about. Code that uses them should almost always be rewritten using " { $link "locals" } " or " { $link "dataflow-combinators" } "."
 $nl
