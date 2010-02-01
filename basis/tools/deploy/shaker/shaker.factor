@@ -127,7 +127,7 @@ IN: tools.deploy.shaker
                 "boa-check"
                 "coercer"
                 "combination"
-                "compiled-generic-uses"
+                "generic-call-sites"
                 "effect-dependencies"
                 "definition-dependencies"
                 "conditional-dependencies"
@@ -343,7 +343,7 @@ IN: tools.deploy.shaker
                 classes.private:update-map
                 main-vocab-hook
                 compiler.crossref:compiled-crossref
-                compiler.crossref:compiled-generic-crossref
+                compiler.crossref:generic-call-site-crossref
                 compiler-impl
                 compiler.errors:compiler-errors
                 lexer-factory
