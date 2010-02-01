@@ -711,7 +711,7 @@ M: bad-executable summary
 
 \ dll-valid? { object } { object } define-primitive
 
-\ modify-code-heap { array } { } define-primitive
+\ modify-code-heap { array object object } { } define-primitive
 
 \ unimplemented { } { } define-primitive
 

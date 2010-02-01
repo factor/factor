@@ -62,7 +62,8 @@ HOOK: to-recompile compiler-impl ( -- words )
 
 HOOK: process-forgotten-words compiler-impl ( words -- )
 
-: compile ( words -- ) recompile modify-code-heap ;
+: compile ( words -- )
+    recompile t f modify-code-heap ;
 
 ! Non-optimizing compiler
 M: f update-call-sites
@@ -149,13 +150,20 @@ M: object always-bump-effect-counter? drop f ;
     updated-definitions dup assoc-empty?
     [ drop ] [ notify-definition-observers notify-error-observers ] if ;
 
+: update-existing? ( defs -- ? )
+    new-words get keys diff empty? not ;
+
+: reset-pics? ( -- ? )
+    outdated-generics get assoc-empty? not ;
+
 : finish-compilation-unit ( -- )
     [ ] [
         remake-generics
-        to-recompile recompile
-        update-tuples
-        process-forgotten-definitions
-        modify-code-heap
+        to-recompile [
+            recompile
+            update-tuples
+            process-forgotten-definitions
+        ] keep update-existing? reset-pics? modify-code-heap
         bump-effect-counter
         notify-observers
     ] if-bootstrapping ;

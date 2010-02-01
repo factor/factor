@@ -71,8 +71,8 @@ HELP: no-compilation-unit
 { $description "Throws a " { $link no-compilation-unit } " error." }
 { $error-description "Thrown when an attempt is made to define a word outside of a " { $link with-compilation-unit } " combinator." } ;
 
-HELP: modify-code-heap ( alist -- )
-{ $values { "alist" "an alist" } }
+HELP: modify-code-heap ( alist update-existing? reset-pics? -- )
+{ $values { "alist" "an alist" } { "update-existing?" "a boolean" } { "reset-pics?" "a boolean" } }
 { $description "Stores compiled code definitions in the code heap. The alist maps words to the following:"
 { $list
     { "a quotation - in this case, the quotation is compiled with the non-optimizing compiler and the word will call the quotation when executed." }

@@ -77,25 +77,43 @@ bool factor_vm::in_code_heap_p(cell ptr)
 
 struct word_updater {
 	factor_vm *parent;
+	bool reset_inline_caches;
 
-	explicit word_updater(factor_vm *parent_) : parent(parent_) {}
+	word_updater(factor_vm *parent_, bool reset_inline_caches_) :
+		parent(parent_), reset_inline_caches(reset_inline_caches_) {}
 
 	void operator()(code_block *compiled, cell size)
 	{
-		parent->update_word_references(compiled);
+		parent->update_word_references(compiled,reset_inline_caches);
 	}
 };
 
-/* Update pointers to words referenced from all code blocks. Only after
-defining a new word. */
-void factor_vm::update_code_heap_words()
+/* Update pointers to words referenced from all code blocks.
+Only needed after redefining an existing word.
+If generic words were redefined, inline caches need to be reset. */
+void factor_vm::update_code_heap_words(bool reset_inline_caches)
 {
-	word_updater updater(this);
+	word_updater updater(this,reset_inline_caches);
 	each_code_block(updater);
+}
+
+/* Fix up new words only.
+Fast path for compilation units that only define new words. */
+void factor_vm::initialize_code_blocks()
+{
+	std::map<code_block *, cell>::const_iterator iter = code->uninitialized_blocks.begin();
+	std::map<code_block *, cell>::const_iterator end = code->uninitialized_blocks.end();
+
+	for(; iter != end; iter++)
+		initialize_code_block(iter->first,iter->second);
+
+	code->uninitialized_blocks.clear();
 }
 
 void factor_vm::primitive_modify_code_heap()
 {
+	bool reset_inline_caches = to_boolean(ctx->pop());
+	bool update_existing_words = to_boolean(ctx->pop());
 	data_root<array> alist(ctx->pop(),this);
 
 	cell count = array_capacity(alist.untagged());
@@ -144,7 +162,10 @@ void factor_vm::primitive_modify_code_heap()
 		update_word_entry_point(word.untagged());
 	}
 
-	update_code_heap_words();
+	if(update_existing_words)
+		update_code_heap_words(reset_inline_caches);
+	else
+		initialize_code_blocks();
 }
 
 code_heap_room factor_vm::code_room()

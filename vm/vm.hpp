@@ -508,12 +508,13 @@ struct factor_vm
 	cell compute_entry_point_pic_address(cell w_);
 	cell compute_entry_point_pic_tail_address(cell w_);
 	cell code_block_owner(code_block *compiled);
-	void update_word_references(code_block *compiled);
+	void update_word_references(code_block *compiled, bool reset_inline_caches);
 	void undefined_symbol();
 	cell compute_dlsym_address(array *literals, cell index);
 	cell compute_vm_address(cell arg);
 	void store_external_address(instruction_operand op);
 	cell compute_here_address(cell arg, cell offset, code_block *compiled);
+	void initialize_code_block(code_block *compiled, cell literals);
 	void initialize_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
 	code_block *allot_code_block(cell size, code_block_type type);
@@ -529,7 +530,8 @@ struct factor_vm
 
 	void init_code_heap(cell size);
 	bool in_code_heap_p(cell ptr);
-	void update_code_heap_words();
+	void update_code_heap_words(bool reset_inline_caches);
+	void initialize_code_blocks();
 	void primitive_modify_code_heap();
 	code_heap_room code_room();
 	void primitive_code_room();
