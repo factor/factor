@@ -78,6 +78,9 @@ M: string resolve-pointer-type
         [ resolve-pointer-type ] [ drop void* ] if
     ] if ;
 
+M: array resolve-pointer-type
+    first resolve-pointer-type ;
+
 : resolve-typedef ( name -- c-type )
     dup void? [ no-c-type ] when
     dup c-type-name? [ c-type ] when ;
