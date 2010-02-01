@@ -156,7 +156,8 @@ M: word reset-word
     2dup [ hashcode ] bi@ bitxor >fixnum (word) dup new-word ;
 
 : <uninterned-word> ( name -- word )
-    f \ <uninterned-word> counter >fixnum (word) ;
+    f \ <uninterned-word> counter >fixnum (word)
+    new-words get [ dup new-word ] when ;
 
 : gensym ( -- word )
     "( gensym )" <uninterned-word> ;

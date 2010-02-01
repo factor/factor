@@ -9,7 +9,7 @@ IN: compiler.tests.low-level-ir
 : compile-cfg ( cfg -- word )
     gensym
     [ build-mr generate code>> ] dip
-    [ associate >alist modify-code-heap ] keep ;
+    [ associate >alist t t modify-code-heap ] keep ;
 
 : compile-test-cfg ( -- word )
     cfg new 0 get >>entry
