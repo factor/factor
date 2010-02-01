@@ -74,29 +74,53 @@ SYMBOL: ->
 : remove-breakpoints ( quot pos -- quot' )
     1 + short cut [ (remove-breakpoints) ] bi@ [ -> ] glue ;
 
-: callframe. ( triple -- )
-    first3
+: optimized-frame? ( triple -- ? ) second word? ;
+
+: frame-word? ( triple -- ? )
+    first word? ;
+
+: frame-word. ( triple -- )
+    first {
+        { [ dup method? ] [ "Method: " write pprint ] }
+        { [ dup word? ] [ "Word: " write pprint ] }
+        [ drop ]
+    } cond ;
+
+: optimized-frame. ( triple -- )
     [
-        {
-            { [ dup method? ] [ "Method: " write . ] }
-            { [ dup word? ] [ "Word: " write . ] }
-            [ drop ]
-        } cond
-    ] 2dip
-    over quotation? [
-        "Quotation: " write
-        remove-breakpoints
+        [ "(O)" write ] with-cell
+        [ frame-word. ] with-cell
+    ] with-row ;
+
+: unoptimized-frame. ( triple -- )
+    [
+        [ "(U)" write ] with-cell
         [
-            3 nesting-limit set
-            100 length-limit set
-            .
-        ] with-scope
-    ] [ 2drop ] if ;
+            "Quotation: " write
+            dup [ second ] [ third ] bi remove-breakpoints
+            [
+                3 nesting-limit set
+                100 length-limit set
+                pprint
+            ] with-scope
+        ] with-cell
+    ] with-row
+    dup frame-word? [
+        [
+            [ ] with-cell
+            [ frame-word. ] with-cell
+        ] with-row
+    ] [ drop ] if ;
+
+: callframe. ( triple -- )
+    dup optimized-frame?
+    [ optimized-frame. ] [ unoptimized-frame. ] if ;
 
 PRIVATE>
 
 : callstack. ( callstack -- )
-    callstack>array 3 <groups> [ nl ] [ callframe. ] interleave ;
+    callstack>array 3 <groups>
+    { { table-gap { 5 5 } } } [ [ callframe. ] each ] tabular-output nl ;
 
 : .c ( -- ) callstack callstack. ;
 
