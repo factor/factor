@@ -1,6 +1,7 @@
-IN: macros.tests
 USING: tools.test macros math kernel arrays
-vectors io.streams.string prettyprint parser eval see ;
+vectors io.streams.string prettyprint parser eval see
+stack-checker compiler.units definitions vocabs ;
+IN: macros.tests
 
 MACRO: see-test ( a b -- quot ) + ;
 
@@ -19,7 +20,21 @@ unit-test
 
 [ f ] [ \ see-test macro? ] unit-test
 
-[ ] [ "USING: macros stack-checker kernel ; IN: hanging-macro MACRO: c ( quot -- ) infer drop [ ] ; : a ( -- ) [ a ] c ;" eval( -- ) ] unit-test
+[ ] [ "USING: macros stack-checker kernel ; IN: hanging-macro MACRO: c ( quot -- ) infer drop [ ] ;" eval( -- ) ] unit-test
+[ ] [ "USING: macros kernel ; IN: hanging-macro : a ( -- ) [ a ] c ;" eval( -- ) ] unit-test
+
+[ ] [ [ "hanging-macro" forget-vocab ] with-compilation-unit ] unit-test
 
 [ ] [ "IN: macros.tests USE: macros MACRO: foo ( -- x ) [ ] ;" eval( -- ) ] unit-test
     [ "IN: macros.tests USE: macros MACRO: foo ( -- x ) [ ] ; inline" eval( -- ) ] must-fail
+
+! The macro expander code should infer
+MACRO: bad-macro ( a -- b ) 1 2 3 [ ] ;
+
+! Must fail twice, and not memoize a bad result
+[ [ 0 bad-macro ] call ] must-fail
+[ [ 0 bad-macro ] call ] must-fail
+
+[ [ 0 bad-macro ] infer ] must-fail
+
+[ ] [ [ \ bad-macro forget ] with-compilation-unit ] unit-test
