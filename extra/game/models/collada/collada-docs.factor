@@ -2,13 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.crossref help.stylesheet help.topics help.syntax
 definitions io prettyprint summary arrays math sequences vocabs strings
-see xml.data hashtables ;
-IN: collada
+see xml.data hashtables assocs ;
+IN: game.models.collada
 
-ABOUT: "collada"
+ABOUT: "game.models.collada"
 
-ARTICLE: "collada" "Conversion of COLLADA assets"
-"The " { $vocab-link "collada" } " vocabulary implements words for converting COLLADA assets to data suitable for use with OpenGL. See the COLLADA documentation at " { $url "http://collada.org" } "." ;
+ARTICLE: "game.models.collada" "Conversion of COLLADA assets"
+"The " { $vocab-link "game.models.collada" } " vocabulary implements words for converting COLLADA assets to data suitable for use with OpenGL. See the COLLADA documentation at " { $url "http://collada.org" } "." ;
 
 HELP: model
 { $class-description "Tuple of a packed attribute buffer, index buffer and vertex format suitable for a single OpenGL draw call." } ;
@@ -22,11 +22,12 @@ HELP: up-axis
 HELP: unit-ratio
 { $description "Scaling ratio for the coordinates of the tags being read." } ;
 
-HELP: missing-attr
-{ $description "An error thrown when an attribute is missing from a tag." } ;
+HELP: indexed-seq
+{ $class-description "A sequence described by a sequence of unique elements and a sequence of indices. The sequence can only be appended to. An associative map is used as a reverse lookup table when appending." } ;
 
-HELP: missing-child
-{ $description "An error thrown when a child is missing from a tag." } ;
+HELP: <indexed-seq>
+{ $values { "dseq-exemplar" sequence } { "iseq-examplar" sequence } { "rassoc-examplar" assoc } }
+{ $class-description "Construct an " { $link indexed-seq } " using the given examplars for the underlying data structures." } ;
 
 HELP: string>numbers ( string -- number-seq )
 { $values { "string" string } { "number-seq" sequence } }
@@ -37,7 +38,7 @@ HELP: y-up { $class-description "Right-handed 3D coordinate system where Y is up
 HELP: z-up { $class-description "Right-handed 3D coordinate system where Z is up." } ;
 
 HELP: >y-up-axis!
-{ $values { "sequence" sequence } { "from-axis" rh-up } { "sequence" sequence } }
+{ $values { "seq" sequence } { "from-axis" rh-up } { "seq" sequence } }
 { $description "Destructively swizzles the first three elements of the input sequence to a right-handed 3D coordinate system where Y is up and returns the modified sequence." } ;
 
 HELP: source>seq
@@ -57,11 +58,11 @@ HELP: mesh>vertices
 { $description "Convert the mesh tag's vertices element to a pair for further lookup in " { $link collect-sources } ". " } ;
 
 HELP: collect-sources
-{ $values { "sources" hashtable } { "vertices" pair } { "inputs" tag sequence } { "soures" sequence } }
+{ $values { "sources" hashtable } { "vertices" pair } { "inputs" tag sequence } { "sources" sequence } }
 { $description "Look up the sources for these " { $emphasis "input" } " elements and return a sequence of " { $link source } " tuples." } ;
 
 HELP: group-indices
-{ $values { "index-stride" number } { "triangle-count" number } { indices "sequence" } { "grouped-indices" sequence } }
+{ $values { "index-stride" number } { "triangle-count" number } { "indices" sequence } { "grouped-indices" sequence } }
 { $description "Groups the index sequence by triangle and then groups each triangle's indices by vertex." } ;
 
 HELP: triangles>numbers
@@ -76,6 +77,10 @@ HELP: <model>
 { $values { "attribute-buffer" sequence } { "index-buffer" sequence } { "sources" sequence } { "model" model } }
 { $description "Converts the inputs to a form suitable for use with " { $vocab-link "gpu" } " and constructs a " { $link model } "." } ;
 
+HELP: pack-attributes
+{ $values { "source-indices" sequence } { "sources" sequence } { "attributes" sequence } }
+{ $description "Packs the attributes for a single vertex into a sequence from a set of source data streams." } ;
+
 HELP: soa>aos
 { $values { "triangles-indices" sequence } { "sources" sequence } { "attribute-buffer" sequence } { "index-buffer" sequence } }
 { $description "Swizzles the input sources from a structure of arrays form to an array of structures form and generates a new index buffer." } ;
@@ -85,7 +90,7 @@ HELP: triangles>model
 { $description "Creates a " { $link model } " tuple from the given triangles tag, source set and vertices pair." } ;
 
 HELP: mesh>triangles
-{ $values { "souces" sequence } { "vertices" pair } { "mesh-tag" tag } { "models" sequence } }
+{ $values { "sources" sequence } { "vertices" pair } { "mesh-tag" tag } { "models" sequence } }
 { $description "Creates a sequence of models from the triangles in the mesh tag." } ;
 
 HELP: mesh>models
