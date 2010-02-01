@@ -7,7 +7,7 @@ FROM: mason.build => build ;
 IN: mason
 
 : build-loop-error ( error -- )
-    [ "Build loop error:" print flush error. flush ]
+    [ "Build loop error:" print flush error. flush :c flush ]
     [ error-continuation get call>> email-error ] bi ;
 
 : build-loop-fatal ( error -- )
