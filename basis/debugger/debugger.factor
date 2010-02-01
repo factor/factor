@@ -237,8 +237,8 @@ M: redefine-error error.
 
 M: undefined summary
     word>> undefined?
-    "Cannot call a deferred word before it has been defined"
-    "Cannot call a word before it has been compiled"
+    "Cannot execute a deferred word before it has been defined"
+    "Cannot execute a word before it has been compiled"
     ? ;
 
 M: no-compilation-unit error.
