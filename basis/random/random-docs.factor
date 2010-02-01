@@ -86,8 +86,9 @@ HELP: sample
 }
 { $description "Takes " { $snippet "n" } " samples at random without replacement from a sequence. Throws an error if " { $snippet "n" } " is longer than the sequence." }
 { $examples
-    { $unchecked-example "USING: random prettyprint ; { 1 2 3 } 2 sample ."
-        "{ 3 2 }"
+    { $unchecked-example "USING: random prettyprint ;"
+    "{ 1 2 3 } 2 sample ."
+    "{ 3 2 }"
     }
 } ;
 

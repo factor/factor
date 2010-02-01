@@ -14,7 +14,7 @@ M: empty-mixin sheeple drop "wake up" ; inline
 : sheeple-test ( -- string ) { } sheeple ;
 
 : compiled-use? ( key word -- ? )
-    "compiled-uses" word-prop 2 <groups> key? ;
+    "definition-dependencies" word-prop member-eq? ;
 
 [ "sheeple" ] [ sheeple-test ] unit-test
 [ t ] [ \ sheeple-test optimized? ] unit-test
