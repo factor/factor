@@ -78,7 +78,7 @@ SYMBOL: ->
     first3
     [
         {
-            { [ dup method-body? ] [ "Method: " write . ] }
+            { [ dup method? ] [ "Method: " write . ] }
             { [ dup word? ] [ "Word: " write . ] }
             [ drop ]
         } cond
