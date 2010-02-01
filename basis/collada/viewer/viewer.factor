@@ -8,8 +8,9 @@ io io.encodings.ascii io.files io.files.temp kernel locals math
 math.matrices math.vectors.simd math.parser math.vectors
 method-chains namespaces sequences splitting threads ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats specialized-arrays
-specialized-vectors literals collada fry xml xml.traversal sequences.deep
+specialized-vectors literals game.models.collada fry xml xml.traversal sequences.deep
 
+math.bitwise
 opengl.gl
 prettyprint ;
 FROM: alien.c-types => float ;
@@ -23,18 +24,26 @@ uniform vec3 light_position;
 
 attribute vec3 POSITION;
 attribute vec3 NORMAL;
+attribute vec2 TEXCOORD;
+
+varying vec2 texit;
+varying vec3 norm;
 
 void main()
 {
     vec4 position = mv_matrix * vec4(POSITION, 1.0);
     gl_Position = p_matrix * position;
+    texit = TEXCOORD;
+    norm = NORMAL;
 }
 ;
 
 GLSL-SHADER: collada-fragment-shader fragment-shader
+varying vec2 texit;
+varying vec3 norm;
 void main()
 {
-    gl_FragColor = vec4(1, 1, 0, 1);
+    gl_FragColor = vec4(texit, 0, 1) + vec4(norm, 1);
 }
 ;
 
@@ -78,8 +87,9 @@ TUPLE: collada-world < wasd-world
     { collada collada-state } ;
 
 VERTEX-FORMAT: collada-vertex
-    { "POSITION" float-components 3 f }
-    { "NORMAL"   float-components 3 f } ;
+    { "POSITION"   float-components 3 f }
+    { "NORMAL" float-components 3 f }
+    { "TEXCOORD" float-components 2 f } ;
 
 VERTEX-FORMAT: debug-vertex
     { "POSITION" float-components 3 f }
@@ -112,8 +122,8 @@ VERTEX-FORMAT: debug-vertex
     
 : <collada-state> ( -- collada-state )
     collada-state new
-    #! "C:/Users/erikc/Downloads/mech.dae"
-    "/Users/erikc/Documents/mech.dae"
+    "C:/Users/erikc/Downloads/test2.dae"
+    #! "/Users/erikc/Documents/mech.dae"
     file>xml "mesh" deep-tags-named [ mesh>models ] map flatten >>models ;
 
 M: collada-world begin-game-world
@@ -152,10 +162,15 @@ M: collada-world begin-game-world
       { 0 0 0 } { 0 0 1 } { 0 0 1 } } draw-lines ;
           
 : draw-collada ( world -- )
-    GL_COLOR_BUFFER_BIT glClear
+    0 0 0 0 glClearColor 
+    1 glClearDepth
+    HEX: ffffffff glClearStencil
+    { GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT GL_STENCIL_BUFFER_BIT } flags glClear
 
     [
-        triangle-lines dup t <triangle-state> set-gpu-state
+        #! triangle-lines dup t <triangle-state> set-gpu-state
+        face-ccw cull-back <triangle-cull-state> set-gpu-state
+        cmp-less <depth-state> set-gpu-state
         [ collada>> vertex-arrays>> ]
         [ collada>> index-vectors>> ]
         [ <collada-uniforms> ]
@@ -170,6 +185,7 @@ M: collada-world begin-game-world
         ] curry 2each
     ]
     [
+        cmp-always <depth-state> set-gpu-state
         draw-axes
     ]
     bi ;
@@ -177,7 +193,7 @@ M: collada-world begin-game-world
 M: collada-world draw-world*
     draw-collada ;
 
-M: collada-world wasd-movement-speed drop 1/16. ;
+M: collada-world wasd-movement-speed drop 1/4. ;
 M: collada-world wasd-near-plane drop 1/32. ;
 M: collada-world wasd-far-plane drop 1024.0 ;
 

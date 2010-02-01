@@ -5,8 +5,8 @@ locals math math.parser sequences sequences.deep
 specialized-arrays.instances.alien.c-types.float
 specialized-arrays.instances.alien.c-types.uint splitting xml
 xml.data xml.traversal math.order
-namespaces combinators images gpu.shaders io ;
-IN: collada
+namespaces combinators images gpu.shaders io make ;
+IN: game.models.collada
 
 TUPLE: model attribute-buffer index-buffer vertex-format ;
 TUPLE: source semantic offset data ;
@@ -16,8 +16,48 @@ SYMBOLS: up-axis unit-ratio ;
 ERROR: missing-attr tag attr ;
 ERROR: missing-child tag child-name ;
 
+TUPLE: indexed-seq dseq iseq rassoc ;
+INSTANCE: indexed-seq sequence
+
+M: indexed-seq length
+    iseq>> length ; inline
+
+M: indexed-seq nth
+    [ iseq>> nth ] keep dseq>> nth ; inline
+
+M:: indexed-seq set-nth ( elt n seq -- )
+    seq dseq>>   :> dseq
+    seq iseq>>   :> iseq
+    seq rassoc>> :> rassoc
+    seq length n = not [ seq immutable ] when
+    elt rassoc at
+    [
+        iseq push
+    ]
+    [
+        dseq length
+        [ elt rassoc set-at ]
+        [ iseq push ] bi
+        elt dseq push
+    ] if* ; inline
+
+: <indexed-seq> ( dseq-examplar iseq-exampler rassoc-examplar -- indexed-seq )
+    indexed-seq new
+    swap clone >>rassoc
+    swap clone >>iseq
+    swap clone >>dseq ;
+
+M: indexed-seq new-resizable
+    [ dseq>> ] [ iseq>> ] [ rassoc>> ] tri <indexed-seq>
+    dup -rot
+    [ [ dseq>> new-resizable ] keep (>>dseq) ]
+    [ [ iseq>> new-resizable ] keep (>>iseq) ]
+    [ [ rassoc>> clone nip ] keep (>>rassoc) ]
+    2tri ;
+
+
 : string>numbers ( string -- number-seq )
-    " \t\n" split [ string>number ] map ;
+    " \t\n" split [ "" = ] trim [ string>number ] map ;
 
 : x/ ( tag child-name -- child-tag )
     [ tag-named ]
@@ -69,8 +109,8 @@ M: z-up >y-up-axis!
     rot
     [ "float_array" x/ xt string>numbers [ * ] with map ]
     [ nip "technique_common" x/ "accessor" x/ "stride" x@ string>number ] 2bi
-    <groups>
-    [ swap >y-up-axis! ] with map ;
+    group
+    [ swap over length 2 > [ >y-up-axis! ] [ drop ] if ] with map ;
 
 : source>pair ( source-tag -- pair )
     [ "id" x@ ]
@@ -108,7 +148,7 @@ M: z-up >y-up-axis!
     ] map flatten ;
 
 : group-indices ( index-stride triangle-count indices -- grouped-indices )
-    dup length rot / <groups> swap [ <groups> ] curry map ;
+    dup length rot / group swap [ group ] curry map ;
 
 : triangles>numbers ( triangles-tag -- number-seq )
     "p" x/ children>string " \t\n" split [ string>number ] map ;
@@ -130,32 +170,21 @@ M: z-up >y-up-axis!
         ] map
     ] tri* model boa ;
 
-:: soa>aos ( triangles-indices sources -- attribute-buffer index-buffer )
-    V{ } clone :> attribute-buffer
-    V{ } clone :> index-buffer
-    H{ } clone :> inverse-attribute-buffer
-    triangles-indices [
+: pack-attributes ( source-indices sources -- attributes )
+    [
         [
-            [| triangle-index triangle-offset |
-                triangle-index triangle-offset sources
-                [| index offset source |
-                    source offset>> offset = [
-                        index source data>> nth
-                    ] [ f ] if 
-                ] with with map sift flatten :> attributes
-                
-                attributes inverse-attribute-buffer at [
-                    index-buffer push
-                ] [
-                    attribute-buffer length
-                    [ attributes inverse-attribute-buffer set-at ]
-                    [ index-buffer push ] bi
-                    attributes attribute-buffer push
-                ] if*
-            ] each-index
-        ] each
-    ] each
-    attribute-buffer index-buffer ;
+            [
+                [ data>> ] [ offset>> ] bi
+                rot = [ nth ] [ 2drop f ] if 
+            ] with with map sift flatten ,
+        ] curry each-index
+    ] V{ } make flatten ;
+
+:: soa>aos ( triangles-indices sources -- attribute-buffer index-buffer )
+    [ triangles-indices [ [
+        sources pack-attributes ,
+    ] each ] each ]
+    V{ } V{ } H{ } <indexed-seq> make [ dseq>> ] [ iseq>> ] bi ;
 
 : triangles>model ( sources vertices triangles-tag -- model )
     [ "input" tags-named collect-sources ] keep swap
@@ -174,7 +203,7 @@ M: z-up >y-up-axis!
 
 : mesh>models ( mesh-tag -- models )
     [
-        { { up-axis z-up } { unit-ratio 0.5 } } [
+        { { up-axis y-up } { unit-ratio 0.5 } } [
             mesh>sources
         ] bind
     ]
