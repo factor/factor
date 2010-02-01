@@ -131,12 +131,10 @@ HELP: M\
 { $class-description "Pushes a method on the stack." }
 { $examples { $code "M\\ fixnum + see" } { $code "USING: ui.gadgets ui.gadgets.editors ;" "M\\ editor draw-gadget* edit" } } ;
 
-HELP: method-body
-{ $class-description "The class of method bodies, which are words with special word properties set." } ;
-
 HELP: method
-{ $values { "class" class } { "generic" generic } { "method/f" { $maybe method-body } } }
-{ $description "Looks up a method definition." } ;
+{ $values { "class" class } { "generic" generic } { "method/f" { $maybe method } } }
+{ $description "Looks up a method definition." }
+{ $class-description "The class of method bodies, which are words with special word properties set." } ;
 
 { method create-method POSTPONE: M: } related-words
 
@@ -159,14 +157,14 @@ HELP: with-methods
 $low-level-note ;
 
 HELP: create-method
-{ $values { "class" class } { "generic" generic } { "method" method-body } }
+{ $values { "class" class } { "generic" generic } { "method" method } }
 { $description "Creates a method or returns an existing one. This is the runtime equivalent of " { $link POSTPONE: M: } "." }
 { $notes "To define a method, pass the output value to " { $link define } "." } ;
 
 { sort-classes order } related-words
 
 HELP: (call-next-method)
-{ $values { "method" method-body } }
+{ $values { "method" method } }
 { $description "Low-level word implementing " { $link POSTPONE: call-next-method } "." }
 { $notes "In most cases, " { $link POSTPONE: call-next-method } " should be used instead." } ;
 

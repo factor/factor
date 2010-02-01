@@ -52,7 +52,7 @@ M: object specializer-declaration class ;
     specializer [ specialize-quot ] when* ;
 
 : standard-method? ( method -- ? )
-    dup method-body? [
+    dup method? [
         "method-generic" word-prop standard-generic?
     ] [ drop f ] if ;
 

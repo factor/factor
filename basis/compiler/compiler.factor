@@ -54,7 +54,7 @@ SYMBOL: compiled
 
 GENERIC: no-compile? ( word -- ? )
 
-M: method-body no-compile? "method-generic" word-prop no-compile? ;
+M: method no-compile? "method-generic" word-prop no-compile? ;
 
 M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
 
@@ -63,7 +63,7 @@ M: word no-compile?
 
 GENERIC: combinator? ( word -- ? )
 
-M: method-body combinator? "method-generic" word-prop combinator? ;
+M: method combinator? "method-generic" word-prop combinator? ;
 
 M: predicate-engine-word combinator? "owner-generic" word-prop combinator? ;
 
