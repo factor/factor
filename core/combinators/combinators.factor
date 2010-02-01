@@ -24,14 +24,15 @@ SLOT: in
 SLOT: out
 
 : call-effect ( quot effect -- )
+    ! Don't use fancy combinators here, since this word always
+    ! runs unoptimized
     [ datastack ] 2dip
-    [
+    2dup [
         [ dip ] dip
-        [ in>> length ] [ out>> length ] bi
+        dup in>> length swap out>> length
         check-datastack
-    ]
-    [ [ wrong-values ] 2curry ] 2bi
-    unless ;
+    ] 2dip
+    [ 2drop ] [ wrong-values ] if ;
 
 : execute-effect ( word effect -- )
     [ [ execute ] curry ] dip call-effect ;
