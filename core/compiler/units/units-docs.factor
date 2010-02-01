@@ -1,14 +1,10 @@
 USING: help.markup help.syntax words math source-files
-parser quotations definitions ;
+parser quotations definitions stack-checker.errors ;
 IN: compiler.units
 
-ARTICLE: "compilation-units" "Compilation units"
-"A " { $emphasis "compilation unit" } " scopes a group of related definitions. They are compiled and entered into the system in one atomic operation."
+ARTICLE: "compilation-units-internals" "Compilation units internals"
+"These words do not need to be called directly, and only serve to support the implementation."
 $nl
-"Words defined in a compilation unit may not be called until the compilation unit is finished. The parser detects this case for parsing words and throws a " { $link staging-violation } "; calling any other word from within its own compilation unit throws an " { $link undefined } " error."
-$nl
-"The parser groups all definitions in a source file into one compilation unit, and parsing words do not need to concern themselves with compilation units. However, if definitions are being created at run time, a compilation unit must be created explicitly:"
-{ $subsections with-compilation-unit }
 "Compiling a set of words:"
 { $subsections compile }
 "Words called to associate a definition with a compilation unit and a source file location:"
@@ -22,6 +18,23 @@ $nl
 { $subsections recompile }
 "Low-level compiler interface exported by the Factor VM:"
 { $subsections modify-code-heap } ;
+
+ARTICLE: "compilation-units" "Compilation units"
+"A " { $emphasis "compilation unit" } " scopes a group of related definitions. They are compiled and entered into the system in one atomic operation."
+$nl
+"When a source file is being parsed, all definitions are part of a single compilation unit, unless the " { $link POSTPONE: << } " parsing word is used to create nested compilation units."
+$nl
+"Words defined in a compilation unit may not be called until the compilation unit is finished. The parser detects this case for parsing words and throws a " { $link staging-violation } ". Similarly, an attempt to use a macro from a word defined in the same compilation unit will throw a " { $link transform-expansion-error } ". Calling any other word from within its own compilation unit throws an " { $link undefined } " error."
+$nl
+"This means that parsing words and macros generally cannot be used in the same source file as they are defined. There are two means of getting around this:"
+{ $list
+    { "The simplest way is to split off the parsing words and macros into sub-vocabularies; perhaps suffixed by " { $snippet ".syntax" } " and " { $snippet ".macros" } "." }
+    { "Alternatively, nested compilation units can be created using " { $link "syntax-immediate" } "." }
+}
+"Parsing words which create new definitions at parse time will implicitly add them to the compilation unit of the current source file. Code which creates new definitions at run time will need to explicitly create a compilation unit with a combinator:"
+{ $subsections with-compilation-unit }
+"Additional topics:"
+{ $subsections "compilation-units-internals" } ;
 
 ABOUT: "compilation-units"
 
