@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors words sequences math prettyprint kernel arrays
 io io.styles namespaces assocs kernel.private strings
@@ -39,7 +39,7 @@ IN: tools.profiler
 
 : profiler-usage ( word -- words )
     [ smart-usage [ word? ] filter ]
-    [ compiled-generic-usage keys ]
+    [ generic-call-sites-of keys ]
     [ effect-dependencies-of keys ]
     tri 3append prune ;
 
