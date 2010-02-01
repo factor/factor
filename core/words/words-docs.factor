@@ -65,7 +65,7 @@ $nl
 "Deferred words are just compound definitions in disguise. The following two lines are equivalent:"
 { $code
     "DEFER: foo"
-    ": foo undefined ;"
+    ": foo ( -- * ) undefined ;"
 } ;
 
 ARTICLE: "declarations" "Compiler declarations"
@@ -191,6 +191,14 @@ HELP: deferred
 { $class-description "The class of deferred words created by " { $link POSTPONE: DEFER: } "." } ;
 
 { deferred POSTPONE: DEFER: } related-words
+
+HELP: undefined
+{ $error-description "This error is thrown in two cases, and the debugger's summary message reflects the cause:"
+    { $list
+        { "A word was executed before being compiled. For example, this can happen if a macro is defined in the same compilation unit where it was used. See " { $link "compilation-units" } " for a discussion." }
+        { "A word defined with " { $link POSTPONE: DEFER: } " was executed. Since this syntax is usually used for mutually-recursive word definitions, executing a deferred word usually indicates a programmer mistake." }
+    }
+} ;
 
 HELP: primitive
 { $description "The class of primitive words." } ;
