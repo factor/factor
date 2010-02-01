@@ -1,10 +1,10 @@
-! Copyright (C) 2003, 2009 Slava Pestov.
+! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays accessors assocs colors combinators grouping io
 io.streams.string io.styles kernel make math math.parser namespaces
 parser prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections quotations sequences sorting strings vocabs
-vocabs.prettyprint words sets ;
+vocabs.prettyprint words sets generic ;
 IN: prettyprint
 
 : with-use ( obj quot -- )
@@ -72,24 +72,31 @@ SYMBOL: ->
     ] [ ] make ;
 
 : remove-breakpoints ( quot pos -- quot' )
+    1 + short cut [ (remove-breakpoints) ] bi@ [ -> ] glue ;
+
+: callframe. ( triple -- )
+    first3
+    [
+        {
+            { [ dup method-body? ] [ "Method: " write . ] }
+            { [ dup word? ] [ "Word: " write . ] }
+            [ drop ]
+        } cond
+    ] 2dip
     over quotation? [
-        1 + short cut [ (remove-breakpoints) ] bi@
-        [ -> ] glue
-    ] [
-        drop
-    ] if ;
-
-PRIVATE>
-
-: callstack. ( callstack -- )
-    callstack>array 2 <groups> [
+        "Quotation: " write
         remove-breakpoints
         [
             3 nesting-limit set
             100 length-limit set
             .
         ] with-scope
-    ] assoc-each ;
+    ] [ 2drop ] if ;
+
+PRIVATE>
+
+: callstack. ( callstack -- )
+    callstack>array 3 <groups> [ nl ] [ callframe. ] interleave ;
 
 : .c ( -- ) callstack callstack. ;
 
