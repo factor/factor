@@ -37,7 +37,7 @@ M: array (fake-quotations>)
     [ [ (fake-quotations>) ] each ] { } make , ;
 
 M: fake-call-next-method (fake-quotations>)
-    drop method-body get literalize , \ (call-next-method) , ;
+    drop \ method get literalize , \ (call-next-method) , ;
 
 M: object (fake-quotations>) , ;
 
@@ -74,7 +74,7 @@ FUNCTOR-SYNTAX: MIXIN:
 FUNCTOR-SYNTAX: M:
     scan-param suffix!
     scan-param suffix!
-    [ create-method-in dup method-body set ] append! 
+    [ create-method-in dup \ method set ] append!
     parse-definition*
     \ define* suffix! ;
 

@@ -5,7 +5,7 @@ IN: compiler.tests.stack-trace
 
 : symbolic-stack-trace ( -- newseq )
     error-continuation get call>> callstack>array
-    2 group flip first ;
+    3 group flip first ;
 
 : foo ( -- * ) 3 throw 7 ;
 : bar ( -- * ) foo 4 ;
