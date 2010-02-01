@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel assocs match fry accessors namespaces make effects
-sequences sequences.private quotations generic macros arrays
+sequences sequences.private quotations generic arrays
 prettyprint prettyprint.backend prettyprint.custom
 prettyprint.sections math words combinators
 combinators.short-circuit io sorting hints
@@ -30,34 +30,31 @@ IN: compiler.tree.debugger
 
 GENERIC: node>quot ( node -- )
 
-MACRO: match-choose ( alist -- )
-    [ '[ _ ] ] assoc-map '[ _ match-cond ] ;
-
 MATCH-VARS: ?a ?b ?c ;
 
 : pretty-shuffle ( effect -- word/f )
     [ in>> ] [ out>> ] bi 2array {
-        { { { } { } } [ ] }
-        { { { ?a } { ?a } } [ ] }
-        { { { ?a ?b } { ?a ?b } } [ ] }
-        { { { ?a ?b ?c } { ?a ?b ?c } } [ ] }
-        { { { ?a } { } } [ drop ] }
-        { { { ?a ?b } { } } [ 2drop ] }
-        { { { ?a ?b ?c } { } } [ 3drop ] }
-        { { { ?a } { ?a ?a } } [ dup ] }
-        { { { ?a ?b } { ?a ?b ?a ?b } } [ 2dup ] }
-        { { { ?a ?b ?c } { ?a ?b ?c ?a ?b ?c } } [ 3dup ] }
-        { { { ?a ?b } { ?a ?b ?a } } [ over ] }
-        { { { ?b ?a } { ?a ?b } } [ swap ] }
-        { { { ?b ?a ?c } { ?a ?b ?c } } [ swapd ] }
-        { { { ?a ?b } { ?a ?a ?b } } [ dupd ] }
-        { { { ?a ?b ?c } { ?a ?b ?c ?a } } [ pick ] }
-        { { { ?a ?b ?c } { ?c ?a ?b } } [ -rot ] }
-        { { { ?a ?b ?c } { ?b ?c ?a } } [ rot ] }
-        { { { ?a ?b } { ?b } } [ nip ] }
-        { { { ?a ?b ?c } { ?c } } [ 2nip ] }
-        { __ f }
-    } match-choose ;
+        { { { } { } } [ [ ] ] }
+        { { { ?a } { ?a } } [ [ ] ] }
+        { { { ?a ?b } { ?a ?b } } [ [ ] ] }
+        { { { ?a ?b ?c } { ?a ?b ?c } } [ [ ] ] }
+        { { { ?a } { } } [ [ drop ] ] }
+        { { { ?a ?b } { } } [ [ 2drop ] ] }
+        { { { ?a ?b ?c } { } } [ [ 3drop ] ] }
+        { { { ?a } { ?a ?a } } [ [ dup ] ] }
+        { { { ?a ?b } { ?a ?b ?a ?b } } [ [ 2dup ] ] }
+        { { { ?a ?b ?c } { ?a ?b ?c ?a ?b ?c } } [ [ 3dup ] ] }
+        { { { ?a ?b } { ?a ?b ?a } } [ [ over ] ] }
+        { { { ?b ?a } { ?a ?b } } [ [ swap ] ] }
+        { { { ?b ?a ?c } { ?a ?b ?c } } [ [ swapd ] ] }
+        { { { ?a ?b } { ?a ?a ?b } } [ [ dupd ] ] }
+        { { { ?a ?b ?c } { ?a ?b ?c ?a } } [ [ pick ] ] }
+        { { { ?a ?b ?c } { ?c ?a ?b } } [ [ -rot ] ] }
+        { { { ?a ?b ?c } { ?b ?c ?a } } [ [ rot ] ] }
+        { { { ?a ?b } { ?b } } [ [ nip ] ] }
+        { { { ?a ?b ?c } { ?c } } [ [ 2nip ] ] }
+        { __ [ f ] }
+    } match-cond ;
 
 TUPLE: shuffle-node { effect effect } ;
 

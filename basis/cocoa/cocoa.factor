@@ -1,9 +1,10 @@
-! Copyright (C) 2006, 2009 Slava Pestov
+! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: compiler io kernel cocoa.runtime cocoa.subclassing
 cocoa.messages cocoa.types sequences words vocabs parser
 core-foundation.bundles namespaces assocs hashtables
-compiler.units lexer init ;
+compiler.units lexer init macros quotations fry alien.c-types
+arrays combinators ;
 IN: cocoa
 
 : (remember-send) ( selector variable -- )
@@ -14,7 +15,7 @@ SYMBOL: sent-messages
 : remember-send ( selector -- )
     sent-messages (remember-send) ;
 
-SYNTAX: -> scan dup remember-send suffix! \ send suffix! ;
+SYNTAX: -> scan [ remember-send ] [ suffix! ] bi \ send suffix! ;
 
 SYMBOL: super-sent-messages
 
@@ -32,6 +33,14 @@ frameworks [ V{ } clone ] initialize
 SYNTAX: FRAMEWORK: scan [ load-framework ] [ frameworks get push ] bi ;
 
 SYNTAX: IMPORT: scan [ ] import-objc-class ;
+
+MACRO: objc-class-case ( alist -- quot )
+    "isKindOfClass:" remember-send
+    [
+        dup callable?
+        [ first2 [ '[ dup _ execute "isKindOfClass:" send c-bool> ] ] dip 2array ]
+        unless
+    ] map '[ _ cond ] ;
 
 "Importing Cocoa classes..." print
 

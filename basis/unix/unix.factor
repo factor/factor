@@ -9,6 +9,8 @@ sequences stack-checker strings system unix.time unix.types
 vocabs vocabs.loader unix.ffi ;
 IN: unix
 
+<<
+
 ERROR: unix-error errno message ;
 
 : (io-error) ( -- * ) errno dup strerror unix-error ;
@@ -46,6 +48,8 @@ MACRO:: unix-system-call ( quot -- )
         ] if
     ] ;
 
+>>
+
 HOOK: open-file os ( path flags mode -- fd )
 
 : close-file ( fd -- ) [ close ] unix-system-call drop ;
@@ -72,10 +76,6 @@ M: unix open-file [ open ] unix-system-call ;
 
 : unlink-file ( path -- ) [ unlink ] unix-system-call drop ;
 
-<<
-
 "debugger" vocab [
     "unix.debugger" require
 ] when
-
->>
