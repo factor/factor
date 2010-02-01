@@ -113,3 +113,12 @@ IN: generalizations.tests
 
 [ { 1 2 3 } { 4 5 6 } ]
 [ 1 2 3 4 5 6 [ 3array ] 3 2 mnapply ] unit-test
+
+[ { 1 2 3 } { 4 5 6 } ]
+[ 1 2 3 4 5 6 [ 3array ] [ 3array ] 3 2 nspread* ] unit-test
+
+[ ]
+[ [ 2array ] 2 0 mnapply ] unit-test
+
+[ ]
+[ 2 0 nspread* ] unit-test

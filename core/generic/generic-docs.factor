@@ -163,10 +163,6 @@ HELP: create-method
 { $description "Creates a method or returns an existing one. This is the runtime equivalent of " { $link POSTPONE: M: } "." }
 { $notes "To define a method, pass the output value to " { $link define } "." } ;
 
-HELP: forget-methods
-{ $values { "class" class } }
-{ $description "Remove all method definitions which specialize on the class." } ;
-
 { sort-classes order } related-words
 
 HELP: (call-next-method)
