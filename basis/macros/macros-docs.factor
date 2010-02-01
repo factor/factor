@@ -47,7 +47,9 @@ $nl
 $nl
 "Defining new macros:"
 { $subsections POSTPONE: MACRO: }
-"As with parsing words, macros cannot be used from the same source file that they are defined in."
+"A slightly lower-level facility, " { $emphasis "compiler transforms" } ", allows an ordinary word definition to co-exist with a version that performs compile-time expansion."
+{ $subsections define-transform }
+"An example is the " { $link member? } " word. If the input sequence is a literal, the compile transform kicks in and converts the " { $link member? } " call into a series of conditionals. Otherwise, if the input sequence is not literal, a call to the definition of " { $link member? } " is generated."
 { $see-also "generalizations" "fry" } ;
 
 ABOUT: "macros"

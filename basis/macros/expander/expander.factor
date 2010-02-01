@@ -1,8 +1,8 @@
-! Copyright (C) 2008, 2010 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private namespaces make
 quotations accessors words continuations vectors effects math
-generalizations fry arrays combinators ;
+generalizations fry arrays ;
 IN: macros.expander
 
 GENERIC: expand-macros ( quot -- quot' )
@@ -55,7 +55,7 @@ M: wrapper expand-macros* wrapped>> literal ;
 
 : word, ( word -- ) end , ;
 
-: expand-transform ( word quot -- )
+: expand-macro ( word quot -- )
     '[
         drop
         stack [ _ with-datastack >vector ] change
@@ -65,25 +65,18 @@ M: wrapper expand-macros* wrapped>> literal ;
         word,
     ] recover ;
 
-: expand-transform? ( word -- ? )
-    dup "transform-quot" word-prop [
-        "transform-n" word-prop
+: expand-macro? ( word -- quot ? )
+    dup [ "transform-quot" word-prop ] [ "macro" word-prop ] bi or dup [
+        swap [ "transform-n" word-prop ] [ stack-effect in>> length ] bi or
         stack get length <=
-    ] [ drop f ] if ;
-
-: expand-macro? ( word -- ? )
-    dup "macro" word-prop [
-        stack-effect in>> length
-        stack get length <=
-    ] [ drop f ] if ;
+    ] [ 2drop f f ] if ;
 
 M: word expand-macros*
-    {
-        { [ dup expand-dispatch? ] [ drop expand-dispatch ] }
-        { [ dup expand-macro? ] [ dup "macro" word-prop '[ _ execute ] expand-transform ] }
-        { [ dup expand-transform? ] [ dup "transform-quot" word-prop expand-transform ] }
-        [ word, ]
-    } cond ;
+    dup expand-dispatch? [ drop expand-dispatch ] [
+        dup expand-macro? [ expand-macro ] [
+            drop word,
+        ] if
+    ] if ;
 
 M: object expand-macros* literal ;
 
