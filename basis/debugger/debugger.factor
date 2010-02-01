@@ -236,7 +236,10 @@ M: redefine-error error.
     def>> . ;
 
 M: undefined summary
-    drop "Calling a deferred word before it has been defined" ;
+    word>> undefined?
+    "Cannot call a deferred word before it has been defined"
+    "Cannot call a word before it has been compiled"
+    ? ;
 
 M: no-compilation-unit error.
     "Attempting to define " write

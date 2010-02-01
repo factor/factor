@@ -32,9 +32,22 @@ M: word definition def>> ;
 
 : reset-props ( word seq -- ) [ remove-word-prop ] with each ;
 
-ERROR: undefined ;
+<PRIVATE
 
-PREDICATE: deferred < word ( obj -- ? ) def>> [ undefined ] = ;
+: caller ( callstack -- word ) callstack>array <reversed> third ;
+
+PRIVATE>
+
+TUPLE: undefined word ;
+: undefined ( -- * ) callstack caller \ undefined boa throw ;
+
+: undefined-def ( -- quot )
+    #! 'f' inhibits tail call optimization in non-optimizing
+    #! compiler, ensuring that we can pull out the caller word
+    #! above.
+    [ undefined f ] ;
+
+PREDICATE: deferred < word ( obj -- ? ) def>> undefined-def = ;
 M: deferred definer drop \ DEFER: f ;
 M: deferred definition drop f ;
 
