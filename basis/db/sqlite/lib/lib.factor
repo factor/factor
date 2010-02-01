@@ -11,17 +11,12 @@ IN: db.sqlite.lib
 ERROR: sqlite-error < db-error n string ;
 ERROR: sqlite-sql-error < sql-error n string ;
 
-: <sqlite-sql-error> ( n string -- error )
-    \ sqlite-sql-error new
-        swap >>string
-        swap >>n ;
-
 : throw-sqlite-error ( n -- * )
     dup sqlite-error-messages nth sqlite-error ;
 
 : sqlite-statement-error ( -- * )
     SQLITE_ERROR
-    db-connection get handle>> sqlite3_errmsg <sqlite-sql-error> throw ;
+    db-connection get handle>> sqlite3_errmsg sqlite-sql-error ;
 
 : sqlite-check-result ( n -- )
     {
