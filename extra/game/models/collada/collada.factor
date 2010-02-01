@@ -59,6 +59,9 @@ M: indexed-seq new-resizable
 : string>numbers ( string -- number-seq )
     " \t\n" split [ "" = ] trim [ string>number ] map ;
 
+: string>floats ( string -- float-seq )
+    " \t\n" split [ "" = ] trim [ string>float ] map ;
+
 : x/ ( tag child-name -- child-tag )
     [ tag-named ]
     [ rot dup [ drop missing-child ] unless 2nip ]
@@ -107,7 +110,7 @@ M: z-up >y-up-axis!
 
 : source>seq ( source-tag up-axis scale -- sequence )
     rot
-    [ "float_array" x/ xt string>numbers [ * ] with map ]
+    [ "float_array" x/ xt string>floats [ * ] with map ]
     [ nip "technique_common" x/ "accessor" x/ "stride" x@ string>number ] 2bi
     group
     [ swap over length 2 > [ >y-up-axis! ] [ drop ] if ] with map ;

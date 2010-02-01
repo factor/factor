@@ -31,7 +31,11 @@ HELP: <indexed-seq>
 
 HELP: string>numbers ( string -- number-seq )
 { $values { "string" string } { "number-seq" sequence } }
-{ $description "Splits a string on whitespace and converts the elements to a number sequence" } ;
+{ $description "Splits a string on whitespace and converts the elements to a number sequence." } ;
+
+HELP: string>floats ( string -- float-seq )
+{ $values { "string" string } { "float-seq" sequence } }
+{ $description "Splits a string on whitespace and converts the elements to a float sequence." } ;
 
 HELP: x-up { $class-description "Right-handed 3D coordinate system where X is up." } ;
 HELP: y-up { $class-description "Right-handed 3D coordinate system where Y is up." } ;
