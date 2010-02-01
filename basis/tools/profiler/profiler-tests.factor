@@ -58,7 +58,7 @@ IN: tools.profiler.tests
 
 [ ] [ [ [ ] compile-call ] profile ] unit-test
 
-[ [ gensym execute ] profile ] [ T{ undefined } = ] must-fail-with
+[ [ gensym execute ] profile ] [ undefined? ] must-fail-with
 
 : crash-bug-1 ( -- x ) "hi" <uninterned-word> ;
 : crash-bug-2 ( -- ) 100000 [ crash-bug-1 drop ] times ;
