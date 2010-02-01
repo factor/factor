@@ -31,7 +31,7 @@ SLOT: out
         [ dip ] dip
         dup in>> length swap out>> length
         check-datastack
-    ] 2dip
+    ] 2dip rot
     [ 2drop ] [ wrong-values ] if ;
 
 : execute-effect ( word effect -- )
