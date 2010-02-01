@@ -339,7 +339,7 @@ M: check-mixin-class summary drop "Not a mixin class" ;
 
 M: not-found-in-roots summary drop "Cannot resolve vocab: path" ;
 
-M: wrong-values summary drop "Quotation called with wrong stack effect" ;
+M: wrong-values summary drop "Quotation's stack effect does not match call site" ;
 
 M: stack-effect-omits-dashes summary drop "Stack effect must contain “--”" ;
 
