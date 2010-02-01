@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel classes combinators accessors sequences arrays
-vectors assocs namespaces words sorting layouts math hashtables
-kernel.private sets math.order ;
+USING: kernel classes classes.private combinators accessors
+sequences arrays vectors assocs namespaces words sorting layouts
+math hashtables kernel.private sets math.order ;
 IN: classes.algebra
 
 <PRIVATE

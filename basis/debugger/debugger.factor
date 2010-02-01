@@ -293,6 +293,9 @@ M: duplicate-slot-names summary
 M: invalid-slot-name summary
     drop "Invalid slot name" ;
 
+M: bad-inheritance summary
+    drop "Circularity in inheritance chain" ;
+
 M: not-in-a-method-error summary
     drop "call-next-method can only be called in a method definition" ;
 
