@@ -159,7 +159,12 @@ intel-unix-abi fortran-abi [
     [ "integer(*)" fortran-ret-type>c-type ] unit-test
 
     [ c:void { c:void* } ]
-    [ "fortran_test_record" fortran-ret-type>c-type ] unit-test
+    [
+        [
+            "alien.fortran.tests" use-vocab
+            "fortran_test_record" fortran-ret-type>c-type
+        ] with-manifest
+    ] unit-test
 
     ! fortran-sig>c-sig
 
