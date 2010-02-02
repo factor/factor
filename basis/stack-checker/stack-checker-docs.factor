@@ -40,7 +40,7 @@ ARTICLE: "inference-combinators" "Combinator stack effects"
 "The following code now passes the stack checker; it would fail were " { $snippet "twice" } " not declared " { $link POSTPONE: inline } ":"
 { $unchecked-example "USE: math.functions" "[ [ sqrt ] twice ] infer." "( x -- x )" }
 { $subheading "Defining a combinator for unknown quotations" }
-"In the next example, " { $link POSTPONE: call( } " must be used because the quotation the result of calling a runtime accessor, and the compiler cannot make any static assumptions about this quotation at all:"
+"In the next example, " { $link POSTPONE: call( } " must be used because the quotation is the result of calling a runtime accessor, and the compiler cannot make any static assumptions about this quotation at all:"
 { $code
   "TUPLE: action name quot ;"
   ": perform ( value action -- result ) quot>> call( value -- result ) ;"
