@@ -8,7 +8,21 @@ $nl
 "If the sequence is non-empty, outputs the index and value of the closest match, which is either an element for which the quotation output " { $link +eq+ } ", or failing that, least element for which the quotation output " { $link +lt+ } "."
 $nl
 "If the sequence is empty, outputs " { $link f } " " { $link f } "." }
-{ $notes "If the sequence has at least one element, this word always outputs a valid index, because it finds the closest match, not necessarily an exact one. In this respect its behavior differs from " { $link find } "." } ;
+{ $notes "If the sequence has at least one element, this word always outputs a valid index, because it finds the closest match, not necessarily an exact one. In this respect its behavior differs from " { $link find } "." }
+{ $examples
+    "Searching for an integer in a sorted array:"
+    { $example
+        "USING: binary-search math.order prettyprint ;"
+        "{ -13 -4 1 9 16 17 28 } [ 5 >=< ] search . ."
+        "1\n2"
+    }
+    "Frequently, the quotation passed to " { $link search } " is constructed by " { $link curry } " or " { $link with } " in order to make the search key a parameter:"
+    { $example
+        "USING: binary-search kernel math.order prettyprint ;"
+        "5 { -13 -4 1 9 16 17 28 } [ <=> ] with search . ."
+        "1\n2"
+    }
+} ;
 
 { find find-from find-last find-last find-last-from search } related-words
 
