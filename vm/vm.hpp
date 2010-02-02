@@ -348,13 +348,14 @@ struct factor_vm
 	void primitive_die();
 
 	//arrays
+	inline void set_array_nth(array *array, cell slot, cell value);
 	array *allot_array(cell capacity, cell fill_);
 	void primitive_array();
 	cell allot_array_1(cell obj_);
 	cell allot_array_2(cell v1_, cell v2_);
 	cell allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_);
 	void primitive_resize_array();
-	inline void set_array_nth(array *array, cell slot, cell value);
+	cell std_vector_to_array(std::vector<cell> &elements);
 
 	//strings
 	cell string_nth(const string *str, cell index);
@@ -521,11 +522,11 @@ struct factor_vm
 	code_block *add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell parameters_, cell literals_);
 
 	//code heap
-	inline void check_code_pointer(cell ptr)
+	inline void check_code_pointer(cell ptr) { }
+
+	template<typename Iterator> void each_code_block(Iterator &iter)
 	{
-	#ifdef FACTOR_DEBUG
-		//assert(in_code_heap_p(ptr));
-	#endif
+		code->allocator->iterate(iter);
 	}
 
 	void init_code_heap(cell size);
@@ -536,11 +537,8 @@ struct factor_vm
 	code_heap_room code_room();
 	void primitive_code_room();
 	void primitive_strip_stack_traces();
-
-	template<typename Iterator> void each_code_block(Iterator &iter)
-	{
-		code->allocator->iterate(iter);
-	}
+	cell code_blocks();
+	void primitive_code_blocks();
 
 	//callbacks
 	void init_callbacks(cell size);

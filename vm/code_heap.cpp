@@ -202,4 +202,40 @@ void factor_vm::primitive_strip_stack_traces()
 	each_code_block(stripper);
 }
 
+struct code_block_accumulator {
+	std::vector<cell> objects;
+
+	void operator()(code_block *compiled, cell size)
+	{
+		objects.push_back(compiled->owner);
+		objects.push_back(compiled->parameters);
+		objects.push_back(compiled->relocation);
+
+		objects.push_back(tag_fixnum(compiled->type()));
+		objects.push_back(tag_fixnum(compiled->size()));
+
+		/* Note: the entry point is always a multiple of the heap
+		alignment (16 bytes). We cannot allocate while iterating
+		through the code heap, so it is not possible to call allot_cell()
+		here. It is OK, however, to add it as if it were a fixnum, and
+		have library code shift it to the left by 4. */
+		cell entry_point = (cell)compiled->entry_point();
+		assert((entry_point & (data_alignment - 1)) == 0);
+		assert((entry_point & TAG_MASK) == FIXNUM_TYPE);
+		objects.push_back(entry_point);
+	}
+};
+
+cell factor_vm::code_blocks()
+{
+	code_block_accumulator accum;
+	each_code_block(accum);
+	return std_vector_to_array(accum.objects);
+}
+
+void factor_vm::primitive_code_blocks()
+{
+	ctx->push(code_blocks());
+}
+
 }
