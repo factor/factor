@@ -287,6 +287,15 @@ M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
     func "libm" load-library %alien-invoke
     dst float-function-return ;
 
+: stdcall? ( params -- ? )
+    abi>> "stdcall" = ;
+
+: funny-large-struct-return? ( params -- ? )
+    #! MINGW ABI incompatibility disaster
+    [ return>> large-struct? ]
+    [ abi>> "mingw" = os windows? not or ]
+    bi and ;
+
 M: x86.32 %cleanup ( params -- )
     #! a) If we just called an stdcall function in Windows, it
     #! cleaned up the stack frame for us. But we don't want that
@@ -294,13 +303,8 @@ M: x86.32 %cleanup ( params -- )
     #! b) If we just called a function returning a struct, we
     #! have to fix ESP.
     {
-        {
-            [ dup abi>> "stdcall" = ]
-            [ drop ESP stack-frame get params>> SUB ]
-        } {
-            [ dup return>> large-struct? ]
-            [ drop EAX PUSH ]
-        }
+        { [ dup stdcall? ] [ drop ESP stack-frame get params>> SUB ] }
+        { [ dup funny-large-struct-return? ] [ drop EAX PUSH ] }
         [ drop ]
     } cond ;
 
@@ -323,11 +327,8 @@ M: x86.32 callback-return-rewind ( params -- n )
     #! b) If the callback is returning a large struct, we have
     #! to fix ESP.
     {
-        { [ dup abi>> "stdcall" = ] [
-            <alien-stack-frame>
-            [ params>> ] [ return>> ] bi +
-        ] }
-        { [ dup return>> large-struct? ] [ drop 4 ] }
+        { [ dup stdcall? ] [ <alien-stack-frame> [ params>> ] [ return>> ] bi + ] }
+        { [ dup funny-large-struct-return? ] [ drop 4 ] }
         [ drop 0 ]
     } cond ;
 
