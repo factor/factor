@@ -1,10 +1,11 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.struct
-combinators combinators.smart continuations fry generalizations
-generic grouping io io.styles kernel make math math.parser
-math.statistics memory namespaces parser prettyprint sequences
-sorting splitting strings system vm words ;
+USING: accessors arrays assocs binary-search classes
+classes.struct combinators combinators.smart continuations fry
+generalizations generic grouping io io.styles kernel make math
+math.order math.parser math.statistics memory memory.private
+layouts namespaces parser prettyprint sequences sorting
+splitting strings system vm words hints hashtables ;
 IN: tools.memory
 
 <PRIVATE
@@ -195,3 +196,72 @@ PRIVATE>
         { "Code heap sweep time:" [ [ code-sweep-time>> ] map-sum nanos>string ] }
         { "Compaction time:" [ [ compaction-time>> ] map-sum nanos>string ] }
     } object-table. ;
+
+SINGLETONS: +unoptimized+ +optimized+ +profiling+ +pic+ ;
+
+TUPLE: code-block
+{ owner read-only }
+{ parameters read-only }
+{ relocation read-only }
+{ type read-only }
+{ size read-only }
+{ entry-point read-only } ;
+
+TUPLE: code-blocks { blocks sliced-groups } { cache hashtable } ;
+
+<PRIVATE
+
+: code-block-type ( n -- type )
+    { +unoptimized+ +optimized+ +profiling+ +pic+ } nth ;
+
+: <code-block> ( seq -- code-block )
+    6 firstn-unsafe {
+        [ ]
+        [ ]
+        [ ]
+        [ code-block-type ]
+        [ ]
+        [ tag-bits get shift ]
+    } spread code-block boa ; inline
+
+: <code-blocks> ( seq -- code-blocks )
+    6 <sliced-groups> H{ } clone \ code-blocks boa ;
+
+SYMBOL: code-heap-start
+SYMBOL: code-heap-end
+
+: in-code-heap? ( address -- ? )
+    code-heap-start get code-heap-end get between? ;
+
+: (lookup-return-address) ( addr seq -- code-block )
+    [ entry-point>> <=> ] with search nip ;
+
+HINTS: (lookup-return-address) code-blocks ;
+
+PRIVATE>
+
+M: code-blocks length blocks>> length ; inline
+
+FROM: sequences.private => nth-unsafe ;
+
+M: code-blocks nth-unsafe
+    [ cache>> ] [ blocks>> ] bi
+    '[ _ nth-unsafe <code-block> ] cache ; inline
+
+INSTANCE: code-blocks immutable-sequence
+
+: code-blocks ( -- blocks )
+    (code-blocks) <code-blocks> ;
+
+: with-code-blocks ( quot -- )
+    [
+        code-blocks
+        [ \ code-blocks set ]
+        [ first entry-point>> code-heap-start set ]
+        [ last [ entry-point>> ] [ size>> ] bi + code-heap-end set ] tri
+        call
+    ] with-scope ; inline
+
+: lookup-return-address ( addr -- code-block )
+    dup in-code-heap?
+    [ \ code-blocks get (lookup-return-address) ] [ drop f ] if ;
