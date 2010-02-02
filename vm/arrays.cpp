@@ -60,6 +60,19 @@ void factor_vm::primitive_resize_array()
 	ctx->push(tag<array>(reallot_array(a.untagged(),capacity)));
 }
 
+cell factor_vm::std_vector_to_array(std::vector<cell> &elements)
+{
+	cell element_count = elements.size();
+	data_roots.push_back(data_root_range(&elements[0],element_count));
+
+	tagged<array> objects(allot_uninitialized_array<array>(element_count));
+	memcpy(objects->data(),&elements[0],element_count * sizeof(cell));
+
+	data_roots.pop_back();
+
+	return objects.value();
+}
+
 void growable_array::add(cell elt_)
 {
 	factor_vm *parent = elements.parent;

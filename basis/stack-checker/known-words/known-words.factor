@@ -523,6 +523,9 @@ M: bad-executable summary
 \ data-room { } { byte-array } define-primitive
 \ data-room make-flushable
 
+\ (code-blocks) { } { array } define-primitive
+\ (code-blocks)  make-flushable
+
 \ code-room { } { byte-array } define-primitive
 \ code-room  make-flushable
 
