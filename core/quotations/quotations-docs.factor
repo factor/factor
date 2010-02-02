@@ -26,7 +26,7 @@ $nl
 "Although quotations can be treated as sequences, the compiler will be unable to reason about quotations manipulated as sequences at runtime. " { $link "compositional-combinators" } " are provided for runtime partial application and composition of quotations." ;
 
 ARTICLE: "wrappers" "Wrappers"
-"Wrappers evaluate to the object being wrapped when encountered in code. They are are used to suppress the execution of " { $link "words" } " so that they can be used as values."
+"Wrappers evaluate to the object being wrapped when encountered in code. They are used to suppress the execution of " { $link "words" } " so that they can be used as values."
 { $subsections
     wrapper
     literalize
