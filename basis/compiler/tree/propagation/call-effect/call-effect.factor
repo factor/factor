@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.private effects
-fry kernel kernel.private make sequences continuations
+fry kernel kernel.private make namespaces sequences continuations
 quotations words math stack-checker stack-checker.dependencies
 combinators.short-circuit stack-checker.transforms
 compiler.tree.propagation.info
@@ -63,7 +63,11 @@ M: compose cached-effect
     [ first>> ] [ second>> ] bi [ cached-effect ] bi@ compose-effects* ;
 
 : safe-infer ( quot -- effect )
-    [ [ infer ] [ 2drop +unknown+ ] recover ] without-dependencies ;
+    ! Save and restore error variables here, so that we don't
+    ! pollute words such as :error and :c for the user.
+    error get-global error-continuation get-global
+    [ [ [ infer ] [ 2drop +unknown+ ] recover ] without-dependencies ] 2dip
+    [ error set-global ] [ error-continuation set-global ] bi* ;
 
 : cached-effect-valid? ( quot -- ? )
     cache-counter>> effect-counter eq? ; inline
