@@ -2,16 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.crossref help.stylesheet help.topics help.syntax
 definitions io prettyprint summary arrays math sequences vocabs strings
-see xml.data hashtables assocs ;
+see xml.data hashtables assocs game.models.collada.private game.models.util ;
 IN: game.models.collada
 
 ABOUT: "game.models.collada"
 
 ARTICLE: "game.models.collada" "Conversion of COLLADA assets"
 "The " { $vocab-link "game.models.collada" } " vocabulary implements words for converting COLLADA assets to data suitable for use with OpenGL. See the COLLADA documentation at " { $url "http://collada.org" } "." ;
-
-HELP: model
-{ $class-description "Tuple of a packed attribute buffer, index buffer and vertex format suitable for a single OpenGL draw call." } ;
 
 HELP: source
 { $class-description "Tuple of a vertex attribute semantic, offset in triangle index buffer and float data for a single vertex attribute." } ;
@@ -21,13 +18,6 @@ HELP: up-axis
 
 HELP: unit-ratio
 { $description "Scaling ratio for the coordinates of the tags being read." } ;
-
-HELP: indexed-seq
-{ $class-description "A sequence described by a sequence of unique elements and a sequence of indices. The sequence can only be appended to. An associative map is used as a reverse lookup table when appending." } ;
-
-HELP: <indexed-seq>
-{ $values { "dseq-exemplar" sequence } { "iseq-examplar" sequence } { "rassoc-examplar" assoc } }
-{ $class-description "Construct an " { $link indexed-seq } " using the given examplars for the underlying data structures." } ;
 
 HELP: string>numbers ( string -- number-seq )
 { $values { "string" string } { "number-seq" sequence } }
@@ -76,10 +66,6 @@ HELP: triangles>numbers
 HELP: largest-offset+1
 { $values { "source-seq" sequence } { "largest-offset+1" number } }
 { $description "Finds the largest offset in the sequence of " { $link source } " tuples and adds 1, which is the index stride for " { $link group-indices } "." } ;
-
-HELP: <model>
-{ $values { "attribute-buffer" sequence } { "index-buffer" sequence } { "sources" sequence } { "model" model } }
-{ $description "Converts the inputs to a form suitable for use with " { $vocab-link "gpu" } " and constructs a " { $link model } "." } ;
 
 HELP: pack-attributes
 { $values { "source-indices" sequence } { "sources" sequence } { "attributes" sequence } }
