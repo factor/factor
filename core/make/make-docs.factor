@@ -25,14 +25,14 @@ $nl
 "is equivalent to"
 { $code "[ reverse ] map concat" }
 { $heading "Utilities for simple make patterns" }
-"Sometimes, an existing word already implements a specific " { $link make } " usage. For example, " { $link suffix } " is equivalent to the following, with the added caveat that the below example always outputs an array:"
+"Sometimes, an existing word already implements a specific " { $link make } " usage. For example, " { $link prefix } " is equivalent to the following, with the added caveat that the below example always outputs an array:"
 { $code "[ , % ] { } make" }
 "The existing utility words can in some cases express intent better than a bunch of " { $link , } " and " { $link % } "."
 { $heading "Constructing quotations" }
 "Simple quotation construction can often be accomplished using " { $link "fry" } " and " { $link "compositional-combinators" } "."
 $nl
 "For example,"
-{ $code "[ 2 , , \ + , ] [ ] make" }
+{ $code "[ 2 , , \\ + , ] [ ] make" }
 "is better expressed as"
 { $code "'[ 2 _ + ]" } ;
 
