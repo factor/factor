@@ -8,11 +8,9 @@ io io.encodings.ascii io.files io.files.temp kernel locals math
 math.matrices math.vectors.simd math.parser math.vectors
 method-chains namespaces sequences splitting threads ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats specialized-arrays
-specialized-vectors literals game.models.collada fry xml xml.traversal sequences.deep
-
-math.bitwise
-opengl.gl
-prettyprint ;
+specialized-vectors literals game.models.collada fry xml
+xml.traversal sequences.deep destructors math.bitwise opengl.gl
+prettyprint game.models.obj game.models.loader ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-VECTOR: uint
@@ -95,36 +93,40 @@ VERTEX-FORMAT: debug-vertex
     { "POSITION" float-components 3 f }
     { "COLOR"    float-components 3 f } ;
 
+TUPLE: vbo vertex-buffer index-buffer index-count vertex-format ;
+
 : <collada-buffers> ( models -- buffers )
-!    drop
-!    float-array{ -0.5 0 0 1 0 0 0 1 0 0 1 0 0.5 0 0 0 0 1 }
-!    uint-array{ 0 1 2 }
-!    f model boa 1array
     [
-        [ attribute-buffer>> underlying>> static-upload draw-usage vertex-buffer byte-array>buffer ]
-        [ index-buffer>> underlying>> static-upload draw-usage index-buffer byte-array>buffer ]
-        [ index-buffer>> length ] tri 3array
+        {
+            [ attribute-buffer>> underlying>> static-upload draw-usage vertex-buffer byte-array>buffer ]
+            [ index-buffer>> underlying>> static-upload draw-usage index-buffer byte-array>buffer ]
+            [ index-buffer>> length ]
+            [ vertex-format>> ]
+        } cleave vbo boa
     ] map ;
 
 : fill-collada-state ( collada-state -- )
     dup models>> <collada-buffers>
     [
         [
-            first collada-program <program-instance> collada-vertex buffer>vertex-array
+            [ vertex-buffer>> collada-program <program-instance> ]
+            [ vertex-format>> ] bi buffer>vertex-array
         ] map >>vertex-arrays drop
     ]
     [
         [
-            [ second ] [ third ] bi
+            [ index-buffer>> ] [ index-count>> ] bi
             '[ _ 0 <buffer-ptr> _ uint-indexes <index-elements> ] call
         ] map >>index-vectors drop
     ] 2bi ;
-    
+
+: model-files ( -- files )
+    { "C:/Users/erikc/Downloads/test2.dae"
+      "C:/Users/erikc/Downloads/Sponza.obj" } ;
+
 : <collada-state> ( -- collada-state )
     collada-state new
-    "C:/Users/erikc/Downloads/test2.dae"
-    #! "/Users/erikc/Documents/mech.dae"
-    file>xml "mesh" deep-tags-named [ mesh>models ] map flatten >>models ;
+    model-files [ load-models ] [ append ] map-reduce >>models ;
 
 M: collada-world begin-game-world
     init-gpu
@@ -168,8 +170,9 @@ M: collada-world begin-game-world
     { GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT GL_STENCIL_BUFFER_BIT } flags glClear
 
     [
-        #! triangle-lines dup t <triangle-state> set-gpu-state
+        triangle-fill dup t <triangle-state> set-gpu-state
         face-ccw cull-back <triangle-cull-state> set-gpu-state
+        
         cmp-less <depth-state> set-gpu-state
         [ collada>> vertex-arrays>> ]
         [ collada>> index-vectors>> ]
@@ -200,10 +203,7 @@ M: collada-world wasd-far-plane drop 1024.0 ;
 GAME: collada-game {
         { world-class collada-world }
         { title "Collada Viewer" }
-        { pixel-format-attributes {
-            windowed
-            double-buffered
-        } }
+        { pixel-format-attributes { windowed double-buffered } }
         { grab-input? t }
         { use-game-input? t }
         { pref-dim { 1024 768 } }
