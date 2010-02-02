@@ -3,7 +3,7 @@ sequences.private ;
 IN: growable
 
 ARTICLE: "growable" "Resizable sequence implementation"
-"Resizable sequences are implementing by having a wrapper object hold a reference to an underlying sequence, together with a fill pointer indicating how many elements of the underlying sequence are occupied. When the fill pointer exceeds the underlying sequence capacity, the underlying sequence grows."
+"Resizable sequences are implemented by having a wrapper object hold a reference to an underlying sequence, together with a fill pointer indicating how many elements of the underlying sequence are occupied. When the fill pointer exceeds the underlying sequence capacity, the underlying sequence grows."
 $nl
 "There is a resizable sequence mixin:"
 { $subsections growable }

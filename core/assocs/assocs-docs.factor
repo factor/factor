@@ -80,7 +80,7 @@ ARTICLE: "assocs-lookup" "Lookup and querying of assocs"
 { $see-also at* assoc-size } ;
 
 ARTICLE: "assocs-values" "Transposed assoc operations"
-"default Most assoc words take a key and find the corresponding value. The following words take a value and find the corresponding key:"
+"Most assoc words take a key and find the corresponding value. The following words take a value and find the corresponding key:"
 { $subsections
     value-at
     value-at*

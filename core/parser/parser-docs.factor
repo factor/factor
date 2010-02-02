@@ -87,7 +87,7 @@ $nl
 "Also, top-level forms run in a new dynamic scope, so using " { $link set } " to store values is almost always wrong, since the values will be lost after the top-level form completes. To save values computed by a top-level form, either use " { $link set-global } " or define a new word with the value." ;
 
 ARTICLE: "parser" "The parser"
-"The Factor parser reading textual representations of objects and definitions, with all syntax determined by " { $link "parsing-words" } ". The parser is implemented in the " { $vocab-link "parser" } " vocabulary, with standard syntax in the " { $vocab-link "syntax" } " vocabulary. See " { $link "syntax" } " for a description of standard syntax."
+"The Factor parser reads textual representations of objects and definitions, with all syntax determined by " { $link "parsing-words" } ". The parser is implemented in the " { $vocab-link "parser" } " vocabulary, with standard syntax in the " { $vocab-link "syntax" } " vocabulary. See " { $link "syntax" } " for a description of standard syntax."
 $nl
 "The parser cross-references " { $link "source-files" } " and " { $link "definitions" } ". This functionality is used for improved error checking, as well as tools such as " { $link "tools.crossref" } " and " { $link "editor" } "."
 $nl
