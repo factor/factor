@@ -2,7 +2,7 @@
 	#define FACTOR_STDCALL(return_type) return_type __stdcall
 #elif defined(i386) || defined(__i386) || defined(__i386__)
 	#define FACTOR_STDCALL(return_type) __attribute__((stdcall)) return_type
-#el
+#else
 	#define FACTOR_STDCALL(return_type) return_type
 #endif
 
