@@ -15,7 +15,7 @@ $nl
 { $subsections add-vocab-root } ;
 
 ARTICLE: "vocabs.roots" "Vocabulary roots"
-"The vocabulary loader searches for it in one of the root directories:"
+"The vocabulary loader searches for vocabularies in one of the root directories:"
 { $subsections vocab-roots }
 "The default set of roots includes the following directories in the Factor source directory:"
 { $list

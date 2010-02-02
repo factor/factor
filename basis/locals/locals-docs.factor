@@ -14,9 +14,9 @@ HELP: [let
 
 HELP: :>
 { $syntax ":> var" ":> var!" ":> ( var-1 var-2 ... )" }
-{ $description "Binds one or more new lexical variables. In the " { $snippet ":> var" } " form, the value on the top of the datastack to a new lexical variable named " { $snippet "var" } " and scoped to the enclosing quotation, " { $link POSTPONE: [let } " form, or " { $link POSTPONE: :: } " definition."
+{ $description "Binds one or more new lexical variables. In the " { $snippet ":> var" } " form, the value on the top of the datastack is bound to a new lexical variable named " { $snippet "var" } " and is scoped to the enclosing quotation, " { $link POSTPONE: [let } " form, or " { $link POSTPONE: :: } " definition."
 $nl
-"The " { $snippet ":> ( var-1 ... )" } " form binds multiple variables to the top values off the datastack in left to right order. These two snippets have the same effect:"
+"The " { $snippet ":> ( var-1 ... )" } " form binds multiple variables to the top values of the datastack in right to left order, with the last variable bound to the top of the datastack. These two snippets have the same effect:"
 { $code ":> c :> b :> a" }
 { $code ":> ( a b c )" }
 $nl
@@ -112,7 +112,7 @@ $nl
 $nl
 
 { $heading "Mutable bindings" }
-"This next example demonstrates closures and mutable variable bindings. The " { $snippet "make-counter" } " word outputs a tuple containing a pair of quotations that respectively increment and decrement an internal counter in the mutable " { $snippet "value" } " variable and then return the new value. The quotations close over the counter, so each invocation of the word gives new quotations with a new internal counter."
+"This next example demonstrates closures and mutable variable bindings. The " { $snippet "<counter>" } " word outputs a tuple containing a pair of quotations that respectively increment and decrement an internal counter in the mutable " { $snippet "value" } " variable and then return the new value. The quotations close over the counter, so each invocation of the word gives new quotations with a new internal counter."
 { $example
 """USING: locals kernel math ;
 IN: scratchpad

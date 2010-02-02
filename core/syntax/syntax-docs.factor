@@ -185,7 +185,7 @@ ARTICLE: "syntax-literals" "Literals"
 $nl
 "If a quotation contains a literal object, the same literal object instance is used each time the quotation executes; that is, literals are “live”."
 $nl
-"Using mutable object literals in word definitions requires care, since if those objects are mutated, the actual word definition will be changed, which is in most cases not what you would expect. Literals should be " { $link clone } "d before being passed to word which may potentially mutate them."
+"Using mutable object literals in word definitions requires care, since if those objects are mutated, the actual word definition will be changed, which is in most cases not what you would expect. Literals should be " { $link clone } "d before being passed to a word which may potentially mutate them."
 { $subsections
     "syntax-numbers"
     "syntax-words"
