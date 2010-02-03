@@ -361,9 +361,9 @@ HELP: assoc-diff
 ;
 
 HELP: assoc-diff!
-{ $values { "assoc1" assoc } { "assoc2" assoc } { "diff" "a new assoc" } }
+{ $values { "assoc1" assoc } { "assoc2" assoc } }
 { $description "Removes all entries from " { $snippet "assoc1" } " whose key is contained in " { $snippet "assoc2" } "." }
-{ $side-effects assoc-diff! } ;
+{ $side-effects "assoc1" } ;
 
 HELP: substitute
 { $values { "seq" sequence } { "assoc" assoc } { "newseq" sequence } }
