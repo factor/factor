@@ -245,8 +245,8 @@ VM_C_API int err_no()
 	return errno;
 }
 
-VM_C_API void clear_err_no()
+VM_C_API void set_err_no(int err)
 {
-	errno = 0;
+	errno = err;
 }
 }

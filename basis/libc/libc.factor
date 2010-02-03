@@ -9,8 +9,14 @@ IN: libc
 : errno ( -- int )
     int "factor" "err_no" { } alien-invoke ;
 
+: set-errno ( int -- )
+    void "factor" "set_err_no" { int } alien-invoke ;
+
 : clear-errno ( -- )
-    void "factor" "clear_err_no" { } alien-invoke ;
+    0 set-errno ;
+
+: preserve-errno ( quot -- )
+    errno [ call ] dip set-errno ; inline
 
 <PRIVATE
 
