@@ -55,6 +55,8 @@ IN: tools.memory
         { "Mark stack:" [ mark-stack>> kilobytes ] }
     } object-table. ;
 
+PRIVATE>
+
 : data-room. ( -- )
     "== Data heap ==" print nl
     data-room data-heap-room memory>struct {
@@ -63,14 +65,6 @@ IN: tools.memory
         [ tenured-room. nl ]
         [ misc-room. ]
     } cleave ;
-
-: code-room. ( -- )
-    "== Code heap ==" print nl
-    code-room mark-sweep-sizes memory>struct mark-sweep-table. ;
-
-PRIVATE>
-
-: room. ( -- ) data-room. nl code-room. ;
 
 <PRIVATE
 
@@ -265,3 +259,36 @@ INSTANCE: code-blocks immutable-sequence
 : lookup-return-address ( addr -- code-block )
     dup in-code-heap?
     [ \ code-blocks get (lookup-return-address) ] [ drop f ] if ;
+
+<PRIVATE
+
+: code-block-stats ( code-blocks -- counts sizes )
+    H{ } clone H{ } clone
+    [ '[ [ size>> ] [ type>> ] bi [ nip _ inc-at ] [ _ at+ ] 2bi ] each ]
+    2keep ;
+
+: blocks ( n -- str ) number>string " blocks" append ;
+
+: code-block-table-row ( string type counts sizes -- triple )
+    [ at 0 or blocks ] [ at 0 or kilobytes ] bi-curry* bi 3array ;
+
+: code-block-table. ( counts sizes -- )
+    [
+        {
+            { "Optimized code:" +optimized+ }
+            { "Unoptimized code:" +unoptimized+ }
+            { "Inline caches:" +pic+ }
+            { "Profiling stubs:" +profiling+ }
+        }
+    ] 2dip '[ _ _ code-block-table-row ] { } assoc>map
+    simple-table. ;
+
+PRIVATE>
+
+: code-room. ( -- )
+    "== Code heap ==" print nl
+    code-room mark-sweep-sizes memory>struct mark-sweep-table. nl
+    code-blocks code-block-stats code-block-table. ;
+
+: room. ( -- )
+    data-room. nl code-room. ;
