@@ -684,7 +684,7 @@ M:: ppc %restore-context ( temp1 temp2 -- )
 
 M:: ppc %save-context ( temp1 temp2 -- )
     temp1 "ctx" %vm-field
-    1 temp1 "callstack-bottom" context-field-offset STW
+    1 temp1 "callstack-top" context-field-offset STW
     ds-reg temp1 "datastack" context-field-offset STW
     rs-reg temp1 "retainstack" context-field-offset STW ;
 
