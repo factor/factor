@@ -3,7 +3,7 @@ USING: accessors alien alien.c-types alien.complex
 alien.data alien.fortran alien.fortran.private alien.strings
 classes.struct arrays assocs byte-arrays combinators fry
 generalizations io.encodings.ascii kernel macros
-macros.expander namespaces sequences shuffle tools.test ;
+macros.expander namespaces sequences shuffle tools.test vocabs.parser ;
 QUALIFIED-WITH: alien.c-types c
 IN: alien.fortran.tests
 
@@ -91,7 +91,12 @@ intel-unix-abi fortran-abi [
     [ "complex*16" fortran-type>c-type ] unit-test
 
     [ fortran_test_record ]
-    [ "fortran_test_record" fortran-type>c-type ] unit-test
+    [
+        [
+            "alien.fortran.tests" use-vocab
+            "fortran_test_record" fortran-type>c-type
+        ] with-manifest
+    ] unit-test
 
     ! fortran-arg-type>c-type
 
@@ -105,7 +110,12 @@ intel-unix-abi fortran-abi [
     [ "integer(*)" fortran-arg-type>c-type ] unit-test
 
     [ c:void* { } ]
-    [ "fortran_test_record" fortran-arg-type>c-type ] unit-test
+    [
+        [
+            "alien.fortran.tests" use-vocab
+            "fortran_test_record" fortran-arg-type>c-type
+        ] with-manifest
+    ] unit-test
 
     [ c:char* { } ]
     [ "character" fortran-arg-type>c-type ] unit-test
@@ -149,7 +159,12 @@ intel-unix-abi fortran-abi [
     [ "integer(*)" fortran-ret-type>c-type ] unit-test
 
     [ c:void { c:void* } ]
-    [ "fortran_test_record" fortran-ret-type>c-type ] unit-test
+    [
+        [
+            "alien.fortran.tests" use-vocab
+            "fortran_test_record" fortran-ret-type>c-type
+        ] with-manifest
+    ] unit-test
 
     ! fortran-sig>c-sig
 
