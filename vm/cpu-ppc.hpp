@@ -14,13 +14,11 @@ static const fixnum xt_tail_pic_offset = 4;
 
 inline static void check_call_site(cell return_address)
 {
-#ifdef FACTOR_DEBUG
 	cell insn = *(cell *)return_address;
 	/* Check that absolute bit is 0 */
 	assert((insn & 0x2) == 0x0);
 	/* Check that instruction is branch */
 	assert((insn >> 26) == 0x12);
-#endif
 }
 
 static const cell b_mask = 0x3fffffc;
