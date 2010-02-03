@@ -120,12 +120,12 @@ M: object always-bump-effect-counter? drop f ;
 
 : updated-definitions ( -- assoc )
     H{ } clone
-    dup forgotten-definitions get update
-    dup new-definitions get first update
-    dup new-definitions get second update
-    dup changed-definitions get update
-    dup maybe-changed get update
-    dup dup changed-vocabs update ;
+    forgotten-definitions get assoc-union!
+    new-definitions get first assoc-union!
+    new-definitions get second assoc-union!
+    changed-definitions get assoc-union!
+    maybe-changed get assoc-union!
+    dup changed-vocabs assoc-union! ;
 
 : process-forgotten-definitions ( -- )
     forgotten-definitions get keys

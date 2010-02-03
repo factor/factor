@@ -22,7 +22,7 @@ PREDICATE: writer-method < method "writing" word-prop ;
 
 : define-typecheck ( class generic quot props -- )
     [ create-method ] 2dip
-    [ [ props>> ] [ drop ] [ ] tri* update ]
+    [ [ props>> ] [ drop ] [ ] tri* assoc-union! drop ]
     [ drop define ]
     [ 2drop make-inline ]
     3tri ;

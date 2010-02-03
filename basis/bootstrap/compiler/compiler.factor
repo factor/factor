@@ -103,7 +103,7 @@ gc
     "." write flush
 
     {
-        lines prefix suffix unclip new-assoc update
+        lines prefix suffix unclip new-assoc assoc-union!
         word-prop set-word-prop 1array 2array 3array ?nth
     } compile-unoptimized
 
