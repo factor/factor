@@ -236,7 +236,7 @@ SYMBOL: deserialized
 : deserialize-hashtable ( -- hashtable )
     H{ } clone
     [ intern-object ]
-    [ (deserialize) update ]
+    [ (deserialize) assoc-union! drop ]
     [ ] tri ;
 
 : copy-seq-to-tuple ( seq tuple -- )
