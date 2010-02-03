@@ -136,7 +136,7 @@ CHLOE: form
     XML> body>> clone ;
 
 : add-tag-attrs ( attrs tag -- )
-    attrs>> swap update ;
+    attrs>> swap assoc-union! drop ;
 
 CHLOE: button
     button-tag-markup

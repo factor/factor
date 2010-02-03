@@ -35,10 +35,10 @@ M: form clone
     [ [ value ] keep ] dip ; inline
 
 : from-object ( object -- )
-    [ values ] [ make-mirror ] bi* update ;
+    [ values ] [ make-mirror ] bi* assoc-union! drop ;
 
 : to-object ( destination names -- )
-    [ make-mirror ] [ values extract-keys ] bi* update ;
+    [ make-mirror ] [ values extract-keys ] bi* assoc-union! drop ;
 
 : with-each-value ( name quot -- )
     [ value ] dip '[
