@@ -145,7 +145,7 @@ ARTICLE: "delete-move-copy" "Deleting, moving, and copying files"
 "Operations for deleting and copying files come in two forms:"
 { $list
     { "Words named " { $snippet { $emphasis "operation" } "-file" } " which work on regular files only." }
-    { "Words named " { $snippet { $emphasis "operation" } "-tree" } " works on directory trees recursively, and also accepts regular files." }
+  { "Words named " { $snippet { $emphasis "operation" } "-tree" } " works on directory trees recursively, and also accepts regular files. (see " { $link "io.directories.hierarchy" } ")" }
 }
 "The operations for moving and copying files come in three flavors:"
 { $list

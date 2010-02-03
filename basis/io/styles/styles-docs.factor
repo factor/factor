@@ -204,7 +204,7 @@ HELP: foreground
 { $description "Character style. An instance of " { $link color } ". See " { $link "colors" } "." } 
 { $examples
     { $code
-        "10 ["
+        "10 iota ["
             "    \"Hello world\\n\""
             "    swap 10 / 1 <gray> foreground associate format"
         "] each"
@@ -215,9 +215,9 @@ HELP: background
 { $description "Character style. An instance of " { $link color } ". See " { $link "colors" } "." }
 { $examples
     { $code
-        "10 ["
+        "10 iota ["
             "    \"Hello world\\n\""
-            "    swap 10 / 1 1 over - over 1 <rgba>"
+            "    swap 10 / 1 over - over 1 <rgba>"
             "    background associate format nl"
         "] each"
     }
