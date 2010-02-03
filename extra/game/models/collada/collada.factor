@@ -5,62 +5,25 @@ locals math math.parser sequences sequences.deep
 specialized-arrays.instances.alien.c-types.float
 specialized-arrays.instances.alien.c-types.uint splitting xml
 xml.data xml.traversal math.order
-namespaces combinators images gpu.shaders io make ;
+namespaces combinators images gpu.shaders io make
+game.models.util io.encodings.ascii game.models.loader ;
 IN: game.models.collada
 
-TUPLE: model attribute-buffer index-buffer vertex-format ;
-TUPLE: source semantic offset data ;
-
-SYMBOLS: up-axis unit-ratio ;
+SINGLETON: collada-models
+"dae" ascii collada-models register-models-class
 
 ERROR: missing-attr tag attr ;
 ERROR: missing-child tag child-name ;
 
-TUPLE: indexed-seq dseq iseq rassoc ;
-INSTANCE: indexed-seq sequence
-
-M: indexed-seq length
-    iseq>> length ; inline
-
-M: indexed-seq nth
-    [ iseq>> nth ] keep dseq>> nth ; inline
-
-M:: indexed-seq set-nth ( elt n seq -- )
-    seq dseq>>   :> dseq
-    seq iseq>>   :> iseq
-    seq rassoc>> :> rassoc
-    seq length n = not [ seq immutable ] when
-    elt rassoc at
-    [
-        iseq push
-    ]
-    [
-        dseq length
-        [ elt rassoc set-at ]
-        [ iseq push ] bi
-        elt dseq push
-    ] if* ; inline
-
-: <indexed-seq> ( dseq-examplar iseq-exampler rassoc-examplar -- indexed-seq )
-    indexed-seq new
-    swap clone >>rassoc
-    swap clone >>iseq
-    swap clone >>dseq ;
-
-M: indexed-seq new-resizable
-    [ dseq>> ] [ iseq>> ] [ rassoc>> ] tri <indexed-seq>
-    dup -rot
-    [ [ dseq>> new-resizable ] keep (>>dseq) ]
-    [ [ iseq>> new-resizable ] keep (>>iseq) ]
-    [ [ rassoc>> clone nip ] keep (>>rassoc) ]
-    2tri ;
-
+<PRIVATE
+TUPLE: source semantic offset data ;
+SYMBOLS: up-axis unit-ratio ;
 
 : string>numbers ( string -- number-seq )
-    " \t\n" split [ "" = ] trim [ string>number ] map ;
+    " \t\n" split harvest [ string>number ] map ;
 
 : string>floats ( string -- float-seq )
-    " \t\n" split [ "" = ] trim [ string>float ] map ;
+    " \t\n" split harvest [ string>float ] map ;
 
 : x/ ( tag child-name -- child-tag )
     [ tag-named ]
@@ -78,7 +41,6 @@ M: indexed-seq new-resizable
     [ tags-named ] dip map ; inline
 
 SINGLETONS: x-up y-up z-up ;
-
 UNION: rh-up x-up y-up z-up ;
 
 GENERIC: >y-up-axis! ( seq from-axis -- seq )
@@ -159,19 +121,10 @@ M: z-up >y-up-axis!
 : largest-offset+1 ( source-seq -- largest-offset+1 )
     [ offset>> ] [ max ] map-reduce 1 + ;
 
-: <model> ( attribute-buffer index-buffer sources -- model )
-    [ flatten >float-array ]
-    [ flatten >uint-array ]
-    [
-        [
-            {
-                [ semantic>> ]
-                [ drop float-components ]
-                [ data>> first length ]
-                [ drop f ]
-            } cleave vertex-attribute boa
-        ] map
-    ] tri* model boa ;
+VERTEX-FORMAT: collada-vertex-format
+    { "POSITION" float-components 3 f }
+    { "NORMAL" float-components 3 f }
+    { "TEXCOORD" float-components 2 f } ;
 
 : pack-attributes ( source-indices sources -- attributes )
     [
@@ -184,9 +137,7 @@ M: z-up >y-up-axis!
     ] V{ } make flatten ;
 
 :: soa>aos ( triangles-indices sources -- attribute-buffer index-buffer )
-    [ triangles-indices [ [
-        sources pack-attributes ,
-    ] each ] each ]
+    [ triangles-indices [ [ sources pack-attributes , ] each ] each ]
     V{ } V{ } H{ } <indexed-seq> make [ dseq>> ] [ iseq>> ] bi ;
 
 : triangles>model ( sources vertices triangles-tag -- model )
@@ -198,7 +149,10 @@ M: z-up >y-up-axis!
         group-indices
     ]
     [
-        [ soa>aos ] keep <model>
+        soa>aos 
+        [ flatten >float-array ]
+        [ flatten >uint-array ]
+        bi* collada-vertex-format model boa
     ] bi ;
     
 : mesh>triangles ( sources vertices mesh-tag -- models )
@@ -206,9 +160,13 @@ M: z-up >y-up-axis!
 
 : mesh>models ( mesh-tag -- models )
     [
-        { { up-axis y-up } { unit-ratio 0.5 } } [
+        { { up-axis y-up } { unit-ratio 1 } } [
             mesh>sources
         ] bind
     ]
     [ mesh>vertices ]
     [ mesh>triangles ] tri ;
+PRIVATE>
+
+M: collada-models stream>models
+    drop read-xml "mesh" deep-tags-named [ mesh>models ] map flatten ;
