@@ -44,7 +44,7 @@ CONSTANT: fail-state -1
     unify-final-state renumber-states box-transitions 
     [ start-state>> ]
     [ final-states>> keys first ]
-    [ nfa-table get [ transitions>> ] bi@ swap update ] tri ;
+    [ nfa-table get [ transitions>> ] bi@ swap assoc-union! drop ] tri ;
 
 : ast>dfa ( parse-tree -- minimal-dfa )
     construct-nfa disambiguate construct-dfa minimize ;
