@@ -656,6 +656,7 @@ struct factor_vm
 
 	// os-*
 	void primitive_existsp();
+	void move_file(const vm_char *path1, const vm_char *path2);
 	void init_ffi();
 	void ffi_dlopen(dll *dll);
 	void *ffi_dlsym(dll *dll, symbol_char *symbol);
