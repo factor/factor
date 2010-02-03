@@ -57,10 +57,11 @@ CONSTANT: vm-reg 15
 
 : %load-vm-addr ( reg -- ) vm-reg MR ;
 
-: %load-vm-field-addr ( reg symbol -- )
-    [ vm-reg ] dip vm-field-offset ADDI ;
+M: ppc %vm-field ( dst field -- )
+    [ vm-reg ] dip vm-field-offset LWZ ;
 
-M: ppc %vm-field-ptr ( dst field -- ) %load-vm-field-addr ;
+M: ppc %vm-field-ptr ( dst field -- )
+    [ vm-reg ] dip vm-field-offset ADDI ;
 
 GENERIC: loc-reg ( loc -- reg )
 
@@ -601,26 +602,19 @@ M: ppc %push-stack ( -- )
     ds-reg ds-reg 4 ADDI
     int-regs return-reg ds-reg 0 STW ;
 
-:: %load-context-datastack ( dst -- )
-    ! Load context struct
-    dst "ctx" %vm-field-ptr
-    dst dst 0 LWZ
-    ! Load context datastack pointer
-    dst dst "datastack" context-field-offset ADDI ;
-
 M: ppc %push-context-stack ( -- )
-    11 %load-context-datastack
-    12 11 0 LWZ
+    11 "ctx" %vm-field
+    12 11 "datastack" context-field-offset LWZ
     12 12 4 ADDI
-    12 11 0 STW
+    12 11 "datastack" context-field-offset STW
     int-regs return-reg 12 0 STW ;
 
 M: ppc %pop-context-stack ( -- )
-    11 %load-context-datastack
-    12 11 0 LWZ
+    11 "ctx" %vm-field
+    12 11 "datastack" context-field-offset LWZ
     int-regs return-reg 12 0 LWZ
     12 12 4 SUBI
-    12 11 0 STW ;
+    12 11 "datastack" context-field-offset STW ;
 
 M: ppc %unbox ( n rep func -- )
     ! Value must be in r3
