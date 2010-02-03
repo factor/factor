@@ -1,10 +1,9 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces arrays sequences io words fry
-continuations vocabs assocs dlists definitions math graphs
-generic generic.single combinators combinators.smart deques
-search-deques macros source-files.errors
-combinators.short-circuit classes.algebra
+continuations vocabs assocs definitions math graphs generic
+generic.single combinators combinators.smart macros
+source-files.errors combinators.short-circuit classes.algebra
 
 stack-checker stack-checker.dependencies stack-checker.inlining
 stack-checker.errors
@@ -22,19 +21,14 @@ compiler.cfg.mr
 compiler.codegen ;
 IN: compiler
 
-SYMBOL: compile-queue
 SYMBOL: compiled
 
 : compile? ( word -- ? )
     #! Don't attempt to compile certain words.
     {
         [ "forgotten" word-prop ]
-        [ compiled get key? ]
         [ inlined-block? ]
     } 1|| not ;
-
-: queue-compile ( word -- )
-    dup compile? [ compile-queue get push-front ] [ drop ] if ;
 
 : compiler-message ( string -- )
     "trace-compilation" get [ global [ print flush ] bind ] [ drop ] if ;
@@ -129,29 +123,10 @@ M: word combinator? inline? ;
         contains-breakpoints? [ nip deoptimize* ] [ drop ] if
     ] [ deoptimize* ] if ;
 
-: compile-dependency ( word -- )
-    #! If a word calls an unoptimized word, try to compile the callee.
-    dup optimized? [ drop ] [ queue-compile ] if ;
-
-! Only switch this off for debugging.
-SYMBOL: compile-dependencies?
-
-t compile-dependencies? set-global
-
-: compile-dependencies ( asm -- )
-    compile-dependencies? get
-    [ calls>> [ compile-dependency ] each ] [ drop ] if ;
-
-: save-asm ( asm -- )
-    [ [ code>> ] [ label>> ] bi compiled get set-at ]
-    [ compile-dependencies ]
-    bi ;
-
 : backend ( tree word -- )
     build-cfg [
         [ optimize-cfg build-mr ] with-cfg
-        generate
-        save-asm
+        [ generate ] [ label>> ] bi compiled get set-at
     ] each ;
 
 : compile-word ( word -- )
@@ -166,9 +141,6 @@ t compile-dependencies? set-global
         } cleave
     ] with-return ;
 
-: compile-loop ( deque -- )
-    [ compile-word yield-hook get call( -- ) ] slurp-deque ;
-
 SINGLETON: optimizing-compiler
 
 M: optimizing-compiler update-call-sites ( class generic -- words )
@@ -180,16 +152,11 @@ M: optimizing-compiler update-call-sites ( class generic -- words )
     ] assoc-filter keys ;
 
 M: optimizing-compiler recompile ( words -- alist )
-    [
-        <hashed-dlist> compile-queue set
-        H{ } clone compiled set
-        [
-            [ queue-compile ]
-            [ subwords [ compile-dependency ] each ] bi
-        ] each
-        compile-queue get compile-loop
+    H{ } clone compiled [
+        [ compile? ] filter
+        [ compile-word yield-hook get call( -- ) ] each
         compiled get >alist
-    ] with-scope
+    ] with-variable
     "--- compile done" compiler-message ;
 
 M: optimizing-compiler to-recompile ( -- words )
