@@ -1,9 +1,10 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces arrays sequences io words fry
-continuations vocabs assocs dlists definitions math graphs generic
-generic.single combinators deques search-deques macros
-source-files.errors combinators.short-circuit classes.algebra
+continuations vocabs assocs dlists definitions math graphs
+generic generic.single combinators combinators.smart deques
+search-deques macros source-files.errors
+combinators.short-circuit classes.algebra
 
 stack-checker stack-checker.dependencies stack-checker.inlining
 stack-checker.errors
@@ -34,15 +35,6 @@ SYMBOL: compiled
 
 : queue-compile ( word -- )
     dup compile? [ compile-queue get push-front ] [ drop ] if ;
-
-: recompile-callers? ( word -- ? )
-    changed-effects get key? ;
-
-: recompile-callers ( word -- )
-    #! If a word's stack effect changed, recompile all words
-    #! that have compiled calls to it.
-    dup recompile-callers?
-    [ effect-dependencies-of keys [ queue-compile ] each ] [ drop ] if ;
 
 : compiler-message ( string -- )
     "trace-compilation" get [ global [ print flush ] bind ] [ drop ] if ;
@@ -81,7 +73,6 @@ M: word combinator? inline? ;
     #! Recompile callers if the word's stack effect changed, then
     #! save the word's dependencies so that if they change, the
     #! word can get recompiled too.
-    [ recompile-callers ]
     [ compiled-unxref ]
     [
         dup crossref? [
@@ -89,7 +80,7 @@ M: word combinator? inline? ;
             [ conditional-dependencies get set-dependency-checks ]
             bi
         ] [ drop ] if
-    ] tri ;
+    ] bi ;
 
 : deoptimize-with ( word def -- * )
     #! If the word failed to infer, compile it with the
@@ -202,9 +193,12 @@ M: optimizing-compiler recompile ( words -- alist )
     "--- compile done" compiler-message ;
 
 M: optimizing-compiler to-recompile ( -- words )
-    changed-definitions get compiled-usages
-    maybe-changed get outdated-conditional-usages
-    append assoc-combine keys ;
+    [
+        changed-effects get new-words get assoc-diff outdated-effect-usages
+        changed-definitions get new-words get assoc-diff outdated-definition-usages
+        maybe-changed get new-words get assoc-diff outdated-conditional-usages
+        changed-definitions get [ drop word? ] assoc-filter 1array
+    ] append-outputs assoc-combine keys ;
 
 M: optimizing-compiler process-forgotten-words
     [ delete-compiled-xref ] each ;
