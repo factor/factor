@@ -4,7 +4,7 @@ USING: accessors kernel continuations fry words ;
 IN: db.errors
 
 ERROR: db-error ;
-ERROR: sql-error location ;
+TUPLE: sql-error location ;
 
 ERROR: bad-schema ;
 
