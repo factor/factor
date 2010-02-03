@@ -168,6 +168,17 @@ M: object always-bump-effect-counter? drop f ;
         notify-observers
     ] if-bootstrapping ;
 
+TUPLE: nesting-observer new-words ;
+
+M: nesting-observer definitions-changed new-words>> swap assoc-diff! drop ;
+
+: add-nesting-observer ( -- )
+    new-words get nesting-observer boa
+    [ nesting-observer set ] [ add-definition-observer ] bi ;
+
+: remove-nesting-observer ( -- )
+    nesting-observer get remove-definition-observer ;
+
 PRIVATE>
 
 : with-nested-compilation-unit ( quot -- )
@@ -178,19 +189,17 @@ PRIVATE>
         H{ } clone outdated-generics set
         H{ } clone outdated-tuples set
         H{ } clone new-words set
-        [ finish-compilation-unit ] [ ] cleanup
+        add-nesting-observer
+        [
+            remove-nesting-observer
+            finish-compilation-unit
+        ] [ ] cleanup
     ] with-scope ; inline
 
 : with-compilation-unit ( quot -- )
     [
-        H{ } clone changed-definitions set
-        H{ } clone maybe-changed set
-        H{ } clone changed-effects set
-        H{ } clone outdated-generics set
-        H{ } clone forgotten-definitions set
-        H{ } clone outdated-tuples set
-        H{ } clone new-words set
         <definitions> new-definitions set
         <definitions> old-definitions set
-        [ finish-compilation-unit ] [ ] cleanup
+        H{ } clone forgotten-definitions set
+        with-nested-compilation-unit
     ] with-scope ; inline
