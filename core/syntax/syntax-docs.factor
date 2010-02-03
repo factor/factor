@@ -129,7 +129,7 @@ ARTICLE: "escape" "Character escape codes"
 } ;
 
 ARTICLE: "syntax-strings" "Character and string syntax"
-"Factor has no distinct character type, however Unicode character value integers can be read by specifying a literal character, or an escaped representation thereof."
+"Factor has no distinct character type. Integers representing Unicode code points can be read by specifying a literal character, or an escaped representation thereof."
 { $subsections
     POSTPONE: CHAR:
     POSTPONE: "
@@ -537,7 +537,7 @@ HELP: IN:
 
 HELP: CHAR:
 { $syntax "CHAR: token" }
-{ $values { "token" "a literal character, escape code, or Unicode character name" } }
+{ $values { "token" "a literal character, escape code, or Unicode code point name" } }
 { $description "Adds a Unicode code point to the parse tree." }
 { $examples
     { $code

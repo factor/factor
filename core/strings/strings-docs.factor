@@ -4,13 +4,9 @@ sbufs math help.vocabs ;
 IN: strings
 
 ARTICLE: "strings" "Strings"
-"The " { $vocab-link "strings" } " vocabulary implements fixed-size mutable sequences of of Unicode 5.1 code points."
+"The " { $vocab-link "strings" } " vocabulary implements a data type for storing text. Strings are represented as fixed-size mutable sequences of Unicode code points. Code points are represented as integers in the range [0,2,097,152]."
 $nl
-"Code points, or characters as they're informally known, are not a first-class type; they are simply represented as integers in the range 0 and 16,777,216 (2^24), inclusive. Only characters up to 2,097,152 (2^21) have a defined meaning in Unicode."
-$nl
-"String literal syntax is covered in " { $link "syntax-strings" } "."
-$nl
-"Since strings implement the " { $link "sequence-protocol" } ", basic string manipulation can be performed with " { $link "sequences" } " in the " { $vocab-link "sequences" } " vocabulary. More text processing functionality can be found in vocabularies carrying the " { $link T{ vocab-tag { name "text" } } } " tag."
+"Strings implement the " { $link "sequence-protocol" } ", and basic string manipulation can be performed with " { $link "sequences" } " from the " { $vocab-link "sequences" } " vocabulary. More text processing functionality can be found in vocabularies carrying the " { $link T{ vocab-tag { name "text" } } } " tag."
 $nl
 "Strings form a class:"
 { $subsections
@@ -23,7 +19,8 @@ $nl
     <string>
 }
 "Creating a string from a single character:"
-{ $subsections 1string } ;
+{ $subsections 1string }
+{ $see-also "syntax-strings" "sbufs" "unicode" "io.encodings" } ;
 
 ABOUT: "strings"
 
