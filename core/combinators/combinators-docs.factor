@@ -58,9 +58,7 @@ $nl
 "A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "." ;
 
 ARTICLE: "apply-combinators" "Apply combinators"
-"The apply combinators apply a single quotation to multiple values. The asterisk (" { $snippet "@" } ") suffixed to these words' names signifies that they are apply combinators."
-$nl
-"One quotation:"
+"The apply combinators apply a single quotation to multiple values. The at sign (" { $snippet "@" } ") suffixed to these words' names signifies that they are apply combinators."
 { $subsections bi@ 2bi@ tri@ 2tri@ }
 "A pair of condition words built from " { $link bi@ } " to test two values:"
 { $subsections both? either? }
