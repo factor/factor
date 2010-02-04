@@ -238,3 +238,42 @@ IN: math.matrices.simd.tests
     float-4{ 0.5 0.5 0.5 1.0 } scale-matrix4 m4.
     float-4{ 2.0 3.0 4.0 1.0 } m4.v
 ] unit-test
+
+[
+    S{ matrix4 f
+        float-4-array{
+            float-4{ 1.0  0.0  0.0  0.0 }
+            float-4{ 0.0  1.0  0.0  0.0 }
+            float-4{ 0.0  0.0  1.0  0.0 }
+            float-4{ 0.0  0.0  0.0  1.0 }
+        }
+    }
+] [
+    float-4{ 1.0 0.0 0.0 0.0 } q>matrix4
+] unit-test
+
+[ t ] [
+    pi 0.5 * 0.0 0.0 euler4 q>matrix4
+    S{ matrix4 f
+        float-4-array{
+            float-4{ 1.0  0.0  0.0  0.0 }
+            float-4{ 0.0  0.0  1.0  0.0 }
+            float-4{ 0.0 -1.0  0.0  0.0 }
+            float-4{ 0.0  0.0  0.0  1.0 }
+        }
+    }
+    1.0e-7 m~ 
+] unit-test
+
+[ t ] [
+    0.0 pi 0.25 * 0.0 euler4 q>matrix4
+    S{ matrix4 f
+        float-4-array{
+            float-4{ $[ 1/2. sqrt ] 0.0 $[ 1/2. sqrt neg ] 0.0 }
+            float-4{ 0.0            1.0 0.0                0.0 }
+            float-4{ $[ 1/2. sqrt ] 0.0 $[ 1/2. sqrt     ] 0.0 }
+            float-4{ 0.0            0.0 0.0                1.0 }
+        }
+    }
+    1.0e-7 m~ 
+] unit-test
