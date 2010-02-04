@@ -60,7 +60,7 @@ SINGLETON: method-renderer
 M: method-renderer column-alignment drop { 0 0 1 } ;
 M: method-renderer filled-column drop 1 ;
 
-! Value is a { method-body count } pair
+! Value is a { method count } pair
 M: method-renderer row-columns
     drop [
         [ [ definition-icon <image-name> ] [ synopsis ] bi ]

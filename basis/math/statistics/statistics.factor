@@ -64,7 +64,7 @@ IN: math.statistics
 
 PRIVATE>
 
-: sequence>assoc* ( assoc seq quot: ( obj assoc -- ) -- assoc )
+: sequence>assoc! ( assoc seq quot: ( obj assoc -- ) -- assoc )
     rot (sequence>assoc) ; inline
 
 : sequence>assoc ( seq quot: ( obj assoc -- ) exemplar -- assoc )
@@ -73,8 +73,8 @@ PRIVATE>
 : sequence>hashtable ( seq quot: ( obj hashtable -- ) -- hashtable )
     H{ } sequence>assoc ; inline
 
-: histogram* ( hashtable seq -- hashtable )
-    [ inc-at ] sequence>assoc* ;
+: histogram! ( hashtable seq -- hashtable )
+    [ inc-at ] sequence>assoc! ;
 
 : histogram ( seq -- hashtable )
     [ inc-at ] sequence>hashtable ;

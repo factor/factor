@@ -77,11 +77,6 @@ big-endian off
 ] jit-push jit-define
 
 [
-    temp3 0 MOV rc-absolute-cell rt-here jit-rel
-    0 JMP rc-relative rt-entry-point-pic-tail jit-rel
-] jit-word-jump jit-define
-
-[
     0 CALL rc-relative rt-entry-point-pic jit-rel
 ] jit-word-call jit-define
 

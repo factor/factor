@@ -51,6 +51,7 @@ $nl
 { $table
     { "General form" "Description" "Examples" }
     { { $snippet { $emphasis "foo" } "?" } "outputs a boolean" { { $link empty? } } }
+    { { $snippet { $emphasis "foo" } "!" } { "a variant of " { $snippet "foo" } " which mutates one of its arguments" } { { $link append! } } }
     { { $snippet "?" { $emphasis "foo" } } { "conditionally performs " { $snippet { $emphasis "foo" } } } { { $links ?nth } } }
     { { $snippet "<" { $emphasis "foo" } ">" } { "creates a new " { $snippet "foo" } } { { $link <array> } } }
     { { $snippet ">" { $emphasis "foo" } } { "converts the top of the stack into a " { $snippet "foo" } } { { $link >array } } }

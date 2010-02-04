@@ -27,10 +27,8 @@ inline static unsigned char call_site_opcode(cell return_address)
 
 inline static void check_call_site(cell return_address)
 {
-#ifdef FACTOR_DEBUG
 	unsigned char opcode = call_site_opcode(return_address);
 	assert(opcode == call_opcode || opcode == jmp_opcode);
-#endif
 }
 
 inline static void *get_call_target(cell return_address)

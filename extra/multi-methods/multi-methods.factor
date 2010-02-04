@@ -40,7 +40,7 @@ SYMBOL: total
     ] assoc-map ;
 
 : canonicalize-specializer-3 ( specializer -- specializer' )
-    [ total get object <array> dup <enum> ] dip update ;
+    [ total get object <array> <enum> ] dip assoc-union! seq>> ;
 
 : canonicalize-specializers ( methods -- methods' hooks )
     [

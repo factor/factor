@@ -306,7 +306,7 @@ bool factor_vm::save_image(const vm_char *saving_filename, const vm_char *filena
 	if(!ok)
 		std::cout << "save-image failed: " << strerror(errno) << std::endl;
 	else
-		MOVE_FILE(saving_filename,filename); 
+		move_file(saving_filename,filename); 
 
 	return ok;
 }

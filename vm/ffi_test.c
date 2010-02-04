@@ -103,12 +103,12 @@ struct tiny ffi_test_17(int x)
 	return r;
 }
 
-F_STDCALL int ffi_test_18(int x, int y, int z, int t)
+FACTOR_STDCALL(int) ffi_test_18(int x, int y, int z, int t)
 {
 	return x + y + z * t;
 }
 
-F_STDCALL struct bar ffi_test_19(long x, long y, long z)
+FACTOR_STDCALL(struct bar) ffi_test_19(long x, long y, long z)
 {
 	struct bar r;
 	r.x = x; r.y = y; r.z = z;
@@ -305,6 +305,9 @@ struct test_struct_14 ffi_test_44(void)
 	return retval;
 }
 
+/* C99 features */
+#ifndef _MSC_VER
+
 _Complex float ffi_test_45(int x)
 {
 	return x;
@@ -324,3 +327,5 @@ short ffi_test_48(struct bool_field_test x)
 {
 	return x.parents;
 }
+
+#endif
