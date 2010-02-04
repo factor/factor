@@ -250,6 +250,13 @@ GENERIC# (define-tuple-class) 2 ( class superclass slots -- )
 : thrower-effect ( slots -- effect )
     [ name>> ] map { "*" } <effect> ;
 
+: error-slots ( slots -- slots' )
+    [
+        dup string? [ 1array ] when
+        read-only swap remove
+        read-only suffix
+    ] map ;
+
 PRIVATE>
 
 : define-tuple-class ( class superclass slots -- )
@@ -265,6 +272,7 @@ M: tuple-class (define-tuple-class)
     [ 2drop ?define-symbol ] [ redefine-tuple-class ] if ;
 
 : define-error-class ( class superclass slots -- )
+    error-slots
     [ define-tuple-class ]
     [ 2drop reset-generic ]
     [

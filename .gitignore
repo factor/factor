@@ -8,6 +8,7 @@ Factor/factor
 *.a
 *.dll
 *.lib
+*.exp
 *.res
 *.image
 *.dylib

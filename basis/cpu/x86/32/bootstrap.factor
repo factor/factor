@@ -36,6 +36,11 @@ IN: bootstrap.x86
     ESP stack-frame-size 3 bootstrap-cells - SUB
 ] jit-prolog jit-define
 
+[
+    temp3 0 MOV rc-absolute-cell rt-here jit-rel
+    0 JMP rc-relative rt-entry-point-pic-tail jit-rel
+] jit-word-jump jit-define
+
 : jit-load-vm ( -- )
     vm-reg 0 MOV 0 rc-absolute-cell jit-vm ;
 

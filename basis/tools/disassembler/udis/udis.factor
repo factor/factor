@@ -1,11 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Jorge Acereda Macia.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.disassembler namespaces combinators
-alien alien.syntax alien.c-types lexer parser kernel
-sequences layouts math math.order alien.libraries
-math.parser system make fry arrays libc destructors
-tools.disassembler.utils tools.disassembler.private splitting
-alien.data classes.struct ;
+USING: tools.disassembler namespaces combinators alien
+alien.syntax alien.c-types lexer parser kernel sequences layouts
+math math.order alien.libraries math.parser system make fry
+arrays libc destructors tools.memory tools.disassembler.utils
+tools.disassembler.private splitting alien.data classes.struct ;
 IN: tools.disassembler.udis
 
 <<
@@ -105,7 +104,7 @@ FUNCTION: char* ud_lookup_mnemonic ( int c ) ;
     dup UD_SYN_INTEL ud_set_syntax ;
 
 : with-ud ( quot: ( ud -- ) -- )
-    [ [ [ <ud> ] dip call ] with-destructors ] with-word-entry-points ; inline
+    [ [ [ <ud> ] dip call ] with-destructors ] with-code-blocks ; inline
 
 SINGLETON: udis-disassembler
 

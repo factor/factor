@@ -545,7 +545,7 @@ M: quotation '
     \ c-to-factor c-to-factor-word set
     \ lazy-jit-compile lazy-jit-compile-word set
     \ unwind-native-frames unwind-native-frames-word set
-    [ undefined ] undefined-quot set ;
+    undefined-def undefined-quot set ;
 
 : emit-special-objects ( -- )
     special-objects get keys [ emit-special-object ] each ;

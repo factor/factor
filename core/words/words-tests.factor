@@ -64,9 +64,14 @@ FORGET: forgotten
 FORGET: another-forgotten
 : another-forgotten ( -- ) ;
 
+! Make sure that undefined words throw proper errors
+DEFER: deferred
+[ deferred ] [ T{ undefined f deferred } = ] must-fail-with
 
-DEFER: x
-[ x ] [ undefined? ] must-fail-with
+[ "IN: words.tests DEFER: not-compiled << not-compiled >>" eval( -- ) ]
+[ error>> [ undefined? ] [ word>> name>> "not-compiled" = ] bi and ] must-fail-with
+
+[ ] [ "IN: words.tests FORGET: not-compiled" eval( -- ) ] unit-test
 
 [ ] [ [ "no-loc" "words.tests" create drop ] with-compilation-unit ] unit-test
 [ f ] [ "no-loc" "words.tests" lookup where ] unit-test

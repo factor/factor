@@ -27,6 +27,9 @@ M: x86.32 temp-reg ECX ;
 M: x86.32 %mov-vm-ptr ( reg -- )
     0 MOV 0 rc-absolute-cell rel-vm ;
 
+M: x86.32 %vm-field ( dst field -- )
+    [ 0 [] MOV ] dip vm-field-offset rc-absolute-cell rel-vm ;
+
 M: x86.32 %vm-field-ptr ( dst field -- )
     [ 0 MOV ] dip vm-field-offset rc-absolute-cell rel-vm ;
 
@@ -102,6 +105,9 @@ M: x86.32 %prologue ( n -- )
     0 PUSH rc-absolute-cell rel-this
     3 cells - decr-stack-reg ;
 
+M: x86.32 %prepare-jump
+    pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here ;
+
 M: x86.32 %load-param-reg
     stack-params assert=
     [ [ EAX ] dip local@ MOV ] dip
@@ -160,10 +166,10 @@ M: x86.32 %pop-stack ( n -- )
     EAX swap ds-reg reg-stack MOV ;
 
 M: x86.32 %pop-context-stack ( -- )
-    temp-reg %load-context-datastack
-    EAX temp-reg [] MOV
+    temp-reg "ctx" %vm-field
+    EAX temp-reg "datastack" context-field-offset [+] MOV
     EAX EAX [] MOV
-    temp-reg [] bootstrap-cell SUB ;
+    temp-reg "datastack" context-field-offset [+] bootstrap-cell SUB ;
 
 : call-unbox-func ( func -- )
     4 save-vm-ptr
@@ -287,6 +293,15 @@ M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
     func "libm" load-library %alien-invoke
     dst float-function-return ;
 
+: stdcall? ( params -- ? )
+    abi>> "stdcall" = ;
+
+: funny-large-struct-return? ( params -- ? )
+    #! MINGW ABI incompatibility disaster
+    [ return>> large-struct? ]
+    [ abi>> "mingw" = os windows? not or ]
+    bi and ;
+
 M: x86.32 %cleanup ( params -- )
     #! a) If we just called an stdcall function in Windows, it
     #! cleaned up the stack frame for us. But we don't want that
@@ -294,13 +309,8 @@ M: x86.32 %cleanup ( params -- )
     #! b) If we just called a function returning a struct, we
     #! have to fix ESP.
     {
-        {
-            [ dup abi>> "stdcall" = ]
-            [ drop ESP stack-frame get params>> SUB ]
-        } {
-            [ dup return>> large-struct? ]
-            [ drop EAX PUSH ]
-        }
+        { [ dup stdcall? ] [ drop ESP stack-frame get params>> SUB ] }
+        { [ dup funny-large-struct-return? ] [ drop EAX PUSH ] }
         [ drop ]
     } cond ;
 
@@ -323,11 +333,8 @@ M: x86.32 callback-return-rewind ( params -- n )
     #! b) If the callback is returning a large struct, we have
     #! to fix ESP.
     {
-        { [ dup abi>> "stdcall" = ] [
-            <alien-stack-frame>
-            [ params>> ] [ return>> ] bi +
-        ] }
-        { [ dup return>> large-struct? ] [ drop 4 ] }
+        { [ dup stdcall? ] [ <alien-stack-frame> [ params>> ] [ return>> ] bi + ] }
+        { [ dup funny-large-struct-return? ] [ drop 4 ] }
         [ drop 0 ]
     } cond ;
 

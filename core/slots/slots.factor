@@ -10,11 +10,11 @@ TUPLE: slot-spec name offset class initial read-only ;
 
 PREDICATE: reader < word "reader" word-prop ;
 
-PREDICATE: reader-method < method-body "reading" word-prop ;
+PREDICATE: reader-method < method "reading" word-prop ;
 
 PREDICATE: writer < word "writer" word-prop ;
 
-PREDICATE: writer-method < method-body "writing" word-prop ;
+PREDICATE: writer-method < method "writing" word-prop ;
 
 : <slot-spec> ( -- slot-spec )
     slot-spec new
@@ -22,7 +22,7 @@ PREDICATE: writer-method < method-body "writing" word-prop ;
 
 : define-typecheck ( class generic quot props -- )
     [ create-method ] 2dip
-    [ [ props>> ] [ drop ] [ ] tri* update ]
+    [ [ props>> ] [ drop ] [ ] tri* assoc-union! drop ]
     [ drop define ]
     [ 2drop make-inline ]
     3tri ;

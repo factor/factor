@@ -523,6 +523,9 @@ M: bad-executable summary
 \ data-room { } { byte-array } define-primitive
 \ data-room make-flushable
 
+\ (code-blocks) { } { array } define-primitive
+\ (code-blocks)  make-flushable
+
 \ code-room { } { byte-array } define-primitive
 \ code-room  make-flushable
 
@@ -711,7 +714,7 @@ M: bad-executable summary
 
 \ dll-valid? { object } { object } define-primitive
 
-\ modify-code-heap { array } { } define-primitive
+\ modify-code-heap { array object object } { } define-primitive
 
 \ unimplemented { } { } define-primitive
 

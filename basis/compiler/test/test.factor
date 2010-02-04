@@ -5,7 +5,7 @@ sequences vocabs words tools.test tools.test.private ;
 IN: compiler.test
 
 : decompile ( word -- )
-    dup def>> 2array 1array modify-code-heap ;
+    dup def>> 2array 1array t t modify-code-heap ;
 
 : recompile-all ( -- )
     all-words compile ;
