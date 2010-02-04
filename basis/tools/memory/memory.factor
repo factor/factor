@@ -242,8 +242,6 @@ M: code-blocks nth-unsafe
     [ cache>> ] [ blocks>> ] bi
     '[ _ nth-unsafe <code-block> ] cache ; inline
 
-M: code-blocks hashcode* 2drop 0 ;
-
 INSTANCE: code-blocks immutable-sequence
 
 : code-blocks ( -- blocks )
