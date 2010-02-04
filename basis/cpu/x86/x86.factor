@@ -88,8 +88,10 @@ M: x86 %call ( word -- ) 0 CALL rc-relative rel-word-pic ;
     #! See the comment in vm/cpu-x86.hpp
     4 1 + ; inline
 
+HOOK: %prepare-jump cpu ( -- )
+
 M: x86 %jump ( word -- )
-    pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here
+    %prepare-jump
     0 JMP rc-relative rel-word-pic-tail ;
 
 M: x86 %jump-label ( label -- ) 0 JMP rc-relative label-fixup ;
@@ -474,17 +476,10 @@ M: x86 %push-stack ( -- )
     ds-reg cell ADD
     ds-reg [] int-regs return-reg MOV ;
 
-:: %load-context-datastack ( dst -- )
-    ! Load context struct
-    dst "ctx" %vm-field-ptr
-    dst dst [] MOV
-    ! Load context datastack pointer
-    dst "datastack" context-field-offset ADD ;
-
 M: x86 %push-context-stack ( -- )
-    temp-reg %load-context-datastack
-    temp-reg [] bootstrap-cell ADD
-    temp-reg temp-reg [] MOV
+    temp-reg "ctx" %vm-field
+    temp-reg "datastack" context-field-offset [+] bootstrap-cell ADD
+    temp-reg temp-reg "datastack" context-field-offset [+] MOV
     temp-reg [] int-regs return-reg MOV ;
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
@@ -1409,8 +1404,7 @@ M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
 M:: x86 %restore-context ( temp1 temp2 -- )
     #! Load Factor stack pointers on entry from C to Factor.
     #! Also save callstack bottom!
-    temp1 "ctx" %vm-field-ptr
-    temp1 temp1 [] MOV
+    temp1 "ctx" %vm-field
     temp2 stack-reg stack-frame get total-size>> cell - [+] LEA
     temp1 "callstack-bottom" context-field-offset [+] temp2 MOV
     ds-reg temp1 "datastack" context-field-offset [+] MOV
@@ -1420,8 +1414,7 @@ M:: x86 %save-context ( temp1 temp2 -- )
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    temp1 "ctx" %vm-field-ptr
-    temp1 temp1 [] MOV
+    temp1 "ctx" %vm-field
     temp2 stack-reg cell neg [+] LEA
     temp1 "callstack-top" context-field-offset [+] temp2 MOV
     temp1 "datastack" context-field-offset [+] ds-reg MOV

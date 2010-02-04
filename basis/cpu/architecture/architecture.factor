@@ -434,6 +434,7 @@ HOOK: %set-alien-double    cpu ( ptr offset value -- )
 HOOK: %set-alien-vector    cpu ( ptr offset value rep -- )
 
 HOOK: %alien-global cpu ( dst symbol library -- )
+HOOK: %vm-field cpu ( dst fieldname -- )
 HOOK: %vm-field-ptr cpu ( dst fieldname -- )
 
 HOOK: %allot cpu ( dst size class temp -- )

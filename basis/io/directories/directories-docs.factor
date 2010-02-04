@@ -142,11 +142,6 @@ ARTICLE: "io.directories.create" "Creating directories"
 } ;
 
 ARTICLE: "delete-move-copy" "Deleting, moving, and copying files"
-"Operations for deleting and copying files come in two forms:"
-{ $list
-    { "Words named " { $snippet { $emphasis "operation" } "-file" } " which work on regular files only." }
-    { "Words named " { $snippet { $emphasis "operation" } "-tree" } " works on directory trees recursively, and also accepts regular files." }
-}
 "The operations for moving and copying files come in three flavors:"
 { $list
     { "A word named " { $snippet { $emphasis "operation" } } " which takes a source and destination path." }
@@ -175,7 +170,7 @@ $nl
 "On most operating systems, files can only be moved within the same file system. To move files between file systems, use " { $link copy-file } " followed by " { $link delete-file } " on the old name." ;
 
 ARTICLE: "io.directories" "Directory manipulation"
-"The " { $vocab-link "io.directories" } " vocabulary defines words for inspecting and manipulating directory trees."
+"The " { $vocab-link "io.directories" } " vocabulary defines words for inspecting and manipulating directories."
 { $subsections
     home
     "current-directory"

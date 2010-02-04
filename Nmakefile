@@ -61,7 +61,7 @@ DLL_OBJS = vm\os-windows-nt.obj \
 .rs.res:
 	rc $<
 
-all: factor.com factor.exe
+all: factor.com factor.exe libfactor-ffi-test.dll
 
 libfactor-ffi-test.dll: vm/ffi_test.obj
 	link $(LINK_FLAGS) /out:libfactor-ffi-test.dll /dll vm/ffi_test.obj

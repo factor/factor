@@ -129,7 +129,7 @@ ARTICLE: "escape" "Character escape codes"
 } ;
 
 ARTICLE: "syntax-strings" "Character and string syntax"
-"Factor has no distinct character type, however Unicode character value integers can be read by specifying a literal character, or an escaped representation thereof."
+"Factor has no distinct character type. Integers representing Unicode code points can be read by specifying a literal character, or an escaped representation thereof."
 { $subsections
     POSTPONE: CHAR:
     POSTPONE: "
@@ -185,7 +185,7 @@ ARTICLE: "syntax-literals" "Literals"
 $nl
 "If a quotation contains a literal object, the same literal object instance is used each time the quotation executes; that is, literals are “live”."
 $nl
-"Using mutable object literals in word definitions requires care, since if those objects are mutated, the actual word definition will be changed, which is in most cases not what you would expect. Literals should be " { $link clone } "d before being passed to word which may potentially mutate them."
+"Using mutable object literals in word definitions requires care, since if those objects are mutated, the actual word definition will be changed, which is in most cases not what you would expect. Literals should be " { $link clone } "d before being passed to a word which may potentially mutate them."
 { $subsections
     "syntax-numbers"
     "syntax-words"
@@ -537,7 +537,7 @@ HELP: IN:
 
 HELP: CHAR:
 { $syntax "CHAR: token" }
-{ $values { "token" "a literal character, escape code, or Unicode character name" } }
+{ $values { "token" "a literal character, escape code, or Unicode code point name" } }
 { $description "Adds a Unicode code point to the parse tree." }
 { $examples
     { $code

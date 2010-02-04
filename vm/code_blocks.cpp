@@ -67,8 +67,13 @@ cell factor_vm::code_block_owner(code_block *compiled)
 
 struct update_word_references_relocation_visitor {
 	factor_vm *parent;
+	bool reset_inline_caches;
 
-	explicit update_word_references_relocation_visitor(factor_vm *parent_) : parent(parent_) {}
+	update_word_references_relocation_visitor(
+		factor_vm *parent_,
+		bool reset_inline_caches_) :
+		parent(parent_),
+		reset_inline_caches(reset_inline_caches_) {}
 
 	void operator()(instruction_operand op)
 	{
@@ -85,17 +90,23 @@ struct update_word_references_relocation_visitor {
 		case RT_ENTRY_POINT_PIC:
 			{
 				code_block *compiled = op.load_code_block();
-				cell owner = parent->code_block_owner(compiled);
-				if(to_boolean(owner))
-					op.store_value(parent->compute_entry_point_pic_address(owner));
+				if(reset_inline_caches || !compiled->pic_p())
+				{
+					cell owner = parent->code_block_owner(compiled);
+					if(to_boolean(owner))
+						op.store_value(parent->compute_entry_point_pic_address(owner));
+				}
 				break;
 			}
 		case RT_ENTRY_POINT_PIC_TAIL:
 			{
 				code_block *compiled = op.load_code_block();
-				cell owner = parent->code_block_owner(compiled);
-				if(to_boolean(owner))
-					op.store_value(parent->compute_entry_point_pic_tail_address(owner));
+				if(reset_inline_caches || !compiled->pic_p())
+				{
+					cell owner = parent->code_block_owner(compiled);
+					if(to_boolean(owner))
+						op.store_value(parent->compute_entry_point_pic_tail_address(owner));
+				}
 				break;
 			}
 		default:
@@ -108,7 +119,7 @@ struct update_word_references_relocation_visitor {
 dlsyms, and words. For all other words in the code heap, we only need
 to update references to other words, without worrying about literals
 or dlsyms. */
-void factor_vm::update_word_references(code_block *compiled)
+void factor_vm::update_word_references(code_block *compiled, bool reset_inline_caches)
 {
 	if(code->uninitialized_p(compiled))
 		initialize_code_block(compiled);
@@ -119,11 +130,11 @@ void factor_vm::update_word_references(code_block *compiled)
 	   are referenced after this is done. So instead of polluting
 	   the code heap with dead PICs that will be freed on the next
 	   GC, we add them to the free list immediately. */
-	else if(compiled->pic_p())
+	else if(reset_inline_caches && compiled->pic_p())
 		code->free(compiled);
 	else
 	{
-		update_word_references_relocation_visitor visitor(this);
+		update_word_references_relocation_visitor visitor(this,reset_inline_caches);
 		compiled->each_instruction_operand(visitor);
 		compiled->flush_icache();
 	}
@@ -272,20 +283,23 @@ struct initial_code_block_visitor {
 };
 
 /* Perform all fixups on a code block */
-void factor_vm::initialize_code_block(code_block *compiled)
+void factor_vm::initialize_code_block(code_block *compiled, cell literals)
 {
-	std::map<code_block *,cell>::iterator iter = code->uninitialized_blocks.find(compiled);
-
-	initial_code_block_visitor visitor(this,iter->second);
+	initial_code_block_visitor visitor(this,literals);
 	compiled->each_instruction_operand(visitor);
 	compiled->flush_icache();
-
-	code->uninitialized_blocks.erase(iter);
 
 	/* next time we do a minor GC, we have to trace this code block, since
 	the newly-installed instruction operands might point to literals in
 	nursery or aging */
 	code->write_barrier(compiled);
+}
+
+void factor_vm::initialize_code_block(code_block *compiled)
+{
+	std::map<code_block *,cell>::iterator iter = code->uninitialized_blocks.find(compiled);
+	initialize_code_block(compiled,iter->second);
+	code->uninitialized_blocks.erase(iter);
 }
 
 /* Fixup labels. This is done at compile time, not image load time */

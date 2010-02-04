@@ -135,7 +135,7 @@ IN: bootstrap.syntax
 
     "DEFER:" [
         scan current-vocab create
-        [ fake-definition ] [ set-word ] [ [ undefined ] define ] tri
+        [ fake-definition ] [ set-word ] [ undefined-def define ] tri
     ] define-core-syntax
     
     "ALIAS:" [

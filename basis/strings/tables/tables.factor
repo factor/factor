@@ -11,11 +11,9 @@ IN: strings.tables
 : max-length ( seq -- n )
     [ length ] [ max ] map-reduce ;
 
-: format-row ( seq ? -- seq )
-    [
-        dup max-length
-        '[ _ "" pad-tail ] map
-    ] unless ;
+: format-row ( seq -- seq )
+    dup max-length
+    '[ _ "" pad-tail ] map ;
 
 : format-column ( seq ? -- seq )
     [
@@ -26,5 +24,5 @@ IN: strings.tables
 PRIVATE>
 
 : format-table ( table -- seq )
-    [ [ [ string-lines ] map ] dip format-row flip ] map-last concat
+    [ [ string-lines ] map format-row flip ] map concat
     flip [ format-column ] map-last flip [ " " join ] map ;

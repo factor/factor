@@ -556,6 +556,9 @@ FUNCTION: test_struct_14 ffi_test_44 ( ) ; inline
 
 [ ] [ stack-frame-bustage 2drop ] unit-test
 
+! C99 tests
+os windows? [
+
 FUNCTION: complex-float ffi_test_45 ( int x ) ;
 
 [ C{ 3.0 0.0 } ] [ 3 ffi_test_45 ] unit-test
@@ -584,6 +587,8 @@ FUNCTION: short ffi_test_48 ( bool-field-test x ) ;
         123 >>parents
     ffi_test_48
 ] unit-test
+
+] unless
 
 ! Regression: calling an undefined function would raise a protection fault
 FUNCTION: void this_does_not_exist ( ) ;

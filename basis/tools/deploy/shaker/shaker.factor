@@ -106,18 +106,12 @@ IN: tools.deploy.shaker
 
 : strip-word-props ( stripped-props words -- )
     "Stripping word properties" show
-    [
-        swap '[
-            [
-                [ drop _ member? not ] assoc-filter sift-assoc
-                >alist f like
-            ] change-props drop
-        ] each
-    ] [
-        H{ } clone '[
-            [ [ _ [ ] cache ] map ] change-props drop
-        ] each
-    ] bi ;
+    swap '[
+        [
+            [ drop _ member? not ] assoc-filter sift-assoc
+            >alist f like
+        ] change-props drop
+    ] each ;
 
 : stripped-word-props ( -- seq )
     [

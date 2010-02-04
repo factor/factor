@@ -76,7 +76,7 @@ M: hook-generic synopsis*
         [ stack-effect. ]
     } cleave ;
 
-M: method-body synopsis*
+M: method synopsis*
     [ definer. ]
     [ "method-class" word-prop pprint-word ]
     [ "method-generic" word-prop pprint-word ] tri ;

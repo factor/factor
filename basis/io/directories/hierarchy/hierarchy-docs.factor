@@ -26,6 +26,11 @@ HELP: copy-trees-into
 ARTICLE: "io.directories.hierarchy" "Directory hierarchy manipulation"
 "The " { $vocab-link "io.directories.hierarchy" } " vocabulary defines words for operating on directory hierarchies recursively."
 $nl
+"There is a naming scheme used by " { $vocab-link "io.directories" } " and " { $vocab-link "io.directories.hierarchy" } ". Operations for deleting and copying files come in two forms:"
+{ $list
+    { "Words named " { $snippet { $emphasis "operation" } "-file" } " which work on regular files only." }
+    { "Words named " { $snippet { $emphasis "operation" } "-tree" } " works on directory trees recursively, and also accepts regular files." }
+}
 "Deleting directory trees recursively:"
 { $subsections delete-tree }
 "Copying directory trees recursively:"
