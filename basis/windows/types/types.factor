@@ -40,7 +40,7 @@ TYPEDEF: intptr_t            LONG_PTR
 TYPEDEF: intptr_t*           PLONG_PTR
 
 TYPEDEF: uint                ULONG
-TYPEDEF: void*               ULONG_PTR
+TYPEDEF: uintptr_t           ULONG_PTR
 TYPEDEF: void*               PULONG_PTR
 
 TYPEDEF: void                VOID
