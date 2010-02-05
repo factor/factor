@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov, Alex Chapman.
+! Copyright (C) 2005, 2010 Slava Pestov, Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays alien alien.c-types
 alien.arrays alien.strings kernel math namespaces parser
@@ -22,7 +22,7 @@ SYNTAX: CALLBACK:
     (CALLBACK:) define-inline ;
 
 SYNTAX: TYPEDEF:
-    scan-c-type CREATE-C-TYPE typedef ;
+    scan-c-type CREATE-C-TYPE dup save-location typedef ;
 
 SYNTAX: C-ENUM:
     ";" parse-tokens
