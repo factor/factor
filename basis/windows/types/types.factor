@@ -37,11 +37,9 @@ TYPEDEF: int                 HFILE
 TYPEDEF: long                LONG
 TYPEDEF: long*               LPLONG
 TYPEDEF: intptr_t            LONG_PTR
-TYPEDEF: intptr_t*           PLONG_PTR
 
 TYPEDEF: uint                ULONG
 TYPEDEF: uintptr_t           ULONG_PTR
-TYPEDEF: void*               PULONG_PTR
 
 TYPEDEF: void                VOID
 TYPEDEF: void*               PVOID
@@ -85,7 +83,6 @@ TYPEDEF: TCHAR       TBYTE
 
 TYPEDEF: WORD                ATOM
 TYPEDEF: BYTE                BOOLEAN
-TYPEDEF: DWORD               COLORREF
 TYPEDEF: ULONGLONG           DWORDLONG
 TYPEDEF: ULONG_PTR           DWORD_PTR
 TYPEDEF: PVOID               HANDLE
@@ -132,7 +129,6 @@ TYPEDEF: DWORD               LGRPID
 TYPEDEF: LONG_PTR            LPARAM
 TYPEDEF: BOOL*               LPBOOL
 TYPEDEF: BYTE*               LPBYTE
-TYPEDEF: DWORD*              LPCOLORREF
 TYPEDEF: WCHAR*              LPCWSTR
 ! TYPEDEF: WCHAR*              LPWSTR
 
@@ -196,8 +192,6 @@ TYPEDEF: WCHAR*              PWSTR
 TYPEDEF: HANDLE              SC_HANDLE
 TYPEDEF: LPVOID              SC_LOCK
 TYPEDEF: HANDLE              SERVICE_STATUS_HANDLE
-TYPEDEF: ULONG_PTR           SIZE_T
-TYPEDEF: LONG_PTR            SSIZE_T
 TYPEDEF: LONGLONG            USN
 TYPEDEF: UINT_PTR            WPARAM
 
@@ -332,7 +326,6 @@ TYPEDEF: RECT* LPRECT
 TYPEDEF: PIXELFORMATDESCRIPTOR PFD
 TYPEDEF: PFD* LPPFD
 TYPEDEF: HANDLE HGLRC
-TYPEDEF: HANDLE HRGN
 
 TYPEDEF: void* PWNDCLASS
 TYPEDEF: void* PWNDCLASSEX
