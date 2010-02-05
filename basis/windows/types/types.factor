@@ -36,8 +36,8 @@ TYPEDEF: int                 HFILE
 
 TYPEDEF: long                LONG
 TYPEDEF: long*               LPLONG
-TYPEDEF: long                LONG_PTR
-TYPEDEF: long*               PLONG_PTR
+TYPEDEF: intptr_t            LONG_PTR
+TYPEDEF: intptr_t*           PLONG_PTR
 
 TYPEDEF: uint                ULONG
 TYPEDEF: void*               ULONG_PTR
@@ -54,9 +54,6 @@ TYPEDEF: intptr_t    HALF_PTR
 TYPEDEF: intptr_t    UHALF_PTR
 TYPEDEF: intptr_t    INT_PTR
 TYPEDEF: intptr_t    UINT_PTR
-
-TYPEDEF: int         LONG_PTR
-TYPEDEF: ulong       ULONG_PTR
 
 TYPEDEF: int         INT32
 TYPEDEF: uint        UINT32
