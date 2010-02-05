@@ -8,93 +8,109 @@ io io.encodings.ascii io.files io.files.temp kernel locals math
 math.matrices math.vectors.simd math.parser math.vectors
 method-chains namespaces sequences splitting threads ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats specialized-arrays
-specialized-vectors literals fry xml
-xml.traversal sequences.deep destructors math.bitwise opengl.gl
-game.models.obj game.models.loader game.models.collada ;
+specialized-vectors literals fry
+sequences.deep destructors math.bitwise opengl.gl
+game.models game.models.obj game.models.loader game.models.collada
+prettyprint images.tga ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-VECTOR: uint
 IN: model-viewer
 
-GLSL-SHADER: model-vertex-shader vertex-shader
-uniform mat4 mv_matrix, p_matrix;
-uniform vec3 light_position;
+GLSL-SHADER: obj-vertex-shader vertex-shader
+uniform mat4 mv_matrix;
+uniform mat4 p_matrix;
 
 attribute vec3 POSITION;
+attribute vec3 TEXCOORD;
 attribute vec3 NORMAL;
-attribute vec2 TEXCOORD;
 
-varying vec2 texit;
-varying vec3 norm;
+varying vec2 texcoord_fs;
+varying vec3 normal_fs;
+varying vec3 world_pos_fs;
 
 void main()
 {
     vec4 position = mv_matrix * vec4(POSITION, 1.0);
-    gl_Position = p_matrix * position;
-    texit = TEXCOORD;
-    norm = NORMAL;
+    gl_Position   = p_matrix * position;
+    world_pos_fs  = POSITION;
+    texcoord_fs   = TEXCOORD;
+    normal_fs     = NORMAL;
 }
 ;
 
-GLSL-SHADER: model-fragment-shader fragment-shader
-varying vec2 texit;
-varying vec3 norm;
-void main()
-{
-    gl_FragColor = vec4(texit, 0, 1) + vec4(norm, 1);
-}
-;
-
-GLSL-PROGRAM: model-program
-    model-vertex-shader model-fragment-shader ;
-
-GLSL-SHADER: debug-vertex-shader vertex-shader
+GLSL-SHADER: obj-fragment-shader fragment-shader
 uniform mat4 mv_matrix, p_matrix;
-uniform vec3 light_position;
-
-attribute vec3 POSITION;
-attribute vec3 COLOR;
-varying vec4 color;
-
+uniform sampler2D map_Ka;
+uniform sampler2D map_bump;
+uniform vec3 Ka;
+uniform vec3 view_pos;
+uniform vec3 light;
+varying vec2 texcoord_fs;
+varying vec3 normal_fs;
+varying vec3 world_pos_fs;
 void main()
 {
-    gl_Position = p_matrix * mv_matrix * vec4(POSITION, 1.0);
-    color = vec4(COLOR, 1);
+    vec4 d = texture2D(map_Ka, texcoord_fs.xy);
+    vec3 b = texture2D(map_bump, texcoord_fs.xy).xyz;
+    vec3 n = normal_fs;
+    vec3 v = normalize(view_pos - world_pos_fs);
+    vec3 l = normalize(light);
+    vec3 h = normalize(v + l);
+    float cosTh = saturate(dot(n, l));
+    gl_FragColor = d * cosTh
+                 + d * 0.5 * cosTh * pow(saturate(dot(n, h)), 10.0) ;
 }
 ;
 
-GLSL-SHADER: debug-fragment-shader fragment-shader
-varying vec4 color;
-void main()
-{
-    gl_FragColor = color;
-}
-;
-
-GLSL-PROGRAM: debug-program debug-vertex-shader debug-fragment-shader ;
+GLSL-PROGRAM: obj-program
+    obj-vertex-shader obj-fragment-shader ;
 
 UNIFORM-TUPLE: model-uniforms < mvp-uniforms
-    { "light-position" vec3-uniform  f } ;
+    { "map_Ka"    texture-uniform   f }
+    { "map_bump"  texture-uniform   f }
+    { "Ka"        vec3-uniform      f }
+    { "light"     vec3-uniform      f }
+    { "view_pos"  vec3-uniform      f }
+    ;
 
 TUPLE: model-state
     models
     vertex-arrays
-    index-vectors ;
+    index-vectors
+    textures
+    bumps
+    kas ;
 
-TUPLE: model-world < wasd-world
-    { model-state model-state } ;
+TUPLE: model-world < wasd-world model-path model-state ;
 
-VERTEX-FORMAT: model-vertex
-    { "POSITION"   float-components 3 f }
-    { "NORMAL" float-components 3 f }
-    { "TEXCOORD" float-components 2 f } ;
+TUPLE: vbo
+    vertex-buffer
+    index-buffer index-count vertex-format texture bump ka ;
 
-VERTEX-FORMAT: debug-vertex
-    { "POSITION" float-components 3 f }
-    { "COLOR"    float-components 3 f } ;
+: white-image ( -- image )
+    { 1 1 } BGR ubyte-components f
+    B{ 255 255 255 } image boa ;
 
-TUPLE: vbo vertex-buffer index-buffer index-count vertex-format ;
-
+: up-image ( -- image )
+    { 1 1 } BGR ubyte-components f
+    B{ 0 0 0 } image boa ;
+        
+: make-texture ( pathname alt -- texture )
+    swap [ nip load-image ] [ ] if*
+    [
+        [ component-order>> ]
+        [ component-type>> ] bi
+        T{ texture-parameters
+           { wrap repeat-texcoord }
+           { min-filter filter-linear }
+           { min-mipmap-filter f } }
+        <texture-2d>
+    ]
+    [
+        0 swap [ allocate-texture-image ] 3keep 2drop
+    ] bi ;
+        
 : <model-buffers> ( models -- buffers )
     [
         {
@@ -102,110 +118,104 @@ TUPLE: vbo vertex-buffer index-buffer index-count vertex-format ;
             [ index-buffer>> underlying>> static-upload draw-usage index-buffer byte-array>buffer ]
             [ index-buffer>> length ]
             [ vertex-format>> ]
+            [ material>> ambient-map>> white-image make-texture ]
+            [ material>> bump-map>> up-image make-texture ]
+            [ material>> ambient-reflectivity>> ]
         } cleave vbo boa
     ] map ;
 
 : fill-model-state ( model-state -- )
     dup models>> <model-buffers>
-    [
-        [
-            [ vertex-buffer>> model-program <program-instance> ]
-            [ vertex-format>> ] bi buffer>vertex-array
-        ] map >>vertex-arrays drop
-    ]
-    [
-        [
-            [ index-buffer>> ] [ index-count>> ] bi
-            '[ _ 0 <buffer-ptr> _ uint-indexes <index-elements> ] call
-        ] map >>index-vectors drop
-    ] 2bi ;
-
-: model-files ( -- files )
-    { "C:/Users/erikc/Downloads/test2.dae"
-      "C:/Users/erikc/Downloads/Sponza.obj" } ;
-
-: <model-state> ( -- model-state )
-    model-state new
-    model-files [ load-models ] [ append ] map-reduce >>models ;
-
-M: model-world begin-game-world
-    init-gpu
-    { 0.0 0.0 2.0 } 0 0 set-wasd-view
-    <model-state> [ fill-model-state drop ] [ >>model-state drop ] 2bi ;
-
-: <model-uniforms> ( world -- uniforms )
-    [ wasd-mv-matrix ] [ wasd-p-matrix ] bi
-    { -10000.0 10000.0 10000.0 } ! light position
-    model-uniforms boa ;
-
-: draw-line ( world from to color -- )
-    [ 3 head ] tri@ dup -rot append -rot append swap append >float-array
-    underlying>> stream-upload draw-usage vertex-buffer byte-array>buffer
-    debug-program <program-instance> debug-vertex buffer>vertex-array
-    
-    { 0 1 } >uint-array stream-upload draw-usage index-buffer byte-array>buffer
-    2 '[ _ 0 <buffer-ptr> _ uint-indexes <index-elements> ] call
-    
-    rot <model-uniforms>
-
     {
-        { "primitive-mode"     [ 3drop lines-mode ] }
-        { "uniforms"           [ nip nip ] }
-        { "vertex-array"       [ drop drop ] }
-        { "indexes"            [ drop nip ] }
-    } 3<render-set> render ;
+        [
+            [
+                [ vertex-buffer>> obj-program <program-instance> ]
+                [ vertex-format>> ] bi buffer>vertex-array
+            ] map >>vertex-arrays drop
+        ]
+        [
+            [
+                [ index-buffer>> ] [ index-count>> ] bi
+                '[ _ 0 <buffer-ptr> _ uint-indexes <index-elements> ] call
+            ] map >>index-vectors drop
+        ]
+        [ [ texture>> ] map >>textures drop ]
+        [ [ bump>> ] map >>bumps drop ]
+        [ [ ka>> ] map >>kas drop ]
+    } 2cleave ;
 
-: draw-lines ( world lines -- )
-    3 <groups> [ first3 draw-line ] with each ; inline
+: <model-state> ( model-world -- model-state )
+    model-path>> 1array model-state new swap
+    [ load-models ] [ append ] map-reduce >>models ;
 
-: draw-axes ( world -- )
-    { { 0 0 0 } { 1 0 0 } { 1 0 0 }
-      { 0 0 0 } { 0 1 0 } { 0 1 0 }
-      { 0 0 0 } { 0 0 1 } { 0 0 1 } } draw-lines ;
-          
-: draw-model ( world -- )
+:: <model-uniforms> ( world -- uniforms )
+    world model-state>>
+    [ textures>> ] [ bumps>> ] [ kas>> ] tri
+    [| texture bump ka |
+        world wasd-mv-matrix
+        world wasd-p-matrix
+        texture bump ka
+        { 0.5 0.5 0.5 }
+        world location>>
+        model-uniforms boa
+    ] 3map ;
+
+: clear-screen ( -- )
     0 0 0 0 glClearColor 
     1 glClearDepth
     HEX: ffffffff glClearStencil
-    { GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT GL_STENCIL_BUFFER_BIT } flags glClear
-
+    { GL_COLOR_BUFFER_BIT
+      GL_DEPTH_BUFFER_BIT
+      GL_STENCIL_BUFFER_BIT } flags glClear ;
+    
+: draw-model ( world -- )
+    clear-screen
+    face-ccw cull-back <triangle-cull-state> set-gpu-state
+    cmp-less <depth-state> set-gpu-state
+    [ model-state>> vertex-arrays>> ]
+    [ model-state>> index-vectors>> ]
+    [ <model-uniforms> ]
+    tri
     [
-        triangle-fill dup t <triangle-state> set-gpu-state
-        face-ccw cull-back <triangle-cull-state> set-gpu-state
-        
-        cmp-less <depth-state> set-gpu-state
-        [ model-state>> vertex-arrays>> ]
-        [ model-state>> index-vectors>> ]
-        [ <model-uniforms> ]
-        tri
-        [
-            {
-                { "primitive-mode"     [ 3drop triangles-mode ] }
-                { "uniforms"           [ nip nip ] }
-                { "vertex-array"       [ drop drop ] }
-                { "indexes"            [ drop nip ] }
-            } 3<render-set> render
-        ] curry 2each
-    ]
-    [
-        cmp-always <depth-state> set-gpu-state
-        draw-axes
-    ]
-    bi ;
+        {
+            { "primitive-mode"     [ 3drop triangles-mode ] }
+            { "uniforms"           [ nip nip ] }
+            { "vertex-array"       [ drop drop ] }
+            { "indexes"            [ drop nip ] }
+        } 3<render-set> render
+    ] 3each ;
 
-M: model-world draw-world*
-    draw-model ;
+TUPLE: model-attributes < game-attributes model-path ;
 
+M: model-world draw-world* draw-model ;
 M: model-world wasd-movement-speed drop 1/4. ;
 M: model-world wasd-near-plane drop 1/32. ;
 M: model-world wasd-far-plane drop 1024.0 ;
+M: model-world begin-game-world
+    init-gpu
+    { 0.0 0.0 2.0 } 0 0 set-wasd-view
+    [ <model-state> [ fill-model-state ] keep ] [ (>>model-state) ] bi ;
+M: model-world apply-world-attributes
+    {
+        [ model-path>> >>model-path ]
+        [ call-next-method ]
+    } cleave ;
 
-GAME: model-viewer {
-        { world-class model-world }
-        { title "Model Viewer" }
-        { pixel-format-attributes { windowed double-buffered } }
-        { grab-input? t }
-        { use-game-input? t }
-        { pref-dim { 1024 768 } }
-        { tick-interval-micros $[ 60 fps ] }
-    } ;
+:: open-model-viewer ( model-path -- )
+    [
+        f
+        T{ model-attributes
+           { world-class model-world }
+           { grab-input? t }
+           { title "Model Viewer" }
+           { pixel-format-attributes
+             { windowed double-buffered }
+           }
+           { pref-dim { 1024 768 } }
+           { tick-interval-micros 16666 }
+           { use-game-input? t }
+           { model-path model-path }
+        }
+        clone
+        open-window
+    ] with-ui ;
