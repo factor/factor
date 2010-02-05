@@ -492,6 +492,15 @@ struct factor_vm
 	//io
 	void init_c_io();
 	void io_error();
+	size_t safe_fread(void *ptr, size_t size, size_t nitems, FILE *stream);
+	size_t safe_fwrite(void *ptr, size_t size, size_t nitems, FILE *stream);
+	void safe_fclose(FILE *stream);
+	FILE* safe_fopen(char *filename, char *mode);
+	int safe_fgetc(FILE *stream);
+	void safe_fputc(int c, FILE* stream);
+	void safe_fflush(FILE *stream);
+	int safe_ftell(FILE *stream);
+	void safe_fseek(FILE *stream, off_t offset, int whence);
 	void primitive_fopen();
 	FILE *pop_file_handle();
 	void primitive_fgetc();
