@@ -1,6 +1,6 @@
 USING: accessors tools.profiler tools.test kernel memory math
 threads alien alien.c-types tools.profiler.private sequences
-compiler.test compiler.units words ;
+compiler.test compiler.units words arrays ;
 IN: tools.profiler.tests
 
 [ t ] [
@@ -9,7 +9,7 @@ IN: tools.profiler.tests
     \ length counter>> =
 ] unit-test
 
-[ ] [ [ 10 [ gc ] times ] profile ] unit-test
+[ ] [ [ 3 [ gc ] times ] profile ] unit-test
 
 [ ] [ [ 1000000 sleep ] profile ] unit-test 
 
@@ -72,3 +72,8 @@ IN: tools.profiler.tests
     ] profile
     counter>>
 ] unit-test
+
+! unwind_native_frames() would fail if profiling was enabled
+! because the jit-profiling stub would clobber a parameter register
+! on x86-64
+[ [ -10 f <array> ] profile ] must-fail

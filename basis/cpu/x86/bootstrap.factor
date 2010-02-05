@@ -56,15 +56,15 @@ big-endian off
 
 [
     ! Load word
-    temp0 0 MOV rc-absolute-cell rt-literal jit-rel
+    safe-reg 0 MOV rc-absolute-cell rt-literal jit-rel
     ! Bump profiling counter
-    temp0 profile-count-offset [+] 1 tag-fixnum ADD
+    safe-reg profile-count-offset [+] 1 tag-fixnum ADD
     ! Load word->code
-    temp0 temp0 word-code-offset [+] MOV
+    safe-reg safe-reg word-code-offset [+] MOV
     ! Compute word entry point
-    temp0 compiled-header-size ADD
+    safe-reg compiled-header-size ADD
     ! Jump to entry point
-    temp0 JMP
+    safe-reg JMP
 ] jit-profiling jit-define
 
 [
