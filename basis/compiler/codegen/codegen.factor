@@ -24,24 +24,12 @@ H{ } clone insn-counts set-global
 
 GENERIC: generate-insn ( insn -- )
 
-TUPLE: asm label code calls ;
-
-SYMBOL: calls
-
-: add-call ( word -- )
-    #! Compile this word later.
-    calls get push ;
-
 ! Mapping _label IDs to label instances
 SYMBOL: labels
 
-: init-generator ( -- )
-    H{ } clone labels set
-    V{ } clone calls set ;
-
-: generate-insns ( asm -- code )
+: generate ( mr -- code )
     dup label>> [
-        init-generator
+        H{ } clone labels set
         instructions>> [
             [ class insn-counts get inc-at ]
             [ generate-insn ]
@@ -49,21 +37,11 @@ SYMBOL: labels
         ] each
     ] with-fixup ;
 
-: generate ( mr -- asm )
-    [
-        [ label>> ] [ generate-insns ] bi calls get
-        asm boa
-    ] with-scope ;
-
 : lookup-label ( id -- label )
     labels get [ drop <label> ] cache ;
 
 ! Special cases
 M: ##no-tco generate-insn drop ;
-
-M: ##call generate-insn word>> [ add-call ] [ %call ] bi ;
-
-M: ##jump generate-insn word>> [ add-call ] [ %jump ] bi ;
 
 M: _dispatch-label generate-insn
     label>> lookup-label
@@ -104,6 +82,8 @@ CODEGEN: ##peek %peek
 CODEGEN: ##replace %replace
 CODEGEN: ##inc-d %inc-d
 CODEGEN: ##inc-r %inc-r
+CODEGEN: ##call %call
+CODEGEN: ##jump %jump
 CODEGEN: ##return %return
 CODEGEN: ##slot %slot
 CODEGEN: ##slot-imm %slot-imm

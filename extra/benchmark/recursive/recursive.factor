@@ -32,6 +32,6 @@ IN: benchmark.recursive
 
 HINTS: recursive fixnum ;
 
-: recursive-main ( -- ) 11 recursive ;
+: recursive-main ( -- ) 10 recursive ;
 
 MAIN: recursive-main

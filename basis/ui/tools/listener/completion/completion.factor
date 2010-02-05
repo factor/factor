@@ -119,7 +119,7 @@ M: object completion-string present ;
 : method-completion-string ( word -- string )
     "method-generic" word-prop present ;
 
-M: method-body completion-string method-completion-string ;
+M: method completion-string method-completion-string ;
 
 GENERIC# accept-completion-hook 1 ( item popup -- )
 

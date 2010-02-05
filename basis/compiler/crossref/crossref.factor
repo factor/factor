@@ -22,9 +22,13 @@ generic-call-site-crossref [ H{ } clone ] initialize
 : conditional-dependencies-of ( word -- assoc )
     effect-dependencies-of [ nip conditional-dependency dependency>= ] assoc-filter ;
 
-: compiled-usages ( assoc -- assocs )
+: outdated-definition-usages ( assoc -- assocs )
     [ drop word? ] assoc-filter
-    [ [ drop definition-dependencies-of ] { } assoc>map ] keep suffix ;
+    [ drop definition-dependencies-of ] { } assoc>map ;
+
+: outdated-effect-usages ( assoc -- assocs )
+    [ drop word? ] assoc-filter
+    [ drop effect-dependencies-of ] { } assoc>map ;
 
 : dependencies-satisfied? ( word cache -- ? )
     [ "dependency-checks" word-prop ] dip

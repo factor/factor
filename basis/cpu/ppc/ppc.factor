@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sequences kernel combinators make math
 math.order math.ranges system namespaces locals layouts words
@@ -57,10 +57,11 @@ CONSTANT: vm-reg 15
 
 : %load-vm-addr ( reg -- ) vm-reg MR ;
 
-: %load-vm-field-addr ( reg symbol -- )
-    [ vm-reg ] dip vm-field-offset ADDI ;
+M: ppc %vm-field ( dst field -- )
+    [ vm-reg ] dip vm-field-offset LWZ ;
 
-M: ppc %vm-field-ptr ( dst field -- ) %load-vm-field-addr ;
+M: ppc %vm-field-ptr ( dst field -- )
+    [ vm-reg ] dip vm-field-offset ADDI ;
 
 GENERIC: loc-reg ( loc -- reg )
 
@@ -383,7 +384,7 @@ M: ppc %set-alien-float -rot STFS ;
 M: ppc %set-alien-double -rot STFD ;
 
 : load-zone-ptr ( reg -- )
-    "nursery" %load-vm-field-addr ;
+    "nursery" %vm-field-ptr ;
 
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
     [ drop load-zone-ptr ] [ swap 0 LWZ ] 2bi ;
@@ -601,26 +602,19 @@ M: ppc %push-stack ( -- )
     ds-reg ds-reg 4 ADDI
     int-regs return-reg ds-reg 0 STW ;
 
-:: %load-context-datastack ( dst -- )
-    ! Load context struct
-    dst "ctx" %vm-field-ptr
-    dst dst 0 LWZ
-    ! Load context datastack pointer
-    dst dst "datastack" context-field-offset ADDI ;
-
 M: ppc %push-context-stack ( -- )
-    11 %load-context-datastack
-    12 11 0 LWZ
+    11 "ctx" %vm-field
+    12 11 "datastack" context-field-offset LWZ
     12 12 4 ADDI
-    12 11 0 STW
+    12 11 "datastack" context-field-offset STW
     int-regs return-reg 12 0 STW ;
 
 M: ppc %pop-context-stack ( -- )
-    11 %load-context-datastack
-    12 11 0 LWZ
+    11 "ctx" %vm-field
+    12 11 "datastack" context-field-offset LWZ
     int-regs return-reg 12 0 LWZ
     12 12 4 SUBI
-    12 11 0 STW ;
+    12 11 "datastack" context-field-offset STW ;
 
 M: ppc %unbox ( n rep func -- )
     ! Value must be in r3
@@ -682,19 +676,17 @@ M: ppc %box-large-struct ( n c-type -- )
     "from_value_struct" f %alien-invoke ;
 
 M:: ppc %restore-context ( temp1 temp2 -- )
-    temp1 "ctx" %load-vm-field-addr
-    temp1 temp1 0 LWZ
+    temp1 "ctx" %vm-field
     temp2 1 stack-frame get total-size>> ADDI
     temp2 temp1 "callstack-bottom" context-field-offset STW
-    ds-reg temp1 8 LWZ
-    rs-reg temp1 12 LWZ ;
+    ds-reg temp1 "datastack" context-field-offset LWZ
+    rs-reg temp1 "retainstack" context-field-offset LWZ ;
 
 M:: ppc %save-context ( temp1 temp2 -- )
-    temp1 "ctx" %load-vm-field-addr
-    temp1 temp1 0 LWZ
-    1 temp1 0 STW
-    ds-reg temp1 8 STW
-    rs-reg temp1 12 STW ;
+    temp1 "ctx" %vm-field
+    1 temp1 "callstack-top" context-field-offset STW
+    ds-reg temp1 "datastack" context-field-offset STW
+    rs-reg temp1 "retainstack" context-field-offset STW ;
 
 M: ppc %alien-invoke ( symbol dll -- )
     [ 11 ] 2dip %alien-global 11 MTLR BLRL ;

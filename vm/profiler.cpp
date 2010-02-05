@@ -55,7 +55,7 @@ void factor_vm::set_profiling(bool profiling)
 		update_word_entry_point(word.untagged());
 	}
 
-	update_code_heap_words();
+	update_code_heap_words(false);
 }
 
 void factor_vm::primitive_profiling()

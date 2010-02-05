@@ -1,6 +1,7 @@
 USING: alien alien.syntax alien.c-types alien.parser
 eval kernel tools.test sequences system libc alien.strings
-io.encodings.utf8 math.constants classes.struct classes ;
+io.encodings.utf8 math.constants classes.struct classes
+accessors compiler.units ;
 IN: alien.c-types.tests
 
 CONSTANT: xyz 123
@@ -100,3 +101,12 @@ DEFER: struct-redefined
     \ struct-redefined class?
 ] unit-test
 
+[
+    "IN: alien.c-types.tests
+    USE: alien.syntax
+    USE: alien.c-types
+    TYPEDEF: int type-redefinition-test
+    TYPEDEF: int type-redefinition-test" eval( -- )
+]
+[ error>> error>> redefine-error? ]
+must-fail-with

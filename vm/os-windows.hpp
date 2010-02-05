@@ -39,11 +39,6 @@ typedef wchar_t vm_char;
 
 #define OPEN_READ(path) _wfopen((path),L"rb")
 #define OPEN_WRITE(path) _wfopen((path),L"wb")
-#define MOVE_FILE(path1,path2)\
-do {\
-	if(MoveFileEx((path1),(path2),MOVEFILE_REPLACE_EXISTING) == false)\
-		std::cout << "MoveFile() failed: error " << GetLastError() << std::endl;\
-} while(0)
 
 /* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
 #define EPOCH_OFFSET 0x019db1ded53e8000LL
@@ -55,5 +50,6 @@ u64 system_micros();
 u64 nano_count();
 void sleep_nanos(u64 nsec);
 long getpagesize();
+void move_file(const vm_char *path1, const vm_char *path2);
 
 }

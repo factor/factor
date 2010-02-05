@@ -101,9 +101,9 @@ ERROR: bad-slot-name class slot ;
     over [ slot-named* ] dip check-slot-exists drop ;
 
 : assoc>object ( class slots values -- tuple )
-    [ [ [ initial>> ] map ] keep ] dip
+    [ [ [ initial>> ] map <enum> ] keep ] dip
     swap [ [ slot-named-checked ] curry dip ] curry assoc-map
-    [ dup <enum> ] dip update boa>object ;
+    assoc-union! seq>> boa>object ;
 
 : parse-tuple-literal-slots ( class slots -- tuple )
     scan {

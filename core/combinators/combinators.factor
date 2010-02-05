@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2009 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2006, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays sequences sequences.private math.private
 kernel kernel.private math assocs quotations vectors
@@ -17,16 +17,22 @@ M: object throw
 
 PRIVATE>
 
-ERROR: wrong-values effect ;
+ERROR: wrong-values quot effect ;
 
 ! We can't USE: effects here so we forward reference slots instead
 SLOT: in
 SLOT: out
 
 : call-effect ( quot effect -- )
-    [ [ datastack ] dip dip ] dip
-    [ in>> length ] [ out>> length ] [ ] tri [ check-datastack ] dip
-    [ wrong-values ] curry unless ;
+    ! Don't use fancy combinators here, since this word always
+    ! runs unoptimized
+    [ datastack ] 2dip
+    2dup [
+        [ dip ] dip
+        dup in>> length swap out>> length
+        check-datastack
+    ] 2dip rot
+    [ 2drop ] [ wrong-values ] if ;
 
 : execute-effect ( word effect -- )
     [ [ execute ] curry ] dip call-effect ;

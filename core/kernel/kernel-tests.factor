@@ -127,38 +127,38 @@ IN: kernel.tests
 
 ! Test traceback accuracy
 : last-frame ( -- pair )
-    error-continuation get call>> callstack>array 4 head* 2 tail* ;
+    error-continuation get call>> callstack>array 6 head* 3 tail* ;
 
 [
-    { [ 1 2 [ 3 throw ] call 4 ] 3 }
+    { [ 1 2 [ 3 throw ] call 4 ] [ 1 2 [ 3 throw ] call 4 ] 3 }
 ] [
     [ [ 1 2 [ 3 throw ] call 4 ] call ] ignore-errors
     last-frame
 ] unit-test
 
 [
-    { [ 1 2 [ 3 throw ] dip 4 ] 3 }
+    { [ 1 2 [ 3 throw ] dip 4 ] [ 1 2 [ 3 throw ] dip 4 ] 3 }
 ] [
     [ [ 1 2 [ 3 throw ] dip 4 ] call ] ignore-errors
     last-frame
 ] unit-test
 
 [
-    { [ 1 2 3 throw [ ] call 4 ] 3 }
+    { [ 1 2 3 throw [ ] call 4 ] [ 1 2 3 throw [ ] call 4 ] 3 }
 ] [
     [ [ 1 2 3 throw [ ] call 4 ] call ] ignore-errors
     last-frame
 ] unit-test
 
 [
-    { [ 1 2 3 throw [ ] dip 4 ] 3 }
+    { [ 1 2 3 throw [ ] dip 4 ] [ 1 2 3 throw [ ] dip 4 ] 3 }
 ] [
     [ [ 1 2 3 throw [ ] dip 4 ] call ] ignore-errors
     last-frame
 ] unit-test
 
 [
-    { [ 1 2 3 throw [ ] [ ] if 4 ] 3 }
+    { [ 1 2 3 throw [ ] [ ] if 4 ] [ 1 2 3 throw [ ] [ ] if 4 ] 3 }
 ] [
     [ [ 1 2 3 throw [ ] [ ] if 4 ] call ] ignore-errors
     last-frame
