@@ -86,9 +86,12 @@ TYPED: buffer-size ( buffer: buffer -- size: integer )
     2dup [ buffer-size ] dip -
     buffer-range boa ; inline
 
-TYPED:: allocate-buffer ( buffer: buffer size: integer initial-data -- )
+:: allocate-buffer ( buffer size initial-data -- )
     buffer bind-buffer :> target
-    target size initial-data buffer gl-buffer-usage glBufferData ;
+    target size initial-data buffer gl-buffer-usage glBufferData ; inline
+
+: allocate-byte-array ( buffer byte-array -- )
+    [ byte-length ] [ ] bi allocate-buffer ; inline
 
 TYPED: <buffer> ( upload: buffer-upload-pattern
                   usage: buffer-usage-pattern
