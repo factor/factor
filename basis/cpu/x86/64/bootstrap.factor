@@ -28,7 +28,7 @@ IN: bootstrap.x86
 
 [
     ! load entry point
-    safe-reg 0 MOV rc-absolute-cell rt-this jit-rel
+    safe-reg -7 [] LEA
     ! save stack frame size
     stack-frame-size PUSH
     ! push entry point
@@ -36,6 +36,11 @@ IN: bootstrap.x86
     ! alignment
     RSP stack-frame-size 3 bootstrap-cells - SUB
 ] jit-prolog jit-define
+
+[
+    temp3 5 [] LEA
+    0 JMP rc-relative rt-entry-point-pic-tail jit-rel
+] jit-word-jump jit-define
 
 : jit-load-context ( -- )
     ctx-reg vm-reg vm-context-offset [+] MOV ;

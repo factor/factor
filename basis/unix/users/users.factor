@@ -61,8 +61,8 @@ M: string user-passwd ( string -- passwd/f )
     dup user-passwd
     [ nip user-name>> ] [ number>string ] if* ;
 
-: user-id ( string -- id )
-    user-passwd uid>> ;
+: user-id ( string -- id/f )
+    user-passwd dup [ uid>> ] when ;
 
 : real-user-id ( -- id )
     unix.ffi:getuid ; inline

@@ -1,8 +1,10 @@
 ! (c)Joe Groff bsd license
 USING: accessors classes.struct fry generalizations kernel locals
 math math.combinatorics math.functions math.matrices.simd math.vectors
-math.vectors.simd sequences sequences.private specialized-arrays
+math.vectors.simd math.quaternions sequences sequences.private specialized-arrays
 typed ;
+FROM: sequences.private => nth-unsafe ;
+FROM: math.quaternions.private => (q*sign) ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: float-4
 IN: math.matrices.simd
@@ -23,10 +25,7 @@ M: matrix4 new-sequence 2drop matrix4 (struct) ; inline
 
 :: set-columns ( c1 c2 c3 c4 c -- c )
     c columns>> :> columns
-    c1 columns set-first
-    c2 columns set-second
-    c3 columns set-third
-    c4 columns set-fourth
+    c1 c2 c3 c4 columns 4 set-firstn-unsafe
     c ; inline
 
 : make-matrix4 ( quot: ( -- c1 c2 c3 c4 ) -- c )
@@ -151,12 +150,24 @@ TYPED: translation-matrix4 ( offset: float-4 -- matrix: matrix4 )
         ] dip
     ] make-matrix4 ;
 
+:: (rotation-matrix4) ( diagonal triangle-hi triangle-lo -- matrix )
+    matrix4 (struct) :> triangle-m
+    diagonal scale-matrix4 :> diagonal-m
+
+    triangle-hi { 3 2 1 3 } vshuffle
+    triangle-hi { 3 3 0 3 } vshuffle triangle-lo { 2 3 3 3 } vshuffle vbitor
+                                     triangle-lo { 1 0 3 3 } vshuffle
+    float-4 new
+
+    triangle-m set-columns drop
+
+    diagonal-m triangle-m m4+ ; inline
+
 TYPED:: rotation-matrix4 ( axis: float-4 theta: float -- matrix: matrix4 )
     !   x*x + c*(1.0 - x*x)   x*y*(1.0 - c) + s*z   x*z*(1.0 - c) - s*y   0
     !   x*y*(1.0 - c) - s*z   y*y + c*(1.0 - y*y)   y*z*(1.0 - c) + s*x   0
     !   x*z*(1.0 - c) + s*y   y*z*(1.0 - c) - s*x   z*z + c*(1.0 - z*z)   0
     !   0                     0                     0                     1
-    matrix4 (struct) :> triangle-m
     theta cos :> c
     theta sin :> s
 
@@ -176,17 +187,8 @@ TYPED:: rotation-matrix4 ( axis: float-4 theta: float -- matrix: matrix4 )
     triangle-a triangle-b v+ :> triangle-lo
     triangle-a triangle-b v- :> triangle-hi
 
-    diagonal scale-matrix4 :> diagonal-m
-
-    triangle-hi { 3 2 1 3 } vshuffle
-    triangle-hi { 3 3 0 3 } vshuffle triangle-lo { 2 3 3 3 } vshuffle v+
-    triangle-lo { 1 0 3 3 } vshuffle
-    float-4 new
-
-    triangle-m set-columns drop
-
-    diagonal-m triangle-m m4+ ;
-
+    diagonal triangle-hi triangle-lo (rotation-matrix4) ;
+    
 TYPED:: frustum-matrix4 ( xy: float-4 near: float far: float -- matrix: matrix4 )
     [
         near near near far + 2 near far * * float-4-boa ! num
@@ -200,3 +202,30 @@ TYPED:: frustum-matrix4 ( xy: float-4 near: float far: float -- matrix: matrix4 
         [ negone (vmerge) ] bi*
     ] make-matrix4 ;
 
+! interface with quaternions
+M: float-4 (q*sign)
+    float-4{ -0.0  0.0  0.0  0.0 } vbitxor ; inline
+M: float-4 qconjugate
+    float-4{  0.0 -0.0 -0.0 -0.0 } vbitxor ; inline
+
+: euler4 ( phi theta psi -- q )
+    float-4{ 0 0 0 0 } euler-like ; inline
+
+TYPED:: q>matrix4 ( q: float-4 -- matrix: matrix4 )
+    !   a*a + b*b - c*c - d*d  2*b*c - 2*a*d          2*b*d + 2*a*c          0
+    !   2*b*c + 2*a*d          a*a - b*b + c*c - d*d  2*c*d - 2*a*b          0
+    !   2*b*d - 2*a*c          2*c*d + 2*a*b          a*a - b*b - c*c + d*d  0
+    !   0                      0                      0                      1
+    q { 2 1 1 3 } vshuffle  q { 3 3 2 3 } vshuffle  v*  :> triangle-a
+    q { 0 0 0 3 } vshuffle  q { 1 2 3 3 } vshuffle  v*  :> triangle-b
+
+    triangle-a float-4{ 2.0 2.0 2.0 0.0 } v*  triangle-b float-4{ -2.0 2.0 -2.0 0.0 } v*
+    [ v- ] [ v+ ] 2bi :> ( triangle-hi triangle-lo )
+
+    q q v* first4 {
+        [ [ + ] [ - ] [ - ] tri* ]
+        [ [ - ] [ + ] [ - ] tri* ]
+        [ [ - ] [ - ] [ + ] tri* ]
+    } 4 ncleave 1.0 float-4-boa :> diagonal
+
+    diagonal triangle-hi triangle-lo (rotation-matrix4) ;

@@ -162,7 +162,7 @@ SYMBOL: node-count
                 word>> {
                     { [ dup "intrinsic" word-prop ] [ intrinsics-called ] }
                     { [ dup generic? ] [ generics-called ] }
-                    { [ dup method-body? ] [ methods-called ] }
+                    { [ dup method? ] [ methods-called ] }
                     [ words-called ]
                 } cond get inc-at
             ] [ drop ] if

@@ -58,7 +58,7 @@ C: <ftp-disconnect> ftp-disconnect
     send-response ;
 
 : serving? ( path -- ? )
-    normalize-path server get serving-directory>> head? ;
+    resolve-symlinks server get serving-directory>> head? ;
 
 : can-serve-directory? ( path -- ? )
     { [ exists? ] [ file-info directory? ] [ serving? ] } 1&& ;
@@ -343,7 +343,7 @@ M: ftp-server handle-client* ( server -- )
 : <ftp-server> ( directory port -- server )
     latin1 ftp-server new-threaded-server
         swap >>insecure
-        swap normalize-path >>serving-directory
+        swap resolve-symlinks >>serving-directory
         "ftp.server" >>name
         5 minutes >>timeout ;
 

@@ -10,9 +10,7 @@ IN: tuple-arrays
 
 MACRO: boa-unsafe ( class -- quot ) tuple-layout '[ _ <tuple-boa> ] ;
 
-MACRO: infer-in ( class -- quot ) inputs '[ _ ] ;
-
-: tuple-arity ( class -- quot ) '[ _ boa ] infer-in ; inline
+: tuple-arity ( class -- quot ) '[ _ boa ] inputs ; inline
 
 : smart-tuple>array ( tuple class -- array )
     '[ [ _ boa ] undo ] output>array ; inline

@@ -121,3 +121,5 @@ PRIVATE>
 : make-atlas ( images -- image-texcoords atlas-image )
     pack-atlas dup (make-atlas) [ '[ _ image-placement>texcoords ] H{ } map>assoc ] keep ;
 
+: make-atlas-assoc ( image-assoc -- texcoord-assoc atlas-image )
+    dup values make-atlas [ '[ _ at ] assoc-map ] dip ;

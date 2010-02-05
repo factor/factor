@@ -32,9 +32,22 @@ IN: assocs.tests
 [ f ] [ H{ { 1 2 } { 2 2 } } [ = ] assoc-all? ] unit-test
 
 [ H{ } ] [ H{ { t f } { f t } } [ 2drop f ] assoc-filter ] unit-test
+[ H{ } ] [ H{ { t f } { f t } } clone dup [ 2drop f ] assoc-filter! drop ] unit-test
+[ H{ } ] [ H{ { t f } { f t } } clone [ 2drop f ] assoc-filter! ] unit-test
+
 [ H{ { 3 4 } { 4 5 } { 6 7 } } ] [
     H{ { 1 2 } { 2 3 } { 3 4 } { 4 5 } { 6 7 } }
     [ drop 3 >= ] assoc-filter
+] unit-test
+
+[ H{ { 3 4 } { 4 5 } { 6 7 } } ] [
+    H{ { 1 2 } { 2 3 } { 3 4 } { 4 5 } { 6 7 } } clone
+    [ drop 3 >= ] assoc-filter!
+] unit-test
+
+[ H{ { 3 4 } { 4 5 } { 6 7 } } ] [
+    H{ { 1 2 } { 2 3 } { 3 4 } { 4 5 } { 6 7 } } clone dup
+    [ drop 3 >= ] assoc-filter! drop
 ] unit-test
 
 [ 21 ] [
@@ -69,6 +82,20 @@ H{ } clone "cache-test" set
     assoc-union
 ] unit-test
 
+[
+    H{ { 1 2 } { 2 3 } { 6 5 } }
+] [
+    H{ { 2 4 } { 6 5 } } clone dup H{ { 1 2 } { 2 3 } }
+    assoc-union! drop
+] unit-test
+
+[
+    H{ { 1 2 } { 2 3 } { 6 5 } }
+] [
+    H{ { 2 4 } { 6 5 } } clone H{ { 1 2 } { 2 3 } }
+    assoc-union!
+] unit-test
+
 [ H{ { 1 2 } { 2 3 } } t ] [
     f H{ { 1 2 } { 2 3 } } [ assoc-union ] 2keep swap assoc-union dupd =
 ] unit-test
@@ -77,6 +104,24 @@ H{ } clone "cache-test" set
     H{ { 1 f } }
 ] [
     H{ { 1 f } } H{ { 1 f } } assoc-intersect
+] unit-test
+
+[
+    H{ { 3 4 } }
+] [
+    H{ { 1 2 } { 3 4 } } H{ { 1 3 } } assoc-diff
+] unit-test
+
+[
+    H{ { 3 4 } }
+] [
+    H{ { 1 2 } { 3 4 } } clone dup H{ { 1 3 } } assoc-diff! drop
+] unit-test
+
+[
+    H{ { 3 4 } }
+] [
+    H{ { 1 2 } { 3 4 } } clone H{ { 1 3 } } assoc-diff!
 ] unit-test
 
 [ H{ { "hi" 2 } { 3 4 } } ]

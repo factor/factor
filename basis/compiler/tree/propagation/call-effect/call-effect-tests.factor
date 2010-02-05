@@ -78,7 +78,7 @@ TUPLE: a-tuple x ;
 
 [ ] [ "IN: compiler.tree.propagation.call-effect.tests USE: math : call(-redefine-test ( a -- c ) 1 + ;" eval( -- ) ] unit-test
 
-[ 1 3 test-quotatation inline-cache-invalidation-test ] [ T{ wrong-values f (( a b -- c )) } = ] must-fail-with
+[ 1 3 test-quotatation inline-cache-invalidation-test ] [ T{ wrong-values f [ call(-redefine-test ] (( a b -- c )) } = ] must-fail-with
 
 ! See if redefining a tuple class bumps effect counter
 TUPLE: my-tuple a b c ;
