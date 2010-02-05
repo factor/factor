@@ -67,7 +67,7 @@ DEFER: finalize-rule-set
     [ resolve-delegate ] each-rule ;
 
 : ?update ( keyword-map/f keyword-map -- keyword-map )
-    over [ dupd update ] [ nip clone ] if ;
+    over [ assoc-union! ] [ nip clone ] if ;
 
 : import-keywords ( parent child -- )
     over [ [ keywords>> ] bi@ ?update ] dip (>>keywords) ;

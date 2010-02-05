@@ -132,10 +132,12 @@ struct stack_frame_accumulator {
 
 	void operator()(stack_frame *frame)
 	{
-		data_root<object> executing(parent->frame_executing_quot(frame),parent);
+		data_root<object> executing_quot(parent->frame_executing_quot(frame),parent);
+		data_root<object> executing(parent->frame_executing(frame),parent);
 		data_root<object> scan(parent->frame_scan(frame),parent);
 
 		frames.add(executing.value());
+		frames.add(executing_quot.value());
 		frames.add(scan.value());
 	}
 };

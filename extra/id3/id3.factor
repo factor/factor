@@ -153,7 +153,7 @@ CONSTANT: id3v1+-length 227
     } cleave ;
 
 : merge-frames ( id3 assoc -- id3 )
-    [ dup frames>> ] dip update ;
+    [ dup frames>> ] dip assoc-union! drop ;
 
 : merge-id3v1 ( id3 -- id3 )
     dup id3v1>frames frames>assoc merge-frames ;

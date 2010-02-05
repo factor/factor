@@ -207,7 +207,7 @@ M: integer forget-test 3 + ;
 [ ] [ "IN: generic.tests USE: math FORGET: M\\ integer forget-test" eval( -- ) ] unit-test
 
 [ { } ] [
-    \ + effect-dependencies-of keys [ method-body? ] filter
+    \ + effect-dependencies-of keys [ method? ] filter
     [ "method-generic" word-prop \ forget-test eq? ] filter
 ] unit-test
 

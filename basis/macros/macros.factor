@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser kernel sequences words effects combinators assocs
-definitions quotations namespaces memoize accessors
+definitions quotations namespaces memoize accessors fry
 compiler.units ;
 IN: macros
 
@@ -14,7 +14,11 @@ PRIVATE>
 
 : define-macro ( word definition effect -- )
     real-macro-effect {
-        [ [ memoize-quot [ call ] append ] keep define-declared ]
+        [
+            [ '[ _ _ call-effect ] ] keep
+            [ memoize-quot '[ @ call ] ] keep
+            define-declared
+        ]
         [ drop "macro" set-word-prop ]
         [ 2drop changed-effect ]
     } 3cleave ;

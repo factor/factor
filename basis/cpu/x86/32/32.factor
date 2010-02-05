@@ -27,6 +27,9 @@ M: x86.32 temp-reg ECX ;
 M: x86.32 %mov-vm-ptr ( reg -- )
     0 MOV 0 rc-absolute-cell rel-vm ;
 
+M: x86.32 %vm-field ( dst field -- )
+    [ 0 [] MOV ] dip vm-field-offset rc-absolute-cell rel-vm ;
+
 M: x86.32 %vm-field-ptr ( dst field -- )
     [ 0 MOV ] dip vm-field-offset rc-absolute-cell rel-vm ;
 
@@ -102,6 +105,9 @@ M: x86.32 %prologue ( n -- )
     0 PUSH rc-absolute-cell rel-this
     3 cells - decr-stack-reg ;
 
+M: x86.32 %prepare-jump
+    pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here ;
+
 M: x86.32 %load-param-reg
     stack-params assert=
     [ [ EAX ] dip local@ MOV ] dip
@@ -160,10 +166,10 @@ M: x86.32 %pop-stack ( n -- )
     EAX swap ds-reg reg-stack MOV ;
 
 M: x86.32 %pop-context-stack ( -- )
-    temp-reg %load-context-datastack
-    EAX temp-reg [] MOV
+    temp-reg "ctx" %vm-field
+    EAX temp-reg "datastack" context-field-offset [+] MOV
     EAX EAX [] MOV
-    temp-reg [] bootstrap-cell SUB ;
+    temp-reg "datastack" context-field-offset [+] bootstrap-cell SUB ;
 
 : call-unbox-func ( func -- )
     4 save-vm-ptr

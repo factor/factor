@@ -37,7 +37,7 @@ M: parsing-word pprint*
 M: word pprint*
     [ pprint-word ] [ ?start-group ] [ ?end-group ] tri ;
 
-M: method-body pprint*
+M: method pprint*
     [
         [
             [ "M\\ " % "method-class" word-prop word-name* % ]
@@ -229,7 +229,7 @@ M: compose pprint* pprint-object ;
 
 M: wrapper pprint*
     {
-        { [ dup wrapped>> method-body? ] [ wrapped>> pprint* ] }
+        { [ dup wrapped>> method? ] [ wrapped>> pprint* ] }
         { [ dup wrapped>> word? ] [ <block \ \ pprint-word wrapped>> pprint-word block> ] }
         [ pprint-object ]
     } cond ;

@@ -26,9 +26,9 @@ $nl
 { $code
     "USING: io sequences ;"
     "IN: a"
-    ": hello \"Hello\" ;"
-    ": world \"world\" ;"
-    ": hello-world hello " " world 3append print ;"
+    ": hello ( -- str ) \"Hello\" ;"
+    ": world ( -- str ) \"world\" ;"
+    ": hello-world ( -- ) hello \" \" world 3append print ;"
 }
 "The definitions for " { $snippet "hello" } ", " { $snippet "world" } ", and " { $snippet "hello-world" } " are in the dictionary."
 $nl
@@ -36,9 +36,9 @@ $nl
 { $code
     "USING: namespaces ;"
     "IN: a"
-    ": hello \"Hello\" % ;"
-    ": hello-world [ hello " " % world ] \"\" make ;"
-    ": world \"world\" % ;"
+    ": hello ( -- ) \"Hello\" % ;"
+    ": hello-world ( -- str ) [ hello \" \" % world ] \"\" make ;"
+    ": world ( -- ) \"world\" % ;"
 }
 "Note that the developer has made a mistake, placing the definition of " { $snippet "world" } " " { $emphasis "after" } " its usage in " { $snippet "hello-world" } "."
 $nl

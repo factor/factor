@@ -80,7 +80,7 @@ ARTICLE: "assocs-lookup" "Lookup and querying of assocs"
 { $see-also at* assoc-size } ;
 
 ARTICLE: "assocs-values" "Transposed assoc operations"
-"default Most assoc words take a key and find the corresponding value. The following words take a value and find the corresponding key:"
+"Most assoc words take a key and find the corresponding value. The following words take a value and find the corresponding key:"
 { $subsections
     value-at
     value-at*
@@ -93,11 +93,15 @@ ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 { $subsections
     assoc-subset?
     assoc-intersect
-    update
     assoc-union
     assoc-diff
     substitute
     extract-keys
+}
+"Destructive operations:"
+{ $subsections
+    assoc-union!
+    assoc-diff!
 }
 { $see-also key? assoc-any? assoc-all? "sets" } ;
 
@@ -135,17 +139,21 @@ $nl
     assoc-map
     assoc-filter
     assoc-filter-as
+    assoc-partition
     assoc-any?
     assoc-all?
 }
-"Additional combinators:"
+"Mapping between assocs and sequences:"
 { $subsections
-    assoc-partition
-    cache
-    2cache
     map>assoc
     assoc>map
     assoc-map-as
+}
+"Destructive combinators:"
+{ $subsections
+    assoc-filter!
+    cache
+    2cache
 } ;
 
 ARTICLE: "assocs" "Associative mapping operations"
@@ -260,7 +268,12 @@ HELP: assoc-filter-as
 { $values { "assoc" assoc } { "quot" { $quotation "( key value -- ? )" } } { "exemplar" assoc } { "subassoc" "a new assoc" } }
 { $description "Outputs an assoc of the same type as " { $snippet "exemplar" } " consisting of all entries for which the predicate quotation yields true." } ;
 
-{ assoc-filter assoc-filter-as } related-words
+HELP: assoc-filter!
+{ $values { "assoc" assoc } { "quot" { $quotation "( key value -- ? )" } } }
+{ $description "Removes all entries for which the predicate quotation yields true." }
+{ $side-effects "assoc" } ;
+
+{ assoc-filter assoc-filter-as assoc-filter! } related-words
 
 HELP: assoc-partition
 { $values
@@ -333,7 +346,7 @@ HELP: assoc-intersect
 { $description "Outputs an assoc consisting of all entries from " { $snippet "assoc2" } " such that the key is also present in " { $snippet "assoc1" } "." }
 { $notes "The values of the keys in " { $snippet "assoc1" } " are disregarded, so this word is usually used for set-theoretic calculations where the assoc in question either has dummy sentinels as values, or the values equal the keys." } ;
 
-HELP: update
+HELP: assoc-union!
 { $values { "assoc1" assoc } { "assoc2" assoc } }
 { $description "Adds all entries from " { $snippet "assoc2" } " to " { $snippet "assoc1" } "." }
 { $side-effects "assoc1" } ;
@@ -346,6 +359,11 @@ HELP: assoc-diff
 { $values { "assoc1" assoc } { "assoc2" assoc } { "diff" "a new assoc" } }
 { $description "Outputs an assoc consisting of all entries from " { $snippet "assoc1" } " whose key is not contained in " { $snippet "assoc2" } "." } 
 ;
+
+HELP: assoc-diff!
+{ $values { "assoc1" assoc } { "assoc2" assoc } }
+{ $description "Removes all entries from " { $snippet "assoc1" } " whose key is contained in " { $snippet "assoc2" } "." }
+{ $side-effects "assoc1" } ;
 
 HELP: substitute
 { $values { "seq" sequence } { "assoc" assoc } { "newseq" sequence } }
