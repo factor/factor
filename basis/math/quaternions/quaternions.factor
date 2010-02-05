@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators kernel math math.functions math.libm math.vectors sequences ;
+USING: arrays combinators kernel locals math math.functions
+math.libm math.order math.vectors sequences ;
 IN: math.quaternions
 
 : q+ ( u v -- u+v )
@@ -67,3 +68,9 @@ PRIVATE>
 
 : euler ( phi theta psi -- q )
     { } euler-like ; inline
+
+:: slerp ( q0 q1 t -- qt )
+    q0 q1 v. -1.0 1.0 clamp :> dot
+    dot facos t * :> omega
+    q1 dot q0 n*v v- normalize :> qt'
+    omega fcos q0 n*v omega fsin qt' n*v v+ ; inline
