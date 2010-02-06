@@ -201,7 +201,7 @@ cell object::binary_payload_start() const
 		return sizeof(wrapper);
 	default:
 		critical_error("Invalid header",(cell)this);
-                return 0; /* can't happen */
+		return 0; /* can't happen */
 	}
 }
 
