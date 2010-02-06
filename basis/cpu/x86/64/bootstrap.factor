@@ -28,7 +28,7 @@ IN: bootstrap.x86
 
 [
     ! load entry point
-    safe-reg -7 [] LEA
+    safe-reg 0 MOV rc-absolute-cell rt-this jit-rel
     ! save stack frame size
     stack-frame-size PUSH
     ! push entry point
