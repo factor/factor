@@ -97,11 +97,11 @@ CONSTANT: ctx-reg 16
     rs-reg ctx-reg context-retainstack-offset LWZ ;
 
 [
-    0 3 LOAD32 rc-absolute-ppc-2/2 rt-literal jit-rel
-    11 3 profile-count-offset LWZ
+    0 12 LOAD32 rc-absolute-ppc-2/2 rt-literal jit-rel
+    11 12 profile-count-offset LWZ
     11 11 1 tag-fixnum ADDI
-    11 3 profile-count-offset STW
-    11 3 word-code-offset LWZ
+    11 12 profile-count-offset STW
+    11 12 word-code-offset LWZ
     11 11 compiled-header-size ADDI
     11 MTCTR
     BCTR
