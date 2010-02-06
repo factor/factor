@@ -59,7 +59,7 @@ PRIVATE>
     [ nip ] [ number>string ] if* ;
 
 : group-id ( string -- id/f )
-    group-struct [ gr_gid>> ] [ f ] if* ;
+    group-struct dup [ gr_gid>> ] when ;
 
 <PRIVATE
 
