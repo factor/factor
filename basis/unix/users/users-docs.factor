@@ -62,7 +62,7 @@ HELP: user-name
 HELP: user-id
 { $values
      { "string" string }
-     { "id" integer } }
+     { "id/f" "an integer or f" } }
 { $description "Returns the user id associated with the user-name." } ;
 
 HELP: with-effective-user
