@@ -79,6 +79,9 @@ unit-test
 [ 100.0 ] [ "100.0" string>number ] unit-test
 [ 100.0 ] [ "100." string>number ] unit-test
 
+[ 100.0 ] [ "1e2" string>number ] unit-test
+[ HEX: 1e2 ] [ "1e2" hex> ] unit-test
+
 [ HEX: 1.999999999999ap-3 ] [ "0.2" string>number ] unit-test
 [ HEX: 1.3333333333333p0  ] [ "1.2" string>number ] unit-test
 [ HEX: 1.5555555555555p0  ] [ "1.333,333,333,333,333,333" string>number ] unit-test
