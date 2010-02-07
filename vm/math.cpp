@@ -168,7 +168,7 @@ void factor_vm::primitive_bignum_xor()
 void factor_vm::primitive_bignum_shift()
 {
 	fixnum y = untag_fixnum(ctx->pop());
-        bignum* x = untag<bignum>(ctx->pop());
+	bignum* x = untag<bignum>(ctx->pop());
 	ctx->push(tag<bignum>(bignum_arithmetic_shift(x,y)));
 }
 
