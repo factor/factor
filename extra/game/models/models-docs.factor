@@ -6,4 +6,4 @@ see ;
 IN: game.models
 
 HELP: model
-{ $class-description "Tuple of a packed attribute buffer, index buffer and vertex format suitable for a single OpenGL draw call." } ;
+{ $class-description "Tuple of a packed attribute buffer, index buffer, vertex format and material suitable for a single OpenGL draw call." } ;
