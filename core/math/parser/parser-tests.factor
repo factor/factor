@@ -25,8 +25,20 @@ unit-test
 [ "12345abcdef" string>number ]
 unit-test
 
-[ t ]
-[ "-12" string>number 0 < ]
+[ 12 ]
+[ "+12" string>number ]
+unit-test
+
+[ -12 ]
+[ "-12" string>number ]
+unit-test
+
+[ f ]
+[ "-+12" string>number ]
+unit-test
+
+[ f ]
+[ "+-12" string>number ]
 unit-test
 
 [ f ]
@@ -47,13 +59,13 @@ unit-test
 [ f ] [ "1/-2" string>number ] unit-test
 [ f ] [ "1/2/3" string>number ] unit-test
 [ 1+1/2 ] [ "1+1/2" string>number ] unit-test
+[ 1+1/2 ] [ "+1+1/2" string>number ] unit-test
 [ f ] [ "1-1/2" string>number ] unit-test
 [ -1-1/2 ] [ "-1-1/2" string>number ] unit-test
 [ f ] [ "-1+1/2" string>number ] unit-test
 [ f ] [ "1+2" string>number ] unit-test
 [ f ] [ "1+" string>number ] unit-test
 [ f ] [ "1-" string>number ] unit-test
-[ f ] [ "+1" string>number ] unit-test
 [ f ] [ "1+1/2+2" string>number ] unit-test
 
 [ 100000 ] [ "100,000" string>number ] unit-test
@@ -68,6 +80,7 @@ unit-test
 [ f ] [ "-,2" string>number ] unit-test
 
 [ 2.0 ] [ "2." string>number ] unit-test
+[ 2.0 ] [ "+2." string>number ] unit-test
 [ 0.25 ] [ ".25" string>number ] unit-test
 [ -2.0 ] [ "-2." string>number ] unit-test
 [ -0.25 ] [ "-.25" string>number ] unit-test
@@ -80,6 +93,7 @@ unit-test
 [ 100.0 ] [ "100." string>number ] unit-test
 
 [ 100.0 ] [ "1e2" string>number ] unit-test
+[ 100.0 ] [ "1e+2" string>number ] unit-test
 [ HEX: 1e2 ] [ "1e2" hex> ] unit-test
 
 [ HEX: 1.999999999999ap-3 ] [ "0.2" string>number ] unit-test
