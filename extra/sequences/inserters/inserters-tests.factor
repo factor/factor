@@ -1,25 +1,26 @@
 ! (c)2010 Joe Groff bsd license
-USING: sequences.inserters tools.test ;
+USING: assocs kernel sequences sequences.inserters tools.test
+unicode.case ;
 IN: sequences.inserters.tests
 
 [ V{ 1 2 "Three" "Four" "Five" } ] [
     { "three" "four" "five" }
-    [ >title ] V{ 1 2 } clone <back-inserter> map-as
+    [ >title ] V{ 1 2 } clone <appender> map-as
 ] unit-test
 
 [ t ] [
     { "three" "four" "five" }
-    [ >title ] V{ 1 2 } clone [ <back-inserter> map-as ] keep eq?
+    [ >title ] V{ 1 2 } clone [ <appender> map-as ] keep eq?
 ] unit-test
 
 [ V{ 1 2 "Three" "Four" "Five" } ] [
     { { "Th" "ree" } { "Fo" "ur" } { "Fi" "ve" } }
-    [ append ] V{ 1 2 } clone <back-inserter> assoc>map
+    [ append ] V{ 1 2 } clone <appender> assoc>map
 ] unit-test
 
 [ t ] [
     { { "Th" "ree" } { "Fo" "ur" } { "Fi" "ve" } }
-    [ append ] V{ 1 2 } clone [ <back-inserter> assoc>map ] keep eq?
+    [ append ] V{ 1 2 } clone [ <appender> assoc>map ] keep eq?
 ] unit-test
 
 [ V{ "Three" "Four" "Five" } ] [
@@ -31,3 +32,14 @@ IN: sequences.inserters.tests
     { "three" "four" "five" }
     [ >title ] V{ 1 2 } clone [ <replacer> map-as ] keep eq?
 ] unit-test
+
+[ V{ "Three" "Four" "Five" } ] [
+    { { "Th" "ree" } { "Fo" "ur" } { "Fi" "ve" } }
+    [ append ] V{ 1 2 } clone <replacer> assoc>map
+] unit-test
+
+[ t ] [
+    { { "Th" "ree" } { "Fo" "ur" } { "Fi" "ve" } }
+    [ append ] V{ 1 2 } clone [ <replacer> assoc>map ] keep eq?
+] unit-test
+
