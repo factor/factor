@@ -96,7 +96,7 @@ typedef fixnum bignum_length_type;
 #define BIGNUM_ASSERT(expression)					\
 {									\
   if (! (expression))							\
-    BIGNUM_EXCEPTION ();						\
+	BIGNUM_EXCEPTION ();						\
 }
 
 #endif /* not BIGNUM_DISABLE_ASSERTION_CHECKS */

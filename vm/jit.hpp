@@ -61,7 +61,7 @@ struct jit {
 			return position;
 	}
 
-        void set_position(fixnum position_)
+	void set_position(fixnum position_)
 	{
 		if(computing_offset_p)
 			position = position_;

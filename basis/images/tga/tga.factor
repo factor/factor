@@ -238,7 +238,7 @@ ERROR: bad-tga-unsupported ;
         ] unless
     ] ignore-errors
 
-    #! Only 24-bit uncompressed RGB and 32-bit uncompressed ARGB are supported.
+    #! Only 24-bit uncompressed BGR and 32-bit uncompressed BGRA are supported.
     #! Other formats would need to be converted to work within the image class.
     map-type 0 = [ bad-tga-unsupported ] unless 
     image-type 2 = [ bad-tga-unsupported ] unless
@@ -247,7 +247,7 @@ ERROR: bad-tga-unsupported ;
     
     #! Create image instance
     image new
-    alpha-bits 0 = [ RGB ] [ ARGB ] if >>component-order
+    alpha-bits 0 = [ BGR ] [ BGRA ] if >>component-order
     { image-width image-height }       >>dim
     pixel-order 0 =                    >>upside-down?
     image-data                         >>bitmap
@@ -259,7 +259,7 @@ M: tga-image stream>image
 M: tga-image image>stream
     drop
     [
-        component-order>> { RGB ARGB } member? [ bad-tga-unsupported ] unless
+        component-order>> { BGRA BGRA } member? [ bad-tga-unsupported ] unless
     ] keep
 
     B{ 0 }         write #! id-length
@@ -272,15 +272,15 @@ M: tga-image image>stream
         [ dim>> second 2 >le write ]
         [ component-order>>
           {
-              {  RGB [ B{ 24 } write ] }
-              { ARGB [ B{ 32 } write ] }
+              {  BGR [ B{ 24 } write ] }
+              { BGRA [ B{ 32 } write ] }
           } case
         ]
         [
             dup component-order>>
             {
-                {  RGB [ 0 ] }
-                { ARGB [ 8 ] }
+                {  BGR [ 0 ] }
+                { BGRA [ 8 ] }
             } case swap
             upside-down?>> [ 0 ] [ 2 ] if 3 shift bitor
             1 >le write
