@@ -58,20 +58,20 @@ inline static bool tail_call_site_p(cell return_address)
 
 inline static unsigned int fpu_status(unsigned int status)
 {
-        unsigned int r = 0;
+	unsigned int r = 0;
 
-        if (status & 0x20000000)
+	if (status & 0x20000000)
 		r |= FP_TRAP_INVALID_OPERATION;
-        if (status & 0x10000000)
+	if (status & 0x10000000)
 		r |= FP_TRAP_OVERFLOW;
-        if (status & 0x08000000)
+	if (status & 0x08000000)
 		r |= FP_TRAP_UNDERFLOW;
-        if (status & 0x04000000)
+	if (status & 0x04000000)
 		r |= FP_TRAP_ZERO_DIVIDE;
-        if (status & 0x02000000)
+	if (status & 0x02000000)
 		r |= FP_TRAP_INEXACT;
 
-        return r;
+	return r;
 }
 
 /* Defined in assembly */

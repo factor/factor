@@ -154,7 +154,7 @@ void factor_vm::primitive_fopen()
 
 	FILE *file;
 	file = safe_fopen((char *)(path.untagged() + 1),
-						(char *)(mode.untagged() + 1));
+		(char *)(mode.untagged() + 1));
 	ctx->push(allot_alien(file));
 }
 
@@ -187,31 +187,24 @@ void factor_vm::primitive_fread()
 
 	data_root<byte_array> buf(allot_uninitialized_array<byte_array>(size),this);
 
-	for(;;)
+	int c = safe_fread(buf.untagged() + 1,1,size,file);
+	if(c == 0)
 	{
-		int c = safe_fread(buf.untagged() + 1,1,size,file);
-		if(c == 0)
-		{
-			if(feof(file))
-			{
-				ctx->push(false_object);
-				break;
-			}
-			else
-				io_error();
-		}
+		if(feof(file))
+			ctx->push(false_object);
 		else
+			io_error();
+	}
+	else
+	{
+		if(feof(file))
 		{
-			if(feof(file))
-			{
-				byte_array *new_buf = allot_byte_array(c);
-				memcpy(new_buf + 1, buf.untagged() + 1,c);
-				buf = new_buf;
-			}
-
-			ctx->push(buf.value());
-			break;
+			byte_array *new_buf = allot_byte_array(c);
+			memcpy(new_buf + 1, buf.untagged() + 1,c);
+			buf = new_buf;
 		}
+
+		ctx->push(buf.value());
 	}
 }
 
