@@ -91,7 +91,7 @@ M: unix kill-process* ( pid -- )
 TUPLE: signal n ;
 
 : code>status ( code -- obj )
-    dup WIFEXITED [ WEXITSTATUS ] [ WTERMSIG signal boa ] if ;
+    dup WIFSIGNALED [ WTERMSIG signal boa ] [ WEXITSTATUS ] if ;
 
 M: unix wait-for-processes ( -- ? )
     0 <int> -1 over WNOHANG waitpid
