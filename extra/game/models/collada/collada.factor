@@ -1,12 +1,12 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs grouping hashtables kernel
-locals math math.parser sequences sequences.deep
+USING: accessors arrays assocs grouping hashtables kernel locals
+math math.floats.parser math.parser sequences sequences.deep
 specialized-arrays.instances.alien.c-types.float
 specialized-arrays.instances.alien.c-types.uint splitting xml
-xml.data xml.traversal math.order
-namespaces combinators images gpu.shaders io make game.models
-game.models.util io.encodings.ascii game.models.loader ;
+xml.data xml.traversal math.order namespaces combinators images
+gpu.shaders io make game.models game.models.util
+io.encodings.ascii game.models.loader ;
 IN: game.models.collada
 
 SINGLETON: collada-models
