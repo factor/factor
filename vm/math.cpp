@@ -260,20 +260,6 @@ void factor_vm::primitive_bignum_to_float()
 	ctx->replace(allot_float(bignum_to_float(ctx->peek())));
 }
 
-void factor_vm::primitive_str_to_float()
-{
-	byte_array *bytes = untag_check<byte_array>(ctx->peek());
-	cell capacity = array_capacity(bytes);
-
-	char *c_str = (char *)(bytes + 1);
-	char *end = c_str;
-	double f = strtod(c_str,&end);
-	if(end == c_str + capacity - 1)
-		ctx->replace(allot_float(f));
-	else
-		ctx->replace(false_object);
-}
-
 void factor_vm::primitive_float_to_str()
 {
 	byte_array *array = allot_byte_array(33);
