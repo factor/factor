@@ -463,7 +463,6 @@ tuple
     { "double>bits" "math" "primitive_double_bits" (( x -- n )) }
     { "float>bits" "math" "primitive_float_bits" (( x -- n )) }
     { "(float>string)" "math.parser.private" "primitive_float_to_str" (( n -- str )) }
-    { "(string>float)" "math.parser.private" "primitive_str_to_float" (( str -- n/f )) }
     { "bignum*" "math.private" "primitive_bignum_multiply" (( x y -- z )) }
     { "bignum+" "math.private" "primitive_bignum_add" (( x y -- z )) }
     { "bignum-" "math.private" "primitive_bignum_subtract" (( x y -- z )) }

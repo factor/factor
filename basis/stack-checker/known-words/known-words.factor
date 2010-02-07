@@ -327,9 +327,6 @@ M: bad-executable summary
 \ bignum>float { bignum } { float } define-primitive
 \ bignum>float make-foldable
 
-\ (string>float) { byte-array } { float } define-primitive
-\ (string>float) make-foldable
-
 \ (float>string) { float } { byte-array } define-primitive
 \ (float>string) make-foldable
 
