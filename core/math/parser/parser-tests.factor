@@ -6,6 +6,22 @@ IN: math.parser.tests
 unit-test
 
 [ f ]
+[ ";" string>number ]
+unit-test
+
+[ f ]
+[ "<>" string>number ]
+unit-test
+
+[ f ]
+[ "^" string>number ]
+unit-test
+
+[ f ]
+[ "789:;<=>?@" string>number ]
+unit-test
+
+[ f ]
 [ "12345abcdef" string>number ]
 unit-test
 
