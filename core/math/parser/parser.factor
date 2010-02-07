@@ -5,11 +5,10 @@ IN: math.parser
 
 : digit> ( ch -- n )
     {
-        { [ dup CHAR: 9 <= ] [ CHAR: 0 - ] }
-        { [ dup CHAR: a <  ] [ CHAR: A 10 - - ] }
-        [ CHAR: a 10 - - ]
-    } cond
-    dup 0 < [ drop 255 ] when ; inline
+        { [ dup CHAR: 9 <= ] [ CHAR: 0 -      dup  0 < [ drop 255 ] when ] }
+        { [ dup CHAR: a <  ] [ CHAR: A 10 - - dup 10 < [ drop 255 ] when ] }
+                             [ CHAR: a 10 - - dup 10 < [ drop 255 ] when ]
+    } cond ; inline
 
 <PRIVATE
 
