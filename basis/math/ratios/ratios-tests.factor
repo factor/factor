@@ -95,13 +95,14 @@ unit-test
 [ "-10/2" string>number ]
 unit-test
 
-[ -5 ]
+[ f ]
 [ "10/-2" string>number ]
 unit-test
 
-[ 5 ]
+[ f ]
 [ "-10/-2" string>number ]
 unit-test
+
 [ "33/100" ]
 [ "66/200" string>number number>string ]
 unit-test
