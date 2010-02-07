@@ -502,6 +502,7 @@ SYMBOL: nc-buttons
     {
         { APPCOMMAND_BROWSER_BACKWARD [ pick window left-action send-action ] }
         { APPCOMMAND_BROWSER_FORWARD [ pick window right-action send-action ] }
+        [ drop ]
     } case 3drop ;
     
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
