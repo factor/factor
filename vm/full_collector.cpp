@@ -67,7 +67,7 @@ void factor_vm::collect_mark_impl(bool trace_contexts_p)
 	data->tenured->clear_mark_bits();
 
 	collector.trace_roots();
-        if(trace_contexts_p)
+	if(trace_contexts_p)
 	{
 		collector.trace_contexts();
 		collector.trace_context_code_blocks();

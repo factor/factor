@@ -184,20 +184,20 @@ struct factor_vm
 	void bignum_destructive_add(bignum * bignum, bignum_digit_type n);
 	void bignum_destructive_scale_up(bignum * bignum, bignum_digit_type factor);
 	void bignum_divide_unsigned_large_denominator(bignum * numerator, bignum * denominator,
-						      bignum * * quotient, bignum * * remainder, int q_negative_p, int r_negative_p);
+							bignum * * quotient, bignum * * remainder, int q_negative_p, int r_negative_p);
 	void bignum_divide_unsigned_normalized(bignum * u, bignum * v, bignum * q);
 	bignum_digit_type bignum_divide_subtract(bignum_digit_type * v_start, bignum_digit_type * v_end,
-						 bignum_digit_type guess, bignum_digit_type * u_start);
+						 	bignum_digit_type guess, bignum_digit_type * u_start);
 	void bignum_divide_unsigned_medium_denominator(bignum * numerator,bignum_digit_type denominator,
-						       bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
+							bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
 	void bignum_destructive_normalization(bignum * source, bignum * target, int shift_left);
 	void bignum_destructive_unnormalization(bignum * bignum, int shift_right);
 	bignum_digit_type bignum_digit_divide(bignum_digit_type uh, bignum_digit_type ul,
-					      bignum_digit_type v, bignum_digit_type * q) /* return value */;
+							bignum_digit_type v, bignum_digit_type * q) /* return value */;
 	bignum_digit_type bignum_digit_divide_subtract(bignum_digit_type v1, bignum_digit_type v2,
-						       bignum_digit_type guess, bignum_digit_type * u);
+							bignum_digit_type guess, bignum_digit_type * u);
 	void bignum_divide_unsigned_small_denominator(bignum * numerator, bignum_digit_type denominator,
-						      bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
+							bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
 	bignum_digit_type bignum_destructive_scale_down(bignum * bignum, bignum_digit_type denominator);
 	bignum * bignum_remainder_unsigned_small_denominator(bignum * n, bignum_digit_type d, int negative_p);
 	bignum *bignum_digit_to_bignum(bignum_digit_type digit, int negative_p);
@@ -314,7 +314,7 @@ struct factor_vm
 		if(!(current_gc && current_gc->op == collect_growing_heap_op))
 		{
 			assert((cell)pointer >= data->seg->start
-			       && (cell)pointer < data->seg->end);
+				&& (cell)pointer < data->seg->end);
 		}
 	#endif
 	}
