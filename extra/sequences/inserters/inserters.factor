@@ -22,12 +22,12 @@ M: inserter new-resizable
 M: inserter length
     drop 0 ; inline
 
-TUPLE: back-inserter { underlying read-only } ;
-C: <back-inserter> back-inserter
+TUPLE: appender { underlying read-only } ;
+C: <appender> appender
 
-INSTANCE: back-inserter inserter
+INSTANCE: appender inserter
 
-M:: back-inserter new-sequence ( len inserter -- sequence )
+M:: appender new-sequence ( len inserter -- sequence )
     inserter underlying>> :> underlying
     underlying length :> old-length
     old-length len + :> new-length
