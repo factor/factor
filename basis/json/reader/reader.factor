@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Peter Burns, 2009 Philipp Winkler
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators io io.streams.string json
-kernel math math.parser prettyprint
-sequences strings vectors ;
+kernel math math.floats.parser math.parser prettyprint sequences
+strings vectors ;
 IN: json.reader
 
 <PRIVATE

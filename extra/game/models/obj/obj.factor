@@ -1,12 +1,12 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.encodings.ascii math.parser sequences splitting kernel
-assocs io.files combinators math.order math namespaces
-arrays sequences.deep accessors
+USING: io io.encodings.ascii math.parser math.floats.parser
+sequences splitting kernel assocs io.files combinators
+math.order math namespaces arrays sequences.deep accessors
 specialized-arrays.instances.alien.c-types.float
-specialized-arrays.instances.alien.c-types.uint
-game.models game.models.util gpu.shaders images
-game.models.loader prettyprint ;
+specialized-arrays.instances.alien.c-types.uint game.models
+game.models.util gpu.shaders images game.models.loader
+prettyprint ;
 IN: game.models.obj
 
 SINGLETON: obj-models
