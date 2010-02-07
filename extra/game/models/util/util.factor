@@ -3,8 +3,6 @@
 USING: sequences accessors kernel locals assocs ;
 IN: game.models.util
 
-TUPLE: model attribute-buffer index-buffer vertex-format ;
-
 TUPLE: indexed-seq dseq iseq rassoc ;
 INSTANCE: indexed-seq sequence
 
