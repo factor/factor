@@ -118,6 +118,7 @@ DEFER: @neg-digit
 : @exponent-first-char ( float-parse i number-parse n char -- float-parse n/f )
     {
         { CHAR: - [ [ @exponent-digit ] require-next-digit ?neg ] }
+        { CHAR: + [ [ @exponent-digit ] require-next-digit ] }
         [ @exponent-digit ]
     } case ; inline
 
@@ -231,6 +232,7 @@ DEFER: @neg-digit
 : @first-char ( i number-parse n char -- n/f ) 
     {
         { CHAR: - [ [ @neg-first-digit ] require-next-digit ?neg ] }
+        { CHAR: + [ [ @pos-first-digit ] require-next-digit ] }
         [ @pos-first-digit ]
     } case ; inline
 
