@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.encodings.ascii math.parser math.floats.parser
-sequences splitting kernel assocs io.files combinators
-math.order math namespaces arrays sequences.deep accessors
+USING: io io.encodings.ascii math.parser sequences splitting
+kernel assocs io.files combinators math.order math namespaces
+arrays sequences.deep accessors
 specialized-arrays.instances.alien.c-types.float
 specialized-arrays.instances.alien.c-types.uint game.models
 game.models.util gpu.shaders images game.models.loader
@@ -36,8 +36,8 @@ TUPLE: material
 : cm ( -- current-material ) current-material get ; inline
 : md ( -- material-dictionary ) material-dictionary get ; inline
 
-: strings>floats ( strings -- floats )
-    [ string>float ] map ;
+: strings>numbers ( strings -- numbers )
+    [ string>number ] map ;
 
 : strings>faces ( strings -- faces )
     [ "/" split [ string>number ] map ] map ;
@@ -54,22 +54,22 @@ TUPLE: material
                 [ material new swap >>name current-material set ]
                 [ cm swap md set-at ] bi
             ] }
-            { "Ka"       [ 3 head [ string>float ] map cm (>>ambient-reflectivity)  ] }
-            { "Kd"       [ 3 head [ string>float ] map cm (>>diffuse-reflectivity)  ] }
-            { "Ks"       [ 3 head [ string>float ] map cm (>>specular-reflectivity) ] }
-            { "Tf"       [ 3 head [ string>float ] map cm (>>transmission-filter)   ] }
-            { "d"        [ first string>float cm          (>>dissolve)              ] }
-            { "Ns"       [ first string>float cm          (>>specular-exponent)     ] }
-            { "Ni"       [ first string>float cm          (>>refraction-index)      ] }
-            { "map_Ka"   [ first cm                       (>>ambient-map)           ] }
-            { "map_Kd"   [ first cm                       (>>diffuse-map)           ] }
-            { "map_Ks"   [ first cm                       (>>specular-map)          ] }
-            { "map_Ns"   [ first cm                       (>>specular-exponent-map) ] }
-            { "map_d"    [ first cm                       (>>dissolve-map)          ] }
-            { "map_bump" [ first cm                       (>>bump-map)              ] }
-            { "bump"     [ first cm                       (>>bump-map)              ] }
-            { "disp"     [ first cm                       (>>displacement-map)      ] }
-            { "refl"     [ first cm                       (>>reflection-map)        ] }
+            { "Ka"       [ 3 head strings>numbers cm (>>ambient-reflectivity)  ] }
+            { "Kd"       [ 3 head strings>numbers cm (>>diffuse-reflectivity)  ] }
+            { "Ks"       [ 3 head strings>numbers cm (>>specular-reflectivity) ] }
+            { "Tf"       [ 3 head strings>numbers cm (>>transmission-filter)   ] }
+            { "d"        [ first string>number cm    (>>dissolve)              ] }
+            { "Ns"       [ first string>number cm    (>>specular-exponent)     ] }
+            { "Ni"       [ first string>number cm    (>>refraction-index)      ] }
+            { "map_Ka"   [ first cm                  (>>ambient-map)           ] }
+            { "map_Kd"   [ first cm                  (>>diffuse-map)           ] }
+            { "map_Ks"   [ first cm                  (>>specular-map)          ] }
+            { "map_Ns"   [ first cm                  (>>specular-exponent-map) ] }
+            { "map_d"    [ first cm                  (>>dissolve-map)          ] }
+            { "map_bump" [ first cm                  (>>bump-map)              ] }
+            { "bump"     [ first cm                  (>>bump-map)              ] }
+            { "disp"     [ first cm                  (>>displacement-map)      ] }
+            { "refl"     [ first cm                  (>>reflection-map)        ] }
             [ 2drop ]
         } case
     ] unless-empty ;
@@ -137,9 +137,9 @@ VERTEX-FORMAT: obj-vertex-format
         [ rest ] [ first ] bi
         {
             { "mtllib" [ first read-mtl material-dictionary set ] }
-            { "v"      [ strings>floats 3 head vp [ push* ] change ] }
-            { "vt"     [ strings>floats 2 head vt [ push* ] change ] }
-            { "vn"     [ strings>floats 3 head vn [ push* ] change ] }
+            { "v"      [ strings>numbers 3 head vp [ push* ] change ] }
+            { "vt"     [ strings>numbers 2 head vt [ push* ] change ] }
+            { "vn"     [ strings>numbers 3 head vn [ push* ] change ] }
             { "usemtl" [ push-current-model first md at current-material set ] }
             { "f"      [ strings>faces face>aos [ [ current-model [ push* ] change ] each ] each ] }
             [ 2drop ]
