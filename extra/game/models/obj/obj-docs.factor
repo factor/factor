@@ -22,9 +22,9 @@ HELP: md
 { $values { "material-dictionary" assoc } }
 { $description "Convenience word for accessing the material dictionary while parsing primitives. " } ;
 
-HELP: strings>floats
-{ $values { "strings" sequence } { "floats" sequence } }
-{ $description "Convert a sequence of strings to a sequence of floats." } ;
+HELP: strings>numbers
+{ $values { "strings" sequence } { "numbers" sequence } }
+{ $description "Convert a sequence of strings to a sequence of numbers." } ;
 
 HELP: strings>faces
 { $values { "strings" sequence } { "faces" sequence } }
