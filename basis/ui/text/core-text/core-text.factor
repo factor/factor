@@ -1,11 +1,10 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors alien core-graphics.types core-text
-core-text.fonts kernel hashtables namespaces sequences
-ui.gadgets.worlds ui.text ui.text.private opengl opengl.gl
-opengl.textures destructors combinators core-foundation
-core-foundation.strings math math.vectors init colors colors.constants
-cache arrays images ;
+core-text.fonts kernel hashtables namespaces sequences ui.text
+ui.text.private destructors combinators core-foundation
+core-foundation.strings math math.vectors init colors
+colors.constants cache arrays images ;
 IN: ui.text.core-text
 
 SINGLETON: core-text-renderer
@@ -18,13 +17,8 @@ M: core-text-renderer string-dim
 M: core-text-renderer flush-layout-cache
     cached-lines get purge-cache ;
 
-: rendered-line ( font string -- texture )
-    world get world-text-handle [
-        cached-line [ image>> ] [ loc>> ] bi <texture>
-    ] 2cache ;
-
-M: core-text-renderer draw-string ( font string -- )
-    rendered-line draw-texture ;
+M: core-text-renderer string>image ( font string -- image loc )
+    cached-line [ image>> ] [ loc>> ] bi ;
 
 M: core-text-renderer x>offset ( x font string -- n )
     [ 2drop 0 ] [
