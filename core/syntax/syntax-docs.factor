@@ -65,26 +65,59 @@ ARTICLE: "syntax-ratios" "Ratio syntax"
 "More information on ratios can be found in " { $link "rationals" } ;
 
 ARTICLE: "syntax-floats" "Float syntax"
-"Floating point literals can be input in base 10 or 16. Base 10 literals must contain a decimal point, and may contain an exponent after " { $snippet "e" } ":"
+"Floating point literals are specified when a literal number contains a decimal point or exponent. Exponents are marked by an " { $snippet "e" } " or " { $snippet "E" } ":"
 { $code
     "10.5"
     "-3.1456"
-    "7.e13"
+    "7e13"
     "1.0e-5"
+    "1.0E+5"
 }
-"Base 16 literals use " { $snippet "p" } " instead of " { $snippet "e" } " for the exponent, which is still decimal:"
+"Literal numbers without a decimal point or an exponent always parse as integers:"
 { $example
-    "10.125 HEX: 1.44p3 = ."
+    "1 float? ."
+    "f"
+}
+{ $example
+    "1. float? ."
     "t"
 }
-"Syntax for special float values:"
+{ $example
+    "1e0 float? ."
+    "t"
+}
+"Literal floating point approximations of ratios can also be input by placing a decimal point in the denominator:"
+{ $example
+    "1/2. ."
+    "0.5"
+}
+{ $example
+    "1/3. ."
+    "0.3333333333333333"
+}
+"The special float values have their own syntax:"
 { $table
 { "Positive infinity" { $snippet "1/0." } }
 { "Negative infinity" { $snippet "-1/0." } }
 { "Not-a-number" { $snippet "0/0." } }
 }
-"A Not-a-number with an arbitrary payload can also be parsed in:"
+"A Not-a-number literal with an arbitrary payload can also be input:"
 { $subsections POSTPONE: NAN: }
+"Hexadecimal float literals are also supported. These consist of a hexadecimal literal with a decimal point and an optional base-two exponent expressed as a decimal number after " { $snippet "p" } " or " { $snippet "P" } ":"
+{ $example
+    "8.0 HEX: 1.0p3 = ."
+    "t"
+}
+{ $example
+    "1024.0 HEX: 1.0P10 = ."
+    "t"
+}
+{ $example
+    "10.125 HEX: 1.44p3 = ."
+    "t"
+}
+"The normalized hex form " { $snippet "HEX: ±1.MMMMMMMMMMMMMp±EEEE" } " allows any floating-point number to be specified precisely. The values of MMMMMMMMMMMMM and EEEE map directly to the mantissa and exponent fields of IEEE 754 representation."
+$nl
 "More information on floats can be found in " { $link "floats" } "." ;
 
 ARTICLE: "syntax-complex-numbers" "Complex number syntax"
