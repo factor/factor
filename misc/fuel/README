@@ -99,6 +99,7 @@ beast.
     |-----------------+------------------------------------------------------------|
     | C-cz            | switch to listener (run-factor)                            |
     | C-co            | cycle between code, tests and docs files                   |
+    | C-ct            | run the unit tests for a vocabulary                        |
     | C-cr            | switch to listener and refresh all loaded vocabs           |
     | C-cs            | switch to other factor buffer (fuel-switch-to-buffer)      |
     | C-x4s           | switch to other factor buffer in other window              |
