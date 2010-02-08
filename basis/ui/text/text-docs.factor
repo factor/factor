@@ -1,5 +1,5 @@
 IN: ui.text
-USING: help.markup help.syntax kernel ui.text.private strings math fonts ;
+USING: help.markup help.syntax kernel ui.text.private strings math fonts images ;
 
 HELP: string-width
 { $values { "font" font } { "string" string } { "w" "a positive integer" } }
