@@ -1,8 +1,8 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays sequences math math.order cache opengl
-opengl.gl strings fonts colors accessors namespaces
-ui.gadgets.worlds ;
+USING: kernel arrays assocs sequences math math.order cache
+opengl opengl.gl opengl.textures strings fonts colors accessors
+namespaces ui.gadgets.worlds ;
 IN: ui.text
 
 <PRIVATE
@@ -28,8 +28,6 @@ M: object string-dim [ string-width ] [ string-height ] 2bi 2array ;
 M: object string-width string-dim first ;
 
 M: object string-height string-dim second ;
-
-HOOK: draw-string font-renderer ( font string -- )
 
 HOOK: free-fonts font-renderer ( world -- )
 
@@ -58,6 +56,22 @@ M: array text-dim
 HOOK: font-metrics font-renderer ( font -- metrics )
 
 HOOK: line-metrics font-renderer ( font string -- metrics )
+
+HOOK: string>image font-renderer ( font string -- image loc )
+
+<PRIVATE
+
+: string-empty? ( obj -- ? )
+    dup selection? [ string>> ] when empty? ;
+
+: draw-string ( font string -- )
+    dup string-empty? [ 2drop ] [
+        world get world-text-handle
+        [ string>image <texture> ] 2cache
+        draw-texture
+    ] if ;
+
+PRIVATE>
 
 GENERIC: draw-text ( font text -- )
 
