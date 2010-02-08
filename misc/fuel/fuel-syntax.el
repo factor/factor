@@ -50,7 +50,8 @@
     "DEFER:"
     "EBNF:" ";EBNF" "ERROR:" "EXCLUDE:"
     "f" "FORGET:" "FROM:" "FUNCTION:"
-    "GENERIC#" "GENERIC:"
+    "GAME:" "GENERIC#" "GENERIC:"
+    "GLSL-SHADER:" "GLSL-PROGRAM:"
     "HELP:" "HEX:" "HOOK:"
     "IN:" "initial:" "INSTANCE:" "INTERSECTION:"
     "LIBRARY:"
@@ -60,10 +61,10 @@
     "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROVIDE:"
     "QUALIFIED-WITH:" "QUALIFIED:"
     "read-only" "RENAME:" "REQUIRE:"  "REQUIRES:"
-    "SINGLETON:" "SINGLETONS:" "SLOT:" "SYMBOL:" "SYMBOLS:" "SYNTAX:"
-    "TUPLE:" "t" "t?" "TYPEDEF:"
-    "UNION:" "USE:" "USING:"
-    "VARS:"))
+    "SINGLETON:" "SINGLETONS:" "SLOT:" "STRING:" "SYMBOL:" "SYMBOLS:" "SYNTAX:"
+    "TUPLE:" "t" "t?" "TYPEDEF:" "TYPED:" "TYPED::"
+    "UNIFORM-TUPLE:" "UNION:" "USE:" "USING:"
+    "VARS:" "VERTEX-FORMAT:"))
 
 (defconst fuel-syntax--parsing-words-regex
   (regexp-opt fuel-syntax--parsing-words 'words))
@@ -110,7 +111,7 @@
   (format "\\_<\\(%s\\)?: +\\_<\\(\\w+\\)\\_>"
           (regexp-opt
            '(":" "GENERIC" "DEFER" "HOOK" "MAIN" "MATH" "POSTPONE"
-             "SYMBOL" "SYNTAX" "RENAME"))))
+             "SYMBOL" "SYNTAX" "TYPED" "RENAME"))))
 
 (defconst fuel-syntax--alias-definition-regex
   "^ALIAS: +\\(\\_<.+?\\_>\\) +\\(\\_<.+?\\_>\\)")
@@ -159,8 +160,11 @@
                                            "MEMO" "MEMO:" "METHOD"
                                            "SYNTAX"
                                            "PREDICATE" "PRIMITIVE"
-                                           "STRUCT" "TAG" "TUPLE" "UNION-STRUCT"
-                                           "UNION"))
+                                           "STRUCT" "TAG" "TUPLE"
+                                           "TYPED" "TYPED:"
+                                           "UNIFORM-TUPLE"
+                                           "UNION-STRUCT" "UNION"
+                                           "VERTEX-FORMAT"))
 
 (defconst fuel-syntax--no-indent-def-starts '("ARTICLE"
                                               "HELP"
@@ -185,7 +189,7 @@
                 "CONSTANT:" "C:"
                 "DEFER:"
                 "FORGET:"
-                "GENERIC:" "GENERIC#"
+                "GAME:" "GENERIC:" "GENERIC#" "GLSL-PROGRAM:" 
                 "HEX:" "HOOK:"
                 "IN:" "INSTANCE:"
                 "LIBRARY:"
