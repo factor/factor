@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays compiler.units fry hashtables help.topics io
 kernel math namespaces sequences sets help.vocabs
@@ -21,7 +21,8 @@ M: apropos add-recent-where recent-searches ;
 M: object add-recent-where f ;
 
 : $recent ( element -- )
-    first get reverse [ nl ] [ 1array $pretty-link ] interleave ;
+    first get [ valid-article? ] filter <reversed>
+    [ nl ] [ 1array $pretty-link ] interleave ;
 
 : $recent-searches ( element -- )
     drop recent-searches get [ <$link> ] map $list ;
