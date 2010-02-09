@@ -1,11 +1,11 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.syntax cocoa cocoa.nibs cocoa.application
 cocoa.classes cocoa.dialogs cocoa.pasteboard cocoa.runtime
 cocoa.subclassing core-foundation core-foundation.strings
 help.topics kernel memory namespaces parser system ui
 ui.tools.browser ui.tools.listener ui.backend.cocoa eval
-locals vocabs.refresh ;
+locals listener vocabs.refresh ;
 FROM: alien.c-types => int void ;
 IN: ui.backend.cocoa.tools
 
@@ -82,12 +82,20 @@ CLASS: {
     "evalInListener:userData:error:"
     void
     { id SEL id id id }
-    [ nip [ eval-listener f ] do-service 2drop ]
+    [
+        nip
+        [ eval-listener f ] do-service
+        2drop
+    ]
 } {
     "evalToString:userData:error:"
     void
     { id SEL id id id }
-    [ nip [ eval>string ] do-service 2drop ]
+    [
+        nip
+        [ [ (eval>string) ] with-interactive-vocabs ] do-service
+        2drop
+    ]
 } ;
 
 : register-services ( -- )
