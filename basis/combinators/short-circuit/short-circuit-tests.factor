@@ -1,4 +1,4 @@
-USING: kernel math tools.test combinators.short-circuit ;
+USING: kernel math tools.test combinators.short-circuit accessors ;
 IN: combinators.short-circuit.tests
 
 [ 3 ] [ { [ 1 ] [ 2 ] [ 3 ] } 0&& ] unit-test
@@ -23,3 +23,18 @@ IN: combinators.short-circuit.tests
 
 [ 30 ] [ 10 20 compiled-|| ] unit-test
 [ 2 ] [ 1 1 compiled-|| ] unit-test
+
+! && and || should be row-polymorphic both when compiled and when interpreted
+
+: row-&& ( -- ? )
+    f t { [ drop dup ] } 1&& nip ;
+
+[ f ] [ row-&& ] unit-test
+[ f ] [ \ row-&& def>> call ] unit-test
+
+: row-|| ( -- ? )
+    f t { [ drop dup ] } 1|| nip ;
+
+[ f ] [ row-|| ] unit-test
+[ f ] [ \ row-|| def>> call ] unit-test
+
