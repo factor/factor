@@ -9,14 +9,14 @@ IN: mason.release.archive
 : base-name ( -- string )
     [ "factor-" % platform % "-" % stamp get % ] "" make ;
 
-: extension ( -- extension )
-    target-os get {
+: extension ( os -- extension )
+    {
         { "winnt" [ ".zip" ] }
         { "macosx" [ ".dmg" ] }
         [ drop ".tar.gz" ]
     } case ;
 
-: archive-name ( -- string ) base-name extension append ;
+: archive-name ( -- string ) base-name target-os get extension append ;
 
 :: make-windows-archive ( archive-name -- )
     { "zip" "-r" archive-name "factor" } short-running-process ;
