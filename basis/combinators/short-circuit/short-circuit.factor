@@ -1,11 +1,19 @@
 USING: kernel combinators quotations arrays sequences assocs
-generalizations macros fry ;
+generalizations macros fry math ;
 IN: combinators.short-circuit
+
+<PRIVATE
+
+MACRO: keeping ( n quot -- quot' )
+    swap dup 1 +
+    '[ _ _ nkeep _ nrot ] ;
+
+PRIVATE>
 
 MACRO: n&& ( quots n -- quot )
     [
         [ [ f ] ] 2dip swap [
-            [ '[ drop _ ndup @ dup not ] ]
+            [ '[ drop _ _ keeping dup not ] ]
             [ drop '[ drop _ ndrop f ] ]
             2bi 2array
         ] with map
@@ -27,7 +35,7 @@ PRIVATE>
 MACRO: n|| ( quots n -- quot )
     [
         [ [ f ] ] 2dip swap [
-            [ '[ drop _ ndup @ dup ] ]
+            [ '[ drop _ _ keeping dup ] ]
             [ drop '[ _ nnip ] ]
             2bi 2array
         ] with map
