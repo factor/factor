@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators db db.tuples furnace.actions
 http.server.responses http.server.dispatchers kernel mason.platform
-mason.server.notify mason.report math.order sequences sorting
+mason.server mason.report math.order sequences sorting
 splitting xml.syntax xml.writer io.pathnames io.encodings.utf8
 io.files present validators html.forms furnace.db urls ;
 FROM: assocs => at keys values ;
