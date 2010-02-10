@@ -1,46 +1,9 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.smart command-line db
-db.sqlite db.tuples db.types io io.encodings.utf8 io.files
-present kernel namespaces sequences calendar ;
-IN: mason.notify.server
-
-CONSTANT: +starting+ "starting"
-CONSTANT: +make-vm+ "make-vm"
-CONSTANT: +boot+ "boot"
-CONSTANT: +test+ "test"
-CONSTANT: +clean+ "status-clean"
-CONSTANT: +dirty+ "status-dirty"
-CONSTANT: +error+ "status-error"
-
-TUPLE: builder
-host-name os cpu
-clean-git-id clean-timestamp
-last-release release-git-id
-last-git-id last-timestamp last-report
-current-git-id current-timestamp
-status ;
-
-builder "BUILDERS" {
-    { "host-name" "HOST_NAME" TEXT +user-assigned-id+ }
-    { "os" "OS" TEXT +user-assigned-id+ }
-    { "cpu" "CPU" TEXT +user-assigned-id+ }
-    
-    { "clean-git-id" "CLEAN_GIT_ID" TEXT }
-    { "clean-timestamp" "CLEAN_TIMESTAMP" TIMESTAMP }
-
-    { "last-release" "LAST_RELEASE" TEXT }
-    { "release-git-id" "RELEASE_GIT_ID" TEXT }
-    
-    { "last-git-id" "LAST_GIT_ID" TEXT }
-    { "last-timestamp" "LAST_TIMESTAMP" TIMESTAMP }
-    { "last-report" "LAST_REPORT" TEXT }
-
-    { "current-git-id" "CURRENT_GIT_ID" TEXT }
-    ! Can't name it CURRENT_TIMESTAMP because of bug in db library
-    { "current-timestamp" "CURR_TIMESTAMP" TIMESTAMP }
-    { "status" "STATUS" TEXT }
-} define-persistent
+USING: accessors calendar combinators combinators.smart
+command-line db.tuples io io.encodings.utf8 io.files kernel
+mason.server namespaces present sequences ;
+IN: mason.server.notify
 
 SYMBOLS: host-name target-os target-cpu message message-arg ;
 
@@ -96,13 +59,11 @@ SYMBOLS: host-name target-os target-cpu message message-arg ;
         { "release" [ message-arg get release ] }
     } case ;
 
-: mason-db ( -- db ) "resource:mason.db" <sqlite-db> ;
-
 : handle-update ( command-line timestamp -- )
-    mason-db [
+    [
         [ parse-args find-builder ] dip >>current-timestamp
         [ update-builder ] [ update-tuple ] bi
-    ] with-db ;
+    ] with-mason-db ;
 
 CONSTANT: log-file "resource:mason.log"
 

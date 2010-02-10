@@ -50,7 +50,7 @@ M: string error. print ;
 
 : restart. ( restart n -- )
     [
-        1 + dup 3 <= [ ":" % # "    " % ] [ # " :res  " % ] if
+        1 + dup 3 <= [ ":" % # "      " % ] [ # " :res  " % ] if
         name>> %
     ] "" make print ;
 

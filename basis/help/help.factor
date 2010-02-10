@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io io.styles kernel namespaces make
 parser prettyprint sequences words words.symbol assocs
@@ -47,6 +47,8 @@ M: predicate word-help* drop \ $predicate ;
 
 : all-errors ( -- seq )
     all-words [ error? ] filter sort-articles ;
+
+M: word valid-article? drop t ;
 
 M: word article-name name>> ;
 
