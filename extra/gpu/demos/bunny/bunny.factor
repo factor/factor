@@ -163,7 +163,7 @@ CONSTANT: bunny-model-url "http://factorcode.org/bun_zipper.ply"
 
 : fill-bunny-state ( bunny-state -- )
     dup [ vertexes>> ] [ indexes>> ] bi <bunny-buffers>
-    [ bunny-program <program-instance> bunny-vertex buffer>vertex-array >>vertex-array ]
+    [ bunny-program <program-instance> <vertex-array> >>vertex-array ]
     [ 0 <buffer-ptr> ]
     [ uint-indexes <index-elements> >>index-elements ] tri*
     drop ;
@@ -180,7 +180,7 @@ CONSTANT: bunny-model-url "http://factorcode.org/bun_zipper.ply"
 
 : <sobel-state> ( window-vertex-buffer -- sobel-state )
     sobel-state new
-        swap sobel-program <program-instance> window-vertex buffer>vertex-array >>vertex-array
+        swap sobel-program <program-instance> <vertex-array> >>vertex-array
 
         RGBA half-components T{ texture-parameters
             { wrap clamp-texcoord-to-edge }
@@ -207,7 +207,7 @@ CONSTANT: bunny-model-url "http://factorcode.org/bun_zipper.ply"
 : <loading-state> ( window-vertex-buffer -- loading-state )
     loading-state new
         swap
-        loading-program <program-instance> window-vertex buffer>vertex-array >>vertex-array
+        loading-program <program-instance> <vertex-array> >>vertex-array
 
         RGBA ubyte-components T{ texture-parameters
             { wrap clamp-texcoord-to-edge }
