@@ -2,7 +2,7 @@
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs byte-arrays classes.mixin classes.parser
 classes.singleton classes.struct combinators combinators.short-circuit
-definitions destructors generic.parser gpu gpu.buffers hashtables
+definitions destructors fry generic.parser gpu gpu.buffers hashtables
 images io.encodings.ascii io.files io.pathnames kernel lexer
 literals locals math math.parser memoize multiline namespaces
 opengl opengl.gl opengl.shaders parser quotations sequences
@@ -45,6 +45,7 @@ TUPLE: program
     { filename read-only }
     { line integer read-only }
     { shaders array read-only }
+    { vertex-formats array read-only }
     { feedback-format ?vertex-format read-only }
     { instances hashtable read-only } ;
 
@@ -64,6 +65,9 @@ MEMO: attribute-index ( program-instance attribute-name -- index )
     [ handle>> ] dip glGetAttribLocation ;
 MEMO: output-index ( program-instance output-name -- index )
     [ handle>> ] dip glGetFragDataLocation ;
+
+: vertex-format-attributes ( vertex-format -- attributes )
+    "vertex-format-attributes" word-prop ; inline    
 
 <PRIVATE
 
@@ -200,6 +204,10 @@ GENERIC: link-feedback-format ( program-handle format -- )
 M: f link-feedback-format
     2drop ;
 
+: link-vertex-formats ( program-handle formats -- )
+    [ vertex-format-attributes [ name>> ] map sift ] map concat
+    swap '[ [ _ ] 2dip swap glBindAttribLocation ] each-index ; 
+
 GENERIC: (verify-feedback-format) ( program-instance format -- )
 
 M: f (verify-feedback-format)
@@ -305,7 +313,7 @@ SYNTAX: VERTEX-FORMAT:
     define-vertex-format ;
 
 : define-vertex-struct ( class vertex-format -- )
-    "vertex-format-attributes" word-prop [ vertex-attribute>struct-slot ] map
+    vertex-format-attributes [ vertex-attribute>struct-slot ] map
     define-struct-class ;
 
 SYNTAX: VERTEX-STRUCT:
@@ -360,8 +368,11 @@ DEFER: <shader-instance>
     [ compile-shader-error ] if ;
 
 : (link-program) ( program shader-instances -- program-instance )
-    [ [ handle>> ] map ] curry
-    [ feedback-format>> [ link-feedback-format ] curry ] bi (gl-program)
+    '[ _ [ handle>> ] map ]
+    [
+        [ vertex-formats>> ] [ feedback-format>> ] bi
+        '[ [ _ link-vertex-formats ] [ _ link-feedback-format ] bi ]
+    ] bi (gl-program)
     dup gl-program-ok?  [
         [ swap world get \ program-instance boa |dispose dup verify-feedback-format ]
         with-destructors window-resource
@@ -400,15 +411,26 @@ DEFER: <shader-instance>
     world get over instances>> at*
     [ nip ] [ drop link-program ] if ;
 
-: shaders-and-feedback-format ( words -- shaders feedback-format )
-    [ vertex-format? ] partition swap
-    [ [ def>> first ] map ] [
-        dup length 1 <=
-        [ [ f ] [ first ] if-empty ]
-        [ too-many-feedback-formats-error ] if
-    ] bi* ;
+TUPLE: feedback-format
+    { vertex-format ?vertex-format read-only } ;
+
+: validate-feedback-format ( sequence -- vertex-format/f )
+    dup length 1 <=
+    [ [ f ] [ first vertex-format>> ] if-empty ]
+    [ too-many-feedback-formats-error ] if ;
+
+: ?shader ( object -- shader/f )
+    dup word? [ def>> first dup shader? [ drop f ] unless ] [ drop f ] if ;
+
+: shaders-and-formats ( words -- shaders vertex-formats feedback-format )
+    [ [ ?shader ] map sift ]
+    [ [ vertex-format? ] filter ]
+    [ [ feedback-format? ] filter validate-feedback-format ] tri ;
 
 PRIVATE>
+
+SYNTAX: feedback-format:
+    scan-object feedback-format boa suffix! ;
 
 TYPED:: refresh-program ( program: program -- )
     program shaders>> [ refresh-shader-source ] each
@@ -475,7 +497,7 @@ SYNTAX: GLSL-PROGRAM:
     dup old-instances [
         f
         lexer get line>>
-        \ ; parse-until >array shaders-and-feedback-format
+        \ ; parse-until >array shaders-and-formats
     ] dip
     program boa
     over reset-generic
