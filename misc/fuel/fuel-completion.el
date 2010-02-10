@@ -190,13 +190,13 @@ terminates a current completion."
 
 (defvar fuel-completion--vocab-history nil)
 
-(defun fuel-completion--read-vocab (refresh)
+(defun fuel-completion--read-vocab (refresh &optional init-input)
   (let ((minibuffer-local-completion-map fuel-completion--minibuffer-map)
         (vocabs (fuel-completion--vocabs refresh))
         (prompt "Vocabulary name: "))
     (if vocabs
-        (completing-read prompt vocabs nil nil nil fuel-completion--vocab-history)
-      (read-string prompt nil fuel-completion--vocab-history))))
+        (completing-read prompt vocabs nil nil init-input fuel-completion--vocab-history)
+      (read-string prompt init-input fuel-completion--vocab-history))))
 
 (defun fuel-completion--complete-symbol ()
   "Complete the symbol at point.

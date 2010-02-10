@@ -119,30 +119,26 @@ M: bignum (log2) bignum-log2 ; inline
 : scale-denonimator ( den -- scaled-den scale' )
     dup twos neg [ shift ] keep ; inline
 
-: pre-scale ( num den -- scale shifted-num scaled-den )
+: pre-scale ( num den -- mantissa den' scale )
     2dup [ log2 ] bi@ -
-    [ neg 54 + shift ] [ [ scale-denonimator ] dip + ] bi-curry bi*
-    -rot ; inline
+    [ neg 54 + shift ] [ [ scale-denonimator ] dip + ] bi-curry bi* ; inline
 
 ! Second step: loop
-: shift-mantissa ( scale mantissa -- scale' mantissa' )
-    [ 1 + ] [ 2/ ] bi* ; inline
-
-: /f-loop ( scale mantissa den -- scale' fraction-and-guard rem )
-    [ 2dup /i log2 53 > ]
-    [ [ shift-mantissa ] dip ]
-    while /mod ; inline
+: /f-loop ( mantissa den scale -- fraction-and-guard rem scale' )
+    [ 2over /i log2 53 > ]
+    [ [ 2/ ] [ ] [ 1 + ] tri* ] while
+    [ /mod ] dip ; inline
 
 ! Third step: post-scaling
 : unscaled-float ( mantissa -- n )
     52 2^ 1 - bitand 1022 52 shift bitor bits>double ; inline
 
-: scale-float ( scale mantissa -- float' )
-    [ dup 0 < [ neg 2^ recip ] [ 2^ ] if ] dip * ; inline
+: scale-float ( mantissa scale -- float' )
+    dup 0 < [ neg 2^ recip ] [ 2^ ] if * ; inline
 
-: post-scale ( scale mantissa -- n )
-    2/ dup log2 52 > [ shift-mantissa ] when
-    unscaled-float scale-float ; inline
+: post-scale ( mantissa scale -- n )
+    [ 2/ ] dip over log2 52 > [ [ 2/ ] [ 1 + ] bi* ] when
+    [ unscaled-float ] dip scale-float ; inline
 
 ! Main word
 : /f-abs ( m n -- f )
@@ -153,8 +149,8 @@ M: bignum (log2) bignum-log2 ; inline
             drop 1/0.
         ] [
             pre-scale
-            /f-loop over odd?
-            [ zero? [ 1 + ] unless ] [ drop ] if
+            /f-loop
+            [ over odd? [ zero? [ 1 + ] unless ] [ drop ] if ] dip
             post-scale
         ] if-zero
     ] if ; inline
