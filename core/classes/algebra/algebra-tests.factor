@@ -211,12 +211,6 @@ MIXIN: empty-mixin
 
 [ f ] [ null class-not null class= ] unit-test
 
-! class<=>
-
-[ +lt+ ] [ sequence object class<=> ] unit-test
-[ +gt+ ] [ object sequence class<=> ] unit-test
-[ +eq+ ] [ integer integer class<=> ] unit-test
-
 ! smallest-class etc
 [ real ] [ { real sequence } smallest-class ] unit-test
 [ real ] [ { sequence real } smallest-class ] unit-test
