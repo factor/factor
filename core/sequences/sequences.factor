@@ -91,6 +91,8 @@ M: sequence set-nth-unsafe set-nth ; inline
 : change-nth-unsafe ( i seq quot -- )
     [ [ nth-unsafe ] dip call ] 3keep drop set-nth-unsafe ; inline
 
+PRIVATE>
+
 ! The f object supports the sequence protocol trivially
 M: f length drop 0 ; inline
 M: f nth-unsafe nip ; inline
@@ -98,19 +100,17 @@ M: f like drop [ f ] when-empty ; inline
 
 INSTANCE: f immutable-sequence
 
-PRIVATE>
-
-! In the future, this will replace integer sequences
+! Integer sequences
 TUPLE: iota { n integer read-only } ;
 
 : iota ( n -- iota ) \ iota boa ; inline
-
-<PRIVATE
 
 M: iota length n>> ; inline
 M: iota nth-unsafe drop ; inline
 
 INSTANCE: iota immutable-sequence
+
+<PRIVATE
 
 : first-unsafe ( seq -- first )
     0 swap nth-unsafe ; inline
