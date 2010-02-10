@@ -326,19 +326,28 @@ TUPLE: vertex-array < gpu-object
 M: vertex-array dispose
     [ [ delete-vertex-array ] when* f ] change-handle drop ;
 
-: <vertex-array> ( program-instance vertex-formats -- vertex-array )
-    gen-vertex-array
-    [ glBindVertexArray [ first2 bind-vertex-format ] with each ]
-    [ -rot [ first buffer>> ] map vertex-array boa ] 3bi
-    window-resource ; inline
+: ?>buffer-ptr ( buffer/ptr -- buffer-ptr )
+    dup buffer-ptr? [ 0 <buffer-ptr> ] unless ; inline
+: ?>buffer ( buffer/ptr -- buffer )
+    dup buffer? [ buffer>> ] unless ; inline
 
-TYPED: buffer>vertex-array ( vertex-buffer: buffer
-                             program-instance: program-instance
-                             format: vertex-format
-                             --
-                             vertex-array: vertex-array )
-    [ swap ] dip
-    [ 0 <buffer-ptr> ] dip 2array 1array <vertex-array> ; inline
+:: <multi-vertex-array> ( vertex-formats program-instance -- vertex-array )
+    gen-vertex-array :> handle
+    handle glBindVertexArray
+
+    vertex-formats [ program-instance swap first2 [ ?>buffer-ptr ] dip bind-vertex-format ] each
+    handle program-instance vertex-formats [ first ?>buffer ] map
+    vertex-array boa window-resource ; inline
+
+:: <vertex-array*> ( vertex-buffer program-instance format -- vertex-array )
+    gen-vertex-array :> handle
+    handle glBindVertexArray
+    program-instance vertex-buffer ?>buffer-ptr format bind-vertex-format
+    handle program-instance vertex-buffer ?>buffer 1array
+    vertex-array boa window-resource ; inline
+
+: <vertex-array> ( vertex-buffer program-instance -- vertex-array )
+    dup program>> vertex-formats>> first <vertex-array*> ; inline
 
 TYPED: vertex-array-buffer ( vertex-array: vertex-array -- vertex-buffer: buffer )
     vertex-buffers>> first ;
@@ -424,7 +433,7 @@ TUPLE: feedback-format
 
 : shaders-and-formats ( words -- shaders vertex-formats feedback-format )
     [ [ ?shader ] map sift ]
-    [ [ vertex-format? ] filter ]
+    [ [ vertex-format-attributes ] filter ]
     [ [ feedback-format? ] filter validate-feedback-format ] tri ;
 
 PRIVATE>

@@ -130,7 +130,7 @@ TUPLE: vbo
         [
             [
                 [ vertex-buffer>> obj-program <program-instance> ]
-                [ vertex-format>> ] bi buffer>vertex-array
+                [ vertex-format>> ] bi <vertex-array*>
             ] map >>vertex-arrays drop
         ]
         [
