@@ -24,9 +24,13 @@ HELP: <vertex-array>
 }
 { $description "Creates a new " { $link vertex-array } " to feed data to " { $snippet "program-instance" } " from the set of " { $link buffer } "s specified in " { $snippet "vertex-formats" } "." } ;
 
+HELP: feedback-format:
+{ $syntax "feedback-format: vertex-format" }
+{ $description "When used as part of a " { $link GLSL-PROGRAM: } " definition, this syntax specifies the " { $link vertex-format } " in which transform feedback output will be generated." } ;
+
 HELP: GLSL-PROGRAM:
-{ $syntax "GLSL-PROGRAM: program-name shader shader ... shader [vertex-format] ;" }
-{ $description "Defines a new " { $link program } " named " { $snippet "program-name" } ". When the program is instantiated with " { $link <program-instance> } ", it will link together instances of all of the specified " { $link shader } "s to create the program instance. A single " { $link vertex-array } " may optionally be specified; if the program is used to collect transform feedback, this format will be used for the output." }
+{ $syntax "GLSL-PROGRAM: program-name shader shader ... [vertex-format vertex-format ...] [feedback-format: vertex-format] ;" }
+{ $description "Defines a new " { $link program } " named " { $snippet "program-name" } ". When the program is instantiated with " { $link <program-instance> } ", it will link together instances of all of the specified " { $link shader } "s to create the program instance. If any " { $link vertex-format } "s are specified, their attributes will be pre-assigned attribute indexes at link time, to ensure that their indexes remain constant if the program is refreshed with " { $link refresh-program } ". A trasform feedback vertex format may optionally be specified with " { $link feedback-format: } "; if the program is used to collect transform feedback, the given vertex format will be used for the output." }
 { $notes "Transform feedback requires OpenGL 3.0 or one of the " { $snippet "GL_EXT_transform_feedback" } " or " { $snippet "GL_ARB_transform_feedback" } " extensions." } ;
 
 HELP: GLSL-SHADER-FILE:
