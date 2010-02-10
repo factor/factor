@@ -1,8 +1,8 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators db db.tuples furnace.actions
 http.server.responses http.server.dispatchers kernel mason.platform
-mason.notify.server mason.report math.order sequences sorting
+mason.server mason.report math.order sequences sorting
 splitting xml.syntax xml.writer io.pathnames io.encodings.utf8
 io.files present validators html.forms furnace.db urls ;
 FROM: assocs => at keys values ;
@@ -181,4 +181,3 @@ CONSTANT: cpus
     <download-binary-action> "download" add-responder
     <download-grid-action> "grid" add-responder
     mason-db <db-persistence> ;
-

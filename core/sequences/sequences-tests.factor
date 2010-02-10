@@ -1,4 +1,4 @@
-USING: arrays kernel math namespaces sequences kernel.private
+USING: arrays kernel math math.order namespaces sequences kernel.private
 sequences.private strings sbufs tools.test vectors assocs
 generic vocabs.loader ;
 IN: sequences.tests
@@ -300,3 +300,12 @@ USE: make
 
 [ t ] [ 0 array-capacity? ] unit-test
 [ f ] [ -1 array-capacity? ] unit-test
+
+[ +lt+ ] [ { 0 0 0 } { 1 1 1 } <=> ] unit-test
+[ +lt+ ] [ { 0 0 0 } { 0 1 1 } <=> ] unit-test
+[ +lt+ ] [ { 0 0 0 } { 0 0 0 0 } <=> ] unit-test
+[ +gt+ ] [ { 1 1 1 } { 0 0 0 } <=> ] unit-test
+[ +gt+ ] [ { 0 1 1 } { 0 0 0 } <=> ] unit-test
+[ +gt+ ] [ { 0 0 0 0 } { 0 0 0 } <=> ] unit-test
+[ +eq+ ] [ { } { } <=> ] unit-test
+[ +eq+ ] [ { 1 2 3 } { 1 2 3 } <=> ] unit-test

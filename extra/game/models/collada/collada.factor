@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs grouping hashtables kernel locals
-math math.floats.parser math.parser sequences sequences.deep
+math math.parser sequences sequences.deep
 specialized-arrays.instances.alien.c-types.float
 specialized-arrays.instances.alien.c-types.uint splitting xml
 xml.data xml.traversal math.order namespaces combinators images
@@ -23,7 +23,7 @@ SYMBOLS: up-axis unit-ratio ;
     " \t\n" split harvest [ string>number ] map ;
 
 : string>floats ( string -- float-seq )
-    " \t\n" split harvest [ string>float ] map ;
+    " \t\n" split harvest [ string>number ] map ;
 
 : x/ ( tag child-name -- child-tag )
     [ tag-named ]

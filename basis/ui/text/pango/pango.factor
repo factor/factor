@@ -1,8 +1,8 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types assocs cache kernel math math.vectors
-namespaces opengl.textures pango.cairo pango.layouts ui.gadgets.worlds
-ui.text ui.text.private pango sequences ;
+USING: accessors assocs cache kernel math math.vectors
+namespaces pango.cairo pango.layouts ui.text ui.text.private
+pango sequences ;
 IN: ui.text.pango
 
 SINGLETON: pango-renderer
@@ -14,13 +14,8 @@ M: pango-renderer string-dim
 M: pango-renderer flush-layout-cache
     cached-layouts get purge-cache ;
 
-: rendered-layout ( font string -- texture )
-    world get world-text-handle [
-        cached-layout [ image>> ] [ text-position vneg ] bi <texture>
-    ] 2cache ;
-
-M: pango-renderer draw-string ( font string -- )
-    rendered-layout draw-texture ;
+M: pango-renderer string>image ( font string -- image loc )
+    cached-layout [ image>> ] [ text-position vneg ] bi ;
 
 M: pango-renderer x>offset ( x font string -- n )
     cached-layout swap x>line-offset ;
