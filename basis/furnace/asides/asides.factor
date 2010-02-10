@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces assocs kernel sequences accessors hashtables
 urls db.types db.tuples math.parser fry logging combinators
@@ -51,7 +51,7 @@ SYMBOL: aside-id
     set-aside ;
 
 M: asides call-responder*
-    [ init-asides ] [ asides set ] [ call-next-method ] tri ;
+    [ init-asides ] [ call-next-method ] bi ;
 
 : touch-aside ( aside -- )
     asides get touch-state ;
@@ -65,14 +65,13 @@ M: asides call-responder*
     [ touch-aside ] [ insert-tuple ] [ set-aside ] tri ;
 
 : end-aside-post ( aside -- response )
-    [ url>> ] [ post-data>> ] bi
     request [
         clone
-            swap >>post-data
-            over >>url
+            over post-data>> >>post-data
+            over url>> >>url
     ] change
-    [ url set ] [ path>> split-path ] bi
-    asides get responder>> call-responder ;
+    [ [ post-data>> params>> params set ] [ url>> url set ] bi ]
+    [ url>> path>> split-path asides get responder>> call-responder ] bi ;
 
 \ end-aside-post DEBUG add-input-logging
 
