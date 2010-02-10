@@ -586,13 +586,13 @@ PRIVATE>
     [ empty? not ] filter ;
 
 : mismatch ( seq1 seq2 -- i )
-    [ min-length iota ] 2keep
+    [ min-length ] 2keep
     [ 2nth-unsafe = not ] 2curry
-    find drop ; inline
+    find-integer ; inline
 
 M: sequence <=>
-    2dup mismatch
-    [ -rot 2nth-unsafe <=> ] [ [ length ] compare ] if* ;
+    [ mismatch ] 2keep pick
+    [ 2nth-unsafe <=> ] [ [ length ] compare nip ] if ;
 
 : sequence= ( seq1 seq2 -- ? )
     2dup [ length ] bi@ =
