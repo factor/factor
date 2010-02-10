@@ -13,20 +13,33 @@ SPECIALIZED-ARRAY: float
 SPECIALIZED-VECTOR: uint
 IN: gpu.demos.bunny
 
+VERTEX-FORMAT: bunny-vertex
+    { "vertex" float-components 3 f }
+    { f        float-components 1 f }
+    { "normal" float-components 3 f }
+    { f        float-components 1 f } ;
+
+STRUCT: bunny-vertex-struct
+    { vertex float-4 }
+    { normal float-4 } ;
+
 GLSL-SHADER-FILE: bunny-vertex-shader vertex-shader "bunny.v.glsl"
 GLSL-SHADER-FILE: bunny-fragment-shader fragment-shader "bunny.f.glsl"
 GLSL-PROGRAM: bunny-program
-    bunny-vertex-shader bunny-fragment-shader ;
+    bunny-vertex-shader bunny-fragment-shader
+    bunny-vertex ;
 
 GLSL-SHADER-FILE: window-vertex-shader vertex-shader "window.v.glsl"
 
 GLSL-SHADER-FILE: sobel-fragment-shader fragment-shader "sobel.f.glsl"
 GLSL-PROGRAM: sobel-program
-    window-vertex-shader sobel-fragment-shader ;
+    window-vertex-shader sobel-fragment-shader
+    window-vertex ;
 
 GLSL-SHADER-FILE: loading-fragment-shader fragment-shader "loading.f.glsl"
 GLSL-PROGRAM: loading-program
-    window-vertex-shader loading-fragment-shader ;
+    window-vertex-shader loading-fragment-shader
+    window-vertex ;
 
 TUPLE: bunny-state
     vertexes
@@ -47,16 +60,6 @@ TUPLE: loading-state
 
 TUPLE: bunny-world < wasd-world
     bunny sobel loading ;
-
-VERTEX-FORMAT: bunny-vertex
-    { "vertex" float-components 3 f }
-    { f        float-components 1 f }
-    { "normal" float-components 3 f }
-    { f        float-components 1 f } ;
-
-STRUCT: bunny-vertex-struct
-    { vertex float-4 }
-    { normal float-4 } ;
 
 SPECIALIZED-VECTOR: bunny-vertex-struct
 
