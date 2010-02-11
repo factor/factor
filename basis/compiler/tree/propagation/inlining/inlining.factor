@@ -79,14 +79,6 @@ M: callable splicing-nodes splicing-body ;
 : inline-math-method ( #call word -- ? )
     dupd inlining-math-method eliminate-dispatch ;
 
-: inlining-math-partial ( #call word -- class/f quot/f )
-    [ "derived-from" word-prop first inlining-math-method ]
-    [ nip 1quotation ] 2bi
-    [ = not ] [ drop ] 2bi and ;
-
-: inline-math-partial ( #call word -- ? )
-    dupd inlining-math-partial eliminate-dispatch ;
-
 ! Method body inlining
 SYMBOL: history
 
