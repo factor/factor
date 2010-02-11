@@ -3,7 +3,7 @@
 USING: accessors assocs combinators compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.registers fry kernel
 locals namespaces sequences sets sorting math.vectors
-make math combinators.short-circuit ;
+make math combinators.short-circuit vectors ;
 IN: compiler.cfg.dependence
 
 ! Dependence graph construction
@@ -16,6 +16,7 @@ SYMBOL: nodes
 ! These need to be numbered so that the same instruction
 ! will get distinct nodes if it occurs multiple times
 TUPLE: node
+    precedes-data precedes-control
     number insn precedes follows
     children parent
     registers parent-index ;
@@ -29,6 +30,8 @@ M: node hashcode* nip number>> ;
         node-number counter >>number
         swap >>insn
         H{ } clone >>precedes
+        H{ } clone >>precedes-data
+        H{ } clone >>precedes-control
         H{ } clone >>follows ;
 
 : ready? ( node -- ? ) precedes>> assoc-empty? ;
@@ -36,17 +39,25 @@ M: node hashcode* nip number>> ;
 : precedes ( first second -- )
     swap precedes>> conjoin ;
 
+: precedes-data ( first second -- )
+    [ precedes ]
+    [ swap precedes-data>> conjoin ] 2bi ;
+
+: precedes-control ( first second -- )
+    [ precedes ]
+    [ swap precedes-control>> conjoin ] 2bi ;
+
 :: add-data-edges ( nodes -- )
     ! This builds up def-use information on the fly, since
     ! we only care about local def-use
     H{ } clone :> definers
     nodes [| node |
         node insn>> defs-vreg [ node swap definers set-at ] when*
-        node insn>> uses-vregs [ definers at [ node precedes ] when* ] each
+        node insn>> uses-vregs [ definers at [ node precedes-data ] when* ] each
     ] each ;
 
 : make-chain ( nodes -- )
-    [ dup rest-slice [ precedes ] 2each ] unless-empty ;
+    [ dup rest-slice [ precedes-control ] 2each ] unless-empty ;
 
 : instruction-chain ( nodes quot -- )
     '[ insn>> @ ] filter make-chain ; inline
@@ -113,6 +124,9 @@ UNION: alien-call-insn
         [ set-roots ]
     } cleave ;
 
+! Constructing fan-in trees using the
+! Sethi-Ulmann numbering
+
 :: calculate-registers ( node -- registers )
     node children>> [ 0 ] [
         [ [ calculate-registers ] map natural-sort ]
@@ -122,38 +136,22 @@ UNION: alien-call-insn
     node insn>> temp-vregs length +
     dup node (>>registers) ;
 
-: data-dependence? ( to from -- ? )
-    ! If this takes lots of time, then refactor code
-    ! so that nodes store their data dependences
-    [ insn>> ] bi@
-    [ uses-vregs ] [ defs-vreg ] bi*
-    swap member? ;
+: attach-parent ( node parent -- )
+    [ >>parent drop ]
+    [ [ ?push ] change-children drop ] 2bi ;
 
-DEFER: follow-tree
-
-: maybe-cut-node ( node -- ? )
-    ! If this node has multiple successors
-    ! then it needs to be made into the head of a new tree
-    [ precedes>> assoc-size 1 = dup ] keep
-    '[ _ dup , follow-tree ] when ;
-
-: follow-tree ( node -- )
-    ! This is bogus: it misses nodes that aren't reachable
-    ! from the roots because of a control dependence
-    dup dup follows>> values
-    [ data-dependence? ] with filter
-    [ parent>> not ] filter
-    [ maybe-cut-node ] filter
-    
-    [ [ >>parent drop ] with each ]
-    [ >>children drop ] 2bi ;
-
-: attach-parent ( node -- )
-    drop ;
+: choose-parent ( node -- )
+    ! If a node has control dependences, it has to be a root
+    ! Otherwise, choose one of the data dependences for a parent
+    dup precedes-control>> assoc-empty? [
+        dup precedes-data>> values [ drop ] [
+            first attach-parent
+        ] if-empty
+    ] [ drop ] if ;
 
 : make-trees ( -- trees )
     nodes get
-    [ [ attach-parent ] each ]
+    [ [ choose-parent ] each ]
     [ [ parent>> not ] filter ] bi ;
 
 ERROR: node-missing-parent trees nodes ;
