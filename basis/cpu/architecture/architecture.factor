@@ -169,6 +169,19 @@ M: uint-scalar-rep rep-size drop 4 ;
 M: longlong-scalar-rep rep-size drop 8 ;
 M: ulonglong-scalar-rep rep-size drop 8 ;
 
+GENERIC: rep-length ( rep -- n ) foldable
+
+M: char-16-rep rep-length drop 16 ;
+M: uchar-16-rep rep-length drop 16 ;
+M: short-8-rep rep-length drop 8 ;
+M: ushort-8-rep rep-length drop 8 ;
+M: int-4-rep rep-length drop 4 ;
+M: uint-4-rep rep-length drop 4 ;
+M: longlong-2-rep rep-length drop 2 ;
+M: ulonglong-2-rep rep-length drop 2 ;
+M: float-4-rep rep-length drop 4 ;
+M: double-2-rep rep-length drop 2 ;
+
 GENERIC: rep-component-type ( rep -- n )
 
 ! Methods defined in alien.c-types
