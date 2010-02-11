@@ -148,6 +148,14 @@ DEFER: follow-tree
     [ [ >>parent drop ] with each ]
     [ >>children drop ] 2bi ;
 
+: attach-parent ( node -- )
+    drop ;
+
+: make-trees ( -- trees )
+    nodes get
+    [ [ attach-parent ] each ]
+    [ [ parent>> not ] filter ] bi ;
+
 ERROR: node-missing-parent trees nodes ;
 ERROR: node-missing-children trees nodes ;
 
@@ -168,13 +176,8 @@ ERROR: node-missing-children trees nodes ;
 : verify-trees ( trees -- trees )
     verify-parents verify-children ;
 
-: make-trees ( -- trees )
-    [
-        roots get [ dup , follow-tree ] each
-    ] { } make verify-trees ;
-
 : build-fan-in-trees ( -- )
-    make-trees [
+    make-trees verify-trees [
         -1/0. >>parent-index 
         calculate-registers drop
     ] each ;
