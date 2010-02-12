@@ -31,7 +31,7 @@ ERROR: bad-delete-at key assoc ;
     [ [ ready? ] filter roots get push-all ] bi ;
 
 : score ( insn -- n )
-    [ parent-index>> ] [ registers>> neg ] bi 2array ;
+    [ parent-index>> ] [ registers>> neg ] [ insn>> insn#>> ] tri 3array ;
 
 : pull-out-nth ( n seq -- elt )
     [ nth ] [ remove-nth! drop ] 2bi ;
