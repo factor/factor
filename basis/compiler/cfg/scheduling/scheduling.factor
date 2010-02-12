@@ -122,26 +122,14 @@ ERROR: definition-after-usage vreg old-bb new-bb ;
 ! to decide whether to schedule instructions
 : num-registers ( -- x ) int-regs machine-registers at length ;
 
-: update-vregs ( insn vregs -- )
-    [ [ defs-vreg ] dip '[ _ delete-at ] when* ]
-    [ [ uses-vregs ] dip '[ _ conjoin ] each ] 2bi ;
-
-:: (might-spill?) ( vregs insns -- ? )
-    insns <reversed> [
-        [ vregs update-vregs ]
-        [ temp-vregs length vregs assoc-size + num-registers > ] bi
-    ] any? ;
-
 : might-spill? ( bb -- ? )
-    ! Conservative approximation testing whether a bb might spill
-    ! by calculating register pressure all along, assuming
-    ! everything in live-out are in registers
-    ! This is done bottom-up: a def means the register is no longer live
-    [ live-out H{ } assoc-clone-like ] [ instructions>> ] bi (might-spill?) ;
+    [ live-in assoc-size ]
+    [ instructions>> [ defs-vreg ] count ] bi
+    + num-registers >= ;
 
 : schedule-instructions ( cfg -- cfg' )
     dup [
-        dup might-spill?
+    dup might-spill?
         [ schedule-block ]
         [ drop ] if
     ] each-basic-block ;
