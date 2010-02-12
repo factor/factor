@@ -26,7 +26,7 @@ ERROR: bad-delete-at key assoc ;
     '[ _ >>parent-index drop ] each ;
 
 : remove-node ( node -- )
-    [ follows>> values ] keep
+    [ follows>> keys ] keep
     '[ [ precedes>> _ swap check-delete-at ] each ]
     [ [ ready? ] filter roots get push-all ] bi ;
 
