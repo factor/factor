@@ -120,13 +120,11 @@ UNION: alien-call-insn
         [ add-data-edges ]
         [ add-control-edges ]
         [ set-follows ]
-        [ nodes set ] ! for assertions later
+        [ nodes set ]
         [ set-roots ]
     } cleave ;
 
-! Constructing fan-in trees using the
 ! Sethi-Ulmann numbering
-
 :: calculate-registers ( node -- registers )
     node children>> [ 0 ] [
         [ [ calculate-registers ] map natural-sort ]
@@ -135,6 +133,8 @@ UNION: alien-call-insn
     ] if-empty
     node insn>> temp-vregs length +
     dup node (>>registers) ;
+
+! Constructing fan-in trees
 
 : attach-parent ( node parent -- )
     [ >>parent drop ]
