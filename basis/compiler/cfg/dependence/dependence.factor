@@ -12,11 +12,13 @@ SYMBOL: roots
 SYMBOL: node-number
 SYMBOL: nodes
 
+SYMBOL: +data+
+SYMBOL: +control+
+
 ! Nodes in the dependency graph
 ! These need to be numbered so that the same instruction
 ! will get distinct nodes if it occurs multiple times
 TUPLE: node
-    precedes-data precedes-control
     number insn precedes follows
     children parent
     registers parent-index ;
@@ -30,22 +32,15 @@ M: node hashcode* nip number>> ;
         node-number counter >>number
         swap >>insn
         H{ } clone >>precedes
-        H{ } clone >>precedes-data
-        H{ } clone >>precedes-control
         H{ } clone >>follows ;
 
 : ready? ( node -- ? ) precedes>> assoc-empty? ;
 
-: precedes ( first second -- )
-    swap precedes>> conjoin ;
+: spin ( a b c -- c b a )
+    [ 2nip ] [ drop nip ] [ 2drop ] 3tri ;
 
-: precedes-data ( first second -- )
-    [ precedes ]
-    [ swap precedes-data>> conjoin ] 2bi ;
-
-: precedes-control ( first second -- )
-    [ precedes ]
-    [ swap precedes-control>> conjoin ] 2bi ;
+: precedes ( first second how -- )
+    spin precedes>> set-at ;
 
 :: add-data-edges ( nodes -- )
     ! This builds up def-use information on the fly, since
@@ -53,11 +48,11 @@ M: node hashcode* nip number>> ;
     H{ } clone :> definers
     nodes [| node |
         node insn>> defs-vreg [ node swap definers set-at ] when*
-        node insn>> uses-vregs [ definers at [ node precedes-data ] when* ] each
+        node insn>> uses-vregs [ definers at [ node +data+ precedes ] when* ] each
     ] each ;
 
 : make-chain ( nodes -- )
-    [ dup rest-slice [ precedes-control ] 2each ] unless-empty ;
+    [ dup rest-slice [ +control+ precedes ] 2each ] unless-empty ;
 
 : instruction-chain ( nodes quot -- )
     '[ insn>> @ ] filter make-chain ; inline
@@ -107,7 +102,7 @@ UNION: alien-call-insn
 
 : set-follows ( nodes -- )
     [
-        dup precedes>> values [
+        dup precedes>> keys [
             follows>> conjoin
         ] with each
     ] each ;
@@ -140,11 +135,14 @@ UNION: alien-call-insn
     [ >>parent drop ]
     [ [ ?push ] change-children drop ] 2bi ;
 
+: keys-for ( assoc value -- keys )
+    '[ nip _ = ] assoc-filter keys ;
+
 : choose-parent ( node -- )
     ! If a node has control dependences, it has to be a root
     ! Otherwise, choose one of the data dependences for a parent
-    dup precedes-control>> assoc-empty? [
-        dup precedes-data>> values [ drop ] [
+    dup precedes>> +control+ keys-for empty? [
+        dup precedes>> +data+ keys-for [ drop ] [
             first attach-parent
         ] if-empty
     ] [ drop ] if ;
