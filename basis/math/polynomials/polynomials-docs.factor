@@ -11,6 +11,7 @@ ARTICLE: "polynomials" "Polynomials"
     p-
     p*
     p-sq
+    p^
     powers
     n*p
     p/mod
@@ -73,6 +74,11 @@ HELP: p-sq
 { $values { "p" "a polynomial" } { "p^2" "a polynomial" } }
 { $description "Squares a polynomial." }
 { $examples { $example "USING: math.polynomials prettyprint ;" "{ 1 2 0 } p-sq ." "{ 1 4 4 0 0 }" } } ;
+
+HELP: p^
+{ $values { "p" "a polynomial" } { "n" number } { "p^n" "a polynomial" } }
+{ $description "Computes " { $snippet "p" } " to the power of " { $snippet "n" } "." }
+{ $examples { $example "USING: math.polynomials prettyprint ;" "{ 1 2 0 } 3 p^ ." "{ 1 6 12 8 0 0 0 }" } } ;
 
 HELP: p/mod
 { $values { "p" "a polynomial" } { "q" "a polynomial" } { "z" "a polynomial" } { "w" "a polynomial" } }
