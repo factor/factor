@@ -178,9 +178,9 @@ terrain-world H{
     [
         { 0 2 3 3 } vshuffle terrain-height-at PLAYER-HEIGHT +
         -1/0. swap -1/0. -1/0. float-4-boa
-    ] keep vmax ;
+    ] keep vmax ; inline
 
-:: collide ( world player -- )
+TYPED:: collide ( world: terrain-world player: player -- )
     world terrain-segment>> :> segment
     player location>> :> location
     segment location (collide) :> location'

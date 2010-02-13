@@ -1,9 +1,10 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry assocs arrays byte-arrays strings accessors sequences
 kernel slots classes.algebra classes.tuple classes.tuple.private
-words math math.private combinators sequences.private namespaces
-slots.private classes compiler.tree.propagation.info ;
+combinators.short-circuit words math math.private combinators
+sequences.private namespaces slots.private classes
+compiler.tree.propagation.info ;
 IN: compiler.tree.propagation.slots
 
 ! Propagation of immutable slots and array lengths
@@ -52,8 +53,18 @@ UNION: fixed-length-sequence array byte-array string ;
     dup [ read-only>> ] when ;
 
 : literal-info-slot ( slot object -- info/f )
-    2dup class read-only-slot?
-    [ swap slot <literal-info> ] [ 2drop f ] if ;
+    #! literal-info-slot makes an unsafe call to 'slot'.
+    #! Check that the layout is up to date to avoid accessing the
+    #! wrong slot during a compilation unit where reshaping took
+    #! place. This could happen otherwise because the "slots" word
+    #! property would reflect the new layout, but instances in the
+    #! heap would use the old layout since instances are updated
+    #! immediately after compilation.
+    {
+        [ class read-only-slot? ]
+        [ nip layout-up-to-date? ]
+        [ swap slot <literal-info> ]
+    } 2&& ;
 
 : length-accessor? ( slot info -- ? )
     [ 1 = ] [ length>> ] bi* and ;
