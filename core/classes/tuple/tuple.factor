@@ -32,6 +32,10 @@ M: tuple class layout-of 2 slot { word } declare ; inline
 : tuple-size ( tuple -- size )
     layout-of 3 slot { fixnum } declare ; inline
 
+: layout-up-to-date? ( object -- ? )
+    dup tuple?
+    [ [ layout-of ] [ class tuple-layout ] bi eq? ] [ drop t ] if ;
+
 : check-tuple ( object -- tuple )
     dup tuple? [ not-a-tuple ] unless ; inline
 

@@ -2251,7 +2251,7 @@ CONSTANT: GL_LUMINANCE_ALPHA_INTEGER_EXT  HEX: 8D9D
 GL-FUNCTION: void glClearColorIiEXT { } ( GLint r, GLint g, GLint b, GLint a ) ;
 GL-FUNCTION: void glClearColorIuiEXT { } ( GLuint r, GLuint g, GLuint b, GLuint a ) ;
 
-! GL_EXT_texture_compression_s3tc
+! GL_EXT_texture_compression_s3tc, GL_EXT_texture_compression_dxt1
 
 CONSTANT: GL_COMPRESSED_RGB_S3TC_DXT1_EXT  HEX: 83F0
 CONSTANT: GL_COMPRESSED_RGBA_S3TC_DXT1_EXT HEX: 83F1
