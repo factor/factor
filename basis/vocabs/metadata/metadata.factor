@@ -19,6 +19,15 @@ MEMO: vocab-file-contents ( vocab name -- seq )
         3append throw
     ] ?if ;
 
+: vocab-resources-path ( vocab -- string )
+    vocab-dir "resources.txt" append-path ;
+
+: vocab-resources ( vocab -- patterns )
+    dup vocab-resources-path vocab-file-contents harvest ;
+
+: set-vocab-resources ( patterns vocab -- )
+    dup vocab-resources-path set-vocab-file-contents ;
+
 : vocab-summary-path ( vocab -- string )
     vocab-dir "summary.txt" append-path ;
 
