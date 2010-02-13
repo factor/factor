@@ -28,6 +28,12 @@ IN: io.directories.tests
     ] with-directory
 ] unit-test
 
+[ { "classes/tuple" } ] [
+    "resource:core" [
+        "." directory-tree-files [ "classes/tuple" = ] filter
+    ] with-directory
+] unit-test
+
 [ { "classes/tuple/tuple.factor" } ] [
     "resource:core" [
         [ "classes/tuple/tuple.factor" = ] filter

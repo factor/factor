@@ -48,7 +48,7 @@ HELP: directory-files
 
 HELP: directory-tree-files
 { $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
-{ $description "Outputs a sequence of all non-directory files inside the directory named by " { $snippet "path" } " and its subdirectories." } ;
+{ $description "Outputs a sequence of all files and subdirectories inside the directory named by " { $snippet "path" } " or recursively inside its subdirectories." } ;
 
 HELP: with-directory-files
 { $values { "path" "a pathname string" } { "quot" quotation } }
