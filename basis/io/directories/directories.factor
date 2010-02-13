@@ -45,8 +45,11 @@ HOOK: (directory-entries) os ( path -- seq )
     dup directory-entries
     [
         dup type>> +directory+ =
-        [ name>> [ append-path directory-tree-files ] [ [ prepend-path ] curry map ] bi ]
-        [ nip name>> 1array ] if
+        [ name>>
+            [ append-path directory-tree-files ]
+            [ [ prepend-path ] curry map ]
+            [ prefix ] tri
+        ] [ nip name>> 1array ] if
     ] with map concat ;
 
 : with-directory-entries ( path quot -- )
