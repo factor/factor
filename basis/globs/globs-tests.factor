@@ -1,4 +1,4 @@
-USING: tools.test globs ;
+USING: tools.test globs io.pathnames ;
 IN: globs.tests
 
 [ f ] [ "abd" "fdf" glob-matches? ] unit-test
@@ -17,3 +17,8 @@ IN: globs.tests
 [ f ] [ "foo." "*.{xml,txt}" glob-matches? ] unit-test
 [ t ] [ "foo." "*.{,xml,txt}" glob-matches? ] unit-test
 [ t ] [ "foo.{" "*.{" glob-matches? ] unit-test
+
+[ f ] [ "foo" "bar" append-path "*" glob-matches? ] unit-test
+[ t ] [ "foo" "bar" append-path "*" "*" append-path glob-matches? ] unit-test
+[ f ] [ "foo" "bar" append-path "foo?bar" glob-matches? ] unit-test
+[ t ] [ "foo" "bar" append-path "fo?" "bar" append-path glob-matches? ] unit-test
