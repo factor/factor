@@ -38,6 +38,15 @@ PRIVATE>
 : p-sq ( p -- p^2 )
     dup p* ;
 
+ERROR: negative-power-polynomial p n ;
+
+: p^ ( p n -- p^n )
+    {
+        { [ dup 0 > ] [ 1 - dupd [ p* ] with times ] }
+        { [ dup 0 = ] [ 2drop { 1 } ] }
+        { [ dup 0 < ] [ negative-power-polynomial ] }
+    } cond ;
+
 <PRIVATE
 
 : p/mod-setup ( p p -- p p n )
