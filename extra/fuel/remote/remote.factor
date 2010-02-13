@@ -8,7 +8,7 @@ IN: fuel.remote
 <PRIVATE
 
 : start-listener ( -- )
-    [ [ print-error-and-restarts ] error-hook set listener ] with-scope ;
+    [ [ print-error-and-restarts drop ] error-hook set listener ] with-scope ;
 
 : server ( port -- server )
     utf8 <threaded-server>
