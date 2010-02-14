@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar db db.tuples grouping io
+USING: accessors calendar db db.tuples db.types grouping io
 io.encodings.ascii io.launcher kernel locals make
 mason.release.archive mason.server namespaces sequences ;
 IN: mason.server.release
@@ -38,6 +38,14 @@ SYMBOL: upload-directory
 TUPLE: release
 host-name os cpu
 last-release release-git-id ;
+
+release "RELEASES" {
+    { "host-name" "HOST_NAME" TEXT +user-assigned-id+ }
+    { "os" "OS" TEXT +user-assigned-id+ }
+    { "cpu" "CPU" TEXT +user-assigned-id+ }
+    { "last-release" "LAST_RELEASE" TEXT }
+    { "release-git-id" "RELEASE_GIT_ID" TEXT }
+} define-persistent
 
 :: <release> ( version builder -- release )
     release new

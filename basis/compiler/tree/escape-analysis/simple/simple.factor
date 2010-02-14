@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences classes.tuple
 classes.tuple.private arrays math math.private slots.private
@@ -50,7 +50,10 @@ DEFER: record-literal-allocation
     if* ;
 
 M: #push escape-analysis*
-    [ out-d>> first ] [ literal>> ] bi record-literal-allocation ;
+    dup literal>> layout-up-to-date?
+    [ [ out-d>> first ] [ literal>> ] bi record-literal-allocation ]
+    [ out-d>> unknown-allocations ]
+    if ;
 
 : record-unknown-allocation ( #call -- )
     [ in-d>> add-escaping-values ]
