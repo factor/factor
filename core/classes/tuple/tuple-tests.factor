@@ -746,3 +746,21 @@ TUPLE: g < a-g ;
 [ ] [ "IN: classes.tuple.tests MIXIN: a-g TUPLE: g ;" eval( -- ) ] unit-test
 
 [ t ] [ g new layout-of "g" get layout-of eq? ] unit-test
+
+! Joe Groff discovered this bug
+DEFER: factor-crashes-anymore
+
+[ ] [
+    "IN: classes.tuple.tests
+    TUPLE: unsafe-slot-access ;
+    CONSTANT: unsafe-slot-access' T{ unsafe-slot-access }" eval( -- )
+] unit-test
+
+[ ] [
+    "IN: classes.tuple.tests
+    USE: accessors
+    TUPLE: unsafe-slot-access { x read-only initial: 31337 } ;
+    : factor-crashes-anymore ( -- x ) unsafe-slot-access' x>> ;" eval( -- )
+] unit-test
+
+[ 31337 ] [ factor-crashes-anymore ] unit-test
