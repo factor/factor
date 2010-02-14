@@ -1,21 +1,13 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar db db.tuples grouping io
+USING: accessors calendar db db.tuples db.types grouping io
 io.encodings.ascii io.launcher kernel locals make
-mason.release.archive mason.server namespaces sequences ;
+mason.release.archive mason.config mason.platform mason.server
+namespaces sequences ;
 IN: mason.server.release
 
-! Host to upload binary package to.
-SYMBOL: upload-host
-
-! Username to log in.
-SYMBOL: upload-username
-
-! Directory with binary packages.
-SYMBOL: upload-directory
-
 : platform ( builder -- string )
-    [ os>> ] [ cpu>> ] bi "-" glue ;
+    [ os>> ] [ cpu>> ] bi (platform) ;
 
 : package-name ( builder -- string )
     [ platform ] [ last-release>> ] bi "/" glue ;
@@ -23,21 +15,29 @@ SYMBOL: upload-directory
 : release-name ( version builder -- string )
     [
         "releases/" %
-        [ platform % "/" % ]
+        over % "/" %
         [ "factor-" % platform % "-" % % ]
         [ os>> extension % ]
-        tri
+        bi
     ] "" make ;
 
 : release-command ( version builder -- command )
     [
-        "ln -s " %
+        "cp " %
         [ nip package-name % " " % ] [ release-name % ] 2bi
-    ] { } make ;
+    ] "" make ;
 
 TUPLE: release
 host-name os cpu
 last-release release-git-id ;
+
+release "RELEASES" {
+    { "host-name" "HOST_NAME" TEXT +user-assigned-id+ }
+    { "os" "OS" TEXT +user-assigned-id+ }
+    { "cpu" "CPU" TEXT +user-assigned-id+ }
+    { "last-release" "LAST_RELEASE" TEXT }
+    { "release-git-id" "RELEASE_GIT_ID" TEXT }
+} define-persistent
 
 :: <release> ( version builder -- release )
     release new
@@ -51,12 +51,13 @@ last-release release-git-id ;
     [ "ssh" , upload-host get , "-l" , upload-username get , ] { } make
     <process>
         swap >>command
-        30 seconds >>timeout
+        5 minutes >>timeout
     ascii [ write ] with-process-writer ;
 
 : release-script ( version builders -- string )
-    upload-directory get "cd " "\n" surround prepend
-    [ release-command ] with map "\n" join ;
+    [ upload-directory get "cd " "\n" surround ] 2dip
+    [ release-command ] with map "\n" join
+    append ;
 
 : create-releases ( version builders -- )
     release-script execute-on-server ;
