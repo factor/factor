@@ -1,18 +1,13 @@
 ! Copyright (C) 2008 Peter Burns, 2009 Philipp Winkler
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators io io.streams.string json
-kernel math math.parser prettyprint
-sequences strings vectors ;
+kernel math math.parser prettyprint sequences strings vectors ;
 IN: json.reader
 
 <PRIVATE
 : value ( char -- num char )
     1string " \t\r\n,:}]" read-until
-    [
-        append
-        [ string>float ]
-        [ [ "eE." index ] any? [ >integer ] unless ] bi
-    ] dip ;
+    [ append string>number ] dip ;
 
 DEFER: j-string
 

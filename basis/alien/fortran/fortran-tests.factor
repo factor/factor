@@ -3,12 +3,13 @@ USING: accessors alien alien.c-types alien.complex
 alien.data alien.fortran alien.fortran.private alien.strings
 classes.struct arrays assocs byte-arrays combinators fry
 generalizations io.encodings.ascii kernel macros
-macros.expander namespaces sequences shuffle tools.test ;
+macros.expander namespaces sequences shuffle tools.test vocabs.parser ;
+QUALIFIED-WITH: alien.c-types c
 IN: alien.fortran.tests
 
 << intel-unix-abi "(alien.fortran-tests)" (add-fortran-library) >>
 LIBRARY: (alien.fortran-tests)
-STRUCT: FORTRAN_TEST_RECORD
+STRUCT: fortran_test_record
     { FOO int }
     { BAR double[2] }
     { BAS char[4] } ;
@@ -23,148 +24,163 @@ intel-unix-abi fortran-abi [
 
     ! fortran-type>c-type
 
-    [ "short" ]
+    [ c:short ]
     [ "integer*2" fortran-type>c-type ] unit-test
 
-    [ "int" ]
+    [ c:int ]
     [ "integer*4" fortran-type>c-type ] unit-test
 
-    [ "int" ]
+    [ c:int ]
     [ "INTEGER" fortran-type>c-type ] unit-test
 
-    [ "longlong" ]
+    [ c:longlong ]
     [ "iNteger*8" fortran-type>c-type ] unit-test
 
-    [ "int[0]" ]
+    [ { c:int 0 } ]
     [ "integer(*)" fortran-type>c-type ] unit-test
 
-    [ "int[0]" ]
+    [ { c:int 0 } ]
     [ "integer(3,*)" fortran-type>c-type ] unit-test
 
-    [ "int[3]" ]
+    [ { c:int 3 } ]
     [ "integer(3)" fortran-type>c-type ] unit-test
 
-    [ "int[6]" ]
+    [ { c:int 6 } ]
     [ "integer(3,2)" fortran-type>c-type ] unit-test
 
-    [ "int[24]" ]
+    [ { c:int 24 } ]
     [ "integer(4,3,2)" fortran-type>c-type ] unit-test
 
-    [ "char" ]
+    [ c:char ]
     [ "character" fortran-type>c-type ] unit-test
 
-    [ "char" ]
+    [ c:char ]
     [ "character*1" fortran-type>c-type ] unit-test
 
-    [ "char[17]" ]
+    [ { c:char 17 } ]
     [ "character*17" fortran-type>c-type ] unit-test
 
-    [ "char[17]" ]
+    [ { c:char 17 } ]
     [ "character(17)" fortran-type>c-type ] unit-test
 
-    [ "int" ]
+    [ c:int ]
     [ "logical" fortran-type>c-type ] unit-test
 
-    [ "float" ]
+    [ c:float ]
     [ "real" fortran-type>c-type ] unit-test
 
-    [ "double" ]
+    [ c:double ]
     [ "double-precision" fortran-type>c-type ] unit-test
 
-    [ "float" ]
+    [ c:float ]
     [ "real*4" fortran-type>c-type ] unit-test
 
-    [ "double" ]
+    [ c:double ]
     [ "real*8" fortran-type>c-type ] unit-test
 
-    [ "complex-float" ]
+    [ complex-float ]
     [ "complex" fortran-type>c-type ] unit-test
 
-    [ "complex-double" ]
+    [ complex-double ]
     [ "double-complex" fortran-type>c-type ] unit-test
 
-    [ "complex-float" ]
+    [ complex-float ]
     [ "complex*8" fortran-type>c-type ] unit-test
 
-    [ "complex-double" ]
+    [ complex-double ]
     [ "complex*16" fortran-type>c-type ] unit-test
 
-    [ "fortran_test_record" ]
-    [ "fortran_test_record" fortran-type>c-type ] unit-test
+    [ fortran_test_record ]
+    [
+        [
+            "alien.fortran.tests" use-vocab
+            "fortran_test_record" fortran-type>c-type
+        ] with-manifest
+    ] unit-test
 
     ! fortran-arg-type>c-type
 
-    [ "int*" { } ]
+    [ c:void* { } ]
     [ "integer" fortran-arg-type>c-type ] unit-test
 
-    [ "int*" { } ]
+    [ c:void* { } ]
     [ "integer(3)" fortran-arg-type>c-type ] unit-test
 
-    [ "int*" { } ]
+    [ c:void* { } ]
     [ "integer(*)" fortran-arg-type>c-type ] unit-test
 
-    [ "fortran_test_record*" { } ]
-    [ "fortran_test_record" fortran-arg-type>c-type ] unit-test
+    [ c:void* { } ]
+    [
+        [
+            "alien.fortran.tests" use-vocab
+            "fortran_test_record" fortran-arg-type>c-type
+        ] with-manifest
+    ] unit-test
 
-    [ "char*" { } ]
+    [ c:char* { } ]
     [ "character" fortran-arg-type>c-type ] unit-test
 
-    [ "char*" { } ]
+    [ c:char* { } ]
     [ "character(1)" fortran-arg-type>c-type ] unit-test
 
-    [ "char*" { "long" } ]
+    [ c:char* { long } ]
     [ "character(17)" fortran-arg-type>c-type ] unit-test
 
     ! fortran-ret-type>c-type
 
-    [ "char" { } ]
+    [ c:char { } ]
     [ "character(1)" fortran-ret-type>c-type ] unit-test
 
-    [ "void" { "char*" "long" } ]
+    [ c:void { c:char* long } ]
     [ "character(17)" fortran-ret-type>c-type ] unit-test
 
-    [ "int" { } ]
+    [ c:int { } ]
     [ "integer" fortran-ret-type>c-type ] unit-test
 
-    [ "int" { } ]
+    [ c:int { } ]
     [ "logical" fortran-ret-type>c-type ] unit-test
 
-    [ "float" { } ]
+    [ c:float { } ]
     [ "real" fortran-ret-type>c-type ] unit-test
 
-    [ "void" { "float*" } ]
+    [ c:void { c:void* } ]
     [ "real(*)" fortran-ret-type>c-type ] unit-test
 
-    [ "double" { } ]
+    [ c:double { } ]
     [ "double-precision" fortran-ret-type>c-type ] unit-test
 
-    [ "void" { "complex-float*" } ]
+    [ c:void { c:void* } ]
     [ "complex" fortran-ret-type>c-type ] unit-test
 
-    [ "void" { "complex-double*" } ]
+    [ c:void { c:void* } ]
     [ "double-complex" fortran-ret-type>c-type ] unit-test
 
-    [ "void" { "int*" } ]
+    [ c:void { c:void* } ]
     [ "integer(*)" fortran-ret-type>c-type ] unit-test
 
-    [ "void" { "fortran_test_record*" } ]
-    [ "fortran_test_record" fortran-ret-type>c-type ] unit-test
+    [ c:void { c:void* } ]
+    [
+        [
+            "alien.fortran.tests" use-vocab
+            "fortran_test_record" fortran-ret-type>c-type
+        ] with-manifest
+    ] unit-test
 
     ! fortran-sig>c-sig
 
-    [ "float" { "int*" "char*" "float*" "double*" "long" } ]
+    [ c:float { c:void* c:char* c:void* c:void* c:long } ]
     [ "real" { "integer" "character*17" "real" "real*8" } fortran-sig>c-sig ]
     unit-test
 
-    [ "char" { "char*" "char*" "int*" "long" } ]
+    [ c:char { c:char* c:char* c:void* c:long } ]
     [ "character(1)" { "character*17" "character" "integer" } fortran-sig>c-sig ]
     unit-test
 
-    [ "void" { "char*" "long" "char*" "char*" "int*" "long" } ]
+    [ c:void { c:char* c:long c:char* c:char* c:void* c:long } ]
     [ "character*18" { "character*17" "character" "integer" } fortran-sig>c-sig ]
     unit-test
 
-    [ "void" { "complex-float*" "char*" "char*" "int*" "long" } ]
+    [ c:void { c:void* c:char* c:char* c:void* c:long } ]
     [ "complex" { "character*17" "character" "integer" } fortran-sig>c-sig ]
     unit-test
 
@@ -184,8 +200,8 @@ intel-unix-abi fortran-abi [
         } 5 ncleave
         ! [fortran-invoke]
         [ 
-            "void" "funpack" "funtimes_"
-            { "char*" "longlong*" "float*" "complex-float*" "short*" "long" }
+            c:void "funpack" "funtimes_"
+            { c:char* c:void* c:void* c:void* c:void* c:long }
             alien-invoke
         ] 6 nkeep
         ! [fortran-results>]
@@ -210,7 +226,7 @@ intel-unix-abi fortran-abi [
             [ { [ drop ] } spread ]
         } 1 ncleave
         ! [fortran-invoke]
-        [ "float" "funpack" "fun_times_" { "float*" } alien-invoke ]
+        [ c:float "funpack" "fun_times_" { void* } alien-invoke ]
         1 nkeep
         ! [fortran-results>]
         shuffle( reta aa -- reta aa ) 
@@ -222,13 +238,13 @@ intel-unix-abi fortran-abi [
 
     [ [
         ! [<fortran-result>]
-        [ "complex-float" <c-object> ] 1 ndip
+        [ complex-float <c-object> ] 1 ndip
         ! [fortran-args>c-args]
         { [ { [ ] } spread ] [ { [ drop ] } spread ] } 1 ncleave
         ! [fortran-invoke]
         [
-            "void" "funpack" "fun_times_"
-            { "complex-float*" "float*" } 
+            c:void "funpack" "fun_times_"
+            { void* void* } 
             alien-invoke
         ] 2 nkeep
         ! [fortran-results>]
@@ -244,8 +260,8 @@ intel-unix-abi fortran-abi [
         [ 20 <byte-array> 20 ] 0 ndip
         ! [fortran-invoke]
         [
-            "void" "funpack" "fun_times_"
-            { "char*" "long" } 
+            c:void "funpack" "fun_times_"
+            { c:char* long } 
             alien-invoke
         ] 2 nkeep
         ! [fortran-results>]
@@ -270,8 +286,8 @@ intel-unix-abi fortran-abi [
         } 3 ncleave
         ! [fortran-invoke]
         [
-            "void" "funpack" "fun_times_"
-            { "char*" "long" "char*" "float*" "char*" "long" "long" } 
+            c:void "funpack" "fun_times_"
+            { c:char* long c:char* c:void* c:char* c:long c:long } 
             alien-invoke
         ] 7 nkeep
         ! [fortran-results>]
@@ -302,19 +318,19 @@ intel-windows-abi fortran-abi [
 
 f2c-abi fortran-abi [
 
-    [ "char[1]" ]
+    [ { c:char 1 } ]
     [ "character(1)" fortran-type>c-type ] unit-test
 
-    [ "char*" { "long" } ]
+    [ c:char* { c:long } ]
     [ "character" fortran-arg-type>c-type ] unit-test
 
-    [ "void" { "char*" "long" } ]
+    [ c:void { c:char* c:long } ]
     [ "character" fortran-ret-type>c-type ] unit-test
 
-    [ "double" { } ]
+    [ c:double { } ]
     [ "real" fortran-ret-type>c-type ] unit-test
 
-    [ "void" { "float*" } ]
+    [ c:void { void* } ]
     [ "real(*)" fortran-ret-type>c-type ] unit-test
 
     [ "fun_" ] [ "FUN" fortran-name>symbol-name ] unit-test
@@ -325,34 +341,34 @@ f2c-abi fortran-abi [
 
 gfortran-abi fortran-abi [
 
-    [ "float" { } ]
+    [ c:float { } ]
     [ "real" fortran-ret-type>c-type ] unit-test
 
-    [ "void" { "float*" } ]
+    [ c:void { void* } ]
     [ "real(*)" fortran-ret-type>c-type ] unit-test
 
-    [ "complex-float" { } ]
+    [ complex-float { } ]
     [ "complex" fortran-ret-type>c-type ] unit-test
 
-    [ "complex-double" { } ]
+    [ complex-double { } ]
     [ "double-complex" fortran-ret-type>c-type ] unit-test
 
-    [ "char[1]" ]
+    [ { char 1 } ]
     [ "character(1)" fortran-type>c-type ] unit-test
 
-    [ "char*" { "long" } ]
+    [ c:char* { c:long } ]
     [ "character" fortran-arg-type>c-type ] unit-test
 
-    [ "void" { "char*" "long" } ]
+    [ c:void { c:char* c:long } ]
     [ "character" fortran-ret-type>c-type ] unit-test
 
-    [ "complex-float" { } ]
+    [ complex-float { } ]
     [ "complex" fortran-ret-type>c-type ] unit-test
 
-    [ "complex-double" { } ]
+    [ complex-double { } ]
     [ "double-complex" fortran-ret-type>c-type ] unit-test
 
-    [ "void" { "complex-double*" } ]
+    [ c:void { c:void* } ]
     [ "double-complex(3)" fortran-ret-type>c-type ] unit-test
 
 ] with-variable

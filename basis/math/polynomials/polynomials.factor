@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel make math math.order math.vectors sequences
-    splitting vectors macros combinators ;
+splitting vectors macros combinators math.bits ;
 IN: math.polynomials
 
 <PRIVATE
@@ -37,6 +37,16 @@ PRIVATE>
 
 : p-sq ( p -- p^2 )
     dup p* ;
+
+ERROR: negative-power-polynomial p n ;
+
+: (p^) ( p n  -- p^n )
+    make-bits { 1 } [ [ over p* ] when [ p-sq ] dip ] reduce nip ;
+
+: p^ ( p n -- p^n )
+    dup 0 >=
+    [ (p^) ]
+    [ negative-power-polynomial ] if ;
 
 <PRIVATE
 

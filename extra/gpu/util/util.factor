@@ -62,4 +62,4 @@ CONSTANT: window-vertexes
     byte-array>buffer ; inline
 
 : <window-vertex-array> ( program-instance -- vertex-array )
-    [ <window-vertex-buffer> ] dip window-vertex buffer>vertex-array ; inline
+    [ <window-vertex-buffer> ] dip window-vertex <vertex-array*> ; inline

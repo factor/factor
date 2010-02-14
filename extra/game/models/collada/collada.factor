@@ -1,23 +1,29 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs grouping hashtables kernel
-locals math math.parser sequences sequences.deep
+USING: accessors arrays assocs grouping hashtables kernel locals
+math math.parser sequences sequences.deep
 specialized-arrays.instances.alien.c-types.float
 specialized-arrays.instances.alien.c-types.uint splitting xml
-xml.data xml.traversal math.order
-namespaces combinators images gpu.shaders io ;
-IN: collada
+xml.data xml.traversal math.order namespaces combinators images
+gpu.shaders io make game.models game.models.util
+io.encodings.ascii game.models.loader ;
+IN: game.models.collada
 
-TUPLE: model attribute-buffer index-buffer vertex-format ;
-TUPLE: source semantic offset data ;
-
-SYMBOLS: up-axis unit-ratio ;
+SINGLETON: collada-models
+"dae" ascii collada-models register-models-class
 
 ERROR: missing-attr tag attr ;
 ERROR: missing-child tag child-name ;
 
+<PRIVATE
+TUPLE: source semantic offset data ;
+SYMBOLS: up-axis unit-ratio ;
+
 : string>numbers ( string -- number-seq )
-    " \t\n" split [ string>number ] map ;
+    " \t\n" split harvest [ string>number ] map ;
+
+: string>floats ( string -- float-seq )
+    " \t\n" split harvest [ string>number ] map ;
 
 : x/ ( tag child-name -- child-tag )
     [ tag-named ]
@@ -35,7 +41,6 @@ ERROR: missing-child tag child-name ;
     [ tags-named ] dip map ; inline
 
 SINGLETONS: x-up y-up z-up ;
-
 UNION: rh-up x-up y-up z-up ;
 
 GENERIC: >y-up-axis! ( seq from-axis -- seq )
@@ -67,10 +72,10 @@ M: z-up >y-up-axis!
 
 : source>seq ( source-tag up-axis scale -- sequence )
     rot
-    [ "float_array" x/ xt string>numbers [ * ] with map ]
+    [ "float_array" x/ xt string>floats [ * ] with map ]
     [ nip "technique_common" x/ "accessor" x/ "stride" x@ string>number ] 2bi
-    <groups>
-    [ swap >y-up-axis! ] with map ;
+    group
+    [ swap over length 2 > [ >y-up-axis! ] [ drop ] if ] with map ;
 
 : source>pair ( source-tag -- pair )
     [ "id" x@ ]
@@ -108,7 +113,7 @@ M: z-up >y-up-axis!
     ] map flatten ;
 
 : group-indices ( index-stride triangle-count indices -- grouped-indices )
-    dup length rot / <groups> swap [ <groups> ] curry map ;
+    dup length rot / group swap [ group ] curry map ;
 
 : triangles>numbers ( triangles-tag -- number-seq )
     "p" x/ children>string " \t\n" split [ string>number ] map ;
@@ -116,46 +121,24 @@ M: z-up >y-up-axis!
 : largest-offset+1 ( source-seq -- largest-offset+1 )
     [ offset>> ] [ max ] map-reduce 1 + ;
 
-: <model> ( attribute-buffer index-buffer sources -- model )
-    [ flatten >float-array ]
-    [ flatten >uint-array ]
+VERTEX-FORMAT: collada-vertex-format
+    { "POSITION" float-components 3 f }
+    { "NORMAL" float-components 3 f }
+    { "TEXCOORD" float-components 2 f } ;
+
+: pack-attributes ( source-indices sources -- attributes )
     [
         [
-            {
-                [ semantic>> ]
-                [ drop float-components ]
-                [ data>> first length ]
-                [ drop f ]
-            } cleave vertex-attribute boa
-        ] map
-    ] tri* model boa ;
+            [
+                [ data>> ] [ offset>> ] bi
+                rot = [ nth ] [ 2drop f ] if 
+            ] with with map sift flatten ,
+        ] curry each-index
+    ] V{ } make flatten ;
 
 :: soa>aos ( triangles-indices sources -- attribute-buffer index-buffer )
-    V{ } clone :> attribute-buffer
-    V{ } clone :> index-buffer
-    H{ } clone :> inverse-attribute-buffer
-    triangles-indices [
-        [
-            [| triangle-index triangle-offset |
-                triangle-index triangle-offset sources
-                [| index offset source |
-                    source offset>> offset = [
-                        index source data>> nth
-                    ] [ f ] if 
-                ] with with map sift flatten :> attributes
-                
-                attributes inverse-attribute-buffer at [
-                    index-buffer push
-                ] [
-                    attribute-buffer length
-                    [ attributes inverse-attribute-buffer set-at ]
-                    [ index-buffer push ] bi
-                    attributes attribute-buffer push
-                ] if*
-            ] each-index
-        ] each
-    ] each
-    attribute-buffer index-buffer ;
+    [ triangles-indices [ [ sources pack-attributes , ] each ] each ]
+    V{ } V{ } H{ } <indexed-seq> make [ dseq>> ] [ iseq>> ] bi ;
 
 : triangles>model ( sources vertices triangles-tag -- model )
     [ "input" tags-named collect-sources ] keep swap
@@ -166,7 +149,10 @@ M: z-up >y-up-axis!
         group-indices
     ]
     [
-        [ soa>aos ] keep <model>
+        soa>aos 
+        [ flatten >float-array ]
+        [ flatten >uint-array ]
+        bi* collada-vertex-format f model boa
     ] bi ;
     
 : mesh>triangles ( sources vertices mesh-tag -- models )
@@ -174,9 +160,13 @@ M: z-up >y-up-axis!
 
 : mesh>models ( mesh-tag -- models )
     [
-        { { up-axis z-up } { unit-ratio 0.5 } } [
+        { { up-axis y-up } { unit-ratio 1 } } [
             mesh>sources
         ] bind
     ]
     [ mesh>vertices ]
     [ mesh>triangles ] tri ;
+PRIVATE>
+
+M: collada-models stream>models
+    drop read-xml "mesh" deep-tags-named [ mesh>models ] map flatten ;

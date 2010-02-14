@@ -110,15 +110,21 @@ SYNTAX: TEST:
 
 >>
 
+PRIVATE>
+
 : run-test-file ( path -- )
     dup file [
         test-failures get file get +test-failure+ delete-file-errors
         '[ _ run-file ] [ file-failure ] recover
     ] with-variable ;
 
+<PRIVATE
+
 : run-vocab-tests ( vocab -- )
-    dup vocab source-loaded?>> [
-        vocab-tests [ run-test-file ] each
+    vocab dup [
+        dup source-loaded?>> [
+            vocab-tests [ run-test-file ] each
+        ] [ drop ] if
     ] [ drop ] if ;
 
 PRIVATE>

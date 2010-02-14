@@ -58,7 +58,7 @@ PRIVATE>
     (assoc-each) each ; inline
 
 : assoc>map ( assoc quot exemplar -- seq )
-    [ collector [ assoc-each ] dip ] dip like ; inline
+    [ collector-for [ assoc-each ] dip ] [ like ] bi ; inline
 
 : assoc-map-as ( assoc quot exemplar -- newassoc )
     [ [ 2array ] compose V{ } assoc>map ] dip assoc-like ; inline
@@ -71,6 +71,12 @@ PRIVATE>
 
 : assoc-filter ( assoc quot -- subassoc )
     over assoc-filter-as ; inline
+
+: assoc-filter! ( assoc quot -- assoc )
+    [
+        over [ [ [ drop ] 2bi ] dip [ delete-at ] 2curry unless ] 2curry
+        assoc-each
+    ] [ drop ] 2bi ; inline
 
 : assoc-partition ( assoc quot -- true-assoc false-assoc )
     [ (assoc-each) partition ] [ drop ] 2bi
@@ -119,21 +125,27 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : assoc-intersect ( assoc1 assoc2 -- intersection )
     swap [ nip key? ] curry assoc-filter ;
 
-: update ( assoc1 assoc2 -- )
-    swap [ set-at ] with-assoc assoc-each ;
+: assoc-union! ( assoc1 assoc2 -- assoc1 )
+    over [ set-at ] with-assoc assoc-each ;
 
 : assoc-union ( assoc1 assoc2 -- union )
     [ [ [ assoc-size ] bi@ + ] [ drop ] 2bi new-assoc ] 2keep
-    [ dupd update ] bi@ ;
+    [ assoc-union! ] bi@ ;
 
 : assoc-combine ( seq -- union )
-    H{ } clone [ dupd update ] reduce ;
+    H{ } clone [ assoc-union! ] reduce ;
 
 : assoc-refine ( seq -- assoc )
     [ f ] [ [ ] [ assoc-intersect ] map-reduce ] if-empty ;
 
+: assoc-differ ( key -- quot )
+    [ nip key? not ] curry ; inline
+
 : assoc-diff ( assoc1 assoc2 -- diff )
-    [ nip key? not ] curry assoc-filter ;
+    assoc-differ assoc-filter ;
+
+: assoc-diff! ( assoc1 assoc2 -- assoc1 )
+    assoc-differ assoc-filter! ;
 
 : substitute ( seq assoc -- newseq )
     substituter map ;

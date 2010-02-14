@@ -171,13 +171,13 @@ $nl
 }
 "The " { $vocab-link "delegate" } " library provides a language abstraction for expressing has-a relationships."
 { $heading "Anti-pattern #2: subclassing for implementation sharing only" }
-"Tuple subclassing purely for sharing implementations of methods is not a good idea either. If a class " { $snippet "A" } " is a subclass of a class " { $snippet "B" } ", then instances of " { $snippet "A" } " should be usable anywhere that an instance of " { $snippet "B" } " is. If this properly does not hold, then subclassing should not be used."
+"Tuple subclassing purely for sharing implementations of methods is not a good idea either. If a class " { $snippet "A" } " is a subclass of a class " { $snippet "B" } ", then instances of " { $snippet "A" } " should be usable anywhere that an instance of " { $snippet "B" } " is. If this property does not hold, then subclassing should not be used."
 $nl
 "There are two alternatives which are preferred to subclassing in this case. The first is " { $link "mixins" } "."
 $nl
 "The second is to use ad-hoc slot polymorphism. If two classes define a slot with the same name, then code which uses " { $link "accessors" } " can operate on instances of both objects, assuming the values stored in that slot implement a common protocol. This allows code to be shared without creating contrieved relationships between classes."
 { $heading "Anti-pattern #3: subclassing to override a method definition" }
-"While method overriding is a very powerful tool, improper use can cause tight coupling of code and lead to difficulty in testing and refactoring. Subclassing should not be used as a means of “monkey patching” methods to fix bugs and add features. Only subclass from classes which were designed to be inherited from, and when writing classes of your own which are intended to be subclassed, clearly document that subclasses may and may not do. This includes construction policy; document whether subclasses should use " { $link new } ", " { $link boa } ", or a custom parametrized constructor."
+"While method overriding is a very powerful tool, improper use can cause tight coupling of code and lead to difficulty in testing and refactoring. Subclassing should not be used as a means of “monkey patching” methods to fix bugs and add features. Only subclass from classes which were designed to be inherited from, and when writing classes of your own which are intended to be subclassed, clearly document what subclasses may and may not do. This includes construction policy; document whether subclasses should use " { $link new } ", " { $link boa } ", or a custom parametrized constructor."
 { $see-also "parametrized-constructors" } ;
 
 ARTICLE: "tuple-subclassing" "Tuple subclassing"
@@ -425,7 +425,7 @@ HELP: <tuple-boa> ( ... layout -- tuple )
 
 HELP: new
 { $values { "class" tuple-class } { "tuple" tuple } }
-{ $description "Creates a new instance of " { $snippet "class" } " with all slots set to their initial values (see" { $link "tuple-declarations" } ")." }
+{ $description "Creates a new instance of " { $snippet "class" } " with all slots set to their initial values (see " { $link "tuple-declarations" } ")." }
 { $examples
     { $example
         "USING: kernel prettyprint ;"

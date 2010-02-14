@@ -1,11 +1,12 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: accessors alien alien.c-types alien.complex alien.data grouping
-alien.strings alien.syntax arrays ascii assocs
+USING: accessors alien alien.c-types alien.complex alien.data alien.parser
+grouping alien.strings alien.syntax arrays ascii assocs
 byte-arrays combinators combinators.short-circuit fry generalizations
 kernel lexer macros math math.parser namespaces parser sequences
 splitting stack-checker vectors vocabs.parser words locals
 io.encodings.ascii io.encodings.string shuffle effects math.ranges
 math.order sorting strings system alien.libraries ;
+QUALIFIED-WITH: alien.c-types c
 IN: alien.fortran
 
 SINGLETONS: f2c-abi g95-abi gfortran-abi intel-unix-abi intel-windows-abi ;
@@ -101,8 +102,7 @@ CONSTANT: fortran>c-types H{
 }
 
 : append-dimensions ( base-c-type type -- c-type )
-    dims>>
-    [ product number>string "[" "]" surround append ] when* ;
+    dims>> [ product 2array ] when* ;
 
 MACRO: size-case-type ( cases -- )
     [ invalid-fortran-type ] suffix
@@ -118,35 +118,35 @@ MACRO: size-case-type ( cases -- )
 
 GENERIC: (fortran-type>c-type) ( type -- c-type )
 
-M: f (fortran-type>c-type) drop "void" ;
+M: f (fortran-type>c-type) drop c:void ;
 
 M: integer-type (fortran-type>c-type)
     {
-        { f [ "int"      ] }
-        { 1 [ "char"     ] }
-        { 2 [ "short"    ] }
-        { 4 [ "int"      ] }
-        { 8 [ "longlong" ] }
+        { f [ c:int      ] }
+        { 1 [ c:char     ] }
+        { 2 [ c:short    ] }
+        { 4 [ c:int      ] }
+        { 8 [ c:longlong ] }
     } size-case-type ;
 M: real-type (fortran-type>c-type)
     {
-        { f [ "float"  ] }
-        { 4 [ "float"  ] }
-        { 8 [ "double" ] }
+        { f [ c:float  ] }
+        { 4 [ c:float  ] }
+        { 8 [ c:double ] }
     } size-case-type ;
 M: real-complex-type (fortran-type>c-type)
     {
-        {  f [ "complex-float"  ] }
-        {  8 [ "complex-float"  ] }
-        { 16 [ "complex-double" ] }
+        {  f [ complex-float  ] }
+        {  8 [ complex-float  ] }
+        { 16 [ complex-double ] }
     } size-case-type ;
 
 M: double-precision-type (fortran-type>c-type)
-    "double" simple-type ;
+    c:double simple-type ;
 M: double-complex-type (fortran-type>c-type)
-    "complex-double" simple-type ;
+    complex-double simple-type ;
 M: misc-type (fortran-type>c-type)
-    dup name>> simple-type ;
+    dup name>> parse-c-type simple-type ;
 
 : single-char? ( character-type -- ? )
     { [ drop character(1)-maps-to-char? ] [ dims>> product 1 = ] } 1&& ;
@@ -158,7 +158,7 @@ M: misc-type (fortran-type>c-type)
     dup single-char? [ f >>dims ] when ;
 
 M: character-type (fortran-type>c-type)
-    fix-character-type "char" simple-type ;
+    fix-character-type c:char simple-type ;
 
 : dimension>number ( string -- number )
     dup "*" = [ drop 0 ] [ string>number ] if ;
@@ -181,13 +181,10 @@ M: character-type (fortran-type>c-type)
 : parse-fortran-type ( fortran-type-string/f -- type/f )
     dup [ (parse-fortran-type) ] when ;
 
-: c-type>pointer ( c-type -- c-type* )
-    "[" split1 drop "*" append ;
-
 GENERIC: added-c-args ( type -- args )
 
 M: fortran-type added-c-args drop { } ;
-M: character-type added-c-args fix-character-type single-char? [ { } ] [ { "long" } ] if ;
+M: character-type added-c-args fix-character-type single-char? [ { } ] [ { c:long } ] if ;
 
 GENERIC: returns-by-value? ( type -- ? )
 
@@ -200,10 +197,10 @@ M: complex-type returns-by-value?
 
 GENERIC: (fortran-ret-type>c-type) ( type -- c-type )
 
-M: f (fortran-ret-type>c-type) drop "void" ;
+M: f (fortran-ret-type>c-type) drop c:void ;
 M: fortran-type (fortran-ret-type>c-type) (fortran-type>c-type) ;
 M: real-type (fortran-ret-type>c-type)
-    drop real-functions-return-double? [ "double" ] [ "float" ] if ;
+    drop real-functions-return-double? [ c:double ] [ c:float ] if ;
 
 GENERIC: (fortran-arg>c-args) ( type -- main-quot added-quot )
 
@@ -354,7 +351,7 @@ M: character-type (<fortran-result>)
 
 : (shuffle-map) ( return parameters -- ret par )
     [
-        fortran-ret-type>c-type length swap "void" = [ 1 + ] unless
+        fortran-ret-type>c-type length swap void? [ 1 + ] unless
         letters swap head [ "ret" swap suffix ] map
     ] [
         [ fortran-arg-type>c-type nip length 1 + ] map letters swap zip
@@ -395,13 +392,13 @@ PRIVATE>
 
 : fortran-arg-type>c-type ( fortran-type -- c-type added-args )
     parse-fortran-type
-    [ (fortran-type>c-type) c-type>pointer ]
+    [ (fortran-type>c-type) resolve-pointer-type ]
     [ added-c-args ] bi ;
 : fortran-ret-type>c-type ( fortran-type -- c-type added-args )
     parse-fortran-type dup returns-by-value?
     [ (fortran-ret-type>c-type) { } ] [
-        "void" swap 
-        [ added-c-args ] [ (fortran-type>c-type) c-type>pointer ] bi prefix
+        c:void swap 
+        [ added-c-args ] [ (fortran-type>c-type) resolve-pointer-type ] bi prefix
     ] if ;
 
 : fortran-arg-types>c-types ( fortran-types -- c-types )
@@ -433,7 +430,7 @@ MACRO: fortran-invoke ( return library function parameters -- )
 
 :: define-fortran-function ( return library function parameters -- )
     function create-in dup reset-generic 
-    return library function parameters return [ "void" ] unless* parse-arglist
+    return library function parameters return [ c:void ] unless* parse-arglist
     [ \ fortran-invoke 5 [ ] nsequence ] dip define-declared ;
 
 SYNTAX: SUBROUTINE: 

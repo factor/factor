@@ -106,18 +106,12 @@ IN: tools.deploy.shaker
 
 : strip-word-props ( stripped-props words -- )
     "Stripping word properties" show
-    [
-        swap '[
-            [
-                [ drop _ member? not ] assoc-filter sift-assoc
-                >alist f like
-            ] change-props drop
-        ] each
-    ] [
-        H{ } clone '[
-            [ [ _ [ ] cache ] map ] change-props drop
-        ] each
-    ] bi ;
+    swap '[
+        [
+            [ drop _ member? not ] assoc-filter sift-assoc
+            >alist f like
+        ] change-props drop
+    ] each ;
 
 : stripped-word-props ( -- seq )
     [
@@ -127,7 +121,7 @@ IN: tools.deploy.shaker
                 "boa-check"
                 "coercer"
                 "combination"
-                "compiled-generic-uses"
+                "generic-call-sites"
                 "effect-dependencies"
                 "definition-dependencies"
                 "conditional-dependencies"
@@ -343,7 +337,7 @@ IN: tools.deploy.shaker
                 classes.private:update-map
                 main-vocab-hook
                 compiler.crossref:compiled-crossref
-                compiler.crossref:compiled-generic-crossref
+                compiler.crossref:generic-call-site-crossref
                 compiler-impl
                 compiler.errors:compiler-errors
                 lexer-factory

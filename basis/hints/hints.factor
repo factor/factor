@@ -3,7 +3,7 @@
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 combinators definitions effects fry generic generic.single
 generic.standard hashtables io.binary io.streams.string kernel
-kernel.private math math.integers.private math.parser math.parser.private
+kernel.private math math.integers.private math.parser
 namespaces parser sbufs sequences splitting splitting.private strings
 vectors words ;
 IN: hints
@@ -52,7 +52,7 @@ M: object specializer-declaration class ;
     specializer [ specialize-quot ] when* ;
 
 : standard-method? ( method -- ? )
-    dup method-body? [
+    dup method? [
         "method-generic" word-prop standard-generic?
     ] [ drop f ] if ;
 
@@ -129,11 +129,5 @@ SYNTAX: HINTS:
 M\ hashtable at* { { fixnum object } { word object } } "specializer" set-word-prop
 
 M\ hashtable set-at { { object fixnum object } { object word object } } "specializer" set-word-prop
-
-\ dec>float { string } "specializer" set-word-prop
-
-\ hex>float { string } "specializer" set-word-prop
-
-\ string>integer { string fixnum } "specializer" set-word-prop
 
 \ bignum/f { { bignum bignum } { bignum fixnum } { fixnum bignum } { fixnum fixnum } } "specializer" set-word-prop

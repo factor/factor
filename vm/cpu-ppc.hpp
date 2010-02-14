@@ -14,13 +14,11 @@ static const fixnum xt_tail_pic_offset = 4;
 
 inline static void check_call_site(cell return_address)
 {
-#ifdef FACTOR_DEBUG
 	cell insn = *(cell *)return_address;
 	/* Check that absolute bit is 0 */
 	assert((insn & 0x2) == 0x0);
 	/* Check that instruction is branch */
 	assert((insn >> 26) == 0x12);
-#endif
 }
 
 static const cell b_mask = 0x3fffffc;
@@ -60,20 +58,20 @@ inline static bool tail_call_site_p(cell return_address)
 
 inline static unsigned int fpu_status(unsigned int status)
 {
-        unsigned int r = 0;
+	unsigned int r = 0;
 
-        if (status & 0x20000000)
+	if (status & 0x20000000)
 		r |= FP_TRAP_INVALID_OPERATION;
-        if (status & 0x10000000)
+	if (status & 0x10000000)
 		r |= FP_TRAP_OVERFLOW;
-        if (status & 0x08000000)
+	if (status & 0x08000000)
 		r |= FP_TRAP_UNDERFLOW;
-        if (status & 0x04000000)
+	if (status & 0x04000000)
 		r |= FP_TRAP_ZERO_DIVIDE;
-        if (status & 0x02000000)
+	if (status & 0x02000000)
 		r |= FP_TRAP_INEXACT;
 
-        return r;
+	return r;
 }
 
 /* Defined in assembly */

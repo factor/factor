@@ -27,10 +27,8 @@ inline static unsigned char call_site_opcode(cell return_address)
 
 inline static void check_call_site(cell return_address)
 {
-#ifdef FACTOR_DEBUG
 	unsigned char opcode = call_site_opcode(return_address);
 	assert(opcode == call_opcode || opcode == jmp_opcode);
-#endif
 }
 
 inline static void *get_call_target(cell return_address)
@@ -57,20 +55,20 @@ inline static bool tail_call_site_p(cell return_address)
 
 inline static unsigned int fpu_status(unsigned int status)
 {
-        unsigned int r = 0;
+	unsigned int r = 0;
 	
-        if (status & 0x01)
+	if (status & 0x01)
 		r |= FP_TRAP_INVALID_OPERATION;
-        if (status & 0x04)
+	if (status & 0x04)
 		r |= FP_TRAP_ZERO_DIVIDE;
-        if (status & 0x08)
+	if (status & 0x08)
 		r |= FP_TRAP_OVERFLOW;
-        if (status & 0x10)
+	if (status & 0x10)
 		r |= FP_TRAP_UNDERFLOW;
-        if (status & 0x20)
+	if (status & 0x20)
 		r |= FP_TRAP_INEXACT;
 
-        return r;
+	return r;
 }
 
 }

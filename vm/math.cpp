@@ -168,7 +168,7 @@ void factor_vm::primitive_bignum_xor()
 void factor_vm::primitive_bignum_shift()
 {
 	fixnum y = untag_fixnum(ctx->pop());
-        bignum* x = untag<bignum>(ctx->pop());
+	bignum* x = untag<bignum>(ctx->pop());
 	ctx->push(tag<bignum>(bignum_arithmetic_shift(x,y)));
 }
 
@@ -258,20 +258,6 @@ void factor_vm::primitive_fixnum_to_float()
 void factor_vm::primitive_bignum_to_float()
 {
 	ctx->replace(allot_float(bignum_to_float(ctx->peek())));
-}
-
-void factor_vm::primitive_str_to_float()
-{
-	byte_array *bytes = untag_check<byte_array>(ctx->peek());
-	cell capacity = array_capacity(bytes);
-
-	char *c_str = (char *)(bytes + 1);
-	char *end = c_str;
-	double f = strtod(c_str,&end);
-	if(end == c_str + capacity - 1)
-		ctx->replace(allot_float(f));
-	else
-		ctx->replace(false_object);
 }
 
 void factor_vm::primitive_float_to_str()

@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs fry help.markup help.topics io
 kernel make math math.parser namespaces sequences sorting
@@ -18,6 +18,8 @@ IN: help.apropos
 TUPLE: more-completions seq ;
 
 CONSTANT: max-completions 5
+
+M: more-completions valid-article? drop t ;
 
 M: more-completions article-title
     seq>> length number>string " results" append ;
@@ -59,6 +61,8 @@ M: more-completions article-content
 TUPLE: apropos search ;
 
 C: <apropos> apropos
+
+M: apropos valid-article? drop t ;
 
 M: apropos article-title
     search>> "Search results for “" "”" surround ;

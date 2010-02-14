@@ -5,7 +5,7 @@ kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types
 alien.strings alien.arrays alien.complex alien.libraries sets libc
 continuations.private fry cpu.architecture classes classes.struct locals
-source-files.errors slots parser generic.parser
+source-files.errors slots parser generic.parser strings
 compiler.errors
 compiler.alien
 compiler.constants
@@ -24,24 +24,12 @@ H{ } clone insn-counts set-global
 
 GENERIC: generate-insn ( insn -- )
 
-TUPLE: asm label code calls ;
-
-SYMBOL: calls
-
-: add-call ( word -- )
-    #! Compile this word later.
-    calls get push ;
-
 ! Mapping _label IDs to label instances
 SYMBOL: labels
 
-: init-generator ( -- )
-    H{ } clone labels set
-    V{ } clone calls set ;
-
-: generate-insns ( asm -- code )
+: generate ( mr -- code )
     dup label>> [
-        init-generator
+        H{ } clone labels set
         instructions>> [
             [ class insn-counts get inc-at ]
             [ generate-insn ]
@@ -49,21 +37,11 @@ SYMBOL: labels
         ] each
     ] with-fixup ;
 
-: generate ( mr -- asm )
-    [
-        [ label>> ] [ generate-insns ] bi calls get
-        asm boa
-    ] with-scope ;
-
 : lookup-label ( id -- label )
     labels get [ drop <label> ] cache ;
 
 ! Special cases
 M: ##no-tco generate-insn drop ;
-
-M: ##call generate-insn word>> [ add-call ] [ %call ] bi ;
-
-M: ##jump generate-insn word>> [ add-call ] [ %jump ] bi ;
 
 M: _dispatch-label generate-insn
     label>> lookup-label
@@ -104,6 +82,8 @@ CODEGEN: ##peek %peek
 CODEGEN: ##replace %replace
 CODEGEN: ##inc-d %inc-d
 CODEGEN: ##inc-r %inc-r
+CODEGEN: ##call %call
+CODEGEN: ##jump %jump
 CODEGEN: ##return %return
 CODEGEN: ##slot %slot
 CODEGEN: ##slot-imm %slot-imm
@@ -409,20 +389,28 @@ M: c-type-name flatten-value-type c-type flatten-value-type ;
 : box-return* ( node -- )
     return>> [ ] [ box-return %push-stack ] if-void ;
 
+GENERIC# dlsym-valid? 1 ( symbols dll -- ? )
+
+M: string dlsym-valid? dlsym ;
+
+M: array dlsym-valid? '[ _ dlsym ] any? ;
+
 : check-dlsym ( symbols dll -- )
     dup dll-valid? [
-        dupd '[ _ dlsym ] any?
+        dupd dlsym-valid?
         [ drop ] [ compiling-word get no-such-symbol ] if
     ] [
         dll-path compiling-word get no-such-library drop
     ] if ;
 
-: stdcall-mangle ( symbol params -- symbol )
-    parameters>> parameter-offsets drop number>string "@" glue ;
+: stdcall-mangle ( params -- symbols )
+    [ function>> ] [ parameters>> parameter-offsets drop number>string ] bi
+    [ drop ] [ "@" glue ] [ "@" glue "_" prepend ] 2tri
+    3array ;
 
 : alien-invoke-dlsym ( params -- symbols dll )
-    [ [ function>> dup ] keep stdcall-mangle 2array ]
-    [ library>> library dup [ dll>> ] when ]
+    [ dup abi>> "stdcall" = [ stdcall-mangle ] [ function>> ] if ]
+    [ library>> load-library ]
     bi 2dup check-dlsym ;
 
 M: ##alien-invoke generate-insn

@@ -1,8 +1,7 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs cache kernel math math.vectors sequences fonts
-namespaces opengl.textures ui.text ui.text.private ui.gadgets.worlds 
-windows.uniscribe ;
+USING: accessors assocs cache kernel math math.vectors sequences
+fonts namespaces ui.text ui.text.private windows.uniscribe ;
 IN: ui.text.uniscribe
 
 SINGLETON: uniscribe-renderer
@@ -14,14 +13,8 @@ M: uniscribe-renderer string-dim
 M: uniscribe-renderer flush-layout-cache
     cached-script-strings get purge-cache ;
 
-: rendered-script-string ( font string -- texture )
-    world get world-text-handle
-    [ cached-script-string image>> { 0 0 } <texture> ]
-    2cache ;
-
-M: uniscribe-renderer draw-string ( font string -- )
-    dup dup selection? [ string>> ] when empty?
-    [ 2drop ] [ rendered-script-string draw-texture ] if ;
+M: uniscribe-renderer string>image ( font string -- image loc )
+    cached-script-string image>> { 0 0 } ;
 
 M: uniscribe-renderer x>offset ( x font string -- n )
     [ 2drop 0 ] [

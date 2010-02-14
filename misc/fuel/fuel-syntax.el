@@ -46,11 +46,12 @@
   '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
     "ABOUT:" "ALIAS:" "ALIEN:" "ARTICLE:"
     "B" "BIN:"
-    "C:" "C-ENUM:" "C-STRUCT:" "C-UNION:" "CHAR:" "CONSTANT:" "call-next-method"
+    "C:" "CALLBACK:" "C-ENUM:" "C-STRUCT:" "C-TYPE:" "C-UNION:" "CHAR:" "CONSTANT:" "call-next-method"
     "DEFER:"
     "EBNF:" ";EBNF" "ERROR:" "EXCLUDE:"
     "f" "FORGET:" "FROM:" "FUNCTION:"
-    "GENERIC#" "GENERIC:"
+    "GAME:" "GENERIC#" "GENERIC:"
+    "GLSL-SHADER:" "GLSL-PROGRAM:"
     "HELP:" "HEX:" "HOOK:"
     "IN:" "initial:" "INSTANCE:" "INTERSECTION:"
     "LIBRARY:"
@@ -60,10 +61,10 @@
     "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROVIDE:"
     "QUALIFIED-WITH:" "QUALIFIED:"
     "read-only" "RENAME:" "REQUIRE:"  "REQUIRES:"
-    "SINGLETON:" "SINGLETONS:" "SLOT:" "SYMBOL:" "SYMBOLS:" "SYNTAX:"
-    "TUPLE:" "t" "t?" "TYPEDEF:"
-    "UNION:" "USE:" "USING:"
-    "VARS:"))
+    "SINGLETON:" "SINGLETONS:" "SLOT:" "SPECIALIZED-ARRAY:" "SPECIALIZED-ARRAYS:" "STRING:" "STRUCT:" "SYMBOL:" "SYMBOLS:" "SYNTAX:"
+    "TUPLE:" "t" "t?" "TYPEDEF:" "TYPED:" "TYPED::"
+    "UNIFORM-TUPLE:" "UNION:" "USE:" "USING:"
+    "VARS:" "VERTEX-FORMAT:"))
 
 (defconst fuel-syntax--parsing-words-regex
   (regexp-opt fuel-syntax--parsing-words 'words))
@@ -110,7 +111,7 @@
   (format "\\_<\\(%s\\)?: +\\_<\\(\\w+\\)\\_>"
           (regexp-opt
            '(":" "GENERIC" "DEFER" "HOOK" "MAIN" "MATH" "POSTPONE"
-             "SYMBOL" "SYNTAX" "RENAME"))))
+             "SYMBOL" "SYNTAX" "TYPED" "RENAME"))))
 
 (defconst fuel-syntax--alias-definition-regex
   "^ALIAS: +\\(\\_<.+?\\_>\\) +\\(\\_<.+?\\_>\\)")
@@ -124,7 +125,7 @@
 
 (defconst fuel-syntax--type-definition-regex
   (fuel-syntax--second-word-regex
-   '("C-STRUCT:" "C-UNION:" "MIXIN:" "TUPLE:" "SINGLETON:" "UNION:")))
+   '("C-STRUCT:" "C-UNION:" "MIXIN:" "TUPLE:" "SINGLETON:" "SPECIALIZED-ARRAY:" "STRUCT:" "UNION:")))
 
 (defconst fuel-syntax--tuple-decl-regex
   "^TUPLE: +\\([^ \n]+\\) +< +\\([^ \n]+\\)\\_>")
@@ -151,6 +152,9 @@
 (defconst fuel-syntax--alien-function-regex
   "\\_<FUNCTION: \\(\\w+\\) \\(\\w+\\)")
 
+(defconst fuel-syntax--alien-callback-regex
+  "\\_<CALLBACK: \\(\\w+\\) \\(\\w+\\)")
+
 (defconst fuel-syntax--indent-def-starts '("" ":"
                                            "C-ENUM" "C-STRUCT" "C-UNION"
                                            "FROM" "FUNCTION:"
@@ -159,12 +163,16 @@
                                            "MEMO" "MEMO:" "METHOD"
                                            "SYNTAX"
                                            "PREDICATE" "PRIMITIVE"
-                                           "STRUCT" "TAG" "TUPLE" "UNION-STRUCT"
-                                           "UNION"))
+                                           "STRUCT" "TAG" "TUPLE"
+                                           "TYPED" "TYPED:"
+                                           "UNIFORM-TUPLE"
+                                           "UNION-STRUCT" "UNION"
+                                           "VERTEX-FORMAT"))
 
 (defconst fuel-syntax--no-indent-def-starts '("ARTICLE"
                                               "HELP"
                                               "SINGLETONS"
+                                              "SPECIALIZED-ARRAYS"
                                               "SYMBOLS"
                                               "VARS"))
 
@@ -182,10 +190,10 @@
 (defconst fuel-syntax--single-liner-regex
   (regexp-opt '("ABOUT:"
                 "ALIAS:"
-                "CONSTANT:" "C:"
+                "CONSTANT:" "C:" "C-TYPE:"
                 "DEFER:"
                 "FORGET:"
-                "GENERIC:" "GENERIC#"
+                "GAME:" "GENERIC:" "GENERIC#" "GLSL-PROGRAM:" 
                 "HEX:" "HOOK:"
                 "IN:" "INSTANCE:"
                 "LIBRARY:"
@@ -194,7 +202,7 @@
                 "POSTPONE:" "PRIVATE>" "<PRIVATE"
                 "QUALIFIED-WITH:" "QUALIFIED:"
                 "RENAME:"
-                "SINGLETON:" "SLOT:" "SYMBOL:"
+                "SINGLETON:" "SLOT:" "SPECIALIZED-ARRAY:" "SYMBOL:"
                 "TYPEDEF:"
                 "USE:"
                 "VAR:")))
@@ -267,7 +275,7 @@
     ("\\_<C-ENUM:\\( \\|\n\\)" (1 "<b"))
     ("\\_<TUPLE: +\\w+? +< +\\w+? *\\( \\|\n\\)\\([^;]\\|$\\)" (1 "<b"))
     ("\\_<TUPLE: +\\w+? *\\( \\|\n\\)\\([^;<\n]\\|\\_>\\)" (1 "<b"))
-    ("\\_<\\(SYMBOLS\\|VARS\\|SINGLETONS\\): *?\\( \\|\n\\)\\([^;\n]\\|\\_>\\)"
+    ("\\_<\\(SYMBOLS\\|VARS\\|SPECIALIZED-ARRAYS\\|SINGLETONS\\): *?\\( \\|\n\\)\\([^;\n]\\|\\_>\\)"
      (2 "<b"))
     ("\\(\n\\| \\);\\_>" (1 ">b"))
     ;; Let and lambda:
@@ -287,6 +295,7 @@
     ("\\_<\\()\\))\\_>" (1 ")("))
     ;; Quotations:
     ("\\_<'\\(\\[\\)\\_>" (1 "(]"))      ; fried
+    ("\\_<$\\(\\[\\)\\_>" (1 "(]"))      ; parse-time
     ("\\_<\\(\\[\\)\\_>" (1 "(]"))
     ("\\_<\\(\\]\\)\\_>" (1 ")["))))
 
