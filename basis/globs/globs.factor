@@ -43,3 +43,10 @@ Main = Concatenation End
 
 : glob-matches? ( input glob -- ? )
     [ >case-fold ] bi@ <glob> matches? ;
+
+: glob-pattern? ( string -- ? )
+    [ "\\*?[{" member? ] any? ;
+
+: glob-parent-directory ( glob -- parent-directory )
+    path-components dup [ glob-pattern? ] find drop head
+    path-separator join ;
