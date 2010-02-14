@@ -51,23 +51,17 @@ M: node hashcode* nip number>> ;
         node insn>> uses-vregs [ definers at [ node +data+ precedes ] when* ] each
     ] each ;
 
-: make-chain ( nodes -- )
-    [ dup rest-slice [ +control+ precedes ] 2each ] unless-empty ;
-
-: instruction-chain ( nodes quot -- )
-    '[ insn>> @ ] filter make-chain ; inline
-
 UNION: stack-read-write ##peek ##replace ;
-UNION: stack-change-height ##inc-d ##inc-r ;
-UNION: stack-insn stack-read-write stack-change-height ;
 
-GENERIC: data-stack-insn? ( insn -- ? )
-M: object data-stack-insn? drop f ;
-M: ##inc-d data-stack-insn? drop t ;
-M: stack-read-write data-stack-insn? loc>> ds-loc? ;
+PREDICATE: ds-read-write < stack-read-write
+    loc>> ds-loc? ;
+UNION: data-stack-insn
+    ##inc-d ds-read-write ;
 
-: retain-stack-insn? ( insn -- ? )
-    dup stack-insn? [ data-stack-insn? not ] [ drop f ] if ;
+PREDICATE: rs-read-write < stack-read-write
+    loc>> rs-loc? ;
+UNION: retain-stack-insn
+    ##inc-r rs-read-write ;
 
 UNION: ##alien-read
     ##alien-double ##alien-float ##alien-cell ##alien-vector
@@ -90,15 +84,38 @@ UNION: string-memory-insn
 UNION: alien-call-insn
     ##save-context ##alien-invoke ##alien-indirect ##alien-callback ;
 
+: chain ( node var -- )
+    dup get [
+        pick +control+ precedes
+    ] when*
+    set ;
+
+GENERIC: add-control-edge ( node insn -- )
+
+M: data-stack-insn add-control-edge
+    drop data-stack-insn chain ;
+
+M: retain-stack-insn add-control-edge
+    drop retain-stack-insn chain ;
+
+M: alien-memory-insn add-control-edge
+    drop alien-memory-insn chain ;
+
+M: slot-memory-insn add-control-edge
+    drop slot-memory-insn chain ;
+
+M: string-memory-insn add-control-edge
+    drop string-memory-insn chain ;
+
+M: alien-call-insn add-control-edge
+    drop alien-call-insn chain ;
+
+M: object add-control-edge 2drop ;
+
 : add-control-edges ( nodes -- )
-    {
-        [ [ data-stack-insn? ] instruction-chain ]
-        [ [ retain-stack-insn? ] instruction-chain ]
-        [ [ alien-memory-insn? ] instruction-chain ]
-        [ [ slot-memory-insn? ] instruction-chain ]
-        [ [ string-memory-insn? ] instruction-chain ]
-        [ [ alien-call-insn? ] instruction-chain ]
-    } cleave ;
+    [
+        [ dup insn>> add-control-edge ] each
+    ] with-scope ;
 
 : set-follows ( nodes -- )
     [
@@ -112,11 +129,11 @@ UNION: alien-call-insn
 
 : build-dependence-graph ( instructions -- )
     [ <node> ] map {
-        [ add-data-edges ]
         [ add-control-edges ]
+        [ add-data-edges ]
         [ set-follows ]
-        [ nodes set ]
         [ set-roots ]
+        [ nodes set ]
     } cleave ;
 
 ! Sethi-Ulmann numbering
