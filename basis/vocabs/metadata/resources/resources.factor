@@ -21,4 +21,5 @@ PRIVATE>
     ] with-directory-tree-files ;
 
 : vocab-resource-files ( vocab -- filenames )
-    dup vocab-resources expand-vocab-resource-files ;
+    dup vocab-resources
+    [ drop f ] [ expand-vocab-resource-files ] if-empty ;
