@@ -38,7 +38,7 @@ PRIVATE>
 : copy-vocab-resources ( dir vocab -- )
     dup vocab-resource-files 
     [ 2drop ] [
-        [ [ vocab-dir append-path P ] [ vocab-dir-in-root P ] bi ] dip
+        [ [ vocab-dir append-path ] [ vocab-dir-in-root ] bi ] dip
         [ 2drop make-directories ]
         [ [ copy-vocab-resource ] with with each ] 3bi
     ] if-empty ;
