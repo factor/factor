@@ -101,6 +101,8 @@
     (,fuel-syntax--brace-words-regex 1 'factor-font-lock-parsing-word)
     (,fuel-syntax--alien-function-regex (1 'factor-font-lock-type-name)
                                         (2 'factor-font-lock-word))
+    (,fuel-syntax--alien-callback-regex (1 'factor-font-lock-type-name)
+                                        (2 'factor-font-lock-word))
     (,fuel-syntax--vocab-ref-regexp  2 'factor-font-lock-vocabulary-name)
     (,fuel-syntax--constructor-decl-regex
      (1 'factor-font-lock-word)
