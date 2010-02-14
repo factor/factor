@@ -18,7 +18,7 @@ GENERIC: word-vocabulary ( word -- vocabulary )
 
 M: word word-vocabulary vocabulary>> ;
 
-M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
+M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
 
 :: do-step ( errors summary-file details-file -- )
     errors

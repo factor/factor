@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2009 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.builtin
 classes.intersection classes.mixin classes.predicate
@@ -278,6 +278,8 @@ INSTANCE: vocab topic
 
 INSTANCE: vocab-link topic
 
+M: vocab-spec valid-article? drop t ;
+
 M: vocab-spec article-title vocab-name " vocabulary" append ;
 
 M: vocab-spec article-name vocab-name ;
@@ -288,6 +290,8 @@ M: vocab-spec article-content
 M: vocab-spec article-parent drop "vocab-index" ;
 
 M: vocab-tag >link ;
+
+M: vocab-tag valid-article? drop t ;
 
 M: vocab-tag article-title
     name>> "Vocabularies tagged “" "”" surround ;
@@ -302,6 +306,8 @@ M: vocab-tag article-parent drop "vocab-tags" ;
 M: vocab-tag summary article-title ;
 
 M: vocab-author >link ;
+
+M: vocab-author valid-article? drop t ;
 
 M: vocab-author article-title
     name>> "Vocabularies by " prepend ;

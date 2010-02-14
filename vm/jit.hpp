@@ -33,7 +33,9 @@ struct jit {
 	void word_jump(cell word_)
 	{
 		data_root<word> word(word_,parent);
+#ifndef FACTOR_AMD64
 		literal(tag_fixnum(xt_tail_pic_offset));
+#endif
 		literal(word.value());
 		emit(parent->special_objects[JIT_WORD_JUMP]);
 	}
@@ -59,7 +61,7 @@ struct jit {
 			return position;
 	}
 
-        void set_position(fixnum position_)
+	void set_position(fixnum position_)
 	{
 		if(computing_offset_p)
 			position = position_;

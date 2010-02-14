@@ -49,6 +49,18 @@ C: <texture-data> texture-data
 UNION: ?texture-data texture-data POSTPONE: f ;
 UNION: ?float-array float-array POSTPONE: f ;
 
+VARIANT: compressed-texture-format
+    DXT1-RGB DXT1-RGBA DXT3 DXT5
+    RGTC1 RGTC1-SIGNED RGTC2 RGTC2-SIGNED ;
+
+TUPLE: compressed-texture-data
+    { ptr read-only }
+    { format compressed-texture-format read-only }
+    { length integer read-only } ;
+
+C: <compressed-texture-data> compressed-texture-data
+UNION: ?compressed-texture-data compressed-texture-data POSTPONE: f ;
+
 VARIANT: texture-wrap
     clamp-texcoord-to-edge clamp-texcoord-to-border repeat-texcoord repeat-texcoord-mirrored ;
 VARIANT: texture-filter
@@ -75,6 +87,18 @@ M: cube-map-face texture-object
     texture>> ; inline
 M: texture texture-object
     ; inline
+
+: gl-compressed-texture-format ( format -- gl-format )
+    {
+        { DXT1-RGB     [ GL_COMPRESSED_RGB_S3TC_DXT1_EXT  ] }
+        { DXT1-RGBA    [ GL_COMPRESSED_RGBA_S3TC_DXT1_EXT ] }
+        { DXT3         [ GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ] }
+        { DXT5         [ GL_COMPRESSED_RGBA_S3TC_DXT5_EXT ] }
+        { RGTC1        [ GL_COMPRESSED_RED_RGTC1          ] }
+        { RGTC1-SIGNED [ GL_COMPRESSED_SIGNED_RED_RGTC1   ] }
+        { RGTC2        [ GL_COMPRESSED_RG_RGTC2           ] }
+        { RGTC2-SIGNED [ GL_COMPRESSED_SIGNED_RG_RGTC2    ] }
+    } case ; inline
 
 : gl-wrap ( wrap -- gl-wrap )
     {
@@ -159,49 +183,77 @@ M: cube-map-face     texture-data-gl-target
 : ?product ( x -- y )
     dup number? [ product ] unless ; inline
 
+:: (allocate-texture) ( tdt level dim data dim-quot teximage-quot -- )
+    tdt bind-tdt :> texture
+    tdt texture-data-gl-target level texture texture-gl-internal-format
+    dim dim-quot call 0 texture data texture-data-gl-args
+    pixel-unpack-buffer teximage-quot with-gpu-data-ptr ; inline
+
+:: (allocate-compressed-texture) ( tdt level dim compressed-data dim-quot teximage-quot -- )
+    tdt bind-tdt :> texture
+    tdt texture-data-gl-target level compressed-data format>> gl-compressed-texture-format
+    dim dim-quot call 0 compressed-data [ length>> ] [ ptr>> ] bi
+    pixel-unpack-buffer teximage-quot with-gpu-data-ptr ; inline
+
+:: (update-texture) ( tdt level loc dim data dim-quot texsubimage-quot -- )
+    tdt bind-tdt :> texture
+    tdt texture-data-gl-target level
+    loc dim dim-quot bi@
+    texture data texture-data-gl-args
+    pixel-unpack-buffer texsubimage-quot with-gpu-data-ptr ; inline
+
+:: (update-compressed-texture) ( tdt level loc dim compressed-data dim-quot texsubimage-quot -- )
+    tdt bind-tdt :> texture
+    tdt texture-data-gl-target level
+    loc dim dim-quot bi@
+    compressed-data [ format>> gl-compressed-texture-format ] [ length>> ] [ ptr>> ] tri
+    pixel-unpack-buffer texsubimage-quot with-gpu-data-ptr ; inline
+
 PRIVATE>
 
 GENERIC# allocate-texture 3 ( tdt level dim data -- )
 
-M:: texture-1d-data-target allocate-texture ( tdt level dim data -- )
-    tdt bind-tdt :> texture
-    tdt texture-data-gl-target level texture texture-gl-internal-format
-    dim 0 texture data texture-data-gl-args
-    pixel-unpack-buffer [ glTexImage1D ] with-gpu-data-ptr ;
+M: texture-1d-data-target allocate-texture ( tdt level dim data -- )
+    [ ] [ glTexImage1D ] (allocate-texture) ;
 
-M:: texture-2d-data-target allocate-texture ( tdt level dim data -- )
-    tdt bind-tdt :> texture
-    tdt texture-data-gl-target level texture texture-gl-internal-format
-    dim first2 0 texture data texture-data-gl-args
-    pixel-unpack-buffer [ glTexImage2D ] with-gpu-data-ptr ;
+M: texture-2d-data-target allocate-texture ( tdt level dim data -- )
+    [ first2 ] [ glTexImage2D ] (allocate-texture) ;
 
-M:: texture-3d-data-target allocate-texture ( tdt level dim data -- )
-    tdt bind-tdt :> texture
-    tdt texture-data-gl-target level texture texture-gl-internal-format
-    dim first3 0 texture data texture-data-gl-args
-    pixel-unpack-buffer [ glTexImage3D ] with-gpu-data-ptr ;
+M: texture-3d-data-target allocate-texture ( tdt level dim data -- )
+    [ first3 ] [ glTexImage3D ] (allocate-texture) ;
+
+GENERIC# allocate-compressed-texture 3 ( tdt level dim compressed-data -- )
+
+M: texture-1d-data-target allocate-compressed-texture ( tdt level dim compressed-data -- )
+    [ ] [ glCompressedTexImage1D ] (allocate-compressed-texture) ;
+
+M: texture-2d-data-target allocate-compressed-texture ( tdt level dim compressed-data -- )
+    [ first2 ] [ glCompressedTexImage2D ] (allocate-compressed-texture) ;
+
+M: texture-3d-data-target allocate-compressed-texture ( tdt level dim compressed-data -- )
+    [ first3 ] [ glCompressedTexImage3D ] (allocate-compressed-texture) ;
 
 GENERIC# update-texture 4 ( tdt level loc dim data -- )
 
-M:: texture-1d-data-target update-texture ( tdt level loc dim data -- )
-    tdt bind-tdt :> texture
-    tdt texture-data-gl-target level
-    loc dim texture data texture-data-gl-args
-    pixel-unpack-buffer [ glTexSubImage1D ] with-gpu-data-ptr ;
+M: texture-1d-data-target update-texture ( tdt level loc dim data -- )
+    [ ] [ glTexSubImage1D ] (update-texture) ;
 
-M:: texture-2d-data-target update-texture ( tdt level loc dim data -- )
-    tdt bind-tdt :> texture
-    tdt texture-data-gl-target level
-    loc dim [ first2 ] bi@
-    texture data texture-data-gl-args
-    pixel-unpack-buffer [ glTexSubImage2D ] with-gpu-data-ptr ;
+M: texture-2d-data-target update-texture ( tdt level loc dim data -- )
+    [ first2 ] [ glTexSubImage2D ] (update-texture) ;
 
-M:: texture-3d-data-target update-texture ( tdt level loc dim data -- )
-    tdt bind-tdt :> texture
-    tdt texture-data-gl-target level
-    loc dim [ first3 ] bi@
-    texture data texture-data-gl-args
-    pixel-unpack-buffer [ glTexSubImage3D ] with-gpu-data-ptr ;
+M: texture-3d-data-target update-texture ( tdt level loc dim data -- )
+    [ first3 ] [ glTexSubImage3D ] (update-texture) ;
+
+GENERIC# update-compressed-texture 4 ( tdt level loc dim compressed-data -- )
+
+M: texture-1d-data-target update-compressed-texture ( tdt level loc dim compressed-data -- )
+    [ ] [ glCompressedTexSubImage1D ] (update-compressed-texture) ;
+
+M: texture-2d-data-target update-compressed-texture ( tdt level loc dim compressed-data -- )
+    [ first2 ] [ glCompressedTexSubImage2D ] (update-compressed-texture) ;
+
+M: texture-3d-data-target update-compressed-texture ( tdt level loc dim compressed-data -- )
+    [ first3 ] [ glCompressedTexSubImage3D ] (update-compressed-texture) ;
 
 : image>texture-data ( image -- dim texture-data )
     { [ dim>> ] [ bitmap>> ] [ component-order>> ] [ component-type>> ] } cleave
@@ -211,13 +263,13 @@ GENERIC# texture-dim 1 ( tdt level -- dim )
 
 M:: texture-1d-data-target texture-dim ( tdt level -- dim )
     tdt bind-tdt :> texture
-    tdt texture-data-gl-target level GL_TEXTURE_WIDTH get-texture-int ;
+    tdt texture-data-gl-target level GL_TEXTURE_WIDTH get-texture-int ; inline
 
 M:: texture-2d-data-target texture-dim ( tdt level -- dim )
     tdt bind-tdt :> texture
     tdt texture-data-gl-target level 
     [ GL_TEXTURE_WIDTH get-texture-int ] [ GL_TEXTURE_HEIGHT get-texture-int ] 2bi
-    2array ;
+    2array ; inline
 
 M:: texture-3d-data-target texture-dim ( tdt level -- dim )
     tdt bind-tdt :> texture
@@ -225,7 +277,11 @@ M:: texture-3d-data-target texture-dim ( tdt level -- dim )
     [ GL_TEXTURE_WIDTH get-texture-int ]
     [ GL_TEXTURE_HEIGHT get-texture-int ]
     [ GL_TEXTURE_DEPTH get-texture-int ] 2tri
-    3array ;
+    3array ; inline
+
+: compressed-texture-data-size ( tdt level -- size )
+    [ [ bind-tdt drop ] [ texture-data-gl-target ] bi ] dip
+    GL_TEXTURE_COMPRESSED_IMAGE_SIZE get-texture-int ; inline
 
 : texture-data-size ( tdt level -- size )
     [ texture-dim ?product ] [ drop texture-object bytes-per-pixel ] 2bi * ; inline
@@ -237,8 +293,17 @@ TYPED:: read-texture-to ( tdt: texture-data-target level: integer gpu-data-ptr -
     gpu-data-ptr pixel-pack-buffer [ glGetTexImage ] with-gpu-data-ptr ;
 
 TYPED: read-texture ( tdt: texture-data-target level: integer -- byte-array: byte-array )
-    2dup texture-data-size <byte-array>
+    2dup texture-data-size (byte-array)
     [ read-texture-to ] keep ;
+
+TYPED:: read-compressed-texture-to ( tdt: texture-data-target level: integer gpu-data-ptr -- )
+    tdt bind-tdt :> texture
+    tdt texture-data-gl-target level
+    gpu-data-ptr pixel-pack-buffer [ glGetCompressedTexImage ] with-gpu-data-ptr ;
+
+TYPED: read-compressed-texture ( tdt: texture-data-target level: integer -- byte-array: byte-array )
+    2dup compressed-texture-data-size (byte-array)
+    [ read-compressed-texture-to ] keep ;
 
 : allocate-texture-image ( tdt level image -- )
     image>texture-data allocate-texture ; inline

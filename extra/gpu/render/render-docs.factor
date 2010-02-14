@@ -62,7 +62,7 @@ $nl
     { "Boolean vector types: " { $link bvec2-uniform } ", " { $link bvec3-uniform } ", " { $link bvec4-uniform } }
     }
 }
-{ "Matrix uniforms take their values from row-major Factor " { $link sequence } "s of sequences of floats. Matrix types are:" 
+{ "Matrix uniforms take their values either from row-major Factor " { $link sequence } "s of sequences of floats, or from " { $link alien } "s or " { $link float-array } "s referencing packed column-major arrays of floats. Matrix types are:" 
     { $list
     { { $link mat2-uniform } ", " { $link mat2x3-uniform } ", " { $link mat2x4-uniform } }
     { { $link mat3x2-uniform } ", " { $link mat3-uniform } ", " { $link mat3x4-uniform } }
@@ -71,7 +71,7 @@ $nl
 "Rectangular matrix type names are column x row."
 }
 { "Uniform slots can also be defined as other " { $snippet "uniform-tuple" } " types to bind uniform structures. The uniform structure will take its value from the slots of a tuple of the given type." }
-{ "Array uniforms are passed as Factor sequences of the corresponding value type above." }
+{ "Array uniforms are passed either as Factor sequences of the corresponding type specified above, or as " { $link alien } "s or " { $vocab-link "specialized-arrays" } " that reference pre-packed binary arrays of " { $link c:int } "s or " { $link c:float } "s." }
 }
 $nl
 "A value of a uniform tuple type is a standard Factor tuple. Uniform tuples are constructed with " { $link new } " or " { $link boa } ", and values are placed inside them using standard slot accessors."

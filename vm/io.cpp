@@ -31,7 +31,38 @@ void factor_vm::io_error()
 	general_error(ERROR_IO,tag_fixnum(errno),false_object,NULL);
 }
 
-size_t safe_fread(void *ptr, size_t size, size_t nitems, FILE *stream)
+FILE *factor_vm::safe_fopen(char *filename, char *mode)
+{
+	FILE *file;
+	do {
+		file = fopen(filename,mode);
+		if(file == NULL)
+			io_error();
+		else
+			break;
+	} while(errno == EINTR);
+	return file;
+}
+
+int factor_vm::safe_fgetc(FILE *stream)
+{
+	int c;
+	do {
+		c = fgetc(stream);
+		if(c == EOF)
+		{
+			if(feof(stream))
+				return EOF;
+			else
+				io_error();
+		}
+		else
+			break;
+	} while(errno == EINTR);
+	return c;
+}
+
+size_t factor_vm::safe_fread(void *ptr, size_t size, size_t nitems, FILE *stream)
 {
 	size_t items_read = 0;
 
@@ -42,7 +73,17 @@ size_t safe_fread(void *ptr, size_t size, size_t nitems, FILE *stream)
 	return items_read;
 }
 
-size_t safe_fwrite(void *ptr, size_t size, size_t nitems, FILE *stream)
+void factor_vm::safe_fputc(int c, FILE *stream)
+{
+	do {
+		if(fputc(c,stream) == EOF)
+			io_error();
+		else
+			break;
+	} while(errno == EINTR);
+}
+
+size_t factor_vm::safe_fwrite(void *ptr, size_t size, size_t nitems, FILE *stream)
 {
 	size_t items_written = 0;
 
@@ -53,15 +94,55 @@ size_t safe_fwrite(void *ptr, size_t size, size_t nitems, FILE *stream)
 	return items_written;
 }
 
-int safe_fclose(FILE *stream)
+int factor_vm::safe_ftell(FILE *stream)
 {
-	int ret = 0;
+	off_t offset;
+	do {
+		if((offset = FTELL(stream)) == -1)
+			io_error();
+		else
+			break;
+	} while(errno == EINTR);
+	return offset;
+}
+
+void factor_vm::safe_fseek(FILE *stream, off_t offset, int whence)
+{
+	switch(whence)
+	{
+	case 0: whence = SEEK_SET; break;
+	case 1: whence = SEEK_CUR; break;
+	case 2: whence = SEEK_END; break;
+	default:
+		critical_error("Bad value for whence",whence);
+	}
 
 	do {
-		ret = fclose(stream);
-	} while(ret != 0 && errno == EINTR);
+		if(FSEEK(stream,offset,whence) == -1)
+			io_error();
+		else
+			break;
+	} while(errno == EINTR);
+}
 
-	return ret;
+void factor_vm::safe_fflush(FILE *stream)
+{
+	do {
+		if(fflush(stream) == EOF)
+			io_error();
+		else
+			break;
+	} while(errno == EINTR);
+}
+
+void factor_vm::safe_fclose(FILE *stream)
+{
+	do {
+		if(fclose(stream) == EOF)
+			io_error();
+		else
+			break;
+	} while(errno == EINTR);
 }
 
 void factor_vm::primitive_fopen()
@@ -72,13 +153,8 @@ void factor_vm::primitive_fopen()
 	path.untag_check(this);
 
 	FILE *file;
-	do {
-		file = fopen((char *)(path.untagged() + 1),
-				   (char *)(mode.untagged() + 1));
-		if(file == NULL)
-			io_error();
-	} while(errno == EINTR);
-
+	file = safe_fopen((char *)(path.untagged() + 1),
+		(char *)(mode.untagged() + 1));
 	ctx->push(allot_alien(file));
 }
 
@@ -91,24 +167,11 @@ void factor_vm::primitive_fgetc()
 {
 	FILE *file = pop_file_handle();
 
-	do {
-		int c = fgetc(file);
-		if(c == EOF)
-		{
-			if(feof(file))
-			{
-				ctx->push(false_object);
-				break;
-			}
-			else
-				io_error();
-		}
-		else
-		{
-			ctx->push(tag_fixnum(c));
-			break;
-		}
-	} while(errno == EINTR);
+	int c = safe_fgetc(file);
+	if(c == EOF && feof(file))
+		ctx->push(false_object);
+	else
+		ctx->push(tag_fixnum(c));
 }
 
 void factor_vm::primitive_fread()
@@ -124,31 +187,24 @@ void factor_vm::primitive_fread()
 
 	data_root<byte_array> buf(allot_uninitialized_array<byte_array>(size),this);
 
-	for(;;)
+	int c = safe_fread(buf.untagged() + 1,1,size,file);
+	if(c == 0)
 	{
-		int c = safe_fread(buf.untagged() + 1,1,size,file);
-		if(c == 0)
-		{
-			if(feof(file))
-			{
-				ctx->push(false_object);
-				break;
-			}
-			else
-				io_error();
-		}
+		if(feof(file))
+			ctx->push(false_object);
 		else
+			io_error();
+	}
+	else
+	{
+		if(feof(file))
 		{
-			if(feof(file))
-			{
-				byte_array *new_buf = allot_byte_array(c);
-				memcpy(new_buf + 1, buf.untagged() + 1,c);
-				buf = new_buf;
-			}
-
-			ctx->push(buf.value());
-			break;
+			byte_array *new_buf = allot_byte_array(c);
+			memcpy(new_buf + 1, buf.untagged() + 1,c);
+			buf = new_buf;
 		}
+
+		ctx->push(buf.value());
 	}
 }
 
@@ -156,13 +212,7 @@ void factor_vm::primitive_fputc()
 {
 	FILE *file = pop_file_handle();
 	fixnum ch = to_fixnum(ctx->pop());
-
-	do {
-		if(fputc(ch,file) == EOF)
-			io_error();
-		else
-			break;
-	} while(errno == EINTR);
+	safe_fputc(ch, file);
 }
 
 void factor_vm::primitive_fwrite()
@@ -183,16 +233,7 @@ void factor_vm::primitive_fwrite()
 void factor_vm::primitive_ftell()
 {
 	FILE *file = pop_file_handle();
-	off_t offset;
-
-	do {
-		if((offset = FTELL(file)) == -1)
-			io_error();
-		else
-			break;
-	} while(errno == EINTR);
-
-	ctx->push(from_signed_8(offset));
+	ctx->push(from_signed_8(safe_ftell(file)));
 }
 
 void factor_vm::primitive_fseek()
@@ -200,41 +241,19 @@ void factor_vm::primitive_fseek()
 	int whence = to_fixnum(ctx->pop());
 	FILE *file = pop_file_handle();
 	off_t offset = to_signed_8(ctx->pop());
-
-	switch(whence)
-	{
-	case 0: whence = SEEK_SET; break;
-	case 1: whence = SEEK_CUR; break;
-	case 2: whence = SEEK_END; break;
-	default:
-		critical_error("Bad value for whence",whence);
-		break;
-	}
-
-	do {
-		if(FSEEK(file,offset,whence) == -1)
-			io_error();
-		else
-			break;
-	} while(errno == EINTR);
+	safe_fseek(file,offset,whence);
 }
 
 void factor_vm::primitive_fflush()
 {
 	FILE *file = pop_file_handle();
-	do {
-		if(fflush(file) == EOF)
-			io_error();
-		else
-			break;
-	} while(errno == EINTR);
+	safe_fflush(file);
 }
 
 void factor_vm::primitive_fclose()
 {
 	FILE *file = pop_file_handle();
-	if(safe_fclose(file) == EOF)
-		io_error();
+	safe_fclose(file);
 }
 
 /* This function is used by FFI I/O. Accessing the errno global directly is
@@ -245,8 +264,8 @@ VM_C_API int err_no()
 	return errno;
 }
 
-VM_C_API void clear_err_no()
+VM_C_API void set_err_no(int err)
 {
-	errno = 0;
+	errno = err;
 }
 }

@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private sequences sequences.private math
 combinators macros math.order math.ranges quotations fry effects
-memoize.private ;
+memoize.private arrays ;
 IN: generalizations
 
 <<
@@ -100,8 +100,18 @@ MACRO: nspread ( quots n -- )
 
 MACRO: spread* ( n -- )
     [ [ ] ] [
-        1 swap [a,b) [ '[ [ [ _ ndip ] curry ] dip compose ] ] map [ ] concat-as
+        [1,b) [ '[ [ [ _ ndip ] curry ] dip compose ] ] map [ ] concat-as
         [ call ] compose
+    ] if-zero ;
+
+MACRO: nspread* ( m n -- )
+    [ drop [ ] ] [
+        [ * 0 ] [ drop neg ] 2bi
+        <range> rest >array dup length iota <reversed>
+        [
+            '[ [ [ _ ndip ] curry ] _ ndip ]
+        ] 2map dup rest-slice [ [ compose ] compose ] map! drop
+        [ ] concat-as [ call ] compose
     ] if-zero ;
 
 MACRO: cleave* ( n -- )
@@ -111,6 +121,9 @@ MACRO: cleave* ( n -- )
 
 : napply ( quot n -- )
     [ dupn ] [ spread* ] bi ; inline
+
+: mnapply ( quot m n -- )
+    [ nip dupn ] [ nspread* ] 2bi ; inline
 
 : apply-curry ( ...a quot n -- )
     [ [curry] ] dip napply ; inline
@@ -123,10 +136,6 @@ MACRO: cleave* ( n -- )
 
 MACRO: mnswap ( m n -- )
     1 + '[ _ -nrot ] swap '[ _ _ napply ] ;
-
-MACRO: mnapply ( quot m n -- )
-    swap
-    [ swap '[ _ ] replicate ] dip '[ _ _ nspread ] ;
 
 MACRO: nweave ( n -- )
     [ dup iota <reversed> [ '[ _ _ mnswap ] ] with map ] keep

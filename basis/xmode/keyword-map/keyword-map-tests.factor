@@ -8,7 +8,7 @@ f <keyword-map> dup "k" set
     { "int" KEYWORD1 }
     { "void" KEYWORD2 }
     { "size_t" KEYWORD3 }
-} update
+} assoc-union! drop
 
 [ 3 ] [ "k" get assoc-size ] unit-test
 [ KEYWORD1 ] [ "int" "k" get at ] unit-test
@@ -21,7 +21,7 @@ t <keyword-map> dup "k" set
     { "Foo" KEYWORD1 }
     { "bbar" KEYWORD2 }
     { "BAZ" KEYWORD3 }
-} update
+} assoc-union! drop
 
 [ KEYWORD1 ] [ "fOo" "k" get at ] unit-test
 

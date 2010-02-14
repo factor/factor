@@ -1,72 +1,76 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.functions math.vectors sequences ;
+USING: arrays combinators kernel locals math math.functions
+math.libm math.order math.vectors sequences ;
 IN: math.quaternions
 
-! Everybody's favorite non-commutative skew field, the quaternions!
+: q+ ( u v -- u+v )
+    v+ ; inline
 
-! Quaternions are represented as pairs of complex numbers, using the
-! identity: (a+bi)+(c+di)j = a+bi+cj+dk.
+: q- ( u v -- u-v )
+    v- ; inline
 
 <PRIVATE
 
-: ** ( x y -- z ) conjugate * ; inline
-
-: 2q ( u v -- u' u'' v' v'' ) [ first2 ] bi@ ; inline
-
-: q*a ( u v -- a ) 2q swapd ** [ * ] dip - ; inline
-
-: q*b ( u v -- b ) 2q [ ** swap ] dip * + ; inline
+GENERIC: (q*sign) ( q -- q' )
+M: object (q*sign) { -1 1 1 1 } v* ; inline
 
 PRIVATE>
 
-: q+ ( u v -- u+v )
-    v+ ;
-
-: q- ( u v -- u-v )
-    v- ;
-
 : q* ( u v -- u*v )
-    [ q*a ] [ q*b ] 2bi 2array ;
+    {
+        [ [ { 1 0 0 0 } vshuffle ] [ { 1 1 2 3 } vshuffle ] bi* v*    ]
+        [ [ { 2 1 2 3 } vshuffle ] [ { 2 0 0 0 } vshuffle ] bi* v* v+ ]
+        [ [ { 3 2 3 1 } vshuffle ] [ { 3 3 1 2 } vshuffle ] bi* v* v+ ]
+        [ [ { 0 3 1 2 } vshuffle ] [ { 0 2 3 1 } vshuffle ] bi* v* v- ]
+    } 2cleave (q*sign) ; inline
 
-: qconjugate ( u -- u' )
-    first2 [ conjugate ] [ neg  ] bi* 2array ;
+GENERIC: qconjugate ( u -- u' )
+M: object qconjugate ( u -- u' )
+    { 1 -1 -1 -1 } v* ; inline
 
 : qrecip ( u -- 1/u )
-    qconjugate dup norm-sq v/n ;
+    qconjugate dup norm-sq v/n ; inline
 
 : q/ ( u v -- u/v )
-    qrecip q* ;
+    qrecip q* ; inline
+
+: n*q ( q n -- q )
+    v*n ; inline
 
 : q*n ( q n -- q )
-    conjugate v*n ;
+    v*n ; inline
+
+: n>q ( n -- q )
+    0 0 0 4array ; inline
+
+: n>q-like ( c exemplar -- q )
+    [ 0 0 0 ] dip 4sequence ; inline
 
 : c>q ( c -- q )
-    0 2array ;
+    >rect 0 0 4array ; inline
 
-: v>q ( v -- q )
-    first3 rect> [ 0 swap rect> ] dip 2array ;
-
-: q>v ( q -- v )
-    first2 [ imaginary-part ] dip >rect 3array ;
-
-! Zero
-CONSTANT: q0 { 0 0 }
-
-! Units
-CONSTANT: q1 { 1 0 }
-CONSTANT: qi { C{ 0 1 } 0 }
-CONSTANT: qj { 0 1 }
-CONSTANT: qk { 0 C{ 0 1 } }
+: c>q-like ( c exemplar -- q )
+    [ >rect 0 0 ] dip 4sequence ; inline
 
 ! Euler angles
 
 <PRIVATE
 
-: (euler) ( theta unit -- q )
-    [ -0.5 * [ cos c>q ] [ sin ] bi ] dip n*v v- ;
+: (euler) ( theta exemplar shuffle -- q )
+    swap
+    [ 0.5 * [ fcos ] [ fsin ] bi 0.0 0.0 ] [ call ] [ 4sequence ] tri* ; inline
 
 PRIVATE>
 
+: euler-like ( phi theta psi exemplar -- q )
+    [ [ ] (euler) ] [ [ swapd ] (euler) ] [ [ rot ] (euler) ] tri-curry tri* q* q* ; inline
+
 : euler ( phi theta psi -- q )
-  [ qi (euler) ] [ qj (euler) ] [ qk (euler) ] tri* q* q* ;
+    { } euler-like ; inline
+
+:: slerp ( q0 q1 t -- qt )
+    q0 q1 v. -1.0 1.0 clamp :> dot
+    dot facos t * :> omega
+    q1 dot q0 n*v v- normalize :> qt'
+    omega fcos q0 n*v omega fsin qt' n*v v+ ; inline

@@ -184,20 +184,20 @@ struct factor_vm
 	void bignum_destructive_add(bignum * bignum, bignum_digit_type n);
 	void bignum_destructive_scale_up(bignum * bignum, bignum_digit_type factor);
 	void bignum_divide_unsigned_large_denominator(bignum * numerator, bignum * denominator,
-						      bignum * * quotient, bignum * * remainder, int q_negative_p, int r_negative_p);
+							bignum * * quotient, bignum * * remainder, int q_negative_p, int r_negative_p);
 	void bignum_divide_unsigned_normalized(bignum * u, bignum * v, bignum * q);
 	bignum_digit_type bignum_divide_subtract(bignum_digit_type * v_start, bignum_digit_type * v_end,
-						 bignum_digit_type guess, bignum_digit_type * u_start);
+						 	bignum_digit_type guess, bignum_digit_type * u_start);
 	void bignum_divide_unsigned_medium_denominator(bignum * numerator,bignum_digit_type denominator,
-						       bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
+							bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
 	void bignum_destructive_normalization(bignum * source, bignum * target, int shift_left);
 	void bignum_destructive_unnormalization(bignum * bignum, int shift_right);
 	bignum_digit_type bignum_digit_divide(bignum_digit_type uh, bignum_digit_type ul,
-					      bignum_digit_type v, bignum_digit_type * q) /* return value */;
+							bignum_digit_type v, bignum_digit_type * q) /* return value */;
 	bignum_digit_type bignum_digit_divide_subtract(bignum_digit_type v1, bignum_digit_type v2,
-						       bignum_digit_type guess, bignum_digit_type * u);
+							bignum_digit_type guess, bignum_digit_type * u);
 	void bignum_divide_unsigned_small_denominator(bignum * numerator, bignum_digit_type denominator,
-						      bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
+							bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
 	bignum_digit_type bignum_destructive_scale_down(bignum * bignum, bignum_digit_type denominator);
 	bignum * bignum_remainder_unsigned_small_denominator(bignum * n, bignum_digit_type d, int negative_p);
 	bignum *bignum_digit_to_bignum(bignum_digit_type digit, int negative_p);
@@ -314,7 +314,7 @@ struct factor_vm
 		if(!(current_gc && current_gc->op == collect_growing_heap_op))
 		{
 			assert((cell)pointer >= data->seg->start
-			       && (cell)pointer < data->seg->end);
+				&& (cell)pointer < data->seg->end);
 		}
 	#endif
 	}
@@ -348,13 +348,14 @@ struct factor_vm
 	void primitive_die();
 
 	//arrays
+	inline void set_array_nth(array *array, cell slot, cell value);
 	array *allot_array(cell capacity, cell fill_);
 	void primitive_array();
 	cell allot_array_1(cell obj_);
 	cell allot_array_2(cell v1_, cell v2_);
 	cell allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_);
 	void primitive_resize_array();
-	inline void set_array_nth(array *array, cell slot, cell value);
+	cell std_vector_to_array(std::vector<cell> &elements);
 
 	//strings
 	cell string_nth(const string *str, cell index);
@@ -440,7 +441,6 @@ struct factor_vm
 	cell unbox_array_size_slow();
 	void primitive_fixnum_to_float();
 	void primitive_bignum_to_float();
-	void primitive_str_to_float();
 	void primitive_float_to_str();
 	void primitive_float_eq();
 	void primitive_float_add();
@@ -491,6 +491,15 @@ struct factor_vm
 	//io
 	void init_c_io();
 	void io_error();
+	FILE* safe_fopen(char *filename, char *mode);
+	int safe_fgetc(FILE *stream);
+	size_t safe_fread(void *ptr, size_t size, size_t nitems, FILE *stream);
+	void safe_fputc(int c, FILE* stream);
+	size_t safe_fwrite(void *ptr, size_t size, size_t nitems, FILE *stream);
+	int safe_ftell(FILE *stream);
+	void safe_fseek(FILE *stream, off_t offset, int whence);
+	void safe_fflush(FILE *stream);
+	void safe_fclose(FILE *stream);
 	void primitive_fopen();
 	FILE *pop_file_handle();
 	void primitive_fgetc();
@@ -508,37 +517,36 @@ struct factor_vm
 	cell compute_entry_point_pic_address(cell w_);
 	cell compute_entry_point_pic_tail_address(cell w_);
 	cell code_block_owner(code_block *compiled);
-	void update_word_references(code_block *compiled);
+	void update_word_references(code_block *compiled, bool reset_inline_caches);
 	void undefined_symbol();
 	cell compute_dlsym_address(array *literals, cell index);
 	cell compute_vm_address(cell arg);
 	void store_external_address(instruction_operand op);
 	cell compute_here_address(cell arg, cell offset, code_block *compiled);
+	void initialize_code_block(code_block *compiled, cell literals);
 	void initialize_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
 	code_block *allot_code_block(cell size, code_block_type type);
 	code_block *add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell parameters_, cell literals_);
 
 	//code heap
-	inline void check_code_pointer(cell ptr)
-	{
-	#ifdef FACTOR_DEBUG
-		//assert(in_code_heap_p(ptr));
-	#endif
-	}
-
-	void init_code_heap(cell size);
-	bool in_code_heap_p(cell ptr);
-	void update_code_heap_words();
-	void primitive_modify_code_heap();
-	code_heap_room code_room();
-	void primitive_code_room();
-	void primitive_strip_stack_traces();
+	inline void check_code_pointer(cell ptr) { }
 
 	template<typename Iterator> void each_code_block(Iterator &iter)
 	{
 		code->allocator->iterate(iter);
 	}
+
+	void init_code_heap(cell size);
+	bool in_code_heap_p(cell ptr);
+	void update_code_heap_words(bool reset_inline_caches);
+	void initialize_code_blocks();
+	void primitive_modify_code_heap();
+	code_heap_room code_room();
+	void primitive_code_room();
+	void primitive_strip_stack_traces();
+	cell code_blocks();
+	void primitive_code_blocks();
 
 	//callbacks
 	void init_callbacks(cell size);
@@ -656,6 +664,7 @@ struct factor_vm
 
 	// os-*
 	void primitive_existsp();
+	void move_file(const vm_char *path1, const vm_char *path2);
 	void init_ffi();
 	void ffi_dlopen(dll *dll);
 	void *ffi_dlsym(dll *dll, symbol_char *symbol);

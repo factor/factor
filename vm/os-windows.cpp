@@ -128,13 +128,19 @@ segment::~segment()
 long getpagesize()
 {
 	static long g_pagesize = 0;
-	if (! g_pagesize)
+	if(!g_pagesize)
 	{
 		SYSTEM_INFO system_info;
 		GetSystemInfo (&system_info);
 		g_pagesize = system_info.dwPageSize;
 	}
 	return g_pagesize;
+}
+
+void factor_vm::move_file(const vm_char *path1, const vm_char *path2)
+{
+	if(MoveFileEx((path1),(path2),MOVEFILE_REPLACE_EXISTING) == false)
+		general_error(ERROR_IO,tag_fixnum(GetLastError()),false_object,NULL);
 }
 
 }

@@ -34,7 +34,7 @@ PostgresqlSqlError = (TableError | FunctionError | SyntaxError | UnknownError)
 ;EBNF
 
 
-ERROR: parse-postgresql-location column line text ;
+TUPLE: parse-postgresql-location column line text ;
 C: <parse-postgresql-location> parse-postgresql-location
 
 EBNF: parse-postgresql-line-error

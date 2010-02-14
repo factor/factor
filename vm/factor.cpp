@@ -81,7 +81,7 @@ void factor_vm::prepare_boot_image()
 	fflush(stdout);
 
 	compile_all_words();
-	update_code_heap_words();
+	update_code_heap_words(true);
 	initialize_all_quotations();
 	special_objects[OBJ_STAGE2] = true_object;
 
