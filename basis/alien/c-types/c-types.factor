@@ -78,6 +78,9 @@ M: string resolve-pointer-type
         [ resolve-pointer-type ] [ drop void* ] if
     ] if ;
 
+M: array resolve-pointer-type
+    first resolve-pointer-type ;
+
 : resolve-typedef ( name -- c-type )
     dup void? [ no-c-type ] when
     dup c-type-name? [ c-type ] when ;
@@ -550,9 +553,6 @@ M: longlong-2-rep rep-component-type drop longlong ;
 M: ulonglong-2-rep rep-component-type drop ulonglong ;
 M: float-4-rep rep-component-type drop float ;
 M: double-2-rep rep-component-type drop double ;
-
-: rep-length ( rep -- n )
-    16 swap rep-component-type heap-size /i ; foldable
 
 : (unsigned-interval) ( bytes -- from to ) [ 0 ] dip 8 * 2^ 1 - ; foldable
 : unsigned-interval ( c-type -- from to ) heap-size (unsigned-interval) ; foldable

@@ -301,12 +301,12 @@ bool factor_vm::save_image(const vm_char *saving_filename, const vm_char *filena
 	if(safe_fwrite(&h,sizeof(image_header),1,file) != 1) ok = false;
 	if(safe_fwrite((void*)data->tenured->start,h.data_size,1,file) != 1) ok = false;
 	if(safe_fwrite(code->allocator->first_block(),h.code_size,1,file) != 1) ok = false;
-	if(safe_fclose(file)) ok = false;
+	safe_fclose(file);
 
 	if(!ok)
 		std::cout << "save-image failed: " << strerror(errno) << std::endl;
 	else
-		MOVE_FILE(saving_filename,filename); 
+		move_file(saving_filename,filename); 
 
 	return ok;
 }

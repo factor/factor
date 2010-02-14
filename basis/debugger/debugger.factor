@@ -50,7 +50,7 @@ M: string error. print ;
 
 : restart. ( restart n -- )
     [
-        1 + dup 3 <= [ ":" % # "    " % ] [ # " :res  " % ] if
+        1 + dup 3 <= [ ":" % # "      " % ] [ # " :res  " % ] if
         name>> %
     ] "" make print ;
 
@@ -236,7 +236,10 @@ M: redefine-error error.
     def>> . ;
 
 M: undefined summary
-    drop "Calling a deferred word before it has been defined" ;
+    word>> undefined?
+    "Cannot execute a deferred word before it has been defined"
+    "Cannot execute a word before it has been compiled"
+    ? ;
 
 M: no-compilation-unit error.
     "Attempting to define " write
@@ -336,7 +339,7 @@ M: check-mixin-class summary drop "Not a mixin class" ;
 
 M: not-found-in-roots summary drop "Cannot resolve vocab: path" ;
 
-M: wrong-values summary drop "Quotation called with wrong stack effect" ;
+M: wrong-values summary drop "Quotation's stack effect does not match call site" ;
 
 M: stack-effect-omits-dashes summary drop "Stack effect must contain “--”" ;
 

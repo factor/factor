@@ -45,7 +45,7 @@ struct gc_event {
 struct gc_state {
 	gc_op op;
 	u64 start_time;
-        jmp_buf gc_unwind;
+	jmp_buf gc_unwind;
 	gc_event *event;
 
 	explicit gc_state(gc_op op_, factor_vm *parent);

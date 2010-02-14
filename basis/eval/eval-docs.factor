@@ -37,7 +37,7 @@ ARTICLE: "eval-vocabs" "Evaluating strings with a different vocabulary search pa
     (eval)
     with-file-vocabs
 }
-"Code in the listener tool starts out with a different initial search path, with more vocabularies are available by default. Strings of code can be evaluated in this search path by using " { $link (eval) } " with a different combinator:"
+"Code in the listener tool starts out with a different initial search path, with more vocabularies available by default. Strings of code can be evaluated in this search path by using " { $link (eval) } " with a different combinator:"
 { $subsections
     with-interactive-vocabs
 }

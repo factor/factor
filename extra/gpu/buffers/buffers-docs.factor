@@ -34,6 +34,12 @@ HELP: allocate-buffer
 }
 { $description "Discards any memory currently held by " { $snippet "buffer" } " and reallocates a new memory block of " { $snippet "size" } " bytes for it. If " { $snippet "initial-data" } " is not " { $link f } ", " { $snippet "size" } " bytes are copied from " { $snippet "initial-data" } " into the buffer to initialize it; otherwise, the buffer content is left uninitialized." } ;
 
+HELP: allocate-byte-array
+{ $values
+    { "buffer" buffer } { "byte-array" byte-array }
+}
+{ $description "Discards any memory currently held by " { $snippet "buffer" } " and reallocates a new memory block large enough to store " { $snippet "byte-array" } ". The contents of " { $snippet "byte-array" } " are then copied into the buffer." } ;
+
 HELP: buffer
 { $class-description "Objects of this class represent GPU-accessible memory buffers. Buffer objects can be used to store vertex data and to update or read pixel data from textures and framebuffers without CPU involvement. The data inside buffer objects may be resident in main memory or different parts of GPU memory; the graphics driver will choose a location for a buffer based on usage hints specified when the buffer object is constructed with " { $link <buffer> } " or " { $link byte-array>buffer } ":"
 { $list
@@ -201,7 +207,7 @@ HELP: with-mapped-buffer
 }
 { $description "Maps " { $snippet "buffer" } " into CPU address space with " { $snippet "access" } " for the dynamic extent of " { $snippet "quot" } ". " { $snippet "quot" } " is called with a pointer to the mapped memory on top of the stack." } ;
 
-{ allocate-buffer buffer-size update-buffer read-buffer copy-buffer with-mapped-buffer } related-words
+{ allocate-buffer allocate-byte-array buffer-size update-buffer read-buffer copy-buffer with-mapped-buffer } related-words
 
 HELP: write-access
 { $class-description "This " { $link buffer-access-mode } " value requests write-only access when mapping a buffer object through " { $link with-mapped-buffer } "." } ;
@@ -229,6 +235,7 @@ ARTICLE: "gpu.buffers" "Buffer objects"
 "Manipulating buffer data:"
 { $subsections
     allocate-buffer
+    allocate-byte-array
     update-buffer
     read-buffer
     copy-buffer

@@ -327,9 +327,6 @@ M: bad-executable summary
 \ bignum>float { bignum } { float } define-primitive
 \ bignum>float make-foldable
 
-\ (string>float) { byte-array } { float } define-primitive
-\ (string>float) make-foldable
-
 \ (float>string) { float } { byte-array } define-primitive
 \ (float>string) make-foldable
 
@@ -523,6 +520,9 @@ M: bad-executable summary
 \ data-room { } { byte-array } define-primitive
 \ data-room make-flushable
 
+\ (code-blocks) { } { array } define-primitive
+\ (code-blocks)  make-flushable
+
 \ code-room { } { byte-array } define-primitive
 \ code-room  make-flushable
 
@@ -711,7 +711,7 @@ M: bad-executable summary
 
 \ dll-valid? { object } { object } define-primitive
 
-\ modify-code-heap { array } { } define-primitive
+\ modify-code-heap { array object object } { } define-primitive
 
 \ unimplemented { } { } define-primitive
 

@@ -422,7 +422,7 @@ tuple
     { "resize-byte-array" "byte-arrays" "primitive_resize_byte_array" (( n byte-array -- newbyte-array )) }
     { "<tuple-boa>" "classes.tuple.private" "primitive_tuple_boa" (( ... layout -- tuple )) }
     { "<tuple>" "classes.tuple.private" "primitive_tuple" (( layout -- tuple )) }
-    { "modify-code-heap" "compiler.units" "primitive_modify_code_heap" (( alist -- )) }
+    { "modify-code-heap" "compiler.units" "primitive_modify_code_heap" (( alist update-existing? reset-pics? -- )) }
     { "lookup-method" "generic.single.private" "primitive_lookup_method" (( object methods -- method )) }
     { "mega-cache-miss" "generic.single.private" "primitive_mega_cache_miss" (( methods index cache -- method )) }
     { "(exists?)" "io.files.private" "primitive_existsp" (( path -- ? )) }
@@ -463,7 +463,6 @@ tuple
     { "double>bits" "math" "primitive_double_bits" (( x -- n )) }
     { "float>bits" "math" "primitive_float_bits" (( x -- n )) }
     { "(float>string)" "math.parser.private" "primitive_float_to_str" (( n -- str )) }
-    { "(string>float)" "math.parser.private" "primitive_str_to_float" (( str -- n/f )) }
     { "bignum*" "math.private" "primitive_bignum_multiply" (( x y -- z )) }
     { "bignum+" "math.private" "primitive_bignum_add" (( x y -- z )) }
     { "bignum-" "math.private" "primitive_bignum_subtract" (( x y -- z )) }
@@ -506,6 +505,7 @@ tuple
     { "float>bignum" "math.private" "primitive_float_to_bignum" (( x -- y )) }
     { "float>fixnum" "math.private" "primitive_float_to_fixnum" (( x -- y )) }
     { "all-instances" "memory" "primitive_all_instances" (( -- array )) }
+    { "(code-blocks)" "memory.private" "primitive_code_blocks" (( -- array )) }
     { "code-room" "memory" "primitive_code_room" (( -- code-room )) }
     { "compact-gc" "memory" "primitive_compact_gc" (( -- )) }
     { "data-room" "memory" "primitive_data_room" (( -- data-room )) }

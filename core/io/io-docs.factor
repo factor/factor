@@ -165,7 +165,7 @@ $io-error ;
 
 HELP: read-until
 { $values { "seps" string } { "seq" { $or byte-array string f } } { "sep/f" "a character or " { $link f } } }
-{ $contract "Reads elements from " { $link input-stream } ". until the first occurrence of a separator, or stream exhaustion. In the former case, the separator character is pushed on the stack, and is not part of the output. In the latter case, the entire stream contents are output, along with " { $link f } "." }
+{ $contract "Reads elements from " { $link input-stream } " until the first occurrence of a separator, or stream exhaustion. In the former case, the separator character is pushed on the stack, and is not part of the output. In the latter case, the entire stream contents are output, along with " { $link f } "." }
 $io-error ;
 
 HELP: read-partial
@@ -300,14 +300,14 @@ ARTICLE: "stdio-motivation" "Motivation for default streams"
 { $code
     "USING: continuations kernel io io.files math.parser splitting ;"
     "\"data.txt\" utf8 <file-reader>"
-    "dup stream-readln number>string over stream-read 16 group"
+    "dup stream-readln string>number over stream-read 16 group"
     "swap dispose"
 }
 "This code has two problems: it has some unnecessary stack shuffling, and if either " { $link stream-readln } " or " { $link stream-read } " throws an I/O error, the stream is not closed because " { $link dispose } " is never reached. So we can add a call to " { $link with-disposal } " to ensure the stream is always closed:"
 { $code
     "USING: continuations kernel io io.files math.parser splitting ;"
     "\"data.txt\" utf8 <file-reader> ["
-    "    dup stream-readln number>string over stream-read"
+    "    dup stream-readln string>number over stream-read"
     "    16 group"
     "] with-disposal"
 }
@@ -315,14 +315,14 @@ ARTICLE: "stdio-motivation" "Motivation for default streams"
 { $code
     "USING: continuations kernel io io.files math.parser splitting ;"
     "\"data.txt\" utf8 <file-reader> ["
-    "    readln number>string read 16 group"
+    "    readln string>number read 16 group"
     "] with-input-stream"
 }
 "An even better implementation that takes advantage of a utility word:"
 { $code
     "USING: continuations kernel io io.files math.parser splitting ;"
     "\"data.txt\" utf8 ["
-    "    readln number>string read 16 group"
+    "    readln string>number read 16 group"
     "] with-file-reader"
 } ;
 

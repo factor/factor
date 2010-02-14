@@ -37,8 +37,6 @@ u64 system_micros()
 		- EPOCH_OFFSET) / 10;
 }
 
-/* On VirtualBox, QueryPerformanceCounter does not increment
-the high part every time the low part overflows.  Workaround. */
 u64 nano_count()
 {
 	LARGE_INTEGER count;
@@ -53,8 +51,14 @@ u64 nano_count()
 	if(ret == 0)
 		fatal_error("QueryPerformanceFrequency", 0);
 
-	if(count.LowPart < lo)
-		hi += 1;
+#ifdef FACTOR_64
+	hi = count.HighPart;
+#else
+	/* On VirtualBox, QueryPerformanceCounter does not increment
+	the high part every time the low part overflows.  Workaround. */
+	if(lo > count.LowPart)
+		hi++;
+#endif
 	lo = count.LowPart;
 
 	return (u64)((((u64)hi << 32) | (u64)lo)*(1000000000.0/frequency.QuadPart));
@@ -75,12 +79,12 @@ LONG factor_vm::exception_handler(PEXCEPTION_POINTERS pe)
 	else
 		signal_callstack_top = NULL;
 
-        switch (e->ExceptionCode)
-        {
-        case EXCEPTION_ACCESS_VIOLATION:
+	switch (e->ExceptionCode)
+	{
+	case EXCEPTION_ACCESS_VIOLATION:
 		signal_fault_addr = e->ExceptionInformation[1];
 		c->EIP = (cell)factor::memory_signal_handler_impl;
-                break;
+		break;
 
 	case STATUS_FLOAT_DENORMAL_OPERAND:
 	case STATUS_FLOAT_DIVIDE_BY_ZERO:
@@ -91,7 +95,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_POINTERS pe)
 	case STATUS_FLOAT_UNDERFLOW:
 	case STATUS_FLOAT_MULTIPLE_FAULTS:
 	case STATUS_FLOAT_MULTIPLE_TRAPS:
-#ifdef FACTOR_AMD64
+#ifdef FACTOR_64
 		signal_fpu_status = fpu_status(MXCSR(c));
 #else
 		signal_fpu_status = fpu_status(X87SW(c) | MXCSR(c));

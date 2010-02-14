@@ -21,6 +21,7 @@ $nl
 "There are several ways of creating an uninterned word:"
 { $subsections
     <word>
+    <uninterned-word>
     gensym
     define-temp
 } ;
@@ -65,7 +66,7 @@ $nl
 "Deferred words are just compound definitions in disguise. The following two lines are equivalent:"
 { $code
     "DEFER: foo"
-    ": foo undefined ;"
+    ": foo ( -- * ) undefined ;"
 } ;
 
 ARTICLE: "declarations" "Compiler declarations"
@@ -192,6 +193,14 @@ HELP: deferred
 
 { deferred POSTPONE: DEFER: } related-words
 
+HELP: undefined
+{ $error-description "This error is thrown in two cases, and the debugger's summary message reflects the cause:"
+    { $list
+        { "A word was executed before being compiled. For example, this can happen if a macro is defined in the same compilation unit where it was used. See " { $link "compilation-units" } " for a discussion." }
+        { "A word defined with " { $link POSTPONE: DEFER: } " was executed. Since this syntax is usually used for mutually-recursive word definitions, executing a deferred word usually indicates a programmer mistake." }
+    }
+} ;
+
 HELP: primitive
 { $description "The class of primitive words." } ;
 
@@ -238,8 +247,13 @@ $low-level-note
 
 HELP: <word> ( name vocab -- word )
 { $values { "name" string } { "vocab" string } { "word" word } }
-{ $description "Allocates an uninterned word with the specified name and vocabulary, and a blank word property hashtable. User code should call " { $link gensym } " to create uninterned words and " { $link create } " to create interned words." }
+{ $description "Allocates a word with the specified name and vocabulary. User code should call " { $link <uninterned-word> } " to create uninterned words and " { $link create } " to create interned words, instead of calling this constructor directly." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
+
+HELP: <uninterned-word> ( name -- word )
+{ $values { "name" string } { "word" word } }
+{ $description "Creates an uninterned word with the specified name,  that is not equal to any other word in the system." }
+{ $notes "Unlike " { $link create } ", this word does not have to be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: gensym
 { $values { "word" word } }
@@ -249,7 +263,7 @@ HELP: gensym
     "( gensym )"
     }
 }
-{ $notes "Gensyms are often used as placeholder values that have no meaning of their own but must be unique. For example, the compiler uses gensyms to label sections of code." } ;
+{ $notes "Unlike " { $link create } ", this word does not have to be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: bootstrapping?
 { $var-description "Set by the library while bootstrap is in progress. Some parsing words need to behave differently during bootstrap." } ;

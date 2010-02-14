@@ -11,7 +11,7 @@ SHARED_FLAG = -dynamiclib
 ifdef X11
 	LIBS = -lm -framework Cocoa -L/opt/local/lib $(X11_UI_LIBS) -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
 else
-    LIBS = -lm -framework Cocoa -framework AppKit
+	LIBS = -lm -framework Cocoa -framework AppKit
 endif
 
 LINKER = $(CPP) $(CFLAGS) -dynamiclib -single_module -std=gnu99 \

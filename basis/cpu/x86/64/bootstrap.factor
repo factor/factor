@@ -37,6 +37,11 @@ IN: bootstrap.x86
     RSP stack-frame-size 3 bootstrap-cells - SUB
 ] jit-prolog jit-define
 
+[
+    temp3 5 [] LEA
+    0 JMP rc-relative rt-entry-point-pic-tail jit-rel
+] jit-word-jump jit-define
+
 : jit-load-context ( -- )
     ctx-reg vm-reg vm-context-offset [+] MOV ;
 

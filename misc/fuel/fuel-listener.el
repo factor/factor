@@ -192,6 +192,13 @@ With prefix, you're teletransported to the listener's buffer."
     (comint-send-string nil "\"Refreshing loaded vocabs...\" write nl flush")
     (comint-send-string nil " refresh-all \"Done!\" write nl flush\n")))
 
+(defun fuel-test-vocab (vocab)
+  "Run the unit tests for the specified vocabulary."
+  (interactive (list (fuel-completion--read-vocab nil (fuel-syntax--current-vocab))))
+  (comint-send-string (fuel-listener--process)
+                      (concat "\"" vocab "\" reload nl flush\n"
+                              "\"" vocab "\" test nl flush\n")))
+
 
 ;;; Completion support
 

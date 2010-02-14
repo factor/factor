@@ -9,9 +9,9 @@ SYMBOL: compiled-crossref
 
 compiled-crossref [ H{ } clone ] initialize
 
-SYMBOL: compiled-generic-crossref
+SYMBOL: generic-call-site-crossref
 
-compiled-generic-crossref [ H{ } clone ] initialize
+generic-call-site-crossref [ H{ } clone ] initialize
 
 : effect-dependencies-of ( word -- assoc )
     compiled-crossref get at ;
@@ -22,9 +22,13 @@ compiled-generic-crossref [ H{ } clone ] initialize
 : conditional-dependencies-of ( word -- assoc )
     effect-dependencies-of [ nip conditional-dependency dependency>= ] assoc-filter ;
 
-: compiled-usages ( assoc -- assocs )
+: outdated-definition-usages ( assoc -- assocs )
     [ drop word? ] assoc-filter
-    [ [ drop definition-dependencies-of ] { } assoc>map ] keep suffix ;
+    [ drop definition-dependencies-of ] { } assoc>map ;
+
+: outdated-effect-usages ( assoc -- assocs )
+    [ drop word? ] assoc-filter
+    [ drop effect-dependencies-of ] { } assoc>map ;
 
 : dependencies-satisfied? ( word cache -- ? )
     [ "dependency-checks" word-prop ] dip
@@ -37,14 +41,14 @@ compiled-generic-crossref [ H{ } clone ] initialize
         [ drop _ dependencies-satisfied? not ] assoc-filter
     ] { } assoc>map ;
 
-: compiled-generic-usage ( word -- assoc )
-    compiled-generic-crossref get at ;
+: generic-call-sites-of ( word -- assoc )
+    generic-call-site-crossref get at ;
 
 : only-xref ( assoc -- assoc' )
     [ drop crossref? ] { } assoc-filter-as ;
 
-: set-compiled-generic-uses ( word alist -- )
-    concat f like "compiled-generic-uses" set-word-prop ;
+: set-generic-call-sites ( word alist -- )
+    concat f like "generic-call-sites" set-word-prop ;
 
 : split-dependencies ( assoc -- effect-deps cond-deps def-deps )
     [ nip effect-dependency eq? ] assoc-partition
@@ -59,12 +63,12 @@ compiled-generic-crossref [ H{ } clone ] initialize
     [ (store-dependencies) ] tri-curry@ tri-curry* tri ;
 
 : (compiled-xref) ( word dependencies generic-dependencies -- )
-    compiled-crossref compiled-generic-crossref
+    compiled-crossref generic-call-site-crossref
     [ get add-vertex* ] bi-curry@ bi-curry* bi ;
 
 : compiled-xref ( word dependencies generic-dependencies -- )
     [ only-xref ] bi@
-    [ nip set-compiled-generic-uses ]
+    [ nip set-generic-call-sites ]
     [ drop store-dependencies ]
     [ (compiled-xref) ]
     3tri ;
@@ -88,23 +92,23 @@ compiled-generic-crossref [ H{ } clone ] initialize
 : (compiled-unxref) ( word dependencies variable -- )
     get remove-vertex* ;
 
-: compiled-generic-uses ( word -- alist )
-    "compiled-generic-uses" word-prop 2 <groups> ;
+: generic-call-sites ( word -- alist )
+    "generic-call-sites" word-prop 2 <groups> ;
 
 : compiled-unxref ( word -- )
     {
         [ dup load-dependencies compiled-crossref (compiled-unxref) ]
-        [ dup compiled-generic-uses compiled-generic-crossref (compiled-unxref) ]
+        [ dup generic-call-sites generic-call-site-crossref (compiled-unxref) ]
         [ "effect-dependencies" remove-word-prop ]
         [ "conditional-dependencies" remove-word-prop ]
         [ "definition-dependencies" remove-word-prop ]
-        [ "compiled-generic-uses" remove-word-prop ]
+        [ "generic-call-sites" remove-word-prop ]
     } cleave ;
 
 : delete-compiled-xref ( word -- )
     [ compiled-unxref ]
     [ compiled-crossref get delete-at ]
-    [ compiled-generic-crossref get delete-at ]
+    [ generic-call-site-crossref get delete-at ]
     tri ;
 
 : set-dependency-checks ( word deps -- )

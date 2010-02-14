@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.parser assocs
-compiler.units functors growable kernel lexer namespaces parser
+compiler.units functors growable kernel lexer math namespaces parser
 prettyprint.custom sequences specialized-arrays
 specialized-arrays.private strings vocabs vocabs.parser
 vocabs.generated fry make ;
@@ -26,7 +26,7 @@ V A <A> vectors.functor:define-vector
 
 M: V contract 2drop ; inline
 
-M: V byte-length underlying>> byte-length ; inline
+M: V byte-length length \ T heap-size * ; inline
 
 M: V pprint-delims drop \ V{ \ } ;
 

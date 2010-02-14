@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: http.client checksums checksums.md5 splitting assocs
 kernel io.files bootstrap.image sequences io urls ;
@@ -19,9 +19,11 @@ CONSTANT: url URL" http://factorcode.org/images/latest/"
     ] [ drop t ] if ;
 
 : download-image ( arch -- )
-    boot-image-name dup need-new-image? [
-        "Downloading " write dup write "..." print
-         url over >url derive-url download
+    url swap boot-image-name >url derive-url download ;
+
+: maybe-download-image ( arch -- )
+    dup boot-image-name need-new-image? [
+         dup download-image
          need-new-image? [
              "Boot image corrupt, or checksums.txt on server out of date" throw
          ] when
@@ -30,6 +32,6 @@ CONSTANT: url URL" http://factorcode.org/images/latest/"
         drop
     ] if ;
 
-: download-my-image ( -- ) my-arch download-image ;
+: download-my-image ( -- ) my-arch maybe-download-image ;
 
 MAIN: download-my-image

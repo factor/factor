@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2009 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors cpu.architecture vocabs.loader system
 sequences namespaces parser kernel kernel.private classes
@@ -33,6 +33,7 @@ enable-optimizer
 gc
 
 : compile-unoptimized ( words -- )
+    [ [ subwords ] map ] keep suffix concat
     [ optimized? not ] filter compile ;
 
 "debug-compiler" get [
@@ -102,7 +103,7 @@ gc
     "." write flush
 
     {
-        lines prefix suffix unclip new-assoc update
+        lines prefix suffix unclip new-assoc assoc-union!
         word-prop set-word-prop 1array 2array 3array ?nth
     } compile-unoptimized
 

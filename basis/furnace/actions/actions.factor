@@ -28,10 +28,10 @@ TUPLE: action rest init authorize display validate submit ;
     action new-action ;
 
 : merge-forms ( form -- )
-    form get
-    [ [ errors>> ] bi@ push-all ]
-    [ [ values>> ] bi@ swap update ]
-    [ swap validation-failed>> >>validation-failed drop ]
+    [ form get ] dip
+    [ [ errors>> ] bi@ append! drop ]
+    [ [ values>> ] bi@ assoc-union! drop ]
+    [ validation-failed>> >>validation-failed drop ]
     2tri ;
 
 : set-nested-form ( form name -- )

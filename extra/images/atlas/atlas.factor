@@ -1,7 +1,7 @@
 ! (c)2010 Joe Groff bsd license
-USING: accessors byte-arrays fry images kernel locals math
-math.functions math.order math.vectors namespaces sequences
-sorting ;
+USING: accessors arrays assocs byte-arrays fry images kernel
+locals math math.functions math.order math.vectors namespaces
+sequences sorting ;
 IN: images.atlas
 
 ! sort rects by height/width/whatever
@@ -103,5 +103,23 @@ PRIVATE>
 : (make-atlas) ( image-placements -- image )
     dup dup atlas-image-format <atlas-image> [ copy-images-into-atlas ] keep ;
 
-: make-atlas ( images -- image-placements atlas-image )
-    pack-atlas dup (make-atlas) ;
+:: image-placement>texcoords ( image-placement atlas-image -- image texcoords )
+    atlas-image dim>> first2 :> ( aw ah )
+    image-placement image>> :> image
+    image-placement loc>> first2 :> ( x y )
+    image dim>> first2 :> ( w h )
+    
+    x     aw /f :> left-u
+    y     ah /f :> top-v
+    x w + aw /f :> right-u
+    y h + ah /f :> bottom-v
+
+    image dup upside-down?>>
+    [ left-u top-v    right-u bottom-v ]
+    [ left-u bottom-v right-u top-v    ] if 4array ; inline
+
+: make-atlas ( images -- image-texcoords atlas-image )
+    pack-atlas dup (make-atlas) [ '[ _ image-placement>texcoords ] H{ } map>assoc ] keep ;
+
+: make-atlas-assoc ( image-assoc -- texcoord-assoc atlas-image )
+    dup values make-atlas [ '[ _ at ] assoc-map ] dip ;

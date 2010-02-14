@@ -220,7 +220,7 @@ unit-test
     1 random zero? [ >bignum ] when ;
 
 [ t ] [
-    1000 [
+    10000 [
         drop
         random-integer
         random-integer

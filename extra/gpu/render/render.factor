@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien alien.c-types alien.data arrays
-assocs classes classes.mixin classes.parser classes.singleton
+assocs classes classes.mixin classes.parser classes.singleton classes.struct
 classes.tuple classes.tuple.private combinators combinators.tuple destructors fry
 generic generic.parser gpu gpu.buffers gpu.framebuffers
 gpu.framebuffers.private gpu.shaders gpu.shaders.private gpu.state
@@ -8,7 +8,7 @@ gpu.textures gpu.textures.private half-floats images kernel
 lexer locals math math.order math.parser namespaces opengl
 opengl.gl parser quotations sequences slots sorting
 specialized-arrays strings ui.gadgets.worlds variants
-vocabs.parser words ;
+vocabs.parser words math.vectors.simd ;
 FROM: math => float ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
@@ -235,6 +235,109 @@ DEFER: uniform-texture-accessors
     0 swap [ texture-accessor>cleave ] map nip
     \ nip swap \ cleave [ ] 3sequence ;
 
+UNION: binary-data
+    c-ptr specialized-array struct simd-128 ;
+
+GENERIC: >uniform-bool-array ( sequence -- c-array )
+GENERIC: >uniform-int-array ( sequence -- c-array )
+GENERIC: >uniform-uint-array ( sequence -- c-array )
+GENERIC: >uniform-float-array  ( sequence -- c-array )
+
+GENERIC# >uniform-bvec-array 1 ( sequence dim -- c-array )
+GENERIC# >uniform-ivec-array 1 ( sequence dim -- c-array )
+GENERIC# >uniform-uvec-array 1 ( sequence dim -- c-array )
+GENERIC# >uniform-vec-array  1 ( sequence dim -- c-array )
+
+GENERIC# >uniform-matrix 2 ( sequence cols rows -- c-array )
+
+GENERIC# >uniform-matrix-array 2 ( sequence cols rows -- c-array )
+
+GENERIC: bind-uniform-bvec2 ( index sequence -- )
+GENERIC: bind-uniform-bvec3 ( index sequence -- )
+GENERIC: bind-uniform-bvec4 ( index sequence -- )
+GENERIC: bind-uniform-ivec2 ( index sequence -- )
+GENERIC: bind-uniform-ivec3 ( index sequence -- )
+GENERIC: bind-uniform-ivec4 ( index sequence -- )
+GENERIC: bind-uniform-uvec2 ( index sequence -- )
+GENERIC: bind-uniform-uvec3 ( index sequence -- )
+GENERIC: bind-uniform-uvec4 ( index sequence -- )
+GENERIC: bind-uniform-vec2  ( index sequence -- )
+GENERIC: bind-uniform-vec3  ( index sequence -- )
+GENERIC: bind-uniform-vec4  ( index sequence -- )
+
+M: object >uniform-bool-array [ >c-bool ] int-array{ } map-as ; inline
+M: binary-data >uniform-bool-array ; inline 
+
+M: object >uniform-int-array >int-array ; inline
+M: binary-data >uniform-int-array ; inline 
+
+M: object >uniform-uint-array >uint-array ; inline
+M: binary-data >uniform-uint-array ; inline 
+
+M: object >uniform-float-array >float-array ; inline
+M: binary-data >uniform-float-array ; inline 
+
+M: object >uniform-bvec-array '[ _ head-slice [ >c-bool ] int-array{ } map-as ] map concat ; inline
+M: binary-data >uniform-bvec-array drop ; inline
+
+M: object >uniform-ivec-array '[ _ head ] map int-array{ } concat-as ; inline
+M: binary-data >uniform-ivec-array drop ; inline
+
+M: object >uniform-uvec-array '[ _ head ] map uint-array{ } concat-as ; inline
+M: binary-data >uniform-uvec-array drop ; inline
+
+M: object >uniform-vec-array '[ _ head ] map float-array{ } concat-as ; inline
+M: binary-data >uniform-vec-array drop ; inline
+
+M:: object >uniform-matrix ( sequence cols rows -- c-array )
+     sequence flip cols head-slice
+     [ rows head-slice >float-array ] { } map-as concat ; inline
+M: binary-data >uniform-matrix 2drop ; inline
+
+M: object >uniform-matrix-array 
+     '[ _ _ >uniform-matrix ] map concat ; inline
+M: binary-data >uniform-matrix-array 2drop ; inline
+
+M: object bind-uniform-bvec2 ( index sequence -- )
+    1 swap 2 head-slice [ >c-bool ] int-array{ } map-as glUniform2iv ; inline
+M: binary-data bind-uniform-bvec2 ( index sequence -- )
+    1 swap glUniform2iv ; inline
+M: object bind-uniform-bvec3 ( index sequence -- )
+    1 swap 3 head-slice [ >c-bool ] int-array{ } map-as glUniform3iv ; inline
+M: binary-data bind-uniform-bvec3 ( index sequence -- )
+    1 swap glUniform3iv ; inline
+M: object bind-uniform-bvec4 ( index sequence -- )
+    1 swap 4 head-slice [ >c-bool ] int-array{ } map-as glUniform4iv ; inline
+M: binary-data bind-uniform-bvec4 ( index sequence -- )
+    1 swap glUniform4iv ; inline
+
+M: object bind-uniform-ivec2 ( index sequence -- ) first2 glUniform2i ; inline
+M: binary-data bind-uniform-ivec2 ( index sequence -- ) 1 swap glUniform2iv ; inline
+
+M: object bind-uniform-ivec3 ( index sequence -- ) first3 glUniform3i ; inline
+M: binary-data bind-uniform-ivec3 ( index sequence -- ) 1 swap glUniform3iv ; inline
+
+M: object bind-uniform-ivec4 ( index sequence -- ) first4 glUniform4i ; inline
+M: binary-data bind-uniform-ivec4 ( index sequence -- ) 1 swap glUniform4iv ; inline
+
+M: object bind-uniform-uvec2 ( index sequence -- ) first2 glUniform2ui ; inline
+M: binary-data bind-uniform-uvec2 ( index sequence -- ) 1 swap glUniform2uiv ; inline
+
+M: object bind-uniform-uvec3 ( index sequence -- ) first3 glUniform3ui ; inline
+M: binary-data bind-uniform-uvec3 ( index sequence -- ) 1 swap glUniform3uiv ; inline
+
+M: object bind-uniform-uvec4 ( index sequence -- ) first4 glUniform4ui ; inline
+M: binary-data bind-uniform-uvec4 ( index sequence -- ) 1 swap glUniform4uiv ; inline
+
+M: object bind-uniform-vec2 ( index sequence -- ) first2 glUniform2f ; inline
+M: binary-data bind-uniform-vec2 ( index sequence -- ) 1 swap glUniform2fv ; inline
+
+M: object bind-uniform-vec3 ( index sequence -- ) first3 glUniform3f ; inline
+M: binary-data bind-uniform-vec3 ( index sequence -- ) 1 swap glUniform3fv ; inline
+
+M: object bind-uniform-vec4 ( index sequence -- ) first4 glUniform4f ; inline
+M: binary-data bind-uniform-vec4 ( index sequence -- ) 1 swap glUniform4fv ; inline
+
 DEFER: [bind-uniform-tuple]
 
 :: [bind-uniform-array] ( value>>-quot type texture-unit name dim -- texture-unit' quot )
@@ -242,37 +345,37 @@ DEFER: [bind-uniform-tuple]
     { index-quot value>>-quot bi* } >quotation :> pre-quot
 
     type H{
-        { bool-uniform  { dim swap [ >c-bool ] int-array{ } map-as glUniform1iv  } }
-        { int-uniform   { dim swap >int-array   glUniform1iv  } }
-        { uint-uniform  { dim swap >uint-array  glUniform1uiv } }
-        { float-uniform { dim swap >float-array glUniform1fv  } }
+        { bool-uniform  { dim swap >uniform-bool-array  glUniform1iv  } }
+        { int-uniform   { dim swap >uniform-int-array   glUniform1iv  } }
+        { uint-uniform  { dim swap >uniform-uint-array  glUniform1uiv } }
+        { float-uniform { dim swap >uniform-float-array glUniform1fv  } }
 
-        { bvec2-uniform { dim swap [ [ >c-bool ] map ] map int-array{ } concat-as glUniform2iv  } }
-        { ivec2-uniform { dim swap int-array{ }   concat-as glUniform2i  } }
-        { uvec2-uniform { dim swap uint-array{ }  concat-as glUniform2ui } }
-        { vec2-uniform  { dim swap float-array{ } concat-as glUniform2f  } }
+        { bvec2-uniform { dim swap 2 >uniform-bvec-array glUniform2iv  } }
+        { ivec2-uniform { dim swap 2 >uniform-ivec-array glUniform2i  } }
+        { uvec2-uniform { dim swap 2 >uniform-uvec-array glUniform2ui } }
+        { vec2-uniform  { dim swap 2 >uniform-vec-array  glUniform2f  } }
 
-        { bvec3-uniform { dim swap [ [ >c-bool ] map ] map int-array{ } concat-as glUniform3iv  } }
-        { ivec3-uniform { dim swap int-array{ }   concat-as glUniform3i  } }
-        { uvec3-uniform { dim swap uint-array{ }  concat-as glUniform3ui } }
-        { vec3-uniform  { dim swap float-array{ } concat-as glUniform3f  } }
+        { bvec3-uniform { dim swap 3 >uniform-bvec-array glUniform3iv  } }
+        { ivec3-uniform { dim swap 3 >uniform-ivec-array glUniform3i  } }
+        { uvec3-uniform { dim swap 3 >uniform-uvec-array glUniform3ui } }
+        { vec3-uniform  { dim swap 3 >uniform-vec-array  glUniform3f  } }
 
-        { bvec4-uniform { dim swap [ [ >c-bool ] map ] map int-array{ } concat-as glUniform4iv  } }
-        { ivec4-uniform { dim swap int-array{ }   concat-as glUniform4iv  } }
-        { uvec4-uniform { dim swap uint-array{ }  concat-as glUniform4uiv } }
-        { vec4-uniform  { dim swap float-array{ } concat-as glUniform4fv  } }
+        { bvec4-uniform { dim swap 4 >uniform-bvec-array glUniform4iv  } }
+        { ivec4-uniform { dim swap 4 >uniform-ivec-array glUniform4iv  } }
+        { uvec4-uniform { dim swap 4 >uniform-uvec-array glUniform4uiv } }
+        { vec4-uniform  { dim swap 4 >uniform-vec-array  glUniform4fv  } }
 
-        { mat2-uniform   { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix2fv   } }
-        { mat2x3-uniform { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix2x3fv } }
-        { mat2x4-uniform { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix2x4fv } }
-                                                                 
-        { mat3x2-uniform { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix3x2fv } }
-        { mat3-uniform   { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix3fv   } }
-        { mat3x4-uniform { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix3x4fv } }
-                                                                  
-        { mat4x2-uniform { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix4x2fv } }
-        { mat4x3-uniform { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix4x3fv } }
-        { mat4-uniform   { [ dim 1 ] dip float-array{ } concat-as concat glUniformMatrix4fv   } }
+        { mat2-uniform   { [ dim 0 ] dip 2 2 >uniform-matrix-array glUniformMatrix2fv   } }
+        { mat2x3-uniform { [ dim 0 ] dip 2 3 >uniform-matrix-array glUniformMatrix2x3fv } }
+        { mat2x4-uniform { [ dim 0 ] dip 2 4 >uniform-matrix-array glUniformMatrix2x4fv } }
+
+        { mat3x2-uniform { [ dim 0 ] dip 3 2 >uniform-matrix-array glUniformMatrix3x2fv } }
+        { mat3-uniform   { [ dim 0 ] dip 3 3 >uniform-matrix-array glUniformMatrix3fv   } }
+        { mat3x4-uniform { [ dim 0 ] dip 3 4 >uniform-matrix-array glUniformMatrix3x4fv } }
+
+        { mat4x2-uniform { [ dim 0 ] dip 4 2 >uniform-matrix-array glUniformMatrix4x2fv } }
+        { mat4x3-uniform { [ dim 0 ] dip 4 3 >uniform-matrix-array glUniformMatrix4x3fv } }
+        { mat4-uniform   { [ dim 0 ] dip 4 4 >uniform-matrix-array glUniformMatrix4fv   } }
 
         { texture-uniform { drop dim dup iota [ texture-unit + ] int-array{ } map-as glUniform1iv } }
     } at [ uniform invalid-uniform-type ] unless* >quotation :> value-quot
@@ -290,32 +393,32 @@ DEFER: [bind-uniform-tuple]
         { uint-uniform  [ glUniform1ui ] }
         { float-uniform [ glUniform1f  ] }
 
-        { bvec2-uniform [ [ >c-bool ] map first2 glUniform2i  ] }
-        { ivec2-uniform [ first2 glUniform2i  ] }
-        { uvec2-uniform [ first2 glUniform2ui ] }
-        { vec2-uniform  [ first2 glUniform2f  ] }
+        { bvec2-uniform [ bind-uniform-bvec2 ] }
+        { ivec2-uniform [ bind-uniform-ivec2 ] }
+        { uvec2-uniform [ bind-uniform-uvec2 ] }
+        { vec2-uniform  [ bind-uniform-vec2  ] }
 
-        { bvec3-uniform [ [ >c-bool ] map first3 glUniform3i  ] }
-        { ivec3-uniform [ first3 glUniform3i  ] }
-        { uvec3-uniform [ first3 glUniform3ui ] }
-        { vec3-uniform  [ first3 glUniform3f  ] }
+        { bvec3-uniform [ bind-uniform-bvec3 ] }
+        { ivec3-uniform [ bind-uniform-ivec3 ] }
+        { uvec3-uniform [ bind-uniform-uvec3 ] }
+        { vec3-uniform  [ bind-uniform-vec3  ] }
 
-        { bvec4-uniform [ [ >c-bool ] map first4 glUniform4i  ] }
-        { ivec4-uniform [ first4 glUniform4i  ] }
-        { uvec4-uniform [ first4 glUniform4ui ] }
-        { vec4-uniform  [ first4 glUniform4f  ] }
+        { bvec4-uniform [ bind-uniform-bvec4 ] }
+        { ivec4-uniform [ bind-uniform-ivec4 ] }
+        { uvec4-uniform [ bind-uniform-uvec4 ] }
+        { vec4-uniform  [ bind-uniform-vec4  ] }
 
-        { mat2-uniform   [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix2fv   ] }
-        { mat2x3-uniform [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix2x3fv ] }
-        { mat2x4-uniform [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix2x4fv ] }
+        { mat2-uniform   [ [ 1 0 ] dip 2 2 >uniform-matrix glUniformMatrix2fv   ] }
+        { mat2x3-uniform [ [ 1 0 ] dip 2 3 >uniform-matrix glUniformMatrix2x3fv ] }
+        { mat2x4-uniform [ [ 1 0 ] dip 2 4 >uniform-matrix glUniformMatrix2x4fv ] }
 
-        { mat3x2-uniform [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix3x2fv ] }
-        { mat3-uniform   [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix3fv   ] }
-        { mat3x4-uniform [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix3x4fv ] }
+        { mat3x2-uniform [ [ 1 0 ] dip 3 2 >uniform-matrix glUniformMatrix3x2fv ] }
+        { mat3-uniform   [ [ 1 0 ] dip 3 3 >uniform-matrix glUniformMatrix3fv   ] }
+        { mat3x4-uniform [ [ 1 0 ] dip 3 4 >uniform-matrix glUniformMatrix3x4fv ] }
 
-        { mat4x2-uniform [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix4x2fv ] }
-        { mat4x3-uniform [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix4x3fv ] }
-        { mat4-uniform   [ [ 1 1 ] dip float-array{ } concat-as glUniformMatrix4fv   ] }
+        { mat4x2-uniform [ [ 1 0 ] dip 4 2 >uniform-matrix glUniformMatrix4x2fv ] }
+        { mat4x3-uniform [ [ 1 0 ] dip 4 3 >uniform-matrix glUniformMatrix4x3fv ] }
+        { mat4-uniform   [ [ 1 0 ] dip 4 4 >uniform-matrix glUniformMatrix4fv   ] }
 
         { texture-uniform { drop texture-unit glUniform1i } }
     } at [ uniform invalid-uniform-type ] unless* >quotation :> value-quot

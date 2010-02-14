@@ -53,4 +53,4 @@ MACRO: smart-if ( pred true false -- )
     '[ _ preserving _ _ if ] ;
 
 MACRO: smart-apply ( quot n -- )
-    [ dup inputs ] dip '[ _ _ mnapply ] ;
+    [ dup inputs ] dip '[ _ _ _ mnapply ] ;
