@@ -46,7 +46,6 @@ IN: tools.deploy.macosx
             [ copy-dll ]
             [ copy-nib ]
             [ "Contents/Resources" append-path make-directories ]
-            [ "Contents/Resources" copy-theme ]
         } cleave
     ]
     [ create-app-plist ]
@@ -72,6 +71,7 @@ M: macosx deploy* ( vocab -- )
             [ bundle-name create-app-dir ] keep
             [ bundle-name deploy.app-image ] keep
             namespace make-deploy-image
+            bundle-name "Contents/Resources" copy-resources
             bundle-name show-in-finder
         ] bind
     ] with-directory ;
