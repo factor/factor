@@ -1,4 +1,4 @@
-USING: tools.test globs io.pathnames ;
+USING: arrays tools.test globs io.pathnames sequences ;
 IN: globs.tests
 
 [ f ] [ "abd" "fdf" glob-matches? ] unit-test
@@ -22,3 +22,19 @@ IN: globs.tests
 [ t ] [ "foo" "bar" append-path "*" "*" append-path glob-matches? ] unit-test
 [ f ] [ "foo" "bar" append-path "foo?bar" glob-matches? ] unit-test
 [ t ] [ "foo" "bar" append-path "fo?" "bar" append-path glob-matches? ] unit-test
+
+[ f ] [ "foo" glob-pattern? ] unit-test
+[ t ] [ "fo?" glob-pattern? ] unit-test
+[ t ] [ "fo*" glob-pattern? ] unit-test
+[ t ] [ "fo[mno]" glob-pattern? ] unit-test
+[ t ] [ "fo\\*" glob-pattern? ] unit-test
+[ t ] [ "fo{o,bro}" glob-pattern? ] unit-test
+
+"foo" "bar" append-path 1array
+[ { "foo" "bar" "ba?" } path-separator join glob-parent-directory ] unit-test
+
+[ "foo" ] 
+[ { "foo" "b?r" "bas" } path-separator join glob-parent-directory ] unit-test
+
+[ "" ] 
+[ { "f*" "bar" "bas" } path-separator join glob-parent-directory ] unit-test
