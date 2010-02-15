@@ -1,11 +1,11 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors io.backend io.streams.c init fry
-namespaces math make assocs kernel parser parser.notes lexer
-strings.parser vocabs sequences sequences.deep sequences.private
-words memory kernel.private continuations io vocabs.loader
-system strings sets vectors quotations byte-arrays sorting
-compiler.units definitions generic generic.standard
+USING: arrays accessors io.backend io.pathnames io.streams.c
+init fry namespaces math make assocs kernel parser parser.notes
+lexer strings.parser vocabs sequences sequences.deep
+sequences.private words memory kernel.private continuations io
+vocabs.loader system strings sets vectors quotations byte-arrays
+sorting compiler.units definitions generic generic.standard
 generic.single tools.deploy.config combinators classes
 classes.builtin slots.private grouping command-line ;
 QUALIFIED: bootstrap.stage2
@@ -48,7 +48,6 @@ IN: tools.deploy.shaker
     ] when
     strip-dictionary? [
         {
-            ! "compiler.units"
             "vocabs"
             "vocabs.cache"
             "source-files.errors"
@@ -293,6 +292,9 @@ IN: tools.deploy.shaker
             input-stream
             output-stream
             error-stream
+            vm
+            image
+            current-directory
         } %
 
         "io-thread" "io.thread" lookup ,
