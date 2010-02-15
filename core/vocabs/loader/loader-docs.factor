@@ -45,11 +45,12 @@ $nl
     { { $snippet "foo/bar/bar-docs.factor" } " - documentation, see " { $link "writing-help" } }
     { { $snippet "foo/bar/bar-tests.factor" } " - unit tests, see " { $link "tools.test" } }
 }
-"Finally, optional three text files may contain meta-data:"
+"Finally, four optional text files may contain metadata:"
 { $list
-    { { $snippet "foo/bar/authors.txt" } " - a series of lines, with one author name per line. These are listed under " { $link "vocab-authors" } }
-    { { $snippet "foo/bar/summary.txt" } " - a one-line description" }
-    { { $snippet "foo/bar/tags.txt" } " - a whitespace-separated list of tags which classify the vocabulary. Consult " { $link "vocab-tags" } " for a list of existing tags you can re-use" }
+    { { $snippet "foo/bar/authors.txt" } " - a series of lines, with one author name per line. These are listed under " { $link "vocab-authors" } "." }
+    { { $snippet "foo/bar/resources.txt" } " - a series of lines with one file glob pattern per line. Files inside the vocabulary directory whose names match any of these glob patterns will be included with the compiled application as " { $link "deploy-resources" } "." }
+    { { $snippet "foo/bar/summary.txt" } " - a one-line description." }
+    { { $snippet "foo/bar/tags.txt" } " - a whitespace-separated list of tags which classify the vocabulary. Consult " { $link "vocab-tags" } " for a list of existing tags you can reuse." }
 }
 "The " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " words load vocabularies which have not been loaded yet, as needed."
 $nl
