@@ -16,20 +16,18 @@ IN: tools.deploy.windows
 
 : create-exe-dir ( vocab bundle-name -- vm )
     dup copy-dll
-    deploy-ui? get [
-        [ "" copy-theme ] [ ".exe" copy-vm ] bi
-    ] [ ".com" copy-vm ] if ;
+    deploy-ui? get ".exe" ".com" ? copy-vm ;
 
 M: winnt deploy*
     "resource:" [
         dup deploy-config [
             deploy-name get
-            [
+            {
                 [ create-exe-dir ]
                 [ image-name ]
-                [ drop ]
-                2tri namespace make-deploy-image
-            ]
-            [ nip open-in-explorer ] 2bi
+                [ drop namespace make-deploy-image ]
+                [ nip "" copy-resources ]
+                [ nip open-in-explorer ]
+            } 2cleave 
         ] bind
     ] with-directory ;
