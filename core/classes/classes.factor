@@ -59,13 +59,14 @@ PRIVATE>
 
 : classes ( -- seq ) implementors-map get keys ;
 
+PREDICATE: predicate < word "predicating" word-prop >boolean ;
+
 : create-predicate-word ( word -- predicate )
-    [ name>> "?" append ] [ vocabulary>> ] bi create ;
+    [ name>> "?" append ] [ vocabulary>> ] bi create
+    dup predicate? [ dup reset-generic ] unless ;
 
 : predicate-word ( word -- predicate )
     "predicate" word-prop first ;
-
-PREDICATE: predicate < word "predicating" word-prop >boolean ;
 
 M: predicate flushable? drop t ;
 

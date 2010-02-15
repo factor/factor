@@ -8,11 +8,17 @@ IN: mason.source
 : clone-factor ( -- )
     { "git" "clone" } home "factor" append-path suffix try-process ;
 
+: save-git-id ( -- )
+    git-id "git-id" to-file ;
+
+: delete-git-tree ( -- )
+    ".git" delete-tree ;
+
+: download-images ( -- )
+    images [ download-image ] each ;
+
 : prepare-source ( -- )
-    "factor" [
-        ".git" delete-tree
-        images [ download-image ] each
-    ] with-directory ;
+    "factor" [ save-git-id delete-git-tree download-images ] with-directory ;
 
 : package-name ( version -- string )
     "factor-src-" ".zip" surround ;

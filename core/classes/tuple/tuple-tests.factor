@@ -764,3 +764,9 @@ DEFER: factor-crashes-anymore
 ] unit-test
 
 [ 31337 ] [ factor-crashes-anymore ] unit-test
+
+TUPLE: tuple-predicate-redefine-test ;
+
+[ ] [ "IN: classes.tuple.tests TUPLE: tuple-predicate-redefine-test ;" eval( -- ) ] unit-test
+
+[ t ] [ \ tuple-predicate-redefine-test? predicate? ] unit-test
