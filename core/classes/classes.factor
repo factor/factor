@@ -60,7 +60,8 @@ PRIVATE>
 : classes ( -- seq ) implementors-map get keys ;
 
 : create-predicate-word ( word -- predicate )
-    [ name>> "?" append ] [ vocabulary>> ] bi create ;
+    [ name>> "?" append ] [ vocabulary>> ] bi
+    create dup reset-generic ;
 
 : predicate-word ( word -- predicate )
     "predicate" word-prop first ;
