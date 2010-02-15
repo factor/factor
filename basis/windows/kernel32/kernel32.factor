@@ -826,7 +826,8 @@ FUNCTION: BOOL AllocConsole ( ) ;
 ! FUNCTION: BaseUpdateAppcompatCache
 ! FUNCTION: Beep
 ! FUNCTION: BeginUpdateResourceA
-! FUNCTION: BeginUpdateResourceW
+FUNCTION: HANDLE BeginUpdateResource ( LPCTSTR pFileName, BOOL bDeleteExistingResources ) ;
+ALIAS: BeginUpdateResource BeginUpdateResourceW
 ! FUNCTION: BindIoCompletionCallback
 ! FUNCTION: BuildCommDCBA
 ! FUNCTION: BuildCommDCBAndTimeoutsA
@@ -1013,7 +1014,8 @@ CONSTANT: DUPLICATE_SAME_ACCESS 2
 ! FUNCTION: EncodePointer
 ! FUNCTION: EncodeSystemPointer
 ! FUNCTION: EndUpdateResourceA
-! FUNCTION: EndUpdateResourceW
+FUNCTION: BOOL EndUpdateResourceW ( HANDLE hUpdate, BOOL fDiscard ) ;
+ALIAS: EndUpdateResource EndUpdateResourceW
 ! FUNCTION: EnterCriticalSection
 ! FUNCTION: EnumCalendarInfoA
 ! FUNCTION: EnumCalendarInfoExA
@@ -1831,7 +1833,8 @@ FUNCTION: BOOL UnmapViewOfFile ( LPCVOID lpBaseAddress ) ;
 ! FUNCTION: UnregisterWait
 ! FUNCTION: UnregisterWaitEx
 ! FUNCTION: UpdateResourceA
-! FUNCTION: UpdateResourceW
+FUNCTION: BOOL UpdateResourceW ( HANDLE hUpdate, LPCTSTR lpType, LPCTSTR lpName, WORD wLanguage, LPVOID lpData, DWORD cbData ) ;
+ALIAS: UpdateResource UpdateResourceW
 ! FUNCTION: UTRegister
 ! FUNCTION: UTUnRegister
 ! FUNCTION: ValidateLCType
