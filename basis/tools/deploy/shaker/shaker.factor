@@ -43,7 +43,6 @@ IN: tools.deploy.shaker
         "io.thread" startup-hooks get delete-at
     ] unless
     strip-io? [
-        "io.files" startup-hooks get delete-at
         "io.backend" startup-hooks get delete-at
         "io.thread" startup-hooks get delete-at
     ] when

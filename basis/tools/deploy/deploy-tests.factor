@@ -117,3 +117,9 @@ os macosx? [
 [ ] [ "tools.deploy.test.16" shake-and-bake run-temp-image ] unit-test
 
 [ ] [ "tools.deploy.test.17" shake-and-bake run-temp-image ] unit-test
+
+[ t ] [
+    "tools.deploy.test.18" shake-and-bake
+    deploy-test-command ascii [ readln ] with-process-reader
+    "test.image" temp-file =
+] unit-test
