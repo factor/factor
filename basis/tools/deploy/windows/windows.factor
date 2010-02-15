@@ -5,7 +5,7 @@ io.encodings.ascii kernel namespaces
 sequences locals system splitting tools.deploy.backend
 tools.deploy.config tools.deploy.config.editor assocs hashtables
 prettyprint combinators windows.kernel32 windows.shell32 windows.user32
-alien.c-types vocabs.metadata vocabs.loader ;
+alien.c-types vocabs.metadata vocabs.loader tools.deploy.windows.ico ;
 IN: tools.deploy.windows
 
 CONSTANT: app-icon-resource-id "APPICON"
@@ -22,17 +22,9 @@ CONSTANT: app-icon-resource-id "APPICON"
     dup copy-dll
     deploy-ui? get ".exe" ".com" ? copy-vm ;
 
-:: (embed-ico) ( vm ico-bytes -- )
-    vm 0 BeginUpdateResource :> hUpdate
-    hUpdate [
-        hUpdate RT_ICON app-icon-resource-id 0 ico-bytes dup byte-length
-        UpdateResource drop
-        hUpdate 0 EndUpdateResource drop
-    ] when ;
-
 : embed-ico ( vm vocab -- )
     dup vocab-windows-icon-path vocab-append-path dup exists?
-    [ binary file-contents (embed-ico) ]
+    [ binary file-contents app-icon-resource-id embed-icon-resource ]
     [ 2drop ] if ;
 
 M: winnt deploy*
