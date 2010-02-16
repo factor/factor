@@ -119,3 +119,9 @@ TUPLE: forgotten-predicate-test ;
 
 [ ] [ [ \ forgotten-predicate-test forget ] with-compilation-unit ] unit-test
 [ f ] [ \ forgotten-predicate-test? predicate? ] unit-test
+
+GENERIC: generic-predicate? ( a -- b )
+
+[ ] [ "IN: classes.tests TUPLE: generic-predicate ;" eval( -- ) ] unit-test
+
+[ f ] [ \ generic-predicate? generic? ] unit-test
