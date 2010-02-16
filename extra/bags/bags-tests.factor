@@ -23,8 +23,8 @@ IN: bags.tests
 [ t ] [ 4 { 2 4 5 } in? ] unit-test
 [ f ] [ 1 { 2 4 5 } in? ] unit-test
 
-[ V{ 1 2 3 } ] [ 3 V{ 1 2 } clone [ add ] keep ] unit-test
-[ V{ 1 2 2 } ] [ 2 V{ 1 2 } clone [ add ] keep ] unit-test
+[ V{ 1 2 3 } ] [ 3 V{ 1 2 } clone [ adjoin ] keep ] unit-test
+[ V{ 1 2 } ] [ 2 V{ 1 2 } clone [ adjoin ] keep ] unit-test
 [ V{ 1 2 } ] [ 3 V{ 1 2 } clone [ delete ] keep ] unit-test
 [ V{ 2 } ] [ 1 V{ 1 2 } clone [ delete ] keep ] unit-test
 
@@ -45,8 +45,8 @@ IN: bags.tests
 
 [ t ] [ 1 HS{ 0 1 2 } in? ] unit-test
 [ f ] [ 3 HS{ 0 1 2 } in? ] unit-test
-[ HS{ 1 2 3 } ] [ 3 HS{ 1 2 } clone [ add ] keep ] unit-test
-[ HS{ 1 2 } ] [ 2 HS{ 1 2 } clone [ add ] keep ] unit-test
+[ HS{ 1 2 3 } ] [ 3 HS{ 1 2 } clone [ adjoin ] keep ] unit-test
+[ HS{ 1 2 } ] [ 2 HS{ 1 2 } clone [ adjoin ] keep ] unit-test
 [ HS{ 1 2 3 } ] [ 4 HS{ 1 2 3 } clone [ delete ] keep ] unit-test
 [ HS{ 1 2 } ] [ 3 HS{ 1 2 3 } clone [ delete ] keep ] unit-test
 [ HS{ 1 2 } ] [ HS{ 1 2 } fast-set ] unit-test
@@ -66,7 +66,7 @@ IN: bags.tests
 [ f ] [ HS{ 2 3 } HS{ 2 1 3 } set= ] unit-test
 [ f ] [ HS{ 1 2 3 } HS{ 2 3 } set= ] unit-test
 
-[ HS{ 1 2 } HS{ 1 2 3 } ] [ HS{ 1 2 } clone dup clone [ 3 swap add ] keep ] unit-test
+[ HS{ 1 2 } HS{ 1 2 3 } ] [ HS{ 1 2 } clone dup clone [ 3 swap adjoin ] keep ] unit-test
 
 [ T{ bit-set f ?{ t f t f t f } } ] [
     T{ bit-set f ?{ t f f f t f } }
@@ -113,13 +113,13 @@ IN: bags.tests
 [ t { 1 2 3 } ] [
     { 1 2 } 5 <bit-set> set-like
     [ bit-set? ] keep
-    3 over add
+    3 over adjoin
     items >array natural-sort
 ] unit-test
 
-[ V{ 0 1 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ 1 swap add ] keep items ] unit-test
-[ T{ bit-set f ?{ t f t f f t } } clone [ 9 swap add ] keep items ] must-fail
-[ T{ bit-set f ?{ t f t f f t } } clone [ "foo" swap add ] keep items ] must-fail
+[ V{ 0 1 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ 1 swap adjoin ] keep items ] unit-test
+[ T{ bit-set f ?{ t f t f f t } } clone [ 9 swap adjoin ] keep items ] must-fail
+[ T{ bit-set f ?{ t f t f f t } } clone [ "foo" swap adjoin ] keep items ] must-fail
 
 [ V{ 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ 0 swap delete ] keep items ] unit-test
 [ V{ 0 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ 1 swap delete ] keep items ] unit-test
