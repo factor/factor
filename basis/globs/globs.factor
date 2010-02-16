@@ -1,11 +1,11 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences io.pathnames kernel regexp.combinators
-strings unicode.case peg.ebnf regexp arrays ;
+strings splitting system unicode.case peg.ebnf regexp arrays ;
 IN: globs
 
 : not-path-separator ( -- sep )
-    "[^" path-separator "]" 3append <regexp> ; foldable
+    os windows? R! [^/\\]! R! [^/]! ? ; foldable
 
 EBNF: <glob>
 
@@ -48,5 +48,5 @@ Main = Concatenation End
     [ "\\*?[{" member? ] any? ;
 
 : glob-parent-directory ( glob -- parent-directory )
-    path-components dup [ glob-pattern? ] find drop head
+    path-separator split harvest dup [ glob-pattern? ] find drop head
     path-separator join ;
