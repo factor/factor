@@ -98,7 +98,7 @@ SYMBOL: dh-file
         <login-config> <factor-boilerplate> test-db <alloy> "concatenative.org" add-responder
         <pastebin> <login-config> <factor-boilerplate> test-db <alloy> "paste.factorcode.org" add-responder
         <planet> <login-config> <factor-boilerplate> test-db <alloy> "planet.factorcode.org" add-responder
-        <mason-app> <login-config> "builds.factorcode.org" add-responder
+        <mason-app> <login-config> test-db <alloy> "builds.factorcode.org" add-responder
         home "docs" append-path <help-webapp> "docs.factorcode.org" add-responder
         home "cgi" append-path <gitweb> "gitweb.factorcode.org" add-responder
     main-responder set-global ;
