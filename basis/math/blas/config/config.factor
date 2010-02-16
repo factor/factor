@@ -1,7 +1,7 @@
 USING: alien.fortran combinators kernel namespaces system ;
 IN: math.blas.config
 
-SYMBOLS: blas-library blas-fortran-abi ;
+SYMBOLS: blas-library blas-fortran-abi deploy-blas? ;
 
 blas-library [
     {
@@ -21,3 +21,5 @@ blas-fortran-abi [
         [ f2c-abi ]
     } cond
 ] initialize
+
+deploy-blas? [ os macosx? not ] initialize
