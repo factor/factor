@@ -32,14 +32,14 @@ IN: bags.tests
 [ f ] [ { 2 3 } { 1 2 3 } set= ] unit-test
 [ f ] [ { 1 2 3 } { 2 3 } set= ] unit-test
 
-[ { 1 } ] [ { 1 } items ] unit-test
+[ { 1 } ] [ { 1 } members ] unit-test
 
 [ { 1 2 3 } ] [ { 1 1 1 2 2 3 3 3 3 3 } dup set-like natural-sort ] unit-test
 [ { 1 2 3 } ] [ HS{ 1 2 3 } { } set-like natural-sort ] unit-test
 
 [ HS{ 1 2 3 } ] [ { 1 2 3 } fast-set ] unit-test
 
-[ { 1 2 3 } ] [ HS{ 1 2 3 } items natural-sort ] unit-test
+[ { 1 2 3 } ] [ HS{ 1 2 3 } members natural-sort ] unit-test
 
 [ "HS{ 1 2 3 4 }" ] [ HS{ 1 2 3 4 } unparse ] unit-test
 
@@ -50,7 +50,7 @@ IN: bags.tests
 [ HS{ 1 2 3 } ] [ 4 HS{ 1 2 3 } clone [ delete ] keep ] unit-test
 [ HS{ 1 2 } ] [ 3 HS{ 1 2 3 } clone [ delete ] keep ] unit-test
 [ HS{ 1 2 } ] [ HS{ 1 2 } fast-set ] unit-test
-[ { 1 2 } ] [ HS{ 1 2 } items natural-sort ] unit-test
+[ { 1 2 } ] [ HS{ 1 2 } members natural-sort ] unit-test
 
 [ HS{ 1 2 3 4 } ] [ HS{ 1 2 3 } HS{ 2 3 4 } union ] unit-test
 [ HS{ 2 3 } ] [ HS{ 1 2 3 } HS{ 2 3 4 } intersect ] unit-test
@@ -108,20 +108,20 @@ IN: bags.tests
     T{ bit-set f ?{ t t t f f f } } subset?
 ] unit-test
 
-[ V{ 0 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } items ] unit-test
+[ V{ 0 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } members ] unit-test
 
 [ t { 1 2 3 } ] [
     { 1 2 } 5 <bit-set> set-like
     [ bit-set? ] keep
     3 over adjoin
-    items >array natural-sort
+    members >array natural-sort
 ] unit-test
 
-[ V{ 0 1 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ 1 swap adjoin ] keep items ] unit-test
-[ T{ bit-set f ?{ t f t f f t } } clone [ 9 swap adjoin ] keep items ] must-fail
-[ T{ bit-set f ?{ t f t f f t } } clone [ "foo" swap adjoin ] keep items ] must-fail
+[ V{ 0 1 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ 1 swap adjoin ] keep members ] unit-test
+[ T{ bit-set f ?{ t f t f f t } } clone [ 9 swap adjoin ] keep members ] must-fail
+[ T{ bit-set f ?{ t f t f f t } } clone [ "foo" swap adjoin ] keep members ] must-fail
 
-[ V{ 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ 0 swap delete ] keep items ] unit-test
-[ V{ 0 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ 1 swap delete ] keep items ] unit-test
-[ V{ 0 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ 9 swap delete ] keep items ] unit-test
-[ V{ 0 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ "foo" swap delete ] keep items ] unit-test
+[ V{ 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ 0 swap delete ] keep members ] unit-test
+[ V{ 0 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ 1 swap delete ] keep members ] unit-test
+[ V{ 0 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ 9 swap delete ] keep members ] unit-test
+[ V{ 0 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ "foo" swap delete ] keep members ] unit-test
