@@ -22,10 +22,6 @@ TUPLE: fd < disposable fd ;
     ] with-destructors ;
 
 : <fd> ( n -- fd )
-    #! We drop the error code rather than calling io-error,
-    #! since on OS X 10.3, this operation fails from init-io
-    #! when running the Factor.app (presumably because fd 0 and
-    #! 1 are closed).
     fd new-disposable swap >>fd ;
 
 M: fd dispose
@@ -197,5 +193,5 @@ TUPLE: mx-port < port mx ;
         [ drop 0 ] [ (io-error) ] if
     ] when ;
 
-: ?flag ( n mask symbol -- n )
-    pick rot bitand 0 > [ , ] [ drop ] if ;
+:: ?flag ( n mask symbol -- n )
+    n mask bitand 0 > [ symbol , ] when n ;
