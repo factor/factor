@@ -69,3 +69,6 @@ M: bit-set set-like
         [ members ] dip table>> length <bit-set>
         [ [ adjoin ] curry each ] keep
     ] if ;
+
+M: bit-set clone
+    table>> clone bit-set boa ;
