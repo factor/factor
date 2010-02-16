@@ -24,6 +24,8 @@ IN: openal
         { [ os unix?  ]  [ "libopenal.so" ] }
     } cond "cdecl" add-library >>
 
+<< os macosx? [ "openal" deploy-library "alut" deploy-library ] unless >>
+
 LIBRARY: openal
 
 TYPEDEF: char ALboolean 
