@@ -10,7 +10,7 @@ IN: tools.deploy.libraries.unix
 
 M: unix find-library-file
     dup absolute-path? [ ?exists ] [
-        { "/lib" "/usr/lib" "/usr/local/lib" }
+        { "/lib" "/usr/lib" "/usr/local/lib" "/opt/local/lib" "resource:" }
         [ prepend-path ?exists ] with map-find drop
     ] if ;
 
