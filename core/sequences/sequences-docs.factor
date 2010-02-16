@@ -1416,9 +1416,7 @@ $nl
 ARTICLE: "sequences-integers" "Counted loops"
 "A virtual sequence is defined for iterating over integers from zero."
 { $subsection iota }
-"For example, calling " { $link iota } " on the integer 3 produces a sequence containing the elements 0, 1, and 2. This is very useful for performing counted loops."
-$nl
-"This means the " { $link each } " combinator, given an integer, simply calls a quotation that number of times, pushing a counter on each iteration that ranges from 0 up to that integer:"
+"For example, calling " { $link iota } " on the integer 3 produces a sequence containing the elements 0, 1, and 2. This is very useful for performing counted loops using words such as " { $link each } ":"
 { $example "3 iota [ . ] each" "0\n1\n2" }
 "A common idiom is to iterate over a sequence, while also maintaining a loop counter. This can be done using " { $link each-index } ", " { $link map-index } " and " { $link reduce-index } "."
 $nl
