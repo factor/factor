@@ -24,7 +24,11 @@ IN: tools.deploy.tests
 
 [ ] [ "terrain" shake-and-bake 1700000 small-enough? ] unit-test
 
+[ ] [ "gpu.demos.raytrace" shake-and-bake 2500000 small-enough? ] unit-test
+
 [ ] [ "bunny" shake-and-bake 2500000 small-enough? ] unit-test
+
+[ ] [ "gpu.demos.bunny" shake-and-bake 3500000 small-enough? ] unit-test
 
 os macosx? [
     [ ] [ "webkit-demo" shake-and-bake 500000 small-enough? ] unit-test
