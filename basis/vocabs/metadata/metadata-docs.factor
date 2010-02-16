@@ -18,6 +18,11 @@ ARTICLE: "vocabs.metadata" "Vocabulary metadata"
     set-vocab-tags
     add-vocab-tags
 }
+"Vocabulary resources:"
+{ $subsections
+    vocab-resources
+    set-vocab-resources
+}
 "Getting and setting arbitrary vocabulary metadata:"
 { $subsections
     vocab-file-contents
@@ -50,3 +55,11 @@ HELP: set-vocab-tags
 { $values { "tags" "a sequence of strings" } { "vocab" "a vocabulary specifier" } }
 { $description "Stores a list of short tags classifying the vocabulary to the " { $snippet "tags.txt" } " file in the vocabulary's directory." } ;
 
+HELP: vocab-resources
+{ $values { "vocab" "a vocabulary specifier" } { "patterns" "a sequence of glob patterns" } }
+{ $description "Outputs a list of glob patterns matching files that will be deployed with an application that includes " { $snippet "vocab" } ", as specified by the " { $snippet "resources.txt" } " file in the vocabulary's directory. Outputs an empty array if the file doesn't exist." }
+{ $notes "The " { $vocab-link "vocabs.metadata.resources" } " vocabulary contains words that will expand the glob patterns and directory names in " { $snippet "patterns" } " and return all the matching files." } ;
+
+HELP: set-vocab-resources
+{ $values { "patterns" "a sequence of glob patterns" } { "vocab" "a vocabulary specifier" } }
+{ $description "Stores a list of glob patterns matching files that will be deployed with an application that includes " { $snippet "vocab" } " to the " { $snippet "resources.txt" } " file in the vocabulary's directory." } ;
