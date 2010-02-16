@@ -19,6 +19,8 @@ IN: ogg
     { [ os macosx? ] [ "libogg.0.dylib" ] }
     { [ os unix? ]   [ "libogg.so" ] }
 } cond "cdecl" add-library
+
+"ogg" deploy-library
 >>
 
 LIBRARY: ogg
