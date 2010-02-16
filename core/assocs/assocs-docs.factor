@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg, Slava Pestov, and Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel sequences
-sequences.private namespaces math quotations assocs.private ;
+sequences.private namespaces math quotations assocs.private
+sets ;
 IN: assocs
 
 ARTICLE: "alists" "Association lists"
@@ -90,6 +91,8 @@ ARTICLE: "assocs-values" "Transposed assoc operations"
 
 ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 "It is often useful to use the keys of an associative mapping as a set, exploiting the constant or logarithmic lookup time of most implementations (" { $link "alists" } " being a notable exception)."
+$nl
+"Set-theoretic operations:"
 { $subsections
     assoc-subset?
     assoc-intersect
@@ -97,6 +100,11 @@ ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
     assoc-diff
     substitute
     extract-keys
+}
+"Adding elements to sets:"
+{ $subsections
+    conjoin
+    conjoin-at
 }
 "Destructive operations:"
 { $subsections
