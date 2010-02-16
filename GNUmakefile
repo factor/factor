@@ -4,7 +4,7 @@ ifdef CONFIG
 	AR = ar
 	LD = ld
 
-	VERSION = 0.92
+	VERSION = 0.93
 
 	BUNDLE = Factor.app
 	LIBPATH = -L/usr/X11R6/lib

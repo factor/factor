@@ -7,21 +7,15 @@ summary layouts vocabs.loader prettyprint.config prettyprint debugger
 io.streams.c io.files io.files.temp io.pathnames io.directories
 io.directories.hierarchy io.backend quotations io.launcher
 tools.deploy.config tools.deploy.config.editor bootstrap.image
-io.encodings.utf8 destructors accessors hashtables ;
+io.encodings.utf8 destructors accessors hashtables
+vocabs.metadata.resources ;
 IN: tools.deploy.backend
 
 : copy-vm ( executable bundle-name -- vm )
     prepend-path vm over copy-file ;
 
-CONSTANT: theme-path "basis/ui/gadgets/theme/"
-
-: copy-theme ( name dir -- )
-    deploy-ui? get [
-        append-path
-        theme-path append-path
-        [ make-directories ]
-        [ theme-path "resource:" prepend swap copy-tree ] bi
-    ] [ 2drop ] if ;
+: copy-resources ( manifest name dir -- )
+    append-path swap [ copy-vocab-resources ] with each ;
 
 : image-name ( vocab bundle-name -- str )
     prepend-path ".image" append ;
@@ -89,7 +83,7 @@ DEFER: ?make-staging-image
     [ "deploy-config-" prepend temp-file ] bi
     [ utf8 set-file-contents ] keep ;
 
-: deploy-command-line ( image vocab config -- flags )
+: deploy-command-line ( image vocab manifest-file config -- flags )
     [
         bootstrap-profile ?make-staging-image
 
@@ -97,6 +91,7 @@ DEFER: ?make-staging-image
             "-i=" bootstrap-profile staging-image-name append ,
             "-resource-path=" "" resource-path append ,
             "-run=tools.deploy.shaker" ,
+            "-vocab-manifest-out=" prepend ,
             [ "-deploy-vocab=" prepend , ]
             [ make-deploy-config "-deploy-config=" prepend , ] bi
             "-output-image=" prepend ,
@@ -104,8 +99,10 @@ DEFER: ?make-staging-image
         ] { } make
     ] bind ;
 
-: make-deploy-image ( vm image vocab config -- )
+: make-deploy-image ( vm image vocab config -- manifest )
     make-boot-image
-    deploy-command-line run-factor ;
+    over "vocab-manifest-" prepend temp-file
+    [ swap deploy-command-line run-factor ]
+    [ utf8 file-lines ] bi ;
 
 HOOK: deploy* os ( vocab -- )
