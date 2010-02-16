@@ -14,7 +14,7 @@ GENERIC: in? ( elt set -- ? )
 GENERIC: delete ( elt set -- )
 GENERIC: set-like ( set exemplar -- set' )
 GENERIC: fast-set ( set -- set' )
-GENERIC: items ( set -- sequence )
+GENERIC: members ( set -- sequence )
 GENERIC: union ( set1 set2 -- set )
 GENERIC: intersect ( set1 set2 -- set )
 GENERIC: intersects? ( set1 set2 -- ? )
@@ -26,12 +26,12 @@ GENERIC: set= ( set1 set2 -- ? )
 ! Override them for efficiency
 
 M: set union
-    [ [ items ] bi@ append ] keep set-like ;
+    [ [ members ] bi@ append ] keep set-like ;
 
 <PRIVATE
 
 : sequence/tester ( set1 set2 -- set1' quot )
-    [ items ] [ fast-set [ in? ] curry ] bi* ; inline
+    [ members ] [ fast-set [ in? ] curry ] bi* ; inline
 
 PRIVATE>
 
@@ -56,16 +56,16 @@ M: set fast-set ;
 ! In a better implementation, less memory would be used
 TUPLE: hash-set { table hashtable read-only } ;
 
-: <hash-set> ( items -- hash-set )
+: <hash-set> ( members -- hash-set )
     sets:unique hash-set boa ;
 
 INSTANCE: hash-set set
 M: hash-set in? table>> key? ; inline
 M: hash-set adjoin table>> dupd set-at ; inline
 M: hash-set delete table>> delete-at ; inline
-M: hash-set items table>> keys ; inline
+M: hash-set members table>> keys ; inline
 M: hash-set set-like
-    drop dup hash-set? [ items <hash-set> ] unless ;
+    drop dup hash-set? [ members <hash-set> ] unless ;
 M: hash-set clone
     table>> clone hash-set boa ;
 
@@ -74,7 +74,7 @@ SYNTAX: HS{
 
 M: hash-set pprint* pprint-object ;
 M: hash-set pprint-delims drop \ HS{ \ } ;
-M: hash-set >pprint-sequence items ;
+M: hash-set >pprint-sequence members ;
 
 ! Sequences are sets
 INSTANCE: sequence set
@@ -82,9 +82,9 @@ M: sequence in? member? ; inline
 M: sequence adjoin sets:adjoin ; inline
 M: sequence delete remove! drop ; inline
 M: sequence set-like
-    [ dup sequence? [ sets:prune ] [ items ] if ] dip
+    [ dup sequence? [ sets:prune ] [ members ] if ] dip
     like ;
-M: sequence items ;
+M: sequence members ;
 M: sequence fast-set <hash-set> ;
 
 ! Bit sets are sets
@@ -131,13 +131,13 @@ M: bit-set diff
 M: bit-set subset?
     (bit-set-op) swap bit-set-subset? ;
 
-M: bit-set items
+M: bit-set members
     [ table>> length iota ] keep [ in? ] curry filter ;
 
 M: bit-set set-like
     ! This crashes if there are keys that can't be put in the bit set
     over bit-set? [ 2dup [ table>> ] bi@ length = ] [ f ] if
     [ drop ] [
-        [ items ] dip table>> length <bit-set>
+        [ members ] dip table>> length <bit-set>
         [ [ adjoin ] curry each ] keep
     ] if ;
