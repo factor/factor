@@ -58,3 +58,6 @@ IN: bit-sets.tests
 [ V{ 0 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ 1 swap delete ] keep members ] unit-test
 [ V{ 0 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ 9 swap delete ] keep members ] unit-test
 [ V{ 0 2 5 } ] [ T{ bit-set f ?{ t f t f f t } } clone [ "foo" swap delete ] keep members ] unit-test
+
+[ T{ bit-set f ?{ f } } T{ bit-set f ?{ t } } ]
+[ 1 <bit-set> dup clone 0 over adjoin ] unit-test

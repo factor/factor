@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs hashtables kernel
 math sequences parser prettyprint.custom ;
-QUALIFIED: sets
+FROM: sets => prune ;
 IN: new-sets
 ! The vocab is called new-sets for now, but only until it gets into core
 ! All the code here is in the style that could be put in core
@@ -52,37 +52,14 @@ M: set set=
 
 M: set fast-set ;
 
-! Hash sets
-! In a better implementation, less memory would be used
-TUPLE: hash-set { table hashtable read-only } ;
-
-: <hash-set> ( members -- hash-set )
-    sets:unique hash-set boa ;
-
-INSTANCE: hash-set set
-M: hash-set in? table>> key? ; inline
-M: hash-set adjoin table>> dupd set-at ; inline
-M: hash-set delete table>> delete-at ; inline
-M: hash-set members table>> keys ; inline
-M: hash-set set-like
-    drop dup hash-set? [ members <hash-set> ] unless ;
-M: hash-set clone
-    table>> clone hash-set boa ;
-
-SYNTAX: HS{
-    \ } [ <hash-set> ] parse-literal ;
-
-M: hash-set pprint* pprint-object ;
-M: hash-set pprint-delims drop \ HS{ \ } ;
-M: hash-set >pprint-sequence members ;
-
 ! Sequences are sets
 INSTANCE: sequence set
 M: sequence in? member? ; inline
-M: sequence adjoin sets:adjoin ; inline
+M: sequence adjoin [ delete ] [ push ] 2bi ;
 M: sequence delete remove! drop ; inline
 M: sequence set-like
-    [ dup sequence? [ sets:prune ] [ members ] if ] dip
-    like ;
-M: sequence members ;
-M: sequence fast-set <hash-set> ;
+    [ dup sequence? [ prune ] [ members ] if ] dip like ;
+M: sequence members fast-set members ;
+
+USE: vocabs.loader
+"hash-sets" require
