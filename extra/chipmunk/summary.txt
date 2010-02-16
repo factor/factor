@@ -1,1 +1,1 @@
-FFI bindings to the Chipmunk 2D physics library.
+Chipmunk 2D physics library binding
