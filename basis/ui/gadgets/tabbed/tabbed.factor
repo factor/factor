@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: ui.pens ui.gadgets.tracks ui.gadgets.buttons
 ui.gadgets.buttons.private ui.gadgets.books ui.gadgets.packs
-ui.gadgets.borders ui.gadgets.icons ui.gadgets ui.pens.image
-sequences models accessors kernel colors colors.constants ;
+ui.gadgets.borders ui.gadgets.icons ui.gadgets ui.gadgets.theme
+ui.pens.image sequences models accessors kernel colors
+colors.constants ;
 IN: ui.gadgets.tabbed
 
 TUPLE: tabbed-gadget < track tabs book ;

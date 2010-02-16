@@ -1,13 +1,13 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors io.backend io.pathnames io.streams.c
-init fry namespaces math make assocs kernel parser parser.notes
-lexer strings.parser vocabs sequences sequences.deep
+USING: arrays accessors io.backend io.encodings.utf8 io.files
+io.streams.c init fry namespaces math make assocs kernel parser
+parser.notes lexer strings.parser vocabs sequences sequences.deep
 sequences.private words memory kernel.private continuations io
 vocabs.loader system strings sets vectors quotations byte-arrays
 sorting compiler.units definitions generic generic.standard
 generic.single tools.deploy.config combinators classes
-classes.builtin slots.private grouping command-line ;
+classes.builtin slots.private grouping command-line io.pathnames ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes.private
 QUALIFIED: compiler.crossref
@@ -466,7 +466,8 @@ SYMBOL: deploy-vocab
 
 : startup-stripper ( -- )
     t "quiet" set-global
-    f output-stream set-global ;
+    f output-stream set-global
+    V{ "resource:" } clone vocab-roots set-global ;
 
 : next-method* ( method -- quot )
     [ "method-class" word-prop ]
@@ -502,7 +503,12 @@ SYMBOL: deploy-vocab
     "Clearing megamorphic caches" show
     [ clear-megamorphic-cache ] each ;
 
-: strip ( -- )
+: write-vocab-manifest ( vocab-manifest-out -- )
+    "Writing vocabulary manifest to " write dup print flush
+    vocabs swap utf8 set-file-lines ;
+
+: strip ( vocab-manifest-out -- )
+    [ write-vocab-manifest ] when*
     startup-stripper
     strip-libc
     strip-destructors
@@ -536,7 +542,7 @@ SYMBOL: deploy-vocab
         1 exit
     ] recover ; inline
 
-: (deploy) ( final-image vocab config -- )
+: (deploy) ( final-image vocab-manifest-out vocab config -- )
     #! Does the actual work of a deployment in the slave
     #! stage2 image
     [
@@ -549,11 +555,11 @@ SYMBOL: deploy-vocab
                     "ui.debugger" require
                 ] when
             ] unless
-            deploy-vocab set
-            deploy-vocab get require
-            deploy-vocab get vocab-main [
-                "Vocabulary has no MAIN: word." print flush 1 exit
-            ] unless
+            [ deploy-vocab set ] [ require ] [
+                vocab-main [
+                    "Vocabulary has no MAIN: word." print flush 1 exit
+                ] unless
+            ] tri
             strip
             "Saving final image" show
             save-image-and-exit
@@ -562,6 +568,7 @@ SYMBOL: deploy-vocab
 
 : do-deploy ( -- )
     "output-image" get
+    "vocab-manifest-out" get
     "deploy-vocab" get
     "Deploying " write dup write "..." print
     "deploy-config" get parse-file first
