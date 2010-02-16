@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math sorting words parser io summary
 quotations sequences prettyprint continuations effects
@@ -108,5 +108,5 @@ PRIVATE>
 
 : word-timing. ( -- )
     word-timing get
-    >alist [ 1000000 /f ] assoc-map sort-values
+    >alist [ 1,000,000,000 /f ] assoc-map sort-values
     simple-table. ;
