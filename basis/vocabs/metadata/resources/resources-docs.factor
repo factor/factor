@@ -16,7 +16,7 @@ HELP: vocab-resource-files
 }
 { $description "Outputs a sequence containing the individual resource files and directories that match the patterns specified in " { $snippet "vocab" } "'s " { $snippet "resources.txt" } " file. Any matching directories will also have their contents recursively included in the output. The paths in the output will be relative to " { $snippet "vocab" } "'s directory." } ;
 
-ARTICLE: "vocabs.metadata.resources" "vocabs.metadata.resources"
+ARTICLE: "vocabs.metadata.resources" "Vocabulary resource metadata"
 "The " { $vocab-link "vocabs.metadata.resources" } " vocabulary contains words to retrieve the full list of files that match the patterns specified in a vocabulary's " { $snippet "resources.txt" } " file."
 { $subsections
     vocab-resource-files

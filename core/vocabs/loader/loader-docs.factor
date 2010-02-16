@@ -52,6 +52,8 @@ $nl
     { { $snippet "foo/bar/summary.txt" } " - a one-line description." }
     { { $snippet "foo/bar/tags.txt" } " - a whitespace-separated list of tags which classify the vocabulary. Consult " { $link "vocab-tags" } " for a list of existing tags you can reuse." }
 }
+"An icon file representing the vocabulary can also be provided. A file named " { $snippet "icon.ico" } " will be used as the application icon when the application is deployed on Windows. A file named " { $snippet "icon.icns" } " will be used when the application is deployed on MacOS X."
+$nl
 "The " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " words load vocabularies which have not been loaded yet, as needed."
 $nl
 "Vocabularies can also be loaded at run time, without altering the vocabulary search path. This is done by calling a word which loads a vocabulary if it is not in the image, doing nothing if it is:"
