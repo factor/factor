@@ -3,6 +3,7 @@
 USING: accessors arrays assocs bit-arrays bit-sets fry
 hashtables hints kernel locals math namespaces sequences sets
 compiler.cfg compiler.cfg.dominance compiler.cfg.rpo ;
+QUALIFIED: new-sets
 IN: compiler.cfg.ssa.construction.tdmsc
 
 ! TDMSC-I algorithm from "A Practical and Fast Iterative Algorithm for
@@ -15,7 +16,7 @@ IN: compiler.cfg.ssa.construction.tdmsc
 SYMBOLS: visited merge-sets levels again? ;
 
 : init-merge-sets ( cfg -- )
-    post-order dup length '[ _ <bit-array> ] H{ } map>assoc merge-sets set ;
+    post-order dup length '[ _ <bit-set> ] H{ } map>assoc merge-sets set ;
 
 : compute-levels ( cfg -- )
     0 over entry>> associate [
@@ -29,15 +30,12 @@ SYMBOLS: visited merge-sets levels again? ;
 
 : level ( bb -- n ) levels get at ; inline
 
-: set-bit ( bit-array n -- )
-    [ t ] 2dip swap set-nth ;
-
 : update-merge-set ( tmp to -- )
     [ merge-sets get ] dip
     '[
         _
-        [ merge-sets get at bit-set-union ]
-        [ dupd number>> set-bit ]
+        [ merge-sets get at new-sets:union ]
+        [ number>> over new-sets:adjoin ]
         bi
     ] change-at ;
 
@@ -54,7 +52,7 @@ SYMBOLS: visited merge-sets levels again? ;
 : visited? ( pair -- ? ) visited get key? ;
 
 : consistent? ( snode lnode -- ? )
-    [ merge-sets get at ] bi@ swap bit-set-subset? ;
+    [ merge-sets get at ] bi@ new-sets:subset? ;
 
 : (process-edge) ( from to -- )
     f walk [
@@ -82,13 +80,8 @@ SYMBOLS: visited merge-sets levels again? ;
     loop ;
 
 : (merge-set) ( bbs -- flags rpo )
-    merge-sets get '[ _ at ] [ bit-set-union ] map-reduce
+    merge-sets get '[ _ at ] [ new-sets:union ] map-reduce
     cfg get reverse-post-order ; inline
-
-: filter-by ( flags seq -- seq' )
-    [ drop ] selector [ 2each ] dip ;
-
-HINTS: filter-by { bit-array object } ;
 
 PRIVATE>
 
@@ -101,10 +94,8 @@ PRIVATE>
     [ compute-merge-set-loop ]
     tri ;
 
-: merge-set-each ( bbs quot: ( bb -- ) -- )
-    [ (merge-set) ] dip '[
-        swap _ [ drop ] if
-    ] 2each ; inline
-
 : merge-set ( bbs -- bbs' )
-     (merge-set) filter-by ;
+     (merge-set) [ new-sets:members ] dip nths ;
+
+: merge-set-each ( bbs quot: ( bb -- ) -- )
+    [ merge-set ] dip each ; inline
