@@ -29,8 +29,6 @@ $nl
 "Adding elements to sets:"
 { $subsections
     adjoin
-    conjoin
-    conjoin-at
 }
 { $see-also member? member-eq? any? all? "assocs-sets" } ;
 

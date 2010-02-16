@@ -99,7 +99,7 @@ M: bignum (bit-count)
     ] if ;
 
 : byte-array-bit-count ( byte-array -- n )
-    0 [ byte-bit-count + ] reduce ;
+    0 [ byte-bit-count + ] reduce ; inline
 
 PRIVATE>
 
