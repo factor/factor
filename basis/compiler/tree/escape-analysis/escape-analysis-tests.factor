@@ -329,3 +329,18 @@ TUPLE: empty-tuple ;
     [ { vector } declare length>> ]
     count-unboxed-allocations
 ] unit-test
+
+! Bug found while tweaking benchmark.raytracer-simd
+
+TUPLE: point-2d { x read-only } { y read-only } ;
+TUPLE: point-3d < point-2d { z read-only } ;
+
+[ 0 ] [
+    [ { point-2d } declare dup point-3d? [ z>> ] [ x>> ] if ]
+    count-unboxed-allocations
+] unit-test
+
+[ 0 ] [
+    [ point-2d boa dup point-3d? [ z>> ] [ x>> ] if ]
+    count-unboxed-allocations
+] unit-test
