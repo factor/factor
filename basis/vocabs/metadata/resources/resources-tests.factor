@@ -14,6 +14,5 @@ IN: vocabs.metadata.resources.tests
     "resource-dir/bas"
     "resource-dir/bas/zang"
     "resource-dir/bas/zim"
-    "resource-dir/buh"
     "resource-dir/foo"
 } ] [ "vocabs.metadata.resources.test.3" vocab-resource-files natural-sort ] unit-test
