@@ -520,9 +520,6 @@ SYNTAX: UNIFORM-TUPLE:
 
 <PRIVATE 
 
-: bind-vertex-array ( vertex-array -- )
-    handle>> glBindVertexArray ;
-
 : bind-unnamed-output-attachments ( framebuffer attachments -- )
     [ gl-attachment ] with map
     dup length 1 =
@@ -567,7 +564,7 @@ UNION: transform-feedback-output buffer buffer-range POSTPONE: f ;
 
 TUPLE: render-set
     { primitive-mode primitive-mode read-only }
-    { vertex-array vertex-array read-only }
+    { vertex-array vertex-array initial: T{ vertex-array-collection } read-only }
     { uniforms uniform-tuple read-only }
     { indexes vertex-indexes initial: T{ index-range } read-only } 
     { instances ?integer initial: f read-only }
