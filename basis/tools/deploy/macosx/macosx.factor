@@ -81,7 +81,9 @@ M: macosx deploy* ( vocab -- )
             [ bundle-name create-app-dir ] keep
             [ bundle-name deploy.app-image ] keep
             namespace make-deploy-image
-            bundle-name "Contents/Resources" copy-resources
+            bundle-name
+            [ "Contents/Resources" copy-resources ]
+            [ "Contents/Frameworks" copy-libraries ] 2bi
             bundle-name show-in-finder
         ] bind
     ] with-directory ;

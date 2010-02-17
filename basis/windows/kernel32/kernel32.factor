@@ -90,6 +90,8 @@ CONSTANT: FILE_ACTION_MODIFIED 3
 CONSTANT: FILE_ACTION_RENAMED_OLD_NAME 4
 CONSTANT: FILE_ACTION_RENAMED_NEW_NAME 5
 
+CONSTANT: DONT_RESOLVE_DLL_REFERENCES 1
+
 STRUCT: FILE_NOTIFY_INFORMATION
     { NextEntryOffset DWORD }
     { Action DWORD }
@@ -1167,7 +1169,7 @@ FUNCTION: BOOL FreeConsole ( ) ;
 ! FUNCTION: FreeEnvironmentStringsA
 FUNCTION: BOOL FreeEnvironmentStringsW ( LPTCH lpszEnvironmentBlock ) ;
 ALIAS: FreeEnvironmentStrings FreeEnvironmentStringsW
-! FUNCTION: FreeLibrary
+FUNCTION: BOOL FreeLibrary ( HMODULE hModule ) ;
 ! FUNCTION: FreeLibraryAndExitThread
 ! FUNCTION: FreeResource
 ! FUNCTION: FreeUserPhysicalPages
@@ -1314,7 +1316,8 @@ FUNCTION: DWORD GetLogicalDrives ( ) ;
 ! FUNCTION: GetLongPathNameW
 ! FUNCTION: GetMailslotInfo
 ! FUNCTION: GetModuleFileNameA
-! FUNCTION: GetModuleFileNameW
+FUNCTION: DWORD GetModuleFileNameW ( HMODULE hModule, LPTSTR lpFilename, DWORD nSize ) ;
+ALIAS: GetModuleFileName GetModuleFileNameW
 FUNCTION: HMODULE GetModuleHandleW ( LPCWSTR lpModuleName ) ;
 ALIAS: GetModuleHandle GetModuleHandleW
 ! FUNCTION: GetModuleHandleExA
