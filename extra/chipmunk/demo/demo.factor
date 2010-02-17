@@ -1,9 +1,8 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http:// factorcode.org/license.txt for BSD license.
-USING: accessors chipmunk classes.struct game.loop game.worlds gpu
-gpu.util.wasd kernel literals locals math method-chains opengl.gl
-random sequences specialized-arrays
-specialized-arrays.instances.alien.c-types.void* ui.gadgets.worlds
+USING: accessors chipmunk classes.struct game.worlds kernel locals
+math method-chains opengl.gl random sequences specialized-arrays
+specialized-arrays.instances.alien.c-types.void* ui ui.gadgets.worlds
 ui.pixel-formats ;
 IN: chipmunk.demo
 
@@ -56,7 +55,7 @@ CONSTANT: image-bitmap B{
     cpCircleShapeAlloc body 0.95 0 0 cpv cpCircleShapeInit cpCircleShape memory>struct
     [ shape>> 0 >>e ] [ shape>> 0 >>u ] bi drop ;
 
-TUPLE: chipmunk-world < wasd-world
+TUPLE: chipmunk-world < game-world
     space ;
 
 AFTER: chipmunk-world tick-game-world
@@ -97,8 +96,6 @@ M:: chipmunk-world draw-world* ( world -- )
 
 M:: chipmunk-world begin-game-world ( world -- )
     cpInitChipmunk
-    init-gpu
-    world { -0.2 0.13 0.1 } 1.1 0.2 set-wasd-view drop
 
     cpSpaceAlloc cpSpaceInit cpSpace memory>struct :> space
 
@@ -132,20 +129,19 @@ M: chipmunk-world end-game-world
     [ cpSpaceFreeChildren ]
     [ cpSpaceFree ] bi ;
 
-M: chipmunk-world wasd-movement-speed drop 1/160. ;
-M: chipmunk-world wasd-near-plane drop 1/32. ;
-M: chipmunk-world wasd-far-plane drop 256.0 ;
+: chipmunk-demo ( -- )
+    [
+        f
+        T{ game-attributes
+           { world-class chipmunk-world }
+           { title "Chipmunk Physics Demo" }
+           { pixel-format-attributes
+             { windowed double-buffered }
+           }
+           { pref-dim { 640 480 } }
+           { tick-interval-micros 16666 }
+        }
+        clone
+        open-window
+    ] with-ui ;
 
-GAME: chipmunk-demo {
-        { world-class chipmunk-world }
-        { title "Chipmunk Physics Demo" }
-        { pixel-format-attributes {
-            windowed
-            double-buffered
-            T{ depth-bits { value 24 } }
-        } }
-        { grab-input? t }
-        { use-game-input? t }
-        { pref-dim { 640 480 } }
-        { tick-interval-micros $[ 60 fps ] }
-    } ;
