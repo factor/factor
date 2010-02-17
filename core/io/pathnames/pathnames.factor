@@ -76,6 +76,8 @@ ERROR: no-parent-directory path ;
         [ f ]
     } cond ;
 
+PRIVATE>
+
 : absolute-path? ( path -- ? )
     {
         { [ dup empty? ] [ f ] }
@@ -84,8 +86,6 @@ ERROR: no-parent-directory path ;
         { [ dup first path-separator? ] [ t ] }
         [ f ]
     } cond nip ;
-
-PRIVATE>
 
 : append-path ( path1 path2 -- path )
     {
