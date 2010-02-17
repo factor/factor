@@ -63,6 +63,9 @@ FUNCTOR-SYNTAX: TUPLE:
     } case
     \ define-tuple-class suffix! ;
 
+FUNCTOR-SYNTAX: final
+    [ word make-final ] append! ;
+
 FUNCTOR-SYNTAX: SINGLETON:
     scan-param suffix!
     \ define-singleton-class suffix! ;

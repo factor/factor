@@ -97,3 +97,11 @@ TYPED: no-outputs-unboxable-input ( x: unboxable3 -- )
     buh set ;
 
 [ T{ unboxable3 } ] [ T{ unboxable3 } no-outputs-unboxable-input buh get ] unit-test
+
+! Reported by littledan
+TUPLE: superclass x ;
+TUPLE: subclass < superclass y ;
+
+TYPED: unbox-fail ( superclass: a -- ? ) subclass? ;
+
+[ t ] [ subclass new unbox-fail ] unit-test
