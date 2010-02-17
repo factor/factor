@@ -240,7 +240,7 @@ M: tuple-class update-class
 
 GENERIC: valid-superclass? ( class -- ? )
 
-M: tuple-class valid-superclass? drop t ;
+M: tuple-class valid-superclass? "final" word-prop not ;
 
 M: builtin-class valid-superclass? tuple eq? ;
 
@@ -266,7 +266,15 @@ PRIVATE>
 : define-tuple-class ( class superclass slots -- )
     over check-superclass
     over prepare-slots
+    pick f "final" set-word-prop
     (define-tuple-class) ;
+
+GENERIC: make-final ( class -- )
+
+M: tuple-class make-final
+    [ dup class-usage keys ?metaclass-changed ]
+    [ t "final" set-word-prop ]
+    bi ;
 
 M: word (define-tuple-class)
     define-new-tuple-class ;
@@ -301,7 +309,7 @@ M: tuple-class reset-class
         ] with each
     ] [
         [ call-next-method ]
-        [ { "layout" "slots" "boa-check" "prototype" } reset-props ]
+        [ { "layout" "slots" "boa-check" "prototype" "final" } reset-props ]
         bi
     ] bi ;
 
