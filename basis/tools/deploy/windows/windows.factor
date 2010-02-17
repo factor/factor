@@ -36,7 +36,7 @@ M: winnt deploy*
                 [ drop embed-ico ]
                 [ image-name ]
                 [ drop namespace make-deploy-image ]
-                [ nip "" copy-resources ]
+                [ nip "" [ copy-resources ] [ copy-libraries ] 3bi ]
                 [ nip open-in-explorer ]
             } 2cleave 
         ] bind

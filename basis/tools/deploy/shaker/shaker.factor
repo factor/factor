@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors io.backend io.encodings.utf8 io.files
+USING: arrays alien.libraries accessors io.backend io.encodings.utf8 io.files
 io.streams.c init fry namespaces math make assocs kernel parser
 parser.notes lexer strings.parser vocabs sequences sequences.deep
 sequences.private words memory kernel.private continuations io
@@ -19,6 +19,7 @@ QUALIFIED: layouts
 QUALIFIED: source-files
 QUALIFIED: source-files.errors
 QUALIFIED: vocabs
+FROM: alien.libraries.private => >deployed-library-path ;
 IN: tools.deploy.shaker
 
 ! This file is some hairy shit.
@@ -505,11 +506,28 @@ SYMBOL: deploy-vocab
 
 : write-vocab-manifest ( vocab-manifest-out -- )
     "Writing vocabulary manifest to " write dup print flush
-    vocabs swap utf8 set-file-lines ;
+    vocabs "VOCABS:" prefix
+    deploy-libraries get [ libraries get at path>> ] map prune "LIBRARIES:" prefix append
+    swap utf8 set-file-lines ;
+
+: prepare-deploy-libraries ( -- )
+    "Preparing deployed libraries" show
+    deploy-libraries get [
+        libraries get [
+            [ path>> >deployed-library-path ] [ abi>> ] bi <library>
+        ] change-at
+    ] each
+    
+    [
+        "deploy-libraries" "alien.libraries" lookup forget
+        "deploy-library" "alien.libraries" lookup forget
+        ">deployed-library-path" "alien.libraries.private" lookup forget
+    ] with-compilation-unit ;
 
 : strip ( vocab-manifest-out -- )
     [ write-vocab-manifest ] when*
     startup-stripper
+    prepare-deploy-libraries
     strip-libc
     strip-destructors
     strip-call
