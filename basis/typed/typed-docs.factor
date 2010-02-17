@@ -58,10 +58,18 @@ HELP: output-mismatch-error
 
 ARTICLE: "typed" "Strongly-typed word definitions"
 "The Factor compiler supports advanced compiler optimizations that take advantage of the type information it can glean from source code. The " { $vocab-link "typed" } " vocabulary provides syntax that allows words to provide checked type information about their inputs and outputs and improve the performance of compiled code."
+$nl
+"Parameters and return values of typed words where the type is declared to be a " { $link POSTPONE: final } " tuple class with all slots " { $link read-only } " are passed by value."
 { $subsections
     POSTPONE: TYPED:
     POSTPONE: TYPED::
+}
+"Defining typed words at run time:"
+{ $subsections
     define-typed
+}
+"Errors:"
+{ $subsections
     input-mismatch-error
     output-mismatch-error
 } ;
