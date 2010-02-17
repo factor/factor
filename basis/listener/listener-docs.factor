@@ -1,4 +1,5 @@
-USING: help.markup help.syntax kernel io system prettyprint continuations quotations vocabs.loader vocabs.refresh parser ;
+USING: help.markup help.syntax kernel io system prettyprint
+continuations quotations vocabs.loader parser ;
 IN: listener
 
 ARTICLE: "listener-watch" "Watching variables in the listener"
@@ -46,7 +47,7 @@ HELP: hide-all-vars
 { $description "Removes all variables from the watch list." } ;
 
 ARTICLE: "listener" "The listener"
-"The listener evaluates Factor expressions read from the input stream. Typically, you write Factor code in a text editor, load it from the listener by calling " { $link require } ", " { $link refresh-all } " or " { $link run-file } ", and then test it from interactively."
+"The listener evaluates Factor expressions read from the input stream. Typically, you write Factor code in a text editor, load it from the listener by calling " { $link require } ", " { $link reload } " or " { $link run-file } ", and then test it from interactively."
 $nl
 "The classical first program can be run in the listener:"
 { $example "\"Hello, world\" print" "Hello, world" }
