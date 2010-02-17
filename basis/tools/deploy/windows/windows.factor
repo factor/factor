@@ -5,7 +5,8 @@ io.encodings.ascii kernel namespaces
 sequences locals system splitting tools.deploy.backend
 tools.deploy.config tools.deploy.config.editor assocs hashtables
 prettyprint combinators windows.kernel32 windows.shell32 windows.user32
-alien.c-types vocabs.metadata vocabs.loader tools.deploy.windows.ico ;
+alien.c-types vocabs.metadata vocabs.loader tools.deploy.windows.ico
+io.files.windows.nt ;
 IN: tools.deploy.windows
 
 CONSTANT: app-icon-resource-id "APPICON"
@@ -21,6 +22,10 @@ CONSTANT: app-icon-resource-id "APPICON"
 : create-exe-dir ( vocab bundle-name -- vm )
     dup copy-dll
     deploy-ui? get ".exe" ".com" ? copy-vm ;
+
+: open-in-explorer ( dir -- )
+    [ f "open" ] dip absolute-path normalize-separators
+    f f SW_SHOWNORMAL ShellExecute drop ;
 
 : embed-ico ( vm vocab -- )
     dup vocab-windows-icon-path vocab-append-path dup exists?
