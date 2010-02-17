@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax combinators generalizations
-kernel openal openal.backend ;
-IN: openal.other
+kernel openal openal.alut.backend ;
+IN: openal.alut.other
 
 LIBRARY: alut
 
