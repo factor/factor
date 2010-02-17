@@ -17,7 +17,7 @@ M: object throw
 
 PRIVATE>
 
-ERROR: wrong-values quot effect ;
+ERROR: wrong-values quot call-site ;
 
 ! We can't USE: effects here so we forward reference slots instead
 SLOT: in
