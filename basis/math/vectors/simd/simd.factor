@@ -251,7 +251,7 @@ BOA-EFFECT [ N "n" <array> { "v" } <effect> ]
 
 WHERE
 
-TUPLE: A < simd-128 ;
+TUPLE: A < simd-128 ; final
 
 M: A new-underlying    drop \ A boa ; inline
 M: A simd-rep          drop A-rep ; inline
