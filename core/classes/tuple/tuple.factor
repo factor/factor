@@ -93,6 +93,14 @@ ERROR: bad-superclass class ;
         ] [ 2drop f ] if
     ] [ 2drop f ] if ; inline
 
+GENERIC: final-class? ( class -- ? )
+
+M: tuple-class final-class? "final" word-prop ;
+
+M: builtin-class final-class? tuple eq? not ;
+
+M: class final-class? drop t ;
+
 <PRIVATE
 
 : tuple-predicate-quot/1 ( class -- quot )
@@ -238,16 +246,8 @@ M: tuple-class update-class
     [ [ "slots" word-prop ] dip = ]
     bi-curry* bi and ;
 
-GENERIC: valid-superclass? ( class -- ? )
-
-M: tuple-class valid-superclass? "final" word-prop not ;
-
-M: builtin-class valid-superclass? tuple eq? ;
-
-M: class valid-superclass? drop f ;
-
 : check-superclass ( superclass -- )
-    dup valid-superclass? [ bad-superclass ] unless drop ;
+    dup final-class? [ bad-superclass ] when drop ;
 
 GENERIC# (define-tuple-class) 2 ( class superclass slots -- )
 
@@ -261,12 +261,19 @@ GENERIC# (define-tuple-class) 2 ( class superclass slots -- )
         read-only suffix
     ] map ;
 
+: reset-final ( class -- )
+    dup final-class? [
+        [ f "final" set-word-prop ]
+        [ changed-conditionally ]
+        bi
+    ] [ drop ] if ;
+
 PRIVATE>
 
 : define-tuple-class ( class superclass slots -- )
     over check-superclass
     over prepare-slots
-    pick f "final" set-word-prop
+    pick reset-final
     (define-tuple-class) ;
 
 GENERIC: make-final ( class -- )
