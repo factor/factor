@@ -56,7 +56,7 @@ $nl
     "USE: math.functions"
     ": twice ( word -- ) [ execute ] [ execute ] bi ; inline"
     "81 \\ sqrt twice ."
-    "3"
+    "3.0"
 }
 "Multi-line expressions are supported:"
 { $example "{ 1 2 3 } [\n    .\n] each" "1\n2\n3" }
