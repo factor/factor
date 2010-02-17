@@ -273,7 +273,6 @@ PRIVATE>
 : define-tuple-class ( class superclass slots -- )
     over check-superclass
     over prepare-slots
-    pick reset-final
     (define-tuple-class) ;
 
 GENERIC: make-final ( class -- )
@@ -287,6 +286,7 @@ M: word (define-tuple-class)
     define-new-tuple-class ;
 
 M: tuple-class (define-tuple-class)
+    pick reset-final
     3dup tuple-class-unchanged?
     [ 2drop ?define-symbol ] [ redefine-tuple-class ] if ;
 
