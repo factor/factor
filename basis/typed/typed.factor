@@ -20,6 +20,7 @@ PREDICATE: typed-word < word "typed-word" word-prop ;
     {
         [ all-slots empty? not ]
         [ immutable-tuple-class? ]
+        [ final-class? ]
     } 1&& ;
 
 ! typed inputs
@@ -30,9 +31,14 @@ PREDICATE: typed-word < word "typed-word" word-prop ;
 : input-mismatch-quot ( word types -- quot )
     [ input-mismatch-error ] 2curry ;
 
+: depends-on-unboxing ( class -- )
+    [ dup tuple-layout depends-on-tuple-layout ]
+    [ depends-on-final ]
+    bi ;
+
 : (unboxer) ( type -- quot )
     dup unboxable-tuple-class? [
-        dup dup tuple-layout depends-on-tuple-layout
+        dup depends-on-unboxing
         all-slots [
             [ name>> reader-word 1quotation ]
             [ class>> (unboxer) ] bi compose
@@ -52,7 +58,7 @@ PREDICATE: typed-word < word "typed-word" word-prop ;
 : (unboxed-types) ( type -- types )
     dup unboxable-tuple-class?
     [
-        dup dup tuple-layout depends-on-tuple-layout
+        dup depends-on-unboxing
         all-slots [ class>> (unboxed-types) ] map concat
     ]
     [ 1array ] if ;
@@ -81,7 +87,7 @@ DEFER: make-boxer
 : boxer ( type -- quot )
     dup unboxable-tuple-class?
     [
-        dup dup tuple-layout depends-on-tuple-layout
+        dup depends-on-unboxing
         [ all-slots [ class>> ] map make-boxer ]
         [ [ boa ] curry ]
         bi compose
