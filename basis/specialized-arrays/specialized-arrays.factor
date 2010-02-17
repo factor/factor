@@ -47,7 +47,7 @@ WHERE
 
 TUPLE: A
 { underlying c-ptr read-only }
-{ length array-capacity read-only } ;
+{ length array-capacity read-only } ; final
 
 : <direct-A> ( alien len -- specialized-array ) A boa ; inline
 

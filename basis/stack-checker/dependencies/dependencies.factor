@@ -1,7 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors classes.algebra fry generic kernel math
-namespaces sequences words sets combinators.short-circuit ;
+namespaces sequences words sets combinators.short-circuit
+classes.tuple ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: stack-checker.dependencies
 
@@ -121,6 +122,15 @@ TUPLE: depends-on-flushable word ;
 
 M: depends-on-flushable satisfied?
     word>> flushable? ;
+
+TUPLE: depends-on-final class ;
+
+: depends-on-final ( word -- )
+    [ depends-on-conditionally ]
+    [ \ depends-on-final add-conditional-dependency ] bi ;
+
+M: depends-on-final satisfied?
+    class>> final-class? ;
 
 : init-dependencies ( -- )
     H{ } clone dependencies set

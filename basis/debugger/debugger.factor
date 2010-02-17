@@ -194,7 +194,7 @@ M: not-a-tuple summary
     drop "Not a tuple" ;
 
 M: bad-superclass summary
-    drop "Tuple classes can only inherit from other tuple classes" ;
+    drop "Tuple classes can only inherit from non-final tuple classes" ;
 
 M: no-initial-value summary
     drop "Initial value must be provided for slots specialized to this class" ;
