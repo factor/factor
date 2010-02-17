@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2009 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces make continuations.private kernel.private init
 assocs kernel vocabs words sequences memory io system arrays
@@ -19,13 +19,12 @@ TUPLE: vocab-manifest vocabs libraries ;
 : copy-resources ( manifest name dir -- )
     append-path swap vocabs>> [ copy-vocab-resources ] with each ;
 
-ERROR: cant-deploy-library-file library ;
-<PRIVATE
+ERROR: can't-deploy-library-file library ;
+
 : copy-library ( dir library -- )
     dup find-library-file
-    [ nip swap over file-name append-path copy-file ]
-    [ cant-deploy-library-file ] if* ;
-PRIVATE>
+    [ swap over file-name append-path copy-file ]
+    [ can't-deploy-library-file ] ?if ;
 
 : copy-libraries ( manifest name dir -- )
     append-path swap libraries>> [ copy-library ] with each ;

@@ -1,11 +1,11 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien alien.c-types alien.data ascii
-assocs byte-arrays classes.struct classes.tuple.private
+assocs byte-arrays classes.struct classes.tuple.private classes.tuple
 combinators compiler.tree.debugger compiler.units destructors
 io.encodings.utf8 io.pathnames io.streams.string kernel libc
 literals math mirrors namespaces prettyprint
 prettyprint.config see sequences specialized-arrays system
-tools.test parser lexer eval layouts ;
+tools.test parser lexer eval layouts generic.single classes ;
 FROM: math => float ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: char
@@ -338,13 +338,28 @@ STRUCT: struct-that's-a-word { x int } ;
 [
     "USE: classes.struct IN: classes.struct.tests TUPLE: not-a-struct ; S{ not-a-struct }"
     eval( -- value )
-] must-fail
+] [ error>> no-method? ] must-fail-with
 
 ! Subclassing a struct class should not be allowed
 [
-    "USE: classes.struct IN: classes.struct.tests STRUCT: a-struct { x int } ; TUPLE: not-a-struct < a-struct ;"
+    "USING: alien.c-types classes.struct ; IN: classes.struct.tests STRUCT: a-struct { x int } ; TUPLE: not-a-struct < a-struct ;"
     eval( -- )
-] must-fail
+] [ error>> bad-superclass? ] must-fail-with
+
+! Changing a superclass into a struct should reset the subclass
+TUPLE: will-become-struct ;
+
+TUPLE: a-subclass < will-become-struct ;
+
+[ f ] [ will-become-struct struct-class? ] unit-test
+
+[ will-become-struct ] [ a-subclass superclass ] unit-test
+
+[ ] [ "IN: classes.struct.tests USING: classes.struct alien.c-types ; STRUCT: will-become-struct { x int } ;" eval( -- ) ] unit-test
+
+[ t ] [ will-become-struct struct-class? ] unit-test
+
+[ tuple ] [ a-subclass superclass ] unit-test
 
 ! Remove c-type when struct class is forgotten
 [ ] [
