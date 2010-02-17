@@ -20,6 +20,8 @@ IN: ogg.vorbis
     { [ os macosx? ] [ "libvorbis.0.dylib" ] }
     { [ os unix? ]   [ "libvorbis.so" ] }
 } cond "cdecl" add-library 
+
+"vorbis" deploy-library
 >>
 
 LIBRARY: vorbis
