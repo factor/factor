@@ -1,6 +1,6 @@
 USING: io.pathnames io.files.temp io.directories
 continuations math io.files.private kernel
-namespaces tools.test io.pathnames.private ;
+namespaces sequences tools.test io.pathnames.private ;
 IN: io.pathnames.tests
 
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test
@@ -11,20 +11,23 @@ IN: io.pathnames.tests
 [ "freetype6.dll" ] [ "resource:freetype6.dll" file-name ] unit-test
 [ "freetype6.dll" ] [ "resource:/freetype6.dll" file-name ] unit-test
 
-[ "/usr/lib" ] [ "/usr" "lib" append-path ] unit-test
-[ "/usr/lib" ] [ "/usr/" "lib" append-path ] unit-test
-[ "/usr/lib" ] [ "/usr" "./lib" append-path ] unit-test
-[ "/usr/lib/" ] [ "/usr" "./lib/" append-path ] unit-test
-[ "/lib" ] [ "/usr" "../lib" append-path ] unit-test
-[ "/lib/" ] [ "/usr" "../lib/" append-path ] unit-test
+: >test-path ( path -- path' )
+    [ dup path-separator? [ drop CHAR: / ] when ] map ;
+
+[ "/usr/lib" ] [ "/usr" "lib" append-path >test-path ] unit-test
+[ "/usr/lib" ] [ "/usr/" "lib" append-path >test-path ] unit-test
+[ "/usr/lib" ] [ "/usr" "./lib" append-path >test-path ] unit-test
+[ "/usr/lib/" ] [ "/usr" "./lib/" append-path >test-path ] unit-test
+[ "/lib" ] [ "/usr" "../lib" append-path >test-path ] unit-test
+[ "/lib/" ] [ "/usr" "../lib/" append-path >test-path ] unit-test
 
 [ "" ] [ "" "." append-path ] unit-test
 [ "" ".." append-path ] must-fail
 
-[ "/" ] [ "/" "./." append-path ] unit-test
-[ "/" ] [ "/" "././" append-path ] unit-test
-[ "/a/b/lib" ] [ "/a/b/c/d/e/f/" "../../../../lib" append-path ] unit-test
-[ "/a/b/lib/" ] [ "/a/b/c/d/e/f/" "../../../../lib/" append-path ] unit-test
+[ "/" ] [ "/" "./." append-path >test-path ] unit-test
+[ "/" ] [ "/" "././" append-path >test-path ] unit-test
+[ "/a/b/lib" ] [ "/a/b/c/d/e/f/" "../../../../lib" append-path >test-path ] unit-test
+[ "/a/b/lib/" ] [ "/a/b/c/d/e/f/" "../../../../lib/" append-path >test-path ] unit-test
 
 [ "" "../lib/" append-path ] must-fail
 [ "lib" ] [ "" "lib" append-path ] unit-test
@@ -45,10 +48,10 @@ IN: io.pathnames.tests
 [ "" parent-directory ] must-fail
 [ "." ] [ "boot.x86.64.image" parent-directory ] unit-test
 
-[ "bar/foo" ] [ "bar/baz" "..///foo" append-path ] unit-test
-[ "bar/baz/foo" ] [ "bar/baz" ".///foo" append-path ] unit-test
-[ "bar/foo" ] [ "bar/baz" "./..//foo" append-path ] unit-test
-[ "bar/foo" ] [ "bar/baz" "./../././././././///foo" append-path ] unit-test
+[ "bar/foo" ] [ "bar/baz" "..///foo" append-path >test-path ] unit-test
+[ "bar/baz/foo" ] [ "bar/baz" ".///foo" append-path >test-path ] unit-test
+[ "bar/foo" ] [ "bar/baz" "./..//foo" append-path >test-path ] unit-test
+[ "bar/foo" ] [ "bar/baz" "./../././././././///foo" append-path >test-path ] unit-test
 
 [ t ] [ "resource:core" absolute-path? ] unit-test
 [ f ] [ "" absolute-path? ] unit-test
@@ -61,7 +64,7 @@ IN: io.pathnames.tests
     "." current-directory set
     ".." "resource-path" set
     [ "../core/bootstrap/stage2.factor" ]
-    [ "resource:core/bootstrap/stage2.factor" absolute-path ]
+    [ "resource:core/bootstrap/stage2.factor" absolute-path >test-path ]
     unit-test
 ] with-scope
 
