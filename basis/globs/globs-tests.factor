@@ -30,7 +30,7 @@ IN: globs.tests
 [ t ] [ "fo\\*" glob-pattern? ] unit-test
 [ t ] [ "fo{o,bro}" glob-pattern? ] unit-test
 
-"foo" "bar" append-path 1array
+{ "foo" "bar" } path-separator join 1array
 [ { "foo" "bar" "ba?" } path-separator join glob-parent-directory ] unit-test
 
 [ "foo" ] 
