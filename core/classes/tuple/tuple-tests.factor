@@ -782,7 +782,7 @@ TUPLE: final-subclass < final-superclass ;
 
 [ tuple ] [ final-subclass superclass ] unit-test
 
-[ t ] [ \ final-subclass valid-superclass? ] unit-test
+[ f ] [ \ final-subclass final-class? ] unit-test
 
 ! Subclassing a final class should fail
 [ "IN: classes.tuple.tests TUPLE: final-subclass < final-superclass ;" eval( -- ) ]
@@ -796,4 +796,4 @@ TUPLE: final-subclass < final-superclass ;
 ! Changing a superclass should not change the final status of a subclass
 [ ] [ "IN: classes.tuple.tests TUPLE: final-superclass x ;" eval( -- ) ] unit-test
 
-[ f ] [ \ final-subclass valid-superclass? ] unit-test
+[ t ] [ \ final-subclass final-class? ] unit-test
