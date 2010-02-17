@@ -204,6 +204,10 @@ IN: bootstrap.syntax
         parse-tuple-definition define-tuple-class
     ] define-core-syntax
 
+    "final" [
+        word make-final
+    ] define-core-syntax
+
     "SLOT:" [
         scan define-protocol-slot
     ] define-core-syntax
