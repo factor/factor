@@ -93,5 +93,5 @@ M: mouse-state clone
 {
     { [ os windows? ] [ "game.input.xinput" require ] }
     { [ os macosx? ] [ "game.input.iokit" require ] }
-    { [ t ] [ ] }
+    { [ os linux? ] [ "game.input.linux" require ] }
 } cond
