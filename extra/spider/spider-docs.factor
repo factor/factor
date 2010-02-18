@@ -12,7 +12,6 @@ HELP: <spider>
 
 HELP: run-spider
 { $values
-     { "spider" spider }
      { "spider" spider } }
 { $description "Runs a spider until completion. See the " { $subsection "spider-tutorial" } " for a complete description of the tuple slots that affect how thet spider works." } ;
 

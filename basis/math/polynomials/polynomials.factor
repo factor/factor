@@ -20,15 +20,15 @@ PRIVATE>
 
 : p= ( p q -- ? ) pextend = ;
 
-: ptrim ( p -- p )
+: ptrim ( p -- q )
     dup length 1 = [ [ zero? ] trim-tail ] unless ;
 
-: 2ptrim ( p q -- p q ) [ ptrim ] bi@ ;
+: 2ptrim ( p q -- p' q' ) [ ptrim ] bi@ ;
 : p+ ( p q -- r ) pextend v+ ;
 : p- ( p q -- r ) pextend v- ;
 : n*p ( n p -- n*p ) n*v ;
 
-: pextend-conv ( p q -- p q )
+: pextend-conv ( p q -- p' q' )
     2dup [ length ] bi@ + 1 - 2pad-tail [ >vector ] bi@ ;
 
 : p* ( p q -- r )

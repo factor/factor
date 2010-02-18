@@ -30,7 +30,7 @@ HELP: q/
 { $examples { $example "USING: math.quaternions prettyprint ;" "{ 0 0 0 1 } { 0 0 1 0 } q/ ." "{ 0 1 0 0 }" } } ;
 
 HELP: q*n
-{ $values { "q" "a quaternion" } { "n" real } { "q" "a quaternion" } }
+{ $values { "q" "a quaternion" } { "n" real } { "r" "a quaternion" } }
 { $description "Multiplies each element of " { $snippet "q" } " by real value " { $snippet "n" } "." }
 { $notes "To multiply a quaternion with a complex value, use " { $link c>q } " " { $link q* } "." } ;
 
