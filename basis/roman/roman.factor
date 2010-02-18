@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs effects fry generalizations
 grouping kernel lexer macros math math.order math.vectors
-namespaces parser quotations sequences sequences.private
-splitting.monotonic stack-checker strings unicode.case words ;
+namespaces parser effects.parser quotations sequences
+sequences.private splitting.monotonic stack-checker strings
+unicode.case words ;
 IN: roman
 
 <PRIVATE
@@ -58,14 +59,14 @@ PRIVATE>
 SYNTAX: ROMAN-OP:
     scan-word [ name>> "roman" prepend create-in ] keep
     1quotation '[ _ binary-roman-op ]
-    dup infer define-declared ;
+    complete-effect define-declared ;
 
 >>
 
-ROMAN-OP: +
-ROMAN-OP: -
-ROMAN-OP: *
-ROMAN-OP: /i
-ROMAN-OP: /mod
+ROMAN-OP: + ( x y -- z )
+ROMAN-OP: - ( x y -- z )
+ROMAN-OP: * ( x y -- z )
+ROMAN-OP: /i ( x y -- z )
+ROMAN-OP: /mod ( x y -- z w )
 
 SYNTAX: ROMAN: scan roman> suffix! ;

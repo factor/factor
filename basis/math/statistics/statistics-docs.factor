@@ -87,7 +87,6 @@ HELP: histogram
 HELP: histogram!
 { $values
     { "hashtable" hashtable } { "seq" sequence }
-    { "hashtable" hashtable }
 }
 { $examples 
     { $example "! Count the number of times the elements of two sequences appear."
@@ -128,7 +127,6 @@ HELP: sequence>assoc
 HELP: sequence>assoc!
 { $values
     { "assoc" assoc } { "seq" sequence } { "quot" quotation }
-    { "assoc" assoc }
 }
 { $examples 
     { $example "! Iterate over a sequence and add the counts to an existing assoc"
