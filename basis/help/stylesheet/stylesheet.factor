@@ -83,7 +83,7 @@ H{
 SYMBOL: output-style
 H{
     { font-style bold }
-    { foreground COLOR: dark-red }
+    { foreground COLOR: DarkOrange4 }
 } output-style set-global
 
 SYMBOL: url-style
