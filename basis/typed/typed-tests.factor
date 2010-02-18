@@ -14,8 +14,8 @@ TYPED: fix+ ( a: fixnum b: fixnum -- c: fixnum )
 most-positive-fixnum neg 1 - 1quotation
 [ most-positive-fixnum 1 fix+ ] unit-test
 
-TUPLE: tweedle-dee ;
-TUPLE: tweedle-dum ;
+TUPLE: tweedle-dee ; final
+TUPLE: tweedle-dum ; final
 
 TYPED: dee ( x: tweedle-dee -- y )
     drop \ tweedle-dee ;
@@ -39,11 +39,11 @@ TYPED:: f+locals ( a: float b: float -- c: float )
 
 TUPLE: unboxable
     { x fixnum read-only }
-    { y fixnum read-only } ;
+    { y fixnum read-only } ; final
 
 TUPLE: unboxable2
     { u unboxable read-only }
-    { xy fixnum read-only } ;
+    { xy fixnum read-only } ; final
 
 TYPED: unboxy ( in: unboxable -- out: unboxable2 )
     dup [ x>> ] [ y>> ] bi - unboxable2 boa ;
@@ -63,7 +63,7 @@ IN: typed.tests
 TUPLE: unboxable
     { x fixnum read-only }
     { y fixnum read-only }
-    { z float read-only } ;
+    { z float read-only } ; final
 """ eval( -- )
 
 """
@@ -79,12 +79,14 @@ TYPED: no-inputs ( -- out: integer )
 [ 1 ] [ no-inputs ] unit-test
 
 TUPLE: unboxable3
-    { x read-only } ;
+    { x read-only } ; final
 
 TYPED: no-inputs-unboxable-output ( -- out: unboxable3 )
     T{ unboxable3 } ;
 
 [ T{ unboxable3 } ] [ no-inputs-unboxable-output ] unit-test
+
+[ f ] [ no-inputs-unboxable-output no-inputs-unboxable-output eq? ] unit-test
 
 SYMBOL: buh
 
@@ -97,3 +99,26 @@ TYPED: no-outputs-unboxable-input ( x: unboxable3 -- )
     buh set ;
 
 [ T{ unboxable3 } ] [ T{ unboxable3 } no-outputs-unboxable-input buh get ] unit-test
+
+[ f ] [
+    T{ unboxable3 } no-outputs-unboxable-input buh get
+    T{ unboxable3 } no-outputs-unboxable-input buh get
+    eq?
+] unit-test
+
+! Reported by littledan
+TUPLE: superclass { x read-only } ;
+TUPLE: subclass < superclass { y read-only } ; final
+
+TYPED: unbox-fail ( a: superclass -- ? ) subclass? ;
+
+[ t ] [ subclass new unbox-fail ] unit-test
+
+! If a final class becomes non-final, typed words need to be recompiled
+TYPED: recompile-fail ( a: subclass -- ? ) buh get eq? ;
+
+[ f ] [ subclass new [ buh set ] [ recompile-fail ] bi ] unit-test
+
+[ ] [ "IN: typed.tests TUPLE: subclass < superclass { y read-only } ;" eval( -- ) ] unit-test
+
+[ t ] [ subclass new [ buh set ] [ recompile-fail ] bi ] unit-test

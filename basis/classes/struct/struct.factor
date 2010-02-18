@@ -32,8 +32,6 @@ TUPLE: struct-bit-slot-spec < struct-slot-spec
 PREDICATE: struct-class < tuple-class
     superclass \ struct eq? ;
 
-M: struct-class valid-superclass? drop f ;
-
 SLOT: fields
 
 : struct-slots ( struct-class -- slots )
@@ -273,7 +271,7 @@ M: struct binary-zero? >c-ptr [ 0 = ] all? ;
     [ type>> c-type drop ] each ;
 
 : redefine-struct-tuple-class ( class -- )
-    [ dup class? [ forget-class ] [ drop ] if ] [ struct f define-tuple-class ] bi ;
+    [ struct f define-tuple-class ] [ make-final ] bi ;
 
 :: (define-struct-class) ( class slots offsets-quot -- )
     slots empty? [ struct-must-have-slots ] when
