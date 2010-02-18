@@ -31,7 +31,7 @@ HELP: flatten
 { $description "Creates a sequence of all of the leaf nodes (non-sequence nodes, but including strings and numbers) in the object." } ;
 
 HELP: deep-map!
-{ $values { "obj" object } { "quot" { $quotation "( elt -- newelt )" } } { "obj" object } }
+{ $values { "obj" object } { "quot" { $quotation "( elt -- newelt )" } } }
 { $description "Modifies each sub-node of an object in place, in preorder, and returns that object." }
 { $see-also map! } ;
 

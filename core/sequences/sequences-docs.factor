@@ -296,7 +296,7 @@ $nl
 } ;
 
 HELP: accumulate!
-{ $values { "seq" sequence } { "identity" object } { "quot" { $quotation "( prev elt -- next )" } } { "final" "the final result" } { "seq" sequence } }
+{ $values { "seq" sequence } { "identity" object } { "quot" { $quotation "( prev elt -- next )" } } { "final" "the final result" } }
 { $description "Combines successive elements of the sequence using a binary operation, and outputs the original sequence of intermediate results, together with the final result."
 $nl
 "The first element of the new sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the old sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the old sequence."
@@ -344,7 +344,7 @@ HELP: change-nth
 { $side-effects "seq" } ;
 
 HELP: map!
-{ $values { "seq" "a mutable sequence" } { "quot" { $quotation "( old -- new )" } } { "seq" "a mutable sequence" } }
+{ $values { "seq" "a mutable sequence" } { "quot" { $quotation "( old -- new )" } } }
 { $description "Applies the quotation to each element yielding a new element, storing the new elements back in the original sequence. Returns the original sequence." }
 { $errors "Throws an error if the sequence is immutable, or the sequence cannot hold elements of the type output by " { $snippet "quot" } "." }
 { $side-effects "seq" } ;
@@ -442,7 +442,7 @@ HELP: filter-as
 { $description "Applies the quotation to each element in turn, and outputs a new sequence of the same type as " { $snippet "exemplar" } " containing the elements of the original sequence for which the quotation output a true value." } ;
 
 HELP: filter!
-{ $values { "seq" "a resizable mutable sequence" } { "quot" { $quotation "( elt -- ? )" } } { "seq" "a resizable mutable sequence" } }
+{ $values { "seq" "a resizable mutable sequence" } { "quot" { $quotation "( elt -- ? )" } } }
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a false value." }
 { $side-effects "seq" } ;
 
@@ -503,19 +503,19 @@ HELP: move
 { $side-effects "seq" } ;
 
 HELP: remove!
-{ $values { "elt" object } { "seq" "a resizable mutable sequence" } { "elt" object } }
+{ $values { "elt" object } { "seq" "a resizable mutable sequence" } }
 { $description "Removes all elements equal to " { $snippet "elt" } " from " { $snippet "seq" } " and returns " { $snippet "seq" } "." }
 { $notes "This word uses equality comparison (" { $link = } ")." }
 { $side-effects "seq" } ;
 
 HELP: remove-eq!
-{ $values { "elt" object } { "seq" "a resizable mutable sequence" } { "seq" "a resizable mutable sequence" } }
+{ $values { "elt" object } { "seq" "a resizable mutable sequence" } }
 { $description "Outputs a new sequence containing all elements of the input sequence except the given element." }
 { $notes "This word uses identity comparison (" { $link eq? } ")." }
 { $side-effects "seq" } ;
 
 HELP: remove-nth!
-{ $values { "n" "a non-negative integer" } { "seq" "a resizable mutable sequence" } { "seq" "a resizable mutable sequence" } }
+{ $values { "n" "a non-negative integer" } { "seq" "a resizable mutable sequence" } }
 { $description "Removes the " { $snippet "n" } "th element from the sequence, shifting all other elements down and reducing its length by one." }
 { $side-effects "seq" } ;
 
@@ -540,7 +540,7 @@ HELP: suffix
 } ;
 
 HELP: suffix!
-{ $values { "seq" sequence } { "elt" object } { "seq" sequence } }
+{ $values { "seq" sequence } { "elt" object } }
 { $description "Modifiers a sequence in-place by adding " { $snippet "elt" } " to the end of " { $snippet "seq" } ". Outputs " { $snippet "seq" } "." }
 { $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq" } "." }
 { $examples
@@ -548,7 +548,7 @@ HELP: suffix!
 } ;
 
 HELP: append!
-{ $values { "seq1" sequence } { "seq2" sequence } { "seq1" sequence } }
+{ $values { "seq1" sequence } { "seq2" sequence } }
 { $description "Modifiers " { $snippet "seq1" } " in-place by adding the elements from " { $snippet "seq2" } " to the end and outputs " { $snippet "seq1" } "." }
 { $examples
     { $example "USING: prettyprint sequences ;" "V{ 1 2 3 } { 4 5 6 } append! ." "V{ 1 2 3 4 5 6 }" }
@@ -996,7 +996,7 @@ HELP: count
 HELP: selector
 { $values
      { "quot" "a predicate quotation" }
-     { "quot" quotation } { "accum" vector } }
+     { "selector" quotation } { "accum" vector } }
 { $description "Creates a new vector to accumulate the values which return true for a predicate.  Returns a new quotation which accepts an object to be tested and stored in the collector if the test yields true. The collector is left on the stack for convenience." }
 { $example "! Find all the even numbers:" "USING: prettyprint sequences math kernel ;"
            "10 iota [ even? ] selector [ each ] dip ."
@@ -1202,7 +1202,7 @@ HELP: 2map-reduce
 HELP: 2selector
 { $values
      { "quot" quotation }
-     { "quot" quotation } { "accum1" vector } { "accum2" vector } }
+     { "selector" quotation } { "accum1" vector } { "accum2" vector } }
 { $description "Creates two new vectors to accumultate values based on a predicate. The first vector accumulates values for which the predicate yields true; the second for false." } ;
 
 HELP: 2reverse-each
@@ -1323,8 +1323,7 @@ HELP: sequence-hashcode-step
 
 HELP: short
 { $values
-     { "seq" sequence } { "n" integer }
-     { "seq" sequence } { "n'" integer } }
+     { "seq" sequence } { "n" integer } { "n'" integer } }
 { $description "Returns the input sequence and its length or " { $snippet "n" } ", whichever is less." }
 { $examples { $example "USING: sequences kernel prettyprint ;"
     "\"abcd\" 3 short [ . ] bi@"

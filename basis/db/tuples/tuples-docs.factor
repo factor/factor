@@ -51,7 +51,7 @@ HELP: <insert-user-assigned-statement>
 HELP: <select-by-slots-statement>
 { $values
      { "tuple" tuple } { "class" class }
-     { "tuple" tuple } }
+     { "statement" tuple } }
 { $description "A database-specific hook for generating the SQL for a select statement." } ;
 
 HELP: <update-tuple-statement>

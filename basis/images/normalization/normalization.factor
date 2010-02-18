@@ -55,7 +55,7 @@ M: ushort-components normalize-component-type*
 M: ubyte-components normalize-component-type*
     drop ;
 
-: normalize-scan-line-order ( image -- image )
+: normalize-scan-line-order ( image -- image' )
     dup upside-down?>> [
         dup dim>> first 4 * '[
             _ <groups> reverse concat
@@ -71,14 +71,14 @@ M: ubyte-components normalize-component-type*
 
 PRIVATE>
 
-: reorder-components ( image component-order -- image )
+: reorder-components ( image component-order -- image' )
     [
         dup component-type>> '[ _ normalize-component-type* ] change-bitmap
         dup component-order>>
     ] dip
     validate-request [ (reorder-components) ] keep >>component-order ;
 
-: normalize-image ( image -- image )
+: normalize-image ( image -- image' )
     [ >byte-array ] change-bitmap
     RGBA reorder-components
     normalize-scan-line-order ;
