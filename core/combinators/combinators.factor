@@ -5,6 +5,10 @@ kernel kernel.private math assocs quotations vectors
 hashtables sorting words sets math.order make ;
 IN: combinators
 
+! Most of these combinators have compile-time expansions in
+! the optimizing compiler. See stack-checker.transforms and
+! compiler.tree.propagation.call-effect
+
 <PRIVATE
 
 : call-effect-unsafe ( quot effect -- ) drop call ;
@@ -17,7 +21,7 @@ M: object throw
 
 PRIVATE>
 
-ERROR: wrong-values quot effect ;
+ERROR: wrong-values quot call-site ;
 
 ! We can't USE: effects here so we forward reference slots instead
 SLOT: in

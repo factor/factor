@@ -80,8 +80,11 @@ H{
     { wrap-margin f }
 } code-style set-global
 
-SYMBOL: input-style
-H{ { font-style bold } } input-style set-global
+SYMBOL: output-style
+H{
+    { font-style bold }
+    { foreground COLOR: dark-red }
+} output-style set-global
 
 SYMBOL: url-style
 H{

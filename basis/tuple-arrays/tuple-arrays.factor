@@ -1,10 +1,12 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.smart fry functors kernel
 kernel.private macros sequences combinators sequences.private
-stack-checker parser math classes.tuple.private ;
+stack-checker parser math classes.tuple classes.tuple.private ;
 FROM: inverse => undo ;
 IN: tuple-arrays
+
+ERROR: not-final class ;
 
 <PRIVATE
 
@@ -29,6 +31,13 @@ MACRO: write-tuple ( class -- quot )
     [ tuple-arity iota <reversed> [ '[ [ _ ] dip set-nth-unsafe ] ] map '[ _ cleave ] ]
     bi '[ _ dip @ ] ;
 
+: check-final ( class -- )
+    {
+        { [ dup tuple-class? not ] [ not-a-tuple ] }
+        { [ dup final-class? not ] [ not-final ] }
+        [ drop ]
+    } cond ;
+
 PRIVATE>
 
 FUNCTOR: define-tuple-array ( CLASS -- )
@@ -42,6 +51,8 @@ CLASS-array? IS ${CLASS-array}?
 >CLASS-array DEFINES >${CLASS}-array
 
 WHERE
+
+CLASS check-final
 
 TUPLE: CLASS-array
 { seq array read-only }
