@@ -103,7 +103,7 @@ PRIVATE>
         ] }
         [
             [ trim-tail-separators ]
-            [ trim-head-separators ] bi* path-separator glue
+            [ trim-head-separators ] bi* "/" glue
         ]
     } cond ;
 
