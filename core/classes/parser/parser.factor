@@ -8,8 +8,9 @@ IN: classes.parser
 
 : create-class-in ( string -- word )
     current-vocab create
+    dup set-word
     dup save-class-location
-    dup create-predicate-word dup set-word save-location ;
+    dup create-predicate-word save-location ;
 
 : CREATE-CLASS ( -- word )
     scan create-class-in ;
