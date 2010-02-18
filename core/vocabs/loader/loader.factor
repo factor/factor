@@ -42,7 +42,7 @@ PRIVATE>
 : vocab-dir+ ( vocab str/f -- path )
     [ vocab-name "." split ] dip
     [ [ dup last ] dip append suffix ] when*
-    path-separator join ;
+    "/" join ;
 
 : find-vocab-root ( vocab -- path/f )
     vocab-name dup root-cache get at
