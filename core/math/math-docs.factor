@@ -212,7 +212,7 @@ HELP: recip
 HELP: rem
 { $values { "x" rational } { "y" rational } { "z" rational } }
 { $description
-    "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder always positive."
+    "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder always positive or zero."
     { $list 
         "Given fixnums, always yields a fixnum."
         "Given bignums, always yields a bignum."
