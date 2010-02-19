@@ -4,6 +4,7 @@ USING: assocs accessors classes classes.algebra fry generic
 kernel math namespaces sequences words sets
 combinators.short-circuit classes.tuple ;
 FROM: classes.tuple.private => tuple-layout ;
+FROM: assocs => change-at ;
 IN: stack-checker.dependencies
 
 ! Words that the current quotation depends on
