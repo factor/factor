@@ -1,4 +1,4 @@
-! Copyright (c) 2007-2009 Aaron Schaefer.
+! Copyright (c) 2007-2010 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel lists make math math.functions math.matrices
     math.primes.miller-rabin math.order math.parser math.primes.factors
@@ -19,7 +19,7 @@ IN: project-euler.common
 ! mediant - #71, #73
 ! nth-prime - #7, #69
 ! nth-triangle - #12, #42
-! number>digits - #16, #20, #30, #34, #35, #38, #43, #52, #55, #56, #92
+! number>digits - #16, #20, #30, #34, #35, #38, #43, #52, #55, #56, #92, #206
 ! palindrome? - #4, #36, #55
 ! pandigital? - #32, #38
 ! pentagonal? - #44, #45
