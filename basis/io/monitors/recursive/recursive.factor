@@ -41,7 +41,7 @@ DEFER: add-child-monitor
 
 M: recursive-monitor dispose*
     [ "stop" swap thread>> send-synchronous drop ]
-    [ queue>> dispose ]
+    [ call-next-method ]
     bi ;
 
 : stop-pump ( -- )
