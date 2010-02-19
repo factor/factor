@@ -38,12 +38,9 @@ ARTICLE: "prettyprint-variables" "Prettyprint control variables"
     boa-tuples?
     c-object-pointers?
 }
-"Note that the " { $link short. } " and " { $link pprint-short } " variables override some of these variables."
-{
-    $warning "Treat the global variables as essentially being constants. Only ever rebind them in a nested scope."
-    $nl
-    "Some of the globals are safe to change, like the tab size and wrap margin. However setting limits globally could break code which uses the prettyprinter as a serialization mechanism."
-} ;
+"The default limits are meant to strike a balance between readability, and not producing too much output when large structures are given. There are two combinators that override the defaults:"
+{ $subsections with-short-limits without-limits }
+"That the " { $link short. } " and " { $link pprint-short } " words wrap calls to " { $link . } " and " { $link pprint } " in " { $link with-short-limits } ". Code that uses the prettyprinter for serialization should use " { $link without-limits } " to avoid producing unreadable output." ;
 
 ARTICLE: "prettyprint-limitations" "Prettyprinter limitations"
 "When using the prettyprinter as a serialization mechanism, keep the following points in mind:"
