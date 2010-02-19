@@ -71,7 +71,7 @@ M: word crossref-def
 
 : defs-to-crossref ( -- seq )
     [
-        all-words
+        all-words [ generic? not ] filter
         all-articles [ >link ] map
         source-files get keys [ <pathname> ] map
     ] append-outputs ;
