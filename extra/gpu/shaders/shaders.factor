@@ -2,9 +2,9 @@
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs byte-arrays classes.mixin classes.parser
 classes.singleton classes.struct combinators combinators.short-circuit
-definitions destructors fry generic.parser gpu gpu.buffers hashtables
-images io.encodings.ascii io.files io.pathnames kernel lexer
-literals locals math math.parser memoize multiline namespaces
+definitions destructors fry generic.parser gpu gpu.buffers gpu.private
+gpu.state hashtables images io.encodings.ascii io.files io.pathnames
+kernel lexer literals locals math math.parser memoize multiline namespaces
 opengl opengl.gl opengl.shaders parser quotations sequences
 specialized-arrays splitting strings tr ui.gadgets.worlds
 variants vectors vocabs vocabs.loader vocabs.parser words
@@ -319,11 +319,18 @@ SYNTAX: VERTEX-FORMAT:
 SYNTAX: VERTEX-STRUCT:
     CREATE-CLASS scan-word define-vertex-struct ;
 
-TUPLE: vertex-array < gpu-object
+TUPLE: vertex-array-object < gpu-object
     { program-instance program-instance read-only }
     { vertex-buffers sequence read-only } ;
 
-M: vertex-array dispose
+TUPLE: vertex-array-collection
+    { vertex-formats sequence read-only }
+    { program-instance program-instance read-only } ;
+
+UNION: vertex-array
+    vertex-array-object vertex-array-collection ;
+
+M: vertex-array-object dispose
     [ [ delete-vertex-array ] when* f ] change-handle drop ;
 
 : ?>buffer-ptr ( buffer/ptr -- buffer-ptr )
@@ -331,26 +338,73 @@ M: vertex-array dispose
 : ?>buffer ( buffer/ptr -- buffer )
     dup buffer? [ buffer>> ] unless ; inline
 
-:: <multi-vertex-array> ( vertex-formats program-instance -- vertex-array )
+<PRIVATE
+
+: normalize-vertex-formats ( vertex-formats -- vertex-formats' )
+    [ first2 [ ?>buffer-ptr ] dip 2array ] map ; inline
+
+: (bind-vertex-array) ( vertex-formats program-instance -- )
+    '[ _ swap first2 bind-vertex-format ] each ; inline
+
+: (reset-vertex-array) ( -- )
+    GL_MAX_VERTEX_ATTRIBS get-gl-int iota [ glDisableVertexAttribArray ] each ; inline
+
+:: <multi-vertex-array-object> ( vertex-formats program-instance -- vertex-array )
     gen-vertex-array :> handle
     handle glBindVertexArray
 
-    vertex-formats [ program-instance swap first2 [ ?>buffer-ptr ] dip bind-vertex-format ] each
-    handle program-instance vertex-formats [ first ?>buffer ] map
-    vertex-array boa window-resource ; inline
+    vertex-formats normalize-vertex-formats program-instance (bind-vertex-array)
 
-:: <vertex-array*> ( vertex-buffer program-instance format -- vertex-array )
+    handle program-instance vertex-formats [ first ?>buffer ] map
+    vertex-array-object boa window-resource ; inline
+
+: <multi-vertex-array-collection> ( vertex-formats program-instance -- vertex-array )
+    [ normalize-vertex-formats ] dip vertex-array-collection boa ; inline
+
+:: <vertex-array-object> ( vertex-buffer program-instance format -- vertex-array )
     gen-vertex-array :> handle
     handle glBindVertexArray
     program-instance vertex-buffer ?>buffer-ptr format bind-vertex-format
     handle program-instance vertex-buffer ?>buffer 1array
-    vertex-array boa window-resource ; inline
+    vertex-array-object boa window-resource ; inline
+
+: <vertex-array-collection> ( vertex-buffer program-instance format -- vertex-array )
+    swap [ [ ?>buffer-ptr ] dip 2array 1array ] dip <multi-vertex-array-collection> ; inline
+
+PRIVATE>
+
+GENERIC: bind-vertex-array ( vertex-array -- )
+
+M: vertex-array-object bind-vertex-array
+    handle>> glBindVertexArray ; inline
+
+M: vertex-array-collection bind-vertex-array
+    (reset-vertex-array)
+    [ vertex-formats>> ] [ program-instance>> ] bi (bind-vertex-array) ; inline
+
+: <multi-vertex-array> ( vertex-formats program-instance -- vertex-array )
+    has-vertex-array-objects? get
+    [ <multi-vertex-array-object> ]
+    [ <multi-vertex-array-collection> ] if ; inline
+    
+: <vertex-array*> ( vertex-buffer program-instance format -- vertex-array )
+    has-vertex-array-objects? get
+    [ <vertex-array-object> ]
+    [ <vertex-array-collection> ] if ; inline
 
 : <vertex-array> ( vertex-buffer program-instance -- vertex-array )
     dup program>> vertex-formats>> first <vertex-array*> ; inline
 
-TYPED: vertex-array-buffer ( vertex-array: vertex-array -- vertex-buffer: buffer )
-    vertex-buffers>> first ;
+GENERIC: vertex-array-buffers ( vertex-array -- buffers )
+
+M: vertex-array-object vertex-array-buffers
+    vertex-buffers>> ; inline
+
+M: vertex-array-collection vertex-array-buffers
+    vertex-formats>> [ first buffer>> ] map ; inline
+
+: vertex-array-buffer ( vertex-array: vertex-array -- vertex-buffer: buffer )
+    vertex-array-buffers first ; inline
 
 TUPLE: compile-shader-error shader log ;
 TUPLE: link-program-error program log ;

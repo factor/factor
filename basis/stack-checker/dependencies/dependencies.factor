@@ -1,8 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs accessors classes.algebra fry generic kernel math
-namespaces sequences words sets combinators.short-circuit ;
+USING: assocs accessors classes classes.algebra fry generic
+kernel math namespaces sequences words sets
+combinators.short-circuit classes.tuple ;
 FROM: classes.tuple.private => tuple-layout ;
+FROM: assocs => change-at ;
 IN: stack-checker.dependencies
 
 ! Words that the current quotation depends on
@@ -56,28 +58,26 @@ GENERIC: satisfied? ( dependency -- ? )
     boa conditional-dependencies get
     dup [ conjoin ] [ 2drop ] if ; inline
 
-TUPLE: depends-on-class<= class1 class2 ;
+TUPLE: depends-on-class-predicate class1 class2 result ;
 
-: depends-on-class<= ( class1 class2 -- )
-    \ depends-on-class<= add-conditional-dependency ;
+: depends-on-class-predicate ( class1 class2 result -- )
+    \ depends-on-class-predicate add-conditional-dependency ;
 
-M: depends-on-class<= satisfied?
+M: depends-on-class-predicate satisfied?
     {
-        [ class1>> classoid? ]
-        [ class2>> classoid? ]
-        [ [ class1>> ] [ class2>> ] bi class<= ]
+        [ [ class1>> classoid? ] [ class2>> classoid? ] bi and ]
+        [ [ [ class1>> ] [ class2>> ] bi compare-classes ] [ result>> ] bi eq? ]
     } 1&& ;
 
-TUPLE: depends-on-classes-disjoint class1 class2 ;
+TUPLE: depends-on-instance-predicate object class result ;
 
-: depends-on-classes-disjoint ( class1 class2 -- )
-    \ depends-on-classes-disjoint add-conditional-dependency ;
+: depends-on-instance-predicate ( object class result -- )
+    \ depends-on-instance-predicate add-conditional-dependency ;
 
-M: depends-on-classes-disjoint satisfied?
+M: depends-on-instance-predicate satisfied?
     {
-        [ class1>> classoid? ]
-        [ class2>> classoid? ]
-        [ [ class1>> ] [ class2>> ] bi classes-intersect? not ]
+        [ class>> classoid? ]
+        [ [ [ object>> ] [ class>> ] bi instance? ] [ result>> ] bi eq? ]
     } 1&& ;
 
 TUPLE: depends-on-next-method class generic next-method ;
@@ -121,6 +121,15 @@ TUPLE: depends-on-flushable word ;
 
 M: depends-on-flushable satisfied?
     word>> flushable? ;
+
+TUPLE: depends-on-final class ;
+
+: depends-on-final ( word -- )
+    [ depends-on-conditionally ]
+    [ \ depends-on-final add-conditional-dependency ] bi ;
+
+M: depends-on-final satisfied?
+    class>> final-class? ;
 
 : init-dependencies ( -- )
     H{ } clone dependencies set

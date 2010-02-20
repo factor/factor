@@ -167,14 +167,23 @@ HELP: vertex-shader
 { $class-description "This " { $link shader-kind } " indicates that a " { $link shader } " is a vertex shader." } ;
 
 HELP: vertex-array
-{ $class-description "A " { $snippet "vertex-array" } " object associates a shader " { $link program-instance } " with vertex attribute data from one or more " { $link buffer } "s. The format of the binary data inside these buffers is described using " { $link vertex-format } "s. " { $snippet "vertex-array" } "s are constructed using the " { $link <multi-vertex-array> } " or " { $link <vertex-array*> } " words." } ;
+{ $class-description "A " { $snippet "vertex-array" } " object associates a shader " { $link program-instance } " with vertex attribute data from one or more " { $link buffer } "s. The format of the binary data inside these buffers is described using " { $link vertex-format } "s. " { $snippet "vertex-array" } "s are constructed using the " { $link <multi-vertex-array> } " or " { $link <vertex-array*> } " words. The actual type of a vertex-array object is opaque, but the " { $link vertex-array-buffers } " word can be used to query a vertex array object for its component buffers." } ;
+
+HELP: vertex-array-buffers
+{ $values
+    { "vertex-array" vertex-array }
+    { "buffers" sequence }
+}
+{ $description "Returns a sequence containing all of the " { $link buffer } " objects that make up " { $snippet "vertex-array" } "." } ;
 
 HELP: vertex-array-buffer
 { $values
     { "vertex-array" vertex-array }
     { "vertex-buffer" buffer }
 }
-{ $description "Returns the first " { $link buffer } " object comprised in " { $snippet "vertex-array" } "." } ;
+{ $description "Returns the first " { $link buffer } " object that makes up " { $snippet "vertex-array" } "." } ;
+
+{ vertex-array-buffer vertex-array-buffers } related-words
 
 HELP: vertex-attribute
 { $class-description "This tuple type is passed to " { $link define-vertex-format } " to define a new " { $link vertex-format } " type." } ;
@@ -204,7 +213,8 @@ ARTICLE: "gpu.shaders" "Shader objects"
 { $subsections
     vertex-array
     <multi-vertex-array>
-    vertex-array
+    <vertex-array*>
+    <vertex-array>
     POSTPONE: VERTEX-FORMAT:
 } ;
 

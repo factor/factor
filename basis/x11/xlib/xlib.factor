@@ -284,6 +284,11 @@ X-FUNCTION: int XConvertSelection ( Display* display, Atom selection, Atom targe
 X-FUNCTION: Pixmap XCreatePixmap ( Display* display, Drawable d, uint width, uint height, uint depth ) ;
 X-FUNCTION: int XFreePixmap ( Display* display, Pixmap pixmap ) ;
 
+! 5.2 - Creating, Recoloring, and Freeing Cursors
+
+C-TYPE: XColor
+X-FUNCTION: Cursor XCreatePixmapCursor ( Display* display, Pixmap source, Pixmap mask, XColor* foreground_color, XColor* background_color, uint x, uint y ) ;
+X-FUNCTION: int XFreeCursor ( Display* display, Cursor cursor ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 6 - Color Management Functions
@@ -1096,6 +1101,7 @@ X-FUNCTION: int XGrabPointer (
 X-FUNCTION: Status XUngrabPointer ( Display* display, Time time ) ;
 X-FUNCTION: Status XChangeActivePointerGrab ( Display* display, uint event_mask, Cursor cursor, Time time ) ;
 X-FUNCTION: Status XGrabKey ( Display* display, int keycode, uint modifiers, Window grab_window, Bool owner_events, int pointer_mode, int keyboard_mode ) ;
+X-FUNCTION: int XGrabKeyboard ( Display* display, Window grab_window, Bool owner_events, int pointer_mode, int keyboard_mode, Time time ) ;
 X-FUNCTION: Status XSetInputFocus ( Display* display, Window focus, int revert_to, Time time ) ;
 
 X-FUNCTION: Status XGetInputFocus ( Display* display,
@@ -1209,6 +1215,14 @@ STRUCT: XVisualInfo
         { blue_mask ulong }
         { colormap_size int }
         { bits_per_rgb int } ;
+
+! 16.9 Manipulating Bitmaps
+X-FUNCTION: Pixmap XCreateBitmapFromData (
+    Display* display,
+    Drawable d,
+    char* data,
+    uint width,
+    uint height ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Appendix D - Compatibility Functions

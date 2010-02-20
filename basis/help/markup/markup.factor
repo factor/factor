@@ -129,8 +129,8 @@ ALIAS: $slot $snippet
     "Examples" $heading print-element ;
 
 : $example ( element -- )
-    1 cut* swap "\n" join dup <input> [
-        input-style get format nl print-element
+    1 cut* [ "\n" join ] bi@ over <input> [
+        [ print ] [ output-style get format ] bi*
     ] ($code) ;
 
 : $unchecked-example ( element -- )
