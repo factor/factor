@@ -144,7 +144,7 @@ HELP: lcomp
 { $description "Get the cartesian product of the lists in " { $snippet "list" } " and call " { $snippet "quot" } " call with each element from the cartesian product on the stack, the result of which is returned in the final " { $snippet "list" } "." } ;
 
 HELP: lcomp*
-{ $values { "list" "a list of lists" } { "guards" "a sequence of quotations with stack effect ( seq -- bool )" } { "quot" { $quotation "( seq -- X )" } } { "list" "the resulting list" } { "result" "a list" } }
+{ $values { "list" "a list of lists" } { "guards" "a sequence of quotations with stack effect ( seq -- bool )" } { "quot" { $quotation "( seq -- X )" } } { "result" "a list" } }
 { $description "Get the cartesian product of the lists in " { $snippet "list" } ", filter it by applying each guard quotation to it and call " { $snippet "quot" } " call with each element from the remaining cartesian product items on the stack, the result of which is returned in the final " { $snippet "list" } "." }
 { $examples
   { $code "{ 1 2 3 } >list { 4 5 6 } >list 2list { [ first odd? ] } [ first2 + ] lcomp*" }

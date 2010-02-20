@@ -13,26 +13,26 @@ IN: math.transforms.fft
 : omega ( n -- n' )
     recip -2 pi i* * * exp ;
 
-: twiddle ( seq -- seq )
+: twiddle ( seq -- seq' )
     dup length [ omega ] [ n^v ] bi v* ;
 
 PRIVATE>
 
 DEFER: fft
 
-: two ( seq -- seq )
+: two ( seq -- seq' )
     fft 2 v/n dup append ;
 
 <PRIVATE
 
-: even ( seq -- seq ) 2 group 0 <column> ;
-: odd ( seq -- seq ) 2 group 1 <column> ;
+: even ( seq -- seq' ) 2 group 0 <column> ;
+: odd ( seq -- seq' ) 2 group 1 <column> ;
 
-: (fft) ( seq -- seq )
+: (fft) ( seq -- seq' )
     [ odd two twiddle ] [ even two ] bi v+ ;
 
 PRIVATE>
 
-: fft ( seq -- seq )
+: fft ( seq -- seq' )
     dup length 1 = [ (fft) ] unless ;
 

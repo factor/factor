@@ -75,7 +75,7 @@ HELP: with-system-random
 HELP: randomize
 { $values
      { "seq" sequence }
-     { "seq" sequence }
+     { "randomized" sequence }
 }
 { $description "Randomizes a sequence in-place with the Fisher-Yates algorithm and returns the sequence." } ;
 

@@ -172,7 +172,7 @@ HELP: vertex-array
 HELP: vertex-array-buffers
 { $values
     { "vertex-array" vertex-array }
-    { "vertex-buffer" buffer }
+    { "buffers" sequence }
 }
 { $description "Returns a sequence containing all of the " { $link buffer } " objects that make up " { $snippet "vertex-array" } "." } ;
 
