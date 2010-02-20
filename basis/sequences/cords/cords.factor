@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sequences sorting binary-search fry math
 math.order arrays classes combinators kernel functors math.functions
@@ -8,7 +8,7 @@ IN: sequences.cords
 MIXIN: cord
 
 TUPLE: generic-cord
-    { head read-only } { tail read-only } ;
+    { head read-only } { tail read-only } ; final
 INSTANCE: generic-cord cord
 
 M: cord length
@@ -34,7 +34,7 @@ T-cord DEFINES-CLASS ${C}
 WHERE
 
 TUPLE: T-cord
-    { head T read-only } { tail T read-only } ;
+    { head T read-only } { tail T read-only } ; final
 INSTANCE: T-cord cord
 
 M: T cord-append

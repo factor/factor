@@ -339,7 +339,7 @@ IN: parser.tests
 ] unit-test
 
 [ t ] [
-    "foo?" "parser.tests" lookup word eq?
+    "foo" "parser.tests" lookup word eq?
 ] unit-test
 
 [ ] [

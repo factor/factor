@@ -149,6 +149,9 @@ C: <condition> condition ( error restarts cc -- condition )
 : rethrow-restarts ( error restarts -- restart )
     [ <condition> rethrow ] callcc1 2nip ;
 
+: throw-continue ( error -- )
+    { { "Continue" t } } throw-restarts drop ;
+
 TUPLE: restart name obj continuation ;
 
 C: <restart> restart

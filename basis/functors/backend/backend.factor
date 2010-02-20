@@ -1,6 +1,6 @@
 USING: accessors arrays assocs generic.standard kernel
 lexer locals.types namespaces parser quotations vocabs.parser
-words ;
+words classes.tuple ;
 IN: functors.backend
 
 DEFER: functor-words
@@ -27,7 +27,11 @@ SYNTAX: FUNCTOR-SYNTAX:
 
 : define* ( word def -- ) over set-word define ;
 
-: define-declared* ( word def effect -- ) pick set-word define-declared ;
+: define-declared* ( word def effect -- )
+    pick set-word define-declared ;
 
-: define-simple-generic* ( word effect -- ) over set-word define-simple-generic ;
+: define-simple-generic* ( word effect -- )
+    over set-word define-simple-generic ;
 
+: define-tuple-class* ( class superclass slots -- )
+    pick set-word define-tuple-class ;

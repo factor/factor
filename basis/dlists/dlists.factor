@@ -157,7 +157,7 @@ M: dlist clear-deque ( dlist -- )
 
 : 1dlist ( obj -- dlist ) <dlist> [ push-front ] keep ;
 
-: dlist-filter ( dlist quot -- dlist )
+: dlist-filter ( dlist quot -- dlist' )
     over [ '[ dup obj>> @ [ drop ] [ _ delete-node ] if ] dlist-each-node ] keep ; inline
 
 M: dlist clone
