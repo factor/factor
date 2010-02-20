@@ -4,6 +4,9 @@ USING: alien.c-types alien.syntax arrays kernel game.input namespaces
 classes bit-arrays sequences vectors x11 x11.xlib ;
 IN: game.input.linux
 
+LIBRARY: xlib
+FUNCTION: int XQueryKeymap ( Display* display, char[32] keys_return ) ;
+
 SINGLETON: linux-game-input-backend
 
 linux-game-input-backend game-input-backend set-global
@@ -74,9 +77,9 @@ CONSTANT: x>hid-bit-order {
 }
      
 : x-bits>hid-bits ( bit-array -- bit-array )
-        256 iota [ 2array ] 2map [ first ] filter [ second ] map
-        x>hid-bit-order [ nth ] with map
-        ?{ } swap [ t swap pick set-nth ] each ;
+        256 iota [ 2array ] { } 2map-as [ first ] filter [ second ] map
+        x>hid-bit-order [ nth ] curry map
+        256 <bit-array> swap [ t swap pick set-nth ] each ;
         
 M: linux-game-input-backend read-keyboard
         dpy get 256 <bit-array> [ XQueryKeymap drop ] keep
