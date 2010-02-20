@@ -100,19 +100,24 @@ ERROR: bad-platform name ;
     [ [ name>> ] map ] dip
     dup vocab-platforms-path set-vocab-file-contents ;
 
-: supported-platform? ( vocab -- ? )
-    vocab-platforms [ t ] [ [ os swap class<= ] any? ] if-empty ;
+: supported-platform? ( platforms -- ? )
+    [ t ] [ [ os swap class<= ] any? ] if-empty ;
 
 : unportable? ( vocab -- ? )
     {
         [ vocab-tags "untested" swap member? ]
-        [ supported-platform? not ]
+        [ vocab-platforms supported-platform? not ]
     } 1|| ;
 
-ERROR: unsupported-platform vocab ;
+TUPLE: unsupported-platform vocab requires ;
+
+: unsupported-platform ( vocab requires -- )
+    \ unsupported-platform boa throw-continue ;
 
 M: unsupported-platform summary
     drop "Current operating system not supported by this vocabulary" ;
 
-[ dup supported-platform? [ drop ] [ vocab-name unsupported-platform ] if ]
-check-vocab-hook set-global
+[
+    dup vocab-platforms dup supported-platform?
+    [ 2drop ] [ [ vocab-name ] dip unsupported-platform ] if
+] check-vocab-hook set-global
