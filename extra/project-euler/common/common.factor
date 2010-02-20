@@ -92,6 +92,9 @@ PRIVATE>
         [ [ 10 * ] [ 1 + ] bi* ] while 2nip
     ] if-zero ;
 
+: nth-place ( x n -- y )
+    10^ [ * round >integer ] keep /f ;
+
 : nth-prime ( n -- n )
     1 - lprimes lnth ;
 
