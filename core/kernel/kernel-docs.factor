@@ -708,7 +708,7 @@ HELP: 3curry
 { $notes "This operation is efficient and does not copy the quotation." } ;
 
 HELP: with
-{ $values { "param" object } { "obj" object } { "quot" { $quotation "( param elt -- ... )" } } { "obj" object } { "curry" curry } }
+{ $values { "param" object } { "obj" object } { "quot" { $quotation "( param elt -- ... )" } } { "curry" curry } }
 { $description "Partial application on the left. The following two lines are equivalent:"
     { $code "swap [ swap A ] curry B" }
     { $code "[ A ] with B" }

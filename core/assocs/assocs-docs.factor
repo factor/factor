@@ -221,7 +221,7 @@ HELP: assoc-size
 
 HELP: assoc-like
 { $values { "assoc" assoc } { "exemplar" assoc } { "newassoc" "a new assoc" } }
-{ $contract "Creates a new assoc having the same entries as  "{ $snippet "assoc" } " and the same type as " { $snippet "exemplar" } "." } ;
+{ $contract "Creates a new assoc having the same entries as " { $snippet "assoc" } " and the same type as " { $snippet "exemplar" } "." } ;
 
 HELP: assoc-empty?
 { $values { "assoc" assoc } { "?" "a boolean" } }
@@ -383,7 +383,7 @@ HELP: cache
 { $side-effects "assoc" } ;
 
 HELP: 2cache
-{ $values { "key1" "a key" } { "key2" "a key" } { "assoc" assoc } { "quot" { $quotation "( key -- value )" } } { "value" "a previously-retained or freshly-computed value" } }
+{ $values { "key1" "a key" } { "key2" "a key" } { "assoc" assoc } { "quot" { $quotation "( key1 key2 -- value )" } } { "value" "a previously-retained or freshly-computed value" } }
 { $description "If a single key composed of the input keys is present in the assoc, outputs the associated value, otherwise calls the quotation to produce a value and stores the keys/value pair into the assoc. Returns the value stored in the assoc. Returns a value either looked up or newly stored in the assoc." }
 { $side-effects "assoc" } ;
 
@@ -432,7 +432,7 @@ HELP: assoc-combine
 
 HELP: assoc-map-as
 { $values
-     { "assoc" assoc } { "quot" quotation } { "exemplar" assoc }
+     { "assoc" assoc } { "quot" { $quotation "( key value -- newkey newvalue )" } } { "exemplar" assoc }
      { "newassoc" assoc } }
 { $description "Applies the quotation to each entry in the input assoc and collects the results in a new assoc of the stame type as the exemplar." }
 { $examples { $example "USING: prettyprint assocs hashtables math ;" " H{ { 1 2 } { 3 4 } } [ sq ] { } assoc-map-as ." "{ { 1 4 } { 3 16 } }" } } ;

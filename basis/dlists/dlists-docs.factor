@@ -48,7 +48,7 @@ HELP: dlist-find
 } ;
 
 HELP: dlist-filter
-{ $values { "dlist" { $link dlist } } { "quot" quotation } { "dlist" { $link dlist } } }
+{ $values { "dlist" { $link dlist } } { "quot" quotation } { "dlist'" { $link dlist } } }
 { $description "Applies the quotation to each element of the " { $link dlist } " in turn, removing the corresponding nodes if the quotation returns " { $link f } "." }
 { $side-effects { "dlist" } } ;
 

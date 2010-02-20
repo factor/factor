@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2010 Joe Groff, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators kernel locals math math.functions
 math.libm math.order math.vectors sequences ;
@@ -35,10 +35,10 @@ M: object qconjugate ( u -- u' )
 : q/ ( u v -- u/v )
     qrecip q* ; inline
 
-: n*q ( q n -- q )
+: n*q ( q n -- r )
     v*n ; inline
 
-: q*n ( q n -- q )
+: q*n ( q n -- r )
     v*n ; inline
 
 : n>q ( n -- q )
