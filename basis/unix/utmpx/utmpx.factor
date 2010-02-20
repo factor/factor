@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data alien.syntax combinators
 continuations io.encodings.string io.encodings.utf8 kernel
-sequences strings unix calendar system accessors unix.time
-calendar.unix vocabs.loader classes.struct ;
+sequences strings calendar system accessors unix unix.time
+unix.ffi calendar.unix vocabs.loader classes.struct ;
 IN: unix.utmpx
 
 CONSTANT: EMPTY 0
@@ -18,6 +18,8 @@ CONSTANT: DEAD_PROCESS 8
 CONSTANT: ACCOUNTING 9
 CONSTANT: SIGNATURE 10
 CONSTANT: SHUTDOWN_TIME 11
+
+C-TYPE: utmpx
 
 FUNCTION: void setutxent ( ) ;
 FUNCTION: void endutxent ( ) ;
