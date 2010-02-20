@@ -20,7 +20,6 @@ HELP: tiff-lzw-uncompress
 
 HELP: lzw-read
 { $values
-    { "lzw" lzw }
     { "lzw" lzw } { "n" integer }
 }
 { $description "Read the next LZW code." } ;
@@ -47,7 +46,6 @@ HELP: code-space-full?
 
 HELP: reset-lzw-uncompress
 { $values
-    { "lzw" lzw }
     { "lzw" lzw }
 }
 { $description "Reset the LZW uncompressor state (either at initialization time or immediately after receiving a Clear Code). " } ;

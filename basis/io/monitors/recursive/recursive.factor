@@ -39,17 +39,19 @@ DEFER: add-child-monitor
 : remove-child-monitor ( monitor -- )
     monitor tget children>> delete-at* [ dispose ] [ drop ] if ;
 
+SYMBOL: +stop+
+
 M: recursive-monitor dispose*
-    [ "stop" swap thread>> send-synchronous drop ]
-    [ queue>> dispose ]
-    bi ;
+    [ [ +stop+ ] dip thread>> send ] [ call-next-method ] bi ;
 
 : stop-pump ( -- )
     monitor tget children>> values dispose-each ;
 
 : pump-step ( msg -- )
-    [ [ monitor>> path>> ] [ path>> ] bi append-path ] [ changed>> ] bi
-    monitor tget queue-change ;
+    monitor tget disposed>> [ drop ] [
+        [ [ monitor>> path>> ] [ path>> ] bi append-path ] [ changed>> ] bi
+        monitor tget queue-change
+    ] if ;
 
 : child-added ( path monitor -- )
     path>> prepend-path add-child-monitor ;
@@ -69,8 +71,8 @@ M: recursive-monitor dispose*
     ] with with each ;
 
 : pump-loop ( -- )
-    receive dup synchronous? [
-        [ stop-pump t ] dip reply-synchronous
+    receive dup +stop+ eq? [
+        drop stop-pump
     ] [
         [ '[ _ update-hierarchy ] ignore-errors ] [ pump-step ] bi
         pump-loop

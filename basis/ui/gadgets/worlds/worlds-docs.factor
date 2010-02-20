@@ -33,7 +33,7 @@ HELP: set-gl-context
 { $description "Selects an OpenGL context to be the implicit destination for subsequent GL rendering calls. This word is called automatically by the UI before drawing a " { $link world } "." } ;
 
 HELP: window-resource
-{ $values { "resource" disposable } { "resource" disposable } }
+{ $values { "resource" disposable } }
 { $description "Marks " { $snippet "resource" } " to be destroyed with " { $link dispose } " when the window with the currently active OpenGL context (set by " { $link set-gl-context } ") is closed. " { $snippet "resource" } " is left unmodified at the top of the stack." } ;
 
 HELP: flush-gl-context

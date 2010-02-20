@@ -58,7 +58,7 @@ HELP: children-tags
 { $see-also first-child-tag } ;
 
 HELP: first-child-tag
-{ $values { "tag" "an XML tag or document" } { "tag" tag } }
+{ $values { "tag" "an XML tag or document" } { "child" tag } }
 { $description "Returns the first child of the given tag that is a tag." }
 { $see-also children-tags } ;
 

@@ -1,8 +1,6 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel game.input namespaces classes windows.com.syntax
-bit-arrays
-vectors ;
+USING: kernel game.input namespaces classes bit-arrays vectors ;
 IN: game.input.linux
 
 SINGLETON: linux-game-input-backend
@@ -25,10 +23,10 @@ M: linux-game-input-backend product-string
     drop "" ;
      
 M: linux-game-input-backend product-id
-    drop GUID: {00000000-0000-0000-0000-000000000000} ;
+    drop f ;
      
 M: linux-game-input-backend instance-id
-    drop GUID: {00000000-0000-0000-0000-000000000000} ;
+    drop f ;
      
 M: linux-game-input-backend read-controller
     drop controller-state new ;
