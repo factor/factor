@@ -99,6 +99,11 @@ PRIVATE>
 
 SYMBOL: blacklist
 
+! Defined by vocabs.metadata
+SYMBOL: check-vocab-hook
+
+check-vocab-hook [ [ drop ] ] initialize
+
 <PRIVATE
 
 : add-to-blacklist ( error vocab -- )
@@ -115,10 +120,12 @@ M: vocab (load-vocab)
     ] [ [ swap add-to-blacklist ] keep rethrow ] recover ;
 
 M: vocab-link (load-vocab)
-    vocab-name create-vocab (load-vocab) ;
+    vocab-name (load-vocab) ;
 
 M: string (load-vocab)
-    create-vocab (load-vocab) ;
+    [ check-vocab-hook get call( vocab -- ) ]
+    [ create-vocab (load-vocab) ]
+    bi ;
 
 PRIVATE>
 
