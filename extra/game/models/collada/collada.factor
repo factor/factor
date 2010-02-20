@@ -94,7 +94,7 @@ M: z-up >y-up-axis!
       ] x*
     ] bi 2array ;
 
-:: collect-sources ( sources vertices inputs -- sources )
+:: collect-sources ( sources vertices inputs -- seq )
     inputs
     [| input |
         input "source" x@ rest vertices first =

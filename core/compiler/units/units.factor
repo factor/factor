@@ -12,8 +12,7 @@ SYMBOL: new-definitions
 TUPLE: redefine-error def ;
 
 : redefine-error ( definition -- )
-    \ redefine-error boa
-    { { "Continue" t } } throw-restarts drop ;
+    \ redefine-error boa throw-continue ;
 
 <PRIVATE
 

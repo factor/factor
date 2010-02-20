@@ -26,13 +26,7 @@ IN: prettyprint
 : unparse-use ( obj -- str ) [ pprint-use ] with-string-writer ;
 
 : pprint-short ( obj -- )
-    H{
-       { line-limit 1 }
-       { length-limit 15 }
-       { nesting-limit 2 }
-       { string-limit? t }
-       { boa-tuples? t }
-    } clone [ pprint ] bind ;
+    [ pprint ] with-short-limits ;
 
 : unparse-short ( obj -- str )
     [ pprint-short ] with-string-writer ;

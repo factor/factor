@@ -9,7 +9,7 @@ HELP: interactor
 $nl
 "Interactors are created by calling " { $link <interactor> } "."
 $nl
-"Interactors implement the " { $link stream-readln } ", " { $link stream-read } " and " { $link read-quot } " generic words." } ;
+"Interactors implement the " { $link stream-readln } ", " { $link stream-read } " and " { $link stream-read-quot } " generic words." } ;
 
 ARTICLE: "ui-listener" "UI listener"
 "The graphical listener adds input history and word and vocabulary completion. See " { $link "listener" } " for general information on the listener."

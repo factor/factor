@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.parser
 assocs byte-arrays classes compiler.units functors kernel lexer
@@ -18,6 +18,11 @@ ERROR: bad-byte-array-length byte-array type ;
 
 M: bad-byte-array-length summary
     drop "Byte array length doesn't divide type width" ;
+
+ERROR: not-a-byte-array alien ;
+
+M: not-a-byte-array summary
+    drop "Not a byte array" ;
 
 : (underlying) ( n c-type -- array )
     heap-size * (byte-array) ; inline
@@ -47,7 +52,7 @@ WHERE
 
 TUPLE: A
 { underlying c-ptr read-only }
-{ length array-capacity read-only } ;
+{ length array-capacity read-only } ; final
 
 : <direct-A> ( alien len -- specialized-array ) A boa ; inline
 
@@ -61,9 +66,11 @@ TUPLE: A
     [ \ T heap-size calloc ] keep <direct-A> ; inline
 
 : byte-array>A ( byte-array -- specialized-array )
-    >c-ptr dup length \ T heap-size /mod 0 =
-    [ drop \ T bad-byte-array-length ] unless
-    <direct-A> ; inline
+    >c-ptr dup byte-array? [
+        dup length \ T heap-size /mod 0 =
+        [ <direct-A> ]
+        [ drop \ T bad-byte-array-length ] if
+    ] [ not-a-byte-array ] if ; inline
 
 M: A clone [ underlying>> clone ] [ length>> ] bi <direct-A> ; inline
 
