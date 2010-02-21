@@ -76,13 +76,13 @@ MACRO: (send) ( selector super? -- quot )
 : super-send ( receiver args... selector -- return... ) t (send) ; inline
 
 ! Runtime introspection
-SYMBOL: class-startup-hooks
+SYMBOL: class-init-hooks
 
-class-startup-hooks [ H{ } clone ] initialize
+class-init-hooks [ H{ } clone ] initialize
 
 : (objc-class) ( name word -- class )
     2dup execute dup [ 2nip ] [
-        drop over class-startup-hooks get at [ call( -- ) ] when*
+        drop over class-init-hooks get at [ call( -- ) ] when*
         2dup execute dup [ 2nip ] [
             2drop "No such class: " prepend throw
         ] if
@@ -229,7 +229,7 @@ ERROR: no-objc-type name ;
 : class-exists? ( string -- class ) objc_getClass >boolean ;
 
 : define-objc-class-word ( quot name -- )
-    [ class-startup-hooks get set-at ]
+    [ class-init-hooks get set-at ]
     [
         [ "cocoa.classes" create ] [ '[ _ objc-class ] ] bi
         (( -- class )) define-declared
@@ -237,8 +237,10 @@ ERROR: no-objc-type name ;
 
 : import-objc-class ( name quot -- )
     over define-objc-class-word
-    [ objc-class register-objc-methods ]
-    [ objc-meta-class register-objc-methods ] bi ;
+    dup objc_getClass [
+        [ objc-class register-objc-methods ]
+        [ objc-meta-class register-objc-methods ] bi
+    ] [ drop ] if ;
 
 : root-class ( class -- root )
     dup class_getSuperclass [ root-class ] [ ] ?if ;
