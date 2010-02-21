@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors kernel sequences sequences.private assocs
 words namespaces classes.algebra combinators
@@ -93,11 +93,8 @@ M: #declare propagate-before
     recover ;
 
 : predicate-output-infos/class ( info class -- info )
-    [ class>> ] dip {
-        { [ 2dup class<= ] [ t <literal-info> ] }
-        { [ 2dup classes-intersect? not ] [ f <literal-info> ] }
-        [ object-info ]
-    } cond 2nip ;
+    [ class>> ] dip compare-classes
+    dup +incomparable+ eq? [ drop object-info ] [ <literal-info> ] if ;
 
 : predicate-output-infos ( info class -- info )
     over literal?>>
