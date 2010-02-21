@@ -96,8 +96,6 @@ IN: %s
   (let ((cmd `(:fuel* (,vocab ,summary fuel-scaffold-summary) "fuel")))
     (fuel-eval--send/wait cmd)))
 
-(defsubst fuel-scaffold--creaet-
-
 (defun fuel-scaffold--help (parent)
   (when (and parent (fuel-scaffold--check-auto fuel-scaffold-help-autoinsert-p))
     (let* ((ret (fuel-scaffold--create-docs (fuel-scaffold--vocab parent)))
