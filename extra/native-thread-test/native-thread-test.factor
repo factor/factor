@@ -1,26 +1,24 @@
-USING: alien.c-types alien.syntax io io.encodings.utf16n
-io.encodings.utf8 io.files kernel namespaces sequences system threads
+! Copyright (C) 2009 Phil Dawes.
+! See http://factorcode.org/license.txt for BSD license.
+USING: alien.c-types alien.strings alien.syntax io
+io.encodings.utf8 io.files kernel sequences system threads
 unix.utilities ;
 IN: native-thread-test
 
 FUNCTION: void* start_standalone_factor_in_new_thread ( int argc, char** argv ) ;
 
-HOOK: native-string-encoding os ( -- encoding )
-M: windows native-string-encoding utf16n ;
-M: unix native-string-encoding utf8 ;
-
 : start-vm-in-os-thread ( args -- threadhandle )
-    \ vm get-global prefix 
+    vm prefix
     [ length ] [ native-string-encoding strings>alien ] bi 
-     start_standalone_factor_in_new_thread ;
+    start_standalone_factor_in_new_thread ;
 
 : start-tetris-in-os-thread ( -- )
-     { "-run=tetris" } start-vm-in-os-thread drop ;
+    { "-run=tetris" } start-vm-in-os-thread drop ;
 
-: start-testthread-in-os-thread ( -- )
-     { "-run=native-thread-test" } start-vm-in-os-thread drop ;
- 
-: testthread ( -- )
-     "/tmp/hello" utf8 [ "hello!\n" write ] with-file-appender 5000000 sleep ;
+: start-test-thread-in-os-thread ( -- )
+    { "-run=native-thread-test" } start-vm-in-os-thread drop ;
 
-MAIN: testthread
+: test-thread ( -- )
+    "/tmp/hello" utf8 [ "hello!\n" write ] with-file-appender 5000000 sleep ;
+
+MAIN: test-thread

@@ -230,6 +230,9 @@ action-gestures [
     bi*
 ] H{ } assoc-map-as
 H{
+    { T{ key-down f { S+ } "DELETE" } [ \ cut-action send-action ] }
+    { T{ key-down f { S+ } "INSERT" } [ \ paste-action send-action ] }
+    { T{ key-down f { C+ } "INSERT" } [ \ copy-action send-action ] }
     { T{ button-down f { C+ } 1 } [ drop T{ button-down f f 3 } button-gesture ] }
     { T{ button-down f { A+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }
     { T{ button-down f { M+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }

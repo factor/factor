@@ -648,7 +648,7 @@ M: array iterate first t ; inline
     ] final-info drop
 ] unit-test
 
-[ V{ word } ] [
+[ V{ t } ] [
     [ { hashtable } declare hashtable instance? ] final-classes
 ] unit-test
 
@@ -660,7 +660,7 @@ M: array iterate first t ; inline
     [ { assoc } declare hashtable instance? ] final-classes
 ] unit-test
 
-[ V{ word } ] [
+[ V{ t } ] [
     [ { string } declare string? ] final-classes
 ] unit-test
 
@@ -774,7 +774,7 @@ MIXIN: empty-mixin
     [ { fixnum } declare log2 ] final-classes
 ] unit-test
 
-[ V{ word } ] [
+[ V{ t } ] [
     [ { fixnum } declare log2 0 >= ] final-classes
 ] unit-test
 

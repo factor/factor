@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs io.files io.pathnames io.directories
 io.encodings.utf8 hashtables kernel namespaces sequences
-vocabs.loader io combinators calendar accessors math.parser
-io.streams.string ui.tools.operations quotations strings arrays
-prettyprint words vocabs sorting sets classes math alien urls
-splitting ascii combinators.short-circuit alarms words.symbol
-system summary ;
+vocabs.loader vocabs.metadata io combinators calendar accessors
+math.parser io.streams.string ui.tools.operations quotations
+strings arrays prettyprint words vocabs sorting sets classes
+math alien urls splitting ascii combinators.short-circuit alarms
+words.symbol system summary ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -15,7 +15,6 @@ SYMBOL: using
 ERROR: not-a-vocab-root string ;
 ERROR: vocab-name-contains-separator path ;
 ERROR: vocab-name-contains-dot path ;
-ERROR: no-vocab vocab ;
 ERROR: bad-developer-name name ;
 
 M: bad-developer-name summary
@@ -39,9 +38,6 @@ M: bad-developer-name summary
 
 : check-root ( string -- string )
     dup vocab-root? [ not-a-vocab-root ] unless ;
-
-: check-vocab ( vocab -- vocab )
-    dup find-vocab-root [ no-vocab ] unless ;
 
 : check-vocab-root/vocab ( vocab-root string -- vocab-root string )
     [ check-root ] [ check-vocab-name ] bi* ;
