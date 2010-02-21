@@ -296,9 +296,6 @@ PRIVATE>
 : define-union-struct-class ( class slots -- )
     [ compute-union-offsets ] (define-struct-class) ;
 
-M: struct-class reset-class
-    [ call-next-method ] [ name>> c-types get delete-at ] bi ;
-
 ERROR: invalid-struct-slot token ;
 
 : struct-slot-class ( c-type -- class' )

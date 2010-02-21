@@ -361,13 +361,6 @@ TUPLE: a-subclass < will-become-struct ;
 
 [ tuple ] [ a-subclass superclass ] unit-test
 
-! Remove c-type when struct class is forgotten
-[ ] [
-    "USE: classes.struct IN: classes.struct.tests TUPLE: a-struct ;" eval( -- )
-] unit-test
-
-[ f ] [ "a-struct" c-types get key? ] unit-test
-
 STRUCT: bit-field-test
     { a uint bits: 12 }
     { b int bits: 2 }

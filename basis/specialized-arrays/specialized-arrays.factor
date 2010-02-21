@@ -116,10 +116,7 @@ M: A v*high [ * \ T heap-size neg shift ] 2map ; inline
 
 ;FUNCTOR
 
-GENERIC: (underlying-type) ( c-type -- c-type' )
-
-M: string (underlying-type) c-types get at ;
-M: word (underlying-type) "c-type" word-prop ;
+: (underlying-type) ( word -- c-type ) "c-type" word-prop ; inline
 
 : underlying-type ( c-type -- c-type' )
     dup (underlying-type) {
