@@ -38,7 +38,7 @@ ERROR: no-com-interface interface ;
 
 : (parse-com-function) ( tokens -- definition )
     [ second ]
-    [ first ]
+    [ first parse-c-type ]
     [
         3 tail [ CHAR: , swap remove ] map
         2 group [ first2 normalize-c-arg 2array ] map
