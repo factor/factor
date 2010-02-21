@@ -32,13 +32,10 @@ HELP: no-c-type
 { $description "Throws a " { $link no-c-type } " error." }
 { $error-description "Thrown by " { $link c-type } " if a given string does not name a C type. When thrown during compile time, indicates a typo in an " { $link alien-invoke } " or " { $link alien-callback } " form." } ;
 
-HELP: c-types
-{ $var-description "Global variable holding a hashtable mapping C type names to C types. Use the " { $link c-type } " word to look up C types." } ;
-
 HELP: c-type
 { $values { "name" "a C type" } { "c-type" c-type } }
 { $description "Looks up a C type by name." }
-{ $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
+{ $errors "Throws a " { $link no-c-type } " error if the type does not exist, or the word is not a C type." } ;
 
 HELP: c-getter
 { $values { "name" "a C type" } { "quot" { $quotation "( c-ptr n -- obj )" } } }
