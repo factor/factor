@@ -378,10 +378,6 @@ IN: tools.deploy.shaker
             ] when
         ] when
 
-        deploy-c-types? get [
-            "c-types" "alien.c-types" lookup ,
-        ] unless
-
         "windows-messages" "windows.messages" lookup [ , ] when*
     ] { } make ;
 
