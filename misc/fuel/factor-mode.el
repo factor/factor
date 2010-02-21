@@ -245,11 +245,11 @@ code in the buffer."
 (defsubst factor-mode--in-tests (&optional file)
   (factor-mode--code-file "tests"))
 
-(defun factor-mode-visit-other-file (&optional skip)
+(defun factor-mode-visit-other-file (&optional create)
   "Cycle between code, tests and docs factor files.
-With prefix, non-existing files will be skipped."
+With prefix, non-existing files will be created."
   (interactive "P")
-  (let ((file (factor-mode--cycle-next (buffer-file-name) skip)))
+  (let ((file (factor-mode--cycle-next (buffer-file-name) (not create))))
     (unless file (error "No other file found"))
     (find-file file)
     (unless (file-exists-p file)
