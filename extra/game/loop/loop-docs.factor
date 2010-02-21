@@ -109,13 +109,13 @@ ARTICLE: "game.loop" "Game loops"
     start-loop
     stop-loop
 }
-"The game loop maintains performance counters for measuring drawing frames and ticks per second:"
+"The game loop maintains performance counters:"
 { $subsections
     reset-loop-benchmark
     benchmark-frames-per-second
     benchmark-ticks-per-second
 }
-"The game loop manages errors that occur in the delegate's methods during the course of the game loop:"
+"The game loop catches errors that occur in the delegate's methods during the course of the game loop:"
 { $subsections
     game-loop-error
 }
