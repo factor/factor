@@ -63,6 +63,9 @@ M: bad-developer-name summary
 : vocab-root/vocab/suffix>path ( vocab-root vocab suffix -- path )
     [ vocab-root/vocab>path dup file-name append-path ] dip append ;
 
+: vocab/file>path ( vocab file -- path )
+    [ vocab>path ] dip append-path ;
+
 : vocab/suffix>path ( vocab suffix -- path )
     [ vocab>path dup file-name append-path ] dip append ;
 
@@ -104,16 +107,17 @@ M: bad-developer-name summary
         2drop
     ] if ;
 
-: scaffold-authors ( vocab-root vocab -- )
-    developer-name get [
-        "authors.txt" vocab-root/vocab/file>path scaffolding? [
-            developer-name get swap utf8 set-file-contents
+: scaffold-metadata ( vocab file contents -- )
+    [ ensure-vocab-exists ] 2dip
+    [
+        [ vocab/file>path ] dip swap scaffolding? [
+            utf8 set-file-contents
         ] [
-            drop
+            2drop
         ] if
     ] [
         2drop
-    ] if ;
+    ] if* ;
 
 : lookup-type ( string -- object/string ? )
     "new" ?head drop [ { [ CHAR: ' = ] [ digit? ] } 1|| ] trim-tail
@@ -258,12 +262,21 @@ PRIVATE>
 : scaffold-undocumented ( string -- )
     [ interesting-words. ] [ link-vocab ] bi ;
 
+: scaffold-authors ( vocab -- )
+    "authors.txt" developer-name get scaffold-metadata ;
+
+: scaffold-tags ( vocab tags -- )
+    [ "tags.txt" ] dip scaffold-metadata ;
+
+: scaffold-summary ( vocab summary -- )
+    [ "summary.txt" ] dip scaffold-metadata ;
+
 : scaffold-vocab ( vocab-root string -- )
     {
         [ scaffold-directory ]
         [ scaffold-main ]
-        [ scaffold-authors ]
         [ nip require ]
+        [ nip scaffold-authors ]
     } 2cleave ;
 
 : scaffold-core ( string -- ) "resource:core" swap scaffold-vocab ;
