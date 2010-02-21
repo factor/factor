@@ -9,9 +9,13 @@ ARTICLE: "errors-restartable" "Restartable errors"
     throw-restarts
     rethrow-restarts
 }
+"A utility word using the above:"
+{ $subsections
+    throw-continue
+}
 "The list of restarts from the most recently-thrown error is stored in a global variable:"
 { $subsections restarts }
-"To invoke restarts, see " { $link "debugger" } "." ;
+"To invoke restarts, use " { $link "debugger" } "." ;
 
 ARTICLE: "errors-post-mortem" "Post-mortem error inspection"
 "The most recently thrown error, together with the continuation at that point, are stored in a pair of global variables:"
@@ -213,7 +217,11 @@ HELP: rethrow-restarts
 { $values { "error" object } { "restarts" "a sequence of " { $snippet "{ string object }" } " pairs" } { "restart" object } }
 { $description "Throws a restartable error using " { $link rethrow } ". Otherwise, this word is identical to " { $link throw-restarts } "." } ;
 
-{ throw rethrow throw-restarts rethrow-restarts } related-words
+{ throw rethrow throw-restarts rethrow-restarts throw-continue } related-words
+
+HELP: throw-continue
+{ $values { "error" object } }
+{ $description "Throws a resumable error. If the user elects to continue execution, this word returns normally." } ;
 
 HELP: compute-restarts
 { $values { "error" object } { "seq" "a sequence" } }
