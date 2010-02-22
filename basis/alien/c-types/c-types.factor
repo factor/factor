@@ -17,8 +17,9 @@ SYMBOLS:
     long ulong
     longlong ulonglong
     float double
-    void* bool
-    void ;
+    void* bool ;
+
+SINGLETON: void
 
 DEFER: <int>
 DEFER: *char
@@ -56,9 +57,6 @@ GENERIC: c-type ( name -- c-type ) foldable
 GENERIC: resolve-pointer-type ( name -- c-type )
 
 << \ void \ void* "pointer-c-type" set-word-prop >>
-
-: void? ( c-type -- ? )
-    { void "void" } member? ;
 
 M: word resolve-pointer-type
     dup "pointer-c-type" word-prop
