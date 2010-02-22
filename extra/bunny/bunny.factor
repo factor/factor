@@ -44,24 +44,17 @@ M: bunny-world draw-world*
         [ geom>> ] [ get-draw ] bi draw-bunny
     ] if ;
 
-M: bunny-world pref-dim* ( gadget -- dim )
-    drop { 640 480 } ;
-    
 bunny-world H{
     { T{ key-down f f "TAB" } [ next-draw ] }
 } set-gestures
 
-: bunny-window ( -- )
-    [
-        f T{ world-attributes
-            { world-class bunny-world }
-            { title "Bunny" }
-            { pixel-format-attributes {
-                windowed
-                double-buffered
-                T{ depth-bits { value 16 } }
-            } }
-        } open-window
-    ] with-ui ;
-
-MAIN: bunny-window
+MAIN-WINDOW: bunny-window {
+        { world-class bunny-world }
+        { title "Bunny" }
+        { pixel-format-attributes {
+            windowed
+            double-buffered
+            T{ depth-bits { value 16 } }
+        } }
+        { pref-dim { 640 480 } }
+    } ;

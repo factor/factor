@@ -12,6 +12,7 @@ TUPLE: promise mailbox ;
     mailbox>> mailbox-empty? not ;
 
 ERROR: promise-already-fulfilled promise ;
+
 : fulfill ( value promise -- )
     dup promise-fulfilled? [ 
         promise-already-fulfilled

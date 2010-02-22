@@ -18,7 +18,7 @@ VALUE: jis212
 "vocab:io/encodings/iso2022/212.txt" flat-file>biassoc to: jis212
 
 VALUE: ascii
-128 unique >biassoc to: ascii
+128 iota unique >biassoc to: ascii
 
 TUPLE: iso2022-state type ;
 
@@ -31,7 +31,7 @@ M: iso2022 <encoder>
 M: iso2022 <decoder>
     make-iso-coder <decoder> ;
 
-<< SYNTAX: ESC HEX: 16 parsed ; >>
+<< SYNTAX: ESC HEX: 16 suffix! ; >>
 
 CONSTANT: switch-ascii B{ ESC CHAR: ( CHAR: B }
 CONSTANT: switch-jis201 B{ ESC CHAR: ( CHAR: J }

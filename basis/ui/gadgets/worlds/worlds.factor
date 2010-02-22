@@ -50,7 +50,8 @@ TUPLE: world-attributes
     status
     gadgets
     { pixel-format-attributes initial: $ default-world-pixel-format-attributes }
-    { window-controls initial: $ default-world-window-controls } ;
+    { window-controls initial: $ default-world-window-controls }
+    pref-dim ;
 
 : <world-attributes> ( -- world-attributes )
     world-attributes new ; inline
@@ -120,11 +121,12 @@ M: world request-focus-on ( child gadget -- )
         V{ } clone >>window-resources ;
 
 : initial-background-color ( attributes -- color )
-    window-controls>> textured-background swap memq?
+    window-controls>> textured-background swap member-eq?
     [ T{ rgba f 0.0 0.0 0.0 0.0 } ]
     [ T{ rgba f 1.0 1.0 1.0 1.0 } ] if ;
 
-: apply-world-attributes ( world attributes -- world )
+GENERIC# apply-world-attributes 1 ( world attributes -- world )
+M: world apply-world-attributes
     {
         [ title>> >>title ]
         [ status>> >>status ]
@@ -132,7 +134,8 @@ M: world request-focus-on ( child gadget -- )
         [ window-controls>> >>window-controls ]
         [ initial-background-color >>background-color ]
         [ grab-input?>> >>grab-input? ]
-        [ gadgets>> [ 1 track-add ] each ]
+        [ gadgets>> dup sequence? [ [ 1 track-add ] each ] [ 1 track-add ] if ]
+        [ pref-dim>> >>pref-dim ]
     } cleave ;
 
 : <world> ( world-attributes -- world )
@@ -151,8 +154,8 @@ M: world focusable-child* children>> [ t ] [ first ] if-empty ;
 M: world children-on nip children>> ;
 
 M: world remove-gadget
-    2dup layers>> memq?
-    [ layers>> delq ] [ call-next-method ] if ;
+    2dup layers>> member-eq?
+    [ layers>> remove-eq! drop ] [ call-next-method ] if ;
 
 SYMBOL: flush-layout-cache-hook
 
@@ -227,6 +230,9 @@ action-gestures [
     bi*
 ] H{ } assoc-map-as
 H{
+    { T{ key-down f { S+ } "DELETE" } [ \ cut-action send-action ] }
+    { T{ key-down f { S+ } "INSERT" } [ \ paste-action send-action ] }
+    { T{ key-down f { C+ } "INSERT" } [ \ copy-action send-action ] }
     { T{ button-down f { C+ } 1 } [ drop T{ button-down f f 3 } button-gesture ] }
     { T{ button-down f { A+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }
     { T{ button-down f { M+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }

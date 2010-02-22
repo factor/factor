@@ -153,11 +153,11 @@ M: dlist clear-deque ( dlist -- )
     '[ obj>> @ ] dlist-each-node ; inline
 
 : dlist>seq ( dlist -- seq )
-    [ ] accumulator [ dlist-each ] dip ;
+    [ ] collector [ dlist-each ] dip ;
 
 : 1dlist ( obj -- dlist ) <dlist> [ push-front ] keep ;
 
-: dlist-filter ( dlist quot -- dlist )
+: dlist-filter ( dlist quot -- dlist' )
     over [ '[ dup obj>> @ [ drop ] [ _ delete-node ] if ] dlist-each-node ] keep ; inline
 
 M: dlist clone

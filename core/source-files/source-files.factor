@@ -3,7 +3,7 @@
 USING: arrays definitions generic assocs kernel math namespaces
 sequences strings vectors words quotations io io.files
 io.pathnames combinators sorting splitting math.parser effects
-continuations checksums checksums.crc32 vocabs hashtables graphs
+continuations checksums checksums.crc32 vocabs hashtables
 compiler.units io.encodings.utf8 accessors source-files.errors ;
 IN: source-files
 
@@ -16,7 +16,8 @@ checksum
 definitions ;
 
 : record-top-level-form ( quot file -- )
-    (>>top-level-form) H{ } notify-definition-observers ;
+    (>>top-level-form)
+    [ ] [ H{ } notify-definition-observers ] if-bootstrapping ;
 
 : record-checksum ( lines source-file -- )
     [ crc32 checksum-lines ] dip (>>checksum) ;

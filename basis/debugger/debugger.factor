@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: slots arrays definitions generic hashtables summary io kernel
 math namespaces make prettyprint prettyprint.config sequences assocs
@@ -8,20 +8,26 @@ continuations.private combinators generic.math classes.builtin classes
 compiler.units generic.standard generic.single vocabs init
 kernel.private io.encodings accessors math.order destructors
 source-files parser classes.tuple.parser effects.parser lexer
-generic.parser strings.parser vocabs.loader vocabs.parser see
+generic.parser strings.parser vocabs.loader vocabs.parser
 source-files.errors ;
 IN: debugger
 
-GENERIC: error. ( error -- )
 GENERIC: error-help ( error -- topic )
-
-M: object error. . ;
 
 M: object error-help drop f ;
 
 M: tuple error-help class ;
 
+M: source-file-error error-help error>> error-help ;
+
+GENERIC: error. ( error -- )
+
+M: object error. short. ;
+
 M: string error. print ;
+
+: traceback-link. ( continuation -- )
+    "[" write [ "Traceback" ] dip write-object "]" print ;
 
 : :s ( -- )
     error-continuation get data>> stack. ;
@@ -44,7 +50,7 @@ M: string error. print ;
 
 : restart. ( restart n -- )
     [
-        1 + dup 3 <= [ ":" % # "    " % ] [ # " :res  " % ] if
+        1 + dup 3 <= [ ":" % # "      " % ] [ # " :res  " % ] if
         name>> %
     ] "" make print ;
 
@@ -100,9 +106,6 @@ HOOK: signal-error. os ( obj -- )
 : ffi-error. ( obj -- )
     "FFI error" print drop ;
 
-: heap-scan-error. ( obj -- )
-    "Cannot do next-object outside begin/end-scan" print drop ;
-
 : undefined-symbol-error. ( obj -- )
     "The image refers to a library or symbol that was not found at load time"
     print drop ;
@@ -145,14 +148,13 @@ PREDICATE: vm-error < array
         { 6  [ array-size-error.       ] }
         { 7  [ c-string-error.         ] }
         { 8  [ ffi-error.              ] }
-        { 9  [ heap-scan-error.        ] }
-        { 10 [ undefined-symbol-error. ] }
-        { 11 [ datastack-underflow.    ] }
-        { 12 [ datastack-overflow.     ] }
-        { 13 [ retainstack-underflow.  ] }
-        { 14 [ retainstack-overflow.   ] }
-        { 15 [ memory-error.           ] }
-        { 16 [ fp-trap-error.          ] }
+        { 9  [ undefined-symbol-error. ] }
+        { 10 [ datastack-underflow.    ] }
+        { 11 [ datastack-overflow.     ] }
+        { 12 [ retainstack-underflow.  ] }
+        { 13 [ retainstack-overflow.   ] }
+        { 14 [ memory-error.           ] }
+        { 15 [ fp-trap-error.          ] }
     } ; inline
 
 M: vm-error summary drop "VM error" ;
@@ -192,7 +194,7 @@ M: not-a-tuple summary
     drop "Not a tuple" ;
 
 M: bad-superclass summary
-    drop "Tuple classes can only inherit from other tuple classes" ;
+    drop "Tuple classes can only inherit from non-final tuple classes" ;
 
 M: no-initial-value summary
     drop "Initial value must be provided for slots specialized to this class" ;
@@ -234,7 +236,10 @@ M: redefine-error error.
     def>> . ;
 
 M: undefined summary
-    drop "Calling a deferred word before it has been defined" ;
+    word>> undefined?
+    "Cannot execute a deferred word before it has been defined"
+    "Cannot execute a word before it has been compiled"
+    ? ;
 
 M: no-compilation-unit error.
     "Attempting to define " write
@@ -249,6 +254,8 @@ M: encode-error summary drop "Character encoding error" ;
 M: decode-error summary drop "Character decoding error" ;
 
 M: bad-create summary drop "Bad parameters to create" ;
+
+M: cannot-be-inline summary drop "This type of word cannot be inlined" ;
 
 M: attempt-all-error summary drop "Nothing to attempt" ;
 
@@ -288,6 +295,9 @@ M: duplicate-slot-names summary
 
 M: invalid-slot-name summary
     drop "Invalid slot name" ;
+
+M: bad-inheritance summary
+    drop "Circularity in inheritance chain" ;
 
 M: not-in-a-method-error summary
     drop "call-next-method can only be called in a method definition" ;
@@ -329,7 +339,9 @@ M: check-mixin-class summary drop "Not a mixin class" ;
 
 M: not-found-in-roots summary drop "Cannot resolve vocab: path" ;
 
-M: wrong-values summary drop "Quotation called with wrong stack effect" ;
+M: wrong-values summary drop "Quotation's stack effect does not match call site" ;
+
+M: stack-effect-omits-dashes summary drop "Stack effect must contain “--”" ;
 
 {
     { [ os windows? ] [ "debugger.windows" require ] }

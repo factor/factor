@@ -3,13 +3,15 @@
 USING: kernel namespaces sequences splitting system accessors
 math.functions make io io.files io.pathnames io.directories
 io.directories.hierarchy io.launcher io.encodings.utf8 prettyprint
-combinators.short-circuit parser combinators calendar
+combinators.short-circuit parser combinators math calendar
 calendar.format arrays mason.config locals debugger fry
 continuations strings io.sockets ;
 IN: mason.common
 
+ERROR: no-host-name ;
+
 : short-host-name ( -- string )
-    host-name "." split1 drop ;
+    host-name "." split1 drop [ no-host-name ] unless* ;
 
 SYMBOL: current-git-id
 
@@ -23,23 +25,23 @@ HOOK: really-delete-tree os ( path -- )
 M: windows really-delete-tree
     #! Workaround: Cygwin GIT creates read-only files for
     #! some reason.
-    [ { "chmod" "ug+rw" "-R" } swap (normalize-path) suffix short-running-process ]
+    [ { "chmod" "ug+rw" "-R" } swap absolute-path suffix short-running-process ]
     [ delete-tree ]
     bi ;
 
 M: unix really-delete-tree delete-tree ;
 
 : retry ( n quot -- )
+    [ iota ] dip
     '[ drop @ f ] attempt-all drop ; inline
 
 :: upload-safely ( local username host remote -- )
-    [let* | temp [ remote ".incomplete" append ]
-            scp-remote [ { username "@" host ":" temp } concat ]
-            scp [ scp-command get ]
-            ssh [ ssh-command get ] |
-        5 [ { scp local scp-remote } short-running-process ] retry
-        5 [ { ssh host "-l" username "mv" temp remote } short-running-process ] retry
-    ] ;
+    remote ".incomplete" append :> temp
+    { username "@" host ":" temp } concat :> scp-remote
+    scp-command get :> scp
+    ssh-command get :> ssh
+    5 [ { scp local scp-remote } short-running-process ] retry
+    5 [ { ssh host "-l" username "mv" temp remote } short-running-process ] retry ;
 
 : eval-file ( file -- obj )
     dup utf8 file-lines parse-fresh
@@ -58,10 +60,8 @@ M: unix really-delete-tree delete-tree ;
         } cleave
     ] { } make [ pad-00 ] map "-" join ;
 
-: milli-seconds>time ( n -- string )
-    millis>timestamp
-    [ hour>> ] [ minute>> ] [ second>> floor ] tri 3array
-    [ pad-00 ] map ":" join ;
+: nanos>time ( n -- string )
+    1,000,000,000 /i 60 /mod [ 60 /mod ] dip 3array [ pad-00 ] map ":" join ;
 
 SYMBOL: stamp
 

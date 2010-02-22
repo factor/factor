@@ -2,10 +2,6 @@ namespace factor
 {
 
 #define FACTOR_CPU_STRING "ppc"
-#define VM_ASM_API VM_C_API
-
-register cell ds asm("r13");
-register cell rs asm("r14");
 
 /* In the instruction sequence:
 
@@ -13,18 +9,16 @@ register cell rs asm("r14");
    B blah
 
    the offset from the immediate operand to LOAD32 to the instruction after
-   the branch is two instructions. */
-static const fixnum xt_tail_pic_offset = 4 * 2;
+   the branch is one instruction. */
+static const fixnum xt_tail_pic_offset = 4;
 
 inline static void check_call_site(cell return_address)
 {
-#ifdef FACTOR_DEBUG
 	cell insn = *(cell *)return_address;
 	/* Check that absolute bit is 0 */
 	assert((insn & 0x2) == 0x0);
 	/* Check that instruction is branch */
 	assert((insn >> 26) == 0x12);
-#endif
 }
 
 static const cell b_mask = 0x3fffffc;
@@ -64,31 +58,23 @@ inline static bool tail_call_site_p(cell return_address)
 
 inline static unsigned int fpu_status(unsigned int status)
 {
-        unsigned int r = 0;
+	unsigned int r = 0;
 
-        if (status & 0x20000000)
+	if (status & 0x20000000)
 		r |= FP_TRAP_INVALID_OPERATION;
-        if (status & 0x10000000)
+	if (status & 0x10000000)
 		r |= FP_TRAP_OVERFLOW;
-        if (status & 0x08000000)
+	if (status & 0x08000000)
 		r |= FP_TRAP_UNDERFLOW;
-        if (status & 0x04000000)
+	if (status & 0x04000000)
 		r |= FP_TRAP_ZERO_DIVIDE;
-        if (status & 0x02000000)
+	if (status & 0x02000000)
 		r |= FP_TRAP_INEXACT;
 
-        return r;
+	return r;
 }
 
 /* Defined in assembly */
-VM_ASM_API void c_to_factor(cell quot, void *vm);
-VM_ASM_API void throw_impl(cell quot, stack_frame *rewind, void *vm);
-VM_ASM_API void lazy_jit_compile(cell quot, void *vm);
-VM_ASM_API void flush_icache(cell start, cell len);
-
-VM_ASM_API void set_callstack(stack_frame *to,
-			       stack_frame *from,
-			       cell length,
-			       void *(*memcpy)(void*,const void*, size_t));
+VM_C_API void flush_icache(cell start, cell len);
 
 }

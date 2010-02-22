@@ -1,4 +1,4 @@
-USING: arrays json.reader kernel strings tools.test
+USING: assocs arrays json.reader kernel strings tools.test
 hashtables json ;
 IN: json.reader.tests
 
@@ -58,3 +58,6 @@ IN: json.reader.tests
 { 0 } [ "      0" json> ] unit-test
 { 0 } [ "0      " json> ] unit-test
 { 0 } [ "   0   " json> ] unit-test
+
+! empty objects are allowed as values in objects
+{ H{ { "foo" H{ } } } } [ "{ \"foo\" : {}}" json> ] unit-test

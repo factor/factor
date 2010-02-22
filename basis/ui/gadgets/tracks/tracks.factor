@@ -39,7 +39,8 @@ TUPLE: track < pack sizes ;
 M: track layout* ( track -- ) dup track-layout pack-layout ;
 
 : track-pref-dims-1 ( track -- dim )
-    children>> pref-dims max-dim ;
+    [ children>> pref-dims max-dim ]
+    [ pref-dim>> { 0 0 } or ] bi vmax ;
 
 : track-pref-dims-2 ( track -- dim )
     [
@@ -61,7 +62,7 @@ PRIVATE>
     pick sizes>> push add-gadget ;
 
 M: track remove-gadget
-    [ [ children>> index ] [  sizes>> ] bi delete-nth ]
+    [ [ children>> index ] [  sizes>> ] bi remove-nth! drop ]
     [ call-next-method ] 2bi ;
 
 : clear-track ( track -- ) [ sizes>> delete-all ] [ clear-gadget ] bi ;

@@ -40,4 +40,4 @@ MACRO: interpolate ( string -- )
 
 SYNTAX: I[
     "]I" parse-multiline-string
-    interpolate-locals over push-all ;
+    interpolate-locals append! ;

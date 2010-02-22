@@ -9,10 +9,10 @@ HELP: interactor
 $nl
 "Interactors are created by calling " { $link <interactor> } "."
 $nl
-"Interactors implement the " { $link stream-readln } ", " { $link stream-read } " and " { $link read-quot } " generic words." } ;
+"Interactors implement the " { $link stream-readln } ", " { $link stream-read } " and " { $link stream-read-quot } " generic words." } ;
 
 ARTICLE: "ui-listener" "UI listener"
-"The graphical listener is based around the terminal listener (" { $link "listener" } ") and adds an input history, and word and vocabulary completion."
+"The graphical listener adds input history and word and vocabulary completion. See " { $link "listener" } " for general information on the listener."
 { $command-map listener-gadget "toolbar" }
 { $command-map interactor "completion" }
 { $command-map interactor "interactor" }
@@ -36,7 +36,7 @@ TIP: "You can read documentation by pressing F1." ;
 
 TIP: "The listener tool remembers previous lines of input. Press " { $command interactor "completion" recall-previous } " and " { $command interactor "completion" recall-next } " to cycle through them." ;
 
-TIP: "When you mouse over certain objects, a block border will appear. Left-clicking on such an object will perform the default operation. Right-clicking will show a menu with all operations." ;
+TIP: "When you mouse over certain objects, a black border will appear. Left-clicking on such an object will perform the default operation. Right-clicking will show a menu with all operations." ;
 
 TIP: "The status bar displays stack effects of recognized words as they are being typed in." ;
 

@@ -1,58 +1,84 @@
-! Copyright (C) 2007, 2009 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image.private kernel kernel.private namespaces system
-layouts compiler.units math math.private compiler.constants vocabs
-slots.private words locals.backend make sequences combinators arrays
- cpu.x86.assembler cpu.x86.assembler.operands ;
+USING: bootstrap.image.private compiler.constants
+compiler.units cpu.x86.assembler cpu.x86.assembler.operands
+kernel kernel.private layouts locals.backend make math
+math.private namespaces sequences slots.private vocabs ;
 IN: bootstrap.x86
 
 big-endian off
 
+! C to Factor entry point
+[
+    ! Optimizing compiler's side of callback accesses
+    ! arguments that are on the stack via the frame pointer.
+    ! On x86-64, some arguments are passed in registers, and
+    ! so the only register that is safe for use here is safe-reg.
+    frame-reg PUSH
+    frame-reg stack-reg MOV
+
+    ! Save all non-volatile registers
+    nv-regs [ PUSH ] each
+
+    ! Save old stack pointer and align
+    safe-reg stack-reg MOV
+    stack-reg bootstrap-cell SUB
+    stack-reg -16 AND
+    stack-reg [] safe-reg MOV
+
+    ! Register shadow area - only required on Win64, but doesn't
+    ! hurt on other platforms
+    stack-reg 32 SUB
+
+    ! Load VM into vm-reg
+    vm-reg 0 MOV rc-absolute-cell rt-vm jit-rel
+
+    ! Call into Factor code
+    safe-reg 0 MOV rc-absolute-cell rt-entry-point jit-rel
+    safe-reg CALL
+
+    ! Tear down register shadow area
+    stack-reg 32 ADD
+
+    ! Undo stack alignment
+    stack-reg stack-reg [] MOV
+
+    ! Restore non-volatile registers
+    nv-regs <reversed> [ POP ] each
+
+    frame-reg POP
+
+    ! Callbacks which return structs, or use stdcall, need a
+    ! parameter here. See the comment in callback-return-rewind
+    ! in cpu.x86.32
+    HEX: ffff RET rc-absolute-2 rt-untagged jit-rel
+] callback-stub jit-define
+
 [
     ! Load word
-    temp0 0 MOV rc-absolute-cell rt-immediate jit-rel
+    safe-reg 0 MOV rc-absolute-cell rt-literal jit-rel
     ! Bump profiling counter
-    temp0 profile-count-offset [+] 1 tag-fixnum ADD
+    safe-reg profile-count-offset [+] 1 tag-fixnum ADD
     ! Load word->code
-    temp0 temp0 word-code-offset [+] MOV
-    ! Compute word XT
-    temp0 compiled-header-size ADD
-    ! Jump to XT
-    temp0 JMP
+    safe-reg safe-reg word-code-offset [+] MOV
+    ! Compute word entry point
+    safe-reg compiled-header-size ADD
+    ! Jump to entry point
+    safe-reg JMP
 ] jit-profiling jit-define
 
 [
-    ! load XT
-    temp0 0 MOV rc-absolute-cell rt-this jit-rel
-    ! save stack frame size
-    stack-frame-size PUSH
-    ! push XT
-    temp0 PUSH
-    ! alignment
-    stack-reg stack-frame-size 3 bootstrap-cells - SUB
-] jit-prolog jit-define
-
-[
     ! load literal
-    temp0 0 MOV rc-absolute-cell rt-immediate jit-rel
+    temp0 0 MOV rc-absolute-cell rt-literal jit-rel
     ! increment datastack pointer
     ds-reg bootstrap-cell ADD
     ! store literal on datastack
     ds-reg [] temp0 MOV
-] jit-push-immediate jit-define
+] jit-push jit-define
 
 [
-    temp3 0 MOV rc-absolute-cell rt-here jit-rel
-    0 JMP rc-relative rt-xt-pic-tail jit-rel
-] jit-word-jump jit-define
-
-[
-    0 CALL rc-relative rt-xt-pic jit-rel
+    0 CALL rc-relative rt-entry-point-pic jit-rel
 ] jit-word-call jit-define
-
-[
-    0 JMP rc-relative rt-xt jit-rel
-] jit-word-special jit-define
 
 [
     ! load boolean
@@ -60,11 +86,11 @@ big-endian off
     ! pop boolean
     ds-reg bootstrap-cell SUB
     ! compare boolean with f
-    temp0 \ f tag-number CMP
+    temp0 \ f type-number CMP
     ! jump to true branch if not equal
-    0 JNE rc-relative rt-xt jit-rel
+    0 JNE rc-relative rt-entry-point jit-rel
     ! jump to false branch if equal
-    0 JMP rc-relative rt-xt jit-rel
+    0 JMP rc-relative rt-entry-point jit-rel
 ] jit-if jit-define
 
 : jit->r ( -- )
@@ -117,36 +143,39 @@ big-endian off
 
 [
     jit->r
-    0 CALL rc-relative rt-xt jit-rel
+    0 CALL rc-relative rt-entry-point jit-rel
     jit-r>
 ] jit-dip jit-define
 
 [
     jit-2>r
-    0 CALL rc-relative rt-xt jit-rel
+    0 CALL rc-relative rt-entry-point jit-rel
     jit-2r>
 ] jit-2dip jit-define
 
 [
     jit-3>r
-    0 CALL rc-relative rt-xt jit-rel
+    0 CALL rc-relative rt-entry-point jit-rel
     jit-3r>
 ] jit-3dip jit-define
 
-: prepare-(execute) ( -- operand )
+[
     ! load from stack
     temp0 ds-reg [] MOV
     ! pop stack
     ds-reg bootstrap-cell SUB
-    ! execute word
-    temp0 word-xt-offset [+] ;
-
-[ prepare-(execute) JMP ] jit-execute-jump jit-define
-
-[ prepare-(execute) CALL ] jit-execute-call jit-define
+]
+[ temp0 word-entry-point-offset [+] CALL ]
+[ temp0 word-entry-point-offset [+] JMP ]
+\ (execute) define-combinator-primitive
 
 [
-    ! unwind stack frame
+    temp0 ds-reg [] MOV
+    ds-reg bootstrap-cell SUB
+    temp0 word-entry-point-offset [+] JMP
+] jit-execute jit-define
+
+[
     stack-reg stack-frame-size bootstrap-cell - ADD
 ] jit-epilog jit-define
 
@@ -154,7 +183,7 @@ big-endian off
 
 ! ! ! Polymorphic inline caches
 
-! The PIC and megamorphic code stubs are not permitted to touch temp3.
+! The PIC stubs are not permitted to touch temp3.
 
 ! Load a value from a stack position
 [
@@ -171,60 +200,35 @@ big-endian off
 ! The 'make' trick lets us compute the jump distance for the
 ! conditional branches there
 
-! Hi-tag
-[
-    temp0 temp1 MOV
-    load-tag
-    temp1 object tag-number tag-fixnum CMP
-    [ temp1 temp0 object tag-number neg [+] MOV ] { } make
-    [ length JNE ] [ % ] bi
-] pic-hi-tag jit-define
-
 ! Tuple
 [
     temp0 temp1 MOV
     load-tag
-    temp1 tuple tag-number tag-fixnum CMP
-    [ temp1 temp0 tuple tag-number neg bootstrap-cell + [+] MOV ] { } make
-    [ length JNE ] [ % ] bi
+    temp1 tuple type-number tag-fixnum CMP
+    [ JNE ]
+    [ temp1 temp0 tuple type-number neg bootstrap-cell + [+] MOV ]
+    jit-conditional
 ] pic-tuple jit-define
 
-! Hi-tag and tuple
 [
-    temp0 temp1 MOV
-    load-tag
-    ! If bits 2 and 3 are set, the tag is either 6 (object) or 7 (tuple)
-    temp1 BIN: 110 tag-fixnum CMP
-    [
-        ! Untag temp0
-        temp0 tag-mask get bitnot AND
-        ! Set temp1 to 0 for objects, and bootstrap-cell for tuples
-        temp1 1 tag-fixnum AND
-        bootstrap-cell 4 = [ temp1 1 SHR ] when
-        ! Load header cell or tuple layout cell
-        temp1 temp0 temp1 [+] MOV
-    ] [ ] make [ length JL ] [ % ] bi
-] pic-hi-tag-tuple jit-define
-
-[
-    temp1 HEX: ffffffff CMP rc-absolute rt-immediate jit-rel
+    temp1 HEX: ffffffff CMP rc-absolute rt-literal jit-rel
 ] pic-check-tag jit-define
 
 [
-    temp2 HEX: ffffffff MOV rc-absolute-cell rt-immediate jit-rel
+    temp2 HEX: ffffffff MOV rc-absolute-cell rt-literal jit-rel
     temp1 temp2 CMP
-] pic-check jit-define
+] pic-check-tuple jit-define
 
-[ 0 JE rc-relative rt-xt jit-rel ] pic-hit jit-define
+[ 0 JE rc-relative rt-entry-point jit-rel ] pic-hit jit-define
 
 ! ! ! Megamorphic caches
 
 [
     ! cache = ...
-    temp0 0 MOV rc-absolute-cell rt-immediate jit-rel
-    ! key = class
+    temp0 0 MOV rc-absolute-cell rt-literal jit-rel
+    ! key = hashcode(class)
     temp2 temp1 MOV
-    bootstrap-cell 8 = [ temp2 1 SHL ] when
+    bootstrap-cell 4 = [ temp2 1 SHR ] when
     ! key &= cache.length - 1
     temp2 mega-cache-size get 1 - bootstrap-cell * AND
     ! cache += array-start-offset
@@ -239,23 +243,11 @@ big-endian off
     temp1 [] 1 ADD
     ! goto get(cache + bootstrap-cell)
     temp0 temp0 bootstrap-cell [+] MOV
-    temp0 word-xt-offset [+] JMP
+    temp0 word-entry-point-offset [+] JMP
     ! fall-through on miss
 ] mega-lookup jit-define
 
 ! ! ! Sub-primitives
-
-! Quotations and words
-[
-    ! load from stack
-    arg1 ds-reg [] MOV
-    ! pop stack
-    ds-reg bootstrap-cell SUB
-    ! pass vm pointer
-    arg2 0 MOV rc-absolute-cell rt-vm jit-rel
-    ! call quotation
-    arg1 quot-xt-offset [+] JMP
-] \ (call) define-sub-primitive
 
 ! Objects
 [
@@ -358,15 +350,6 @@ big-endian off
 
 [
     temp0 ds-reg [] MOV
-    temp1 ds-reg -1 bootstrap-cells [+] MOV
-    ds-reg bootstrap-cell ADD
-    ds-reg [] temp0 MOV
-    ds-reg -1 bootstrap-cells [+] temp1 MOV
-    ds-reg -2 bootstrap-cells [+] temp0 MOV
-] \ tuck define-sub-primitive
-
-[
-    temp0 ds-reg [] MOV
     temp1 ds-reg bootstrap-cell neg [+] MOV
     ds-reg bootstrap-cell neg [+] temp0 MOV
     ds-reg [] temp1 MOV
@@ -402,9 +385,10 @@ big-endian off
 ! Comparisons
 : jit-compare ( insn -- )
     ! load t
-    temp3 0 MOV rc-absolute-cell rt-immediate jit-rel
+    t jit-literal
+    temp3 0 MOV rc-absolute-cell rt-literal jit-rel
     ! load f
-    temp1 \ f tag-number MOV
+    temp1 \ f type-number MOV
     ! load first value
     temp0 ds-reg [] MOV
     ! adjust stack pointer
@@ -534,7 +518,7 @@ big-endian off
     ds-reg bootstrap-cell SUB
     temp0 ds-reg [] OR
     temp0 tag-mask get AND
-    temp0 \ f tag-number MOV
+    temp0 \ f type-number MOV
     temp1 1 tag-fixnum MOV
     temp0 temp1 CMOVE
     ds-reg [] temp0 MOV

@@ -1,0 +1,1 @@
+Common DirectX constants. Corresponds to dcommon.h.

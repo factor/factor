@@ -24,7 +24,7 @@ HELP: <scroller>
 { <viewport> <scroller> } related-words
 
 HELP: set-scroll-position
-{ $values { "scroller" scroller } { "value" "a pair of integers" } }
+{ $values { "value" "a pair of integers" } { "scroller" scroller } }
 { $description "Sets the offset of the top-left corner of the scroller's " { $link viewport } "'s child." } ;
 
 HELP: relative-scroll-rect

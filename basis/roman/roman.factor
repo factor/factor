@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs effects fry generalizations
 grouping kernel lexer macros math math.order math.vectors
-namespaces parser quotations sequences sequences.private
-splitting.monotonic stack-checker strings unicode.case words ;
+namespaces parser effects.parser quotations sequences
+sequences.private splitting.monotonic stack-checker strings
+unicode.case words ;
 IN: roman
 
 <PRIVATE
@@ -17,7 +18,7 @@ CONSTANT: roman-values
 ERROR: roman-range-error n ;
 
 : roman-range-check ( n -- n )
-    dup 1 3999 between? [ roman-range-error ] unless ;
+    dup 1 10000 between? [ roman-range-error ] unless ;
 
 : roman-digit-index ( ch -- n )
     1string roman-digits index ; inline
@@ -43,12 +44,12 @@ PRIVATE>
 : >ROMAN ( n -- str ) >roman >upper ;
 
 : roman> ( str -- n )
-    >lower [ roman>= ] monotonic-split [ (roman>) ] sigma ;
+    >lower [ roman>= ] monotonic-split [ (roman>) ] map-sum ;
 
 <PRIVATE
 
 MACRO: binary-roman-op ( quot -- quot' )
-    [ infer in>> ] [ ] [ infer out>> ] tri
+    [ inputs ] [ ] [ outputs ] tri
     '[ [ roman> ] _ napply @ [ >roman ] _ napply ] ;
 
 PRIVATE>
@@ -58,15 +59,14 @@ PRIVATE>
 SYNTAX: ROMAN-OP:
     scan-word [ name>> "roman" prepend create-in ] keep
     1quotation '[ _ binary-roman-op ]
-    dup infer [ in>> ] [ out>> ] bi
-    [ "string" <repetition> ] bi@ <effect> define-declared ;
+    complete-effect define-declared ;
 
 >>
 
-ROMAN-OP: +
-ROMAN-OP: -
-ROMAN-OP: *
-ROMAN-OP: /i
-ROMAN-OP: /mod
+ROMAN-OP: + ( x y -- z )
+ROMAN-OP: - ( x y -- z )
+ROMAN-OP: * ( x y -- z )
+ROMAN-OP: /i ( x y -- z )
+ROMAN-OP: /mod ( x y -- z w )
 
-SYNTAX: ROMAN: scan roman> parsed ;
+SYNTAX: ROMAN: scan roman> suffix! ;

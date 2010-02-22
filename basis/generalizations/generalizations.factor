@@ -1,8 +1,9 @@
 ! Copyright (C) 2007, 2009 Chris Double, Doug Coleman, Eduardo
 ! Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences sequences.private math combinators
-macros quotations fry effects memoize.private ;
+USING: kernel kernel.private sequences sequences.private math
+combinators macros math.order math.ranges quotations fry effects
+memoize.private arrays ;
 IN: generalizations
 
 <<
@@ -42,6 +43,10 @@ MACRO: nover ( n -- )
 MACRO: ndup ( n -- )
     dup '[ _ npick ] n*quot ;
 
+MACRO: dupn ( n -- )
+    [ [ drop ] ]
+    [ 1 - [ dup ] n*quot ] if-zero ;
+
 MACRO: nrot ( n -- )
     1 - [ ] [ '[ _ dip swap ] ] repeat ;
 
@@ -66,14 +71,11 @@ MACRO: ndrop ( n -- )
 MACRO: nnip ( n -- )
     '[ [ _ ndrop ] dip ] ;
 
-MACRO: ntuck ( n -- )
-    2 + '[ dup _ -nrot ] ;
+MACRO: ndip ( n -- )
+    [ [ dip ] curry ] n*quot [ call ] compose ;
 
-MACRO: ndip ( quot n -- )
-    [ '[ _ dip ] ] times ;
-
-MACRO: nkeep ( quot n -- )
-    tuck '[ _ ndup _ _ ndip ] ;
+MACRO: nkeep ( n -- )
+    dup '[ [ _ ndup ] dip _ ndip ] ;
 
 MACRO: ncurry ( n -- )
     [ curry ] n*quot ;
@@ -96,8 +98,41 @@ MACRO: nspread ( quots n -- )
         '[ [ _ _ nspread ] _ ndip @ ]
     ] if ;
 
-MACRO: napply ( n -- )
-    [ [ drop ] ] dip [ '[ tuck _ 2dip call ] ] times ;
+MACRO: spread* ( n -- )
+    [ [ ] ] [
+        [1,b) [ '[ [ [ _ ndip ] curry ] dip compose ] ] map [ ] concat-as
+        [ call ] compose
+    ] if-zero ;
+
+MACRO: nspread* ( m n -- )
+    [ drop [ ] ] [
+        [ * 0 ] [ drop neg ] 2bi
+        <range> rest >array dup length iota <reversed>
+        [
+            '[ [ [ _ ndip ] curry ] _ ndip ]
+        ] 2map dup rest-slice [ [ compose ] compose ] map! drop
+        [ ] concat-as [ call ] compose
+    ] if-zero ;
+
+MACRO: cleave* ( n -- )
+    [ [ ] ]
+    [ 1 - [ [ [ keep ] curry ] dip compose ] n*quot [ call ] compose ] 
+    if-zero ;
+
+: napply ( quot n -- )
+    [ dupn ] [ spread* ] bi ; inline
+
+: mnapply ( quot m n -- )
+    [ nip dupn ] [ nspread* ] 2bi ; inline
+
+: apply-curry ( ...a quot n -- )
+    [ [curry] ] dip napply ; inline
+
+: cleave-curry ( a ...quot n -- )
+    [ [curry] ] swap [ napply ] [ cleave* ] bi ; inline
+
+: spread-curry ( ...a ...quot n -- )
+    [ [curry] ] swap [ napply ] [ spread* ] bi ; inline
 
 MACRO: mnswap ( m n -- )
     1 + '[ _ -nrot ] swap '[ _ _ napply ] ;
@@ -114,5 +149,3 @@ MACRO: nbi-curry ( n -- )
 
 : nappend ( n -- seq ) narray concat ; inline
 
-MACRO: nspin ( n -- )
-    [ [ ] ] swap [ swap [ ] curry compose ] n*quot [ call ] 3append ;

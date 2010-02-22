@@ -33,13 +33,12 @@ IN: project-euler.073
 <PRIVATE
 
 :: (euler073) ( counter limit lo hi -- counter' )
-    [let | m [ lo hi mediant ] |
-        m denominator limit <= [
-            counter 1 +
-            limit lo m (euler073)
-            limit m hi (euler073)
-        ] [ counter ] if
-    ] ;
+    lo hi mediant :> m
+    m denominator limit <= [
+        counter 1 +
+        limit lo m (euler073)
+        limit m hi (euler073)
+    ] [ counter ] if ;
 
 PRIVATE>
 

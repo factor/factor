@@ -20,15 +20,15 @@ $nl
 { $see-also "see" } ;
 
 ARTICLE: "definition-checking" "Definition sanity checking"
-"When a source file is reloaded, the parser compares the previous list of definitions with the current list; any definitions which are no longer present in the file are removed by a call to " { $link forget } ". A warning message is printed if any other definitions still depend on the removed definitions."
+"When a source file is reloaded, the parser compares the previous list of definitions with the current list; any definitions which are no longer present in the file are removed by a call to " { $link forget } "."
 $nl
 "The parser also catches forward references when reloading source files. This is best illustrated with an example. Suppose we load a source file " { $snippet "a.factor" } ":"
 { $code
     "USING: io sequences ;"
     "IN: a"
-    ": hello \"Hello\" ;"
-    ": world \"world\" ;"
-    ": hello-world hello " " world 3append print ;"
+    ": hello ( -- str ) \"Hello\" ;"
+    ": world ( -- str ) \"world\" ;"
+    ": hello-world ( -- ) hello \" \" world 3append print ;"
 }
 "The definitions for " { $snippet "hello" } ", " { $snippet "world" } ", and " { $snippet "hello-world" } " are in the dictionary."
 $nl
@@ -36,9 +36,9 @@ $nl
 { $code
     "USING: namespaces ;"
     "IN: a"
-    ": hello \"Hello\" % ;"
-    ": hello-world [ hello " " % world ] \"\" make ;"
-    ": world \"world\" % ;"
+    ": hello ( -- ) \"Hello\" % ;"
+    ": hello-world ( -- str ) [ hello \" \" % world ] \"\" make ;"
+    ": world ( -- ) \"world\" % ;"
 }
 "Note that the developer has made a mistake, placing the definition of " { $snippet "world" } " " { $emphasis "after" } " its usage in " { $snippet "hello-world" } "."
 $nl

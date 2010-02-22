@@ -14,20 +14,17 @@ HELP: 3drop ( x y z -- )             $shuffle ;
 HELP: dup   ( x -- x x )             $shuffle ;
 HELP: 2dup  ( x y -- x y x y )       $shuffle ;
 HELP: 3dup  ( x y z -- x y z x y z ) $shuffle ;
-HELP: rot   ( x y z -- y z x )       $shuffle ;
-HELP: -rot  ( x y z -- z x y )       $shuffle ;
-HELP: dupd  ( x y -- x x y )         $shuffle ;
-HELP: swapd ( x y z -- y x z )       $shuffle ;
 HELP: nip   ( x y -- y )             $shuffle ;
 HELP: 2nip  ( x y z -- z )           $shuffle ;
-HELP: tuck  ( x y -- y x y )         $shuffle ;
 HELP: over  ( x y -- x y x )         $shuffle ;
 HELP: 2over                          $shuffle ;
 HELP: pick  ( x y z -- x y z x )     $shuffle ;
 HELP: swap  ( x y -- y x )           $shuffle ;
-HELP: spin                           $shuffle ;
-HELP: roll                           $shuffle ;
-HELP: -roll                          $shuffle ;
+
+HELP: rot   ( x y z -- y z x ) $complex-shuffle ;
+HELP: -rot  ( x y z -- z x y ) $complex-shuffle ;
+HELP: dupd  ( x y -- x x y )   $complex-shuffle ;
+HELP: swapd ( x y z -- y x z ) $complex-shuffle ;
 
 HELP: datastack ( -- ds )
 { $values { "ds" array } }
@@ -49,9 +46,9 @@ HELP: callstack ( -- cs )
 { $values { "cs" callstack } }
 { $description "Outputs a copy of the call stack contents, with the top of the stack at the end of the vector. The stack frame of the caller word is " { $emphasis "not" } " included." } ;
 
-HELP: set-callstack ( cs -- )
+HELP: set-callstack ( cs -- * )
 { $values { "cs" callstack } }
-{ $description "Replaces the call stack contents. The end of the vector becomes the top of the stack. Control flow is transferred immediately to the new call stack." } ;
+{ $description "Replaces the call stack contents. Control flow is transferred immediately to the innermost frame of the new call stack." } ;
 
 HELP: clear
 { $description "Clears the data stack." } ;
@@ -75,7 +72,11 @@ HELP: hashcode
 { $values { "obj" object } { "code" fixnum } }
 { $description "Computes the hashcode of an object with a default hashing depth. See " { $link hashcode* } " for the hashcode contract." } ;
 
-{ hashcode hashcode* } related-words
+HELP: identity-hashcode
+{ $values { "obj" object } { "code" fixnum } }
+{ $description "Outputs the identity hashcode of an object. The identity hashcode is not guaranteed to be unique, however it will not change during the object's lifetime." } ;
+
+{ hashcode hashcode* identity-hashcode } related-words
 
 HELP: =
 { $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
@@ -168,7 +169,7 @@ HELP: xor
 { $notes "This word implements boolean exclusive or, so applying it to integers will not yield useful results (all integers have a true value). Bitwise exclusive or is the " { $link bitxor } " word." } ;
 
 HELP: both?
-{ $values { "quot" { $quotation "( obj -- ? )" } } { "x" object } { "y" object } { "?" "a boolean" } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation "( obj -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if the quotation yields a true value when applied to both " { $snippet "x" } " and " { $snippet "y" } "." }
 { $examples
     { $example "USING: kernel math prettyprint ;" "3 5 [ odd? ] both? ." "t" }
@@ -176,7 +177,7 @@ HELP: both?
 } ;
 
 HELP: either?
-{ $values { "quot" { $quotation "( obj -- ? )" } } { "x" object } { "y" object } { "?" "a boolean" } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation "( obj -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if the quotation yields a true value when applied to either " { $snippet "x" } " or " { $snippet "y" } "." }
 { $examples
     { $example "USING: kernel math prettyprint ;" "3 6 [ odd? ] either? ." "t" }
@@ -207,24 +208,24 @@ HELP: call
 
 { call POSTPONE: call( } related-words
 
-HELP: call-clear ( quot -- )
+HELP: call-clear ( quot -- * )
 { $values { "quot" callable } }
 { $description "Calls a quotation with an empty call stack. If the quotation returns, Factor will exit.." }
 { $notes "Used to implement " { $link "threads" } "." } ;
 
 HELP: keep
-{ $values { "quot" { $quotation "( x -- ... )" } } { "x" object } }
+{ $values { "x" object } { "quot" { $quotation "( x -- ... )" } } }
 { $description "Call a quotation with a value on the stack, restoring the value when the quotation returns." }
 { $examples
     { $example "USING: arrays kernel prettyprint ;" "2 \"greetings\" [ <array> ] keep 2array ." "{ { \"greetings\" \"greetings\" } \"greetings\" }" }
 } ;
 
 HELP: 2keep
-{ $values { "quot" { $quotation "( x y -- ... )" } } { "x" object } { "y" object } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation "( x y -- ... )" } } }
 { $description "Call a quotation with two values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: 3keep
-{ $values { "quot" { $quotation "( x y z -- ... )" } } { "x" object } { "y" object } { "z" object } }
+{ $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( x y z -- ... )" } } }
 { $description "Call a quotation with three values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: bi
@@ -278,11 +279,6 @@ HELP: 3bi
     { $code
         "[ p ] [ q ] 3bi"
         "3dup p q"
-    }
-    "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x y z -- w )" } ", then the following two lines are equivalent:"
-    { $code
-        "[ p ] [ q ] 3bi"
-        "3dup p -roll q"
     }
     "In general, the following two lines are equivalent:"
     { $code
@@ -657,15 +653,15 @@ HELP: declare
 
 HELP: tag ( object -- n )
 { $values { "object" object } { "n" "a tag number" } }
-{ $description "Outputs an object's tag number, between zero and one less than " { $link num-tags } ". This is implementation detail and user code should call " { $link class } " instead." } ;
+{ $description "Outputs an object's tag number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class } " instead." } ;
 
-HELP: getenv ( n -- obj )
+HELP: special-object ( n -- obj )
 { $values { "n" "a non-negative integer" } { "obj" object } }
-{ $description "Reads an object from the Factor VM's environment table. User code never has to read the environment table directly; instead, use one of the callers of this word." } ;
+{ $description "Reads an object from the Factor VM's special object table. User code never has to read the special object table directly; instead, use one of the callers of this word." } ;
 
-HELP: setenv ( obj n -- )
-{ $values { "n" "a non-negative integer" } { "obj" object } }
-{ $description "Writes an object to the Factor VM's environment table. User code never has to write to the environment table directly; instead, use one of the callers of this word." } ;
+HELP: set-special-object ( obj n -- )
+{ $values { "obj" object } { "n" "a non-negative integer" } }
+{ $description "Writes an object to the Factor VM's special object table. User code never has to write to the special object table directly; instead, use one of the callers of this word." } ;
 
 HELP: object
 { $class-description
@@ -676,6 +672,9 @@ HELP: object
 HELP: null
 { $class-description
     "The canonical empty class with no instances."
+}
+{ $notes
+    "Unlike " { $snippet "null" } " in Java or " { $snippet "NULL" } " in C++, this is not a value signifying empty, or nothing. Use " { $link f } " for this purpose."
 } ;
 
 HELP: most
@@ -709,7 +708,7 @@ HELP: 3curry
 { $notes "This operation is efficient and does not copy the quotation." } ;
 
 HELP: with
-{ $values { "param" object } { "obj" object } { "quot" { $quotation "( param elt -- ... )" } } { "obj" object } { "curry" curry } }
+{ $values { "param" object } { "obj" object } { "quot" { $quotation "( param elt -- ... )" } } { "curry" curry } }
 { $description "Partial application on the left. The following two lines are equivalent:"
     { $code "swap [ swap A ] curry B" }
     { $code "[ A ] with B" }
@@ -821,10 +820,26 @@ HELP: assert=
 { $values { "a" object } { "b" object } }
 { $description "Throws an " { $link assert } " error if " { $snippet "a" } " does not equal " { $snippet "b" } "." } ;
 
-ARTICLE: "shuffle-words" "Shuffle words"
-"Shuffle words rearrange items at the top of the data stack. They control the flow of data between words that perform actions."
+HELP: become
+{ $values { "old" array } { "new" array } }
+{ $description "Replaces all references to objects in " { $snippet "old" } " with the corresponding object in " { $snippet "new" } ". This word is used to implement tuple reshaping. See " { $link "tuple-redefinition" } "." } ;
+
+ARTICLE: "shuffle-words-complex" "Complex shuffle words"
+"These shuffle words tend to make code difficult to read and to reason about. Code that uses them should almost always be rewritten using " { $link "locals" } " or " { $link "dataflow-combinators" } "."
 $nl
-"The " { $link "cleave-combinators" } ", " { $link "spread-combinators" } " and " { $link "apply-combinators" } " are closely related to shuffle words and should be used instead where possible because they can result in clearer code; also, see the advice in " { $link "cookbook-philosophy" } "."
+"Duplicating stack elements deep in the stack:"
+{ $subsections
+    dupd
+}
+"Permuting stack elements deep in the stack:"
+{ $subsections
+    swapd
+    rot
+    -rot
+} ;
+
+ARTICLE: "shuffle-words" "Shuffle words"
+"Shuffle words rearrange items at the top of the data stack as indicated by their stack effects. They provide simple data flow control between words. More complex data flow control is available with the " { $link "dataflow-combinators" } " and with " { $link "locals" } "."
 $nl
 "Removing stack elements:"
 { $subsections
@@ -839,21 +854,17 @@ $nl
     dup
     2dup
     3dup
-    dupd
     over
     2over
     pick
-    tuck
 }
 "Permuting stack elements:"
 { $subsections
     swap
-    swapd
-    rot
-    -rot
-    spin
-    roll
-    -roll
+}
+"There are additional, more complex stack shuffling words whose use is not recommended."
+{ $subsections
+    "shuffle-words-complex"
 } ;
 
 ARTICLE: "equality" "Equality"

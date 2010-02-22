@@ -3,7 +3,7 @@
 USING: alien.c-types io.encodings.utf8 io.encodings.string
 kernel sequences unix.stat accessors unix combinators math
 grouping system alien.strings math.bitwise alien.syntax
-unix.types classes.struct ;
+unix.types classes.struct unix.ffi ;
 IN: unix.statfs.macosx
 
 CONSTANT: MNT_RDONLY  HEX: 00000001

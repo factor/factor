@@ -70,11 +70,12 @@ IN: csv.tests
 
 "can write csv too!"
 [ "foo1,bar1\nfoo2,bar2\n" ]
-[ { { "foo1" "bar1" } { "foo2" "bar2" } } <string-writer> tuck write-csv >string ] named-unit-test
+[ { { "foo1" "bar1" } { "foo2" "bar2" } } <string-writer> [ write-csv ] keep >string ] named-unit-test
+
 
 "escapes quotes commas and newlines when writing"
 [ "\"fo\"\"o1\",bar1\n\"fo\no2\",\"b,ar2\"\n" ]
-[ { { "fo\"o1" "bar1" } { "fo\no2" "b,ar2" } } <string-writer> tuck write-csv >string ] named-unit-test ! "
+[ { { "fo\"o1" "bar1" } { "fo\no2" "b,ar2" } } <string-writer> [ write-csv ] keep >string ] named-unit-test ! "
 
 [ { { "writing" "some" "csv" "tests" } } ]
 [

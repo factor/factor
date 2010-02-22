@@ -10,9 +10,9 @@ tools.test math kernel sequences ;
 [ f ] [ \ + object number math-both-known? ] unit-test
 [ f ] [ \ number= fixnum object math-both-known? ] unit-test
 [ t ] [ \ number= integer fixnum math-both-known? ] unit-test
-[ f ] [ \ >fixnum \ shift derived-ops memq? ] unit-test
-[ f ] [ \ >integer \ /i derived-ops memq? ] unit-test
-[ t ] [ \ fixnum-shift \ shift derived-ops memq? ] unit-test
+[ f ] [ \ >fixnum \ shift derived-ops member-eq? ] unit-test
+[ f ] [ \ >integer \ /i derived-ops member-eq? ] unit-test
+[ t ] [ \ fixnum-shift \ shift derived-ops member-eq? ] unit-test
 
 [ { integer fixnum } ] [ \ +-integer-fixnum integer-op-input-classes ] unit-test
 [ { fixnum fixnum } ] [ \ fixnum+ integer-op-input-classes ] unit-test

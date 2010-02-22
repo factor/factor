@@ -11,9 +11,7 @@ TUPLE: parts in out ;
     zip [ first ] partition [ values ] bi@ parts boa ;
 
 : powerset-partition ( sequence -- partitions )
-    [ length [ 2^ ] keep ] keep '[
-        _ <bits> _ make-partition
-    ] map rest ;
+    [ length [ 2^ iota ] keep ] keep '[ _ <bits> _ make-partition ] map rest ;
 
 : partition>class ( parts -- class )
     [ out>> [ <not-class> ] map ]
@@ -44,12 +42,12 @@ TUPLE: parts in out ;
         [ _ meaningful-integers ] keep add-out
     ] map ;
 
-: class-partitions ( classes -- assoc )
-    [ integer? ] partition [
-        dup powerset-partition spin add-integers
-        [ [ partition>class ] keep 2array ] map
-        [ first ] filter
-    ] [ '[ _ singleton-partition ] map ] 2bi append ;
+:: class-partitions ( classes -- assoc )
+    classes [ integer? ] partition :> ( integers classes )
+    
+    classes powerset-partition classes integers add-integers
+    [ [ partition>class ] keep 2array ] map [ first ] filter
+    integers [ classes singleton-partition ] map append ;
 
 : new-transitions ( transitions -- assoc ) ! assoc is class, partition
     values [ keys ] gather

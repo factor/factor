@@ -1,7 +1,7 @@
-! Copyright (c) 2007-2009 Slava Pestov, Doug Coleman, Aaron Schaefer.
+! Copyright (c) 2007-2010 Slava Pestov, Doug Coleman, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs binary-search fry kernel locals math math.order
-    math.ranges mirrors namespaces sequences sorting ;
+    math.ranges namespaces sequences sorting ;
 IN: math.combinatorics
 
 <PRIVATE
@@ -15,7 +15,7 @@ IN: math.combinatorics
 PRIVATE>
 
 : factorial ( n -- n! )
-    1 [ 1 + * ] reduce ;
+    iota 1 [ 1 + * ] reduce ;
 
 : nPk ( n k -- nPk )
     2dup possible? [ dupd - [a,b) product ] [ 2drop 0 ] if ;
@@ -42,15 +42,15 @@ PRIVATE>
 
 PRIVATE>
 
-: permutation ( n seq -- seq )
+: permutation ( n seq -- seq' )
     [ permutation-indices ] keep nths ;
 
-: all-permutations ( seq -- seq )
-    [ length factorial ] keep
+: all-permutations ( seq -- seq' )
+    [ length factorial iota ] keep
     '[ _ permutation ] map ;
 
 : each-permutation ( seq quot -- )
-    [ [ length factorial ] keep ] dip
+    [ [ length factorial iota ] keep ] dip
     '[ _ permutation @ ] each ; inline
 
 : reduce-permutations ( seq identity quot -- result )
@@ -77,7 +77,7 @@ C: <combo> combo
     dup 0 = [
         drop 1 - nip
     ] [
-        [ [0,b) ] 2dip '[ _ nCk _ >=< ] search nip
+        [ iota ] 2dip '[ _ nCk _ >=< ] search nip
     ] if ;
 
 :: next-values ( a b x -- a' b' x' v )
@@ -96,30 +96,33 @@ C: <combo> combo
     initial-values [ over 0 > ] [ next-values ] produce
     [ 3drop ] dip ;
 
-: combination-indices ( m combo -- seq )
-    [ tuck dual-index combinadic ] keep
-    seq>> length 1 - swap [ - ] with map ;
+:: combination-indices ( m combo -- seq )
+    combo m combo dual-index combinadic
+    combo seq>> length 1 - swap [ - ] with map ;
 
 : apply-combination ( m combo -- seq )
     [ combination-indices ] keep seq>> nths ;
 
+: combinations-quot ( seq k quot -- seq quot )
+    [ <combo> [ choose iota ] keep ] dip
+    '[ _ apply-combination @ ] ; inline
+
 PRIVATE>
 
-: combination ( m seq k -- seq )
-    <combo> apply-combination ;
-
-: all-combinations ( seq k -- seq )
-    <combo> [ choose [0,b) ] keep
-    '[ _ apply-combination ] map ;
-
 : each-combination ( seq k quot -- )
-    [ <combo> [ choose [0,b) ] keep ] dip
-    '[ _ apply-combination @ ] each ; inline
+    combinations-quot each ; inline
 
 : map-combinations ( seq k quot -- )
-    [ <combo> [ choose [0,b) ] keep ] dip
-    '[ _ apply-combination @ ] map ; inline
+    combinations-quot map ; inline
+
+: map>assoc-combinations ( seq k quot exemplar -- )
+    [ combinations-quot ] dip map>assoc ; inline
+
+: combination ( m seq k -- seq' )
+    <combo> apply-combination ;
+
+: all-combinations ( seq k -- seq' )
+    [ ] combinations-quot map ;
 
 : reduce-combinations ( seq k identity quot -- result )
     [ -rot ] dip each-combination ; inline
-

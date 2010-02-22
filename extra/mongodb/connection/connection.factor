@@ -123,15 +123,16 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
 PRIVATE>
 
 :: verify-nodes ( mdb -- )
-    [ [let* | acc [ V{ } clone ]
-              node1 [ mdb dup master-node [ check-node ] keep ]
-              node2 [ mdb node1 remote>>
-                      [ [ check-node ] keep ]
-                      [ drop f ] if*  ]
-              | node1 [ acc push ] when*
-                node2 [ acc push ] when*
-                mdb acc nodelist>table >>nodes drop 
-              ]
+    [
+        V{ } clone :> acc
+        mdb dup master-node [ check-node ] keep :> node1
+        mdb node1 remote>>
+        [ [ check-node ] keep ]
+        [ drop f ] if*  :> node2
+
+        node1 [ acc push ] when*
+        node2 [ acc push ] when*
+        mdb acc nodelist>table >>nodes drop 
     ] with-destructors ; 
               
 : mdb-open ( mdb -- mdb-connection )

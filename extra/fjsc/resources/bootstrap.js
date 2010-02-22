@@ -188,7 +188,7 @@ Factor.prototype.make_quotation = function(source, func) {
 
 Factor.prototype.server_eval = function(text, handler, next) {
    var self = this;
-   $.post("/responder/fjsc/compile", { code: text }, function(result) {
+   $.post("compile", { code: text }, function(result) {
      factor.run_eval = function(func) {
        factor.cont.next = function() { handler(text,result); } 
        try {

@@ -3,20 +3,20 @@
 namespace factor
 {
 
-cell factor_vm::string_nth(string* str, cell index)
+cell string::nth(cell index) const
 {
 	/* If high bit is set, the most significant 16 bits of the char
 	come from the aux vector. The least significant bit of the
 	corresponding aux vector entry is negated, so that we can
 	XOR the two components together and get the original code point
 	back. */
-	cell lo_bits = str->data()[index];
+	cell lo_bits = data()[index];
 
 	if((lo_bits & 0x80) == 0)
 		return lo_bits;
 	else
 	{
-		byte_array *aux = untag<byte_array>(str->aux);
+		byte_array *aux = untag<byte_array>(this->aux);
 		cell hi_bits = aux->data<u16>()[index];
 		return (hi_bits << 7) ^ lo_bits;
 	}
@@ -24,18 +24,20 @@ cell factor_vm::string_nth(string* str, cell index)
 
 void factor_vm::set_string_nth_fast(string *str, cell index, cell ch)
 {
-	str->data()[index] = ch;
+	str->data()[index] = (u8)ch;
 }
 
 void factor_vm::set_string_nth_slow(string *str_, cell index, cell ch)
 {
-	gc_root<string> str(str_,this);
+	data_root<string> str(str_,this);
 
 	byte_array *aux;
 
 	str->data()[index] = ((ch & 0x7f) | 0x80);
 
-	if(str->aux == F)
+	if(to_boolean(str->aux))
+		aux = untag<byte_array>(str->aux);
+	else
 	{
 		/* We don't need to pre-initialize the
 		byte array with any data, since we
@@ -43,15 +45,13 @@ void factor_vm::set_string_nth_slow(string *str_, cell index, cell ch)
 		if the most significant bit of a
 		character is set. Initially all of
 		the bits are clear. */
-		aux = allot_array_internal<byte_array>(untag_fixnum(str->length) * sizeof(u16));
+		aux = allot_uninitialized_array<byte_array>(untag_fixnum(str->length) * sizeof(u16));
 
-		write_barrier(str.untagged());
 		str->aux = tag<byte_array>(aux);
+		write_barrier(&str->aux);
 	}
-	else
-		aux = untag<byte_array>(str->aux);
 
-	aux->data<u16>()[index] = ((ch >> 7) ^ 1);
+	aux->data<u16>()[index] = (u16)((ch >> 7) ^ 1);
 }
 
 /* allocates memory */
@@ -69,8 +69,8 @@ string *factor_vm::allot_string_internal(cell capacity)
 	string *str = allot<string>(string_size(capacity));
 
 	str->length = tag_fixnum(capacity);
-	str->hashcode = F;
-	str->aux = F;
+	str->hashcode = false_object;
+	str->aux = false_object;
 
 	return str;
 }
@@ -78,10 +78,10 @@ string *factor_vm::allot_string_internal(cell capacity)
 /* Allocates memory */
 void factor_vm::fill_string(string *str_, cell start, cell capacity, cell fill)
 {
-	gc_root<string> str(str_,this);
+	data_root<string> str(str_,this);
 
 	if(fill <= 0x7f)
-		memset(&str->data()[start],fill,capacity - start);
+		memset(&str->data()[start],(int)fill,capacity - start);
 	else
 	{
 		cell i;
@@ -94,34 +94,34 @@ void factor_vm::fill_string(string *str_, cell start, cell capacity, cell fill)
 /* Allocates memory */
 string *factor_vm::allot_string(cell capacity, cell fill)
 {
-	gc_root<string> str(allot_string_internal(capacity),this);
+	data_root<string> str(allot_string_internal(capacity),this);
 	fill_string(str.untagged(),0,capacity,fill);
 	return str.untagged();
 }
 
 void factor_vm::primitive_string()
 {
-	cell initial = to_cell(dpop());
+	cell initial = to_cell(ctx->pop());
 	cell length = unbox_array_size();
-	dpush(tag<string>(allot_string(length,initial)));
+	ctx->push(tag<string>(allot_string(length,initial)));
 }
 
 bool factor_vm::reallot_string_in_place_p(string *str, cell capacity)
 {
 	return nursery.contains_p(str)
-		&& (str->aux == F || nursery.contains_p(untag<byte_array>(str->aux)))
+		&& (!to_boolean(str->aux) || nursery.contains_p(untag<byte_array>(str->aux)))
 		&& capacity <= string_capacity(str);
 }
 
 string* factor_vm::reallot_string(string *str_, cell capacity)
 {
-	gc_root<string> str(str_,this);
+	data_root<string> str(str_,this);
 
 	if(reallot_string_in_place_p(str.untagged(),capacity))
 	{
 		str->length = tag_fixnum(capacity);
 
-		if(str->aux != F)
+		if(to_boolean(str->aux))
 		{
 			byte_array *aux = untag<byte_array>(str->aux);
 			aux->capacity = tag_fixnum(capacity * 2);
@@ -135,16 +135,16 @@ string* factor_vm::reallot_string(string *str_, cell capacity)
 		if(capacity < to_copy)
 			to_copy = capacity;
 
-		gc_root<string> new_str(allot_string_internal(capacity),this);
+		data_root<string> new_str(allot_string_internal(capacity),this);
 
 		memcpy(new_str->data(),str->data(),to_copy);
 
-		if(str->aux != F)
+		if(to_boolean(str->aux))
 		{
 			byte_array *new_aux = allot_byte_array(capacity * sizeof(u16));
 
-			write_barrier(new_str.untagged());
 			new_str->aux = tag<byte_array>(new_aux);
+			write_barrier(&new_str->aux);
 
 			byte_array *aux = untag<byte_array>(str->aux);
 			memcpy(new_aux->data<u16>(),aux->data<u16>(),to_copy * sizeof(u16));
@@ -157,31 +157,32 @@ string* factor_vm::reallot_string(string *str_, cell capacity)
 
 void factor_vm::primitive_resize_string()
 {
-	string* str = untag_check<string>(dpop());
+	data_root<string> str(ctx->pop(),this);
+	str.untag_check(this);
 	cell capacity = unbox_array_size();
-	dpush(tag<string>(reallot_string(str,capacity)));
+	ctx->push(tag<string>(reallot_string(str.untagged(),capacity)));
 }
 
 void factor_vm::primitive_string_nth()
 {
-	string *str = untag<string>(dpop());
-	cell index = untag_fixnum(dpop());
-	dpush(tag_fixnum(string_nth(str,index)));
+	string *str = untag<string>(ctx->pop());
+	cell index = untag_fixnum(ctx->pop());
+	ctx->push(tag_fixnum(str->nth(index)));
 }
 
 void factor_vm::primitive_set_string_nth_fast()
 {
-	string *str = untag<string>(dpop());
-	cell index = untag_fixnum(dpop());
-	cell value = untag_fixnum(dpop());
+	string *str = untag<string>(ctx->pop());
+	cell index = untag_fixnum(ctx->pop());
+	cell value = untag_fixnum(ctx->pop());
 	set_string_nth_fast(str,index,value);
 }
 
 void factor_vm::primitive_set_string_nth_slow()
 {
-	string *str = untag<string>(dpop());
-	cell index = untag_fixnum(dpop());
-	cell value = untag_fixnum(dpop());
+	string *str = untag<string>(ctx->pop());
+	cell index = untag_fixnum(ctx->pop());
+	cell value = untag_fixnum(ctx->pop());
 	set_string_nth_slow(str,index,value);
 }
 

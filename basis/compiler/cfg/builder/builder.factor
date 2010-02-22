@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators hashtables kernel
 math fry namespaces make sequences words byte-arrays
@@ -44,6 +44,12 @@ SYMBOL: loops
         @
         end-stack-analysis
     ] with-scope ; inline
+
+: with-dummy-cfg-builder ( node quot -- )
+    [
+        [ V{ } clone procedures ] 2dip
+        '[ _ t t [ _ call( node -- ) ] with-cfg-builder ] with-variable
+    ] { } make drop ;
 
 GENERIC: emit-node ( node -- )
 
@@ -117,7 +123,7 @@ M: #recursive emit-node
     and ;
 
 : emit-trivial-if ( -- )
-    ds-pop \ f tag-number cc/= ^^compare-imm ds-push ;
+    ds-pop \ f type-number cc/= ^^compare-imm ds-push ;
 
 : trivial-not-if? ( #if -- ? )
     children>> first2
@@ -126,12 +132,12 @@ M: #recursive emit-node
     and ;
 
 : emit-trivial-not-if ( -- )
-    ds-pop \ f tag-number cc= ^^compare-imm ds-push ;
+    ds-pop \ f type-number cc= ^^compare-imm ds-push ;
 
 : emit-actual-if ( #if -- )
     ! Inputs to the final instruction need to be copied because of
     ! loc>vreg sync
-    ds-pop any-rep ^^copy \ f tag-number cc/= ##compare-imm-branch emit-if ;
+    ds-pop any-rep ^^copy \ f type-number cc/= ##compare-imm-branch emit-if ;
 
 M: #if emit-node
     {
@@ -212,7 +218,8 @@ M: #terminate emit-node drop ##no-tco end-basic-block ;
     stack-frame new
         swap
         [ return>> return-size >>return ]
-        [ alien-parameters parameter-sizes drop >>params ] bi ;
+        [ alien-parameters parameter-offsets drop >>params ] bi
+        t >>calls-vm? ;
 
 : alien-node-height ( params -- )
     [ out-d>> length ] [ in-d>> length ] bi - adjust-d ;
@@ -229,13 +236,16 @@ M: #alien-invoke emit-node
 M: #alien-indirect emit-node
     [ ##alien-indirect ] emit-alien-node ;
 
+M: #alien-assembly emit-node
+    [ ##alien-assembly ] emit-alien-node ;
+
 M: #alien-callback emit-node
     dup params>> xt>> dup
     [
         ##prologue
-        dup [ ##alien-callback ] emit-alien-node
+        [ ##alien-callback ] emit-alien-node
         ##epilogue
-        params>> ##callback-return
+        ##return
     ] with-cfg-builder ;
 
 ! No-op nodes

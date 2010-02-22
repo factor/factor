@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs sequences kernel locals fry
 combinators stack-checker.backend
@@ -24,7 +24,7 @@ M: #call-recursive compute-live-values*
 
 :: drop-dead-inputs ( inputs outputs -- #shuffle )
     inputs filter-live
-    outputs inputs filter-corresponding make-values
+    outputs inputs filter-corresponding length make-values
     outputs
     inputs
     drop-values ;
@@ -39,14 +39,13 @@ M: #enter-recursive remove-dead-code*
     2bi ;
 
 :: (drop-call-recursive-outputs) ( inputs outputs -- #shuffle )
-    [let* | new-live-outputs [ inputs outputs filter-corresponding make-values ]
-            live-outputs [ outputs filter-live ] |
-        new-live-outputs
-        live-outputs
-        live-outputs
-        new-live-outputs
-        drop-values
-    ] ;
+    inputs outputs filter-corresponding length make-values :> new-live-outputs
+    outputs filter-live :> live-outputs
+    new-live-outputs
+    live-outputs
+    live-outputs
+    new-live-outputs
+    drop-values ;
 
 : drop-call-recursive-outputs ( node -- #shuffle )
     dup [ label>> return>> in-d>> ] [ out-d>> ] bi
@@ -60,22 +59,20 @@ M: #call-recursive remove-dead-code*
     tri 3array ;
 
 :: drop-recursive-inputs ( node -- shuffle )
-    [let* | shuffle [ node [ in-d>> ] [ label>> enter-out>> ] bi drop-dead-inputs ]
-            new-outputs [ shuffle out-d>> ] |
-        node new-outputs
-        [ [ label>> enter-recursive>> ] dip >>in-d drop ] [ >>in-d drop ] 2bi
-        shuffle
-    ] ;
+    node [ in-d>> ] [ label>> enter-out>> ] bi drop-dead-inputs :> shuffle
+    shuffle out-d>> :> new-outputs
+    node new-outputs
+    [ [ label>> enter-recursive>> ] dip >>in-d drop ] [ >>in-d drop ] 2bi
+    shuffle ;
 
 :: drop-recursive-outputs ( node -- shuffle )
-    [let* | return [ node label>> return>> ]
-            new-inputs [ return in-d>> filter-live ]
-            new-outputs [ return [ in-d>> ] [ out-d>> ] bi filter-corresponding ] |
-        return
-        [ new-inputs >>in-d new-outputs >>out-d drop ]
-        [ drop-dead-outputs ]
-        bi
-    ] ;
+    node label>> return>> :> return
+    return in-d>> filter-live :> new-inputs
+    return [ in-d>> ] [ out-d>> ] bi filter-corresponding :> new-outputs
+    return
+    [ new-inputs >>in-d new-outputs >>out-d drop ]
+    [ drop-dead-outputs ]
+    bi ;
 
 M: #recursive remove-dead-code* ( node -- nodes )
     [ drop-recursive-inputs ]

@@ -71,7 +71,7 @@ $nl
     { { { $link float } } { $snippet "0.0" } }
     { { { $link string } } { $snippet "\"\"" } }
     { { { $link byte-array } } { $snippet "B{ }" } }
-    { { { $link simple-alien } } { $snippet "BAD-ALIEN" } }
+    { { { $link pinned-alien } } { $snippet "BAD-ALIEN" } }
 }
 "All other classes are handled with one of two cases:"
 { $list

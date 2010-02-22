@@ -6,7 +6,7 @@ io.streams.string kernel kernel.private math math.constants
 math.order namespaces parser parser.notes prettyprint
 quotations random see sequences sequences.private slots
 slots.private splitting strings summary threads tools.test
-vectors vocabs words words.symbol ;
+vectors vocabs words words.symbol fry literals memory ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -110,7 +110,7 @@ TUPLE: yo-momma ;
     [ t ] [ \ yo-momma class? ] unit-test
     [ ] [ \ yo-momma forget ] unit-test
     [ ] [ \ <yo-momma> forget ] unit-test
-    [ f ] [ \ yo-momma update-map get values memq? ] unit-test
+    [ f ] [ \ yo-momma update-map get values member-eq? ] unit-test
 ] with-compilation-unit
 
 TUPLE: loc-recording ;
@@ -443,14 +443,14 @@ TUPLE: redefinition-problem-2 ;
 
 [ ] [
     [
-        \ vocab tuple { "xxx" } "slots" get append
+        \ vocab identity-tuple { "xxx" } "slots" get append
         define-tuple-class
     ] with-compilation-unit
 
     all-words drop
 
     [
-        \ vocab tuple "slots" get
+        \ vocab identity-tuple "slots" get
         define-tuple-class
     ] with-compilation-unit
 ] unit-test
@@ -511,58 +511,6 @@ TUPLE: another-forget-accessors-test ;
 ! Missing error check
 [ "IN: classes.tuple.tests USE: words TUPLE: wrong-superclass < word ;" eval( -- ) ] must-fail
 
-! Class forget messyness
-TUPLE: subclass-forget-test ;
-
-TUPLE: subclass-forget-test-1 < subclass-forget-test ;
-TUPLE: subclass-forget-test-2 < subclass-forget-test ;
-TUPLE: subclass-forget-test-3 < subclass-forget-test-2 ;
-
-[ ] [ "IN: classes.tuple.tests FORGET: subclass-forget-test" eval( -- ) ] unit-test
-
-[ { subclass-forget-test-2 } ]
-[ subclass-forget-test-2 class-usages ]
-unit-test
-
-[ { subclass-forget-test-3 } ]
-[ subclass-forget-test-3 class-usages ]
-unit-test
-
-[ f ] [ subclass-forget-test-1 tuple-class? ] unit-test
-[ f ] [ subclass-forget-test-2 tuple-class? ] unit-test
-[ subclass-forget-test-3 new ] must-fail
-
-[ "IN: classes.tuple.tests TUPLE: subclass-forget-test-4 < subclass-forget-test-2 ;" eval( -- ) ] must-fail
-
-! More
-DEFER: subclass-reset-test
-DEFER: subclass-reset-test-1
-DEFER: subclass-reset-test-2
-DEFER: subclass-reset-test-3
-
-GENERIC: break-me ( obj -- )
-
-[ ] [ [ M\ integer break-me forget ] with-compilation-unit ] unit-test
-
-[ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test ;" <string-reader> "subclass-reset-test" parse-stream drop ] unit-test
-[ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test-1 < subclass-reset-test ;" eval( -- ) ] unit-test
-[ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test-2 < subclass-reset-test ;" eval( -- ) ] unit-test
-[ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test-3 < subclass-reset-test-2 ;" eval( -- ) ] unit-test
-
-[ ] [ "IN: classes.tuple.tests USE: kernel M: subclass-reset-test-1 break-me drop ;" eval( -- ) ] unit-test
-
-[ ] [ "IN: classes.tuple.tests : subclass-reset-test ( -- ) ;" <string-reader> "subclass-reset-test" parse-stream drop ] unit-test
-
-[ f ] [ subclass-reset-test-1 tuple-class? ] unit-test
-[ f ] [ subclass-reset-test-2 tuple-class? ] unit-test
-[ subclass-forget-test-3 new ] must-fail
-
-[ t ] [ \ break-me "methods" word-prop assoc-empty? ] unit-test
-
-[ ] [ "IN: classes.tuple.tests USE: math USE: kernel M: integer break-me drop ;" eval( -- ) ] unit-test
-
-[ f ] [ \ break-me "methods" word-prop assoc-empty? ] unit-test
-
 ! Insufficient type checking
 [ \ vocab tuple>array drop ] must-fail
 
@@ -577,8 +525,31 @@ unit-test
 [ T{ bad-slot-value f "hi" fixnum } = ]
 must-fail-with
 
-[ T{ declared-types f 0 "hi" } ]
-[ 0.0 "hi" declared-types boa ] unit-test
+! Check fixnum coercer
+[ 0 ] [ 0.0 "hi" declared-types boa n>> ] unit-test
+
+[ 0 ] [ declared-types new 0.0 >>n n>> ] unit-test
+
+! Check bignum coercer
+TUPLE: bignum-coercer { n bignum initial: $[ 0 >bignum ] } ;
+
+[ 13 bignum ] [ 13.5 bignum-coercer boa n>> dup class ] unit-test
+
+[ 13 bignum ] [ bignum-coercer new 13.5 >>n n>> dup class ] unit-test
+
+! Check float coercer
+TUPLE: float-coercer { n float } ;
+
+[ 13.0 float ] [ 13 float-coercer boa n>> dup class ] unit-test
+
+[ 13.0 float ] [ float-coercer new 13 >>n n>> dup class ] unit-test
+
+! Check integer coercer
+TUPLE: integer-coercer { n integer } ;
+
+[ 13 fixnum ] [ 13.5 integer-coercer boa n>> dup class ] unit-test
+
+[ 13 fixnum ] [ integer-coercer new 13.5 >>n n>> dup class ] unit-test
 
 : foo ( a b -- c ) declared-types boa ;
 
@@ -734,3 +705,95 @@ ERROR: base-error x y ;
 ERROR: derived-error < base-error z ;
 
 [ (( x y z -- * )) ] [ \ derived-error stack-effect ] unit-test
+
+! Make sure that tuple reshaping updates code heap roots
+TUPLE: code-heap-ref ;
+
+: code-heap-ref' ( -- a ) T{ code-heap-ref } ;
+
+! Push foo's literal to tenured space
+[ ] [ gc ] unit-test
+
+! Reshape!
+[ ] [ "IN: classes.tuple.tests USE: math TUPLE: code-heap-ref { x integer initial: 5 } ;" eval( -- ) ] unit-test
+
+! Code heap reference
+[ t ] [ code-heap-ref' code-heap-ref? ] unit-test
+[ 5 ] [ code-heap-ref' x>> ] unit-test
+
+! Data heap reference
+[ t ] [ \ code-heap-ref' def>> first code-heap-ref? ] unit-test
+[ 5 ] [ \ code-heap-ref' def>> first x>> ] unit-test
+
+! If the metaclass of a superclass changes into something other
+! than a tuple class, the tuple needs to have its superclass reset
+TUPLE: metaclass-change ;
+TUPLE: metaclass-change-subclass < metaclass-change ;
+
+[ metaclass-change ] [ metaclass-change-subclass superclass ] unit-test
+
+[ ] [ "IN: classes.tuple.tests MIXIN: metaclass-change" eval( -- ) ] unit-test
+
+[ t ] [ metaclass-change-subclass tuple-class? ] unit-test
+[ tuple ] [ metaclass-change-subclass superclass ] unit-test
+
+! Reshaping bug related to the above
+TUPLE: a-g ;
+TUPLE: g < a-g ;
+
+[ ] [ g new "g" set ] unit-test
+
+[ ] [ "IN: classes.tuple.tests MIXIN: a-g TUPLE: g ;" eval( -- ) ] unit-test
+
+[ t ] [ g new layout-of "g" get layout-of eq? ] unit-test
+
+! Joe Groff discovered this bug
+DEFER: factor-crashes-anymore
+
+[ ] [
+    "IN: classes.tuple.tests
+    TUPLE: unsafe-slot-access ;
+    CONSTANT: unsafe-slot-access' T{ unsafe-slot-access }" eval( -- )
+] unit-test
+
+[ ] [
+    "IN: classes.tuple.tests
+    USE: accessors
+    TUPLE: unsafe-slot-access { x read-only initial: 31337 } ;
+    : factor-crashes-anymore ( -- x ) unsafe-slot-access' x>> ;" eval( -- )
+] unit-test
+
+[ 31337 ] [ factor-crashes-anymore ] unit-test
+
+TUPLE: tuple-predicate-redefine-test ;
+
+[ ] [ "IN: classes.tuple.tests TUPLE: tuple-predicate-redefine-test ;" eval( -- ) ] unit-test
+
+[ t ] [ \ tuple-predicate-redefine-test? predicate? ] unit-test
+
+! Final classes
+TUPLE: final-superclass ;
+TUPLE: final-subclass < final-superclass ;
+
+[ final-superclass ] [ final-subclass superclass ] unit-test
+
+! Making the superclass final should change the superclass of the subclass
+[ ] [ "IN: classes.tuple.tests TUPLE: final-superclass ; final" eval( -- ) ] unit-test
+
+[ tuple ] [ final-subclass superclass ] unit-test
+
+[ f ] [ \ final-subclass final-class? ] unit-test
+
+! Subclassing a final class should fail
+[ "IN: classes.tuple.tests TUPLE: final-subclass < final-superclass ;" eval( -- ) ]
+[ error>> bad-superclass? ] must-fail-with
+
+! Making a final class non-final should work
+[ ] [ "IN: classes.tuple.tests TUPLE: final-superclass ;" eval( -- ) ] unit-test
+
+[ ] [ "IN: classes.tuple.tests TUPLE: final-subclass < final-superclass ; final" eval( -- ) ] unit-test
+
+! Changing a superclass should not change the final status of a subclass
+[ ] [ "IN: classes.tuple.tests TUPLE: final-superclass x ;" eval( -- ) ] unit-test
+
+[ t ] [ \ final-subclass final-class? ] unit-test

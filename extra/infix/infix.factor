@@ -82,15 +82,4 @@ M: ast-function infix-codegen
 PRIVATE>
 
 SYNTAX: [infix
-    "infix]" [infix-parse parsed \ call parsed ;
-
-<PRIVATE
-
-: parse-infix-locals ( assoc end -- quot )
-    '[ _ [infix-parse prepare-operand ] ((parse-lambda)) ;
-
-PRIVATE>
-
-SYNTAX: [infix|
-    "|" parse-bindings "infix]" parse-infix-locals <let>
-    ?rewrite-closures over push-all ;
+    "infix]" [infix-parse suffix! \ call suffix! ;

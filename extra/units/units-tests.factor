@@ -10,7 +10,7 @@ IN: units.tests
 [ t ] [ 5 m 1 m d- 4 m = ] unit-test
 [ t ] [ 5 m 2 m d* 10 m^2 = ] unit-test
 [ t ] [ 5 m 2 m d/ 5/2 { } { } <dimensioned> = ] unit-test
-[ t ] [ 5 m 2 m tuck d/ drop 2 m = ] unit-test
+[ t ] [ 2 m 5 m 2 m d/ drop 2 m = ] unit-test
 
 [ t ] [ 1 m 2 m 3 m 3array d-product 6 m^3 = ] unit-test
 [ t ] [ 3 m d-recip 1/3 { } { m } <dimensioned> = ] unit-test

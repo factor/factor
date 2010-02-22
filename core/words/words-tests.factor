@@ -1,7 +1,7 @@
 USING: arrays generic assocs kernel math namespaces
 sequences tools.test words definitions parser quotations
 vocabs continuations classes.tuple compiler.units
-io.streams.string accessors eval words.symbol ;
+io.streams.string accessors eval words.symbol grouping ;
 IN: words.tests
 
 [ 4 ] [
@@ -25,7 +25,8 @@ DEFER: plist-test
     \ plist-test "sample-property" word-prop
 ] unit-test
 
-"create-test" "scratchpad" create { 1 2 } "testing" set-word-prop
+[ ] [ [ "create-test" "scratchpad" create { 1 2 } "testing" set-word-prop ] with-compilation-unit ] unit-test
+
 [ { 1 2 } ] [
     "create-test" "scratchpad" lookup "testing" word-prop
 ] unit-test
@@ -33,7 +34,7 @@ DEFER: plist-test
 [
     [ t ] [ \ array? "array?" "arrays" lookup = ] unit-test
 
-    [ ] [ "test-scope" "scratchpad" create drop ] unit-test
+    [ ] [ [ "test-scope" "scratchpad" create drop ] with-compilation-unit ] unit-test
 ] with-scope
 
 [ "test-scope" ] [
@@ -63,11 +64,16 @@ FORGET: forgotten
 FORGET: another-forgotten
 : another-forgotten ( -- ) ;
 
+! Make sure that undefined words throw proper errors
+DEFER: deferred
+[ deferred ] [ T{ undefined f deferred } = ] must-fail-with
 
-DEFER: x
-[ x ] [ undefined? ] must-fail-with
+[ "IN: words.tests DEFER: not-compiled << not-compiled >>" eval( -- ) ]
+[ error>> [ undefined? ] [ word>> name>> "not-compiled" = ] bi and ] must-fail-with
 
-[ ] [ "no-loc" "words.tests" create drop ] unit-test
+[ ] [ "IN: words.tests FORGET: not-compiled" eval( -- ) ] unit-test
+
+[ ] [ [ "no-loc" "words.tests" create drop ] with-compilation-unit ] unit-test
 [ f ] [ "no-loc" "words.tests" lookup where ] unit-test
 
 [ ] [ "IN: words.tests : no-loc-2 ( -- ) ;" eval( -- ) ] unit-test
@@ -121,9 +127,11 @@ DEFER: x
 [ { } ]
 [
     all-words [
-        "compiled-uses" word-prop
-        keys [ "forgotten" word-prop ] filter
+        [ "effect-dependencies" word-prop ]
+        [ "definition-dependencies" word-prop ]
+        [ "conditional-dependencies" word-prop ] tri
+        3append [ "forgotten" word-prop ] filter
     ] map harvest
 ] unit-test
 
-[ "hi" word-xt ] must-fail
+[ "hi" word-code ] must-fail

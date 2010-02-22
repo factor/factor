@@ -1,9 +1,9 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: models.arrow models.product stack-checker accessors fry
-generalizations macros kernel ;
+generalizations combinators.smart macros kernel ;
 IN: models.arrow.smart
 
 MACRO: <smart-arrow> ( quot -- quot' )
-    [ infer in>> dup ] keep
+    [ inputs dup ] keep
     '[ _ narray <product> [ _ firstn @ ] <arrow> ] ;

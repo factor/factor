@@ -1,4 +1,4 @@
-USING: generalizations accessors arrays compiler kernel
+USING: generalizations accessors arrays compiler.test kernel
 kernel.private math hashtables.private math.private namespaces
 sequences tools.test namespaces.private slots.private
 sequences.private byte-arrays alien alien.accessors layouts
@@ -116,7 +116,7 @@ unit-test
     1 1.0 2.5 try-breaking-dispatch "bye" = [ 3.5 = ] dip and ;
 
 [ t ] [
-    10000000 [ drop try-breaking-dispatch-2 ] all?
+    10000000 [ drop try-breaking-dispatch-2 ] all-integers?
 ] unit-test
 
 ! Regression
@@ -173,20 +173,6 @@ TUPLE: my-tuple ;
         { byte-array } declare
         [ 0 alien-unsigned-1 ] keep
     ] compile-call
-] unit-test
-
-[ 1 t ] [
-    B{ 1 2 3 4 } [
-        { c-ptr } declare
-        [ 0 alien-unsigned-1 ] keep hi-tag
-    ] compile-call byte-array type-number =
-] unit-test
-
-[ t ] [
-    B{ 1 2 3 4 } [
-        { c-ptr } declare
-        0 alien-cell hi-tag
-    ] compile-call alien type-number =
 ] unit-test
 
 [ 2 1 ] [
@@ -270,8 +256,8 @@ TUPLE: id obj ;
     { float } declare dup 0 =
     [ drop 1 ] [
         dup 0 >=
-        [ 2 "double" "libm" "pow" { "double" "double" } alien-invoke ]
-        [ -0.5 "double" "libm" "pow" { "double" "double" } alien-invoke ]
+        [ 2 double "libm" "pow" { double double } alien-invoke ]
+        [ -0.5 double "libm" "pow" { double double } alien-invoke ]
         if
     ] if ;
 
@@ -328,7 +314,7 @@ cell 4 = [
 
 ! Bug with ##return node construction
 : return-recursive-bug ( nodes -- ? )
-    { fixnum } declare [
+    { fixnum } declare iota [
         dup 3 bitand 1 = [ drop t ] [
             dup 3 bitand 2 = [
                 return-recursive-bug

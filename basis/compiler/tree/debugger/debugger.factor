@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel assocs match fry accessors namespaces make effects
 sequences sequences.private quotations generic macros arrays
@@ -51,7 +51,6 @@ MATCH-VARS: ?a ?b ?c ;
         { { { ?b ?a } { ?a ?b } } [ swap ] }
         { { { ?b ?a ?c } { ?a ?b ?c } } [ swapd ] }
         { { { ?a ?b } { ?a ?a ?b } } [ dupd ] }
-        { { { ?a ?b } { ?b ?a ?b } } [ tuck ] }
         { { { ?a ?b ?c } { ?a ?b ?c ?a } } [ pick ] }
         { { { ?a ?b ?c } { ?c ?a ?b } } [ -rot ] }
         { { { ?a ?b ?c } { ?b ?c ?a } } [ rot ] }
@@ -65,7 +64,7 @@ TUPLE: shuffle-node { effect effect } ;
 M: shuffle-node pprint* effect>> effect>string text ;
  
 : (shuffle-effect) ( in out #shuffle -- effect )
-    mapping>> '[ _ at ] map <effect> ;
+    mapping>> '[ _ at ] map [ >array ] bi@ <effect> ;
 
 : shuffle-effect ( #shuffle -- effect )
     [ in-d>> ] [ out-d>> ] [ ] tri (shuffle-effect) ;
@@ -127,6 +126,8 @@ M: #alien-invoke node>quot params>> , \ #alien-invoke , ;
 
 M: #alien-indirect node>quot params>> , \ #alien-indirect , ;
 
+M: #alien-assembly node>quot params>> , \ #alien-assembly , ;
+
 M: #alien-callback node>quot params>> , \ #alien-callback , ;
 
 M: node node>quot drop ;
@@ -161,7 +162,7 @@ SYMBOL: node-count
                 word>> {
                     { [ dup "intrinsic" word-prop ] [ intrinsics-called ] }
                     { [ dup generic? ] [ generics-called ] }
-                    { [ dup method-body? ] [ methods-called ] }
+                    { [ dup method? ] [ methods-called ] }
                     [ words-called ]
                 } cond get inc-at
             ] [ drop ] if

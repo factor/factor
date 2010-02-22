@@ -65,7 +65,7 @@ $nl
 }
 { $see-also "words" } ;
 
-ARTICLE: "word-search-parsing" "Word lookup in parsing words"
+ARTICLE: "word-search-parsing" "Reflection support for vocabulary search path"
 "The parsing words described in " { $link "word-search-syntax" } " are implemented using the below words, which you can also call from your own parsing words."
 $nl
 "The current state used for word search is stored in a " { $emphasis "manifest" } ":"

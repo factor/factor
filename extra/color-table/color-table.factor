@@ -37,7 +37,5 @@ M: color-renderer row-value
         10 >>min-rows
         10 >>max-rows ;
 
-: color-table-demo ( -- )
-    [ <color-table> <scroller> "Colors" open-window ] with-ui ;
-
-MAIN: color-table-demo
+MAIN-WINDOW: color-table-demo { { title "Colors" } }
+    <color-table> <scroller> >>gadgets ;

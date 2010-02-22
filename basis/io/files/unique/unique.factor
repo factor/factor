@@ -35,8 +35,8 @@ SYMBOL: unique-retries
 : random-name ( -- string )
     unique-length get [ random-ch ] "" replicate-as ;
 
-: retry ( quot: ( -- ? )  n -- )
-    swap [ drop ] prepose attempt-all ; inline
+: retry ( quot: ( -- ? ) n -- )
+    iota swap [ drop ] prepose attempt-all ; inline
 
 : (make-unique-file) ( path prefix suffix -- path )
     '[
@@ -69,6 +69,11 @@ PRIVATE>
 
 : unique-file ( prefix -- path )
     "" make-unique-file ;
+
+: move-file-unique ( path directory -- path' )
+    [
+        "" unique-file [ move-file ] keep
+    ] with-temporary-directory ;
 
 {
     { [ os unix? ] [ "io.files.unique.unix" ] }

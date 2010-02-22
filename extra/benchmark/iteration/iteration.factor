@@ -2,7 +2,7 @@ IN: benchmark.iteration
 USING: sequences vectors arrays strings sbufs math math.vectors
 kernel ;
 
-: <range> ( from to -- seq ) dup <slice> ; inline
+: <range> ( from to -- seq ) dup iota <slice> ; inline
 
 : vector-iter ( -- ) 100 [ 0 100000 <range> >vector [ ] map drop ] times ;
 : array-iter ( -- ) 100 [ 0 100000 <range> >array [ ] map drop ] times ;

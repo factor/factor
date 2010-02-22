@@ -26,7 +26,7 @@ PRIVATE>
 : (monotonic-slice) ( seq quot class -- slices )
     [
         dupd '[
-            [ length ] [ ] [ <circular> 1 over change-circular-start ] tri
+            [ length iota ] [ ] [ <circular> 1 over change-circular-start ] tri
             [ @ not [ , ] [ drop ] if ] 3each
         ] { } make
         dup empty? [ over length 1 - prefix ] when -1 prefix 2 clump

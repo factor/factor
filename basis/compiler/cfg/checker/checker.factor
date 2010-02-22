@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel combinators.short-circuit accessors math sequences
 sets assocs compiler.cfg.instructions compiler.cfg.rpo
@@ -14,7 +14,7 @@ ERROR: bad-kill-block bb ;
     dup instructions>> dup penultimate ##epilogue? [
         {
             [ length 2 = ]
-            [ last { [ ##return? ] [ ##callback-return? ] [ ##jump? ] } 1|| ]
+            [ last { [ ##return? ] [ ##jump? ] } 1|| ]
         } 1&&
     ] [ last ##branch? ] if
     [ drop ] [ bad-kill-block ] if ;
@@ -49,7 +49,7 @@ ERROR: bad-kill-insn bb ;
 ERROR: bad-successors ;
 
 : check-successors ( bb -- )
-    dup successors>> [ predecessors>> memq? ] with all?
+    dup successors>> [ predecessors>> member-eq? ] with all?
     [ bad-successors ] unless ;
 
 : check-basic-block ( bb -- )

@@ -60,7 +60,7 @@ SINGLETON: method-renderer
 M: method-renderer column-alignment drop { 0 0 1 } ;
 M: method-renderer filled-column drop 1 ;
 
-! Value is a { method-body count } pair
+! Value is a { method count } pair
 M: method-renderer row-columns
     drop [
         [ [ definition-icon <image-name> ] [ synopsis ] bi ]
@@ -107,7 +107,7 @@ M: method-renderer column-titles drop { "" "Method" "Count" } ;
 : method-matches? ( method generic class -- ? )
     [ first ] 2dip
     {
-        [ drop dup [ subwords memq? ] [ 2drop t ] if ]
+        [ drop dup [ subwords member-eq? ] [ 2drop t ] if ]
         [ nip dup [ swap "method-class" word-prop = ] [ 2drop t ] if ]
     } 3&& ;
 

@@ -5,7 +5,7 @@ IN: random.mersenne-twister.tests
 : check-random ( max -- ? )
     [ random 0 ] keep between? ;
 
-[ t ] [ 100 [ drop 674 check-random ] all? ] unit-test
+[ t ] [ 100 [ drop 674 check-random ] all-integers? ] unit-test
 
 : randoms ( -- seq )
     100 [ 100 random ] replicate ;
@@ -16,11 +16,11 @@ IN: random.mersenne-twister.tests
 [ f ] [ 1234 [ randoms randoms = ] test-rng ] unit-test
 
 [ 1333075495 ] [
-    0 [ 1000 [ drop random-generator get random-32* drop ] each random-generator get random-32* ] test-rng
+    0 [ 1000 [ drop random-generator get random-32* drop ] each-integer random-generator get random-32* ] test-rng
 ] unit-test
 
 [ 1575309035 ] [
-    0 [ 10000 [ drop random-generator get random-32* drop ] each random-generator get random-32* ] test-rng
+    0 [ 10000 [ drop random-generator get random-32* drop ] each-integer random-generator get random-32* ] test-rng
 ] unit-test
 
 

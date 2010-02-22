@@ -8,7 +8,8 @@ IN: command-line
 SYMBOL: script
 SYMBOL: command-line
 
-: (command-line) ( -- args ) 10 getenv sift [ alien>native-string ] map ;
+: (command-line) ( -- args )
+    10 special-object sift [ alien>native-string ] map ;
 
 : rc-path ( name -- path )
     os windows? [ "." prepend ] unless
@@ -66,7 +67,4 @@ SYMBOL: main-vocab-hook
         main-vocab "run" set
     ] bind ;
 
-: ignore-cli-args? ( -- ? )
-    os macosx? "run" get "ui" = and ;
-
-[ default-cli-args ] "command-line" add-init-hook
+[ default-cli-args ] "command-line" add-startup-hook

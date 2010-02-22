@@ -34,7 +34,7 @@ IN: project-euler.034
     { 1 1 2 6 24 120 720 5040 40320 362880 } nth ;
 
 : factorion? ( n -- ? )
-    dup number>digits [ digit-factorial ] sigma = ;
+    dup number>digits [ digit-factorial ] map-sum = ;
 
 PRIVATE>
 

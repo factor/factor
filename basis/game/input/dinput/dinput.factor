@@ -1,12 +1,12 @@
-USING: accessors alien alien.c-types alien.strings arrays
-assocs byte-arrays combinators combinators.short-circuit
-continuations game.input game.input.dinput.keys-array
-io.encodings.utf16 io.encodings.utf16n kernel locals math
-math.bitwise math.rectangles namespaces parser sequences
-shuffle specialized-arrays ui.backend.windows vectors
-windows.com windows.dinput windows.dinput.constants
-windows.errors windows.kernel32 windows.messages
-windows.ole32 windows.user32 classes.struct alien.data ;
+USING: accessors alien alien.c-types alien.strings arrays assocs
+byte-arrays combinators combinators.short-circuit continuations
+game.input game.input.dinput.keys-array io.encodings.utf16
+io.encodings.utf16n kernel locals math math.bitwise
+math.rectangles namespaces parser sequences shuffle
+specialized-arrays ui.backend.windows vectors windows.com
+windows.directx.dinput windows.directx.dinput.constants
+windows.kernel32 windows.messages windows.ole32 windows.errors
+windows.user32 classes.struct alien.data ;
 SPECIALIZED-ARRAY: DIDEVICEOBJECTDATA
 IN: game.input.dinput
 
@@ -314,7 +314,7 @@ CONSTANT: pov-values
     } case ;
 
 : fill-mouse-state ( buffer count -- state )
-    [ +mouse-state+ get ] 2dip swap [ nth (fill-mouse-state) ] curry each ;
+    iota [ +mouse-state+ get ] 2dip swap [ nth (fill-mouse-state) ] curry each ;
 
 : get-device-state ( device DIJOYSTATE2 -- )
     [ dup IDirectInputDevice8W::Poll ole32-error ] dip

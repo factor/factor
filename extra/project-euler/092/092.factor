@@ -29,7 +29,7 @@ IN: project-euler.092
 <PRIVATE
 
 : next-link ( n -- m )
-    number>digits [ sq ] sigma ;
+    number>digits [ sq ] map-sum ;
 
 : chain-ending ( n -- m )
     dup [ 1 = ] [ 89 = ] bi or [ next-link chain-ending ] unless ;

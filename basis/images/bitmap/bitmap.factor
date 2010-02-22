@@ -6,8 +6,8 @@ images.loader images.normalization io io.binary
 io.encodings.binary io.encodings.string io.files
 io.streams.limited kernel locals macros math math.bitwise
 math.functions namespaces sequences specialized-arrays
-specialized-arrays.instances.uint
-specialized-arrays.instances.ushort strings summary ;
+strings summary ;
+SPECIALIZED-ARRAYS: uint ushort ;
 IN: images.bitmap
 
 SINGLETON: bmp-image

@@ -4,7 +4,7 @@ USING: alien arrays assocs classes compiler db hashtables
 io.files kernel math math.parser namespaces prettyprint fry
 sequences strings classes.tuple alien.c-types continuations
 db.sqlite.lib db.sqlite.ffi db.tuples words db.types combinators
-math.intervals io nmake accessors vectors math.ranges random
+math.intervals io locals nmake accessors vectors math.ranges random
 math.bitwise db.queries destructors db.tuples.private interpolate
 io.streams.string make db.private sequences.deep
 db.errors.sqlite ;
@@ -85,12 +85,11 @@ M: literal-bind sqlite-bind-conversion ( tuple literal-bind -- array )
     nip [ key>> ] [ value>> ] [ type>> ] tri
     <sqlite-low-level-binding> ;
 
-M: generator-bind sqlite-bind-conversion ( tuple generate-bind -- array )
-    tuck
-    [ generator-singleton>> eval-generator tuck ] [ slot-name>> ] bi
-    rot set-slot-named
-    [ [ key>> ] [ type>> ] bi ] dip
-    swap <sqlite-low-level-binding> ;
+M:: generator-bind sqlite-bind-conversion ( tuple generate-bind -- array )
+    generate-bind generator-singleton>> eval-generator :> obj
+    generate-bind slot-name>> :> name
+    obj name tuple set-slot-named
+    generate-bind key>> obj generate-bind type>> <sqlite-low-level-binding> ;
 
 M: sqlite-statement bind-tuple ( tuple statement -- )
     [

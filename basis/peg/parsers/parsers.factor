@@ -40,7 +40,7 @@ M: just-parser (compile) ( parser -- quot )
 <PRIVATE
 
 : flatten-vectors ( pair -- vector )
-  first2 over push-all ;
+  first2 append! ;
 
 PRIVATE>
 

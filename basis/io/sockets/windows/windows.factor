@@ -1,6 +1,9 @@
+! Copyright (C) 2007, 2009 Slava Pestov, Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors io.sockets io.sockets.private
 io.backend.windows io.backend windows.winsock system destructors
 alien.c-types classes.struct combinators ;
+FROM: namespaces => get ;
 IN: io.sockets.windows
 
 M: windows addrinfo-error ( n -- )
@@ -55,7 +58,11 @@ M: object (get-remote-address) ( socket addrspec -- sockaddr )
 
 M: object ((client)) ( addrspec -- handle )
     [ SOCK_STREAM open-socket ] keep
-    [ unspecific-sockaddr/size bind-socket ] [ drop ] 2bi ;
+    [
+        bind-local-address get
+        [ nip make-sockaddr/size ]
+        [ unspecific-sockaddr/size ] if* bind-socket
+    ] [ drop ] 2bi ;
 
 : server-socket ( addrspec type -- fd )
     [ open-socket ] [ drop ] 2bi

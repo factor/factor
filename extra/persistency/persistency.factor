@@ -26,5 +26,5 @@ SYNTAX: STORED-TUPLE: parse-tuple-definition [ drop persistent ] dip [ remove-ty
 : remove-tuples ( tuple -- ) [ delete-tuples ] w/db ;
     
 TUPLE: pattern value ; C: <pattern> pattern
-SYNTAX: %" parse-string <pattern> parsed ;
+SYNTAX: %" parse-string <pattern> suffix! ;
 M: pattern where value>> over column-name>> 0% " LIKE " 0% bind# ;

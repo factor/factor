@@ -47,19 +47,19 @@ HELP: log-message
 { $description "Sends a message to the current log if the level is more urgent than " { $link log-level } ". Does nothing if not executing in a dynamic scope established by " { $link with-logging } "." } ;
 
 HELP: add-logging
-{ $values { "level" "a log level" } { "word" word } }
+{ $values { "word" word } { "level" "a log level" } }
 { $description "Causes the word to log a message every time it is called." } ;
 
 HELP: add-input-logging
-{ $values { "level" "a log level" } { "word" word } }
+{ $values { "word" word } { "level" "a log level" } }
 { $description "Causes the word to log its input values every time it is called. The word must have a stack effect declaration." } ;
 
 HELP: add-output-logging
-{ $values { "level" "a log level" } { "word" word } }
+{ $values { "word" word } { "level" "a log level" } }
 { $description "Causes the word to log its output values every time it is called. The word must have a stack effect declaration." } ;
 
 HELP: add-error-logging
-{ $values { "level" "a log level" } { "word" word } }
+{ $values { "word" word } { "level" "a log level" } }
 { $description "Causes the word to log its input values and any errors it throws."
 $nl
 "If the word is not executed in a dynamic scope established by " { $link with-logging } ", its behavior is unchanged, and any errors it throws are passed to the caller."

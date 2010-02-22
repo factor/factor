@@ -1,31 +1,45 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien.c-types arrays classes.struct combinators
-combinators.short-circuit game.worlds gpu gpu.buffers
+combinators.short-circuit game.loop game.worlds gpu gpu.buffers
 gpu.util.wasd gpu.framebuffers gpu.render gpu.shaders gpu.state
 gpu.textures gpu.util grouping http.client images images.loader
-io io.encodings.ascii io.files io.files.temp kernel math
-math.matrices math.parser math.vectors method-chains sequences
-splitting threads ui ui.gadgets ui.gadgets.worlds
-ui.pixel-formats specialized-arrays specialized-vectors ;
+images.tiff io io.encodings.ascii io.files io.files.temp kernel
+locals math math.matrices math.vectors.simd math.parser math.vectors
+method-chains namespaces sequences splitting threads ui ui.gadgets
+ui.gadgets.worlds ui.pixel-formats specialized-arrays
+specialized-vectors literals ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-VECTOR: uint
 IN: gpu.demos.bunny
 
+VERTEX-FORMAT: bunny-vertex
+    { "vertex" float-components 3 f }
+    { f        float-components 1 f }
+    { "normal" float-components 3 f }
+    { f        float-components 1 f } ;
+
+STRUCT: bunny-vertex-struct
+    { vertex float-4 }
+    { normal float-4 } ;
+
 GLSL-SHADER-FILE: bunny-vertex-shader vertex-shader "bunny.v.glsl"
 GLSL-SHADER-FILE: bunny-fragment-shader fragment-shader "bunny.f.glsl"
 GLSL-PROGRAM: bunny-program
-    bunny-vertex-shader bunny-fragment-shader ;
+    bunny-vertex-shader bunny-fragment-shader
+    bunny-vertex ;
 
 GLSL-SHADER-FILE: window-vertex-shader vertex-shader "window.v.glsl"
 
 GLSL-SHADER-FILE: sobel-fragment-shader fragment-shader "sobel.f.glsl"
 GLSL-PROGRAM: sobel-program
-    window-vertex-shader sobel-fragment-shader ;
+    window-vertex-shader sobel-fragment-shader
+    window-vertex ;
 
 GLSL-SHADER-FILE: loading-fragment-shader fragment-shader "loading.f.glsl"
 GLSL-PROGRAM: loading-program
-    window-vertex-shader loading-fragment-shader ;
+    window-vertex-shader loading-fragment-shader
+    window-vertex ;
 
 TUPLE: bunny-state
     vertexes
@@ -47,13 +61,6 @@ TUPLE: loading-state
 TUPLE: bunny-world < wasd-world
     bunny sobel loading ;
 
-VERTEX-FORMAT: bunny-vertex
-    { "vertex" float-components 3 f }
-    { f        float-components 1 f }
-    { "normal" float-components 3 f }
-    { f        float-components 1 f } ;
-VERTEX-STRUCT: bunny-vertex-struct bunny-vertex
-
 SPECIALIZED-VECTOR: bunny-vertex-struct
 
 UNIFORM-TUPLE: bunny-uniforms < mvp-uniforms
@@ -74,43 +81,58 @@ UNIFORM-TUPLE: loading-uniforms
     { "texcoord-scale"  vec2-uniform    f }
     { "loading-texture" texture-uniform f } ;
 
-: numbers ( str -- seq )
-    " " split [ string>number ] map sift ;
+: numbers ( tokens -- seq )
+    [ string>number ] map ; inline
 
 : <bunny-vertex> ( vertex -- struct )
     bunny-vertex-struct <struct>
-        swap >float-array >>vertex ; inline
+        swap first3 0.0 float-4-boa >>vertex ; inline
+
+: (read-line-tokens) ( seq stream -- seq )
+    " \n" over stream-read-until
+    [ [ pick push ] unless-empty ]
+    [
+        {
+            { CHAR: \s [ (read-line-tokens) ] }
+            { CHAR: \n [ drop ] }
+            [ 2drop [ f ] when-empty ]
+        } case
+    ] bi* ; inline recursive
+
+: stream-read-line-tokens ( stream -- seq )
+    V{ } clone swap (read-line-tokens) ;
+
+: each-line-tokens ( quot -- )
+    input-stream get [ stream-read-line-tokens ] curry each-morsel ; inline
 
 : (parse-bunny-model) ( vs is -- vs is )
-    readln [
+    [
         numbers {
-            { [ dup length 5 = ] [ 3 head <bunny-vertex> pick push ] }
-            { [ dup first 3 = ] [ rest over push-all ] }
+            { [ dup length 5 = ] [ <bunny-vertex> pick push ] }
+            { [ dup first 3 = ] [ rest append! ] }
             [ drop ]
-        } cond (parse-bunny-model)
-    ] when* ;
+        } cond
+    ] each-line-tokens ; inline
 
 : parse-bunny-model ( -- vertexes indexes )
     100000 <bunny-vertex-struct-vector>
     100000 <uint-vector>
-    (parse-bunny-model) ;
+    (parse-bunny-model) ; inline
 
-: normal ( vertexes -- normal )
-    [ [ second ] [ first ] bi v- ]
-    [ [ third  ] [ first ] bi v- ] bi cross
-    vneg normalize ; inline
+:: normal ( a b c -- normal )
+    c a v-
+    b a v- cross normalize ; inline
 
-: calc-bunny-normal ( vertexes indexes -- )
-    swap
-    [ [ nth vertex>> ] curry { } map-as normal ]
-    [ [ nth [ v+ ] change-normal drop ] curry with each ] 2bi ;
+:: calc-bunny-normal ( a b c vertexes -- )
+    a b c [ vertexes nth vertex>> ] tri@ normal :> n
+    a b c [ vertexes nth [ n v+ ] change-normal drop ] tri@ ; inline
 
 : calc-bunny-normals ( vertexes indexes -- )
-    3 <groups>
-    [ calc-bunny-normal ] with each ;
+    3 <sliced-groups> swap
+    [ [ first3 ] dip calc-bunny-normal ] curry each ; inline
 
 : normalize-bunny-normals ( vertexes -- )
-    [ [ normalize ] change-normal drop ] each ;
+    [ [ normalize ] change-normal drop ] each ; inline
 
 : bunny-data ( filename -- vertexes indexes )
     ascii [ parse-bunny-model ] with-file-reader
@@ -141,7 +163,7 @@ CONSTANT: bunny-model-url "http://factorcode.org/bun_zipper.ply"
 
 : fill-bunny-state ( bunny-state -- )
     dup [ vertexes>> ] [ indexes>> ] bi <bunny-buffers>
-    [ bunny-program <program-instance> bunny-vertex buffer>vertex-array >>vertex-array ]
+    [ bunny-program <program-instance> <vertex-array> >>vertex-array ]
     [ 0 <buffer-ptr> ]
     [ uint-indexes <index-elements> >>index-elements ] tri*
     drop ;
@@ -158,7 +180,7 @@ CONSTANT: bunny-model-url "http://factorcode.org/bun_zipper.ply"
 
 : <sobel-state> ( window-vertex-buffer -- sobel-state )
     sobel-state new
-        swap sobel-program <program-instance> window-vertex buffer>vertex-array >>vertex-array
+        swap sobel-program <program-instance> <vertex-array> >>vertex-array
 
         RGBA half-components T{ texture-parameters
             { wrap clamp-texcoord-to-edge }
@@ -185,7 +207,7 @@ CONSTANT: bunny-model-url "http://factorcode.org/bun_zipper.ply"
 : <loading-state> ( window-vertex-buffer -- loading-state )
     loading-state new
         swap
-        loading-program <program-instance> window-vertex buffer>vertex-array >>vertex-array
+        loading-program <program-instance> <vertex-array> >>vertex-array
 
         RGBA ubyte-components T{ texture-parameters
             { wrap clamp-texcoord-to-edge }
@@ -195,7 +217,7 @@ CONSTANT: bunny-model-url "http://factorcode.org/bun_zipper.ply"
         dup 0 "vocab:gpu/demos/bunny/loading.tiff" load-image allocate-texture-image
         >>texture ;
 
-BEFORE: bunny-world begin-world
+M: bunny-world begin-game-world
     init-gpu
     
     { -0.2 0.13 0.1 } 1.1 0.2 set-wasd-view
@@ -274,24 +296,20 @@ M: bunny-world draw-world*
 AFTER: bunny-world resize-world
     [ sobel>> framebuffer>> ] [ dim>> ] bi resize-framebuffer ;
 
-M: bunny-world pref-dim* drop { 1024 768 } ;
-M: bunny-world tick-length drop 1000 30 /i ;
 M: bunny-world wasd-movement-speed drop 1/160. ;
 M: bunny-world wasd-near-plane drop 1/32. ;
 M: bunny-world wasd-far-plane drop 256.0 ;
 
-: bunny-window ( -- )
-    [
-        f T{ world-attributes
-            { world-class bunny-world }
-            { title "Bunny" }
-            { pixel-format-attributes {
-                windowed
-                double-buffered
-                T{ depth-bits { value 24 } }
-            } }
-            { grab-input? t }
-        } open-window
-    ] with-ui ;
-
-MAIN: bunny-window
+GAME: bunny-game {
+        { world-class bunny-world }
+        { title "Bunny" }
+        { pixel-format-attributes {
+            windowed
+            double-buffered
+            T{ depth-bits { value 24 } }
+        } }
+        { grab-input? t }
+        { use-game-input? t }
+        { pref-dim { 1024 768 } }
+        { tick-interval-micros $[ 60 fps ] }
+    } ;

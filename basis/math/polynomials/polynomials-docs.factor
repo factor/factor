@@ -11,6 +11,7 @@ ARTICLE: "polynomials" "Polynomials"
     p-
     p*
     p-sq
+    p^
     powers
     n*p
     p/mod
@@ -35,12 +36,12 @@ HELP: p=
 { $examples { $example "USING: math.polynomials prettyprint ;" "{ 0 1 } { 0 1 0 } p= ." "t" } } ;
 
 HELP: ptrim
-{ $values { "p" "a polynomial" } { "p" "a polynomial" } }
+{ $values { "p" "a polynomial" } { "q" "a polynomial" } }
 { $description "Trims excess zeros from a polynomial." }
 { $examples { $example "USING: math.polynomials prettyprint ;" "{ 0 1 0 0 } ptrim ." "{ 0 1 }" } } ;
 
 HELP: 2ptrim
-{ $values { "p" "a polynomial" } { "q" "a polynomial" } { "p" "a polynomial" } { "q" "a polynomial" } }
+{ $values { "p" "a polynomial" } { "q" "a polynomial" } { "p'" "a polynomial" } { "q'" "a polynomial" } }
 { $description "Trims excess zeros from two polynomials." }
 { $examples { $example "USING: kernel math.polynomials prettyprint ;" "{ 0 1 0 0 } { 1 0 0 } 2ptrim [ . ] bi@" "{ 0 1 }\n{ 1 }" } } ;
 
@@ -60,7 +61,7 @@ HELP: n*p
 { $examples { $example "USING: math.polynomials prettyprint ;" "4 { 3 0 1 } n*p ." "{ 12 0 4 }" } } ;
 
 HELP: pextend-conv
-{ $values { "p" "a polynomial" } { "q" "a polynomial" } { "p" "a polynomial" } { "q" "a polynomial" } }
+{ $values { "p" "a polynomial" } { "q" "a polynomial" } { "p'" "a polynomial" } { "q'" "a polynomial" } }
 { $description "Convulution, extending to " { $snippet "p_m + q_n - 1" } "." }
 { $examples { $example "USING: kernel math.polynomials prettyprint ;" "{ 1 0 1 } { 0 1 } pextend-conv [ . ] bi@" "V{ 1 0 1 0 }\nV{ 0 1 0 0 }" } } ;
 
@@ -73,6 +74,11 @@ HELP: p-sq
 { $values { "p" "a polynomial" } { "p^2" "a polynomial" } }
 { $description "Squares a polynomial." }
 { $examples { $example "USING: math.polynomials prettyprint ;" "{ 1 2 0 } p-sq ." "{ 1 4 4 0 0 }" } } ;
+
+HELP: p^
+{ $values { "p" "a polynomial" } { "n" number } { "p^n" "a polynomial" } }
+{ $description "Computes " { $snippet "p" } " to the power of " { $snippet "n" } "." }
+{ $examples { $example "USING: math.polynomials prettyprint ;" "{ 1 2 0 } 3 p^ ." "{ 1 6 12 8 0 0 0 }" } } ;
 
 HELP: p/mod
 { $values { "p" "a polynomial" } { "q" "a polynomial" } { "z" "a polynomial" } { "w" "a polynomial" } }

@@ -14,7 +14,7 @@ CONSTANT: db-url "http://software77.net/cgi-bin/ip-country/geo-ip.pl?action=down
 : download-db ( -- path )
     db-path dup exists? [
         db-url over ".gz" append download-to
-        { "gunzip" } over ".gz" append (normalize-path) suffix try-process
+        { "gunzip" } over ".gz" append absolute-path suffix try-process
     ] unless ;
 
 TUPLE: ip-entry from to registry assigned city cntry country ;

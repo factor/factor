@@ -39,7 +39,7 @@ IN: project-euler.038
     pick length 8 > [
         2drop 10 digits>integer
     ] [
-        [ * number>digits over push-all ] 2keep 1 + (concat-product)
+        [ * number>digits append! ] 2keep 1 + (concat-product)
     ] if ;
 
 : concat-product ( n -- m )

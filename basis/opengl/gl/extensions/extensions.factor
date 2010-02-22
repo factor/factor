@@ -19,7 +19,7 @@ SYMBOL: +gl-function-pointers+
 : reset-gl-function-pointers ( -- )
     100 <hashtable> +gl-function-pointers+ set-global ;
     
-[ reset-gl-function-pointers ] "opengl.gl" add-init-hook
+[ reset-gl-function-pointers ] "opengl.gl" add-startup-hook
 reset-gl-function-pointers
 reset-gl-function-number-counter
 
@@ -49,7 +49,7 @@ reset-gl-function-number-counter
 
 SYNTAX: GL-FUNCTION:
     gl-function-calling-convention
-    scan
+    scan-c-type
     scan dup
     scan drop "}" parse-tokens swap prefix
     gl-function-number

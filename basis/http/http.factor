@@ -5,9 +5,7 @@ sequences splitting sorting sets strings vectors hashtables
 quotations arrays byte-arrays math.parser calendar
 calendar.format present urls fry
 io io.encodings io.encodings.iana io.encodings.binary
-io.encodings.8-bit io.crlf ascii
-http.parsers
-base64 ;
+io.crlf ascii io.encodings.8-bit.latin1 http.parsers base64 ;
 IN: http
 
 CONSTANT: max-redirects 10
@@ -193,7 +191,7 @@ M: response clone
     [ cookies>> ] dip '[ [ _ ] dip name>> = ] find nip ;
 
 : delete-cookie ( request/response name -- )
-    over cookies>> [ get-cookie ] dip delete ;
+    over cookies>> [ get-cookie ] dip remove! drop ;
 
 : put-cookie ( request/response cookie -- request/response )
     [ name>> dupd get-cookie [ dupd delete-cookie ] when* ] keep

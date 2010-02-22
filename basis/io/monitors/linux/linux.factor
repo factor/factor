@@ -36,7 +36,7 @@ TUPLE: linux-monitor < monitor wd inotify watches ;
     inotify-fd -rot inotify_add_watch dup io-error dup check-existing ;
 
 : add-watch ( path mask mailbox -- monitor )
-    [ [ (normalize-path) ] dip [ (add-watch) ] [ drop ] 2bi ] dip
+    [ [ absolute-path ] dip [ (add-watch) ] [ drop ] 2bi ] dip
     <linux-monitor> [ ] [ ] [ wd>> ] tri watches get set-at ;
 
 : check-inotify ( -- )
@@ -59,7 +59,9 @@ M: linux-monitor dispose* ( monitor -- )
             [ inotify>> handle>> handle-fd ] [ wd>> ] bi
             inotify_rm_watch io-error
         ] if
-    ] bi ;
+    ]
+    [ call-next-method ]
+    tri ;
 
 : ignore-flags? ( mask -- ? )
     {

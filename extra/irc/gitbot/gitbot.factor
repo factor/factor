@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry irc.client irc.client.chats kernel namespaces
-sequences threads io.encodings.8-bit io.launcher io splitting
-make mason.common mason.updates calendar math alarms ;
+sequences threads io.launcher io splitting
+make mason.common mason.updates calendar math alarms
+io.encodings.8-bit.latin1 ;
 IN: irc.gitbot
 
 : bot-profile ( -- obj )

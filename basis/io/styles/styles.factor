@@ -163,9 +163,3 @@ M: input summary
 : write-object ( str obj -- ) presented associate format ;
 
 : write-image ( image -- ) [ "" ] dip image associate format ;
-
-SYMBOL: stack-effect-style
-H{
-    { foreground COLOR: FactorDarkGreen }
-    { font-style plain }
-} stack-effect-style set-global

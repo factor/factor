@@ -1,7 +1,0 @@
-<title>Factor to Javascript REPL</title>
-<link rel="stylesheet" type="text/css" href="/responder/fjsc-repl-resources/termlib/term_styles.css"/>
-<script type="text/javascript" src="/responder/fjsc-repl-resources/termlib/termlib.js"></script>
-<script type="text/javascript" src="/responder/fjsc-resources/jquery.js"></script>
-<script type="text/javascript" src="/responder/fjsc-resources/bootstrap.js"></script>
-<script type="text/javascript" src="/responder/fjsc-repl-resources/repl.js"></script>
-<script type="text/javascript" src="/responder/fjsc/compile-url?url=/responder/fjsc-resources/bootstrap.factor"></script>

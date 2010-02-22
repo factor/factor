@@ -21,12 +21,13 @@ $nl
 "There are several ways of creating an uninterned word:"
 { $subsections
     <word>
+    <uninterned-word>
     gensym
     define-temp
 } ;
 
 ARTICLE: "colon-definition" "Colon definitions"
-"Every word has an associated quotation definition that is called when the word is executed. A " { $emphasis "colon definition" } " is a word where this quotation is supplied directly by the user. This is the simplest and most common type of word definition."
+"All words have associated definition " { $link "quotations" } ". A word's definition quotation is called when the word is executed. A " { $emphasis "colon definition" } " is a word where this quotation is supplied directly by the user. This is the simplest and most common type of word definition."
 $nl
 "Defining words at parse time:"
 { $subsections
@@ -65,7 +66,7 @@ $nl
 "Deferred words are just compound definitions in disguise. The following two lines are equivalent:"
 { $code
     "DEFER: foo"
-    ": foo undefined ;"
+    ": foo ( -- * ) undefined ;"
 } ;
 
 ARTICLE: "declarations" "Compiler declarations"
@@ -133,8 +134,8 @@ $nl
 ARTICLE: "word.private" "Word implementation details"
 "The " { $snippet "def" } " slot of a word holds a " { $link quotation } " instance that is called when the word is executed."
 $nl
-"An " { $emphasis "XT" } " (execution token) is the machine code address of a word:"
-{ $subsections word-xt } ;
+"A primitive to get the memory range storing the machine code for a word:"
+{ $subsections word-code } ;
 
 ARTICLE: "words.introspection" "Word introspection"
 "Word introspection facilities and implementation details are found in the " { $vocab-link "words" } " vocabulary."
@@ -160,7 +161,7 @@ $nl
 } ;
 
 ARTICLE: "words" "Words"
-"Words are the Factor equivalent of functions or procedures; a word is essentially a named quotation."
+"Words are the Factor equivalent of functions or procedures in other languages. Words are essentially named " { $link "quotations" } "."
 $nl
 "There are two ways of creating word definitions:"
 { $list
@@ -192,6 +193,14 @@ HELP: deferred
 
 { deferred POSTPONE: DEFER: } related-words
 
+HELP: undefined
+{ $error-description "This error is thrown in two cases, and the debugger's summary message reflects the cause:"
+    { $list
+        { "A word was executed before being compiled. For example, this can happen if a macro is defined in the same compilation unit where it was used. See " { $link "compilation-units" } " for a discussion." }
+        { "A word defined with " { $link POSTPONE: DEFER: } " was executed. Since this syntax is usually used for mutually-recursive word definitions, executing a deferred word usually indicates a programmer mistake." }
+    }
+} ;
+
 HELP: primitive
 { $description "The class of primitive words." } ;
 
@@ -209,9 +218,9 @@ HELP: remove-word-prop
 { $description "Removes a word property, so future lookups will output " { $link f } " until it is set again. Word property names are conventionally strings." }
 { $side-effects "word" } ;
 
-HELP: word-xt ( word -- start end )
+HELP: word-code ( word -- start end )
 { $values { "word" word } { "start" "the word's start address" } { "end" "the word's end address" } }
-{ $description "Outputs the machine code address of the word's definition." } ;
+{ $description "Outputs the memory range containing the word's machine code." } ;
 
 HELP: define
 { $values { "word" word } { "def" quotation } }
@@ -238,7 +247,13 @@ $low-level-note
 
 HELP: <word> ( name vocab -- word )
 { $values { "name" string } { "vocab" string } { "word" word } }
-{ $description "Allocates an uninterned word with the specified name and vocabulary, and a blank word property hashtable. User code should call " { $link gensym } " to create uninterned words and " { $link create } " to create interned words." } ;
+{ $description "Allocates a word with the specified name and vocabulary. User code should call " { $link <uninterned-word> } " to create uninterned words and " { $link create } " to create interned words, instead of calling this constructor directly." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
+
+HELP: <uninterned-word> ( name -- word )
+{ $values { "name" string } { "word" word } }
+{ $description "Creates an uninterned word with the specified name,  that is not equal to any other word in the system." }
+{ $notes "Unlike " { $link create } ", this word does not have to be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: gensym
 { $values { "word" word } }
@@ -248,7 +263,7 @@ HELP: gensym
     "( gensym )"
     }
 }
-{ $notes "Gensyms are often used as placeholder values that have no meaning of their own but must be unique. For example, the compiler uses gensyms to label sections of code." } ;
+{ $notes "Unlike " { $link create } ", this word does not have to be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: bootstrapping?
 { $var-description "Set by the library while bootstrap is in progress. Some parsing words need to behave differently during bootstrap." } ;
@@ -279,12 +294,14 @@ HELP: check-create
 
 HELP: create
 { $values { "name" string } { "vocab" string } { "word" word } }
-{ $description "Creates a new word. If the vocabulary already contains a word with the requested name, outputs the existing word. The vocabulary must exist already; if it does not, you must call " { $link create-vocab } " first." } ;
+{ $description "Creates a new word. If the vocabulary already contains a word with the requested name, outputs the existing word. The vocabulary must exist already; if it does not, you must call " { $link create-vocab } " first." }
+{ $notes "This word must be called from inside " { $link with-compilation-unit } ". Parsing words should call " { $link create-in } " instead of this word." } ;
 
 HELP: constructor-word
 { $values { "name" string } { "vocab" string } { "word" word } }
 { $description "Creates a new word, surrounding " { $snippet "name" } " in angle brackets." }
-{ $examples { $example "USING: prettyprint words ;" "\"salmon\" \"scratchpad\" constructor-word ." "<salmon>" } } ;
+{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
+{ $examples { $example "USING: compiler.units prettyprint words ;" "[ \"salmon\" \"scratchpad\" constructor-word ] with-compilation-unit ." "<salmon>" } } ;
 
 { POSTPONE: FORGET: forget forget* forget-vocab } related-words
 

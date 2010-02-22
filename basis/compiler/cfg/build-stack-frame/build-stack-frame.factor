@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces accessors math.order assocs kernel sequences
 combinators make classes words cpu.architecture layouts
@@ -17,17 +17,19 @@ GENERIC: compute-stack-frame* ( insn -- )
 UNION: stack-frame-insn
     ##alien-invoke
     ##alien-indirect
+    ##alien-assembly
     ##alien-callback ;
 
 M: stack-frame-insn compute-stack-frame*
     stack-frame>> request-stack-frame ;
 
-M: ##call compute-stack-frame*
-    word>> sub-primitive>> [ frame-required? on ] unless ;
+M: ##call compute-stack-frame* drop frame-required? on ;
 
 M: ##gc compute-stack-frame*
     frame-required? on
-    stack-frame new swap tagged-values>> length cells >>gc-root-size
+    stack-frame new
+        swap tagged-values>> length cells >>gc-root-size
+        t >>calls-vm?
     request-stack-frame ;
 
 M: _spill-area-size compute-stack-frame*

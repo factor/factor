@@ -41,7 +41,7 @@ CONSTANT: identity-transform T{ affine-transform f { 1.0 0.0 } { 0.0 1.0 } { 0.0
     [ [ y>> second     ] [ x>> second neg ] bi 2array ]
     [ [ y>> first  neg ] [ x>> first      ] bi 2array ]
     [ |a| ] tri
-    tuck [ v/n ] 2bi@ ;
+    [ v/n ] curry bi@ ;
 
 : inverse-axes ( a -- a^-1 )
     (inverted-axes) { 0.0 0.0 } <affine-transform> ;

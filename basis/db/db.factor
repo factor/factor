@@ -100,10 +100,10 @@ M: object execute-statement* ( statement type -- )
     t >>bound? drop ;
 
 : sql-row ( result-set -- seq )
-    dup #columns [ row-column ] with map ;
+    dup #columns [ row-column ] with { } map-integers ;
 
 : sql-row-typed ( result-set -- seq )
-    dup #columns [ row-column-typed ] with map ;
+    dup #columns [ row-column-typed ] with { } map-integers ;
 
 : query-each ( statement quot: ( statement -- ) -- )
     over more-rows? [
@@ -113,7 +113,7 @@ M: object execute-statement* ( statement type -- )
     ] if ; inline recursive
 
 : query-map ( statement quot -- seq )
-    accumulator [ query-each ] dip { } like ; inline
+    collector [ query-each ] dip { } like ; inline
 
 : with-db ( db quot -- )
     [ db-open db-connection ] dip

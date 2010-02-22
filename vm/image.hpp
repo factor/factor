@@ -7,17 +7,16 @@ static const cell image_version = 4;
 struct image_header {
 	cell magic;
 	cell version;
-	/* all pointers in the image file are relocated from
-	   relocation_base to here when the image is loaded */
+	/* base address of data heap when image was saved */
 	cell data_relocation_base;
 	/* size of heap */
 	cell data_size;
-	/* code relocation base */
+	/* base address of code heap when image was saved */
 	cell code_relocation_base;
 	/* size of code heap */
 	cell code_size;
 	/* tagged pointer to t singleton */
-	cell t;
+	cell true_object;
 	/* tagged pointer to bignum 0 */
 	cell bignum_zero;
 	/* tagged pointer to bignum 1 */
@@ -25,7 +24,7 @@ struct image_header {
 	/* tagged pointer to bignum -1 */
 	cell bignum_neg_one;
 	/* Initial user environment */
-	cell userenv[USER_ENV];
+	cell special_objects[special_object_count];
 };
 
 struct vm_parameters {
@@ -34,10 +33,11 @@ struct vm_parameters {
 	cell ds_size, rs_size;
 	cell young_size, aging_size, tenured_size;
 	cell code_size;
-	bool secure_gc;
 	bool fep;
 	bool console;
+	bool signals;
 	cell max_pic_size;
+	cell callback_size;
 };
 
 }

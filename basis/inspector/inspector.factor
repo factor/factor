@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays generic hashtables io kernel assocs math
 namespaces prettyprint prettyprint.custom prettyprint.sections
@@ -23,9 +23,7 @@ GENERIC: add-numbers ( alist -- table' )
 M: enum add-numbers ;
 
 M: assoc add-numbers
-    +number-rows+ get [
-        dup length [ prefix ] 2map
-    ] when ;
+    +number-rows+ get [ [ prefix ] map-index ] when ;
 
 TUPLE: slot-name name ;
 

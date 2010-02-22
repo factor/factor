@@ -2,31 +2,53 @@ namespace factor
 {
 
 struct data_heap {
+	cell start;
+
 	cell young_size;
 	cell aging_size;
 	cell tenured_size;
 
 	segment *seg;
 
-	zone *nursery;
+	nursery_space *nursery;
 	aging_space *aging;
 	aging_space *aging_semispace;
 	tenured_space *tenured;
-	tenured_space *tenured_semispace;
 
-	char *cards;
-	char *cards_end;
+	card *cards;
+	card *cards_end;
 
-	char *decks;
-	char *decks_end;
+	card_deck *decks;
+	card_deck *decks_end;
 	
-	explicit data_heap(factor_vm *myvm, cell young_size, cell aging_size, cell tenured_size);
+	explicit data_heap(cell young_size, cell aging_size, cell tenured_size);
 	~data_heap();
+	data_heap *grow(cell requested_size);
+	template<typename Generation> void clear_cards(Generation *gen);
+	template<typename Generation> void clear_decks(Generation *gen);
+	void reset_generation(nursery_space *gen);
+	void reset_generation(aging_space *gen);
+	void reset_generation(tenured_space *gen);
+	bool high_fragmentation_p();
+	bool low_memory_p();
+	void mark_all_cards();
 };
 
-static const cell nursery_gen = 0;
-static const cell aging_gen = 1;
-static const cell tenured_gen = 2;
-static const cell gen_count = 3;
+struct data_heap_room {
+	cell nursery_size;
+	cell nursery_occupied;
+	cell nursery_free;
+	cell aging_size;
+	cell aging_occupied;
+	cell aging_free;
+	cell tenured_size;
+	cell tenured_occupied;
+	cell tenured_total_free;
+	cell tenured_contiguous_free;
+	cell tenured_free_block_count;
+	cell cards;
+	cell decks;
+	cell mark_stack;
+};
 
 }

@@ -18,13 +18,13 @@ ERROR: bad-live-ranges interval ;
 
 : trim-before-ranges ( live-interval -- )
     [ ranges>> ] [ uses>> last 1 + ] bi
-    [ '[ from>> _ <= ] filter-here ]
+    [ '[ from>> _ <= ] filter! drop ]
     [ swap last (>>to) ]
     2bi ;
 
 : trim-after-ranges ( live-interval -- )
     [ ranges>> ] [ uses>> first ] bi
-    [ '[ to>> _ >= ] filter-here ]
+    [ '[ to>> _ >= ] filter! drop ]
     [ swap first (>>from) ]
     2bi ;
 
@@ -103,7 +103,7 @@ ERROR: bad-live-ranges interval ;
     ! most one) are split and spilled and removed from the inactive
     ! set.
     new vreg>> active-intervals-for [ [ reg>> reg = ] find swap dup ] keep
-    '[ _ delete-nth new start>> spill ] [ 2drop ] if ;
+    '[ _ remove-nth! drop  new start>> spill ] [ 2drop ] if ;
 
 :: spill-intersecting-inactive ( new reg -- )
     ! Any inactive intervals using 'reg' are split and spilled
@@ -114,7 +114,7 @@ ERROR: bad-live-ranges interval ;
                 new start>> spill f
             ] [ drop t ] if
         ] [ drop t ] if
-    ] filter-here ;
+    ] filter! drop ;
 
 : spill-intersecting ( new reg -- )
     ! Split and spill all active and inactive intervals

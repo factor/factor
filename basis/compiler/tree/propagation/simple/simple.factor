@@ -1,10 +1,10 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors kernel sequences sequences.private assocs
 words namespaces classes.algebra combinators
 combinators.short-circuit classes classes.tuple
 classes.tuple.private continuations arrays alien.c-types math
-math.private slots generic definitions stack-checker.state
+math.private slots generic definitions stack-checker.dependencies
 compiler.tree
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
@@ -36,7 +36,7 @@ M: #declare propagate-before
     #! classes mentioned in the declaration are redefined, since
     #! now we're making assumptions but their definitions.
     declaration>> [
-        [ inlined-dependency depends-on ]
+        [ depends-on-conditionally ]
         [ <class-info> swap refine-value-info ]
         bi
     ] assoc-each ;
@@ -80,7 +80,7 @@ M: #declare propagate-before
 : (fold-call) ( #call word -- info )
     [ [ out-d>> ] [ in-d>> [ value-info literal>> ] map ] bi ] [ '[ _ execute ] ] bi*
     '[ _ _ with-datastack [ <literal-info> ] map nip ]
-    [ drop [ object-info ] replicate ]
+    [ drop length [ object-info ] replicate ]
     recover ;
 
 : fold-call ( #call word -- )
@@ -93,11 +93,8 @@ M: #declare propagate-before
     recover ;
 
 : predicate-output-infos/class ( info class -- info )
-    [ class>> ] dip {
-        { [ 2dup class<= ] [ t <literal-info> ] }
-        { [ 2dup classes-intersect? not ] [ f <literal-info> ] }
-        [ object-info ]
-    } cond 2nip ;
+    [ class>> ] dip compare-classes
+    dup +incomparable+ eq? [ drop object-info ] [ <literal-info> ] if ;
 
 : predicate-output-infos ( info class -- info )
     over literal?>>
@@ -110,8 +107,9 @@ M: #declare propagate-before
     #! is redefined, since now we're making assumptions but the
     #! class definition itself.
     [ in-d>> first value-info ]
-    [ "predicating" word-prop dup inlined-dependency depends-on ] bi*
-    predicate-output-infos 1array ;
+    [ "predicating" word-prop ] bi*
+    [ nip depends-on-conditionally ]
+    [ predicate-output-infos 1array ] 2bi ;
 
 : default-output-value-infos ( #call word -- infos )
     "default-output-classes" word-prop
@@ -153,8 +151,6 @@ M: #call propagate-after
     [ out-d>> ] [ params>> return>> ] bi
     [ drop ] [ c-type-class <class-info> swap first set-value-info ] if-void ;
 
-M: #alien-invoke propagate-before propagate-alien-invoke ;
-
-M: #alien-indirect propagate-before propagate-alien-invoke ;
+M: #alien-node propagate-before propagate-alien-invoke ;
 
 M: #return annotate-node dup in-d>> (annotate-node) ;

@@ -1,5 +1,5 @@
 USING: sequences sequences.private math
-accessors alien.data ;
+accessors alien.c-types ;
 IN: game.input.dinput.keys-array
 
 TUPLE: keys-array

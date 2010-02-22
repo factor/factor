@@ -26,15 +26,15 @@ ERROR: decimal-test-failure D1 D2 quot ;
 : test-decimal-op ( quot1 quot2 -- ? )
     [ random-test-decimal random-test-decimal ] 2dip (test-decimal-op) ; inline
 
-[ t ] [ 1000 [ drop [ D+ ] [ + ] test-decimal-op ] all? ] unit-test
-[ t ] [ 1000 [ drop [ D- ] [ - ] test-decimal-op ] all? ] unit-test
-[ t ] [ 1000 [ drop [ D* ] [ * ] test-decimal-op ] all? ] unit-test
+[ t ] [ 1000 [ drop [ D+ ] [ + ] test-decimal-op ] all-integers? ] unit-test
+[ t ] [ 1000 [ drop [ D- ] [ - ] test-decimal-op ] all-integers? ] unit-test
+[ t ] [ 1000 [ drop [ D* ] [ * ] test-decimal-op ] all-integers? ] unit-test
 [ t ] [
     1000 [
         drop
         [ [ 100 D/ ] [ /f ] test-decimal-op ]
         [ { "kernel-error" 4 f f } = ] recover
-    ] all?
+    ] all-integers?
 ] unit-test
 
 [ t ] [ 
@@ -49,3 +49,4 @@ ERROR: decimal-test-failure D1 D2 quot ;
 [ f ] [ D: -1 D: -2 before? ] unit-test
 [ f ] [ D: -2 D: -2 before? ] unit-test
 [ t ] [ D: -3 D: -2 before? ] unit-test
+[ t ] [ D: .5 D: 0 D: 1.0 between? ] unit-test

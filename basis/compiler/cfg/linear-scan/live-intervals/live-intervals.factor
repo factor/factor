@@ -152,8 +152,8 @@ ERROR: bad-live-interval live-interval ;
     ! to reverse some sequences, and compute the start and end.
     values dup [
         {
-            [ ranges>> reverse-here ]
-            [ uses>> reverse-here ]
+            [ ranges>> reverse! drop ]
+            [ uses>> reverse! drop ]
             [ compute-start/end ]
             [ check-start ]
         } cleave

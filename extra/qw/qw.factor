@@ -1,5 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: lexer parser ;
+USING: lexer sequences parser ;
 IN: qw
 
-SYNTAX: qw{ "}" parse-tokens parsed ;
+SYNTAX: qw{ "}" parse-tokens suffix! ;

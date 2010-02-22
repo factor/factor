@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables kernel math namespaces
 make sequences quotations math.vectors combinators sorting
@@ -11,7 +11,6 @@ CONSTANT: horizontal { 1 0 }
 CONSTANT: vertical { 0 1 }
 
 TUPLE: gadget < rect
-id
 pref-dim
 parent
 children
@@ -29,7 +28,7 @@ model ;
 
 M: gadget equal? 2drop f ;
 
-M: gadget hashcode* nip [ [ \ gadget counter ] unless* ] change-id id>> ;
+M: gadget hashcode* nip identity-hashcode ;
 
 M: gadget model-changed 2drop ;
 
@@ -63,18 +62,19 @@ M: gadget children-on nip children>> ;
 
 <PRIVATE
 
-: ((fast-children-on)) ( gadget dim axis -- <=> )
-    [ swap loc>> v- ] dip v. 0 <=> ;
-
-:: (fast-children-on) ( dim axis children -- i )
-    children [ dim axis ((fast-children-on)) ] search drop ;
+:: (fast-children-on) ( point axis children quot -- i )
+    children [
+        [ point ] dip
+        quot call( value -- loc ) v-
+        axis v. 0 <=>
+    ] search drop ; inline
 
 PRIVATE>
 
-: fast-children-on ( rect axis children -- from to )
-    [ [ loc>> ] 2dip (fast-children-on) 0 or ]
-    [ [ rect-bounds v+ ] 2dip (fast-children-on) ?1+ ]
-    3bi ;
+:: fast-children-on ( rect axis children quot -- slice )
+    rect loc>> axis children quot (fast-children-on) 0 or
+    rect rect-bounds v+ axis children quot (fast-children-on) ?1+
+    children <slice> ; inline
 
 M: gadget contains-rect? ( bounds gadget -- ? )
     dup visible?>> [ call-next-method ] [ 2drop f ] if ;
@@ -306,7 +306,7 @@ M: gadget remove-gadget 2drop ;
             [ remove-gadget ] [
                 over (unparent)
                 [ unfocus-gadget ]
-                [ children>> delete ]
+                [ children>> remove! drop ]
                 [ nip relayout ]
                 2tri
             ] 2bi

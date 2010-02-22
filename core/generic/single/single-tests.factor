@@ -4,7 +4,8 @@ accessors words byte-arrays bit-arrays parser namespaces make
 quotations stack-checker vectors growable hashtables sbufs
 prettyprint byte-vectors bit-vectors specialized-vectors
 definitions generic sets graphs assocs grouping see eval ;
-SPECIALIZED-VECTOR: double
+QUALIFIED-WITH: alien.c-types c
+SPECIALIZED-VECTOR: c:double
 IN: generic.single.tests
 
 GENERIC: lo-tag-test ( obj -- obj' )
@@ -281,3 +282,6 @@ M: growable call-next-hooker call-next-method "growable " prepend ;
 [ "IN: generic.single.tests GENERIC# broken-generic# -1 ( a -- b )" eval( -- ) ]
 [ error>> bad-dispatch-position? ]
 must-fail-with
+
+[ ] [ "IN: generic.single.tests GENERIC: foo ( -- x )" eval( -- ) ] unit-test
+    [ "IN: generic.single.tests GENERIC: foo ( -- x ) inline" eval( -- ) ] must-fail

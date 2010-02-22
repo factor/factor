@@ -34,7 +34,7 @@ TUPLE: document < model locs undos redos inside-undo? ;
 
 : add-loc ( loc document -- ) locs>> push ;
 
-: remove-loc ( loc document -- ) locs>> delete ;
+: remove-loc ( loc document -- ) locs>> remove! drop ;
 
 : update-locs ( loc document -- )
     locs>> [ set-model ] with each ;
@@ -61,7 +61,7 @@ TUPLE: document < model locs undos redos inside-undo? ;
     ] if ; inline
 
 : map-lines ( from to quot -- results )
-    accumulator [ each-line ] dip ; inline
+    collector [ each-line ] dip ; inline
 
 : start/end-on-line ( from to line# document -- n1 n2 )
     [ start-on-line ] [ end-on-line ] bi-curry bi-curry bi* ;

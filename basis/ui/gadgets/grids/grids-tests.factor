@@ -1,11 +1,13 @@
 USING: ui.gadgets ui.gadgets.grids tools.test kernel arrays
 namespaces math.rectangles accessors ui.gadgets.grids.private
-ui.gadgets.debug sequences ;
+ui.gadgets.debug sequences classes ;
 IN: ui.gadgets.grids.tests
 
 [ { 0 0 } ] [ { } <grid> pref-dim ] unit-test
 
 : 100x100 ( -- gadget ) <gadget> { 100 100 } >>dim ;
+
+: 200x200 ( -- gadget ) <gadget> { 200 200 } >>dim ;
 
 [ { 100 100 } ] [
     100x100
@@ -82,3 +84,21 @@ IN: ui.gadgets.grids.tests
     dup layout
     children>> [ loc>> ] map
 ] unit-test
+
+! children-on logic was insufficient
+[ ] [
+    100x100 dup "a" set 200x200 2array
+    100x100 dup "b" set 200x200 2array 2array <grid> f >>fill? "g" set
+] unit-test
+
+[ ] [ "g" get prefer ] unit-test
+[ ] [ "g" get layout ] unit-test
+
+[ { 0 50 } ] [ "a" get loc>> ] unit-test
+[ { 0 250 } ] [ "b" get loc>> ] unit-test
+
+[ gadget { 200 200 } ]
+[ { 120 20 } "g" get pick-up [ class ] [ dim>> ] bi ] unit-test
+
+[ gadget { 200 200 } ]
+[ { 120 220 } "g" get pick-up [ class ] [ dim>> ] bi ] unit-test

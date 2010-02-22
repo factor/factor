@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax generic assocs kernel
 kernel.private math io.ports sequences strings sbufs threads
-unix vectors io.buffers io.backend io.encodings math.parser
+unix unix.ffi vectors io.buffers io.backend io.encodings math.parser
 continuations system libc namespaces make io.timeouts
 io.encodings.utf8 destructors destructors.private accessors
-summary combinators locals unix.time fry
+summary combinators locals unix.time unix.types fry
 io.backend.unix.multiplexers ;
 QUALIFIED: io
 IN: io.backend.unix
@@ -17,15 +17,11 @@ TUPLE: fd < disposable fd ;
 : init-fd ( fd -- fd )
     [
         |dispose
-        dup fd>> F_SETFL O_NONBLOCK fcntl io-error
-        dup fd>> F_SETFD FD_CLOEXEC fcntl io-error
+        dup fd>> F_SETFL O_NONBLOCK [ fcntl ] unix-system-call drop
+        dup fd>> F_SETFD FD_CLOEXEC [ fcntl ] unix-system-call drop
     ] with-destructors ;
 
 : <fd> ( n -- fd )
-    #! We drop the error code rather than calling io-error,
-    #! since on OS X 10.3, this operation fails from init-io
-    #! when running the Factor.app (presumably because fd 0 and
-    #! 1 are closed).
     fd new-disposable swap >>fd ;
 
 M: fd dispose
@@ -50,7 +46,7 @@ M: fd cancel-operation ( fd -- )
     ] if ;
 
 M: unix tell-handle ( handle -- n )
-    fd>> 0 SEEK_CUR lseek [ io-error ] [ ] bi ;
+    fd>> 0 SEEK_CUR [ lseek ] unix-system-call [ io-error ] [ ] bi ;
 
 M: unix seek-handle ( n seek-type handle -- )
     swap {
@@ -59,7 +55,7 @@ M: unix seek-handle ( n seek-type handle -- )
         { io:seek-end [ SEEK_END ] }
         [ io:bad-seek-type ]
     } case
-    [ fd>> swap ] dip lseek io-error ;
+    [ fd>> swap ] dip [ lseek ] unix-system-call drop ;
 
 SYMBOL: +retry+ ! just try the operation again without blocking
 SYMBOL: +input+
@@ -151,7 +147,7 @@ M: stdin dispose*
 
 : wait-for-stdin ( stdin -- n )
     [ control>> CHAR: X over io:stream-write1 io:stream-flush ]
-    [ size>> "ssize_t" heap-size swap io:stream-read *int ]
+    [ size>> ssize_t heap-size swap io:stream-read *int ]
     bi ;
 
 :: refill-stdin ( buffer stdin size -- )
@@ -197,5 +193,5 @@ TUPLE: mx-port < port mx ;
         [ drop 0 ] [ (io-error) ] if
     ] when ;
 
-: ?flag ( n mask symbol -- n )
-    pick rot bitand 0 > [ , ] [ drop ] if ;
+:: ?flag ( n mask symbol -- n )
+    n mask bitand 0 > [ symbol , ] when n ;

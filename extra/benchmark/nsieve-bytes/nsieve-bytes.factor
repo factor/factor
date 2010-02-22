@@ -20,7 +20,7 @@ byte-arrays make io ;
     ] if ; inline recursive
 
 : nsieve ( m -- count )
-    0 2 rot 1 + <byte-array> dup [ drop 1 ] change-each (nsieve) ;
+    0 2 rot 1 + <byte-array> [ drop 1 ] map! (nsieve) ;
 
 : nsieve. ( m -- )
     [ "Primes up to " % dup # " " % nsieve # ] "" make print ;

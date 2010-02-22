@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: splitting parser parser.notes compiler.units kernel namespaces
-debugger io.streams.string fry combinators effects.parser ;
+USING: splitting parser parser.notes compiler.units kernel
+namespaces debugger io.streams.string fry combinators
+effects.parser continuations ;
 IN: eval
 
 : parse-string ( str -- quot )
@@ -19,7 +20,7 @@ SYNTAX: eval( \ eval parse-call( ;
     [
         "quiet" on
         parser-notes off
-        '[ _ (( -- )) (eval) ] try
+        '[ _ (( -- )) (eval) ] [ print-error ] recover
     ] with-string-writer ;
 
 : eval>string ( str -- output )

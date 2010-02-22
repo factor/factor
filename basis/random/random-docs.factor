@@ -19,9 +19,8 @@ HELP: random-bytes*
 { $description "Generates a byte-array of random bytes." } ;
 
 HELP: random
-{ $values { "seq" sequence } { "elt" "a random element" } }
-{ $description "Outputs a random element of the input sequence. Outputs " { $link f } " if the sequence is empty." }
-{ $notes "Since integers are sequences, passing an integer " { $snippet "n" } " outputs an integer in the interval " { $snippet "[0,n)" } "." }
+{ $values { "obj" object } { "elt" "a random element" } }
+{ $description "Outputs a random element of the input object, or outputs " { $link f } " if the object contains no elements." }
 { $examples
     { $unchecked-example "USING: random prettyprint ;"
         "10 random ."
@@ -76,7 +75,7 @@ HELP: with-system-random
 HELP: randomize
 { $values
      { "seq" sequence }
-     { "seq" sequence }
+     { "randomized" sequence }
 }
 { $description "Randomizes a sequence in-place with the Fisher-Yates algorithm and returns the sequence." } ;
 
@@ -87,8 +86,9 @@ HELP: sample
 }
 { $description "Takes " { $snippet "n" } " samples at random without replacement from a sequence. Throws an error if " { $snippet "n" } " is longer than the sequence." }
 { $examples
-    { $unchecked-example "USING: random prettyprint ; { 1 2 3 } 2 sample ."
-        "{ 3 2 }"
+    { $unchecked-example "USING: random prettyprint ;"
+    "{ 1 2 3 } 2 sample ."
+    "{ 3 2 }"
     }
 } ;
 
@@ -96,7 +96,7 @@ HELP: delete-random
 { $values
      { "seq" sequence }
      { "elt" object } }
-{ $description "Deletes a random number from a sequence using " { $link delete-nth } " and returns the deleted object." } ;
+{ $description "Deletes a random number from a sequence using " { $link remove-nth! } " and returns the deleted object." } ;
 
 ARTICLE: "random-protocol" "Random protocol"
 "A random number generator must implement one of these two words:"

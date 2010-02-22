@@ -10,10 +10,10 @@ SYMBOL: current-directory
 
 : path-separator ( -- string ) os windows? "\\" "/" ? ;
 
-: trim-tail-separators ( str -- newstr )
+: trim-tail-separators ( string -- string' )
     [ path-separator? ] trim-tail ;
 
-: trim-head-separators ( str -- newstr )
+: trim-head-separators ( string -- string' )
     [ path-separator? ] trim-head ;
 
 : last-path-separator ( path -- n ? )
@@ -61,8 +61,6 @@ ERROR: no-parent-directory path ;
         [ nip ]
     } cond ;
 
-PRIVATE>
-
 : windows-absolute-path? ( path -- path ? )
     {
         { [ dup "\\\\?\\" head? ] [ t ] }
@@ -87,7 +85,9 @@ PRIVATE>
         [ f ]
     } cond nip ;
 
-: append-path ( str1 str2 -- str )
+PRIVATE>
+
+: append-path ( path1 path2 -- path )
     {
         { [ over empty? ] [ append-path-empty ] }
         { [ dup empty? ] [ drop ] }
@@ -102,12 +102,12 @@ PRIVATE>
             [ 2 head ] dip append
         ] }
         [
-            [ trim-tail-separators "/" ] dip
-            trim-head-separators 3append
+            [ trim-tail-separators ]
+            [ trim-head-separators ] bi* "/" glue
         ]
     } cond ;
 
-: prepend-path ( str1 str2 -- str )
+: prepend-path ( path1 path2 -- path )
     swap append-path ; inline
 
 : file-name ( path -- string )
@@ -127,38 +127,38 @@ PRIVATE>
 : path-components ( path -- seq )
     normalize-path path-separator split harvest ;
 
-HOOK: canonicalize-path os ( path -- path' )
+HOOK: resolve-symlinks os ( path -- path' )
 
-M: object canonicalize-path normalize-path ;
+M: object resolve-symlinks normalize-path ;
 
 : resource-path ( path -- newpath )
     "resource-path" get prepend-path ;
 
 GENERIC: vocab-path ( path -- newpath )
 
-GENERIC: (normalize-path) ( path -- path' )
+GENERIC: absolute-path ( path -- path' )
 
-M: string (normalize-path)
+M: string absolute-path
     "resource:" ?head [
         trim-head-separators resource-path
-        (normalize-path)
+        absolute-path
     ] [
         "vocab:" ?head [
             trim-head-separators vocab-path
-            (normalize-path)
+            absolute-path
         ] [
             current-directory get prepend-path
         ] if
     ] if ;
 
 M: object normalize-path ( path -- path' )
-    (normalize-path) ;
+    absolute-path ;
 
 TUPLE: pathname string ;
 
 C: <pathname> pathname
 
-M: pathname (normalize-path) string>> (normalize-path) ;
+M: pathname absolute-path string>> absolute-path ;
 
 M: pathname <=> [ string>> ] compare ;
 

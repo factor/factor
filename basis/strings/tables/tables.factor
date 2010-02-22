@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences fry math.order splitting ;
 IN: strings.tables
@@ -6,16 +6,14 @@ IN: strings.tables
 <PRIVATE
 
 : map-last ( seq quot -- seq )
-    [ dup length <reversed> ] dip '[ 0 = @ ] 2map ; inline
+    [ dup length iota <reversed> ] dip '[ 0 = @ ] 2map ; inline
 
 : max-length ( seq -- n )
     [ length ] [ max ] map-reduce ;
 
-: format-row ( seq ? -- seq )
-    [
-        dup max-length
-        '[ _ "" pad-tail ] map
-    ] unless ;
+: format-row ( seq -- seq )
+    dup max-length
+    '[ _ "" pad-tail ] map ;
 
 : format-column ( seq ? -- seq )
     [
@@ -26,5 +24,5 @@ IN: strings.tables
 PRIVATE>
 
 : format-table ( table -- seq )
-    [ [ [ string-lines ] map ] dip format-row flip ] map-last concat
+    [ [ string-lines ] map format-row flip ] map concat
     flip [ format-column ] map-last flip [ " " join ] map ;

@@ -5,7 +5,7 @@ IN: compiler.tests.stack-trace
 
 : symbolic-stack-trace ( -- newseq )
     error-continuation get call>> callstack>array
-    2 group flip first ;
+    3 group flip first ;
 
 : foo ( -- * ) 3 throw 7 ;
 : bar ( -- * ) foo 4 ;
@@ -19,7 +19,7 @@ IN: compiler.tests.stack-trace
 
 : bleh ( seq -- seq' ) [ 3 + ] map [ 0 > ] filter ;
 
-: stack-trace-any? ( word -- ? ) symbolic-stack-trace memq? ;
+: stack-trace-any? ( word -- ? ) symbolic-stack-trace member-eq? ;
 
 [ t ] [
     [ { 1 "hi" } bleh ] ignore-errors \ + stack-trace-any?

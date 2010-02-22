@@ -147,14 +147,16 @@ PRIVATE>
 
 : (find-integer) ( i n quot: ( i -- ? ) -- i )
     [
-        iterate-step roll
-        [ 2drop ] [ iterate-next (find-integer) ] if
+        iterate-step
+        [ [ ] ] 2dip
+        [ iterate-next (find-integer) ] 2curry bi-curry if
     ] [ 3drop f ] if-iterate? ; inline recursive
 
 : (all-integers?) ( i n quot: ( i -- ? ) -- ? )
     [
-        iterate-step roll
-        [ iterate-next (all-integers?) ] [ 3drop f ] if
+        iterate-step
+        [ iterate-next (all-integers?) ] 3curry
+        [ f ] if
     ] [ 3drop t ] if-iterate? ; inline recursive
 
 : each-integer ( n quot -- )

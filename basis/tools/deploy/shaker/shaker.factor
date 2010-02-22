@@ -1,14 +1,16 @@
-! Copyright (C) 2007, 2009 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors io.backend io.streams.c init fry
-namespaces math make assocs kernel parser parser.notes lexer
-strings.parser vocabs sequences sequences.deep sequences.private
-words memory kernel.private continuations io vocabs.loader
-system strings sets vectors quotations byte-arrays sorting
-compiler.units definitions generic generic.standard
+USING: arrays alien.libraries accessors io.backend io.encodings.utf8 io.files
+io.streams.c init fry namespaces math make assocs kernel parser
+parser.notes lexer strings.parser vocabs sequences sequences.deep
+sequences.private words memory kernel.private continuations io
+vocabs.loader system strings sets vectors quotations byte-arrays
+sorting compiler.units definitions generic generic.standard
 generic.single tools.deploy.config combinators classes
-classes.builtin slots.private grouping command-line ;
+classes.builtin slots.private grouping command-line io.pathnames ;
 QUALIFIED: bootstrap.stage2
+QUALIFIED: classes.private
+QUALIFIED: compiler.crossref
 QUALIFIED: compiler.errors
 QUALIFIED: continuations
 QUALIFIED: definitions
@@ -17,42 +19,40 @@ QUALIFIED: layouts
 QUALIFIED: source-files
 QUALIFIED: source-files.errors
 QUALIFIED: vocabs
+FROM: alien.libraries.private => >deployed-library-path ;
 IN: tools.deploy.shaker
 
 ! This file is some hairy shit.
 
 : add-command-line-hook ( -- )
     [ (command-line) command-line set-global ] "command-line"
-    init-hooks get set-at ;
+    startup-hooks get set-at ;
 
-: strip-init-hooks ( -- )
+: strip-startup-hooks ( -- )
     "Stripping startup hooks" show
     {
         "alien.strings"
         "cpu.x86"
-        "destructors"
         "environment"
         "libc"
     }
-    [ init-hooks get delete-at ] each
+    [ startup-hooks get delete-at ] each
     deploy-threads? get [
-        "threads" init-hooks get delete-at
+        "threads" startup-hooks get delete-at
     ] unless
     native-io? [
-        "io.thread" init-hooks get delete-at
+        "io.thread" startup-hooks get delete-at
     ] unless
     strip-io? [
-        "io.files" init-hooks get delete-at
-        "io.backend" init-hooks get delete-at
-        "io.thread" init-hooks get delete-at
+        "io.backend" startup-hooks get delete-at
+        "io.thread" startup-hooks get delete-at
     ] when
     strip-dictionary? [
         {
-            ! "compiler.units"
             "vocabs"
             "vocabs.cache"
             "source-files.errors"
-        } [ init-hooks get delete-at ] each
+        } [ startup-hooks get delete-at ] each
     ] when ;
 
 : strip-debugger ( -- )
@@ -85,6 +85,13 @@ IN: tools.deploy.shaker
         run-file
     ] when ;
 
+: strip-specialized-arrays ( -- )
+    strip-dictionary? "specialized-arrays" vocab and [
+        "Stripping specialized arrays" show
+        "vocab:tools/deploy/shaker/strip-specialized-arrays.factor"
+        run-file
+    ] when ;
+
 : strip-word-names ( words -- )
     "Stripping word names" show
     [ f >>name f >>vocabulary drop ] each ;
@@ -98,18 +105,12 @@ IN: tools.deploy.shaker
 
 : strip-word-props ( stripped-props words -- )
     "Stripping word properties" show
-    [
-        swap '[
-            [
-                [ drop _ member? not ] assoc-filter sift-assoc
-                >alist f like
-            ] change-props drop
-        ] each
-    ] [
-        H{ } clone '[
-            [ [ _ [ ] cache ] map ] change-props drop
-        ] each
-    ] bi ;
+    swap '[
+        [
+            [ drop _ member? not ] assoc-filter sift-assoc
+            >alist f like
+        ] change-props drop
+    ] each ;
 
 : stripped-word-props ( -- seq )
     [
@@ -119,8 +120,11 @@ IN: tools.deploy.shaker
                 "boa-check"
                 "coercer"
                 "combination"
-                "compiled-generic-uses"
-                "compiled-uses"
+                "generic-call-sites"
+                "effect-dependencies"
+                "definition-dependencies"
+                "conditional-dependencies"
+                "dependency-checks"
                 "constant"
                 "constraints"
                 "custom-inlining"
@@ -152,7 +156,6 @@ IN: tools.deploy.shaker
                 "members"
                 "memo-quot"
                 "methods"
-                "mixin"
                 "method-class"
                 "method-generic"
                 "modular-arithmetic"
@@ -173,13 +176,14 @@ IN: tools.deploy.shaker
                 "slots"
                 "special"
                 "specializer"
-                "specializations"
                 "struct-slots"
                 ! UI needs this
                 ! "superclass"
                 "transform-n"
                 "transform-quot"
                 "type"
+                "typed-def"
+                "typed-word"
                 "writer"
                 "writing"
             } %
@@ -249,7 +253,7 @@ IN: tools.deploy.shaker
             ! otherwise do nothing
             [ 2drop ]
         } cond
-    ] change-each ;
+    ] map! drop ;
 
 : strip-default-method ( generic new-default -- )
     [
@@ -284,11 +288,14 @@ IN: tools.deploy.shaker
             continuations:error-continuation
             continuations:error-thread
             continuations:restarts
-            init:init-hooks
+            init:startup-hooks
             source-files:source-files
             input-stream
             output-stream
             error-stream
+            vm
+            image
+            current-directory
         } %
 
         "io-thread" "io.thread" lookup ,
@@ -322,17 +329,17 @@ IN: tools.deploy.shaker
             {
                 gensym
                 name>char-hook
-                next-method-quot-cache
-                class-and-cache
-                class-not-cache
-                class-or-cache
-                class<=-cache
-                classes-intersect-cache
-                implementors-map
-                update-map
+                classes.private:next-method-quot-cache
+                classes.private:class-and-cache
+                classes.private:class-not-cache
+                classes.private:class-or-cache
+                classes.private:class<=-cache
+                classes.private:classes-intersect-cache
+                classes.private:implementors-map
+                classes.private:update-map
                 main-vocab-hook
-                compiled-crossref
-                compiled-generic-crossref
+                compiler.crossref:compiled-crossref
+                compiler.crossref:generic-call-site-crossref
                 compiler-impl
                 compiler.errors:compiler-errors
                 lexer-factory
@@ -371,10 +378,6 @@ IN: tools.deploy.shaker
             ] when
         ] when
 
-        deploy-c-types? get [
-            "c-types" "alien.c-types" lookup ,
-        ] unless
-
         "windows-messages" "windows.messages" lookup [ , ] when*
     ] { } make ;
 
@@ -385,7 +388,7 @@ IN: tools.deploy.shaker
         '[ drop _ member? not ] assoc-filter
         [ drop string? not ] assoc-filter ! strip CLI args
         sift-assoc
-        21 setenv
+        21 set-special-object
     ] [ drop ] if ;
 
 : strip-c-io ( -- )
@@ -436,10 +439,10 @@ SYMBOL: deploy-vocab
 
 : [print-error] ( -- word ) "print-error" "debugger" lookup ;
 
-: deploy-boot-quot ( word -- )
+: deploy-startup-quot ( word -- )
     [
         [ boot ] %
-        init-hooks get values concat %
+        startup-hooks get values concat %
         strip-debugger? [ , ] [
             ! Don't reference 'try' directly since we don't want
             ! to pull in the debugger and prettyprinter into every
@@ -456,11 +459,12 @@ SYMBOL: deploy-vocab
         strip-io? [ [ flush ] % ] unless
         [ 0 exit ] %
     ] [ ] make
-    set-boot-quot ;
+    set-startup-quot ;
 
-: init-stripper ( -- )
+: startup-stripper ( -- )
     t "quiet" set-global
-    f output-stream set-global ;
+    f output-stream set-global
+    V{ "resource:" } clone vocab-roots set-global ;
 
 : next-method* ( method -- quot )
     [ "method-class" word-prop ]
@@ -468,7 +472,7 @@ SYMBOL: deploy-vocab
     next-method ;
 
 : calls-next-method? ( method -- ? )
-    def>> flatten \ (call-next-method) swap memq? ;
+    def>> flatten \ (call-next-method) swap member-eq? ;
 
 : compute-next-methods ( -- )
     [ standard-generic? ] instances [
@@ -496,21 +500,44 @@ SYMBOL: deploy-vocab
     "Clearing megamorphic caches" show
     [ clear-megamorphic-cache ] each ;
 
-: strip ( -- )
-    init-stripper
+: write-vocab-manifest ( vocab-manifest-out -- )
+    "Writing vocabulary manifest to " write dup print flush
+    vocabs "VOCABS:" prefix
+    deploy-libraries get [ libraries get at path>> ] map prune "LIBRARIES:" prefix append
+    swap utf8 set-file-lines ;
+
+: prepare-deploy-libraries ( -- )
+    "Preparing deployed libraries" show
+    deploy-libraries get [
+        libraries get [
+            [ path>> >deployed-library-path ] [ abi>> ] bi <library>
+        ] change-at
+    ] each
+    
+    [
+        "deploy-libraries" "alien.libraries" lookup forget
+        "deploy-library" "alien.libraries" lookup forget
+        ">deployed-library-path" "alien.libraries.private" lookup forget
+    ] with-compilation-unit ;
+
+: strip ( vocab-manifest-out -- )
+    [ write-vocab-manifest ] when*
+    startup-stripper
+    prepare-deploy-libraries
     strip-libc
     strip-destructors
     strip-call
     strip-cocoa
     strip-debugger
+    strip-specialized-arrays
     compute-next-methods
-    strip-init-hooks
+    strip-startup-hooks
     add-command-line-hook
     strip-c-io
     strip-default-methods
     strip-compiler-classes
-    f 5 setenv ! we can't use the Factor debugger or Factor I/O anymore
-    deploy-vocab get vocab-main deploy-boot-quot
+    f 5 set-special-object ! we can't use the Factor debugger or Factor I/O anymore
+    deploy-vocab get vocab-main deploy-startup-quot
     find-megamorphic-caches
     stripped-word-props
     stripped-globals strip-globals
@@ -529,23 +556,24 @@ SYMBOL: deploy-vocab
         1 exit
     ] recover ; inline
 
-: (deploy) ( final-image vocab config -- )
+: (deploy) ( final-image vocab-manifest-out vocab config -- )
     #! Does the actual work of a deployment in the slave
     #! stage2 image
     [
         [
             strip-debugger? [
                 "debugger" require
+                "tools.errors" require
                 "inspector" require
                 deploy-ui? get [
                     "ui.debugger" require
                 ] when
             ] unless
-            deploy-vocab set
-            deploy-vocab get require
-            deploy-vocab get vocab-main [
-                "Vocabulary has no MAIN: word." print flush 1 exit
-            ] unless
+            [ deploy-vocab set ] [ require ] [
+                vocab-main [
+                    "Vocabulary has no MAIN: word." print flush 1 exit
+                ] unless
+            ] tri
             strip
             "Saving final image" show
             save-image-and-exit
@@ -554,6 +582,7 @@ SYMBOL: deploy-vocab
 
 : do-deploy ( -- )
     "output-image" get
+    "vocab-manifest-out" get
     "deploy-vocab" get
     "Deploying " write dup write "..." print
     "deploy-config" get parse-file first

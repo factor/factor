@@ -7,4 +7,4 @@ TUPLE: key-handler < border handlers ;
 : <keys> ( gadget -- key-handler ) key-handler new-border { 0 0 } >>size ;
 
 M: key-handler handle-gesture
-    tuck handlers>> at [ call( gadget -- ) f ] [ drop t ] if* ;
+    [ handlers>> at ] keep swap [ call( gadget -- ) f ] [ drop t ] if* ;

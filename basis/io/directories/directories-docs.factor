@@ -46,9 +46,17 @@ HELP: directory-files
 { $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
 { $description "Outputs the contents of a directory named by " { $snippet "path" } "." } ;
 
+HELP: directory-tree-files
+{ $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
+{ $description "Outputs a sequence of all files and subdirectories inside the directory named by " { $snippet "path" } " or recursively inside its subdirectories." } ;
+
 HELP: with-directory-files
 { $values { "path" "a pathname string" } { "quot" quotation } }
 { $description "Calls the quotation with the directory file names on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." } ;
+
+HELP: with-directory-tree-files
+{ $values { "path" "a pathname string" } { "quot" quotation } }
+{ $description "Calls the quotation with the recursive directory file names on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." } ;
 
 HELP: with-directory-entries
 { $values { "path" "a pathname string" } { "quot" quotation } }
@@ -119,7 +127,7 @@ ARTICLE: "current-directory" "Current working directory"
     with-directory
 }
 "This variable is independent of the operating system notion of “current working directory”. While all Factor I/O operations use the variable and not the operating system's value, care must be taken when making FFI calls which expect a pathname. The first option is to resolve relative paths:"
-{ $subsections (normalize-path) }
+{ $subsections absolute-path }
 "The second is to change the working directory of the current process:"
 { $subsections
     cd
@@ -142,11 +150,6 @@ ARTICLE: "io.directories.create" "Creating directories"
 } ;
 
 ARTICLE: "delete-move-copy" "Deleting, moving, and copying files"
-"Operations for deleting and copying files come in two forms:"
-{ $list
-    { "Words named " { $snippet { $emphasis "operation" } "-file" } " which work on regular files only." }
-    { "Words named " { $snippet { $emphasis "operation" } "-tree" } " works on directory trees recursively, and also accepts regular files." }
-}
 "The operations for moving and copying files come in three flavors:"
 { $list
     { "A word named " { $snippet { $emphasis "operation" } } " which takes a source and destination path." }
@@ -175,7 +178,7 @@ $nl
 "On most operating systems, files can only be moved within the same file system. To move files between file systems, use " { $link copy-file } " followed by " { $link delete-file } " on the old name." ;
 
 ARTICLE: "io.directories" "Directory manipulation"
-"The " { $vocab-link "io.directories" } " vocabulary defines words for inspecting and manipulating directory trees."
+"The " { $vocab-link "io.directories" } " vocabulary defines words for inspecting and manipulating directories."
 { $subsections
     home
     "current-directory"

@@ -1,14 +1,14 @@
 USING: ui.gadgets.packs ui.gadgets.packs.private
 ui.gadgets.labels ui.gadgets ui.gadgets.debug ui.render
 ui.baseline-alignment kernel namespaces tools.test math.parser
-sequences math.rectangles accessors ;
+sequences math.rectangles accessors math ;
 IN: ui.gadgets.packs.tests
 
 [ t ] [
     { 0 0 } { 100 100 } <rect> clip set
 
     <pile>
-        100 [ number>string <label> add-gadget ] each
+        100 [ number>string <label> add-gadget ] each-integer
     dup layout
 
     visible-children [ label? ] all?
