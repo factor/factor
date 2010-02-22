@@ -1,5 +1,5 @@
 USING: kernel windows.com windows.com.syntax windows.ole32
-alien alien.syntax tools.test libc alien.c-types
+windows.types alien alien.syntax tools.test libc alien.c-types
 namespaces arrays continuations accessors math windows.com.wrapper
 windows.com.wrapper.private destructors effects compiler.units ;
 IN: windows.com.tests
