@@ -116,13 +116,17 @@ M: A v*high [ * \ T heap-size neg shift ] 2map ; inline
 
 ;FUNCTOR
 
-: underlying-type ( c-type -- c-type' )
+GENERIC: underlying-type ( c-type -- c-type' )
+M: c-type-word underlying-type
     dup "c-type" word-prop {
         { [ dup not ] [ drop no-c-type ] }
         { [ dup pointer? ] [ 2drop void* ] }
         { [ dup c-type-word? ] [ nip underlying-type ] }
         [ drop ]
     } cond ;
+
+M: pointer underlying-type
+    drop void* ;
 
 : specialized-array-vocab ( c-type -- vocab )
     [
