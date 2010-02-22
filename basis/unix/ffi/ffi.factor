@@ -101,6 +101,7 @@ FUNCTION: uid_t getuid ;
 FUNCTION: uint htonl ( uint n ) ;
 FUNCTION: ushort htons ( ushort n ) ;
 ! FUNCTION: int issetugid ;
+FUNCTION: int isatty ( int fildes ) ;
 FUNCTION: int ioctl ( int fd, ulong request, char* argp ) ;
 FUNCTION: int lchown ( char* path, uid_t owner, gid_t group ) ;
 FUNCTION: int listen ( int s, int backlog ) ;
