@@ -304,7 +304,9 @@ CONSTANT: primitive-types
 
 : resolve-pointer-typedef ( type -- base-type )
     dup "c-type" word-prop dup word?
-    [ nip resolve-pointer-typedef ] [ drop ] if ;
+    [ nip resolve-pointer-typedef ] [
+        pointer? [ drop void* ] when
+    ] if ;
 
 : special-pointer-type ( type -- special-type )
     dup c-type-word? [
