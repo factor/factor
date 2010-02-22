@@ -34,9 +34,14 @@ CONSTANT: eleven 11
 
 ] with-file-vocabs
 
-FUNCTION: void* alien-parser-effect-test ( int *arg1 float arg2 ) ;
+FUNCTION: void* alien-parser-function-effect-test ( int *arg1 float arg2 ) ;
 [ (( arg1 arg2 -- void* )) ] [
-    \ alien-parser-effect-test "declared-effect" word-prop
+    \ alien-parser-function-effect-test "declared-effect" word-prop
+] unit-test
+
+CALLBACK: void* alien-parser-callback-effect-test ( int *arg1 float arg2 ) ;
+[ (( arg1 arg2 -- void* )) ] [
+    \ alien-parser-callback-effect-test "callback-effect" word-prop
 ] unit-test
 
 ! Reported by mnestic

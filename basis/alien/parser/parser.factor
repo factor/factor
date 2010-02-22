@@ -93,15 +93,15 @@ IN: alien.parser
 : library-abi ( lib -- abi )
     library [ abi>> ] [ "cdecl" ] if* ;
 
-:: make-callback-type ( lib return! type-name! parameters -- word quot effect )
-    return type-name normalize-c-arg type-name! return!
+:: make-callback-type ( lib return type-name parameters -- word quot effect )
+    return type-name normalize-c-arg :> ( return-c-type type-name )
     type-name current-vocab create :> type-word 
     type-word [ reset-generic ] [ reset-c-type ] bi
     void* type-word typedef
     parameters return parse-arglist :> ( types callback-effect )
     type-word callback-effect "callback-effect" set-word-prop
     type-word lib "callback-library" set-word-prop
-    type-word return types lib library-abi callback-quot (( quot -- alien )) ;
+    type-word return-c-type types lib library-abi callback-quot (( quot -- alien )) ;
 
 : (CALLBACK:) ( -- word quot effect )
     "c-library" get
