@@ -49,8 +49,7 @@ unless
 : (make-query-interface) ( interfaces -- quot )
     (query-interface-cases) 
     '[
-        swap GUID memory>struct
-        _ case
+        swap _ case
         [
             void* heap-size * rot <displaced-alien> com-add-ref
             swap 0 set-alien-cell S_OK

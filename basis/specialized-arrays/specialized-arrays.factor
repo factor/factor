@@ -143,9 +143,6 @@ PRIVATE>
     [ specialized-array-vocab ] [ '[ _ define-array ] ] bi
     generate-vocab ;
 
-M: c-type-word require-c-array define-array-vocab drop ;
-M: pointer require-c-array drop void* require-c-array ;
-
 ERROR: specialized-array-vocab-not-loaded c-type ;
 
 M: c-type-word c-array-constructor

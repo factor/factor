@@ -94,7 +94,6 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 
 : find-device-axes-callback ( -- alien )
     [ ! ( lpddoi pvRef -- BOOL )
-        [ DIDEVICEOBJECTINSTANCEW memory>struct ] dip
         +controller-devices+ get at
         swap guidType>> {
             { [ dup GUID_XAxis = ] [ drop 0.0 >>x ] }
@@ -142,7 +141,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 
 : find-controller-callback ( -- alien )
     [ ! ( lpddi pvRef -- BOOL )
-        drop DIDEVICEINSTANCEW memory>struct guidInstance>> add-controller
+        drop guidInstance>> add-controller
         DIENUM_CONTINUE
     ] LPDIENUMDEVICESCALLBACKW ; inline
 

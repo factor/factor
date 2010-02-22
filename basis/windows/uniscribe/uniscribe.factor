@@ -82,7 +82,6 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
 : script-string-size ( script-string -- dim )
     ssa>> ScriptString_pSize
     dup win32-error=0/f
-    SIZE memory>struct
     [ cx>> ] [ cy>> ] bi 2array ;
 
 : dc-metrics ( dc -- metrics )
