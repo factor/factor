@@ -104,6 +104,7 @@ M: string-type c-type-setter
     drop [ set-alien-cell ] ;
 
 { char* utf8 } char <pointer> typedef
+{ char* utf8 } char* typedef
 { char* utf8 } uchar <pointer> typedef
 { char* binary } byte <pointer> typedef
 { char* binary } ubyte <pointer> typedef
