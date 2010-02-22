@@ -49,8 +49,7 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: glx-visual { $ GLX_USE_GL $ GLX_RGBA } H{
 
 M: x11-ui-backend (make-pixel-format)
     [ drop dpy get scr get ] dip
-    >glx-visual-int-array glXChooseVisual
-    XVisualInfo memory>struct ;
+    >glx-visual-int-array glXChooseVisual ;
 
 M: x11-ui-backend (free-pixel-format)
     handle>> XFree ;

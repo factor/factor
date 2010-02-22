@@ -83,7 +83,7 @@ M: integer user-groups ( id -- seq )
     user-name (user-groups) ;
     
 : all-groups ( -- seq )
-    [ unix.ffi:getgrent dup ] [ \ unix.ffi:group memory>struct group-struct>group ] produce nip ;
+    [ unix.ffi:getgrent dup ] [ group-struct>group ] produce nip ;
 
 : <group-cache> ( -- assoc )
     all-groups [ [ id>> ] keep ] H{ } map>assoc ;
