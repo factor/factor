@@ -50,9 +50,9 @@ CONSTANT: image-bitmap B{
     x bitnot 7 bitand neg shift 1 bitand 1 = ;
 
 :: make-ball ( x y -- shape )
-    cpBodyAlloc 1.0 NAN: 0 cpBodyInit cpBody memory>struct
+    cpBodyAlloc 1.0 NAN: 0 cpBodyInit
     x y cpv >>p :> body
-    cpCircleShapeAlloc body 0.95 0 0 cpv cpCircleShapeInit cpCircleShape memory>struct
+    cpCircleShapeAlloc body 0.95 0 0 cpv cpCircleShapeInit
     [ shape>> 0 >>e ] [ shape>> 0 >>u ] bi drop ;
 
 TUPLE: chipmunk-world < game-world
@@ -76,7 +76,7 @@ M:: chipmunk-world draw-world* ( world -- )
     3 glPointSize
     0 0 0 glColor3f
     GL_POINTS glBegin
-    space bodies>> cpArray memory>struct
+    space bodies>>
     [ num>> ] [ arr>> swap <direct-void*-array> ] bi [
         cpBody memory>struct p>> [ x>> ] [ y>> ] bi glVertex2f
     ] each
@@ -85,7 +85,7 @@ M:: chipmunk-world draw-world* ( world -- )
     2 glPointSize
     1 0 0 glColor3f
     GL_POINTS glBegin
-    space arbiters>> cpArray memory>struct
+    space arbiters>>
     [ num>> ] [ arr>> swap <direct-void*-array> ] bi [
         cpArbiter memory>struct
         [ numContacts>> ] [ contacts>> swap <direct-cpContact-array> ] bi [
@@ -97,7 +97,7 @@ M:: chipmunk-world draw-world* ( world -- )
 M:: chipmunk-world begin-game-world ( world -- )
     cpInitChipmunk
 
-    cpSpaceAlloc cpSpaceInit cpSpace memory>struct :> space
+    cpSpaceAlloc cpSpaceInit :> space
 
     world space >>space drop
     space 2.0 10000 cpSpaceResizeActiveHash
@@ -115,11 +115,11 @@ M:: chipmunk-world begin-game-world ( world -- )
         ] each
     ] each
     
-    space cpBodyAlloc NAN: 0 dup cpBodyInit cpSpaceAddBody cpBody memory>struct :> body
+    space cpBodyAlloc NAN: 0 dup cpBodyInit cpSpaceAddBody :> body
     body -1000 -10 cpv >>p drop
     body 400 0 cpv >>v drop
 
-    space cpCircleShapeAlloc body 8 0 0 cpv cpCircleShapeInit cpSpaceAddShape cpCircleShape memory>struct :> shape
+    space cpCircleShapeAlloc body 8 0 0 cpv cpCircleShapeInit cpSpaceAddShape :> shape
     shape
     [ shape>> 0 >>e drop ]
     [ shape>> 0 >>u drop ] bi ;
