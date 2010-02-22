@@ -21,7 +21,7 @@ IN: compiler.cfg.intrinsics.fixnum
     ds-push ;
 
 : tag-literal ( n -- tagged )
-    literal>> [ tag-fixnum ] [ \ f tag-number ] if* ;
+    literal>> [ tag-fixnum ] [ \ f type-number ] if* ;
 
 : emit-fixnum-op ( insn -- )
     [ 2inputs ] dip call ds-push ; inline

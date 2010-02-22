@@ -18,6 +18,7 @@ HOOK: instance-id game-input-backend ( controller -- id )
 
 HOOK: read-controller game-input-backend ( controller -- controller-state )
 HOOK: calibrate-controller game-input-backend ( controller -- )
+HOOK: vibrate-controller game-input-backend ( controller motor1 motor2 -- )
 
 HOOK: read-keyboard game-input-backend ( -- keyboard-state )
 
@@ -35,7 +36,7 @@ M: f (reset-game-input) ;
 : reset-game-input ( -- )
     (reset-game-input) ;
 
-[ reset-game-input ] "game-input" add-init-hook
+[ reset-game-input ] "game-input" add-startup-hook
 
 PRIVATE>
 
@@ -75,9 +76,8 @@ SYMBOLS:
     get-controllers [ product-id = ] with filter ;
 : find-controller-instance ( product-id instance-id -- controller/f )
     get-controllers [
-        tuck
         [ product-id  = ]
-        [ instance-id = ] 2bi* and
+        [ instance-id = ] bi-curry bi* and
     ] with with find nip ;
 
 TUPLE: keyboard-state keys ;
@@ -90,8 +90,24 @@ TUPLE: mouse-state dx dy scroll-dx scroll-dy buttons ;
 M: mouse-state clone
     call-next-method dup buttons>> clone >>buttons ;
 
+SYMBOLS: pressed released ;
+
+: button-delta ( old? new? -- delta )
+    {
+        { [ 2dup xor not ] [ 2drop f ] }
+        { [ dup  not     ] [ 2drop released ] }
+        { [ over not     ] [ 2drop pressed ] }
+    } cond ; inline
+
+: buttons-delta-as ( old-buttons new-buttons exemplar -- delta )
+    [ button-delta ] swap 2map-as ; inline
+
+: buttons-delta ( old-buttons new-buttons -- delta )
+    { } buttons-delta-as ; inline
+
 {
-    { [ os windows? ] [ "game.input.dinput" require ] }
+    { [ os windows? ] [ "game.input.xinput" require ] }
     { [ os macosx? ] [ "game.input.iokit" require ] }
-    { [ t ] [ ] }
+    { [ os linux? ] [ "game.input.linux" require ] }
+    [ ]
 } cond

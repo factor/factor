@@ -74,12 +74,12 @@ $nl
 "Here is an example of the locals version:"
 { $example
 """USING: locals urls xml.syntax xml.writer ;
-[let |
-    number [ 3 ]
-    false [ f ]
-    url [ URL" http://factorcode.org/" ]
-    string [ "hello" ]
-    word [ \\ drop ] |
+[let
+    3 :> number
+    f :> false
+    URL" http://factorcode.org/" :> url
+    "hello" :> string
+    \\ drop :> word
     <XML
         <x
             number=<-number->

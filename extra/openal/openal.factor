@@ -2,19 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors arrays alien system combinators
 alien.syntax namespaces alien.c-types sequences vocabs.loader
-shuffle openal.backend alien.libraries generalizations
-specialized-arrays ;
+shuffle alien.libraries generalizations
+specialized-arrays alien.destructors ;
 FROM: alien.c-types => float short ;
 SPECIALIZED-ARRAY: uint
 IN: openal
-
-<< "alut" {
-        { [ os windows? ]  [ "alut.dll" ] }
-        { [ os macosx? ] [
-            "/System/Library/Frameworks/OpenAL.framework/OpenAL"
-        ] }
-        { [ os unix?  ]  [ "libalut.so" ] }
-    } cond "cdecl" add-library >>
 
 << "openal" {
         { [ os windows? ]  [ "OpenAL32.dll" ] }
@@ -23,6 +15,8 @@ IN: openal
         ] }
         { [ os unix?  ]  [ "libopenal.so" ] }
     } cond "cdecl" add-library >>
+
+<< os macosx? [ "openal" deploy-library ] unless >>
 
 LIBRARY: openal
 
@@ -183,70 +177,74 @@ FUNCTION: void alDopplerVelocity ( ALfloat value ) ;
 FUNCTION: void alSpeedOfSound ( ALfloat value ) ;
 FUNCTION: void alDistanceModel ( ALenum distanceModel ) ;
 
-LIBRARY: alut
+C-TYPE: ALCdevice
+C-TYPE: ALCcontext
+TYPEDEF: char ALCboolean
+TYPEDEF: char ALCchar
+TYPEDEF: int ALCenum
+TYPEDEF: int ALCint
+TYPEDEF: int ALCsizei
+TYPEDEF: uint ALCuint
 
-CONSTANT: ALUT_API_MAJOR_VERSION 1
-CONSTANT: ALUT_API_MINOR_VERSION 1
-CONSTANT: ALUT_ERROR_NO_ERROR 0
-CONSTANT: ALUT_ERROR_OUT_OF_MEMORY HEX: 200
-CONSTANT: ALUT_ERROR_INVALID_ENUM HEX: 201
-CONSTANT: ALUT_ERROR_INVALID_VALUE HEX: 202
-CONSTANT: ALUT_ERROR_INVALID_OPERATION HEX: 203
-CONSTANT: ALUT_ERROR_NO_CURRENT_CONTEXT HEX: 204
-CONSTANT: ALUT_ERROR_AL_ERROR_ON_ENTRY HEX: 205
-CONSTANT: ALUT_ERROR_ALC_ERROR_ON_ENTRY HEX: 206
-CONSTANT: ALUT_ERROR_OPEN_DEVICE HEX: 207
-CONSTANT: ALUT_ERROR_CLOSE_DEVICE HEX: 208
-CONSTANT: ALUT_ERROR_CREATE_CONTEXT HEX: 209
-CONSTANT: ALUT_ERROR_MAKE_CONTEXT_CURRENT HEX: 20A
-CONSTANT: ALUT_ERROR_DESTRY_CONTEXT HEX: 20B
-CONSTANT: ALUT_ERROR_GEN_BUFFERS HEX: 20C
-CONSTANT: ALUT_ERROR_BUFFER_DATA HEX: 20D
-CONSTANT: ALUT_ERROR_IO_ERROR HEX: 20E
-CONSTANT: ALUT_ERROR_UNSUPPORTED_FILE_TYPE HEX: 20F
-CONSTANT: ALUT_ERROR_UNSUPPORTED_FILE_SUBTYPE HEX: 210
-CONSTANT: ALUT_ERROR_CORRUPT_OR_TRUNCATED_DATA HEX: 211
-CONSTANT: ALUT_WAVEFORM_SINE HEX: 100
-CONSTANT: ALUT_WAVEFORM_SQUARE HEX: 101
-CONSTANT: ALUT_WAVEFORM_SAWTOOTH HEX: 102
-CONSTANT: ALUT_WAVEFORM_WHITENOISE HEX: 103
-CONSTANT: ALUT_WAVEFORM_IMPULSE HEX: 104
-CONSTANT: ALUT_LOADER_BUFFER HEX: 300
-CONSTANT: ALUT_LOADER_MEMORY HEX: 301
+CONSTANT: ALC_FALSE                                0
+CONSTANT: ALC_TRUE                                 1
+CONSTANT: ALC_FREQUENCY                            HEX: 1007
+CONSTANT: ALC_REFRESH                              HEX: 1008
+CONSTANT: ALC_SYNC                                 HEX: 1009
+CONSTANT: ALC_MONO_SOURCES                         HEX: 1010
+CONSTANT: ALC_STEREO_SOURCES                       HEX: 1011
 
-FUNCTION: ALboolean alutInit ( int* argcp, char** argv ) ;
-FUNCTION: ALboolean alutInitWithoutContext ( int* argcp, char** argv ) ;
-FUNCTION: ALboolean alutExit ( ) ;
-FUNCTION: ALenum alutGetError ( ) ;
-FUNCTION: char* alutGetErrorString ( ALenum error ) ;
-FUNCTION: ALuint alutCreateBufferFromFile ( char* fileName ) ;
-FUNCTION: ALuint alutCreateBufferFromFileImage ( void* data, ALsizei length ) ;
-FUNCTION: ALuint alutCreateBufferHelloWorld ( ) ;
-FUNCTION: ALuint alutCreateBufferWaveform ( ALenum waveshape, ALfloat frequency, ALfloat phase, ALfloat duration ) ;
-FUNCTION: void* alutLoadMemoryFromFile ( char* fileName, ALenum* format, ALsizei* size, ALfloat* frequency ) ;
-FUNCTION: void* alutLoadMemoryFromFileImage ( void* data, ALsizei length, ALenum* format, ALsizei* size, ALfloat* frequency ) ;
-FUNCTION: void* alutLoadMemoryHelloWorld ( ALenum* format, ALsizei* size, ALfloat* frequency ) ;
-FUNCTION: void* alutLoadMemoryWaveform ( ALenum waveshape, ALfloat frequency, ALfloat phase, ALfloat duration, ALenum* format, ALsizei* size, ALfloat* freq ) ;
-FUNCTION: char* alutGetMIMETypes ( ALenum loader ) ;
-FUNCTION: ALint alutGetMajorVersion ( ) ;
-FUNCTION: ALint alutGetMinorVersion ( ) ;
-FUNCTION: ALboolean alutSleep ( ALfloat duration ) ;
+CONSTANT: ALC_NO_ERROR                             0
 
-FUNCTION: void alutUnloadWAV ( ALenum format, void* data, ALsizei size, ALsizei frequency ) ;
+CONSTANT: ALC_INVALID_DEVICE                       HEX: A001
+CONSTANT: ALC_INVALID_CONTEXT                      HEX: A002
+CONSTANT: ALC_INVALID_ENUM                         HEX: A003
+CONSTANT: ALC_INVALID_VALUE                        HEX: A004
+CONSTANT: ALC_OUT_OF_MEMORY                        HEX: A005
 
-SYMBOL: init
+CONSTANT: ALC_DEFAULT_DEVICE_SPECIFIER             HEX: 1004
+CONSTANT: ALC_DEVICE_SPECIFIER                     HEX: 1005
+CONSTANT: ALC_EXTENSIONS                           HEX: 1006
 
-: init-openal ( -- )
-    init get-global expired? [
-        f f alutInit 0 = [ "Could not initialize OpenAL" throw ] when
-        1337 <alien> init set-global
-    ] when ;
+CONSTANT: ALC_MAJOR_VERSION                        HEX: 1000
+CONSTANT: ALC_MINOR_VERSION                        HEX: 1001
 
-: exit-openal ( -- )
-    init get-global expired? [
-        alutExit 0 = [ "Could not close OpenAL" throw ] when
-        f init set-global
-    ] unless ;
+CONSTANT: ALC_ATTRIBUTES_SIZE                      HEX: 1002
+CONSTANT: ALC_ALL_ATTRIBUTES                       HEX: 1003
+CONSTANT: ALC_DEFAULT_ALL_DEVICES_SPECIFIER        HEX: 1012
+CONSTANT: ALC_ALL_DEVICES_SPECIFIER                HEX: 1013
+CONSTANT: ALC_CAPTURE_DEVICE_SPECIFIER             HEX: 310
+CONSTANT: ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER     HEX: 311
+CONSTANT: ALC_CAPTURE_SAMPLES                      HEX: 312
+
+FUNCTION: ALCdevice* alcOpenDevice ( ALCchar* deviceSpecifier ) ;
+FUNCTION: ALCboolean alcCloseDevice ( ALCdevice* deviceHandle ) ;
+
+: alcCloseDevice* ( deviceHandle -- )
+    alcCloseDevice drop ;
+
+FUNCTION: ALCcontext* alcCreateContext ( ALCdevice* deviceHandle, ALCint* attrList ) ;
+FUNCTION: ALCboolean alcMakeContextCurrent ( ALCcontext* context ) ;
+FUNCTION: void alcProcessContext ( ALCcontext* context ) ;
+FUNCTION: void alcSuspendContext ( ALCcontext* context ) ;
+FUNCTION: void alcDestroyContext ( ALCcontext* context ) ;
+FUNCTION: ALCcontext* alcGetCurrentContext ( ) ;
+FUNCTION: ALCdevice* alcGetContextsDevice ( ALCcontext* context ) ;
+FUNCTION: ALCboolean alcIsExtensionPresent ( ALCdevice* deviceHandle, ALCchar* extName ) ;
+FUNCTION: void* alcGetProcAddress ( ALCdevice* deviceHandle, ALCchar* funcName ) ;
+FUNCTION: ALCenum alcGetEnumValue ( ALCdevice* deviceHandle, ALCchar* enumName ) ;
+FUNCTION: ALCenum alcGetError ( ALCdevice* deviceHandle ) ;
+FUNCTION: ALCchar* alcGetString ( ALCdevice* deviceHandle, ALCenum token ) ;
+FUNCTION: void alcGetIntegerv ( ALCdevice* deviceHandle, ALCenum token, ALCsizei size, ALCint* dest ) ;
+
+FUNCTION: ALCdevice* alcCaptureOpenDevice ( ALCchar* deviceName, ALCuint freq, ALCenum fmt, ALCsizei bufsize ) ;
+FUNCTION: ALCboolean alcCaptureCloseDevice ( ALCdevice* device ) ;
+FUNCTION: void alcCaptureStart ( ALCdevice* device ) ;
+FUNCTION: void alcCaptureStop ( ALCdevice* device ) ;
+FUNCTION: void alcCaptureSamples ( ALCdevice* device, void* buf, ALCsizei samps ) ;
+
+DESTRUCTOR: alcCloseDevice*
+DESTRUCTOR: alcDestroyContext
 
 : gen-sources ( size -- seq )
     dup <uint-array> [ alGenSources ] keep ;
@@ -255,17 +253,6 @@ SYMBOL: init
     dup <uint-array> [ alGenBuffers ] keep ;
 
 : gen-buffer ( -- buffer ) 1 gen-buffers first ;
-
-: create-buffer-from-file ( filename -- buffer )
-    alutCreateBufferFromFile dup AL_NONE = [
-        "create-buffer-from-file failed" throw
-    ] when ;
-
-os macosx? "openal.macosx" "openal.other" ? require
-
-: create-buffer-from-wav ( filename -- buffer )
-    gen-buffer dup rot load-wav-file
-    [ alBufferData ] 4 nkeep alutUnloadWAV ;
 
 : queue-buffers ( source buffers -- )
     [ length ] [ >uint-array ] bi alSourceQueueBuffers ;
@@ -288,13 +275,6 @@ os macosx? "openal.macosx" "openal.other" ? require
 : source-play ( source -- ) alSourcePlay ;
 
 : source-stop ( source -- ) alSourceStop ;
-
-: check-error ( -- )
-    alGetError dup ALUT_ERROR_NO_ERROR = [
-        drop
-    ] [
-        alGetString throw
-    ] if ;
 
 : source-playing? ( source -- bool )
     AL_SOURCE_STATE get-source-param AL_PLAYING = ;

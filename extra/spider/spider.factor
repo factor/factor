@@ -57,7 +57,7 @@ fetched-in parsed-html links processed-in fetched-at ;
     [ filter-base-links ] 2keep
     depth>> 1 + swap
     [ add-nonmatching ]
-    [ tuck [ apply-filters ] 2dip add-todo ] 2bi ;
+    [ dup '[ _ apply-filters ] curry 2dip add-todo ] 2bi ;
 
 : normalize-hrefs ( base links -- links' )
     [ derive-url ] with map ;
@@ -69,12 +69,12 @@ fetched-in parsed-html links processed-in fetched-at ;
 
 :: fill-spidered-result ( spider spider-result -- )
     f spider-result url>> spider spidered>> set-at
-    [ spider-result url>> http-get ] benchmark :> fetched-in :> html :> headers
+    [ spider-result url>> http-get ] benchmark :> ( headers html fetched-in )
     [
         html parse-html
         spider currently-spidering>>
         over find-all-links normalize-hrefs
-    ] benchmark :> processed-in :> links :> parsed-html
+    ] benchmark :> ( parsed-html links processed-in )
     spider-result
         headers >>headers
         fetched-in >>fetched-in

@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types assocs byte-arrays byte-vectors
-combinators fry io.backend io.binary kernel locals math
-math.bitwise math.constants math.functions math.ranges
-namespaces sequences sets summary system vocabs.loader ;
+USING: accessors alien.c-types arrays assocs byte-arrays
+byte-vectors combinators fry io.backend io.binary kernel locals
+math math.bitwise math.constants math.functions math.order
+math.ranges namespaces sequences sets summary system
+vocabs.loader ;
 IN: random
 
 SYMBOL: system-random-generator
@@ -19,7 +20,7 @@ M: object random-bytes* ( n tuple -- byte-array )
     [ pick '[ _ random-32* 4 >le _ push-all ] times ]
     [
         over zero?
-        [ 2drop ] [ random-32* 4 >le swap head over push-all ] if
+        [ 2drop ] [ random-32* 4 >le swap head append! ] if
     ] bi-curry bi* ;
 
 M: object random-32* ( tuple -- r ) 4 swap random-bytes* le> ;
@@ -50,39 +51,34 @@ PRIVATE>
 : random-bits* ( numbits -- n )
     1 - [ random-bits ] keep set-bit ;
 
-: random ( seq -- elt )
+GENERIC: random ( obj -- elt )
+
+M: integer random [ f ] [ random-integer ] if-zero ;
+
+M: sequence random
     [ f ] [
         [ length random-integer ] keep nth
     ] if-empty ;
 
 : random-32 ( -- n ) random-generator get random-32* ;
 
-: randomize ( seq -- seq )
-    dup length [ dup 1 > ]
-    [ [ iota random ] [ 1 - ] bi [ pick exchange ] keep ]
+: randomize-n-last ( seq n -- seq ) 
+    [ dup length dup ] dip - 1 max '[ dup _ > ] 
+    [ [ random ] [ 1 - ] bi [ pick exchange ] keep ]
     while drop ;
+
+: randomize ( seq -- randomized )
+    dup length randomize-n-last ;
 
 ERROR: too-many-samples seq n ;
 
-<PRIVATE
-
-:: next-sample ( length n seq hashtable -- elt )
-    n hashtable key? [
-        length n 1 + length mod seq hashtable next-sample
-    ] [
-        n hashtable conjoin
-        n seq nth
-    ] if ;
-
-PRIVATE>
-
 : sample ( seq n -- seq' )
     2dup [ length ] dip < [ too-many-samples ] when
-    swap [ length ] [ ] bi H{ } clone 
-    '[ _ dup random _ _ next-sample ] replicate ;
+    [ [ length iota >array ] dip [ randomize-n-last ] keep tail-slice* ]
+    [ drop ] 2bi nths ;
 
 : delete-random ( seq -- elt )
-    [ length random-integer ] keep [ nth ] 2keep delete-nth ;
+    [ length random-integer ] keep [ nth ] 2keep remove-nth! drop ;
 
 : with-random ( tuple quot -- )
     random-generator swap with-variable ; inline

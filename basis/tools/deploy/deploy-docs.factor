@@ -7,7 +7,13 @@ ARTICLE: "prepare-deploy" "Preparing to deploy an application"
 { $subsections
     "deploy-config"
     "deploy-flags"
+    "deploy-resources"
 } ;
+
+ARTICLE: "deploy-resources" "Deployed resource files"
+"To include additional files in your deployed application, specify their names in a vocabulary's " { $snippet "resources.txt" } " file. The " { $snippet "resources.txt" } " file contains one glob pattern per line. These patterns are expanded relative to the vocabulary directory; files outside of the vocabulary directory cannot be referenced. If a file inside the vocabulary directory matches any of these patterns, it will be included in deployed applications that reference the vocabulary. If a subdirectory matches, its contents will be included recursively."
+$nl
+"If the deployed vocabulary includes an icon file for the current platform, it will be embedded in the deployed application as its GUI icon. See " { $link "vocabs.icons" } "." ;
 
 ARTICLE: "tools.deploy.usage" "Deploy tool usage"
 "Once the necessary deployment flags have been set, the application can be deployed:"

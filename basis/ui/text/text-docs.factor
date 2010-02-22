@@ -1,5 +1,5 @@
 IN: ui.text
-USING: help.markup help.syntax kernel ui.text.private strings math fonts ;
+USING: help.markup help.syntax kernel ui.text.private strings math fonts images ;
 
 HELP: string-width
 { $values { "font" font } { "string" string } { "w" "a positive integer" } }
@@ -48,8 +48,12 @@ HELP: line-metrics
 { $values { "font" font } { "string" string } { "metrics" line-metrics } }
 { $contract "Outputs a " { $link metrics } " object with text measurements." } ;
 
+HELP: string>image
+{ $values { "font" font } { "string" string } { "image" image } { "loc" "a pair of real numbers" } }
+{ $description "Renders a line of text into an image." } ;
+
 ARTICLE: "text-rendering" "Rendering text"
-"The " { $vocab-link "ui.text" } " vocabulary provides a cross-platform interface to the operating system's native font rendering engine. Currently, it uses Core Text on Mac OS X and FreeType on Windows and X11."
+"The " { $vocab-link "ui.text" } " vocabulary provides a cross-platform interface to the operating system's native font rendering engine. Currently, it uses Core Text on Mac OS X, Uniscribe on Windows and Pango on X11."
 { $subsections "fonts" }
 "Measuring text:"
 { $subsections
@@ -64,7 +68,7 @@ ARTICLE: "text-rendering" "Rendering text"
     offset>x
 }
 "Rendering text:"
-{ $subsections draw-text }
+{ $subsections draw-text string>image }
 "Low-level text protocol for UI backends:"
 { $subsections
     string-width

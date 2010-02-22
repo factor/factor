@@ -10,6 +10,6 @@ SYNTAX: get-psql-info <postgresql-db> get-info 5 firstn
         [ >>username ]
         [ [ f ] [ ] if-empty >>password ]
         [ >>database ]
-    } spread parsed ;
+    } spread suffix! ;
 
-SYNTAX: get-sqlite-info get-info first <sqlite-db> parsed ;
+SYNTAX: get-sqlite-info get-info first <sqlite-db> suffix! ;

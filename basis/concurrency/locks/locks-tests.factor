@@ -4,57 +4,55 @@ threads sequences calendar accessors ;
 IN: concurrency.locks.tests
 
 :: lock-test-0 ( -- v )
-    [let | v [ V{ } clone ]
-           c [ 2 <count-down> ] |
+    V{ } clone :> v
+    2 <count-down> :> c
 
-           [
-               yield
-               1 v push
-               yield
-               2 v push
-               c count-down
-           ] "Lock test 1" spawn drop
+    [
+        yield
+        1 v push
+        yield
+        2 v push
+        c count-down
+    ] "Lock test 1" spawn drop
 
-           [
-               yield
-               3 v push
-               yield
-               4 v push
-               c count-down
-           ] "Lock test 2" spawn drop
+    [
+        yield
+        3 v push
+        yield
+        4 v push
+        c count-down
+    ] "Lock test 2" spawn drop
 
-           c await
-           v
-    ] ;
+    c await
+    v ;
 
 :: lock-test-1 ( -- v )
-    [let | v [ V{ } clone ]
-           l [ <lock> ]
-           c [ 2 <count-down> ] |
+    V{ } clone :> v
+    <lock> :> l
+    2 <count-down> :> c
 
-           [
-               l [
-                   yield
-                   1 v push
-                   yield
-                   2 v push
-               ] with-lock
-               c count-down
-           ] "Lock test 1" spawn drop
+    [
+        l [
+            yield
+            1 v push
+            yield
+            2 v push
+        ] with-lock
+        c count-down
+    ] "Lock test 1" spawn drop
 
-           [
-               l [
-                   yield
-                   3 v push
-                   yield
-                   4 v push
-               ] with-lock
-               c count-down
-           ] "Lock test 2" spawn drop
+    [
+        l [
+            yield
+            3 v push
+            yield
+            4 v push
+        ] with-lock
+        c count-down
+    ] "Lock test 2" spawn drop
 
-           c await
-           v
-    ] ;
+    c await
+    v ;
 
 [ V{ 1 3 2 4 } ] [ lock-test-0 ] unit-test
 [ V{ 1 2 3 4 } ] [ lock-test-1 ] unit-test
@@ -80,98 +78,96 @@ IN: concurrency.locks.tests
 [ ] [ <rw-lock> dup [ [ ] with-read-lock ] with-write-lock ] unit-test
 
 :: rw-lock-test-1 ( -- v )
-    [let | l [ <rw-lock> ]
-           c [ 1 <count-down> ]
-           c' [ 1 <count-down> ]
-           c'' [ 4 <count-down> ]
-           v [ V{ } clone ] |
+    <rw-lock> :> l
+    1 <count-down> :> c
+    1 <count-down> :> c'
+    4 <count-down> :> c''
+    V{ } clone :> v
 
-           [
-               l [
-                   1 v push
-                   c count-down
-                   yield
-                   3 v push
-               ] with-read-lock
-               c'' count-down
-           ] "R/W lock test 1" spawn drop
+    [
+        l [
+            1 v push
+            c count-down
+            yield
+            3 v push
+        ] with-read-lock
+        c'' count-down
+    ] "R/W lock test 1" spawn drop
 
-           [
-               c await
-               l [
-                   4 v push
-                   1 seconds sleep
-                   5 v push
-               ] with-write-lock
-               c'' count-down
-           ] "R/W lock test 2" spawn drop
+    [
+        c await
+        l [
+            4 v push
+            1 seconds sleep
+            5 v push
+        ] with-write-lock
+        c'' count-down
+    ] "R/W lock test 2" spawn drop
 
-           [
-               c await
-               l [
-                   2 v push
-                   c' count-down
-               ] with-read-lock
-               c'' count-down
-           ] "R/W lock test 4" spawn drop
+    [
+        c await
+        l [
+            2 v push
+            c' count-down
+        ] with-read-lock
+        c'' count-down
+    ] "R/W lock test 4" spawn drop
 
-           [
-               c' await
-               l [
-                   6 v push
-               ] with-write-lock
-               c'' count-down
-           ] "R/W lock test 5" spawn drop
+    [
+        c' await
+        l [
+            6 v push
+        ] with-write-lock
+        c'' count-down
+    ] "R/W lock test 5" spawn drop
 
-           c'' await
-           v
-    ] ;
+    c'' await
+    v ;
 
 [ V{ 1 2 3 4 5 6 } ] [ rw-lock-test-1 ] unit-test
 
 :: rw-lock-test-2 ( -- v )
-    [let | l [ <rw-lock> ]
-           c [ 1 <count-down> ]
-           c' [ 2 <count-down> ]
-           v [ V{ } clone ] |
+    <rw-lock> :> l
+    1 <count-down> :> c
+    2 <count-down> :> c'
+    V{ } clone :> v
 
-           [
-               l [
-                   1 v push
-                   c count-down
-                   1 seconds sleep
-                   2 v push
-               ] with-write-lock
-               c' count-down
-           ] "R/W lock test 1" spawn drop
+    [
+        l [
+            1 v push
+            c count-down
+            1 seconds sleep
+            2 v push
+        ] with-write-lock
+        c' count-down
+    ] "R/W lock test 1" spawn drop
 
-           [
-               c await
-               l [
-                   3 v push
-               ] with-read-lock
-               c' count-down
-           ] "R/W lock test 2" spawn drop
+    [
+        c await
+        l [
+            3 v push
+        ] with-read-lock
+        c' count-down
+    ] "R/W lock test 2" spawn drop
 
-           c' await
-           v
-    ] ;
+    c' await
+    v ;
 
 [ V{ 1 2 3 } ] [ rw-lock-test-2 ] unit-test
 
 ! Test lock timeouts
 :: lock-timeout-test ( -- v )
-    [let | l [ <lock> ] |
-        [
-            l [ 1 seconds sleep ] with-lock
-        ] "Lock holder" spawn drop
+    <lock> :> l
 
-        [
-            l 1/10 seconds [ ] with-lock-timeout
-        ] "Lock timeout-er" spawn-linked drop
+    [
+        l [ 1 seconds sleep ] with-lock
+    ] "Lock holder" spawn drop
 
-        receive
-    ] ;
+    [
+        l 1/10 seconds [ ] with-lock-timeout
+    ] "Lock timeout-er" spawn-linked drop
+
+    receive ;
 
 [ lock-timeout-test ] [
     thread>> name>> "Lock timeout-er" =

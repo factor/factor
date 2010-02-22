@@ -1,6 +1,6 @@
 USING: io.pathnames io.files.temp io.directories
 continuations math io.files.private kernel
-namespaces tools.test ;
+namespaces tools.test io.pathnames.private ;
 IN: io.pathnames.tests
 
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test
@@ -61,7 +61,7 @@ IN: io.pathnames.tests
     "." current-directory set
     ".." "resource-path" set
     [ "../core/bootstrap/stage2.factor" ]
-    [ "resource:core/bootstrap/stage2.factor" (normalize-path) ]
+    [ "resource:core/bootstrap/stage2.factor" absolute-path ]
     unit-test
 ] with-scope
 

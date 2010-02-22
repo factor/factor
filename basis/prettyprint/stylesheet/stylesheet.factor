@@ -42,5 +42,12 @@ PRIVATE>
 : vocab-style ( vocab -- style )
     dim-color colored-presentation-style ;
 
+SYMBOL: stack-effect-style
+
+H{
+    { foreground COLOR: FactorDarkGreen }
+    { font-style plain }
+} stack-effect-style set-global
+
 : effect-style ( effect -- style )
     presented associate stack-effect-style get assoc-union ;

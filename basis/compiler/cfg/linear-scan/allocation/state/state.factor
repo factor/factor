@@ -33,7 +33,7 @@ SYMBOL: active-intervals
     dup vreg>> active-intervals-for push ;
 
 : delete-active ( live-interval -- )
-    dup vreg>> active-intervals-for delq ;
+    dup vreg>> active-intervals-for remove-eq! drop ;
 
 : assign-free-register ( new registers -- )
     pop >>reg add-active ;
@@ -48,7 +48,7 @@ SYMBOL: inactive-intervals
     dup vreg>> inactive-intervals-for push ;
 
 : delete-inactive ( live-interval -- )
-    dup vreg>> inactive-intervals-for delq ;
+    dup vreg>> inactive-intervals-for remove-eq! drop ;
 
 ! Vector of handled live intervals
 SYMBOL: handled-intervals
@@ -83,7 +83,7 @@ ERROR: register-already-used live-interval ;
 ! Moving intervals between active and inactive sets
 : process-intervals ( n symbol quots -- )
     ! symbol stores an alist mapping register classes to vectors
-    [ get values ] dip '[ [ _ cond ] with filter-here ] with each ; inline
+    [ get values ] dip '[ [ _ cond ] with filter! drop ] with each ; inline
 
 : deactivate-intervals ( n -- )
     ! Any active intervals which have ended are moved to handled

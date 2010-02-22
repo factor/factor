@@ -15,6 +15,9 @@ IN: math.polynomials.tests
 [ { 0 0 0 } ] [ { 0 0 0 } { 0 0 0 } p- ] unit-test
 [ { 0 0 0 } ] [ 4 { 0 0 0 } n*p ] unit-test
 [ { 4 8 0 12 } ] [ 4 { 1 2 0 3 } n*p ] unit-test
+[ { 1 4 4 0 0 } ] [ { 1 2 0 } p-sq ] unit-test
+[ { 1 6 12 8 0 0 0 } ] [ { 1 2 0 } 3 p^ ] unit-test
+[ { 1 } ] [ { 1 2 0 } 0 p^ ] unit-test
 [ { 1 4 7 6 0 0 0 0 0 } ] [ { 1 2 3 0 0 0 } { 1 2 0 0 } p* ] unit-test
 [ V{ 7 -2 1 } V{ -20 0 0 } ] [ { 1 1 1 1 } { 3 1 } p/mod ] unit-test
 [ V{ 0 0 } V{ 1 1 } ] [ { 1 1 } { 1 1 1 1 } p/mod ] unit-test

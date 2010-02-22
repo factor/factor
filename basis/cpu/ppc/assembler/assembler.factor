@@ -97,6 +97,8 @@ X: XOR 0 316 31
 X: XOR. 1 316 31
 X1: EXTSB 0 954 31
 X1: EXTSB. 1 954 31
+: FRSP ( a s -- ) [ 0 ] 2dip 0 12 63 x-insn ;
+: FRSP. ( a s -- ) [ 0 ] 2dip 1 12 63 x-insn ;
 : FMR ( a s -- ) [ 0 ] 2dip 0 72 63 x-insn ;
 : FMR. ( a s -- ) [ 0 ] 2dip 1 72 63 x-insn ;
 : FCTIWZ ( a s -- ) [ 0 ] 2dip 0 15 63 x-insn ;

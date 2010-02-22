@@ -1,9 +1,10 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words assocs definitions io io.pathnames io.styles kernel
-prettyprint sorting see sets sequences arrays hashtables help.crossref
-help.topics help.markup quotations accessors source-files namespaces
-graphs vocabs generic generic.single threads compiler.units init ;
+prettyprint sorting see sets sequences arrays hashtables help
+help.crossref help.topics help.markup quotations accessors
+source-files namespaces graphs vocabs generic generic.single
+threads compiler.units init combinators.smart ;
 IN: tools.crossref
 
 SYMBOL: crossref
@@ -24,13 +25,13 @@ M: word quot-uses over crossref? [ conjoin ] [ 2drop ] if ;
     [ quot-uses ] curry each ;
 
 : seq-uses ( seq assoc -- )
-    over visited get memq? [ 2drop ] [
+    over visited get member-eq? [ 2drop ] [
         over visited get push
         (seq-uses)
     ] if ;
 
 : assoc-uses ( assoc' assoc -- )
-    over visited get memq? [ 2drop ] [
+    over visited get member-eq? [ 2drop ] [
         over visited get push
         [ >alist ] dip (seq-uses)
     ] if ;
@@ -50,30 +51,40 @@ M: callable uses ( quot -- assoc )
 
 M: word uses def>> uses ;
 
-M: link uses { $subsection $subsections $link $see-also } article-links ;
+M: link uses
+    [ { $subsection $subsections $link $see-also } article-links [ >link ] map ]
+    [ { $vocab-link } article-links [ >vocab-link ] map ]
+    bi append ;
 
 M: pathname uses string>> source-file top-level-form>> [ uses ] [ { } ] if* ;
 
-GENERIC: crossref-def ( defspec -- )
+! To make UI browser happy
+M: vocab uses drop f ;
 
-M: object crossref-def
+: crossref-def ( defspec -- )
     dup uses crossref get add-vertex ;
 
-M: word crossref-def
-    [ call-next-method ] [ subwords [ crossref-def ] each ] bi ;
+: defs-to-crossref ( -- seq )
+    [
+        all-words
+        [ [ generic? not ] filter ]
+        [ [ subwords ] map concat ] bi
+
+        all-articles [ >link ] map
+
+        source-files get keys [ <pathname> ] map
+    ] append-outputs ;
 
 : build-crossref ( -- crossref )
     "Computing usage index... " write flush yield
-    H{ } clone crossref [
-        all-words
-        source-files get keys [ <pathname> ] map
-        [ [ crossref-def ] each ] bi@
-        crossref get
-    ] with-variable
+    H{ } clone [
+        crossref set-global
+        defs-to-crossref [ crossref-def ] each
+    ] keep
     "done" print flush ;
 
 : get-crossref ( -- crossref )
-    crossref global [ drop build-crossref ] cache ;
+    crossref get-global [ build-crossref ] unless* ;
 
 GENERIC: irrelevant? ( defspec -- ? )
 
@@ -91,7 +102,7 @@ GENERIC: smart-usage ( defspec -- seq )
 
 M: object smart-usage usage [ irrelevant? not ] filter ;
 
-M: method-body smart-usage "method-generic" word-prop smart-usage ;
+M: method smart-usage "method-generic" word-prop smart-usage ;
 
 M: f smart-usage drop \ f smart-usage ;
 
@@ -112,7 +123,7 @@ M: f smart-usage drop \ f smart-usage ;
     [ [ vocab-name ] [ words [ generic? not ] filter ] bi ] dip map
     [
         [ [ word? ] [ generic? not ] bi and ] filter [
-            dup method-body?
+            dup method?
             [ "method-generic" word-prop ] when
             vocabulary>>
         ] map
@@ -135,6 +146,6 @@ SINGLETON: invalidate-crossref
 
 M: invalidate-crossref definitions-changed 2drop crossref global delete-at ;
 
-[ invalidate-crossref add-definition-observer ] "tools.crossref" add-init-hook
+[ invalidate-crossref add-definition-observer ] "tools.crossref" add-startup-hook
 
 PRIVATE>

@@ -1,11 +1,11 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien alien.c-types alien.data ascii
-assocs byte-arrays classes.struct classes.tuple.private
+assocs byte-arrays classes.struct classes.tuple.private classes.tuple
 combinators compiler.tree.debugger compiler.units destructors
 io.encodings.utf8 io.pathnames io.streams.string kernel libc
 literals math mirrors namespaces prettyprint
 prettyprint.config see sequences specialized-arrays system
-tools.test parser lexer eval layouts ;
+tools.test parser lexer eval layouts generic.single classes ;
 FROM: math => float ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: char
@@ -219,7 +219,7 @@ UNION-STRUCT: struct-test-float-and-bits
         { type bool }
         { class object }
     }
-} ] [ "struct-test-foo" c-type fields>> ] unit-test
+} ] [ struct-test-foo c-type fields>> ] unit-test
 
 [ {
     T{ struct-slot-spec
@@ -236,7 +236,7 @@ UNION-STRUCT: struct-test-float-and-bits
         { class integer }
         { initial 0 }
     }
-} ] [ "struct-test-float-and-bits" c-type fields>> ] unit-test
+} ] [ struct-test-float-and-bits c-type fields>> ] unit-test
 
 STRUCT: struct-test-equality-1
     { x int } ;
@@ -338,20 +338,28 @@ STRUCT: struct-that's-a-word { x int } ;
 [
     "USE: classes.struct IN: classes.struct.tests TUPLE: not-a-struct ; S{ not-a-struct }"
     eval( -- value )
-] must-fail
+] [ error>> no-method? ] must-fail-with
 
 ! Subclassing a struct class should not be allowed
 [
-    "USE: classes.struct IN: classes.struct.tests STRUCT: a-struct { x int } ; TUPLE: not-a-struct < a-struct ;"
+    "USING: alien.c-types classes.struct ; IN: classes.struct.tests STRUCT: a-struct { x int } ; TUPLE: not-a-struct < a-struct ;"
     eval( -- )
-] must-fail
+] [ error>> bad-superclass? ] must-fail-with
 
-! Remove c-type when struct class is forgotten
-[ ] [
-    "USE: classes.struct IN: classes.struct.tests TUPLE: a-struct ;" eval( -- )
-] unit-test
+! Changing a superclass into a struct should reset the subclass
+TUPLE: will-become-struct ;
 
-[ f ] [ "a-struct" c-types get key? ] unit-test
+TUPLE: a-subclass < will-become-struct ;
+
+[ f ] [ will-become-struct struct-class? ] unit-test
+
+[ will-become-struct ] [ a-subclass superclass ] unit-test
+
+[ ] [ "IN: classes.struct.tests USING: classes.struct alien.c-types ; STRUCT: will-become-struct { x int } ;" eval( -- ) ] unit-test
+
+[ t ] [ will-become-struct struct-class? ] unit-test
+
+[ tuple ] [ a-subclass superclass ] unit-test
 
 STRUCT: bit-field-test
     { a uint bits: 12 }
@@ -365,3 +373,18 @@ STRUCT: bit-field-test
 [ -2 ] [ bit-field-test <struct> 2 >>b b>> ] unit-test
 [ 1 ] [ bit-field-test <struct> 257 >>c c>> ] unit-test
 [ 3 ] [ bit-field-test heap-size ] unit-test
+
+cpu ppc? [
+    STRUCT: ppc-align-test-1
+        { x longlong }
+        { y int } ;
+
+    [ 16 ] [ ppc-align-test-1 heap-size ] unit-test
+
+    STRUCT: ppc-align-test-2
+        { y int }
+        { x longlong } ;
+
+    [ 12 ] [ ppc-align-test-2 heap-size ] unit-test
+    [ 4 ] [ "x" ppc-align-test-2 offset-of ] unit-test
+] when

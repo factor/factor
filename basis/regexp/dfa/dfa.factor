@@ -25,7 +25,7 @@ IN: regexp.dfa
     ] unless ;
 
 : epsilon-table ( states nfa -- table )
-    [ H{ } clone tuck ] dip
+    [ [ H{ } clone ] dip over ] dip
     '[ _ _ t epsilon-loop ] each ;
 
 : find-epsilon-closure ( states nfa -- dfa-state )

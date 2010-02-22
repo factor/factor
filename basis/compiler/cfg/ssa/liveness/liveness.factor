@@ -121,10 +121,9 @@ PRIVATE>
 PRIVATE>
 
 :: live-out? ( vreg node -- ? )
-    [let | def [ vreg def-of ] |
-        {
-            { [ node def eq? ] [ vreg uses-of def only? not ] }
-            { [ def node strictly-dominates? ] [ vreg node (live-out?) ] }
-            [ f ]
-        } cond
-    ] ;
+    vreg def-of :> def
+    {
+        { [ node def eq? ] [ vreg uses-of def only? not ] }
+        { [ def node strictly-dominates? ] [ vreg node (live-out?) ] }
+        [ f ]
+    } cond ;

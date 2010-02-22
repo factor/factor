@@ -12,7 +12,7 @@ IN: compiler.cfg.predecessors
 : update-phi ( bb ##phi -- )
     [
         swap predecessors>>
-        '[ drop _ memq? ] assoc-filter
+        '[ drop _ member-eq? ] assoc-filter
     ] change-inputs drop ;
 
 : update-phis ( bb -- )

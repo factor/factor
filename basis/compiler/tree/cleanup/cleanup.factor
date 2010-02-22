@@ -1,9 +1,9 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences combinators fry
 classes.algebra namespaces assocs words math math.private
 math.partial-dispatch math.intervals classes classes.tuple
-classes.tuple.private layouts definitions stack-checker.state
+classes.tuple.private layouts definitions stack-checker.dependencies
 stack-checker.branches
 compiler.utilities
 compiler.tree
@@ -20,7 +20,7 @@ IN: compiler.tree.cleanup
 GENERIC: delete-node ( node -- )
 
 M: #call-recursive delete-node
-    dup label>> calls>> [ node>> eq? not ] with filter-here ;
+    dup label>> calls>> [ node>> eq? not ] with filter! drop ;
 
 M: #return-recursive delete-node
     label>> f >>return drop ;
@@ -36,32 +36,56 @@ GENERIC: cleanup* ( node -- node/nodes )
     #! do it since the logic is a bit more involved
     [ cleanup* ] map-flat ;
 
+! Constant folding
 : cleanup-folding? ( #call -- ? )
     node-output-infos
     [ f ] [ [ literal?>> ] all? ] if-empty ;
 
-: cleanup-folding ( #call -- nodes )
+: (cleanup-folding) ( #call -- nodes )
     #! Replace a #call having a known result with a #drop of its
     #! inputs followed by #push nodes for the outputs.
-    [ word>> inlined-dependency depends-on ]
     [
         [ node-output-infos ] [ out-d>> ] bi
         [ [ literal>> ] dip #push ] 2map
     ]
     [ in-d>> #drop ]
-    tri prefix ;
+    bi prefix ;
 
+: >predicate-folding< ( #call -- value-info class result )
+    [ node-input-infos first ]
+    [ word>> "predicating" word-prop ]
+    [ node-output-infos first literal>> ] tri ;
+
+: record-predicate-folding ( #call -- )
+    >predicate-folding< pick literal?>>
+    [ [ literal>> ] 2dip depends-on-instance-predicate ]
+    [ [ class>> ] 2dip depends-on-class-predicate ]
+    if ;
+
+: record-folding ( #call -- )
+    dup word>> predicate?
+    [ record-predicate-folding ]
+    [ word>> depends-on-definition ]
+    if ;
+
+: cleanup-folding ( #call -- nodes )
+    [ (cleanup-folding) ] [ record-folding ] bi ;
+
+! Method inlining
 : add-method-dependency ( #call -- )
     dup method>> word? [
-        [ word>> ] [ class>> ] bi depends-on-generic
+        [ [ class>> ] [ word>> ] bi depends-on-generic ]
+        [ [ class>> ] [ word>> ] [ method>> ] tri depends-on-method ]
+        bi
     ] [ drop ] if ;
 
+: record-inlining ( #call -- )
+    dup method>>
+    [ add-method-dependency ]
+    [ word>> depends-on-definition ] if ;
+
 : cleanup-inlining ( #call -- nodes )
-    [
-        dup method>>
-        [ add-method-dependency ]
-        [ word>> inlined-dependency depends-on ] if
-    ] [ body>> cleanup ] bi ;
+    [ record-inlining ] [ body>> cleanup ] bi ;
 
 ! Removing overflow checks
 : (remove-overflow-check?) ( #call -- ? )

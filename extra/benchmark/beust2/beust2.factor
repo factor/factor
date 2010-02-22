@@ -7,25 +7,24 @@ IN: benchmark.beust2
 
 :: (count-numbers) ( remaining first value used max listener: ( -- ) -- ? )
     10 first - iota [| i |
-        [let* | digit [ i first + ]
-                mask [ digit 2^ ]
-                value' [ i value + ] |
-            used mask bitand zero? [
-                value max > [ t ] [
-                    remaining 1 <= [
-                        listener call f
-                    ] [
-                        remaining 1 -
-                        0
-                        value' 10 *
-                        used mask bitor
-                        max
-                        listener
-                        (count-numbers)
-                    ] if
+        i first + :> digit
+        digit 2^ :> mask
+        i value + :> value'
+        used mask bitand zero? [
+            value max > [ t ] [
+                remaining 1 <= [
+                    listener call f
+                ] [
+                    remaining 1 -
+                    0
+                    value' 10 *
+                    used mask bitor
+                    max
+                    listener
+                    (count-numbers)
                 ] if
-            ] [ f ] if
-        ]
+            ] if
+        ] [ f ] if
     ] any? ; inline recursive
 
 :: count-numbers ( max listener -- )
@@ -33,9 +32,8 @@ IN: benchmark.beust2
     inline
 
 :: beust ( -- )
-    [let | i! [ 0 ] |
-        5000000000 [ i 1 + i! ] count-numbers
-        i number>string " unique numbers." append print
-    ] ;
+    0 :> i!
+    5000000000 [ i 1 + i! ] count-numbers
+    i number>string " unique numbers." append print ;
 
 MAIN: beust

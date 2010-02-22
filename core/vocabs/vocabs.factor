@@ -73,7 +73,7 @@ GENERIC: vocabs-changed ( obj -- )
     vocab-observers get push ;
 
 : remove-vocab-observer ( obj -- )
-    vocab-observers get delq ;
+    vocab-observers get remove-eq! drop ;
 
 : notify-vocab-observers ( -- )
     vocab-observers get [ vocabs-changed ] each ;

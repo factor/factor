@@ -91,11 +91,11 @@ IN: vectors.tests
 [ 4 ] [ 5 V{ 1 2 3 4 5 } index ] unit-test
 
 [ t ] [
-    100 >array dup >vector <reversed> >array [ reverse ] dip =
+    100 iota >array dup >vector <reversed> >array [ reverse ] dip =
 ] unit-test
 
 [ fixnum ] [ 1 >bignum V{ } new-sequence length class ] unit-test
 
-[ fixnum ] [ 1 >bignum [ ] V{ } map-as length class ] unit-test
+[ fixnum ] [ 1 >bignum iota [ ] V{ } map-as length class ] unit-test
 
 [ V{ "lulz" } ] [ "lulz" 1vector ] unit-test

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors namespaces kernel parser assocs ;
+USING: accessors namespaces kernel parser assocs sequences ;
 IN: compiler.cfg.registers
 
 ! Virtual registers, used by CFG and machine IRs, are just integers
@@ -42,5 +42,5 @@ C: <ds-loc> ds-loc
 TUPLE: rs-loc < loc ;
 C: <rs-loc> rs-loc
 
-SYNTAX: D scan-word <ds-loc> parsed ;
-SYNTAX: R scan-word <rs-loc> parsed ;
+SYNTAX: D scan-word <ds-loc> suffix! ;
+SYNTAX: R scan-word <rs-loc> suffix! ;

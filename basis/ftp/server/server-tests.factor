@@ -1,7 +1,7 @@
 USING: calendar ftp.server io.encodings.ascii io.files
 io.files.unique namespaces threads tools.test kernel
 io.servers.connection ftp.client accessors urls
-io.pathnames io.directories sequences fry ;
+io.pathnames io.directories sequences fry io.backend ;
 FROM: ftp.client => ftp-get ;
 IN: ftp.server.tests
 
@@ -11,7 +11,7 @@ IN: ftp.server.tests
 : create-test-file ( -- path )
     test-file-contents
     "ftp.server" "test" make-unique-file
-    [ ascii set-file-contents ] keep canonicalize-path ;
+    [ ascii set-file-contents ] [ normalize-path ] bi ;
 
 : test-ftp-server ( quot -- )
     '[

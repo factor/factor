@@ -170,6 +170,8 @@ PRIVATE>
 : lo-word ( wparam -- lo ) <short> *short ; inline
 : hi-word ( wparam -- hi ) -16 shift lo-word ; inline
 : >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ;
+: GET_APPCOMMAND_LPARAM ( lParam -- appCommand )
+    hi-word FAPPCOMMAND_MASK lo-word bitnot bitand ; inline
 
 : crlf>lf ( str -- str' )
     CHAR: \r swap remove ;
@@ -470,7 +472,7 @@ SYMBOL: nc-buttons
 : handle-wm-ncbutton ( hWnd uMsg wParam lParam -- )
     2drop nip
     message>button nc-buttons get
-    swap [ push ] [ delete ] if ;
+    swap [ push ] [ remove! drop ] if ;
 
 : mouse-wheel ( wParam -- array ) >lo-hi [ sgn neg ] map ;
 
@@ -495,16 +497,24 @@ SYMBOL: nc-buttons
     ReleaseCapture win32-error=0/f
     mouse-captured off ;
 
+: handle-app-command ( hWnd uMsg wParam lParam -- )
+    GET_APPCOMMAND_LPARAM
+    {
+        { APPCOMMAND_BROWSER_BACKWARD [ pick window left-action send-action ] }
+        { APPCOMMAND_BROWSER_FORWARD [ pick window right-action send-action ] }
+        [ drop ]
+    } case 3drop ;
+    
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
     [
         over set-capture
-        dup message>button drop nc-buttons get delete
+        dup message>button drop nc-buttons get remove! drop
     ] 2dip prepare-mouse send-button-down ;
 
 : handle-wm-buttonup ( hWnd uMsg wParam lParam -- )
     mouse-captured get [ release-capture ] when
     pick message>button drop dup nc-buttons get member? [
-        nc-buttons get delete 4drop
+        nc-buttons get remove! drop 4drop
     ] [
         drop prepare-mouse send-button-up
     ] if ;
@@ -537,7 +547,7 @@ SYMBOL: nc-buttons
     COLOR_BTNFACE GetSysColor RGB>color ;
 
 : ?make-glass ( world hwnd -- )
-    over window-controls>> textured-background swap memq? [
+    over window-controls>> textured-background swap member-eq? [
         composition-enabled? [
             full-window-margins DwmExtendFrameIntoClientArea drop
             T{ rgba f 0.0 0.0 0.0 0.0 }
@@ -571,6 +581,8 @@ H{ } clone wm-handlers set-global
 [ handle-wm-set-focus 0  ] WM_SETFOCUS add-wm-handler
 [ handle-wm-kill-focus 0 ] WM_KILLFOCUS add-wm-handler
 
+[ handle-app-command 0 ] WM_APPCOMMAND add-wm-handler
+
 [ handle-wm-buttondown 0 ] WM_LBUTTONDOWN add-wm-handler
 [ handle-wm-buttondown 0 ] WM_MBUTTONDOWN add-wm-handler
 [ handle-wm-buttondown 0 ] WM_RBUTTONDOWN add-wm-handler
@@ -596,7 +608,7 @@ SYMBOL: trace-messages?
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
-    "uint" { "void*" "uint" "long" "long" } "stdcall" [
+    uint { void* uint long long } "stdcall" [
         pick
         trace-messages? get-global [ dup windows-message-name name>> print flush ] when
         wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if

@@ -1,7 +1,7 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel math.constants math.private math.bits
-math.libm combinators math.order sequences ;
+math.libm combinators fry math.order sequences ;
 IN: math.functions
 
 : >fraction ( a/b -- a b )
@@ -13,12 +13,13 @@ IN: math.functions
 GENERIC: sqrt ( x -- y ) foldable
 
 M: real sqrt
-    >float dup 0.0 < [ neg fsqrt 0.0 swap rect> ] [ fsqrt ] if ; inline
+    >float dup 0.0 <
+    [ neg fsqrt [ 0.0 ] dip rect> ] [ fsqrt ] if ; inline
 
 : factor-2s ( n -- r s )
     #! factor an integer into 2^r * s
     dup 0 = [ 1 ] [
-        0 swap [ dup even? ] [ [ 1 + ] [ 2/ ] bi* ] while
+        [ 0 ] dip [ dup even? ] [ [ 1 + ] [ 2/ ] bi* ] while
     ] if ; inline
 
 <PRIVATE
@@ -26,20 +27,20 @@ M: real sqrt
 GENERIC# ^n 1 ( z w -- z^w ) foldable
 
 : (^n) ( z w -- z^w )
-    make-bits 1 [ [ dupd * ] when [ sq ] dip ] reduce nip ; inline
+    make-bits 1 [ [ over * ] when [ sq ] dip ] reduce nip ; inline
 
 M: integer ^n
     [ factor-2s ] dip [ (^n) ] keep rot * shift ;
 
 M: ratio ^n
-    [ >fraction ] dip [ ^n ] curry bi@ / ;
+    [ >fraction ] dip '[ _ ^n ] bi@ / ;
 
 M: float ^n (^n) ;
 
 M: complex ^n (^n) ;
 
 : integer^ ( x y -- z )
-    dup 0 > [ ^n ] [ neg ^n recip ] if ; inline
+    dup 0 >= [ ^n ] [ [ recip ] dip neg ^n ] if ; inline
 
 PRIVATE>
 
@@ -62,7 +63,7 @@ M: float exp fexp ; inline
 
 M: real exp >float exp ; inline
 
-M: complex exp >rect swap fexp swap polar> ; inline
+M: complex exp >rect [ exp ] dip polar> ; inline
 
 <PRIVATE
 
@@ -84,10 +85,9 @@ M: complex exp >rect swap fexp swap polar> ; inline
 : 0^ ( x -- z )
     [ 0/0. ] [ 0 < 1/0. 0 ? ] if-zero ; inline
 
-: (^mod) ( n x y -- z )
-    make-bits 1 [
-        [ dupd * pick mod ] when [ sq over mod ] dip
-    ] reduce 2nip ; inline
+: (^mod) ( x y n -- z )
+    [ make-bits 1 ] dip dup
+    '[ [ over * _ mod ] when [ sq _ mod ] dip ] reduce nip ; inline
 
 : (gcd) ( b a x y -- a d )
     over zero? [
@@ -106,6 +106,8 @@ PRIVATE>
         [ ^complex ]
     } cond ; inline
 
+: nth-root ( n x -- y ) swap recip ^ ; inline
+
 : gcd ( x y -- a d )
     [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; foldable
 
@@ -123,11 +125,8 @@ ERROR: non-trivial-divisor n ;
     [ non-trivial-divisor ] if ; foldable
 
 : ^mod ( x y n -- z )
-    over 0 < [
-        [ [ neg ] dip ^mod ] keep mod-inv
-    ] [
-        -rot (^mod)
-    ] if ; foldable
+    over 0 <
+    [ [ [ neg ] dip ^mod ] keep mod-inv ] [ (^mod) ] if ; foldable
 
 GENERIC: absq ( x -- y ) foldable
 
@@ -304,4 +303,3 @@ M: real atan >float atan ; inline
     [ [ / floor ] [ * ] bi ] unless-zero ;
 
 : lerp ( a b t -- a_t ) [ over - ] dip * + ; inline
-

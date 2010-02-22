@@ -11,17 +11,12 @@ IN: db.sqlite.lib
 ERROR: sqlite-error < db-error n string ;
 ERROR: sqlite-sql-error < sql-error n string ;
 
-: <sqlite-sql-error> ( n string -- error )
-    \ sqlite-sql-error new
-        swap >>string
-        swap >>n ;
-
 : throw-sqlite-error ( n -- * )
     dup sqlite-error-messages nth sqlite-error ;
 
 : sqlite-statement-error ( -- * )
     SQLITE_ERROR
-    db-connection get handle>> sqlite3_errmsg <sqlite-sql-error> throw ;
+    db-connection get handle>> sqlite3_errmsg sqlite-sql-error ;
 
 : sqlite-check-result ( n -- )
     {
@@ -32,14 +27,14 @@ ERROR: sqlite-sql-error < sql-error n string ;
 
 : sqlite-open ( path -- db )
     normalize-path
-    "void*" <c-object>
+    void* <c-object>
     [ sqlite3_open sqlite-check-result ] keep *void* ;
 
 : sqlite-close ( db -- )
     sqlite3_close sqlite-check-result ;
 
 : sqlite-prepare ( db sql -- handle )
-    utf8 encode dup length "void*" <c-object> "void*" <c-object>
+    utf8 encode dup length void* <c-object> void* <c-object>
     [ sqlite3_prepare_v2 sqlite-check-result ] 2keep
     drop *void* ;
 

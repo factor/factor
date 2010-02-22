@@ -6,26 +6,25 @@ namespaces namespaces.private assocs accessors ;
 IN: tools.walker.debug
 
 :: test-walker ( quot -- data )
-    [let | p [ <promise> ] |
+    <promise> :> p
+    [
+        H{ } clone >n
+
         [
-            H{ } clone >n
+            p promise-fulfilled?
+            [ drop ] [ p fulfill ] if
+            2drop
+        ] show-walker-hook set
 
-            [
-                p promise-fulfilled?
-                [ drop ] [ p fulfill ] if
-                2drop
-            ] show-walker-hook set
+        break
 
-            break
+        quot call
+    ] "Walker test" spawn drop
 
-            quot call
-        ] "Walker test" spawn drop
+    step-into-all
+    p ?promise
+    send-synchronous drop
 
-        step-into-all
-        p ?promise
-        send-synchronous drop
-
-        p ?promise
-        variables>> walker-continuation swap at
-        value>> data>>
-    ] ;
+    p ?promise
+    variables>> walker-continuation swap at
+    value>> data>> ;

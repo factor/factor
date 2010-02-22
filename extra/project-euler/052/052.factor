@@ -24,7 +24,7 @@ IN: project-euler.052
 <PRIVATE
 
 : map-nx ( n x -- seq )
-    [ 1 + * ] with map ; inline
+    iota [ 1 + * ] with map ; inline
 
 : all-same-digits? ( seq -- ? )
     [ number>digits natural-sort ] map all-equal? ;

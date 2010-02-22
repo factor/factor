@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2005, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences kernel accessors ;
 IN: columns
@@ -8,11 +8,11 @@ TUPLE: column seq col ;
 
 C: <column> column
 
-M: column virtual-seq seq>> ;
+M: column virtual-exemplar seq>> ;
 M: column virtual@ [ col>> swap ] [ seq>> ] bi nth bounds-check ;
 M: column length seq>> length ;
 
 INSTANCE: column virtual-sequence
 
 : <flipped> ( seq -- seq' )
-    dup empty? [ dup first length [ <column> ] with map ] unless ;
+    dup empty? [ dup first length [ <column> ] with { } map-integers ] unless ;

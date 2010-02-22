@@ -19,10 +19,9 @@ M:: leaf-node (new-at) ( shift value key hashcode leaf-node -- node' added-leaf 
             value leaf-node value>> =
             [ leaf-node f ] [ value key hashcode <leaf-node> f ] if
         ] [
-            [let | new-leaf [ value key hashcode <leaf-node> ] |
-                hashcode leaf-node new-leaf 2array <collision-node>
-                new-leaf
-            ]
+            value key hashcode <leaf-node> :> new-leaf
+            hashcode leaf-node new-leaf 2array <collision-node>
+            new-leaf
         ] if
     ] [ shift leaf-node value key hashcode make-bitmap-node ] if ;
 

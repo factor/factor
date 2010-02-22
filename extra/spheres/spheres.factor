@@ -196,9 +196,6 @@ M: spheres-world end-world
         [ plane-program>> [ delete-gl-program ] when* ]
     } cleave ;
 
-M: spheres-world pref-dim*
-    drop { 640 480 } ;
-
 :: (draw-sphere) ( program center radius -- )
     program "center" glGetAttribLocation center first3 glVertexAttrib3f
     program "radius" glGetAttribLocation radius glVertexAttrib1f
@@ -299,17 +296,13 @@ M: spheres-world draw-world*
         ]
     } cleave ;
 
-: spheres-window ( -- )
-    [
-        f T{ world-attributes
-            { world-class spheres-world }
-            { title "Spheres" }
-            { pixel-format-attributes {
-                windowed
-                double-buffered
-                T{ depth-bits { value 16 } }
-            } }
-        } open-window
-    ] with-ui ;
-
-MAIN: spheres-window
+MAIN-WINDOW: spheres-window {
+        { world-class spheres-world }
+        { title "Spheres" }
+        { pixel-format-attributes {
+            windowed
+            double-buffered
+            T{ depth-bits { value 16 } }
+        } }
+        { pref-dim { 640 480 } }
+    } ;

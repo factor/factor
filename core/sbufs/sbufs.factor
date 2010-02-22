@@ -23,12 +23,12 @@ M: sbuf like
         dup string? [ dup length sbuf boa ] [ >sbuf ] if
     ] unless ; inline
 
-M: sbuf new-resizable drop <sbuf> ; inline
-
 M: sbuf equal?
     over sbuf? [ sequence= ] [ 2drop f ] if ;
 
 M: string new-resizable drop <sbuf> ; inline
+
+M: sbuf new-resizable drop <sbuf> ; inline
 
 M: string like
     #! If we have a string, we're done.

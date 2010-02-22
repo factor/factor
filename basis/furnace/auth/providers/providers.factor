@@ -23,26 +23,24 @@ GENERIC: new-user ( user provider -- user/f )
 ! Password recovery support
 
 :: issue-ticket ( email username provider -- user/f )
-    [let | user [ username provider get-user ] |
-        user [
-            user email>> length 0 > [
-                user email>> email = [
-                    user
-                    256 random-bits >hex >>ticket
-                    dup provider update-user
-                ] [ f ] if
+    username provider get-user :> user
+    user [
+        user email>> length 0 > [
+            user email>> email = [
+                user
+                256 random-bits >hex >>ticket
+                dup provider update-user
             ] [ f ] if
         ] [ f ] if
-    ] ;
+    ] [ f ] if ;
 
 :: claim-ticket ( ticket username provider -- user/f )
-    [let | user [ username provider get-user ] |
-        user [
-            user ticket>> ticket = [
-                user f >>ticket dup provider update-user
-            ] [ f ] if
+    username provider get-user :> user
+    user [
+        user ticket>> ticket = [
+            user f >>ticket dup provider update-user
         ] [ f ] if
-    ] ;
+    ] [ f ] if ;
 
 ! For configuration
 

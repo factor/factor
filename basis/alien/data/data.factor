@@ -65,10 +65,6 @@ M: memory-stream stream-read
 : byte-array>memory ( byte-array base -- )
     swap dup byte-length memcpy ; inline
 
-: >c-bool ( ? -- int ) 1 0 ? ; inline
-
-: c-bool> ( int -- ? ) 0 = not ; inline
-
 M: value-type c-type-rep drop int-rep ;
 
 M: value-type c-type-getter
@@ -77,5 +73,3 @@ M: value-type c-type-getter
 M: value-type c-type-setter ( type -- quot )
     [ c-type-getter ] [ c-type-unboxer-quot ] [ heap-size ] tri
     '[ @ swap @ _ memcpy ] ;
-
-

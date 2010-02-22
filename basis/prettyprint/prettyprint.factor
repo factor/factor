@@ -1,10 +1,10 @@
-! Copyright (C) 2003, 2009 Slava Pestov.
+! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays accessors assocs colors combinators grouping io
 io.streams.string io.styles kernel make math math.parser namespaces
 parser prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections quotations sequences sorting strings vocabs
-vocabs.prettyprint words sets ;
+vocabs.prettyprint words sets generic ;
 IN: prettyprint
 
 : with-use ( obj quot -- )
@@ -26,13 +26,7 @@ IN: prettyprint
 : unparse-use ( obj -- str ) [ pprint-use ] with-string-writer ;
 
 : pprint-short ( obj -- )
-    H{
-       { line-limit 1 }
-       { length-limit 15 }
-       { nesting-limit 2 }
-       { string-limit? t }
-       { boa-tuples? t }
-    } clone [ pprint ] bind ;
+    [ pprint ] with-short-limits ;
 
 : unparse-short ( obj -- str )
     [ pprint-short ] with-string-writer ;
@@ -72,24 +66,55 @@ SYMBOL: ->
     ] [ ] make ;
 
 : remove-breakpoints ( quot pos -- quot' )
-    over quotation? [
-        1 + cut [ (remove-breakpoints) ] bi@
-        [ -> ] glue 
-    ] [
-        drop
-    ] if ;
+    1 + short cut [ (remove-breakpoints) ] bi@ [ -> ] glue ;
+
+: optimized-frame? ( triple -- ? ) second word? ;
+
+: frame-word? ( triple -- ? )
+    first word? ;
+
+: frame-word. ( triple -- )
+    first {
+        { [ dup method? ] [ "Method: " write pprint ] }
+        { [ dup word? ] [ "Word: " write pprint ] }
+        [ drop ]
+    } cond ;
+
+: optimized-frame. ( triple -- )
+    [
+        [ "(O)" write ] with-cell
+        [ frame-word. ] with-cell
+    ] with-row ;
+
+: unoptimized-frame. ( triple -- )
+    [
+        [ "(U)" write ] with-cell
+        [
+            "Quotation: " write
+            dup [ second ] [ third ] bi remove-breakpoints
+            [
+                3 nesting-limit set
+                100 length-limit set
+                pprint
+            ] with-scope
+        ] with-cell
+    ] with-row
+    dup frame-word? [
+        [
+            [ ] with-cell
+            [ frame-word. ] with-cell
+        ] with-row
+    ] [ drop ] if ;
+
+: callframe. ( triple -- )
+    dup optimized-frame?
+    [ optimized-frame. ] [ unoptimized-frame. ] if ;
 
 PRIVATE>
 
 : callstack. ( callstack -- )
-    callstack>array 2 <groups> [
-        remove-breakpoints
-        [
-            3 nesting-limit set
-            100 length-limit set
-            .
-        ] with-scope
-    ] assoc-each ;
+    callstack>array 3 <groups>
+    { { table-gap { 5 5 } } } [ [ callframe. ] each ] tabular-output nl ;
 
 : .c ( -- ) callstack callstack. ;
 
@@ -110,3 +135,7 @@ SYMBOL: pprint-string-cells?
             ] with-row
         ] each
     ] tabular-output nl ;
+
+: object-table. ( obj alist -- )
+    [ [ nip first ] [ second call( obj -- str ) ] 2bi 2array ] with map
+    simple-table. ;

@@ -80,7 +80,7 @@ M: linux file-systems
     ] if ;
 
 : find-mount-point ( path -- mtab-entry )
-    canonicalize-path
+    resolve-symlinks
     parse-mtab [ [ mount-point>> ] keep ] H{ } map>assoc (find-mount-point) ;
 
 ERROR: file-system-not-found ;

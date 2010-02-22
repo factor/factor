@@ -1,7 +1,7 @@
 namespace factor
 {
 
-inline static cell string_capacity(string *str)
+inline static cell string_capacity(const string *str)
 {
 	return untag_fixnum(str->length);
 }

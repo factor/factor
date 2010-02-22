@@ -1,9 +1,9 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays definitions graphs kernel
-kernel.private slots.private math namespaces sequences
-strings vectors sbufs quotations assocs hashtables sorting vocabs
-math.order sets words.private ;
+USING: accessors arrays definitions kernel kernel.private
+slots.private math namespaces sequences strings vectors sbufs
+quotations assocs hashtables sorting vocabs math.order sets
+words.private ;
 IN: words
 
 : word ( -- word ) \ word get-global ;
@@ -21,20 +21,6 @@ M: word definer drop \ : \ ; ;
 
 M: word definition def>> ;
 
-ERROR: undefined ;
-
-PREDICATE: deferred < word ( obj -- ? )
-    def>> [ undefined ] = ;
-M: deferred definer drop \ DEFER: f ;
-M: deferred definition drop f ;
-
-PREDICATE: primitive < word ( obj -- ? )
-    [ def>> [ do-primitive ] tail? ]
-    [ sub-primitive>> >boolean ]
-    bi or ;
-M: primitive definer drop \ PRIMITIVE: f ;
-M: primitive definition drop f ;
-
 : word-prop ( word name -- value ) swap props>> at ;
 
 : remove-word-prop ( word name -- ) swap props>> delete-at ;
@@ -45,6 +31,29 @@ M: primitive definition drop f ;
     [ nip remove-word-prop ] if ;
 
 : reset-props ( word seq -- ) [ remove-word-prop ] with each ;
+
+<PRIVATE
+
+: caller ( callstack -- word ) callstack>array <reversed> third ;
+
+PRIVATE>
+
+TUPLE: undefined word ;
+: undefined ( -- * ) callstack caller \ undefined boa throw ;
+
+: undefined-def ( -- quot )
+    #! 'f' inhibits tail call optimization in non-optimizing
+    #! compiler, ensuring that we can pull out the caller word
+    #! above.
+    [ undefined f ] ;
+
+PREDICATE: deferred < word ( obj -- ? ) def>> undefined-def = ;
+M: deferred definer drop \ DEFER: f ;
+M: deferred definition drop f ;
+
+PREDICATE: primitive < word ( obj -- ? ) "primitive" word-prop ;
+M: primitive definer drop \ PRIMITIVE: f ;
+M: primitive definition drop f ;
 
 : lookup ( name vocab -- word ) vocab-words at ;
 
@@ -63,41 +72,6 @@ GENERIC: crossref? ( word -- ? )
 
 M: word crossref?
     dup "forgotten" word-prop [ drop f ] [ vocabulary>> >boolean ] if ;
-
-SYMBOL: compiled-crossref
-
-compiled-crossref [ H{ } clone ] initialize
-
-SYMBOL: compiled-generic-crossref
-
-compiled-generic-crossref [ H{ } clone ] initialize
-
-: (compiled-xref) ( word dependencies word-prop variable -- )
-    [ [ set-word-prop ] curry ]
-    [ [ get add-vertex* ] curry ]
-    bi* 2bi ;
-
-: compiled-xref ( word dependencies generic-dependencies -- )
-    [ [ drop crossref? ] { } assoc-filter-as f like ] bi@
-    [ "compiled-uses" compiled-crossref (compiled-xref) ]
-    [ "compiled-generic-uses" compiled-generic-crossref (compiled-xref) ]
-    bi-curry* bi ;
-
-: (compiled-unxref) ( word word-prop variable -- )
-    [ [ [ dupd word-prop ] dip get remove-vertex* ] 2curry ]
-    [ drop [ remove-word-prop ] curry ]
-    2bi bi ;
-
-: compiled-unxref ( word -- )
-    [ "compiled-uses" compiled-crossref (compiled-unxref) ]
-    [ "compiled-generic-uses" compiled-generic-crossref (compiled-unxref) ]
-    bi ;
-
-: delete-compiled-xref ( word -- )
-    [ compiled-unxref ]
-    [ compiled-crossref get delete-at ]
-    [ compiled-generic-crossref get delete-at ]
-    tri ;
 
 : inline? ( word -- ? ) "inline" word-prop ; inline
 
@@ -126,7 +100,11 @@ M: word subwords drop f ;
 : make-deprecated ( word -- )
     t "deprecated" set-word-prop ;
 
-: make-inline ( word -- )
+ERROR: cannot-be-inline word ;
+
+GENERIC: make-inline ( word -- )
+
+M: word make-inline
     dup inline? [ drop ] [
         [ t "inline" set-word-prop ]
         [ changed-effect ]
@@ -145,9 +123,14 @@ M: word subwords drop f ;
 : define-inline ( word def effect -- )
     [ define-declared ] [ 2drop make-inline ] 3bi ;
 
+GENERIC: flushable? ( word -- ? )
+
+M: word flushable? "flushable" word-prop ;
+
 GENERIC: reset-word ( word -- )
 
 M: word reset-word
+    dup flushable? [ dup changed-conditionally ] when
     {
         "unannotated-def" "parsing" "inline" "recursive"
         "foldable" "flushable" "reading" "writing" "reader"
@@ -170,10 +153,14 @@ M: word reset-word
     ] tri ;
 
 : <word> ( name vocab -- word )
-    2dup [ hashcode ] bi@ bitxor >fixnum (word) ;
+    2dup [ hashcode ] bi@ bitxor >fixnum (word) dup new-word ;
+
+: <uninterned-word> ( name -- word )
+    f \ <uninterned-word> counter >fixnum (word)
+    new-words get [ dup new-word ] when ;
 
 : gensym ( -- word )
-    "( gensym )" f \ gensym counter >fixnum (word) ;
+    "( gensym )" <uninterned-word> ;
 
 : define-temp ( quot effect -- word )
     [ gensym dup ] 2dip define-declared ;
@@ -191,7 +178,12 @@ ERROR: bad-create name vocab ;
 
 : create ( name vocab -- word )
     check-create 2dup lookup
-    dup [ 2nip ] [ drop vocab-name <word> dup reveal ] if ;
+    dup [ 2nip ] [
+        drop
+        vocab-name <word>
+        dup reveal
+        dup changed-definition
+    ] if ;
 
 : constructor-word ( name vocab -- word )
     [ "<" ">" surround ] dip create ;

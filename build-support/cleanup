@@ -3,6 +3,8 @@ temp
 logs
 .git
 .gitignore
-Makefile
+GNUmakefile
+Nmakefile
 unmaintained
 build-support
+images

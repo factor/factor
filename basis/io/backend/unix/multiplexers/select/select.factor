@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types kernel bit-arrays sequences assocs unix
-math namespaces accessors math.order locals unix.time fry
-io.ports io.backend.unix io.backend.unix.multiplexers ;
+USING: alien.c-types kernel bit-arrays sequences assocs math
+namespaces accessors math.order locals fry io.ports
+io.backend.unix io.backend.unix.multiplexers unix unix.ffi
+unix.time ;
 IN: io.backend.unix.multiplexers.select
 
 TUPLE: select-mx < mx read-fdset write-fdset ;
@@ -48,9 +49,9 @@ TUPLE: select-mx < mx read-fdset write-fdset ;
     [ write-fdset/tasks [ init-fdset ] keep ] tri
     f ;
 
-M:: select-mx wait-for-events ( us mx -- )
+M:: select-mx wait-for-events ( nanos mx -- )
     mx
-    [ init-fdsets us dup [ make-timeval ] when select multiplexer-error drop ]
+    [ init-fdsets nanos 1000 /i dup [ make-timeval ] when select multiplexer-error drop ]
     [ [ read-fdset/tasks ] keep [ input-available ] check-fdset ]
     [ [ write-fdset/tasks ] keep [ output-available ] check-fdset ]
     tri ;

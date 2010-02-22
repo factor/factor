@@ -1,19 +1,17 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions hashtables kernel kernel.private math
 namespaces make sequences sequences.private strings vectors
 words quotations memory combinators generic classes
-classes.algebra classes.builtin classes.private slots.private
-slots math.private accessors assocs effects ;
+classes.algebra classes.algebra.private classes.builtin
+classes.private slots.private slots math.private accessors
+assocs effects ;
 IN: classes.tuple
 
 PREDICATE: tuple-class < class
     "metaclass" word-prop tuple-class eq? ;
 
 ERROR: not-a-tuple object ;
-
-: check-tuple ( object -- tuple )
-    dup tuple? [ not-a-tuple ] unless ; inline
 
 : all-slots ( class -- slots )
     superclasses [ "slots" word-prop ] map concat ;
@@ -34,6 +32,13 @@ M: tuple class layout-of 2 slot { word } declare ; inline
 : tuple-size ( tuple -- size )
     layout-of 3 slot { fixnum } declare ; inline
 
+: layout-up-to-date? ( object -- ? )
+    dup tuple?
+    [ [ layout-of ] [ class tuple-layout ] bi eq? ] [ drop t ] if ;
+
+: check-tuple ( object -- tuple )
+    dup tuple? [ not-a-tuple ] unless ; inline
+
 : prepare-tuple>array ( tuple -- n tuple layout )
     check-tuple [ tuple-size iota ] [ ] [ layout-of ] tri ;
 
@@ -48,13 +53,13 @@ M: tuple class layout-of 2 slot { word } declare ; inline
         ] 2each
     ] if-bootstrapping ; inline
 
-PRIVATE>
-
 : initial-values ( class -- slots )
     all-slots [ initial>> ] map ;
 
 : pad-slots ( slots class -- slots' class )
     [ initial-values over length tail append ] keep ; inline
+
+PRIVATE>
 
 : tuple>array ( tuple -- array )
     prepare-tuple>array
@@ -88,6 +93,14 @@ ERROR: bad-superclass class ;
         ] [ 2drop f ] if
     ] [ 2drop f ] if ; inline
 
+GENERIC: final-class? ( class -- ? )
+
+M: tuple-class final-class? "final" word-prop ;
+
+M: builtin-class final-class? tuple eq? not ;
+
+M: class final-class? drop t ;
+
 <PRIVATE
 
 : tuple-predicate-quot/1 ( class -- quot )
@@ -118,26 +131,7 @@ ERROR: bad-superclass class ;
     } case define-predicate ;
 
 : class-size ( class -- n )
-    superclasses [ "slots" word-prop length ] sigma ;
-
-: (instance-check-quot) ( class -- quot )
-    [
-        \ dup ,
-        [ "predicate" word-prop % ]
-        [ [ literalize , \ bad-slot-value , ] [ ] make , ] bi
-        \ unless ,
-    ] [ ] make ;
-
-: (fixnum-check-quot) ( class -- quot )
-    (instance-check-quot) fixnum "coercer" word-prop prepend ;
-
-: instance-check-quot ( class -- quot )
-    {
-        { [ dup object bootstrap-word eq? ] [ drop [ ] ] }
-        { [ dup "coercer" word-prop ] [ "coercer" word-prop ] }
-        { [ dup \ fixnum class<= ] [ (fixnum-check-quot) ] }
-        [ (instance-check-quot) ]
-    } cond ;
+    superclasses [ "slots" word-prop length ] map-sum ;
 
 : boa-check-quot ( class -- quot )
     all-slots [ class>> instance-check-quot ] map spread>quot
@@ -241,7 +235,7 @@ M: tuple-class update-class
         2drop
         [
             [ update-tuples-after ]
-            [ changed-definition ]
+            [ changed-conditionally ]
             bi
         ] each-subclass
     ]
@@ -252,18 +246,27 @@ M: tuple-class update-class
     [ [ "slots" word-prop ] dip = ]
     bi-curry* bi and ;
 
-GENERIC: valid-superclass? ( class -- ? )
-
-M: tuple-class valid-superclass? drop t ;
-
-M: builtin-class valid-superclass? tuple eq? ;
-
-M: class valid-superclass? drop f ;
-
 : check-superclass ( superclass -- )
-    dup valid-superclass? [ bad-superclass ] unless drop ;
+    dup final-class? [ bad-superclass ] when drop ;
 
 GENERIC# (define-tuple-class) 2 ( class superclass slots -- )
+
+: thrower-effect ( slots -- effect )
+    [ name>> ] map { "*" } <effect> ;
+
+: error-slots ( slots -- slots' )
+    [
+        dup string? [ 1array ] when
+        read-only swap remove
+        read-only suffix
+    ] map ;
+
+: reset-final ( class -- )
+    dup final-class? [
+        [ f "final" set-word-prop ]
+        [ changed-conditionally ]
+        bi
+    ] [ drop ] if ;
 
 PRIVATE>
 
@@ -272,17 +275,23 @@ PRIVATE>
     over prepare-slots
     (define-tuple-class) ;
 
+GENERIC: make-final ( class -- )
+
+M: tuple-class make-final
+    [ dup class-usage keys ?metaclass-changed ]
+    [ t "final" set-word-prop ]
+    bi ;
+
 M: word (define-tuple-class)
     define-new-tuple-class ;
 
 M: tuple-class (define-tuple-class)
+    pick reset-final
     3dup tuple-class-unchanged?
     [ 2drop ?define-symbol ] [ redefine-tuple-class ] if ;
 
-: thrower-effect ( slots -- effect )
-    [ name>> ] map { "*" } <effect> ;
-
 : define-error-class ( class superclass slots -- )
+    error-slots
     [ define-tuple-class ]
     [ 2drop reset-generic ]
     [
@@ -307,9 +316,14 @@ M: tuple-class reset-class
         ] with each
     ] [
         [ call-next-method ]
-        [ { "layout" "slots" "boa-check" "prototype" } reset-props ]
+        [ { "layout" "slots" "boa-check" "prototype" "final" } reset-props ]
         bi
     ] bi ;
+
+M: tuple-class metaclass-changed
+    ! Our superclass is no longer a tuple class, redefine with
+    ! default superclass
+    nip tuple over "slots" word-prop define-tuple-class ;
 
 M: tuple-class rank-class drop 0 ;
 

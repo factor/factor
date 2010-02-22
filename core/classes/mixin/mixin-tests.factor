@@ -38,8 +38,8 @@ MIXIN: mx1
 INSTANCE: integer mx1
 
 [ t ] [ integer mx1 class<= ] unit-test
-[ t ] [ mx1 integer class<= ] unit-test
-[ t ] [ mx1 number class<= ] unit-test
+[ f ] [ mx1 integer class<= ] unit-test
+[ f ] [ mx1 number class<= ] unit-test
 
 "IN: classes.mixin.tests USE: arrays INSTANCE: array mx1" eval( -- )
 
@@ -128,3 +128,23 @@ SYMBOL: not-a-mixin
 TUPLE: a-class ;
 
 [ [ \ a-class \ not-a-mixin add-mixin-instance ] with-compilation-unit ] must-fail
+
+! Changing a mixin member's metaclass should not remove it from the mixin
+MIXIN: metaclass-change-mixin
+TUPLE: metaclass-change ;
+INSTANCE: metaclass-change metaclass-change-mixin
+
+GENERIC: metaclass-change-generic ( a -- b )
+
+M: metaclass-change-mixin metaclass-change-generic ;
+
+[ T{ metaclass-change } ] [ T{ metaclass-change } metaclass-change-generic ] unit-test
+
+[ ] [ "IN: classes.mixin.tests USE: math UNION: metaclass-change integer ;" eval( -- ) ] unit-test
+
+[ 0 ] [ 0 metaclass-change-generic ] unit-test
+
+! Forgetting a mixin member class should remove it from the mixin
+[ ] [ [ metaclass-change forget-class ] with-compilation-unit ] unit-test
+
+[ t ] [ metaclass-change-mixin members empty? ] unit-test

@@ -73,7 +73,7 @@ TUPLE: declared-fixnum { x fixnum } ;
 
 [ t ] [
     [
-        { fixnum } declare 0 swap
+        { fixnum } declare iota 0 swap
         [
             drop 615949 * 797807 + 20 2^ rem dup 19 2^ -
         ] map
@@ -94,7 +94,7 @@ TUPLE: declared-fixnum { x fixnum } ;
 
 [ t ] [
     [
-        { integer } declare [ 256 mod ] map
+        { integer } declare iota [ 256 mod ] map
     ] { mod fixnum-mod } inlined?
 ] unit-test
 

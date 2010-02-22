@@ -1,5 +1,5 @@
-USING: accessors assocs fry generalizations kernel math
-namespaces parser sequences words ;
+USING: accessors assocs fry generalizations kernel locals math
+namespaces parser sequences shuffle words ;
 IN: set-n
 : get* ( var n -- val ) namestack dup length rot - head assoc-stack ;
 

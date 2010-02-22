@@ -1,12 +1,13 @@
 ! (c)Joe Groff, Daniel Ehrenberg bsd license
-USING: accessors alien alien.c-types alien.data alien.parser arrays
-byte-arrays classes classes.parser classes.tuple classes.tuple.parser
-classes.tuple.private combinators combinators.short-circuit
-combinators.smart cpu.architecture definitions functors.backend
-fry generalizations generic.parser kernel kernel.private lexer
-libc locals macros make math math.order parser quotations
-sequences slots slots.private specialized-arrays vectors words
-summary namespaces assocs vocabs.parser math.functions
+USING: accessors alien alien.c-types alien.data alien.parser
+arrays byte-arrays classes classes.private classes.parser
+classes.tuple classes.tuple.parser classes.tuple.private
+combinators combinators.short-circuit combinators.smart
+cpu.architecture definitions functors.backend fry
+generalizations generic.parser kernel kernel.private lexer libc
+locals macros make math math.order parser quotations sequences
+slots slots.private specialized-arrays vectors words summary
+namespaces assocs vocabs.parser math.functions
 classes.struct.bit-accessors bit-arrays ;
 QUALIFIED: math
 IN: classes.struct
@@ -30,8 +31,6 @@ TUPLE: struct-bit-slot-spec < struct-slot-spec
 
 PREDICATE: struct-class < tuple-class
     superclass \ struct eq? ;
-
-M: struct-class valid-superclass? drop f ;
 
 SLOT: fields
 
@@ -189,9 +188,6 @@ M: struct-c-type c-struct? drop t ;
     \ cleave [ ] 2sequence
     \ output>array [ ] 2sequence ;
 
-: define-inline-method ( class generic quot -- )
-    [ create-method-in ] dip [ define ] [ drop make-inline ] 2bi ;
-
 : (define-struct-slot-values-method) ( class -- )
     [ \ struct-slot-values ] [ struct-slot-values-quot ] bi
     define-inline-method ;
@@ -211,27 +207,32 @@ M: struct-c-type c-struct? drop t ;
         slots >>fields
         size >>size
         align >>align
+        align >>align-first
         class (unboxer-quot) >>unboxer-quot
-        class (boxer-quot)   >>boxer-quot ;
-    
-GENERIC: align-offset ( offset class -- offset' )
+        class (boxer-quot) >>boxer-quot ;
 
-M: struct-slot-spec align-offset
-    [ type>> c-type-align 8 * align ] keep
+GENERIC: compute-slot-offset ( offset class -- offset' )
+
+: c-type-align-at ( class offset -- n )
+    0 = [ c-type-align-first ] [ c-type-align ] if ;
+
+M: struct-slot-spec compute-slot-offset
+    [ type>> over c-type-align-at 8 * align ] keep
     [ [ 8 /i ] dip (>>offset) ] [ type>> heap-size 8 * + ] 2bi ;
 
-M: struct-bit-slot-spec align-offset
+M: struct-bit-slot-spec compute-slot-offset
     [ (>>offset) ] [ bits>> + ] 2bi ;
 
-: struct-offsets ( slots -- size )
-    0 [ align-offset ] reduce 8 align 8 /i ;
+: compute-struct-offsets ( slots -- size )
+    0 [ compute-slot-offset ] reduce 8 align 8 /i ;
 
-: union-struct-offsets ( slots -- size )
+: compute-union-offsets ( slots -- size )
     1 [ 0 >>offset type>> heap-size max ] reduce ;
 
-: struct-align ( slots -- align )
+: struct-alignment ( slots -- align )
     [ struct-bit-slot-spec? not ] filter
-    1 [ type>> c-type-align max ] reduce ;
+    1 [ [ type>> ] [ offset>> ] bi c-type-align-at max ] reduce ;
+
 PRIVATE>
 
 M: struct byte-length class "struct-size" word-prop ; foldable
@@ -243,10 +244,8 @@ GENERIC: binary-zero? ( value -- ? )
 
 M: object binary-zero? drop f ;
 M: f binary-zero? drop t ;
-M: number binary-zero? zero? ;
-M: struct binary-zero?
-    [ byte-length iota ] [ >c-ptr ] bi
-    [ <displaced-alien> *uchar zero? ] curry all? ;
+M: number binary-zero? 0 = ;
+M: struct binary-zero? >c-ptr [ 0 = ] all? ;
 
 : struct-needs-prototype? ( class -- ? )
     struct-slots [ initial>> binary-zero? ] all? not ;
@@ -272,14 +271,15 @@ M: struct binary-zero?
     [ type>> c-type drop ] each ;
 
 : redefine-struct-tuple-class ( class -- )
-    [ dup class? [ forget-class ] [ drop ] if ] [ struct f define-tuple-class ] bi ;
+    [ struct f define-tuple-class ] [ make-final ] bi ;
 
 :: (define-struct-class) ( class slots offsets-quot -- )
     slots empty? [ struct-must-have-slots ] when
     class redefine-struct-tuple-class
     slots make-slots dup check-struct-slots :> slot-specs
-    slot-specs struct-align :> alignment
-    slot-specs offsets-quot call alignment align :> size
+    slot-specs offsets-quot call :> unaligned-size
+    slot-specs struct-alignment :> alignment
+    unaligned-size alignment align :> size
 
     class  slot-specs  size  alignment  c-type-for-class :> c-type
 
@@ -291,13 +291,10 @@ M: struct binary-zero?
 PRIVATE>
 
 : define-struct-class ( class slots -- )
-    [ struct-offsets ] (define-struct-class) ;
+    [ compute-struct-offsets ] (define-struct-class) ;
 
 : define-union-struct-class ( class slots -- )
-    [ union-struct-offsets ] (define-struct-class) ;
-
-M: struct-class reset-class
-    [ call-next-method ] [ name>> c-types get delete-at ] bi ;
+    [ compute-union-offsets ] (define-struct-class) ;
 
 ERROR: invalid-struct-slot token ;
 
@@ -350,7 +347,7 @@ PRIVATE>
 : parse-struct-slots ( slots -- slots' more? )
     scan {
         { ";" [ f ] }
-        { "{" [ parse-struct-slot over push t ] }
+        { "{" [ parse-struct-slot suffix! t ] }
         { f [ unexpected-eof ] }
         [ invalid-struct-slot ]
     } case ;
@@ -365,10 +362,10 @@ SYNTAX: UNION-STRUCT:
     parse-struct-definition define-union-struct-class ;
 
 SYNTAX: S{
-    scan-word dup struct-slots parse-tuple-literal-slots parsed ;
+    scan-word dup struct-slots parse-tuple-literal-slots suffix! ;
 
 SYNTAX: S@
-    scan-word scan-object swap memory>struct parsed ;
+    scan-word scan-object swap memory>struct suffix! ;
 
 ! functor support
 
@@ -378,7 +375,7 @@ SYNTAX: S@
 
 : parse-struct-slot` ( accum -- accum )
     scan-string-param scan-c-type` \ } parse-until
-    [ <struct-slot-spec> over push ] 3curry over push-all ;
+    [ <struct-slot-spec> suffix! ] 3curry append! ;
 
 : parse-struct-slots` ( accum -- accum more? )
     scan {
@@ -389,10 +386,10 @@ SYNTAX: S@
 PRIVATE>
 
 FUNCTOR-SYNTAX: STRUCT:
-    scan-param parsed
-    [ 8 <vector> ] over push-all
+    scan-param suffix!
+    [ 8 <vector> ] append!
     [ parse-struct-slots` ] [ ] while
-    [ >array define-struct-class ] over push-all ;
+    [ >array define-struct-class ] append! ;
 
 USING: vocabs vocabs.loader ;
 

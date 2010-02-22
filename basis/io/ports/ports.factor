@@ -27,7 +27,7 @@ TUPLE: buffered-port < port { buffer buffer } ;
 
 TUPLE: input-port < buffered-port ;
 
-M: input-port stream-element-type drop +byte+ ;
+M: input-port stream-element-type drop +byte+ ; inline
 
 : <input-port> ( handle -- input-port )
     input-port <buffered-port> ;
@@ -53,7 +53,7 @@ M: input-port stream-read-partial ( max stream -- byte-array/f )
 : read-loop ( count port accum -- )
     pick over length - dup 0 > [
         pick read-step dup [
-            over push-all read-loop
+            append! read-loop
         ] [
             2drop 2drop
         ] if
@@ -78,7 +78,7 @@ M: input-port stream-read
 
 : read-until-loop ( seps port buf -- separator/f )
     2over read-until-step over [
-        [ over push-all ] dip dup [
+        [ append! ] dip dup [
             [ 3drop ] dip
         ] [
             drop read-until-loop
@@ -104,7 +104,7 @@ TUPLE: output-port < buffered-port ;
     [ nip ] [ buffer>> buffer-capacity <= ] 2bi
     [ drop ] [ stream-flush ] if ; inline
 
-M: output-port stream-element-type stream>> stream-element-type ;
+M: output-port stream-element-type stream>> stream-element-type ; inline
 
 M: output-port stream-write1
     dup check-disposed

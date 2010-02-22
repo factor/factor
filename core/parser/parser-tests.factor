@@ -141,15 +141,15 @@ IN: parser.tests
     ] unit-test
     
     [ t ] [
-        array "smudge-me" "parser.tests" lookup order memq?
+        array "smudge-me" "parser.tests" lookup order member-eq?
     ] unit-test
     
     [ t ] [
-        integer "smudge-me" "parser.tests" lookup order memq?
+        integer "smudge-me" "parser.tests" lookup order member-eq?
     ] unit-test
     
     [ f ] [
-        string "smudge-me" "parser.tests" lookup order memq?
+        string "smudge-me" "parser.tests" lookup order member-eq?
     ] unit-test
 
     [ ] [
@@ -339,7 +339,7 @@ IN: parser.tests
 ] unit-test
 
 [ t ] [
-    "foo?" "parser.tests" lookup word eq?
+    "foo" "parser.tests" lookup word eq?
 ] unit-test
 
 [ ] [

@@ -22,14 +22,14 @@ PRIVATE>
     ] (parallel-each) ; inline
 
 : parallel-filter ( seq quot -- newseq )
-    over [ pusher [ parallel-each ] dip ] dip like ; inline
+    over [ selector [ parallel-each ] dip ] dip like ; inline
 
 <PRIVATE
 
 : [future] ( quot -- quot' ) '[ _ curry future ] ; inline
 
 : future-values ( futures -- futures )
-    dup [ ?future ] change-each ; inline
+    [ ?future ] map! ; inline
 
 PRIVATE>
 

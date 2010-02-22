@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
+! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.parser
 alien.libraries arrays assocs classes combinators
@@ -10,15 +10,25 @@ IN: alien.parser
 : parse-c-type-name ( name -- word )
     dup search [ ] [ no-word ] ?if ;
 
-: parse-c-type ( string -- type )
+: parse-array-type ( name -- dims c-type )
+    "[" split unclip
+    [ [ "]" ?tail drop parse-word ] map ] dip ;
+
+: (parse-c-type) ( string -- type )
     {
-        { [ dup "void" =            ] [ drop void ] }
-        { [ CHAR: ] over member?    ] [ parse-array-type parse-c-type-name prefix ] }
-        { [ dup search c-type-word? ] [ parse-c-type-name ] }
-        { [ "**" ?tail              ] [ drop void* ] }
-        { [ "*" ?tail               ] [ parse-c-type-name resolve-pointer-type ] }
-        [ dup search [ no-c-type ] [ no-word ] ?if ]
+        { [ dup "void" =         ] [ drop void ] }
+        { [ CHAR: ] over member? ] [ parse-array-type parse-c-type-name prefix ] }
+        { [ dup search           ] [ parse-c-type-name ] }
+        { [ "**" ?tail           ] [ drop void* ] }
+        { [ "*" ?tail            ] [ parse-c-type-name resolve-pointer-type ] }
+        [ dup search [ ] [ no-word ] ?if ]
     } cond ;
+
+: valid-c-type? ( c-type -- ? )
+    { [ array? ] [ c-type-name? ] [ void? ] } 1|| ;
+
+: parse-c-type ( string -- type )
+    (parse-c-type) dup valid-c-type? [ no-c-type ] unless ;
 
 : scan-c-type ( -- c-type )
     scan dup "{" =
@@ -56,14 +66,14 @@ IN: alien.parser
         2 group [ first2 normalize-c-arg 2array ] map
         unzip [ "," ?tail drop ] map
     ]
-    [ [ { } ] [ 1array ] if-void ]
+    [ [ { } ] [ name>> 1array ] if-void ]
     bi* <effect> ;
 
 : function-quot ( return library function types -- quot )
     '[ _ _ _ _ alien-invoke ] ;
 
-:: make-function ( return! library function! parameters -- word quot effect )
-    return function normalize-c-arg function! return!
+:: make-function ( return library function parameters -- word quot effect )
+    return function normalize-c-arg :> ( return function )
     function create-in dup reset-generic
     return library function
     parameters return parse-arglist [ function-quot ] dip ;
@@ -78,17 +88,14 @@ IN: alien.parser
     make-function define-declared ;
 
 : callback-quot ( return types abi -- quot )
-    [ [ ] 3curry dip alien-callback ] 3curry ;
+    '[ [ _ _ _ ] dip alien-callback ] ;
 
-: library-abi ( lib -- abi )
-    library [ abi>> ] [ "cdecl" ] if* ;
-
-:: make-callback-type ( lib return! type-name! parameters -- word quot effect )
-    return type-name normalize-c-arg type-name! return!
+:: make-callback-type ( lib return type-name parameters -- word quot effect )
+    return type-name normalize-c-arg :> ( return type-name )
     type-name current-vocab create :> type-word 
     type-word [ reset-generic ] [ reset-c-type ] bi
     void* type-word typedef
-    parameters return parse-arglist :> callback-effect :> types
+    parameters return parse-arglist :> ( types callback-effect )
     type-word callback-effect "callback-effect" set-word-prop
     type-word lib "callback-library" set-word-prop
     type-word return types lib library-abi callback-quot (( quot -- alien )) ;
@@ -105,4 +112,3 @@ PREDICATE: alien-function-word < word
 
 PREDICATE: alien-callback-type-word < typedef-word
     "callback-effect" word-prop ;
-

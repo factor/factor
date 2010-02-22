@@ -8,10 +8,6 @@ IN: tools.errors
 #! Tools for source-files.errors. Used by tools.tests and others
 #! for error reporting
 
-M: source-file-error compute-restarts error>> compute-restarts ;
-
-M: source-file-error error-help error>> error-help ;
-
 CONSTANT: +listener-input+ "<Listener input>"
 
 : error-location ( error -- string )

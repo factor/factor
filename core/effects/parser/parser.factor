@@ -25,7 +25,7 @@ ERROR: bad-effect ;
 : parse-effect-tokens ( end -- tokens )
     [ parse-effect-token dup ] curry [ ] produce nip ;
 
-ERROR: stack-effect-omits-dashes effect ;
+ERROR: stack-effect-omits-dashes tokens ;
 
 : parse-effect ( end -- effect )
     parse-effect-tokens { "--" } split1 dup
@@ -35,4 +35,4 @@ ERROR: stack-effect-omits-dashes effect ;
     "(" expect ")" parse-effect ;
 
 : parse-call( ( accum word -- accum )
-    [ ")" parse-effect ] dip 2array over push-all ;
+    [ ")" parse-effect ] dip 2array append! ;

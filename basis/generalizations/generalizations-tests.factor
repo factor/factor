@@ -1,5 +1,5 @@
 USING: tools.test generalizations kernel math arrays sequences
-ascii fry math.parser ;
+ascii fry math.parser io io.streams.string ;
 IN: generalizations.tests
 
 { 1 2 3 4 1 } [ 1 2 3 4 4 npick ] unit-test
@@ -26,11 +26,11 @@ IN: generalizations.tests
 { 0 } [ 0 1 2 3 4 4 ndrop ] unit-test
 [ [ 1 ] 5 ndip ] must-infer
 [ 1 2 3 4 ] [ 2 3 4 [ 1 ] 3 ndip ] unit-test
-[ 5 nspin ] must-infer
-[ 1 5 4 3 2 ] [ 1 2 3 4 5 4 nspin ] unit-test
 
 [ 1 2 3 4 5 [ drop drop drop drop drop 2 ] 5 nkeep ] must-infer
+[ 1 2 3 4 5 2 '[ drop drop drop drop drop _ ] 5 nkeep ] must-infer
 { 2 1 2 3 4 5 } [ 1 2 3 4 5 [ drop drop drop drop drop 2 ] 5 nkeep ] unit-test
+{ 2 1 2 3 4 5 } [ 1 2 3 4 5 2 '[ drop drop drop drop drop _ ] 5 nkeep ] unit-test
 [ [ 1 2 3 + ] ] [ 1 2 3 [ + ] 3 ncurry ] unit-test
 
 [ "HELLO" ] [ "hello" [ >upper ] 1 napply ] unit-test
@@ -64,7 +64,7 @@ IN: generalizations.tests
 { 3 5 } [ 2 nweave ] must-infer-as
 
 [ { 0 1 2 } { 3 5 4 } { 7 8 6 } ]
-[ 9 [ ] each { [ 3array ] [ swap 3array ] [ rot 3array ] } 3 nspread ] unit-test
+[ 9 [ ] each-integer { [ 3array ] [ swap 3array ] [ rot 3array ] } 3 nspread ] unit-test
 
 [ 1 2 3 4 1 2 3 ] [ 1 2 3 4 3 nover ] unit-test
 
@@ -79,3 +79,46 @@ IN: generalizations.tests
 [ 1 2 3 4 1 2 3 ] [ nover-test ] unit-test
 
 [ '[ number>string _ append ] 4 napply ] must-infer
+
+[ 6 8 10 12 ] [
+    1 2 3 4
+    5 6 7 8 [ + ] 4 apply-curry 4 spread*
+] unit-test
+
+[ 6 ] [ 5 [ 1 + ] 1 spread* ] unit-test
+[ 6 ] [ 5 [ 1 + ] 1 cleave* ] unit-test
+[ 6 ] [ 5 [ 1 + ] 1 napply  ] unit-test
+
+[ 6 ] [ 6 0 spread* ] unit-test
+[ 6 ] [ 6 0 cleave* ] unit-test
+[ 6 ] [ 6 [ 1 + ] 0 napply ] unit-test
+
+[ 6 7 8 9 ] [
+    1
+    5 6 7 8 [ + ] 4 apply-curry 4 cleave*
+] unit-test
+
+[ 8 3 8 3/2 ] [
+    6 5 4 3
+    2 [ + ] [ - ] [ * ] [ / ] 4 cleave-curry 4 spread*
+] unit-test
+
+[ 8 4 0 -3 ] [
+    6 5 4  3
+    2 1 0 -1 [ + ] [ - ] [ * ] [ / ] 4 spread-curry 4 spread*
+] unit-test
+
+[ { 1 2 } { 3 4 } { 5 6 } ]
+[ 1 2 3 4 5 6 [ 2array ] 2 3 mnapply ] unit-test
+
+[ { 1 2 3 } { 4 5 6 } ]
+[ 1 2 3 4 5 6 [ 3array ] 3 2 mnapply ] unit-test
+
+[ { 1 2 3 } { 4 5 6 } ]
+[ 1 2 3 4 5 6 [ 3array ] [ 3array ] 3 2 nspread* ] unit-test
+
+[ ]
+[ [ 2array ] 2 0 mnapply ] unit-test
+
+[ ]
+[ 2 0 nspread* ] unit-test

@@ -25,6 +25,9 @@ IN: math.functions.tests
 [ t ] [ e pi i* ^ real-part -1.0 = ] unit-test
 [ t ] [ e pi i* ^ imaginary-part -0.00001 0.00001 between? ] unit-test
 
+[ 1/0. ] [ 2.0 1024 ^ ] unit-test
+[ HEX: 1.0p-1024 ] [ 2.0 -1024 ^ ] unit-test
+
 [ t ] [ 0 0 ^ fp-nan? ] unit-test
 [ 0.0 ] [ 0.0 1.0 ^ ] unit-test
 [ 1/0. ] [ 0 -2 ^ ] unit-test

@@ -1,22 +1,12 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel math namespaces sequences system
 kernel.private byte-arrays arrays init ;
 IN: alien
 
-! Some predicate classes used by the compiler for optimization
-! purposes
-PREDICATE: simple-alien < alien underlying>> not ;
+PREDICATE: pinned-alien < alien underlying>> not ;
 
-UNION: simple-c-ptr
-simple-alien POSTPONE: f byte-array ;
-
-DEFER: pinned-c-ptr?
-
-PREDICATE: pinned-alien < alien underlying>> pinned-c-ptr? ;
-
-UNION: pinned-c-ptr
-    pinned-alien POSTPONE: f ;
+UNION: pinned-c-ptr pinned-alien POSTPONE: f ;
 
 GENERIC: >c-ptr ( obj -- c-ptr )
 
@@ -33,7 +23,7 @@ M: alien expired? expired>> ;
 M: f expired? drop t ;
 
 : <alien> ( address -- alien )
-    f <displaced-alien> { simple-c-ptr } declare ; inline
+    f <displaced-alien> { pinned-c-ptr } declare ; inline
 
 : <bad-alien> ( -- alien )
     -1 <alien> t >>expired ; inline
@@ -49,7 +39,8 @@ M: alien equal?
         2drop f
     ] if ;
 
-M: simple-alien hashcode* nip dup expired>> [ drop 1234 ] [ alien-address ] if ;
+M: pinned-alien hashcode*
+    nip dup expired>> [ drop 1234 ] [ alien-address ] if ;
 
 ERROR: alien-callback-error ;
 
@@ -58,7 +49,7 @@ ERROR: alien-callback-error ;
 
 ERROR: alien-indirect-error ;
 
-: alien-indirect ( ... funcptr return parameters abi -- )
+: alien-indirect ( ... funcptr return parameters abi -- ... )
     alien-indirect-error ;
 
 ERROR: alien-invoke-error library symbol ;
@@ -66,11 +57,18 @@ ERROR: alien-invoke-error library symbol ;
 : alien-invoke ( ... return library function parameters -- ... )
     2over alien-invoke-error ;
 
-! Callbacks are registered in a global hashtable. If you clear
-! this hashtable, they will all be blown away by code GC, beware.
+ERROR: alien-assembly-error code ;
+
+: alien-assembly ( ... return parameters abi quot -- ... )
+    dup alien-assembly-error ;
+
+! Callbacks are registered in a global hashtable. Note that they
+! are also pinned in a special callback area, so clearing this
+! hashtable will not reclaim callbacks. It should only be
+! cleared on startup.
 SYMBOL: callbacks
 
-[ H{ } clone callbacks set-global ] "alien" add-init-hook
+[ H{ } clone callbacks set-global ] "alien" add-startup-hook
 
 <PRIVATE
 

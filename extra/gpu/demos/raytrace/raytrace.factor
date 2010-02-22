@@ -1,15 +1,16 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors arrays combinators.tuple game.loop game.worlds
 generalizations gpu gpu.render gpu.shaders gpu.util gpu.util.wasd
-kernel literals math math.matrices math.order math.vectors
+kernel literals math math.libm math.matrices math.order math.vectors
 method-chains sequences ui ui.gadgets ui.gadgets.worlds
-ui.pixel-formats ;
+ui.pixel-formats audio.engine audio.loader locals ;
 IN: gpu.demos.raytrace
 
 GLSL-SHADER-FILE: raytrace-vertex-shader vertex-shader "raytrace.v.glsl"
 GLSL-SHADER-FILE: raytrace-fragment-shader fragment-shader "raytrace.f.glsl"
 GLSL-PROGRAM: raytrace-program
-    raytrace-vertex-shader raytrace-fragment-shader ;
+    raytrace-vertex-shader raytrace-fragment-shader
+    window-vertex ;
 
 UNIFORM-TUPLE: sphere-uniforms
     { "center" vec3-uniform  f }
@@ -49,6 +50,9 @@ TUPLE: raytrace-world < wasd-world
     [ [ axis>> ] [ theta>> ] bi rotation-matrix4 ]
     [ home>> ] bi m.v ;
 
+M: sphere audio-position sphere-center ; inline
+M: sphere audio-distance radius>> fsqrt 2.0 * ; inline
+
 : <sphere-uniforms> ( world -- uniforms )
     [ wasd-mv-inv-matrix ]
     [ fov>> ]
@@ -69,19 +73,36 @@ CONSTANT: initial-spheres {
     T{ sphere f { 1.0 0.0  0.0 } {  0.0 5.0 0.0 } 0.025 1.0 { 1.0 1.0 0.0 1.0 } }
 }
 
-BEFORE: raytrace-world begin-world
+:: set-up-audio ( world -- )
+    world audio-engine>> :> audio-engine
+    world spheres>> :> spheres
+
+    audio-engine world >>listener update-audio
+
+    audio-engine spheres first
+    "vocab:gpu/demos/raytrace/mirror-ball.aiff" read-audio t <static-audio-clip>
+    audio-engine spheres second
+    "vocab:gpu/demos/raytrace/red-ball.aiff" read-audio t <static-audio-clip>
+    audio-engine spheres third
+    "vocab:gpu/demos/raytrace/green-ball.aiff" read-audio t <static-audio-clip>
+    audio-engine spheres fourth
+    "vocab:gpu/demos/raytrace/yellow-ball.aiff" read-audio t <static-audio-clip>
+    
+    4array play-clips ;
+
+M: raytrace-world begin-game-world
     init-gpu
     { -2.0 6.25 10.0 } 0.19 0.55 set-wasd-view
     initial-spheres [ clone ] map >>spheres    
     raytrace-program <program-instance> <window-vertex-array> >>vertex-array
-    drop ;
+    set-up-audio ;
 
 CONSTANT: fov 0.7
 
 AFTER: raytrace-world resize-world
     dup dim>> dup first2 min >float v/n fov v*n >>fov drop ;
 
-AFTER: raytrace-world tick*
+AFTER: raytrace-world tick-game-world
     spheres>> [ tick-sphere ] each ;
 
 M: raytrace-world draw-world*
@@ -92,21 +113,18 @@ M: raytrace-world draw-world*
         { "vertex-array"   [ vertex-array>>              ] }
     } <render-set> render ;
 
-M: raytrace-world pref-dim* drop { 1024 768 } ;
-M: raytrace-world tick-length drop 1000 30 /i ;
 M: raytrace-world wasd-movement-speed drop 1/4. ;
 
-: raytrace-window ( -- )
-    [
-        f T{ world-attributes
-            { world-class raytrace-world }
-            { title "Raytracing" }
-            { pixel-format-attributes {
-                windowed
-                double-buffered
-            } }
-            { grab-input? t }
-        } open-window
-    ] with-ui ;
-
-MAIN: raytrace-window
+GAME: raytrace-game {
+        { world-class raytrace-world }
+        { title "Raytracing" }
+        { pixel-format-attributes {
+            windowed
+            double-buffered
+        } }
+        { grab-input? t }
+        { use-game-input? t }
+        { use-audio-engine? t }
+        { pref-dim { 1024 768 } }
+        { tick-interval-micros $[ 60 fps ] }
+    } ;

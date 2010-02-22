@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors arrays kernel sequences namespaces words
 math math.order layouts classes.algebra classes.union
@@ -277,6 +277,11 @@ literal: rep ;
 
 PURE-INSN: ##shuffle-vector
 def: dst
+use: src shuffle
+literal: rep ;
+
+PURE-INSN: ##shuffle-vector-imm
+def: dst
 use: src
 literal: shuffle rep ;
 
@@ -377,6 +382,16 @@ def: dst
 use: src1 src2
 literal: rep ;
 
+PURE-INSN: ##mul-high-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
+PURE-INSN: ##mul-horizontal-add-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
 PURE-INSN: ##saturated-mul-vector
 def: dst
 use: src1 src2
@@ -397,27 +412,37 @@ def: dst
 use: src1 src2
 literal: rep ;
 
+PURE-INSN: ##avg-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
 PURE-INSN: ##dot-vector
 def: dst/scalar-rep
 use: src1 src2
 literal: rep ;
 
+PURE-INSN: ##sad-vector
+def: dst
+use: src1 src2
+literal: rep ;
+
 PURE-INSN: ##horizontal-add-vector
-def: dst/scalar-rep
-use: src
+def: dst
+use: src1 src2
 literal: rep ;
 
 PURE-INSN: ##horizontal-sub-vector
-def: dst/scalar-rep
-use: src
+def: dst
+use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##horizontal-shl-vector
+PURE-INSN: ##horizontal-shl-vector-imm
 def: dst
 use: src1
 literal: src2 rep ;
 
-PURE-INSN: ##horizontal-shr-vector
+PURE-INSN: ##horizontal-shr-vector-imm
 def: dst
 use: src1
 literal: src2 rep ;
@@ -456,6 +481,16 @@ PURE-INSN: ##not-vector
 def: dst
 use: src
 literal: rep ;
+
+PURE-INSN: ##shl-vector-imm
+def: dst
+use: src1
+literal: src2 rep ;
+
+PURE-INSN: ##shr-vector-imm
+def: dst
+use: src1
+literal: src2 rep ;
 
 PURE-INSN: ##shl-vector
 def: dst
@@ -497,13 +532,12 @@ temp: temp/int-rep ;
 PURE-INSN: ##box-displaced-alien
 def: dst/int-rep
 use: displacement/int-rep base/int-rep
-temp: temp1/int-rep temp2/int-rep
+temp: temp/int-rep
 literal: base-class ;
 
 PURE-INSN: ##unbox-any-c-ptr
 def: dst/int-rep
-use: src/int-rep
-temp: temp/int-rep ;
+use: src/int-rep ;
 
 : ##unbox-f ( dst src -- ) drop 0 ##load-immediate ;
 : ##unbox-byte-array ( dst src -- ) byte-array-offset ##add-imm ;
@@ -512,12 +546,12 @@ PURE-INSN: ##unbox-alien
 def: dst/int-rep
 use: src/int-rep ;
 
-: ##unbox-c-ptr ( dst src class temp -- )
+: ##unbox-c-ptr ( dst src class -- )
     {
-        { [ over \ f class<= ] [ 2drop ##unbox-f ] }
-        { [ over simple-alien class<= ] [ 2drop ##unbox-alien ] }
-        { [ over byte-array class<= ] [ 2drop ##unbox-byte-array ] }
-        [ nip ##unbox-any-c-ptr ]
+        { [ dup \ f class<= ] [ drop ##unbox-f ] }
+        { [ dup alien class<= ] [ drop ##unbox-alien ] }
+        { [ dup byte-array class<= ] [ drop ##unbox-byte-array ] }
+        [ drop ##unbox-any-c-ptr ]
     } cond ;
 
 ! Alien accessors
@@ -614,8 +648,13 @@ literal: size class
 temp: temp/int-rep ;
 
 INSN: ##write-barrier
+use: src/int-rep slot/int-rep
+temp: temp1/int-rep temp2/int-rep ;
+
+INSN: ##write-barrier-imm
 use: src/int-rep
-temp: card#/int-rep table/int-rep ;
+literal: slot
+temp: temp1/int-rep temp2/int-rep ;
 
 INSN: ##alien-global
 def: dst/int-rep
@@ -632,11 +671,11 @@ literal: params stack-frame ;
 INSN: ##alien-indirect
 literal: params stack-frame ;
 
-INSN: ##alien-callback
+INSN: ##alien-assembly
 literal: params stack-frame ;
 
-INSN: ##callback-return
-literal: params ;
+INSN: ##alien-callback
+literal: params stack-frame ;
 
 ! Instructions used by CFG IR only.
 INSN: ##prologue ;
@@ -709,8 +748,7 @@ temp: temp1/int-rep temp2/int-rep
 literal: size data-values tagged-values uninitialized-locs ;
 
 INSN: ##save-context
-temp: temp1/int-rep temp2/int-rep
-literal: callback-allowed? ;
+temp: temp1/int-rep temp2/int-rep ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue
@@ -823,7 +861,7 @@ SYMBOL: vreg-insn
 [
     vreg-insn
     insn-classes get [
-        "insn-slots" word-prop [ type>> { def use temp } memq? ] any?
+        "insn-slots" word-prop [ type>> { def use temp } member-eq? ] any?
     ] filter
     define-union-class
 ] with-compilation-unit

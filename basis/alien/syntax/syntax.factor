@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov, Alex Chapman.
+! Copyright (C) 2005, 2010 Slava Pestov, Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays alien alien.c-types
 alien.arrays alien.strings kernel math namespaces parser
@@ -7,11 +7,11 @@ effects assocs combinators lexer strings.parser alien.parser
 fry vocabs.parser words.constant alien.libraries ;
 IN: alien.syntax
 
-SYNTAX: DLL" lexer get skip-blank parse-string dlopen parsed ;
+SYNTAX: DLL" lexer get skip-blank parse-string dlopen suffix! ;
 
-SYNTAX: ALIEN: 16 scan-base <alien> parsed ;
+SYNTAX: ALIEN: 16 scan-base <alien> suffix! ;
 
-SYNTAX: BAD-ALIEN <bad-alien> parsed ;
+SYNTAX: BAD-ALIEN <bad-alien> suffix! ;
 
 SYNTAX: LIBRARY: scan "c-library" set ;
 
@@ -22,7 +22,7 @@ SYNTAX: CALLBACK:
     (CALLBACK:) define-inline ;
 
 SYNTAX: TYPEDEF:
-    scan-c-type CREATE-C-TYPE typedef ;
+    scan-c-type CREATE-C-TYPE dup save-location typedef ;
 
 SYNTAX: C-ENUM:
     ";" parse-tokens
@@ -37,7 +37,7 @@ ERROR: no-such-symbol name library ;
     2dup load-library dlsym [ 2nip ] [ no-such-symbol ] if* ;
 
 SYNTAX: &:
-    scan "c-library" get '[ _ _ address-of ] over push-all ;
+    scan "c-library" get '[ _ _ address-of ] append! ;
 
 : global-quot ( type word -- quot )
     name>> "c-library" get '[ _ _ address-of 0 ]

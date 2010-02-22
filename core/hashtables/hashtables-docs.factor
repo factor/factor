@@ -42,11 +42,12 @@ $nl
 ARTICLE: "hashtables.keys" "Hashtable keys"
 "Hashtables rely on the " { $link hashcode } " word to rapidly locate values associated with keys. The objects used as keys in a hashtable must obey certain restrictions."
 $nl
-"The " { $link hashcode } " of a key is a function of the its slot values, and if the hashcode changes then the hashtable will be left in an inconsistent state. The easiest way to avoid this problem is to never mutate objects used as hashtable keys."
+"The " { $link hashcode } " of a key is a function of its slot values, and if the hashcode changes then the hashtable will be left in an inconsistent state. The easiest way to avoid this problem is to never mutate objects used as hashtable keys."
 $nl
 "In certain advanced applications, this cannot be avoided and the best design involves mutating hashtable keys. In this case, a custom " { $link hashcode* } " method must be defined which only depends on immutable slots."
 $nl
-"In addition, the " { $link equal? } " and " { $link hashcode* } " methods must be congruent, and if one is defined the other should be defined also. This is documented in detail in the documentation for these respective words." ;
+"In addition, the " { $link equal? } " and " { $link hashcode* } " methods must be congruent, and if one is defined the other should be defined also. This is documented in detail in the documentation for these respective words."
+{ $subsections hashcode hashcode* identity-hashcode } ;
 
 ARTICLE: "hashtables.utilities" "Hashtable utilities"
 "Utility words to create a new hashtable from a single key/value pair:"

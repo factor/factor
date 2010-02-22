@@ -1,27 +1,20 @@
-#if defined(__arm__)
-	#define FACTOR_ARM
-#elif defined(__amd64__) || defined(__x86_64__)
-	#define FACTOR_AMD64
-#elif defined(i386) || defined(__i386) || defined(__i386__) || defined(WIN32)
-	#define FACTOR_X86
-#elif defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)
-	#define FACTOR_PPC
-#else
-	#error "Unsupported architecture"
-#endif
-
 #if defined(WINDOWS)
 	#if defined(WINCE)
 		#include "os-windows-ce.hpp"
-	#else
+		#include "os-windows.hpp"
+	#elif defined(WINNT)
 		#include "os-windows-nt.hpp"
-	#endif
+		#include "os-windows.hpp"
 
-	#include "os-windows.hpp"
-	#if defined(FACTOR_AMD64)
-		#include "os-windows-nt.64.hpp"
-	#elif defined(FACTOR_X86)
-		#include "os-windows-nt.32.hpp"
+		#if defined(FACTOR_AMD64)
+			#include "os-windows-nt.64.hpp"
+		#elif defined(FACTOR_X86)
+			#include "os-windows-nt.32.hpp"
+		#else
+			#error "Unsupported Windows flavor"
+		#endif
+	#else
+		#error "Unsupported Windows flavor"
 	#endif
 #else
 	#include "os-unix.hpp"

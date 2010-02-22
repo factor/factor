@@ -49,7 +49,7 @@ M: funky url-of "http://www.funky-town.com/" swap town>> append ;
     ] make-html-string
 ] unit-test
 
-[ "<div style=\"background-color: #ff00ff; white-space: pre; font-family: monospace;\">cdr</div>" ]
+[ "<div style=\"background-color: #ff00ff; white-space: pre; font-family: monospace; display: inline-block;\">cdr</div>" ]
 [
     [
         H{ { page-color T{ rgba f 1 0 1 1 } } }
@@ -57,7 +57,7 @@ M: funky url-of "http://www.funky-town.com/" swap town>> append ;
     ] make-html-string
 ] unit-test
 
-[ "<div style=\"white-space: pre; font-family: monospace;\"></div>" ] [
+[ "<div style=\"white-space: pre; font-family: monospace; display: inline-block;\"></div><br/>" ] [
     [ H{ } [ ] with-nesting nl ] make-html-string
 ] unit-test
 

@@ -3,13 +3,14 @@
 USING: kernel arrays namespaces math accessors alien locals
 destructors system threads io.backend.unix.multiplexers
 io.backend.unix.multiplexers.kqueue core-foundation
-core-foundation.run-loop ;
+core-foundation.run-loop core-foundation.file-descriptors ;
+FROM: alien.c-types => void void* ;
 IN: io.backend.unix.multiplexers.run-loop
 
 TUPLE: run-loop-mx kqueue-mx ;
 
 : file-descriptor-callback ( -- callback )
-    "void" { "CFFileDescriptorRef" "CFOptionFlags" "void*" }
+    void { CFFileDescriptorRef CFOptionFlags void* }
     "cdecl" [
         3drop
         0 mx get kqueue-mx>> wait-for-events
@@ -29,5 +30,5 @@ M: run-loop-mx add-output-callback kqueue-mx>> add-output-callback ;
 M: run-loop-mx remove-input-callbacks kqueue-mx>> remove-input-callbacks ;
 M: run-loop-mx remove-output-callbacks kqueue-mx>> remove-output-callbacks ;
 
-M: run-loop-mx wait-for-events ( us mx -- )
+M: run-loop-mx wait-for-events ( nanos mx -- )
     swap run-one-iteration [ 0 swap wait-for-events ] [ drop ] if ;

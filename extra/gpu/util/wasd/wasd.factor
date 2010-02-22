@@ -4,7 +4,7 @@ game.input.scancodes game.loop game.worlds
 gpu.render gpu.state kernel literals
 locals math math.constants math.functions math.matrices
 math.order math.vectors opengl.gl sequences
-ui ui.gadgets.worlds specialized-arrays ;
+ui ui.gadgets.worlds specialized-arrays audio.engine ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: gpu.util.wasd
@@ -49,6 +49,9 @@ M: wasd-world wasd-fly-vertically? drop t ;
 : wasd-p-matrix ( world -- matrix )
     p-matrix>> ;
 
+: <mvp-uniforms> ( world -- uniforms )
+    [ wasd-mv-matrix ] [ wasd-p-matrix ] bi mvp-uniforms boa ;
+
 CONSTANT: fov 0.7
 
 :: generate-p-matrix ( world -- matrix )
@@ -84,6 +87,9 @@ CONSTANT: fov 0.7
     [ yaw>> ] [ ?pitch ] [ wasd-movement-speed ] tri
     { 1.0 0.0 0.0 } n*v eye-rotate ;
 
+M: wasd-world audio-position location>> ; inline
+M: wasd-world audio-orientation forward-vector { 0.0 1.0 0.0 } <audio-orientation> ; inline
+
 : walk-forward ( world -- )
     dup forward-vector [ v+ ] curry change-location drop ;
 : walk-backward ( world -- )
@@ -107,18 +113,18 @@ CONSTANT: fov 0.7
 
 :: wasd-keyboard-input ( world -- )
     read-keyboard keys>> :> keys
-    key-w keys nth key-, keys nth or [ world walk-forward   ] when 
-    key-s keys nth key-o keys nth or [ world walk-backward  ] when 
-    key-a keys nth                   [ world walk-leftward  ] when 
-    key-d keys nth key-e keys nth or [ world walk-rightward ] when 
+    key-w keys nth [ world walk-forward   ] when 
+    key-s keys nth [ world walk-backward  ] when 
+    key-a keys nth [ world walk-leftward  ] when 
+    key-d keys nth [ world walk-rightward ] when 
     key-space keys nth [ world walk-upward ] when 
-    key-c keys nth key-j keys nth or [ world walk-downward ] when 
+    key-c keys nth [ world walk-downward ] when 
     key-escape keys nth [ world close-window ] when ;
 
 : wasd-mouse-input ( world -- )
     read-mouse rotate-with-mouse ;
 
-M: wasd-world tick*
+M: wasd-world tick-game-world
     dup focused?>> [
         [ wasd-keyboard-input ] [ wasd-mouse-input ] bi
         reset-mouse

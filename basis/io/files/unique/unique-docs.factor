@@ -54,6 +54,13 @@ HELP: with-unique-directory
 }
 { $description "Creates a directory with " { $link unique-directory } " and calls the quotation with the pathname on the stack using the " { $link with-temporary-directory } " combinator. The quotation can access the " { $link current-temporary-directory } " symbol for the name of the temporary directory. Subsequent unique files will be created in this unique directory until the combinator returns." } ;
 
+HELP: move-file-unique
+{ $values
+    { "path" "a pathname string" } { "directory" "a directory" }
+    { "path'" "a pathname string" }
+}
+{ $description "Moves " { $snippet "path" } " to " { $snippet "directory" } " by creating a unique file in this directory. Returns the new path." } ;
+
 HELP: current-temporary-directory
 { $values
      { "value" "a path" }
@@ -90,6 +97,8 @@ ARTICLE: "io.files.unique" "Unique files"
     cleanup-unique-directory
 }
 "Default temporary directory:"
-{ $subsections default-temporary-directory } ;
+{ $subsections default-temporary-directory }
+"Moving files into a directory safely:"
+{ $subsections move-file-unique } ;
 
 ABOUT: "io.files.unique"

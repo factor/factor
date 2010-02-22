@@ -7,4 +7,4 @@ USING: byte-arrays math math.bitwise math.primes.erato sequences tools.test ;
 [ t ] [ 113 100 sieve marked-prime? ] unit-test
 
 ! There are 25997 primes below 300000. 1 must be removed and 3 5 7 added.
-[ 25997 ] [ 299999 sieve [ bit-count ] sigma 2 + ] unit-test
+[ 25997 ] [ 299999 sieve [ bit-count ] map-sum 2 + ] unit-test

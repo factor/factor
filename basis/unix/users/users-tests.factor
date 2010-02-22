@@ -25,3 +25,5 @@ IN: unix.users.tests
 [ "9999999999999999999" ] [ 9999999999999999999 user-name ] unit-test
 
 [ f ] [ 89898989898989898989898989898 user-passwd ] unit-test
+
+[ f ] [ "thisusershouldnotexistabcdefg12345asdfasdfasdfasdfasdfasdfasdf" user-id ] unit-test

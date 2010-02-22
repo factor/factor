@@ -1,11 +1,13 @@
+! (c)2009 Joe Groff bsd license
 USING: accessors calendar continuations destructors kernel math
 math.order namespaces system threads ui ui.gadgets.worlds
 sequences ;
 IN: game.loop
 
 TUPLE: game-loop
-    { tick-length integer read-only }
-    delegate
+    { tick-interval-micros integer read-only }
+    tick-delegate
+    draw-delegate
     { last-tick integer }
     thread 
     { running? boolean }
@@ -20,11 +22,11 @@ GENERIC: draw* ( tick-slice delegate -- )
 
 SYMBOL: game-loop
 
-: since-last-tick ( loop -- milliseconds )
-    last-tick>> millis swap - ;
+: since-last-tick ( loop -- microseconds )
+    last-tick>> system-micros swap - ;
 
 : tick-slice ( loop -- slice )
-    [ since-last-tick ] [ tick-length>> ] bi /f 1.0 min ;
+    [ since-last-tick ] [ tick-interval-micros>> ] bi /f 1.0 min ;
 
 CONSTANT: MAX-FRAMES-TO-SKIP 5
 
@@ -38,23 +40,26 @@ TUPLE: game-loop-error game-loop error ;
 : game-loop-error ( game-loop error -- )
     [ drop stop-loop ] [ \ game-loop-error boa ?ui-error ] 2bi ;
 
+: fps ( fps -- micros )
+    1,000,000 swap /i ; inline
+
 <PRIVATE
 
 : redraw ( loop -- )
     [ 1 + ] change-frame-number
-    [ tick-slice ] [ delegate>> ] bi draw* ;
+    [ tick-slice ] [ draw-delegate>> ] bi draw* ;
 
 : tick ( loop -- )
-    delegate>> tick* ;
+    tick-delegate>> tick* ;
 
 : increment-tick ( loop -- )
     [ 1 + ] change-tick-number
-    dup tick-length>> [ + ] curry change-last-tick
+    dup tick-interval-micros>> [ + ] curry change-last-tick
     drop ;
 
 : ?tick ( loop count -- )
-    [ millis >>last-tick drop ] [
-        over [ since-last-tick ] [ tick-length>> ] bi >=
+    [ system-micros >>last-tick drop ] [
+        over [ since-last-tick ] [ tick-interval-micros>> ] bi >=
         [ [ drop increment-tick ] [ drop tick ] [ 1 - ?tick ] 2tri ]
         [ 2drop ] if
     ] if-zero ;
@@ -69,24 +74,24 @@ TUPLE: game-loop-error game-loop error ;
     [ [ (run-loop) ] [ game-loop-error ] recover ]
     with-variable ;
 
-: benchmark-millis ( loop -- millis )
-    millis swap benchmark-time>> - ;
+: benchmark-micros ( loop -- micros )
+    system-micros swap benchmark-time>> - ;
 
 PRIVATE>
 
 : reset-loop-benchmark ( loop -- )
-    millis >>benchmark-time
+    system-micros >>benchmark-time
     dup tick-number>> >>benchmark-tick-number
     dup frame-number>> >>benchmark-frame-number
     drop ;
 
 : benchmark-ticks-per-second ( loop -- n )
-    [ tick-number>> ] [ benchmark-tick-number>> - ] [ benchmark-millis ] tri /f ;
+    [ tick-number>> ] [ benchmark-tick-number>> - ] [ benchmark-micros ] tri /f ;
 : benchmark-frames-per-second ( loop -- n )
-    [ frame-number>> ] [ benchmark-frame-number>> - ] [ benchmark-millis ] tri /f ;
+    [ frame-number>> ] [ benchmark-frame-number>> - ] [ benchmark-micros ] tri /f ;
 
 : start-loop ( loop -- )
-    millis >>last-tick
+    system-micros >>last-tick
     t >>running?
     [ reset-loop-benchmark ]
     [ [ run-loop ] curry "game loop" spawn ]
@@ -97,9 +102,12 @@ PRIVATE>
     f >>thread
     drop ;
 
-: <game-loop> ( tick-length delegate -- loop )
-    millis f f 0 0 millis 0 0
+: <game-loop*> ( tick-interval-micros tick-delegate draw-delegate -- loop )
+    system-micros f f 0 0 system-micros 0 0
     game-loop boa ;
+
+: <game-loop> ( tick-interval-micros delegate -- loop )
+    dup <game-loop*> ; inline
 
 M: game-loop dispose
     stop-loop ;

@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2009 Daniel Ehrenberg, Slava Pestov
+! Copyright (C) 2007, 2010 Daniel Ehrenberg, Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences arrays math sequences.private vectors
 accessors ;
@@ -58,7 +58,7 @@ PRIVATE>
     (assoc-each) each ; inline
 
 : assoc>map ( assoc quot exemplar -- seq )
-    [ accumulator [ assoc-each ] dip ] dip like ; inline
+    [ collector-for [ assoc-each ] dip ] [ like ] bi ; inline
 
 : assoc-map-as ( assoc quot exemplar -- newassoc )
     [ [ 2array ] compose V{ } assoc>map ] dip assoc-like ; inline
@@ -71,6 +71,12 @@ PRIVATE>
 
 : assoc-filter ( assoc quot -- subassoc )
     over assoc-filter-as ; inline
+
+: assoc-filter! ( assoc quot -- assoc )
+    [
+        over [ [ [ drop ] 2bi ] dip [ delete-at ] 2curry unless ] 2curry
+        assoc-each
+    ] [ drop ] 2bi ; inline
 
 : assoc-partition ( assoc quot -- true-assoc false-assoc )
     [ (assoc-each) partition ] [ drop ] 2bi
@@ -119,27 +125,27 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : assoc-intersect ( assoc1 assoc2 -- intersection )
     swap [ nip key? ] curry assoc-filter ;
 
-: update ( assoc1 assoc2 -- )
-    swap [ set-at ] with-assoc assoc-each ;
+: assoc-union! ( assoc1 assoc2 -- assoc1 )
+    over [ set-at ] with-assoc assoc-each ;
 
 : assoc-union ( assoc1 assoc2 -- union )
     [ [ [ assoc-size ] bi@ + ] [ drop ] 2bi new-assoc ] 2keep
-    [ dupd update ] bi@ ;
+    [ assoc-union! ] bi@ ;
 
 : assoc-combine ( seq -- union )
-    H{ } clone [ dupd update ] reduce ;
+    H{ } clone [ assoc-union! ] reduce ;
 
 : assoc-refine ( seq -- assoc )
     [ f ] [ [ ] [ assoc-intersect ] map-reduce ] if-empty ;
 
+: assoc-differ ( key -- quot )
+    [ nip key? not ] curry ; inline
+
 : assoc-diff ( assoc1 assoc2 -- diff )
-    [ nip key? not ] curry assoc-filter ;
+    assoc-differ assoc-filter ;
 
-: remove-all ( assoc seq -- subseq )
-    swap [ key? not ] curry filter ;
-
-: substitute-here ( seq assoc -- )
-    substituter change-each ;
+: assoc-diff! ( assoc1 assoc2 -- assoc1 )
+    assoc-differ assoc-filter! ;
 
 : substitute ( seq assoc -- newseq )
     substituter map ;
@@ -195,7 +201,7 @@ M: sequence clear-assoc delete-all ; inline
 
 M: sequence delete-at
     [ nip ] [ search-alist nip ] 2bi
-    [ swap delete-nth ] [ drop ] if* ;
+    [ swap remove-nth! drop ] [ drop ] if* ;
 
 M: sequence assoc-size length ; inline
 
@@ -208,6 +214,10 @@ M: sequence assoc-like
 M: sequence >alist ; inline
 
 ! Override sequence => assoc instance for f
+M: f at* 2drop f f ; inline
+
+M: f assoc-size drop 0 ; inline
+
 M: f clear-assoc drop ; inline
 
 M: f assoc-like drop dup assoc-empty? [ drop f ] when ; inline
@@ -224,10 +234,10 @@ M: enum at*
 
 M: enum set-at seq>> set-nth ; inline
 
-M: enum delete-at seq>> delete-nth ; inline
+M: enum delete-at seq>> remove-nth! drop ; inline
 
 M: enum >alist ( enum -- alist )
-    seq>> [ length ] keep zip ; inline
+    seq>> [ length iota ] keep zip ; inline
 
 M: enum assoc-size seq>> length ; inline
 

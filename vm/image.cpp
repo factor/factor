@@ -6,9 +6,9 @@ namespace factor
 /* Certain special objects in the image are known to the runtime */
 void factor_vm::init_objects(image_header *h)
 {
-	memcpy(userenv,h->userenv,sizeof(userenv));
+	memcpy(special_objects,h->special_objects,sizeof(special_objects));
 
-	T = h->t;
+	true_object = h->true_object;
 	bignum_zero = h->bignum_zero;
 	bignum_pos_one = h->bignum_pos_one;
 	bignum_neg_one = h->bignum_neg_one;
@@ -16,31 +16,22 @@ void factor_vm::init_objects(image_header *h)
 
 void factor_vm::load_data_heap(FILE *file, image_header *h, vm_parameters *p)
 {
-	cell good_size = h->data_size + (1 << 20);
-
-	if(good_size > p->tenured_size)
-		p->tenured_size = good_size;
+	p->tenured_size = std::max((h->data_size * 3) / 2,p->tenured_size);
 
 	init_data_heap(p->young_size,
 		p->aging_size,
-		p->tenured_size,
-		p->secure_gc);
+		p->tenured_size);
 
-	clear_gc_stats();
-
-	fixnum bytes_read = fread((void*)data->tenured->start,1,h->data_size,file);
+	fixnum bytes_read = safe_fread((void*)data->tenured->start,1,h->data_size,file);
 
 	if((cell)bytes_read != h->data_size)
 	{
-		print_string("truncated image: ");
-		print_fixnum(bytes_read);
-		print_string(" bytes read, ");
-		print_cell(h->data_size);
-		print_string(" bytes expected\n");
+		std::cout << "truncated image: " << bytes_read << " bytes read, ";
+		std::cout << h->data_size << " bytes expected\n";
 		fatal_error("load_data_heap failed",0);
 	}
 
-	data->tenured->here = data->tenured->start + h->data_size;
+	data->tenured->initial_free_list(h->data_size);
 }
 
 void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
@@ -52,267 +43,189 @@ void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 
 	if(h->code_size != 0)
 	{
-		size_t bytes_read = fread(code->first_block(),1,h->code_size,file);
+		size_t bytes_read = safe_fread(code->allocator->first_block(),1,h->code_size,file);
 		if(bytes_read != h->code_size)
 		{
-			print_string("truncated image: ");
-			print_fixnum(bytes_read);
-			print_string(" bytes read, ");
-			print_cell(h->code_size);
-			print_string(" bytes expected\n");
+			std::cout << "truncated image: " << bytes_read << " bytes read, ";
+			std::cout << h->code_size << " bytes expected\n";
 			fatal_error("load_code_heap failed",0);
 		}
 	}
 
-	code->build_free_list(h->code_size);
+	code->allocator->initial_free_list(h->code_size);
 }
 
-/* Save the current image to disk */
-bool factor_vm::save_image(const vm_char *filename)
-{
-	FILE* file;
-	image_header h;
+struct data_fixupper {
+	cell offset;
 
-	file = OPEN_WRITE(filename);
-	if(file == NULL)
+	explicit data_fixupper(cell offset_) : offset(offset_) {}
+
+	object *operator()(object *obj)
 	{
-		print_string("Cannot open image file: "); print_native_string(filename); nl();
-		print_string(strerror(errno)); nl();
-		return false;
-	}
-
-	h.magic = image_magic;
-	h.version = image_version;
-	h.data_relocation_base = data->tenured->start;
-	h.data_size = data->tenured->here - data->tenured->start;
-	h.code_relocation_base = code->seg->start;
-	h.code_size = code->heap_size();
-
-	h.t = T;
-	h.bignum_zero = bignum_zero;
-	h.bignum_pos_one = bignum_pos_one;
-	h.bignum_neg_one = bignum_neg_one;
-
-	for(cell i = 0; i < USER_ENV; i++)
-		h.userenv[i] = (save_env_p(i) ? userenv[i] : F);
-
-	bool ok = true;
-
-	if(fwrite(&h,sizeof(image_header),1,file) != 1) ok = false;
-	if(fwrite((void*)data->tenured->start,h.data_size,1,file) != 1) ok = false;
-	if(fwrite(code->first_block(),h.code_size,1,file) != 1) ok = false;
-	if(fclose(file)) ok = false;
-
-	if(!ok)
-	{
-		print_string("save-image failed: "); print_string(strerror(errno)); nl();
-	}
-
-	return ok;
-}
-
-void factor_vm::primitive_save_image()
-{
-	/* do a full GC to push everything into tenured space */
-	gc();
-
-	gc_root<byte_array> path(dpop(),this);
-	path.untag_check(this);
-	save_image((vm_char *)(path.untagged() + 1));
-}
-
-void factor_vm::primitive_save_image_and_exit()
-{
-	/* We unbox this before doing anything else. This is the only point
-	where we might throw an error, so we have to throw an error here since
-	later steps destroy the current image. */
-	gc_root<byte_array> path(dpop(),this);
-	path.untag_check(this);
-
-	/* strip out userenv data which is set on startup anyway */
-	for(cell i = 0; i < USER_ENV; i++)
-	{
-		if(!save_env_p(i)) userenv[i] = F;
-	}
-
-	/* do a full GC + code heap compaction */
-	compact_code_heap();
-
-	/* Save the image */
-	if(save_image((vm_char *)(path.untagged() + 1)))
-		exit(0);
-	else
-		exit(1);
-}
-
-void factor_vm::data_fixup(cell *handle, cell data_relocation_base)
-{
-	if(immediate_p(*handle))
-		return;
-
-	*handle += (data->tenured->start - data_relocation_base);
-}
-
-template<typename Type> void factor_vm::code_fixup(Type **handle, cell code_relocation_base)
-{
-	Type *ptr = *handle;
-	Type *new_ptr = (Type *)(((cell)ptr) + (code->seg->start - code_relocation_base));
-	*handle = new_ptr;
-}
-
-void factor_vm::fixup_word(word *word, cell code_relocation_base)
-{
-	if(word->code)
-		code_fixup(&word->code,code_relocation_base);
-	if(word->profiling)
-		code_fixup(&word->profiling,code_relocation_base);
-	code_fixup(&word->xt,code_relocation_base);
-}
-
-void factor_vm::fixup_quotation(quotation *quot, cell code_relocation_base)
-{
-	if(quot->code)
-	{
-		code_fixup(&quot->xt,code_relocation_base);
-		code_fixup(&quot->code,code_relocation_base);
-	}
-	else
-		quot->xt = (void *)lazy_jit_compile;
-}
-
-void factor_vm::fixup_alien(alien *d)
-{
-	if(d->base == F) d->expired = T;
-}
-
-struct stack_frame_fixupper {
-	factor_vm *myvm;
-	cell code_relocation_base;
-
-	explicit stack_frame_fixupper(factor_vm *myvm_, cell code_relocation_base_) :
-		myvm(myvm_), code_relocation_base(code_relocation_base_) {}
-	void operator()(stack_frame *frame)
-	{
-		myvm->code_fixup(&frame->xt,code_relocation_base);
-		myvm->code_fixup(&FRAME_RETURN_ADDRESS(frame,myvm),code_relocation_base);
+		return (object *)((char *)obj + offset);
 	}
 };
 
-void factor_vm::fixup_callstack_object(callstack *stack, cell code_relocation_base)
+struct code_fixupper {
+	cell offset;
+
+	explicit code_fixupper(cell offset_) : offset(offset_) {}
+
+	code_block *operator()(code_block *compiled)
+	{
+		return (code_block *)((char *)compiled + offset);
+	}
+};
+
+static inline cell tuple_size_with_fixup(cell offset, object *obj)
 {
-	stack_frame_fixupper fixupper(this,code_relocation_base);
-	iterate_callstack_object(stack,fixupper);
+	tuple_layout *layout = (tuple_layout *)((char *)UNTAG(((tuple *)obj)->layout) + offset);
+	return tuple_size(layout);
 }
+
+struct fixup_sizer {
+	cell offset;
+
+	explicit fixup_sizer(cell offset_) : offset(offset_) {}
+
+	cell operator()(object *obj)
+	{
+		if(obj->type() == TUPLE_TYPE)
+			return align(tuple_size_with_fixup(offset,obj),data_alignment);
+		else
+			return obj->size();
+	}
+};
 
 struct object_fixupper {
-	factor_vm *myvm;
-	cell data_relocation_base;
+	factor_vm *parent;
+	cell data_offset;
+	slot_visitor<data_fixupper> data_visitor;
+	code_block_visitor<code_fixupper> code_visitor;
 
-	explicit object_fixupper(factor_vm *myvm_, cell data_relocation_base_) :
-		myvm(myvm_), data_relocation_base(data_relocation_base_) { }
+	object_fixupper(factor_vm *parent_, cell data_offset_, cell code_offset_) :
+		parent(parent_),
+		data_offset(data_offset_),
+		data_visitor(slot_visitor<data_fixupper>(parent_,data_fixupper(data_offset_))),
+		code_visitor(code_block_visitor<code_fixupper>(parent_,code_fixupper(code_offset_))) {}
 
-	void operator()(cell *scan)
+	void operator()(object *obj, cell size)
 	{
-		myvm->data_fixup(scan,data_relocation_base);
+		parent->data->tenured->starts.record_object_start_offset(obj);
+
+		switch(obj->type())
+		{
+		case ALIEN_TYPE:
+			{
+				cell payload_start = obj->binary_payload_start();
+				data_visitor.visit_slots(obj,payload_start);
+
+				alien *ptr = (alien *)obj;
+
+				if(to_boolean(ptr->base))
+					ptr->update_address();
+				else
+					ptr->expired = parent->true_object;
+				break;
+			}
+		case DLL_TYPE:
+			{
+				cell payload_start = obj->binary_payload_start();
+				data_visitor.visit_slots(obj,payload_start);
+
+				parent->ffi_dlopen((dll *)obj);
+				break;
+			}
+		case TUPLE_TYPE:
+			{
+				cell payload_start = tuple_size_with_fixup(data_offset,obj);
+				data_visitor.visit_slots(obj,payload_start);
+				break;
+			}
+		default:
+			{
+				cell payload_start = obj->binary_payload_start();
+				data_visitor.visit_slots(obj,payload_start);
+				code_visitor.visit_object_code_block(obj);
+				break;
+			}
+		}
 	}
 };
 
-/* Initialize an object in a newly-loaded image */
-void factor_vm::relocate_object(object *object,
-	cell data_relocation_base,
-	cell code_relocation_base)
+void factor_vm::fixup_data(cell data_offset, cell code_offset)
 {
-	cell hi_tag = object->h.hi_tag();
-	
-	/* Tuple relocation is a bit trickier; we have to fix up the
-	layout object before we can get the tuple size, so do_slots is
-	out of the question */
-	if(hi_tag == TUPLE_TYPE)
+	slot_visitor<data_fixupper> data_workhorse(this,data_fixupper(data_offset));
+	data_workhorse.visit_roots();
+
+	object_fixupper fixupper(this,data_offset,code_offset);
+	fixup_sizer sizer(data_offset);
+	data->tenured->iterate(fixupper,sizer);
+}
+
+struct code_block_fixup_relocation_visitor {
+	factor_vm *parent;
+	cell code_offset;
+	slot_visitor<data_fixupper> data_visitor;
+	code_fixupper code_visitor;
+
+	code_block_fixup_relocation_visitor(factor_vm *parent_, cell data_offset_, cell code_offset_) :
+		parent(parent_),
+		code_offset(code_offset_),
+		data_visitor(slot_visitor<data_fixupper>(parent_,data_fixupper(data_offset_))),
+		code_visitor(code_fixupper(code_offset_)) {}
+
+	void operator()(instruction_operand op)
 	{
-		tuple *t = (tuple *)object;
-		data_fixup(&t->layout,data_relocation_base);
+		code_block *compiled = op.parent_code_block();
+		cell old_offset = op.rel_offset() + (cell)compiled->entry_point() - code_offset;
 
-		cell *scan = t->data();
-		cell *end = (cell *)((cell)object + untagged_object_size(object));
-
-		for(; scan < end; scan++)
-			data_fixup(scan,data_relocation_base);
-	}
-	else
-	{
-		object_fixupper fixupper(this,data_relocation_base);
-		do_slots((cell)object,fixupper);
-
-		switch(hi_tag)
+		switch(op.rel_type())
 		{
-		case WORD_TYPE:
-			fixup_word((word *)object,code_relocation_base);
+		case RT_LITERAL:
+			op.store_value(data_visitor.visit_pointer(op.load_value(old_offset)));
 			break;
-		case QUOTATION_TYPE:
-			fixup_quotation((quotation *)object,code_relocation_base);
+		case RT_ENTRY_POINT:
+		case RT_ENTRY_POINT_PIC:
+		case RT_ENTRY_POINT_PIC_TAIL:
+			op.store_code_block(code_visitor(op.load_code_block(old_offset)));
 			break;
-		case DLL_TYPE:
-			ffi_dlopen((dll *)object);
+		case RT_HERE:
+			op.store_value(op.load_value(old_offset) + code_offset);
 			break;
-		case ALIEN_TYPE:
-			fixup_alien((alien *)object);
+		case RT_UNTAGGED:
 			break;
-		case CALLSTACK_TYPE:
-			fixup_callstack_object((callstack *)object,code_relocation_base);
+		default:
+			parent->store_external_address(op);
 			break;
 		}
 	}
-}
-
-/* Since the image might have been saved with a different base address than
-where it is loaded, we need to fix up pointers in the image. */
-void factor_vm::relocate_data(cell data_relocation_base, cell code_relocation_base)
-{
-	for(cell i = 0; i < USER_ENV; i++)
-		data_fixup(&userenv[i],data_relocation_base);
-
-	data_fixup(&T,data_relocation_base);
-	data_fixup(&bignum_zero,data_relocation_base);
-	data_fixup(&bignum_pos_one,data_relocation_base);
-	data_fixup(&bignum_neg_one,data_relocation_base);
-
-	cell obj = data->tenured->start;
-
-	while(obj)
-	{
-		relocate_object((object *)obj,data_relocation_base,code_relocation_base);
-		data->tenured->record_object_start_offset((object *)obj);
-		obj = data->tenured->next_object_after(this,obj);
-	}
-}
-
-void factor_vm::fixup_code_block(code_block *compiled, cell data_relocation_base)
-{
-	/* relocate literal table data */
-	data_fixup(&compiled->owner,data_relocation_base);
-	data_fixup(&compiled->literals,data_relocation_base);
-	data_fixup(&compiled->relocation,data_relocation_base);
-
-	relocate_code_block(compiled);
-}
+};
 
 struct code_block_fixupper {
-	factor_vm *myvm;
-	cell data_relocation_base;
+	factor_vm *parent;
+	cell data_offset;
+	cell code_offset;
 
-	code_block_fixupper(factor_vm *myvm_, cell data_relocation_base_) :
-		myvm(myvm_), data_relocation_base(data_relocation_base_) { }
+	code_block_fixupper(factor_vm *parent_, cell data_offset_, cell code_offset_) :
+		parent(parent_),
+		data_offset(data_offset_),
+		code_offset(code_offset_) {}
 
-	void operator()(code_block *compiled)
+	void operator()(code_block *compiled, cell size)
 	{
-		myvm->fixup_code_block(compiled,data_relocation_base);
+		slot_visitor<data_fixupper> data_visitor(parent,data_fixupper(data_offset));
+		data_visitor.visit_code_block_objects(compiled);
+
+		code_block_fixup_relocation_visitor code_visitor(parent,data_offset,code_offset);
+		compiled->each_instruction_operand(code_visitor);
 	}
 };
 
-void factor_vm::relocate_code(cell data_relocation_base)
+void factor_vm::fixup_code(cell data_offset, cell code_offset)
 {
-	code_block_fixupper fixupper(this,data_relocation_base);
-	iterate_code_heap(fixupper);
+	code_block_fixupper fixupper(this,data_offset,code_offset);
+	code->allocator->iterate(fixupper);
 }
 
 /* Read an image file from disk, only done once during startup */
@@ -322,13 +235,13 @@ void factor_vm::load_image(vm_parameters *p)
 	FILE *file = OPEN_READ(p->image_path);
 	if(file == NULL)
 	{
-		print_string("Cannot open image file: "); print_native_string(p->image_path); nl();
-		print_string(strerror(errno)); nl();
+		std::cout << "Cannot open image file: " << p->image_path << std::endl;
+		std::cout << strerror(errno) << std::endl;
 		exit(1);
 	}
 
 	image_header h;
-	if(fread(&h,sizeof(image_header),1,file) != 1)
+	if(safe_fread(&h,sizeof(image_header),1,file) != 1)
 		fatal_error("Cannot read image header",0);
 
 	if(h.magic != image_magic)
@@ -340,15 +253,99 @@ void factor_vm::load_image(vm_parameters *p)
 	load_data_heap(file,&h,p);
 	load_code_heap(file,&h,p);
 
-	fclose(file);
+	safe_fclose(file);
 
 	init_objects(&h);
 
-	relocate_data(h.data_relocation_base,h.code_relocation_base);
-	relocate_code(h.data_relocation_base);
+	cell data_offset = data->tenured->start - h.data_relocation_base;
+	cell code_offset = code->seg->start - h.code_relocation_base;
+
+	fixup_data(data_offset,code_offset);
+	fixup_code(data_offset,code_offset);
 
 	/* Store image path name */
-	userenv[IMAGE_ENV] = allot_alien(F,(cell)p->image_path);
+	special_objects[OBJ_IMAGE] = allot_alien(false_object,(cell)p->image_path);
+}
+
+/* Save the current image to disk */
+bool factor_vm::save_image(const vm_char *saving_filename, const vm_char *filename)
+{
+	FILE* file;
+	image_header h;
+
+	file = OPEN_WRITE(saving_filename);
+	if(file == NULL)
+	{
+		std::cout << "Cannot open image file: " << saving_filename << std::endl;
+		std::cout << strerror(errno) << std::endl;
+		return false;
+	}
+
+	h.magic = image_magic;
+	h.version = image_version;
+	h.data_relocation_base = data->tenured->start;
+	h.data_size = data->tenured->occupied_space();
+	h.code_relocation_base = code->seg->start;
+	h.code_size = code->allocator->occupied_space();
+
+	h.true_object = true_object;
+	h.bignum_zero = bignum_zero;
+	h.bignum_pos_one = bignum_pos_one;
+	h.bignum_neg_one = bignum_neg_one;
+
+	for(cell i = 0; i < special_object_count; i++)
+		h.special_objects[i] = (save_special_p(i) ? special_objects[i] : false_object);
+
+	bool ok = true;
+
+	if(safe_fwrite(&h,sizeof(image_header),1,file) != 1) ok = false;
+	if(safe_fwrite((void*)data->tenured->start,h.data_size,1,file) != 1) ok = false;
+	if(safe_fwrite(code->allocator->first_block(),h.code_size,1,file) != 1) ok = false;
+	safe_fclose(file);
+
+	if(!ok)
+		std::cout << "save-image failed: " << strerror(errno) << std::endl;
+	else
+		move_file(saving_filename,filename); 
+
+	return ok;
+}
+
+void factor_vm::primitive_save_image()
+{
+	/* do a full GC to push everything into tenured space */
+	primitive_compact_gc();
+
+	data_root<byte_array> path2(ctx->pop(),this);
+	path2.untag_check(this);
+	data_root<byte_array> path1(ctx->pop(),this);
+	path1.untag_check(this);
+	save_image((vm_char *)(path1.untagged() + 1 ),(vm_char *)(path2.untagged() + 1));
+}
+
+void factor_vm::primitive_save_image_and_exit()
+{
+	/* We unbox this before doing anything else. This is the only point
+	where we might throw an error, so we have to throw an error here since
+	later steps destroy the current image. */
+	data_root<byte_array> path2(ctx->pop(),this);
+	path2.untag_check(this);
+	data_root<byte_array> path1(ctx->pop(),this);
+	path1.untag_check(this);
+
+	/* strip out special_objects data which is set on startup anyway */
+	for(cell i = 0; i < special_object_count; i++)
+		if(!save_special_p(i)) special_objects[i] = false_object;
+
+	gc(collect_compact_op,
+		0, /* requested size */
+		false /* discard objects only reachable from stacks */);
+
+	/* Save the image */
+	if(save_image((vm_char *)(path1.untagged() + 1), (vm_char *)(path2.untagged() + 1)))
+		exit(0);
+	else
+		exit(1);
 }
 
 }

@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.algebra
 combinators definitions generic hashtables kernel
@@ -15,6 +15,8 @@ TUPLE: single-combination ;
 
 PREDICATE: single-generic < generic
     "combination" word-prop single-combination? ;
+
+M: single-generic make-inline cannot-be-inline ;
 
 GENERIC: dispatch# ( word -- n )
 
@@ -63,19 +65,18 @@ TUPLE: predicate-engine class methods ;
 
 C: <predicate-engine> predicate-engine
 
-: push-method ( method specializer atomic assoc -- )
+: push-method ( method class atomic assoc -- )
     dupd [
         [ ] [ H{ } clone <predicate-engine> ] ?if
         [ methods>> set-at ] keep
     ] change-at ;
 
-: flatten-method ( class method assoc -- )
-    [ [ flatten-class keys ] keep ] 2dip [
-        [ spin ] dip push-method
-    ] 3curry each ;
+: flatten-method ( method class assoc -- )
+    over flatten-class keys
+    [ swap push-method ] with with with each ;
 
 : flatten-methods ( assoc -- assoc' )
-    H{ } clone [ [ flatten-method ] curry assoc-each ] keep ;
+    H{ } clone [ [ swapd flatten-method ] curry assoc-each ] keep ;
 
 ! 2. Convert methods
 : split-methods ( assoc class -- first second )
@@ -112,15 +113,6 @@ TUPLE: tuple-dispatch-engine echelons ;
     tuple bootstrap-word
     \ <tuple-dispatch-engine> convert-methods ;
 
-! 2.2 Convert hi-tag methods
-TUPLE: hi-tag-dispatch-engine methods ;
-
-C: <hi-tag-dispatch-engine> hi-tag-dispatch-engine
-
-: convert-hi-tag-methods ( assoc -- assoc' )
-    \ hi-tag bootstrap-word
-    \ <hi-tag-dispatch-engine> convert-methods ;
-
 ! 3 Tag methods
 TUPLE: tag-dispatch-engine methods ;
 
@@ -129,7 +121,6 @@ C: <tag-dispatch-engine> tag-dispatch-engine
 : <engine> ( assoc -- engine )
     flatten-methods
     convert-tuple-methods
-    convert-hi-tag-methods
     <tag-dispatch-engine> ;
 
 ! ! ! Compile engine ! ! !
@@ -142,25 +133,14 @@ GENERIC: compile-engine ( engine -- obj )
     [ over assumed [ compile-engine ] with-variable ] assoc-map ;
 
 : direct-dispatch-table ( assoc n -- table )
-    default get <array> [ <enum> swap update ] keep ;
+    default get <array> <enum> swap assoc-union! seq>> ;
 
-: lo-tag-number ( class -- n )
-    "type" word-prop dup num-tags get iota member?
-    [ drop object tag-number ] unless ;
+: tag-number ( class -- n ) "type" word-prop ;
 
 M: tag-dispatch-engine compile-engine
     methods>> compile-engines*
-    [ [ lo-tag-number ] dip ] assoc-map
-    num-tags get direct-dispatch-table ;
-
-: num-hi-tags ( -- n ) num-types get num-tags get - ;
-
-: hi-tag-number ( class -- n ) "type" word-prop ;
-
-M: hi-tag-dispatch-engine compile-engine
-    methods>> compile-engines*
-    [ [ hi-tag-number num-tags get - ] dip ] assoc-map
-    num-hi-tags direct-dispatch-table ;
+    [ [ tag-number ] dip ] assoc-map
+    num-types get direct-dispatch-table ;
 
 : build-fast-hash ( methods -- buckets )
     >alist V{ } clone [ hashcode 1array ] distribute-buckets
@@ -180,7 +160,7 @@ M: tuple-dispatch-engine compile-engine
     tuple assumed [
         echelons>> compile-engines
         dup keys supremum 1 + f <array>
-        [ <enum> swap update ] keep
+        <enum> swap assoc-union! seq>>
     ] with-variable ;
 
 PREDICATE: predicate-engine-word < word "owner-generic" word-prop ;

@@ -21,17 +21,17 @@ HOOK: init-stdio io-backend ( -- )
 
 HOOK: io-multiplex io-backend ( us -- )
 
-HOOK: normalize-directory io-backend ( str -- newstr )
+HOOK: normalize-directory io-backend ( path -- path' )
 
-HOOK: normalize-path io-backend ( str -- newstr )
+HOOK: normalize-path io-backend ( path -- path' )
 
 M: object normalize-directory normalize-path ;
 
 : set-io-backend ( io-backend -- )
     io-backend set-global init-io init-stdio
-    "io.files" init-hooks get at call( -- ) ;
+    "io.files" startup-hooks get at call( -- ) ;
 
 ! Note that we have 'alien' in our using list so that the alien
 ! init hook runs before this one.
 [ init-io embedded? [ init-stdio ] unless ]
-"io.backend" add-init-hook
+"io.backend" add-startup-hook

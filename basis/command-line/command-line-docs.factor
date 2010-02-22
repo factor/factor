@@ -37,10 +37,6 @@ HELP: main-vocab
 HELP: default-cli-args
 { $description "Sets global variables corresponding to default command line arguments." } ;
 
-HELP: ignore-cli-args?
-{ $values { "?" "a boolean" } }
-{ $description "On Mac OS X, source files to run are supplied by the Cocoa API, so to avoid running them twice the startup code has to call this word." } ;
-
 ARTICLE: "runtime-cli-args" "Command line switches for the VM"
 "A handful of command line switches are processed by the VM and not the library. They control low-level features."
 { $table
@@ -95,7 +91,7 @@ ARTICLE: "standard-cli-args" "Command line switches for general usage"
 } ;
 
 ARTICLE: "factor-boot-rc" "Bootstrap initialization file"
-"The botstrap initialization file is named " { $snippet "factor-boot-rc" } " on Windows and " { $snippet ".factor-boot-rc" } " on Unix. This file can contain " { $link require } " calls for vocabularies you use frequently, and other such long-running tasks that you do not want to perform every time Factor starts."
+"The bootstrap initialization file is named " { $snippet "factor-boot-rc" } " on Windows and " { $snippet ".factor-boot-rc" } " on Unix. This file can contain " { $link require } " calls for vocabularies you use frequently, and other such long-running tasks that you do not want to perform every time Factor starts."
 $nl
 "A word to run this file from an existing Factor session:"
 { $subsections run-bootstrap-init }

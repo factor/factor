@@ -84,8 +84,8 @@ unit-test
 [ 1.0 ] [ 0.5 1/2 + ] unit-test
 [ 1.0 ] [ 1/2 0.5 + ] unit-test
 
-[ 1/268435456 ] [ -1 -268435456 >fixnum / ] unit-test
-[ 268435456 ] [ -268435456 >fixnum -1 / ] unit-test
+[ 1/134217728 ] [ -1 -134217728 >fixnum / ] unit-test
+[ 134217728 ] [ -134217728 >fixnum -1 / ] unit-test
 
 [ 5 ]
 [ "10/2" string>number ]
@@ -95,13 +95,14 @@ unit-test
 [ "-10/2" string>number ]
 unit-test
 
-[ -5 ]
+[ f ]
 [ "10/-2" string>number ]
 unit-test
 
-[ 5 ]
+[ f ]
 [ "-10/-2" string>number ]
 unit-test
+
 [ "33/100" ]
 [ "66/200" string>number number>string ]
 unit-test

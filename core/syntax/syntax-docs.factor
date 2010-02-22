@@ -65,26 +65,59 @@ ARTICLE: "syntax-ratios" "Ratio syntax"
 "More information on ratios can be found in " { $link "rationals" } ;
 
 ARTICLE: "syntax-floats" "Float syntax"
-"Floating point literals can be input in base 10 or 16. Base 10 literals must contain a decimal point, and may contain an exponent after " { $snippet "e" } ":"
+"Floating point literals are specified when a literal number contains a decimal point or exponent. Exponents are marked by an " { $snippet "e" } " or " { $snippet "E" } ":"
 { $code
     "10.5"
     "-3.1456"
-    "7.e13"
+    "7e13"
     "1.0e-5"
+    "1.0E+5"
 }
-"Base 16 literals use " { $snippet "p" } " instead of " { $snippet "e" } " for the exponent, which is still decimal:"
+"Literal numbers without a decimal point or an exponent always parse as integers:"
 { $example
-    "10.125 HEX: 1.44p3 = ."
+    "1 float? ."
+    "f"
+}
+{ $example
+    "1. float? ."
     "t"
 }
-"Syntax for special float values:"
+{ $example
+    "1e0 float? ."
+    "t"
+}
+"Literal floating point approximations of ratios can also be input by placing a decimal point in the denominator:"
+{ $example
+    "1/2. ."
+    "0.5"
+}
+{ $example
+    "1/3. ."
+    "0.3333333333333333"
+}
+"The special float values have their own syntax:"
 { $table
 { "Positive infinity" { $snippet "1/0." } }
 { "Negative infinity" { $snippet "-1/0." } }
 { "Not-a-number" { $snippet "0/0." } }
 }
-"A Not-a-number with an arbitrary payload can also be parsed in:"
+"A Not-a-number literal with an arbitrary payload can also be input:"
 { $subsections POSTPONE: NAN: }
+"Hexadecimal float literals are also supported. These consist of a hexadecimal literal with a decimal point and an optional base-two exponent expressed as a decimal number after " { $snippet "p" } " or " { $snippet "P" } ":"
+{ $example
+    "8.0 HEX: 1.0p3 = ."
+    "t"
+}
+{ $example
+    "1024.0 HEX: 1.0P10 = ."
+    "t"
+}
+{ $example
+    "10.125 HEX: 1.44p3 = ."
+    "t"
+}
+"The normalized hex form " { $snippet "HEX: ±1.MMMMMMMMMMMMMp±EEEE" } " allows any floating-point number to be specified precisely. The values of MMMMMMMMMMMMM and EEEE map directly to the mantissa and exponent fields of IEEE 754 representation."
+$nl
 "More information on floats can be found in " { $link "floats" } "." ;
 
 ARTICLE: "syntax-complex-numbers" "Complex number syntax"
@@ -106,7 +139,7 @@ ARTICLE: "syntax-numbers" "Number syntax"
 } ;
 
 ARTICLE: "syntax-words" "Word syntax"
-"A word occurring inside a quotation is executed when the quotation is called. Sometimes a word needs to be pushed on the data stack instead. The canonical use-case for this is passing the word to the " { $link execute } " combinator, or alternatively, reflectively accessing word properties (" { $link "word-props" } ")."
+"A word occurring inside a quotation is executed when the quotation is called. Sometimes a word needs to be pushed on the data stack instead. The canonical use case for this is passing the word to the " { $link execute } " combinator, or alternatively, reflectively accessing word properties (" { $link "word-props" } ")."
 { $subsections
     POSTPONE: \
     POSTPONE: POSTPONE:
@@ -129,7 +162,7 @@ ARTICLE: "escape" "Character escape codes"
 } ;
 
 ARTICLE: "syntax-strings" "Character and string syntax"
-"Factor has no distinct character type, however Unicode character value integers can be read by specifying a literal character, or an escaped representation thereof."
+"Factor has no distinct character type. Integers representing Unicode code points can be read by specifying a literal character, or an escaped representation thereof."
 { $subsections
     POSTPONE: CHAR:
     POSTPONE: "
@@ -185,7 +218,7 @@ ARTICLE: "syntax-literals" "Literals"
 $nl
 "If a quotation contains a literal object, the same literal object instance is used each time the quotation executes; that is, literals are “live”."
 $nl
-"Using mutable object literals in word definitions requires care, since if those objects are mutated, the actual word definition will be changed, which is in most cases not what you would expect. Literals should be " { $link clone } "d before being passed to word which may potentially mutate them."
+"Using mutable object literals in word definitions requires care, since if those objects are mutated, the actual word definition will be changed, which is in most cases not what you would expect. Literals should be " { $link clone } "d before being passed to a word which may potentially mutate them."
 { $subsections
     "syntax-numbers"
     "syntax-words"
@@ -371,7 +404,7 @@ HELP: POSTPONE:
 HELP: :
 { $syntax ": word ( stack -- effect ) definition... ;" }
 { $values { "word" "a new word to define" } { "definition" "a word definition" } }
-{ $description "Defines a word with the given stack effect in the current vocabulary. The stack effect is optional for words which only push literals on the stack." }
+{ $description "Defines a word with the given stack effect in the current vocabulary." }
 { $examples { $code ": ask-name ( -- name )\n    \"What is your name? \" write readln ;\n: greet ( name -- )\n    \"Greetings, \" write print ;\n: friend ( -- )\n    ask-name greet ;" } } ;
 
 { POSTPONE: : POSTPONE: ; define } related-words
@@ -537,7 +570,7 @@ HELP: IN:
 
 HELP: CHAR:
 { $syntax "CHAR: token" }
-{ $values { "token" "a literal character, escape code, or Unicode character name" } }
+{ $values { "token" "a literal character, escape code, or Unicode code point name" } }
 { $description "Adds a Unicode code point to the parse tree." }
 { $examples
     { $code
@@ -574,7 +607,7 @@ HELP: SBUF"
 HELP: P"
 { $syntax "P\" pathname\"" }
 { $values { "pathname" "a pathname string" } }
-{ $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", creates a new " { $link pathname } ", and appends it to the parse tree." }
+{ $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", creates a new " { $link pathname } ", and appends it to the parse tree. Pathnames presented in the UI are clickable, which opens them in a text editor configured with " { $link "editor" } "." }
 { $examples { $example "USING: accessors io io.files ;" "P\" foo.txt\" string>> print" "foo.txt" } } ;
 
 HELP: (
@@ -758,6 +791,10 @@ $nl
     "An example mixing short and long slot specifiers:"
     { $code "TUPLE: person" "{ age integer initial: 0 }" "{ department string initial: \"Marketing\" }" "manager ;" }
 } ;
+
+HELP: final
+{ $syntax "TUPLE: ... ; final" }
+{ $description "Declares the most recently defined word as a final tuple class which cannot be subclassed. Attempting to subclass a final class raises a " { $link bad-superclass } " error." } ;
 
 HELP: initial:
 { $syntax "TUPLE: ... { slot initial: value } ... ;" }

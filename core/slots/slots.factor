@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays byte-arrays kernel kernel.private math namespaces
 make sequences strings effects generic generic.standard
@@ -10,11 +10,11 @@ TUPLE: slot-spec name offset class initial read-only ;
 
 PREDICATE: reader < word "reader" word-prop ;
 
-PREDICATE: reader-method < method-body "reading" word-prop ;
+PREDICATE: reader-method < method "reading" word-prop ;
 
 PREDICATE: writer < word "writer" word-prop ;
 
-PREDICATE: writer-method < method-body "writing" word-prop ;
+PREDICATE: writer-method < method "writing" word-prop ;
 
 : <slot-spec> ( -- slot-spec )
     slot-spec new
@@ -22,7 +22,7 @@ PREDICATE: writer-method < method-body "writing" word-prop ;
 
 : define-typecheck ( class generic quot props -- )
     [ create-method ] 2dip
-    [ [ props>> ] [ drop ] [ ] tri* update ]
+    [ [ props>> ] [ drop ] [ ] tri* assoc-union! drop ]
     [ drop define ]
     [ 2drop make-inline ]
     3tri ;
@@ -64,39 +64,29 @@ M: object reader-quot
 
 ERROR: bad-slot-value value class ;
 
-: writer-quot/object ( slot-spec -- )
-    offset>> , \ set-slot , ;
-
-: writer-quot/coerce ( slot-spec -- )
-    [ class>> "coercer" word-prop [ dip ] curry % ]
-    [ offset>> , \ set-slot , ]
-    bi ;
-
-: writer-quot/check ( slot-spec -- )
-    [ offset>> , ]
+: (instance-check-quot) ( class -- quot )
     [
-        \ pick ,
-        dup class>> "predicate" word-prop %
-        [ set-slot ] ,
-        class>> [ 2nip bad-slot-value ] curry [ ] like ,
-        \ if ,
-    ]
-    bi ;
+        \ dup ,
+        [ "predicate" word-prop % ]
+        [ [ bad-slot-value ] curry , ] bi
+        \ unless ,
+    ] [ ] make ;
 
-: writer-quot/fixnum ( slot-spec -- )
-    [ [ >fixnum ] dip ] % writer-quot/check ;
+: instance-check-quot ( class -- quot )
+    {
+        { [ dup object bootstrap-word eq? ] [ drop [ ] ] }
+        { [ dup "coercer" word-prop ] [ "coercer" word-prop ] }
+        { [ dup integer bootstrap-word eq? ] [ drop [ >integer ] ] }
+        [ (instance-check-quot) ]
+    } cond ;
 
 GENERIC# writer-quot 1 ( class slot-spec -- quot )
 
 M: object writer-quot
-    nip [
-        {
-            { [ dup class>> object bootstrap-word eq? ] [ writer-quot/object ] }
-            { [ dup class>> "coercer" word-prop ] [ writer-quot/coerce ] }
-            { [ dup class>> fixnum bootstrap-word class<= ] [ writer-quot/fixnum ] }
-            [ writer-quot/check ]
-        } cond
-    ] [ ] make ;
+    nip
+    [ class>> instance-check-quot dup empty? [ [ dip ] curry ] unless ]
+    [ offset>> [ set-slot ] curry ]
+    bi append ;
 
 : writer-props ( slot-spec -- assoc )
     "writing" associate ;
@@ -173,7 +163,7 @@ M: class initial-value* no-initial-value ;
         { [ string bootstrap-word over class<= ] [ "" ] }
         { [ array bootstrap-word over class<= ] [ { } ] }
         { [ byte-array bootstrap-word over class<= ] [ B{ } ] }
-        { [ simple-alien bootstrap-word over class<= ] [ <bad-alien> ] }
+        { [ pinned-alien bootstrap-word over class<= ] [ <bad-alien> ] }
         { [ quotation bootstrap-word over class<= ] [ [ ] ] }
         [ dup initial-value* ]
     } cond nip ;

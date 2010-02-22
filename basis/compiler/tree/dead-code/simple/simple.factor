@@ -1,21 +1,13 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors words assocs sequences arrays namespaces
 fry locals definitions classes classes.algebra generic
-stack-checker.state
+stack-checker.dependencies
 stack-checker.backend
 compiler.tree
 compiler.tree.propagation.info
 compiler.tree.dead-code.liveness ;
 IN: compiler.tree.dead-code.simple
-
-GENERIC: flushable? ( word -- ? )
-
-M: predicate flushable? drop t ;
-
-M: word flushable? "flushable" word-prop ;
-
-M: method-body flushable? "method-generic" word-prop flushable? ;
 
 : flushable-call? ( #call -- ? )
     dup word>> dup flushable? [
@@ -28,9 +20,7 @@ M: method-body flushable? "method-generic" word-prop flushable? ;
 M: #call mark-live-values*
     dup flushable-call? [ drop ] [ look-at-inputs ] if ;
 
-M: #alien-invoke mark-live-values* look-at-inputs ;
-
-M: #alien-indirect mark-live-values* look-at-inputs ;
+M: #alien-node mark-live-values* look-at-inputs ;
 
 M: #return mark-live-values* look-at-inputs ;
 
@@ -47,9 +37,7 @@ M: #call compute-live-values* nip look-at-inputs ;
 M: #shuffle compute-live-values*
     mapping>> at look-at-value ;
 
-M: #alien-invoke compute-live-values* nip look-at-inputs ;
-
-M: #alien-indirect compute-live-values* nip look-at-inputs ;
+M: #alien-node compute-live-values* nip look-at-inputs ;
 
 : filter-mapping ( assoc -- assoc' )
     live-values get '[ drop _ key? ] assoc-filter ;
@@ -71,14 +59,13 @@ M: #alien-indirect compute-live-values* nip look-at-inputs ;
     filter-corresponding zip #data-shuffle ; inline
 
 :: drop-dead-values ( outputs -- #shuffle )
-    [let* | new-outputs [ outputs make-values ]
-            live-outputs [ outputs filter-live ] |
-        new-outputs
-        live-outputs
-        outputs
-        new-outputs
-        drop-values
-    ] ;
+    outputs length make-values :> new-outputs
+    outputs filter-live :> live-outputs
+    new-outputs
+    live-outputs
+    outputs
+    new-outputs
+    drop-values ;
 
 : drop-dead-outputs ( node -- #shuffle )
     dup out-d>> drop-dead-values [ in-d>> >>out-d drop ] keep ;
@@ -103,7 +90,7 @@ M: #push remove-dead-code*
     ] [ drop f ] if ;
 
 : remove-flushable-call ( #call -- node )
-    [ word>> flushed-dependency depends-on ]
+    [ word>> depends-on-flushable ]
     [ in-d>> #drop remove-dead-code* ]
     bi ;
 
@@ -128,8 +115,5 @@ M: #terminate remove-dead-code*
     [ filter-live ] change-in-d
     [ filter-live ] change-in-r ;
 
-M: #alien-invoke remove-dead-code*
-    maybe-drop-dead-outputs ;
-
-M: #alien-indirect remove-dead-code*
+M: #alien-node remove-dead-code*
     maybe-drop-dead-outputs ;

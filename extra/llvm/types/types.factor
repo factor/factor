@@ -242,4 +242,4 @@ Program = Type
 
 ;EBNF
 
-SYNTAX: TYPE: ";" parse-multiline-string parse-type parsed ; 
+SYNTAX: TYPE: ";" parse-multiline-string parse-type suffix! ; 

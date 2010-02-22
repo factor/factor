@@ -113,7 +113,7 @@ PRIVATE>
 M:: lsb0-bit-writer poke ( value n bs -- )
     value n <widthed> :> widthed
     widthed
-    bs widthed>> #bits>> 8 swap - split-widthed :> remainder :> byte
+    bs widthed>> #bits>> 8 swap - split-widthed :> ( byte remainder )
     byte bs widthed>> |widthed :> new-byte
     new-byte #bits>> 8 = [
         new-byte bits>> bs bytes>> push
@@ -143,7 +143,7 @@ ERROR: not-enough-bits n bit-reader ;
     neg shift n bits ;
 
 :: adjust-bits ( n bs -- )
-    n 8 /mod :> #bits :> #bytes
+    n 8 /mod :> ( #bytes #bits )
     bs [ #bytes + ] change-byte-pos
     bit-pos>> #bits + dup 8 >= [
         8 - bs (>>bit-pos)

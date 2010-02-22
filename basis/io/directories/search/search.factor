@@ -1,16 +1,16 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays continuations deques dlists fry
-io.directories io.files io.files.info io.pathnames kernel
-sequences system vocabs.loader locals math namespaces
-sorting assocs calendar threads io math.parser unicode.case ;
+USING: accessors arrays assocs continuations deques dlists fry
+io.backend io.directories io.files.info io.pathnames kernel
+locals math sequences sorting system unicode.case vocabs.loader ;
 IN: io.directories.search
 
 : qualified-directory-entries ( path -- seq )
-    dup directory-entries
-    [ [ append-path ] change-name ] with map ;
+    absolute-path
+    dup directory-entries [ [ append-path ] change-name ] with map ;
 
 : qualified-directory-files ( path -- seq )
+    absolute-path
     dup directory-files [ append-path ] with map ;
 
 : with-qualified-directory-files ( path quot -- )
@@ -64,17 +64,17 @@ PRIVATE>
     setup-traversal iterate-directory-entries drop ; inline
 
 : recursive-directory-files ( path bfs? -- paths )
-    [ ] accumulator [ each-file ] dip ; inline
+    [ ] collector [ each-file ] dip ; inline
 
 : recursive-directory-entries ( path bfs? -- directory-entries )
-    [ ] accumulator [ each-directory-entry ] dip ; inline
+    [ ] collector [ each-directory-entry ] dip ; inline
 
 : find-file ( path bfs? quot -- path/f )
     [ <directory-iterator> ] dip
     [ keep and ] curry iterate-directory ; inline
 
 : find-all-files ( path quot -- paths/f )
-    [ f <directory-iterator> ] dip pusher
+    [ f <directory-iterator> ] dip selector
     [ [ f ] compose iterate-directory drop ] dip ; inline
 
 ERROR: file-not-found path bfs? quot ;

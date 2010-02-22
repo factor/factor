@@ -55,12 +55,15 @@ ARTICLE: "math-vectors-shuffle" "Vector shuffling, packing, and unpacking"
 "These operations are primarily meant to be used with " { $vocab-link "math.vectors.simd" } " types. The software fallbacks for types not supported by hardware will not perform well."
 }
 $nl
-{ $subsection vshuffle }
-{ $subsection vbroadcast }
-{ $subsection hlshift } 
-{ $subsection hrshift }
-{ $subsection vmerge }
-{ $subsection (vmerge) } ;
+{ $subsections
+    vshuffle
+    vbroadcast
+    hlshift
+    hrshift
+    vmerge
+    (vmerge)
+}
+"See the " { $vocab-link "math.vectors.conversion" } " vocabulary for packing, unpacking, and converting vectors." ;
 
 ARTICLE: "math-vectors-logic" "Vector component- and bit-wise logic"
 { $notes
@@ -98,6 +101,7 @@ $nl
     vxor
     vnot
     v?
+    vif
 }
 "Entire vector tests:"
 { $subsections
@@ -121,8 +125,6 @@ ARTICLE: "math-vectors-simd-logic" "Componentwise logic with SIMD vectors"
 "Processor SIMD units supported by the " { $vocab-link "math.vectors.simd" } " vocabulary represent boolean values as bitmasks, where a true result's binary representation is all ones and a false representation is all zeroes. This is the format in which results from comparison words such as " { $link v= } " return their results and in which logic and test words such as " { $link vand } " and " { $link vall? } " take their inputs when working with SIMD types. For a float vector, false will manifest itself as " { $snippet "0.0" } " and true as a " { $link POSTPONE: NAN: } " literal with a string of set bits in its payload:"
 { $example
 """USING: math.vectors math.vectors.simd prettyprint ;
-FROM: alien.c-types => float ;
-SIMD: float
 
 float-4{ 1.0 2.0 3.0 0/0. } float-4{ 1.0 -2.0 3.0 0/0. } v= ."""
 """float-4{ NAN: fffffe0000000 0.0 NAN: fffffe0000000 0.0 }"""
@@ -130,8 +132,6 @@ float-4{ 1.0 2.0 3.0 0/0. } float-4{ 1.0 -2.0 3.0 0/0. } v= ."""
 "For an integer vector, false will manifest as " { $snippet "0" } " and true as " { $snippet "-1" } " (for signed vectors) or the largest representable value of the element type (for unsigned vectors):"
 { $example
 """USING: math.vectors math.vectors.simd prettyprint alien.c-types ;
-SIMD: int
-SIMD: uchar
 
 int-4{ 1 2 3 0 } int-4{ 1 -2 3 4 } v=
 uchar-16{  0  1  2  3  4  5 6 7 8 9 10 11 12 13 14 15 }
@@ -143,7 +143,6 @@ uchar-16{ 255 255 255 255 255 255 255 255 0 0 0 0 0 0 0 0 }"""
 "This differs from Factor's native representation of boolean values, where " { $link f } " is false and every other value (including " { $snippet "0" } " and " { $snippet "0.0" } ") is true. To make it easy to construct literal SIMD masks, " { $link t } " and " { $link f } " are accepted inside SIMD literal syntax and expand to the proper true or false representation for the underlying type:"
 { $example
 """USING: math.vectors math.vectors.simd prettyprint alien.c-types ;
-SIMD: int
 
 int-4{ f f t f } ."""
 """int-4{ 0 0 -1 0 }""" }
@@ -212,36 +211,36 @@ HELP: vtruncate
 { $description "Truncates each element of " { $snippet "u" } "." } ;
 
 HELP: n+v
-{ $values { "n" "a number" } { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
+{ $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Adds " { $snippet "n" } " to each element of " { $snippet "u" } "." } ;
 
 HELP: v+n
-{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "v" "a sequence of numbers" } }
+{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
 { $description "Adds " { $snippet "n" } " to each element of " { $snippet "u" } "." } ;
 
 HELP: n-v
-{ $values { "n" "a number" } { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
+{ $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Subtracts each element of " { $snippet "u" } " from " { $snippet "n" } "." } ;
 
 HELP: v-n
-{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "v" "a sequence of numbers" } }
+{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
 { $description "Subtracts " { $snippet "n" } " from each element of " { $snippet "u" } "." } ;
 
 HELP: n*v
-{ $values { "n" "a number" } { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
+{ $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Multiplies each element of " { $snippet "u" } " by " { $snippet "n" } "." } ;
 
 HELP: v*n
-{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "v" "a sequence of numbers" } }
+{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
 { $description "Multiplies each element of " { $snippet "u" } " by " { $snippet "n" } "." } ;
 
 HELP: n/v
-{ $values { "n" "a number" } { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
+{ $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Divides " { $snippet "n" } " by each element of " { $snippet "u" } "." }
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
 
 HELP: v/n
-{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "v" "a sequence of numbers" } }
+{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
 { $description "Divides each element of " { $snippet "u" } " by " { $snippet "n" } "." }
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
 
@@ -255,7 +254,7 @@ HELP: v-
 
 HELP: v+-
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
-{ $description "Adds and subtracts alternate elements of " { $snippet "v" } " and " { $snippet "u" } " component-wise." }
+{ $description "Adds and subtracts alternate elements of " { $snippet "v" } " and " { $snippet "u" } " component-wise. Elements at even indexes are subtracted, while elements at odd indexes are added." }
 { $examples
     { $example
         "USING: math.vectors prettyprint ;"
@@ -409,21 +408,45 @@ HELP: vbroadcast
 { $examples
     { $example
         "USING: alien.c-types math.vectors math.vectors.simd" "prettyprint ;"
-        "SIMD: int"
         "int-4{ 69 42 911 13 } 2 vbroadcast ."
         "int-4{ 911 911 911 911 }"
     }
 } ;
 
 HELP: vshuffle
-{ $values { "u" "a SIMD array" } { "perm" "an array of integers" } { "v" "a SIMD array" } }
-{ $description "Permutes the elements of a SIMD array. Duplicate entries are allowed in the permutation." }
+{ $values { "u" "a SIMD array" } { "perm" "an array of integers, or a byte-array" } { "v" "a SIMD array" } }
+{ $description "Permutes the elements of a SIMD array. Duplicate entries are allowed in the permutation. The " { $snippet "perm" } " argument can have one of two forms:"
+{ $list
+{ "A literal array of integers of the same length as the vector. This will perform a static, elementwise shuffle." }
+{ "A byte array or SIMD vector of the same byte length as the vector. This will perform a variable bytewise shuffle." }
+} }
 { $examples
     { $example
         "USING: alien.c-types math.vectors math.vectors.simd" "prettyprint ;"
-        "SIMD: int"
         "int-4{ 69 42 911 13 } { 1 3 2 3 } vshuffle ."
         "int-4{ 42 13 911 13 }"
+    }
+    { $example
+        "USING: alien.c-types combinators math.vectors math.vectors.simd"
+        "namespaces prettyprint prettyprint.config ;"
+        "IN: scratchpad"
+        ""
+        ": endian-swap ( size -- vector )"
+        "    {"
+        "        { 1 [ uchar-16{ 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 } ] }"
+        "        { 2 [ uchar-16{ 1 0 3 2 5 4 7 6 9 8 11 10 13 12 15 14 } ] }"
+        "        { 4 [ uchar-16{ 3 2 1 0 7 6 5 4 11 10 9 8 15 14 13 12 } ] }"
+        "    } case ;"
+        ""
+        "int-4{ HEX: 11223344 HEX: 11223344 HEX: 11223344 HEX: 11223344 }"
+        "4 endian-swap vshuffle"
+        "16 number-base [ . ] with-variable"
+        """int-4{
+    HEX: 44332211
+    HEX: 44332211
+    HEX: 44332211
+    HEX: 44332211
+}"""
     }
 } ;
 
@@ -504,9 +527,18 @@ HELP: vnot
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: v?
-{ $values { "mask" "a sequence of booleans" } { "true" "a sequence of numbers" } { "false" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "mask" "a sequence of booleans" } { "true" "a sequence of numbers" } { "false" "a sequence of numbers" } { "result" "a sequence of numbers" } }
 { $description "Creates a new sequence by selecting elements from the " { $snippet "true" } " and " { $snippet "false" } " sequences based on whether the corresponding bits of the " { $snippet "mask" } " sequence are set or not." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
+
+HELP: vif
+{ $values { "mask" "a sequence of booleans" } { "true-quot" { $quotation "( -- vector )" } } { "false-quot" { $quotation "( -- vector )" } } { "result" "a sequence" } }
+{ $description "If all of the elements of " { $snippet "mask" } " are true, " { $snippet "true-quot" } " is called and its output value returned. If all of the elements of " { $snippet "mask" } " are false, " { $snippet "false-quot" } " is called and its output value returned. Otherwise, both quotations are called and " { $snippet "mask" } " is used to select elements from each output as with " { $link v? } "." }
+{ $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types."
+$nl
+"For most conditional SIMD code, unless a case is exceptionally expensive to compute, it is usually most efficient to just compute all cases and blend them with " { $link v? } " instead of using " { $snippet "vif" } "." } ;
+
+{ v? vif } related-words
 
 HELP: vany?
 { $values { "v" "a sequence of booleans" } { "?" "a boolean" } }

@@ -3,8 +3,8 @@
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs cocoa kernel math cocoa.messages cocoa.subclassing
 cocoa.classes cocoa.views cocoa.application cocoa.pasteboard
-cocoa.types cocoa.windows sequences io.encodings.utf8 ui ui.private
-ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
+cocoa.runtime cocoa.types cocoa.windows sequences io.encodings.utf8
+ui ui.private ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
 core-foundation.strings core-graphics core-graphics.types threads
 combinators math.rectangles ;
 IN: ui.backend.cocoa.views
@@ -148,76 +148,76 @@ CLASS: {
 }
 
 ! Rendering
-{ "drawRect:" "void" { "id" "SEL" "NSRect" }
+{ "drawRect:" void { id SEL NSRect }
     [ 2drop window relayout-1 yield ]
 }
 
 ! Events
-{ "acceptsFirstMouse:" "char" { "id" "SEL" "id" }
+{ "acceptsFirstMouse:" char { id SEL id }
     [ 3drop 1 ]
 }
 
-{ "mouseEntered:" "void" { "id" "SEL" "id" }
+{ "mouseEntered:" void { id SEL id }
     [ nip send-mouse-moved ]
 }
 
-{ "mouseExited:" "void" { "id" "SEL" "id" }
+{ "mouseExited:" void { id SEL id }
     [ 3drop forget-rollover ]
 }
 
-{ "mouseMoved:" "void" { "id" "SEL" "id" }
+{ "mouseMoved:" void { id SEL id }
     [ nip send-mouse-moved ]
 }
 
-{ "mouseDragged:" "void" { "id" "SEL" "id" }
+{ "mouseDragged:" void { id SEL id }
     [ nip send-mouse-moved ]
 }
 
-{ "rightMouseDragged:" "void" { "id" "SEL" "id" }
+{ "rightMouseDragged:" void { id SEL id }
     [ nip send-mouse-moved ]
 }
 
-{ "otherMouseDragged:" "void" { "id" "SEL" "id" }
+{ "otherMouseDragged:" void { id SEL id }
     [ nip send-mouse-moved ]
 }
 
-{ "mouseDown:" "void" { "id" "SEL" "id" }
+{ "mouseDown:" void { id SEL id }
     [ nip send-button-down$ ]
 }
 
-{ "mouseUp:" "void" { "id" "SEL" "id" }
+{ "mouseUp:" void { id SEL id }
     [ nip send-button-up$ ]
 }
 
-{ "rightMouseDown:" "void" { "id" "SEL" "id" }
+{ "rightMouseDown:" void { id SEL id }
     [ nip send-button-down$ ]
 }
 
-{ "rightMouseUp:" "void" { "id" "SEL" "id" }
+{ "rightMouseUp:" void { id SEL id }
     [ nip send-button-up$ ]
 }
 
-{ "otherMouseDown:" "void" { "id" "SEL" "id" }
+{ "otherMouseDown:" void { id SEL id }
     [ nip send-button-down$ ]
 }
 
-{ "otherMouseUp:" "void" { "id" "SEL" "id" }
+{ "otherMouseUp:" void { id SEL id }
     [ nip send-button-up$ ]
 }
 
-{ "scrollWheel:" "void" { "id" "SEL" "id" }
+{ "scrollWheel:" void { id SEL id }
     [ nip send-wheel$ ]
 }
 
-{ "keyDown:" "void" { "id" "SEL" "id" }
+{ "keyDown:" void { id SEL id }
     [ nip send-key-down-event ]
 }
 
-{ "keyUp:" "void" { "id" "SEL" "id" }
+{ "keyUp:" void { id SEL id }
     [ nip send-key-up-event ]
 }
 
-{ "validateUserInterfaceItem:" "char" { "id" "SEL" "id" }
+{ "validateUserInterfaceItem:" char { id SEL id }
     [
         nip -> action
         2dup [ window ] [ utf8 alien>string ] bi* validate-action
@@ -225,57 +225,57 @@ CLASS: {
     ]
 }
 
-{ "undo:" "id" { "id" "SEL" "id" }
+{ "undo:" id { id SEL id }
     [ nip undo-action send-action$ ]
 }
 
-{ "redo:" "id" { "id" "SEL" "id" }
+{ "redo:" id { id SEL id }
     [ nip redo-action send-action$ ]
 }
 
-{ "cut:" "id" { "id" "SEL" "id" }
+{ "cut:" id { id SEL id }
     [ nip cut-action send-action$ ]
 }
 
-{ "copy:" "id" { "id" "SEL" "id" }
+{ "copy:" id { id SEL id }
     [ nip copy-action send-action$ ]
 }
 
-{ "paste:" "id" { "id" "SEL" "id" }
+{ "paste:" id { id SEL id }
     [ nip paste-action send-action$ ]
 }
 
-{ "delete:" "id" { "id" "SEL" "id" }
+{ "delete:" id { id SEL id }
     [ nip delete-action send-action$ ]
 }
 
-{ "selectAll:" "id" { "id" "SEL" "id" }
+{ "selectAll:" id { id SEL id }
     [ nip select-all-action send-action$ ]
 }
 
-{ "newDocument:" "id" { "id" "SEL" "id" }
+{ "newDocument:" id { id SEL id }
     [ nip new-action send-action$ ]
 }
 
-{ "openDocument:" "id" { "id" "SEL" "id" }
+{ "openDocument:" id { id SEL id }
     [ nip open-action send-action$ ]
 }
 
-{ "saveDocument:" "id" { "id" "SEL" "id" }
+{ "saveDocument:" id { id SEL id }
     [ nip save-action send-action$ ]
 }
 
-{ "saveDocumentAs:" "id" { "id" "SEL" "id" }
+{ "saveDocumentAs:" id { id SEL id }
     [ nip save-as-action send-action$ ]
 }
 
-{ "revertDocumentToSaved:" "id" { "id" "SEL" "id" }
+{ "revertDocumentToSaved:" id { id SEL id }
     [ nip revert-action send-action$ ]
 }
 
 ! Multi-touch gestures: this is undocumented.
 ! http://cocoadex.com/2008/02/nsevent-modifications-swipe-ro.html
-{ "magnifyWithEvent:" "void" { "id" "SEL" "id" }
+{ "magnifyWithEvent:" void { id SEL id }
     [
         nip
         dup -> deltaZ sgn {
@@ -286,7 +286,7 @@ CLASS: {
     ]
 }
 
-{ "swipeWithEvent:" "void" { "id" "SEL" "id" }
+{ "swipeWithEvent:" void { id SEL id }
     [
         nip
         dup -> deltaX sgn {
@@ -305,14 +305,14 @@ CLASS: {
     ]
 }
 
-! "rotateWithEvent:" "void" { "id" "SEL" "id" }}
+! "rotateWithEvent:" void { id SEL id }}
 
-{ "acceptsFirstResponder" "char" { "id" "SEL" }
+{ "acceptsFirstResponder" char { id SEL }
     [ 2drop 1 ]
 }
 
 ! Services
-{ "validRequestorForSendType:returnType:" "id" { "id" "SEL" "id" "id" }
+{ "validRequestorForSendType:returnType:" id { id SEL id id }
     [
         ! We return either self or nil
         [ over window-focus ] 2dip
@@ -320,7 +320,7 @@ CLASS: {
     ]
 }
 
-{ "writeSelectionToPasteboard:types:" "char" { "id" "SEL" "id" "id" }
+{ "writeSelectionToPasteboard:types:" char { id SEL id id }
     [
         CF>string-array NSStringPboardType swap member? [
             [ drop window-focus gadget-selection ] dip over
@@ -329,7 +329,7 @@ CLASS: {
     ]
 }
 
-{ "readSelectionFromPasteboard:" "char" { "id" "SEL" "id" }
+{ "readSelectionFromPasteboard:" char { id SEL id }
     [
         pasteboard-string dup [
             [ drop window ] dip swap user-input 1
@@ -338,60 +338,60 @@ CLASS: {
 }
 
 ! Text input
-{ "insertText:" "void" { "id" "SEL" "id" }
+{ "insertText:" void { id SEL id }
     [ nip CF>string swap window user-input ]
 }
 
-{ "hasMarkedText" "char" { "id" "SEL" }
+{ "hasMarkedText" char { id SEL }
     [ 2drop 0 ]
 }
 
-{ "markedRange" "NSRange" { "id" "SEL" }
+{ "markedRange" NSRange { id SEL }
     [ 2drop 0 0 <NSRange> ]
 }
 
-{ "selectedRange" "NSRange" { "id" "SEL" }
+{ "selectedRange" NSRange { id SEL }
     [ 2drop 0 0 <NSRange> ]
 }
 
-{ "setMarkedText:selectedRange:" "void" { "id" "SEL" "id" "NSRange" }
+{ "setMarkedText:selectedRange:" void { id SEL id NSRange }
     [ 2drop 2drop ]
 }
 
-{ "unmarkText" "void" { "id" "SEL" }
+{ "unmarkText" void { id SEL }
     [ 2drop ]
 }
 
-{ "validAttributesForMarkedText" "id" { "id" "SEL" }
+{ "validAttributesForMarkedText" id { id SEL }
     [ 2drop NSArray -> array ]
 }
 
-{ "attributedSubstringFromRange:" "id" { "id" "SEL" "NSRange" }
+{ "attributedSubstringFromRange:" id { id SEL NSRange }
     [ 3drop f ]
 }
 
-{ "characterIndexForPoint:" "NSUInteger" { "id" "SEL" "NSPoint" }
+{ "characterIndexForPoint:" NSUInteger { id SEL NSPoint }
     [ 3drop 0 ]
 }
 
-{ "firstRectForCharacterRange:" "NSRect" { "id" "SEL" "NSRange" }
+{ "firstRectForCharacterRange:" NSRect { id SEL NSRange }
     [ 3drop 0 0 0 0 <CGRect> ]
 }
 
-{ "conversationIdentifier" "NSInteger" { "id" "SEL" }
+{ "conversationIdentifier" NSInteger { id SEL }
     [ drop alien-address ]
 }
 
 ! Initialization
-{ "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }
+{ "updateFactorGadgetSize:" void { id SEL id }
     [ 2drop [ window ] [ view-dim ] bi >>dim drop yield ]
 }
 
-{ "doCommandBySelector:" "void" { "id" "SEL" "SEL" }
+{ "doCommandBySelector:" void { id SEL SEL }
     [ 3drop ]
 }
 
-{ "initWithFrame:pixelFormat:" "id" { "id" "SEL" "NSRect" "id" }
+{ "initWithFrame:pixelFormat:" id { id SEL NSRect id }
     [
         [ drop ] 2dip
         SUPER-> initWithFrame:pixelFormat:
@@ -399,13 +399,13 @@ CLASS: {
     ]
 }
 
-{ "isOpaque" "char" { "id" "SEL" }
+{ "isOpaque" char { id SEL }
     [
         2drop 0
     ]
 }
 
-{ "dealloc" "void" { "id" "SEL" }
+{ "dealloc" void { id SEL }
     [
         drop
         [ unregister-window ]
@@ -430,19 +430,19 @@ CLASS: {
     { +name+ "FactorWindowDelegate" }
 }
 
-{ "windowDidMove:" "void" { "id" "SEL" "id" }
+{ "windowDidMove:" void { id SEL id }
     [
         2nip -> object [ -> contentView window ] keep save-position
     ]
 }
 
-{ "windowDidBecomeKey:" "void" { "id" "SEL" "id" }
+{ "windowDidBecomeKey:" void { id SEL id }
     [
         2nip -> object -> contentView window focus-world
     ]
 }
 
-{ "windowDidResignKey:" "void" { "id" "SEL" "id" }
+{ "windowDidResignKey:" void { id SEL id }
     [
         forget-rollover
         2nip -> object -> contentView
@@ -452,13 +452,13 @@ CLASS: {
     ]
 }
 
-{ "windowShouldClose:" "char" { "id" "SEL" "id" }
+{ "windowShouldClose:" char { id SEL id }
     [
         3drop 1
     ]
 }
 
-{ "windowWillClose:" "void" { "id" "SEL" "id" }
+{ "windowWillClose:" void { id SEL id }
     [
         2nip -> object -> contentView window ungraft
     ]

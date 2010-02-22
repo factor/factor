@@ -96,9 +96,9 @@ MACRO: <experiment> ( word -- )
     ] [ drop ] if ; inline
 
 : parse-test ( accum word -- accum )
-    literalize parsed
-    lexer get line>> parsed
-    \ experiment parsed ; inline
+    literalize suffix!
+    lexer get line>> suffix!
+    \ experiment suffix! ; inline
 
 <<
 
@@ -110,19 +110,22 @@ SYNTAX: TEST:
 
 >>
 
+PRIVATE>
+
 : run-test-file ( path -- )
     dup file [
         test-failures get file get +test-failure+ delete-file-errors
         '[ _ run-file ] [ file-failure ] recover
     ] with-variable ;
 
-: run-vocab-tests ( vocab -- )
-    dup vocab source-loaded?>> [
-        vocab-tests [ run-test-file ] each
-    ] [ drop ] if ;
+<PRIVATE
 
-: traceback-button. ( failure -- )
-    "[" write [ "Traceback" ] dip continuation>> write-object "]" print ;
+: run-vocab-tests ( vocab -- )
+    vocab dup [
+        dup source-loaded?>> [
+            vocab-tests [ run-test-file ] each
+        ] [ drop ] if
+    ] [ drop ] if ;
 
 PRIVATE>
 
@@ -137,7 +140,7 @@ M: test-failure error. ( error -- )
         [ error-location print nl ]
         [ asset>> [ experiment. nl ] when* ]
         [ error>> error. ]
-        [ traceback-button. ]
+        [ continuation>> traceback-link. ]
     } cleave ;
 
 : :test-failures ( -- ) test-failures get errors. ;

@@ -12,10 +12,10 @@ HELP: do-not-compile
     }
 } ;
 
-HELP: literal-expected
-{ $error-description "Thrown when inference encounters a combinator or macro being applied to a value which is not known to be a literal, or constructed in a manner which can be analyzed statically. Such code needs changes before it can compile and run. See " { $link "inference-combinators" } " and " { $link "inference-escape" } " for details." }
+HELP: unknown-macro-input
+{ $error-description "Thrown when inference encounters a combinator or macro being applied to an input parameter of a non-" { $link POSTPONE: inline } " word. The word needs to be declared " { $link POSTPONE: inline } " before its callers can compile and run. See " { $link "inference-combinators" } " and " { $link "inference-escape" } " for details." }
 { $examples
-    "In this example, the words being defined cannot be called, because they fail to compile with a " { $link literal-expected } " error:"
+    "In this example, the words being defined cannot be called, because they fail to compile with a " { $link unknown-macro-input } " error:"
     { $code
         ": bad-example ( quot -- )"
         "    [ call ] [ call ] bi ;"
@@ -38,6 +38,27 @@ HELP: literal-expected
         ""
         ": usage ( -- )"
         "    10 [ 2 * ] good-example . ;"
+    }
+} ;
+
+HELP: bad-macro-input
+{ $error-description "Thrown when inference encounters a combinator or macro being applied to a value which is not known at compile time. Such code needs changes before it can compile and run. See " { $link "inference-combinators" } " and " { $link "inference-escape" } " for details." }
+{ $examples
+    "In this example, the words being defined cannot be called, because they fail to compile with a " { $link bad-macro-input } " error:"
+    { $code
+        ": bad-example ( quot -- )"
+        "    [ . ] append call ; inline"
+        ""
+        ": usage ( -- )"
+        "    2 2 [ + ] bad-example ;"
+    }
+    "One fix is to use " { $link compose } " instead of " { $link append } ":"
+    { $code
+        ": good-example ( quot -- )"
+        "    [ . ] compose call ; inline"
+        ""
+        ": usage ( -- )"
+        "    2 2 [ + ] good-example ;"
     }
 } ;
 
@@ -113,15 +134,16 @@ HELP: inconsistent-recursive-call-error
 } ;
 
 ARTICLE: "inference-errors" "Stack checker errors"
-"These " { $link "inference" } " failure conditions are reported in one of two ways:"
+"Stack effect checking failure conditions are reported in one of two ways:"
 { $list
-    { { $link "tools.inference" } " throws them as errors" }
-    { "The " { $link "compiler" } " reports them via " { $link "tools.errors" } }
+    { { $link "tools.inference" } " report them when fed quotations interactively" }
+    { "The " { $link "compiler" } " reports them while compiling words, via the " { $link "tools.errors" } " mechanism" }
 }
 "Errors thrown when insufficient information is available to calculate the stack effect of a call to a combinator or macro (see " { $link "inference-combinators" } "):"
 { $subsections
     do-not-compile
-    literal-expected
+    unknown-macro-input
+    bad-macro-input
 }
 "Error thrown when a word's stack effect declaration does not match the composition of the stack effects of its factors:"
 { $subsections effect-error }

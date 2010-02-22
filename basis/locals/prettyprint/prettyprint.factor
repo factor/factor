@@ -27,22 +27,17 @@ M: lambda pprint*
 
 : pprint-let ( let word -- )
     pprint-word
-    [ body>> ] [ bindings>> ] bi
-    \ | pprint-word
-    t <inset
-    <block
-    [ <block [ pprint-var ] dip pprint* block> ] assoc-each
-    block>
-    \ | pprint-word
-    <block pprint-elements block>
-    block>
+    <block body>> pprint-elements block>
     \ ] pprint-word ;
 
 M: let pprint* \ [let pprint-let ;
 
-M: wlet pprint* \ [wlet pprint-let ;
-
-M: let* pprint* \ [let* pprint-let ;
-
 M: def pprint*
-    <block \ :> pprint-word local>> pprint-word block> ;
+    dup local>> word?
+    [ <block \ :> pprint-word local>> pprint-var block> ]
+    [ pprint-tuple ] if ;
+
+M: multi-def pprint*
+    dup locals>> [ word? ] all?
+    [ <block \ :> pprint-word "(" text locals>> [ pprint-var ] each ")" text block> ]
+    [ pprint-tuple ] if ;

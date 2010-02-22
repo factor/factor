@@ -7,17 +7,19 @@ IN: tools.deploy.test
     [ "test.image" temp-file delete-file ] ignore-errors
     "resource:" [
         [ vm "test.image" temp-file ] dip
-        dup deploy-config make-deploy-image
+        dup deploy-config make-deploy-image drop
     ] with-directory ;
 
-: small-enough? ( n -- ? )
+ERROR: image-too-big actual-size max-size ;
+
+: small-enough? ( n -- )
     [ "test.image" temp-file file-info size>> ]
     [
         cell 4 / *
         cpu ppc? [ 100000 + ] when
         os windows? [ 150000 + ] when
     ] bi*
-    <= ;
+    2dup <= [ 2drop ] [ image-too-big ] if ;
 
 : deploy-test-command ( -- args )
     os macosx?

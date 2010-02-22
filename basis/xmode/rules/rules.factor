@@ -43,7 +43,7 @@ MEMO: standard-rule-set ( id -- ruleset )
 
 : ?push-all ( seq1 seq2 -- seq1+seq2 )
     [
-        over [ [ V{ } like ] dip over push-all ] [ nip ] if
+        over [ [ V{ } like ] dip append! ] [ nip ] if
     ] when* ;
 
 : rule-set-no-word-sep* ( ruleset -- str )

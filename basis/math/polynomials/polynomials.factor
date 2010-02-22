@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel make math math.order math.vectors sequences
-    splitting vectors macros combinators ;
+splitting vectors macros combinators math.bits ;
 IN: math.polynomials
 
 <PRIVATE
@@ -20,23 +20,33 @@ PRIVATE>
 
 : p= ( p q -- ? ) pextend = ;
 
-: ptrim ( p -- p )
+: ptrim ( p -- q )
     dup length 1 = [ [ zero? ] trim-tail ] unless ;
 
-: 2ptrim ( p q -- p q ) [ ptrim ] bi@ ;
+: 2ptrim ( p q -- p' q' ) [ ptrim ] bi@ ;
 : p+ ( p q -- r ) pextend v+ ;
 : p- ( p q -- r ) pextend v- ;
 : n*p ( n p -- n*p ) n*v ;
 
-: pextend-conv ( p q -- p q )
+: pextend-conv ( p q -- p' q' )
     2dup [ length ] bi@ + 1 - 2pad-tail [ >vector ] bi@ ;
 
 : p* ( p q -- r )
-    2unempty pextend-conv <reversed> dup length
+    2unempty pextend-conv <reversed> dup length iota
     [ over length pick <slice> pick [ * ] 2map sum ] map 2nip reverse ;
 
 : p-sq ( p -- p^2 )
     dup p* ;
+
+ERROR: negative-power-polynomial p n ;
+
+: (p^) ( p n  -- p^n )
+    make-bits { 1 } [ [ over p* ] when [ p-sq ] dip ] reduce nip ;
+
+: p^ ( p n -- p^n )
+    dup 0 >=
+    [ (p^) ]
+    [ negative-power-polynomial ] if ;
 
 <PRIVATE
 

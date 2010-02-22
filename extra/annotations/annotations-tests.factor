@@ -23,5 +23,8 @@ IN: annotations.tests
     } 1&&
 ] unit-test
 
-[ { four three } ] [ BROKENs natural-sort ] unit-test
-[ { five } ] [ TODOs ] unit-test
+[ t ] [
+    BROKENs { [ \ four swap member? ] [ \ three swap member? ] } 1&&
+] unit-test
+
+[ t ] [ TODOs \ five swap member? ] unit-test

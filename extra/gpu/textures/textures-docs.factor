@@ -88,6 +88,13 @@ HELP: <texture-rectangle>
 { $description "Creates a new rectangle texture. The new texture starts out with no image data; " { $link allocate-texture } " or " { $link allocate-texture-image } " must be used to allocate memory for the texture." }
 { $notes "Rectangle textures require OpenGL 3.1 or the " { $snippet "GL_ARB_texture_rectangle" } " extension." } ;
 
+HELP: allocate-compressed-texture
+{ $values
+    { "tdt" texture-data-target } { "level" integer } { "dim" "an " { $link integer } " or sequence of " { $link integer } "s" } { "compressed-data" compressed-texture-data }
+}
+{ $description "Allocates a new block of GPU memory for the " { $snippet "level" } "th level of detail of a " { $link texture-data-target } ". The new data is initialized with compressed texture data from the given " { $link compressed-texture-data } " object." }
+{ $notes "Using a " { $link buffer-ptr } " as the " { $snippet "ptr" } " of a " { $snippet "compressed-texture-data" } " object requires OpenGL 2.1 or later or the " { $snippet "GL_ARB_pixel_buffer_object" } " extension." } ;
+
 HELP: allocate-texture
 { $values
     { "tdt" texture-data-target } { "level" integer } { "dim" "an " { $link integer } " or sequence of " { $link integer } "s" } { "data" { $maybe texture-data } }
@@ -101,7 +108,7 @@ HELP: allocate-texture-image
 }
 { $description "Allocates a new block of GPU memory for the " { $snippet "level" } "th level of detail of a " { $link texture-data-target } " and initializes it with the contents of an " { $link image } "." } ;
 
-{ allocate-texture allocate-texture-image } related-words
+{ allocate-compressed-texture allocate-texture allocate-texture-image } related-words
 
 HELP: clamp-texcoord-to-border
 { $class-description "This " { $link texture-wrap } " value clamps texture coordinates to a texture's border." } ;
@@ -140,6 +147,21 @@ HELP: image>texture-data
 }
 { $description "Constructs a " { $link texture-data } " tuple referencing the pixel data from an " { $link image } "." } ;
 
+HELP: read-compressed-texture
+{ $values
+    { "tdt" texture-data-target } { "level" integer }
+    { "byte-array" byte-array }
+}
+{ $description "Reads the entire compressed image for the " { $snippet "level" } "th level of detail of a texture into a new " { $link byte-array } ". The format of the data in the byte array is determined by the " { $link compressed-texture-format } " of the data originally allocated by " { $link allocate-compressed-texture } " for the texture." } ;
+
+HELP: read-compressed-texture-to
+{ $values
+    { "tdt" texture-data-target } { "level" integer }
+    { "gpu-data-ptr" byte-array }
+}
+{ $description "Reads the entire compressed image for the " { $snippet "level" } "th level of detail of a texture into the CPU or GPU memory referenced by " { $link gpu-data-ptr } ". The format of the written data is determined by the " { $link compressed-texture-format } " of the data originally allocated by " { $link allocate-compressed-texture } " for the texture." }
+{ $notes "Reading texture data into a GPU " { $snippet "buffer-ptr" } " requires OpenGL 2.1 or later or the " { $snippet "GL_ARB_pixel_buffer_object" } " extension." } ;
+
 HELP: read-texture
 { $values
     { "tdt" texture-data-target } { "level" integer }
@@ -158,10 +180,10 @@ HELP: read-texture-to
 { $values
     { "tdt" texture-data-target } { "level" integer } { "gpu-data-ptr" gpu-data-ptr }
 }
-{ $description "Reads the entire image for the " { $snippet "level" } "th level of detail of a texture into the CPU or GPU memory referenced by " { $link gpu-data-ptr } ". The format of the data in the byte array is determined by the " { $link component-order } " and " { $link component-type } " of the texture." }
+{ $description "Reads the entire image for the " { $snippet "level" } "th level of detail of a texture into the CPU or GPU memory referenced by " { $link gpu-data-ptr } ". The format of the written data is determined by the " { $link component-order } " and " { $link component-type } " of the texture." }
 { $notes "Reading texture data into a GPU " { $snippet "buffer-ptr" } " requires OpenGL 2.1 or later or the " { $snippet "GL_ARB_pixel_buffer_object" } " extension." } ;
 
-{ read-texture read-texture-image read-texture-to } related-words
+{ read-compressed-texture read-compressed-texture-to read-texture read-texture-image read-texture-to } related-words
 
 HELP: repeat-texcoord
 { $class-description "This " { $link texture-wrap } " value causes the texture image to be repeated through texture coordinate space." } ;
@@ -256,6 +278,13 @@ HELP: texture-dim
 }
 { $description "Returns the dimensions of the memory allocated for the " { $snippet "level" } "th level of detail of the given " { $link texture-data-target } "." } ;
 
+HELP: compressed-texture-data-size
+{ $values
+    { "tdt" texture-data-target } { "level" integer }
+    { "size" integer }
+}
+{ $description "Returns the size in bytes of the memory allocated for the compressed texture data making up the " { $snippet "level" } "th level of detail of the given " { $link texture-data-target } "." } ;
+
 HELP: texture-filter
 { $class-description { $snippet "texture-filter" } " values are used in a " { $link texture-parameters } " tuple to determine how a texture should be sampled between pixels or between levels of detail. " { $link filter-linear } " selects linear filtering, while " { $link filter-nearest } " selects nearest-neighbor sampling." } ;
 
@@ -277,6 +306,13 @@ HELP: texture-rectangle
 { $class-description "A two-dimensional rectangle " { $link texture } " object. Textures of this type are dimensioned by pairs of integers in calls to " { $link allocate-texture } " and " { $link update-texture } ". Rectangle textures differ from normal 2D textures (" { $link texture-2d } ") in that texture coordinates map directly to pixel coordinates when they are sampled from shader code, rather than being normalized into the 0.0 to 1.0 range as with other texture types. Also, rectangle textures do not support mipmapping or texture wrapping." }
 { $notes "Rectangle textures require OpenGL 3.1 or the " { $snippet "GL_ARB_texture_rectangle" } " extension." } ;
 
+HELP: update-compressed-texture
+{ $values
+    { "tdt" texture-data-target } { "level" integer } { "loc" "an " { $link integer } " or sequence of integers" } { "dim" "an " { $link integer } " or sequence of integers" } { "compressed-data" texture-data }
+}
+{ $description "Updates the linear, rectangular, or cubic subregion of a compressed " { $link texture-data-target } " bounded by " { $snippet "loc" } " and " { $snippet "dim" } " with the data referenced by the given " { $link compressed-texture-data } " tuple. The given level of detail of the texture must have been previously allocated for compressed data with " { $link allocate-compressed-texture } "." }
+{ $notes "Using a " { $link buffer-ptr } " as the " { $snippet "ptr" } " of a " { $snippet "compressed-texture-data" } " object requires OpenGL 2.1 or later or the " { $snippet "GL_ARB_pixel_buffer_object" } " extension." } ;
+
 HELP: update-texture
 { $values
     { "tdt" texture-data-target } { "level" integer } { "loc" "an " { $link integer } " or sequence of integers" } { "dim" "an " { $link integer } " or sequence of integers" } { "data" texture-data }
@@ -290,22 +326,63 @@ HELP: update-texture-image
 }
 { $description "Updates the linear, rectangular, or cubic subregion of a " { $link texture-data-target } " bounded by " { $snippet "loc" } " and " { $snippet "dim" } " with new image data from an " { $link image } " object." } ;
 
-{ update-texture update-texture-image } related-words
+{ update-compressed-texture update-texture update-texture-image } related-words
+
+HELP: compressed-texture-format
+{ $class-description { $snippet "compressed-texture-format" } " values are used as part of a " { $link compressed-texture-data } " tuple to specify the binary format of texture data being given to " { $link allocate-compressed-texture } " or " { $link update-compressed-texture } ". The following compressed formats are available:"
+{ $list
+{ { $link DXT1-RGB } }
+{ { $link DXT1-RGBA } }
+{ { $link DXT3 } }
+{ { $link DXT5 } }
+{ { $link LATC1 } }
+{ { $link LATC1-SIGNED } }
+{ { $link LATC2 } }
+{ { $link LATC2-SIGNED } }
+{ { $link RGTC1 } }
+{ { $link RGTC1-SIGNED } }
+{ { $link RGTC2 } }
+{ { $link RGTC2-SIGNED } }
+} }
+{ $notes "The " { $snippet "DXT1" } " formats require either the " { $snippet "GL_EXT_texture_compression_s3tc" } " or " { $snippet "GL_EXT_texture_compression_dxt1" } " extension. The other " { $snippet "DXT" } " formats require the " { $snippet "GL_EXT_texture_compression_s3tc" } " extension. The " { $snippet "LATC" } " formats require the " { $snippet "GL_EXT_texture_compression_latc" } " extension. The " { $snippet "RGTC" } " formats require OpenGL 3.0 or later or the " { $snippet "GL_EXT_texture_compression_rgtc" } " extension." } ;
+
+HELP: compressed-texture-data
+{ $class-description { $snippet "compressed-texture-data" } " tuples are used to feed compressed texture data to " { $link allocate-compressed-texture } " and " { $link update-compressed-texture } "."
+{ $list
+{ "The " { $snippet "ptr" } " slot references either CPU memory (as a " { $link byte-array } " or " { $link alien } ") or a GPU " { $link buffer-ptr } " that contains the image data." }
+{ "The " { $snippet "format" } " slot determines the " { $link compressed-texture-format } " of the referenced data." }
+{ "The " { $snippet "length" } " slot determines the size in bytes of the referenced data." }
+} }
+{ $notes "Using a " { $link buffer-ptr } " as the " { $snippet "ptr" } " of a " { $snippet "texture-data" } " object requires OpenGL 2.1 or later or the " { $snippet "GL_ARB_pixel_buffer_object" } " extension." } ;
+
+{ compressed-texture-data <compressed-texture-data> } related-words
 
 ARTICLE: "gpu.textures" "Texture objects"
 "The " { $vocab-link "gpu.textures" } " vocabulary provides words for creating, allocating, updating, and reading GPU texture objects."
 { $subsections
     texture
+    texture-data
     allocate-texture
     update-texture
+    texture-dim
     read-texture
+    read-texture-to
 }
-"Words are also provided to interface textures with the " { $vocab-link "images" } " library:"
+"Words are also provided to use " { $link image } " objects from the " { $vocab-link "images" } " library as data sources and destinations for texture data:"
 { $subsections
     allocate-texture-image
     update-texture-image
     read-texture-image
 }
-;
+"Compressed texture data can also be supplied and read:"
+{ $subsections
+    compressed-texture-format
+    compressed-texture-data
+    allocate-compressed-texture
+    update-compressed-texture
+    compressed-texture-data-size
+    read-compressed-texture
+    read-compressed-texture-to
+} ;
 
 ABOUT: "gpu.textures"

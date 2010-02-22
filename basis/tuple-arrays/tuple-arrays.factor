@@ -1,18 +1,18 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.smart fry functors kernel
 kernel.private macros sequences combinators sequences.private
-stack-checker parser math classes.tuple.private ;
+stack-checker parser math classes.tuple classes.tuple.private ;
 FROM: inverse => undo ;
 IN: tuple-arrays
+
+ERROR: not-final class ;
 
 <PRIVATE
 
 MACRO: boa-unsafe ( class -- quot ) tuple-layout '[ _ <tuple-boa> ] ;
 
-MACRO: infer-in ( class -- quot ) infer in>> '[ _ ] ;
-
-: tuple-arity ( class -- quot ) '[ _ boa ] infer-in ; inline
+: tuple-arity ( class -- quot ) '[ _ boa ] inputs ; inline
 
 : smart-tuple>array ( tuple class -- array )
     '[ [ _ boa ] undo ] output>array ; inline
@@ -28,8 +28,15 @@ MACRO: infer-in ( class -- quot ) infer in>> '[ _ ] ;
 
 MACRO: write-tuple ( class -- quot )
     [ '[ [ _ boa ] undo ] ]
-    [ tuple-arity <reversed> [ '[ [ _ ] dip set-nth-unsafe ] ] map '[ _ cleave ] ]
+    [ tuple-arity iota <reversed> [ '[ [ _ ] dip set-nth-unsafe ] ] map '[ _ cleave ] ]
     bi '[ _ dip @ ] ;
+
+: check-final ( class -- )
+    {
+        { [ dup tuple-class? not ] [ not-a-tuple ] }
+        { [ dup final-class? not ] [ not-final ] }
+        [ drop ]
+    } cond ;
 
 PRIVATE>
 
@@ -44,6 +51,8 @@ CLASS-array? IS ${CLASS-array}?
 >CLASS-array DEFINES >${CLASS}-array
 
 WHERE
+
+CLASS check-final
 
 TUPLE: CLASS-array
 { seq array read-only }

@@ -33,7 +33,7 @@ IN: project-euler.028
     dup 1 = [ [ sq 4 * ] [ 6 * ] bi - 6 + ] unless ;
 
 : sum-diags ( n -- sum )
-    1 swap 2 <range> [ sum-corners ] sigma ;
+    1 swap 2 <range> [ sum-corners ] map-sum ;
 
 PRIVATE>
 

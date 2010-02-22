@@ -1,68 +1,58 @@
 namespace factor
 {
 
-/* statistics */
-struct generation_statistics {
-	cell collections;
-	u64 gc_time;
-	u64 max_gc_time;
-	cell object_count;
-	u64 bytes_copied;
+enum gc_op {
+	collect_nursery_op,
+	collect_aging_op,
+	collect_to_tenured_op,
+	collect_full_op,
+	collect_compact_op,
+	collect_growing_heap_op
 };
 
-struct gc_statistics {
-	generation_statistics generations[gen_count];
-	u64 cards_scanned;
-	u64 decks_scanned;
-	u64 card_scan_time;
-	u64 code_blocks_scanned;
+struct gc_event {
+	gc_op op;
+	data_heap_room data_heap_before;
+	code_heap_room code_heap_before;
+	data_heap_room data_heap_after;
+	code_heap_room code_heap_after;
+	cell cards_scanned;
+	cell decks_scanned;
+	cell code_blocks_scanned;
+	u64 start_time;
+	cell total_time;
+	cell card_scan_time;
+	cell code_scan_time;
+	cell data_sweep_time;
+	cell code_sweep_time;
+	cell compaction_time;
+	u64 temp_time;
+
+	explicit gc_event(gc_op op_, factor_vm *parent);
+	void started_card_scan();
+	void ended_card_scan(cell cards_scanned_, cell decks_scanned_);
+	void started_code_scan();
+	void ended_code_scan(cell code_blocks_scanned_);
+	void started_data_sweep();
+	void ended_data_sweep();
+	void started_code_sweep();
+	void ended_code_sweep();
+	void started_compaction();
+	void ended_compaction();
+	void ended_gc(factor_vm *parent);
 };
 
 struct gc_state {
-	/* The data heap we're collecting */
-	data_heap *data;
-
-	/* sometimes we grow the heap */
-	bool growing_data_heap;
-	data_heap *old_data_heap;
-
-	/* Which generation is being collected */
-	cell collecting_gen;
-
-	/* If true, we are collecting aging space for the second time, so if it is still
-	   full, we go on to collect tenured */
-	bool collecting_aging_again;
-
-	/* GC start time, for benchmarking */
+	gc_op op;
 	u64 start_time;
+	jmp_buf gc_unwind;
+	gc_event *event;
 
-        jmp_buf gc_unwind;
-
-	explicit gc_state(data_heap *data_, bool growing_data_heap_, cell collecting_gen_);
+	explicit gc_state(gc_op op_, factor_vm *parent);
 	~gc_state();
-
-	inline bool collecting_nursery_p()
-	{
-		return collecting_gen == nursery_gen;
-	}
-
-	inline bool collecting_aging_p()
-	{
-		return collecting_gen == aging_gen;
-	}
-
-	inline bool collecting_tenured_p()
-	{
-		return collecting_gen == tenured_gen;
-	}
-
-	inline bool collecting_accumulation_gen_p()
-	{
-		return ((collecting_aging_p() && !collecting_aging_again)
-			|| collecting_tenured_p());
-	}
+	void start_again(gc_op op_, factor_vm *parent);
 };
 
-VM_C_API void inline_gc(cell *gc_roots_base, cell gc_roots_size, factor_vm *myvm);
+VM_C_API void inline_gc(cell *data_roots_base, cell data_roots_size, factor_vm *parent);
 
 }

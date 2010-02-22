@@ -11,7 +11,7 @@ IN: stack-checker.branches
 
 SYMBOLS: +bottom+ +top+ ;
 
-: unify-inputs ( max-d-in d-in meta-d -- new-meta-d )
+: unify-inputs ( max-input-count input-count meta-d -- new-meta-d )
     ! Introduced values can be anything, and don't unify with
     ! literals.
     dup [ [ - +top+ <repetition> ] dip append ] [ 3drop f ] if ;
@@ -24,7 +24,7 @@ SYMBOLS: +bottom+ +top+ ;
         '[ _ +bottom+ pad-head ] map
     ] unless ;
 
-: phi-inputs ( max-d-in pairs -- newseq )
+: phi-inputs ( max-input-count pairs -- newseq )
     dup empty? [ nip ] [
         swap '[ [ _ ] dip first2 unify-inputs ] map
         pad-with-bottom
@@ -61,9 +61,9 @@ SYMBOL: quotations
     branch-variable ;
 
 : datastack-phi ( seq -- phi-in phi-out )
-    [ d-in branch-variable ] [ \ meta-d active-variable ] bi
+    [ input-count branch-variable ] [ \ meta-d active-variable ] bi
     unify-branches
-    [ d-in set ] [ ] [ dup >vector \ meta-d set ] tri* ;
+    [ input-count set ] [ ] [ dup >vector \ meta-d set ] tri* ;
 
 : terminated-phi ( seq -- terminated )
     terminated? branch-variable ;
@@ -80,7 +80,7 @@ SYMBOL: quotations
 : copy-inference ( -- )
     \ meta-d [ clone ] change
     literals [ clone ] change
-    d-in [ ] change ;
+    input-count [ ] change ;
 
 GENERIC: infer-branch ( literal -- namespace )
 

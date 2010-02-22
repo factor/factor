@@ -6,6 +6,13 @@ HELP: SPECIALIZED-VECTOR:
 { $values { "type" "a C type" } }
 { $description "Brings a specialized vector for holding values of " { $snippet "type" } " into the vocabulary search path. The generated words are documented in " { $link "specialized-vector-words" } "." } ;
 
+HELP: SPECIALIZED-VECTORS:
+{ $syntax "SPECIALIZED-VECTORS: type type type ... ;" }
+{ $values { "type" "a C type" } }
+{ $description "Brings a set of specialized vectors for holding values of each " { $snippet "type" } " into the vocabulary search path. The generated words are documented in " { $link "specialized-vector-words" } "." } ;
+
+{ POSTPONE: SPECIALIZED-VECTOR: POSTPONE: SPECIALIZED-VECTORS: } related-words
+
 ARTICLE: "specialized-vector-words" "Specialized vector words"
 "The " { $link POSTPONE: SPECIALIZED-VECTOR: } " parsing word generates the specialized vector type if it hasn't been generated already, and adds the following words to the vocabulary search path, where " { $snippet "T" } " is the C type in question:"
 { $table
@@ -21,6 +28,12 @@ ARTICLE: "specialized-vector-c" "Passing specialized vectors to C functions"
 
 ARTICLE: "specialized-vectors" "Specialized vectors"
 "The " { $vocab-link "specialized-vectors" } " vocabulary implements resizable sequence types for storing machine values in a space-efficient manner without boxing."
+$nl
+"A specialized vector type needs to be generated for each element type. This is done with parsing words:"
+{ $subsections
+    POSTPONE: SPECIALIZED-VECTOR:
+    POSTPONE: SPECIALIZED-VECTORS:
+}
 { $subsections
     "specialized-vector-words"
     "specialized-vector-c"
