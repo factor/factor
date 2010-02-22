@@ -11,11 +11,7 @@ TYPEDEF: uchar               UCHAR
 TYPEDEF: uchar               BYTE
 
 TYPEDEF: ushort              wchar_t
-SYMBOL: wchar_t*
-<<
-{ char* utf16n } \ wchar_t* typedef
-\ wchar_t \ wchar_t* "pointer-c-type" set-word-prop
->>
+TYPEDEF: { char* utf16n }    wchar_t*
 
 TYPEDEF: wchar_t             WCHAR
 

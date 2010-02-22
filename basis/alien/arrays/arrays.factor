@@ -99,8 +99,5 @@ M: string-type c-type-getter
 M: string-type c-type-setter
     drop [ set-alien-cell ] ;
 
-{ char* utf8 } char* typedef
-char* uchar* typedef
+TYPEDEF: { char* utf8 } char*
 
-char char* "pointer-c-type" set-word-prop
-uchar uchar* "pointer-c-type" set-word-prop

@@ -19,13 +19,12 @@ IN: alien.parser
         { [ dup "void" =         ] [ drop void ] }
         { [ CHAR: ] over member? ] [ parse-array-type parse-c-type-name prefix ] }
         { [ dup search           ] [ parse-c-type-name ] }
-        { [ "**" ?tail           ] [ drop void* ] }
-        { [ "*" ?tail            ] [ parse-c-type-name resolve-pointer-type ] }
+        { [ "*" ?tail            ] [ (parse-c-type) <pointer> ] }
         [ dup search [ ] [ no-word ] ?if ]
     } cond ;
 
 : valid-c-type? ( c-type -- ? )
-    { [ array? ] [ c-type-name? ] [ void? ] } 1|| ;
+    { [ array? ] [ c-type-word? ] [ pointer? ] [ void? ] } 1|| ;
 
 : parse-c-type ( string -- type )
     (parse-c-type) dup valid-c-type? [ no-c-type ] unless ;

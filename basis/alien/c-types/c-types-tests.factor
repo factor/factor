@@ -16,40 +16,45 @@ UNION-STRUCT: foo
     { a int }
     { b int } ;
 
-[ f ] [ char  resolve-pointer-type c-type void* c-type eq? ] unit-test
-[ t ] [ char* resolve-pointer-type c-type void* c-type eq? ] unit-test
+[ t ] [ pointer: void c-type void* c-type eq? ] unit-test
+[ t ] [ pointer: int  c-type void* c-type eq? ] unit-test
+[ t ] [ pointer: int* c-type void* c-type eq? ] unit-test
+[ f ] [ pointer: foo  c-type void* c-type eq? ] unit-test
+[ t ] [ pointer: foo* c-type void* c-type eq? ] unit-test
+
+[ t ] [ pointer: char c-type c-string c-type eq? ] unit-test
+
+[ t ] [ pointer: foo c-type-boxer-quot foo c-type-boxer-quot = ] unit-test
 
 [ t ] [ foo heap-size int heap-size = ] unit-test
 
 TYPEDEF: int MyInt
 
-[ t ] [ int   c-type MyInt                      c-type eq? ] unit-test
-[ t ] [ void* c-type MyInt resolve-pointer-type c-type eq? ] unit-test
-
-TYPEDEF: char MyChar
-
-[ t ] [ char  c-type MyChar                      c-type eq? ] unit-test
-[ f ] [ void* c-type MyChar resolve-pointer-type c-type eq? ] unit-test
-[ t ] [ char* c-type MyChar resolve-pointer-type c-type eq? ] unit-test
+[ t ] [ int   c-type          MyInt c-type eq? ] unit-test
+[ t ] [ void* c-type pointer: MyInt c-type eq? ] unit-test
 
 [ 32 ] [ { int 8 } heap-size ] unit-test
 
 TYPEDEF: char* MyString
 
-[ t ] [ char* c-type MyString                      c-type eq? ] unit-test
-[ t ] [ void* c-type MyString resolve-pointer-type c-type eq? ] unit-test
+[ t ] [ c-string c-type MyString          c-type eq? ] unit-test
+[ t ] [ void*    c-type pointer: MyString c-type eq? ] unit-test
 
 TYPEDEF: int* MyIntArray
 
 [ t ] [ void* c-type MyIntArray c-type eq? ] unit-test
 
-TYPEDEF: uchar* MyLPBYTE
+TYPEDEF: c-string MyLPBYTE
 
-[ t ] [ { char* utf8 } c-type MyLPBYTE c-type = ] unit-test
+[ t ] [ { c-string utf8 } c-type MyLPBYTE c-type = ] unit-test
 
 [
     0 B{ 1 2 3 4 } <displaced-alien> <void*>
 ] must-fail
+
+C-TYPE: MyOpaqueType
+
+[ f ] [ pointer: MyOpaqueType c-type void* c-type eq? ] unit-test
 
 os windows? cpu x86.64? and [
     [ -2147467259 ] [ 2147500037 <long> *long ] unit-test
