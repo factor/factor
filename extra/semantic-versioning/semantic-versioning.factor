@@ -20,3 +20,18 @@ IN: semantic-versioning
         { [ drop 2dup [ length ] bi@ >=< dup +eq+ = not ] [ 2nip ] }
         [ drop [ first ] bi@ <=> ]
     } cond ;
+
+: version< ( version1 version2 -- ? )
+    version<=> +lt+ = ;
+
+: version<= ( version1 version2 -- ? )
+    version<=> [ +lt+ = ] [ +eq+ = ] either? ;
+
+: version= ( version1 version2 -- ? )
+    version<=> +eq+ = ;
+
+: version>= ( version1 version2 -- ? )
+    version<=> [ +gt+ = ] [ +eq+ = ] either? ;
+
+: version> ( version1 version2 -- ? )
+    version<=> +gt+ = ;
