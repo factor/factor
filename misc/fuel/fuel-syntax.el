@@ -63,7 +63,7 @@
     "read-only" "RENAME:" "REQUIRE:"  "REQUIRES:"
     "SINGLETON:" "SINGLETONS:" "SLOT:" "SPECIALIZED-ARRAY:" "SPECIALIZED-ARRAYS:" "STRING:" "STRUCT:" "SYMBOL:" "SYMBOLS:" "SYNTAX:"
     "TUPLE:" "t" "t?" "TYPEDEF:" "TYPED:" "TYPED::"
-    "UNIFORM-TUPLE:" "UNION:" "USE:" "USING:"
+    "UNIFORM-TUPLE:" "UNION:" "UNION-STRUCT:" "USE:" "USING:"
     "VARS:" "VERTEX-FORMAT:"))
 
 (defconst fuel-syntax--parsing-words-regex
@@ -125,7 +125,7 @@
 
 (defconst fuel-syntax--type-definition-regex
   (fuel-syntax--second-word-regex
-   '("C-STRUCT:" "C-UNION:" "MIXIN:" "TUPLE:" "SINGLETON:" "SPECIALIZED-ARRAY:" "STRUCT:" "UNION:")))
+   '("C-STRUCT:" "C-UNION:" "MIXIN:" "TUPLE:" "SINGLETON:" "SPECIALIZED-ARRAY:" "STRUCT:" "UNION:" "UNION-STRUCT:")))
 
 (defconst fuel-syntax--tuple-decl-regex
   "^TUPLE: +\\([^ \n]+\\) +< +\\([^ \n]+\\)\\_>")
