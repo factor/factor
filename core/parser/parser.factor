@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic assocs kernel math namespaces
 sequences strings vectors words words.symbol quotations io
@@ -33,11 +33,19 @@ SYMBOL: auto-use?
         [ "Added \"" "\" vocabulary to search path" surround note. ] bi
     ] [ create-in ] if ;
 
+: ignore-forwards ( seq -- seq' )
+    [ forward-reference? not ] filter ;
+
+: private? ( word -- ? ) vocabulary>> ".private" tail? ;
+
+: ignore-privates ( seq -- seq' )
+    dup [ private? ] all? [ [ private? not ] filter ] unless ;
+
 : no-word ( name -- newword )
-    dup words-named [ forward-reference? not ] filter
-    dup length 1 = auto-use? get and
-    [ nip first no-word-restarted ]
-    [ <no-word-error> throw-restarts no-word-restarted ]
+    dup words-named ignore-forwards
+    dup ignore-privates dup length 1 = auto-use? get and
+    [ 2nip first no-word-restarted ]
+    [ drop <no-word-error> throw-restarts no-word-restarted ]
     if ;
 
 : parse-word ( string -- word/number )
