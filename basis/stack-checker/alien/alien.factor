@@ -59,7 +59,7 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
     pop-library
     pop-return
     ! Set ABI
-    dup library>> library [ abi>> ] [ "cdecl" ] if* >>abi
+    dup library>> library-abi >>abi
     ! Quotation which coerces parameters to required types
     dup infer-params
     ! Magic #: consume exactly the number of inputs
