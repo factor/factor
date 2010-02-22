@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
+! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.parser
 alien.libraries arrays assocs classes combinators
@@ -66,7 +66,7 @@ IN: alien.parser
         2 group [ first2 normalize-c-arg 2array ] map
         unzip [ "," ?tail drop ] map
     ]
-    [ [ { } ] [ 1array ] if-void ]
+    [ dup "void" = [ drop { } ] [ 1array ] if ]
     bi* <effect> ;
 
 : function-quot ( return library function types -- quot )
