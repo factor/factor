@@ -30,9 +30,11 @@ IN: alien.parser
     (parse-c-type) dup valid-c-type? [ no-c-type ] unless ;
 
 : scan-c-type ( -- c-type )
-    scan dup "{" =
-    [ drop \ } parse-until >array ]
-    [ parse-c-type ] if ; 
+    scan {
+        { [ dup "{" = ] [ drop \ } parse-until >array ] }
+        { [ dup "pointer:" = ] [ drop scan-c-type <pointer> ] }
+        [ parse-c-type ]
+    } cond ; 
 
 : reset-c-type ( word -- )
     dup "struct-size" word-prop

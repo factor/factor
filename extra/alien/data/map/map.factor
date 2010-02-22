@@ -54,7 +54,7 @@ INSTANCE: data-map-param immutable-sequence
     nip '[ _ <sliced-groups> ] ;
 
 : [>param] ( type -- quot )
-    c-type-count over c-type-word?
+    c-type-count over c-type-name?
     [ [>c-type-param] ] [ [>object-param] ] if ; 
 
 MACRO: >param ( in -- quot: ( array -- param ) )
@@ -74,7 +74,7 @@ MACRO: >param ( in -- quot: ( array -- param ) )
     "Factor sequences as data-map outputs not supported" throw ;
 
 : [alloc-param] ( type -- quot )
-    c-type-count over c-type-word?
+    c-type-count over c-type-name?
     [ [alloc-c-type-param] ] [ [alloc-object-param] ] if ; 
 
 MACRO: alloc-param ( out -- quot: ( len -- param ) )
