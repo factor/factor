@@ -45,21 +45,24 @@ stack-align? ;
 
 ERROR: no-c-type name ;
 
-PREDICATE: c-type-word < word
-    "c-type" word-prop ;
-
 ! C type protocol
 GENERIC: c-type ( name -- c-type ) foldable
 
 : void? ( c-type -- ? )
     void = ; inline
 
+PREDICATE: c-type-word < word
+    "c-type" word-prop ;
+
 TUPLE: pointer { to initial: void read-only } ;
 C: <pointer> pointer
 
+UNION: c-type-name
+    c-type-word pointer ;
+
 : resolve-typedef ( name -- c-type )
     dup void? [ no-c-type ] when
-    dup c-type-word? [ c-type ] when ;
+    dup c-type-name? [ c-type ] when ;
 
 <PRIVATE
 
@@ -77,7 +80,7 @@ GENERIC: c-struct? ( c-type -- ? )
 
 M: object c-struct? drop f ;
 
-M: c-type-word c-struct? dup void? [ drop f ] [ c-type c-struct? ] if ;
+M: c-type-name c-struct? dup void? [ drop f ] [ c-type c-struct? ] if ;
 
 ! These words being foldable means that words need to be
 ! recompiled if a C type is redefined. Even so, folding the
@@ -86,65 +89,65 @@ GENERIC: c-type-class ( name -- class )
 
 M: abstract-c-type c-type-class class>> ;
 
-M: c-type-word c-type-class c-type c-type-class ;
+M: c-type-name c-type-class c-type c-type-class ;
 
 GENERIC: c-type-boxed-class ( name -- class )
 
 M: abstract-c-type c-type-boxed-class boxed-class>> ;
 
-M: c-type-word c-type-boxed-class c-type c-type-boxed-class ;
+M: c-type-name c-type-boxed-class c-type c-type-boxed-class ;
 
 GENERIC: c-type-boxer ( name -- boxer )
 
 M: c-type c-type-boxer boxer>> ;
 
-M: c-type-word c-type-boxer c-type c-type-boxer ;
+M: c-type-name c-type-boxer c-type c-type-boxer ;
 
 GENERIC: c-type-boxer-quot ( name -- quot )
 
 M: abstract-c-type c-type-boxer-quot boxer-quot>> ;
 
-M: c-type-word c-type-boxer-quot c-type c-type-boxer-quot ;
+M: c-type-name c-type-boxer-quot c-type c-type-boxer-quot ;
 
 GENERIC: c-type-unboxer ( name -- boxer )
 
 M: c-type c-type-unboxer unboxer>> ;
 
-M: c-type-word c-type-unboxer c-type c-type-unboxer ;
+M: c-type-name c-type-unboxer c-type c-type-unboxer ;
 
 GENERIC: c-type-unboxer-quot ( name -- quot )
 
 M: abstract-c-type c-type-unboxer-quot unboxer-quot>> ;
 
-M: c-type-word c-type-unboxer-quot c-type c-type-unboxer-quot ;
+M: c-type-name c-type-unboxer-quot c-type c-type-unboxer-quot ;
 
 GENERIC: c-type-rep ( name -- rep )
 
 M: c-type c-type-rep rep>> ;
 
-M: c-type-word c-type-rep c-type c-type-rep ;
+M: c-type-name c-type-rep c-type c-type-rep ;
 
 GENERIC: c-type-getter ( name -- quot )
 
 M: c-type c-type-getter getter>> ;
 
-M: c-type-word c-type-getter c-type c-type-getter ;
+M: c-type-name c-type-getter c-type c-type-getter ;
 
 GENERIC: c-type-setter ( name -- quot )
 
 M: c-type c-type-setter setter>> ;
 
-M: c-type-word c-type-setter c-type c-type-setter ;
+M: c-type-name c-type-setter c-type c-type-setter ;
 
 GENERIC: c-type-align ( name -- n )
 
 M: abstract-c-type c-type-align align>> ;
 
-M: c-type-word c-type-align c-type c-type-align ;
+M: c-type-name c-type-align c-type c-type-align ;
 
 GENERIC: c-type-align-first ( name -- n )
 
-M: c-type-word c-type-align-first c-type c-type-align-first ;
+M: c-type-name c-type-align-first c-type c-type-align-first ;
 
 M: abstract-c-type c-type-align-first align-first>> ;
 
@@ -152,7 +155,7 @@ GENERIC: c-type-stack-align? ( name -- ? )
 
 M: c-type c-type-stack-align? stack-align?>> ;
 
-M: c-type-word c-type-stack-align? c-type c-type-stack-align? ;
+M: c-type-name c-type-stack-align? c-type c-type-stack-align? ;
 
 : c-type-box ( n c-type -- )
     [ c-type-rep ] [ c-type-boxer [ "No boxer" throw ] unless* ] bi
@@ -166,37 +169,37 @@ GENERIC: box-parameter ( n c-type -- )
 
 M: c-type box-parameter c-type-box ;
 
-M: c-type-word box-parameter c-type box-parameter ;
+M: c-type-name box-parameter c-type box-parameter ;
 
 GENERIC: box-return ( c-type -- )
 
 M: c-type box-return f swap c-type-box ;
 
-M: c-type-word box-return c-type box-return ;
+M: c-type-name box-return c-type box-return ;
 
 GENERIC: unbox-parameter ( n c-type -- )
 
 M: c-type unbox-parameter c-type-unbox ;
 
-M: c-type-word unbox-parameter c-type unbox-parameter ;
+M: c-type-name unbox-parameter c-type unbox-parameter ;
 
 GENERIC: unbox-return ( c-type -- )
 
 M: c-type unbox-return f swap c-type-unbox ;
 
-M: c-type-word unbox-return c-type unbox-return ;
+M: c-type-name unbox-return c-type unbox-return ;
 
 : little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
 
 GENERIC: heap-size ( name -- size )
 
-M: c-type-word heap-size c-type heap-size ;
+M: c-type-name heap-size c-type heap-size ;
 
 M: abstract-c-type heap-size size>> ;
 
 GENERIC: stack-size ( name -- size )
 
-M: c-type-word stack-size c-type stack-size ;
+M: c-type-name stack-size c-type stack-size ;
 
 M: c-type stack-size size>> cell align ;
 
@@ -233,7 +236,7 @@ MIXIN: value-type
 GENERIC: typedef ( old new -- )
 
 PREDICATE: typedef-word < c-type-word
-    "c-type" word-prop c-type-word? ;
+    "c-type" word-prop c-type-name? ;
 
 M: word typedef ( old new -- )
     {
@@ -243,7 +246,7 @@ M: word typedef ( old new -- )
 
 M: pointer typedef ( old new -- )
     to>> dup c-type-word?
-    [ ]
+    [ swap "pointer-c-type" set-word-prop ]
     [ 2drop ] if ;
 
 TUPLE: long-long-type < c-type ;
@@ -278,6 +281,10 @@ M: long-long-type box-return ( c-type -- )
 : if-void ( c-type true false -- )
     pick void? [ drop nip call ] [ nip call ] if ; inline
 
+SYMBOLS:
+    ptrdiff_t intptr_t uintptr_t size_t
+    byte ubyte char* ;
+
 CONSTANT: primitive-types
     {
         char uchar
@@ -287,35 +294,37 @@ CONSTANT: primitive-types
         longlong ulonglong
         float double
         void* bool
+        char*
     }
-
-SYMBOLS:
-    ptrdiff_t intptr_t uintptr_t size_t
-    char* ;
-
-<PRIVATE
 
 : (pointer-c-type) ( void* type -- void*' )
     [ clone ] dip c-type-boxer-quot >>boxer-quot ;
 
-: string-pointer-type? ( type -- ? )
-    dup pointer? [ drop f ]
-    [ resolve-typedef { char uchar } member? ] if ;
+<PRIVATE
+
+: resolve-pointer-typedef ( type -- base-type )
+    dup "c-type" word-prop dup word?
+    [ nip resolve-pointer-typedef ] [ drop ] if ;
+
+: special-pointer-type ( type -- special-type )
+    dup c-type-word? [
+        dup "pointer-c-type" word-prop
+        [ ] [ resolve-pointer-typedef "pointer-c-type" word-prop ] ?if
+    ] [ drop f ] if ;
 
 : primitive-pointer-type? ( type -- ? )
-    dup pointer? [ drop t ] [
-        resolve-typedef [ void? ] [ primitive-types member? ] bi or
-    ] if ;
+    dup c-type-word? [
+        resolve-pointer-typedef [ void? ] [ primitive-types member? ] bi or
+    ] [ drop t ] if ;
 
 PRIVATE>
 
 M: pointer c-type
     [ \ void* c-type ] dip
-    to>> {
-        { [ dup string-pointer-type? ] [ drop \ char* c-type ] }
-        { [ dup primitive-pointer-type? ] [ drop ] }
-        [ (pointer-c-type) ]
-    } cond ;
+    to>> dup special-pointer-type
+    [ nip ] [
+        dup primitive-pointer-type? [ drop ] [ (pointer-c-type) ] if
+    ] ?if ;
 
 : 8-byte-alignment ( c-type -- c-type )
     {
@@ -528,6 +537,9 @@ M: pointer c-type
         \ uint c-type \ uintptr_t typedef
         \ uint c-type \ size_t typedef
     ] if
+
+    \ char \ byte typedef
+    \ uchar \ ubyte typedef
 ] with-compilation-unit
 
 M: char-16-rep rep-component-type drop char ;

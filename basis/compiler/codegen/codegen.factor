@@ -325,7 +325,7 @@ GENERIC: flatten-value-type ( type -- types )
 M: object flatten-value-type 1array ;
 M: struct-c-type flatten-value-type (flatten-int-type) ;
 M: long-long-type flatten-value-type (flatten-int-type) ;
-M: c-type-word flatten-value-type c-type flatten-value-type ;
+M: c-type-name flatten-value-type c-type flatten-value-type ;
 
 : flatten-value-types ( params -- params )
     #! Convert value type structs to consecutive void*s.
