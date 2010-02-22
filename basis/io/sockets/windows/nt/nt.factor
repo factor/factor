@@ -55,8 +55,8 @@ TUPLE: ConnectEx-args port
         [ lpOverlapped>> ]
         [ ptr>> ]
     } cleave
-    "int"
-    { "SOCKET" "sockaddr_in*" "int" "PVOID" "DWORD" "LPDWORD" "void*" }
+    int
+    { SOCKET void* int PVOID DWORD LPDWORD void* }
     "stdcall" alien-indirect drop
     winsock-error-string [ throw ] when* ; inline
 
