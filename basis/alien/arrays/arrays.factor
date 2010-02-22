@@ -35,10 +35,7 @@ M: array box-return drop void* box-return ;
 M: array stack-size drop void* stack-size ;
 
 M: array c-type-boxer-quot
-    unclip
-    [ array-length ]
-    [ [ require-c-array ] keep ] bi*
-    [ <c-direct-array> ] 2curry ;
+    unclip [ array-length ] dip [ <c-direct-array> ] 2curry ;
 
 M: array c-type-unboxer-quot drop [ >c-ptr ] ;
 
