@@ -1,5 +1,5 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types alien.data ascii
+USING: accessors alien alien.c-types alien.data alien.syntax ascii
 assocs byte-arrays classes.struct classes.tuple.private classes.tuple
 combinators compiler.tree.debugger compiler.units destructors
 io.encodings.utf8 io.pathnames io.streams.string kernel libc
