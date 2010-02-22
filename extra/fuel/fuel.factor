@@ -3,7 +3,8 @@
 
 USING: accessors assocs compiler.units continuations fuel.eval fuel.help
 fuel.remote fuel.xref help.topics io.pathnames kernel namespaces parser
-sequences tools.scaffold vocabs.loader vocabs.parser words ;
+sequences tools.scaffold vocabs.loader vocabs.parser words vocabs.files
+vocabs.metadata ;
 
 IN: fuel
 
@@ -144,6 +145,22 @@ PRIVATE>
 : fuel-scaffold-help ( name devname -- )
     [ fuel-scaffold-name dup require dup scaffold-help ] with-scope
     vocab-docs-path absolute-path fuel-eval-set-result ;
+
+: fuel-scaffold-tests ( name devname -- )
+    [ fuel-scaffold-name dup require dup scaffold-tests ] with-scope
+    vocab-tests-file absolute-path fuel-eval-set-result ;
+
+: fuel-scaffold-authors ( name devname -- )
+    [ fuel-scaffold-name dup require dup scaffold-authors ] with-scope
+    [ vocab-authors-path ] keep swap vocab-append-path absolute-path fuel-eval-set-result ;
+
+: fuel-scaffold-tags ( name tags -- )
+    [ scaffold-tags ]
+    [ drop [ vocab-tags-path ] keep swap vocab-append-path absolute-path fuel-eval-set-result ] 2bi ;
+
+: fuel-scaffold-summary ( name summary -- )
+    [ scaffold-summary ]
+    [ drop [ vocab-summary-path ] keep swap vocab-append-path absolute-path fuel-eval-set-result ] 2bi ;
 
 : fuel-scaffold-get-root ( name -- ) find-vocab-root fuel-eval-set-result ;
 
