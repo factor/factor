@@ -21,7 +21,7 @@ M: c-type-word declarations. drop ;
 
 GENERIC: pprint-c-type ( c-type -- )
 M: word pprint-c-type pprint-word ;
-M: pointer pprint-c-type to>> pprint-c-type "*" text ;
+M: pointer pprint-c-type pprint* ;
 M: wrapper pprint-c-type wrapped>> pprint-word ;
 M: string pprint-c-type text ;
 M: array pprint-c-type pprint* ;

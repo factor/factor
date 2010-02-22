@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.strings alien.c-types alien.data alien.accessors
 arrays words sequences math kernel namespaces fry cpu.architecture
-io.encodings.utf8 accessors ;
+io.encodings.binary io.encodings.utf8 accessors ;
 IN: alien.arrays
 
 INSTANCE: array value-type
@@ -88,10 +88,14 @@ M: string-type c-type-unboxer
     drop void* c-type-unboxer ;
 
 M: string-type c-type-boxer-quot
-    second '[ _ alien>string ] ;
+    second dup binary =
+    [ drop void* c-type-boxer-quot ]
+    [ '[ _ alien>string ] ] if ;
 
 M: string-type c-type-unboxer-quot
-    second '[ _ string>alien ] ;
+    second dup binary =
+    [ drop void* c-type-unboxer-quot ]
+    [ '[ _ string>alien ] ] if ;
 
 M: string-type c-type-getter
     drop [ alien-cell ] ;
@@ -99,5 +103,8 @@ M: string-type c-type-getter
 M: string-type c-type-setter
     drop [ set-alien-cell ] ;
 
-TYPEDEF: { char* utf8 } char*
+{ char* utf8 } char <pointer> typedef
+{ char* utf8 } uchar <pointer> typedef
+{ char* binary } byte <pointer> typedef
+{ char* binary } ubyte <pointer> typedef
 
