@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test ui.text fonts math accessors kernel sequences ;
+USING: tools.test ui.text images fonts math arrays accessors kernel
+sequences ;
 IN: ui.text.tests
 
 [ t ] [ 0 sans-serif-font "aaa" offset>x zero? ] unit-test
@@ -20,3 +21,5 @@ IN: ui.text.tests
 [ t ] [ sans-serif-font "" text-dim first zero? ] unit-test
 
 [ f ] [ sans-serif-font font-metrics height>> zero? ] unit-test
+
+[ t ] [ serif-font "Hello world" string>image [ image? ] [ pair? ] bi* and ] unit-test

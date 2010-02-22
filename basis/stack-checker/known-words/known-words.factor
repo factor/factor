@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2004, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors alien alien.accessors arrays byte-arrays
 classes continuations.private effects generic hashtables
@@ -13,7 +13,7 @@ words.private definitions assocs summary compiler.units
 system.private combinators combinators.short-circuit locals
 locals.backend locals.types combinators.private
 stack-checker.values generic.single generic.single.private
-alien.libraries
+alien.libraries tools.dispatch.private tools.profiler.private
 stack-checker.alien
 stack-checker.state
 stack-checker.errors
@@ -21,6 +21,7 @@ stack-checker.visitor
 stack-checker.backend
 stack-checker.branches
 stack-checker.transforms
+stack-checker.dependencies
 stack-checker.recursive-state ;
 IN: stack-checker.known-words
 
@@ -43,7 +44,6 @@ IN: stack-checker.known-words
     { swapd (( x y z -- y x z       )) }
     { nip   (( x y   -- y           )) }
     { 2nip  (( x y z -- z           )) }
-    { tuck  (( x y   -- y x y       )) }
     { over  (( x y   -- x y x       )) }
     { pick  (( x y z -- x y z x     )) }
     { swap  (( x y   -- y x         )) }
@@ -98,8 +98,8 @@ M: composed infer-call*
     1 infer->r infer-call
     terminated? get [ 1 infer-r> infer-call ] unless ;
 
-M: object infer-call*
-    "literal quotation" literal-expected ;
+M: input-parameter infer-call* \ call unknown-macro-input ;
+M: object infer-call* \ call bad-macro-input ;
 
 : infer-ndip ( word n -- )
     [ literals get ] 2dip
@@ -153,7 +153,7 @@ M: bad-executable summary
 
 : infer-<tuple-boa> ( -- )
     \ <tuple-boa>
-    peek-d literal value>> second 1 + { tuple } <effect>
+    peek-d literal value>> second 1 + "obj" <array> { tuple } <effect>
     apply-word/effect ;
 
 \ <tuple-boa> [ infer-<tuple-boa> ] "special" set-word-prop
@@ -192,17 +192,17 @@ M: bad-executable summary
 
 \ load-local [ infer-load-local ] "special" set-word-prop
 
-: infer-get-local ( -- )
-    [let* | n [ pop-literal nip 1 swap - ]
-            in-r [ n consume-r ]
-            out-d [ in-r first copy-value 1array ]
-            out-r [ in-r copy-values ] |
-         out-d output-d
-         out-r output-r
-         f out-d in-r out-r
-         out-r in-r zip out-d first in-r first 2array suffix
-         #shuffle,
-    ] ;
+:: infer-get-local ( -- )
+    pop-literal nip 1 swap - :> n
+    n consume-r :> in-r
+    in-r first copy-value 1array :> out-d
+    in-r copy-values :> out-r
+
+    out-d output-d
+    out-r output-r
+    f out-d in-r out-r
+    out-r in-r zip out-d first in-r first 2array suffix
+    #shuffle, ;
 
 \ get-local [ infer-get-local ] "special" set-word-prop
 
@@ -221,17 +221,32 @@ M: bad-executable summary
     dup '[ _ infer-call-effect ] "special" set-word-prop
 ] each
 
-\ do-primitive [ unknown-primitive-error ] "special" set-word-prop
-
 \ if [ infer-if ] "special" set-word-prop
 \ dispatch [ infer-dispatch ] "special" set-word-prop
 
 \ alien-invoke [ infer-alien-invoke ] "special" set-word-prop
 \ alien-indirect [ infer-alien-indirect ] "special" set-word-prop
+\ alien-assembly [ infer-alien-assembly ] "special" set-word-prop
 \ alien-callback [ infer-alien-callback ] "special" set-word-prop
 
+{
+    do-primitive
+    mega-cache-miss
+    mega-cache-lookup
+    inline-cache-miss
+    inline-cache-miss-tail
+    unwind-native-frames
+    set-datastack
+    set-callstack
+    set-retainstack
+    unwind-native-frames
+    lazy-jit-compile
+    c-to-factor
+    call-clear
+} [ dup '[ _ do-not-compile ] "special" set-word-prop ] each
+
 : infer-special ( word -- )
-    "special" word-prop call( -- ) ;
+    [ current-word set ] [ "special" word-prop call( -- ) ] bi ;
 
 : infer-local-reader ( word -- )
     (( -- value )) apply-word/effect ;
@@ -258,7 +273,7 @@ M: bad-executable summary
 \ clear t "no-compile" set-word-prop
 
 : non-inline-word ( word -- )
-    dup called-dependency depends-on
+    dup depends-on-effect
     {
         { [ dup "shuffle" word-prop ] [ infer-shuffle-word ] }
         { [ dup "special" word-prop ] [ infer-special ] }
@@ -311,9 +326,6 @@ M: bad-executable summary
 
 \ bignum>float { bignum } { float } define-primitive
 \ bignum>float make-foldable
-
-\ (string>float) { byte-array } { float } define-primitive
-\ (string>float) make-foldable
 
 \ (float>string) { float } { byte-array } define-primitive
 \ (float>string) make-foldable
@@ -485,32 +497,40 @@ M: bad-executable summary
 \ (word) { object object object } { word } define-primitive
 \ (word) make-flushable
 
-\ word-xt { word } { integer integer } define-primitive
-\ word-xt make-flushable
+\ word-code { word } { integer integer } define-primitive
+\ word-code make-flushable
 
-\ getenv { fixnum } { object } define-primitive
-\ getenv make-flushable
+\ special-object { fixnum } { object } define-primitive
+\ special-object make-flushable
 
-\ setenv { object fixnum } { } define-primitive
+\ set-special-object { object fixnum } { } define-primitive
 
 \ (exists?) { string } { object } define-primitive
 
+\ minor-gc { } { } define-primitive
+
 \ gc { } { } define-primitive
 
-\ gc-stats { } { array } define-primitive
+\ compact-gc { } { } define-primitive
 
-\ (save-image) { byte-array } { } define-primitive
+\ (save-image) { byte-array byte-array } { } define-primitive
 
-\ (save-image-and-exit) { byte-array } { } define-primitive
+\ (save-image-and-exit) { byte-array byte-array } { } define-primitive
 
-\ data-room { } { integer integer array } define-primitive
+\ data-room { } { byte-array } define-primitive
 \ data-room make-flushable
 
-\ code-room { } { integer integer integer integer } define-primitive
+\ (code-blocks) { } { array } define-primitive
+\ (code-blocks)  make-flushable
+
+\ code-room { } { byte-array } define-primitive
 \ code-room  make-flushable
 
-\ micros { } { integer } define-primitive
-\ micros make-flushable
+\ system-micros { } { integer } define-primitive
+\ system-micros make-flushable
+
+\ nano-count { } { integer } define-primitive
+\ nano-count make-flushable
 
 \ tag { object } { fixnum } define-primitive
 \ tag make-foldable
@@ -590,7 +610,7 @@ M: bad-executable summary
 
 \ set-alien-double { float c-ptr integer } { } define-primitive
 
-\ alien-cell { c-ptr integer } { simple-c-ptr } define-primitive
+\ alien-cell { c-ptr integer } { pinned-c-ptr } define-primitive
 \ alien-cell make-flushable
 
 \ set-alien-cell { c-ptr c-ptr integer } { } define-primitive
@@ -621,11 +641,7 @@ M: bad-executable summary
 \ <array> { integer object } { array } define-primitive
 \ <array> make-flushable
 
-\ begin-scan { } { } define-primitive
-
-\ next-object { } { object } define-primitive
-
-\ end-scan { } { } define-primitive
+\ all-instances { } { array } define-primitive
 
 \ size { object } { fixnum } define-primitive
 \ size make-flushable
@@ -646,6 +662,8 @@ M: bad-executable summary
 
 \ fseek { alien integer integer } { } define-primitive
 
+\ ftell { alien } { integer } define-primitive
+
 \ fclose { alien } { } define-primitive
 
 \ <wrapper> { object } { wrapper } define-primitive
@@ -660,8 +678,8 @@ M: bad-executable summary
 \ array>quotation { array } { quotation } define-primitive
 \ array>quotation make-flushable
 
-\ quotation-xt { quotation } { integer } define-primitive
-\ quotation-xt make-flushable
+\ quotation-code { quotation } { integer integer } define-primitive
+\ quotation-code make-flushable
 
 \ <tuple> { tuple-layout } { tuple } define-primitive
 \ <tuple> make-flushable
@@ -693,21 +711,32 @@ M: bad-executable summary
 
 \ dll-valid? { object } { object } define-primitive
 
-\ modify-code-heap { array } { } define-primitive
+\ modify-code-heap { array object object } { } define-primitive
 
 \ unimplemented { } { } define-primitive
-
-\ gc-reset { } { } define-primitive
-
-\ gc-stats { } { array } define-primitive
 
 \ jit-compile { quotation } { } define-primitive
 
 \ lookup-method { object array } { word } define-primitive
 
 \ reset-dispatch-stats { } { } define-primitive
-\ dispatch-stats { } { array } define-primitive
-\ reset-inline-cache-stats { } { } define-primitive
-\ inline-cache-stats { } { array } define-primitive
+\ dispatch-stats { } { byte-array } define-primitive
 
 \ optimized? { word } { object } define-primitive
+
+\ strip-stack-traces { } { } define-primitive
+
+\ <callback> { integer word } { alien } define-primitive
+
+\ enable-gc-events { } { } define-primitive
+\ disable-gc-events { } { object } define-primitive
+
+\ profiling { object } { } define-primitive
+
+\ (identity-hashcode) { object } { fixnum } define-primitive
+
+\ compute-identity-hashcode { object } { } define-primitive
+
+\ (exit) { integer } { } define-primitive
+
+\ quot-compiled? { quotation } { object } define-primitive

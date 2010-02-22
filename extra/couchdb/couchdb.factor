@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs continuations debugger hashtables http
 http.client io io.encodings.string io.encodings.utf8 json.reader
-json.writer kernel make math math.parser namespaces sequences strings
-urls urls.encoding vectors ;
+json.writer kernel locals make math math.parser namespaces sequences
+strings urls urls.encoding vectors ;
 IN: couchdb
 
 ! NOTE: This code only works with the latest couchdb (0.9.*), because old
@@ -136,8 +136,9 @@ C: <db> db
 : attachments> ( assoc -- attachments ) "_attachments" swap at ;
 : >attachments ( assoc attachments -- assoc ) "_attachments" pick set-at ;
 
-: copy-key ( to from to-key from-key -- )
-    rot at spin set-at ;
+:: copy-key ( to from to-key from-key -- )
+    from-key from at
+    to-key to set-at ;
 
 : copy-id ( to from -- )
     "_id" "id" copy-key ;

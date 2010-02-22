@@ -26,7 +26,7 @@ TUPLE: id obj ;
 
 C: <id> id
 
-M: id hashcode* obj>> hashcode* ;
+M: id hashcode* nip obj>> identity-hashcode ;
 
 M: id equal? over id? [ [ obj>> ] bi@ eq? ] [ 2drop f ] if ;
 
@@ -222,7 +222,7 @@ SYMBOL: deserialized
 :: (deserialize-seq) ( exemplar quot -- seq )
     deserialize-cell exemplar new-sequence
     [ intern-object ]
-    [ dup [ drop quot call ] change-each ] bi ; inline
+    [ [ drop quot call ] map! ] bi ; inline
 
 : deserialize-array ( -- array )
     { } [ (deserialize) ] (deserialize-seq) ;
@@ -236,11 +236,11 @@ SYMBOL: deserialized
 : deserialize-hashtable ( -- hashtable )
     H{ } clone
     [ intern-object ]
-    [ (deserialize) update ]
+    [ (deserialize) assoc-union! drop ]
     [ ] tri ;
 
 : copy-seq-to-tuple ( seq tuple -- )
-    [ dup length ] dip [ set-array-nth ] curry 2each ;
+    [ set-array-nth ] curry each-index ;
 
 : deserialize-tuple ( -- array )
     #! Ugly because we have to intern the tuple before reading

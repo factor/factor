@@ -1,20 +1,13 @@
 USING: compiler definitions compiler.units tools.test arrays sequences words kernel
-accessors namespaces fry eval ;
+accessors namespaces fry eval quotations math ;
 IN: compiler.units.tests
 
 [ [ [ ] define-temp ] with-compilation-unit ] must-infer
 [ [ [ ] define-temp ] with-nested-compilation-unit ] must-infer
 
-[ flushed-dependency ] [ f flushed-dependency strongest-dependency ] unit-test
-[ flushed-dependency ] [ flushed-dependency f strongest-dependency ] unit-test
-[ inlined-dependency ] [ flushed-dependency inlined-dependency strongest-dependency ] unit-test
-[ inlined-dependency ] [ called-dependency inlined-dependency strongest-dependency ] unit-test
-[ flushed-dependency ] [ called-dependency flushed-dependency strongest-dependency ] unit-test
-[ called-dependency ] [ called-dependency f strongest-dependency ] unit-test
-
 ! Non-optimizing compiler bugs
 [ 1 1 ] [
-    "A" "B" <word> [ [ [ 1 ] dip ] 2array 1array modify-code-heap ] keep
+    "A" <uninterned-word> [ [ [ 1 ] dip ] 2array 1array t t modify-code-heap ] keep
     1 swap execute
 ] unit-test
 
@@ -63,3 +56,16 @@ DEFER: nesting-test
 [ ] [ "IN: compiler.units.tests << : nesting-test ( -- ) ; >>" eval( -- ) ] unit-test
 
 observer remove-definition-observer
+
+! Make sure that non-optimized calls to a generic word which
+! hasn't been compiled yet work properly
+GENERIC: uncompiled-generic-test ( a -- b )
+
+M: integer uncompiled-generic-test 1 + ;
+
+<< [ uncompiled-generic-test ] [ jit-compile ] [ suffix! ] bi >>
+"q" set
+
+[ 4 ] [ 3 "q" get call ] unit-test
+
+[ ] [ [ \ uncompiled-generic-test forget ] with-compilation-unit ] unit-test

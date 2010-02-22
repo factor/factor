@@ -40,16 +40,29 @@ factor_vm *tls_vm()
 
 static void *null_dll;
 
-s64 current_micros()
+u64 system_micros()
 {
 	struct timeval t;
 	gettimeofday(&t,NULL);
-	return (s64)t.tv_sec * 1000000 + t.tv_usec;
+	return (u64)t.tv_sec * 1000000 + t.tv_usec;
 }
 
-void sleep_micros(cell usec)
+void sleep_nanos(u64 nsec)
 {
-	usleep(usec);
+	timespec ts;
+	timespec ts_rem;
+	int ret;
+	ts.tv_sec = nsec / 1000000000;
+	ts.tv_nsec = nsec % 1000000000;
+	ret = nanosleep(&ts,&ts_rem);
+	while(ret == -1 && errno == EINTR)
+	{
+		memcpy(&ts, &ts_rem, sizeof(ts));
+		ret = nanosleep(&ts, &ts_rem);
+	}
+
+	if(ret == -1)
+		fatal_error("nanosleep failed", 0);
 }
 
 void factor_vm::init_ffi()
@@ -60,39 +73,52 @@ void factor_vm::init_ffi()
 
 void factor_vm::ffi_dlopen(dll *dll)
 {
-	dll->dll = dlopen(alien_offset(dll->path), RTLD_LAZY);
+	dll->handle = dlopen(alien_offset(dll->path), RTLD_LAZY);
 }
 
 void *factor_vm::ffi_dlsym(dll *dll, symbol_char *symbol)
 {
-	void *handle = (dll == NULL ? null_dll : dll->dll);
+	void *handle = (dll == NULL ? null_dll : dll->handle);
 	return dlsym(handle,symbol);
 }
 
 void factor_vm::ffi_dlclose(dll *dll)
 {
-	if(dlclose(dll->dll))
-		general_error(ERROR_FFI,F,F,NULL);
-	dll->dll = NULL;
+	if(dlclose(dll->handle))
+		general_error(ERROR_FFI,false_object,false_object,NULL);
+	dll->handle = NULL;
 }
 
 void factor_vm::primitive_existsp()
 {
 	struct stat sb;
-	char *path = (char *)(untag_check<byte_array>(dpop()) + 1);
-	box_boolean(stat(path,&sb) >= 0);
+	char *path = (char *)(untag_check<byte_array>(ctx->pop()) + 1);
+	ctx->push(tag_boolean(stat(path,&sb) >= 0));
 }
 
-segment::segment(cell size_)
+void factor_vm::move_file(const vm_char *path1, const vm_char *path2)
+{
+	int ret = 0;
+	do {
+		ret = rename((path1),(path2));
+	} while(ret < 0 && errno == EINTR);
+	if(ret < 0)
+		general_error(ERROR_IO,tag_fixnum(errno),false_object,NULL);
+}
+
+segment::segment(cell size_, bool executable_p)
 {
 	size = size_;
 
 	int pagesize = getpagesize();
 
-	char *array = (char *)mmap(NULL,pagesize + size + pagesize,
-		PROT_READ | PROT_WRITE | PROT_EXEC,
-		MAP_ANON | MAP_PRIVATE,-1,0);
+	int prot;
+	if(executable_p)
+		prot = (PROT_READ | PROT_WRITE | PROT_EXEC);
+	else
+		prot = (PROT_READ | PROT_WRITE);
 
+	char *array = (char *)mmap(NULL,pagesize + size + pagesize,prot,MAP_ANON | MAP_PRIVATE,-1,0);
 	if(array == (char*)-1) out_of_memory();
 
 	if(mprotect(array,pagesize,PROT_NONE) == -1)
@@ -112,63 +138,47 @@ segment::~segment()
 	if(retval)
 		fatal_error("Segment deallocation failed",0);
 }
-  
-stack_frame *factor_vm::uap_stack_pointer(void *uap)
+
+void factor_vm::dispatch_signal(void *uap, void (handler)())
 {
-	/* There is a race condition here, but in practice a signal
-	delivered during stack frame setup/teardown or while transitioning
-	from Factor to C is a sign of things seriously gone wrong, not just
-	a divide by zero or stack underflow in the listener */
 	if(in_code_heap_p(UAP_PROGRAM_COUNTER(uap)))
 	{
-		stack_frame *ptr = (stack_frame *)ucontext_stack_pointer(uap);
-		if(!ptr)
-			critical_error("Invalid uap",(cell)uap);
-		return ptr;
+		stack_frame *ptr = (stack_frame *)UAP_STACK_POINTER(uap);
+		assert(ptr);
+		signal_callstack_top = ptr;
 	}
 	else
-		return NULL;
-}
+		signal_callstack_top = NULL;
 
-void factor_vm::memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
-{
-	signal_fault_addr = (cell)siginfo->si_addr;
-	signal_callstack_top = uap_stack_pointer(uap);
-	UAP_PROGRAM_COUNTER(uap) = (cell)factor::memory_signal_handler_impl;
+	UAP_STACK_POINTER(uap) = align_stack_pointer(UAP_STACK_POINTER(uap));
+	UAP_PROGRAM_COUNTER(uap) = (cell)handler;
 }
 
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	SIGNAL_VM_PTR()->memory_signal_handler(signal,siginfo,uap);
-}
-
-void factor_vm::misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
-{
-	signal_number = signal;
-	signal_callstack_top = uap_stack_pointer(uap);
-	UAP_PROGRAM_COUNTER(uap) = (cell)factor::misc_signal_handler_impl;
+	factor_vm *vm = tls_vm();
+	vm->signal_fault_addr = (cell)siginfo->si_addr;
+	vm->dispatch_signal(uap,factor::memory_signal_handler_impl);
 }
 
 void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	SIGNAL_VM_PTR()->misc_signal_handler(signal,siginfo,uap);
-}
-
-void factor_vm::fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
-{
-	signal_number = signal;
-	signal_callstack_top = uap_stack_pointer(uap);
-	signal_fpu_status = fpu_status(uap_fpu_status(uap));
-	uap_clear_fpu_status(uap);
-	UAP_PROGRAM_COUNTER(uap) =
-		(siginfo->si_code == FPE_INTDIV || siginfo->si_code == FPE_INTOVF)
-		? (cell)factor::misc_signal_handler_impl
-		: (cell)factor::fp_signal_handler_impl;
+	factor_vm *vm = tls_vm();
+	vm->signal_number = signal;
+	vm->dispatch_signal(uap,factor::misc_signal_handler_impl);
 }
 
 void fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	SIGNAL_VM_PTR()->fpe_signal_handler(signal, siginfo, uap);
+	factor_vm *vm = tls_vm();
+	vm->signal_number = signal;
+	vm->signal_fpu_status = fpu_status(uap_fpu_status(uap));
+	uap_clear_fpu_status(uap);
+
+	vm->dispatch_signal(uap,
+		(siginfo->si_code == FPE_INTDIV || siginfo->si_code == FPE_INTOVF)
+		? factor::misc_signal_handler_impl
+		: factor::fp_signal_handler_impl);
 }
 
 static void sigaction_safe(int signum, const struct sigaction *act, struct sigaction *oldact)
@@ -211,7 +221,6 @@ void unix_init_signals()
 	misc_sigaction.sa_sigaction = misc_signal_handler;
 	misc_sigaction.sa_flags = SA_SIGINFO;
 
-	sigaction_safe(SIGABRT,&misc_sigaction,NULL);
 	sigaction_safe(SIGQUIT,&misc_sigaction,NULL);
 	sigaction_safe(SIGILL,&misc_sigaction,NULL);
 

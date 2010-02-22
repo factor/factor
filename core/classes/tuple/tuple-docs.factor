@@ -129,17 +129,18 @@ ARTICLE: "tuple-inheritance-example" "Tuple subclassing example"
 }
 "Rectangles and parallelograms use the same algorithm for computing the area, whereas they use different algorithms for computing perimiter. Also, rectangles and parallelograms both have " { $snippet "width" } " and " { $snippet "height" } " slots. We can exploit this with subclassing:"
 { $code
+    "USING: accessors kernel math math.constants math.functions ;"
     "GENERIC: area ( shape -- n )"
     "GENERIC: perimiter ( shape -- n )"
     ""
     "TUPLE: shape ;"
     ""
     "TUPLE: circle < shape radius ;"
-    "M: area circle radius>> sq pi * ;"
-    "M: perimiter circle radius>> 2 * pi * ;"
+    "M: circle area radius>> sq pi * ;"
+    "M: circle perimiter radius>> 2 * pi * ;"
     ""
-    "TUPLE: quad < shape width height"
-    "M: area quad [ width>> ] [ height>> ] bi * ;"
+    "TUPLE: quad < shape width height ;"
+    "M: quad area [ width>> ] [ height>> ] bi * ;"
     ""
     "TUPLE: rectangle < quad ;"
     "M: rectangle perimiter [ width>> 2 * ] [ height>> 2 * ] bi + ;"
@@ -170,13 +171,13 @@ $nl
 }
 "The " { $vocab-link "delegate" } " library provides a language abstraction for expressing has-a relationships."
 { $heading "Anti-pattern #2: subclassing for implementation sharing only" }
-"Tuple subclassing purely for sharing implementations of methods is not a good idea either. If a class " { $snippet "A" } " is a subclass of a class " { $snippet "B" } ", then instances of " { $snippet "A" } " should be usable anywhere that an instance of " { $snippet "B" } " is. If this properly does not hold, then subclassing should not be used."
+"Tuple subclassing purely for sharing implementations of methods is not a good idea either. If a class " { $snippet "A" } " is a subclass of a class " { $snippet "B" } ", then instances of " { $snippet "A" } " should be usable anywhere that an instance of " { $snippet "B" } " is. If this property does not hold, then subclassing should not be used."
 $nl
 "There are two alternatives which are preferred to subclassing in this case. The first is " { $link "mixins" } "."
 $nl
 "The second is to use ad-hoc slot polymorphism. If two classes define a slot with the same name, then code which uses " { $link "accessors" } " can operate on instances of both objects, assuming the values stored in that slot implement a common protocol. This allows code to be shared without creating contrieved relationships between classes."
 { $heading "Anti-pattern #3: subclassing to override a method definition" }
-"While method overriding is a very powerful tool, improper use can cause tight coupling of code and lead to difficulty in testing and refactoring. Subclassing should not be used as a means of “monkey patching” methods to fix bugs and add features. Only subclass from classes which were designed to be inherited from, and when writing classes of your own which are intended to be subclassed, clearly document that subclasses may and may not do. This includes construction policy; document whether subclasses should use " { $link new } ", " { $link boa } ", or a custom parametrized constructor."
+"While method overriding is a very powerful tool, improper use can cause tight coupling of code and lead to difficulty in testing and refactoring. Subclassing should not be used as a means of “monkey patching” methods to fix bugs and add features. Only subclass from classes which were designed to be inherited from, and when writing classes of your own which are intended to be subclassed, clearly document what subclasses may and may not do. This includes construction policy; document whether subclasses should use " { $link new } ", " { $link boa } ", or a custom parametrized constructor."
 { $see-also "parametrized-constructors" } ;
 
 ARTICLE: "tuple-subclassing" "Tuple subclassing"
@@ -190,6 +191,8 @@ $nl
     "tuple-inheritance-example"
     "tuple-inheritance-anti-example"
 } 
+"Declaring a tuple class final prohibits other classes from subclassing it:"
+{ $subsections POSTPONE: final }
 { $see-also "call-next-method" "parametrized-constructors" "unions" "mixins" } ;
 
 ARTICLE: "tuple-introspection" "Tuple introspection"
@@ -199,6 +202,8 @@ ARTICLE: "tuple-introspection" "Tuple introspection"
     tuple>array
     tuple-slots
 }
+"Tuples can be compared for slot equality even if the tuple class overrides " { $link equal? } ":"
+{ $subsections tuple= }
 "Tuple classes can also be defined at run time:"
 { $subsections define-tuple-class }
 { $see-also "slots" "mirrors" } ;
@@ -347,8 +352,7 @@ HELP: tuple-class
 
 HELP: tuple=
 { $values { "tuple1" tuple } { "tuple2" tuple } { "?" "a boolean" } }
-{ $description "Low-level tuple equality test. User code should use " { $link = } " instead." }
-{ $warning "This word is in the " { $vocab-link "classes.tuple.private" } " vocabulary because it does not do any type checking. Passing values which are not tuples can result in memory corruption." } ;
+{ $description "Checks if two tuples have equal slot values. This is the default behavior of " { $link = } " on tuples, unless the tuple class subclasses " { $link identity-tuple } " or implements a method on " { $link equal? } ". In cases where equality has been redefined, this word can be used to get the default semantics if needed." } ;
 
 HELP: tuple
 { $class-description "The class of tuples. This class is further partitioned into disjoint subclasses; each tuple shape defined by " { $link POSTPONE: TUPLE: } " is a new class."
@@ -423,7 +427,7 @@ HELP: <tuple-boa> ( ... layout -- tuple )
 
 HELP: new
 { $values { "class" tuple-class } { "tuple" tuple } }
-{ $description "Creates a new instance of " { $snippet "class" } " with all slots set to their initial values (see" { $link "tuple-declarations" } ")." }
+{ $description "Creates a new instance of " { $snippet "class" } " with all slots set to their initial values (see " { $link "tuple-declarations" } ")." }
 { $examples
     { $example
         "USING: kernel prettyprint ;"
@@ -439,3 +443,6 @@ HELP: boa
 { $description "Creates a new instance of " { $snippet "class" } " and fill in the slots from the stack, with the top-most stack element being stored in the right-most slot." }
 { $notes "The name " { $snippet "boa" } " is shorthand for “by order of arguments”, and “BOA constructor” is a pun on “boa constrictor”." }
 { $errors "Throws an error if the slot values do not match class declarations on slots (see" { $link "tuple-declarations" } ")." } ;
+
+HELP: bad-superclass
+{ $error-description "Thrown if an attempt is made to subclass a class that is not a tuple class, or a tuple class declared " { $link POSTPONE: final } "." } ;

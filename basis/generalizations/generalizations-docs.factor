@@ -89,6 +89,11 @@ HELP: ndup
     }
 } ;
 
+HELP: dupn
+{ $values { "n" integer } }
+{ $description "Calls " { $link dup } " enough times that " { $snippet "n" } " references to the element at the top of the stack before " { $snippet "dupn" } " is called are on the top of the stack." }
+{ $notes { $snippet "2 dupn" } " is equivalent to " { $link dup } ". " { $snippet "1 dupn" } " is a no-op. " { $snippet "0 dupn" } " is equivalent to " { $link drop } "." } ;
+
 HELP: nnip
 { $values { "n" integer } }
 { $description "A generalization of " { $link nip } " and " { $link 2nip }
@@ -149,7 +154,7 @@ HELP: -nrot
 } ;
 
 HELP: ndip
-{ $values { "quot" quotation } { "n" integer } }
+{ $values { "n" integer } }
 { $description "A generalization of " { $link dip } " that can work " 
 "for any stack depth. The quotation will be called with a stack that "
 "has 'n' items removed first. The 'n' items are then put back on the "
@@ -167,7 +172,7 @@ HELP: ndip
 } ;
 
 HELP: nkeep
-{ $values { "quot" quotation } { "n" integer } }
+{ $values { "n" integer } }
 { $description "A generalization of " { $link keep } " that can work " 
 "for any stack depth. The first " { $snippet "n" } " items after the quotation will be "
 "saved, the quotation called, and the items restored."
@@ -207,7 +212,7 @@ HELP: nwith
 } ;
 
 HELP: napply
-{ $values { "n" integer } }
+{ $values { "quot" quotation } { "n" integer } }
 { $description "A generalization of " { $link bi@ } " and " { $link tri@ } " that can work for any stack depth."
 } 
 { $examples
@@ -235,6 +240,31 @@ HELP: nspread
 { $values { "quots" "a sequence of quotations" } { "n" integer } }
 { $description "A generalization of " { $link spread } " that can work for any quotation arity."
 } ;
+
+HELP: cleave*
+{ $values { "n" integer } }
+{ $description "Like " { $link cleave } ", but instead of taking a single array of quotations, cleaves using quotations taken from the top " { $snippet "n" } " elements of the datastack." }
+{ $notes "This word can be used with " { $link apply-curry } " to generalize the " { $snippet "bi-curry@ bi" } " or " { $snippet "tri-curry@ tri" } " dataflow patterns." } ;
+
+HELP: spread*
+{ $values { "n" integer } }
+{ $description "Like " { $link spread } ", but instead of taking a single array of quotations, spreads using quotations taken from the top " { $snippet "n" } " elements of the datastack." }
+{ $notes "This word can be used with " { $link apply-curry } " to generalize the " { $snippet "bi-curry@ bi*" } " or " { $snippet "tri-curry@ tri*" } " dataflow patterns." } ;
+
+HELP: apply-curry
+{ $values { "...a" { $snippet "n" } " values on the datastack" } { "quot" quotation } { "n" integer } }
+{ $description "Curries each of the top " { $snippet "n" } " items of the datastack onto " { $snippet "quot" } ", leaving " { $snippet "n" } " quotations on the datastack. A generalization of " { $link bi-curry@ } " and " { $link tri-curry@ } "." }
+{ $notes "This word can be used with " { $link cleave* } " and " { $link spread* } " to generalize dataflow patterns such as " { $snippet "bi-curry@ bi" } ", " { $snippet "tri-curry@ tri" } ", " { $snippet "bi-curry@ bi*" } ", and " { $snippet "tri-curry@ tri*" } "." } ;
+
+HELP: cleave-curry
+{ $values { "a" object } { "...quot" { $snippet "n" } " quotations on the datastack" } { "n" integer } }
+{ $description "Curries " { $snippet "a" } " onto the " { $snippet "n" } " quotations on the top of the datastack. A generalization of " { $link bi-curry } " and " { $link tri-curry } "." }
+{ $notes "This word can be used with " { $link cleave* } " and " { $link spread* } " to generalize dataflow patterns such as " { $snippet "bi-curry bi" } ", " { $snippet "tri-curry tri" } ", " { $snippet "bi-curry bi*" } ", and " { $snippet "tri-curry tri*" } "." } ;
+
+HELP: spread-curry
+{ $values { "...a" { $snippet "n" } " objects on the datastack" } { "...quot" { $snippet "n" } " quotations on the datastack" } { "n" integer } }
+{ $description "Curries the " { $snippet "n" } " quotations on the top of the datastack with the " { $snippet "n" } " values just below them. A generalization of " { $link bi-curry* } " and " { $link tri-curry* } "." }
+{ $notes "This word can be used with " { $link cleave* } " and " { $link spread* } " to generalize dataflow patterns such as " { $snippet "bi-curry* bi" } ", " { $snippet "tri-curry* tri" } ", " { $snippet "bi-curry* bi*" } ", and " { $snippet "tri-curry* tri*" } "." } ;
 
 HELP: mnswap
 { $values { "m" integer } { "n" integer } }
@@ -302,18 +332,6 @@ HELP: nappend-as
 
 { nappend nappend-as } related-words
 
-HELP: ntuck
-{ $values
-     { "n" integer }
-}
-{ $description "A generalization of " { $link tuck } " that can work for any stack depth. The top item will be copied and placed " { $snippet "n" } " items down on the stack." } ;
-
-HELP: nspin
-{ $values
-    { "n" integer }
-}
-{ $description "A generalization of " { $link spin } " that can work for any stack depth. The top " { $snippet "n" } " items will be reversed in order." } ;
-
 ARTICLE: "sequence-generalizations" "Generalized sequence operations"
 { $subsections
     narray
@@ -327,13 +345,12 @@ ARTICLE: "sequence-generalizations" "Generalized sequence operations"
 ARTICLE: "shuffle-generalizations" "Generalized shuffle words"
 { $subsections
     ndup
+    dupn
     npick
     nrot
     -nrot
     nnip
     ndrop
-    ntuck
-    nspin
     mnswap
     nweave
 } ;
@@ -345,6 +362,11 @@ ARTICLE: "combinator-generalizations" "Generalized combinators"
     napply
     ncleave
     nspread
+    cleave*
+    spread*
+    apply-curry
+    cleave-curry
+    spread-curry
 } ;
 
 ARTICLE: "other-generalizations" "Additional generalizations"
@@ -363,6 +385,7 @@ ARTICLE: "generalizations" "Generalized shuffle words and combinators"
     "shuffle-generalizations"
     "combinator-generalizations"
     "other-generalizations"
-} ;
+}
+"Also see the " { $vocab-link "sequences.generalizations" } " vocabulary for generalized sequence iteration combinators." ;
 
 ABOUT: "generalizations"

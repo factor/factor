@@ -28,9 +28,9 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
     dimensioned boa ;
 
 : >dimensioned< ( d -- n top bot )
-    [ value>> ] [ top>> ] [ bot>> ] tri ;
+    [ bot>> ] [ top>> ] [ value>> ] tri ;
 
-\ <dimensioned> [ >dimensioned< ] define-inverse
+\ <dimensioned> [ [ dimensioned boa ] undo ] define-inverse
 
 : dimensions ( dimensioned -- top bot )
     [ top>> ] [ bot>> ] bi ;
@@ -65,7 +65,7 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
 : d-sq ( d -- d ) dup d* ;
 
 : d-recip ( d -- d' )
-    >dimensioned< spin recip dimension-op> ;
+    >dimensioned< recip dimension-op> ;
 
 : d/ ( d d -- d ) d-recip d* ;
 

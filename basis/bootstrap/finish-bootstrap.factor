@@ -3,15 +3,20 @@ namespaces eval kernel vocabs.loader io ;
 
 [
     boot
-    do-init-hooks
+    do-startup-hooks
     [
         (command-line) parse-command-line
         load-vocab-roots
         run-user-init
-        "e" get [ eval( -- ) ] when*
-        ignore-cli-args? not script get and
-        [ run-script ] [ "run" get run ] if*
+
+        "e" get script get or [
+            "e" get [ eval( -- ) ] when*
+            script get [ run-script ] when*
+        ] [
+            "run" get run
+        ] if
+
         output-stream get [ stream-flush ] when*
         0 exit
     ] [ print-error 1 exit ] recover
-] set-boot-quot
+] set-startup-quot

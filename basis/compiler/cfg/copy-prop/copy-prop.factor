@@ -63,7 +63,7 @@ M: insn update-insn rename-insn-uses t ;
     copies get dup assoc-empty? [ 2drop ] [
         renamings set
         [
-            instructions>> [ update-insn ] filter-here
+            instructions>> [ update-insn ] filter! drop
         ] each-basic-block
     ] if ;
 

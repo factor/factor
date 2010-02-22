@@ -21,7 +21,7 @@ SYMBOL: total
 : canonicalize-specializer-1 ( specializer -- specializer' )
     [
         [ class? ] filter
-        [ length <reversed> [ 1 + neg ] map ] keep zip
+        [ length iota <reversed> [ 1 + neg ] map ] keep zip
         [ length args [ max ] change ] keep
     ]
     [
@@ -40,7 +40,7 @@ SYMBOL: total
     ] assoc-map ;
 
 : canonicalize-specializer-3 ( specializer -- specializer' )
-    [ total get object <array> dup <enum> ] dip update ;
+    [ total get object <array> <enum> ] dip assoc-union! seq>> ;
 
 : canonicalize-specializers ( methods -- methods' hooks )
     [
@@ -81,7 +81,7 @@ SYMBOL: total
 
 : topological-sort ( seq quot -- newseq )
     [ >vector [ dup empty? not ] ] dip
-    [ dupd maximal-element [ over delete-nth ] dip ] curry
+    [ dupd maximal-element [ over remove-nth! drop ] dip ] curry
     produce nip ; inline
 
 : classes< ( seq1 seq2 -- lt/eq/gt )
@@ -111,7 +111,7 @@ SYMBOL: total
     swap "predicate" word-prop append ;
 
 : multi-predicate ( classes -- quot )
-    dup length <reversed>
+    dup length iota <reversed>
     [ picker 2array ] 2map
     [ drop object eq? not ] assoc-filter
     [ [ t ] ] [

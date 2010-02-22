@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: system kernel namespaces strings hashtables sequences assocs
 combinators vocabs.loader init threads continuations math accessors
@@ -75,14 +75,12 @@ SYMBOL: wait-flag
 [
     H{ } clone processes set-global
     start-wait-thread
-] "io.launcher" add-init-hook
+] "io.launcher" add-startup-hook
 
 : process-started ( process handle -- )
     >>handle
     V{ } clone swap processes get set-at
     wait-flag get-global raise-flag ;
-
-M: process hashcode* handle>> hashcode* ;
 
 : pass-environment? ( process -- ? )
     dup environment>> assoc-empty? not
@@ -129,16 +127,17 @@ M: process-was-killed error.
     "Launch descriptor:" print nl
     process>> . ;
 
-: wait-for-process ( process -- status )
+: (wait-for-process) ( process -- status )
+    dup handle>>
     [
-        dup handle>>
-        [
-            dup [ processes get at push ] curry
-            "process" suspend drop
-        ] when
-        dup killed>>
-        [ process-was-killed ] [ status>> ] if
-    ] with-timeout ;
+        dup [ processes get at push ] curry
+        "process" suspend drop
+    ] when
+    dup killed>>
+    [ process-was-killed ] [ status>> ] if ;
+
+: wait-for-process ( process -- status )
+    [ (wait-for-process) ] with-timeout ;
 
 : run-detached ( desc -- process )
     >process
@@ -266,7 +265,7 @@ M: output-process-error error.
     +stdout+ >>stderr
     [ +closed+ or ] change-stdin
     utf8 <process-reader*>
-    [ stream-contents ] [ dup wait-for-process ] bi*
+    [ [ stream-contents ] [ dup (wait-for-process) ] bi* ] with-timeout
     0 = [ 2drop ] [ output-process-error ] if ;
 
 : notify-exit ( process status -- )

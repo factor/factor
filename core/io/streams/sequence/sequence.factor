@@ -32,7 +32,7 @@ SLOT: i
 
 : find-sep ( seps stream -- sep/f n )
     swap [ >sequence-stream< swap tail-slice ] dip
-    [ memq? ] curry find swap ; inline
+    [ member-eq? ] curry find swap ; inline
 
 : sequence-read-until ( separators stream -- seq sep/f )
     [ find-sep ] keep

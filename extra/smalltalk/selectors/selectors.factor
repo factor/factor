@@ -1,6 +1,6 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators effects generic generic.standard
+USING: arrays combinators effects generic generic.standard
 kernel sequences words lexer ;
 IN: smalltalk.selectors
 
@@ -15,9 +15,9 @@ SYMBOLS: unary binary keyword ;
 
 : selector>effect ( selector -- effect )
     dup selector-type {
-        { unary [ drop 0 ] }
-        { binary [ drop 1 ] }
-        { keyword [ [ CHAR: : = ] count ] }
+        { unary [ drop { } ] }
+        { binary [ drop { "x" } ] }
+        { keyword [ [ CHAR: : = ] count "x" <array> ] }
     } case "receiver" suffix { "result" } <effect> ;
 
 : selector>generic ( selector -- generic )

@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math math.order math.parser math.functions kernel
 sequences io accessors arrays io.streams.string splitting
@@ -66,11 +66,11 @@ M: array month. ( pair -- )
     [ month-name write bl number>string print ]
     [ 1 zeller-congruence ]
     [ (days-in-month) day-abbreviations2 " " join print ] 2tri
-    over "   " <repetition> concat write
+    over "   " <repetition> "" concat-as write
     [
         [ 1 + day. ] keep
         1 + + 7 mod zero? [ nl ] [ bl ] if
-    ] with each nl ;
+    ] with each-integer nl ;
 
 M: timestamp month. ( timestamp -- )
     [ year>> ] [ month>> ] bi 2array month. ;
@@ -78,7 +78,7 @@ M: timestamp month. ( timestamp -- )
 GENERIC: year. ( obj -- )
 
 M: integer year. ( n -- )
-    12 [ 1 + 2array month. nl ] with each ;
+    12 [ 1 + 2array month. nl ] with each-integer ;
 
 M: timestamp year. ( timestamp -- )
     year>> year. ;

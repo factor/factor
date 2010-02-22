@@ -46,7 +46,7 @@ GENERIC: nfa-node ( node -- start-state end-state )
     epsilon nfa-table get add-transition ;
 
 M:: star nfa-node ( node -- start end )
-    node term>> nfa-node :> s1 :> s0
+    node term>> nfa-node :> ( s0 s1 )
     next-state :> s2
     next-state :> s3
     s1 s0 epsilon-transition

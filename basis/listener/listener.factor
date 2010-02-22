@@ -48,7 +48,7 @@ SYMBOL: error-hook
 
 : call-error-hook ( error -- )
     error-continuation get error-hook get
-    call( error continuation -- ) ;
+    call( continuation error -- ) ;
 
 [ drop print-error-and-restarts ] error-hook set-global
 
@@ -131,7 +131,6 @@ SYMBOL: interactive-vocabs
     "arrays"
     "assocs"
     "combinators"
-    "compiler"
     "compiler.errors"
     "compiler.units"
     "continuations"
@@ -163,14 +162,17 @@ SYMBOL: interactive-vocabs
     "syntax"
     "tools.annotations"
     "tools.crossref"
+    "tools.deprecation"
     "tools.destructors"
     "tools.disassembler"
+    "tools.dispatch"
     "tools.errors"
     "tools.memory"
     "tools.profiler"
     "tools.test"
     "tools.threads"
     "tools.time"
+    "tools.walker"
     "vocabs"
     "vocabs.loader"
     "vocabs.refresh"
@@ -191,13 +193,12 @@ SYMBOL: interactive-vocabs
 
 : with-interactive-vocabs ( quot -- )
     [
-        <manifest> manifest set
         "scratchpad" set-current-vocab
         interactive-vocabs get only-use-vocabs
         call
-    ] with-scope ; inline
+    ] with-manifest ; inline
 
 : listener ( -- )
-    [ [ { } (listener) ] with-interactive-vocabs ] with-return ;
+    [ [ { } (listener) ] with-return ] with-interactive-vocabs ;
 
 MAIN: listener

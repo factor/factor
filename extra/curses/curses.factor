@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.strings assocs byte-arrays
 combinators continuations destructors fry io.encodings.8-bit
-io io.encodings.string io.encodings.utf8 kernel math
+io io.encodings.string io.encodings.utf8 kernel locals math
 namespaces prettyprint sequences classes.struct
-strings threads curses.ffi ;
+strings threads curses.ffi unix.ffi ;
 IN: curses
 
 SYMBOL: curses-windows
@@ -19,6 +19,7 @@ ERROR: duplicate-window window ;
 ERROR: unnamed-window window ;
 ERROR: window-not-found window ;
 ERROR: curses-failed ;
+ERROR: unsupported-curses-terminal ;
 
 : get-window ( string -- window )
     dup curses-windows get at*
@@ -28,7 +29,11 @@ ERROR: curses-failed ;
 
 : curses-error ( n -- ) ERR = [ curses-failed ] when ;
 
+: curses-ok? ( -- ? )
+    { 0 1 2 } [ isatty 0 = not ] all? ;
+
 : with-curses ( quot -- )
+    curses-ok? [ unsupported-curses-terminal ] unless
     H{ } clone curses-windows [
         initscr curses-error
         [
@@ -123,8 +128,10 @@ PRIVATE>
 : curses-writef ( window string -- )
     [ window-ptr dup ] dip (curses-wprint) (curses-window-refresh) ;
 
-: (curses-read) ( window-ptr n encoding -- string )
-    [ [ <byte-array> tuck ] keep wgetnstr curses-error ] dip alien>string ;
+:: (curses-read) ( window-ptr n encoding -- string )
+    n <byte-array> :> buf
+    window-ptr buf n wgetnstr curses-error
+    buf encoding alien>string ;
 
 : curses-read ( window n -- string )
     utf8 [ window-ptr ] 2dip (curses-read) ;

@@ -1,7 +1,7 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.vectors math.matrices namespaces
-sequences ;
+USING: kernel locals math math.vectors math.matrices
+namespaces sequences fry sorting ;
 IN: math.matrices.elimination
 
 SYMBOL: matrix
@@ -42,7 +42,7 @@ SYMBOL: matrix
     [ [ clear-scale ] 2keep [ n*v ] dip v+ ] change-row ;
 
 : rows-from ( row# -- slice )
-    rows dup <slice> ;
+    rows dup iota <slice> ;
 
 : clear-col ( col# row# rows -- )
     [ nth-row ] dip [ [ 2dup ] dip (clear-col) ] each 2drop ;
@@ -79,18 +79,17 @@ SYMBOL: matrix
 
 : reduced ( matrix' -- matrix'' )
     [
-        rows <reversed> [
+        rows iota <reversed> [
             dup nth-row leading drop
-            dup [ swap dup clear-col ] [ 2drop ] if
+            dup [ swap dup iota clear-col ] [ 2drop ] if
         ] each
     ] with-matrix ;
 
-: basis-vector ( row col# -- )
-    [ clone ] dip
-    [ swap nth neg recip ] 2keep
-    [ 0 spin set-nth ] 2keep
-    [ n*v ] dip
-    matrix get set-nth ;
+:: basis-vector ( row col# -- )
+    row clone :> row'
+    col# row' nth neg recip :> a
+    0 col# row' set-nth
+    a row n*v col# matrix get set-nth ;
 
 : nullspace ( matrix -- seq )
     echelon reduced dup empty? [

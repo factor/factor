@@ -17,16 +17,21 @@ HELP: <shader-instance>
 }
 { $description "Compiles an instance of " { $snippet "shader" } " for the current graphics context. If an instance already exists for " { $snippet "shader" } " in the current context, it is reused." } ;
 
-HELP: <vertex-array>
+HELP: <multi-vertex-array>
 { $values
-    { "program-instance" program-instance } { "vertex-formats" "a list of " { $link buffer-ptr } "/" { $link vertex-format } " pairs" }
+    { "vertex-formats" "a list of " { $link buffer-ptr } "/" { $link vertex-format } " pairs" }
+    { "program-instance" program-instance } 
     { "vertex-array" vertex-array }
 }
-{ $description "Creates a new " { $link vertex-array } " to feed data to " { $snippet "program-instance" } " from the set of " { $link buffer } "s specified in " { $snippet "vertex-formats" } "." } ;
+{ $description "Creates a new " { $link vertex-array } " to feed data to " { $snippet "program-instance" } " from the set of " { $link buffer } "s specified in " { $snippet "vertex-formats" } ". The first element of each pair in " { $snippet "vertex-formats" } " can be either a " { $link buffer-ptr } " or a " { $link buffer } "; in the latter case, vertex data in the associated format is read from the beginning of the buffer." } ;
+
+HELP: feedback-format:
+{ $syntax "feedback-format: vertex-format" }
+{ $description "When used as part of a " { $link POSTPONE: GLSL-PROGRAM: } " definition, this syntax specifies the " { $link vertex-format } " in which transform feedback output will be generated." } ;
 
 HELP: GLSL-PROGRAM:
-{ $syntax "GLSL-PROGRAM: program-name shader shader ... shader [vertex-format] ;" }
-{ $description "Defines a new " { $link program } " named " { $snippet "program-name" } ". When the program is instantiated with " { $link <program-instance> } ", it will link together instances of all of the specified " { $link shader } "s to create the program instance. A single " { $link vertex-array } " may optionally be specified; if the program is used to collect transform feedback, this format will be used for the output." }
+{ $syntax "GLSL-PROGRAM: program-name shader shader ... [vertex-format vertex-format ...] [feedback-format: vertex-format] ;" }
+{ $description "Defines a new " { $link program } " named " { $snippet "program-name" } ". When the program is instantiated with " { $link <program-instance> } ", it will link together instances of all of the specified " { $link shader } "s to create the program instance. If any " { $link vertex-format } "s are specified, their attributes will be pre-assigned attribute indexes at link time, to ensure that their indexes remain constant if the program is refreshed with " { $link refresh-program } ". A transform feedback vertex format may optionally be specified with " { $link POSTPONE: feedback-format: } "; if the program is used to collect transform feedback, the given vertex format will be used for the output." }
 { $notes "Transform feedback requires OpenGL 3.0 or one of the " { $snippet "GL_EXT_transform_feedback" } " or " { $snippet "GL_ARB_transform_feedback" } " extensions." } ;
 
 HELP: GLSL-SHADER-FILE:
@@ -62,14 +67,21 @@ HELP: attribute-index
 }
 { $description "Returns the numeric index of the vertex attribute named " { $snippet "attribute-name" } " in " { $snippet "program-instance" } "." } ;
 
-HELP: buffer>vertex-array
+HELP: <vertex-array>
 { $values
-    { "vertex-buffer" buffer } { "program-instance" program-instance } { "format" vertex-format }
+    { "vertex-buffer" "a " { $link buffer } " or " { $link buffer-ptr } } { "program-instance" program-instance }
     { "vertex-array" vertex-array }
 }
-{ $description "Creates a new " { $link vertex-array } " from the entire contents of a single " { $link buffer } " in a single " { $link vertex-format } " for use with " { $snippet "program-instance" } "." } ;
+{ $description "Creates a new " { $link vertex-array } " from the entire contents of a single " { $link buffer } " for use with a " { $link program-instance } ". The data in " { $snippet "buffer" } " is taken in the first " { $link vertex-format } " specified in the program instance's originating " { $link POSTPONE: GLSL-PROGRAM: } " definition. If the program has no associated vertex formats, an error will be thrown. To specify a different vertex format, use " { $link <vertex-array*> } "." } ;
 
-{ vertex-array <vertex-array> buffer>vertex-array } related-words
+HELP: <vertex-array*>
+{ $values
+    { "vertex-buffer" "a " { $link buffer } " or " { $link buffer-ptr } } { "program-instance" program-instance } { "format" vertex-format }
+    { "vertex-array" vertex-array }
+}
+{ $description "Creates a new " { $link vertex-array } " from the entire contents of a single " { $link buffer } " for use with a " { $link program-instance } ". The data in " { $snippet "buffer" } " is taken in the specified " { $link vertex-format } "." } ;
+
+{ vertex-array <multi-vertex-array> <vertex-array> <vertex-array*> } related-words
 
 HELP: compile-shader-error
 { $class-description "An error compiling the source for a " { $link shader } "."
@@ -155,14 +167,23 @@ HELP: vertex-shader
 { $class-description "This " { $link shader-kind } " indicates that a " { $link shader } " is a vertex shader." } ;
 
 HELP: vertex-array
-{ $class-description "A " { $snippet "vertex-array" } " object associates a shader " { $link program-instance } " with vertex attribute data from one or more " { $link buffer } "s. The format of the binary data inside these buffers is described using " { $link vertex-format } "s. " { $snippet "vertex-array" } "s are constructed using the " { $link <vertex-array> } " or " { $link buffer>vertex-array } " words." } ;
+{ $class-description "A " { $snippet "vertex-array" } " object associates a shader " { $link program-instance } " with vertex attribute data from one or more " { $link buffer } "s. The format of the binary data inside these buffers is described using " { $link vertex-format } "s. " { $snippet "vertex-array" } "s are constructed using the " { $link <multi-vertex-array> } " or " { $link <vertex-array*> } " words. The actual type of a vertex-array object is opaque, but the " { $link vertex-array-buffers } " word can be used to query a vertex array object for its component buffers." } ;
+
+HELP: vertex-array-buffers
+{ $values
+    { "vertex-array" vertex-array }
+    { "buffers" sequence }
+}
+{ $description "Returns a sequence containing all of the " { $link buffer } " objects that make up " { $snippet "vertex-array" } "." } ;
 
 HELP: vertex-array-buffer
 { $values
     { "vertex-array" vertex-array }
     { "vertex-buffer" buffer }
 }
-{ $description "Returns the first " { $link buffer } " object comprised in " { $snippet "vertex-array" } "." } ;
+{ $description "Returns the first " { $link buffer } " object that makes up " { $snippet "vertex-array" } "." } ;
+
+{ vertex-array-buffer vertex-array-buffers } related-words
 
 HELP: vertex-attribute
 { $class-description "This tuple type is passed to " { $link define-vertex-format } " to define a new " { $link vertex-format } " type." } ;
@@ -191,8 +212,9 @@ ARTICLE: "gpu.shaders" "Shader objects"
 "Render data inside GPU " { $link buffer } "s is organized into " { $link vertex-array } "s for consumption by shader code:"
 { $subsections
     vertex-array
+    <multi-vertex-array>
+    <vertex-array*>
     <vertex-array>
-    buffer>vertex-array
     POSTPONE: VERTEX-FORMAT:
 } ;
 

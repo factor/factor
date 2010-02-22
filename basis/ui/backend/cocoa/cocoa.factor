@@ -130,7 +130,7 @@ CONSTANT: window-control>styleMask
 M:: cocoa-ui-backend (open-window) ( world -- )
     world [ [ dim>> ] dip <FactorView> ]
     with-world-pixel-format :> view
-    world window-controls>> textured-background swap memq?
+    world window-controls>> textured-background swap member-eq?
     [ view make-context-transparent ] when
     view world [ world>NSRect ] [ world>styleMask ] bi <ViewWindow> :> window
     view -> release
@@ -218,16 +218,16 @@ CLASS: {
     { +name+ "FactorApplicationDelegate" }
 }
 
-{ "applicationDidUpdate:" "void" { "id" "SEL" "id" }
+{ "applicationDidUpdate:" void { id SEL id }
     [ 3drop reset-run-loop ]
 } ;
 
 : install-app-delegate ( -- )
     NSApp FactorApplicationDelegate install-delegate ;
 
-SYMBOL: cocoa-init-hook
+SYMBOL: cocoa-startup-hook
 
-cocoa-init-hook [
+cocoa-startup-hook [
     [ "MiniFactor.nib" load-nib install-app-delegate ]
 ] initialize
 
@@ -235,7 +235,7 @@ M: cocoa-ui-backend (with-ui)
     "UI" assert.app [
         [
             init-clipboard
-            cocoa-init-hook get call( -- )
+            cocoa-startup-hook get call( -- )
             start-ui
             f io-thread-running? set-global
             init-thread-timer

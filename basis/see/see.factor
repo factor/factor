@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.builtin
 classes.intersection classes.mixin classes.predicate classes.singleton
@@ -76,7 +76,7 @@ M: hook-generic synopsis*
         [ stack-effect. ]
     } cleave ;
 
-M: method-body synopsis*
+M: method synopsis*
     [ definer. ]
     [ "method-class" word-prop pprint-word ]
     [ "method-generic" word-prop pprint-word ] tri ;
@@ -182,14 +182,21 @@ M: array pprint-slot-name
     dup length 1 = [ first ] when
     pprint-slot-name ;
 
+: tuple-declarations. ( class -- )
+    \ final declaration. ;
+
+: superclass. ( class -- )
+    superclass dup tuple eq? [ drop ] [ "<" text pprint-word ] if ;
+
 M: tuple-class see-class*
     <colon \ TUPLE: pprint-word
-    dup pprint-word
-    dup superclass tuple eq? [
-        "<" text dup superclass pprint-word
-    ] unless
-    <block "slots" word-prop [ pprint-slot ] each block>
-    pprint-; block> ;
+    {
+        [ pprint-word ]
+        [ superclass. ]
+        [ <block "slots" word-prop [ pprint-slot ] each block> pprint-; ]
+        [ tuple-declarations. ]
+    } cleave
+    block> ;
 
 M: word see-class* drop ;
 

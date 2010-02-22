@@ -16,6 +16,8 @@ IN: peg.ebnf
 
 ERROR: no-rule rule parser ;
 
+<PRIVATE
+
 : lookup-rule ( rule parser -- rule' )
     2dup rule [ 2nip ] [ no-rule ] if* ; 
 
@@ -443,16 +445,16 @@ M: ebnf-sequence build-locals ( code ast -- code )
       drop 
     ] [ 
       [
-        "FROM: locals => [let* ; FROM: sequences => nth ; [let* | " %
-          dup length swap [
-            dup ebnf-var? [
+        "FROM: locals => [let :> ; FROM: sequences => nth ; [let " %
+          [
+            over ebnf-var? [
+              " " % # " over nth :> " %
               name>> % 
-              " [ " % # " over nth ] " %
             ] [
               2drop
             ] if
-          ] 2each
-          " | " %
+          ] each-index
+          " " %
           %  
           " nip ]" %     
       ] "" make 
@@ -461,9 +463,9 @@ M: ebnf-sequence build-locals ( code ast -- code )
 
 M: ebnf-var build-locals ( code ast -- )
   [
-    "FROM: locals => [let* ; FROM: kernel => dup nip ; [let* | " %
-    name>> % " [ dup ] " %
-    " | " %
+    "FROM: locals => [let :> ; FROM: kernel => dup nip ; [let " %
+    " dup :> " % name>> %
+    " " %
     %  
     " nip ]" %     
   ] "" make ;
@@ -540,15 +542,17 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   parse-ebnf dup dup parser [ main swap at compile ] with-variable
   [ compiled-parse ] curry [ with-scope ast>> ] curry ;
 
+PRIVATE>
+
 SYNTAX: <EBNF
   "EBNF>"
   reset-tokenizer parse-multiline-string parse-ebnf main swap at  
-  parsed reset-tokenizer ;
+  suffix! reset-tokenizer ;
 
 SYNTAX: [EBNF
   "EBNF]"
   reset-tokenizer parse-multiline-string ebnf>quot nip 
-  parsed \ call parsed reset-tokenizer ;
+  suffix! \ call suffix! reset-tokenizer ;
 
 SYNTAX: EBNF: 
   reset-tokenizer CREATE-WORD dup ";EBNF" parse-multiline-string  

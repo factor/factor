@@ -336,7 +336,7 @@ M: wrapper (parse-factor-quotation) ( object -- ast )
 GENERIC: fjsc-parse ( object -- ast )
 
 M: string fjsc-parse ( object -- ast )
-  'expression' parse ast>> ;
+  'expression' parse ;
 
 M: quotation fjsc-parse ( object -- ast )
   [
@@ -353,11 +353,11 @@ M: quotation fjsc-parse ( object -- ast )
   ] with-string-writer ;
 
 : fjsc-compile* ( string -- string )
-  'statement' parse ast>> fjsc-compile ;
+  'statement' parse fjsc-compile ;
 
 : fc* ( string -- )
   [
-    'statement' parse ast>> values>> do-expressions
+    'statement' parse values>> do-expressions
   ] { } make [ write ] each ;
 
 

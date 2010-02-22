@@ -8,19 +8,9 @@ TUPLE: lambda vars body ;
 
 C: <lambda> lambda
 
-TUPLE: binding-form bindings body ;
-
-TUPLE: let < binding-form ;
+TUPLE: let body ;
 
 C: <let> let
-
-TUPLE: let* < binding-form ;
-
-C: <let*> let*
-
-TUPLE: wlet < binding-form ;
-
-C: <wlet> wlet
 
 TUPLE: quote local ;
 
@@ -31,6 +21,10 @@ C: <quote> quote
 TUPLE: def local ;
 
 C: <def> def
+
+TUPLE: multi-def locals ;
+
+C: <multi-def> multi-def
 
 PREDICATE: local < word "local?" word-prop ;
 

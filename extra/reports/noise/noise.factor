@@ -10,7 +10,6 @@ IN: reports.noise
 : badness ( word -- n )
     H{
         { -nrot 5 }
-        { -roll 4 }
         { -rot 3 }
         { bi@ 1 }
         { 2curry 1 }
@@ -50,16 +49,12 @@ IN: reports.noise
         { nkeep 5 }
         { npick 6 }
         { nrot 5 }
-        { ntuck 6 }
         { nwith 4 }
         { over 2 }
         { pick 4 }
-        { roll 4 }
         { rot 3 }
-        { spin 3 }
         { swap 1 }
         { swapd 3 }
-        { tuck 2 }
         { with 1/2 }
 
         { bi 1/2 }
@@ -80,8 +75,6 @@ M: word noise badness 1 2array ;
 M: wrapper noise wrapped>> noise ;
 
 M: let noise body>> noise ;
-
-M: wlet noise body>> noise ;
 
 M: lambda noise body>> noise ;
 

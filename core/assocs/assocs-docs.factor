@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg, Slava Pestov, and Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel sequences
-sequences.private namespaces math quotations assocs.private ;
+sequences.private namespaces math quotations assocs.private
+sets ;
 IN: assocs
 
 ARTICLE: "alists" "Association lists"
@@ -28,7 +29,7 @@ ARTICLE: "enums" "Enumerations"
 HELP: enum
 { $class-description "An associative structure which wraps a sequence and maps integers to the corresponding elements of the sequence."
 $nl
-"Enumerations are mutable; note that deleting a key calls " { $link delete-nth } ", which results in all subsequent elements being shifted down." } ;
+"Enumerations are mutable; note that deleting a key calls " { $link remove-nth! } ", which results in all subsequent elements being shifted down." } ;
 
 HELP: <enum>
 { $values { "seq" sequence } { "enum" enum } }
@@ -80,7 +81,7 @@ ARTICLE: "assocs-lookup" "Lookup and querying of assocs"
 { $see-also at* assoc-size } ;
 
 ARTICLE: "assocs-values" "Transposed assoc operations"
-"default Most assoc words take a key and find the corresponding value. The following words take a value and find the corresponding key:"
+"Most assoc words take a key and find the corresponding value. The following words take a value and find the corresponding key:"
 { $subsections
     value-at
     value-at*
@@ -90,16 +91,25 @@ ARTICLE: "assocs-values" "Transposed assoc operations"
 
 ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 "It is often useful to use the keys of an associative mapping as a set, exploiting the constant or logarithmic lookup time of most implementations (" { $link "alists" } " being a notable exception)."
+$nl
+"Set-theoretic operations:"
 { $subsections
     assoc-subset?
     assoc-intersect
-    update
     assoc-union
     assoc-diff
-    remove-all
     substitute
-    substitute-here
     extract-keys
+}
+"Adding elements to sets:"
+{ $subsections
+    conjoin
+    conjoin-at
+}
+"Destructive operations:"
+{ $subsections
+    assoc-union!
+    assoc-diff!
 }
 { $see-also key? assoc-any? assoc-all? "sets" } ;
 
@@ -137,17 +147,21 @@ $nl
     assoc-map
     assoc-filter
     assoc-filter-as
+    assoc-partition
     assoc-any?
     assoc-all?
 }
-"Additional combinators:"
+"Mapping between assocs and sequences:"
 { $subsections
-    assoc-partition
-    cache
-    2cache
     map>assoc
     assoc>map
     assoc-map-as
+}
+"Destructive combinators:"
+{ $subsections
+    assoc-filter!
+    cache
+    2cache
 } ;
 
 ARTICLE: "assocs" "Associative mapping operations"
@@ -207,7 +221,7 @@ HELP: assoc-size
 
 HELP: assoc-like
 { $values { "assoc" assoc } { "exemplar" assoc } { "newassoc" "a new assoc" } }
-{ $contract "Creates a new assoc having the same entries as  "{ $snippet "assoc" } " and the same type as " { $snippet "exemplar" } "." } ;
+{ $contract "Creates a new assoc having the same entries as " { $snippet "assoc" } " and the same type as " { $snippet "exemplar" } "." } ;
 
 HELP: assoc-empty?
 { $values { "assoc" assoc } { "?" "a boolean" } }
@@ -262,7 +276,12 @@ HELP: assoc-filter-as
 { $values { "assoc" assoc } { "quot" { $quotation "( key value -- ? )" } } { "exemplar" assoc } { "subassoc" "a new assoc" } }
 { $description "Outputs an assoc of the same type as " { $snippet "exemplar" } " consisting of all entries for which the predicate quotation yields true." } ;
 
-{ assoc-filter assoc-filter-as } related-words
+HELP: assoc-filter!
+{ $values { "assoc" assoc } { "quot" { $quotation "( key value -- ? )" } } }
+{ $description "Removes all entries for which the predicate quotation yields true." }
+{ $side-effects "assoc" } ;
+
+{ assoc-filter assoc-filter-as assoc-filter! } related-words
 
 HELP: assoc-partition
 { $values
@@ -335,7 +354,7 @@ HELP: assoc-intersect
 { $description "Outputs an assoc consisting of all entries from " { $snippet "assoc2" } " such that the key is also present in " { $snippet "assoc1" } "." }
 { $notes "The values of the keys in " { $snippet "assoc1" } " are disregarded, so this word is usually used for set-theoretic calculations where the assoc in question either has dummy sentinels as values, or the values equal the keys." } ;
 
-HELP: update
+HELP: assoc-union!
 { $values { "assoc1" assoc } { "assoc2" assoc } }
 { $description "Adds all entries from " { $snippet "assoc2" } " to " { $snippet "assoc1" } "." }
 { $side-effects "assoc1" } ;
@@ -348,17 +367,11 @@ HELP: assoc-diff
 { $values { "assoc1" assoc } { "assoc2" assoc } { "diff" "a new assoc" } }
 { $description "Outputs an assoc consisting of all entries from " { $snippet "assoc1" } " whose key is not contained in " { $snippet "assoc2" } "." } 
 ;
-HELP: remove-all
-{ $values { "assoc" assoc } { "seq" "a sequence" } { "subseq" "a new sequence" } }
-{ $description "Constructs a sequence consisting of all elements in " { $snippet "seq" } " which do not appear as keys in " { $snippet "assoc" } "." }
-{ $notes "The values of the keys in the assoc are disregarded, so this word is usually used for set-theoretic calculations where the assoc in question either has dummy sentinels as values, or the values equal the keys." }
-{ $side-effects "assoc" } ;
 
-HELP: substitute-here
-{ $values { "seq" "a mutable sequence" } { "assoc" assoc } }
-{ $description "Replaces elements of " { $snippet "seq" } " which appear as keys in " { $snippet "assoc" } " with the corresponding values, acting as the identity on all other elements." }
-{ $errors "Throws an error if " { $snippet "assoc" } " contains values whose types are not permissible in " { $snippet "seq" } "." }
-{ $side-effects "seq" } ;
+HELP: assoc-diff!
+{ $values { "assoc1" assoc } { "assoc2" assoc } }
+{ $description "Removes all entries from " { $snippet "assoc1" } " whose key is contained in " { $snippet "assoc2" } "." }
+{ $side-effects "assoc1" } ;
 
 HELP: substitute
 { $values { "seq" sequence } { "assoc" assoc } { "newseq" sequence } }
@@ -370,7 +383,7 @@ HELP: cache
 { $side-effects "assoc" } ;
 
 HELP: 2cache
-{ $values { "key1" "a key" } { "key2" "a key" } { "assoc" assoc } { "quot" { $quotation "( key -- value )" } } { "value" "a previously-retained or freshly-computed value" } }
+{ $values { "key1" "a key" } { "key2" "a key" } { "assoc" assoc } { "quot" { $quotation "( key1 key2 -- value )" } } { "value" "a previously-retained or freshly-computed value" } }
 { $description "If a single key composed of the input keys is present in the assoc, outputs the associated value, otherwise calls the quotation to produce a value and stores the keys/value pair into the assoc. Returns the value stored in the assoc. Returns a value either looked up or newly stored in the assoc." }
 { $side-effects "assoc" } ;
 
@@ -419,7 +432,7 @@ HELP: assoc-combine
 
 HELP: assoc-map-as
 { $values
-     { "assoc" assoc } { "quot" quotation } { "exemplar" assoc }
+     { "assoc" assoc } { "quot" { $quotation "( key value -- newkey newvalue )" } } { "exemplar" assoc }
      { "newassoc" assoc } }
 { $description "Applies the quotation to each entry in the input assoc and collects the results in a new assoc of the stame type as the exemplar." }
 { $examples { $example "USING: prettyprint assocs hashtables math ;" " H{ { 1 2 } { 3 4 } } [ sq ] { } assoc-map-as ." "{ { 1 4 } { 3 16 } }" } } ;

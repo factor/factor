@@ -1,6 +1,7 @@
-USING: accessors assocs combinators continuations fry generalizations
-io.pathnames kernel macros sequences stack-checker tools.test xml
-xml.traversal xml.writer arrays xml.data ; 
+USING: accessors assocs combinators combinators.smart
+continuations fry generalizations io.pathnames kernel macros
+sequences stack-checker tools.test xml xml.traversal xml.writer
+arrays xml.data ;
 IN: xml.tests.suite
 
 TUPLE: xml-test id uri sections description type ;
@@ -19,14 +20,11 @@ TUPLE: xml-test id uri sections description type ;
 
 CONSTANT: base "vocab:xml/tests/xmltest/"
 
-MACRO: drop-output ( quot -- newquot )
-    dup infer out>> '[ @ _ ndrop ] ;
-
-MACRO: drop-input ( quot -- newquot )
-    infer in>> '[ _ ndrop ] ;
+MACRO: drop-inputs ( quot -- newquot )
+    inputs '[ _ ndrop ] ;
 
 : fails? ( quot -- ? )
-    [ drop-output f ] [ nip drop-input t ] bi-curry recover ; inline
+    [ drop-outputs f ] [ nip drop-inputs t ] bi-curry recover ; inline
 
 : well-formed? ( uri -- answer )
     [ file>xml ] fails? "not-wf" "valid" ? ;

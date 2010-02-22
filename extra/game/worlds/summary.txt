@@ -1,0 +1,1 @@
+World class that integrates game loop and game input

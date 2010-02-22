@@ -7,7 +7,7 @@ IN: annotations
 <<
 
 : (parse-annotation) ( accum -- accum )
-    lexer get [ line-text>> parsed ] [ next-line ] bi ;
+    lexer get [ line-text>> suffix! ] [ next-line ] bi ;
 
 : (non-annotation-usage) ( word -- usages )
     smart-usage
@@ -24,7 +24,7 @@ NAMEs. DEFINES ${NAME}s.
 WHERE
 
 : (NAME) ( str -- ) drop ; inline
-SYNTAX: !NAME (parse-annotation) \ (NAME) parsed ;
+SYNTAX: !NAME (parse-annotation) \ (NAME) suffix! ;
 
 : NAMEs ( -- usages )
     \ (NAME) (non-annotation-usage) ;

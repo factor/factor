@@ -13,4 +13,4 @@ SYNTAX: FONT: \ ; parse-until {
     [ [ italic = ] find nip [ >>italic? ] install ]
     [ [ bold = ] find nip [ >>bold? ] install ]
     [ [ fontname? ] find nip [ >>name* ] install ]
-} cleave 4array concat '[ dup font>> @ drop ] over push-all ;
+} cleave 4array concat '[ dup font>> @ drop ] append! ;

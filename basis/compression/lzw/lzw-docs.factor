@@ -20,7 +20,6 @@ HELP: tiff-lzw-uncompress
 
 HELP: lzw-read
 { $values
-    { "lzw" lzw }
     { "lzw" lzw } { "n" integer }
 }
 { $description "Read the next LZW code." } ;
@@ -48,11 +47,10 @@ HELP: code-space-full?
 HELP: reset-lzw-uncompress
 { $values
     { "lzw" lzw }
-    { "lzw" lzw }
 }
 { $description "Reset the LZW uncompressor state (either at initialization time or immediately after receiving a Clear Code). " } ;
 
-ARTICLE: "compression.lzw.differences" "LZW Differences between TIFF and GIF"
+ARTICLE: "compression.lzw.differences" "LZW differences between TIFF and GIF"
 { $vocab-link "compression.lzw" }
 $nl
 "There are some subtle differences between the LZW algorithm used by TIFF and GIF images."
@@ -66,7 +64,7 @@ $nl
 "TIFF and GIF both add the concept of a 'Clear Code' and a 'End of Information Code' to the LZW algorithm. In both cases, the 'Clear Code' is equal to 2**(code-size - 1) and the 'End of Information Code' is equal to the Clear Code + 1. These 2 codes are reserved in the string table. So in both cases, the LZW string table is initialized to have a length equal to the End of Information Code + 1."
 ;
 
-ARTICLE: "compression.lzw" "LZW Compression"
+ARTICLE: "compression.lzw" "LZW compression"
 { $vocab-link "compression.lzw" }
 $nl
 "Implements both the TIFF and GIF variations of the LZW algorithm."

@@ -36,7 +36,7 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
     5 bitstream bs:read 1 +
     4 bitstream bs:read 4 + clen-shuffle swap head 
 
-    dup length iota [ 3 bitstream bs:read ] replicate
+    dup length [ 3 bitstream bs:read ] replicate
     get-table
     bitstream swap <huffman-decoder>
     [ 2dup + ] dip swap :> k!
@@ -64,13 +64,13 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
 
 MEMO: static-huffman-tables ( -- obj )
     [
-        0 143 [a,b] [ 8 ] replicate
-        144 255 [a,b] [ 9 ] replicate append
-        256 279 [a,b] [ 7 ] replicate append
-        280 287 [a,b] [ 8 ] replicate append
+        0 143 [a,b] length [ 8 ] replicate
+        144 255 [a,b] length [ 9 ] replicate append
+        256 279 [a,b] length [ 7 ] replicate append
+        280 287 [a,b] length [ 8 ] replicate append
     ] append-outputs
-    0 31 [a,b] [ 5 ] replicate 2array
-    [ [ length>> [0,b) ] [ ] bi get-table ] map ;
+    0 31 [a,b] length [ 5 ] replicate 2array
+    [ [ length>> iota ] [ ] bi get-table ] map ;
 
 CONSTANT: length-table
     {

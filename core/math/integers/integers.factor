@@ -1,8 +1,8 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! Copyright (C) 2008, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private sequences
-sequences.private math math.private combinators ;
+USING: kernel kernel.private sequences sequences.private math
+math.private math.order combinators ;
 IN: math.integers.private
 
 : fixnum-min ( x y -- z ) [ fixnum< ] most ; foldable
@@ -29,11 +29,23 @@ M: fixnum u<= fixnum<= ; inline
 M: fixnum u> fixnum> ; inline
 M: fixnum u>= fixnum>= ; inline
 
+M: fixnum min over fixnum? [ fixnum-min ] [ call-next-method ] if ; inline
+M: fixnum max over fixnum? [ fixnum-max ] [ call-next-method ] if ; inline
+
 M: fixnum + fixnum+ ; inline
 M: fixnum - fixnum- ; inline
 M: fixnum * fixnum* ; inline
 M: fixnum /i fixnum/i ; inline
-M: fixnum /f [ >float ] dip >float float/f ; inline
+
+DEFER: bignum/f
+CONSTANT: bignum/f-threshold HEX: 20,0000,0000,0000
+
+: fixnum/f ( m n -- m/n )
+    [ >float ] bi@ float/f ; inline
+
+M: fixnum /f
+    2dup [ abs bignum/f-threshold >= ] either?
+    [ bignum/f ] [ fixnum/f ] if ; inline
 
 M: fixnum mod fixnum-mod ; inline
 
@@ -46,7 +58,10 @@ M: fixnum shift >fixnum fixnum-shift ; inline
 
 M: fixnum bitnot fixnum-bitnot ; inline
 
-M: fixnum bit? neg shift 1 bitand 0 > ; inline
+: fixnum-bit? ( n m -- b )
+    neg shift 1 bitand 0 > ; inline
+
+M: fixnum bit? fixnum-bit? ; inline
 
 : fixnum-log2 ( x -- n )
     0 swap [ dup 1 eq? ] [ [ 1 + ] [ 2/ ] bi* ] until drop ;
@@ -104,30 +119,26 @@ M: bignum (log2) bignum-log2 ; inline
 : scale-denonimator ( den -- scaled-den scale' )
     dup twos neg [ shift ] keep ; inline
 
-: pre-scale ( num den -- scale shifted-num scaled-den )
+: pre-scale ( num den -- mantissa den' scale )
     2dup [ log2 ] bi@ -
-    [ neg 54 + shift ] [ [ scale-denonimator ] dip + ] bi-curry bi*
-    -rot ; inline
+    [ neg 54 + shift ] [ [ scale-denonimator ] dip + ] bi-curry bi* ; inline
 
 ! Second step: loop
-: shift-mantissa ( scale mantissa -- scale' mantissa' )
-    [ 1 + ] [ 2/ ] bi* ; inline
-
-: /f-loop ( scale mantissa den -- scale' fraction-and-guard rem )
-    [ 2dup /i log2 53 > ]
-    [ [ shift-mantissa ] dip ]
-    while /mod ; inline
+: /f-loop ( mantissa den scale -- fraction-and-guard rem scale' )
+    [ 2over /i log2 53 > ]
+    [ [ 2/ ] [ ] [ 1 + ] tri* ] while
+    [ /mod ] dip ; inline
 
 ! Third step: post-scaling
 : unscaled-float ( mantissa -- n )
     52 2^ 1 - bitand 1022 52 shift bitor bits>double ; inline
 
-: scale-float ( scale mantissa -- float' )
-    [ dup 0 < [ neg 2^ recip ] [ 2^ ] if ] dip * ; inline
+: scale-float ( mantissa scale -- float' )
+    dup 0 < [ neg 2^ recip ] [ 2^ ] if * ; inline
 
-: post-scale ( scale mantissa -- n )
-    2/ dup log2 52 > [ shift-mantissa ] when
-    unscaled-float scale-float ; inline
+: post-scale ( mantissa scale -- n )
+    [ 2/ ] dip over log2 52 > [ [ 2/ ] [ 1 + ] bi* ] when
+    [ unscaled-float ] dip scale-float ; inline
 
 ! Main word
 : /f-abs ( m n -- f )
@@ -138,11 +149,14 @@ M: bignum (log2) bignum-log2 ; inline
             drop 1/0.
         ] [
             pre-scale
-            /f-loop over odd?
-            [ zero? [ 1 + ] unless ] [ drop ] if
+            /f-loop
+            [ over odd? [ zero? [ 1 + ] unless ] [ drop ] if ] dip
             post-scale
         ] if-zero
     ] if ; inline
 
-M: bignum /f ( m n -- f )
+: bignum/f ( m n -- f )
     [ [ abs ] bi@ /f-abs ] [ [ 0 < ] bi@ xor ] 2bi [ neg ] when ;
+
+M: bignum /f ( m n -- f )
+    bignum/f ;

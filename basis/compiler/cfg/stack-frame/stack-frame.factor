@@ -9,7 +9,8 @@ TUPLE: stack-frame
 { return integer }
 { total-size integer }
 { gc-root-size integer }
-{ spill-area-size integer } ;
+{ spill-area-size integer }
+{ calls-vm? boolean } ;
 
 ! Stack frame utilities
 : param-base ( -- n )
@@ -35,7 +36,9 @@ TUPLE: stack-frame
 
 : max-stack-frame ( frame1 frame2 -- frame3 )
     [ stack-frame new ] 2dip
+    {
         [ [ params>> ] bi@ max >>params ]
         [ [ return>> ] bi@ max >>return ]
         [ [ gc-root-size>> ] bi@ max >>gc-root-size ]
-        2tri ;
+        [ [ calls-vm?>> ] bi@ or >>calls-vm? ]
+    } 2cleave ;

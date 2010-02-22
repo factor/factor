@@ -4,7 +4,7 @@ USING: accessors arrays bit-arrays fry infix kernel layouts locals math
 math.functions multiline sequences ;
 IN: bloom-filters
 
-FROM: math.ranges => [1,b] [0,b) ;
+FROM: math.ranges => [1,b] ;
 FROM: math.intervals => (a,b) interval-contains? ;
 
 /*
@@ -121,7 +121,7 @@ PRIVATE>
     [infix hash0 + (index * hash1) + ((pow(index, 3) - index) / 6) infix] ;
 
 : enhanced-double-hashes ( hash0 hash1 n -- seq )
-    [0,b)
+    iota
     [ '[ _ _ enhanced-double-hash ] ] dip
     swap map ;
 

@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2009 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables help.markup help.stylesheet io
 io.styles kernel math models namespaces sequences ui ui.gadgets
@@ -94,12 +94,12 @@ TUPLE: slides < book ;
     [ first3 ] dip head 3array ;
 
 : strip-tease ( data -- seq )
-    dup third length 1 - [
+    dup third length 1 - iota [
         2 + (strip-tease)
     ] with map ;
 
 SYNTAX: STRIP-TEASE:
-    parse-definition strip-tease [ parsed ] each ;
+    parse-definition strip-tease [ suffix! ] each ;
 
 \ slides H{
     { T{ button-down } [ request-focus ] }

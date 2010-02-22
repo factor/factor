@@ -62,7 +62,7 @@ $nl
     { "Boolean vector types: " { $link bvec2-uniform } ", " { $link bvec3-uniform } ", " { $link bvec4-uniform } }
     }
 }
-{ "Matrix uniforms take their values from row-major Factor " { $link sequence } "s of sequences of floats. Matrix types are:" 
+{ "Matrix uniforms take their values either from row-major Factor " { $link sequence } "s of sequences of floats, or from " { $link alien } "s or " { $link float-array } "s referencing packed column-major arrays of floats. Matrix types are:" 
     { $list
     { { $link mat2-uniform } ", " { $link mat2x3-uniform } ", " { $link mat2x4-uniform } }
     { { $link mat3x2-uniform } ", " { $link mat3-uniform } ", " { $link mat3x4-uniform } }
@@ -71,7 +71,7 @@ $nl
 "Rectangular matrix type names are column x row."
 }
 { "Uniform slots can also be defined as other " { $snippet "uniform-tuple" } " types to bind uniform structures. The uniform structure will take its value from the slots of a tuple of the given type." }
-{ "Array uniforms are passed as Factor sequences of the corresponding value type above." }
+{ "Array uniforms are passed either as Factor sequences of the corresponding type specified above, or as " { $link alien } "s or " { $vocab-link "specialized-arrays" } " that reference pre-packed binary arrays of " { $link c:int } "s or " { $link c:float } "s." }
 }
 $nl
 "A value of a uniform tuple type is a standard Factor tuple. Uniform tuples are constructed with " { $link new } " or " { $link boa } ", and values are placed inside them using standard slot accessors."
@@ -225,6 +225,11 @@ HELP: render-set
 { "The " { $snippet "transform-feedback-output" } " slot specifies a target for transform feedback output from the vertex shader: either an entire " { $link buffer } ", a " { $link buffer-range } " subset, or a " { $link buffer-ptr } " offset into the buffer. If " { $link f } ", no transform feedback output is collected. The shader program associated with " { $snippet "vertex-array" } " must have a transform feedback output format specified." }
 } }
 { $notes "User-created framebuffers require OpenGL 3.0 or one of the " { $snippet "GL_EXT_framebuffer_object" } " or " { $snippet "GL_ARB_framebuffer_object" } " extensions. Disabling rasterization requires OpenGL 3.0 or the " { $snippet "GL_EXT_transform_feedback" } " extension. Named output-attachment values are available in GLSL 1.30 or later, and GLSL 1.20 and earlier using the " { $snippet "GL_EXT_gpu_shader4" } " extension. Transform feedback requires OpenGL 3.0 or one of the " { $snippet "GL_EXT_transform_feedback" } " or " { $snippet "GL_ARB_transform_feedback" } " extensions." } ;
+
+HELP: bind-uniforms
+{ $values { "program-instance" program-instance } { "uniforms" uniform-tuple } }
+{ $description "Binds the uniform shader parameters for " { $snippet "program-instance" } " using values from the given uniform tuple." }
+{ $notes "The " { $link render } " word uses this word. Calling this word directly is only necessary if uniform parameters need to be bound independently of a " { $snippet "render" } " operation." } ;
 
 { render render-set } related-words
 

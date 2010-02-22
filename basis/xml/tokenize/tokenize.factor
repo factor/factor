@@ -86,7 +86,7 @@ HINTS: next* { spot } ;
     spot get '[ _ char>> blank? not ] skip-until ;
 
 : string-matches? ( string circular spot -- ? )
-    char>> over push-circular sequence= ;
+    char>> over circular-push sequence= ;
 
 : take-string ( match -- string )
     dup length <circular-string>
@@ -95,7 +95,7 @@ HINTS: next* { spot } ;
     get-char [ missing-close ] unless next ;
 
 : expect ( string -- )
-    dup spot get '[ _ [ char>> ] keep next* ] replicate
+    dup length spot get '[ _ [ char>> ] keep next* ] "" replicate-as
     2dup = [ 2drop ] [ expected ] if ;
 
 ! Suddenly XML-specific
@@ -147,7 +147,7 @@ HINTS: next* { spot } ;
 :: parse-text ( -- string )
     3 f <array> <circular> :> circ
     depth get zero? :> no-text [| char |
-        char circ push-circular
+        char circ circular-push
         circ assure-no-]]>
         no-text [ char blank? char CHAR: < = or [
             char 1string t pre/post-content

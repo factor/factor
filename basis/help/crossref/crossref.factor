@@ -7,10 +7,10 @@ IN: help.crossref
 
 : article-links ( topic elements -- seq )
     [ article-content ] dip
-    collect-elements [ >link ] map ;
+    collect-elements ;
 
 : article-children ( topic -- seq )
-    { $subsection $subsections } article-links ;
+    { $subsection $subsections } article-links [ >link ] map ;
 
 : help-path ( topic -- seq )
     [ article-parent ] follow rest ;

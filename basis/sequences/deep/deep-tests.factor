@@ -17,7 +17,7 @@ IN: sequences.deep.tests
 [ "hey" 1array 1array [ change-something ] deep-map ] unit-test
 
 [ { { "heyhello" "hihello" } } ]
-[ "hey" 1array 1array [ [ change-something ] deep-change-each ] keep ] unit-test
+[ "hey" 1array 1array [ change-something ] deep-map! ] unit-test
 
 [ t ] [ "foo" [ string? ] deep-any?  ] unit-test
 

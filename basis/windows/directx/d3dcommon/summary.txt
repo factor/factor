@@ -1,0 +1,1 @@
+Common constants. Corresponds to d3dcommon.h.

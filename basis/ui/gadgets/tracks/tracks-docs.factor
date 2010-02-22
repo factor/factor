@@ -18,7 +18,7 @@ HELP: <track>
 { $description "Creates a new track which lays out children along the given orientation, either " { $link horizontal } " or " { $link vertical } "." } ;
 
 HELP: track-add
-{ $values { "gadget" gadget } { "track" track } { "constraint" "a number between 0 and 1, or " { $link f } } }
+{ $values { "track" track } { "gadget" gadget } { "constraint" "a number between 0 and 1, or " { $link f } } }
 { $description "Adds a new child to a track. If the constraint is " { $link f } ", the child always occupies its preferred size. Otherwise, the constrant is a fraction of the total size which is allocated for the child." } ;
 
 ABOUT: "ui-track-layout"

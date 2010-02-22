@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs generic kernel kernel.private
 math memory namespaces make sequences layouts system hashtables
@@ -95,7 +95,7 @@ double-rep
 vector-rep
 scalar-rep ;
 
-: unsign-rep ( rep -- rep' )
+: signed-rep ( rep -- rep' )
     {
         { uint-4-rep           int-4-rep }
         { ulonglong-2-rep      longlong-2-rep }
@@ -105,7 +105,29 @@ scalar-rep ;
         { ushort-scalar-rep    short-scalar-rep }
         { uint-scalar-rep      int-scalar-rep }
         { ulonglong-scalar-rep longlong-scalar-rep }
-    } ?at drop ;
+    } ?at drop ; foldable
+
+: widen-vector-rep ( rep -- rep' )
+    {
+        { char-16-rep     short-8-rep     }
+        { short-8-rep     int-4-rep       }
+        { int-4-rep       longlong-2-rep  }
+        { uchar-16-rep    ushort-8-rep    }
+        { ushort-8-rep    uint-4-rep      }
+        { uint-4-rep      ulonglong-2-rep }
+        { float-4-rep     double-2-rep    }
+    } at ; foldable
+
+: narrow-vector-rep ( rep -- rep' )
+    {
+        { short-8-rep     char-16-rep     }
+        { int-4-rep       short-8-rep     }
+        { longlong-2-rep  int-4-rep       }
+        { ushort-8-rep    uchar-16-rep    }
+        { uint-4-rep      ushort-8-rep    }
+        { ulonglong-2-rep uint-4-rep      }
+        { double-2-rep    float-4-rep     }
+    } at ; foldable
 
 ! Register classes
 SINGLETONS: int-regs float-regs ;
@@ -146,6 +168,19 @@ M: int-scalar-rep rep-size drop 4 ;
 M: uint-scalar-rep rep-size drop 4 ;
 M: longlong-scalar-rep rep-size drop 8 ;
 M: ulonglong-scalar-rep rep-size drop 8 ;
+
+GENERIC: rep-length ( rep -- n ) foldable
+
+M: char-16-rep rep-length drop 16 ;
+M: uchar-16-rep rep-length drop 16 ;
+M: short-8-rep rep-length drop 8 ;
+M: ushort-8-rep rep-length drop 8 ;
+M: int-4-rep rep-length drop 4 ;
+M: uint-4-rep rep-length drop 4 ;
+M: longlong-2-rep rep-length drop 2 ;
+M: ulonglong-2-rep rep-length drop 2 ;
+M: float-4-rep rep-length drop 4 ;
+M: double-2-rep rep-length drop 2 ;
 
 GENERIC: rep-component-type ( rep -- n )
 
@@ -242,6 +277,7 @@ HOOK: %fill-vector cpu ( dst rep -- )
 HOOK: %gather-vector-2 cpu ( dst src1 src2 rep -- )
 HOOK: %gather-vector-4 cpu ( dst src1 src2 src3 src4 rep -- )
 HOOK: %shuffle-vector cpu ( dst src shuffle rep -- )
+HOOK: %shuffle-vector-imm cpu ( dst src shuffle rep -- )
 HOOK: %tail>head-vector cpu ( dst src rep -- )
 HOOK: %merge-vector-head cpu ( dst src1 src2 rep -- )
 HOOK: %merge-vector-tail cpu ( dst src1 src2 rep -- )
@@ -260,14 +296,18 @@ HOOK: %add-sub-vector cpu ( dst src1 src2 rep -- )
 HOOK: %sub-vector cpu ( dst src1 src2 rep -- )
 HOOK: %saturated-sub-vector cpu ( dst src1 src2 rep -- )
 HOOK: %mul-vector cpu ( dst src1 src2 rep -- )
+HOOK: %mul-high-vector cpu ( dst src1 src2 rep -- )
+HOOK: %mul-horizontal-add-vector cpu ( dst src1 src2 rep -- )
 HOOK: %saturated-mul-vector cpu ( dst src1 src2 rep -- )
 HOOK: %div-vector cpu ( dst src1 src2 rep -- )
 HOOK: %min-vector cpu ( dst src1 src2 rep -- )
 HOOK: %max-vector cpu ( dst src1 src2 rep -- )
+HOOK: %avg-vector cpu ( dst src1 src2 rep -- )
 HOOK: %dot-vector cpu ( dst src1 src2 rep -- )
+HOOK: %sad-vector cpu ( dst src1 src2 rep -- )
 HOOK: %sqrt-vector cpu ( dst src rep -- )
-HOOK: %horizontal-add-vector cpu ( dst src rep -- )
-HOOK: %horizontal-sub-vector cpu ( dst src rep -- )
+HOOK: %horizontal-add-vector cpu ( dst src1 src2 rep -- )
+HOOK: %horizontal-sub-vector cpu ( dst src1 src2 rep -- )
 HOOK: %abs-vector cpu ( dst src rep -- )
 HOOK: %and-vector cpu ( dst src1 src2 rep -- )
 HOOK: %andn-vector cpu ( dst src1 src2 rep -- )
@@ -276,8 +316,10 @@ HOOK: %xor-vector cpu ( dst src1 src2 rep -- )
 HOOK: %not-vector cpu ( dst src rep -- )
 HOOK: %shl-vector cpu ( dst src1 src2 rep -- )
 HOOK: %shr-vector cpu ( dst src1 src2 rep -- )
-HOOK: %horizontal-shl-vector cpu ( dst src1 src2 rep -- )
-HOOK: %horizontal-shr-vector cpu ( dst src1 src2 rep -- )
+HOOK: %shl-vector-imm cpu ( dst src1 src2 rep -- )
+HOOK: %shr-vector-imm cpu ( dst src1 src2 rep -- )
+HOOK: %horizontal-shl-vector-imm cpu ( dst src1 src2 rep -- )
+HOOK: %horizontal-shr-vector-imm cpu ( dst src1 src2 rep -- )
 
 HOOK: %integer>scalar cpu ( dst src rep -- )
 HOOK: %scalar>integer cpu ( dst src rep -- )
@@ -288,7 +330,9 @@ HOOK: %zero-vector-reps cpu ( -- reps )
 HOOK: %fill-vector-reps cpu ( -- reps )
 HOOK: %gather-vector-2-reps cpu ( -- reps )
 HOOK: %gather-vector-4-reps cpu ( -- reps )
+HOOK: %alien-vector-reps cpu ( -- reps )
 HOOK: %shuffle-vector-reps cpu ( -- reps )
+HOOK: %shuffle-vector-imm-reps cpu ( -- reps )
 HOOK: %merge-vector-reps cpu ( -- reps )
 HOOK: %signed-pack-vector-reps cpu ( -- reps )
 HOOK: %unsigned-pack-vector-reps cpu ( -- reps )
@@ -305,11 +349,15 @@ HOOK: %add-sub-vector-reps cpu ( -- reps )
 HOOK: %sub-vector-reps cpu ( -- reps )
 HOOK: %saturated-sub-vector-reps cpu ( -- reps )
 HOOK: %mul-vector-reps cpu ( -- reps )
+HOOK: %mul-high-vector-reps cpu ( -- reps )
+HOOK: %mul-horizontal-add-vector-reps cpu ( -- reps )
 HOOK: %saturated-mul-vector-reps cpu ( -- reps )
 HOOK: %div-vector-reps cpu ( -- reps )
 HOOK: %min-vector-reps cpu ( -- reps )
 HOOK: %max-vector-reps cpu ( -- reps )
+HOOK: %avg-vector-reps cpu ( -- reps )
 HOOK: %dot-vector-reps cpu ( -- reps )
+HOOK: %sad-vector-reps cpu ( -- reps )
 HOOK: %sqrt-vector-reps cpu ( -- reps )
 HOOK: %horizontal-add-vector-reps cpu ( -- reps )
 HOOK: %horizontal-sub-vector-reps cpu ( -- reps )
@@ -321,14 +369,18 @@ HOOK: %xor-vector-reps cpu ( -- reps )
 HOOK: %not-vector-reps cpu ( -- reps )
 HOOK: %shl-vector-reps cpu ( -- reps )
 HOOK: %shr-vector-reps cpu ( -- reps )
-HOOK: %horizontal-shl-vector-reps cpu ( -- reps )
-HOOK: %horizontal-shr-vector-reps cpu ( -- reps )
+HOOK: %shl-vector-imm-reps cpu ( -- reps )
+HOOK: %shr-vector-imm-reps cpu ( -- reps )
+HOOK: %horizontal-shl-vector-imm-reps cpu ( -- reps )
+HOOK: %horizontal-shr-vector-imm-reps cpu ( -- reps )
 
 M: object %zero-vector-reps { } ;
 M: object %fill-vector-reps { } ;
 M: object %gather-vector-2-reps { } ;
 M: object %gather-vector-4-reps { } ;
+M: object %alien-vector-reps { } ;
 M: object %shuffle-vector-reps { } ;
+M: object %shuffle-vector-imm-reps { } ;
 M: object %merge-vector-reps { } ;
 M: object %signed-pack-vector-reps { } ;
 M: object %unsigned-pack-vector-reps { } ;
@@ -361,13 +413,19 @@ M: object %xor-vector-reps { } ;
 M: object %not-vector-reps { } ;
 M: object %shl-vector-reps { } ;
 M: object %shr-vector-reps { } ;
-M: object %horizontal-shl-vector-reps { } ;
-M: object %horizontal-shr-vector-reps { } ;
+M: object %shl-vector-imm-reps { } ;
+M: object %shr-vector-imm-reps { } ;
+M: object %horizontal-shl-vector-imm-reps { } ;
+M: object %horizontal-shr-vector-imm-reps { } ;
+
+ALIAS: %merge-vector-head-reps %merge-vector-reps
+ALIAS: %merge-vector-tail-reps %merge-vector-reps
+ALIAS: %tail>head-vector-reps %unpack-vector-head-reps
 
 HOOK: %unbox-alien cpu ( dst src -- )
-HOOK: %unbox-any-c-ptr cpu ( dst src temp -- )
+HOOK: %unbox-any-c-ptr cpu ( dst src -- )
 HOOK: %box-alien cpu ( dst src temp -- )
-HOOK: %box-displaced-alien cpu ( dst displacement base temp1 temp2 base-class -- )
+HOOK: %box-displaced-alien cpu ( dst displacement base temp base-class -- )
 
 HOOK: %alien-unsigned-1 cpu ( dst src offset -- )
 HOOK: %alien-unsigned-2 cpu ( dst src offset -- )
@@ -389,10 +447,12 @@ HOOK: %set-alien-double    cpu ( ptr offset value -- )
 HOOK: %set-alien-vector    cpu ( ptr offset value rep -- )
 
 HOOK: %alien-global cpu ( dst symbol library -- )
+HOOK: %vm-field cpu ( dst fieldname -- )
 HOOK: %vm-field-ptr cpu ( dst fieldname -- )
 
 HOOK: %allot cpu ( dst size class temp -- )
-HOOK: %write-barrier cpu ( src card# table -- )
+HOOK: %write-barrier cpu ( src slot temp1 temp2 -- )
+HOOK: %write-barrier-imm cpu ( src slot temp1 temp2 -- )
 
 ! GC checks
 HOOK: %check-nursery cpu ( label size temp1 temp2 -- )
@@ -434,9 +494,13 @@ M: reg-class param-reg param-regs nth ;
 
 M: stack-params param-reg drop ;
 
-! Is this integer small enough to appear in value template
-! slots?
-HOOK: small-enough? cpu ( n -- ? )
+! Is this integer small enough to be an immediate operand for
+! %add-imm, %sub-imm, and %mul-imm?
+HOOK: immediate-arithmetic? cpu ( n -- ? )
+
+! Is this integer small enough to be an immediate operand for
+! %and-imm, %or-imm, and %xor-imm?
+HOOK: immediate-bitwise? cpu ( n -- ? )
 
 ! Is this structure small enough to be returned in registers?
 HOOK: return-struct-in-registers? cpu ( c-type -- ? )
@@ -453,8 +517,27 @@ HOOK: dummy-int-params? cpu ( -- ? )
 ! If t, all int parameters are shadowed by dummy FP parameters
 HOOK: dummy-fp-params? cpu ( -- ? )
 
-HOOK: %prepare-unbox cpu ( -- )
+! Load a value (from the data stack in the ds register).
+! The value is then passed as a parameter to a VM to_*() function
+HOOK: %pop-stack cpu ( n -- )
 
+! Store a value (to the data stack in the VM's current context)
+! The value is passed to a VM to_*() function -- used for
+! callback returns
+HOOK: %pop-context-stack cpu ( -- )
+
+! Store a value (to the data stack in the ds register).
+! The value was returned from a VM from_*() function
+HOOK: %push-stack cpu ( -- )
+
+! Store a value (to the data stack in the VM's current context)
+! The value is returned from a VM from_*() function -- used for
+! callback parameters
+HOOK: %push-context-stack cpu ( -- )
+
+! Call a function to convert a tagged pointer returned by
+! %pop-stack or %pop-context-stack into a value that can be
+! passed to a C function, or returned from a callback
 HOOK: %unbox cpu ( n rep func -- )
 
 HOOK: %unbox-long-long cpu ( n func -- )
@@ -463,6 +546,10 @@ HOOK: %unbox-small-struct cpu ( c-type -- )
 
 HOOK: %unbox-large-struct cpu ( n c-type -- )
 
+! Call a function to convert a value into a tagged pointer,
+! possibly allocating a bignum, float, or alien instance,
+! which is then pushed on the data stack by %push-stack or
+! %push-context-stack
 HOOK: %box cpu ( n rep func -- )
 
 HOOK: %box-long-long cpu ( n func -- )
@@ -477,7 +564,9 @@ HOOK: %save-param-reg cpu ( stack reg rep -- )
 
 HOOK: %load-param-reg cpu ( stack reg rep -- )
 
-HOOK: %save-context cpu ( temp1 temp2 callback-allowed? -- )
+HOOK: %restore-context cpu ( temp1 temp2 -- )
+
+HOOK: %save-context cpu ( temp1 temp2 -- )
 
 HOOK: %prepare-var-args cpu ( -- )
 
@@ -501,7 +590,6 @@ HOOK: %nest-stacks cpu ( -- )
 
 HOOK: %unnest-stacks cpu ( -- )
 
-! Return to caller with stdcall unwinding (only for x86)
-HOOK: %callback-return cpu ( params -- )
+HOOK: callback-return-rewind cpu ( params -- n )
 
-M: object %callback-return drop %return ;
+M: object callback-return-rewind drop 0 ;

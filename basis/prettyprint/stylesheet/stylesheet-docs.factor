@@ -8,33 +8,31 @@ HELP: effect-style
     { "effect" "an effect" }
     { "style" "a style assoc" }
 }
-{ $description "The styling hook for stack effects" } ;
+{ $description "The stylesheet for stack effects" } ;
 
 HELP: string-style
 { $values
     { "str" "a string" }
     { "style" "a style assoc" }
 }
-{ $description "The styling hook for string literals" } ;
+{ $description "The stylesheet for string literals" } ;
 
 HELP: vocab-style
 { $values
     { "vocab" "a vocabulary specifier" }
     { "style" "a style assoc" }
 }
-{ $description "The styling hook for vocab names" } ;
+{ $description "The stylesheet for vocab names" } ;
 
 HELP: word-style
 { $values
     { "word" "a word" }
     { "style" "a style assoc" }
 }
-{ $description "The styling hook for word names" } ;
+{ $description "The stylesheet for word names" } ;
 
-ARTICLE: "prettyprint.stylesheet" "Prettyprinter Formatted Output"
-{ $vocab-link "prettyprint.stylesheet" }
-$nl
-"Control the way that the prettyprinter formats output based on object type. These hooks form a basic \"syntax\" highlighting system."
+ARTICLE: "prettyprint.stylesheet" "Prettyprinter stylesheet"
+"The " { $vocab-link "prettyprint.stylesheet" } " vocabulary defines variables which control the way that the prettyprinter formats output based on object type."
 { $subsections
     word-style
     string-style

@@ -16,7 +16,6 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <math.h>
-#include <stdbool.h>
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,25 +24,30 @@
 
 /* C++ headers */
 #include <algorithm>
+#include <map>
 #include <set>
 #include <vector>
+#include <iostream>
 
-#if __GNUC__ == 4
-        #include <tr1/unordered_map>
-
-	namespace factor
-	{
-		using std::tr1::unordered_map;
-	}
-#elif __GNUC__ == 3
-        #include <boost/unordered_map.hpp>
-
-	namespace factor
-	{
-		using boost::unordered_map;
-	}
+/* Detect target CPU type */
+#if defined(__arm__)
+	#define FACTOR_ARM
+#elif defined(__amd64__) || defined(__x86_64__) || defined(_M_AMD64)
+	#define FACTOR_AMD64
+	#define FACTOR_64
+#elif defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_IX86)
+	#define FACTOR_X86
+#elif defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)
+	#define FACTOR_PPC
 #else
-        #error Factor requires GCC 3.x or later
+	#error "Unsupported architecture"
+#endif
+
+#if defined(_MSC_VER)
+	#define WINDOWS
+	#define WINNT
+#elif defined(WIN32)
+	#define WINDOWS
 #endif
 
 /* Forward-declare this since it comes up in function prototypes */
@@ -56,21 +60,29 @@ namespace factor
 #include "layouts.hpp"
 #include "platform.hpp"
 #include "primitives.hpp"
-#include "stacks.hpp"
 #include "segments.hpp"
 #include "contexts.hpp"
 #include "run.hpp"
+#include "objects.hpp"
 #include "profiler.hpp"
 #include "errors.hpp"
 #include "bignumint.hpp"
 #include "bignum.hpp"
-#include "code_block.hpp"
-#include "zone.hpp"
+#include "booleans.hpp"
+#include "instruction_operands.hpp"
+#include "code_blocks.hpp"
+#include "bump_allocator.hpp"
+#include "bitwise_hacks.hpp"
+#include "mark_bits.hpp"
+#include "free_list.hpp"
+#include "free_list_allocator.hpp"
 #include "write_barrier.hpp"
-#include "old_space.hpp"
+#include "object_start_map.hpp"
+#include "nursery_space.hpp"
 #include "aging_space.hpp"
 #include "tenured_space.hpp"
 #include "data_heap.hpp"
+#include "code_heap.hpp"
 #include "gc.hpp"
 #include "debug.hpp"
 #include "strings.hpp"
@@ -78,28 +90,32 @@ namespace factor
 #include "words.hpp"
 #include "float_bits.hpp"
 #include "io.hpp"
-#include "heap.hpp"
 #include "image.hpp"
 #include "alien.hpp"
-#include "code_heap.hpp"
+#include "callbacks.hpp"
+#include "dispatch.hpp"
+#include "entry_points.hpp"
 #include "vm.hpp"
+#include "allot.hpp"
 #include "tagged.hpp"
-#include "local_roots.hpp"
+#include "data_roots.hpp"
+#include "code_roots.hpp"
+#include "generic_arrays.hpp"
+#include "slot_visitor.hpp"
 #include "collector.hpp"
 #include "copying_collector.hpp"
 #include "nursery_collector.hpp"
 #include "aging_collector.hpp"
 #include "to_tenured_collector.hpp"
+#include "code_block_visitor.hpp"
+#include "compaction.hpp"
 #include "full_collector.hpp"
 #include "callstack.hpp"
-#include "generic_arrays.hpp"
 #include "arrays.hpp"
 #include "math.hpp"
-#include "booleans.hpp"
 #include "byte_arrays.hpp"
 #include "jit.hpp"
 #include "quotations.hpp"
-#include "dispatch.hpp"
 #include "inline_cache.hpp"
 #include "factor.hpp"
 #include "utilities.hpp"

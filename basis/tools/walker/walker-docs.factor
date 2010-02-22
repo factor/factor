@@ -6,7 +6,7 @@ HELP: breakpoint
 { $description "Annotates a word definition to enter the single stepper when executed." } ;
 
 HELP: breakpoint-if
-{ $values { "quot" { $quotation "( -- ? )" } } { "word" word } }
+{ $values { "word" word } { "quot" { $quotation "( -- ? )" } } }
 { $description "Annotates a word definition to enter the single stepper if the quotation yields true." } ;
 
 HELP: B

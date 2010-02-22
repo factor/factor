@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2009 Slava Pestov.
+! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables io kernel math assocs
 namespaces make sequences strings io.styles vectors words
@@ -309,7 +309,7 @@ SYMBOL: next
 
 : group-flow ( seq -- newseq )
     [
-        dup length [
+        dup length iota [
             2dup 1 - swap ?nth prev set
             2dup 1 + swap ?nth next set
             swap nth dup split-before dup , split-after

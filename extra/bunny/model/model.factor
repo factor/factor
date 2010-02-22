@@ -1,6 +1,6 @@
 USING: accessors alien.c-types arrays combinators destructors
 http.client io io.encodings.ascii io.files io.files.temp kernel
-math math.matrices math.parser math.vectors opengl
+locals math math.matrices math.parser math.vectors opengl
 opengl.capabilities opengl.gl opengl.demo-support sequences
 splitting vectors words specialized-arrays ;
 QUALIFIED-WITH: alien.c-types c
@@ -51,8 +51,11 @@ IN: bunny.model
         over download-to
     ] unless ;
 
-: (draw-triangle) ( ns vs triple -- )
-    [ dup roll nth gl-normal swap nth gl-vertex ] with with each ;
+:: (draw-triangle) ( ns vs triple -- )
+    triple [| elt |
+        elt ns nth gl-normal
+        elt vs nth gl-vertex
+    ] each ;
 
 : draw-triangles ( ns vs is -- )
     GL_TRIANGLES [ [ (draw-triangle) ] with with each ] do-state ;
@@ -90,7 +93,7 @@ M: bunny-buffers bunny-geom
         { GL_VERTEX_ARRAY GL_NORMAL_ARRAY } [
             GL_FLOAT 0 0 buffer-offset glNormalPointer
             [
-                nv>> "float" heap-size * buffer-offset
+                nv>> c:float heap-size * buffer-offset
                 [ 3 GL_FLOAT 0 ] dip glVertexPointer
             ] [
                 ni>>

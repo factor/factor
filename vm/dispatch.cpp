@@ -15,17 +15,17 @@ cell factor_vm::search_lookup_alist(cell table, cell klass)
 			index -= 2;
 	}
 
-	return F;
+	return false_object;
 }
 
 cell factor_vm::search_lookup_hash(cell table, cell klass, cell hashcode)
 {
 	array *buckets = untag<array>(table);
 	cell bucket = array_nth(buckets,hashcode & (array_capacity(buckets) - 1));
-	if(tagged<object>(bucket).type_p(WORD_TYPE) || bucket == F)
-		return bucket;
-	else
+	if(TAG(bucket) == ARRAY_TYPE)
 		return search_lookup_alist(bucket,klass);
+	else
+		return bucket;
 }
 
 cell factor_vm::nth_superclass(tuple_layout *layout, fixnum echelon)
@@ -46,22 +46,20 @@ cell factor_vm::lookup_tuple_method(cell obj, cell methods)
 
 	array *echelons = untag<array>(methods);
 
-	fixnum echelon = untag_fixnum(layout->echelon);
-	fixnum max_echelon = array_capacity(echelons) - 1;
-	if(echelon > max_echelon) echelon = max_echelon;
-       
+	fixnum echelon = std::min(untag_fixnum(layout->echelon),(fixnum)array_capacity(echelons) - 1);
+
 	while(echelon >= 0)
 	{
 		cell echelon_methods = array_nth(echelons,echelon);
 
 		if(tagged<object>(echelon_methods).type_p(WORD_TYPE))
 			return echelon_methods;
-		else if(echelon_methods != F)
+		else if(to_boolean(echelon_methods))
 		{
 			cell klass = nth_superclass(layout,echelon);
 			cell hashcode = untag_fixnum(nth_hashcode(layout,echelon));
 			cell result = search_lookup_hash(echelon_methods,klass,hashcode);
-			if(result != F)
+			if(to_boolean(result))
 				return result;
 		}
 
@@ -69,68 +67,39 @@ cell factor_vm::lookup_tuple_method(cell obj, cell methods)
 	}
 
 	critical_error("Cannot find tuple method",methods);
-	return F;
-}
-
-cell factor_vm::lookup_hi_tag_method(cell obj, cell methods)
-{
-	array *hi_tag_methods = untag<array>(methods);
-	cell tag = untag<object>(obj)->h.hi_tag() - HEADER_TYPE;
-#ifdef FACTOR_DEBUG
-	assert(tag < TYPE_COUNT - HEADER_TYPE);
-#endif
-	return array_nth(hi_tag_methods,tag);
-}
-
-cell factor_vm::lookup_hairy_method(cell obj, cell methods)
-{
-	cell method = array_nth(untag<array>(methods),TAG(obj));
-	if(tagged<object>(method).type_p(WORD_TYPE))
-		return method;
-	else
-	{
-		switch(TAG(obj))
-		{
-		case TUPLE_TYPE:
-			return lookup_tuple_method(obj,method);
-			break;
-		case OBJECT_TYPE:
-			return lookup_hi_tag_method(obj,method);
-			break;
-		default:
-			critical_error("Bad methods array",methods);
-			return 0;
-		}
-	}
+	return false_object;
 }
 
 cell factor_vm::lookup_method(cell obj, cell methods)
 {
 	cell tag = TAG(obj);
-	if(tag == TUPLE_TYPE || tag == OBJECT_TYPE)
-		return lookup_hairy_method(obj,methods);
+	cell method = array_nth(untag<array>(methods),tag);
+
+	if(tag == TUPLE_TYPE)
+	{
+		if(TAG(method) == ARRAY_TYPE)
+			return lookup_tuple_method(obj,method);
+		else
+			return method;
+	}
 	else
-		return array_nth(untag<array>(methods),TAG(obj));
+		return method;
 }
 
 void factor_vm::primitive_lookup_method()
 {
-	cell methods = dpop();
-	cell obj = dpop();
-	dpush(lookup_method(obj,methods));
+	cell methods = ctx->pop();
+	cell obj = ctx->pop();
+	ctx->push(lookup_method(obj,methods));
 }
 
 cell factor_vm::object_class(cell obj)
 {
-	switch(TAG(obj))
-	{
-	case TUPLE_TYPE:
+	cell tag = TAG(obj);
+	if(tag == TUPLE_TYPE)
 		return untag<tuple>(obj)->layout;
-	case OBJECT_TYPE:
-		return untag<object>(obj)->h.value;
-	default:
-		return tag_fixnum(TAG(obj));
-	}
+	else
+		return tag_fixnum(tag);
 }
 
 cell factor_vm::method_cache_hashcode(cell klass, array *array)
@@ -149,59 +118,55 @@ void factor_vm::update_method_cache(cell cache, cell klass, cell method)
 
 void factor_vm::primitive_mega_cache_miss()
 {
-	megamorphic_cache_misses++;
+	dispatch_stats.megamorphic_cache_misses++;
 
-	cell cache = dpop();
-	fixnum index = untag_fixnum(dpop());
-	cell methods = dpop();
+	cell cache = ctx->pop();
+	fixnum index = untag_fixnum(ctx->pop());
+	cell methods = ctx->pop();
 
-	cell object = ((cell *)ds)[-index];
+	cell object = ((cell *)ctx->datastack)[-index];
 	cell klass = object_class(object);
 	cell method = lookup_method(object,methods);
 
 	update_method_cache(cache,klass,method);
 
-	dpush(method);
+	ctx->push(method);
 }
 
 void factor_vm::primitive_reset_dispatch_stats()
 {
-	megamorphic_cache_hits = megamorphic_cache_misses = 0;
+	memset(&dispatch_stats,0,sizeof(dispatch_statistics));
 }
 
 void factor_vm::primitive_dispatch_stats()
 {
-	growable_array stats(this);
-	stats.add(allot_cell(megamorphic_cache_hits));
-	stats.add(allot_cell(megamorphic_cache_misses));
-	stats.trim();
-	dpush(stats.elements.value());
+	ctx->push(tag<byte_array>(byte_array_from_value(&dispatch_stats)));
 }
 
 void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index, cell cache_)
 {
-	gc_root<array> methods(methods_,parent_vm);
-	gc_root<array> cache(cache_,parent_vm);
+	data_root<array> methods(methods_,parent);
+	data_root<array> cache(cache_,parent);
 
 	/* Generate machine code to determine the object's class. */
-	emit_class_lookup(index,PIC_HI_TAG_TUPLE);
+	emit_class_lookup(index,PIC_TUPLE);
 
 	/* Do a cache lookup. */
-	emit_with(parent_vm->userenv[MEGA_LOOKUP],cache.value());
+	emit_with_literal(parent->special_objects[MEGA_LOOKUP],cache.value());
 	
 	/* If we end up here, the cache missed. */
-	emit(parent_vm->userenv[JIT_PROLOG]);
+	emit(parent->special_objects[JIT_PROLOG]);
 
 	/* Push index, method table and cache on the stack. */
 	push(methods.value());
 	push(tag_fixnum(index));
 	push(cache.value());
-	word_call(parent_vm->userenv[MEGA_MISS_WORD]);
+	word_call(parent->special_objects[MEGA_MISS_WORD]);
 
 	/* Now the new method has been stored into the cache, and its on
 	   the stack. */
-	emit(parent_vm->userenv[JIT_EPILOG]);
-	emit(parent_vm->userenv[JIT_EXECUTE_JUMP]);
+	emit(parent->special_objects[JIT_EPILOG]);
+	emit(parent->special_objects[JIT_EXECUTE]);
 }
 
 }

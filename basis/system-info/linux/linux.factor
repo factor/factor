@@ -7,7 +7,7 @@ SPECIALIZED-ARRAY: char
 IN: system-info.linux
 
 : (uname) ( buf -- int )
-    "int" f "uname" { "char*" } alien-invoke ;
+    int f "uname" { char* } alien-invoke ;
 
 : uname ( -- seq )
     65536 <char-array> [ (uname) io-error ] keep

@@ -1,7 +1,7 @@
 USING: assocs compiler.cfg.builder compiler.cfg.optimizer
 compiler.errors compiler.tree.builder compiler.tree.optimizer
-compiler.units help.markup help.syntax io parser quotations
-sequences words ;
+compiler.units compiler.codegen help.markup help.syntax io
+parser quotations sequences words ;
 IN: compiler
 
 HELP: enable-optimizer
@@ -16,17 +16,11 @@ ARTICLE: "compiler-usage" "Calling the optimizing compiler"
     disable-optimizer
     enable-optimizer
 }
-"Removing a word's optimized definition:"
-{ $subsections decompile }
-"Compiling a single quotation:"
-{ $subsections compile-call }
-"Higher-level words can be found in " { $link "compilation-units" } "." ;
+"More words can be found in " { $link "compilation-units" } "." ;
 
 ARTICLE: "compiler-impl" "Compiler implementation"
 "The " { $vocab-link "compiler" } "vocabulary, in addition to providing the user-visible words of the compiler, implements the main compilation loop."
 $nl
-"Words are added to the " { $link compile-queue } " variable as needed and compiled."
-{ $subsections compile-queue }
 "Once compiled, a word is added to the assoc stored in the " { $link compiled } " variable. When compilation is complete, this assoc is passed to " { $link modify-code-heap } "."
 $nl
 "The " { $link compile-word } " word performs the actual task of compiling an individual word. The process proceeds as follows:"
@@ -34,7 +28,7 @@ $nl
   { "The " { $link frontend } " word calls " { $link build-tree } ". If this fails, the error is passed to " { $link deoptimize } ". The logic for ignoring certain compile errors generated for inline words and macros is located here. If the error is not ignorable, it is added to the global " { $link compiler-errors } " assoc (see " { $link "compiler-errors" } ")." }
   { "If the word contains a breakpoint, compilation ends here. Otherwise, all remaining steps execute until machine code is generated. Any further errors thrown by the compiler are not reported as compile errors, but instead are ordinary exceptions. This is because they indicate bugs in the compiler, not errors in user code." }
   { "The " { $link frontend } " word then calls " { $link optimize-tree } ". This produces the final optimized tree IR, and this stage of the compiler is complete." }
-  { "The " { $link backend } " word calls " { $link build-cfg } " followed by " { $link optimize-cfg } " and a few other stages. Finally, it calls " { $link save-asm } ", and adds any uncompiled words called by this word to the compilation queue with " { $link compile-dependency } "." }
+  { "The " { $link backend } " word calls " { $link build-cfg } " followed by " { $link optimize-cfg } " and a few other stages. Finally, it calls " { $link generate } "." }
 }
 "If compilation fails, the word is stored in the " { $link compiled } " assoc with a value of " { $link f } ". This causes the VM to compile the word with the non-optimizing compiler."
 $nl
@@ -60,10 +54,6 @@ $nl
 
 ABOUT: "compiler"
 
-HELP: decompile
-{ $values { "word" word } }
-{ $description "Removes a word's optimized definition. The word will be compiled with the non-optimizing compiler until recompiled with the optimizing compiler again." } ;
-
 HELP: compile-word
 { $values { "word" word } }
 { $description "Compile a single word." }
@@ -72,8 +62,3 @@ HELP: compile-word
 HELP: optimizing-compiler
 { $description "Singleton class implementing " { $link recompile } " to call the optimizing compiler." }
 { $notes "This is an internal word, and user code should call " { $link compile } " instead." } ;
-
-HELP: compile-call
-{ $values { "quot" quotation } }
-{ $description "Compiles and runs a quotation." }
-{ $notes "This word is used by compiler unit tests to test compilation of small pieces of code." } ;

@@ -84,7 +84,7 @@ PRIVATE>
     [ prepare-match-iterator ] dip (each-match) ; inline
 
 : map-matches ( string regexp quot: ( start end string -- obj ) -- seq )
-    accumulator [ each-match ] dip >array ; inline
+    collector [ each-match ] dip >array ; inline
 
 : all-matching-slices ( string regexp -- seq )
     [ slice boa ] map-matches ;
@@ -200,7 +200,7 @@ PRIVATE>
 
 : parsing-regexp ( accum end -- accum )
     lexer get [ take-until ] [ parse-noblank-token ] bi
-    <optioned-regexp> compile-next-match parsed ;
+    <optioned-regexp> compile-next-match suffix! ;
 
 PRIVATE>
 

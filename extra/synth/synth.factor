@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel locals math math.constants math.functions memoize openal synth.buffers sequences sequences.modified sequences.repeating ;
+USING: accessors kernel locals math math.constants math.functions memoize openal openal.alut synth.buffers sequences sequences.modified sequences.repeating ;
 IN: synth
 
 MEMO: single-sine-wave ( samples/wave -- seq )
@@ -16,7 +16,7 @@ MEMO: single-sine-wave ( samples/wave -- seq )
     [ sample-freq>> -rot sine-wave ] keep swap >>data ;
 
 : >silent-buffer ( seconds buffer -- buffer )
-    tuck sample-freq>> * >integer 0 <repetition> >>data ;
+    [ sample-freq>> * >integer 0 <repetition> ] [ (>>data) ] [ ] tri ;
 
 TUPLE: harmonic n amplitude ;
 C: <harmonic> harmonic
@@ -32,5 +32,5 @@ C: <note> note
     harmonic amplitude>> <scaled> ;
 
 : >note ( harmonics note buffer -- buffer )
-    dup -roll [ note-harmonic-data ] 2curry map <summed> >>data ;
+    [ [ note-harmonic-data ] 2curry map <summed> ] [ (>>data) ] [ ] tri ;
 

@@ -16,12 +16,12 @@ IN: serialize.tests
 [ t ] [
     100 [
         drop
-        40 [        test-serialize-cell ] all?
-         4 [ 40 *   test-serialize-cell ] all?
-         4 [ 400 *  test-serialize-cell ] all?
-         4 [ 4000 * test-serialize-cell ] all?
+        40 [        test-serialize-cell ] all-integers?
+         4 [ 40 *   test-serialize-cell ] all-integers?
+         4 [ 400 *  test-serialize-cell ] all-integers?
+         4 [ 4000 * test-serialize-cell ] all-integers?
         and and and
-    ] all?
+    ] all-integers?
 ] unit-test
 
 TUPLE: serialize-test a b ;
@@ -50,7 +50,7 @@ CONSTANT: objects
         B{ 50 13 55 64 1 }
         ?{ t f t f f t f }
         double-array{ 1.0 3.0 4.0 1.0 2.35 0.33 }
-        << 1 [ 2 ] curry parsed >>
+        << 1 [ 2 ] curry suffix! >>
         { { "a" "bc" } { "de" "fg" } }
         H{ { "a" "bc" } { "de" "fg" } }
     }

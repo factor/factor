@@ -29,7 +29,7 @@ IN: project-euler.063
 ! Round down since we already know that particular value of n is no good.
 
 : euler063 ( -- answer )
-    9 [1,b] [ log [ 10 log dup ] dip - /i ] sigma ;
+    9 [1,b] [ log [ 10 log dup ] dip - /i ] map-sum ;
 
 ! [ euler063 ] 100 ave-time
 ! 0 ms ave run time - 0.0 SD (100 trials)

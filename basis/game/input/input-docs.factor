@@ -32,6 +32,12 @@ ARTICLE: "game-input" "Game controller input"
     controller-state
     keyboard-state
     mouse-state
+}
+"Convenience functions are provided to convert a pair of key or button state sequences into a sequence of " { $link pressed } "/" { $link released } " deltas:"
+{ $subsections
+    button-delta
+    buttons-delta
+    buttons-delta-as
 } ;
 
 HELP: open-game-input
@@ -136,7 +142,7 @@ HELP: controller-state
     { "A value of " { $link f } " in any slot (besides the elements of " { $snippet "buttons" } ") indicates that the corresponding element is not present on the device." } } } ;
 
 HELP: keyboard-state
-{ $class-description "The " { $link read-keyboard } " word returns objects of this class. The " { $snippet "keys" } " slot of a " { $snippet "keyboard-state" } " object contains a " { $link sequence } " of 256 members representing the state of the keys on the keyboard. Each element is a boolean value indicating whether the corresponding key is pressed. The sequence is indexed by scancode as defined under usage page 7 of the USB HID standard. Named scancode constants are provided in the " { $vocab-link "game.input.scancodes" } " vocabulary." }
+{ $class-description "The " { $link read-keyboard } " word returns objects of this class. The " { $snippet "keys" } " slot of a " { $snippet "keyboard-state" } " object contains a " { $link sequence } " of 256 members representing the state of the keys on the keyboard. Each element is a boolean value indicating whether the corresponding key is pressed. The sequence is indexed by scancode as defined by the USB HID standard. Named scancode constants are provided in the " { $vocab-link "game.input.scancodes" } " vocabulary." }
 { $warning "The scancodes used to index " { $snippet "keyboard-state" } " objects correspond to physical key positions on the keyboard--they are unaffected by keymaps, modifier keys, or other operating environment postprocessing. The face value of the constants in " { $vocab-link "game.input.scancodes" } " do not necessarily correspond to what the user expects the key to type. Because of this, " { $link read-keyboard } " should not be used for text entry purposes. The Factor UI's standard gesture mechanism should be used in cases where the logical meaning of keypresses is needed; see " { $link "keyboard-gestures" } "." } ;
 
 HELP: mouse-state
@@ -151,7 +157,30 @@ HELP: mouse-state
 "Mouse movement is recorded relative to when the game input interface was opened with " { $link open-game-input } " or the mouse state is reset with " { $link reset-mouse } "."
 } ;
 
-
 { keyboard-state read-keyboard } related-words
+
+HELP: button-delta
+{ $values { "old?" boolean } { "new?" boolean } { "delta" { $link pressed } ", " { $link released } ", or " { $link POSTPONE: f } } }
+{ $description "Outputs a symbol representing the change in a key or button's state given a \"before\" and \"after\" sample of its state. Outputs " { $link pressed } " if " { $snippet "old?" } " is false and " { $snippet "new?" } " is true, " { $link released } " if " { $snippet "old?" } " is true and " { $snippet "new?" } " is false, or " { $link POSTPONE: f } " if the two inputs have the same boolean value." } ;
+
+HELP: buttons-delta
+{ $values { "old-buttons" sequence } { "new-buttons" sequence } { "delta" "an array of " { $link pressed } ", " { $link released } ", or " { $link POSTPONE: f } } }
+{ $description "Outputs an array of symbols representing the change in a set of keys or buttons' states given \"before\" and \"after\" samples of their state. For each corresponding pair of values in the two input sequences, outputs " { $link pressed } " if " { $snippet "old-buttons" } " contains a false and " { $snippet "new-buttons" } " a true value, " { $link released } " if " { $snippet "old-buttons" } " contains true and " { $snippet "new-buttons" } " false, or " { $link POSTPONE: f } " if the two elements have the same boolean value."
+$nl
+"This word can be used with two samples of a " { $link keyboard-state } "'s " { $snippet "keys" } " slot or of a " { $link mouse-state } "'s or " { $link controller-state } "'s " { $snippet "buttons" } " slot to convert the button states into pressed/released values. Remember to " { $link clone } " state objects to record snapshots of their state." } ;
+
+HELP: buttons-delta-as
+{ $values { "old-buttons" sequence } { "new-buttons" sequence } { "exemplar" sequence } { "delta" "a sequence of " { $link pressed } ", " { $link released } ", or " { $link POSTPONE: f } } }
+{ $description "Like " { $link buttons-delta } ", but returns a sequence matching the type of the " { $snippet "exemplar" } "." } ;
+
+{ button-delta buttons-delta buttons-delta-as } related-words
+
+HELP: pressed
+{ $class-description "This symbol is returned by " { $link button-delta } " or " { $link buttons-delta } " to represent a button or key being pressed between two samples of its state." } ;
+
+HELP: released
+{ $class-description "This symbol is returned by " { $link button-delta } " or " { $link buttons-delta } " to represent a button or key being released between two samples of its state." } ;
+
+{ pressed released } related-words
 
 ABOUT: "game-input"

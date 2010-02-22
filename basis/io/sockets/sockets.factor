@@ -11,7 +11,7 @@ IN: io.sockets
 
 << {
     { [ os windows? ] [ "windows.winsock" ] }
-    { [ os unix? ] [ "unix" ] }
+    { [ os unix? ] [ "unix.ffi" ] }
 } cond use-vocab >>
 
 ! Addressing
@@ -64,21 +64,25 @@ C: <inet4> inet4
 M: inet4 inet-ntop ( data addrspec -- str )
     drop 4 memory>byte-array [ number>string ] { } map-as "." join ;
 
+ERROR: malformed-inet4 sequence ;
+ERROR: bad-inet4-component string ;
+
+: parse-inet4 ( string -- seq )
+    "." split dup length 4 = [
+        malformed-inet4
+    ] unless
+    [
+        string>number
+        [ "Dotted component not a number" throw ] unless*
+    ] B{ } map-as ;
+
 ERROR: invalid-inet4 string reason ;
 
 M: invalid-inet4 summary drop "Invalid IPv4 address" ;
 
 M: inet4 inet-pton ( str addrspec -- data )
     drop
-    [
-        "." split dup length 4 = [
-            "Must have four components" throw
-        ] unless
-        [
-            string>number
-            [ "Dotted component not a number" throw ] unless*
-        ] B{ } map-as
-    ] [ invalid-inet4 ] recover ;
+    [ parse-inet4 ] [ invalid-inet4 ] recover ;
 
 M: inet4 address-size drop 4 ;
 
@@ -112,11 +116,21 @@ M: invalid-inet6 summary drop "Invalid IPv6 address" ;
 
 <PRIVATE
 
+ERROR: bad-ipv6-component obj ;
+
+ERROR: bad-ipv4-embedded-prefix obj ;
+
+: parse-ipv6-component ( seq -- seq' )
+    [ dup hex> [ nip ] [ bad-ipv6-component ] if* ] { } map-as ;
+
 : parse-inet6 ( string -- seq )
     [ f ] [
-        ":" split [
-            hex> [ "Component not a number" throw ] unless*
-        ] { } map-as
+        ":" split CHAR: . over last member? [
+            unclip-last
+            [ parse-ipv6-component ] [ parse-inet4 ] bi* append
+        ] [
+            parse-ipv6-component
+        ] if
     ] if-empty ;
 
 : pad-inet6 ( string1 string2 -- seq )
@@ -172,6 +186,8 @@ GENERIC: (get-remote-address) ( handle remote -- sockaddr )
     [
         [ <input-port> |dispose ] [ <output-port> |dispose ] bi
     ] with-destructors ;
+
+SYMBOL: bind-local-address
 
 GENERIC: establish-connection ( client-out remote -- )
 
@@ -320,6 +336,18 @@ M: invalid-inet-server summary
 
 M: inet (server)
     invalid-inet-server ;
+
+ERROR: invalid-local-address addrspec ;
+
+M: invalid-local-address summary
+    drop "Cannot use with-local-address with <inet>; use <inet4> or <inet6> instead" ;
+
+: with-local-address ( addr quot -- )
+    [
+        [ ] [ inet4? ] [ inet6? ] tri or
+        [ bind-local-address ]
+        [ invalid-local-address ] if
+    ] dip with-variable ; inline
 
 {
     { [ os unix? ] [ "io.sockets.unix" require ] }

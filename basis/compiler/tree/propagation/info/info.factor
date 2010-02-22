@@ -1,10 +1,11 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs classes classes.algebra classes.tuple
-classes.tuple.private kernel accessors math math.intervals namespaces
-sequences sequences.private words combinators memoize
-combinators.short-circuit byte-arrays strings arrays layouts
-cpu.architecture compiler.tree.propagation.copy ;
+classes.tuple.private classes.singleton kernel accessors math
+math.intervals namespaces sequences sequences.private words
+combinators memoize combinators.short-circuit byte-arrays
+strings arrays layouts cpu.architecture
+compiler.tree.propagation.copy ;
 IN: compiler.tree.propagation.info
 
 : false-class? ( class -- ? ) \ f class<= ;
@@ -65,9 +66,17 @@ DEFER: <literal-info>
 
 UNION: fixed-length array byte-array string ;
 
+: literal-class ( obj -- class )
+    #! Handle forgotten tuples and singleton classes properly
+    dup singleton-class? [
+        class dup class? [
+            drop tuple
+        ] unless
+    ] unless ;
+
 : init-literal-info ( info -- info )
     empty-interval >>interval
-    dup literal>> class >>class
+    dup literal>> literal-class >>class
     dup literal>> {
         { [ dup real? ] [ [a,a] >>interval ] }
         { [ dup tuple? ] [ tuple-slot-infos >>slots ] }
@@ -294,8 +303,11 @@ DEFER: (value-info-union)
 ! Assoc stack of current value --> info mapping
 SYMBOL: value-infos
 
+: value-info* ( value -- info ? )
+    resolve-copy value-infos get assoc-stack [ null-info or ] [ >boolean ] bi ; inline
+
 : value-info ( value -- info )
-    resolve-copy value-infos get assoc-stack null-info or ;
+    value-info* drop ;
 
 : set-value-info ( info value -- )
     resolve-copy value-infos get last set-at ;
@@ -309,16 +321,12 @@ SYMBOL: value-infos
     value-info >literal< ;
 
 : possible-boolean-values ( info -- values )
-    dup literal?>> [
-        literal>> 1array
-    ] [
-        class>> {
-            { [ dup null-class? ] [ { } ] }
-            { [ dup true-class? ] [ { t } ] }
-            { [ dup false-class? ] [ { f } ] }
-            [ { t f } ]
-        } cond nip
-    ] if ;
+    class>> {
+        { [ dup null-class? ] [ { } ] }
+        { [ dup true-class? ] [ { t } ] }
+        { [ dup false-class? ] [ { f } ] }
+        [ { t f } ]
+    } cond nip ;
 
 : node-value-info ( node value -- info )
     swap info>> at* [ drop null-info ] unless ;
@@ -339,19 +347,4 @@ SYMBOL: value-infos
     dup word>> \ <tuple-boa> eq? [
         dup in-d>> last node-value-info
         literal>> first immutable-tuple-class?
-    ] [ drop f ] if ;
-
-: value-info-small-fixnum? ( value-info -- ? )
-    literal>> {
-        { [ dup fixnum? ] [ tag-fixnum small-enough? ] }
-        [ drop f ]
-    } cond ;
-
-: value-info-small-tagged? ( value-info -- ? )
-    dup literal?>> [
-        literal>> {
-            { [ dup fixnum? ] [ tag-fixnum small-enough? ] }
-            { [ dup not ] [ drop t ] }
-            [ drop f ]
-        } cond
     ] [ drop f ] if ;

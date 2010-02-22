@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit
 compiler.cfg.instructions compiler.cfg.registers
@@ -14,14 +14,7 @@ IN: compiler.cfg.save-contexts
             [ ##binary-float-function? ]
             [ ##alien-invoke? ]
             [ ##alien-indirect? ]
-        } 1||
-    ] any? ;
-
-: needs-callback-context? ( insns -- ? )
-    [
-        {
-            [ ##alien-invoke? ]
-            [ ##alien-indirect? ]
+            [ ##alien-assembly? ]
         } 1||
     ] any? ;
 
@@ -29,7 +22,6 @@ IN: compiler.cfg.save-contexts
     dup instructions>> dup needs-save-context? [
         int-rep next-vreg-rep
         int-rep next-vreg-rep
-        pick needs-callback-context?
         \ ##save-context new-insn prefix
         >>instructions drop
     ] [ 2drop ] if ;

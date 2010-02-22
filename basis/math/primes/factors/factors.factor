@@ -1,7 +1,8 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators kernel make math math.functions
-math.primes math.ranges sequences sequences.product sorting ;
+math.primes math.ranges sequences sequences.product sorting
+io math.parser ;
 IN: math.primes.factors
 
 <PRIVATE
@@ -49,3 +50,16 @@ PRIVATE>
         group-factors [ first2 [0,b] [ ^ ] with map ] map
         [ product ] product-map natural-sort
     ] if ;
+
+: unix-factor ( string -- )
+    dup string>number [
+        [ ": " append write ]
+        [ factors [ number>string ] map " " join print ] bi*
+    ] [
+        "factor: `" "' is not a valid positive integer" surround print
+    ] if* ;
+
+: run-unix-factor ( -- )
+    [ readln [ unix-factor t ] [ f ] if* ] loop ;
+
+MAIN: run-unix-factor

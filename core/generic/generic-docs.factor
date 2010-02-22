@@ -11,22 +11,20 @@ $nl
 { $code
     "GENERIC: explain ( object -- )"
     "M: object explain drop \"an object\" print ;"
-    "M: number explain drop \"a number\" print ;"
-    "M: sequence explain drop \"a sequence\" print ;"
+    "M: generic explain drop \"a generic word\" print ;"
+    "M: class explain drop \"a class word\" print ;"
 }
 "The linear order is the following, from least-specific to most-specific:"
-{ $code "{ object sequence number }" }
-"Neither " { $link number } " nor " { $link sequence } " are subclasses of each other, yet their intersection is the non-empty " { $link integer } " class. Calling " { $snippet "explain" } " with an integer on the stack will print " { $snippet "a number" } " because " { $link number } " precedes " { $link sequence } " in the class linearization order. If this was not the desired outcome, define a method on the intersection:"
-{ $code "M: integer explain drop \"an integer\" print ;" }
-"Now, the linear order is the following, from least-specific to most-specific:"
-{ $code "{ object sequence number integer }" }
+{ $code "{ object generic class }" }
+"Neither " { $link class } " nor " { $link generic } " are subclasses of each other, and their intersection is non-empty. Calling " { $snippet "explain" } " with a word on the stack that is both a class and a generic word will print " { $snippet "a class word" } " because " { $link class } " is more specific than " { $link generic } " in the class linearization order. (One example of a word which is both a class and a generic word is the class of classes, " { $link class } ", which is also a word to get the class of an object.)"
+$nl
 "The " { $link order } " word can be useful to clarify method dispatch order:"
 { $subsections order } ;
 
 ARTICLE: "generic-introspection" "Generic word introspection"
 "In most cases, generic words and methods are defined at parse time with " { $link POSTPONE: GENERIC: } " (or some other parsing word) and " { $link POSTPONE: M: } "."
 $nl
-"Sometimes, generic words need to be inspected defined at run time; words for performing these tasks are found in the " { $vocab-link "generic" } " vocabulary."
+"Sometimes, generic words need to be inspected or defined at run time; words for performing these tasks are found in the " { $vocab-link "generic" } " vocabulary."
 $nl
 "The set of generic words is a class which implements the " { $link "definition-protocol" } ":"
 { $subsections
@@ -88,7 +86,7 @@ $nl
 } ;
 
 ARTICLE: "generic" "Generic words and methods"
-"A " { $emphasis "generic word" } " is composed of zero or more " { $emphasis "methods" } " together with a " { $emphasis "method combination" } ". A method " { $emphasis "specializes" } " on a class; when a generic word executed, the method combination chooses the most appropriate method and calls its definition."
+"A " { $emphasis "generic word" } " is composed of zero or more " { $emphasis "methods" } " together with a " { $emphasis "method combination" } ". A method " { $emphasis "specializes" } " on a class; when a generic word is executed, the method combination chooses the most appropriate method and calls its definition."
 $nl
 "A generic word behaves roughly like a long series of class predicate conditionals in a " { $link cond } " form, however methods can be defined in independent source files, reducing coupling and increasing extensibility. The method combination determines which object the generic word will " { $emphasis "dispatch" } " on; this could be the top of the stack, or some other value."
 $nl
@@ -124,7 +122,7 @@ HELP: make-generic
 $low-level-note ;
 
 HELP: define-generic
-{ $values { "word" word } { "effect" effect } { "combination" "a method combination" } }
+{ $values { "word" word } { "combination" "a method combination" } { "effect" effect } }
 { $description "Defines a generic word. A method combination is an object which responds to the " { $link perform-combination } " generic word." }
 { $contract "The method combination quotation is called each time the generic word has to be updated (for example, when a method is added), and thus must be side-effect free." } ;
 
@@ -133,12 +131,10 @@ HELP: M\
 { $class-description "Pushes a method on the stack." }
 { $examples { $code "M\\ fixnum + see" } { $code "USING: ui.gadgets ui.gadgets.editors ;" "M\\ editor draw-gadget* edit" } } ;
 
-HELP: method-body
-{ $class-description "The class of method bodies, which are words with special word properties set." } ;
-
 HELP: method
-{ $values { "class" class } { "generic" generic } { "method/f" { $maybe method-body } } }
-{ $description "Looks up a method definition." } ;
+{ $values { "class" class } { "generic" generic } { "method/f" { $maybe method } } }
+{ $description "Looks up a method definition." }
+{ $class-description "The class of method bodies, which are words with special word properties set." } ;
 
 { method create-method POSTPONE: M: } related-words
 
@@ -161,20 +157,22 @@ HELP: with-methods
 $low-level-note ;
 
 HELP: create-method
-{ $values { "class" class } { "generic" generic } { "method" method-body } }
+{ $values { "class" class } { "generic" generic } { "method" method } }
 { $description "Creates a method or returns an existing one. This is the runtime equivalent of " { $link POSTPONE: M: } "." }
 { $notes "To define a method, pass the output value to " { $link define } "." } ;
-
-HELP: forget-methods
-{ $values { "class" class } }
-{ $description "Remove all method definitions which specialize on the class." } ;
 
 { sort-classes order } related-words
 
 HELP: (call-next-method)
-{ $values { "method" method-body } }
+{ $values { "method" method } }
 { $description "Low-level word implementing " { $link POSTPONE: call-next-method } "." }
-{ $notes "In most cases, " { $link POSTPONE: call-next-method } " should be used instead." } ;
+{ $notes
+    "The " { $link POSTPONE: call-next-method } " word parses into this word. The following are equivalent:"
+    { $code
+        "M: class generic call-next-method ;"
+        "M: class generic M\\ class generic (call-next-method) ;"
+    }
+} ;
 
 HELP: no-next-method
 { $error-description "Thrown by " { $link POSTPONE: call-next-method } " if the current method is already the least specific method." }

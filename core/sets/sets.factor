@@ -3,7 +3,7 @@
 USING: assocs hashtables kernel sequences vectors ;
 IN: sets
 
-: adjoin ( elt seq -- ) [ delete ] [ push ] 2bi ;
+: adjoin ( elt seq -- ) [ remove! drop ] [ push ] 2bi ;
 
 : conjoin ( elt assoc -- ) dupd set-at ;
 

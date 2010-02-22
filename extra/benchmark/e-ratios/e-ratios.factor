@@ -4,7 +4,7 @@ USING: kernel math math.combinatorics math.ranges sequences ;
 IN: benchmark.e-ratios
 
 : calculate-e-ratios ( n -- e )
-    iota [ factorial recip ] sigma ;
+    iota [ factorial recip ] map-sum ;
 
 : calculate-e-ratios-benchmark ( -- )
     5 [ 300 calculate-e-ratios drop ] times ;

@@ -1,6 +1,6 @@
-! Copyright (C) 2004, 2009 Slava Pestov, Joe Groff.
+! Copyright (C) 2004, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.private ;
+USING: kernel math math.private math.order ;
 IN: math.floats.private
 
 : float-unordered? ( x y -- ? ) [ fp-nan? ] bi@ or ;
@@ -28,6 +28,9 @@ M: float u<  float-u< ; inline
 M: float u<= float-u<= ; inline
 M: float u>  float-u> ; inline
 M: float u>= float-u>= ; inline
+
+M: float min over float? [ float-min ] [ call-next-method ] if ; inline
+M: float max over float? [ float-max ] [ call-next-method ] if ; inline
 
 M: float + float+ ; inline
 M: float - float- ; inline

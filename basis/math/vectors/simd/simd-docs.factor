@@ -1,6 +1,6 @@
 USING: classes.tuple.private cpu.architecture help.markup
-help.syntax kernel.private math math.vectors
-math.vectors.simd.intrinsics sequences ;
+help.syntax kernel.private math math.vectors math.vectors.simd.intrinsics
+sequences ;
 IN: math.vectors.simd
 
 ARTICLE: "math.vectors.simd.intro" "Introduction to SIMD support"
@@ -8,7 +8,7 @@ ARTICLE: "math.vectors.simd.intro" "Introduction to SIMD support"
 $nl
 "SIMD support in the processor takes the form of instruction sets which operate on vector registers. By operating on multiple scalar values at the same time, code which operates on points, colors, and other vector data can be sped up."
 $nl
-"In Factor, SIMD support is exposed in the form of special-purpose SIMD " { $link "sequence-protocol" } " implementations. These are fixed-length, homogeneous sequences. They are referred to as vectors, but should not be confused with Factor's " { $link "vectors" } ", which can hold any type of object and can be resized.)."
+"In Factor, SIMD support is exposed in the form of special-purpose SIMD " { $link "sequence-protocol" } " implementations. These are fixed-length, homogeneous sequences. They are referred to as vectors, but should not be confused with Factor's " { $link "vectors" } ", which can hold any type of object and can be resized."
 $nl
 "The words in the " { $vocab-link "math.vectors" } " vocabulary, which can be used with any sequence of numbers, are special-cased by the compiler. If the compiler can prove that only SIMD vectors are used, it expands " { $link "math-vectors" } " into " { $link "math.vectors.simd.intrinsics" } ". While in the general case, SIMD intrinsics operate on heap-allocated SIMD vectors, that too can be optimized since in many cases the compiler unbox SIMD vectors, storing them directly in registers."
 $nl
@@ -19,11 +19,11 @@ $nl
 ARTICLE: "math.vectors.simd.support" "Supported SIMD instruction sets and operations"
 "At present, the SIMD support makes use of a subset of SSE up to SSE4.1. The subset used depends on the current CPU type."
 $nl
-"SSE1 only supports single-precision SIMD (" { $snippet "float-4" } " and " { $snippet "float-8" } ")."
+"SSE1 only supports single-precision SIMD (" { $snippet "float-4" } ")."
 $nl
-"SSE2 introduces double-precision SIMD (" { $snippet "double-2" } " and " { $snippet "double-4" } ") and integer SIMD (all types). Integer SIMD is missing a few features, in particular the " { $link vmin } " and " { $link vmax } " operations only work on " { $snippet "uchar-16" } " and " { $snippet "short-8" } "."
+"SSE2 introduces double-precision SIMD (" { $snippet "double-2" } ") and integer SIMD (all types). Integer SIMD is missing a few features; in particular, the " { $link vmin } " and " { $link vmax } " operations only work on " { $snippet "uchar-16" } " and " { $snippet "short-8" } "."
 $nl
-"SSE3 introduces horizontal adds (summing all components of a single vector register), which is useful for computing dot products. Where available, SSE3 operations are used to speed up " { $link sum } ", " { $link v. } ", " { $link norm-sq } ", " { $link norm } ", and " { $link distance } "."
+"SSE3 introduces horizontal adds (summing all components of a single vector register), which are useful for computing dot products. Where available, SSE3 operations are used to speed up " { $link sum } ", " { $link v. } ", " { $link norm-sq } ", " { $link norm } ", and " { $link distance } "."
 $nl
 "SSSE3 introduces " { $link vabs } " for " { $snippet "char-16" } ", " { $snippet "short-8" } " and " { $snippet "int-4" } "."
 $nl
@@ -36,32 +36,30 @@ $nl
 ARTICLE: "math.vectors.simd.types" "SIMD vector types"
 "Each SIMD vector type is named " { $snippet "scalar-count" } ", where " { $snippet "scalar" } " is a scalar C type and " { $snippet "count" } " is a vector dimension."
 $nl
-"To use a SIMD vector type, a parsing word is used to generate the relevant code and bring it into the vocabulary search path; this is the same idea as with " { $link "specialized-arrays" } ":"
-{ $subsections
-    POSTPONE: SIMD:
-    POSTPONE: SIMDS:
-}
-"The following vector types are supported:"
+"The following 128-bit vector types are defined in the " { $vocab-link "math.vectors.simd" } " vocabulary:"
 { $code
     "char-16"
     "uchar-16"
-    "char-32"
-    "uchar-32"
     "short-8"
     "ushort-8"
-    "short-16"
-    "ushort-16"
     "int-4"
     "uint-4"
-    "int-8"
-    "uint-8"
     "longlong-2"
     "ulonglong-2"
+    "float-4"
+    "double-2"
+}
+"Double-width 256-bit vector types are defined in the " { $vocab-link "math.vectors.simd.cords" } " vocabulary:"
+{ $code
+    "char-32"
+    "uchar-32"
+    "short-16"
+    "ushort-16"
+    "int-8"
+    "uint-8"
     "longlong-4"
     "ulonglong-4"
-    "float-4"
     "float-8"
-    "double-2"
     "double-4"
 } ;
 
@@ -92,29 +90,27 @@ math.vectors.simd ;
 SYMBOLS: x y ;
 
 [
-    double-4{ 1.5 2.0 3.7 0.4 } x set
-    double-4{ 1.5 2.0 3.7 0.4 } y set
+    float-4{ 1.5 2.0 3.7 0.4 } x set
+    float-4{ 1.5 2.0 3.7 0.4 } y set
     x get y get v+
 ] optimizer-report.""" }
 "The following word benefits from SIMD optimization, because it begins with an unsafe declaration:"
 { $code
 """USING: compiler.tree.debugger kernel.private
 math.vectors math.vectors.simd ;
-SIMD: float
 IN: simd-demo
 
 : interpolate ( v a b -- w )
     { float-4 float-4 float-4 } declare
     [ v* ] [ [ 1.0 ] dip n-v v* ] bi-curry* bi v+ ;
 
-\ interpolate optimizer-report.""" }
+\\ interpolate optimizer-report.""" }
 "Note that using " { $link declare } " is not recommended. Safer ways of getting type information for the input parameters to a word include defining methods on a generic word (the value being dispatched upon has a statically known type in the method body), as well as using " { $link "hints" } " and " { $link POSTPONE: inline } " declarations."
 $nl
 "Here is a better version of the " { $snippet "interpolate" } " words above that uses hints:"
 { $code
 """USING: compiler.tree.debugger hints
 math.vectors math.vectors.simd ;
-SIMD: float
 IN: simd-demo
 
 : interpolate ( v a b -- w )
@@ -122,7 +118,7 @@ IN: simd-demo
 
 HINTS: interpolate float-4 float-4 float-4 ;
 
-\ interpolate optimizer-report. """ }
+\\ interpolate optimizer-report. """ }
 "This time, the optimizer report lists calls to both SIMD primitives and high-level vector words, because hints cause two code paths to be generated. The " { $snippet "optimized." } " word can be used to make sure that the fast code path consists entirely of calls to primitives."
 $nl
 "If the " { $snippet "interpolate" } " word was to be used in several places with different types of vectors, it would be best to declare it " { $link POSTPONE: inline } "."
@@ -130,7 +126,6 @@ $nl
 "In the " { $snippet "interpolate" } " word, there is still a call to the " { $link <tuple-boa> } " primitive, because the return value at the end is being boxed on the heap. In the next example, no memory allocation occurs at all because the SIMD vectors are stored inside a struct class (see " { $link "classes.struct" } "); also note the use of inlining:"
 { $code
 """USING: compiler.tree.debugger math.vectors math.vectors.simd ;
-SIMD: float
 IN: simd-demo
 
 STRUCT: actor
@@ -153,21 +148,25 @@ M: actor advance ( dt actor -- )
     [ >float ] dip
     [ update-velocity ] [ update-position ] 2bi ;
 
-M\ actor advance optimized."""
+M\\ actor advance optimized."""
 }
 "The " { $vocab-link "compiler.cfg.debugger" } " vocabulary can give a lower-level picture of the generated code, that includes register assignments and other low-level details. To look at low-level optimizer output, call " { $snippet "test-mr mr." } " on a word or quotation:"
 { $code
 """USE: compiler.tree.debugger
 
-M\ actor advance test-mr mr.""" }
-"An example of a high-performance algorithm that uses SIMD primitives can be found in the " { $vocab-link "benchmark.nbody-simd" } " vocabulary." ;
+M\\ actor advance test-mr mr.""" }
+"Example of a high-performance algorithms that use SIMD primitives can be found in the following vocabularies:"
+{ $list
+    { $vocab-link "benchmark.nbody-simd" }
+    { $vocab-link "benchmark.raytracer-simd" }
+    { $vocab-link "random.sfmt" }
+} ;
 
 ARTICLE: "math.vectors.simd.intrinsics" "Low-level SIMD primitives"
 "The words in the " { $vocab-link "math.vectors.simd.intrinsics" } " vocabulary are used to implement SIMD support. These words have three disadvantages compared to the higher-level " { $link "math-vectors" } " words:"
 { $list
     "They operate on raw byte arrays, with a separate “representation” parameter passed in to determine the type of the operands and result."
     "They are unsafe; passing values which are not byte arrays, or byte arrays with the wrong size, will dereference invalid memory and possibly crash Factor."
-    { "They do not have software fallbacks; if the current CPU does not have SIMD support, a " { $link bad-simd-call } " error will be thrown." }
 }
 "The compiler converts " { $link "math-vectors" } " into SIMD primitives automatically in cases where it is safe; this means that the input types are known to be SIMD vectors, and the CPU supports SIMD."
 $nl
@@ -188,7 +187,7 @@ $nl
 ARTICLE: "math.vectors.simd.accuracy" "Numerical accuracy of SIMD primitives"
 "No guarantees are made that " { $vocab-link "math.vectors.simd" } " words will give identical results on different SSE versions, or between the hardware intrinsics and the software fallbacks."
 $nl
-"In particular, horizontal operations on " { $snippet "float-4" } " and " { $snippet "float-8" } " are affected by this. They are computed with lower precision in intrinsics than the software fallback. Horizontal operations include anything involving adding together the components of a vector, such as " { $link sum } " or " { $link normalize } "." ;
+"In particular, horizontal operations on " { $snippet "float-4" } " vectors are affected by this. They are computed with lower precision in intrinsics than the software fallback. Horizontal operations include anything involving adding together the components of a vector, such as " { $link sum } " or " { $link normalize } "." ;
 
 ARTICLE: "math.vectors.simd" "Hardware vector arithmetic (SIMD)"
 "The " { $vocab-link "math.vectors.simd" } " vocabulary extends the " { $vocab-link "math.vectors" } " vocabulary to support efficient vector arithmetic on small, fixed-size vectors."
@@ -202,17 +201,5 @@ ARTICLE: "math.vectors.simd" "Hardware vector arithmetic (SIMD)"
     "math.vectors.simd.alien"
     "math.vectors.simd.intrinsics"
 } ;
-
-HELP: SIMD:
-{ $syntax "SIMD: type" }
-{ $values { "type" "a scalar C type" } }
-{ $description "Defines 128-bit and 256-bit SIMD arrays for holding elements of " { $snippet "type" } " into the vocabulary search path. The possible type/length combinations are listed in " { $link "math.vectors.simd.types" } " and the generated words are documented in " { $link "math.vectors.simd.words" } "." } ;
-
-HELP: SIMDS:
-{ $syntax "SIMDS: type type type ... ;" }
-{ $values { "type" "a scalar C type" } }
-{ $description "Defines 128-bit and 256-bit SIMD arrays for holding elements of each " { $snippet "type" } " into the vocabulary search path. The possible type/length combinations are listed in " { $link "math.vectors.simd.types" } " and the generated words are documented in " { $link "math.vectors.simd.words" } "." } ;
-
-{ POSTPONE: SIMD: POSTPONE: SIMDS: } related-words
 
 ABOUT: "math.vectors.simd"

@@ -1,15 +1,14 @@
 USING: kernel compiler.tree.builder compiler.tree
 compiler.tree.propagation compiler.tree.recursive
-compiler.tree.normalization tools.test math math.order
-accessors sequences arrays kernel.private vectors
-alien.accessors alien.c-types sequences.private
-byte-arrays classes.algebra classes.tuple.private
-math.functions math.private strings layouts
-compiler.tree.propagation.info compiler.tree.def-use
-compiler.tree.debugger compiler.tree.checker
-slots.private words hashtables classes assocs locals
-specialized-arrays system sorting math.libm
-math.intervals quotations effects alien alien.data ;
+compiler.tree.normalization tools.test math math.order accessors
+sequences arrays kernel.private vectors alien.accessors
+alien.c-types sequences.private byte-arrays classes.algebra
+classes.tuple.private math.functions math.private strings
+layouts compiler.tree.propagation.info compiler.tree.def-use
+compiler.tree.debugger compiler.tree.checker slots.private words
+hashtables classes assocs locals specialized-arrays system
+sorting math.libm math.floats.private math.integers.private
+math.intervals quotations effects alien alien.data sets ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
 SPECIALIZED-ARRAY: void*
@@ -90,6 +89,8 @@ IN: compiler.tree.propagation.tests
 [ bignum ] [ [ { integer } declare 123 >bignum bitand ] final-math-class ] unit-test
 
 [ float ] [ [ { float float } declare mod ] final-math-class ] unit-test
+
+[ V{ integer float } ] [ [ { float float } declare [ /i ] keep ] final-classes ] unit-test
 
 [ V{ fixnum } ] [ [ 255 bitand ] final-classes ] unit-test
 
@@ -226,9 +227,25 @@ IN: compiler.tree.propagation.tests
 
 [ V{ fixnum } ] [
     [
+        [ { fixnum } declare ] [ drop f ] if
+        dup [ dup 13 eq? [ t ] [ f ] if ] [ t ] if
+        [ "Oops" throw ] when
+    ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [
         >fixnum
         dup [ 10 < ] [ -10 > ] bi and not [ 2 * ] unless
     ] final-classes
+] unit-test
+
+[ ] [
+    [
+        dup dup dup [ 100 < ] [ drop f ] if dup
+        [ 2drop f ] [ 2drop f ] if
+        [ ] [ dup [ ] [ ] if ] if
+    ] final-info drop
 ] unit-test
 
 [ V{ fixnum } ] [
@@ -389,14 +406,6 @@ IN: compiler.tree.propagation.tests
     ] final-literals
 ] unit-test
 
-[ V{ 27 } ] [
-    [
-        dup number? over sequence? and [
-            dup 10 < over 8 <= not and [ 3 * ] [ "A" throw ] if
-        ] [ "B" throw ] if
-    ] final-literals
-] unit-test
-
 [ V{ string string } ] [
     [
         2dup [ dup string? [ "Oops" throw ] unless ] bi@ 2drop
@@ -408,7 +417,15 @@ IN: compiler.tree.propagation.tests
 ] unit-test
 
 [ V{ fixnum } ] [
+    [ { fixnum fixnum } declare 7 bitand neg >bignum shift ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
     [ { fixnum } declare 1 swap 7 bitand shift ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [ { fixnum } declare 1 swap 7 bitand >bignum shift ] final-classes
 ] unit-test
 
 cell-bits 32 = [
@@ -631,7 +648,7 @@ M: array iterate first t ; inline
     ] final-info drop
 ] unit-test
 
-[ V{ word } ] [
+[ V{ t } ] [
     [ { hashtable } declare hashtable instance? ] final-classes
 ] unit-test
 
@@ -643,7 +660,7 @@ M: array iterate first t ; inline
     [ { assoc } declare hashtable instance? ] final-classes
 ] unit-test
 
-[ V{ word } ] [
+[ V{ t } ] [
     [ { string } declare string? ] final-classes
 ] unit-test
 
@@ -656,7 +673,7 @@ M: array iterate first t ; inline
 ] unit-test
 
 [ V{ fixnum } ] [
-    [ { fixnum fixnum } declare [ nth-unsafe ] curry call ] final-classes
+    [ { fixnum fixnum } declare iota [ nth-unsafe ] curry call ] final-classes
 ] unit-test
 
 [ V{ f } ] [
@@ -757,7 +774,7 @@ MIXIN: empty-mixin
     [ { fixnum } declare log2 ] final-classes
 ] unit-test
 
-[ V{ word } ] [
+[ V{ t } ] [
     [ { fixnum } declare log2 0 >= ] final-classes
 ] unit-test
 
@@ -859,8 +876,8 @@ SYMBOL: not-an-assoc
 [ t ] [ [ { 1 2 3 } member? ] { member? } inlined? ] unit-test
 [ f ] [ [ { 1 2 3 } swap member? ] { member? } inlined? ] unit-test
 
-[ t ] [ [ { 1 2 3 } memq? ] { memq? } inlined? ] unit-test
-[ f ] [ [ { 1 2 3 } swap memq? ] { memq? } inlined? ] unit-test
+[ t ] [ [ { 1 2 3 } member-eq? ] { member-eq? } inlined? ] unit-test
+[ f ] [ [ { 1 2 3 } swap member-eq? ] { member-eq? } inlined? ] unit-test
 
 [ t ] [ [ V{ } clone ] { clone (clone) } inlined? ] unit-test
 [ f ] [ [ { } clone ] { clone (clone) } inlined? ] unit-test
@@ -882,10 +899,10 @@ M: tuple-with-read-only-slot clone
     [ { 1 2 3 } dup tuple-with-read-only-slot boa clone x>> eq? ] final-classes
 ] unit-test
 
-! alien-cell outputs a simple-alien or f
+! alien-cell outputs a alien or f
 [ t ] [
     [ { byte-array fixnum } declare alien-cell dup [ "OOPS" throw ] unless ] final-classes
-    first simple-alien class=
+    first alien class=
 ] unit-test
 
 ! Don't crash if bad literal inputs are passed to unsafe words
@@ -900,9 +917,48 @@ M: tuple-with-read-only-slot clone
 [ t ] [ [ void* <c-direct-array> ] { <c-direct-array> } inlined? ] unit-test
 [ V{ void*-array } ] [ [ void* <c-direct-array> ] final-classes ] unit-test
 
+! bitand identities
 [ t ] [ [ alien-unsigned-1 255 bitand ] { bitand fixnum-bitand } inlined? ] unit-test
 [ t ] [ [ alien-unsigned-1 255 swap bitand ] { bitand fixnum-bitand } inlined? ] unit-test
 
 [ t ] [ [ { fixnum } declare 256 rem -256 bitand ] { fixnum-bitand } inlined? ] unit-test
 [ t ] [ [ { fixnum } declare 250 rem -256 bitand ] { fixnum-bitand } inlined? ] unit-test
 [ f ] [ [ { fixnum } declare 257 rem -256 bitand ] { fixnum-bitand } inlined? ] unit-test
+
+[ V{ fixnum } ] [ [ >bignum 10 mod 2^ ] final-classes ] unit-test
+[ V{ bignum } ] [ [ >bignum 10 bitand ] final-classes ] unit-test
+[ V{ bignum } ] [ [ >bignum 10 >bignum bitand ] final-classes ] unit-test
+[ V{ bignum } ] [ [ >bignum 10 mod ] final-classes ] unit-test
+[ V{ bignum } ] [ [ { fixnum } declare -1 >bignum bitand ] final-classes ] unit-test
+[ V{ bignum } ] [ [ { fixnum } declare -1 >bignum swap bitand ] final-classes ] unit-test
+
+! Could be bignum not integer but who cares
+[ V{ integer } ] [ [ 10 >bignum bitand ] final-classes ] unit-test
+
+[ t ] [ [ { fixnum fixnum } declare min ] { min } inlined? ] unit-test
+[ f ] [ [ { fixnum fixnum } declare min ] { fixnum-min } inlined? ] unit-test
+
+[ t ] [ [ { float float } declare min ] { min } inlined? ] unit-test
+[ f ] [ [ { float float } declare min ] { float-min } inlined? ] unit-test
+
+[ t ] [ [ { fixnum fixnum } declare max ] { max } inlined? ] unit-test
+[ f ] [ [ { fixnum fixnum } declare max ] { fixnum-max } inlined? ] unit-test
+
+[ t ] [ [ { float float } declare max ] { max } inlined? ] unit-test
+[ f ] [ [ { float float } declare max ] { float-max } inlined? ] unit-test
+
+! Propagation should not call equal?, hashcode, etc on literals in user code
+[ V{ } ] [ [ 4 <reversed> [ 2drop ] with each ] final-info ] unit-test
+
+! Reduction
+[ 1 ] [ [ 4 <reversed> [ nth-unsafe ] [ ] unless ] final-info length ] unit-test
+
+! Optimization on bit?
+[ t ] [ [ 3 bit? ] { bit? fixnum-bit? } inlined? ] unit-test
+[ f ] [ [ 500 bit? ] { bit? fixnum-bit? } inlined? ] unit-test
+
+[ t ] [ [ { 1 } intersect ] { intersect } inlined? ] unit-test
+[ f ] [ [ { 1 } swap intersect ] { intersect } inlined? ] unit-test ! We could do this
+
+[ t ] [ [ { 1 } diff ] { diff } inlined? ] unit-test
+[ f ] [ [ { 1 } swap diff ] { diff } inlined? ] unit-test ! We could do this

@@ -3,7 +3,7 @@
 USING: arrays assocs continuations debugger generic hashtables
 init io io.files kernel kernel.private make math memory
 namespaces parser prettyprint sequences splitting system
-vectors vocabs vocabs.loader words ;
+vectors vocabs vocabs.loader words destructors ;
 QUALIFIED: bootstrap.image.private
 IN: bootstrap.stage1
 
@@ -14,28 +14,23 @@ IN: bootstrap.stage1
 load-help? off
 { "resource:core" } vocab-roots set
 
-! Create a boot quotation for the target
+! Create a boot quotation for the target by collecting all top-level
+! forms into a quotation, surrounded by some boilerplate.
 [
     [
-        ! Rehash hashtables, since bootstrap.image creates them
-        ! using the host image's hashing algorithms. We don't
-        ! use each-object here since the catch stack isn't yet
-        ! set up.
-        gc
-        begin-scan
-        [ hashtable? ] pusher [ (each-object) ] dip
-        end-scan
-        [ rehash ] each
+        ! Rehash hashtables first, since bootstrap.image creates
+        ! them using the host image's hashing algorithms.
+        [ hashtable? ] instances [ rehash ] each
         boot
     ] %
 
     "math.integers" require
     "math.floats" require
     "memory" require
-    
+
     "io.streams.c" require
     "vocabs.loader" require
-    
+
     "syntax" require
     "bootstrap.layouts" require
 
@@ -47,8 +42,8 @@ load-help? off
             "Cannot find " write write "." print
             "Please move " write image write " to the same directory as the Factor sources," print
             "and try again." print
-            1 exit
+            1 (exit)
         ] if
     ] %
 ] [ ] make
-bootstrap.image.private:bootstrap-boot-quot set
+bootstrap.image.private:bootstrap-startup-quot set

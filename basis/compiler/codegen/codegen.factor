@@ -1,11 +1,11 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces make math math.order math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types
 alien.strings alien.arrays alien.complex alien.libraries sets libc
 continuations.private fry cpu.architecture classes classes.struct locals
-source-files.errors slots parser generic.parser
+source-files.errors slots parser generic.parser strings
 compiler.errors
 compiler.alien
 compiler.constants
@@ -24,24 +24,12 @@ H{ } clone insn-counts set-global
 
 GENERIC: generate-insn ( insn -- )
 
-TUPLE: asm label code calls ;
-
-SYMBOL: calls
-
-: add-call ( word -- )
-    #! Compile this word later.
-    calls get push ;
-
 ! Mapping _label IDs to label instances
 SYMBOL: labels
 
-: init-generator ( -- )
-    H{ } clone labels set
-    V{ } clone calls set ;
-
-: generate-insns ( asm -- code )
-    dup word>> [
-        init-generator
+: generate ( mr -- code )
+    dup label>> [
+        H{ } clone labels set
         instructions>> [
             [ class insn-counts get inc-at ]
             [ generate-insn ]
@@ -49,23 +37,11 @@ SYMBOL: labels
         ] each
     ] with-fixup ;
 
-: generate ( mr -- asm )
-    [
-        [ label>> ] [ generate-insns ] bi calls get
-        asm boa
-    ] with-scope ;
-
 : lookup-label ( id -- label )
     labels get [ drop <label> ] cache ;
 
 ! Special cases
 M: ##no-tco generate-insn drop ;
-
-M: ##call generate-insn
-    word>> dup sub-primitive>>
-    [ first % ] [ [ add-call ] [ %call ] bi ] ?if ;
-
-M: ##jump generate-insn word>> [ add-call ] [ %jump ] bi ;
 
 M: _dispatch-label generate-insn
     label>> lookup-label
@@ -106,6 +82,8 @@ CODEGEN: ##peek %peek
 CODEGEN: ##replace %replace
 CODEGEN: ##inc-d %inc-d
 CODEGEN: ##inc-r %inc-r
+CODEGEN: ##call %call
+CODEGEN: ##jump %jump
 CODEGEN: ##return %return
 CODEGEN: ##slot %slot
 CODEGEN: ##slot-imm %slot-imm
@@ -154,6 +132,7 @@ CODEGEN: ##zero-vector %zero-vector
 CODEGEN: ##fill-vector %fill-vector
 CODEGEN: ##gather-vector-2 %gather-vector-2
 CODEGEN: ##gather-vector-4 %gather-vector-4
+CODEGEN: ##shuffle-vector-imm %shuffle-vector-imm
 CODEGEN: ##shuffle-vector %shuffle-vector
 CODEGEN: ##tail>head-vector %tail>head-vector
 CODEGEN: ##merge-vector-head %merge-vector-head
@@ -172,22 +151,28 @@ CODEGEN: ##add-sub-vector %add-sub-vector
 CODEGEN: ##sub-vector %sub-vector
 CODEGEN: ##saturated-sub-vector %saturated-sub-vector
 CODEGEN: ##mul-vector %mul-vector
+CODEGEN: ##mul-high-vector %mul-high-vector
+CODEGEN: ##mul-horizontal-add-vector %mul-horizontal-add-vector
 CODEGEN: ##saturated-mul-vector %saturated-mul-vector
 CODEGEN: ##div-vector %div-vector
 CODEGEN: ##min-vector %min-vector
 CODEGEN: ##max-vector %max-vector
+CODEGEN: ##avg-vector %avg-vector
 CODEGEN: ##dot-vector %dot-vector
+CODEGEN: ##sad-vector %sad-vector
 CODEGEN: ##sqrt-vector %sqrt-vector
 CODEGEN: ##horizontal-add-vector %horizontal-add-vector
 CODEGEN: ##horizontal-sub-vector %horizontal-sub-vector
-CODEGEN: ##horizontal-shl-vector %horizontal-shl-vector
-CODEGEN: ##horizontal-shr-vector %horizontal-shr-vector
+CODEGEN: ##horizontal-shl-vector-imm %horizontal-shl-vector-imm
+CODEGEN: ##horizontal-shr-vector-imm %horizontal-shr-vector-imm
 CODEGEN: ##abs-vector %abs-vector
 CODEGEN: ##and-vector %and-vector
 CODEGEN: ##andn-vector %andn-vector
 CODEGEN: ##or-vector %or-vector
 CODEGEN: ##xor-vector %xor-vector
 CODEGEN: ##not-vector %not-vector
+CODEGEN: ##shl-vector-imm %shl-vector-imm
+CODEGEN: ##shr-vector-imm %shr-vector-imm
 CODEGEN: ##shl-vector %shl-vector
 CODEGEN: ##shr-vector %shr-vector
 CODEGEN: ##integer>scalar %integer>scalar
@@ -217,6 +202,7 @@ CODEGEN: ##set-alien-double %set-alien-double
 CODEGEN: ##set-alien-vector %set-alien-vector
 CODEGEN: ##allot %allot
 CODEGEN: ##write-barrier %write-barrier
+CODEGEN: ##write-barrier-imm %write-barrier-imm
 CODEGEN: ##compare %compare
 CODEGEN: ##compare-imm %compare-imm
 CODEGEN: ##compare-float-ordered %compare-float-ordered
@@ -277,7 +263,7 @@ M: ##gc generate-insn
         [ [ uninitialized-locs>> ] [ temp1>> ] bi wipe-locs ]
         [ data-values>> save-data-regs ]
         [ [ tagged-values>> ] [ temp1>> ] bi save-gc-roots ]
-        [ [ temp1>> ] [ temp2>> ] bi t %save-context ]
+        [ [ temp1>> ] [ temp2>> ] bi %save-context ]
         [ [ tagged-values>> length ] [ temp1>> ] bi %call-gc ]
         [ [ tagged-values>> ] [ temp1>> ] bi load-gc-roots ]
         [ data-values>> load-data-regs ]
@@ -331,35 +317,29 @@ M: reg-class reg-class-full?
     [ alloc-stack-param ] [ alloc-fastcall-param ] if
     [ param-reg ] dip ;
 
-: (flatten-int-type) ( size -- seq )
-    cell /i "void*" c-type <repetition> ;
+: (flatten-int-type) ( type -- seq )
+    stack-size cell align cell /i void* c-type <repetition> ;
 
 GENERIC: flatten-value-type ( type -- types )
 
 M: object flatten-value-type 1array ;
-
-M: struct-c-type flatten-value-type ( type -- types )
-    stack-size cell align (flatten-int-type) ;
-
-M: long-long-type flatten-value-type ( type -- types )
-    stack-size cell align (flatten-int-type) ;
+M: struct-c-type flatten-value-type (flatten-int-type) ;
+M: long-long-type flatten-value-type (flatten-int-type) ;
+M: c-type-name flatten-value-type c-type flatten-value-type ;
 
 : flatten-value-types ( params -- params )
     #! Convert value type structs to consecutive void*s.
     [
         0 [
             c-type
-            [ parameter-align (flatten-int-type) % ] keep
+            [ parameter-align cell /i void* c-type <repetition> % ] keep
             [ stack-size cell align + ] keep
             flatten-value-type %
         ] reduce drop
     ] { } make ;
 
 : each-parameter ( parameters quot -- )
-    [ [ parameter-sizes nip ] keep ] dip 2each ; inline
-
-: reverse-each-parameter ( parameters quot -- )
-    [ [ parameter-sizes nip ] keep ] dip 2reverse-each ; inline
+    [ [ parameter-offsets nip ] keep ] dip 2each ; inline
 
 : reset-fastcall-counts ( -- )
     { int-regs float-regs stack-params } [ 0 swap set ] each ;
@@ -376,10 +356,17 @@ M: long-long-type flatten-value-type ( type -- types )
     [ '[ alloc-parameter _ execute ] ]
     bi* each-parameter ; inline
 
+: reverse-each-parameter ( parameters quot -- )
+    [ [ parameter-offsets nip ] keep ] dip 2reverse-each ; inline
+
+: prepare-unbox-parameters ( parameters -- offsets types indices )
+    [ parameter-offsets nip ] [ ] [ length iota <reversed> ] tri ;
+
 : unbox-parameters ( offset node -- )
-    parameters>> [
-        %prepare-unbox [ over + ] dip unbox-parameter
-    ] reverse-each-parameter drop ;
+    parameters>> swap
+    '[ prepare-unbox-parameters [ %pop-stack [ _ + ] dip unbox-parameter ] 3each ]
+    [ length neg %inc-d ]
+    bi ;
 
 : prepare-box-struct ( node -- offset )
     #! Return offset on C stack where to store unboxed
@@ -400,22 +387,30 @@ M: long-long-type flatten-value-type ( type -- types )
     ] with-param-regs ;
 
 : box-return* ( node -- )
-    return>> [ ] [ box-return ] if-void ;
+    return>> [ ] [ box-return %push-stack ] if-void ;
+
+GENERIC# dlsym-valid? 1 ( symbols dll -- ? )
+
+M: string dlsym-valid? dlsym ;
+
+M: array dlsym-valid? '[ _ dlsym ] any? ;
 
 : check-dlsym ( symbols dll -- )
     dup dll-valid? [
-        dupd '[ _ dlsym ] any?
+        dupd dlsym-valid?
         [ drop ] [ compiling-word get no-such-symbol ] if
     ] [
         dll-path compiling-word get no-such-library drop
     ] if ;
 
-: stdcall-mangle ( symbol params -- symbol )
-    parameters>> parameter-sizes drop number>string "@" glue ;
+: stdcall-mangle ( params -- symbols )
+    [ function>> ] [ parameters>> parameter-offsets drop number>string ] bi
+    [ drop ] [ "@" glue ] [ "@" glue "_" prepend ] 2tri
+    3array ;
 
 : alien-invoke-dlsym ( params -- symbols dll )
-    [ [ function>> dup ] keep stdcall-mangle 2array ]
-    [ library>> library dup [ dll>> ] when ]
+    [ dup abi>> "stdcall" = [ stdcall-mangle ] [ function>> ] if ]
+    [ library>> load-library ]
     bi 2dup check-dlsym ;
 
 M: ##alien-invoke generate-insn
@@ -427,6 +422,16 @@ M: ##alien-invoke generate-insn
     dup alien-invoke-dlsym %alien-invoke
     ! Box return value
     dup %cleanup
+    box-return* ;
+
+M: ##alien-assembly generate-insn
+    params>>
+    ! Unbox parameters
+    dup objects>registers
+    %prepare-var-args
+    ! Generate assembly
+    dup quot>> call( -- )
+    ! Box return value
     box-return* ;
 
 ! ##alien-indirect
@@ -445,7 +450,7 @@ M: ##alien-indirect generate-insn
 
 ! ##alien-callback
 : box-parameters ( params -- )
-    alien-parameters [ box-parameter ] each-parameter ;
+    alien-parameters [ box-parameter %push-context-stack ] each-parameter ;
 
 : registers>objects ( node -- )
     ! Generate code for boxing input parameters in a callback.
@@ -457,7 +462,7 @@ M: ##alien-indirect generate-insn
 
 TUPLE: callback-context ;
 
-: current-callback ( -- id ) 2 getenv ;
+: current-callback ( -- id ) 2 special-object ;
 
 : wait-to-return ( token -- )
     dup current-callback eq? [
@@ -468,7 +473,7 @@ TUPLE: callback-context ;
 
 : do-callback ( quot token -- )
     init-catchstack
-    [ 2 setenv call ] keep
+    [ 2 set-special-object call ] keep
     wait-to-return ; inline
 
 : callback-return-quot ( ctype -- quot )
@@ -488,11 +493,6 @@ TUPLE: callback-context ;
         [ callback-return-quot ] tri 3append ,
         [ callback-context new do-callback ] %
     ] [ ] make ;
-
-M: ##callback-return generate-insn
-    #! All the extra book-keeping for %unwind is only for x86.
-    #! On other platforms its an alias for %return.
-    params>> %callback-return ;
 
 M: ##alien-callback generate-insn
     params>>

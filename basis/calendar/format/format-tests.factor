@@ -1,5 +1,5 @@
 USING: calendar.format calendar kernel math tools.test
-io.streams.string accessors io math.order ;
+io.streams.string accessors io math.order sequences ;
 IN: calendar.format.tests
 
 [ 0 ] [
@@ -81,3 +81,5 @@ IN: calendar.format.tests
 ] [ "Thursday, 02-Oct-2008 23:59:59 GMT" cookie-string>timestamp ] unit-test
 
 
+[ ]
+[ { 2008 2009 } [ year. ] each ] unit-test

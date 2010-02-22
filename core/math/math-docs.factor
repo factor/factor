@@ -212,7 +212,7 @@ HELP: recip
 HELP: rem
 { $values { "x" rational } { "y" rational } { "z" rational } }
 { $description
-    "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder always positive."
+    "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder always positive or zero."
     { $list 
         "Given fixnums, always yields a fixnum."
         "Given bignums, always yields a bignum."
@@ -283,7 +283,7 @@ HELP: unless-zero
 { $examples "This word is equivalent to " { $link if-zero } " with an empty first quotation:"
     { $example
     "USING: sequences math prettyprint ;"
-    "3 [ ] [ sq ] if-empty ."
+    "3 [ ] [ sq ] if-zero ."
     "9"
     }
     { $example
@@ -403,7 +403,7 @@ HELP: number
 
 HELP: next-power-of-2
 { $values { "m" "a non-negative integer" } { "n" "an integer" } }
-{ $description "Outputs the smallest power of 2 greater than " { $snippet "m" } ". The output value is always at least 1." } ;
+{ $description "Outputs the smallest power of 2 greater than " { $snippet "m" } ". The output value is always at least 2." } ;
 
 HELP: power-of-2?
 { $values { "n" integer } { "?" "a boolean" } }

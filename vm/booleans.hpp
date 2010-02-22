@@ -1,12 +1,13 @@
 namespace factor
 {
 
-VM_C_API void box_boolean(bool value, factor_vm *vm);
 VM_C_API bool to_boolean(cell value, factor_vm *vm);
+VM_C_API cell from_boolean(bool value, factor_vm *vm);
 
-inline cell factor_vm::tag_boolean(cell untagged)
+/* Cannot allocate */
+inline static bool to_boolean(cell value)
 {
-	return (untagged ? T : F);
+	return value != false_object;
 }
 
 }

@@ -14,5 +14,6 @@ IN: curses.tests
         2000000 sleep
     ] with-curses ;
 
-[
-] [ hello-curses ] unit-test
+curses-ok? [
+    [ ] [ hello-curses ] unit-test
+] when

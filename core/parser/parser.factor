@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic assocs kernel math namespaces
 sequences strings vectors words words.symbol quotations io
@@ -33,19 +33,28 @@ SYMBOL: auto-use?
         [ "Added \"" "\" vocabulary to search path" surround note. ] bi
     ] [ create-in ] if ;
 
+: ignore-forwards ( seq -- seq' )
+    [ forward-reference? not ] filter ;
+
+: private? ( word -- ? ) vocabulary>> ".private" tail? ;
+
+: ignore-privates ( seq -- seq' )
+    dup [ private? ] all? [ [ private? not ] filter ] unless ;
+
 : no-word ( name -- newword )
-    dup words-named [ forward-reference? not ] filter
-    dup length 1 = auto-use? get and
-    [ nip first no-word-restarted ]
-    [ <no-word-error> throw-restarts no-word-restarted ]
+    dup words-named ignore-forwards
+    dup ignore-privates dup length 1 = auto-use? get and
+    [ 2nip first no-word-restarted ]
+    [ drop <no-word-error> throw-restarts no-word-restarted ]
     if ;
 
+: parse-word ( string -- word/number )
+    dup search [ ] [
+        dup string>number [ ] [ no-word ] ?if
+    ] ?if ;
+
 : scan-word ( -- word/number/f )
-    scan dup [
-        dup search [ ] [
-            dup string>number [ ] [ no-word ] ?if
-        ] ?if
-    ] when ;
+    scan dup [ parse-word ] when ;
 
 ERROR: staging-violation word ;
 
@@ -54,8 +63,11 @@ ERROR: staging-violation word ;
     execute( accum -- accum ) ;
 
 : scan-object ( -- object )
-    scan-word dup parsing-word?
-    [ V{ } clone swap execute-parsing first ] when ;
+    scan-word {
+        { [ dup not ] [ unexpected-eof ] }
+        { [ dup parsing-word? ] [ V{ } clone swap execute-parsing first ] }
+        [ ]
+    } cond  ;
 
 : parse-step ( accum end -- accum ? )
     scan-word {
@@ -78,8 +90,6 @@ HOOK: parse-quotation quotation-parser ( -- quot )
 
 M: f parse-quotation \ ] parse-until >quotation ;
 
-: parsed ( accum obj -- accum ) over push ;
-
 : (parse-lines) ( lexer -- quot )
     [ f parse-until >quotation ] with-lexer ;
 
@@ -87,7 +97,7 @@ M: f parse-quotation \ ] parse-until >quotation ;
     lexer-factory get call( lines -- lexer ) (parse-lines) ;
 
 : parse-literal ( accum end quot -- accum )
-    [ parse-until ] dip call parsed ; inline
+    [ parse-until ] dip call suffix! ; inline
 
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
@@ -103,17 +113,16 @@ ERROR: bad-number ;
     scan swap base> [ bad-number ] unless* ;
 
 : parse-base ( parsed base -- parsed )
-    scan-base parsed ;
+    scan-base suffix! ;
 
 SYMBOL: bootstrap-syntax
 
 : with-file-vocabs ( quot -- )
     [
-        <manifest> manifest set
         "syntax" use-vocab
         bootstrap-syntax get [ use-words ] when*
         call
-    ] with-scope ; inline
+    ] with-manifest ; inline
 
 SYMBOL: print-use-hook
 

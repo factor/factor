@@ -8,9 +8,9 @@ IN: math.primes.miller-rabin
 
 :: (miller-rabin) ( n trials -- ? )
     n 1 - :> n-1
-    n-1 factor-2s :> s :> r
+    n-1 factor-2s :> ( r s )
     0 :> a!
-    trials [
+    trials iota [
         drop
         2 n 2 - [a,b] random a!
         a s n ^mod 1 = [

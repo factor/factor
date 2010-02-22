@@ -156,16 +156,16 @@ MACRO: interpolate-xml ( xml -- quot )
 : collect ( accum variables -- accum ? )
     {
         { [ dup empty? ] [ drop f ] } ! Just a literal
-        { [ dup [ ] all? ] [ >search-hash parsed t ] } ! locals
-        { [ dup [ not ] all? ] [ length parsed \ nenum parsed t ] } ! fry
+        { [ dup [ ] all? ] [ >search-hash suffix! t ] } ! locals
+        { [ dup [ not ] all? ] [ length suffix! \ nenum suffix! t ] } ! fry
         [ drop "XML interpolation contains both fry and locals" throw ] ! mixed
     } cond ;
 
 : parse-def ( accum delimiter quot -- accum )
     [ parse-multiline-string [ blank? ] trim ] dip call
     [ extract-variables collect ] keep swap
-    [ number<-> parsed ] dip
-    [ \ interpolate-xml parsed ] when ; inline
+    [ number<-> suffix! ] dip
+    [ \ interpolate-xml suffix! ] when ; inline
 
 PRIVATE>
 

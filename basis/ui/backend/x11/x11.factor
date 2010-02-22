@@ -1,14 +1,13 @@
 ! Copyright (C) 2005, 2009 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays ascii assocs colors
-classes.struct combinators io.encodings.ascii
-io.encodings.string io.encodings.utf8 kernel literals math
-namespaces sequences strings ui ui.backend ui.clipboards
-ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.pixel-formats ui.pixel-formats.private
-ui.private x11 x11.clipboard x11.constants x11.events x11.glx
-x11.io x11.windows x11.xim x11.xlib environment command-line
-combinators.short-circuit ;
+USING: accessors alien.c-types ascii assocs classes.struct combinators
+combinators.short-circuit command-line environment io.encodings.ascii
+io.encodings.string io.encodings.utf8 kernel literals locals math
+namespaces sequences specialized-arrays.instances.alien.c-types.uchar
+strings ui ui.backend ui.clipboards ui.event-loop ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
+ui.pixel-formats.private ui.private x11 x11.clipboard x11.constants
+x11.events x11.glx x11.io x11.windows x11.xim x11.xlib ;
 IN: ui.backend.x11
 
 SINGLETON: x11-ui-backend
@@ -327,6 +326,22 @@ M: x11-ui-backend (with-ui) ( quot -- )
 
 M: x11-ui-backend beep ( -- )
     dpy get 100 XBell drop ;
+
+: black ( -- xcolor ) 0 0 0 0 0 0 XColor <struct-boa> ; inline
+
+M:: x11-ui-backend (grab-input) ( handle -- )
+    handle window>>                                                  :> wnd
+    dpy get                                                          :> dpy
+    dpy wnd uchar-array{ 0 0 0 0 0 0 0 0 } 8 8 XCreateBitmapFromData :> pixmap
+    dpy pixmap dup black dup 0 0 XCreatePixmapCursor                 :> cursor
+
+    dpy wnd 1 NoEventMask GrabModeAsync dup wnd cursor CurrentTime XGrabPointer drop
+
+    dpy cursor XFreeCursor drop
+    dpy pixmap XFreePixmap drop ;
+
+M: x11-ui-backend (ungrab-input)
+    drop dpy get CurrentTime XUngrabPointer drop ;
 
 x11-ui-backend ui-backend set-global
 

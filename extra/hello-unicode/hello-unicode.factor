@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ui.gadgets.panes ui.gadgets.borders ui io io.styles ;
+USING: accessors ui.gadgets.panes ui.gadgets.borders ui io io.styles ;
 IN: hello-unicode
 
 : <hello-gadget> ( -- gadget )
@@ -15,6 +15,5 @@ IN: hello-unicode
         ] with-style
     ] make-pane { 10 10 } <border> ;
 
-: hello-unicode ( -- ) [ <hello-gadget> "გამარჯობა" open-window ] with-ui ;
-
-MAIN: hello-unicode
+MAIN-WINDOW: hello-unicode { { title "გამარჯობა" } }
+    <hello-gadget> >>gadgets ;

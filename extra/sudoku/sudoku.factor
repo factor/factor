@@ -19,7 +19,7 @@ SYMBOL: board
 
 : box-any? ( n x y -- ? )
     [ 3 /i 3 * ] bi@
-    9 [ [ 3dup ] dip cell-any? ] any?
+    9 iota [ [ 3dup ] dip cell-any? ] any?
     [ 3drop ] dip ;
 
 DEFER: search
@@ -35,7 +35,7 @@ DEFER: search
         [ assume ]
     } cond ;
 
-: solve ( x y -- ) 9 [ 1 + 2over attempt ] each 2drop ;
+: solve ( x y -- ) 9 [ 1 + 2over attempt ] each-integer 2drop ;
 
 : board. ( board -- )
     standard-table-style [
@@ -52,7 +52,7 @@ DEFER: search
                 ] each
             ] with-row
         ] each
-    ] tabular-output ;
+    ] tabular-output nl ;
 
 : solution. ( -- )
     solutions inc "Solution:" print board get board. ;

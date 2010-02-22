@@ -19,17 +19,17 @@ IN: lcs
     i 1 + j 1 + matrix nth set-nth ; inline
 
 : lcs-initialize ( |str1| |str2| -- matrix )
-    [ drop 0 <array> ] with map ;
+    iota [ drop 0 <array> ] with map ;
 
 : levenshtein-initialize ( |str1| |str2| -- matrix )
-    [ [ + ] curry map ] with map ;
+    [ iota ] bi@ [ [ + ] curry map ] with map ;
 
 :: run-lcs ( old new init step -- matrix )
-    [let | matrix [ old length 1 + new length 1 + init call ] |
-        old length [| i |
-            new length
-            [| j | i j matrix old new step loop-step ] each
-        ] each matrix ] ; inline
+    old length 1 + new length 1 + init call :> matrix
+    old length iota [| i |
+        new length iota
+        [| j | i j matrix old new step loop-step ] each
+    ] each matrix ; inline
 PRIVATE>
 
 : levenshtein ( old new -- n )

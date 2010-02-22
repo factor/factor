@@ -11,43 +11,18 @@ vm_char *safe_strdup(const vm_char *str)
 	return ptr;
 }
 
-/* We don't use printf directly, because format directives are not portable.
-Instead we define the common cases here. */
-void nl()
-{
-	fputs("\n",stdout);
-}
-
-void print_string(const char *str)
-{
-	fputs(str,stdout);
-}
-
-void print_cell(cell x)
-{
-	printf(CELL_FORMAT,x);
-}
-
-void print_cell_hex(cell x)
-{
-	printf(CELL_HEX_FORMAT,x);
-}
-
-void print_cell_hex_pad(cell x)
-{
-	printf(CELL_HEX_PAD_FORMAT,x);
-}
-
-void print_fixnum(fixnum x)
-{
-	printf(FIXNUM_FORMAT,x);
-}
-
 cell read_cell_hex()
 {
 	cell cell;
 	if(scanf(CELL_HEX_FORMAT,&cell) < 0) exit(1);
 	return cell;
+}
+
+/* On Windows, memcpy() is in a different DLL and the non-optimizing
+compiler can't find it */
+VM_C_API void *factor_memcpy(void *dst, void *src, size_t len)
+{
+	return memcpy(dst,src,len);
 }
 
 }

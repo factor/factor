@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov, Doug Coleman.
+! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math ;
 IN: math.order
@@ -32,8 +32,12 @@ M: real after? ( obj1 obj2 -- ? ) > ; inline
 M: real before=? ( obj1 obj2 -- ? ) <= ; inline
 M: real after=? ( obj1 obj2 -- ? ) >= ; inline
 
-: min ( x y -- z ) [ before? ] most ;
-: max ( x y -- z ) [ after? ] most ;
+GENERIC: min ( obj1 obj2 -- obj )
+GENERIC: max ( obj1 obj2 -- obj )
+
+M: object min [ before? ] most ; inline
+M: object max [ after? ] most ; inline
+
 : clamp ( x min max -- y ) [ max ] dip min ; inline
 
 : between? ( x y z -- ? )

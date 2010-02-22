@@ -99,8 +99,8 @@ CONSTANT: SQLITE_OPEN_TEMP_JOURNAL     HEX: 00001000
 CONSTANT: SQLITE_OPEN_SUBJOURNAL       HEX: 00002000
 CONSTANT: SQLITE_OPEN_MASTER_JOURNAL   HEX: 00004000
 
-TYPEDEF: void sqlite3
-TYPEDEF: void sqlite3_stmt
+TYPEDEF: void* sqlite3*
+TYPEDEF: void* sqlite3_stmt*
 TYPEDEF: longlong sqlite3_int64
 TYPEDEF: ulonglong sqlite3_uint64
 
@@ -120,8 +120,8 @@ FUNCTION: int sqlite3_bind_int ( sqlite3_stmt* pStmt, int index, int n ) ;
 FUNCTION: int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_int64 n ) ;
 ! Bind the same function as above, but for unsigned 64bit integers
 : sqlite3-bind-uint64 ( pStmt index in64 -- int )
-    "int" "sqlite" "sqlite3_bind_int64"
-    { "sqlite3_stmt*" "int" "sqlite3_uint64" } alien-invoke ;
+    int "sqlite" "sqlite3_bind_int64"
+    { sqlite3_stmt* int sqlite3_uint64 } alien-invoke ;
 FUNCTION: int sqlite3_bind_null ( sqlite3_stmt* pStmt, int n ) ;
 FUNCTION: int sqlite3_bind_text ( sqlite3_stmt* pStmt, int index, char* text, int len, int destructor ) ;
 FUNCTION: int sqlite3_bind_parameter_index ( sqlite3_stmt* pStmt, char* name ) ;
@@ -134,8 +134,8 @@ FUNCTION: int sqlite3_column_int ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: sqlite3_int64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col ) ;
 ! Bind the same function as above, but for unsigned 64bit integers
 : sqlite3-column-uint64 ( pStmt col -- uint64 )
-    "sqlite3_uint64" "sqlite" "sqlite3_column_int64"
-    { "sqlite3_stmt*" "int" } alien-invoke ;
+    sqlite3_uint64 "sqlite" "sqlite3_column_int64"
+    { sqlite3_stmt* int } alien-invoke ;
 FUNCTION: double sqlite3_column_double ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: char* sqlite3_column_name ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: char* sqlite3_column_text ( sqlite3_stmt* pStmt, int col ) ;

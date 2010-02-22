@@ -79,18 +79,10 @@ M: callable splicing-nodes splicing-body ;
 : inline-math-method ( #call word -- ? )
     dupd inlining-math-method eliminate-dispatch ;
 
-: inlining-math-partial ( #call word -- class/f quot/f )
-    [ "derived-from" word-prop first inlining-math-method ]
-    [ nip 1quotation ] 2bi
-    [ = not ] [ drop ] 2bi and ;
-
-: inline-math-partial ( #call word -- ? )
-    dupd inlining-math-partial eliminate-dispatch ;
-
 ! Method body inlining
 SYMBOL: history
 
-: already-inlined? ( obj -- ? ) history get memq? ;
+: already-inlined? ( obj -- ? ) history get member-eq? ;
 
 : add-to-history ( obj -- ) history [ swap suffix ] change ;
 
@@ -104,7 +96,7 @@ SYMBOL: history
     ] if ;
 
 : always-inline-word? ( word -- ? )
-    { curry compose } memq? ;
+    { curry compose } member-eq? ;
 
 : never-inline-word? ( word -- ? )
     { [ deferred? ] [ "default" word-prop ] [ \ call eq? ] } 1|| ;

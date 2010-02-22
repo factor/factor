@@ -43,3 +43,13 @@ IN: math.statistics.tests
 [ 0 ] [ { 1 } var ] unit-test
 [ 0.0 ] [ { 1 } std ] unit-test
 [ 0.0 ] [ { 1 } ste ] unit-test
+
+[
+    H{
+        { 97 2 }
+        { 98 2 }
+        { 99 2 }
+    }
+] [
+    "aabbcc" histogram
+] unit-test

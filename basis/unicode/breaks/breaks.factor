@@ -74,14 +74,14 @@ SYMBOL: table
   
 : make-grapheme-table ( -- )
     { CR } { LF } connect
-    { Control CR LF } graphemes disconnect
-    graphemes { Control CR LF } disconnect
+    { Control CR LF } graphemes iota disconnect
+    graphemes iota { Control CR LF } disconnect
     { L } { L V LV LVT } connect
     { LV V } { V T } connect
     { LVT T } { T } connect
-    graphemes { Extend } connect
-    graphemes { SpacingMark } connect
-    { Prepend } graphemes connect ;
+    graphemes iota { Extend } connect
+    graphemes iota { SpacingMark } connect
+    { Prepend } graphemes iota connect ;
 
 VALUE: grapheme-table
 
@@ -154,8 +154,8 @@ SYMBOL: check-number-after
 
 : make-word-table ( -- )
     { wCR } { wLF } connect
-    { wNewline wCR wLF } words disconnect
-    words { wNewline wCR wLF } disconnect
+    { wNewline wCR wLF } words iota disconnect
+    words iota { wNewline wCR wLF } disconnect
     { wALetter } { wMidLetter wMidNumLet } check-letter-after set-table
     { wMidLetter wMidNumLet } { wALetter } check-letter-before set-table
     { wNumeric wALetter } { wNumeric wALetter } connect
@@ -252,7 +252,7 @@ PRIVATE>
     over tail-slice first-word + ;
 
 : last-word ( str -- i )
-    [ length ] keep '[ _ word-break-at? ] find-last drop 0 or ;
+    [ length iota ] keep '[ _ word-break-at? ] find-last drop 0 or ;
 
 : last-word-from ( end str -- i )
     swap head-slice last-word ;

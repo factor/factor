@@ -63,7 +63,7 @@ C: <transaction> transaction
 
 : process-to-date ( account date -- account )
     over interest-last-paid>> 1 days time+
-    [ dupd process-day ] spin each-day ;
+    [ [ dupd process-day ] ] 2dip swap each-day ;
 
 : inserting-transactions ( account transactions -- account )
     [ [ date>> process-to-date ] keep >>transaction ] each ;

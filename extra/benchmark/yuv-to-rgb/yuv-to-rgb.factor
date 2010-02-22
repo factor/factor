@@ -17,20 +17,19 @@ STRUCT: yuv_buffer
     { v void* } ;
 
 :: fake-data ( -- rgb yuv )
-    [let* | w [ 1600 ]
-            h [ 1200 ]
-            buffer [ yuv_buffer <struct> ]
-            rgb [ w h * 3 * <byte-array> ] |
-        rgb buffer
-            w >>y_width
-            h >>y_height
-            h >>uv_height
-            w >>y_stride
-            w >>uv_stride
-            w h * [ dup * ] B{ } map-as malloc-byte-array &free >>y
-            w h * 2/ [ dup dup * * ] B{ } map-as malloc-byte-array &free >>u
-            w h * 2/ [ dup * dup * ] B{ } map-as malloc-byte-array &free >>v
-    ] ;
+    1600 :> w
+    1200 :> h
+    yuv_buffer <struct> :> buffer
+    w h * 3 * <byte-array> :> rgb
+    rgb buffer
+        w >>y_width
+        h >>y_height
+        h >>uv_height
+        w >>y_stride
+        w >>uv_stride
+        w h * iota [ dup * ] B{ } map-as malloc-byte-array &free >>y
+        w h * 2/ iota [ dup dup * * ] B{ } map-as malloc-byte-array &free >>u
+        w h * 2/ iota [ dup * dup * ] B{ } map-as malloc-byte-array &free >>v ;
 
 : clamp ( n -- n )
     255 min 0 max ; inline
@@ -77,12 +76,12 @@ STRUCT: yuv_buffer
 
 : yuv>rgb-row ( index rgb yuv y -- index )
     over stride
-    pick y_width>>
+    pick y_width>> iota
     [ yuv>rgb-pixel ] with with with with each ; inline
 
 : yuv>rgb ( rgb yuv -- )
     [ 0 ] 2dip
-    dup y_height>>
+    dup y_height>> iota
     [ yuv>rgb-row ] with with each
     drop ;
 

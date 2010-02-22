@@ -1,13 +1,14 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces arrays sequences io words fry
-continuations vocabs assocs dlists definitions math graphs generic
-generic.single combinators deques search-deques macros
-source-files.errors combinators.short-circuit
+continuations vocabs assocs definitions math graphs generic
+generic.single combinators combinators.smart macros
+source-files.errors combinators.short-circuit classes.algebra
 
-stack-checker stack-checker.state stack-checker.inlining stack-checker.errors
+stack-checker stack-checker.dependencies stack-checker.inlining
+stack-checker.errors
 
-compiler.errors compiler.units compiler.utilities
+compiler.errors compiler.units compiler.utilities compiler.crossref
 
 compiler.tree.builder
 compiler.tree.optimizer
@@ -20,81 +21,64 @@ compiler.cfg.mr
 compiler.codegen ;
 IN: compiler
 
-SYMBOL: compile-queue
 SYMBOL: compiled
 
 : compile? ( word -- ? )
     #! Don't attempt to compile certain words.
     {
         [ "forgotten" word-prop ]
-        [ compiled get key? ]
         [ inlined-block? ]
-        [ primitive? ]
     } 1|| not ;
-
-: queue-compile ( word -- )
-    dup compile? [ compile-queue get push-front ] [ drop ] if ;
-
-: recompile-callers? ( word -- ? )
-    changed-effects get key? ;
-
-: recompile-callers ( words -- )
-    #! If a word's stack effect changed, recompile all words that
-    #! have compiled calls to it.
-    dup recompile-callers?
-    [ compiled-usage keys [ queue-compile ] each ] [ drop ] if ;
 
 : compiler-message ( string -- )
     "trace-compilation" get [ global [ print flush ] bind ] [ drop ] if ;
 
 : start ( word -- )
     dup name>> compiler-message
-    H{ } clone dependencies set
-    H{ } clone generic-dependencies set
+    init-dependencies
     clear-compiler-error ;
 
 GENERIC: no-compile? ( word -- ? )
 
-M: word no-compile? "no-compile" word-prop ;
-
-M: method-body no-compile? "method-generic" word-prop no-compile? ;
+M: method no-compile? "method-generic" word-prop no-compile? ;
 
 M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
+
+M: word no-compile?
+    { [ macro? ] [ "special" word-prop ] [ "no-compile" word-prop ] } 1|| ;
+
+GENERIC: combinator? ( word -- ? )
+
+M: method combinator? "method-generic" word-prop combinator? ;
+
+M: predicate-engine-word combinator? "owner-generic" word-prop combinator? ;
+
+M: word combinator? inline? ;
 
 : ignore-error? ( word error -- ? )
     #! Ignore some errors on inline combinators, macros, and special
     #! words such as 'call'.
-    [
-        {
-            [ macro? ]
-            [ inline? ]
-            [ no-compile? ]
-            [ "special" word-prop ]
-        } 1||
-    ] [
-        {
-            [ do-not-compile? ]
-            [ literal-expected? ]
-        } 1||
-    ] bi* and ;
+    {
+        [ drop no-compile? ]
+        [ [ combinator? ] [ unknown-macro-input? ] bi* and ]
+    } 2|| ;
 
 : finish ( word -- )
     #! Recompile callers if the word's stack effect changed, then
     #! save the word's dependencies so that if they change, the
     #! word can get recompiled too.
-    [ recompile-callers ]
     [ compiled-unxref ]
     [
         dup crossref? [
-            dependencies get
-            generic-dependencies get
-            compiled-xref
+            [ dependencies get generic-dependencies get compiled-xref ]
+            [ conditional-dependencies get set-dependency-checks ]
+            bi
         ] [ drop ] if
-    ] tri ;
+    ] bi ;
 
 : deoptimize-with ( word def -- * )
     #! If the word failed to infer, compile it with the
-    #! non-optimizing compiler. 
+    #! non-optimizing compiler.
     swap [ finish ] [ compiled get set-at ] bi return ;
 
 : not-compiled-def ( word error -- def )
@@ -123,7 +107,10 @@ M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
     } cond ;
 
 : optimize? ( word -- ? )
-    single-generic? not ;
+    {
+        [ single-generic? ]
+        [ primitive? ]
+    } 1|| not ;
 
 : contains-breakpoints? ( -- ? )
     dependencies get keys [ "break?" word-prop ] any? ;
@@ -136,29 +123,10 @@ M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
         contains-breakpoints? [ nip deoptimize* ] [ drop ] if
     ] [ deoptimize* ] if ;
 
-: compile-dependency ( word -- )
-    #! If a word calls an unoptimized word, try to compile the callee.
-    dup optimized? [ drop ] [ queue-compile ] if ;
-
-! Only switch this off for debugging.
-SYMBOL: compile-dependencies?
-
-t compile-dependencies? set-global
-
-: compile-dependencies ( asm -- )
-    compile-dependencies? get
-    [ calls>> [ compile-dependency ] each ] [ drop ] if ;
-
-: save-asm ( asm -- )
-    [ [ code>> ] [ label>> ] bi compiled get set-at ]
-    [ compile-dependencies ]
-    bi ;
-
 : backend ( tree word -- )
     build-cfg [
         [ optimize-cfg build-mr ] with-cfg
-        generate
-        save-asm
+        [ generate ] [ label>> ] bi compiled get set-at
     ] each ;
 
 : compile-word ( word -- )
@@ -173,31 +141,34 @@ t compile-dependencies? set-global
         } cleave
     ] with-return ;
 
-: compile-loop ( deque -- )
-    [ compile-word yield-hook get call( -- ) ] slurp-deque ;
-
-: decompile ( word -- )
-    dup def>> 2array 1array modify-code-heap ;
-
-: compile-call ( quot -- )
-    [ dup infer define-temp ] with-compilation-unit execute ;
-
-\ compile-call t "no-compile" set-word-prop
-
 SINGLETON: optimizing-compiler
 
+M: optimizing-compiler update-call-sites ( class generic -- words )
+    #! Words containing call sites with inferred type 'class'
+    #! which inlined a method on 'generic'
+    generic-call-sites-of swap '[
+        nip _ 2dup [ classoid? ] both?
+        [ classes-intersect? ] [ 2drop f ] if
+    ] assoc-filter keys ;
+
 M: optimizing-compiler recompile ( words -- alist )
-    [
-        <hashed-dlist> compile-queue set
-        H{ } clone compiled set
-        [
-            [ queue-compile ]
-            [ subwords [ compile-dependency ] each ] bi
-        ] each
-        compile-queue get compile-loop
+    H{ } clone compiled [
+        [ compile? ] filter
+        [ compile-word yield-hook get call( -- ) ] each
         compiled get >alist
-    ] with-scope
+    ] with-variable
     "--- compile done" compiler-message ;
+
+M: optimizing-compiler to-recompile ( -- words )
+    [
+        changed-effects get new-words get assoc-diff outdated-effect-usages
+        changed-definitions get new-words get assoc-diff outdated-definition-usages
+        maybe-changed get new-words get assoc-diff outdated-conditional-usages
+        changed-definitions get [ drop word? ] assoc-filter 1array
+    ] append-outputs assoc-combine keys ;
+
+M: optimizing-compiler process-forgotten-words
+    [ delete-compiled-xref ] each ;
 
 : with-optimizer ( quot -- )
     [ optimizing-compiler compiler-impl ] dip with-variable ; inline
@@ -207,6 +178,3 @@ M: optimizing-compiler recompile ( words -- alist )
 
 : disable-optimizer ( -- )
     f compiler-impl set-global ;
-
-: recompile-all ( -- )
-    all-words compile ;

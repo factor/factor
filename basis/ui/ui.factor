@@ -5,7 +5,7 @@ deques sequences threads words continuations init
 combinators combinators.short-circuit hashtables concurrency.flags
 sets accessors calendar fry destructors ui.gadgets ui.gadgets.private
 ui.gadgets.worlds ui.gadgets.tracks ui.gestures ui.backend ui.render
-strings ;
+strings classes.tuple classes.tuple.parser lexer vocabs.parser parser ;
 IN: ui
 
 <PRIVATE
@@ -34,7 +34,7 @@ SYMBOL: windows
 : raised-window ( world -- )
     windows get-global
     [ [ second eq? ] with find drop ] keep
-    [ nth ] [ delete-nth ] [ nip ] 2tri push ;
+    [ nth ] [ remove-nth! drop ] [ nip ] 2tri push ;
 
 : focus-gestures ( new old -- )
     drop-prefix <reversed>
@@ -236,9 +236,23 @@ M: object close-window
 [
     f \ ui-running set-global
     <flag> ui-notify-flag set-global
-] "ui" add-init-hook
+] "ui" add-startup-hook
 
 : with-ui ( quot -- )
     ui-running? [ call( -- ) ] [ '[ init-ui @ ] (with-ui) ] if ;
 
 HOOK: beep ui-backend ( -- )
+
+: parse-main-window-attributes ( class -- attributes )
+    "{" expect dup all-slots parse-tuple-literal-slots ;
+
+: define-main-window ( word attributes quot -- )
+    [
+        '[ [ f _ clone @ open-window ] with-ui ] (( -- )) define-declared
+    ] [ 2drop current-vocab (>>main) ] 3bi ;
+
+SYNTAX: MAIN-WINDOW:
+    CREATE
+    world-attributes parse-main-window-attributes
+    parse-definition
+    define-main-window ;

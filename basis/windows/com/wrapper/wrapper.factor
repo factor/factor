@@ -141,11 +141,11 @@ unless
     dup callbacks>> (callbacks>vtbls) >>vtbls
     f >>disposed drop ;
 
-: (init-hook) ( -- )
+: com-startup-hook ( -- )
     +live-wrappers+ get-global [ (allocate-wrapper) ] each
     H{ } +wrapped-objects+ set-global ;
 
-[ (init-hook) ] "windows.com.wrapper" add-init-hook
+[ com-startup-hook ] "windows.com.wrapper" add-startup-hook
 
 PRIVATE>
 
@@ -159,7 +159,7 @@ PRIVATE>
 
 M: com-wrapper dispose*
     [ [ free ] each f ] change-vtbls
-    +live-wrappers+ get-global delete ;
+    +live-wrappers+ get-global remove! drop ;
 
 : com-wrap ( object wrapper -- wrapped-object )
     [ vtbls>> ] [ (malloc-wrapped-object) ] bi

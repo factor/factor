@@ -32,7 +32,7 @@ HELP: month-names
 { $warning "Do not use this array for looking up a month name directly. Use month-name instead." } ;
 
 HELP: month-name
-{ $values { "n" integer } { "string" string } }
+{ $values { "obj" { $or integer timestamp } } { "string" string } }
 { $description "Looks up the month name and returns it as a string.  January has an index of 1 instead of zero." } ;
 
 HELP: month-abbreviations
@@ -46,11 +46,11 @@ HELP: month-abbreviation
 
 
 HELP: day-names
-{ $values { "array" array } }
+{ $values { "value" array } }
 { $description "Returns an array with the English names of the days of the week." } ;
 
 HELP: day-name
-{ $values { "n" integer } { "string" string } }
+{ $values { "obj" { $or integer timestamp } } { "string" string } }
 { $description "Looks up the day name and returns it as a string." } ;
 
 HELP: day-abbreviations2
@@ -309,7 +309,7 @@ HELP: time-
 } ;
 
 HELP: convert-timezone
-{ $values { "timestamp" timestamp } { "duration" duration } { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "duration" duration } { "timestamp'" timestamp } }
 { $description "Converts the " { $snippet "timestamp" } "'s " { $snippet "gmt-offset" } " to the GMT offset represented by the " { $snippet "duration" } "." }
 { $examples
     { $example "USING: accessors calendar prettyprint ;"
@@ -319,7 +319,7 @@ HELP: convert-timezone
 } ;
 
 HELP: >local-time
-{ $values { "timestamp" timestamp } { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Converts the " { $snippet "timestamp" } " to the timezone of your computer." }
 { $examples
     { $example "USING: accessors calendar kernel prettyprint ;"
@@ -329,7 +329,7 @@ HELP: >local-time
 } ;
 
 HELP: >gmt
-{ $values { "timestamp" timestamp } { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Converts the " { $snippet "timestamp" } " to the GMT timezone." }
 { $examples
     { $example "USING: accessors calendar kernel prettyprint ;"
@@ -355,7 +355,7 @@ HELP: before
 
 HELP: <zero>
 { $values { "timestamp" timestamp } }
-{ $description "Outputs a zero timestamp that consists of zeros for every slot.  Used to see if timestamps are valid." } ;
+{ $description "Returns a zero timestamp that consists of zeros for every slot.  Used to see if timestamps are valid." } ;
 
 HELP: valid-timestamp?
 { $values { "timestamp" timestamp } { "?" "a boolean" } }
@@ -363,7 +363,7 @@ HELP: valid-timestamp?
 
 HELP: unix-1970
 { $values { "timestamp" timestamp } }
-{ $description "Outputs the beginning of UNIX time, or midnight, January 1, 1970." } ;
+{ $description "Returns the beginning of UNIX time, or midnight, January 1, 1970." } ;
 
 HELP: micros>timestamp
 { $values { "x" number } { "timestamp" timestamp } }
@@ -377,13 +377,13 @@ HELP: micros>timestamp
 
 HELP: gmt
 { $values { "timestamp" timestamp } }
-{ $description "Outputs the time right now, but in the GMT timezone." } ;
+{ $description "Returns the time right now, but in the GMT timezone." } ;
 
 { gmt now } related-words
 
 HELP: now
 { $values { "timestamp" timestamp } }
-{ $description "Outputs the time right now in your computer's timezone." }
+{ $description "Returns the time right now in your computer's timezone." }
 { $examples
     { $unchecked-example "USING: calendar prettyprint ;"
         "now ."
@@ -490,23 +490,23 @@ HELP: saturday
 
 HELP: midnight
 { $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
-{ $description "Returns a timestamp that represents today at midnight, or the beginning of the day." } ;
+{ $description "Returns a new timestamp that represents today at midnight, or the beginning of the day." } ;
 
 HELP: noon
 { $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
-{ $description "Returns a timestamp that represents today at noon, or the middle of the day." } ;
+{ $description "Returns a new timestamp that represents today at noon, or the middle of the day." } ;
 
 HELP: beginning-of-month
 { $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
-{ $description "Outputs a timestamp with the day set to one." } ;
+{ $description "Returns a new timestamp with the day set to one." } ;
 
 HELP: beginning-of-week
 { $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
-{ $description "Outputs a timestamp where the day of the week is Sunday." } ;
+{ $description "Returns a new timestamp where the day of the week is Sunday." } ;
 
 HELP: beginning-of-year
-{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
-{ $description "Outputs a timestamp with the month and day set to one, or January 1 of the input timestamp." } ;
+{ $values { "object" object } { "new-timestamp" timestamp } }
+{ $description "Returns a new timestamp with the month and day set to one, or January 1 of the input timestamp, given a year or a timestamp." } ;
 
 HELP: time-since-midnight
 { $values { "timestamp" timestamp } { "duration" duration } }

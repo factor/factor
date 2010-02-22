@@ -46,7 +46,7 @@ PRIVATE>
         [
             [
                 [ [ 1array $vocab-link ] with-cell ]
-                [ 1000000 /f pprint-cell ]
+                [ 1,000,000,000 /f pprint-cell ]
                 bi*
             ] with-row
         ] assoc-each

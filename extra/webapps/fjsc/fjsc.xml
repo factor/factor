@@ -1,0 +1,17 @@
+<?xml version='1.0' ?>
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+      <title><t:write-title/></title>
+      <link rel="stylesheet" type="text/css" href="static/termlib/term_styles.css"/>
+      <script type="text/javascript" src="static/termlib/termlib.js"></script>
+      <script type="text/javascript" src="fjsc/jquery.js"></script>
+      <script type="text/javascript" src="fjsc/bootstrap.js"></script>
+      <script type="text/javascript" src="static/repl.js"></script>
+      <script type="text/javascript" src="compile-url?url=fjsc/bootstrap.factor"></script>
+    </head>
+    <body>
+      <div id="content"><t:call-next-template /></div>
+    </body>
+</html>
+</t:chloe>

@@ -1,8 +1,8 @@
-USING: accessors ui.gadgets.editors tools.test kernel io
-io.streams.plain definitions namespaces ui.gadgets
-ui.gadgets.grids prettyprint documents ui.gestures ui.gadgets.debug
-models documents.elements ui.gadgets.scrollers ui.gadgets.line-support
-sequences ;
+USING: accessors ui.gadgets.editors ui.gadgets.editors.private
+tools.test kernel io io.streams.plain definitions namespaces
+ui.gadgets ui.gadgets.grids prettyprint documents ui.gestures
+ui.gadgets.debug models documents.elements ui.gadgets.scrollers
+ui.gadgets.line-support sequences ;
 IN: ui.gadgets.editors.tests
 
 [ "foo bar" ] [
@@ -55,6 +55,9 @@ IN: ui.gadgets.editors.tests
 [ ] [ <editor> com-join-lines ] unit-test
 [ ] [ <editor> "A" over set-editor-string com-join-lines ] unit-test
 [ "A B" ] [ <editor> "A\nB" over set-editor-string [ com-join-lines ] [ editor-string ] bi ] unit-test
+[ "A B\nC\nD" ] [ <editor> "A\nB\nC\nD" over set-editor-string { 0 0 } over set-caret dup mark>caret [ com-join-lines ] [ editor-string ] bi ] unit-test
+[ "A\nB C\nD" ] [ <editor> "A\nB\nC\nD" over set-editor-string { 1 0 } over set-caret dup mark>caret [ com-join-lines ] [ editor-string ] bi ] unit-test
+[ "A\nB\nC D" ] [ <editor> "A\nB\nC\nD" over set-editor-string { 2 0 } over set-caret dup mark>caret [ com-join-lines ] [ editor-string ] bi ] unit-test
 
 [ 2 ] [ <editor> 20 >>min-rows 20 >>min-cols pref-viewport-dim length ] unit-test
 

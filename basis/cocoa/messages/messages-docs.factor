@@ -2,13 +2,13 @@ USING: help.markup help.syntax strings alien ;
 IN: cocoa.messages
 
 HELP: send
-{ $values { "args..." "method arguments" } { "receiver" alien } { "selector" string } { "return..." "value returned by method, if any" } }
+{ $values { "receiver" alien } { "args..." "method arguments" } { "selector" string } { "return..." "value returned by method, if any" } }
 { $description "Sends an Objective C message named by " { $snippet "selector" } " to " { $snippet "receiver" } ". The arguments must be on the stack in left-to-right order." }
 { $errors "Throws an error if the receiver does not recognize the message, or if the arguments have inappropriate types." }
 { $notes "This word uses a special fast code path if " { $snippet "selector" } " is a literal and the word containing the call to " { $link send } " is compiled." } ;
 
 HELP: super-send
-{ $values { "args..." "method arguments" } { "receiver" alien } { "selector" string } { "return..." "value returned by method, if any" } }
+{ $values { "receiver" alien } { "args..." "method arguments" } { "selector" string } { "return..." "value returned by method, if any" } }
 { $description "Sends an Objective C message named by " { $snippet "selector" } " to the super class of " { $snippet "receiver" } ". Otherwise behaves identically to " { $link send } "." } ;
 
 HELP: objc-class

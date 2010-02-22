@@ -1,13 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel system math math.bitwise strings arrays
-sequences combinators combinators.short-circuit alien.c-types
-vocabs.loader calendar calendar.unix io.files.info
-io.files.types io.backend io.directories unix unix.stat
-unix.time unix.users unix.groups classes.struct
-specialized-arrays ;
-SPECIALIZED-ARRAY: timeval
+USING: accessors alien.c-types arrays calendar calendar.unix
+classes.struct combinators combinators.short-circuit io.backend
+io.directories io.files.info io.files.types kernel literals
+math math.bitwise sequences specialized-arrays strings system
+unix unix.ffi unix.groups unix.stat unix.time unix.users
+vocabs.loader ;
 IN: io.files.info.unix
+SPECIALIZED-ARRAY: timeval
 
 TUPLE: unix-file-system-info < file-system-info
 block-size preferred-block-size
@@ -109,7 +109,7 @@ M: unix stat>type ( stat -- type )
 
 : chmod-set-bit ( path mask ? -- )
     [ dup stat-mode ] 2dip
-    [ bitor ] [ unmask ] if chmod io-error ;
+    [ bitor ] [ unmask ] if [ chmod ] unix-system-call drop ;
 
 GENERIC# file-mode? 1 ( obj mask -- ? )
 
@@ -134,6 +134,9 @@ CONSTANT: OTHER-ALL     OCT: 0000007
 CONSTANT: OTHER-READ    OCT: 0000004
 CONSTANT: OTHER-WRITE   OCT: 0000002
 CONSTANT: OTHER-EXECUTE OCT: 0000001
+CONSTANT: ALL-READ      OCT: 0000444
+CONSTANT: ALL-WRITE     OCT: 0000222
+CONSTANT: ALL-EXECUTE   OCT: 0000111
 
 : uid? ( obj -- ? ) UID file-mode? ;
 : gid? ( obj -- ? ) GID file-mode? ;
@@ -171,10 +174,16 @@ CONSTANT: OTHER-EXECUTE OCT: 0000001
 : set-other-execute ( path ? -- ) OTHER-EXECUTE swap chmod-set-bit ;
 
 : set-file-permissions ( path n -- )
-    [ normalize-path ] dip chmod io-error ;
+    [ normalize-path ] dip [ chmod ] unix-system-call drop ;
 
 : file-permissions ( path -- n )
     normalize-path file-info permissions>> ;
+
+: add-file-permissions ( path n -- )
+    over file-permissions bitor set-file-permissions ;
+
+: remove-file-permissions ( path n -- )
+    over file-permissions [ bitnot ] dip bitand set-file-permissions ;
 
 M: unix copy-file-and-info ( from to -- )
     [ copy-file ] [ swap file-permissions set-file-permissions ] 2bi ;
@@ -193,7 +202,7 @@ PRIVATE>
 : set-file-times ( path timestamps -- )
     #! set access, write
     [ normalize-path ] dip
-    timestamps>byte-array utimes io-error ;
+    timestamps>byte-array [ utimes ] unix-system-call drop ;
 
 : set-file-access-time ( path timestamp -- )
     f 2array set-file-times ;
@@ -202,7 +211,8 @@ PRIVATE>
     f swap 2array set-file-times ;
 
 : set-file-ids ( path uid gid -- )
-    [ normalize-path ] 2dip [ -1 or ] bi@ chown io-error ;
+    [ normalize-path ] 2dip [ -1 or ] bi@
+    [ chown ] unix-system-call drop ;
 
 GENERIC: set-file-user ( path string/id -- )
 
@@ -276,3 +286,5 @@ PRIVATE>
         { +regular-file+ [ file-type>executable ] }
         [ drop file-type>executable ]
     } case ;
+
+"io.files.info.unix." os name>> append require

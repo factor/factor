@@ -48,7 +48,7 @@ IN: project-euler.074
     { 1 1 2 6 24 120 720 5040 40320 362880 } nth ;
 
 : digits-factorial-sum ( n -- n )
-    number>digits [ digit-factorial ] sigma ;
+    number>digits [ digit-factorial ] map-sum ;
 
 : chain-length ( n -- n )
     61 <hashtable>
