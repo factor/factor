@@ -374,6 +374,63 @@ STRUCT: bit-field-test
 [ 1 ] [ bit-field-test <struct> 257 >>c c>> ] unit-test
 [ 3 ] [ bit-field-test heap-size ] unit-test
 
+STRUCT: referent
+    { y int } ;
+STRUCT: referrer
+    { x referent* } ;
+
+[ 57 ] [
+    [
+        referrer <struct>
+            referent malloc-struct &free
+                57 >>y
+            >>x
+        x>> y>>
+    ] with-destructors
+] unit-test
+
+STRUCT: self-referent
+    { x self-referent* }
+    { y int } ;
+
+[ 75 ] [
+    [
+        self-referent <struct>
+            self-referent malloc-struct &free
+                75 >>y
+            >>x
+        x>> y>>
+    ] with-destructors
+] unit-test
+
+C-TYPE: forward-referent
+STRUCT: backward-referent
+    { x forward-referent* }
+    { y int } ;
+STRUCT: forward-referent
+    { x backward-referent* }
+    { y int } ;
+
+[ 41 ] [
+    [
+        forward-referent <struct>
+            backward-referent malloc-struct &free
+                41 >>y
+            >>x
+        x>> y>>
+    ] with-destructors
+] unit-test
+
+[ 14 ] [
+    [
+        backward-referent <struct>
+            forward-referent malloc-struct &free
+                14 >>y
+            >>x
+        x>> y>>
+    ] with-destructors
+] unit-test
+
 cpu ppc? [
     STRUCT: ppc-align-test-1
         { x longlong }

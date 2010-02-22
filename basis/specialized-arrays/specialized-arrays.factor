@@ -116,12 +116,10 @@ M: A v*high [ * \ T heap-size neg shift ] 2map ; inline
 
 ;FUNCTOR
 
-: (underlying-type) ( word -- c-type ) "c-type" word-prop ; inline
-
 : underlying-type ( c-type -- c-type' )
-    dup (underlying-type) {
+    dup "c-type" word-prop {
         { [ dup not ] [ drop no-c-type ] }
-        { [ dup c-type-name? ] [ nip underlying-type ] }
+        { [ dup c-type-word? ] [ nip underlying-type ] }
         [ drop ]
     } cond ;
 
@@ -140,21 +138,21 @@ PRIVATE>
     [ specialized-array-vocab ] [ '[ _ define-array ] ] bi
     generate-vocab ;
 
-M: c-type-name require-c-array define-array-vocab drop ;
+M: c-type-word require-c-array define-array-vocab drop ;
 
 ERROR: specialized-array-vocab-not-loaded c-type ;
 
-M: c-type-name c-array-constructor
+M: c-type-word c-array-constructor
     underlying-type
     dup [ name>> "<" "-array>" surround ] [ specialized-array-vocab ] bi lookup
     [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 
-M: c-type-name c-(array)-constructor
+M: c-type-word c-(array)-constructor
     underlying-type
     dup [ name>> "(" "-array)" surround ] [ specialized-array-vocab ] bi lookup
     [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 
-M: c-type-name c-direct-array-constructor
+M: c-type-word c-direct-array-constructor
     underlying-type
     dup [ name>> "<direct-" "-array>" surround ] [ specialized-array-vocab ] bi lookup
     [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
