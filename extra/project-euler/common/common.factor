@@ -1,10 +1,11 @@
-! Copyright (c) 2007-2009 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel lists make math math.functions math.matrices
-    math.primes.miller-rabin math.order math.parser math.primes.factors
-    math.primes.lists math.ranges math.ratios namespaces parser prettyprint
-    quotations sequences sorting strings unicode.case vocabs vocabs.parser
-    words ;
+! Copyright (c) 2007-2010 Aaron Schaefer.
+! The contents of this file are licensed under the Simplified BSD License
+! A copy of the license is available at http://factorcode.org/license.txt
+USING: accessors arrays byte-arrays fry hints kernel lists make math
+    math.functions math.matrices math.order math.parser math.primes.factors
+    math.primes.lists math.primes.miller-rabin math.ranges math.ratios
+    namespaces parser prettyprint quotations sequences sorting strings
+    unicode.case vocabs vocabs.parser words ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -19,12 +20,13 @@ IN: project-euler.common
 ! mediant - #71, #73
 ! nth-prime - #7, #69
 ! nth-triangle - #12, #42
-! number>digits - #16, #20, #30, #34, #35, #38, #43, #52, #55, #56, #92
+! number>digits - #16, #20, #30, #34, #35, #38, #43, #52, #55, #56, #92, #206
 ! palindrome? - #4, #36, #55
 ! pandigital? - #32, #38
 ! pentagonal? - #44, #45
 ! penultimate - #69, #71
 ! propagate-all - #18, #67
+! permutations? - #49, #70
 ! sum-proper-divisors - #21
 ! tau* - #12
 ! [uad]-transform - #39, #75
@@ -37,6 +39,13 @@ IN: project-euler.common
     dup sqrt mod zero? ;
 
 <PRIVATE
+
+: count-digits ( n -- byte-array )
+    10 <byte-array> [
+        '[ 10 /mod _ [ 1 + ] change-nth dup 0 > ] loop drop
+    ] keep ;
+
+HINTS: count-digits fixnum ;
 
 : max-children ( seq -- seq )
     [ dup length 1 - iota [ nth-pair max , ] with each ] { } make ;
@@ -83,6 +92,9 @@ PRIVATE>
         [ [ 10 * ] [ 1 + ] bi* ] while 2nip
     ] if-zero ;
 
+: nth-place ( x n -- y )
+    10^ [ * round >integer ] keep /f ;
+
 : nth-prime ( n -- n )
     1 - lprimes lnth ;
 
@@ -106,6 +118,9 @@ PRIVATE>
 : propagate-all ( triangle -- new-triangle )
     reverse [ first dup ] [ rest ] bi
     [ propagate dup ] map nip reverse swap suffix ;
+
+: permutations? ( n m -- ? )
+    [ count-digits ] bi@ = ;
 
 : sum-divisors ( n -- sum )
     dup 4 < [ { 0 1 3 4 } nth ] [ (sum-divisors) ] if ;
