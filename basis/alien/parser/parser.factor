@@ -73,10 +73,10 @@ IN: alien.parser
 : function-quot ( return library function types -- quot )
     '[ _ _ _ _ alien-invoke ] ;
 
-:: make-function ( return! library function! parameters -- word quot effect )
-    return function normalize-c-arg function! return!
+:: make-function ( return library function parameters -- word quot effect )
+    return function normalize-c-arg :> ( return-c-type function )
     function create-in dup reset-generic
-    return library function
+    return-c-type library function
     parameters return parse-arglist [ function-quot ] dip ;
 
 : parse-arg-tokens ( -- tokens )
