@@ -79,6 +79,23 @@ IN: %s
                       "fuel")))
     (fuel-eval--send/wait cmd)))
 
+(defsubst fuel-scaffold--create-tests (vocab)
+  (let ((cmd `(:fuel* (,vocab ,fuel-scaffold-developer-name fuel-scaffold-tests)
+                      "fuel")))
+    (fuel-eval--send/wait cmd)))
+
+(defsubst fuel-scaffold--create-authors (vocab)
+  (let ((cmd `(:fuel* (,vocab ,fuel-scaffold-developer-name fuel-scaffold-authors) "fuel")))
+    (fuel-eval--send/wait cmd)))
+
+(defsubst fuel-scaffold--create-tags (vocab tags)
+  (let ((cmd `(:fuel* (,vocab ,tags fuel-scaffold-tags) "fuel")))
+    (fuel-eval--send/wait cmd)))
+
+(defsubst fuel-scaffold--create-summary (vocab summary)
+  (let ((cmd `(:fuel* (,vocab ,summary fuel-scaffold-summary) "fuel")))
+    (fuel-eval--send/wait cmd)))
+
 (defun fuel-scaffold--help (parent)
   (when (and parent (fuel-scaffold--check-auto fuel-scaffold-help-autoinsert-p))
     (let* ((ret (fuel-scaffold--create-docs (fuel-scaffold--vocab parent)))
@@ -102,7 +119,8 @@ IN: %s
 
 (defun fuel-scaffold-vocab (&optional other-window name-hint root-hint)
   "Creates a directory in the given root for a new vocabulary and
-adds source, tests and authors.txt files.
+adds source and authors.txt files. Prompts the user for optional summary,
+tags, help, and test file creation.
 
 You can configure `fuel-scaffold-developer-name' (set by default to
 `user-full-name') for the name to be inserted in the generated files."
@@ -111,12 +129,24 @@ You can configure `fuel-scaffold-developer-name' (set by default to
          (root (completing-read "Vocab root: "
                                 (fuel-scaffold--vocab-roots)
                                 nil t (or root-hint "resource:")))
+         (summary (read-string "Vocab summary (empty for none): "))
+         (tags (read-string "Vocab tags (empty for none): "))
+         (help (y-or-n-p "Scaffold help? "))
+         (tests (y-or-n-p "Scaffold tests? "))
          (cmd `(:fuel* ((,root ,name ,fuel-scaffold-developer-name)
                         (fuel-scaffold-vocab)) "fuel"))
          (ret (fuel-eval--send/wait cmd))
          (file (fuel-eval--retort-result ret)))
     (unless file
       (error "Error creating vocab (%s)" (car (fuel-eval--retort-error ret))))
+    (when (not (equal "" summary))
+      (fuel-scaffold--create-summary name summary))
+    (when (not (equal "" tags))
+      (fuel-scaffold--create-tags name tags))
+    (when help
+         (fuel-scaffold--create-docs name))
+    (when tests
+         (fuel-scaffold--create-tests name))
     (if other-window (find-file-other-window file) (find-file file))
     (goto-char (point-max))
     name))
@@ -135,6 +165,60 @@ You can configure `fuel-scaffold-developer-name' (set by default to
          (file (fuel-eval--retort-result ret)))
         (unless file
           (error "Error creating help file" (car (fuel-eval--retort-error ret))))
+        (find-file file)))
+
+(defun fuel-scaffold-tests (&optional arg)
+  "Creates, if it does not already exist, a tests file for the current vocabulary.
+
+With prefix argument, ask for the vocabulary name.
+You can configure `fuel-scaffold-developer-name' (set by default to
+`user-full-name') for the name to be inserted in the generated file."
+  (interactive "P")
+  (let* ((vocab (or (and (not arg) (fuel-syntax--current-vocab))
+                    (fuel-completion--read-vocab nil)))
+         (ret (fuel-scaffold--create-tests vocab))
+         (file (fuel-eval--retort-result ret)))
+        (unless file
+          (error "Error creating tests file" (car (fuel-eval--retort-error ret))))
+        (find-file file)))
+
+(defun fuel-scaffold-authors (&optional arg)
+  "Creates, if it does not already exist, an authors file for the current vocabulary.
+
+With prefix argument, ask for the vocabulary name.
+You can configure `fuel-scaffold-developer-name' (set by default to
+`user-full-name') for the name to be inserted in the generated file."
+  (interactive "P")
+  (let* ((vocab (or (and (not arg) (fuel-syntax--current-vocab))
+                    (fuel-completion--read-vocab nil)))
+         (ret (fuel-scaffold--create-authors vocab))
+         (file (fuel-eval--retort-result ret)))
+        (unless file
+          (error "Error creating authors file" (car (fuel-eval--retort-error ret))))
+        (find-file file)))
+
+(defun fuel-scaffold-tags (&optional arg)
+  "Creates, if it does not already exist, a tags file for the current vocabulary."
+  (interactive "P")
+  (let* ((vocab (or (and (not arg) (fuel-syntax--current-vocab))
+                    (fuel-completion--read-vocab nil)))
+         (tags (read-string "Tags: "))
+         (ret (fuel-scaffold--create-tags vocab tags))
+         (file (fuel-eval--retort-result ret)))
+        (unless file
+          (error "Error creating tags file" (car (fuel-eval--retort-error ret))))
+        (find-file file)))
+
+(defun fuel-scaffold-summary (&optional arg)
+  "Creates, if it does not already exist, a summary file for the current vocabulary."
+  (interactive "P")
+  (let* ((vocab (or (and (not arg ) (fuel-syntax--current-vocab))
+                    (fuel-completion--read-vocab nil)))
+         (summary (read-string "Summary: "))
+         (ret (fuel-scaffold--create-summary vocab summary))
+         (file (fuel-eval--retort-result ret)))
+        (unless file
+          (error "Error creating summary file" (car (fuel-eval--retort-error ret))))
         (find-file file)))
 
 

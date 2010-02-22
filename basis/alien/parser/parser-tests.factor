@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien.c-types alien.parser alien.syntax
-tools.test vocabs.parser parser eval vocabs.parser debugger
-continuations ;
+tools.test vocabs.parser parser eval debugger kernel
+continuations words ;
 IN: alien.parser.tests
 
 TYPEDEF: char char2
@@ -33,6 +33,11 @@ CONSTANT: eleven 11
     [ "not-word" parse-c-type ] [ error>> no-word-error? ] must-fail-with
 
 ] with-file-vocabs
+
+FUNCTION: void* alien-parser-effect-test ( int *arg1 float arg2 ) ;
+[ (( arg1 arg2 -- void* )) ] [
+    \ alien-parser-effect-test "declared-effect" word-prop
+] unit-test
 
 ! Reported by mnestic
 TYPEDEF: int alien-parser-test-int ! reasonably unique name...
