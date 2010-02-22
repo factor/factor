@@ -40,7 +40,7 @@ SYMBOLS: effect-dependency conditional-dependency definition-dependency ;
 
 GENERIC: depends-on-c-type ( c-type -- )
 
-M: c-type-word depends-on-c-type depends-on-definition ;
+M: word depends-on-c-type depends-on-definition ;
 
 M: array depends-on-c-type
     [ word? ] filter [ depends-on-definition ] each ;
