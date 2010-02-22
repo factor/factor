@@ -17,8 +17,9 @@ SYMBOLS:
     long ulong
     longlong ulonglong
     float double
-    bool void*
-    void ;
+    void* bool ;
+
+SINGLETON: void
 
 DEFER: <int>
 DEFER: *char
@@ -48,9 +49,6 @@ ERROR: no-c-type name ;
 ! C type protocol
 GENERIC: c-type ( name -- c-type ) foldable
 
-: void? ( c-type -- ? )
-    void = ; inline
-
 PREDICATE: c-type-word < word
     "c-type" word-prop ;
 
@@ -63,14 +61,6 @@ UNION: c-type-name
 : resolve-typedef ( name -- c-type )
     dup void? [ no-c-type ] when
     dup c-type-name? [ c-type ] when ;
-
-<PRIVATE
-
-: parse-array-type ( name -- dims c-type )
-    "[" split unclip
-    [ [ "]" ?tail drop string>number ] map ] dip ;
-
-PRIVATE>
 
 M: word c-type
     dup "c-type" word-prop resolve-typedef
