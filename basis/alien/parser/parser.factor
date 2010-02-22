@@ -18,8 +18,8 @@ IN: alien.parser
     {
         { [ dup "void" =         ] [ drop void ] }
         { [ CHAR: ] over member? ] [ parse-array-type parse-c-type-name prefix ] }
-        { [ dup search           ] [ parse-c-type-name ] }
         { [ "*" ?tail            ] [ (parse-c-type) <pointer> ] }
+        { [ dup search           ] [ parse-c-type-name ] }
         [ dup search [ ] [ no-word ] ?if ]
     } cond ;
 
