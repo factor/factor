@@ -62,12 +62,20 @@ IN: alien.parser
     ] bi
     [ parse-c-type ] dip ;
 
+<PRIVATE
+GENERIC: return-type-name ( type -- name )
+
+M: object return-type-name drop "void" ;
+M: word return-type-name name>> ;
+M: pointer return-type-name to>> return-type-name CHAR: * suffix ;
+PRIVATE>
+
 : parse-arglist ( parameters return -- types effect )
     [
         2 group [ first2 normalize-c-arg 2array ] map
         unzip [ "," ?tail drop ] map
     ]
-    [ [ { } ] [ name>> 1array ] if-void ]
+    [ [ { } ] [ return-type-name 1array ] if-void ]
     bi* <effect> ;
 
 : function-quot ( return library function types -- quot )
