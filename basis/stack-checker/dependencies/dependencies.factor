@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs accessors classes classes.algebra fry generic
-kernel math namespaces sequences words sets
-combinators.short-circuit classes.tuple ;
+USING: arrays assocs accessors classes classes.algebra fry
+generic kernel math namespaces sequences words sets
+combinators.short-circuit classes.tuple alien.c-types ;
 FROM: classes.tuple.private => tuple-layout ;
 FROM: assocs => change-at ;
 IN: stack-checker.dependencies
@@ -37,6 +37,13 @@ SYMBOLS: effect-dependency conditional-dependency definition-dependency ;
 
 : depends-on-definition ( word -- )
     definition-dependency depends-on ;
+
+GENERIC: depends-on-c-type ( c-type -- )
+
+M: c-type-word depends-on-c-type depends-on-definition ;
+
+M: array depends-on-c-type
+    [ word? ] filter [ depends-on-definition ] each ;
 
 ! Generic words that the current quotation depends on
 SYMBOL: generic-dependencies
