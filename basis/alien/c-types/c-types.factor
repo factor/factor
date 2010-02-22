@@ -69,14 +69,6 @@ M: array resolve-pointer-type
     dup void? [ no-c-type ] when
     dup c-type-name? [ c-type ] when ;
 
-<PRIVATE
-
-: parse-array-type ( name -- dims c-type )
-    "[" split unclip
-    [ [ "]" ?tail drop string>number ] map ] dip ;
-
-PRIVATE>
-
 M: word c-type
     dup "c-type" word-prop resolve-typedef
     [ ] [ no-c-type ] ?if ;
