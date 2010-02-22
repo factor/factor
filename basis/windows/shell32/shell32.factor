@@ -87,9 +87,6 @@ ALIAS: SHGetFolderPath SHGetFolderPathW
 FUNCTION: HINSTANCE ShellExecuteW ( HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFile, LPCTSTR lpParameters, LPCTSTR lpDirectory, INT nShowCmd ) ;
 ALIAS: ShellExecute ShellExecuteW
 
-: open-in-explorer ( dir -- )
-    [ f "open" ] dip absolute-path f f SW_SHOWNORMAL ShellExecute drop ;
-
 : shell32-directory ( n -- str )
     f swap f SHGFP_TYPE_DEFAULT
     MAX_UNICODE_PATH <ushort-array>
