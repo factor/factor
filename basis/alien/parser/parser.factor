@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
+! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.parser
 alien.libraries arrays assocs classes combinators
@@ -67,16 +67,16 @@ IN: alien.parser
         2 group [ first2 normalize-c-arg 2array ] map
         unzip [ "," ?tail drop ] map
     ]
-    [ [ { } ] [ 1array ] if-void ]
+    [ [ { } ] [ name>> 1array ] if-void ]
     bi* <effect> ;
 
 : function-quot ( return library function types -- quot )
     '[ _ _ _ _ alien-invoke ] ;
 
 :: make-function ( return library function parameters -- word quot effect )
-    return function normalize-c-arg :> ( return-c-type function )
+    return function normalize-c-arg :> ( return function )
     function create-in dup reset-generic
-    return-c-type library function
+    return library function
     parameters return parse-arglist [ function-quot ] dip ;
 
 : parse-arg-tokens ( -- tokens )
@@ -89,13 +89,10 @@ IN: alien.parser
     make-function define-declared ;
 
 : callback-quot ( return types abi -- quot )
-    [ [ ] 3curry dip alien-callback ] 3curry ;
+    '[ [ _ _ _ ] dip alien-callback ] ;
 
-: library-abi ( lib -- abi )
-    library [ abi>> ] [ "cdecl" ] if* ;
-
-:: make-callback-type ( lib return! type-name! parameters -- word quot effect )
-    return type-name normalize-c-arg type-name! return!
+:: make-callback-type ( lib return type-name parameters -- word quot effect )
+    return type-name normalize-c-arg :> ( return type-name )
     type-name current-vocab create :> type-word 
     type-word [ reset-generic ] [ reset-c-type ] bi
     void* type-word typedef
@@ -116,4 +113,3 @@ PREDICATE: alien-function-word < word
 
 PREDICATE: alien-callback-type-word < typedef-word
     "callback-effect" word-prop ;
-
