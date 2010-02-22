@@ -236,10 +236,11 @@ ERROR: no-objc-type name ;
     ] bi ;
 
 : import-objc-class ( name quot -- )
-    over define-objc-class-word
+    2dup swap define-objc-class-word
+    over objc_getClass [ drop ] [ call( -- ) ] if
     dup objc_getClass [
-        [ objc-class register-objc-methods ]
-        [ objc-meta-class register-objc-methods ] bi
+        [ objc_getClass register-objc-methods ]
+        [ objc_getMetaClass register-objc-methods ] bi
     ] [ drop ] if ;
 
 : root-class ( class -- root )
