@@ -267,7 +267,7 @@ test-server-slot-values
 ] unit-test
 
 [
-    "IN: classes.tuple.tests TUPLE: bad-superclass < word ;" eval( -- )
+    "IN: classes.tuple.tests TUPLE: invalid-superclass < word ;" eval( -- )
 ] must-fail
 
 ! Dynamically changing inheritance hierarchy
