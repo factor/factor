@@ -36,7 +36,7 @@ HELP: printf
     "For example:\n"
     { $list
         "\"%5s\" formats a string padding with spaces up to 5 characters wide."
-        "\"%08d\" formats an integer padding with zeros up to 3 characters wide."
+        "\"%03d\" formats an integer padding with zeros up to 3 characters wide."
         "\"%'#5f\" formats a float padding with '#' up to 3 characters wide."
         "\"%-10d\" formats an integer to 10 characters wide and left-aligns." 
     }
