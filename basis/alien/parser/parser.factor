@@ -41,7 +41,6 @@ IN: alien.parser
     [ dup [ forget-class ] [ { "struct-size" } reset-props ] bi ] when
     {
         "c-type"
-        "pointer-c-type"
         "callback-effect"
         "callback-library"
     } reset-props ;

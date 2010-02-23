@@ -223,21 +223,14 @@ MIXIN: value-type
         \ swap , [ heap-size , [ * >fixnum ] % ] [ % ] bi*
     ] [ ] make ;
 
-GENERIC: typedef ( old new -- )
-
 PREDICATE: typedef-word < c-type-word
     "c-type" word-prop c-type-name? ;
 
-M: word typedef ( old new -- )
+: typedef ( old new -- )
     {
         [ nip define-symbol ]
         [ swap "c-type" set-word-prop ]
     } 2cleave ;
-
-M: pointer typedef ( old new -- )
-    to>> dup c-type-word?
-    [ swap "pointer-c-type" set-word-prop ]
-    [ 2drop ] if ;
 
 TUPLE: long-long-type < c-type ;
 
@@ -298,12 +291,6 @@ CONSTANT: primitive-types
         pointer? [ drop void* ] when
     ] if ;
 
-: special-pointer-type ( type -- special-type )
-    dup c-type-word? [
-        dup "pointer-c-type" word-prop
-        [ ] [ "c-type" word-prop special-pointer-type ] ?if
-    ] [ drop f ] if ;
-
 : primitive-pointer-type? ( type -- ? )
     dup c-type-word? [
         resolve-pointer-typedef [ void? ] [ primitive-types member? ] bi or
@@ -313,10 +300,7 @@ PRIVATE>
 
 M: pointer c-type
     [ \ void* c-type ] dip
-    to>> dup special-pointer-type
-    [ nip ] [
-        dup primitive-pointer-type? [ drop ] [ (pointer-c-type) ] if
-    ] ?if ;
+    to>> dup primitive-pointer-type? [ drop ] [ (pointer-c-type) ] if ;
 
 : 8-byte-alignment ( c-type -- c-type )
     {
