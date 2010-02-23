@@ -90,20 +90,20 @@ STRUCT: vorbis-block
     ;
 
 STRUCT: vorbis-comment
-    { usercomments char** }
+    { usercomments c-string* }
     { comment_lengths int* }
     { comments int }
-    { vendor char* }
+    { vendor c-string }
     ;
 
 FUNCTION: void     vorbis_info_init ( vorbis-info* vi ) ;
 FUNCTION: void     vorbis_info_clear ( vorbis-info* vi ) ;
 FUNCTION: int      vorbis_info_blocksize ( vorbis-info* vi, int zo ) ;
 FUNCTION: void     vorbis_comment_init ( vorbis-comment* vc ) ;
-FUNCTION: void     vorbis_comment_add ( vorbis-comment* vc, char* comment ) ;
-FUNCTION: void     vorbis_comment_add_tag ( vorbis-comment* vc, char* tag, char* contents ) ;
-FUNCTION: char*    vorbis_comment_query ( vorbis-comment* vc, char* tag, int count ) ;
-FUNCTION: int      vorbis_comment_query_count ( vorbis-comment* vc, char* tag ) ;
+FUNCTION: void     vorbis_comment_add ( vorbis-comment* vc, c-string comment ) ;
+FUNCTION: void     vorbis_comment_add_tag ( vorbis-comment* vc, c-string tag, c-string contents ) ;
+FUNCTION: c-string    vorbis_comment_query ( vorbis-comment* vc, c-string tag, int count ) ;
+FUNCTION: int      vorbis_comment_query_count ( vorbis-comment* vc, c-string tag ) ;
 FUNCTION: void     vorbis_comment_clear ( vorbis-comment* vc ) ;
 FUNCTION: int      vorbis_block_init ( vorbis-dsp-state* v, vorbis-block* vb ) ;
 FUNCTION: int      vorbis_block_clear ( vorbis-block* vb ) ;

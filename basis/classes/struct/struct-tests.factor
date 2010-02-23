@@ -139,7 +139,7 @@ UNION-STRUCT: struct-test-float-and-bits
 [ 123 ] [ [ struct-test-foo malloc-struct &free y>> ] with-destructors ] unit-test
 
 STRUCT: struct-test-string-ptr
-    { x char* } ;
+    { x c-string } ;
 
 [ "hello world" ] [
     [

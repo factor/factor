@@ -273,7 +273,7 @@ M: long-long-type box-return ( c-type -- )
 
 SYMBOLS:
     ptrdiff_t intptr_t uintptr_t size_t
-    byte ubyte char* ;
+    c-string ;
 
 CONSTANT: primitive-types
     {
@@ -284,7 +284,7 @@ CONSTANT: primitive-types
         longlong ulonglong
         float double
         void* bool
-        char*
+        c-string
     }
 
 : (pointer-c-type) ( void* type -- void*' )
@@ -530,8 +530,6 @@ M: pointer c-type
         \ uint c-type \ size_t typedef
     ] if
 
-    \ char \ byte typedef
-    \ uchar \ ubyte typedef
 ] with-compilation-unit
 
 M: char-16-rep rep-component-type drop char ;

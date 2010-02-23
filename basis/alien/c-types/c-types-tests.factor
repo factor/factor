@@ -22,7 +22,7 @@ UNION-STRUCT: foo
 [ f ] [ pointer: foo  c-type void* c-type = ] unit-test
 [ t ] [ pointer: foo* c-type void* c-type = ] unit-test
 
-[ t ] [ pointer: char c-type char* c-type = ] unit-test
+[ t ] [ c-string c-type c-string c-type = ] unit-test
 
 [ t ] [ foo heap-size int heap-size = ] unit-test
 
@@ -35,35 +35,20 @@ TYPEDEF: int MyInt
 
 TYPEDEF: char MyChar
 
-[ t ] [ pointer: char c-type pointer: MyChar c-type = ] unit-test
-[ t ] [ char*         c-type pointer: MyChar c-type = ] unit-test
+[ t ] [ pointer: void c-type pointer: MyChar c-type = ] unit-test
 
-TYPEDEF: char MyFunkyChar
-{ char* ascii } pointer: MyFunkyChar typedef
+TYPEDEF: { c-string ascii } MyFunkyString
 
-[ f ] [ pointer: char c-type pointer: MyFunkyChar c-type = ] unit-test
-[ { char* ascii } ] [ pointer: MyFunkyChar c-type ] unit-test
+[ { c-string ascii } ] [ MyFunkyString c-type ] unit-test
 
-TYPEDEF: MyFunkyChar MyFunkyTypedef
+TYPEDEF: c-string MyString
 
-[ { char* ascii } ] [ pointer: MyFunkyTypedef c-type ] unit-test
-
-TYPEDEF: MyFunkyChar* MyFunkyString
-
-[ { char* ascii } ] [ MyFunkyString c-type ] unit-test
-
-TYPEDEF: char* MyString
-
-[ t ] [ char* c-type MyString          c-type = ] unit-test
+[ t ] [ c-string c-type MyString          c-type = ] unit-test
 [ t ] [ void* c-type pointer: MyString c-type = ] unit-test
 
 TYPEDEF: int* MyIntArray
 
 [ t ] [ void* c-type MyIntArray c-type = ] unit-test
-
-TYPEDEF: char* MyLPBYTE
-
-[ t ] [ { char* utf8 } c-type MyLPBYTE c-type = ] unit-test
 
 [
     0 B{ 1 2 3 4 } <displaced-alien> <void*>

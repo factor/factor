@@ -41,7 +41,7 @@ FUNCTION: cpVect cpvslerp ( cpVect v1, cpVect v2, cpFloat t ) ;
 FUNCTION: cpVect cpvslerpconst ( cpVect v1, cpVect v2, cpFloat a ) ;
 FUNCTION: cpVect cpvforangle ( cpFloat a ) ;
 FUNCTION: cpFloat cpvtoangle ( cpVect v ) ;
-FUNCTION: char* cpvstr ( cpVect v ) ;
+FUNCTION: c-string cpvstr ( cpVect v ) ;
 
 TYPED: cpvadd ( v1: cpVect v2: cpVect -- v3: cpVect )
     [ [ x>> ] bi@ + ]

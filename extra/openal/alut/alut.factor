@@ -49,20 +49,20 @@ CONSTANT: ALUT_WAVEFORM_IMPULSE HEX: 104
 CONSTANT: ALUT_LOADER_BUFFER HEX: 300
 CONSTANT: ALUT_LOADER_MEMORY HEX: 301
 
-FUNCTION: ALboolean alutInit ( int* argcp, char** argv ) ;
-FUNCTION: ALboolean alutInitWithoutContext ( int* argcp, char** argv ) ;
+FUNCTION: ALboolean alutInit ( int* argcp, c-string* argv ) ;
+FUNCTION: ALboolean alutInitWithoutContext ( int* argcp, c-string* argv ) ;
 FUNCTION: ALboolean alutExit ( ) ;
 FUNCTION: ALenum alutGetError ( ) ;
-FUNCTION: char* alutGetErrorString ( ALenum error ) ;
-FUNCTION: ALuint alutCreateBufferFromFile ( char* fileName ) ;
+FUNCTION: c-string alutGetErrorString ( ALenum error ) ;
+FUNCTION: ALuint alutCreateBufferFromFile ( c-string fileName ) ;
 FUNCTION: ALuint alutCreateBufferFromFileImage ( void* data, ALsizei length ) ;
 FUNCTION: ALuint alutCreateBufferHelloWorld ( ) ;
 FUNCTION: ALuint alutCreateBufferWaveform ( ALenum waveshape, ALfloat frequency, ALfloat phase, ALfloat duration ) ;
-FUNCTION: void* alutLoadMemoryFromFile ( char* fileName, ALenum* format, ALsizei* size, ALfloat* frequency ) ;
+FUNCTION: void* alutLoadMemoryFromFile ( c-string fileName, ALenum* format, ALsizei* size, ALfloat* frequency ) ;
 FUNCTION: void* alutLoadMemoryFromFileImage ( void* data, ALsizei length, ALenum* format, ALsizei* size, ALfloat* frequency ) ;
 FUNCTION: void* alutLoadMemoryHelloWorld ( ALenum* format, ALsizei* size, ALfloat* frequency ) ;
 FUNCTION: void* alutLoadMemoryWaveform ( ALenum waveshape, ALfloat frequency, ALfloat phase, ALfloat duration, ALenum* format, ALsizei* size, ALfloat* freq ) ;
-FUNCTION: char* alutGetMIMETypes ( ALenum loader ) ;
+FUNCTION: c-string alutGetMIMETypes ( ALenum loader ) ;
 FUNCTION: ALint alutGetMajorVersion ( ) ;
 FUNCTION: ALint alutGetMinorVersion ( ) ;
 FUNCTION: ALboolean alutSleep ( ALfloat duration ) ;

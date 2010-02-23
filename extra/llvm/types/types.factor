@@ -99,7 +99,7 @@ TUPLE: pointer < enclosing type ;
 M: pointer (>tref)* type>> (>tref) 0 LLVMPointerType ;
 M: pointer clean* type>> clean ;
 M: pointer (tref>)* swap LLVMGetElementType (tref>) >>type ;
-M: pointer c-type type>> 8 <integer> = "char*" "void*" ? ;
+M: pointer c-type type>> 8 <integer> = "c-string" "void*" ? ;
 
 TUPLE: vector < enclosing size type ;
 : <vector> ( s t -- o )

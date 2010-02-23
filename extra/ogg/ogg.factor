@@ -28,18 +28,18 @@ LIBRARY: ogg
 STRUCT: oggpack-buffer
     { endbyte long }
     { endbit int   }
-    { buffer uchar* }
-    { ptr uchar* }
+    { buffer c-string }
+    { ptr c-string }
     { storage long } ;
 
 STRUCT: ogg-page
-    {  header uchar* }
+    {  header c-string }
     {  header_len long }
-    {  body uchar* }
+    {  body c-string }
     {  body_len long } ;
 
 STRUCT: ogg-stream-state
-    {  body_data uchar* }
+    {  body_data c-string }
     {  body_storage long }
     {  body_fill long }
     {  body_returned long }
@@ -59,7 +59,7 @@ STRUCT: ogg-stream-state
     {  granulepos longlong } ;
 
 STRUCT: ogg-packet
-    {  packet uchar* }
+    {  packet c-string }
     {  bytes long }
     {  b_o_s long }
     {  e_o_s long }
@@ -67,7 +67,7 @@ STRUCT: ogg-packet
     {  packetno longlong } ;
 
 STRUCT: ogg-sync-state
-    { data uchar* }
+    { data c-string }
     { storage int }
     { fill int }  
     { returned int }
@@ -81,7 +81,7 @@ FUNCTION: void  oggpack_writealign ( oggpack-buffer* b) ;
 FUNCTION: void  oggpack_writecopy ( oggpack-buffer* b, void* source, long bits ) ;
 FUNCTION: void  oggpack_reset ( oggpack-buffer* b ) ;
 FUNCTION: void  oggpack_writeclear ( oggpack-buffer* b ) ;
-FUNCTION: void  oggpack_readinit ( oggpack-buffer* b, uchar* buf, int bytes ) ;
+FUNCTION: void  oggpack_readinit ( oggpack-buffer* b, c-string buf, int bytes ) ;
 FUNCTION: void  oggpack_write ( oggpack-buffer* b, ulong value, int bits ) ;
 FUNCTION: long  oggpack_look ( oggpack-buffer* b, int bits ) ;
 FUNCTION: long  oggpack_look1 ( oggpack-buffer* b ) ;
@@ -91,14 +91,14 @@ FUNCTION: long  oggpack_read ( oggpack-buffer* b, int bits ) ;
 FUNCTION: long  oggpack_read1 ( oggpack-buffer* b ) ;
 FUNCTION: long  oggpack_bytes ( oggpack-buffer* b ) ;
 FUNCTION: long  oggpack_bits ( oggpack-buffer* b ) ;
-FUNCTION: uchar* oggpack_get_buffer ( oggpack-buffer* b ) ;
+FUNCTION: c-string oggpack_get_buffer ( oggpack-buffer* b ) ;
 FUNCTION: void  oggpackB_writeinit ( oggpack-buffer* b ) ;
 FUNCTION: void  oggpackB_writetrunc ( oggpack-buffer* b, long bits ) ;
 FUNCTION: void  oggpackB_writealign ( oggpack-buffer* b ) ;
 FUNCTION: void  oggpackB_writecopy ( oggpack-buffer* b, void* source, long bits ) ;
 FUNCTION: void  oggpackB_reset ( oggpack-buffer* b ) ;
 FUNCTION: void  oggpackB_writeclear ( oggpack-buffer* b ) ;
-FUNCTION: void  oggpackB_readinit ( oggpack-buffer* b, uchar* buf, int bytes ) ;
+FUNCTION: void  oggpackB_readinit ( oggpack-buffer* b, c-string buf, int bytes ) ;
 FUNCTION: void  oggpackB_write ( oggpack-buffer* b, ulong value, int bits ) ;
 FUNCTION: long  oggpackB_look ( oggpack-buffer* b, int bits ) ;
 FUNCTION: long  oggpackB_look1 ( oggpack-buffer* b ) ;
@@ -108,7 +108,7 @@ FUNCTION: long  oggpackB_read ( oggpack-buffer* b, int bits ) ;
 FUNCTION: long  oggpackB_read1 ( oggpack-buffer* b ) ;
 FUNCTION: long  oggpackB_bytes ( oggpack-buffer* b ) ;
 FUNCTION: long  oggpackB_bits ( oggpack-buffer* b ) ;
-FUNCTION: uchar* oggpackB_get_buffer ( oggpack-buffer* b ) ;
+FUNCTION: c-string oggpackB_get_buffer ( oggpack-buffer* b ) ;
 FUNCTION: int      ogg_stream_packetin ( ogg-stream-state* os, ogg-packet* op ) ;
 FUNCTION: int      ogg_stream_pageout ( ogg-stream-state* os, ogg-page* og ) ;
 FUNCTION: int      ogg_stream_flush ( ogg-stream-state* os, ogg-page* og ) ;
