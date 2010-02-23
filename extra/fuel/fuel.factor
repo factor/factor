@@ -162,6 +162,10 @@ PRIVATE>
     [ scaffold-summary ]
     [ drop [ vocab-summary-path ] keep swap vocab-append-path absolute-path fuel-eval-set-result ] 2bi ;
 
+: fuel-scaffold-platforms ( name platforms -- )
+    [ scaffold-platforms ]
+    [ drop [ vocab-platforms-path ] keep swap vocab-append-path absolute-path fuel-eval-set-result ] 2bi ;
+
 : fuel-scaffold-get-root ( name -- ) find-vocab-root fuel-eval-set-result ;
 
 ! Remote connection
