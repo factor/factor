@@ -2,7 +2,7 @@
 USING: accessors arrays classes classes.tuple combinators
 combinators.short-circuit definitions effects fry hints
 math kernel kernel.private namespaces parser quotations
-sequences slots words locals 
+sequences slots words locals effects.parser
 locals.parser macros stack-checker.dependencies ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: typed

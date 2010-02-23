@@ -5,7 +5,7 @@ sequences strings vectors words words.symbol quotations io
 combinators sorting splitting math.parser effects continuations
 io.files vocabs io.encodings.utf8 source-files classes
 hashtables compiler.units accessors sets lexer vocabs.parser
-effects.parser slots parser.notes ;
+ slots parser.notes ;
 IN: parser
 
 : location ( -- loc )
@@ -101,11 +101,6 @@ M: f parse-quotation \ ] parse-until >quotation ;
 
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
-
-: (:) ( -- word def effect )
-    CREATE-WORD
-    complete-effect
-    parse-definition swap ;
 
 ERROR: bad-number ;
 

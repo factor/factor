@@ -1,7 +1,7 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: lexer sets sequences kernel splitting effects
-combinators arrays vocabs.parser classes ;
+combinators arrays vocabs.parser classes parser ;
 IN: effects.parser
 
 DEFER: parse-effect
@@ -14,9 +14,8 @@ ERROR: bad-effect ;
             ":" ?tail [
                 scan {
                     { [ dup "(" = ] [ drop ")" parse-effect ] }
-                    { [ dup search class? ] [ search ] }
                     { [ dup f = ] [ ")" unexpected-eof ] }
-                    [ bad-effect ]
+                    [ parse-word dup class? [ bad-effect ] unless ]
                 } cond 2array
             ] when
         ] if
@@ -36,3 +35,8 @@ ERROR: stack-effect-omits-dashes tokens ;
 
 : parse-call( ( accum word -- accum )
     [ ")" parse-effect ] dip 2array append! ;
+
+: (:) ( -- word def effect )
+    CREATE-WORD
+    complete-effect
+    parse-definition swap ;
