@@ -46,7 +46,7 @@
   '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
     "ABOUT:" "ALIAS:" "ALIEN:" "ARTICLE:"
     "B" "BIN:"
-    "C:" "CALLBACK:" "C-ENUM:" "C-STRUCT:" "C-TYPE:" "C-UNION:" "CHAR:" "CONSTANT:" "call-next-method"
+    "C:" "CALLBACK:" "C-ENUM:" "C-STRUCT:" "C-TYPE:" "C-UNION:" "CHAR:" "COM-INTERFACE:" "CONSTANT:" "call-next-method"
     "DEFER:"
     "EBNF:" ";EBNF" "ERROR:" "EXCLUDE:"
     "f" "FORGET:" "FROM:" "FUNCTION:"
@@ -125,7 +125,7 @@
 
 (defconst fuel-syntax--type-definition-regex
   (fuel-syntax--second-word-regex
-   '("C-STRUCT:" "C-UNION:" "MIXIN:" "TUPLE:" "SINGLETON:" "SPECIALIZED-ARRAY:" "STRUCT:" "UNION:" "UNION-STRUCT:")))
+   '("C-STRUCT:" "C-UNION:" "COM-INTERFACE:" "MIXIN:" "TUPLE:" "SINGLETON:" "SPECIALIZED-ARRAY:" "STRUCT:" "UNION:" "UNION-STRUCT:")))
 
 (defconst fuel-syntax--tuple-decl-regex
   "^TUPLE: +\\([^ \n]+\\) +< +\\([^ \n]+\\)\\_>")
@@ -156,7 +156,7 @@
   "\\_<CALLBACK: \\(\\w+\\) \\(\\w+\\)")
 
 (defconst fuel-syntax--indent-def-starts '("" ":"
-                                           "C-ENUM" "C-STRUCT" "C-UNION"
+                                           "C-ENUM" "C-STRUCT" "C-UNION" "COM-INTERFACE"
                                            "FROM" "FUNCTION:"
                                            "INTERSECTION:"
                                            "M" "M:" "MACRO" "MACRO:"
