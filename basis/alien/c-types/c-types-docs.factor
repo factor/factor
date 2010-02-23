@@ -103,7 +103,7 @@ HELP: ulonglong
 HELP: void
 { $description "This symbol is not a valid C type, but it can be used as the return type for a " { $link POSTPONE: FUNCTION: } " or " { $link POSTPONE: CALLBACK: } " definition or for an " { $link alien-invoke } " or " { $link alien-callback } " call." } ;
 HELP: void*
-{ $description "This C type represents a generic pointer to C memory. See " { $link pointer } " for information on pointer C types." }
+{ $description "This C type represents a generic pointer to C memory. See " { $link pointer } " for information on pointer C types." } ;
 HELP: c-string
 { $description "This C type represents a pointer to a C string. See " { $link "c-strings" } " for details about using strings with the FFI." } ;
 HELP: float
