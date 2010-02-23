@@ -147,7 +147,7 @@ M: struct-class initial-value* <struct> ; inline
 GENERIC: struct-slot-values ( struct -- sequence )
 
 M: struct-class reader-quot
-    dup array? [ dup first define-array-vocab drop ] when
+    dup type>> array? [ dup type>> first define-array-vocab drop ] when
     nip '[ _ read-struct-slot ] ;
 
 M: struct-class writer-quot
