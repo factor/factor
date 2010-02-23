@@ -24,8 +24,6 @@ UNION-STRUCT: foo
 
 [ t ] [ pointer: char c-type char* c-type = ] unit-test
 
-[ t ] [ pointer: foo c-type-boxer-quot foo c-type-boxer-quot = ] unit-test
-
 [ t ] [ foo heap-size int heap-size = ] unit-test
 
 TYPEDEF: int MyInt
