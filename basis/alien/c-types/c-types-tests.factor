@@ -44,6 +44,14 @@ TYPEDEF: char MyFunkyChar
 [ f ] [ pointer: char c-type pointer: MyFunkyChar c-type = ] unit-test
 [ { char* ascii } ] [ pointer: MyFunkyChar c-type ] unit-test
 
+TYPEDEF: MyFunkyChar MyFunkyTypedef
+
+[ { char* ascii } ] [ pointer: MyFunkyTypedef c-type ] unit-test
+
+TYPEDEF: MyFunkyChar* MyFunkyString
+
+[ { char* ascii } ] [ MyFunkyString c-type ] unit-test
+
 TYPEDEF: char* MyString
 
 [ t ] [ char* c-type MyString          c-type = ] unit-test
