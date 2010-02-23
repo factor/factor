@@ -301,7 +301,7 @@ CONSTANT: primitive-types
 : special-pointer-type ( type -- special-type )
     dup c-type-word? [
         dup "pointer-c-type" word-prop
-        [ ] [ resolve-pointer-typedef "pointer-c-type" word-prop ] ?if
+        [ ] [ "c-type" word-prop special-pointer-type ] ?if
     ] [ drop f ] if ;
 
 : primitive-pointer-type? ( type -- ? )
