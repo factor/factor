@@ -40,11 +40,11 @@ $nl
 }
 "You can define a word for invoking it:"
 { $unchecked-example
-    "LIBRARY: foo\nFUNCTION: void the_answer ( char* question, int value ) ;"
-    "USE: compiler"
+    "LIBRARY: foo\nFUNCTION: void the_answer ( c-string question, int value ) ;"
     "\"the question\" 42 the_answer"
     "The answer to the question is 42."
 } }
+"Using the " { $link c-string } " type instead of " { $snippet "char*" } " causes the FFI to automatically convert Factor strings to C strings. See " { $link "c-strings" } " for more information on using strings with the FFI."
 { $notes "Note that the parentheses and commas are only syntax sugar and can be omitted; they serve no purpose other than to make the declaration slightly easier to read:"
 { $code
     "FUNCTION: void glHint ( GLenum target, GLenum mode ) ;"

@@ -58,7 +58,7 @@ STRUCT: c-window
     { _use_keypad bool    }
     { _delay int     }
 
-    { _line char* }
+    { _line c-string }
     { _regtop NCURSES_SIZE_T }
     { _regbottom NCURSES_SIZE_T }
 
@@ -79,7 +79,7 @@ C-GLOBAL: void* stdscr
 FUNCTION: WINDOW* initscr ( ) ;
 FUNCTION: int endwin ( ) ;
 FUNCTION: bool isendwin ( ) ;
-FUNCTION: SCREEN* newterm ( char* type, FILE* outfd, FILE* infd ) ;
+FUNCTION: SCREEN* newterm ( c-string type, FILE* outfd, FILE* infd ) ;
 FUNCTION: SCREEN* set_term ( SCREEN* new ) ;
 FUNCTION: void delscreen ( SCREEN* sp ) ;
 
@@ -157,21 +157,21 @@ FUNCTION: int mvwgetch ( WINDOW* win, int y, int x ) ;
 FUNCTION: int ungetch ( int ch ) ;
 FUNCTION: int has_key ( int ch ) ;
 
-FUNCTION: int getstr ( char* str ) ;
-FUNCTION: int getnstr ( char* str, int n ) ;
-FUNCTION: int wgetstr ( WINDOW* win, char* str ) ;
-FUNCTION: int wgetnstr ( WINDOW* win, char* str, int n ) ;
-FUNCTION: int mvgetstr ( int y, int x, char* str ) ;
-FUNCTION: int mvwgetstr ( WINDOW* win, int y, int x, char* str ) ;
-FUNCTION: int mvgetnstr ( int y, int x, char* str, int n ) ;
-FUNCTION: int mvwgetnstr ( WINDOW* win, int y, int x, char* str, int n ) ;
+FUNCTION: int getstr ( c-string str ) ;
+FUNCTION: int getnstr ( c-string str, int n ) ;
+FUNCTION: int wgetstr ( WINDOW* win, c-string str ) ;
+FUNCTION: int wgetnstr ( WINDOW* win, c-string str, int n ) ;
+FUNCTION: int mvgetstr ( int y, int x, c-string str ) ;
+FUNCTION: int mvwgetstr ( WINDOW* win, int y, int x, c-string str ) ;
+FUNCTION: int mvgetnstr ( int y, int x, c-string str, int n ) ;
+FUNCTION: int mvwgetnstr ( WINDOW* win, int y, int x, c-string str, int n ) ;
 
-FUNCTION: int printw ( char* fmt, int lol ) ;
-FUNCTION: int wprintw ( WINDOW* win, char* fmt, int lol ) ;
-FUNCTION: int mvprintw ( int y, int x, char* fmt, int lol ) ;
-FUNCTION: int mvwprintw ( WINDOW* win, int y, int x, char* fmt, int lol ) ;
-FUNCTION: int vwprintw ( WINDOW* win, char* fmt, va_list varglist ) ;
-FUNCTION: int vw_printw ( WINDOW* win, char* fmt, va_list varglist ) ;
+FUNCTION: int printw ( c-string fmt, int lol ) ;
+FUNCTION: int wprintw ( WINDOW* win, c-string fmt, int lol ) ;
+FUNCTION: int mvprintw ( int y, int x, c-string fmt, int lol ) ;
+FUNCTION: int mvwprintw ( WINDOW* win, int y, int x, c-string fmt, int lol ) ;
+FUNCTION: int vwprintw ( WINDOW* win, c-string fmt, va_list varglist ) ;
+FUNCTION: int vw_printw ( WINDOW* win, c-string fmt, va_list varglist ) ;
 
 FUNCTION: int move ( int y, int x ) ;
 FUNCTION: int wmove ( WINDOW* win, int y, int x ) ;
@@ -221,11 +221,11 @@ FUNCTION: int winsdelln ( WINDOW* win, int n ) ;
 FUNCTION: int insertln ( ) ;
 FUNCTION: int winsertln ( WINDOW* win ) ;
 
-FUNCTION: int addstr ( char* str ) ;
-FUNCTION: int addnstr ( char* str, int n ) ;
-FUNCTION: int waddstr ( WINDOW* win, char* str ) ;
-FUNCTION: int waddnstr ( WINDOW* win, char* str, int n ) ;
-FUNCTION: int mvaddstr ( int y, int x, char* str ) ;
-FUNCTION: int mvaddnstr ( int y, int x, char* str, int n ) ;
-FUNCTION: int mvwaddstr ( WINDOW* win, int y, int x, char* str ) ;
-FUNCTION: int mvwaddnstr ( WINDOW* win, int y, int x, char* str, int n ) ;
+FUNCTION: int addstr ( c-string str ) ;
+FUNCTION: int addnstr ( c-string str, int n ) ;
+FUNCTION: int waddstr ( WINDOW* win, c-string str ) ;
+FUNCTION: int waddnstr ( WINDOW* win, c-string str, int n ) ;
+FUNCTION: int mvaddstr ( int y, int x, c-string str ) ;
+FUNCTION: int mvaddnstr ( int y, int x, c-string str, int n ) ;
+FUNCTION: int mvwaddstr ( WINDOW* win, int y, int x, c-string str ) ;
+FUNCTION: int mvwaddnstr ( WINDOW* win, int y, int x, c-string str, int n ) ;
