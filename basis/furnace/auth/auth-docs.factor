@@ -121,6 +121,7 @@ $nl
     "furnace.auth.providers.null"
     "furnace.auth.providers.assoc"
     "furnace.auth.providers.db"
+    "furnace.auth.providers.couchdb"
 } ;
 
 ARTICLE: "furnace.auth.features" "Optional authentication features"
