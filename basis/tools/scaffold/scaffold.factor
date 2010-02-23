@@ -267,6 +267,9 @@ PRIVATE>
 : scaffold-summary ( vocab summary -- )
     [ "summary.txt" ] dip scaffold-metadata ;
 
+: scaffold-platforms ( vocab platforms -- )
+    [ "platforms.txt" ] dip scaffold-metadata ;
+
 : scaffold-vocab ( vocab-root string -- )
     {
         [ scaffold-directory ]
