@@ -46,8 +46,14 @@ IN: alien.parser
         "callback-library"
     } reset-props ;
 
+ERROR: *-in-c-type-name name ;
+
+: validate-c-type-name ( name -- name )
+    dup "*" tail?
+    [ *-in-c-type-name ] when ;
+
 : CREATE-C-TYPE ( -- word )
-    scan current-vocab create {
+    scan validate-c-type-name current-vocab create {
         [ fake-definition ]
         [ set-word ]
         [ reset-c-type ]
