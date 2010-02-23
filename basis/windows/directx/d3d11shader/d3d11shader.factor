@@ -152,6 +152,9 @@ COM-INTERFACE: ID3D11ShaderReflectionType f {6E6FFA6A-9BAE-4613-A51E-91652D508C2
     HRESULT IsOfType ( ID3D11ShaderReflectionType* pType )
     HRESULT ImplementsInterface ( ID3D11ShaderReflectionType* pBase ) ;
 
+C-TYPE: ID3D11ShaderReflectionType
+C-TYPE: ID3D11ShaderReflectionConstantBuffer
+
 COM-INTERFACE: ID3D11ShaderReflectionVariable f {51F23923-F3E5-4BD1-91CB-606177D8DB4C}
     HRESULT GetDesc ( D3D11_SHADER_VARIABLE_DESC* pDesc )
     ID3D11ShaderReflectionType* GetType ( )
