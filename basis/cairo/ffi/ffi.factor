@@ -788,7 +788,7 @@ cairo_format_stride_for_width ( cairo_format_t format, int width ) ;
 FUNCTION: cairo_surface_t*
 cairo_image_surface_create_for_data ( char* data, cairo_format_t format, int width, int height, int stride ) ;
 
-FUNCTION: c-string
+FUNCTION: uchar*
 cairo_image_surface_get_data ( cairo_surface_t* surface ) ;
 
 FUNCTION: cairo_format_t
