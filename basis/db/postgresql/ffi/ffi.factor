@@ -63,7 +63,6 @@ C-TYPE: PGconn
 C-TYPE: PGresult
 C-TYPE: PGcancel
 TYPEDEF: uint Oid
-TYPEDEF: uint* Oid*
 TYPEDEF: char pqbool
 C-TYPE: PQconninfoOption
 C-TYPE: PGnotify
