@@ -11,7 +11,7 @@ TYPEDEF: uchar               UCHAR
 TYPEDEF: uchar               BYTE
 
 TYPEDEF: ushort              wchar_t
-TYPEDEF: { char* utf16n }    wchar_t*
+<< { char* utf16n } pointer: wchar_t typedef >>
 
 TYPEDEF: wchar_t             WCHAR
 
