@@ -512,9 +512,9 @@ FUNCTION: void cpArbiterIgnore ( cpArbiter* arb ) ;
 
 TYPED: cpArbiterGetShapes ( arb: cpArbiter -- a: cpShape b: cpShape )
     dup swappedColl>> 0 = [
-        [ a>> cpShape memory>struct ] [ b>> cpShape memory>struct ] bi
+        [ a>> ] [ b>> ] bi
     ] [
-        [ b>> cpShape memory>struct ] [ a>> cpShape memory>struct ] bi
+        [ b>> ] [ a>> ] bi
     ] if ; inline
 
 TYPED: cpArbiterIsFirstContact ( arb: cpArbiter -- ? )
