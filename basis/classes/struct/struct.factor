@@ -8,7 +8,8 @@ generalizations generic.parser kernel kernel.private lexer libc
 locals macros make math math.order parser quotations sequences
 slots slots.private specialized-arrays vectors words summary
 namespaces assocs vocabs.parser math.functions
-classes.struct.bit-accessors bit-arrays ;
+classes.struct.bit-accessors bit-arrays
+stack-checker.dependencies ;
 QUALIFIED: math
 IN: classes.struct
 
@@ -124,6 +125,14 @@ M: struct-bit-slot-spec (writer-quot)
 
 : (unboxer-quot) ( class -- quot )
     drop [ >c-ptr ] ;
+
+MACRO: read-struct-slot ( slot -- )
+    dup type>> depends-on-c-type
+    (reader-quot) ;
+
+MACRO: write-struct-slot ( slot -- )
+    dup type>> depends-on-c-type
+    (writer-quot) ;
 PRIVATE>
 
 M: struct-class boa>object
@@ -138,10 +147,11 @@ M: struct-class initial-value* <struct> ; inline
 GENERIC: struct-slot-values ( struct -- sequence )
 
 M: struct-class reader-quot
-    nip (reader-quot) ;
+    dup array? [ dup first define-array-vocab drop ] when
+    nip '[ _ read-struct-slot ] ;
 
 M: struct-class writer-quot
-    nip (writer-quot) ;
+    nip '[ _ write-struct-slot ] ;
 
 : offset-of ( field struct -- offset )
     struct-slots slot-named offset>> ; inline

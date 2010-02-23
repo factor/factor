@@ -18,22 +18,23 @@ IN: alien.parser
     {
         { [ dup "void" =         ] [ drop void ] }
         { [ CHAR: ] over member? ] [ parse-array-type parse-c-type-name prefix ] }
+        { [ "*" ?tail            ] [ (parse-c-type) <pointer> ] }
         { [ dup search           ] [ parse-c-type-name ] }
-        { [ "**" ?tail           ] [ drop void* ] }
-        { [ "*" ?tail            ] [ parse-c-type-name resolve-pointer-type ] }
         [ dup search [ ] [ no-word ] ?if ]
     } cond ;
 
 : valid-c-type? ( c-type -- ? )
-    { [ array? ] [ c-type-name? ] [ void? ] } 1|| ;
+    { [ array? ] [ c-type-word? ] [ pointer? ] [ void? ] } 1|| ;
 
 : parse-c-type ( string -- type )
     (parse-c-type) dup valid-c-type? [ no-c-type ] unless ;
 
 : scan-c-type ( -- c-type )
-    scan dup "{" =
-    [ drop \ } parse-until >array ]
-    [ parse-c-type ] if ; 
+    scan {
+        { [ dup "{" = ] [ drop \ } parse-until >array ] }
+        { [ dup "pointer:" = ] [ drop scan-c-type <pointer> ] }
+        [ parse-c-type ]
+    } cond ; 
 
 : reset-c-type ( word -- )
     dup "struct-size" word-prop
@@ -61,12 +62,20 @@ IN: alien.parser
     ] bi
     [ parse-c-type ] dip ;
 
+<PRIVATE
+GENERIC: return-type-name ( type -- name )
+
+M: object return-type-name drop "void" ;
+M: word return-type-name name>> ;
+M: pointer return-type-name to>> return-type-name CHAR: * suffix ;
+PRIVATE>
+
 : parse-arglist ( parameters return -- types effect )
     [
         2 group [ first2 normalize-c-arg 2array ] map
         unzip [ "," ?tail drop ] map
     ]
-    [ [ { } ] [ name>> 1array ] if-void ]
+    [ [ { } ] [ return-type-name 1array ] if-void ]
     bi* <effect> ;
 
 : function-quot ( return library function types -- quot )

@@ -47,6 +47,9 @@ M: c-type-word depends-on-c-type depends-on-definition ;
 M: array depends-on-c-type
     [ word? ] filter [ depends-on-definition ] each ;
 
+M: pointer depends-on-c-type
+    to>> depends-on-c-type ;
+
 ! Generic words that the current quotation depends on
 SYMBOL: generic-dependencies
 
