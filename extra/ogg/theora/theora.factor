@@ -53,7 +53,7 @@ STRUCT: th-img-plane
     { width int }
     { height int }
     { stride int }
-    { data c-string }
+    { data uchar* }
 ;
 
 TYPEDEF: th-img-plane[3] th-ycbcr-buffer

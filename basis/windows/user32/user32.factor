@@ -1352,7 +1352,7 @@ ALIAS: GetWindowLong GetWindowLongW
 FUNCTION: BOOL GetWindowRect ( HWND hWnd, LPRECT lpRect ) ;
 ! FUNCTION: GetWindowRgn
 ! FUNCTION: GetWindowRgnBox
-FUNCTION: int GetWindowTextA ( HWND hWnd, c-string lpString, int nMaxCount ) ;
+FUNCTION: int GetWindowTextA ( HWND hWnd, char* lpString, int nMaxCount ) ;
 ! FUNCTION: GetWindowTextLengthA
 ! FUNCTION: GetWindowTextLengthW
 ! FUNCTION: GetWindowTextW
