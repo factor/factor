@@ -464,7 +464,7 @@ STRUCT: XImage
 { height int }
 { xoffset int }
 { format int }
-{ data c-string }
+{ data uchar* }
 { byte_order int }
 { bitmap_unit int }
 { bitmap_bit_order int }
