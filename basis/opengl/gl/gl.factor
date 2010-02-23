@@ -22,7 +22,7 @@ TYPEDEF: float   GLfloat
 TYPEDEF: float   GLclampf
 TYPEDEF: double  GLdouble
 TYPEDEF: double  GLclampd
-TYPEDEF: void*   GLvoid*
+C-TYPE: GLvoid
 
 ! Constants
 

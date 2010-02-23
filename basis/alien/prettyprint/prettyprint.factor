@@ -19,11 +19,24 @@ M: c-type-word definer drop \ C-TYPE: f ;
 M: c-type-word definition drop f ;
 M: c-type-word declarations. drop ;
 
+<PRIVATE
+GENERIC: pointer-string ( pointer -- string/f )
+M: object pointer-string drop f ;
+M: word pointer-string name>> ;
+M: pointer pointer-string to>> pointer-string [ CHAR: * suffix ] [ f ] if* ;
+PRIVATE>
+
 GENERIC: pprint-c-type ( c-type -- )
 M: word pprint-c-type pprint-word ;
+M: pointer pprint-c-type
+    dup pointer-string
+    [ swap present-text ]
+    [ pprint* ] if* ;
 M: wrapper pprint-c-type wrapped>> pprint-word ;
 M: string pprint-c-type text ;
 M: array pprint-c-type pprint* ;
+
+M: pointer pprint* \ pointer: pprint-word to>> pprint-c-type ;
 
 M: typedef-word definer drop \ TYPEDEF: f ;
 
