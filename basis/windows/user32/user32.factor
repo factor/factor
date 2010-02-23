@@ -1186,8 +1186,8 @@ FUNCTION: UINT EnumClipboardFormats ( UINT format ) ;
 ! FUNCTION: ExcludeUpdateRgn
 ! FUNCTION: ExitWindowsEx
 FUNCTION: int FillRect ( HDC hDC, RECT* lprc, HBRUSH hbr ) ;
-FUNCTION: HWND FindWindowA ( char* lpClassName, char* lpWindowName ) ;
-FUNCTION: HWND FindWindowExA ( HWND hwndParent, HWND childAfter, char* lpClassName, char* lpWindowName ) ;
+FUNCTION: HWND FindWindowA ( c-string lpClassName, c-string lpWindowName ) ;
+FUNCTION: HWND FindWindowExA ( HWND hwndParent, HWND childAfter, c-string lpClassName, c-string lpWindowName ) ;
 ! FUNCTION: FindWindowExW
 ! FUNCTION: FindWindowW
 ! FUNCTION: FlashWindow
@@ -1352,7 +1352,7 @@ ALIAS: GetWindowLong GetWindowLongW
 FUNCTION: BOOL GetWindowRect ( HWND hWnd, LPRECT lpRect ) ;
 ! FUNCTION: GetWindowRgn
 ! FUNCTION: GetWindowRgnBox
-FUNCTION: int GetWindowTextA ( HWND hWnd, char* lpString, int nMaxCount ) ;
+FUNCTION: int GetWindowTextA ( HWND hWnd, c-string lpString, int nMaxCount ) ;
 ! FUNCTION: GetWindowTextLengthA
 ! FUNCTION: GetWindowTextLengthW
 ! FUNCTION: GetWindowTextW

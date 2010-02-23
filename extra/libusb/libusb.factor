@@ -128,7 +128,7 @@ STRUCT: libusb_endpoint_descriptor
     { bInterval         uint8_t  }
     { bRefresh          uint8_t  }
     { bSynchAddress     uint8_t  }
-    { extra             uchar*   }
+    { extra             c-string   }
     { extra_length      int      } ;
 
 STRUCT: libusb_interface_descriptor
@@ -142,7 +142,7 @@ STRUCT: libusb_interface_descriptor
     { bInterfaceProtocol  uint8_t                     }
     { iInterface          uint8_t                     }
     { endpoint            libusb_endpoint_descriptor* }
-    { extra               uchar*                      }
+    { extra               c-string                      }
     { extra_length        int                         } ;
 
 STRUCT: libusb_interface
@@ -159,7 +159,7 @@ STRUCT: libusb_config_descriptor
     { bmAttributes         uint8_t           }
     { MaxPower             uint8_t           }
     { interface            libusb_interface* }
-    { extra                uchar*            }
+    { extra                c-string            }
     { extra_length         int               } ;
 
 STRUCT: libusb_control_setup
@@ -227,7 +227,7 @@ STRUCT: libusb_transfer
     { actual_length   int                             }
     { callback        libusb_transfer_cb_fn           }
     { user_data       void*                           }
-    { buffer          uchar*                          }
+    { buffer          c-string                          }
     { num_iso_packets int                             }
     { iso_packet_desc libusb_iso_packet_descriptor[0] } ;
 
@@ -370,14 +370,14 @@ FUNCTION: void libusb_free_transfer ( libusb_transfer* transfer ) ;
 
 FUNCTION: int libusb_control_transfer ( libusb_device_handle* dev_handle,
     uint8_t request_type, uint8_t request, uint16_t value, uint16_t index,
-    uchar* data, uint16_t length, uint timeout ) ;
+    c-string data, uint16_t length, uint timeout ) ;
 
 FUNCTION: int libusb_bulk_transfer ( libusb_device_handle* dev_handle,
-    uchar endpoint, uchar* data, int length,
+    uchar endpoint, c-string data, int length,
     int* actual_length, uint timeout ) ;
 
 FUNCTION: int libusb_interrupt_transfer ( libusb_device_handle* dev_handle,
-    uchar endpoint, uchar* data, int length,
+    uchar endpoint, c-string data, int length,
     int* actual_length, int timeout ) ;
 
 :: libusb_get_descriptor ( dev desc_type desc_index data length -- int )
@@ -392,7 +392,7 @@ FUNCTION: int libusb_interrupt_transfer ( libusb_device_handle* dev_handle,
 
 FUNCTION: int libusb_get_string_descriptor_ascii ( libusb_device_handle* dev,
                                                    uint8_t               index,
-                                                   uchar*                data,
+                                                   c-string                data,
                                                    int                   length ) ;
 
 FUNCTION: int libusb_try_lock_events ( libusb_context* ctx ) ;

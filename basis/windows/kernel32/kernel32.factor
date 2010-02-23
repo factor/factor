@@ -1352,7 +1352,7 @@ FUNCTION: DWORD GetPriorityClass ( HANDLE hProcess ) ;
 ! FUNCTION: GetPrivateProfileStringW
 ! FUNCTION: GetPrivateProfileStructA
 ! FUNCTION: GetPrivateProfileStructW
-FUNCTION: LPVOID GetProcAddress ( HMODULE hModule, char* lpProcName ) ;
+FUNCTION: LPVOID GetProcAddress ( HMODULE hModule, c-string lpProcName ) ;
 ! FUNCTION: GetProcessAffinityMask
 ! FUNCTION: GetProcessHandleCount
 ! FUNCTION: GetProcessHeap

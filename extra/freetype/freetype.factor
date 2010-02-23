@@ -83,7 +83,7 @@ STRUCT: glyph
     { n-points short }
 
     { points void* }
-    { tags char* }
+    { tags c-string }
     { contours short* }
 
     { outline-flags int }
