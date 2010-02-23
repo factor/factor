@@ -288,7 +288,7 @@ CONSTANT: primitive-types
     }
 
 : (pointer-c-type) ( void* type -- void*' )
-    [ clone ] dip c-type-boxer-quot >>boxer-quot ;
+    [ clone ] dip c-type-boxer-quot '[ _ [ f ] if* ] >>boxer-quot ;
 
 <PRIVATE
 
