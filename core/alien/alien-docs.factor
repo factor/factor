@@ -42,7 +42,7 @@ HELP: <alien>
 { $notes "Alien objects are invalidated between image saves and loads." } ;
 
 HELP: c-ptr
-{ $class-description "Class of objects consisting of aliens, byte arrays and " { $link f } ". These objects can convert to pointer C types, which are all aliases of " { $snippet "void*" } "." } ;
+{ $class-description "Class of objects consisting of aliens, byte arrays and " { $link f } ". These objects all can be used as values of " { $link pointer } " C types." } ;
 
 HELP: alien-invoke-error
 { $error-description "Thrown if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
@@ -136,7 +136,7 @@ ARTICLE: "aliens" "Alien addresses"
 }
 "Anywhere that a " { $link alien } " instance is accepted, the " { $link f } " singleton may be passed in to denote a null pointer."
 $nl
-"Usually alien objects do not have to created and dereferenced directly; instead declaring C function parameters and return values as having a pointer type such as " { $snippet "void*" } " takes care of the details."
+"Usually alien objects do not have to created and dereferenced directly; instead declaring C function parameters and return values as having a " pointer type such as " { $snippet "void*" } " takes care of the details."
 { $subsections
     "syntax-aliens"
     "alien-expiry"
