@@ -141,7 +141,7 @@ STRUCT: timeval
     { sec long }
     { usec long } ;
 
-TYPEDEF: void* fd_set*
+C-TYPE: fd_set
 
 LIBRARY: winsock
 
