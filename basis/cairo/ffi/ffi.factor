@@ -38,7 +38,7 @@ TYPEDEF: void* cairo_pattern_t
 
 TYPEDEF: void* cairo_destroy_func_t
 : cairo-destroy-func ( quot -- callback )
-    [ void { void* } "cdecl" ] dip alien-callback ; inline
+    [ void { pointer: void } "cdecl" ] dip alien-callback ; inline
 
 ! See cairo.h for details
 STRUCT: cairo_user_data_key_t
@@ -79,11 +79,11 @@ CONSTANT: CAIRO_CONTENT_COLOR_ALPHA HEX: 3000
 
 TYPEDEF: void* cairo_write_func_t
 : cairo-write-func ( quot -- callback )
-    [ cairo_status_t { void* uchar* int } "cdecl" ] dip alien-callback ; inline
+    [ cairo_status_t { pointer: void pointer: uchar int } "cdecl" ] dip alien-callback ; inline
                           
 TYPEDEF: void* cairo_read_func_t
 : cairo-read-func ( quot -- callback )
-    [ cairo_status_t { void* uchar* int } "cdecl" ] dip alien-callback ; inline
+    [ cairo_status_t { pointer: void pointer: uchar int } "cdecl" ] dip alien-callback ; inline
 
 ! Functions for manipulating state objects
 FUNCTION: cairo_t*
