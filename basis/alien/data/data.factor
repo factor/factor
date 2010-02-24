@@ -49,7 +49,7 @@ M: word <c-direct-array>
     heap-size malloc ; inline
 
 : malloc-byte-array ( byte-array -- alien )
-    dup byte-length [ nip malloc dup ] 2keep memcpy ;
+    binary-object [ nip malloc dup ] 2keep memcpy ;
 
 : memory>byte-array ( alien len -- byte-array )
     [ nip (byte-array) dup ] 2keep memcpy ;
@@ -63,14 +63,12 @@ M: memory-stream stream-read
         swap memory>byte-array
     ] [ [ + ] change-index drop ] 2bi ;
 
-: byte-array>memory ( byte-array base -- )
-    swap dup byte-length memcpy ; inline
-
 M: byte-vector stream-write
-    [ binary-object ] dip
-    [ [ length + ] keep lengthen drop ]
-    [ '[ _ underlying>> ] 2dip memcpy ]
-    3bi ;
+    [ dup byte-length tail-slice ]
+    [ [ [ byte-length ] bi@ + ] keep lengthen ]
+    [ drop byte-length ]
+    2tri
+    [ >c-ptr swap >c-ptr ] dip memcpy ;
 
 M: value-type c-type-rep drop int-rep ;
 

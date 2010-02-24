@@ -6,6 +6,7 @@ IN: io.streams.byte-array.tests
 
 [ B{ } ] [ B{ } binary [ contents ] with-byte-reader ] unit-test
 [ B{ 1 2 3 } ] [ binary [ B{ 1 2 3 } write ] with-byte-writer ] unit-test
+[ B{ 1 2 3 4 5 6 } ] [ binary [ B{ 1 2 3 } write B{ 4 5 6 } write ] with-byte-writer ] unit-test
 [ B{ 1 2 3 } ] [ { 1 2 3 } binary [ 3 read ] with-byte-reader ] unit-test
 
 [ B{ BIN: 11110101 BIN: 10111111 BIN: 10000000 BIN: 10111111 BIN: 11101111 BIN: 10000000 BIN: 10111111 BIN: 11011111 BIN: 10000000 CHAR: x } ]
