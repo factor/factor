@@ -34,20 +34,22 @@ void factor_vm::io_error()
 FILE *factor_vm::safe_fopen(char *filename, char *mode)
 {
 	FILE *file;
-	do {
+	for(;;)
+	{
 		file = fopen(filename,mode);
 		if(file == NULL)
 			io_error();
 		else
 			break;
-	} while(errno == EINTR);
+	}
 	return file;
 }
 
 int factor_vm::safe_fgetc(FILE *stream)
 {
 	int c;
-	do {
+	for(;;)
+	{
 		c = fgetc(stream);
 		if(c == EOF)
 		{
@@ -58,38 +60,53 @@ int factor_vm::safe_fgetc(FILE *stream)
 		}
 		else
 			break;
-	} while(errno == EINTR);
+	}
 	return c;
 }
 
 size_t factor_vm::safe_fread(void *ptr, size_t size, size_t nitems, FILE *stream)
 {
 	size_t items_read = 0;
+	size_t ret = 0;
 
-	do {
-		items_read += fread((void*)((int*)ptr+items_read*size),size,nitems-items_read,stream);
-	} while(items_read != nitems && errno == EINTR);
+	do
+	{
+		ret = fread((void*)((int*)ptr+items_read*size),size,nitems-items_read,stream);
+		if(ret == 0)
+		{
+			if(feof(stream))
+				break;
+			else
+				io_error();
+		}
+		items_read += ret;
+	} while(items_read != nitems);
 
 	return items_read;
 }
 
 void factor_vm::safe_fputc(int c, FILE *stream)
 {
-	do {
+	for(;;)
+	{
 		if(fputc(c,stream) == EOF)
 			io_error();
 		else
 			break;
-	} while(errno == EINTR);
+	}
 }
 
 size_t factor_vm::safe_fwrite(void *ptr, size_t size, size_t nitems, FILE *stream)
 {
 	size_t items_written = 0;
+	size_t ret = 0;
 
 	do {
-		items_written += fwrite((void*)((int*)ptr+items_written*size),size,nitems-items_written,stream);
-	} while(items_written != nitems && errno == EINTR);
+		ret = fwrite((void*)((int*)ptr+items_written*size),size,nitems-items_written,stream);
+		if(ret == 0)
+			io_error();
+		items_written += ret;
+	} while(items_written != nitems);
 
 	return items_written;
 }
@@ -97,12 +114,13 @@ size_t factor_vm::safe_fwrite(void *ptr, size_t size, size_t nitems, FILE *strea
 int factor_vm::safe_ftell(FILE *stream)
 {
 	off_t offset;
-	do {
+	for(;;)
+	{
 		if((offset = FTELL(stream)) == -1)
 			io_error();
 		else
 			break;
-	} while(errno == EINTR);
+	}
 	return offset;
 }
 
@@ -117,32 +135,35 @@ void factor_vm::safe_fseek(FILE *stream, off_t offset, int whence)
 		critical_error("Bad value for whence",whence);
 	}
 
-	do {
+	for(;;)
+	{
 		if(FSEEK(stream,offset,whence) == -1)
 			io_error();
 		else
 			break;
-	} while(errno == EINTR);
+	}
 }
 
 void factor_vm::safe_fflush(FILE *stream)
 {
-	do {
+	for(;;)
+	{
 		if(fflush(stream) == EOF)
 			io_error();
 		else
 			break;
-	} while(errno == EINTR);
+	}
 }
 
 void factor_vm::safe_fclose(FILE *stream)
 {
-	do {
+	for(;;)
+	{
 		if(fclose(stream) == EOF)
 			io_error();
 		else
 			break;
-	} while(errno == EINTR);
+	}
 }
 
 void factor_vm::primitive_fopen()
@@ -189,12 +210,7 @@ void factor_vm::primitive_fread()
 
 	int c = safe_fread(buf.untagged() + 1,1,size,file);
 	if(c == 0)
-	{
-		if(feof(file))
-			ctx->push(false_object);
-		else
-			io_error();
-	}
+		ctx->push(false_object);
 	else
 	{
 		if(feof(file))
