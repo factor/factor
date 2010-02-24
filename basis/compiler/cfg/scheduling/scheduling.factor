@@ -58,8 +58,11 @@ ERROR: bad-delete-at key assoc ;
 : cut-by ( seq quot -- before after )
     dupd find drop [ cut ] [ f ] if* ; inline
 
+UNION: initial-insn
+    ##phi ##inc-d ##inc-r ;
+
 : split-3-ways ( insns -- first middle last )
-    [ ##phi? not ] cut-by unclip-last ;
+    [ initial-insn? not ] cut-by unclip-last ;
 
 : reorder ( insns -- insns' )
     split-3-ways [
