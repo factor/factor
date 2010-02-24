@@ -218,14 +218,13 @@ void factor_vm::primitive_fputc()
 void factor_vm::primitive_fwrite()
 {
 	FILE *file = pop_file_handle();
-	byte_array *text = untag_check<byte_array>(ctx->pop());
-	cell length = array_capacity(text);
-	char *string = (char *)(text + 1);
+	cell length = to_cell(ctx->pop());
+	char *text = alien_offset(ctx->pop());
 
 	if(length == 0)
 		return;
 
-	size_t written = safe_fwrite(string,1,length,file);
+	size_t written = safe_fwrite(text,1,length,file);
 	if(written != length)
 		io_error();
 }
@@ -238,8 +237,8 @@ void factor_vm::primitive_ftell()
 
 void factor_vm::primitive_fseek()
 {
-	int whence = to_fixnum(ctx->pop());
 	FILE *file = pop_file_handle();
+	int whence = to_fixnum(ctx->pop());
 	off_t offset = to_signed_8(ctx->pop());
 	safe_fseek(file,offset,whence);
 }

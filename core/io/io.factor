@@ -15,7 +15,7 @@ GENERIC: stream-read-partial ( n stream -- seq )
 GENERIC: stream-readln ( stream -- str/f )
 
 GENERIC: stream-write1 ( elt stream -- )
-GENERIC: stream-write ( seq stream -- )
+GENERIC: stream-write ( data stream -- )
 GENERIC: stream-flush ( stream -- )
 GENERIC: stream-nl ( stream -- )
 

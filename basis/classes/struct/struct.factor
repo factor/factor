@@ -46,11 +46,11 @@ M: struct >c-ptr
 M: struct equal?
     {
         [ [ class ] bi@ = ]
-        [ [ >c-ptr ] [ [ >c-ptr ] [ byte-length ] bi ] bi* memory= ]
+        [ [ >c-ptr ] [ binary-object ] bi* memory= ]
     } 2&& ; inline
 
 M: struct hashcode*
-    [ >c-ptr ] [ byte-length ] bi <direct-uchar-array> hashcode* ; inline    
+    binary-object <direct-uchar-array> hashcode* ; inline
 
 : struct-prototype ( class -- prototype ) "prototype" word-prop ; foldable
 
@@ -137,7 +137,7 @@ PRIVATE>
 
 M: struct-class boa>object
     swap pad-struct-slots
-    [ <struct> ] [ struct-slots ] bi 
+    [ <struct> ] [ struct-slots ] bi
     [ [ (writer-quot) call( value struct -- ) ] with 2each ] curry keep ;
 
 M: struct-class initial-value* <struct> ; inline
@@ -203,7 +203,7 @@ M: struct-c-type c-struct? drop t ;
     define-inline-method ;
 
 : clone-underlying ( struct -- byte-array )
-    [ >c-ptr ] [ byte-length ] bi memory>byte-array ; inline
+    binary-object memory>byte-array ; inline
 
 : (define-clone-method) ( class -- )
     [ \ clone ]
@@ -353,7 +353,7 @@ PRIVATE>
 <PRIVATE
 : parse-struct-slot ( -- slot )
     scan scan-c-type \ } parse-until <struct-slot-spec> ;
-    
+
 : parse-struct-slots ( slots -- slots' more? )
     scan {
         { ";" [ f ] }

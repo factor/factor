@@ -1,9 +1,9 @@
-USING: accessors alien.c-types arrays byte-arrays classes combinators
+USING: accessors alien arrays byte-arrays classes combinators
 cpu.architecture effects fry functors generalizations generic
 generic.parser kernel lexer literals macros math math.functions
-math.vectors math.vectors.private math.vectors.simd.intrinsics namespaces parser
-prettyprint.custom quotations sequences sequences.private vocabs
-vocabs.loader words ;
+math.vectors math.vectors.private math.vectors.simd.intrinsics
+namespaces parser prettyprint.custom quotations sequences
+sequences.private vocabs vocabs.loader words ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd
 
@@ -107,7 +107,7 @@ PRIVATE>
 
 M: simd-128 hashcode* underlying>> hashcode* ; inline
 M: simd-128 clone [ clone ] change-underlying ; inline
-M: simd-128 c:byte-length drop 16 ; inline
+M: simd-128 byte-length drop 16 ; inline
 
 M: simd-128 new-sequence
     2dup length =
@@ -243,7 +243,7 @@ A{     DEFINES       ${T}{
 
 ELT     [ A-rep rep-component-type ]
 N       [ A-rep rep-length ]
-COERCER [ ELT c-type-class "coercer" word-prop [ ] or ]
+COERCER [ ELT c:c-type-class "coercer" word-prop [ ] or ]
 
 SET-NTH [ ELT dup c:c-setter c:array-accessor ]
 
