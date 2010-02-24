@@ -117,8 +117,7 @@ M: byte-array bit-count
     byte-array-bit-count ;
 
 M: object bit-count
-    [ >c-ptr ] [ byte-length ] bi <direct-uchar-array>
-    byte-array-bit-count ;
+    binary-object <direct-uchar-array> byte-array-bit-count ;
 
 : even-parity? ( obj -- ? ) bit-count even? ;
 

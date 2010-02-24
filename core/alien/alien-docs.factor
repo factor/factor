@@ -1,8 +1,18 @@
 USING: byte-arrays arrays help.syntax help.markup
 alien.syntax compiler definitions math libc eval
 debugger parser io io.backend system alien.accessors
-alien.libraries alien.c-types quotations ;
+alien.libraries alien.c-types quotations kernel ;
 IN: alien
+
+HELP: >c-ptr
+{ $values { "object" object } { "c-ptr" c-ptr } }
+{ $contract "Outputs a pointer to the binary data of this object." } ;
+
+HELP: byte-length
+{ $values { "object" object } { "n" "a non-negative integer" } }
+{ $contract "Outputs the number of bytes of binary data that will be output by " { $link >c-ptr } "." } ;
+
+{ >c-ptr byte-length } related-words
 
 HELP: alien
 { $class-description "The class of alien pointers. See " { $link "syntax-aliens" } " for syntax and " { $link "c-data" } " for general information." } ;
