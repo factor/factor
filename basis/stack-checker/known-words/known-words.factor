@@ -652,15 +652,15 @@ M: bad-executable summary
 
 \ fgetc { alien } { object } define-primitive
 
-\ fwrite { string alien } { } define-primitive
+\ fwrite { c-ptr integer alien } { } define-primitive
 
 \ fputc { object alien } { } define-primitive
 
-\ fread { integer string } { object } define-primitive
+\ fread { integer alien } { object } define-primitive
 
 \ fflush { alien } { } define-primitive
 
-\ fseek { alien integer integer } { } define-primitive
+\ fseek { integer integer alien } { } define-primitive
 
 \ ftell { alien } { integer } define-primitive
 

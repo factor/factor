@@ -193,12 +193,6 @@ M: c-type-name stack-size c-type stack-size ;
 
 M: c-type stack-size size>> cell align ;
 
-GENERIC: byte-length ( seq -- n ) flushable
-
-M: byte-array byte-length length ; inline
-
-M: f byte-length drop 0 ; inline
-
 : >c-bool ( ? -- int ) 1 0 ? ; inline
 
 : c-bool> ( int -- ? ) 0 = not ; inline
