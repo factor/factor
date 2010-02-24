@@ -1617,8 +1617,8 @@ ARTICLE: "sequences-destructive-discussion" "When to use destructive operations"
 }
 "The second reason is much weaker than the first one. In particular, many combinators (see " { $link map } ", " { $link produce } " and " { $link "namespaces-make" } ") as well as more advanced data structures (such as " { $vocab-link "persistent.vectors" } ") alleviate the need for explicit use of side effects." ;
 
-ARTICLE: "sequences-destructive" "Destructive operations"
-"Many operations have constructive and destructive variants:"
+ARTICLE: "sequences-destructive" "Destructive sequence operations"
+"Many operations have destructive variants that side effect an input sequence, instead of creating a new sequence:"
 { $table
     { "Constructive" "Destructive" }
     { { $link suffix } { $link suffix! } }
@@ -1641,10 +1641,14 @@ ARTICLE: "sequences-destructive" "Destructive operations"
     delete-all
     filter!
 }
+"Adding elements:"
+{ $subsections
+    suffix!
+    append!
+}
 "Other destructive words:"
 { $subsections
     reverse!
-    append!
     move
     exchange
     copy
