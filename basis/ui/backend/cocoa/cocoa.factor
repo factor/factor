@@ -213,6 +213,16 @@ M: cocoa-ui-backend offscreen-pixels ( world -- alien w h )
 M: cocoa-ui-backend beep ( -- )
     NSBeep ;
 
+M: cocoa-ui-backend system-alert
+    NSAlert -> alloc -> init -> autorelease [
+        {
+            [ swap <NSString> -> setInformativeText: ]
+            [ swap <NSString> -> setMessageText: ]
+            [ "OK" <NSString> -> addButtonWithTitle: drop ]
+            [ -> runModal drop ]
+        } cleave
+    ] [ 2drop ] if* ;
+
 CLASS: {
     { +superclass+ "NSObject" }
     { +name+ "FactorApplicationDelegate" }
