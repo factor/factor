@@ -5,6 +5,7 @@ compiler.cfg.tco
 compiler.cfg.useless-conditionals
 compiler.cfg.branch-splitting
 compiler.cfg.block-joining
+compiler.cfg.height
 compiler.cfg.ssa.construction
 compiler.cfg.alias-analysis
 compiler.cfg.value-numbering
@@ -30,6 +31,7 @@ SYMBOL: check-optimizer?
     delete-useless-conditionals
     split-branches
     join-blocks
+    normalize-height
     construct-ssa
     alias-analysis
     value-numbering
