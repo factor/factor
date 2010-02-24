@@ -62,6 +62,13 @@ IN: tools.deploy.shaker
         run-file
     ] when ;
 
+: strip-ui-error-hook ( -- )
+    strip-debugger? deploy-ui? get and "ui" vocab and [
+        "Installing generic UI error hook" show
+        "vocab:tools/deploy/shaker/strip-ui-error-hook.factor"
+        run-file
+    ] when ;
+
 : strip-libc ( -- )
     "libc" vocab [
         "Stripping manual memory management debug code" show
@@ -372,10 +379,6 @@ IN: tools.deploy.shaker
                 compiler.errors:compiler-errors
                 continuations:thread-error-hook
             } %
-            
-            deploy-ui? get [
-                "ui-error-hook" "ui.gadgets.worlds" lookup ,
-            ] when
         ] when
 
         "windows-messages" "windows.messages" lookup [ , ] when*
@@ -529,6 +532,7 @@ SYMBOL: deploy-vocab
     strip-call
     strip-cocoa
     strip-debugger
+    strip-ui-error-hook
     strip-specialized-arrays
     compute-next-methods
     strip-startup-hooks
