@@ -15,7 +15,7 @@
 					<div class="contents">
 						<t:bind t:name="contents">
 							<h2>
-								<t:a t:href="$wiki/view" t:query="title">
+								<t:a t:href="$wiki/view" t:rest="title">
 									<t:label t:name="title" />
 								</t:a>
 							</h2>
