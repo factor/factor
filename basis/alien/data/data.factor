@@ -1,7 +1,8 @@
-! (c)2009 Slava Pestov, Joe Groff bsd license
+! (c)2009, 2010 Slava Pestov, Joe Groff bsd license
 USING: accessors alien alien.c-types alien.strings arrays
 byte-arrays cpu.architecture fry io io.encodings.binary
-io.files io.streams.memory kernel libc math sequences words ;
+io.files io.streams.memory kernel libc math sequences words
+byte-vectors ;
 IN: alien.data
 
 GENERIC: require-c-array ( c-type -- )
@@ -64,6 +65,12 @@ M: memory-stream stream-read
 
 : byte-array>memory ( byte-array base -- )
     swap dup byte-length memcpy ; inline
+
+M: byte-vector stream-write
+    [ binary-object ] dip
+    [ [ length + ] keep lengthen drop ]
+    [ '[ _ underlying>> ] 2dip memcpy ]
+    3bi ;
 
 M: value-type c-type-rep drop int-rep ;
 
