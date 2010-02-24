@@ -6,10 +6,6 @@ QUALIFIED: math
 QUALIFIED: sequences
 IN: alien.c-types
 
-HELP: byte-length
-{ $values { "seq" "A byte array or float array" } { "n" "a non-negative integer" } }
-{ $contract "Outputs the size of the byte array, struct, or specialized array data in bytes." } ;
-
 HELP: heap-size
 { $values { "name" "a C type name" } { "size" math:integer } }
 { $description "Outputs the number of bytes needed for a heap-allocated value of this C type." }

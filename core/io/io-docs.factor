@@ -1,6 +1,20 @@
 USING: help.markup help.syntax quotations hashtables kernel
-classes strings continuations destructors math byte-arrays ;
+classes strings continuations destructors math byte-arrays
+alien ;
 IN: io
+
+ARTICLE: "stream-types" "Binary and text streams"
+"A word which outputs the stream element type:"
+{ $subsections stream-element-type }
+"Stream element types:"
+{ $subsections +byte+ +character+ }
+"The stream element type is the data type read and written by " { $link stream-read1 } " and " { $link stream-write1 } "."
+$nl
+"Binary streams have an element type of " { $link +byte+ } ". Elements are integers in the range " { $snippet "[0,255]" } ", representing bytes. Reading a sequence of elements produces a " { $link byte-array } ". Any object implementing the " { $link >c-ptr } " and " { $link byte-length } " generic words can be written to a binary stream."
+$nl
+"Character streams have an element tye of " { $link +character+ } ". Elements are non-negative integers, representing Unicode code points. Only instances of the " { $link string } " class can be read or written on a character stream."
+$nl
+"Most external streams are binary streams, and can be wrapped in string streams once a suitable encoding has been provided; see " { $link "io.encodings" } "." ;
 
 HELP: +byte+
 { $description "A stream element type. See " { $link stream-element-type } " for explanation." } ;
@@ -10,15 +24,7 @@ HELP: +character+
 
 HELP: stream-element-type
 { $values { "stream" "a stream" } { "type" { $link +byte+ } " or " { $link +character+ } } }
-{ $description
-  "Outputs one of the following two values:"
-  { $list
-    { { $link +byte+ } " - indicates that stream elements are integers in the range " { $snippet "[0,255]" } "; they represent bytes. Reading a sequence of elements produces a " { $link byte-array } "." }
-    { { $link +character+ } " - indicates that stream elements are non-negative integers, representing Unicode code points. Reading a sequence of elements produces a " { $link string } "." }
-  }
-  "Most external streams are binary streams, and can be wrapped in string streams once a suitable encoding has been provided; see " { $link "io.encodings" } "."
-  
-} ;
+{ $contract "Outputs one of " { $link +byte+ } " or " { $link +character+ } "." } ;
 
 HELP: stream-readln
 { $values { "stream" "an input stream" } { "str/f" "a string or " { $link f } } }
@@ -57,8 +63,8 @@ HELP: stream-write1
 $io-error ;
 
 HELP: stream-write
-{ $values { "seq" "a byte array or string" } { "stream" "an output stream" } }
-{ $contract "Writes a sequence of elements to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
+{ $values { "data" "binary data or a string" } { "stream" "an output stream" } }
+{ $contract "Writes a piece of data to the stream. If the stream performs buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link write } "; see " { $link "stdio" } "." }
 $io-error ;
 
@@ -262,9 +268,7 @@ $nl
 "Stream protocol words are rarely called directly, since code which only works with one stream at a time should be written to use " { $link "stdio" } " instead, wrapping I/O operations such as " { $link read } " and " { $link write } " in " { $link with-input-stream } " and " { $link with-output-stream } "."
 $nl
 "All streams must implement the " { $link dispose } " word in addition to the stream protocol."
-$nl
-"The following word is required for all input and output streams:"
-{ $subsections stream-element-type }
+{ $subsections "stream-types" }
 "These words are required for binary and string input streams:"
 { $subsections
     stream-read1
