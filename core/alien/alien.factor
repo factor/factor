@@ -8,9 +8,18 @@ PREDICATE: pinned-alien < alien underlying>> not ;
 
 UNION: pinned-c-ptr pinned-alien POSTPONE: f ;
 
-GENERIC: >c-ptr ( obj -- c-ptr )
+GENERIC: >c-ptr ( obj -- c-ptr ) flushable
 
 M: c-ptr >c-ptr ; inline
+
+GENERIC: byte-length ( seq -- n ) flushable
+
+M: byte-array byte-length length ; inline
+
+M: f byte-length drop 0 ; inline
+
+: binary-object ( obj -- c-ptr n )
+    [ >c-ptr ] [ byte-length ] bi ; inline
 
 SLOT: underlying
 
