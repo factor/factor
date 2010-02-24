@@ -63,3 +63,6 @@ M: sequence members fast-set members ;
 
 USE: vocabs.loader
 "hash-sets" require
+
+: combine ( sets -- set )
+    f [ union ] reduce ;

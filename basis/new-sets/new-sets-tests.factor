@@ -38,3 +38,5 @@ IN: new-sets.tests
 [ { 1 2 3 } ] [ HS{ 1 2 3 } { } set-like natural-sort ] unit-test
 
 [ HS{ 1 2 3 } ] [ { 1 2 3 } fast-set ] unit-test
+
+[ { 1 2 3 } ] [ { { 1 } { 2 } { 1 3 } } combine ] unit-test
