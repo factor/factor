@@ -8,6 +8,7 @@ strings ui ui.backend ui.clipboards ui.event-loop ui.gadgets
 ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
 ui.pixel-formats.private ui.private x11 x11.clipboard x11.constants
 x11.events x11.glx x11.io x11.windows x11.xim x11.xlib ;
+FROM: unix.ffi => system ;
 IN: ui.backend.x11
 
 SINGLETON: x11-ui-backend
@@ -325,6 +326,17 @@ M: x11-ui-backend (with-ui) ( quot -- )
 
 M: x11-ui-backend beep ( -- )
     dpy get 100 XBell drop ;
+
+<PRIVATE
+: escape-' ( string -- string' )
+    [ dup CHAR: ' = [ drop "'\''" ] [ 1string ] if ] { } map-as concat ;
+
+: xmessage ( string -- )
+    escape-' "/usr/X11R6/bin/xmessage '" "'" surround system ;
+PRIVATE>
+
+M: x11-ui-backend system-alert
+    "\n\n" glue xmessage ;
 
 : black ( -- xcolor ) 0 0 0 0 0 0 XColor <struct-boa> ; inline
 

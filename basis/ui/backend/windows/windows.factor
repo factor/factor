@@ -783,6 +783,9 @@ M: windows-ui-backend (with-ui)
 M: windows-ui-backend beep ( -- )
     0 MessageBeep drop ;
 
+M: windows-ui-backend system-alert
+    [ f ] 2dip swap MB_OK MessageBox drop ;
+
 : fullscreen-RECT ( hwnd -- RECT )
     MONITOR_DEFAULTTONEAREST MonitorFromWindow
     MONITORINFOEX <struct>
