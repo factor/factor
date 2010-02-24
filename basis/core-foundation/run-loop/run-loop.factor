@@ -91,6 +91,9 @@ TUPLE: run-loop fds sources timers ;
         CFRunLoopAddTimer
     ] bi ;
 
+: invalidate-run-loop-timers ( -- )
+    run-loop [ [ [ CFRunLoopTimerInvalidate ] [ CFRelease ] bi ] each V{ } ] change-timers drop ;
+
 <PRIVATE
 
 : ((reset-timer)) ( timer counter timestamp -- )

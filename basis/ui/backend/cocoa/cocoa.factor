@@ -214,6 +214,7 @@ M: cocoa-ui-backend beep ( -- )
     NSBeep ;
 
 M: cocoa-ui-backend system-alert
+    invalidate-run-loop-timers
     NSAlert -> alloc -> init -> autorelease [
         {
             [ swap <NSString> -> setInformativeText: ]
@@ -221,7 +222,8 @@ M: cocoa-ui-backend system-alert
             [ "OK" <NSString> -> addButtonWithTitle: drop ]
             [ -> runModal drop ]
         } cleave
-    ] [ 2drop ] if* ;
+    ] [ 2drop ] if*
+    init-thread-timer ;
 
 CLASS: {
     { +superclass+ "NSObject" }
