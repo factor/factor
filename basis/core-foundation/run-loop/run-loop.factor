@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov
+! Copyright (C) 2008, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.syntax kernel math
 namespaces sequences destructors combinators threads heaps
@@ -92,7 +92,10 @@ TUPLE: run-loop fds sources timers ;
     ] bi ;
 
 : invalidate-run-loop-timers ( -- )
-    run-loop [ [ [ CFRunLoopTimerInvalidate ] [ CFRelease ] bi ] each V{ } ] change-timers drop ;
+    run-loop [
+        [ [ CFRunLoopTimerInvalidate ] [ CFRelease ] bi ] each
+        V{ } clone
+    ] change-timers drop ;
 
 <PRIVATE
 
