@@ -53,16 +53,6 @@ M: node hashcode* nip number>> ;
 
 UNION: stack-read-write ##peek ##replace ;
 
-PREDICATE: ds-read-write < stack-read-write
-    loc>> ds-loc? ;
-UNION: data-stack-insn
-    ##inc-d ds-read-write ;
-
-PREDICATE: rs-read-write < stack-read-write
-    loc>> rs-loc? ;
-UNION: retain-stack-insn
-    ##inc-r rs-read-write ;
-
 UNION: ##alien-read
     ##alien-double ##alien-float ##alien-cell ##alien-vector
     ##alien-signed-1 ##alien-signed-2 ##alien-signed-4
@@ -92,11 +82,8 @@ UNION: alien-call-insn
 
 GENERIC: add-control-edge ( node insn -- )
 
-M: data-stack-insn add-control-edge
-    drop data-stack-insn chain ;
-
-M: retain-stack-insn add-control-edge
-    drop retain-stack-insn chain ;
+M: stack-read-write add-control-edge
+    loc>> chain ;
 
 M: alien-memory-insn add-control-edge
     drop alien-memory-insn chain ;
