@@ -363,7 +363,8 @@ PRIVATE>
     } case ;
 
 : parse-struct-definition ( -- class slots )
-    CREATE-CLASS 8 <vector> [ parse-struct-slots ] [ ] while >array ;
+    CREATE-CLASS 8 <vector> [ parse-struct-slots ] [ ] while >array
+    dup [ name>> ] map check-duplicate-slots ;
 PRIVATE>
 
 SYNTAX: STRUCT:
