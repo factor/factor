@@ -38,7 +38,7 @@ ERROR: no-com-interface interface ;
 
 : (parse-com-function) ( tokens -- definition )
     [ second ]
-    [ first ]
+    [ first parse-c-type ]
     [
         3 tail [ CHAR: , swap remove ] map
         2 group [ first2 normalize-c-arg 2array ] map
@@ -71,7 +71,7 @@ ERROR: no-com-interface interface ;
 : (stack-effect-from-return-and-parameters) ( return parameters -- stack-effect )
     swap
     [ [ second ] map ]
-    [ dup void? [ drop { } ] [ 1array ] if ] bi*
+    [ dup void? [ drop { } ] [ name>> 1array ] if ] bi*
     <effect> ;
 
 : (define-word-for-function) ( function interface n -- )

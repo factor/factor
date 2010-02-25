@@ -49,7 +49,7 @@ reset-gl-function-number-counter
 
 SYNTAX: GL-FUNCTION:
     gl-function-calling-convention
-    scan
+    scan-c-type
     scan dup
     scan drop "}" parse-tokens swap prefix
     gl-function-number

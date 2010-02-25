@@ -234,3 +234,12 @@ ERROR: topological-sort-failed ;
 
 : flatten-class ( class -- assoc )
     [ (flatten-class) ] H{ } make-assoc ;
+
+SYMBOL: +incomparable+
+
+: compare-classes ( class1 class2 -- ? )
+    {
+        { [ 2dup class<= ] [ t ] }
+        { [ 2dup classes-intersect? not ] [ f ] }
+        [ +incomparable+ ]
+    } cond 2nip ;

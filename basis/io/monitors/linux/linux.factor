@@ -59,7 +59,9 @@ M: linux-monitor dispose* ( monitor -- )
             [ inotify>> handle>> handle-fd ] [ wd>> ] bi
             inotify_rm_watch io-error
         ] if
-    ] bi ;
+    ]
+    [ call-next-method ]
+    tri ;
 
 : ignore-flags? ( mask -- ? )
     {

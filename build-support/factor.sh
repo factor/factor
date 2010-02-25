@@ -107,6 +107,7 @@ check_installed_programs() {
     ensure_program_installed git
     ensure_program_installed wget curl
     ensure_program_installed gcc
+    ensure_program_installed g++ cl
     ensure_program_installed make gmake
     ensure_program_installed md5sum md5
     ensure_program_installed cut

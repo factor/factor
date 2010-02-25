@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg, Slava Pestov, and Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel sequences
-sequences.private namespaces math quotations assocs.private ;
+sequences.private namespaces math quotations assocs.private
+sets ;
 IN: assocs
 
 ARTICLE: "alists" "Association lists"
@@ -90,6 +91,8 @@ ARTICLE: "assocs-values" "Transposed assoc operations"
 
 ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 "It is often useful to use the keys of an associative mapping as a set, exploiting the constant or logarithmic lookup time of most implementations (" { $link "alists" } " being a notable exception)."
+$nl
+"Set-theoretic operations:"
 { $subsections
     assoc-subset?
     assoc-intersect
@@ -97,6 +100,11 @@ ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
     assoc-diff
     substitute
     extract-keys
+}
+"Adding elements to sets:"
+{ $subsections
+    conjoin
+    conjoin-at
 }
 "Destructive operations:"
 { $subsections
@@ -213,7 +221,7 @@ HELP: assoc-size
 
 HELP: assoc-like
 { $values { "assoc" assoc } { "exemplar" assoc } { "newassoc" "a new assoc" } }
-{ $contract "Creates a new assoc having the same entries as  "{ $snippet "assoc" } " and the same type as " { $snippet "exemplar" } "." } ;
+{ $contract "Creates a new assoc having the same entries as " { $snippet "assoc" } " and the same type as " { $snippet "exemplar" } "." } ;
 
 HELP: assoc-empty?
 { $values { "assoc" assoc } { "?" "a boolean" } }
@@ -375,7 +383,7 @@ HELP: cache
 { $side-effects "assoc" } ;
 
 HELP: 2cache
-{ $values { "key1" "a key" } { "key2" "a key" } { "assoc" assoc } { "quot" { $quotation "( key -- value )" } } { "value" "a previously-retained or freshly-computed value" } }
+{ $values { "key1" "a key" } { "key2" "a key" } { "assoc" assoc } { "quot" { $quotation "( key1 key2 -- value )" } } { "value" "a previously-retained or freshly-computed value" } }
 { $description "If a single key composed of the input keys is present in the assoc, outputs the associated value, otherwise calls the quotation to produce a value and stores the keys/value pair into the assoc. Returns the value stored in the assoc. Returns a value either looked up or newly stored in the assoc." }
 { $side-effects "assoc" } ;
 
@@ -424,7 +432,7 @@ HELP: assoc-combine
 
 HELP: assoc-map-as
 { $values
-     { "assoc" assoc } { "quot" quotation } { "exemplar" assoc }
+     { "assoc" assoc } { "quot" { $quotation "( key value -- newkey newvalue )" } } { "exemplar" assoc }
      { "newassoc" assoc } }
 { $description "Applies the quotation to each entry in the input assoc and collects the results in a new assoc of the stame type as the exemplar." }
 { $examples { $example "USING: prettyprint assocs hashtables math ;" " H{ { 1 2 } { 3 4 } } [ sq ] { } assoc-map-as ." "{ { 1 4 } { 3 16 } }" } } ;

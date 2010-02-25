@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2009 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces make continuations.private kernel.private init
 assocs kernel vocabs words sequences memory io system arrays
@@ -7,21 +7,27 @@ summary layouts vocabs.loader prettyprint.config prettyprint debugger
 io.streams.c io.files io.files.temp io.pathnames io.directories
 io.directories.hierarchy io.backend quotations io.launcher
 tools.deploy.config tools.deploy.config.editor bootstrap.image
-io.encodings.utf8 destructors accessors hashtables ;
+io.encodings.utf8 destructors accessors hashtables
+tools.deploy.libraries vocabs.metadata.resources ;
 IN: tools.deploy.backend
 
 : copy-vm ( executable bundle-name -- vm )
     prepend-path vm over copy-file ;
 
-CONSTANT: theme-path "basis/ui/gadgets/theme/"
+TUPLE: vocab-manifest vocabs libraries ;
 
-: copy-theme ( name dir -- )
-    deploy-ui? get [
-        append-path
-        theme-path append-path
-        [ make-directories ]
-        [ theme-path "resource:" prepend swap copy-tree ] bi
-    ] [ 2drop ] if ;
+: copy-resources ( manifest name dir -- )
+    append-path swap vocabs>> [ copy-vocab-resources ] with each ;
+
+ERROR: can't-deploy-library-file library ;
+
+: copy-library ( dir library -- )
+    dup find-library-file
+    [ swap over file-name append-path copy-file ]
+    [ can't-deploy-library-file ] ?if ;
+
+: copy-libraries ( manifest name dir -- )
+    append-path swap libraries>> [ copy-library ] with each ;
 
 : image-name ( vocab bundle-name -- str )
     prepend-path ".image" append ;
@@ -89,7 +95,7 @@ DEFER: ?make-staging-image
     [ "deploy-config-" prepend temp-file ] bi
     [ utf8 set-file-contents ] keep ;
 
-: deploy-command-line ( image vocab config -- flags )
+: deploy-command-line ( image vocab manifest-file config -- flags )
     [
         bootstrap-profile ?make-staging-image
 
@@ -97,6 +103,7 @@ DEFER: ?make-staging-image
             "-i=" bootstrap-profile staging-image-name append ,
             "-resource-path=" "" resource-path append ,
             "-run=tools.deploy.shaker" ,
+            "-vocab-manifest-out=" prepend ,
             [ "-deploy-vocab=" prepend , ]
             [ make-deploy-config "-deploy-config=" prepend , ] bi
             "-output-image=" prepend ,
@@ -104,8 +111,16 @@ DEFER: ?make-staging-image
         ] { } make
     ] bind ;
 
-: make-deploy-image ( vm image vocab config -- )
+: parse-vocab-manifest-file ( path -- vocab-manifest )
+    utf8 file-lines
+    dup first "VOCABS:" =
+    [ { "LIBRARIES:" } split1 vocab-manifest boa ]
+    [ "invalid vocab manifest!" throw ] if ;
+
+: make-deploy-image ( vm image vocab config -- manifest )
     make-boot-image
-    deploy-command-line run-factor ;
+    over "vocab-manifest-" prepend temp-file
+    [ swap deploy-command-line run-factor ]
+    [ parse-vocab-manifest-file ] bi ;
 
 HOOK: deploy* os ( vocab -- )

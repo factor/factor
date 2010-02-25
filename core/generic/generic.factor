@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors words kernel sequences namespaces make assocs
 hashtables definitions kernel.private classes classes.private
@@ -104,11 +104,8 @@ GENERIC: update-generic ( class generic -- )
 : method-word-name ( class generic -- string )
     [ name>> ] bi@ "=>" glue ;
 
-M: method flushable?
-    "method-generic" word-prop flushable? ;
-
-M: method stack-effect
-    "method-generic" word-prop stack-effect ;
+M: method parent-word
+    "method-generic" word-prop ;
 
 M: method crossref?
     "forgotten" word-prop not ;
@@ -195,9 +192,6 @@ M: generic subwords
         [ "engines" word-prop % ]
         tri
     ] { } make ;
-
-M: generic forget*
-    [ subwords forget-all ] [ call-next-method ] bi ;
 
 M: class forget-methods
     [ implementors ] [ [ swap method ] curry ] bi map forget-all ;

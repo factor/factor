@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2007, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces make sequences io io.files io.pathnames kernel
 assocs words vocabs definitions parser continuations hashtables
@@ -57,9 +57,15 @@ PRIVATE>
 
 SYMBOL: load-help?
 
+! Defined by vocabs.metadata
+SYMBOL: check-vocab-hook
+
+check-vocab-hook [ [ drop ] ] initialize
+
 <PRIVATE
 
 : load-source ( vocab -- )
+    dup check-vocab-hook get call( vocab -- )
     [
         +parsing+ >>source-loaded?
         dup vocab-source-path [ parse-file ] [ [ ] ] if*
@@ -115,10 +121,9 @@ M: vocab (load-vocab)
     ] [ [ swap add-to-blacklist ] keep rethrow ] recover ;
 
 M: vocab-link (load-vocab)
-    vocab-name create-vocab (load-vocab) ;
+    vocab-name (load-vocab) ;
 
-M: string (load-vocab)
-    create-vocab (load-vocab) ;
+M: string (load-vocab) create-vocab (load-vocab) ;
 
 PRIVATE>
 

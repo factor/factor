@@ -212,7 +212,7 @@ PRIVATE>
             dup win32-error=0/f
     
         dup GlobalLock dup win32-error=0/f
-        swapd byte-array>memory
+        rot binary-object memcpy
         dup GlobalUnlock win32-error=0/f
         CF_UNICODETEXT swap SetClipboardData win32-error=0/f
     ] with-clipboard ;
@@ -782,6 +782,9 @@ M: windows-ui-backend (with-ui)
 
 M: windows-ui-backend beep ( -- )
     0 MessageBeep drop ;
+
+M: windows-ui-backend system-alert
+    [ f ] 2dip swap MB_OK MessageBox drop ;
 
 : fullscreen-RECT ( hwnd -- RECT )
     MONITOR_DEFAULTTONEAREST MonitorFromWindow

@@ -486,10 +486,10 @@ PRIVATE>
 : push-if ( elt quot accum -- )
     [ keep ] dip rot [ push ] [ 2drop ] if ; inline
 
-: selector-for ( quot exemplar -- quot accum )
+: selector-for ( quot exemplar -- selector accum )
     [ length ] keep new-resizable [ [ push-if ] 2curry ] keep ; inline
 
-: selector ( quot -- quot accum )
+: selector ( quot -- selector accum )
     V{ } selector-for ; inline
 
 : filter-as ( seq quot exemplar -- subseq )
@@ -501,7 +501,7 @@ PRIVATE>
 : push-either ( elt quot accum1 accum2 -- )
     [ keep swap ] 2dip ? push ; inline
 
-: 2selector ( quot -- quot accum1 accum2 )
+: 2selector ( quot -- selector accum1 accum2 )
     V{ } clone V{ } clone [ [ push-either ] 3curry ] 2keep ; inline
 
 : partition ( seq quot -- trueseq falseseq )
