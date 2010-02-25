@@ -133,6 +133,7 @@ CONSTANT: KEY_UNDO      OCT: 630  /* undo key */
 CONSTANT: KEY_MOUSE     OCT: 631  /* Mouse event has occurred */
 CONSTANT: KEY_RESIZE    OCT: 632  /* Terminal resize event */
 CONSTANT: KEY_EVENT     OCT: 633  /* We were interrupted by an event */
+CONSTANT: KEY_MAX       OCT: 777  /* Maximum key value is 0633 */
 CONSTANT: KEY_F0        OCT: 410  /* Function keys.  Space for 64 */
 : KEY_F ( n -- code ) KEY_F0 + ; inline /* Value of function key n */
 
@@ -451,30 +452,29 @@ PRIVATE>
     0 <ulong> [ ffi:mousemask ] keep *ulong ;
 
 : wget-yx ( window -- y x )
-    ptr>> ffi:c-window memory>struct [ _cury>> ] [ _curx>> ] bi ;
+    ptr>> [ _cury>> ] [ _curx>> ] bi ;
 : get-yx ( -- y x )
     current-window get wget-yx ;
 
 : wget-y ( window -- y )
-    ptr>> ffi:c-window memory>struct _cury>> ;
+    ptr>> _cury>> ;
 : get-y ( -- y )
     current-window get wget-y ;
 : wget-x ( window -- x )
-    ptr>> ffi:c-window memory>struct _curx>> ;
+    ptr>> _curx>> ;
 : get-x ( -- x )
     current-window get wget-x ;
 
 : wget-max-yx ( window -- y x )
-    ptr>> ffi:c-window memory>struct
-    [ _maxy>> 1 + ] [ _maxx>> 1 + ] bi ;
+    ptr>> [ _maxy>> 1 + ] [ _maxx>> 1 + ] bi ;
 : get-max-yx ( -- y x )
     current-window get wget-max-yx ;
 
 : wget-max-y ( window -- y )
-    ptr>> ffi:c-window memory>struct _maxy>> 1 + ;
+    ptr>> _maxy>> 1 + ;
 : get-max-y ( -- y )
     current-window get wget-max-y ;
 : wget-max-x ( window -- x )
-    ptr>> ffi:c-window memory>struct _maxx>> 1 + ;
+    ptr>> _maxx>> 1 + ;
 : get-max-x ( -- x )
     current-window get wget-max-x ;
