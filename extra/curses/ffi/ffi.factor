@@ -7,10 +7,9 @@ IN: curses.ffi
 << "curses" {
     { [ os winnt? ]  [ "libcurses.dll" ] }
     { [ os macosx? ] [ "libcurses.dylib" ] }
-    { [ os unix?  ]  [ "libncursesw.so.5.7" ] }
+    { [ os unix?  ]  [ "libncursesw.so" ] }
 } cond cdecl add-library >>
 
-C-TYPE: WINDOW
 C-TYPE: SCREEN
 TYPEDEF: void* va_list
 
@@ -38,7 +37,7 @@ STRUCT: pdat
 { _pad_bottom NCURSES_SIZE_T }
 { _pad_right NCURSES_SIZE_T } ;
 
-STRUCT: c-window
+STRUCT: WINDOW
 { _cury NCURSES_SIZE_T }
 { _curx NCURSES_SIZE_T }
 
