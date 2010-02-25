@@ -947,6 +947,15 @@ M: object sum 0 [ + ] binary-reduce ; inline
 
 : count ( seq quot -- n ) [ 1 0 ? ] compose map-sum ; inline
 
+: cartesian-each ( seq1 seq2 quot -- )
+    [ with each ] 2curry each ; inline
+
+: cartesian-map ( seq1 seq2 quot -- newseq )
+    [ with map ] 2curry map ; inline
+
+: cartesian-product ( seq1 seq2 -- newseq )
+    [ { } 2sequence ] cartesian-map ;
+
 ! We hand-optimize flip to such a degree because type hints
 ! cannot express that an array is an array of arrays yet, and
 ! this word happens to be performance-critical since the compiler

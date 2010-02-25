@@ -1,9 +1,9 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs cache colors.constants destructors
 kernel opengl opengl.gl opengl.capabilities combinators images
 images.tesselation grouping sequences math math.vectors
-math.matrices generalizations fry arrays namespaces system
+generalizations fry arrays namespaces system
 locals literals specialized-arrays ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
@@ -354,7 +354,7 @@ TUPLE: multi-texture < disposable grid display-list loc ;
 : image-locs ( image-grid -- loc-grid )
     [ first [ dim>> first ] map ] [ [ first dim>> second ] map ] bi
     [ 0 [ + ] accumulate nip ] bi@
-    cross-zip flip ;
+    cartesian-product flip ;
 
 : <texture-grid> ( image-grid loc -- grid )
     [ dup image-locs ] dip
