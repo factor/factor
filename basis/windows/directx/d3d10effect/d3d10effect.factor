@@ -113,6 +113,20 @@ STRUCT: D3D10_EFFECT_VARIABLE_DESC
     { BufferOffset         UINT   }
     { ExplicitBindPoint    UINT   } ;
 
+C-TYPE: ID3D10EffectConstantBuffer
+C-TYPE: ID3D10EffectScalarVariable
+C-TYPE: ID3D10EffectVectorVariable
+C-TYPE: ID3D10EffectMatrixVariable
+C-TYPE: ID3D10EffectStringVariable
+C-TYPE: ID3D10EffectShaderResourceVariable
+C-TYPE: ID3D10EffectRenderTargetViewVariable
+C-TYPE: ID3D10EffectDepthStencilViewVariable
+C-TYPE: ID3D10EffectShaderVariable
+C-TYPE: ID3D10EffectBlendVariable
+C-TYPE: ID3D10EffectDepthStencilVariable
+C-TYPE: ID3D10EffectRasterizerVariable
+C-TYPE: ID3D10EffectSamplerVariable
+
 COM-INTERFACE: ID3D10EffectVariable f {AE897105-00E6-45bf-BB8E-281DD6DB8E1B}
     BOOL IsValid ( )
     ID3D10EffectType* GetType ( )

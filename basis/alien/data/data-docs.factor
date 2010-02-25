@@ -21,11 +21,6 @@ HELP: memory>byte-array
 { $values { "alien" c-ptr } { "len" "a non-negative integer" } { "byte-array" byte-array } }
 { $description "Reads " { $snippet "len" } " bytes starting from " { $snippet "base" } " and stores them in a new byte array." } ;
 
-HELP: byte-array>memory
-{ $values { "byte-array" byte-array } { "base" c-ptr } }
-{ $description "Writes a byte array to memory starting from the " { $snippet "base" } " address." }
-{ $warning "This word is unsafe. Improper use can corrupt memory." } ;
-
 HELP: malloc-array
 { $values { "n" "a non-negative integer" } { "type" "a C type" } { "array" "a specialized array" } }
 { $description "Allocates an unmanaged memory block large enough to hold " { $snippet "n" } " values of a C type, then wraps the memory in a sequence object using " { $link <c-direct-array> } "." }
@@ -75,9 +70,7 @@ $nl
 "You can unsafely copy a range of bytes from one memory location to another:"
 { $subsections memcpy }
 "You can copy a range of bytes from memory into a byte array:"
-{ $subsections memory>byte-array }
-"You can copy a byte array to memory unsafely:"
-{ $subsections byte-array>memory } ;
+{ $subsections memory>byte-array } ;
 
 ARTICLE: "c-pointers" "Passing pointers to C functions"
 "The following Factor objects may be passed to C function parameters with pointer types:"
@@ -85,7 +78,7 @@ ARTICLE: "c-pointers" "Passing pointers to C functions"
     { "Instances of " { $link alien } "." }
     { "Instances of " { $link f } "; this is interpreted as a null pointer." }
     { "Instances of " { $link byte-array } "; the C function receives a pointer to the first element of the array." }
-    { "Any data type which defines a method on " { $link >c-ptr } " that returns an instance of one of the above. This includes " { $link "classes.struct" } " and " { $link "specialized-arrays" } "." } 
+    { "Any data type which defines a method on " { $link >c-ptr } ". This includes " { $link "classes.struct" } " and " { $link "specialized-arrays" } "." }
 }
 "The class of primitive C pointer types:"
 { $subsections c-ptr }
@@ -111,7 +104,7 @@ $nl
 { $subsections "byte-arrays-gc" }
 "C-style enumerated types are supported:"
 { $subsections POSTPONE: C-ENUM: }
-"C types can be aliased for convenience and consitency with native library documentation:"
+"C types can be aliased for convenience and consistency with native library documentation:"
 { $subsections POSTPONE: TYPEDEF: }
 "A utility for defining " { $link "destructors" } " for deallocating memory:"
 { $subsections "alien.destructors" }
@@ -140,13 +133,13 @@ HELP: <c-direct-array>
 { $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. The vocabulary can be loaded with the " { $link require-c-array } " word. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." } ;
 
 ARTICLE: "c-strings" "C strings"
-"C string types are arrays with shape " { $snippet "{ char* encoding }" } ", where " { $snippet "encoding" } " is an encoding descriptor. The type " { $link char* } " is an alias for " { $snippet "{ char* utf8 }" } ". See " { $link "encodings-descriptors" } " for information about encoding descriptors."
+"C string types are arrays with shape " { $snippet "{ c-string encoding }" } ", where " { $snippet "encoding" } " is an encoding descriptor. The type " { $link c-string } " is an alias for " { $snippet "{ c-string utf8 }" } ". See " { $link "encodings-descriptors" } " for information about encoding descriptors. In " { $link POSTPONE: TYPEDEF: } ", " { $link POSTPONE: FUNCTION: } ", " { $link POSTPONE: CALLBACK: } ", and " { $link POSTPONE: STRUCT: } " definitions, the shorthand syntax " { $snippet "c-string[encoding]" } " can be used to specify the string encoding."
 $nl
-"Passing a Factor string to a C function expecting a C string allocates a " { $link byte-array } " in the Factor heap; the string is then converted to the requested format and a raw pointer is passed to the function."
+"Passing a Factor string to a C function expecting a " { $link c-string } " allocates a " { $link byte-array } " in the Factor heap; the string is then converted to the requested format and a raw pointer is passed to the function."
 $nl
 "If the conversion fails, for example if the string contains null bytes or characters with values higher than 255, a " { $link c-string-error. } " is thrown."
 $nl
-"Care must be taken if the C function expects a " { $link char* } " with a length in bytes, rather than a null-terminated " { $link char* } "; passing the result of calling " { $link length } " on the string object will not suffice. This is because a Factor string of " { $emphasis "n" } " characters will not necessarily encode to " { $emphasis "n" } " bytes. The correct idiom for C functions which take a string with a length is to first encode the string using " { $link encode } ", and then pass the resulting byte array together with the length of this byte array."
+"Care must be taken if the C function expects a pointer to a string with its length represented by another parameter rather than a null terminator. Passing the result of calling " { $link length } " on the string object will not suffice. This is because a Factor string of " { $emphasis "n" } " characters will not necessarily encode to " { $emphasis "n" } " bytes. The correct idiom for C functions which take a string with a length is to first encode the string using " { $link encode } ", and then pass the resulting byte array together with the length of this byte array."
 $nl
 "Sometimes a C function has a parameter type of " { $link void* } ", and various data types, among them strings, can be passed in. In this case, strings are not automatically converted to aliens, and instead you must call one of these words:"
 { $subsections
@@ -155,7 +148,9 @@ $nl
 }
 "The first allocates " { $link byte-array } "s, and the latter allocates manually-managed memory which is not moved by the garbage collector and has to be explicitly freed by calling " { $link free } ". See " { $link "byte-arrays-gc" } " for a discussion of the two approaches."
 $nl
+"The C type " { $link char } { $snippet "*" } " represents a generic pointer to " { $snippet "char" } "; arguments with this type will expect and return " { $link alien } "s, and won't perform any implicit string conversion."
+$nl
 "A word to read strings from arbitrary addresses:"
 { $subsections alien>string }
-"For example, if a C function returns a " { $link char* } " but stipulates that the caller must deallocate the memory afterward, you must define the function as returning " { $link void* } ", and call one of the above words before passing the pointer to " { $link free } "." ;
+"For example, if a C function returns a " { $link c-string } " but stipulates that the caller must deallocate the memory afterward, you must define the function as returning " { $snippet "char*" } " and call one of the above words before passing the pointer to " { $link free } "." ;
 

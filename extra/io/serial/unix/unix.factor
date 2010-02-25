@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax alien.data 
 classes.struct combinators io.ports io.streams.duplex
-system kernel math math.bitwise vocabs.loader unix io.serial
-io.serial.unix.termios io.backend.unix ;
+system kernel math math.bitwise vocabs.loader io.serial
+io.serial.unix.termios io.backend.unix unix unix.ffi ;
 IN: io.serial.unix
 
 << {

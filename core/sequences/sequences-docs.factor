@@ -269,7 +269,7 @@ HELP: reduce
 
 HELP: reduce-index
 { $values
-     { "seq" sequence } { "identity" object } { "quot" quotation } }
+     { "seq" sequence } { "identity" object } { "quot" { $quotation "( prev elt index -- result )" } } }
 { $description "Combines successive elements of the sequence and their indices binary operations, and outputs the final result. On the first iteration, the three inputs to the quotation are " { $snippet "identity" } ", the first element of the sequence, and its index, 0. On successive iterations, the first input is the result of the previous iteration, the second input is the corresponding element of the sequence, and the third is its index." }
 { $examples { $example "USING: sequences prettyprint math ;"
     "{ 10 50 90 } 0 [ + + ] reduce-index ."
@@ -296,7 +296,7 @@ $nl
 } ;
 
 HELP: accumulate!
-{ $values { "seq" sequence } { "identity" object } { "quot" { $quotation "( prev elt -- next )" } } { "final" "the final result" } { "seq" sequence } }
+{ $values { "seq" sequence } { "identity" object } { "quot" { $quotation "( prev elt -- next )" } } { "final" "the final result" } }
 { $description "Combines successive elements of the sequence using a binary operation, and outputs the original sequence of intermediate results, together with the final result."
 $nl
 "The first element of the new sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the old sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the old sequence."
@@ -321,20 +321,20 @@ HELP: map-as
 
 HELP: each-index
 { $values
-     { "seq" sequence } { "quot" quotation } }
+     { "seq" sequence } { "quot" { $quotation "( elt index -- )" } } }
 { $description "Calls the quotation with the element of the sequence and its index on the stack, with the index on the top of the stack." }
-{ $examples { $example "USING: sequences prettyprint math ;"
-"{ 10 20 30 } [ + . ] each-index"
-"10\n21\n32"
+{ $examples { $example "USING: arrays sequences prettyprint ;"
+"{ 10 20 30 } [ 2array . ] each-index"
+"{ 10 0 }\n{ 20 1 }\n{ 30 2 }"
 } } ;
 
 HELP: map-index
 { $values
-  { "seq" sequence } { "quot" quotation } { "newseq" sequence } }
+  { "seq" sequence } { "quot" { $quotation "( elt index -- result )" } } { "newseq" sequence } }
 { $description "Calls the quotation with the element of the sequence and its index on the stack, with the index on the top of the stack. Collects the outputs of the quotation and outputs them in a sequence of the same type as the input sequence." }
-{ $examples { $example "USING: sequences prettyprint math ;"
-"{ 10 20 30 } [ + ] map-index ."
-"{ 10 21 32 }"
+{ $examples { $example "USING: arrays sequences prettyprint ;"
+"{ 10 20 30 } [ 2array ] map-index ."
+"{ { 10 0 } { 20 1 } { 30 2 } }"
 } } ;
 
 HELP: change-nth
@@ -344,7 +344,7 @@ HELP: change-nth
 { $side-effects "seq" } ;
 
 HELP: map!
-{ $values { "seq" "a mutable sequence" } { "quot" { $quotation "( old -- new )" } } { "seq" "a mutable sequence" } }
+{ $values { "seq" "a mutable sequence" } { "quot" { $quotation "( old -- new )" } } }
 { $description "Applies the quotation to each element yielding a new element, storing the new elements back in the original sequence. Returns the original sequence." }
 { $errors "Throws an error if the sequence is immutable, or the sequence cannot hold elements of the type output by " { $snippet "quot" } "." }
 { $side-effects "seq" } ;
@@ -442,7 +442,7 @@ HELP: filter-as
 { $description "Applies the quotation to each element in turn, and outputs a new sequence of the same type as " { $snippet "exemplar" } " containing the elements of the original sequence for which the quotation output a true value." } ;
 
 HELP: filter!
-{ $values { "seq" "a resizable mutable sequence" } { "quot" { $quotation "( elt -- ? )" } } { "seq" "a resizable mutable sequence" } }
+{ $values { "seq" "a resizable mutable sequence" } { "quot" { $quotation "( elt -- ? )" } } }
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a false value." }
 { $side-effects "seq" } ;
 
@@ -503,19 +503,19 @@ HELP: move
 { $side-effects "seq" } ;
 
 HELP: remove!
-{ $values { "elt" object } { "seq" "a resizable mutable sequence" } { "elt" object } }
+{ $values { "elt" object } { "seq" "a resizable mutable sequence" } }
 { $description "Removes all elements equal to " { $snippet "elt" } " from " { $snippet "seq" } " and returns " { $snippet "seq" } "." }
 { $notes "This word uses equality comparison (" { $link = } ")." }
 { $side-effects "seq" } ;
 
 HELP: remove-eq!
-{ $values { "elt" object } { "seq" "a resizable mutable sequence" } { "seq" "a resizable mutable sequence" } }
+{ $values { "elt" object } { "seq" "a resizable mutable sequence" } }
 { $description "Outputs a new sequence containing all elements of the input sequence except the given element." }
 { $notes "This word uses identity comparison (" { $link eq? } ")." }
 { $side-effects "seq" } ;
 
 HELP: remove-nth!
-{ $values { "n" "a non-negative integer" } { "seq" "a resizable mutable sequence" } { "seq" "a resizable mutable sequence" } }
+{ $values { "n" "a non-negative integer" } { "seq" "a resizable mutable sequence" } }
 { $description "Removes the " { $snippet "n" } "th element from the sequence, shifting all other elements down and reducing its length by one." }
 { $side-effects "seq" } ;
 
@@ -540,7 +540,7 @@ HELP: suffix
 } ;
 
 HELP: suffix!
-{ $values { "seq" sequence } { "elt" object } { "seq" sequence } }
+{ $values { "seq" sequence } { "elt" object } }
 { $description "Modifiers a sequence in-place by adding " { $snippet "elt" } " to the end of " { $snippet "seq" } ". Outputs " { $snippet "seq" } "." }
 { $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq" } "." }
 { $examples
@@ -548,7 +548,7 @@ HELP: suffix!
 } ;
 
 HELP: append!
-{ $values { "seq1" sequence } { "seq2" sequence } { "seq1" sequence } }
+{ $values { "seq1" sequence } { "seq2" sequence } }
 { $description "Modifiers " { $snippet "seq1" } " in-place by adding the elements from " { $snippet "seq2" } " to the end and outputs " { $snippet "seq1" } "." }
 { $examples
     { $example "USING: prettyprint sequences ;" "V{ 1 2 3 } { 4 5 6 } append! ." "V{ 1 2 3 4 5 6 }" }
@@ -995,8 +995,8 @@ HELP: count
 
 HELP: selector
 { $values
-     { "quot" "a predicate quotation" }
-     { "quot" quotation } { "accum" vector } }
+     { "quot" { $quotation "( elt -- ? )" } }
+     { "selector" { $quotation "( elt -- )" } } { "accum" vector } }
 { $description "Creates a new vector to accumulate the values which return true for a predicate.  Returns a new quotation which accepts an object to be tested and stored in the collector if the test yields true. The collector is left on the stack for convenience." }
 { $example "! Find all the even numbers:" "USING: prettyprint sequences math kernel ;"
            "10 iota [ even? ] selector [ each ] dip ."
@@ -1152,7 +1152,7 @@ HELP: replicate
 
 HELP: replicate-as
 { $values
-     { "len" integer } { "quot" quotation } { "exemplar" sequence }
+     { "len" integer } { "quot" { $quotation "( -- elt )" } } { "exemplar" sequence }
      { "newseq" sequence } }
  { $description "Calls the quotation " { $snippet "len" } " times, collecting results into a new sequence of the same type as the exemplar sequence." }
 { $examples 
@@ -1190,7 +1190,7 @@ HELP: virtual@
 
 HELP: 2map-reduce
 { $values
-     { "seq1" sequence } { "seq2" sequence } { "map-quot" quotation } { "reduce-quot" quotation }
+     { "seq1" sequence } { "seq2" sequence } { "map-quot" { $quotation "( elt1 elt2 -- intermediate )" } } { "reduce-quot" { $quotation "( prev intermediate -- result )" } }
      { "result" object } }
  { $description "Calls " { $snippet "map-quot" } " on each pair of elements from " { $snippet "seq1" } " and " { $snippet "seq2" } " and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
 { $errors "Throws an error if the sequence is empty." }
@@ -1202,7 +1202,7 @@ HELP: 2map-reduce
 HELP: 2selector
 { $values
      { "quot" quotation }
-     { "quot" quotation } { "accum1" vector } { "accum2" vector } }
+     { "selector" quotation } { "accum1" vector } { "accum2" vector } }
 { $description "Creates two new vectors to accumultate values based on a predicate. The first vector accumulates values for which the predicate yields true; the second for false." } ;
 
 HELP: 2reverse-each
@@ -1236,7 +1236,7 @@ HELP: collector
 
 HELP: binary-reduce
 { $values
-     { "seq" sequence } { "start" integer } { "quot" quotation }
+     { "seq" sequence } { "start" integer } { "quot" { $quotation "( elt1 elt2 -- newelt )" } }
      { "value" object } }
 { $description "Like " { $link reduce } ", but splits the sequence in half recursively until each sequence is small enough, and calls the quotation on these smaller sequences. If the quotation computes values that depend on the size of their input, such as bignum arithmetic, then this algorithm can be more efficient than using " { $link reduce } "." }
 { $examples "Computing factorial:"
@@ -1247,7 +1247,7 @@ HELP: binary-reduce
 
 HELP: follow
 { $values
-     { "obj" object } { "quot" quotation }
+     { "obj" object } { "quot" { $quotation "( prev -- result/f )" } }
      { "seq" sequence } }
 { $description "Outputs a sequence containing the input object and all of the objects generated by successively feeding the result of the quotation called on the input object to the quotation recursuively. Objects yielded by the quotation are added to the output sequence until the quotation yields " { $link f } ", at which point the recursion terminates." }
 { $examples "Get random numbers until zero is reached:"
@@ -1323,8 +1323,7 @@ HELP: sequence-hashcode-step
 
 HELP: short
 { $values
-     { "seq" sequence } { "n" integer }
-     { "seq" sequence } { "n'" integer } }
+     { "seq" sequence } { "n" integer } { "n'" integer } }
 { $description "Returns the input sequence and its length or " { $snippet "n" } ", whichever is less." }
 { $examples { $example "USING: sequences kernel prettyprint ;"
     "\"abcd\" 3 short [ . ] bi@"
@@ -1416,9 +1415,7 @@ $nl
 ARTICLE: "sequences-integers" "Counted loops"
 "A virtual sequence is defined for iterating over integers from zero."
 { $subsection iota }
-"For example, calling " { $link iota } " on the integer 3 produces a sequence containing the elements 0, 1, and 2. This is very useful for performing counted loops."
-$nl
-"This means the " { $link each } " combinator, given an integer, simply calls a quotation that number of times, pushing a counter on each iteration that ranges from 0 up to that integer:"
+"For example, calling " { $link iota } " on the integer 3 produces a sequence containing the elements 0, 1, and 2. This is very useful for performing counted loops using words such as " { $link each } ":"
 { $example "3 iota [ . ] each" "0\n1\n2" }
 "A common idiom is to iterate over a sequence, while also maintaining a loop counter. This can be done using " { $link each-index } ", " { $link map-index } " and " { $link reduce-index } "."
 $nl
@@ -1620,8 +1617,8 @@ ARTICLE: "sequences-destructive-discussion" "When to use destructive operations"
 }
 "The second reason is much weaker than the first one. In particular, many combinators (see " { $link map } ", " { $link produce } " and " { $link "namespaces-make" } ") as well as more advanced data structures (such as " { $vocab-link "persistent.vectors" } ") alleviate the need for explicit use of side effects." ;
 
-ARTICLE: "sequences-destructive" "Destructive operations"
-"Many operations have constructive and destructive variants:"
+ARTICLE: "sequences-destructive" "Destructive sequence operations"
+"Many operations have destructive variants that side effect an input sequence, instead of creating a new sequence:"
 { $table
     { "Constructive" "Destructive" }
     { { $link suffix } { $link suffix! } }
@@ -1644,10 +1641,14 @@ ARTICLE: "sequences-destructive" "Destructive operations"
     delete-all
     filter!
 }
+"Adding elements:"
+{ $subsections
+    suffix!
+    append!
+}
 "Other destructive words:"
 { $subsections
     reverse!
-    append!
     move
     exchange
     copy

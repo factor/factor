@@ -1,12 +1,13 @@
 IN: specialized-arrays.tests
 USING: tools.test alien.syntax specialized-arrays
-specialized-arrays.private sequences alien.c-types accessors
+specialized-arrays.private sequences alien accessors
 kernel arrays combinators compiler compiler.units classes.struct
 combinators.smart compiler.tree.debugger math libc destructors
 sequences.private multiline eval words vocabs namespaces
 assocs prettyprint alien.data math.vectors definitions
 compiler.test ;
-FROM: alien.c-types => float ;
+FROM: alien.c-types => int float bool char float ulonglong ushort uint
+heap-size little-endian? ;
 
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAYS: bool ushort char uint float ulonglong ;

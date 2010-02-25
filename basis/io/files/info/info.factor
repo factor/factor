@@ -26,7 +26,7 @@ available-space free-space used-space total-space ;
 HOOK: file-system-info os ( path -- file-system-info )
 
 {
-    { [ os unix? ] [ "io.files.info" ] }
+    { [ os unix? ] [ "io.files.info.unix" ] }
     { [ os windows? ] [ "io.files.info.windows" ] }
 } cond require
 

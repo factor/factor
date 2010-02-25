@@ -92,7 +92,7 @@ HELP: normalize-path
 { $values { "path" "a pathname string" } { "path'" "a new pathname string" } }
 { $description "Prepends the " { $link current-directory } " to the pathname, resolves a " { $snippet "resource:" } " or " { $snippet "vocab:" } " prefix, if present (see " { $link "io.pathnames.special" } "). Also converts the path into a UNC path on Windows." }
 { $notes "High-level words, such as " { $link <file-reader> } " and " { $link delete-file } " call this word for you. It only needs to be called directly when passing pathnames to C functions or external processes. This is because Factor does not use the operating system's notion of a current directory, and instead maintains its own dynamically-scoped " { $link current-directory } " variable." }
-{ $notes "On Windows NT platforms, this word does prepends the Unicode path prefix." }
+{ $notes "On Windows NT platforms, this word prepends the Unicode path prefix." }
 { $examples
   "For example, if you create a file named " { $snippet "data.txt" } " in the current directory, and wish to pass it to a process, you must normalize it:"
   { $code

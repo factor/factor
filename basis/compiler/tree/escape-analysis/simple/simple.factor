@@ -61,22 +61,28 @@ M: #push escape-analysis*
 
 : record-tuple-allocation ( #call -- )
     dup immutable-tuple-boa?
-    [ [ in-d>> but-last ] [ out-d>> first ] bi record-allocation ]
+    [ [ in-d>> but-last { } like ] [ out-d>> first ] bi record-allocation ]
     [ record-unknown-allocation ]
     if ;
 
 : slot-offset ( #call -- n/f )
-    dup in-d>>
-    [ second node-value-info literal>> ]
-    [ first node-value-info class>> ] 2bi
-    2dup [ fixnum? ] [ tuple class<= ] bi* and [
-        over 2 >= [ drop 2 - ] [ 2drop f ] if
+    dup in-d>> second node-value-info literal>> dup [ 2 - ] when ;
+
+: valid-slot-offset? ( slot# in -- ? )
+    over [
+        allocation dup [
+            dup array? [ bounds-check? ] [ 2drop f ] if
+        ] [ 2drop t ] if
     ] [ 2drop f ] if ;
 
+: unknown-slot-call ( out slot# in -- )
+    [ unknown-allocation ] [ drop ] [ add-escaping-value ] tri* ;
+
 : record-slot-call ( #call -- )
-    [ out-d>> first ] [ slot-offset ] [ in-d>> first ] tri over
+    [ out-d>> first ] [ slot-offset ] [ in-d>> first ] tri
+    2dup valid-slot-offset?
     [ [ record-slot-access ] [ copy-slot-value ] 3bi ]
-    [ [ unknown-allocation ] [ drop ] [ add-escaping-value ] tri* ]
+    [ unknown-slot-call ]
     if ;
 
 M: #call escape-analysis*

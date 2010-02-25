@@ -52,5 +52,5 @@ CONSTANT: IN_ONESHOT HEX: 80000000    ! only send event once
     } flags ; foldable
 
 FUNCTION: int inotify_init ( ) ;
-FUNCTION: int inotify_add_watch ( int fd, char* name, uint mask  ) ;
+FUNCTION: int inotify_add_watch ( int fd, c-string name, uint mask  ) ;
 FUNCTION: int inotify_rm_watch ( int fd, uint wd ) ;

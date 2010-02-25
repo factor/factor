@@ -6,7 +6,7 @@ sequences system tools.deploy.backend tools.deploy.config
 tools.deploy.config.editor assocs hashtables prettyprint
 io.backend.unix cocoa io.encodings.utf8 io.backend
 cocoa.application cocoa.classes cocoa.plists
-combinators ;
+combinators vocabs.metadata vocabs.loader ;
 IN: tools.deploy.macosx
 
 : bundle-dir ( -- dir )
@@ -16,7 +16,7 @@ IN: tools.deploy.macosx
     [ bundle-dir prepend-path swap ] keep
     "Contents" prepend-path append-path copy-tree ;
 
-: app-plist ( executable bundle-name -- assoc )
+: app-plist ( icon? executable bundle-name -- assoc )
     [
         "6.0" "CFBundleInfoDictionaryVersion" set
         "APPL" "CFBundlePackageType" set
@@ -25,9 +25,11 @@ IN: tools.deploy.macosx
 
         [ "CFBundleExecutable" set ]
         [ "org.factor." prepend "CFBundleIdentifier" set ] bi
+
+        [ "Icon.icns" "CFBundleIconFile" set ] when
     ] H{ } make-assoc ;
 
-: create-app-plist ( executable bundle-name -- )
+: create-app-plist ( icon? executable bundle-name -- )
     [ app-plist ] keep
     "Contents/Info.plist" append-path
     write-plist ;
@@ -40,17 +42,24 @@ IN: tools.deploy.macosx
         "Resources/English.lproj/MiniFactor.nib" copy-bundle-dir
     ] [ drop ] if ;
 
+: copy-icns ( vocab bundle-name -- icon? )
+    swap dup vocab-mac-icon-path vocab-append-path dup exists?
+    [ swap "Contents/Resources/Icon.icns" append-path copy-file t ]
+    [ 2drop f ] if ;
+
 : create-app-dir ( vocab bundle-name -- vm )
-    [
-        nip {
-            [ copy-dll ]
-            [ copy-nib ]
-            [ "Contents/Resources" append-path make-directories ]
-            [ "Contents/Resources" copy-theme ]
-        } cleave
-    ]
-    [ create-app-plist ]
-    [ "Contents/MacOS/" append-path copy-vm ] 2tri
+    {
+        [
+            nip {
+                [ copy-dll ]
+                [ copy-nib ]
+                [ "Contents/Resources" append-path make-directories ]
+            } cleave
+        ]
+        [ copy-icns ]
+        [ create-app-plist ]
+        [ "Contents/MacOS/" append-path copy-vm ]
+    } 2cleave
     dup OCT: 755 set-file-permissions ;
 
 : deploy.app-image ( vocab bundle-name -- str )
@@ -72,6 +81,9 @@ M: macosx deploy* ( vocab -- )
             [ bundle-name create-app-dir ] keep
             [ bundle-name deploy.app-image ] keep
             namespace make-deploy-image
+            bundle-name
+            [ "Contents/Resources" copy-resources ]
+            [ "Contents/Frameworks" copy-libraries ] 2bi
             bundle-name show-in-finder
         ] bind
     ] with-directory ;

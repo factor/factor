@@ -434,7 +434,7 @@ tuple
     { "fread" "io.streams.c" "primitive_fread" (( n alien -- str/f )) }
     { "fseek" "io.streams.c" "primitive_fseek" (( alien offset whence -- )) }
     { "ftell" "io.streams.c" "primitive_ftell" (( alien -- n )) }
-    { "fwrite" "io.streams.c" "primitive_fwrite" (( string alien -- )) }
+    { "fwrite" "io.streams.c" "primitive_fwrite" (( data length alien -- )) }
     { "(clone)" "kernel" "primitive_clone" (( obj -- newobj )) }
     { "<wrapper>" "kernel" "primitive_wrapper" (( obj -- wrapper )) }
     { "callstack" "kernel" "primitive_callstack" (( -- cs )) }

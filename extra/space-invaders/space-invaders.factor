@@ -18,6 +18,7 @@ USING:
     math
     math.order
     openal
+    openal.alut
     opengl.gl
     sequences
     ui

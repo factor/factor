@@ -792,6 +792,10 @@ $nl
     { $code "TUPLE: person" "{ age integer initial: 0 }" "{ department string initial: \"Marketing\" }" "manager ;" }
 } ;
 
+HELP: final
+{ $syntax "TUPLE: ... ; final" }
+{ $description "Declares the most recently defined word as a final tuple class which cannot be subclassed. Attempting to subclass a final class raises a " { $link bad-superclass } " error." } ;
+
 HELP: initial:
 { $syntax "TUPLE: ... { slot initial: value } ... ;" }
 { $values { "slot" "a slot name" } { "value" "any literal" } }

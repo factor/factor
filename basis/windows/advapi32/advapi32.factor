@@ -405,7 +405,7 @@ CONSTANT: KEY_READ                HEX: 20019
 CONSTANT: KEY_WOW64_32KEY         HEX: 0200
 CONSTANT: KEY_WOW64_64KEY         HEX: 0100
 CONSTANT: KEY_WRITE               HEX: 20006
-CONSTANT: KEY_EXECUTE             KEY_READ
+ALIAS: KEY_EXECUTE             KEY_READ
 CONSTANT: KEY_ALL_ACCESS          HEX: F003F
 
 CONSTANT: REG_NONE                         0
@@ -422,6 +422,9 @@ CONSTANT: REG_FULL_RESOURCE_DESCRIPTOR     9
 CONSTANT: REG_RESOURCE_REQUIREMENTS_LIST  10
 CONSTANT: REG_QWORD                       11
 CONSTANT: REG_QWORD_LITTLE_ENDIAN         11
+
+CONSTANT: REG_CREATED_NEW_KEY     1
+CONSTANT: REG_OPENED_EXISTING_KEY 2
 
 TYPEDEF: DWORD REGSAM
 
@@ -926,6 +929,7 @@ FUNCTION: LONG RegCloseKey ( HKEY hKey ) ;
 ! : RegCreateKeyA ;
 ! : RegCreateKeyExA ;
 FUNCTION: LONG RegCreateKeyExW ( HKEY hKey, LPCTSTR lpSubKey, DWORD Reserved, LPTSTR lpClass, DWORD dwOptions, REGSAM samDesired, LPSECURITY_ATTRIBUTES lpSecurityAttributes, PHKEY phkResult, LPDWORD lpdwDisposition ) ;
+ALIAS: RegCreateKeyEx RegCreateKeyExW
 ! : RegCreateKeyW
 ! : RegDeleteKeyA ;
 ! : RegDeleteKeyW ;
@@ -949,6 +953,7 @@ ALIAS: RegDeleteKeyEx RegDeleteKeyExW
 ! : RegDisablePredefinedCache ;
 ! : RegEnumKeyA ;
 ! : RegEnumKeyExA ;
+
 FUNCTION: LONG RegEnumKeyExW (
         HKEY hKey,
         DWORD dwIndex,
@@ -959,6 +964,8 @@ FUNCTION: LONG RegEnumKeyExW (
         LPDWORD lpcClass,
         PFILETIME lpftLastWriteTime
     ) ;
+ALIAS: RegEnumKeyEx RegEnumKeyExW
+
 ! : RegEnumKeyW ;
 ! : RegEnumValueA ;
 
@@ -1023,7 +1030,8 @@ ALIAS: RegQueryValueEx RegQueryValueExW
 ! : RegSetValueA ;
 ! : RegSetValueExA ;
 ! : RegSetValueExW ;
-! : RegSetValueW ;
+FUNCTION: LONG RegSetValueExW ( HKEY hKey, LPCTSTR lpValueName, DWORD Reserved, DWORD dwType, BYTE* lpData, DWORD cbData ) ;
+ALIAS: RegSetValueEx RegSetValueExW
 ! : RegUnLoadKeyA ;
 ! : RegUnLoadKeyW ;
 ! : RegisterEventSourceA ;

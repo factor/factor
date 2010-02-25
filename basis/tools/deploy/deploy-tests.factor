@@ -24,7 +24,11 @@ IN: tools.deploy.tests
 
 [ ] [ "terrain" shake-and-bake 1700000 small-enough? ] unit-test
 
+[ ] [ "gpu.demos.raytrace" shake-and-bake 2500000 small-enough? ] unit-test
+
 [ ] [ "bunny" shake-and-bake 2500000 small-enough? ] unit-test
+
+[ ] [ "gpu.demos.bunny" shake-and-bake 3500000 small-enough? ] unit-test
 
 os macosx? [
     [ ] [ "webkit-demo" shake-and-bake 500000 small-enough? ] unit-test
@@ -117,3 +121,9 @@ os macosx? [
 [ ] [ "tools.deploy.test.16" shake-and-bake run-temp-image ] unit-test
 
 [ ] [ "tools.deploy.test.17" shake-and-bake run-temp-image ] unit-test
+
+[ t ] [
+    "tools.deploy.test.18" shake-and-bake
+    deploy-test-command ascii [ readln ] with-process-reader
+    "test.image" temp-file =
+] unit-test
