@@ -407,8 +407,8 @@ TUPLE: mouse-event
 
 : button-n? ( bstate n -- ? ) substate-n 0 = not ; inline
 
-: fill-in-type ( mouse-event substate -- )
-    {
+: fill-in-type ( mouse-event bstate button -- )
+    substate-n {
         { BUTTON1_RELEASED       [ +released+ ] }
         { BUTTON1_PRESSED        [ +pressed+ ] }
         { BUTTON1_CLICKED        [ +clicked+ ] }
@@ -418,22 +418,10 @@ TUPLE: mouse-event
 
 : fill-in-bstate ( mouse-event bstate -- )
     2dup {
-        {
-            [ dup 1 button-n? ]
-            [ [ 1 >>button ] dip 1 substate-n fill-in-type ]
-        }
-        {
-            [ dup 2 button-n? ]
-            [ [ 2 >>button ] dip 2 substate-n fill-in-type ]
-        }
-        {
-            [ dup 3 button-n? ]
-            [ [ 3 >>button ] dip 3 substate-n fill-in-type ]
-        }
-        {
-            [ dup 4 button-n? ]
-            [ [ 4 >>button ] dip 4 substate-n fill-in-type ]
-        }
+        { [ dup 1 button-n? ] [ [ 1 >>button ] dip 1 fill-in-type ] }
+        { [ dup 2 button-n? ] [ [ 2 >>button ] dip 2 fill-in-type ] }
+        { [ dup 3 button-n? ] [ [ 3 >>button ] dip 3 fill-in-type ] }
+        { [ dup 4 button-n? ] [ [ 4 >>button ] dip 4 fill-in-type ] }
     } cond
     {
         [ BUTTON_CTRL  bitand 0 = not [ t >>ctrl  ] when drop ]
