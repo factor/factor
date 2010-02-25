@@ -1,10 +1,10 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien alien.c-types alien.data alien.syntax ascii
-assocs byte-arrays classes.struct classes.tuple.private classes.tuple
-combinators compiler.tree.debugger compiler.units destructors
-io.encodings.utf8 io.pathnames io.streams.string kernel libc
-literals math mirrors namespaces prettyprint
-prettyprint.config see sequences specialized-arrays system
+assocs byte-arrays classes.struct classes.tuple.parser
+classes.tuple.private classes.tuple combinators compiler.tree.debugger
+compiler.units destructors io.encodings.utf8 io.pathnames
+io.streams.string kernel libc literals math mirrors namespaces
+prettyprint prettyprint.config see sequences specialized-arrays system
 tools.test parser lexer eval layouts generic.single classes ;
 FROM: math => float ;
 QUALIFIED-WITH: alien.c-types c
@@ -333,6 +333,14 @@ STRUCT: struct-that's-a-word { x int } ;
     "USE: classes.struct IN: classes.struct.tests STRUCT: unexpected-eof-test" <string-reader>
     "struct-class-test-1" parse-stream
 ] [ error>> error>> unexpected-eof? ] must-fail-with
+
+[
+    "USING: alien.c-types classes.struct ; IN: classes.struct.tests STRUCT: struct-test-duplicate-slots { x uint } { x uint } ;" eval( -- )
+] [ error>> duplicate-slot-names? ] must-fail-with
+
+[
+    "USING: alien.c-types classes.struct ; IN: classes.struct.tests STRUCT: struct-test-duplicate-slots { x uint } { x float } ;" eval( -- )
+] [ error>> duplicate-slot-names? ] must-fail-with
 
 ! S{ with non-struct type
 [
