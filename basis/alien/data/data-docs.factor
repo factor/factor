@@ -21,11 +21,6 @@ HELP: memory>byte-array
 { $values { "alien" c-ptr } { "len" "a non-negative integer" } { "byte-array" byte-array } }
 { $description "Reads " { $snippet "len" } " bytes starting from " { $snippet "base" } " and stores them in a new byte array." } ;
 
-HELP: byte-array>memory
-{ $values { "byte-array" byte-array } { "base" c-ptr } }
-{ $description "Writes a byte array to memory starting from the " { $snippet "base" } " address." }
-{ $warning "This word is unsafe. Improper use can corrupt memory." } ;
-
 HELP: malloc-array
 { $values { "n" "a non-negative integer" } { "type" "a C type" } { "array" "a specialized array" } }
 { $description "Allocates an unmanaged memory block large enough to hold " { $snippet "n" } " values of a C type, then wraps the memory in a sequence object using " { $link <c-direct-array> } "." }
@@ -75,9 +70,7 @@ $nl
 "You can unsafely copy a range of bytes from one memory location to another:"
 { $subsections memcpy }
 "You can copy a range of bytes from memory into a byte array:"
-{ $subsections memory>byte-array }
-"You can copy a byte array to memory unsafely:"
-{ $subsections byte-array>memory } ;
+{ $subsections memory>byte-array } ;
 
 ARTICLE: "c-pointers" "Passing pointers to C functions"
 "The following Factor objects may be passed to C function parameters with pointer types:"
@@ -85,7 +78,7 @@ ARTICLE: "c-pointers" "Passing pointers to C functions"
     { "Instances of " { $link alien } "." }
     { "Instances of " { $link f } "; this is interpreted as a null pointer." }
     { "Instances of " { $link byte-array } "; the C function receives a pointer to the first element of the array." }
-    { "Any data type which defines a method on " { $link >c-ptr } " that returns an instance of one of the above. This includes " { $link "classes.struct" } " and " { $link "specialized-arrays" } "." } 
+    { "Any data type which defines a method on " { $link >c-ptr } ". This includes " { $link "classes.struct" } " and " { $link "specialized-arrays" } "." }
 }
 "The class of primitive C pointer types:"
 { $subsections c-ptr }

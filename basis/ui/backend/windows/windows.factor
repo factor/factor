@@ -212,7 +212,7 @@ PRIVATE>
             dup win32-error=0/f
     
         dup GlobalLock dup win32-error=0/f
-        swapd byte-array>memory
+        rot binary-object memcpy
         dup GlobalUnlock win32-error=0/f
         CF_UNICODETEXT swap SetClipboardData win32-error=0/f
     ] with-clipboard ;
