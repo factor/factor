@@ -1365,15 +1365,15 @@ HELP: assert-sequence=
 } ;
 
 HELP: cartesian-each
-{ $values { "seq1" sequence } { "seq1" sequence } { "quot" { $quotation "( elt1 elt2 -- )" } } }
+{ $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation "( elt1 elt2 -- )" } } }
 { $description "Applies the quotation to every possible pairing of elements from the two sequences." } ;
 
 HELP: cartesian-map
-{ $values { "seq1" sequence } { "seq1" sequence } { "quot" { $quotation "( elt1 elt2 -- result )" } } { "newseq" "a new sequence of sequences" } }
+{ $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation "( elt1 elt2 -- result )" } } { "newseq" "a new sequence of sequences" } }
 { $description "Applies the quotation to every possible pairing of elements from the two sequences, collecting results into a new sequence of sequences." } ;
 
 HELP: cartesian-product
-{ $values { "seq1" sequence } { "seq1" sequence } { "newseq" "a new sequence of sequences of pairs" } }
+{ $values { "seq1" sequence } { "seq2" sequence } { "newseq" "a new sequence of sequences of pairs" } }
 { $description "Outputs a sequence of all possible pairings of elements from the two sequences." }
 { $examples
     { $example
