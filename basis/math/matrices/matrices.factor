@@ -11,7 +11,7 @@ IN: math.matrices
 
 : identity-matrix ( n -- matrix )
     #! Make a nxn identity matrix.
-    iota dup [ [ = 1 0 ? ] with map ] curry map ;
+    iota dup [ = 1 0 ? ] cartesian-map ;
 
 :: rotation-matrix3 ( axis theta -- matrix )
     theta cos :> c
@@ -126,9 +126,6 @@ IN: math.matrices
 : norm-gram-schmidt ( seq -- orthonormal )
     gram-schmidt [ normalize ] map ;
 
-: cross-zip ( seq1 seq2 -- seq1xseq2 )
-    [ [ 2array ] with map ] curry map ;
-    
 : m^n ( m n -- n ) 
     make-bits over first length identity-matrix
     [ [ dupd m. ] when [ dup m. ] dip ] reduce nip ;

@@ -62,17 +62,17 @@ PRIVATE>
 
 <PRIVATE
 
-: source-032a ( -- seq )
-    50 [1,b] 2000 [1,b] cartesian-product ;
-
 ! multiplicand/multiplier/product
-: mmp ( pair -- n )
-    first2 2dup * [ number>string ] tri@ 3append string>number ;
+: mmp ( x y -- n )
+    2dup * [ number>string ] tri@ 3append string>number ;
 
 PRIVATE>
 
 : euler032a ( -- answer )
-    source-032a [ mmp ] map [ pandigital? ] filter products prune sum ;
+    50 [1,b] 2000 [1,b]
+    [ mmp ] cartesian-map concat
+    [ pandigital? ] filter
+    products prune sum ;
 
 ! [ euler032a ] 10 ave-time
 ! 2624 ms ave run time - 131.91 SD (10 trials)

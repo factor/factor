@@ -309,3 +309,6 @@ USE: make
 [ +gt+ ] [ { 0 0 0 0 } { 0 0 0 } <=> ] unit-test
 [ +eq+ ] [ { } { } <=> ] unit-test
 [ +eq+ ] [ { 1 2 3 } { 1 2 3 } <=> ] unit-test
+
+[ { { { 1 "a" } { 1 "b" } } { { 2 "a" } { 2 "b" } } } ]
+[ { 1 2 } { "a" "b" } cartesian-product ] unit-test
