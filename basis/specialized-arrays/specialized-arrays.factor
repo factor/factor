@@ -95,7 +95,7 @@ M: A resize
     ] [ drop ] 2bi
     <direct-A> ; inline
 
-M: A byte-length length \ T heap-size * ; inline
+M: A element-size drop \ T heap-size ; inline
 
 M: A direct-array-syntax drop \ A@ ;
 

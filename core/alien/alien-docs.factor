@@ -1,18 +1,24 @@
 USING: byte-arrays arrays help.syntax help.markup
 alien.syntax compiler definitions math libc eval
 debugger parser io io.backend system alien.accessors
-alien.libraries alien.c-types quotations kernel ;
+alien.libraries alien.c-types quotations kernel
+sequences ;
 IN: alien
 
 HELP: >c-ptr
-{ $values { "object" object } { "c-ptr" c-ptr } }
+{ $values { "obj" object } { "c-ptr" c-ptr } }
 { $contract "Outputs a pointer to the binary data of this object." } ;
 
 HELP: byte-length
-{ $values { "object" object } { "n" "a non-negative integer" } }
+{ $values { "obj" object } { "n" "a non-negative integer" } }
 { $contract "Outputs the number of bytes of binary data that will be output by " { $link >c-ptr } "." } ;
 
-{ >c-ptr byte-length } related-words
+HELP: element-size
+{ $values { "seq" sequence } { "n" "a non-negative integer" } }
+{ $contract "Outputs the number of bytes used for each element of the sequence." }
+{ $notes "If a sequence class implements " { $link element-size } " and " { $link >c-ptr } ", then instances of this sequence, as well as slices of this sequence, can be used as binary objects." } ;
+
+{ >c-ptr element-size byte-length } related-words
 
 HELP: alien
 { $class-description "The class of alien pointers. See " { $link "syntax-aliens" } " for syntax and " { $link "c-data" } " for general information." } ;

@@ -1,5 +1,5 @@
-USING: destructors io io.encodings.binary io.files io.directories
-io.files.temp io.ports kernel sequences math
+USING: destructors io io.directories io.encodings.binary
+io.files io.files.temp kernel libc math sequences
 specialized-arrays.instances.alien.c-types.int tools.test ;
 IN: io.ports.tests
 
@@ -8,9 +8,11 @@ IN: io.ports.tests
 
 [ ] [
     "test.txt" temp-file binary [
-        100,000 iota
-        0
-        100,000 malloc-int-array &dispose [ copy ] keep write
+        [
+            100,000 iota
+            0
+            100,000 malloc-int-array &free [ copy ] keep write
+        ] with-destructors
     ] with-file-writer
 ] unit-test
 
