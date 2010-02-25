@@ -72,10 +72,7 @@ M: array array-base-type first ;
     call swap set-global ; inline
 
 : (malloc-guid-symbol) ( symbol guid -- )
-    '[
-        _ execute( -- value )
-        [ byte-length malloc ] [ over byte-array>memory ] bi
-    ] initialize ;
+    '[ _ execute( -- value ) malloc-byte-array ] initialize ;
 
 : define-guid-constants ( -- )
     {

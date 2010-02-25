@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.parser assocs
 compiler.units functors growable kernel lexer math namespaces
@@ -26,7 +26,7 @@ V A <A> vectors.functor:define-vector
 
 M: V contract 2drop ; inline
 
-M: V byte-length length \ T heap-size * ; inline
+M: V element-size drop \ T heap-size ; inline
 
 M: V pprint-delims drop \ V{ \ } ;
 
