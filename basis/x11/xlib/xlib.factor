@@ -1010,14 +1010,7 @@ STRUCT: XKeymapEvent
 { send_event Bool }
 { display Display* }
 { window Window }
-{ pad int }
-{ pad int }
-{ pad int }
-{ pad int }
-{ pad int }
-{ pad int }
-{ pad int }
-{ pad int } ;
+{ pad int[8] } ;
 
 UNION-STRUCT: XEvent
 { int int }
