@@ -2,15 +2,19 @@
 ! See http:// factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax classes.struct combinators
 combinators.short-circuit kernel math math.order sequences
-specialized-arrays.instances.alien.c-types.void* typed
-specialized-arrays locals system alien.libraries ;
+typed specialized-arrays locals system alien.libraries ;
+SPECIALIZED-ARRAY: void*
 IN: chipmunk.ffi
 
-<< "chipmunk" {
-        { [ os windows? ] [ "chipmunk.dll" ] }
-        { [ os macosx? ] [ "libchipmunk.dylib"  ] }
-        { [ os unix?  ] [ "libchipmunk.so" ] }
-    } cond "cdecl" add-library >>
+<<
+"chipmunk" {
+    { [ os windows? ] [ "chipmunk.dll" ] }
+    { [ os macosx? ] [ "libchipmunk.dylib"  ] }
+    { [ os unix?  ] [ "libchipmunk.so" ] }
+} cond "cdecl" add-library
+
+"chipmunk" deploy-library
+>>
 LIBRARY: chipmunk
 
 ! chipmunk_types.h
