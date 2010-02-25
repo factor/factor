@@ -60,8 +60,8 @@ HINTS: buffer-read fixnum buffer ;
 HINTS: n>buffer fixnum buffer ;
 
 : >buffer ( byte-array buffer -- )
-    [ buffer-end byte-array>memory ]
-    [ [ length ] dip n>buffer ]
+    [ buffer-end swap binary-object memcpy ]
+    [ [ byte-length ] dip n>buffer ]
     2bi ;
 
 HINTS: >buffer byte-array buffer ;

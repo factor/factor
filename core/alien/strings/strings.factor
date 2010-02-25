@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays sequences kernel kernel.private accessors math
 alien.accessors byte-arrays io io.encodings io.encodings.utf8
@@ -37,17 +37,16 @@ M: string string>alien
 
 M: tuple string>alien drop underlying>> ;
 
-HOOK: alien>native-string os ( alien -- string )
+HOOK: native-string-encoding os ( -- encoding ) foldable
 
-M: windows alien>native-string utf16n alien>string ;
+M: unix native-string-encoding utf8 ;
+M: windows native-string-encoding utf16n ;
 
-M: unix alien>native-string utf8 alien>string ;
+: alien>native-string ( alien -- string )
+    native-string-encoding alien>string ; inline
 
-HOOK: native-string>alien os ( string -- alien )
-
-M: windows native-string>alien utf16n string>alien ;
-
-M: unix native-string>alien utf8 string>alien ;
+: native-string>alien ( string -- alien )
+    native-string-encoding string>alien ; inline
 
 : dll-path ( dll -- string )
     path>> alien>native-string ;

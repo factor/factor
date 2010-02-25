@@ -316,15 +316,15 @@ M: duration <=> [ duration>years ] compare ;
 
 GENERIC: time- ( time1 time2 -- time3 )
 
-: convert-timezone ( timestamp duration -- timestamp )
+: convert-timezone ( timestamp duration -- timestamp' )
     over gmt-offset>> over = [ drop ] [
         [ over gmt-offset>> time- time+ ] keep >>gmt-offset
     ] if ;
 
-: >local-time ( timestamp -- timestamp )
+: >local-time ( timestamp -- timestamp' )
     gmt-offset-duration convert-timezone ;
 
-: >gmt ( timestamp -- timestamp )
+: >gmt ( timestamp -- timestamp' )
     instant convert-timezone ;
 
 M: timestamp <=> ( ts1 ts2 -- n )

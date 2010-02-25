@@ -49,6 +49,7 @@ IN: bootstrap.syntax
         "SYMBOLS:"
         "CONSTANT:"
         "TUPLE:"
+        "final"
         "SLOT:"
         "T{"
         "UNION:"

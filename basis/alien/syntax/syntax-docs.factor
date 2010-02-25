@@ -40,11 +40,11 @@ $nl
 }
 "You can define a word for invoking it:"
 { $unchecked-example
-    "LIBRARY: foo\nFUNCTION: void the_answer ( char* question, int value ) ;"
-    "USE: compiler"
+    "LIBRARY: foo\nFUNCTION: void the_answer ( c-string question, int value ) ;"
     "\"the question\" 42 the_answer"
     "The answer to the question is 42."
 } }
+"Using the " { $link c-string } " type instead of " { $snippet "char*" } " causes the FFI to automatically convert Factor strings to C strings. See " { $link "c-strings" } " for more information on using strings with the FFI."
 { $notes "Note that the parentheses and commas are only syntax sugar and can be omitted; they serve no purpose other than to make the declaration slightly easier to read:"
 { $code
     "FUNCTION: void glHint ( GLenum target, GLenum mode ) ;"
@@ -54,7 +54,7 @@ $nl
 HELP: TYPEDEF:
 { $syntax "TYPEDEF: old new" }
 { $values { "old" "a C type" } { "new" "a C type" } }
-{ $description "Aliases the C type " { $snippet "old" } " under the name " { $snippet "new" } " if ." }
+{ $description "Aliases the C type " { $snippet "old" } " under the name " { $snippet "new" } "." }
 { $notes "This word differs from " { $link typedef } " in that it runs at parse time, to ensure correct ordering of operations when loading source files. Words defined in source files are compiled before top-level forms are run, so if a source file defines C binding words and uses " { $link typedef } ", the type alias won't be available at compile time." } ;
 
 HELP: C-ENUM:
@@ -72,12 +72,12 @@ HELP: C-ENUM:
 HELP: C-TYPE:
 { $syntax "C-TYPE: type" }
 { $values { "type" "a new C type" } }
-{ $description "Defines a new, opaque C type. Since it is opaque, " { $snippet "type" } " will not be directly usable as a parameter or return type of a " { $link POSTPONE: FUNCTION: } " or as a slot of a " { $link POSTPONE: STRUCT: } ". However, it can be used as the type of a pointer (that is, as " { $snippet "type*" } ")." $nl
-{ $snippet "C-TYPE:" } " can also be used to forward-declare C types to enable circular dependencies. For example:"
+{ $description "Defines a new, opaque C type. Since it is opaque, " { $snippet "type" } " will not be directly usable as a parameter or return type of a " { $link POSTPONE: FUNCTION: } " or as a slot of a " { $link POSTPONE: STRUCT: } ". However, it can be used as the type of a " { $link pointer } "."
+{ $snippet "C-TYPE:" } " can also be used to forward declare C types, allowing circular dependencies to occur between types. For example:"
 { $code """C-TYPE: forward 
 STRUCT: backward { x forward* } ;
 STRUCT: forward { x backward* } ; """ } }
-{ $notes "Primitive C types are also displayed using " { $snippet "C-TYPE:" } " syntax when they are displayed by " { $link see } "." } ;
+{ $notes "Primitive C types are displayed using " { $snippet "C-TYPE:" } " syntax when they are " { $link see } "n." } ;
 
 HELP: CALLBACK:
 { $syntax "CALLBACK: return type ( parameters ) ;" }

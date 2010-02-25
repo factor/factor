@@ -67,7 +67,12 @@ CONSTANT: cpus
 
 : <package-grid-action> ( -- action )
     <action>
-    [ package-grid xml>string "text/html" <content> ] >>display ;
+    [
+        [
+            package-grid xml>string
+            "text/html" <content>
+        ] with-mason-db
+    ] >>display ;
 
 : release-url ( builder -- url )
     [ URL" $mason-app/release" ] dip
@@ -90,4 +95,9 @@ CONSTANT: cpus
 
 : <release-grid-action> ( -- action )
     <action>
-    [ release-grid xml>string "text/html" <content> ] >>display ;
+    [
+        [
+            release-grid xml>string
+            "text/html" <content>
+        ] with-mason-db
+    ] >>display ;

@@ -243,6 +243,8 @@ M: object close-window
 
 HOOK: beep ui-backend ( -- )
 
+HOOK: system-alert ui-backend ( caption text -- )
+
 : parse-main-window-attributes ( class -- attributes )
     "{" expect dup all-slots parse-tuple-literal-slots ;
 

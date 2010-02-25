@@ -54,18 +54,20 @@ IN: webapps.mason.package
 : <download-package-action> ( -- action )
     <page-action>
     [
-        validate-os/cpu
-        "os" value "cpu" value (platform) "platform" set-value
-        current-builder {
-            [ package-link "package" set-value ]
-            [ release-git-id>> git-link "git-id" set-value ]
-            [ requirements "requirements" set-value ]
-            [ host-name>> "host-name" set-value ]
-            [ current-status "status" set-value ]
-            [ last-build-status "last-build" set-value ]
-            [ clean-build-status "last-clean-build" set-value ]
-            [ packages-link "binaries" set-value ]
-            [ clean-image-link "clean-images" set-value ]
-            [ report-link "last-report" set-value ]
-        } cleave
+        [
+            validate-os/cpu
+            "os" value "cpu" value (platform) "platform" set-value
+            current-builder {
+                [ package-link "package" set-value ]
+                [ release-git-id>> git-link "git-id" set-value ]
+                [ requirements "requirements" set-value ]
+                [ host-name>> "host-name" set-value ]
+                [ current-status "status" set-value ]
+                [ last-build-status "last-build" set-value ]
+                [ clean-build-status "last-clean-build" set-value ]
+                [ packages-link "binaries" set-value ]
+                [ clean-image-link "clean-images" set-value ]
+                [ report-link "last-report" set-value ]
+            } cleave
+        ] with-mason-db
     ] >>init ;

@@ -4,7 +4,7 @@ USING: alien.c-types io.directories.unix kernel system unix
 classes.struct unix.ffi ;
 IN: io.directories.unix.linux
 
-M: unix find-next-file ( DIR* -- dirent )
+M: linux find-next-file ( DIR* -- dirent )
     dirent <struct>
     f <void*>
     [ [ readdir64_r ] unix-system-call 0 = [ (io-error) ] unless ] 2keep

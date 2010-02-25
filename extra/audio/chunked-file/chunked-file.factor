@@ -24,5 +24,5 @@ ERROR: invalid-audio-file ;
     } case ;
 
 : check-chunk ( chunk id class -- ? )
-    heap-size [ id= ] [ [ length ] dip >= ] bi-curry* bi and ;
+    heap-size [ id= ] [ [ length ] dip >= ] bi-curry* bi and ; inline
 

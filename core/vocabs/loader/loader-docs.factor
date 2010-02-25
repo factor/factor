@@ -27,10 +27,11 @@ ARTICLE: "vocabs.roots" "Vocabulary roots"
 "You can store your own vocabularies in the " { $snippet "work" } " directory."
 { $subsections "add-vocab-roots" } ;
 
+ARTICLE: "vocabs.icons" "Vocabulary icons"
+"An icon file representing the vocabulary can be provided for use by " { $link "tools.deploy" } ". A file named " { $snippet "icon.ico" } " will be used as the application icon when the application is deployed on Windows. A file named " { $snippet "icon.icns" } " will be used when the application is deployed on MacOS X." ;
+
 ARTICLE: "vocabs.loader" "Vocabulary loader"
-"The vocabulary loader combines the vocabulary system with " { $link "parser" } " in order to implement automatic loading of vocabulary source files. The vocabulary loader is implemented in the " { $vocab-link "vocabs.loader" } " vocabulary."
-$nl
-"When an attempt is made to use a vocabulary that has not been loaded into the image, the vocabulary loader is asked to locate the vocabulary's source files, and load them."
+"The " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " words load vocabularies using the vocabulary loader. The vocabulary loader is implemented in the " { $vocab-link "vocabs.loader" } " vocabulary."
 $nl
 "The vocabulary loader searches for vocabularies in a set of directories known as vocabulary roots."
 { $subsections "vocabs.roots" }
@@ -45,14 +46,8 @@ $nl
     { { $snippet "foo/bar/bar-docs.factor" } " - documentation, see " { $link "writing-help" } }
     { { $snippet "foo/bar/bar-tests.factor" } " - unit tests, see " { $link "tools.test" } }
 }
-"Finally, optional three text files may contain meta-data:"
-{ $list
-    { { $snippet "foo/bar/authors.txt" } " - a series of lines, with one author name per line. These are listed under " { $link "vocab-authors" } }
-    { { $snippet "foo/bar/summary.txt" } " - a one-line description" }
-    { { $snippet "foo/bar/tags.txt" } " - a whitespace-separated list of tags which classify the vocabulary. Consult " { $link "vocab-tags" } " for a list of existing tags you can re-use" }
-}
-"The " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " words load vocabularies which have not been loaded yet, as needed."
-$nl
+"Optional text files may contain metadata."
+{ $subsections "vocabs.metadata" "vocabs.icons" }
 "Vocabularies can also be loaded at run time, without altering the vocabulary search path. This is done by calling a word which loads a vocabulary if it is not in the image, doing nothing if it is:"
 { $subsections require }
 "The above word will only ever load a vocabulary once in a given session. There is another word which unconditionally loads vocabulary from disk, regardless of whether or not is has already been loaded:"

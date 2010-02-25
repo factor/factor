@@ -83,7 +83,7 @@ STRUCT: glyph
     { n-points short }
 
     { points void* }
-    { tags char* }
+    { tags c-string }
     { contours short* }
 
     { outline-flags int }
@@ -166,7 +166,7 @@ STRUCT: FT_Bitmap
     { palette_mode char }
     { palette void* } ;
 
-TYPEDEF: void* FT_Face*
+C-TYPE: FT_Face
 
 FUNCTION: FT_Error FT_New_Face ( void* library, FT_Char* font, FT_Long index, face* face ) ;
 

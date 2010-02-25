@@ -33,4 +33,4 @@ STRUCT: statvfs
     { f_mntonname { char _VFS_MNAMELEN } }
     { f_mntfromname { char _VFS_MNAMELEN } } ;
 
-FUNCTION: int statvfs ( char* path, statvfs* buf ) ;
+FUNCTION: int statvfs ( c-string path, statvfs* buf ) ;

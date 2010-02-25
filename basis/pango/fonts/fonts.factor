@@ -45,16 +45,16 @@ pango_font_description_free ( PangoFontDescription* desc ) ;
 DESTRUCTOR: pango_font_description_free
 
 FUNCTION: PangoFontDescription*
-pango_font_description_from_string ( char* str ) ;
+pango_font_description_from_string ( c-string str ) ;
 
-FUNCTION: char*
+FUNCTION: c-string
 pango_font_description_to_string ( PangoFontDescription* desc ) ;
 
-FUNCTION: char*
+FUNCTION: c-string
 pango_font_description_to_filename ( PangoFontDescription* desc ) ;
 
 FUNCTION: void
-pango_font_description_set_family ( PangoFontDescription* desc, char* family ) ;
+pango_font_description_set_family ( PangoFontDescription* desc, c-string family ) ;
 
 FUNCTION: void
 pango_font_description_set_style ( PangoFontDescription* desc, PangoStyle style ) ;
@@ -68,7 +68,7 @@ pango_font_description_set_size ( PangoFontDescription* desc, gint size ) ;
 FUNCTION: void
 pango_font_map_list_families ( PangoFontMap* fontmap, PangoFontFamily*** families, int* n_families ) ;
 
-FUNCTION: char*
+FUNCTION: c-string
 pango_font_family_get_name ( PangoFontFamily* family ) ;
 
 FUNCTION: int
@@ -77,7 +77,7 @@ pango_font_family_is_monospace ( PangoFontFamily* family ) ;
 FUNCTION: void
 pango_font_family_list_faces ( PangoFontFamily* family, PangoFontFace*** faces, int* n_faces ) ;
 
-FUNCTION: char*
+FUNCTION: c-string
 pango_font_face_get_face_name ( PangoFontFace* face ) ;
 
 FUNCTION: void

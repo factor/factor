@@ -1,8 +1,12 @@
 USING: tools.test io.streams.byte-array io.encodings.binary
-io.encodings.utf8 io kernel arrays strings namespaces math ;
+io.encodings.utf8 io kernel arrays strings namespaces math
+specialized-arrays alien.c-types ;
+SPECIALIZED-ARRAY: int
+IN: io.streams.byte-array.tests
 
 [ B{ } ] [ B{ } binary [ contents ] with-byte-reader ] unit-test
 [ B{ 1 2 3 } ] [ binary [ B{ 1 2 3 } write ] with-byte-writer ] unit-test
+[ B{ 1 2 3 4 5 6 } ] [ binary [ B{ 1 2 3 } write B{ 4 5 6 } write ] with-byte-writer ] unit-test
 [ B{ 1 2 3 } ] [ { 1 2 3 } binary [ 3 read ] with-byte-reader ] unit-test
 
 [ B{ BIN: 11110101 BIN: 10111111 BIN: 10000000 BIN: 10111111 BIN: 11101111 BIN: 10000000 BIN: 10111111 BIN: 11011111 BIN: 10000000 CHAR: x } ]
@@ -36,4 +40,10 @@ io.encodings.utf8 io kernel arrays strings namespaces math ;
 ! Overly aggressive compiler optimizations
 [ B{ 123 } ] [
     binary [ 123 >bignum write1 ] with-byte-writer
+] unit-test
+
+! Writing specialized arrays to byte writers
+[ int-array{ 1 2 3 } ] [
+    binary [ int-array{ 1 2 3 } write ] with-byte-writer
+    byte-array>int-array
 ] unit-test

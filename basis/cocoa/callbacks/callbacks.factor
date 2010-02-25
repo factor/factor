@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Kevin Reid.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel namespaces cocoa cocoa.classes
-cocoa.subclassing debugger ;
+USING: alien.c-types assocs kernel namespaces cocoa
+cocoa.classes cocoa.runtime cocoa.subclassing debugger ;
 IN: cocoa.callbacks
 
 SYMBOL: callbacks

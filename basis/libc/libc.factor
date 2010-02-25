@@ -96,6 +96,6 @@ PRIVATE>
     memcmp 0 = ;
 
 : strlen ( alien -- len )
-    size_t "libc" "strlen" { char* } alien-invoke ;
+    size_t "libc" "strlen" { c-string } alien-invoke ;
 
 DESTRUCTOR: free

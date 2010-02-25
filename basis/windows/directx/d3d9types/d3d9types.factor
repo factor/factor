@@ -900,12 +900,6 @@ CONSTANT: D3DMULTISAMPLE_14_SAMPLES      14
 CONSTANT: D3DMULTISAMPLE_15_SAMPLES      15
 CONSTANT: D3DMULTISAMPLE_16_SAMPLES      16
 CONSTANT: D3DMULTISAMPLE_FORCE_DWORD     HEX: 7fffffff
-
-:: MAKEFOURCC ( ch0 ch1 ch2 ch3 -- n )
-    ch3 HEX: ff bitand 24 shift
-    ch2 HEX: ff bitand 16 shift
-    ch1 HEX: ff bitand  8 shift
-    ch0 HEX: ff bitand bitor bitor bitor ; inline
                                                                   
 TYPEDEF: int D3DFORMAT
 CONSTANT: D3DFMT_UNKNOWN              0
@@ -937,15 +931,15 @@ CONSTANT: D3DFMT_X8L8V8U8             62
 CONSTANT: D3DFMT_Q8W8V8U8             63
 CONSTANT: D3DFMT_V16U16               64
 CONSTANT: D3DFMT_A2W10V10U10          67
-#! : D3DFMT_UYVY                 ( -- n ) 'U' 'Y' 'V' 'Y' MAKEFOURCC
-#! D3DFMT_R8G8_B8G8            = MAKEFOURCC('R', 'G', 'B', 'G'),
-#! D3DFMT_YUY2                 = MAKEFOURCC('Y', 'U', 'Y', '2'),
-#! D3DFMT_G8R8_G8B8            = MAKEFOURCC('G', 'R', 'G', 'B'),
-#! D3DFMT_DXT1                 = MAKEFOURCC('D', 'X', 'T', '1'),
-#! D3DFMT_DXT2                 = MAKEFOURCC('D', 'X', 'T', '2'),
-#! D3DFMT_DXT3                 = MAKEFOURCC('D', 'X', 'T', '3'),
-#! D3DFMT_DXT4                 = MAKEFOURCC('D', 'X', 'T', '4'),
-#! D3DFMT_DXT5                 = MAKEFOURCC('D', 'X', 'T', '5'),
+CONSTANT: D3DFMT_UYVY                 HEX: 55595659
+CONSTANT: D3DFMT_R8G8_B8G8            HEX: 52474247
+CONSTANT: D3DFMT_YUY2                 HEX: 59555932
+CONSTANT: D3DFMT_G8R8_G8B8            HEX: 47524742
+CONSTANT: D3DFMT_DXT1                 HEX: 44585431
+CONSTANT: D3DFMT_DXT2                 HEX: 44585432
+CONSTANT: D3DFMT_DXT3                 HEX: 44585433
+CONSTANT: D3DFMT_DXT4                 HEX: 44585434
+CONSTANT: D3DFMT_DXT5                 HEX: 44585435
 CONSTANT: D3DFMT_D16_LOCKABLE         70
 CONSTANT: D3DFMT_D32                  71
 CONSTANT: D3DFMT_D15S1                73
@@ -962,7 +956,7 @@ CONSTANT: D3DFMT_VERTEXDATA           100
 CONSTANT: D3DFMT_INDEX16              101
 CONSTANT: D3DFMT_INDEX32              102
 CONSTANT: D3DFMT_Q16W16V16U16         110
-#! D3DFMT_MULTI2_ARGB8         = MAKEFOURCC('M', 'E', 'T', '1'),
+CONSTANT: D3DFMT_MULTI2_ARGB8         HEX: 4d455431
 CONSTANT: D3DFMT_R16F                 111
 CONSTANT: D3DFMT_G16R16F              112
 CONSTANT: D3DFMT_A16B16G16R16F        113

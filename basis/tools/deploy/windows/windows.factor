@@ -1,10 +1,15 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.files io.pathnames io.directories io.encodings.ascii kernel namespaces
+USING: io io.encodings.binary io.files io.pathnames io.directories
+io.encodings.ascii kernel namespaces
 sequences locals system splitting tools.deploy.backend
 tools.deploy.config tools.deploy.config.editor assocs hashtables
-prettyprint combinators windows.shell32 windows.user32 ;
+prettyprint combinators windows.kernel32 windows.shell32 windows.user32
+alien.c-types vocabs.metadata vocabs.loader tools.deploy.windows.ico
+io.files.windows.nt ;
 IN: tools.deploy.windows
+
+CONSTANT: app-icon-resource-id "APPICON"
 
 : copy-dll ( bundle-name -- )
     "resource:factor.dll" swap copy-file-into ;
@@ -16,20 +21,28 @@ IN: tools.deploy.windows
 
 : create-exe-dir ( vocab bundle-name -- vm )
     dup copy-dll
-    deploy-ui? get [
-        [ "" copy-theme ] [ ".exe" copy-vm ] bi
-    ] [ ".com" copy-vm ] if ;
+    deploy-ui? get ".exe" ".com" ? copy-vm ;
+
+: open-in-explorer ( dir -- )
+    [ f "open" ] dip absolute-path normalize-separators
+    f f SW_SHOWNORMAL ShellExecute drop ;
+
+: embed-ico ( vm vocab -- )
+    dup vocab-windows-icon-path vocab-append-path dup exists?
+    [ binary file-contents app-icon-resource-id embed-icon-resource ]
+    [ 2drop ] if ;
 
 M: winnt deploy*
     "resource:" [
         dup deploy-config [
             deploy-name get
-            [
-                [ create-exe-dir ]
+            {
+                [ create-exe-dir dup ]
+                [ drop embed-ico ]
                 [ image-name ]
-                [ drop ]
-                2tri namespace make-deploy-image
-            ]
-            [ nip open-in-explorer ] 2bi
+                [ drop namespace make-deploy-image ]
+                [ nip "" [ copy-resources ] [ copy-libraries ] 3bi ]
+                [ nip open-in-explorer ]
+            } 2cleave 
         ] bind
     ] with-directory ;

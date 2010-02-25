@@ -9,7 +9,7 @@ STRUCT: addrinfo
     { socktype int }
     { protocol int }
     { addrlen socklen_t }
-    { canonname char* }
+    { canonname c-string }
     { addr void* }
     { next addrinfo* } ;
 
