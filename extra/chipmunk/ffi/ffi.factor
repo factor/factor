@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.syntax classes.struct combinators
 combinators.short-circuit kernel math math.order sequences
 specialized-arrays.instances.alien.c-types.void* typed
 specialized-arrays locals system alien.libraries ;
-IN: chipmunk
+IN: chipmunk.ffi
 
 << "chipmunk" {
         { [ os windows? ] [ "chipmunk.dll" ] }
