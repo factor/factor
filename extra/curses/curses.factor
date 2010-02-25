@@ -317,18 +317,24 @@ PRIVATE>
 : wcrefresh ( window -- ) ptr>> (wcrefresh) ;
 : crefresh ( -- ) current-window get wcrefresh ;
 
-: wcnl ( window -- ) [ "\n" ] dip ptr>> (wcwrite) ;
+: wgetch ( window -- key ) ptr>> (wgetch) ;
+: getch ( -- key ) current-window get wgetch ;
+
+: waddch ( ch window -- ) ptr>> (waddch) ;
+: addch ( ch -- ) current-window get waddch ;
+
+: wcnl ( window -- ) [ CHAR: \n ] dip waddch ;
 : cnl ( -- ) current-window get wcnl ;
 
 : wcwrite ( string window -- ) ptr>> (wcwrite) ;
 : cwrite ( string -- ) current-window get wcwrite ;
 
 : wcprint ( string window -- )
-    ptr>> [ (wcwrite) ] [ "\n" swap (wcwrite) ] bi ;
+    ptr>> [ (wcwrite) ] [ CHAR: \n swap (waddch) ] bi ;
 : cprint ( string -- ) current-window get wcprint ;
 
 : wcprintf ( string window -- )
-    ptr>> [ (wcwrite) ] [ "\n" swap (wcwrite) ]
+    ptr>> [ (wcwrite) ] [ CHAR: \n swap (waddch) ]
     [ (wcrefresh) ] tri ;
 : cprintf ( string -- ) current-window get wcprintf ;
 
@@ -339,12 +345,6 @@ PRIVATE>
 : wcread ( n window -- string )
     [ encoding>> ] [ ptr>> ] bi (wcread) ;
 : cread ( n -- string ) current-window get wcread ;
-
-: wgetch ( window -- key ) ptr>> (wgetch) ;
-: getch ( -- key ) current-window get wgetch ;
-
-: waddch ( ch window -- ) ptr>> (waddch) ;
-: addch ( ch -- ) current-window get waddch ;
 
 : werase ( window -- ) ptr>> ffi:werase curses-error ;
 : erase ( -- ) current-window get werase ;
@@ -449,3 +449,32 @@ PRIVATE>
 
 : mousemask ( mask -- newmask oldmask )
     0 <ulong> [ ffi:mousemask ] keep *ulong ;
+
+: wget-yx ( window -- y x )
+    ptr>> ffi:c-window memory>struct [ _cury>> ] [ _curx>> ] bi ;
+: get-yx ( -- y x )
+    current-window get wget-yx ;
+
+: wget-y ( window -- y )
+    ptr>> ffi:c-window memory>struct _cury>> ;
+: get-y ( -- y )
+    current-window get wget-y ;
+: wget-x ( window -- x )
+    ptr>> ffi:c-window memory>struct _curx>> ;
+: get-x ( -- x )
+    current-window get wget-x ;
+
+: wget-max-yx ( window -- y x )
+    ptr>> ffi:c-window memory>struct
+    [ _maxy>> 1 + ] [ _maxx>> 1 + ] bi ;
+: get-max-yx ( -- y x )
+    current-window get wget-max-yx ;
+
+: wget-max-y ( window -- y )
+    ptr>> ffi:c-window memory>struct _maxy>> 1 + ;
+: get-max-y ( -- y )
+    current-window get wget-max-y ;
+: wget-max-x ( window -- x )
+    ptr>> ffi:c-window memory>struct _maxx>> 1 + ;
+: get-max-x ( -- x )
+    current-window get wget-max-x ;
