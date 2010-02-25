@@ -1364,6 +1364,25 @@ HELP: assert-sequence=
   }
 } ;
 
+HELP: cartesian-each
+{ $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation "( elt1 elt2 -- )" } } }
+{ $description "Applies the quotation to every possible pairing of elements from the two sequences." } ;
+
+HELP: cartesian-map
+{ $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation "( elt1 elt2 -- result )" } } { "newseq" "a new sequence of sequences" } }
+{ $description "Applies the quotation to every possible pairing of elements from the two sequences, collecting results into a new sequence of sequences." } ;
+
+HELP: cartesian-product
+{ $values { "seq1" sequence } { "seq2" sequence } { "newseq" "a new sequence of sequences of pairs" } }
+{ $description "Outputs a sequence of all possible pairings of elements from the two sequences." }
+{ $examples
+    { $example
+        "USING: prettyprint sequences ;"
+        "{ 1 2 } { 3 4 } cartesian-product ."
+        "{ { { 1 3 } { 1 4 } } { { 2 3 } { 2 4 } } }"
+    }
+} ;
+
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
 "The " { $link nth-unsafe } " and " { $link set-nth-unsafe } " sequence protocol bypasses bounds checks for increased performance."
 $nl
@@ -1691,6 +1710,19 @@ ARTICLE: "sequences-combinator-implementation" "Implementing sequence combinator
     2selector
 } ;
 
+ARTICLE: "sequences-cartesian" "Cartesian product operations"
+"The cartesian product of two sequences is a sequence of all pairs where the first element of each pair is from the first sequence, and the second element of each pair is from the second sequence. The number of elements in the cartesian product is the product of the lengths of the two sequences."
+$nl
+"Combinators which pair every element of the first sequence with every element of the second:"
+{ $subsections
+    cartesian-each
+    cartesian-map
+}
+"Computing the cartesian product of two sequences:"
+{ $subsections
+    cartesian-product
+} ;
+
 ARTICLE: "sequences" "Sequence operations"
 "A " { $emphasis "sequence" } " is a finite, linearly-ordered collection of elements. Words for working with sequences are in the " { $vocab-link "sequences" } " vocabulary."
 $nl
@@ -1718,6 +1750,7 @@ $nl
     "binary-search"
     "sets"
     "sequences-trimming"
+    "sequences-cartesian"
     "sequences.deep"
 }
 "Using sequences for looping:"
