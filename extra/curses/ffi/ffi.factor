@@ -7,7 +7,7 @@ IN: curses.ffi
 << "curses" {
     { [ os winnt? ]  [ "libcurses.dll" ] }
     { [ os macosx? ] [ "libcurses.dylib" ] }
-    { [ os unix?  ]  [ "libncurses.so.5.7" ] }
+    { [ os unix?  ]  [ "libncursesw.so.5.7" ] }
 } cond cdecl add-library >>
 
 C-TYPE: WINDOW
