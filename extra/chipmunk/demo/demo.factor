@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http:// factorcode.org/license.txt for BSD license.
-USING: accessors chipmunk classes.struct game.worlds kernel locals
+USING: accessors chipmunk.ffi classes.struct game.worlds kernel locals
 math method-chains opengl.gl random sequences specialized-arrays
 specialized-arrays.instances.alien.c-types.void* ui ui.gadgets.worlds
 ui.pixel-formats ;
