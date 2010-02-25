@@ -1,13 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.strings assocs byte-arrays
-classes.struct combinators continuations destructors
-fry io io.encodings.8-bit io.encodings.string io.encodings.utf8
-io.streams.c kernel libc locals math memoize multiline
-namespaces prettyprint sequences strings threads ;
-IN: curses
+USING: accessors alien.c-types alien.strings classes.struct
+combinators continuations destructors fry io.encodings.utf8
+kernel libc locals math memoize multiline namespaces sequences
+unix.ffi ;
 
 QUALIFIED-WITH: curses.ffi ffi
+
+IN: curses
 
 SYMBOL: current-window
 
@@ -244,6 +244,7 @@ MEMO: register-color ( fg bg -- n )
         1 n-registered-colors set
         \ register-color reset-memoized
         ffi:start_color curses-error
+        ffi:stdscr 0 f ffi:wcolor_set curses-error
     ] when ;
 
 PRIVATE>
@@ -376,10 +377,7 @@ PRIVATE>
 : all-attroff ( -- ) current-window get wall-attroff ;
 
 : wccolor ( foreground background window -- )
-    [
-        2dup [ COLOR_WHITE = ] [ COLOR_BLACK = ] bi* and
-        [ 2drop 0 ] [ register-color ] if ffi:COLOR_PAIR
-    ] dip ptr>> (wattron) ;
+    [ register-color ] dip ptr>> swap f ffi:wcolor_set curses-error ;
 
 : ccolor ( foreground background -- )
     current-window get wccolor ;
