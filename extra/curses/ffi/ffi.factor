@@ -254,6 +254,8 @@ C-GLOBAL: int COLOR_PAIRS
 
 : COLOR_PAIR ( n -- n' ) 8 shift ; inline foldable
 
+FUNCTION: int wcolor_set ( WINDOW* win, short color_pair_number, void* opts ) ;
+
 FUNCTION: int wattron ( WINDOW* win, int attrs ) ;
 FUNCTION: int wattroff ( WINDOW* win, int attrs ) ;
 FUNCTION: int wattrset ( WINDOW* win, int attrs ) ;
