@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.order strings arrays vectors sequences
-sequences.private accessors fry combinators.short-circuit ;
+sequences.private accessors fry combinators.short-circuit
+combinators ;
 IN: grouping
 
 <PRIVATE
@@ -114,7 +115,15 @@ INSTANCE: sliced-clumps abstract-clumps
 
 : all-eq? ( seq -- ? ) [ eq? ] monotonic? ;
 
-TUPLE: circular-slice < slice ;
+TUPLE: circular-slice
+    { from read-only }
+    { to   read-only }
+    { seq  read-only } ;
+INSTANCE: circular-slice virtual-sequence
+M: circular-slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
+M: circular-slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
+M: circular-slice length [ to>> ] [ from>> ] bi - ; inline
+M: circular-slice virtual-exemplar seq>> ; inline
 M: circular-slice virtual@
     [ from>> + ] [ seq>> ] bi [ length slice-mod ] keep ; inline
 
