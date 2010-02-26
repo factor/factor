@@ -309,7 +309,7 @@ HELP: time-
 } ;
 
 HELP: convert-timezone
-{ $values { "timestamp" timestamp } { "duration" duration } { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "duration" duration } { "timestamp'" timestamp } }
 { $description "Converts the " { $snippet "timestamp" } "'s " { $snippet "gmt-offset" } " to the GMT offset represented by the " { $snippet "duration" } "." }
 { $examples
     { $example "USING: accessors calendar prettyprint ;"
@@ -319,7 +319,7 @@ HELP: convert-timezone
 } ;
 
 HELP: >local-time
-{ $values { "timestamp" timestamp } { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Converts the " { $snippet "timestamp" } " to the timezone of your computer." }
 { $examples
     { $example "USING: accessors calendar kernel prettyprint ;"
@@ -329,7 +329,7 @@ HELP: >local-time
 } ;
 
 HELP: >gmt
-{ $values { "timestamp" timestamp } { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Converts the " { $snippet "timestamp" } " to the GMT timezone." }
 { $examples
     { $example "USING: accessors calendar kernel prettyprint ;"

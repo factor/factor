@@ -1,8 +1,10 @@
-USING: arrays debugger.threads destructors io io.directories
-io.encodings.ascii io.encodings.binary io.encodings.string
-io.encodings.8-bit.latin1 io.files io.files.private
-io.files.temp io.files.unique kernel make math sequences system
-threads tools.test generic.single ;
+USING: alien alien.c-types arrays classes.struct
+debugger.threads destructors generic.single io io.directories
+io.encodings.8-bit.latin1 io.encodings.ascii
+io.encodings.binary io.encodings.string io.files
+io.files.private io.files.temp io.files.unique kernel make math
+sequences specialized-arrays system threads tools.test ;
+SPECIALIZED-ARRAY: int
 IN: io.files.tests
 
 [ ] [ "append-test" temp-file dup exists? [ delete-file ] [ drop ] if ] unit-test
@@ -65,6 +67,65 @@ IN: io.files.tests
     ] with-file-reader
 ] unit-test
 
+! Writing specialized arrays to binary streams should work
+[ ] [
+    "test.txt" temp-file binary [
+        int-array{ 1 2 3 } write
+    ] with-file-writer
+] unit-test
+
+[ int-array{ 1 2 3 } ] [
+    "test.txt" temp-file binary [
+        3 4 * read
+    ] with-file-reader
+    byte-array>int-array
+] unit-test
+
+[ ] [
+    BV{ 0 1 2 } "test.txt" temp-file binary set-file-contents
+] unit-test
+
+[ t ] [
+    "test.txt" temp-file binary file-contents
+    B{ 0 1 2 } =
+] unit-test
+
+STRUCT: pt { x uint } { y uint } ;
+SPECIALIZED-ARRAY: pt
+
+CONSTANT: pt-array-1
+    pt-array{ S{ pt f 1 1 } S{ pt f 2 2 } S{ pt f 3 3 } }
+
+[ ] [
+    pt-array-1
+    "test.txt" temp-file binary set-file-contents
+] unit-test
+
+[ t ] [
+    "test.txt" temp-file binary file-contents
+    pt-array-1 >c-ptr sequence=
+] unit-test
+
+! Slices should support >c-ptr and byte-length
+
+[ ] [
+    pt-array-1 rest-slice
+    "test.txt" temp-file binary set-file-contents
+] unit-test
+
+[ t ] [
+    "test.txt" temp-file binary file-contents
+    byte-array>pt-array
+    pt-array-1 rest-slice sequence=
+] unit-test
+
+! Writing strings to binary streams should fail
+[
+    "test.txt" temp-file binary [
+        "OMGFAIL" write
+    ] with-file-writer
+] must-fail
+
 ! Test EOF behavior
 [ 10 ] [
     image binary [
@@ -73,8 +134,7 @@ IN: io.files.tests
     ] with-file-reader
 ] unit-test
 
-USE: debugger.threads
-
+! Make sure that writing to a closed stream from another thread doesn't crash
 [ ] [ "test-quux.txt" temp-file ascii [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
 
 [ ] [ "test-quux.txt" temp-file delete-file ] unit-test

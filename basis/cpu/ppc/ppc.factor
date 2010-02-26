@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sequences kernel combinators make math
 math.order math.ranges system namespaces locals layouts words
-alien alien.accessors alien.c-types alien.data literals cpu.architecture
-cpu.ppc.assembler cpu.ppc.assembler.backend compiler.cfg.registers
+alien alien.accessors alien.c-types alien.complex alien.data
+literals cpu.architecture cpu.ppc.assembler
+cpu.ppc.assembler.backend compiler.cfg.registers
 compiler.cfg.instructions compiler.cfg.comparisons
 compiler.codegen.fixup compiler.cfg.intrinsics
 compiler.cfg.stack-frame compiler.cfg.build-stack-frame
@@ -780,4 +781,4 @@ USE: vocabs.loader
     { [ os linux? ] [ "cpu.ppc.linux" require ] }
 } cond
 
-"complex-double" c-type t >>return-in-registers? drop
+complex-double c-type t >>return-in-registers? drop

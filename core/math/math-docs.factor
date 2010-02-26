@@ -212,7 +212,7 @@ HELP: recip
 HELP: rem
 { $values { "x" rational } { "y" rational } { "z" rational } }
 { $description
-    "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder always positive."
+    "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder always positive or zero."
     { $list 
         "Given fixnums, always yields a fixnum."
         "Given bignums, always yields a bignum."
@@ -385,14 +385,14 @@ HELP: prev-float
 HELP: real-part
 { $values { "z" number } { "x" real } }
 { $description "Outputs the real part of a complex number. This acts as the identity on real numbers." }
-{ $examples { $example "USING: math prettyprint ; C{ 1 2 } real-part ." "1" } } ;
+{ $examples { $example "USING: math prettyprint ;" "C{ 1 2 } real-part ." "1" } } ;
 
 HELP: imaginary-part
 { $values { "z" number } { "y" real } }
 { $description "Outputs the imaginary part of a complex number. This outputs zero for real numbers." }
 { $examples
-    { $example "USING: math prettyprint ; C{ 1 2 } imaginary-part ." "2" }
-    { $example "USING: math prettyprint ; 3 imaginary-part ." "0" }
+    { $example "USING: math prettyprint ;" "C{ 1 2 } imaginary-part ." "2" }
+    { $example "USING: math prettyprint ;" "3 imaginary-part ." "0" }
 } ;
 
 HELP: real

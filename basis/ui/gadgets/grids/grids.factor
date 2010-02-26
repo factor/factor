@@ -1,9 +1,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.order math.matrices namespaces
-make sequences words io math.vectors ui.gadgets
-ui.baseline-alignment columns accessors strings.tables
-math.rectangles fry ;
+USING: arrays kernel math math.order namespaces make sequences
+words io math.vectors ui.gadgets ui.baseline-alignment columns
+accessors strings.tables math.rectangles fry ;
 IN: ui.gadgets.grids
 
 TUPLE: grid < gadget
@@ -90,7 +89,7 @@ M: grid pref-dim* <grid-layout> grid-pref-dim ;
 : (compute-cell-locs) ( grid-layout -- locs )
     [ accumulate-cell-xs nip ]
     [ accumulate-cell-ys nip ]
-    bi cross-zip flip ;
+    bi cartesian-product flip ;
 
 : adjust-for-baseline ( row-locs row-cells -- row-locs' )
     align-baselines [ 0 swap 2array v+ ] 2map ;
@@ -104,7 +103,7 @@ M: grid pref-dim* <grid-layout> grid-pref-dim ;
 
 : cell-dims ( grid-layout -- dims )
     dup fill?>>
-    [ [ column-widths>> ] [ row-heights>> ] bi cross-zip flip ]
+    [ [ column-widths>> ] [ row-heights>> ] bi cartesian-product flip ]
     [ grid>> [ [ pref-dim>> ] map ] map ]
     if ;
 

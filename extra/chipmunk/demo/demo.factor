@@ -1,9 +1,8 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http:// factorcode.org/license.txt for BSD license.
-USING: accessors chipmunk classes.struct game.loop game.worlds gpu
-gpu.util.wasd kernel literals locals math method-chains opengl.gl
-random sequences specialized-arrays
-specialized-arrays.instances.alien.c-types.void* ui.gadgets.worlds
+USING: accessors alien chipmunk.ffi classes.struct game.worlds kernel
+locals math method-chains opengl.gl random sequences specialized-arrays
+specialized-arrays.instances.alien.c-types.void* ui ui.gadgets.worlds
 ui.pixel-formats ;
 IN: chipmunk.demo
 
@@ -51,12 +50,15 @@ CONSTANT: image-bitmap B{
     x bitnot 7 bitand neg shift 1 bitand 1 = ;
 
 :: make-ball ( x y -- shape )
-    cpBodyAlloc 1.0 NAN: 0 cpBodyInit cpBody memory>struct
+    cpBodyAlloc 1.0 NAN: 0 cpBodyInit
     x y cpv >>p :> body
-    cpCircleShapeAlloc body 0.95 0 0 cpv cpCircleShapeInit cpCircleShape memory>struct
-    [ shape>> 0 >>e ] [ shape>> 0 >>u ] bi drop ;
+    cpCircleShapeAlloc body 0.95 0 0 cpv cpCircleShapeInit
+    dup shape>>
+        0 >>e
+        0 >>u
+        drop ;
 
-TUPLE: chipmunk-world < wasd-world
+TUPLE: chipmunk-world < game-world
     space ;
 
 AFTER: chipmunk-world tick-game-world
@@ -77,7 +79,7 @@ M:: chipmunk-world draw-world* ( world -- )
     3 glPointSize
     0 0 0 glColor3f
     GL_POINTS glBegin
-    space bodies>> cpArray memory>struct
+    space bodies>>
     [ num>> ] [ arr>> swap <direct-void*-array> ] bi [
         cpBody memory>struct p>> [ x>> ] [ y>> ] bi glVertex2f
     ] each
@@ -86,10 +88,10 @@ M:: chipmunk-world draw-world* ( world -- )
     2 glPointSize
     1 0 0 glColor3f
     GL_POINTS glBegin
-    space arbiters>> cpArray memory>struct
+    space arbiters>>
     [ num>> ] [ arr>> swap <direct-void*-array> ] bi [
         cpArbiter memory>struct
-        [ numContacts>> ] [ contacts>> swap <direct-cpContact-array> ] bi [
+        [ numContacts>> ] [ contacts>> >c-ptr swap <direct-cpContact-array> ] bi [
             p>> [ x>> ] [ y>> ] bi glVertex2f
         ] each
     ] each
@@ -97,10 +99,8 @@ M:: chipmunk-world draw-world* ( world -- )
 
 M:: chipmunk-world begin-game-world ( world -- )
     cpInitChipmunk
-    init-gpu
-    world { -0.2 0.13 0.1 } 1.1 0.2 set-wasd-view drop
 
-    cpSpaceAlloc cpSpaceInit cpSpace memory>struct :> space
+    cpSpaceAlloc cpSpaceInit :> space
 
     world space >>space drop
     space 2.0 10000 cpSpaceResizeActiveHash
@@ -112,40 +112,42 @@ M:: chipmunk-world begin-game-world ( world -- )
                 x image-width 2 / - 0.05 0.0 1.0 uniform-random-float * + 2 *
                 image-height 2 / y - 0.05 0.0 1.0 uniform-random-float * + 2 *
                 make-ball :> shape
-                space shape body>> cpSpaceAddBody drop
+                space shape shape>> body>> cpSpaceAddBody drop
                 space shape cpSpaceAddShape drop
             ] when
         ] each
     ] each
     
-    space cpBodyAlloc NAN: 0 dup cpBodyInit cpSpaceAddBody cpBody memory>struct :> body
+    space cpBodyAlloc NAN: 0 dup cpBodyInit cpSpaceAddBody :> body
     body -1000 -10 cpv >>p drop
     body 400 0 cpv >>v drop
 
-    space cpCircleShapeAlloc body 8 0 0 cpv cpCircleShapeInit cpSpaceAddShape cpCircleShape memory>struct :> shape
-    shape
-    [ shape>> 0 >>e drop ]
-    [ shape>> 0 >>u drop ] bi ;
+    space cpCircleShapeAlloc [ body 8 0 0 cpv cpCircleShapeInit cpSpaceAddShape drop ] keep
+        :> shape
+    shape shape>>
+        0 >>e
+        0 >>u
+        drop ;
 
 M: chipmunk-world end-game-world
     space>>
     [ cpSpaceFreeChildren ]
     [ cpSpaceFree ] bi ;
 
-M: chipmunk-world wasd-movement-speed drop 1/160. ;
-M: chipmunk-world wasd-near-plane drop 1/32. ;
-M: chipmunk-world wasd-far-plane drop 256.0 ;
+: chipmunk-demo ( -- )
+    [
+        f
+        T{ game-attributes
+           { world-class chipmunk-world }
+           { title "Chipmunk Physics Demo" }
+           { pixel-format-attributes
+             { windowed double-buffered }
+           }
+           { pref-dim { 640 480 } }
+           { tick-interval-micros 16666 }
+        }
+        clone
+        open-window
+    ] with-ui ;
 
-GAME: chipmunk-demo {
-        { world-class chipmunk-world }
-        { title "Chipmunk Physics Demo" }
-        { pixel-format-attributes {
-            windowed
-            double-buffered
-            T{ depth-bits { value 24 } }
-        } }
-        { grab-input? t }
-        { use-game-input? t }
-        { pref-dim { 640 480 } }
-        { tick-interval-micros $[ 60 fps ] }
-    } ;
+MAIN: chipmunk-demo

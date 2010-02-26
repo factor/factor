@@ -1,23 +1,41 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs io.encodings.utf8 io.files
-io.pathnames kernel make math.parser memoize sequences sets
-sorting summary vocabs vocabs.loader ;
+USING: accessors arrays assocs io.directories io.encodings.utf8
+io.files io.pathnames kernel make math.parser memoize sequences
+sets sorting summary vocabs vocabs.loader words system
+classes.algebra combinators.short-circuit fry continuations
+namespaces ;
 IN: vocabs.metadata
+
+: check-vocab ( vocab -- vocab )
+    dup find-vocab-root [ no-vocab ] unless ;
 
 MEMO: vocab-file-contents ( vocab name -- seq )
     vocab-append-path dup
     [ dup exists? [ utf8 file-lines ] [ drop f ] if ] when ;
 
+: ?delete-file ( pathname -- ) '[ _ delete-file ] ignore-errors ;
+
 : set-vocab-file-contents ( seq vocab name -- )
     dupd vocab-append-path [
-        utf8 set-file-lines
+        swap [ ?delete-file ] [ swap utf8 set-file-lines ] if-empty
         \ vocab-file-contents reset-memoized
-    ] [
-        "The " swap vocab-name
-        " vocabulary was not loaded from the file system"
-        3append throw
-    ] ?if ;
+    ] [ vocab-name no-vocab ] ?if ;
+
+: vocab-windows-icon-path ( vocab -- string )
+    vocab-dir "icon.ico" append-path ;
+
+: vocab-mac-icon-path ( vocab -- string )
+    vocab-dir "icon.icns" append-path ;
+
+: vocab-resources-path ( vocab -- string )
+    vocab-dir "resources.txt" append-path ;
+
+: vocab-resources ( vocab -- patterns )
+    dup vocab-resources-path vocab-file-contents harvest ;
+
+: set-vocab-resources ( patterns vocab -- )
+    dup vocab-resources-path set-vocab-file-contents ;
 
 : vocab-summary-path ( vocab -- string )
     vocab-dir "summary.txt" append-path ;
@@ -57,6 +75,9 @@ M: vocab-link summary vocab-summary ;
 : add-vocab-tags ( tags vocab -- )
     [ vocab-tags append prune ] keep set-vocab-tags ;
 
+: remove-vocab-tags ( tags vocab -- )
+    [ vocab-tags swap diff ] keep set-vocab-tags ;
+
 : vocab-authors-path ( vocab -- string )
     vocab-dir "authors.txt" append-path ;
 
@@ -66,5 +87,37 @@ M: vocab-link summary vocab-summary ;
 : set-vocab-authors ( authors vocab -- )
     dup vocab-authors-path set-vocab-file-contents ;
 
+: vocab-platforms-path ( vocab -- string )
+    vocab-dir "platforms.txt" append-path ;
+
+ERROR: bad-platform name ;
+
+: vocab-platforms ( vocab -- platforms )
+    dup vocab-platforms-path vocab-file-contents
+    [ dup "system" lookup [ ] [ bad-platform ] ?if ] map ;
+
+: set-vocab-platforms ( platforms vocab -- )
+    [ [ name>> ] map ] dip
+    dup vocab-platforms-path set-vocab-file-contents ;
+
+: supported-platform? ( platforms -- ? )
+    [ t ] [ [ os swap class<= ] any? ] if-empty ;
+
 : unportable? ( vocab -- ? )
-    vocab-tags "unportable" swap member? ;
+    {
+        [ vocab-tags "untested" swap member? ]
+        [ vocab-platforms supported-platform? not ]
+    } 1|| ;
+
+TUPLE: unsupported-platform vocab requires ;
+
+: unsupported-platform ( vocab requires -- )
+    \ unsupported-platform boa throw-continue ;
+
+M: unsupported-platform summary
+    drop "Current operating system not supported by this vocabulary" ;
+
+[
+    dup vocab-platforms dup supported-platform?
+    [ 2drop ] [ [ vocab-name ] dip unsupported-platform ] if
+] check-vocab-hook set-global

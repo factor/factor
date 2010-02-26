@@ -47,3 +47,6 @@ SYNTAX: &:
     [ nip ] [ global-quot ] 2bi (( -- value )) define-declared ;
 
 SYNTAX: C-GLOBAL: scan-c-type CREATE-WORD define-global ;
+
+SYNTAX: pointer:
+    scan-c-type <pointer> suffix! ;

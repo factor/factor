@@ -65,9 +65,9 @@ LIBRARY: libcrypto
 ! bio.h
 ! ===============================================
 
-FUNCTION: bio* BIO_new_file ( char* filename, char* mode ) ;
+FUNCTION: bio* BIO_new_file ( c-string filename, c-string mode ) ;
 
-FUNCTION: int BIO_printf ( bio* bio, char* format ) ;
+FUNCTION: int BIO_printf ( bio* bio, c-string format ) ;
 
 FUNCTION: long BIO_ctrl ( void* bio, int cmd, long larg, void* parg ) ;
 
@@ -83,17 +83,17 @@ FUNCTION: void* BIO_push ( void* bio, void* append ) ;
 
 FUNCTION: int BIO_read ( void* b, void* buf, int len ) ;
 
-FUNCTION: int BIO_gets ( void* b, char* buf, int size ) ;
+FUNCTION: int BIO_gets ( void* b, c-string buf, int size ) ;
 
 FUNCTION: int BIO_write ( void* b, void* buf, int len ) ;
 
-FUNCTION: int BIO_puts ( void* bp, char* buf ) ;
+FUNCTION: int BIO_puts ( void* bp, c-string buf ) ;
 
 FUNCTION: ulong ERR_get_error (  ) ;
 
 FUNCTION: void ERR_clear_error ( ) ;
 
-FUNCTION: char* ERR_error_string ( ulong e, void* buf ) ;
+FUNCTION: c-string ERR_error_string ( ulong e, void* buf ) ;
 
 FUNCTION: void* BIO_f_buffer (  ) ;
 
@@ -103,7 +103,7 @@ FUNCTION: void* BIO_f_buffer (  ) ;
 
 CONSTANT: EVP_MAX_MD_SIZE 64
 
-TYPEDEF: void* EVP_MD*
+C-TYPE: EVP_MD
 C-TYPE: ENGINE
 
 STRUCT: EVP_MD_CTX
@@ -120,7 +120,7 @@ FUNCTION: void OpenSSL_add_all_digests (  ) ;
 ! Clean them up before exiting
 FUNCTION: void EVP_cleanup (  ) ;
 
-FUNCTION: EVP_MD* EVP_get_digestbyname ( char* name ) ;
+FUNCTION: EVP_MD* EVP_get_digestbyname ( c-string name ) ;
 
 FUNCTION: void EVP_MD_CTX_init ( EVP_MD* ctx ) ;
 
@@ -166,7 +166,7 @@ FUNCTION: int RSA_print_fp ( void* fp, void* x, int offset ) ;
 ! objects.h
 ! ===============================================
 
-FUNCTION: int OBJ_sn2nid ( char* s ) ;
+FUNCTION: int OBJ_sn2nid ( c-string s ) ;
 
 ! ===============================================
 ! bn.h

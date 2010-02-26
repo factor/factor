@@ -35,7 +35,7 @@ STRUCT: tm
     { yday int }
     { isdst int }
     { gmtoff long }
-    { zone char* } ;
+    { zone c-string } ;
 
 FUNCTION: time_t time ( time_t* t ) ;
 FUNCTION: tm* localtime ( time_t* clock ) ;
