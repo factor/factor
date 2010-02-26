@@ -135,6 +135,7 @@ IN: compiler.tree.propagation.transforms
     in-d>> first value-info literal>> {
         { V{ } [ [ drop { } 0 vector boa ] ] }
         { H{ } [ [ drop 0 <hashtable> ] ] }
+        { HS{ } [ [ drop f fast-set ] ] }
         [ drop f ]
     } case
 ] "custom-inlining" set-word-prop
