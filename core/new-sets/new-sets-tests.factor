@@ -40,3 +40,12 @@ IN: new-sets.tests
 [ HS{ 1 2 3 } ] [ { 1 2 3 } fast-set ] unit-test
 
 [ { 1 2 3 } ] [ { { 1 } { 2 } { 1 3 } } combine ] unit-test
+
+[ f ] [ { 0 1 1 2 3 5 } all-unique? ] unit-test
+[ t ] [ { 0 1 2 3 4 5 } all-unique? ] unit-test
+
+[ { 1 2 3 } ] [ { 1 2 2 3 3 } { } set-like ] unit-test
+[ { 3 2 1 } ] [ { 3 3 2 2 1 } { } set-like ] unit-test
+
+[ { 1 2 1 } ] [ { 1 2 3 2 1 2 1 } duplicates ] unit-test
+[ f ] [ HS{ 1 2 3 1 2 1 } duplicates ] unit-test
