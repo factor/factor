@@ -22,3 +22,6 @@ M: hash-set clone
     table>> clone hash-set boa ;
 
 M: sequence fast-set <hash-set> ;
+
+M: sequence duplicates
+    HS{ } clone [ [ in? ] [ adjoin ] 2bi ] curry filter ;
