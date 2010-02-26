@@ -7,7 +7,7 @@ IN: bootstrap.image.download
 CONSTANT: url URL" http://factorcode.org/images/latest/"
 
 : download-checksums ( -- alist )
-    url "checksums.txt" >url derive-url http-get nip
+    url "checksums.txt" >url derive-url http-data
     string-lines [ " " split1 ] { } map>assoc ;
 
 : need-new-image? ( image -- ? )
