@@ -44,9 +44,8 @@ PRIVATE>
 M: game-world begin-world
     dup use-game-input?>> [ open-game-input ] when
     dup use-audio-engine?>> [ dup open-game-audio-engine >>audio-engine ] when
-    dup begin-game-world
-    dup [ tick-interval-micros>> ] [ ] bi <game-loop> [ >>game-loop ] keep start-loop
-    drop ;
+    dup [ tick-interval-micros>> ] [ ] bi <game-loop>
+    [ >>game-loop begin-game-world ] keep start-loop ;
 
 M: game-world end-world
     [ [ stop-loop ] when* f ] change-game-loop

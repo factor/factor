@@ -89,8 +89,8 @@ CONSTANT: SSL_ERROR_WANT_ACCEPT      8
     } ;
 
 TYPEDEF: void* ssl-method
-TYPEDEF: void* SSL_CTX*
-TYPEDEF: void* SSL_SESSION*
+C-TYPE: SSL_CTX
+C-TYPE: SSL_SESSION
 C-TYPE: SSL
 
 LIBRARY: libssl
@@ -99,8 +99,7 @@ LIBRARY: libssl
 ! x509.h
 ! ===============================================
 
-TYPEDEF: void* X509_NAME*
-
+C-TYPE: X509_NAME
 C-TYPE: X509
 
 FUNCTION: int X509_NAME_get_text_by_NID ( X509_NAME* name, int nid, void* buf, int len ) ;
@@ -110,7 +109,7 @@ FUNCTION: X509_NAME* X509_get_subject_name ( X509* a ) ;
 ! ssl.h
 ! ===============================================
 
-FUNCTION: char* SSL_get_version ( SSL* ssl ) ;
+FUNCTION: c-string SSL_get_version ( SSL* ssl ) ;
 
 ! Maps OpenSSL errors to strings
 FUNCTION: void SSL_load_error_strings (  ) ;
@@ -144,7 +143,7 @@ FUNCTION: SSL_CTX* SSL_CTX_new ( ssl-method method ) ;
 
 ! Load the certificates and private keys into the SSL_CTX
 FUNCTION: int SSL_CTX_use_certificate_chain_file ( SSL_CTX* ctx,
-                                                   char* file ) ; ! PEM type
+                                                   c-string file ) ; ! PEM type
 
 FUNCTION: SSL* SSL_new ( SSL_CTX* ctx ) ;
 
@@ -175,7 +174,7 @@ CONSTANT: SSL_RECEIVED_SHUTDOWN 2
 
 FUNCTION: int SSL_get_shutdown ( SSL* ssl ) ;
 
-FUNCTION: int SSL_CTX_set_session_id_context ( SSL_CTX* ctx, char* sid_ctx, uint len ) ;
+FUNCTION: int SSL_CTX_set_session_id_context ( SSL_CTX* ctx, c-string sid_ctx, uint len ) ;
 
 FUNCTION: SSL_SESSION* SSL_get1_session ( SSL* ssl ) ;
 
@@ -198,17 +197,17 @@ FUNCTION: void SSL_CTX_free ( SSL_CTX* ctx ) ;
 
 FUNCTION: void RAND_seed ( void* buf, int num ) ;
 
-FUNCTION: int SSL_set_cipher_list ( SSL* ssl, char* str ) ;
+FUNCTION: int SSL_set_cipher_list ( SSL* ssl, c-string str ) ;
 
-FUNCTION: int SSL_use_RSAPrivateKey_file ( SSL* ssl, char* str ) ;
+FUNCTION: int SSL_use_RSAPrivateKey_file ( SSL* ssl, c-string str ) ;
 
 FUNCTION: int SSL_CTX_use_RSAPrivateKey_file ( SSL_CTX* ctx, int type ) ;
 
 FUNCTION: int SSL_use_certificate_file ( SSL* ssl,
-                                         char* str, int type ) ;
+                                         c-string str, int type ) ;
 
-FUNCTION: int SSL_CTX_load_verify_locations ( SSL_CTX* ctx, char* CAfile,
-                                              char* CApath ) ;
+FUNCTION: int SSL_CTX_load_verify_locations ( SSL_CTX* ctx, c-string CAfile,
+                                              c-string CApath ) ;
 
 FUNCTION: int SSL_CTX_set_default_verify_paths ( SSL_CTX* ctx ) ;
 
@@ -221,7 +220,7 @@ FUNCTION: void SSL_CTX_set_verify ( SSL_CTX* ctx, int mode, void* callback ) ;
 
 FUNCTION: void SSL_CTX_set_client_CA_list ( SSL_CTX* ctx, SSL* list ) ;
 
-FUNCTION: SSL* SSL_load_client_CA_file ( char* file ) ;
+FUNCTION: SSL* SSL_load_client_CA_file ( c-string file ) ;
 
 ! Used to manipulate settings of the SSL_CTX and SSL objects.
 ! This function should never be called directly
@@ -232,7 +231,7 @@ FUNCTION: void SSL_CTX_set_default_passwd_cb ( SSL_CTX* ctx, void* cb ) ;
 FUNCTION: void SSL_CTX_set_default_passwd_cb_userdata ( SSL_CTX* ctx,
                                                         void* u ) ;
 
-FUNCTION: int SSL_CTX_use_PrivateKey_file ( SSL_CTX* ctx, char* file,
+FUNCTION: int SSL_CTX_use_PrivateKey_file ( SSL_CTX* ctx, c-string file,
                                             int type ) ;
 
 ! Sets the maximum depth for the allowed ctx certificate chain verification

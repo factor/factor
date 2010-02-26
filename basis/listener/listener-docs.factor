@@ -1,8 +1,9 @@
-USING: help.markup help.syntax kernel io system prettyprint continuations quotations ;
+USING: help.markup help.syntax kernel io system prettyprint
+continuations quotations vocabs.loader parser ;
 IN: listener
 
 ARTICLE: "listener-watch" "Watching variables in the listener"
-"The listener prints the concepts of the data and retain stacks after every expression. It can also print values of dynamic variables which are added to a watch list:"
+"The listener prints values of dynamic variables which are added to a watch list:"
 { $subsections visible-vars }
 "To add or remove a single variable:"
 { $subsections
@@ -14,7 +15,7 @@ ARTICLE: "listener-watch" "Watching variables in the listener"
     show-vars
     hide-vars
 }
-"Hiding all visible variables:"
+"Clearing the watch list:"
 { $subsections hide-all-vars } ;
 
 HELP: only-use-vocabs
@@ -46,21 +47,33 @@ HELP: hide-all-vars
 { $description "Removes all variables from the watch list." } ;
 
 ARTICLE: "listener" "The listener"
-"The listener evaluates Factor expressions read from a stream. The listener is the primary interface to the Factor runtime. Typically, you write Factor code in a text editor, then load it using the listener and test it."
+"The listener evaluates Factor expressions read from the input stream. Typically, you write Factor code in a text editor, load it from the listener by calling " { $link require } ", " { $link reload } " or " { $link run-file } ", and then test it from interactively."
 $nl
 "The classical first program can be run in the listener:"
 { $example "\"Hello, world\" print" "Hello, world" }
+"New words can also be defined in the listener:"
+{ $example
+    "USE: math.functions"
+    ": twice ( word -- ) [ execute ] [ execute ] bi ; inline"
+    "81 \\ sqrt twice ."
+    "3.0"
+}
 "Multi-line expressions are supported:"
 { $example "{ 1 2 3 } [\n    .\n] each" "1\n2\n3" }
-"The listener knows when to expect more input by looking at the height of the stack. Parsing words such as " { $link POSTPONE: { } " leave elements on the parser stack, and corresponding words such as " { $link POSTPONE: } } " pop them."
+"The listener will display the current contents of the datastack after every line of input."
 $nl
-"The listener will display the current contents of the datastack after every expression is evaluated. The listener can additionally watch dynamic variables:"
+"The listener can watch dynamic variables:"
 { $subsections "listener-watch" }
-"To start a nested listener:"
+"Nested listeners can be useful for testing code in other dynamic scopes. For example, when doing database maintanance using the " { $vocab-link "db.tuples" } " vocabulary, it can be useful to start a listener with a database connection:"
+{ $code
+    "USING: db db.sqlite listener ;"
+    "\"data.db\" <sqlite-db> [ listener ] with-db"
+}
+"Starting a nested listener:"
 { $subsections listener }
 "To exit a listener, invoke the " { $link return } " word."
 $nl
-"Multi-line quotations can be read independently of the rest of the listener:"
+"The listener's mechanism for reading multi-line expressions from the input stream can be called from user code:"
 { $subsections read-quot } ;
 
 ABOUT: "listener"

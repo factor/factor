@@ -392,13 +392,13 @@ PRIVATE>
 
 : fortran-arg-type>c-type ( fortran-type -- c-type added-args )
     parse-fortran-type
-    [ (fortran-type>c-type) resolve-pointer-type ]
+    [ (fortran-type>c-type) <pointer> ]
     [ added-c-args ] bi ;
 : fortran-ret-type>c-type ( fortran-type -- c-type added-args )
     parse-fortran-type dup returns-by-value?
     [ (fortran-ret-type>c-type) { } ] [
         c:void swap 
-        [ added-c-args ] [ (fortran-type>c-type) resolve-pointer-type ] bi prefix
+        [ added-c-args ] [ (fortran-type>c-type) <pointer> ] bi prefix
     ] if ;
 
 : fortran-arg-types>c-types ( fortran-types -- c-types )

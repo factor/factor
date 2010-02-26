@@ -100,4 +100,4 @@ M:: winnt (monitor) ( path recursive? mailbox -- monitor )
     ] with-destructors ;
 
 M: win32-monitor dispose
-    port>> dispose ;
+    [ port>> dispose ] [ call-next-method ] bi ;

@@ -80,10 +80,10 @@ STRUCT: th-info
 ;
 
 STRUCT: th-comment
-    { user-comments char** }
+    { user-comments c-string* }
     { comment-lengths int* }
     { comments int }
-    { vendor char* }
+    { vendor c-string }
 ;
 
 TYPEDEF: uchar[64] th-quant-base
@@ -110,7 +110,7 @@ STRUCT: th-huff-code
 ;
 
 LIBRARY: theoradec
-FUNCTION: char* th_version_string ( ) ;
+FUNCTION: c-string th_version_string ( ) ;
 FUNCTION: uint th_version_number ( ) ;
 FUNCTION: longlong th_granule_frame ( void* encdec, longlong granpos) ;
 FUNCTION: int th_packet_isheader ( ogg-packet* op ) ;
@@ -118,10 +118,10 @@ FUNCTION: int th_packet_iskeyframe ( ogg-packet* op ) ;
 FUNCTION: void th_info_init ( th-info* info ) ;
 FUNCTION: void th_info_clear ( th-info* info ) ;
 FUNCTION: void th_comment_init ( th-comment* tc ) ;
-FUNCTION: void th_comment_add ( th-comment* tc, char* comment ) ;
-FUNCTION: void th_comment_add_tag ( th-comment* tc, char* tag, char* value ) ;
-FUNCTION: char* th_comment_query ( th-comment* tc, char* tag, int count ) ;
-FUNCTION: int   th_comment_query_count ( th-comment* tc, char* tag ) ;
+FUNCTION: void th_comment_add ( th-comment* tc, c-string comment ) ;
+FUNCTION: void th_comment_add_tag ( th-comment* tc, c-string tag, c-string value ) ;
+FUNCTION: c-string th_comment_query ( th-comment* tc, c-string tag, int count ) ;
+FUNCTION: int   th_comment_query_count ( th-comment* tc, c-string tag ) ;
 FUNCTION: void  th_comment_clear ( th-comment* tc ) ;
 
 CONSTANT: TH-ENCCTL-SET-HUFFMAN-CODES 0

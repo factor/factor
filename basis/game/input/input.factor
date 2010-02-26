@@ -90,8 +90,24 @@ TUPLE: mouse-state dx dy scroll-dx scroll-dy buttons ;
 M: mouse-state clone
     call-next-method dup buttons>> clone >>buttons ;
 
+SYMBOLS: pressed released ;
+
+: button-delta ( old? new? -- delta )
+    {
+        { [ 2dup xor not ] [ 2drop f ] }
+        { [ dup  not     ] [ 2drop released ] }
+        { [ over not     ] [ 2drop pressed ] }
+    } cond ; inline
+
+: buttons-delta-as ( old-buttons new-buttons exemplar -- delta )
+    [ button-delta ] swap 2map-as ; inline
+
+: buttons-delta ( old-buttons new-buttons -- delta )
+    { } buttons-delta-as ; inline
+
 {
     { [ os windows? ] [ "game.input.xinput" require ] }
     { [ os macosx? ] [ "game.input.iokit" require ] }
-    { [ t ] [ ] }
+    { [ os linux? ] [ "game.input.linux" require ] }
+    [ ]
 } cond

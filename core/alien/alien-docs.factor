@@ -1,8 +1,24 @@
 USING: byte-arrays arrays help.syntax help.markup
 alien.syntax compiler definitions math libc eval
 debugger parser io io.backend system alien.accessors
-alien.libraries alien.c-types quotations ;
+alien.libraries alien.c-types quotations kernel
+sequences ;
 IN: alien
+
+HELP: >c-ptr
+{ $values { "obj" object } { "c-ptr" c-ptr } }
+{ $contract "Outputs a pointer to the binary data of this object." } ;
+
+HELP: byte-length
+{ $values { "obj" object } { "n" "a non-negative integer" } }
+{ $contract "Outputs the number of bytes of binary data that will be output by " { $link >c-ptr } "." } ;
+
+HELP: element-size
+{ $values { "seq" sequence } { "n" "a non-negative integer" } }
+{ $contract "Outputs the number of bytes used for each element of the sequence." }
+{ $notes "If a sequence class implements " { $link element-size } " and " { $link >c-ptr } ", then instances of this sequence, as well as slices of this sequence, can be used as binary objects." } ;
+
+{ >c-ptr element-size byte-length } related-words
 
 HELP: alien
 { $class-description "The class of alien pointers. See " { $link "syntax-aliens" } " for syntax and " { $link "c-data" } " for general information." } ;
@@ -42,7 +58,7 @@ HELP: <alien>
 { $notes "Alien objects are invalidated between image saves and loads." } ;
 
 HELP: c-ptr
-{ $class-description "Class of objects consisting of aliens, byte arrays and " { $link f } ". These objects can convert to pointer C types, which are all aliases of " { $snippet "void*" } "." } ;
+{ $class-description "Class of objects consisting of aliens, byte arrays and " { $link f } ". These objects all can be used as values of " { $link pointer } " C types." } ;
 
 HELP: alien-invoke-error
 { $error-description "Thrown if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
@@ -136,7 +152,7 @@ ARTICLE: "aliens" "Alien addresses"
 }
 "Anywhere that a " { $link alien } " instance is accepted, the " { $link f } " singleton may be passed in to denote a null pointer."
 $nl
-"Usually alien objects do not have to created and dereferenced directly; instead declaring C function parameters and return values as having a pointer type such as " { $snippet "void*" } " takes care of the details."
+"Usually alien objects do not have to created and dereferenced directly; instead declaring C function parameters and return values as having a " { $link pointer } " type such as " { $snippet "void*" } " takes care of the details."
 { $subsections
     "syntax-aliens"
     "alien-expiry"

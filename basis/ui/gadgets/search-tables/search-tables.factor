@@ -3,7 +3,7 @@
 USING: accessors kernel delegate fry sequences models
 combinators.short-circuit models.search models.delay calendar locals
 ui.gestures ui.pens ui.pens.image ui.gadgets.editors ui.gadgets.labels
-ui.gadgets.scrollers ui.gadgets.tables ui.gadgets.tracks
+ui.gadgets.scrollers ui.gadgets.tables ui.gadgets.theme ui.gadgets.tracks
 ui.gadgets.borders ui.gadgets.buttons ui.baseline-alignment ui.gadgets ;
 IN: ui.gadgets.search-tables
 

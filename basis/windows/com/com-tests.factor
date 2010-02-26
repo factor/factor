@@ -1,5 +1,5 @@
 USING: kernel windows.com windows.com.syntax windows.ole32
-alien alien.syntax tools.test libc alien.c-types
+windows.types alien alien.syntax tools.test libc alien.c-types
 namespaces arrays continuations accessors math windows.com.wrapper
 windows.com.wrapper.private destructors effects compiler.units ;
 IN: windows.com.tests
@@ -15,6 +15,9 @@ COM-INTERFACE: IInherited ISimple {9620ecec-8438-423b-bb14-86f835aa40dd}
 COM-INTERFACE: IUnrelated IUnknown {b06ac3f4-30e4-406b-a7cd-c29cead4552c}
     int xPlus ( int y )
     int xMulAdd ( int mul, int add ) ;
+
+COM-INTERFACE: ISelfReferential IUnknown {d4f45bf8-f720-4701-a09d-e8e341981121}
+    ISelfReferential* selfReference ( ) ;
 
 { GUID: {216fb341-0eb2-44b1-8edb-60b76e353abc} } [ ISimple-iid ] unit-test
 { GUID: {9620ecec-8438-423b-bb14-86f835aa40dd} } [ IInherited-iid ] unit-test

@@ -4,7 +4,7 @@
 ! This file is based on the gl.h that comes with xorg-x11 6.8.2
 
 USING: alien alien.c-types alien.syntax combinators kernel parser
-sequences system words opengl.gl.extensions ;
+sequences system words opengl.gl.extensions io.encodings.ascii ;
 FROM: alien.c-types => short ;
 IN: opengl.gl
 
@@ -22,7 +22,9 @@ TYPEDEF: float   GLfloat
 TYPEDEF: float   GLclampf
 TYPEDEF: double  GLdouble
 TYPEDEF: double  GLclampd
-TYPEDEF: void*   GLvoid*
+C-TYPE: GLvoid
+
+TYPEDEF: c-string[ascii] GLstring
 
 ! Constants
 
@@ -668,7 +670,7 @@ FUNCTION: void glPopClientAttrib ( ) ;
 
 FUNCTION: GLint glRenderMode ( GLenum mode ) ;
 FUNCTION: GLenum glGetError ( ) ;
-FUNCTION: char* glGetString ( GLenum name ) ;
+FUNCTION: GLstring glGetString ( GLenum name ) ;
 FUNCTION: void glFinish ( ) ;
 FUNCTION: void glFlush ( ) ;
 FUNCTION: void glHint ( GLenum target, GLenum mode ) ;
@@ -1587,10 +1589,8 @@ CONSTANT: GL_STENCIL_BACK_VALUE_MASK HEX: 8CA4
 CONSTANT: GL_STENCIL_BACK_WRITEMASK HEX: 8CA5
 ALIAS: GL_BLEND_EQUATION_RGB GL_BLEND_EQUATION
 
-TYPEDEF: char GLchar
-
 GL-FUNCTION: void glAttachShader { glAttachObjectARB } ( GLuint program, GLuint shader ) ;
-GL-FUNCTION: void glBindAttribLocation { glBindAttribLocationARB } ( GLuint program, GLuint index, GLchar* name ) ;
+GL-FUNCTION: void glBindAttribLocation { glBindAttribLocationARB } ( GLuint program, GLuint index, GLstring name ) ;
 GL-FUNCTION: void glBlendEquationSeparate { glBlendEquationSeparateEXT } ( GLenum modeRGB, GLenum modeAlpha ) ;
 GL-FUNCTION: void glCompileShader { glCompileShaderARB } ( GLuint shader ) ;
 GL-FUNCTION: GLuint glCreateProgram { glCreateProgramObjectARB } (  ) ;
@@ -1601,16 +1601,16 @@ GL-FUNCTION: void glDetachShader { glDetachObjectARB } ( GLuint program, GLuint 
 GL-FUNCTION: void glDisableVertexAttribArray { glDisableVertexAttribArrayARB } ( GLuint index ) ;
 GL-FUNCTION: void glDrawBuffers { glDrawBuffersARB glDrawBuffersATI } ( GLsizei n, GLenum* bufs ) ;
 GL-FUNCTION: void glEnableVertexAttribArray { glEnableVertexAttribArrayARB } ( GLuint index ) ;
-GL-FUNCTION: void glGetActiveAttrib { glGetActiveAttribARB } ( GLuint program, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLchar* name ) ;
-GL-FUNCTION: void glGetActiveUniform { glGetActiveUniformARB } ( GLuint program, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLchar* name ) ;
+GL-FUNCTION: void glGetActiveAttrib { glGetActiveAttribARB } ( GLuint program, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLstring name ) ;
+GL-FUNCTION: void glGetActiveUniform { glGetActiveUniformARB } ( GLuint program, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLstring name ) ;
 GL-FUNCTION: void glGetAttachedShaders { glGetAttachedObjectsARB } ( GLuint program, GLsizei maxCount, GLsizei* count, GLuint* shaders ) ;
-GL-FUNCTION: GLint glGetAttribLocation { glGetAttribLocationARB } ( GLuint program, GLchar* name ) ;
-GL-FUNCTION: void glGetProgramInfoLog { glGetInfoLogARB } ( GLuint program, GLsizei bufSize, GLsizei* length, GLchar* infoLog ) ;
+GL-FUNCTION: GLint glGetAttribLocation { glGetAttribLocationARB } ( GLuint program, GLstring name ) ;
+GL-FUNCTION: void glGetProgramInfoLog { glGetInfoLogARB } ( GLuint program, GLsizei bufSize, GLsizei* length, GLstring infoLog ) ;
 GL-FUNCTION: void glGetProgramiv { glGetObjectParameterivARB } ( GLuint program, GLenum pname, GLint* param ) ;
-GL-FUNCTION: void glGetShaderInfoLog { glGetInfoLogARB } ( GLuint shader, GLsizei bufSize, GLsizei* length, GLchar* infoLog ) ;
-GL-FUNCTION: void glGetShaderSource { glGetShaderSourceARB } ( GLint obj, GLsizei maxLength, GLsizei* length, GLchar* source ) ;
+GL-FUNCTION: void glGetShaderInfoLog { glGetInfoLogARB } ( GLuint shader, GLsizei bufSize, GLsizei* length, GLstring infoLog ) ;
+GL-FUNCTION: void glGetShaderSource { glGetShaderSourceARB } ( GLint obj, GLsizei maxLength, GLsizei* length, GLstring source ) ;
 GL-FUNCTION: void glGetShaderiv { glGetObjectParameterivARB } ( GLuint shader, GLenum pname, GLint* param ) ;
-GL-FUNCTION: GLint glGetUniformLocation { glGetUniformLocationARB } ( GLint programObj, GLchar* name ) ;
+GL-FUNCTION: GLint glGetUniformLocation { glGetUniformLocationARB } ( GLint programObj, GLstring name ) ;
 GL-FUNCTION: void glGetUniformfv { glGetUniformfvARB } ( GLuint program, GLint location, GLfloat* params ) ;
 GL-FUNCTION: void glGetUniformiv { glGetUniformivARB } ( GLuint program, GLint location, GLint* params ) ;
 GL-FUNCTION: void glGetVertexAttribPointerv { glGetVertexAttribPointervARB } ( GLuint index, GLenum pname, GLvoid** pointer ) ;
@@ -1620,7 +1620,7 @@ GL-FUNCTION: void glGetVertexAttribiv { glGetVertexAttribivARB } ( GLuint index,
 GL-FUNCTION: GLboolean glIsProgram { glIsProgramARB } ( GLuint program ) ;
 GL-FUNCTION: GLboolean glIsShader { glIsShaderARB } ( GLuint shader ) ;
 GL-FUNCTION: void glLinkProgram { glLinkProgramARB } ( GLuint program ) ;
-GL-FUNCTION: void glShaderSource { glShaderSourceARB } ( GLuint shader, GLsizei count, GLchar** strings, GLint* lengths ) ;
+GL-FUNCTION: void glShaderSource { glShaderSourceARB } ( GLuint shader, GLsizei count, GLstring* strings, GLint* lengths ) ;
 GL-FUNCTION: void glStencilFuncSeparate { glStencilFuncSeparateATI } ( GLenum frontfunc, GLenum backfunc, GLint ref, GLuint mask ) ;
 GL-FUNCTION: void glStencilMaskSeparate { } ( GLenum face, GLuint mask ) ;
 GL-FUNCTION: void glStencilOpSeparate { glStencilOpSeparateATI } ( GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass ) ;
@@ -1991,8 +1991,8 @@ GL-FUNCTION: void glUniform4uiv { glUniform4uivEXT } ( GLint location, GLsizei c
 
 GL-FUNCTION: void glGetUniformuiv { glGetUniformuivEXT } ( GLuint program, GLint location, GLuint* params ) ;
 
-GL-FUNCTION: void glBindFragDataLocation { glBindFragDataLocationEXT } ( GLuint program, GLuint colorNumber, GLchar* name ) ;
-GL-FUNCTION: GLint glGetFragDataLocation { glGetFragDataLocationEXT } ( GLuint program, GLchar* name ) ;
+GL-FUNCTION: void glBindFragDataLocation { glBindFragDataLocationEXT } ( GLuint program, GLuint colorNumber, GLstring name ) ;
+GL-FUNCTION: GLint glGetFragDataLocation { glGetFragDataLocationEXT } ( GLuint program, GLstring name ) ;
 
 GL-FUNCTION: void glBeginConditionalRender { glBeginConditionalRenderNV } ( GLuint id, GLenum mode ) ;
 GL-FUNCTION: void glEndConditionalRender { glEndConditionalRenderNV } ( ) ;
@@ -2061,10 +2061,10 @@ GL-FUNCTION: void glBeginTransformFeedback { glBeginTransformFeedbackEXT } ( GLe
 GL-FUNCTION: void glEndTransformFeedback { glEndTransformFeedbackEXT } ( ) ;
 
 GL-FUNCTION: void glTransformFeedbackVaryings { glTransformFeedbackVaryingsEXT } ( GLuint program, GLsizei count,
-                                      GLchar** varyings, GLenum bufferMode ) ;
+                                      GLstring* varyings, GLenum bufferMode ) ;
 GL-FUNCTION: void glGetTransformFeedbackVarying { glGetTransformFeedbackVaryingEXT } ( GLuint program, GLuint index,
                                         GLsizei bufSize, GLsizei* length, 
-                                        GLsizei* size, GLenum* type, GLchar* name ) ;
+                                        GLsizei* size, GLenum* type, GLstring name ) ;
 
 GL-FUNCTION: void glClearBufferiv  { } ( GLenum buffer, GLint drawbuffer, GLint* value ) ;
 GL-FUNCTION: void glClearBufferuiv { } ( GLenum buffer, GLint drawbuffer, GLuint* value ) ;
@@ -2156,12 +2156,12 @@ GL-FUNCTION: void glDrawElementsInstanced { glDrawElementsInstancedARB } ( GLenu
 GL-FUNCTION: void glTexBuffer { glTexBufferEXT } ( GLenum target, GLenum internalformat, GLuint buffer ) ;
 GL-FUNCTION: void glPrimitiveRestartIndex { } ( GLuint index ) ;
 
-GL-FUNCTION: void glGetUniformIndices { } ( GLuint program, GLsizei uniformCount, GLchar** uniformNames, GLuint* uniformIndices ) ;
+GL-FUNCTION: void glGetUniformIndices { } ( GLuint program, GLsizei uniformCount, GLstring* uniformNames, GLuint* uniformIndices ) ;
 GL-FUNCTION: void glGetActiveUniformsiv { } ( GLuint program, GLsizei uniformCount, GLuint* uniformIndices, GLenum pname, GLint* params ) ;
-GL-FUNCTION: void glGetActiveUniformName { } ( GLuint program, GLuint uniformIndex, GLsizei bufSize, GLsizei* length, GLchar* uniformName ) ;
-GL-FUNCTION: GLuint glGetUniformBlockIndex { } ( GLuint program, GLchar* uniformBlockName ) ;
+GL-FUNCTION: void glGetActiveUniformName { } ( GLuint program, GLuint uniformIndex, GLsizei bufSize, GLsizei* length, GLstring uniformName ) ;
+GL-FUNCTION: GLuint glGetUniformBlockIndex { } ( GLuint program, GLstring uniformBlockName ) ;
 GL-FUNCTION: void glGetActiveUniformBlockiv { } ( GLuint program, GLuint uniformBlockIndex, GLenum pname, GLint* params ) ;
-GL-FUNCTION: void glGetActiveUniformBlockName { } ( GLuint program, GLuint uniformBlockIndex, GLsizei bufSize, GLsizei* length, GLchar* uniformName ) ;
+GL-FUNCTION: void glGetActiveUniformBlockName { } ( GLuint program, GLuint uniformBlockIndex, GLsizei bufSize, GLsizei* length, GLstring uniformName ) ;
 GL-FUNCTION: void glUniformBlockBinding { } ( GLuint buffer, GLuint uniformBlockIndex, GLuint uniformBlockBinding ) ;
 
 GL-FUNCTION: void glCopyBufferSubData { glCopyBufferSubDataEXT } ( GLenum readtarget, GLenum writetarget, GLintptr readoffset, GLintptr writeoffset, GLsizeiptr size ) ;

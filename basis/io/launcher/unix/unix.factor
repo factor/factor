@@ -1,15 +1,14 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs combinators
 continuations environment io io.backend io.backend.unix
-io.files io.files.private io.files.unix io.launcher
-io.launcher.unix.parser io.pathnames io.ports kernel math
-namespaces sequences strings system threads unix
-unix.process unix.ffi ;
+io.files io.files.private io.files.unix io.launcher io.pathnames
+io.ports kernel math namespaces sequences strings system threads
+unix unix.process unix.ffi simple-tokenizer ;
 IN: io.launcher.unix
 
 : get-arguments ( process -- seq )
-    command>> dup string? [ tokenize-command ] when ;
+    command>> dup string? [ tokenize ] when ;
 
 : assoc>env ( assoc -- env )
     [ "=" glue ] { } assoc>map ;

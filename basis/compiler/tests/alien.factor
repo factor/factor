@@ -67,7 +67,7 @@ FUNCTION: FOO ffi_test_14 int x int y ;
 
 [ 11 6 ] [ 11 6 ffi_test_14 [ x>> ] [ y>> ] bi ] unit-test
 
-FUNCTION: char* ffi_test_15 char* x char* y ;
+FUNCTION: c-string ffi_test_15 c-string x c-string y ;
 
 [ "foo" ] [ "xy" "zt" ffi_test_15 ] unit-test
 [ "bar" ] [ "xy" "xy" ffi_test_15 ] unit-test
@@ -576,7 +576,7 @@ FUNCTION: complex-float ffi_test_47 ( complex-float x, complex-double y ) ;
 
 ! Reported by jedahu
 STRUCT: bool-field-test
-    { name char* }
+    { name c-string }
     { on bool }
     { parents short } ;
 

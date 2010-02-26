@@ -241,7 +241,7 @@ HOOK: (send) io-backend ( packet addrspec datagram -- )
     parse-sockaddr ;
 
 : parse-addrinfo-list ( addrinfo -- seq )
-    [ next>> dup [ addrinfo memory>struct ] when ] follow
+    [ next>> ] follow
     [ addrinfo>addrspec ] map
     sift ;
 
