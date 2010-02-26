@@ -35,6 +35,11 @@ HELP: http-get
 { $description "Downloads the contents of a URL." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
+HELP: http-data
+{ $values { "url" "a " { $link url } " or " { $link string } } { "data" sequence } }
+{ $description "Downloads the contents of a URL. To view the HTTP response, use " { $link http-get } "." }
+{ $errors "Throws an error if the HTTP request fails." } ;
+
 HELP: http-post
 { $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP POST request." }
@@ -61,7 +66,7 @@ HELP: with-http-request
 
 ARTICLE: "http.client.get" "GET requests with the HTTP client"
 "Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
-{ $subsections http-get }
+{ $subsections http-get http-data }
 "Utilities to retrieve a " { $link url } " and save the contents to a file:"
 { $subsections
     download
