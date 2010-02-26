@@ -61,12 +61,12 @@ M: set all-unique? drop t ;
 <PRIVATE
 
 : (prune) ( elt hash vec -- )
-    3dup drop key? [ 3drop ] [
-        [ drop dupd set-at ] [ nip push ] 3bi
+    3dup drop in? [ 3drop ] [
+        [ drop adjoin ] [ nip push ] 3bi
     ] if ; inline
 
 : prune ( seq -- newseq )
-    [ ] [ length <hashtable> ] [ length <vector> ] tri
+    [ f fast-set ] [ length <vector> ] bi
     [ [ (prune) ] 2curry each ] keep ;
 
 PRIVATE>
@@ -98,3 +98,9 @@ USE: vocabs.loader
 
 : combine ( sets -- set )
     f [ union ] reduce ;
+
+: gather ( seq quot -- newseq )
+    map concat members ; inline
+
+: adjoin-at ( value key assoc -- )
+    [ [ f fast-set ] unless* [ adjoin ] keep ] change-at ;
