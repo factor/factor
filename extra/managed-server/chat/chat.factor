@@ -5,6 +5,7 @@ destructors fry io io.encodings.utf8 kernel managed-server
 namespaces parser sequences sorting splitting strings.parser
 unicode.case unicode.categories calendar calendar.format
 locals io.encodings.binary io.encodings.string prettyprint ;
+FROM: namespaces => set ;
 IN: managed-server.chat
 
 TUPLE: chat-server < managed-server ;
