@@ -9,6 +9,7 @@ sequences.private generalizations stack-checker.backend
 stack-checker.state stack-checker.visitor stack-checker.errors
 stack-checker.values stack-checker.recursive-state
 stack-checker.dependencies ;
+FROM: namespaces => set ;
 IN: stack-checker.transforms
 
 : call-transformer ( stack quot -- newquot )

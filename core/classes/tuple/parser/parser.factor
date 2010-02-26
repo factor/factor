@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel new-sets namespaces make sequences parser
+USING: accessors kernel sets namespaces make sequences parser
 lexer combinators words classes.parser classes.tuple arrays
 slots math assocs parser.notes classes classes.algebra ;
 IN: classes.tuple.parser

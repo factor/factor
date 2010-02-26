@@ -6,6 +6,7 @@ math.parser hash2 math.order byte-arrays namespaces
 compiler.units parser io.encodings.ascii values interval-maps
 ascii sets combinators locals math.ranges sorting make
 strings.parser io.encodings.utf8 memoize simple-flat-file ;
+FROM: namespaces => set ;
 IN: unicode.data
 
 <PRIVATE

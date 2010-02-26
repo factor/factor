@@ -5,6 +5,7 @@ namespaces prettyprint prettyprint.custom prettyprint.sections
 sequences strings io.styles vectors words quotations mirrors
 splitting math.parser classes vocabs sets sorting summary
 debugger continuations fry combinators ;
+FROM: namespaces => set ;
 IN: inspector
 
 SYMBOL: +number-rows+

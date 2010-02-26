@@ -12,6 +12,7 @@ compiler.cfg.registers
 compiler.cfg.comparisons
 compiler.cfg.instructions
 compiler.cfg.representations.preferred ;
+FROM: namespaces => set ;
 IN: compiler.cfg.alias-analysis
 
 ! We try to eliminate redundant slot operations using some simple heuristics.

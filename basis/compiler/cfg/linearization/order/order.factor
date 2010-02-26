@@ -4,7 +4,7 @@ USING: accessors assocs deques dlists kernel make sorting
 namespaces sequences combinators combinators.short-circuit
 fry math compiler.cfg.rpo compiler.cfg.utilities
 compiler.cfg.loop-detection compiler.cfg.predecessors
-new-sets hash-sets ;
+sets hash-sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.linearization.order
 
