@@ -4,6 +4,7 @@ USING: accessors arrays definitions assocs kernel kernel.private
 slots.private namespaces make sequences strings words words.symbol
 vectors math quotations combinators sorting effects graphs
 vocabs sets ;
+FROM: namespaces => set ;
 IN: classes
 
 ERROR: bad-inheritance class superclass ;

@@ -3,13 +3,13 @@
 USING: alien.c-types kernel sequences words fry generic accessors
 classes.tuple classes classes.algebra definitions
 stack-checker.dependencies quotations classes.tuple.private math
-math.partial-dispatch math.private math.intervals new-sets.private
+math.partial-dispatch math.private math.intervals sets.private
 math.floats.private math.integers.private layouts math.order
 vectors hashtables combinators effects generalizations assocs
-new-sets combinators.short-circuit sequences.private locals growable
+sets combinators.short-circuit sequences.private locals growable
 stack-checker namespaces compiler.tree.propagation.info ;
 FROM: math => float ;
-FROM: new-sets => set ;
+FROM: sets => set ;
 IN: compiler.tree.propagation.transforms
 
 \ equal? [

@@ -3,6 +3,7 @@
 USING: accessors assocs checksums checksums.crc32
 io.encodings.utf8 io.files kernel namespaces sequences sets
 source-files vocabs vocabs.errors vocabs.loader ;
+FROM: namespaces => set ;
 IN: vocabs.refresh
 
 : source-modified? ( path -- ? )

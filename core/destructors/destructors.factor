@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors continuations kernel namespaces make
 sequences vectors sets assocs init math ;
+FROM: namespaces => set ;
 IN: destructors
 
 SYMBOL: disposables

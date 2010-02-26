@@ -5,6 +5,7 @@ words sets combinators generalizations cpu.architecture compiler.units
 compiler.cfg.utilities compiler.cfg compiler.cfg.rpo
 compiler.cfg.instructions compiler.cfg.def-use ;
 FROM: compiler.cfg.instructions.syntax => insn-def-slot insn-use-slots insn-temp-slots scalar-rep ;
+FROM: namespaces => set ;
 IN: compiler.cfg.representations.preferred
 
 GENERIC: defs-vreg-rep ( insn -- rep/f )

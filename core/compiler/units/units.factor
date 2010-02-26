@@ -4,6 +4,7 @@ USING: accessors arrays kernel continuations assocs namespaces
 sequences words vocabs definitions hashtables init sets math
 math.order classes classes.private classes.algebra classes.tuple
 classes.tuple.private generic source-files.errors kernel.private ;
+FROM: namespaces => set ;
 IN: compiler.units
 
 SYMBOL: old-definitions

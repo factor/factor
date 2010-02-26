@@ -16,6 +16,7 @@ ui.tools.listener.completion ui.tools.listener.popups
 ui.tools.listener.history ui.images ui.tools.error-list
 tools.errors.model ;
 FROM: source-files.errors => all-errors ;
+FROM: namespaces => set ;
 IN: ui.tools.listener
 
 ! If waiting is t, we're waiting for user input, and invoking

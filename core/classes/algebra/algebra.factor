@@ -3,6 +3,7 @@
 USING: kernel classes classes.private combinators accessors
 sequences arrays vectors assocs namespaces words sorting layouts
 math hashtables kernel.private sets math.order ;
+FROM: classes => members ;
 IN: classes.algebra
 
 <PRIVATE
