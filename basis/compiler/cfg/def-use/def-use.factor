@@ -5,6 +5,7 @@ compiler.units fry generalizations generic kernel locals
 namespaces quotations sequences sets slots words
 compiler.cfg.instructions compiler.cfg.instructions.syntax
 compiler.cfg.rpo ;
+FROM: namespaces => set ;
 IN: compiler.cfg.def-use
 
 GENERIC: defs-vreg ( insn -- vreg/f )

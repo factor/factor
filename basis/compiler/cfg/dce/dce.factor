@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel namespaces sequences
 compiler.cfg.instructions compiler.cfg.def-use
-compiler.cfg.rpo compiler.cfg.predecessors hash-sets new-sets ;
+compiler.cfg.rpo compiler.cfg.predecessors hash-sets sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.dce
 

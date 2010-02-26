@@ -1,4 +1,4 @@
-USING: bit-sets tools.test new-sets kernel bit-arrays ;
+USING: bit-sets tools.test sets kernel bit-arrays ;
 IN: bit-sets.tests
 
 [ T{ bit-set f ?{ t f t f t f } } ] [

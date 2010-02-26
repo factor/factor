@@ -12,6 +12,7 @@ compiler.cfg.instructions
 compiler.cfg.renaming
 compiler.cfg.renaming.functor
 compiler.cfg.ssa.construction.tdmsc ;
+FROM: namespaces => set ;
 IN: compiler.cfg.ssa.construction
 
 ! The phi placement algorithm is implemented in

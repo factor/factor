@@ -15,6 +15,7 @@ compiler.cfg.utilities
 compiler.cfg.loop-detection
 compiler.cfg.renaming.functor
 compiler.cfg.representations.preferred ;
+FROM: namespaces => set ;
 IN: compiler.cfg.representations
 
 ! Virtual register representation selection.

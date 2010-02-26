@@ -6,6 +6,7 @@ stack-checker.state
 stack-checker.branches
 compiler.tree
 compiler.tree.combinators ;
+FROM: namespaces => set ;
 IN: compiler.tree.def-use
 
 SYMBOL: def-use
