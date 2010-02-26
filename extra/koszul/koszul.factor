@@ -4,6 +4,7 @@ USING: accessors arrays hashtables assocs io kernel locals math
 math.vectors math.matrices math.matrices.elimination namespaces
 parser prettyprint sequences words combinators math.parser
 splitting sorting shuffle sets math.order ;
+FROM: namespaces => set ;
 IN: koszul
 
 ! Utilities
