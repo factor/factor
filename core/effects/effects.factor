@@ -1,7 +1,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser math.order namespaces make sequences strings
-words assocs combinators accessors arrays quotations ;
+USING: kernel math math.parser math.order namespaces make
+sequences strings words assocs combinators accessors arrays
+quotations ;
 IN: effects
 
 TUPLE: effect
@@ -64,7 +65,9 @@ M: pair effect>type second effect>type ;
 
 GENERIC: stack-effect ( word -- effect/f )
 
-M: word stack-effect "declared-effect" word-prop ;
+M: word stack-effect
+    [ "declared-effect" word-prop ]
+    [ parent-word dup [ stack-effect ] when ] bi or ;
 
 M: deferred stack-effect call-next-method (( -- * )) or ;
 

@@ -99,11 +99,8 @@ M: consultation forget*
 ! Protocols
 <PRIVATE
 
-: cross-2each ( seq1 seq2 quot -- )
-    [ with each ] 2curry each ; inline
-
 : forget-all-methods ( classes words -- )
-    [ first method forget ] cross-2each ;
+    [ first method forget ] cartesian-each ;
 
 : protocol-users ( protocol -- users )
     protocol-consult keys ;
@@ -120,7 +117,7 @@ M: consultation forget*
 
 : add-new-definitions ( protocol wordlist -- )
     [ drop protocol-consult values ] [ added-words ] 2bi
-    [ swap consult-method ] cross-2each ;
+    [ swap consult-method ] cartesian-each ;
 
 : initialize-protocol-props ( protocol wordlist -- )
     [

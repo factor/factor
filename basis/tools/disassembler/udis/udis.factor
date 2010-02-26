@@ -32,8 +32,8 @@ STRUCT: ud
     { inp_fill uchar }
     { inp_file void* }
     { inp_ctr uchar }
-    { inp_buff uchar* }
-    { inp_buff_end uchar* }
+    { inp_buff c-string }
+    { inp_buff_end c-string }
     { inp_end uchar }
     { translator void* }
     { insn_offset ulonglong }
@@ -83,19 +83,19 @@ CONSTANT: UD_VENDOR_INTEL 1
 FUNCTION: void ud_init ( ud* u ) ;
 FUNCTION: void ud_set_mode ( ud* u, uchar mode ) ;
 FUNCTION: void ud_set_pc ( ud* u, ulonglong pc ) ;
-FUNCTION: void ud_set_input_buffer ( ud* u, uchar* offset, size_t size ) ;
+FUNCTION: void ud_set_input_buffer ( ud* u, c-string offset, size_t size ) ;
 FUNCTION: void ud_set_vendor ( ud* u, uint vendor ) ;
 FUNCTION: void ud_set_syntax ( ud* u, void* syntax ) ;
 FUNCTION: void ud_input_skip ( ud* u, size_t size ) ;
 FUNCTION: int ud_input_end ( ud* u ) ;
 FUNCTION: uint ud_decode ( ud* u ) ;
 FUNCTION: uint ud_disassemble ( ud* u ) ;
-FUNCTION: char* ud_insn_asm ( ud* u ) ;
+FUNCTION: c-string ud_insn_asm ( ud* u ) ;
 FUNCTION: void* ud_insn_ptr ( ud* u ) ;
 FUNCTION: ulonglong ud_insn_off ( ud* u ) ;
-FUNCTION: char* ud_insn_hex ( ud* u ) ;
+FUNCTION: c-string ud_insn_hex ( ud* u ) ;
 FUNCTION: uint ud_insn_len ( ud* u ) ;
-FUNCTION: char* ud_lookup_mnemonic ( int c ) ;
+FUNCTION: c-string ud_lookup_mnemonic ( int c ) ;
 
 : <ud> ( -- ud )
     ud malloc-struct &free

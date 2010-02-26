@@ -18,7 +18,7 @@ IN: cairo.ffi
 LIBRARY: cairo
 
 FUNCTION: int cairo_version ( ) ;
-FUNCTION: char* cairo_version_string ( ) ;
+FUNCTION: c-string cairo_version_string ( ) ;
 
 TYPEDEF: int cairo_bool_t
 
@@ -38,7 +38,7 @@ TYPEDEF: void* cairo_pattern_t
 
 TYPEDEF: void* cairo_destroy_func_t
 : cairo-destroy-func ( quot -- callback )
-    [ void { void* } "cdecl" ] dip alien-callback ; inline
+    [ void { pointer: void } "cdecl" ] dip alien-callback ; inline
 
 ! See cairo.h for details
 STRUCT: cairo_user_data_key_t
@@ -79,11 +79,11 @@ CONSTANT: CAIRO_CONTENT_COLOR_ALPHA HEX: 3000
 
 TYPEDEF: void* cairo_write_func_t
 : cairo-write-func ( quot -- callback )
-    [ cairo_status_t { void* uchar* int } "cdecl" ] dip alien-callback ; inline
+    [ cairo_status_t { pointer: void c-string int } "cdecl" ] dip alien-callback ; inline
                           
 TYPEDEF: void* cairo_read_func_t
 : cairo-read-func ( quot -- callback )
-    [ cairo_status_t { void* uchar* int } "cdecl" ] dip alien-callback ; inline
+    [ cairo_status_t { pointer: void c-string int } "cdecl" ] dip alien-callback ; inline
 
 ! Functions for manipulating state objects
 FUNCTION: cairo_t*
@@ -463,7 +463,7 @@ cairo_font_options_get_hint_metrics ( cairo_font_options_t* options ) ;
 !  font object inside the the cairo_t.
 
 FUNCTION: void
-cairo_select_font_face ( cairo_t* cr, char* family, cairo_font_slant_t slant, cairo_font_weight_t weight ) ;
+cairo_select_font_face ( cairo_t* cr, c-string family, cairo_font_slant_t slant, cairo_font_weight_t weight ) ;
 
 FUNCTION: void
 cairo_set_font_size ( cairo_t* cr, double size ) ;
@@ -493,19 +493,19 @@ FUNCTION: cairo_scaled_font_t*
 cairo_get_scaled_font ( cairo_t* cr ) ;
 
 FUNCTION: void
-cairo_show_text ( cairo_t* cr, char* utf8 ) ;
+cairo_show_text ( cairo_t* cr, c-string utf8 ) ;
 
 FUNCTION: void
 cairo_show_glyphs ( cairo_t* cr, cairo_glyph_t* glyphs, int num_glyphs ) ;
 
 FUNCTION: void
-cairo_text_path  ( cairo_t* cr, char* utf8 ) ;
+cairo_text_path  ( cairo_t* cr, c-string utf8 ) ;
 
 FUNCTION: void
 cairo_glyph_path ( cairo_t* cr, cairo_glyph_t* glyphs, int num_glyphs ) ;
 
 FUNCTION: void
-cairo_text_extents ( cairo_t* cr, char* utf8, cairo_text_extents_t* extents ) ;
+cairo_text_extents ( cairo_t* cr, c-string utf8, cairo_text_extents_t* extents ) ;
 
 FUNCTION: void
 cairo_glyph_extents ( cairo_t* cr, cairo_glyph_t* glyphs, int num_glyphs, cairo_text_extents_t* extents ) ;
@@ -573,7 +573,7 @@ FUNCTION: void
 cairo_scaled_font_extents ( cairo_scaled_font_t* scaled_font, cairo_font_extents_t* extents ) ;
 
 FUNCTION: void
-cairo_scaled_font_text_extents ( cairo_scaled_font_t* scaled_font, char* utf8, cairo_text_extents_t* extents ) ;
+cairo_scaled_font_text_extents ( cairo_scaled_font_t* scaled_font, c-string utf8, cairo_text_extents_t* extents ) ;
 
 FUNCTION: void
 cairo_scaled_font_glyph_extents ( cairo_scaled_font_t* scaled_font, cairo_glyph_t* glyphs, int num_glyphs, cairo_text_extents_t* extents ) ;
@@ -682,7 +682,7 @@ cairo_path_destroy ( cairo_path_t* path ) ;
 FUNCTION: cairo_status_t
 cairo_status ( cairo_t* cr ) ;
 
-FUNCTION: char* 
+FUNCTION: c-string 
 cairo_status_to_string ( cairo_status_t status ) ;
 
 ! Surface manipulation
@@ -731,7 +731,7 @@ FUNCTION: cairo_content_t
 cairo_surface_get_content ( cairo_surface_t* surface ) ;
 
 FUNCTION: cairo_status_t
-cairo_surface_write_to_png ( cairo_surface_t* surface, char* filename ) ;
+cairo_surface_write_to_png ( cairo_surface_t* surface, c-string filename ) ;
 
 FUNCTION: cairo_status_t
 cairo_surface_write_to_png_stream ( cairo_surface_t* surface, cairo_write_func_t write_func, void* closure ) ;
@@ -786,7 +786,7 @@ FUNCTION: int
 cairo_format_stride_for_width ( cairo_format_t format, int width ) ;
 
 FUNCTION: cairo_surface_t*
-cairo_image_surface_create_for_data ( uchar* data, cairo_format_t format, int width, int height, int stride ) ;
+cairo_image_surface_create_for_data ( char* data, cairo_format_t format, int width, int height, int stride ) ;
 
 FUNCTION: uchar*
 cairo_image_surface_get_data ( cairo_surface_t* surface ) ;
@@ -804,7 +804,7 @@ FUNCTION: int
 cairo_image_surface_get_stride ( cairo_surface_t* surface ) ;
 
 FUNCTION: cairo_surface_t*
-cairo_image_surface_create_from_png ( char* filename ) ;
+cairo_image_surface_create_from_png ( c-string filename ) ;
 
 FUNCTION: cairo_surface_t*
 cairo_image_surface_create_from_png_stream ( cairo_read_func_t read_func, void* closure ) ;

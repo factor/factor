@@ -121,7 +121,7 @@ STRUCT: sockaddr-in6
     { scopeid uint } ;
 
 STRUCT: hostent
-    { name char* }
+    { name c-string }
     { aliases void* }
     { addrtype short }
     { length short }
@@ -133,7 +133,7 @@ STRUCT: addrinfo
     { socktype int }
     { protocol int }
     { addrlen size_t }
-    { canonname char* }
+    { canonname c-string }
     { addr sockaddr* }
     { next addrinfo* } ;
 
@@ -141,33 +141,33 @@ STRUCT: timeval
     { sec long }
     { usec long } ;
 
-TYPEDEF: void* fd_set*
+C-TYPE: fd_set
 
 LIBRARY: winsock
 
-FUNCTION: int setsockopt ( SOCKET s, int level, int optname, char* optval, int optlen ) ;
+FUNCTION: int setsockopt ( SOCKET s, int level, int optname, c-string optval, int optlen ) ;
 
 FUNCTION: ushort htons ( ushort n ) ;
 FUNCTION: ushort ntohs ( ushort n ) ;
 FUNCTION: int bind ( void* socket, sockaddr-in* sockaddr, int len ) ;
 FUNCTION: int listen ( void* socket, int backlog ) ;
-FUNCTION: char* inet_ntoa ( int in-addr ) ;
-FUNCTION: int getaddrinfo ( char* nodename,
-                            char* servername,
+FUNCTION: c-string inet_ntoa ( int in-addr ) ;
+FUNCTION: int getaddrinfo ( c-string nodename,
+                            c-string servername,
                             addrinfo* hints,
                             addrinfo** res ) ;
 
 FUNCTION: void freeaddrinfo ( addrinfo* ai ) ;
 
 
-FUNCTION: hostent* gethostbyname ( char* name ) ;
-FUNCTION: int gethostname ( char* name, int len ) ;
+FUNCTION: hostent* gethostbyname ( c-string name ) ;
+FUNCTION: int gethostname ( c-string name, int len ) ;
 FUNCTION: int connect ( void* socket, sockaddr-in* sockaddr, int addrlen ) ;
 FUNCTION: int select ( int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, timeval* timeout ) ;
 FUNCTION: int closesocket ( SOCKET s ) ;
 FUNCTION: int shutdown ( SOCKET s, int how ) ;
-FUNCTION: int send ( SOCKET s, char* buf, int len, int flags ) ;
-FUNCTION: int recv ( SOCKET s, char* buf, int len, int flags ) ;
+FUNCTION: int send ( SOCKET s, c-string buf, int len, int flags ) ;
+FUNCTION: int recv ( SOCKET s, c-string buf, int len, int flags ) ;
 
 FUNCTION: int getsockname ( SOCKET s, sockaddr-in* address, int* addrlen ) ;
 FUNCTION: int getpeername ( SOCKET s, sockaddr-in* address, int* addrlen ) ;

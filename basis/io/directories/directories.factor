@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators destructors io io.backend
-io.encodings.binary io.files io.pathnames kernel namespaces
-sequences system vocabs.loader fry ;
+USING: accessors arrays combinators destructors io io.backend
+io.encodings.binary io.files io.files.types io.pathnames
+kernel namespaces sequences system vocabs.loader fry ;
 IN: io.directories
 
 : set-current-directory ( path -- )
@@ -41,11 +41,25 @@ HOOK: (directory-entries) os ( path -- seq )
 : directory-files ( path -- seq )
     directory-entries [ name>> ] map ;
 
+: directory-tree-files ( path -- seq )
+    dup directory-entries
+    [
+        dup type>> +directory+ =
+        [ name>>
+            [ append-path directory-tree-files ]
+            [ [ prepend-path ] curry map ]
+            [ prefix ] tri
+        ] [ nip name>> 1array ] if
+    ] with map concat ;
+
 : with-directory-entries ( path quot -- )
     '[ "" directory-entries @ ] with-directory ; inline
 
 : with-directory-files ( path quot -- )
     '[ "" directory-files @ ] with-directory ; inline
+
+: with-directory-tree-files ( path quot -- )
+    '[ "" directory-tree-files @ ] with-directory ; inline
 
 ! Touching files
 HOOK: touch-file io-backend ( path -- )

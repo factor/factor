@@ -166,7 +166,13 @@ HELP: create-method
 HELP: (call-next-method)
 { $values { "method" method } }
 { $description "Low-level word implementing " { $link POSTPONE: call-next-method } "." }
-{ $notes "In most cases, " { $link POSTPONE: call-next-method } " should be used instead." } ;
+{ $notes
+    "The " { $link POSTPONE: call-next-method } " word parses into this word. The following are equivalent:"
+    { $code
+        "M: class generic call-next-method ;"
+        "M: class generic M\\ class generic (call-next-method) ;"
+    }
+} ;
 
 HELP: no-next-method
 { $error-description "Thrown by " { $link POSTPONE: call-next-method } " if the current method is already the least specific method." }

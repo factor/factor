@@ -176,15 +176,15 @@ ARTICLE: "conditionals" "Conditional combinators"
 { $subsections "conditionals-boolean-equivalence" }
 { $see-also "booleans" "bitwise-arithmetic" both? either? } ;
 
-ARTICLE: "dataflow-combinators" "Data flow combinators"
-"Data flow combinators express common dataflow patterns such as performing a operation while preserving its inputs, applying multiple operations to a single value, applying a set of operations to a set of values, or applying a single operation to multiple values."
+ARTICLE: "dataflow-combinators" "Dataflow combinators"
+"Dataflow combinators express common dataflow patterns such as performing a operation while preserving its inputs, applying multiple operations to a single value, applying a set of operations to a set of values, or applying a single operation to multiple values."
 { $subsections
     "dip-keep-combinators"
     "cleave-combinators"
     "spread-combinators"
     "apply-combinators"
 }
-"More intricate data flow can be constructed by composing " { $link "curried-dataflow" } "." ;
+"More intricate dataflow can be constructed by composing " { $link "curried-dataflow" } "." ;
 
 ARTICLE: "combinators-quot" "Quotation construction utilities"
 "Some words for creating quotations which can be useful for implementing method combinations and compiler transforms:"

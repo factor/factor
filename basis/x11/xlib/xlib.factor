@@ -30,7 +30,7 @@ TYPEDEF: XID KeySym
 
 TYPEDEF: ulong Atom
 
-TYPEDEF: char* XPointer
+TYPEDEF: c-string XPointer
 C-TYPE: Screen
 TYPEDEF: void* GC
 C-TYPE: Visual
@@ -256,13 +256,13 @@ X-FUNCTION: Bool XQueryPointer ( Display* display, Window w, Window* root_return
 
 ! 4.3 - Properties and Atoms
 
-X-FUNCTION: Atom XInternAtom ( Display* display, char* atom_name, Bool only_if_exists ) ;
+X-FUNCTION: Atom XInternAtom ( Display* display, c-string atom_name, Bool only_if_exists ) ;
 
-X-FUNCTION: char* XGetAtomName ( Display* display, Atom atom ) ;
+X-FUNCTION: c-string XGetAtomName ( Display* display, Atom atom ) ;
 
 ! 4.4 - Obtaining and Changing Window Properties
 
-X-FUNCTION: int XGetWindowProperty ( Display* display, Window w, Atom property, long long_offset, long long_length, Bool delete, Atom req_type, Atom* actual_type_return, int* actual_format_return, ulong* nitems_return, ulong* bytes_after_return, char** prop_return ) ;
+X-FUNCTION: int XGetWindowProperty ( Display* display, Window w, Atom property, long long_offset, long long_length, Bool delete, Atom req_type, Atom* actual_type_return, int* actual_format_return, ulong* nitems_return, ulong* bytes_after_return, c-string* prop_return ) ;
 
 X-FUNCTION: int XChangeProperty ( Display* display, Window w, Atom property, Atom type, int format, int mode, void* data, int nelements ) ;
 
@@ -284,6 +284,11 @@ X-FUNCTION: int XConvertSelection ( Display* display, Atom selection, Atom targe
 X-FUNCTION: Pixmap XCreatePixmap ( Display* display, Drawable d, uint width, uint height, uint depth ) ;
 X-FUNCTION: int XFreePixmap ( Display* display, Pixmap pixmap ) ;
 
+! 5.2 - Creating, Recoloring, and Freeing Cursors
+
+C-TYPE: XColor
+X-FUNCTION: Cursor XCreatePixmapCursor ( Display* display, Pixmap source, Pixmap mask, XColor* foreground_color, XColor* background_color, uint x, uint y ) ;
+X-FUNCTION: int XFreeCursor ( Display* display, Cursor cursor ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 6 - Color Management Functions
@@ -297,7 +302,7 @@ STRUCT: XColor
 { flags char }
 { pad char } ;
 
-X-FUNCTION: Status XLookupColor ( Display* display, Colormap colormap, char* color_name, XColor* exact_def_return, XColor* screen_def_return ) ;
+X-FUNCTION: Status XLookupColor ( Display* display, Colormap colormap, c-string color_name, XColor* exact_def_return, XColor* screen_def_return ) ;
 X-FUNCTION: Status XAllocColor ( Display* display, Colormap colormap, XColor* screen_in_out ) ;
 X-FUNCTION: Status XQueryColor ( Display* display, Colormap colormap, XColor* def_in_out ) ;
 
@@ -425,11 +430,11 @@ STRUCT: XFontStruct
 { ascent int }
 { descent int } ;
 
-X-FUNCTION: Font XLoadFont ( Display* display, char* name ) ;
+X-FUNCTION: Font XLoadFont ( Display* display, c-string name ) ;
 X-FUNCTION: XFontStruct* XQueryFont ( Display* display, XID font_ID ) ;
-X-FUNCTION: XFontStruct* XLoadQueryFont ( Display* display, char* name ) ;
+X-FUNCTION: XFontStruct* XLoadQueryFont ( Display* display, c-string name ) ;
 
-X-FUNCTION: int XTextWidth ( XFontStruct* font_struct, char* string, int count ) ;
+X-FUNCTION: int XTextWidth ( XFontStruct* font_struct, c-string string, int count ) ;
 
 ! 8.6 - Drawing Text
 
@@ -439,7 +444,7 @@ X-FUNCTION: Status XDrawString (
         GC gc,
         int x,
         int y,
-        char* string,
+        c-string string,
         int length ) ;
 
 ! 8.7 - Transferring Images between Client and Server
@@ -459,7 +464,7 @@ STRUCT: XImage
 { height int }
 { xoffset int }
 { format int }
-{ data char* }
+{ data uchar* }
 { byte_order int }
 { bitmap_unit int }
 { bitmap_bit_order int }
@@ -1005,14 +1010,7 @@ STRUCT: XKeymapEvent
 { send_event Bool }
 { display Display* }
 { window Window }
-{ pad int }
-{ pad int }
-{ pad int }
-{ pad int }
-{ pad int }
-{ pad int }
-{ pad int }
-{ pad int } ;
+{ pad int[8] } ;
 
 UNION-STRUCT: XEvent
 { int int }
@@ -1096,6 +1094,7 @@ X-FUNCTION: int XGrabPointer (
 X-FUNCTION: Status XUngrabPointer ( Display* display, Time time ) ;
 X-FUNCTION: Status XChangeActivePointerGrab ( Display* display, uint event_mask, Cursor cursor, Time time ) ;
 X-FUNCTION: Status XGrabKey ( Display* display, int keycode, uint modifiers, Window grab_window, Bool owner_events, int pointer_mode, int keyboard_mode ) ;
+X-FUNCTION: int XGrabKeyboard ( Display* display, Window grab_window, Bool owner_events, int pointer_mode, int keyboard_mode, Time time ) ;
 X-FUNCTION: Status XSetInputFocus ( Display* display, Window focus, int revert_to, Time time ) ;
 
 X-FUNCTION: Status XGetInputFocus ( Display* display,
@@ -1110,7 +1109,7 @@ X-FUNCTION: Status XWarpPointer ( Display* display, Window src_w, Window dest_w,
 
 ! 14.1 Client to Window Manager Communication
 
-X-FUNCTION: Status XFetchName ( Display* display, Window w, char** window_name_return ) ;
+X-FUNCTION: Status XFetchName ( Display* display, Window w, c-string* window_name_return ) ;
 X-FUNCTION: Status XGetTransientForHint ( Display* display, Window w, Window* prop_window_return ) ;
 
 ! 14.1.1.  Manipulating Top-Level Windows
@@ -1210,6 +1209,14 @@ STRUCT: XVisualInfo
         { colormap_size int }
         { bits_per_rgb int } ;
 
+! 16.9 Manipulating Bitmaps
+X-FUNCTION: Pixmap XCreateBitmapFromData (
+    Display* display,
+    Drawable d,
+    c-string data,
+    uint width,
+    uint height ) ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Appendix D - Compatibility Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1217,10 +1224,10 @@ STRUCT: XVisualInfo
 X-FUNCTION: Status XSetStandardProperties (
         Display* display,
         Window w,
-        char* window_name,
-        char* icon_name,
+        c-string window_name,
+        c-string icon_name,
         Pixmap icon_pixmap,
-        char** argv,
+        c-string* argv,
         int argc,
         XSizeHints* hints ) ;
 
@@ -1302,7 +1309,7 @@ CONSTANT: XA_LAST_PREDEFINED 68
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 X-FUNCTION: void XFree ( void* data ) ;
-X-FUNCTION: int XStoreName ( Display* display, Window w, char* window_name ) ;
+X-FUNCTION: int XStoreName ( Display* display, Window w, c-string window_name ) ;
 X-FUNCTION: void XSetWMNormalHints ( Display* display, Window w, XSizeHints* hints ) ;
 X-FUNCTION: int XBell ( Display* display, int percent ) ;
 
@@ -1370,11 +1377,11 @@ CONSTANT: XLookupBoth      4
 
 X-FUNCTION: Bool XFilterEvent ( XEvent* event, Window w ) ;
 
-X-FUNCTION: XIM XOpenIM ( Display* dpy, void* rdb, char* res_name, char* res_class ) ;
+X-FUNCTION: XIM XOpenIM ( Display* dpy, void* rdb, c-string res_name, c-string res_class ) ;
 
 X-FUNCTION: Status XCloseIM ( XIM im ) ;
 
-X-FUNCTION: XIC XCreateIC ( XIM im, char* key1, Window value1, char* key2, Window value2, char* key3, int value3, char* key4, char* value4, char* key5, char* value5, int key6 ) ;
+X-FUNCTION: XIC XCreateIC ( XIM im, c-string key1, Window value1, c-string key2, Window value2, c-string key3, int value3, c-string key4, c-string value4, c-string key5, c-string value5, int key6 ) ;
 
 X-FUNCTION: void XDestroyIC ( XIC ic ) ;
 
@@ -1384,7 +1391,7 @@ X-FUNCTION: void XUnsetICFocus ( XIC ic ) ;
 
 X-FUNCTION: int XwcLookupString ( XIC ic, XKeyPressedEvent* event, ulong* buffer_return, int bytes_buffer, KeySym* keysym_return, Status* status_return ) ;
 
-X-FUNCTION: int Xutf8LookupString ( XIC ic, XKeyPressedEvent* event, char* buffer_return, int bytes_buffer, KeySym* keysym_return, Status* status_return ) ;
+X-FUNCTION: int Xutf8LookupString ( XIC ic, XKeyPressedEvent* event, c-string buffer_return, int bytes_buffer, KeySym* keysym_return, Status* status_return ) ;
 
 ! !!! category of setlocale
 CONSTANT: LC_ALL      0
@@ -1394,8 +1401,8 @@ CONSTANT: LC_MONETARY 3
 CONSTANT: LC_NUMERIC  4
 CONSTANT: LC_TIME     5
 
-X-FUNCTION: char* setlocale ( int category, char* name ) ;
+X-FUNCTION: c-string setlocale ( int category, c-string name ) ;
 
 X-FUNCTION: Bool XSupportsLocale ( ) ;
 
-X-FUNCTION: char* XSetLocaleModifiers ( char* modifier_list ) ;
+X-FUNCTION: c-string XSetLocaleModifiers ( c-string modifier_list ) ;

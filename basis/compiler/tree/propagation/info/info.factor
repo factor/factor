@@ -1,10 +1,11 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs classes classes.algebra classes.tuple
-classes.tuple.private kernel accessors math math.intervals namespaces
-sequences sequences.private words combinators memoize
-combinators.short-circuit byte-arrays strings arrays layouts
-cpu.architecture compiler.tree.propagation.copy ;
+classes.tuple.private classes.singleton kernel accessors math
+math.intervals namespaces sequences sequences.private words
+combinators memoize combinators.short-circuit byte-arrays
+strings arrays layouts cpu.architecture
+compiler.tree.propagation.copy ;
 IN: compiler.tree.propagation.info
 
 : false-class? ( class -- ? ) \ f class<= ;
@@ -65,9 +66,17 @@ DEFER: <literal-info>
 
 UNION: fixed-length array byte-array string ;
 
+: literal-class ( obj -- class )
+    #! Handle forgotten tuples and singleton classes properly
+    dup singleton-class? [
+        class dup class? [
+            drop tuple
+        ] unless
+    ] unless ;
+
 : init-literal-info ( info -- info )
     empty-interval >>interval
-    dup literal>> class >>class
+    dup literal>> literal-class >>class
     dup literal>> {
         { [ dup real? ] [ [a,a] >>interval ] }
         { [ dup tuple? ] [ tuple-slot-infos >>slots ] }

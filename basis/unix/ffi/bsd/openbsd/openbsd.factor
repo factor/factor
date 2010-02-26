@@ -10,7 +10,7 @@ STRUCT: addrinfo
     { protocol int }
     { addrlen socklen_t }
     { addr void* }
-    { canonname char* }
+    { canonname c-string }
     { next addrinfo* } ;
 
 STRUCT: dirent

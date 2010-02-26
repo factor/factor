@@ -6,7 +6,7 @@ eval ;
 IN: alien.remote-control
 
 : eval-callback ( -- callback )
-    void* { char* } "cdecl"
+    void* { c-string } "cdecl"
     [ eval>string utf8 malloc-string ] alien-callback ;
 
 : yield-callback ( -- callback )

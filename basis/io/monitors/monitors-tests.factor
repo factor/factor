@@ -3,7 +3,7 @@ USING: io.monitors tools.test io.files system sequences
 continuations namespaces concurrency.count-downs kernel io
 threads calendar prettyprint destructors io.timeouts
 io.files.temp io.directories io.directories.hierarchy
-io.pathnames accessors ;
+io.pathnames accessors concurrency.promises ;
 
 os { winnt linux macosx } member? [
     [
@@ -109,5 +109,24 @@ os { winnt linux macosx } member? [
         [ ] [ 3 seconds "m" get set-timeout ] unit-test
         [ [ t ] [ "m" get next-change drop ] while ] must-fail
         [ ] [ "m" get dispose ] unit-test
+    ] with-monitors
+
+    ! Disposing a monitor should throw an error in any threads
+    ! waiting on notifications
+    [
+        [ ] [
+            <promise> "p" set
+            "monitor-test" temp-file t <monitor> "m" set
+            10 seconds "m" get set-timeout
+        ] unit-test
+
+        [
+            [ "m" get next-change ] [ ] recover
+            "p" get fulfill
+        ] in-thread
+
+        [ ] [ 1 seconds sleep ] unit-test
+        [ ] [ "m" get dispose ] unit-test
+        [ t ] [ "p" get 10 seconds ?promise-timeout already-disposed? ] unit-test
     ] with-monitors
 ] when

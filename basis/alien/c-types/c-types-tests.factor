@@ -1,6 +1,6 @@
 USING: alien alien.syntax alien.c-types alien.parser
 eval kernel tools.test sequences system libc alien.strings
-io.encodings.utf8 math.constants classes.struct classes
+io.encodings.ascii io.encodings.utf8 math.constants classes.struct classes
 accessors compiler.units ;
 IN: alien.c-types.tests
 
@@ -16,36 +16,39 @@ UNION-STRUCT: foo
     { a int }
     { b int } ;
 
-[ f ] [ char  resolve-pointer-type c-type void* c-type eq? ] unit-test
-[ t ] [ char* resolve-pointer-type c-type void* c-type eq? ] unit-test
+[ t ] [ pointer: void c-type void* c-type = ] unit-test
+[ t ] [ pointer: int  c-type void* c-type = ] unit-test
+[ t ] [ pointer: int* c-type void* c-type = ] unit-test
+[ f ] [ pointer: foo  c-type void* c-type = ] unit-test
+[ t ] [ pointer: foo* c-type void* c-type = ] unit-test
+
+[ t ] [ c-string c-type c-string c-type = ] unit-test
 
 [ t ] [ foo heap-size int heap-size = ] unit-test
 
 TYPEDEF: int MyInt
 
-[ t ] [ int   c-type MyInt                      c-type eq? ] unit-test
-[ t ] [ void* c-type MyInt resolve-pointer-type c-type eq? ] unit-test
-
-TYPEDEF: char MyChar
-
-[ t ] [ char  c-type MyChar                      c-type eq? ] unit-test
-[ f ] [ void* c-type MyChar resolve-pointer-type c-type eq? ] unit-test
-[ t ] [ char* c-type MyChar resolve-pointer-type c-type eq? ] unit-test
+[ t ] [ int   c-type          MyInt c-type = ] unit-test
+[ t ] [ void* c-type pointer: MyInt c-type = ] unit-test
 
 [ 32 ] [ { int 8 } heap-size ] unit-test
 
-TYPEDEF: char* MyString
+TYPEDEF: char MyChar
 
-[ t ] [ char* c-type MyString                      c-type eq? ] unit-test
-[ t ] [ void* c-type MyString resolve-pointer-type c-type eq? ] unit-test
+[ t ] [ pointer: void c-type pointer: MyChar c-type = ] unit-test
+
+TYPEDEF: { c-string ascii } MyFunkyString
+
+[ { c-string ascii } ] [ MyFunkyString c-type ] unit-test
+
+TYPEDEF: c-string MyString
+
+[ t ] [ c-string c-type MyString          c-type = ] unit-test
+[ t ] [ void* c-type pointer: MyString c-type = ] unit-test
 
 TYPEDEF: int* MyIntArray
 
-[ t ] [ void* c-type MyIntArray c-type eq? ] unit-test
-
-TYPEDEF: uchar* MyLPBYTE
-
-[ t ] [ { char* utf8 } c-type MyLPBYTE c-type = ] unit-test
+[ t ] [ void* c-type MyIntArray c-type = ] unit-test
 
 [
     0 B{ 1 2 3 4 } <displaced-alien> <void*>
@@ -63,7 +66,7 @@ os windows? cpu x86.64? and [
 
 C-TYPE: opaque
 
-[ t ] [ void* c-type opaque resolve-pointer-type c-type eq? ] unit-test
+[ t ] [ void* c-type pointer: opaque c-type = ] unit-test
 [ opaque c-type ] [ no-c-type? ] must-fail-with
 
 [ """

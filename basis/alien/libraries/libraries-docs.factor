@@ -60,6 +60,10 @@ $nl
 }
 "Note the parse time evaluation with " { $link POSTPONE: << } "." } ;
 
+HELP: deploy-library
+{ $values { "name" string } }
+{ $description "Specifies that the logical library named " { $snippet "name" } " should be included during " { $link "tools.deploy" } ". " { $snippet "name" } " must be the name of a library previously loaded with " { $link add-library } "." } ;
+
 HELP: remove-library
 { $values { "name" string } }
 { $description "Unloads a library and removes it from the internal list of libraries. The " { $snippet "name" } " parameter should be a name that was previously passed to " { $link add-library } ". If no library with that name exists, this word does nothing." } ;
@@ -72,4 +76,9 @@ ARTICLE: "loading-libs" "Loading native libraries"
 }
 "Once a library has been defined, you can try loading it to see if the path name is correct:"
 { $subsections load-library }
-"If the compiler cannot load a library, or cannot resolve a symbol in a library, a linkage error is reported using the compiler error mechanism (see " { $link "compiler-errors" } "). Once you install the right library, reload the source file containing the " { $link add-library } " form to force the compiler to try loading the library again." ;
+"If the compiler cannot load a library, or cannot resolve a symbol in a library, a linkage error is reported using the compiler error mechanism (see " { $link "compiler-errors" } "). Once you install the right library, reload the source file containing the " { $link add-library } " form to force the compiler to try loading the library again."
+$nl
+"Libraries that do not come standard with the operating system need to be included with deployed applications that use them. A word is provided to instruct " { $link "tools.deploy" } " that a library must be so deployed:"
+{ $subsections
+    deploy-library
+} ;

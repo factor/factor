@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel strings words vocabs ;
+USING: help.markup help.syntax kernel strings words vocabs sequences ;
 IN: tools.scaffold
 
 HELP: developer-name
@@ -22,6 +22,30 @@ HELP: scaffold-undocumented
 { $description "Prints scaffolding documenation for undocumented words in a vocabuary except for automatically generated class predicates." } ;
 
 { scaffold-help scaffold-undocumented } related-words
+
+HELP: scaffold-authors
+{ $values
+    { "vocab" "a vocabulary specifier" }
+}
+{ $description "Creates an authors.txt file using the value in " { $link developer-name } ". This word only works if no authors.txt file yet exists." } ;
+
+HELP: scaffold-summary
+{ $values
+    { "vocab" "a vocabulary specifier" } { "summary" string }
+}
+{ $description "Creates a summary.txt file with the given summary. This word only works if no summary.txt file yet exists." } ;
+
+HELP: scaffold-tags
+{ $values
+    { "vocab" "a vocabulary specifier" } { "tags" string }
+}
+{ $description "Creates a tags.txt file with the given tags. This word only works if no tags.txt file yet exists." } ;
+
+HELP: scaffold-tests
+{ $values
+    { "vocab" "a vocabulary specifier" }
+}
+{ $description "Takes an existing vocabulary and creates an empty tests file help for each word. This word only works if no tests file yet exists." } ;
 
 HELP: scaffold-vocab
 { $values

@@ -4,6 +4,7 @@ alien.data alien.fortran alien.fortran.private alien.strings
 classes.struct arrays assocs byte-arrays combinators fry
 generalizations io.encodings.ascii kernel macros
 macros.expander namespaces sequences shuffle tools.test vocabs.parser ;
+FROM: alien.syntax => pointer: ;
 QUALIFIED-WITH: alien.c-types c
 IN: alien.fortran.tests
 
@@ -100,16 +101,16 @@ intel-unix-abi fortran-abi [
 
     ! fortran-arg-type>c-type
 
-    [ c:void* { } ]
+    [ pointer: c:int { } ]
     [ "integer" fortran-arg-type>c-type ] unit-test
 
-    [ c:void* { } ]
+    [ pointer: { c:int 3 } { } ]
     [ "integer(3)" fortran-arg-type>c-type ] unit-test
 
-    [ c:void* { } ]
+    [ pointer: { c:int 0 } { } ]
     [ "integer(*)" fortran-arg-type>c-type ] unit-test
 
-    [ c:void* { } ]
+    [ pointer: fortran_test_record { } ]
     [
         [
             "alien.fortran.tests" use-vocab
@@ -117,13 +118,13 @@ intel-unix-abi fortran-abi [
         ] with-manifest
     ] unit-test
 
-    [ c:char* { } ]
+    [ pointer: c:char { } ]
     [ "character" fortran-arg-type>c-type ] unit-test
 
-    [ c:char* { } ]
+    [ pointer: c:char { } ]
     [ "character(1)" fortran-arg-type>c-type ] unit-test
 
-    [ c:char* { long } ]
+    [ pointer: { c:char 17 } { long } ]
     [ "character(17)" fortran-arg-type>c-type ] unit-test
 
     ! fortran-ret-type>c-type
@@ -131,7 +132,7 @@ intel-unix-abi fortran-abi [
     [ c:char { } ]
     [ "character(1)" fortran-ret-type>c-type ] unit-test
 
-    [ c:void { c:char* long } ]
+    [ c:void { pointer: { c:char 17 } long } ]
     [ "character(17)" fortran-ret-type>c-type ] unit-test
 
     [ c:int { } ]
@@ -143,22 +144,22 @@ intel-unix-abi fortran-abi [
     [ c:float { } ]
     [ "real" fortran-ret-type>c-type ] unit-test
 
-    [ c:void { c:void* } ]
+    [ c:void { pointer: { c:float 0 } } ]
     [ "real(*)" fortran-ret-type>c-type ] unit-test
 
     [ c:double { } ]
     [ "double-precision" fortran-ret-type>c-type ] unit-test
 
-    [ c:void { c:void* } ]
+    [ c:void { pointer: complex-float } ]
     [ "complex" fortran-ret-type>c-type ] unit-test
 
-    [ c:void { c:void* } ]
+    [ c:void { pointer: complex-double } ]
     [ "double-complex" fortran-ret-type>c-type ] unit-test
 
-    [ c:void { c:void* } ]
+    [ c:void { pointer: { c:int 0 } } ]
     [ "integer(*)" fortran-ret-type>c-type ] unit-test
 
-    [ c:void { c:void* } ]
+    [ c:void { pointer: fortran_test_record } ]
     [
         [
             "alien.fortran.tests" use-vocab
@@ -168,19 +169,19 @@ intel-unix-abi fortran-abi [
 
     ! fortran-sig>c-sig
 
-    [ c:float { c:void* c:char* c:void* c:void* c:long } ]
+    [ c:float { pointer: c:int pointer: { c:char 17 } pointer: c:float pointer: c:double c:long } ]
     [ "real" { "integer" "character*17" "real" "real*8" } fortran-sig>c-sig ]
     unit-test
 
-    [ c:char { c:char* c:char* c:void* c:long } ]
+    [ c:char { pointer: { c:char 17 } pointer: c:char pointer: c:int c:long } ]
     [ "character(1)" { "character*17" "character" "integer" } fortran-sig>c-sig ]
     unit-test
 
-    [ c:void { c:char* c:long c:char* c:char* c:void* c:long } ]
+    [ c:void { pointer: { c:char 18 } c:long pointer: { c:char 17 } pointer: c:char pointer: c:int c:long } ]
     [ "character*18" { "character*17" "character" "integer" } fortran-sig>c-sig ]
     unit-test
 
-    [ c:void { c:void* c:char* c:char* c:void* c:long } ]
+    [ c:void { pointer: complex-float pointer: { c:char 17 } pointer: c:char pointer: c:int c:long } ]
     [ "complex" { "character*17" "character" "integer" } fortran-sig>c-sig ]
     unit-test
 
@@ -201,7 +202,7 @@ intel-unix-abi fortran-abi [
         ! [fortran-invoke]
         [ 
             c:void "funpack" "funtimes_"
-            { c:char* c:void* c:void* c:void* c:void* c:long }
+            { pointer: { c:char 12 } pointer: c:longlong pointer: c:float pointer: complex-float pointer: c:short c:long }
             alien-invoke
         ] 6 nkeep
         ! [fortran-results>]
@@ -226,7 +227,7 @@ intel-unix-abi fortran-abi [
             [ { [ drop ] } spread ]
         } 1 ncleave
         ! [fortran-invoke]
-        [ c:float "funpack" "fun_times_" { void* } alien-invoke ]
+        [ c:float "funpack" "fun_times_" { pointer: { c:float 0 } } alien-invoke ]
         1 nkeep
         ! [fortran-results>]
         shuffle( reta aa -- reta aa ) 
@@ -244,7 +245,7 @@ intel-unix-abi fortran-abi [
         ! [fortran-invoke]
         [
             c:void "funpack" "fun_times_"
-            { void* void* } 
+            { pointer: complex-float pointer: { c:float 0 } } 
             alien-invoke
         ] 2 nkeep
         ! [fortran-results>]
@@ -261,7 +262,7 @@ intel-unix-abi fortran-abi [
         ! [fortran-invoke]
         [
             c:void "funpack" "fun_times_"
-            { c:char* long } 
+            { pointer: { c:char 20 } long } 
             alien-invoke
         ] 2 nkeep
         ! [fortran-results>]
@@ -287,7 +288,7 @@ intel-unix-abi fortran-abi [
         ! [fortran-invoke]
         [
             c:void "funpack" "fun_times_"
-            { c:char* long c:char* c:void* c:char* c:long c:long } 
+            { pointer: { c:char 10 } long pointer: { c:char 20 } pointer: c:float pointer: { c:char 30 } c:long c:long } 
             alien-invoke
         ] 7 nkeep
         ! [fortran-results>]
@@ -321,16 +322,16 @@ f2c-abi fortran-abi [
     [ { c:char 1 } ]
     [ "character(1)" fortran-type>c-type ] unit-test
 
-    [ c:char* { c:long } ]
+    [ pointer: c:char { c:long } ]
     [ "character" fortran-arg-type>c-type ] unit-test
 
-    [ c:void { c:char* c:long } ]
+    [ c:void { pointer: c:char c:long } ]
     [ "character" fortran-ret-type>c-type ] unit-test
 
     [ c:double { } ]
     [ "real" fortran-ret-type>c-type ] unit-test
 
-    [ c:void { void* } ]
+    [ c:void { pointer: { c:float 0 } } ]
     [ "real(*)" fortran-ret-type>c-type ] unit-test
 
     [ "fun_" ] [ "FUN" fortran-name>symbol-name ] unit-test
@@ -344,7 +345,7 @@ gfortran-abi fortran-abi [
     [ c:float { } ]
     [ "real" fortran-ret-type>c-type ] unit-test
 
-    [ c:void { void* } ]
+    [ c:void { pointer: { c:float 0 } } ]
     [ "real(*)" fortran-ret-type>c-type ] unit-test
 
     [ complex-float { } ]
@@ -356,10 +357,10 @@ gfortran-abi fortran-abi [
     [ { char 1 } ]
     [ "character(1)" fortran-type>c-type ] unit-test
 
-    [ c:char* { c:long } ]
+    [ pointer: c:char { c:long } ]
     [ "character" fortran-arg-type>c-type ] unit-test
 
-    [ c:void { c:char* c:long } ]
+    [ c:void { pointer: c:char c:long } ]
     [ "character" fortran-ret-type>c-type ] unit-test
 
     [ complex-float { } ]
@@ -368,7 +369,7 @@ gfortran-abi fortran-abi [
     [ complex-double { } ]
     [ "double-complex" fortran-ret-type>c-type ] unit-test
 
-    [ c:void { c:void* } ]
+    [ c:void { pointer: { complex-double 3 } } ]
     [ "double-complex(3)" fortran-ret-type>c-type ] unit-test
 
 ] with-variable
