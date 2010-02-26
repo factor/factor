@@ -3,12 +3,13 @@
 USING: alien.c-types kernel sequences words fry generic accessors
 classes.tuple classes classes.algebra definitions
 stack-checker.dependencies quotations classes.tuple.private math
-math.partial-dispatch math.private math.intervals sets.private
+math.partial-dispatch math.private math.intervals new-sets.private
 math.floats.private math.integers.private layouts math.order
 vectors hashtables combinators effects generalizations assocs
-sets combinators.short-circuit sequences.private locals growable
+new-sets combinators.short-circuit sequences.private locals growable
 stack-checker namespaces compiler.tree.propagation.info ;
 FROM: math => float ;
+FROM: new-sets => set ;
 IN: compiler.tree.propagation.transforms
 
 \ equal? [
@@ -207,7 +208,7 @@ ERROR: bad-partial-eval quot word ;
         [ drop f ] swap
         [ literalize [ t ] ] { } map>assoc linear-case-quot
     ] [
-        unique [ key? ] curry
+        tester
     ] if ;
 
 \ member? [
@@ -272,14 +273,14 @@ CONSTANT: lookup-table-at-max 256
 \ at* [ at-quot ] 1 define-partial-eval
 
 : diff-quot ( seq -- quot: ( seq' -- seq'' ) )
-    tester '[ [ @ not ] filter ] ;
+    tester '[ [ [ @ not ] filter ] keep set-like ] ;
 
-\ diff [ diff-quot ] 1 define-partial-eval
+M\ set diff [ diff-quot ] 1 define-partial-eval
 
 : intersect-quot ( seq -- quot: ( seq' -- seq'' ) )
-    tester '[ _ filter ] ;
+    tester '[ [ _ filter ] keep set-like ] ;
 
-\ intersect [ intersect-quot ] 1 define-partial-eval
+M\ set intersect [ intersect-quot ] 1 define-partial-eval
 
 : fixnum-bits ( -- n )
     cell-bits tag-bits get - ;
