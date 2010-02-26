@@ -3,6 +3,7 @@ effects kernel windows.ole32 parser lexer splitting grouping
 sequences namespaces assocs quotations generalizations
 accessors words macros alien.syntax fry arrays layouts math
 classes.struct windows.kernel32 ;
+FROM: alien.parser.private => return-type-name ;
 IN: windows.com.syntax
 
 <PRIVATE
@@ -71,7 +72,7 @@ ERROR: no-com-interface interface ;
 : (stack-effect-from-return-and-parameters) ( return parameters -- stack-effect )
     swap
     [ [ second ] map ]
-    [ dup void? [ drop { } ] [ name>> 1array ] if ] bi*
+    [ dup void? [ drop { } ] [ return-type-name 1array ] if ] bi*
     <effect> ;
 
 : (define-word-for-function) ( function interface n -- )
@@ -83,17 +84,16 @@ ERROR: no-com-interface interface ;
 
 : define-words-for-com-interface ( definition -- )
     [ [ (iid-word) ] [ iid>> 1quotation ] bi (( -- iid )) define-declared ]
-    [ word>> void* swap typedef ]
     [
         dup family-tree-functions
         [ (define-word-for-function) ] with each-index
-    ]
-    tri ;
+    ] bi ;
 
 PRIVATE>
 
 SYNTAX: COM-INTERFACE:
     CREATE-C-TYPE
+    void* over typedef
     scan-object find-com-interface-definition
     scan string>guid
     parse-com-functions
