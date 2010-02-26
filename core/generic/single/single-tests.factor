@@ -5,6 +5,7 @@ quotations stack-checker vectors growable hashtables sbufs
 prettyprint byte-vectors bit-vectors specialized-vectors
 definitions generic sets graphs assocs grouping see eval ;
 QUALIFIED-WITH: alien.c-types c
+FROM: namespaces => set ;
 SPECIALIZED-VECTOR: c:double
 IN: generic.single.tests
 

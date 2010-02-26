@@ -20,6 +20,7 @@ QUALIFIED: source-files
 QUALIFIED: source-files.errors
 QUALIFIED: vocabs
 FROM: alien.libraries.private => >deployed-library-path ;
+FROM: namespaces => set ;
 IN: tools.deploy.shaker
 
 ! This file is some hairy shit.
