@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs hashtables kernel
-math sequences parser prettyprint.custom ;
+math sequences ;
 FROM: sets => prune ;
 IN: new-sets
 ! The vocab is called new-sets for now, but only until it gets into core
