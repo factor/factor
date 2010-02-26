@@ -47,5 +47,7 @@ IN: new-sets.tests
 [ { 1 2 3 } ] [ { 1 2 2 3 3 } { } set-like ] unit-test
 [ { 3 2 1 } ] [ { 3 3 2 2 1 } { } set-like ] unit-test
 
-[ { 1 2 1 } ] [ { 1 2 3 2 1 2 1 } duplicates ] unit-test
+[ { 2 1 2 1 } ] [ { 1 2 3 2 1 2 1 } duplicates ] unit-test
 [ f ] [ HS{ 1 2 3 1 2 1 } duplicates ] unit-test
+
+[ H{ { 3 HS{ 1 2 } } } ] [ H{ } clone 1 3 pick adjoin-at 2 3 pick adjoin-at ] unit-test
