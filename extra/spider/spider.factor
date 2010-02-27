@@ -48,7 +48,7 @@ fetched-in parsed-html links processed-in fetched-at ;
     nonmatching>> push-links ;
 
 : filter-base-links ( spider spider-result -- base-links nonmatching-links )
-    [ base>> host>> ] [ links>> prune ] bi*
+    [ base>> host>> ] [ links>> members ] bi*
     [ host>> = ] with partition ;
 
 : add-spidered ( spider spider-result -- )

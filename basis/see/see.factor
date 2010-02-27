@@ -239,7 +239,7 @@ PRIVATE>
         dup class? [ dup seeing-implementors % ] when
         dup generic? [ dup seeing-methods % ] when
         drop
-    ] { } make prune ;
+    ] { } make members ;
 
 : see-methods ( word -- )
     methods see-all nl ;
