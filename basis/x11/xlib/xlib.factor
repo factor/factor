@@ -1406,3 +1406,8 @@ X-FUNCTION: c-string setlocale ( int category, c-string name ) ;
 X-FUNCTION: Bool XSupportsLocale ( ) ;
 
 X-FUNCTION: c-string XSetLocaleModifiers ( c-string modifier_list ) ;
+
+! uncategorized xlib bindings
+
+X-FUNCTION: int XQueryKeymap ( Display* display, char[32] keys_return ) ;
+
