@@ -14,7 +14,7 @@ IN: random.tests
 [ t ] [ 10000 [ iota 0 [ drop 187 random + ] reduce ] keep / 2 * 187 10 ~ ] unit-test
 [ t ] [ 10000 [ iota 0 [ drop 400 random + ] reduce ] keep / 2 * 400 10 ~ ] unit-test
 
-[ t ] [ 1000 [ 400 random ] replicate prune length 256 > ] unit-test
+[ t ] [ 1000 [ 400 random ] replicate members length 256 > ] unit-test
 
 [ f ] [ 0 random ] unit-test
 
@@ -28,8 +28,8 @@ IN: random.tests
 
 [ { 1 2 } 3 sample ] [ too-many-samples?  ] must-fail-with
 
-[ 3 ] [ { 1 2 3 4 } 3 sample prune length ] unit-test
-[ 99 ] [ 100 iota 99 sample prune length ] unit-test
+[ 3 ] [ { 1 2 3 4 } 3 sample members length ] unit-test
+[ 99 ] [ 100 iota 99 sample members length ] unit-test
 
 [ ]
 [ [ 100 random-bytes ] with-system-random drop ] unit-test

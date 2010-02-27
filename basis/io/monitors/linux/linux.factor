@@ -81,7 +81,7 @@ M: linux-monitor dispose* ( monitor -- )
         IN_MOVED_FROM +rename-file-old+ ?flag
         IN_MOVED_TO +rename-file-new+ ?flag
         drop
-    ] { } make prune ;
+    ] { } make members ;
 
 : parse-event-name ( event -- name )
     dup len>> zero?
