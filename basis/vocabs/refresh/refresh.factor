@@ -82,7 +82,7 @@ SYMBOL: modified-docs
         [ [ vocab f >>docs-loaded? drop ] each ] bi*
     ]
     [
-        append prune
+        union
         [ unchanged-vocabs ]
         [ require-all load-failures. ] bi
     ] 2bi ;

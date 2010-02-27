@@ -184,7 +184,7 @@ C: <code-point> code-point
     ] assoc-map ;
 
 : properties>intervals ( properties -- assoc[str,interval] )
-    dup values prune [ f ] H{ } map>assoc
+    dup values members [ f ] H{ } map>assoc
     [ [ push-at ] curry assoc-each ] keep
     [ <interval-set> ] assoc-map ;
 

@@ -79,11 +79,8 @@ SYMBOL: terms
         [ nth ] 2keep swap 1 + tail-slice (inversions) +
     ] curry each ;
 
-: duplicates? ( seq -- ? )
-    dup prune [ length ] bi@ > ;
-
 : (wedge) ( n basis1 basis2 -- n basis )
-    append dup duplicates? [
+    append dup all-unique? not [
         2drop 0 { }
     ] [
         dup permutation inversions -1^ rot *

@@ -29,7 +29,7 @@ IN: project-euler.004
 PRIVATE>
 
 : euler004 ( -- answer )
-    source-004 dup [ * ] cartesian-map concat prune max-palindrome ;
+    source-004 dup [ * ] cartesian-map combine max-palindrome ;
 
 ! [ euler004 ] 100 ave-time
 ! 1164 ms ave run time - 39.35 SD (100 trials)
