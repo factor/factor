@@ -1,5 +1,5 @@
 USING: help.syntax help.markup kernel prettyprint sequences
-io.pathnames ;
+io.pathnames strings ;
 IN: csv
 
 HELP: csv
