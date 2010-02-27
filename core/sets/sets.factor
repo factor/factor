@@ -105,7 +105,6 @@ M: sequence all-unique?
 
 ! Temporarily for compatibility
 
-ALIAS: prune members
 : unique ( seq -- assoc )
     [ dup ] H{ } map>assoc ;
 : conjoin ( elt assoc -- )

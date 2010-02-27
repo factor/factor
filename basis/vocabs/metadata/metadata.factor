@@ -73,7 +73,7 @@ M: vocab-link summary vocab-summary ;
     dup vocab-tags-path set-vocab-file-contents ;
 
 : add-vocab-tags ( tags vocab -- )
-    [ vocab-tags append prune ] keep set-vocab-tags ;
+    [ vocab-tags append members ] keep set-vocab-tags ;
 
 : remove-vocab-tags ( tags vocab -- )
     [ vocab-tags swap diff ] keep set-vocab-tags ;
