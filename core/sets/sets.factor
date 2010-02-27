@@ -18,11 +18,13 @@ GENERIC: intersects? ( set1 set2 -- ? )
 GENERIC: diff ( set1 set2 -- set )
 GENERIC: subset? ( set1 set2 -- ? )
 GENERIC: set= ( set1 set2 -- ? )
-GENERIC: duplicates ( set -- sequence )
+GENERIC: duplicates ( set -- seq )
 GENERIC: all-unique? ( set -- ? )
 
 ! Defaults for some methods.
 ! Override them for efficiency
+
+M: set set-like drop ; inline
 
 M: set union
     [ [ members ] bi@ append ] keep set-like ;
