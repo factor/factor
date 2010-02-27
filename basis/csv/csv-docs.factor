@@ -30,7 +30,7 @@ HELP: string>csv
 
 HELP: csv>string
 { $values
-    { "rows" "a sequence of sequences of strings" }
+    { "csv" "csv" }
     { "string" string }
 }
 { $description "Writes a comma-separated-value structure to a string." } ;
