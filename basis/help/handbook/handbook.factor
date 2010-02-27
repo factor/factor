@@ -166,6 +166,7 @@ ARTICLE: "collections" "Collections"
 }
 { $heading "Other collections" }
 { $subsections
+    "sets"
     "lists"
     "disjoint-sets"
     "interval-maps"
