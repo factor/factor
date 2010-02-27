@@ -1,4 +1,4 @@
-! Copyright (C) 2010 Erik Charlebois.
+! Copyright (C) 2010 Erik Charlebois, William Schlieper.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax arrays kernel game.input namespaces
 classes bit-arrays sequences vectors x11 x11.xlib ;
