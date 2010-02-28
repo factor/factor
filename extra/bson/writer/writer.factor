@@ -84,7 +84,7 @@ TYPED: write-assoc ( assoc: hashtables -- )
 UNION: code word quotation ;
 
 TYPED: (serialize-code) ( code: code -- )
-  object>bytes 
+  object>bytes
   [ length write-int32 ]
   [ T_Binary_Custom write1 write ] bi ; inline
 
@@ -144,7 +144,7 @@ TYPED: write-boolean ( bool: boolean -- )
 PRIVATE>
 
 TYPED: assoc>bv ( assoc: hashtables -- byte-vector )
-    [ BV{  } clone dup ] dip '[ _ write-assoc ] with-output-stream* ; inline
+    [ BV{ } clone dup ] dip '[ _ write-assoc ] with-output-stream* ; inline
 
 TYPED: assoc>stream ( assoc: hashtables -- )
     write-assoc ; inline
