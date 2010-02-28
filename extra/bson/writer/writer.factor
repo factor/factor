@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bson.constants byte-arrays
 calendar combinators.short-circuit fry hashtables io io.binary
-kernel linked-assocs literals math math.parser namespaces
+kernel linked-assocs literals math math.parser namespaces byte-vectors
 quotations sequences serialize strings vectors dlists alien.accessors ;
 FROM: words => word? word ;
 FROM: typed => TYPED: ;
@@ -17,7 +17,7 @@ CONSTANT: INT64-SIZE 8
 
 PRIVATE>
 
-: with-length ( quot: ( -- ) -- bytes-written start-index )
+TYPED: with-length ( quot -- bytes-written: integer start-index: integer )
     [ output-stream get [ length ] [ ] bi ] dip
     call length swap [ - ] keep ; inline
 
@@ -33,26 +33,26 @@ PRIVATE>
     
 <PRIVATE
 
-: write-int32 ( int -- ) INT32-SIZE >le write ; inline
+TYPED: write-int32 ( int: integer -- ) INT32-SIZE >le write ; inline
 
-: write-double ( real -- ) double>bits INT64-SIZE >le write ; inline
+TYPED: write-double ( real: float -- ) double>bits INT64-SIZE >le write ; inline
 
-: write-cstring ( string -- ) B{ } like write 0 write1 ; inline
+TYPED: write-cstring ( string: string -- ) B{ } like write 0 write1 ; inline
 
 : write-longlong ( object -- ) INT64-SIZE >le write ; inline
 
 : write-eoo ( -- ) T_EOO write1 ; inline
 
-: write-header ( name object type -- object )
+TYPED: write-header ( name: string object type: integer -- object )
     write1 [ write-cstring ] dip ; inline
 
 DEFER: write-pair
 
-: write-byte-array ( binary -- )
+TYPED: write-byte-array ( binary: byte-array -- )
     [ length write-int32 ]
     [ T_Binary_Bytes write1 write ] bi ; inline
 
-: write-mdbregexp ( regexp -- )
+TYPED: write-mdbregexp ( regexp: mdbregexp -- )
    [ regexp>> write-cstring ]
    [ options>> write-cstring ] bi ; inline
 
@@ -94,7 +94,7 @@ TYPED: write-string ( string: string -- )
 TYPED: write-boolean ( bool: boolean -- )
     [ 1 write1 ] [ 0 write1 ] if ; inline
 
-: write-pair ( name obj -- )
+TYPED: write-pair ( name: string obj -- )
     {
         {
             [ dup { [ hashtable? ] [ linked-assoc? ] } 1|| ]
@@ -143,12 +143,12 @@ TYPED: write-boolean ( bool: boolean -- )
 
 PRIVATE>
 
-TYPED: assoc>bv ( assoc: hashtables -- byte-vector )
+TYPED: assoc>bv ( assoc: hashtables -- byte-vector: byte-vector )
     [ BV{ } clone dup ] dip '[ _ write-assoc ] with-output-stream* ; inline
 
 TYPED: assoc>stream ( assoc: hashtables -- )
     write-assoc ; inline
 
-: mdb-special-value? ( value -- ? )
+TYPED: mdb-special-value? ( value -- ?: boolean )
    { [ timestamp? ] [ quotation? ] [ mdbregexp? ]
      [ oid? ] [ byte-array? ] } 1|| ; inline
