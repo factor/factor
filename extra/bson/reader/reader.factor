@@ -2,10 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs bson.constants calendar combinators
 combinators.short-circuit io io.binary kernel math
-namespaces sequences serialize strings vectors ;
+namespaces sequences serialize strings vectors byte-arrays ;
 
 FROM: io.encodings.binary => binary ;
 FROM: io.streams.byte-array => with-byte-reader ;
+FROM: typed => TYPED: ;
 
 IN: bson.reader
 
@@ -20,7 +21,7 @@ TUPLE: state
     { scope vector }
     { elements vector } ;
 
-: (prepare-elements) ( -- elements-vector )
+TYPED: (prepare-elements) ( -- elements-vector: vector )
     V{ } clone [ T_Object "" element boa swap push ] [ ] bi ; inline
 
 : <state> ( exemplar -- state )
@@ -32,46 +33,43 @@ TUPLE: state
     } cleave
     (prepare-elements) >>elements ;
 
-: get-state ( -- state )
+TYPED: get-state ( -- state: state )
     state get ; inline
 
-: read-int32 ( -- int32 )
+TYPED: read-int32 ( -- int32: integer )
     4 read signed-le> ; inline
 
-: read-longlong ( -- longlong )
+TYPED: read-longlong ( -- longlong: integer )
     8 read signed-le> ; inline
 
-: read-double ( -- double )
+TYPED: read-double ( -- double: float )
     8 read le> bits>double ; inline
 
-: read-byte-raw ( -- byte-raw )
+TYPED: read-byte-raw ( -- byte-raw: byte-array )
     1 read ; inline
 
-: read-byte ( -- byte )
+TYPED: read-byte ( -- byte: integer )
     read-byte-raw first ; inline
 
-: read-cstring ( -- string )
+TYPED: read-cstring ( -- string: string )
     "\0" read-until drop >string ; inline
 
-: read-sized-string ( length -- string )
+TYPED: read-sized-string ( length: integer -- string: string )
     read 1 head-slice* >string ; inline
 
-: push-element ( type name state -- )
+TYPED: push-element ( type: integer name: string state: state -- )
     [ element boa ] dip elements>> push ; inline
 
-: pop-element ( state -- element )
+TYPED: pop-element ( state: state -- element: element )
     elements>> pop ; inline
 
-: peek-scope ( state -- ht )
+TYPED: peek-scope ( state: state -- ht )
     scope>> last ; inline
 
 : bson-object-data-read ( -- object )
     read-int32 drop get-state 
     [ exemplar>> clone ] [ scope>> ] bi
     [ push ] keep ; inline
-
-: bson-binary-bytes? ( subtype -- ? )
-    T_Binary_Bytes = ; inline
 
 : bson-binary-read ( -- binary )
    read-int32 read-byte 
@@ -82,14 +80,14 @@ TUPLE: state
         [ drop read >string ]
    } case ; inline
 
-: bson-regexp-read ( -- mdbregexp )
+TYPED: bson-regexp-read ( -- mdbregexp: mdbregexp )
    mdbregexp new
    read-cstring >>regexp read-cstring >>options ; inline
 
-: bson-oid-read ( -- oid )
+TYPED: bson-oid-read ( -- oid: oid )
     read-longlong read-int32 oid boa ; inline
 
-: element-data-read ( type -- object )
+TYPED: element-data-read ( type: integer -- object )
     {
         { T_OID [ bson-oid-read ] }
         { T_String [ read-int32 read-sized-string ] }
@@ -104,50 +102,50 @@ TUPLE: state
         { T_NULL [ f ] }
     } case ; inline
 
-: bson-array? ( type -- ? )
+TYPED: bson-array? ( type: integer -- ?: boolean )
     T_Array = ; inline
 
-: bson-object? ( type -- ? )
+TYPED: bson-object? ( type: integer -- ?: boolean )
     T_Object = ; inline
 
 : check-object ( assoc -- object )
     dup dbref-assoc? [ assoc>dbref ] when ; inline
 
-: fix-result ( assoc type -- result )
+TYPED: fix-result ( assoc type: integer -- result )
     {
         { T_Array [ values ] }
         { T_Object [ check-object ] }
     } case ; inline
 
-: end-element ( type -- )
+TYPED: end-element ( type: integer -- )
     { [ bson-object? ] [ bson-array? ] } 1||
     [ get-state pop-element drop ] unless ; inline
 
-: (>state<) ( -- state scope element )
+TYPED: (>state<) ( -- state: state scope: vector element: element )
     get-state [  ] [ scope>> ] [ pop-element ] tri ; inline
 
-: (prepare-result) ( scope element -- result )
+TYPED: (prepare-result) ( scope: vector element: element -- result )
     [ pop ] [ type>> ] bi* fix-result ; inline
 
-: bson-eoo-element-read ( -- cont? )
+: bson-eoo-element-read ( -- cont?: boolean )
     (>state<)
     [ (prepare-result) ] [  ] [ drop empty? ] 2tri
     [ 2drop >>result drop f ]
     [ swap [ name>> ] [ last ] bi* set-at drop t ] if ; inline
 
-: (prepare-object) ( type -- object )
+TYPED: (prepare-object) ( type: integer -- object )
     [ element-data-read ] [ end-element ] bi ; inline
 
-: (read-object) ( type name state -- )
+TYPED: (read-object) ( type: integer name: string state: state -- )
     [ (prepare-object) ] 2dip
     peek-scope set-at ; inline
 
-: bson-not-eoo-element-read ( type -- cont? )
+TYPED: bson-not-eoo-element-read ( type: integer -- cont?: boolean )
     read-cstring get-state
     [ push-element ]
     [ (read-object) t ] 3bi ; inline
 
-: (element-read) ( type -- cont? )
+TYPED: (element-read) ( type: integer -- cont?: boolean )
     dup T_EOO > 
     [ bson-not-eoo-element-read ]
     [ drop bson-eoo-element-read ] if ; inline
