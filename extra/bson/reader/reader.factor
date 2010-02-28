@@ -1,44 +1,36 @@
 ! Copyright (C) 2010 Sascha Matzke.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs bson.constants calendar combinators
-combinators.short-circuit fry io io.binary kernel locals math
-namespaces sequences serialize tools.continuations strings ;
+combinators.short-circuit io io.binary kernel math
+namespaces sequences serialize strings vectors ;
+
 FROM: io.encodings.binary => binary ;
 FROM: io.streams.byte-array => with-byte-reader ;
+
 IN: bson.reader
 
 <PRIVATE
 
 TUPLE: element { type integer } name ;
+
 TUPLE: state
-    { size initial: -1 } exemplar
-    result scope element ;
+    { size initial: -1 }
+    { exemplar assoc }
+    result
+    { scope vector }
+    { elements vector } ;
+
+: (prepare-elements) ( -- elements-vector )
+    V{ } clone [ T_Object "" element boa swap push ] [ ] bi ; inline
 
 : <state> ( exemplar -- state )
     [ state new ] dip
-    [ clone >>exemplar ] keep
-    clone [ >>result ] [ V{ } clone [ push ] keep >>scope ] bi
-    V{ } clone [ T_Object "" element boa swap push ] keep >>element ; 
-
-PREDICATE: bson-not-eoo < integer T_EOO > ;
-PREDICATE: bson-eoo     < integer T_EOO = ;
-
-PREDICATE: bson-string  < integer T_String = ;
-PREDICATE: bson-object  < integer T_Object = ;
-PREDICATE: bson-oid     < integer T_OID = ;
-PREDICATE: bson-array   < integer T_Array = ;
-PREDICATE: bson-integer < integer T_Integer = ;
-PREDICATE: bson-double  < integer T_Double = ;
-PREDICATE: bson-date    < integer T_Date = ;
-PREDICATE: bson-binary  < integer T_Binary = ;
-PREDICATE: bson-boolean < integer T_Boolean = ;
-PREDICATE: bson-regexp  < integer T_Regexp = ;
-PREDICATE: bson-null    < integer T_NULL = ;
-PREDICATE: bson-ref     < integer T_DBRef = ;
-PREDICATE: bson-binary-bytes < integer T_Binary_Bytes = ;
-PREDICATE: bson-binary-function < integer T_Binary_Function = ;
-PREDICATE: bson-binary-uuid < integer T_Binary_UUID = ;
-PREDICATE: bson-binary-custom < integer T_Binary_Custom = ;
+    {
+        [ clone >>exemplar ]
+        [ clone >>result ]
+        [ V{ } clone [ push ] keep >>scope ]
+    } cleave
+    (prepare-elements) >>elements ;
 
 : get-state ( -- state )
     state get ; inline
@@ -53,7 +45,7 @@ PREDICATE: bson-binary-custom < integer T_Binary_Custom = ;
     8 read le> bits>double ; inline
 
 : read-byte-raw ( -- byte-raw )
-    1 read ;
+    1 read ; inline
 
 : read-byte ( -- byte )
     read-byte-raw first ; inline
@@ -64,26 +56,31 @@ PREDICATE: bson-binary-custom < integer T_Binary_Custom = ;
 : read-sized-string ( length -- string )
     read 1 head-slice* >string ; inline
 
-: read-element-type ( -- type )
-    read-byte ; inline
+: push-element ( type name state -- )
+    [ element boa ] dip elements>> push ; inline
 
-: push-element ( type name -- )
-    element boa get-state element>> push ; inline
+: pop-element ( state -- element )
+    elements>> pop ; inline
 
-: pop-element ( -- element )
-    get-state element>> pop ; inline
-
-: peek-scope ( -- ht )
-    get-state scope>> last ; inline
+: peek-scope ( state -- ht )
+    scope>> last ; inline
 
 : bson-object-data-read ( -- object )
     read-int32 drop get-state 
     [ exemplar>> clone ] [ scope>> ] bi
     [ push ] keep ; inline
 
+: bson-binary-bytes? ( subtype -- ? )
+    T_Binary_Bytes = ; inline
+
 : bson-binary-read ( -- binary )
    read-int32 read-byte 
-   bson-binary-bytes? [ read ] [ read bytes>object ] if ; inline
+   {
+        { T_Binary_Bytes [ read ] }
+        { T_Binary_Custom [ read bytes>object ] }
+        { T_Binary_Function [ read ] }
+        [ drop read >string ]
+   } case ; inline
 
 : bson-regexp-read ( -- mdbregexp )
    mdbregexp new
@@ -107,44 +104,61 @@ PREDICATE: bson-binary-custom < integer T_Binary_Custom = ;
         { T_NULL [ f ] }
     } case ; inline
 
+: bson-array? ( type -- ? )
+    T_Array = ; inline
+
+: bson-object? ( type -- ? )
+    T_Object = ; inline
+
+: check-object ( assoc -- object )
+    dup dbref-assoc? [ assoc>dbref ] when ; inline
+
 : fix-result ( assoc type -- result )
     {
-        { [ dup T_Array = ] [ drop values ] }
-        {
-            [ dup T_Object = ]
-            [ drop dup dbref-assoc? [ assoc>dbref ] when ]
-        }
-    } cond ; inline
+        { T_Array [ values ] }
+        { T_Object [ check-object ] }
+    } case ; inline
 
 : end-element ( type -- )
     { [ bson-object? ] [ bson-array? ] } 1||
-    [ pop-element drop ] unless ; inline
+    [ get-state pop-element drop ] unless ; inline
 
-:: bson-eoo-element-read ( type -- cont? )
-    pop-element :> element
-    get-state scope>>
-    [ pop element type>> fix-result ] [ empty? ] bi
-    [ [ get-state ] dip >>result drop f ]
-    [ element name>> peek-scope set-at t ] if ; inline
+: (>state<) ( -- state scope element )
+    get-state [  ] [ scope>> ] [ pop-element ] tri ; inline
 
-:: bson-not-eoo-element-read ( type -- cont? )
-    peek-scope :> scope
-    type read-cstring [ push-element ] 2keep
-    [ [ element-data-read ] [ end-element ] bi ]
-    [ scope set-at t ] bi* ; inline
+: (prepare-result) ( scope element -- result )
+    [ pop ] [ type>> ] bi* fix-result ; inline
+
+: bson-eoo-element-read ( -- cont? )
+    (>state<)
+    [ (prepare-result) ] [  ] [ drop empty? ] 2tri
+    [ 2drop >>result drop f ]
+    [ swap [ name>> ] [ last ] bi* set-at drop t ] if ; inline
+
+: (prepare-object) ( type -- object )
+    [ element-data-read ] [ end-element ] bi ; inline
+
+: (read-object) ( type name state -- )
+    [ (prepare-object) ] 2dip
+    peek-scope set-at ; inline
+
+: bson-not-eoo-element-read ( type -- cont? )
+    read-cstring get-state
+    [ push-element ]
+    [ (read-object) t ] 3bi ; inline
 
 : (element-read) ( type -- cont? )
-    dup bson-not-eoo? 
+    dup T_EOO > 
     [ bson-not-eoo-element-read ]
-    [ bson-eoo-element-read ] if ; inline
+    [ drop bson-eoo-element-read ] if ; inline
 
 : read-elements ( -- )
-    read-element-type
-    (element-read) [ read-elements ] when ; inline recursive
+    read-byte (element-read)
+    [ read-elements ] when ; inline recursive
 
 PRIVATE>
 
 : stream>assoc ( exemplar -- assoc )
-    <state> dup state
-    [ read-int32 >>size read-elements ] with-variable
-    result>> ; inline
+    <state> read-int32 >>size
+    [ state [ read-elements ] with-variable ]
+    [ result>> ] bi ;
