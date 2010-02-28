@@ -66,7 +66,7 @@ TUPLE: game-loop-error game-loop error ;
 
 : (run-loop) ( loop -- )
     dup running?>>
-    [ [ MAX-FRAMES-TO-SKIP ?tick ] [ redraw ] [ 1 milliseconds sleep (run-loop) ] tri ]
+    [ [ MAX-FRAMES-TO-SKIP ?tick ] [ redraw ] [ yield (run-loop) ] tri ]
     [ drop ] if ;
 
 : run-loop ( loop -- )
