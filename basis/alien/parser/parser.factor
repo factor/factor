@@ -80,7 +80,7 @@ PRIVATE>
     type-str end-marker = [
         type-str { "(" ")" } member? [
             type-str parse-c-type :> type
-            scan :> name
+            scan "," ?tail drop :> name
             type name parse-pointers :> ( type' name' )
             type' types push name' names push
         ] unless
