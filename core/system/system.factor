@@ -24,6 +24,8 @@ UNION: unix bsd solaris linux haiku ;
 
 : os ( -- class ) \ os get-global ; foldable
 
+: vm-compiler ( -- string ) \ vm-compiler get-global ; foldable
+
 <PRIVATE
 
 : string>cpu ( str -- class )
