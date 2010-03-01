@@ -298,14 +298,14 @@ SYMBOL: live-stores
     histories get
     values [
         values [ [ store? ] filter [ insn#>> ] map ] map concat
-    ] map concat unique
+    ] map concat HS{ } set-like
     live-stores set ;
 
 GENERIC: eliminate-dead-stores* ( insn -- insn' )
 
 : (eliminate-dead-stores) ( insn -- insn' )
     dup insn-slot# [
-        insn# get live-stores get key? [
+        insn# get live-stores get in? [
             drop f
         ] unless
     ] when ;
