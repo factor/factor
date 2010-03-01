@@ -79,8 +79,7 @@ $parsing-note ;
 
 HELP: parse-tokens
 { $values { "end" string } { "seq" "a new sequence of strings" } }
-{ $description "Reads a sequence of tokens until the first occurrence of " { $snippet "end" } ". The tokens remain as strings and are not processed in any way." }
-{ $notes "This word is equivalent to " { $link map-tokens } " with an empty quotation." }
+{ $description "Reads a sequence of tokens until the first occurrence of " { $snippet "end" } ". The tokens remain as strings and are not processed in any way. This word is equivalent to " { $link map-tokens } " with an empty quotation." }
 $parsing-note ;
 
 HELP: unexpected
