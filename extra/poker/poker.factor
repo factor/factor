@@ -263,4 +263,4 @@ ERROR: bad-suit-symbol ch ;
     string>value value>hand-name ;
 
 SYNTAX: HAND{
-    "}" parse-tokens [ card> ] { } map-as suffix! ;
+    "}" [ card> ] map-tokens suffix! ;
