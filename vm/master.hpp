@@ -29,6 +29,19 @@
 #include <vector>
 #include <iostream>
 
+/* Record compiler version */
+#if defined(__clang__)
+	#define FACTOR_COMPILER_VERSION "Clang (GCC " __VERSION__ ")"
+#elif defined(__INTEL_COMPILER)
+	#define FACTOR_COMPILER_VERSION "Intel C Compiler " #__INTEL_COMPILER
+#elif defined(__GNUC__)
+	#define FACTOR_COMPILER_VERSION "GCC " __VERSION__
+#elif defined(_MSC_FULL_VER)
+	#define FACTOR_COMPILER_VERSION "Microsoft Visual C++ " #_MSC_FULL_VER
+#else
+	#define FACTOR_COMPILER_VERSION "unknown"
+#endif
+
 /* Detect target CPU type */
 #if defined(__arm__)
 	#define FACTOR_ARM
