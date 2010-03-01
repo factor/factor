@@ -5,6 +5,5 @@ sequences slots  ;
 IN: slots.syntax
 
 SYNTAX: slots{
-    "}" parse-tokens
-    [ reader-word 1quotation ] map
+    "}" [ reader-word 1quotation ] map-tokens
     '[ [ _ cleave ] output>array ] append! ;

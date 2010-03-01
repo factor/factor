@@ -56,11 +56,11 @@ PRIVATE>
     generate-vocab ;
 
 SYNTAX: SPECIALIZED-VECTORS:
-    ";" parse-tokens [
+    ";" [
         parse-c-type
         [ define-array-vocab use-vocab ]
         [ define-vector-vocab use-vocab ] bi
-    ] each ;
+    ] each-token ;
 
 SYNTAX: SPECIALIZED-VECTOR:
     scan-c-type

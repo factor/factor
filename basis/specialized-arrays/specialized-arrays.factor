@@ -168,7 +168,7 @@ M: c-type-word c-direct-array-constructor
 M: pointer c-direct-array-constructor drop void* c-direct-array-constructor ;
 
 SYNTAX: SPECIALIZED-ARRAYS:
-    ";" parse-tokens [ parse-c-type define-array-vocab use-vocab ] each ;
+    ";" [ parse-c-type define-array-vocab use-vocab ] each-token ;
 
 SYNTAX: SPECIALIZED-ARRAY:
     scan-c-type define-array-vocab use-vocab ;
