@@ -298,7 +298,7 @@ SYMBOL: live-stores
     histories get
     values [
         values [ [ store? ] filter [ insn#>> ] map ] map concat
-    ] map concat HS{ } set-like
+    ] map concat fast-set
     live-stores set ;
 
 GENERIC: eliminate-dead-stores* ( insn -- insn' )
