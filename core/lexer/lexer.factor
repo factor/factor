@@ -82,15 +82,17 @@ PREDICATE: unexpected-eof < unexpected
     [ unexpected-eof ]
     if* ;
 
-: (parse-tokens) ( accum end -- accum )
-    scan 2dup = [
-        2drop
-    ] [
-        [ pick push (parse-tokens) ] [ unexpected-eof ] if*
-    ] if ;
+: (each-token) ( end quot -- pred quot )
+    [ [ [ scan dup ] ] dip [ = not ] curry [ [ f ] if* ] curry compose ] dip ; inline
+
+: each-token ( end quot -- )
+    (each-token) while drop ; inline
+
+: map-tokens ( end quot -- seq )
+    (each-token) produce nip ; inline
 
 : parse-tokens ( end -- seq )
-    100 <vector> swap (parse-tokens) >array ;
+    [ ] map-tokens ;
 
 TUPLE: lexer-error line column line-text error ;
 

@@ -51,7 +51,7 @@ IN: bootstrap.syntax
 
     "UNUSE:" [ scan unuse-vocab ] define-core-syntax
 
-    "USING:" [ ";" parse-tokens [ use-vocab ] each ] define-core-syntax
+    "USING:" [ ";" [ use-vocab ] each-token ] define-core-syntax
 
     "QUALIFIED:" [ scan dup add-qualified ] define-core-syntax
 
@@ -124,13 +124,11 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "SYMBOLS:" [
-        ";" parse-tokens
-        [ create-in dup reset-generic define-symbol ] each
+        ";" [ create-in dup reset-generic define-symbol ] each-token
     ] define-core-syntax
 
     "SINGLETONS:" [
-        ";" parse-tokens
-        [ create-class-in define-singleton-class ] each
+        ";" [ create-class-in define-singleton-class ] each-token
     ] define-core-syntax
 
     "DEFER:" [
