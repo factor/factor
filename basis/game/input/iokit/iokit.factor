@@ -203,10 +203,10 @@ HINTS: record-keyboard { bit-array alien } ;
 HINTS: record-mouse { mouse-state alien } ;
 
 M: iokit-game-input-backend read-mouse
-    +mouse-state+ get ;
+    +mouse-state+ get-global ;
 
 M: iokit-game-input-backend reset-mouse
-    +mouse-state+ get
+    +mouse-state+ get-global
         0 >>dx
         0 >>dy
         0 >>scroll-dx 
@@ -247,7 +247,7 @@ M: iokit-game-input-backend reset-mouse
     } cleave controller-state boa ;
 
 : ?add-mouse-buttons ( device -- )
-    button-count +mouse-state+ get buttons>> 
+    button-count +mouse-state+ get-global buttons>> 
     2dup length >
     [ set-length ] [ 2drop ] if ;
 
@@ -256,7 +256,7 @@ M: iokit-game-input-backend reset-mouse
         { [ device mouse-device? ] [ device ?add-mouse-buttons ] }
         { [ device controller-device? ] [
             device <device-controller-state>
-            device +controller-states+ get set-at
+            device +controller-states+ get-global set-at
         ] }
         [ ]
     } cond ;
@@ -265,18 +265,18 @@ M: iokit-game-input-backend reset-mouse
     [ (device-matched-callback) ] IOHIDDeviceCallback ;
 
 :: (device-removed-callback) ( context result sender device -- )
-    device +controller-states+ get delete-at ;
+    device +controller-states+ get-global delete-at ;
 
 : device-removed-callback ( -- alien )
     [ (device-removed-callback) ] IOHIDDeviceCallback ;
 
 :: (device-input-callback) ( context result sender value -- )
     {
-        { [ sender mouse-device? ] [ +mouse-state+ get value record-mouse ] }
+        { [ sender mouse-device? ] [ +mouse-state+ get-global value record-mouse ] }
         { [ sender controller-device? ] [
-            sender +controller-states+ get at value record-controller
+            sender +controller-states+ get-global at value record-controller
         ] }
-        [ +keyboard-state+ get value record-keyboard ]
+        [ +keyboard-state+ get-global value record-keyboard ]
     } cond ;
 
 : device-input-callback ( -- alien )
@@ -324,7 +324,7 @@ M: iokit-game-input-backend (close-game-input)
     ] when ;
 
 M: iokit-game-input-backend get-controllers ( -- sequence )
-    +controller-states+ get keys [ controller boa ] map ;
+    +controller-states+ get-global keys [ controller boa ] map ;
 
 : ?join ( pre post sep -- string )
     2over start [ swap 2nip ] [ [ 2array ] dip join ] if ;
@@ -341,10 +341,10 @@ M: iokit-game-input-backend instance-id ( controller -- integer )
     handle>> kIOHIDLocationIDKey device-property ;
 
 M: iokit-game-input-backend read-controller ( controller -- controller-state )
-    handle>> +controller-states+ get at clone ;
+    handle>> +controller-states+ get-global at clone ;
 
 M: iokit-game-input-backend read-keyboard ( -- keyboard-state )
-    +keyboard-state+ get clone keyboard-state boa ;
+    +keyboard-state+ get-global clone keyboard-state boa ;
 
 M: iokit-game-input-backend calibrate-controller ( controller -- )
     drop ;
