@@ -157,9 +157,6 @@ ERROR: download-failed response ;
 : http-get ( url -- response data )
     <get-request> http-request ;
 
-: http-data ( url -- data )
-    http-get nip ;
-
 : with-http-get ( url quot -- response )
     [ <get-request> ] dip with-http-request ; inline
 

@@ -5,7 +5,7 @@ images.viewer ;
 IN: images.http
 
 : load-http-image ( path -- image )
-    [ http-data ] [ image-class ] bi load-image* ;
+    [ http-get nip ] [ image-class ] bi load-image* ;
 
 : http-image. ( path -- )
     load-http-image image. ;
