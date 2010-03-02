@@ -112,11 +112,6 @@ HELP: c-struct?
 { $values { "c-type" "a C type" } { "?" "a boolean" } }
 { $description "Tests if a C type is a structure defined by " { $link POSTPONE: STRUCT: } "." } ;
 
-HELP: define-function
-{ $values { "return" "a C return type" } { "library" "a logical library name" } { "function" "a C function name" } { "parameters" "a sequence of C parameter types" } }
-{ $description "Defines a word named " { $snippet "function" } " in the current vocabulary (see " { $link "vocabularies" } "). The word calls " { $link alien-invoke } " with the specified parameters." }
-{ $notes "This word is used to implement the " { $link POSTPONE: FUNCTION: } " parsing word." } ;
-
 HELP: C-GLOBAL:
 { $syntax "C-GLOBAL: type name" }
 { $values { "type" "a C type" } { "name" "a C global variable name" } }
