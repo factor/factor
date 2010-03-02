@@ -580,8 +580,8 @@ CONSTANT: SWP_HIDEWINDOW 128
 CONSTANT: SWP_NOCOPYBITS 256
 CONSTANT: SWP_NOOWNERZORDER 512
 CONSTANT: SWP_NOSENDCHANGING 1024
-CONSTANT: SWP_DRAWFRAME SWP_FRAMECHANGED
-CONSTANT: SWP_NOREPOSITION SWP_NOOWNERZORDER
+ALIAS: SWP_DRAWFRAME SWP_FRAMECHANGED
+ALIAS: SWP_NOREPOSITION SWP_NOOWNERZORDER
 CONSTANT: SWP_DEFERERASE 8192
 CONSTANT: SWP_ASYNCWINDOWPOS 16384
 
@@ -1250,7 +1250,7 @@ FUNCTION: UINT EnumClipboardFormats ( UINT format ) ;
 ! FUNCTION: EnumDesktopWindows
 ! FUNCTION: EnumDisplayDevicesA
 ! FUNCTION: EnumDisplayDevicesW
-! FUNCTION: EnumDisplayMonitors
+! FUNCTION: BOOL EnumDisplayMonitors ( HDC hdc, LPCRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData ) ;
 ! FUNCTION: EnumDisplaySettingsA
 ! FUNCTION: EnumDisplaySettingsExA
 ! FUNCTION: EnumDisplaySettingsExW
@@ -1327,7 +1327,7 @@ FUNCTION: HWND GetDesktopWindow ( ) ;
 ! FUNCTION: GetDlgItemTextW
 FUNCTION: uint GetDoubleClickTime ( ) ;
 FUNCTION: HWND GetFocus ( ) ;
-! FUNCTION: GetForegroundWindow
+FUNCTION: HWND GetForegroundWindow ( ) ;
 ! FUNCTION: GetGuiResources
 ! FUNCTION: GetGUIThreadInfo
 ! FUNCTION: GetIconInfo
@@ -1428,7 +1428,8 @@ FUNCTION: HWND GetWindow ( HWND hWnd, UINT uCmd ) ;
 FUNCTION: LONG_PTR GetWindowLongW ( HANDLE hWnd, int index ) ;
 ALIAS: GetWindowLong GetWindowLongW
 
-FUNCTION: LONG_PTR GetWindowLongPtr ( HWND hWnd, int nIndex ) ;
+FUNCTION: LONG_PTR GetWindowLongPtrW ( HWND hWnd, int nIndex ) ;
+ALIAS: GetWindowLongPtr GetWindowLongPtrW
 ! FUNCTION: GetWindowModuleFileName
 ! FUNCTION: GetWindowModuleFileNameA
 ! FUNCTION: GetWindowModuleFileNameW
@@ -1776,7 +1777,8 @@ ALIAS: SetWindowLong SetWindowLongW
 ! FUNCTION: SetWindowPlacement
 FUNCTION: BOOL SetWindowPos ( HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags ) ;
 
-FUNCTION: LONG_PTR SetWindowLongPtr ( HWND hWnd, int nIndex, LONG_PTR dwNewLong ) ;
+FUNCTION: LONG_PTR SetWindowLongPtrW ( HWND hWnd, int nIndex, LONG_PTR dwNewLong ) ;
+ALIAS: SetWindowLongPtr SetWindowLongPtrW
 
 : HWND_BOTTOM ( -- alien ) 1 <alien> ;
 : HWND_NOTOPMOST ( -- alien ) -2 <alien> ;
