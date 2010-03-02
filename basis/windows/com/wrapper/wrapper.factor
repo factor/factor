@@ -110,11 +110,7 @@ unless
     keep (next-vtbl-counter) '[
         swap [
             [ name>> _ _ (callback-word) ]
-            [ return>> ] [
-                parameters>>
-                [ [ first ] map ]
-                [ length ] bi
-            ] tri
+            [ return>> ] [ parameter-types>> dup length ] tri
         ] [
             first2 (finish-thunk)
         ] bi*

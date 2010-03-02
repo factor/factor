@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2008 Phil Dawes
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences io namespaces make combinators
-unicode.categories io.files combinators.short-circuit ;
+unicode.categories io.files combinators.short-circuit
+io.streams.string ;
 IN: csv
 
 SYMBOL: delimiter
@@ -65,6 +66,9 @@ PRIVATE>
     [ [ (csv) ] { } make ] with-input-stream
     dup last { "" } = [ but-last ] when ;
 
+: string>csv ( string -- csv )
+    <string-reader> csv ;
+
 : file>csv ( path encoding -- csv )
     <file-reader> csv ;
 
@@ -96,8 +100,18 @@ PRIVATE>
 : write-row ( row -- )
     [ delimiter get write1 ]
     [ escape-if-required write ] interleave nl ; inline
-    
-: write-csv ( rows stream -- )
-    [ [ write-row ] each ] with-output-stream ;
 
+<PRIVATE
+
+: (write-csv) ( rows -- )
+    [ write-row ] each ;
+    
+PRIVATE>
+
+: write-csv ( rows stream -- )
+    [ (write-csv) ] with-output-stream ;
+
+: csv>string ( csv -- string )
+    [ (write-csv) ] with-string-writer ;
+    
 : csv>file ( rows path encoding -- ) <file-writer> write-csv ;

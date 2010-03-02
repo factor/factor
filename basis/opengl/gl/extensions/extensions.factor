@@ -11,11 +11,11 @@ ERROR: unknown-gl-platform ;
     [ unknown-gl-platform ]
 } cond use-vocab >>
 
-SYMBOL: +gl-function-number-counter+
+SYMBOL: +gl-function-counter+
 SYMBOL: +gl-function-pointers+
 
 : reset-gl-function-number-counter ( -- )
-    0 +gl-function-number-counter+ set-global ;
+    0 +gl-function-counter+ set-global ;
 : reset-gl-function-pointers ( -- )
     100 <hashtable> +gl-function-pointers+ set-global ;
     
@@ -23,9 +23,9 @@ SYMBOL: +gl-function-pointers+
 reset-gl-function-pointers
 reset-gl-function-number-counter
 
-: gl-function-number ( -- n )
-    +gl-function-number-counter+ get-global
-    dup 1 + +gl-function-number-counter+ set-global ;
+: gl-function-counter ( -- n )
+    +gl-function-counter+ get-global
+    dup 1 + +gl-function-counter+ set-global ;
 
 : gl-function-pointer ( names n -- funptr )
     gl-function-context 2array dup +gl-function-pointers+ get-global at
@@ -41,18 +41,15 @@ reset-gl-function-number-counter
 : indirect-quot ( function-ptr-quot return types abi -- quot )
     '[ @  _ _ _ alien-indirect ] ;
 
-:: define-indirect ( abi return function-ptr-quot function-name parameters -- )
+:: define-indirect ( abi return function-name function-ptr-quot types names -- )
     function-name create-in dup reset-generic
-    function-ptr-quot return
-    parameters return parse-arglist [ abi indirect-quot ] dip
+    function-ptr-quot return types abi indirect-quot
+    names return function-effect
     define-declared ;
 
 SYNTAX: GL-FUNCTION:
     gl-function-calling-convention
-    scan-c-type
-    scan dup
-    scan drop "}" parse-tokens swap prefix
-    gl-function-number
-    [ gl-function-pointer ] 2curry swap
-    ";" parse-tokens [ "()" subseq? not ] filter
-    define-indirect ;
+    scan-function-name
+    "{" expect "}" parse-tokens over prefix
+    gl-function-counter '[ _ _ gl-function-pointer ]
+    ";" scan-c-args define-indirect ;

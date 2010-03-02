@@ -33,7 +33,7 @@ HOLIDAY-NAME: new-years-day us-federal "New Year's Day"
 HOLIDAY: martin-luther-king-day january 3 monday-of-month ;
 HOLIDAY-NAME: martin-luther-king-day us-federal "Martin Luther King Day"
 
-HOLIDAY: inauguration-day year dup 4 neg rem + january 20 >>day ;
+HOLIDAY: inauguration-day january 20 >>day [ dup 4 neg rem + ] change-year ;
 HOLIDAY-NAME: inauguration-day us "Inauguration Day"
 
 HOLIDAY: washingtons-birthday february 3 monday-of-month ;

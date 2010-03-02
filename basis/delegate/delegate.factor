@@ -157,6 +157,6 @@ M: protocol definer drop \ PROTOCOL: \ ; ;
 M: protocol group-words protocol-words ;
 
 SYNTAX: SLOT-PROTOCOL:
-    CREATE-WORD ";" parse-tokens
-    [ [ reader-word ] [ writer-word ] bi 2array ] map concat
-    define-protocol ;
+    CREATE-WORD ";"
+    [ [ reader-word ] [ writer-word ] bi 2array ]
+    map-tokens concat define-protocol ;
