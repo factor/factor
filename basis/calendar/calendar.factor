@@ -170,18 +170,6 @@ M: timestamp easter ( timestamp -- timestamp )
 : microseconds ( x -- duration ) 1000000 / seconds ;
 : nanoseconds ( x -- duration ) 1000000000 / seconds ;
 
-GENERIC: year ( obj -- n )
-M: integer year ;
-M: timestamp year year>> ;
-
-GENERIC: month ( obj -- n )
-M: integer month ;
-M: timestamp month month>> ;
-
-GENERIC: day ( obj -- n )
-M: integer day ;
-M: timestamp day day>> ;
-
 GENERIC: leap-year? ( obj -- ? )
 
 M: integer leap-year? ( year -- ? )
