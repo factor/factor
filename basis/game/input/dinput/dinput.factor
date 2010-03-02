@@ -92,21 +92,22 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     +dinput+ get swap device-guid
     IDirectInput8W::GetDeviceStatus S_OK = ;
 
+: (find-device-axes-callback) ( lpddoi pvRef -- BOOL )
+    +controller-devices+ get at
+    swap guidType>> {
+        { [ dup GUID_XAxis = ] [ drop 0.0 >>x ] }
+        { [ dup GUID_YAxis = ] [ drop 0.0 >>y ] }
+        { [ dup GUID_ZAxis = ] [ drop 0.0 >>z ] }
+        { [ dup GUID_RxAxis = ] [ drop 0.0 >>rx ] }
+        { [ dup GUID_RyAxis = ] [ drop 0.0 >>ry ] }
+        { [ dup GUID_RzAxis = ] [ drop 0.0 >>rz ] }
+        { [ dup GUID_Slider = ] [ drop 0.0 >>slider ] }
+        [ drop ]
+    } cond drop
+    DIENUM_CONTINUE ;
+
 : find-device-axes-callback ( -- alien )
-    [ ! ( lpddoi pvRef -- BOOL )
-        +controller-devices+ get at
-        swap guidType>> {
-            { [ dup GUID_XAxis = ] [ drop 0.0 >>x ] }
-            { [ dup GUID_YAxis = ] [ drop 0.0 >>y ] }
-            { [ dup GUID_ZAxis = ] [ drop 0.0 >>z ] }
-            { [ dup GUID_RxAxis = ] [ drop 0.0 >>rx ] }
-            { [ dup GUID_RyAxis = ] [ drop 0.0 >>ry ] }
-            { [ dup GUID_RzAxis = ] [ drop 0.0 >>rz ] }
-            { [ dup GUID_Slider = ] [ drop 0.0 >>slider ] }
-            [ drop ]
-        } cond drop
-        DIENUM_CONTINUE
-    ] LPDIENUMDEVICEOBJECTSCALLBACKW ;
+    [ (find-device-axes-callback) ] LPDIENUMDEVICEOBJECTSCALLBACKW ;
 
 : find-device-axes ( device controller-state -- controller-state )
     swap [ +controller-devices+ get set-at ] 2keep
@@ -139,11 +140,12 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     [ device-guid +controller-guids+ get delete-at ]
     [ com-release ] tri ;
 
+: (find-controller-callback) ( lpddi pvRef -- BOOL )
+    drop guidInstance>> add-controller
+    DIENUM_CONTINUE ;
+
 : find-controller-callback ( -- alien )
-    [ ! ( lpddi pvRef -- BOOL )
-        drop guidInstance>> add-controller
-        DIENUM_CONTINUE
-    ] LPDIENUMDEVICESCALLBACKW ; inline
+    [ (find-controller-callback) ] LPDIENUMDEVICESCALLBACKW ;
 
 : find-controllers ( -- )
     +dinput+ get DI8DEVCLASS_GAMECTRL find-controller-callback
