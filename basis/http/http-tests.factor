@@ -226,14 +226,14 @@ test-db [
 
 [ t ] [
     "vocab:http/test/foo.html" ascii file-contents
-    "http://localhost/nested/foo.html" add-port http-data =
+    "http://localhost/nested/foo.html" add-port http-get nip =
 ] unit-test
 
-[ "http://localhost/redirect-loop" add-port http-data ]
+[ "http://localhost/redirect-loop" add-port http-get nip ]
 [ too-many-redirects? ] must-fail-with
 
 [ "Goodbye" ] [
-    "http://localhost/quit" add-port http-data
+    "http://localhost/quit" add-port http-get nip
 ] unit-test
 
 ! HTTP client redirect bug
@@ -247,7 +247,7 @@ test-db [
 ] unit-test
 
 [ "Goodbye" ] [
-    "http://localhost/redirect" add-port http-data
+    "http://localhost/redirect" add-port http-get nip
 ] unit-test
 
 
@@ -274,12 +274,12 @@ test-db [
 : 404? ( response -- ? ) [ download-failed? ] [ response>> code>> 404 = ] bi and ;
 
 ! This should give a 404 not an infinite redirect loop
-[ "http://localhost/d/blah" add-port http-data ] [ 404? ] must-fail-with
+[ "http://localhost/d/blah" add-port http-get nip ] [ 404? ] must-fail-with
 
 ! This should give a 404 not an infinite redirect loop
-[ "http://localhost/blah/" add-port http-data ] [ 404? ] must-fail-with
+[ "http://localhost/blah/" add-port http-get nip ] [ 404? ] must-fail-with
 
-[ "Goodbye" ] [ "http://localhost/quit" add-port http-data ] unit-test
+[ "Goodbye" ] [ "http://localhost/quit" add-port http-get nip ] unit-test
 
 [ ] [
     <dispatcher>
@@ -293,9 +293,9 @@ test-db [
     test-httpd
 ] unit-test
 
-[ "Hi" ] [ "http://localhost/" add-port http-data ] unit-test
+[ "Hi" ] [ "http://localhost/" add-port http-get nip ] unit-test
 
-[ "Goodbye" ] [ "http://localhost/quit" add-port http-data ] unit-test
+[ "Goodbye" ] [ "http://localhost/quit" add-port http-get nip ] unit-test
 
 USING: html.components html.forms
 xml xml.traversal validators
@@ -353,7 +353,7 @@ SYMBOL: a
 
 [ 4 ] [ a get-global ] unit-test
 
-[ "Goodbye" ] [ "http://localhost/quit" add-port http-data ] unit-test
+[ "Goodbye" ] [ "http://localhost/quit" add-port http-get nip ] unit-test
 
 ! Test cloning
 [ f ] [ <404> dup clone "b" "a" set-header drop "a" header ] unit-test
@@ -371,7 +371,7 @@ SYMBOL: a
 ] unit-test
 
 [ t ] [
-    "http://localhost/" add-port http-data
+    "http://localhost/" add-port http-get nip
     "vocab:http/test/foo.html" ascii file-contents =
 ] unit-test
 
