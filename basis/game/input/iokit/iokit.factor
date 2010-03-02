@@ -251,33 +251,36 @@ M: iokit-game-input-backend reset-mouse
     2dup length >
     [ set-length ] [ 2drop ] if ;
 
+:: (device-matched-callback) ( context result sender device -- )
+    {
+        { [ device mouse-device? ] [ device ?add-mouse-buttons ] }
+        { [ device controller-device? ] [
+            device <device-controller-state>
+            device +controller-states+ get set-at
+        ] }
+        [ ]
+    } cond ;
+
 : device-matched-callback ( -- alien )
-    [| context result sender device |
-        {
-            { [ device controller-device? ] [
-                device <device-controller-state>
-                device +controller-states+ get set-at
-            ] }
-            { [ device mouse-device? ] [ device ?add-mouse-buttons ] }
-            [ ]
-        } cond
-    ] IOHIDDeviceCallback ;
+    [ (device-matched-callback) ] IOHIDDeviceCallback ;
+
+:: (device-removed-callback) ( context result sender device -- )
+    device +controller-states+ get delete-at ;
 
 : device-removed-callback ( -- alien )
-    [| context result sender device |
-        device +controller-states+ get delete-at
-    ] IOHIDDeviceCallback ;
+    [ (device-removed-callback) ] IOHIDDeviceCallback ;
+
+:: (device-input-callback) ( context result sender value -- )
+    {
+        { [ sender mouse-device? ] [ +mouse-state+ get value record-mouse ] }
+        { [ sender controller-device? ] [
+            sender +controller-states+ get at value record-controller
+        ] }
+        [ +keyboard-state+ get value record-keyboard ]
+    } cond ;
 
 : device-input-callback ( -- alien )
-    [| context result sender value |
-        {
-            { [ sender controller-device? ] [
-                sender +controller-states+ get at value record-controller
-            ] }
-            { [ sender mouse-device? ] [ +mouse-state+ get value record-mouse ] }
-            [ +keyboard-state+ get value record-keyboard ]
-        } cond
-    ] IOHIDValueCallback ;
+    [ (device-input-callback) ] IOHIDValueCallback ;
 
 : initialize-variables ( manager -- )
     +hid-manager+ set-global
