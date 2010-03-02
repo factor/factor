@@ -57,4 +57,4 @@ CONSTANT: factor-id "fRrVAKzV34GDyeRw6bUHDhEWHRedwfOC7e61wwXZLgGF80E67spxdQXuugB
         swap >>query ;
 
 : search-yahoo ( search -- seq )
-    query http-data string>xml parse-yahoo ;
+    query http-get nip string>xml parse-yahoo ;
