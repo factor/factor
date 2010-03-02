@@ -163,6 +163,6 @@ M: with-options nfa-node ( node -- start end )
         <transition-table> nfa-table set
         nfa-node
         nfa-table get
-            swap dup associate >>final-states
+            swap 1array fast-set >>final-states
             swap >>start-state
     ] with-scope ;
