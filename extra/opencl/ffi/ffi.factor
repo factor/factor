@@ -1,28 +1,28 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.libraries alien.syntax classes.struct
-combinators system unix.types alien.accessors byte-arrays kernel ;
+combinators system alien.accessors byte-arrays kernel ;
 IN: opencl.ffi
 
 << "opencl" {
-        { [ os windows? ] [ "OpenCL32.dll" ] }
+        { [ os windows? ] [ "OpenCL.dll" ] }
         { [ os macosx? ] [ "/System/Library/Frameworks/OpenCL.framework/OpenCL" ] }
         { [ os unix? ] [ "libopencl.so" ] }
     } cond "stdcall" add-library >>
 LIBRARY: opencl
 
 ! cl_platform.h
-TYPEDEF: int8_t   cl_char
-TYPEDEF: uint8_t  cl_uchar
-TYPEDEF: int16_t  cl_short
-TYPEDEF: uint16_t cl_ushort
-TYPEDEF: int32_t  cl_int
-TYPEDEF: uint32_t cl_uint
-TYPEDEF: int64_t  cl_long
-TYPEDEF: uint64_t cl_ulong
-TYPEDEF: uint16_t cl_half;
-TYPEDEF: float    cl_float;
-TYPEDEF: double   cl_double;
+TYPEDEF: char      cl_char
+TYPEDEF: uchar     cl_uchar
+TYPEDEF: short     cl_short
+TYPEDEF: ushort    cl_ushort
+TYPEDEF: int       cl_int
+TYPEDEF: uint      cl_uint
+TYPEDEF: longlong  cl_long
+TYPEDEF: ulonglong cl_ulong
+TYPEDEF: ushort    cl_half;
+TYPEDEF: float     cl_float;
+TYPEDEF: double    cl_double;
 
 CONSTANT: CL_CHAR_BIT         8
 CONSTANT: CL_SCHAR_MAX        127
