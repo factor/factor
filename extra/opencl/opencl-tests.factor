@@ -8,7 +8,7 @@ SPECIALIZED-ARRAY: float
 IN: opencl.tests
     
 STRING: kernel-source
-__kernel square(
+__kernel void square(
     __global float* input,
     __global float* output,
     const unsigned int count)

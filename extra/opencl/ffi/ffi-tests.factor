@@ -4,11 +4,11 @@ USING: tools.test opencl.ffi multiline locals kernel io.encodings.ascii
 io.encodings.string sequences libc alien.c-types destructors math specialized-arrays
 math.order alien ;
 FROM: alien.c-types => float ;
-SPECIALIZED-ARRAY: float
+SPECIALIZED-ARRAYS: float void* ;
 IN: opencl.ffi.tests
 
 STRING: kernel-source
-__kernel square(
+__kernel void square(
     __global float* input,
     __global float* output,
     const unsigned int count)
@@ -28,8 +28,10 @@ ERROR: cl-error err ;
     str-buffer length malloc &free :> str-alien 
     str-alien str-buffer dup length memcpy str-alien ;
     
-:: opencl-square ( in type -- out )
-    f CL_DEVICE_TYPE_CPU 1 f <void*> [ f clGetDeviceIDs cl-success ] keep *void* :> device-id
+:: opencl-square ( in -- out )
+    0 f 0 <uint> [ clGetPlatformIDs cl-success ] keep *uint
+    dup <void*-array> [ f clGetPlatformIDs cl-success ] keep first
+    CL_DEVICE_TYPE_DEFAULT 1 f <void*> [ f clGetDeviceIDs cl-success ] keep *void* :> device-id
     f 1 device-id <void*> f f 0 <int> [ clCreateContext ] keep *int cl-success   :> context
     context device-id 0 0 <int> [ clCreateCommandQueue ] keep *int cl-success    :> queue
  
@@ -69,6 +71,4 @@ ERROR: cl-error err ;
     context clReleaseContext cl-success ;
 
 [ float-array{ 1.0 4.0 9.0 16.0 100.0 } ]
-[ float-array{ 1.0 2.0 3.0 4.0 10.0 } CL_DEVICE_TYPE_CPU opencl-square ] unit-test
-[ float-array{ 1.0 4.0 9.0 16.0 100.0 } ]
-[ float-array{ 1.0 2.0 3.0 4.0 10.0 } CL_DEVICE_TYPE_GPU opencl-square ] unit-test
+[ float-array{ 1.0 2.0 3.0 4.0 10.0 } opencl-square ] unit-test

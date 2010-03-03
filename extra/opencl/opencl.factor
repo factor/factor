@@ -12,10 +12,10 @@ SPECIALIZED-ARRAYS: void* char size_t ;
 ERROR: cl-error err ;
 
 : cl-success ( err -- )
-    dup CL_SUCCESS = [ drop ] [ cl-error ] if ;
+    dup CL_SUCCESS = [ drop ] [ cl-error ] if ; inline
 
 : cl-not-null ( err -- )
-    dup f = [ cl-error ] [ drop ] if ;
+    dup f = [ cl-error ] [ drop ] if ; inline
 
 MACRO: info ( info-quot lift-quot -- quot )
     [ dup ] dip '[ 2dup 0 f 0 <size_t> _ '[ _ call cl-success ] keep
@@ -56,6 +56,17 @@ MACRO: 2info ( info-quot lift-quot -- quot )
 
 TUPLE: cl-handle < disposable handle ;
 PRIVATE>
+
+VARIANT: cl-device-type
+    cl-device-default cl-device-cpu cl-device-gpu cl-device-accelerator ;
+
+: size_t>cl-device-type ( size_t -- cl-device-type )
+    {
+        { CL_DEVICE_TYPE_DEFAULT     [ cl-device-default     ] }
+        { CL_DEVICE_TYPE_CPU         [ cl-device-cpu         ] }
+        { CL_DEVICE_TYPE_GPU         [ cl-device-gpu         ] }
+        { CL_DEVICE_TYPE_ACCELERATOR [ cl-device-accelerator ] }
+    } case ; inline
 
 VARIANT: cl-fp-feature
     cl-denorm cl-inf-and-nan cl-round-to-nearest cl-round-to-zero cl-round-to-inf cl-fma ;
@@ -180,16 +191,16 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
         { CL_ADDRESS_CLAMP_TO_EDGE [ cl-clamp-to-edge-addressing ] }
         { CL_ADDRESS_CLAMP         [ cl-clamp-addressing         ] }
         { CL_ADDRESS_NONE          [ cl-no-addressing            ] }
-    } case ;
+    } case ; inline
 
 : cl_filter_mode>filter-mode ( cl_filter_mode -- filter-mode )
     {
         { CL_FILTER_LINEAR  [ cl-filter-linear  ] }
         { CL_FILTER_NEAREST [ cl-filter-nearest ] }
-    } case ;
+    } case ; inline
 
 : platform-info-string ( handle name -- string )
-    [ clGetPlatformInfo ] info-string ;
+    [ clGetPlatformInfo ] info-string ; inline
 
 : platform-info ( id -- profile version name vendor extensions )
     {
@@ -215,29 +226,29 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
         { CL_NONE             [ cl-no-cache         ] }
         { CL_READ_ONLY_CACHE  [ cl-read-only-cache  ] }
         { CL_READ_WRITE_CACHE [ cl-read-write-cache ] }
-    } case ;
+    } case ; inline
 
 : device-info-bool ( handle name -- ? )
-    [ clGetDeviceInfo ] info-bool ;
+    [ clGetDeviceInfo ] info-bool ; inline
 
 : device-info-ulong ( handle name -- ulong )
-    [ clGetDeviceInfo ] info-ulong ;
+    [ clGetDeviceInfo ] info-ulong ; inline
 
 : device-info-uint ( handle name -- uint )
-    [ clGetDeviceInfo ] info-uint ;
+    [ clGetDeviceInfo ] info-uint ; inline
 
 : device-info-string ( handle name -- string )
-    [ clGetDeviceInfo ] info-string ;
+    [ clGetDeviceInfo ] info-string ; inline
 
 : device-info-size_t ( handle name -- size_t )
-    [ clGetDeviceInfo ] info-size_t ;
+    [ clGetDeviceInfo ] info-size_t ; inline
 
 : device-info-size_t-array ( handle name -- size_t-array )
-    [ clGetDeviceInfo ] info-size_t-array ;
+    [ clGetDeviceInfo ] info-size_t-array ; inline
 
 : device-info ( device-id -- device )
     dup {
-        [ CL_DEVICE_TYPE                          device-info-size_t       ]
+        [ CL_DEVICE_TYPE                          device-info-size_t size_t>cl-device-type ]
         [ CL_DEVICE_VENDOR_ID                     device-info-uint         ]
         [ CL_DEVICE_MAX_COMPUTE_UNITS             device-info-uint         ]
         [ CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS      device-info-uint         ]
@@ -295,26 +306,26 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
         0 f 0 <uint> [ clGetDeviceIDs cl-success ] keep *uint
     ] [
         rot dup <void*-array> [ f clGetDeviceIDs cl-success ] keep
-    ] 2bi ;
+    ] 2bi ; inline
 
 : command-queue-info-ulong ( handle name -- ulong )
-    [ clGetCommandQueueInfo ] info-ulong ;
+    [ clGetCommandQueueInfo ] info-ulong ; inline
 
 : sampler-info-bool ( handle name -- ? )
-    [ clGetSamplerInfo ] info-bool ;
+    [ clGetSamplerInfo ] info-bool ; inline
 
 : sampler-info-uint ( handle name -- uint )
-    [ clGetSamplerInfo ] info-uint ;
+    [ clGetSamplerInfo ] info-uint ; inline
 
 : program-build-info-string ( program-handle device-handle name -- string )
-    [ clGetProgramBuildInfo ] 2info-string ;
+    [ clGetProgramBuildInfo ] 2info-string ; inline
 
 : program-build-log ( program-handle device-handle -- string )
-    CL_PROGRAM_BUILD_LOG program-build-info-string ;
+    CL_PROGRAM_BUILD_LOG program-build-info-string ; inline
 
 : strings>char*-array ( strings -- char*-array )
     [ ascii encode dup length dup malloc [ cl-not-null ]
-      keep &free [ -rot memcpy ] keep ] void*-array{ } map-as ;
+      keep &free [ -rot memcpy ] keep ] void*-array{ } map-as ; inline
 
 : (program) ( cl-context sources -- program-handle )
     [ handle>> ] dip [
@@ -326,8 +337,8 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
 
 :: (build-program) ( program-handle device options -- program )
     program-handle 1 device 1array [ id>> ] void*-array{ } map-as
-    options ascii encode 0 suffix f f clBuildProgram :> rc
-    rc {
+    options ascii encode 0 suffix f f clBuildProgram
+    {
         { CL_BUILD_PROGRAM_FAILURE [
             program-handle device id>> program-build-log program-handle
             clReleaseProgram cl-success cl-error f ] }
@@ -336,19 +347,19 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
     } case ;
 
 : kernel-info-string ( handle name -- string )
-    [ clGetKernelInfo ] info-string ;
+    [ clGetKernelInfo ] info-string ; inline
 
 : kernel-info-uint ( handle name -- uint )
-    [ clGetKernelInfo ] info-uint ;
+    [ clGetKernelInfo ] info-uint ; inline
 
 : kernel-work-group-info-size_t ( handle1 handle2 name -- size_t )
-    [ clGetKernelWorkGroupInfo ] 2info-size_t ;
+    [ clGetKernelWorkGroupInfo ] 2info-size_t ; inline
 
 : event-info-uint ( handle name -- uint )
-    [ clGetEventInfo ] info-uint ;
+    [ clGetEventInfo ] info-uint ; inline
 
 : event-info-int ( handle name -- int )
-    [ clGetEventInfo ] info-int ;
+    [ clGetEventInfo ] info-int ; inline
 
 : cl_command_type>command-type ( cl_command-type -- command-type )
     {
@@ -378,19 +389,19 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
         { CL_RUNNING   [ cl-running   ] }
         { CL_COMPLETE  [ cl-complete  ] }
         [ drop cl-failure ]
-    } case ;
+    } case ; inline
 
 : profiling-info-ulong ( handle name -- ulong )
-    [ clGetEventProfilingInfo ] info-ulong ;
+    [ clGetEventProfilingInfo ] info-ulong ; inline
 
 
 : bind-kernel-arg-buffer ( kernel index buffer -- )
     [ handle>> ] [ cl_mem heap-size ] [ handle>> <void*> ] tri*
-    clSetKernelArg cl-success ;
+    clSetKernelArg cl-success ; inline
 
 : bind-kernel-arg-data ( kernel index byte-array -- )
     [ handle>> ] 2dip
-    [ byte-length ] keep clSetKernelArg cl-success ;
+    [ byte-length ] keep clSetKernelArg cl-success ; inline
 
 GENERIC: bind-kernel-arg ( kernel index data -- )
 M: cl-buffer  bind-kernel-arg bind-kernel-arg-buffer ;
@@ -431,11 +442,11 @@ PRIVATE>
 
 : cl-out-of-order-execution? ( command-queue -- ? )
     CL_QUEUE_PROPERTIES command-queue-info-ulong
-    CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE bitand 0 = not ;
+    CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE bitand 0 = not ; inline
 
 : cl-profiling? ( command-queue -- ? )
     CL_QUEUE_PROPERTIES command-queue-info-ulong
-    CL_QUEUE_PROFILING_ENABLE bitand 0 = not ;
+    CL_QUEUE_PROFILING_ENABLE bitand 0 = not ; inline
 
 : <cl-buffer> ( buffer-access-mode size initial-data -- buffer )
     [ (current-cl-context) ] 3dip
@@ -498,13 +509,13 @@ PRIVATE>
     cl-sampler new-disposable swap >>handle ;
 
 : cl-normalized-coords? ( sampler -- ? )
-    handle>> CL_SAMPLER_NORMALIZED_COORDS sampler-info-bool ;
+    handle>> CL_SAMPLER_NORMALIZED_COORDS sampler-info-bool ; inline
 
 : cl-addressing-mode ( sampler -- addressing-mode )
-    handle>> CL_SAMPLER_ADDRESSING_MODE sampler-info-uint cl_addressing_mode>addressing-mode ;
+    handle>> CL_SAMPLER_ADDRESSING_MODE sampler-info-uint cl_addressing_mode>addressing-mode ; inline
 
 : cl-filter-mode ( sampler -- filter-mode )
-    handle>> CL_SAMPLER_FILTER_MODE sampler-info-uint cl_filter_mode>filter-mode ;
+    handle>> CL_SAMPLER_FILTER_MODE sampler-info-uint cl_filter_mode>filter-mode ; inline
 
 : <cl-program> ( options strings -- program )
     [ (current-cl-device) ] 2dip
@@ -514,16 +525,16 @@ PRIVATE>
 : <cl-kernel> ( program kernel-name -- kernel )
     [ handle>> ] [ ascii encode 0 suffix ] bi*
     0 <int> [ clCreateKernel ] keep *int cl-success
-    cl-kernel new-disposable swap >>handle ;
+    cl-kernel new-disposable swap >>handle ; inline
 
 : cl-kernel-name ( kernel -- string )
-    handle>> CL_KERNEL_FUNCTION_NAME kernel-info-string ;
+    handle>> CL_KERNEL_FUNCTION_NAME kernel-info-string ; inline
 
 : cl-kernel-arity ( kernel -- arity )
-    handle>> CL_KERNEL_NUM_ARGS kernel-info-uint ;
+    handle>> CL_KERNEL_NUM_ARGS kernel-info-uint ; inline
 
 : cl-kernel-local-size ( kernel -- size )
-    (current-cl-device) [ handle>> ] bi@ CL_KERNEL_WORK_GROUP_SIZE kernel-work-group-info-size_t ;
+    (current-cl-device) [ handle>> ] bi@ CL_KERNEL_WORK_GROUP_SIZE kernel-work-group-info-size_t ; inline
 
 :: cl-queue-kernel ( kernel args sizes dependent-events -- event )
     args [| arg idx | kernel idx arg bind-kernel-arg ] each-index
@@ -535,10 +546,10 @@ PRIVATE>
     cl-event new-disposable swap >>handle ;
 
 : cl-event-type ( event -- command-type )
-    handle>> CL_EVENT_COMMAND_TYPE event-info-uint cl_command_type>command-type ;
+    handle>> CL_EVENT_COMMAND_TYPE event-info-uint cl_command_type>command-type ; inline
 
 : cl-event-status ( event -- execution-status )
-    handle>> CL_EVENT_COMMAND_EXECUTION_STATUS event-info-int cl_int>execution-status ;
+    handle>> CL_EVENT_COMMAND_EXECUTION_STATUS event-info-int cl_int>execution-status ; inline
 
 : cl-profile-counters ( event -- queued submitted started finished )
     handle>> {
