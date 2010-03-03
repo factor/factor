@@ -10,6 +10,7 @@ prettyprint.sections sequences sets sorting strings summary words
 words.symbol words.constant words.alias vocabs slots ;
 FROM: namespaces => set ;
 FROM: classes => members ;
+RENAME: members sets => set-members
 IN: see
 
 GENERIC: synopsis* ( defspec -- )
@@ -239,7 +240,7 @@ PRIVATE>
         dup class? [ dup seeing-implementors % ] when
         dup generic? [ dup seeing-methods % ] when
         drop
-    ] { } make members ;
+    ] { } make set-members ;
 
 : see-methods ( word -- )
     methods see-all nl ;
