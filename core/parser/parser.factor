@@ -58,9 +58,14 @@ SYMBOL: auto-use?
 
 ERROR: staging-violation word ;
 
+: (execute-parsing) ( accum word -- accum )
+    dup push-parsing-word
+    execute( accum -- accum )
+    pop-parsing-word ; inline
+
 : execute-parsing ( accum word -- accum )
     dup changed-definitions get key? [ staging-violation ] when
-    execute( accum -- accum ) ;
+    (execute-parsing) ;
 
 : scan-object ( -- object )
     scan-word {
