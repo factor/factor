@@ -99,22 +99,18 @@ TUPLE: run-loop fds sources timers ;
 
 <PRIVATE
 
-: ((reset-timer)) ( timer counter timestamp -- )
-    nip >CFAbsoluteTime CFRunLoopTimerSetNextFireDate ;
+: (reset-timer) ( timer timestamp -- )
+    >CFAbsoluteTime CFRunLoopTimerSetNextFireDate ;
 
-: nano-count>timestamp ( x -- timestamp )
-    nano-count - nanoseconds now time+ ;
-
-: (reset-timer) ( timer counter -- )
-    yield {
-        { [ dup 0 = ] [ now ((reset-timer)) ] }
-        { [ run-queue deque-empty? not ] [ 1 - (reset-timer) ] }
-        { [ sleep-queue heap-empty? ] [ 5 minutes hence ((reset-timer)) ] }
-        [ sleep-queue heap-peek nip nano-count>timestamp ((reset-timer)) ]
-    } cond ;
+: nano-count>micros ( x -- n )
+    nano-count - 1,000 /f system-micros + ;
 
 : reset-timer ( timer -- )
-    10 (reset-timer) ;
+    yield {
+        { [ run-queue deque-empty? not ] [ yield system-micros (reset-timer) ] }
+        { [ sleep-queue heap-empty? ] [ system-micros 1,000,000 + (reset-timer) ] }
+        [ sleep-queue heap-peek nip nano-count>micros (reset-timer) ]
+    } cond ;
 
 PRIVATE>
 
