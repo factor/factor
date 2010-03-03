@@ -5,7 +5,9 @@ io vectors arrays math.parser combinators continuations
 source-files.errors ;
 IN: lexer
 
-TUPLE: lexer text line line-text line-length column ;
+TUPLE: lexer text line line-text line-length column parsing-words ;
+
+TUPLE: lexer-parsing-word word line line-text column ;
 
 : next-line ( lexer -- )
     dup [ line>> ] [ text>> ] bi ?nth >>line-text
@@ -14,10 +16,23 @@ TUPLE: lexer text line line-text line-length column ;
     0 >>column
     drop ;
 
+: push-parsing-word ( word -- )
+    lexer-parsing-word new
+        swap >>word
+        lexer get [
+            [ line>>      >>line      ]
+            [ line-text>> >>line-text ]
+            [ column>>    >>column    ] tri
+        ] [ parsing-words>> push ] bi ;
+
+: pop-parsing-word ( -- )
+    lexer get parsing-words>> pop drop ;
+
 : new-lexer ( text class -- lexer )
     new
         0 >>line
         swap >>text
+        V{ } clone >>parsing-words
     dup next-line ; inline
 
 : <lexer> ( text -- lexer )
@@ -94,26 +109,45 @@ PREDICATE: unexpected-eof < unexpected
 : parse-tokens ( end -- seq )
     [ ] map-tokens ;
 
-TUPLE: lexer-error line column line-text error ;
+TUPLE: lexer-error line column line-text parsing-words error ;
 
 M: lexer-error error-file error>> error-file ;
 M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
 
 : <lexer-error> ( msg -- error )
     \ lexer-error new
-        lexer get
-        [ line>> >>line ]
-        [ column>> >>column ]
-        [ line-text>> >>line-text ]
-        tri
+        lexer get [
+            [ line>> >>line ]
+            [ column>> >>column ] bi
+        ] [ 
+            [ line-text>> >>line-text ]
+            [ parsing-words>> clone >>parsing-words ] bi
+        ] bi
         swap >>error ;
 
-: lexer-dump ( error -- )
+: simple-lexer-dump ( error -- )
     [ line>> number>string ": " append ]
     [ line-text>> dup string? [ drop "" ] unless ]
     [ column>> 0 or ] tri
     pick length + CHAR: \s <string>
     [ write ] [ print ] [ write "^" print ] tri* ;
+
+: (parsing-word-lexer-dump) ( error parsing-word -- )
+    [
+        line>> number>string
+        over line>> number>string length
+        CHAR: \s pad-head
+        ": " append write
+    ] [ line-text>> dup string? [ drop "" ] unless print ] bi
+    simple-lexer-dump ;
+
+: parsing-word-lexer-dump ( error parsing-word -- )
+    2dup [ line>> ] bi@ =
+    [ drop simple-lexer-dump ]
+    [ (parsing-word-lexer-dump) ] if ;
+
+: lexer-dump ( error -- )
+    dup parsing-words>> [ simple-lexer-dump ] [ last parsing-word-lexer-dump ] if-empty ;
 
 : with-lexer ( lexer quot -- newquot )
     [ lexer set ] dip [ <lexer-error> rethrow ] recover ; inline
