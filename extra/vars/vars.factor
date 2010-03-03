@@ -28,4 +28,4 @@ SYNTAX: VAR: ! var
     [ define-var ] each ;
 
 SYNTAX: VARS: ! vars ...
-    ";" parse-tokens define-vars ;
+    ";" [ define-var ] each-token ;

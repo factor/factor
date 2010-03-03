@@ -109,7 +109,7 @@ COM-INTERFACE: IDirect3DDevice9 IUnknown {D0223B96-BF7A-43fd-92BD-A43B0D82B9EB}
     HRESULT Clear ( DWORD Count, D3DRECT* pRects, DWORD Flags, D3DCOLOR Color, float Z, DWORD Stencil )
     HRESULT SetTransform ( D3DTRANSFORMSTATETYPE State, D3DMATRIX* pMatrix )
     HRESULT GetTransform ( D3DTRANSFORMSTATETYPE State, D3DMATRIX* pMatrix )
-    HRESULT MultiplyTransform ( D3DTRANSFORMSTATETYPE, D3DMATRIX* )
+    HRESULT MultiplyTransform ( D3DTRANSFORMSTATETYPE State, D3DMATRIX* pMatrix )
     HRESULT SetViewport ( D3DVIEWPORT9* pViewport )
     HRESULT GetViewport ( D3DVIEWPORT9* pViewport )
     HRESULT SetMaterial ( D3DMATERIAL9* pMaterial )

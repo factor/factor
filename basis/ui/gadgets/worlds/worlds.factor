@@ -33,7 +33,8 @@ CONSTANT: default-world-window-controls
     }
 
 TUPLE: world < track
-    active? focused? grab-input?
+    active? focused? grab-input? fullscreen?
+    saved-position
     layers
     title status status-owner
     text-handle handle images

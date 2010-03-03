@@ -95,6 +95,8 @@ enum special_object {
 	OBJ_THREADS = 64,
 	OBJ_RUN_QUEUE = 65,
 	OBJ_SLEEP_QUEUE = 66,
+
+	OBJ_VM_COMPILER = 67,    /* version string of the compiler we were built with */
 };
 
 /* save-image-and-exit discards special objects that are filled in on startup
