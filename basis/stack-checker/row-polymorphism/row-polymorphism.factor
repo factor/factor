@@ -1,7 +1,7 @@
 ! (c)2010 Joe Groff bsd license
 USING: accessors arrays assocs combinators combinators.short-circuit
 continuations effects fry kernel locals math namespaces
-quotations sequences splitting stack-checker
+quotations sequences splitting
 stack-checker.backend
 stack-checker.errors
 stack-checker.known-words
@@ -68,7 +68,7 @@ GENERIC: (infer-known) ( known -- effect )
 M: object (infer-known)
     current-word get bad-macro-input ;
 M: literal (infer-known)
-    value>> dup callable? [ infer ] [ abandon-check ] if ;
+    value>> dup callable? [ (infer) ] [ abandon-check ] if ;
 M: composed (infer-known)
     [ quot1>> known (infer-known) ] [ quot2>> known (infer-known) ] bi compose-effects ;
 M: curried (infer-known)
