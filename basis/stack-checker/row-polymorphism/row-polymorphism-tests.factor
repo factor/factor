@@ -8,24 +8,6 @@ stack-checker.state
 stack-checker.values ;
 IN: stack-checker.row-polymorphism.tests
 
-: checked-each ( ..a seq quot: ( ..a x -- ..a ) -- ..a )
-    curry call ; inline
-
-: checked-map ( ..a seq quot: ( ..a x -- ..a y ) -- ..a seq' )
-    curry call f ; inline
-
-: checked-map-index ( ..a seq quot: ( ..a x index -- ..a y ) -- ..a seq' )
-    0 swap 2curry call f ; inline
-
-: checked-if ( ..a x then: ( ..a -- ..b ) else: ( ..a -- ..b ) -- ..b )
-    drop nip call ; inline
-
-: checked-if* ( ..a x then: ( ..a x -- ..b ) else: ( ..a -- ..b ) -- ..b )
-    drop call ; inline
-
-: checked-with-variable ( ..a value key quot: ( ..a -- ..b ) -- ..b )
-    2nip call ; inline
-
 : infer-polymorphic-quot ( quot -- vars )
     t infer-polymorphic? [
         unclip-last [
@@ -43,51 +25,47 @@ IN: stack-checker.row-polymorphism.tests
 
 : poly-infer-must-fail ( quot -- )
     '[ _ infer-polymorphic-quot ] [ invalid-quotation-input? ] must-fail-with ; inline
-: poly-infer-must-fail-bad-macro-input ( quot -- )
-    '[ _ infer-polymorphic-quot ] [ bad-macro-input? ] must-fail-with ; inline
+: poly-infer-must-fail-unknown ( quot -- )
+    '[ _ infer-polymorphic-quot ] [ unknown-macro-input? ] must-fail-with ; inline
 
-H{ { "a" 0 } } [ [ write      ] checked-each ] test-poly-infer
-H{ { "a" 1 } } [ [ append     ] checked-each ] test-poly-infer
-H{ { "a" 0 } } [ [            ] checked-map  ] test-poly-infer
-H{ { "a" 0 } } [ [ reverse    ] checked-map  ] test-poly-infer
-H{ { "a" 1 } } [ [ append dup ] checked-map  ] test-poly-infer
-H{ { "a" 1 } } [ [ swap nth suffix dup ] checked-map-index ] test-poly-infer
+H{ { "." 0 } } [ [ write      ] each ] test-poly-infer
+H{ { "." 1 } } [ [ append     ] each ] test-poly-infer
+H{ { "." 0 } } [ [            ] map  ] test-poly-infer
+H{ { "." 0 } } [ [ reverse    ] map  ] test-poly-infer
+H{ { "." 1 } } [ [ append dup ] map  ] test-poly-infer
+H{ { "." 1 } } [ [ swap nth suffix dup ] map-index ] test-poly-infer
 
-H{ { "a" 3 } { "b" 1 } } [ [ 2drop ] [ 2nip    ] checked-if ] test-poly-infer
-H{ { "a" 2 } { "b" 3 } } [ [ dup   ] [ over    ] checked-if ] test-poly-infer
-H{ { "a" 0 } { "b" 1 } } [ [ os    ] [ cpu     ] checked-if ] test-poly-infer
-H{ { "a" 1 } { "b" 2 } } [ [ os    ] [ 1 + cpu ] checked-if ] test-poly-infer
+H{ { "a" 3 } { "b" 1 } } [ [ 2drop ] [ 2nip    ] if ] test-poly-infer
+H{ { "a" 2 } { "b" 3 } } [ [ dup   ] [ over    ] if ] test-poly-infer
+H{ { "a" 0 } { "b" 1 } } [ [ os    ] [ cpu     ] if ] test-poly-infer
+H{ { "a" 1 } { "b" 2 } } [ [ os    ] [ 1 + cpu ] if ] test-poly-infer
 
-H{ { "a" 0 } { "b" 0 } } [ [ write     ] [ "(f)" write ] checked-if* ] test-poly-infer
-H{ { "a" 0 } { "b" 1 } } [ [           ] [ f           ] checked-if* ] test-poly-infer
-H{ { "a" 1 } { "b" 1 } } [ [ nip       ] [ drop f      ] checked-if* ] test-poly-infer
-H{ { "a" 1 } { "b" 1 } } [ [ nip       ] [             ] checked-if* ] test-poly-infer
-H{ { "a" 2 } { "b" 2 } } [ [ 3append f ] [             ] checked-if* ] test-poly-infer
-H{ { "a" 0 } { "b" 0 } } [ [ drop      ] [             ] checked-if* ] test-poly-infer
+H{ { "a" 0 } { "b" 0 } } [ [ write     ] [ "(f)" write ] if* ] test-poly-infer
+H{ { "a" 0 } { "b" 1 } } [ [           ] [ f           ] if* ] test-poly-infer
+H{ { "a" 1 } { "b" 1 } } [ [ nip       ] [ drop f      ] if* ] test-poly-infer
+H{ { "a" 1 } { "b" 1 } } [ [ nip       ] [             ] if* ] test-poly-infer
+H{ { "a" 2 } { "b" 2 } } [ [ 3append f ] [             ] if* ] test-poly-infer
+H{ { "a" 0 } { "b" 0 } } [ [ drop      ] [             ] if* ] test-poly-infer
 
-H{ { "a" 1 } { "b" 0 } } [ [ write ] checked-with-variable ] test-poly-infer
-H{ { "a" 0 } { "b" 1 } } [ [ os    ] checked-with-variable ] test-poly-infer
-H{ { "a" 1 } { "b" 1 } } [ [ dup + ] checked-with-variable ] test-poly-infer
+[ [ write write ] each      ] poly-infer-must-fail
+[ [             ] each      ] poly-infer-must-fail
+[ [ dup         ] map       ] poly-infer-must-fail
+[ [ drop        ] map       ] poly-infer-must-fail
+[ [ 1 +         ] map-index ] poly-infer-must-fail
 
-[ [ write write ] checked-each      ] poly-infer-must-fail
-[ [             ] checked-each      ] poly-infer-must-fail
-[ [ dup         ] checked-map       ] poly-infer-must-fail
-[ [ drop        ] checked-map       ] poly-infer-must-fail
-[ [ 1 +         ] checked-map-index ] poly-infer-must-fail
+[ [ dup  ] [      ] if ] poly-infer-must-fail
+[ [ 2dup ] [ over ] if ] poly-infer-must-fail
+[ [ drop ] [      ] if ] poly-infer-must-fail
 
-[ [ dup  ] [      ] checked-if ] poly-infer-must-fail
-[ [ 2dup ] [ over ] checked-if ] poly-infer-must-fail
-[ [ drop ] [      ] checked-if ] poly-infer-must-fail
+[ [      ] [       ] if* ] poly-infer-must-fail
+[ [ dup  ] [       ] if* ] poly-infer-must-fail
+[ [ drop ] [ drop  ] if* ] poly-infer-must-fail
+[ [      ] [ drop  ] if* ] poly-infer-must-fail
+[ [      ] [ 2dup  ] if* ] poly-infer-must-fail
 
-[ [      ] [       ] checked-if* ] poly-infer-must-fail
-[ [ dup  ] [       ] checked-if* ] poly-infer-must-fail
-[ [ drop ] [ drop  ] checked-if* ] poly-infer-must-fail
-[ [      ] [ drop  ] checked-if* ] poly-infer-must-fail
-[ [      ] [ 2dup  ] checked-if* ] poly-infer-must-fail
-
-[ "derp" checked-each ] poly-infer-must-fail
-[ checked-each ] poly-infer-must-fail-bad-macro-input
-[ "derp" [ "derp" ] checked-if ] poly-infer-must-fail
-[ [ "derp" ] "derp" checked-if ] poly-infer-must-fail
-[ [ "derp" ] checked-if ] poly-infer-must-fail-bad-macro-input
+[ "derp" each ] poly-infer-must-fail
+[ each ] poly-infer-must-fail-unknown
+[ "derp" [ "derp" ] if ] poly-infer-must-fail
+[ [ "derp" ] "derp" if ] poly-infer-must-fail
+[ [ "derp" ] if ] poly-infer-must-fail-unknown
 

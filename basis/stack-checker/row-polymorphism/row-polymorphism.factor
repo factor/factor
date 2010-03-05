@@ -5,11 +5,13 @@ quotations sequences splitting
 stack-checker.backend
 stack-checker.errors
 stack-checker.known-words
-stack-checker.values ;
+stack-checker.state
+stack-checker.values
+stack-checker.visitor ;
 IN: stack-checker.row-polymorphism
 
 <PRIVATE
-SYMBOLS: current-effect-variables current-effect current-meta-d ;
+SYMBOLS: current-effect-variables current-word-effect current-meta-d ;
 
 : quotation-effect? ( in -- ? )
     dup pair? [ second effect? ] [ drop f ] if ;
@@ -32,7 +34,7 @@ M: curried >error-quot
 
 : abandon-check ( -- * )
     current-word get
-    current-effect get in>> current-meta-d get zip
+    current-word-effect get in>> current-meta-d get zip
     [ first quotation-effect? ] filter
     >error-branches-and-quots
     invalid-quotation-input ;
@@ -65,23 +67,12 @@ M: curried >error-quot
         abandon-check
     ] if ;
 
-GENERIC: (infer-known) ( known -- effect )
-
-M: object (infer-known)
-    current-word get bad-macro-input ;
-M: literal (infer-known)
-    value>> dup callable? [ (infer) ] [ abandon-check ] if ;
-M: composed (infer-known)
-    [ quot1>> known (infer-known) ] [ quot2>> known (infer-known) ] bi compose-effects ;
-M: curried (infer-known)
-    (( -- x )) swap quot>> known (infer-known) compose-effects ;
-
-: infer-known ( value -- effect )
-    (infer-known) ; inline
+: infer-value ( value -- effect )
+    dup known [ nest-visitor init-inference infer-call* current-effect ] with-scope ; inline
 
 : check-input ( in value -- )
     over quotation-effect? [
-        [ second ] dip known infer-known (check-input)
+        [ second ] dip infer-value (check-input)
     ] [ 2drop ] if ;
 
 : normalize-variables ( -- variables' )
@@ -94,14 +85,16 @@ PRIVATE>
 
 : infer-polymorphic-vars ( effect -- variables )
     H{ } clone current-effect-variables set
-    dup current-effect set
+    dup current-word-effect set
     in>> dup length ensure-d dup current-meta-d set
     [ check-input ] 2each
     normalize-variables ;
 
 : check-polymorphic-effect ( word -- )
     current-word get [
-        dup current-word set stack-effect infer-polymorphic-vars drop
+        dup current-word set stack-effect
+        dup { [ in-var>> ] [ out-var>> ] } 1||
+        [ infer-polymorphic-vars ] when drop
     ] dip current-word set ;
 
 SYMBOL: infer-polymorphic?
