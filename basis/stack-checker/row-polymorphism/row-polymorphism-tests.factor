@@ -8,12 +8,6 @@ stack-checker.state
 stack-checker.values ;
 IN: stack-checker.row-polymorphism.tests
 
-[ 3 f   ] [ (( a b c -- d )) in-effect-variable ] unit-test
-[ 0 f   ] [ (( -- d )) in-effect-variable ] unit-test
-[ 2 "a" ] [ (( ..a b c -- d )) in-effect-variable ] unit-test
-[ (( a ..b c -- d )) in-effect-variable ] [ invalid-effect-variable? ] must-fail-with
-[ (( ..a: integer b c -- d )) in-effect-variable ] [ effect-variable-can't-have-type? ] must-fail-with
-
 : checked-each ( ..a seq quot: ( ..a x -- ..a ) -- ..a )
     curry call ; inline
 
