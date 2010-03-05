@@ -92,7 +92,7 @@ GENERIC: (infer-known) ( known -- effect )
 M: object (infer-known)
     current-word get bad-macro-input ;
 M: literal (infer-known)
-    value>> dup callable? [ infer ] [ current-word get bad-macro-input ] if ;
+    value>> dup callable? [ infer ] [ abandon-check ] if ;
 M: composed (infer-known)
     [ quot1>> known (infer-known) ] [ quot2>> known (infer-known) ] bi compose-effects ;
 M: curried (infer-known)
@@ -127,5 +127,3 @@ PRIVATE>
     ] dip current-word set ;
 
 SYMBOL: infer-polymorphic?
-
-
