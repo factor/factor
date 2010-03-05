@@ -34,7 +34,7 @@ ERROR: transform-expansion-error < inference-error error continuation word ;
 
 ERROR: bad-declaration-error < inference-error declaration ;
 
-ERROR: invalid-quotation-input < inference-error branches quots ;
+ERROR: invalid-quotation-input < inference-error word branches quots ;
 
 ERROR: invalid-effect-variable < inference-error effect ;
 

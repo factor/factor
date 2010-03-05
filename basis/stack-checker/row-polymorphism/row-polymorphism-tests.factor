@@ -4,6 +4,7 @@ system tools.test
 stack-checker.backend
 stack-checker.errors
 stack-checker.row-polymorphism
+stack-checker.state
 stack-checker.values ;
 IN: stack-checker.row-polymorphism.tests
 
