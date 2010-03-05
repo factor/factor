@@ -13,10 +13,13 @@ M: bad-macro-input summary
 M: unbalanced-branches-error summary
     drop "Unbalanced branches" ;
 
+: quots-and-branches. ( quots branches -- )
+    zip [ [ first pprint-short bl ] [ second effect>string print ] bi ] each ;
+
 M: unbalanced-branches-error error.
     dup summary print
-    [ quots>> ] [ branches>> [ length [ "x" <array> ] bi@ <effect> ] { } assoc>map ] bi zip
-    [ [ first pprint-short bl ] [ second effect>string print ] bi ] each ;
+    [ quots>> ] [ branches>> [ length [ "x" <array> ] bi@ <effect> ] { } assoc>map ] bi
+    quots-and-branches. ;
 
 M: too-many->r summary
     drop "Quotation pushes elements on retain stack without popping them" ;
@@ -61,3 +64,17 @@ M: transform-expansion-error error.
 
 M: do-not-compile summary
     word>> name>> "Cannot compile call to " prepend ;
+
+M: invalid-quotation-input summary
+    word>> name>>
+    "The input quotations to " " don't match their expected effects" surround ;
+
+M: invalid-quotation-input error.
+    dup summary print
+    P [ quots>> ] [ branches>> ] bi quots-and-branches. ;
+
+M: invalid-effect-variable summary
+    drop "Stack effect variables can only occur as the first input or output" ;
+M: effect-variable-can't-have-type summary
+    drop "Stack effect variables cannot have a declared type" ;
+
