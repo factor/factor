@@ -49,6 +49,8 @@ IN: stack-checker.row-polymorphism.tests
 
 : poly-infer-must-fail ( quot -- )
     '[ _ infer-polymorphic-quot ] [ invalid-quotation-input? ] must-fail-with ; inline
+: poly-infer-must-fail-bad-macro-input ( quot -- )
+    '[ _ infer-polymorphic-quot ] [ bad-macro-input? ] must-fail-with ; inline
 
 H{ { "a" 0 } } [ [ write      ] checked-each ] test-poly-infer
 H{ { "a" 1 } } [ [ append     ] checked-each ] test-poly-infer
@@ -90,8 +92,8 @@ H{ { "a" 1 } { "b" 1 } } [ [ dup + ] checked-with-variable ] test-poly-infer
 [ [      ] [ 2dup  ] checked-if* ] poly-infer-must-fail
 
 [ "derp" checked-each ] poly-infer-must-fail
-[ checked-each ] poly-infer-must-fail
+[ checked-each ] poly-infer-must-fail-bad-macro-input
 [ "derp" [ "derp" ] checked-if ] poly-infer-must-fail
 [ [ "derp" ] "derp" checked-if ] poly-infer-must-fail
-[ [ "derp" ] checked-if ] poly-infer-must-fail
+[ [ "derp" ] checked-if ] poly-infer-must-fail-bad-macro-input
 
