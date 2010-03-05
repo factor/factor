@@ -40,7 +40,7 @@ SYMBOL: literals
 : current-effect ( -- effect )
     input-count get "x" <array>
     meta-d length "x" <array>
-    terminated? get effect boa ;
+    terminated? get <terminated-effect> ;
 
 : init-inference ( -- )
     terminated? off

@@ -14,30 +14,6 @@ SYMBOLS: current-effect-variables current-effect current-meta-d ;
 : quotation-effect? ( in -- ? )
     dup pair? [ second effect? ] [ drop f ] if ;
 
-: (effect-variable) ( effect in -- effect variable/f )
-    dup pair?
-    [ first ".." head? [ effect-variable-can't-have-type ] [ f ] if ]
-    [ ".." ?head [ drop f ] unless ] if ;
-
-: validate-effect-variables ( effect ins/outs -- )
-    [ (effect-variable) ] any? [ invalid-effect-variable ] [ drop ] if ;
-
-: effect-variable ( effect ins/outs -- count variable/f )
-    [ drop 0 f ] [
-        unclip
-        [ [ validate-effect-variables ] [ length ] bi ]
-        [ (effect-variable) ] bi*
-        [ 1 + f ] unless*
-    ] if-empty ;
-PRIVATE>
-
-: in-effect-variable ( effect -- count variable/f )
-    dup in>> effect-variable ;
-: out-effect-variable ( effect -- count variable/f )
-    dup out>> effect-variable ;
-
-<PRIVATE
-
 SYMBOL: (unknown)
 
 GENERIC: >error-quot ( known -- quot )
@@ -77,8 +53,8 @@ M: curried >error-quot
     [ 2drop ] if ; inline
 
 :: (check-input) ( declared actual -- )
-    actual in>>  length  declared in-effect-variable  [ check-variable ] keep :> ( in-diff in-var ) 
-    actual out>> length  declared out-effect-variable [ check-variable ] keep :> ( out-diff out-var )
+    actual in>>  length  declared in-var>>  [ check-variable ] keep :> ( in-diff in-var ) 
+    actual out>> length  declared out-var>> [ check-variable ] keep :> ( out-diff out-var )
     { [ in-var not ] [ out-var not ] [ in-diff out-diff = ] } 0||
     [
         in-var  [ in-diff  swap adjust-variable ] when*
