@@ -29,7 +29,7 @@ DEFER: if
     #! two literal quotations.
     rot [ drop ] [ nip ] if ; inline
 
-: if ( ? true false -- ) ? call ;
+: if ( ..a ? true: ( ..a -- ..b ) false: ( ..a -- ..b ) -- ..b ) ? call ;
 
 ! Single branch
 : unless ( ? false -- )
@@ -39,7 +39,7 @@ DEFER: if
     swap [ call ] [ drop ] if ; inline
 
 ! Anaphoric
-: if* ( ? true false -- )
+: if* ( ..a ? true: ( ..a ? -- ..b ) false: ( ..a -- ..b ) -- ..b )
     pick [ drop call ] [ 2nip call ] if ; inline
 
 : when* ( ? true -- )
@@ -49,7 +49,7 @@ DEFER: if
     over [ drop ] [ nip call ] if ; inline
 
 ! Default
-: ?if ( default cond true false -- )
+: ?if ( ..a default cond true: ( ..a cond -- ..b ) false: ( ..a default -- ..b ) -- ..b )
     pick [ drop [ drop ] 2dip call ] [ 2nip call ] if ; inline
 
 ! Dippers.
@@ -171,16 +171,16 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 : most ( x y quot -- z ) 2keep ? ; inline
 
 ! Loops
-: loop ( pred: ( -- ? ) -- )
+: loop ( ... pred: ( ... -- ... ? ) -- ... )
     [ call ] keep [ loop ] curry when ; inline recursive
 
 : do ( pred body -- pred body )
     dup 2dip ; inline
 
-: while ( pred: ( -- ? ) body: ( -- ) -- )
+: while ( ... pred: ( ... -- ... ? ) body: ( ... -- ... ) -- ... )
     swap do compose [ loop ] curry when ; inline
 
-: until ( pred: ( -- ? ) body: ( -- ) -- )
+: until ( ... pred: ( ... -- ... ? ) body: ( ... -- ... ) -- )
     [ [ not ] compose ] dip while ; inline
 
 ! Object protocol
