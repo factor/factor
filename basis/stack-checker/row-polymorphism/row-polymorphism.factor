@@ -9,7 +9,7 @@ stack-checker.values ;
 IN: stack-checker.row-polymorphism
 
 <PRIVATE
-SYMBOL: effect-variables
+SYMBOLS: current-effect-variables current-effect current-meta-d ;
 
 : quotation-effect? ( in -- ? )
     dup pair? [ second effect? ] [ drop f ] if ;
@@ -38,21 +38,42 @@ PRIVATE>
 
 <PRIVATE
 
-ERROR: abandon-check ;
+SYMBOL: (unknown)
+
+GENERIC: >error-quot ( known -- quot )
+
+M: object >error-quot drop (unknown) ;
+M: literal >error-quot value>> ;
+M: composed >error-quot
+    [ quot1>> known >error-quot ] [ quot2>> known >error-quot ] bi
+    \ compose [ ] 3sequence ;
+M: curried >error-quot
+    [ obj>> known >error-quot ] [ quot>> known >error-quot ] bi
+    \ curry [ ] 3sequence ;
+
+: >error-branches-and-quots ( branch/values -- branches quots )
+    [ [ second ] [ known >error-quot ] bi* ] assoc-map unzip ;
+
+: abandon-check ( -- * )
+    current-word get
+    current-effect get in>> current-meta-d get zip
+    [ first quotation-effect? ] filter
+    >error-branches-and-quots
+    invalid-quotation-input ;
 
 :: check-variable ( actual-count declared-count variable -- difference )
     actual-count declared-count -
     variable [
-        variable effect-variables get at* nip
-        [ variable effect-variables get at -     ]
-        [ variable effect-variables get set-at 0 ] if
+        variable current-effect-variables get at* nip
+        [ variable current-effect-variables get at -     ]
+        [ variable current-effect-variables get set-at 0 ] if
     ] [
         dup [ abandon-check ] unless-zero
     ] if ;
 
 : adjust-variable ( diff var -- )
     over 0 >=
-    [ effect-variables get at+ ]
+    [ current-effect-variables get at+ ]
     [ 2drop ] if ; inline
 
 :: (check-input) ( declared actual -- )
@@ -86,7 +107,7 @@ M: curried (infer-known)
     ] [ 2drop ] if ;
 
 : normalize-variables ( -- variables' )
-    effect-variables get dup values [
+    current-effect-variables get dup values [
         infimum dup 0 <
         [ '[ _ - ] assoc-map ] [ drop ] if
     ] unless-empty ;
@@ -94,8 +115,10 @@ M: curried (infer-known)
 PRIVATE>
 
 : infer-polymorphic-vars ( effect -- variables )
-    H{ } clone effect-variables set
-    in>> dup length ensure-d [ check-input ] 2each
+    H{ } clone current-effect-variables set
+    dup current-effect set
+    in>> dup length ensure-d dup current-meta-d set
+    [ check-input ] 2each
     normalize-variables ;
 
 : check-polymorphic-effect ( word -- )
