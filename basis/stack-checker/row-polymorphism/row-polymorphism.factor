@@ -53,8 +53,10 @@ M: curried >error-quot
     [ 2drop ] if ; inline
 
 :: (check-input) ( declared actual -- )
-    actual in>>  length  declared in-var>>  [ check-variable ] keep :> ( in-diff in-var ) 
-    actual out>> length  declared out-var>> [ check-variable ] keep :> ( out-diff out-var )
+    actual declared [ in>>  length ] bi@ declared in-var>>
+        [ check-variable ] keep :> ( in-diff in-var ) 
+    actual declared [ out>> length ] bi@ declared out-var>>
+        [ check-variable ] keep :> ( out-diff out-var )
     { [ in-var not ] [ out-var not ] [ in-diff out-diff = ] } 0||
     [
         in-var  [ in-diff  swap adjust-variable ] when*
