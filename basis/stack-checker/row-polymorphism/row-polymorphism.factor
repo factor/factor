@@ -66,24 +66,27 @@ ERROR: abandon-check ;
         abandon-check
     ] if ;
 
-GENERIC: infer-known ( known -- effect )
+GENERIC: (infer-known) ( known -- effect )
 
-M: object infer-known
+M: object (infer-known)
     current-word get bad-macro-input ;
-M: literal infer-known
+M: literal (infer-known)
     value>> dup callable? [ infer ] [ current-word get bad-macro-input ] if ;
-M: composed infer-known
-    [ quot1>> known infer-known ] [ quot2>> known infer-known ] bi compose-effects ;
-M: curried infer-known
-    (( -- x )) swap quot>> known infer-known compose-effects ;
+M: composed (infer-known)
+    [ quot1>> known (infer-known) ] [ quot2>> known (infer-known) ] bi compose-effects ;
+M: curried (infer-known)
+    (( -- x )) swap quot>> known (infer-known) compose-effects ;
+
+: infer-known ( value -- effect )
+    (infer-known) ; inline
 
 : check-input ( in value -- )
     over quotation-effect? [
         [ second ] dip known infer-known (check-input)
     ] [ 2drop ] if ;
 
-: normalize-variables ( variables -- variables' )
-    dup values [
+: normalize-variables ( -- variables' )
+    effect-variables get dup values [
         infimum dup 0 <
         [ '[ _ - ] assoc-map ] [ drop ] if
     ] unless-empty ;
@@ -91,12 +94,14 @@ M: curried infer-known
 PRIVATE>
 
 : infer-polymorphic-vars ( effect -- variables )
-    H{ } clone 
-    [ effect-variables [ in>> dup length ensure-d [ check-input ] 2each ] with-variable ]
-    keep normalize-variables ;
+    H{ } clone effect-variables set
+    in>> dup length ensure-d [ check-input ] 2each
+    normalize-variables ;
 
 : check-polymorphic-effect ( word -- )
-    dup current-word [ stack-effect infer-polymorphic-vars drop ] with-variable ;
+    current-word get [
+        dup current-word set stack-effect infer-polymorphic-vars drop
+    ] dip current-word set ;
 
 SYMBOL: infer-polymorphic?
 
