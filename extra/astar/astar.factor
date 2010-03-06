@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs heaps kernel math math.order sequences sets shuffle ;
+USING: accessors assocs heaps kernel math sequences sets shuffle ;
 IN: astar
 
 ! This implements the A* algorithm. See http://en.wikipedia.org/wiki/A*
