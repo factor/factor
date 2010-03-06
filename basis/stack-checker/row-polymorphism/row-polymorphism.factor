@@ -55,17 +55,19 @@ M: curried >error-quot
     [ 2drop ] if ; inline
 
 :: (check-input) ( declared actual -- )
-    actual declared [ in>>  length ] bi@ declared in-var>>
-        [ check-variable ] keep :> ( in-diff in-var ) 
-    actual declared [ out>> length ] bi@ declared out-var>>
-        [ check-variable ] keep :> ( out-diff out-var )
-    { [ in-var not ] [ out-var not ] [ in-diff out-diff = ] } 0||
-    [
-        in-var  [ in-diff  swap adjust-variable ] when*
-        out-var [ out-diff swap adjust-variable ] when*
-    ] [
-        abandon-check
-    ] if ;
+    actual terminated?>> [
+        actual declared [ in>>  length ] bi@ declared in-var>>
+            [ check-variable ] keep :> ( in-diff in-var ) 
+        actual declared [ out>> length ] bi@ declared out-var>>
+            [ check-variable ] keep :> ( out-diff out-var )
+        { [ in-var not ] [ out-var not ] [ in-diff out-diff = ] } 0||
+        [
+            in-var  [ in-diff  swap adjust-variable ] when*
+            out-var [ out-diff swap adjust-variable ] when*
+        ] [
+            abandon-check
+        ] if
+    ] unless ;
 
 : infer-value ( value -- effect )
     dup known [ nest-visitor init-inference infer-call* current-effect ] with-scope ; inline
@@ -92,9 +94,10 @@ PRIVATE>
 
 : check-polymorphic-effect ( word -- )
     current-word get [
-        dup current-word set stack-effect
-        dup { [ in-var>> ] [ out-var>> ] } 1||
+        dup current-word set
+        stack-effect dup { [ in-var>> ] [ out-var>> ] } 1||
         [ infer-polymorphic-vars ] when drop
     ] dip current-word set ;
 
 SYMBOL: infer-polymorphic?
+infer-polymorphic? [ t ] initialize
