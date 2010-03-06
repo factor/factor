@@ -47,6 +47,8 @@ H{ { "a" 1 } { "b" 1 } } [ [ nip       ] [             ] if* ] test-poly-infer
 H{ { "a" 2 } { "b" 2 } } [ [ 3append f ] [             ] if* ] test-poly-infer
 H{ { "a" 0 } { "b" 0 } } [ [ drop      ] [             ] if* ] test-poly-infer
 
+H{ { "a" 0 } { "b" 1 } } [ [ 1 +       ] [ "oops" throw ] if* ] test-poly-infer
+
 [ [ write write ] each      ] poly-infer-must-fail
 [ [             ] each      ] poly-infer-must-fail
 [ [ dup         ] map       ] poly-infer-must-fail
@@ -63,9 +65,6 @@ H{ { "a" 0 } { "b" 0 } } [ [ drop      ] [             ] if* ] test-poly-infer
 [ [      ] [ drop  ] if* ] poly-infer-must-fail
 [ [      ] [ 2dup  ] if* ] poly-infer-must-fail
 
-[ "derp" each ] poly-infer-must-fail
 [ each ] poly-infer-must-fail-unknown
-[ "derp" [ "derp" ] if ] poly-infer-must-fail
-[ [ "derp" ] "derp" if ] poly-infer-must-fail
 [ [ "derp" ] if ] poly-infer-must-fail-unknown
 
