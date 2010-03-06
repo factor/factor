@@ -11,6 +11,7 @@ stack-checker.backend
 stack-checker.branches
 stack-checker.known-words
 stack-checker.dependencies
+stack-checker.row-polymorphism
 stack-checker.recursive-state ;
 IN: stack-checker.inlining
 
@@ -141,6 +142,7 @@ SYMBOL: enter-out
 : inline-word ( word -- )
     commit-literals
     [ depends-on-definition ]
+    [ infer-polymorphic? get [ check-polymorphic-effect ] [ drop ] if ]
     [
         dup inline-recursive-label [
             call-recursive-inline-word
@@ -150,7 +152,7 @@ SYMBOL: enter-out
             [ dup infer-inline-word-def ]
             if
         ] if*
-    ] bi ;
+    ] tri ;
 
 M: word apply-object
     dup inline? [ inline-word ] [ non-inline-word ] if ;
