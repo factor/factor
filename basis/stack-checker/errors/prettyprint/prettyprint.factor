@@ -73,8 +73,3 @@ M: invalid-quotation-input error.
     dup summary print
     [ quots>> ] [ branches>> ] bi quots-and-branches. ;
 
-M: invalid-effect-variable summary
-    drop "Stack effect variables can only occur as the first input or output" ;
-M: effect-variable-can't-have-type summary
-    drop "Stack effect variables cannot have a declared type" ;
-
