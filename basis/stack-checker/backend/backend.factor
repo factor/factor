@@ -157,3 +157,6 @@ M: bad-call summary
         current-effect
         stack-visitor get
     ] with-scope ; inline
+
+: (infer) ( quot -- effect )
+    [ infer-quot-here ] with-infer drop ;

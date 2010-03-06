@@ -1,4 +1,4 @@
-USING: effects kernel tools.test prettyprint accessors
+USING: effects effects.parser eval kernel tools.test prettyprint accessors
 quotations sequences ;
 IN: effects.tests
 
@@ -27,3 +27,18 @@ IN: effects.tests
 
 [ { object object } ] [ (( a b -- )) effect-in-types ] unit-test
 [ { object sequence } ] [ (( a b: sequence -- )) effect-in-types ] unit-test
+
+[ f   ] [ (( a b c -- d )) in-var>> ] unit-test
+[ f   ] [ (( -- d )) in-var>> ] unit-test
+[ "a" ] [ (( ..a b c -- d )) in-var>> ] unit-test
+[ { "b" "c" } ] [ (( ..a b c -- d )) in>> ] unit-test
+
+[ f   ] [ (( ..a b c -- e )) out-var>> ] unit-test
+[ "d" ] [ (( ..a b c -- ..d e )) out-var>> ] unit-test
+[ { "e" } ] [ (( ..a b c -- ..d e )) out>> ] unit-test
+
+[ "(( a ..b c -- d ))" eval( -- effect ) ]
+[ error>> invalid-effect-variable? ] must-fail-with
+
+[ "(( ..a: integer b c -- d ))" eval( -- effect ) ]
+[ error>> effect-variable-can't-have-type? ] must-fail-with

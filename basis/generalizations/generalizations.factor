@@ -125,13 +125,13 @@ MACRO: cleave* ( n -- )
 : mnapply ( quot m n -- )
     [ nip dupn ] [ nspread* ] 2bi ; inline
 
-: apply-curry ( ...a quot n -- )
+: apply-curry ( a... quot n -- )
     [ [curry] ] dip napply ; inline
 
-: cleave-curry ( a ...quot n -- )
+: cleave-curry ( a quot... n -- )
     [ [curry] ] swap [ napply ] [ cleave* ] bi ; inline
 
-: spread-curry ( ...a ...quot n -- )
+: spread-curry ( a... quot... n -- )
     [ [curry] ] swap [ napply ] [ spread* ] bi ; inline
 
 MACRO: mnswap ( m n -- )

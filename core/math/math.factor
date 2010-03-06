@@ -77,7 +77,7 @@ ERROR: log2-expects-positive x ;
 : even? ( n -- ? ) 1 bitand zero? ;
 : odd? ( n -- ? ) 1 bitand 1 number= ;
 
-: if-zero ( n quot1 quot2 -- )
+: if-zero ( ..a n quot1: ( ..a -- ..b ) quot2: ( ..a n -- ..b ) -- ..b )
     [ dup zero? ] [ [ drop ] prepose ] [ ] tri* if ; inline
 
 : when-zero ( n quot -- ) [ ] if-zero ; inline
@@ -141,18 +141,18 @@ GENERIC: prev-float ( m -- n )
 
 PRIVATE>
 
-: (each-integer) ( i n quot: ( i -- ) -- )
+: (each-integer) ( ... i n quot: ( ... i -- ... ) -- ... )
     [ iterate-step iterate-next (each-integer) ]
     [ 3drop ] if-iterate? ; inline recursive
 
-: (find-integer) ( i n quot: ( i -- ? ) -- i )
+: (find-integer) ( ... i n quot: ( ... i -- ... ? ) -- ... i )
     [
         iterate-step
         [ [ ] ] 2dip
         [ iterate-next (find-integer) ] 2curry bi-curry if
     ] [ 3drop f ] if-iterate? ; inline recursive
 
-: (all-integers?) ( i n quot: ( i -- ? ) -- ? )
+: (all-integers?) ( ... i n quot: ( ... i -- ... ? ) -- ... ? )
     [
         iterate-step
         [ iterate-next (all-integers?) ] 3curry
@@ -171,7 +171,7 @@ PRIVATE>
 : all-integers? ( n quot -- ? )
     iterate-prep (all-integers?) ; inline
 
-: find-last-integer ( n quot: ( i -- ? ) -- i )
+: find-last-integer ( ... n quot: ( ... i -- ... ? ) -- ... i )
     over 0 < [
         2drop f
     ] [

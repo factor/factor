@@ -8,11 +8,21 @@ IN: effects
 TUPLE: effect
 { in array read-only }
 { out array read-only }
-{ terminated? read-only } ;
+{ terminated? read-only }
+{ in-var read-only }
+{ out-var read-only } ;
+
+: ?terminated ( out -- out terminated? )
+    dup { "*" } = [ drop { } t ] [ f ] if ;
 
 : <effect> ( in out -- effect )
-    dup { "*" } = [ drop { } t ] [ f ] if
-    effect boa ;
+    ?terminated f f effect boa ;
+
+: <terminated-effect> ( in out terminated? -- effect )
+    f f effect boa ; inline
+
+: <variable-effect> ( in-var in out-var out -- effect )
+    swap [ rot ] dip [ ?terminated ] 2dip effect boa ;
 
 : effect-height ( effect -- n )
     [ out>> length ] [ in>> length ] bi - ; inline
@@ -42,13 +52,19 @@ M: pair effect>string first2 [ effect>string ] bi@ ": " glue ;
 : stack-picture ( seq -- string )
     [ [ effect>string % CHAR: \s , ] each ] "" make ;
 
+: var-picture ( var -- string )
+    [ ".." " " surround ]
+    [ "" ] if* ;
+
 M: effect effect>string ( effect -- string )
     [
         "( " %
-        [ in>> stack-picture % "-- " % ]
-        [ out>> stack-picture % ]
-        [ terminated?>> [ "* " % ] when ]
-        tri
+        dup in-var>> var-picture %
+        dup in>> stack-picture % "-- " %
+        dup out-var>> var-picture %
+        dup out>> stack-picture %
+        dup terminated?>> [ "* " % ] when
+        drop
         ")" %
     ] "" make ;
 
@@ -87,7 +103,7 @@ M: effect clone
     shuffle-mapping swap nths ;
 
 : add-effect-input ( effect -- effect' )
-    [ in>> "obj" suffix ] [ out>> ] [ terminated?>> ] tri effect boa ;
+    [ in>> "obj" suffix ] [ out>> ] [ terminated?>> ] tri <terminated-effect> ;
 
 : compose-effects ( effect1 effect2 -- effect' )
     over terminated?>> [
@@ -97,5 +113,5 @@ M: effect clone
         [ [ out>> length ] [ [ in>> length ] [ out>> length ] bi ] bi* [ [-] ] dip + ]
         [ nip terminated?>> ] 2tri
         [ [ "x" <array> ] bi@ ] dip
-        effect boa
+        <terminated-effect>
     ] if ; inline
