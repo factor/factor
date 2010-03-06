@@ -1,11 +1,13 @@
 ! (c)2010 Joe Groff bsd license
-USING: effects fry io kernel math namespaces sequences
-system tools.test
+USING: accessors effects fry io kernel make math namespaces sequences
+splitting system tools.test
+stack-checker
 stack-checker.backend
 stack-checker.errors
 stack-checker.row-polymorphism
 stack-checker.state
 stack-checker.values ;
+FROM: splitting.private => split, ;
 IN: stack-checker.row-polymorphism.tests
 
 : infer-polymorphic-quot ( quot -- vars )
@@ -48,6 +50,14 @@ H{ { "a" 2 } { "b" 2 } } [ [ 3append f ] [             ] if* ] test-poly-infer
 H{ { "a" 0 } { "b" 0 } } [ [ drop      ] [             ] if* ] test-poly-infer
 
 H{ { "a" 0 } { "b" 1 } } [ [ 1 +       ] [ "oops" throw ] if* ] test-poly-infer
+
+H{ } [ [ [ member? ] curry split, ] { } make ] test-poly-infer
+
+[ (( x x -- x )) ] [
+    t infer-polymorphic? [
+        [ [ [ member? ] curry split, ] { } make ] infer
+    ] with-variable
+] unit-test
 
 [ [ write write ] each      ] poly-infer-must-fail
 [ [             ] each      ] poly-infer-must-fail
