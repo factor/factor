@@ -37,11 +37,8 @@ IN: astar.tests
 : cost ( from to -- cost )
     2dup [ first ] bi@ = [ [ second ] bi@ > 1 5 ? ] [ 2drop 2 ] if ;
 
-: heuristic ( pos1 pos2 -- distance )
-    v- [ sq ] map sum sqrt ;
-
 : test1 ( to -- path considered )
-    { 1 1 } swap [ neighbours ] [ cost ] [ heuristic ] <astar> [ find-path ] [ considered ] bi ;
+    { 1 1 } swap [ neighbours ] [ cost ] [ distance ] <astar> [ find-path ] [ considered ] bi ;
 >>
 
 ! Existing path from s to f
