@@ -513,10 +513,10 @@ PRIVATE>
 : collector ( quot -- quot' vec )
     V{ } collector-for ; inline
 
-: produce-as ( ... pred: ( ... -- ... ? ) quot: ( ... -- ... obj ) exemplar -- ... seq )
+: produce-as ( ..a pred: ( ..a -- ..b ? ) quot: ( ..b -- ..a obj ) exemplar -- ..b seq )
     dup [ collector-for [ while ] dip ] curry dip like ; inline
 
-: produce ( ... pred: ( ... -- ... ? ) quot: ( ... -- ... obj ) -- ... seq )
+: produce ( ..a pred: ( ..a -- ..b ? ) quot: ( ..b -- ..a obj ) -- ..b seq )
     { } produce-as ; inline
 
 : follow ( ... obj quot: ( ... prev -- ... result/f ) -- ... seq )

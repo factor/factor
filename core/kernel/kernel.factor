@@ -177,10 +177,10 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 : do ( pred body -- pred body )
     dup 2dip ; inline
 
-: while ( ... pred: ( ... -- ... ? ) body: ( ... -- ... ) -- ... )
+: while ( ..a pred: ( ..a -- ..b ? ) body: ( ..b -- ..a ) -- ..b )
     swap do compose [ loop ] curry when ; inline
 
-: until ( ... pred: ( ... -- ... ? ) body: ( ... -- ... ) -- )
+: until ( ..a pred: ( ..a -- ..b ? ) body: ( ..b -- ..a ) -- ..b )
     [ [ not ] compose ] dip while ; inline
 
 ! Object protocol
