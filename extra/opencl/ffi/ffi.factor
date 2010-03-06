@@ -7,7 +7,7 @@ IN: opencl.ffi
 << "opencl" {
         { [ os windows? ] [ "OpenCL.dll" ] }
         { [ os macosx? ] [ "/System/Library/Frameworks/OpenCL.framework/OpenCL" ] }
-        { [ os unix? ] [ "libopencl.so" ] }
+        { [ os unix? ] [ "libOpenCL.so" ] }
     } cond "stdcall" add-library >>
 LIBRARY: opencl
 
