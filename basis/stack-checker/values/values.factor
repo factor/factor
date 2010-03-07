@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors namespaces kernel assocs sequences
-stack-checker.recursive-state stack-checker.errors ;
+stack-checker.recursive-state stack-checker.errors
+quotations ;
 IN: stack-checker.values
 
 ! Values
@@ -97,9 +98,39 @@ M: input-parameter (literal-value?) drop f ;
 
 M: input-parameter (literal) current-word get unknown-macro-input ;
 
+! Argument corresponding to polymorphic declared input of inline combinator
+
+TUPLE: declared-effect value word effect variables ;
+
+C: <declared-effect> declared-effect
+
+M: declared-effect (input-value?) value>> input-value? ;
+
+M: declared-effect (literal-value?) value>> literal-value? ;
+
+M: declared-effect (literal) value>> literal ;
+
 ! Computed values
 M: f (input-value?) drop f ;
 
 M: f (literal-value?) drop f ;
 
 M: f (literal) current-word get bad-macro-input ;
+
+SYMBOL: (_)
+ERROR: (@) ;
+
+GENERIC: known>callable ( known -- quot )
+
+: ?@ ( x -- y )
+    dup callable? [ drop [ (@) ] ] unless ;
+
+M: object known>callable drop (_) ;
+M: literal known>callable value>> ;
+M: composed known>callable
+    [ quot1>> known known>callable ?@ ] [ quot2>> known known>callable ?@ ] bi
+    append ;
+M: curried known>callable
+    [ quot>> known known>callable ] [ obj>> known known>callable ] bi
+    prefix ;
+

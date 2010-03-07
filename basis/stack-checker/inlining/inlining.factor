@@ -142,7 +142,7 @@ SYMBOL: enter-out
 : inline-word ( word -- )
     commit-literals
     [ depends-on-definition ]
-    [ infer-polymorphic? get [ check-polymorphic-effect ] [ drop ] if ]
+    [ declare-input-effects ]
     [
         dup inline-recursive-label [
             call-recursive-inline-word

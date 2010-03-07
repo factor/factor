@@ -91,6 +91,9 @@ M: literal infer-branch
         [ value>> quotation set ] [ infer-literal-quot ] bi
     ] H{ } make-assoc ;
 
+M: declared-effect infer-branch
+    value>> infer-branch ;
+
 M: callable infer-branch
     [
         copy-inference
@@ -107,12 +110,18 @@ M: callable infer-branch
     infer-branches
     [ first2 #if, ] dip compute-phi-function ;
 
+GENERIC: curried/composed? ( known -- ? )
+M: object curried/composed? drop f ;
+M: curried curried/composed? drop t ;
+M: composed curried/composed? drop t ;
+M: declared-effect curried/composed? value>> known curried/composed? ;
+
 : infer-if ( -- )
     2 literals-available? [
         (infer-if)
     ] [
         drop 2 consume-d
-        dup [ known [ curried? ] [ composed? ] bi or ] any? [
+        dup [ known curried/composed? ] any? [
             output-d
             [ rot [ drop call ] [ nip call ] if ]
             infer-quot-here
