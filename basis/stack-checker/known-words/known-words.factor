@@ -98,6 +98,16 @@ M: composed infer-call*
     1 infer->r infer-call
     terminated? get [ 1 infer-r> infer-call ] unless ;
 
+: Pdeclared-effect ( x -- x )
+    dup
+    [ word>> P. ]
+    [ effect>> P. ]
+    [ value>> known known>callable P. ] tri ;
+
+M: declared-effect infer-call*
+    Pdeclared-effect
+    nip value>> (infer-call) ;
+
 M: input-parameter infer-call* \ call unknown-macro-input ;
 M: object infer-call* \ call bad-macro-input ;
 
