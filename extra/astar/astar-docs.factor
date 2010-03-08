@@ -3,7 +3,40 @@
 USING: help.markup help.syntax ;
 IN: astar
 
-{ find-path <astar> considered } related-words
+HELP: astar
+{ $description "This tuple must be subclassed and its method " { $link cost } ", "
+  { $link heuristic } ", and " { $link neighbours } " must be implemented. "
+  "Alternatively, the " { $link <astar> } " word can be used to build a non-specialized version." } ;
+
+HELP: cost
+{ $values
+  { "from" "a node" }
+  { "to" "a node" }
+  { "astar" "an instance of a subclassed " { $link astar } " tuple" }
+  { "n" "a number" }
+}
+{ $description "Return the cost to go from " { $snippet "from" } " to " { $snippet "to" } ". "
+  { $snippet "to" } " is necessarily a neighbour of " { $snippet "from" } "."
+} ;
+
+HELP: heuristic
+{ $values
+  { "from" "a node" }
+  { "to" "a node" }
+  { "astar" "an instance of a subclassed " { $link astar } " tuple" }
+  { "n" "a number" }
+}
+{ $description "Return the estimated (undervalued) cost to go from " { $snippet "from" } " to " { $snippet "to" } ". "
+  { $snippet "from" } " and " { $snippet "to" } " are not necessarily neighbours."
+} ;
+
+HELP: neighbours
+{ $values
+  { "node" "a node" }
+  { "astar" "an instance of a subclassed " { $link astar } " tuple" }
+  { "seq" "a sequence of nodes" }
+}
+{ $description "Return the list of nodes reachable from " { $snippet "node" } "." } ;
 
 HELP: <astar>
 { $values
@@ -16,7 +49,8 @@ HELP: <astar>
   { $snippet "neighbours" } " one builds the list of neighbours. The "
   { $snippet "cost" } " and " { $snippet "heuristic" } " ones represent "
   "respectively the cost for transitioning from a node to one of its neighbour, "
-  "and the underestimated cost for going from a node to the target."
+  "and the underestimated cost for going from a node to the target. This solution "
+  "may not be as efficient as subclassing the " { $link astar } " tuple."
 } ;
 
 HELP: find-path
