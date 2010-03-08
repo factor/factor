@@ -8,6 +8,7 @@ IN: stack-checker.backend.tests
     V{ } clone \ literals set
     H{ } clone known-values set
     0 input-count set
+    0 inner-d-index set
 ] unit-test
 
 [ 0 ] [ 0 ensure-d length ] unit-test
