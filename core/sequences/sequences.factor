@@ -483,7 +483,7 @@ PRIVATE>
 : all? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
     (each) all-integers? ; inline
 
-: push-if ( ... elt quot: ( ... elt -- ... ? ) accum -- ... )
+: push-if ( ..a elt quot: ( ..a elt -- ..b ? ) accum -- ..b )
     [ keep ] dip rot [ push ] [ 2drop ] if ; inline
 
 : selector-for ( quot exemplar -- selector accum )
@@ -498,7 +498,7 @@ PRIVATE>
 : filter ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
     over filter-as ; inline
 
-: push-either ( ... elt quot: ( ... elt -- ... ? ) accum1 accum2 -- ... )
+: push-either ( ..a elt quot: ( ..a elt -- ..b ? ) accum1 accum2 -- ..b )
     [ keep swap ] 2dip ? push ; inline
 
 : 2selector ( quot -- selector accum1 accum2 )
