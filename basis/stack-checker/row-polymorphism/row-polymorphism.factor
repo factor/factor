@@ -83,10 +83,12 @@ IN: stack-checker.row-polymorphism
     [ word>> ] [
         branches>> <reversed>
         [ [ known>callable ] { } map-as ]
-        [ [ effect>> ] { } map-as ] bi
+        [ [ effect>> ] { } map-as ]
+        [ [ actual>> ] { } map-as ] tri
     ] bi invalid-quotation-input ;
 
 : check-declared-effect ( known effect -- )
+    [ >>actual ] keep
     2dup [ [ variables>> ] [ effect>> ] bi ] dip check-variables
     [ 2drop ] [ drop invalid-quotation-input* ] if ;
 
