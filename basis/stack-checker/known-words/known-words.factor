@@ -99,21 +99,6 @@ M: composed infer-call*
     1 infer->r infer-call
     terminated? get [ 1 infer-r> infer-call ] unless ;
 
-! : Pdeclared-effect ( x -- x )
-!     "-->" P.
-!     dup
-!     [ word>> P. ]
-!     [ effect>> P. ]
-!     [ value>> known known>callable P. ] tri
-!     current-effect P. ;
-! 
-! M: declared-effect infer-call*
-!     [ Pdeclared-effect
-!     nip value>> (infer-call) ]
-!     [ "<--" P.
-!     word>> P.
-!     current-effect P. ] bi ;
-
 M: declared-effect infer-call*
     [ [ known>> infer-call* ] keep ] with-effect-here check-declared-effect ;
 
