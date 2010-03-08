@@ -42,8 +42,11 @@ IN: stack-checker.backend
 : shorten-by ( n seq -- )
     [ length swap - ] keep shorten ; inline
 
+: shorten-d ( n -- )
+    meta-d shorten-by meta-d length update-inner-d ;
+
 : consume-d ( n -- seq )
-    [ ensure-d ] [ meta-d shorten-by ] bi ;
+    [ ensure-d ] [ shorten-d ] bi ;
 
 : output-d ( values -- ) meta-d push-all ;
 

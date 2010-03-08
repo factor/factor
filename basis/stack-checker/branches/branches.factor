@@ -61,7 +61,9 @@ SYMBOL: quotations
     branch-variable ;
 
 : datastack-phi ( seq -- phi-in phi-out )
-    [ input-count branch-variable ] [ \ meta-d active-variable ] bi
+    [ input-count branch-variable ]
+    [ inner-d-index branch-variable infimum inner-d-index set ]
+    [ \ meta-d active-variable ] tri
     unify-branches
     [ input-count set ] [ ] [ dup >vector \ meta-d set ] tri* ;
 
@@ -80,7 +82,8 @@ SYMBOL: quotations
 : copy-inference ( -- )
     \ meta-d [ clone ] change
     literals [ clone ] change
-    input-count [ ] change ;
+    input-count [ ] change
+    inner-d-index [ ] change ;
 
 GENERIC: infer-branch ( literal -- namespace )
 
