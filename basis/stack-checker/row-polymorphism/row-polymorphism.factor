@@ -10,29 +10,6 @@ stack-checker.values
 stack-checker.visitor ;
 IN: stack-checker.row-polymorphism
 
-: ?quotation-effect ( in -- effect/f )
-    dup pair? [ second dup effect? [ drop f ] unless ] [ drop f ] if ;
-
-:: declare-effect-d ( word effect variables branches n -- )
-    meta-d length :> d-length
-    n d-length < [
-        d-length 1 - n - :> n'
-        n' meta-d nth :> value
-        value known :> known
-        known word effect variables branches <declared-effect> :> known'
-        known' value set-known
-        known' branches push
-    ] [ word unknown-macro-input ] if ;
-
-:: declare-input-effects ( word -- )
-    H{ } clone :> variables
-    V{ } clone :> branches
-    word stack-effect in>> <reversed> [| in n |
-        in ?quotation-effect [| effect |
-            word effect variables branches n declare-effect-d
-        ] when*
-    ] each-index ;
-
 :: with-effect-here ( quot -- effect )
     inner-d-index get :> old-inner-d-index
     input-count get :> old-input-count

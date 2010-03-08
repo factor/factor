@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry vectors sequences assocs math math.order accessors kernel
-combinators quotations namespaces grouping stack-checker.state
+combinators quotations namespaces grouping locals stack-checker.state
 stack-checker.backend stack-checker.errors stack-checker.visitor
 stack-checker.values stack-checker.recursive-state ;
 IN: stack-checker.branches
@@ -119,11 +119,19 @@ M: curried curried/composed? drop t ;
 M: composed curried/composed? drop t ;
 M: declared-effect curried/composed? known>> curried/composed? ;
 
+:: declare-if-effects ( -- )
+    H{ } clone :> variables
+    V{ } clone :> branches
+    \ if (( ..a -- ..b )) variables branches 0 declare-effect-d
+    \ if (( ..a -- ..b )) variables branches 1 declare-effect-d ;
+
 : infer-if ( -- )
     2 literals-available? [
         (infer-if)
     ] [
-        drop 2 consume-d
+        drop 2 ensure-d
+        declare-if-effects
+        2 shorten-d
         dup [ known curried/composed? ] any? [
             output-d
             [ rot [ drop call ] [ nip call ] if ]

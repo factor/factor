@@ -3,7 +3,7 @@
 USING: fry arrays generic io io.streams.string kernel math namespaces
 parser sequences strings vectors words quotations effects classes
 continuations assocs combinators compiler.errors accessors math.order
-definitions sets hints macros stack-checker.state
+definitions locals sets hints macros stack-checker.state
 stack-checker.visitor stack-checker.errors stack-checker.values
 stack-checker.recursive-state stack-checker.dependencies summary ;
 FROM: sequences.private => from-end ;
@@ -170,3 +170,27 @@ M: bad-call summary
 
 : (infer) ( quot -- effect )
     [ infer-quot-here ] with-infer drop ;
+
+: ?quotation-effect ( in -- effect/f )
+    dup pair? [ second dup effect? [ drop f ] unless ] [ drop f ] if ;
+
+:: declare-effect-d ( word effect variables branches n -- )
+    meta-d length :> d-length
+    n d-length < [
+        d-length 1 - n - :> n'
+        n' meta-d nth :> value
+        value known :> known
+        known word effect variables branches <declared-effect> :> known'
+        known' value set-known
+        known' branches push
+    ] [ word unknown-macro-input ] if ;
+
+:: declare-input-effects ( word -- )
+    H{ } clone :> variables
+    V{ } clone :> branches
+    word stack-effect in>> <reversed> [| in n |
+        in ?quotation-effect [| effect |
+            word effect variables branches n declare-effect-d
+        ] when*
+    ] each-index ;
+
