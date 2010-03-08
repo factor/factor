@@ -71,5 +71,6 @@ M: invalid-quotation-input summary
 
 M: invalid-quotation-input error.
     dup summary print
-    [ quots>> ] [ branches>> ] bi quots-and-branches. ;
+    [ quots>> ] [ declareds>> ] [ actuals>> ] tri 3array flip
+    { "Input" "Expected" "Got" } prefix simple-table. ;
 
