@@ -381,6 +381,7 @@ DEFER: eee'
 
 [ [ each ] infer ] [ T{ unknown-macro-input f each } = ] must-fail-with
 [ [ if* ] infer ] [ T{ unknown-macro-input f if* } = ] must-fail-with
+[ [ [ "derp" ] if* ] infer ] [ T{ unknown-macro-input f if* } = ] must-fail-with
 
 [ [ [ "OOPS" throw ] dip ] [ drop ] if ] must-infer
 
@@ -404,3 +405,46 @@ DEFER: eee'
     [ "special" word-prop not ] filter
     [ "shuffle" word-prop not ] filter
 ] unit-test
+
+{ 1 0 } [ [ drop       ] each ] must-infer-as
+{ 2 1 } [ [ append     ] each ] must-infer-as
+{ 1 1 } [ [            ] map  ] must-infer-as
+{ 1 1 } [ [ reverse    ] map  ] must-infer-as
+{ 2 2 } [ [ append dup ] map  ] must-infer-as
+{ 2 2 } [ [ swap nth suffix dup ] map-index ] must-infer-as
+
+{ 4 1 } [ [ 2drop ] [ 2nip    ] if ] must-infer-as
+{ 3 3 } [ [ dup   ] [ over    ] if ] must-infer-as
+{ 1 1 } [ [ 1     ] [ 0       ] if ] must-infer-as
+{ 2 2 } [ [ t     ] [ 1 + f   ] if ] must-infer-as
+
+{ 1 0 } [ [ write     ] [ "(f)" write ] if* ] must-infer-as
+{ 1 1 } [ [           ] [ f           ] if* ] must-infer-as
+{ 2 1 } [ [ nip       ] [ drop f      ] if* ] must-infer-as
+{ 2 1 } [ [ nip       ] [             ] if* ] must-infer-as
+{ 3 2 } [ [ 3append f ] [             ] if* ] must-infer-as
+{ 1 0 } [ [ drop      ] [             ] if* ] must-infer-as
+
+{ 1 1 } [ [ 1 +       ] [ "oops" throw ] if* ] must-infer-as
+
+! ensure that polymorphic checking works on recursive combinators
+FROM: splitting.private => split, ;
+{ 2 0 } [ [ member? ] curry split, ] must-infer-as
+
+[ [ [ write write ] each      ] infer ] [ invalid-quotation-input? ] must-fail-with
+
+[ [ [             ] each      ] infer ] [ invalid-quotation-input? ] must-fail-with
+[ [ [ dup         ] map       ] infer ] [ invalid-quotation-input? ] must-fail-with
+[ [ [ drop        ] map       ] infer ] [ invalid-quotation-input? ] must-fail-with
+[ [ [ 1 +         ] map-index ] infer ] [ invalid-quotation-input? ] must-fail-with
+
+[ [ [ dup  ] [      ] if ] infer ] [ invalid-quotation-input? ] must-fail-with
+[ [ [ 2dup ] [ over ] if ] infer ] [ invalid-quotation-input? ] must-fail-with
+[ [ [ drop ] [      ] if ] infer ] [ invalid-quotation-input? ] must-fail-with
+
+[ [ [      ] [       ] if* ] infer ] [ invalid-quotation-input? ] must-fail-with
+[ [ [ dup  ] [       ] if* ] infer ] [ invalid-quotation-input? ] must-fail-with
+[ [ [ drop ] [ drop  ] if* ] infer ] [ invalid-quotation-input? ] must-fail-with
+[ [ [      ] [ drop  ] if* ] infer ] [ invalid-quotation-input? ] must-fail-with
+[ [ [      ] [ 2dup  ] if* ] infer ] [ invalid-quotation-input? ] must-fail-with
+
