@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry vectors sequences assocs math math.order accessors kernel
+USING: arrays effects fry vectors sequences assocs math math.order accessors kernel
 combinators quotations namespaces grouping locals stack-checker.state
 stack-checker.backend stack-checker.errors stack-checker.visitor
 stack-checker.values stack-checker.recursive-state ;
@@ -45,11 +45,17 @@ SYMBOLS: +bottom+ +top+ ;
 
 SYMBOL: quotations
 
+: simple-unbalanced-branches-error ( branches quots -- * )
+    [ \ if ] 2dip swap
+    [ length [ (( ..a -- ..b )) ] replicate ]
+    [ [ length [ "x" <array> ] bi@ <effect> ] { } assoc>map ] bi
+    unbalanced-branches-error ;
+
 : unify-branches ( ins stacks -- in phi-in phi-out )
     zip [ 0 { } { } ] [
         [ keys supremum ] [ ] [ balanced? ] tri
         [ dupd phi-inputs dup phi-outputs ]
-        [ quotations get unbalanced-branches-error ]
+        [ quotations get simple-unbalanced-branches-error ]
         if
     ] if-empty ;
 

@@ -56,16 +56,16 @@ IN: stack-checker.row-polymorphism
         ] when
     ] if ;
 
-: invalid-quotation-input* ( known -- * )
+: complex-unbalanced-branches-error ( known -- * )
     [ word>> ] [
         branches>> <reversed>
         [ [ known>callable ] { } map-as ]
         [ [ effect>> ] { } map-as ]
         [ [ actual>> ] { } map-as ] tri
-    ] bi invalid-quotation-input ;
+    ] bi unbalanced-branches-error ;
 
 : check-declared-effect ( known effect -- )
     [ >>actual ] keep
     2dup [ [ variables>> ] [ effect>> ] bi ] dip check-variables
-    [ 2drop ] [ drop invalid-quotation-input* ] if ;
+    [ 2drop ] [ drop complex-unbalanced-branches-error ] if ;
 
