@@ -448,6 +448,6 @@ FROM: splitting.private => split, ;
 [ [ [      ] [ drop  ] if* ] infer ] [ invalid-quotation-input? ] must-fail-with
 [ [ [      ] [ 2dup  ] if* ] infer ] [ invalid-quotation-input? ] must-fail-with
 
-! edge cases in polymorphic checking
+! M\ declared-effect infer-call* didn't properly unify branches
 { 1 0 } [ [ 1 [ drop ] [ drop ] if ] each ] must-infer-as
 
