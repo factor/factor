@@ -22,7 +22,8 @@ stack-checker.backend
 stack-checker.branches
 stack-checker.transforms
 stack-checker.dependencies
-stack-checker.recursive-state ;
+stack-checker.recursive-state
+stack-checker.row-polymorphism ;
 IN: stack-checker.known-words
 
 : infer-primitive ( word -- )
@@ -98,15 +99,23 @@ M: composed infer-call*
     1 infer->r infer-call
     terminated? get [ 1 infer-r> infer-call ] unless ;
 
-: Pdeclared-effect ( x -- x )
-    dup
-    [ word>> P. ]
-    [ effect>> P. ]
-    [ value>> known known>callable P. ] tri ;
+! : Pdeclared-effect ( x -- x )
+!     "-->" P.
+!     dup
+!     [ word>> P. ]
+!     [ effect>> P. ]
+!     [ value>> known known>callable P. ] tri
+!     current-effect P. ;
+! 
+! M: declared-effect infer-call*
+!     [ Pdeclared-effect
+!     nip value>> (infer-call) ]
+!     [ "<--" P.
+!     word>> P.
+!     current-effect P. ] bi ;
 
 M: declared-effect infer-call*
-    Pdeclared-effect
-    nip value>> (infer-call) ;
+    [ nip dup value>> (infer-call) ] with-effect-here check-declared-effect ;
 
 M: input-parameter infer-call* \ call unknown-macro-input ;
 M: object infer-call* \ call bad-macro-input ;

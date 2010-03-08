@@ -133,4 +133,6 @@ M: composed known>callable
 M: curried known>callable
     [ quot>> known known>callable ] [ obj>> known known>callable ] bi
     prefix ;
+M: declared-effect known>callable
+    value>> known known>callable ;
 

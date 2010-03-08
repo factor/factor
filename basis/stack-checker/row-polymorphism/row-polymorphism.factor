@@ -1,6 +1,6 @@
 ! (c)2010 Joe Groff bsd license
 USING: accessors arrays assocs combinators combinators.short-circuit
-continuations effects fry kernel locals math namespaces
+continuations effects fry kernel locals math math.order namespaces
 quotations sequences splitting
 stack-checker.backend
 stack-checker.errors
@@ -33,3 +33,25 @@ IN: stack-checker.row-polymorphism
         ] when*
     ] each-index ;
 
+:: with-effect-here ( quot -- effect )
+    inner-d-index get :> old-inner-d-index
+    input-count get :> old-input-count
+    meta-d length :> old-meta-d-length
+
+    old-meta-d-length inner-d-index set
+    quot call
+        
+    inner-d-index get :> new-inner-d-index
+    input-count get :> new-input-count
+
+    old-meta-d-length new-inner-d-index -
+    new-input-count old-input-count - + :> in
+
+    meta-d length new-inner-d-index - :> out
+
+    new-inner-d-index old-inner-d-index min inner-d-index set
+
+    in "x" <array> out "x" <array> terminated? get <terminated-effect> ; inline
+
+: check-declared-effect ( known effect -- )
+    [ known>callable P. ] [ P. ] bi* ;

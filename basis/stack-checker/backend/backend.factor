@@ -6,6 +6,7 @@ continuations assocs combinators compiler.errors accessors math.order
 definitions sets hints macros stack-checker.state
 stack-checker.visitor stack-checker.errors stack-checker.values
 stack-checker.recursive-state stack-checker.dependencies summary ;
+FROM: sequences.private => from-end ;
 IN: stack-checker.backend
 
 : push-d ( obj -- ) meta-d push ;
@@ -16,8 +17,13 @@ IN: stack-checker.backend
     [ #introduce, ]
     tri ;
 
+: update-inner-d ( new -- )
+    inner-d-index get min inner-d-index set ;
+
 : pop-d  ( -- obj )
-    meta-d [ <value> dup 1array introduce-values ] [ pop ] if-empty ;
+    meta-d
+    [ <value> dup 1array introduce-values ]
+    [ pop meta-d length update-inner-d ] if-empty ;
 
 : peek-d ( -- obj ) pop-d dup push-d ;
 
@@ -30,7 +36,8 @@ IN: stack-checker.backend
         [ nip >array ] [ length - make-values ] [ nip delete-all ] 2tri
         [ introduce-values ] [ meta-d push-all ] bi
         meta-d push-all
-    ] when swap tail* ;
+    ] when
+    swap from-end [ tail ] [ update-inner-d ] bi ;
 
 : shorten-by ( n seq -- )
     [ length swap - ] keep shorten ; inline
