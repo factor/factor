@@ -100,15 +100,15 @@ M: input-parameter (literal) current-word get unknown-macro-input ;
 
 ! Argument corresponding to polymorphic declared input of inline combinator
 
-TUPLE: declared-effect value word effect variables ;
+TUPLE: declared-effect known word effect variables ;
 
 C: <declared-effect> declared-effect
 
-M: declared-effect (input-value?) value>> input-value? ;
+M: declared-effect (input-value?) known>> (input-value?) ;
 
-M: declared-effect (literal-value?) value>> literal-value? ;
+M: declared-effect (literal-value?) known>> (literal-value?) ;
 
-M: declared-effect (literal) value>> literal ;
+M: declared-effect (literal) known>> (literal) ;
 
 ! Computed values
 M: f (input-value?) drop f ;
@@ -134,5 +134,5 @@ M: curried known>callable
     [ quot>> known known>callable ] [ obj>> known known>callable ] bi
     prefix ;
 M: declared-effect known>callable
-    value>> known known>callable ;
+    known>> known>callable ;
 

@@ -121,7 +121,7 @@ SYMBOL: enter-out
 
 GENERIC: (undeclared-known) ( value -- known )
 M: object (undeclared-known) ;
-M: declared-effect (undeclared-known) value>> known (undeclared-known) ;
+M: declared-effect (undeclared-known) known>> (undeclared-known) ;
 
 : undeclared-known ( value -- known ) known (undeclared-known) ;
 
