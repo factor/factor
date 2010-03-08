@@ -115,7 +115,7 @@ M: composed infer-call*
 !     current-effect P. ] bi ;
 
 M: declared-effect infer-call*
-    [ nip dup value>> (infer-call) ] with-effect-here check-declared-effect ;
+    [ [ known>> infer-call* ] keep ] with-effect-here check-declared-effect ;
 
 M: input-parameter infer-call* \ call unknown-macro-input ;
 M: object infer-call* \ call bad-macro-input ;
