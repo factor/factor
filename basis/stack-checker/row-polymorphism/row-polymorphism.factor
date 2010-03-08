@@ -53,5 +53,36 @@ IN: stack-checker.row-polymorphism
 
     in "x" <array> out "x" <array> terminated? get <terminated-effect> ; inline
 
+:: check-variable ( actual-count declared-count variable vars -- difference )
+    actual-count declared-count -
+    variable [
+        variable vars at* nip
+        [ variable vars at -     ]
+        [ variable vars set-at 0 ] if
+    ] [ drop 0 ] if ;
+
+: adjust-variable ( diff var vars -- )
+    pick 0 >=
+    [ at+ ]
+    [ 3drop ] if ; inline
+
+:: check-variables ( vars declared actual -- ? )
+    actual terminated?>> [ t ] [
+        actual declared [ in>>  length ] bi@ declared in-var>>
+            [ vars check-variable ] keep :> ( in-diff in-var ) 
+        actual declared [ out>> length ] bi@ declared out-var>>
+            [ vars check-variable ] keep :> ( out-diff out-var )
+        { [ in-var not ] [ out-var not ] [ in-diff out-diff = ] } 0||
+        dup [
+            in-var  [ in-diff  swap vars adjust-variable ] when*
+            out-var [ out-diff swap vars adjust-variable ] when*
+        ] when
+    ] if ;
+
 : check-declared-effect ( known effect -- )
-    [ known>callable P. ] [ P. ] bi* ;
+    2dup [ [ variables>> ] [ effect>> ] bi ] dip check-variables
+    [ 2drop ] [
+        [ { [ word>> ] [ known>callable ] [ variables>> ] [ effect>> ] } cleave ]
+        dip invalid-quotation-input
+    ] if ;
+
