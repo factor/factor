@@ -100,7 +100,7 @@ M: input-parameter (literal) current-word get unknown-macro-input ;
 
 ! Argument corresponding to polymorphic declared input of inline combinator
 
-TUPLE: declared-effect known word effect variables ;
+TUPLE: declared-effect known word effect variables branches ;
 
 C: <declared-effect> declared-effect
 

@@ -68,3 +68,8 @@ M: do-not-compile summary
 M: invalid-quotation-input summary
     word>> name>>
     "The input quotations to " " don't match their expected effects" surround ;
+
+M: invalid-quotation-input error.
+    dup summary print
+    [ quots>> ] [ branches>> ] bi quots-and-branches. ;
+
