@@ -17,12 +17,10 @@ IN: stack-checker.row-polymorphism
     meta-d length :> d-length
     n d-length < [
         d-length 1 - n - :> n'
-        n' meta-d [| value |
-            value word effect variables <declared-effect> :> known'
-            <value> :> value'
-            known' value' set-known
-            value'
-        ] change-nth
+        n' meta-d nth :> value
+        value known :> known
+        known word effect variables <declared-effect> :> known'
+        known' value set-known
     ] [ word unknown-macro-input ] if ;
 
 :: declare-input-effects ( word -- )

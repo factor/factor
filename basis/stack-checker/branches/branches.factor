@@ -92,7 +92,7 @@ M: literal infer-branch
     ] H{ } make-assoc ;
 
 M: declared-effect infer-branch
-    value>> infer-branch ;
+    known>> infer-branch ;
 
 M: callable infer-branch
     [
@@ -114,7 +114,7 @@ GENERIC: curried/composed? ( known -- ? )
 M: object curried/composed? drop f ;
 M: curried curried/composed? drop t ;
 M: composed curried/composed? drop t ;
-M: declared-effect curried/composed? value>> known curried/composed? ;
+M: declared-effect curried/composed? known>> curried/composed? ;
 
 : infer-if ( -- )
     2 literals-available? [
