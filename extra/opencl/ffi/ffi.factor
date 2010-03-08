@@ -20,9 +20,9 @@ TYPEDEF: int       cl_int
 TYPEDEF: uint      cl_uint
 TYPEDEF: longlong  cl_long
 TYPEDEF: ulonglong cl_ulong
-TYPEDEF: ushort    cl_half;
-TYPEDEF: float     cl_float;
-TYPEDEF: double    cl_double;
+TYPEDEF: ushort    cl_half
+TYPEDEF: float     cl_float
+TYPEDEF: double    cl_double
 
 CONSTANT: CL_CHAR_BIT         8
 CONSTANT: CL_SCHAR_MAX        127
