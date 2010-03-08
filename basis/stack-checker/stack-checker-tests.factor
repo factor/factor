@@ -234,10 +234,12 @@ DEFER: blah4
 
 ! Test some curry stuff
 { 1 1 } [ 3 [ ] curry 4 [ ] curry if ] must-infer-as
+{ 3 1 } [ [ ] curry [ [ ] curry ] dip if ] must-infer-as
 
 { 2 1 } [ [ ] curry 4 [ ] curry if ] must-infer-as
 
 [ [ 3 [ ] curry 1 2 [ ] 2curry if ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ ] curry [ [ ] 2curry ] dip if ] infer ] [ unbalanced-branches-error? ] must-fail-with
 
 { 1 3 } [ [ 2drop f ] assoc-find ] must-infer-as
 
@@ -431,22 +433,22 @@ DEFER: eee'
 FROM: splitting.private => split, ;
 { 2 0 } [ [ member? ] curry split, ] must-infer-as
 
-[ [ [ write write ] each      ] infer ] [ invalid-quotation-input? ] must-fail-with
+[ [ [ write write ] each      ] infer ] [ unbalanced-branches-error? ] must-fail-with
 
-[ [ [             ] each      ] infer ] [ invalid-quotation-input? ] must-fail-with
-[ [ [ dup         ] map       ] infer ] [ invalid-quotation-input? ] must-fail-with
-[ [ [ drop        ] map       ] infer ] [ invalid-quotation-input? ] must-fail-with
-[ [ [ 1 +         ] map-index ] infer ] [ invalid-quotation-input? ] must-fail-with
+[ [ [             ] each      ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ dup         ] map       ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ drop        ] map       ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ 1 +         ] map-index ] infer ] [ unbalanced-branches-error? ] must-fail-with
 
-[ [ [ dup  ] [      ] if ] infer ] [ invalid-quotation-input? ] must-fail-with
-[ [ [ 2dup ] [ over ] if ] infer ] [ invalid-quotation-input? ] must-fail-with
-[ [ [ drop ] [      ] if ] infer ] [ invalid-quotation-input? ] must-fail-with
+[ [ [ dup  ] [      ] if ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ 2dup ] [ over ] if ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ drop ] [      ] if ] infer ] [ unbalanced-branches-error? ] must-fail-with
 
-[ [ [      ] [       ] if* ] infer ] [ invalid-quotation-input? ] must-fail-with
-[ [ [ dup  ] [       ] if* ] infer ] [ invalid-quotation-input? ] must-fail-with
-[ [ [ drop ] [ drop  ] if* ] infer ] [ invalid-quotation-input? ] must-fail-with
-[ [ [      ] [ drop  ] if* ] infer ] [ invalid-quotation-input? ] must-fail-with
-[ [ [      ] [ 2dup  ] if* ] infer ] [ invalid-quotation-input? ] must-fail-with
+[ [ [      ] [       ] if* ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ dup  ] [       ] if* ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ drop ] [ drop  ] if* ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [      ] [ drop  ] if* ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [      ] [ 2dup  ] if* ] infer ] [ unbalanced-branches-error? ] must-fail-with
 
 ! M\ declared-effect infer-call* didn't properly unify branches
 { 1 0 } [ [ 1 [ drop ] [ drop ] if ] each ] must-infer-as
