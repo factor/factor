@@ -39,7 +39,7 @@ predecessors-valid? dominance-valid? loops-valid? ;
 : predecessors-changed ( cfg -- cfg )
     f >>predecessors-valid? ;
 
-: with-cfg ( cfg quot: ( cfg -- ) -- )
+: with-cfg ( ..a cfg quot: ( ..a cfg -- ..b ) -- ..b )
     [ dup cfg ] dip with-variable ; inline
 
 TUPLE: mr { instructions array } word label ;

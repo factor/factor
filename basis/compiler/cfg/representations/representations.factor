@@ -187,7 +187,7 @@ SYMBOLS: renaming-set needs-renaming? ;
 : record-renaming ( from to -- )
     2array renaming-set get push needs-renaming? on ;
 
-:: (compute-renaming-set) ( vreg required quot: ( vreg preferred required -- ) -- )
+:: (compute-renaming-set) ( ..a vreg required quot: ( ..a vreg preferred required -- ..b ) -- ..b )
     vreg rep-of :> preferred
     preferred required eq?
     [ vreg no-renaming ]

@@ -136,7 +136,7 @@ M: bad-call summary
 : infer-r> ( n -- )
     consume-r dup copy-values [ nip output-d ] [ #r>, ] 2bi ;
 
-: consume/produce ( effect quot: ( inputs outputs -- ) -- )
+: consume/produce ( ..a effect quot: ( ..a inputs outputs -- ..b ) -- ..b )
     '[ [ in>> length consume-d ] [ out>> length produce-d ] bi @ ]
     [ terminated?>> [ terminate ] when ]
     bi ; inline
