@@ -31,7 +31,6 @@ class
 interval
 literal
 literal?
-length
 slots ;
 
 CONSTANT: null-info T{ value-info f null empty-interval }
@@ -74,13 +73,20 @@ UNION: fixed-length array byte-array string ;
         ] unless
     ] unless ;
 
+: length-slots ( length class -- slots )
+    "slots" word-prop length 1 - f <array>
+    swap prefix ;
+
 : init-literal-info ( info -- info )
     empty-interval >>interval
     dup literal>> literal-class >>class
     dup literal>> {
         { [ dup real? ] [ [a,a] >>interval ] }
         { [ dup tuple? ] [ tuple-slot-infos >>slots ] }
-        { [ dup fixed-length? ] [ length <literal-info> >>length ] }
+        { [ dup fixed-length? ] [
+            [ length <literal-info> ] [ class ] bi
+            length-slots >>slots
+        ] }
         [ drop ]
     } cond ; inline
 
@@ -158,11 +164,11 @@ UNION: fixed-length array byte-array string ;
         t >>literal?
     init-value-info ; foldable
 
-: <sequence-info> ( value -- info )
+: <sequence-info'> ( length class -- info )
     <value-info>
-        object >>class
-        swap value-info >>length
-    init-value-info ; foldable
+        over >>class
+        [ length-slots ] dip swap >>slots
+    init-value-info ;
 
 : <tuple-info> ( slots class -- info )
     <value-info>
@@ -184,13 +190,6 @@ UNION: fixed-length array byte-array string ;
 DEFER: value-info-intersect
 
 DEFER: (value-info-intersect)
-
-: intersect-lengths ( info1 info2 -- length )
-    [ length>> ] bi@ {
-        { [ dup not ] [ drop ] }
-        { [ over not ] [ nip ] }
-        [ value-info-intersect ]
-    } cond ;
 
 : intersect-slot ( info1 info2 -- info )
     {
@@ -215,7 +214,6 @@ DEFER: (value-info-intersect)
         [ [ class>> ] bi@ class-and >>class ]
         [ [ interval>> ] bi@ interval-intersect >>interval ]
         [ intersect-literals [ >>literal ] [ >>literal? ] bi* ]
-        [ intersect-lengths >>length ]
         [ intersect-slots >>slots ]
     } 2cleave
     init-value-info ;
@@ -236,13 +234,6 @@ DEFER: value-info-union
 
 DEFER: (value-info-union)
 
-: union-lengths ( info1 info2 -- length )
-    [ length>> ] bi@ {
-        { [ dup not ] [ nip ] }
-        { [ over not ] [ drop ] }
-        [ value-info-union ]
-    } cond ;
-
 : union-slot ( info1 info2 -- info )
     {
         { [ dup not ] [ nip ] }
@@ -261,7 +252,6 @@ DEFER: (value-info-union)
         [ [ class>> ] bi@ class-or >>class ]
         [ [ interval>> ] bi@ interval-union >>interval ]
         [ union-literals [ >>literal ] [ >>literal? ] bi* ]
-        [ union-lengths >>length ]
         [ union-slots >>slots ]
     } 2cleave
     init-value-info ;
@@ -293,7 +283,6 @@ DEFER: (value-info-union)
                 { [ 2dup [ class>> ] bi@ class<= not ] [ f ] }
                 { [ 2dup [ interval>> ] bi@ interval-subset? not ] [ f ] }
                 { [ 2dup literals<= not ] [ f ] }
-                { [ 2dup [ length>> ] bi@ value-info<= not ] [ f ] }
                 { [ 2dup [ slots>> ] bi@ [ value-info<= ] 2all? not ] [ f ] }
                 [ t ]
             } cond 2nip
