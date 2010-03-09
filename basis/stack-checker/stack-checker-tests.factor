@@ -431,9 +431,18 @@ DEFER: eee'
 
 : strict-each ( seq quot: ( x -- ) -- )
     each ; inline
+: strict-map ( seq quot: ( x -- x' ) -- seq' )
+    map ; inline
+: strict-2map ( xs ys quot: ( x y -- z ) -- zs )
+    2map ; inline
 
 { 1 0 } [ [ drop ] strict-each ] must-infer-as
+{ 1 1 } [ [ 1 + ] strict-map ] must-infer-as
+{ 1 1 } [ [  ] strict-map ] must-infer-as
+{ 2 1 } [ [ + ] strict-2map ] must-infer-as
+{ 2 1 } [ [ drop ] strict-2map ] must-infer-as
 [ [ [ append ] strict-each ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ 1 + ] strict-2map ] infer ] [ unbalanced-branches-error? ] must-fail-with
 
 ! ensure that polymorphic checking works on recursive combinators
 FROM: splitting.private => split, ;
