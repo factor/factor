@@ -20,7 +20,7 @@ SYNTAX: RECT: scan-object scan-object <rect> suffix! ;
 
 : rect-center ( rect -- center ) rect-bounds 2 v/n v+ ;
 
-: with-rect-extents ( rect1 rect2 loc-quot: ( loc1 loc2 -- ) ext-quot: ( ext1 ext2 -- ) -- )
+: with-rect-extents ( ..a+b rect1 rect2 loc-quot: ( ..a loc1 loc2 -- ..c ) ext-quot: ( ..b ext1 ext2 -- ..d ) -- ..c+d )
     [ [ rect-extent ] bi@ ] 2dip bi-curry* bi* ; inline
 
 : <extent-rect> ( loc ext -- rect ) over [v-] <rect> ;
