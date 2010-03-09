@@ -119,7 +119,7 @@ SYMBOL: thread-error-hook
     ] when
     c> continue-with ;
 
-: recover ( try recovery -- )
+: recover ( ..a try: ( ..a -- ..b ) recovery: ( ..a error -- ..b ) -- ..b )
     [ [ swap >c call c> drop ] curry ] dip ifcc ; inline
 
 : ignore-errors ( quot -- )
@@ -130,7 +130,7 @@ SYMBOL: thread-error-hook
 
 ERROR: attempt-all-error ;
 
-: attempt-all ( seq quot -- obj )
+: attempt-all ( ... seq quot: ( ... elt -- ... obj ) -- ... obj )
     over empty? [
         attempt-all-error
     ] [
