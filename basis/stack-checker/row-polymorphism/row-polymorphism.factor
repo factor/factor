@@ -37,7 +37,7 @@ IN: stack-checker.row-polymorphism
         [ variable vars at -     ]
         [ variable vars set-at 0 ] if
         t
-    ] [ dup zero? ] if ;
+    ] [ dup 0 <= ] if ;
 
 : adjust-variable ( diff var vars -- )
     pick 0 >=
