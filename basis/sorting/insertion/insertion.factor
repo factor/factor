@@ -2,7 +2,7 @@ USING: locals sequences kernel math ;
 IN: sorting.insertion
 
 <PRIVATE
-:: insert ( seq quot: ( elt -- elt' ) n -- )
+:: insert ( ... seq quot: ( ... elt -- ... elt' ) n -- ... )
     n zero? [
         n n 1 - [ seq nth quot call ] bi@ >= [
             n n 1 - seq exchange

@@ -38,7 +38,7 @@ SYMBOL: visited
     [ drop basic-block set ]
     [ change-instructions drop ] 2bi ; inline
 
-: local-optimization ( cfg quot: ( insns -- insns' ) -- cfg' )
+: local-optimization ( ... cfg quot: ( ... insns -- ... insns' ) -- ... cfg' )
     dupd '[ _ optimize-basic-block ] each-basic-block ; inline
 
 : needs-post-order ( cfg -- cfg' )

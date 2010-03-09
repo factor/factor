@@ -23,7 +23,7 @@ TUPLE: mailbox threads data ;
 : wait-for-mailbox ( mailbox timeout -- )
     [ threads>> ] dip "mailbox" wait ;
 
-:: block-unless-pred ( mailbox timeout pred: ( message -- ? ) -- )
+:: block-unless-pred ( ... mailbox timeout pred: ( ... message -- ... ? ) -- ... )
     mailbox data>> pred dlist-any? [
         mailbox timeout wait-for-mailbox
         mailbox timeout pred block-unless-pred

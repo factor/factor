@@ -102,7 +102,7 @@ SYMBOL: changed?
         recursive-nesting get pop*
     ] each ;
 
-: while-changing ( quot: ( -- ) -- )
+: while-changing ( ... quot: ( ... -- ... ) -- ... )
     changed? off
     [ call ] [ changed? get [ while-changing ] [ drop ] if ] bi ;
     inline recursive
