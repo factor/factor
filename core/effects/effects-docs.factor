@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math strings words kernel combinators sequences ;
+USING: arrays classes help.markup help.syntax math strings words kernel combinators sequences ;
 IN: effects
 
 ARTICLE: "effects" "Stack effect declarations"
@@ -29,7 +29,72 @@ $nl
     { { $snippet "*" } "when this symbol appears by itself in the list of outputs, it means the word unconditionally throws an error" }
     { { $snippet ".." } { "indicates " { $link "effects-variables" } ". only valid as the first input or first output" } }
 }
+"For reflection and metaprogramming, you can use " { $link "syntax-effects" } " to include literal stack effects in your code, or these constructor words to construct stack effect objects at runtime:"
+{ $subsections
+    <effect>
+    <terminated-effect>
+    <variable-effect>
+}
+$nl
 { $see-also "inference" } ;
+
+HELP: <effect>
+{ $values
+    { "in" "a sequence of strings or string–type pairs" }
+    { "out" "a sequence of strings or string–type pairs" }
+    { "effect" effect }
+}
+{ $description "Constructs an " { $link effect } " object. Each element of " { $snippet "in" } " and " { $snippet "out" } " must be either a string (which is equivalent to a " { $snippet "name" } " in literal stack effect syntax), or a " { $link pair } " where the first element is a string and the second is either a " { $link class } " or effect (which is equivalent to " { $snippet "name: class" } " or " { $snippet "name: ( nested -- effect )" } " in the literal syntax. If the " { $snippet "out" } " array consists of a single string element " { $snippet "\"*\"" } ", a terminating stack effect will be constructed." }
+{ $notes "This word cannot construct effects with " { $link "effects-variables" } ". Use " { $link <variable-effect> } " to construct variable stack effects." }
+{ $examples
+{ $example """USING: effects prettyprint ;
+{ "a" "b" } { "c" } <effect> .""" """(( a b -- c ))""" }
+{ $example """USING: arrays effects prettyprint ;
+{ "a" { "b" array } } { "c" } <effect> .""" """(( a b: array -- c ))""" }
+{ $example """USING: effects prettyprint ;
+{ "a" { "b" (( x y -- z )) } } { "c" } <effect> .""" """(( a b: ( x y -- z ) -- c ))""" }
+{ $example """USING: effects prettyprint ;
+{ "a" { "b" (( x y -- z )) } } { "*" } <effect> .""" """(( a b: ( x y -- z ) -- * ))""" }
+} ;
+
+HELP: <terminated-effect>
+{ $values
+    { "in" "a sequence of strings or string–type pairs" }
+    { "out" "a sequence of strings or string–type pairs" }
+    { "terminated?" boolean }
+    { "effect" effect }
+}
+{ $description "Constructs an " { $link effect } " object like " { $link <effect> } ". If " { $snippet "terminated?" } " is true, the value of " { $snippet "out" } " is ignored, and a terminating stack effect is constructed." }
+{ $notes "This word cannot construct effects with " { $link "effects-variables" } ". Use " { $link <variable-effect> } " to construct variable stack effects." }
+{ $examples
+{ $example """USING: effects prettyprint ;
+{ "a" { "b" (( x y -- z )) } } { "c" } f <terminated-effect> .""" """(( a b: ( x y -- z ) -- c ))""" }
+{ $example """USING: effects prettyprint ;
+{ "a" { "b" (( x y -- z )) } } { } t <terminated-effect> .""" """(( a b: ( x y -- z ) -- * ))""" }
+} ;
+
+HELP: <variable-effect>
+{ $values
+    { "in-var" { $maybe string } }
+    { "in" "a sequence of strings or string–type pairs" }
+    { "out-var" { $maybe string } }
+    { "out" "a sequence of strings or string–type pairs" }
+    { "effect" effect }
+}
+{ $description "Constructs an " { $link effect } " object like " { $link <effect> } ". If " { $snippet "in-var" } " or " { $snippet "out-var" } " are not " { $link f } ", they are used as the names of the " { $link "effects-variables" } " for the inputs and outputs of the effect object." }
+{ $examples
+{ $example """USING: effects prettyprint ;
+f { "a" "b" } f { "c" } <variable-effect> .""" """(( a b -- c ))""" }
+{ $example """USING: effects prettyprint ;
+"x" { "a" "b" } "y" { "c" } <variable-effect> .""" """(( ..x a b -- ..y c ))""" }
+{ $example """USING: arrays effects prettyprint ;
+"y" { "a" { "b" (( ..x -- ..y )) } } "x" { "c" } <variable-effect> .""" """(( ..y a b: ( ..x -- ..y ) -- ..x c ))""" }
+{ $example """USING: effects prettyprint ;
+"." { "a" "b" } f { "*" } <variable-effect> .""" """(( ... a b -- * ))""" }
+} ;
+
+
+{ <effect> <terminated-effect> <variable-effect> } related-words
 
 ARTICLE: "effects-variables" "Stack effect variables"
 { $link POSTPONE: inline } " combinators can have variable stack effects, depending on the effect of the quotation they call. For example, while " { $link each } " inputs elements of its sequence to its quotation, the quotation can also manipulate values on the stack below the element, as long as it leaves the same number of elements on the stack. This ability is used to implement " { $link reduce } " in terms of " { $snippet "each" } ". This variable stack effect is indicated by starting the list of inputs and outputs with a name starting with " { $snippet ".." } ":"
