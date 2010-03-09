@@ -30,13 +30,14 @@ IN: stack-checker.row-polymorphism
     meta-d length inner-d - :> out
     in "x" <array> out "x" <array> terminated? get <terminated-effect> ; inline
 
-:: check-variable ( actual-count declared-count variable vars -- difference )
+:: check-variable ( actual-count declared-count variable vars -- difference ? )
     actual-count declared-count -
     variable [
         variable vars at* nip
         [ variable vars at -     ]
         [ variable vars set-at 0 ] if
-    ] [ drop 0 ] if ;
+        t
+    ] [ dup zero? ] if ;
 
 : adjust-variable ( diff var vars -- )
     pick 0 >=
@@ -46,10 +47,10 @@ IN: stack-checker.row-polymorphism
 :: check-variables ( vars declared actual -- ? )
     actual terminated?>> [ t ] [
         actual declared [ in>>  length ] bi@ declared in-var>>
-            [ vars check-variable ] keep :> ( in-diff in-var ) 
+            [ vars check-variable ] keep :> ( in-diff in-ok? in-var ) 
         actual declared [ out>> length ] bi@ declared out-var>>
-            [ vars check-variable ] keep :> ( out-diff out-var )
-        { [ in-var not ] [ out-var not ] [ in-diff out-diff = ] } 0||
+            [ vars check-variable ] keep :> ( out-diff out-ok? out-var )
+        { [ in-ok? ] [ out-ok? ] [ in-diff out-diff = ] } 0&&
         dup [
             in-var  [ in-diff  swap vars adjust-variable ] when*
             out-var [ out-diff swap vars adjust-variable ] when*

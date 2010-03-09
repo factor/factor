@@ -429,6 +429,12 @@ DEFER: eee'
 
 { 1 1 } [ [ 1 +       ] [ "oops" throw ] if* ] must-infer-as
 
+: strict-each ( seq quot: ( x -- ) -- )
+    each ; inline
+
+{ 1 0 } [ [ drop ] strict-each ] must-infer-as
+[ [ [ append ] strict-each ] infer ] [ unbalanced-branches-error? ] must-fail-with
+
 ! ensure that polymorphic checking works on recursive combinators
 FROM: splitting.private => split, ;
 { 2 0 } [ [ member? ] curry split, ] must-infer-as
