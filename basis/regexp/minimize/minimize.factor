@@ -3,6 +3,7 @@
 USING: kernel sequences regexp.transition-tables fry assocs
 accessors locals math sorting arrays sets hashtables regexp.dfa
 combinators.short-circuit regexp.classes ;
+FROM: assocs => change-at ;
 IN: regexp.minimize
 
 : table>state-numbers ( table -- assoc )
@@ -51,7 +52,7 @@ IN: regexp.minimize
     <reversed>
     >hashtable ;
 
-:: (while-changes) ( obj quot: ( obj -- obj' ) comp: ( obj -- key ) old-key -- obj )
+:: (while-changes) ( ..a obj quot: ( ..a obj -- ..b obj' ) comp: ( ..b obj' -- ..a key ) old-key -- ..a obj )
     obj quot call :> new-obj
     new-obj comp call :> new-key
     new-key old-key =
