@@ -57,6 +57,7 @@
     "LIBRARY:"
     "M:" "M::" "MACRO:" "MACRO::" "MAIN:" "MATH:"
     "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
+    "NAN:"
     "OCT:"
     "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROVIDE:"
     "QUALIFIED-WITH:" "QUALIFIED:"
@@ -64,7 +65,7 @@
     "SINGLETON:" "SINGLETONS:" "SLOT:" "SPECIALIZED-ARRAY:" "SPECIALIZED-ARRAYS:" "STRING:" "STRUCT:" "SYMBOL:" "SYMBOLS:" "SYNTAX:"
     "TUPLE:" "t" "t?" "TYPEDEF:" "TYPED:" "TYPED::"
     "UNIFORM-TUPLE:" "UNION:" "UNION-STRUCT:" "USE:" "USING:"
-    "VARS:" "VERTEX-FORMAT:"))
+    "VARIANT:" "VERTEX-FORMAT:"))
 
 (defconst fuel-syntax--parsing-words-regex
   (regexp-opt fuel-syntax--parsing-words 'words))
@@ -91,7 +92,7 @@
   "\\_<-?[0-9]+\\_>")
 
 (defconst fuel-syntax--raw-float-regex
-  "[0-9]*\\.[0-9]*\\([eE][+-]?[0-9]+\\)?")
+  "[0-9]*\\.[0-9]*\\([eEpP][+-]?[0-9]+\\)?")
 
 (defconst fuel-syntax--float-regex
   (format "\\_<-?%s\\_>" fuel-syntax--raw-float-regex))
@@ -121,7 +122,7 @@
    '("IN:" "USE:" "FROM:" "EXCLUDE:" "QUALIFIED:" "QUALIFIED-WITH:")))
 
 (defconst fuel-syntax--int-constant-def-regex
-  (fuel-syntax--second-word-regex '("ALIEN:" "CHAR:" "BIN:" "HEX:" "OCT:")))
+  (fuel-syntax--second-word-regex '("ALIEN:" "CHAR:" "BIN:" "HEX:" "NAN:" "OCT:")))
 
 (defconst fuel-syntax--type-definition-regex
   (fuel-syntax--second-word-regex
@@ -163,18 +164,16 @@
                                            "MEMO" "MEMO:" "METHOD"
                                            "SYNTAX"
                                            "PREDICATE" "PRIMITIVE"
-                                           "STRUCT" "TAG" "TUPLE"
+                                           "SINGLETONS"
+                                           "STRUCT" "SYMBOLS" "TAG" "TUPLE"
                                            "TYPED" "TYPED:"
                                            "UNIFORM-TUPLE"
                                            "UNION-STRUCT" "UNION"
-                                           "VERTEX-FORMAT"))
+                                           "VARIANT" "VERTEX-FORMAT"))
 
 (defconst fuel-syntax--no-indent-def-starts '("ARTICLE"
                                               "HELP"
-                                              "SINGLETONS"
-                                              "SPECIALIZED-ARRAYS"
-                                              "SYMBOLS"
-                                              "VARS"))
+                                              "SPECIALIZED-ARRAYS"))
 
 (defconst fuel-syntax--indent-def-start-regex
   (format "^\\(%s:\\)\\( \\|\n\\)" (regexp-opt fuel-syntax--indent-def-starts)))
@@ -198,6 +197,7 @@
                 "IN:" "INSTANCE:"
                 "LIBRARY:"
                 "MAIN:" "MATH:" "MIXIN:"
+                "NAN:"
                 "OCT:"
                 "POSTPONE:" "PRIVATE>" "<PRIVATE"
                 "QUALIFIED-WITH:" "QUALIFIED:"
@@ -275,7 +275,7 @@
     ("\\_<C-ENUM:\\( \\|\n\\)" (1 "<b"))
     ("\\_<TUPLE: +\\w+? +< +\\w+? *\\( \\|\n\\)\\([^;]\\|$\\)" (1 "<b"))
     ("\\_<TUPLE: +\\w+? *\\( \\|\n\\)\\([^;<\n]\\|\\_>\\)" (1 "<b"))
-    ("\\_<\\(SYMBOLS\\|VARS\\|SPECIALIZED-ARRAYS\\|SINGLETONS\\): *?\\( \\|\n\\)\\([^;\n]\\|\\_>\\)"
+    ("\\_<\\(SYMBOLS\\|SPECIALIZED-ARRAYS\\|SINGLETONS\\|VARIANT\\): *?\\( \\|\n\\)\\([^;\n]\\|\\_>\\)"
      (2 "<b"))
     ("\\(\n\\| \\);\\_>" (1 ">b"))
     ;; Let and lambda:
