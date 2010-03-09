@@ -10,24 +10,24 @@ stack-checker.values
 stack-checker.visitor ;
 IN: stack-checker.row-polymorphism
 
-:: with-effect-here ( quot -- effect )
+:: with-inner-d ( quot -- inner-d )
     inner-d-index get :> old-inner-d-index
+    meta-d length inner-d-index set
+    quot call
+    inner-d-index get :> new-inner-d-index
+    old-inner-d-index new-inner-d-index min inner-d-index set
+    new-inner-d-index ; inline
+
+:: with-effect-here ( quot -- effect )
     input-count get :> old-input-count
     meta-d length :> old-meta-d-length
 
-    old-meta-d-length inner-d-index set
-    quot call
+    quot with-inner-d :> inner-d
         
-    inner-d-index get :> new-inner-d-index
     input-count get :> new-input-count
-
-    old-meta-d-length new-inner-d-index -
+    old-meta-d-length inner-d -
     new-input-count old-input-count - + :> in
-
-    meta-d length new-inner-d-index - :> out
-
-    new-inner-d-index old-inner-d-index min inner-d-index set
-
+    meta-d length inner-d - :> out
     in "x" <array> out "x" <array> terminated? get <terminated-effect> ; inline
 
 :: check-variable ( actual-count declared-count variable vars -- difference )
