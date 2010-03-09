@@ -87,7 +87,7 @@ SYMBOL: error-stream
 
 : bl ( -- ) " " write ;
 
-: each-morsel ( handler: ( data -- ) reader: ( -- data ) -- )
+: each-morsel ( ..a handler: ( ..a data -- ..b ) reader: ( ..b -- ..a data ) -- ..a )
     [ dup ] compose swap while drop ; inline
 
 <PRIVATE

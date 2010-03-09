@@ -70,7 +70,7 @@ DEFER: (parse-paragraph)
         { CHAR: % inline-code }
     } at ;
 
-: or-simple-title ( url title/f quot: ( title -- title' ) -- url title' )
+: or-simple-title ( ... url title/f quot: ( ... title -- ... title' ) -- ... url title' )
     [ "" like dup simple-link-title ] if* ; inline
 
 : parse-link ( string -- paragraph-list )
