@@ -36,10 +36,26 @@ SYMBOL: vocab-articles
         first rest [ first ] map
     ] unless ;
 
+: extract-value-effects ( element -- seq )
+    \ $values swap elements dup empty? [
+        first rest [ 
+            \ $quotation swap elements dup empty? [ drop f ] [
+                first second
+            ] if
+        ] map
+    ] unless ;
+
 : effect-values ( word -- seq )
     stack-effect
     [ in>> ] [ out>> ] bi append
     [ dup pair? [ first ] when effect>string ] map prune ;
+
+: effect-effects ( word -- seq )
+    stack-effect in>> [
+        dup pair?
+        [ second dup effect? [ effect>string ] [ drop f ] if ]
+        [ drop f ] if
+    ] map ;
 
 : contains-funky-elements? ( element -- ? )
     {
@@ -70,8 +86,15 @@ SYMBOL: vocab-articles
             [ effect-values ]
             [ extract-values ]
             bi* sequence=
-        ]
+        ] 
     } 2|| [ "$values don't match stack effect" simple-lint-error ] unless ;
+
+: check-value-effects ( word element -- )
+    [ effect-effects ]
+    [ extract-value-effects ]
+    bi* [ 2dup and [ = ] [ 2drop t ] if ] 2all?
+    [ "$quotation documentation in $values don't match stack effect" simple-lint-error ]
+    unless ;
 
 : check-nulls ( element -- )
     \ $values swap elements
