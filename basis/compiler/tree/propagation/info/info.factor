@@ -47,9 +47,7 @@ CONSTANT: object-info T{ value-info f object full-interval }
             { [ over interval-length 0 > ] [ 3drop f f ] }
             { [ pick bignum class<= ] [ 2nip >bignum t ] }
             { [ pick integer class<= ] [ 2nip >fixnum t ] }
-            { [ pick float class<= ] [
-                2nip dup zero? [ drop f f ] [ >float t ] if
-            ] }
+            { [ pick float class<= ] [ 2nip dup zero? [ drop f f ] [ >float t ] if ] }
             [ 3drop f f ]
         } cond
     ] if ;
@@ -73,9 +71,11 @@ UNION: fixed-length array byte-array string ;
         ] unless
     ] unless ;
 
-: length-slots ( length class -- slots )
-    "slots" word-prop length 1 - f <array>
-    swap prefix ;
+: (slots-with-length) ( length class -- slots )
+    "slots" word-prop length 1 - f <array> swap prefix ;
+
+: slots-with-length ( seq -- slots )
+    [ length <literal-info> ] [ class ] bi (slots-with-length) ;
 
 : init-literal-info ( info -- info )
     empty-interval >>interval
@@ -83,10 +83,7 @@ UNION: fixed-length array byte-array string ;
     dup literal>> {
         { [ dup real? ] [ [a,a] >>interval ] }
         { [ dup tuple? ] [ tuple-slot-infos >>slots ] }
-        { [ dup fixed-length? ] [
-            [ length <literal-info> ] [ class ] bi
-            length-slots >>slots
-        ] }
+        { [ dup fixed-length? ] [ slots-with-length >>slots ] }
         [ drop ]
     } cond ; inline
 
@@ -164,10 +161,10 @@ UNION: fixed-length array byte-array string ;
         t >>literal?
     init-value-info ; foldable
 
-: <sequence-info'> ( length class -- info )
+: <sequence-info> ( length class -- info )
     <value-info>
         over >>class
-        [ length-slots ] dip swap >>slots
+        [ (slots-with-length) ] dip swap >>slots
     init-value-info ;
 
 : <tuple-info> ( slots class -- info )
