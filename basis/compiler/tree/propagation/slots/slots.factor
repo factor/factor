@@ -23,7 +23,7 @@ IN: compiler.tree.propagation.slots
 : propagate-sequence-constructor ( #call word -- infos )
     [ in-d>> first value-info ]
     [ constructor-output-class ] bi*
-    <sequence-info'> 1array ;
+    <sequence-info> 1array ;
 
 : fold-<tuple-boa> ( values class -- info )
     [ [ literal>> ] map ] dip prefix >tuple
