@@ -71,7 +71,7 @@ HELP: alien-invoke-error
 } ;
 
 HELP: alien-invoke
-{ $values { "..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "library" "a logical library name" } { "function" "a C function name" } { "parameters" "a sequence of C parameter types" } }
+{ $values { "args..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "library" "a logical library name" } { "function" "a C function name" } { "parameters" "a sequence of C parameter types" } { "return..." "the return value of the function, if not " { $link void } } }
 { $description "Calls a C library function with the given name. Input parameters are taken from the data stack, and the return value is pushed on the data stack after the function returns. A return type of " { $link void } " indicates that no value is to be expected." }
 { $notes "C type names are documented in " { $link "c-types-specs" } "." }
 { $errors "Throws an " { $link alien-invoke-error } " if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler." } ;
@@ -85,7 +85,7 @@ HELP: alien-indirect-error
 } ;
 
 HELP: alien-indirect
-{ $values { "..." "zero or more objects passed to the C function" } { "funcptr" "a C function pointer" } { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } }
+{ $values { "args..." "zero or more objects passed to the C function" } { "funcptr" "a C function pointer" } { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "return..." "the return value of the function, if not " { $link void } } }
 { $description
     "Invokes a C function pointer passed on the data stack. Input parameters are taken from the data stack following the function pointer, and the return value is pushed on the data stack after the function returns. A return type of " { $link void } " indicates that no value is to be expected."
 }
@@ -128,7 +128,7 @@ HELP: alien-assembly-error
 } ;
 
 HELP: alien-assembly
-{ $values { "..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "quot" quotation } }
+{ $values { "args..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "quot" quotation } { "return..." "the return value of the function, if not " { $link void } } }
 { $description
     "Invokes arbitrary machine code, generated at compile-time by the quotation. Input parameters are taken from the data stack, and the return value is pushed on the data stack after the function returns. A return type of " { $link void } " indicates that no value is to be expected."
 }

@@ -169,7 +169,7 @@ HELP: xor
 { $notes "This word implements boolean exclusive or, so applying it to integers will not yield useful results (all integers have a true value). Bitwise exclusive or is the " { $link bitxor } " word." } ;
 
 HELP: both?
-{ $values { "x" object } { "y" object } { "quot" { $quotation "( obj -- ? )" } } { "?" "a boolean" } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation "( ... obj -- ... ? )" } } { "?" "a boolean" } }
 { $description "Tests if the quotation yields a true value when applied to both " { $snippet "x" } " and " { $snippet "y" } "." }
 { $examples
     { $example "USING: kernel math prettyprint ;" "3 5 [ odd? ] both? ." "t" }
@@ -177,7 +177,7 @@ HELP: both?
 } ;
 
 HELP: either?
-{ $values { "x" object } { "y" object } { "quot" { $quotation "( obj -- ? )" } } { "?" "a boolean" } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation "( ... obj -- ... ? )" } } { "?" "a boolean" } }
 { $description "Tests if the quotation yields a true value when applied to either " { $snippet "x" } " or " { $snippet "y" } "." }
 { $examples
     { $example "USING: kernel math prettyprint ;" "3 6 [ odd? ] either? ." "t" }
@@ -214,22 +214,22 @@ HELP: call-clear ( quot -- * )
 { $notes "Used to implement " { $link "threads" } "." } ;
 
 HELP: keep
-{ $values { "x" object } { "quot" { $quotation "( x -- ... )" } } }
+{ $values { "x" object } { "quot" { $quotation "( ..a x -- ..b )" } } }
 { $description "Call a quotation with a value on the stack, restoring the value when the quotation returns." }
 { $examples
     { $example "USING: arrays kernel prettyprint ;" "2 \"greetings\" [ <array> ] keep 2array ." "{ { \"greetings\" \"greetings\" } \"greetings\" }" }
 } ;
 
 HELP: 2keep
-{ $values { "x" object } { "y" object } { "quot" { $quotation "( x y -- ... )" } } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation "( ..a x y -- ..b )" } } }
 { $description "Call a quotation with two values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: 3keep
-{ $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( x y z -- ... )" } } }
+{ $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( ..a x y z -- ..b )" } } }
 { $description "Call a quotation with three values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: bi
-{ $values { "x" object } { "p" { $quotation "( x -- ... )" } } { "q" { $quotation "( x -- ... )" } } }
+{ $values { "x" object } { "p" { $quotation "( ..a x -- ..b )" } } { "q" { $quotation "( ..c x -- ..d )" } } }
 { $description "Applies " { $snippet "p" } " to " { $snippet "x" } ", then applies " { $snippet "q" } " to " { $snippet "x" } "." }
 { $examples
     "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x -- )" } ", then the following two lines are equivalent:"
@@ -595,7 +595,7 @@ $nl
 "The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
 
 HELP: if*
-{ $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- ... )" } } { "false" quotation } }
+{ $values { "?" "a generalized boolean" } { "true" { $quotation "( ..a ? -- ..b )" } } { "false" { $quotation "( ..a -- ..b )" } } }
 { $description "Alternative conditional form that preserves the " { $snippet "cond" } " value if it is true."
 $nl
 "If the condition is true, it is retained on the stack before the " { $snippet "true" } " quotation is called. Otherwise, the condition is removed from the stack and the " { $snippet "false" } " quotation is called."
@@ -618,7 +618,7 @@ HELP: unless*
 { $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
 
 HELP: ?if
-{ $values { "default" object } { "cond" "a generalized boolean" } { "true" { $quotation "( cond -- ... )" } } { "false" { $quotation "( default -- ... )" } } }
+{ $values { "default" object } { "cond" "a generalized boolean" } { "true" { $quotation "( ..a cond -- ..b )" } } { "false" { $quotation "( ..a default -- ..b )" } } }
 { $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack." }
 { $notes
 "The following two lines are equivalent:"
@@ -771,15 +771,15 @@ HELP: 4dip
 } ;
 
 HELP: while
-{ $values { "pred" { $quotation "( -- ? )" } } { "body" "a quotation" } }
+{ $values { "pred" { $quotation "( ..a -- ..b ? )" } } { "body" { $quotation "( ..b -- ..a )" } } }
 { $description "Calls " { $snippet "body" } " until " { $snippet "pred" } " returns " { $link f } "." } ;
 
 HELP: until
-{ $values { "pred" { $quotation "( -- ? )" } } { "body" "a quotation" } }
+{ $values { "pred" { $quotation "( ..a -- ..b ? )" } } { "body" { $quotation "( ..b -- ..a )" } } }
 { $description "Calls " { $snippet "body" } " until " { $snippet "pred" } " returns " { $link t } "." } ;
 
 HELP: do
-{ $values { "pred" { $quotation "( -- ? )" } } { "body" "a quotation" } }
+{ $values { "pred" { $quotation "( ..a -- ..b ? )" } } { "body" { $quotation "( ..b -- ..a )" } } }
 { $description "Executes one iteration of a " { $link while } " or " { $link until } " loop." } ;
 
 HELP: loop
