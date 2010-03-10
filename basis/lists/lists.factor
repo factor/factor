@@ -61,10 +61,10 @@ PRIVATE>
 : lmap ( ... list quot: ( ... elt -- ... newelt ) -- ... result )
     over nil? [ drop ] [ (leach) lmap cons ] if ; inline recursive
 
-: foldl ( ... list identity quot: ( ... obj1 obj2 -- ... obj ) -- ... result )
+: foldl ( ... list identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd leach ; inline
 
-:: foldr ( ... list identity quot: ( ... obj1 obj2 -- ... obj ) -- ... result )
+:: foldr ( ... list identity quot: ( ... prev elt -- ... next ) -- ... result )
     list nil? [ identity ] [
         list cdr identity quot foldr
         list car quot call

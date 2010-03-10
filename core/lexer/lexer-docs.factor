@@ -67,13 +67,13 @@ HELP: still-parsing?
 { $description "Outputs " { $link f } " if end of input has been reached, " { $link t } " otherwise." } ;
 
 HELP: each-token
-{ $values { "end" string } { "quot" { $quotation "( token -- )" } } }
+{ $values { "end" string } { "quot" { $quotation "( ... token -- ... )" } } }
 { $description "Reads a sequence of tokens until the first occurrence of " { $snippet "end" } ". " { $snippet "quot" } " is called on each token as it is read." }
 { $examples "This word is used to implement " { $link POSTPONE: USING: } "." }
 $parsing-note ;
 
 HELP: map-tokens
-{ $values { "end" string } { "quot" { $quotation "( token -- object )" } } { "seq" "a new sequence of " { $snippet "object" } "s" } }
+{ $values { "end" string } { "quot" { $quotation "( ... token -- ... elt )" } } { "seq" "a new sequence of " { $snippet "object" } "s" } }
 { $description "Reads a sequence of tokens until the first occurrence of " { $snippet "end" } ". " { $snippet "quot" } " is called on each token as it is read, and the results are collected into a new output sequence." }
 $parsing-note ;
 
