@@ -295,7 +295,7 @@ HELP: spread
 { bi* tri* spread } related-words
 
 HELP: to-fixed-point
-{ $values { "object" object } { "quot" { $quotation "( object(n) -- object(n+1) )" } } { "object(n)" object } }
+{ $values { "object" object } { "quot" { $quotation "( ... object(n) -- ... object(n+1) )" } } { "object(n)" object } }
 { $description "Applies the quotation repeatedly with " { $snippet "object" } " as the initial input until the output of the quotation equals the input." }
 { $examples
     { $example

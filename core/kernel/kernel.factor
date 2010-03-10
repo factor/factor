@@ -226,7 +226,7 @@ M: callstack clone (clone) ; inline
 ! Tuple construction
 GENERIC: new ( class -- tuple )
 
-GENERIC: boa ( ... class -- tuple )
+GENERIC: boa ( slots... class -- tuple )
 
 ! Error handling -- defined early so that other files can
 ! throw errors before continuations are loaded

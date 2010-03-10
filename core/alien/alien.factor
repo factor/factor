@@ -70,17 +70,17 @@ ERROR: alien-callback-error ;
 
 ERROR: alien-indirect-error ;
 
-: alien-indirect ( ... funcptr return parameters abi -- ... )
+: alien-indirect ( args... funcptr return parameters abi -- return... )
     alien-indirect-error ;
 
 ERROR: alien-invoke-error library symbol ;
 
-: alien-invoke ( ... return library function parameters -- ... )
+: alien-invoke ( args... return library function parameters -- return... )
     2over alien-invoke-error ;
 
 ERROR: alien-assembly-error code ;
 
-: alien-assembly ( ... return parameters abi quot -- ... )
+: alien-assembly ( args... return parameters abi quot -- return... )
     dup alien-assembly-error ;
 
 ! Callbacks are registered in a global hashtable. Note that they
