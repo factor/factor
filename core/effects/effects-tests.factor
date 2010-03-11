@@ -38,7 +38,7 @@ IN: effects.tests
 [ { "e" } ] [ (( ..a b c -- ..d e )) out>> ] unit-test
 
 [ "(( a ..b c -- d ))" eval( -- effect ) ]
-[ error>> invalid-effect-variable? ] must-fail-with
+[ error>> invalid-row-variable? ] must-fail-with
 
 [ "(( ..a: integer b c -- d ))" eval( -- effect ) ]
-[ error>> effect-variable-can't-have-type? ] must-fail-with
+[ error>> row-variable-can't-have-type? ] must-fail-with
