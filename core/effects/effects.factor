@@ -27,10 +27,17 @@ TUPLE: effect
 : effect-height ( effect -- n )
     [ out>> length ] [ in>> length ] bi - ; inline
 
+: variable-effect? ( effect -- ? )
+    [ in-var>> ] [ out-var>> ] bi or ;
+: bivariable-effect? ( effect -- ? )
+    [ in-var>> ] [ out-var>> ] bi = not ;
+
 : effect<= ( effect1 effect2 -- ? )
     {
         { [ over terminated?>> ] [ t ] }
         { [ dup terminated?>> ] [ f ] }
+        { [ 2dup [ bivariable-effect? ] either? ] [ f ] }
+        { [ 2dup [ variable-effect? ] [ variable-effect? not ] bi* and ] [ f ] }
         { [ 2dup [ in>> length ] bi@ > ] [ f ] }
         { [ 2dup [ effect-height ] bi@ = not ] [ f ] }
         [ t ]
