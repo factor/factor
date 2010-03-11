@@ -11,12 +11,12 @@ TUPLE: recaptcha < filter-responder domain public-key private-key ;
 
 SYMBOLS: recaptcha-valid? recaptcha-error ;
 
-: <recaptcha> ( responder -- obj )
+: <recaptcha> ( responder -- recaptcha )
     recaptcha new
         swap >>responder ;
 
 M: recaptcha call-responder*
-    dup \ recaptcha set
+    dup recaptcha set
     responder>> call-responder ;
 
 <PRIVATE
@@ -60,17 +60,23 @@ M: recaptcha call-responder*
     } URL" http://api-verify.recaptcha.net/verify"
     <post-request> http-request nip parse-recaptcha-response ;
 
-CHLOE: recaptcha
-    drop [ render-recaptcha ] [xml-code] ;
-
-PRIVATE>
-
-: validate-recaptcha ( -- )
+: validate-recaptcha-params ( -- )
     {
         { "recaptcha_challenge_field" [ v-required ] }
         { "recaptcha_response_field" [ v-required ] }
-    } validate-params
+    } validate-params ;
+
+PRIVATE>
+
+CHLOE: recaptcha drop [ render-recaptcha ] [xml-code] ;
+
+: validate-recaptcha ( -- )
+    begin-conversation
+    validate-recaptcha-params
+
     "recaptcha_challenge_field" value
     "recaptcha_response_field" value
-    \ recaptcha get (validate-recaptcha)
-    [ recaptcha-valid? cset ] [ recaptcha-error cset ] bi* ;
+    recaptcha get
+    (validate-recaptcha)
+    recaptcha-error cset
+    [ validation-failed ] unless ;

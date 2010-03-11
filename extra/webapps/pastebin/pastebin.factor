@@ -159,10 +159,7 @@ M: annotation entity-url
         { "mode" [ v-mode ] }
         { "contents" [ v-required ] }
     } validate-params
-
-    begin-conversation
-    validate-recaptcha
-    recaptcha-valid? cget [ validation-failed ] unless ;
+    validate-recaptcha ;
 
 : deposit-entity-slots ( tuple -- )
     now >>date
