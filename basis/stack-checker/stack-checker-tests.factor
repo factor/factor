@@ -234,10 +234,12 @@ DEFER: blah4
 
 ! Test some curry stuff
 { 1 1 } [ 3 [ ] curry 4 [ ] curry if ] must-infer-as
+{ 3 1 } [ [ ] curry [ [ ] curry ] dip if ] must-infer-as
 
 { 2 1 } [ [ ] curry 4 [ ] curry if ] must-infer-as
 
 [ [ 3 [ ] curry 1 2 [ ] 2curry if ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ ] curry [ [ ] 2curry ] dip if ] infer ] [ unbalanced-branches-error? ] must-fail-with
 
 { 1 3 } [ [ 2drop f ] assoc-find ] must-infer-as
 
@@ -378,7 +380,10 @@ DEFER: eee'
 
 [ [ cond ] infer ] [ T{ unknown-macro-input f cond } = ] must-fail-with
 [ [ bi ] infer ] [ T{ unknown-macro-input f call } = ] must-fail-with
-[ [ each ] infer ] [ T{ unknown-macro-input f call } = ] must-fail-with
+
+[ [ each ] infer ] [ T{ unknown-macro-input f each } = ] must-fail-with
+[ [ if* ] infer ] [ T{ unknown-macro-input f if* } = ] must-fail-with
+[ [ [ "derp" ] if* ] infer ] [ T{ unknown-macro-input f if* } = ] must-fail-with
 
 [ [ [ "OOPS" throw ] dip ] [ drop ] if ] must-infer
 
@@ -402,3 +407,64 @@ DEFER: eee'
     [ "special" word-prop not ] filter
     [ "shuffle" word-prop not ] filter
 ] unit-test
+
+{ 1 0 } [ [ drop       ] each ] must-infer-as
+{ 2 1 } [ [ append     ] each ] must-infer-as
+{ 1 1 } [ [            ] map  ] must-infer-as
+{ 1 1 } [ [ reverse    ] map  ] must-infer-as
+{ 2 2 } [ [ append dup ] map  ] must-infer-as
+{ 2 2 } [ [ swap nth suffix dup ] map-index ] must-infer-as
+
+{ 4 1 } [ [ 2drop ] [ 2nip    ] if ] must-infer-as
+{ 3 3 } [ [ dup   ] [ over    ] if ] must-infer-as
+{ 1 1 } [ [ 1     ] [ 0       ] if ] must-infer-as
+{ 2 2 } [ [ t     ] [ 1 + f   ] if ] must-infer-as
+
+{ 1 0 } [ [ write     ] [ "(f)" write ] if* ] must-infer-as
+{ 1 1 } [ [           ] [ f           ] if* ] must-infer-as
+{ 2 1 } [ [ nip       ] [ drop f      ] if* ] must-infer-as
+{ 2 1 } [ [ nip       ] [             ] if* ] must-infer-as
+{ 3 2 } [ [ 3append f ] [             ] if* ] must-infer-as
+{ 1 0 } [ [ drop      ] [             ] if* ] must-infer-as
+
+{ 1 1 } [ [ 1 +       ] [ "oops" throw ] if* ] must-infer-as
+
+: strict-each ( seq quot: ( x -- ) -- )
+    each ; inline
+: strict-map ( seq quot: ( x -- x' ) -- seq' )
+    map ; inline
+: strict-2map ( xs ys quot: ( x y -- z ) -- zs )
+    2map ; inline
+
+{ 1 0 } [ [ drop ] strict-each ] must-infer-as
+{ 1 1 } [ [ 1 + ] strict-map ] must-infer-as
+{ 1 1 } [ [  ] strict-map ] must-infer-as
+{ 2 1 } [ [ + ] strict-2map ] must-infer-as
+{ 2 1 } [ [ drop ] strict-2map ] must-infer-as
+[ [ [ append ] strict-each ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ 1 + ] strict-2map ] infer ] [ unbalanced-branches-error? ] must-fail-with
+
+! ensure that polymorphic checking works on recursive combinators
+FROM: splitting.private => split, ;
+{ 2 0 } [ [ member? ] curry split, ] must-infer-as
+
+[ [ [ write write ] each      ] infer ] [ unbalanced-branches-error? ] must-fail-with
+
+[ [ [             ] each      ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ dup         ] map       ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ drop        ] map       ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ 1 +         ] map-index ] infer ] [ unbalanced-branches-error? ] must-fail-with
+
+[ [ [ dup  ] [      ] if ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ 2dup ] [ over ] if ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ drop ] [      ] if ] infer ] [ unbalanced-branches-error? ] must-fail-with
+
+[ [ [      ] [       ] if* ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ dup  ] [       ] if* ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ drop ] [ drop  ] if* ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [      ] [ drop  ] if* ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [      ] [ 2dup  ] if* ] infer ] [ unbalanced-branches-error? ] must-fail-with
+
+! M\ declared-effect infer-call* didn't properly unify branches
+{ 1 0 } [ [ 1 [ drop ] [ drop ] if ] each ] must-infer-as
+

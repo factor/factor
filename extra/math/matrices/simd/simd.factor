@@ -28,7 +28,7 @@ M: matrix4 new-sequence 2drop matrix4 (struct) ; inline
     c1 c2 c3 c4 columns 4 set-firstn-unsafe
     c ; inline
 
-: make-matrix4 ( quot: ( -- c1 c2 c3 c4 ) -- c )
+: make-matrix4 ( ..a quot: ( ..a -- ..b c1 c2 c3 c4 ) -- ..b c )
     matrix4 (struct) swap dip set-columns ; inline
 
 :: 2map-columns ( a b quot -- c )
@@ -42,7 +42,7 @@ M: matrix4 new-sequence 2drop matrix4 (struct) ; inline
         a4 b4 quot call
     ] make-matrix4 ; inline
 
-: map-columns ( a quot -- c )
+: map-columns ( ... a quot: ( ... col -- ... newcol ) -- ... c )
     '[ columns _ 4 napply ] make-matrix4 ; inline
     
 PRIVATE>

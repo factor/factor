@@ -44,7 +44,7 @@ SYNTAX: XML-NS:
 : each-attrs ( attrs quot -- )
     [ values [ interpolated? ] filter ] dip each ; inline
 
-: (each-interpolated) ( item quot: ( interpolated -- ) -- )
+: (each-interpolated) ( ... item quot: ( ... interpolated -- ... ) -- ... )
      {
         { [ over interpolated? ] [ call ] }
         { [ over tag? ] [ [ attrs>> ] dip each-attrs ] }

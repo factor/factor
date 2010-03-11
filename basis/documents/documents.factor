@@ -55,12 +55,12 @@ TUPLE: document < model locs undos redos inside-undo? ;
     to first line# =
     [ to second ] [ line# document doc-line length ] if ;
 
-: each-line ( from to quot -- )
+: each-line ( ... from to quot: ( ... line -- ... ) -- ... )
     2over = [ 3drop ] [
         [ [ first ] bi@ [a,b] ] dip each
     ] if ; inline
 
-: map-lines ( from to quot -- results )
+: map-lines ( ... from to quot: ( ... line -- ... result ) -- ... results )
     collector [ each-line ] dip ; inline
 
 : start/end-on-line ( from to line# document -- n1 n2 )
@@ -109,7 +109,7 @@ CONSTANT: doc-start { 0 0 }
 : entire-doc ( document -- start end document )
     [ [ doc-start ] dip doc-end ] keep ;
 
-: with-undo ( document quot: ( document -- ) -- )
+: with-undo ( ..a document quot: ( ..a document -- ..b ) -- ..b )
     [ t >>inside-undo? ] dip keep f >>inside-undo? drop ; inline
 
 PRIVATE>

@@ -1,6 +1,6 @@
 ! (c)2010 Joe Groff bsd license
 USING: accessors arrays assocs combinators combinators.short-circuit
-continuations effects fry kernel locals math namespaces
+continuations effects fry kernel locals math math.order namespaces
 quotations sequences splitting
 stack-checker.backend
 stack-checker.errors
@@ -10,91 +10,63 @@ stack-checker.values
 stack-checker.visitor ;
 IN: stack-checker.row-polymorphism
 
-<PRIVATE
-SYMBOLS: current-effect-variables current-word-effect current-meta-d ;
+:: with-inner-d ( quot -- inner-d )
+    inner-d-index get :> old-inner-d-index
+    meta-d length inner-d-index set
+    quot call
+    inner-d-index get :> new-inner-d-index
+    old-inner-d-index new-inner-d-index min inner-d-index set
+    new-inner-d-index ; inline
 
-: quotation-effect? ( in -- ? )
-    dup pair? [ second effect? ] [ drop f ] if ;
+:: with-effect-here ( quot -- effect )
+    input-count get :> old-input-count
+    meta-d length :> old-meta-d-length
 
-SYMBOL: (unknown)
+    quot with-inner-d :> inner-d
+        
+    input-count get :> new-input-count
+    old-meta-d-length inner-d -
+    new-input-count old-input-count - + :> in
+    meta-d length inner-d - :> out
+    in "x" <array> out "x" <array> terminated? get <terminated-effect> ; inline
 
-GENERIC: >error-quot ( known -- quot )
-
-M: object >error-quot drop (unknown) ;
-M: literal >error-quot value>> ;
-M: composed >error-quot
-    [ quot1>> known >error-quot ] [ quot2>> known >error-quot ] bi
-    \ compose [ ] 3sequence ;
-M: curried >error-quot
-    [ obj>> known >error-quot ] [ quot>> known >error-quot ] bi
-    \ curry [ ] 3sequence ;
-
-: >error-branches-and-quots ( branch/values -- branches quots )
-    [ [ second ] [ known >error-quot ] bi* ] assoc-map unzip ;
-
-: abandon-check ( -- * )
-    current-word get
-    current-word-effect get in>> current-meta-d get zip
-    [ first quotation-effect? ] filter
-    >error-branches-and-quots
-    invalid-quotation-input ;
-
-:: check-variable ( actual-count declared-count variable -- difference )
+:: check-variable ( actual-count declared-count variable vars -- difference ? )
     actual-count declared-count -
     variable [
-        variable current-effect-variables get at* nip
-        [ variable current-effect-variables get at -     ]
-        [ variable current-effect-variables get set-at 0 ] if
-    ] [
-        dup [ abandon-check ] unless-zero
+        variable vars at* nip
+        [ variable vars at -     ]
+        [ variable vars set-at 0 ] if
+        t
+    ] [ dup 0 <= ] if ;
+
+: adjust-variable ( diff var vars -- )
+    pick 0 >=
+    [ at+ ]
+    [ 3drop ] if ; inline
+
+:: check-variables ( vars declared actual -- ? )
+    actual terminated?>> [ t ] [
+        actual declared [ in>>  length ] bi@ declared in-var>>
+            [ vars check-variable ] keep :> ( in-diff in-ok? in-var ) 
+        actual declared [ out>> length ] bi@ declared out-var>>
+            [ vars check-variable ] keep :> ( out-diff out-ok? out-var )
+        { [ in-ok? ] [ out-ok? ] [ in-diff out-diff = ] } 0&&
+        dup [
+            in-var  [ in-diff  swap vars adjust-variable ] when*
+            out-var [ out-diff swap vars adjust-variable ] when*
+        ] when
     ] if ;
 
-: adjust-variable ( diff var -- )
-    over 0 >=
-    [ current-effect-variables get at+ ]
-    [ 2drop ] if ; inline
+: complex-unbalanced-branches-error ( known -- * )
+    [ word>> ] [
+        branches>> <reversed>
+        [ [ known>callable ] { } map-as ]
+        [ [ effect>> ] { } map-as ]
+        [ [ actual>> ] { } map-as ] tri
+    ] bi unbalanced-branches-error ;
 
-:: (check-input) ( declared actual -- )
-    actual declared [ in>>  length ] bi@ declared in-var>>
-        [ check-variable ] keep :> ( in-diff in-var ) 
-    actual declared [ out>> length ] bi@ declared out-var>>
-        [ check-variable ] keep :> ( out-diff out-var )
-    { [ in-var not ] [ out-var not ] [ in-diff out-diff = ] } 0||
-    [
-        in-var  [ in-diff  swap adjust-variable ] when*
-        out-var [ out-diff swap adjust-variable ] when*
-    ] [
-        abandon-check
-    ] if ;
+: check-declared-effect ( known effect -- )
+    [ >>actual ] keep
+    2dup [ [ variables>> ] [ effect>> ] bi ] dip check-variables
+    [ 2drop ] [ drop complex-unbalanced-branches-error ] if ;
 
-: infer-value ( value -- effect )
-    dup known [ nest-visitor init-inference infer-call* current-effect ] with-scope ; inline
-
-: check-input ( in value -- )
-    over quotation-effect? [
-        [ second ] dip infer-value (check-input)
-    ] [ 2drop ] if ;
-
-: normalize-variables ( -- variables' )
-    current-effect-variables get dup values [
-        infimum dup 0 <
-        [ '[ _ - ] assoc-map ] [ drop ] if
-    ] unless-empty ;
-
-PRIVATE>
-
-: infer-polymorphic-vars ( effect -- variables )
-    H{ } clone current-effect-variables set
-    dup current-word-effect set
-    in>> dup length ensure-d dup current-meta-d set
-    [ check-input ] 2each
-    normalize-variables ;
-
-: check-polymorphic-effect ( word -- )
-    current-word get [
-        dup current-word set stack-effect
-        dup { [ in-var>> ] [ out-var>> ] } 1||
-        [ infer-polymorphic-vars ] when drop
-    ] dip current-word set ;
-
-SYMBOL: infer-polymorphic?

@@ -74,7 +74,7 @@ PRIVATE>
 
 SYMBOL: generic-word
 
-: make-math-method-table ( classes quot: ( class -- quot ) -- alist )
+: make-math-method-table ( classes quot: ( ... class -- ... quot ) -- alist )
     [ bootstrap-words ] dip
     [ [ drop ] [ call ] 2bi ] curry { } map>assoc ; inline
 
@@ -93,7 +93,7 @@ SYMBOL: generic-word
 : tuple-dispatch ( picker alist -- alist' )
     swap [ [ tuple-dispatch-entry ] curry dip ] curry assoc-map math-alist>quot ;
 
-: math-dispatch-step ( picker quot: ( class -- quot ) -- quot )
+: math-dispatch-step ( picker quot: ( ... class -- ... quot ) -- quot )
     [ [ { bignum float fixnum } ] dip make-math-method-table ]
     [ [ { ratio complex } ] dip make-math-method-table tuple-dispatch ] 2bi
     tuple swap 2array prefix tag-dispatch ; inline

@@ -5,7 +5,7 @@ arrays stack-checker.inlining namespaces compiler.tree
 math.order ;
 IN: compiler.tree.combinators
 
-: each-node ( nodes quot: ( node -- ) -- )
+: each-node ( ... nodes quot: ( ... node -- ... ) -- ... )
     dup dup '[
         _ [
             dup #branch? [
@@ -18,7 +18,7 @@ IN: compiler.tree.combinators
         ] bi
     ] each ; inline recursive
 
-: map-nodes ( nodes quot: ( node -- node' ) -- nodes )
+: map-nodes ( ... nodes quot: ( ... node -- ... node' ) -- ... nodes )
     dup dup '[
         @
         dup #branch? [
@@ -30,7 +30,7 @@ IN: compiler.tree.combinators
         ] if
     ] map-flat ; inline recursive
 
-: contains-node? ( nodes quot: ( node -- ? ) -- ? )
+: contains-node? ( ... nodes quot: ( ... node -- ... ? ) -- ... ? )
     dup dup '[
         _ keep swap [ drop t ] [
             dup #branch? [
@@ -49,7 +49,7 @@ IN: compiler.tree.combinators
 : sift-children ( seq flags -- seq' )
     zip [ nip ] assoc-filter keys ;
 
-: until-fixed-point ( #recursive quot: ( node -- ) -- )
+: until-fixed-point ( ... #recursive quot: ( ... node -- ... ) -- ... )
     over label>> t >>fixed-point drop
     [ with-scope ] 2keep
     over label>> fixed-point>> [ 2drop ] [ until-fixed-point ] if ;
