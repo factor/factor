@@ -13,28 +13,35 @@ ERROR: stack-effect-omits-dashes ;
 
 SYMBOL: effect-var
 
-: parse-var ( first? var name -- var )
+<PRIVATE
+: end-token? ( end token -- token ? ) [ nip ] [ = ] 2bi ; inline
+: effect-opener? ( token -- token ? ) dup { f "(" "((" "--" } member? ; inline
+: effect-closer? ( token -- token ? ) dup { ")" "))" } member? ; inline
+: effect-variable? ( token -- token' ? ) ".." ?head ; inline
+
+: parse-effect-var ( first? var name -- var )
     nip
     [ ":" ?tail [ effect-variable-can't-have-type ] when ] curry
     [ invalid-effect-variable ] if ;
 
+: parse-effect-value ( token -- value )
+    ":" ?tail [
+        scan {
+            { [ dup "(" = ] [ drop ")" parse-effect ] }
+            { [ dup f = ] [ ")" unexpected-eof ] }
+            [ parse-word dup class? [ bad-effect ] unless ]
+        } cond 2array
+    ] when ;
+PRIVATE>
+
 : parse-effect-token ( first? var end -- var more? )
-    scan [ nip ] [ = ] 2bi [ drop nip f ] [
-        dup { f "(" "((" "--" } member? [ bad-effect ] [
-            dup { ")" "))" } member? [ stack-effect-omits-dashes ] [
-                ".." ?head [ parse-var t ] [
-                    [ drop ] 2dip
-                    ":" ?tail [
-                        scan {
-                            { [ dup "(" = ] [ drop ")" parse-effect ] }
-                            { [ dup f = ] [ ")" unexpected-eof ] }
-                            [ parse-word dup class? [ bad-effect ] unless ]
-                        } cond 2array
-                    ] when , t
-                ] if
-            ] if
-        ] if
-    ] if ;
+    scan {
+        { [ end-token? ] [ drop nip f ] }
+        { [ effect-opener? ] [ bad-effect ] }
+        { [ effect-closer? ] [ stack-effect-omits-dashes ] }
+        { [ effect-variable? ] [ parse-effect-var t ] }
+        [ [ drop ] 2dip parse-effect-value , t ]
+    } cond ;
 
 : parse-effect-tokens ( end -- var tokens )
     [

@@ -10,27 +10,21 @@ stack-checker.values
 stack-checker.visitor ;
 IN: stack-checker.row-polymorphism
 
-:: with-inner-d ( quot -- inner-d )
-    inner-d-index get :> old-inner-d-index
-    meta-d length inner-d-index set
-    quot call
-    inner-d-index get :> new-inner-d-index
-    old-inner-d-index new-inner-d-index min inner-d-index set
-    new-inner-d-index ; inline
+: with-inner-d ( quot -- inner-d )
+    inner-d-index get
+    [ meta-d length inner-d-index set call ] dip
+    inner-d-index get [ min inner-d-index set ] keep ; inline
 
-:: with-effect-here ( quot -- effect )
-    input-count get :> old-input-count
-    meta-d length :> old-meta-d-length
+:: (effect-here) ( inner-d old-meta-d-length old-input-count -- effect )
+    old-meta-d-length inner-d - input-count get old-input-count - +
+    meta-d length inner-d -
+    [ "x" <array> ] bi@ terminated? get <terminated-effect> ; inline
 
-    quot with-inner-d :> inner-d
-        
-    input-count get :> new-input-count
-    old-meta-d-length inner-d -
-    new-input-count old-input-count - + :> in
-    meta-d length inner-d - :> out
-    in "x" <array> out "x" <array> terminated? get <terminated-effect> ; inline
+: with-effect-here ( quot -- effect )
+    meta-d length input-count get
+    [ with-inner-d ] 2dip (effect-here) ; inline
 
-:: check-variable ( actual-count declared-count variable vars -- difference ? )
+:: (check-variable) ( actual-count declared-count variable vars -- difference ? )
     actual-count declared-count -
     variable [
         variable vars at* nip
@@ -44,20 +38,25 @@ IN: stack-checker.row-polymorphism
     [ at+ ]
     [ 3drop ] if ; inline
 
-:: check-variables ( vars declared actual -- ? )
-    actual terminated?>> [ t ] [
-        actual declared [ in>>  length ] bi@ declared in-var>>
-            [ vars check-variable ] keep :> ( in-diff in-ok? in-var ) 
-        actual declared [ out>> length ] bi@ declared out-var>>
-            [ vars check-variable ] keep :> ( out-diff out-ok? out-var )
-        { [ in-ok? ] [ out-ok? ] [ in-diff out-diff = ] } 0&&
-        dup [
-            in-var  [ in-diff  swap vars adjust-variable ] when*
-            out-var [ out-diff swap vars adjust-variable ] when*
-        ] when
+:: check-variable ( vars declared actual slot var-slot -- diff ok? var )
+    actual declared [ slot call length ] bi@ declared var-slot call
+    [ vars (check-variable) ] keep ; inline
+
+:: unify-variables ( in-diff in-ok? in-var out-diff out-ok? out-var vars -- ? )
+    { [ in-ok? ] [ out-ok? ] [ in-diff out-diff = ] } 0&&
+    dup [
+        in-var  [ in-diff  swap vars adjust-variable ] when*
+        out-var [ out-diff swap vars adjust-variable ] when*
+    ] when ;
+
+: check-variables ( vars declared actual -- ? )
+    dup terminated?>> [ 3drop t ] [
+        [ [ in>>  ] [ in-var>>  ] check-variable ]
+        [ [ out>> ] [ out-var>> ] check-variable ]
+        [ 2drop ] 3tri unify-variables
     ] if ;
 
-: complex-unbalanced-branches-error ( known -- * )
+: combinator-unbalanced-branches-error ( known -- * )
     [ word>> ] [
         branches>> <reversed>
         [ [ known>callable ] { } map-as ]
@@ -68,5 +67,5 @@ IN: stack-checker.row-polymorphism
 : check-declared-effect ( known effect -- )
     [ >>actual ] keep
     2dup [ [ variables>> ] [ effect>> ] bi ] dip check-variables
-    [ 2drop ] [ drop complex-unbalanced-branches-error ] if ;
+    [ 2drop ] [ drop combinator-unbalanced-branches-error ] if ;
 
