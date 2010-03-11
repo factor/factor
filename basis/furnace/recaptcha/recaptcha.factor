@@ -23,23 +23,23 @@ M: recaptcha call-responder*
 
 : (render-recaptcha) ( private-key -- xml )
     dup
-[XML <script type="text/javascript"
-   src=<->>
-</script>
+    [XML
+        <script type="text/javascript"
+           src=<->>
+        </script>
 
-<noscript>
-   <iframe src=<->
-       height="300" width="500" frameborder="0"></iframe><br/>
-   <textarea name="recaptcha_challenge_field" rows="3" cols="40">
-   </textarea>
-   <input type="hidden" name="recaptcha_response_field" 
-       value="manual_challenge"/>
-</noscript>
-XML] ;
+        <noscript>
+           <iframe src=<->
+               height="300" width="500" frameborder="0"></iframe><br/>
+           <textarea name="recaptcha_challenge_field" rows="3" cols="40">
+           </textarea>
+           <input type="hidden" name="recaptcha_response_field"
+               value="manual_challenge"/>
+        </noscript>
+    XML] ;
 
 : recaptcha-url ( secure? -- ? )
-    [ "https://api.recaptcha.net/challenge" ]
-    [ "http://api.recaptcha.net/challenge" ] if
+    "https://api.recaptcha.net/challenge" "http://api.recaptcha.net/challenge" ?
     recaptcha-error cget [ "?error=" glue ] when* >url ;
 
 : render-recaptcha ( -- xml )

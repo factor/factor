@@ -26,7 +26,7 @@ ARTICLE: "recaptcha-example" "Recaptcha example"
     { "Wrap the responder in a " { $link <recaptcha> } }
     { "Wrap the responder in a " { $link <conversations> } " if it is not already" }
     { "Ensure that there is a database connected, with the " { $link <alloy> } " word" }
-    { "Start a conversation to move values between requests" }
+    { "Start a conversation with " { $link begin-conversation } " to move values between requests" }
     { "Add a handler calling " { $link validate-recaptcha } " in the " { $slot "submit" } " of the " { $link page-action } }
     { "Pass the conversation from your submit action using " { $link <continue-conversation> } }
     { "Put the chloe tag " { $snippet "<recaptcha/>" } " inside a form tag in the template for your " { $link page-action } }
