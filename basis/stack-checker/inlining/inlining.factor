@@ -119,9 +119,15 @@ SYMBOL: enter-out
 : trimmed-enter-out ( label -- stack )
     dup enter-out>> trim-stack ;
 
+GENERIC: (undeclared-known) ( value -- known )
+M: object (undeclared-known) ;
+M: declared-effect (undeclared-known) known>> (undeclared-known) ;
+
+: undeclared-known ( value -- known ) known (undeclared-known) ;
+
 : check-call-site-stack ( label -- )
     [ ] [ call-site-stack ] [ trimmed-enter-out ] tri
-    [ dup known [ [ known ] bi@ = ] [ 2drop t ] if ] 2all?
+    [ dup undeclared-known [ [ undeclared-known ] bi@ = ] [ 2drop t ] if ] 2all?
     [ drop ] [ word>> inconsistent-recursive-call-error inference-error ] if ;
 
 : check-call ( label -- )
@@ -142,7 +148,7 @@ SYMBOL: enter-out
 : inline-word ( word -- )
     commit-literals
     [ depends-on-definition ]
-    [ infer-polymorphic? get [ check-polymorphic-effect ] [ drop ] if ]
+    [ declare-input-effects ]
     [
         dup inline-recursive-label [
             call-recursive-inline-word

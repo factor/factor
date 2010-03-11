@@ -45,8 +45,7 @@ IN: compiler.tree.propagation.recursive
             [ clone ] dip
             [ [ drop ] [ [ [ interval>> ] bi@ ] [ drop class>> ] 2bi generalize-counter-interval ] 2bi >>interval ]
             [ [ drop ] [ [ slots>> ] bi@ [ generalize-counter ] 2map ] 2bi >>slots ]
-            [ [ drop ] [ [ length>> ] bi@ generalize-counter ] 2bi >>length ]
-            tri
+            bi
         ] if
     ] if ;
 

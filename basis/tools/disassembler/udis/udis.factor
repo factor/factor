@@ -103,7 +103,7 @@ FUNCTION: c-string ud_lookup_mnemonic ( int c ) ;
     dup cell-bits ud_set_mode
     dup UD_SYN_INTEL ud_set_syntax ;
 
-: with-ud ( quot: ( ud -- ) -- )
+: with-ud ( ..a quot: ( ..a ud -- ..b ) -- ..b )
     [ [ [ <ud> ] dip call ] with-destructors ] with-code-blocks ; inline
 
 SINGLETON: udis-disassembler

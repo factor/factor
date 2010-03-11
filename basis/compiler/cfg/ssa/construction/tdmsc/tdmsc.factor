@@ -47,7 +47,7 @@ SYMBOLS: visited merge-sets levels again? ;
         tmp dom-parent to tmp walk
     ] [ lnode ] if ;
 
-: each-incoming-j-edge ( bb quot: ( from to -- ) -- )
+: each-incoming-j-edge ( ... bb quot: ( ... from to -- ... ) -- ... )
     [ [ predecessors>> ] keep ] dip
     '[ _ 2dup j-edge? _ [ 2drop ] if ] each ; inline
 
@@ -101,7 +101,7 @@ PRIVATE>
     [ compute-merge-set-loop ]
     tri ;
 
-: merge-set-each ( bbs quot: ( bb -- ) -- )
+: merge-set-each ( ... bbs quot: ( ... bb -- ... ) -- ... )
     [ (merge-set) ] dip '[
         swap _ [ drop ] if
     ] 2each ; inline

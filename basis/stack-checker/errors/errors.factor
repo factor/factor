@@ -10,8 +10,6 @@ ERROR: bad-macro-input < inference-error macro ;
 
 ERROR: unknown-macro-input < inference-error macro ;
 
-ERROR: unbalanced-branches-error < inference-error branches quots ;
-
 ERROR: too-many->r < inference-error ;
 
 ERROR: too-many-r> < inference-error ;
@@ -34,9 +32,5 @@ ERROR: transform-expansion-error < inference-error error continuation word ;
 
 ERROR: bad-declaration-error < inference-error declaration ;
 
-ERROR: invalid-quotation-input < inference-error word branches quots ;
-
-ERROR: invalid-effect-variable < inference-error effect ;
-
-ERROR: effect-variable-can't-have-type < inference-error effect ;
+ERROR: unbalanced-branches-error < inference-error word quots declareds actuals ;
 

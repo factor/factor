@@ -69,7 +69,7 @@ PRIVATE>
     dup next-match>>
     execute( i string regexp -- i start end ? ) ; inline
 
-:: (each-match) ( i string regexp quot: ( start end string -- ) -- )
+:: (each-match) ( ... i string regexp quot: ( ... start end string -- ... ) -- ... )
     i string regexp do-next-match [| i' start end |
         start end string quot call
         i' string regexp quot (each-match)
@@ -80,10 +80,10 @@ PRIVATE>
 
 PRIVATE>
 
-: each-match ( string regexp quot: ( start end string -- ) -- )
+: each-match ( ... string regexp quot: ( ... start end string -- ... ) -- ... )
     [ prepare-match-iterator ] dip (each-match) ; inline
 
-: map-matches ( string regexp quot: ( start end string -- obj ) -- seq )
+: map-matches ( ... string regexp quot: ( ... start end string -- ... obj ) -- ... seq )
     collector [ each-match ] dip >array ; inline
 
 : all-matching-slices ( string regexp -- seq )

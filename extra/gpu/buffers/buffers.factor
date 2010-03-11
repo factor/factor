@@ -132,7 +132,7 @@ TYPED:: copy-buffer ( to-buffer-ptr: buffer-ptr from-buffer-ptr: buffer-ptr size
     from-buffer-ptr offset>> to-buffer-ptr offset>>
     size glCopyBufferSubData ;
 
-:: with-mapped-buffer ( buffer access quot: ( alien -- ) -- )
+:: with-mapped-buffer ( ..a buffer access quot: ( ..a alien -- ..b ) -- ..b )
     buffer bind-buffer :> target
     target access gl-access glMapBuffer
 
@@ -140,15 +140,15 @@ TYPED:: copy-buffer ( to-buffer-ptr: buffer-ptr from-buffer-ptr: buffer-ptr size
 
     target glUnmapBuffer drop ; inline
 
-:: with-bound-buffer ( buffer target quot: ( -- ) -- )
+:: with-bound-buffer ( ..a buffer target quot: ( ..a -- ..b ) -- ..b )
     target gl-target buffer glBindBuffer
     quot call ; inline
 
-: with-buffer-ptr ( buffer-ptr target quot: ( c-ptr -- ) -- )
+: with-buffer-ptr ( ..a buffer-ptr target quot: ( ..a c-ptr -- ..b ) -- ..b )
     [ [ offset>> <alien> ] [ buffer>> handle>> ] bi ] 2dip
     with-bound-buffer ; inline
 
-: with-gpu-data-ptr ( gpu-data-ptr target quot: ( c-ptr -- ) -- )
+: with-gpu-data-ptr ( ..a gpu-data-ptr target quot: ( ..a c-ptr -- ..b ) -- ..b )
     pick buffer-ptr?
     [ with-buffer-ptr ]
     [ [ gl-target 0 glBindBuffer ] dip call ] if ; inline

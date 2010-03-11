@@ -38,10 +38,10 @@ TUPLE: empty-tuple ;
 } [ [ ] swap [ test-unboxing ] curry unit-test ] each
 
 ! A more complicated example
-: impeach-node ( quot: ( node -- ) -- )
+: impeach-node ( quot: ( ..a -- ..b ) -- )
     [ call ] keep impeach-node ; inline recursive
 
-: bleach-node ( quot: ( node -- ) -- )
+: bleach-node ( quot: ( ..a -- ..b ) -- )
     [ bleach-node ] curry [ ] compose impeach-node ; inline recursive
 
 [ ] [ [ [ ] bleach-node ] test-unboxing ] unit-test

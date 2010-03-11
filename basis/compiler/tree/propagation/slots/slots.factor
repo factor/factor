@@ -9,8 +9,6 @@ IN: compiler.tree.propagation.slots
 
 ! Propagation of immutable slots and array lengths
 
-UNION: fixed-length-sequence array byte-array string ;
-
 : sequence-constructor? ( word -- ? )
     { <array> <byte-array> (byte-array) <string> } member-eq? ;
 
@@ -23,9 +21,9 @@ UNION: fixed-length-sequence array byte-array string ;
     } at ;
 
 : propagate-sequence-constructor ( #call word -- infos )
-    [ in-d>> first <sequence-info> ]
-    [ constructor-output-class <class-info> ]
-    bi* value-info-intersect 1array ;
+    [ in-d>> first value-info ]
+    [ constructor-output-class ] bi*
+    <sequence-info> 1array ;
 
 : fold-<tuple-boa> ( values class -- info )
     [ [ literal>> ] map ] dip prefix >tuple
@@ -72,7 +70,6 @@ UNION: fixed-length-sequence array byte-array string ;
 : value-info-slot ( slot info -- info' )
     {
         { [ over 0 = ] [ 2drop fixnum <class-info> ] }
-        { [ 2dup length-accessor? ] [ nip length>> ] }
         { [ dup literal?>> ] [ literal>> literal-info-slot ] }
         [ [ 1 - ] [ slots>> ] bi* ?nth ]
     } cond [ object-info ] unless* ;

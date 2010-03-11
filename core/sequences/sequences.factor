@@ -417,19 +417,19 @@ PRIVATE>
 : map-integers ( len quot exemplar -- newseq )
     [ over ] dip [ [ collect ] keep ] new-like ; inline
 
-: map-as ( ... seq quot: ( ... x -- ... newx ) exemplar -- ... newseq )
+: map-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
     [ (each) ] dip map-integers ; inline
 
-: map ( ... seq quot: ( ... x -- ... newx ) -- ... newseq )
+: map ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     over map-as ; inline
 
-: replicate-as ( ... len quot: ( ... -- ... newx ) exemplar -- ... newseq )
+: replicate-as ( ... len quot: ( ... -- ... newelt ) exemplar -- ... newseq )
     [ [ drop ] prepose ] dip map-integers ; inline
 
-: replicate ( ... len quot: ( ... -- ... newx ) -- ... newseq )
+: replicate ( ... len quot: ( ... -- ... newelt ) -- ... newseq )
     { } replicate-as ; inline
 
-: map! ( ... seq quot: ( ... x -- ... x' ) -- ... seq )
+: map! ( ... seq quot: ( ... elt -- ... newelt ) -- ... seq )
     over [ map-into ] keep ; inline
 
 : accumulate-as ( ... seq identity quot: ( ... prev elt -- ... next ) exemplar -- ... final newseq )
@@ -441,31 +441,31 @@ PRIVATE>
 : accumulate! ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... final seq )
     (accumulate) map! ; inline
 
-: 2each ( ... seq1 seq2 quot: ( ... x1 x2 -- ... ) -- ... )
+: 2each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
     (2each) each-integer ; inline
 
-: 2reverse-each ( ... seq1 seq2 quot: ( ... x1 x2 -- ... ) -- ... )
+: 2reverse-each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
     [ [ <reversed> ] bi@ ] dip 2each ; inline
 
 : 2reduce ( ... seq1 seq2 identity quot: ( ... prev elt1 elt2 -- ... next ) -- ... result )
     [ -rot ] dip 2each ; inline
 
-: 2map-as ( ... seq1 seq2 quot: ( ... x1 x2 -- ... newx ) exemplar -- ... newseq )
+: 2map-as ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) exemplar -- ... newseq )
     [ (2each) ] dip map-integers ; inline
 
-: 2map ( ... seq1 seq2 quot: ( ... x1 x2 -- ... newx ) -- ... newseq )
+: 2map ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) -- ... newseq )
     pick 2map-as ; inline
 
 : 2all? ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... ? )
     (2each) all-integers? ; inline
 
-: 3each ( ... seq1 seq2 seq3 quot: ( ... x1 x2 x3 -- ... ) -- ... )
+: 3each ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... ) -- ... )
     (3each) each-integer ; inline
 
-: 3map-as ( ... seq1 seq2 seq3 quot: ( ... x1 x2 x3 -- ... newx ) exemplar -- ... newseq )
+: 3map-as ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... newelt ) exemplar -- ... newseq )
     [ (3each) ] dip map-integers ; inline
 
-: 3map ( ... seq1 seq2 seq3 quot: ( ... x1 x2 x3 -- ... newx ) -- ... newseq )
+: 3map ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... newelt ) -- ... newseq )
     [ pick ] dip swap 3map-as ; inline
 
 : find-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
@@ -483,7 +483,7 @@ PRIVATE>
 : all? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
     (each) all-integers? ; inline
 
-: push-if ( ... elt quot: ( ... elt -- ... ? ) accum -- ... )
+: push-if ( ..a elt quot: ( ..a elt -- ..b ? ) accum -- ..b )
     [ keep ] dip rot [ push ] [ 2drop ] if ; inline
 
 : selector-for ( quot exemplar -- selector accum )
@@ -498,7 +498,7 @@ PRIVATE>
 : filter ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
     over filter-as ; inline
 
-: push-either ( ... elt quot: ( ... elt -- ... ? ) accum1 accum2 -- ... )
+: push-either ( ..a elt quot: ( ..a elt -- ..b ? ) accum1 accum2 -- ..b )
     [ keep swap ] 2dip ? push ; inline
 
 : 2selector ( quot -- selector accum1 accum2 )
@@ -513,16 +513,16 @@ PRIVATE>
 : collector ( quot -- quot' vec )
     V{ } collector-for ; inline
 
-: produce-as ( ... pred: ( ... -- ... ? ) quot: ( ... -- ... obj ) exemplar -- ... seq )
+: produce-as ( ..a pred: ( ..a -- ..b ? ) quot: ( ..b -- ..a obj ) exemplar -- ..b seq )
     dup [ collector-for [ while ] dip ] curry dip like ; inline
 
-: produce ( ... pred: ( ... -- ... ? ) quot: ( ... -- ... obj ) -- ... seq )
+: produce ( ..a pred: ( ..a -- ..b ? ) quot: ( ..b -- ..a obj ) -- ..b seq )
     { } produce-as ; inline
 
 : follow ( ... obj quot: ( ... prev -- ... result/f ) -- ... seq )
     [ dup ] swap [ keep ] curry produce nip ; inline
 
-: each-index ( ... seq quot: ( ... x i -- ... ) -- ... )
+: each-index ( ... seq quot: ( ... elt index -- ... ) -- ... )
     (each-index) each-integer ; inline
 
 : interleave ( seq between quot -- )
@@ -532,10 +532,10 @@ PRIVATE>
         3bi
     ] if ; inline
 
-: map-index ( ... seq quot: ( ... x i -- ... newx ) -- ... newseq )
+: map-index ( ... seq quot: ( ... elt index -- ... newelt ) -- ... newseq )
     [ dup length iota ] dip 2map ; inline
 
-: reduce-index ( ... seq identity quot: ( ... prev x i -- ... next ) -- ... result )
+: reduce-index ( ... seq identity quot: ( ... prev elt index -- ... next ) -- ... result )
     swapd each-index ; inline
 
 : index ( obj seq -- n )
@@ -877,7 +877,7 @@ PRIVATE>
     [ [ unclip-slice ] dip [ call ] keep ] dip
     compose reduce ; inline
 
-: 2map-reduce ( ..a seq1 seq2 map-quot: ( ..a x1 x2 -- ..b elt ) reduce-quot: ( ..b prev elt -- ..a next ) -- ..a result )
+: 2map-reduce ( ..a seq1 seq2 map-quot: ( ..a elt1 elt2 -- ..b intermediate ) reduce-quot: ( ..b prev intermediate -- ..a next ) -- ..a result )
     [ [ prepare-2map-reduce ] keep ] dip
     compose compose each-integer ; inline
 
@@ -889,10 +889,10 @@ PRIVATE>
 
 PRIVATE>
 
-: map-find ( ... seq quot: ( ... elt -- ... ? ) -- ... result elt )
+: map-find ( ... seq quot: ( ... elt -- ... result/f ) -- ... result elt )
     [ find ] (map-find) ; inline
 
-: map-find-last ( ... seq quot: ( ... elt -- ... ? ) -- ... result elt )
+: map-find-last ( ... seq quot: ( ... elt -- ... result/f ) -- ... result elt )
     [ find-last ] (map-find) ; inline
 
 : unclip-last-slice ( seq -- butlast-slice last )
