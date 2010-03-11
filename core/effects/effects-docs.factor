@@ -44,7 +44,7 @@ HELP: <effect>
     { "out" "a sequence of strings or string–type pairs" }
     { "effect" effect }
 }
-{ $description "Constructs an " { $link effect } " object. Each element of " { $snippet "in" } " and " { $snippet "out" } " must be either a string (which is equivalent to a " { $snippet "name" } " in literal stack effect syntax), or a " { $link pair } " where the first element is a string and the second is either a " { $link class } " or effect (which is equivalent to " { $snippet "name: class" } " or " { $snippet "name: ( nested -- effect )" } " in the literal syntax. If the " { $snippet "out" } " array consists of a single string element " { $snippet "\"*\"" } ", a terminating stack effect will be constructed." }
+{ $description "Constructs an " { $link effect } " object. Each element of " { $snippet "in" } " and " { $snippet "out" } " must be either a string, which is equivalent to a " { $snippet "name" } " in literal stack effect syntax), or a " { $link pair } " where the first element is a string and the second is either a " { $link class } " or effect, which is equivalent to " { $snippet "name: class" } " or " { $snippet "name: ( nested -- effect )" } " in the literal syntax. If the " { $snippet "out" } " array consists of a single string element " { $snippet "\"*\"" } ", a terminating stack effect will be constructed." }
 { $notes "This word cannot construct effects with " { $link "effects-variables" } ". Use " { $link <variable-effect> } " to construct variable stack effects." }
 { $examples
 { $example """USING: effects prettyprint ;
