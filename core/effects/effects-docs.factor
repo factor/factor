@@ -6,8 +6,12 @@ ARTICLE: "effects" "Stack effect declarations"
 { $code "( input1 input2 ... -- output1 ... )" }
 "Stack elements in a stack effect are ordered so that the top of the stack is on the right side. Here is an example:"
 { $synopsis + }
-"Parameters which are quotations can be declared by suffixing the parameter name with " { $snippet ":" } " and then writing a nested stack effect declaration. If the number of inputs or outputs depends on the stack effects of quotation parameters, " { $link "effects-variables" } " can be used to declare this:"
+"Parameters which are quotations can be declared by suffixing the parameter name with " { $snippet ":" } " and then writing a nested stack effect declaration. If the number of inputs or outputs depends on the stack effects of quotation parameters, row variables can be declared:"
+{ $subsection "effects-variables" }
+"Some examples of row-polymorphic combinators:"
 { $synopsis while }
+{ $synopsis if* }
+{ $synopsis each }
 "For words that are not " { $link POSTPONE: inline } ", only the number of inputs and outputs carries semantic meaning, and effect variables are ignored. However, nested quotation declarations are enforced for inline words. Nested quotation declarations are optional for non-recursive inline combinators and only provide better error messages. However, quotation inputs to " { $link POSTPONE: recursive } " combinators must have an effect declared. See " { $link "inference-recursive-combinators" } "."
 $nl
 "In concatenative code, input and output names are for documentation purposes only and certain conventions have been established to make them more descriptive. For code written with " { $link "locals" } ", stack values are bound to local variables named by the stack effect's input parameters."
@@ -27,7 +31,6 @@ $nl
     { { $snippet "loc" } "a screen location specified as a two-element array holding x and y co-ordinates" }
     { { $snippet "dim" } "a screen dimension specified as a two-element array holding width and height values" }
     { { $snippet "*" } "when this symbol appears by itself in the list of outputs, it means the word unconditionally throws an error" }
-    { { $snippet ".." } { "indicates " { $link "effects-variables" } ". only valid as the first input or first output" } }
 }
 "For reflection and metaprogramming, you can use " { $link "syntax-effects" } " to include literal stack effects in your code, or these constructor words to construct stack effect objects at runtime:"
 { $subsections
@@ -35,7 +38,6 @@ $nl
     <terminated-effect>
     <variable-effect>
 }
-$nl
 { $see-also "inference" } ;
 
 HELP: <effect>
@@ -96,11 +98,20 @@ f { "a" "b" } f { "c" } <variable-effect> .""" """(( a b -- c ))""" }
 
 { <effect> <terminated-effect> <variable-effect> } related-words
 
-ARTICLE: "effects-variables" "Stack effect variables"
-{ $link POSTPONE: inline } " combinators can have variable stack effects, depending on the effect of the quotation they call. For example, while " { $link each } " inputs elements of its sequence to its quotation, the quotation can also manipulate values on the stack below the element, as long as it leaves the same number of elements on the stack. This ability is used to implement " { $link reduce } " in terms of " { $snippet "each" } ". This variable stack effect is indicated by starting the list of inputs and outputs with a name starting with " { $snippet ".." } ":"
+ARTICLE: "effects-variables" "Stack effect row variables"
+"The stack of effect of many " { $link POSTPONE: inline } " combinators can have variable stack effects, depending on the effect of the quotation they call. For example, the quotation parameter to " { $link each } " receives an element from the input sequence each time it is called, but it can also manipulate values on the stack below the element as long as it leaves the same number of elements on the stack. (This is how " { $link reduce } " is implemented in terms of " { $snippet "each" } ".) The stack effect of an " { $snippet "each" } " expression thus depends on the stack effect of its input quotation:"
+{ $example
+ """USING: io sequences stack-checker ;
+[ [ write ] each ] infer."""
+"""( x -- )""" }
+{ $example
+"""USING: sequences stack-checker ;
+[ [ append ] each ] infer."""
+"""( x x -- x )""" }
+"This feature is referred to as row polymorphism. Row-polymorphic combinators are declared by including row variables in their stack effect, which are indicated by names starting with " { $snippet ".." } ":"
 { $synopsis each }
-"In combinators with multiple quotation inputs, the number of inputs or outputs represented by a particular " { $snippet ".." } " name must match. For example, the predicate for a " { $link while } " loop can take an arbitrary number of inputs and leave an arbitrary number of outputs on the stack in addition to the predicate result; however, for the loop to leave the stack balanced, the body of the while loop must consume all of the predicate's outputs and leave a number of its own outputs equal to the initial number of stack values before the predicate was called. This is expressed with the following stack effect:"
-{ $synopsis while }
+"Using the same variable name in both the inputs and outputs (in the above case of " { $snippet "each" } ", " { $snippet "..." } ") indicates that the number of additional inputs and outputs must be the same. Using different variable names indicates that they can be independent. In combinators with multiple quotation inputs, the number of inputs or outputs represented by a particular " { $snippet ".." } " name must match among all of the quotations. For example, the branches of " { $link if* } " can take a different number of inputs from outputs, as long as they both have the same stack height. The true branch receives the test value as an added input. This is declared as follows:"
+{ $synopsis if* }
 "Stack effect variables can only occur as the first input or first output of a stack effect; names starting in " { $snippet ".." } " cause a syntax error if they occur elsewhere in the effect. For words that are not " { $link POSTPONE: inline } ", effect variables are currently ignored by the stack checker." ;
 
 ABOUT: "effects"
