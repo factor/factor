@@ -141,7 +141,7 @@ TUPLE: depends-on-final class ;
     [ \ depends-on-final add-conditional-dependency ] bi ;
 
 M: depends-on-final satisfied?
-    class>> final-class? ;
+    class>> { [ class? ] [ final-class? ] } 1&& ;
 
 : init-dependencies ( -- )
     H{ } clone dependencies set
