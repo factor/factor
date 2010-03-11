@@ -9,23 +9,19 @@ IN: furnace.recaptcha.example
 
 TUPLE: recaptcha-app < dispatcher recaptcha ;
 
-: recaptcha-db ( -- obj ) "recaptcha-example" <sqlite-db> ;
+: recaptcha-db ( -- obj ) "resource:recaptcha-example" <sqlite-db> ;
 
 : <recaptcha-challenge> ( -- obj )
     <page-action>
-        [
-            begin-conversation
-            validate-recaptcha
-            recaptcha-valid? cget
-            "?good" "?bad" ? >url <continue-conversation>
-        ] >>submit
+        [ validate-recaptcha ] >>validate
+        [ "?good" >url <redirect> ] >>submit
         { recaptcha-app "example" } >>template ;
 
 : <recaptcha-app> ( -- obj )
     \ recaptcha-app new-dispatcher
         <recaptcha-challenge> "" add-responder
         <recaptcha>
-        "concatenative.org" >>domain
-        "6LeJWQgAAAAAAFlYV7SuBClE9uSpGtV_ZS-qVON7" >>public-key
-        "6LeJWQgAAAAAALh-XJgSSQ6xKygRgJ8-029Ip2Xv" >>private-key
+            "concatenative.org" >>domain
+            "6LeJWQgAAAAAAFlYV7SuBClE9uSpGtV_ZS-qVON7" >>public-key
+            "6LeJWQgAAAAAALh-XJgSSQ6xKygRgJ8-029Ip2Xv" >>private-key
         recaptcha-db <alloy> ;
