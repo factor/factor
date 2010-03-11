@@ -10,6 +10,13 @@ IN: effects.tests
 [ 2 ] [ (( a b -- c )) in>> length ] unit-test
 [ 1 ] [ (( a b -- c )) out>> length ] unit-test
 
+[ t ] [ (( a b -- c )) (( ... a b -- ... c )) effect<= ] unit-test
+[ t ] [ (( b -- )) (( ... a b -- ... c )) effect<= ] unit-test
+[ f ] [ (( ... a b -- ... c )) (( a b -- c )) effect<= ] unit-test
+[ f ] [ (( ... b -- ... )) (( a b -- c )) effect<= ] unit-test
+[ f ] [ (( a b -- c )) (( ... a b -- c )) effect<= ] unit-test
+[ f ] [ (( a b -- c )) (( ..x a b -- ..y c )) effect<= ] unit-test
+
 [ "(( object -- object ))" ] [ { f } { f } <effect> unparse ] unit-test
 [ "(( a b -- c d ))" ] [ { "a" "b" } { "c" "d" } <effect> unparse ] unit-test
 [ "(( -- c d ))" ] [ { } { "c" "d" } <effect> unparse ] unit-test
