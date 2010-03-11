@@ -7,8 +7,8 @@ IN: effects.parser
 DEFER: parse-effect
 
 ERROR: bad-effect ;
-ERROR: invalid-effect-variable ;
-ERROR: effect-variable-can't-have-type ;
+ERROR: invalid-row-variable ;
+ERROR: row-variable-can't-have-type ;
 ERROR: stack-effect-omits-dashes ;
 
 SYMBOL: effect-var
@@ -17,12 +17,12 @@ SYMBOL: effect-var
 : end-token? ( end token -- token ? ) [ nip ] [ = ] 2bi ; inline
 : effect-opener? ( token -- token ? ) dup { f "(" "((" "--" } member? ; inline
 : effect-closer? ( token -- token ? ) dup { ")" "))" } member? ; inline
-: effect-variable? ( token -- token' ? ) ".." ?head ; inline
+: row-variable? ( token -- token' ? ) ".." ?head ; inline
 
 : parse-effect-var ( first? var name -- var )
     nip
-    [ ":" ?tail [ effect-variable-can't-have-type ] when ] curry
-    [ invalid-effect-variable ] if ;
+    [ ":" ?tail [ row-variable-can't-have-type ] when ] curry
+    [ invalid-row-variable ] if ;
 
 : parse-effect-value ( token -- value )
     ":" ?tail [
@@ -39,7 +39,7 @@ PRIVATE>
         { [ end-token? ] [ drop nip f ] }
         { [ effect-opener? ] [ bad-effect ] }
         { [ effect-closer? ] [ stack-effect-omits-dashes ] }
-        { [ effect-variable? ] [ parse-effect-var t ] }
+        { [ row-variable? ] [ parse-effect-var t ] }
         [ [ drop ] 2dip parse-effect-value , t ]
     } cond ;
 
