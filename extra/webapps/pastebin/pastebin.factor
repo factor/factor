@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov
+! Copyright (C) 2007, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces assocs sorting sequences kernel accessors
 hashtables db.types db.tuples db combinators
@@ -17,7 +17,9 @@ furnace.redirection
 furnace.auth
 furnace.auth.login
 furnace.boilerplate
-furnace.syndication ;
+furnace.recaptcha
+furnace.syndication
+furnace.conversations ;
 IN: webapps.pastebin
 
 TUPLE: pastebin < dispatcher ;
@@ -156,8 +158,8 @@ M: annotation entity-url
         { "author" [ v-one-line ] }
         { "mode" [ v-mode ] }
         { "contents" [ v-required ] }
-        { "captcha" [ v-captcha ] }
-    } validate-params ;
+    } validate-params
+    validate-recaptcha ;
 
 : deposit-entity-slots ( tuple -- )
     now >>date
