@@ -24,45 +24,41 @@ IN: stack-checker.row-polymorphism
     meta-d length input-count get
     [ with-inner-d ] 2dip (effect-here) ; inline
 
-:: (check-variable) ( actual-count declared-count variable vars -- difference ? )
-    actual-count declared-count -
-    variable [
-        variable vars at* nip
-        [ variable vars at -     ]
-        [ variable vars set-at 0 ] if
-        t
-    ] [ dup 0 <= ] if ;
+: (diff-variable) ( diff variable vars -- diff' )
+    [ at* nip ] [ '[ _ _ at - ] ] [ '[ _ _ set-at 0 ] ] 2tri if ;
+
+: (check-variable) ( actual-count declared-count variable vars -- diff ? )
+    [ - ] 2dip dupd '[ _ _ (diff-variable) t ] [ dup 0 <= ] if ;
 
 : adjust-variable ( diff var vars -- )
-    pick 0 >=
-    [ at+ ]
-    [ 3drop ] if ; inline
+    pick 0 >= [ at+ ] [ 3drop ] if ; inline
 
 :: check-variable ( vars declared actual slot var-slot -- diff ok? var )
     actual declared [ slot call length ] bi@ declared var-slot call
     [ vars (check-variable) ] keep ; inline
 
 :: unify-variables ( in-diff in-ok? in-var out-diff out-ok? out-var vars -- ? )
-    { [ in-ok? ] [ out-ok? ] [ in-diff out-diff = ] } 0&&
-    dup [
+    { [ in-ok? ] [ out-ok? ] [ in-diff out-diff = ] } 0&& dup [
         in-var  [ in-diff  swap vars adjust-variable ] when*
         out-var [ out-diff swap vars adjust-variable ] when*
     ] when ;
 
+: (check-variables) ( vars declared actual -- ? )
+    [ [ in>>  ] [ in-var>>  ] check-variable ]
+    [ [ out>> ] [ out-var>> ] check-variable ]
+    [ 2drop ] 3tri unify-variables ;
+
 : check-variables ( vars declared actual -- ? )
-    dup terminated?>> [ 3drop t ] [
-        [ [ in>>  ] [ in-var>>  ] check-variable ]
-        [ [ out>> ] [ out-var>> ] check-variable ]
-        [ 2drop ] 3tri unify-variables
-    ] if ;
+    dup terminated?>> [ 3drop t ] [ (check-variables) ] if ;
+
+: combinator-branches-effects ( branches -- quots declareds actuals )
+    [ [ known>callable ] { } map-as ]
+    [ [ effect>> ] { } map-as ]
+    [ [ actual>> ] { } map-as ] tri ;
 
 : combinator-unbalanced-branches-error ( known -- * )
-    [ word>> ] [
-        branches>> <reversed>
-        [ [ known>callable ] { } map-as ]
-        [ [ effect>> ] { } map-as ]
-        [ [ actual>> ] { } map-as ] tri
-    ] bi unbalanced-branches-error ;
+    [ word>> ] [ branches>> <reversed> combinator-branches-effects ] bi
+    unbalanced-branches-error ;
 
 : check-declared-effect ( known effect -- )
     [ >>actual ] keep
