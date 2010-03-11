@@ -54,16 +54,16 @@ M: dlist-node node-value obj>> ;
 : set-front-to-back ( dlist -- )
     dup front>> [ dup back>> >>front ] unless drop ; inline
 
-: (dlist-find-node) ( dlist-node quot: ( node -- ? ) -- node/f ? )
+: (dlist-find-node) ( ... dlist-node quot: ( ... node -- ... ? ) -- ... node/f ? )
     over [
         [ call ] 2keep rot
         [ drop t ] [ [ next>> ] dip (dlist-find-node) ] if
     ] [ 2drop f f ] if ; inline recursive
 
-: dlist-find-node ( dlist quot -- node/f ? )
+: dlist-find-node ( ... dlist quot: ( ... node -- ... ? ) -- ... node/f ? )
     [ front>> ] dip (dlist-find-node) ; inline
 
-: dlist-each-node ( dlist quot -- )
+: dlist-each-node ( ... dlist quot: ( ... node -- ... ) -- ... )
     '[ @ f ] dlist-find-node 2drop ; inline
 
 : unlink-node ( dlist-node -- )
@@ -114,10 +114,10 @@ M: dlist pop-back* ( dlist -- )
     ] keep
     normalize-front ;
 
-: dlist-find ( dlist quot -- obj/f ? )
+: dlist-find ( ... dlist quot: ( ... value -- ... ? ) -- ... obj/f ? )
     '[ obj>> @ ] dlist-find-node [ obj>> t ] [ drop f f ] if ; inline
 
-: dlist-any? ( dlist quot -- ? )
+: dlist-any? ( ... dlist quot: ( ... value -- ... ? ) -- ... ? )
     dlist-find nip ; inline
 
 M: dlist deque-member? ( value dlist -- ? )
@@ -130,7 +130,7 @@ M: dlist delete-node ( dlist-node dlist -- )
         [ drop unlink-node ]
     } cond ;
 
-: delete-node-if* ( dlist quot -- obj/f ? )
+: delete-node-if* ( ... dlist quot: ( ... value -- ... ? ) -- ... obj/f ? )
     dupd dlist-find-node [
         dup [
             [ swap delete-node ] keep obj>> t
@@ -141,7 +141,7 @@ M: dlist delete-node ( dlist-node dlist -- )
         2drop f f
     ] if ; inline
 
-: delete-node-if ( dlist quot -- obj/f )
+: delete-node-if ( ... dlist quot: ( ... value -- ... ? ) -- ... obj/f )
     '[ obj>> @ ] delete-node-if* drop ; inline
 
 M: dlist clear-deque ( dlist -- )
@@ -149,7 +149,7 @@ M: dlist clear-deque ( dlist -- )
     f >>back
     drop ;
 
-: dlist-each ( dlist quot -- )
+: dlist-each ( ... dlist quot: ( ... value -- ... ) -- ... )
     '[ obj>> @ ] dlist-each-node ; inline
 
 : dlist>seq ( dlist -- seq )
@@ -157,7 +157,7 @@ M: dlist clear-deque ( dlist -- )
 
 : 1dlist ( obj -- dlist ) <dlist> [ push-front ] keep ;
 
-: dlist-filter ( dlist quot -- dlist' )
+: dlist-filter ( ... dlist quot: ( ... value -- ... ? ) -- ... dlist' )
     over [ '[ dup obj>> @ [ drop ] [ _ delete-node ] if ] dlist-each-node ] keep ; inline
 
 M: dlist clone

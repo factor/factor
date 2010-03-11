@@ -32,7 +32,7 @@ IN: compiler.tests.curry
     compile-call
 ] unit-test
 
-: foobar ( quot: ( -- ) -- )
+: foobar ( quot: ( ..a -- ..b ) -- )
     [ call ] keep swap [ foobar ] [ drop ] if ; inline recursive
 
 [ ] [ [ [ f ] foobar ] compile-call ] unit-test

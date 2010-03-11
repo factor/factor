@@ -11,6 +11,7 @@ SYMBOL: terminated?
 
 ! Number of inputs current word expects from the stack
 SYMBOL: input-count
+SYMBOL: inner-d-index
 
 DEFER: commit-literals
 
@@ -46,4 +47,5 @@ SYMBOL: literals
     terminated? off
     V{ } clone \ meta-d set
     V{ } clone literals set
-    0 input-count set ;
+    0 input-count set
+    0 inner-d-index set ;

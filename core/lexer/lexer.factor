@@ -100,10 +100,10 @@ PREDICATE: unexpected-eof < unexpected
 : (each-token) ( end quot -- pred quot )
     [ [ [ scan dup ] ] dip [ = not ] curry [ [ f ] if* ] curry compose ] dip ; inline
 
-: each-token ( end quot -- )
+: each-token ( ... end quot: ( ... token -- ... ) -- ... )
     (each-token) while drop ; inline
 
-: map-tokens ( end quot -- seq )
+: map-tokens ( ... end quot: ( ... token -- ... elt ) -- ... seq )
     (each-token) produce nip ; inline
 
 : parse-tokens ( end -- seq )
