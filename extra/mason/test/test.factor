@@ -1,11 +1,12 @@
-! Copyright (C) 2008, 2009 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs benchmark bootstrap.stage2 compiler.errors
-source-files.errors generic help.html help.lint io.directories
-io.encodings.utf8 io.files kernel mason.common math namespaces
-prettyprint sequences sets sorting tools.test tools.time
-words system io tools.errors vocabs.hierarchy vocabs.errors
-vocabs.refresh locals ;
+USING: accessors assocs benchmark bootstrap.stage2
+compiler.errors source-files.errors generic help.html help.lint
+io.directories io.encodings.utf8 io.files kernel mason.common
+math namespaces prettyprint sequences sets sorting tools.test
+tools.time words system io tools.errors vocabs vocabs.files
+vocabs.hierarchy vocabs.errors vocabs.refresh locals
+source-files compiler.units ;
 IN: mason.test
 
 : do-load ( -- )
@@ -31,6 +32,12 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
     test-all-vocabs-file
     test-all-errors-file
     do-step ;
+
+: cleanup-tests ( -- )
+    ! Free up some code heap space
+    [
+        vocabs [ vocab-tests [ forget-source ] each ] each
+    ] with-compilation-unit ;
 
 : do-help-lint ( -- )
     help-lint-all lint-failures get values
@@ -67,6 +74,7 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
         [ do-load ] benchmark load-time-file to-file
         [ generate-help ] benchmark html-help-time-file to-file
         [ do-tests ] benchmark test-time-file to-file
+        cleanup-tests
         [ do-help-lint ] benchmark help-lint-time-file to-file
         [ do-benchmarks ] benchmark benchmark-time-file to-file
         do-compile-errors
