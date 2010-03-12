@@ -74,3 +74,12 @@ HELP: considered
 { $description "When called after a call to " { $link find-path } ", return a list of nodes "
   "which have been examined during the A* exploration."
 } ;
+
+ARTICLE: "astar" "A* algorithm"
+"The " { $vocab-link "astar" } " vocabulary implements a graph search algorithm for finding the least-cost path from one node to another." $nl
+"Make an A* object:"
+{ $subsections <astar> }
+"Find a path between nodes:"
+{ $subsections find-path } ;
+
+ABOUT: "astar"
