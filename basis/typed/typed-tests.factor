@@ -1,6 +1,6 @@
 USING: accessors effects eval kernel layouts math namespaces
 quotations tools.test typed words words.symbol
-compiler.tree.debugger prettyprint ;
+compiler.tree.debugger prettyprint definitions compiler.units ;
 IN: typed.tests
 
 TYPED: f+ ( a: float b: float -- c: float )
@@ -149,3 +149,12 @@ SYMBOL: a-symbol
         a-symbol get
     ] with-variable
 ] unit-test
+
+! Forgetting an unboxed final class should work
+TUPLE: forget-class { x read-only } ; final
+
+TYPED: forget-fail ( a: forget-class -- ) drop ;
+
+[ ] [ [ \ forget-class forget ] with-compilation-unit ] unit-test
+
+[ ] [ [ \ forget-fail forget ] with-compilation-unit ] unit-test
