@@ -14,9 +14,6 @@ HELP: <recaptcha>
 HELP: recaptcha-error
 { $var-description "Set to the error string returned by the recaptcha server." } ;
 
-HELP: recaptcha-valid?
-{ $var-description "Set to " { $link t } " if the user solved the last recaptcha correctly." } ;
-
 HELP: validate-recaptcha
 { $description "Validates a recaptcha using the recaptcha web service API." } ;
 
@@ -45,14 +42,9 @@ ARTICLE: "furnace.recaptcha" "Recaptcha support for Furnace"
 { $subsections <recaptcha> }
 "Validating recaptcha:"
 { $subsections validate-recaptcha }
-"Symbols set after validation:"
-{ $subsections
-    recaptcha-valid?
-    recaptcha-error
-}
+"Symbol set after validation:"
+{ $subsections recaptcha-error }
 "An example:"
-{ $subsections
-    "recaptcha-example"
-} ;
+{ $subsections "recaptcha-example" } ;
 
 ABOUT: "furnace.recaptcha"
