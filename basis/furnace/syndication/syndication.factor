@@ -1,8 +1,8 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences fry combinators syndication
 http.server.responses http.server.redirection furnace.actions
-furnace.utilities ;
+furnace.utilities io.encodings.utf8 ;
 IN: furnace.syndication
 
 GENERIC: feed-entry-title ( object -- string )
