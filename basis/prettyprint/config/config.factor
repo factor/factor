@@ -28,7 +28,7 @@ string-limit? on
         2 nesting-limit set
         string-limit? on
         boa-tuples? on
-        c-object-pointers? on
+        c-object-pointers? off
         call
     ] with-scope ; inline
 
