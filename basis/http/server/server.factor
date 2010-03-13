@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2009 Slava Pestov.
+! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences arrays namespaces splitting
 vocabs.loader destructors assocs debugger continuations
@@ -101,8 +101,10 @@ GENERIC: write-full-response ( request response -- )
     tri ;
 
 : unparse-content-type ( request -- content-type )
-    [ content-type>> "application/octet-stream" or ] [ content-charset>> ] bi
-    dup binary eq? [ drop ] [ encoding>name "; charset=" glue ] if ;
+    [ content-type>> ] [ content-charset>> ] bi
+    over "text/" head? [ "UTF-8" or ] when
+    [ "application/octet-stream" or ] dip
+    [ "; charset=" glue ] when* ;
 
 : ensure-domain ( cookie -- cookie )
     [
@@ -133,7 +135,7 @@ M: response write-response ( respose -- )
 M: response write-full-response ( request response -- )
     dup write-response
     swap method>> "HEAD" = [
-        [ content-charset>> encode-output ]
+        [ content-encoding>> encode-output ]
         [ write-response-body ]
         bi
     ] unless drop ;
