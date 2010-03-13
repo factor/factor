@@ -1,11 +1,11 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math math.parser namespaces make
 sequences strings splitting calendar continuations accessors vectors
 math.order hashtables byte-arrays destructors
 io io.sockets io.streams.string io.files io.timeouts
 io.pathnames io.encodings io.encodings.string io.encodings.ascii
-io.encodings.utf8 io.encodings.binary io.crlf
+io.encodings.utf8 io.encodings.binary io.encodings.iana io.crlf
 io.streams.duplex fry ascii urls urls.encoding present locals
 http http.parsers http.client.post-data ;
 IN: http.client
@@ -56,8 +56,8 @@ ERROR: too-many-redirects ;
     dup "set-cookie" header parse-set-cookie >>cookies
     dup "content-type" header [
         parse-content-type
-        [ >>content-type ]
-        [ >>content-charset ] bi*
+        [ >>content-type ] [ >>content-charset ] bi*
+        dup content-charset>> name>encoding >>content-encoding
     ] when* ;
 
 : read-response ( -- response )
@@ -149,7 +149,7 @@ ERROR: download-failed response ;
 
 : http-request ( request -- response data )
     [ [ % ] with-http-request ] B{ } make
-    over content-charset>> decode check-response-with-body ;
+    over content-encoding>> decode check-response-with-body ;
 
 : <get-request> ( url -- request )
     "GET" <client-request> ;

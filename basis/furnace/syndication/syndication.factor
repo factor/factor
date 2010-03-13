@@ -35,7 +35,9 @@ M: object >entry
     ] map ;
 
 : <feed-content> ( body -- response )
-    feed>xml "application/atom+xml" <content> ;
+    feed>xml "application/atom+xml" <content>
+    "UTF-8" >>content-charset
+    utf8 >>content-encoding ;
 
 TUPLE: feed-action < action title url entries ;
 
