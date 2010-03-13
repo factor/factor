@@ -26,6 +26,7 @@ http.server.remapping
 html.templates
 html.streams
 html
+mime.types
 xml.writer ;
 FROM: mime.multipart => parse-multipart ;
 IN: http.server
@@ -102,7 +103,7 @@ GENERIC: write-full-response ( request response -- )
 
 : unparse-content-type ( request -- content-type )
     [ content-type>> ] [ content-charset>> ] bi
-    over "text/" head? [ "UTF-8" or ] when
+    over mime-type-encoding encoding>name or
     [ "application/octet-stream" or ] dip
     [ "; charset=" glue ] when* ;
 
