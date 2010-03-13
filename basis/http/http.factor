@@ -5,7 +5,7 @@ sequences splitting sorting sets strings vectors hashtables
 quotations arrays byte-arrays math.parser calendar
 calendar.format present urls fry io io.encodings
 io.encodings.iana io.encodings.binary io.encodings.utf8 io.crlf
-ascii io.encodings.8-bit.latin1 http.parsers base64 ;
+ascii io.encodings.8-bit.latin1 http.parsers base64 mime.types ;
 IN: http
 
 CONSTANT: max-redirects 10
@@ -223,4 +223,4 @@ TUPLE: post-data data params content-type content-encoding ;
 : parse-content-type ( content-type -- type encoding )
     ";" split1
     parse-content-type-attributes "charset" swap at
-    [ dup "text/" head? "UTF-8" and ] unless* ;
+    [ dup mime-type-encoding encoding>name ] unless* ;
