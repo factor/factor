@@ -46,7 +46,7 @@ IN: windows.offscreen
         ubyte-components >>component-type
         t >>upside-down? ;
 
-: with-memory-dc ( quot: ( hDC -- ) -- )
+: with-memory-dc ( ..a quot: ( ..a hDC -- ..b ) -- ..b )
     [ [ f CreateCompatibleDC &DeleteDC ] dip call ] with-destructors ; inline
 
 :: make-bitmap-image ( dim dc quot -- image )
