@@ -7,7 +7,7 @@ io io.sockets io.streams.string io.files io.timeouts
 io.pathnames io.encodings io.encodings.string io.encodings.ascii
 io.encodings.utf8 io.encodings.binary io.encodings.iana io.crlf
 io.streams.duplex fry ascii urls urls.encoding present locals
-http http.parsers http.client.post-data ;
+http http.parsers http.client.post-data mime.types ;
 IN: http.client
 
 ERROR: too-many-redirects ;
@@ -51,13 +51,18 @@ ERROR: too-many-redirects ;
     read-crlf parse-response-line first3
     [ >>version ] [ >>code ] [ >>message ] tri* ;
 
+: detect-encoding ( response -- encoding )
+    [ content-charset>> name>encoding ]
+    [ content-type>> mime-type-encoding ] bi
+    or ;
+
 : read-response-header ( response -- response )
     read-header >>header
     dup "set-cookie" header parse-set-cookie >>cookies
     dup "content-type" header [
         parse-content-type
         [ >>content-type ] [ >>content-charset ] bi*
-        dup content-charset>> name>encoding >>content-encoding
+        dup detect-encoding >>content-encoding
     ] when* ;
 
 : read-response ( -- response )
