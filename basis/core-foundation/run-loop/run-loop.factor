@@ -106,11 +106,11 @@ TUPLE: run-loop fds sources timers ;
     nano-count - 1,000 /f system-micros + ;
 
 : reset-timer ( timer -- )
-    yield {
-        { [ run-queue deque-empty? not ] [ yield system-micros (reset-timer) ] }
-        { [ sleep-queue heap-empty? ] [ system-micros 1,000,000 + (reset-timer) ] }
-        [ sleep-queue heap-peek nip nano-count>micros (reset-timer) ]
-    } cond ;
+    {
+        { [ run-queue deque-empty? not ] [ system-micros ] }
+        { [ sleep-queue heap-empty? not ] [ sleep-queue heap-peek nip nano-count>micros ] }
+        [ system-micros 1,000,000 + ]
+    } cond (reset-timer) ;
 
 PRIVATE>
 
