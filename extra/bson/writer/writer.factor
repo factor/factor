@@ -25,10 +25,10 @@ TYPED: with-length ( quot -- bytes-written: integer start-index: integer )
     [ [ B{ 0 0 0 0 } write ] prepose with-length ] dip swap
     [ call output-stream get underlying>> ] dip set-alien-unsigned-4 ; inline
 
-: with-length-prefix ( quot: ( -- ) -- )
+: with-length-prefix ( quot: ( .. -- .. ) -- )
     [ ] (with-length-prefix) ; inline
     
-: with-length-prefix-excl ( quot: ( -- ) -- )
+: with-length-prefix-excl ( quot: ( .. -- .. ) -- )
     [ INT32-SIZE - ] (with-length-prefix) ; inline
     
 <PRIVATE
