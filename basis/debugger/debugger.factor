@@ -1,15 +1,15 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: slots alien.c-types arrays definitions generic hashtables
-summary io kernel math namespaces make prettyprint prettyprint.config
-sequences assocs sequences.private strings io.styles io.pathnames
-vectors words system splitting math.parser classes.mixin classes.tuple
-continuations continuations.private combinators generic.math
-classes.builtin classes compiler.units generic.standard generic.single
-vocabs init kernel.private io.encodings accessors math.order destructors
-source-files parser classes.tuple.parser effects.parser lexer
-generic.parser strings.parser vocabs.loader vocabs.parser
-source-files.errors ;
+USING: slots alien.c-types alien.parser arrays definitions generic
+hashtables summary io kernel math namespaces make prettyprint
+prettyprint.config sequences assocs sequences.private strings
+io.styles io.pathnames vectors words system splitting math.parser
+classes.mixin classes.tuple continuations continuations.private
+combinators generic.math classes.builtin classes compiler.units
+generic.standard generic.single vocabs init kernel.private
+io.encodings accessors math.order destructors source-files parser
+classes.tuple.parser effects.parser lexer generic.parser strings.parser
+vocabs.loader vocabs.parser source-files.errors ;
 IN: debugger
 
 GENERIC: error-help ( error -- topic )
@@ -348,6 +348,9 @@ M: wrong-values summary drop "Quotation's stack effect does not match call site"
 M: stack-effect-omits-dashes summary drop "Stack effect must contain “--”" ;
 
 M: no-c-type summary name>> unparse "“" "” is not a C type" surround ;
+
+M: *-in-c-type-name summary
+    name>> "Cannot define a C type “" "” that ends with an asterisk (*)" surround ;
 
 {
     { [ os windows? ] [ "debugger.windows" require ] }
