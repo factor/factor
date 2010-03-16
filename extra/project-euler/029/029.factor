@@ -29,7 +29,7 @@ IN: project-euler.029
 ! --------
 
 : euler029 ( -- answer )
-    2 100 [a,b] dup [ ^ ] cartesian-map concat prune length ;
+    2 100 [a,b] dup [ ^ ] cartesian-map concat members length ;
 
 ! [ euler029 ] 100 ave-time
 ! 704 ms ave run time - 28.07 SD (100 trials)

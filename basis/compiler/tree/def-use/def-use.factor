@@ -6,6 +6,8 @@ stack-checker.state
 stack-checker.branches
 compiler.tree
 compiler.tree.combinators ;
+FROM: namespaces => set ;
+FROM: sets => members ;
 IN: compiler.tree.def-use
 
 SYMBOL: def-use
@@ -42,7 +44,7 @@ GENERIC: node-uses-values ( node -- values )
 
 M: #introduce node-uses-values drop f ;
 M: #push node-uses-values drop f ;
-M: #phi node-uses-values phi-in-d>> concat remove-bottom prune ;
+M: #phi node-uses-values phi-in-d>> concat remove-bottom members ;
 M: #declare node-uses-values drop f ;
 M: #terminate node-uses-values [ in-d>> ] [ in-r>> ] bi append ;
 M: #shuffle node-uses-values [ in-d>> ] [ in-r>> ] bi append ;

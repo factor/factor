@@ -27,7 +27,7 @@ ERROR: bad-class name ;
     [ [ simple ] keep ] H{ } map>assoc ;
 
 MEMO: simple-script-table ( -- table )
-    script-table interval-values prune simple-table ;
+    script-table interval-values members simple-table ;
 
 MEMO: simple-category-table ( -- table )
     categories simple-table ;

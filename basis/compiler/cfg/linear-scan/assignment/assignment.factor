@@ -13,6 +13,7 @@ compiler.cfg.linearization.order
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals ;
+FROM: namespaces => set ;
 IN: compiler.cfg.linear-scan.assignment
 
 ! This contains both active and inactive intervals; any interval

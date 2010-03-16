@@ -8,6 +8,7 @@ prettyprint.stylesheet quotations see sequences sets slots
 sorting splitting strings vectors vocabs vocabs.loader words
 words.symbol ;
 FROM: prettyprint.sections => with-pprint ;
+FROM: namespaces => set ;
 IN: help.markup
 
 PREDICATE: simple-element < array
@@ -441,7 +442,7 @@ M: array elements*
 : elements ( elt-type element -- seq ) [ elements* ] { } make ;
 
 : collect-elements ( element seq -- elements )
-    swap '[ _ elements [ rest ] map concat ] map concat prune ;
+    swap '[ _ elements [ rest ] map concat ] gather ;
 
 : <$link> ( topic -- element )
     1array \ $link prefix ;
