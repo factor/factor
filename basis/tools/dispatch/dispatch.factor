@@ -17,7 +17,7 @@ SYMBOL: last-dispatch-stats
         { "Tuple check count" [ pic-tuple-count>> ] }
     } object-table. ;
 
-: collect-dispatch-stats ( quot -- dispatch-stats )
+: collect-dispatch-stats ( quot -- dispatch-statistics )
     reset-dispatch-stats
     call
     dispatch-stats dispatch-statistics memory>struct ; inline
