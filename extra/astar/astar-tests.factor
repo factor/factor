@@ -4,14 +4,16 @@ USING: arrays assocs astar combinators hashtables kernel literals math math.func
 math.vectors sequences sorting splitting strings tools.test ;
 IN: astar.tests
 
-<<
-
 ! Use a 10x9 maze (see below) to try to go from s to e, f or g.
 ! X means that a position is unreachable.
 ! The costs model is:
 !   - going up costs 5 points
 !   - going down costs 1 point
 !   - going left or right costs 2 points
+
+<<
+
+TUPLE: maze < astar ;
 
 : reachable? ( pos -- ? )
     first2 [ 2 * 5 + ] [ 2 + ] bi* $[
@@ -28,20 +30,21 @@ IN: astar.tests
   8  X X X X X X X X X X"
         "\n" split ] nth nth CHAR: X = not ;
 
-: neighbours ( pos -- neighbours )
-     first2
-     { [ 1 + 2array ] [ 1 - 2array ] [ [ 1 + ] dip 2array ] [ [ 1 - ] dip 2array ] } 2cleave
-     4array
-     [ reachable? ] filter ;
+M: maze neighbours
+    drop
+    first2
+    { [ 1 + 2array ] [ 1 - 2array ] [ [ 1 + ] dip 2array ] [ [ 1 - ] dip 2array ] } 2cleave
+    4array
+    [ reachable? ] filter ;
 
-: heuristic ( from to -- cost )
-    v- [ abs ] [ + ] map-reduce ;
+M: maze heuristic
+    drop v- [ abs ] [ + ] map-reduce ;
 
-: cost ( from to -- cost )
-    2dup [ first ] bi@ = [ [ second ] bi@ > 1 5 ? ] [ 2drop 2 ] if ;
+M: maze cost
+    drop 2dup [ first ] bi@ = [ [ second ] bi@ > 1 5 ? ] [ 2drop 2 ] if ;
 
 : test1 ( to -- path considered )
-    { 1 1 } swap [ neighbours ] [ cost ] [ heuristic ] <astar> [ find-path ] [ considered ] bi ;
+    { 1 1 } swap maze new [ find-path ] [ considered ] bi ;
 >>
 
 ! Existing path from s to f
@@ -73,8 +76,6 @@ IN: astar.tests
 ! Non-existing path from s to g -- all positions must have been considered
 [ f 26 ] [ { 1 7 } test1 length ] unit-test
 
-<<
-
 ! Look for a path between A and C. The best path is A --> D --> C. C will be placed
 ! in the open set early because B will be examined first. This checks that the evaluation
 ! of C is correctly replaced in the open set.
@@ -91,6 +92,10 @@ IN: astar.tests
 !
 !     A ---> D ---------> E ---> F
 !       (2)       (1)       (1)
+
+<<
+
+! In this version, we will use the quotations-aware version through <astar>.
 
 : n ( pos -- neighbours )
     $[ { "ABD" "BC" "C" "DCE" "ECF" } [ unclip swap 2array ] map >hashtable ] at ;
