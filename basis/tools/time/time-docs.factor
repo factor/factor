@@ -32,6 +32,6 @@ HELP: collect-gc-events
 { $notes "The " { $link time } " combinator automatically calls this combinator." } ;
 
 HELP: collect-dispatch-stats
-{ $values { "quot" quotation } { "dispatch-stats" dispatch-stats } }
-{ $description "Calls the quotation and outputs a " { $link dispatch-stats } " instance." }
+{ $values { "quot" quotation } { "dispatch-statistics" dispatch-statistics } }
+{ $description "Calls the quotation and outputs a " { $link dispatch-statistics } " instance." }
 { $notes "The " { $link time } " combinator automatically calls this combinator." } ;
