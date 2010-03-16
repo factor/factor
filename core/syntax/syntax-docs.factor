@@ -189,6 +189,10 @@ ARTICLE: "syntax-hashtables" "Hashtable syntax"
 { $subsections POSTPONE: H{ }
 "Hashtables are documented in " { $link "hashtables" } "." ;
 
+ARTICLE: "syntax-hash-sets" "Hash set syntax"
+{ $subsections POSTPONE: HS{ }
+"Hashtables are documented in " { $link "hash-sets" } "." ;
+
 ARTICLE: "syntax-tuples" "Tuple syntax"
 { $subsections POSTPONE: T{ }
 "Tuples are documented in " { $link "tuples" } "."  ;
@@ -229,6 +233,7 @@ $nl
     "syntax-vectors"
     "syntax-sbufs"
     "syntax-hashtables"
+    "syntax-hash-sets"
     "syntax-tuples"
     "syntax-pathnames"
     "syntax-effects"
@@ -330,7 +335,7 @@ HELP: }
 $nl
 "Parsing words can use this word as a generic end delimiter." } ;
 
-{ POSTPONE: { POSTPONE: V{ POSTPONE: H{ POSTPONE: C{ POSTPONE: T{ POSTPONE: W{ POSTPONE: } } related-words
+{ POSTPONE: { POSTPONE: V{ POSTPONE: H{ POSTPONE: HS{ POSTPONE: C{ POSTPONE: T{ POSTPONE: W{ POSTPONE: } } related-words
 
 HELP: {
 { $syntax "{ elements... }" }
@@ -355,6 +360,12 @@ HELP: H{
 { $values { "key" "an object" } { "value" "an object" } }
 { $description "Marks the beginning of a literal hashtable, given as a list of two-element arrays holding key/value pairs. Literal hashtables are terminated by " { $link POSTPONE: } } "." } 
 { $examples { $code "H{ { \"tuna\" \"fish\" } { \"jalapeno\" \"vegetable\" } }" } } ;
+
+HELP: HS{
+{ $syntax "HS{ members ... }" }
+{ $values { "members" "a list of objects" } }
+{ $description "Marks the beginning of a literal hash set, given as a list of its members. Literal hashtables are terminated by " { $link POSTPONE: } } "." } 
+{ $examples { $code "HS{ 3 \"foo\" }" } } ;
 
 HELP: C{
 { $syntax "C{ real-part imaginary-part }" }

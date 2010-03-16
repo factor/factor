@@ -5,6 +5,7 @@ generic kernel math namespaces sequences words sets
 combinators.short-circuit classes.tuple alien.c-types ;
 FROM: classes.tuple.private => tuple-layout ;
 FROM: assocs => change-at ;
+FROM: namespaces => set ;
 IN: stack-checker.dependencies
 
 ! Words that the current quotation depends on

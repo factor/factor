@@ -5,6 +5,7 @@ io.streams.string io.styles kernel make math math.parser namespaces
 parser prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections quotations sequences sorting strings vocabs
 vocabs.prettyprint words sets generic ;
+FROM: namespaces => set ;
 IN: prettyprint
 
 : with-use ( obj quot -- )

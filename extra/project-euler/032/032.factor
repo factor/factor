@@ -48,7 +48,7 @@ IN: project-euler.032
 PRIVATE>
 
 : euler032 ( -- answer )
-    source-032 [ valid? ] filter products prune sum ;
+    source-032 [ valid? ] filter products members sum ;
 
 ! [ euler032 ] 10 ave-time
 ! 16361 ms ave run time - 417.8 SD (10 trials)
@@ -72,7 +72,7 @@ PRIVATE>
     50 [1,b] 2000 [1,b]
     [ mmp ] cartesian-map concat
     [ pandigital? ] filter
-    products prune sum ;
+    products members sum ;
 
 ! [ euler032a ] 10 ave-time
 ! 2624 ms ave run time - 131.91 SD (10 trials)

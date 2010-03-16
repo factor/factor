@@ -12,6 +12,7 @@ compiler.cfg.registers
 compiler.cfg.comparisons
 compiler.cfg.instructions
 compiler.cfg.representations.preferred ;
+FROM: namespaces => set ;
 IN: compiler.cfg.alias-analysis
 
 ! We try to eliminate redundant slot operations using some simple heuristics.
@@ -297,14 +298,14 @@ SYMBOL: live-stores
     histories get
     values [
         values [ [ store? ] filter [ insn#>> ] map ] map concat
-    ] map concat unique
+    ] map concat fast-set
     live-stores set ;
 
 GENERIC: eliminate-dead-stores* ( insn -- insn' )
 
 : (eliminate-dead-stores) ( insn -- insn' )
     dup insn-slot# [
-        insn# get live-stores get key? [
+        insn# get live-stores get in? [
             drop f
         ] unless
     ] when ;

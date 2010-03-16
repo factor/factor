@@ -39,7 +39,7 @@ TR: convert-separators "/\\" ".." ;
 : monitor-thread ( -- )
     [
         [
-            vocab-roots get prune [ add-monitor-for-path ] each
+            vocab-roots get [ add-monitor-for-path ] each
 
             H{ } clone changed-vocabs set-global
             vocabs [ changed-vocab ] each
