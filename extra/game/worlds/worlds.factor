@@ -28,7 +28,7 @@ M: game-world tick*
     [ audio-engine>> [ update-audio ] when* ] bi ;
 
 M: game-world draw*
-    swap >>tick-slice draw-world ;
+    swap >>tick-slice relayout-1 yield ;
 
 <PRIVATE
 
