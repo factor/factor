@@ -1,6 +1,6 @@
-! Copyright (C) 2003, 2009 Slava Pestov.
+! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: system kernel math io prettyprint tools.memory
+USING: system kernel math namespaces io prettyprint tools.memory
 tools.dispatch ;
 IN: tools.time
 
@@ -18,5 +18,7 @@ IN: tools.time
     "gc-summary.      - Print aggregate garbage collection statistics" print ;
 
 : time ( quot -- )
-    [ [ benchmark ] collect-dispatch-stats ] collect-gc-events
+    [
+        [ benchmark ] collect-dispatch-stats last-dispatch-stats set
+    ] collect-gc-events gc-events set
     time. nl time-banner. ; inline
