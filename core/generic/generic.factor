@@ -4,6 +4,7 @@ USING: accessors words kernel sequences namespaces make assocs
 hashtables definitions kernel.private classes classes.private
 classes.algebra quotations arrays vocabs effects combinators
 sets ;
+FROM: namespaces => set ;
 IN: generic
 
 ! Method combination protocol

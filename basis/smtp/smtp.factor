@@ -7,6 +7,7 @@ io.encodings.ascii io.timeouts io.sockets io.sockets.secure io.crlf
 kernel logging sequences combinators splitting assocs strings
 math.order math.parser random system calendar summary calendar.format
 accessors sets hashtables base64 debugger classes prettyprint words ;
+FROM: namespaces => set ;
 IN: smtp
 
 SYMBOL: smtp-domain

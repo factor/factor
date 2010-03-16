@@ -2,8 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs deques dlists kernel make sorting
 namespaces sequences combinators combinators.short-circuit
-fry math sets compiler.cfg.rpo compiler.cfg.utilities
-compiler.cfg.loop-detection compiler.cfg.predecessors ;
+fry math compiler.cfg.rpo compiler.cfg.utilities
+compiler.cfg.loop-detection compiler.cfg.predecessors
+sets hash-sets ;
+FROM: namespaces => set ;
 IN: compiler.cfg.linearization.order
 
 ! This is RPO except loops are rotated. Based on SBCL's src/compiler/control.lisp
@@ -12,16 +14,16 @@ IN: compiler.cfg.linearization.order
 
 SYMBOLS: work-list loop-heads visited ;
 
-: visited? ( bb -- ? ) visited get key? ;
+: visited? ( bb -- ? ) visited get in? ;
 
 : add-to-work-list ( bb -- )
-    dup visited get key? [ drop ] [
+    dup visited? [ drop ] [
         work-list get push-back
     ] if ;
 
 : init-linearization-order ( cfg -- )
     <dlist> work-list set
-    H{ } clone visited set
+    HS{ } clone visited set
     entry>> add-to-work-list ;
 
 : (find-alternate-loop-head) ( bb -- bb' )
@@ -58,7 +60,7 @@ SYMBOLS: work-list loop-heads visited ;
 : process-block ( bb -- )
     dup visited? [ drop ] [
         [ , ]
-        [ visited get conjoin ]
+        [ visited get adjoin ]
         [ sorted-successors [ process-successor ] each ]
         tri
     ] if ;

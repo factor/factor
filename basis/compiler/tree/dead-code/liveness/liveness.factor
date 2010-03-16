@@ -4,6 +4,7 @@ USING: fry accessors namespaces assocs deques search-deques
 dlists kernel sequences compiler.utilities words sets
 stack-checker.branches compiler.tree compiler.tree.def-use
 compiler.tree.combinators ;
+FROM: namespaces => set ;
 IN: compiler.tree.dead-code.liveness
 
 SYMBOL: work-list
