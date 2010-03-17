@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs hashtables kernel vectors
 math sequences ;
+FROM: assocs => change-at ;
 IN: sets
 
 ! Set protocol
@@ -11,7 +12,7 @@ GENERIC: in? ( elt set -- ? )
 GENERIC: delete ( elt set -- )
 GENERIC: set-like ( set exemplar -- set' )
 GENERIC: fast-set ( set -- set' )
-GENERIC: members ( set -- sequence )
+GENERIC: members ( set -- seq )
 GENERIC: union ( set1 set2 -- set )
 GENERIC: intersect ( set1 set2 -- set )
 GENERIC: intersects? ( set1 set2 -- ? )
@@ -95,13 +96,21 @@ M: sequence all-unique?
     dup pruned sequence= ;
 
 : combine ( sets -- set )
-    f [ union ] reduce ;
+    [ f ]
+    [ [ [ members ] map concat ] [ first ] bi set-like ]
+    if-empty ;
 
 : gather ( seq quot -- newseq )
     map concat members ; inline
 
 : adjoin-at ( value key assoc -- )
     [ [ f fast-set ] unless* [ adjoin ] keep ] change-at ;
+
+: within ( seq set -- subseq )
+    fast-set [ in? ] curry filter ;
+
+: without ( seq set -- subseq )
+    fast-set [ in? not ] curry filter ;
 
 ! Temporarily for compatibility
 

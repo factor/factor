@@ -3,7 +3,7 @@ quotations sequences vectors ;
 IN: sets
 
 ARTICLE: "sets" "Sets"
-"A set is an unordered list of elements. Words for working with sets are in the " { $vocab-link "sets" } " vocabulary."
+"A set is an unordered list of elements. Words for working with sets are in the " { $vocab-link "sets" } " vocabulary." $nl
 "All sets are instances of a mixin class:"
 { $subsections
     set
@@ -43,6 +43,11 @@ ARTICLE: "set-operations" "Operations on sets"
 { $subsections
     all-unique?
     duplicates
+}
+"Utilities for sets and sequences:"
+{ $subsections
+     within
+     without
 } ;
 
 ARTICLE: "set-implementations" "Set implementations"
@@ -68,11 +73,11 @@ HELP: adjoin
 { $description "Destructively adds " { $snippet "elt" } " to " { $snippet "set" } ". For sequences, this guarantees that this element is not duplicated, and that it is at the end of the sequence." $nl "Each mutable set type is expected to implement a method on this generic word." }
 { $examples
     { $example
-        "USING: namespaces prettyprint sets ;"
-        "V{ \"beans\" \"salsa\" \"cheese\" } \"v\" set"
-        "\"nachos\" \"v\" get adjoin"
-        "\"salsa\" \"v\" get adjoin"
-        "\"v\" get ."
+        "USING: prettyprint sets kernel ;"
+        "V{ \"beans\" \"salsa\" \"cheese\" } clone"
+        "\"nachos\" over adjoin"
+        "\"salsa\" over adjoin"
+        "."
         "V{ \"beans\" \"cheese\" \"nachos\" \"salsa\" }"
     }
 }
@@ -100,7 +105,7 @@ HELP: duplicates
 { $values { "set" set } { "seq" sequence } }
 { $description "Outputs a sequence consisting of elements which occur more than once in " { $snippet "set" } "." }
 { $examples
-    { $example "USING: sets prettyprint ;" "{ 1 2 3 1 2 1 } duplicates ." "{ 2 1 2 1 }" }
+    { $example "USING: sets prettyprint ;" "{ 1 2 3 1 2 1 } duplicates ." "{ 1 2 1 }" }
 } ;
 
 HELP: all-unique?
@@ -165,3 +170,11 @@ HELP: set-like
 { $examples
     { $example "USING: sets prettyprint ;" "{ 1 2 3 } HS{ } set-like ." "HS{ 1 2 3 }" }
 } ;
+
+HELP: within
+{ $values { "seq" sequence } { "set" set } { "subseq" sequence } }
+{ $description "Returns the subsequence of the given sequence consisting of members of the set. This may contain duplicates, if the sequence has duplicates." } ;
+
+HELP: without
+{ $values { "seq" sequence } { "set" set } { "subseq" sequence } }
+{ $description "Returns the subsequence of the given sequence consisting of things that are not members of the set. This may contain duplicates, if the sequence has duplicates." } ;
