@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs fry hashtables kernel sequences
-vectors locals regexp.classes ;
+vectors locals regexp.classes sets ;
 IN: regexp.transition-tables
 
 TUPLE: transition-table transitions start-state final-states ;
@@ -9,7 +9,7 @@ TUPLE: transition-table transitions start-state final-states ;
 : <transition-table> ( -- transition-table )
     transition-table new
         H{ } clone >>transitions
-        H{ } clone >>final-states ;
+        HS{ } clone >>final-states ;
 
 :: (set-transition) ( from to obj hash -- )
     from hash at
@@ -27,8 +27,8 @@ TUPLE: transition-table transitions start-state final-states ;
 : add-transition ( from to obj transition-table -- )
     transitions>> (add-transition) ;
 
-: map-set ( assoc quot -- new-assoc )
-    '[ drop @ dup ] assoc-map ; inline
+: map-set ( set quot -- new-set )
+    over [ [ members ] dip map ] dip set-like ; inline
 
 : number-transitions ( transitions numbering -- new-transitions )
     dup '[

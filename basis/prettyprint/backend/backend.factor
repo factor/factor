@@ -6,7 +6,8 @@ combinators continuations effects generic hashtables io
 io.pathnames io.styles kernel make math math.order math.parser
 namespaces prettyprint.config prettyprint.custom
 prettyprint.sections prettyprint.stylesheet quotations sbufs
-sequences strings vectors words words.symbol ;
+sequences strings vectors words words.symbol hash-sets ;
+FROM: sets => members ;
 IN: prettyprint.backend
 
 M: effect pprint* effect>string "(" ")" surround text ;
@@ -187,6 +188,7 @@ M: hashtable pprint-delims drop \ H{ \ } ;
 M: tuple pprint-delims drop \ T{ \ } ;
 M: wrapper pprint-delims drop \ W{ \ } ;
 M: callstack pprint-delims drop \ CS{ \ } ;
+M: hash-set pprint-delims drop \ HS{ \ } ;
 
 M: object >pprint-sequence ;
 M: vector >pprint-sequence ;
@@ -195,6 +197,7 @@ M: callable >pprint-sequence ;
 M: hashtable >pprint-sequence >alist ;
 M: wrapper >pprint-sequence wrapped>> 1array ;
 M: callstack >pprint-sequence callstack>array ;
+M: hash-set >pprint-sequence members ;
 
 : class-slot-sequence ( class slots -- sequence )
     [ 1array ] [ [ f 2array ] dip append ] if-empty ;
@@ -226,6 +229,7 @@ M: byte-vector pprint* pprint-object ;
 M: hashtable pprint* pprint-object ;
 M: curry pprint* pprint-object ;
 M: compose pprint* pprint-object ;
+M: hash-set pprint* pprint-object ;
 
 M: wrapper pprint*
     {

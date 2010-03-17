@@ -19,7 +19,7 @@ IN: regexp.minimize
     {
         [ drop <= ]
         [ transitions>> '[ _ at keys ] bi@ set= ]
-        [ final-states>> '[ _ key? ] bi@ = ]
+        [ final-states>> '[ _ in? ] bi@ = ]
     } 3&& ;
 
 :: initialize-partitions ( transition-table -- partitions )

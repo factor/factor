@@ -147,7 +147,7 @@ ERROR: no-case object ;
 : contiguous-range? ( keys -- ? )
     dup [ fixnum? ] all? [
         dup all-unique? [
-            [ prune length ]
+            [ length ]
             [ [ supremum ] [ infimum ] bi - ]
             bi - 1 =
         ] [ drop f ] if

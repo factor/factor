@@ -5,6 +5,7 @@ io vectors arrays math.parser math.order combinators classes
 sets unicode.categories compiler.units parser effects.parser
 words quotations memoize accessors locals splitting
 combinators.short-circuit generalizations ;
+FROM: namespaces => set ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;

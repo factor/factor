@@ -1,94 +1,116 @@
 USING: assocs hashtables help.markup help.syntax kernel
-quotations sequences ;
+quotations sequences vectors ;
 IN: sets
 
-ARTICLE: "sets" "Set-theoretic operations on sequences"
-"Set-theoretic operations on sequences are defined on the " { $vocab-link "sets" } " vocabulary. All of these operations use hashtables internally to achieve linear running time."
-$nl
-"Remove duplicates:"
-{ $subsections prune }
-"Test for duplicates:"
+ARTICLE: "sets" "Sets"
+"A set is an unordered list of elements. Words for working with sets are in the " { $vocab-link "sets" } " vocabulary." $nl
+"All sets are instances of a mixin class:"
 { $subsections
-    all-unique?
-    duplicates
+    set
+    set?
 }
-"Set operations on sequences:"
+{ $subsections "set-operations" "set-implementations" } ;
+
+ABOUT: "sets"
+
+ARTICLE: "set-operations" "Operations on sets"
+"To test if an object is a member of a set:"
+{ $subsections member? }
+"All sets can be represented as a sequence, without duplicates, of their members:"
+{ $subsections members }
+"Sets can have members added or removed destructively:"
+{ $subsections
+    adjoin
+    delete
+}
+"Basic mathematical operations, which any type of set may override for efficiency:"
 { $subsections
     diff
     intersect
     union
 }
-"Set-theoretic predicates:"
+"Mathematical predicates on sets, which may be overridden for efficiency:"
 { $subsections
     intersects?
     subset?
     set=
 }
-"A word used to implement the above:"
-{ $subsections unique }
-"Adding elements to sets:"
+"An optional generic word for creating sets of the same class as a given set:"
+{ $subsections set-like }
+"An optional generic word for creating a set with a fast lookup operation, if the set itself has a slow lookup operation:"
+{ $subsections fast-set }
+"For set types that allow duplicates, like sequence sets, some additional words test for duplication:"
 { $subsections
-    adjoin
+    all-unique?
+    duplicates
 }
-{ $see-also member? member-eq? any? all? "assocs-sets" } ;
+"Utilities for sets and sequences:"
+{ $subsections
+     within
+     without
+} ;
 
-ABOUT: "sets"
+ARTICLE: "set-implementations" "Set implementations"
+"There are several implementations of sets in the Factor library. More can be added if they implement the words of the set protocol, the basic set operations."
+{ $subsections
+    "sequence-sets"
+    "hash-sets"
+    "bit-sets"
+} ;
+
+ARTICLE: "sequence-sets" "Sequences as sets"
+"Any sequence can be used as a set. The members of this set are the elements of the sequence. Calling the word " { $link members } " on a sequence returns a copy of the sequence with only one listing of each member. Destructive operations " { $link adjoin } " and " { $link delete } " only work properly on growable sequences like " { $link vector } "s."
+$nl
+"Care must be taken in writing efficient code using sequence sets. Testing for membership with " { $link in? } ", as well as the destructive set operations, take time proportional to the size of the sequence. Another representation, like " { $link "hash-sets" } ", would take constant time for membership tests. But binary operations like " { $link union } "are asymptotically optimal, taking time proportional to the sum of the size of the inputs."
+$nl
+"As one particlar example, " { $link POSTPONE: f } " is a representation of the empty set, as it represents the empty sequence." ;
+
+HELP: set
+{ $class-description "The class of all sets. Custom implementations of the set protocol should be declared as instances of this mixin for all set implementation to work correctly." } ;
 
 HELP: adjoin
-{ $values { "elt" object } { "seq" "a resizable mutable sequence" } }
-{ $description "Removes all elements equal to " { $snippet "elt" } ", and adds " { $snippet "elt" } " at the end of the sequence." }
+{ $values { "elt" object } { "set" set } }
+{ $description "Destructively adds " { $snippet "elt" } " to " { $snippet "set" } ". For sequences, this guarantees that this element is not duplicated, and that it is at the end of the sequence." $nl "Each mutable set type is expected to implement a method on this generic word." }
 { $examples
     { $example
-        "USING: namespaces prettyprint sets ;"
-        "V{ \"beans\" \"salsa\" \"cheese\" } \"v\" set"
-        "\"nachos\" \"v\" get adjoin"
-        "\"salsa\" \"v\" get adjoin"
-        "\"v\" get ."
+        "USING: prettyprint sets kernel ;"
+        "V{ \"beans\" \"salsa\" \"cheese\" } clone"
+        "\"nachos\" over adjoin"
+        "\"salsa\" over adjoin"
+        "."
         "V{ \"beans\" \"cheese\" \"nachos\" \"salsa\" }"
     }
 }
-{ $side-effects "seq" } ;
+{ $side-effects "set" } ;
 
-HELP: conjoin
-{ $values { "elt" object } { "assoc" assoc } }
-{ $description "Stores a key/value pair, both equal to " { $snippet "elt" } ", into the assoc." }
-{ $examples
-    { $example
-        "USING: kernel prettyprint sets ;"
-        "H{ } clone 1 over conjoin ."
-        "H{ { 1 1 } }"
-    }
-}
+HELP: delete
+{ $values { "elt" object } { "set" set } }
+{ $description "Destructively removes " { $snippet "elt" } " from " { $snippet "set" } ". If the element is not present, this does nothing." $nl "Each mutable set type is expected to implement a method on this generic word." }
+{ $side-effects "set" } ;
+
+HELP: members
+{ $values { "set" set } { "seq" sequence } }
+{ $description "Creates a sequence with a single copy of each member of the set." $nl "Each set type is expected to implement a method on this generic word." } ;
+
+HELP: in?
+{ $values { "elt" object } { "set" set } { "?" "a boolean" } }
+{ $description "Tests whether the element is a member of the set." $nl "Each set type is expected to implement a method on this generic word as part of the set protocol." } ;
+
+HELP: adjoin-at
+{ $values { "value" object } { "key" object } { "assoc" assoc } }
+{ $description "Adds " { $snippet "value" } " to the set stored at " { $snippet "key" } " of " { $snippet "assoc" } "." }
 { $side-effects "assoc" } ;
 
-HELP: conjoin-at
-{ $values { "value" object } { "key" object } { "assoc" assoc } }
-{ $description "Adds " { $snippet "value" } " to the set stored at " { $snippet "key" } " of " { $snippet "assoc" } "." } ;
-
-HELP: unique
-{ $values { "seq" "a sequence" } { "assoc" assoc } }
-{ $description "Outputs a new assoc where the keys and values are equal." }
-{ $examples
-    { $example "USING: sets prettyprint ;" "{ 1 1 2 2 3 3 } unique ." "H{ { 1 1 } { 2 2 } { 3 3 } }" }
-} ;
-
-HELP: prune
-{ $values { "seq" "a sequence" } { "newseq" "a sequence" } }
-{ $description "Outputs a new sequence with each distinct element of " { $snippet "seq" } " appearing only once. Elements are compared for equality using " { $link = } " and elements are ordered according to their position in " { $snippet "seq" } "." }
-{ $examples
-    { $example "USING: sets prettyprint ;" "{ 1 1 t 3 t } prune ." "V{ 1 t 3 }" }
-} ;
-
 HELP: duplicates
-{ $values { "seq" "a sequence" } { "newseq" "a sequence" } }
-{ $description "Outputs a new sequence consisting of elements which occur more than once in " { $snippet "seq" } "." }
+{ $values { "set" set } { "seq" sequence } }
+{ $description "Outputs a sequence consisting of elements which occur more than once in " { $snippet "set" } "." }
 { $examples
     { $example "USING: sets prettyprint ;" "{ 1 2 3 1 2 1 } duplicates ." "{ 1 2 1 }" }
 } ;
 
 HELP: all-unique?
-{ $values { "seq" sequence } { "?" "a boolean" } }
-{ $description "Tests whether a sequence contains any repeated elements." }
+{ $values { "set" set } { "?" "a boolean" } }
+{ $description "Tests whether a set contains any repeated elements." }
 { $example
     "USING: sets prettyprint ;"
     "{ 0 1 1 2 3 5 } all-unique? ."
@@ -96,41 +118,44 @@ HELP: all-unique?
 } ;
 
 HELP: diff
-{ $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
-{ $description "Outputs a sequence consisting of elements present in " { $snippet "seq1" } " but not " { $snippet "seq2" } ", comparing elements for equality." 
+{ $values { "set1" set } { "set2" set } { "set" set } }
+{ $description "Outputs a set consisting of elements present in " { $snippet "set1" } " but not " { $snippet "set2" } ", comparing elements for equality." 
+"This word has a default definition which works for all sets, but set implementations may override the default for efficiency."
 } { $examples
     { $example "USING: sets prettyprint ;" "{ 1 2 3 } { 2 3 4 } diff ." "{ 1 }" }
 } ;
 
 HELP: intersect
-{ $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
-{ $description "Outputs a sequence consisting of elements present in both " { $snippet "seq1" } " and " { $snippet "seq2" } "." }
+{ $values { "set1" set } { "set2" set } { "set" set } }
+{ $description "Outputs a set consisting of elements present in both " { $snippet "set1" } " and " { $snippet "set2" } "."
+"This word has a default definition which works for all sets, but set implementations may override the default for efficiency." }
 { $examples
     { $example "USING: sets prettyprint ;" "{ 1 2 3 } { 2 3 4 } intersect ." "{ 2 3 }" }
 } ;
 
 HELP: union
-{ $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
-{ $description "Outputs a sequence consisting of elements present in " { $snippet "seq1" } " and " { $snippet "seq2" } " which does not contain duplicate values." }
+{ $values { "set1" set } { "set2" set } { "set" set } }
+{ $description "Outputs a set consisting of elements present in either " { $snippet "set1" } " or " { $snippet "set2" } " which does not contain duplicate values."
+"This word has a default definition which works for all sets, but set implementations may override the default for efficiency." }
 { $examples
-    { $example "USING: sets prettyprint ;" "{ 1 2 3 } { 2 3 4 } union ." "V{ 1 2 3 4 }" }
+    { $example "USING: sets prettyprint ;" "{ 1 2 3 } { 2 3 4 } union ." "{ 1 2 3 4 }" }
 } ;
 
 { diff intersect union } related-words
 
 HELP: intersects?
-{ $values { "seq1" sequence } { "seq2" sequence } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "seq1" } " and " { $snippet "seq2" } " have any elements in common." }
-{ $notes "If one of the sequences is empty, the result is always " { $link f } "." } ;
+{ $values { "set1" set } { "set2" set } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "set1" } " and " { $snippet "set2" } " have any elements in common." }
+{ $notes "If one of the sets is empty, the result is always " { $link f } "." } ;
 
 HELP: subset?
-{ $values { "seq1" sequence } { "seq2" sequence } { "?" "a boolean" } }
-{ $description "Tests if every element of " { $snippet "seq1" } " is contained in " { $snippet "seq2" } "." }
-{ $notes "If " { $snippet "seq1" } " is empty, the result is always " { $link t } "." } ;
+{ $values { "set1" set } { "set2" set } { "?" "a boolean" } }
+{ $description "Tests if every element of " { $snippet "set1" } " is contained in " { $snippet "set2" } "." }
+{ $notes "If " { $snippet "set1" } " is empty, the result is always " { $link t } "." } ;
 
 HELP: set=
-{ $values { "seq1" sequence } { "seq2" sequence } { "?" "a boolean" } }
-{ $description "Tests if both sequences contain the same elements, disregrading order and duplicates." } ;
+{ $values { "set1" set } { "set2" set } { "?" "a boolean" } }
+{ $description "Tests if both sets contain the same elements, disregrading order and duplicates." } ;
 
 HELP: gather
 { $values
@@ -138,3 +163,18 @@ HELP: gather
      { "newseq" sequence } }
 { $description "Maps a quotation onto a sequence, concatenates the results of the mapping, and removes duplicates." } ;
 
+HELP: set-like
+{ $values { "set" set } { "exemplar" set } { "set'" set } }
+{ $description "If the conversion is defined for the exemplar, converts the set into a set of the exemplar's class. This is not guaranteed to create a new set, for example if the input set and exemplar are of the same class." $nl
+"Set implementations may optionally implement a method on this generic word. The default implementation returns its input set." }
+{ $examples
+    { $example "USING: sets prettyprint ;" "{ 1 2 3 } HS{ } set-like ." "HS{ 1 2 3 }" }
+} ;
+
+HELP: within
+{ $values { "seq" sequence } { "set" set } { "subseq" sequence } }
+{ $description "Returns the subsequence of the given sequence consisting of members of the set. This may contain duplicates, if the sequence has duplicates." } ;
+
+HELP: without
+{ $values { "seq" sequence } { "set" set } { "subseq" sequence } }
+{ $description "Returns the subsequence of the given sequence consisting of things that are not members of the set. This may contain duplicates, if the sequence has duplicates." } ;

@@ -24,7 +24,7 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
 :: do-step ( errors summary-file details-file -- )
     errors
     [ error-type +linkage-error+ eq? not ] filter
-    [ file>> ] map prune natural-sort summary-file to-file
+    [ file>> ] map members natural-sort summary-file to-file
     errors details-file utf8 [ errors. ] with-file-writer ;
 
 : do-tests ( -- )
@@ -62,7 +62,7 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
     "" to-refresh drop 2dup [ empty? not ] either?
     [
         "Boot image is out of date. Changed vocabs:" print
-        append prune [ print ] each
+        members [ print ] each
         flush
         1 exit
     ] [ 2drop ] if ;
