@@ -90,12 +90,10 @@ PRIVATE>
         ] each 2drop
     ] tabular-output nl ;
 
-SYMBOL: gc-events
-
-: collect-gc-events ( quot -- )
+: collect-gc-events ( quot -- gc-events )
     enable-gc-events
     [ ] [ disable-gc-events drop ] cleanup
-    disable-gc-events [ gc-event memory>struct ] map gc-events set ; inline
+    disable-gc-events [ gc-event memory>struct ] map ; inline
 
 <PRIVATE
 
@@ -163,6 +161,8 @@ TUPLE: gc-stats collections times ;
     { "" "Number" "Total" "Mean" "Median" "Min" "Max" } prefix ;
 
 PRIVATE>
+
+SYMBOL: gc-events
 
 : gc-event. ( event -- )
     {
