@@ -16,6 +16,7 @@ compiler.cfg.registers
 compiler.cfg.builder
 compiler.codegen.fixup
 compiler.utilities ;
+FROM: namespaces => set ;
 IN: compiler.codegen
 
 SYMBOL: insn-counts

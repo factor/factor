@@ -8,7 +8,7 @@ generic.standard generic.hook generic.math generic.parser classes
 io.pathnames vocabs vocabs.parser classes.parser classes.union
 classes.intersection classes.mixin classes.predicate
 classes.singleton classes.tuple.parser compiler.units
-combinators effects.parser slots ;
+combinators effects.parser slots hash-sets ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -104,6 +104,7 @@ IN: bootstrap.syntax
     "H{" [ \ } [ >hashtable ] parse-literal ] define-core-syntax
     "T{" [ parse-tuple-literal suffix! ] define-core-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-core-syntax
+    "HS{" [ \ } [ <hash-set> ] parse-literal ] define-core-syntax
 
     "POSTPONE:" [ scan-word suffix! ] define-core-syntax
     "\\" [ scan-word <wrapper> suffix! ] define-core-syntax

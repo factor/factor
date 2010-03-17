@@ -97,7 +97,7 @@ IN: validators
     sum 10 mod 0 = ;
 
 : v-credit-card ( str -- n )
-    "- " diff
+    "- " without
     dup CHAR: 0 CHAR: 9 [a,b] diff empty? [
         13 v-min-length
         16 v-max-length

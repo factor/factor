@@ -138,7 +138,7 @@ M: world ungraft*
         layout-queue [
             dup layout find-world [ , ] when*
         ] slurp-deque
-    ] { } make prune ;
+    ] { } make members ;
 
 : redraw-worlds ( seq -- )
     [ dup update-hand draw-world ] each ;
