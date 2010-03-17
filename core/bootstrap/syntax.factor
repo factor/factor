@@ -29,6 +29,7 @@ IN: bootstrap.syntax
         "HEX:"
         "HOOK:"
         "H{"
+        "HS{"
         "IN:"
         "INSTANCE:"
         "M:"

@@ -25,14 +25,14 @@ IN: suffix-arrays.tests
 [ { } ]
 [ SA{ } "something" swap query ] unit-test
 
-[ V{ "unit-test" "(unit-test)" } ]
+[ { "unit-test" "(unit-test)" } ]
 [ "suffix-array" get "unit-test" swap query ] unit-test
 
 [ t ]
 [ "suffix-array" get "something else" swap query empty? ] unit-test
 
-[ V{ "rofl" } ] [ SA{ "rofl" } "r" swap query ] unit-test
-[ V{ "rofl" } ] [ SA{ "rofl" } "o" swap query ] unit-test
-[ V{ "rofl" } ] [ SA{ "rofl" } "f" swap query ] unit-test
-[ V{ "rofl" } ] [ SA{ "rofl" } "l" swap query ] unit-test
-[ V{ } ] [ SA{ "rofl" } "t" swap query ] unit-test
+[ { "rofl" } ] [ SA{ "rofl" } "r" swap query ] unit-test
+[ { "rofl" } ] [ SA{ "rofl" } "o" swap query ] unit-test
+[ { "rofl" } ] [ SA{ "rofl" } "f" swap query ] unit-test
+[ { "rofl" } ] [ SA{ "rofl" } "l" swap query ] unit-test
+[ { } ] [ SA{ "rofl" } "t" swap query ] unit-test

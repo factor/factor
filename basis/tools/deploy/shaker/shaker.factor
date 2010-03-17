@@ -20,6 +20,8 @@ QUALIFIED: source-files
 QUALIFIED: source-files.errors
 QUALIFIED: vocabs
 FROM: alien.libraries.private => >deployed-library-path ;
+FROM: namespaces => set ;
+FROM: sets => members ;
 IN: tools.deploy.shaker
 
 ! This file is some hairy shit.
@@ -506,7 +508,7 @@ SYMBOL: deploy-vocab
 : write-vocab-manifest ( vocab-manifest-out -- )
     "Writing vocabulary manifest to " write dup print flush
     vocabs "VOCABS:" prefix
-    deploy-libraries get [ libraries get at path>> ] map prune "LIBRARIES:" prefix append
+    deploy-libraries get [ libraries get at path>> ] map members "LIBRARIES:" prefix append
     swap utf8 set-file-lines ;
 
 : prepare-deploy-libraries ( -- )

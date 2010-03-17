@@ -65,8 +65,8 @@ PRIVATE>
     #! Hack.
     [ vocab-prefix? ] partition
     [
-        [ vocab-name ] map unique
-        '[ name>> _ key? not ] filter
+        [ vocab-name ] map fast-set
+        '[ name>> _ in? not ] filter
         convert-prefixes
     ] keep
     append ;

@@ -6,6 +6,7 @@ help help.markup help.topics io.streams.string kernel macros
 namespaces sequences sequences.deep sets sorting splitting
 strings unicode.categories values vocabs vocabs.loader words
 words.symbol summary debugger io ;
+FROM: sets => members ;
 IN: help.lint.checks
 
 ERROR: simple-lint-error message ;
@@ -48,7 +49,7 @@ SYMBOL: vocab-articles
 : effect-values ( word -- seq )
     stack-effect
     [ in>> ] [ out>> ] bi append
-    [ dup pair? [ first ] when effect>string ] map prune ;
+    [ dup pair? [ first ] when effect>string ] map members ;
 
 : effect-effects ( word -- seq )
     stack-effect in>> [
@@ -103,7 +104,7 @@ SYMBOL: vocab-articles
 
 : check-see-also ( element -- )
     \ $see-also swap elements [
-        rest dup prune [ length ] bi@ assert=
+        rest all-unique? t assert=
     ] each ;
 
 : vocab-exists? ( name -- ? )
