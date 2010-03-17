@@ -25,4 +25,4 @@ M: sequence fast-set <hash-set> ;
 M: f fast-set drop H{ } clone hash-set boa ;
 
 M: sequence duplicates
-    HS{ } clone [ [ in? ] [ adjoin ] 2bi ] curry filter ;
+    f fast-set [ [ in? ] [ adjoin ] 2bi ] curry filter ;
