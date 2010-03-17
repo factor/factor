@@ -15,9 +15,9 @@ ABOUT: "sets"
 
 ARTICLE: "set-operations" "Operations on sets"
 "To test if an object is a member of a set:"
-{ $subsection member? }
+{ $subsections member? }
 "All sets can be represented as a sequence, without duplicates, of their members:"
-{ $subsection members }
+{ $subsections members }
 "Sets can have members added or removed destructively:"
 { $subsections
     adjoin
@@ -36,9 +36,9 @@ ARTICLE: "set-operations" "Operations on sets"
     set=
 }
 "An optional generic word for creating sets of the same class as a given set:"
-{ $subsection set-like }
+{ $subsections set-like }
 "An optional generic word for creating a set with a fast lookup operation, if the set itself has a slow lookup operation:"
-{ $subsection fast-set }
+{ $subsections fast-set }
 "For set types that allow duplicates, like sequence sets, some additional words test for duplication:"
 { $subsections
     all-unique?
