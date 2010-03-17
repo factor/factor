@@ -903,7 +903,7 @@ FUNCTION: void glEdgeFlagPointer ( GLsizei stride, GLvoid* ptr ) ;
 
 ! [09:39] (slava) NULL <void*>
 ! [09:39] (slava) then keep that object
-! [09:39] (slava) when you want to get the value stored there, *void*
+! [09:39] (slava) when you want to get the value stored there,* void*
 ! [09:39] (slava) which returns an alien
 FUNCTION: void glGetPointerv ( GLenum pname, GLvoid** params ) ;
 
@@ -2258,6 +2258,227 @@ GL-FUNCTION: void glGetMultisamplefv { } (  GLenum pname, GLuint index, GLfloat*
 GL-FUNCTION: void glSampleMaski { } ( GLuint index, GLbitfield mask ) ;
 
 
+! OpenGL 3.3
+
+CONSTANT: GL_SRC1_COLOR                     HEX: 88F9
+CONSTANT: GL_ONE_MINUS_SRC1_COLOR           HEX: 88FA
+CONSTANT: GL_ONE_MINUS_SRC1_ALPHA           HEX: 88FB
+CONSTANT: GL_MAX_DUAL_SOURCE_DRAW_BUFFERS   HEX: 88FC
+
+CONSTANT: GL_ANY_SAMPLES_PASSED             HEX: 8C2F
+
+CONSTANT: GL_SAMPLER_BINDING                HEX: 8919
+
+CONSTANT: GL_RGB10_A2UI                     HEX: 906F
+
+CONSTANT: GL_TEXTURE_SWIZZLE_R              HEX: 8E42
+CONSTANT: GL_TEXTURE_SWIZZLE_G              HEX: 8E43
+CONSTANT: GL_TEXTURE_SWIZZLE_B              HEX: 8E44
+CONSTANT: GL_TEXTURE_SWIZZLE_A              HEX: 8E45
+CONSTANT: GL_TEXTURE_SWIZZLE_RGBA           HEX: 8E46
+
+CONSTANT: GL_TIME_ELAPSED                   HEX: 88BF
+CONSTANT: GL_TIMESTAMP                      HEX: 8E28
+
+CONSTANT: GL_INT_2_10_10_10_REV             HEX: 8D9F
+
+GL-FUNCTION: void glBindFragDataLocationIndexed { } ( GLuint program, GLuint colorNumber, GLuint index, GLstring name ) ;
+GL-FUNCTION: GLint glGetFragDataIndex { } ( GLuint program, GLstring name ) ;
+
+GL-FUNCTION: void glGenSamplers { } ( GLsizei count, GLuint* samplers ) ;
+GL-FUNCTION: void glDeleteSamplers { } ( GLsizei count, GLuint* samplers ) ;
+GL-FUNCTION: GLboolean glIsSampler { } ( GLuint sampler ) ;
+GL-FUNCTION: void glBindSampler { } ( GLenum unit, GLuint sampler ) ;
+GL-FUNCTION: void glSamplerParameteri { } ( GLuint sampler, GLenum pname, GLint param ) ;
+GL-FUNCTION: void glSamplerParameteriv { } ( GLuint sampler, GLenum pname, GLint* param ) ;
+GL-FUNCTION: void glSamplerParameterf { } ( GLuint sampler, GLenum pname, GLfloat param ) ;
+GL-FUNCTION: void glSamplerParameterfv { } ( GLuint sampler, GLenum pname, GLfloat* param ) ;
+GL-FUNCTION: void glSamplerParameterIiv { } ( GLuint sampler, GLenum pname, GLint* param ) ;
+GL-FUNCTION: void glSamplerParameterIuiv { } ( GLuint sampler, GLenum pname, GLuint* param ) ;
+GL-FUNCTION: void glGetSamplerParameteriv { } ( GLuint sampler, GLenum pname, GLint* params ) ;
+GL-FUNCTION: void glGetSamplerParameterIiv { } ( GLuint sampler, GLenum pname, GLint* params ) ;
+GL-FUNCTION: void glGetSamplerParameterfv { } ( GLuint sampler, GLenum pname, GLfloat* params ) ;
+GL-FUNCTION: void glGetSamplerParameterIfv { } ( GLuint sampler, GLenum pname, GLfloat* params ) ;
+
+GL-FUNCTION: void glQueryCounter { } ( GLuint id, GLenum target ) ;
+GL-FUNCTION: void glGetQueryObjecti64v { } ( GLuint id, GLenum pname, GLint64* params ) ;
+GL-FUNCTION: void glGetQueryObjectui64v { } ( GLuint id, GLenum pname, GLuint64* params ) ;
+
+GL-FUNCTION: void glVertexP2ui { } ( GLenum type, GLuint value ) ;
+GL-FUNCTION: void glVertexP2uiv { } ( GLenum type, GLuint* value ) ;
+GL-FUNCTION: void glVertexP3ui { } ( GLenum type, GLuint value ) ;
+GL-FUNCTION: void glVertexP3uiv { } ( GLenum type, GLuint* value ) ;
+GL-FUNCTION: void glVertexP4ui { } ( GLenum type, GLuint value ) ;
+GL-FUNCTION: void glVertexP4uiv { } ( GLenum type, GLuint* value ) ;
+GL-FUNCTION: void glTexCoordP1ui { } ( GLenum type, GLuint coords ) ;
+GL-FUNCTION: void glTexCoordP1uiv { } ( GLenum type, GLuint* coords ) ;
+GL-FUNCTION: void glTexCoordP2ui { } ( GLenum type, GLuint coords ) ;
+GL-FUNCTION: void glTexCoordP2uiv { } ( GLenum type, GLuint* coords ) ;
+GL-FUNCTION: void glTexCoordP3ui { } ( GLenum type, GLuint coords ) ;
+GL-FUNCTION: void glTexCoordP3uiv { } ( GLenum type, GLuint* coords ) ;
+GL-FUNCTION: void glTexCoordP4ui { } ( GLenum type, GLuint coords ) ;
+GL-FUNCTION: void glTexCoordP4uiv { } ( GLenum type, GLuint* coords ) ;
+GL-FUNCTION: void glMultiTexCoordP1ui { } ( GLenum texture, GLenum type, GLuint coords ) ;
+GL-FUNCTION: void glMultiTexCoordP1uiv { } ( GLenum texture, GLenum type, GLuint* coords ) ;
+GL-FUNCTION: void glMultiTexCoordP2ui { } ( GLenum texture, GLenum type, GLuint coords ) ;
+GL-FUNCTION: void glMultiTexCoordP2uiv { } ( GLenum texture, GLenum type, GLuint* coords ) ;
+GL-FUNCTION: void glMultiTexCoordP3ui { } ( GLenum texture, GLenum type, GLuint coords ) ;
+GL-FUNCTION: void glMultiTexCoordP3uiv { } ( GLenum texture, GLenum type, GLuint* coords ) ;
+GL-FUNCTION: void glMultiTexCoordP4ui { } ( GLenum texture, GLenum type, GLuint coords ) ;
+GL-FUNCTION: void glMultiTexCoordP4uiv { } ( GLenum texture, GLenum type, GLuint* coords ) ;
+GL-FUNCTION: void glNormalP3ui { } ( GLenum type, GLuint coords ) ;
+GL-FUNCTION: void glNormalP3uiv { } ( GLenum type, GLuint* coords ) ;
+GL-FUNCTION: void glColorP3ui { } ( GLenum type, GLuint color ) ;
+GL-FUNCTION: void glColorP3uiv { } ( GLenum type, GLuint* color ) ;
+GL-FUNCTION: void glColorP4ui { } ( GLenum type, GLuint color ) ;
+GL-FUNCTION: void glColorP4uiv { } ( GLenum type, GLuint* color ) ;
+GL-FUNCTION: void glSecondaryColorP3ui { } ( GLenum type, GLuint color ) ;
+GL-FUNCTION: void glSecondaryColorP3uiv { } ( GLenum type, GLuint* color ) ;
+GL-FUNCTION: void glVertexAttribP1ui { } ( GLuint index, GLenum type, GLboolean normalized, GLuint value ) ;
+GL-FUNCTION: void glVertexAttribP1uiv { } ( GLuint index, GLenum type, GLboolean normalized, GLuint* value ) ;
+GL-FUNCTION: void glVertexAttribP2ui { } ( GLuint index, GLenum type, GLboolean normalized, GLuint value ) ;
+GL-FUNCTION: void glVertexAttribP2uiv { } ( GLuint index, GLenum type, GLboolean normalized, GLuint* value ) ;
+GL-FUNCTION: void glVertexAttribP3ui { } ( GLuint index, GLenum type, GLboolean normalized, GLuint value ) ;
+GL-FUNCTION: void glVertexAttribP3uiv { } ( GLuint index, GLenum type, GLboolean normalized, GLuint* value ) ;
+GL-FUNCTION: void glVertexAttribP4ui { } ( GLuint index, GLenum type, GLboolean normalized, GLuint value ) ;
+GL-FUNCTION: void glVertexAttribP4uiv { } ( GLuint index, GLenum type, GLboolean normalized, GLuint* value ) ;
+
+
+! OpenGL 4.0
+
+CONSTANT: GL_DRAW_INDIRECT_BUFFER           HEX: 8F3F
+CONSTANT: GL_DRAW_INDIRECT_BUFFER_BINDING   HEX: 8F43
+
+CONSTANT: GL_GEOMETRY_SHADER_INVOCATIONS    HEX: 887F
+CONSTANT: GL_MAX_GEOMETRY_SHADER_INVOCATIONS HEX: 8E5A
+CONSTANT: GL_MIN_FRAGMENT_INTERPOLATION_OFFSET HEX: 8E5B
+CONSTANT: GL_MAX_FRAGMENT_INTERPOLATION_OFFSET HEX: 8E5C
+CONSTANT: GL_FRAGMENT_INTERPOLATION_OFFSET_BITS HEX: 8E5D
+CONSTANT: GL_MAX_VERTEX_STREAMS             HEX: 8E71
+
+CONSTANT: GL_DOUBLE_VEC2                    HEX: 8FFC
+CONSTANT: GL_DOUBLE_VEC3                    HEX: 8FFD
+CONSTANT: GL_DOUBLE_VEC4                    HEX: 8FFE
+CONSTANT: GL_DOUBLE_MAT2                    HEX: 8F46
+CONSTANT: GL_DOUBLE_MAT3                    HEX: 8F47
+CONSTANT: GL_DOUBLE_MAT4                    HEX: 8F48
+CONSTANT: GL_DOUBLE_MAT2x3                  HEX: 8F49
+CONSTANT: GL_DOUBLE_MAT2x4                  HEX: 8F4A
+CONSTANT: GL_DOUBLE_MAT3x2                  HEX: 8F4B
+CONSTANT: GL_DOUBLE_MAT3x4                  HEX: 8F4C
+CONSTANT: GL_DOUBLE_MAT4x2                  HEX: 8F4D
+CONSTANT: GL_DOUBLE_MAT4x3                  HEX: 8F4E
+
+CONSTANT: GL_ACTIVE_SUBROUTINES             HEX: 8DE5
+CONSTANT: GL_ACTIVE_SUBROUTINE_UNIFORMS     HEX: 8DE6
+CONSTANT: GL_ACTIVE_SUBROUTINE_UNIFORM_LOCATIONS HEX: 8E47
+CONSTANT: GL_ACTIVE_SUBROUTINE_MAX_LENGTH   HEX: 8E48
+CONSTANT: GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTH HEX: 8E49
+CONSTANT: GL_MAX_SUBROUTINES                HEX: 8DE7
+CONSTANT: GL_MAX_SUBROUTINE_UNIFORM_LOCATIONS HEX: 8DE8
+CONSTANT: GL_NUM_COMPATIBLE_SUBROUTINES     HEX: 8E4A
+CONSTANT: GL_COMPATIBLE_SUBROUTINES         HEX: 8E4B
+
+CONSTANT: GL_PATCHES                        HEX: 000E
+CONSTANT: GL_PATCH_VERTICES                 HEX: 8E72
+CONSTANT: GL_PATCH_DEFAULT_INNER_LEVEL      HEX: 8E73
+CONSTANT: GL_PATCH_DEFAULT_OUTER_LEVEL      HEX: 8E74
+CONSTANT: GL_TESS_CONTROL_OUTPUT_VERTICES   HEX: 8E75
+CONSTANT: GL_TESS_GEN_MODE                  HEX: 8E76
+CONSTANT: GL_TESS_GEN_SPACING               HEX: 8E77
+CONSTANT: GL_TESS_GEN_VERTEX_ORDER          HEX: 8E78
+CONSTANT: GL_TESS_GEN_POINT_MODE            HEX: 8E79
+CONSTANT: GL_ISOLINES                       HEX: 8E7A
+CONSTANT: GL_FRACTIONAL_ODD                 HEX: 8E7B
+CONSTANT: GL_FRACTIONAL_EVEN                HEX: 8E7C
+CONSTANT: GL_MAX_PATCH_VERTICES             HEX: 8E7D
+CONSTANT: GL_MAX_TESS_GEN_LEVEL             HEX: 8E7E
+CONSTANT: GL_MAX_TESS_CONTROL_UNIFORM_COMPONENTS HEX: 8E7F
+CONSTANT: GL_MAX_TESS_EVALUATION_UNIFORM_COMPONENTS HEX: 8E80
+CONSTANT: GL_MAX_TESS_CONTROL_TEXTURE_IMAGE_UNITS HEX: 8E81
+CONSTANT: GL_MAX_TESS_EVALUATION_TEXTURE_IMAGE_UNITS HEX: 8E82
+CONSTANT: GL_MAX_TESS_CONTROL_OUTPUT_COMPONENTS HEX: 8E83
+CONSTANT: GL_MAX_TESS_PATCH_COMPONENTS      HEX: 8E84
+CONSTANT: GL_MAX_TESS_CONTROL_TOTAL_OUTPUT_COMPONENTS HEX: 8E85
+CONSTANT: GL_MAX_TESS_EVALUATION_OUTPUT_COMPONENTS HEX: 8E86
+CONSTANT: GL_MAX_TESS_CONTROL_UNIFORM_BLOCKS HEX: 8E89
+CONSTANT: GL_MAX_TESS_EVALUATION_UNIFORM_BLOCKS HEX: 8E8A
+CONSTANT: GL_MAX_TESS_CONTROL_INPUT_COMPONENTS HEX: 886C
+CONSTANT: GL_MAX_TESS_EVALUATION_INPUT_COMPONENTS HEX: 886D
+CONSTANT: GL_MAX_COMBINED_TESS_CONTROL_UNIFORM_COMPONENTS HEX: 8E1E
+CONSTANT: GL_MAX_COMBINED_TESS_EVALUATION_UNIFORM_COMPONENTS HEX: 8E1F
+CONSTANT: GL_UNIFORM_BLOCK_REFERENCED_BY_TESS_CONTROL_SHADER HEX: 84F0
+CONSTANT: GL_UNIFORM_BLOCK_REFERENCED_BY_TESS_EVALUATION_SHADER HEX: 84F1
+CONSTANT: GL_TESS_EVALUATION_SHADER         HEX: 8E87
+CONSTANT: GL_TESS_CONTROL_SHADER            HEX: 8E88
+CONSTANT: GL_TRANSFORM_FEEDBACK             HEX: 8E22
+CONSTANT: GL_TRANSFORM_FEEDBACK_BUFFER_PAUSED HEX: 8E23
+CONSTANT: GL_TRANSFORM_FEEDBACK_BUFFER_ACTIVE HEX: 8E24
+CONSTANT: GL_TRANSFORM_FEEDBACK_BINDING     HEX: 8E25
+CONSTANT: GL_MAX_TRANSFORM_FEEDBACK_BUFFERS HEX: 8E70
+
+GL-FUNCTION: void glUniform1d { } ( GLint location, GLdouble x ) ;
+GL-FUNCTION: void glUniform2d { } ( GLint location, GLdouble x, GLdouble y ) ;
+GL-FUNCTION: void glUniform3d { } ( GLint location, GLdouble x, GLdouble y, GLdouble z ) ;
+GL-FUNCTION: void glUniform4d { } ( GLint location, GLdouble x, GLdouble y, GLdouble z, GLdouble w ) ;
+GL-FUNCTION: void glUniform1dv { } ( GLint location, GLsizei count, GLdouble* value ) ;
+GL-FUNCTION: void glUniform2dv { } ( GLint location, GLsizei count, GLdouble* value ) ;
+GL-FUNCTION: void glUniform3dv { } ( GLint location, GLsizei count, GLdouble* value ) ;
+GL-FUNCTION: void glUniform4dv { } ( GLint location, GLsizei count, GLdouble* value ) ;
+GL-FUNCTION: void glUniformMatrix2dv { } ( GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glUniformMatrix3dv { } ( GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glUniformMatrix4dv { } ( GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glUniformMatrix2x3dv { } ( GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glUniformMatrix2x4dv { } ( GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glUniformMatrix3x2dv { } ( GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glUniformMatrix3x4dv { } ( GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glUniformMatrix4x2dv { } ( GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glUniformMatrix4x3dv { } ( GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glGetUniformdv { } ( GLuint program, GLint location, GLdouble* params ) ;
+GL-FUNCTION: void glProgramUniform1dEXT { } ( GLuint program, GLint location, GLdouble x ) ;
+GL-FUNCTION: void glProgramUniform2dEXT { } ( GLuint program, GLint location, GLdouble x, GLdouble y ) ;
+GL-FUNCTION: void glProgramUniform3dEXT { } ( GLuint program, GLint location, GLdouble x, GLdouble y, GLdouble z ) ;
+GL-FUNCTION: void glProgramUniform4dEXT { } ( GLuint program, GLint location, GLdouble x, GLdouble y, GLdouble z, GLdouble w ) ;
+GL-FUNCTION: void glProgramUniform1dvEXT { } ( GLuint program, GLint location, GLsizei count, GLdouble* value ) ;
+GL-FUNCTION: void glProgramUniform2dvEXT { } ( GLuint program, GLint location, GLsizei count, GLdouble* value ) ;
+GL-FUNCTION: void glProgramUniform3dvEXT { } ( GLuint program, GLint location, GLsizei count, GLdouble* value ) ;
+GL-FUNCTION: void glProgramUniform4dvEXT { } ( GLuint program, GLint location, GLsizei count, GLdouble* value ) ;
+GL-FUNCTION: void glProgramUniformMatrix2dvEXT { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glProgramUniformMatrix3dvEXT { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glProgramUniformMatrix4dvEXT { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glProgramUniformMatrix2x3dvEXT { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glProgramUniformMatrix2x4dvEXT { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glProgramUniformMatrix3x2dvEXT { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glProgramUniformMatrix3x4dvEXT { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glProgramUniformMatrix4x2dvEXT { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+GL-FUNCTION: void glProgramUniformMatrix4x3dvEXT { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLdouble* value ) ;
+
+GL-FUNCTION: GLint glGetSubroutineUniformLocation { } ( GLuint program, GLenum shadertype, GLstring name ) ;
+GL-FUNCTION: GLuint glGetSubroutineIndex { } ( GLuint program, GLenum shadertype, GLstring name ) ;
+GL-FUNCTION: void glGetActiveSubroutineUniformiv { } ( GLuint program, GLenum shadertype, GLuint index, GLenum pname, GLint* values ) ;
+GL-FUNCTION: void glGetActiveSubroutineUniformName { } ( GLuint program, GLenum shadertype, GLuint index, GLsizei bufsize, GLsizei* length, GLstring name ) ;
+GL-FUNCTION: void glGetActiveSubroutineName { } ( GLuint program, GLenum shadertype, GLuint index, GLsizei bufsize, GLsizei* length, GLstring name ) ;
+GL-FUNCTION: void glUniformSubroutinesuiv { } ( GLenum shadertype, GLsizei count, GLuint* indices ) ;
+GL-FUNCTION: void glGetUniformSubroutineuiv { } ( GLenum shadertype, GLint location, GLuint* params ) ;
+GL-FUNCTION: void glGetProgramStageiv { } ( GLuint program, GLenum shadertype, GLenum pname, GLint* values ) ;
+
+GL-FUNCTION: void glPatchParameteri { } ( GLenum pname, GLint value ) ;
+GL-FUNCTION: void glPatchParameterfv { } ( GLenum pname, GLfloat* values ) ;
+
+GL-FUNCTION: void glBindTransformFeedback { } ( GLenum target, GLuint id ) ;
+GL-FUNCTION: void glDeleteTransformFeedbacks { } ( GLsizei n, GLuint* ids ) ;
+GL-FUNCTION: void glGenTransformFeedbacks { } ( GLsizei n, GLuint* ids ) ;
+GL-FUNCTION: GLboolean glIsTransformFeedback { } ( GLuint id ) ;
+GL-FUNCTION: void glPauseTransformFeedback { } ( ) ;
+GL-FUNCTION: void glResumeTransformFeedback { } ( ) ;
+GL-FUNCTION: void glDrawTransformFeedback { } ( GLenum mode, GLuint id ) ;
+
+GL-FUNCTION: void glDrawTransformFeedbackStream { } ( GLenum mode, GLuint id, GLuint stream ) ;
+GL-FUNCTION: void glBeginQueryIndexed { } ( GLenum target, GLuint index, GLuint id ) ;
+GL-FUNCTION: void glEndQueryIndexed { } ( GLenum target, GLuint index ) ;
+GL-FUNCTION: void glGetQueryIndexediv { } ( GLenum target, GLuint index, GLenum pname, GLint* params ) ;
+
+
 ! GL_ARB_geometry_shader4
 
 GL-FUNCTION: void glProgramParameteriARB { glProgramParameteriEXT }
@@ -2289,6 +2510,7 @@ CONSTANT: GL_LUMINANCE16F_ARB HEX: 881E
 CONSTANT: GL_LUMINANCE_ALPHA16F_ARB HEX: 881F
 CONSTANT: GL_TEXTURE_LUMINANCE_TYPE_ARB HEX: 8C14
 CONSTANT: GL_TEXTURE_INTENSITY_TYPE_ARB HEX: 8C15
+
 
 ! GL_EXT_texture_integer
 
@@ -2329,12 +2551,14 @@ CONSTANT: GL_LUMINANCE_ALPHA_INTEGER_EXT  HEX: 8D9D
 GL-FUNCTION: void glClearColorIiEXT { } ( GLint r, GLint g, GLint b, GLint a ) ;
 GL-FUNCTION: void glClearColorIuiEXT { } ( GLuint r, GLuint g, GLuint b, GLuint a ) ;
 
+
 ! GL_EXT_texture_compression_s3tc, GL_EXT_texture_compression_dxt1
 
 CONSTANT: GL_COMPRESSED_RGB_S3TC_DXT1_EXT  HEX: 83F0
 CONSTANT: GL_COMPRESSED_RGBA_S3TC_DXT1_EXT HEX: 83F1
 CONSTANT: GL_COMPRESSED_RGBA_S3TC_DXT3_EXT HEX: 83F2
 CONSTANT: GL_COMPRESSED_RGBA_S3TC_DXT5_EXT HEX: 83F3
+
 
 ! GL_EXT_texture_compression_latc
 
