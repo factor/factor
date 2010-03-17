@@ -23,6 +23,7 @@ IN: bootstrap.compiler
 "prettyprint" vocab [
     "stack-checker.errors.prettyprint" require
     "alien.prettyprint" require
+    "alien.debugger" require
 ] when
 
 "cpu." cpu name>> append require
