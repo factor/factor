@@ -2,7 +2,7 @@ USING: help.markup help.syntax sequences math ;
 IN: bit-sets
 
 ARTICLE: "bit-sets" "Bit sets"
-"The " { $vocab-link "bit-sets" } " vocabulary implements bit-array-backed sets. Bitsets are efficient for implementing relatively dense sets whose members are in a contiguous range of integers starting from 0. One bit is required for each integer in this range in the underlying representation."
+"The " { $vocab-link "bit-sets" } " vocabulary implements bit-array-backed sets. Bitsets are efficient for implementing relatively dense sets whose members are in a contiguous range of integers starting from 0. One bit is required for each integer in this range in the underlying representation." $nl
 "Bit sets are of the class"
 { $subsection bit-set }
 "They can be instantiated with the word"
@@ -11,7 +11,7 @@ ARTICLE: "bit-sets" "Bit sets"
 ABOUT: "bit-sets"
 
 HELP: bit-set
-{ $class-description "The class of bit-array-based sets. These implement the " { $link "sets" } "." } ;
+{ $class-description "The class of bit-array-based " { $link "sets" } "." } ;
 
 HELP: <bit-set>
 { $values { "capacity" integer } { "bit-set" bit-set } }
