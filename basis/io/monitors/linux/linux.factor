@@ -6,6 +6,7 @@ io.backend.unix io.encodings.utf8 unix.linux.inotify assocs
 namespaces make threads continuations init math math.bitwise
 sets alien alien.strings alien.c-types vocabs.loader accessors
 system hashtables destructors unix classes.struct ;
+FROM: namespaces => set ;
 IN: io.monitors.linux
 
 SYMBOL: watches
