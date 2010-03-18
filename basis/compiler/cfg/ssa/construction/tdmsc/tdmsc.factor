@@ -88,7 +88,6 @@ PRIVATE>
 : compute-merge-sets ( cfg -- )
     needs-dominance
 
-    HS{ } clone visited set
     [ compute-levels ]
     [ init-merge-sets ]
     [ compute-merge-set-loop ]
@@ -96,6 +95,3 @@ PRIVATE>
 
 : merge-set ( bbs -- bbs' )
      (merge-set) [ members ] dip nths ;
-
-: merge-set-each ( bbs quot: ( bb -- ) -- )
-    [ merge-set ] dip each ; inline
