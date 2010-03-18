@@ -509,6 +509,11 @@ M: bad-executable summary
 
 \ set-special-object { object fixnum } { } define-primitive
 
+\ context-object { fixnum } { object } define-primitive
+\ context-object make-flushable
+
+\ set-context-object { object fixnum } { } define-primitive
+
 \ (exists?) { string } { object } define-primitive
 
 \ minor-gc { } { } define-primitive

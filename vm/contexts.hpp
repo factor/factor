@@ -1,6 +1,14 @@
 namespace factor
 {
 
+static const cell context_object_count = 10;
+
+enum context_object {
+	OBJ_NAMESTACK,
+	OBJ_CATCHSTACK,
+	OBJ_CONTEXT_ID,
+};
+
 /* Assembly code makes assumptions about the layout of this struct */
 struct context {
 	/* C stack pointer on entry */
@@ -19,13 +27,16 @@ struct context {
 	/* memory region holding current retain stack */
 	segment *retainstack_region;
 
-	/* saved special_objects slots on entry to callback */
-	cell catchstack_save;
-	cell current_callback_save;
+	/* context-specific special objects, accessed by context-object and
+	set-context-object primitives */
+	cell context_objects[context_object_count];
 
 	context *next;
 
 	context(cell ds_size, cell rs_size);
+	void reset_datastack();
+	void reset_retainstack();
+	void reset_context_objects();
 
 	cell peek()
 	{
@@ -48,16 +59,6 @@ struct context {
 	{
 		datastack += sizeof(cell);
 		replace(tagged);
-	}
-
-	void reset_datastack()
-	{
-		datastack = datastack_region->start - sizeof(cell);
-	}
-
-	void reset_retainstack()
-	{
-		retainstack = retainstack_region->start - sizeof(cell);
 	}
 
 	static const cell stack_reserved = (64 * sizeof(cell));

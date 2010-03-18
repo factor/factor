@@ -4,7 +4,6 @@ continuations effects fry kernel locals math math.order namespaces
 quotations sequences splitting
 stack-checker.backend
 stack-checker.errors
-stack-checker.known-words
 stack-checker.state
 stack-checker.values
 stack-checker.visitor ;

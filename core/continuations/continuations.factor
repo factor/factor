@@ -13,7 +13,7 @@ SYMBOL: restarts
 <PRIVATE
 
 : catchstack* ( -- catchstack )
-    1 special-object { vector } declare ; inline
+    1 context-object { vector } declare ; inline
 
 : >c ( continuation -- ) catchstack* push ;
 
@@ -23,13 +23,14 @@ SYMBOL: restarts
 : dummy-1 ( -- obj ) f ;
 : dummy-2 ( obj -- obj ) dup drop ;
 
-: init-catchstack ( -- ) V{ } clone 1 set-special-object ;
-
-PRIVATE>
-
 : catchstack ( -- catchstack ) catchstack* clone ; inline
 
-: set-catchstack ( catchstack -- ) >vector 1 set-special-object ; inline
+: set-catchstack ( catchstack -- )
+    >vector 1 set-context-object ; inline
+
+: init-catchstack ( -- ) f set-catchstack ;
+
+PRIVATE>
 
 TUPLE: continuation data call retain name catch ;
 
@@ -39,14 +40,12 @@ C: <continuation> continuation
     datastack callstack retainstack namestack catchstack
     <continuation> ;
 
+<PRIVATE
+
 : >continuation< ( continuation -- data call retain name catch )
-    {
-        [ data>>   ]
-        [ call>>   ]
-        [ retain>> ]
-        [ name>>   ]
-        [ catch>>  ]
-    } cleave ;
+    { [ data>> ] [ call>> ] [ retain>> ] [ name>> ] [ catch>> ] } cleave ;
+
+PRIVATE>
 
 : ifcc ( capture restore -- )
     [ dummy-1 continuation ] 2dip [ dummy-2 ] prepose ?if ; inline
@@ -172,7 +171,7 @@ M: condition compute-restarts
 <PRIVATE
 
 : init-error-handler ( -- )
-    V{ } clone set-catchstack
+    init-catchstack
     ! VM calls on error
     [
         ! 63 = self
