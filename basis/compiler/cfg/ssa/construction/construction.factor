@@ -57,7 +57,7 @@ SYMBOL: inserting-phi-nodes
     ] [ 2drop ] if ;
 
 : compute-phi-nodes-for ( vreg bbs -- )
-    keys [ insert-phi-node-later ] with merge-set-each ;
+    keys merge-set [ insert-phi-node-later ] with each ;
 
 : compute-phi-nodes ( -- )
     H{ } clone inserting-phi-nodes set
