@@ -1,8 +1,7 @@
-! Copyright (C) 2005, 2010 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.order strings arrays vectors sequences
-sequences.private accessors fry combinators.short-circuit
-combinators ;
+sequences.private accessors fry combinators ;
 IN: grouping
 
 <PRIVATE
@@ -64,8 +63,7 @@ TUPLE: chunking-seq { seq read-only } { n read-only } ;
     2dup >= [ - ] [ drop ] if ; inline
 
 : check-circular-clumps ( seq n -- seq n )
-    2dup { [ nip 0 <= ] [ swap length > ] } 2|| 
-    [ "Invalid clump size" throw ] when ; inline
+    2dup 1 - swap bounds-check 2drop ; inline
 
 PRIVATE>
 
@@ -115,15 +113,18 @@ INSTANCE: sliced-clumps abstract-clumps
 
 : all-eq? ( seq -- ? ) [ eq? ] monotonic? ;
 
-TUPLE: circular-slice
-    { from read-only }
-    { to   read-only }
-    { seq  read-only } ;
+TUPLE: circular-slice { from read-only } { to read-only } { seq read-only } ;
+
 INSTANCE: circular-slice virtual-sequence
+
 M: circular-slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
+
 M: circular-slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
+
 M: circular-slice length [ to>> ] [ from>> ] bi - ; inline
+
 M: circular-slice virtual-exemplar seq>> ; inline
+
 M: circular-slice virtual@
     [ from>> + ] [ seq>> ] bi [ length slice-mod ] keep ; inline
 
@@ -155,4 +156,3 @@ M: circular-clumps nth
 
 : circular-clump ( seq n -- array )
     <circular-clumps> { } like ; inline
-
