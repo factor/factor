@@ -30,6 +30,11 @@ M: bit-set delete
 ! of the same length.
 <PRIVATE
 
+ERROR: check-bit-set-failed ;
+
+: check-bit-set ( bit-set -- bit-set )
+    dup bit-set? [ check-bit-set-failed ] unless ; inline
+
 : bit-set-map ( seq1 seq2 quot -- seq )
     [ 2drop length>> ]
     [
@@ -62,13 +67,20 @@ M: bit-set subset?
 M: bit-set members
     [ table>> length iota ] keep [ in? ] curry filter ;
 
-M: bit-set set-like
+<PRIVATE
+
+: bit-set-like ( set bit-set -- bit-set' )
     ! This crashes if there are keys that can't be put in the bit set
-    over bit-set? [ 2dup [ table>> ] bi@ length = ] [ f ] if
+    over bit-set? [ 2dup [ table>> length ] bi@ = ] [ f ] if
     [ drop ] [
         [ members ] dip table>> length <bit-set>
         [ [ adjoin ] curry each ] keep
     ] if ;
+
+PRIVATE>
+
+M: bit-set set-like
+    bit-set-like check-bit-set ; inline
 
 M: bit-set clone
     table>> clone bit-set boa ;
