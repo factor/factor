@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs strings kernel sorting namespaces
-sequences definitions ;
+sequences definitions sets ;
 IN: vocabs
 
 SYMBOL: dictionary
@@ -83,6 +83,9 @@ ERROR: bad-vocab-name name ;
 : check-vocab-name ( name -- name )
     dup string? [ bad-vocab-name ] unless ;
 
+SYMBOL: conditional-requires
+conditional-requires [ H{ } clone ] initialize
+
 : create-vocab ( name -- vocab )
     check-vocab-name
     dictionary get [ <vocab> ] cache
@@ -118,8 +121,8 @@ M: vocab-spec >vocab-link ;
 M: string >vocab-link dup vocab [ ] [ <vocab-link> ] ?if ;
 
 : forget-vocab ( vocab -- )
-    dup words forget-all
-    vocab-name dictionary get delete-at
+    [ words forget-all ]
+    [ vocab-name dictionary get delete-at ] bi
     notify-vocab-observers ;
 
 M: vocab-spec forget* forget-vocab ;
