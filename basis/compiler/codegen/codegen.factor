@@ -1,11 +1,12 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces make math math.order math.parser sequences accessors
-kernel kernel.private layouts assocs words summary arrays
-combinators classes.algebra alien alien.c-types
-alien.strings alien.arrays alien.complex alien.libraries sets libc
-continuations.private fry cpu.architecture classes classes.struct locals
-source-files.errors slots parser generic.parser strings
+USING: namespaces make math math.order math.parser sequences
+accessors kernel layouts assocs words summary arrays combinators
+classes.algebra alien alien.private alien.c-types alien.strings
+alien.arrays alien.complex alien.libraries sets libc
+continuations.private fry cpu.architecture classes
+classes.struct locals source-files.errors slots parser
+generic.parser strings quotations
 compiler.errors
 compiler.alien
 compiler.constants
@@ -461,22 +462,6 @@ M: ##alien-indirect generate-insn
         box-parameters
     ] with-param-regs ;
 
-TUPLE: callback-context ;
-
-: current-callback ( -- id ) 2 special-object ;
-
-: wait-to-return ( token -- )
-    dup current-callback eq? [
-        drop
-    ] [
-        yield-hook get call( -- ) wait-to-return
-    ] if ;
-
-: do-callback ( quot token -- )
-    init-catchstack
-    [ 2 set-special-object call ] keep
-    wait-to-return ; inline
-
 : callback-return-quot ( ctype -- quot )
     return>> {
         { [ dup void? ] [ drop [ ] ] }
@@ -488,12 +473,10 @@ TUPLE: callback-context ;
     parameters>> [ c-type c-type-boxer-quot ] map spread>quot ;
 
 : wrap-callback-quot ( params -- quot )
-    [
-        [ callback-prep-quot ]
-        [ quot>> ]
-        [ callback-return-quot ] tri 3append ,
-        [ callback-context new do-callback ] %
-    ] [ ] make ;
+    [ callback-prep-quot ] [ quot>> ] [ callback-return-quot ] tri 3append
+     yield-hook get
+     '[ _ _ do-callback ]
+     >quotation ;
 
 M: ##alien-callback generate-insn
     params>>

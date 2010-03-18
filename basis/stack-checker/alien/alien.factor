@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors combinators math namespaces
-init sets words assocs alien.libraries alien alien.c-types
-cpu.architecture fry stack-checker.backend stack-checker.errors
-stack-checker.visitor stack-checker.dependencies ;
+init sets words assocs alien.libraries alien alien.private
+alien.c-types cpu.architecture fry stack-checker.backend
+stack-checker.errors stack-checker.visitor
+stack-checker.dependencies ;
 IN: stack-checker.alien
 
 TUPLE: alien-node-params return parameters abi in-d out-d ;
