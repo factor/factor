@@ -96,7 +96,7 @@ PRIVATE>
 : require ( vocab -- )
     load-vocab drop ;
 
-: require-if ( if then -- )
+: require-when ( if then -- )
     over vocab
     [ nip require ]
     [ swap conditional-requires get [ swap suffix ] change-at ]
