@@ -27,23 +27,23 @@ M: recursive-quotation-error summary
 
 M: undeclared-recursion-error summary
     word>> name>>
-    "The inline recursive word " " must be declared recursive" surround ;
+    "The inline recursive word “" "” must be declared recursive" surround ;
 
 M: diverging-recursion-error summary
     word>> name>>
-    "The recursive word " " digs arbitrarily deep into the stack" surround ;
+    "The recursive word “" "” digs arbitrarily deep into the stack" surround ;
 
 M: unbalanced-recursion-error summary
     word>> name>>
-    "The recursive word " " leaves with the stack having the wrong height" surround ;
+    "The recursive word “" "” leaves with the stack having the wrong height" surround ;
 
 M: inconsistent-recursive-call-error summary
     word>> name>>
-    "The recursive word "
-    " calls itself with a different set of quotation parameters than were input" surround ;
+    "The recursive word “"
+    "” calls itself with a different set of quotation parameters than were input" surround ;
 
 M: transform-expansion-error summary
-    word>> name>> "Macro expansion of " " threw an error" surround ;
+    word>> name>> "Macro expansion of “" "” threw an error" surround ;
 
 M: transform-expansion-error error.
     [ summary print ]
@@ -52,14 +52,13 @@ M: transform-expansion-error error.
     tri ;
 
 M: do-not-compile summary
-    word>> name>> "Cannot compile call to " prepend ;
+    word>> name>> "Cannot compile call to “" "”" surround ;
 
 M: unbalanced-branches-error summary
     word>> name>>
-    "The input quotations to " " don't match their expected effects" surround ;
+    "The input quotations to “" "” don't match their expected effects" surround ;
 
 M: unbalanced-branches-error error.
     dup summary print
     [ quots>> ] [ declareds>> ] [ actuals>> ] tri 3array flip
     { "Input" "Expected" "Got" } prefix simple-table. ;
-
