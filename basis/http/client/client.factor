@@ -196,4 +196,4 @@ ERROR: download-failed response ;
 
 USING: vocabs vocabs.loader ;
 
-"debugger" vocab [ "http.client.debugger" require ] when
+"debugger" "http.client.debugger" require-when
