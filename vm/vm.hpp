@@ -18,7 +18,8 @@ struct factor_vm
 	cell cards_offset;
 	cell decks_offset;
 
-	/* TAGGED user environment data; see getenv/setenv prims */
+	/* Various special objects, accessed by special-object and
+	set-special-object primitives */
 	cell special_objects[special_object_count];
 
 	/* Data stack and retain stack sizes */
@@ -100,6 +101,8 @@ struct factor_vm
 	void nest_stacks();
 	void unnest_stacks();
 	void init_stacks(cell ds_size_, cell rs_size_);
+	void primitive_context_object();
+	void primitive_set_context_object();
 	bool stack_to_array(cell bottom, cell top);
 	cell array_to_stack(array *array, cell bottom);
 	void primitive_datastack();

@@ -10,12 +10,26 @@ context::context(cell ds_size, cell rs_size) :
 	retainstack(0),
 	datastack_region(new segment(ds_size,false)),
 	retainstack_region(new segment(rs_size,false)),
-	catchstack_save(0),
-	current_callback_save(0),
 	next(NULL)
 {
 	reset_datastack();
 	reset_retainstack();
+	reset_context_objects();
+}
+
+void context::reset_datastack()
+{
+	datastack = datastack_region->start - sizeof(cell);
+}
+
+void context::reset_retainstack()
+{
+	retainstack = retainstack_region->start - sizeof(cell);
+}
+
+void context::reset_context_objects()
+{
+	memset_cell(context_objects,false_object,context_object_count * sizeof(cell));
 }
 
 context *factor_vm::alloc_context()
@@ -47,12 +61,9 @@ void factor_vm::nest_stacks()
 	new_ctx->callstack_bottom = (stack_frame *)-1;
 	new_ctx->callstack_top = (stack_frame *)-1;
 
-	/* save per-callback special_objects */
-	new_ctx->current_callback_save = special_objects[OBJ_CURRENT_CALLBACK];
-	new_ctx->catchstack_save = special_objects[OBJ_CATCHSTACK];
-
 	new_ctx->reset_datastack();
 	new_ctx->reset_retainstack();
+	new_ctx->reset_context_objects();
 
 	new_ctx->next = ctx;
 	ctx = new_ctx;
@@ -66,10 +77,6 @@ void nest_stacks(factor_vm *parent)
 /* called when leaving a compiled callback */
 void factor_vm::unnest_stacks()
 {
-	/* restore per-callback special_objects */
-	special_objects[OBJ_CURRENT_CALLBACK] = ctx->current_callback_save;
-	special_objects[OBJ_CATCHSTACK] = ctx->catchstack_save;
-
 	context *old_ctx = ctx;
 	ctx = old_ctx->next;
 	dealloc_context(old_ctx);
@@ -87,6 +94,19 @@ void factor_vm::init_stacks(cell ds_size_, cell rs_size_)
 	rs_size = rs_size_;
 	ctx = NULL;
 	unused_contexts = NULL;
+}
+
+void factor_vm::primitive_context_object()
+{
+	fixnum n = untag_fixnum(ctx->peek());
+	ctx->replace(ctx->context_objects[n]);
+}
+
+void factor_vm::primitive_set_context_object()
+{
+	fixnum n = untag_fixnum(ctx->pop());
+	cell value = ctx->pop();
+	ctx->context_objects[n] = value;
 }
 
 bool factor_vm::stack_to_array(cell bottom, cell top)
