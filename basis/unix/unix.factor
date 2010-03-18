@@ -74,8 +74,6 @@ M: unix open-file [ open ] unix-system-call ;
 
 <<
 
-"debugger" vocab [
-    "unix.debugger" require
-] when
+"debugger" "unix.debugger" require-when
 
 >>

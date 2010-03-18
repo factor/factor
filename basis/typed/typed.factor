@@ -166,4 +166,4 @@ SYNTAX: TYPED::
 
 USING: vocabs vocabs.loader ;
 
-"prettyprint" vocab [ "typed.prettyprint" require ] when
+"prettyprint" "typed.prettyprint" require-when
