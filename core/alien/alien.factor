@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel math namespaces sequences system
-kernel.private byte-arrays byte-vectors arrays init ;
+kernel.private byte-arrays byte-vectors arrays init
+continuations.private ;
 IN: alien
 
 PREDICATE: pinned-alien < alien underlying>> not ;
@@ -83,6 +84,8 @@ ERROR: alien-assembly-error code ;
 : alien-assembly ( args... return parameters abi quot -- return... )
     dup alien-assembly-error ;
 
+<PRIVATE
+
 ! Callbacks are registered in a global hashtable. Note that they
 ! are also pinned in a special callback area, so clearing this
 ! hashtable will not reclaim callbacks. It should only be
@@ -91,8 +94,29 @@ SYMBOL: callbacks
 
 [ H{ } clone callbacks set-global ] "alien" add-startup-hook
 
-<PRIVATE
+! Every context object in the VM is identified from the Factor
+! side by a unique identifier
+TUPLE: context-id < identity-tuple ;
 
+C: <context-id> context-id
+
+: context-id ( -- id ) 2 context-object ;
+
+: set-context-id ( id -- ) 2 set-context-object ;
+
+: wait-to-return ( yield-quot id -- )
+    dup context-id eq?
+    [ 2drop ] [ over call( -- ) wait-to-return ] if ;
+
+! Used by compiler.codegen to wrap callback bodies
+: do-callback ( callback-quot yield-quot -- )
+    init-namespaces
+    init-catchstack
+    <context-id>
+    [ set-context-id drop call ] [ wait-to-return drop ] 3bi ; inline
+
+! A utility for defining global variables that are recompiled in
+! every session
 TUPLE: expiry-check object alien ;
 
 : recompute-value? ( check -- ? )
