@@ -4,11 +4,7 @@ namespace factor
 static const cell special_object_count = 70;
 
 enum special_object {
-	OBJ_NAMESTACK,             /* used by library only */
-	OBJ_CATCHSTACK,            /* used by library only, per-callback */
-
-	OBJ_CURRENT_CALLBACK = 2,  /* used by library only, per-callback */
-	OBJ_WALKER_HOOK,           /* non-local exit hook, used by library only */
+	OBJ_WALKER_HOOK = 3,       /* non-local exit hook, used by library only */
 	OBJ_CALLCC_1,              /* used to pass the value in callcc1 */
 
 	ERROR_HANDLER_QUOT = 5,    /* quotation called when VM throws an error */

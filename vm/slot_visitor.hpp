@@ -26,6 +26,7 @@ template<typename Visitor> struct slot_visitor {
 
 	cell visit_pointer(cell pointer);
 	void visit_handle(cell *handle);
+	void visit_object_array(cell *start, cell *end);
 	void visit_slots(object *ptr, cell payload_start);
 	void visit_slots(object *ptr);
 	void visit_stack_elements(segment *region, cell *top);
@@ -56,6 +57,12 @@ void slot_visitor<Visitor>::visit_handle(cell *handle)
 }
 
 template<typename Visitor>
+void slot_visitor<Visitor>::visit_object_array(cell *start, cell *end)
+{
+	while(start < end) visit_handle(start++);
+}
+
+template<typename Visitor>
 void slot_visitor<Visitor>::visit_slots(object *ptr, cell payload_start)
 {
 	cell *slot = (cell *)ptr;
@@ -64,7 +71,7 @@ void slot_visitor<Visitor>::visit_slots(object *ptr, cell payload_start)
 	if(slot != end)
 	{
 		slot++;
-		for(; slot < end; slot++) visit_handle(slot);
+		visit_object_array(slot,end);
 	}
 }
 
@@ -77,8 +84,7 @@ void slot_visitor<Visitor>::visit_slots(object *ptr)
 template<typename Visitor>
 void slot_visitor<Visitor>::visit_stack_elements(segment *region, cell *top)
 {
-	for(cell *ptr = (cell *)region->start; ptr <= top; ptr++)
-		visit_handle(ptr);
+	visit_object_array((cell *)region->start,top + 1);
 }
 
 template<typename Visitor>
@@ -88,11 +94,7 @@ void slot_visitor<Visitor>::visit_data_roots()
 	std::vector<data_root_range>::const_iterator end = parent->data_roots.end();
 
 	for(; iter < end; iter++)
-	{
-		data_root_range r = *iter;
-		for(cell index = 0; index < r.len; index++)
-			visit_handle(r.start + index);
-	}
+		visit_object_array(iter->start,iter->start + iter->len);
 }
 
 template<typename Visitor>
@@ -162,8 +164,7 @@ void slot_visitor<Visitor>::visit_roots()
 	visit_callback_roots();
 	visit_literal_table_roots();
 
-	for(cell i = 0; i < special_object_count; i++)
-		visit_handle(&parent->special_objects[i]);
+	visit_object_array(parent->special_objects,parent->special_objects + special_object_count);
 }
 
 template<typename Visitor>
@@ -175,9 +176,7 @@ void slot_visitor<Visitor>::visit_contexts()
 	{
 		visit_stack_elements(ctx->datastack_region,(cell *)ctx->datastack);
 		visit_stack_elements(ctx->retainstack_region,(cell *)ctx->retainstack);
-
-		visit_handle(&ctx->catchstack_save);
-		visit_handle(&ctx->current_callback_save);
+		visit_object_array(ctx->context_objects,ctx->context_objects + context_object_count);
 
 		ctx = ctx->next;
 	}
