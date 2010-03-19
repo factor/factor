@@ -330,24 +330,13 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
 
 : callback-3 ( -- callback ) void { } "cdecl" [ 5 "x" set ] alien-callback ;
 
-[ t ] [
-    namestack*
-    3 "x" set callback-3 callback_test_1
-    namestack* eq?
-] unit-test
-
-[ 5 ] [
+[ t 3 5 ] [
     [
-        3 "x" set callback-3 callback_test_1 "x" get
+        namestack*
+        3 "x" set callback-3 callback_test_1
+        namestack* eq?
+        "x" get "x" get-global
     ] with-scope
-] unit-test
-
-: callback-4 ( -- callback )
-    void { } "cdecl" [ "Hello world" write ] alien-callback
-    gc ;
-
-[ "Hello world" ] [
-    [ callback-4 callback_test_1 ] with-string-writer
 ] unit-test
 
 : callback-5 ( -- callback )

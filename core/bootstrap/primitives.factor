@@ -447,8 +447,10 @@ tuple
     { "call-clear" "kernel.private" "primitive_call_clear" (( quot -- * )) }
     { "check-datastack" "kernel.private" "primitive_check_datastack" (( array in# out# -- ? )) }
     { "compute-identity-hashcode" "kernel.private" "primitive_compute_identity_hashcode" (( obj -- )) }
+    { "context-object" "kernel.private" "primitive_context_object" (( n -- obj )) }
     { "innermost-frame-executing" "kernel.private" "primitive_innermost_stack_frame_executing" (( callstack -- obj )) }
     { "innermost-frame-scan" "kernel.private" "primitive_innermost_stack_frame_scan" (( callstack -- n )) }
+    { "set-context-object" "kernel.private" "primitive_set_context_object" (( obj n -- )) }
     { "set-datastack" "kernel.private" "primitive_set_datastack" (( ds -- )) }
     { "set-innermost-frame-quot" "kernel.private" "primitive_set_innermost_stack_frame_quot" (( n callstack -- )) }
     { "set-retainstack" "kernel.private" "primitive_set_retainstack" (( rs -- )) }

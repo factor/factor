@@ -58,19 +58,21 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
     compiler-error-messages-file
     do-step ;
 
-: check-boot-image ( -- )
-    "" to-refresh drop 2dup [ empty? not ] either?
-    [
-        "Boot image is out of date. Changed vocabs:" print
-        members [ print ] each
-        flush
-        1 exit
-    ] [ 2drop ] if ;
+: outdated-core-vocabs ( -- modified-sources modified-docs any? )
+    "" to-refresh drop 2dup [ empty? not ] either? ;
+
+: outdated-boot-image. ( modified-sources modified-docs -- )
+    "Boot image is out of date. Changed vocabs:" print
+    union [ print ] each
+    flush ;
+
+: check-boot-image ( -- ? )
+    outdated-core-vocabs [ outdated-boot-image. t ] [ 2drop f ] if ;
 
 : do-all ( -- )
     ".." [
         bootstrap-time get boot-time-file to-file
-        check-boot-image
+        check-boot-image [ 1 exit ] when
         [ do-load ] benchmark load-time-file to-file
         [ generate-help ] benchmark html-help-time-file to-file
         [ do-tests ] benchmark test-time-file to-file
