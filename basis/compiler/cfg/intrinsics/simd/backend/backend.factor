@@ -64,16 +64,19 @@ M: ##shr-vector-imm insn-available? rep>> %shr-vector-imm-reps member? ;
 M: ##horizontal-shl-vector-imm insn-available? rep>> %horizontal-shl-vector-imm-reps member? ;
 M: ##horizontal-shr-vector-imm insn-available? rep>> %horizontal-shr-vector-imm-reps member? ;
 
+: [vector-op-checked] ( #dup quot -- quot )
+    '[ _ ndup [ @ ] { } make dup [ insn-available? ] all? ] ;
+
 GENERIC# >vector-op-cond 2 ( quot #pick #dup -- quotpair )
 M:: callable >vector-op-cond ( quot #pick #dup -- quotpair )
-    #dup quot '[ 2drop _ ndup [ @ ] { } make dup [ insn-available? ] all? ]
+    #dup quot [vector-op-checked] '[ 2drop @ ]
     #dup '[ % _ nnip ]
     2array ;
 
 M:: pair >vector-op-cond ( pair #pick #dup -- quotpair )
     pair first2 :> ( class quot )
-    #pick class #dup quot
-    '[ 2drop _ npick _ instance? [ _ ndup [ @ ] { } make dup [ insn-available? ] all? ] [ f f f ] if ]
+    #pick class #dup quot [vector-op-checked]
+    '[ 2drop _ npick _ instance? _ [ f f f ] if ]
     #dup '[ % _ nnip ]
     2array ;
 
