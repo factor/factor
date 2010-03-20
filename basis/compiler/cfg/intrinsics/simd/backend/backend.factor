@@ -66,24 +66,27 @@ M: ##horizontal-shr-vector-imm insn-available? rep>> %horizontal-shr-vector-imm-
 
 GENERIC# >vector-op-cond 2 ( quot #pick #dup -- quotpair )
 M:: callable >vector-op-cond ( quot #pick #dup -- quotpair )
-    #dup quot '[ _ ndup [ @ drop ] { } make [ insn-available? ] all? ] quot 2array ;
+    #dup quot '[ 2drop _ ndup [ @ ] { } make dup [ insn-available? ] all? ]
+    #dup '[ % _ nnip ]
+    2array ;
 
 M:: pair >vector-op-cond ( pair #pick #dup -- quotpair )
     pair first2 :> ( class quot )
     #pick class #dup quot
-    '[ _ npick _ instance? [ _ ndup [ @ drop ] { } make [ insn-available? ] all? ] [ f ] if ]
-    quot 2array ;
+    '[ 2drop _ npick _ instance? [ _ ndup [ @ ] { } make dup [ insn-available? ] all? ] [ f f f ] if ]
+    #dup '[ % _ nnip ]
+    2array ;
 
 MACRO: v-vector-op ( trials -- )
-    [ 1 2 >vector-op-cond ] map '[ _ cond ] ;
+    [ 1 2 >vector-op-cond ] map '[ f f _ cond ] ;
 MACRO: vl-vector-op ( trials -- )
-    [ 1 3 >vector-op-cond ] map '[ _ cond ] ;
+    [ 1 3 >vector-op-cond ] map '[ f f _ cond ] ;
 MACRO: vv-vector-op ( trials -- )
-    [ 1 3 >vector-op-cond ] map '[ _ cond ] ;
+    [ 1 3 >vector-op-cond ] map '[ f f _ cond ] ;
 MACRO: vv-cc-vector-op ( trials -- )
-    [ 2 4 >vector-op-cond ] map '[ _ cond ] ;
+    [ 2 4 >vector-op-cond ] map '[ f f _ cond ] ;
 MACRO: vvvv-vector-op ( trials -- )
-    [ 1 5 >vector-op-cond ] map '[ _ cond ] ;
+    [ 1 5 >vector-op-cond ] map '[ f f _ cond ] ;
 
 ! Intrinsic code emission
 
