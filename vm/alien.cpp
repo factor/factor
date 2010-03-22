@@ -113,19 +113,7 @@ void *factor_vm::alien_pointer()
 		*ptr = value; \
 	}
 
-DEFINE_ALIEN_ACCESSOR(signed_cell,fixnum,from_signed_cell,to_fixnum)
-DEFINE_ALIEN_ACCESSOR(unsigned_cell,cell,from_unsigned_cell,to_cell)
-DEFINE_ALIEN_ACCESSOR(signed_8,s64,from_signed_8,to_signed_8)
-DEFINE_ALIEN_ACCESSOR(unsigned_8,u64,from_unsigned_8,to_unsigned_8)
-DEFINE_ALIEN_ACCESSOR(signed_4,s32,from_signed_4,to_fixnum)
-DEFINE_ALIEN_ACCESSOR(unsigned_4,u32,from_unsigned_4,to_cell)
-DEFINE_ALIEN_ACCESSOR(signed_2,s16,from_signed_2,to_fixnum)
-DEFINE_ALIEN_ACCESSOR(unsigned_2,u16,from_unsigned_2,to_cell)
-DEFINE_ALIEN_ACCESSOR(signed_1,s8,from_signed_1,to_fixnum)
-DEFINE_ALIEN_ACCESSOR(unsigned_1,u8,from_unsigned_1,to_cell)
-DEFINE_ALIEN_ACCESSOR(float,float,from_float,to_float)
-DEFINE_ALIEN_ACCESSOR(double,double,from_double,to_double)
-DEFINE_ALIEN_ACCESSOR(cell,void *,allot_alien,pinned_alien_offset)
+EACH_ALIEN_PRIMITIVE(DEFINE_ALIEN_ACCESSOR)
 
 /* open a native library and push a handle */
 void factor_vm::primitive_dlopen()
