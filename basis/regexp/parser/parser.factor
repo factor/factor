@@ -133,7 +133,7 @@ CharacterInBracket = !("}") Character
 QuotedCharacter = !("\\E") .
 
 Escape = "p{" CharacterInBracket*:s "}" => [[ s name>class <primitive-class> ]]
-       | "P{" CharacterInBracket*:s "}" => [[ s name>class <primitive-class> <negation> ]]
+       | "P{" CharacterInBracket*:s "}" => [[ s name>class <primitive-class> <not-class> ]]
        | "Q" QuotedCharacter*:s "\\E" => [[ s <concatenation> ]]
        | "u" Character:a Character:b Character:c Character:d
             => [[ { a b c d } hex> ensure-number ]]
