@@ -3,6 +3,8 @@
 USING: help.markup help.syntax ;
 IN: path-finding
 
+{ <astar> <bfs> } related-words
+
 HELP: astar
 { $description "This tuple must be subclassed and its method " { $link cost } ", "
   { $link heuristic } ", and " { $link neighbours } " must be implemented. "
@@ -53,6 +55,16 @@ HELP: <astar>
   "may not be as efficient as subclassing the " { $link astar } " tuple."
 } ;
 
+HELP: <bfs>
+{ $values
+  { "neighbours" "an assoc" }
+  { "astar" "a astar tuple" }
+}
+{ $description "Build an astar object from the " { $snippet "neighbours" } " assoc. "
+  "When used with " { $link find-path } ", this astar tuple will use the breadth-first search (BFS) "
+  "path finding algorithm which is a particular case of the general A* algorithm."
+} ;
+
 HELP: find-path
 { $values
   { "start" "a node" }
@@ -74,12 +86,12 @@ HELP: considered
   "which have been examined during the A* exploration."
 } ;
 
-ARTICLE: "astar" "A* algorithm"
-"The " { $vocab-link "path-finding" } " vocabulary implements a graph search algorithm for finding the least-cost path from one node to another." $nl
-"The " { $link astar } " tuple may be derived from and its " { $link cost } ", " { $link heuristic } ", and " { $link neighbours } " methods overwritten, or the " { $link <astar> } " word can be used to build such an object from quotations." $nl
+ARTICLE: "path-finding" "Path finding using the A* algorithm"
+"The " { $vocab-link "path-finding" } " vocabulary implements a graph search algorithm for finding the least-cost path from one node to another using the A* algorithm." $nl
+"The " { $link astar } " tuple may be derived from and its " { $link cost } ", " { $link heuristic } ", and " { $link neighbours } " methods overwritten, or the " { $link <astar> } " or " { $link <bfs> } " words can be used to build a new tuple." $nl
 "Make an A* object:"
-{ $subsections <astar> }
+{ $subsections <astar> <bfs> }
 "Find a path between nodes:"
 { $subsections find-path } ;
 
-ABOUT: "astar"
+ABOUT: "path-finding"
