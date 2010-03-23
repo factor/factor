@@ -5,12 +5,14 @@ compiler.cfg.tco
 compiler.cfg.useless-conditionals
 compiler.cfg.branch-splitting
 compiler.cfg.block-joining
+compiler.cfg.height
 compiler.cfg.ssa.construction
 compiler.cfg.alias-analysis
 compiler.cfg.value-numbering
 compiler.cfg.copy-prop
 compiler.cfg.dce
 compiler.cfg.write-barrier
+compiler.cfg.scheduling
 compiler.cfg.representations
 compiler.cfg.ssa.destruction
 compiler.cfg.empty-blocks
@@ -29,12 +31,14 @@ SYMBOL: check-optimizer?
     delete-useless-conditionals
     split-branches
     join-blocks
+    normalize-height
     construct-ssa
     alias-analysis
     value-numbering
     copy-propagation
     eliminate-dead-code
     eliminate-write-barriers
+    schedule-instructions
     select-representations
     destruct-ssa
     delete-empty-blocks
