@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry irc.client irc.client.chats kernel namespaces
 sequences threads io.launcher io splitting
@@ -46,8 +46,10 @@ M: object handle-message drop ;
     '[ _ speak ] interleave ;
 
 : check-for-updates ( chat -- )
-    [ git-id git-pull-cmd short-running-process git-id ] dip
-    report-updates ;
+    '[
+        git-id git-pull-cmd short-running-process git-id
+        _ report-updates
+    ] try ;
 
 : bot ( -- )
     start-bot
