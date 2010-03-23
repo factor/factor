@@ -7,7 +7,7 @@ io.encodings.8-bit.latin1 debugger ;
 IN: irc.gitbot
 
 : bot-profile ( -- obj )
-    "irc.freenode.org" 6667 "jackass" f <irc-profile> ;
+    "irc.freenode.org" 6667 "stackoid" f <irc-profile> ;
 
 : bot-channel ( -- seq ) "#concatenative" ;
 
