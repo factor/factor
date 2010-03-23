@@ -69,6 +69,11 @@ M: astar-simple cost cost>> call( n1 n2 -- c ) ;
 M: astar-simple heuristic heuristic>> call( n1 n2 -- c ) ;
 M: astar-simple neighbours neighbours>> call( n -- neighbours ) ;
 
+TUPLE: bfs < astar neighbours ;
+M: bfs cost 3drop 1 ;
+M: bfs heuristic 3drop 0 ;
+M: bfs neighbours neighbours>> at ;
+
 PRIVATE>
 
 : find-path ( start target astar -- path/f )
@@ -79,3 +84,6 @@ PRIVATE>
 
 : considered ( astar -- considered )
     in-closed-set>> members ;
+
+: <bfs> ( neighbours -- astar )
+    [ bfs new ] dip >>neighbours ;
