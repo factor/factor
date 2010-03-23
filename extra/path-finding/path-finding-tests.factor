@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs astar combinators hashtables kernel literals math math.functions
-math.vectors sequences sorting splitting strings tools.test ;
-IN: astar.tests
+USING: arrays assocs combinators hashtables kernel literals math math.functions
+math.vectors path-finding sequences sorting splitting strings tools.test ;
+IN: path-finding.tests
 
 ! Use a 10x9 maze (see below) to try to go from s to e, f or g.
 ! X means that a position is unreachable.
