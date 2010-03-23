@@ -104,7 +104,7 @@ catch_exception_raise (mach_port_t exception_port,
 	mach_msg_type_number_t code_count)
 {
 	/* 10.6 likes to report exceptions from child processes too. Ignore those */
-	if(task != mach_task_self()) return KERN_SUCCESS;
+	if(task != mach_task_self()) return KERN_FAILURE;
 
 	/* Get fault information and the faulting thread's register contents..
 	
