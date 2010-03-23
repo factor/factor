@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs astar combinators hashtables kernel literals math math.functions
-math.vectors sequences sorting splitting strings tools.test ;
-IN: astar.tests
+USING: arrays assocs combinators hashtables kernel literals math math.functions
+math.vectors memoize path-finding sequences sorting splitting strings tools.test ;
+IN: path-finding.tests
 
 ! Use a 10x9 maze (see below) to try to go from s to e, f or g.
 ! X means that a position is unreachable.
@@ -97,8 +97,10 @@ M: maze cost
 
 ! In this version, we will use the quotations-aware version through <astar>.
 
+MEMO: routes ( -- hash ) $[ { "ABD" "BC" "C" "DCE" "ECF" } [ unclip swap 2array ] map >hashtable ] ;
+
 : n ( pos -- neighbours )
-    $[ { "ABD" "BC" "C" "DCE" "ECF" } [ unclip swap 2array ] map >hashtable ] at ;
+    routes at ;
 
 : c ( from to -- cost )
     "" 2sequence H{ { "AB" 1 } { "AD" 2 } { "BC" 5 } { "DC" 2 } { "DE" 1 } { "EC" 2 } { "EF" 1 } } at ;
@@ -112,3 +114,9 @@ M: maze cost
 
 ! No path from D to B -- all nodes reachable from D must have been examined
 [ f "CDEF" ] [ "DB" test2 ] unit-test
+
+! Find a path using BFS. There are no path from F to A, and the path from D to
+! C does not include any other node.
+
+[ f ] [ "FA" first2 routes <bfs> find-path ] unit-test
+[ "DC" ] [ "DC" first2 routes <bfs> find-path >string ] unit-test
