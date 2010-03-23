@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax ;
-IN: astar
+IN: path-finding
 
 HELP: astar
 { $description "This tuple must be subclassed and its method " { $link cost } ", "
@@ -75,7 +75,7 @@ HELP: considered
 } ;
 
 ARTICLE: "astar" "A* algorithm"
-"The " { $vocab-link "astar" } " vocabulary implements a graph search algorithm for finding the least-cost path from one node to another." $nl
+"The " { $vocab-link "path-finding" } " vocabulary implements a graph search algorithm for finding the least-cost path from one node to another." $nl
 "The " { $link astar } " tuple may be derived from and its " { $link cost } ", " { $link heuristic } ", and " { $link neighbours } " methods overwritten, or the " { $link <astar> } " word can be used to build such an object from quotations." $nl
 "Make an A* object:"
 { $subsections <astar> }
