@@ -15,7 +15,18 @@ SPECIALIZED-ARRAY: void*
 IN: gpu.shaders
 
 VARIANT: shader-kind
-    vertex-shader fragment-shader ;
+    vertex-shader fragment-shader geometry-shader ;
+
+VARIANT: geometry-shader-input
+    points-input
+    lines-input
+    lines-with-adjacency-input
+    triangles-input
+    triangles-with-adjacency-input ;
+VARIANT: geometry-shader-output
+    points-output
+    line-strips-output
+    triangle-strips-output ;
 
 UNION: ?string string POSTPONE: f ;
 
@@ -47,6 +58,7 @@ TUPLE: program
     { shaders array read-only }
     { vertex-formats array read-only }
     { feedback-format ?vertex-format read-only }
+    { geometry-shader-parameters array read-only }
     { instances hashtable read-only } ;
 
 TUPLE: shader-instance < gpu-object
@@ -197,6 +209,31 @@ TR: hyphens>underscores "-" "_" ;
     vertex-attributes [ [verify-feedback-attribute] ] map-index :> verify-cleave
     { drop verify-cleave cleave } >quotation ;
 
+: gl-geometry-shader-input ( input -- input )
+    {
+        { points-input [ GL_POINTS ] }
+        { lines-input  [ GL_LINES ] }
+        { lines-with-adjacency-input [ GL_LINES_ADJACENCY ] }
+        { triangles-input [ GL_TRIANGLES ] }
+        { triangles-with-adjacency-input [ GL_TRIANGLES_ADJACENCY ] }
+    } case ; inline
+
+: gl-geometry-shader-output ( output -- output )
+    {
+        { points-output [ GL_POINTS ] }
+        { line-strips-output  [ GL_LINE_STRIP ] }
+        { triangle-strips-output [ GL_TRIANGLE_STRIP ] }
+    } case ; inline
+
+TUPLE: geometry-shader-vertices-out
+    { count integer read-only } ;
+
+UNION: geometry-shader-parameter
+    geometry-shader-input
+    geometry-shader-output
+    geometry-shader-vertices-out ;
+
+
 GENERIC: bind-vertex-format ( program-instance buffer-ptr format -- )
 
 GENERIC: link-feedback-format ( program-handle format -- )
@@ -207,6 +244,18 @@ M: f link-feedback-format
 : link-vertex-formats ( program-handle formats -- )
     [ vertex-format-attributes [ name>> ] map sift ] map concat
     swap '[ [ _ ] 2dip swap glBindAttribLocation ] each-index ; 
+
+GENERIC: link-geometry-shader-parameter ( program-handle parameter -- )
+
+M: geometry-shader-input link-geometry-shader-parameter
+    [ GL_GEOMETRY_INPUT_TYPE ] dip gl-geometry-shader-input glProgramParameteriARB ;
+M: geometry-shader-output link-geometry-shader-parameter
+    [ GL_GEOMETRY_OUTPUT_TYPE ] dip gl-geometry-shader-output glProgramParameteriARB ;
+M: geometry-shader-vertices-out link-geometry-shader-parameter
+    [ GL_GEOMETRY_VERTICES_OUT ] dip count>> glProgramParameteriARB ;
+
+: link-geometry-shader-parameters ( program-handle parameters -- )
+    [ link-geometry-shader-parameter ] with each ;
 
 GENERIC: (verify-feedback-format) ( program-instance format -- )
 
@@ -293,7 +342,8 @@ padding-no [ 0 ] initialize
     {
         { vertex-shader [ GL_VERTEX_SHADER ] }
         { fragment-shader [ GL_FRAGMENT_SHADER ] }
-    } case ;
+        { geometry-shader [ GL_GEOMETRY_SHADER ] }
+    } case ; inline
 
 PRIVATE>
 
@@ -433,8 +483,12 @@ DEFER: <shader-instance>
 : (link-program) ( program shader-instances -- program-instance )
     '[ _ [ handle>> ] map ]
     [
-        [ vertex-formats>> ] [ feedback-format>> ] bi
-        '[ [ _ link-vertex-formats ] [ _ link-feedback-format ] bi ]
+        [ vertex-formats>> ] [ feedback-format>> ] [ geometry-shader-parameters>> ] tri
+        '[
+            [ _ link-vertex-formats ]
+            [ _ link-feedback-format ]
+            [ _ link-geometry-shader-parameters ] tri
+        ]
     ] bi (gl-program)
     dup gl-program-ok?  [
         [ swap world get \ program-instance boa |dispose dup verify-feedback-format ]
@@ -485,15 +539,20 @@ TUPLE: feedback-format
 : ?shader ( object -- shader/f )
     dup word? [ def>> first dup shader? [ drop f ] unless ] [ drop f ] if ;
 
-: shaders-and-formats ( words -- shaders vertex-formats feedback-format )
-    [ [ ?shader ] map sift ]
-    [ [ vertex-format-attributes ] filter ]
-    [ [ feedback-format? ] filter validate-feedback-format ] tri ;
+: shaders-and-formats ( words -- shaders vertex-formats feedback-format geom-parameters )
+    {
+        [ [ ?shader ] map sift ]
+        [ [ vertex-format-attributes ] filter ]
+        [ [ feedback-format? ] filter validate-feedback-format ]
+        [ [ geometry-shader-parameter? ] filter ]
+    } cleave ;
 
 PRIVATE>
 
 SYNTAX: feedback-format:
     scan-object feedback-format boa suffix! ;
+SYNTAX: geometry-shader-vertices-out:
+    scan-object geometry-shader-vertices-out boa suffix! ;
 
 TYPED:: refresh-program ( program: program -- )
     program shaders>> [ refresh-shader-source ] each
