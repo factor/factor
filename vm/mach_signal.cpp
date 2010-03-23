@@ -82,11 +82,14 @@ static void call_fault_handler(
 	MACH_THREAD_STATE_TYPE *thread_state,
 	MACH_FLOAT_STATE_TYPE *float_state)
 {
+	/* Look up the VM instance involved */
 	THREADHANDLE thread_id = pthread_from_mach_thread_np(thread);
 	assert(thread_id);
 	std::map<THREADHANDLE, factor_vm*>::const_iterator vm = thread_vms.find(thread_id);
+
+	/* Handle the exception */
 	if (vm != thread_vms.end())
-	    vm->second->call_fault_handler(exception,code,exc_state,thread_state,float_state);
+		vm->second->call_fault_handler(exception,code,exc_state,thread_state,float_state);
 }
 
 /* Handle an exception by invoking the user's fault handler and/or forwarding
@@ -100,15 +103,14 @@ catch_exception_raise (mach_port_t exception_port,
 	exception_data_t code,
 	mach_msg_type_number_t code_count)
 {
-	MACH_EXC_STATE_TYPE exc_state;
-	MACH_THREAD_STATE_TYPE thread_state;
-	MACH_FLOAT_STATE_TYPE float_state;
-	mach_msg_type_number_t exc_state_count, thread_state_count, float_state_count;
+	/* 10.6 likes to report exceptions from child processes too. Ignore those */
+	if(task != mach_task_self()) return KERN_SUCCESS;
 
 	/* Get fault information and the faulting thread's register contents..
 	
 	See http://web.mit.edu/darwin/src/modules/xnu/osfmk/man/thread_get_state.html.	*/
-	exc_state_count = MACH_EXC_STATE_COUNT;
+	MACH_EXC_STATE_TYPE exc_state;
+	mach_msg_type_number_t exc_state_count = MACH_EXC_STATE_COUNT;
 	if (thread_get_state (thread, MACH_EXC_STATE_FLAVOR,
 			      (natural_t *)&exc_state, &exc_state_count)
 		!= KERN_SUCCESS)
@@ -118,7 +120,8 @@ catch_exception_raise (mach_port_t exception_port,
 		return KERN_FAILURE;
 	}
 
-	thread_state_count = MACH_THREAD_STATE_COUNT;
+	MACH_THREAD_STATE_TYPE thread_state;
+	mach_msg_type_number_t thread_state_count = MACH_THREAD_STATE_COUNT;
 	if (thread_get_state (thread, MACH_THREAD_STATE_FLAVOR,
 			      (natural_t *)&thread_state, &thread_state_count)
 		!= KERN_SUCCESS)
@@ -128,7 +131,8 @@ catch_exception_raise (mach_port_t exception_port,
 		return KERN_FAILURE;
 	}
 
-	float_state_count = MACH_FLOAT_STATE_COUNT;
+	MACH_FLOAT_STATE_TYPE float_state;
+	mach_msg_type_number_t float_state_count = MACH_FLOAT_STATE_COUNT;
 	if (thread_get_state (thread, MACH_FLOAT_STATE_FLAVOR,
 			      (natural_t *)&float_state, &float_state_count)
 		!= KERN_SUCCESS)
