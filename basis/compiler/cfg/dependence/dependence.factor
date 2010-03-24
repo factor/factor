@@ -4,6 +4,7 @@ USING: accessors assocs combinators compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.registers fry kernel
 locals namespaces sequences sets sorting math.vectors
 make math combinators.short-circuit vectors ;
+FROM: namespaces => set ;
 IN: compiler.cfg.dependence
 
 ! Dependence graph construction
@@ -32,15 +33,12 @@ M: node hashcode* nip number>> ;
         node-number counter >>number
         swap >>insn
         H{ } clone >>precedes
-        H{ } clone >>follows ;
+        V{ } clone >>follows ;
 
 : ready? ( node -- ? ) precedes>> assoc-empty? ;
 
-: spin ( a b c -- c b a )
-    [ 2nip ] [ drop nip ] [ 2drop ] 3tri ;
-
-: precedes ( first second how -- )
-    spin precedes>> set-at ;
+:: precedes ( first second how -- )
+    how second first precedes>> set-at ;
 
 :: add-data-edges ( nodes -- )
     ! This builds up def-use information on the fly, since
@@ -107,12 +105,12 @@ M: object add-control-edge 2drop ;
 : set-follows ( nodes -- )
     [
         dup precedes>> keys [
-            follows>> conjoin
+            follows>> push
         ] with each
     ] each ;
 
 : set-roots ( nodes -- )
-    [ ready? ] filter V{ } like roots set ;
+    [ ready? ] V{ } filter-as roots set ;
 
 : build-dependence-graph ( instructions -- )
     [ <node> ] map {
