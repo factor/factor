@@ -116,6 +116,11 @@ M: end-of-stream cursor= eq? ; inline
 M: end-of-stream inc-cursor ; inline
 M: end-of-stream cursor-stream-ended? drop t ; inline
 
+INSTANCE: finite-stream-cursor container
+
+M: finite-stream-cursor begin-cursor ; inline
+M: finite-stream-cursor end-cursor drop end-of-stream ; inline
+
 !
 ! basic iterator
 !
@@ -426,3 +431,58 @@ M: hashtable begin-cursor
     dup array>> 0 (inc-hashtable-cursor) <hashtable-cursor> ; inline
 M: hashtable end-cursor
     dup array>> length <hashtable-cursor> ; inline
+
+!
+! zip cursor
+!
+
+TUPLE: zip-cursor
+    { keys   read-only }
+    { values read-only } ;
+C: <zip-cursor> zip-cursor
+
+INSTANCE: zip-cursor forward-cursor
+
+M: zip-cursor cursor-compatible? ( cursor cursor -- ? )
+    {
+        [ [ zip-cursor? ] both? ]
+        [ [ keys>> ] bi@ cursor-compatible? ]
+        [ [ values>> ] bi@ cursor-compatible? ]
+    } 2&& ; inline
+
+M: zip-cursor cursor-valid? ( cursor -- ? )
+    [ keys>> ] [ values>> ] bi [ cursor-valid? ] both? ; inline
+M: zip-cursor cursor= ( cursor cursor -- ? )
+    {
+        [ [ keys>> ] bi@ cursor= ]
+        [ [ values>> ] bi@ cursor= ]
+    } 2|| ; inline
+
+M: zip-cursor cursor-distance-hint ( cursor cursor -- n )
+    [ [ keys>> ] bi@ cursor-distance-hint ]
+    [ [ values>> ] bi@ cursor-distance-hint ] 2bi max ; inline
+
+M: zip-cursor inc-cursor ( cursor -- cursor' )
+    [ keys>> inc-cursor ] [ values>> inc-cursor ] bi <zip-cursor> ; inline
+    
+INSTANCE: zip-cursor assoc-cursor
+
+M: zip-cursor cursor-key-value
+    [ keys>> cursor-value ] [ values>> cursor-value ] bi ; inline
+
+: zip-cursors ( a-begin a-end b-begin b-end -- begin end )
+    [ <zip-cursor> ] bi-curry@ bi* ; inline
+
+: 2all ( a b -- begin end )
+    [ all ] bi@ zip-cursors ; inline
+
+: 2all- ( a b quot -- begin end quot )
+    [ 2all ] dip ; inline
+
+ALIAS: -2container- assoc ; inline
+
+: 2container- ( a b quot -- begin end quot' )
+    2all- -2container- ; inline
+
+
+
