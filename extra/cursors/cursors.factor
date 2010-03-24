@@ -1,6 +1,7 @@
 ! (c)2010 Joe Groff bsd license
-USING: accessors assocs combinators.short-circuit fry hashtables
-kernel locals math math.functions sequences sequences.private ;
+USING: accessors arrays assocs combinators.short-circuit fry
+hashtables kernel locals math math.functions sequences ;
+FROM: sequences.private => nth-unsafe set-nth-unsafe ;
 FROM: hashtables.private => tombstone? ;
 IN: cursors
 
@@ -80,6 +81,40 @@ PRIVATE>
 M: output-cursor set-cursor-value-unsafe set-cursor-value ; inline
 M: output-cursor set-cursor-value
     dup cursor-valid? [ set-cursor-value-unsafe ] [ invalid-cursor ] if ; inline
+
+!
+! stream cursors
+!
+
+MIXIN: stream-cursor
+INSTANCE: stream-cursor forward-cursor
+
+M: stream-cursor cursor-compatible? 2drop f ; inline
+M: stream-cursor cursor-valid? drop t ; inline
+M: stream-cursor cursor= 2drop f ; inline
+
+MIXIN: infinite-stream-cursor
+INSTANCE: infinite-stream-cursor stream-cursor
+
+M: infinite-stream-cursor inc-cursor ; inline
+
+MIXIN: finite-stream-cursor
+INSTANCE: finite-stream-cursor stream-cursor
+
+SINGLETON: end-of-stream
+
+GENERIC: cursor-stream-ended? ( cursor -- ? )
+
+M: finite-stream-cursor inc-cursor
+    dup cursor-stream-ended? [ drop end-of-stream ] when ; inline
+
+INSTANCE: end-of-stream finite-stream-cursor
+
+M: end-of-stream cursor-compatible? drop finite-stream-cursor? ; inline
+M: end-of-stream cursor-valid? drop f ; inline
+M: end-of-stream cursor= eq? ; inline
+M: end-of-stream inc-cursor ; inline
+M: end-of-stream cursor-stream-ended? drop t ; inline
 
 !
 ! basic iterator
@@ -168,8 +203,11 @@ MIXIN: collection
 GENERIC: begin-cursor ( collection -- cursor )
 GENERIC: end-cursor ( collection -- cursor )
 
+: all ( collection -- begin end )
+    [ begin-cursor ] [ end-cursor ] bi ; inline
+
 : all- ( collection quot -- begin end quot )
-    [ [ begin-cursor ] [ end-cursor ] bi ] dip ; inline
+    [ all ] dip ; inline
 
 !
 ! containers
@@ -265,14 +303,7 @@ TUPLE: pusher-cursor
     { growable read-only } ;
 C: <pusher-cursor> pusher-cursor
 
-INSTANCE: pusher-cursor forward-cursor
-
-! XXX define a protocol for stream cursors that don't actually move
-M: pusher-cursor cursor-compatible? 2drop f ; inline
-M: pusher-cursor cursor-valid? drop t ; inline
-M: pusher-cursor cursor= 2drop f ; inline
-M: pusher-cursor inc-cursor ; inline
-
+INSTANCE: pusher-cursor infinite-stream-cursor
 INSTANCE: pusher-cursor output-cursor
 
 M: pusher-cursor set-cursor-value growable>> push ; inline
@@ -384,7 +415,12 @@ M: hashtable-cursor cursor-key-value
     [ n>> ] [ hashtable>> array>> ] bi
     [ nth-unsafe ] [ [ 1 + ] dip nth-unsafe ] 2bi ; inline
 
-INSTANCE: hashtable collection
+INSTANCE: hashtable-cursor input-cursor
+
+M: hashtable-cursor cursor-value
+    cursor-key-value 2array ; inline
+
+INSTANCE: hashtable container
 
 M: hashtable begin-cursor
     dup array>> 0 (inc-hashtable-cursor) <hashtable-cursor> ; inline
