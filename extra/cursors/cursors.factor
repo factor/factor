@@ -484,5 +484,11 @@ ALIAS: -2container- -assoc-
 : 2container- ( a b quot -- begin end quot' )
     2all- -2container- ; inline
 
+: 2each ( ... a b quot: ( ... x y -- ... ) -- ... )
+    2container- -each ; inline
 
+: 2map-as ( ... a b quot: ( ... x y -- ... z ) exemplar -- ... c )
+    [ 2container- ] dip -map-as ; inline
 
+: 2map ( ... a b quot: ( ... x y -- ... z ) -- ... c )
+    pick 2map-as ; inline 
