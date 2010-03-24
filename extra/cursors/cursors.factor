@@ -1,6 +1,6 @@
 ! (c)2010 Joe Groff bsd license
 USING: accessors arrays assocs combinators.short-circuit fry
-hashtables kernel locals math math.functions sequences ;
+hashtables kernel locals math math.functions math.order sequences ;
 FROM: sequences.private => nth-unsafe set-nth-unsafe ;
 FROM: hashtables.private => tombstone? ;
 IN: cursors
@@ -116,11 +116,6 @@ M: end-of-stream cursor= eq? ; inline
 M: end-of-stream inc-cursor ; inline
 M: end-of-stream cursor-stream-ended? drop t ; inline
 
-INSTANCE: finite-stream-cursor container
-
-M: finite-stream-cursor begin-cursor ; inline
-M: finite-stream-cursor end-cursor drop end-of-stream ; inline
-
 !
 ! basic iterator
 !
@@ -228,6 +223,11 @@ INSTANCE: container collection
     all- -container- ; inline
 
 : each ( ... container quot: ( ... x -- ... ) -- ... ) container- -each ; inline
+
+INSTANCE: finite-stream-cursor container
+
+M: finite-stream-cursor begin-cursor ; inline
+M: finite-stream-cursor end-cursor drop end-of-stream ; inline
 
 !
 ! sequence cursor
@@ -479,7 +479,7 @@ M: zip-cursor cursor-key-value
 : 2all- ( a b quot -- begin end quot )
     [ 2all ] dip ; inline
 
-ALIAS: -2container- assoc ; inline
+ALIAS: -2container- -assoc-
 
 : 2container- ( a b quot -- begin end quot' )
     2all- -2container- ; inline
