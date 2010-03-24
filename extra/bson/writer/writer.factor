@@ -17,13 +17,16 @@ CONSTANT: INT64-SIZE 8
 
 PRIVATE>
 
+TYPED: get-output ( -- stream: byte-vector )
+    output-stream get ; inline
+
 TYPED: with-length ( quot -- bytes-written: integer start-index: integer )
-    [ output-stream get [ length ] [ ] bi ] dip
+    [ get-output [ length ] [ ] bi ] dip
     call length swap [ - ] keep ; inline
 
-: (with-length-prefix) ( ..a quot: ( ..a -- ..b ) length-quot: ( bytes-written -- length ) -- ..b )
+: (with-length-prefix) ( quot: ( .. -- .. ) length-quot: ( bytes-written -- length ) -- )
     [ [ B{ 0 0 0 0 } write ] prepose with-length ] dip swap
-    [ call output-stream get underlying>> ] dip set-alien-unsigned-4 ; inline
+    [ call( written -- length ) get-output underlying>> ] dip set-alien-unsigned-4 ; inline
 
 : with-length-prefix ( quot: ( .. -- .. ) -- )
     [ ] (with-length-prefix) ; inline
