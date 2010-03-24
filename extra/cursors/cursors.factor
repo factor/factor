@@ -1,6 +1,7 @@
 ! (c)2010 Joe Groff bsd license
 USING: accessors arrays assocs combinators.short-circuit fry
-hashtables kernel locals math math.functions math.order sequences ;
+hashtables kernel locals macros math math.functions math.order
+generalizations sequences ;
 FROM: sequences.private => nth-unsafe set-nth-unsafe ;
 FROM: hashtables.private => tombstone? ;
 IN: cursors
@@ -376,7 +377,7 @@ GENERIC: cursor-key-value ( cursor -- key value )
 INSTANCE: input-cursor assoc-cursor
 
 M: input-cursor cursor-key-value
-    cursor-value first2 ; inline
+    cursor-value-unsafe first2 ; inline
 
 !
 ! hashtable cursor
@@ -422,7 +423,7 @@ M: hashtable-cursor cursor-key-value
 
 INSTANCE: hashtable-cursor input-cursor
 
-M: hashtable-cursor cursor-value
+M: hashtable-cursor cursor-value-unsafe
     cursor-key-value 2array ; inline
 
 INSTANCE: hashtable container
@@ -468,7 +469,7 @@ M: zip-cursor inc-cursor ( cursor -- cursor' )
 INSTANCE: zip-cursor assoc-cursor
 
 M: zip-cursor cursor-key-value
-    [ keys>> cursor-value ] [ values>> cursor-value ] bi ; inline
+    [ keys>> cursor-value-unsafe ] [ values>> cursor-value-unsafe ] bi ; inline
 
 : zip-cursors ( a-begin a-end b-begin b-end -- begin end )
     [ <zip-cursor> ] bi-curry@ bi* ; inline
@@ -492,3 +493,27 @@ ALIAS: -2container- -assoc-
 
 : 2map ( ... a b quot: ( ... x y -- ... z ) -- ... c )
     pick 2map-as ; inline 
+
+!
+! generalized zips
+!
+
+: -unzip- ( quot -- quot' )
+    '[ [ keys>> cursor-value-unsafe ] [ values>> ] bi @ ] ; inline
+
+MACRO: nzip-cursors ( n -- ) 1 - [ zip-cursors ] n*quot ;
+
+: nall ( seqs... n -- begin end ) [ [ all ] swap napply ] [ nzip-cursors ] bi ; inline
+
+: nall- ( seqs... quot n -- begin end quot ) swap [ nall ] dip ; inline
+
+MACRO: -ncontainer- ( n -- )
+    1 - [ -unzip- ] n*quot [ -container- ] prepend ;
+
+: ncontainer- ( seqs... quot n -- begin end quot ) [ nall- ] [ -ncontainer- ] bi ; inline
+
+: neach ( seqs... quot n -- ) ncontainer- -each ; inline
+: nmap-as ( seqs... quot exemplar n -- newseq )
+    swap [ ncontainer- ] dip -map-as ; inline
+: nmap ( seqs... quot n -- newseq )
+    dup [ npick ] curry [ dip swap ] curry dip nmap-as ; inline
