@@ -1,44 +1,68 @@
-! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: cursors math tools.test make ;
+! (c)2010 Joe Groff bsd license
+USING: accessors cursors make math sequences sorting tools.test ;
+FROM: cursors => each map assoc-each assoc>map ;
 IN: cursors.tests
 
-[ 2 t ] [ { 2 3 } [ even? ] find ] unit-test
-[ 3 t ] [ { 2 3 } [ odd? ] find ] unit-test
-[ f f ] [ { 2 4 } [ odd? ] find ] unit-test
+[ { 1 2 3 4 } ] [
+    [ T{ linear-cursor f 1 1 } T{ linear-cursor f 5 1 } [ value>> , ] -each ]
+    { } make
+] unit-test
 
-[ { 2 3 } ] [ { 1 2 } [ 1 + ] map ] unit-test
-[ { 2 3 } ] [ { 1 2 } [ [ 1 + , ] each ] { 2 3 } make ] unit-test
+[ { 1 3 } ] [
+    [ T{ linear-cursor f 1 2 } T{ linear-cursor f 5 2 } [ value>> , ] -each ]
+    { } make
+] unit-test
 
-[ t ] [ { } [ odd? ] all? ] unit-test
-[ t ] [ { 1 3 5 } [ odd? ] all? ] unit-test
-[ f ] [ { 1 3 5 6 } [ odd? ] all? ] unit-test
+[ B{ 1 2 3 4 5 } ] [ [ { 1 2 3 4 5 } [ , ] each ] B{ } make ] unit-test
+[ B{ } ] [ [ { } [ , ] each ] B{ } make ] unit-test
+[ { 2 4 6 8 10 } ] [ { 1 2 3 4 5 } [ 2 * ] map ] unit-test
 
-[ t ] [ { } [ odd? ] all? ] unit-test
-[ t ] [ { 1 3 5 } [ odd? ] any? ] unit-test
-[ f ] [ { 2 4 6 } [ odd? ] any? ] unit-test
+[ { "roses: lutefisk" "tulips: lox" } ]
+[
+    [
+        { { "roses" "lutefisk" } { "tulips" "lox" } }
+        [ ": " glue , ] assoc-each
+    ] { } make
+] unit-test
 
-[ { 1 3 5 } ] [ { 1 2 3 4 5 6 } [ odd? ] filter ] unit-test
+[ { "roses: lutefisk" "tulips: lox" } ]
+[
+    { { "roses" "lutefisk" } { "tulips" "lox" } }
+    [ ": " glue ] { } assoc>map
+] unit-test
 
-[ { } ]
-[ { 1 2 } { } [ + ] 2map ] unit-test
+[ { "roses: lutefisk" "tulips: lox" } ]
+[
+    [
+        H{ { "roses" "lutefisk" } { "tulips" "lox" } }
+        [ ": " glue , ] assoc-each
+    ] { } make natural-sort
+] unit-test
 
-[ { 11 } ]
-[ { 1 2 } { 10 } [ + ] 2map ] unit-test
+[ { "roses: lutefisk" "tulips: lox" } ]
+[
+    H{ { "roses" "lutefisk" } { "tulips" "lox" } }
+    [ ": " glue ] { } assoc>map natural-sort
+] unit-test
 
-[ { 11 22 } ]
-[ { 1 2 } { 10 20 } [ + ] 2map ] unit-test
+: compile-test-each ( xs -- )
+    [ , ] each ;
 
-[ { } ]
-[ { 1 2 } { } { } [ + + ] 3map ] unit-test
+: compile-test-map ( xs -- ys )
+    [ 2 * ] map ;
 
-[ { 111 } ]
-[ { 1 2 } { 10 } { 100 200 } [ + + ] 3map ] unit-test
+: compile-test-assoc-each ( xs -- )
+    [ ": " glue , ] assoc-each ;
 
-[ { 111 222 } ]
-[ { 1 2 } { 10 20 } { 100 200 } [ + + ] 3map ] unit-test
+: compile-test-assoc>map ( xs -- ys )
+    [ ": " glue ] { } assoc>map ;
 
-: test-3map ( -- seq )
-     { 1 2 } { 10 20 } { 100 200 } [ + + ] 3map ;
+[ B{ 1 2 3 4 5 } ] [ [ { 1 2 3 4 5 } compile-test-each ] B{ } make ] unit-test
+[ { 2 4 6 8 10 } ] [ { 1 2 3 4 5 } compile-test-map ] unit-test
 
-[ { 111 222 } ] [ test-3map ] unit-test
+[ { "roses: lutefisk" "tulips: lox" } ]
+[ [ { { "roses" "lutefisk" } { "tulips" "lox" } } compile-test-assoc-each ] { } make ] unit-test
+
+[ { "roses: lutefisk" "tulips: lox" } ]
+[ { { "roses" "lutefisk" } { "tulips" "lox" } } compile-test-assoc>map ] unit-test
+
