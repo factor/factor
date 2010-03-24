@@ -375,6 +375,10 @@ $nl
     bit?
     bit-clear?
 }
+"Toggling a bit:"
+{ $subsections
+    toggle-bit
+}
 "Operations with bitmasks:"
 { $subsections
     mask
