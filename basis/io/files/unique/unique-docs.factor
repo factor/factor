@@ -54,12 +54,19 @@ HELP: with-unique-directory
 }
 { $description "Creates a directory with " { $link unique-directory } " and calls the quotation with the pathname on the stack using the " { $link with-temporary-directory } " combinator. The quotation can access the " { $link current-temporary-directory } " symbol for the name of the temporary directory. Subsequent unique files will be created in this unique directory until the combinator returns." } ;
 
-HELP: move-file-unique
+HELP: copy-file-unique
 { $values
-    { "path" "a pathname string" } { "directory" "a directory" }
+    { "path" "a pathname string" } { "prefix" string } { "suffix" string }
     { "path'" "a pathname string" }
 }
-{ $description "Moves " { $snippet "path" } " to " { $snippet "directory" } " by creating a unique file in this directory. Returns the new path." } ;
+{ $description "Copies " { $snippet "path" } " to a new unique file in the directory stored in " { $link current-temporary-directory } ". Returns the new path." } ;
+
+HELP: move-file-unique
+{ $values
+    { "path" "a pathname string" } { "prefix" string } { "suffix" string }
+    { "path'" "a pathname string" }
+}
+{ $description "Moves " { $snippet "path" } " to a new unique file in the directory stored in " { $link current-temporary-directory } ". Returns the new path." } ;
 
 HELP: current-temporary-directory
 { $values
@@ -98,7 +105,10 @@ ARTICLE: "io.files.unique" "Unique files"
 }
 "Default temporary directory:"
 { $subsections default-temporary-directory }
-"Moving files into a directory safely:"
-{ $subsections move-file-unique } ;
+"Copying and moving files to a new unique file:"
+{ $subsections
+    copy-file-unique
+    move-file-unique
+} ;
 
 ABOUT: "io.files.unique"
