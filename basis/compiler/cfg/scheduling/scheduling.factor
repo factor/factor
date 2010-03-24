@@ -26,7 +26,7 @@ ERROR: bad-delete-at key assoc ;
     '[ _ >>parent-index drop ] each ;
 
 : remove-node ( node -- )
-    [ follows>> keys ] keep
+    [ follows>> members ] keep
     '[ [ precedes>> _ swap check-delete-at ] each ]
     [ [ ready? ] filter roots get push-all ] bi ;
 
@@ -84,12 +84,12 @@ t check-scheduling? set-global
 ERROR: definition-after-usage vreg old-bb new-bb ;
 
 :: check-usages ( new-bb old-bb -- )
-    H{ } clone :> useds
+    HS{ } clone :> useds
     new-bb instructions>> split-3-ways drop nip
     [| insn |
-        insn uses-vregs [ useds conjoin ] each
+        insn uses-vregs [ useds adjoin ] each
         insn defs-vreg :> def-reg
-        def-reg useds key?
+        def-reg useds in?
         [ def-reg old-bb new-bb definition-after-usage ] when
     ] each ;
 
@@ -132,7 +132,7 @@ ERROR: definition-after-usage vreg old-bb new-bb ;
 
 : schedule-instructions ( cfg -- cfg' )
     dup [
-    dup might-spill?
+        dup might-spill?
         [ schedule-block ]
         [ drop ] if
     ] each-basic-block ;
