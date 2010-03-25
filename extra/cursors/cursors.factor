@@ -118,12 +118,21 @@ M: end-of-stream inc-cursor ; inline
 M: end-of-stream cursor-stream-ended? drop t ; inline
 
 !
-! basic iterator
+! basic iterators
 !
 
 : -each ( ... begin end quot: ( ... cursor -- ... ) -- ... )
     [ '[ dup _ cursor>= ] ]
     [ '[ _ keep inc-cursor ] ] bi* until drop ; inline
+
+: -in- ( quot -- quot' )
+    '[ cursor-value-unsafe @ ] ; inline
+
+: -out- ( quot -- quot' )
+    '[ _ keep set-cursor-value-unsafe ] ; inline
+
+: -out ( ... begin end quot: ( ... cursor -- ... value ) -- ... )
+    -out- -each ; inline
 
 !
 ! numeric cursors
@@ -217,13 +226,10 @@ GENERIC: end-cursor ( collection -- cursor )
 MIXIN: container
 INSTANCE: container collection
 
-: -container- ( quot -- quot' )
-    '[ cursor-value-unsafe @ ] ; inline
+: in- ( container quot -- begin end quot' )
+    all- -in- ; inline
 
-: container- ( container quot -- begin end quot' )
-    all- -container- ; inline
-
-: each ( ... container quot: ( ... x -- ... ) -- ... ) container- -each ; inline
+: each ( ... container quot: ( ... x -- ... ) -- ... ) in- -each ; inline
 
 INSTANCE: finite-stream-cursor container
 
@@ -278,28 +284,31 @@ M: sequence-cursor set-cursor-value-unsafe [ n>> ] [ seq>> ] bi set-nth-unsafe ;
 M: sequence-cursor set-cursor-value [ n>> ] [ seq>> ] bi set-nth ; inline
 
 !
-! pipe cursor
+! map cursor
 !
 
-TUPLE: pipe-cursor
+TUPLE: map-cursor
     { from read-only }
     { to read-only } ;
-C: <pipe-cursor> pipe-cursor
+C: <map-cursor> map-cursor
 
-INSTANCE: pipe-cursor forward-cursor
+INSTANCE: map-cursor forward-cursor
 
-M: pipe-cursor cursor-compatible? [ from>> ] bi@ cursor-compatible? ; inline
-M: pipe-cursor cursor-valid? [ from>> ] [ to>> ] bi [ cursor-valid? ] both? ; inline
-M: pipe-cursor cursor= [ from>> ] bi@ cursor= ; inline
-M: pipe-cursor inc-cursor [ from>> inc-cursor ] [ to>> inc-cursor ] bi <pipe-cursor> ; inline
+M: map-cursor cursor-compatible? [ from>> ] bi@ cursor-compatible? ; inline
+M: map-cursor cursor-valid? [ from>> ] [ to>> ] bi [ cursor-valid? ] both? ; inline
+M: map-cursor cursor= [ from>> ] bi@ cursor= ; inline
+M: map-cursor inc-cursor [ from>> inc-cursor ] [ to>> inc-cursor ] bi <map-cursor> ; inline
 
-INSTANCE: pipe-cursor output-cursor
+INSTANCE: map-cursor output-cursor
 
-M: pipe-cursor set-cursor-value-unsafe to>> set-cursor-value-unsafe ; inline
-M: pipe-cursor set-cursor-value        to>> set-cursor-value        ; inline
+M: map-cursor set-cursor-value-unsafe to>> set-cursor-value-unsafe ; inline
+M: map-cursor set-cursor-value        to>> set-cursor-value        ; inline
 
-: -pipe- ( begin end quot to -- begin' end' quot' )
-    swap [ '[ _ <pipe-cursor> ] bi@ ] dip '[ from>> @ ] ; inline
+: -map- ( begin end quot to -- begin' end' quot' )
+    swap [ '[ _ <map-cursor> ] bi@ ] dip '[ from>> @ ] ; inline
+
+: -map ( begin end quot to -- begin' end' quot' )
+    -map- -out ; inline
 
 !
 ! pusher cursor
@@ -328,30 +337,24 @@ M: random-access-cursor new-sequence-cursor
 M: forward-cursor new-sequence-cursor
     new-growable-cursor ; inline
 
-: -into-sequence- ( begin end quot exemplar -- begin' end' quot' result )
-    swap [ [ 2dup ] dip new-sequence-cursor ] dip swap [ swap -pipe- ] dip ; inline
+: -into-sequence- ( begin end quot exemplar -- begin' end' quot' cursor result )
+    [ 2over ] dip new-sequence-cursor ; inline
 
-: -into-growable- ( begin end quot exemplar -- begin' end' quot' result )
-    swap [ [ 2dup ] dip new-growable-cursor ] dip swap [ swap -pipe- ] dip ; inline
+: -into-growable- ( begin end quot exemplar -- begin' end' quot' cursor result )
+    [ 2over ] dip new-sequence-cursor ; inline
 
 !
-! map
+! map combinators
 !
-
-: -map- ( quot -- quot' )
-    '[ _ keep set-cursor-value-unsafe ] ; inline
-
-: -map ( ... begin end quot: ( ... cursor -- ... value ) -- ... )
-    -map- -each ; inline
 
 ! XXX generalize exemplar
 : -map-as ( ... begin end quot: ( ... cursor -- ... value ) exemplar -- ... newseq )
     [ -into-sequence- [ -map ] dip ] keep like ; inline
 
 : map! ( ... container quot: ( ... x -- ... newx ) -- ... container )
-    [ container- -map ] keep ; inline
+    [ in- -out ] keep ; inline
 : map-as ( ... container quot: ( ... x -- ... newx ) exemplar -- ... newseq )
-    [ container- ] dip -map-as ; inline
+    [ in- ] dip -map-as ; inline
 : map ( ... container quot: ( ... x -- ... newx ) -- ... newcontainer )
     over map-as ; inline
 
@@ -480,16 +483,16 @@ M: zip-cursor cursor-key-value
 : 2all- ( a b quot -- begin end quot )
     [ 2all ] dip ; inline
 
-ALIAS: -2container- -assoc-
+ALIAS: -2in- -assoc-
 
-: 2container- ( a b quot -- begin end quot' )
-    2all- -2container- ; inline
+: 2in- ( a b quot -- begin end quot' )
+    2all- -2in- ; inline
 
 : 2each ( ... a b quot: ( ... x y -- ... ) -- ... )
-    2container- -each ; inline
+    2in- -each ; inline
 
 : 2map-as ( ... a b quot: ( ... x y -- ... z ) exemplar -- ... c )
-    [ 2container- ] dip -map-as ; inline
+    [ 2in- ] dip -map-as ; inline
 
 : 2map ( ... a b quot: ( ... x y -- ... z ) -- ... c )
     pick 2map-as ; inline 
@@ -507,14 +510,14 @@ MACRO: nzip-cursors ( n -- ) 1 - [ zip-cursors ] n*quot ;
 
 : nall- ( seqs... quot n -- begin end quot ) swap [ nall ] dip ; inline
 
-MACRO: -ncontainer- ( n -- )
-    1 - [ -unzip- ] n*quot [ -container- ] prepend ;
+MACRO: -nin- ( n -- )
+    1 - [ -unzip- ] n*quot [ -in- ] prepend ;
 
-: ncontainer- ( seqs... quot n -- begin end quot ) [ nall- ] [ -ncontainer- ] bi ; inline
+: nin- ( seqs... quot n -- begin end quot ) [ nall- ] [ -nin- ] bi ; inline
 
-: neach ( seqs... quot n -- ) ncontainer- -each ; inline
+: neach ( seqs... quot n -- ) nin- -each ; inline
 : nmap-as ( seqs... quot exemplar n -- newseq )
-    swap [ ncontainer- ] dip -map-as ; inline
+    swap [ nin- ] dip -map-as ; inline
 : nmap ( seqs... quot n -- newseq )
     dup [ npick ] curry [ dip swap ] curry dip nmap-as ; inline
 
