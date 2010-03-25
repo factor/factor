@@ -341,7 +341,7 @@ M: forward-cursor new-sequence-cursor
     [ 2over ] dip new-sequence-cursor ; inline
 
 : -into-growable- ( begin end quot exemplar -- begin' end' quot' cursor result )
-    [ 2over ] dip new-sequence-cursor ; inline
+    [ 2over ] dip new-growable-cursor ; inline
 
 !
 ! map combinators
