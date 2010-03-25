@@ -305,10 +305,10 @@ M: map-cursor set-cursor-value-unsafe to>> set-cursor-value-unsafe ; inline
 M: map-cursor set-cursor-value        to>> set-cursor-value        ; inline
 
 : -map- ( begin end quot to -- begin' end' quot' )
-    swap [ '[ _ <map-cursor> ] bi@ ] dip '[ from>> @ ] ; inline
+    swap [ '[ _ <map-cursor> ] bi@ ] dip '[ from>> @ ] -out- ; inline
 
 : -map ( begin end quot to -- begin' end' quot' )
-    -map- -out ; inline
+    -map- -each ; inline
 
 !
 ! pusher cursor
