@@ -517,3 +517,17 @@ MACRO: -ncontainer- ( n -- )
     swap [ ncontainer- ] dip -map-as ; inline
 : nmap ( seqs... quot n -- newseq )
     dup [ npick ] curry [ dip swap ] curry dip nmap-as ; inline
+
+!
+! utilities
+!
+
+: -with- ( invariant begin end quot -- begin end quot' )
+    [ rot ] dip '[ [ _ ] dip @ ] ; inline
+
+: -2with- ( invariant invariant begin end quot -- begin end quot' )
+    -with- -with- ; inline
+
+MACRO: -nwith- ( n -- )
+    [ -with- ] n*quot ;
+
