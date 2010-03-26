@@ -86,8 +86,7 @@ M: lexer skip-word ( lexer -- )
 
 : scan ( -- str/f ) lexer get parse-token ;
 
-PREDICATE: unexpected-eof < unexpected
-    got>> not ;
+PREDICATE: unexpected-eof < unexpected got>> not ;
 
 : unexpected-eof ( word -- * ) f unexpected ;
 
@@ -97,14 +96,15 @@ PREDICATE: unexpected-eof < unexpected
     [ unexpected-eof ]
     if* ;
 
-: (each-token) ( end quot -- pred quot )
-    [ [ [ scan dup ] ] dip [ = not ] curry [ [ f ] if* ] curry compose ] dip ; inline
-
 : each-token ( ... end quot: ( ... token -- ... ) -- ... )
-    (each-token) while drop ; inline
+    [ scan ] 2dip {
+        { [ 2over = ] [ 3drop ] }
+        { [ pick not ] [ drop unexpected-eof ] }
+        [ [ nip call ] [ each-token ] 2bi ]
+    } cond ; inline recursive
 
 : map-tokens ( ... end quot: ( ... token -- ... elt ) -- ... seq )
-    (each-token) produce nip ; inline
+    collector [ each-token ] dip ; inline
 
 : parse-tokens ( end -- seq )
     [ ] map-tokens ;
@@ -112,6 +112,7 @@ PREDICATE: unexpected-eof < unexpected
 TUPLE: lexer-error line column line-text parsing-words error ;
 
 M: lexer-error error-file error>> error-file ;
+
 M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
 
 : <lexer-error> ( msg -- error )
