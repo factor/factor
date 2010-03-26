@@ -104,7 +104,7 @@ PREDICATE: unexpected-eof < unexpected got>> not ;
     } cond ; inline recursive
 
 : map-tokens ( ... end quot: ( ... token -- ... elt ) -- ... seq )
-    collector [ each-token ] dip ; inline
+    collector [ each-token ] dip { } like ; inline
 
 : parse-tokens ( end -- seq )
     [ ] map-tokens ;
