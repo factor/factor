@@ -8,6 +8,8 @@ enum context_object {
 	OBJ_CATCHSTACK,
 };
 
+static const cell stack_reserved = 1024;
+
 struct context {
 
 	// First 4 fields accessed directly by compiler. See basis/vm/vm.factor
@@ -41,6 +43,7 @@ struct context {
 	void reset_callstack();
 	void reset_context_objects();
 	void reset();
+	void fix_stacks();
 
 	cell peek()
 	{
@@ -63,19 +66,6 @@ struct context {
 	{
 		datastack += sizeof(cell);
 		replace(tagged);
-	}
-
-	static const cell stack_reserved = (64 * sizeof(cell));
-
-	void fix_stacks()
-	{
-		if(datastack + sizeof(cell) < datastack_seg->start
-			|| datastack + stack_reserved >= datastack_seg->end)
-			reset_datastack();
-
-		if(retainstack + sizeof(cell) < retainstack_seg->start
-			|| retainstack + stack_reserved >= retainstack_seg->end)
-			reset_retainstack();
 	}
 };
 

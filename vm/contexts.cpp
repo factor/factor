@@ -44,6 +44,17 @@ void context::reset()
 	reset_context_objects();
 }
 
+void context::fix_stacks()
+{
+	if(datastack + sizeof(cell) < datastack_seg->start
+		|| datastack + stack_reserved >= datastack_seg->end)
+		reset_datastack();
+
+	if(retainstack + sizeof(cell) < retainstack_seg->start
+		|| retainstack + stack_reserved >= retainstack_seg->end)
+		reset_retainstack();
+}
+
 context::~context()
 {
 	delete datastack_seg;
@@ -167,13 +178,13 @@ bool factor_vm::stack_to_array(cell bottom, cell top)
 void factor_vm::primitive_datastack()
 {
 	if(!stack_to_array(ctx->datastack_seg->start,ctx->datastack))
-		general_error(ERROR_DS_UNDERFLOW,false_object,false_object,NULL);
+		general_error(ERROR_DATASTACK_UNDERFLOW,false_object,false_object);
 }
 
 void factor_vm::primitive_retainstack()
 {
 	if(!stack_to_array(ctx->retainstack_seg->start,ctx->retainstack))
-		general_error(ERROR_RS_UNDERFLOW,false_object,false_object,NULL);
+		general_error(ERROR_RETAINSTACK_UNDERFLOW,false_object,false_object);
 }
 
 /* returns pointer to top of stack */

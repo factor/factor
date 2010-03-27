@@ -13,7 +13,7 @@ char *factor_vm::pinned_alien_offset(cell obj)
 		{
 			alien *ptr = untag<alien>(obj);
 			if(to_boolean(ptr->expired))
-				general_error(ERROR_EXPIRED,obj,false_object,NULL);
+				general_error(ERROR_EXPIRED,obj,false_object);
 			if(to_boolean(ptr->base))
 				type_error(ALIEN_TYPE,obj);
 			else
