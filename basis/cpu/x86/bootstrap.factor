@@ -42,7 +42,8 @@ big-endian off
     nv-reg 0 MOV rc-absolute-cell rt-entry-point jit-rel
     nv-reg CALL
 
-    ! Load VM into vm-reg
+    ! Load VM into vm-reg; only needed on x86-32, but doesn't
+    ! hurt on x86-64
     vm-reg 0 MOV rc-absolute-cell rt-vm jit-rel
 
     ! Load C callstack pointer
