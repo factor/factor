@@ -94,26 +94,21 @@ SYMBOL: callbacks
 
 [ H{ } clone callbacks set-global ] "alien" add-startup-hook
 
-! Every context object in the VM is identified from the Factor
-! side by a unique identifier
-TUPLE: context-id < identity-tuple ;
-
-C: <context-id> context-id
-
-: context-id ( -- id ) 2 context-object ;
-
-: set-context-id ( id -- ) 2 set-context-object ;
-
-: wait-to-return ( yield-quot id -- )
-    dup context-id eq?
+! Every callback invocation has a unique identifier in the VM.
+! We make sure that the current callback is the right one before
+! returning from it, to avoid a bad interaction between threads
+! and callbacks. See basis/compiler/tests/alien.factor for a
+! test case.
+: wait-to-return ( yield-quot callback-id -- )
+    dup current-callback eq?
     [ 2drop ] [ over call( -- ) wait-to-return ] if ;
 
 ! Used by compiler.codegen to wrap callback bodies
 : do-callback ( callback-quot yield-quot -- )
     init-namespaces
     init-catchstack
-    <context-id>
-    [ set-context-id drop call ] [ wait-to-return drop ] 3bi ; inline
+    current-callback
+    [ 2drop call ] [ wait-to-return drop ] 3bi ; inline
 
 ! A utility for defining global variables that are recompiled in
 ! every session

@@ -129,8 +129,8 @@ SYMBOL: jit-literals
 : jit-vm ( offset rc -- )
     [ jit-parameter ] dip rt-vm jit-rel ;
 
-: jit-dlsym ( name library rc -- )
-    rt-dlsym jit-rel [ string>symbol jit-parameter ] bi@ ;
+: jit-dlsym ( name rc -- )
+    rt-dlsym jit-rel string>symbol jit-parameter f jit-parameter ;
 
 :: jit-conditional ( test-quot false-quot -- )
     [ 0 test-quot call ] B{ } make length :> len

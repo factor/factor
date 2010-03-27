@@ -38,6 +38,7 @@ M: x86.64 machine-registers
     } ;
 
 : vm-reg ( -- reg ) R13 ; inline
+: nv-reg ( -- reg ) RBX ; inline
 
 M: x86.64 %mov-vm-ptr ( reg -- )
     vm-reg MOV ;
@@ -215,23 +216,19 @@ M: x86.64 %alien-invoke
     rc-absolute-cell rel-dlsym
     R11 CALL ;
 
-M: x86.64 %nest-stacks ( -- )
-    param-reg-0 %mov-vm-ptr
-    "nest_stacks" f %alien-invoke ;
-
-M: x86.64 %unnest-stacks ( -- )
-    param-reg-0 %mov-vm-ptr
-    "unnest_stacks" f %alien-invoke ;
-
 M: x86.64 %prepare-alien-indirect ( -- )
     param-reg-0 ds-reg [] MOV
     ds-reg 8 SUB
     param-reg-1 %mov-vm-ptr
     "pinned_alien_offset" f %alien-invoke
-    RBP RAX MOV ;
+    nv-reg RAX MOV ;
 
 M: x86.64 %alien-indirect ( -- )
-    RBP CALL ;
+    nv-reg CALL ;
+
+M: x86.64 %begin-callback ( -- )
+    param-reg-0 %mov-vm-ptr
+    "begin_callback" f %alien-invoke ;
 
 M: x86.64 %alien-callback ( quot -- )
     param-reg-0 param-reg-1 %restore-context
@@ -239,16 +236,15 @@ M: x86.64 %alien-callback ( quot -- )
     param-reg-0 quot-entry-point-offset [+] CALL
     param-reg-0 param-reg-1 %save-context ;
 
-M: x86.64 %callback-value ( ctype -- )
-    %pop-context-stack
-    RSP 8 SUB
-    param-reg-0 PUSH
+M: x86.64 %end-callback ( -- )
     param-reg-0 %mov-vm-ptr
-    ! Restore data/call/retain stacks
-    "unnest_stacks" f %alien-invoke
-    ! Put former top of data stack in param-reg-0
-    param-reg-0 POP
-    RSP 8 ADD
+    "end_callback" f %alien-invoke ;
+
+M: x86.64 %end-callback-value ( ctype -- )
+    %pop-context-stack
+    nv-reg param-reg-0 MOV
+    %end-callback
+    param-reg-0 nv-reg MOV
     ! Unbox former top of data stack to return registers
     unbox-return ;
 
