@@ -267,7 +267,7 @@ CONSTANT: ctx-reg 16
     jit-save-context
     3 6 MR
     4 vm-reg MR
-    0 5 LOAD32 "inline_cache_miss" f rc-absolute-ppc-2/2 jit-dlsym
+    0 5 LOAD32 "inline_cache_miss" rc-absolute-ppc-2/2 jit-dlsym
     5 MTLR
     BLRL
     jit-restore-context ;
@@ -392,7 +392,7 @@ CONSTANT: ctx-reg 16
     1 3 MR
     ! Call memcpy; arguments are now in the correct registers
     1 1 -64 STWU
-    0 2 LOAD32 "factor_memcpy" f rc-absolute-ppc-2/2 jit-dlsym
+    0 2 LOAD32 "factor_memcpy" rc-absolute-ppc-2/2 jit-dlsym
     2 MTLR
     BLRL
     1 1 0 LWZ
@@ -405,7 +405,7 @@ CONSTANT: ctx-reg 16
 [
     jit-save-context
     4 vm-reg MR
-    0 2 LOAD32 "lazy_jit_compile" f rc-absolute-ppc-2/2 jit-dlsym
+    0 2 LOAD32 "lazy_jit_compile" rc-absolute-ppc-2/2 jit-dlsym
     2 MTLR
     BLRL
     5 3 quot-entry-point-offset LWZ
@@ -665,7 +665,7 @@ CONSTANT: ctx-reg 16
     [ BNO ]
     [
         5 vm-reg MR
-        0 6 LOAD32 func f rc-absolute-ppc-2/2 jit-dlsym
+        0 6 LOAD32 func rc-absolute-ppc-2/2 jit-dlsym
         6 MTLR
         BLRL
     ]
@@ -689,7 +689,7 @@ CONSTANT: ctx-reg 16
     [
         4 4 tag-bits get SRAWI
         5 vm-reg MR
-        0 6 LOAD32 "overflow_fixnum_multiply" f rc-absolute-ppc-2/2 jit-dlsym
+        0 6 LOAD32 "overflow_fixnum_multiply" rc-absolute-ppc-2/2 jit-dlsym
         6 MTLR
         BLRL
     ]

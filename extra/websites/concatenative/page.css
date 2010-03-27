@@ -9,7 +9,7 @@ body, button {
 	border: none;
 }
 
-a, .link {
+a:link, a:visited, .link {
 	color: #222;
 	border-bottom:1px dotted #666;
 	text-decoration:none;

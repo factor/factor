@@ -1,7 +1,7 @@
 namespace factor
 {
 
-inline static cell callstack_size(cell size)
+inline static cell callstack_object_size(cell size)
 {
 	return sizeof(callstack) + size;
 }
