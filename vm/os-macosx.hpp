@@ -15,4 +15,6 @@ void c_to_factor_toplevel(cell quot);
 
 #define UAP_STACK_POINTER(ucontext) (((ucontext_t *)ucontext)->uc_stack.ss_sp)
 
+#define UAP_STACK_POINTER_TYPE void*
+
 }
