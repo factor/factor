@@ -664,6 +664,10 @@ INSN: ##vm-field-ptr
 def: dst/int-rep
 literal: field-name ;
 
+INSN: ##vm-field
+def: dst/int-rep
+literal: field-name ;
+
 ! FFI
 INSN: ##alien-invoke
 literal: params stack-frame ;

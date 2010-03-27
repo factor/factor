@@ -211,6 +211,7 @@ CODEGEN: ##compare-float-ordered %compare-float-ordered
 CODEGEN: ##compare-float-unordered %compare-float-unordered
 CODEGEN: ##save-context %save-context
 CODEGEN: ##vm-field-ptr %vm-field-ptr
+CODEGEN: ##vm-field %vm-field
 
 CODEGEN: _fixnum-add %fixnum-add
 CODEGEN: _fixnum-sub %fixnum-sub
