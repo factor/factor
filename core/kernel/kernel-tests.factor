@@ -46,6 +46,10 @@ IN: kernel.tests
 
 [ ] [ :c ] unit-test
 
+: overflow-c ( -- ) overflow-c overflow-c ;
+
+[ overflow-c ] [ { "kernel-error" 14 f f } = ] must-fail-with
+
 [ -7 <byte-array> ] must-fail
 
 [ 3 ] [ t 3 and ] unit-test
