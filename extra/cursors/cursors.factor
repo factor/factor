@@ -125,6 +125,9 @@ M: end-of-stream cursor-stream-ended? drop t ; inline
     [ '[ dup _ cursor>= ] ]
     [ '[ _ keep inc-cursor ] ] bi* until drop ; inline
 
+: -find ( ... begin end quot: ( ... cursor -- ... ? ) -- ... cursor )
+    '[ dup _ cursor>= [ t ] [ dup @ ] if ] [ inc-cursor ] until ; inline
+
 : -in- ( quot -- quot' )
     '[ cursor-value-unsafe @ ] ; inline
 
