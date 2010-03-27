@@ -242,15 +242,12 @@ IN: bootstrap.x86
     arg1 vm-reg MOV
     "new_context" jit-call
 
-    ! Load quotation from datastack
+    ! Load quotation and parameter from datastack
     arg1 ds-reg [] MOV
-
-    ! Load parameter from datastack
     arg2 ds-reg -8 [+] MOV
-
     ds-reg 16 SUB
 
-    ! Make the new context the active context
+    ! Make the new context active
     return-reg jit-set-context
 
     ! Push parameter
@@ -262,16 +259,21 @@ IN: bootstrap.x86
 ] \ (start-context) define-sub-primitive
 
 [
-    ! Load context from datastack
+    ! Load context and parameter from datastack
     temp0 ds-reg [] MOV
     temp0 temp0 alien-offset [+] MOV
-    ds-reg 8 SUB
+    temp1 ds-reg -8 [+] MOV
+    ds-reg 16 SUB
 
-    ! Make it the active context
+    ! Make the new context active
     temp0 jit-set-context
 
     ! Twiddle stack for return
     RSP 8 ADD
+
+    ! Store parameter to datastack
+    ds-reg 8 ADD
+    ds-reg [] temp1 MOV
 ] \ (set-context) define-sub-primitive
 
 << "vocab:cpu/x86/bootstrap.factor" parse-file suffix! >>
