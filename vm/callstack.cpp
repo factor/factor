@@ -13,7 +13,7 @@ void factor_vm::check_frame(stack_frame *frame)
 
 callstack *factor_vm::allot_callstack(cell size)
 {
-	callstack *stack = allot<callstack>(callstack_size(size));
+	callstack *stack = allot<callstack>(callstack_object_size(size));
 	stack->length = tag_fixnum(size);
 	return stack;
 }
