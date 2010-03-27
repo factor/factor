@@ -467,6 +467,12 @@ TUPLE: fold-boa-test-tuple { x read-only } { y read-only } { z read-only } ;
 [ [ 1 2 3 fold-boa-test-tuple boa ] final-literals ]
 unit-test
 
+TUPLE: don't-fold-boa-test-tuple < identity-tuple ;
+
+[ V{ f } ]
+[ [ don't-fold-boa-test-tuple boa ] final-literals ]
+unit-test
+
 TUPLE: immutable-prop-test-tuple { x sequence read-only } ;
 
 [ V{ T{ immutable-prop-test-tuple f "hey" } } ] [

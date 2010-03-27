@@ -34,17 +34,18 @@ IN: compiler.tree.propagation.slots
     [ read-only>> [ value-info ] [ drop f ] if ] 2map
     f prefix ;
 
-: (propagate-tuple-constructor) ( values class -- info )
-    [ read-only-slots ] keep
-    over rest-slice [ dup [ literal?>> ] when ] all? [
-        [ rest-slice ] dip fold-<tuple-boa>
-    ] [
-        <tuple-info>
-    ] if ;
+: fold-<tuple-boa>? ( values class -- ? )
+    [ rest-slice [ dup [ literal?>> ] when ] all? ]
+    [ identity-tuple class<= not ]
+    bi* and ;
+
+: (propagate-<tuple-boa>) ( values class -- info )
+    [ read-only-slots ] keep 2dup fold-<tuple-boa>?
+    [ [ rest-slice ] dip fold-<tuple-boa> ] [ <tuple-info> ] if ;
 
 : propagate-<tuple-boa> ( #call -- infos )
     in-d>> unclip-last
-    value-info literal>> first (propagate-tuple-constructor) 1array ;
+    value-info literal>> first (propagate-<tuple-boa>) 1array ;
 
 : read-only-slot? ( n class -- ? )
     all-slots [ offset>> = ] with find nip
