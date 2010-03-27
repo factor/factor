@@ -87,6 +87,8 @@ void factor_vm::not_implemented_error()
 
 void factor_vm::memory_protection_error(cell addr, stack_frame *stack)
 {
+	/* Retain and call stack underflows are not supposed to happen */
+
 	if(ctx->datastack_seg->underflow_p(addr))
 		general_error(ERROR_DATASTACK_UNDERFLOW,false_object,false_object,stack);
 	else if(ctx->datastack_seg->overflow_p(addr))
@@ -95,6 +97,10 @@ void factor_vm::memory_protection_error(cell addr, stack_frame *stack)
 		general_error(ERROR_RETAINSTACK_UNDERFLOW,false_object,false_object,stack);
 	else if(ctx->retainstack_seg->overflow_p(addr))
 		general_error(ERROR_RETAINSTACK_OVERFLOW,false_object,false_object,stack);
+	else if(ctx->callstack_seg->underflow_p(addr))
+		general_error(ERROR_CALLSTACK_UNDERFLOW,false_object,false_object,stack);
+	else if(ctx->callstack_seg->overflow_p(addr))
+		general_error(ERROR_CALLSTACK_OVERFLOW,false_object,false_object,stack);
 	else
 		general_error(ERROR_MEMORY,allot_cell(addr),false_object,stack);
 }
