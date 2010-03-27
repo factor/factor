@@ -4,7 +4,7 @@ compiler continuations effects io io.backend io.pathnames
 io.streams.string kernel math memory namespaces
 namespaces.private parser quotations sequences
 specialized-arrays stack-checker stack-checker.errors
-system threads tools.test words alien.complex ;
+system threads tools.test words alien.complex concurrency.promises ;
 FROM: alien.c-types => float short ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: char
@@ -578,6 +578,21 @@ FUNCTION: short ffi_test_48 ( bool-field-test x ) ;
 ] unit-test
 
 ] unless
+
+! Test interaction between threads and callbacks
+: thread-callback-1 ( -- callback )
+    int { } "cdecl" [ yield 100 ] alien-callback ;
+
+: thread-callback-2 ( -- callback )
+    int { } "cdecl" [ yield 200 ] alien-callback ;
+
+: thread-callback-invoker ( callback -- n )
+    int { } "cdecl" alien-indirect ;
+
+<promise> "p" set
+[ thread-callback-1 thread-callback-invoker "p" get fulfill ] in-thread
+[ 200 ] [ thread-callback-2 thread-callback-invoker ] unit-test
+[ 100 ] [ "p" get ?promise ] unit-test
 
 ! Regression: calling an undefined function would raise a protection fault
 FUNCTION: void this_does_not_exist ( ) ;

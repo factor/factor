@@ -64,11 +64,12 @@ code_block *callback_heap::add(cell owner, cell return_rewind)
 
 	/* Store VM pointer */
 	store_callback_operand(stub,0,(cell)parent);
+	store_callback_operand(stub,2,(cell)parent);
 
 	/* On x86, the RET instruction takes an argument which depends on
 	the callback's calling convention */
 #if defined(FACTOR_X86) || defined(FACTOR_AMD64)
-	store_callback_operand(stub,2,return_rewind);
+	store_callback_operand(stub,3,return_rewind);
 #endif
 
 	update(stub);

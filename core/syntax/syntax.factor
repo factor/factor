@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays byte-arrays byte-vectors definitions generic
 hashtables kernel math namespaces parser lexer sequences strings
@@ -125,7 +125,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "SYMBOLS:" [
-        ";" [ create-in dup reset-generic define-symbol ] each-token
+        ";" [ create-in [ reset-generic ] [ define-symbol ] bi ] each-token
     ] define-core-syntax
 
     "SINGLETONS:" [
