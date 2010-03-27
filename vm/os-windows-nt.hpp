@@ -47,6 +47,6 @@ inline static THREADHANDLE thread_id() { return GetCurrentThread(); }
 
 void init_platform_globals();
 void register_vm_with_thread(factor_vm *vm);
-factor_vm *tls_vm();
+factor_vm *current_vm();
 
 }

@@ -50,7 +50,7 @@ void sleep_nanos(u64 nsec);
 void init_platform_globals();
 
 void register_vm_with_thread(factor_vm *vm);
-factor_vm *tls_vm();
+factor_vm *current_vm();
 void open_console();
 
 void move_file(const vm_char *path1, const vm_char *path2);

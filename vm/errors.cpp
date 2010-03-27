@@ -17,13 +17,13 @@ void critical_error(const char *msg, cell tagged)
 	std::cout << "critical_error: " << msg;
 	std::cout << ": " << std::hex << tagged << std::dec;
 	std::cout << std::endl;
-	tls_vm()->factorbug();
+	current_vm()->factorbug();
 }
 
 void out_of_memory()
 {
 	std::cout << "Out of memory\n\n";
-	tls_vm()->dump_generations();
+	current_vm()->dump_generations();
 	exit(1);
 }
 
@@ -146,7 +146,7 @@ void factor_vm::memory_signal_handler_impl()
 
 void memory_signal_handler_impl()
 {
-	tls_vm()->memory_signal_handler_impl();
+	current_vm()->memory_signal_handler_impl();
 }
 
 void factor_vm::misc_signal_handler_impl()
@@ -156,7 +156,7 @@ void factor_vm::misc_signal_handler_impl()
 
 void misc_signal_handler_impl()
 {
-	tls_vm()->misc_signal_handler_impl();
+	current_vm()->misc_signal_handler_impl();
 }
 
 void factor_vm::fp_signal_handler_impl()
@@ -166,7 +166,7 @@ void factor_vm::fp_signal_handler_impl()
 
 void fp_signal_handler_impl()
 {
-	tls_vm()->fp_signal_handler_impl();
+	current_vm()->fp_signal_handler_impl();
 }
 
 }
