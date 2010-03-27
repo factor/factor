@@ -508,8 +508,8 @@ M: bad-executable summary
 \ current-callback { } { fixnum } define-primitive
 \ current-callback make-flushable
 
-\ current-context { } { c-ptr } define-primitive
-\ current-context make-flushable
+\ context { } { c-ptr } define-primitive
+\ context make-flushable
 
 \ delete-context { c-ptr } { } define-primitive
 
