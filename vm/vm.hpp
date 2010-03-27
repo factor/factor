@@ -6,11 +6,14 @@ struct code_root;
 
 struct factor_vm
 {
-	// First five fields accessed directly by assembler. See vm.factor
+	// First 5 fields accessed directly by compiler. See basis/vm/vm.factor
 
-	/* Current stacks */
+	/* Current context */
 	context *ctx;
-	
+
+	/* Spare context -- for callbacks */
+	context *spare_ctx;
+
 	/* New objects are allocated here */
 	nursery_space nursery;
 
@@ -23,10 +26,19 @@ struct factor_vm
 	cell special_objects[special_object_count];
 
 	/* Data stack and retain stack sizes */
-	cell ds_size, rs_size;
+	cell datastack_size, retainstack_size, callstack_size;
 
-	/* Pooling unused contexts to make callbacks cheaper */
-	context *unused_contexts;
+	/* Stack of callback IDs */
+	std::vector<int> callback_ids;
+
+	/* Next callback ID */
+	int callback_id;
+
+	/* Pooling unused contexts to make context allocation cheaper */
+	std::vector<context *> unused_contexts;
+
+	/* Active contexts, for tracing by the GC */
+	std::set<context *> active_contexts;
 
 	/* Canonical truth value. In Factor, 't' */
 	cell true_object;
@@ -96,11 +108,13 @@ struct factor_vm
 	u64 last_nano_count;
 
 	// contexts
-	context *alloc_context();
-	void dealloc_context(context *old_context);
-	void nest_stacks();
-	void unnest_stacks();
-	void init_stacks(cell ds_size_, cell rs_size_);
+	context *new_context();
+	void delete_context(context *old_context);
+	void init_contexts(cell datastack_size_, cell retainstack_size_, cell callstack_size_);
+	void delete_contexts();
+	void begin_callback();
+	void end_callback();
+	void primitive_current_callback();
 	void primitive_context_object();
 	void primitive_set_context_object();
 	bool stack_to_array(cell bottom, cell top);
@@ -111,16 +125,15 @@ struct factor_vm
 	void primitive_set_retainstack();
 	void primitive_check_datastack();
 	void primitive_load_locals();
+	void primitive_current_context();
+	void primitive_start_context();
+	void primitive_delete_context();
 
-	template<typename Iterator> void iterate_active_frames(Iterator &iter)
+	template<typename Iterator> void iterate_active_callstacks(Iterator &iter)
 	{
-		context *ctx = this->ctx;
-
-		while(ctx)
-		{
-			iterate_callstack(ctx,iter);
-			ctx = ctx->next;
-		}
+		std::set<context *>::const_iterator begin = active_contexts.begin();
+		std::set<context *>::const_iterator end = active_contexts.end();
+		while(begin != end) iterate_callstack(*begin++,iter);
 	}
 
 	// run
@@ -694,6 +707,7 @@ struct factor_vm
   #endif
 
 	factor_vm();
+	~factor_vm();
 
 };
 

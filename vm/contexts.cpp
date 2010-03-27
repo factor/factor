@@ -3,28 +3,32 @@
 namespace factor
 {
 
-context::context(cell ds_size, cell rs_size) :
+context::context(cell datastack_size, cell retainstack_size, cell callstack_size) :
 	callstack_top(NULL),
 	callstack_bottom(NULL),
 	datastack(0),
 	retainstack(0),
-	datastack_region(new segment(ds_size,false)),
-	retainstack_region(new segment(rs_size,false)),
-	next(NULL)
+	callstack_save(0),
+	datastack_seg(new segment(datastack_size,false)),
+	retainstack_seg(new segment(retainstack_size,false)),
+	callstack_seg(new segment(callstack_size,false))
 {
-	reset_datastack();
-	reset_retainstack();
-	reset_context_objects();
+	reset();
 }
 
 void context::reset_datastack()
 {
-	datastack = datastack_region->start - sizeof(cell);
+	datastack = datastack_seg->start - sizeof(cell);
 }
 
 void context::reset_retainstack()
 {
-	retainstack = retainstack_region->start - sizeof(cell);
+	retainstack = retainstack_seg->start - sizeof(cell);
+}
+
+void context::reset_callstack()
+{
+	callstack_top = callstack_bottom = CALLSTACK_BOTTOM(this);
 }
 
 void context::reset_context_objects()
@@ -32,68 +36,99 @@ void context::reset_context_objects()
 	memset_cell(context_objects,false_object,context_object_count * sizeof(cell));
 }
 
-context *factor_vm::alloc_context()
+void context::reset()
+{
+	reset_datastack();
+	reset_retainstack();
+	reset_callstack();
+	reset_context_objects();
+}
+
+context::~context()
+{
+	delete datastack_seg;
+	delete retainstack_seg;
+	delete callstack_seg;
+}
+
+/* called on startup */
+void factor_vm::init_contexts(cell datastack_size_, cell retainstack_size_, cell callstack_size_)
+{
+	datastack_size = datastack_size_;
+	retainstack_size = retainstack_size_;
+	callstack_size = callstack_size_;
+
+	ctx = NULL;
+	spare_ctx = new_context();
+}
+
+void factor_vm::delete_contexts()
+{
+	assert(!ctx);
+	std::vector<context *>::const_iterator iter = unused_contexts.begin();
+	std::vector<context *>::const_iterator end = unused_contexts.end();
+	while(iter != end)
+	{
+		delete *iter;
+		iter++;
+	}
+}
+
+context *factor_vm::new_context()
 {
 	context *new_context;
 
-	if(unused_contexts)
+	if(unused_contexts.empty())
 	{
-		new_context = unused_contexts;
-		unused_contexts = unused_contexts->next;
+		new_context = new context(datastack_size,
+			retainstack_size,
+			callstack_size);
 	}
 	else
-		new_context = new context(ds_size,rs_size);
+	{
+		new_context = unused_contexts.back();
+		unused_contexts.pop_back();
+	}
+
+	new_context->reset();
+
+	active_contexts.insert(new_context);
 
 	return new_context;
 }
 
-void factor_vm::dealloc_context(context *old_context)
+void factor_vm::delete_context(context *old_context)
 {
-	old_context->next = unused_contexts;
-	unused_contexts = old_context;
+	unused_contexts.push_back(old_context);
+	active_contexts.erase(old_context);
 }
 
-/* called on entry into a compiled callback */
-void factor_vm::nest_stacks()
+void factor_vm::begin_callback()
 {
-	context *new_ctx = alloc_context();
-
-	new_ctx->callstack_bottom = (stack_frame *)-1;
-	new_ctx->callstack_top = (stack_frame *)-1;
-
-	new_ctx->reset_datastack();
-	new_ctx->reset_retainstack();
-	new_ctx->reset_context_objects();
-
-	new_ctx->next = ctx;
-	ctx = new_ctx;
+	ctx->reset();
+	spare_ctx = new_context();
+	callback_ids.push_back(callback_id++);
 }
 
-void nest_stacks(factor_vm *parent)
+void begin_callback(factor_vm *parent)
 {
-	return parent->nest_stacks();
+	parent->begin_callback();
 }
 
-/* called when leaving a compiled callback */
-void factor_vm::unnest_stacks()
+void factor_vm::end_callback()
 {
-	context *old_ctx = ctx;
-	ctx = old_ctx->next;
-	dealloc_context(old_ctx);
+	callback_ids.pop_back();
+	delete_context(ctx);
 }
 
-void unnest_stacks(factor_vm *parent)
+void end_callback(factor_vm *parent)
 {
-	return parent->unnest_stacks();
+	parent->end_callback();
 }
 
-/* called on startup */
-void factor_vm::init_stacks(cell ds_size_, cell rs_size_)
+void factor_vm::primitive_current_callback()
 {
-	ds_size = ds_size_;
-	rs_size = rs_size_;
-	ctx = NULL;
-	unused_contexts = NULL;
+	ctx->push(tag_fixnum(callback_ids.back()));
 }
 
 void factor_vm::primitive_context_object()
@@ -126,13 +161,13 @@ bool factor_vm::stack_to_array(cell bottom, cell top)
 
 void factor_vm::primitive_datastack()
 {
-	if(!stack_to_array(ctx->datastack_region->start,ctx->datastack))
+	if(!stack_to_array(ctx->datastack_seg->start,ctx->datastack))
 		general_error(ERROR_DS_UNDERFLOW,false_object,false_object,NULL);
 }
 
 void factor_vm::primitive_retainstack()
 {
-	if(!stack_to_array(ctx->retainstack_region->start,ctx->retainstack))
+	if(!stack_to_array(ctx->retainstack_seg->start,ctx->retainstack))
 		general_error(ERROR_RS_UNDERFLOW,false_object,false_object,NULL);
 }
 
@@ -146,12 +181,12 @@ cell factor_vm::array_to_stack(array *array, cell bottom)
 
 void factor_vm::primitive_set_datastack()
 {
-	ctx->datastack = array_to_stack(untag_check<array>(ctx->pop()),ctx->datastack_region->start);
+	ctx->datastack = array_to_stack(untag_check<array>(ctx->pop()),ctx->datastack_seg->start);
 }
 
 void factor_vm::primitive_set_retainstack()
 {
-	ctx->retainstack = array_to_stack(untag_check<array>(ctx->pop()),ctx->retainstack_region->start);
+	ctx->retainstack = array_to_stack(untag_check<array>(ctx->pop()),ctx->retainstack_seg->start);
 }
 
 /* Used to implement call( */
@@ -162,12 +197,12 @@ void factor_vm::primitive_check_datastack()
 	fixnum height = out - in;
 	array *saved_datastack = untag_check<array>(ctx->pop());
 	fixnum saved_height = array_capacity(saved_datastack);
-	fixnum current_height = (ctx->datastack - ctx->datastack_region->start + sizeof(cell)) / sizeof(cell);
+	fixnum current_height = (ctx->datastack - ctx->datastack_seg->start + sizeof(cell)) / sizeof(cell);
 	if(current_height - height != saved_height)
 		ctx->push(false_object);
 	else
 	{
-		cell *ds_bot = (cell *)ctx->datastack_region->start;
+		cell *ds_bot = (cell *)ctx->datastack_seg->start;
 		for(fixnum i = 0; i < saved_height - in; i++)
 		{
 			if(ds_bot[i] != array_nth(saved_datastack,i))
@@ -188,6 +223,24 @@ void factor_vm::primitive_load_locals()
 		sizeof(cell) * count);
 	ctx->datastack -= sizeof(cell) * count;
 	ctx->retainstack += sizeof(cell) * count;
+}
+
+void factor_vm::primitive_current_context()
+{
+	ctx->push(allot_alien(ctx));
+}
+
+void factor_vm::primitive_start_context()
+{
+	cell quot = ctx->pop();
+	ctx = new_context();
+	unwind_native_frames(quot,ctx->callstack_bottom);
+}
+
+void factor_vm::primitive_delete_context()
+{
+	context *old_context = (context *)pinned_alien_offset(ctx->pop());
+	delete_context(old_context);
 }
 
 }

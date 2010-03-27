@@ -716,7 +716,7 @@ M: ppc %callback-value ( ctype -- )
     3 1 0 local@ STW
     3 %load-vm-addr
     ! Restore data/call/retain stacks
-    "unnest_stacks" f %alien-invoke
+    "unnest_context" f %alien-invoke
     ! Restore top of data stack
     3 1 0 local@ LWZ
     ! Unbox former top of data stack to return registers
@@ -757,13 +757,13 @@ M: ppc %box-small-struct ( c-type -- )
     4 3 4 LWZ
     3 3 0 LWZ ;
 
-M: ppc %nest-stacks ( -- )
+M: ppc %nest-context ( -- )
     3 %load-vm-addr
-    "nest_stacks" f %alien-invoke ;
+    "nest_context" f %alien-invoke ;
 
-M: ppc %unnest-stacks ( -- )
+M: ppc %unnest-context ( -- )
     3 %load-vm-addr
-    "unnest_stacks" f %alien-invoke ;
+    "unnest_context" f %alien-invoke ;
 
 M: ppc %unbox-small-struct ( size -- )
     heap-size cell align cell /i {

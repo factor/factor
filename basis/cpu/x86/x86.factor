@@ -1403,10 +1403,7 @@ M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
 
 M:: x86 %restore-context ( temp1 temp2 -- )
     #! Load Factor stack pointers on entry from C to Factor.
-    #! Also save callstack bottom!
     temp1 "ctx" %vm-field
-    temp2 stack-reg stack-frame get total-size>> cell - [+] LEA
-    temp1 "callstack-bottom" context-field-offset [+] temp2 MOV
     ds-reg temp1 "datastack" context-field-offset [+] MOV
     rs-reg temp1 "retainstack" context-field-offset [+] MOV ;
 
