@@ -97,6 +97,11 @@ context *factor_vm::new_context()
 	return new_context;
 }
 
+context *new_context(factor_vm *parent)
+{
+	return parent->new_context();
+}
+
 void factor_vm::delete_context(context *old_context)
 {
 	unused_contexts.push_back(old_context);
@@ -225,16 +230,9 @@ void factor_vm::primitive_load_locals()
 	ctx->retainstack += sizeof(cell) * count;
 }
 
-void factor_vm::primitive_current_context()
+void factor_vm::primitive_context()
 {
 	ctx->push(allot_alien(ctx));
-}
-
-void factor_vm::primitive_start_context()
-{
-	cell quot = ctx->pop();
-	ctx = new_context();
-	unwind_native_frames(quot,ctx->callstack_bottom);
 }
 
 void factor_vm::primitive_delete_context()

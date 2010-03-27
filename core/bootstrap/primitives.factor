@@ -369,6 +369,8 @@ tuple
     { "fixnum<=" "math.private" (( x y -- z )) }
     { "fixnum>" "math.private" (( x y -- ? )) }
     { "fixnum>=" "math.private" (( x y -- ? )) }
+    { "(set-context)" "threads.private" (( context -- )) }
+    { "(start-context)" "threads.private" (( obj quot -- )) }
 } [ first3 make-sub-primitive ] each
 
 ! Primitive words
@@ -534,9 +536,8 @@ tuple
     { "nano-count" "system" "primitive_nano_count" (( -- ns )) }
     { "system-micros" "system" "primitive_system_micros" (( -- us )) }
     { "(sleep)" "threads.private" "primitive_sleep" (( nanos -- )) }
-    { "current-context" "threads.private" "primitive_current_context" (( -- c-ptr )) }
+    { "context" "threads.private" "primitive_context" (( -- c-ptr )) }
     { "delete-context" "threads.private" "primitive_delete_context" (( c-ptr -- )) }
-    { "start-context" "threads.private" "primitive_start_context" (( quot -- )) }
     { "dispatch-stats" "tools.dispatch.private" "primitive_dispatch_stats" (( -- stats )) }
     { "reset-dispatch-stats" "tools.dispatch.private" "primitive_reset_dispatch_stats" (( -- )) }
     { "profiling" "tools.profiler.private" "primitive_profiling" (( ? -- )) }

@@ -3,7 +3,7 @@
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.x86.assembler cpu.x86.assembler.operands layouts
 vocabs parser compiler.constants sequences math math.private
-generic.single.private ;
+generic.single.private threads.private ;
 IN: bootstrap.x86
 
 4 \ cell set
@@ -21,7 +21,7 @@ IN: bootstrap.x86
 : vm-reg ( -- reg ) ECX ;
 : ctx-reg ( -- reg ) EBP ;
 : nv-regs ( -- seq ) { ESI EDI EBX } ;
-: nv-reg ( -- reg ) nv-regs first ;
+: nv-reg ( -- reg ) EBX ;
 : ds-reg ( -- reg ) ESI ;
 : rs-reg ( -- reg ) EDI ;
 : fixnum>slot@ ( -- ) temp0 2 SAR ;
@@ -52,6 +52,7 @@ IN: bootstrap.x86
     ctx-reg vm-reg vm-context-offset [+] MOV ;
 
 : jit-save-context ( -- )
+    jit-load-context
     EDX ESP -4 [+] LEA
     ctx-reg context-callstack-top-offset [+] EDX MOV
     ctx-reg context-datastack-offset [+] ds-reg MOV
@@ -63,7 +64,6 @@ IN: bootstrap.x86
 
 [
     jit-load-vm
-    jit-load-context
     jit-save-context
     ! call the primitive
     ESP [] vm-reg MOV
@@ -96,7 +96,6 @@ IN: bootstrap.x86
     EAX quot-entry-point-offset [+] CALL
 
     jit-load-vm
-    jit-load-context
     jit-save-context
 
     ! load C callstack pointer
@@ -167,7 +166,6 @@ IN: bootstrap.x86
 
 [
     jit-load-vm
-    jit-load-context
     jit-save-context
 
     ! Store arguments
@@ -189,7 +187,6 @@ IN: bootstrap.x86
 ! frame, and the stack. The frame setup takes this into account.
 : jit-inline-cache-miss ( -- )
     jit-load-vm
-    jit-load-context
     jit-save-context
     ESP 4 [+] vm-reg MOV
     ESP [] EBX MOV
@@ -210,7 +207,6 @@ IN: bootstrap.x86
 : jit-overflow ( insn func -- )
     ds-reg 4 SUB
     jit-load-vm
-    jit-load-context
     jit-save-context
     EAX ds-reg [] MOV
     EDX ds-reg 4 [+] MOV
@@ -233,7 +229,6 @@ IN: bootstrap.x86
 [
     ds-reg 4 SUB
     jit-load-vm
-    jit-load-context
     jit-save-context
     EBX ds-reg [] MOV
     EAX EBX MOV
@@ -251,6 +246,59 @@ IN: bootstrap.x86
     ]
     jit-conditional
 ] \ fixnum* define-sub-primitive
+
+! Threads
+: jit-set-context ( reg -- )
+    ! Save ds, rs registers
+    jit-load-vm
+    jit-save-context
+
+    ! Make the new context the current one
+    ctx-reg swap MOV
+    vm-reg vm-context-offset [+] ctx-reg MOV
+
+    ! Load new stack pointer
+    ESP ctx-reg context-callstack-top-offset [+] MOV
+
+    ! Load new ds, rs registers
+    jit-restore-context ;
+
+[
+    ! Create the new context in return-reg
+    jit-load-vm
+    ESP [] vm-reg MOV
+    "new_context" jit-call
+
+    ! Save pointer to quotation and parameter, pop them off the
+    ! datastack
+    EBX ds-reg MOV
+    ds-reg 8 SUB
+
+    ! Make the new context the active context
+    EAX jit-set-context
+
+    ! Push parameter
+    EAX EBX -4 [+] MOV
+    ds-reg 4 ADD
+    ds-reg [] EAX MOV
+
+    ! Jump to initial quotation
+    EAX EBX [] MOV
+    EAX quot-entry-point-offset [+] JMP
+] \ (start-context) define-sub-primitive
+
+[
+    ! Load context from datastack
+    EAX ds-reg [] MOV
+    EAX EAX alien-offset [+] MOV
+    ds-reg 4 SUB
+
+    ! Make it the active context
+    EAX jit-set-context
+
+    ! Twiddle stack for return
+    ESP 4 ADD
+] \ (set-context) define-sub-primitive
 
 << "vocab:cpu/x86/bootstrap.factor" parse-file suffix! >>
 call

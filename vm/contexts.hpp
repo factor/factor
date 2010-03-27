@@ -79,7 +79,8 @@ struct context {
 	}
 };
 
-VM_C_API void begin_callback(factor_vm *vm);
-VM_C_API void end_callback(factor_vm *vm);
+VM_C_API context *new_context(factor_vm *parent);
+VM_C_API void begin_callback(factor_vm *parent);
+VM_C_API void end_callback(factor_vm *parent);
 
 }
