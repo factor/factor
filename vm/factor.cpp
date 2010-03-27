@@ -95,7 +95,7 @@ void factor_vm::init_factor(vm_parameters *p)
 	/* Kilobytes */
 	p->datastack_size = align_page(p->datastack_size << 10);
 	p->retainstack_size = align_page(p->retainstack_size << 10);
-	p->callstack_size = align_page(p->retainstack_size << 10);
+	p->callstack_size = align_page(p->callstack_size << 10);
 	p->callback_size = align_page(p->callback_size << 10);
 
 	/* Megabytes */
