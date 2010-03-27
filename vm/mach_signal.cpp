@@ -35,19 +35,9 @@ void factor_vm::call_fault_handler(
 	MACH_THREAD_STATE_TYPE *thread_state,
 	MACH_FLOAT_STATE_TYPE *float_state)
 {
-	/* There is a race condition here, but in practice an exception
-	delivered during stack frame setup/teardown or while transitioning
-	from Factor to C is a sign of things seriously gone wrong, not just
-	a divide by zero or stack underflow in the listener */
+	MACH_STACK_POINTER(thread_state) = (cell)fix_callstack_top((stack_frame *)MACH_STACK_POINTER(thread_state));
 
-	/* Are we in compiled Factor code? Then use the current stack pointer */
-	if(in_code_heap_p(MACH_PROGRAM_COUNTER(thread_state)))
-		signal_callstack_top = (stack_frame *)MACH_STACK_POINTER(thread_state);
-	/* Are we in C? Then use the saved callstack top */
-	else
-		signal_callstack_top = NULL;
-
-	MACH_STACK_POINTER(thread_state) = align_stack_pointer(MACH_STACK_POINTER(thread_state));
+	signal_callstack_top = (stack_frame *)MACH_STACK_POINTER(thread_state);
 
 	/* Now we point the program counter at the right handler function. */
 	if(exception == EXC_BAD_ACCESS)

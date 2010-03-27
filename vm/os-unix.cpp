@@ -85,7 +85,7 @@ void *factor_vm::ffi_dlsym(dll *dll, symbol_char *symbol)
 void factor_vm::ffi_dlclose(dll *dll)
 {
 	if(dlclose(dll->handle))
-		general_error(ERROR_FFI,false_object,false_object,NULL);
+		general_error(ERROR_FFI,false_object,false_object);
 	dll->handle = NULL;
 }
 
@@ -103,7 +103,7 @@ void factor_vm::move_file(const vm_char *path1, const vm_char *path2)
 		ret = rename((path1),(path2));
 	} while(ret < 0 && errno == EINTR);
 	if(ret < 0)
-		general_error(ERROR_IO,tag_fixnum(errno),false_object,NULL);
+		general_error(ERROR_IO,tag_fixnum(errno),false_object);
 }
 
 segment::segment(cell size_, bool executable_p)
@@ -141,16 +141,7 @@ segment::~segment()
 
 void factor_vm::dispatch_signal(void *uap, void (handler)())
 {
-	if(in_code_heap_p(UAP_PROGRAM_COUNTER(uap)))
-	{
-		stack_frame *ptr = (stack_frame *)UAP_STACK_POINTER(uap);
-		assert(ptr);
-		signal_callstack_top = ptr;
-	}
-	else
-		signal_callstack_top = NULL;
-
-	UAP_STACK_POINTER(uap) = align_stack_pointer(UAP_STACK_POINTER(uap));
+	UAP_STACK_POINTER(uap) = fix_callstack_top((stack_frame *)UAP_STACK_POINTER(uap));
 	UAP_PROGRAM_COUNTER(uap) = (cell)handler;
 }
 

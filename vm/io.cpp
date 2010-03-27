@@ -28,7 +28,7 @@ void factor_vm::io_error()
 		return;
 #endif
 
-	general_error(ERROR_IO,tag_fixnum(errno),false_object,NULL);
+	general_error(ERROR_IO,tag_fixnum(errno),false_object);
 }
 
 FILE *factor_vm::safe_fopen(char *filename, char *mode)
