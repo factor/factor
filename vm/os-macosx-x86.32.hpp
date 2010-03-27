@@ -64,11 +64,6 @@ inline static unsigned int uap_fpu_status(void *uap)
 	return mach_fpu_status(UAP_FS(uap));
 }
 
-template<typename Type> Type align_stack_pointer(Type sp)
-{
-	return (Type)((((cell)sp + 4) & ~15) - 4);
-}
-
 inline static void mach_clear_fpu_status(i386_float_state_t *float_state)
 {
         MXCSR(float_state) &= 0xffffffc0;

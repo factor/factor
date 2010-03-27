@@ -144,7 +144,7 @@ void factor_vm::update_word_references(code_block *compiled, bool reset_inline_c
 image load */
 void factor_vm::undefined_symbol()
 {
-	general_error(ERROR_UNDEFINED_SYMBOL,false_object,false_object,NULL);
+	general_error(ERROR_UNDEFINED_SYMBOL,false_object,false_object);
 }
 
 void undefined_symbol()
