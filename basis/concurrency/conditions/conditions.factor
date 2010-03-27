@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: deques threads kernel arrays sequences alarms fry ;
 IN: concurrency.conditions
@@ -22,10 +22,13 @@ IN: concurrency.conditions
 
 ERROR: wait-timeout ;
 
+: queue ( queue -- )
+    [ self ] dip push-front ;
+
 : wait ( queue timeout status -- )
     over [
-        [ queue-timeout [ drop ] ] dip suspend
+        [ queue-timeout ] dip suspend
         [ wait-timeout ] [ cancel-alarm ] if
     ] [
-        [ drop '[ _ push-front ] ] dip suspend drop
+        [ drop queue ] dip suspend drop
     ] if ;
