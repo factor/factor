@@ -3,7 +3,7 @@
 USING: bootstrap.image.private kernel kernel.private namespaces
 system layouts vocabs parser compiler.constants math
 math.private cpu.x86.assembler cpu.x86.assembler.operands
-sequences generic.single.private ;
+sequences generic.single.private threads.private ;
 IN: bootstrap.x86
 
 8 \ cell set
@@ -16,7 +16,7 @@ IN: bootstrap.x86
 : temp2 ( -- reg ) RDX ;
 : temp3 ( -- reg ) RBX ;
 : return-reg ( -- reg ) RAX ;
-: nv-reg ( -- reg ) nv-regs first ;
+: nv-reg ( -- reg ) RBX ;
 : stack-reg ( -- reg ) RSP ;
 : frame-reg ( -- reg ) RBP ;
 : ctx-reg ( -- reg ) R12 ;
@@ -51,8 +51,8 @@ IN: bootstrap.x86
 
 : jit-save-context ( -- )
     jit-load-context
-    RAX RSP -8 [+] LEA
-    ctx-reg context-callstack-top-offset [+] RAX MOV
+    R11 RSP -8 [+] LEA
+    ctx-reg context-callstack-top-offset [+] R11 MOV
     ctx-reg context-datastack-offset [+] ds-reg MOV
     ctx-reg context-retainstack-offset [+] rs-reg MOV ;
 
@@ -221,6 +221,58 @@ IN: bootstrap.x86
     ]
     jit-conditional
 ] \ fixnum* define-sub-primitive
+
+! Threads
+: jit-set-context ( reg -- )
+    ! Save ds, rs registers
+    jit-save-context
+
+    ! Make the new context the current one
+    ctx-reg swap MOV
+    vm-reg vm-context-offset [+] ctx-reg MOV
+
+    ! Load new stack pointer
+    RSP ctx-reg context-callstack-top-offset [+] MOV
+
+    ! Load new ds, rs registers
+    jit-restore-context ;
+
+[
+    ! Create the new context in return-reg
+    arg1 vm-reg MOV
+    "new_context" jit-call
+
+    ! Load quotation from datastack
+    arg1 ds-reg [] MOV
+
+    ! Load parameter from datastack
+    arg2 ds-reg -8 [+] MOV
+
+    ds-reg 16 SUB
+
+    ! Make the new context the active context
+    return-reg jit-set-context
+
+    ! Push parameter
+    ds-reg 8 ADD
+    ds-reg [] arg2 MOV
+
+    ! Jump to initial quotation
+    arg1 quot-entry-point-offset [+] JMP
+] \ (start-context) define-sub-primitive
+
+[
+    ! Load context from datastack
+    temp0 ds-reg [] MOV
+    temp0 temp0 alien-offset [+] MOV
+    ds-reg 8 SUB
+
+    ! Make it the active context
+    temp0 jit-set-context
+
+    ! Twiddle stack for return
+    RSP 8 ADD
+] \ (set-context) define-sub-primitive
 
 << "vocab:cpu/x86/bootstrap.factor" parse-file suffix! >>
 call

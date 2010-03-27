@@ -7,6 +7,16 @@ dlists assocs system combinators combinators.private init boxes
 accessors math.order deques strings quotations fry ;
 IN: threads
 
+<PRIVATE
+
+! (set-context) and (start-context) are sub-primitives, but
+! we don't want them inlined into callers since their behavior
+! depends on what frames are on the callstack
+: start-context ( obj quot: ( obj -- * ) -- ) (start-context) ;
+: set-context ( context -- ) (set-context) ;
+
+PRIVATE>
+
 SYMBOL: initial-thread
 
 TUPLE: thread

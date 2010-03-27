@@ -43,9 +43,9 @@ namespace factor
 	_(code_room) \
 	_(compact_gc) \
 	_(compute_identity_hashcode) \
+	_(context) \
 	_(context_object) \
 	_(current_callback) \
-	_(current_context) \
 	_(data_room) \
 	_(datastack) \
 	_(delete_context) \
@@ -122,7 +122,6 @@ namespace factor
 	_(size) \
 	_(sleep) \
 	_(special_object) \
-	_(start_context) \
 	_(string) \
 	_(string_nth) \
 	_(strip_stack_traces) \

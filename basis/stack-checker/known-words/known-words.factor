@@ -513,7 +513,9 @@ M: bad-executable summary
 
 \ delete-context { c-ptr } { } define-primitive
 
-\ start-context { quotation } { } define-primitive
+\ (start-context) { object quotation } { } define-primitive
+
+\ (set-context) { alien } { } define-primitive
 
 \ special-object { fixnum } { object } define-primitive
 \ special-object make-flushable
