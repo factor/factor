@@ -369,8 +369,8 @@ tuple
     { "fixnum<=" "math.private" (( x y -- z )) }
     { "fixnum>" "math.private" (( x y -- ? )) }
     { "fixnum>=" "math.private" (( x y -- ? )) }
-    { "(set-context)" "threads.private" (( context -- )) }
-    { "(start-context)" "threads.private" (( obj quot -- )) }
+    { "(set-context)" "threads.private" (( obj context -- obj' )) }
+    { "(start-context)" "threads.private" (( obj quot -- obj' )) }
 } [ first3 make-sub-primitive ] each
 
 ! Primitive words

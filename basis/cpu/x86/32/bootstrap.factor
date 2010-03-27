@@ -269,12 +269,11 @@ IN: bootstrap.x86
     ESP [] vm-reg MOV
     "new_context" jit-call
 
-    ! Save pointer to quotation and parameter, pop them off the
-    ! datastack
+    ! Save pointer to quotation and parameter
     EBX ds-reg MOV
     ds-reg 8 SUB
 
-    ! Make the new context the active context
+    ! Make the new context active
     EAX jit-set-context
 
     ! Push parameter
@@ -288,16 +287,21 @@ IN: bootstrap.x86
 ] \ (start-context) define-sub-primitive
 
 [
-    ! Load context from datastack
+    ! Load context and parameter from datastack
     EAX ds-reg [] MOV
     EAX EAX alien-offset [+] MOV
-    ds-reg 4 SUB
+    EBX ds-reg -4 [+] MOV
+    ds-reg 8 SUB
 
-    ! Make it the active context
+    ! Make the new context active
     EAX jit-set-context
 
     ! Twiddle stack for return
     ESP 4 ADD
+
+    ! Store parameter to datastack
+    ds-reg 4 ADD
+    ds-reg [] EBX MOV
 ] \ (set-context) define-sub-primitive
 
 << "vocab:cpu/x86/bootstrap.factor" parse-file suffix! >>
