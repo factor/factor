@@ -17,23 +17,23 @@ THREADHANDLE start_thread(void *(*start_routine)(void *),void *args)
 	return thread;
 }
 
-pthread_key_t tlsKey = 0;
+pthread_key_t current_vm_tls_key = 0;
 
 void init_platform_globals()
 {
-	if (pthread_key_create(&tlsKey, NULL) != 0)
+	if (pthread_key_create(&current_vm_tls_key, NULL) != 0)
 		fatal_error("pthread_key_create() failed",0);
 
 }
 
 void register_vm_with_thread(factor_vm *vm)
 {
-	pthread_setspecific(tlsKey,vm);
+	pthread_setspecific(current_vm_tls_key,vm);
 }
 
-factor_vm *tls_vm()
+factor_vm *current_vm()
 {
-	factor_vm *vm = (factor_vm*)pthread_getspecific(tlsKey);
+	factor_vm *vm = (factor_vm*)pthread_getspecific(current_vm_tls_key);
 	assert(vm != NULL);
 	return vm;
 }
@@ -156,21 +156,21 @@ void factor_vm::dispatch_signal(void *uap, void (handler)())
 
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	factor_vm *vm = tls_vm();
+	factor_vm *vm = current_vm();
 	vm->signal_fault_addr = (cell)siginfo->si_addr;
 	vm->dispatch_signal(uap,factor::memory_signal_handler_impl);
 }
 
 void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	factor_vm *vm = tls_vm();
+	factor_vm *vm = current_vm();
 	vm->signal_number = signal;
 	vm->dispatch_signal(uap,factor::misc_signal_handler_impl);
 }
 
 void fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	factor_vm *vm = tls_vm();
+	factor_vm *vm = current_vm();
 	vm->signal_number = signal;
 	vm->signal_fpu_status = fpu_status(uap_fpu_status(uap));
 	uap_clear_fpu_status(uap);
