@@ -8,6 +8,10 @@ IN: cursors.tests
     { } make
 ] unit-test
 
+[ T{ linear-cursor f 3 1 } ] [
+    T{ linear-cursor f 1 1 } T{ linear-cursor f 5 1 } [ value>> 3 mod zero? ] -find
+] unit-test
+
 [ { 1 3 } ] [
     [ T{ linear-cursor f 1 2 } T{ linear-cursor f 5 2 } [ value>> , ] -each ]
     { } make
