@@ -191,6 +191,10 @@ static void sigaction_safe(int signum, const struct sigaction *act, struct sigac
 
 void factor_vm::unix_init_signals()
 {
+	/* OpenBSD doesn't support sigaltstack() if we link against
+	libpthread. See http://redmine.ruby-lang.org/issues/show/1239 */
+
+#ifndef __OpenBSD__
 	signal_callstack_seg = new segment(callstack_size,false);
 
 	stack_t signal_callstack;
@@ -200,6 +204,7 @@ void factor_vm::unix_init_signals()
 
 	if(sigaltstack(&signal_callstack,(stack_t *)NULL) < 0)
 		fatal_error("sigaltstack() failed",0);
+#endif
 
 	struct sigaction memory_sigaction;
 	struct sigaction misc_sigaction;
