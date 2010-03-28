@@ -67,7 +67,7 @@ void sleep_nanos(u64 nsec)
 
 void factor_vm::init_ffi()
 {
-	/* NULL_DLL is "libfactor.dylib" for OS X and NULL for generic unix */
+	/* NULL_DLL is "libfactor.dylib" for OS X and NULL for generic Unix */
 	null_dll = dlopen(NULL_DLL,RTLD_LAZY);
 }
 
@@ -143,6 +143,8 @@ void factor_vm::dispatch_signal(void *uap, void (handler)())
 {
 	UAP_STACK_POINTER(uap) = (UAP_STACK_POINTER_TYPE)fix_callstack_top((stack_frame *)UAP_STACK_POINTER(uap));
 	UAP_PROGRAM_COUNTER(uap) = (cell)handler;
+
+	signal_callstack_top = (stack_frame *)UAP_STACK_POINTER(uap);
 }
 
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
