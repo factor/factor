@@ -107,6 +107,9 @@ struct factor_vm
 	decrease */
 	u64 last_nano_count;
 
+	/* Stack for signal handlers, only used on Unix */
+	segment *signal_callstack_seg;
+
 	// contexts
 	context *new_context();
 	void delete_context(context *old_context);
@@ -339,7 +342,7 @@ struct factor_vm
 	template<typename Array> bool reallot_array_in_place_p(Array *array, cell capacity);
 	template<typename Array> Array *reallot_array(Array *array_, cell capacity);
 
-	//debug
+	// debug
 	void print_chars(string* str);
 	void print_word(word* word, cell nesting);
 	void print_factor_string(string* str);
@@ -362,7 +365,7 @@ struct factor_vm
 	void factorbug();
 	void primitive_die();
 
-	//arrays
+	// arrays
 	inline void set_array_nth(array *array, cell slot, cell value);
 	array *allot_array(cell capacity, cell fill_);
 	void primitive_array();
@@ -372,7 +375,7 @@ struct factor_vm
 	void primitive_resize_array();
 	cell std_vector_to_array(std::vector<cell> &elements);
 
-	//strings
+	// strings
 	cell string_nth(const string *str, cell index);
 	void set_string_nth_fast(string *str, cell index, cell ch);
 	void set_string_nth_slow(string *str_, cell index, cell ch);
@@ -388,13 +391,13 @@ struct factor_vm
 	void primitive_set_string_nth_fast();
 	void primitive_set_string_nth_slow();
 
-	//booleans
+	// booleans
 	cell tag_boolean(cell untagged)
 	{
 		return (untagged ? true_object : false_object);
 	}
 
-	//byte arrays
+	// byte arrays
 	byte_array *allot_byte_array(cell size);
 	void primitive_byte_array();
 	void primitive_uninitialized_byte_array();
@@ -402,11 +405,11 @@ struct factor_vm
 
 	template<typename Type> byte_array *byte_array_from_value(Type *value);
 
-	//tuples
+	// tuples
 	void primitive_tuple();
 	void primitive_tuple_boa();
 
-	//words
+	// words
 	word *allot_word(cell name_, cell vocab_, cell hashcode_);
 	void primitive_word();
 	void primitive_word_code();
@@ -417,7 +420,7 @@ struct factor_vm
 	cell find_all_words();
 	void compile_all_words();
 
-	//math
+	// math
 	void primitive_bignum_to_fixnum();
 	void primitive_float_to_fixnum();
 	void primitive_fixnum_divint();
@@ -503,7 +506,7 @@ struct factor_vm
 	// tagged
 	template<typename Type> Type *untag_check(cell value);
 
-	//io
+	// io
 	void init_c_io();
 	void io_error();
 	FILE* safe_fopen(char *filename, char *mode);
@@ -526,7 +529,7 @@ struct factor_vm
 	void primitive_fflush();
 	void primitive_fclose();
 
-	//code_block
+	// code_block
 	cell compute_entry_point_address(cell obj);
 	cell compute_entry_point_pic_address(word *w, cell tagged_quot);
 	cell compute_entry_point_pic_address(cell w_);
@@ -563,11 +566,11 @@ struct factor_vm
 	cell code_blocks();
 	void primitive_code_blocks();
 
-	//callbacks
+	// callbacks
 	void init_callbacks(cell size);
 	void primitive_callback();
 
-	//image
+	// image
 	void init_objects(image_header *h);
 	void load_data_heap(FILE *file, image_header *h, vm_parameters *p);
 	void load_code_heap(FILE *file, image_header *h, vm_parameters *p);
@@ -578,7 +581,7 @@ struct factor_vm
 	void fixup_code(cell data_offset, cell code_offset);
 	void load_image(vm_parameters *p);
 
-	//callstack
+	// callstack
 	template<typename Iterator> void iterate_callstack_object(callstack *stack_, Iterator &iterator);
 	void check_frame(stack_frame *frame);
 	callstack *allot_callstack(cell size);
@@ -598,7 +601,7 @@ struct factor_vm
 	void primitive_set_innermost_stack_frame_quot();
 	template<typename Iterator> void iterate_callstack(context *ctx, Iterator &iterator);
 
-	//alien
+	// alien
 	char *pinned_alien_offset(cell obj);
 	cell allot_alien(cell delegate_, cell displacement);
 	cell allot_alien(void *address);
@@ -615,7 +618,7 @@ struct factor_vm
 	cell from_small_struct(cell x, cell y, cell size);
 	cell from_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size);
 
-	//quotations
+	// quotations
 	void primitive_jit_compile();
 	code_block *lazy_jit_compile_block();
 	void primitive_array_to_quotation();
@@ -630,7 +633,7 @@ struct factor_vm
 	cell find_all_quotations();
 	void initialize_all_quotations();
 
-	//dispatch
+	// dispatch
 	cell search_lookup_alist(cell table, cell klass);
 	cell search_lookup_hash(cell table, cell klass, cell hashcode);
 	cell nth_superclass(tuple_layout *layout, fixnum echelon);
@@ -645,7 +648,7 @@ struct factor_vm
 	void primitive_reset_dispatch_stats();
 	void primitive_dispatch_stats();
 
-	//inline cache
+	// inline cache
 	void init_inline_caching(int max_size);
 	void deallocate_inline_cache(cell return_address);
 	cell determine_inline_cache_type(array *cache_entries);
@@ -657,11 +660,11 @@ struct factor_vm
 	void update_pic_transitions(cell pic_size);
 	void *inline_cache_miss(cell return_address);
 
-	//entry points
+	// entry points
 	void c_to_factor(cell quot);
 	void unwind_native_frames(cell quot, stack_frame *to);
 
-	//factor
+	// factor
 	void default_parameters(vm_parameters *p);
 	bool factor_arg(const vm_char *str, const vm_char *arg, cell *value);
 	void init_parameters_from_args(vm_parameters *p, int argc, vm_char **argv);
@@ -685,6 +688,7 @@ struct factor_vm
 	void *ffi_dlsym(dll *dll, symbol_char *symbol);
 	void ffi_dlclose(dll *dll);
 	void c_to_factor_toplevel(cell quot);
+	void init_signals();
 
 	// os-windows
   #if defined(WINDOWS)
@@ -697,8 +701,10 @@ struct factor_vm
 	void open_console();
 	LONG exception_handler(PEXCEPTION_POINTERS pe);
   #endif
+
   #else  // UNIX
 	void dispatch_signal(void *uap, void (handler)());
+	void unix_init_signals();
   #endif
 
   #ifdef __APPLE__
@@ -707,7 +713,6 @@ struct factor_vm
 
 	factor_vm();
 	~factor_vm();
-
 };
 
 extern std::map<THREADHANDLE, factor_vm *> thread_vms;
