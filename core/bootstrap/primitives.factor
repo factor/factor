@@ -63,6 +63,7 @@ call( -- )
     "alien"
     "alien.accessors"
     "alien.libraries"
+    "alien.private"
     "arrays"
     "byte-arrays"
     "classes.private"
@@ -368,6 +369,8 @@ tuple
     { "fixnum<=" "math.private" (( x y -- z )) }
     { "fixnum>" "math.private" (( x y -- ? )) }
     { "fixnum>=" "math.private" (( x y -- ? )) }
+    { "(set-context)" "threads.private" (( obj context -- obj' )) }
+    { "(start-context)" "threads.private" (( obj quot -- obj' )) }
 } [ first3 make-sub-primitive ] each
 
 ! Primitive words
@@ -415,6 +418,7 @@ tuple
     { "(dlsym)" "alien.libraries" "primitive_dlsym" (( name dll -- alien )) }
     { "dlclose" "alien.libraries" "primitive_dlclose" (( dll -- )) }
     { "dll-valid?" "alien.libraries" "primitive_dll_validp" (( dll -- ? )) }
+    { "current-callback" "alien.private" "primitive_current_callback" (( -- n )) }
     { "<array>" "arrays" "primitive_array" (( n elt -- array )) }
     { "resize-array" "arrays" "primitive_resize_array" (( n array -- newarray )) }
     { "(byte-array)" "byte-arrays" "primitive_uninitialized_byte_array" (( n -- byte-array )) }
@@ -532,6 +536,8 @@ tuple
     { "nano-count" "system" "primitive_nano_count" (( -- ns )) }
     { "system-micros" "system" "primitive_system_micros" (( -- us )) }
     { "(sleep)" "threads.private" "primitive_sleep" (( nanos -- )) }
+    { "context" "threads.private" "primitive_context" (( -- c-ptr )) }
+    { "delete-context" "threads.private" "primitive_delete_context" (( c-ptr -- )) }
     { "dispatch-stats" "tools.dispatch.private" "primitive_dispatch_stats" (( -- stats )) }
     { "reset-dispatch-stats" "tools.dispatch.private" "primitive_reset_dispatch_stats" (( -- )) }
     { "profiling" "tools.profiler.private" "primitive_profiling" (( ? -- )) }

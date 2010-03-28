@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables heaps kernel kernel.private math
@@ -7,6 +7,16 @@ dlists assocs system combinators combinators.private init boxes
 accessors math.order deques strings quotations fry ;
 IN: threads
 
+<PRIVATE
+
+! (set-context) and (start-context) are sub-primitives, but
+! we don't want them inlined into callers since their behavior
+! depends on what frames are on the callstack
+: set-context ( obj context -- obj' ) (set-context) ;
+: start-context ( obj quot: ( obj -- * ) -- obj' ) (start-context) ;
+
+PRIVATE>
+
 SYMBOL: initial-thread
 
 TUPLE: thread
@@ -14,21 +24,22 @@ TUPLE: thread
 { quot callable initial: [ ] }
 { exit-handler callable initial: [ ] }
 { id integer }
-continuation
+{ continuation box }
 state
 runnable
 mailbox
-variables
+{ variables hashtable }
 sleep-entry ;
 
-: self ( -- thread ) 63 special-object ; inline
+: self ( -- thread )
+    63 special-object { thread } declare ; inline
 
 ! Thread-local storage
 : tnamespace ( -- assoc )
-    self variables>> [ H{ } clone dup self (>>variables) ] unless* ;
+    self variables>> ; inline
 
 : tget ( key -- value )
-    self variables>> at ;
+    tnamespace at ;
 
 : tset ( value key -- )
     tnamespace set-at ;
@@ -36,9 +47,11 @@ sleep-entry ;
 : tchange ( key quot -- )
     tnamespace swap change-at ; inline
 
-: threads ( -- assoc ) 64 special-object ;
+: threads ( -- assoc )
+    64 special-object { hashtable } declare ; inline
 
-: thread ( id -- thread ) threads at ;
+: thread ( id -- thread )
+    threads at ;
 
 : thread-registered? ( thread -- ? )
     id>> threads key? ;
@@ -70,14 +83,17 @@ PRIVATE>
         swap >>name
         swap >>quot
         \ thread counter >>id
-        <box> >>continuation ; inline
+        <box> >>continuation
+        H{ } clone >>variables ; inline
 
 : <thread> ( quot name -- thread )
     \ thread new-thread ;
 
-: run-queue ( -- dlist ) 65 special-object ;
+: run-queue ( -- dlist )
+    65 special-object { dlist } declare ; inline
 
-: sleep-queue ( -- heap ) 66 special-object ;
+: sleep-queue ( -- heap )
+    66 special-object { dlist } declare ; inline
 
 : resume ( thread -- )
     f >>state
@@ -165,25 +181,22 @@ DEFER: next
 
 PRIVATE>
 
-: stop ( -- )
+: stop ( -- * )
     self [ exit-handler>> call( -- ) ] [ unregister-thread ] bi next ;
 
-: suspend ( quot state -- obj )
-    [
-        [ [ self swap call ] dip self (>>state) ] dip
-        self continuation>> >box
-        next
-    ] callcc1 2nip ; inline
+: suspend ( state -- obj )
+    self (>>state)
+    [ self continuation>> >box next ] callcc1 ; inline
 
-: yield ( -- ) [ resume ] f suspend drop ;
+: yield ( -- ) self resume f suspend drop ;
 
 GENERIC: sleep-until ( n/f -- )
 
 M: integer sleep-until
-    '[ _ schedule-sleep ] "sleep" suspend drop ;
+    [ self ] dip schedule-sleep "sleep" suspend drop ;
 
 M: f sleep-until
-    drop [ drop ] "interrupt" suspend drop ;
+    drop "interrupt" suspend drop ;
 
 GENERIC: sleep ( dt -- )
 
@@ -208,7 +221,7 @@ M: real sleep
 
 : in-thread ( quot -- )
     [ datastack ] dip
-    '[ _ set-datastack _ call ]
+    '[ _ set-datastack @ ]
     "Thread" spawn drop ;
 
 GENERIC: error-in-thread ( error thread -- )

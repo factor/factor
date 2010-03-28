@@ -145,13 +145,13 @@ void factor_vm::print_objects(cell *start, cell *end)
 void factor_vm::print_datastack()
 {
 	std::cout << "==== DATA STACK:\n";
-	print_objects((cell *)ctx->datastack_region->start,(cell *)ctx->datastack);
+	print_objects((cell *)ctx->datastack_seg->start,(cell *)ctx->datastack);
 }
 
 void factor_vm::print_retainstack()
 {
 	std::cout << "==== RETAIN STACK:\n";
-	print_objects((cell *)ctx->retainstack_region->start,(cell *)ctx->retainstack);
+	print_objects((cell *)ctx->retainstack_seg->start,(cell *)ctx->retainstack);
 }
 
 struct stack_frame_printer {
@@ -421,9 +421,9 @@ void factor_vm::factorbug()
 		else if(strcmp(cmd,"t") == 0)
 			full_output = !full_output;
 		else if(strcmp(cmd,"s") == 0)
-			dump_memory(ctx->datastack_region->start,ctx->datastack);
+			dump_memory(ctx->datastack_seg->start,ctx->datastack);
 		else if(strcmp(cmd,"r") == 0)
-			dump_memory(ctx->retainstack_region->start,ctx->retainstack);
+			dump_memory(ctx->retainstack_seg->start,ctx->retainstack);
 		else if(strcmp(cmd,".s") == 0)
 			print_datastack();
 		else if(strcmp(cmd,".r") == 0)

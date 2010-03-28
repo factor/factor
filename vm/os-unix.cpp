@@ -13,27 +13,26 @@ THREADHANDLE start_thread(void *(*start_routine)(void *),void *args)
 		fatal_error("pthread_attr_setdetachstate() failed",0);
 	if (pthread_create (&thread, &attr, start_routine, args) != 0)
 		fatal_error("pthread_create() failed",0);
-	pthread_attr_destroy (&attr);
+	pthread_attr_destroy(&attr);
 	return thread;
 }
 
-pthread_key_t tlsKey = 0;
+pthread_key_t current_vm_tls_key = 0;
 
 void init_platform_globals()
 {
-	if (pthread_key_create(&tlsKey, NULL) != 0)
+	if(pthread_key_create(&current_vm_tls_key, NULL) != 0)
 		fatal_error("pthread_key_create() failed",0);
-
 }
 
 void register_vm_with_thread(factor_vm *vm)
 {
-	pthread_setspecific(tlsKey,vm);
+	pthread_setspecific(current_vm_tls_key,vm);
 }
 
-factor_vm *tls_vm()
+factor_vm *current_vm()
 {
-	factor_vm *vm = (factor_vm*)pthread_getspecific(tlsKey);
+	factor_vm *vm = (factor_vm*)pthread_getspecific(current_vm_tls_key);
 	assert(vm != NULL);
 	return vm;
 }
@@ -67,7 +66,7 @@ void sleep_nanos(u64 nsec)
 
 void factor_vm::init_ffi()
 {
-	/* NULL_DLL is "libfactor.dylib" for OS X and NULL for generic unix */
+	/* NULL_DLL is "libfactor.dylib" for OS X and NULL for generic Unix */
 	null_dll = dlopen(NULL_DLL,RTLD_LAZY);
 }
 
@@ -85,7 +84,7 @@ void *factor_vm::ffi_dlsym(dll *dll, symbol_char *symbol)
 void factor_vm::ffi_dlclose(dll *dll)
 {
 	if(dlclose(dll->handle))
-		general_error(ERROR_FFI,false_object,false_object,NULL);
+		general_error(ERROR_FFI,false_object,false_object);
 	dll->handle = NULL;
 }
 
@@ -99,11 +98,14 @@ void factor_vm::primitive_existsp()
 void factor_vm::move_file(const vm_char *path1, const vm_char *path2)
 {
 	int ret = 0;
-	do {
+	do
+	{
 		ret = rename((path1),(path2));
-	} while(ret < 0 && errno == EINTR);
+	}
+	while(ret < 0 && errno == EINTR);
+
 	if(ret < 0)
-		general_error(ERROR_IO,tag_fixnum(errno),false_object,NULL);
+		general_error(ERROR_IO,tag_fixnum(errno),false_object);
 }
 
 segment::segment(cell size_, bool executable_p)
@@ -141,36 +143,29 @@ segment::~segment()
 
 void factor_vm::dispatch_signal(void *uap, void (handler)())
 {
-	if(in_code_heap_p(UAP_PROGRAM_COUNTER(uap)))
-	{
-		stack_frame *ptr = (stack_frame *)UAP_STACK_POINTER(uap);
-		assert(ptr);
-		signal_callstack_top = ptr;
-	}
-	else
-		signal_callstack_top = NULL;
-
-	UAP_STACK_POINTER(uap) = align_stack_pointer(UAP_STACK_POINTER(uap));
+	UAP_STACK_POINTER(uap) = (UAP_STACK_POINTER_TYPE)fix_callstack_top((stack_frame *)UAP_STACK_POINTER(uap));
 	UAP_PROGRAM_COUNTER(uap) = (cell)handler;
+
+	signal_callstack_top = (stack_frame *)UAP_STACK_POINTER(uap);
 }
 
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	factor_vm *vm = tls_vm();
+	factor_vm *vm = current_vm();
 	vm->signal_fault_addr = (cell)siginfo->si_addr;
 	vm->dispatch_signal(uap,factor::memory_signal_handler_impl);
 }
 
 void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	factor_vm *vm = tls_vm();
+	factor_vm *vm = current_vm();
 	vm->signal_number = signal;
 	vm->dispatch_signal(uap,factor::misc_signal_handler_impl);
 }
 
 void fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	factor_vm *vm = tls_vm();
+	factor_vm *vm = current_vm();
 	vm->signal_number = signal;
 	vm->signal_fpu_status = fpu_status(uap_fpu_status(uap));
 	uap_clear_fpu_status(uap);
@@ -194,8 +189,23 @@ static void sigaction_safe(int signum, const struct sigaction *act, struct sigac
 		fatal_error("sigaction failed", 0);
 }
 
-void unix_init_signals()
+void factor_vm::unix_init_signals()
 {
+	/* OpenBSD doesn't support sigaltstack() if we link against
+	libpthread. See http://redmine.ruby-lang.org/issues/show/1239 */
+
+#ifndef __OpenBSD__
+	signal_callstack_seg = new segment(callstack_size,false);
+
+	stack_t signal_callstack;
+	signal_callstack.ss_sp = (char *)signal_callstack_seg->start;
+	signal_callstack.ss_size = signal_callstack_seg->size;
+	signal_callstack.ss_flags = 0;
+
+	if(sigaltstack(&signal_callstack,(stack_t *)NULL) < 0)
+		fatal_error("sigaltstack() failed",0);
+#endif
+
 	struct sigaction memory_sigaction;
 	struct sigaction misc_sigaction;
 	struct sigaction fpe_sigaction;
@@ -204,7 +214,7 @@ void unix_init_signals()
 	memset(&memory_sigaction,0,sizeof(struct sigaction));
 	sigemptyset(&memory_sigaction.sa_mask);
 	memory_sigaction.sa_sigaction = memory_signal_handler;
-	memory_sigaction.sa_flags = SA_SIGINFO;
+	memory_sigaction.sa_flags = SA_SIGINFO | SA_ONSTACK;
 
 	sigaction_safe(SIGBUS,&memory_sigaction,NULL);
 	sigaction_safe(SIGSEGV,&memory_sigaction,NULL);
@@ -212,14 +222,14 @@ void unix_init_signals()
 	memset(&fpe_sigaction,0,sizeof(struct sigaction));
 	sigemptyset(&fpe_sigaction.sa_mask);
 	fpe_sigaction.sa_sigaction = fpe_signal_handler;
-	fpe_sigaction.sa_flags = SA_SIGINFO;
+	fpe_sigaction.sa_flags = SA_SIGINFO | SA_ONSTACK;
 
 	sigaction_safe(SIGFPE,&fpe_sigaction,NULL);
 
 	memset(&misc_sigaction,0,sizeof(struct sigaction));
 	sigemptyset(&misc_sigaction.sa_mask);
 	misc_sigaction.sa_sigaction = misc_signal_handler;
-	misc_sigaction.sa_flags = SA_SIGINFO;
+	misc_sigaction.sa_flags = SA_SIGINFO | SA_ONSTACK;
 
 	sigaction_safe(SIGQUIT,&misc_sigaction,NULL);
 	sigaction_safe(SIGILL,&misc_sigaction,NULL);

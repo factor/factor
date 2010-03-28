@@ -1,7 +1,7 @@
 USING: delegate kernel arrays tools.test words math definitions
 compiler.units parser generic prettyprint io.streams.string
 accessors eval multiline generic.single delegate.protocols
-delegate.private assocs see ;
+delegate.private assocs see make ;
 IN: delegate.tests
 
 TUPLE: hello this that ;
@@ -197,3 +197,18 @@ DEFER: seq-delegate
     sequence-protocol \ protocol-consult word-prop
     key?
 ] unit-test
+
+GENERIC: broadcastable ( x -- )
+GENERIC: nonbroadcastable ( x -- y )
+
+TUPLE: broadcaster targets ;
+
+BROADCAST: broadcastable broadcaster targets>> ;
+
+M: integer broadcastable 1 + , ;
+
+[ "USING: accessors delegate ; IN: delegate.tests BROADCAST: nonbroadcastable broadcaster targets>> ;" eval( -- ) ]
+[ error>> broadcast-words-must-have-no-outputs? ] must-fail-with
+
+[ { 2 3 4 } ]
+[ { 1 2 3 } broadcaster boa [ broadcastable ] { } make ] unit-test

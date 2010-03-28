@@ -1,11 +1,13 @@
 ! Copyright (C) 2007, 2008 Daniel Ehrenberg
-! Portions copyright (C) 2009 Slava Pestov
+! Portions copyright (C) 2009, 2010 Slava Pestov, Joe Groff
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes.tuple definitions generic
+USING: accessors arrays assocs classes.tuple definitions effects generic
 generic.standard hashtables kernel lexer math parser
 generic.parser sequences sets slots words words.symbol fry
 compiler.units ;
 IN: delegate
+
+ERROR: broadcast-words-must-have-no-outputs group ;
 
 <PRIVATE
 
@@ -28,12 +30,19 @@ M: tuple-class group-words
         2array
     ] map concat ;
 
+: check-broadcast-group ( group -- group )
+    dup group-words [ first stack-effect out>> empty? ] all?
+    [ broadcast-words-must-have-no-outputs ] unless ;
+
 ! Consultation
 
 TUPLE: consultation group class quot loc ;
+TUPLE: broadcast < consultation ;
 
 : <consultation> ( group class quot -- consultation )
     f consultation boa ; 
+: <broadcast> ( group class quot -- consultation )
+    [ check-broadcast-group ] 2dip f broadcast boa ; 
 
 : create-consult-method ( word consultation -- method )
     [ class>> swap first create-method dup fake-definition ] keep
@@ -44,13 +53,21 @@ PREDICATE: consult-method < method "consultation" word-prop ;
 M: consult-method reset-word
     [ call-next-method ] [ f "consultation" set-word-prop ] bi ;
 
-: consult-method-quot ( quot word -- object )
+GENERIC# (consult-method-quot) 2 ( consultation quot word -- object )
+
+M: consultation (consult-method-quot)
+    '[ _ call _ execute ] nip ;
+M: broadcast (consult-method-quot)
+    '[ _ call [ _ execute ] each ] nip ;
+
+: consult-method-quot ( consultation word -- object )
+    [ dup quot>> ] dip
     [ second [ [ dip ] curry ] times ] [ first ] bi
-    '[ _ call _ execute ] ;
+    (consult-method-quot) ;
 
 : consult-method ( word consultation -- )
     [ create-consult-method ]
-    [ quot>> swap consult-method-quot ] 2bi
+    [ swap consult-method-quot ] 2bi
     define ;
 
 : change-word-prop ( word prop quot -- )
@@ -87,6 +104,10 @@ PRIVATE>
 
 SYNTAX: CONSULT:
     scan-word scan-word parse-definition <consultation>
+    [ save-location ] [ define-consult ] bi ;
+
+SYNTAX: BROADCAST:
+    scan-word scan-word parse-definition <broadcast>
     [ save-location ] [ define-consult ] bi ;
 
 M: consultation where loc>> ;

@@ -1,7 +1,8 @@
 USING: arrays byte-arrays kernel kernel.private math memory
 namespaces sequences tools.test math.private quotations
 continuations prettyprint io.streams.string debugger assocs
-sequences.private accessors locals.backend grouping words ;
+sequences.private accessors locals.backend grouping words
+system ;
 IN: kernel.tests
 
 [ 0 ] [ f size ] unit-test
@@ -45,6 +46,12 @@ IN: kernel.tests
 [ overflow-r ] [ { "kernel-error" 13 f f } = ] must-fail-with
 
 [ ] [ :c ] unit-test
+
+: overflow-c ( -- ) overflow-c overflow-c ;
+
+os [ windows? ] [ openbsd? ] bi or [
+    [ overflow-c ] [ { "kernel-error" 14 f f } = ] must-fail-with
+] unless
 
 [ -7 <byte-array> ] must-fail
 

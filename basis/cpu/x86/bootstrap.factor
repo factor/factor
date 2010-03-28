@@ -13,35 +13,46 @@ big-endian off
     ! Optimizing compiler's side of callback accesses
     ! arguments that are on the stack via the frame pointer.
     ! On x86-64, some arguments are passed in registers, and
-    ! so the only register that is safe for use here is safe-reg.
+    ! so the only register that is safe for use here is nv-reg.
     frame-reg PUSH
     frame-reg stack-reg MOV
 
     ! Save all non-volatile registers
     nv-regs [ PUSH ] each
 
-    ! Save old stack pointer and align
-    safe-reg stack-reg MOV
-    stack-reg bootstrap-cell SUB
-    stack-reg -16 AND
-    stack-reg [] safe-reg MOV
-
-    ! Register shadow area - only required on Win64, but doesn't
-    ! hurt on other platforms
-    stack-reg 32 SUB
-
     ! Load VM into vm-reg
     vm-reg 0 MOV rc-absolute-cell rt-vm jit-rel
 
+    ! Save old context
+    nv-reg vm-reg vm-context-offset [+] MOV
+    nv-reg PUSH
+
+    ! Switch over to the spare context
+    nv-reg vm-reg vm-spare-context-offset [+] MOV
+    vm-reg vm-context-offset [+] nv-reg MOV
+
+    ! Save C callstack pointer
+    nv-reg context-callstack-save-offset [+] stack-reg MOV
+
+    ! Load Factor callstack pointer
+    stack-reg nv-reg context-callstack-bottom-offset [+] MOV
+    stack-reg bootstrap-cell ADD
+
     ! Call into Factor code
-    safe-reg 0 MOV rc-absolute-cell rt-entry-point jit-rel
-    safe-reg CALL
+    nv-reg 0 MOV rc-absolute-cell rt-entry-point jit-rel
+    nv-reg CALL
 
-    ! Tear down register shadow area
-    stack-reg 32 ADD
+    ! Load VM into vm-reg; only needed on x86-32, but doesn't
+    ! hurt on x86-64
+    vm-reg 0 MOV rc-absolute-cell rt-vm jit-rel
 
-    ! Undo stack alignment
-    stack-reg stack-reg [] MOV
+    ! Load C callstack pointer
+    nv-reg vm-reg vm-context-offset [+] MOV
+    stack-reg nv-reg context-callstack-save-offset [+] MOV
+
+    ! Load old context
+    nv-reg POP
+    vm-reg vm-context-offset [+] nv-reg MOV
 
     ! Restore non-volatile registers
     nv-regs <reversed> [ POP ] each
@@ -56,15 +67,15 @@ big-endian off
 
 [
     ! Load word
-    safe-reg 0 MOV rc-absolute-cell rt-literal jit-rel
+    nv-reg 0 MOV rc-absolute-cell rt-literal jit-rel
     ! Bump profiling counter
-    safe-reg profile-count-offset [+] 1 tag-fixnum ADD
+    nv-reg profile-count-offset [+] 1 tag-fixnum ADD
     ! Load word->code
-    safe-reg safe-reg word-code-offset [+] MOV
+    nv-reg nv-reg word-code-offset [+] MOV
     ! Compute word entry point
-    safe-reg compiled-header-size ADD
+    nv-reg compiled-header-size ADD
     ! Jump to entry point
-    safe-reg JMP
+    nv-reg JMP
 ] jit-profiling jit-define
 
 [

@@ -9,7 +9,7 @@ void factor_vm::c_to_factor_toplevel(cell quot)
 	c_to_factor(quot);
 }
 
-void init_signals()
+void factor_vm::init_signals()
 {
 	unix_init_signals();
 }
