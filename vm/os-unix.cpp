@@ -13,7 +13,7 @@ THREADHANDLE start_thread(void *(*start_routine)(void *),void *args)
 		fatal_error("pthread_attr_setdetachstate() failed",0);
 	if (pthread_create (&thread, &attr, start_routine, args) != 0)
 		fatal_error("pthread_create() failed",0);
-	pthread_attr_destroy (&attr);
+	pthread_attr_destroy(&attr);
 	return thread;
 }
 
@@ -21,9 +21,8 @@ pthread_key_t current_vm_tls_key = 0;
 
 void init_platform_globals()
 {
-	if (pthread_key_create(&current_vm_tls_key, NULL) != 0)
+	if(pthread_key_create(&current_vm_tls_key, NULL) != 0)
 		fatal_error("pthread_key_create() failed",0);
-
 }
 
 void register_vm_with_thread(factor_vm *vm)
@@ -187,8 +186,18 @@ static void sigaction_safe(int signum, const struct sigaction *act, struct sigac
 		fatal_error("sigaction failed", 0);
 }
 
-void unix_init_signals()
+void factor_vm::unix_init_signals()
 {
+	signal_callstack_seg = new segment(callstack_size,false);
+
+	stack_t signal_callstack;
+	signal_callstack.ss_sp = (void *)signal_callstack_seg->start;
+	signal_callstack.ss_size = signal_callstack_seg->size;
+	signal_callstack.ss_flags = 0;
+
+	if(sigaltstack(&signal_callstack,(stack_t *)NULL) < 0)
+		fatal_error("sigaltstack() failed",0);
+
 	struct sigaction memory_sigaction;
 	struct sigaction misc_sigaction;
 	struct sigaction fpe_sigaction;
@@ -197,7 +206,7 @@ void unix_init_signals()
 	memset(&memory_sigaction,0,sizeof(struct sigaction));
 	sigemptyset(&memory_sigaction.sa_mask);
 	memory_sigaction.sa_sigaction = memory_signal_handler;
-	memory_sigaction.sa_flags = SA_SIGINFO;
+	memory_sigaction.sa_flags = SA_SIGINFO | SA_ONSTACK;
 
 	sigaction_safe(SIGBUS,&memory_sigaction,NULL);
 	sigaction_safe(SIGSEGV,&memory_sigaction,NULL);
@@ -205,14 +214,14 @@ void unix_init_signals()
 	memset(&fpe_sigaction,0,sizeof(struct sigaction));
 	sigemptyset(&fpe_sigaction.sa_mask);
 	fpe_sigaction.sa_sigaction = fpe_signal_handler;
-	fpe_sigaction.sa_flags = SA_SIGINFO;
+	fpe_sigaction.sa_flags = SA_SIGINFO | SA_ONSTACK;
 
 	sigaction_safe(SIGFPE,&fpe_sigaction,NULL);
 
 	memset(&misc_sigaction,0,sizeof(struct sigaction));
 	sigemptyset(&misc_sigaction.sa_mask);
 	misc_sigaction.sa_sigaction = misc_signal_handler;
-	misc_sigaction.sa_flags = SA_SIGINFO;
+	misc_sigaction.sa_flags = SA_SIGINFO | SA_ONSTACK;
 
 	sigaction_safe(SIGQUIT,&misc_sigaction,NULL);
 	sigaction_safe(SIGILL,&misc_sigaction,NULL);
