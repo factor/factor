@@ -1,1 +1,1 @@
-#define UAP_STACK_POINTER_TYPE __greg_t
+#define UAP_STACK_POINTER_TYPE __register_t
