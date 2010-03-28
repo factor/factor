@@ -39,7 +39,6 @@ typedef pthread_t THREADHANDLE;
 THREADHANDLE start_thread(void *(*start_routine)(void *),void *args);
 inline static THREADHANDLE thread_id() { return pthread_self(); }
 
-void unix_init_signals();
 void signal_handler(int signal, siginfo_t* siginfo, void* uap);
 void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap);
 
