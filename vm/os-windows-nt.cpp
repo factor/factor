@@ -75,11 +75,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_POINTERS pe)
 	CONTEXT *c = (CONTEXT*)pe->ContextRecord;
 
 	c->ESP = (cell)fix_callstack_top((stack_frame *)c->ESP);
-
-	if(in_code_heap_p(c->EIP))
-		signal_callstack_top = (stack_frame *)c->ESP;
-	else
-		signal_callstack_top = NULL;
+	signal_callstack_top = (stack_frame *)c->ESP;
 
 	switch (e->ExceptionCode)
 	{
