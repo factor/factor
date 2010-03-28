@@ -40,3 +40,19 @@ yield
 [ "a" [ 1 1 + ] spawn 100 sleep ] must-fail
 
 [ ] [ 0.1 seconds sleep ] unit-test
+
+! Test thread-local variables
+<promise> "p" set
+
+5 "x" tset
+
+[ 5 ] [ "x" tget ] unit-test
+
+[ ] [ "x" [ 1 + ] tchange ] unit-test
+
+[ 6 ] [ "x" tget ] unit-test
+
+! Are they truly thread-local?
+[ "x" tget "p" get fulfill ] in-thread
+
+[ f ] [ "p" get ?promise ] unit-test

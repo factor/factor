@@ -36,10 +36,10 @@ sleep-entry ;
 
 ! Thread-local storage
 : tnamespace ( -- assoc )
-    self variables>> [ H{ } clone dup self (>>variables) ] unless* ;
+    self variables>> ; inline
 
 : tget ( key -- value )
-    self variables>> at ;
+    tnamespace at ;
 
 : tset ( value key -- )
     tnamespace set-at ;
@@ -83,7 +83,8 @@ PRIVATE>
         swap >>name
         swap >>quot
         \ thread counter >>id
-        <box> >>continuation ; inline
+        <box> >>continuation
+        H{ } clone >>variables ; inline
 
 : <thread> ( quot name -- thread )
     \ thread new-thread ;
