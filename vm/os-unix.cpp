@@ -98,9 +98,12 @@ void factor_vm::primitive_existsp()
 void factor_vm::move_file(const vm_char *path1, const vm_char *path2)
 {
 	int ret = 0;
-	do {
+	do
+	{
 		ret = rename((path1),(path2));
-	} while(ret < 0 && errno == EINTR);
+	}
+	while(ret < 0 && errno == EINTR);
+
 	if(ret < 0)
 		general_error(ERROR_IO,tag_fixnum(errno),false_object);
 }
@@ -191,7 +194,7 @@ void factor_vm::unix_init_signals()
 	signal_callstack_seg = new segment(callstack_size,false);
 
 	stack_t signal_callstack;
-	signal_callstack.ss_sp = (void *)signal_callstack_seg->start;
+	signal_callstack.ss_sp = (char *)signal_callstack_seg->start;
 	signal_callstack.ss_size = signal_callstack_seg->size;
 	signal_callstack.ss_flags = 0;
 
