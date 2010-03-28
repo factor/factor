@@ -211,6 +211,7 @@ CODEGEN: ##compare-float-ordered %compare-float-ordered
 CODEGEN: ##compare-float-unordered %compare-float-unordered
 CODEGEN: ##save-context %save-context
 CODEGEN: ##vm-field-ptr %vm-field-ptr
+CODEGEN: ##vm-field %vm-field
 
 CODEGEN: _fixnum-add %fixnum-add
 CODEGEN: _fixnum-sub %fixnum-sub
@@ -458,7 +459,7 @@ M: ##alien-indirect generate-insn
     ! Generate code for boxing input parameters in a callback.
     [
         dup \ %save-param-reg move-parameters
-        %nest-stacks
+        %begin-callback
         box-parameters
     ] with-param-regs ;
 
@@ -482,5 +483,4 @@ M: ##alien-callback generate-insn
     params>>
     [ registers>objects ]
     [ wrap-callback-quot %alien-callback ]
-    [ alien-return [ %unnest-stacks ] [ %callback-value ] if-void ]
-    tri ;
+    [ alien-return [ %end-callback ] [ %end-callback-value ] if-void ] tri ;

@@ -1,19 +1,20 @@
 ! Copyright (C) 2004, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry accessors alien alien.accessors arrays byte-arrays
-classes continuations.private effects generic hashtables
-hashtables.private io io.backend io.files io.files.private
-io.streams.c kernel kernel.private math math.private
-math.parser.private memory memory.private namespaces
-namespaces.private parser quotations quotations.private sbufs
-sbufs.private sequences sequences.private slots.private strings
-strings.private system threads.private classes.tuple
-classes.tuple.private vectors vectors.private words
-words.private definitions assocs summary compiler.units
-system.private combinators combinators.short-circuit locals
-locals.backend locals.types combinators.private
-stack-checker.values generic.single generic.single.private
-alien.libraries tools.dispatch.private tools.profiler.private
+USING: fry accessors alien alien.accessors alien.private arrays
+byte-arrays classes continuations.private effects generic
+hashtables hashtables.private io io.backend io.files
+io.files.private io.streams.c kernel kernel.private math
+math.private math.parser.private memory memory.private
+namespaces namespaces.private parser quotations
+quotations.private sbufs sbufs.private sequences
+sequences.private slots.private strings strings.private system
+threads.private classes.tuple classes.tuple.private vectors
+vectors.private words words.private definitions assocs summary
+compiler.units system.private combinators
+combinators.short-circuit locals locals.backend locals.types
+combinators.private stack-checker.values generic.single
+generic.single.private alien.libraries tools.dispatch.private
+tools.profiler.private
 stack-checker.alien
 stack-checker.state
 stack-checker.errors
@@ -503,6 +504,18 @@ M: bad-executable summary
 
 \ word-code { word } { integer integer } define-primitive
 \ word-code make-flushable
+
+\ current-callback { } { fixnum } define-primitive
+\ current-callback make-flushable
+
+\ context { } { c-ptr } define-primitive
+\ context make-flushable
+
+\ delete-context { c-ptr } { } define-primitive
+
+\ (start-context) { object quotation } { object } define-primitive
+
+\ (set-context) { object alien } { object } define-primitive
 
 \ special-object { fixnum } { object } define-primitive
 \ special-object make-flushable

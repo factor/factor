@@ -3,7 +3,7 @@
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.x86.assembler cpu.x86.assembler.operands layouts
 vocabs parser compiler.constants sequences math math.private
-generic.single.private ;
+generic.single.private threads.private ;
 IN: bootstrap.x86
 
 4 \ cell set
@@ -16,16 +16,19 @@ IN: bootstrap.x86
 : temp1 ( -- reg ) EDX ;
 : temp2 ( -- reg ) ECX ;
 : temp3 ( -- reg ) EBX ;
-: safe-reg ( -- reg ) EAX ;
 : stack-reg ( -- reg ) ESP ;
 : frame-reg ( -- reg ) EBP ;
 : vm-reg ( -- reg ) ECX ;
 : ctx-reg ( -- reg ) EBP ;
 : nv-regs ( -- seq ) { ESI EDI EBX } ;
+: nv-reg ( -- reg ) EBX ;
 : ds-reg ( -- reg ) ESI ;
 : rs-reg ( -- reg ) EDI ;
 : fixnum>slot@ ( -- ) temp0 2 SAR ;
 : rex-length ( -- n ) 0 ;
+
+: jit-call ( name -- )
+    0 CALL rc-relative jit-dlsym ;
 
 [
     ! save stack frame size
@@ -49,7 +52,8 @@ IN: bootstrap.x86
     ctx-reg vm-reg vm-context-offset [+] MOV ;
 
 : jit-save-context ( -- )
-    EDX RSP -4 [+] LEA
+    jit-load-context
+    EDX ESP -4 [+] LEA
     ctx-reg context-callstack-top-offset [+] EDX MOV
     ctx-reg context-datastack-offset [+] ds-reg MOV
     ctx-reg context-retainstack-offset [+] rs-reg MOV ;
@@ -60,7 +64,6 @@ IN: bootstrap.x86
 
 [
     jit-load-vm
-    jit-load-context
     jit-save-context
     ! call the primitive
     ESP [] vm-reg MOV
@@ -70,18 +73,36 @@ IN: bootstrap.x86
 ] jit-primitive jit-define
 
 [
-    ! Load quotation
+    jit-load-vm
+    ESP [] vm-reg MOV
+    "begin_callback" jit-call
+
+    ! load quotation - EBP is ctx-reg so it will get clobbered
+    ! later on
     EAX EBP 8 [+] MOV
-    ! save ctx->callstack_bottom, load ds, rs registers
+
     jit-load-vm
     jit-load-context
     jit-restore-context
-    EDX stack-reg stack-frame-size 4 - [+] LEA
-    ctx-reg context-callstack-bottom-offset [+] EDX MOV
+
+    ! save C callstack pointer
+    ctx-reg context-callstack-save-offset [+] ESP MOV
+
+    ! load Factor callstack pointer
+    ESP ctx-reg context-callstack-bottom-offset [+] MOV
+    ESP 4 ADD
+
     ! call the quotation
     EAX quot-entry-point-offset [+] CALL
-    ! save ds, rs registers
+
+    jit-load-vm
     jit-save-context
+
+    ! load C callstack pointer
+    ESP ctx-reg context-callstack-save-offset [+] MOV
+
+    ESP [] vm-reg MOV
+    "end_callback" jit-call
 ] \ c-to-factor define-sub-primitive
 
 [
@@ -137,7 +158,7 @@ IN: bootstrap.x86
     EDX PUSH
     EBP PUSH
     EAX PUSH
-    0 CALL "factor_memcpy" f rc-relative jit-dlsym
+    "factor_memcpy" jit-call
     ESP 12 ADD
     ! Return with new callstack
     0 RET
@@ -145,7 +166,6 @@ IN: bootstrap.x86
 
 [
     jit-load-vm
-    jit-load-context
     jit-save-context
 
     ! Store arguments
@@ -153,7 +173,7 @@ IN: bootstrap.x86
     ESP 4 [+] vm-reg MOV
 
     ! Call VM
-    0 CALL "lazy_jit_compile" f rc-relative jit-dlsym
+    "lazy_jit_compile" jit-call
 ]
 [ EAX quot-entry-point-offset [+] CALL ]
 [ EAX quot-entry-point-offset [+] JMP ]
@@ -167,11 +187,10 @@ IN: bootstrap.x86
 ! frame, and the stack. The frame setup takes this into account.
 : jit-inline-cache-miss ( -- )
     jit-load-vm
-    jit-load-context
     jit-save-context
     ESP 4 [+] vm-reg MOV
     ESP [] EBX MOV
-    0 CALL "inline_cache_miss" f rc-relative jit-dlsym
+    "inline_cache_miss" jit-call
     jit-restore-context ;
 
 [ jit-load-return-address jit-inline-cache-miss ]
@@ -188,7 +207,6 @@ IN: bootstrap.x86
 : jit-overflow ( insn func -- )
     ds-reg 4 SUB
     jit-load-vm
-    jit-load-context
     jit-save-context
     EAX ds-reg [] MOV
     EDX ds-reg 4 [+] MOV
@@ -200,7 +218,7 @@ IN: bootstrap.x86
         ESP [] EAX MOV
         ESP 4 [+] EDX MOV
         ESP 8 [+] vm-reg MOV
-        [ 0 CALL ] dip f rc-relative jit-dlsym
+        jit-call
     ]
     jit-conditional ;
 
@@ -211,7 +229,6 @@ IN: bootstrap.x86
 [
     ds-reg 4 SUB
     jit-load-vm
-    jit-load-context
     jit-save-context
     EBX ds-reg [] MOV
     EAX EBX MOV
@@ -225,10 +242,67 @@ IN: bootstrap.x86
         ESP [] EBX MOV
         ESP 4 [+] EBP MOV
         ESP 8 [+] vm-reg MOV
-        0 CALL "overflow_fixnum_multiply" f rc-relative jit-dlsym
+        "overflow_fixnum_multiply" jit-call
     ]
     jit-conditional
 ] \ fixnum* define-sub-primitive
+
+! Threads
+: jit-set-context ( reg -- )
+    ! Save ds, rs registers
+    jit-load-vm
+    jit-save-context
+
+    ! Make the new context the current one
+    ctx-reg swap MOV
+    vm-reg vm-context-offset [+] ctx-reg MOV
+
+    ! Load new stack pointer
+    ESP ctx-reg context-callstack-top-offset [+] MOV
+
+    ! Load new ds, rs registers
+    jit-restore-context ;
+
+[
+    ! Create the new context in return-reg
+    jit-load-vm
+    ESP [] vm-reg MOV
+    "new_context" jit-call
+
+    ! Save pointer to quotation and parameter
+    EBX ds-reg MOV
+    ds-reg 8 SUB
+
+    ! Make the new context active
+    EAX jit-set-context
+
+    ! Push parameter
+    EAX EBX -4 [+] MOV
+    ds-reg 4 ADD
+    ds-reg [] EAX MOV
+
+    ! Jump to initial quotation
+    EAX EBX [] MOV
+    EAX quot-entry-point-offset [+] JMP
+] \ (start-context) define-sub-primitive
+
+[
+    ! Load context and parameter from datastack
+    EAX ds-reg [] MOV
+    EAX EAX alien-offset [+] MOV
+    EBX ds-reg -4 [+] MOV
+    ds-reg 8 SUB
+
+    ! Make the new context active
+    EAX jit-set-context
+
+    ! Twiddle stack for return
+    ESP 4 ADD
+
+    ! Store parameter to datastack
+    ds-reg 4 ADD
+    ds-reg [] EBX MOV
+] \ (set-context) define-sub-primitive
 
 << "vocab:cpu/x86/bootstrap.factor" parse-file suffix! >>
 call

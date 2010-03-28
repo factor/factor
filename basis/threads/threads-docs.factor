@@ -142,10 +142,8 @@ HELP: interrupt
 { $description "Interrupts a sleeping thread." } ;
 
 HELP: suspend
-{ $values { "quot" { $quotation "( thread -- )" } } { "state" string } { "obj" object } }
-{ $description "Suspends the current thread and passes it to the quotation."
-$nl
-"After the quotation returns, control yields to the next runnable thread and the current thread does not execute again until it is resumed, and so the quotation must arrange for another thread to later resume the suspended thread with a call to " { $link resume } " or " { $link resume-with } "."
+{ $values { "state" string } { "obj" object } }
+{ $description "Suspends the current thread. Control yields to the next runnable thread and the current thread does not execute again until it is resumed, and so the caller of this word must arrange for another thread to later resume the suspended thread with a call to " { $link resume } " or " { $link resume-with } "."
 $nl
 "The status string is for debugging purposes; see " { $link "tools.threads" } "." } ;
 
