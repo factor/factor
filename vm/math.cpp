@@ -246,7 +246,7 @@ cell factor_vm::unbox_array_size_slow()
 		}
 	}
 
-	general_error(ERROR_ARRAY_SIZE,ctx->pop(),tag_fixnum(array_size_max),NULL);
+	general_error(ERROR_ARRAY_SIZE,ctx->pop(),tag_fixnum(array_size_max));
 	return 0; /* can't happen */
 }
 

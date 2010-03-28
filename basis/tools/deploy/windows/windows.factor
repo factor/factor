@@ -21,7 +21,7 @@ CONSTANT: app-icon-resource-id "APPICON"
 
 : create-exe-dir ( vocab bundle-name -- vm )
     dup copy-dll
-    deploy-ui? get ".exe" ".com" ? copy-vm ;
+    deploy-console? get ".com" ".exe" ? copy-vm ;
 
 : open-in-explorer ( dir -- )
     [ f "open" ] dip absolute-path normalize-separators

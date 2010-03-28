@@ -13,16 +13,22 @@ void factor_vm::check_frame(stack_frame *frame)
 
 callstack *factor_vm::allot_callstack(cell size)
 {
-	callstack *stack = allot<callstack>(callstack_size(size));
+	callstack *stack = allot<callstack>(callstack_object_size(size));
 	stack->length = tag_fixnum(size);
 	return stack;
 }
 
-stack_frame *factor_vm::fix_callstack_top(stack_frame *top, stack_frame *bottom)
+/* If 'stack' points into the middle of the frame, find the nearest valid stack
+pointer where we can resume execution and hope to capture the call trace without
+crashing. Also, make sure we have at least 'stack_reserved' bytes available so
+that we don't run out of callstack space while handling the error. */
+stack_frame *factor_vm::fix_callstack_top(stack_frame *stack)
 {
-	stack_frame *frame = bottom - 1;
+	stack_frame *frame = ctx->callstack_bottom - 1;
 
-	while(frame >= top)
+	while(frame >= stack
+		&& frame >= ctx->callstack_top
+		&& (cell)frame >= ctx->callstack_seg->start + stack_reserved)
 		frame = frame_successor(frame);
 
 	return frame + 1;

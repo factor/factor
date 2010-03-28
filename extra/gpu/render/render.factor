@@ -104,9 +104,13 @@ VARIANT: primitive-mode
     points-mode
     lines-mode
     line-strip-mode
+    lines-with-adjacency-mode
+    line-strip-with-adjacency-mode
     line-loop-mode
     triangles-mode
     triangle-strip-mode
+    triangles-with-adjacency-mode
+    triangle-strip-with-adjacency-mode
     triangle-fan-mode ;
 
 TUPLE: uniform-tuple ;
@@ -131,6 +135,10 @@ ERROR: invalid-uniform-type uniform ;
         { triangles-mode      [ GL_TRIANGLES      ] }
         { triangle-strip-mode [ GL_TRIANGLE_STRIP ] }
         { triangle-fan-mode   [ GL_TRIANGLE_FAN   ] }
+        { lines-with-adjacency-mode          [ GL_LINES_ADJACENCY          ] }
+        { line-strip-with-adjacency-mode     [ GL_LINE_STRIP_ADJACENCY     ] }
+        { triangles-with-adjacency-mode      [ GL_TRIANGLES_ADJACENCY      ] }
+        { triangle-strip-with-adjacency-mode [ GL_TRIANGLE_STRIP_ADJACENCY ] }
     } case ; inline
 
 GENERIC: render-vertex-indexes ( primitive-mode vertex-indexes -- )
