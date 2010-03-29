@@ -20,11 +20,8 @@ IN: bootstrap.compiler
     "alien.remote-control" require
 ] unless
 
-{
-    "stack-checker.errors.prettyprint"
-    "alien.prettyprint"
-    "alien.debugger"
-} [ "prettyprint" swap require-when ] each
+"prettyprint" "alien.prettyprint" require-when
+"debugger" "alien.debugger" require-when
 
 "cpu." cpu name>> append require
 

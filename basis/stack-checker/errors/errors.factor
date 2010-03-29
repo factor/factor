@@ -1,5 +1,6 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: vocabs.loader ;
 IN: stack-checker.errors
 
 TUPLE: inference-error ;
@@ -34,3 +35,4 @@ ERROR: bad-declaration-error < inference-error declaration ;
 
 ERROR: unbalanced-branches-error < inference-error word quots declareds actuals ;
 
+"debugger" "stack-checker.errors.prettyprint" require-when
