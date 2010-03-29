@@ -132,6 +132,7 @@ namespace factor
 #include "jit.hpp"
 #include "quotations.hpp"
 #include "inline_cache.hpp"
+#include "mvm.hpp"
 #include "factor.hpp"
 #include "utilities.hpp"
 

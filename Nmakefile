@@ -38,6 +38,8 @@ DLL_OBJS = vm\os-windows-nt.obj \
 	vm\io.obj \
 	vm\jit.obj \
 	vm\math.obj \
+	vm\mvm.obj \
+	vm\mvm-windows-nt.obj \
 	vm\nursery_collector.obj \
 	vm\object_start_map.obj \
 	vm\objects.obj \
