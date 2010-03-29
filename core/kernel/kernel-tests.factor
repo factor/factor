@@ -49,8 +49,11 @@ IN: kernel.tests
 
 : overflow-c ( -- ) overflow-c overflow-c ;
 
+! The VM cannot recover from callstack overflow on Windows or
+! OpenBSD, because no facility exists to run memory protection
+! fault handlers on an alternate callstack.
 os [ windows? ] [ openbsd? ] bi or [
-    [ overflow-c ] [ { "kernel-error" 14 f f } = ] must-fail-with
+    [ overflow-c ] [ { "kernel-error" 15 f f } = ] must-fail-with
 ] unless
 
 [ -7 <byte-array> ] must-fail

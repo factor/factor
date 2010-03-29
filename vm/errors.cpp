@@ -98,9 +98,9 @@ void factor_vm::memory_protection_error(cell addr, stack_frame *stack)
 	else if(ctx->retainstack_seg->overflow_p(addr))
 		general_error(ERROR_RETAINSTACK_OVERFLOW,false_object,false_object,stack);
 	else if(ctx->callstack_seg->underflow_p(addr))
-		general_error(ERROR_CALLSTACK_UNDERFLOW,false_object,false_object,stack);
-	else if(ctx->callstack_seg->overflow_p(addr))
 		general_error(ERROR_CALLSTACK_OVERFLOW,false_object,false_object,stack);
+	else if(ctx->callstack_seg->overflow_p(addr))
+		general_error(ERROR_CALLSTACK_UNDERFLOW,false_object,false_object,stack);
 	else
 		general_error(ERROR_MEMORY,allot_cell(addr),false_object,stack);
 }
