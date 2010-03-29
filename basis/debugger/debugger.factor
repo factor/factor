@@ -155,10 +155,10 @@ PREDICATE: vm-error < array
         { 11 [ datastack-overflow.     ] }
         { 12 [ retainstack-underflow.  ] }
         { 13 [ retainstack-overflow.   ] }
-        { 13 [ callstack-underflow.    ] }
-        { 14 [ callstack-overflow.     ] }
-        { 15 [ memory-error.           ] }
-        { 16 [ fp-trap-error.          ] }
+        { 14 [ callstack-underflow.    ] }
+        { 15 [ callstack-overflow.     ] }
+        { 16 [ memory-error.           ] }
+        { 17 [ fp-trap-error.          ] }
     } ; inline
 
 M: vm-error summary drop "VM error" ;
