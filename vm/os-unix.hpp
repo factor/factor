@@ -45,11 +45,6 @@ void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap);
 u64 system_micros();
 u64 nano_count();
 void sleep_nanos(u64 nsec);
-
-void init_platform_globals();
-
-void register_vm_with_thread(factor_vm *vm);
-factor_vm *current_vm();
 void open_console();
 
 void move_file(const vm_char *path1, const vm_char *path2);

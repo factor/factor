@@ -715,6 +715,4 @@ struct factor_vm
 	~factor_vm();
 };
 
-extern std::map<THREADHANDLE, factor_vm *> thread_vms;
-
 }
