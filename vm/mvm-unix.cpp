@@ -3,7 +3,7 @@
 namespace factor
 {
 
-pthread_key_t current_vm_tls_key = 0;
+pthread_key_t current_vm_tls_key;
 
 void init_mvm()
 {

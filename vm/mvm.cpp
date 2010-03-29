@@ -1,7 +1,9 @@
-#include "master.cpp"
+#include "master.hpp"
 
 namespace factor
 {
+
+std::map<THREADHANDLE, factor_vm*> thread_vms;
 
 struct startargs {
 	int argc;
