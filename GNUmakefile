@@ -52,6 +52,7 @@ ifdef CONFIG
 		vm/io.o \
 		vm/jit.o \
 		vm/math.o \
+		vm/mvm.o \
 		vm/nursery_collector.o \
 		vm/object_start_map.o \
 		vm/objects.o \

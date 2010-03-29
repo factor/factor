@@ -3,11 +3,9 @@
 namespace factor
 {
 
-std::map<THREADHANDLE, factor_vm*> thread_vms;
-
 void init_globals()
 {
-	init_platform_globals();
+	init_mvm();
 }
 
 void factor_vm::default_parameters(vm_parameters *p)
@@ -205,11 +203,6 @@ void factor_vm::start_standalone_factor(int argc, vm_char **argv)
 	start_factor(&p);
 }
 
-struct startargs {
-	int argc;
-	vm_char **argv;
-};
-
 factor_vm *new_factor_vm()
 {
 	factor_vm *newvm = new factor_vm();
@@ -219,28 +212,10 @@ factor_vm *new_factor_vm()
 	return newvm;
 }
 
-// arg must be new'ed because we're going to delete it!
-void *start_standalone_factor_thread(void *arg) 
-{
-	factor_vm *newvm = new_factor_vm();
-	startargs *args = (startargs*) arg;
-	int argc = args->argc; vm_char **argv = args->argv;
-	delete args;
-	newvm->start_standalone_factor(argc, argv);
-	return 0;
-}
-
 VM_C_API void start_standalone_factor(int argc, vm_char **argv)
 {
 	factor_vm *newvm = new_factor_vm();
 	return newvm->start_standalone_factor(argc,argv);
-}
-
-VM_C_API THREADHANDLE start_standalone_factor_in_new_thread(int argc, vm_char **argv)
-{
-	startargs *args = new startargs;
-	args->argc = argc; args->argv = argv; 
-	return start_thread(start_standalone_factor_thread,args);
 }
 
 }
