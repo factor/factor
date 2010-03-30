@@ -20,7 +20,7 @@ PRIVATE>
     registered-remote-threads delete-at ;
 
 : get-remote-thread ( name -- thread )
-    dup registered-remote-threads at [ ] [ thread ] ?if ;
+    dup registered-remote-threads at [ ] [ threads at ] ?if ;
 
 SYMBOL: local-node
 
