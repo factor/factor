@@ -247,7 +247,6 @@ M: bad-executable summary
     unwind-native-frames
     lazy-jit-compile
     c-to-factor
-    call-clear
 } [ dup '[ _ do-not-compile ] "special" set-word-prop ] each
 
 : infer-special ( word -- )
@@ -299,466 +298,184 @@ M: bad-executable summary
     3tri ;
 
 ! Stack effects for all primitives
-\ fixnum< { fixnum fixnum } { object } define-primitive
-\ fixnum< make-foldable
-
-\ fixnum<= { fixnum fixnum } { object } define-primitive
-\ fixnum<= make-foldable
-
-\ fixnum> { fixnum fixnum } { object } define-primitive
-\ fixnum> make-foldable
-
-\ fixnum>= { fixnum fixnum } { object } define-primitive
-\ fixnum>= make-foldable
-
-\ eq? { object object } { object } define-primitive
-\ eq? make-foldable
-
-\ bignum>fixnum { bignum } { fixnum } define-primitive
-\ bignum>fixnum make-foldable
-
-\ float>fixnum { float } { fixnum } define-primitive
-\ bignum>fixnum make-foldable
-
-\ fixnum>bignum { fixnum } { bignum } define-primitive
-\ fixnum>bignum make-foldable
-
-\ float>bignum { float } { bignum } define-primitive
-\ float>bignum make-foldable
-
-\ fixnum>float { fixnum } { float } define-primitive
-\ fixnum>float make-foldable
-
-\ bignum>float { bignum } { float } define-primitive
-\ bignum>float make-foldable
-
-\ (float>string) { float } { byte-array } define-primitive
-\ (float>string) make-foldable
-
-\ float>bits { real } { integer } define-primitive
-\ float>bits make-foldable
-
-\ double>bits { real } { integer } define-primitive
-\ double>bits make-foldable
-
-\ bits>float { integer } { float } define-primitive
-\ bits>float make-foldable
-
-\ bits>double { integer } { float } define-primitive
-\ bits>double make-foldable
-
-\ both-fixnums? { object object } { object } define-primitive
-
-\ fixnum+ { fixnum fixnum } { integer } define-primitive
-\ fixnum+ make-foldable
-
-\ fixnum+fast { fixnum fixnum } { fixnum } define-primitive
-\ fixnum+fast make-foldable
-
-\ fixnum- { fixnum fixnum } { integer } define-primitive
-\ fixnum- make-foldable
-
-\ fixnum-fast { fixnum fixnum } { fixnum } define-primitive
-\ fixnum-fast make-foldable
-
-\ fixnum* { fixnum fixnum } { integer } define-primitive
-\ fixnum* make-foldable
-
-\ fixnum*fast { fixnum fixnum } { fixnum } define-primitive
-\ fixnum*fast make-foldable
-
-\ fixnum/i { fixnum fixnum } { integer } define-primitive
-\ fixnum/i make-foldable
-
-\ fixnum/i-fast { fixnum fixnum } { fixnum } define-primitive
-\ fixnum/i-fast make-foldable
-
-\ fixnum-mod { fixnum fixnum } { fixnum } define-primitive
-\ fixnum-mod make-foldable
-
-\ fixnum/mod { fixnum fixnum } { integer fixnum } define-primitive
-\ fixnum/mod make-foldable
-
-\ fixnum/mod-fast { fixnum fixnum } { fixnum fixnum } define-primitive
-\ fixnum/mod-fast make-foldable
-
-\ fixnum-bitand { fixnum fixnum } { fixnum } define-primitive
-\ fixnum-bitand make-foldable
-
-\ fixnum-bitor { fixnum fixnum } { fixnum } define-primitive
-\ fixnum-bitor make-foldable
-
-\ fixnum-bitxor { fixnum fixnum } { fixnum } define-primitive
-\ fixnum-bitxor make-foldable
-
-\ fixnum-bitnot { fixnum } { fixnum } define-primitive
-\ fixnum-bitnot make-foldable
-
-\ fixnum-shift { fixnum fixnum } { integer } define-primitive
-\ fixnum-shift make-foldable
-
-\ fixnum-shift-fast { fixnum fixnum } { fixnum } define-primitive
-\ fixnum-shift-fast make-foldable
-
-\ bignum= { bignum bignum } { object } define-primitive
-\ bignum= make-foldable
-
-\ bignum+ { bignum bignum } { bignum } define-primitive
-\ bignum+ make-foldable
-
-\ bignum- { bignum bignum } { bignum } define-primitive
-\ bignum- make-foldable
-
-\ bignum* { bignum bignum } { bignum } define-primitive
-\ bignum* make-foldable
-
-\ bignum/i { bignum bignum } { bignum } define-primitive
-\ bignum/i make-foldable
-
-\ bignum-mod { bignum bignum } { bignum } define-primitive
-\ bignum-mod make-foldable
-
-\ bignum/mod { bignum bignum } { bignum bignum } define-primitive
-\ bignum/mod make-foldable
-
-\ bignum-bitand { bignum bignum } { bignum } define-primitive
-\ bignum-bitand make-foldable
-
-\ bignum-bitor { bignum bignum } { bignum } define-primitive
-\ bignum-bitor make-foldable
-
-\ bignum-bitxor { bignum bignum } { bignum } define-primitive
-\ bignum-bitxor make-foldable
-
-\ bignum-bitnot { bignum } { bignum } define-primitive
-\ bignum-bitnot make-foldable
-
-\ bignum-shift { bignum fixnum } { bignum } define-primitive
-\ bignum-shift make-foldable
-
-\ bignum< { bignum bignum } { object } define-primitive
-\ bignum< make-foldable
-
-\ bignum<= { bignum bignum } { object } define-primitive
-\ bignum<= make-foldable
-
-\ bignum> { bignum bignum } { object } define-primitive
-\ bignum> make-foldable
-
-\ bignum>= { bignum bignum } { object } define-primitive
-\ bignum>= make-foldable
-
-\ bignum-bit? { bignum integer } { object } define-primitive
-\ bignum-bit? make-foldable
-
-\ bignum-log2 { bignum } { bignum } define-primitive
-\ bignum-log2 make-foldable
-
-\ byte-array>bignum { byte-array } { bignum } define-primitive
-\ byte-array>bignum make-foldable
-
-\ float= { float float } { object } define-primitive
-\ float= make-foldable
-
-\ float+ { float float } { float } define-primitive
-\ float+ make-foldable
-
-\ float- { float float } { float } define-primitive
-\ float- make-foldable
-
-\ float* { float float } { float } define-primitive
-\ float* make-foldable
-
-\ float/f { float float } { float } define-primitive
-\ float/f make-foldable
-
-\ float-mod { float float } { float } define-primitive
-\ float-mod make-foldable
-
-\ float< { float float } { object } define-primitive
-\ float< make-foldable
-
-\ float<= { float float } { object } define-primitive
-\ float<= make-foldable
-
-\ float> { float float } { object } define-primitive
-\ float> make-foldable
-
-\ float>= { float float } { object } define-primitive
-\ float>= make-foldable
-
-\ float-u< { float float } { object } define-primitive
-\ float-u< make-foldable
-
-\ float-u<= { float float } { object } define-primitive
-\ float-u<= make-foldable
-
-\ float-u> { float float } { object } define-primitive
-\ float-u> make-foldable
-
-\ float-u>= { float float } { object } define-primitive
-\ float-u>= make-foldable
-
-\ (word) { object object object } { word } define-primitive
-\ (word) make-flushable
-
-\ word-code { word } { integer integer } define-primitive
-\ word-code make-flushable
-
-\ current-callback { } { fixnum } define-primitive
-\ current-callback make-flushable
-
-\ context { } { c-ptr } define-primitive
-\ context make-flushable
-
-\ delete-context { c-ptr } { } define-primitive
-
-\ (start-context) { object quotation } { object } define-primitive
-
-\ (set-context) { object alien } { object } define-primitive
-
-\ special-object { fixnum } { object } define-primitive
-\ special-object make-flushable
-
-\ set-special-object { object fixnum } { } define-primitive
-
-\ context-object { fixnum } { object } define-primitive
-\ context-object make-flushable
-
-\ set-context-object { object fixnum } { } define-primitive
-
-\ (exists?) { string } { object } define-primitive
-
-\ minor-gc { } { } define-primitive
-
-\ gc { } { } define-primitive
-
-\ compact-gc { } { } define-primitive
-
-\ (save-image) { byte-array byte-array } { } define-primitive
-
-\ (save-image-and-exit) { byte-array byte-array } { } define-primitive
-
-\ data-room { } { byte-array } define-primitive
-\ data-room make-flushable
-
-\ (code-blocks) { } { array } define-primitive
-\ (code-blocks)  make-flushable
-
-\ code-room { } { byte-array } define-primitive
-\ code-room  make-flushable
-
-\ system-micros { } { integer } define-primitive
-\ system-micros make-flushable
-
-\ nano-count { } { integer } define-primitive
-\ nano-count make-flushable
-
-\ tag { object } { fixnum } define-primitive
-\ tag make-foldable
-
+\ (byte-array) { integer } { byte-array } define-primitive \ (byte-array) make-flushable
+\ (clone) { object } { object } define-primitive \ (clone) make-flushable
+\ (code-blocks) { } { array } define-primitive \ (code-blocks)  make-flushable
 \ (dlopen) { byte-array } { dll } define-primitive
-
 \ (dlsym) { byte-array object } { c-ptr } define-primitive
-
-\ dlclose { dll } { } define-primitive
-
-\ <byte-array> { integer } { byte-array } define-primitive
-\ <byte-array> make-flushable
-
-\ (byte-array) { integer } { byte-array } define-primitive
-\ (byte-array) make-flushable
-
-\ <displaced-alien> { integer c-ptr } { c-ptr } define-primitive
-\ <displaced-alien> make-flushable
-
-\ alien-signed-cell { c-ptr integer } { integer } define-primitive
-\ alien-signed-cell make-flushable
-
-\ set-alien-signed-cell { integer c-ptr integer } { } define-primitive
-
-\ alien-unsigned-cell { c-ptr integer } { integer } define-primitive
-\ alien-unsigned-cell make-flushable
-
-\ set-alien-unsigned-cell { integer c-ptr integer } { } define-primitive
-
-\ alien-signed-8 { c-ptr integer } { integer } define-primitive
-\ alien-signed-8 make-flushable
-
-\ set-alien-signed-8 { integer c-ptr integer } { } define-primitive
-
-\ alien-unsigned-8 { c-ptr integer } { integer } define-primitive
-\ alien-unsigned-8 make-flushable
-
-\ set-alien-unsigned-8 { integer c-ptr integer } { } define-primitive
-
-\ alien-signed-4 { c-ptr integer } { integer } define-primitive
-\ alien-signed-4 make-flushable
-
-\ set-alien-signed-4 { integer c-ptr integer } { } define-primitive
-
-\ alien-unsigned-4 { c-ptr integer } { integer } define-primitive
-\ alien-unsigned-4 make-flushable
-
-\ set-alien-unsigned-4 { integer c-ptr integer } { } define-primitive
-
-\ alien-signed-2 { c-ptr integer } { fixnum } define-primitive
-\ alien-signed-2 make-flushable
-
-\ set-alien-signed-2 { integer c-ptr integer } { } define-primitive
-
-\ alien-unsigned-2 { c-ptr integer } { fixnum } define-primitive
-\ alien-unsigned-2 make-flushable
-
-\ set-alien-unsigned-2 { integer c-ptr integer } { } define-primitive
-
-\ alien-signed-1 { c-ptr integer } { fixnum } define-primitive
-\ alien-signed-1 make-flushable
-
-\ set-alien-signed-1 { integer c-ptr integer } { } define-primitive
-
-\ alien-unsigned-1 { c-ptr integer } { fixnum } define-primitive
-\ alien-unsigned-1 make-flushable
-
-\ set-alien-unsigned-1 { integer c-ptr integer } { } define-primitive
-
-\ alien-float { c-ptr integer } { float } define-primitive
-\ alien-float make-flushable
-
-\ set-alien-float { float c-ptr integer } { } define-primitive
-
-\ alien-double { c-ptr integer } { float } define-primitive
-\ alien-double make-flushable
-
-\ set-alien-double { float c-ptr integer } { } define-primitive
-
-\ alien-cell { c-ptr integer } { pinned-c-ptr } define-primitive
-\ alien-cell make-flushable
-
-\ set-alien-cell { c-ptr c-ptr integer } { } define-primitive
-
-\ alien-address { alien } { integer } define-primitive
-\ alien-address make-flushable
-
-\ slot { object fixnum } { object } define-primitive
-\ slot make-flushable
-
-\ set-slot { object object fixnum } { } define-primitive
-
-\ string-nth { fixnum string } { fixnum } define-primitive
-\ string-nth make-flushable
-
-\ set-string-nth-slow { fixnum fixnum string } { } define-primitive
-\ set-string-nth-fast { fixnum fixnum string } { } define-primitive
-
-\ resize-array { integer array } { array } define-primitive
-\ resize-array make-flushable
-
-\ resize-byte-array { integer byte-array } { byte-array } define-primitive
-\ resize-byte-array make-flushable
-
-\ resize-string { integer string } { string } define-primitive
-\ resize-string make-flushable
-
-\ <array> { integer object } { array } define-primitive
-\ <array> make-flushable
-
-\ all-instances { } { array } define-primitive
-
-\ size { object } { fixnum } define-primitive
-\ size make-flushable
-
-\ die { } { } define-primitive
-
-\ (fopen) { byte-array byte-array } { alien } define-primitive
-
-\ fgetc { alien } { object } define-primitive
-
-\ fwrite { c-ptr integer alien } { } define-primitive
-
-\ fputc { object alien } { } define-primitive
-
-\ fread { integer alien } { object } define-primitive
-
-\ fflush { alien } { } define-primitive
-
-\ fseek { integer integer alien } { } define-primitive
-
-\ ftell { alien } { integer } define-primitive
-
-\ fclose { alien } { } define-primitive
-
-\ <wrapper> { object } { wrapper } define-primitive
-\ <wrapper> make-foldable
-
-\ (clone) { object } { object } define-primitive
-\ (clone) make-flushable
-
-\ <string> { integer integer } { string } define-primitive
-\ <string> make-flushable
-
-\ array>quotation { array } { quotation } define-primitive
-\ array>quotation make-flushable
-
-\ quotation-code { quotation } { integer integer } define-primitive
-\ quotation-code make-flushable
-
-\ <tuple> { tuple-layout } { tuple } define-primitive
-\ <tuple> make-flushable
-
-\ datastack { } { array } define-primitive
-\ datastack make-flushable
-
-\ check-datastack { array integer integer } { object } define-primitive
-\ check-datastack make-flushable
-
-\ retainstack { } { array } define-primitive
-\ retainstack make-flushable
-
-\ callstack { } { callstack } define-primitive
-\ callstack make-flushable
-
-\ callstack>array { callstack } { array } define-primitive
-\ callstack>array make-flushable
-
-\ (sleep) { integer } { } define-primitive
-
-\ become { array array } { } define-primitive
-
-\ innermost-frame-executing { callstack } { object } define-primitive
-
-\ innermost-frame-scan { callstack } { fixnum } define-primitive
-
-\ set-innermost-frame-quot { quotation callstack } { } define-primitive
-
-\ dll-valid? { object } { object } define-primitive
-
-\ modify-code-heap { array object object } { } define-primitive
-
-\ unimplemented { } { } define-primitive
-
-\ jit-compile { quotation } { } define-primitive
-
-\ lookup-method { object array } { word } define-primitive
-
-\ reset-dispatch-stats { } { } define-primitive
-\ dispatch-stats { } { byte-array } define-primitive
-
-\ optimized? { word } { object } define-primitive
-
-\ strip-stack-traces { } { } define-primitive
-
-\ <callback> { integer word } { alien } define-primitive
-
-\ enable-gc-events { } { } define-primitive
-\ disable-gc-events { } { object } define-primitive
-
-\ profiling { object } { } define-primitive
-
-\ (identity-hashcode) { object } { fixnum } define-primitive
-
-\ compute-identity-hashcode { object } { } define-primitive
-
+\ (exists?) { string } { object } define-primitive
 \ (exit) { integer } { } define-primitive
-
+\ (float>string) { float } { byte-array } define-primitive \ (float>string) make-foldable
+\ (fopen) { byte-array byte-array } { alien } define-primitive
+\ (identity-hashcode) { object } { fixnum } define-primitive
+\ (save-image) { byte-array byte-array } { } define-primitive
+\ (save-image-and-exit) { byte-array byte-array } { } define-primitive
+\ (set-context) { object alien } { object } define-primitive
+\ (sleep) { integer } { } define-primitive
+\ (start-context) { object quotation } { object } define-primitive
+\ (word) { object object object } { word } define-primitive \ (word) make-flushable
+\ <array> { integer object } { array } define-primitive \ <array> make-flushable
+\ <byte-array> { integer } { byte-array } define-primitive \ <byte-array> make-flushable
+\ <callback> { integer word } { alien } define-primitive
+\ <displaced-alien> { integer c-ptr } { c-ptr } define-primitive \ <displaced-alien> make-flushable
+\ <string> { integer integer } { string } define-primitive \ <string> make-flushable
+\ <tuple> { tuple-layout } { tuple } define-primitive \ <tuple> make-flushable
+\ <wrapper> { object } { wrapper } define-primitive \ <wrapper> make-foldable
+\ alien-address { alien } { integer } define-primitive \ alien-address make-flushable
+\ alien-cell { c-ptr integer } { pinned-c-ptr } define-primitive \ alien-cell make-flushable
+\ alien-double { c-ptr integer } { float } define-primitive \ alien-double make-flushable
+\ alien-float { c-ptr integer } { float } define-primitive \ alien-float make-flushable
+\ alien-signed-1 { c-ptr integer } { fixnum } define-primitive \ alien-signed-1 make-flushable
+\ alien-signed-2 { c-ptr integer } { fixnum } define-primitive \ alien-signed-2 make-flushable
+\ alien-signed-4 { c-ptr integer } { integer } define-primitive \ alien-signed-4 make-flushable
+\ alien-signed-8 { c-ptr integer } { integer } define-primitive \ alien-signed-8 make-flushable
+\ alien-signed-cell { c-ptr integer } { integer } define-primitive \ alien-signed-cell make-flushable
+\ alien-unsigned-1 { c-ptr integer } { fixnum } define-primitive \ alien-unsigned-1 make-flushable
+\ alien-unsigned-2 { c-ptr integer } { fixnum } define-primitive \ alien-unsigned-2 make-flushable
+\ alien-unsigned-4 { c-ptr integer } { integer } define-primitive \ alien-unsigned-4 make-flushable
+\ alien-unsigned-8 { c-ptr integer } { integer } define-primitive \ alien-unsigned-8 make-flushable
+\ alien-unsigned-cell { c-ptr integer } { integer } define-primitive \ alien-unsigned-cell make-flushable
+\ all-instances { } { array } define-primitive
+\ array>quotation { array } { quotation } define-primitive \ array>quotation make-foldable
+\ become { array array } { } define-primitive
+\ bignum* { bignum bignum } { bignum } define-primitive \ bignum* make-foldable
+\ bignum+ { bignum bignum } { bignum } define-primitive \ bignum+ make-foldable
+\ bignum- { bignum bignum } { bignum } define-primitive \ bignum- make-foldable
+\ bignum-bit? { bignum integer } { object } define-primitive \ bignum-bit? make-foldable
+\ bignum-bitand { bignum bignum } { bignum } define-primitive \ bignum-bitand make-foldable
+\ bignum-bitnot { bignum } { bignum } define-primitive \ bignum-bitnot make-foldable
+\ bignum-bitor { bignum bignum } { bignum } define-primitive \ bignum-bitor make-foldable
+\ bignum-bitxor { bignum bignum } { bignum } define-primitive \ bignum-bitxor make-foldable
+\ bignum-log2 { bignum } { bignum } define-primitive \ bignum-log2 make-foldable
+\ bignum-mod { bignum bignum } { bignum } define-primitive \ bignum-mod make-foldable
+\ bignum-shift { bignum fixnum } { bignum } define-primitive \ bignum-shift make-foldable
+\ bignum/i { bignum bignum } { bignum } define-primitive \ bignum/i make-foldable
+\ bignum/mod { bignum bignum } { bignum bignum } define-primitive \ bignum/mod make-foldable
+\ bignum< { bignum bignum } { object } define-primitive \ bignum< make-foldable
+\ bignum<= { bignum bignum } { object } define-primitive \ bignum<= make-foldable
+\ bignum= { bignum bignum } { object } define-primitive \ bignum= make-foldable
+\ bignum> { bignum bignum } { object } define-primitive \ bignum> make-foldable
+\ bignum>= { bignum bignum } { object } define-primitive \ bignum>= make-foldable
+\ bignum>fixnum { bignum } { fixnum } define-primitive \ bignum>fixnum make-foldable
+\ bignum>float { bignum } { float } define-primitive \ bignum>float make-foldable
+\ bits>double { integer } { float } define-primitive \ bits>double make-foldable
+\ bits>float { integer } { float } define-primitive \ bits>float make-foldable
+\ both-fixnums? { object object } { object } define-primitive
+\ byte-array>bignum { byte-array } { bignum } define-primitive \ byte-array>bignum make-foldable
+\ callstack { } { callstack } define-primitive \ callstack make-flushable
+\ callstack-for { c-ptr } { callstack } define-primitive \ callstack make-flushable
+\ callstack>array { callstack } { array } define-primitive \ callstack>array make-flushable
+\ check-datastack { array integer integer } { object } define-primitive \ check-datastack make-flushable
+\ code-room { } { byte-array } define-primitive \ code-room  make-flushable
+\ compact-gc { } { } define-primitive
+\ compute-identity-hashcode { object } { } define-primitive
+\ context { } { c-ptr } define-primitive \ context make-flushable
+\ context-object { fixnum } { object } define-primitive \ context-object make-flushable
+\ context-object-for { fixnum c-ptr } { object } define-primitive \ context-object-for make-flushable
+\ current-callback { } { fixnum } define-primitive \ current-callback make-flushable
+\ data-room { } { byte-array } define-primitive \ data-room make-flushable
+\ datastack { } { array } define-primitive \ datastack make-flushable
+\ datastack-for { c-ptr } { array } define-primitive \ datastack-for make-flushable
+\ delete-context { c-ptr } { } define-primitive
+\ die { } { } define-primitive
+\ disable-gc-events { } { object } define-primitive
+\ dispatch-stats { } { byte-array } define-primitive
+\ dlclose { dll } { } define-primitive
+\ dll-valid? { object } { object } define-primitive
+\ double>bits { real } { integer } define-primitive \ double>bits make-foldable
+\ enable-gc-events { } { } define-primitive
+\ eq? { object object } { object } define-primitive \ eq? make-foldable
+\ fclose { alien } { } define-primitive
+\ fflush { alien } { } define-primitive
+\ fgetc { alien } { object } define-primitive
+\ fixnum* { fixnum fixnum } { integer } define-primitive \ fixnum* make-foldable
+\ fixnum*fast { fixnum fixnum } { fixnum } define-primitive \ fixnum*fast make-foldable
+\ fixnum+ { fixnum fixnum } { integer } define-primitive \ fixnum+ make-foldable
+\ fixnum+fast { fixnum fixnum } { fixnum } define-primitive \ fixnum+fast make-foldable
+\ fixnum- { fixnum fixnum } { integer } define-primitive \ fixnum- make-foldable
+\ fixnum-bitand { fixnum fixnum } { fixnum } define-primitive \ fixnum-bitand make-foldable
+\ fixnum-bitnot { fixnum } { fixnum } define-primitive \ fixnum-bitnot make-foldable
+\ fixnum-bitor { fixnum fixnum } { fixnum } define-primitive \ fixnum-bitor make-foldable
+\ fixnum-bitxor { fixnum fixnum } { fixnum } define-primitive \ fixnum-bitxor make-foldable
+\ fixnum-fast { fixnum fixnum } { fixnum } define-primitive \ fixnum-fast make-foldable
+\ fixnum-mod { fixnum fixnum } { fixnum } define-primitive \ fixnum-mod make-foldable
+\ fixnum-shift { fixnum fixnum } { integer } define-primitive \ fixnum-shift make-foldable
+\ fixnum-shift-fast { fixnum fixnum } { fixnum } define-primitive \ fixnum-shift-fast make-foldable
+\ fixnum/i { fixnum fixnum } { integer } define-primitive \ fixnum/i make-foldable
+\ fixnum/i-fast { fixnum fixnum } { fixnum } define-primitive \ fixnum/i-fast make-foldable
+\ fixnum/mod { fixnum fixnum } { integer fixnum } define-primitive \ fixnum/mod make-foldable
+\ fixnum/mod-fast { fixnum fixnum } { fixnum fixnum } define-primitive \ fixnum/mod-fast make-foldable
+\ fixnum< { fixnum fixnum } { object } define-primitive \ fixnum< make-foldable
+\ fixnum<= { fixnum fixnum } { object } define-primitive \ fixnum<= make-foldable
+\ fixnum> { fixnum fixnum } { object } define-primitive \ fixnum> make-foldable
+\ fixnum>= { fixnum fixnum } { object } define-primitive \ fixnum>= make-foldable
+\ fixnum>bignum { fixnum } { bignum } define-primitive \ fixnum>bignum make-foldable
+\ fixnum>float { fixnum } { float } define-primitive \ fixnum>float make-foldable
+\ float* { float float } { float } define-primitive \ float* make-foldable
+\ float+ { float float } { float } define-primitive \ float+ make-foldable
+\ float- { float float } { float } define-primitive \ float- make-foldable
+\ float-mod { float float } { float } define-primitive \ float-mod make-foldable
+\ float-u< { float float } { object } define-primitive \ float-u< make-foldable
+\ float-u<= { float float } { object } define-primitive \ float-u<= make-foldable
+\ float-u> { float float } { object } define-primitive \ float-u> make-foldable
+\ float-u>= { float float } { object } define-primitive \ float-u>= make-foldable
+\ float/f { float float } { float } define-primitive \ float/f make-foldable
+\ float< { float float } { object } define-primitive \ float< make-foldable
+\ float<= { float float } { object } define-primitive \ float<= make-foldable
+\ float= { float float } { object } define-primitive \ float= make-foldable
+\ float> { float float } { object } define-primitive \ float> make-foldable
+\ float>= { float float } { object } define-primitive \ float>= make-foldable
+\ float>bignum { float } { bignum } define-primitive \ float>bignum make-foldable
+\ float>bits { real } { integer } define-primitive \ float>bits make-foldable
+\ float>fixnum { float } { fixnum } define-primitive \ bignum>fixnum make-foldable
+\ fputc { object alien } { } define-primitive
+\ fread { integer alien } { object } define-primitive
+\ fseek { integer integer alien } { } define-primitive
+\ ftell { alien } { integer } define-primitive
+\ fwrite { c-ptr integer alien } { } define-primitive
+\ gc { } { } define-primitive
+\ innermost-frame-executing { callstack } { object } define-primitive
+\ innermost-frame-scan { callstack } { fixnum } define-primitive
+\ jit-compile { quotation } { } define-primitive
+\ lookup-method { object array } { word } define-primitive
+\ minor-gc { } { } define-primitive
+\ modify-code-heap { array object object } { } define-primitive
+\ nano-count { } { integer } define-primitive \ nano-count make-flushable
+\ optimized? { word } { object } define-primitive
+\ profiling { object } { } define-primitive
 \ quot-compiled? { quotation } { object } define-primitive
+\ quotation-code { quotation } { integer integer } define-primitive \ quotation-code make-flushable
+\ reset-dispatch-stats { } { } define-primitive
+\ resize-array { integer array } { array } define-primitive \ resize-array make-flushable
+\ resize-byte-array { integer byte-array } { byte-array } define-primitive \ resize-byte-array make-flushable
+\ resize-string { integer string } { string } define-primitive \ resize-string make-flushable
+\ retainstack { } { array } define-primitive \ retainstack make-flushable
+\ retainstack-for { c-ptr } { array } define-primitive \ retainstack-for make-flushable
+\ set-alien-cell { c-ptr c-ptr integer } { } define-primitive
+\ set-alien-double { float c-ptr integer } { } define-primitive
+\ set-alien-float { float c-ptr integer } { } define-primitive
+\ set-alien-signed-1 { integer c-ptr integer } { } define-primitive
+\ set-alien-signed-2 { integer c-ptr integer } { } define-primitive
+\ set-alien-signed-4 { integer c-ptr integer } { } define-primitive
+\ set-alien-signed-8 { integer c-ptr integer } { } define-primitive
+\ set-alien-signed-cell { integer c-ptr integer } { } define-primitive
+\ set-alien-unsigned-1 { integer c-ptr integer } { } define-primitive
+\ set-alien-unsigned-2 { integer c-ptr integer } { } define-primitive
+\ set-alien-unsigned-4 { integer c-ptr integer } { } define-primitive
+\ set-alien-unsigned-8 { integer c-ptr integer } { } define-primitive
+\ set-alien-unsigned-cell { integer c-ptr integer } { } define-primitive
+\ set-context-object { object fixnum } { } define-primitive
+\ set-innermost-frame-quot { quotation callstack } { } define-primitive
+\ set-slot { object object fixnum } { } define-primitive
+\ set-special-object { object fixnum } { } define-primitive
+\ set-string-nth-fast { fixnum fixnum string } { } define-primitive
+\ set-string-nth-slow { fixnum fixnum string } { } define-primitive
+\ size { object } { fixnum } define-primitive \ size make-flushable
+\ slot { object fixnum } { object } define-primitive \ slot make-flushable
+\ special-object { fixnum } { object } define-primitive \ special-object make-flushable
+\ string-nth { fixnum string } { fixnum } define-primitive \ string-nth make-flushable
+\ strip-stack-traces { } { } define-primitive
+\ system-micros { } { integer } define-primitive \ system-micros make-flushable
+\ tag { object } { fixnum } define-primitive \ tag make-foldable
+\ unimplemented { } { } define-primitive
+\ word-code { word } { integer integer } define-primitive \ word-code make-flushable

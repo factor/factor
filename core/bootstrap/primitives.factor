@@ -343,7 +343,7 @@ tuple
     { "(execute)" "kernel.private" (( word -- )) }
     { "(call)" "kernel.private" (( quot -- )) }
     { "unwind-native-frames" "kernel.private" (( -- )) }
-    { "set-callstack" "kernel.private" (( cs -- * )) }
+    { "set-callstack" "kernel.private" (( callstack -- * )) }
     { "lazy-jit-compile" "kernel.private" (( -- )) }
     { "c-to-factor" "kernel.private" (( -- )) }
     { "slot" "slots.private" (( obj m -- value )) }
@@ -441,23 +441,22 @@ tuple
     { "fwrite" "io.streams.c" "primitive_fwrite" (( data length alien -- )) }
     { "(clone)" "kernel" "primitive_clone" (( obj -- newobj )) }
     { "<wrapper>" "kernel" "primitive_wrapper" (( obj -- wrapper )) }
-    { "callstack" "kernel" "primitive_callstack" (( -- cs )) }
+    { "callstack" "kernel" "primitive_callstack" (( -- callstack )) }
     { "callstack>array" "kernel" "primitive_callstack_to_array" (( callstack -- array )) }
-    { "datastack" "kernel" "primitive_datastack" (( -- ds )) }
+    { "datastack" "kernel" "primitive_datastack" (( -- array )) }
     { "die" "kernel" "primitive_die" (( -- )) }
-    { "retainstack" "kernel" "primitive_retainstack" (( -- rs )) }
+    { "retainstack" "kernel" "primitive_retainstack" (( -- array )) }
     { "(identity-hashcode)" "kernel.private" "primitive_identity_hashcode" (( obj -- code )) }
     { "become" "kernel.private" "primitive_become" (( old new -- )) }
-    { "call-clear" "kernel.private" "primitive_call_clear" (( quot -- * )) }
     { "check-datastack" "kernel.private" "primitive_check_datastack" (( array in# out# -- ? )) }
     { "compute-identity-hashcode" "kernel.private" "primitive_compute_identity_hashcode" (( obj -- )) }
     { "context-object" "kernel.private" "primitive_context_object" (( n -- obj )) }
     { "innermost-frame-executing" "kernel.private" "primitive_innermost_stack_frame_executing" (( callstack -- obj )) }
     { "innermost-frame-scan" "kernel.private" "primitive_innermost_stack_frame_scan" (( callstack -- n )) }
     { "set-context-object" "kernel.private" "primitive_set_context_object" (( obj n -- )) }
-    { "set-datastack" "kernel.private" "primitive_set_datastack" (( ds -- )) }
+    { "set-datastack" "kernel.private" "primitive_set_datastack" (( array -- )) }
     { "set-innermost-frame-quot" "kernel.private" "primitive_set_innermost_stack_frame_quot" (( n callstack -- )) }
-    { "set-retainstack" "kernel.private" "primitive_set_retainstack" (( rs -- )) }
+    { "set-retainstack" "kernel.private" "primitive_set_retainstack" (( array -- )) }
     { "set-special-object" "kernel.private" "primitive_set_special_object" (( obj n -- )) }
     { "special-object" "kernel.private" "primitive_special_object" (( n -- obj )) }
     { "strip-stack-traces" "kernel.private" "primitive_strip_stack_traces" (( -- )) }
@@ -536,8 +535,12 @@ tuple
     { "nano-count" "system" "primitive_nano_count" (( -- ns )) }
     { "system-micros" "system" "primitive_system_micros" (( -- us )) }
     { "(sleep)" "threads.private" "primitive_sleep" (( nanos -- )) }
-    { "context" "threads.private" "primitive_context" (( -- c-ptr )) }
-    { "delete-context" "threads.private" "primitive_delete_context" (( c-ptr -- )) }
+    { "callstack-for" "threads.private" "primitive_callstack_for" (( context -- array )) }
+    { "context" "threads.private" "primitive_context" (( -- context )) }
+    { "context-object-for" "threads.private" "primitive_context_object_for" (( n context -- obj )) }
+    { "datastack-for" "threads.private" "primitive_datastack_for" (( context -- array )) }
+    { "retainstack-for" "threads.private" "primitive_retainstack_for" (( context -- array )) }
+    { "delete-context" "threads.private" "primitive_delete_context" (( context -- )) }
     { "dispatch-stats" "tools.dispatch.private" "primitive_dispatch_stats" (( -- stats )) }
     { "reset-dispatch-stats" "tools.dispatch.private" "primitive_reset_dispatch_stats" (( -- )) }
     { "profiling" "tools.profiler.private" "primitive_profiling" (( ? -- )) }

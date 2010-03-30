@@ -33,9 +33,9 @@ namespace factor
 	_(bits_float) \
 	_(byte_array) \
 	_(byte_array_to_bignum) \
-	_(call_clear) \
 	_(callback) \
 	_(callstack) \
+	_(callstack_for) \
 	_(callstack_to_array) \
 	_(check_datastack) \
 	_(clone) \
@@ -45,9 +45,11 @@ namespace factor
 	_(compute_identity_hashcode) \
 	_(context) \
 	_(context_object) \
+	_(context_object_for) \
 	_(current_callback) \
 	_(data_room) \
 	_(datastack) \
+	_(datastack_for) \
 	_(delete_context) \
 	_(die) \
 	_(disable_gc_events) \
@@ -109,6 +111,7 @@ namespace factor
 	_(resize_byte_array) \
 	_(resize_string) \
 	_(retainstack) \
+	_(retainstack_for) \
 	_(save_image) \
 	_(save_image_and_exit) \
 	_(set_context_object) \

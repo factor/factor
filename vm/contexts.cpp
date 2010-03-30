@@ -160,31 +160,68 @@ void factor_vm::primitive_set_context_object()
 	ctx->context_objects[n] = value;
 }
 
-bool factor_vm::stack_to_array(cell bottom, cell top)
+void factor_vm::primitive_context_object_for()
+{
+	context *other_ctx = (context *)pinned_alien_offset(ctx->pop());
+	fixnum n = untag_fixnum(ctx->pop());
+	ctx->push(other_ctx->context_objects[n]);
+}
+
+cell factor_vm::stack_to_array(cell bottom, cell top)
 {
 	fixnum depth = (fixnum)(top - bottom + sizeof(cell));
 
 	if(depth < 0)
-		return false;
+		return false_object;
 	else
 	{
 		array *a = allot_uninitialized_array<array>(depth / sizeof(cell));
 		memcpy(a + 1,(void*)bottom,depth);
-		ctx->push(tag<array>(a));
-		return true;
+		return tag<array>(a);
 	}
+}
+
+cell factor_vm::datastack_to_array(context *ctx)
+{
+	cell array = stack_to_array(ctx->datastack_seg->start,ctx->datastack);
+	if(array == false_object)
+		general_error(ERROR_DATASTACK_UNDERFLOW,false_object,false_object);
+	else
+		return array;
 }
 
 void factor_vm::primitive_datastack()
 {
-	if(!stack_to_array(ctx->datastack_seg->start,ctx->datastack))
-		general_error(ERROR_DATASTACK_UNDERFLOW,false_object,false_object);
+	ctx->push(datastack_to_array(ctx));
+}
+
+void factor_vm::primitive_datastack_for()
+{
+	context *other_ctx = (context *)pinned_alien_offset(ctx->pop());
+	ctx->push(datastack_to_array(other_ctx));
+}
+
+cell factor_vm::retainstack_to_array(context *ctx)
+{
+	cell array = stack_to_array(ctx->retainstack_seg->start,ctx->retainstack);
+	if(array == false_object)
+	{
+		general_error(ERROR_RETAINSTACK_UNDERFLOW,false_object,false_object);
+		return false_object;
+	}
+	else
+		return array;
 }
 
 void factor_vm::primitive_retainstack()
 {
-	if(!stack_to_array(ctx->retainstack_seg->start,ctx->retainstack))
-		general_error(ERROR_RETAINSTACK_UNDERFLOW,false_object,false_object);
+	ctx->push(retainstack_to_array(ctx));
+}
+
+void factor_vm::primitive_retainstack_for()
+{
+	context *other_ctx = (context *)pinned_alien_offset(ctx->pop());
+	ctx->push(retainstack_to_array(other_ctx));
 }
 
 /* returns pointer to top of stack */
@@ -195,14 +232,24 @@ cell factor_vm::array_to_stack(array *array, cell bottom)
 	return bottom + depth - sizeof(cell);
 }
 
+void factor_vm::set_datastack(context *ctx, array *array)
+{
+	ctx->datastack = array_to_stack(array,ctx->datastack_seg->start);
+}
+
 void factor_vm::primitive_set_datastack()
 {
-	ctx->datastack = array_to_stack(untag_check<array>(ctx->pop()),ctx->datastack_seg->start);
+	set_datastack(ctx,untag_check<array>(ctx->pop()));
+}
+
+void factor_vm::set_retainstack(context *ctx, array *array)
+{
+	ctx->retainstack = array_to_stack(array,ctx->retainstack_seg->start);
 }
 
 void factor_vm::primitive_set_retainstack()
 {
-	ctx->retainstack = array_to_stack(untag_check<array>(ctx->pop()),ctx->retainstack_seg->start);
+	set_retainstack(ctx,untag_check<array>(ctx->pop()));
 }
 
 /* Used to implement call( */
