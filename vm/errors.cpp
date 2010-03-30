@@ -120,11 +120,6 @@ void factor_vm::fp_trap_error(unsigned int fpu_status, stack_frame *stack)
 	general_error(ERROR_FP_TRAP,tag_fixnum(fpu_status),false_object,stack);
 }
 
-void factor_vm::primitive_call_clear()
-{
-	unwind_native_frames(ctx->pop(),ctx->callstack_bottom);
-}
-
 /* For testing purposes */
 void factor_vm::primitive_unimplemented()
 {

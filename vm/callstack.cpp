@@ -42,7 +42,7 @@ This means that if 'callstack' is called in tail position, we
 will have popped a necessary frame... however this word is only
 called by continuation implementation, and user code shouldn't
 be calling it at all, so we leave it as it is for now. */
-stack_frame *factor_vm::second_from_top_stack_frame()
+stack_frame *factor_vm::second_from_top_stack_frame(context *ctx)
 {
 	stack_frame *frame = ctx->callstack_bottom - 1;
 	while(frame >= ctx->callstack_top
@@ -54,16 +54,27 @@ stack_frame *factor_vm::second_from_top_stack_frame()
 	return frame + 1;
 }
 
-void factor_vm::primitive_callstack()
+cell factor_vm::capture_callstack(context *ctx)
 {
-	stack_frame *top = second_from_top_stack_frame();
+	stack_frame *top = second_from_top_stack_frame(ctx);
 	stack_frame *bottom = ctx->callstack_bottom;
 
 	fixnum size = std::max((fixnum)0,(fixnum)bottom - (fixnum)top);
 
 	callstack *stack = allot_callstack(size);
 	memcpy(stack->top(),top,size);
-	ctx->push(tag<callstack>(stack));
+	return tag<callstack>(stack);
+}
+
+void factor_vm::primitive_callstack()
+{
+	ctx->push(capture_callstack(ctx));
+}
+
+void factor_vm::primitive_callstack_for()
+{
+	context *other_ctx = (context *)pinned_alien_offset(ctx->pop());
+	ctx->push(capture_callstack(other_ctx));
 }
 
 code_block *factor_vm::frame_code(stack_frame *frame)
