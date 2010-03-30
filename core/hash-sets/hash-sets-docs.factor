@@ -2,9 +2,9 @@ USING: help.markup help.syntax sequences ;
 IN: hash-sets
 
 ARTICLE: "hash-sets" "Hash sets"
-"The " { $vocab-link "hash-sets" } " vocabulary implements hashtable-backed sets. These are of the class:"
+"The " { $vocab-link "hash-sets" } " vocabulary implements hashtable-backed sets. Hash sets form a class:"
 { $subsection hash-set }
-"They can be instantiated with the word"
+"Constructing new hash sets:"
 { $subsection <hash-set> }
 "The syntax for hash sets is described in " { $link "syntax-hash-sets" } "." ;
 
