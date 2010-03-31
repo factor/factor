@@ -719,8 +719,10 @@ ERROR: error-message-failed id ;
 : win32-error-string ( -- str )
     GetLastError n>win32-error-string ;
 
+ERROR: windows-error n string ;
+
 : (win32-error) ( n -- )
-    [ win32-error-string throw ] unless-zero ;
+    [ dup win32-error-string windows-error ] unless-zero ;
 
 : win32-error ( -- )
     GetLastError (win32-error) ;
