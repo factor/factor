@@ -45,9 +45,6 @@ IN: stack-checker.known-words
 : infer-local-writer ( word -- )
     (( value -- )) apply-word/effect ;
 
-: infer-local-word ( word -- )
-    "local-word-def" word-prop infer-quot-here ;
-
 : non-inline-word ( word -- )
     dup depends-on-effect
     {
@@ -58,7 +55,6 @@ IN: stack-checker.known-words
         { [ dup local? ] [ infer-local-reader ] }
         { [ dup local-reader? ] [ infer-local-reader ] }
         { [ dup local-writer? ] [ infer-local-writer ] }
-        { [ dup local-word? ] [ infer-local-word ] }
         { [ dup "no-compile" word-prop ] [ do-not-compile ] }
         [ dup required-stack-effect apply-word/effect ]
     } cond ;
