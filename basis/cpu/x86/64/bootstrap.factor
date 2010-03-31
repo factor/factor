@@ -57,11 +57,12 @@ IN: bootstrap.x86
     ctx-reg context-retainstack-offset [+] rs-reg MOV ;
 
 : jit-restore-context ( -- )
-    jit-load-context
     ds-reg ctx-reg context-datastack-offset [+] MOV
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
 [
+    ! ctx-reg is preserved across the call because it is non-volatile
+    ! in the C ABI
     jit-save-context
     ! call the primitive
     arg1 vm-reg MOV
@@ -80,6 +81,7 @@ IN: bootstrap.x86
     arg1 vm-reg MOV
     "begin_callback" jit-call
 
+    jit-load-context
     jit-restore-context
 
     ! call the quotation
@@ -115,6 +117,7 @@ IN: bootstrap.x86
     vm-reg 0 MOV 0 rc-absolute-cell jit-vm
 
     ! Load ds and rs registers
+    jit-load-context
     jit-restore-context
 
     ! Call quotation
@@ -168,6 +171,7 @@ IN: bootstrap.x86
     arg1 RBX MOV
     arg2 vm-reg MOV
     "inline_cache_miss" jit-call
+    jit-load-context
     jit-restore-context ;
 
 [ jit-load-return-address jit-inline-cache-miss ]

@@ -63,12 +63,13 @@ IN: bootstrap.x86
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
 [
+    ! ctx-reg is preserved across the call because it is non-volatile
+    ! in the C ABI
     jit-load-vm
     jit-save-context
     ! call the primitive
     ESP [] vm-reg MOV
     0 CALL rc-relative rt-dlsym jit-rel
-    ! restore ds, rs registers
     jit-restore-context
 ] jit-primitive jit-define
 
