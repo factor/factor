@@ -24,10 +24,6 @@ SYMBOL: in-lambda?
 : parse-local-defs ( -- words assoc )
     [ "|" [ make-local ] map-tokens ] H{ } make-assoc ;
 
-: make-local-word ( name def -- word )
-    [ <local-word> [ dup name>> set ] [ ] [ ] tri ] dip
-    "local-word-def" set-word-prop ;
-
 SINGLETON: lambda-parser
 
 SYMBOL: locals
