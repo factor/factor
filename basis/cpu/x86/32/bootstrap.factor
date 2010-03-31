@@ -91,20 +91,10 @@ IN: bootstrap.x86
     jit-load-context
     jit-restore-context
 
-    ! save C callstack pointer
-    ctx-reg context-callstack-save-offset [+] ESP MOV
-
-    ! load Factor callstack pointer
-    ESP ctx-reg context-callstack-bottom-offset [+] MOV
-    ESP 4 ADD
-
     jit-call-quot
 
     jit-load-vm
     jit-save-context
-
-    ! load C callstack pointer
-    ESP ctx-reg context-callstack-save-offset [+] MOV
 
     ESP [] vm-reg MOV
     "end_callback" jit-call
