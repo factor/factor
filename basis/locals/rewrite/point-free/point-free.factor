@@ -21,8 +21,6 @@ M: local localize dupd read-local-quot ;
 
 M: quote localize dupd local>> read-local-quot ;
 
-M: local-word localize dupd read-local-quot [ call ] append ;
-
 M: local-reader localize dupd read-local-quot [ local-value ] append ;
 
 M: local-writer localize
