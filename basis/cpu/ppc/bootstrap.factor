@@ -3,7 +3,8 @@
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.ppc.assembler compiler.units compiler.constants math
 math.private math.ranges layouts words vocabs slots.private
-locals locals.backend generic.single.private fry sequences ;
+locals locals.backend generic.single.private fry sequences
+threads.private ;
 FROM: cpu.ppc.assembler => B ;
 IN: bootstrap.ppc
 
@@ -14,6 +15,22 @@ CONSTANT: ds-reg 13
 CONSTANT: rs-reg 14
 CONSTANT: vm-reg 15
 CONSTANT: ctx-reg 16
+CONSTANT: nv-reg 17
+
+: jit-call ( string -- )
+    0 2 LOAD32 rc-absolute-ppc-2/2 jit-dlsym
+    2 MTLR
+    BLRL ;
+
+: jit-call-quot ( -- )
+    4 3 quot-entry-point-offset LWZ
+    4 MTLR
+    BLRL ;
+
+: jit-jump-quot ( -- )
+    4 3 quot-entry-point-offset LWZ
+    4 MTCTR
+    BCTR ;
 
 : factor-area-size ( -- n ) 16 ;
 
@@ -52,27 +69,59 @@ CONSTANT: ctx-reg 16
     saved-int-regs-size +
     saved-fp-regs-size +
     saved-vec-regs-size +
+    4 +
     16 align ;
 
+: old-context-save-offset ( -- n )
+    432 save-at ;
+
 [
+    ! Create stack frame
     0 MFLR
     1 1 callback-frame-size neg STWU
     0 1 callback-frame-size lr-save + STW
 
+    ! Save all non-volatile registers
     nv-int-regs [ 4 * save-int ] each-index
     nv-fp-regs [ 8 * 80 + save-fp ] each-index
     nv-vec-regs [ 16 * 224 + save-vec ] each-index
 
+    ! Load VM into vm-reg
     0 vm-reg LOAD32 rc-absolute-ppc-2/2 rt-vm jit-rel
 
+    ! Save old context
+    2 vm-reg vm-context-offset LWZ
+    2 1 old-context-save-offset STW
+
+    ! Switch over to the spare context
+    2 vm-reg vm-spare-context-offset LWZ
+    2 vm-reg vm-context-offset STW
+
+    ! Save C callstack pointer
+    2 context-callstack-save-offset 1 STW
+
+    ! Load Factor callstack pointer
+    1 2 context-callstack-bottom-offset LWZ
+
+    ! Call into Factor code
     0 2 LOAD32 rc-absolute-ppc-2/2 rt-entry-point jit-rel
     2 MTLR
     BLRL
 
+    ! Load C callstack pointer
+    2 vm-reg vm-context-offset LWZ
+    1 2 context-callstack-save-offset LWZ
+
+    ! Load old context
+    2 1 old-context-save-offset LWZ
+    2 vm-reg vm-context-offset STW
+
+    ! Restore non-volatile registers
     nv-vec-regs [ 16 * 224 + restore-vec ] each-index
     nv-fp-regs [ 8 * 80 + restore-fp ] each-index
     nv-int-regs [ 4 * restore-int ] each-index
 
+    ! Tear down stack frame and return
     0 1 callback-frame-size lr-save + LWZ
     1 1 0 LWZ
     0 MTLR
@@ -267,9 +316,7 @@ CONSTANT: ctx-reg 16
     jit-save-context
     3 6 MR
     4 vm-reg MR
-    0 5 LOAD32 "inline_cache_miss" rc-absolute-ppc-2/2 jit-dlsym
-    5 MTLR
-    BLRL
+    "inline_cache_miss" jit-call
     jit-restore-context ;
 
 [ jit-load-return-address jit-inline-cache-miss ]
@@ -321,10 +368,9 @@ CONSTANT: ctx-reg 16
 [
     3 ds-reg 0 LWZ
     ds-reg dup 4 SUBI
-    5 3 quot-entry-point-offset LWZ
 ]
-[ 5 MTLR BLRL ]
-[ 5 MTCTR BCTR ] \ (call) define-combinator-primitive
+[ jit-call-quot ]
+[ jit-jump-quot ] \ (call) define-combinator-primitive
 
 [
     3 ds-reg 0 LWZ
@@ -343,14 +389,20 @@ CONSTANT: ctx-reg 16
 
 ! Special primitives
 [
+    nv-reg 3 MR
+
+    3 vm-reg MR
+    "begin_callback" jit-call
+
     jit-restore-context
-    ! Save ctx->callstack_bottom
-    1 ctx-reg context-callstack-bottom-offset STW
+
     ! Call quotation
-    5 3 quot-entry-point-offset LWZ
-    5 MTLR
-    BLRL
+    jit-call-quot
+
     jit-save-context
+
+    3 vm-reg MR
+    "end_callback" jit-call
 ] \ c-to-factor define-sub-primitive
 
 [
@@ -369,9 +421,7 @@ CONSTANT: ctx-reg 16
     0 MTLR
 
     ! Call quotation
-    4 3 quot-entry-point-offset LWZ
-    4 MTCTR
-    BCTR
+    jit-call-quot
 ] \ unwind-native-frames define-sub-primitive
 
 [
@@ -392,9 +442,7 @@ CONSTANT: ctx-reg 16
     1 3 MR
     ! Call memcpy; arguments are now in the correct registers
     1 1 -64 STWU
-    0 2 LOAD32 "factor_memcpy" rc-absolute-ppc-2/2 jit-dlsym
-    2 MTLR
-    BLRL
+    "factor_memcpy" jit-call
     1 1 0 LWZ
     ! Return with new callstack
     0 1 lr-save LWZ
@@ -405,13 +453,10 @@ CONSTANT: ctx-reg 16
 [
     jit-save-context
     4 vm-reg MR
-    0 2 LOAD32 "lazy_jit_compile" rc-absolute-ppc-2/2 jit-dlsym
-    2 MTLR
-    BLRL
-    5 3 quot-entry-point-offset LWZ
+    "lazy_jit_compile" jit-call
 ]
-[ 5 MTLR BLRL ]
-[ 5 MTCTR BCTR ]
+[ jit-call-quot ]
+[ jit-jump-quot ]
 \ lazy-jit-compile define-combinator-primitive
 
 ! Objects
@@ -665,9 +710,7 @@ CONSTANT: ctx-reg 16
     [ BNO ]
     [
         5 vm-reg MR
-        0 6 LOAD32 func rc-absolute-ppc-2/2 jit-dlsym
-        6 MTLR
-        BLRL
+        func jit-call
     ]
     jit-conditional* ;
 
@@ -689,11 +732,77 @@ CONSTANT: ctx-reg 16
     [
         4 4 tag-bits get SRAWI
         5 vm-reg MR
-        0 6 LOAD32 "overflow_fixnum_multiply" rc-absolute-ppc-2/2 jit-dlsym
-        6 MTLR
-        BLRL
+        "overflow_fixnum_multiply" jit-call
     ]
     jit-conditional*
 ] \ fixnum* define-sub-primitive
+
+! Contexts
+: jit-switch-context ( reg -- )
+    ! Save ds, rs registers
+    jit-save-context
+
+    ! Make the new context the current one
+    ctx-reg swap MR
+    ctx-reg vm-reg vm-context-offset STW
+
+    ! Load new stack pointer
+    1 ctx-reg context-callstack-top-offset LWZ
+
+    ! Load new ds, rs registers
+    jit-restore-context ;
+
+: jit-pop-context-and-param ( -- )
+    3 ds-reg 0 LWZ
+    3 3 alien-offset LWZ
+    4 ds-reg -8 LWZ
+    ds-reg ds-reg 16 SUBI ;
+
+: jit-push-param ( -- )
+    ds-reg ds-reg 8 ADDI
+    4 ds-reg 0 STW ;
+
+: jit-set-context ( -- )
+    jit-pop-context-and-param
+    4 jit-switch-context
+    jit-push-param ;
+
+[ jit-set-context ] \ (set-context) define-sub-primitive
+
+: jit-pop-quot-and-param ( -- )
+    3 ds-reg 0 LWZ
+    4 ds-reg -8 LWZ
+    ds-reg ds-reg 16 SUBI ;
+
+: jit-start-context ( -- )
+    ! Create the new context in return-reg
+    3 vm-reg MR
+    "new_context" jit-call
+
+    jit-pop-quot-and-param
+
+    3 jit-switch-context
+
+    jit-push-param
+
+    jit-jump-quot ;
+
+[ jit-start-context ] \ (start-context) define-sub-primitive
+
+: jit-delete-current-context ( -- )
+    jit-load-context
+    3 vm-reg MR
+    4 ctx-reg MR
+    "delete_context" jit-call ;
+
+[
+    jit-delete-current-context
+    jit-set-context
+] \ (set-context-and-delete) define-sub-primitive
+
+[
+    jit-delete-current-context
+    jit-start-context
+] \ (start-context-and-delete) define-sub-primitive
 
 [ "bootstrap.ppc" forget-vocab ] with-compilation-unit
