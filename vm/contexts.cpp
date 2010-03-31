@@ -119,6 +119,11 @@ void factor_vm::delete_context(context *old_context)
 	active_contexts.erase(old_context);
 }
 
+VM_C_API void delete_context(factor_vm *parent, context *old_context)
+{
+	parent->delete_context(old_context);
+}
+
 void factor_vm::begin_callback()
 {
 	ctx->reset();
@@ -185,7 +190,10 @@ cell factor_vm::datastack_to_array(context *ctx)
 {
 	cell array = stack_to_array(ctx->datastack_seg->start,ctx->datastack);
 	if(array == false_object)
+	{
 		general_error(ERROR_DATASTACK_UNDERFLOW,false_object,false_object);
+		return false_object;
+	}
 	else
 		return array;
 }
@@ -291,12 +299,6 @@ void factor_vm::primitive_load_locals()
 void factor_vm::primitive_context()
 {
 	ctx->push(allot_alien(ctx));
-}
-
-void factor_vm::primitive_delete_context()
-{
-	context *old_context = (context *)pinned_alien_offset(ctx->pop());
-	delete_context(old_context);
 }
 
 }
