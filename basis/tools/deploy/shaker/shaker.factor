@@ -392,13 +392,15 @@ IN: tools.deploy.shaker
     ] [ drop ] if ;
 
 : strip-c-io ( -- )
+    ! On all platforms, if deploy-io is 1, we strip out C streams.
+    ! On Unix, if deploy-io is 3, we strip out C streams as well.
+    ! On Windows, even if deploy-io is 3, C streams are still used
+    ! for the console, so don't strip it there.
     strip-io?
     deploy-io get 3 = os windows? not and
     or [
-        [
-            c-io-backend forget
-            "io.streams.c" forget-vocab
-        ] with-compilation-unit
+        "Stripping C I/O" show
+        "vocab:tools/deploy/shaker/strip-c-io.factor" run-file
     ] when ;
 
 : compress ( pred post-process string -- )
