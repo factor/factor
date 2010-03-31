@@ -82,21 +82,11 @@ IN: bootstrap.x86
 
     jit-restore-context
 
-    ! save C callstack pointer
-    ctx-reg context-callstack-save-offset [+] stack-reg MOV
-
-    ! load Factor callstack pointer
-    stack-reg ctx-reg context-callstack-bottom-offset [+] MOV
-    stack-reg 8 ADD
-
     ! call the quotation
     arg1 nv-reg MOV
     jit-call-quot
 
     jit-save-context
-
-    ! load C callstack pointer
-    stack-reg ctx-reg context-callstack-save-offset [+] MOV
 
     arg1 vm-reg MOV
     "end_callback" jit-call
