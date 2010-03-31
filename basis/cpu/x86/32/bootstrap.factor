@@ -72,6 +72,12 @@ IN: bootstrap.x86
     jit-restore-context
 ] jit-primitive jit-define
 
+: jit-jump-quot ( -- )
+    EAX quot-entry-point-offset [+] JMP ;
+
+: jit-call-quot ( -- )
+    EAX quot-entry-point-offset [+] CALL ;
+
 [
     jit-load-vm
     ESP [] vm-reg MOV
@@ -92,8 +98,7 @@ IN: bootstrap.x86
     ESP ctx-reg context-callstack-bottom-offset [+] MOV
     ESP 4 ADD
 
-    ! call the quotation
-    EAX quot-entry-point-offset [+] CALL
+    jit-call-quot
 
     jit-load-vm
     jit-save-context
@@ -109,8 +114,8 @@ IN: bootstrap.x86
     EAX ds-reg [] MOV
     ds-reg bootstrap-cell SUB
 ]
-[ EAX quot-entry-point-offset [+] CALL ]
-[ EAX quot-entry-point-offset [+] JMP ]
+[ jit-call-quot ]
+[ jit-jump-quot ]
 \ (call) define-combinator-primitive
 
 [
@@ -133,8 +138,7 @@ IN: bootstrap.x86
     jit-load-context
     jit-restore-context
 
-    ! Call quotation
-    EAX quot-entry-point-offset [+] JMP
+    jit-jump-quot
 ] \ unwind-native-frames define-sub-primitive
 
 [
@@ -175,8 +179,8 @@ IN: bootstrap.x86
     ! Call VM
     "lazy_jit_compile" jit-call
 ]
-[ EAX quot-entry-point-offset [+] CALL ]
-[ EAX quot-entry-point-offset [+] JMP ]
+[ jit-call-quot ]
+[ jit-jump-quot ]
 \ lazy-jit-compile define-combinator-primitive
 
 ! Inline cache miss entry points
@@ -247,8 +251,8 @@ IN: bootstrap.x86
     jit-conditional
 ] \ fixnum* define-sub-primitive
 
-! Threads
-: jit-set-context ( reg -- )
+! Contexts
+: jit-switch-context ( reg -- )
     ! Save ds, rs registers
     jit-load-vm
     jit-save-context
@@ -263,7 +267,26 @@ IN: bootstrap.x86
     ! Load new ds, rs registers
     jit-restore-context ;
 
-[
+: jit-set-context ( -- )
+    ! Load context and parameter from datastack
+    EAX ds-reg [] MOV
+    EAX EAX alien-offset [+] MOV
+    EBX ds-reg -4 [+] MOV
+    ds-reg 8 SUB
+
+    ! Make the new context active
+    EAX jit-switch-context
+
+    ! Twiddle stack for return
+    ESP 4 ADD
+
+    ! Store parameter to datastack
+    ds-reg 4 ADD
+    ds-reg [] EBX MOV ;
+
+[ jit-set-context ] \ (set-context) define-sub-primitive
+
+: jit-start-context ( -- )
     ! Create the new context in return-reg
     jit-load-vm
     ESP [] vm-reg MOV
@@ -274,7 +297,7 @@ IN: bootstrap.x86
     ds-reg 8 SUB
 
     ! Make the new context active
-    EAX jit-set-context
+    EAX jit-switch-context
 
     ! Push parameter
     EAX EBX -4 [+] MOV
@@ -283,26 +306,26 @@ IN: bootstrap.x86
 
     ! Jump to initial quotation
     EAX EBX [] MOV
-    EAX quot-entry-point-offset [+] JMP
-] \ (start-context) define-sub-primitive
+    jit-jump-quot ;
+
+[ jit-start-context ] \ (start-context) define-sub-primitive
+
+: jit-delete-current-context ( -- )
+    jit-load-vm
+    jit-load-context
+    ESP [] vm-reg MOV
+    ESP 4 [+] ctx-reg MOV
+    "delete_context" jit-call ;
 
 [
-    ! Load context and parameter from datastack
-    EAX ds-reg [] MOV
-    EAX EAX alien-offset [+] MOV
-    EBX ds-reg -4 [+] MOV
-    ds-reg 8 SUB
+    jit-delete-current-context
+    jit-set-context
+] \ (set-context-and-delete) define-sub-primitive
 
-    ! Make the new context active
-    EAX jit-set-context
-
-    ! Twiddle stack for return
-    ESP 4 ADD
-
-    ! Store parameter to datastack
-    ds-reg 4 ADD
-    ds-reg [] EBX MOV
-] \ (set-context) define-sub-primitive
+[
+    jit-delete-current-context
+    jit-start-context
+] \ (start-context-and-delete) define-sub-primitive
 
 << "vocab:cpu/x86/bootstrap.factor" parse-file suffix! >>
 call

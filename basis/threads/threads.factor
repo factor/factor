@@ -9,13 +9,21 @@ IN: threads
 
 <PRIVATE
 
-! (set-context) and (start-context) are sub-primitives, but
-! we don't want them inlined into callers since their behavior
-! depends on what frames are on the callstack
-: set-context ( obj context -- obj' ) (set-context) ;
+! Wrap sub-primitives; we don't want them inlined into callers
+! since their behavior depends on what frames are on the callstack
+: set-context ( obj context -- obj' )
+    (set-context) ;
 
-: start-context ( obj quot: ( obj -- * ) -- obj' ) (start-context) ;
+: start-context ( obj quot: ( obj -- * ) -- obj' )
+    (start-context) ;
 
+: set-context-and-delete ( obj context -- * )
+    (set-context-and-delete) ;
+
+: start-context-and-delete ( obj quot: ( obj -- * ) -- * )
+    (start-context-and-delete) ;
+
+! Context introspection
 : namestack-for ( context -- namestack )
     [ 0 ] dip context-object-for ;
 
@@ -159,60 +167,43 @@ DEFER: stop
     while
     drop ;
 
-: start ( namestack -- obj )
+CONSTANT: [start]
     [
         set-namestack
         init-catchstack
         self quot>> call
         stop
-    ] start-context ;
+    ]
 
-DEFER: next
-
-: no-runnable-threads ( -- obj )
-    ! We should never be in a state where the only threads
-    ! are sleeping; the I/O wait thread is always runnable.
-    ! However, if it dies, we handle this case
-    ! semi-gracefully.
-    !
-    ! And if sleep-time outputs f, there are no sleeping
-    ! threads either... so WTF.
-    sleep-time {
-        { [ dup not ] [ drop die ] }
-        { [ dup 0 = ] [ drop ] }
-        [ (sleep) ]
-    } cond next ;
+: no-runnable-threads ( -- ) die ;
 
 : (next) ( obj thread -- obj' )
-    f >>state
-    dup set-self
     dup runnable>>
-    [ context>> box> set-context ] [ t >>runnable drop start ] if ;
+    [ context>> box> set-context ]
+    [ t >>runnable drop [start] start-context ] if ;
 
-: next ( -- obj )
+: (stop) ( obj thread -- * )
+    dup runnable>>
+    [ context>> box> set-context-and-delete ]
+    [ t >>runnable drop [start] start-context-and-delete ] if ;
+
+: next ( -- obj thread )
     expire-sleep-loop
-    run-queue dup deque-empty?
-    [ drop no-runnable-threads ]
-    [ pop-back dup array? [ first2 ] [ [ f ] dip ] if (next) ] if ;
-
-: recycler-thread ( -- thread ) 68 special-object ;
-
-: recycler-queue ( -- vector ) 69 special-object ;
-
-: delete-context-later ( context -- )
-    recycler-queue push recycler-thread interrupt ;
+    run-queue pop-back
+    dup array? [ first2 ] [ [ f ] dip ] if
+    f >>state
+    dup set-self ;
 
 PRIVATE>
 
 : stop ( -- * )
     self [ exit-handler>> call( -- ) ] [ unregister-thread ] bi
-    context delete-context-later next
-    die 1 exit ;
+    next (stop) ;
 
 : suspend ( state -- obj )
     [ self ] dip >>state
     [ context ] dip context>> >box
-    next ;
+    next (next) ;
 
 : yield ( -- ) self resume f suspend drop ;
 
@@ -260,22 +251,9 @@ GENERIC: error-in-thread ( error thread -- )
     [ set-self ]
     tri ;
 
-! The recycler thread deletes contexts belonging to stopped
-! threads
-
-: recycler-loop ( -- )
-    recycler-queue [ [ delete-context ] each ] [ delete-all ] bi
-    f sleep-until
-    recycler-loop ;
-
-: init-recycler ( -- )
-    [ recycler-loop ] "Context recycler" spawn 68 set-special-object
-    V{ } clone 69 set-special-object ;
-
 : init-threads ( -- )
     init-thread-state
-    init-initial-thread
-    init-recycler ;
+    init-initial-thread ;
 
 PRIVATE>
 
