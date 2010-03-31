@@ -175,7 +175,6 @@ IN: tools.deploy.shaker
                 "predicate"
                 "predicate-definition"
                 "predicating"
-                "primitive"
                 "reader"
                 "reading"
                 "recursive"

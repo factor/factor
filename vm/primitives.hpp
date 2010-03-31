@@ -50,7 +50,6 @@ namespace factor
 	_(data_room) \
 	_(datastack) \
 	_(datastack_for) \
-	_(delete_context) \
 	_(die) \
 	_(disable_gc_events) \
 	_(dispatch_stats) \
