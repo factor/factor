@@ -42,12 +42,8 @@ IN: tools.deploy.shaker
     deploy-threads? get [
         "threads" startup-hooks get delete-at
     ] unless
-    native-io? [
-        "io.thread" startup-hooks get delete-at
-    ] unless
     strip-io? [
         "io.backend" startup-hooks get delete-at
-        "io.thread" startup-hooks get delete-at
     ] when
     strip-dictionary? [
         {
@@ -402,9 +398,6 @@ IN: tools.deploy.shaker
         [
             c-io-backend forget
             "io.streams.c" forget-vocab
-            "io-thread-running?" "io.thread" lookup [
-                global delete-at
-            ] when*
         ] with-compilation-unit
     ] when ;
 
