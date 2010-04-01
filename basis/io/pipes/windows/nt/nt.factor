@@ -3,7 +3,7 @@
 USING: alien alien.c-types arrays destructors io io.backend.windows libc
 windows.types math.bitwise windows.kernel32 windows namespaces
 make kernel sequences windows.errors assocs math.parser system
-random combinators accessors io.pipes io.ports ;
+random combinators accessors io.pipes io.ports literals ;
 IN: io.pipes.windows.nt
 
 ! This code is based on
