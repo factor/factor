@@ -82,9 +82,6 @@ M: local-reader rewrite-element , ;
 M: local-writer rewrite-element
     local-writer-in-literal-error ;
 
-M: local-word rewrite-element
-    local-word-in-literal-error ;
-
 M: word rewrite-element <wrapper> , ;
 
 : rewrite-wrapper ( wrapper -- )

@@ -164,3 +164,5 @@ IN: cpu.x86.assembler.tests
 
 [ { 15 183 195 } ] [ [ EAX BX MOVZX ] { } make ] unit-test
 
+[ { 100 199 5 0 0 0 0 123 0 0 0 } ] [ [ 0 [] FS 123 MOV ] { } make ] unit-test
+

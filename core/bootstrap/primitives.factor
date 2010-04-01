@@ -370,7 +370,9 @@ tuple
     { "fixnum>" "math.private" (( x y -- ? )) }
     { "fixnum>=" "math.private" (( x y -- ? )) }
     { "(set-context)" "threads.private" (( obj context -- obj' )) }
+    { "(set-context-and-delete)" "threads.private" (( obj context -- * )) }
     { "(start-context)" "threads.private" (( obj quot -- obj' )) }
+    { "(start-context-and-delete)" "threads.private" (( obj quot -- * )) }
 } [ first3 make-sub-primitive ] each
 
 ! Primitive words
@@ -531,7 +533,7 @@ tuple
     { "set-string-nth-fast" "strings.private" "primitive_set_string_nth_fast" (( ch n string -- )) }
     { "set-string-nth-slow" "strings.private" "primitive_set_string_nth_slow" (( ch n string -- )) }
     { "string-nth" "strings.private" "primitive_string_nth" (( n string -- ch )) }
-    { "(exit)" "system" "primitive_exit" (( n -- )) }
+    { "(exit)" "system" "primitive_exit" (( n -- * )) }
     { "nano-count" "system" "primitive_nano_count" (( -- ns )) }
     { "system-micros" "system" "primitive_system_micros" (( -- us )) }
     { "(sleep)" "threads.private" "primitive_sleep" (( nanos -- )) }
@@ -540,13 +542,12 @@ tuple
     { "context-object-for" "threads.private" "primitive_context_object_for" (( n context -- obj )) }
     { "datastack-for" "threads.private" "primitive_datastack_for" (( context -- array )) }
     { "retainstack-for" "threads.private" "primitive_retainstack_for" (( context -- array )) }
-    { "delete-context" "threads.private" "primitive_delete_context" (( context -- )) }
     { "dispatch-stats" "tools.dispatch.private" "primitive_dispatch_stats" (( -- stats )) }
     { "reset-dispatch-stats" "tools.dispatch.private" "primitive_reset_dispatch_stats" (( -- )) }
     { "profiling" "tools.profiler.private" "primitive_profiling" (( ? -- )) }
     { "optimized?" "words" "primitive_optimized_p" (( word -- ? )) }
     { "word-code" "words" "primitive_word_code" (( word -- start end )) }
-    { "(word)" "words.private" "primitive_word" (( name vocab -- word )) }
+    { "(word)" "words.private" "primitive_word" (( name vocab hashcode -- word )) }
 } [ first4 make-primitive ] each
 
 ! Bump build number
