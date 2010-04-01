@@ -98,7 +98,7 @@ CONSTANT: nv-reg 17
     2 vm-reg vm-context-offset STW
 
     ! Save C callstack pointer
-    2 context-callstack-save-offset 1 STW
+    1 2 context-callstack-save-offset STW
 
     ! Load Factor callstack pointer
     1 2 context-callstack-bottom-offset LWZ
@@ -107,6 +107,9 @@ CONSTANT: nv-reg 17
     0 2 LOAD32 rc-absolute-ppc-2/2 rt-entry-point jit-rel
     2 MTLR
     BLRL
+
+    ! Load VM again, pointlessly
+    0 vm-reg LOAD32 rc-absolute-ppc-2/2 rt-vm jit-rel
 
     ! Load C callstack pointer
     2 vm-reg vm-context-offset LWZ
@@ -141,7 +144,6 @@ CONSTANT: nv-reg 17
     rs-reg ctx-reg context-retainstack-offset STW ;
 
 : jit-restore-context ( -- )
-    jit-load-context
     ds-reg ctx-reg context-datastack-offset LWZ
     rs-reg ctx-reg context-retainstack-offset LWZ ;
 
@@ -317,6 +319,7 @@ CONSTANT: nv-reg 17
     3 6 MR
     4 vm-reg MR
     "inline_cache_miss" jit-call
+    jit-load-context
     jit-restore-context ;
 
 [ jit-load-return-address jit-inline-cache-miss ]
@@ -394,9 +397,11 @@ CONSTANT: nv-reg 17
     3 vm-reg MR
     "begin_callback" jit-call
 
+    jit-load-context
     jit-restore-context
 
     ! Call quotation
+    3 nv-reg MR
     jit-call-quot
 
     jit-save-context
@@ -414,6 +419,7 @@ CONSTANT: nv-reg 17
     0 vm-reg LOAD32 0 rc-absolute-ppc-2/2 jit-vm
 
     ! Load ds and rs registers
+    jit-load-context
     jit-restore-context
 
     ! We have changed the stack; load return address again
@@ -755,33 +761,34 @@ CONSTANT: nv-reg 17
 : jit-pop-context-and-param ( -- )
     3 ds-reg 0 LWZ
     3 3 alien-offset LWZ
-    4 ds-reg -8 LWZ
-    ds-reg ds-reg 16 SUBI ;
+    4 ds-reg -4 LWZ
+    ds-reg ds-reg 8 SUBI ;
 
 : jit-push-param ( -- )
-    ds-reg ds-reg 8 ADDI
+    ds-reg ds-reg 4 ADDI
     4 ds-reg 0 STW ;
 
 : jit-set-context ( -- )
     jit-pop-context-and-param
-    4 jit-switch-context
+    3 jit-switch-context
     jit-push-param ;
 
 [ jit-set-context ] \ (set-context) define-sub-primitive
 
 : jit-pop-quot-and-param ( -- )
     3 ds-reg 0 LWZ
-    4 ds-reg -8 LWZ
-    ds-reg ds-reg 16 SUBI ;
+    4 ds-reg -4 LWZ
+    ds-reg ds-reg 8 SUBI ;
 
 : jit-start-context ( -- )
     ! Create the new context in return-reg
     3 vm-reg MR
     "new_context" jit-call
+    6 3 MR
 
     jit-pop-quot-and-param
 
-    3 jit-switch-context
+    6 jit-switch-context
 
     jit-push-param
 
