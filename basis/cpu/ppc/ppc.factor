@@ -678,8 +678,6 @@ M: ppc %box-large-struct ( n c-type -- )
 
 M:: ppc %restore-context ( temp1 temp2 -- )
     temp1 "ctx" %vm-field
-    temp2 1 stack-frame get total-size>> ADDI
-    temp2 temp1 "callstack-bottom" context-field-offset STW
     ds-reg temp1 "datastack" context-field-offset LWZ
     rs-reg temp1 "retainstack" context-field-offset LWZ ;
 
@@ -692,14 +690,6 @@ M:: ppc %save-context ( temp1 temp2 -- )
 M: ppc %alien-invoke ( symbol dll -- )
     [ 11 ] 2dip %alien-global 11 MTLR BLRL ;
 
-M: ppc %alien-callback ( quot -- )
-    3 4 %restore-context
-    3 swap %load-reference
-    4 3 quot-entry-point-offset LWZ
-    4 MTLR
-    BLRL
-    3 4 %save-context ;
-
 M: ppc %prepare-alien-indirect ( -- )
     3 ds-reg 0 LWZ
     ds-reg ds-reg 4 SUBI
@@ -709,18 +699,6 @@ M: ppc %prepare-alien-indirect ( -- )
 
 M: ppc %alien-indirect ( -- )
     16 MTLR BLRL ;
-
-M: ppc %callback-value ( ctype -- )
-    ! Save top of data stack
-    3 ds-reg 0 LWZ
-    3 1 0 local@ STW
-    3 %load-vm-addr
-    ! Restore data/call/retain stacks
-    "unnest_context" f %alien-invoke
-    ! Restore top of data stack
-    3 1 0 local@ LWZ
-    ! Unbox former top of data stack to return registers
-    unbox-return ;
 
 M: ppc immediate-arithmetic? ( n -- ? ) -32768 32767 between? ;
 
@@ -757,13 +735,30 @@ M: ppc %box-small-struct ( c-type -- )
     4 3 4 LWZ
     3 3 0 LWZ ;
 
-M: ppc %nest-context ( -- )
+M: ppc %begin-callback ( -- )
     3 %load-vm-addr
-    "nest_context" f %alien-invoke ;
+    "begin_callback" f %alien-invoke ;
 
-M: ppc %unnest-context ( -- )
+M: ppc %alien-callback ( quot -- )
+    3 4 %restore-context
+    3 swap %load-reference
+    4 3 quot-entry-point-offset LWZ
+    4 MTLR
+    BLRL
+    3 4 %save-context ;
+
+M: ppc %end-callback ( -- )
     3 %load-vm-addr
     "unnest_context" f %alien-invoke ;
+
+M: ppc %end-callback-value ( ctype -- )
+    ! Save top of data stack
+    12 ds-reg 0 LWZ
+    %end-callback
+    ! Restore top of data stack
+    3 12 MR
+    ! Unbox former top of data stack to return registers
+    unbox-return ;
 
 M: ppc %unbox-small-struct ( size -- )
     heap-size cell align cell /i {
