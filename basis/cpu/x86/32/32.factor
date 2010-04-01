@@ -291,9 +291,6 @@ M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
     func "libm" load-library %alien-invoke
     dst float-function-return ;
 
-: stdcall? ( params -- ? )
-    abi>> stdcall = ;
-
 : funny-large-struct-return? ( params -- ? )
     #! MINGW ABI incompatibility disaster
     [ return>> large-struct? ]
@@ -307,7 +304,7 @@ M: x86.32 %cleanup ( params -- )
     #! b) If we just called a function returning a struct, we
     #! have to fix ESP.
     {
-        { [ dup stdcall? ] [ drop ESP stack-frame get params>> SUB ] }
+        { [ dup abi>> stdcall? ] [ drop ESP stack-frame get params>> SUB ] }
         { [ dup funny-large-struct-return? ] [ drop EAX PUSH ] }
         [ drop ]
     } cond ;
