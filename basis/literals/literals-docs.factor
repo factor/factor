@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel multiline ;
+USING: help.markup help.syntax kernel multiline sequences ;
 IN: literals
 
 HELP: $
@@ -61,6 +61,19 @@ ${ five six 7 } .
 } ;
 
 { POSTPONE: $ POSTPONE: $[ POSTPONE: ${ } related-words
+
+HELP: flags{
+{ $values { "values" sequence } }
+{ $description "Constructs a constant flag value from a sequence of integers or words that output integers. The resulting constant is computed at parse-time, which makes this word as efficient as using a literal integer." }
+{ $examples
+    { $example "USING: literals kernel prettyprint ;"
+        "IN: scratchpad"
+        "CONSTANT: x HEX: 1"
+        "flags{ HEX: 20 x BIN: 100 } .h"
+        "25"
+    }
+} ;
+
 
 ARTICLE: "literals" "Interpolating code results into literal values"
 "The " { $vocab-link "literals" } " vocabulary contains words to run code at parse time and insert the results into more complex literal values."

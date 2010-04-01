@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax kernel math.bitwise sequences system io.serial ;
+USING: alien.syntax kernel math.bitwise sequences system io.serial
+literals ;
 IN: io.serial.unix
 
 M: bsd lookup-baud ( m -- n )
@@ -60,7 +61,7 @@ CONSTANT: HUPCL       HEX: 00004000
 CONSTANT: CLOCAL      HEX: 00008000
 CONSTANT: CCTS_OFLOW  HEX: 00010000
 CONSTANT: CRTS_IFLOW  HEX: 00020000
-: CRTSCTS ( -- n )  { CCTS_OFLOW CRTS_IFLOW } flags ; inline
+CONSTANT: CRTSCTS flags{ CCTS_OFLOW CRTS_IFLOW }
 CONSTANT: CDTR_IFLOW  HEX: 00040000
 CONSTANT: CDSR_OFLOW  HEX: 00080000
 CONSTANT: CCAR_OFLOW  HEX: 00100000

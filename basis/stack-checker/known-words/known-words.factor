@@ -14,7 +14,7 @@ compiler.units system.private combinators
 combinators.short-circuit locals locals.backend locals.types
 combinators.private stack-checker.values generic.single
 generic.single.private alien.libraries tools.dispatch.private
-tools.profiler.private
+tools.profiler.private macros
 stack-checker.alien
 stack-checker.state
 stack-checker.errors
@@ -27,11 +27,37 @@ stack-checker.recursive-state
 stack-checker.row-polymorphism ;
 IN: stack-checker.known-words
 
-: infer-primitive ( word -- )
-    dup
-    [ "input-classes" word-prop ]
-    [ "default-output-classes" word-prop ] bi <effect>
-    apply-word/effect ;
+: infer-special ( word -- )
+    [ current-word set ] [ "special" word-prop call( -- ) ] bi ;
+
+: infer-shuffle ( shuffle -- )
+    [ in>> length consume-d ] keep ! inputs shuffle
+    [ drop ] [ shuffle dup copy-values dup output-d ] 2bi ! inputs outputs copies
+    [ nip f f ] [ swap zip ] 2bi ! in-d out-d in-r out-r mapping
+    #shuffle, ;
+
+: infer-shuffle-word ( word -- )
+    "shuffle" word-prop infer-shuffle ;
+
+: infer-local-reader ( word -- )
+    (( -- value )) apply-word/effect ;
+
+: infer-local-writer ( word -- )
+    (( value -- )) apply-word/effect ;
+
+: non-inline-word ( word -- )
+    dup depends-on-effect
+    {
+        { [ dup "shuffle" word-prop ] [ infer-shuffle-word ] }
+        { [ dup "special" word-prop ] [ infer-special ] }
+        { [ dup "transform-quot" word-prop ] [ apply-transform ] }
+        { [ dup macro? ] [ apply-macro ] }
+        { [ dup local? ] [ infer-local-reader ] }
+        { [ dup local-reader? ] [ infer-local-reader ] }
+        { [ dup local-writer? ] [ infer-local-writer ] }
+        { [ dup "no-compile" word-prop ] [ do-not-compile ] }
+        [ dup required-stack-effect apply-word/effect ]
+    } cond ;
 
 {
     { drop  (( x     --             )) }
@@ -50,15 +76,6 @@ IN: stack-checker.known-words
     { pick  (( x y z -- x y z x     )) }
     { swap  (( x y   -- y x         )) }
 } [ "shuffle" set-word-prop ] assoc-each
-
-: infer-shuffle ( shuffle -- )
-    [ in>> length consume-d ] keep ! inputs shuffle
-    [ drop ] [ shuffle dup copy-values dup output-d ] 2bi ! inputs outputs copies
-    [ nip f f ] [ swap zip ] 2bi ! in-d out-d in-r out-r mapping
-    #shuffle, ;
-
-: infer-shuffle-word ( word -- )
-    "shuffle" word-prop infer-shuffle ;
 
 : check-declaration ( declaration -- declaration )
     dup { [ array? ] [ [ class? ] all? ] } 1&&
@@ -180,11 +197,6 @@ M: bad-executable summary
 
 \ call-effect-unsafe [ infer-call-effect-unsafe ] "special" set-word-prop
 
-: infer-exit ( -- )
-    \ exit (( n -- * )) apply-word/effect ;
-
-\ exit [ infer-exit ] "special" set-word-prop
-
 : infer-load-locals ( -- )
     pop-literal nip
     consume-d dup copy-values dup output-r
@@ -249,22 +261,10 @@ M: bad-executable summary
     c-to-factor
 } [ dup '[ _ do-not-compile ] "special" set-word-prop ] each
 
-: infer-special ( word -- )
-    [ current-word set ] [ "special" word-prop call( -- ) ] bi ;
-
-: infer-local-reader ( word -- )
-    (( -- value )) apply-word/effect ;
-
-: infer-local-writer ( word -- )
-    (( value -- )) apply-word/effect ;
-
-: infer-local-word ( word -- )
-    "local-word-def" word-prop infer-quot-here ;
-
 {
     declare call (call) dip 2dip 3dip curry compose
     execute (execute) call-effect-unsafe execute-effect-unsafe if
-    dispatch <tuple-boa> exit load-local load-locals get-local
+    dispatch <tuple-boa> load-local load-locals get-local
     drop-locals do-primitive alien-invoke alien-indirect
     alien-callback
 } [ t "no-compile" set-word-prop ] each
@@ -276,26 +276,10 @@ M: bad-executable summary
 ! More words not to compile
 \ clear t "no-compile" set-word-prop
 
-: non-inline-word ( word -- )
-    dup depends-on-effect
-    {
-        { [ dup "shuffle" word-prop ] [ infer-shuffle-word ] }
-        { [ dup "special" word-prop ] [ infer-special ] }
-        { [ dup "primitive" word-prop ] [ infer-primitive ] }
-        { [ dup "transform-quot" word-prop ] [ apply-transform ] }
-        { [ dup "macro" word-prop ] [ apply-macro ] }
-        { [ dup local? ] [ infer-local-reader ] }
-        { [ dup local-reader? ] [ infer-local-reader ] }
-        { [ dup local-writer? ] [ infer-local-writer ] }
-        { [ dup local-word? ] [ infer-local-word ] }
-        [ infer-word ]
-    } cond ;
-
 : define-primitive ( word inputs outputs -- )
-    [ 2drop t "primitive" set-word-prop ]
-    [ drop "input-classes" set-word-prop ]
-    [ nip "default-output-classes" set-word-prop ]
-    3tri ;
+    [ "input-classes" set-word-prop ]
+    [ "default-output-classes" set-word-prop ]
+    bi-curry* bi ;
 
 ! Stack effects for all primitives
 \ (byte-array) { integer } { byte-array } define-primitive \ (byte-array) make-flushable
@@ -311,8 +295,10 @@ M: bad-executable summary
 \ (save-image) { byte-array byte-array } { } define-primitive
 \ (save-image-and-exit) { byte-array byte-array } { } define-primitive
 \ (set-context) { object alien } { object } define-primitive
+\ (set-context-and-delete) { object alien } { } define-primitive
 \ (sleep) { integer } { } define-primitive
 \ (start-context) { object quotation } { object } define-primitive
+\ (start-context-and-delete) { object quotation } { } define-primitive
 \ (word) { object object object } { word } define-primitive \ (word) make-flushable
 \ <array> { integer object } { array } define-primitive \ <array> make-flushable
 \ <byte-array> { integer } { byte-array } define-primitive \ <byte-array> make-flushable
@@ -376,7 +362,6 @@ M: bad-executable summary
 \ data-room { } { byte-array } define-primitive \ data-room make-flushable
 \ datastack { } { array } define-primitive \ datastack make-flushable
 \ datastack-for { c-ptr } { array } define-primitive \ datastack-for make-flushable
-\ delete-context { c-ptr } { } define-primitive
 \ die { } { } define-primitive
 \ disable-gc-events { } { object } define-primitive
 \ dispatch-stats { } { byte-array } define-primitive

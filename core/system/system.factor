@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2009 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private sequences math namespaces
 init splitting assocs system.private layouts words ;
@@ -57,4 +57,4 @@ PRIVATE>
 
 : embedded? ( -- ? ) 15 special-object ;
 
-: exit ( n -- ) do-shutdown-hooks (exit) ;
+: exit ( n -- * ) do-shutdown-hooks (exit) ;

@@ -136,7 +136,6 @@ struct factor_vm
 	void primitive_check_datastack();
 	void primitive_load_locals();
 	void primitive_context();
-	void primitive_delete_context();
 
 	template<typename Iterator> void iterate_active_callstacks(Iterator &iter)
 	{

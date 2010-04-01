@@ -57,11 +57,12 @@ IN: bootstrap.x86
     ctx-reg context-retainstack-offset [+] rs-reg MOV ;
 
 : jit-restore-context ( -- )
-    jit-load-context
     ds-reg ctx-reg context-datastack-offset [+] MOV
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
 [
+    ! ctx-reg is preserved across the call because it is non-volatile
+    ! in the C ABI
     jit-save-context
     ! call the primitive
     arg1 vm-reg MOV
@@ -70,29 +71,24 @@ IN: bootstrap.x86
     jit-restore-context
 ] jit-primitive jit-define
 
+: jit-jump-quot ( -- ) arg1 quot-entry-point-offset [+] JMP ;
+
+: jit-call-quot ( -- ) arg1 quot-entry-point-offset [+] CALL ;
+
 [
     nv-reg arg1 MOV
 
     arg1 vm-reg MOV
     "begin_callback" jit-call
 
+    jit-load-context
     jit-restore-context
-
-    ! save C callstack pointer
-    ctx-reg context-callstack-save-offset [+] stack-reg MOV
-
-    ! load Factor callstack pointer
-    stack-reg ctx-reg context-callstack-bottom-offset [+] MOV
-    stack-reg 8 ADD
 
     ! call the quotation
     arg1 nv-reg MOV
-    arg1 quot-entry-point-offset [+] CALL
+    jit-call-quot
 
     jit-save-context
-
-    ! load C callstack pointer
-    stack-reg ctx-reg context-callstack-save-offset [+] MOV
 
     arg1 vm-reg MOV
     "end_callback" jit-call
@@ -102,8 +98,8 @@ IN: bootstrap.x86
     arg1 ds-reg [] MOV
     ds-reg bootstrap-cell SUB
 ]
-[ arg1 quot-entry-point-offset [+] CALL ]
-[ arg1 quot-entry-point-offset [+] JMP ]
+[ jit-call-quot ]
+[ jit-jump-quot ]
 \ (call) define-combinator-primitive
 
 [
@@ -121,10 +117,11 @@ IN: bootstrap.x86
     vm-reg 0 MOV 0 rc-absolute-cell jit-vm
 
     ! Load ds and rs registers
+    jit-load-context
     jit-restore-context
 
     ! Call quotation
-    arg1 quot-entry-point-offset [+] JMP
+    jit-jump-quot
 ] \ unwind-native-frames define-sub-primitive
 
 [
@@ -157,9 +154,10 @@ IN: bootstrap.x86
     jit-save-context
     arg2 vm-reg MOV
     "lazy_jit_compile" jit-call
+    arg1 return-reg MOV
 ]
 [ return-reg quot-entry-point-offset [+] CALL ]
-[ return-reg quot-entry-point-offset [+] JMP ]
+[ jit-jump-quot ]
 \ lazy-jit-compile define-combinator-primitive
 
 ! Inline cache miss entry points
@@ -173,6 +171,7 @@ IN: bootstrap.x86
     arg1 RBX MOV
     arg2 vm-reg MOV
     "inline_cache_miss" jit-call
+    jit-load-context
     jit-restore-context ;
 
 [ jit-load-return-address jit-inline-cache-miss ]
@@ -222,8 +221,8 @@ IN: bootstrap.x86
     jit-conditional
 ] \ fixnum* define-sub-primitive
 
-! Threads
-: jit-set-context ( reg -- )
+! Contexts
+: jit-switch-context ( reg -- )
     ! Save ds, rs registers
     jit-save-context
 
@@ -237,44 +236,59 @@ IN: bootstrap.x86
     ! Load new ds, rs registers
     jit-restore-context ;
 
-[
+: jit-pop-context-and-param ( -- )
+    arg1 ds-reg [] MOV
+    arg1 arg1 alien-offset [+] MOV
+    arg2 ds-reg -8 [+] MOV
+    ds-reg 16 SUB ;
+
+: jit-push-param ( -- )
+    ds-reg 8 ADD
+    ds-reg [] arg2 MOV ;
+
+: jit-set-context ( -- )
+    jit-pop-context-and-param
+    arg1 jit-switch-context
+    RSP 8 ADD
+    jit-push-param ;
+
+[ jit-set-context ] \ (set-context) define-sub-primitive
+
+: jit-pop-quot-and-param ( -- )
+    arg1 ds-reg [] MOV
+    arg2 ds-reg -8 [+] MOV
+    ds-reg 16 SUB ;
+
+: jit-start-context ( -- )
     ! Create the new context in return-reg
     arg1 vm-reg MOV
     "new_context" jit-call
 
-    ! Load quotation and parameter from datastack
-    arg1 ds-reg [] MOV
-    arg2 ds-reg -8 [+] MOV
-    ds-reg 16 SUB
+    jit-pop-quot-and-param
 
-    ! Make the new context active
-    return-reg jit-set-context
+    return-reg jit-switch-context
 
-    ! Push parameter
-    ds-reg 8 ADD
-    ds-reg [] arg2 MOV
+    jit-push-param
 
-    ! Jump to initial quotation
-    arg1 quot-entry-point-offset [+] JMP
-] \ (start-context) define-sub-primitive
+    jit-jump-quot ;
+
+[ jit-start-context ] \ (start-context) define-sub-primitive
+
+: jit-delete-current-context ( -- )
+    jit-load-context
+    arg1 vm-reg MOV
+    arg2 ctx-reg MOV
+    "delete_context" jit-call ;
 
 [
-    ! Load context and parameter from datastack
-    temp0 ds-reg [] MOV
-    temp0 temp0 alien-offset [+] MOV
-    temp1 ds-reg -8 [+] MOV
-    ds-reg 16 SUB
+    jit-delete-current-context
+    jit-set-context
+] \ (set-context-and-delete) define-sub-primitive
 
-    ! Make the new context active
-    temp0 jit-set-context
-
-    ! Twiddle stack for return
-    RSP 8 ADD
-
-    ! Store parameter to datastack
-    ds-reg 8 ADD
-    ds-reg [] temp1 MOV
-] \ (set-context) define-sub-primitive
+[
+    jit-delete-current-context
+    jit-start-context
+] \ (start-context-and-delete) define-sub-primitive
 
 << "vocab:cpu/x86/bootstrap.factor" parse-file suffix! >>
 call

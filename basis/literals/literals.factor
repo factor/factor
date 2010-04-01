@@ -1,6 +1,6 @@
 ! (c) Joe Groff, see license for details
-USING: accessors continuations kernel parser words quotations
-vectors sequences fry ;
+USING: accessors combinators continuations fry kernel lexer
+math parser quotations sequences vectors words words.alias ;
 IN: literals
 
 <PRIVATE
@@ -8,8 +8,13 @@ IN: literals
 ! Use def>> call so that CONSTANT:s defined in the same file can
 ! be called
 
+: expand-alias ( obj -- obj' )
+    dup alias? [ def>> first expand-alias ] when ;
+
 : expand-literal ( seq obj -- seq' )
-    '[ _ dup word? [ def>> call ] when ] with-datastack ;
+    '[
+        _ expand-alias dup word? [ def>> call ] when
+    ] with-datastack ;
 
 : expand-literals ( seq -- seq' )
     [ [ { } ] dip expand-literal ] map concat ;
@@ -19,3 +24,8 @@ PRIVATE>
 SYNTAX: $ scan-word expand-literal >vector ;
 SYNTAX: $[ parse-quotation with-datastack >vector ;
 SYNTAX: ${ \ } [ expand-literals ] parse-literal ;
+SYNTAX: flags{
+    \ } [
+        expand-literals
+        0 [ bitor ] reduce
+    ] parse-literal ;
