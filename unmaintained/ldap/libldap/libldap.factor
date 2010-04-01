@@ -11,8 +11,8 @@ IN: ldap.libldap
 
 << "libldap" {
     { [ win32? ]  [ "libldap.dll" "stdcall" ] }
-    { [ macosx? ] [ "libldap.dylib" "cdecl" ] }
-    { [ unix? ]   [ "libldap.so" "cdecl" ] }
+    { [ macosx? ] [ "libldap.dylib" cdecl ] }
+    { [ unix? ]   [ "libldap.so" cdecl ] }
 } cond add-library >>
  
 : LDAP_VERSION1     1 ; inline
