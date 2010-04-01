@@ -4,7 +4,7 @@ USING: alien.c-types alien.libraries alien.syntax classes.struct
 kernel math windows.types windows.ole32 ;
 IN: windows.ddk.hid
 
-<< "hid" "hid.dll" "stdcall" add-library >>
+<< "hid" "hid.dll" stdcall add-library >>
 LIBRARY: hid
 
 TYPEDEF: LONG   NTSTATUS

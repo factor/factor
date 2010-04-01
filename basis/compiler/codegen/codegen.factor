@@ -412,7 +412,7 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
     3array ;
 
 : alien-invoke-dlsym ( params -- symbols dll )
-    [ dup abi>> "stdcall" = [ stdcall-mangle ] [ function>> ] if ]
+    [ dup abi>> stdcall = [ stdcall-mangle ] [ function>> ] if ]
     [ library>> load-library ]
     bi 2dup check-dlsym ;
 

@@ -10,7 +10,7 @@ USING: alien alien.syntax combinators kernel system ;
 IN: ldap.libldap
 
 << "libldap" {
-    { [ win32? ]  [ "libldap.dll" "stdcall" ] }
+    { [ win32? ]  [ "libldap.dll" stdcall ] }
     { [ macosx? ] [ "libldap.dylib" cdecl ] }
     { [ unix? ]   [ "libldap.so" cdecl ] }
 } cond add-library >>

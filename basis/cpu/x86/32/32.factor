@@ -292,7 +292,7 @@ M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
     dst float-function-return ;
 
 : stdcall? ( params -- ? )
-    abi>> "stdcall" = ;
+    abi>> stdcall = ;
 
 : funny-large-struct-return? ( params -- ? )
     #! MINGW ABI incompatibility disaster
