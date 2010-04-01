@@ -297,7 +297,7 @@ M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
 : funny-large-struct-return? ( params -- ? )
     #! MINGW ABI incompatibility disaster
     [ return>> large-struct? ]
-    [ abi>> "mingw" = os windows? not or ]
+    [ abi>> mingw = os windows? not or ]
     bi and ;
 
 M: x86.32 %cleanup ( params -- )
