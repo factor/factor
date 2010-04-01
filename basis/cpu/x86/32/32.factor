@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: locals alien.c-types alien.libraries alien.syntax arrays
-kernel fry math namespaces sequences system layouts io
+USING: locals alien alien.c-types alien.libraries alien.syntax
+arrays kernel fry math namespaces sequences system layouts io
 vocabs.loader accessors init combinators command-line make
 compiler compiler.units compiler.constants compiler.alien
 compiler.codegen compiler.codegen.fixup
@@ -83,10 +83,17 @@ M: x86.32 return-struct-in-registers? ( c-type -- ? )
 : struct-return@ ( n -- operand )
     [ next-stack@ ] [ stack-frame get params>> local@ ] if* ;
 
-! On x86, parameters are never passed in registers.
+! On x86, parameters are usually never passed in registers, except with Microsoft's
+! "thiscall" and "fastcall" abis
 M: int-regs return-reg drop EAX ;
-M: int-regs param-regs 2drop { } ;
 M: float-regs param-regs 2drop { } ;
+
+M: int-regs param-regs
+    nip {
+        { thiscall [ { ECX     } ] }
+        { fastcall [ { ECX EDX } ] }
+        [ drop { } ]
+    } case ;
 
 GENERIC: load-return-reg ( src rep -- )
 GENERIC: store-return-reg ( dst rep -- )
