@@ -49,7 +49,8 @@ IN: tools.deploy.macosx
         [
             nip
             [ copy-nib ]
-            [ "Contents/Resources" append-path make-directories ] bi
+            [ "Contents/Resources" append-path make-directories ]
+            [ "Contents/Frameworks" append-path make-directories ] tri
         ]
         [ copy-icns ]
         [ create-app-plist ]
