@@ -16,15 +16,15 @@ kCGImageAlphaFirst
 kCGImageAlphaNoneSkipLast
 kCGImageAlphaNoneSkipFirst ;
 
-: kCGBitmapAlphaInfoMask ( -- n ) HEX: 1f ; inline
-: kCGBitmapFloatComponents ( -- n ) 1 8 shift ; inline
+CONSTANT: kCGBitmapAlphaInfoMask HEX: 1f
+CONSTANT: kCGBitmapFloatComponents 256
 
-: kCGBitmapByteOrderMask ( -- n ) HEX: 7000 ; inline
-: kCGBitmapByteOrderDefault ( -- n ) 0 12 shift ; inline
-: kCGBitmapByteOrder16Little ( -- n ) 1 12 shift ; inline
-: kCGBitmapByteOrder32Little ( -- n ) 2 12 shift ; inline
-: kCGBitmapByteOrder16Big ( -- n ) 3 12 shift ; inline
-: kCGBitmapByteOrder32Big ( -- n ) 4 12 shift ; inline
+CONSTANT: kCGBitmapByteOrderMask HEX: 7000
+CONSTANT: kCGBitmapByteOrderDefault 0
+CONSTANT: kCGBitmapByteOrder16Little 4096
+CONSTANT: kCGBitmapByteOrder32Little 8192
+CONSTANT: kCGBitmapByteOrder16Big 12288
+CONSTANT: kCGBitmapByteOrder32Big 16384
 
 : kCGBitmapByteOrder16Host ( -- n )
     little-endian?
@@ -121,7 +121,8 @@ FUNCTION: uint GetCurrentButtonState ( ) ;
 
 <PRIVATE
 
-CONSTANT: bitmap-flags flags{ kCGImageAlphaPremultipliedFirst kCGBitmapByteOrder32Host }
+: bitmap-flags ( -- n )
+    kCGImageAlphaPremultipliedFirst kCGBitmapByteOrder32Host bitor ;
 
 : bitmap-color-space ( -- color-space )
     CGColorSpaceCreateDeviceRGB &CGColorSpaceRelease ;
