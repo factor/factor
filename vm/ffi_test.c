@@ -339,17 +339,17 @@ FACTOR_FASTCALL(int) ffi_test_53(int x, float y, int z, int w)
 	return x + y + z + w + 1;
 }
 
-FACTOR_FASTCALL(int) ffi_test_54(test_struct_11 x, int y)
+FACTOR_FASTCALL(int) ffi_test_54(struct test_struct_11 x, int y)
 {
 	return x.x + x.y + y + 1;
 }
 
-FACTOR_FASTCALL(int) ffi_test_55(test_struct_11 x, int y, int z)
+FACTOR_FASTCALL(int) ffi_test_55(struct test_struct_11 x, int y, int z)
 {
 	return x.x + x.y + y + z + 1;
 }
 
-FACTOR_FASTCALL(int) ffi_test_56(test_struct_11 x, int y, int z, int w)
+FACTOR_FASTCALL(int) ffi_test_56(struct test_struct_11 x, int y, int z, int w)
 {
 	return x.x + x.y + y + z + w + 1;
 }
