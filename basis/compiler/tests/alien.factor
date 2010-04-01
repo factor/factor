@@ -21,7 +21,7 @@ IN: compiler.tests.alien
 
 "f-cdecl" libfactor-ffi-tests-path cdecl add-library
 
-"f-stdcall" libfactor-ffi-tests-path "stdcall" add-library
+"f-stdcall" libfactor-ffi-tests-path stdcall add-library
 >>
 
 LIBRARY: f-cdecl
@@ -117,11 +117,11 @@ FUNCTION: TINY ffi_test_17 int x ;
 unit-test
 
 : indirect-test-3 ( a b c d ptr -- result )
-    int { int int int int } "stdcall" alien-indirect
+    int { int int int int } stdcall alien-indirect
     gc ;
 
 [ f ] [ "f-stdcall" load-library f = ] unit-test
-[ "stdcall" ] [ "f-stdcall" library abi>> ] unit-test
+[ stdcall ] [ "f-stdcall" library abi>> ] unit-test
 
 : ffi_test_18 ( w x y z -- int )
     int "f-stdcall" "ffi_test_18" { int int int int }

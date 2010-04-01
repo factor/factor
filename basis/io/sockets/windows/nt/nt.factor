@@ -57,7 +57,7 @@ TUPLE: ConnectEx-args port
     } cleave
     int
     { SOCKET void* int PVOID DWORD LPDWORD void* }
-    "stdcall" alien-indirect drop
+    stdcall alien-indirect drop
     winsock-error-string [ throw ] when* ; inline
 
 M: object establish-connection ( client-out remote -- )

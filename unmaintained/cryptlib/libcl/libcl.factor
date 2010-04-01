@@ -13,7 +13,7 @@ USING: alien kernel system combinators alien.syntax ;
 IN: cryptlib.libcl
 
 << "libcl" {
-        { [ win32? ] [ "cl32.dll" "stdcall" ] }
+        { [ win32? ] [ "cl32.dll" stdcall ] }
         { [ macosx? ] [ "libcl.dylib" cdecl ] }
         { [ unix? ] [ "libcl.so" cdecl ] }
     } cond add-library >>
