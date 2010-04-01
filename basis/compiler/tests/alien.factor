@@ -614,14 +614,14 @@ FUNCTION: int ffi_test_51 ( int x, int y, int z ) ;
 FUNCTION: int ffi_test_52 ( int x, float y, int z ) ;
 FUNCTION: int ffi_test_53 ( int x, float y, int z, int w ) ;
 FUNCTION: int ffi_test_54 ( test-struct-11 x, int y ) ;
-FUNCTION: int ffi_test_55 ( int x, int y, int z ) ;
-FUNCTION: int ffi_test_56 ( int x, int y, int z ) ;
+FUNCTION: int ffi_test_55 ( test-struct-11 x, int y, int z ) ;
+FUNCTION: int ffi_test_56 ( test-struct-11 x, int y, int z, int w ) ;
 
 [ 4 ] [ 3 ffi_test_49 ] unit-test
 [ 8 ] [ 3 4 ffi_test_50 ] unit-test
 [ 13 ] [ 3 4 5 ffi_test_51 ] unit-test
 [ 13 ] [ 3 4.0 5 ffi_test_52 ] unit-test
 [ 19 ] [ 3 4.0 5 6 ffi_test_53 ] unit-test
-[ 13 ] [ 3 4 test-struct-11 <struct> 5 ffi_test_54 ] unit-test
-[ 19 ] [ 3 4 test-struct-11 <struct> 5 6 ffi_test_55 ] unit-test
-[ 26 ] [ 3 4 test-struct-11 <struct> 5 6 7 ffi_test_56 ] unit-test
+[ 13 ] [ 3 4 test-struct-11 <struct-boa> 5 ffi_test_54 ] unit-test
+[ 19 ] [ 3 4 test-struct-11 <struct-boa> 5 6 ffi_test_55 ] unit-test
+[ 26 ] [ 3 4 test-struct-11 <struct-boa> 5 6 7 ffi_test_56 ] unit-test
