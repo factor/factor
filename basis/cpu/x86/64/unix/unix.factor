@@ -7,10 +7,10 @@ compiler.cfg.registers ;
 IN: cpu.x86.64.unix
 
 M: int-regs param-regs
-    drop { RDI RSI RDX RCX R8 R9 } ;
+    2drop { RDI RSI RDX RCX R8 R9 } ;
 
 M: float-regs param-regs
-    drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
+    2drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
 M: x86.64 reserved-stack-space 0 ;
 
