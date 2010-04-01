@@ -6,7 +6,7 @@ IN: alien.libraries
 
 HELP: <library>
 { $values
-     { "path" "a pathname string" } { "abi" "the ABI used by the library, either " { $snippet "cdecl" } " or " { $snippet "stdcall" } }
+     { "path" "a pathname string" } { "abi" "the ABI used by the library, either " { $snippet cdecl } " or " { $snippet "stdcall" } }
      { "library" library } }
 { $description "Opens a C library using the path and ABI parameters and outputs a library tuple." }
 { $notes "User code should use " { $link add-library } " so that the opened library is added to a global hashtable, " { $link libraries } "." } ;
@@ -19,7 +19,7 @@ HELP: library
 { $description "Looks up a library by its logical name. The library object is a hashtable with the following keys:"
     { $list
         { { $snippet "name" } " - the full path of the C library binary" }
-        { { $snippet "abi" } " - the ABI used by the library, either " { $snippet "cdecl" } " or " { $snippet "stdcall" } }
+        { { $snippet "abi" } " - the ABI used by the library, either " { $snippet cdecl } " or " { $snippet "stdcall" } }
         { { $snippet "dll" } " - an instance of the " { $link dll } " class; only set if the library is loaded" }
     }
 } ;

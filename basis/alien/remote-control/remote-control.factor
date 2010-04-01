@@ -6,14 +6,14 @@ eval ;
 IN: alien.remote-control
 
 : eval-callback ( -- callback )
-    void* { c-string } "cdecl"
+    void* { c-string } cdecl
     [ eval>string utf8 malloc-string ] alien-callback ;
 
 : yield-callback ( -- callback )
-    void { } "cdecl" [ yield ] alien-callback ;
+    void { } cdecl [ yield ] alien-callback ;
 
 : sleep-callback ( -- callback )
-    void { long } "cdecl" [ sleep ] alien-callback ;
+    void { long } cdecl [ sleep ] alien-callback ;
 
 : ?callback ( word -- alien )
     dup optimized? [ execute ] [ drop f ] if ; inline

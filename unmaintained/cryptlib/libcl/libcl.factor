@@ -14,8 +14,8 @@ IN: cryptlib.libcl
 
 << "libcl" {
         { [ win32? ] [ "cl32.dll" "stdcall" ] }
-        { [ macosx? ] [ "libcl.dylib" "cdecl" ] }
-        { [ unix? ] [ "libcl.so" "cdecl" ] }
+        { [ macosx? ] [ "libcl.dylib" cdecl ] }
+        { [ unix? ] [ "libcl.so" cdecl ] }
     } cond add-library >>
 
 ! ===============================================

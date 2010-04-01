@@ -13,8 +13,8 @@ IN: oracle.liboci
 
 "oci" {
     { [ os winnt? ] [ "oci.dll" "stdcall" ] }
-    { [ os macosx? ] [ "$DYLD_LIBRARY_PATH/libclntsh.dylib" "cdecl" ] }
-    { [ os unix? ] [ "$DYLD_LIBRARY_PATH/libclntsh.so.10.1" "cdecl" ] }
+    { [ os macosx? ] [ "$DYLD_LIBRARY_PATH/libclntsh.dylib" cdecl ] }
+    { [ os unix? ] [ "$DYLD_LIBRARY_PATH/libclntsh.so.10.1" cdecl ] }
 } cond add-library
 
 ! ===============================================

@@ -36,7 +36,7 @@ M: library dispose dll>> [ dispose ] when* ;
     [ <library> swap libraries get set-at ] 3bi ;
 
 : library-abi ( library -- abi )
-    library [ abi>> ] [ "cdecl" ] if* ;
+    library [ abi>> ] [ cdecl ] if* ;
 
 SYMBOL: deploy-libraries
 

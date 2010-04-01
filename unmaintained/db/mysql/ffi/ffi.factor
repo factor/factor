@@ -7,8 +7,8 @@ IN: db.mysql.ffi
 
 << "mysql" {
     { [ os winnt? ] [ "libmySQL.dll" "stdcall" ] }
-    { [ os macosx? ] [ "libmysqlclient.14.dylib" "cdecl" ] }
-    { [ os unix? ] [ "libmysqlclient.so.14" "cdecl" ] }
+    { [ os macosx? ] [ "libmysqlclient.14.dylib" cdecl ] }
+    { [ os unix? ] [ "libmysqlclient.so.14" cdecl ] }
 } cond add-library >>
 
 LIBRARY: mysql

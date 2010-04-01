@@ -9,7 +9,7 @@ IN: db.postgresql.ffi
     { [ os winnt? ]  [ "libpq.dll" ] }
     { [ os macosx? ] [ "libpq.dylib" ] }
     { [ os unix?  ]  [ "libpq.so" ] }
-} cond "cdecl" add-library >>
+} cond cdecl add-library >>
 
 ! ConnSatusType
 CONSTANT: CONNECTION_OK                     HEX: 0
