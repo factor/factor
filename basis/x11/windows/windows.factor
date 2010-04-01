@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math math.bitwise math.vectors
 namespaces sequences x11 x11.xlib x11.constants x11.glx arrays
-fry classes.struct ;
+fry classes.struct literals ;
 IN: x11.windows
 
 CONSTANT: create-window-mask
