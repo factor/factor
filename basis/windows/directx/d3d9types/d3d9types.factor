@@ -1,5 +1,5 @@
 USING: alien.syntax windows.types classes.struct math alien.c-types
-math.bitwise kernel locals windows.kernel32 ;
+math.bitwise kernel locals windows.kernel32 literals ;
 IN: windows.directx.d3d9types
 
 TYPEDEF: DWORD D3DCOLOR
@@ -54,19 +54,21 @@ CONSTANT: D3DCS_PLANE3      HEX: 00000200
 CONSTANT: D3DCS_PLANE4      HEX: 00000400
 CONSTANT: D3DCS_PLANE5      HEX: 00000800
 
-: D3DCS_ALL ( -- n )
-    { D3DCS_LEFT
-      D3DCS_RIGHT
-      D3DCS_TOP
-      D3DCS_BOTTOM
-      D3DCS_FRONT
-      D3DCS_BACK
-      D3DCS_PLANE0
-      D3DCS_PLANE1
-      D3DCS_PLANE2
-      D3DCS_PLANE3
-      D3DCS_PLANE4
-      D3DCS_PLANE5 } flags ; inline
+CONSTANT: D3DCS_ALL
+    flags{
+        D3DCS_LEFT
+        D3DCS_RIGHT
+        D3DCS_TOP
+        D3DCS_BOTTOM
+        D3DCS_FRONT
+        D3DCS_BACK
+        D3DCS_PLANE0
+        D3DCS_PLANE1
+        D3DCS_PLANE2
+        D3DCS_PLANE3
+        D3DCS_PLANE4
+        D3DCS_PLANE5
+    }
 
 STRUCT: D3DCLIPSTATUS9
     { ClipUnion        DWORD }
@@ -777,8 +779,7 @@ CONSTANT: D3DVS_SWIZZLE_MASK      HEX: 00FF0000
 : D3DVS_W_Z ( -- n ) 2 D3DVS_SWIZZLE_SHIFT 6 + shift ; inline
 : D3DVS_W_W ( -- n ) 3 D3DVS_SWIZZLE_SHIFT 6 + shift ; inline
 
-: D3DVS_NOSWIZZLE ( -- n )
-    { D3DVS_X_X D3DVS_Y_Y D3DVS_Z_Z D3DVS_W_W } flags ; inline
+CONSTANT: D3DVS_NOSWIZZLE flags{ D3DVS_X_X D3DVS_Y_Y D3DVS_Z_Z D3DVS_W_W }
 
 CONSTANT: D3DSP_SWIZZLE_SHIFT     16
 CONSTANT: D3DSP_SWIZZLE_MASK      HEX: 00FF0000

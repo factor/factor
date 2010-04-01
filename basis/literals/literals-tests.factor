@@ -1,4 +1,4 @@
-USING: kernel literals math tools.test ;
+USING: accessors kernel literals math tools.test ;
 IN: literals.tests
 
 <<
@@ -27,3 +27,16 @@ CONSTANT: constant-a 3
 : sixty-nine ( -- a b ) 6 9 ;
 
 [ { 6 9 } ] [ ${ sixty-nine } ] unit-test
+
+CONSTANT: a 1
+CONSTANT: b 2
+ALIAS: c b
+ALIAS: d c
+
+CONSTANT: foo flags{ a b d }
+
+[ 3 ] [ foo ] unit-test
+[ 3 ] [ flags{ a b d } ] unit-test
+\ foo def>> must-infer
+
+[ 1 ] [ flags{ 1 } ] unit-test

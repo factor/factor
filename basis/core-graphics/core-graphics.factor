@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.destructors alien.syntax accessors
 destructors fry kernel math math.bitwise sequences libc colors
 images images.memory core-graphics.types core-foundation.utilities
-opengl.gl ;
+opengl.gl literals ;
 IN: core-graphics
 
 ! CGImageAlphaInfo
@@ -121,8 +121,7 @@ FUNCTION: uint GetCurrentButtonState ( ) ;
 
 <PRIVATE
 
-: bitmap-flags ( -- flags )
-    { kCGImageAlphaPremultipliedFirst kCGBitmapByteOrder32Host } flags ;
+CONSTANT: bitmap-flags flags{ kCGImageAlphaPremultipliedFirst kCGBitmapByteOrder32Host }
 
 : bitmap-color-space ( -- color-space )
     CGColorSpaceCreateDeviceRGB &CGColorSpaceRelease ;
