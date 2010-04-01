@@ -8,8 +8,8 @@ USING: alien sequences alien.libraries ;
     { "winsock"     "ws2_32.dll"         "stdcall" }
     { "mswsock"     "mswsock.dll"        "stdcall" }
     { "shell32"     "shell32.dll"        "stdcall" }
-    { "libc"        "msvcrt.dll"         "cdecl"   }
-    { "libm"        "msvcrt.dll"         "cdecl"   }
+    { "libc"        "msvcrt.dll"         cdecl   }
+    { "libm"        "msvcrt.dll"         cdecl   }
     { "gl"          "opengl32.dll"       "stdcall" }
     { "glu"         "glu32.dll"          "stdcall" }
     { "ole32"       "ole32.dll"          "stdcall" }

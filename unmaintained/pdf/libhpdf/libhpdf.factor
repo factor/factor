@@ -11,8 +11,8 @@ IN: pdf.libhpdf
 
 << "libhpdf" {
     { [ win32? ] [ "libhpdf.dll" "stdcall" ] }
-    { [ macosx? ] [ "libhpdf.dylib" "cdecl" ] }
-    { [ unix? ] [ "$LD_LIBRARY_PATH/libhpdf.so" "cdecl" ] }
+    { [ macosx? ] [ "libhpdf.dylib" cdecl ] }
+    { [ unix? ] [ "$LD_LIBRARY_PATH/libhpdf.so" cdecl ] }
 } cond add-library >>
 
 ! compression mode

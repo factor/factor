@@ -10,8 +10,8 @@ alien.libraries classes.struct ;
 
 IN: cairo.ffi
 << {
-    { [ os winnt? ] [ "cairo" "libcairo-2.dll" "cdecl" add-library ] }
-    { [ os macosx? ] [ "cairo" "/opt/local/lib/libcairo.dylib" "cdecl" add-library ] }
+    { [ os winnt? ] [ "cairo" "libcairo-2.dll" cdecl add-library ] }
+    { [ os macosx? ] [ "cairo" "/opt/local/lib/libcairo.dylib" cdecl add-library ] }
     { [ os unix? ] [ ] }
 } cond >>
 
@@ -38,7 +38,7 @@ TYPEDEF: void* cairo_pattern_t
 
 TYPEDEF: void* cairo_destroy_func_t
 : cairo-destroy-func ( quot -- callback )
-    [ void { pointer: void } "cdecl" ] dip alien-callback ; inline
+    [ void { pointer: void } cdecl ] dip alien-callback ; inline
 
 ! See cairo.h for details
 STRUCT: cairo_user_data_key_t
@@ -79,11 +79,11 @@ CONSTANT: CAIRO_CONTENT_COLOR_ALPHA HEX: 3000
 
 TYPEDEF: void* cairo_write_func_t
 : cairo-write-func ( quot -- callback )
-    [ cairo_status_t { pointer: void c-string int } "cdecl" ] dip alien-callback ; inline
+    [ cairo_status_t { pointer: void c-string int } cdecl ] dip alien-callback ; inline
                           
 TYPEDEF: void* cairo_read_func_t
 : cairo-read-func ( quot -- callback )
-    [ cairo_status_t { pointer: void c-string int } "cdecl" ] dip alien-callback ; inline
+    [ cairo_status_t { pointer: void c-string int } cdecl ] dip alien-callback ; inline
 
 ! Functions for manipulating state objects
 FUNCTION: cairo_t*
