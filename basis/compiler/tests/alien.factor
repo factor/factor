@@ -22,6 +22,8 @@ IN: compiler.tests.alien
 "f-cdecl" libfactor-ffi-tests-path cdecl add-library
 
 "f-stdcall" libfactor-ffi-tests-path stdcall add-library
+
+"f-fastcall" libfactor-ffi-tests-path fastcall add-library
 >>
 
 LIBRARY: f-cdecl
@@ -603,3 +605,23 @@ FUNCTION: void this_does_not_exist ( ) ;
 : assembly-test-1 ( -- ) void { } cdecl [ ] alien-assembly ;
 
 [ ] [ assembly-test-1 ] unit-test
+
+LIBRARY: f-fastcall
+
+FUNCTION: int ffi_test_49 ( int x ) ;
+FUNCTION: int ffi_test_50 ( int x, int y ) ;
+FUNCTION: int ffi_test_51 ( int x, int y, int z ) ;
+FUNCTION: int ffi_test_52 ( int x, float y, int z ) ;
+FUNCTION: int ffi_test_53 ( int x, float y, int z, int w ) ;
+FUNCTION: int ffi_test_54 ( test-struct-11 x, int y ) ;
+FUNCTION: int ffi_test_55 ( int x, int y, int z ) ;
+FUNCTION: int ffi_test_56 ( int x, int y, int z ) ;
+
+[ 4 ] [ 3 ffi_test_49 ] unit-test
+[ 8 ] [ 3 4 ffi_test_50 ] unit-test
+[ 13 ] [ 3 4 5 ffi_test_51 ] unit-test
+[ 13 ] [ 3 4.0 5 ffi_test_52 ] unit-test
+[ 19 ] [ 3 4.0 5 6 ffi_test_53 ] unit-test
+[ 13 ] [ 3 4 test-struct-11 <struct> 5 ffi_test_54 ] unit-test
+[ 19 ] [ 3 4 test-struct-11 <struct> 5 6 ffi_test_55 ] unit-test
+[ 26 ] [ 3 4 test-struct-11 <struct> 5 6 7 ffi_test_56 ] unit-test
