@@ -60,6 +60,8 @@ $nl
 }
 "You must always free pointers returned by any of the above words when the block of memory is no longer in use:"
 { $subsections free }
+"The above words record memory allocations, to help catch double frees and track down memory leaks with " { $link "tools.destructors" } ". To free memory allocated by a C library, another word can be used:"
+{ $subsections (free) }
 "Utilities for automatically freeing memory in conjunction with " { $link with-destructors } ":"
 { $subsections
     &free
@@ -148,9 +150,9 @@ $nl
 }
 "The first allocates " { $link byte-array } "s, and the latter allocates manually-managed memory which is not moved by the garbage collector and has to be explicitly freed by calling " { $link free } ". See " { $link "byte-arrays-gc" } " for a discussion of the two approaches."
 $nl
-"The C type " { $link char } { $snippet "*" } " represents a generic pointer to " { $snippet "char" } "; arguments with this type will expect and return " { $link alien } "s, and won't perform any implicit string conversion."
+"The C type " { $snippet "char*" } " represents a generic pointer to " { $snippet "char" } "; arguments with this type will expect and return " { $link alien } "s, and won't perform any implicit string conversion."
 $nl
 "A word to read strings from arbitrary addresses:"
 { $subsections alien>string }
-"For example, if a C function returns a " { $link c-string } " but stipulates that the caller must deallocate the memory afterward, you must define the function as returning " { $snippet "char*" } " and call one of the above words before passing the pointer to " { $link free } "." ;
+"For example, if a C function returns a " { $link c-string } " but stipulates that the caller must deallocate the memory afterward, you must define the function as returning " { $snippet "char*" } " and call " { $link (free) } " yourself." ;
 

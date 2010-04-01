@@ -12,7 +12,8 @@
 ! and note the section.
 USING: accessors kernel arrays alien alien.c-types alien.data
 alien.strings alien.syntax classes.struct math math.bitwise words
-sequences namespaces continuations io io.encodings.ascii x11.syntax ;
+sequences namespaces continuations io io.encodings.ascii x11.syntax
+literals ;
 FROM: alien.c-types => short ;
 IN: x11.xlib
 
@@ -1134,8 +1135,8 @@ X-FUNCTION: Status XWithdrawWindow (
 : PAspect      ( -- n ) 7 2^ ; inline
 : PBaseSize    ( -- n ) 8 2^ ; inline
 : PWinGravity  ( -- n ) 9 2^ ; inline
-: PAllHints    ( -- n )
-    { PPosition PSize PMinSize PMaxSize PResizeInc PAspect } flags ; foldable
+CONSTANT: PAllHints
+    flags{ PPosition PSize PMinSize PMaxSize PResizeInc PAspect }
 
 STRUCT: XSizeHints
     { flags long }

@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax combinators kernel
 system namespaces assocs parser lexer sequences words
-quotations math.bitwise alien.libraries ;
+quotations math.bitwise alien.libraries literals ;
 
 IN: openssl.libssl
 
@@ -258,15 +258,14 @@ CONSTANT: SSL_SESS_CACHE_OFF    HEX: 0000
 CONSTANT: SSL_SESS_CACHE_CLIENT HEX: 0001
 CONSTANT: SSL_SESS_CACHE_SERVER HEX: 0002
 
-: SSL_SESS_CACHE_BOTH ( -- n )
-    { SSL_SESS_CACHE_CLIENT SSL_SESS_CACHE_SERVER } flags ; inline
+CONSTANT: SSL_SESS_CACHE_BOTH flags{ SSL_SESS_CACHE_CLIENT SSL_SESS_CACHE_SERVER }
 
 CONSTANT: SSL_SESS_CACHE_NO_AUTO_CLEAR      HEX: 0080
 CONSTANT: SSL_SESS_CACHE_NO_INTERNAL_LOOKUP HEX: 0100
 CONSTANT: SSL_SESS_CACHE_NO_INTERNAL_STORE  HEX: 0200
 
-: SSL_SESS_CACHE_NO_INTERNAL ( -- n )
-    { SSL_SESS_CACHE_NO_INTERNAL_LOOKUP SSL_SESS_CACHE_NO_INTERNAL_STORE } flags ; inline
+CONSTANT: SSL_SESS_CACHE_NO_INTERNAL
+    flags{ SSL_SESS_CACHE_NO_INTERNAL_LOOKUP SSL_SESS_CACHE_NO_INTERNAL_STORE }
 
 ! ===============================================
 ! x509_vfy.h

@@ -628,7 +628,7 @@ M: windows-ui-backend do-events
     WNDCLASSEX <struct> f GetModuleHandle
     class-name-ptr pick GetClassInfoEx 0 = [
         WNDCLASSEX heap-size >>cbSize
-        { CS_HREDRAW CS_VREDRAW CS_OWNDC } flags >>style
+        flags{ CS_HREDRAW CS_VREDRAW CS_OWNDC } >>style
         ui-wndproc >>lpfnWndProc
         0 >>cbClsExtra
         0 >>cbWndExtra
@@ -811,8 +811,7 @@ M: windows-ui-backend (ungrab-input) ( handle -- )
     f ClipCursor drop
     1 ShowCursor drop ;
 
-: fullscreen-flags ( -- n )
-    { WS_CAPTION WS_BORDER WS_THICKFRAME } flags ; inline
+CONSTANT: fullscreen-flags { WS_CAPTION WS_BORDER WS_THICKFRAME }
 
 : enter-fullscreen ( world -- )
     handle>> hWnd>>
@@ -838,7 +837,7 @@ M: windows-ui-backend (ungrab-input) ( handle -- )
         [
             f
             over hwnd>RECT get-RECT-dimensions
-            { SWP_NOMOVE SWP_NOSIZE SWP_NOZORDER SWP_FRAMECHANGED } flags
+            flags{ SWP_NOMOVE SWP_NOSIZE SWP_NOZORDER SWP_FRAMECHANGED }
             SetWindowPos win32-error=0/f
         ]
         [ SW_RESTORE ShowWindow win32-error=0/f ]

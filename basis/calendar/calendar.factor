@@ -99,12 +99,12 @@ CONSTANT: day-abbreviations3
 : day-abbreviation3 ( n -- string )
     day-abbreviations3 nth ; inline
 
-: average-month ( -- ratio ) 30+5/12 ; inline
-: months-per-year ( -- integer ) 12 ; inline
-: days-per-year ( -- ratio ) 3652425/10000 ; inline
-: hours-per-year ( -- ratio ) 876582/100 ; inline
-: minutes-per-year ( -- ratio ) 5259492/10 ; inline
-: seconds-per-year ( -- integer ) 31556952 ; inline
+CONSTANT: average-month 30+5/12
+CONSTANT: months-per-year 12
+CONSTANT: days-per-year 3652425/10000
+CONSTANT: hours-per-year 876582/100
+CONSTANT: minutes-per-year 5259492/10
+CONSTANT: seconds-per-year 31556952
 
 :: julian-day-number ( year month day -- n )
     #! Returns a composite date number
@@ -200,7 +200,7 @@ GENERIC: +second ( timestamp x -- timestamp )
     [ 3 >>month 1 >>day ] when ;
 
 M: integer +year ( timestamp n -- timestamp )
-    [ [ + ] curry change-year adjust-leap-year ] unless-zero ;
+    [ + ] curry change-year adjust-leap-year ;
 
 M: real +year ( timestamp n -- timestamp )
     [ float>whole-part swapd days-per-year * +day swap +year ] unless-zero ;

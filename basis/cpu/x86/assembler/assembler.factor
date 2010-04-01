@@ -188,6 +188,13 @@ M: register displacement, drop ;
 
 PRIVATE>
 
+! Segment override prefixes
+: CS ( -- ) HEX: 2e , ;
+: ES ( -- ) HEX: 26 , ;
+: SS ( -- ) HEX: 36 , ;
+: FS ( -- ) HEX: 64 , ;
+: GS ( -- ) HEX: 65 , ;
+
 ! Moving stuff
 GENERIC: PUSH ( op -- )
 M: register PUSH f HEX: 50 short-operand ;

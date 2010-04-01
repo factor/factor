@@ -5,7 +5,7 @@ io.files io.pathnames io.buffers io.ports io.timeouts
 io.backend.unix io.encodings.utf8 unix.linux.inotify assocs
 namespaces make threads continuations init math math.bitwise
 sets alien alien.strings alien.c-types vocabs.loader accessors
-system hashtables destructors unix classes.struct ;
+system hashtables destructors unix classes.struct literals ;
 FROM: namespaces => set ;
 IN: io.monitors.linux
 
@@ -65,13 +65,13 @@ M: linux-monitor dispose* ( monitor -- )
     tri ;
 
 : ignore-flags? ( mask -- ? )
-    {
+    flags{
         IN_DELETE_SELF
         IN_MOVE_SELF
         IN_UNMOUNT
         IN_Q_OVERFLOW
         IN_IGNORED
-    } flags bitand 0 > ;
+    } bitand 0 > ;
 
 : parse-action ( mask -- changed )
     [
