@@ -606,17 +606,34 @@ FUNCTION: void this_does_not_exist ( ) ;
 
 [ ] [ assembly-test-1 ] unit-test
 
-LIBRARY: f-fastcall
+[ f ] [ "f-fastcall" load-library f = ] unit-test
+[ fastcall ] [ "f-fastcall" library abi>> ] unit-test
 
-FUNCTION: int ffi_test_49 ( int x ) ;
-FUNCTION: int ffi_test_50 ( int x, int y ) ;
-FUNCTION: int ffi_test_51 ( int x, int y, int z ) ;
-FUNCTION: int ffi_test_52 ( int x, float y, int z ) ;
-FUNCTION: int ffi_test_53 ( int x, float y, int z, int w ) ;
-FUNCTION: int ffi_test_54 ( test-struct-11 x, int y ) ;
-FUNCTION: int ffi_test_55 ( test-struct-11 x, int y, int z ) ;
-FUNCTION: int ffi_test_56 ( test-struct-11 x, int y, int z, int w ) ;
-
+: ffi_test_49 ( x -- int )
+    int "f-fastcall" "ffi_test_49" { int }
+    alien-invoke gc ;
+: ffi_test_50 ( x y -- int )
+    int "f-fastcall" "ffi_test_50" { int int }
+    alien-invoke gc ;
+: ffi_test_51 ( x y z -- int )
+    int "f-fastcall" "ffi_test_51" { int int int }
+    alien-invoke gc ;
+: ffi_test_52 ( x y z -- int )
+    int "f-fastcall" "ffi_test_52" { int float int }
+    alien-invoke gc ;
+: ffi_test_53 ( x y z w -- int )
+    int "f-fastcall" "ffi_test_53" { int int int int }
+    alien-invoke gc ;
+: ffi_test_54 ( x y -- int )
+    int "f-fastcall" "ffi_test_54" { test-struct-11 int }
+    alien-invoke gc ;
+: ffi_test_55 ( x y z -- int )
+    int "f-fastcall" "ffi_test_55" { test-struct-11 int int }
+    alien-invoke gc ;
+: ffi_test_56 ( x y z w -- int )
+    int "f-fastcall" "ffi_test_56" { test-struct-11 int int int }
+    alien-invoke gc ;
+    
 [ 4 ] [ 3 ffi_test_49 ] unit-test
 [ 8 ] [ 3 4 ffi_test_50 ] unit-test
 [ 13 ] [ 3 4 5 ffi_test_51 ] unit-test
