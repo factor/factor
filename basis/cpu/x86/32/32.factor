@@ -85,8 +85,8 @@ M: x86.32 return-struct-in-registers? ( c-type -- ? )
 
 ! On x86, parameters are never passed in registers.
 M: int-regs return-reg drop EAX ;
-M: int-regs param-regs drop { } ;
-M: float-regs param-regs drop { } ;
+M: int-regs param-regs 2drop { } ;
+M: float-regs param-regs 2drop { } ;
 
 GENERIC: load-return-reg ( src rep -- )
 GENERIC: store-return-reg ( dst rep -- )
@@ -297,14 +297,17 @@ M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
     [ abi>> mingw = os windows? not or ]
     bi and ;
 
+: callee-cleanup? ( abi -- ? )
+    { stdcall fastcall thiscall } member? ;
+
 M: x86.32 %cleanup ( params -- )
-    #! a) If we just called an stdcall function in Windows, it
+    #! a) If we just called a stdcall function in Windows, it
     #! cleaned up the stack frame for us. But we don't want that
     #! so we 'undo' the cleanup since we do that in %epilogue.
     #! b) If we just called a function returning a struct, we
     #! have to fix ESP.
     {
-        { [ dup abi>> stdcall? ] [ drop ESP stack-frame get params>> SUB ] }
+        { [ dup abi>> callee-cleanup? ] [ drop ESP stack-frame get params>> SUB ] }
         { [ dup funny-large-struct-return? ] [ drop EAX PUSH ] }
         [ drop ]
     } cond ;
