@@ -9,7 +9,7 @@ IN: compiler.alien
 
 : alien-parameters ( params -- seq )
     dup parameters>>
-    swap return>> large-struct? [ void* prefix ] when ;
+    swap return>> large-struct? [ struct-return-pointer-type prefix ] when ;
 
 : alien-return ( params -- type )
     return>> dup large-struct? [ drop void ] when ;

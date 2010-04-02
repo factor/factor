@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: locals alien alien.c-types alien.libraries alien.syntax
 arrays kernel fry math namespaces sequences system layouts io
-vocabs.loader accessors init combinators command-line make
-compiler compiler.units compiler.constants compiler.alien
+vocabs.loader accessors init classes.struct combinators command-line
+make compiler compiler.units compiler.constants compiler.alien
 compiler.codegen compiler.codegen.fixup
 compiler.cfg.instructions compiler.cfg.builder
 compiler.cfg.intrinsics compiler.cfg.stack-frame
@@ -357,6 +357,12 @@ M: x86.32 callback-return-rewind ( params -- n )
     } cond ;
 
 ! Dreadful
-M: object flatten-value-type (flatten-int-type) ;
+M: object flatten-value-type (flatten-stack-type) ;
+M: struct-c-type flatten-value-type (flatten-stack-type) ;
+M: long-long-type flatten-value-type (flatten-stack-type) ;
+M: c-type flatten-value-type
+    dup rep>> int-rep? [ (flatten-int-type) ] [ (flatten-stack-type) ] if ;
+
+M: x86.64 struct-return-pointer-type (stack-value) ;
 
 check-sse

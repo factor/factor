@@ -502,6 +502,9 @@ HOOK: immediate-arithmetic? cpu ( n -- ? )
 ! %and-imm, %or-imm, and %xor-imm?
 HOOK: immediate-bitwise? cpu ( n -- ? )
 
+! What c-type describes the implicit struct return pointer for large structs?
+HOOK: struct-return-pointer-type cpu ( -- c-type )
+
 ! Is this structure small enough to be returned in registers?
 HOOK: return-struct-in-registers? cpu ( c-type -- ? )
 
