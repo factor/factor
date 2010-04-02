@@ -60,6 +60,8 @@ CONSTANT: vm-reg 15
 
 M: ppc %vm-field ( dst field -- ) [ vm-reg ] dip LWZ ;
 
+M: ppc %set-vm-field ( src field -- ) [ vm-reg ] dip STW ;
+
 GENERIC: loc-reg ( loc -- reg )
 
 M: ds-loc loc-reg drop ds-reg ;
@@ -563,8 +565,7 @@ M:: ppc %compare-float-unordered-branch ( label src1 src2 cc -- )
     } case ;
 
 : next-param@ ( n -- reg x )
-    2 1 stack-frame get total-size>> LWZ
-    [ 2 ] dip param@ ;
+    [ 17 ] dip param@ ;
 
 : store-to-frame ( src n rep -- )
     {
@@ -745,14 +746,14 @@ M: ppc %alien-callback ( quot -- )
 
 M: ppc %end-callback ( -- )
     3 %load-vm-addr
-    "unnest_context" f %alien-invoke ;
+    "end_callback" f %alien-invoke ;
 
 M: ppc %end-callback-value ( ctype -- )
     ! Save top of data stack
-    12 ds-reg 0 LWZ
+    16 ds-reg 0 LWZ
     %end-callback
     ! Restore top of data stack
-    3 12 MR
+    3 16 MR
     ! Unbox former top of data stack to return registers
     unbox-return ;
 
