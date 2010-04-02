@@ -58,11 +58,9 @@ CONSTANT: vm-reg 15
 
 : %load-vm-addr ( reg -- ) vm-reg MR ;
 
-M: ppc %vm-field ( dst field -- )
-    [ vm-reg ] dip vm-field-offset LWZ ;
+M: ppc %vm-field ( dst field -- ) [ vm-reg ] dip LWZ ;
 
-M: ppc %vm-field-ptr ( dst field -- )
-    [ vm-reg ] dip vm-field-offset ADDI ;
+M: ppc %set-vm-field ( src field -- ) [ vm-reg ] dip STW ;
 
 GENERIC: loc-reg ( loc -- reg )
 
@@ -385,7 +383,7 @@ M: ppc %set-alien-float -rot STFS ;
 M: ppc %set-alien-double -rot STFD ;
 
 : load-zone-ptr ( reg -- )
-    "nursery" %vm-field-ptr ;
+    vm-reg "nursery" vm-field-offset ADDI ;
 
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
     [ drop load-zone-ptr ] [ swap 0 LWZ ] 2bi ;
@@ -567,8 +565,7 @@ M:: ppc %compare-float-unordered-branch ( label src1 src2 cc -- )
     } case ;
 
 : next-param@ ( n -- reg x )
-    2 1 stack-frame get total-size>> LWZ
-    [ 2 ] dip param@ ;
+    [ 17 ] dip param@ ;
 
 : store-to-frame ( src n rep -- )
     {
@@ -604,14 +601,14 @@ M: ppc %push-stack ( -- )
     int-regs return-reg ds-reg 0 STW ;
 
 M: ppc %push-context-stack ( -- )
-    11 "ctx" %vm-field
+    11 %context
     12 11 "datastack" context-field-offset LWZ
     12 12 4 ADDI
     12 11 "datastack" context-field-offset STW
     int-regs return-reg 12 0 STW ;
 
 M: ppc %pop-context-stack ( -- )
-    11 "ctx" %vm-field
+    11 %context
     12 11 "datastack" context-field-offset LWZ
     int-regs return-reg 12 0 LWZ
     12 12 4 SUBI
@@ -677,12 +674,12 @@ M: ppc %box-large-struct ( n c-type -- )
     "from_value_struct" f %alien-invoke ;
 
 M:: ppc %restore-context ( temp1 temp2 -- )
-    temp1 "ctx" %vm-field
+    temp1 %context
     ds-reg temp1 "datastack" context-field-offset LWZ
     rs-reg temp1 "retainstack" context-field-offset LWZ ;
 
 M:: ppc %save-context ( temp1 temp2 -- )
-    temp1 "ctx" %vm-field
+    temp1 %context
     1 temp1 "callstack-top" context-field-offset STW
     ds-reg temp1 "datastack" context-field-offset STW
     rs-reg temp1 "retainstack" context-field-offset STW ;
@@ -749,14 +746,14 @@ M: ppc %alien-callback ( quot -- )
 
 M: ppc %end-callback ( -- )
     3 %load-vm-addr
-    "unnest_context" f %alien-invoke ;
+    "end_callback" f %alien-invoke ;
 
 M: ppc %end-callback-value ( ctype -- )
     ! Save top of data stack
-    12 ds-reg 0 LWZ
+    16 ds-reg 0 LWZ
     %end-callback
     ! Restore top of data stack
-    3 12 MR
+    3 16 MR
     ! Unbox former top of data stack to return registers
     unbox-return ;
 

@@ -11,17 +11,20 @@ IN: threads
 
 ! Wrap sub-primitives; we don't want them inlined into callers
 ! since their behavior depends on what frames are on the callstack
+: context ( -- context )
+    2 context-object ; inline
+
 : set-context ( obj context -- obj' )
-    (set-context) ;
+    (set-context) ; inline
 
 : start-context ( obj quot: ( obj -- * ) -- obj' )
-    (start-context) ;
+    (start-context) ; inline
 
 : set-context-and-delete ( obj context -- * )
-    (set-context-and-delete) ;
+    (set-context-and-delete) ; inline
 
 : start-context-and-delete ( obj quot: ( obj -- * ) -- * )
-    (start-context-and-delete) ;
+    (start-context-and-delete) ; inline
 
 ! Context introspection
 : namestack-for ( context -- namestack )
@@ -80,23 +83,13 @@ sleep-entry ;
 : thread-registered? ( thread -- ? )
     id>> threads key? ;
 
-ERROR: already-stopped thread ;
-
-: check-unregistered ( thread -- thread )
-    dup thread-registered? [ already-stopped ] when ;
-
-ERROR: not-running thread ;
-
-: check-registered ( thread -- thread )
-    dup thread-registered? [ not-running ] unless ;
-
 <PRIVATE
 
 : register-thread ( thread -- )
-    check-unregistered dup id>> threads set-at ;
+    dup id>> threads set-at ;
 
 : unregister-thread ( thread -- )
-    check-registered id>> threads delete-at ;
+    id>> threads delete-at ;
 
 : set-self ( thread -- ) 63 set-special-object ; inline
 
@@ -106,7 +99,7 @@ PRIVATE>
     65 special-object { dlist } declare ; inline
 
 : sleep-queue ( -- heap )
-    66 special-object { dlist } declare ; inline
+    66 special-object { min-heap } declare ; inline
 
 : new-thread ( quot name class -- thread )
     new
@@ -120,16 +113,13 @@ PRIVATE>
     \ thread new-thread ;
 
 : resume ( thread -- )
-    f >>state
-    check-registered run-queue push-front ;
+    f >>state run-queue push-front ;
 
 : resume-now ( thread -- )
-    f >>state
-    check-registered run-queue push-back ;
+    f >>state run-queue push-back ;
 
 : resume-with ( obj thread -- )
-    f >>state
-    check-registered 2array run-queue push-front ;
+    f >>state 2array run-queue push-front ;
 
 : sleep-time ( -- nanos/f )
     {
@@ -150,22 +140,19 @@ DEFER: stop
 <PRIVATE
 
 : schedule-sleep ( thread dt -- )
-    [ check-registered dup ] dip sleep-queue heap-push*
-    >>sleep-entry drop ;
+    dupd sleep-queue heap-push* >>sleep-entry drop ;
 
-: expire-sleep? ( heap -- ? )
-    dup heap-empty?
+: expire-sleep? ( -- ? )
+    sleep-queue dup heap-empty?
     [ drop f ] [ heap-peek nip nano-count <= ] if ;
 
 : expire-sleep ( thread -- )
     f >>sleep-entry resume ;
 
 : expire-sleep-loop ( -- )
-    sleep-queue
-    [ dup expire-sleep? ]
-    [ dup heap-pop drop expire-sleep ]
-    while
-    drop ;
+    [ expire-sleep? ]
+    [ sleep-queue heap-pop drop expire-sleep ]
+    while ;
 
 CONSTANT: [start]
     [
@@ -177,7 +164,9 @@ CONSTANT: [start]
 
 : no-runnable-threads ( -- ) die ;
 
-: (next) ( obj thread -- obj' )
+GENERIC: (next) ( obj thread -- obj' )
+
+M: thread (next)
     dup runnable>>
     [ context>> box> set-context ]
     [ t >>runnable drop [start] start-context ] if ;

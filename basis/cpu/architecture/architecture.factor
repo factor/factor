@@ -447,8 +447,10 @@ HOOK: %set-alien-double    cpu ( ptr offset value -- )
 HOOK: %set-alien-vector    cpu ( ptr offset value rep -- )
 
 HOOK: %alien-global cpu ( dst symbol library -- )
-HOOK: %vm-field cpu ( dst fieldname -- )
-HOOK: %vm-field-ptr cpu ( dst fieldname -- )
+HOOK: %vm-field cpu ( dst offset -- )
+HOOK: %set-vm-field cpu ( src offset -- )
+
+: %context ( dst -- ) 0 %vm-field ;
 
 HOOK: %allot cpu ( dst size class temp -- )
 HOOK: %write-barrier cpu ( src slot temp1 temp2 -- )

@@ -538,7 +538,6 @@ tuple
     { "system-micros" "system" "primitive_system_micros" (( -- us )) }
     { "(sleep)" "threads.private" "primitive_sleep" (( nanos -- )) }
     { "callstack-for" "threads.private" "primitive_callstack_for" (( context -- array )) }
-    { "context" "threads.private" "primitive_context" (( -- context )) }
     { "context-object-for" "threads.private" "primitive_context_object_for" (( n context -- obj )) }
     { "datastack-for" "threads.private" "primitive_datastack_for" (( context -- array )) }
     { "retainstack-for" "threads.private" "primitive_retainstack_for" (( context -- array )) }
