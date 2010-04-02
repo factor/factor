@@ -6,7 +6,7 @@ LINK_FLAGS = /nologo shell32.lib
 CL_FLAGS = /nologo /O2 /W3
 !ENDIF
 
-EXE_OBJS = factor.dll.lib vm\main-windows-nt.obj vm\factor.res
+EXE_OBJS = vm\main-windows-nt.obj vm\factor.res
 
 DLL_OBJS = vm\os-windows-nt.obj \
 	vm\os-windows.obj \
@@ -63,7 +63,7 @@ DLL_OBJS = vm\os-windows-nt.obj \
 .rs.res:
 	rc $<
 
-all: factor.com factor.exe libfactor-ffi-test.dll
+all: factor.com factor.exe factor.dll.lib libfactor-ffi-test.dll
 
 libfactor-ffi-test.dll: vm/ffi_test.obj
 	link $(LINK_FLAGS) /out:libfactor-ffi-test.dll /dll vm/ffi_test.obj
@@ -71,11 +71,11 @@ libfactor-ffi-test.dll: vm/ffi_test.obj
 factor.dll.lib: $(DLL_OBJS)
 	link $(LINK_FLAGS) /implib:factor.dll.lib /out:factor.dll /dll $(DLL_OBJS)
 
-factor.com: $(EXE_OBJS)
-	link $(LINK_FLAGS) /out:factor.com /SUBSYSTEM:console $(EXE_OBJS)
+factor.com: $(EXE_OBJS) $(DLL_OBJS)
+	link $(LINK_FLAGS) /out:factor.com /SUBSYSTEM:console $(EXE_OBJS) $(DLL_OBJS)
 
-factor.exe: $(EXE_OBJS)
-	link $(LINK_FLAGS) /out:factor.exe /SUBSYSTEM:windows $(EXE_OBJS)
+factor.exe: $(EXE_OBJS) $(DLL_OBJS)
+	link $(LINK_FLAGS) /out:factor.exe /SUBSYSTEM:windows $(EXE_OBJS) $(DLL_OBJS)
 
 clean:
 	del vm\*.obj
