@@ -423,8 +423,13 @@ M: x86 %sar int-rep two-operand [ SAR ] emit-shift ;
 
 HOOK: %mov-vm-ptr cpu ( reg -- )
 
+HOOK: %vm-field-ptr cpu ( reg offset -- )
+
+: load-zone-offset ( nursery-ptr -- )
+    "nursery" vm-field-offset %vm-field-ptr ;
+
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
-    [ drop "nursery" %vm-field-ptr ] [ swap [] MOV ] 2bi ;
+    [ drop load-zone-offset ] [ swap [] MOV ] 2bi ;
 
 : inc-allot-ptr ( nursery-ptr n -- )
     [ [] ] dip data-alignment get align ADD ;
@@ -456,7 +461,7 @@ M: x86 %write-barrier ( src slot temp1 temp2 -- ) (%write-barrier) ;
 M: x86 %write-barrier-imm ( src slot temp1 temp2 -- ) (%write-barrier) ;
 
 M:: x86 %check-nursery ( label size temp1 temp2 -- )
-    temp1 "nursery" %vm-field-ptr
+    temp1 load-zone-offset
     ! Load 'here' into temp2
     temp2 temp1 [] MOV
     temp2 size ADD
@@ -477,7 +482,7 @@ M: x86 %push-stack ( -- )
     ds-reg [] int-regs return-reg MOV ;
 
 M: x86 %push-context-stack ( -- )
-    temp-reg "ctx" %vm-field
+    temp-reg %context
     temp-reg "datastack" context-field-offset [+] bootstrap-cell ADD
     temp-reg temp-reg "datastack" context-field-offset [+] MOV
     temp-reg [] int-regs return-reg MOV ;
@@ -1403,7 +1408,7 @@ M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
 
 M:: x86 %restore-context ( temp1 temp2 -- )
     #! Load Factor stack pointers on entry from C to Factor.
-    temp1 "ctx" %vm-field
+    temp1 %context
     ds-reg temp1 "datastack" context-field-offset [+] MOV
     rs-reg temp1 "retainstack" context-field-offset [+] MOV ;
 
@@ -1411,7 +1416,7 @@ M:: x86 %save-context ( temp1 temp2 -- )
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    temp1 "ctx" %vm-field
+    temp1 %context
     temp2 stack-reg cell neg [+] LEA
     temp1 "callstack-top" context-field-offset [+] temp2 MOV
     temp1 "datastack" context-field-offset [+] ds-reg MOV
