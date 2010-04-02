@@ -99,6 +99,9 @@ M: int-regs param-regs
 GENERIC: load-return-reg ( src rep -- )
 GENERIC: store-return-reg ( dst rep -- )
 
+M: stack-params load-return-reg drop EAX swap MOV ;
+M: stack-params store-return-reg drop EAX MOV ;
+
 M: int-rep load-return-reg drop EAX swap MOV ;
 M: int-rep store-return-reg drop EAX MOV ;
 
@@ -363,6 +366,6 @@ M: long-long-type flatten-value-type (flatten-stack-type) ;
 M: c-type flatten-value-type
     dup rep>> int-rep? [ (flatten-int-type) ] [ (flatten-stack-type) ] if ;
 
-M: x86.64 struct-return-pointer-type (stack-value) ;
+M: x86.32 struct-return-pointer-type (stack-value) ;
 
 check-sse
