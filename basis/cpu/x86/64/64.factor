@@ -231,6 +231,7 @@ M: x86.64 %alien-indirect ( -- )
 
 M: x86.64 %begin-callback ( -- )
     param-reg-0 %mov-vm-ptr
+    param-reg-1 0 MOV
     "begin_callback" f %alien-invoke ;
 
 M: x86.64 %alien-callback ( quot -- )

@@ -244,6 +244,7 @@ M: x86.32 %alien-indirect ( -- )
 
 M: x86.32 %begin-callback ( -- )
     0 save-vm-ptr
+    ESP 4 [+] 0 MOV
     "begin_callback" f %alien-invoke ;
 
 M: x86.32 %alien-callback ( quot -- )
