@@ -43,11 +43,14 @@ M: x86.64 machine-registers
 M: x86.64 %mov-vm-ptr ( reg -- )
     vm-reg MOV ;
 
-M: x86.64 %vm-field ( dst field -- )
-    [ vm-reg ] dip vm-field-offset [+] MOV ;
+M: x86.64 %vm-field ( dst offset -- )
+    [ vm-reg ] dip [+] MOV ;
 
-M: x86.64 %vm-field-ptr ( dst field -- )
-    [ vm-reg ] dip vm-field-offset [+] LEA ;
+M: x86.64 %set-vm-field ( src offset -- )
+    [ vm-reg ] dip [+] swap MOV ;
+
+M: x86.64 %vm-field-ptr ( dst offset -- )
+    [ vm-reg ] dip [+] LEA ;
 
 : param@ ( n -- op ) reserved-stack-space + stack@ ;
 
@@ -111,7 +114,7 @@ M: x86.64 %pop-stack ( n -- )
     param-reg-0 swap ds-reg reg-stack MOV ;
 
 M: x86.64 %pop-context-stack ( -- )
-    temp-reg "ctx" %vm-field
+    temp-reg %context
     param-reg-0 temp-reg "datastack" context-field-offset [+] MOV
     param-reg-0 param-reg-0 [] MOV
     temp-reg "datastack" context-field-offset [+] bootstrap-cell SUB ;
