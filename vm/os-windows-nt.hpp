@@ -28,7 +28,7 @@ typedef char symbol_char;
 	#define FACTOR_STDCALL(return_type) __attribute__((stdcall)) return_type
 #endif
 
-VM_C_API exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch)
+FACTOR_STDCALL(LONG) exception_handler(PEXCEPTION_POINTERS pe);
 
 // SSE traps raise these exception codes, which are defined in internal NT headers
 // but not winbase.h
