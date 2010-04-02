@@ -108,9 +108,16 @@ context *factor_vm::new_context()
 	return new_context;
 }
 
+void factor_vm::init_context(context *ctx)
+{
+	ctx->context_objects[OBJ_CONTEXT] = allot_alien(ctx);
+}
+
 context *new_context(factor_vm *parent)
 {
-	return parent->new_context();
+	context *new_context = parent->new_context();
+	parent->init_context(new_context);
+	return new_context;
 }
 
 void factor_vm::delete_context(context *old_context)
@@ -124,16 +131,22 @@ VM_C_API void delete_context(factor_vm *parent, context *old_context)
 	parent->delete_context(old_context);
 }
 
-void factor_vm::begin_callback()
+cell factor_vm::begin_callback(cell quot_)
 {
+	data_root<object> quot(quot_,this);
+
 	ctx->reset();
 	spare_ctx = new_context();
 	callback_ids.push_back(callback_id++);
+
+	init_context(ctx);
+
+	return quot.value();
 }
 
-void begin_callback(factor_vm *parent)
+cell begin_callback(factor_vm *parent, cell quot)
 {
-	parent->begin_callback();
+	return parent->begin_callback(quot);
 }
 
 void factor_vm::end_callback()
@@ -294,11 +307,6 @@ void factor_vm::primitive_load_locals()
 		sizeof(cell) * count);
 	ctx->datastack -= sizeof(cell) * count;
 	ctx->retainstack += sizeof(cell) * count;
-}
-
-void factor_vm::primitive_context()
-{
-	ctx->push(allot_alien(ctx));
 }
 
 }
