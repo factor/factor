@@ -11,17 +11,20 @@ IN: threads
 
 ! Wrap sub-primitives; we don't want them inlined into callers
 ! since their behavior depends on what frames are on the callstack
+: context ( -- context )
+    2 context-object ; inline
+
 : set-context ( obj context -- obj' )
-    (set-context) ;
+    (set-context) ; inline
 
 : start-context ( obj quot: ( obj -- * ) -- obj' )
-    (start-context) ;
+    (start-context) ; inline
 
 : set-context-and-delete ( obj context -- * )
-    (set-context-and-delete) ;
+    (set-context-and-delete) ; inline
 
 : start-context-and-delete ( obj quot: ( obj -- * ) -- * )
-    (start-context-and-delete) ;
+    (start-context-and-delete) ; inline
 
 ! Context introspection
 : namestack-for ( context -- namestack )

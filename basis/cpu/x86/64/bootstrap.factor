@@ -76,8 +76,7 @@ IN: bootstrap.x86
 : jit-call-quot ( -- ) arg1 quot-entry-point-offset [+] CALL ;
 
 [
-    nv-reg arg1 MOV
-
+    arg2 arg1 MOV
     arg1 vm-reg MOV
     "begin_callback" jit-call
 
@@ -85,7 +84,7 @@ IN: bootstrap.x86
     jit-restore-context
 
     ! call the quotation
-    arg1 nv-reg MOV
+    arg1 return-reg MOV
     jit-call-quot
 
     jit-save-context

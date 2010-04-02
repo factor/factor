@@ -82,11 +82,9 @@ IN: bootstrap.x86
 [
     jit-load-vm
     ESP [] vm-reg MOV
-    "begin_callback" jit-call
-
-    ! load quotation - EBP is ctx-reg so it will get clobbered
-    ! later on
     EAX EBP 8 [+] MOV
+    ESP 4 [+] EAX MOV
+    "begin_callback" jit-call
 
     jit-load-vm
     jit-load-context
