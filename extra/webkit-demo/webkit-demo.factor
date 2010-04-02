@@ -13,7 +13,7 @@ IMPORT: WebView
     WebView -> alloc
     rect f f -> initWithFrame:frameName:groupName: ;
 
-CONSTANT: window-style ( -- n )
+CONSTANT: window-style
     flags{
         NSClosableWindowMask
         NSMiniaturizableWindowMask
