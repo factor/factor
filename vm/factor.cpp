@@ -15,8 +15,8 @@ void factor_vm::default_parameters(vm_parameters *p)
 	p->datastack_size = 32 * sizeof(cell);
 	p->retainstack_size = 32 * sizeof(cell);
 
-#ifdef __OpenBSD__
-	p->callstack_size = 32 * sizeof(cell);
+#ifdef FACTOR_PPC
+	p->callstack_size = 256 * sizeof(cell);
 #else
 	p->callstack_size = 128 * sizeof(cell);
 #endif
