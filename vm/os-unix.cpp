@@ -46,7 +46,7 @@ void sleep_nanos(u64 nsec)
 
 void factor_vm::init_ffi()
 {
-	null_dll = dlopen(NULL_DLL,RTLD_LAZY);
+	null_dll = dlopen(NULL,RTLD_LAZY);
 }
 
 void factor_vm::ffi_dlopen(dll *dll)
