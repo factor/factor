@@ -320,8 +320,17 @@ M: reg-class reg-class-full?
     [ alloc-stack-param ] [ alloc-fastcall-param ] if
     [ abi param-reg ] dip ;
 
+SYMBOL: (stack-value)
+<< void* c-type clone \ (stack-value) define-primitive-type
+stack-params \ (stack-value) c-type (>>rep) >>
+
+: ((flatten-type)) ( type to-type -- seq )
+    [ stack-size cell align cell /i ] dip c-type <repetition> ; inline
+
 : (flatten-int-type) ( type -- seq )
-    stack-size cell align cell /i void* c-type <repetition> ;
+    void* ((flatten-type)) ;
+: (flatten-stack-type) ( type -- seq )
+    (stack-value) ((flatten-type)) ;
 
 GENERIC: flatten-value-type ( type -- types )
 

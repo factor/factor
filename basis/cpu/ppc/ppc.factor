@@ -704,6 +704,8 @@ M: ppc immediate-arithmetic? ( n -- ? ) -32768 32767 between? ;
 
 M: ppc immediate-bitwise? ( n -- ? ) 0 65535 between? ;
 
+M: ppc struct-return-pointer-type void* ;
+
 M: ppc return-struct-in-registers? ( c-type -- ? )
     c-type return-in-registers?>> ;
 

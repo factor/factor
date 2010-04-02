@@ -275,6 +275,8 @@ M:: x86.64 %call-gc ( gc-root-count temp -- )
     ! Call GC
     "inline_gc" f %alien-invoke ;
 
+M: x86.64 struct-return-pointer-type void* ;
+
 ! The result of reading 4 bytes from memory is a fixnum on
 ! x86-64.
 enable-alien-4-intrinsics
