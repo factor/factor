@@ -43,7 +43,6 @@ namespace factor
 	_(code_room) \
 	_(compact_gc) \
 	_(compute_identity_hashcode) \
-	_(context) \
 	_(context_object) \
 	_(context_object_for) \
 	_(current_callback) \

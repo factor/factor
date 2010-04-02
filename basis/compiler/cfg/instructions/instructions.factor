@@ -660,13 +660,13 @@ INSN: ##alien-global
 def: dst/int-rep
 literal: symbol library ;
 
-INSN: ##vm-field-ptr
-def: dst/int-rep
-literal: field-name ;
-
 INSN: ##vm-field
 def: dst/int-rep
-literal: field-name ;
+literal: offset ;
+
+INSN: ##set-vm-field
+use: src/int-rep
+literal: offset ;
 
 ! FFI
 INSN: ##alien-invoke
@@ -835,8 +835,8 @@ UNION: ##allocation
 ##box-displaced-alien ;
 
 ! For alias analysis
-UNION: ##read ##slot ##slot-imm ##vm-field-ptr ##alien-global ;
-UNION: ##write ##set-slot ##set-slot-imm ;
+UNION: ##read ##slot ##slot-imm ##vm-field ##alien-global ;
+UNION: ##write ##set-slot ##set-slot-imm ##set-vm-field ;
 
 ! Instructions that kill all live vregs but cannot trigger GC
 UNION: partial-sync-insn
