@@ -6,6 +6,7 @@ namespaces.private parser quotations sequences
 specialized-arrays stack-checker stack-checker.errors
 system threads tools.test words alien.complex concurrency.promises ;
 FROM: alien.c-types => float short ;
+FROM: alien.private => fastcall ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: char
 IN: compiler.tests.alien

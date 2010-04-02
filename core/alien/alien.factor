@@ -5,7 +5,11 @@ kernel.private byte-arrays byte-vectors arrays init
 continuations.private ;
 IN: alien
 
-SINGLETONS: stdcall thiscall fastcall cdecl mingw ;
+SINGLETONS: stdcall thiscall cdecl mingw ;
+
+<PRIVATE
+SINGLETON: fastcall
+PRIVATE>
 
 UNION: abi stdcall thiscall fastcall cdecl mingw ;
 
