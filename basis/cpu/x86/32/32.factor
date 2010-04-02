@@ -66,7 +66,7 @@ M:: x86.32 %dispatch ( src temp -- )
 
 M: x86.32 pic-tail-reg EBX ;
 
-M: x86.32 reserved-stack-space 4 cells ;
+M: x86.32 reserved-stack-space 0 ;
 
 M: x86.32 %alien-invoke 0 CALL rc-relative rel-dlsym ;
 
@@ -115,12 +115,17 @@ M: x86.32 %prologue ( n -- )
 M: x86.32 %prepare-jump
     pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here ;
 
-M: x86.32 %load-param-reg
-    stack-params assert=
-    [ [ EAX ] dip local@ MOV ] dip
-    stack@ EAX MOV ;
+M: stack-params copy-register*
+    drop
+    {
+        { [ dup  integer? ] [ EAX swap next-stack@ MOV  EAX MOV ] }
+        { [ over integer? ] [ EAX swap MOV              param@ EAX MOV ] }
+    } cond ;
 
-M: x86.32 %save-param-reg 3drop ;
+M: x86.32 %save-param-reg
+    dup stack-params? [ 3drop ] [ [ param@ ] 2dip %copy ] if ;
+
+M: x86.32 %load-param-reg [ swap local@ ] dip %copy ;
 
 : (%box) ( n rep -- )
     #! If n is f, push the return register onto the stack; we
@@ -307,6 +312,13 @@ M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
 : callee-cleanup? ( abi -- ? )
     { stdcall fastcall thiscall } member? ;
 
+: stack-arg-size ( params -- n )
+    dup abi>> '[
+        alien-parameters flatten-value-types
+        [ _ alloc-parameter 2drop ] each
+        stack-params get
+    ] with-param-regs ;
+
 M: x86.32 %cleanup ( params -- )
     #! a) If we just called a stdcall function in Windows, it
     #! cleaned up the stack frame for us. But we don't want that
@@ -314,7 +326,7 @@ M: x86.32 %cleanup ( params -- )
     #! b) If we just called a function returning a struct, we
     #! have to fix ESP.
     {
-        { [ dup abi>> callee-cleanup? ] [ drop ESP stack-frame get params>> SUB ] }
+        { [ dup abi>> callee-cleanup? ] [ stack-arg-size ESP swap SUB ] }
         { [ dup funny-large-struct-return? ] [ drop EAX PUSH ] }
         [ drop ]
     } cond ;

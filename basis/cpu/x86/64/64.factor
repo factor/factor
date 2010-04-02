@@ -49,8 +49,6 @@ M: x86.64 %vm-field ( dst field -- )
 M: x86.64 %vm-field-ptr ( dst field -- )
     [ vm-reg ] dip vm-field-offset [+] LEA ;
 
-: param@ ( n -- op ) reserved-stack-space + stack@ ;
-
 M: x86.64 %prologue ( n -- )
     temp-reg -7 [] LEA
     dup PUSH
