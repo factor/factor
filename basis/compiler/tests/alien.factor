@@ -637,3 +637,25 @@ FUNCTION: void this_does_not_exist ( ) ;
 [ 8 ] [ 3 4 ffi_test_50 ] unit-test
 [ 13 ] [ 3 4 5 ffi_test_51 ] unit-test
 [ 13 22 ] [ 3 4 5 6 7 8 multi_ffi_test_51 ] unit-test
+
+: ffi_test_52 ( x y z -- int )
+    int "f-fastcall" "ffi_test_52" { int float int }
+    alien-invoke gc ;
+: ffi_test_53 ( x y z w -- int )
+    int "f-fastcall" "ffi_test_53" { int float int int }
+    alien-invoke gc ;
+: ffi_test_54 ( x y -- int )
+    int "f-fastcall" "ffi_test_54" { test-struct-11 int }
+    alien-invoke gc ;
+: ffi_test_55 ( x y z -- int )
+    int "f-fastcall" "ffi_test_55" { test-struct-11 int int }
+    alien-invoke gc ;
+: ffi_test_56 ( x y z w -- int )
+    int "f-fastcall" "ffi_test_56" { test-struct-11 int int int }
+    alien-invoke gc ;
+
+[ 13 ] [ 3 4.0 5 ffi_test_52 ] unit-test
+[ 19 ] [ 3 4.0 5 6 ffi_test_53 ] unit-test
+[ 13 ] [ 3 4 test-struct-11 <struct-boa> 5 ffi_test_54 ] unit-test
+[ 19 ] [ 3 4 test-struct-11 <struct-boa> 5 6 ffi_test_55 ] unit-test
+[ 26 ] [ 3 4 test-struct-11 <struct-boa> 5 6 7 ffi_test_56 ] unit-test
