@@ -660,7 +660,10 @@ FUNCTION: void this_does_not_exist ( ) ;
     int { int int } fastcall alien-indirect ;
 : fastcall-ifi-indirect ( x y z ptr -- result )
     int { int float int } fastcall alien-indirect ;
+: fastcall-struct-return-indirect ( x y ptr -- result )
+    test-struct-11 { int int } fastcall alien-indirect ;
 
 [ 8 ] [ 3 4 &: ffi_test_50 fastcall-ii-indirect ] unit-test
 [ 13 ] [ 3 4.0 5  &: ffi_test_52 fastcall-ifi-indirect ] unit-test
+[ S{ test-struct-11 f 7 -1 } ] [ 3 4 &: ffi_test_57 fastcall-struct-return-indirect ] unit-test
 
