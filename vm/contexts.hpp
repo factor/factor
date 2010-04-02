@@ -28,13 +28,13 @@ struct context {
 	/* C callstack pointer */
 	cell callstack_save;
 
-	/* context-specific special objects, accessed by context-object and
-	set-context-object primitives */
-	cell context_objects[context_object_count];
-
 	segment *datastack_seg;
 	segment *retainstack_seg;
 	segment *callstack_seg;
+
+	/* context-specific special objects, accessed by context-object and
+	set-context-object primitives */
+	cell context_objects[context_object_count];
 
 	context(cell datastack_size, cell retainstack_size, cell callstack_size);
 	~context();

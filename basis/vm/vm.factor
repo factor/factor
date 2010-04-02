@@ -11,10 +11,10 @@ STRUCT: context
 { datastack cell }
 { retainstack cell }
 { callstack-save cell }
-{ context-objects cell[10] }
 { datastack-region void* }
 { retainstack-region void* }
-{ callstack-region void* } ;
+{ callstack-region void* }
+{ context-objects cell[10] } ;
 
 : context-field-offset ( field -- offset ) context offset-of ; inline
 
