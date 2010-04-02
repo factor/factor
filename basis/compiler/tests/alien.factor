@@ -653,12 +653,20 @@ FUNCTION: void this_does_not_exist ( ) ;
 : ffi_test_56 ( x y z w -- int )
     int "f-fastcall" "ffi_test_56" { test-struct-11 int int int }
     alien-invoke gc ;
+: ffi_test_57 ( x y -- test-struct-11 )
+    test-struct-11 "f-fastcall" "ffi_test_57" { int int }
+    alien-invoke gc ;
+: ffi_test_58 ( x y z -- test-struct-11 )
+    test-struct-11 "f-fastcall" "ffi_test_58" { int int int }
+    alien-invoke gc ;
 
 [ 13 ] [ 3 4.0 5 ffi_test_52 ] unit-test
 [ 19 ] [ 3 4.0 5 6 ffi_test_53 ] unit-test
 [ 13 ] [ 3 4 test-struct-11 <struct-boa> 5 ffi_test_54 ] unit-test
 [ 19 ] [ 3 4 test-struct-11 <struct-boa> 5 6 ffi_test_55 ] unit-test
 [ 26 ] [ 3 4 test-struct-11 <struct-boa> 5 6 7 ffi_test_56 ] unit-test
+[ S{ test-struct-11 f 7 -1 } ] [ 3 4 ffi_test_57 ] unit-test
+[ S{ test-struct-11 f 7 -3 } ] [ 3 4 7 ffi_test_58 ] unit-test
 
 : fastcall-ii-indirect ( x y ptr -- result )
     int { int int } fastcall alien-indirect ;
@@ -667,3 +675,4 @@ FUNCTION: void this_does_not_exist ( ) ;
 
 [ 8 ] [ 3 4 &: ffi_test_50 fastcall-ii-indirect ] unit-test
 [ 13 ] [ 3 4.0 5  &: ffi_test_52 fastcall-ifi-indirect ] unit-test
+

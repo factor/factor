@@ -131,3 +131,5 @@ FACTOR_EXPORT FACTOR_FASTCALL(int) ffi_test_53(int x, float y, int z, int w);
 FACTOR_EXPORT FACTOR_FASTCALL(int) ffi_test_54(struct test_struct_11 x, int y);
 FACTOR_EXPORT FACTOR_FASTCALL(int) ffi_test_55(struct test_struct_11 x, int y, int z);
 FACTOR_EXPORT FACTOR_FASTCALL(int) ffi_test_56(struct test_struct_11 x, int y, int z, int w);
+FACTOR_EXPORT FACTOR_FASTCALL(struct test_struct_11) ffi_test_57(int x, int y);
+FACTOR_EXPORT FACTOR_FASTCALL(struct test_struct_11) ffi_test_58(int x, int y, int z);
