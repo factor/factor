@@ -1,10 +1,11 @@
 USING: accessors alien alien.c-types alien.libraries
 alien.syntax arrays classes.struct combinators
-compiler continuations effects io io.backend io.pathnames
-io.streams.string kernel math memory namespaces
-namespaces.private parser quotations sequences
-specialized-arrays stack-checker stack-checker.errors
-system threads tools.test words alien.complex concurrency.promises ;
+compiler continuations effects generalizations io
+io.backend io.pathnames io.streams.string kernel
+math memory namespaces namespaces.private parser
+quotations sequences specialized-arrays stack-checker
+stack-checker.errors system threads tools.test words
+alien.complex concurrency.promises ;
 FROM: alien.c-types => float short ;
 FROM: alien.private => fastcall ;
 SPECIALIZED-ARRAY: float
@@ -139,6 +140,14 @@ unit-test
 [ 11 6 -7 ] [
     11 6 -7 ffi_test_19 [ x>> ] [ y>> ] [ z>> ] tri
 ] unit-test
+
+: multi_ffi_test_18 ( w x y z w' x' y' z' -- int int )
+    [ int "f-stdcall" "ffi_test_18" { int int int int } alien-invoke ]
+    4 ndip
+    int "f-stdcall" "ffi_test_18" { int int int int } alien-invoke
+    gc ;
+
+[ 25 85 ] [ 2 3 4 5 6 7 8 9 multi_ffi_test_18 ] unit-test
 
 FUNCTION: double ffi_test_6 float x float y ;
 [ 6.0 ] [ 3.0 2.0 ffi_test_6 ] unit-test
@@ -619,7 +628,12 @@ FUNCTION: void this_does_not_exist ( ) ;
 : ffi_test_51 ( x y z -- int )
     int "f-fastcall" "ffi_test_51" { int int int }
     alien-invoke gc ;
+: multi_ffi_test_51 ( x y z x' y' z' -- int int )
+    [ int "f-fastcall" "ffi_test_51" { int int int } alien-invoke ]
+    3dip
+    int "f-fastcall" "ffi_test_51" { int int int } alien-invoke gc ;
     
 [ 4 ] [ 3 ffi_test_49 ] unit-test
 [ 8 ] [ 3 4 ffi_test_50 ] unit-test
 [ 13 ] [ 3 4 5 ffi_test_51 ] unit-test
+[ 13 22 ] [ 3 4 5 6 7 8 multi_ffi_test_51 ] unit-test
