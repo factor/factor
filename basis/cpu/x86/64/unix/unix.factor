@@ -14,11 +14,6 @@ M: float-regs param-regs
 
 M: x86.64 reserved-stack-space 0 ;
 
-SYMBOL: (stack-value)
-! The ABI for passing structs by value is pretty great
-<< void* c-type clone \ (stack-value) define-primitive-type
-stack-params \ (stack-value) c-type (>>rep) >>
-
 : struct-types&offset ( struct-type -- pairs )
     fields>> [
         [ type>> ] [ offset>> ] bi 2array
@@ -36,8 +31,7 @@ stack-params \ (stack-value) c-type (>>rep) >>
     ] map ;
 
 : flatten-large-struct ( c-type -- seq )
-    heap-size cell align
-    cell /i \ (stack-value) c-type <repetition> ;
+    (flatten-stack-type) ;
 
 : flatten-struct ( c-type -- seq )
     dup heap-size 16 > [
