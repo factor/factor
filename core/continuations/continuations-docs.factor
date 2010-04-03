@@ -235,7 +235,7 @@ HELP: save-error
 $low-level-note ;
 
 HELP: with-datastack
-{ $values { "stack" sequence } { "quot" quotation } { "newstack" sequence } }
+{ $values { "stack" sequence } { "quot" quotation } { "new-stack" sequence } }
 { $description "Executes the quotation with the given data stack contents, and outputs the new data stack after the word returns. The input sequence is not modified; a new sequence is produced. Does not affect the data stack in surrounding code, other than consuming the two inputs and pushing the output." }
 { $examples
     { $example "USING: continuations math prettyprint ;" "{ 3 7 } [ + ] with-datastack ." "{ 10 }" }
