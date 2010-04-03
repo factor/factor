@@ -130,7 +130,7 @@ HELP: alien-callback
     "A simple example, showing a C function which returns the difference of two given integers:"
     { $code
         ": difference-callback ( -- alien )"
-        "    int { int int } \"cdecl\" [ - ] alien-callback ;"
+        "    int { int int } cdecl [ - ] alien-callback ;"
     }
 }
 { $errors "Throws an " { $link alien-callback-error } " if the word calling " { $link alien-callback } " is not compiled." } ;
