@@ -1,9 +1,9 @@
-! Copyright (C) 2005, 2009 Slava Pestov, Joe Groff.
+! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io.binary kernel combinators kernel.private math
-math.bitwise locals namespaces make sequences words system
-layouts math.order accessors cpu.x86.assembler.operands
-cpu.x86.assembler.operands.private ;
+USING: arrays io.binary kernel combinators
+combinators.short-circuit math math.bitwise locals namespaces
+make sequences words system layouts math.order accessors
+cpu.x86.assembler.operands cpu.x86.assembler.operands.private ;
 QUALIFIED: sequences
 IN: cpu.x86.assembler
 
@@ -22,7 +22,11 @@ IN: cpu.x86.assembler
 GENERIC: sib-present? ( op -- ? )
 
 M: indirect sib-present?
-    [ base>> { ESP RSP R12 } member? ] [ index>> ] [ scale>> ] tri or or ;
+    {
+        [ base>> { ESP RSP R12 } member? ]
+        [ index>> ]
+        [ scale>> ]
+    } 1|| ;
 
 M: register sib-present? drop f ;
 

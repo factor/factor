@@ -47,7 +47,7 @@ IN: bootstrap.x86
 ] jit-prolog jit-define
 
 [
-    temp3 5 [] LEA
+    temp3 5 [RIP+] LEA
     0 JMP rc-relative rt-entry-point-pic-tail jit-rel
 ] jit-word-jump jit-define
 

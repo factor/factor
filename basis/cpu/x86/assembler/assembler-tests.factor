@@ -1,5 +1,5 @@
 USING: cpu.x86.assembler cpu.x86.assembler.operands
-kernel tools.test namespaces make ;
+kernel tools.test namespaces make layouts ;
 IN: cpu.x86.assembler.tests
 
 [ { HEX: 40 HEX: 8a HEX: 2a } ] [ [ BPL RDX [] MOV ] { } make ] unit-test
@@ -164,5 +164,11 @@ IN: cpu.x86.assembler.tests
 
 [ { 15 183 195 } ] [ [ EAX BX MOVZX ] { } make ] unit-test
 
-[ { 100 199 5 0 0 0 0 123 0 0 0 } ] [ [ 0 [] FS 123 MOV ] { } make ] unit-test
+bootstrap-cell 4 = [
+    [ { 100 199 5 0 0 0 0 123 0 0 0 } ] [ [ 0 [] FS 123 MOV ] { } make ] unit-test
+] when
 
+bootstrap-cell 8 = [
+    [ { 72 137 13 123 0 0 0 } ] [ [ 123 [RIP+] RCX MOV ] { } make ] unit-test
+    [ { 101 72 137 12 37 123 0 0 0 } ] [ [ 123 [] GS RCX MOV ] { } make ] unit-test
+] when
