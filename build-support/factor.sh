@@ -68,7 +68,7 @@ set_downloader() {
     if [[ $? -ne 0 ]] ; then
         DOWNLOADER=wget
     else
-        DOWNLOADER="curl -O"
+        DOWNLOADER="curl -f -O"
     fi
 }
 
