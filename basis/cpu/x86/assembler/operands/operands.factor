@@ -1,12 +1,8 @@
-! Copyright (C) 2008, 2009 Slava Pestov, Joe Groff.
+! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel words math accessors sequences namespaces
 assocs layouts cpu.x86.assembler.syntax ;
 IN: cpu.x86.assembler.operands
-
-! In 32-bit mode, { 1234 } is absolute indirect addressing.
-! In 64-bit mode, { 1234 } is RIP-relative.
-! Beware!
 
 REGISTERS: 8 AL CL DL BL SPL BPL SIL DIL R8B R9B R10B R11B R12B R13B R14B R15B ;
 
@@ -90,7 +86,13 @@ M: object operand-64? drop f ;
 PRIVATE>
 
 : [] ( reg/displacement -- indirect )
-    dup integer? [ [ f f f ] dip ] [ f f f ] if <indirect> ;
+    dup integer?
+    [ [ f f bootstrap-cell 8 = 0 f ? ] dip <indirect> ]
+    [ f f f <indirect> ]
+    if ;
+
+: [RIP+] ( displacement -- indirect )
+    [ f f f ] dip <indirect> ;
 
 : [+] ( reg displacement -- indirect )
     dup integer?
