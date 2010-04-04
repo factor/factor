@@ -706,7 +706,7 @@ struct factor_vm
 
   #if defined(WINNT)
 	void open_console();
-	LONG exception_handler(PEXCEPTION_POINTERS pe);
+	LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch);
   #endif
 
   #else  // UNIX

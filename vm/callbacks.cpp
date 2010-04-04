@@ -38,7 +38,12 @@ void callback_heap::store_callback_operand(code_block *stub, cell index, cell va
 
 void callback_heap::update(code_block *stub)
 {
-	store_callback_operand(stub,1,(cell)callback_entry_point(stub));
+#ifdef WIN32
+	cell index = 2;
+#else
+	cell index = 1;
+#endif
+	store_callback_operand(stub,index,(cell)callback_entry_point(stub));
 	stub->flush_icache();
 }
 
@@ -64,12 +69,21 @@ code_block *callback_heap::add(cell owner, cell return_rewind)
 
 	/* Store VM pointer */
 	store_callback_operand(stub,0,(cell)parent);
-	store_callback_operand(stub,2,(cell)parent);
+
+#ifdef WIN32
+	store_callback_operand(stub,1,(cell)&exception_handler);
+	cell index = 1;
+#else
+	cell index = 0;
+#endif
+
+	/* Store VM pointer */
+	store_callback_operand(stub,index + 2,(cell)parent);
 
 	/* On x86, the RET instruction takes an argument which depends on
 	the callback's calling convention */
 #if defined(FACTOR_X86) || defined(FACTOR_AMD64)
-	store_callback_operand(stub,3,return_rewind);
+	store_callback_operand(stub,index + 3,return_rewind);
 #endif
 
 	update(stub);

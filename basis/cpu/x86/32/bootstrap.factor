@@ -108,6 +108,14 @@ IN: bootstrap.x86
 \ (call) define-combinator-primitive
 
 [
+    ! Load ds and rs registers
+    jit-load-vm
+    jit-load-context
+    jit-restore-context
+
+    ! Windows-specific setup
+    ctx-reg jit-update-seh
+
     ! Clear x87 stack, but preserve rounding mode and exception flags
     ESP 2 SUB
     ESP [] FNSTCW
@@ -121,11 +129,6 @@ IN: bootstrap.x86
 
     ! Unwind stack frames
     ESP EDX MOV
-
-    ! Load ds and rs registers
-    jit-load-vm
-    jit-load-context
-    jit-restore-context
 
     jit-jump-quot
 ] \ unwind-native-frames define-sub-primitive
@@ -253,6 +256,9 @@ IN: bootstrap.x86
     ! Load new stack pointer
     ESP ctx-reg context-callstack-top-offset [+] MOV
 
+    ! Windows-specific setup
+    ctx-reg jit-update-tib
+
     ! Load new ds, rs registers
     jit-restore-context ;
 
@@ -265,6 +271,9 @@ IN: bootstrap.x86
 
     ! Make the new context active
     EAX jit-switch-context
+
+    ! Windows-specific setup
+    ctx-reg jit-update-seh
 
     ! Twiddle stack for return
     ESP 4 ADD
@@ -292,6 +301,12 @@ IN: bootstrap.x86
     EAX EBX -4 [+] MOV
     ds-reg 4 ADD
     ds-reg [] EAX MOV
+
+    ! Windows-specific setup
+    jit-install-seh
+
+    ! Push a fake return address
+    0 PUSH
 
     ! Jump to initial quotation
     EAX EBX [] MOV

@@ -225,6 +225,11 @@ void factor_vm::store_external_address(instruction_operand op)
 	case RT_DECKS_OFFSET:
 		op.store_value(decks_offset);
 		break;
+#ifdef WINDOWS
+	case RT_EXCEPTION_HANDLER:
+		op.store_value(&factor::exception_handler);
+		break;
+#endif
 	default:
 		critical_error("Bad rel type",op.rel_type());
 		break;
