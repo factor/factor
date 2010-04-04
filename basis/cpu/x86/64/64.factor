@@ -55,13 +55,13 @@ M: x86.64 %vm-field-ptr ( dst offset -- )
 : param@ ( n -- op ) reserved-stack-space + stack@ ;
 
 M: x86.64 %prologue ( n -- )
-    temp-reg -7 [] LEA
+    temp-reg -7 [RIP+] LEA
     dup PUSH
     temp-reg PUSH
     stack-reg swap 3 cells - SUB ;
 
 M: x86.64 %prepare-jump
-    pic-tail-reg xt-tail-pic-offset [] LEA ;
+    pic-tail-reg xt-tail-pic-offset [RIP+] LEA ;
 
 : load-cards-offset ( dst -- )
     0 MOV rc-absolute-cell rel-cards-offset ;
