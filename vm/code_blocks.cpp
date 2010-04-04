@@ -227,7 +227,7 @@ void factor_vm::store_external_address(instruction_operand op)
 		break;
 #ifdef WINDOWS
 	case RT_EXCEPTION_HANDLER:
-		op.store_value(&factor::exception_handler);
+		op.store_value((cell)&factor::exception_handler);
 		break;
 #endif
 	default:
