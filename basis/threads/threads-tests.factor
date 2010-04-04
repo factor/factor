@@ -56,3 +56,6 @@ yield
 [ "x" tget "p" get fulfill ] in-thread
 
 [ f ] [ "p" get ?promise ] unit-test
+
+! Test system traps inside threads
+[ ] [ [ dup ] in-thread yield ] unit-test

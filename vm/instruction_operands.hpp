@@ -26,6 +26,10 @@ enum relocation_type {
 	RT_CARDS_OFFSET,
 	/* value of vm->decks_offset */
 	RT_DECKS_OFFSET,
+	/* address of exception_handler -- this exists as a separate relocation
+	type since its used in a situation where relocation arguments cannot
+	be passed in, and so RT_DLSYM is inappropriate (Windows only) */
+	RT_EXCEPTION_HANDLER,
 };
 
 enum relocation_class {
@@ -105,6 +109,7 @@ struct relocation_entry {
 		case RT_MEGAMORPHIC_CACHE_HITS:
 		case RT_CARDS_OFFSET:
 		case RT_DECKS_OFFSET:
+		case RT_EXCEPTION_HANDLER:
 			return 0;
 		default:
 			critical_error("Bad rel type",rel_type());
