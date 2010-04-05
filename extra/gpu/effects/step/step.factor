@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ;
+USING: gpu.render gpu.shaders gpu.util ;
 IN: gpu.effects.step
 
 GLSL-SHADER: step-fragment-shader fragment-shader
