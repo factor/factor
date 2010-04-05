@@ -16,7 +16,7 @@ IN: fullscreen
 :: (monitor-info>devmodes) ( monitor-info n -- )
     DEVMODE <struct>
         DEVMODE heap-size >>dmSize
-        { DM_BITSPERPEL DM_PELSWIDTH DM_PELSHEIGHT } flags >>dmFields
+        flags{ DM_BITSPERPEL DM_PELSWIDTH DM_PELSHEIGHT } >>dmFields
     :> devmode
 
     monitor-info szDevice>>
@@ -73,11 +73,11 @@ ERROR: display-change-error n ;
 
 : set-fullscreen-styles ( hwnd -- )
     [ GWL_STYLE [ WS_OVERLAPPEDWINDOW unmask ] change-style ]
-    [ GWL_EXSTYLE [ { WS_EX_APPWINDOW WS_EX_TOPMOST } flags bitor ] change-style ] bi ;
+    [ GWL_EXSTYLE [ flags{ WS_EX_APPWINDOW WS_EX_TOPMOST } bitor ] change-style ] bi ;
 
 : set-non-fullscreen-styles ( hwnd -- )
     [ GWL_STYLE [ WS_OVERLAPPEDWINDOW bitor ] change-style ]
-    [ GWL_EXSTYLE [ { WS_EX_APPWINDOW WS_EX_TOPMOST } flags unmask ] change-style ] bi ;
+    [ GWL_EXSTYLE [ flags{ WS_EX_APPWINDOW WS_EX_TOPMOST } unmask ] change-style ] bi ;
 
 ERROR: unsupported-resolution triple ;
 
@@ -92,10 +92,10 @@ ERROR: unsupported-resolution triple ;
     hwnd f
     desktop-monitor-info rcMonitor>> slots{ left top } first2
     triple first2
-    {
+    flags{
         SWP_NOACTIVATE SWP_NOCOPYBITS SWP_NOOWNERZORDER
         SWP_NOREPOSITION SWP_NOZORDER
-    } flags
+    }
     SetWindowPos win32-error=0/f ;
 
 :: enable-fullscreen ( triple hwnd -- rect )

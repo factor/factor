@@ -135,18 +135,6 @@ HELP: clear-bit
     }
 } ;
 
-HELP: flags
-{ $values { "values" sequence } }
-{ $description "Constructs a constant flag value from a sequence of integers or words that output integers. The resulting constant is computed at compile-time, which makes this word as efficient as using a literal integer." }
-{ $examples
-    { $example "USING: math.bitwise kernel prettyprint ;"
-        "IN: scratchpad"
-        "CONSTANT: x HEX: 1"
-        "{ HEX: 20 x BIN: 100 } flags .h"
-        "25"
-    }
-} ;
-
 HELP: symbols>flags
 { $values { "symbols" sequence } { "assoc" assoc } { "flag-bits" integer } }
 { $description "Constructs an integer value by mapping the values in the " { $snippet "symbols" } " sequence to integer values using " { $snippet "assoc" } " and " { $link bitor } "ing the values together." }
@@ -408,7 +396,6 @@ $nl
 }
 "Bitfields:"
 { $subsections
-    flags
     "math-bitfields"
 } ;
 

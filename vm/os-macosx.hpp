@@ -3,7 +3,6 @@ namespace factor
 
 #define VM_C_API extern "C" __attribute__((visibility("default")))
 #define FACTOR_OS_STRING "macosx"
-#define NULL_DLL "libfactor.dylib"
 
 void early_init();
 

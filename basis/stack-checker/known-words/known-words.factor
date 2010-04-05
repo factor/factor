@@ -355,7 +355,6 @@ M: bad-executable summary
 \ code-room { } { byte-array } define-primitive \ code-room  make-flushable
 \ compact-gc { } { } define-primitive
 \ compute-identity-hashcode { object } { } define-primitive
-\ context { } { c-ptr } define-primitive \ context make-flushable
 \ context-object { fixnum } { object } define-primitive \ context-object make-flushable
 \ context-object-for { fixnum c-ptr } { object } define-primitive \ context-object-for make-flushable
 \ current-callback { } { fixnum } define-primitive \ current-callback make-flushable

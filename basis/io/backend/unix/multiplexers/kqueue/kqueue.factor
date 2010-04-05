@@ -3,7 +3,7 @@
 USING: accessors alien.c-types combinators destructors
 io.backend.unix kernel math.bitwise sequences
 specialized-arrays unix unix.kqueue unix.time assocs
-io.backend.unix.multiplexers classes.struct ;
+io.backend.unix.multiplexers classes.struct literals ;
 SPECIALIZED-ARRAY: kevent
 IN: io.backend.unix.multiplexers.kqueue
 
@@ -31,13 +31,13 @@ M: kqueue-mx dispose* fd>> close-file ;
 
 M: kqueue-mx add-input-callback ( thread fd mx -- )
     [ call-next-method ] [
-        [ EVFILT_READ { EV_ADD EV_ONESHOT } flags make-kevent ] dip
+        [ EVFILT_READ flags{ EV_ADD EV_ONESHOT } make-kevent ] dip
         register-kevent
     ] 2bi ;
 
 M: kqueue-mx add-output-callback ( thread fd mx -- )
     [ call-next-method ] [
-        [ EVFILT_WRITE { EV_ADD EV_ONESHOT } flags make-kevent ] dip
+        [ EVFILT_WRITE flags{ EV_ADD EV_ONESHOT } make-kevent ] dip
         register-kevent
     ] 2bi ;
 
