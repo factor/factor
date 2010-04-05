@@ -98,14 +98,14 @@ M: fluids-world begin-game-world
     dup fluid set
     init-gpu
     initial-particles clone >>particles
-    "C:/Users/erikc/Pictures/particle2.pgm" make-texture >>texture
-    "C:/Users/erikc/Pictures/colors.ppm" make-texture >>ramp
+    "resource:extra/fluids/particle2.pgm" make-texture >>texture
+    "resource:extra/fluids/colors.ppm" make-texture >>ramp
 
     RGB float-components T{ texture-parameters
-                           { wrap clamp-texcoord-to-edge }
-                           { min-filter filter-linear }
-                           { min-mipmap-filter f }
-    } <texture-2d> >>color-texture
+                            { wrap clamp-texcoord-to-edge }
+                            { min-filter filter-linear }
+                            { min-mipmap-filter f } }
+    <texture-2d> >>color-texture
 
     dup color-texture>> 0 <texture-2d-attachment> 1array f f { 320 240 } <framebuffer> >>framebuffer
     drop ;
@@ -135,7 +135,7 @@ M:: fluids-world draw-world* ( world -- )
         { "indexes"        [ nip length 2 / 0 swap <index-range> ] }
         { "framebuffer"    [ drop framebuffer>> ] }
     } 2<render-set> render
-    
+
     world color-texture>> gaussian-blur
     { 0 0 } { 640 480 } <rect> <viewport-state> set-gpu-state
     world ramp>> {
