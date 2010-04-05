@@ -87,7 +87,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, 
 	return ExceptionContinueExecution;
 }
 
-LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch)
+extern "C" LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch)
 {
 	return current_vm()->exception_handler(e,frame,c,dispatch);
 }

@@ -2,9 +2,11 @@
 LINK_FLAGS = /nologo /DEBUG shell32.lib
 CL_FLAGS = /nologo /Zi /O2 /W3 /DFACTOR_DEBUG
 !ELSE
-LINK_FLAGS = /nologo /safeseh:no shell32.lib
+LINK_FLAGS = /nologo /safeseh shell32.lib
 CL_FLAGS = /nologo /O2 /W3
 !ENDIF
+
+ML_FLAGS = /nologo /safeseh
 
 EXE_OBJS = vm\main-windows-nt.obj vm\factor.res
 
@@ -47,6 +49,7 @@ DLL_OBJS = vm\os-windows-nt.obj \
 	vm\profiler.obj \
 	vm\quotations.obj \
 	vm\run.obj \
+	vm\safeseh.obj \
 	vm\strings.obj \
 	vm\to_tenured_collector.obj \
 	vm\tuples.obj \
@@ -59,6 +62,9 @@ DLL_OBJS = vm\os-windows-nt.obj \
 
 .c.obj:
 	cl $(CL_FLAGS) /Fo$@ /c $<
+
+.asm.obj:
+	ml $(ML_FLAGS) /Fo$@ /c $<
 
 .rs.res:
 	rc $<
