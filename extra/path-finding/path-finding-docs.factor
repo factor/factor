@@ -1,7 +1,9 @@
 ! Copyright (C) 2010 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax ;
-IN: astar
+IN: path-finding
+
+{ <astar> <bfs> } related-words
 
 HELP: astar
 { $description "This tuple must be subclassed and its method " { $link cost } ", "
@@ -53,6 +55,16 @@ HELP: <astar>
   "may not be as efficient as subclassing the " { $link astar } " tuple."
 } ;
 
+HELP: <bfs>
+{ $values
+  { "neighbours" "an assoc" }
+  { "astar" "a astar tuple" }
+}
+{ $description "Build an astar object from the " { $snippet "neighbours" } " assoc. "
+  "When used with " { $link find-path } ", this astar tuple will use the breadth-first search (BFS) "
+  "path finding algorithm which is a particular case of the general A* algorithm."
+} ;
+
 HELP: find-path
 { $values
   { "start" "a node" }
@@ -62,8 +74,7 @@ HELP: find-path
     ", or f if no such path exists" }
 }
 { $description "Find a path between " { $snippet "start" } " and " { $snippet "target" }
-  " using the A* algorithm. The " { $snippet "astar" } " tuple must have been previously "
-  " built using " { $link <astar> } "."
+  " using the A* algorithm."
 } ;
 
 HELP: considered
@@ -75,11 +86,12 @@ HELP: considered
   "which have been examined during the A* exploration."
 } ;
 
-ARTICLE: "astar" "A* algorithm"
-"The " { $vocab-link "astar" } " vocabulary implements a graph search algorithm for finding the least-cost path from one node to another." $nl
+ARTICLE: "path-finding" "Path finding using the A* algorithm"
+"The " { $vocab-link "path-finding" } " vocabulary implements a graph search algorithm for finding the least-cost path from one node to another using the A* algorithm." $nl
+"The " { $link astar } " tuple may be derived from and its " { $link cost } ", " { $link heuristic } ", and " { $link neighbours } " methods overwritten, or the " { $link <astar> } " or " { $link <bfs> } " words can be used to build a new tuple." $nl
 "Make an A* object:"
-{ $subsections <astar> }
+{ $subsections <astar> <bfs> }
 "Find a path between nodes:"
 { $subsections find-path } ;
 
-ABOUT: "astar"
+ABOUT: "path-finding"

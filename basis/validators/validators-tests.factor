@@ -2,16 +2,11 @@ IN: validators.tests
 USING: kernel sequences tools.test validators accessors
 namespaces assocs ;
 
-[ "" v-one-line ] must-fail
-[ "hello world" ] [ "hello world" v-one-line ] unit-test
-[ "hello\nworld" v-one-line ] must-fail
-
-[ "" v-one-word ] must-fail
-[ "hello" ] [ "hello" v-one-word ] unit-test
-[ "hello world" v-one-word ] must-fail
-
 [ t ] [ "on" v-checkbox ] unit-test
 [ f ] [ "off" v-checkbox ] unit-test
+
+[ "default test" ] [ "" "default test" v-default ] unit-test
+[ "blah" ] [ "blah" "default test" v-default ] unit-test
 
 [ "foo" v-number ] must-fail
 [ 123 ] [ "123" v-number ] unit-test
@@ -41,6 +36,14 @@ namespaces assocs ;
 
 [ "http:/www.factorcode.org" v-url ]
 [ "invalid URL" = ] must-fail-with
+
+[ "" v-one-line ] must-fail
+[ "hello world" ] [ "hello world" v-one-line ] unit-test
+[ "hello\nworld" v-one-line ] must-fail
+
+[ "" v-one-word ] must-fail
+[ "hello" ] [ "hello" v-one-word ] unit-test
+[ "hello world" v-one-word ] must-fail
 
 [ 4561261212345467 ] [ "4561261212345467" v-credit-card ] unit-test
 

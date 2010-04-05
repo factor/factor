@@ -170,15 +170,17 @@ void slot_visitor<Visitor>::visit_roots()
 template<typename Visitor>
 void slot_visitor<Visitor>::visit_contexts()
 {
-	context *ctx = parent->ctx;
-
-	while(ctx)
+	std::set<context *>::const_iterator begin = parent->active_contexts.begin();
+	std::set<context *>::const_iterator end = parent->active_contexts.end();
+	while(begin != end)
 	{
-		visit_stack_elements(ctx->datastack_region,(cell *)ctx->datastack);
-		visit_stack_elements(ctx->retainstack_region,(cell *)ctx->retainstack);
+		context *ctx = *begin;
+
+		visit_stack_elements(ctx->datastack_seg,(cell *)ctx->datastack);
+		visit_stack_elements(ctx->retainstack_seg,(cell *)ctx->retainstack);
 		visit_object_array(ctx->context_objects,ctx->context_objects + context_object_count);
 
-		ctx = ctx->next;
+		begin++;
 	}
 }
 

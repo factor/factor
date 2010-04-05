@@ -151,13 +151,6 @@ M: bad-call summary
 : required-stack-effect ( word -- effect )
     dup stack-effect [ ] [ missing-effect ] ?if ;
 
-: infer-word ( word -- )
-    {
-        { [ dup macro? ] [ do-not-compile ] }
-        { [ dup "no-compile" word-prop ] [ do-not-compile ] }
-        [ dup required-stack-effect apply-word/effect ]
-    } cond ;
-
 : with-infer ( quot -- effect visitor )
     [
         init-inference

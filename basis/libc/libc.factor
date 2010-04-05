@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2005 Mackenzie Straight
-! Copyright (C) 2007, 2009 Slava Pestov
+! Copyright (C) 2007, 2010 Slava Pestov
 ! Copyright (C) 2007, 2008 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types assocs continuations alien.destructors kernel
@@ -18,8 +18,6 @@ IN: libc
 : preserve-errno ( quot -- )
     errno [ call ] dip set-errno ; inline
 
-<PRIVATE
-
 : (malloc) ( size -- alien )
     void* "libc" "malloc" { ulong } alien-invoke ;
 
@@ -31,6 +29,8 @@ IN: libc
 
 : (realloc) ( alien size -- newalien )
     void* "libc" "realloc" { void* ulong } alien-invoke ;
+
+<PRIVATE
 
 ! We stick malloc-ptr instances in the global disposables set
 TUPLE: malloc-ptr value continuation ;

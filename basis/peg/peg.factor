@@ -630,6 +630,4 @@ SYNTAX: PEG:
 
 USING: vocabs vocabs.loader ;
 
-"debugger" vocab [
-    "peg.debugger" require
-] when
+"debugger" "peg.debugger" require-when

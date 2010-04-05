@@ -17,18 +17,20 @@ void critical_error(const char *msg, cell tagged)
 	std::cout << "critical_error: " << msg;
 	std::cout << ": " << std::hex << tagged << std::dec;
 	std::cout << std::endl;
-	tls_vm()->factorbug();
+	current_vm()->factorbug();
 }
 
 void out_of_memory()
 {
 	std::cout << "Out of memory\n\n";
-	tls_vm()->dump_generations();
+	current_vm()->dump_generations();
 	exit(1);
 }
 
-void factor_vm::throw_error(cell error, stack_frame *callstack_top)
+void factor_vm::throw_error(cell error, stack_frame *stack)
 {
+	assert(stack);
+
 	/* If the error handler is set, we rewind any C stack frames and
 	pass the error to user-space. */
 	if(!current_gc && to_boolean(special_objects[ERROR_HANDLER_QUOT]))
@@ -41,22 +43,13 @@ void factor_vm::throw_error(cell error, stack_frame *callstack_top)
 		bignum_roots.clear();
 		code_roots.clear();
 
-		/* If we had an underflow or overflow, stack pointers might be
-		out of bounds */
+		/* If we had an underflow or overflow, data or retain stack
+		pointers might be out of bounds */
 		ctx->fix_stacks();
 
 		ctx->push(error);
 
-		/* Errors thrown from C code pass NULL for this parameter.
-		Errors thrown from Factor code, or signal handlers, pass the
-		actual stack pointer at the time, since the saved pointer is
-		not necessarily up to date at that point. */
-		if(callstack_top)
-			callstack_top = fix_callstack_top(callstack_top,ctx->callstack_bottom);
-		else
-			callstack_top = ctx->callstack_top;
-
-		unwind_native_frames(special_objects[ERROR_HANDLER_QUOT],callstack_top);
+		unwind_native_frames(special_objects[ERROR_HANDLER_QUOT],stack);
 	}
 	/* Error was thrown in early startup before error handler is set, just
 	crash. */
@@ -70,67 +63,61 @@ void factor_vm::throw_error(cell error, stack_frame *callstack_top)
 	}
 }
 
-void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2, stack_frame *callstack_top)
+void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2, stack_frame *stack)
 {
 	throw_error(allot_array_4(special_objects[OBJ_ERROR],
-		tag_fixnum(error),arg1,arg2),callstack_top);
+		tag_fixnum(error),arg1,arg2),stack);
+}
+
+void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2)
+{
+	throw_error(allot_array_4(special_objects[OBJ_ERROR],
+		tag_fixnum(error),arg1,arg2),ctx->callstack_top);
 }
 
 void factor_vm::type_error(cell type, cell tagged)
 {
-	general_error(ERROR_TYPE,tag_fixnum(type),tagged,NULL);
+	general_error(ERROR_TYPE,tag_fixnum(type),tagged);
 }
 
 void factor_vm::not_implemented_error()
 {
-	general_error(ERROR_NOT_IMPLEMENTED,false_object,false_object,NULL);
+	general_error(ERROR_NOT_IMPLEMENTED,false_object,false_object);
 }
 
-/* Test if 'fault' is in the guard page at the top or bottom (depending on
-offset being 0 or -1) of area+area_size */
-bool factor_vm::in_page(cell fault, cell area, cell area_size, int offset)
+void factor_vm::memory_protection_error(cell addr, stack_frame *stack)
 {
-	int pagesize = getpagesize();
-	area += area_size;
-	area += offset * pagesize;
+	/* Retain and call stack underflows are not supposed to happen */
 
-	return fault >= area && fault <= area + pagesize;
-}
-
-void factor_vm::memory_protection_error(cell addr, stack_frame *native_stack)
-{
-	if(in_page(addr, ctx->datastack_region->start, 0, -1))
-		general_error(ERROR_DS_UNDERFLOW,false_object,false_object,native_stack);
-	else if(in_page(addr, ctx->datastack_region->start, ds_size, 0))
-		general_error(ERROR_DS_OVERFLOW,false_object,false_object,native_stack);
-	else if(in_page(addr, ctx->retainstack_region->start, 0, -1))
-		general_error(ERROR_RS_UNDERFLOW,false_object,false_object,native_stack);
-	else if(in_page(addr, ctx->retainstack_region->start, rs_size, 0))
-		general_error(ERROR_RS_OVERFLOW,false_object,false_object,native_stack);
-	else if(in_page(addr, nursery.end, 0, 0))
-		critical_error("allot_object() missed GC check",0);
+	if(ctx->datastack_seg->underflow_p(addr))
+		general_error(ERROR_DATASTACK_UNDERFLOW,false_object,false_object,stack);
+	else if(ctx->datastack_seg->overflow_p(addr))
+		general_error(ERROR_DATASTACK_OVERFLOW,false_object,false_object,stack);
+	else if(ctx->retainstack_seg->underflow_p(addr))
+		general_error(ERROR_RETAINSTACK_UNDERFLOW,false_object,false_object,stack);
+	else if(ctx->retainstack_seg->overflow_p(addr))
+		general_error(ERROR_RETAINSTACK_OVERFLOW,false_object,false_object,stack);
+	else if(ctx->callstack_seg->underflow_p(addr))
+		general_error(ERROR_CALLSTACK_OVERFLOW,false_object,false_object,stack);
+	else if(ctx->callstack_seg->overflow_p(addr))
+		general_error(ERROR_CALLSTACK_UNDERFLOW,false_object,false_object,stack);
 	else
-		general_error(ERROR_MEMORY,allot_cell(addr),false_object,native_stack);
+		general_error(ERROR_MEMORY,allot_cell(addr),false_object,stack);
 }
 
-void factor_vm::signal_error(cell signal, stack_frame *native_stack)
+void factor_vm::signal_error(cell signal, stack_frame *stack)
 {
-	general_error(ERROR_SIGNAL,allot_cell(signal),false_object,native_stack);
+	general_error(ERROR_SIGNAL,allot_cell(signal),false_object,stack);
 }
 
 void factor_vm::divide_by_zero_error()
 {
-	general_error(ERROR_DIVIDE_BY_ZERO,false_object,false_object,NULL);
+	general_error(ERROR_DIVIDE_BY_ZERO,false_object,false_object);
 }
 
-void factor_vm::fp_trap_error(unsigned int fpu_status, stack_frame *signal_callstack_top)
+void factor_vm::fp_trap_error(unsigned int fpu_status, stack_frame *stack)
 {
-	general_error(ERROR_FP_TRAP,tag_fixnum(fpu_status),false_object,signal_callstack_top);
-}
-
-void factor_vm::primitive_call_clear()
-{
-	unwind_native_frames(ctx->pop(),ctx->callstack_bottom);
+	general_error(ERROR_FP_TRAP,tag_fixnum(fpu_status),false_object,stack);
 }
 
 /* For testing purposes */
@@ -146,7 +133,7 @@ void factor_vm::memory_signal_handler_impl()
 
 void memory_signal_handler_impl()
 {
-	tls_vm()->memory_signal_handler_impl();
+	current_vm()->memory_signal_handler_impl();
 }
 
 void factor_vm::misc_signal_handler_impl()
@@ -156,7 +143,7 @@ void factor_vm::misc_signal_handler_impl()
 
 void misc_signal_handler_impl()
 {
-	tls_vm()->misc_signal_handler_impl();
+	current_vm()->misc_signal_handler_impl();
 }
 
 void factor_vm::fp_signal_handler_impl()
@@ -166,7 +153,7 @@ void factor_vm::fp_signal_handler_impl()
 
 void fp_signal_handler_impl()
 {
-	tls_vm()->fp_signal_handler_impl();
+	current_vm()->fp_signal_handler_impl();
 }
 
 }

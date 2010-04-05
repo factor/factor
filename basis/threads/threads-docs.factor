@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private io
-threads.private continuations init quotations strings
-assocs heaps boxes namespaces deques dlists system ;
+threads.private init quotations strings assocs heaps boxes
+namespaces deques dlists system ;
 IN: threads
 
 ARTICLE: "threads-start/stop" "Starting and stopping threads"
@@ -48,7 +48,7 @@ ARTICLE: "thread-state" "Thread-local state and variables"
 $nl
 "Global hashtable of all threads, keyed by " { $snippet "id" } ":"
 { $subsections threads }
-"Threads have an identity independent of continuations. If a continuation is refied in one thread and then resumed in another thread, the code running in that continuation will observe a change in the value output by " { $link self } "." ;
+"Threads have an identity independent of continuations. If a continuation is reified in one thread and then reflected in another thread, the code running in that continuation will observe a change in the value output by " { $link self } "." ;
 
 ARTICLE: "thread-impl" "Thread implementation"
 "Thread implementation:"
@@ -57,10 +57,8 @@ ARTICLE: "thread-impl" "Thread implementation"
     sleep-queue
 } ;
 
-ARTICLE: "threads" "Lightweight co-operative threads"
-"Factor supports lightweight co-operative threads implemented on top of " { $link "continuations" } ". A thread will yield while waiting for input/output operations to complete, or when a yield has been explicitly requested."
-$nl
-"Factor threads are very lightweight. Each thread can take as little as 900 bytes of memory. This library has been tested running hundreds of thousands of simple threads."
+ARTICLE: "threads" "Co-operative threads"
+"Factor supports co-operative threads. A thread will yield while waiting for input/output operations to complete, or when a yield has been explicitly requested."
 $nl
 "Words for working with threads are in the " { $vocab-link "threads" } " vocabulary."
 { $subsections
@@ -78,7 +76,7 @@ HELP: thread
         { { $snippet "id" } " - a unique identifier assigned to each thread." }
         { { $snippet "name" } " - the name passed to " { $link spawn } "." }
         { { $snippet "quot" } " - the initial quotation passed to " { $link spawn } "." }
-        { { $snippet "continuation" } " - a " { $link box } "; if the thread is ready to run, the box holds the continuation, otherwise it is empty." }
+        { { $snippet "status" } " - a " { $link string } " indicating what the thread is waiting for, or " { $link f } ". This slot is intended to be used for debugging purposes." }
     }
 } ;
 
@@ -142,10 +140,8 @@ HELP: interrupt
 { $description "Interrupts a sleeping thread." } ;
 
 HELP: suspend
-{ $values { "quot" { $quotation "( thread -- )" } } { "state" string } { "obj" object } }
-{ $description "Suspends the current thread and passes it to the quotation."
-$nl
-"After the quotation returns, control yields to the next runnable thread and the current thread does not execute again until it is resumed, and so the quotation must arrange for another thread to later resume the suspended thread with a call to " { $link resume } " or " { $link resume-with } "."
+{ $values { "state" string } { "obj" object } }
+{ $description "Suspends the current thread. Control yields to the next runnable thread and the current thread does not execute again until it is resumed, and so the caller of this word must arrange for another thread to later resume the suspended thread with a call to " { $link resume } " or " { $link resume-with } "."
 $nl
 "The status string is for debugging purposes; see " { $link "tools.threads" } "." } ;
 

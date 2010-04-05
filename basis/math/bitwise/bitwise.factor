@@ -44,10 +44,6 @@ IN: math.bitwise
 : W- ( x y -- z ) - 64 bits ; inline
 : W* ( x y -- z ) * 64 bits ; inline
 
-! flags
-MACRO: flags ( values -- )
-    [ 0 ] [ [ ?execute bitor ] curry compose ] reduce ;
-
 : symbols>flags ( symbols assoc -- flag-bits )
     [ at ] curry map
     0 [ bitor ] reduce ;

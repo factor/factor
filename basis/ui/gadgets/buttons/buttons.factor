@@ -220,8 +220,8 @@ TUPLE: radio-control < button value ;
 M: radio-control model-changed
     2dup [ value>> ] bi@ = >>selected? relayout-1 drop ;
 
-:: <radio-controls> ( parent model assoc quot: ( value model label -- gadget ) -- parent )
-    assoc model [ parent swap quot call add-gadget ] assoc-each ; inline
+:: <radio-controls> ( model assoc parent quot: ( value model label -- gadget ) -- parent )
+    parent assoc [ model swap quot call add-gadget ] assoc-each ; inline
 
 PRIVATE>
 

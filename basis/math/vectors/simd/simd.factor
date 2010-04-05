@@ -339,6 +339,4 @@ M: short-8 v*hs+
 M: int-4 v*hs+
     int-4-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op longlong-2-cast ; inline
 
-"mirrors" vocab [
-    "math.vectors.simd.mirrors" require
-] when
+"mirrors" "math.vectors.simd.mirrors" require-when
