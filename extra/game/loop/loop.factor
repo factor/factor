@@ -114,4 +114,4 @@ M: game-loop dispose
 
 USING: vocabs vocabs.loader ;
 
-"prettyprint" vocab [ "game.loop.prettyprint" require ] when
+"prettyprint" "game.loop.prettyprint" require-when

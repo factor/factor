@@ -10,12 +10,11 @@ STRUCT: context
 { callstack-bottom void* }
 { datastack cell }
 { retainstack cell }
-{ magic-frame void* }
+{ callstack-save cell }
 { datastack-region void* }
 { retainstack-region void* }
-{ catchstack-save cell }
-{ current-callback-save cell }
-{ next context* } ;
+{ callstack-region void* }
+{ context-objects cell[10] } ;
 
 : context-field-offset ( field -- offset ) context offset-of ; inline
 
@@ -27,6 +26,7 @@ STRUCT: zone
 
 STRUCT: vm
 { ctx context* }
+{ spare-ctx context* }
 { nursery zone }
 { cards-offset cell }
 { decks-offset cell }

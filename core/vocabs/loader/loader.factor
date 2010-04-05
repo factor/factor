@@ -62,7 +62,14 @@ SYMBOL: check-vocab-hook
 
 check-vocab-hook [ [ drop ] ] initialize
 
+DEFER: require
+
 <PRIVATE
+
+: load-conditional-requires ( vocab-name -- )
+    conditional-requires get
+    [ at [ require ] each ] 
+    [ delete-at ] 2bi ;
 
 : load-source ( vocab -- )
     dup check-vocab-hook get call( vocab -- )
@@ -71,7 +78,8 @@ check-vocab-hook [ [ drop ] ] initialize
         dup vocab-source-path [ parse-file ] [ [ ] ] if*
         [ +parsing+ >>source-loaded? ] dip
         [ % ] [ call( -- ) ] if-bootstrapping
-        +done+ >>source-loaded? drop
+        +done+ >>source-loaded?
+        vocab-name load-conditional-requires
     ] [ ] [ f >>source-loaded? ] cleanup ;
 
 : load-docs ( vocab -- )
@@ -87,6 +95,12 @@ PRIVATE>
 
 : require ( vocab -- )
     load-vocab drop ;
+
+: require-when ( if then -- )
+    over vocab
+    [ nip require ]
+    [ swap conditional-requires get [ swap suffix ] change-at ]
+    if ;
 
 : reload ( name -- )
     dup vocab

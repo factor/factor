@@ -705,10 +705,10 @@ CONSTANT: FORMAT_MESSAGE_MAX_WIDTH_MASK   HEX: 000000FF
 
 ERROR: error-message-failed id ;
 :: n>win32-error-string ( id -- string )
-    {
+    flags{
         FORMAT_MESSAGE_FROM_SYSTEM
         FORMAT_MESSAGE_ARGUMENT_ARRAY
-    } flags
+    }
     f
     id
     LANG_NEUTRAL SUBLANG_DEFAULT make-lang-id
@@ -719,8 +719,10 @@ ERROR: error-message-failed id ;
 : win32-error-string ( -- str )
     GetLastError n>win32-error-string ;
 
+ERROR: windows-error n string ;
+
 : (win32-error) ( n -- )
-    [ win32-error-string throw ] unless-zero ;
+    [ dup win32-error-string windows-error ] unless-zero ;
 
 : win32-error ( -- )
     GetLastError (win32-error) ;

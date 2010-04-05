@@ -48,6 +48,7 @@
 			#endif
 		#elif defined(__OpenBSD__)
 			#define FACTOR_OS_STRING "openbsd"
+			#include "os-openbsd.hpp"
 
 			#if defined(FACTOR_X86)
 				#include "os-openbsd-x86.32.hpp"
@@ -58,6 +59,7 @@
 			#endif
 		#elif defined(__NetBSD__)
 			#define FACTOR_OS_STRING "netbsd"
+			#include "os-netbsd.hpp"
 
 			#if defined(FACTOR_X86)
 				#include "os-netbsd-x86.32.hpp"
@@ -67,7 +69,6 @@
 				#error "Unsupported NetBSD flavor"
 			#endif
 
-			#include "os-netbsd.hpp"
 		#elif defined(linux)
 			#define FACTOR_OS_STRING "linux"
 			#include "os-linux.hpp"

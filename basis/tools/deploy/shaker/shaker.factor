@@ -42,12 +42,8 @@ IN: tools.deploy.shaker
     deploy-threads? get [
         "threads" startup-hooks get delete-at
     ] unless
-    native-io? [
-        "io.thread" startup-hooks get delete-at
-    ] unless
     strip-io? [
         "io.backend" startup-hooks get delete-at
-        "io.thread" startup-hooks get delete-at
     ] when
     strip-dictionary? [
         {
@@ -175,7 +171,6 @@ IN: tools.deploy.shaker
                 "predicate"
                 "predicate-definition"
                 "predicating"
-                "primitive"
                 "reader"
                 "reading"
                 "recursive"
@@ -397,16 +392,15 @@ IN: tools.deploy.shaker
     ] [ drop ] if ;
 
 : strip-c-io ( -- )
+    ! On all platforms, if deploy-io is 1, we strip out C streams.
+    ! On Unix, if deploy-io is 3, we strip out C streams as well.
+    ! On Windows, even if deploy-io is 3, C streams are still used
+    ! for the console, so don't strip it there.
     strip-io?
     deploy-io get 3 = os windows? not and
     or [
-        [
-            c-io-backend forget
-            "io.streams.c" forget-vocab
-            "io-thread-running?" "io.thread" lookup [
-                global delete-at
-            ] when*
-        ] with-compilation-unit
+        "Stripping C I/O" show
+        "vocab:tools/deploy/shaker/strip-c-io.factor" run-file
     ] when ;
 
 : compress ( pred post-process string -- )

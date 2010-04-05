@@ -16,7 +16,6 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <math.h>
-#include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -132,6 +131,7 @@ namespace factor
 #include "jit.hpp"
 #include "quotations.hpp"
 #include "inline_cache.hpp"
+#include "mvm.hpp"
 #include "factor.hpp"
 #include "utilities.hpp"
 

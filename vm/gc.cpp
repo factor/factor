@@ -135,49 +135,57 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 
 	/* Keep trying to GC higher and higher generations until we don't run out
 	of space */
-	if(setjmp(current_gc->gc_unwind))
+	for(;;)
 	{
-		/* We come back here if a generation is full */
-		start_gc_again();
-	}
-
-	current_gc->event->op = current_gc->op;
-
-	switch(current_gc->op)
-	{
-	case collect_nursery_op:
-		collect_nursery();
-		break;
-	case collect_aging_op:
-		collect_aging();
-		if(data->high_fragmentation_p())
+		try
 		{
-			current_gc->op = collect_full_op;
-			current_gc->event->op = collect_full_op;
-			collect_full(trace_contexts_p);
+			current_gc->event->op = current_gc->op;
+
+			switch(current_gc->op)
+			{
+			case collect_nursery_op:
+				collect_nursery();
+				break;
+			case collect_aging_op:
+				collect_aging();
+				if(data->high_fragmentation_p())
+				{
+					current_gc->op = collect_full_op;
+					current_gc->event->op = collect_full_op;
+					collect_full(trace_contexts_p);
+				}
+				break;
+			case collect_to_tenured_op:
+				collect_to_tenured();
+				if(data->high_fragmentation_p())
+				{
+					current_gc->op = collect_full_op;
+					current_gc->event->op = collect_full_op;
+					collect_full(trace_contexts_p);
+				}
+				break;
+			case collect_full_op:
+				collect_full(trace_contexts_p);
+				break;
+			case collect_compact_op:
+				collect_compact(trace_contexts_p);
+				break;
+			case collect_growing_heap_op:
+				collect_growing_heap(requested_bytes,trace_contexts_p);
+				break;
+			default:
+				critical_error("Bad GC op",current_gc->op);
+				break;
+			}
+
+			break;
 		}
-		break;
-	case collect_to_tenured_op:
-		collect_to_tenured();
-		if(data->high_fragmentation_p())
+		catch(const must_start_gc_again e)
 		{
-			current_gc->op = collect_full_op;
-			current_gc->event->op = collect_full_op;
-			collect_full(trace_contexts_p);
+			/* We come back here if a generation is full */
+			start_gc_again();
+			continue;
 		}
-		break;
-	case collect_full_op:
-		collect_full(trace_contexts_p);
-		break;
-	case collect_compact_op:
-		collect_compact(trace_contexts_p);
-		break;
-	case collect_growing_heap_op:
-		collect_growing_heap(requested_bytes,trace_contexts_p);
-		break;
-	default:
-		critical_error("Bad GC op",current_gc->op);
-		break;
 	}
 
 	end_gc();

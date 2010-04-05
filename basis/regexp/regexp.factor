@@ -218,6 +218,4 @@ SYNTAX: R| CHAR: | parsing-regexp ;
 
 USING: vocabs vocabs.loader ;
 
-"prettyprint" vocab [
-    "regexp.prettyprint" require
-] when
+"prettyprint" "regexp.prettyprint" require-when

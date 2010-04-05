@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs heaps kernel math sequences sets shuffle ;
-IN: astar
+USING: accessors assocs hash-sets heaps kernel math sequences sets shuffle ;
+IN: path-finding
 
 ! This implements the A* algorithm. See http://en.wikipedia.org/wiki/A*
 
@@ -24,10 +24,10 @@ TUPLE: (astar) astar goal origin in-open-set open-set ;
     (add-to-open-set) ;
 
 : ?add-to-open-set ( node astar -- )
-    2dup astar>> in-closed-set>> key? [ 2drop ] [ add-to-open-set ] if ;
+    2dup astar>> in-closed-set>> in? [ 2drop ] [ add-to-open-set ] if ;
 
 : move-to-closed-set ( node astar -- )
-    [ astar>> in-closed-set>> conjoin ] [ in-open-set>> delete-at ] 2bi ;
+    [ astar>> in-closed-set>> adjoin ] [ in-open-set>> delete-at ] 2bi ;
 
 : get-first ( astar -- node )
     [ open-set>> heap-pop drop dup ] [ move-to-closed-set ] bi ;
@@ -58,7 +58,7 @@ TUPLE: (astar) astar goal origin in-open-set open-set ;
 : (init) ( from to astar -- )
     swap >>goal
     H{ } clone over astar>> (>>g)
-    H{ } clone over astar>> (>>in-closed-set)
+    { } <hash-set> over astar>> (>>in-closed-set)
     H{ } clone >>origin
     H{ } clone >>in-open-set
     <min-heap> >>open-set
@@ -69,6 +69,11 @@ M: astar-simple cost cost>> call( n1 n2 -- c ) ;
 M: astar-simple heuristic heuristic>> call( n1 n2 -- c ) ;
 M: astar-simple neighbours neighbours>> call( n -- neighbours ) ;
 
+TUPLE: bfs < astar neighbours ;
+M: bfs cost 3drop 1 ;
+M: bfs heuristic 3drop 0 ;
+M: bfs neighbours neighbours>> at ;
+
 PRIVATE>
 
 : find-path ( start target astar -- path/f )
@@ -78,4 +83,7 @@ PRIVATE>
     astar-simple new swap >>heuristic swap >>cost swap >>neighbours ;
 
 : considered ( astar -- considered )
-    in-closed-set>> keys ;
+    in-closed-set>> members ;
+
+: <bfs> ( neighbours -- astar )
+    [ bfs new ] dip >>neighbours ;
