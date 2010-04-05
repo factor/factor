@@ -5,8 +5,7 @@ classes.struct continuations combinators compiler compiler.alien
 core-graphics.types stack-checker kernel math namespaces make
 quotations sequences strings words cocoa.runtime cocoa.types io
 macros memoize io.encodings.utf8 effects layouts libc
-libc.private lexer init core-foundation fry generalizations
-specialized-arrays ;
+lexer init core-foundation fry generalizations specialized-arrays ;
 QUALIFIED-WITH: alien.c-types c
 IN: cocoa.messages
 

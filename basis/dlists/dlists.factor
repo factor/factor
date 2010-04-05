@@ -29,7 +29,7 @@ TUPLE: dlist
 : <hashed-dlist> ( -- search-deque )
     20 <hashtable> <dlist> <search-deque> ;
 
-M: dlist deque-empty? front>> not ;
+M: dlist deque-empty? front>> not ; inline
 
 M: dlist-node node-value obj>> ;
 

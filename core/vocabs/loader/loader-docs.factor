@@ -50,7 +50,9 @@ $nl
 { $subsections "vocabs.metadata" "vocabs.icons" }
 "Vocabularies can also be loaded at run time, without altering the vocabulary search path. This is done by calling a word which loads a vocabulary if it is not in the image, doing nothing if it is:"
 { $subsections require }
-"The above word will only ever load a vocabulary once in a given session. There is another word which unconditionally loads vocabulary from disk, regardless of whether or not is has already been loaded:"
+"The above word will only ever load a vocabulary once in a given session. Sometimes, two vocabularies require special code to interact. The following word is used to load one vocabulary when another is present:"
+{ $subsections require-when }
+"There is another word which unconditionally loads vocabulary from disk, regardless of whether or not is has already been loaded:"
 { $subsections reload }
 "For interactive development in the listener, calling " { $link reload } " directly is usually not necessary, since a better facility exists for " { $link "vocabs.refresh" } "."
 $nl
@@ -110,6 +112,12 @@ HELP: require
 { $values { "vocab" "a vocabulary specifier" } }
 { $description "Loads a vocabulary if it has not already been loaded." }
 { $notes "To unconditionally reload a vocabulary, use " { $link reload } ". To reload changed source files only, use the words in " { $link "vocabs.refresh" } "." } ;
+
+HELP: require-when
+{ $values { "if" "a vocabulary specifier" } { "then" "a vocabulary specifier" } }
+{ $description "Loads the " { $snippet "then" } " vocabulary if it is not loaded and the " { $snippet "if" } " vocabulary is. If the " { $snippet "if" } " vocabulary is not loaded now, but it is later, then the " { $snippet "then" } " vocabulary will be loaded along with it at that time." }
+{ $notes "This is used to express a joint dependency of vocabularies. If vocabularies " { $snippet "a" } " and " { $snippet "b" } " use code in vocabulary " { $snippet "c" } " to interact, then the following line can be placed in " { $snippet "a" } " in order express the dependency."
+{ $code "\"b\" \"c\" require-when" } } ;
 
 HELP: run
 { $values { "vocab" "a vocabulary specifier" } }

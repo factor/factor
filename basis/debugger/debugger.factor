@@ -120,6 +120,8 @@ HOOK: signal-error. os ( obj -- )
 : datastack-overflow. ( obj -- ) "Data" stack-overflow. ;
 : retainstack-underflow. ( obj -- ) "Retain" stack-underflow. ;
 : retainstack-overflow. ( obj -- ) "Retain" stack-overflow. ;
+: callstack-underflow. ( obj -- ) "Call" stack-underflow. ;
+: callstack-overflow. ( obj -- ) "Call" stack-overflow. ;
 
 : memory-error. ( error -- )
     "Memory protection fault at address " write third .h ;
@@ -153,8 +155,10 @@ PREDICATE: vm-error < array
         { 11 [ datastack-overflow.     ] }
         { 12 [ retainstack-underflow.  ] }
         { 13 [ retainstack-overflow.   ] }
-        { 14 [ memory-error.           ] }
-        { 15 [ fp-trap-error.          ] }
+        { 14 [ callstack-underflow.    ] }
+        { 15 [ callstack-overflow.     ] }
+        { 16 [ memory-error.           ] }
+        { 17 [ fp-trap-error.          ] }
     } ; inline
 
 M: vm-error summary drop "VM error" ;

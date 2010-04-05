@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: threads kernel prettyprint prettyprint.config
 io io.styles sequences assocs namespaces sorting boxes
@@ -7,7 +7,9 @@ IN: tools.threads
 
 : thread. ( thread -- )
     dup id>> pprint-cell
-    dup name>> over [ write-object ] with-cell
+    dup name>> [
+        over write-object
+    ] with-cell
     dup state>> [
         [ dup self eq? "running" "yield" ? ] unless*
         write

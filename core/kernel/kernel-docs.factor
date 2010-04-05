@@ -26,28 +26,28 @@ HELP: -rot  ( x y z -- z x y ) $complex-shuffle ;
 HELP: dupd  ( x y -- x x y )   $complex-shuffle ;
 HELP: swapd ( x y z -- y x z ) $complex-shuffle ;
 
-HELP: datastack ( -- ds )
-{ $values { "ds" array } }
+HELP: datastack ( -- array )
+{ $values { "array" array } }
 { $description "Outputs an array containing a copy of the data stack contents right before the call to this word, with the top of the stack at the end of the array." } ;
 
-HELP: set-datastack ( ds -- )
-{ $values { "ds" array } }
+HELP: set-datastack ( array -- )
+{ $values { "array" array } }
 { $description "Replaces the data stack contents with a copy of an array. The end of the array becomes the top of the stack." } ;
 
-HELP: retainstack ( -- rs )
-{ $values { "rs" array } }
+HELP: retainstack ( -- array )
+{ $values { "array" array } }
 { $description "Outputs an array containing a copy of the retain stack contents right before the call to this word, with the top of the stack at the end of the array." } ;
 
-HELP: set-retainstack ( rs -- )
-{ $values { "rs" array } }
+HELP: set-retainstack ( array -- )
+{ $values { "array" array } }
 { $description "Replaces the retain stack contents with a copy of an array. The end of the array becomes the top of the stack." } ;
 
-HELP: callstack ( -- cs )
-{ $values { "cs" callstack } }
+HELP: callstack ( -- callstack )
+{ $values { "callstack" callstack } }
 { $description "Outputs a copy of the call stack contents, with the top of the stack at the end of the vector. The stack frame of the caller word is " { $emphasis "not" } " included." } ;
 
-HELP: set-callstack ( cs -- * )
-{ $values { "cs" callstack } }
+HELP: set-callstack ( callstack -- * )
+{ $values { "callstack" callstack } }
 { $description "Replaces the call stack contents. Control flow is transferred immediately to the innermost frame of the new call stack." } ;
 
 HELP: clear
@@ -207,11 +207,6 @@ HELP: call
 } ;
 
 { call POSTPONE: call( } related-words
-
-HELP: call-clear ( quot -- * )
-{ $values { "quot" callable } }
-{ $description "Calls a quotation with an empty call stack. If the quotation returns, Factor will exit.." }
-{ $notes "Used to implement " { $link "threads" } "." } ;
 
 HELP: keep
 { $values { "x" object } { "quot" { $quotation "( ..a x -- ..b )" } } }

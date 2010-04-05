@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors ;
 IN: boxes
@@ -11,16 +11,18 @@ ERROR: box-full box ;
 
 : >box ( value box -- )
     dup occupied>>
-    [ box-full ] [ t >>occupied (>>value) ] if ;
+    [ box-full ] [ t >>occupied (>>value) ] if ; inline
 
 ERROR: box-empty box ;
 
+: check-box ( box -- box )
+    dup occupied>> [ box-empty ] unless ; inline
+
 : box> ( box -- value )
-    dup occupied>>
-    [ [ f ] change-value f >>occupied drop ] [ box-empty ] if ;
+    check-box [ f ] change-value f >>occupied drop ; inline
 
 : ?box ( box -- value/f ? )
-    dup occupied>> [ box> t ] [ drop f f ] if ;
+    dup occupied>> [ box> t ] [ drop f f ] if ; inline
 
 : if-box? ( box quot -- )
     [ ?box ] dip [ drop ] if ; inline

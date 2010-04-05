@@ -38,26 +38,30 @@ M: x86.64 machine-registers
     } ;
 
 : vm-reg ( -- reg ) R13 ; inline
+: nv-reg ( -- reg ) RBX ; inline
 
 M: x86.64 %mov-vm-ptr ( reg -- )
     vm-reg MOV ;
 
-M: x86.64 %vm-field ( dst field -- )
-    [ vm-reg ] dip vm-field-offset [+] MOV ;
+M: x86.64 %vm-field ( dst offset -- )
+    [ vm-reg ] dip [+] MOV ;
 
-M: x86.64 %vm-field-ptr ( dst field -- )
-    [ vm-reg ] dip vm-field-offset [+] LEA ;
+M: x86.64 %set-vm-field ( src offset -- )
+    [ vm-reg ] dip [+] swap MOV ;
+
+M: x86.64 %vm-field-ptr ( dst offset -- )
+    [ vm-reg ] dip [+] LEA ;
 
 : param@ ( n -- op ) reserved-stack-space + stack@ ;
 
 M: x86.64 %prologue ( n -- )
-    temp-reg -7 [] LEA
+    temp-reg -7 [RIP+] LEA
     dup PUSH
     temp-reg PUSH
     stack-reg swap 3 cells - SUB ;
 
 M: x86.64 %prepare-jump
-    pic-tail-reg xt-tail-pic-offset [] LEA ;
+    pic-tail-reg xt-tail-pic-offset [RIP+] LEA ;
 
 : load-cards-offset ( dst -- )
     0 MOV rc-absolute-cell rel-cards-offset ;
@@ -110,7 +114,7 @@ M: x86.64 %pop-stack ( n -- )
     param-reg-0 swap ds-reg reg-stack MOV ;
 
 M: x86.64 %pop-context-stack ( -- )
-    temp-reg "ctx" %vm-field
+    temp-reg %context
     param-reg-0 temp-reg "datastack" context-field-offset [+] MOV
     param-reg-0 param-reg-0 [] MOV
     temp-reg "datastack" context-field-offset [+] bootstrap-cell SUB ;
@@ -215,23 +219,20 @@ M: x86.64 %alien-invoke
     rc-absolute-cell rel-dlsym
     R11 CALL ;
 
-M: x86.64 %nest-stacks ( -- )
-    param-reg-0 %mov-vm-ptr
-    "nest_stacks" f %alien-invoke ;
-
-M: x86.64 %unnest-stacks ( -- )
-    param-reg-0 %mov-vm-ptr
-    "unnest_stacks" f %alien-invoke ;
-
 M: x86.64 %prepare-alien-indirect ( -- )
     param-reg-0 ds-reg [] MOV
     ds-reg 8 SUB
     param-reg-1 %mov-vm-ptr
     "pinned_alien_offset" f %alien-invoke
-    RBP RAX MOV ;
+    nv-reg RAX MOV ;
 
 M: x86.64 %alien-indirect ( -- )
-    RBP CALL ;
+    nv-reg CALL ;
+
+M: x86.64 %begin-callback ( -- )
+    param-reg-0 %mov-vm-ptr
+    param-reg-1 0 MOV
+    "begin_callback" f %alien-invoke ;
 
 M: x86.64 %alien-callback ( quot -- )
     param-reg-0 param-reg-1 %restore-context
@@ -239,16 +240,15 @@ M: x86.64 %alien-callback ( quot -- )
     param-reg-0 quot-entry-point-offset [+] CALL
     param-reg-0 param-reg-1 %save-context ;
 
-M: x86.64 %callback-value ( ctype -- )
-    %pop-context-stack
-    RSP 8 SUB
-    param-reg-0 PUSH
+M: x86.64 %end-callback ( -- )
     param-reg-0 %mov-vm-ptr
-    ! Restore data/call/retain stacks
-    "unnest_stacks" f %alien-invoke
-    ! Put former top of data stack in param-reg-0
-    param-reg-0 POP
-    RSP 8 ADD
+    "end_callback" f %alien-invoke ;
+
+M: x86.64 %end-callback-value ( ctype -- )
+    %pop-context-stack
+    nv-reg param-reg-0 MOV
+    %end-callback
+    param-reg-0 nv-reg MOV
     ! Unbox former top of data stack to return registers
     unbox-return ;
 

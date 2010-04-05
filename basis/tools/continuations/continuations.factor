@@ -1,10 +1,11 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: threads kernel namespaces continuations combinators
-sequences math namespaces.private continuations.private
-concurrency.messaging quotations kernel.private words
-sequences.private assocs models models.arrow arrays accessors
-generic generic.single definitions make sbufs tools.crossref fry ;
+USING: threads threads.private kernel namespaces continuations
+combinators sequences math namespaces.private
+continuations.private concurrency.messaging quotations
+kernel.private words sequences.private assocs models
+models.arrow arrays accessors generic generic.single definitions
+make sbufs tools.crossref fry ;
 IN: tools.continuations
 
 <PRIVATE
@@ -126,6 +127,7 @@ PRIVATE>
     >n ndrop >c c>
     continue continue-with
     stop suspend (spawn)
+    set-context start-context
 } [ don't-step-into ] each
 
 \ break [ break ] "step-into" set-word-prop

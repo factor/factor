@@ -144,12 +144,12 @@ void factor_vm::update_word_references(code_block *compiled, bool reset_inline_c
 image load */
 void factor_vm::undefined_symbol()
 {
-	general_error(ERROR_UNDEFINED_SYMBOL,false_object,false_object,NULL);
+	general_error(ERROR_UNDEFINED_SYMBOL,false_object,false_object);
 }
 
 void undefined_symbol()
 {
-	return tls_vm()->undefined_symbol();
+	return current_vm()->undefined_symbol();
 }
 
 /* Look up an external library symbol referenced by a compiled code block */
@@ -225,6 +225,11 @@ void factor_vm::store_external_address(instruction_operand op)
 	case RT_DECKS_OFFSET:
 		op.store_value(decks_offset);
 		break;
+#ifdef WINDOWS
+	case RT_EXCEPTION_HANDLER:
+		op.store_value((cell)&factor::exception_handler);
+		break;
+#endif
 	default:
 		critical_error("Bad rel type",op.rel_type());
 		break;

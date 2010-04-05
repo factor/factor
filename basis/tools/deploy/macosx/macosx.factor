@@ -34,9 +34,6 @@ IN: tools.deploy.macosx
     "Contents/Info.plist" append-path
     write-plist ;
 
-: copy-dll ( bundle-name -- )
-    "Frameworks/libfactor.dylib" copy-bundle-dir ;
-
 : copy-nib ( bundle-name -- )
     deploy-ui? get [
         "Resources/English.lproj/MiniFactor.nib" copy-bundle-dir
@@ -50,11 +47,10 @@ IN: tools.deploy.macosx
 : create-app-dir ( vocab bundle-name -- vm )
     {
         [
-            nip {
-                [ copy-dll ]
-                [ copy-nib ]
-                [ "Contents/Resources" append-path make-directories ]
-            } cleave
+            nip
+            [ copy-nib ]
+            [ "Contents/Resources" append-path make-directories ]
+            [ "Contents/Frameworks" append-path make-directories ] tri
         ]
         [ copy-icns ]
         [ create-app-plist ]

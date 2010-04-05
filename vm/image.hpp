@@ -30,7 +30,7 @@ struct image_header {
 struct vm_parameters {
 	const vm_char *image_path;
 	const vm_char *executable_path;
-	cell ds_size, rs_size;
+	cell datastack_size, retainstack_size, callstack_size;
 	cell young_size, aging_size, tenured_size;
 	cell code_size;
 	bool fep;

@@ -13,16 +13,22 @@ void factor_vm::check_frame(stack_frame *frame)
 
 callstack *factor_vm::allot_callstack(cell size)
 {
-	callstack *stack = allot<callstack>(callstack_size(size));
+	callstack *stack = allot<callstack>(callstack_object_size(size));
 	stack->length = tag_fixnum(size);
 	return stack;
 }
 
-stack_frame *factor_vm::fix_callstack_top(stack_frame *top, stack_frame *bottom)
+/* If 'stack' points into the middle of the frame, find the nearest valid stack
+pointer where we can resume execution and hope to capture the call trace without
+crashing. Also, make sure we have at least 'stack_reserved' bytes available so
+that we don't run out of callstack space while handling the error. */
+stack_frame *factor_vm::fix_callstack_top(stack_frame *stack)
 {
-	stack_frame *frame = bottom - 1;
+	stack_frame *frame = ctx->callstack_bottom - 1;
 
-	while(frame >= top)
+	while(frame >= stack
+		&& frame >= ctx->callstack_top
+		&& (cell)frame >= ctx->callstack_seg->start + stack_reserved)
 		frame = frame_successor(frame);
 
 	return frame + 1;
@@ -36,7 +42,7 @@ This means that if 'callstack' is called in tail position, we
 will have popped a necessary frame... however this word is only
 called by continuation implementation, and user code shouldn't
 be calling it at all, so we leave it as it is for now. */
-stack_frame *factor_vm::second_from_top_stack_frame()
+stack_frame *factor_vm::second_from_top_stack_frame(context *ctx)
 {
 	stack_frame *frame = ctx->callstack_bottom - 1;
 	while(frame >= ctx->callstack_top
@@ -48,16 +54,27 @@ stack_frame *factor_vm::second_from_top_stack_frame()
 	return frame + 1;
 }
 
-void factor_vm::primitive_callstack()
+cell factor_vm::capture_callstack(context *ctx)
 {
-	stack_frame *top = second_from_top_stack_frame();
+	stack_frame *top = second_from_top_stack_frame(ctx);
 	stack_frame *bottom = ctx->callstack_bottom;
 
 	fixnum size = std::max((fixnum)0,(fixnum)bottom - (fixnum)top);
 
 	callstack *stack = allot_callstack(size);
 	memcpy(stack->top(),top,size);
-	ctx->push(tag<callstack>(stack));
+	return tag<callstack>(stack);
+}
+
+void factor_vm::primitive_callstack()
+{
+	ctx->push(capture_callstack(ctx));
+}
+
+void factor_vm::primitive_callstack_for()
+{
+	context *other_ctx = (context *)pinned_alien_offset(ctx->pop());
+	ctx->push(capture_callstack(other_ctx));
 }
 
 code_block *factor_vm::frame_code(stack_frame *frame)
