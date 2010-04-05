@@ -38,8 +38,8 @@ SYMBOL: check-optimizer?
     copy-propagation
     eliminate-dead-code
     eliminate-write-barriers
-    schedule-instructions
     select-representations
+    schedule-instructions
     destruct-ssa
     delete-empty-blocks
     ?check ;
