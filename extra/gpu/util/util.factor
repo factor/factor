@@ -1,6 +1,7 @@
 ! (c)2009 Joe Groff bsd license
-USING: arrays gpu.buffers gpu.framebuffers gpu.render gpu.shaders
-gpu.textures images kernel locals specialized-arrays ;
+USING: accessors arrays gpu.buffers gpu.framebuffers gpu.render
+gpu.shaders gpu.textures images kernel locals opengl.framebuffers
+specialized-arrays ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: gpu.util
@@ -83,6 +84,7 @@ void main()
 ;
 
 GLSL-SHADER: window-point-fragment-shader fragment-shader
+#version 120
 uniform sampler2D texture;
 void main()
 {
@@ -113,9 +115,15 @@ CONSTANT: window-vertexes
     [ <window-vertex-buffer> ] dip window-vertex-format <vertex-array*> ; inline
 
 :: <2d-render-texture> ( dim order type -- renderbuffer texture )
-    order type T{ texture-parameters { wrap clamp-texcoord-to-edge }
-       { min-filter filter-linear } { min-mipmap-filter f } } <texture-2d>
-    [ 0 <texture-2d-attachment> 1array f f dim <framebuffer> ] keep ;
+    order type
+    T{ texture-parameters
+       { wrap clamp-texcoord-to-edge }
+       { min-filter filter-linear }
+       { min-mipmap-filter f } }
+    <texture-2d> [
+        0 <texture-2d-attachment> 1array f f dim <framebuffer>
+        dup { { default-attachment { 0 0 0 } } } clear-framebuffer
+    ] keep ;
 
 : draw-texture ( texture -- )
     {

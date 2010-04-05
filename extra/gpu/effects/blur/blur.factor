@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: destructors fry gpu.render gpu.shaders gpu.state gpu.textures
-gpu.util images kernel locals math math.rectangles sequences ;
+USING: arrays destructors fry gpu.framebuffers gpu.render gpu.shaders
+gpu.state gpu.textures gpu.util images kernel locals math
+math.rectangles sequences ;
 IN: gpu.effects.blur
 
 GLSL-SHADER: blur-fragment-shader fragment-shader
@@ -14,10 +15,10 @@ void main()
     vec4 col = 0.16 * texture2D(texture, texcoord);
     if (horizontal)
     {
-        const vec2 blurX1 = vec2(blurSize, 0.0);
-        const vec2 blurX2 = vec2(blurSize * 2.0, 0.0);
-        const vec2 blurX3 = vec2(blurSize * 3.0, 0.0);
-        const vec2 blurX4 = vec2(blurSize * 4.0, 0.0);
+        vec2 blurX1 = vec2(blurSize, 0.0);
+        vec2 blurX2 = vec2(blurSize * 2.0, 0.0);
+        vec2 blurX3 = vec2(blurSize * 3.0, 0.0);
+        vec2 blurX4 = vec2(blurSize * 4.0, 0.0);
         col += 0.15 * (  texture2D(texture, texcoord - blurX1)
                        + texture2D(texture, texcoord + blurX1));
         col += 0.12 * (  texture2D(texture, texcoord - blurX2)
@@ -29,10 +30,10 @@ void main()
     }
     else
     {
-        const vec2 blurY1 = vec2(0.0, blurSize);
-        const vec2 blurY2 = vec2(0.0, blurSize * 2.0);
-        const vec2 blurY3 = vec2(0.0, blurSize * 3.0);
-        const vec2 blurY4 = vec2(0.0, blurSize * 4.0);
+        vec2 blurY1 = vec2(0.0, blurSize);
+        vec2 blurY2 = vec2(0.0, blurSize * 2.0);
+        vec2 blurY3 = vec2(0.0, blurSize * 3.0);
+        vec2 blurY4 = vec2(0.0, blurSize * 4.0);
         col += 0.15 * (  texture2D(texture, texcoord - blurY1)
                        + texture2D(texture, texcoord + blurY1));
         col += 0.12 * (  texture2D(texture, texcoord - blurY2)
@@ -42,7 +43,7 @@ void main()
         col += 0.05 * (  texture2D(texture, texcoord - blurY4)
                        + texture2D(texture, texcoord + blurY4));
     }
-    gl_FragColor = col ;
+    gl_FragColor = col;
 }
 ;
    
@@ -52,7 +53,7 @@ UNIFORM-TUPLE: blur-uniforms
     { "blurSize"   float-uniform   f } ;
 
 GLSL-PROGRAM: blur-program window-vertex-shader blur-fragment-shader window-vertex-format ;
-
+                        
 :: (blur) ( texture horizontal? framebuffer dim -- )
     { 0 0 } dim <rect> <viewport-state> set-gpu-state
     texture horizontal? 1.0 dim horizontal? [ first ] [ second ] if / blur-uniforms boa framebuffer {
@@ -65,7 +66,7 @@ GLSL-PROGRAM: blur-program window-vertex-shader blur-fragment-shader window-vert
                          
 :: blur ( texture horizontal? -- texture )
     texture 0 texture-dim :> dim
-    dim L ubyte-components <2d-render-texture> :> ( target-framebuffer target-texture )
+    dim RGB float-components <2d-render-texture> :> ( target-framebuffer target-texture )
     texture horizontal? target-framebuffer dim (blur)
     target-framebuffer dispose
     target-texture ;
