@@ -4,10 +4,10 @@ USING: deques threads kernel arrays sequences alarms fry ;
 IN: concurrency.conditions
 
 : notify-1 ( deque -- )
-    dup deque-empty? [ drop ] [ pop-back resume-now ] if ;
+    dup deque-empty? [ drop ] [ pop-back resume-now ] if ; inline
 
 : notify-all ( deque -- )
-    [ resume-now ] slurp-deque ;
+    [ resume-now ] slurp-deque ; inline
 
 : queue-timeout ( queue timeout -- alarm )
     #! Add an alarm which removes the current thread from the
@@ -23,7 +23,7 @@ IN: concurrency.conditions
 ERROR: wait-timeout ;
 
 : queue ( queue -- )
-    [ self ] dip push-front ;
+    [ self ] dip push-front ; inline
 
 : wait ( queue timeout status -- )
     over [
@@ -31,4 +31,4 @@ ERROR: wait-timeout ;
         [ wait-timeout ] [ cancel-alarm ] if
     ] [
         [ drop queue ] dip suspend drop
-    ] if ;
+    ] if ; inline

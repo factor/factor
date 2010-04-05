@@ -19,7 +19,25 @@ void factor_vm::init_callbacks(cell size)
 	callbacks = new callback_heap(size,this);
 }
 
-void callback_heap::store_callback_operand(code_block *stub, cell index, cell value)
+bool callback_heap::setup_seh_p()
+{
+#if defined(WINDOWS) && defined(FACTOR_X86)
+	return true;
+#else
+	return false;
+#endif
+}
+
+bool callback_heap::return_takes_param_p()
+{
+#if defined(FACTOR_X86) || defined(FACTOR_AMD64)
+	return true;
+#else
+	return false;
+#endif
+}
+
+instruction_operand callback_heap::callback_operand(code_block *stub, cell index)
 {
 	tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
 
@@ -33,12 +51,23 @@ void callback_heap::store_callback_operand(code_block *stub, cell index, cell va
 		offset);
 
 	instruction_operand op(rel,stub,0);
-	op.store_value(value);
+
+	return op;
+}
+
+void callback_heap::store_callback_operand(code_block *stub, cell index)
+{
+	parent->store_external_address(callback_operand(stub,index));
+}
+
+void callback_heap::store_callback_operand(code_block *stub, cell index, cell value)
+{
+	callback_operand(stub,index).store_value(value);
 }
 
 void callback_heap::update(code_block *stub)
 {
-	store_callback_operand(stub,1,(cell)callback_entry_point(stub));
+	store_callback_operand(stub,setup_seh_p() ? 2 : 1,(cell)callback_entry_point(stub));
 	stub->flush_icache();
 }
 
@@ -64,13 +93,24 @@ code_block *callback_heap::add(cell owner, cell return_rewind)
 
 	/* Store VM pointer */
 	store_callback_operand(stub,0,(cell)parent);
-	store_callback_operand(stub,2,(cell)parent);
+
+	cell index;
+
+	if(setup_seh_p())
+	{
+		store_callback_operand(stub,1);
+		index = 1;
+	}
+	else
+		index = 0;
+
+	/* Store VM pointer */
+	store_callback_operand(stub,index + 2,(cell)parent);
 
 	/* On x86, the RET instruction takes an argument which depends on
 	the callback's calling convention */
-#if defined(FACTOR_X86) || defined(FACTOR_AMD64)
-	store_callback_operand(stub,3,return_rewind);
-#endif
+	if(return_takes_param_p())
+		store_callback_operand(stub,index + 3,return_rewind);
 
 	update(stub);
 

@@ -26,6 +26,11 @@ IN: bootstrap.x86
 : fixnum>slot@ ( -- ) temp0 1 SAR ;
 : rex-length ( -- n ) 1 ;
 
+: jit-save-tib ( -- ) ;
+: jit-restore-tib ( -- ) ;
+: jit-update-tib ( ctx-reg -- ) drop ;
+: jit-install-seh ( -- ) stack-reg bootstrap-cell ADD ;
+
 : jit-call ( name -- )
     RAX 0 MOV rc-absolute-cell jit-dlsym
     RAX CALL ;
@@ -42,7 +47,7 @@ IN: bootstrap.x86
 ] jit-prolog jit-define
 
 [
-    temp3 5 [] LEA
+    temp3 5 [RIP+] LEA
     0 JMP rc-relative rt-entry-point-pic-tail jit-rel
 ] jit-word-jump jit-define
 
@@ -57,11 +62,12 @@ IN: bootstrap.x86
     ctx-reg context-retainstack-offset [+] rs-reg MOV ;
 
 : jit-restore-context ( -- )
-    jit-load-context
     ds-reg ctx-reg context-datastack-offset [+] MOV
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
 [
+    ! ctx-reg is preserved across the call because it is non-volatile
+    ! in the C ABI
     jit-save-context
     ! call the primitive
     arg1 vm-reg MOV
@@ -75,15 +81,15 @@ IN: bootstrap.x86
 : jit-call-quot ( -- ) arg1 quot-entry-point-offset [+] CALL ;
 
 [
-    nv-reg arg1 MOV
-
+    arg2 arg1 MOV
     arg1 vm-reg MOV
     "begin_callback" jit-call
 
+    jit-load-context
     jit-restore-context
 
     ! call the quotation
-    arg1 nv-reg MOV
+    arg1 return-reg MOV
     jit-call-quot
 
     jit-save-context
@@ -115,6 +121,7 @@ IN: bootstrap.x86
     vm-reg 0 MOV 0 rc-absolute-cell jit-vm
 
     ! Load ds and rs registers
+    jit-load-context
     jit-restore-context
 
     ! Call quotation
@@ -168,6 +175,7 @@ IN: bootstrap.x86
     arg1 RBX MOV
     arg2 vm-reg MOV
     "inline_cache_miss" jit-call
+    jit-load-context
     jit-restore-context ;
 
 [ jit-load-return-address jit-inline-cache-miss ]

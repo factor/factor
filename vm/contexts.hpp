@@ -6,6 +6,7 @@ static const cell context_object_count = 10;
 enum context_object {
 	OBJ_NAMESTACK,
 	OBJ_CATCHSTACK,
+	OBJ_CONTEXT,
 };
 
 static const cell stack_reserved = 1024;
@@ -27,13 +28,13 @@ struct context {
 	/* C callstack pointer */
 	cell callstack_save;
 
-	/* context-specific special objects, accessed by context-object and
-	set-context-object primitives */
-	cell context_objects[context_object_count];
-
 	segment *datastack_seg;
 	segment *retainstack_seg;
 	segment *callstack_seg;
+
+	/* context-specific special objects, accessed by context-object and
+	set-context-object primitives */
+	cell context_objects[context_object_count];
 
 	context(cell datastack_size, cell retainstack_size, cell callstack_size);
 	~context();
@@ -71,7 +72,7 @@ struct context {
 
 VM_C_API context *new_context(factor_vm *parent);
 VM_C_API void delete_context(factor_vm *parent, context *old_context);
-VM_C_API void begin_callback(factor_vm *parent);
+VM_C_API cell begin_callback(factor_vm *parent, cell quot);
 VM_C_API void end_callback(factor_vm *parent);
 
 }

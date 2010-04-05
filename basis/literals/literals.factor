@@ -25,6 +25,7 @@ SYNTAX: $ scan-word expand-literal >vector ;
 SYNTAX: $[ parse-quotation with-datastack >vector ;
 SYNTAX: ${ \ } [ expand-literals ] parse-literal ;
 SYNTAX: flags{
-    "}" [ parse-word ] map-tokens
-    expand-literals
-    0 [ bitor ] reduce suffix! ;
+    \ } [
+        expand-literals
+        0 [ bitor ] reduce
+    ] parse-literal ;

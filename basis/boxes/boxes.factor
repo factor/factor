@@ -11,7 +11,7 @@ ERROR: box-full box ;
 
 : >box ( value box -- )
     dup occupied>>
-    [ box-full ] [ t >>occupied (>>value) ] if ;
+    [ box-full ] [ t >>occupied (>>value) ] if ; inline
 
 ERROR: box-empty box ;
 
@@ -19,10 +19,10 @@ ERROR: box-empty box ;
     dup occupied>> [ box-empty ] unless ; inline
 
 : box> ( box -- value )
-    check-box [ f ] change-value f >>occupied drop ;
+    check-box [ f ] change-value f >>occupied drop ; inline
 
 : ?box ( box -- value/f ? )
-    dup occupied>> [ box> t ] [ drop f f ] if ;
+    dup occupied>> [ box> t ] [ drop f f ] if ; inline
 
 : if-box? ( box quot -- )
     [ ?box ] dip [ drop ] if ; inline
