@@ -43,22 +43,25 @@ M: x86.64 machine-registers
 M: x86.64 %mov-vm-ptr ( reg -- )
     vm-reg MOV ;
 
-M: x86.64 %vm-field ( dst field -- )
-    [ vm-reg ] dip vm-field-offset [+] MOV ;
+M: x86.64 %vm-field ( dst offset -- )
+    [ vm-reg ] dip [+] MOV ;
 
-M: x86.64 %vm-field-ptr ( dst field -- )
-    [ vm-reg ] dip vm-field-offset [+] LEA ;
+M: x86.64 %set-vm-field ( src offset -- )
+    [ vm-reg ] dip [+] swap MOV ;
+
+M: x86.64 %vm-field-ptr ( dst offset -- )
+    [ vm-reg ] dip [+] LEA ;
 
 : param@ ( n -- op ) reserved-stack-space + stack@ ;
 
 M: x86.64 %prologue ( n -- )
-    temp-reg -7 [] LEA
+    temp-reg -7 [RIP+] LEA
     dup PUSH
     temp-reg PUSH
     stack-reg swap 3 cells - SUB ;
 
 M: x86.64 %prepare-jump
-    pic-tail-reg xt-tail-pic-offset [] LEA ;
+    pic-tail-reg xt-tail-pic-offset [RIP+] LEA ;
 
 : load-cards-offset ( dst -- )
     0 MOV rc-absolute-cell rel-cards-offset ;
@@ -111,7 +114,7 @@ M: x86.64 %pop-stack ( n -- )
     param-reg-0 swap ds-reg reg-stack MOV ;
 
 M: x86.64 %pop-context-stack ( -- )
-    temp-reg "ctx" %vm-field
+    temp-reg %context
     param-reg-0 temp-reg "datastack" context-field-offset [+] MOV
     param-reg-0 param-reg-0 [] MOV
     temp-reg "datastack" context-field-offset [+] bootstrap-cell SUB ;
@@ -228,6 +231,7 @@ M: x86.64 %alien-indirect ( -- )
 
 M: x86.64 %begin-callback ( -- )
     param-reg-0 %mov-vm-ptr
+    param-reg-1 0 MOV
     "begin_callback" f %alien-invoke ;
 
 M: x86.64 %alien-callback ( quot -- )

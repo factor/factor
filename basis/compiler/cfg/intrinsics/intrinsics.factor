@@ -32,6 +32,7 @@ IN: compiler.cfg.intrinsics
     { kernel.private:tag [ drop emit-tag ] }
     { kernel.private:context-object [ emit-context-object ] }
     { kernel.private:special-object [ emit-special-object ] }
+    { kernel.private:set-special-object [ emit-set-special-object ] }
     { kernel.private:(identity-hashcode) [ drop emit-identity-hashcode ] }
     { math.private:both-fixnums? [ drop emit-both-fixnums? ] }
     { math.private:fixnum+ [ drop emit-fixnum+ ] }

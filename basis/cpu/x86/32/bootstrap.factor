@@ -63,12 +63,13 @@ IN: bootstrap.x86
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
 [
+    ! ctx-reg is preserved across the call because it is non-volatile
+    ! in the C ABI
     jit-load-vm
     jit-save-context
     ! call the primitive
     ESP [] vm-reg MOV
     0 CALL rc-relative rt-dlsym jit-rel
-    ! restore ds, rs registers
     jit-restore-context
 ] jit-primitive jit-define
 
@@ -81,11 +82,9 @@ IN: bootstrap.x86
 [
     jit-load-vm
     ESP [] vm-reg MOV
-    "begin_callback" jit-call
-
-    ! load quotation - EBP is ctx-reg so it will get clobbered
-    ! later on
     EAX EBP 8 [+] MOV
+    ESP 4 [+] EAX MOV
+    "begin_callback" jit-call
 
     jit-load-vm
     jit-load-context
@@ -109,6 +108,14 @@ IN: bootstrap.x86
 \ (call) define-combinator-primitive
 
 [
+    ! Load ds and rs registers
+    jit-load-vm
+    jit-load-context
+    jit-restore-context
+
+    ! Windows-specific setup
+    ctx-reg jit-update-seh
+
     ! Clear x87 stack, but preserve rounding mode and exception flags
     ESP 2 SUB
     ESP [] FNSTCW
@@ -122,11 +129,6 @@ IN: bootstrap.x86
 
     ! Unwind stack frames
     ESP EDX MOV
-
-    ! Load ds and rs registers
-    jit-load-vm
-    jit-load-context
-    jit-restore-context
 
     jit-jump-quot
 ] \ unwind-native-frames define-sub-primitive
@@ -254,6 +256,9 @@ IN: bootstrap.x86
     ! Load new stack pointer
     ESP ctx-reg context-callstack-top-offset [+] MOV
 
+    ! Windows-specific setup
+    ctx-reg jit-update-tib
+
     ! Load new ds, rs registers
     jit-restore-context ;
 
@@ -266,6 +271,9 @@ IN: bootstrap.x86
 
     ! Make the new context active
     EAX jit-switch-context
+
+    ! Windows-specific setup
+    ctx-reg jit-update-seh
 
     ! Twiddle stack for return
     ESP 4 ADD
@@ -293,6 +301,12 @@ IN: bootstrap.x86
     EAX EBX -4 [+] MOV
     ds-reg 4 ADD
     ds-reg [] EAX MOV
+
+    ! Windows-specific setup
+    jit-install-seh
+
+    ! Push a fake return address
+    0 PUSH
 
     ! Jump to initial quotation
     EAX EBX [] MOV

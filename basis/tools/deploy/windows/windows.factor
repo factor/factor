@@ -11,16 +11,12 @@ IN: tools.deploy.windows
 
 CONSTANT: app-icon-resource-id "APPICON"
 
-: copy-dll ( bundle-name -- )
-    "resource:factor.dll" swap copy-file-into ;
-
 :: copy-vm ( executable bundle-name extension -- vm )
     vm "." split1-last drop extension append
     bundle-name executable ".exe" append append-path
     [ copy-file ] keep ;
 
 : create-exe-dir ( vocab bundle-name -- vm )
-    dup copy-dll
     deploy-console? get ".com" ".exe" ? copy-vm ;
 
 : open-in-explorer ( dir -- )

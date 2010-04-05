@@ -35,7 +35,7 @@ TUPLE: max-heap < heap ;
 : <max-heap> ( -- max-heap ) max-heap <heap> ;
 
 M: heap heap-empty? ( heap -- ? )
-    data>> empty? ;
+    data>> empty? ; inline
 
 M: heap heap-size ( heap -- n )
     data>> length ;

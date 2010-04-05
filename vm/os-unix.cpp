@@ -46,8 +46,7 @@ void sleep_nanos(u64 nsec)
 
 void factor_vm::init_ffi()
 {
-	/* NULL_DLL is "libfactor.dylib" for OS X and NULL for generic Unix */
-	null_dll = dlopen(NULL_DLL,RTLD_LAZY);
+	null_dll = dlopen(NULL,RTLD_LAZY);
 }
 
 void factor_vm::ffi_dlopen(dll *dll)
