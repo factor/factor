@@ -1,0 +1,1 @@
+Render a screen-aligned quad.
