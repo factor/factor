@@ -1,13 +1,9 @@
 ! Copyright (C) 2009, 2010 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators compiler.cfg.def-use
+USING: accessors arrays assocs compiler.cfg.def-use
 compiler.cfg.dependence compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.rpo continuations
-cpu.architecture fry hashtables kernel locals math math.order
-namespaces random sequences sets vectors literals make
-arrays
-compiler.cfg.liveness
-compiler.cfg.liveness.ssa ;
+compiler.cfg.liveness compiler.cfg.rpo cpu.architecture fry
+kernel locals make math namespaces sequences sets ;
 IN: compiler.cfg.scheduling
 
 ! Instruction scheduling to reduce register pressure, from:
