@@ -1,5 +1,5 @@
 !IF DEFINED(DEBUG)
-LINK_FLAGS = /nologo /DEBUG shell32.lib
+LINK_FLAGS = /nologo /safeseh /DEBUG shell32.lib
 CL_FLAGS = /nologo /Zi /O2 /W3 /DFACTOR_DEBUG
 !ELSE
 LINK_FLAGS = /nologo /safeseh shell32.lib
