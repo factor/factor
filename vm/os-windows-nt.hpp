@@ -22,7 +22,7 @@ typedef char symbol_char;
 
 #define FACTOR_DLL NULL
 
-extern "C" LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch);
+VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch);
 
 // SSE traps raise these exception codes, which are defined in internal NT headers
 // but not winbase.h
