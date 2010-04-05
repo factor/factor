@@ -5,7 +5,8 @@ game.worlds gpu gpu.buffers gpu.framebuffers gpu.render gpu.shaders
 gpu.state gpu.textures gpu.util images images.loader kernel literals
 locals make math math.rectangles math.vectors namespaces opengl.gl
 sequences specialized-arrays ui.gadgets.worlds images.ppm
-ui.gestures ui.pixel-formats images.pgm gpu.effects.blur ;
+ui.gestures ui.pixel-formats images.pgm gpu.effects.blur
+gpu.effects.step ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: fluids
