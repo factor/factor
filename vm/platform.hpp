@@ -3,8 +3,8 @@
 		#include "os-windows-ce.hpp"
 		#include "os-windows.hpp"
 	#elif defined(WINNT)
-		#include "os-windows-nt.hpp"
 		#include "os-windows.hpp"
+		#include "os-windows-nt.hpp"
 
 		#if defined(FACTOR_AMD64)
 			#include "os-windows-nt.64.hpp"
