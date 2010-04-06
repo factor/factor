@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors arrays gpu.buffers gpu.framebuffers gpu.render
-gpu.shaders gpu.textures images kernel locals opengl.framebuffers
-specialized-arrays ;
+USING: arrays destructors gpu.buffers gpu.framebuffers gpu.render
+gpu.shaders gpu.state gpu.textures images kernel locals math
+math.rectangles opengl.gl sequences specialized-arrays ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: gpu.util
@@ -125,10 +125,34 @@ CONSTANT: window-vertexes
         dup { { default-attachment { 0 0 0 } } } clear-framebuffer
     ] keep ;
 
-: draw-texture ( texture -- )
+: draw-texture ( texture dim -- )
+    { 0 0 } swap <rect> <viewport-state> set-gpu-state
     {
         { "primitive-mode" [ drop triangle-strip-mode ] }
         { "uniforms"       [ window-uniforms boa ] }
-        { "vertex-array"   [ drop <window-vertex-buffer> window-program <program-instance> <vertex-array> ] }
+        { "vertex-array"   [ drop window-program <program-instance> <window-vertex-array> &dispose ] }
         { "indexes"        [ drop T{ index-range f 0 4 } ] }
     } <render-set> render ;
+
+:: <streamed-vertex-array> ( verts program-instance -- vertex-array )
+    verts stream-upload draw-usage vertex-buffer byte-array>buffer &dispose
+    program-instance <vertex-array> &dispose ;
+
+: (blended-point-sprite-batch) ( verts framebuffer texture point-size dim -- )
+    f eq-add func-one func-one <blend-mode> dup <blend-state> set-gpu-state
+    f origin-upper-left 1.0 <point-state> set-gpu-state
+    GL_POINT_SPRITE glEnable
+    { 0 0 } swap <rect> <viewport-state> set-gpu-state
+    window-point-uniforms boa {
+        { "primitive-mode" [ 3drop points-mode ] }
+        { "uniforms"       [ 2nip ] }
+        { "vertex-array"   [ 2drop window-point-program <program-instance> <streamed-vertex-array> ] }
+        { "indexes"        [ 2drop length 2 / 0 swap <index-range> ] }
+        { "framebuffer"    [ drop nip ] }
+    } 3<render-set> render ;
+    
+:: blended-point-sprite-batch ( verts texture point-size dim -- texture )
+    dim RGB float-components <2d-render-texture> :> ( target-framebuffer target-texture )
+    verts target-framebuffer texture point-size dim (blended-point-sprite-batch)
+    target-framebuffer dispose
+    target-texture ;
