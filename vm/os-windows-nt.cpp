@@ -84,7 +84,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, 
 		break;
 	}
 
-	return ExceptionContinueExecution;
+	return 0;
 }
 
 VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch)
