@@ -1,12 +1,14 @@
 !IF DEFINED(DEBUG)
-LINK_FLAGS = /nologo /DEBUG shell32.lib
+LINK_FLAGS = /nologo /safeseh /DEBUG shell32.lib
 CL_FLAGS = /nologo /Zi /O2 /W3 /DFACTOR_DEBUG
 !ELSE
-LINK_FLAGS = /nologo shell32.lib
+LINK_FLAGS = /nologo /safeseh shell32.lib
 CL_FLAGS = /nologo /O2 /W3
 !ENDIF
 
-EXE_OBJS = factor.dll.lib vm\main-windows-nt.obj vm\factor.res
+ML_FLAGS = /nologo /safeseh
+
+EXE_OBJS = vm\main-windows-nt.obj vm\factor.res
 
 DLL_OBJS = vm\os-windows-nt.obj \
 	vm\os-windows.obj \
@@ -47,6 +49,7 @@ DLL_OBJS = vm\os-windows-nt.obj \
 	vm\profiler.obj \
 	vm\quotations.obj \
 	vm\run.obj \
+	vm\safeseh.obj \
 	vm\strings.obj \
 	vm\to_tenured_collector.obj \
 	vm\tuples.obj \
@@ -60,10 +63,13 @@ DLL_OBJS = vm\os-windows-nt.obj \
 .c.obj:
 	cl $(CL_FLAGS) /Fo$@ /c $<
 
+.asm.obj:
+	ml $(ML_FLAGS) /Fo$@ /c $<
+
 .rs.res:
 	rc $<
 
-all: factor.com factor.exe libfactor-ffi-test.dll
+all: factor.com factor.exe factor.dll.lib libfactor-ffi-test.dll
 
 libfactor-ffi-test.dll: vm/ffi_test.obj
 	link $(LINK_FLAGS) /out:libfactor-ffi-test.dll /dll vm/ffi_test.obj
@@ -71,11 +77,11 @@ libfactor-ffi-test.dll: vm/ffi_test.obj
 factor.dll.lib: $(DLL_OBJS)
 	link $(LINK_FLAGS) /implib:factor.dll.lib /out:factor.dll /dll $(DLL_OBJS)
 
-factor.com: $(EXE_OBJS)
-	link $(LINK_FLAGS) /out:factor.com /SUBSYSTEM:console $(EXE_OBJS)
+factor.com: $(EXE_OBJS) $(DLL_OBJS)
+	link $(LINK_FLAGS) /out:factor.com /SUBSYSTEM:console $(EXE_OBJS) $(DLL_OBJS)
 
-factor.exe: $(EXE_OBJS)
-	link $(LINK_FLAGS) /out:factor.exe /SUBSYSTEM:windows $(EXE_OBJS)
+factor.exe: $(EXE_OBJS) $(DLL_OBJS)
+	link $(LINK_FLAGS) /out:factor.exe /SUBSYSTEM:windows $(EXE_OBJS) $(DLL_OBJS)
 
 clean:
 	del vm\*.obj

@@ -20,15 +20,9 @@ typedef char symbol_char;
 
 #define FACTOR_OS_STRING "winnt"
 
-#define FACTOR_DLL L"factor.dll"
+#define FACTOR_DLL NULL
 
-#ifdef _MSC_VER
-	#define FACTOR_STDCALL(return_type) return_type __stdcall
-#else
-	#define FACTOR_STDCALL(return_type) __attribute__((stdcall)) return_type
-#endif
-
-FACTOR_STDCALL(LONG) exception_handler(PEXCEPTION_POINTERS pe);
+VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch);
 
 // SSE traps raise these exception codes, which are defined in internal NT headers
 // but not winbase.h

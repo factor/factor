@@ -42,7 +42,7 @@ IN: bootstrap.x86
 ] jit-prolog jit-define
 
 [
-    temp3 5 [] LEA
+    temp3 5 [RIP+] LEA
     0 JMP rc-relative rt-entry-point-pic-tail jit-rel
 ] jit-word-jump jit-define
 
@@ -76,8 +76,7 @@ IN: bootstrap.x86
 : jit-call-quot ( -- ) arg1 quot-entry-point-offset [+] CALL ;
 
 [
-    nv-reg arg1 MOV
-
+    arg2 arg1 MOV
     arg1 vm-reg MOV
     "begin_callback" jit-call
 
@@ -85,7 +84,7 @@ IN: bootstrap.x86
     jit-restore-context
 
     ! call the quotation
-    arg1 nv-reg MOV
+    arg1 return-reg MOV
     jit-call-quot
 
     jit-save-context
@@ -234,7 +233,9 @@ IN: bootstrap.x86
     RSP ctx-reg context-callstack-top-offset [+] MOV
 
     ! Load new ds, rs registers
-    jit-restore-context ;
+    jit-restore-context
+
+    ctx-reg jit-update-tib ;
 
 : jit-pop-context-and-param ( -- )
     arg1 ds-reg [] MOV
@@ -289,6 +290,3 @@ IN: bootstrap.x86
     jit-delete-current-context
     jit-start-context
 ] \ (start-context-and-delete) define-sub-primitive
-
-<< "vocab:cpu/x86/bootstrap.factor" parse-file suffix! >>
-call

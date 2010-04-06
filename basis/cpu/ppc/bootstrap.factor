@@ -76,15 +76,22 @@ CONSTANT: nv-reg 17
     432 save-at ;
 
 [
+    ! Save old stack pointer
+    11 1 MR
+
     ! Create stack frame
     0 MFLR
-    1 1 callback-frame-size neg STWU
+    1 1 callback-frame-size SUBI
     0 1 callback-frame-size lr-save + STW
 
     ! Save all non-volatile registers
     nv-int-regs [ 4 * save-int ] each-index
     nv-fp-regs [ 8 * 80 + save-fp ] each-index
     nv-vec-regs [ 16 * 224 + save-vec ] each-index
+
+    ! Stick old stack pointer in a non-volatile register so that
+    ! callbacks can access their arguments
+    nv-reg 11 MR
 
     ! Load VM into vm-reg
     0 vm-reg LOAD32 rc-absolute-ppc-2/2 rt-vm jit-rel
@@ -126,7 +133,7 @@ CONSTANT: nv-reg 17
 
     ! Tear down stack frame and return
     0 1 callback-frame-size lr-save + LWZ
-    1 1 0 LWZ
+    1 1 callback-frame-size ADDI
     0 MTLR
     BLR
 ] callback-stub jit-define

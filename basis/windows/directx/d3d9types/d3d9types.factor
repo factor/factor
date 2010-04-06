@@ -759,25 +759,25 @@ CONSTANT: D3DSHADER_ADDRMODE_FORCE_DWORD HEX: 7fffffff
 CONSTANT: D3DVS_SWIZZLE_SHIFT     16
 CONSTANT: D3DVS_SWIZZLE_MASK      HEX: 00FF0000
 
-: D3DVS_X_X ( -- n ) 0 D3DVS_SWIZZLE_SHIFT shift ; inline
-: D3DVS_X_Y ( -- n ) 1 D3DVS_SWIZZLE_SHIFT shift ; inline
-: D3DVS_X_Z ( -- n ) 2 D3DVS_SWIZZLE_SHIFT shift ; inline
-: D3DVS_X_W ( -- n ) 3 D3DVS_SWIZZLE_SHIFT shift ; inline
+CONSTANT: D3DVS_X_X $[ 0 16 shift ]
+CONSTANT: D3DVS_X_Y $[ 1 16 shift ]
+CONSTANT: D3DVS_X_Z $[ 2 16 shift ]
+CONSTANT: D3DVS_X_W $[ 3 16 shift ]
 
-: D3DVS_Y_X ( -- n ) 0 D3DVS_SWIZZLE_SHIFT 2 + shift ; inline
-: D3DVS_Y_Y ( -- n ) 1 D3DVS_SWIZZLE_SHIFT 2 + shift ; inline
-: D3DVS_Y_Z ( -- n ) 2 D3DVS_SWIZZLE_SHIFT 2 + shift ; inline
-: D3DVS_Y_W ( -- n ) 3 D3DVS_SWIZZLE_SHIFT 2 + shift ; inline
+CONSTANT: D3DVS_Y_X $[ 0 16 2 + shift ]
+CONSTANT: D3DVS_Y_Y $[ 1 16 2 + shift ]
+CONSTANT: D3DVS_Y_Z $[ 2 16 2 + shift ]
+CONSTANT: D3DVS_Y_W $[ 3 16 2 + shift ]
 
-: D3DVS_Z_X ( -- n ) 0 D3DVS_SWIZZLE_SHIFT 4 + shift ; inline
-: D3DVS_Z_Y ( -- n ) 1 D3DVS_SWIZZLE_SHIFT 4 + shift ; inline
-: D3DVS_Z_Z ( -- n ) 2 D3DVS_SWIZZLE_SHIFT 4 + shift ; inline
-: D3DVS_Z_W ( -- n ) 3 D3DVS_SWIZZLE_SHIFT 4 + shift ; inline
+CONSTANT: D3DVS_Z_X $[ 0 16 4 + shift ]
+CONSTANT: D3DVS_Z_Y $[ 1 16 4 + shift ]
+CONSTANT: D3DVS_Z_Z $[ 2 16 4 + shift ]
+CONSTANT: D3DVS_Z_W $[ 3 16 4 + shift ]
 
-: D3DVS_W_X ( -- n ) 0 D3DVS_SWIZZLE_SHIFT 6 + shift ; inline
-: D3DVS_W_Y ( -- n ) 1 D3DVS_SWIZZLE_SHIFT 6 + shift ; inline
-: D3DVS_W_Z ( -- n ) 2 D3DVS_SWIZZLE_SHIFT 6 + shift ; inline
-: D3DVS_W_W ( -- n ) 3 D3DVS_SWIZZLE_SHIFT 6 + shift ; inline
+CONSTANT: D3DVS_W_X $[ 0 16 6 + shift ]
+CONSTANT: D3DVS_W_Y $[ 1 16 6 + shift ]
+CONSTANT: D3DVS_W_Z $[ 2 16 6 + shift ]
+CONSTANT: D3DVS_W_W $[ 3 16 6 + shift ]
 
 CONSTANT: D3DVS_NOSWIZZLE flags{ D3DVS_X_X D3DVS_Y_Y D3DVS_Z_Z D3DVS_W_W }
 
@@ -787,20 +787,20 @@ CONSTANT: D3DSP_SRCMOD_SHIFT      24
 CONSTANT: D3DSP_SRCMOD_MASK       HEX: 0F000000
 
 TYPEDEF: int D3DSHADER_PARAM_SRCMOD_TYPE
-: D3DSPSM_NONE    ( -- n ) 0 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_NEG     ( -- n ) 1 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_BIAS    ( -- n ) 2 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_BIASNEG ( -- n ) 3 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_SIGN    ( -- n ) 4 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_SIGNNEG ( -- n ) 5 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_COMP    ( -- n ) 6 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_X2      ( -- n ) 7 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_X2NEG   ( -- n ) 8 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_DZ      ( -- n ) 9 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_DW      ( -- n ) 10 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_ABS     ( -- n ) 11 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_ABSNEG  ( -- n ) 12 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_NOT     ( -- n ) 13 D3DSP_SRCMOD_SHIFT shift ; inline
+CONSTANT: D3DSPSM_NONE    $[ 0 24 shift ]
+CONSTANT: D3DSPSM_NEG     $[ 1 24 shift ]
+CONSTANT: D3DSPSM_BIAS    $[ 2 24 shift ]
+CONSTANT: D3DSPSM_BIASNEG $[ 3 24 shift ]
+CONSTANT: D3DSPSM_SIGN    $[ 4 24 shift ]
+CONSTANT: D3DSPSM_SIGNNEG $[ 5 24 shift ]
+CONSTANT: D3DSPSM_COMP    $[ 6 24 shift ]
+CONSTANT: D3DSPSM_X2      $[ 7 24 shift ]
+CONSTANT: D3DSPSM_X2NEG   $[ 8 24 shift ]
+CONSTANT: D3DSPSM_DZ      $[ 9 24 shift ]
+CONSTANT: D3DSPSM_DW      $[ 10 24 shift ]
+CONSTANT: D3DSPSM_ABS     $[ 11 24 shift ]
+CONSTANT: D3DSPSM_ABSNEG  $[ 12 24 shift ]
+CONSTANT: D3DSPSM_NOT     $[ 13 24 shift ]
 CONSTANT: D3DSPSM_FORCE_DWORD HEX: 7fffffff
 
 : D3DPS_VERSION ( major minor -- n )
