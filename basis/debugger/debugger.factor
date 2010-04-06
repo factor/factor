@@ -306,6 +306,9 @@ M: bad-inheritance summary
 M: not-in-a-method-error summary
     drop "call-next-method can only be called in a method definition" ;
 
+M: version-control-merge-conflict summary
+    drop "Version control merge conflict in source code" ;
+
 GENERIC: expected>string ( obj -- str )
 
 M: f expected>string drop "end of input" ;
