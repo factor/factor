@@ -61,13 +61,19 @@ ERROR: invalid-cursor cursor ;
 
 MIXIN: input-cursor
 
-GENERIC: cursor-value ( cursor -- value )
+GENERIC: cursor-key-value ( cursor -- key value )
 <PRIVATE
-GENERIC: cursor-value-unsafe ( cursor -- value )
+GENERIC: cursor-key-value-unsafe ( cursor -- key value )
 PRIVATE>
-M: input-cursor cursor-value-unsafe cursor-value ; inline
-M: input-cursor cursor-value
-    dup cursor-valid? [ cursor-value-unsafe ] [ invalid-cursor ] if ; inline
+M: input-cursor cursor-key-value-unsafe cursor-key-value ; inline
+M: input-cursor cursor-key-value
+    dup cursor-valid? [ cursor-key-value-unsafe ] [ invalid-cursor ] if ; inline
+
+: cursor-key ( cursor -- key ) cursor-key-value drop ;
+: cursor-value ( cursor -- key ) cursor-key-value nip ;
+
+: cursor-key-unsafe ( cursor -- key ) cursor-key-value-unsafe drop ;
+: cursor-value-unsafe ( cursor -- key ) cursor-key-value-unsafe nip ;
 
 !
 ! output cursors
@@ -155,7 +161,7 @@ M: numeric-cursor cursor>= [ value>> ] bi@ >= ; inline
 
 INSTANCE: numeric-cursor input-cursor
 
-M: numeric-cursor cursor-value value>> ; inline
+M: numeric-cursor cursor-key-value value>> dup ; inline
 
 !
 ! linear cursor
@@ -278,8 +284,8 @@ M: sequence-cursor cursor-distance ( cursor cursor -- n )
 
 INSTANCE: sequence-cursor input-cursor
 
-M: sequence-cursor cursor-value-unsafe [ n>> ] [ seq>> ] bi nth-unsafe ; inline
-M: sequence-cursor cursor-value [ n>> ] [ seq>> ] bi nth ; inline
+M: sequence-cursor cursor-key-value-unsafe [ n>> dup ] [ seq>> ] bi nth-unsafe ; inline
+M: sequence-cursor cursor-key-value [ n>> dup ] [ seq>> ] bi nth ; inline
 
 INSTANCE: sequence-cursor output-cursor
 
@@ -362,12 +368,8 @@ M: forward-cursor new-sequence-cursor
     over map-as ; inline
 
 !
-! assoc cursors
+! assoc combinators
 !
-
-MIXIN: assoc-cursor
-
-GENERIC: cursor-key-value ( cursor -- key value )
 
 : -assoc- ( quot -- quot' )
     '[ cursor-key-value @ ] ; inline
@@ -379,11 +381,6 @@ GENERIC: cursor-key-value ( cursor -- key value )
     assoc- -each ; inline
 : assoc>map ( ... assoc quot: ( ... k v -- ... newx ) exemplar -- ... newcontainer )
     [ assoc- ] dip -map-as ; inline
-
-INSTANCE: input-cursor assoc-cursor
-
-M: input-cursor cursor-key-value
-    cursor-value-unsafe first2 ; inline
 
 !
 ! hashtable cursor
@@ -421,16 +418,11 @@ M: hashtable-cursor inc-cursor ( cursor -- cursor' )
     [ hashtable>> dup array>> ] [ n>> 2 + ] bi
     (inc-hashtable-cursor) <hashtable-cursor> ; inline
 
-INSTANCE: hashtable-cursor assoc-cursor
-    
-M: hashtable-cursor cursor-key-value
-    [ n>> ] [ hashtable>> array>> ] bi
-    [ nth-unsafe ] [ [ 1 + ] dip nth-unsafe ] 2bi ; inline
-
 INSTANCE: hashtable-cursor input-cursor
 
-M: hashtable-cursor cursor-value-unsafe
-    cursor-key-value 2array ; inline
+M: hashtable-cursor cursor-key-value-unsafe
+    [ n>> ] [ hashtable>> array>> ] bi
+    [ nth-unsafe ] [ [ 1 + ] dip nth-unsafe ] 2bi ; inline
 
 INSTANCE: hashtable container
 
@@ -472,7 +464,7 @@ M: zip-cursor cursor-distance-hint ( cursor cursor -- n )
 M: zip-cursor inc-cursor ( cursor -- cursor' )
     [ keys>> inc-cursor ] [ values>> inc-cursor ] bi <zip-cursor> ; inline
     
-INSTANCE: zip-cursor assoc-cursor
+INSTANCE: zip-cursor input-cursor
 
 M: zip-cursor cursor-key-value
     [ keys>> cursor-value-unsafe ] [ values>> cursor-value-unsafe ] bi ; inline
