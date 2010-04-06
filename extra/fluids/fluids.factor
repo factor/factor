@@ -1,12 +1,12 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.struct destructors game.loop
-game.worlds gpu gpu.buffers gpu.framebuffers gpu.render gpu.shaders
-gpu.state gpu.textures gpu.util images images.loader kernel literals
-locals make math math.rectangles math.vectors namespaces opengl.gl
-sequences specialized-arrays ui.gadgets.worlds images.ppm
-ui.gestures ui.pixel-formats images.pgm gpu.effects.blur
-gpu.effects.step ;
+game.worlds gpu gpu.buffers gpu.effects.blur gpu.framebuffers
+gpu.render gpu.shaders gpu.state gpu.textures gpu.util images
+images.loader kernel literals locals make math math.rectangles
+math.vectors namespaces opengl.gl sequences specialized-arrays
+ui.gadgets.worlds ui.gestures ui.pixel-formats gpu.effects.step
+images.pgm images.ppm ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: fluids
@@ -65,7 +65,7 @@ particle_t-array{
     [ verlet-integrate-particle ] curry map! ;
 
 TUPLE: fluids-world < game-world
-    particles texture framebuffer color-texture ramp { paused boolean initial: f } ;
+    particles texture ramp { paused boolean initial: f } ;
 
 : make-texture ( pathname -- texture )
     load-image
@@ -100,50 +100,27 @@ M: fluids-world begin-game-world
     initial-particles clone >>particles
     "resource:extra/fluids/particle2.pgm" make-texture >>texture
     "resource:extra/fluids/colors.ppm" make-texture >>ramp
-
-    RGB float-components T{ texture-parameters
-                            { wrap clamp-texcoord-to-edge }
-                            { min-filter filter-linear }
-                            { min-mipmap-filter f } }
-    <texture-2d> >>color-texture
-
-    dup color-texture>> 0 <texture-2d-attachment> 1array f f { 320 240 } <framebuffer> >>framebuffer
     drop ;
 
 M: fluids-world end-game-world
-    framebuffer>> dispose ;
+    drop ;
 
 M: fluids-world tick-game-world
     dup paused>> [ drop ] [ integrate ] if ;
 
 M:: fluids-world draw-world* ( world -- )
-    world framebuffer>> { { default-attachment { 0 0 0 } } } clear-framebuffer
-    system-framebuffer { { default-attachment { 0 0 0 } } } clear-framebuffer
-
-    f eq-add func-one func-one <blend-mode> dup <blend-state> set-gpu-state
-    f origin-upper-left 1.0 <point-state> set-gpu-state
     world particles>> [
         [ p>> [ x>> , ] [ y>> , ] bi ] each
     ] curry float-array{ } make :> verts
     
-    { 0 0 } { 320 240 } <rect> <viewport-state> set-gpu-state
-    GL_POINT_SPRITE glEnable
-    world verts {
-        { "primitive-mode" [ 2drop points-mode ] }
-        { "uniforms"       [ drop texture>> 50.0 window-point-uniforms boa ] }
-        { "vertex-array"   [ nip stream-upload draw-usage vertex-buffer byte-array>buffer &dispose window-point-program <program-instance> &dispose <vertex-array> &dispose ] }
-        { "indexes"        [ nip length 2 / 0 swap <index-range> ] }
-        { "framebuffer"    [ drop framebuffer>> ] }
-    } 2<render-set> render
-
-    world color-texture>> gaussian-blur
-    { 0 0 } { 640 480 } <rect> <viewport-state> set-gpu-state
-    world ramp>> {
-        { "primitive-mode" [ 2drop triangle-strip-mode ] }
-        { "uniforms"       [ step-uniforms boa ] }
-        { "vertex-array"   [ 2drop <window-vertex-buffer> step-program <program-instance> <vertex-array> ] }
-        { "indexes"        [ 2drop T{ index-range f 0 4 } ] }
-    } 2<render-set> render
+    [ 
+        verts world texture>> 50.0 { 320 240 } blended-point-sprite-batch &dispose
+        
+        blend-state new set-gpu-state
+        
+        gaussian-blur &dispose world ramp>> { 1024 768 } step-texture &dispose
+        { 1024 768 } draw-texture
+    ] with-destructors
     ;
 
 GAME: fluids {
@@ -151,7 +128,7 @@ GAME: fluids {
     { title "Fluids Test" }
     { pixel-format-attributes {
         windowed double-buffered T{ depth-bits { value 24 } } } }
-    { pref-dim { 640 480 } }
+    { pref-dim { 1024 768 } }
     { tick-interval-micros $[ 60 fps ] }
 } ;
 
@@ -159,7 +136,7 @@ MAIN: fluids
 
 fluids-world H{
     { T{ button-down } [ [
-        hand-loc get { 640 480 } v/ 2 v*n 1 v-n { 1 -1 } v* first2 float2_t <struct-boa>
+        hand-loc get { 1024 768 } v/ 2 v*n 1 v-n { 1 -1 } v* first2 float2_t <struct-boa>
         dup 2.0 particle_t <struct-boa> suffix
     ] change-particles drop ] }
 } set-gestures
