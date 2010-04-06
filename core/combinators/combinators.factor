@@ -30,11 +30,12 @@ SLOT: out
 : call-effect ( quot effect -- )
     ! Don't use fancy combinators here, since this word always
     ! runs unoptimized
-    [ datastack ] 2dip
     2dup [
-        [ dip ] dip
-        dup in>> length swap out>> length
-        check-datastack
+        [ [ datastack ] dip dip ] dip
+        dup terminated?>> [ 2drop f ] [
+            dup in>> length swap out>> length
+            check-datastack
+        ] if
     ] 2dip rot
     [ 2drop ] [ wrong-values ] if ;
 
