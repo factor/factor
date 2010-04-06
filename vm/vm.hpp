@@ -112,10 +112,11 @@ struct factor_vm
 
 	// contexts
 	context *new_context();
+	void init_context(context *ctx);
 	void delete_context(context *old_context);
 	void init_contexts(cell datastack_size_, cell retainstack_size_, cell callstack_size_);
 	void delete_contexts();
-	void begin_callback();
+	cell begin_callback(cell quot);
 	void end_callback();
 	void primitive_current_callback();
 	void primitive_context_object();
@@ -135,7 +136,6 @@ struct factor_vm
 	void primitive_set_retainstack();
 	void primitive_check_datastack();
 	void primitive_load_locals();
-	void primitive_context();
 
 	template<typename Iterator> void iterate_active_callstacks(Iterator &iter)
 	{
@@ -706,7 +706,7 @@ struct factor_vm
 
   #if defined(WINNT)
 	void open_console();
-	LONG exception_handler(PEXCEPTION_POINTERS pe);
+	LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch);
   #endif
 
   #else  // UNIX

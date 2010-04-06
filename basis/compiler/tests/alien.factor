@@ -445,13 +445,17 @@ STRUCT: double-rect
     [ "example" set-global 2drop ] alien-callback ;
 
 : double-rect-test ( arg -- arg' )
-    f f rot
+    [ f f ] 2dip
     double-rect-callback
     void { void* void* double-rect } cdecl alien-indirect
     "example" get-global ;
 
 [ 1.0 2.0 3.0 4.0 ]
-[ 1.0 2.0 3.0 4.0 <double-rect> double-rect-test >double-rect< ] unit-test
+[
+    1.0 2.0 3.0 4.0 <double-rect>
+    double-rect-callback double-rect-test
+    >double-rect<
+] unit-test
 
 STRUCT: test_struct_14
     { x1 double }

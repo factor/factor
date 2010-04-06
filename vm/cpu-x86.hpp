@@ -5,7 +5,7 @@ namespace factor
 
 #define FRAME_RETURN_ADDRESS(frame,vm) *(void **)(vm->frame_successor(frame) + 1)
 
-#define CALLSTACK_BOTTOM(ctx) (stack_frame *)(ctx->callstack_seg->end - sizeof(cell))
+#define CALLSTACK_BOTTOM(ctx) (stack_frame *)(ctx->callstack_seg->end - sizeof(cell) * 5)
 
 inline static void flush_icache(cell start, cell len) {}
 
