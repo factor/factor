@@ -6,22 +6,24 @@ concurrency.conditions accessors debugger debugger.threads
 locals fry ;
 IN: concurrency.mailboxes
 
-TUPLE: mailbox threads data ;
+TUPLE: mailbox { threads dlist } { data dlist } ;
 
 : <mailbox> ( -- mailbox )
     mailbox new
         <dlist> >>threads
-        <dlist> >>data ;
+        <dlist> >>data ; inline
 
 : mailbox-empty? ( mailbox -- bool )
-    data>> deque-empty? ;
+    data>> deque-empty? ; inline
 
-: mailbox-put ( obj mailbox -- )
+GENERIC: mailbox-put ( obj mailbox -- )
+
+M: mailbox mailbox-put
     [ data>> push-front ]
     [ threads>> notify-all ] bi yield ;
 
 : wait-for-mailbox ( mailbox timeout -- )
-    [ threads>> ] dip "mailbox" wait ;
+    [ threads>> ] dip "mailbox" wait ; inline
 
 :: block-unless-pred ( ... mailbox timeout pred: ( ... message -- ... ? ) -- ... )
     mailbox data>> pred dlist-any? [
@@ -34,16 +36,17 @@ TUPLE: mailbox threads data ;
         2dup wait-for-mailbox block-if-empty
     ] [
         drop
-    ] if ;
+    ] if ; inline recursive
 
 : mailbox-peek ( mailbox -- obj )
     data>> peek-back ;
 
-: mailbox-get-timeout ( mailbox timeout -- obj )
-    block-if-empty data>> pop-back ;
+GENERIC# mailbox-get-timeout 1 ( mailbox timeout -- obj )
+
+M: mailbox mailbox-get-timeout block-if-empty data>> pop-back ;
 
 : mailbox-get ( mailbox -- obj )
-    f mailbox-get-timeout ;
+    f mailbox-get-timeout ; inline
 
 : mailbox-get-all-timeout ( mailbox timeout -- array )
     block-if-empty

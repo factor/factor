@@ -1,9 +1,16 @@
-! Copyright (C) 2003, 2009 Slava Pestov.
+! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays vectors kernel kernel.private sequences
 namespaces make math splitting sorting quotations assocs
 combinators combinators.private accessors words ;
 IN: continuations
+
+: with-datastack ( stack quot -- new-stack )
+    [
+        [ [ datastack ] dip swap [ { } like set-datastack ] dip ] dip
+        swap [ call datastack ] dip
+        swap [ set-datastack ] dip
+    ] (( stack quot -- new-stack )) call-effect-unsafe ;
 
 SYMBOL: error
 SYMBOL: error-continuation
@@ -89,14 +96,6 @@ SYMBOL: return-continuation
 
 : return ( -- * )
     return-continuation get continue ;
-
-: with-datastack ( stack quot -- newstack )
-    [
-        [
-            [ [ { } like set-datastack ] dip call datastack ] dip
-            continue-with
-        ] (( stack quot continuation -- * )) call-effect-unsafe
-    ] callcc1 2nip ;
 
 GENERIC: compute-restarts ( error -- seq )
 

@@ -14,7 +14,12 @@ void factor_vm::default_parameters(vm_parameters *p)
 
 	p->datastack_size = 32 * sizeof(cell);
 	p->retainstack_size = 32 * sizeof(cell);
+
+#ifdef FACTOR_PPC
+	p->callstack_size = 256 * sizeof(cell);
+#else
 	p->callstack_size = 128 * sizeof(cell);
+#endif
 
 	p->code_size = 8 * sizeof(cell);
 	p->young_size = sizeof(cell) / 4;
