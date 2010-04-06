@@ -270,20 +270,20 @@ M: no-current-vocab summary
 
 M: no-word-error summary
     name>>
-    "No word named ``"
-    "'' found in current vocabulary search path" surround ;
+    "No word named “"
+    "” found in current vocabulary search path" surround ;
 
 M: no-word-error error. summary print ;
 
 M: no-word-in-vocab summary
     [ vocab>> ] [ word>> ] bi
-    [ "No word named ``" % % "'' found in ``" % % "'' vocabulary" % ] "" make ;
+    [ "No word named “" % % "” found in “" % % "” vocabulary" % ] "" make ;
 
 M: no-word-in-vocab error. summary print ;
 
 M: ambiguous-use-error summary
     words>> first name>>
-    "More than one vocabulary defines a word named ``" "''" surround ;
+    "More than one vocabulary defines a word named “" "”" surround ;
 
 M: ambiguous-use-error error. summary print ;
 
