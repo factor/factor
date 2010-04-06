@@ -118,7 +118,7 @@
   (format "\\_<\\(%s\\)?: +\\_<\\(\\w+\\)\\_>"
           (regexp-opt
            '(":" "GENERIC" "DEFER" "HOOK" "MAIN" "MATH" "POSTPONE"
-             "SYMBOL" "SYNTAX" "TYPED" "RENAME"))))
+             "SYMBOL" "SYNTAX" "TYPED" "TYPED:" "RENAME"))))
 
 (defconst fuel-syntax--alias-definition-regex
   "^ALIAS: +\\(\\_<.+?\\_>\\) +\\(\\_<.+?\\_>\\)")
