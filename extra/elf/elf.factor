@@ -1,6 +1,8 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax classes.struct ;
+USING: accessors alien alien.c-types alien.strings alien.syntax arrays
+classes.struct io.encodings.ascii kernel locals sequences
+specialized-arrays strings typed ;
 IN: elf
 
 CONSTANT: EI_NIDENT 16
@@ -456,3 +458,46 @@ STRUCT: Elf32_Dyn
 STRUCT: Elf64_Dyn
     { d_tag Elf64_Sxword }
     { d_val Elf64_Xword  } ;
+
+SPECIALIZED-ARRAYS: Elf32_Shdr Elf64_Shdr uchar ;
+UNION: Elf32/64_Ehdr Elf32_Ehdr Elf64_Ehdr ;
+UNION: Elf32/64_Shdr Elf32_Shdr Elf64_Shdr ;
+UNION: Elf32/64_Shdr-array Elf32_Shdr-array Elf64_Shdr-array ;
+
+TYPED: 64-bit? ( elf: Elf32/64_Ehdr -- ? )
+    e_ident>> EI_CLASS swap nth ELFCLASS64 = ;
+
+TYPED: elf-header ( c-ptr -- elf: Elf32/64_Ehdr )
+    [ Elf64_Ehdr memory>struct 64-bit? ] keep swap
+    [ Elf64_Ehdr memory>struct ]
+    [ Elf32_Ehdr memory>struct ] if ;
+
+TYPED:: elf-section-headers ( elf: Elf32/64_Ehdr -- headers: Elf32/64_Shdr-array )
+    elf [ e_shoff>> ] [ e_shnum>> ] bi :> ( off num )
+    off elf >c-ptr <displaced-alien> num
+    elf 64-bit?
+    [ <direct-Elf64_Shdr-array> ]
+    [ <direct-Elf32_Shdr-array> ] if ;
+
+TYPED:: elf-section-data ( elf: Elf32/64_Ehdr header: Elf32/64_Shdr -- uchar-array/f )
+    header [ sh_offset>> elf >c-ptr <displaced-alien> ] [ sh_size>> ] bi <direct-uchar-array> ;
+
+TYPED:: elf-section-data-by-name ( elf: Elf32/64_Ehdr name: string -- header/f uchar-array/f )
+    elf elf-section-headers                      :> sections
+    elf e_shstrndx>>                             :> ndx
+    elf ndx sections nth elf-section-data >c-ptr :> section-names
+
+    sections 1 tail [
+        sh_name>> section-names <displaced-alien> ascii alien>string name =
+    ] find nip
+
+    [ dup elf swap elf-section-data ]
+    [ f f ] if* ;
+
+TYPED:: elf-section-names ( elf: Elf32/64_Ehdr -- names )
+    elf elf-section-headers                             :> sections
+    elf ".shstrtab" elf-section-data-by-name nip >c-ptr :> section-names
+    sections 1 tail [
+        sh_name>> section-names <displaced-alien>
+        ascii alien>string
+    ] { } map-as ;
