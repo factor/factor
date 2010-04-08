@@ -11,6 +11,7 @@ ML_FLAGS = /nologo /safeseh
 EXE_OBJS = vm\main-windows-nt.obj vm\factor.res
 
 DLL_OBJS = vm\os-windows-nt.obj \
+	vm\os-windows-nt-x86.32.obj \
 	vm\os-windows.obj \
 	vm\aging_collector.obj \
 	vm\alien.obj \
