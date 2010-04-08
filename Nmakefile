@@ -15,7 +15,7 @@ PLAF_DLL_OBJS = vm\os-windows-nt-x86.32.obj vm\safeseh.obj
 PLAF_DLL_OBJS = vm\os-windows-nt-x86.64.obj
 !ENDIF
 
-ML_FLAGS = /nologo
+ML_FLAGS = /nologo /safeseh
 
 EXE_OBJS = vm\main-windows-nt.obj vm\factor.res
 
@@ -99,6 +99,7 @@ default:
 	@echo Where platform is one of:
 	@echo x86-32
 	@echo x86-64
+	@exit 1
 
 x86-32:
 	nmake PLATFORM=x86-32 /f Nmakefile all
