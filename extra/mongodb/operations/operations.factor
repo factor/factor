@@ -96,7 +96,7 @@ PRIVATE>
         [ query>> "query" selector set-at ]
     } cleave selector ; inline
 
-: query-write-message ( message -- )
+: write-query-message ( message -- )
     [
         {
             [ flags>> write-int32 ]
@@ -108,14 +108,14 @@ PRIVATE>
         } cleave
     ] (write-message) ; inline
 
-: insert-write-message ( message -- )
+: write-insert-message ( message -- )
     [ 
        [ flags>> write-int32 ]
        [ collection>> write-cstring ]
        [ objects>> [ assoc>stream ] each ] tri
     ] (write-message) ; inline
 
-: update-write-message ( message -- )
+: write-update-message ( message -- )
     [
         { 
             [ flags>> write-int32 ]
@@ -126,14 +126,14 @@ PRIVATE>
         } cleave
     ] (write-message) ; inline
 
-: delete-write-message ( message -- )
+: write-delete-message ( message -- )
     [
        [ flags>> write-int32 ]
        [ collection>> write-cstring ]
        [ 0 write-int32 selector>> assoc>stream ] tri
     ] (write-message) ; inline
 
-: getmore-write-message ( message -- )
+: write-getmore-message ( message -- )
     [
         {
            [ flags>> write-int32 ]
@@ -143,7 +143,7 @@ PRIVATE>
         } cleave
     ] (write-message) ; inline
 
-: killcursors-write-message ( message -- )
+: write-killcursors-message ( message -- )
     [
        [ flags>> write-int32 ]
        [ cursors#>> write-int32 ]
@@ -154,10 +154,10 @@ PRIVATE>
 
 : write-message ( message -- )
     {  
-        { [ dup mdb-query-msg? ] [ query-write-message ] }
-        { [ dup mdb-insert-msg? ] [ insert-write-message ] }
-        { [ dup mdb-update-msg? ] [ update-write-message ] }
-        { [ dup mdb-delete-msg? ] [ delete-write-message ] }
-        { [ dup mdb-getmore-msg? ] [ getmore-write-message ] }
-        { [ dup mdb-killcursors-msg? ] [ killcursors-write-message ] }
+        { [ dup mdb-query-msg? ] [ write-query-message ] }
+        { [ dup mdb-insert-msg? ] [ write-insert-message ] }
+        { [ dup mdb-update-msg? ] [ write-update-message ] }
+        { [ dup mdb-delete-msg? ] [ write-delete-message ] }
+        { [ dup mdb-getmore-msg? ] [ write-getmore-message ] }
+        { [ dup mdb-killcursors-msg? ] [ write-killcursors-message ] }
     } cond ;
