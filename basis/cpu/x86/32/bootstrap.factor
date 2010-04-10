@@ -13,15 +13,16 @@ IN: bootstrap.x86
 : div-arg ( -- reg ) EAX ;
 : mod-arg ( -- reg ) EDX ;
 : temp0 ( -- reg ) EAX ;
-: temp1 ( -- reg ) EDX ;
-: temp2 ( -- reg ) ECX ;
-: temp3 ( -- reg ) EBX ;
+: temp1 ( -- reg ) ECX ;
+: temp2 ( -- reg ) EBX ;
+: temp3 ( -- reg ) EDX ;
+: pic-tail-reg ( -- reg ) EDX ;
 : stack-reg ( -- reg ) ESP ;
 : frame-reg ( -- reg ) EBP ;
-: vm-reg ( -- reg ) ECX ;
+: vm-reg ( -- reg ) EBX ;
 : ctx-reg ( -- reg ) EBP ;
 : nv-regs ( -- seq ) { ESI EDI EBX } ;
-: nv-reg ( -- reg ) EBX ;
+: nv-reg ( -- reg ) ESI ;
 : ds-reg ( -- reg ) ESI ;
 : rs-reg ( -- reg ) EDI ;
 : fixnum>slot@ ( -- ) temp0 2 SAR ;
@@ -40,7 +41,7 @@ IN: bootstrap.x86
 ] jit-prolog jit-define
 
 [
-    temp3 0 MOV rc-absolute-cell rt-here jit-rel
+    pic-tail-reg 0 MOV rc-absolute-cell rt-here jit-rel
     0 JMP rc-relative rt-entry-point-pic-tail jit-rel
 ] jit-word-jump jit-define
 
@@ -53,8 +54,8 @@ IN: bootstrap.x86
 
 : jit-save-context ( -- )
     jit-load-context
-    EDX ESP -4 [+] LEA
-    ctx-reg context-callstack-top-offset [+] EDX MOV
+    ECX ESP -4 [+] LEA
+    ctx-reg context-callstack-top-offset [+] ECX MOV
     ctx-reg context-datastack-offset [+] ds-reg MOV
     ctx-reg context-retainstack-offset [+] rs-reg MOV ;
 
@@ -135,25 +136,25 @@ IN: bootstrap.x86
 
 [
     ! Load callstack object
-    EBX ds-reg [] MOV
+    temp3 ds-reg [] MOV
     ds-reg bootstrap-cell SUB
     ! Get ctx->callstack_bottom
     jit-load-vm
     jit-load-context
-    EAX ctx-reg context-callstack-bottom-offset [+] MOV
+    temp0 ctx-reg context-callstack-bottom-offset [+] MOV
     ! Get top of callstack object -- 'src' for memcpy
-    EBP EBX callstack-top-offset [+] LEA
+    temp1 temp3 callstack-top-offset [+] LEA
     ! Get callstack length, in bytes --- 'len' for memcpy
-    EDX EBX callstack-length-offset [+] MOV
-    EDX tag-bits get SHR
+    temp2 temp3 callstack-length-offset [+] MOV
+    temp2 tag-bits get SHR
     ! Compute new stack pointer -- 'dst' for memcpy
-    EAX EDX SUB
+    temp0 temp2 SUB
     ! Install new stack pointer
-    ESP EAX MOV
+    ESP temp0 MOV
     ! Call memcpy
-    EDX PUSH
-    EBP PUSH
-    EAX PUSH
+    temp2 PUSH
+    temp1 PUSH
+    temp0 PUSH
     "factor_memcpy" jit-call
     ESP 12 ADD
     ! Return with new callstack
@@ -177,7 +178,7 @@ IN: bootstrap.x86
 
 ! Inline cache miss entry points
 : jit-load-return-address ( -- )
-    EBX ESP stack-frame-size bootstrap-cell - [+] MOV ;
+    pic-tail-reg ESP stack-frame-size bootstrap-cell - [+] MOV ;
 
 ! These are always in tail position with an existing stack
 ! frame, and the stack. The frame setup takes this into account.
@@ -185,7 +186,7 @@ IN: bootstrap.x86
     jit-load-vm
     jit-save-context
     ESP 4 [+] vm-reg MOV
-    ESP [] EBX MOV
+    ESP [] pic-tail-reg MOV
     "inline_cache_miss" jit-call
     jit-restore-context ;
 
@@ -213,6 +214,7 @@ IN: bootstrap.x86
     [
         ESP [] EAX MOV
         ESP 4 [+] EDX MOV
+        jit-load-vm
         ESP 8 [+] vm-reg MOV
         jit-call
     ]
@@ -237,6 +239,7 @@ IN: bootstrap.x86
         EBX tag-bits get SAR
         ESP [] EBX MOV
         ESP 4 [+] EBP MOV
+        jit-load-vm
         ESP 8 [+] vm-reg MOV
         "overflow_fixnum_multiply" jit-call
     ]
@@ -266,7 +269,7 @@ IN: bootstrap.x86
     ! Load context and parameter from datastack
     EAX ds-reg [] MOV
     EAX EAX alien-offset [+] MOV
-    EBX ds-reg -4 [+] MOV
+    EDX ds-reg -4 [+] MOV
     ds-reg 8 SUB
 
     ! Make the new context active
@@ -280,7 +283,7 @@ IN: bootstrap.x86
 
     ! Store parameter to datastack
     ds-reg 4 ADD
-    ds-reg [] EBX MOV ;
+    ds-reg [] EDX MOV ;
 
 [ jit-set-context ] \ (set-context) define-sub-primitive
 
@@ -291,14 +294,14 @@ IN: bootstrap.x86
     "new_context" jit-call
 
     ! Save pointer to quotation and parameter
-    EBX ds-reg MOV
+    EDX ds-reg MOV
     ds-reg 8 SUB
 
     ! Make the new context active
     EAX jit-switch-context
 
     ! Push parameter
-    EAX EBX -4 [+] MOV
+    EAX EDX -4 [+] MOV
     ds-reg 4 ADD
     ds-reg [] EAX MOV
 
@@ -309,7 +312,7 @@ IN: bootstrap.x86
     0 PUSH
 
     ! Jump to initial quotation
-    EAX EBX [] MOV
+    EAX EDX [] MOV
     jit-jump-quot ;
 
 [ jit-start-context ] \ (start-context) define-sub-primitive
