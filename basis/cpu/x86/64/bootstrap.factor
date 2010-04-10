@@ -11,10 +11,11 @@ IN: bootstrap.x86
 : shift-arg ( -- reg ) RCX ;
 : div-arg ( -- reg ) RAX ;
 : mod-arg ( -- reg ) RDX ;
-: temp0 ( -- reg ) RDI ;
-: temp1 ( -- reg ) RSI ;
+: temp0 ( -- reg ) RAX ;
+: temp1 ( -- reg ) RCX ;
 : temp2 ( -- reg ) RDX ;
 : temp3 ( -- reg ) RBX ;
+: pic-tail-reg ( -- reg ) RBX ;
 : return-reg ( -- reg ) RAX ;
 : nv-reg ( -- reg ) RBX ;
 : stack-reg ( -- reg ) RSP ;
@@ -42,7 +43,7 @@ IN: bootstrap.x86
 ] jit-prolog jit-define
 
 [
-    temp3 5 [RIP+] LEA
+    pic-tail-reg 5 [RIP+] LEA
     0 JMP rc-relative rt-entry-point-pic-tail jit-rel
 ] jit-word-jump jit-define
 
