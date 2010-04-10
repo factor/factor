@@ -694,8 +694,7 @@ cairo_surface_get_reference_count ( cairo_surface_t* surface ) ;
 FUNCTION: cairo_status_t
 cairo_surface_status ( cairo_surface_t* surface ) ;
 
-TYPEDEF: int cairo_surface_type_t
-C-ENUM:
+C-ENUM: cairo_surface_type_t
     CAIRO_SURFACE_TYPE_IMAGE
     CAIRO_SURFACE_TYPE_PDF
     CAIRO_SURFACE_TYPE_PS
@@ -758,8 +757,7 @@ cairo_surface_show_page ( cairo_surface_t* surface ) ;
 
 ! Image-surface functions
 
-TYPEDEF: int cairo_format_t
-C-ENUM:
+C-ENUM: cairo_format_t
     CAIRO_FORMAT_ARGB32
     CAIRO_FORMAT_RGB24
     CAIRO_FORMAT_A8
@@ -831,8 +829,7 @@ cairo_pattern_get_user_data ( cairo_pattern_t* pattern, cairo_user_data_key_t* k
 FUNCTION: cairo_status_t
 cairo_pattern_set_user_data ( cairo_pattern_t* pattern, cairo_user_data_key_t* key, void* user_data, cairo_destroy_func_t destroy ) ;
 
-TYPEDEF: int cairo_pattern_type_t
-C-ENUM:
+C-ENUM: cairo_pattern_type_t
     CAIRO_PATTERN_TYPE_SOLID
     CAIRO_PATTERN_TYPE_SURFACE
     CAIRO_PATTERN_TYPE_LINEAR
@@ -853,8 +850,7 @@ cairo_pattern_set_matrix ( cairo_pattern_t* pattern, cairo_matrix_t* matrix ) ;
 FUNCTION: void
 cairo_pattern_get_matrix ( cairo_pattern_t* pattern, cairo_matrix_t* matrix ) ;
 
-TYPEDEF: int cairo_extend_t
-C-ENUM:
+C-ENUM: cairo_extend_t
     CAIRO_EXTEND_NONE
     CAIRO_EXTEND_REPEAT
     CAIRO_EXTEND_REFLECT
@@ -866,8 +862,7 @@ cairo_pattern_set_extend ( cairo_pattern_t* pattern, cairo_extend_t extend ) ;
 FUNCTION: cairo_extend_t
 cairo_pattern_get_extend ( cairo_pattern_t* pattern ) ;
 
-TYPEDEF: int cairo_filter_t
-C-ENUM:
+C-ENUM: cairo_filter_t
     CAIRO_FILTER_FAST
     CAIRO_FILTER_GOOD
     CAIRO_FILTER_BEST
