@@ -6,8 +6,7 @@ images images.memory core-graphics.types core-foundation.utilities
 opengl.gl literals ;
 IN: core-graphics
 
-! CGImageAlphaInfo
-C-ENUM:
+C-ENUM: CGImageAlphaInfo
 kCGImageAlphaNone
 kCGImageAlphaPremultipliedLast
 kCGImageAlphaPremultipliedFirst

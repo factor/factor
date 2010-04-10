@@ -770,16 +770,14 @@ STRUCT: scattered_relocation_info_little_endian
     { r_address_type_length_pcrel_scattered uint32_t }
     { r_value                               int32_t  } ;
 
-TYPEDEF: int reloc_type_generic
-C-ENUM:
+C-ENUM: reloc_type_generic
     GENERIC_RELOC_VANILLA
     GENERIC_RELOC_PAIR
     GENERIC_RELOC_SECTDIFF
     GENERIC_RELOC_PB_LA_PTR
     GENERIC_RELOC_LOCAL_SECTDIFF ;
 
-TYPEDEF: int reloc_type_x86_64
-C-ENUM:
+C-ENUM: reloc_type_x86_64
     X86_64_RELOC_UNSIGNED
     X86_64_RELOC_SIGNED
     X86_64_RELOC_BRANCH
@@ -790,8 +788,7 @@ C-ENUM:
     X86_64_RELOC_SIGNED_2
     X86_64_RELOC_SIGNED_4 ;
 
-TYPEDEF: int reloc_type_ppc
-C-ENUM:
+C-ENUM: reloc_type_ppc
     PPC_RELOC_VANILLA
     PPC_RELOC_PAIR
     PPC_RELOC_BR14

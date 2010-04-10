@@ -24,7 +24,7 @@ IN: pdf.libhpdf
 : HPDF_COMP_MASK      HEX: FF ; inline
 
 ! page mode
-C-ENUM:
+C-ENUM: f
     HPDF_PAGE_MODE_USE_NONE
     HPDF_PAGE_MODE_USE_OUTLINE
     HPDF_PAGE_MODE_USE_THUMBS
