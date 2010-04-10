@@ -878,7 +878,7 @@ TYPEDEF: int CRYPT_KEYID_TYPE
 ! Internal keyset options
 ! (As _NONE but open for exclusive access, _CRYPT_DEFINED
 ! Last possible key option type, _CRYPT_DEFINED Last external keyset option)
-C-ENUM:
+C-ENUM: f
     CRYPT_KEYOPT_NONE
     CRYPT_KEYOPT_READONLY
     CRYPT_KEYOPT_CREATE
