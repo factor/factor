@@ -12,7 +12,7 @@ IN: llvm.core
         { [ os macosx? ] [ "/usr/local/lib/lib" ".dylib" surround ] }
         { [ os windows? ] [ ".dll" append ] }
         { [ os unix? ] [ "lib" ".so" surround ] }
-    } cond "cdecl" add-library ;
+    } cond cdecl add-library ;
 
 "LLVMSystem" add-llvm-library
 "LLVMSupport" add-llvm-library

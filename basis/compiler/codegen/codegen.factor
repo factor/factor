@@ -300,12 +300,12 @@ M: float-rep next-fastcall-param
 M: double-rep next-fastcall-param
     float-regs inc [ ?dummy-stack-params ] [ ?dummy-int-params ] bi ;
 
-GENERIC: reg-class-full? ( reg-class -- ? )
+GENERIC# reg-class-full? 1 ( reg-class abi -- ? )
 
-M: stack-params reg-class-full? drop t ;
+M: stack-params reg-class-full? 2drop t ;
 
 M: reg-class reg-class-full?
-    [ get ] [ param-regs length ] bi >= ;
+    [ get ] swap '[ _ param-regs length ] bi >= ;
 
 : alloc-stack-param ( rep -- n reg-class rep )
     stack-params get
@@ -315,13 +315,22 @@ M: reg-class reg-class-full?
 : alloc-fastcall-param ( rep -- n reg-class rep )
     [ [ reg-class-of get ] [ reg-class-of ] [ next-fastcall-param ] tri ] keep ;
 
-: alloc-parameter ( parameter -- reg rep )
-    c-type-rep dup reg-class-of reg-class-full?
+:: alloc-parameter ( parameter abi -- reg rep )
+    parameter c-type-rep dup reg-class-of abi reg-class-full?
     [ alloc-stack-param ] [ alloc-fastcall-param ] if
-    [ param-reg ] dip ;
+    [ abi param-reg ] dip ;
+
+SYMBOL: (stack-value)
+<< void* c-type clone \ (stack-value) define-primitive-type
+stack-params \ (stack-value) c-type (>>rep) >>
+
+: ((flatten-type)) ( type to-type -- seq )
+    [ stack-size cell align cell /i ] dip c-type <repetition> ; inline
 
 : (flatten-int-type) ( type -- seq )
-    stack-size cell align cell /i void* c-type <repetition> ;
+    void* ((flatten-type)) ;
+: (flatten-stack-type) ( type -- seq )
+    (stack-value) ((flatten-type)) ;
 
 GENERIC: flatten-value-type ( type -- types )
 
@@ -355,8 +364,8 @@ M: c-type-name flatten-value-type c-type flatten-value-type ;
     #! Moves values from C stack to registers (if word is
     #! %load-param-reg) and registers to C stack (if word is
     #! %save-param-reg).
-    [ alien-parameters flatten-value-types ]
-    [ '[ alloc-parameter _ execute ] ]
+    [ [ alien-parameters flatten-value-types ] [ abi>> ] bi ]
+    [ '[ _ alloc-parameter _ execute ] ]
     bi* each-parameter ; inline
 
 : reverse-each-parameter ( parameters quot -- )
@@ -412,7 +421,7 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
     3array ;
 
 : alien-invoke-dlsym ( params -- symbols dll )
-    [ dup abi>> "stdcall" = [ stdcall-mangle ] [ function>> ] if ]
+    [ dup abi>> stdcall = [ stdcall-mangle ] [ function>> ] if ]
     [ library>> load-library ]
     bi 2dup check-dlsym ;
 

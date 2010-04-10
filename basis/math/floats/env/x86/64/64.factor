@@ -3,23 +3,23 @@ cpu.x86.assembler.operands math.floats.env.x86 sequences system ;
 IN: math.floats.env.x86.64
 
 M: x86.64 get-sse-env
-    void { void* } "cdecl" [
-        int-regs param-regs first [] STMXCSR
+    void { void* } cdecl [
+        int-regs cdecl param-regs first [] STMXCSR
     ] alien-assembly ;
 
 M: x86.64 set-sse-env
-    void { void* } "cdecl" [
-        int-regs param-regs first [] LDMXCSR
+    void { void* } cdecl [
+        int-regs cdecl param-regs first [] LDMXCSR
     ] alien-assembly ;
 
 M: x86.64 get-x87-env
-    void { void* } "cdecl" [
-        int-regs param-regs first [] FNSTSW
-        int-regs param-regs first 2 [+] FNSTCW
+    void { void* } cdecl [
+        int-regs cdecl param-regs first [] FNSTSW
+        int-regs cdecl param-regs first 2 [+] FNSTCW
     ] alien-assembly ;
 
 M: x86.64 set-x87-env
-    void { void* } "cdecl" [
+    void { void* } cdecl [
         FNCLEX
-        int-regs param-regs first 2 [+] FLDCW
+        int-regs cdecl param-regs first 2 [+] FLDCW
     ] alien-assembly ;

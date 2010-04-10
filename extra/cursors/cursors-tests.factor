@@ -1,5 +1,5 @@
 ! (c)2010 Joe Groff bsd license
-USING: accessors cursors make math sequences sorting tools.test ;
+USING: accessors cursors kernel make math sequences sorting tools.test ;
 FROM: cursors => each map assoc-each assoc>map ;
 IN: cursors.tests
 
@@ -10,6 +10,10 @@ IN: cursors.tests
 
 [ T{ linear-cursor f 3 1 } ] [
     T{ linear-cursor f 1 1 } T{ linear-cursor f 5 1 } [ value>> 3 mod zero? ] -find
+] unit-test
+
+[ T{ linear-cursor f 5 1 } ] [
+    T{ linear-cursor f 1 1 } T{ linear-cursor f 5 1 } [ value>> 6 = ] -find
 ] unit-test
 
 [ { 1 3 } ] [
