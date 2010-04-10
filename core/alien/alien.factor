@@ -5,14 +5,6 @@ kernel.private byte-arrays byte-vectors arrays init
 continuations.private ;
 IN: alien
 
-SINGLETONS: stdcall thiscall cdecl mingw ;
-
-<PRIVATE
-SINGLETON: fastcall
-PRIVATE>
-
-UNION: abi stdcall thiscall fastcall cdecl mingw ;
-
 PREDICATE: pinned-alien < alien underlying>> not ;
 
 UNION: pinned-c-ptr pinned-alien POSTPONE: f ;
@@ -71,6 +63,10 @@ M: alien equal?
 
 M: pinned-alien hashcode*
     nip dup expired>> [ drop 1234 ] [ alien-address ] if ;
+
+SINGLETONS: stdcall thiscall fastcall cdecl mingw ;
+
+UNION: abi stdcall thiscall fastcall cdecl mingw ;
 
 ERROR: alien-callback-error ;
 
