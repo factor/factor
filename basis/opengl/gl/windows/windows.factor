@@ -8,4 +8,4 @@ FUNCTION: void* wglGetProcAddress ( c-string name ) ;
 
 : gl-function-context ( -- context ) wglGetCurrentContext ; inline
 : gl-function-address ( name -- address ) wglGetProcAddress ; inline
-: gl-function-calling-convention ( -- str ) "stdcall" ; inline
+: gl-function-calling-convention ( -- str ) stdcall ; inline

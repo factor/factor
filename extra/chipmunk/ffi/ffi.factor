@@ -11,7 +11,7 @@ IN: chipmunk.ffi
     { [ os windows? ] [ "chipmunk.dll" ] }
     { [ os macosx? ] [ "libchipmunk.dylib"  ] }
     { [ os unix?  ] [ "libchipmunk.so" ] }
-} cond "cdecl" add-library
+} cond cdecl add-library
 
 "chipmunk" deploy-library
 >>

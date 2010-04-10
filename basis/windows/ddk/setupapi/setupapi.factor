@@ -4,7 +4,7 @@ USING: literals windows.kernel32 math alien.syntax windows.types classes.struct
 alien.c-types windows.errors windows.ole32 windows.advapi32 alien.libraries ;
 IN: windows.ddk.setupapi
 
-<< "setupapi" "setupapi.dll" "stdcall" add-library >>
+<< "setupapi" "setupapi.dll" stdcall add-library >>
 LIBRARY: setupapi
 
 TYPEDEF: DWORDLONG SP_LOG_TOKEN

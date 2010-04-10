@@ -235,7 +235,7 @@ M: spill-slot float-function-param* [ 1 ] dip n>> spill@ LFD ;
 M: integer float-function-param* FMR ;
 
 : float-function-param ( i src -- )
-    [ float-regs param-regs nth ] dip float-function-param* ;
+    [ float-regs cdecl param-regs nth ] dip float-function-param* ;
 
 : float-function-return ( reg -- )
     float-regs return-reg double-rep %copy ;
@@ -584,7 +584,7 @@ M: ppc %reload ( dst rep src -- )
 M: ppc %loop-entry ;
 
 M: int-regs return-reg drop 3 ;
-M: int-regs param-regs drop { 3 4 5 6 7 8 9 10 } ;
+M: int-regs param-regs 2drop { 3 4 5 6 7 8 9 10 } ;
 M: float-regs return-reg drop 1 ;
 
 M:: ppc %save-param-reg ( stack reg rep -- )
@@ -644,7 +644,7 @@ M:: ppc %box ( n rep func -- )
     ! If the source is a stack location, load it into freg #0.
     ! If the source is f, then we assume the value is already in
     ! freg #0.
-    n [ 0 rep reg-class-of param-reg rep %load-param-reg ] when*
+    n [ 0 rep reg-class-of cdecl param-reg rep %load-param-reg ] when*
     rep double-rep? 5 4 ? %load-vm-addr
     func f %alien-invoke ;
 
@@ -700,6 +700,8 @@ M: ppc %alien-indirect ( -- )
 M: ppc immediate-arithmetic? ( n -- ? ) -32768 32767 between? ;
 
 M: ppc immediate-bitwise? ( n -- ? ) 0 65535 between? ;
+
+M: ppc struct-return-pointer-type void* ;
 
 M: ppc return-struct-in-registers? ( c-type -- ? )
     c-type return-in-registers?>> ;
