@@ -84,17 +84,12 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, 
 		break;
 	}
 
-	return ExceptionContinueExecution;
+	return 0;
 }
 
-LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch)
+VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch)
 {
 	return current_vm()->exception_handler(e,frame,c,dispatch);
-}
-
-void factor_vm::c_to_factor_toplevel(cell quot)
-{
-	c_to_factor(quot);
 }
 
 void factor_vm::open_console()
