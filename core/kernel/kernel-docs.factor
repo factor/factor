@@ -575,19 +575,51 @@ HELP: if
 { $values { "?" "a generalized boolean" } { "true" quotation } { "false" quotation } }
 { $description "If " { $snippet "cond" } " is " { $link f } ", calls the " { $snippet "false" } " quotation. Otherwise calls the " { $snippet "true" } " quotation."
 $nl
-"The " { $snippet "cond" } " value is removed from the stack before either quotation is called." } ;
+"The " { $snippet "cond" } " value is removed from the stack before either quotation is called." }
+{ $examples
+    { $example
+        "USING: io kernel math ;"
+        "10 3 < [ \"Math is broken\" print ] [ \"Math is good\" print ] if"
+        "Math is good"
+    }
+} ;
 
 HELP: when
 { $values { "?" "a generalized boolean" } { "true" quotation } }
 { $description "If " { $snippet "cond" } " is not " { $link f } ", calls the " { $snippet "true" } " quotation."
 $nl
-"The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
+"The " { $snippet "cond" } " value is removed from the stack before the quotation is called." }
+{ $examples
+    { $example
+        "USING: kernel math prettyprint ;"
+        "-5 dup 0 < [ 3 + ] when ."
+        "-2"
+    }
+} ;
 
 HELP: unless
 { $values { "?" "a generalized boolean" } { "false" quotation } }
 { $description "If " { $snippet "cond" } " is " { $link f } ", calls the " { $snippet "false" } " quotation."
 $nl
-"The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
+"The " { $snippet "cond" } " value is removed from the stack before the quotation is called." }
+{ $examples
+    { $example
+        "USING: kernel math prettyprint sequences ;"
+        "IN: scratchpad"
+        ""
+        "CONSTANT: american-cities {"
+        "    \"San Francisco\""
+        "    \"Los Angeles\""
+        "    \"New York\""
+        "}"
+        ""
+        ": add-tax ( price city -- price' )"
+        "    american-cities member? [ 1.1 * ] unless ;"
+        ""
+        "123 \"Ottawa\" add-tax ."
+        "135.3"
+    }
+} ;
 
 HELP: if*
 { $values { "?" "a generalized boolean" } { "true" { $quotation "( ..a ? -- ..b )" } } { "false" { $quotation "( ..a -- ..b )" } } }
@@ -596,7 +628,31 @@ $nl
 "If the condition is true, it is retained on the stack before the " { $snippet "true" } " quotation is called. Otherwise, the condition is removed from the stack and the " { $snippet "false" } " quotation is called."
 $nl
 "The following two lines are equivalent:"
-{ $code "X [ Y ] [ Z ] if*" "X dup [ Y ] [ drop Z ] if" } } ;
+{ $code "X [ Y ] [ Z ] if*" "X dup [ Y ] [ drop Z ] if" } }
+{ $examples
+    "Notice how in this example, the same value is tested by the conditional, and then used in the true branch; the false branch does not need to drop the value because of how " { $link if* } " works:"
+    { $example
+        "USING: assocs io kernel math.parser ;"
+        "IN: scratchpad"
+        ""
+        ": curry-price ( meat -- price )
+    {
+        { \"Beef\" 10 }
+        { \"Chicken\" 12 }
+        { \"Lamb\" 13 }
+    } at ;
+
+: order-curry ( meat -- )
+    curry-price [
+        \"Your order will be \" write
+        number>string write
+        \" dollars.\" write
+    ] [ \"Invalid order.\" print ] if* ;"
+        ""
+        "\"Deer\" order-curry"
+        "Invalid order."
+    }
+} ;
 
 HELP: when*
 { $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- ... )" } } }

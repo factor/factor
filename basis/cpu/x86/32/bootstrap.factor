@@ -330,6 +330,3 @@ IN: bootstrap.x86
     jit-delete-current-context
     jit-start-context
 ] \ (start-context-and-delete) define-sub-primitive
-
-<< "vocab:cpu/x86/bootstrap.factor" parse-file suffix! >>
-call

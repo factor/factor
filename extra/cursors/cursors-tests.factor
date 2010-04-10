@@ -24,20 +24,6 @@ IN: cursors.tests
 [ { "roses: lutefisk" "tulips: lox" } ]
 [
     [
-        { { "roses" "lutefisk" } { "tulips" "lox" } }
-        [ ": " glue , ] assoc-each
-    ] { } make
-] unit-test
-
-[ { "roses: lutefisk" "tulips: lox" } ]
-[
-    { { "roses" "lutefisk" } { "tulips" "lox" } }
-    [ ": " glue ] { } assoc>map
-] unit-test
-
-[ { "roses: lutefisk" "tulips: lox" } ]
-[
-    [
         H{ { "roses" "lutefisk" } { "tulips" "lox" } }
         [ ": " glue , ] assoc-each
     ] { } make natural-sort
@@ -65,8 +51,14 @@ IN: cursors.tests
 [ { 2 4 6 8 10 } ] [ { 1 2 3 4 5 } compile-test-map ] unit-test
 
 [ { "roses: lutefisk" "tulips: lox" } ]
-[ [ { { "roses" "lutefisk" } { "tulips" "lox" } } compile-test-assoc-each ] { } make ] unit-test
+[
+    [ H{ { "roses" "lutefisk" } { "tulips" "lox" } } compile-test-assoc-each ]
+    { } make natural-sort
+] unit-test
 
 [ { "roses: lutefisk" "tulips: lox" } ]
-[ { { "roses" "lutefisk" } { "tulips" "lox" } } compile-test-assoc>map ] unit-test
+[
+    H{ { "roses" "lutefisk" } { "tulips" "lox" } } compile-test-assoc>map
+    natural-sort
+] unit-test
 
