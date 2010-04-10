@@ -66,9 +66,10 @@ big-endian off
 
     frame-reg POP
 
-    ! Callbacks which return structs, or use stdcall, need a
-    ! parameter here. See the comment in callback-return-rewind
-    ! in cpu.x86.32
+    ! Callbacks which return structs, or use stdcall/fastcall/thiscall,
+    ! need a parameter here.
+
+    ! See the comment for M\ x86.32 stack-cleanup in cpu.x86.32
     HEX: ffff RET rc-absolute-2 rt-untagged jit-rel
 ] callback-stub jit-define
 
