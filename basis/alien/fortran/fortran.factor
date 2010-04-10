@@ -13,8 +13,8 @@ SINGLETONS: f2c-abi g95-abi gfortran-abi intel-unix-abi intel-windows-abi ;
 
 << 
 : add-f2c-libraries ( -- )
-    "I77" "libI77.so" "cdecl" add-library
-    "F77" "libF77.so" "cdecl" add-library ;
+    "I77" "libI77.so" cdecl add-library
+    "F77" "libF77.so" cdecl add-library ;
 
 os netbsd? [ add-f2c-libraries ] when
 >>
@@ -42,11 +42,11 @@ library-fortran-abis [ H{ } clone ] initialize
     [ "__" append ] [ "_" append ] if ;
 
 HOOK: fortran-c-abi fortran-abi ( -- abi )
-M: f2c-abi fortran-c-abi "cdecl" ;
-M: g95-abi fortran-c-abi "cdecl" ;
-M: gfortran-abi fortran-c-abi "cdecl" ;
-M: intel-unix-abi fortran-c-abi "cdecl" ;
-M: intel-windows-abi fortran-c-abi "cdecl" ;
+M: f2c-abi fortran-c-abi cdecl ;
+M: g95-abi fortran-c-abi cdecl ;
+M: gfortran-abi fortran-c-abi cdecl ;
+M: intel-unix-abi fortran-c-abi cdecl ;
+M: intel-windows-abi fortran-c-abi cdecl ;
 
 HOOK: real-functions-return-double? fortran-abi ( -- ? )
 M: f2c-abi real-functions-return-double? t ;

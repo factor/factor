@@ -5,6 +5,14 @@ kernel.private byte-arrays byte-vectors arrays init
 continuations.private ;
 IN: alien
 
+SINGLETONS: stdcall thiscall cdecl mingw ;
+
+<PRIVATE
+SINGLETON: fastcall
+PRIVATE>
+
+UNION: abi stdcall thiscall fastcall cdecl mingw ;
+
 PREDICATE: pinned-alien < alien underlying>> not ;
 
 UNION: pinned-c-ptr pinned-alien POSTPONE: f ;

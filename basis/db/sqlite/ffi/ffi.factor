@@ -10,7 +10,7 @@ IN: db.sqlite.ffi
         { [ os winnt? ]  [ "sqlite3.dll" ] }
         { [ os macosx? ] [ "/usr/lib/libsqlite3.dylib" ] }
         { [ os unix? ]  [ "libsqlite3.so" ] }
-    } cond "cdecl" add-library >>
+    } cond cdecl add-library >>
 
 ! Return values from sqlite functions
 CONSTANT: SQLITE_OK           0 ! Successful result
