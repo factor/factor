@@ -1,6 +1,8 @@
 ! Copyright (c) 2007 Sampo Vuori
 ! Copyright (c) 2008 Matthew Willis
 !
+
+
 ! Adapted from cairo.h, version 1.5.14
 ! License: http://factorcode.org/license.txt
 
@@ -389,7 +391,7 @@ C-ENUM: cairo_subpixel_order_t
     CAIRO_SUBPIXEL_ORDER_VRGB
     CAIRO_SUBPIXEL_ORDER_VBGR ;
 
-C-ENUM: cairo_hint_Style_t
+C-ENUM: cairo_hint_style_t
     CAIRO_HINT_STYLE_DEFAULT
     CAIRO_HINT_STYLE_NONE
     CAIRO_HINT_STYLE_SLIGHT
