@@ -595,6 +595,6 @@ HOOK: %end-callback cpu ( -- )
 
 HOOK: %end-callback-value cpu ( c-type -- )
 
-HOOK: callback-return-rewind cpu ( params -- n )
+HOOK: stack-cleanup cpu ( params -- n )
 
-M: object callback-return-rewind drop 0 ;
+M: object stack-cleanup drop 0 ;
