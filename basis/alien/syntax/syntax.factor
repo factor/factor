@@ -24,19 +24,11 @@ SYNTAX: CALLBACK:
 SYNTAX: TYPEDEF:
     scan-c-type CREATE-C-TYPE dup save-location typedef ;
 
-: define-enum-members ( counter -- )
-    scan dup ";" = not [
-        dup "{" =
-        [ 2drop scan create-in scan-word [ define-constant ] keep "}" expect ]
-        [ create-in swap [ define-constant ] keep ]
-        if 1 + define-enum-members
-    ] [ 2drop ] if ;
-
-SYNTAX: C-ENUM: 0 define-enum-members ;
-
-SYNTAX: C-TYPED-ENUM:
-    int CREATE-C-TYPE dup save-location typedef
-    0 define-enum-members ;
+SYNTAX: C-ENUM:
+    scan dup "f" =
+    [ drop ]
+    [ (CREATE-C-TYPE) dup save-location int swap typedef ] if
+    0 parse-enum-members ;
 
 SYNTAX: C-TYPE:
     void CREATE-C-TYPE typedef ;
