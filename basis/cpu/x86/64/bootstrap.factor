@@ -26,11 +26,6 @@ IN: bootstrap.x86
 : fixnum>slot@ ( -- ) temp0 1 SAR ;
 : rex-length ( -- n ) 1 ;
 
-: jit-save-tib ( -- ) ;
-: jit-restore-tib ( -- ) ;
-: jit-update-tib ( ctx-reg -- ) drop ;
-: jit-install-seh ( -- ) stack-reg bootstrap-cell ADD ;
-
 : jit-call ( name -- )
     RAX 0 MOV rc-absolute-cell jit-dlsym
     RAX CALL ;
@@ -238,7 +233,9 @@ IN: bootstrap.x86
     RSP ctx-reg context-callstack-top-offset [+] MOV
 
     ! Load new ds, rs registers
-    jit-restore-context ;
+    jit-restore-context
+
+    ctx-reg jit-update-tib ;
 
 : jit-pop-context-and-param ( -- )
     arg1 ds-reg [] MOV
@@ -293,6 +290,3 @@ IN: bootstrap.x86
     jit-delete-current-context
     jit-start-context
 ] \ (start-context-and-delete) define-sub-primitive
-
-<< "vocab:cpu/x86/bootstrap.factor" parse-file suffix! >>
-call

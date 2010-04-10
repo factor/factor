@@ -1,9 +1,18 @@
 namespace factor
 {
 
+#if defined(WINDOWS) && defined(FACTOR_64)
+	const cell seh_area_size = 1024;
+#else
+	const cell seh_area_size = 0;
+#endif
+
 struct code_heap {
 	/* The actual memory area */
 	segment *seg;
+
+	/* Memory area reserved for SEH. Only used on Windows */
+	char *seh_area;
 
 	/* Memory allocator */
 	free_list_allocator<code_block> *allocator;
