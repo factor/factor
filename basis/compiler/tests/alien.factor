@@ -444,9 +444,8 @@ STRUCT: double-rect
     void { void* void* double-rect } cdecl
     [ "example" set-global 2drop ] alien-callback ;
 
-: double-rect-test ( arg -- arg' )
+: double-rect-test ( arg callback -- arg' )
     [ f f ] 2dip
-    double-rect-callback
     void { void* void* double-rect } cdecl alien-indirect
     "example" get-global ;
 
