@@ -67,7 +67,7 @@ M:: x86.32 %dispatch ( src temp -- )
     [ align-code ]
     bi ;
 
-M: x86.32 pic-tail-reg EBX ;
+M: x86.32 pic-tail-reg EDX ;
 
 M: x86.32 reserved-stack-space 4 cells ;
 
