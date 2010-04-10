@@ -129,8 +129,7 @@ M: stack-params copy-register*
         { [ over integer? ] [ EAX swap MOV              param@ EAX MOV ] }
     } cond ;
 
-M: x86.32 %save-param-reg
-    dup stack-params? [ 3drop ] [ [ param@ ] 2dip %copy ] if ;
+M: x86.32 %save-param-reg [ local@ ] 2dip %copy ;
 
 M: x86.32 %load-param-reg [ swap local@ ] dip %copy ;
 
@@ -139,7 +138,7 @@ M: x86.32 %load-param-reg [ swap local@ ] dip %copy ;
     #! are boxing a return value of a C function. If n is an
     #! integer, push [ESP+n] on the stack; we are boxing a
     #! parameter being passed to a callback from C.
-    over [ [ next-stack@ ] dip load-return-reg ] [ 2drop ] if ;
+    over [ [ local@ ] dip load-return-reg ] [ 2drop ] if ;
 
 M:: x86.32 %box ( n rep func -- )
     n rep (%box)
@@ -327,17 +326,19 @@ M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
         stack-params get
     ] with-param-regs ;
 
-M: x86.32 %cleanup ( params -- )
-    #! a) If we just called a stdcall function in Windows, it
-    #! cleaned up the stack frame for us. But we don't want that
-    #! so we 'undo' the cleanup since we do that in %epilogue.
-    #! b) If we just called a function returning a struct, we
-    #! have to fix ESP.
+M: x86.32 stack-cleanup ( params -- n )
+    #! a) Functions which are stdcall/fastcall/thiscall have to
+    #! clean up the caller's stack frame.
+    #! b) Functions returning large structs on MINGW have to
+    #! fix ESP.
     {
-        { [ dup abi>> callee-cleanup? ] [ stack-arg-size ESP swap SUB ] }
-        { [ dup funny-large-struct-return? ] [ drop EAX PUSH ] }
-        [ drop ]
+        { [ dup abi>> callee-cleanup? ] [ stack-arg-size ] }
+        { [ dup funny-large-struct-return? ] [ drop 4 ] }
+        [ drop 0 ]
     } cond ;
+
+M: x86.32 %cleanup ( params -- )
+    stack-cleanup [ ESP swap SUB ] unless-zero ;
 
 M:: x86.32 %call-gc ( gc-root-count temp -- )
     temp gc-root-base special@ LEA
@@ -351,17 +352,6 @@ M: x86.32 dummy-stack-params? f ;
 M: x86.32 dummy-int-params? f ;
 
 M: x86.32 dummy-fp-params? f ;
-
-M: x86.32 callback-return-rewind ( params -- n )
-    #! a) If the callback is stdcall, we have to clean up the
-    #! caller's stack frame.
-    #! b) If the callback is returning a large struct, we have
-    #! to fix ESP.
-    {
-        { [ dup stdcall? ] [ <alien-stack-frame> [ params>> ] [ return>> ] bi + ] }
-        { [ dup funny-large-struct-return? ] [ drop 4 ] }
-        [ drop 0 ]
-    } cond ;
 
 ! Dreadful
 M: object flatten-value-type (flatten-stack-type) ;
