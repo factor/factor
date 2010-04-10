@@ -10,7 +10,6 @@ compiler.cfg.intrinsics compiler.cfg.stack-frame
 cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
 cpu.architecture vm ;
 FROM: layouts => cell ;
-FROM: alien.private => fastcall ;
 IN: cpu.x86.32
 
 M: x86.32 machine-registers
