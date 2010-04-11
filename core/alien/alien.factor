@@ -64,6 +64,10 @@ M: alien equal?
 M: pinned-alien hashcode*
     nip dup expired>> [ drop 1234 ] [ alien-address ] if ;
 
+SINGLETONS: stdcall thiscall fastcall cdecl mingw ;
+
+UNION: abi stdcall thiscall fastcall cdecl mingw ;
+
 ERROR: alien-callback-error ;
 
 : alien-callback ( return parameters abi quot -- alien )

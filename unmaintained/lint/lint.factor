@@ -52,7 +52,7 @@ SYMBOL: def-hash-keys
         [ t ] [ f ]
         [ { } ]
         [ drop f ]
-        [ "cdecl" ]
+        [ cdecl ]
         [ first ] [ second ] [ third ] [ fourth ]
         [ ">" write ] [ "/>" write ]
     } ;

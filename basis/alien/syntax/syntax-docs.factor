@@ -58,15 +58,15 @@ HELP: TYPEDEF:
 { $notes "This word differs from " { $link typedef } " in that it runs at parse time, to ensure correct ordering of operations when loading source files. Words defined in source files are compiled before top-level forms are run, so if a source file defines C binding words and uses " { $link typedef } ", the type alias won't be available at compile time." } ;
 
 HELP: C-ENUM:
-{ $syntax "C-ENUM: words... ;" }
-{ $values { "words" "a sequence of word names" } }
-{ $description "Creates a sequence of word definitions in the current vocabulary. Each word pushes an integer according to its index in the enumeration definition. The first word pushes 0." }
+{ $syntax "C-ENUM: type/f words... ;" }
+{ $values { "type" "a name to typedef to int or f" } { "words" "a sequence of word names" } }
+{ $description "Creates a sequence of word definitions in the current vocabulary. Each word pushes an integer according to the rules of C enums." }
 { $notes "This word emulates a C-style " { $snippet "enum" } " in Factor. While this feature can be used for any purpose, using integer constants is discouraged unless it is for interfacing with C libraries. Factor code should use " { $link "words.symbol" } " or " { $link "singletons" } " instead." }
 { $examples
     "Here is an example enumeration definition:"
-    { $code "C-ENUM: red green blue ;" }
+    { $code "C-ENUM: color_t red { green 3 } blue ;" }
     "It is equivalent to the following series of definitions:"
-    { $code "CONSTANT: red 0" "CONSTANT: green 1" "CONSTANT: blue 2" }
+    { $code "CONSTANT: red 0" "CONSTANT: green 3" "CONSTANT: blue 4" }
 } ;
 
 HELP: C-TYPE:

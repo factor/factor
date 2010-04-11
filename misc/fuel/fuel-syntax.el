@@ -44,8 +44,8 @@
 
 (defconst fuel-syntax--parsing-words
   '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
-    "ABOUT:" "ALIAS:" "ALIEN:" "ARTICLE:"
-    "B" "BIN:"
+    "ABOUT:" "AFTER:" "ALIAS:" "ALIEN:" "ARTICLE:"
+    "B" "BEFORE:" "BIN:"
     "C:" "CALLBACK:" "C-ENUM:" "C-STRUCT:" "C-TYPE:" "C-UNION:" "CHAR:" "COM-INTERFACE:" "CONSTANT:" "call-next-method"
     "DEFER:"
     "EBNF:" ";EBNF" "ERROR:" "EXCLUDE:"
@@ -88,6 +88,12 @@
 (defconst fuel-syntax--method-definition-regex
   "^M::? +\\([^ ]+\\) +\\([^ ]+\\)")
 
+(defconst fuel-syntax--before-definition-regex
+  "^BEFORE: +\\([^ ]+\\) +\\([^ ]+\\)")
+
+(defconst fuel-syntax--after-definition-regex
+  "^AFTER: +\\([^ ]+\\) +\\([^ ]+\\)")
+
 (defconst fuel-syntax--integer-regex
   "\\_<-?[0-9]+\\_>")
 
@@ -112,7 +118,7 @@
   (format "\\_<\\(%s\\)?: +\\_<\\(\\w+\\)\\_>"
           (regexp-opt
            '(":" "GENERIC" "DEFER" "HOOK" "MAIN" "MATH" "POSTPONE"
-             "SYMBOL" "SYNTAX" "TYPED" "RENAME"))))
+             "SYMBOL" "SYNTAX" "TYPED" "TYPED:" "RENAME"))))
 
 (defconst fuel-syntax--alias-definition-regex
   "^ALIAS: +\\(\\_<.+?\\_>\\) +\\(\\_<.+?\\_>\\)")
@@ -157,6 +163,7 @@
   "\\_<CALLBACK: \\(\\w+\\) \\(\\w+\\)")
 
 (defconst fuel-syntax--indent-def-starts '("" ":"
+                                           "AFTER" "BEFORE"
                                            "C-ENUM" "C-STRUCT" "C-UNION" "COM-INTERFACE"
                                            "FROM" "FUNCTION:"
                                            "INTERSECTION:"
