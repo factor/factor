@@ -1515,14 +1515,13 @@ FUNCTION: BOOL SetupRemoveFileLogEntryA ( HSPFILELOG FileLogHandle, PCSTR LogSec
 FUNCTION: BOOL SetupRemoveFileLogEntryW ( HSPFILELOG FileLogHandle, PCWSTR LogSectionName, PCWSTR TargetFilename ) ;
 ALIAS: SetupRemoveFileLogEntry SetupRemoveFileLogEntryW
 
-C-ENUM:
+C-ENUM: SetupFileLogInfo
     SetupFileLogSourceFilename
     SetupFileLogChecksum
     SetupFileLogDiskTagfile
     SetupFileLogDiskDescription
     SetupFileLogOtherInfo
     SetupFileLogMax ;
-TYPEDEF: int SetupFileLogInfo
 
 FUNCTION: BOOL SetupQueryFileLogA ( HSPFILELOG FileLogHandle, PCSTR LogSectionName, PCSTR TargetFilename, SetupFileLogInfo DesiredInfo, PSTR DataOut, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
 FUNCTION: BOOL SetupQueryFileLogW ( HSPFILELOG FileLogHandle, PCWSTR LogSectionName, PCWSTR TargetFilename, SetupFileLogInfo DesiredInfo, PWSTR DataOut, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
