@@ -349,12 +349,11 @@ STRUCT: cpSegmentQueryInfo
     { t     cpFloat  }
     { n     cpVect   } ;
 
-C-ENUM:
+C-ENUM: cpShapeType
     CP_CIRCLE_SHAPE
     CP_SEGMENT_SHAPE
     CP_POLY_SHAPE
     CP_NUM_SHAPES ;
-TYPEDEF: int cpShapeType
 
 CALLBACK: cpBB cacheData_cb ( cpShape* shape, cpVect p, cpVect rot ) ;
 CALLBACK: void destroy_cb ( cpShape* shape ) ;
@@ -483,11 +482,10 @@ STRUCT: cpContact
 
 FUNCTION: cpContact* cpContactInit ( cpContact* con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash ) ;
 
-C-ENUM:
+C-ENUM: cpArbiterState
     cpArbiterStateNormal
     cpArbiterStateFirstColl
     cpArbiterStateIgnore ;
-TYPEDEF: int cpArbiterState
 
 STRUCT: cpArbiter
     { numContacts int                 }

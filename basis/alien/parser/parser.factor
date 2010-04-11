@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.libraries arrays
 assocs classes combinators combinators.short-circuit
 compiler.units effects grouping kernel parser sequences
 splitting words fry locals lexer namespaces summary math
-vocabs.parser ;
+vocabs.parser words.constant ;
 IN: alien.parser
 
 : parse-c-type-name ( name -- word )
@@ -51,13 +51,16 @@ ERROR: *-in-c-type-name name ;
     dup "*" tail?
     [ *-in-c-type-name ] when ;
 
-: CREATE-C-TYPE ( -- word )
-    scan validate-c-type-name current-vocab create {
+: (CREATE-C-TYPE) ( word -- word )
+    validate-c-type-name current-vocab create {
         [ fake-definition ]
         [ set-word ]
         [ reset-c-type ]
         [ ]
     } cleave ;
+
+: CREATE-C-TYPE ( -- word )
+    scan (CREATE-C-TYPE) ;
 
 <PRIVATE
 GENERIC: return-type-name ( type -- name )
@@ -71,6 +74,18 @@ M: pointer return-type-name to>> return-type-name CHAR: * suffix ;
     [ [ <pointer> ] dip parse-pointers ] when ;
 
 PRIVATE>
+
+: define-enum-member ( word-string value -- next-value )
+     [ create-in ] dip [ define-constant ] keep 1 + ;
+
+: parse-enum-member ( word-string value -- next-value )
+     over "{" =
+     [ 2drop scan scan-object define-enum-member "}" expect ]
+     [ define-enum-member ] if ;
+
+: parse-enum-members ( counter -- )
+     scan dup ";" = not
+     [ swap parse-enum-member parse-enum-members ] [ 2drop ] if ;
 
 : scan-function-name ( -- return function )
     scan-c-type scan parse-pointers ;
