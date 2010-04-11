@@ -1,7 +1,6 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http:// factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax classes.struct kernel literals math
-unix.types ;
+USING: alien.c-types alien.syntax classes.struct kernel literals math unix.types ;
 IN: macho
 
 TYPEDEF: int       integer_t
@@ -524,7 +523,7 @@ CONSTANT: CPU_TYPE_VAX            1
 CONSTANT: CPU_TYPE_MC680x0        6
 CONSTANT: CPU_TYPE_X86            7
 CONSTANT: CPU_TYPE_I386           $ CPU_TYPE_X86
-CONSTANT: CPU_TYPE_X86_64         $[ CPU_TYPE_X86 CPU_ARCH_ABI64 bitor ]
+CONSTANT: CPU_TYPE_X86_64         $[ $ CPU_TYPE_X86 $ CPU_ARCH_ABI64 bitor ]
 CONSTANT: CPU_TYPE_MC98000        10
 CONSTANT: CPU_TYPE_HPPA           11
 CONSTANT: CPU_TYPE_ARM            12
@@ -532,7 +531,7 @@ CONSTANT: CPU_TYPE_MC88000        13
 CONSTANT: CPU_TYPE_SPARC          14
 CONSTANT: CPU_TYPE_I860           15
 CONSTANT: CPU_TYPE_POWERPC        18
-CONSTANT: CPU_TYPE_POWERPC64      $[ $ CPU_TYPE_POWERPC CPU_ARCH_ABI64 bitor ]
+CONSTANT: CPU_TYPE_POWERPC64      $[ $ CPU_TYPE_POWERPC $ CPU_ARCH_ABI64 bitor ]
 
 CONSTANT: CPU_SUBTYPE_MASK    HEX: ff000000
 CONSTANT: CPU_SUBTYPE_LIB64   HEX: 80000000
