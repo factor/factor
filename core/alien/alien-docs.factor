@@ -3,7 +3,6 @@ alien.syntax compiler definitions math libc eval
 debugger parser io io.backend system alien.accessors
 alien.libraries alien.c-types quotations kernel
 sequences ;
-FROM: alien.private => fastcall ;
 IN: alien
 
 HELP: cdecl

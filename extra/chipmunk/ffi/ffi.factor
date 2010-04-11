@@ -1,8 +1,9 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http:// factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.syntax classes.struct combinators
-combinators.short-circuit kernel math math.order sequences
-typed specialized-arrays locals system alien.libraries ;
+USING: accessors alien alien.c-types alien.libraries
+alien.syntax classes.struct combinators combinators.short-circuit
+kernel math math.order sequences typed specialized-arrays locals
+system ;
 SPECIALIZED-ARRAY: void*
 IN: chipmunk.ffi
 
