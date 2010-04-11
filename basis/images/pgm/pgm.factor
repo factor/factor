@@ -29,7 +29,6 @@ SINGLETON: pgm-image
         n 1 + lim read-numbers
     ] unless ;
 
-ERROR: INSPECT a ;
 :: read-pgm ( -- image )
     read-token         :> type
     read-number        :> width
