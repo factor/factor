@@ -11,54 +11,34 @@ FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: fluids
 
-STRUCT: float2_t
-    { x float }
-    { y float } ;
-
-: f2+ ( lhs rhs -- res )
-    [ [ x>> ] bi@ + ]
-    [ [ y>> ] bi@ + ]
-    2bi float2_t <struct-boa> ; inline
-
-: f2- ( lhs rhs -- res )
-    [ [ x>> ] bi@ - ]
-    [ [ y>> ] bi@ - ]
-    2bi float2_t <struct-boa> ; inline
-
-: f2*n ( lhs rhs -- res ) 
-    [ [ x>> ] dip * ]
-    [ [ y>> ] dip * ]
-    2bi float2_t <struct-boa> ; inline
-
 STRUCT: particle_t
-    { p  float2_t }
-    { p' float2_t }
-    { m  float    } ;
+    { p float[2] }
+    { v float[2] }
+    { m float    } ;
 SPECIALIZED-ARRAY: particle_t
 
-CONSTANT: gravity S{ float2_t f 0.0 -0.1 }
+CONSTANT: gravity { 0.0 -0.1 }
 
-:: verlet-integrate-particle ( p dt -- p' )
-    p p>> 2.0 f2*n :> v1
-    p p'>> :> v2
-    gravity dt dt * 1.0 p m>> 2.0 * / * f2*n :> v3
-    v1 v2 f2- v3 f2+
-    p p m>> particle_t <struct-boa> ; inline
+:: verlet-integrate-particle ( particle dt -- particle' )
+    particle [ p>> ] [ v>> ] bi dt v*n v+
+    gravity dt dt * particle m>> 2 * / v*n v+ :> p'
+    p' particle p>> v- dt v/n :> v'
+    p' v' particle m>> particle_t <struct-boa> ; inline
 
 CONSTANT: initial-particles
 particle_t-array{
-    S{ particle_t f S{ float2_t f 0.5 0.6 } S{ float2_t f 0.499 0.599 } 1.0 }
-    S{ particle_t f S{ float2_t f 0.5 0.6 } S{ float2_t f 0.501 0.599 } 3.0 }
+    S{ particle_t f float-array{ 0.5 0.6 } float-array{ 0 0.1 } 1.0 }
+    S{ particle_t f float-array{ 0.5 0.6 } float-array{ 0.1 0 } 3.0 }
     
-    S{ particle_t f S{ float2_t f 0.5 0.5 } S{ float2_t f 0.5 0.5 } 2.0 }
-    S{ particle_t f S{ float2_t f 0.5 0.6 } S{ float2_t f 0.5 0.599 } 1.0 }
-    S{ particle_t f S{ float2_t f 0.6 0.5 } S{ float2_t f 0.6 0.5 } 3.0 }
-    S{ particle_t f S{ float2_t f 0.7 0.5 } S{ float2_t f 0.7 0.5 } 1.0 }
-    S{ particle_t f S{ float2_t f 0.1 0.5 } S{ float2_t f 0.1 0.5 } 5.0 }
-    S{ particle_t f S{ float2_t f 0.2 0.5 } S{ float2_t f 0.2 0.5 } 1.0 }
-    S{ particle_t f S{ float2_t f 0.3 0.3 } S{ float2_t f 0.3 0.3 } 4.0 }
-    S{ particle_t f S{ float2_t f 0.5 0.15 } S{ float2_t f 0.5 0.15 } 1.0 }
-    S{ particle_t f S{ float2_t f 0.5 0.1 } S{ float2_t f 0.5 0.1 } 9.0 }
+    S{ particle_t f float-array{ 0.5 0.5 } float-array{ 0.1 0.1 } 2.0 }
+    S{ particle_t f float-array{ 0.5 0.6 } float-array{ -0.1 0 } 1.0 }
+    S{ particle_t f float-array{ 0.6 0.5 } float-array{ 0 -0.1 } 3.0 }
+    S{ particle_t f float-array{ 0.7 0.5 } float-array{ 0.1 0.1 } 1.0 }
+    S{ particle_t f float-array{ 0.1 0.5 } float-array{ -0.1 -0.1 } 5.0 }
+    S{ particle_t f float-array{ 0.2 0.5 } float-array{ 0 0 } 1.0 }
+    S{ particle_t f float-array{ 0.3 0.3 } float-array{ 0 0 } 4.0 }
+    S{ particle_t f float-array{ 0.5 0.15 } float-array{ 0 0 } 1.0 }
+    S{ particle_t f float-array{ 0.5 0.1 } float-array{ 0 0 } 9.0 }
 }
 
 : integrate-particles! ( particles dt -- particles )
@@ -110,18 +90,17 @@ M: fluids-world tick-game-world
 
 M:: fluids-world draw-world* ( world -- )
     world particles>> [
-        [ p>> [ x>> , ] [ y>> , ] bi ] each
+        [ p>> [ first , ] [ second , ] bi ] each
     ] curry float-array{ } make :> verts
     
     [ 
-        verts world texture>> 50.0 { 320 240 } blended-point-sprite-batch &dispose
-        
+        verts world texture>> 30.0 world dim>> { 4 4 } v/
+        blended-point-sprite-batch &dispose
         blend-state new set-gpu-state
-        
-        gaussian-blur &dispose world ramp>> { 1024 768 } step-texture &dispose
-        { 1024 768 } draw-texture
-    ] with-destructors
-    ;
+        gaussian-blur &dispose
+        world ramp>> world dim>> step-texture &dispose
+        world dim>> draw-texture
+    ] with-destructors ;
 
 GAME: fluids {
     { world-class fluids-world }
@@ -132,11 +111,10 @@ GAME: fluids {
     { tick-interval-micros $[ 60 fps ] }
 } ;
 
-MAIN: fluids
-
 fluids-world H{
     { T{ button-down } [ [
-        hand-loc get { 1024 768 } v/ 2 v*n 1 v-n { 1 -1 } v* first2 float2_t <struct-boa>
-        dup 2.0 particle_t <struct-boa> suffix
+        hand-loc get >float-array
+        world get dim>> >float-array v/ 2 v*n 1 v-n { 1 -1 } v*
+        float-array{ 0 0.2 } 2.0 particle_t <struct-boa> suffix
     ] change-particles drop ] }
 } set-gestures
