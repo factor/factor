@@ -22,12 +22,11 @@ STRUCT: USB_INTERFACE_DESCRIPTOR
     { iInterface         UCHAR } ;
 TYPEDEF: USB_INTERFACE_DESCRIPTOR* PUSB_INTERFACE_DESCRIPTOR
 
-C-ENUM:
+C-ENUM: USBD_PIPE_TYPE
     UsbdPipeTypeControl
     UsbdPipeTypeIsochronous
     UsbdPipeTypeBulk
     UsbdPipeTypeInterrupt ;
-TYPEDEF: int USBD_PIPE_TYPE
 
 STRUCT: WINUSB_PIPE_INFORMATION
     { PipeType                   USBD_PIPE_TYPE }

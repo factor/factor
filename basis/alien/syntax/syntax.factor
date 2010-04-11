@@ -25,8 +25,10 @@ SYNTAX: TYPEDEF:
     scan-c-type CREATE-C-TYPE dup save-location typedef ;
 
 SYNTAX: C-ENUM:
-    ";" parse-tokens
-    [ [ create-in ] dip define-constant ] each-index ;
+    scan dup "f" =
+    [ drop ]
+    [ (CREATE-C-TYPE) dup save-location int swap typedef ] if
+    0 parse-enum-members ;
 
 SYNTAX: C-TYPE:
     void CREATE-C-TYPE typedef ;
