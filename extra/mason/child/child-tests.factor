@@ -1,7 +1,7 @@
 IN: mason.child.tests
 USING: mason.child mason.config tools.test namespaces io kernel sequences ;
 
-[ { "nmake" "/f" "nmakefile" } ] [
+[ { "nmake" "/f" "nmakefile" "x86-32" } ] [
     [
         "winnt" target-os set
         "x86.32" target-cpu set

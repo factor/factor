@@ -5,6 +5,21 @@ alien.libraries alien.c-types quotations kernel
 sequences ;
 IN: alien
 
+HELP: cdecl
+{ $description "This symbol is passed as the " { $snippet "abi" } " argument to " { $link alien-indirect } ", " { $link alien-callback } ", " { $link alien-assembly } ", and " { $link add-library } " to indicate that the standard C calling convention should be used, where the caller cleans up the stack frame after calling the function. This symbol only has meaning on 32-bit x86 platforms." } ;
+
+HELP: stdcall
+{ $description "This symbol is passed as the " { $snippet "abi" } " argument to " { $link alien-indirect } ", " { $link alien-callback } ", " { $link alien-assembly } ", and " { $link add-library } " to indicate that the Windows API calling convention should be used, where the called function cleans up its own stack frame before returning to the caller. This symbol only has meaning on 32-bit x86 platforms." } ;
+
+HELP: fastcall
+{ $warning "In the current implementation this ABI only works for functions that take only integer and pointer arguments." }
+{ $description "This symbol is passed as the " { $snippet "abi" } " argument to " { $link alien-indirect } ", " { $link alien-callback } ", " { $link alien-assembly } ", and " { $link add-library } " to indicate that the \"fast call\" calling convention should be used, where the first two integer or pointer arguments are passed in registers and the function cleans up its own stack frame before returning to the caller. This symbol only has meaning on 32-bit x86 platforms." } ;
+
+HELP: thiscall
+{ $description "This symbol is passed as the " { $snippet "abi" } " argument to " { $link alien-indirect } ", " { $link alien-callback } ", " { $link alien-assembly } ", and " { $link add-library } " to indicate that Microsoft Visual C++ calling convention should be used, where the first argument (which must be a \"this\" pointer) is passed in a register and the function cleans up its own stack frame before returning to the caller. This symbol only has meaning on 32-bit x86 platforms." } ;
+
+{ cdecl stdcall fastcall thiscall } related-words
+
 HELP: >c-ptr
 { $values { "obj" object } { "c-ptr" c-ptr } }
 { $contract "Outputs a pointer to the binary data of this object." } ;
@@ -85,7 +100,7 @@ HELP: alien-indirect-error
 } ;
 
 HELP: alien-indirect
-{ $values { "args..." "zero or more objects passed to the C function" } { "funcptr" "a C function pointer" } { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "return..." "the return value of the function, if not " { $link void } } }
+{ $values { "args..." "zero or more objects passed to the C function" } { "funcptr" "a C function pointer" } { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $link cdecl } " or " { $link stdcall } } { "return..." "the return value of the function, if not " { $link void } } }
 { $description
     "Invokes a C function pointer passed on the data stack. Input parameters are taken from the data stack following the function pointer, and the return value is pushed on the data stack after the function returns. A return type of " { $link void } " indicates that no value is to be expected."
 }
@@ -101,7 +116,7 @@ HELP: alien-callback-error
 } ;
 
 HELP: alien-callback
-{ $values { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "quot" quotation } { "alien" alien } }
+{ $values { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $link cdecl } " or " { $link stdcall } } { "quot" quotation } { "alien" alien } }
 { $description
     "Defines a callback from C to Factor which accepts the given set of parameters from the C caller, pushes them on the data stack, calls the quotation, and passes a return value back to the C caller. A return type of " { $snippet "void" } " indicates that no value is to be returned."
     $nl
@@ -114,7 +129,7 @@ HELP: alien-callback
     "A simple example, showing a C function which returns the difference of two given integers:"
     { $code
         ": difference-callback ( -- alien )"
-        "    int { int int } \"cdecl\" [ - ] alien-callback ;"
+        "    int { int int } cdecl [ - ] alien-callback ;"
     }
 }
 { $errors "Throws an " { $link alien-callback-error } " if the word calling " { $link alien-callback } " is not compiled." } ;
@@ -128,7 +143,7 @@ HELP: alien-assembly-error
 } ;
 
 HELP: alien-assembly
-{ $values { "args..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "quot" quotation } { "return..." "the return value of the function, if not " { $link void } } }
+{ $values { "args..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $link cdecl } " or " { $link stdcall } } { "quot" quotation } { "return..." "the return value of the function, if not " { $link void } } }
 { $description
     "Invokes arbitrary machine code, generated at compile-time by the quotation. Input parameters are taken from the data stack, and the return value is pushed on the data stack after the function returns. A return type of " { $link void } " indicates that no value is to be expected."
 }

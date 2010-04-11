@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.libraries alien.syntax system sequences combinators kernel ;
+USING: alien.libraries alien.syntax system sequences combinators kernel alien.c-types ;
 
 IN: llvm.core
 
@@ -12,7 +12,7 @@ IN: llvm.core
         { [ os macosx? ] [ "/usr/local/lib/lib" ".dylib" surround ] }
         { [ os windows? ] [ ".dll" append ] }
         { [ os unix? ] [ "lib" ".so" surround ] }
-    } cond "cdecl" add-library ;
+    } cond cdecl add-library ;
 
 "LLVMSystem" add-llvm-library
 "LLVMSupport" add-llvm-library
@@ -28,20 +28,20 @@ LIBRARY: LLVMCore
 TYPEDEF: uint unsigned
 TYPEDEF: unsigned enum
 
-CONSTANT: LLVMZExtAttribute         BIN: 1
-CONSTANT: LLVMSExtAttribute         BIN: 10
-CONSTANT: LLVMNoReturnAttribute     BIN: 100
-CONSTANT: LLVMInRegAttribute        BIN: 1000
-CONSTANT: LLVMStructRetAttribute    BIN: 10000
-CONSTANT: LLVMNoUnwindAttribute     BIN: 100000
-CONSTANT: LLVMNoAliasAttribute      BIN: 1000000
-CONSTANT: LLVMByValAttribute        BIN: 10000000
-CONSTANT: LLVMNestAttribute         BIN: 100000000
-CONSTANT: LLVMReadNoneAttribute     BIN: 1000000000
-CONSTANT: LLVMReadOnlyAttribute     BIN: 10000000000
-TYPEDEF: enum LLVMAttribute;
+C-ENUM: LLVMAttribute
+    { LLVMZExtAttribute         BIN: 1 }
+    { LLVMSExtAttribute         BIN: 10 }
+    { LLVMNoReturnAttribute     BIN: 100 }
+    { LLVMInRegAttribute        BIN: 1000 }
+    { LLVMStructRetAttribute    BIN: 10000 }
+    { LLVMNoUnwindAttribute     BIN: 100000 }
+    { LLVMNoAliasAttribute      BIN: 1000000 }
+    { LLVMByValAttribute        BIN: 10000000 }
+    { LLVMNestAttribute         BIN: 100000000 }
+    { LLVMReadNoneAttribute     BIN: 1000000000 }
+    { LLVMReadOnlyAttribute     BIN: 10000000000 } ;
 
-C-ENUM:
+C-ENUM: LLVMTypeKind
   LLVMVoidTypeKind
   LLVMFloatTypeKind
   LLVMDoubleTypeKind
@@ -57,9 +57,8 @@ C-ENUM:
   LLVMPointerTypeKind
   LLVMOpaqueTypeKind
   LLVMVectorTypeKind ;
-TYPEDEF: enum LLVMTypeKind
 
-C-ENUM:
+C-ENUM: LLVMLinkage
   LLVMExternalLinkage
   LLVMLinkOnceLinkage
   LLVMWeakLinkage
@@ -69,34 +68,32 @@ C-ENUM:
   LLVMDLLExportLinkage
   LLVMExternalWeakLinkage
   LLVMGhostLinkage ;
-TYPEDEF: enum LLVMLinkage
 
-C-ENUM:
+C-ENUM: LLVMVisibility
   LLVMDefaultVisibility
   LLVMHiddenVisibility
   LLVMProtectedVisibility ;
-TYPEDEF: enum LLVMVisibility
 
-CONSTANT: LLVMCCallConv             0
-CONSTANT: LLVMFastCallConv          8
-CONSTANT: LLVMColdCallConv          9
-CONSTANT: LLVMX86StdcallCallConv    64
-CONSTANT: LLVMX86FastcallCallConv   65
-TYPEDEF: enum LLVMCallConv
+C-ENUM: LLVMCallConv
+  { LLVMCCallConv             0 }
+  { LLVMFastCallConv          8 }
+  { LLVMColdCallConv          9 }
+  { LLVMX86StdcallCallConv    64 }
+  { LLVMX86FastcallCallConv   65 } ;
 
-CONSTANT: LLVMIntEQ                 32
-CONSTANT: LLVMIntNE                 33
-CONSTANT: LLVMIntUGT                34
-CONSTANT: LLVMIntUGE                35
-CONSTANT: LLVMIntULT                36
-CONSTANT: LLVMIntULE                37
-CONSTANT: LLVMIntSGT                38
-CONSTANT: LLVMIntSGE                39
-CONSTANT: LLVMIntSLT                40
-CONSTANT: LLVMIntSLE                41
-TYPEDEF: enum LLVMIntPredicate
+C-ENUM: LLVMIntPredicate
+  { LLVMIntEQ                 32 }
+  { LLVMIntNE                 33 }
+  { LLVMIntUGT                34 }
+  { LLVMIntUGE                35 }
+  { LLVMIntULT                36 }
+  { LLVMIntULE                37 }
+  { LLVMIntSGT                38 }
+  { LLVMIntSGE                39 }
+  { LLVMIntSLT                40 }
+  { LLVMIntSLE                41 } ;
 
-C-ENUM:
+C-ENUM: LLVMRealPredicate
   LLVMRealPredicateFalse
   LLVMRealOEQ
   LLVMRealOGT
@@ -113,7 +110,6 @@ C-ENUM:
   LLVMRealULE
   LLVMRealUNE
   LLVMRealPredicateTrue ;
-TYPEDEF: enum LLVMRealPredicate
 
 ! Opaque Types
 
