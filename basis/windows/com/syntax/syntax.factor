@@ -12,7 +12,7 @@ MACRO: com-invoke ( n return parameters -- )
     [ 2nip length ] 3keep
     '[
         _ npick *void* _ cell * alien-cell _ _
-        "stdcall" alien-indirect
+        stdcall alien-indirect
     ] ;
 
 TUPLE: com-interface-definition word parent iid functions ;

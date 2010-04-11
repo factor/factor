@@ -10,9 +10,9 @@ IN: openssl.libssl
 << {
     { [ os openbsd? ] [ ] } ! VM is linked with it
     { [ os netbsd? ] [ ] }
-    { [ os winnt? ] [ "libssl" "ssleay32.dll" "cdecl" add-library ] }
-    { [ os macosx? ] [ "libssl" "libssl.dylib" "cdecl" add-library ] }
-    { [ os unix? ] [ "libssl" "libssl.so" "cdecl" add-library ] }
+    { [ os winnt? ] [ "libssl" "ssleay32.dll" cdecl add-library ] }
+    { [ os macosx? ] [ "libssl" "libssl.dylib" cdecl add-library ] }
+    { [ os unix? ] [ "libssl" "libssl.so" cdecl add-library ] }
 } cond >>
 
 CONSTANT: X509_FILETYPE_PEM       1

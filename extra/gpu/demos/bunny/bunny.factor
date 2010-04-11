@@ -34,12 +34,12 @@ GLSL-SHADER-FILE: window-vertex-shader vertex-shader "window.v.glsl"
 GLSL-SHADER-FILE: sobel-fragment-shader fragment-shader "sobel.f.glsl"
 GLSL-PROGRAM: sobel-program
     window-vertex-shader sobel-fragment-shader
-    window-vertex ;
+    window-vertex-format ;
 
 GLSL-SHADER-FILE: loading-fragment-shader fragment-shader "loading.f.glsl"
 GLSL-PROGRAM: loading-program
     window-vertex-shader loading-fragment-shader
-    window-vertex ;
+    window-vertex-format ;
 
 TUPLE: bunny-state
     vertexes

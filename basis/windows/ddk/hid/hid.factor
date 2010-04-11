@@ -1,10 +1,10 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.libraries alien.syntax classes.struct
-kernel math windows.types windows.ole32 ;
+USING: alien alien.c-types alien.libraries alien.syntax
+classes.struct kernel math windows.types windows.ole32 ;
 IN: windows.ddk.hid
 
-<< "hid" "hid.dll" "stdcall" add-library >>
+<< "hid" "hid.dll" stdcall add-library >>
 LIBRARY: hid
 
 TYPEDEF: LONG   NTSTATUS
@@ -206,11 +206,10 @@ CONSTANT: HID_USAGE_DIGITIZER_BARREL_SWITCH HEX: 44
 CONSTANT: HIDP_LINK_COLLECTION_ROOT        -1
 CONSTANT: HIDP_LINK_COLLECTION_UNSPECIFIED 0
 
-C-ENUM:
+C-ENUM: HIDP_REPORT_TYPE
     HidP_Input
     HidP_Output
     HidP_Feature ;
-TYPEDEF: int HIDP_REPORT_TYPE
 
 STRUCT: USAGE_AND_PAGE
     { Usage     USAGE }
@@ -608,10 +607,9 @@ HidP_UsageAndPageListDifference (
    ULONG           UsageListLength
    ) ;
 
-C-ENUM:
+C-ENUM: HIDP_KEYBOARD_DIRECTION
     HidP_Keyboard_Break
     HidP_Keyboard_Make ;
-TYPEDEF: int HIDP_KEYBOARD_DIRECTION
 
 STRUCT: HIDP_KEYBOARD_MODIFIER_STATE
     { ul ULONG } ;

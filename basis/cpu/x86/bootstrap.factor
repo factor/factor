@@ -12,8 +12,9 @@ big-endian off
 [
     ! Optimizing compiler's side of callback accesses
     ! arguments that are on the stack via the frame pointer.
-    ! On x86-64, some arguments are passed in registers, and
-    ! so the only register that is safe for use here is nv-reg.
+    ! On x86-32 fastcall, and x86-64, some arguments are passed
+    ! in registers, and so the only registers that are safe for
+    ! use here are frame-reg, nv-reg and vm-reg.
     frame-reg PUSH
     frame-reg stack-reg MOV
 
@@ -65,23 +66,24 @@ big-endian off
 
     frame-reg POP
 
-    ! Callbacks which return structs, or use stdcall, need a
-    ! parameter here. See the comment in callback-return-rewind
-    ! in cpu.x86.32
+    ! Callbacks which return structs, or use stdcall/fastcall/thiscall,
+    ! need a parameter here.
+
+    ! See the comment for M\ x86.32 stack-cleanup in cpu.x86.32
     HEX: ffff RET rc-absolute-2 rt-untagged jit-rel
 ] callback-stub jit-define
 
 [
     ! Load word
-    nv-reg 0 MOV rc-absolute-cell rt-literal jit-rel
+    temp0 0 MOV rc-absolute-cell rt-literal jit-rel
     ! Bump profiling counter
-    nv-reg profile-count-offset [+] 1 tag-fixnum ADD
+    temp0 profile-count-offset [+] 1 tag-fixnum ADD
     ! Load word->code
-    nv-reg nv-reg word-code-offset [+] MOV
+    temp0 temp0 word-code-offset [+] MOV
     ! Compute word entry point
-    nv-reg compiled-header-size ADD
+    temp0 compiled-header-size ADD
     ! Jump to entry point
-    nv-reg JMP
+    temp0 JMP
 ] jit-profiling jit-define
 
 [
@@ -200,7 +202,7 @@ big-endian off
 
 ! ! ! Polymorphic inline caches
 
-! The PIC stubs are not permitted to touch temp3.
+! The PIC stubs are not permitted to touch pic-tail-reg.
 
 ! Load a value from a stack position
 [
@@ -477,23 +479,23 @@ big-endian off
     ! load value
     temp3 ds-reg [] MOV
     ! make a copy
-    temp1 temp3 MOV
-    ! compute positive shift value in temp1
-    temp1 CL SHL
+    temp2 temp3 MOV
+    ! compute positive shift value in temp2
+    temp2 CL SHL
     shift-arg NEG
     ! compute negative shift value in temp3
     temp3 CL SAR
     temp3 tag-mask get bitnot AND
     shift-arg 0 CMP
-    ! if shift count was negative, move temp0 to temp1
-    temp1 temp3 CMOVGE
+    ! if shift count was negative, move temp0 to temp2
+    temp2 temp3 CMOVGE
     ! push to stack
-    ds-reg [] temp1 MOV
+    ds-reg [] temp2 MOV
 ] \ fixnum-shift-fast define-sub-primitive
 
 : jit-fixnum-/mod ( -- )
     ! load second parameter
-    temp3 ds-reg [] MOV
+    temp1 ds-reg [] MOV
     ! load first parameter
     div-arg ds-reg bootstrap-cell neg [+] MOV
     ! make a copy
@@ -501,7 +503,7 @@ big-endian off
     ! sign-extend
     mod-arg bootstrap-cell-bits 1 - SAR
     ! divide
-    temp3 IDIV ;
+    temp1 IDIV ;
 
 [
     jit-fixnum-/mod

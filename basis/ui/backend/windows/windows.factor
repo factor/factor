@@ -609,7 +609,7 @@ SYMBOL: trace-messages?
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
-    uint { void* uint long long } "stdcall" [
+    uint { void* uint long long } stdcall [
         pick
         trace-messages? get-global [ dup windows-message-name name>> print flush ] when
         wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if
@@ -633,7 +633,7 @@ M: windows-ui-backend do-events
         0 >>cbClsExtra
         0 >>cbWndExtra
         f GetModuleHandle >>hInstance
-        f GetModuleHandle "fraptor" utf16n string>alien LoadIcon >>hIcon
+        f GetModuleHandle "APPICON" utf16n string>alien LoadIcon >>hIcon
         f IDC_ARROW LoadCursor >>hCursor
 
         class-name-ptr >>lpszClassName

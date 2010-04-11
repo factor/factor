@@ -486,15 +486,15 @@ HOOK: %loop-entry cpu ( -- )
 GENERIC: return-reg ( reg-class -- reg )
 
 ! Sequence of registers used for parameter passing in class
-GENERIC: param-regs ( reg-class -- regs )
+GENERIC# param-regs 1 ( reg-class abi -- regs )
 
-M: stack-params param-regs drop f ;
+M: stack-params param-regs 2drop f ;
 
-GENERIC: param-reg ( n reg-class -- reg )
+GENERIC# param-reg 1 ( n reg-class abi -- reg )
 
 M: reg-class param-reg param-regs nth ;
 
-M: stack-params param-reg drop ;
+M: stack-params param-reg 2drop ;
 
 ! Is this integer small enough to be an immediate operand for
 ! %add-imm, %sub-imm, and %mul-imm?
@@ -503,6 +503,9 @@ HOOK: immediate-arithmetic? cpu ( n -- ? )
 ! Is this integer small enough to be an immediate operand for
 ! %and-imm, %or-imm, and %xor-imm?
 HOOK: immediate-bitwise? cpu ( n -- ? )
+
+! What c-type describes the implicit struct return pointer for large structs?
+HOOK: struct-return-pointer-type cpu ( -- c-type )
 
 ! Is this structure small enough to be returned in registers?
 HOOK: return-struct-in-registers? cpu ( c-type -- ? )
@@ -592,6 +595,6 @@ HOOK: %end-callback cpu ( -- )
 
 HOOK: %end-callback-value cpu ( c-type -- )
 
-HOOK: callback-return-rewind cpu ( params -- n )
+HOOK: stack-cleanup cpu ( params -- n )
 
-M: object callback-return-rewind drop 0 ;
+M: object stack-cleanup drop 0 ;
