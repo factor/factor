@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.libraries alien.syntax classes.struct
-kernel math windows.types windows.ole32 ;
+USING: alien alien.c-types alien.libraries alien.syntax
+classes.struct kernel math windows.types windows.ole32 ;
 IN: windows.ddk.hid
 
 << "hid" "hid.dll" stdcall add-library >>
