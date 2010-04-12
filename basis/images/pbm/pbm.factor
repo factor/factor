@@ -1,10 +1,9 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays ascii bit-arrays byte-arrays
-combinators continuations grouping images images.loader io
-io.encodings.ascii io.encodings.string kernel locals make math
-math.functions math.parser sequences specialized-arrays ;
-SPECIALIZED-ARRAY: ushort
+USING: accessors arrays ascii bit-arrays byte-arrays combinators
+continuations grouping images images.loader io io.encodings.ascii
+io.encodings.string kernel locals make math math.functions math.parser
+sequences ;
 IN: images.pbm
 
 SINGLETON: pbm-image
@@ -12,12 +11,14 @@ SINGLETON: pbm-image
 
 <PRIVATE
 : read-token ( -- token )
-    [ read1 dup blank?
-      [ t ]
-      [ dup CHAR: # =
-        [ "\n" read-until 2drop t ]
-        [ f ] if
-      ] if
+    [
+        read1 dup blank?
+        [ t ]
+        [
+            dup CHAR: # =
+            [ "\n" read-until 2drop t ]
+            [ f ] if
+        ] if
     ] [ drop ] while
     " \n\r\t" read-until drop swap
     prefix ascii decode ;
@@ -59,12 +60,12 @@ SINGLETON: pbm-image
     read-number    :> height
     width height * :> npixels
     width 8 mod    :> leftover
-    
+
     type {
         { "P1" [ [ [ read-ascii-bits ] ignore-errors ] B{ } make ] }
         { "P4" [ [ width height read-binary-bits ] B{ } make ] }
     } case :> data
-                     
+
     image new
     L                >>component-order
     { width height } >>dim
