@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2009 Slava Pestov.
+! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.units
 continuations debugger effects fry generalizations io io.files
@@ -118,12 +118,21 @@ PRIVATE>
         '[ _ run-file ] [ file-failure ] recover
     ] with-variable ;
 
+SYMBOL: forget-tests?
+
 <PRIVATE
+
+: forget-tests ( files -- )
+    forget-tests? get
+    [ [ [ forget-source ] each ] with-compilation-unit ] [ drop ] if ;
 
 : run-vocab-tests ( vocab -- )
     vocab dup [
         dup source-loaded?>> [
-            vocab-tests [ run-test-file ] each
+            vocab-tests
+            [ [ run-test-file ] each ]
+            [ forget-tests ]
+            bi
         ] [ drop ] if
     ] [ drop ] if ;
 
