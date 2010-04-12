@@ -434,15 +434,15 @@ MACRO: fortran-invoke ( return library function parameters -- )
     [ \ fortran-invoke 5 [ ] nsequence ] dip define-declared ;
 
 SYNTAX: SUBROUTINE: 
-    f "c-library" get scan ";" parse-tokens
+    f current-library get scan ";" parse-tokens
     [ "()" subseq? not ] filter define-fortran-function ;
 
 SYNTAX: FUNCTION:
-    scan "c-library" get scan ";" parse-tokens
+    scan current-library get scan ";" parse-tokens
     [ "()" subseq? not ] filter define-fortran-function ;
 
 SYNTAX: LIBRARY:
     scan
-    [ "c-library" set ]
+    [ current-library set ]
     [ set-fortran-abi ] bi ;
 
