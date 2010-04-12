@@ -20,7 +20,9 @@ IN: compiler.tests.alien
         { [ os unix?  ]  [ "libfactor-ffi-test.so" ] }
     } cond append-path ;
 
-"f-cdecl" libfactor-ffi-tests-path cdecl add-library
+: mingw? ( -- ? ) os windows? vm-compiler "GCC" head? and ;
+
+"f-cdecl" libfactor-ffi-tests-path mingw? mingw cdecl ? add-library
 
 "f-stdcall" libfactor-ffi-tests-path stdcall add-library
 
@@ -653,55 +655,103 @@ FUNCTION: void this_does_not_exist ( ) ;
     test-struct-11 "f-fastcall" "ffi_test_58" { int int int }
     alien-invoke gc ;
 
-[ 13 ] [ 3 4.0 5 ffi_test_52 ] unit-test
-[ 19 ] [ 3 4.0 5 6 ffi_test_53 ] unit-test
+! GCC bugs
+mingw? [
+    [ 13 ] [ 3 4.0 5 ffi_test_52 ] unit-test
+
+    [ 19 ] [ 3 4.0 5 6 ffi_test_53 ] unit-test
+] unless
+
 [ S{ test-struct-11 f 7 -1 } ] [ 3 4 ffi_test_57 ] unit-test
+
 [ S{ test-struct-11 f 7 -3 } ] [ 3 4 7 ffi_test_58 ] unit-test
 
 : fastcall-ii-indirect ( x y ptr -- result )
     int { int int } fastcall alien-indirect ;
+
 : fastcall-iii-indirect ( x y z ptr -- result )
     int { int int int } fastcall alien-indirect ;
+
 : fastcall-ifi-indirect ( x y z ptr -- result )
     int { int float int } fastcall alien-indirect ;
+
 : fastcall-ifii-indirect ( x y z w ptr -- result )
     int { int float int int } fastcall alien-indirect ;
+
 : fastcall-struct-return-ii-indirect ( x y ptr -- result )
     test-struct-11 { int int } fastcall alien-indirect ;
+
 : fastcall-struct-return-iii-indirect ( x y z ptr -- result )
     test-struct-11 { int int int } fastcall alien-indirect ;
 
-[ 8 ] [ 3 4 &: ffi_test_50 fastcall-ii-indirect ] unit-test
-[ 13 ] [ 3 4 5 &: ffi_test_51 fastcall-iii-indirect ] unit-test
-[ 13 ] [ 3 4.0 5 &: ffi_test_52 fastcall-ifi-indirect ] unit-test
-[ 19 ] [ 3 4.0 5 6 &: ffi_test_53 fastcall-ifii-indirect ] unit-test
+[ 8 ] [
+    3 4
+    os windows? [ &: @ffi_test_50@8 ] [ &: ffi_test_50 ] if
+    fastcall-ii-indirect
+] unit-test
+
+[ 13 ] [
+    3 4 5
+    os windows? [ &: @ffi_test_51@12 ] [ &: ffi_test_51 ] if
+    fastcall-iii-indirect
+] unit-test
+
+mingw? [
+    [ 13 ] [
+        3 4.0 5
+        os windows? [ &: @ffi_test_52@12 ] [ &: ffi_test_52 ] if
+        fastcall-ifi-indirect
+    ] unit-test
+
+    [ 19 ] [
+        3 4.0 5 6
+        os windows? [ &: @ffi_test_53@16 ] [ &: ffi_test_53 ] if
+        fastcall-ifii-indirect
+    ] unit-test
+] unless
 
 [ S{ test-struct-11 f 7 -1 } ]
-[ 3 4 &: ffi_test_57 fastcall-struct-return-ii-indirect ] unit-test
+[
+    3 4
+    os windows? [ &: @ffi_test_57@8 ] [ &: ffi_test_57 ] if
+    fastcall-struct-return-ii-indirect
+] unit-test
 
 [ S{ test-struct-11 f 7 -3 } ]
-[ 3 4 7 &: ffi_test_58 fastcall-struct-return-iii-indirect ] unit-test
+[
+    3 4 7
+    os windows? [ &: @ffi_test_58@12 ] [ &: ffi_test_58 ] if
+    fastcall-struct-return-iii-indirect
+] unit-test
 
 : fastcall-ii-callback ( -- ptr )
     int { int int } fastcall [ + 1 + ] alien-callback ;
+
 : fastcall-iii-callback ( -- ptr )
     int { int int int } fastcall [ + + 1 + ] alien-callback ;
+
 : fastcall-ifi-callback ( -- ptr )
     int { int float int } fastcall
     [ [ >integer ] dip + + 1 + ] alien-callback ;
+
 : fastcall-ifii-callback ( -- ptr )
     int { int float int int } fastcall
     [ [ >integer ] 2dip + + + 1 + ] alien-callback ;
+
 : fastcall-struct-return-ii-callback ( -- ptr )
     test-struct-11 { int int } fastcall
     [ [ + ] [ - ] 2bi test-struct-11 <struct-boa> ] alien-callback ;
+
 : fastcall-struct-return-iii-callback ( -- ptr )
     test-struct-11 { int int int } fastcall
     [ [ drop + ] [ - nip ] 3bi test-struct-11 <struct-boa> ] alien-callback ;
 
 [ 8 ] [ 3 4 fastcall-ii-callback fastcall-ii-indirect ] unit-test
+
 [ 13 ] [ 3 4 5 fastcall-iii-callback fastcall-iii-indirect ] unit-test
+
 [ 13 ] [ 3 4.0 5 fastcall-ifi-callback fastcall-ifi-indirect ] unit-test
+
 [ 19 ] [ 3 4.0 5 6 fastcall-ifii-callback fastcall-ifii-indirect ] unit-test
 
 [ S{ test-struct-11 f 7 -1 } ]
