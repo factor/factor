@@ -315,9 +315,6 @@ M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
     [ abi>> mingw = os windows? not or ]
     bi and ;
 
-: callee-cleanup? ( abi -- ? )
-    { stdcall fastcall thiscall } member? ;
-
 : stack-arg-size ( params -- n )
     dup abi>> '[
         alien-parameters flatten-value-types
