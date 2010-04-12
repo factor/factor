@@ -3,7 +3,8 @@
 USING: accessors furnace.auth furnace.db
 http.server.dispatchers mason.server webapps.mason.grids
 webapps.mason.make-release webapps.mason.package
-webapps.mason.release webapps.mason.report ;
+webapps.mason.release webapps.mason.report
+webapps.mason.downloads ;
 IN: webapps.mason
 
 TUPLE: mason-app < dispatcher ;
@@ -21,19 +22,16 @@ can-make-releases? define-capability
         { mason-app "download-package" } >>template
         "package" add-responder
 
-    <package-grid-action>
-        "packages" add-responder
-
     <download-release-action>
         { mason-app "download-release" } >>template
         "release" add-responder
 
-    <release-grid-action>
-        "releases" add-responder
+    <downloads-action>
+        { mason-app "downloads" } >>template
+        "downloads" add-responder
 
     <make-release-action>
         { mason-app "make-release" } >>template
-
         <protected>
             "make releases" >>description
             { can-make-releases? } >>capabilities
