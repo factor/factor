@@ -633,7 +633,7 @@ M: windows-ui-backend do-events
         0 >>cbClsExtra
         0 >>cbWndExtra
         f GetModuleHandle >>hInstance
-        f GetModuleHandle "fraptor" utf16n string>alien LoadIcon >>hIcon
+        f GetModuleHandle "APPICON" utf16n string>alien LoadIcon >>hIcon
         f IDC_ARROW LoadCursor >>hCursor
 
         class-name-ptr >>lpszClassName
