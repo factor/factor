@@ -359,6 +359,7 @@ M: long-long-type flatten-value-type (flatten-stack-type) ;
 M: c-type flatten-value-type
     dup rep>> int-rep? [ (flatten-int-type) ] [ (flatten-stack-type) ] if ;
 
-M: x86.32 struct-return-pointer-type (stack-value) ;
+M: x86.32 struct-return-pointer-type
+    os linux? void* (stack-value) ? ;
 
 check-sse
