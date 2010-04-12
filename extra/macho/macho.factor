@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http:// factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax classes.struct kernel literals math unix.types ;
+USING: alien.c-types alien.syntax classes.struct kernel literals math ;
 IN: macho
 
 TYPEDEF: int       integer_t
@@ -21,26 +21,26 @@ CONSTANT: VM_PROT_WANTS_COPY  HEX: 10
 
 ! loader.h
 STRUCT: mach_header
-    { magic         uint32_t      }
+    { magic         uint          }
     { cputype       cpu_type_t    }
     { cpusubtype    cpu_subtype_t }
-    { filetype      uint32_t      }
-    { ncmds         uint32_t      }
-    { sizeofcmds    uint32_t      }
-    { flags         uint32_t      } ;
+    { filetype      uint          }
+    { ncmds         uint          }
+    { sizeofcmds    uint          }
+    { flags         uint          } ;
 
 CONSTANT: MH_MAGIC    HEX: feedface
 CONSTANT: MH_CIGAM    HEX: cefaedfe
 
 STRUCT: mach_header_64
-    { magic         uint32_t      }
+    { magic         uint          }
     { cputype       cpu_type_t    }
     { cpusubtype    cpu_subtype_t }
-    { filetype      uint32_t      }
-    { ncmds         uint32_t      }
-    { sizeofcmds    uint32_t      }
-    { flags         uint32_t      }
-    { reserved      uint32_t      } ;
+    { filetype      uint          }
+    { ncmds         uint          }
+    { sizeofcmds    uint          }
+    { flags         uint          }
+    { reserved      uint          } ;
 
 CONSTANT: MH_MAGIC_64 HEX: feedfacf
 CONSTANT: MH_CIGAM_64 HEX: cffaedfe
@@ -82,8 +82,8 @@ CONSTANT: MH_NO_REEXPORTED_DYLIBS    HEX: 100000
 CONSTANT: MH_PIE                     HEX: 200000
 
 STRUCT: load_command
-    { cmd     uint32_t }
-    { cmdsize uint32_t } ;
+    { cmd     uint }
+    { cmdsize uint } ;
 
 CONSTANT: LC_REQ_DYLD HEX: 80000000
 
@@ -124,35 +124,35 @@ CONSTANT: LC_DYLD_INFO          HEX: 22
 CONSTANT: LC_DYLD_INFO_ONLY     HEX: 80000022
 
 UNION-STRUCT: lc_str
-    { offset    uint32_t }
+    { offset    uint     }
     { ptr       char*    } ;
 
 STRUCT: segment_command
-    { cmd            uint32_t  }
-    { cmdsize        uint32_t  }
+    { cmd            uint      }
+    { cmdsize        uint      }
     { segname        char[16]  }
-    { vmaddr         uint32_t  }
-    { vmsize         uint32_t  }
-    { fileoff        uint32_t  }
-    { filesize       uint32_t  }
+    { vmaddr         uint      }
+    { vmsize         uint      }
+    { fileoff        uint      }
+    { filesize       uint      }
     { maxprot        vm_prot_t }
     { initprot       vm_prot_t }
-    { nsects         uint32_t  }
-    { flags          uint32_t  } ;
+    { nsects         uint      }
+    { flags          uint      } ;
 
 STRUCT: segment_command_64
-    { cmd            uint32_t  }
-    { cmdsize        uint32_t  }
-    { segname        char[16]  }
-    { vmaddr         uint64_t  }
-    { vmsize         uint64_t  }
-    { fileoff        uint64_t  }
-    { filesize       uint64_t  }
-    { maxprot        vm_prot_t }
-    { initprot       vm_prot_t }
-    { nsects         uint32_t  }
-    { flags          uint32_t  } ;
-
+    { cmd            uint       }
+    { cmdsize        uint       }
+    { segname        char[16]   }
+    { vmaddr         ulonglong  }
+    { vmsize         ulonglong  }
+    { fileoff        ulonglong  }
+    { filesize       ulonglong  }
+    { maxprot        vm_prot_t  }
+    { initprot       vm_prot_t  }
+    { nsects         uint       }
+    { flags          uint       } ;
+    
 CONSTANT: SG_HIGHVM               HEX: 1
 CONSTANT: SG_FVMLIB               HEX: 2
 CONSTANT: SG_NORELOC              HEX: 4
@@ -161,29 +161,29 @@ CONSTANT: SG_PROTECTED_VERSION_1  HEX: 8
 STRUCT: section
     { sectname        char[16] }
     { segname         char[16] }
-    { addr            uint32_t }
-    { size            uint32_t }
-    { offset          uint32_t }
-    { align           uint32_t }
-    { reloff          uint32_t }
-    { nreloc          uint32_t }
-    { flags           uint32_t }
-    { reserved1       uint32_t }
-    { reserved2       uint32_t } ;
+    { addr            uint     }
+    { size            uint     }
+    { offset          uint     }
+    { align           uint     }
+    { reloff          uint     }
+    { nreloc          uint     }
+    { flags           uint     }
+    { reserved1       uint     }
+    { reserved2       uint     } ;
 
 STRUCT: section_64
-    { sectname        char[16] }
-    { segname         char[16] }
-    { addr            uint64_t }
-    { size            uint64_t }
-    { offset          uint32_t }
-    { align           uint32_t }
-    { reloff          uint32_t }
-    { nreloc          uint32_t }
-    { flags           uint32_t }
-    { reserved1       uint32_t }
-    { reserved2       uint32_t }
-    { reserved3       uint32_t } ;
+    { sectname        char[16]  }
+    { segname         char[16]  }
+    { addr            ulonglong }
+    { size            ulonglong }
+    { offset          uint      }
+    { align           uint      }
+    { reloff          uint      }
+    { nreloc          uint      }
+    { flags           uint      }
+    { reserved1       uint      }
+    { reserved2       uint      }
+    { reserved3       uint      } ;
 
 CONSTANT: SECTION_TYPE         HEX: 000000ff
 CONSTANT: SECTION_ATTRIBUTES   HEX: ffffff00
@@ -242,205 +242,205 @@ CONSTANT: SEG_IMPORT        "__IMPORT"
 
 STRUCT: fvmlib
     { name             lc_str   }
-    { minor_version    uint32_t }
-    { header_addr      uint32_t } ;
+    { minor_version    uint     }
+    { header_addr      uint     } ;
 
 STRUCT: fvmlib_command
-    { cmd        uint32_t }
-    { cmdsize    uint32_t }
+    { cmd        uint     }
+    { cmdsize    uint     }
     { fvmlib     fvmlib   } ;
 
 STRUCT: dylib
     { name                  lc_str   }
-    { timestamp             uint32_t }
-    { current_version       uint32_t }
-    { compatibility_version uint32_t } ;
+    { timestamp             uint     }
+    { current_version       uint     }
+    { compatibility_version uint     } ;
 
 STRUCT: dylib_command
-    { cmd        uint32_t }
-    { cmdsize    uint32_t }
+    { cmd        uint     }
+    { cmdsize    uint     }
     { dylib      dylib    } ;
 
 STRUCT: sub_framework_command
-    { cmd         uint32_t }
-    { cmdsize     uint32_t }
+    { cmd         uint     }
+    { cmdsize     uint     }
     { umbrella    lc_str   } ;
 
 STRUCT: sub_client_command
-    { cmd        uint32_t }
-    { cmdsize    uint32_t }
+    { cmd        uint     }
+    { cmdsize    uint     }
     { client     lc_str   } ;
 
 STRUCT: sub_umbrella_command
-    { cmd             uint32_t }
-    { cmdsize         uint32_t }
+    { cmd             uint     }
+    { cmdsize         uint     }
     { sub_umbrella    lc_str   } ;
 
 STRUCT: sub_library_command
-    { cmd            uint32_t }
-    { cmdsize        uint32_t }
+    { cmd            uint     }
+    { cmdsize        uint     }
     { sub_library    lc_str   } ;
 
 STRUCT: prebound_dylib_command
-    { cmd               uint32_t }
-    { cmdsize           uint32_t }
+    { cmd               uint     }
+    { cmdsize           uint     }
     { name              lc_str   }
-    { nmodules          uint32_t }
+    { nmodules          uint     }
     { linked_modules    lc_str   } ;
 
 STRUCT: dylinker_command
-    { cmd        uint32_t }
-    { cmdsize    uint32_t }
+    { cmd        uint     }
+    { cmdsize    uint     }
     { name       lc_str   } ;
 
 STRUCT: thread_command
-    { cmd        uint32_t }
-    { cmdsize    uint32_t } ;
+    { cmd        uint }
+    { cmdsize    uint } ;
 
 STRUCT: routines_command
-    { cmd             uint32_t }
-    { cmdsize         uint32_t }
-    { init_address    uint32_t }
-    { init_module     uint32_t }
-    { reserved1       uint32_t }
-    { reserved2       uint32_t }
-    { reserved3       uint32_t }
-    { reserved4       uint32_t }
-    { reserved5       uint32_t }
-    { reserved6       uint32_t } ;
+    { cmd             uint }
+    { cmdsize         uint }
+    { init_address    uint }
+    { init_module     uint }
+    { reserved1       uint }
+    { reserved2       uint }
+    { reserved3       uint }
+    { reserved4       uint }
+    { reserved5       uint }
+    { reserved6       uint } ;
 
 STRUCT: routines_command_64
-    { cmd             uint32_t }
-    { cmdsize         uint32_t }
-    { init_address    uint64_t }
-    { init_module     uint64_t }
-    { reserved1       uint64_t }
-    { reserved2       uint64_t }
-    { reserved3       uint64_t }
-    { reserved4       uint64_t }
-    { reserved5       uint64_t }
-    { reserved6       uint64_t } ;
+    { cmd             uint      }
+    { cmdsize         uint      }
+    { init_address    ulonglong }
+    { init_module     ulonglong }
+    { reserved1       ulonglong }
+    { reserved2       ulonglong }
+    { reserved3       ulonglong }
+    { reserved4       ulonglong }
+    { reserved5       ulonglong }
+    { reserved6       ulonglong } ;
 
 STRUCT: symtab_command
-    { cmd        uint32_t }
-    { cmdsize    uint32_t }
-    { symoff     uint32_t }
-    { nsyms      uint32_t }
-    { stroff     uint32_t }
-    { strsize    uint32_t } ;
+    { cmd        uint }
+    { cmdsize    uint }
+    { symoff     uint }
+    { nsyms      uint }
+    { stroff     uint }
+    { strsize    uint } ;
 
 STRUCT: dysymtab_command
-    { cmd            uint32_t }
-    { cmdsize        uint32_t }
-    { ilocalsym      uint32_t }
-    { nlocalsym      uint32_t }
-    { iextdefsym     uint32_t }
-    { nextdefsym     uint32_t }
-    { iundefsym      uint32_t }
-    { nundefsym      uint32_t }
-    { tocoff         uint32_t }
-    { ntoc           uint32_t }
-    { modtaboff      uint32_t }
-    { nmodtab        uint32_t }
-    { extrefsymoff   uint32_t }
-    { nextrefsyms    uint32_t }
-    { indirectsymoff uint32_t }
-    { nindirectsyms  uint32_t }
-    { extreloff      uint32_t }
-    { nextrel        uint32_t }
-    { locreloff      uint32_t }
-    { nlocrel        uint32_t } ;
+    { cmd            uint }
+    { cmdsize        uint }
+    { ilocalsym      uint }
+    { nlocalsym      uint }
+    { iextdefsym     uint }
+    { nextdefsym     uint }
+    { iundefsym      uint }
+    { nundefsym      uint }
+    { tocoff         uint }
+    { ntoc           uint }
+    { modtaboff      uint }
+    { nmodtab        uint }
+    { extrefsymoff   uint }
+    { nextrefsyms    uint }
+    { indirectsymoff uint }
+    { nindirectsyms  uint }
+    { extreloff      uint }
+    { nextrel        uint }
+    { locreloff      uint }
+    { nlocrel        uint } ;
 
 CONSTANT: INDIRECT_SYMBOL_LOCAL HEX: 80000000
 CONSTANT: INDIRECT_SYMBOL_ABS   HEX: 40000000
 
 STRUCT: dylib_table_of_contents
-    { symbol_index uint32_t }
-    { module_index uint32_t } ;
+    { symbol_index uint }
+    { module_index uint } ;
 
 STRUCT: dylib_module
-    { module_name           uint32_t }
-    { iextdefsym            uint32_t }
-    { nextdefsym            uint32_t }
-    { irefsym               uint32_t }
-    { nrefsym               uint32_t }
-    { ilocalsym             uint32_t }
-    { nlocalsym             uint32_t }
-    { iextrel               uint32_t }
-    { nextrel               uint32_t }
-    { iinit_iterm           uint32_t }
-    { ninit_nterm           uint32_t }
-    { objc_module_info_addr uint32_t }
-    { objc_module_info_size uint32_t } ;
+    { module_name           uint }
+    { iextdefsym            uint }
+    { nextdefsym            uint }
+    { irefsym               uint }
+    { nrefsym               uint }
+    { ilocalsym             uint }
+    { nlocalsym             uint }
+    { iextrel               uint }
+    { nextrel               uint }
+    { iinit_iterm           uint }
+    { ninit_nterm           uint }
+    { objc_module_info_addr uint }
+    { objc_module_info_size uint } ;
 
 STRUCT: dylib_module_64
-    { module_name           uint32_t }
-    { iextdefsym            uint32_t }
-    { nextdefsym            uint32_t }
-    { irefsym               uint32_t }
-    { nrefsym               uint32_t }
-    { ilocalsym             uint32_t }
-    { nlocalsym             uint32_t }
-    { iextrel               uint32_t }
-    { nextrel               uint32_t }
-    { iinit_iterm           uint32_t }
-    { ninit_nterm           uint32_t }
-    { objc_module_info_size uint32_t }
-    { objc_module_info_addr uint64_t } ;
+    { module_name           uint      }
+    { iextdefsym            uint      }
+    { nextdefsym            uint      }
+    { irefsym               uint      }
+    { nrefsym               uint      }
+    { ilocalsym             uint      }
+    { nlocalsym             uint      }
+    { iextrel               uint      }
+    { nextrel               uint      }
+    { iinit_iterm           uint      }
+    { ninit_nterm           uint      }
+    { objc_module_info_size uint      }
+    { objc_module_info_addr ulonglong } ;
 
 STRUCT: dylib_reference
-    { isym_flags uint32_t } ;
+    { isym_flags uint } ;
 
 STRUCT: twolevel_hints_command
-    { cmd     uint32_t }
-    { cmdsize uint32_t }
-    { offset  uint32_t }
-    { nhints  uint32_t } ;
+    { cmd     uint }
+    { cmdsize uint }
+    { offset  uint }
+    { nhints  uint } ;
 
 STRUCT: twolevel_hint
-    { isub_image_itoc uint32_t } ;
+    { isub_image_itoc uint } ;
 
 STRUCT: prebind_cksum_command
-    { cmd     uint32_t }
-    { cmdsize uint32_t }
-    { cksum   uint32_t } ;
+    { cmd     uint }
+    { cmdsize uint }
+    { cksum   uint } ;
 
 STRUCT: uuid_command
-    { cmd        uint32_t    }
-    { cmdsize    uint32_t    }
-    { uuid       uint8_t[16] } ;
+    { cmd        uint        }
+    { cmdsize    uint        }
+    { uuid       uchar[16]   } ;
 
 STRUCT: rpath_command
-    { cmd         uint32_t }
-    { cmdsize     uint32_t }
+    { cmd         uint     }
+    { cmdsize     uint     }
     { path        lc_str   } ;
 
 STRUCT: linkedit_data_command
-    { cmd         uint32_t }
-    { cmdsize     uint32_t }
-    { dataoff     uint32_t }
-    { datasize    uint32_t } ;
+    { cmd         uint }
+    { cmdsize     uint }
+    { dataoff     uint }
+    { datasize    uint } ;
 
 STRUCT: encryption_info_command
-    { cmd       uint32_t }
-    { cmdsize   uint32_t }
-    { cryptoff  uint32_t }
-    { cryptsize uint32_t }
-    { cryptid   uint32_t } ;
+    { cmd       uint }
+    { cmdsize   uint }
+    { cryptoff  uint }
+    { cryptsize uint }
+    { cryptid   uint } ;
 
 STRUCT: dyld_info_command
-    { cmd              uint32_t }
-    { cmdsize          uint32_t }
-    { rebase_off       uint32_t }
-    { rebase_size      uint32_t }
-    { bind_off         uint32_t }
-    { bind_size        uint32_t }
-    { weak_bind_off    uint32_t }
-    { weak_bind_size   uint32_t }
-    { lazy_bind_off    uint32_t }
-    { lazy_bind_size   uint32_t }
-    { export_off       uint32_t }
-    { export_size      uint32_t } ;
+    { cmd              uint }
+    { cmdsize          uint }
+    { rebase_off       uint }
+    { rebase_size      uint }
+    { bind_off         uint }
+    { bind_size        uint }
+    { weak_bind_off    uint }
+    { weak_bind_size   uint }
+    { lazy_bind_off    uint }
+    { lazy_bind_size   uint }
+    { export_off       uint }
+    { export_size      uint } ;
 
 CONSTANT: REBASE_TYPE_POINTER                     1
 CONSTANT: REBASE_TYPE_TEXT_ABSOLUTE32             2
@@ -493,20 +493,20 @@ CONSTANT: EXPORT_SYMBOL_FLAGS_INDIRECT_DEFINITION         HEX: 08
 CONSTANT: EXPORT_SYMBOL_FLAGS_HAS_SPECIALIZATIONS         HEX: 10
 
 STRUCT: symseg_command
-    { cmd        uint32_t }
-    { cmdsize    uint32_t }
-    { offset     uint32_t }
-    { size       uint32_t } ;
+    { cmd        uint }
+    { cmdsize    uint }
+    { offset     uint }
+    { size       uint } ;
 
 STRUCT: ident_command
-    { cmd     uint32_t }
-    { cmdsize uint32_t } ;
+    { cmd     uint }
+    { cmdsize uint } ;
 
 STRUCT: fvmfile_command
-    { cmd            uint32_t }
-    { cmdsize        uint32_t }
+    { cmd            uint     }
+    { cmdsize        uint     }
     { name           lc_str   }
-    { header_addr    uint32_t } ;
+    { header_addr    uint     } ;
 
 ! machine.h
 CONSTANT: CPU_STATE_MAX       4
@@ -670,30 +670,30 @@ CONSTANT: FAT_MAGIC HEX: cafebabe
 CONSTANT: FAT_CIGAM HEX: bebafeca
 
 STRUCT: fat_header
-    { magic        uint32_t }
-    { nfat_arch    uint32_t } ;
+    { magic        uint }
+    { nfat_arch    uint } ;
 
 STRUCT: fat_arch
     { cputype      cpu_type_t    }
     { cpusubtype   cpu_subtype_t }
-    { offset       uint32_t      }
-    { size         uint32_t      }
-    { align        uint32_t      } ;
+    { offset       uint          }
+    { size         uint          }
+    { align        uint          } ;
 
 ! nlist.h
 STRUCT: nlist
-    { n_strx  int32_t  }
-    { n_type  uint8_t  }
-    { n_sect  uint8_t  }
-    { n_desc  int16_t  }
-    { n_value uint32_t } ;
+    { n_strx  int      }
+    { n_type  uchar    }
+    { n_sect  uchar    }
+    { n_desc  short    }
+    { n_value uint     } ;
 
 STRUCT: nlist_64
-    { n_strx  uint32_t }
-    { n_type  uint8_t  }
-    { n_sect  uint8_t  }
-    { n_desc  uint16_t }
-    { n_value uint64_t } ;
+    { n_strx  uint      }
+    { n_type  uchar     }
+    { n_sect  uchar     }
+    { n_desc  ushort    }
+    { n_value ulonglong } ;
 
 CONSTANT: N_STAB  HEX: e0
 CONSTANT: N_PEXT  HEX: 10
@@ -750,24 +750,24 @@ CONSTANT: SYMDEF        "__.SYMDEF"
 CONSTANT: SYMDEF_SORTED "__.SYMDEF SORTED"
 
 STRUCT: ranlib
-    { ran_strx uint32_t }
-    { ran_off  uint32_t } ;
+    { ran_strx uint }
+    { ran_off  uint } ;
 
 ! reloc.h
 STRUCT: relocation_info
-    { r_address                            int32_t  }
-    { r_symbolnum_pcrel_length_extern_type uint32_t } ;
+    { r_address                            int  }
+    { r_symbolnum_pcrel_length_extern_type uint } ;
 
 CONSTANT: R_ABS   0
 CONSTANT: R_SCATTERED HEX: 80000000
 
 STRUCT: scattered_relocation_info_big_endian
-    { r_scattered_pcrel_length_type_address  uint32_t }
-    { r_value                                int32_t  } ;
+    { r_scattered_pcrel_length_type_address  uint }
+    { r_value                                int  } ;
 
 STRUCT: scattered_relocation_info_little_endian
-    { r_address_type_length_pcrel_scattered uint32_t }
-    { r_value                               int32_t  } ;
+    { r_address_type_length_pcrel_scattered uint }
+    { r_value                               int  } ;
 
 C-ENUM: reloc_type_generic
     GENERIC_RELOC_VANILLA
