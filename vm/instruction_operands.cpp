@@ -49,6 +49,8 @@ fixnum instruction_operand::load_value(cell relative_to)
 		return load_value_masked(rel_indirect_arm_mask,20,0) + relative_to + sizeof(cell);
 	case RC_ABSOLUTE_2:
 		return *(u16 *)(pointer - sizeof(u16));
+	case RC_ABSOLUTE_1:
+		return *(u8 *)(pointer - sizeof(u8));
 	default:
 		critical_error("Bad rel class",rel.rel_class());
 		return 0;
@@ -123,6 +125,9 @@ void instruction_operand::store_value(fixnum absolute_value)
 		break;
 	case RC_ABSOLUTE_2:
 		*(u16 *)(pointer - sizeof(u16)) = (u16)absolute_value;
+		break;
+	case RC_ABSOLUTE_1:
+		*(u8 *)(pointer - sizeof(u8)) = (u8)absolute_value;
 		break;
 	default:
 		critical_error("Bad rel class",rel.rel_class());
