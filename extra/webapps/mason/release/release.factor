@@ -6,8 +6,7 @@ webapps.mason.utils io.pathnames ;
 IN: webapps.mason.release
 
 : release-link ( builder -- xml )
-    [ "http://downloads.factorcode.org/" ] dip
-    last-release>> [ "/" glue ] [ file-name ] bi link ;
+    last-release>> [ download-url ] [ file-name ] bi link ;
 
 : <download-release-action> ( -- action )
     <page-action>
