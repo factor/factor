@@ -18,6 +18,7 @@ compiler.cfg.builder
 compiler.codegen.fixup
 compiler.utilities ;
 FROM: namespaces => set ;
+FROM: compiler.errors => no-such-symbol ;
 IN: compiler.codegen
 
 SYMBOL: insn-counts
@@ -415,13 +416,18 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
         dll-path compiling-word get no-such-library drop
     ] if ;
 
-: stdcall-mangle ( params -- symbols )
+: decorated-symbol ( params -- symbols )
     [ function>> ] [ parameters>> parameter-offsets drop number>string ] bi
-    [ drop ] [ "@" glue ] [ "@" glue "_" prepend ] 2tri
-    3array ;
+    {
+        [ drop ]
+        [ "@" glue ]
+        [ "@" glue "_" prepend ]
+        [ "@" glue "@" prepend ]
+    } 2cleave
+    4array ;
 
 : alien-invoke-dlsym ( params -- symbols dll )
-    [ dup abi>> stdcall = [ stdcall-mangle ] [ function>> ] if ]
+    [ dup abi>> callee-cleanup? [ decorated-symbol ] [ function>> ] if ]
     [ library>> load-library ]
     bi 2dup check-dlsym ;
 

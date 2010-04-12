@@ -56,7 +56,7 @@ int ffi_test_9(int a, int b, int c, int d, int e, int f, int g)
 
 int ffi_test_10(int a, int b, double c, int d, float e, int f, int g, int h)
 {
-	return a - b - c - d - e - f - g - h;
+	return (int)(a - b - c - d - e - f - g - h);
 }
 
 int ffi_test_11(int a, struct foo b, int c)
@@ -66,7 +66,7 @@ int ffi_test_11(int a, struct foo b, int c)
 
 int ffi_test_12(int a, int b, struct rect c, int d, int e, int f)
 {
-	return a + b + c.x + c.y + c.w + c.h + d + e + f;
+	return (int)(a + b + c.x + c.y + c.w + c.h + d + e + f);
 }
 
 int ffi_test_13(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k)
@@ -128,7 +128,7 @@ long long ffi_test_21(long x, long y)
 
 long ffi_test_22(long x, long long y, long long z)
 {
-	return x + y / z;
+	return (long)(x + y / z);
 }
 
 float ffi_test_23(float x[3], float y[3])
@@ -262,7 +262,7 @@ unsigned long long ffi_test_38(unsigned long long x, unsigned long long y)
 int ffi_test_39(long a, long b, struct test_struct_13 s)
 {
 	assert(a == b);
-	return s.x1 + s.x2 + s.x3 + s.x4 + s.x5 + s.x6;
+	return (int)(s.x1 + s.x2 + s.x3 + s.x4 + s.x5 + s.x6);
 }
 
 struct test_struct_14 ffi_test_40(double x1, double x2)
@@ -330,13 +330,29 @@ short ffi_test_48(struct bool_field_test x)
 
 #endif
 
-FACTOR_FASTCALL(int) ffi_test_49(int x) { return x + 1; }
-FACTOR_FASTCALL(int) ffi_test_50(int x, int y) { return x + y + 1; }
-FACTOR_FASTCALL(int) ffi_test_51(int x, int y, int z) { return x + y + z + 1; }
-FACTOR_FASTCALL(int) ffi_test_52(int x, float y, int z) { return x + y + z + 1; }
+FACTOR_FASTCALL(int) ffi_test_49(int x)
+{
+	return x + 1;
+}
+
+FACTOR_FASTCALL(int) ffi_test_50(int x, int y)
+{
+	return x + y + 1;
+}
+
+FACTOR_FASTCALL(int) ffi_test_51(int x, int y, int z)
+{
+	return x + y + z + 1;
+}
+
+FACTOR_FASTCALL(int) ffi_test_52(int x, float y, int z)
+{
+	return (int)(x + y + z + 1);
+}
+
 FACTOR_FASTCALL(int) ffi_test_53(int x, float y, int z, int w)
 {
-	return x + y + z + w + 1;
+	return (int)(x + y + z + w + 1);
 }
 
 FACTOR_FASTCALL(int) ffi_test_54(struct test_struct_11 x, int y)
