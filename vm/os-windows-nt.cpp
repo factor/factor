@@ -18,17 +18,24 @@ u64 system_micros()
 
 u64 nano_count()
 {
-	LARGE_INTEGER count;
-	LARGE_INTEGER frequency;
+	static double scale_factor;
+
 	static u32 hi = 0;
 	static u32 lo = 0;
-	BOOL ret;
-	ret = QueryPerformanceCounter(&count);
+
+	LARGE_INTEGER count;
+	BOOL ret = QueryPerformanceCounter(&count);
 	if(ret == 0)
 		fatal_error("QueryPerformanceCounter", 0);
-	ret = QueryPerformanceFrequency(&frequency);
-	if(ret == 0)
-		fatal_error("QueryPerformanceFrequency", 0);
+
+	if(scale_factor == 0.0)
+	{
+		LARGE_INTEGER frequency;
+		BOOL ret = QueryPerformanceFrequency(&frequency);
+		if(ret == 0)
+			fatal_error("QueryPerformanceFrequency", 0);
+		scale_factor = (1000000000.0 / frequency.QuadPart);
+	}
 
 #ifdef FACTOR_64
 	hi = count.HighPart;
@@ -40,7 +47,7 @@ u64 nano_count()
 #endif
 	lo = count.LowPart;
 
-	return (u64)((((u64)hi << 32) | (u64)lo)*(1000000000.0/frequency.QuadPart));
+	return (u64)((((u64)hi << 32) | (u64)lo) * scale_factor);
 }
 
 void sleep_nanos(u64 nsec)
