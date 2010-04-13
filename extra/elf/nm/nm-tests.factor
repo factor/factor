@@ -47,5 +47,5 @@ STRING: validation-output
 ;
 
 { $ validation-output }
-[ <string-writer> dup [ "resource:extra/elf/a.out" nm ] with-output-stream >string ]
+[ <string-writer> dup [ "resource:extra/elf/a.elf" nm ] with-output-stream >string ]
 unit-test
