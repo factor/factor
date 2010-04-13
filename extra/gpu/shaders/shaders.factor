@@ -301,13 +301,11 @@ M: f (verify-feedback-format)
     dup 1 = [ drop ] [ 2array ] if ;
 
 SYMBOL: padding-no
-padding-no [ 0 ] initialize
 
 : padding-name ( -- name )
     "padding-"
-    padding-no get number>string append
-    "(" ")" surround
-    padding-no inc ;
+    padding-no counter number>string append
+    "(" ")" surround ;
 
 : vertex-attribute>struct-slot ( vertex-attribute -- struct-slot-spec )
     [ name>> [ padding-name ] unless* ]

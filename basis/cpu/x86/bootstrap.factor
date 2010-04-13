@@ -206,43 +206,37 @@ big-endian off
 
 ! Load a value from a stack position
 [
-    temp1 ds-reg HEX: ffffffff [+] MOV rc-absolute rt-untagged jit-rel
+    temp1 ds-reg HEX: 7f [+] MOV rc-absolute-1 rt-untagged jit-rel
 ] pic-load jit-define
 
-! Tag
-: load-tag ( -- )
-    temp1 tag-mask get AND
-    temp1 tag-bits get SHL ;
+[ temp1 tag-mask get AND ] pic-tag jit-define
 
-[ load-tag ] pic-tag jit-define
-
-! The 'make' trick lets us compute the jump distance for the
-! conditional branches there
-
-! Tuple
 [
     temp0 temp1 MOV
-    load-tag
-    temp1 tuple type-number tag-fixnum CMP
+    temp1 tag-mask get AND
+    temp1 tuple type-number CMP
     [ JNE ]
-    [ temp1 temp0 tuple type-number neg bootstrap-cell + [+] MOV ]
+    [ temp1 temp0 tuple-class-offset [+] MOV ]
     jit-conditional
 ] pic-tuple jit-define
 
 [
-    temp1 HEX: ffffffff CMP rc-absolute rt-literal jit-rel
+    temp1 HEX: 7f CMP rc-absolute-1 rt-untagged jit-rel
 ] pic-check-tag jit-define
-
-[
-    temp2 HEX: ffffffff MOV rc-absolute-cell rt-literal jit-rel
-    temp1 temp2 CMP
-] pic-check-tuple jit-define
 
 [ 0 JE rc-relative rt-entry-point jit-rel ] pic-hit jit-define
 
 ! ! ! Megamorphic caches
 
 [
+    ! class = ...
+    temp0 temp1 MOV
+    temp1 tag-mask get AND
+    temp1 tag-bits get SHL
+    temp1 tuple type-number tag-fixnum CMP
+    [ JNE ]
+    [ temp1 temp0 tuple-class-offset [+] MOV ]
+    jit-conditional
     ! cache = ...
     temp0 0 MOV rc-absolute-cell rt-literal jit-rel
     ! key = hashcode(class)
@@ -256,14 +250,16 @@ big-endian off
     temp0 temp2 ADD
     ! if(get(cache) == class)
     temp0 [] temp1 CMP
-    bootstrap-cell 4 = 14 22 ? JNE ! Yuck!
-    ! megamorphic_cache_hits++
-    temp1 0 MOV rc-absolute-cell rt-megamorphic-cache-hits jit-rel
-    temp1 [] 1 ADD
-    ! goto get(cache + bootstrap-cell)
-    temp0 temp0 bootstrap-cell [+] MOV
-    temp0 word-entry-point-offset [+] JMP
-    ! fall-through on miss
+    [ JNE ]
+    [
+        ! megamorphic_cache_hits++
+        temp1 0 MOV rc-absolute-cell rt-megamorphic-cache-hits jit-rel
+        temp1 [] 1 ADD
+        ! goto get(cache + bootstrap-cell)
+        temp0 temp0 bootstrap-cell [+] MOV
+        temp0 word-entry-point-offset [+] JMP
+        ! fall-through on miss
+    ] jit-conditional
 ] mega-lookup jit-define
 
 ! ! ! Sub-primitives
