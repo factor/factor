@@ -33,11 +33,11 @@ enum relocation_type {
 };
 
 enum relocation_class {
-	/* absolute address in a 64-bit location */
+	/* absolute address in a pointer-width location */
 	RC_ABSOLUTE_CELL,
-	/* absolute address in a 32-bit location */
+	/* absolute address in a 4 byte location */
 	RC_ABSOLUTE,
-	/* relative address in a 32-bit location */
+	/* relative address in a 4 byte location */
 	RC_RELATIVE,
 	/* absolute address in a PowerPC LIS/ORI sequence */
 	RC_ABSOLUTE_PPC_2_2,
@@ -53,8 +53,10 @@ enum relocation_class {
 	RC_INDIRECT_ARM,
 	/* pointer to address in an ARM LDR/STR instruction offset by 8 bytes */
 	RC_INDIRECT_ARM_PC,
-	/* absolute address in a 16-bit location */
-	RC_ABSOLUTE_2
+	/* absolute address in a 2 byte location */
+	RC_ABSOLUTE_2,
+	/* absolute address in a 1 byte location */
+	RC_ABSOLUTE_1,
 };
 
 static const cell rel_absolute_ppc_2_mask = 0xffff;

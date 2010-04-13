@@ -68,6 +68,9 @@ SINGLETONS: stdcall thiscall fastcall cdecl mingw ;
 
 UNION: abi stdcall thiscall fastcall cdecl mingw ;
 
+: callee-cleanup? ( abi -- ? )
+    { stdcall fastcall thiscall } member? ;
+
 ERROR: alien-callback-error ;
 
 : alien-callback ( return parameters abi quot -- alien )
