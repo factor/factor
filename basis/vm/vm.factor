@@ -34,7 +34,7 @@ STRUCT: vm
 
 : vm-field-offset ( field -- offset ) vm offset-of ; inline
 
-C-ENUM: f
+ENUM: f
 collect-nursery-op
 collect-aging-op
 collect-to-tenured-op

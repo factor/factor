@@ -8,7 +8,7 @@ IN: cocoa.application
 
 : <NSString> ( str -- alien ) <CFString> -> autorelease ;
 
-C-ENUM: f
+ENUM: f
 NSApplicationDelegateReplySuccess
 NSApplicationDelegateReplyCancel
 NSApplicationDelegateReplyFailure ;

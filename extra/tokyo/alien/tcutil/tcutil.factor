@@ -12,7 +12,7 @@ IN: tokyo.alien.tcutil
 
 LIBRARY: tokyocabinet
 
-C-ENUM: f
+ENUM: f
     TCDBTHASH
     TCDBTBTREE
     TCDBTFIXED

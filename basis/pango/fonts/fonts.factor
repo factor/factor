@@ -8,7 +8,7 @@ IN: pango.fonts
 
 LIBRARY: pango
 
-C-ENUM: PangoStyle
+ENUM: PangoStyle
 PANGO_STYLE_NORMAL
 PANGO_STYLE_OBLIQUE
 PANGO_STYLE_ITALIC ;
