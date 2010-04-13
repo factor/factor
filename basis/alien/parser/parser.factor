@@ -7,6 +7,8 @@ splitting words fry locals lexer namespaces summary math
 vocabs.parser words.constant ;
 IN: alien.parser
 
+SYMBOL: current-library
+
 : parse-c-type-name ( name -- word )
     dup search [ ] [ no-word ] ?if ;
 
@@ -117,7 +119,7 @@ PRIVATE>
     names return function-effect ;
 
 : (FUNCTION:) ( -- word quot effect )
-    scan-function-name "c-library" get ";" scan-c-args make-function ;
+    scan-function-name current-library get ";" scan-c-args make-function ;
 
 : callback-quot ( return types abi -- quot )
     '[ [ _ _ _ ] dip alien-callback ] ;
@@ -131,7 +133,7 @@ PRIVATE>
     type-word return types lib library-abi callback-quot (( quot -- alien )) ;
 
 : (CALLBACK:) ( -- word quot effect )
-    "c-library" get
+    current-library get
     scan-function-name ";" scan-c-args make-callback-type ;
 
 PREDICATE: alien-function-word < word
@@ -142,3 +144,10 @@ PREDICATE: alien-function-word < word
 
 PREDICATE: alien-callback-type-word < typedef-word
     "callback-effect" word-prop ;
+
+: global-quot ( type word -- quot )
+    name>> current-library get '[ _ _ address-of 0 ]
+    swap c-type-getter-boxer append ;
+
+: define-global ( type word -- )
+    [ nip ] [ global-quot ] 2bi (( -- value )) define-declared ;

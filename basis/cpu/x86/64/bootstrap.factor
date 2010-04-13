@@ -160,6 +160,11 @@ IN: bootstrap.x86
 [ jit-jump-quot ]
 \ lazy-jit-compile define-combinator-primitive
 
+[
+    temp2 HEX: ffffffff MOV rc-absolute-cell rt-literal jit-rel
+    temp1 temp2 CMP
+] pic-check-tuple jit-define
+
 ! Inline cache miss entry points
 : jit-load-return-address ( -- )
     RBX RSP stack-frame-size bootstrap-cell - [+] MOV ;

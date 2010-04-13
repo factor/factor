@@ -315,9 +315,6 @@ M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
     [ abi>> mingw = os windows? not or ]
     bi and ;
 
-: callee-cleanup? ( abi -- ? )
-    { stdcall fastcall thiscall } member? ;
-
 : stack-arg-size ( params -- n )
     dup abi>> '[
         alien-parameters flatten-value-types
@@ -359,6 +356,7 @@ M: long-long-type flatten-value-type (flatten-stack-type) ;
 M: c-type flatten-value-type
     dup rep>> int-rep? [ (flatten-int-type) ] [ (flatten-stack-type) ] if ;
 
-M: x86.32 struct-return-pointer-type (stack-value) ;
+M: x86.32 struct-return-pointer-type
+    os linux? void* (stack-value) ? ;
 
 check-sse

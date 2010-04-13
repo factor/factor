@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Erik Charlebois, William Schlieper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel game.input namespaces
+USING: accessors alien.c-types arrays kernel game.input namespaces math
 classes bit-arrays system sequences vectors x11 x11.xlib ;
 IN: game.input.x11
 
@@ -84,9 +84,24 @@ M: linux x>hid-bit-order
 M: x11-game-input-backend read-keyboard
     dpy get 256 <bit-array> [ XQueryKeymap drop ] keep
     x-bits>hid-bits keyboard-state boa ;
+
+: query-pointer ( -- x y buttons )
+    dpy get dup XDefaultRootWindow
+    0 <int> 0 <int> 0 <int> 0 <int> 0 <int> 0 <int> 0 <int>
+    [ XQueryPointer drop ] 3keep
+    [ *int ] tri@ ;
+
+SYMBOL: mouse-reset?
      
 M: x11-game-input-backend read-mouse
-    0 0 0 0 2 <vector> mouse-state boa ;
+    mouse-reset? get [ reset-mouse ] unless
+    query-pointer
+    mouse-state new
+    swap 256 /i >>buttons
+    swap 400 - >>dy
+    swap 400 - >>dx
+    0 >>scroll-dy 0 >>scroll-dx ;
      
 M: x11-game-input-backend reset-mouse
-    ;
+    dpy get dup XDefaultRootWindow dup
+    0 0 0 0 400 400 XWarpPointer drop t mouse-reset? set-global ;
