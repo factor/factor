@@ -25,11 +25,9 @@ SYMBOLS: host-name target-os target-cpu message message-arg ;
         target-cpu get >>cpu
     dup select-tuple [ ] [ dup insert-tuple ] ?if ;
 
-: heartbeat ( -- )
-    now >>heartbeat-timestamp ;
+: heartbeat ( builder -- ) now >>heartbeat-timestamp drop ;
 
-: git-id ( builder id -- )
-    >>current-git-id +starting+ >>status drop ;
+: git-id ( builder id -- ) >>current-git-id +starting+ >>status drop ;
 
 : make-vm ( builder -- ) +make-vm+ >>status drop ;
 
