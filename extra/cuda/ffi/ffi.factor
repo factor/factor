@@ -11,6 +11,8 @@ IN: cuda.ffi
 } cond add-library
 >>
 
+LIBRARY: cuda
+
 TYPEDEF: uint CUdeviceptr
 TYPEDEF: int CUdevice
 TYPEDEF: void* CUcontext
