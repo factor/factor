@@ -16,7 +16,7 @@ HELP: print-symbol
 { $description "Prints the value, section and name of the given symbol." } ;
 
 ARTICLE: "elf.nm" "ELF nm"
-{ $description "Utility to print the values, sections and names of the symbols in a given ELF file. In an ELF executable or shared library, the symbol values are typically their virtual addresses. In a relocatable ELF object, they are section-relative offsets." }
+"The " { $vocab-link "elf.nm" } " vocab prints the values, sections and names of the symbols in a given ELF file. In an ELF executable or shared library, the symbol values are typically their virtual addresses. In a relocatable ELF object, they are section-relative offsets."
 ;
 
 ABOUT: "elf.nm"
