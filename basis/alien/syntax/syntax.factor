@@ -28,7 +28,7 @@ SYNTAX: CALLBACK:
 SYNTAX: TYPEDEF:
     scan-c-type CREATE-C-TYPE dup save-location typedef ;
 
-SYNTAX: C-ENUM:
+SYNTAX: ENUM:
     scan dup "f" =
     [ drop ]
     [ (CREATE-C-TYPE) dup save-location int swap typedef ] if

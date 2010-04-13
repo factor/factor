@@ -176,14 +176,14 @@ FUNCTION: FT_Error FT_Set_Char_Size ( face* face, FT_F26Dot6 char_width, FT_F26D
 
 FUNCTION: FT_Error FT_Load_Char ( face* face, FT_ULong charcode, FT_Int32 load_flags ) ;
 
-C-ENUM: f
+ENUM: f
     FT_RENDER_MODE_NORMAL
     FT_RENDER_MODE_LIGHT
     FT_RENDER_MODE_MONO
     FT_RENDER_MODE_LCD
     FT_RENDER_MODE_LCD_V ;
 
-C-ENUM: f
+ENUM: f
     FT_PIXEL_MODE_NONE
     FT_PIXEL_MODE_MONO
     FT_PIXEL_MODE_GRAY

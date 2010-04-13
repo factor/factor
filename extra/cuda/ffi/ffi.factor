@@ -49,7 +49,7 @@ double    c-type clone always-8-byte-align \ CUdouble    typedef
 STRUCT: CUuuid
     { bytes char[16] } ;
 
-C-ENUM: CUctx_flags
+ENUM: CUctx_flags
     { CU_CTX_SCHED_AUTO  0 }
     { CU_CTX_SCHED_SPIN  1 }
     { CU_CTX_SCHED_YIELD 2 }
@@ -59,11 +59,11 @@ C-ENUM: CUctx_flags
     { CU_CTX_LMEM_RESIZE_TO_MAX 16 }
     { CU_CTX_FLAGS_MASK  HEX: 1f } ;
 
-C-ENUM: CUevent_flags
+ENUM: CUevent_flags
     { CU_EVENT_DEFAULT       0 }
     { CU_EVENT_BLOCKING_SYNC 1 } ;
 
-C-ENUM: CUarray_format
+ENUM: CUarray_format
     { CU_AD_FORMAT_UNSIGNED_INT8  HEX: 01 }
     { CU_AD_FORMAT_UNSIGNED_INT16 HEX: 02 }
     { CU_AD_FORMAT_UNSIGNED_INT32 HEX: 03 }
@@ -73,16 +73,16 @@ C-ENUM: CUarray_format
     { CU_AD_FORMAT_HALF           HEX: 10 }
     { CU_AD_FORMAT_FLOAT          HEX: 20 } ;
 
-C-ENUM: CUaddress_mode
+ENUM: CUaddress_mode
     { CU_TR_ADDRESS_MODE_WRAP   0 }
     { CU_TR_ADDRESS_MODE_CLAMP  1 }
     { CU_TR_ADDRESS_MODE_MIRROR 2 } ;
 
-C-ENUM: CUfilter_mode
+ENUM: CUfilter_mode
     { CU_TR_FILTER_MODE_POINT  0 }
     { CU_TR_FILTER_MODE_LINEAR 1 } ;
 
-C-ENUM: CUdevice_attribute
+ENUM: CUdevice_attribute
     { CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_BLOCK 1 }
     { CU_DEVICE_ATTRIBUTE_MAX_BLOCK_DIM_X 2 }
     { CU_DEVICE_ATTRIBUTE_MAX_BLOCK_DIM_Y 3 }
@@ -131,7 +131,7 @@ STRUCT: CUdevprop
     { clockRate int }
     { textureAlign int } ;
 
-C-ENUM: CUfunction_attribute
+ENUM: CUfunction_attribute
     { CU_FUNC_ATTRIBUTE_MAX_THREADS_PER_BLOCK 0 }
     { CU_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES 1     }
     { CU_FUNC_ATTRIBUTE_CONST_SIZE_BYTES 2      }
@@ -141,22 +141,22 @@ C-ENUM: CUfunction_attribute
     { CU_FUNC_ATTRIBUTE_BINARY_VERSION 6        }
     CU_FUNC_ATTRIBUTE_MAX ;
 
-C-ENUM: CUfunc_cache
+ENUM: CUfunc_cache
     { CU_FUNC_CACHE_PREFER_NONE   HEX: 00 }
     { CU_FUNC_CACHE_PREFER_SHARED HEX: 01 }
     { CU_FUNC_CACHE_PREFER_L1     HEX: 02 } ;
 
-C-ENUM: CUmemorytype
+ENUM: CUmemorytype
     { CU_MEMORYTYPE_HOST   HEX: 01 }
     { CU_MEMORYTYPE_DEVICE HEX: 02 }
     { CU_MEMORYTYPE_ARRAY  HEX: 03 } ;
 
-C-ENUM: CUcomputemode
+ENUM: CUcomputemode
     { CU_COMPUTEMODE_DEFAULT    0 }
     { CU_COMPUTEMODE_EXCLUSIVE  1 }
     { CU_COMPUTEMODE_PROHIBITED 2 } ;
 
-C-ENUM: CUjit_option
+ENUM: CUjit_option
     { CU_JIT_MAX_REGISTERS 0 }
     CU_JIT_THREADS_PER_BLOCK
     CU_JIT_WALL_TIME
@@ -169,26 +169,26 @@ C-ENUM: CUjit_option
     CU_JIT_TARGET
     CU_JIT_FALLBACK_STRATEGY ;
 
-C-ENUM: CUjit_target
+ENUM: CUjit_target
     { CU_TARGET_COMPUTE_10 0 }
     CU_TARGET_COMPUTE_11
     CU_TARGET_COMPUTE_12
     CU_TARGET_COMPUTE_13
     CU_TARGET_COMPUTE_20 ;
 
-C-ENUM: CUjit_fallback
+ENUM: CUjit_fallback
     { CU_PREFER_PTX 0 }
     CU_PREFER_BINARY ;
 
-C-ENUM: CUgraphicsRegisterFlags
+ENUM: CUgraphicsRegisterFlags
     { CU_GRAPHICS_REGISTER_FLAGS_NONE 0 } ;
 
-C-ENUM: CUgraphicsMapResourceFlags
+ENUM: CUgraphicsMapResourceFlags
     { CU_GRAPHICS_MAP_RESOURCE_FLAGS_NONE          HEX: 00 }
     { CU_GRAPHICS_MAP_RESOURCE_FLAGS_READ_ONLY     HEX: 01 }
     { CU_GRAPHICS_MAP_RESOURCE_FLAGS_WRITE_DISCARD HEX: 02 } ;
 
-C-ENUM: CUarray_cubemap_face
+ENUM: CUarray_cubemap_face
     { CU_CUBEMAP_FACE_POSITIVE_X  HEX: 00 }
     { CU_CUBEMAP_FACE_NEGATIVE_X  HEX: 01 }
     { CU_CUBEMAP_FACE_POSITIVE_Y  HEX: 02 }
@@ -196,7 +196,7 @@ C-ENUM: CUarray_cubemap_face
     { CU_CUBEMAP_FACE_POSITIVE_Z  HEX: 04 }
     { CU_CUBEMAP_FACE_NEGATIVE_Z  HEX: 05 } ;
 
-C-ENUM: CUresult
+ENUM: CUresult
     { CUDA_SUCCESS                    0 }
     { CUDA_ERROR_INVALID_VALUE        1 }
     { CUDA_ERROR_OUT_OF_MEMORY        2 }

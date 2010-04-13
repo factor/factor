@@ -25,7 +25,7 @@ C-TYPE: TCRDB
 !     { timeout double }
 !     { opts int } ;
 
-C-ENUM: f
+ENUM: f
     TTESUCCESS
     TTEINVALID
     TTENOHOST
