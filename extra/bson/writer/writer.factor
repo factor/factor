@@ -11,9 +11,8 @@ IN: bson.writer
 
 <PRIVATE
 
-CONSTANT: CHAR-SIZE  1
-CONSTANT: INT32-SIZE 4
-CONSTANT: INT64-SIZE 8
+CONSTANT: INT32-SIZE { 0 1 2 3 }
+CONSTANT: INT64-SIZE { 0 1 2 3 4 5 6 7 }
 
 PRIVATE>
 
@@ -32,17 +31,21 @@ TYPED: with-length ( quot -- bytes-written: integer start-index: integer )
     [ ] (with-length-prefix) ; inline
     
 : with-length-prefix-excl ( quot: ( .. -- .. ) -- )
-    [ INT32-SIZE - ] (with-length-prefix) ; inline
+    [ 4 - ] (with-length-prefix) ; inline
+
+: (>le) ( x n -- )
+    [ nth-byte write1 ] with each ; inline
     
 <PRIVATE
 
-TYPED: write-int32 ( int: integer -- ) INT32-SIZE >le write ; inline
+TYPED: write-int32 ( int: integer -- ) INT32-SIZE (>le) ; inline
 
-TYPED: write-double ( real: float -- ) double>bits INT64-SIZE >le write ; inline
+TYPED: write-double ( real: float -- ) double>bits INT64-SIZE (>le) ; inline
 
-TYPED: write-cstring ( string: string -- ) B{ } like write 0 write1 ; inline
+TYPED: write-cstring ( string: string -- )
+    get-output [ length ] [  ] bi copy 0 write1 ; inline
 
-: write-longlong ( object -- ) INT64-SIZE >le write ; inline
+: write-longlong ( object -- ) INT64-SIZE (>le) ; inline
 
 : write-eoo ( -- ) T_EOO write1 ; inline
 
