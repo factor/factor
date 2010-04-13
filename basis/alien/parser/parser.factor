@@ -96,7 +96,7 @@ PRIVATE>
     [ swap parse-enum-member parse-enum-members ] [ 2drop ] if ;
 
 : define-enum ( word members -- )
-    [ int swap typedef ] [ define-enum-members ] bi* ;
+    [ [ int swap typedef ] when ] [ define-enum-members ] bi* ;
 
 : scan-function-name ( -- return function )
     scan-c-type scan parse-pointers ;
