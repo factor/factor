@@ -9,7 +9,7 @@ LIBRARY: tokyocabinet
 
 TYPEDEF: void* TCADB
 
-C-ENUM: f
+ENUM: f
     ADBOVOID
     ADBOMDB
     ADBONDB

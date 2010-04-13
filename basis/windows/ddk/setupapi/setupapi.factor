@@ -1516,7 +1516,7 @@ FUNCTION: BOOL SetupRemoveFileLogEntryA ( HSPFILELOG FileLogHandle, PCSTR LogSec
 FUNCTION: BOOL SetupRemoveFileLogEntryW ( HSPFILELOG FileLogHandle, PCWSTR LogSectionName, PCWSTR TargetFilename ) ;
 ALIAS: SetupRemoveFileLogEntry SetupRemoveFileLogEntryW
 
-C-ENUM: SetupFileLogInfo
+ENUM: SetupFileLogInfo
     SetupFileLogSourceFilename
     SetupFileLogChecksum
     SetupFileLogDiskTagfile

@@ -12,7 +12,7 @@ IN: unicode.breaks
 <PRIVATE
 ! Grapheme breaks
 
-C-ENUM: f Any L V T LV LVT Extend Control CR LF
+ENUM: f Any L V T LV LVT Extend Control CR LF
     SpacingMark Prepend graphemes ;
 
 : jamo-class ( ch -- class )
@@ -131,7 +131,7 @@ VALUE: word-break-table
 "vocab:unicode/data/WordBreakProperty.txt" load-interval-file
 to: word-break-table
 
-C-ENUM: f wOther wCR wLF wNewline wExtend wFormat wKatakana wALetter wMidLetter
+ENUM: f wOther wCR wLF wNewline wExtend wFormat wKatakana wALetter wMidLetter
 wMidNum wMidNumLet wNumeric wExtendNumLet words ;
 
 : word-break-classes ( -- table ) ! Is there a way to avoid this?

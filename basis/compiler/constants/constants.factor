@@ -40,7 +40,7 @@ CONSTANT: deck-bits 18
 : segment-end-offset ( -- n ) 2 bootstrap-cells ; inline
 
 ! Relocation classes
-C-ENUM: f
+ENUM: f
     rc-absolute-cell
     rc-absolute
     rc-relative
@@ -55,7 +55,7 @@ C-ENUM: f
     rc-absolute-1 ;
 
 ! Relocation types
-C-ENUM: f
+ENUM: f
     rt-dlsym
     rt-entry-point
     rt-entry-point-pic
