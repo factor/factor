@@ -30,9 +30,9 @@ SYNTAX: TYPEDEF:
 
 SYNTAX: ENUM:
     scan dup "f" =
-    [ drop ]
-    [ (CREATE-C-TYPE) dup save-location int swap typedef ] if
-    0 parse-enum-members ;
+    [ drop f ]
+    [ (CREATE-C-TYPE) dup save-location ] if
+    V{ } clone 0 parse-enum-members define-enum ;
 
 SYNTAX: C-TYPE:
     void CREATE-C-TYPE typedef ;
