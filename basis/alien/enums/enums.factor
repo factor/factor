@@ -8,8 +8,10 @@ TUPLE: enum-c-type base-type members ;
 CONSULT: c-type-protocol enum-c-type
     base-type>> ;
 
+<PRIVATE
 : map-to-case ( quot: ( x -- y ) -- case )
     { } map-as [ ] suffix ; inline
+PRIVATE>
 
 : enum-unboxer ( members -- quot )
     [ first2 '[ _ ] 2array ] map-to-case '[ _ case ] ;
@@ -36,3 +38,5 @@ PRIVATE>
 : define-enum ( word base-type members -- )
     [ define-enum-members ] [ <enum-c-type> swap typedef ] bi ;
 
+PREDICATE: enum-c-type-word < c-type-word
+    "c-type" word-prop enum-c-type? ;
