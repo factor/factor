@@ -14,8 +14,16 @@ SYMBOLS: login api-key ;
         "json" "format" set-query-param
         swap "longUrl" set-query-param ;
 
+ERROR: bad-response json status ;
+
+: check-response ( json -- json )
+    dup "status_code" swap at 200 = [
+        dup "status_txt" swap at
+        bad-response
+    ] unless ;
+
 : parse-response ( response data -- short-url )
-    nip json> "data" swap at "url" swap at ;
+    nip json> check-response "data" swap at "url" swap at ;
 
 PRIVATE>
 
