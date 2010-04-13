@@ -18,8 +18,7 @@ IN: elf.nm
     
 : nm ( path -- )
     [
-        address>> <elf> sections
-        dup ".symtab" find-section
+        sections dup ".symtab" find-section
         symbols [ name>> empty? not ] filter
         [ print-symbol ] with each
-    ] with-mapped-file ;
+    ] with-mapped-elf ;
