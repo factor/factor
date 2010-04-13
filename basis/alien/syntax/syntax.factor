@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays alien alien.c-types alien.arrays
+USING: accessors arrays alien alien.c-types alien.enums alien.arrays
 alien.strings kernel math namespaces parser sequences words
 quotations math.parser splitting grouping effects assocs
 combinators lexer strings.parser alien.parser fry vocabs.parser
