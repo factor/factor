@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.strings alien.syntax arrays
-classes.struct io.encodings.ascii kernel locals math math.intervals
-sequences specialized-arrays strings typed ;
+classes.struct fry io.encodings.ascii kernel locals math
+math.intervals sequences specialized-arrays strings typed ;
 IN: elf
 
 ! FFI data
@@ -609,4 +609,6 @@ M:: segment sections ( segment -- sections )
     symbol sym>> st_value>> segment p_vaddr>> - segment p_offset>> + :> faddress
     faddress symbol elf-header>> >c-ptr <displaced-alien>
     symbol sym>> st_size>> <direct-uchar-array> ;
-    
+
+: find-section ( sections name -- section/f )
+    '[ name>> _ = ] find nip ;
