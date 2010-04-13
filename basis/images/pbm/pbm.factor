@@ -58,8 +58,6 @@ SINGLETON: pbm-image
     read-token     :> type
     read-number    :> width
     read-number    :> height
-    width height * :> npixels
-    width 8 mod    :> leftover
 
     type {
         { "P1" [ [ [ read-ascii-bits ] ignore-errors ] B{ } make ] }
