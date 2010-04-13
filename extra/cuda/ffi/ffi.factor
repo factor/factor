@@ -307,12 +307,12 @@ FUNCTION: CUresult cuCtxPopCurrent ( CUcontext* pctx ) ;
 FUNCTION: CUresult cuCtxGetDevice ( CUdevice* device ) ;
 FUNCTION: CUresult cuCtxSynchronize ( ) ;
 
-FUNCTION: CUresult cuModuleLoad ( CUmodule* module, char* fname ) ;
+FUNCTION: CUresult cuModuleLoad ( CUmodule* module, c-string fname ) ;
 FUNCTION: CUresult cuModuleLoadData ( CUmodule* module, void* image ) ;
 FUNCTION: CUresult cuModuleLoadDataEx ( CUmodule* module, void* image, uint numOptions, CUjit_option* options, void** optionValues ) ;
 FUNCTION: CUresult cuModuleLoadFatBinary ( CUmodule* module, void* fatCubin ) ;
 FUNCTION: CUresult cuModuleUnload ( CUmodule hmod ) ;
-FUNCTION: CUresult cuModuleGetFunction ( CUfunction* hfunc, CUmodule hmod, char* name ) ;
+FUNCTION: CUresult cuModuleGetFunction ( CUfunction* hfunc, CUmodule hmod, c-string name ) ;
 FUNCTION: CUresult cuModuleGetGlobal ( CUdeviceptr* dptr, uint* bytes, CUmodule hmod, char* name ) ;
 FUNCTION: CUresult cuModuleGetTexRef ( CUtexref* pTexRef, CUmodule hmod, char* name ) ;
     
