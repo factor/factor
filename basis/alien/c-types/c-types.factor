@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-arrays arrays assocs kernel kernel.private math
+USING: byte-arrays arrays assocs delegate kernel kernel.private math
 math.order math.parser namespaces make parser sequences strings
 words splitting cpu.architecture alien alien.accessors
 alien.strings quotations layouts system compiler.units io
@@ -79,73 +79,49 @@ GENERIC: c-type-class ( name -- class )
 
 M: abstract-c-type c-type-class class>> ;
 
-M: c-type-name c-type-class c-type c-type-class ;
-
 GENERIC: c-type-boxed-class ( name -- class )
 
 M: abstract-c-type c-type-boxed-class boxed-class>> ;
-
-M: c-type-name c-type-boxed-class c-type c-type-boxed-class ;
 
 GENERIC: c-type-boxer ( name -- boxer )
 
 M: c-type c-type-boxer boxer>> ;
 
-M: c-type-name c-type-boxer c-type c-type-boxer ;
-
 GENERIC: c-type-boxer-quot ( name -- quot )
 
 M: abstract-c-type c-type-boxer-quot boxer-quot>> ;
-
-M: c-type-name c-type-boxer-quot c-type c-type-boxer-quot ;
 
 GENERIC: c-type-unboxer ( name -- boxer )
 
 M: c-type c-type-unboxer unboxer>> ;
 
-M: c-type-name c-type-unboxer c-type c-type-unboxer ;
-
 GENERIC: c-type-unboxer-quot ( name -- quot )
 
 M: abstract-c-type c-type-unboxer-quot unboxer-quot>> ;
-
-M: c-type-name c-type-unboxer-quot c-type c-type-unboxer-quot ;
 
 GENERIC: c-type-rep ( name -- rep )
 
 M: c-type c-type-rep rep>> ;
 
-M: c-type-name c-type-rep c-type c-type-rep ;
-
 GENERIC: c-type-getter ( name -- quot )
 
 M: c-type c-type-getter getter>> ;
-
-M: c-type-name c-type-getter c-type c-type-getter ;
 
 GENERIC: c-type-setter ( name -- quot )
 
 M: c-type c-type-setter setter>> ;
 
-M: c-type-name c-type-setter c-type c-type-setter ;
-
 GENERIC: c-type-align ( name -- n )
 
 M: abstract-c-type c-type-align align>> ;
 
-M: c-type-name c-type-align c-type c-type-align ;
-
 GENERIC: c-type-align-first ( name -- n )
-
-M: c-type-name c-type-align-first c-type c-type-align-first ;
 
 M: abstract-c-type c-type-align-first align-first>> ;
 
 GENERIC: c-type-stack-align? ( name -- ? )
 
 M: c-type c-type-stack-align? stack-align?>> ;
-
-M: c-type-name c-type-stack-align? c-type c-type-stack-align? ;
 
 : c-type-box ( n c-type -- )
     [ c-type-rep ] [ c-type-boxer [ "No boxer" throw ] unless* ] bi
@@ -159,37 +135,25 @@ GENERIC: box-parameter ( n c-type -- )
 
 M: c-type box-parameter c-type-box ;
 
-M: c-type-name box-parameter c-type box-parameter ;
-
 GENERIC: box-return ( c-type -- )
 
 M: c-type box-return f swap c-type-box ;
-
-M: c-type-name box-return c-type box-return ;
 
 GENERIC: unbox-parameter ( n c-type -- )
 
 M: c-type unbox-parameter c-type-unbox ;
 
-M: c-type-name unbox-parameter c-type unbox-parameter ;
-
 GENERIC: unbox-return ( c-type -- )
 
 M: c-type unbox-return f swap c-type-unbox ;
-
-M: c-type-name unbox-return c-type unbox-return ;
 
 : little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
 
 GENERIC: heap-size ( name -- size )
 
-M: c-type-name heap-size c-type heap-size ;
-
 M: abstract-c-type heap-size size>> ;
 
 GENERIC: stack-size ( name -- size )
-
-M: c-type-name stack-size c-type stack-size ;
 
 M: c-type stack-size size>> cell align ;
 
@@ -216,6 +180,29 @@ MIXIN: value-type
     [
         \ swap , [ heap-size , [ * >fixnum ] % ] [ % ] bi*
     ] [ ] make ;
+
+PROTOCOL: c-type-protocol 
+    c-type-class
+    c-type-boxed-class
+    c-type-boxer
+    c-type-boxer-quot
+    c-type-unboxer
+    c-type-unboxer-quot
+    c-type-rep
+    c-type-getter
+    c-type-setter
+    c-type-align
+    c-type-align-first
+    c-type-stack-align?
+    box-parameter
+    box-return
+    unbox-parameter
+    unbox-return
+    heap-size
+    stack-size ;
+
+CONSULT: c-type-protocol c-type-name
+    c-type ;
 
 PREDICATE: typedef-word < c-type-word
     "c-type" word-prop c-type-name? ;
