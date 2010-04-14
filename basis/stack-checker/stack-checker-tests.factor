@@ -252,6 +252,11 @@ DEFER: blah4
 ! A typo
 { 1 0 } [ { [ ] } dispatch ] must-infer-as
 
+! Make sure the error is correct
+[
+    [ { [ drop ] [ dup ] } dispatch ] infer
+] [ word>> \ dispatch eq? ] must-fail-with
+
 DEFER: inline-recursive-2
 : inline-recursive-1 ( -- ) inline-recursive-2 ;
 : inline-recursive-2 ( -- ) inline-recursive-1 ;
