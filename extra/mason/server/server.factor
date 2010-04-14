@@ -17,7 +17,8 @@ clean-git-id clean-timestamp
 last-release release-git-id
 last-git-id last-timestamp last-report
 current-git-id current-timestamp
-status ;
+status
+heartbeat-timestamp ;
 
 builder "BUILDERS" {
     { "host-name" "HOST_NAME" TEXT +user-assigned-id+ }
@@ -38,6 +39,8 @@ builder "BUILDERS" {
     ! Can't name it CURRENT_TIMESTAMP because of bug in db library
     { "current-timestamp" "CURR_TIMESTAMP" TIMESTAMP }
     { "status" "STATUS" TEXT }
+
+    { "heartbeat-timestamp" "HEARTBEAT_TIMESTAMP" TIMESTAMP }
 } define-persistent
 
 : mason-db ( -- db ) "resource:mason.db" <sqlite-db> ;

@@ -7,6 +7,8 @@ SYMBOLS: login api-key ;
 
 <PRIVATE
 
+: of ( assoc key -- value ) swap at ;
+
 : make-request ( long-url -- request )
     "http://api.bit.ly/v3/shorten" >url
         login get "login" set-query-param
@@ -14,8 +16,16 @@ SYMBOLS: login api-key ;
         "json" "format" set-query-param
         swap "longUrl" set-query-param ;
 
+ERROR: bad-response json status ;
+
+: check-response ( json -- json )
+    dup "status_code" of 200 = [
+        dup "status_txt" of
+        bad-response
+    ] unless ;
+
 : parse-response ( response data -- short-url )
-    nip json> "data" swap at "url" swap at ;
+    nip json> check-response "data" of "url" of ;
 
 PRIVATE>
 
