@@ -122,7 +122,7 @@ cell factor_vm::frame_scan(stack_frame *frame)
 			if(obj.type_p(QUOTATION_TYPE))
 			{
 				char *return_addr = (char *)FRAME_RETURN_ADDRESS(frame,this);
-				char *quot_entry_point = (char *)(frame_code(frame) + 1);
+				char *quot_entry_point = (char *)frame_code(frame)->entry_point();
 
 				return tag_fixnum(quot_code_offset_to_scan(
 					obj.value(),(cell)(return_addr - quot_entry_point)));
