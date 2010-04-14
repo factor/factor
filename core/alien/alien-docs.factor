@@ -213,6 +213,7 @@ ARTICLE: "alien-invoke" "Calling C from Factor"
 { $subsections
     POSTPONE: LIBRARY:
     POSTPONE: FUNCTION:
+    POSTPONE: FUNCTION-ALIAS:
 }
 "The above parsing words create word definitions which call a lower-level word; you can use it directly, too:"
 { $subsections alien-invoke }
