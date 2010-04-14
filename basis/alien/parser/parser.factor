@@ -113,13 +113,19 @@ PRIVATE>
 : function-effect ( names return -- effect )
     [ { } ] [ return-type-name 1array ] if-void <effect> ;
 
-:: make-function ( return function library types names -- word quot effect )
-    function create-in dup reset-generic
+: create-function ( name -- word )
+    create-in dup reset-generic ;
+
+:: (make-function) ( return function library types names -- quot effect )
     return library function types function-quot
     names return function-effect ;
 
-: (FUNCTION:) ( -- word quot effect )
-    scan-function-name current-library get ";" scan-c-args make-function ;
+:: make-function ( return function library types names -- word quot effect )
+    function create-function
+    return function library types names (make-function) ;
+
+: (FUNCTION:) ( -- return function library types names )
+    scan-function-name current-library get ";" scan-c-args ;
 
 : callback-quot ( return types abi -- quot )
     '[ [ _ _ _ ] dip alien-callback ] ;
