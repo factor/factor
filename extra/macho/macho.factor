@@ -915,7 +915,7 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
 : with-mapped-macho ( path quot -- )
     '[
         address>> macho-header @
-    ] with-mapped-file ; inline
+    ] with-mapped-file-reader ; inline
 
 : macho-nm ( path -- )
     [| macho |
