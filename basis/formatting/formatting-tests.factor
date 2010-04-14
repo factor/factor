@@ -16,6 +16,7 @@ IN: formatting.tests
 [ t ] [ "+0010" 10 "%+05d" sprintf = ] unit-test
 [ t ] [ "123.456000" 123.456 "%f" sprintf = ] unit-test
 [ t ] [ "2.44" 2.436 "%.2f" sprintf = ] unit-test
+[ t ] [ "8.950" 8.950179003580072 "%.3f" sprintf = ] unit-test
 [ t ] [ "123.10" 123.1 "%01.2f" sprintf = ] unit-test
 [ t ] [ "1.2346" 1.23456789 "%.4f" sprintf = ] unit-test
 [ t ] [ "  1.23" 1.23456789 "%6.2f" sprintf = ] unit-test
