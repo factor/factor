@@ -99,3 +99,4 @@ PRIVATE>
     size_t "libc" "strlen" { c-string } alien-invoke ;
 
 DESTRUCTOR: free
+DESTRUCTOR: (free)
