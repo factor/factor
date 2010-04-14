@@ -464,7 +464,7 @@ struct factor_vm
 	cell unbox_array_size_slow();
 	void primitive_fixnum_to_float();
 	void primitive_bignum_to_float();
-	void primitive_float_to_str();
+	void primitive_format_float();
 	void primitive_float_eq();
 	void primitive_float_add();
 	void primitive_float_subtract();
