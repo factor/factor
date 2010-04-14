@@ -1,9 +1,10 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http:// factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.strings alien.syntax
-classes classes.struct combinators io.encodings.ascii
-io.encodings.string kernel literals make math sequences
-specialized-arrays typed fry io.mmap formatting locals ;
+classes classes.struct combinators combinators.short-circuit
+io.encodings.ascii io.encodings.string kernel literals make
+math sequences specialized-arrays typed fry io.mmap formatting
+locals splitting ;
 FROM: alien.c-types => short ;
 IN: macho
 
@@ -912,6 +913,9 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
 : symbol-name ( symbol string-table -- name )
     [ n_strx>> ] dip <displaced-alien> ascii alien>string ;
 
+: c-symbol-name ( symbol string-table -- name )
+    symbol-name "_" ?head drop ;
+
 : with-mapped-macho ( path quot -- )
     '[
         address>> macho-header @
@@ -929,4 +933,19 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
                 [ symbol-name "%s\n" printf ] 2tri
             ] curry each
         ] each
+    ] with-mapped-macho ;
+
+: dylib-export? ( symtab-entry -- ? )
+    n_type>> {
+        [ N_EXT bitand zero? not ]
+        [ N_TYPE bitand N_UNDF = not ]
+    } 1&& ;
+
+: dylib-exports ( path -- symbol-names )
+    [| macho |
+        macho load-commands symtab-commands [| symtab |
+            macho symtab symbols
+            [ [ dylib-export? ] filter ]
+            [ [ c-symbol-name ] curry { } map-as ] bi*
+        ] { } map-as concat
     ] with-mapped-macho ;
