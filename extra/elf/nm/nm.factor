@@ -4,7 +4,7 @@ USING: accessors combinators elf formatting io.mmap kernel sequences ;
 IN: elf.nm
 
 : print-symbol ( sections symbol -- )
-    [ sym>> st_value>> "%016d " printf ]
+    [ sym>> st_value>> "%016x " printf ]
     [
         sym>> st_shndx>>
         {
@@ -16,7 +16,7 @@ IN: elf.nm
     ]
     [ name>> "%s\n" printf ] tri ;
     
-: nm ( path -- )
+: elf-nm ( path -- )
     [
         sections dup ".symtab" find-section
         symbols [ name>> empty? not ] filter

@@ -1,8 +1,13 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http:// factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax classes.struct kernel literals math ;
+USING: accessors alien alien.c-types alien.strings alien.syntax
+classes classes.struct combinators io.encodings.ascii
+io.encodings.string kernel literals make math sequences
+specialized-arrays typed fry io.mmap formatting locals ;
+FROM: alien.c-types => short ;
 IN: macho
 
+! FFI data
 TYPEDEF: int       integer_t
 TYPEDEF: int       vm_prot_t
 TYPEDEF: integer_t cpu_type_t
@@ -804,3 +809,124 @@ C-ENUM: reloc_type_ppc
     PPC_RELOC_JBSR
     PPC_RELOC_LO14_SECTDIFF
     PPC_RELOC_LOCAL_SECTDIFF ;
+
+! Low-level interface
+SPECIALIZED-ARRAYS: section section_64 nlist nlist_64 ;
+UNION: mach_header_32/64 mach_header mach_header_64 ;
+UNION: segment_command_32/64 segment_command segment_command_64 ;
+UNION: load-command segment_command segment_command_64
+    dylib_command sub_framework_command
+    sub_client_command sub_umbrella_command sub_library_command
+    prebound_dylib_command dylinker_command thread_command
+    routines_command routines_command_64 symtab_command
+    dysymtab_command twolevel_hints_command uuid_command ;
+UNION: section_32/64 section section_64 ;
+UNION: section_32/64-array section-array section_64-array ;
+UNION: nlist_32/64 nlist nlist_64 ;
+UNION: nlist_32/64-array nlist-array nlist_64-array ;
+
+TYPED: 64-bit? ( macho: mach_header_32/64 -- ? )
+    magic>> {
+        { MH_MAGIC_64 [ t ] }
+        { MH_CIGAM_64 [ t ] }
+        [ drop f ]
+    } case ;
+
+TYPED: macho-header ( c-ptr -- macho: mach_header_32/64 )
+    dup mach_header_64 memory>struct 64-bit?
+    [ mach_header_64 memory>struct ]
+    [ mach_header memory>struct ] if ;
+
+: cmd>load-command ( cmd -- load-command )
+    {
+        { LC_UUID           [ uuid_command           ] }
+        { LC_SEGMENT        [ segment_command        ] }
+        { LC_SEGMENT_64     [ segment_command_64     ] }
+        { LC_SYMTAB         [ symtab_command         ] }
+        { LC_DYSYMTAB       [ dysymtab_command       ] }
+        { LC_THREAD         [ thread_command         ] }
+        { LC_UNIXTHREAD     [ thread_command         ] }
+        { LC_LOAD_DYLIB     [ dylib_command          ] }
+        { LC_ID_DYLIB       [ dylib_command          ] }
+        { LC_PREBOUND_DYLIB [ prebound_dylib_command ] }
+        { LC_LOAD_DYLINKER  [ dylinker_command       ] }
+        { LC_ID_DYLINKER    [ dylinker_command       ] }
+        { LC_ROUTINES       [ routines_command       ] }
+        { LC_ROUTINES_64    [ routines_command_64    ] }
+        { LC_TWOLEVEL_HINTS [ twolevel_hints_command ] }
+        { LC_SUB_FRAMEWORK  [ sub_framework_command  ] }
+        { LC_SUB_UMBRELLA   [ sub_umbrella_command   ] }
+        { LC_SUB_LIBRARY    [ sub_library_command    ] }
+        { LC_SUB_CLIENT     [ sub_client_command     ] }
+        { LC_DYLD_INFO      [ dyld_info_command      ] }
+        { LC_DYLD_INFO_ONLY [ dyld_info_command      ] }
+    } case ;
+
+: read-command ( cmd -- next-cmd )
+    dup load_command memory>struct
+    [ cmd>> cmd>load-command memory>struct , ]
+    [ cmdsize>> swap <displaced-alien> ] 2bi ;
+
+TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
+    [
+        [ class heap-size ]
+        [ >c-ptr <displaced-alien> ]
+        [ ncmds>> ] tri iota [
+            drop read-command
+        ] each drop
+    ] { } make ;
+
+: segment-commands ( load-commands -- segment-commands )
+    [ segment_command_32/64? ] filter ; inline
+
+: symtab-commands ( load-commands -- segment-commands )
+    [ symtab_command? ] filter ; inline
+
+: read-array-string ( uchar-array -- string )
+    ascii decode [ 0 = not ] filter ;
+
+: segment-sections ( segment-command -- sections )
+    {
+        [ class heap-size ]
+        [ >c-ptr <displaced-alien> ]
+        [ nsects>> ]
+        [ segment_command_64? ]
+    } cleave
+    [ <direct-section_64-array> ]
+    [ <direct-section-array> ] if ;
+
+: sections-array ( segment-commands -- sections-array )
+    [
+        dup first segment_command_64?
+        [ section_64 ] [ section ] if <struct> ,
+        segment-commands [ segment-sections [ , ] each ] each
+    ] { } make ;
+
+: symbols ( mach-header symtab-command -- symbols string-table )
+    [ symoff>> swap >c-ptr <displaced-alien> ]
+    [ nsyms>> swap 64-bit?
+      [ <direct-nlist_64-array> ]
+      [ <direct-nlist-array> ] if ]
+    [ stroff>> swap >c-ptr <displaced-alien> ] 2tri ;
+    
+: symbol-name ( symbol string-table -- name )
+    [ n_strx>> ] dip <displaced-alien> ascii alien>string ;
+
+: with-mapped-macho ( path quot -- )
+    '[
+        address>> macho-header @
+    ] with-mapped-file ; inline
+
+: macho-nm ( path -- )
+    [| macho |
+        macho load-commands segment-commands sections-array :> sections
+        
+        macho load-commands symtab-commands [| symtab |
+            macho symtab symbols [
+                [ drop n_value>> "%016x " printf ]
+                [ drop n_sect>> sections nth sectname>>
+                  read-array-string "%-16s" printf ]
+                [ symbol-name "%s\n" printf ] 2tri
+            ] curry each
+        ] each
+    ] with-mapped-macho ;
