@@ -1,10 +1,9 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.accessors alien.c-types arrays
-byte-arrays combinators combinators.smart continuations destructors
-fry io.encodings.ascii io.encodings.string kernel libc locals macros
-math math.order multiline opencl.ffi prettyprint sequences
-specialized-arrays typed variants namespaces ;
+USING: accessors alien alien.c-types arrays byte-arrays combinators
+combinators.smart destructors io.encodings.ascii io.encodings.string
+kernel libc locals math namespaces opencl.ffi sequences shuffle
+specialized-arrays variants ;
 IN: opencl
 SPECIALIZED-ARRAYS: void* char size_t ;
 
@@ -16,17 +15,25 @@ ERROR: cl-error err ;
 
 : cl-not-null ( err -- )
     dup f = [ cl-error ] [ drop ] if ; inline
+ 
+: info-data-size ( handle name info-quot -- size_t )
+    [ 0 f 0 <size_t> ] dip [ call cl-success ] 2keep drop *size_t ; inline
 
-MACRO: info ( info-quot lift-quot -- quot )
-    [ dup ] dip '[ 2dup 0 f 0 <size_t> _ '[ _ call cl-success ] keep
-       *size_t dup <byte-array> _ '[ f _ call cl-success ] keep
-       _ call ] ;
-   
-MACRO: 2info ( info-quot lift-quot -- quot )
-    [ dup ] dip '[ 3dup 0 f 0 <size_t> _ '[ _ call cl-success ] keep
-       *size_t dup <byte-array> _ '[ f _ call cl-success ] keep
-       _ call ] ;
-   
+: info-data-bytes ( handle name info-quot size -- bytes )
+    swap [ dup <byte-array> f ] dip [ call cl-success ] 3keep 2drop ; inline
+
+: info ( handle name info-quot lift-quot -- value )
+    [ 3dup info-data-size info-data-bytes ] dip call ; inline
+
+: 2info-data-size ( handle1 handle2 name info-quot -- size_t )
+    [ 0 f 0 <size_t> ] dip [ call cl-success ] 2keep drop *size_t ; inline
+
+: 2info-data-bytes ( handle1 handle2 name info-quot size -- bytes )
+    swap [ dup <byte-array> f ] dip [ call cl-success ] 3keep 2drop ; inline
+
+: 2info ( handle1 handle2 name info_quot lift_quot -- value )
+    [ 4dup 2info-data-size 2info-data-bytes ] dip call ; inline
+    
 : info-bool ( handle name quot -- ? )
     [ *uint CL_TRUE = ] info ; inline
 
