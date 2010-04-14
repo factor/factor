@@ -45,7 +45,7 @@ TUPLE: function name alien return params ;
     ] [ ] make swap function-effect [ define-declared ] with-compilation-unit ;
 
 : install-module ( name -- )
-    thejit get mps>> at [
+    current-jit mps>> at [
         module>> functions [ install-function ] each
     ] [ "no such module" throw ] if* ;
 
