@@ -142,11 +142,14 @@ PRIVATE>
     current-library get
     scan-function-name ";" scan-c-args make-callback-type ;
 
-PREDICATE: alien-function-word < word
+PREDICATE: alien-function-alias-word < word
     def>> {
         [ length 5 = ]
         [ last \ alien-invoke eq? ]
     } 1&& ;
+
+PREDICATE: alien-function-word < alien-function-alias-word
+    [ def>> third ] [ name>> ] bi = ;
 
 PREDICATE: alien-callback-type-word < typedef-word
     "callback-effect" word-prop ;
