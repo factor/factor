@@ -1,6 +1,7 @@
 IN: compiler.tests.redefine23
 USING: classes.struct specialized-arrays alien.c-types sequences
 compiler.units vocabs tools.test ;
+FROM: specialized-arrays.private => specialized-array-vocab ;
 
 STRUCT: my-struct { x int } ;
 SPECIALIZED-ARRAY: my-struct
@@ -8,6 +9,6 @@ SPECIALIZED-ARRAY: my-struct
 
 [ ] [
     [
-        "specialized-arrays.instances.compiler.tests.redefine23" forget-vocab
+        my-struct specialized-array-vocab forget-vocab
     ] with-compilation-unit
 ] unit-test
