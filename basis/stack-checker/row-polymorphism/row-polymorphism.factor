@@ -24,7 +24,7 @@ IN: stack-checker.row-polymorphism
     [ with-inner-d ] 2dip (effect-here) ; inline
 
 : (diff-variable) ( diff variable vars -- diff' )
-    [ at* nip ] [ '[ _ _ at - ] ] [ '[ _ _ set-at 0 ] ] 2tri if ;
+    [ key? ] [ '[ _ _ at - ] ] [ '[ _ _ set-at 0 ] ] 2tri if ;
 
 : (check-variable) ( actual-count declared-count variable vars -- diff ? )
     [ - ] 2dip dupd '[ _ _ (diff-variable) t ] [ dup 0 <= ] if ;
@@ -63,4 +63,3 @@ IN: stack-checker.row-polymorphism
     [ >>actual ] keep
     2dup [ [ variables>> ] [ effect>> ] bi ] dip check-variables
     [ 2drop ] [ drop combinator-unbalanced-branches-error ] if ;
-
