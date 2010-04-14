@@ -3,7 +3,9 @@ debugger.threads destructors generic.single io io.directories
 io.encodings.8-bit.latin1 io.encodings.ascii
 io.encodings.binary io.encodings.string io.files
 io.files.private io.files.temp io.files.unique kernel make math
-sequences specialized-arrays system threads tools.test ;
+sequences specialized-arrays system threads tools.test vocabs
+compiler.units ;
+FROM: specialized-arrays.private => specialized-array-vocab ;
 SPECIALIZED-ARRAY: int
 IN: io.files.tests
 
@@ -117,6 +119,12 @@ CONSTANT: pt-array-1
     "test.txt" temp-file binary file-contents
     byte-array>pt-array
     pt-array-1 rest-slice sequence=
+] unit-test
+
+[ ] [
+    [
+        pt specialized-array-vocab forget-vocab
+    ] with-compilation-unit
 ] unit-test
 
 ! Writing strings to binary streams should fail

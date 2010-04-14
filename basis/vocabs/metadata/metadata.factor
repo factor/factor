@@ -103,11 +103,20 @@ ERROR: bad-platform name ;
 : supported-platform? ( platforms -- ? )
     [ t ] [ [ os swap class<= ] any? ] if-empty ;
 
-: unportable? ( vocab -- ? )
+: don't-load? ( vocab -- ? )
     {
-        [ vocab-tags "untested" swap member? ]
+        [ vocab-tags "not loaded" swap member? ]
         [ vocab-platforms supported-platform? not ]
     } 1|| ;
+
+: filter-don't-load ( vocabs -- vocabs' )
+    [ vocab-name don't-load? not ] filter ;
+
+: don't-test? ( vocab -- ? )
+    vocab-tags "not tested" swap member? ;
+
+: filter-don't-test ( vocabs -- vocabs' )
+    [ don't-test? not ] filter ;
 
 TUPLE: unsupported-platform vocab requires ;
 
