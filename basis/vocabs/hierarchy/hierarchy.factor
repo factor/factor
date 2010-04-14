@@ -97,9 +97,6 @@ MEMO: all-vocabs-recursive ( -- assoc )
 
 <PRIVATE
 
-: filter-unportable ( seq -- seq' )
-    [ vocab-name unportable? not ] filter ;
-
 : collect-vocabs ( quot -- seq )
     [ all-vocabs-recursive no-roots no-prefixes ] dip
     gather natural-sort ; inline
@@ -109,7 +106,7 @@ PRIVATE>
 : (load) ( prefix -- failures )
     [ child-vocabs-recursive no-roots no-prefixes ]
     [ dup find-vocab-root [ >vocab-link prefix ] [ drop ] if ] bi
-    filter-unportable
+    filter-don't-load
     require-all ;
 
 : load ( prefix -- )
