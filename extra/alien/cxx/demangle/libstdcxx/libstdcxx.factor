@@ -4,15 +4,6 @@ alien.syntax combinators destructors io.encodings.ascii kernel
 libc locals sequences system ;
 IN: alien.cxx.demangle.libstdcxx
 
-<<
-"libstdc++" {
-    { [ os macosx? ] [ "/usr/lib/libstdc++.6.0.9.dylib" ] }
-    { [ os unix? ] [ "/usr/lib/libstdc++.so" ] }
-} cond cdecl add-library
->>
-
-LIBRARY: libstdc++
-
 FUNCTION: char* __cxa_demangle ( char* mangled_name, char* output_buffer, size_t* length, int* status ) ;
 
 ERROR: demangle-memory-allocation-failure ;
