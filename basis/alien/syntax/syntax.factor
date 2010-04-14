@@ -16,7 +16,11 @@ SYNTAX: BAD-ALIEN <bad-alien> suffix! ;
 SYNTAX: LIBRARY: scan current-library set ;
 
 SYNTAX: FUNCTION:
-    (FUNCTION:) define-declared ;
+    (FUNCTION:) make-function define-declared ;
+
+SYNTAX: FUNCTION-ALIAS:
+    scan create-function
+    (FUNCTION:) (make-function) define-declared ;
 
 SYNTAX: CALLBACK:
     (CALLBACK:) define-inline ;
