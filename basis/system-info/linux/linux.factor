@@ -6,8 +6,8 @@ specialized-arrays ;
 SPECIALIZED-ARRAY: char
 IN: system-info.linux
 
-: (uname) ( buf -- int )
-    int f "uname" { c-string } alien-invoke ;
+FUNCTION-ALIAS: (uname)
+    int uname ( c-string buf ) ;
 
 : uname ( -- seq )
     65536 <char-array> [ (uname) io-error ] keep
