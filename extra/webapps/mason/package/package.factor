@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators furnace.actions html.forms
 kernel mason.platform mason.report mason.server present
-sequences webapps.mason webapps.mason.report
-webapps.mason.utils xml.syntax ;
+sequences webapps.mason webapps.mason.report webapps.mason.utils
+xml.syntax ;
+FROM: mason.version.files => platform ;
 IN: webapps.mason.package
 
 : building ( builder string -- xml )
@@ -31,7 +32,7 @@ IN: webapps.mason.package
     over [ [ git-link ] [ present ] bi* " (built on " ")" surround 2array ] [ 2drop f ] if ;
 
 : packages-url ( builder -- url )
-    [ os>> ] [ cpu>> ] bi (platform) "http://downloads.factorcode.org/" prepend ;
+    platform download-url ;
 
 : package-link ( builder -- xml )
     [ packages-url ] [ last-release>> ] bi [ "/" glue ] keep link ;
@@ -40,7 +41,7 @@ IN: webapps.mason.package
     packages-url dup link ;
 
 : clean-image-url ( builder -- url )
-    [ os>> ] [ cpu>> ] bi (platform) "http://factorcode.org/images/clean/" prepend ;
+    platform "http://factorcode.org/images/clean/" prepend ;
 
 : clean-image-link ( builder -- link )
     clean-image-url dup link ;
@@ -65,6 +66,7 @@ IN: webapps.mason.package
                 [ current-status "status" set-value ]
                 [ last-build-status "last-build" set-value ]
                 [ clean-build-status "last-clean-build" set-value ]
+                [ heartbeat-timestamp>> "heartbeat-timestamp" set-value ]
                 [ packages-link "binaries" set-value ]
                 [ clean-image-link "clean-images" set-value ]
                 [ report-link "last-report" set-value ]

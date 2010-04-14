@@ -25,8 +25,9 @@ SYMBOLS: host-name target-os target-cpu message message-arg ;
         target-cpu get >>cpu
     dup select-tuple [ ] [ dup insert-tuple ] ?if ;
 
-: git-id ( builder id -- )
-    >>current-git-id +starting+ >>status drop ;
+: heartbeat ( builder -- ) now >>heartbeat-timestamp drop ;
+
+: git-id ( builder id -- ) >>current-git-id +starting+ >>status drop ;
 
 : make-vm ( builder -- ) +make-vm+ >>status drop ;
 
@@ -51,6 +52,7 @@ SYMBOLS: host-name target-os target-cpu message message-arg ;
 
 : update-builder ( builder -- )
     message get {
+        { "heartbeat" [ heartbeat ] }
         { "git-id" [ message-arg get git-id ] }
         { "make-vm" [ make-vm ] }
         { "boot" [ boot ] }

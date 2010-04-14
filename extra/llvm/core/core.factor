@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.libraries alien.syntax system sequences combinators kernel alien.c-types ;
+USING: alien alien.libraries alien.syntax system sequences combinators kernel alien.c-types ;
 
 IN: llvm.core
 

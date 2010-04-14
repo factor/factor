@@ -92,9 +92,6 @@ M: sequence set-like
 M: sequence members
     [ pruned ] keep like ;
 
-M: sequence all-unique?
-    dup pruned sequence= ;
-
 : combine ( sets -- set )
     [ f ]
     [ [ [ members ] map concat ] [ first ] bi set-like ]
