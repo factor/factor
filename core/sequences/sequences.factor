@@ -436,7 +436,7 @@ PRIVATE>
     [ (accumulate) ] dip map-as ; inline
 
 : accumulate ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... final newseq )
-    { } accumulate-as ; inline
+    pick accumulate-as ; inline
 
 : accumulate! ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... final seq )
     (accumulate) map! ; inline

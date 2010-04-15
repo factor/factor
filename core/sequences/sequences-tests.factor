@@ -24,6 +24,9 @@ IN: sequences.tests
 [ 5040 { 1 1 2 6 24 120 720 } ]
 [ { 1 2 3 4 5 6 7 } 1 [ * ] accumulate ] unit-test
 
+[ 64 B{ 1 2 4 16 } ]
+[ B{ 2 2 4 4 } 1 [ * ] accumulate ] unit-test
+
 [ 5040 { 1 1 2 6 24 120 720 } ]
 [ { 1 2 3 4 5 6 7 } 1 [ * ] accumulate! ] unit-test
 
