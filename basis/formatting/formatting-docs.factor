@@ -62,10 +62,6 @@ HELP: printf
         "USING: formatting ;"
         "1.23456789 \"%.3f\" printf"
         "1.235" }
-    { $example 
-        "USING: formatting ;"
-        "1234567890 \"%.5e\" printf"
-        "1.23457e+09" }
     { $example
         "USING: formatting ;"
         "12 \"%'#4d\" printf"
