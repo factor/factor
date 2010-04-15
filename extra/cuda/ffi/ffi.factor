@@ -1,6 +1,6 @@
 ! (c)2010 Joe Groff bsd license
-USING: alien alien.c-types alien.libraries alien.syntax
-classes.struct combinators system ;
+USING: accessors alien alien.c-types alien.libraries alien.syntax
+classes.struct combinators kernel system ;
 IN: cuda.ffi
 
 <<
@@ -23,6 +23,28 @@ TYPEDEF: void* CUtexref
 TYPEDEF: void* CUevent
 TYPEDEF: void* CUstream
 TYPEDEF: void* CUgraphicsResource
+
+! versions of double and longlong that always 8-byte align
+
+SYMBOLS: CUdouble CUlonglong CUulonglong ;
+
+: >cuda-param-type ( c-type -- c-type' )
+    {
+        { CUdeviceptr [ void* ] }
+        { double      [ CUdouble ] }
+        { longlong    [ CUlonglong ] }
+        { ulonglong   [ CUulonglong ] }
+        [ ]
+    } case ;
+
+<<
+: always-8-byte-align ( c-type -- c-type )
+    8 >>align 8 >>align-first ;
+
+longlong  c-type clone always-8-byte-align \ CUlonglong  typedef
+ulonglong c-type clone always-8-byte-align \ CUulonglong typedef
+double    c-type clone always-8-byte-align \ CUdouble    typedef
+>>
 
 STRUCT: CUuuid
     { bytes char[16] } ;
