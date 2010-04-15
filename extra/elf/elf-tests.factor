@@ -1,8 +1,9 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays elf kernel sequences tools.test ;
+USING: accessors byte-arrays elf kernel sequences system tools.test ;
 IN: elf.tests
 
+cpu ppc? [
 {
     {
         ""
@@ -178,3 +179,4 @@ unit-test
     ] with-mapped-elf
 ]
 unit-test
+] unless
