@@ -26,9 +26,9 @@ HELP: LIBRARY:
 { $notes "Logical library names are defined with the " { $link add-library } " word." } ;
 
 HELP: FUNCTION:
-{ $syntax "FUNCTION: return name ( parameters )" }
+{ $syntax "FUNCTION: return name ( parameters ) ;" }
 { $values { "return" "a C return type" } { "name" "a C function name" } { "parameters" "a comma-separated sequence of type/name pairs; " { $snippet "type1 arg1, type2 arg2, ..." } } }
-{ $description "Defines a new word " { $snippet "name" } " which calls a C library function with the same name, in the logical library given by the most recent " { $link POSTPONE: LIBRARY: } " declaration."
+{ $description "Defines a new word " { $snippet "name" } " which calls the C library function with the same " { $snippet "name" } " in the logical library given by the most recent " { $link POSTPONE: LIBRARY: } " declaration."
 $nl
 "The new word must be compiled before being executed." }
 { $examples
@@ -45,11 +45,23 @@ $nl
     "The answer to the question is 42."
 } }
 "Using the " { $link c-string } " type instead of " { $snippet "char*" } " causes the FFI to automatically convert Factor strings to C strings. See " { $link "c-strings" } " for more information on using strings with the FFI."
-{ $notes "Note that the parentheses and commas are only syntax sugar and can be omitted; they serve no purpose other than to make the declaration slightly easier to read:"
+{ $notes "Note that the parentheses and commas are only syntax sugar and can be omitted; they serve no purpose other than to make the declaration easier to read. The following definitions are equivalent:"
 { $code
     "FUNCTION: void glHint ( GLenum target, GLenum mode ) ;"
     "FUNCTION: void glHint GLenum target GLenum mode ;"
-} } ;
+}
+"To make a Factor word with a name different from the C function, use " { $link POSTPONE: FUNCTION-ALIAS: } "." } ;
+
+HELP: FUNCTION-ALIAS:
+{ $syntax "FUNCTION-ALIAS: factor-name
+    return c_name ( parameters ) ;" }
+{ $values { "factor-name" "a Factor word name" } { "return" "a C return type" } { "name" "a C function name" } { "parameters" "a comma-separated sequence of type/name pairs; " { $snippet "type1 arg1, type2 arg2, ..." } } }
+{ $description "Defines a new word " { $snippet "factor-name" } " which calls the C library function named " { $snippet "c_name" } " in the logical library given by the most recent " { $link POSTPONE: LIBRARY: } " declaration."
+$nl
+"The new word must be compiled before being executed." }
+{ $notes "Note that the parentheses and commas are only syntax sugar and can be omitted. They serve no purpose other than to make the declaration easier to read." } ;
+
+{ POSTPONE: FUNCTION: POSTPONE: FUNCTION-ALIAS: } related-words
 
 HELP: TYPEDEF:
 { $syntax "TYPEDEF: old new" }
@@ -58,15 +70,15 @@ HELP: TYPEDEF:
 { $notes "This word differs from " { $link typedef } " in that it runs at parse time, to ensure correct ordering of operations when loading source files. Words defined in source files are compiled before top-level forms are run, so if a source file defines C binding words and uses " { $link typedef } ", the type alias won't be available at compile time." } ;
 
 HELP: C-ENUM:
-{ $syntax "C-ENUM: words... ;" }
-{ $values { "words" "a sequence of word names" } }
-{ $description "Creates a sequence of word definitions in the current vocabulary. Each word pushes an integer according to its index in the enumeration definition. The first word pushes 0." }
+{ $syntax "C-ENUM: type/f words... ;" }
+{ $values { "type" "a name to typedef to int or f" } { "words" "a sequence of word names" } }
+{ $description "Creates a sequence of word definitions in the current vocabulary. Each word pushes an integer according to the rules of C enums." }
 { $notes "This word emulates a C-style " { $snippet "enum" } " in Factor. While this feature can be used for any purpose, using integer constants is discouraged unless it is for interfacing with C libraries. Factor code should use " { $link "words.symbol" } " or " { $link "singletons" } " instead." }
 { $examples
     "Here is an example enumeration definition:"
-    { $code "C-ENUM: red green blue ;" }
+    { $code "C-ENUM: color_t red { green 3 } blue ;" }
     "It is equivalent to the following series of definitions:"
-    { $code "CONSTANT: red 0" "CONSTANT: green 1" "CONSTANT: blue 2" }
+    { $code "CONSTANT: red 0" "CONSTANT: green 3" "CONSTANT: blue 4" }
 } ;
 
 HELP: C-TYPE:

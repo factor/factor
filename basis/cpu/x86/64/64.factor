@@ -11,10 +11,10 @@ cpu.architecture vm ;
 FROM: layouts => cell cells ;
 IN: cpu.x86.64
 
-: param-reg-0 ( -- reg ) 0 int-regs param-reg ; inline
-: param-reg-1 ( -- reg ) 1 int-regs param-reg ; inline
-: param-reg-2 ( -- reg ) 2 int-regs param-reg ; inline
-: param-reg-3 ( -- reg ) 3 int-regs param-reg ; inline
+: param-reg-0 ( -- reg ) 0 int-regs cdecl param-reg ; inline
+: param-reg-1 ( -- reg ) 1 int-regs cdecl param-reg ; inline
+: param-reg-2 ( -- reg ) 2 int-regs cdecl param-reg ; inline
+: param-reg-3 ( -- reg ) 3 int-regs cdecl param-reg ; inline
 
 M: x86.64 pic-tail-reg RBX ;
 
@@ -51,8 +51,6 @@ M: x86.64 %set-vm-field ( src offset -- )
 
 M: x86.64 %vm-field-ptr ( dst offset -- )
     [ vm-reg ] dip [+] LEA ;
-
-: param@ ( n -- op ) reserved-stack-space + stack@ ;
 
 M: x86.64 %prologue ( n -- )
     temp-reg -7 [RIP+] LEA
@@ -157,7 +155,7 @@ M:: x86.64 %unbox-large-struct ( n c-type -- )
     "to_value_struct" f %alien-invoke ;
 
 : load-return-value ( rep -- )
-    [ [ 0 ] dip reg-class-of param-reg ]
+    [ [ 0 ] dip reg-class-of cdecl param-reg ]
     [ reg-class-of return-reg ]
     [ ]
     tri %copy ;
@@ -165,7 +163,7 @@ M:: x86.64 %unbox-large-struct ( n c-type -- )
 M:: x86.64 %box ( n rep func -- )
     n [
         n
-        0 rep reg-class-of param-reg
+        0 rep reg-class-of cdecl param-reg
         rep %load-param-reg
     ] [
         rep load-return-value
@@ -253,7 +251,7 @@ M: x86.64 %end-callback-value ( ctype -- )
     unbox-return ;
 
 : float-function-param ( i src -- )
-    [ float-regs param-regs nth ] dip double-rep %copy ;
+    [ float-regs cdecl param-regs nth ] dip double-rep %copy ;
 
 : float-function-return ( reg -- )
     float-regs return-reg double-rep %copy ;
@@ -280,6 +278,8 @@ M:: x86.64 %call-gc ( gc-root-count temp -- )
     param-reg-2 %mov-vm-ptr
     ! Call GC
     "inline_gc" f %alien-invoke ;
+
+M: x86.64 struct-return-pointer-type void* ;
 
 ! The result of reading 4 bytes from memory is a fixnum on
 ! x86-64.

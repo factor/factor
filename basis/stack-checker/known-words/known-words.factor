@@ -289,7 +289,7 @@ M: bad-executable summary
 \ (dlsym) { byte-array object } { c-ptr } define-primitive
 \ (exists?) { string } { object } define-primitive
 \ (exit) { integer } { } define-primitive
-\ (float>string) { float } { byte-array } define-primitive \ (float>string) make-foldable
+\ (format-float) { float byte-array } { byte-array } define-primitive \ (format-float) make-foldable
 \ (fopen) { byte-array byte-array } { alien } define-primitive
 \ (identity-hashcode) { object } { fixnum } define-primitive
 \ (save-image) { byte-array byte-array } { } define-primitive

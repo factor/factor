@@ -31,7 +31,7 @@ HELP: new-action
 { $description "Constructs a subclass of " { $link action } "." } ;
 
 HELP: page-action
-{ $class-description "The class of Chloe page actions. These are actions whose " { $slot "display" } " slot is pre-set to serve the Chloe template stored in the " { $slot "page" } " slot." } ;
+{ $class-description "The class of Chloe page actions. These are actions whose " { $slot "display" } " slot is pre-set to serve the Chloe template stored in the " { $slot "template" } " slot. The " { $slot "template" } " slot contains a pair with shape " { $snippet "{ responder name }" } "." } ;
 
 HELP: validate-integer-id
 { $description "A utility word which validates an integer parameter named " { $snippet "id" } "." }

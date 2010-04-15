@@ -4,8 +4,10 @@ USING: accessors alien alien.c-types alien.libraries arrays
 assocs classes combinators combinators.short-circuit
 compiler.units effects grouping kernel parser sequences
 splitting words fry locals lexer namespaces summary math
-vocabs.parser ;
+vocabs.parser words.constant ;
 IN: alien.parser
+
+SYMBOL: current-library
 
 : parse-c-type-name ( name -- word )
     dup search [ ] [ no-word ] ?if ;
@@ -51,13 +53,16 @@ ERROR: *-in-c-type-name name ;
     dup "*" tail?
     [ *-in-c-type-name ] when ;
 
-: CREATE-C-TYPE ( -- word )
-    scan validate-c-type-name current-vocab create {
+: (CREATE-C-TYPE) ( word -- word )
+    validate-c-type-name current-vocab create {
         [ fake-definition ]
         [ set-word ]
         [ reset-c-type ]
         [ ]
     } cleave ;
+
+: CREATE-C-TYPE ( -- word )
+    scan (CREATE-C-TYPE) ;
 
 <PRIVATE
 GENERIC: return-type-name ( type -- name )
@@ -71,6 +76,18 @@ M: pointer return-type-name to>> return-type-name CHAR: * suffix ;
     [ [ <pointer> ] dip parse-pointers ] when ;
 
 PRIVATE>
+
+: define-enum-member ( word-string value -- next-value )
+     [ create-in ] dip [ define-constant ] keep 1 + ;
+
+: parse-enum-member ( word-string value -- next-value )
+     over "{" =
+     [ 2drop scan scan-object define-enum-member "}" expect ]
+     [ define-enum-member ] if ;
+
+: parse-enum-members ( counter -- )
+     scan dup ";" = not
+     [ swap parse-enum-member parse-enum-members ] [ 2drop ] if ;
 
 : scan-function-name ( -- return function )
     scan-c-type scan parse-pointers ;
@@ -96,13 +113,19 @@ PRIVATE>
 : function-effect ( names return -- effect )
     [ { } ] [ return-type-name 1array ] if-void <effect> ;
 
-:: make-function ( return function library types names -- word quot effect )
-    function create-in dup reset-generic
+: create-function ( name -- word )
+    create-in dup reset-generic ;
+
+:: (make-function) ( return function library types names -- quot effect )
     return library function types function-quot
     names return function-effect ;
 
-: (FUNCTION:) ( -- word quot effect )
-    scan-function-name "c-library" get ";" scan-c-args make-function ;
+:: make-function ( return function library types names -- word quot effect )
+    function create-function
+    return function library types names (make-function) ;
+
+: (FUNCTION:) ( -- return function library types names )
+    scan-function-name current-library get ";" scan-c-args ;
 
 : callback-quot ( return types abi -- quot )
     '[ [ _ _ _ ] dip alien-callback ] ;
@@ -116,14 +139,24 @@ PRIVATE>
     type-word return types lib library-abi callback-quot (( quot -- alien )) ;
 
 : (CALLBACK:) ( -- word quot effect )
-    "c-library" get
+    current-library get
     scan-function-name ";" scan-c-args make-callback-type ;
 
-PREDICATE: alien-function-word < word
+PREDICATE: alien-function-alias-word < word
     def>> {
         [ length 5 = ]
         [ last \ alien-invoke eq? ]
     } 1&& ;
 
+PREDICATE: alien-function-word < alien-function-alias-word
+    [ def>> third ] [ name>> ] bi = ;
+
 PREDICATE: alien-callback-type-word < typedef-word
     "callback-effect" word-prop ;
+
+: global-quot ( type word -- quot )
+    name>> current-library get '[ _ _ address-of 0 ]
+    swap c-type-getter-boxer append ;
+
+: define-global ( type word -- )
+    [ nip ] [ global-quot ] 2bi (( -- value )) define-declared ;

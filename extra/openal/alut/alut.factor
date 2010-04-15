@@ -14,7 +14,7 @@ IN: openal.alut
             "/System/Library/Frameworks/OpenAL.framework/OpenAL"
         ] }
         { [ os unix?  ]  [ "libalut.so" ] }
-    } cond "cdecl" add-library >>
+    } cond cdecl add-library >>
 
 << os macosx? [ "alut" deploy-library ] unless >>
 

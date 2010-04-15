@@ -1,8 +1,9 @@
 ! Based on http://shootout.alioth.debian.org/gp4/benchmark.php?test=fasta&lang=java&id=2
-USING: alien.c-types math kernel io io.files locals multiline
-assocs sequences sequences.private benchmark.reverse-complement
-hints io.encodings.ascii byte-arrays specialized-arrays ;
-SPECIALIZED-ARRAY: double
+USING: assocs benchmark.reverse-complement byte-arrays fry io
+io.encodings.ascii io.files locals kernel math sequences
+sequences.private specialized-arrays strings typed ;
+QUALIFIED-WITH: alien.c-types c
+SPECIALIZED-ARRAY: c:double
 IN: benchmark.fasta
 
 CONSTANT: IM 139968
@@ -11,10 +12,8 @@ CONSTANT: IC 29573
 CONSTANT: initial-seed 42
 CONSTANT: line-length 60
 
-: random ( seed -- n seed )
-    >float IA * IC + IM mod [ IM /f ] keep ; inline
-
-HINTS: random fixnum ;
+: random ( seed -- seed n )
+    >float IA * IC + IM mod dup IM /f ; inline
 
 CONSTANT: ALU "GGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAA"
 
@@ -46,34 +45,32 @@ CONSTANT: homo-sapiens
         { CHAR: t 0.3015094502008 }
     }
 
-: make-cumulative ( freq -- chars floats )
+TYPED: make-cumulative ( freq -- chars: byte-array floats: double-array )
     [ keys >byte-array ]
-    [ values >double-array ] bi unclip [ + ] accumulate swap suffix ;
+    [ values >double-array unclip [ + ] accumulate swap suffix ] bi ;
 
 :: select-random ( seed chars floats -- seed elt )
-    floats seed random -rot
-    [ >= ] curry find drop
-    chars nth-unsafe ; inline
+    seed random floats [ <= ] with find drop chars nth-unsafe ; inline
 
-: make-random-fasta ( seed len chars floats -- seed )
-    [ iota ] 2dip [ [ drop ] 2dip select-random ] 2curry "" map-as print ; inline
+TYPED: make-random-fasta ( seed: fixnum len: fixnum chars: byte-array floats: double-array -- seed: fixnum )
+    '[ _ _ select-random ] "" replicate-as print ;
 
 : write-description ( desc id -- )
-    ">" write write bl print ; inline
+    ">" write write bl print ;
 
 :: split-lines ( n quot -- )
     n line-length /mod
     [ [ line-length quot call ] times ] dip
     quot unless-zero ; inline
 
-: write-random-fasta ( seed n chars floats desc id -- seed )
+TYPED: write-random-fasta ( seed: fixnum n: fixnum chars: byte-array floats: double-array desc id -- seed: fixnum )
     write-description
-    [ make-random-fasta ] 2curry split-lines ; inline
+    '[ _ _ make-random-fasta ] split-lines ;
 
-:: make-repeat-fasta ( k len alu -- k' )
+TYPED:: make-repeat-fasta ( k: fixnum len: fixnum alu: string -- k': fixnum )
     alu length :> kn
     len iota [ k + kn mod alu nth-unsafe ] "" map-as print
-    k len + ; inline
+    k len + ;
 
 : write-repeat-fasta ( n alu desc id -- )
     write-description
@@ -81,7 +78,7 @@ CONSTANT: homo-sapiens
         :> alu
         0 :> k!
         [| len | k len alu make-repeat-fasta k! ] split-lines
-    ] ; inline
+    ] ;
 
 : fasta ( n out -- )
     homo-sapiens make-cumulative

@@ -1,10 +1,11 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: literals windows.kernel32 math alien.syntax windows.types classes.struct
-alien.c-types windows.errors windows.ole32 windows.advapi32 alien.libraries ;
+USING: literals windows.kernel32 math alien.syntax windows.types
+classes.struct alien alien.c-types windows.errors windows.ole32
+windows.advapi32 alien.libraries ;
 IN: windows.ddk.setupapi
 
-<< "setupapi" "setupapi.dll" "stdcall" add-library >>
+<< "setupapi" "setupapi.dll" stdcall add-library >>
 LIBRARY: setupapi
 
 TYPEDEF: DWORDLONG SP_LOG_TOKEN
@@ -1515,14 +1516,13 @@ FUNCTION: BOOL SetupRemoveFileLogEntryA ( HSPFILELOG FileLogHandle, PCSTR LogSec
 FUNCTION: BOOL SetupRemoveFileLogEntryW ( HSPFILELOG FileLogHandle, PCWSTR LogSectionName, PCWSTR TargetFilename ) ;
 ALIAS: SetupRemoveFileLogEntry SetupRemoveFileLogEntryW
 
-C-ENUM:
+C-ENUM: SetupFileLogInfo
     SetupFileLogSourceFilename
     SetupFileLogChecksum
     SetupFileLogDiskTagfile
     SetupFileLogDiskDescription
     SetupFileLogOtherInfo
     SetupFileLogMax ;
-TYPEDEF: int SetupFileLogInfo
 
 FUNCTION: BOOL SetupQueryFileLogA ( HSPFILELOG FileLogHandle, PCSTR LogSectionName, PCSTR TargetFilename, SetupFileLogInfo DesiredInfo, PSTR DataOut, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
 FUNCTION: BOOL SetupQueryFileLogW ( HSPFILELOG FileLogHandle, PCWSTR LogSectionName, PCWSTR TargetFilename, SetupFileLogInfo DesiredInfo, PWSTR DataOut, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;

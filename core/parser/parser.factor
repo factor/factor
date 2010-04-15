@@ -207,3 +207,5 @@ print-use-hook [ [ ] ] initialize
 
 : ?run-file ( path -- )
     dup exists? [ run-file ] [ drop ] if ;
+
+ERROR: version-control-merge-conflict ;

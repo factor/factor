@@ -107,8 +107,7 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
     [ callbacks get ] dip '[ _ <callback> ] cache ;
 
 : callback-bottom ( params -- )
-    [ xt>> ] [ callback-return-rewind ] bi
-    '[ _ _ callback-xt ] infer-quot-here ;
+    [ xt>> ] [ stack-cleanup ] bi '[ _ _ callback-xt ] infer-quot-here ;
 
 : infer-alien-callback ( -- )
     alien-callback-params new

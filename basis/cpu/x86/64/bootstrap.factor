@@ -11,10 +11,11 @@ IN: bootstrap.x86
 : shift-arg ( -- reg ) RCX ;
 : div-arg ( -- reg ) RAX ;
 : mod-arg ( -- reg ) RDX ;
-: temp0 ( -- reg ) RDI ;
-: temp1 ( -- reg ) RSI ;
+: temp0 ( -- reg ) RAX ;
+: temp1 ( -- reg ) RCX ;
 : temp2 ( -- reg ) RDX ;
 : temp3 ( -- reg ) RBX ;
+: pic-tail-reg ( -- reg ) RBX ;
 : return-reg ( -- reg ) RAX ;
 : nv-reg ( -- reg ) RBX ;
 : stack-reg ( -- reg ) RSP ;
@@ -25,11 +26,6 @@ IN: bootstrap.x86
 : rs-reg ( -- reg ) R15 ;
 : fixnum>slot@ ( -- ) temp0 1 SAR ;
 : rex-length ( -- n ) 1 ;
-
-: jit-save-tib ( -- ) ;
-: jit-restore-tib ( -- ) ;
-: jit-update-tib ( ctx-reg -- ) drop ;
-: jit-install-seh ( -- ) stack-reg bootstrap-cell ADD ;
 
 : jit-call ( name -- )
     RAX 0 MOV rc-absolute-cell jit-dlsym
@@ -47,7 +43,7 @@ IN: bootstrap.x86
 ] jit-prolog jit-define
 
 [
-    temp3 5 [RIP+] LEA
+    pic-tail-reg 5 [RIP+] LEA
     0 JMP rc-relative rt-entry-point-pic-tail jit-rel
 ] jit-word-jump jit-define
 
@@ -164,6 +160,11 @@ IN: bootstrap.x86
 [ jit-jump-quot ]
 \ lazy-jit-compile define-combinator-primitive
 
+[
+    temp2 HEX: ffffffff MOV rc-absolute-cell rt-literal jit-rel
+    temp1 temp2 CMP
+] pic-check-tuple jit-define
+
 ! Inline cache miss entry points
 : jit-load-return-address ( -- )
     RBX RSP stack-frame-size bootstrap-cell - [+] MOV ;
@@ -238,7 +239,9 @@ IN: bootstrap.x86
     RSP ctx-reg context-callstack-top-offset [+] MOV
 
     ! Load new ds, rs registers
-    jit-restore-context ;
+    jit-restore-context
+
+    ctx-reg jit-update-tib ;
 
 : jit-pop-context-and-param ( -- )
     arg1 ds-reg [] MOV
@@ -293,6 +296,3 @@ IN: bootstrap.x86
     jit-delete-current-context
     jit-start-context
 ] \ (start-context-and-delete) define-sub-primitive
-
-<< "vocab:cpu/x86/bootstrap.factor" parse-file suffix! >>
-call

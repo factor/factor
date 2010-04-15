@@ -1,9 +1,12 @@
 #if defined(_MSC_VER)
 	#define FACTOR_STDCALL(return_type) return_type __stdcall
+	#define FACTOR_FASTCALL(return_type) return_type __fastcall
 #elif defined(i386) || defined(__i386) || defined(__i386__)
 	#define FACTOR_STDCALL(return_type) __attribute__((stdcall)) return_type
+	#define FACTOR_FASTCALL(return_type) __attribute__((fastcall)) return_type
 #else
 	#define FACTOR_STDCALL(return_type) return_type
+	#define FACTOR_FASTCALL(return_type) return_type
 #endif
 
 #if defined(__APPLE__)
@@ -119,3 +122,14 @@ struct bool_field_test {
 FACTOR_EXPORT short ffi_test_48(struct bool_field_test x);
 
 #endif
+
+FACTOR_EXPORT FACTOR_FASTCALL(int) ffi_test_49(int x);
+FACTOR_EXPORT FACTOR_FASTCALL(int) ffi_test_50(int x, int y);
+FACTOR_EXPORT FACTOR_FASTCALL(int) ffi_test_51(int x, int y, int z);
+FACTOR_EXPORT FACTOR_FASTCALL(int) ffi_test_52(int x, float y, int z);
+FACTOR_EXPORT FACTOR_FASTCALL(int) ffi_test_53(int x, float y, int z, int w);
+FACTOR_EXPORT FACTOR_FASTCALL(int) ffi_test_54(struct test_struct_11 x, int y);
+FACTOR_EXPORT FACTOR_FASTCALL(int) ffi_test_55(struct test_struct_11 x, int y, int z);
+FACTOR_EXPORT FACTOR_FASTCALL(int) ffi_test_56(struct test_struct_11 x, int y, int z, int w);
+FACTOR_EXPORT FACTOR_FASTCALL(struct test_struct_11) ffi_test_57(int x, int y);
+FACTOR_EXPORT FACTOR_FASTCALL(struct test_struct_11) ffi_test_58(int x, int y, int z);

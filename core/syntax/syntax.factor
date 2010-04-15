@@ -257,4 +257,12 @@ IN: bootstrap.syntax
     "call(" [ \ call-effect parse-call( ] define-core-syntax
 
     "execute(" [ \ execute-effect parse-call( ] define-core-syntax
+
+    "<<<<<<<" [ version-control-merge-conflict ] define-core-syntax
+    "=======" [ version-control-merge-conflict ] define-core-syntax
+    ">>>>>>>" [ version-control-merge-conflict ] define-core-syntax
+
+    "<<<<<<" [ version-control-merge-conflict ] define-core-syntax
+    "======" [ version-control-merge-conflict ] define-core-syntax
+    ">>>>>>" [ version-control-merge-conflict ] define-core-syntax
 ] with-compilation-unit
