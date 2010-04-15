@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.strings alien.syntax arrays
-classes.struct fry io.encodings.ascii kernel locals math
+classes.struct fry io.encodings.ascii io.mmap kernel locals math
 math.intervals sequences specialized-arrays strings typed ;
 IN: elf
 
@@ -611,4 +611,16 @@ M:: segment sections ( segment -- sections )
     symbol sym>> st_size>> <direct-uchar-array> ;
 
 : find-section ( sections name -- section/f )
-    '[ name>> _ = ] find nip ;
+    '[ name>> _ = ] find nip ; inline
+
+: find-symbol ( symbols name -- symbol/f )
+    '[ name>> _ = ] find nip ; inline
+
+: find-section-symbol ( sections section symbol -- symbol/f )
+    [ find-section ] dip over [
+        [ symbols ] dip find-symbol ] [ 2drop f ] if ;
+
+: with-mapped-elf ( path quot -- )
+    '[
+        address>> <elf> @
+    ] with-mapped-file ; inline
