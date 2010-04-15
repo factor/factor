@@ -15,9 +15,9 @@ IN: mason
     error. flush ;
 
 : build-loop ( -- )
-    notify-heartbeat
     ?prepare-build-machine
     [
+        notify-heartbeat
         [
             builds/factor set-current-directory
             new-code-available? [ build ] when
