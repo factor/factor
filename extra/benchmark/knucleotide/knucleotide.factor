@@ -14,7 +14,7 @@ IN: benchmark.knucleotide
     CHAR: \n swap remove >upper ;
 
 : handle-table ( inputs n -- )
-    clump
+    <clumps>
     [ histogram >alist sort-values reverse ] [ length ] bi
     '[
         [ first write bl ]
@@ -22,7 +22,7 @@ IN: benchmark.knucleotide
     ] each ;
 
 : handle-n ( input x -- )
-    [ nip ] [ length clump histogram ] 2bi at 0 or "%d\t" printf ;
+    [ nip ] [ length <clumps> histogram ] 2bi at 0 or "%d\t" printf ;
 
 : process-input ( input -- )
     [ 1 handle-table nl ]
