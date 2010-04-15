@@ -286,7 +286,7 @@ $nl
 
 HELP: accumulate
 { $values { "seq" sequence } { "identity" object } { "quot" { $quotation "( ... prev elt -- ... next )" } } { "final" "the final result" } { "newseq" "a new array" } }
-{ $description "Combines successive elements of the sequence using a binary operation, and outputs an array of intermediate results, together with the final result."
+{ $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of intermediate results, together with the final result."
 $nl
 "The first element of the new sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the old sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the old sequence."
 $nl
