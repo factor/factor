@@ -36,7 +36,12 @@ M: library dispose dll>> [ dispose ] when* ;
     [ <library> swap libraries get set-at ] 3bi ;
 
 : library-abi ( library -- abi )
-    library [ abi>> ] [ "cdecl" ] if* ;
+    library [ abi>> ] [ cdecl ] if* ;
+
+ERROR: no-such-symbol name library ;
+
+: address-of ( name library -- value )
+    2dup load-library dlsym [ 2nip ] [ no-such-symbol ] if* ;
 
 SYMBOL: deploy-libraries
 

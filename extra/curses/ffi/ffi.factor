@@ -8,7 +8,7 @@ IN: curses.ffi
     { [ os winnt? ]  [ "libcurses.dll" ] }
     { [ os macosx? ] [ "libcurses.dylib" ] }
     { [ os unix?  ]  [ "libcurses.so" ] }
-} cond "cdecl" add-library >>
+} cond cdecl add-library >>
 
 C-TYPE: WINDOW
 C-TYPE: SCREEN

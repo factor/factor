@@ -114,7 +114,7 @@ unless
         ] [
             first2 (finish-thunk)
         ] bi*
-        "stdcall" swap compile-alien-callback
+        stdcall swap compile-alien-callback
     ] 2map ;
 
 : (make-callbacks) ( implementations -- sequence )

@@ -1,14 +1,15 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.libraries alien.syntax classes.struct
-combinators system alien.accessors byte-arrays kernel ;
+USING: alien alien.c-types alien.libraries alien.syntax
+classes.struct combinators system alien.accessors byte-arrays
+kernel ;
 IN: opencl.ffi
 
 << "opencl" {
-        { [ os windows? ] [ "OpenCL.dll" ] }
-        { [ os macosx? ] [ "/System/Library/Frameworks/OpenCL.framework/OpenCL" ] }
-        { [ os unix? ] [ "libOpenCL.so" ] }
-    } cond "stdcall" add-library >>
+        { [ os windows? ] [ "OpenCL.dll" stdcall ] }
+        { [ os macosx? ] [ "/System/Library/Frameworks/OpenCL.framework/OpenCL" cdecl ] }
+        { [ os unix? ] [ "libOpenCL.so" cdecl ] }
+    } cond add-library >>
 LIBRARY: opencl
 
 ! cl_platform.h

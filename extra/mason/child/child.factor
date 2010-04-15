@@ -4,13 +4,20 @@ USING: accessors arrays calendar combinators.short-circuit fry
 continuations debugger io.directories io.files io.launcher
 io.pathnames io.encodings.ascii kernel make mason.common mason.config
 mason.platform mason.report mason.notify namespaces sequences
-quotations macros system combinators ;
+quotations macros system combinators splitting ;
 IN: mason.child
+
+: nmake-cmd ( -- args )
+    { "nmake" "/f" "nmakefile" }
+    target-cpu get "." split "-" join suffix ;
+
+: gnu-make-cmd ( -- args )
+    gnu-make platform 2array ;
 
 : make-cmd ( -- args )
     {
-        { [ target-os get "winnt" = ] [ { "nmake" "/f" "nmakefile" } ] }
-        [ gnu-make platform 2array ]
+        { [ target-os get "winnt" = ] [ nmake-cmd ] }
+        [ gnu-make-cmd ]
     } cond ;
 
 : make-vm ( -- )

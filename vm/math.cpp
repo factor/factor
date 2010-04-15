@@ -260,10 +260,12 @@ void factor_vm::primitive_bignum_to_float()
 	ctx->replace(allot_float(bignum_to_float(ctx->peek())));
 }
 
-void factor_vm::primitive_float_to_str()
+void factor_vm::primitive_format_float()
 {
-	byte_array *array = allot_byte_array(33);
-	SNPRINTF((char *)(array + 1),32,"%.16g",untag_float_check(ctx->pop()));
+	byte_array *array = allot_byte_array(100);
+	char *format = alien_offset(ctx->pop());
+	double value = untag_float_check(ctx->pop());
+	SNPRINTF(array->data<char>(),99,format,value);
 	ctx->push(tag<byte_array>(array));
 }
 

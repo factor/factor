@@ -9,7 +9,7 @@ IN: tokyo.alien.tcrdb
     { [ os macosx? ] [ "/opt/local/lib/libtokyotyrant.dylib" ] }
     { [ os unix? ] [ "libtokyotyrant.so" ] }
     { [ os windows? ] [ "tokyotyrant.dll" ] }
-} cond "cdecl" add-library >>
+} cond cdecl add-library >>
 
 LIBRARY: tokyotyrant
 
@@ -25,7 +25,7 @@ C-TYPE: TCRDB
 !     { timeout double }
 !     { opts int } ;
 
-C-ENUM:
+C-ENUM: f
     TTESUCCESS
     TTEINVALID
     TTENOHOST

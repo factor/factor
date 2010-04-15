@@ -1,8 +1,9 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http:// factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.syntax classes.struct combinators
-combinators.short-circuit kernel math math.order sequences
-typed specialized-arrays locals system alien.libraries ;
+USING: accessors alien alien.c-types alien.libraries
+alien.syntax classes.struct combinators combinators.short-circuit
+kernel math math.order sequences typed specialized-arrays locals
+system ;
 SPECIALIZED-ARRAY: void*
 IN: chipmunk.ffi
 
@@ -11,7 +12,7 @@ IN: chipmunk.ffi
     { [ os windows? ] [ "chipmunk.dll" ] }
     { [ os macosx? ] [ "libchipmunk.dylib"  ] }
     { [ os unix?  ] [ "libchipmunk.so" ] }
-} cond "cdecl" add-library
+} cond cdecl add-library
 
 "chipmunk" deploy-library
 >>
@@ -348,12 +349,11 @@ STRUCT: cpSegmentQueryInfo
     { t     cpFloat  }
     { n     cpVect   } ;
 
-C-ENUM:
+C-ENUM: cpShapeType
     CP_CIRCLE_SHAPE
     CP_SEGMENT_SHAPE
     CP_POLY_SHAPE
     CP_NUM_SHAPES ;
-TYPEDEF: int cpShapeType
 
 CALLBACK: cpBB cacheData_cb ( cpShape* shape, cpVect p, cpVect rot ) ;
 CALLBACK: void destroy_cb ( cpShape* shape ) ;
@@ -482,11 +482,10 @@ STRUCT: cpContact
 
 FUNCTION: cpContact* cpContactInit ( cpContact* con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash ) ;
 
-C-ENUM:
+C-ENUM: cpArbiterState
     cpArbiterStateNormal
     cpArbiterStateFirstColl
     cpArbiterStateIgnore ;
-TYPEDEF: int cpArbiterState
 
 STRUCT: cpArbiter
     { numContacts int                 }

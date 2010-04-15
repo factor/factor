@@ -4,9 +4,11 @@ assocs byte-arrays classes.struct classes.tuple.parser
 classes.tuple.private classes.tuple combinators compiler.tree.debugger
 compiler.units destructors io.encodings.utf8 io.pathnames
 io.streams.string kernel libc literals math mirrors namespaces
-prettyprint prettyprint.config see sequences specialized-arrays system
-tools.test parser lexer eval layouts generic.single classes ;
+prettyprint prettyprint.config see sequences specialized-arrays
+system tools.test parser lexer eval layouts generic.single classes
+vocabs ;
 FROM: math => float ;
+FROM: specialized-arrays.private => specialized-array-vocab ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: char
 SPECIALIZED-ARRAY: int
@@ -301,6 +303,12 @@ SPECIALIZED-ARRAY: struct-test-optimization
 [ t ] [
     [ struct-test-optimization <struct> struct-test-optimization <struct> [ x>> ] bi@ ]
     { x>> } inlined?
+] unit-test
+
+[ ] [
+    [
+        struct-test-optimization specialized-array-vocab forget-vocab
+    ] with-compilation-unit
 ] unit-test
 
 ! Test cloning structs

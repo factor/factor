@@ -13,9 +13,9 @@ USING: alien kernel system combinators alien.syntax ;
 IN: cryptlib.libcl
 
 << "libcl" {
-        { [ win32? ] [ "cl32.dll" "stdcall" ] }
-        { [ macosx? ] [ "libcl.dylib" "cdecl" ] }
-        { [ unix? ] [ "libcl.so" "cdecl" ] }
+        { [ win32? ] [ "cl32.dll" stdcall ] }
+        { [ macosx? ] [ "libcl.dylib" cdecl ] }
+        { [ unix? ] [ "libcl.so" cdecl ] }
     } cond add-library >>
 
 ! ===============================================
@@ -878,7 +878,7 @@ TYPEDEF: int CRYPT_KEYID_TYPE
 ! Internal keyset options
 ! (As _NONE but open for exclusive access, _CRYPT_DEFINED
 ! Last possible key option type, _CRYPT_DEFINED Last external keyset option)
-C-ENUM:
+C-ENUM: f
     CRYPT_KEYOPT_NONE
     CRYPT_KEYOPT_READONLY
     CRYPT_KEYOPT_CREATE

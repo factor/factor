@@ -1,5 +1,5 @@
 ! (c)2010 Joe Groff bsd license
-USING: accessors cursors make math sequences sorting tools.test ;
+USING: accessors cursors kernel make math sequences sorting tools.test ;
 FROM: cursors => each map assoc-each assoc>map ;
 IN: cursors.tests
 
@@ -12,6 +12,10 @@ IN: cursors.tests
     T{ linear-cursor f 1 1 } T{ linear-cursor f 5 1 } [ value>> 3 mod zero? ] -find
 ] unit-test
 
+[ T{ linear-cursor f 5 1 } ] [
+    T{ linear-cursor f 1 1 } T{ linear-cursor f 5 1 } [ value>> 6 = ] -find
+] unit-test
+
 [ { 1 3 } ] [
     [ T{ linear-cursor f 1 2 } T{ linear-cursor f 5 2 } [ value>> , ] -each ]
     { } make
@@ -20,20 +24,6 @@ IN: cursors.tests
 [ B{ 1 2 3 4 5 } ] [ [ { 1 2 3 4 5 } [ , ] each ] B{ } make ] unit-test
 [ B{ } ] [ [ { } [ , ] each ] B{ } make ] unit-test
 [ { 2 4 6 8 10 } ] [ { 1 2 3 4 5 } [ 2 * ] map ] unit-test
-
-[ { "roses: lutefisk" "tulips: lox" } ]
-[
-    [
-        { { "roses" "lutefisk" } { "tulips" "lox" } }
-        [ ": " glue , ] assoc-each
-    ] { } make
-] unit-test
-
-[ { "roses: lutefisk" "tulips: lox" } ]
-[
-    { { "roses" "lutefisk" } { "tulips" "lox" } }
-    [ ": " glue ] { } assoc>map
-] unit-test
 
 [ { "roses: lutefisk" "tulips: lox" } ]
 [
@@ -65,8 +55,14 @@ IN: cursors.tests
 [ { 2 4 6 8 10 } ] [ { 1 2 3 4 5 } compile-test-map ] unit-test
 
 [ { "roses: lutefisk" "tulips: lox" } ]
-[ [ { { "roses" "lutefisk" } { "tulips" "lox" } } compile-test-assoc-each ] { } make ] unit-test
+[
+    [ H{ { "roses" "lutefisk" } { "tulips" "lox" } } compile-test-assoc-each ]
+    { } make natural-sort
+] unit-test
 
 [ { "roses: lutefisk" "tulips: lox" } ]
-[ { { "roses" "lutefisk" } { "tulips" "lox" } } compile-test-assoc>map ] unit-test
+[
+    H{ { "roses" "lutefisk" } { "tulips" "lox" } } compile-test-assoc>map
+    natural-sort
+] unit-test
 

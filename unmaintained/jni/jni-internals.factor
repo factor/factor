@@ -296,61 +296,61 @@ FUNCTION: jint JNI_CreateJavaVM ( void** pvm, void** penv, void* args ) ;
   ] when ;
 
 : (destroy-java-vm) 
-  "int" { "void*" } "cdecl" alien-indirect ;
+  "int" { "void*" } cdecl alien-indirect ;
 
 : (attach-current-thread) 
-  "int" { "void*" "void*" "void*" } "cdecl" alien-indirect ;
+  "int" { "void*" "void*" "void*" } cdecl alien-indirect ;
 
 : (detach-current-thread) 
-  "int" { "void*" } "cdecl" alien-indirect ;
+  "int" { "void*" } cdecl alien-indirect ;
 
 : (get-env) 
-  "int" { "void*" "void*" "int" } "cdecl" alien-indirect ;
+  "int" { "void*" "void*" "int" } cdecl alien-indirect ;
 
 : (attach-current-thread-as-daemon) 
-  "int" { "void*" "void*" "void*" } "cdecl" alien-indirect ;
+  "int" { "void*" "void*" "void*" } cdecl alien-indirect ;
 
 : destroy-java-vm ( javavm -- int )
   dup JavaVM-functions JNIInvokeInterface-DestroyJavaVM (destroy-java-vm) ;
 
 : (get-version) 
-  "jint" { "JNIEnv*" } "cdecl" alien-indirect ;
+  "jint" { "JNIEnv*" } cdecl alien-indirect ;
 
 : get-version ( jnienv -- int )
   dup JNIEnv-functions JNINativeInterface-GetVersion (get-version) ;
   
 : (find-class) 
-  "void*" { "JNINativeInterface*" "char*" } "cdecl" alien-indirect ;
+  "void*" { "JNINativeInterface*" "char*" } cdecl alien-indirect ;
 
 : find-class ( name jnienv -- int )
   dup swapd JNIEnv-functions JNINativeInterface-FindClass (find-class) ;
 
 : (get-static-field-id) 
-  "void*" { "JNINativeInterface*" "void*" "char*" "char*" } "cdecl" alien-indirect ;
+  "void*" { "JNINativeInterface*" "void*" "char*" "char*" } cdecl alien-indirect ;
 
 : get-static-field-id ( class name sig jnienv -- int )
   dup >r >r 3array r> swap first3 r> JNIEnv-functions JNINativeInterface-GetStaticFieldID (get-static-field-id) ;
 
 : (get-static-object-field) 
-  "void*" { "JNINativeInterface*" "void*" "void*" } "cdecl" alien-indirect ;
+  "void*" { "JNINativeInterface*" "void*" "void*" } cdecl alien-indirect ;
 
 : get-static-object-field ( class id jnienv -- int )
   dup >r >r 2array r> swap first2 r> JNIEnv-functions JNINativeInterface-GetStaticObjectField (get-static-object-field) ;
 
 : (get-method-id) 
-  "void*" { "JNINativeInterface*" "void*" "char*" "char*" } "cdecl" alien-indirect ;
+  "void*" { "JNINativeInterface*" "void*" "char*" "char*" } cdecl alien-indirect ;
 
 : get-method-id ( class name sig jnienv -- int )
   dup >r >r 3array r> swap first3 r> JNIEnv-functions JNINativeInterface-GetMethodID (get-method-id) ;
 
 : (new-string) 
-  "void*" { "JNINativeInterface*" "char*" "int" } "cdecl" alien-indirect ;
+  "void*" { "JNINativeInterface*" "char*" "int" } cdecl alien-indirect ;
 
 : new-string ( str jnienv -- str )
   dup >r >r dup length 2array r> swap first2 r> JNIEnv-functions JNINativeInterface-NewString (new-string) ;
 
 : (call1) 
-  "void" { "JNINativeInterface*" "void*" "void*" "int" } "cdecl" alien-indirect ;
+  "void" { "JNINativeInterface*" "void*" "void*" "int" } cdecl alien-indirect ;
 
 : call1 ( obj method-id jstr jnienv -- )
   dup >r >r 3array r> swap first3 r> JNIEnv-functions JNINativeInterface-CallObjectMethod (call1) ;
