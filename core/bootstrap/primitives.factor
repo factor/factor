@@ -470,7 +470,7 @@ tuple
     { "byte-array>bignum" "math" "primitive_byte_array_to_bignum" (( x -- y )) }
     { "double>bits" "math" "primitive_double_bits" (( x -- n )) }
     { "float>bits" "math" "primitive_float_bits" (( x -- n )) }
-    { "(float>string)" "math.parser.private" "primitive_float_to_str" (( n -- str )) }
+    { "(format-float)" "math.parser.private" "primitive_format_float" (( n format -- byte-array )) }
     { "bignum*" "math.private" "primitive_bignum_multiply" (( x y -- z )) }
     { "bignum+" "math.private" "primitive_bignum_add" (( x y -- z )) }
     { "bignum-" "math.private" "primitive_bignum_subtract" (( x y -- z )) }

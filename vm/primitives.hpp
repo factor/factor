@@ -82,8 +82,8 @@ namespace factor
 	_(float_subtract) \
 	_(float_to_bignum) \
 	_(float_to_fixnum) \
-	_(float_to_str) \
 	_(fopen) \
+	_(format_float) \
 	_(fputc) \
 	_(fread) \
 	_(fseek) \

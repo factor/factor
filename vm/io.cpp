@@ -216,7 +216,7 @@ void factor_vm::primitive_fread()
 		if(feof(file))
 		{
 			byte_array *new_buf = allot_byte_array(c);
-			memcpy(new_buf + 1, buf.untagged() + 1,c);
+			memcpy(new_buf->data<char>(), buf->data<char>(),c);
 			buf = new_buf;
 		}
 
