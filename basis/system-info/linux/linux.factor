@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: unix alien alien.c-types kernel math sequences strings
 io.backend.unix splitting io.encodings.utf8 io.encodings.string
-specialized-arrays ;
+specialized-arrays alien.syntax ;
 SPECIALIZED-ARRAY: char
 IN: system-info.linux
 
