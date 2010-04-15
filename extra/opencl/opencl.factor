@@ -1,10 +1,9 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.accessors alien.c-types arrays
-byte-arrays combinators combinators.smart continuations destructors
-fry io.encodings.ascii io.encodings.string kernel libc locals macros
-math math.order multiline opencl.ffi prettyprint sequences
-specialized-arrays typed variants namespaces ;
+USING: accessors alien alien.c-types arrays byte-arrays combinators
+combinators.smart destructors io.encodings.ascii io.encodings.string
+kernel libc locals math namespaces opencl.ffi sequences shuffle
+specialized-arrays variants ;
 IN: opencl
 SPECIALIZED-ARRAYS: void* char size_t ;
 
@@ -16,17 +15,25 @@ ERROR: cl-error err ;
 
 : cl-not-null ( err -- )
     dup f = [ cl-error ] [ drop ] if ; inline
+ 
+: info-data-size ( handle name info-quot -- size_t )
+    [ 0 f 0 <size_t> ] dip [ call cl-success ] 2keep drop *size_t ; inline
 
-MACRO: info ( info-quot lift-quot -- quot )
-    [ dup ] dip '[ 2dup 0 f 0 <size_t> _ '[ _ call cl-success ] keep
-       *size_t dup <byte-array> _ '[ f _ call cl-success ] keep
-       _ call ] ;
-   
-MACRO: 2info ( info-quot lift-quot -- quot )
-    [ dup ] dip '[ 3dup 0 f 0 <size_t> _ '[ _ call cl-success ] keep
-       *size_t dup <byte-array> _ '[ f _ call cl-success ] keep
-       _ call ] ;
-   
+: info-data-bytes ( handle name info-quot size -- bytes )
+    swap [ dup <byte-array> f ] dip [ call cl-success ] 3keep 2drop ; inline
+
+: info ( handle name info-quot lift-quot -- value )
+    [ 3dup info-data-size info-data-bytes ] dip call ; inline
+
+: 2info-data-size ( handle1 handle2 name info-quot -- size_t )
+    [ 0 f 0 <size_t> ] dip [ call cl-success ] 2keep drop *size_t ; inline
+
+: 2info-data-bytes ( handle1 handle2 name info-quot size -- bytes )
+    swap [ dup <byte-array> f ] dip [ call cl-success ] 3keep 2drop ; inline
+
+: 2info ( handle1 handle2 name info_quot lift_quot -- value )
+    [ 4dup 2info-data-size 2info-data-bytes ] dip call ; inline
+    
 : info-bool ( handle name quot -- ? )
     [ *uint CL_TRUE = ] info ; inline
 
@@ -156,6 +163,7 @@ C: <cl-buffer-range> cl-buffer-range
 SYMBOLS: cl-current-context cl-current-queue cl-current-device ;
 
 <PRIVATE
+
 : (current-cl-context) ( -- cl-context )
     cl-current-context get ; inline
 
@@ -200,7 +208,7 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
     } case ; inline
 
 : platform-info-string ( handle name -- string )
-    [ clGetPlatformInfo ] info-string ; inline
+    [ clGetPlatformInfo ] info-string ;
 
 : platform-info ( id -- profile version name vendor extensions )
     {
@@ -229,22 +237,22 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
     } case ; inline
 
 : device-info-bool ( handle name -- ? )
-    [ clGetDeviceInfo ] info-bool ; inline
+    [ clGetDeviceInfo ] info-bool ;
 
 : device-info-ulong ( handle name -- ulong )
-    [ clGetDeviceInfo ] info-ulong ; inline
+    [ clGetDeviceInfo ] info-ulong ;
 
 : device-info-uint ( handle name -- uint )
-    [ clGetDeviceInfo ] info-uint ; inline
+    [ clGetDeviceInfo ] info-uint ;
 
 : device-info-string ( handle name -- string )
-    [ clGetDeviceInfo ] info-string ; inline
+    [ clGetDeviceInfo ] info-string ;
 
 : device-info-size_t ( handle name -- size_t )
-    [ clGetDeviceInfo ] info-size_t ; inline
+    [ clGetDeviceInfo ] info-size_t ;
 
 : device-info-size_t-array ( handle name -- size_t-array )
-    [ clGetDeviceInfo ] info-size_t-array ; inline
+    [ clGetDeviceInfo ] info-size_t-array ;
 
 : device-info ( device-id -- device )
     dup {
@@ -309,23 +317,23 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
     ] 2bi ; inline
 
 : command-queue-info-ulong ( handle name -- ulong )
-    [ clGetCommandQueueInfo ] info-ulong ; inline
+    [ clGetCommandQueueInfo ] info-ulong ;
 
 : sampler-info-bool ( handle name -- ? )
-    [ clGetSamplerInfo ] info-bool ; inline
+    [ clGetSamplerInfo ] info-bool ;
 
 : sampler-info-uint ( handle name -- uint )
-    [ clGetSamplerInfo ] info-uint ; inline
+    [ clGetSamplerInfo ] info-uint ;
 
 : program-build-info-string ( program-handle device-handle name -- string )
-    [ clGetProgramBuildInfo ] 2info-string ; inline
+    [ clGetProgramBuildInfo ] 2info-string ;
 
 : program-build-log ( program-handle device-handle -- string )
-    CL_PROGRAM_BUILD_LOG program-build-info-string ; inline
+    CL_PROGRAM_BUILD_LOG program-build-info-string ;
 
 : strings>char*-array ( strings -- char*-array )
     [ ascii encode dup length dup malloc [ cl-not-null ]
-      keep &free [ -rot memcpy ] keep ] void*-array{ } map-as ; inline
+      keep &free [ -rot memcpy ] keep ] void*-array{ } map-as ;
 
 : (program) ( cl-context sources -- program-handle )
     [ handle>> ] dip [
@@ -347,19 +355,19 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
     } case ;
 
 : kernel-info-string ( handle name -- string )
-    [ clGetKernelInfo ] info-string ; inline
+    [ clGetKernelInfo ] info-string ;
 
 : kernel-info-uint ( handle name -- uint )
-    [ clGetKernelInfo ] info-uint ; inline
+    [ clGetKernelInfo ] info-uint ;
 
 : kernel-work-group-info-size_t ( handle1 handle2 name -- size_t )
-    [ clGetKernelWorkGroupInfo ] 2info-size_t ; inline
+    [ clGetKernelWorkGroupInfo ] 2info-size_t ;
 
 : event-info-uint ( handle name -- uint )
-    [ clGetEventInfo ] info-uint ; inline
+    [ clGetEventInfo ] info-uint ;
 
 : event-info-int ( handle name -- int )
-    [ clGetEventInfo ] info-int ; inline
+    [ clGetEventInfo ] info-int ;
 
 : cl_command_type>command-type ( cl_command-type -- command-type )
     {
@@ -392,8 +400,7 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
     } case ; inline
 
 : profiling-info-ulong ( handle name -- ulong )
-    [ clGetEventProfilingInfo ] info-ulong ; inline
-
+    [ clGetEventProfilingInfo ] info-ulong ;
 
 : bind-kernel-arg-buffer ( kernel index buffer -- )
     [ handle>> ] [ cl_mem heap-size ] [ handle>> <void*> ] tri*
@@ -528,10 +535,10 @@ PRIVATE>
     cl-kernel new-disposable swap >>handle ; inline
 
 : cl-kernel-name ( kernel -- string )
-    handle>> CL_KERNEL_FUNCTION_NAME kernel-info-string ; inline
+    handle>> CL_KERNEL_FUNCTION_NAME kernel-info-string ;
 
 : cl-kernel-arity ( kernel -- arity )
-    handle>> CL_KERNEL_NUM_ARGS kernel-info-uint ; inline
+    handle>> CL_KERNEL_NUM_ARGS kernel-info-uint ;
 
 : cl-kernel-local-size ( kernel -- size )
     (current-cl-device) [ handle>> ] bi@ CL_KERNEL_WORK_GROUP_SIZE kernel-work-group-info-size_t ; inline
