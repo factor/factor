@@ -1,6 +1,7 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors combinators kernel kernel.private math
-namespaces sequences sequences.private splitting strings make ;
+USING: accessors byte-arrays combinators kernel kernel.private
+math namespaces sequences sequences.private splitting strings
+make ;
 IN: math.parser
 
 : digit> ( ch -- n )
@@ -356,15 +357,15 @@ M: ratio >base
         mantissa-expt [ float>hex-value ] [ float>hex-expt ] bi*
     ] bi 3append ;
 
-: float>decimal ( n -- str )
-    (float>string)
-    [ 0 = ] trim-tail >string
+: format-float ( n format -- string )
+    0 suffix >byte-array (format-float)
+    dup [ 0 = ] find drop head >string
     fix-float ;
 
 : float>base ( n base -- str )
     {
         { 16 [ float>hex ] }
-        [ drop float>decimal ]
+        [ drop "%.16g" format-float ]
     } case ; inline
 
 PRIVATE>

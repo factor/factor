@@ -286,25 +286,19 @@ CONSTANT: nv-reg 17
     4 ds-reg 0 LWZ rc-absolute-ppc-2 rt-untagged jit-rel
 ] pic-load jit-define
 
-! Tag
-: load-tag ( -- )
-    4 4 tag-mask get ANDI
-    4 4 tag-bits get SLWI ;
+[ 4 4 tag-mask get ANDI ] pic-tag jit-define
 
-[ load-tag ] pic-tag jit-define
-
-! Tuple
 [
     3 4 MR
-    load-tag
-    0 4 tuple type-number tag-fixnum CMPI
+    4 4 tag-mask get ANDI
+    0 4 tuple type-number CMPI
     [ BNE ]
-    [ 4 3 tuple type-number neg 4 + LWZ ]
+    [ 4 3 tuple-class-offset LWZ ]
     jit-conditional*
 ] pic-tuple jit-define
 
 [
-    0 4 0 CMPI rc-absolute-ppc-2 rt-literal jit-rel
+    0 4 0 CMPI rc-absolute-ppc-2 rt-untagged jit-rel
 ] pic-check-tag jit-define
 
 [
@@ -342,6 +336,14 @@ CONSTANT: nv-reg 17
 ! ! ! Megamorphic caches
 
 [
+    ! class = ...
+    3 4 MR
+    4 4 tag-mask get ANDI
+    4 4 tag-bits get SLWI
+    0 4 tuple type-number tag-fixnum CMPI
+    [ BNE ]
+    [ 4 3 tuple-class-offset LWZ ]
+    jit-conditional*
     ! cache = ...
     0 3 LOAD32 rc-absolute-ppc-2/2 rt-literal jit-rel
     ! key = hashcode(class)

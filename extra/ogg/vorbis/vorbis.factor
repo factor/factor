@@ -19,7 +19,7 @@ IN: ogg.vorbis
     { [ os winnt? ]  [ "vorbis.dll" ] }
     { [ os macosx? ] [ "libvorbis.0.dylib" ] }
     { [ os unix? ]   [ "libvorbis.so" ] }
-} cond "cdecl" add-library 
+} cond cdecl add-library 
 
 "vorbis" deploy-library
 >>

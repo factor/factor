@@ -49,43 +49,43 @@ M: assoc assoc-like drop ; inline
 
 PRIVATE>
 
-: assoc-find ( assoc quot -- key value ? )
+: assoc-find ( ... assoc quot: ( ... key value -- ... ? ) -- ... key value ? )
     (assoc-each) find swap [ first2 t ] [ drop f f f ] if ; inline
 
 : key? ( key assoc -- ? ) at* nip ; inline
 
-: assoc-each ( assoc quot -- )
+: assoc-each ( ... assoc quot: ( ... key value -- ... ) -- ... )
     (assoc-each) each ; inline
 
-: assoc>map ( assoc quot exemplar -- seq )
+: assoc>map ( ... assoc quot: ( ... key value -- ... elt ) exemplar -- ... seq )
     [ collector-for [ assoc-each ] dip ] [ like ] bi ; inline
 
-: assoc-map-as ( assoc quot exemplar -- newassoc )
+: assoc-map-as ( ... assoc quot: ( ... key value -- ... newkey newvalue ) exemplar -- ... newassoc )
     [ [ 2array ] compose V{ } assoc>map ] dip assoc-like ; inline
 
-: assoc-map ( assoc quot -- newassoc )
+: assoc-map ( ... assoc quot: ( ... key value -- ... newkey newvalue ) -- ... newassoc )
     over assoc-map-as ; inline
 
-: assoc-filter-as ( assoc quot exemplar -- subassoc )
+: assoc-filter-as ( ... assoc quot: ( ... key value -- ... ? ) exemplar -- ... subassoc )
     [ (assoc-each) filter ] dip assoc-like ; inline
 
-: assoc-filter ( assoc quot -- subassoc )
+: assoc-filter ( ... assoc quot: ( ... key value -- ... ? ) -- ... subassoc )
     over assoc-filter-as ; inline
 
-: assoc-filter! ( assoc quot -- assoc )
+: assoc-filter! ( ... assoc quot: ( ... key value -- ... ? ) -- ... assoc )
     [
         over [ [ [ drop ] 2bi ] dip [ delete-at ] 2curry unless ] 2curry
         assoc-each
     ] [ drop ] 2bi ; inline
 
-: assoc-partition ( assoc quot -- true-assoc false-assoc )
+: assoc-partition ( ... assoc quot: ( ... key value -- ... ? ) -- ... true-assoc false-assoc )
     [ (assoc-each) partition ] [ drop ] 2bi
     [ assoc-like ] curry bi@ ; inline
 
-: assoc-any? ( assoc quot -- ? )
+: assoc-any? ( ... assoc quot: ( ... key value -- ... ? ) -- ... ? )
     assoc-find 2nip ; inline
 
-: assoc-all? ( assoc quot -- ? )
+: assoc-all? ( ... assoc quot: ( ... key value -- ... ? ) -- ... ? )
     [ not ] compose assoc-any? not ; inline
 
 : at ( key assoc -- value/f )
@@ -150,23 +150,23 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : substitute ( seq assoc -- newseq )
     substituter map ;
 
-: cache ( key assoc quot -- value )
+: cache ( ... key assoc quot: ( ... key -- ... value ) -- ... value )
     [ [ at* ] 2keep ] dip
     [ [ nip call dup ] [ drop ] 3bi set-at ] 3curry
     [ drop ] prepose
     unless ; inline
 
-: 2cache ( key1 key2 assoc quot -- value )
+: 2cache ( ... key1 key2 assoc quot: ( ... key1 key2 -- ... value ) -- ... value )
     [ 2array ] 2dip [ first2 ] prepose cache ; inline
 
-: change-at ( key assoc quot -- )
+: change-at ( ..a key assoc quot: ( ..a value -- ..b newvalue ) -- ..b )
     [ [ at ] dip call ] [ drop ] 3bi set-at ; inline
 
 : at+ ( n key assoc -- ) [ 0 or + ] change-at ; inline
 
 : inc-at ( key assoc -- ) [ 1 ] 2dip at+ ; inline
 
-: map>assoc ( seq quot exemplar -- assoc )
+: map>assoc ( ... seq quot: ( ... elt -- ... key value ) exemplar -- ... assoc )
     [ [ 2array ] compose { } map-as ] dip assoc-like ; inline
 
 : extract-keys ( seq assoc -- subassoc )

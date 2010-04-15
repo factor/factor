@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.strings alien.syntax arrays
 byte-arrays kernel literals math sequences windows.types
 windows.kernel32 windows.errors math.bitwise io.encodings.utf16n
-classes.struct windows.com.syntax init literals ;
+classes.struct windows.com.syntax init ;
 FROM: alien.c-types => short ;
 IN: windows.winsock
 

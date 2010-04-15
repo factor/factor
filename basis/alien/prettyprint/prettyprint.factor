@@ -61,22 +61,36 @@ M: typedef-word synopsis*
 : pprint-library ( library -- )
     [ \ LIBRARY: [ text ] pprint-prefix ] when* ;
 
+: pprint-function ( word quot -- )
+    [ def>> first pprint-c-type ]
+    swap
+    [
+        <block "(" text
+        [ def>> fourth ] [ stack-effect in>> ] bi
+        pprint-function-args
+        ")" text block>
+    ] tri ; inline
+
+M: alien-function-alias-word definer
+    drop \ FUNCTION-ALIAS: \ ; ;
+M: alien-function-alias-word definition drop f ;
+M: alien-function-alias-word synopsis*
+    {
+        [ seeing-word ]
+        [ def>> second pprint-library ]
+        [ definer. ]
+        [ pprint-word ]
+        [ [ def>> third text ] pprint-function ]
+    } cleave ;
+
 M: alien-function-word definer
     drop \ FUNCTION: \ ; ;
-M: alien-function-word definition drop f ;
 M: alien-function-word synopsis*
     {
         [ seeing-word ]
         [ def>> second pprint-library ]
         [ definer. ]
-        [ def>> first pprint-c-type ]
-        [ pprint-word ]
-        [
-            <block "(" text
-            [ def>> fourth ] [ stack-effect in>> ] bi
-            pprint-function-args
-            ")" text block>
-        ]
+        [ [ pprint-word ] pprint-function ]
     } cleave ;
 
 M: alien-callback-type-word definer
