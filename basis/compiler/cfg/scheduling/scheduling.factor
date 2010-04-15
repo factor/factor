@@ -70,7 +70,7 @@ UNION: initial-insn
 ERROR: not-all-instructions-were-scheduled old-bb new-bb ;
 
 SYMBOL: check-scheduling?
-t check-scheduling? set-global
+f check-scheduling? set-global
 
 :: check-instructions ( new-bb old-bb -- )
     new-bb old-bb [ instructions>> ] bi@
