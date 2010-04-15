@@ -119,7 +119,7 @@ FUNCTION: int sqlite3_bind_double ( sqlite3_stmt* pStmt, int index, double x ) ;
 FUNCTION: int sqlite3_bind_int ( sqlite3_stmt* pStmt, int index, int n ) ;
 FUNCTION: int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_int64 n ) ;
 ! Bind the same function as above, but for unsigned 64bit integers
-FUNCTION-ALIAS: sqlite3-bind-uint64 ( pStmt index in64 -- int )
+FUNCTION-ALIAS: sqlite3-bind-uint64
     int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_uint64 in64 ) ;
 FUNCTION: int sqlite3_bind_null ( sqlite3_stmt* pStmt, int n ) ;
 FUNCTION: int sqlite3_bind_text ( sqlite3_stmt* pStmt, int index, c-string text, int len, int destructor ) ;
@@ -132,7 +132,7 @@ FUNCTION: c-string sqlite3_column_decltype ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: int sqlite3_column_int ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: sqlite3_int64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col ) ;
 ! Bind the same function as above, but for unsigned 64bit integers
-FUNCTION-ALIAS: sqlite3-column-uint64 ( pStmt col -- uint64 )
+FUNCTION-ALIAS: sqlite3-column-uint64
     sqlite3_uint64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: double sqlite3_column_double ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: c-string sqlite3_column_name ( sqlite3_stmt* pStmt, int col ) ;
