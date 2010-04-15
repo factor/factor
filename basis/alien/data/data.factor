@@ -1,5 +1,5 @@
 ! (c)2009, 2010 Slava Pestov, Joe Groff bsd license
-USING: accessors alien alien.c-types alien.strings arrays
+USING: accessors alien alien.c-types alien.arrays alien.strings arrays
 byte-arrays cpu.architecture fry io io.encodings.binary
 io.files io.streams.memory kernel libc math sequences words
 byte-vectors ;
@@ -78,3 +78,9 @@ M: value-type c-type-getter
 M: value-type c-type-setter ( type -- quot )
     [ c-type-getter ] [ c-type-unboxer-quot ] [ heap-size ] tri
     '[ @ swap @ _ memcpy ] ;
+
+M: array c-type-boxer-quot
+    unclip [ array-length ] dip [ <c-direct-array> ] 2curry ;
+
+M: array c-type-unboxer-quot drop [ >c-ptr ] ;
+
