@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.strings alien.syntax
 classes classes.struct combinators combinators.short-circuit
 io.encodings.ascii io.encodings.string kernel literals make
 math sequences specialized-arrays typed fry io.mmap formatting
-locals splitting ;
+locals splitting io.binary arrays ;
 FROM: alien.c-types => short ;
 IN: macho
 
@@ -812,7 +812,7 @@ C-ENUM: reloc_type_ppc
     PPC_RELOC_LOCAL_SECTDIFF ;
 
 ! Low-level interface
-SPECIALIZED-ARRAYS: section section_64 nlist nlist_64 ;
+SPECIALIZED-ARRAYS: section section_64 nlist nlist_64 fat_arch uchar ;
 UNION: mach_header_32/64 mach_header mach_header_64 ;
 UNION: segment_command_32/64 segment_command segment_command_64 ;
 UNION: load-command segment_command segment_command_64
@@ -825,6 +825,26 @@ UNION: section_32/64 section section_64 ;
 UNION: section_32/64-array section-array section_64-array ;
 UNION: nlist_32/64 nlist nlist_64 ;
 UNION: nlist_32/64-array nlist-array nlist_64-array ;
+
+TUPLE: fat-binary-member cpu-type cpu-subtype data ;
+ERROR: not-fat-binary ;
+
+TYPED: fat-binary-members ( >c-ptr -- fat-binary-members )
+    fat_header memory>struct dup magic>> {
+        { FAT_MAGIC [ ] }
+        { FAT_CIGAM [ ] }
+        [ 2drop not-fat-binary ]
+    } case dup
+    [ >c-ptr fat_header heap-size swap <displaced-alien> ]
+    [ nfat_arch>> 4 >be le> ] bi
+    <direct-fat_arch-array> [
+        {
+            [ nip cputype>> 4 >be le> ]
+            [ nip cpusubtype>> 4 >be le> ]
+            [ offset>> 4 >be le> swap >c-ptr <displaced-alien> ]
+            [ nip size>> 4 >be le> <direct-uchar-array> ]
+        } 2cleave fat-binary-member boa
+    ] with { } map-as ;
 
 TYPED: 64-bit? ( macho: mach_header_32/64 -- ? )
     magic>> {
@@ -924,12 +944,13 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
 : macho-nm ( path -- )
     [| macho |
         macho load-commands segment-commands sections-array :> sections
-        
         macho load-commands symtab-commands [| symtab |
             macho symtab symbols [
                 [ drop n_value>> "%016x " printf ]
-                [ drop n_sect>> sections nth sectname>>
-                  read-array-string "%-16s" printf ]
+                [
+                    drop n_sect>> sections nth sectname>>
+                    read-array-string "%-16s" printf
+                ]
                 [ symbol-name "%s\n" printf ] 2tri
             ] curry each
         ] each
