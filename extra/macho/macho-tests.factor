@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.streams.string kernel literals macho multiline strings
-tools.test ;
+USING: accessors alien io io.streams.string kernel literals macho
+multiline sequences strings system tools.test ;
 IN: macho.tests
 
 STRING: validation-output
@@ -21,6 +21,14 @@ STRING: validation-output
 
 ;
 
-{ $ validation-output }
-[ <string-writer> dup [ "resource:extra/macho/a.macho" macho-nm ] with-output-stream >string ]
-unit-test
+cpu ppc? [
+    { $ validation-output }
+    [ <string-writer> dup [ "resource:extra/macho/a.macho" macho-nm ] with-output-stream >string ]
+    unit-test
+    
+    { t } [
+        "resource:extra/macho/a2.macho" [
+            >c-ptr fat-binary-members first data>> >c-ptr macho-header 64-bit?
+        ] with-mapped-macho
+    ] unit-test
+] unless
