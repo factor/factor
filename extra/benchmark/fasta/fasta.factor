@@ -13,7 +13,7 @@ CONSTANT: initial-seed 42
 CONSTANT: line-length 60
 
 : random ( seed -- seed n )
-    >float IA * IC + IM mod dup IM /f ; inline
+    IA * IC + IM mod dup IM /f ; inline
 
 CONSTANT: ALU "GGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAA"
 
@@ -52,7 +52,7 @@ TYPED: make-cumulative ( freq -- chars: byte-array floats: double-array )
 :: select-random ( seed chars floats -- seed elt )
     seed random floats [ <= ] with find drop chars nth-unsafe ; inline
 
-TYPED: make-random-fasta ( seed: fixnum len: fixnum chars: byte-array floats: double-array -- seed: fixnum )
+TYPED: make-random-fasta ( seed: float len: fixnum chars: byte-array floats: double-array -- seed: float )
     '[ _ _ select-random ] "" replicate-as print ;
 
 : write-description ( desc id -- )
@@ -63,7 +63,7 @@ TYPED: make-random-fasta ( seed: fixnum len: fixnum chars: byte-array floats: do
     [ [ line-length quot call ] times ] dip
     quot unless-zero ; inline
 
-TYPED: write-random-fasta ( seed: fixnum n: fixnum chars: byte-array floats: double-array desc id -- seed: fixnum )
+TYPED: write-random-fasta ( seed: float n: fixnum chars: byte-array floats: double-array desc id -- seed: float )
     write-description
     '[ _ _ make-random-fasta ] split-lines ;
 

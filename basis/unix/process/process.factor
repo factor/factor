@@ -36,8 +36,7 @@ FUNCTION: int execve ( c-string path, c-string* argv, c-string* envp ) ;
     [ [ first ] [ ] bi ] dip exec-with-env ;
 
 : with-fork ( child parent -- )
-    [ [ fork-process dup zero? ] dip '[ drop @ ] ] dip
-    if ; inline
+    [ fork-process ] 2dip if-zero ; inline
 
 CONSTANT: SIGKILL 9
 CONSTANT: SIGTERM 15
