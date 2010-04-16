@@ -19,8 +19,9 @@ IN: z-algorithm
     r k - 1 +   :> b
     seq Z Zk' b <
     [ Zk' Z push l r ] ! still inside
-    [ seq r 1 + seq b [ tail-slice ] 2bi@ lcp :> q
-      q b + Z push k q r +
+    [
+        seq r 1 + seq b [ tail-slice ] 2bi@ lcp :> q
+        q b + Z push k q r +
     ] if ; inline
 
 : (z-value) ( seq Z l r k -- seq Z l r )
