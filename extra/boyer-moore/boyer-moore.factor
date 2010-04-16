@@ -53,10 +53,12 @@ TUPLE: boyer-moore pattern bc-table gs-table ;
     pat length        :> plen
     seq length plen - :> lim
     from
-    [ dup lim <=
-      [ seq pat pick plen mismatch?
-        [ 2dup + seq nth-unsafe bm do-shift t ] [ f ] if*
-      ] [ drop f f ] if
+    [
+        dup lim <=
+        [
+            seq pat pick plen mismatch?
+            [ 2dup + seq nth-unsafe bm do-shift t ] [ f ] if*
+        ] [ drop f f ] if
     ] loop ; inline
 
 PRIVATE>

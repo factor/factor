@@ -1,11 +1,11 @@
 ! Copyright (C) 2010 Dmitry Shubin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel sequences ;
+USING: boyer-moore.private help.markup help.syntax kernel sequences ;
 IN: boyer-moore
 
 HELP: <boyer-moore>
 { $values
-  { "pat" sequence } { "bm" object }
+  { "pat" sequence } { "bm" boyer-moore }
 }
 { $description
   "Given a pattern performs pattern preprocessing and returns "
@@ -43,7 +43,7 @@ ARTICLE: "boyer-moore" "The Boyer-Moore algorithm"
 { $heading "Summary" }
 "The " { $vocab-link "boyer-moore" } " vocabulary "
 "implements a Boyer-Moore string search algorithm with "
-"so-called 'strong good suffix shift rule'. Since agorithm is "
+"so-called 'strong good suffix shift rule'. Since algorithm is "
 "alphabet-independent it is applicable to searching in any "
 "collection that implements " { $links "sequence-protocol" } "."
 
@@ -51,8 +51,8 @@ ARTICLE: "boyer-moore" "The Boyer-Moore algorithm"
 "Let " { $snippet "n" } " and " { $snippet "m" } " be lengths "
 "of the sequences being searched " { $emphasis "in" } " and "
 { $emphasis "for" } " respectively. Then searching runs in "
-{ $snippet "O(n)" } " time in it's worst case using additional "
-{ $snippet "O(m)" } " space. Preprocessing phase runs in "
+{ $snippet "O(n)" } " time in its worst case using additional "
+{ $snippet "O(m)" } " space. The preprocessing phase runs in "
 { $snippet "O(m)" } " time."
 ;
 
