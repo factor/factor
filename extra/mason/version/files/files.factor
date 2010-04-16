@@ -10,9 +10,6 @@ IN: mason.version.files
 : remote-directory ( string -- string' )
     [ upload-directory get ] dip "/" glue ;
 
-: remote ( string version -- string )
-    remote-directory swap "/" glue ;
-
 : platform ( builder -- string )
     [ os>> ] [ cpu>> ] bi (platform) ;
 
@@ -30,10 +27,10 @@ IN: mason.version.files
     ] [ drop ] 2bi release-directory ;
 
 : remote-binary-release-name ( version builder -- string )
-    [ binary-release-name ] [ drop ] 2bi remote ;
+    binary-release-name remote-directory ;
 
 : source-release-name ( version -- string )
     [ "factor-src-" ".zip" surround ] keep release-directory ;
 
 : remote-source-release-name ( version -- string )
-    [ source-release-name ] keep remote ;
+    source-release-name remote-directory ;
