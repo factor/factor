@@ -13,7 +13,7 @@ IN: mason.version
 
 : make-release-directory ( version -- )
     "Creating release directory..." print flush
-    [ "mkdir -p " % "" release-directory % "\n" % ] "" make
+    [ "mkdir -p " % "" release-directory remote-directory % "\n" % ] "" make
     execute-on-server ;
 
 : tweet-release ( version announcement-url -- )

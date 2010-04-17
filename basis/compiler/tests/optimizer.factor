@@ -194,25 +194,6 @@ M: number detect-number ;
 [ 4 [ + ] ] [ 2 2 [ [ + ] [ call ] keep ] compile-call ] unit-test
 
 ! Regression
-USE: sorting
-USE: binary-search
-USE: binary-search.private
-
-: old-binsearch ( elt quot: ( ..a -- ..b ) seq -- elt quot i )
-    dup length 1 <= [
-        from>>
-    ] [
-        [ midpoint swap call ] 3keep [ rot ] dip swap dup zero?
-        [ drop dup from>> swap midpoint@ + ]
-        [ drop dup midpoint@ head-slice old-binsearch ] if
-    ] if ; inline recursive
-
-[ 10 ] [
-    10 20 iota <flat-slice>
-    [ [ - ] swap old-binsearch ] compile-call 2nip
-] unit-test
-
-! Regression
 : empty-compound ( -- ) ;
 
 : node-successor-f-bug ( x -- * )
