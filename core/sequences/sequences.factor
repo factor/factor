@@ -898,11 +898,6 @@ PRIVATE>
 : unclip-last-slice ( seq -- butlast-slice last )
     [ but-last-slice ] [ last ] bi ; inline
 
-: <flat-slice> ( seq -- slice )
-    dup slice? [ { } like ] when
-    [ drop 0 ] [ length ] [ ] tri <slice> ;
-    inline
-
 <PRIVATE
     
 : (trim-head) ( seq quot -- seq n )
