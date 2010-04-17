@@ -1,0 +1,1 @@
+Boyer-Moore string search algorithm

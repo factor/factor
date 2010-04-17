@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: elf.nm io io.streams.string kernel multiline strings tools.test
-literals ;
+USING: elf.nm io io.streams.string kernel literals multiline strings
+system tools.test ;
 IN: elf.nm.tests
 
 STRING: validation-output
@@ -46,6 +46,8 @@ STRING: validation-output
 
 ;
 
-{ $ validation-output }
-[ <string-writer> dup [ "resource:extra/elf/a.elf" elf-nm ] with-output-stream >string ]
-unit-test
+cpu ppc? [
+    { $ validation-output }
+    [ <string-writer> dup [ "resource:extra/elf/a.elf" elf-nm ] with-output-stream >string ]
+    unit-test
+] unless
