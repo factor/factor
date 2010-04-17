@@ -61,3 +61,6 @@ IN: sets.tests
 [ f ] [ HS{ 1 2 3 1 2 1 } duplicates ] unit-test
 
 [ H{ { 3 HS{ 1 2 } } } ] [ H{ } clone 1 3 pick adjoin-at 2 3 pick adjoin-at ] unit-test
+
+[ t ] [ f null? ] unit-test
+[ f ] [ { 4 } null? ] unit-test
