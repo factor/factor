@@ -1,41 +1,29 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences sequences.private accessors math
-math.order combinators hints arrays ;
+USING: accessors arrays combinators hints kernel locals math
+math.order sequences ;
 IN: binary-search
 
 <PRIVATE
 
-: midpoint ( seq -- elt )
-    [ midpoint@ ] keep nth-unsafe ; inline
+:: (search) ( seq from to quot: ( elt -- <=> ) -- i elt )
+    from to + 2/ :> midpoint@
+    midpoint@ seq nth :> midpoint
 
-: decide ( quot seq -- quot seq <=> )
-    [ midpoint swap call ] 2keep rot ; inline
-
-: finish ( quot slice -- i elt )
-    [ [ from>> ] [ midpoint@ ] bi + ] [ seq>> ] bi
-    [ drop ] [ dup ] [ ] tri* nth ; inline
-
-DEFER: (search)
-
-: keep-searching ( seq quot -- slice )
-    [ dup midpoint@ ] dip call collapse-slice slice boa (search) ; inline
-
-: (search) ( ... quot: ( ... elt -- ... <=> ) seq -- ... i elt )
-    dup length 1 <= [
-        finish
+    to from - 1 <= [
+        midpoint@ midpoint
     ] [
-        decide {
-            { +eq+ [ finish ] }
-            { +lt+ [ [ (head) ] keep-searching ] }
-            { +gt+ [ [ (tail) ] keep-searching ] }
+        midpoint quot call {
+            { +eq+ [ midpoint@ midpoint ] }
+            { +lt+ [ seq from midpoint@ quot (search) ] }
+            { +gt+ [ seq midpoint@ to quot (search) ] }
         } case
     ] if ; inline recursive
 
 PRIVATE>
 
-: search ( seq quot -- i elt )
-    over empty? [ 2drop f f ] [ swap <flat-slice> (search) ] if ;
+: search ( seq quot: ( elt -- <=> ) -- i elt )
+    over empty? [ 2drop f f ] [ [ 0 over length ] dip (search) ] if ;
     inline
 
 : natural-search ( obj seq -- i elt )
