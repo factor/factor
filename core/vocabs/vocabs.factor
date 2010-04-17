@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs strings kernel sorting namespaces
-sequences definitions sets ;
+sequences definitions sets combinators ;
 IN: vocabs
 
 SYMBOL: dictionary
@@ -83,8 +83,24 @@ ERROR: bad-vocab-name name ;
 : check-vocab-name ( name -- name )
     dup string? [ bad-vocab-name ] unless ;
 
+TUPLE: require-when-record
+    vocab loaded unloaded ;
+
+! These are identified by their vocab
+M: require-when-record equal?
+    over require-when-record?
+    [ [ vocab>> ] bi@ = ] [ 2drop f ] if ;
+
+M: require-when-record hashcode*
+    vocab>> hashcode* ;
+
+C: <require-when-record> require-when-record
+
 SYMBOL: conditional-requires
 conditional-requires [ H{ } clone ] initialize
+
+SYMBOL: partly-required
+partly-required [ H{ } clone ] initialize
 
 : create-vocab ( name -- vocab )
     check-vocab-name
@@ -120,9 +136,26 @@ M: vocab-spec >vocab-link ;
 
 M: string >vocab-link dup vocab [ ] [ <vocab-link> ] ?if ;
 
+<PRIVATE
+
+: untransfer-conditionals ( vocab-name record -- )
+    {
+        [ loaded>> delete ]
+        [ unloaded>> adjoin ]
+        [ swap conditional-requires get adjoin-at ]
+    } 2cleave ;
+
+: unload-conditional-requires ( vocab-name -- )
+    partly-required get
+    [ dupd at members [ untransfer-conditionals ] with each ] 
+    [ delete-at ] 2bi ;
+
+PRIVATE>
+
 : forget-vocab ( vocab -- )
     [ words forget-all ]
-    [ vocab-name dictionary get delete-at ] bi
+    [ vocab-name dictionary get delete-at ]
+    [ unload-conditional-requires ] tri
     notify-vocab-observers ;
 
 M: vocab-spec forget* forget-vocab ;
