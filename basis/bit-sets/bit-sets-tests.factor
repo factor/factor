@@ -11,6 +11,9 @@ IN: bit-sets.tests
     T{ bit-set f ?{ f f t f t f } } intersect
 ] unit-test
 
+[ f ] [ T{ bit-set f ?{ t f f f t f } } null? ] unit-test
+[ t ] [ T{ bit-set f ?{ f f f f f f } } null? ] unit-test
+
 [ T{ bit-set f ?{ t f t f f f } } ] [
     T{ bit-set f ?{ t t t f f f } }
     T{ bit-set f ?{ f t f f t t } } diff
