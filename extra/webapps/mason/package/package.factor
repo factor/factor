@@ -66,7 +66,7 @@ IN: webapps.mason.package
                 [ current-status "status" set-value ]
                 [ last-build-status "last-build" set-value ]
                 [ clean-build-status "last-clean-build" set-value ]
-                [ heartbeat-timestamp>> "heartbeat-timestamp" set-value ]
+                [ current-timestamp>> "current-timestamp" set-value ]
                 [ packages-link "binaries" set-value ]
                 [ clean-image-link "clean-images" set-value ]
                 [ report-link "last-report" set-value ]
