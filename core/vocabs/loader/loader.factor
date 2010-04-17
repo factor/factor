@@ -3,7 +3,7 @@
 USING: namespaces make sequences io io.files io.pathnames kernel
 assocs words vocabs definitions parser continuations hashtables
 sorting source-files arrays combinators strings system
-math.parser splitting init accessors sets ;
+math.parser splitting init accessors sets fry ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
@@ -66,9 +66,17 @@ DEFER: require
 
 <PRIVATE
 
+: transfer-conditionals ( vocab-name record -- )
+    {
+        [ unloaded>> delete ]
+        [ loaded>> adjoin ]
+        [ swap partly-required get adjoin-at ]
+        [ unloaded>> null? swap '[ _ require ] when ]
+    } 2cleave ;
+
 : load-conditional-requires ( vocab-name -- )
     conditional-requires get
-    [ at [ require ] each ] 
+    [ dupd at members [ transfer-conditionals ] with each ] 
     [ delete-at ] 2bi ;
 
 : load-source ( vocab -- )
@@ -96,11 +104,22 @@ PRIVATE>
 : require ( vocab -- )
     load-vocab drop ;
 
+<PRIVATE
+
+: adjoin-each-at ( elt seq assoc -- )
+    [ swap ] dip '[ _ swap _ adjoin-at ] each ;
+
+: record-require-when ( then loaded unloaded -- )
+    [ [ fast-set ] bi@ <require-when-record> ] 2keep
+    [ conditional-requires get adjoin-each-at ]
+    [ partly-required get adjoin-each-at ]
+    bi-curry* bi ;
+
+PRIVATE>
+
 : require-when ( if then -- )
-    over vocab
-    [ nip require ]
-    [ swap conditional-requires get [ swap suffix ] change-at ]
-    if ;
+    swap [ vocab ] partition
+    [ drop require ] [ record-require-when ] if-empty ;
 
 : reload ( name -- )
     dup vocab
