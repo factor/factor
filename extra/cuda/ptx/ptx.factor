@@ -5,8 +5,8 @@ FROM: roles => TUPLE: ;
 IN: cuda.ptx
 
 UNION: dim integer sequence ;
-UNION: ?integer integer POSTPONE: f ;
-UNION: ?string string POSTPONE: f ;
+UNION: ?integer POSTPONE: f integer ;
+UNION: ?string POSTPONE: f string ;
 
 VARIANT: ptx-type
     .s8 .s16 .s32 .s64
@@ -21,11 +21,11 @@ VARIANT: ptx-type
 
 VARIANT: ptx-arch
     sm_10 sm_11 sm_12 sm_13 sm_20 ;
-UNION: ?ptx-arch ptx-arch POSTPONE: f ;
+UNION: ?ptx-arch POSTPONE: f ptx-arch ;
 
 VARIANT: ptx-texmode
     .texmode_unified .texmode_independent ;
-UNION: ?ptx-texmode ptx-texmode POSTPONE: f ;
+UNION: ?ptx-texmode POSTPONE: f ptx-texmode ;
 
 VARIANT: ptx-storage-space
     .reg
@@ -36,7 +36,7 @@ VARIANT: ptx-storage-space
     .param
     .shared
     .tex ;
-UNION: ?ptx-storage-space ptx-storage-space POSTPONE: f ;
+UNION: ?ptx-storage-space POSTPONE: f ptx-storage-space ;
 
 TUPLE: ptx-target
     { arch ?ptx-arch }
@@ -66,7 +66,7 @@ TUPLE: ptx-variable
 TUPLE: ptx-predicate
     { negated? boolean }
     { variable string } ; 
-UNION: ?ptx-predicate ptx-predicate POSTPONE: f ;
+UNION: ?ptx-predicate POSTPONE: f ptx-predicate ;
 
 TUPLE: ptx-instruction
     { label ?string }
@@ -102,12 +102,12 @@ VARIANT: ptx-float-rounding-mode
     .rn .rz .rm .rp .approx .full ;
 VARIANT: ptx-int-rounding-mode
     .rni .rzi .rmi .rpi ;
-UNION: ?ptx-float-rounding-mode ptx-float-rounding-mode POSTPONE: f ;
-UNION: ?ptx-int-rounding-mode ptx-int-rounding-mode POSTPONE: f ;
+UNION: ?ptx-float-rounding-mode POSTPONE: f ptx-float-rounding-mode ;
+UNION: ?ptx-int-rounding-mode POSTPONE: f ptx-int-rounding-mode ;
 
 UNION: ptx-rounding-mode
     ptx-float-rounding-mode ptx-int-rounding-mode ;
-UNION: ?ptx-rounding-mode ptx-rounding-mode POSTPONE: f ;
+UNION: ?ptx-rounding-mode POSTPONE: f ptx-rounding-mode ;
 
 TUPLE: ptx-typed-instruction < ptx-instruction
     { type ptx-type }
@@ -137,7 +137,7 @@ TUPLE: ptx-addsub-instruction < ptx-3op-instruction
 
 VARIANT: ptx-mul-mode
     .wide ;
-UNION: ?ptx-mul-mode ptx-mul-mode POSTPONE: f ;
+UNION: ?ptx-mul-mode POSTPONE: f ptx-mul-mode ;
 
 TUPLE: ptx-mul-instruction < ptx-3op-instruction
     { mode ?ptx-mul-mode } ;
@@ -148,7 +148,7 @@ TUPLE: ptx-mad-instruction < ptx-4op-instruction
 
 VARIANT: ptx-prmt-mode
     .f4e .b4e .rc8 .ecl .ecr .rc16 ;
-UNION: ?ptx-prmt-mode ptx-prmt-mode POSTPONE: f ;
+UNION: ?ptx-prmt-mode POSTPONE: f ptx-prmt-mode ;
 
 ROLE: ptx-float-ftz
     { ftz? boolean } ;
@@ -169,6 +169,7 @@ VARIANT: ptx-cmp-op
 VARIANT: ptx-op
     .and .or .xor .cas .exch .add .inc .dec .min .max
     .popc ;
+UNION: ?ptx-op POSTPONE: f ptx-op ;
 
 SINGLETONS: .lo .hi ;
 INSTANCE: .lo ptx-mul-mode
@@ -178,14 +179,14 @@ INSTANCE: .hi ptx-cmp-op
 
 TUPLE: ptx-set-instruction < ptx-3op-instruction
     { cmp-op ptx-cmp-op }
-    { bool-op ptx-op }
+    { bool-op ?ptx-op }
     { c ?string }
     { ftz? boolean } ;
 
 VARIANT: ptx-cache-op
     .ca .cg .cs .lu .cv
     .wb .wt ;
-UNION: ?ptx-cache-op ptx-cache-op POSTPONE: f ;
+UNION: ?ptx-cache-op POSTPONE: f ptx-cache-op ;
 
 TUPLE: ptx-ldst-instruction < ptx-2op-instruction
     { volatile? boolean }
@@ -434,7 +435,7 @@ M: ptx-instruction ptx-element-label
 
 : write-insn ( insn name -- insn )
     over predicate>>
-    [ "@" write dup negated?>> [ "!" write ] when variable>> write ] when*
+    [ "@" write dup negated?>> [ "!" write ] when variable>> write " " write ] when*
     write ;
 
 : write-2op ( insn -- )
@@ -710,7 +711,11 @@ M: set (write-ptx-element)
 M: setp (write-ptx-element)
     "setp" write-insn
     dup write-set
-    dup write-3op
+    dup type>> (write-ptx-element) " " write
+    dup dest>> write
+    dup |dest>> [ "|" write write ] when* ", " write
+    dup a>> write ", " write
+    dup b>> write
     c>> [ ", " write write ] when* ;
 M: shl (write-ptx-element)
     "shl" write-insn
