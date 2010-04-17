@@ -1,57 +1,50 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors io io.sockets io.encodings.utf8 io.files
-io.launcher kernel make mason.config mason.common mason.email
-mason.twitter namespaces sequences prettyprint fry ;
+USING: accessors fry http.client io io.encodings.utf8 io.files
+kernel mason.common mason.config mason.email mason.twitter
+namespaces prettyprint sequences ;
 IN: mason.notify
 
-: status-notify ( input-file args -- )
-    status-host get [
-        [
-            "ssh" , status-host get , "-l" , status-username get ,
-            "./mason-notify" ,
-            short-host-name ,
-            target-cpu get ,
-            target-os get ,
-        ] { } make prepend
-        [ 5 ] 2dip '[
-            <process>
-                _ >>stdin
-                _ >>command
-            short-running-process
-        ] retry
-    ] [ 2drop ] if ;
+: status-notify ( report arg message -- )
+    [
+        short-host-name "host-name" set
+        target-cpu get "target-cpu" set
+        target-os get "target-os" set
+        status-secret get "secret" set
+        "message" set
+        "arg" set
+        "report" set
+    ] H{ } make-assoc
+    [ 5 ] dip '[ _ status-url get http-post 2drop ] retry ;
 
 : notify-heartbeat ( -- )
-    f { "heartbeat" } status-notify ;
+    f f "heartbeat" status-notify ;
 
 : notify-begin-build ( git-id -- )
     [ "Starting build of GIT ID " write print flush ]
-    [ f swap "git-id" swap 2array status-notify ]
+    [ f swap "git-id" status-notify ]
     bi ;
 
 : notify-make-vm ( -- )
     "Compiling VM" print flush
-    f { "make-vm" } status-notify ;
+    f f "make-vm" status-notify ;
 
 : notify-boot ( -- )
     "Bootstrapping" print flush
-    f { "boot" } status-notify ;
+    f f "boot" status-notify ;
 
 : notify-test ( -- )
     "Running tests" print flush
-    f { "test" } status-notify ;
+    f f "test" status-notify ;
 
 : notify-report ( status -- )
     [ "Build finished with status: " write . flush ]
     [
-        [ "report" ] dip
-        [ [ utf8 file-contents ] dip email-report ]
-        [ "report" swap name>> 2array status-notify ]
-        2bi
+        [ "report" utf8 file-contents ] dip
+        [ name>> "report" status-notify ] [ email-report ] 2bi
     ] bi ;
 
 : notify-release ( archive-name -- )
     [ "Uploaded " prepend [ print flush ] [ mason-tweet ] bi ]
-    [ f swap "release" swap 2array status-notify ]
+    [ f swap "release" status-notify ]
     bi ;
