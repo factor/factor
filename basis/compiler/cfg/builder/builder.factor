@@ -137,7 +137,7 @@ M: #recursive emit-node
 : emit-actual-if ( #if -- )
     ! Inputs to the final instruction need to be copied because of
     ! loc>vreg sync
-    ds-pop any-rep ^^copy \ f type-number cc/= ##compare-imm-branch emit-if ;
+    ds-pop any-rep ^^copy f cc/= ##compare-imm-branch emit-if ;
 
 M: #if emit-node
     {
