@@ -3,7 +3,7 @@
 USING: namespaces make sequences io io.files io.pathnames kernel
 assocs words vocabs definitions parser continuations hashtables
 sorting source-files arrays combinators strings system
-math.parser splitting init accessors sets fry ;
+math.parser splitting init accessors sets ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
@@ -76,7 +76,7 @@ require-when-table [ V{ } clone ] initialize
     vocab-name require-when-vocabs get in? [
         require-when-table get [
             [ [ vocab ] all? ] dip
-            '[ _ require ] when
+            [ require ] curry when
         ] assoc-each
     ] when ;
 
