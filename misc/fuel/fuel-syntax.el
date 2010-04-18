@@ -47,7 +47,7 @@
   '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
     "ABOUT:" "AFTER:" "ALIAS:" "ALIEN:" "ARTICLE:"
     "B" "BEFORE:" "BIN:"
-    "C:" "CALLBACK:" "C-ENUM:" "C-TYPE:" "CHAR:" "COM-INTERFACE:" "CONSTANT:" "CONSULT:" "call-next-method"
+    "C:" "CALLBACK:" "ENUM:" "C-TYPE:" "CHAR:" "COM-INTERFACE:" "CONSTANT:" "CONSULT:" "call-next-method"
     "DEFER:"
     "EBNF:" ";EBNF" "ERROR:" "EXCLUDE:"
     "f" "FORGET:" "FROM:" "FUNCTION:"
@@ -165,7 +165,7 @@
 
 (defconst fuel-syntax--indent-def-starts '("" ":"
                                            "AFTER" "BEFORE"
-                                           "C-ENUM" "COM-INTERFACE" "CONSULT"
+                                           "ENUM" "COM-INTERFACE" "CONSULT"
                                            "FROM" "FUNCTION:"
                                            "INTERSECTION:"
                                            "M" "M:" "MACRO" "MACRO:"
@@ -280,7 +280,7 @@
     ("\\_<\\(U\\)SING: \\(;\\)" (1 "<b") (2 ">b"))
     ("\\_<USING:\\( \\)" (1 "<b"))
     ("\\_<\\(C\\)-ENUM: \\(;\\)" (1 "<b") (2 ">b"))
-    ("\\_<C-ENUM:\\( \\|\n\\)" (1 "<b"))
+    ("\\_<ENUM:\\( \\|\n\\)" (1 "<b"))
     ("\\_<TUPLE: +\\w+? +< +\\w+? *\\( \\|\n\\)\\([^;]\\|$\\)" (1 "<b"))
     ("\\_<TUPLE: +\\w+? *\\( \\|\n\\)\\([^;<\n]\\|\\_>\\)" (1 "<b"))
     ("\\_<\\(SYMBOLS\\|SPECIALIZED-ARRAYS\\|SINGLETONS\\|VARIANT\\): *?\\( \\|\n\\)\\([^;\n]\\|\\_>\\)"
