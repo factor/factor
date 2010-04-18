@@ -1,6 +1,6 @@
 ! (c)2010 Joe Groff bsd license
 USING: accessors alien.c-types arrays combinators delegate fry
-kernel quotations sequences words.symbol ;
+kernel quotations sequences words.symbol words ;
 IN: alien.enums
 
 TUPLE: enum-c-type base-type members ;
@@ -27,6 +27,12 @@ M: enum-c-type c-type-setter
     '[ _ 2dip @ ] ;
 
 C: <enum-c-type> enum-c-type
+
+: enum>int ( enum enum-c-type -- int )
+    c-type-unboxer-quot call( x -- y ) ; inline
+
+: int>enum ( int enum-c-type -- enum )
+    c-type-boxer-quot call( x -- y ) ; inline
 
 <PRIVATE
 

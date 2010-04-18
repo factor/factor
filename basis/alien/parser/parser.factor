@@ -79,9 +79,7 @@ M: pointer return-type-name to>> return-type-name CHAR: * suffix ;
     [ 2array suffix! ] [ 1 + ] bi ;
 
 : parse-enum-name ( -- name )
-    scan dup "f" =
-    [ drop f ]
-    [ (CREATE-C-TYPE) dup save-location ] if ;
+    scan (CREATE-C-TYPE) dup save-location ;
 
 : parse-enum-base-type ( -- base-type token )
     scan dup "<" =
