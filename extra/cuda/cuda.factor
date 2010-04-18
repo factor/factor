@@ -1,11 +1,13 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.parser
-alien.strings arrays assocs byte-arrays classes.struct
+USING: accessors alien alien.data alien.parser alien.strings
+alien.syntax arrays assocs byte-arrays classes.struct
 combinators continuations cuda.ffi destructors fry io
 io.backend io.encodings.string io.encodings.utf8 kernel lexer
-locals math math.parser namespaces opengl.gl.extensions
-prettyprint quotations sequences ;
+locals macros math math.parser namespaces nested-comments
+opengl.gl.extensions parser prettyprint quotations sequences
+words ;
+QUALIFIED-WITH: alien.c-types a
 IN: cuda
 
 SYMBOL: cuda-device
@@ -15,13 +17,32 @@ SYMBOL: cuda-function
 SYMBOL: cuda-launcher
 SYMBOL: cuda-memory-hashtable
 
+SYMBOL: cuda-libraries
+cuda-libraries [ H{ } clone ] initialize
+
+SYMBOL: cuda-functions
+
+TUPLE: cuda-library name path ;
+
+: <cuda-library> ( name path -- obj )
+    \ cuda-library new
+        swap >>path
+        swap >>name ;
+
+: add-cuda-library ( name path -- )
+    normalize-path <cuda-library>
+    dup name>> cuda-libraries get set-at ;
+
+: cuda-library ( name -- cuda-library )
+    cuda-libraries get at ;
+
 ERROR: throw-cuda-error n ;
 
 : cuda-error ( n -- )
     dup CUDA_SUCCESS = [ drop ] [ throw-cuda-error ] if ;
 
 : cuda-version ( -- n )
-    int <c-object> [ cuDriverGetVersion cuda-error ] keep *int ;
+    a:int <c-object> [ cuDriverGetVersion cuda-error ] keep a:*int ;
 
 : init-cuda ( -- )
     0 cuInit cuda-error ;
@@ -29,12 +50,19 @@ ERROR: throw-cuda-error n ;
 TUPLE: launcher
 { device integer initial: 0 }
 { device-flags initial: 0 }
-path block-shape shared-size grid ;
+path ;
+
+TUPLE: function-launcher
+dim-block
+dim-grid
+shared-size
+stream ;
 
 : with-cuda-context ( flags device quot -- )
+    H{ } clone cuda-functions set
     [
         [ CUcontext <c-object> ] 2dip
-        [ cuCtxCreate cuda-error ] 3keep 2drop *void*
+        [ cuCtxCreate cuda-error ] 3keep 2drop a:*void*
     ] dip 
     [ '[ _ @ ] ]
     [ drop '[ _ cuCtxDestroy cuda-error ] ] 2bi
@@ -44,7 +72,7 @@ path block-shape shared-size grid ;
     [
         normalize-path
         [ CUmodule <c-object> ] dip
-        [ cuModuleLoad cuda-error ] 2keep drop *void*
+        [ cuModuleLoad cuda-error ] 2keep drop a:*void*
     ] dip
     [ '[ _ @ ] ]
     [ drop '[ _ cuModuleUnload cuda-error ] ] 2bi
@@ -74,10 +102,10 @@ path block-shape shared-size grid ;
 <PRIVATE
 
 : #cuda-devices ( -- n )
-    int <c-object> [ cuDeviceGetCount cuda-error ] keep *int ;
+    a:int <c-object> [ cuDeviceGetCount cuda-error ] keep a:*int ;
 
 : n>cuda-device ( n -- device )
-    [ CUdevice <c-object> ] dip [ cuDeviceGet cuda-error ] 2keep drop *int ;
+    [ CUdevice <c-object> ] dip [ cuDeviceGet cuda-error ] 2keep drop a:*int ;
 
 : enumerate-cuda-devices ( -- devices )
     #cuda-devices iota [ n>cuda-device ] map ;
@@ -98,26 +126,29 @@ PRIVATE>
     [ 2drop utf8 alien>string ] 3bi ;
 
 : cuda-device-capability ( n -- pair )
-    [ int <c-object> int <c-object> ] dip
+    [ a:int <c-object> a:int <c-object> ] dip
     [ cuDeviceComputeCapability cuda-error ]
-    [ drop [ *int ] bi@ ] 3bi 2array ;
+    [ drop [ a:*int ] bi@ ] 3bi 2array ;
 
 : cuda-device-memory ( n -- bytes )
-    [ uint <c-object> ] dip
+    [ a:uint <c-object> ] dip
     [ cuDeviceTotalMem cuda-error ]
-    [ drop *uint ] 2bi ;
+    [ drop a:*uint ] 2bi ;
 
-: get-cuda-function* ( module string -- function )
+: get-function-ptr* ( module string -- function )
     [ CUfunction <c-object> ] 2dip
-    [ cuModuleGetFunction cuda-error ] 3keep 2drop *void* ;
+    [ cuModuleGetFunction cuda-error ] 3keep 2drop a:*void* ;
 
-: get-cuda-function ( string -- function )
-    [ cuda-module get ] dip get-cuda-function* ;
+: get-function-ptr ( string -- function )
+    [ cuda-module get ] dip get-function-ptr* ;
 
 : with-cuda-function ( string quot -- )
     [
-        get-cuda-function cuda-function set
+        get-function-ptr* cuda-function set
     ] dip call ; inline
+
+: cached-cuda-function ( string -- alien )
+    cuda-functions get [ get-function-ptr ] cache ;
 
 : launch-function* ( function -- ) cuLaunch cuda-error ;
 
@@ -157,7 +188,7 @@ M: cuda-memory byte-length length>> ;
 : cuda-malloc ( n -- ptr )
     [ CUdeviceptr <c-object> ] dip
     [ cuMemAlloc cuda-error ] 2keep
-    [ *int ] dip <cuda-memory> add-cuda-memory ;
+    [ a:*int ] dip <cuda-memory> add-cuda-memory ;
 
 : cuda-free* ( ptr -- )
     cuMemFree cuda-error ;
@@ -237,9 +268,9 @@ ERROR: bad-cuda-parameter parameter ;
     offset param-size ;
 
 : cuda-device-attribute ( attribute dev -- n )
-    [ int <c-object> ] 2dip
+    [ a:int <c-object> ] 2dip
     [ cuDeviceGetAttribute cuda-error ]
-    [ 2drop *int ] 3bi ;
+    [ 2drop a:*int ] 3bi ;
 
 : function-block-shape* ( function x y z -- )
     cuFuncSetBlockShape cuda-error ;
@@ -289,20 +320,46 @@ ERROR: bad-cuda-parameter parameter ;
     "CUDA Version: " write cuda-version number>string print nl
     #cuda-devices iota [ nl ] [ cuda-device. ] interleave ;
 
+: c-type>cuda-setter ( c-type -- n cuda-type )
+    {
+        { [ dup a:int = ] [ drop 4 [ cuda-int* ] ] }
+        { [ dup a:uint = ] [ drop 4 [ cuda-int* ] ] }
+        { [ dup a:float = ] [ drop 4 [ cuda-float* ] ] }
+        { [ dup a:pointer? ] [ drop 4 [ ptr>> cuda-int* ] ] }
+        { [ dup a:void* = ] [ drop 4 [ ptr>> cuda-int* ] ] }
+    } cond ;
 
-: test-cuda0 ( -- )
-    T{ launcher
-        { path "vocab:cuda/hello.ptx" }
-        { block-shape { 6 6 6 } }
-        { shared-size 2 }
-        { grid { 2 6 } }
-    } [
-        "helloWorld" [
-            "Hello World!" [ - ] map-index
-            malloc-device-string &dispose
+: run-function-launcher ( function-launcher function -- )
+    swap
+    {
+        [ dim-block>> first3 function-block-shape* ]
+        [ shared-size>> function-shared-size* ]
+        [
+            dim-grid>> [
+                launch-function*
+            ] [
+                first2 launch-function-grid*
+            ] if-empty
+        ]
+    } 2cleave ;
 
-            [ 1array set-parameters ]
-            [ drop launch ]
-            [ device>host utf8 alien>string . ] tri
-        ] with-cuda-function
-    ] with-cuda ;
+: cuda-argument-setter ( offset c-type -- offset' quot )
+    c-type>cuda-setter
+    [ over [ + ] dip ] dip
+    '[ swap _ swap _ call ] ;
+
+MACRO: cuda-arguments ( c-types -- quot: ( args... function -- ) )
+    [ 0 ] dip [ cuda-argument-setter ] map reverse
+    swap '[ _ param-size* ] suffix
+    '[ _ cleave ] ;
+
+: define-cuda-word ( word string arguments -- )
+    [
+        '[
+            _ get-function-ptr
+            [ nip _ cuda-arguments ]
+            [ run-function-launcher ] 2bi
+        ]
+    ]
+    [ nip \ function-launcher suffix a:void function-effect ]
+    2bi define-declared ;
