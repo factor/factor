@@ -134,17 +134,12 @@ M: ##compare-imm rewrite-tagged-comparison
     } cond
     swap cc= eq? [ [ negate-cc ] change-cc ] when ;
 
-ERROR: bad-comparison ;
-
 : (fold-compare-imm) ( insn -- ? )
-    [ [ src1>> vreg>constant ] [ src2>> ] bi ] [ cc>> ] bi
-    pick integer?
-    [ [ <=> ] dip evaluate-cc ]
-    [
-        2nip {
-            { cc= [ f ] }
-            { cc/= [ t ] }
-            [ bad-comparison ]
+    [ src1>> vreg>constant ] [ src2>> ] [ cc>> ] tri
+    2over [ integer? ] both? [ [ <=> ] dip evaluate-cc ] [
+        {
+            { cc= [ eq? ] }
+            { cc/= [ eq? not ] }
         } case
     ] if ;
 
@@ -253,7 +248,12 @@ M: ##shl-imm constant-fold* drop shift ;
 
 : constant-fold ( insn -- insn' )
     [ dst>> ]
-    [ [ src1>> vreg>constant ] [ src2>> ] [ ] tri constant-fold* ] bi
+    [
+        [ src1>> vreg>constant \ f type-number or ]
+        [ src2>> ]
+        [ ]
+        tri constant-fold*
+    ] bi
     \ ##load-immediate new-insn ; inline
 
 : unary-constant-fold? ( insn -- ? )
@@ -379,7 +379,7 @@ M: ##sar-imm rewrite
         [ drop f ]
     } cond ;
 
-: insn>imm-insn ( insn op swap? -- )
+: insn>imm-insn ( insn op swap? -- new-insn )
     swap [
         [ [ dst>> ] [ src1>> ] [ src2>> ] tri ] dip
         [ swap ] when vreg>constant
@@ -389,13 +389,13 @@ M: ##sar-imm rewrite
     arithmetic-op?
     [ vreg-immediate-arithmetic? ] [ vreg-immediate-bitwise? ] if ;
 
-: rewrite-arithmetic ( insn op -- ? )
+: rewrite-arithmetic ( insn op -- insn/f )
     {
         { [ over src2>> over vreg-immediate? ] [ f insn>imm-insn ] }
         [ 2drop f ]
     } cond ; inline
 
-: rewrite-arithmetic-commutative ( insn op -- ? )
+: rewrite-arithmetic-commutative ( insn op -- insn/f )
     {
         { [ over src2>> over vreg-immediate? ] [ f insn>imm-insn ] }
         { [ over src1>> over vreg-immediate? ] [ t insn>imm-insn ] }
