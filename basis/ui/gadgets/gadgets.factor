@@ -395,4 +395,4 @@ M: f request-focus-on 2drop ;
 
 USE: vocabs.loader
 
-"prettyprint" "ui.gadgets.prettyprint" require-when
+{ "ui.gadgets" "prettyprint" } "ui.gadgets.prettyprint" require-when
