@@ -66,18 +66,19 @@ DEFER: require
 
 <PRIVATE
 
-: transfer-conditionals ( vocab-name record -- )
-    {
-        [ unloaded>> delete ]
-        [ loaded>> adjoin ]
-        [ swap partly-required get adjoin-at ]
-        [ unloaded>> null? swap '[ _ require ] when ]
-    } 2cleave ;
+SYMBOL: require-when-vocabs
+require-when-vocabs [ HS{ } clone ] initialize
 
-: load-conditional-requires ( vocab-name -- )
-    conditional-requires get
-    [ dupd at members [ transfer-conditionals ] with each ] 
-    [ delete-at ] 2bi ;
+SYMBOL: require-when-table
+require-when-table [ V{ } clone ] initialize
+
+: load-conditional-requires ( vocab -- )
+    vocab-name require-when-vocabs get in? [
+        require-when-table get [
+            [ [ vocab ] all? ] dip
+            '[ _ require ] when
+        ] assoc-each
+    ] when ;
 
 : load-source ( vocab -- )
     dup check-vocab-hook get call( vocab -- )
@@ -87,7 +88,7 @@ DEFER: require
         [ +parsing+ >>source-loaded? ] dip
         [ % ] [ call( -- ) ] if-bootstrapping
         +done+ >>source-loaded?
-        vocab-name load-conditional-requires
+        load-conditional-requires
     ] [ ] [ f >>source-loaded? ] cleanup ;
 
 : load-docs ( vocab -- )
@@ -104,22 +105,13 @@ PRIVATE>
 : require ( vocab -- )
     load-vocab drop ;
 
-<PRIVATE
-
-: adjoin-each-at ( elt seq assoc -- )
-    [ swap ] dip '[ _ swap _ adjoin-at ] each ;
-
-: record-require-when ( then loaded unloaded -- )
-    [ [ fast-set ] bi@ <require-when-record> ] 2keep
-    [ conditional-requires get adjoin-each-at ]
-    [ partly-required get adjoin-each-at ]
-    bi-curry* bi ;
-
-PRIVATE>
-
 : require-when ( if then -- )
-    swap [ vocab ] partition
-    [ drop require ] [ record-require-when ] if-empty ;
+    over [ vocab ] all? [
+        require drop
+    ] [
+        [ drop [ require-when-vocabs get adjoin ] each ]
+        [ 2array require-when-table get push ] 2bi
+    ] if ;
 
 : reload ( name -- )
     dup vocab
