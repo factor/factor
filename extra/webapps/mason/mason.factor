@@ -4,7 +4,7 @@ USING: accessors furnace.auth furnace.db
 http.server.dispatchers mason.server webapps.mason.grids
 webapps.mason.make-release webapps.mason.package
 webapps.mason.release webapps.mason.report
-webapps.mason.downloads ;
+webapps.mason.downloads webapps.mason.status-update ;
 IN: webapps.mason
 
 TUPLE: mason-app < dispatcher ;
@@ -35,5 +35,7 @@ can-make-releases? define-capability
         <protected>
             "make releases" >>description
             { can-make-releases? } >>capabilities
+        "make-release" add-responder
 
-        "make-release" add-responder ;
+    <status-update-action>
+        "status-update" add-responder ;

@@ -6,7 +6,12 @@ IN: webapps.mason.make-release
 
 : <make-release-action> ( -- action )
     <page-action>
-    [ { { "version" [ v-one-line ] } } validate-params ] >>validate
+    [
+        {
+            { "version" [ v-one-line ] }
+            { "announcement-url" [ v-url ] }
+        } validate-params
+    ] >>validate
     [
         [
             "version" value "announcement-url" value do-release
