@@ -519,6 +519,59 @@ cpu x86.32? [
     } value-numbering-step trim-temps
 ] unit-test
 
+! Branch folding
+[
+    {
+        T{ ##load-immediate f 1 100 }
+        T{ ##load-immediate f 2 200 }
+        T{ ##load-constant f 3 t }
+    }
+] [
+    {
+        T{ ##load-immediate f 1 100 }
+        T{ ##load-immediate f 2 200 }
+        T{ ##compare f 3 1 2 cc<= }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##load-immediate f 1 100 }
+        T{ ##load-immediate f 2 200 }
+        T{ ##load-constant f 3 f }
+    }
+] [
+    {
+        T{ ##load-immediate f 1 100 }
+        T{ ##load-immediate f 2 200 }
+        T{ ##compare f 3 1 2 cc= }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##load-immediate f 1 100 }
+        T{ ##load-constant f 2 f }
+    }
+] [
+    {
+        T{ ##load-immediate f 1 100 }
+        T{ ##compare-imm f 2 1 f cc= }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##load-constant f 1 f }
+        T{ ##load-constant f 2 t }
+    }
+] [
+    {
+        T{ ##load-constant f 1 f }
+        T{ ##compare-imm f 2 1 f cc= }
+    } value-numbering-step trim-temps
+] unit-test
+
 ! Reassociation
 [
     {
@@ -1039,6 +1092,19 @@ cell 8 = [
         T{ ##peek f 0 D 0 }
         T{ ##load-immediate f 1 1 }
         T{ ##not f 2 1 }
+    } value-numbering-step
+] unit-test
+
+! Stupid constant folding corner case
+[
+    {
+        T{ ##load-constant f 1 f }
+        T{ ##load-immediate f 2 $[ \ f type-number ] }
+    }
+] [
+    {
+        T{ ##load-constant f 1 f }
+        T{ ##and-imm f 2 1 15 }
     } value-numbering-step
 ] unit-test
 

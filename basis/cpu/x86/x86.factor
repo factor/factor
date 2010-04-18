@@ -521,7 +521,7 @@ M:: x86 %compare ( dst src1 src2 cc temp -- )
         { [ 3dup use-test? ] [ 2drop dup TEST ] }
         { [ over integer? ] [ drop CMP ] }
         { [ over word? ] [ drop (%compare-tagged) ] }
-        { [ over not ] [ 2drop f type-number CMP ] }
+        { [ over not ] [ 2drop \ f type-number CMP ] }
     } cond ;
 
 M:: x86 %compare-imm ( dst src1 src2 cc temp -- )
