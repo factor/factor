@@ -72,6 +72,6 @@ M: unix open-file [ open ] unix-system-call ;
 
 <<
 
-"debugger" "unix.debugger" require-when
+{ "unix" "debugger" } "unix.debugger" require-when
 
 >>
