@@ -27,6 +27,12 @@ IN: compiler.cfg.value-numbering.rewrite
         [ value>> immediate-bitwise? ]
     } 1&& ;
 
+: vreg-immediate-comparand? ( vreg -- ? )
+    vreg>expr {
+        [ constant-expr? ]
+        [ value>> immediate-comparand? ]
+    } 1&& ;
+
 ! Outputs f to mean no change
 
 GENERIC: rewrite ( insn -- insn/f )
@@ -35,10 +41,7 @@ M: insn rewrite drop f ;
 
 : ##branch-t? ( insn -- ? )
     dup ##compare-imm-branch? [
-        {
-            [ cc>> cc/= eq? ]
-            [ src2>> \ f type-number eq? ]
-        } 1&&
+        { [ cc>> cc/= eq? ] [ src2>> not ] } 1&&
     ] [ drop f ] if ; inline
 
 : general-compare-expr? ( insn -- ? )
@@ -118,8 +121,8 @@ M: ##compare-imm rewrite-tagged-comparison
 : rewrite-redundant-comparison? ( insn -- ? )
     {
         [ src1>> vreg>expr general-compare-expr? ]
-        [ src2>> \ f type-number = ]
-        [ cc>> { cc= cc/= } member-eq? ]
+        [ src2>> not ]
+        [ cc>> { cc= cc/= } member? ]
     } 1&& ; inline
 
 : rewrite-redundant-comparison ( insn -- insn' )
@@ -189,8 +192,8 @@ M: ##compare-imm-branch rewrite
 
 M: ##compare-branch rewrite
     {
-        { [ dup src1>> vreg-immediate-arithmetic? ] [ t >compare-imm-branch ] }
-        { [ dup src2>> vreg-immediate-arithmetic? ] [ f >compare-imm-branch ] }
+        { [ dup src1>> vreg-immediate-comparand? ] [ t >compare-imm-branch ] }
+        { [ dup src2>> vreg-immediate-comparand? ] [ f >compare-imm-branch ] }
         { [ dup self-compare? ] [ rewrite-self-compare-branch ] }
         [ drop f ]
     } cond ;
@@ -209,19 +212,15 @@ M: ##compare-branch rewrite
     next-vreg \ ##compare-imm new-insn ; inline
 
 : >boolean-insn ( insn ? -- insn' )
-    [ dst>> ] dip
-    {
-        { t [ t \ ##load-constant new-insn ] }
-        { f [ \ f type-number \ ##load-immediate new-insn ] }
-    } case ;
+    [ dst>> ] dip \ ##load-constant new-insn ;
 
 : rewrite-self-compare ( insn -- insn' )
     dup (rewrite-self-compare) >boolean-insn ;
 
 M: ##compare rewrite
     {
-        { [ dup src1>> vreg-immediate-arithmetic? ] [ t >compare-imm ] }
-        { [ dup src2>> vreg-immediate-arithmetic? ] [ f >compare-imm ] }
+        { [ dup src1>> vreg-immediate-comparand? ] [ t >compare-imm ] }
+        { [ dup src2>> vreg-immediate-comparand? ] [ f >compare-imm ] }
         { [ dup self-compare? ] [ rewrite-self-compare ] }
         [ drop f ]
     } cond ;

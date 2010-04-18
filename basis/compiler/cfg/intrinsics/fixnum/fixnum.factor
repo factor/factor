@@ -20,9 +20,6 @@ IN: compiler.cfg.intrinsics.fixnum
     0 cc= ^^compare-imm
     ds-push ;
 
-: tag-literal ( n -- tagged )
-    literal>> [ tag-fixnum ] [ \ f type-number ] if* ;
-
 : emit-fixnum-op ( insn -- )
     [ 2inputs ] dip call ds-push ; inline
 
@@ -44,7 +41,7 @@ IN: compiler.cfg.intrinsics.fixnum
         { [ dup 0 [-inf,a] interval-subset? ] [ drop emit-fixnum-right-shift ] }
         [ drop emit-fixnum-shift-general ]
     } cond ;
-    
+
 : emit-fixnum-bitnot ( -- )
     ds-pop ^^not tag-mask get ^^xor-imm ds-push ;
 

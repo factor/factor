@@ -1,8 +1,8 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays kernel layouts math
-namespaces sequences combinators splitting parser effects
-words cpu.architecture compiler.cfg.registers
+USING: accessors arrays byte-arrays combinators.short-circuit
+kernel layouts math namespaces sequences combinators splitting
+parser effects words cpu.architecture compiler.cfg.registers
 compiler.cfg.instructions compiler.cfg.instructions.syntax ;
 IN: compiler.cfg.hats
 
@@ -41,11 +41,13 @@ insn-classes get [
 
 >>
 
+: immutable? ( obj -- ? )
+    { [ float? ] [ word? ] [ not ] } 1|| ; inline
+
 : ^^load-literal ( obj -- dst )
     [ next-vreg dup ] dip {
-        { [ dup not ] [ drop \ f type-number ##load-immediate ] }
         { [ dup fixnum? ] [ tag-fixnum ##load-immediate ] }
-        { [ dup float? ] [ ##load-constant ] }
+        { [ dup immutable? ] [ ##load-constant ] }
         [ ##load-reference ]
     } cond ;
 
