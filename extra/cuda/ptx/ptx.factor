@@ -1,6 +1,6 @@
 ! (c)2010 Joe Groff bsd license
-USING: accessors arrays combinators io kernel math math.parser
-roles sequences strings variants words ;
+USING: accessors arrays combinators io io.streams.string kernel
+math math.parser roles sequences strings variants words ;
 FROM: roles => TUPLE: ;
 IN: cuda.ptx
 
@@ -62,6 +62,7 @@ TUPLE: ptx-variable
     { parameter ?integer }
     { dim dim }
     { initializer ?string } ;
+UNION: ?ptx-variable POSTPONE: f ptx-variable ;
 
 TUPLE: ptx-predicate
     { negated? boolean }
@@ -79,7 +80,7 @@ TUPLE: ptx-entry
     body ;
 
 TUPLE: ptx-func < ptx-entry
-    { return ptx-variable } ;
+    { return ?ptx-variable } ;
 
 TUPLE: ptx-directive ;
 
@@ -331,15 +332,23 @@ TUPLE: xor       < ptx-3op-instruction ;
 GENERIC: ptx-element-label ( elt -- label )
 M: object ptx-element-label  drop f ;
 
+GENERIC: ptx-semicolon? ( elt -- ? )
+M: object ptx-semicolon? drop t ;
+M: ptx-target ptx-semicolon? drop f ;
+M: ptx-entry ptx-semicolon? drop f ;
+M: ptx-func ptx-semicolon? drop f ;
+M: .file ptx-semicolon? drop f ;
+M: .loc ptx-semicolon? drop f ;
+
 GENERIC: (write-ptx-element) ( elt -- )
 
 : write-ptx-element ( elt -- )
     dup ptx-element-label [ write ":" write ] when*
-    "\t" write (write-ptx-element) 
-    ";" print ;
+    "\t" write dup (write-ptx-element) 
+    ptx-semicolon? [ ";" print ] [ nl ] if ;
 
 : write-ptx ( ptx -- )
-    "\t.version " write dup version>> write ";" print
+    "\t.version " write dup version>> print
     dup target>> write-ptx-element
     body>> [ write-ptx-element ] each ;
 
@@ -399,9 +408,9 @@ M: ptx-variable (write-ptx-element)
     "\t}" write ;
 
 : write-entry ( entry -- )
-    dup name>> write " " write
-    dup params>> [ write-params ] when* nl
-    dup directives>> [ (write-ptx-element) ] each nl
+    dup name>> write
+    dup params>> [  " " write write-params ] when* nl
+    dup directives>> [ (write-ptx-element) nl ] each
     dup body>> write-body
     drop ;
 
@@ -754,5 +763,8 @@ M: vote (write-ptx-element)
     dup mode>> (write-ptx-element)
     write-2op ;
 M: xor (write-ptx-element)
-    "or" write-insn
+    "xor" write-insn
     write-3op ;
+
+: ptx>string ( ptx -- string )
+    [ write-ptx ] with-string-writer ;
