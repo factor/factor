@@ -33,10 +33,10 @@ IN: compiler.tests.low-level-ir
     compile-test-cfg
     execute( -- result ) ;
 
-! loading immediates
+! loading constants
 [ f ] [
     V{
-        T{ ##load-immediate f 0 $[ \ f type-number ] }
+        T{ ##load-constant f 0 f }
     } compile-test-bb
 ] unit-test
 

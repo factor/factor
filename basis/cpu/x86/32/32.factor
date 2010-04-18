@@ -2,15 +2,18 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: locals alien alien.c-types alien.libraries alien.syntax
 arrays kernel fry math namespaces sequences system layouts io
-vocabs.loader accessors init classes.struct combinators command-line
-make compiler compiler.units compiler.constants compiler.alien
-compiler.codegen compiler.codegen.fixup
-compiler.cfg.instructions compiler.cfg.builder
-compiler.cfg.intrinsics compiler.cfg.stack-frame
-cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
-cpu.architecture vm ;
+vocabs.loader accessors init classes.struct combinators
+command-line make words compiler compiler.units
+compiler.constants compiler.alien compiler.codegen
+compiler.codegen.fixup compiler.cfg.instructions
+compiler.cfg.builder compiler.cfg.intrinsics
+compiler.cfg.stack-frame cpu.x86.assembler
+cpu.x86.assembler.operands cpu.x86 cpu.architecture vm ;
 FROM: layouts => cell ;
 IN: cpu.x86.32
+
+M: x86.32 immediate-comparand? ( n -- ? )
+    [ call-next-method ] [ word? ] bi or ;
 
 M: x86.32 machine-registers
     {
