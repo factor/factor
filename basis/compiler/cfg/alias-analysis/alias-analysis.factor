@@ -287,7 +287,7 @@ M: ##copy analyze-aliases*
 M: ##compare analyze-aliases*
     call-next-method
     dup useless-compare? [
-        dst>> \ f type-number \ ##load-immediate new-insn
+        dst>> f \ ##load-constant new-insn
         analyze-aliases*
     ] when ;
 
