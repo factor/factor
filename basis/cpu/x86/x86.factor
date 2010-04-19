@@ -66,7 +66,7 @@ HOOK: pic-tail-reg cpu ( -- reg )
 
 M: x86 %load-immediate dup 0 = [ drop dup XOR ] [ MOV ] if ;
 
-M: x86 %load-reference swap 0 MOV rc-absolute-cell rel-immediate ;
+M: x86 %load-reference swap 0 MOV rc-absolute-cell rel-literal ;
 
 HOOK: ds-reg cpu ( -- reg )
 HOOK: rs-reg cpu ( -- reg )
@@ -493,7 +493,7 @@ M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
 :: (%boolean) ( dst temp insn -- )
     dst \ f type-number MOV
-    temp 0 MOV \ t rc-absolute-cell rel-immediate
+    temp 0 MOV \ t rc-absolute-cell rel-literal
     dst temp insn execute ; inline
 
 : %boolean ( dst cc temp -- )
@@ -514,7 +514,7 @@ M:: x86 %compare ( dst src1 src2 cc temp -- )
     [ register? ] [ 0 = ] [ { cc= cc/= } member? ] tri* and and ;
 
 : (%compare-tagged) ( src1 src2 -- )
-    [ HEX: ffffffff CMP ] dip rc-absolute rel-immediate ;
+    [ HEX: ffffffff CMP ] dip rc-absolute rel-literal ;
 
 : (%compare-imm) ( src1 src2 cc -- )
     {

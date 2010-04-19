@@ -202,8 +202,9 @@ M: ulonglong-2-rep scalar-rep-of drop ulonglong-scalar-rep ;
 ! Mapping from register class to machine registers
 HOOK: machine-registers cpu ( -- assoc )
 
-HOOK: %load-immediate cpu ( reg obj -- )
+HOOK: %load-immediate cpu ( reg val -- )
 HOOK: %load-reference cpu ( reg obj -- )
+HOOK: %load-double cpu ( reg val -- )
 
 HOOK: %peek cpu ( vreg loc -- )
 HOOK: %replace cpu ( vreg loc -- )
@@ -495,6 +496,11 @@ GENERIC# param-reg 1 ( n reg-class abi -- reg )
 M: reg-class param-reg param-regs nth ;
 
 M: stack-params param-reg 2drop ;
+
+! Does this architecture support %load-double?
+HOOK: load-double? cpu ( -- ? )
+
+M: object load-double? f ;
 
 ! Can this value be an immediate operand for %add-imm, %sub-imm,
 ! or %mul-imm?

@@ -12,9 +12,6 @@ cpu.x86.assembler.operands cpu.x86 cpu.architecture vm ;
 FROM: layouts => cell ;
 IN: cpu.x86.32
 
-M: x86.32 immediate-comparand? ( n -- ? )
-    [ call-next-method ] [ word? ] bi or ;
-
 M: x86.32 machine-registers
     {
         { int-regs { EAX ECX EDX EBP EBX } }
@@ -26,6 +23,14 @@ M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
 M: x86.32 frame-reg EBP ;
 M: x86.32 temp-reg ECX ;
+
+M: x86.32 immediate-comparand? ( n -- ? )
+    [ call-next-method ] [ word? ] bi or ;
+
+M: x86.32 load-double? ( -- ? ) t ;
+
+M: x86.32 %load-double ( dst val -- )
+    [ 0 [] MOVSD ] dip rc-absolute rel-float ;
 
 M: x86.32 %mov-vm-ptr ( reg -- )
     0 MOV 0 rc-absolute-cell rel-vm ;
