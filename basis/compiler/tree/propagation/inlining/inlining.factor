@@ -61,16 +61,19 @@ M: callable splicing-nodes splicing-body ;
         [ nip t ] [ 2drop f f ] if
     ] if ;
 
+:: find-method-call ( class generic -- subclass/f ? )
+    object generic method-classes 
+    [| last-class new-class |
+        class new-class classes-intersect? [
+            new-class class class< [
+                last-class new-class class-min
+            ] [ object f ] if
+        ] [ last-class t ] if
+    ] all? ;
+
 :: split-method-call ( class generic -- quot/f )
     class object = [ f ] [
-        object generic method-classes 
-        [| last-class new-class |
-            class new-class classes-intersect? [
-                new-class class class<= [
-                    last-class new-class class-min
-                ] [ object f ] if
-            ] [ last-class t ] if
-        ] all?
+        class generic find-method-call
         [ generic split-code ] [ drop f ] if
     ] if ;
 
