@@ -2,16 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.strings cuda cuda.syntax destructors
 io.encodings.utf8 kernel locals math prettyprint sequences ;
-IN: cuda.hello-world
+IN: cuda.demos.hello-world
 
-CUDA-LIBRARY: hello vocab:cuda/hello.ptx
+CUDA-LIBRARY: hello vocab:cuda/demos/hello-world/hello.ptx
 
 CUDA-FUNCTION: helloWorld ( char* string-ptr ) ;
 
 :: cuda-hello-world ( -- )
     T{ launcher
         { device 0 }
-        { path "vocab:cuda/hello.ptx" }
+        { path "vocab:cuda/demos/hello-world/hello.ptx" }
     } [
         "Hello World!" [ - ] map-index malloc-device-string &dispose dup :> str
 
