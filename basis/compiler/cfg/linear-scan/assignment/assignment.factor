@@ -121,10 +121,10 @@ M: vreg-insn assign-registers-in-insn
 : trace-on-gc ( assoc -- assoc' )
     ! When a GC occurs, virtual registers which contain tagged data
     ! are traced by the GC. Outputs a sequence physical registers.
-    [ drop rep-of int-rep eq? ] { } assoc-filter-as values ;
+    [ drop rep-of tagged-rep eq? ] { } assoc-filter-as values ;
 
 : spill-on-gc? ( vreg reg -- ? )
-    [ rep-of int-rep? not ] [ spill-slot? not ] bi* and ;
+    [ rep-of tagged-rep? not ] [ spill-slot? not ] bi* and ;
 
 : spill-on-gc ( assoc -- assoc' )
     ! When a GC occurs, virtual registers which contain untagged data,

@@ -32,8 +32,8 @@ M: ##box-displaced-alien allocation-size* drop 5 cells ;
 
 : insert-gc-check ( bb -- )
     dup dup '[
-        int-rep next-vreg-rep
-        int-rep next-vreg-rep
+        tagged-rep next-vreg-rep
+        tagged-rep next-vreg-rep
         _ allocation-size
         f
         f

@@ -224,6 +224,7 @@ M:: ppc %float>integer ( dst src -- )
 M: ppc %copy ( dst src rep -- )
     2over eq? [ 3drop ] [
         {
+            { tagged-rep [ MR ] }
             { int-rep [ MR ] }
             { double-rep [ FMR ] }
         } case
