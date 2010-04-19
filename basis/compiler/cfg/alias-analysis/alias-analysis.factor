@@ -238,7 +238,7 @@ M: insn analyze-aliases*
     ! a new value, except boxing instructions haven't been
     ! inserted yet.
     dup defs-vreg [
-        over defs-vreg-rep int-rep eq?
+        over defs-vreg-rep { int-rep tagged-rep } member?
         [ set-heap-ac ] [ set-new-ac ] if
     ] when* ;
 
