@@ -1,8 +1,7 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math.private sequences kernel.private
-math sequences.private slots.private byte-arrays
-alien.accessors ;
+math sequences.private slots.private alien.accessors ;
 IN: strings
 
 <PRIVATE

@@ -35,7 +35,7 @@ gc
     [ optimized? not ] filter compile ;
 
 "debug-compiler" get [
-    
+
     nl
     "Compiling..." write flush
 
@@ -116,5 +116,7 @@ gc
     vocabs [ words compile-unoptimized "." write flush ] each
 
     " done" print flush
+
+    "io.streams.byte-array.fast" require
 
 ] unless

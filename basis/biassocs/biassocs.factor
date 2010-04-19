@@ -13,9 +13,9 @@ TUPLE: biassoc from to ;
 
 M: biassoc assoc-size from>> assoc-size ;
 
-M: biassoc at* from>> at* ;
+M: biassoc at* from>> at* ; inline
 
-M: biassoc value-at* to>> at* ;
+M: biassoc value-at* to>> at* ; inline
 
 : once-at ( value key assoc -- )
     2dup key? [ 3drop ] [ set-at ] if ;
