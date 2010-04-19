@@ -1,14 +1,14 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators hints kernel locals math
-math.order sequences ;
+math.order sequences sequences.private ;
 IN: binary-search
 
 <PRIVATE
 
 :: (search) ( seq from to quot: ( elt -- <=> ) -- i elt )
     from to + 2/ :> midpoint@
-    midpoint@ seq nth :> midpoint
+    midpoint@ seq nth-unsafe :> midpoint
 
     to from - 1 <= [
         midpoint@ midpoint

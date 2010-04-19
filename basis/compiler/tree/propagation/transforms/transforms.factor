@@ -1,12 +1,13 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types kernel sequences words fry generic accessors
-classes.tuple classes classes.algebra definitions
-stack-checker.dependencies quotations classes.tuple.private math
-math.partial-dispatch math.private math.intervals sets.private
-math.floats.private math.integers.private layouts math.order
-vectors hashtables combinators effects generalizations assocs
-sets combinators.short-circuit sequences.private locals growable
+USING: alien.c-types kernel sequences words fry generic
+generic.single accessors classes.tuple classes classes.algebra
+definitions stack-checker.dependencies quotations
+classes.tuple.private math math.partial-dispatch math.private
+math.intervals sets.private math.floats.private
+math.integers.private layouts math.order vectors hashtables
+combinators effects generalizations assocs sets
+combinators.short-circuit sequences.private locals growable
 stack-checker namespaces compiler.tree.propagation.info ;
 FROM: math => float ;
 FROM: sets => set ;
@@ -297,6 +298,12 @@ M\ set intersect [ intersect-quot ] 1 define-partial-eval
 \ push [
     in-d>> second value-info class>> growable class<=
     [ \ push def>> ] [ f ] if
+] "custom-inlining" set-word-prop
+
+! Speeds up fasta benchmark
+\ >fixnum [
+    in-d>> first value-info class>> fixnum \ f class-or class<=
+    [ [ dup [ \ >fixnum no-method ] unless ] ] [ f ] if
 ] "custom-inlining" set-word-prop
 
 ! We want to constant-fold calls to heap-size, and recompile those

@@ -35,7 +35,7 @@ gc
     [ optimized? not ] filter compile ;
 
 "debug-compiler" get [
-    
+
     nl
     "Compiling..." write flush
 
@@ -57,7 +57,7 @@ gc
 
         curry compose uncurry
 
-        array-nth set-array-nth length>>
+        array-nth set-array-nth
 
         wrap probe
 
@@ -116,5 +116,7 @@ gc
     vocabs [ words compile-unoptimized "." write flush ] each
 
     " done" print flush
+
+    "io.streams.byte-array.fast" require
 
 ] unless
