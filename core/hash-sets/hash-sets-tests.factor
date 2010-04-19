@@ -31,3 +31,6 @@ IN: hash-sets.tests
 [ f ] [ HS{ 1 2 3 } HS{ 2 3 } set= ] unit-test
 
 [ HS{ 1 2 } HS{ 1 2 3 } ] [ HS{ 1 2 } clone dup clone [ 3 swap adjoin ] keep ] unit-test
+
+[ t ] [ HS{ } null? ] unit-test
+[ f ] [ HS{ 1 } null? ] unit-test

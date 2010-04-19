@@ -23,6 +23,8 @@ ARTICLE: "set-operations" "Operations on sets"
     adjoin
     delete
 }
+"To test if a set is the empty set:"
+{ $subsections null? }
 "Basic mathematical operations, which any type of set may override for efficiency:"
 { $subsections
     diff
@@ -178,3 +180,7 @@ HELP: within
 HELP: without
 { $values { "seq" sequence } { "set" set } { "subseq" sequence } }
 { $description "Returns the subsequence of the given sequence consisting of things that are not members of the set. This may contain duplicates, if the sequence has duplicates." } ;
+
+HELP: null?
+{ $values { "set" set } { "?" "a boolean" } }
+{ $description "Tests whether the given set is empty. This outputs " { $snippet "t" } " when given a null set of any type." } ;

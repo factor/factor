@@ -112,6 +112,6 @@ PRIVATE>
 M: game-loop dispose
     stop-loop ;
 
-USING: vocabs vocabs.loader ;
+USE: vocabs.loader
 
-"prettyprint" "game.loop.prettyprint" require-when
+{ "game.loop" "prettyprint" } "game.loop.prettyprint" require-when
