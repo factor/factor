@@ -693,7 +693,7 @@ M: fixnum bad-generic 1 fixnum+fast ; inline
 
 [ V{ fixnum } ] [ [ bad-behavior ] final-classes ] unit-test
 
-[ V{ number } ] [
+[ V{ integer } ] [
     [
         0 10 [ bad-generic dup 123 bitand drop bad-generic 1 + ] times
     ] final-classes
@@ -994,3 +994,6 @@ UNION: ?fixnum fixnum POSTPONE: f ;
 [ t ] [ 1 instance-test-2 ] unit-test
 [ f ] [ 1.1 instance-test-2 ] unit-test
 [ t ] [ f instance-test-3 ] unit-test
+
+[ t ] [ [ { ?fixnum } declare >fixnum ] { >fixnum } inlined? ] unit-test
+[ f ] [ [ { integer } declare >fixnum ] { >fixnum } inlined? ] unit-test

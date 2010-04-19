@@ -55,18 +55,23 @@ M: callable splicing-nodes splicing-body ;
         [ generic no-method ] if
     ] and ;
 
+: class-min ( class1 class2 -- class/f ? )
+    2dup class<= [ drop t ] [
+        2dup swap class<=
+        [ nip t ] [ 2drop f f ] if
+    ] if ;
+
 :: split-method-call ( class generic -- quot/f )
     class object = [ f ] [
         object generic method-classes 
         [| last-class new-class |
             class new-class classes-intersect? [
                 new-class class class<= [
-                    last-class new-class class<=
-                    last-class new-class ? f
-                ] [ object t ] if
-            ] [ last-class f ] if
-        ] any?
-        [ drop f ] [ generic split-code ] if
+                    last-class new-class class-min
+                ] [ object f ] if
+            ] [ last-class t ] if
+        ] all?
+        [ generic split-code ] [ drop f ] if
     ] if ;
 
 : inlining-standard-method ( #call word -- class/f method/f )
