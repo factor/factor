@@ -492,7 +492,7 @@ M: ppc %epilogue ( n -- )
     } case ;
 
 : (%compare) ( src1 src2 -- ) [ 0 ] dip CMP ; inline
-: (%compare-imm) ( src1 src2 -- ) [ 0 ] 2dip CMPI ; inline
+: (%compare-imm) ( src1 src2 -- ) [ 0 ] [ ] [ \ f type-number or ] tri* CMPI ; inline
 : (%compare-float-unordered) ( src1 src2 -- ) [ 0 ] dip FCMPU ; inline
 : (%compare-float-ordered) ( src1 src2 -- ) [ 0 ] dip FCMPO ; inline
 
