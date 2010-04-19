@@ -27,6 +27,12 @@ IN: compiler.cfg.value-numbering.rewrite
         [ value>> immediate-bitwise? ]
     } 1&& ;
 
+: vreg-immediate-comparand? ( vreg -- ? )
+    vreg>expr {
+        [ constant-expr? ]
+        [ value>> immediate-comparand? ]
+    } 1&& ;
+
 ! Outputs f to mean no change
 
 GENERIC: rewrite ( insn -- insn/f )
@@ -35,10 +41,7 @@ M: insn rewrite drop f ;
 
 : ##branch-t? ( insn -- ? )
     dup ##compare-imm-branch? [
-        {
-            [ cc>> cc/= eq? ]
-            [ src2>> \ f type-number eq? ]
-        } 1&&
+        { [ cc>> cc/= eq? ] [ src2>> not ] } 1&&
     ] [ drop f ] if ; inline
 
 : general-compare-expr? ( insn -- ? )
@@ -118,8 +121,8 @@ M: ##compare-imm rewrite-tagged-comparison
 : rewrite-redundant-comparison? ( insn -- ? )
     {
         [ src1>> vreg>expr general-compare-expr? ]
-        [ src2>> \ f type-number = ]
-        [ cc>> { cc= cc/= } member-eq? ]
+        [ src2>> not ]
+        [ cc>> { cc= cc/= } member? ]
     } 1&& ; inline
 
 : rewrite-redundant-comparison ( insn -- insn' )
@@ -131,17 +134,12 @@ M: ##compare-imm rewrite-tagged-comparison
     } cond
     swap cc= eq? [ [ negate-cc ] change-cc ] when ;
 
-ERROR: bad-comparison ;
-
 : (fold-compare-imm) ( insn -- ? )
-    [ [ src1>> vreg>constant ] [ src2>> ] bi ] [ cc>> ] bi
-    pick integer?
-    [ [ <=> ] dip evaluate-cc ]
-    [
-        2nip {
-            { cc= [ f ] }
-            { cc/= [ t ] }
-            [ bad-comparison ]
+    [ src1>> vreg>constant ] [ src2>> ] [ cc>> ] tri
+    2over [ integer? ] both? [ [ <=> ] dip evaluate-cc ] [
+        {
+            { cc= [ eq? ] }
+            { cc/= [ eq? not ] }
         } case
     ] if ;
 
@@ -189,8 +187,8 @@ M: ##compare-imm-branch rewrite
 
 M: ##compare-branch rewrite
     {
-        { [ dup src1>> vreg-immediate-arithmetic? ] [ t >compare-imm-branch ] }
-        { [ dup src2>> vreg-immediate-arithmetic? ] [ f >compare-imm-branch ] }
+        { [ dup src1>> vreg-immediate-comparand? ] [ t >compare-imm-branch ] }
+        { [ dup src2>> vreg-immediate-comparand? ] [ f >compare-imm-branch ] }
         { [ dup self-compare? ] [ rewrite-self-compare-branch ] }
         [ drop f ]
     } cond ;
@@ -209,19 +207,15 @@ M: ##compare-branch rewrite
     next-vreg \ ##compare-imm new-insn ; inline
 
 : >boolean-insn ( insn ? -- insn' )
-    [ dst>> ] dip
-    {
-        { t [ t \ ##load-constant new-insn ] }
-        { f [ \ f type-number \ ##load-immediate new-insn ] }
-    } case ;
+    [ dst>> ] dip \ ##load-constant new-insn ;
 
 : rewrite-self-compare ( insn -- insn' )
     dup (rewrite-self-compare) >boolean-insn ;
 
 M: ##compare rewrite
     {
-        { [ dup src1>> vreg-immediate-arithmetic? ] [ t >compare-imm ] }
-        { [ dup src2>> vreg-immediate-arithmetic? ] [ f >compare-imm ] }
+        { [ dup src1>> vreg-immediate-comparand? ] [ t >compare-imm ] }
+        { [ dup src2>> vreg-immediate-comparand? ] [ f >compare-imm ] }
         { [ dup self-compare? ] [ rewrite-self-compare ] }
         [ drop f ]
     } cond ;
@@ -254,7 +248,12 @@ M: ##shl-imm constant-fold* drop shift ;
 
 : constant-fold ( insn -- insn' )
     [ dst>> ]
-    [ [ src1>> vreg>constant ] [ src2>> ] [ ] tri constant-fold* ] bi
+    [
+        [ src1>> vreg>constant \ f type-number or ]
+        [ src2>> ]
+        [ ]
+        tri constant-fold*
+    ] bi
     \ ##load-immediate new-insn ; inline
 
 : unary-constant-fold? ( insn -- ? )
@@ -380,7 +379,7 @@ M: ##sar-imm rewrite
         [ drop f ]
     } cond ;
 
-: insn>imm-insn ( insn op swap? -- )
+: insn>imm-insn ( insn op swap? -- new-insn )
     swap [
         [ [ dst>> ] [ src1>> ] [ src2>> ] tri ] dip
         [ swap ] when vreg>constant
@@ -390,13 +389,13 @@ M: ##sar-imm rewrite
     arithmetic-op?
     [ vreg-immediate-arithmetic? ] [ vreg-immediate-bitwise? ] if ;
 
-: rewrite-arithmetic ( insn op -- ? )
+: rewrite-arithmetic ( insn op -- insn/f )
     {
         { [ over src2>> over vreg-immediate? ] [ f insn>imm-insn ] }
         [ 2drop f ]
     } cond ; inline
 
-: rewrite-arithmetic-commutative ( insn op -- ? )
+: rewrite-arithmetic-commutative ( insn op -- insn/f )
     {
         { [ over src2>> over vreg-immediate? ] [ f insn>imm-insn ] }
         { [ over src1>> over vreg-immediate? ] [ t insn>imm-insn ] }

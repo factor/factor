@@ -202,8 +202,9 @@ M: ulonglong-2-rep scalar-rep-of drop ulonglong-scalar-rep ;
 ! Mapping from register class to machine registers
 HOOK: machine-registers cpu ( -- assoc )
 
-HOOK: %load-immediate cpu ( reg obj -- )
+HOOK: %load-immediate cpu ( reg val -- )
 HOOK: %load-reference cpu ( reg obj -- )
+HOOK: %load-double cpu ( reg val -- )
 
 HOOK: %peek cpu ( vreg loc -- )
 HOOK: %replace cpu ( vreg loc -- )
@@ -496,15 +497,32 @@ M: reg-class param-reg param-regs nth ;
 
 M: stack-params param-reg 2drop ;
 
-! Is this integer small enough to be an immediate operand for
-! %add-imm, %sub-imm, and %mul-imm?
+! Does this architecture support %load-double?
+HOOK: load-double? cpu ( -- ? )
+
+M: object load-double? f ;
+
+! Can this value be an immediate operand for %add-imm, %sub-imm,
+! or %mul-imm?
 HOOK: immediate-arithmetic? cpu ( n -- ? )
 
-! Is this integer small enough to be an immediate operand for
-! %and-imm, %or-imm, and %xor-imm?
+! Can this value be an immediate operand for %and-imm, %or-imm,
+! or %xor-imm?
 HOOK: immediate-bitwise? cpu ( n -- ? )
 
-! What c-type describes the implicit struct return pointer for large structs?
+! Can this value be an immediate operand for %compare-imm or
+! %compare-imm-branch?
+HOOK: immediate-comparand? cpu ( n -- ? )
+
+M: object immediate-comparand? ( n -- ? )
+    {
+        { [ dup integer? ] [ immediate-arithmetic? ] }
+        { [ dup not ] [ drop t ] }
+        [ drop f ]
+    } cond ;
+
+! What c-type describes the implicit struct return pointer for
+! large structs?
 HOOK: struct-return-pointer-type cpu ( -- c-type )
 
 ! Is this structure small enough to be returned in registers?

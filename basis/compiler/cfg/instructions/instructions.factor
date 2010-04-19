@@ -33,6 +33,10 @@ INSN: ##load-constant
 def: dst/int-rep
 constant: obj ;
 
+INSN: ##load-double
+def: dst/double-rep
+constant: val ;
+
 INSN: ##peek
 def: dst/int-rep
 literal: loc ;

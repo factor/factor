@@ -2,13 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: locals alien alien.c-types alien.libraries alien.syntax
 arrays kernel fry math namespaces sequences system layouts io
-vocabs.loader accessors init classes.struct combinators command-line
-make compiler compiler.units compiler.constants compiler.alien
-compiler.codegen compiler.codegen.fixup
-compiler.cfg.instructions compiler.cfg.builder
-compiler.cfg.intrinsics compiler.cfg.stack-frame
-cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
-cpu.architecture vm ;
+vocabs.loader accessors init classes.struct combinators
+command-line make words compiler compiler.units
+compiler.constants compiler.alien compiler.codegen
+compiler.codegen.fixup compiler.cfg.instructions
+compiler.cfg.builder compiler.cfg.intrinsics
+compiler.cfg.stack-frame cpu.x86.assembler
+cpu.x86.assembler.operands cpu.x86 cpu.architecture vm ;
 FROM: layouts => cell ;
 IN: cpu.x86.32
 
@@ -23,6 +23,14 @@ M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
 M: x86.32 frame-reg EBP ;
 M: x86.32 temp-reg ECX ;
+
+M: x86.32 immediate-comparand? ( n -- ? )
+    [ call-next-method ] [ word? ] bi or ;
+
+M: x86.32 load-double? ( -- ? ) t ;
+
+M: x86.32 %load-double ( dst val -- )
+    [ 0 [] MOVSD ] dip rc-absolute rel-float ;
 
 M: x86.32 %mov-vm-ptr ( reg -- )
     0 MOV 0 rc-absolute-cell rel-vm ;
