@@ -123,7 +123,7 @@ M: #recursive emit-node
     and ;
 
 : emit-trivial-if ( -- )
-    ds-pop \ f type-number cc/= ^^compare-imm ds-push ;
+    ds-pop f cc/= ^^compare-imm ds-push ;
 
 : trivial-not-if? ( #if -- ? )
     children>> first2
@@ -132,12 +132,12 @@ M: #recursive emit-node
     and ;
 
 : emit-trivial-not-if ( -- )
-    ds-pop \ f type-number cc= ^^compare-imm ds-push ;
+    ds-pop f cc= ^^compare-imm ds-push ;
 
 : emit-actual-if ( #if -- )
     ! Inputs to the final instruction need to be copied because of
     ! loc>vreg sync
-    ds-pop any-rep ^^copy \ f type-number cc/= ##compare-imm-branch emit-if ;
+    ds-pop any-rep ^^copy f cc/= ##compare-imm-branch emit-if ;
 
 M: #if emit-node
     {
