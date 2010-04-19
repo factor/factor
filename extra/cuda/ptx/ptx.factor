@@ -1,6 +1,6 @@
 ! (c)2010 Joe Groff bsd license
-USING: accessors arrays combinators io kernel math math.parser
-roles sequences strings variants words ;
+USING: accessors arrays combinators io io.streams.string kernel
+math math.parser roles sequences strings variants words ;
 FROM: roles => TUPLE: ;
 IN: cuda.ptx
 
@@ -62,6 +62,7 @@ TUPLE: ptx-variable
     { parameter ?integer }
     { dim dim }
     { initializer ?string } ;
+UNION: ?ptx-variable POSTPONE: f ptx-variable ;
 
 TUPLE: ptx-predicate
     { negated? boolean }
@@ -79,7 +80,7 @@ TUPLE: ptx-entry
     body ;
 
 TUPLE: ptx-func < ptx-entry
-    { return ptx-variable } ;
+    { return ?ptx-variable } ;
 
 TUPLE: ptx-directive ;
 
@@ -241,7 +242,7 @@ TUPLE: cnot      < ptx-2op-instruction ;
 TUPLE: copysign  < ptx-3op-instruction ;
 TUPLE: cos       <{ ptx-2op-instruction ptx-float-env } ;
 TUPLE: cvt       < ptx-2op-instruction
-    { rounding-mode ?ptx-rounding-mode }
+    { round ?ptx-rounding-mode }
     { ftz? boolean }
     { sat? boolean }
     { dest-type ptx-type } ;
@@ -253,7 +254,7 @@ TUPLE: ex2       <{ ptx-2op-instruction ptx-float-env } ;
 TUPLE: exit      < ptx-instruction ;
 TUPLE: fma       <{ ptx-mad-instruction ptx-float-env } ;
 TUPLE: isspacep  < ptx-instruction
-    { storage-space ?ptx-storage-space }
+    { storage-space ptx-storage-space }
     { dest string }
     { a string } ;
 TUPLE: ld        < ptx-ldst-instruction ;
@@ -331,15 +332,23 @@ TUPLE: xor       < ptx-3op-instruction ;
 GENERIC: ptx-element-label ( elt -- label )
 M: object ptx-element-label  drop f ;
 
+GENERIC: ptx-semicolon? ( elt -- ? )
+M: object ptx-semicolon? drop t ;
+M: ptx-target ptx-semicolon? drop f ;
+M: ptx-entry ptx-semicolon? drop f ;
+M: ptx-func ptx-semicolon? drop f ;
+M: .file ptx-semicolon? drop f ;
+M: .loc ptx-semicolon? drop f ;
+
 GENERIC: (write-ptx-element) ( elt -- )
 
 : write-ptx-element ( elt -- )
     dup ptx-element-label [ write ":" write ] when*
-    "\t" write (write-ptx-element) 
-    ";" print ;
+    "\t" write dup (write-ptx-element) 
+    ptx-semicolon? [ ";" print ] [ nl ] if ;
 
 : write-ptx ( ptx -- )
-    "\t.version " write dup version>> write ";" print
+    "\t.version " write dup version>> print
     dup target>> write-ptx-element
     body>> [ write-ptx-element ] each ;
 
@@ -399,9 +408,9 @@ M: ptx-variable (write-ptx-element)
     "\t}" write ;
 
 : write-entry ( entry -- )
-    dup name>> write " " write
-    dup params>> [ write-params ] when* nl
-    dup directives>> [ (write-ptx-element) ] each nl
+    dup name>> write
+    dup params>> [  " " write write-params ] when* nl
+    dup directives>> [ (write-ptx-element) nl ] each
     dup body>> write-body
     drop ;
 
@@ -538,7 +547,7 @@ M: bar.red (write-ptx-element)
     dup b>> [ ", " write write ] when*
     ", " write c>> write ;
 M: bar.sync (write-ptx-element)
-    "bar.arrive " write-insn
+    "bar.sync " write-insn
     dup a>> write
     dup b>> [ ", " write write ] when*
     drop ;
@@ -554,15 +563,16 @@ M: bfind (write-ptx-element)
     write-2op ;
 M: bra (write-ptx-element)
     "bra" write-insn
-    dup write-uni
-    " " write target>> write ;
+    dup write-uni " " write
+    target>> write ;
 M: brev (write-ptx-element)
     "brev" write-insn
     write-2op ;
 M: brkpt (write-ptx-element)
     "brkpt" write-insn drop ;
 M: call (write-ptx-element)
-    "call" write-insn " " write
+    "call" write-insn
+    dup write-uni " " write
     dup return>> [ "(" write write "), " write ] when*
     dup target>> write
     dup params>> [ ", (" write ", " join write ")" write ] unless-empty
@@ -582,7 +592,7 @@ M: cos (write-ptx-element)
     write-2op ;
 M: cvt (write-ptx-element)
     "cvt" write-insn
-    dup rounding-mode>> (write-ptx-element)
+    dup round>> (write-ptx-element)
     dup write-ftz
     dup write-sat
     dup dest-type>> (write-ptx-element)
@@ -676,12 +686,17 @@ M: prefetchu (write-ptx-element)
     " " write a>> write ;
 M: prmt (write-ptx-element)
     "prmt" write-insn
-    dup mode>> (write-ptx-element)
-    write-4op ;
+    dup type>> (write-ptx-element)
+    dup mode>> (write-ptx-element) " " write
+    dup dest>> write ", " write
+    dup a>> write ", " write
+    dup b>> write ", " write
+    dup c>> write
+    drop ;
 M: rcp (write-ptx-element)
     "rcp" write-insn
     dup write-float-env
-    write-3op ;
+    write-2op ;
 M: red (write-ptx-element)
     "red" write-insn
     dup storage-space>> (write-ptx-element)
@@ -749,10 +764,15 @@ M: testp (write-ptx-element)
     "testp" write-insn
     dup op>> (write-ptx-element)
     write-2op ;
+M: trap (write-ptx-element)
+    "trap" write-insn drop ;
 M: vote (write-ptx-element)
     "vote" write-insn
     dup mode>> (write-ptx-element)
     write-2op ;
 M: xor (write-ptx-element)
-    "or" write-insn
+    "xor" write-insn
     write-3op ;
+
+: ptx>string ( ptx -- string )
+    [ write-ptx ] with-string-writer ;
