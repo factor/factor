@@ -1,48 +1,55 @@
-! (c)2010 Joe Groff bsd license
-USING: accessors alien.c-types arrays combinators delegate fry
-kernel quotations sequences words.symbol words ;
+! (c)2010 Joe Groff, Erik Charlebois bsd license
+USING: accessors alien.c-types arrays classes.singleton combinators
+delegate fry generic.parser kernel math parser sequences words ;
 IN: alien.enums
 
+<PRIVATE
 TUPLE: enum-c-type base-type members ;
-
+C: <enum-c-type> enum-c-type
 CONSULT: c-type-protocol enum-c-type
     base-type>> ;
-
-<PRIVATE
-: map-to-case ( quot: ( x -- y ) -- case )
-    { } map-as [ ] suffix ; inline
 PRIVATE>
 
-: enum-unboxer ( members -- quot )
-    [ first2 '[ _ ] 2array ] map-to-case '[ _ case ] ;
+GENERIC: enum>number ( enum -- number )
+M: integer enum>number ;
 
-: enum-boxer ( members -- quot )
-    [ first2 swap '[ _ ] 2array ] map-to-case '[ _ case ] ;
-
-M: enum-c-type c-type-boxed-class drop object ;
-M: enum-c-type c-type-boxer-quot members>> enum-boxer ;
-M: enum-c-type c-type-unboxer-quot members>> enum-unboxer ;
-M: enum-c-type c-type-setter
-    [ members>> enum-unboxer ] [ base-type>> c-type-setter ] bi
-    '[ _ 2dip @ ] ;
-
-C: <enum-c-type> enum-c-type
-
-: enum>int ( enum enum-c-type -- int )
-    c-type-unboxer-quot call( x -- y ) ; inline
-
-: int>enum ( int enum-c-type -- enum )
+: number>enum ( number enum-c-type -- enum )
     c-type-boxer-quot call( x -- y ) ; inline
 
 <PRIVATE
+: enum-boxer ( members -- quot )
+    [ first2 swap '[ _ ] 2array ]
+    { } map-as [ ] suffix '[ _ case ] ;
+PRIVATE>
+
+M: enum-c-type c-type-boxed-class drop object ;
+M: enum-c-type c-type-boxer-quot members>> enum-boxer ;
+M: enum-c-type c-type-unboxer-quot drop [ enum>number ] ;
+M: enum-c-type c-type-setter
+   [ enum>number ] swap base-type>> c-type-setter '[ _ 2dip @ ] ;
+
+<PRIVATE
+
+: define-enum>number ( class value -- )
+    [ \ enum>number create-method-in ]
+    [ '[ drop _ ] ] bi* define ;
 
 : define-enum-members ( member-names -- )
-    [ first define-symbol ] each ;
+    [
+        [ first define-singleton-class ]
+        [ first2 define-enum>number ] bi
+    ] each ;
+
+: define-enum-constructor ( word -- )
+    [ name>> "<" ">" surround create-in ] keep
+    [ number>enum ] curry (( enum -- number )) define-inline ;
 
 PRIVATE>
 
 : define-enum ( word base-type members -- )
-    [ define-enum-members ] [ <enum-c-type> swap typedef ] bi ;
-
+    [ dup define-enum-constructor ] 2dip
+    dup define-enum-members
+    <enum-c-type> swap typedef ;
+    
 PREDICATE: enum-c-type-word < c-type-word
     "c-type" word-prop enum-c-type? ;
