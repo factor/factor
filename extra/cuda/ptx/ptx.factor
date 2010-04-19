@@ -242,7 +242,7 @@ TUPLE: cnot      < ptx-2op-instruction ;
 TUPLE: copysign  < ptx-3op-instruction ;
 TUPLE: cos       <{ ptx-2op-instruction ptx-float-env } ;
 TUPLE: cvt       < ptx-2op-instruction
-    { rounding-mode ?ptx-rounding-mode }
+    { round ?ptx-rounding-mode }
     { ftz? boolean }
     { sat? boolean }
     { dest-type ptx-type } ;
@@ -254,7 +254,7 @@ TUPLE: ex2       <{ ptx-2op-instruction ptx-float-env } ;
 TUPLE: exit      < ptx-instruction ;
 TUPLE: fma       <{ ptx-mad-instruction ptx-float-env } ;
 TUPLE: isspacep  < ptx-instruction
-    { storage-space ?ptx-storage-space }
+    { storage-space ptx-storage-space }
     { dest string }
     { a string } ;
 TUPLE: ld        < ptx-ldst-instruction ;
@@ -547,7 +547,7 @@ M: bar.red (write-ptx-element)
     dup b>> [ ", " write write ] when*
     ", " write c>> write ;
 M: bar.sync (write-ptx-element)
-    "bar.arrive " write-insn
+    "bar.sync " write-insn
     dup a>> write
     dup b>> [ ", " write write ] when*
     drop ;
@@ -563,15 +563,16 @@ M: bfind (write-ptx-element)
     write-2op ;
 M: bra (write-ptx-element)
     "bra" write-insn
-    dup write-uni
-    " " write target>> write ;
+    dup write-uni " " write
+    target>> write ;
 M: brev (write-ptx-element)
     "brev" write-insn
     write-2op ;
 M: brkpt (write-ptx-element)
     "brkpt" write-insn drop ;
 M: call (write-ptx-element)
-    "call" write-insn " " write
+    "call" write-insn
+    dup write-uni " " write
     dup return>> [ "(" write write "), " write ] when*
     dup target>> write
     dup params>> [ ", (" write ", " join write ")" write ] unless-empty
@@ -591,7 +592,7 @@ M: cos (write-ptx-element)
     write-2op ;
 M: cvt (write-ptx-element)
     "cvt" write-insn
-    dup rounding-mode>> (write-ptx-element)
+    dup round>> (write-ptx-element)
     dup write-ftz
     dup write-sat
     dup dest-type>> (write-ptx-element)
@@ -685,12 +686,17 @@ M: prefetchu (write-ptx-element)
     " " write a>> write ;
 M: prmt (write-ptx-element)
     "prmt" write-insn
-    dup mode>> (write-ptx-element)
-    write-4op ;
+    dup type>> (write-ptx-element)
+    dup mode>> (write-ptx-element) " " write
+    dup dest>> write ", " write
+    dup a>> write ", " write
+    dup b>> write ", " write
+    dup c>> write
+    drop ;
 M: rcp (write-ptx-element)
     "rcp" write-insn
     dup write-float-env
-    write-3op ;
+    write-2op ;
 M: red (write-ptx-element)
     "red" write-insn
     dup storage-space>> (write-ptx-element)
@@ -758,6 +764,8 @@ M: testp (write-ptx-element)
     "testp" write-insn
     dup op>> (write-ptx-element)
     write-2op ;
+M: trap (write-ptx-element)
+    "trap" write-insn drop ;
 M: vote (write-ptx-element)
     "vote" write-insn
     dup mode>> (write-ptx-element)
