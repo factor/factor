@@ -70,7 +70,9 @@ UNION: string-memory-insn
     ##string-nth ##set-string-nth-fast ;
 
 UNION: alien-call-insn
-    ##save-context ##alien-invoke ##alien-indirect ##alien-callback ;
+    ##save-context
+    ##alien-invoke ##alien-indirect ##alien-callback
+    ##unary-float-function ##binary-float-function ;
 
 : chain ( node var -- )
     dup get [
