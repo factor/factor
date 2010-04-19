@@ -47,12 +47,34 @@ M: callable splicing-nodes splicing-body ;
         ] if
     ] [ 2drop undo-inlining ] if ;
 
+:: split-code ( class generic -- quot/f )
+    class generic method-for-class :> method
+    method [
+        dup class instance?
+        [ method execute ]
+        [ generic no-method ] if
+    ] and ;
+
+:: split-method-call ( class generic -- quot/f )
+    class object = [ f ] [
+        object generic method-classes 
+        [| last-class new-class |
+            class new-class classes-intersect? [
+                new-class class class<= [
+                    last-class new-class class<=
+                    last-class new-class ? f
+                ] [ object t ] if
+            ] [ last-class f ] if
+        ] any?
+        [ drop f ] [ generic split-code ] if
+    ] if ;
+
 : inlining-standard-method ( #call word -- class/f method/f )
     dup "methods" word-prop assoc-empty? [ 2drop f f ] [
         2dup [ in-d>> length ] [ dispatch# ] bi* <= [ 2drop f f ] [
             [ in-d>> <reversed> ] [ [ dispatch# ] keep ] bi*
             [ swap nth value-info class>> dup ] dip
-            method-for-class
+            { [ method-for-class ] [ split-method-call ] } 2||
         ] if
     ] if ;
 
