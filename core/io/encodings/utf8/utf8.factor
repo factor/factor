@@ -1,7 +1,8 @@
 ! Copyright (C) 2006, 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math math.order kernel sequences sbufs vectors growable io
-continuations namespaces io.encodings combinators strings ;
+USING: accessors byte-arrays math math.order kernel sequences
+sbufs vectors growable io continuations namespaces io.encodings
+combinators strings ;
 IN: io.encodings.utf8
 
 ! Decoding UTF-8
@@ -45,10 +46,10 @@ M: utf8 decode-char
 ! Encoding UTF-8
 
 : encoded ( stream char -- )
-    BIN: 111111 bitand BIN: 10000000 bitor swap stream-write1 ;
+    BIN: 111111 bitand BIN: 10000000 bitor swap stream-write1 ; inline
 
-: char>utf8 ( stream char -- )
-    {
+: char>utf8 ( char stream -- )
+    swap {
         { [ dup -7 shift zero? ] [ swap stream-write1 ] }
         { [ dup -11 shift zero? ] [
             2dup -6 shift BIN: 11000000 bitor swap stream-write1
@@ -65,10 +66,16 @@ M: utf8 decode-char
             2dup -6 shift encoded
             encoded
         ]
-    } cond ;
+    } cond ; inline
 
 M: utf8 encode-char
-    drop swap char>utf8 ;
+    drop char>utf8 ;
+
+M: utf8 encode-string
+    drop
+    over aux>>
+    [ [ char>utf8 ] curry each ]
+    [ [ >byte-array ] dip stream-write ] if ;
 
 PRIVATE>
 
