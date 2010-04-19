@@ -22,15 +22,15 @@ TUPLE: pure-insn < insn ;
 
 ! Stack operations
 INSN: ##load-immediate
-def: dst/int-rep
+def: dst/tagged-rep
 constant: val ;
 
 INSN: ##load-reference
-def: dst/int-rep
+def: dst/tagged-rep
 constant: obj ;
 
 INSN: ##load-constant
-def: dst/int-rep
+def: dst/tagged-rep
 constant: obj ;
 
 INSN: ##load-double
@@ -38,11 +38,11 @@ def: dst/double-rep
 constant: val ;
 
 INSN: ##peek
-def: dst/int-rep
+def: dst/tagged-rep
 literal: loc ;
 
 INSN: ##replace
-use: src/int-rep
+use: src/tagged-rep
 literal: loc ;
 
 INSN: ##inc-d
@@ -65,34 +65,34 @@ INSN: ##no-tco ;
 
 ! Jump tables
 INSN: ##dispatch
-use: src/int-rep
+use: src/tagged-rep
 temp: temp/int-rep ;
 
 ! Slot access
 INSN: ##slot
-def: dst/int-rep
-use: obj/int-rep slot/int-rep ;
+def: dst/tagged-rep
+use: obj/tagged-rep slot/tagged-rep ;
 
 INSN: ##slot-imm
-def: dst/int-rep
-use: obj/int-rep
+def: dst/tagged-rep
+use: obj/tagged-rep
 literal: slot tag ;
 
 INSN: ##set-slot
-use: src/int-rep obj/int-rep slot/int-rep ;
+use: src/tagged-rep obj/tagged-rep slot/tagged-rep ;
 
 INSN: ##set-slot-imm
-use: src/int-rep obj/int-rep
+use: src/tagged-rep obj/tagged-rep
 literal: slot tag ;
 
 ! String element access
 INSN: ##string-nth
-def: dst/int-rep
-use: obj/int-rep index/int-rep
+def: dst/tagged-rep
+use: obj/tagged-rep index/tagged-rep
 temp: temp/int-rep ;
 
 INSN: ##set-string-nth-fast
-use: src/int-rep obj/int-rep index/int-rep
+use: src/tagged-rep obj/tagged-rep index/tagged-rep
 temp: temp/int-rep ;
 
 PURE-INSN: ##copy
@@ -102,105 +102,105 @@ literal: rep ;
 
 ! Integer arithmetic
 PURE-INSN: ##add
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 PURE-INSN: ##add-imm
-def: dst/int-rep
-use: src1/int-rep
+def: dst/tagged-rep
+use: src1/tagged-rep
 constant: src2 ;
 
 PURE-INSN: ##sub
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 PURE-INSN: ##sub-imm
-def: dst/int-rep
-use: src1/int-rep
+def: dst/tagged-rep
+use: src1/tagged-rep
 constant: src2 ;
 
 PURE-INSN: ##mul
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 PURE-INSN: ##mul-imm
-def: dst/int-rep
-use: src1/int-rep
+def: dst/tagged-rep
+use: src1/tagged-rep
 constant: src2 ;
 
 PURE-INSN: ##and
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 PURE-INSN: ##and-imm
-def: dst/int-rep
-use: src1/int-rep
+def: dst/tagged-rep
+use: src1/tagged-rep
 constant: src2 ;
 
 PURE-INSN: ##or
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 PURE-INSN: ##or-imm
-def: dst/int-rep
-use: src1/int-rep
+def: dst/tagged-rep
+use: src1/tagged-rep
 constant: src2 ;
 
 PURE-INSN: ##xor
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 PURE-INSN: ##xor-imm
-def: dst/int-rep
-use: src1/int-rep
+def: dst/tagged-rep
+use: src1/tagged-rep
 constant: src2 ;
 
 PURE-INSN: ##shl
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 PURE-INSN: ##shl-imm
-def: dst/int-rep
-use: src1/int-rep
+def: dst/tagged-rep
+use: src1/tagged-rep
 constant: src2 ;
 
 PURE-INSN: ##shr
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 PURE-INSN: ##shr-imm
-def: dst/int-rep
-use: src1/int-rep
+def: dst/tagged-rep
+use: src1/tagged-rep
 constant: src2 ;
 
 PURE-INSN: ##sar
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 PURE-INSN: ##sar-imm
-def: dst/int-rep
-use: src1/int-rep
+def: dst/tagged-rep
+use: src1/tagged-rep
 constant: src2 ;
 
 PURE-INSN: ##min
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 PURE-INSN: ##max
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 PURE-INSN: ##not
-def: dst/int-rep
-use: src/int-rep ;
+def: dst/tagged-rep
+use: src/tagged-rep ;
 
 PURE-INSN: ##neg
-def: dst/int-rep
-use: src/int-rep ;
+def: dst/tagged-rep
+use: src/tagged-rep ;
 
 PURE-INSN: ##log2
-def: dst/int-rep
-use: src/int-rep ;
+def: dst/tagged-rep
+use: src/tagged-rep ;
 
 ! Float arithmetic
 PURE-INSN: ##add-float
@@ -253,12 +253,12 @@ use: src/double-rep ;
 
 ! Float/integer conversion
 PURE-INSN: ##float>integer
-def: dst/int-rep
+def: dst/tagged-rep
 use: src/double-rep ;
 
 PURE-INSN: ##integer>float
 def: dst/double-rep
-use: src/int-rep ;
+use: src/tagged-rep ;
 
 ! SIMD operations
 PURE-INSN: ##zero-vector
@@ -340,7 +340,7 @@ use: src1 src2
 literal: rep cc ;
 
 PURE-INSN: ##test-vector
-def: dst/int-rep
+def: dst/tagged-rep
 use: src1
 temp: temp/int-rep
 literal: rep vcc ;
@@ -508,13 +508,13 @@ literal: rep ;
 
 ! Scalar/vector conversion
 PURE-INSN: ##scalar>integer
-def: dst/int-rep
+def: dst/tagged-rep
 use: src
 literal: rep ;
 
 PURE-INSN: ##integer>scalar
 def: dst
-use: src/int-rep
+use: src/tagged-rep
 literal: rep ;
 
 PURE-INSN: ##vector>scalar
@@ -529,26 +529,26 @@ literal: rep ;
 
 ! Boxing and unboxing aliens
 PURE-INSN: ##box-alien
-def: dst/int-rep
-use: src/int-rep
+def: dst/tagged-rep
+use: src/tagged-rep
 temp: temp/int-rep ;
 
 PURE-INSN: ##box-displaced-alien
-def: dst/int-rep
-use: displacement/int-rep base/int-rep
+def: dst/tagged-rep
+use: displacement/tagged-rep base/tagged-rep
 temp: temp/int-rep
 literal: base-class ;
 
 PURE-INSN: ##unbox-any-c-ptr
-def: dst/int-rep
-use: src/int-rep ;
+def: dst/tagged-rep
+use: src/tagged-rep ;
 
 : ##unbox-f ( dst src -- ) drop 0 ##load-immediate ;
 : ##unbox-byte-array ( dst src -- ) byte-array-offset ##add-imm ;
 
 PURE-INSN: ##unbox-alien
-def: dst/int-rep
-use: src/int-rep ;
+def: dst/tagged-rep
+use: src/tagged-rep ;
 
 : ##unbox-c-ptr ( dst src class -- )
     {
@@ -560,116 +560,116 @@ use: src/int-rep ;
 
 ! Alien accessors
 INSN: ##alien-unsigned-1
-def: dst/int-rep
-use: src/int-rep
+def: dst/tagged-rep
+use: src/tagged-rep
 literal: offset ;
 
 INSN: ##alien-unsigned-2
-def: dst/int-rep
-use: src/int-rep
+def: dst/tagged-rep
+use: src/tagged-rep
 literal: offset ;
 
 INSN: ##alien-unsigned-4
-def: dst/int-rep
-use: src/int-rep
+def: dst/tagged-rep
+use: src/tagged-rep
 literal: offset ;
 
 INSN: ##alien-signed-1
-def: dst/int-rep
-use: src/int-rep
+def: dst/tagged-rep
+use: src/tagged-rep
 literal: offset ;
 
 INSN: ##alien-signed-2
-def: dst/int-rep
-use: src/int-rep
+def: dst/tagged-rep
+use: src/tagged-rep
 literal: offset ;
 
 INSN: ##alien-signed-4
-def: dst/int-rep
-use: src/int-rep
+def: dst/tagged-rep
+use: src/tagged-rep
 literal: offset ;
 
 INSN: ##alien-cell
-def: dst/int-rep
-use: src/int-rep
+def: dst/tagged-rep
+use: src/tagged-rep
 literal: offset ;
 
 INSN: ##alien-float
 def: dst/float-rep
-use: src/int-rep
+use: src/tagged-rep
 literal: offset ;
 
 INSN: ##alien-double
 def: dst/double-rep
-use: src/int-rep
+use: src/tagged-rep
 literal: offset ;
 
 INSN: ##alien-vector
 def: dst
-use: src/int-rep
+use: src/tagged-rep
 literal: offset rep ;
 
 INSN: ##set-alien-integer-1
-use: src/int-rep
+use: src/tagged-rep
 literal: offset
-use: value/int-rep ;
+use: value/tagged-rep ;
 
 INSN: ##set-alien-integer-2
-use: src/int-rep
+use: src/tagged-rep
 literal: offset
-use: value/int-rep ;
+use: value/tagged-rep ;
 
 INSN: ##set-alien-integer-4
-use: src/int-rep
+use: src/tagged-rep
 literal: offset
-use: value/int-rep ;
+use: value/tagged-rep ;
 
 INSN: ##set-alien-cell
-use: src/int-rep
+use: src/tagged-rep
 literal: offset
-use: value/int-rep ;
+use: value/tagged-rep ;
 
 INSN: ##set-alien-float
-use: src/int-rep
+use: src/tagged-rep
 literal: offset
 use: value/float-rep ;
 
 INSN: ##set-alien-double
-use: src/int-rep
+use: src/tagged-rep
 literal: offset
 use: value/double-rep ;
 
 INSN: ##set-alien-vector
-use: src/int-rep
+use: src/tagged-rep
 literal: offset
 use: value
 literal: rep ;
 
 ! Memory allocation
 INSN: ##allot
-def: dst/int-rep
+def: dst/tagged-rep
 literal: size class
 temp: temp/int-rep ;
 
 INSN: ##write-barrier
-use: src/int-rep slot/int-rep
+use: src/tagged-rep slot/tagged-rep
 temp: temp1/int-rep temp2/int-rep ;
 
 INSN: ##write-barrier-imm
-use: src/int-rep
+use: src/tagged-rep
 literal: slot
 temp: temp1/int-rep temp2/int-rep ;
 
 INSN: ##alien-global
-def: dst/int-rep
+def: dst/tagged-rep
 literal: symbol library ;
 
 INSN: ##vm-field
-def: dst/int-rep
+def: dst/tagged-rep
 literal: offset ;
 
 INSN: ##set-vm-field
-use: src/int-rep
+use: src/tagged-rep
 literal: offset ;
 
 ! FFI
@@ -697,23 +697,23 @@ literal: inputs ;
 
 ! Conditionals
 INSN: ##compare-branch
-use: src1/int-rep src2/int-rep
+use: src1/tagged-rep src2/tagged-rep
 literal: cc ;
 
 INSN: ##compare-imm-branch
-use: src1/int-rep
+use: src1/tagged-rep
 constant: src2
 literal: cc ;
 
 PURE-INSN: ##compare
-def: dst/int-rep
-use: src1/int-rep src2/int-rep
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep
 literal: cc
 temp: temp/int-rep ;
 
 PURE-INSN: ##compare-imm
-def: dst/int-rep
-use: src1/int-rep
+def: dst/tagged-rep
+use: src1/tagged-rep
 constant: src2
 literal: cc
 temp: temp/int-rep ;
@@ -727,29 +727,29 @@ use: src1/double-rep src2/double-rep
 literal: cc ;
 
 PURE-INSN: ##compare-float-ordered
-def: dst/int-rep
+def: dst/tagged-rep
 use: src1/double-rep src2/double-rep
 literal: cc
 temp: temp/int-rep ;
 
 PURE-INSN: ##compare-float-unordered
-def: dst/int-rep
+def: dst/tagged-rep
 use: src1/double-rep src2/double-rep
 literal: cc
 temp: temp/int-rep ;
 
 ! Overflowing arithmetic
 INSN: ##fixnum-add
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 INSN: ##fixnum-sub
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 INSN: ##fixnum-mul
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 INSN: ##gc
 temp: temp1/int-rep temp2/int-rep
@@ -774,7 +774,7 @@ literal: label ;
 INSN: _loop-entry ;
 
 INSN: _dispatch
-use: src/int-rep
+use: src/tagged-rep
 temp: temp ;
 
 INSN: _dispatch-label
@@ -782,40 +782,40 @@ literal: label ;
 
 INSN: _compare-branch
 literal: label
-use: src1/int-rep src2/int-rep
+use: src1/tagged-rep src2/tagged-rep
 literal: cc ;
 
 INSN: _compare-imm-branch
 literal: label
-use: src1/int-rep
+use: src1/tagged-rep
 constant: src2
 literal: cc ;
 
 INSN: _compare-float-unordered-branch
 literal: label
-use: src1/int-rep src2/int-rep
+use: src1/tagged-rep src2/tagged-rep
 literal: cc ;
 
 INSN: _compare-float-ordered-branch
 literal: label
-use: src1/int-rep src2/int-rep
+use: src1/tagged-rep src2/tagged-rep
 literal: cc ;
 
 ! Overflowing arithmetic
 INSN: _fixnum-add
 literal: label
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 INSN: _fixnum-sub
 literal: label
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 INSN: _fixnum-mul
 literal: label
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep ;
 
 TUPLE: spill-slot { n integer } ;
 C: <spill-slot> spill-slot

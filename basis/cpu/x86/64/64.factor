@@ -168,9 +168,7 @@ M:: x86.64 %box ( n rep func -- )
     ] [
         rep load-return-value
     ] if
-    rep int-rep?
-    cpu x86.64? os windows? and or
-    param-reg-1 param-reg-0 ? %mov-vm-ptr
+    rep int-rep? os windows? or param-reg-1 param-reg-0 ? %mov-vm-ptr
     func f %alien-invoke ;
 
 : box-struct-field@ ( i -- operand ) 1 + cells param@ ;
