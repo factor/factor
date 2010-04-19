@@ -1,7 +1,18 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax classes.struct ;
+USING: alien alien.c-types alien.libraries alien.syntax
+classes.struct combinators io.encodings.utf8 system ;
 IN: javascriptcore.ffi
+
+<<
+"javascriptcore" {
+        { [ os macosx? ] [ "/System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/JavaScriptCore" ] }
+        ! { [ os winnt? ]  [ "javascriptcore.dll" ] }
+        ! { [ os unix? ]  [ "libsqlite3.so" ] }
+    } cond cdecl add-library
+>>
+
+LIBRARY: javascriptcore
 
 TYPEDEF: void* JSContextGroupRef
 TYPEDEF: void* JSContextRef
@@ -24,6 +35,8 @@ TYPEDEF: void* JSObjectCallAsConstructorCallback
 TYPEDEF: void* JSObjectHasInstanceCallback
 TYPEDEF: void* JSObjectConvertToTypeCallback
 TYPEDEF: uint unsigned
+TYPEDEF: ushort JSChar
+! char[utf16n] for strings
 
 C-ENUM: JSPropertyAttributes
     { kJSPropertyAttributeNone       0 }
@@ -187,12 +200,9 @@ FUNCTION: JSStringRef JSPropertyNameArrayGetNameAtIndex ( JSPropertyNameArrayRef
 
 FUNCTION: void JSPropertyNameAccumulatorAddName ( JSPropertyNameAccumulatorRef accumulator, JSStringRef propertyName ) ;
 
-! char[utf16n] for strings
-TYPEDEF: ushort JSChar
-
 FUNCTION: JSStringRef JSStringCreateWithCharacters ( JSChar* chars, size_t numChars ) ;
 
-FUNCTION: JSStringRef JSStringCreateWithUTF8CString ( char* string ) ;
+FUNCTION: JSStringRef JSStringCreateWithUTF8CString ( c-string[utf8] string ) ;
 
 FUNCTION: JSStringRef JSStringRetain ( JSStringRef string ) ;
 
