@@ -141,6 +141,19 @@ IN: compiler.tree.propagation.transforms
     } case
 ] "custom-inlining" set-word-prop
 
+:: inline-instance ( node -- quot/f )
+    node in-d>> first2 [ value-info ] bi@ literal>> :> ( obj klass )
+    klass class? [
+        {
+            [ klass \ f = not ]
+            [ obj class>> \ f class-not class-and klass class<= ]
+        } 0&&
+        [ [ drop >boolean ] ]
+        [ klass "predicate" word-prop '[ drop @ ] ] if
+    ] [ f ] if ;
+
+\ instance? [ inline-instance ] "custom-inlining" set-word-prop
+
 ERROR: bad-partial-eval quot word ;
 
 : check-effect ( quot word -- )
@@ -172,11 +185,6 @@ ERROR: bad-partial-eval quot word ;
     ] [ drop f ] if ;
 
 \ new [ inline-new ] 1 define-partial-eval
-
-\ instance? [
-    dup class?
-    [ "predicate" word-prop ] [ drop f ] if
-] 1 define-partial-eval
 
 ! Shuffling
 : nths-quot ( indices -- quot )
