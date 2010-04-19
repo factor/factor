@@ -47,7 +47,7 @@ CONSTANT: fp-scratch-reg 30
 M: ppc %load-immediate ( reg n -- ) swap LOAD ;
 
 M: ppc %load-reference ( reg obj -- )
-    [ 0 swap LOAD32 ] [ rc-absolute-ppc-2/2 rel-immediate ] bi* ;
+    [ 0 swap LOAD32 ] [ rc-absolute-ppc-2/2 rel-literal ] bi* ;
 
 M: ppc %alien-global ( register symbol dll -- )
     [ 0 swap LOAD32 ] 2dip rc-absolute-ppc-2/2 rel-dlsym ;

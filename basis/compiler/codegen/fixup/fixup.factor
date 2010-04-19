@@ -70,8 +70,11 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 : rel-word-pic-tail ( word class -- )
     [ add-literal ] dip rt-entry-point-pic-tail rel-fixup ;
 
-: rel-immediate ( literal class -- )
+: rel-literal ( literal class -- )
     [ add-literal ] dip rt-literal rel-fixup ;
+
+: rel-float ( literal class -- )
+    [ add-literal ] dip rt-float rel-fixup ;
 
 : rel-this ( class -- )
     rt-this rel-fixup ;

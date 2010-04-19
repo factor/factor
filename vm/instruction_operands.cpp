@@ -62,6 +62,16 @@ fixnum instruction_operand::load_value()
 	return load_value(pointer);
 }
 
+cell instruction_operand::load_float()
+{
+	return (cell)load_value() - boxed_float_offset;
+}
+
+cell instruction_operand::load_float(cell pointer)
+{
+	return (cell)load_value(pointer) - boxed_float_offset;
+}
+
 code_block *instruction_operand::load_code_block(cell relative_to)
 {
 	return ((code_block *)load_value(relative_to) - 1);
@@ -133,6 +143,11 @@ void instruction_operand::store_value(fixnum absolute_value)
 		critical_error("Bad rel class",rel.rel_class());
 		break;
 	}
+}
+
+void instruction_operand::store_float(cell value)
+{
+	store_value((fixnum)value + boxed_float_offset);
 }
 
 void instruction_operand::store_code_block(code_block *compiled)

@@ -57,7 +57,7 @@ gc
 
         curry compose uncurry
 
-        array-nth set-array-nth length>>
+        array-nth set-array-nth
 
         wrap probe
 

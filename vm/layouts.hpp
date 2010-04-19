@@ -246,6 +246,8 @@ struct wrapper : public object {
 	cell object;
 };
 
+const fixnum boxed_float_offset = 8 - FLOAT_TYPE;
+
 /* Assembly code makes assumptions about the layout of this struct */
 struct boxed_float : object {
 	static const cell type_number = FLOAT_TYPE;
