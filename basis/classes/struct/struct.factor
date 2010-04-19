@@ -404,4 +404,4 @@ FUNCTOR-SYNTAX: STRUCT:
 
 USING: vocabs vocabs.loader ;
 
-"prettyprint" "classes.struct.prettyprint" require-when
+{ "classes.struct" "prettyprint" } "classes.struct.prettyprint" require-when

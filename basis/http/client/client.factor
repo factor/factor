@@ -194,6 +194,6 @@ ERROR: download-failed response ;
 : http-delete ( url -- response data )
     <delete-request> http-request ;
 
-USING: vocabs vocabs.loader ;
+USE: vocabs.loader
 
-"debugger" "http.client.debugger" require-when
+{ "http.client" "debugger" } "http.client.debugger" require-when
