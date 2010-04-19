@@ -997,3 +997,5 @@ UNION: ?fixnum fixnum POSTPONE: f ;
 
 [ t ] [ [ { ?fixnum } declare >fixnum ] { >fixnum } inlined? ] unit-test
 [ f ] [ [ { integer } declare >fixnum ] { >fixnum } inlined? ] unit-test
+
+[ f ] [ [ { word } declare parent-word ] { parent-word } inlined? ] unit-test
