@@ -8,7 +8,7 @@ IN: compiler.tree.propagation.recursive.tests
     integer generalize-counter-interval
 ] unit-test
 
-[ T{ interval f { 0 t } { $[ most-positive-fixnum ] t } } ] [
+[ T{ interval f { 0 t } { $[ max-array-capacity ] t } } ] [
     T{ interval f { 1 t } { 1 t } }
     T{ interval f { 0 t } { 0 t } }
     fixnum generalize-counter-interval
