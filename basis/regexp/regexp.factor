@@ -216,6 +216,6 @@ SYNTAX: R` CHAR: ` parsing-regexp ;
 SYNTAX: R{ CHAR: } parsing-regexp ;
 SYNTAX: R| CHAR: | parsing-regexp ;
 
-USING: vocabs vocabs.loader ;
+USE: vocabs.loader
 
-"prettyprint" "regexp.prettyprint" require-when
+{ "prettyprint" "regexp" } "regexp.prettyprint" require-when

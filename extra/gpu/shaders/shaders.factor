@@ -632,4 +632,4 @@ M: program-instance dispose
     [ world>> ] [ program>> instances>> ] [ ] tri ?delete-at
     reset-memos ;
 
-"prettyprint" "gpu.shaders.prettyprint" require-when
+{ "gpu.shaders" "prettyprint" } "gpu.shaders.prettyprint" require-when

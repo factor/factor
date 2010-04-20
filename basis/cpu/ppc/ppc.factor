@@ -47,7 +47,7 @@ CONSTANT: fp-scratch-reg 30
 M: ppc %load-immediate ( reg n -- ) swap LOAD ;
 
 M: ppc %load-reference ( reg obj -- )
-    [ 0 swap LOAD32 ] [ rc-absolute-ppc-2/2 rel-immediate ] bi* ;
+    [ 0 swap LOAD32 ] [ rc-absolute-ppc-2/2 rel-literal ] bi* ;
 
 M: ppc %alien-global ( register symbol dll -- )
     [ 0 swap LOAD32 ] 2dip rc-absolute-ppc-2/2 rel-dlsym ;
@@ -492,7 +492,7 @@ M: ppc %epilogue ( n -- )
     } case ;
 
 : (%compare) ( src1 src2 -- ) [ 0 ] dip CMP ; inline
-: (%compare-imm) ( src1 src2 -- ) [ 0 ] 2dip CMPI ; inline
+: (%compare-imm) ( src1 src2 -- ) [ 0 ] [ ] [ \ f type-number or ] tri* CMPI ; inline
 : (%compare-float-unordered) ( src1 src2 -- ) [ 0 ] dip FCMPU ; inline
 : (%compare-float-ordered) ( src1 src2 -- ) [ 0 ] dip FCMPO ; inline
 

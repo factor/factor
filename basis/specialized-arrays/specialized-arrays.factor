@@ -173,6 +173,6 @@ SYNTAX: SPECIALIZED-ARRAYS:
 SYNTAX: SPECIALIZED-ARRAY:
     scan-c-type define-array-vocab use-vocab ;
 
-"prettyprint" "specialized-arrays.prettyprint" require-when
+{ "specialized-arrays" "prettyprint" } "specialized-arrays.prettyprint" require-when
 
-"mirrors" "specialized-arrays.mirrors" require-when
+{ "specialized-arrays" "mirrors" } "specialized-arrays.mirrors" require-when

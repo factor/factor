@@ -66,7 +66,7 @@ HOOK: pic-tail-reg cpu ( -- reg )
 
 M: x86 %load-immediate dup 0 = [ drop dup XOR ] [ MOV ] if ;
 
-M: x86 %load-reference swap 0 MOV rc-absolute-cell rel-immediate ;
+M: x86 %load-reference swap 0 MOV rc-absolute-cell rel-literal ;
 
 HOOK: ds-reg cpu ( -- reg )
 HOOK: rs-reg cpu ( -- reg )
@@ -491,43 +491,60 @@ M: x86 %push-context-stack ( -- )
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
-:: %boolean ( dst temp word -- )
+:: (%boolean) ( dst temp insn -- )
     dst \ f type-number MOV
-    temp 0 MOV \ t rc-absolute-cell rel-immediate
-    dst temp word execute ; inline
+    temp 0 MOV \ t rc-absolute-cell rel-literal
+    dst temp insn execute ; inline
 
-: (%compare) ( src1 src2 cc -- )
-    2over [ { cc= cc/= } member? ] [ register? ] [ 0 = ] tri* and and
-    [ drop dup TEST ]
-    [ CMP ] if ;
+: %boolean ( dst cc temp -- )
+    swap order-cc {
+        { cc<  [ \ CMOVL (%boolean) ] }
+        { cc<= [ \ CMOVLE (%boolean) ] }
+        { cc>  [ \ CMOVG (%boolean) ] }
+        { cc>= [ \ CMOVGE (%boolean) ] }
+        { cc=  [ \ CMOVE (%boolean) ] }
+        { cc/= [ \ CMOVNE (%boolean) ] }
+    } case ;
 
 M:: x86 %compare ( dst src1 src2 cc temp -- )
-    src1 src2 cc (%compare)
-    cc order-cc {
-        { cc<  [ dst temp \ CMOVL %boolean ] }
-        { cc<= [ dst temp \ CMOVLE %boolean ] }
-        { cc>  [ dst temp \ CMOVG %boolean ] }
-        { cc>= [ dst temp \ CMOVGE %boolean ] }
-        { cc=  [ dst temp \ CMOVE %boolean ] }
-        { cc/= [ dst temp \ CMOVNE %boolean ] }
-    } case ;
+    src1 src2 CMP
+    dst cc temp %boolean ;
 
-M: x86 %compare-imm ( dst src1 src2 cc temp -- )
-    %compare ;
+: use-test? ( src1 src2 cc -- ? )
+    [ register? ] [ 0 = ] [ { cc= cc/= } member? ] tri* and and ;
+
+: (%compare-tagged) ( src1 src2 -- )
+    [ HEX: ffffffff CMP ] dip rc-absolute rel-literal ;
+
+: (%compare-imm) ( src1 src2 cc -- )
+    {
+        { [ 3dup use-test? ] [ 2drop dup TEST ] }
+        { [ over integer? ] [ drop CMP ] }
+        { [ over word? ] [ drop (%compare-tagged) ] }
+        { [ over not ] [ 2drop \ f type-number CMP ] }
+    } cond ;
+
+M:: x86 %compare-imm ( dst src1 src2 cc temp -- )
+    src1 src2 cc (%compare-imm)
+    dst cc temp %boolean ;
+
+: %branch ( label cc -- )
+    order-cc {
+        { cc<  [ JL ] }
+        { cc<= [ JLE ] }
+        { cc>  [ JG ] }
+        { cc>= [ JGE ] }
+        { cc=  [ JE ] }
+        { cc/= [ JNE ] }
+    } case ;
 
 M:: x86 %compare-branch ( label src1 src2 cc -- )
-    src1 src2 cc (%compare)
-    cc order-cc {
-        { cc<  [ label JL ] }
-        { cc<= [ label JLE ] }
-        { cc>  [ label JG ] }
-        { cc>= [ label JGE ] }
-        { cc=  [ label JE ] }
-        { cc/= [ label JNE ] }
-    } case ;
+    src1 src2 CMP
+    label cc %branch ;
 
-M: x86 %compare-imm-branch ( label src1 src2 cc -- )
-    %compare-branch ;
+M:: x86 %compare-imm-branch ( label src1 src2 cc -- )
+    src1 src2 cc (%compare-imm)
+    label cc %branch ;
 
 M: x86 %add-float double-rep two-operand ADDSD ;
 M: x86 %sub-float double-rep two-operand SUBSD ;
@@ -569,20 +586,20 @@ M: x86 %float>integer CVTTSD2SI ;
 
 :: (%compare-float) ( dst src1 src2 cc temp compare -- )
     cc {
-        { cc<    [ src2 src1 \ compare execute( a b -- ) dst temp \ CMOVA  %boolean ] }
-        { cc<=   [ src2 src1 \ compare execute( a b -- ) dst temp \ CMOVAE %boolean ] }
-        { cc>    [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVA  %boolean ] }
-        { cc>=   [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVAE %boolean ] }
-        { cc=    [ src1 src2 \ compare execute( a b -- ) dst temp \ %cmov-float= %boolean ] }
-        { cc<>   [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVNE %boolean ] }
-        { cc<>=  [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVNP %boolean ] }
-        { cc/<   [ src2 src1 \ compare execute( a b -- ) dst temp \ CMOVBE %boolean ] }
-        { cc/<=  [ src2 src1 \ compare execute( a b -- ) dst temp \ CMOVB  %boolean ] }
-        { cc/>   [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVBE %boolean ] }
-        { cc/>=  [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVB  %boolean ] }
-        { cc/=   [ src1 src2 \ compare execute( a b -- ) dst temp \ %cmov-float/= %boolean ] }
-        { cc/<>  [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVE  %boolean ] }
-        { cc/<>= [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVP  %boolean ] }
+        { cc<    [ src2 src1 \ compare execute( a b -- ) dst temp \ CMOVA  (%boolean) ] }
+        { cc<=   [ src2 src1 \ compare execute( a b -- ) dst temp \ CMOVAE (%boolean) ] }
+        { cc>    [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVA  (%boolean) ] }
+        { cc>=   [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVAE (%boolean) ] }
+        { cc=    [ src1 src2 \ compare execute( a b -- ) dst temp \ %cmov-float= (%boolean) ] }
+        { cc<>   [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVNE (%boolean) ] }
+        { cc<>=  [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVNP (%boolean) ] }
+        { cc/<   [ src2 src1 \ compare execute( a b -- ) dst temp \ CMOVBE (%boolean) ] }
+        { cc/<=  [ src2 src1 \ compare execute( a b -- ) dst temp \ CMOVB  (%boolean) ] }
+        { cc/>   [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVBE (%boolean) ] }
+        { cc/>=  [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVB  (%boolean) ] }
+        { cc/=   [ src1 src2 \ compare execute( a b -- ) dst temp \ %cmov-float/= (%boolean) ] }
+        { cc/<>  [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVE  (%boolean) ] }
+        { cc/<>= [ src1 src2 \ compare execute( a b -- ) dst temp \ CMOVP  (%boolean) ] }
     } case ; inline
 
 M: x86 %compare-float-ordered ( dst src1 src2 cc temp -- )
@@ -954,10 +971,10 @@ M: x86 %compare-vector-ccs
 
 :: %test-vector-mask ( dst temp mask vcc -- )
     vcc {
-        { vcc-any    [ dst dst TEST dst temp \ CMOVNE %boolean ] }
-        { vcc-none   [ dst dst TEST dst temp \ CMOVE  %boolean ] }
-        { vcc-all    [ dst mask CMP dst temp \ CMOVE  %boolean ] }
-        { vcc-notall [ dst mask CMP dst temp \ CMOVNE %boolean ] }
+        { vcc-any    [ dst dst TEST dst temp \ CMOVNE (%boolean) ] }
+        { vcc-none   [ dst dst TEST dst temp \ CMOVE  (%boolean) ] }
+        { vcc-all    [ dst mask CMP dst temp \ CMOVE  (%boolean) ] }
+        { vcc-notall [ dst mask CMP dst temp \ CMOVNE (%boolean) ] }
     } case ;
 
 : %move-vector-mask ( dst src rep -- mask )

@@ -64,4 +64,4 @@ M: rect contains-point?
 
 USE: vocabs.loader
 
-"prettyprint" "math.rectangles.prettyprint" require-when
+{ "math.rectangles" "prettyprint" } "math.rectangles.prettyprint" require-when

@@ -81,6 +81,7 @@ SYNTAX: CODEGEN:
 CODEGEN: ##load-immediate %load-immediate
 CODEGEN: ##load-reference %load-reference
 CODEGEN: ##load-constant %load-reference
+CODEGEN: ##load-double %load-double
 CODEGEN: ##peek %peek
 CODEGEN: ##replace %replace
 CODEGEN: ##inc-d %inc-d

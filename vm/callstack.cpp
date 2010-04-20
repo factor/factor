@@ -214,4 +214,10 @@ void factor_vm::primitive_set_innermost_stack_frame_quot()
 	FRAME_RETURN_ADDRESS(inner,this) = (char *)quot->entry_point + offset;
 }
 
+void factor_vm::primitive_callstack_bounds()
+{
+	ctx->push(allot_alien((void*)ctx->callstack_seg->start));
+	ctx->push(allot_alien((void*)ctx->callstack_seg->end));
+}
+
 }
