@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov
+! Copyright (C) 2009, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel fry accessors sequences assocs sets namespaces
 arrays combinators combinators.short-circuit math make locals
@@ -91,8 +91,8 @@ SYMBOL: possibilities
 : possible ( vreg -- reps ) possibilities get at ;
 
 : compute-possibilities ( cfg -- )
-    H{ } clone [ '[ swap _ conjoin-at ] with-vreg-reps ] keep
-    [ keys ] assoc-map possibilities set ;
+    H{ } clone [ '[ swap _ adjoin-at ] with-vreg-reps ] keep
+    [ members ] assoc-map possibilities set ;
 
 ! Compute vregs which must remain tagged for their lifetime.
 SYMBOL: always-boxed
@@ -119,15 +119,18 @@ SYMBOL: always-boxed
 SYMBOL: costs
 
 : init-costs ( -- )
-    possibilities get [ [ 0 ] H{ } map>assoc ] assoc-map costs set ;
+    possibilities get [ drop H{ } clone ] assoc-map costs set ;
+
+: record-possibility ( rep vreg -- )
+    costs get at [ 0 or ] change-at ;
 
 : increase-cost ( rep vreg -- )
     ! Increase cost of keeping vreg in rep, making a choice of rep less
     ! likely.
-    [ basic-block get loop-nesting-at ] 2dip costs get at at+ ;
+    costs get at [ 0 or basic-block get loop-nesting-at 1 + + ] change-at ;
 
 : maybe-increase-cost ( possible vreg preferred -- )
-    pick eq? [ 2drop ] [ increase-cost ] if ;
+    pick eq? [ record-possibility ] [ increase-cost ] if ;
 
 : representation-cost ( vreg preferred -- )
     ! 'preferred' is a representation that the instruction can accept with no cost.
@@ -137,11 +140,29 @@ SYMBOL: costs
     [ '[ _ _ maybe-increase-cost ] ]
     2bi each ;
 
+GENERIC: compute-insn-costs ( insn -- )
+
+M: ##load-constant compute-insn-costs
+    ! There's no cost to unboxing the result of a ##load-constant
+    drop ;
+
+M: insn compute-insn-costs [ representation-cost ] each-rep ;
+
 : compute-costs ( cfg -- costs )
-    init-costs [ representation-cost ] with-vreg-reps costs get ;
+    init-costs
+    [
+        [ basic-block set ]
+        [
+            [
+                compute-insn-costs
+            ] each-non-phi
+        ] bi
+    ] each-basic-block
+    costs get ;
 
 ! For every vreg, compute preferred representation, that minimizes costs.
 : minimize-costs ( costs -- representations )
+    [ nip assoc-empty? not ] assoc-filter
     [ >alist alist-min first ] assoc-map ;
 
 : compute-representations ( cfg -- )
@@ -149,6 +170,54 @@ SYMBOL: costs
     [ compute-always-boxed ]
     bi assoc-union
     representations set ;
+
+! PHI nodes require special treatment
+! If the output of a phi instruction is only used as the input to another
+! phi instruction, then we want to use the same representation for both
+! if possible.
+SYMBOL: phis
+
+: collect-phis ( cfg -- )
+    H{ } clone phis set
+    [
+        phis get
+        '[ [ inputs>> values ] [ dst>> ] bi _ set-at ] each-phi
+    ] each-basic-block ;
+
+SYMBOL: work-list
+
+: add-to-work-list ( vregs -- )
+    work-list get push-all-front ;
+
+: rep-assigned ( vregs -- vregs' )
+    representations get '[ _ key? ] filter ;
+
+: rep-not-assigned ( vregs -- vregs' )
+    representations get '[ _ key? not ] filter ;
+
+: add-ready-phis ( -- )
+    phis get keys rep-assigned add-to-work-list ;
+
+: process-phi ( dst -- )
+    ! If dst = phi(src1,src2,...) and dst's representation has been
+    ! determined, assign that representation to each one of src1,...
+    ! that does not have a representation yet, and process those, too.
+    dup phis get at* [
+        [ rep-of ] [ rep-not-assigned ] bi*
+        [ [ set-rep-of ] with each ] [ add-to-work-list ] bi
+    ] [ 2drop ] if ;
+
+: remaining-phis ( -- )
+    phis get keys rep-not-assigned { } assert-sequence= ;
+
+: process-phis ( -- )
+    <hashed-dlist> work-list set
+    add-ready-phis
+    work-list get [ process-phi ] slurp-deque
+    remaining-phis ;
+
+: compute-phi-representations ( cfg -- )
+    collect-phis process-phis ;
 
 ! Insert conversions. This introduces new temporaries, so we need
 ! to rename opearands too.
@@ -188,7 +257,7 @@ SYMBOLS: renaming-set needs-renaming? ;
 : record-renaming ( from to -- )
     2array renaming-set get push needs-renaming? on ;
 
-:: (compute-renaming-set) ( ..a vreg required quot: ( ..a vreg preferred required -- ..b ) -- ..b )
+:: (compute-renaming-set) ( vreg required quot: ( vreg preferred required -- new-vreg ) -- )
     vreg rep-of :> preferred
     preferred required eq?
     [ vreg no-renaming ]
@@ -217,15 +286,16 @@ RENAMING: convert [ converted-value ] [ converted-value ] [ ]
 
 GENERIC: conversions-for-insn ( insn -- )
 
-SYMBOL: phi-mappings
+M: ##phi conversions-for-insn , ;
 
-! compiler.cfg.cssa inserts conversions which convert phi inputs into
-!  the representation of the output. However, we still have to do some
-!  processing here, because if the only node that uses the output of
-!  the phi instruction is another phi instruction then this phi node's
-! output won't have a representation assigned.
-M: ##phi conversions-for-insn
-    [ , ] [ [ inputs>> values ] [ dst>> ] bi phi-mappings get set-at ] bi ;
+! When a float is unboxed, we replace the ##load-constant with a ##load-double
+! if the architecture supports it
+: convert-to-load-double? ( insn -- ? )
+    {
+        [ drop load-double? ]
+        [ dst>> rep-of double-rep? ]
+        [ obj>> float? ]
+    } 1&& ;
 
 ! When a literal zeroes/ones vector is unboxed, we replace the ##load-reference
 ! with a ##zero-vector or ##fill-vector instruction since this is more efficient.
@@ -234,17 +304,25 @@ M: ##phi conversions-for-insn
         [ dst>> rep-of vector-rep? ]
         [ obj>> B{ 0 0 0 0  0 0 0 0  0 0 0 0  0 0 0 0 } = ]
     } 1&& ;
+
 : convert-to-fill-vector? ( insn -- ? )
     {
         [ dst>> rep-of vector-rep? ]
         [ obj>> B{ 255 255 255 255  255 255 255 255  255 255 255 255  255 255 255 255 } = ]
     } 1&& ;
 
+: (convert-to-load-double) ( insn -- dst val )
+    [ dst>> ] [ obj>> ] bi ; inline
+
 : (convert-to-zero/fill-vector) ( insn -- dst rep )
     dst>> dup rep-of ; inline
 
 : conversions-for-load-insn ( insn -- ?insn )
     {
+        {
+            [ dup convert-to-load-double? ]
+            [ (convert-to-load-double) ##load-double f ]
+        }
         {
             [ dup convert-to-zero-vector? ]
             [ (convert-to-zero/fill-vector) ##zero-vector f ]
@@ -277,46 +355,8 @@ M: insn conversions-for-insn , ;
         ] change-instructions drop
     ] if ;
 
-! If the output of a phi instruction is only used as the input to another
-! phi instruction, then we want to use the same representation for both
-! if possible.
-SYMBOL: work-list
-
-: add-to-work-list ( vregs -- )
-    work-list get push-all-front ;
-
-: rep-assigned ( vregs -- vregs' )
-    representations get '[ _ key? ] filter ;
-
-: rep-not-assigned ( vregs -- vregs' )
-    representations get '[ _ key? not ] filter ;
-
-: add-ready-phis ( -- )
-    phi-mappings get keys rep-assigned add-to-work-list ;
-
-: process-phi-mapping ( dst -- )
-    ! If dst = phi(src1,src2,...) and dst's representation has been
-    ! determined, assign that representation to each one of src1,...
-    ! that does not have a representation yet, and process those, too.
-    dup phi-mappings get at* [
-        [ rep-of ] [ rep-not-assigned ] bi*
-        [ [ set-rep-of ] with each ] [ add-to-work-list ] bi
-    ] [ 2drop ] if ;
-
-: remaining-phi-mappings ( -- )
-    phi-mappings get keys rep-not-assigned
-    [ [ int-rep ] dip set-rep-of ] each ;
-
-: process-phi-mappings ( -- )
-    <hashed-dlist> work-list set
-    add-ready-phis
-    work-list get [ process-phi-mapping ] slurp-deque
-    remaining-phi-mappings ;
-
 : insert-conversions ( cfg -- )
-    H{ } clone phi-mappings set
-    [ conversions-for-block ] each-basic-block
-    process-phi-mappings ;
+    [ conversions-for-block ] each-basic-block ;
 
 PRIVATE>
 
@@ -326,6 +366,7 @@ PRIVATE>
     {
         [ compute-possibilities ]
         [ compute-representations ]
+        [ compute-phi-representations ]
         [ insert-conversions ]
         [ ]
     } cleave

@@ -4,6 +4,6 @@ USING: vocabs.loader kernel io.thread threads
 compiler.utilities namespaces ;
 IN: bootstrap.threads
 
-"debugger" "debugger.threads" require-when
+{ "bootstrap.threads" "debugger" } "debugger.threads" require-when
 
 [ yield ] yield-hook set-global

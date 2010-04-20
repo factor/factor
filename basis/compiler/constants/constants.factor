@@ -68,7 +68,8 @@ C-ENUM: f
     rt-vm
     rt-cards-offset
     rt-decks-offset
-    rt-exception-handler ;
+    rt-exception-handler
+    rt-float ;
 
 : rc-absolute? ( n -- ? )
     ${

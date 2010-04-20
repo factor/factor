@@ -192,8 +192,17 @@ struct literal_references_visitor {
 
 	void operator()(instruction_operand op)
 	{
-		if(op.rel_type() == RT_LITERAL)
+		switch(op.rel_type())
+		{
+		case RT_LITERAL:
 			op.store_value(visitor->visit_pointer(op.load_value()));
+			break;
+		case RT_FLOAT:
+			op.store_float(visitor->visit_pointer(op.load_float()));
+			break;
+		default:
+			break;
+		}
 	}
 };
 
