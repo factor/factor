@@ -105,7 +105,7 @@ $nl
 "Important guidelines for passing data in byte arrays:"
 { $subsections "byte-arrays-gc" }
 "C-style enumerated types are supported:"
-{ $subsections POSTPONE: C-ENUM: }
+{ $subsections POSTPONE: ENUM: }
 "C types can be aliased for convenience and consistency with native library documentation:"
 { $subsections POSTPONE: TYPEDEF: }
 "A utility for defining " { $link "destructors" } " for deallocating memory:"
