@@ -111,6 +111,9 @@ struct code_block_compaction_relocation_visitor {
 		case RT_LITERAL:
 			op.store_value(slot_forwarder.visit_pointer(op.load_value(old_offset)));
 			break;
+		case RT_FLOAT:
+			op.store_float(slot_forwarder.visit_pointer(op.load_float(old_offset)));
+			break;
 		case RT_ENTRY_POINT:
 		case RT_ENTRY_POINT_PIC:
 		case RT_ENTRY_POINT_PIC_TAIL:

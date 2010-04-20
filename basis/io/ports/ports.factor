@@ -114,7 +114,7 @@ M: output-port stream-write1
 
 : write-in-groups ( byte-array port -- )
     [ binary-object <direct-uchar-array> ] dip
-    [ buffer>> size>> <groups> ] [ '[ _ stream-write ] ] bi
+    [ buffer>> size>> <sliced-groups> ] [ '[ _ stream-write ] ] bi
     each ;
 
 M: output-port stream-write
@@ -198,5 +198,3 @@ io.encodings.private ;
 HINTS: decoder-read-until { string input-port utf8 } { string input-port ascii } ;
 
 HINTS: decoder-readln { input-port utf8 } { input-port ascii } ;
-
-HINTS: encoder-write { object output-port utf8 } { object output-port ascii } ;
