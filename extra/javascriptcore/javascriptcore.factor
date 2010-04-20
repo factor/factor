@@ -6,6 +6,8 @@ javascriptcore.ffi javascriptcore.ffi.hack kernel namespaces
 sequences ;
 IN: javascriptcore
 
+ERROR: javascriptcore-error error ;
+
 : with-javascriptcore ( quot -- )
     set-callstack-bounds
     call ; inline
@@ -33,16 +35,14 @@ SYMBOL: js-context
         drop f
     ] if* ;
 
-: eval-js ( string -- ret/f exception/f )
-    [
+: eval-js ( string -- result-string )
+    '[
         [
-            [
-                swap JSStringCreateWithUTF8CString f f 0 JSValueRef <c-object>
-                [ JSEvaluateScript ] keep *void*
-            ]
-            [ '[ [ _ ] dip JSValueRef>string ] bi@ ] bi
+            dup _ JSStringCreateWithUTF8CString f f 0 JSValueRef <c-object>
+            [ JSEvaluateScript ] keep *void*
+            dup [ nip JSValueRef>string javascriptcore-error ] [ drop JSValueRef>string ] if
         ] with-global-context
     ] with-javascriptcore ;
 
-: eval-js-path ( path -- ret/f exception/f ) utf8 file-contents eval-js ;
+: eval-js-path ( path -- result-string ) utf8 file-contents eval-js ;
 
