@@ -35,14 +35,13 @@ SYMBOL: js-context
         drop f
     ] if* ;
 
-: eval-js ( string -- result-string )
-    '[
-        [
-            dup _ JSStringCreateWithUTF8CString f f 0 JSValueRef <c-object>
-            [ JSEvaluateScript ] keep *void*
-            dup [ nip JSValueRef>string javascriptcore-error ] [ drop JSValueRef>string ] if
-        ] with-global-context
-    ] with-javascriptcore ;
+: eval-js ( context string -- result-string )
+    dupd JSStringCreateWithUTF8CString f f 0 JSValueRef <c-object>
+    [ JSEvaluateScript ] keep *void*
+    dup [ nip JSValueRef>string javascriptcore-error ] [ drop JSValueRef>string ] if ;
 
-: eval-js-path ( path -- result-string ) utf8 file-contents eval-js ;
+: eval-js-standalone ( string -- result-string )
+    '[ [ _ eval-js ] with-global-context ] with-javascriptcore ;
+
+: eval-js-path-standalone ( path -- result-string ) utf8 file-contents eval-js-standalone ;
 
