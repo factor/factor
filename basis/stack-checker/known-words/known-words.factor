@@ -349,6 +349,7 @@ M: bad-executable summary
 \ both-fixnums? { object object } { object } define-primitive
 \ byte-array>bignum { byte-array } { bignum } define-primitive \ byte-array>bignum make-foldable
 \ callstack { } { callstack } define-primitive \ callstack make-flushable
+\ callstack-bounds { } { alien alien } define-primitive \ callstack-bounds make-flushable
 \ callstack-for { c-ptr } { callstack } define-primitive \ callstack make-flushable
 \ callstack>array { callstack } { array } define-primitive \ callstack>array make-flushable
 \ check-datastack { array integer integer } { object } define-primitive \ check-datastack make-flushable
