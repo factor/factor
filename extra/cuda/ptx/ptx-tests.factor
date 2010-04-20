@@ -1,4 +1,4 @@
-USING: cuda.ptx tools.test ;
+USING: cuda.ptx io.streams.string tools.test ;
 IN: cuda.ptx.tests
 
 [ """	.version 2.0
@@ -113,6 +113,17 @@ IN: cuda.ptx.tests
     } ptx>string
 ] unit-test
 
+[ "a" ] [ [ "a" write-ptx-operand ] with-string-writer ] unit-test
+[ "2" ] [ [ 2 write-ptx-operand ] with-string-writer ] unit-test
+[ "0d4000000000000000" ] [ [ 2.0 write-ptx-operand ] with-string-writer ] unit-test
+[ "!a" ] [ [ T{ ptx-negation f "a" } write-ptx-operand ] with-string-writer ] unit-test
+[ "{a, b, c, d}" ] [ [ T{ ptx-vector f { "a" "b" "c" "d" } } write-ptx-operand ] with-string-writer ] unit-test
+[ "[a]" ] [ [ T{ ptx-indirect f "a" 0 } write-ptx-operand ] with-string-writer ] unit-test
+[ "[a+1]" ] [ [ T{ ptx-indirect f "a" 1 } write-ptx-operand ] with-string-writer ] unit-test
+[ "[a-1]" ] [ [ T{ ptx-indirect f "a" -1 } write-ptx-operand ] with-string-writer ] unit-test
+[ "a[1]" ] [ [ T{ ptx-element f "a" 1 } write-ptx-operand ] with-string-writer ] unit-test
+[ "{a, b[2], 3, 0d4000000000000000}" ] [ [ T{ ptx-vector f { "a" T{ ptx-element f "b" 2 } 3 2.0 } } write-ptx-operand ] with-string-writer ] unit-test
+
 [ """	.version 2.0
 	.target sm_20
 	abs.s32 a, b;
@@ -127,11 +138,11 @@ foo:	abs.s32 a, b;
         { body {
             T{ abs { type .s32 } { dest "a" } { a "b" } }
             T{ abs
-                { predicate T{ ptx-predicate { variable "p" } } }
+                { predicate "p" }
                 { type .s32 } { dest "a" } { a "b" }
             }
             T{ abs
-                { predicate T{ ptx-predicate { negated? t } { variable "p" } } }
+                { predicate T{ ptx-negation f "p" } }
                 { type .s32 } { dest "a" } { a "b" }
             }
             T{ abs
@@ -206,9 +217,9 @@ foo:	abs.s32 a, b;
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
         { body {
-            T{ atom { op .and } { type .u32 } { dest "a" } { a "[b]" } { b "c" } }
-            T{ atom { storage-space .global } { op .or } { type .u32 } { dest "a" } { a "[b]" } { b "c" } }
-            T{ atom { storage-space .shared } { op .cas } { type .u32 } { dest "a" } { a "[b]" } { b "c" } { c "d" } }
+            T{ atom { op .and } { type .u32 } { dest "a" } { a T{ ptx-indirect f "b" } } { b "c" } }
+            T{ atom { storage-space .global } { op .or } { type .u32 } { dest "a" } { a T{ ptx-indirect f "b" } } { b "c" } }
+            T{ atom { storage-space .shared } { op .cas } { type .u32 } { dest "a" } { a T{ ptx-indirect f "b" } } { b "c" } { c "d" } }
 
         } }
     } ptx>string
@@ -229,8 +240,8 @@ foo:	abs.s32 a, b;
         { body {
             T{ bar.arrive { a "a" } { b "b" } }
             T{ bar.red { op .popc } { type .u32 } { dest "a" } { a "b" } { c "d" } }
-            T{ bar.red { op .popc } { type .u32 } { dest "a" } { a "b" } { c "!d" } }
-            T{ bar.red { op .popc } { type .u32 } { dest "a" } { a "b" } { b "c" } { c "!d" } }
+            T{ bar.red { op .popc } { type .u32 } { dest "a" } { a "b" } { c T{ ptx-negation f "d" } } }
+            T{ bar.red { op .popc } { type .u32 } { dest "a" } { a "b" } { b "c" } { c T{ ptx-negation f "d" } } }
             T{ bar.sync { a "a" } }
             T{ bar.sync { a "a" } { b "b" } }
         } }
@@ -327,6 +338,7 @@ foo:	abs.s32 a, b;
 	call (a), foo, (b);
 	call (a), foo, (b, c);
 	call (a), foo, (b, c, d);
+	call (a[2]), foo, (b, c, d[3]);
 	call foo, (b, c, d);
 """ ] [
     T{ ptx
@@ -339,6 +351,7 @@ foo:	abs.s32 a, b;
             T{ call { return "a" } { target "foo" } { params { "b" } } }
             T{ call { return "a" } { target "foo" } { params { "b" "c" } } }
             T{ call { return "a" } { target "foo" } { params { "b" "c" "d" } } }
+            T{ call { return T{ ptx-element f "a" 2 } } { target "foo" } { params { "b" "c" T{ ptx-element f "d" 3 } } } }
             T{ call { target "foo" } { params { "b" "c" "d" } } }
         } }
     } ptx>string
@@ -549,13 +562,13 @@ foo:	abs.s32 a, b;
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
         { body {
-            T{ ld { type .u32 } { dest "a" } { a "[b]" } }
-            T{ ld { type T{ .v2 { of .u32 } } } { dest "a" } { a "[b]" } }
-            T{ ld { type T{ .v4 { of .u32 } } } { dest "a" } { a "[b]" } }
-            T{ ld { type T{ .v4 { of .u32 } } } { dest "{a, b, c, d}" } { a "[e]" } }
+            T{ ld { type .u32 } { dest "a" } { a T{ ptx-indirect f "b" } } }
+            T{ ld { type T{ .v2 { of .u32 } } } { dest "a" } { a T{ ptx-indirect f "b" } } }
+            T{ ld { type T{ .v4 { of .u32 } } } { dest "a" } { a T{ ptx-indirect f "b" } } }
+            T{ ld { type T{ .v4 { of .u32 } } } { dest T{ ptx-vector f { "a" "b" "c" "d" } } } { a "[e]" } }
             T{ ld { cache-op .lu } { type .u32 } { dest "a" } { a "[b]" } }
-            T{ ld { storage-space T{ .const } } { cache-op .lu } { type .u32 } { dest "a" } { a "[b]" } }
-            T{ ld { volatile? t } { storage-space T{ .const { bank 5 } } } { type .u32 } { dest "a" } { a "[b]" } }
+            T{ ld { storage-space T{ .const } } { cache-op .lu } { type .u32 } { dest "a" } { a T{ ptx-indirect f "b" } } }
+            T{ ld { volatile? t } { storage-space T{ .const { bank 5 } } } { type .u32 } { dest "a" } { a T{ ptx-indirect f "b" } } }
         } }
     } ptx>string
 ] unit-test
@@ -574,13 +587,13 @@ foo:	abs.s32 a, b;
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
         { body {
-            T{ ldu { type .u32 } { dest "a" } { a "[b]" } }
-            T{ ldu { type T{ .v2 { of .u32 } } } { dest "a" } { a "[b]" } }
-            T{ ldu { type T{ .v4 { of .u32 } } } { dest "a" } { a "[b]" } }
-            T{ ldu { type T{ .v4 { of .u32 } } } { dest "{a, b, c, d}" } { a "[e]" } }
+            T{ ldu { type .u32 } { dest "a" } { a T{ ptx-indirect f "b" } } }
+            T{ ldu { type T{ .v2 { of .u32 } } } { dest "a" } { a T{ ptx-indirect f "b" } } }
+            T{ ldu { type T{ .v4 { of .u32 } } } { dest "a" } { a T{ ptx-indirect f "b" } } }
+            T{ ldu { type T{ .v4 { of .u32 } } } { dest T{ ptx-vector f { "a" "b" "c" "d" } } } { a "[e]" } }
             T{ ldu { cache-op .lu } { type .u32 } { dest "a" } { a "[b]" } }
-            T{ ldu { storage-space T{ .const } } { cache-op .lu } { type .u32 } { dest "a" } { a "[b]" } }
-            T{ ldu { volatile? t } { storage-space T{ .const { bank 5 } } } { type .u32 } { dest "a" } { a "[b]" } }
+            T{ ldu { storage-space T{ .const } } { cache-op .lu } { type .u32 } { dest "a" } { a T{ ptx-indirect f "b" } } }
+            T{ ldu { volatile? t } { storage-space T{ .const { bank 5 } } } { type .u32 } { dest "a" } { a T{ ptx-indirect f "b" } } }
         } }
     } ptx>string
 ] unit-test
@@ -723,9 +736,9 @@ foo:	abs.s32 a, b;
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
         { body {
-            T{ prefetch { level .L1 } { a "[a]" } }
-            T{ prefetch { storage-space .local } { level .L2 } { a "[a]" } }
-            T{ prefetchu { level .L1 } { a "[a]" } }
+            T{ prefetch { level .L1 } { a T{ ptx-indirect f "a" } } }
+            T{ prefetch { storage-space .local } { level .L2 } { a T{ ptx-indirect f "a" } } }
+            T{ prefetchu { level .L1 } { a T{ ptx-indirect f "a" } } }
         } }
     } ptx>string
 ] unit-test
@@ -781,8 +794,8 @@ foo:	abs.s32 a, b;
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
         { body {
-            T{ red { op .and } { type .u32 } { dest "[a]" } { a "b" } }
-            T{ red { storage-space .global } { op .and } { type .u32 } { dest "[a]" } { a "b" } }
+            T{ red { op .and } { type .u32 } { dest T{ ptx-indirect f "a" } } { a "b" } }
+            T{ red { storage-space .global } { op .and } { type .u32 } { dest T{ ptx-indirect f "a" } } { a "b" } }
         } }
     } ptx>string
 ] unit-test
@@ -861,7 +874,7 @@ foo:	abs.s32 a, b;
             T{ set { cmp-op .gt } { dest-type .u32 } { type .s32 } { dest "a" } { a "b" } { b "c" } }
             T{ set { cmp-op .gt } { ftz? t } { dest-type .u32 } { type .f32 } { dest "a" } { a "b" } { b "c" } }
             T{ set { cmp-op .gt } { bool-op .and } { ftz? t } { dest-type .u32 } { type .f32 } { dest "a" } { a "b" } { b "c" } { c "d" } }
-            T{ set { cmp-op .gt } { bool-op .and } { ftz? t } { dest-type .u32 } { type .f32 } { dest "a" } { a "b" } { b "c" } { c "!d" } }
+            T{ set { cmp-op .gt } { bool-op .and } { ftz? t } { dest-type .u32 } { type .f32 } { dest "a" } { a "b" } { b "c" } { c T{ ptx-negation f "d" } } }
         } }
     } ptx>string
 ] unit-test
@@ -982,13 +995,13 @@ foo:	abs.s32 a, b;
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
         { body {
-            T{ st { type .u32 } { dest "[a]" } { a "b" } }
-            T{ st { type T{ .v2 { of .u32 } } } { dest "[a]" } { a "b" } }
-            T{ st { type T{ .v4 { of .u32 } } } { dest "[a]" } { a "b" } }
-            T{ st { type T{ .v4 { of .u32 } } } { dest "[a]" } { a "{b, c, d, e}" } }
-            T{ st { cache-op .lu } { type .u32 } { dest "[a]" } { a "b" } }
-            T{ st { storage-space .local } { cache-op .lu } { type .u32 } { dest "[a]" } { a "b" } }
-            T{ st { volatile? t } { storage-space .local } { type .u32 } { dest "[a]" } { a "b" } }
+            T{ st { type .u32 } { dest T{ ptx-indirect f "a" } } { a "b" } }
+            T{ st { type T{ .v2 { of .u32 } } } { dest T{ ptx-indirect f "a" } } { a "b" } }
+            T{ st { type T{ .v4 { of .u32 } } } { dest T{ ptx-indirect f "a" } } { a "b" } }
+            T{ st { type T{ .v4 { of .u32 } } } { dest T{ ptx-indirect f "a" } } { a T{ ptx-vector f { "b" "c" "d" "e" } } } }
+            T{ st { cache-op .lu } { type .u32 } { dest T{ ptx-indirect f "a" } } { a "b" } }
+            T{ st { storage-space .local } { cache-op .lu } { type .u32 } { dest T{ ptx-indirect f "a" } } { a "b" } }
+            T{ st { volatile? t } { storage-space .local } { type .u32 } { dest T{ ptx-indirect f "a" } } { a "b" } }
         } }
     } ptx>string
 ] unit-test
