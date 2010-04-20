@@ -65,9 +65,10 @@ M: callable splicing-nodes splicing-body ;
     object generic method-classes 
     [| last-class new-class |
         class new-class classes-intersect? [
-            new-class class class< [
+            class new-class class<=
+            [ object f ] [
                 last-class new-class class-min
-            ] [ object f ] if
+            ] if
         ] [ last-class t ] if
     ] all? ;
 
