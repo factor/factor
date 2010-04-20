@@ -606,6 +606,7 @@ struct factor_vm
 	void primitive_innermost_stack_frame_executing();
 	void primitive_innermost_stack_frame_scan();
 	void primitive_set_innermost_stack_frame_quot();
+	void primitive_callstack_bounds();
 	template<typename Iterator> void iterate_callstack(context *ctx, Iterator &iterator);
 
 	// alien
