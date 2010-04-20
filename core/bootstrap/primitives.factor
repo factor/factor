@@ -451,6 +451,7 @@ tuple
     { "retainstack" "kernel" "primitive_retainstack" (( -- array )) }
     { "(identity-hashcode)" "kernel.private" "primitive_identity_hashcode" (( obj -- code )) }
     { "become" "kernel.private" "primitive_become" (( old new -- )) }
+    { "callstack-bounds" "kernel.private" "primitive_callstack_bounds" (( -- start end )) }
     { "check-datastack" "kernel.private" "primitive_check_datastack" (( array in# out# -- ? )) }
     { "compute-identity-hashcode" "kernel.private" "primitive_compute_identity_hashcode" (( obj -- )) }
     { "context-object" "kernel.private" "primitive_context_object" (( n -- obj )) }

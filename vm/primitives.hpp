@@ -35,6 +35,7 @@ namespace factor
 	_(byte_array_to_bignum) \
 	_(callback) \
 	_(callstack) \
+	_(callstack_bounds) \
 	_(callstack_for) \
 	_(callstack_to_array) \
 	_(check_datastack) \
