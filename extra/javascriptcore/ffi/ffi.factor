@@ -2,16 +2,18 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax
 classes.struct combinators io.encodings.utf16n
-io.encodings.utf8 system ;
+io.encodings.utf8 kernel system ;
 IN: javascriptcore.ffi
 
 <<
 "javascriptcore" {
-        { [ os macosx? ] [ "/System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/JavaScriptCore" ] }
-        ! { [ os winnt? ]  [ "javascriptcore.dll" ] }
-        ! { [ os unix? ]  [ "libsqlite3.so" ] }
-        [ ]
-    } cond cdecl add-library
+    { [ os macosx? ] [
+        "/System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/JavaScriptCore" cdecl add-library
+    ] }
+    ! { [ os winnt? ]  [ "javascriptcore.dll" ] }
+    ! { [ os unix? ]  [ "libsqlite3.so" ] }
+    [ drop ]
+} cond
 >>
 
 LIBRARY: javascriptcore
