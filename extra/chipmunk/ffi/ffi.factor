@@ -349,7 +349,7 @@ STRUCT: cpSegmentQueryInfo
     { t     cpFloat  }
     { n     cpVect   } ;
 
-C-ENUM: cpShapeType
+ENUM: cpShapeType
     CP_CIRCLE_SHAPE
     CP_SEGMENT_SHAPE
     CP_POLY_SHAPE
@@ -482,7 +482,7 @@ STRUCT: cpContact
 
 FUNCTION: cpContact* cpContactInit ( cpContact* con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash ) ;
 
-C-ENUM: cpArbiterState
+ENUM: cpArbiterState
     cpArbiterStateNormal
     cpArbiterStateFirstColl
     cpArbiterStateIgnore ;

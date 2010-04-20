@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel layouts system strings words quotations byte-arrays
-alien alien.syntax arrays literals sequences ;
+alien arrays literals sequences ;
 IN: compiler.constants
 
 ! These constants must match vm/memory.h
@@ -40,42 +40,40 @@ CONSTANT: deck-bits 18
 : segment-end-offset ( -- n ) 2 bootstrap-cells ; inline
 
 ! Relocation classes
-C-ENUM: f
-    rc-absolute-cell
-    rc-absolute
-    rc-relative
-    rc-absolute-ppc-2/2
-    rc-absolute-ppc-2
-    rc-relative-ppc-2
-    rc-relative-ppc-3
-    rc-relative-arm-3
-    rc-indirect-arm
-    rc-indirect-arm-pc
-    rc-absolute-2
-    rc-absolute-1 ;
+CONSTANT: rc-absolute-cell 0
+CONSTANT: rc-absolute 1
+CONSTANT: rc-relative 2
+CONSTANT: rc-absolute-ppc-2/2 3
+CONSTANT: rc-absolute-ppc-2 4
+CONSTANT: rc-relative-ppc-2 5
+CONSTANT: rc-relative-ppc-3 6
+CONSTANT: rc-relative-arm-3 7
+CONSTANT: rc-indirect-arm 8
+CONSTANT: rc-indirect-arm-pc 9
+CONSTANT: rc-absolute-2 10
+CONSTANT: rc-absolute-1 11
 
 ! Relocation types
-C-ENUM: f
-    rt-dlsym
-    rt-entry-point
-    rt-entry-point-pic
-    rt-entry-point-pic-tail
-    rt-here
-    rt-this
-    rt-literal
-    rt-untagged
-    rt-megamorphic-cache-hits
-    rt-vm
-    rt-cards-offset
-    rt-decks-offset
-    rt-exception-handler
-    rt-float ;
+CONSTANT: rt-dlsym 0
+CONSTANT: rt-entry-point 1
+CONSTANT: rt-entry-point-pic 2
+CONSTANT: rt-entry-point-pic-tail 3
+CONSTANT: rt-here 4
+CONSTANT: rt-this 5
+CONSTANT: rt-literal 6
+CONSTANT: rt-untagged 7
+CONSTANT: rt-megamorphic-cache-hits 8
+CONSTANT: rt-vm 9
+CONSTANT: rt-cards-offset 10
+CONSTANT: rt-decks-offset 11
+CONSTANT: rt-exception-handler 12
+CONSTANT: rt-float 13
 
 : rc-absolute? ( n -- ? )
     ${
-        rc-absolute-ppc-2/2
-        rc-absolute-cell
-        rc-absolute
-        rc-absolute-2
-        rc-absolute-1
+        $ rc-absolute-ppc-2/2
+        $ rc-absolute-cell
+        $ rc-absolute
+        $ rc-absolute-2
+        $ rc-absolute-1
     } member? ;

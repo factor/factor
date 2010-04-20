@@ -133,7 +133,7 @@ STRUCT: XAUDIO2_EFFECT_CHAIN
     { EffectCount        UINT32                     }
     { pEffectDescriptors XAUDIO2_EFFECT_DESCRIPTOR* } ;
 
-C-ENUM: XAUDIO2_FILTER_TYPE
+ENUM: XAUDIO2_FILTER_TYPE
     LowPassFilter
     BandPassFilter
     HighPassFilter

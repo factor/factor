@@ -75,19 +75,32 @@ M: pointer return-type-name to>> return-type-name CHAR: * suffix ;
     "*" ?head
     [ [ <pointer> ] dip parse-pointers ] when ;
 
+: next-enum-member ( members name value -- members value' )
+    [ 2array suffix! ] [ 1 + ] bi ;
+
+: parse-enum-name ( -- name )
+    scan (CREATE-C-TYPE) dup save-location ;
+
+: parse-enum-base-type ( -- base-type token )
+    scan dup "<" =
+    [ drop scan-object scan ]
+    [ [ int ] dip ] if ;
+
+: parse-enum-member ( members name value -- members value' )
+    over "{" =
+    [ 2drop scan create-in scan-object next-enum-member "}" expect ]
+    [ [ create-in ] dip next-enum-member ] if ;
+
+: parse-enum-members ( members counter token -- members )
+    dup ";" = not
+    [ swap parse-enum-member scan parse-enum-members ] [ 2drop ] if ;
+
 PRIVATE>
 
-: define-enum-member ( word-string value -- next-value )
-     [ create-in ] dip [ define-constant ] keep 1 + ;
-
-: parse-enum-member ( word-string value -- next-value )
-     over "{" =
-     [ 2drop scan scan-object define-enum-member "}" expect ]
-     [ define-enum-member ] if ;
-
-: parse-enum-members ( counter -- )
-     scan dup ";" = not
-     [ swap parse-enum-member parse-enum-members ] [ 2drop ] if ;
+: parse-enum ( -- name base-type members )
+    parse-enum-name
+    parse-enum-base-type
+    [ V{ } clone 0 ] dip parse-enum-members ;
 
 : scan-function-name ( -- return function )
     scan-c-type scan parse-pointers ;
