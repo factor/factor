@@ -78,8 +78,8 @@ M: fluids-world begin-game-world
     dup fluid set
     init-gpu
     initial-particles clone >>particles
-    "resource:extra/fluids/particle2.pgm" make-texture >>texture
-    "resource:extra/fluids/colors.ppm" make-texture >>ramp
+    "vocab:fluids/particle2.pgm" make-texture >>texture
+    "vocab:fluids/colors.ppm" make-texture >>ramp
     drop ;
 
 M: fluids-world end-game-world
