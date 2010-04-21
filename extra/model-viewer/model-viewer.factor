@@ -8,8 +8,7 @@ io io.encodings.ascii io.files io.files.temp kernel locals math
 math.matrices math.vectors.simd math.parser math.vectors
 method-chains namespaces sequences splitting threads ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats specialized-arrays
-specialized-vectors literals fry
-sequences.deep destructors math.bitwise opengl.gl
+specialized-vectors fry sequences.deep destructors math.bitwise opengl.gl
 game.models game.models.obj game.models.loader game.models.collada
 prettyprint images.tga literals ;
 FROM: alien.c-types => float ;
