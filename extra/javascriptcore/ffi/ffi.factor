@@ -41,17 +41,17 @@ TYPEDEF: void* JSObjectConvertToTypeCallback
 TYPEDEF: uint unsigned
 TYPEDEF: ushort JSChar
 
-C-ENUM: JSPropertyAttributes
+ENUM: JSPropertyAttributes
     { kJSPropertyAttributeNone       0 }
     { kJSPropertyAttributeReadOnly   2 }
     { kJSPropertyAttributeDontEnum   4 }
     { kJSPropertyAttributeDontDelete 8 } ;
 
-C-ENUM: JSClassAttributes
+ENUM: JSClassAttributes
     { kJSClassAttributeNone 0 }
     { kJSClassAttributeNoAutomaticPrototype 2 } ;
 
-C-ENUM: JSType
+ENUM: JSType
     kJSTypeUndefined,
     kJSTypeNull,
     kJSTypeBoolean,

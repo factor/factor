@@ -75,7 +75,7 @@ require-when-table [ V{ } clone ] initialize
 : load-conditional-requires ( vocab -- )
     vocab-name require-when-vocabs get in? [
         require-when-table get [
-            [ [ vocab ] all? ] dip
+            [ [ vocab dup [ source-loaded?>> +done+ = ] when ] all? ] dip
             [ require ] curry when
         ] assoc-each
     ] when ;
