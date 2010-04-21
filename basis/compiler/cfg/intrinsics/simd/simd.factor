@@ -43,24 +43,24 @@ IN: compiler.cfg.intrinsics.simd
 
 : ^load-neg-zero-vector ( rep -- dst )
     {
-        { float-4-rep [ float-array{ -0.0 -0.0 -0.0 -0.0 } underlying>> ^^load-constant ] }
-        { double-2-rep [ double-array{ -0.0 -0.0 } underlying>> ^^load-constant ] }
+        { float-4-rep [ float-array{ -0.0 -0.0 -0.0 -0.0 } underlying>> ^^load-literal ] }
+        { double-2-rep [ double-array{ -0.0 -0.0 } underlying>> ^^load-literal ] }
     } case ;
 
 : ^load-add-sub-vector ( rep -- dst )
     signed-rep {
-        { float-4-rep    [ float-array{ -0.0  0.0 -0.0  0.0 } underlying>> ^^load-constant ] }
-        { double-2-rep   [ double-array{ -0.0  0.0 } underlying>> ^^load-constant ] }
-        { char-16-rep    [ char-array{ -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 } underlying>> ^^load-constant ] }
-        { short-8-rep    [ short-array{ -1 0 -1 0 -1 0 -1 0 } underlying>> ^^load-constant ] }
-        { int-4-rep      [ int-array{ -1 0 -1 0 } underlying>> ^^load-constant ] }
-        { longlong-2-rep [ longlong-array{ -1 0 } underlying>> ^^load-constant ] }
+        { float-4-rep    [ float-array{ -0.0  0.0 -0.0  0.0 } underlying>> ^^load-literal ] }
+        { double-2-rep   [ double-array{ -0.0  0.0 } underlying>> ^^load-literal ] }
+        { char-16-rep    [ char-array{ -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 } underlying>> ^^load-literal ] }
+        { short-8-rep    [ short-array{ -1 0 -1 0 -1 0 -1 0 } underlying>> ^^load-literal ] }
+        { int-4-rep      [ int-array{ -1 0 -1 0 } underlying>> ^^load-literal ] }
+        { longlong-2-rep [ longlong-array{ -1 0 } underlying>> ^^load-literal ] }
     } case ;
 
 : ^load-half-vector ( rep -- dst )
     {
-        { float-4-rep  [ float-array{  0.5 0.5 0.5 0.5 } underlying>> ^^load-constant ] }
-        { double-2-rep [ double-array{ 0.5 0.5 }         underlying>> ^^load-constant ] }
+        { float-4-rep  [ float-array{  0.5 0.5 0.5 0.5 } underlying>> ^^load-literal ] }
+        { double-2-rep [ double-array{ 0.5 0.5 }         underlying>> ^^load-literal ] }
     } case ;
 
 : >variable-shuffle ( shuffle rep -- shuffle' )
@@ -70,7 +70,7 @@ IN: compiler.cfg.intrinsics.simd
     '[ _ n*v _ v+ ] map concat ;
 
 : ^load-immediate-shuffle ( shuffle rep -- dst )
-    >variable-shuffle ^^load-constant ;
+    >variable-shuffle ^^load-literal ;
 
 :: ^blend-vector ( mask true false rep -- dst )
     true mask rep ^^and-vector
@@ -118,7 +118,7 @@ IN: compiler.cfg.intrinsics.simd
         [ ^(compare-vector) ]
         [ ^minmax-compare-vector ]
         { unsigned-int-vector-rep [| src1 src2 rep cc |
-            rep sign-bit-mask ^^load-constant :> sign-bits
+            rep sign-bit-mask ^^load-literal :> sign-bits
             src1 sign-bits rep ^^xor-vector
             src2 sign-bits rep ^^xor-vector
             rep signed-rep cc ^(compare-vector)

@@ -7,59 +7,70 @@ IN: compiler.cfg.representations.conversion
 
 ERROR: bad-conversion dst src dst-rep src-rep ;
 
-GENERIC: emit-box ( dst src rep -- )
-GENERIC: emit-unbox ( dst src rep -- )
+GENERIC: rep>tagged ( dst src rep -- )
+GENERIC: tagged>rep ( dst src rep -- )
 
-M: int-rep emit-box ( dst src rep -- )
+M: int-rep rep>tagged ( dst src rep -- )
     drop tag-bits get ##shl-imm ;
 
-M: int-rep emit-unbox ( dst src rep -- )
+M: int-rep tagged>rep ( dst src rep -- )
     drop tag-bits get ##sar-imm ;
 
-M:: float-rep emit-box ( dst src rep -- )
+M:: float-rep rep>tagged ( dst src rep -- )
     double-rep next-vreg-rep :> temp
     temp src ##single>double-float
-    dst temp double-rep emit-box ;
+    dst temp double-rep rep>tagged ;
 
-M:: float-rep emit-unbox ( dst src rep -- )
+M:: float-rep tagged>rep ( dst src rep -- )
     double-rep next-vreg-rep :> temp
-    temp src double-rep emit-unbox
+    temp src double-rep tagged>rep
     dst temp ##double>single-float ;
 
-M: double-rep emit-box
+M: double-rep rep>tagged
     drop
-    [ drop 16 float tagged-rep next-vreg-rep ##allot ]
+    [ drop 16 float int-rep next-vreg-rep ##allot ]
     [ float-offset swap ##set-alien-double ]
     2bi ;
 
-M: double-rep emit-unbox
+M: double-rep tagged>rep
     drop float-offset ##alien-double ;
 
-M:: vector-rep emit-box ( dst src rep -- )
+M:: vector-rep rep>tagged ( dst src rep -- )
     tagged-rep next-vreg-rep :> temp
-    dst 16 2 cells + byte-array tagged-rep next-vreg-rep ##allot
-    temp 16 tag-fixnum ##load-immediate
+    dst 16 2 cells + byte-array int-rep next-vreg-rep ##allot
+    temp 16 tag-fixnum ##load-tagged
     temp dst 1 byte-array type-number ##set-slot-imm
     dst byte-array-offset src rep ##set-alien-vector ;
 
-M: vector-rep emit-unbox
+M: vector-rep tagged>rep
     [ byte-array-offset ] dip ##alien-vector ;
 
-M:: scalar-rep emit-box ( dst src rep -- )
+M:: scalar-rep rep>tagged ( dst src rep -- )
     tagged-rep next-vreg-rep :> temp
     temp src rep ##scalar>integer
-    dst temp int-rep emit-box ;
+    dst temp int-rep rep>tagged ;
 
-M:: scalar-rep emit-unbox ( dst src rep -- )
+M:: scalar-rep tagged>rep ( dst src rep -- )
     tagged-rep next-vreg-rep :> temp
-    temp src int-rep emit-unbox
+    temp src int-rep tagged>rep
     dst temp rep ##integer>scalar ;
+
+GENERIC: rep>int ( dst src rep -- )
+GENERIC: int>rep ( dst src rep -- )
+
+M: scalar-rep rep>int ( dst src rep -- )
+    ##scalar>integer ;
+
+M: scalar-rep int>rep ( dst src rep -- )
+    ##integer>scalar ;
 
 : emit-conversion ( dst src dst-rep src-rep -- )
     {
         { [ 2dup eq? ] [ drop ##copy ] }
-        { [ dup tagged-rep eq? ] [ drop emit-unbox ] }
-        { [ over tagged-rep eq? ] [ nip emit-box ] }
+        { [ dup tagged-rep? ] [ drop tagged>rep ] }
+        { [ over tagged-rep? ] [ nip rep>tagged ] }
+        { [ dup int-rep? ] [ drop int>rep ] }
+        { [ over int-rep? ] [ nip rep>int ] }
         [
             2dup 2array {
                 { { double-rep float-rep } [ 2drop ##single>double-float ] }

@@ -29,7 +29,7 @@ SYMBOL: always-boxed
     H{ } clone [
         '[
             [
-                dup [ ##load-reference? ] [ ##load-constant? ] bi or
+                dup ##load-reference?
                 [ drop ] [ [ _ (compute-always-boxed) ] each-def-rep ] if
             ] each-non-phi
         ] each-basic-block
@@ -65,9 +65,9 @@ SYMBOL: costs
 
 GENERIC: compute-insn-costs ( insn -- )
 
-M: ##load-constant compute-insn-costs
-    ! There's no cost to unboxing the result of a ##load-constant
-    drop ;
+! There's no cost to converting a constant's representation
+M: ##load-integer compute-insn-costs drop ;
+M: ##load-reference compute-insn-costs drop ;
 
 M: insn compute-insn-costs [ representation-cost ] each-rep ;
 
