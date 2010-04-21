@@ -127,7 +127,7 @@ unit-test
 unit-test
 
 ! vneg
-[ { ##load-constant ##sub-vector } ]
+[ { ##load-reference ##sub-vector } ]
 [ simple-ops-cpu float-4-rep [ emit-simd-vneg ] test-emit ]
 unit-test
 
@@ -153,11 +153,11 @@ M: addsub-cpu %add-sub-vector-reps { int-4-rep float-4-rep } ;
 [ addsub-cpu float-4-rep [ emit-simd-v+- ] test-emit ]
 unit-test
 
-[ { ##load-constant ##xor-vector ##add-vector } ]
+[ { ##load-reference ##xor-vector ##add-vector } ]
 [ simple-ops-cpu float-4-rep [ emit-simd-v+- ] test-emit ]
 unit-test
 
-[ { ##load-constant ##xor-vector ##sub-vector ##add-vector } ]
+[ { ##load-reference ##xor-vector ##sub-vector ##add-vector } ]
 [ simple-ops-cpu int-4-rep [ emit-simd-v+- ] test-emit ]
 unit-test
 
@@ -301,7 +301,7 @@ unit-test
 [ abs-cpu float-4-rep [ emit-simd-vabs ] test-emit ]
 unit-test
 
-[ { ##load-constant ##andn-vector } ]
+[ { ##load-reference ##andn-vector } ]
 [ simple-ops-cpu float-4-rep [ emit-simd-vabs ] test-emit ]
 unit-test
 
@@ -388,7 +388,7 @@ TUPLE: shuffle-cpu < simple-ops-cpu ;
 M: shuffle-cpu %shuffle-vector-reps signed-reps ;
 
 ! vshuffle-elements
-[ { ##load-constant ##shuffle-vector } ]
+[ { ##load-reference ##shuffle-vector } ]
 [ shuffle-cpu { 0 1 2 3 } int-4-rep [ emit-simd-vshuffle-elements ] test-emit-literal ]
 unit-test
 
@@ -420,7 +420,7 @@ unit-test
 [ minmax-cpu int-4-rep [ emit-simd-v<= ] test-emit ]
 unit-test
 
-[ { ##load-constant ##xor-vector ##xor-vector ##compare-vector } ]
+[ { ##load-reference ##xor-vector ##xor-vector ##compare-vector } ]
 [ compare-cpu uint-4-rep [ emit-simd-v<= ] test-emit ]
 unit-test
 

@@ -16,7 +16,7 @@ IN: compiler.cfg.intrinsics.alien
 
 : emit-<displaced-alien> ( node -- )
     dup emit-<displaced-alien>? [
-        [ 2inputs [ ^^untag-fixnum ] dip ] dip
+        [ 2inputs ] dip
         node-input-infos second class>>
         ^^box-displaced-alien ds-push
     ] [ emit-primitive ] if ;
@@ -32,11 +32,8 @@ IN: compiler.cfg.intrinsics.alien
     [ second class>> fixnum class<= ]
     bi and ;
 
-: ^^unbox-c-ptr ( src class -- dst )
-    [ next-vreg dup ] 2dip ##unbox-c-ptr ;
-
 : prepare-alien-accessor ( info -- ptr-vreg offset )
-    class>> [ 2inputs ^^untag-fixnum swap ] dip ^^unbox-c-ptr ^^add 0 ;
+    class>> [ 2inputs swap ] dip ^^unbox-c-ptr ^^add 0 ;
 
 : prepare-alien-getter ( infos -- ptr-vreg offset )
     first prepare-alien-accessor ;
@@ -54,8 +51,8 @@ IN: compiler.cfg.intrinsics.alien
 : prepare-alien-setter ( infos -- ptr-vreg offset )
     second prepare-alien-accessor ;
 
-: inline-alien-integer-setter ( node quot -- )
-    '[ prepare-alien-setter ds-pop ^^untag-fixnum @ ]
+: inline-alien-setter ( node quot -- )
+    '[ prepare-alien-setter ds-pop @ ]
     [ fixnum inline-alien-setter? ]
     inline-alien ; inline
 
@@ -64,18 +61,13 @@ IN: compiler.cfg.intrinsics.alien
     [ pinned-c-ptr inline-alien-setter? ]
     inline-alien ; inline
 
-: inline-alien-float-setter ( node quot -- )
-    '[ prepare-alien-setter ds-pop @ ]
-    [ float inline-alien-setter? ]
-    inline-alien ; inline
-
 : emit-alien-unsigned-getter ( node n -- )
     '[
         _ {
             { 1 [ ^^alien-unsigned-1 ] }
             { 2 [ ^^alien-unsigned-2 ] }
             { 4 [ ^^alien-unsigned-4 ] }
-        } case ^^tag-fixnum
+        } case
     ] inline-alien-getter ;
 
 : emit-alien-signed-getter ( node n -- )
@@ -84,7 +76,7 @@ IN: compiler.cfg.intrinsics.alien
             { 1 [ ^^alien-signed-1 ] }
             { 2 [ ^^alien-signed-2 ] }
             { 4 [ ^^alien-signed-4 ] }
-        } case ^^tag-fixnum
+        } case
     ] inline-alien-getter ;
 
 : emit-alien-integer-setter ( node n -- )
@@ -94,7 +86,7 @@ IN: compiler.cfg.intrinsics.alien
             { 2 [ ##set-alien-integer-2 ] }
             { 4 [ ##set-alien-integer-4 ] }
         } case
-    ] inline-alien-integer-setter ;
+    ] inline-alien-setter ;
 
 : emit-alien-cell-getter ( node -- )
     [ ^^alien-cell ^^box-alien ] inline-alien-getter ;
@@ -116,4 +108,4 @@ IN: compiler.cfg.intrinsics.alien
             { float-rep [ ##set-alien-float ] }
             { double-rep [ ##set-alien-double ] }
         } case
-    ] inline-alien-float-setter ;
+    ] inline-alien-setter ;

@@ -1,12 +1,16 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.renaming.functor
+combinators.short-circuit layouts kernel locals make math
+namespaces sequences
+compiler.cfg.instructions
+compiler.cfg.registers
+compiler.cfg.renaming.functor
 compiler.cfg.representations.conversion
-compiler.cfg.representations.preferred compiler.cfg.rpo
-compiler.cfg.utilities cpu.architecture kernel locals make math
-namespaces sequences ;
+compiler.cfg.representations.preferred
+compiler.cfg.rpo
+compiler.cfg.utilities
+cpu.architecture ;
 IN: compiler.cfg.representations.rewrite
 
 ! Insert conversions. This introduces new temporaries, so we need
@@ -78,7 +82,16 @@ GENERIC: conversions-for-insn ( insn -- )
 
 M: ##phi conversions-for-insn , ;
 
-! When a float is unboxed, we replace the ##load-constant with a ##load-double
+M: ##load-integer conversions-for-insn
+    {
+        {
+            [ dup dst>> rep-of tagged-rep? ]
+            [ [ dst>> ] [ val>> tag-fixnum ] bi ##load-tagged ]
+        }
+        [ call-next-method ]
+    } cond ;
+
+! When a float is unboxed, we replace the ##load-reference with a ##load-double
 ! if the architecture supports it
 : convert-to-load-double? ( insn -- ? )
     {
@@ -107,28 +120,22 @@ M: ##phi conversions-for-insn , ;
 : (convert-to-zero/fill-vector) ( insn -- dst rep )
     dst>> dup rep-of ; inline
 
-: conversions-for-load-insn ( insn -- ?insn )
+M: ##load-reference conversions-for-insn
     {
         {
             [ dup convert-to-load-double? ]
-            [ (convert-to-load-double) ##load-double f ]
+            [ (convert-to-load-double) ##load-double ]
         }
         {
             [ dup convert-to-zero-vector? ]
-            [ (convert-to-zero/fill-vector) ##zero-vector f ]
+            [ (convert-to-zero/fill-vector) ##zero-vector ]
         }
         {
             [ dup convert-to-fill-vector? ]
-            [ (convert-to-zero/fill-vector) ##fill-vector f ]
+            [ (convert-to-zero/fill-vector) ##fill-vector ]
         }
-        [ ]
+        [ call-next-method ]
     } cond ;
-
-M: ##load-reference conversions-for-insn
-    conversions-for-load-insn [ call-next-method ] when* ;
-
-M: ##load-constant conversions-for-insn
-    conversions-for-load-insn [ call-next-method ] when* ;
 
 M: vreg-insn conversions-for-insn
     [ compute-renaming-set ] [ perform-renaming ] bi ;

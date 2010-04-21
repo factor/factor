@@ -41,21 +41,22 @@ insn-classes get [
 
 >>
 
-: immutable? ( obj -- ? )
-    { [ float? ] [ word? ] [ not ] } 1|| ; inline
-
 : ^^load-literal ( obj -- dst )
-    [ next-vreg dup ] dip {
-        { [ dup fixnum? ] [ tag-fixnum ##load-immediate ] }
-        { [ dup immutable? ] [ ##load-constant ] }
-        [ ##load-reference ]
-    } cond ;
+    dup fixnum? [ ^^load-integer ] [ ^^load-reference ] if ;
 
 : ^^offset>slot ( slot -- vreg' )
-    cell 4 = 2 1 ? ^^shr-imm ;
+    cell 4 = 2 3 ? ^^shl-imm ;
 
-: ^^tag-fixnum ( src -- dst )
-    tag-bits get ^^shl-imm ;
+: ^^unbox-f ( src -- dst )
+    drop 0 ^^load-literal ;
 
-: ^^untag-fixnum ( src -- dst )
-    tag-bits get ^^sar-imm ;
+: ^^unbox-byte-array ( src -- dst )
+    ^^tagged>integer byte-array-offset ^^add-imm ;
+
+: ^^unbox-c-ptr ( src class -- dst )
+    {
+        { [ dup \ f class<= ] [ drop ^^unbox-f ] }
+        { [ dup alien class<= ] [ drop ^^unbox-alien ] }
+        { [ dup byte-array class<= ] [ drop ^^unbox-byte-array ] }
+        [ drop ^^unbox-any-c-ptr ]
+    } cond ;

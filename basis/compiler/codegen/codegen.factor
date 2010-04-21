@@ -78,9 +78,9 @@ SYNTAX: CODEGEN:
     codegen-method-body define ;
 >>
 
-CODEGEN: ##load-immediate %load-immediate
+CODEGEN: ##load-integer %load-immediate
+CODEGEN: ##load-tagged %load-immediate
 CODEGEN: ##load-reference %load-reference
-CODEGEN: ##load-constant %load-reference
 CODEGEN: ##load-double %load-double
 CODEGEN: ##peek %peek
 CODEGEN: ##replace %replace
@@ -119,6 +119,7 @@ CODEGEN: ##not %not
 CODEGEN: ##neg %neg
 CODEGEN: ##log2 %log2
 CODEGEN: ##copy %copy
+CODEGEN: ##tagged>integer %copy
 CODEGEN: ##add-float %add-float
 CODEGEN: ##sub-float %sub-float
 CODEGEN: ##mul-float %mul-float

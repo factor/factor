@@ -1,7 +1,7 @@
 USING: accessors compiler.cfg compiler.cfg.debugger
 compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.representations.preferred cpu.architecture kernel
-namespaces tools.test sequences arrays system ;
+namespaces tools.test sequences arrays system literals layouts ;
 IN: compiler.cfg.representations
 
 [ { double-rep double-rep } ] [
@@ -50,6 +50,59 @@ V{
 
 [ 1 ] [ 1 get instructions>> [ ##allot? ] count ] unit-test
 
+! Converting a ##load-integer into a ##load-tagged
+V{
+    T{ ##prologue }
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##load-integer f 1 100 }
+    T{ ##replace f 1 D 0 }
+    T{ ##branch }
+} 1 test-bb
+
+V{
+    T{ ##epilogue }
+    T{ ##return }
+} 2 test-bb
+
+0 1 edge
+1 2 edge
+
+[ ] [ test-representations ] unit-test
+
+[ T{ ##load-tagged f 1 $[ 100 tag-fixnum ] } ]
+[ 1 get instructions>> first ]
+unit-test
+
+! scalar-rep => int-rep conversion
+V{
+    T{ ##prologue }
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##peek f 1 D 0 }
+    T{ ##peek f 2 D 0 }
+    T{ ##vector>scalar f 3 2 int-4-rep }
+    T{ ##shl f 4 1 3 }
+    T{ ##replace f 4 D 0 }
+    T{ ##branch }
+} 1 test-bb
+
+V{
+    T{ ##epilogue }
+    T{ ##return }
+} 2 test-bb
+
+0 1 edge
+1 2 edge
+
+[ ] [ test-representations ] unit-test
+
+[ t ] [ 1 get instructions>> 4 swap nth ##scalar>integer? ] unit-test
+
 cpu x86.32? [
 
     ! Make sure load-constant is converted into load-double
@@ -60,7 +113,7 @@ cpu x86.32? [
 
     V{
         T{ ##peek f 1 D 0 }
-        T{ ##load-constant f 2 0.5 }
+        T{ ##load-reference f 2 0.5 }
         T{ ##add-float f 3 1 2 }
         T{ ##replace f 3 D 0 }
         T{ ##branch }
@@ -90,12 +143,12 @@ cpu x86.32? [
     } 1 test-bb
 
     V{
-        T{ ##load-constant f 2 1.5 }
+        T{ ##load-reference f 2 1.5 }
         T{ ##branch }
     } 2 test-bb
 
     V{
-        T{ ##load-constant f 3 2.5 }
+        T{ ##load-reference f 3 2.5 }
         T{ ##branch }
     } 3 test-bb
 
