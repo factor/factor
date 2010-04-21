@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.c-types alien.libraries
 alien.syntax classes.struct combinators io.encodings.ascii kernel
-literals locals math system ;
+locals math system ;
 IN: lua
 
 << "liblua5.1" {
@@ -19,12 +19,12 @@ TYPEDEF: ptrdiff_t LUA_INTEGER
 CONSTANT: LUA_IDSIZE 60
 
 ! This is normally the BUFSIZ value of the given platform.
-CONSTANT: LUAL_BUFFERSIZE $[
+: LUAL_BUFFERSIZE ( -- x )
     {
         { [ os windows? ] [ 512 ] }
         { [ os macosx? ] [ 1024 ] }
         { [ os unix? ] [ 8192 ] }
-    } cond ] 
+    } cond ;
 
 ! lua.h
 CONSTANT: LUA_SIGNATURE B{ 27 76 117 97 }
@@ -207,7 +207,7 @@ STRUCT: lua_Debug
 : luaL_getn ( L i -- int ) lua_objlen ; inline
 : luaL_setn ( L i j -- ) 3drop ; inline
  
-CONSTANT: LUA_ERRFILE $[ $ LUA_ERRERR 1 + ]
+: LUA_ERRFILE ( -- x ) LUA_ERRERR 1 + ;
 
 STRUCT: luaL_Reg
     { name char*         }
