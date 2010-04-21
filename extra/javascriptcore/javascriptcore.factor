@@ -8,19 +8,19 @@ IN: javascriptcore
 
 ERROR: javascriptcore-error error ;
 
-: with-javascriptcore ( quot -- )
-    set-callstack-bounds
-    call ; inline
-
 SYMBOL: js-context
 
 : with-global-context ( quot -- )
     [
-        [ f JSGlobalContextCreate ] dip
-        [ '[ _ @ ] ]
+        [ f JSGlobalContextCreate dup js-context set ] dip
+        [ nip '[ @ ] ]
         [ drop '[ _ JSGlobalContextRelease ] ] 2bi
         [ ] cleanup
     ] with-scope ; inline
+
+: with-javascriptcore ( quot -- )
+    set-callstack-bounds
+    with-global-context ; inline
 
 : JSString>string ( JSString -- string )
     dup JSStringGetMaximumUTF8CStringSize [ <byte-array> ] keep
@@ -35,13 +35,14 @@ SYMBOL: js-context
         drop f
     ] if* ;
 
-: eval-js ( context string -- result-string )
-    dupd JSStringCreateWithUTF8CString f f 0 JSValueRef <c-object>
+: eval-js ( string -- result-string )
+    [ js-context get dup ] dip
+    JSStringCreateWithUTF8CString f f 0 JSValueRef <c-object>
     [ JSEvaluateScript ] keep *void*
     dup [ nip JSValueRef>string javascriptcore-error ] [ drop JSValueRef>string ] if ;
 
 : eval-js-standalone ( string -- result-string )
-    '[ [ _ eval-js ] with-global-context ] with-javascriptcore ;
+    '[ _ eval-js ] with-javascriptcore ;
 
 : eval-js-path-standalone ( path -- result-string ) utf8 file-contents eval-js-standalone ;
 
