@@ -1457,7 +1457,7 @@ M: x86 immediate-bitwise? ( n -- ? )
     frame-reg swap 2 cells + [+] ;
 
 enable-min/max
-enable-fixnum-log2
+enable-log2
 
 :: install-sse2-check ( -- )
     [

@@ -9,7 +9,7 @@ FROM: vm => context-field-offset vm-field-offset ;
 IN: compiler.cfg.intrinsics.misc
 
 : emit-tag ( -- )
-    ds-pop tag-mask get ^^and-imm ^^tag-fixnum ds-push ;
+    ds-pop ^^tagged>integer tag-mask get ^^and-imm ds-push ;
 
 : special-object-offset ( n -- offset )
     cells "special-objects" vm-field-offset + ;
@@ -37,7 +37,8 @@ IN: compiler.cfg.intrinsics.misc
     ] [ emit-primitive ] ?if ;
 
 : emit-identity-hashcode ( -- )
-    ds-pop tag-mask get bitnot ^^load-immediate ^^and 0 0 ^^slot-imm
+    ds-pop ^^tagged>integer
+    tag-mask get bitnot ^^load-integer ^^and
+    0 ^^alien-cell
     hashcode-shift ^^shr-imm
-    ^^tag-fixnum
     ds-push ;

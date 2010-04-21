@@ -8,10 +8,13 @@ compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.def-use
 compiler.cfg.instructions
-compiler.cfg.value-numbering.graph
+compiler.cfg.value-numbering.alien
+compiler.cfg.value-numbering.comparisons
 compiler.cfg.value-numbering.expressions
-compiler.cfg.value-numbering.simplify
-compiler.cfg.value-numbering.rewrite ;
+compiler.cfg.value-numbering.graph
+compiler.cfg.value-numbering.math
+compiler.cfg.value-numbering.rewrite
+compiler.cfg.value-numbering.simplify ;
 IN: compiler.cfg.value-numbering
 
 ! Local value numbering.

@@ -7,7 +7,7 @@ compiler.cfg.def-use
 compiler.cfg.utilities
 compiler.cfg.registers
 compiler.cfg.instructions
-compiler.cfg.representations ;
+compiler.cfg.representations.conversion ;
 IN: compiler.cfg.ssa.cssa
 
 ! Convert SSA to conventional SSA. This pass runs after representation

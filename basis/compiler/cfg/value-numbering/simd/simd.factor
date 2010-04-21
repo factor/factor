@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit arrays
 fry kernel layouts math namespaces sequences cpu.architecture
@@ -9,6 +9,7 @@ compiler.cfg
 compiler.cfg.registers
 compiler.cfg.comparisons
 compiler.cfg.instructions
+compiler.cfg.value-numbering.alien
 compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.rewrite
@@ -34,19 +35,18 @@ M: ##set-alien-vector rewrite rewrite-alien-addressing ;
 
 : fold-shuffle-vector-imm ( insn expr -- insn' )
     [ [ dst>> ] [ shuffle>> ] bi ] dip value>>
-    (fold-shuffle-vector-imm) \ ##load-constant new-insn ;
+    (fold-shuffle-vector-imm) \ ##load-reference new-insn ;
 
 M: ##shuffle-vector-imm rewrite
     dup src>> vreg>expr {
         { [ dup shuffle-vector-imm-expr? ] [ rewrite-shuffle-vector-imm ] }
         { [ dup reference-expr? ] [ fold-shuffle-vector-imm ] }
-        { [ dup constant-expr? ] [ fold-shuffle-vector-imm ] }
         [ 2drop f ]
     } cond ;
 
 : (fold-scalar>vector) ( insn bytes -- insn' )
     [ [ dst>> ] [ rep>> rep-length ] bi ] dip <repetition> concat
-    \ ##load-constant new-insn ;
+    \ ##load-reference new-insn ;
 
 : fold-scalar>vector ( insn expr -- insn' )
     value>> over rep>> {
@@ -56,7 +56,7 @@ M: ##shuffle-vector-imm rewrite
     } case ;
 
 M: ##scalar>vector rewrite
-    dup src>> vreg>expr dup constant-expr?
+    dup src>> vreg>expr dup reference-expr?
     [ fold-scalar>vector ] [ 2drop f ] if ;
 
 M: ##xor-vector rewrite
@@ -117,4 +117,3 @@ M: scalar>vector-expr simplify*
 M: shuffle-vector-imm-expr simplify*
     [ src>> ] [ shuffle>> ] [ rep>> rep-length iota ] tri
     sequence= [ drop f ] unless ;
-

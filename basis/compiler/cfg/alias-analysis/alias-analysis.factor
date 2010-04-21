@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces assocs hashtables sequences arrays
 accessors words vectors combinators combinators.short-circuit
@@ -187,19 +187,12 @@ SYMBOL: heap-ac
         [ kill-constant-set-slot ] 2bi
     ] [ nip kill-computed-set-slot ] if ;
 
-SYMBOL: constants
-
-: constant ( vreg -- n/f )
-    #! Return a ##load-immediate value, or f if the vreg was not
-    #! assigned by an ##load-immediate.
-    resolve constants get at ;
-
 GENERIC: insn-slot# ( insn -- slot#/f )
 GENERIC: insn-object ( insn -- vreg )
 
-M: ##slot insn-slot# slot>> constant ;
+M: ##slot insn-slot# drop f ;
 M: ##slot-imm insn-slot# slot>> ;
-M: ##set-slot insn-slot# slot>> constant ;
+M: ##set-slot insn-slot# drop f ;
 M: ##set-slot-imm insn-slot# slot>> ;
 M: ##alien-global insn-slot# [ library>> ] [ symbol>> ] bi 2array ;
 M: ##vm-field insn-slot# offset>> ;
@@ -218,7 +211,6 @@ M: ##set-vm-field insn-object drop \ ##vm-field ;
     H{ } clone vregs>acs set
     H{ } clone acs>vregs set
     H{ } clone live-slots set
-    H{ } clone constants set
     H{ } clone copies set
 
     0 ac-counter set
@@ -244,10 +236,6 @@ M: insn analyze-aliases*
 
 M: ##phi analyze-aliases*
     dup defs-vreg set-heap-ac ;
-
-M: ##load-immediate analyze-aliases*
-    call-next-method
-    dup [ val>> ] [ dst>> ] bi constants get set-at ;
 
 M: ##allocation analyze-aliases*
     #! A freshly allocated object is distinct from any other
@@ -287,7 +275,7 @@ M: ##copy analyze-aliases*
 M: ##compare analyze-aliases*
     call-next-method
     dup useless-compare? [
-        dst>> f \ ##load-constant new-insn
+        dst>> f \ ##load-reference new-insn
         analyze-aliases*
     ] when ;
 

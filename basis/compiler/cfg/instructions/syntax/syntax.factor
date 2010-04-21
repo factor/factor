@@ -37,17 +37,17 @@ TUPLE: insn-slot-spec type name rep ;
         ] reduce drop
     ] { } make ;
 
-: insn-def-slot ( class -- slot/f )
-    "insn-slots" word-prop
+: find-def-slot ( slots -- slot/f )
     [ type>> def eq? ] find nip ;
 
+: insn-def-slot ( class -- slot/f )
+    "insn-slots" word-prop find-def-slot ;
+
 : insn-use-slots ( class -- slots )
-    "insn-slots" word-prop
-    [ type>> use eq? ] filter ;
+    "insn-slots" word-prop [ type>> use eq? ] filter ;
 
 : insn-temp-slots ( class -- slots )
-    "insn-slots" word-prop
-    [ type>> temp eq? ] filter ;
+    "insn-slots" word-prop [ type>> temp eq? ] filter ;
 
 ! We cannot reference words in compiler.cfg.instructions directly
 ! since that would create circularity.

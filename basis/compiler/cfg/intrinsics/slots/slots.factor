@@ -76,8 +76,7 @@ IN: compiler.cfg.intrinsics.slots
     ] [ drop emit-primitive ] if ;
 
 : emit-string-nth ( -- )
-    2inputs swap ^^untag-fixnum ^^string-nth ^^tag-fixnum ds-push ;
+    2inputs swap ^^string-nth ds-push ;
 
 : emit-set-string-nth-fast ( -- )
-    3inputs [ ^^untag-fixnum ] [ ^^untag-fixnum ] [ ] tri*
-    swap next-vreg ##set-string-nth-fast ;
+    3inputs swap next-vreg ##set-string-nth-fast ;

@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors combinators classes math layouts
 sequences 
@@ -19,11 +19,9 @@ M: unbox-alien-expr simplify* simplify-unbox-alien ;
 
 M: unbox-any-c-ptr-expr simplify* simplify-unbox-alien ;
 
-: expr-zero? ( expr -- ? ) T{ constant-expr f 0 } = ; inline
-
-: expr-one? ( expr -- ? ) T{ constant-expr f 1 } = ; inline
-
-: expr-neg-one? ( expr -- ? ) T{ constant-expr f -1 } = ; inline
+: expr-zero? ( expr -- ? ) T{ integer-expr f 0 } = ; inline
+: expr-one? ( expr -- ? ) T{ integer-expr f 1 } = ; inline
+: expr-neg-one? ( expr -- ? ) T{ integer-expr f -1 } = ; inline
 
 : >unary-expr< ( expr -- in ) src>> vn>expr ; inline
 
@@ -101,13 +99,8 @@ M: or-imm-expr simplify* simplify-or ;
 M: xor-expr simplify* simplify-xor ;
 M: xor-imm-expr simplify* simplify-xor ;
 
-: useless-shr? ( in1 in2 -- ? )
-    over shl-imm-expr?
-    [ [ src2>> ] [ expr>vn ] bi* = ] [ 2drop f ] if ; inline
-
 : simplify-shr ( expr -- vn/expr/f )
     >binary-expr< {
-        { [ 2dup useless-shr? ] [ drop src1>> ] }
         { [ dup expr-zero? ] [ drop ] }
         [ 2drop f ]
     } cond ; inline

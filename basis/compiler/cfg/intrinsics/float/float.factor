@@ -14,10 +14,10 @@ IN: compiler.cfg.intrinsics.float
     [ 2inputs ] dip ^^compare-float-unordered ds-push ; inline
 
 : emit-float>fixnum ( -- )
-    ds-pop ^^float>integer ^^tag-fixnum ds-push ;
+    ds-pop ^^float>integer ds-push ;
 
 : emit-fixnum>float ( -- )
-    ds-pop ^^untag-fixnum ^^integer>float ds-push ;
+    ds-pop ^^integer>float ds-push ;
 
 : emit-fsqrt ( -- )
     ds-pop ^^sqrt ds-push ;

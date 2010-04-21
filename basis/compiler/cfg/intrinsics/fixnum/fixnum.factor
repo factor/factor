@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
+! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences accessors layouts kernel math math.intervals
 namespaces combinators fry arrays
@@ -20,14 +20,17 @@ IN: compiler.cfg.intrinsics.fixnum
     0 cc= ^^compare-imm
     ds-push ;
 
-: emit-fixnum-op ( insn -- )
+: binary-fixnum-op ( quot -- )
     [ 2inputs ] dip call ds-push ; inline
 
+: unary-fixnum-op ( quot -- )
+    [ ds-pop ] dip call ds-push ; inline
+
 : emit-fixnum-left-shift ( -- )
-    [ ^^untag-fixnum ^^shl ] emit-fixnum-op ;
+    [ ^^shl ] binary-fixnum-op ;
 
 : emit-fixnum-right-shift ( -- )
-    [ ^^untag-fixnum ^^neg ^^sar dup tag-mask get ^^and-imm ^^xor ] emit-fixnum-op ;
+    [ ^^sar ] binary-fixnum-op ;
 
 : emit-fixnum-shift-general ( -- )
     ds-peek 0 cc> ##compare-imm-branch
@@ -42,17 +45,8 @@ IN: compiler.cfg.intrinsics.fixnum
         [ drop emit-fixnum-shift-general ]
     } cond ;
 
-: emit-fixnum-bitnot ( -- )
-    ds-pop ^^not tag-mask get ^^xor-imm ds-push ;
-
-: emit-fixnum-log2 ( -- )
-    ds-pop ^^log2 tag-bits get ^^sub-imm ^^tag-fixnum ds-push ;
-
-: emit-fixnum*fast ( -- )
-    2inputs ^^untag-fixnum ^^mul ds-push ;
-
 : emit-fixnum-comparison ( cc -- )
-    '[ _ ^^compare ] emit-fixnum-op ;
+    '[ _ ^^compare ] binary-fixnum-op ;
 
 : emit-no-overflow-case ( dst -- final-bb )
     [ ds-drop ds-drop ds-push ] with-branch ;
@@ -80,4 +74,4 @@ IN: compiler.cfg.intrinsics.fixnum
     [ ^^fixnum-sub ] \ fixnum-overflow emit-fixnum-overflow-op ;
 
 : emit-fixnum* ( -- )
-    [ ^^untag-fixnum ^^fixnum-mul ] \ fixnum*overflow emit-fixnum-overflow-op ;
+    [ ^^fixnum-mul ] \ fixnum*overflow emit-fixnum-overflow-op ;

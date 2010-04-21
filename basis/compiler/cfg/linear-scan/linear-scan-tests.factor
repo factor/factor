@@ -1126,7 +1126,7 @@ V{
 V{ T{ ##prologue } T{ ##branch } } 0 test-bb
 
 V{
-    T{ ##load-immediate { dst 61 } }
+    T{ ##load-integer { dst 61 } }
     T{ ##peek { dst 62 } { loc D 0 } }
     T{ ##peek { dst 64 } { loc D 1 } }
     T{ ##slot-imm
@@ -1269,7 +1269,7 @@ V{
         { src1 109 }
         { src2 8 }
     }
-    T{ ##load-immediate { dst 129 } { val 24 } }
+    T{ ##load-integer { dst 129 } { val 24 } }
     T{ ##inc-d { n 4 } }
     T{ ##inc-r { n 1 } }
     T{ ##replace { src 109 } { loc D 2 } }

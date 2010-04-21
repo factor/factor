@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
+! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words sequences kernel combinators cpu.architecture assocs
 compiler.cfg.hats
@@ -38,14 +38,14 @@ IN: compiler.cfg.intrinsics
     { math.private:fixnum+ [ drop emit-fixnum+ ] }
     { math.private:fixnum- [ drop emit-fixnum- ] }
     { math.private:fixnum* [ drop emit-fixnum* ] }
-    { math.private:fixnum+fast [ drop [ ^^add ] emit-fixnum-op ] }
-    { math.private:fixnum-fast [ drop [ ^^sub ] emit-fixnum-op ] }
-    { math.private:fixnum*fast [ drop emit-fixnum*fast ] }
-    { math.private:fixnum-bitand [ drop [ ^^and ] emit-fixnum-op ] }
-    { math.private:fixnum-bitor [ drop [ ^^or ] emit-fixnum-op ] }
-    { math.private:fixnum-bitxor [ drop [ ^^xor ] emit-fixnum-op ] }
+    { math.private:fixnum+fast [ drop [ ^^add ] binary-fixnum-op ] }
+    { math.private:fixnum-fast [ drop [ ^^sub ] binary-fixnum-op ] }
+    { math.private:fixnum*fast [ drop [ ^^mul ] binary-fixnum-op ] }
+    { math.private:fixnum-bitand [ drop [ ^^and ] binary-fixnum-op ] }
+    { math.private:fixnum-bitor [ drop [ ^^or ] binary-fixnum-op ] }
+    { math.private:fixnum-bitxor [ drop [ ^^xor ] binary-fixnum-op ] }
     { math.private:fixnum-shift-fast [ emit-fixnum-shift-fast ] }
-    { math.private:fixnum-bitnot [ drop emit-fixnum-bitnot ] }
+    { math.private:fixnum-bitnot [ drop [ ^^not ] unary-fixnum-op ] }
     { math.private:fixnum< [ drop cc< emit-fixnum-comparison ] }
     { math.private:fixnum<= [ drop cc<= emit-fixnum-comparison ] }
     { math.private:fixnum>= [ drop cc>= emit-fixnum-comparison ] }
@@ -143,13 +143,13 @@ IN: compiler.cfg.intrinsics
 
 : enable-min/max ( -- )
     {
-        { math.integers.private:fixnum-min [ drop [ ^^min ] emit-fixnum-op ] }
-        { math.integers.private:fixnum-max [ drop [ ^^max ] emit-fixnum-op ] }
+        { math.integers.private:fixnum-min [ drop [ ^^min ] binary-fixnum-op ] }
+        { math.integers.private:fixnum-max [ drop [ ^^max ] binary-fixnum-op ] }
     } enable-intrinsics ;
 
-: enable-fixnum-log2 ( -- )
+: enable-log2 ( -- )
     {
-        { math.integers.private:fixnum-log2 [ drop emit-fixnum-log2 ] }
+        { math.integers.private:fixnum-log2 [ drop [ ^^log2 ] unary-fixnum-op ] }
     } enable-intrinsics ;
 
 : emit-intrinsic ( node word -- )
