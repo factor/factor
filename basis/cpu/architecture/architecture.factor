@@ -253,6 +253,8 @@ HOOK: %log2    cpu ( dst src -- )
 
 HOOK: %copy cpu ( dst src rep -- )
 
+: %tagged>integer ( dst src -- ) int-rep %copy ;
+
 HOOK: %fixnum-add cpu ( label dst src1 src2 -- )
 HOOK: %fixnum-sub cpu ( label dst src1 src2 -- )
 HOOK: %fixnum-mul cpu ( label dst src1 src2 -- )

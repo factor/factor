@@ -123,7 +123,7 @@ M: #recursive emit-node
     and ;
 
 : emit-trivial-if ( -- )
-    ds-pop f cc/= ^^compare-imm ds-push ;
+    [ f cc/= ^^compare-imm ] unary-op ;
 
 : trivial-not-if? ( #if -- ? )
     children>> first2
@@ -132,7 +132,7 @@ M: #recursive emit-node
     and ;
 
 : emit-trivial-not-if ( -- )
-    ds-pop f cc= ^^compare-imm ds-push ;
+    [ f cc= ^^compare-imm ] unary-op ;
 
 : emit-actual-if ( #if -- )
     ! Inputs to the final instruction need to be copied because of

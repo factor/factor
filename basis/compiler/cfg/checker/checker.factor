@@ -27,6 +27,8 @@ ERROR: last-insn-not-a-jump bb ;
         [ ##dispatch? ]
         [ ##compare-branch? ]
         [ ##compare-imm-branch? ]
+        [ ##compare-integer-branch? ]
+        [ ##compare-integer-imm-branch? ]
         [ ##compare-float-ordered-branch? ]
         [ ##compare-float-unordered-branch? ]
         [ ##fixnum-add? ]

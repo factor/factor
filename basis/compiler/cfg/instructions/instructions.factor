@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors arrays kernel sequences namespaces words
-math math.order layouts classes.algebra classes.union
-compiler.units alien byte-arrays compiler.constants combinators
-compiler.cfg.registers compiler.cfg.instructions.syntax ;
+math math.order layouts classes.union compiler.units alien
+byte-arrays combinators compiler.cfg.registers
+compiler.cfg.instructions.syntax ;
 IN: compiler.cfg.instructions
 
 <<
@@ -23,20 +23,20 @@ TUPLE: pure-insn < insn ;
 ! Constants
 INSN: ##load-integer
 def: dst/int-rep
-constant: val ;
+constant: val/int-rep ;
 
 INSN: ##load-reference
 def: dst/tagged-rep
-constant: obj ;
+constant: obj/tagged-rep ;
 
 ! These two are inserted by representation selection
 INSN: ##load-tagged
 def: dst/tagged-rep
-constant: val ;
+constant: val/tagged-rep ;
 
 INSN: ##load-double
 def: dst/double-rep
-constant: val ;
+constant: val/double-rep ;
 
 ! Stack operations
 INSN: ##peek
@@ -115,7 +115,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##add-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+constant: src2/int-rep ;
 
 PURE-INSN: ##sub
 def: dst/int-rep
@@ -124,7 +124,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##sub-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+constant: src2/int-rep ;
 
 PURE-INSN: ##mul
 def: dst/int-rep
@@ -133,7 +133,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##mul-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+constant: src2/int-rep ;
 
 PURE-INSN: ##and
 def: dst/int-rep
@@ -142,7 +142,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##and-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+constant: src2/int-rep ;
 
 PURE-INSN: ##or
 def: dst/int-rep
@@ -151,7 +151,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##or-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+constant: src2/int-rep ;
 
 PURE-INSN: ##xor
 def: dst/int-rep
@@ -160,7 +160,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##xor-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+constant: src2/int-rep ;
 
 PURE-INSN: ##shl
 def: dst/int-rep
@@ -169,7 +169,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##shl-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+constant: src2/int-rep ;
 
 PURE-INSN: ##shr
 def: dst/int-rep
@@ -178,7 +178,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##shr-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+constant: src2/int-rep ;
 
 PURE-INSN: ##sar
 def: dst/int-rep
@@ -187,7 +187,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##sar-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+constant: src2/int-rep ;
 
 PURE-INSN: ##min
 def: dst/int-rep
@@ -691,14 +691,14 @@ INSN: ##phi
 def: dst
 literal: inputs ;
 
-! Conditionals
+! Tagged conditionals
 INSN: ##compare-branch
 use: src1/tagged-rep src2/tagged-rep
 literal: cc ;
 
 INSN: ##compare-imm-branch
 use: src1/tagged-rep
-constant: src2
+constant: src2/tagged-rep
 literal: cc ;
 
 PURE-INSN: ##compare
@@ -710,10 +710,34 @@ temp: temp/int-rep ;
 PURE-INSN: ##compare-imm
 def: dst/tagged-rep
 use: src1/tagged-rep
-constant: src2
+constant: src2/tagged-rep
 literal: cc
 temp: temp/int-rep ;
 
+! Integer conditionals
+INSN: ##compare-integer-branch
+use: src1/int-rep src2/int-rep
+literal: cc ;
+
+INSN: ##compare-integer-imm-branch
+use: src1/int-rep
+constant: src2/int-rep
+literal: cc ;
+
+PURE-INSN: ##compare-integer
+def: dst/tagged-rep
+use: src1/int-rep src2/int-rep
+literal: cc
+temp: temp/int-rep ;
+
+PURE-INSN: ##compare-integer-imm
+def: dst/tagged-rep
+use: src1/int-rep
+constant: src2/int-rep
+literal: cc
+temp: temp/int-rep ;
+
+! Float conditionals
 INSN: ##compare-float-ordered-branch
 use: src1/double-rep src2/double-rep
 literal: cc ;
@@ -770,7 +794,7 @@ literal: label ;
 INSN: _loop-entry ;
 
 INSN: _dispatch
-use: src/int-rep
+use: src
 temp: temp ;
 
 INSN: _dispatch-label
@@ -778,46 +802,44 @@ literal: label ;
 
 INSN: _compare-branch
 literal: label
-use: src1/tagged-rep src2/tagged-rep
+use: src1 src2
 literal: cc ;
 
 INSN: _compare-imm-branch
 literal: label
-use: src1/tagged-rep
+use: src1
 constant: src2
 literal: cc ;
 
 INSN: _compare-float-unordered-branch
 literal: label
-use: src1/tagged-rep src2/tagged-rep
+use: src1 src2
 literal: cc ;
 
 INSN: _compare-float-ordered-branch
 literal: label
-use: src1/tagged-rep src2/tagged-rep
+use: src1 src2
 literal: cc ;
 
 ! Overflowing arithmetic
 INSN: _fixnum-add
 literal: label
-def: dst/tagged-rep
-use: src1/tagged-rep src2/tagged-rep ;
+def: dst
+use: src1 src2 ;
 
 INSN: _fixnum-sub
 literal: label
-def: dst/tagged-rep
-use: src1/tagged-rep src2/tagged-rep ;
+def: dst
+use: src1 src2 ;
 
 INSN: _fixnum-mul
 literal: label
-def: dst/tagged-rep
-use: src1/tagged-rep src2/int-rep ;
+def: dst
+use: src1 src2 ;
 
 TUPLE: spill-slot { n integer } ;
 C: <spill-slot> spill-slot
 
-! These instructions operate on machine registers and not
-! virtual registers
 INSN: _spill
 use: src
 literal: rep dst ;
@@ -829,6 +851,7 @@ literal: rep src ;
 INSN: _spill-area-size
 literal: n ;
 
+! For GC check insertion
 UNION: ##allocation
 ##allot
 ##box-alien

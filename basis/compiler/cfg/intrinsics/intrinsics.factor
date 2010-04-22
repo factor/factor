@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words sequences kernel combinators cpu.architecture assocs
 compiler.cfg.hats
+compiler.cfg.stacks
 compiler.cfg.instructions
 compiler.cfg.intrinsics.alien
 compiler.cfg.intrinsics.allot
@@ -38,19 +39,19 @@ IN: compiler.cfg.intrinsics
     { math.private:fixnum+ [ drop emit-fixnum+ ] }
     { math.private:fixnum- [ drop emit-fixnum- ] }
     { math.private:fixnum* [ drop emit-fixnum* ] }
-    { math.private:fixnum+fast [ drop [ ^^add ] binary-fixnum-op ] }
-    { math.private:fixnum-fast [ drop [ ^^sub ] binary-fixnum-op ] }
-    { math.private:fixnum*fast [ drop [ ^^mul ] binary-fixnum-op ] }
-    { math.private:fixnum-bitand [ drop [ ^^and ] binary-fixnum-op ] }
-    { math.private:fixnum-bitor [ drop [ ^^or ] binary-fixnum-op ] }
-    { math.private:fixnum-bitxor [ drop [ ^^xor ] binary-fixnum-op ] }
+    { math.private:fixnum+fast [ drop [ ^^add ] binary-op ] }
+    { math.private:fixnum-fast [ drop [ ^^sub ] binary-op ] }
+    { math.private:fixnum*fast [ drop [ ^^mul ] binary-op ] }
+    { math.private:fixnum-bitand [ drop [ ^^and ] binary-op ] }
+    { math.private:fixnum-bitor [ drop [ ^^or ] binary-op ] }
+    { math.private:fixnum-bitxor [ drop [ ^^xor ] binary-op ] }
     { math.private:fixnum-shift-fast [ emit-fixnum-shift-fast ] }
-    { math.private:fixnum-bitnot [ drop [ ^^not ] unary-fixnum-op ] }
+    { math.private:fixnum-bitnot [ drop [ ^^not ] unary-op ] }
     { math.private:fixnum< [ drop cc< emit-fixnum-comparison ] }
     { math.private:fixnum<= [ drop cc<= emit-fixnum-comparison ] }
     { math.private:fixnum>= [ drop cc>= emit-fixnum-comparison ] }
     { math.private:fixnum> [ drop cc> emit-fixnum-comparison ] }
-    { kernel:eq? [ drop cc= emit-fixnum-comparison ] }
+    { kernel:eq? [ emit-eq ] }
     { slots.private:slot [ emit-slot ] }
     { slots.private:set-slot [ emit-set-slot ] }
     { strings.private:string-nth [ drop emit-string-nth ] }
@@ -83,10 +84,10 @@ IN: compiler.cfg.intrinsics
 
 : enable-float-intrinsics ( -- )
     {
-        { math.private:float+ [ drop [ ^^add-float ] emit-float-op ] }
-        { math.private:float- [ drop [ ^^sub-float ] emit-float-op ] }
-        { math.private:float* [ drop [ ^^mul-float ] emit-float-op ] }
-        { math.private:float/f [ drop [ ^^div-float ] emit-float-op ] }
+        { math.private:float+ [ drop [ ^^add-float ] binary-op ] }
+        { math.private:float- [ drop [ ^^sub-float ] binary-op ] }
+        { math.private:float* [ drop [ ^^mul-float ] binary-op ] }
+        { math.private:float/f [ drop [ ^^div-float ] binary-op ] }
         { math.private:float< [ drop cc< emit-float-ordered-comparison ] }
         { math.private:float<= [ drop cc<= emit-float-ordered-comparison ] }
         { math.private:float>= [ drop cc>= emit-float-ordered-comparison ] }
@@ -96,8 +97,8 @@ IN: compiler.cfg.intrinsics
         { math.private:float-u>= [ drop cc>= emit-float-unordered-comparison ] }
         { math.private:float-u> [ drop cc> emit-float-unordered-comparison ] }
         { math.private:float= [ drop cc= emit-float-unordered-comparison ] }
-        { math.private:float>fixnum [ drop emit-float>fixnum ] }
-        { math.private:fixnum>float [ drop emit-fixnum>float ] }
+        { math.private:float>fixnum [ drop [ ^^float>integer ] unary-op ] }
+        { math.private:fixnum>float [ drop [ ^^integer>float ] unary-op ] }
         { math.floats.private:float-unordered? [ drop cc/<>= emit-float-unordered-comparison ] }
         { alien.accessors:alien-float [ float-rep emit-alien-float-getter ] }
         { alien.accessors:set-alien-float [ float-rep emit-alien-float-setter ] }
@@ -107,13 +108,13 @@ IN: compiler.cfg.intrinsics
 
 : enable-fsqrt ( -- )
     {
-        { math.libm:fsqrt [ drop emit-fsqrt ] }
+        { math.libm:fsqrt [ drop [ ^^sqrt ] unary-op ] }
     } enable-intrinsics ;
 
 : enable-float-min/max ( -- )
     {
-        { math.floats.private:float-min [ drop [ ^^min-float ] emit-float-op ] }
-        { math.floats.private:float-max [ drop [ ^^max-float ] emit-float-op ] }
+        { math.floats.private:float-min [ drop [ ^^min-float ] binary-op ] }
+        { math.floats.private:float-max [ drop [ ^^max-float ] binary-op ] }
     } enable-intrinsics ;
 
 : enable-float-functions ( -- )
@@ -143,13 +144,13 @@ IN: compiler.cfg.intrinsics
 
 : enable-min/max ( -- )
     {
-        { math.integers.private:fixnum-min [ drop [ ^^min ] binary-fixnum-op ] }
-        { math.integers.private:fixnum-max [ drop [ ^^max ] binary-fixnum-op ] }
+        { math.integers.private:fixnum-min [ drop [ ^^min ] binary-op ] }
+        { math.integers.private:fixnum-max [ drop [ ^^max ] binary-op ] }
     } enable-intrinsics ;
 
 : enable-log2 ( -- )
     {
-        { math.integers.private:fixnum-log2 [ drop [ ^^log2 ] unary-fixnum-op ] }
+        { math.integers.private:fixnum-log2 [ drop [ ^^log2 ] unary-op ] }
     } enable-intrinsics ;
 
 : emit-intrinsic ( node word -- )

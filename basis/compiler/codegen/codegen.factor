@@ -119,7 +119,7 @@ CODEGEN: ##not %not
 CODEGEN: ##neg %neg
 CODEGEN: ##log2 %log2
 CODEGEN: ##copy %copy
-CODEGEN: ##tagged>integer %copy
+CODEGEN: ##tagged>integer %tagged>integer
 CODEGEN: ##add-float %add-float
 CODEGEN: ##sub-float %sub-float
 CODEGEN: ##mul-float %mul-float
@@ -210,6 +210,8 @@ CODEGEN: ##write-barrier %write-barrier
 CODEGEN: ##write-barrier-imm %write-barrier-imm
 CODEGEN: ##compare %compare
 CODEGEN: ##compare-imm %compare-imm
+CODEGEN: ##compare-integer %compare
+CODEGEN: ##compare-integer-imm %compare-imm
 CODEGEN: ##compare-float-ordered %compare-float-ordered
 CODEGEN: ##compare-float-unordered %compare-float-unordered
 CODEGEN: ##save-context %save-context
