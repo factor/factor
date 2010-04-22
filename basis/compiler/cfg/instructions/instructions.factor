@@ -542,7 +542,7 @@ temp: temp/int-rep ;
 
 PURE-INSN: ##box-displaced-alien
 def: dst/tagged-rep
-use: displacement/int-rep base/int-rep
+use: displacement/int-rep base/tagged-rep
 temp: temp/int-rep
 literal: base-class ;
 
@@ -665,7 +665,7 @@ def: dst/tagged-rep
 literal: offset ;
 
 INSN: ##set-vm-field
-use: src/int-rep
+use: src/tagged-rep
 literal: offset ;
 
 ! FFI
