@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.algebra classes.parser
 classes.tuple combinators combinators.short-circuit fry
-generic.parser kernel layouts locals math namespaces quotations
+generic.parser kernel layouts math namespaces quotations
 sequences slots splitting words
 cpu.architecture
 compiler.cfg.instructions
@@ -57,18 +57,18 @@ M: integer-expr expr>integer value>> ;
 : vreg-immediate-arithmetic? ( vreg -- ? )
     vreg>expr {
         [ integer-expr? ]
-        [ expr>integer tag-fixnum immediate-arithmetic? ]
+        [ expr>integer immediate-arithmetic? ]
     } 1&& ;
 
 : vreg-immediate-bitwise? ( vreg -- ? )
     vreg>expr {
         [ integer-expr? ]
-        [ expr>integer tag-fixnum immediate-bitwise? ]
+        [ expr>integer immediate-bitwise? ]
     } 1&& ;
 
 GENERIC: expr>comparand ( expr -- n )
 
-M: integer-expr expr>comparand value>> ;
+M: integer-expr expr>comparand value>> tag-fixnum ;
 
 M: reference-expr expr>comparand value>> ;
 
@@ -94,18 +94,20 @@ M: reference-expr expr>comparand value>> ;
 : define-expr-class ( expr slot-specs -- )
     [ expr ] dip [ name>> ] map define-tuple-class ;
 
-: constant>vn ( obj -- vn )
-    dup integer? [ <integer-expr> ] [ <reference-expr> ] if
-    expr>vn ;
+: constant-quot ( rep -- quot )
+    {
+        { int-rep [ [ <integer-expr> ] ] }
+        { tagged-rep [ [ <reference-expr> ] ] }
+    } case [ expr>vn ] append ;
 
 : >expr-quot ( expr slot-specs -- quot )
      [
         [ name>> reader-word 1quotation ]
         [
-            type>> {
-                { use [ [ vreg>vn ] ] }
-                { literal [ [ ] ] }
-                { constant [ [ constant>vn ] ] }
+            [ rep>> ] [ type>> ] bi {
+                { use [ drop [ vreg>vn ] ] }
+                { literal [ drop [ ] ] }
+                { constant [ constant-quot ] }
             } case
         ] bi append
     ] map cleave>quot swap suffix \ boa suffix ;
