@@ -23,8 +23,11 @@ HELP: number>enum
 }
 { $description "Convert a number to an enum." } ;
 
-ARTICLE: "alien.enums" "alien.enums"
+ARTICLE: "alien.enums" "Alien Enumerations"
 { $vocab-link "alien.enums" }
-;
+"Defining enums at run-time:"
+{ $subsection define-enum }
+"Conversions between enums and integers:"
+{ $subsections enum>number number>enum } ;
 
 ABOUT: "alien.enums"
