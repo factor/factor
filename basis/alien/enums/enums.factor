@@ -1,6 +1,6 @@
 ! (c)2010 Joe Groff, Erik Charlebois bsd license
-USING: accessors alien.c-types arrays classes.singleton combinators
-delegate fry generic.parser kernel macros math parser sequences words ;
+USING: accessors alien.c-types arrays combinators delegate fry
+generic.parser kernel macros math parser sequences words words.symbol ;
 IN: alien.enums
 
 <PRIVATE
@@ -12,6 +12,7 @@ PRIVATE>
 
 GENERIC: enum>number ( enum -- number ) foldable
 M: integer enum>number ;
+M: symbol enum>number "enum-value" word-prop ;
 
 <PRIVATE
 : enum-boxer ( members -- quot )
@@ -30,14 +31,13 @@ M: enum-c-type c-type-setter
 
 <PRIVATE
 
-: define-enum>number ( class value -- )
-    [ \ enum>number create-method-in ]
-    [ '[ drop _ ] ] bi* define ;
+: define-enum-value ( class value -- )
+    "enum-value" set-word-prop ;
 
 : define-enum-members ( member-names -- )
     [
-        [ first define-singleton-class ]
-        [ first2 define-enum>number ] bi
+        [ first define-symbol ]
+        [ first2 define-enum-value ] bi
     ] each ;
 
 : define-enum-constructor ( word -- )
