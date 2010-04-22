@@ -69,6 +69,12 @@ M: ##compare-branch linearize-insn
 M: ##compare-imm-branch linearize-insn
     binary-conditional _compare-imm-branch emit-branch ;
 
+M: ##compare-integer-branch linearize-insn
+    binary-conditional _compare-branch emit-branch ;
+
+M: ##compare-integer-imm-branch linearize-insn
+    binary-conditional _compare-imm-branch emit-branch ;
+
 M: ##compare-float-ordered-branch linearize-insn
     binary-conditional _compare-float-ordered-branch emit-branch ;
 

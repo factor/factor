@@ -67,7 +67,7 @@ GENERIC: prepare-insn ( insn -- )
 M: insn prepare-insn
     [ defs-vreg ] [ uses-vregs ] bi
     2dup empty? not and [
-        first 
+        first
         2dup [ rep-of ] bi@ eq?
         [ try-to-coalesce ] [ 2drop ] if
     ] [ 2drop ] if ;

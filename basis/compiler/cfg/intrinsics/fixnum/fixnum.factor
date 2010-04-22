@@ -14,26 +14,24 @@ compiler.cfg.comparisons ;
 IN: compiler.cfg.intrinsics.fixnum
 
 : emit-both-fixnums? ( -- )
-    2inputs
-    ^^or
-    tag-mask get ^^and-imm
-    0 cc= ^^compare-imm
-    ds-push ;
-
-: binary-fixnum-op ( quot -- )
-    [ 2inputs ] dip call ds-push ; inline
-
-: unary-fixnum-op ( quot -- )
-    [ ds-pop ] dip call ds-push ; inline
+    [
+        [ ^^tagged>integer ] bi@
+        ^^or tag-mask get ^^and-imm
+        0 cc= ^^compare-integer-imm
+    ] binary-op ;
 
 : emit-fixnum-left-shift ( -- )
-    [ ^^shl ] binary-fixnum-op ;
+    [ ^^shl ] binary-op ;
 
 : emit-fixnum-right-shift ( -- )
-    [ ^^sar ] binary-fixnum-op ;
+    [
+        [ tag-bits get ^^shl-imm ] dip
+        ^^neg ^^sar
+        tag-bits get ^^sar-imm
+    ] binary-op ;
 
 : emit-fixnum-shift-general ( -- )
-    ds-peek 0 cc> ##compare-imm-branch
+    ds-peek 0 cc> ##compare-integer-imm-branch
     [ emit-fixnum-left-shift ] with-branch
     [ emit-fixnum-right-shift ] with-branch
     2array emit-conditional ;
@@ -46,7 +44,7 @@ IN: compiler.cfg.intrinsics.fixnum
     } cond ;
 
 : emit-fixnum-comparison ( cc -- )
-    '[ _ ^^compare ] binary-fixnum-op ;
+    '[ _ ^^compare-integer ] binary-op ;
 
 : emit-no-overflow-case ( dst -- final-bb )
     [ ds-drop ds-drop ds-push ] with-branch ;

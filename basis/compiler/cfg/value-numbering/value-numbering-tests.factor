@@ -13,6 +13,8 @@ IN: compiler.cfg.value-numbering.tests
         dup {
             [ ##compare? ]
             [ ##compare-imm? ]
+            [ ##compare-integer? ]
+            [ ##compare-integer-imm? ]
             [ ##compare-float-unordered? ]
             [ ##compare-float-ordered? ]
             [ ##test-vector? ]
@@ -72,17 +74,17 @@ IN: compiler.cfg.value-numbering.tests
 ! Double compare elimination
 [
     {
-        T{ ##load-reference f 1 "hi" }
-        T{ ##peek f 2 D 0 }
-        T{ ##compare f 4 2 1 cc> }
+        T{ ##peek f 1 D 1 }
+        T{ ##peek f 2 D 2 }
+        T{ ##compare f 4 2 1 cc= }
         T{ ##copy f 6 4 any-rep }
         T{ ##replace f 6 D 0 }
     }
 ] [
     {
-        T{ ##load-reference f 1 "hi" }
-        T{ ##peek f 2 D 0 }
-        T{ ##compare f 4 2 1 cc> }
+        T{ ##peek f 1 D 1 }
+        T{ ##peek f 2 D 2 }
+        T{ ##compare f 4 2 1 cc= }
         T{ ##compare-imm f 6 4 f cc/= }
         T{ ##replace f 6 D 0 }
     } value-numbering-step trim-temps
@@ -90,19 +92,69 @@ IN: compiler.cfg.value-numbering.tests
 
 [
     {
-        T{ ##load-reference f 1 "hi" }
-        T{ ##peek f 2 D 0 }
-        T{ ##compare f 4 2 1 cc<= }
-        T{ ##compare f 6 2 1 cc/<= }
+        T{ ##peek f 1 D 1 }
+        T{ ##compare-imm f 2 1 16 cc= }
+        T{ ##copy f 3 2 any-rep }
+        T{ ##replace f 3 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 1 D 1 }
+        T{ ##compare-imm f 2 1 16 cc= }
+        T{ ##compare-imm f 3 2 f cc/= }
+        T{ ##replace f 3 D 0 }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##peek f 1 D 1 }
+        T{ ##peek f 2 D 2 }
+        T{ ##compare-integer f 4 2 1 cc> }
+        T{ ##copy f 6 4 any-rep }
         T{ ##replace f 6 D 0 }
     }
 ] [
     {
-        T{ ##load-reference f 1 "hi" }
-        T{ ##peek f 2 D 0 }
-        T{ ##compare f 4 2 1 cc<= }
+        T{ ##peek f 1 D 1 }
+        T{ ##peek f 2 D 2 }
+        T{ ##compare-integer f 4 2 1 cc> }
+        T{ ##compare-imm f 6 4 f cc/= }
+        T{ ##replace f 6 D 0 }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##peek f 1 D 1 }
+        T{ ##peek f 2 D 2 }
+        T{ ##compare-integer f 4 2 1 cc<= }
+        T{ ##compare-integer f 6 2 1 cc/<= }
+        T{ ##replace f 6 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 1 D 1 }
+        T{ ##peek f 2 D 2 }
+        T{ ##compare-integer f 4 2 1 cc<= }
         T{ ##compare-imm f 6 4 f cc= }
         T{ ##replace f 6 D 0 }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##peek f 1 D 1 }
+        T{ ##compare-integer-imm f 2 1 100 cc<= }
+        T{ ##compare-integer-imm f 3 1 100 cc/<= }
+        T{ ##replace f 3 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 1 D 1 }
+        T{ ##compare-integer-imm f 2 1 100 cc<= }
+        T{ ##compare-imm f 3 2 f cc= }
+        T{ ##replace f 3 D 0 }
     } value-numbering-step trim-temps
 ] unit-test
 
@@ -128,14 +180,30 @@ IN: compiler.cfg.value-numbering.tests
     {
         T{ ##peek f 29 D -1 }
         T{ ##peek f 30 D -2 }
-        T{ ##compare f 33 29 30 cc<= }
-        T{ ##compare-branch f 29 30 cc<= }
+        T{ ##compare f 33 29 30 cc= }
+        T{ ##compare-branch f 29 30 cc= }
     }
 ] [
     {
         T{ ##peek f 29 D -1 }
         T{ ##peek f 30 D -2 }
-        T{ ##compare f 33 29 30 cc<= }
+        T{ ##compare f 33 29 30 cc= }
+        T{ ##compare-imm-branch f 33 f cc/= }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##peek f 29 D -1 }
+        T{ ##peek f 30 D -2 }
+        T{ ##compare-integer f 33 29 30 cc<= }
+        T{ ##compare-integer-branch f 29 30 cc<= }
+    }
+] [
+    {
+        T{ ##peek f 29 D -1 }
+        T{ ##peek f 30 D -2 }
+        T{ ##compare-integer f 33 29 30 cc<= }
         T{ ##compare-imm-branch f 33 f cc/= }
     } value-numbering-step trim-temps
 ] unit-test
@@ -153,6 +221,22 @@ IN: compiler.cfg.value-numbering.tests
         T{ ##compare-imm-branch f 2 f cc/= }
     } value-numbering-step trim-temps
 ] unit-test
+
+cpu x86.32? [
+    [
+        {
+            T{ ##peek f 1 D 0 }
+            T{ ##compare-imm f 2 1 + cc= }
+            T{ ##compare-imm-branch f 1 + cc= }
+        }
+    ] [
+        {
+            T{ ##peek f 1 D 0 }
+            T{ ##compare-imm f 2 1 + cc= }
+            T{ ##compare-imm-branch f 2 f cc/= }
+        } value-numbering-step trim-temps
+    ] unit-test
+] when
 
 ! Immediate operand fusion
 [
@@ -409,13 +493,27 @@ IN: compiler.cfg.value-numbering.tests
     {
         T{ ##peek f 0 D 0 }
         T{ ##load-integer f 1 100 }
-        T{ ##compare-imm f 2 0 100 cc<= }
+        T{ ##compare-imm f 2 0 $[ 100 tag-fixnum ] cc= }
     }
 ] [
     {
         T{ ##peek f 0 D 0 }
         T{ ##load-integer f 1 100 }
-        T{ ##compare f 2 0 1 cc<= }
+        T{ ##compare f 2 0 1 cc= }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 1 100 }
+        T{ ##compare-integer-imm f 2 0 100 cc<= }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 1 100 }
+        T{ ##compare-integer f 2 0 1 cc<= }
     } value-numbering-step trim-temps
 ] unit-test
 
@@ -481,13 +579,13 @@ cpu x86.32? [
     {
         T{ ##peek f 0 D 0 }
         T{ ##load-integer f 1 100 }
-        T{ ##compare-imm f 2 0 100 cc>= }
+        T{ ##compare-integer-imm f 2 0 100 cc>= }
     }
 ] [
     {
         T{ ##peek f 0 D 0 }
         T{ ##load-integer f 1 100 }
-        T{ ##compare f 2 1 0 cc<= }
+        T{ ##compare-integer f 2 1 0 cc<= }
     } value-numbering-step trim-temps
 ] unit-test
 
@@ -495,13 +593,13 @@ cpu x86.32? [
     {
         T{ ##peek f 0 D 0 }
         T{ ##load-integer f 1 100 }
-        T{ ##compare-imm-branch f 0 100 cc<= }
+        T{ ##compare-integer-imm-branch f 0 100 cc<= }
     }
 ] [
     {
         T{ ##peek f 0 D 0 }
         T{ ##load-integer f 1 100 }
-        T{ ##compare-branch f 0 1 cc<= }
+        T{ ##compare-integer-branch f 0 1 cc<= }
     } value-numbering-step
 ] unit-test
 
@@ -509,13 +607,13 @@ cpu x86.32? [
     {
         T{ ##peek f 0 D 0 }
         T{ ##load-integer f 1 100 }
-        T{ ##compare-imm-branch f 0 100 cc>= }
+        T{ ##compare-integer-imm-branch f 0 100 cc>= }
     }
 ] [
     {
         T{ ##peek f 0 D 0 }
         T{ ##load-integer f 1 100 }
-        T{ ##compare-branch f 1 0 cc<= }
+        T{ ##compare-integer-branch f 1 0 cc<= }
     } value-numbering-step trim-temps
 ] unit-test
 
@@ -530,7 +628,7 @@ cpu x86.32? [
     {
         T{ ##load-integer f 1 100 }
         T{ ##load-integer f 2 200 }
-        T{ ##compare f 3 1 2 cc<= }
+        T{ ##compare-integer f 3 1 2 cc<= }
     } value-numbering-step trim-temps
 ] unit-test
 
@@ -544,7 +642,7 @@ cpu x86.32? [
     {
         T{ ##load-integer f 1 100 }
         T{ ##load-integer f 2 200 }
-        T{ ##compare f 3 1 2 cc= }
+        T{ ##compare-integer f 3 1 2 cc= }
     } value-numbering-step trim-temps
 ] unit-test
 
@@ -556,89 +654,235 @@ cpu x86.32? [
 ] [
     {
         T{ ##load-integer f 1 100 }
-        T{ ##compare-imm f 2 1 f cc= }
+        T{ ##compare-integer-imm f 2 1 123 cc= }
     } value-numbering-step trim-temps
 ] unit-test
 
 [
     {
+        T{ ##load-integer f 1 10 }
+        T{ ##load-integer f 2 20 }
+        T{ ##load-reference f 3 f }
+    }
+] [
+    {
+        T{ ##load-integer f 1 10 }
+        T{ ##load-integer f 2 20 }
+        T{ ##compare-integer f 3 1 2 cc= }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-integer f 1 1 }
+        T{ ##load-integer f 2 2 }
+        T{ ##load-reference f 3 t }
+    }
+] [
+    {
+        T{ ##load-integer f 1 1 }
+        T{ ##load-integer f 2 2 }
+        T{ ##compare-integer f 3 1 2 cc/= }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-integer f 1 1 }
+        T{ ##load-integer f 2 2 }
+        T{ ##load-reference f 3 t }
+    }
+] [
+    {
+        T{ ##load-integer f 1 1 }
+        T{ ##load-integer f 2 2 }
+        T{ ##compare-integer f 3 1 2 cc< }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-integer f 1 10 }
+        T{ ##load-integer f 2 20 }
+        T{ ##load-reference f 3 f }
+    }
+] [
+    {
+        T{ ##load-integer f 1 10 }
+        T{ ##load-integer f 2 20 }
+        T{ ##compare-integer f 3 2 1 cc< }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
         T{ ##load-reference f 1 f }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##compare-integer f 1 0 0 cc< }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-reference f 1 t }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##compare-integer f 1 0 0 cc<= }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-reference f 1 f }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##compare-integer f 1 0 0 cc> }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-reference f 1 t }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##compare-integer f 1 0 0 cc>= }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-reference f 1 f }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##compare-integer f 1 0 0 cc/= }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-reference f 1 t }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##compare-integer f 1 0 0 cc= }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-integer f 1 10 }
+        T{ ##load-reference f 2 f }
+    }
+] [
+    {
+        T{ ##load-integer f 1 10 }
+        T{ ##compare-imm f 2 1 10 cc= }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-integer f 1 10 }
         T{ ##load-reference f 2 t }
     }
 ] [
     {
-        T{ ##load-reference f 1 f }
-        T{ ##compare-imm f 2 1 f cc= }
-    } value-numbering-step trim-temps
-] unit-test
-
-[
-    {
         T{ ##load-integer f 1 10 }
-        T{ ##load-integer f 2 20 }
-        T{ ##load-reference f 3 f }
-    }
-] [
-    {
-        T{ ##load-integer f 1 10 }
-        T{ ##load-integer f 2 20 }
-        T{ ##compare f 3 1 2 cc= }
-    } value-numbering-step
-] unit-test
-
-[
-    {
-        T{ ##load-integer f 1 1 }
-        T{ ##load-integer f 2 2 }
-        T{ ##load-reference f 3 t }
-    }
-] [
-    {
-        T{ ##load-integer f 1 1 }
-        T{ ##load-integer f 2 2 }
-        T{ ##compare f 3 1 2 cc/= }
-    } value-numbering-step
-] unit-test
-
-[
-    {
-        T{ ##load-integer f 1 1 }
-        T{ ##load-integer f 2 2 }
-        T{ ##load-reference f 3 t }
-    }
-] [
-    {
-        T{ ##load-integer f 1 1 }
-        T{ ##load-integer f 2 2 }
-        T{ ##compare f 3 1 2 cc< }
+        T{ ##compare-imm f 2 1 $[ 10 tag-fixnum ] cc= }
     } value-numbering-step
 ] unit-test
 
 [
     {
         T{ ##load-integer f 1 10 }
-        T{ ##load-integer f 2 20 }
-        T{ ##load-reference f 3 f }
+        T{ ##load-reference f 2 t }
     }
 ] [
     {
         T{ ##load-integer f 1 10 }
-        T{ ##load-integer f 2 20 }
-        T{ ##compare f 3 2 1 cc< }
+        T{ ##compare-imm f 2 1 10 cc/= }
     } value-numbering-step
 ] unit-test
 
 [
     {
-        T{ ##peek f 0 D 0 }
-        T{ ##load-reference f 1 f }
+        T{ ##load-integer f 1 10 }
+        T{ ##load-reference f 2 f }
     }
 ] [
     {
-        T{ ##peek f 0 D 0 }
-        T{ ##compare f 1 0 0 cc< }
+        T{ ##load-integer f 1 10 }
+        T{ ##compare-imm f 2 1 $[ 10 tag-fixnum ] cc/= }
     } value-numbering-step
 ] unit-test
+
+cpu x86.32? [
+    [
+        {
+            T{ ##load-reference f 1 + }
+            T{ ##load-reference f 2 f }
+        }
+    ] [
+        {
+            T{ ##load-reference f 1 + }
+            T{ ##compare-imm f 2 1 + cc/= }
+        } value-numbering-step
+    ] unit-test
+
+    [
+        {
+            T{ ##load-reference f 1 + }
+            T{ ##load-reference f 2 t }
+        }
+    ] [
+        {
+            T{ ##load-reference f 1 + }
+            T{ ##compare-imm f 2 1 * cc/= }
+        } value-numbering-step
+    ] unit-test
+
+    [
+        {
+            T{ ##load-reference f 1 + }
+            T{ ##load-reference f 2 t }
+        }
+    ] [
+        {
+            T{ ##load-reference f 1 + }
+            T{ ##compare-imm f 2 1 + cc= }
+        } value-numbering-step
+    ] unit-test
+
+    [
+        {
+            T{ ##load-reference f 1 + }
+            T{ ##load-reference f 2 f }
+        }
+    ] [
+        {
+            T{ ##load-reference f 1 + }
+            T{ ##compare-imm f 2 1 * cc= }
+        } value-numbering-step
+    ] unit-test
+] when
 
 [
     {
@@ -648,31 +892,7 @@ cpu x86.32? [
 ] [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##compare f 1 0 0 cc<= }
-    } value-numbering-step
-] unit-test
-
-[
-    {
-        T{ ##peek f 0 D 0 }
-        T{ ##load-reference f 1 f }
-    }
-] [
-    {
-        T{ ##peek f 0 D 0 }
-        T{ ##compare f 1 0 0 cc> }
-    } value-numbering-step
-] unit-test
-
-[
-    {
-        T{ ##peek f 0 D 0 }
-        T{ ##load-reference f 1 t }
-    }
-] [
-    {
-        T{ ##peek f 0 D 0 }
-        T{ ##compare f 1 0 0 cc>= }
+        T{ ##compare f 1 0 0 cc= }
     } value-numbering-step
 ] unit-test
 
@@ -685,18 +905,6 @@ cpu x86.32? [
     {
         T{ ##peek f 0 D 0 }
         T{ ##compare f 1 0 0 cc/= }
-    } value-numbering-step
-] unit-test
-
-[
-    {
-        T{ ##peek f 0 D 0 }
-        T{ ##load-reference f 1 t }
-    }
-] [
-    {
-        T{ ##peek f 0 D 0 }
-        T{ ##compare f 1 0 0 cc= }
     } value-numbering-step
 ] unit-test
 
@@ -1560,7 +1768,7 @@ cell 8 = [
     {
         T{ ##load-integer f 1 1 }
         T{ ##load-integer f 2 2 }
-        T{ ##compare-branch f 1 2 cc< }
+        T{ ##compare-integer-branch f 1 2 cc< }
     } test-branch-folding
 ] unit-test
 
@@ -1575,7 +1783,7 @@ cell 8 = [
     {
         T{ ##load-integer f 1 1 }
         T{ ##load-integer f 2 2 }
-        T{ ##compare-branch f 2 1 cc< }
+        T{ ##compare-integer-branch f 2 1 cc< }
     } test-branch-folding
 ] unit-test
 
@@ -1588,7 +1796,7 @@ cell 8 = [
 ] [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##compare-branch f 0 0 cc< }
+        T{ ##compare-integer-branch f 0 0 cc< }
     } test-branch-folding
 ] unit-test
 
@@ -1601,7 +1809,7 @@ cell 8 = [
 ] [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##compare-branch f 0 0 cc<= }
+        T{ ##compare-integer-branch f 0 0 cc<= }
     } test-branch-folding
 ] unit-test
 
@@ -1614,7 +1822,7 @@ cell 8 = [
 ] [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##compare-branch f 0 0 cc> }
+        T{ ##compare-integer-branch f 0 0 cc> }
     } test-branch-folding
 ] unit-test
 
@@ -1627,7 +1835,7 @@ cell 8 = [
 ] [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##compare-branch f 0 0 cc>= }
+        T{ ##compare-integer-branch f 0 0 cc>= }
     } test-branch-folding
 ] unit-test
 
@@ -1640,7 +1848,7 @@ cell 8 = [
 ] [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##compare-branch f 0 0 cc= }
+        T{ ##compare-integer-branch f 0 0 cc= }
     } test-branch-folding
 ] unit-test
 
@@ -1653,7 +1861,7 @@ cell 8 = [
 ] [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##compare-branch f 0 0 cc/= }
+        T{ ##compare-integer-branch f 0 0 cc/= }
     } test-branch-folding
 ] unit-test
 
@@ -1677,7 +1885,7 @@ V{ T{ ##branch } } 0 test-bb
 
 V{
     T{ ##peek f 0 D 0 }
-    T{ ##compare-branch f 0 0 cc< }
+    T{ ##compare-integer-branch f 0 0 cc< }
 } 1 test-bb
 
 V{
@@ -1718,7 +1926,7 @@ V{
 
 V{
     T{ ##peek f 1 D 1 }
-    T{ ##compare-branch f 1 1 cc< }
+    T{ ##compare-integer-branch f 1 1 cc< }
 } 1 test-bb
 
 V{
@@ -1816,4 +2024,3 @@ V{
 ] unit-test
 
 [ f ] [ 1 get instructions>> [ ##peek? ] any? ] unit-test
-
