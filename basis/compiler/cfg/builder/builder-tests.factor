@@ -172,17 +172,29 @@ IN: compiler.cfg.builder.tests
 
 [ t ] [
     [ { fixnum byte-array fixnum } declare set-alien-unsigned-1 ]
-    [ ##set-alien-integer-1? ] contains-insn?
+    [ ##store-memory-imm? ] contains-insn?
 ] unit-test
 
 [ t ] [
     [ { fixnum byte-array fixnum } declare [ dup * dup * ] 2dip set-alien-unsigned-1 ]
-    [ ##set-alien-integer-1? ] contains-insn?
+    [ ##store-memory-imm? ] contains-insn?
 ] unit-test
 
 [ f ] [
     [ { byte-array fixnum } declare set-alien-unsigned-1 ]
-    [ ##set-alien-integer-1? ] contains-insn?
+    [ ##store-memory-imm? ] contains-insn?
+] unit-test
+
+[ t t ] [
+    [ { byte-array fixnum } declare alien-cell ]
+    [ [ ##load-memory-imm? ] contains-insn? ]
+    [ [ ##box-alien? ] contains-insn? ]
+    bi
+] unit-test
+
+[ f ] [
+    [ { byte-array integer } declare alien-cell ]
+    [ ##load-memory-imm? ] contains-insn?
 ] unit-test
 
 [ f ] [
@@ -209,7 +221,7 @@ IN: compiler.cfg.builder.tests
         [ [ ##allot? ] contains-insn? ] bi
     ] unit-test
     
-    [ 1 ] [ [ dup float+ ] [ ##alien-double? ] count-insns ] unit-test
+    [ 1 ] [ [ dup float+ ] [ ##load-memory-imm? ] count-insns ] unit-test
 ] when
 
 ! Regression. Make sure everything is inlined correctly

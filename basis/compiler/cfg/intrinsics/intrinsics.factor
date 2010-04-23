@@ -14,6 +14,7 @@ compiler.cfg.intrinsics.misc
 compiler.cfg.comparisons ;
 QUALIFIED: alien
 QUALIFIED: alien.accessors
+QUALIFIED: alien.c-types
 QUALIFIED: kernel
 QUALIFIED: arrays
 QUALIFIED: byte-arrays
@@ -63,24 +64,24 @@ IN: compiler.cfg.intrinsics
     { byte-arrays:(byte-array) [ emit-(byte-array) ] }
     { kernel:<wrapper> [ emit-simple-allot ] }
     { alien:<displaced-alien> [ emit-<displaced-alien> ] }
-    { alien.accessors:alien-unsigned-1 [ 1 emit-alien-unsigned-getter ] }
-    { alien.accessors:set-alien-unsigned-1 [ 1 emit-alien-integer-setter ] }
-    { alien.accessors:alien-signed-1 [ 1 emit-alien-signed-getter ] }
-    { alien.accessors:set-alien-signed-1 [ 1 emit-alien-integer-setter ] }
-    { alien.accessors:alien-unsigned-2 [ 2 emit-alien-unsigned-getter ] }
-    { alien.accessors:set-alien-unsigned-2 [ 2 emit-alien-integer-setter ] }
-    { alien.accessors:alien-signed-2 [ 2 emit-alien-signed-getter ] }
-    { alien.accessors:set-alien-signed-2 [ 2 emit-alien-integer-setter ] }
-    { alien.accessors:alien-cell [ emit-alien-cell-getter ] }
-    { alien.accessors:set-alien-cell [ emit-alien-cell-setter ] }
+    { alien.accessors:alien-unsigned-1 [ int-rep alien.c-types:uchar emit-load-memory ] }
+    { alien.accessors:set-alien-unsigned-1 [ int-rep alien.c-types:uchar emit-store-memory ] }
+    { alien.accessors:alien-signed-1 [ int-rep alien.c-types:char emit-load-memory ] }
+    { alien.accessors:set-alien-signed-1 [ int-rep alien.c-types:char emit-store-memory ] }
+    { alien.accessors:alien-unsigned-2 [ int-rep alien.c-types:ushort emit-load-memory ] }
+    { alien.accessors:set-alien-unsigned-2 [ int-rep alien.c-types:ushort emit-store-memory ] }
+    { alien.accessors:alien-signed-2 [ int-rep alien.c-types:short emit-load-memory ] }
+    { alien.accessors:set-alien-signed-2 [ int-rep alien.c-types:short emit-store-memory ] }
+    { alien.accessors:alien-cell [ emit-alien-cell ] }
+    { alien.accessors:set-alien-cell [ emit-set-alien-cell ] }
 } enable-intrinsics
 
 : enable-alien-4-intrinsics ( -- )
     {
-        { alien.accessors:alien-unsigned-4 [ 4 emit-alien-unsigned-getter ] }
-        { alien.accessors:set-alien-unsigned-4 [ 4 emit-alien-integer-setter ] }
-        { alien.accessors:alien-signed-4 [ 4 emit-alien-signed-getter ] }
-        { alien.accessors:set-alien-signed-4 [ 4 emit-alien-integer-setter ] }
+        { alien.accessors:alien-signed-4 [ int-rep alien.c-types:int emit-load-memory ] }
+        { alien.accessors:set-alien-signed-4 [ int-rep alien.c-types:int emit-store-memory ] }
+        { alien.accessors:alien-unsigned-4 [ int-rep alien.c-types:uint emit-load-memory ] }
+        { alien.accessors:set-alien-unsigned-4 [ int-rep alien.c-types:uint emit-store-memory ] }
     } enable-intrinsics ;
 
 : enable-float-intrinsics ( -- )
@@ -101,10 +102,10 @@ IN: compiler.cfg.intrinsics
         { math.private:float>fixnum [ drop [ ^^float>integer ] unary-op ] }
         { math.private:fixnum>float [ drop [ ^^integer>float ] unary-op ] }
         { math.floats.private:float-unordered? [ drop cc/<>= emit-float-unordered-comparison ] }
-        { alien.accessors:alien-float [ float-rep emit-alien-float-getter ] }
-        { alien.accessors:set-alien-float [ float-rep emit-alien-float-setter ] }
-        { alien.accessors:alien-double [ double-rep emit-alien-float-getter ] }
-        { alien.accessors:set-alien-double [ double-rep emit-alien-float-setter ] }
+        { alien.accessors:alien-float [ float-rep f emit-load-memory ] }
+        { alien.accessors:set-alien-float [ float-rep f emit-store-memory ] }
+        { alien.accessors:alien-double [ double-rep f emit-load-memory ] }
+        { alien.accessors:set-alien-double [ double-rep f emit-store-memory ] }
     } enable-intrinsics ;
 
 : enable-fsqrt ( -- )

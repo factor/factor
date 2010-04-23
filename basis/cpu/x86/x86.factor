@@ -12,6 +12,7 @@ compiler.cfg.intrinsics
 compiler.cfg.comparisons
 compiler.cfg.stack-frame
 compiler.codegen.fixup ;
+QUALIFIED-WITH: alien.c-types c
 FROM: layouts => cell ;
 FROM: math => float ;
 IN: cpu.x86
@@ -66,7 +67,10 @@ HOOK: pic-tail-reg cpu ( -- reg )
 
 M: x86 %load-immediate dup 0 = [ drop dup XOR ] [ MOV ] if ;
 
-M: x86 %load-reference swap 0 MOV rc-absolute-cell rel-literal ;
+M: x86 %load-reference
+    [ swap 0 MOV rc-absolute-cell rel-literal ]
+    [ \ f type-number MOV ]
+    if* ;
 
 HOOK: ds-reg cpu ( -- reg )
 HOOK: rs-reg cpu ( -- reg )
@@ -354,45 +358,48 @@ M:: x86 %string-nth ( dst src index temp -- )
         dst new-dst int-rep %copy
     ] with-small-register ;
 
-:: %alien-integer-getter ( dst src offset size quot -- )
-    dst { src } size [| new-dst |
-        new-dst dup size n-bit-version-of dup src offset [+] MOV
+:: %alien-integer-getter ( dst base offset bits quot -- )
+    dst { base } bits [| new-dst |
+        new-dst dup bits n-bit-version-of dup base offset [+] MOV
         quot call
         dst new-dst int-rep %copy
     ] with-small-register ; inline
 
-: %alien-unsigned-getter ( dst src offset size -- )
+: %alien-unsigned-getter ( dst base offset bits -- )
     [ MOVZX ] %alien-integer-getter ; inline
 
-: %alien-signed-getter ( dst src offset size -- )
+: %alien-signed-getter ( dst base offset bits -- )
     [ MOVSX ] %alien-integer-getter ; inline
 
-:: %alien-integer-setter ( ptr offset value size -- )
-    value { ptr } size [| new-value |
+:: %alien-integer-setter ( value base offset bits -- )
+    value { base } bits [| new-value |
         new-value value int-rep %copy
-        ptr offset [+] new-value size n-bit-version-of MOV
+        base offset [+] new-value bits n-bit-version-of MOV
     ] with-small-register ; inline
 
-M: x86 %alien-unsigned-1 8 %alien-unsigned-getter ;
-M: x86 %alien-unsigned-2 16 %alien-unsigned-getter ;
-M: x86 %alien-unsigned-4 32 [ 2drop ] %alien-integer-getter ;
+M: x86 %load-memory-imm ( dst base offset rep c-type -- )
+    [
+        {
+            { c:char   [ 8 %alien-signed-getter ] }
+            { c:uchar  [ 8 %alien-unsigned-getter ] }
+            { c:short  [ 16 %alien-signed-getter ] }
+            { c:ushort [ 16 %alien-unsigned-getter ] }
+            { c:int    [ 32 [ 2drop ] %alien-integer-getter ] }
+            { c:uint   [ 32 %alien-signed-getter ] }
+        } case
+    ] [ [ [+] ] dip %copy ] ?if ;
 
-M: x86 %alien-signed-1 8 %alien-signed-getter ;
-M: x86 %alien-signed-2 16 %alien-signed-getter ;
-M: x86 %alien-signed-4 32 %alien-signed-getter ;
-
-M: x86 %alien-cell [+] MOV ;
-M: x86 %alien-float [+] MOVSS ;
-M: x86 %alien-double [+] MOVSD ;
-M: x86 %alien-vector [ [+] ] dip %copy ;
-
-M: x86 %set-alien-integer-1 8 %alien-integer-setter ;
-M: x86 %set-alien-integer-2 16 %alien-integer-setter ;
-M: x86 %set-alien-integer-4 32 %alien-integer-setter ;
-M: x86 %set-alien-cell [ [+] ] dip MOV ;
-M: x86 %set-alien-float [ [+] ] dip MOVSS ;
-M: x86 %set-alien-double [ [+] ] dip MOVSD ;
-M: x86 %set-alien-vector [ [+] ] 2dip %copy ;
+M: x86 %store-memory-imm ( src base offset rep c-type -- )
+    [
+        {
+            { c:char   [ 8 %alien-integer-setter ] }
+            { c:uchar  [ 8 %alien-integer-setter ] }
+            { c:short  [ 16 %alien-integer-setter ] }
+            { c:ushort [ 16 %alien-integer-setter ] }
+            { c:int    [ 32 %alien-integer-setter ] }
+            { c:uint   [ 32 %alien-integer-setter ] }
+        } case
+    ] [ [ [+] swap ] dip %copy ] ?if ;
 
 : shift-count? ( reg -- ? ) { ECX RCX } member-eq? ;
 

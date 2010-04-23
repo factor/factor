@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences alien math classes.algebra fry
 locals combinators combinators.short-circuit cpu.architecture
@@ -22,96 +22,66 @@ IN: compiler.cfg.intrinsics.alien
         ] binary-op
     ] [ emit-primitive ] if ;
 
-:: inline-alien ( node quot test -- )
+:: inline-accessor ( node quot test -- )
     node node-input-infos :> infos
     infos test call
     [ infos quot call ]
     [ node emit-primitive ] if ; inline
 
-: inline-alien-getter? ( infos -- ? )
+: inline-load-memory? ( infos -- ? )
     [ first class>> c-ptr class<= ]
     [ second class>> fixnum class<= ]
     bi and ;
 
-: prepare-alien-accessor ( info -- ptr-vreg offset )
-    class>> [ 2inputs swap ] dip ^^unbox-c-ptr ^^add 0 ;
+: prepare-accessor ( base offset info -- base offset )
+    class>> swap [ ^^unbox-c-ptr ] dip ^^add 0 ;
 
-: prepare-alien-getter ( infos -- ptr-vreg offset )
-    first prepare-alien-accessor ;
+: prepare-load-memory ( infos -- base offset )
+    [ 2inputs ] dip first prepare-accessor ;
 
-: inline-alien-getter ( node quot -- )
-    '[ prepare-alien-getter @ ds-push ]
-    [ inline-alien-getter? ] inline-alien ; inline
+: (emit-load-memory) ( node rep c-type quot -- )
+    '[ prepare-load-memory _ _ ^^load-memory-imm @ ds-push ]
+    [ inline-load-memory? ]
+    inline-accessor ; inline
 
-: inline-alien-setter? ( infos class -- ? )
+: emit-load-memory ( node rep c-type -- )
+    [ ] (emit-load-memory) ;
+
+: emit-alien-cell ( node -- )
+    int-rep f [ ^^box-alien ] (emit-load-memory) ;
+
+: inline-store-memory? ( infos class -- ? )
     '[ first class>> _ class<= ]
     [ second class>> c-ptr class<= ]
     [ third class>> fixnum class<= ]
     tri and and ;
 
-: prepare-alien-setter ( infos -- ptr-vreg offset )
-    second prepare-alien-accessor ;
+: prepare-store-memory ( infos -- value base offset )
+    [ 3inputs ] dip second prepare-accessor ;
 
-: inline-alien-integer-setter ( node quot -- )
-    '[ prepare-alien-setter ds-pop @ ]
-    [ fixnum inline-alien-setter? ]
-    inline-alien ; inline
+:: (emit-store-memory) ( node rep c-type prepare-quot test-quot -- )
+    node
+    [ prepare-quot call rep c-type ##store-memory-imm ]
+    [ test-quot call inline-store-memory? ]
+    inline-accessor ; inline
 
-: inline-alien-float-setter ( node quot -- )
-    '[ prepare-alien-setter ds-pop @ ]
-    [ float inline-alien-setter? ]
-    inline-alien ; inline
-
-: inline-alien-cell-setter ( node quot -- )
-    '[ [ prepare-alien-setter ds-pop ] [ first class>> ] bi ^^unbox-c-ptr @ ]
-    [ pinned-c-ptr inline-alien-setter? ]
-    inline-alien ; inline
-
-: emit-alien-unsigned-getter ( node n -- )
-    '[
-        _ {
-            { 1 [ ^^alien-unsigned-1 ] }
-            { 2 [ ^^alien-unsigned-2 ] }
-            { 4 [ ^^alien-unsigned-4 ] }
+:: emit-store-memory ( node rep c-type -- )
+    node rep c-type
+    [ prepare-store-memory ]
+    [
+        rep {
+            { int-rep [ fixnum ] }
+            { float-rep [ float ] }
+            { double-rep [ float ] }
         } case
-    ] inline-alien-getter ;
+    ]
+    (emit-store-memory) ;
 
-: emit-alien-signed-getter ( node n -- )
-    '[
-        _ {
-            { 1 [ ^^alien-signed-1 ] }
-            { 2 [ ^^alien-signed-2 ] }
-            { 4 [ ^^alien-signed-4 ] }
-        } case
-    ] inline-alien-getter ;
-
-: emit-alien-integer-setter ( node n -- )
-    '[
-        _ {
-            { 1 [ ##set-alien-integer-1 ] }
-            { 2 [ ##set-alien-integer-2 ] }
-            { 4 [ ##set-alien-integer-4 ] }
-        } case
-    ] inline-alien-integer-setter ;
-
-: emit-alien-cell-getter ( node -- )
-    [ ^^alien-cell ^^box-alien ] inline-alien-getter ;
-
-: emit-alien-cell-setter ( node -- )
-    [ ##set-alien-cell ] inline-alien-cell-setter ;
-
-: emit-alien-float-getter ( node rep -- )
-    '[
-        _ {
-            { float-rep [ ^^alien-float ] }
-            { double-rep [ ^^alien-double ] }
-        } case
-    ] inline-alien-getter ;
-
-: emit-alien-float-setter ( node rep -- )
-    '[
-        _ {
-            { float-rep [ ##set-alien-float ] }
-            { double-rep [ ##set-alien-double ] }
-        } case
-    ] inline-alien-float-setter ;
+: emit-set-alien-cell ( node -- )
+    int-rep f
+    [
+        [ first class>> ] [ prepare-store-memory ] bi
+        [ swap ^^unbox-c-ptr ] 2dip
+    ]
+    [ pinned-c-ptr ]
+    (emit-store-memory) ;

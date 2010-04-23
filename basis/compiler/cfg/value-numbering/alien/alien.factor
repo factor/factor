@@ -30,21 +30,10 @@ M: ##unbox-any-c-ptr rewrite
 
 ! More efficient addressing for alien intrinsics
 : rewrite-alien-addressing ( insn -- insn' )
-    dup src>> vreg>expr dup add-imm-expr? [
+    dup base>> vreg>expr dup add-imm-expr? [
         [ src1>> vn>vreg ] [ src2>> vn>integer ] bi
-        [ >>src ] [ '[ _ + ] change-offset ] bi*
+        [ >>base ] [ '[ _ + ] change-offset ] bi*
     ] [ 2drop f ] if ;
 
-M: ##alien-unsigned-1 rewrite rewrite-alien-addressing ;
-M: ##alien-unsigned-2 rewrite rewrite-alien-addressing ;
-M: ##alien-unsigned-4 rewrite rewrite-alien-addressing ;
-M: ##alien-signed-1 rewrite rewrite-alien-addressing ;
-M: ##alien-signed-2 rewrite rewrite-alien-addressing ;
-M: ##alien-signed-4 rewrite rewrite-alien-addressing ;
-M: ##alien-float rewrite rewrite-alien-addressing ;
-M: ##alien-double rewrite rewrite-alien-addressing ;
-M: ##set-alien-integer-1 rewrite rewrite-alien-addressing ;
-M: ##set-alien-integer-2 rewrite rewrite-alien-addressing ;
-M: ##set-alien-integer-4 rewrite rewrite-alien-addressing ;
-M: ##set-alien-float rewrite rewrite-alien-addressing ;
-M: ##set-alien-double rewrite rewrite-alien-addressing ;
+M: ##load-memory-imm rewrite rewrite-alien-addressing ;
+M: ##store-memory-imm rewrite rewrite-alien-addressing ;

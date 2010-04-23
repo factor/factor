@@ -2,7 +2,8 @@ USING: accessors compiler.cfg compiler.cfg.debugger
 compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.representations.preferred cpu.architecture kernel
 namespaces tools.test sequences arrays system literals layouts
-math ;
+math compiler.constants compiler.cfg.representations.conversion
+compiler.cfg.representations.rewrite make ;
 IN: compiler.cfg.representations
 
 [ { double-rep double-rep } ] [
@@ -14,10 +15,37 @@ IN: compiler.cfg.representations
 ] unit-test
 
 [ double-rep ] [
-    T{ ##alien-double
+    T{ ##load-memory-imm
        { dst 5 }
-       { src 3 }
+       { base 3 }
+       { offset 0 }
+       { rep double-rep }
     } defs-vreg-rep
+] unit-test
+
+H{ } clone representations set
+
+3 \ vreg-counter set-global
+
+[
+    {
+        T{ ##allot f 2 16 float 4 }
+        T{ ##store-memory-imm f 1 2 $[ float-offset ] double-rep f }
+    }
+] [
+    [
+        2 1 tagged-rep double-rep emit-conversion
+    ] { } make
+] unit-test
+
+[
+    {
+        T{ ##load-memory-imm f 2 1 $[ float-offset ] double-rep f }
+    }
+] [
+    [
+        2 1 double-rep tagged-rep emit-conversion
+    ] { } make
 ] unit-test
 
 : test-representations ( -- )

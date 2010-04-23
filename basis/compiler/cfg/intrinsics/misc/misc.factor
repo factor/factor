@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.algebra layouts kernel math namespaces
-sequences
+sequences cpu.architecture
 compiler.tree.propagation.info
 compiler.cfg.stacks
 compiler.cfg.hats
@@ -10,6 +10,7 @@ compiler.cfg.instructions
 compiler.cfg.builder.blocks
 compiler.cfg.utilities ;
 FROM: vm => context-field-offset vm-field-offset ;
+QUALIFIED-WITH: alien.c-types c
 IN: compiler.cfg.intrinsics.misc
 
 : emit-tag ( -- )
@@ -48,6 +49,6 @@ IN: compiler.cfg.intrinsics.misc
     [
         ^^tagged>integer
         tag-mask get bitnot ^^load-integer ^^and
-        0 ^^alien-cell
+        0 int-rep f ^^load-memory-imm
         hashcode-shift ^^shr-imm
     ] unary-op ;

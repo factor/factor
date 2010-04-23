@@ -3,7 +3,7 @@ compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.mr
 compiler.cfg.registers compiler.codegen compiler.units
 cpu.architecture hashtables kernel namespaces sequences
 tools.test vectors words layouts literals math arrays
-alien.syntax math.private ;
+alien.c-types alien.syntax math.private ;
 IN: compiler.tests.low-level-ir
 
 : compile-cfg ( cfg -- word )
@@ -92,7 +92,7 @@ IN: compiler.tests.low-level-ir
     V{
         T{ ##load-reference f 1 B{ 31 67 52 } }
         T{ ##unbox-any-c-ptr f 0 1 }
-        T{ ##alien-unsigned-1 f 0 0 0 }
+        T{ ##load-memory-imm f 0 0 0 int-rep uchar }
         T{ ##shl-imm f 0 0 4 }
     } compile-test-bb
 ] unit-test
