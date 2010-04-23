@@ -6,7 +6,7 @@ combinators continuations cuda.ffi cuda.memory cuda.utils
 destructors fry init io io.backend io.encodings.string
 io.encodings.utf8 kernel lexer locals macros math math.parser
 namespaces nested-comments opengl.gl.extensions parser
-prettyprint quotations sequences words ;
+prettyprint quotations sequences words cuda.libraries ;
 QUALIFIED-WITH: alien.c-types a
 IN: cuda
 
