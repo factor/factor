@@ -354,13 +354,6 @@ M:: x86 %string-nth ( dst src index temp -- )
         dst new-dst int-rep %copy
     ] with-small-register ;
 
-M:: x86 %set-string-nth-fast ( ch str index temp -- )
-    ch { index str temp } 8 [| new-ch |
-        new-ch ch int-rep %copy
-        temp str index [+] LEA
-        temp string-offset [+] new-ch 8-bit-version-of MOV
-    ] with-small-register ;
-
 :: %alien-integer-getter ( dst src offset size quot -- )
     dst { src } size [| new-dst |
         new-dst dup size n-bit-version-of dup src offset [+] MOV
