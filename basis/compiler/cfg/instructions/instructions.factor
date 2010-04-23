@@ -550,92 +550,15 @@ PURE-INSN: ##unbox-alien
 def: dst/int-rep
 use: src/tagged-rep ;
 
-! Alien accessors
-INSN: ##alien-unsigned-1
-def: dst/int-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-unsigned-2
-def: dst/int-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-unsigned-4
-def: dst/int-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-signed-1
-def: dst/int-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-signed-2
-def: dst/int-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-signed-4
-def: dst/int-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-cell
-def: dst/int-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-float
-def: dst/float-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-double
-def: dst/double-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-vector
+! Raw memory accessors
+INSN: ##load-memory-imm
 def: dst
-use: src/int-rep
-literal: offset rep ;
+use: base/int-rep
+literal: offset rep c-type ;
 
-INSN: ##set-alien-integer-1
-use: src/int-rep
-literal: offset
-use: value/int-rep ;
-
-INSN: ##set-alien-integer-2
-use: src/int-rep
-literal: offset
-use: value/int-rep ;
-
-INSN: ##set-alien-integer-4
-use: src/int-rep
-literal: offset
-use: value/int-rep ;
-
-INSN: ##set-alien-cell
-use: src/int-rep
-literal: offset
-use: value/int-rep ;
-
-INSN: ##set-alien-float
-use: src/int-rep
-literal: offset
-use: value/float-rep ;
-
-INSN: ##set-alien-double
-use: src/int-rep
-literal: offset
-use: value/double-rep ;
-
-INSN: ##set-alien-vector
-use: src/int-rep
-literal: offset
-use: value
-literal: rep ;
+INSN: ##store-memory-imm
+use: src base/int-rep
+literal: offset rep c-type ;
 
 ! Memory allocation
 INSN: ##allot

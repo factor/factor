@@ -16,9 +16,6 @@ compiler.cfg.value-numbering.rewrite
 compiler.cfg.value-numbering.simplify ;
 IN: compiler.cfg.value-numbering.simd
 
-M: ##alien-vector rewrite rewrite-alien-addressing ;
-M: ##set-alien-vector rewrite rewrite-alien-addressing ;
-
 ! Some lame constant folding for SIMD intrinsics. Eventually this
 ! should be redone completely.
 

@@ -26,24 +26,22 @@ M:: float-rep tagged>rep ( dst src rep -- )
     temp src double-rep tagged>rep
     dst temp ##double>single-float ;
 
-M: double-rep rep>tagged
-    drop
-    [ drop 16 float int-rep next-vreg-rep ##allot ]
-    [ float-offset swap ##set-alien-double ]
-    2bi ;
+M:: double-rep rep>tagged ( dst src rep -- )
+    dst 16 float int-rep next-vreg-rep ##allot
+    src dst float-offset double-rep f ##store-memory-imm ;
 
 M: double-rep tagged>rep
-    drop float-offset ##alien-double ;
+    drop float-offset double-rep f ##load-memory-imm ;
 
 M:: vector-rep rep>tagged ( dst src rep -- )
     tagged-rep next-vreg-rep :> temp
     dst 16 2 cells + byte-array int-rep next-vreg-rep ##allot
     temp 16 tag-fixnum ##load-tagged
     temp dst 1 byte-array type-number ##set-slot-imm
-    dst byte-array-offset src rep ##set-alien-vector ;
+    src dst byte-array-offset rep f ##store-memory-imm ;
 
 M: vector-rep tagged>rep
-    [ byte-array-offset ] dip ##alien-vector ;
+    [ byte-array-offset ] dip f ##load-memory-imm ;
 
 M:: scalar-rep rep>tagged ( dst src rep -- )
     tagged-rep next-vreg-rep :> temp

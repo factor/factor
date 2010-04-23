@@ -587,20 +587,20 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 : emit-alien-vector ( node -- )
     dup [
         '[
-            ds-drop prepare-alien-getter
-            _ ^^alien-vector ds-push
+            ds-drop prepare-load-memory
+            _ f ^^load-memory-imm ds-push
         ]
-        [ inline-alien-getter? ] inline-alien
+        [ inline-load-memory? ] inline-accessor
     ] with { [ %alien-vector-reps member? ] } if-literals-match ;
 
 : emit-set-alien-vector ( node -- )
     dup [
         '[
-            ds-drop prepare-alien-setter ds-pop
-            _ ##set-alien-vector
+            ds-drop prepare-store-memory
+            _ f ##store-memory-imm
         ]
-        [ byte-array inline-alien-setter? ]
-        inline-alien
+        [ byte-array inline-store-memory? ]
+        inline-accessor
     ] with { [ %alien-vector-reps member? ] } if-literals-match ;
 
 : enable-simd ( -- )

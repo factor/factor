@@ -20,7 +20,7 @@ IN: compiler.cfg.value-numbering
 ! Local value numbering.
 
 : >copy ( insn -- insn/##copy )
-    dup defs-vreg dup vreg>vn vn>vreg
+    dup dst>> dup vreg>vn vn>vreg
     2dup eq? [ 2drop ] [ any-rep \ ##copy new-insn nip ] if ;
 
 GENERIC: process-instruction ( insn -- insn' )
