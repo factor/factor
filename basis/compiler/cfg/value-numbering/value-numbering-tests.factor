@@ -6,6 +6,7 @@ compiler.cfg.ssa.destruction compiler.cfg.loop-detection
 compiler.cfg.representations compiler.cfg assocs vectors arrays
 layouts literals namespaces alien compiler.cfg.value-numbering.simd
 system ;
+QUALIFIED-WITH: alien.c-types c
 IN: compiler.cfg.value-numbering.tests
 
 : trim-temps ( insns -- insns )
@@ -2207,3 +2208,40 @@ V{
 ] unit-test
 
 [ f ] [ 1 get instructions>> [ ##peek? ] any? ] unit-test
+
+! Alien addressing optimization
+[
+    V{
+        T{ ##peek f 1 D 0 }
+        T{ ##tagged>integer f 2 1 }
+        T{ ##add-imm f 3 2 10 }
+        T{ ##load-memory-imm f 4 2 10 int-rep c:uchar }
+    }
+] [
+    V{
+        T{ ##peek f 1 D 0 }
+        T{ ##tagged>integer f 2 1 }
+        T{ ##add-imm f 3 2 10 }
+        T{ ##load-memory-imm f 4 3 0 int-rep c:uchar }
+    } value-numbering-step
+] unit-test
+
+[
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##tagged>integer f 2 0 }
+        T{ ##tagged>integer f 3 1 }
+        T{ ##add-imm f 4 3 10 }
+        T{ ##store-memory-imm f 2 3 10 int-rep c:uchar }
+    }
+] [
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##tagged>integer f 2 0 }
+        T{ ##tagged>integer f 3 1 }
+        T{ ##add-imm f 4 3 10 }
+        T{ ##store-memory-imm f 2 4 0 int-rep c:uchar }
+    } value-numbering-step
+] unit-test
