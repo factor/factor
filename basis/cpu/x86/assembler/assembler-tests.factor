@@ -11,6 +11,58 @@ IN: cpu.x86.assembler.tests
 [ { HEX: 4c HEX: 89 HEX: e2 } ] [ [ RDX R12 MOV ] { } make ] unit-test
 [ { HEX: 49 HEX: 89 HEX: d4 } ] [ [ R12 RDX MOV ] { } make ] unit-test
 
+! memory address modes
+[ { HEX: 8a HEX: 18         } ] [ [ BL RAX [] MOV ] { } make ] unit-test
+[ { HEX: 66 HEX: 8b HEX: 18 } ] [ [ BX RAX [] MOV ] { } make ] unit-test
+[ { HEX: 8b HEX: 18         } ] [ [ EBX RAX [] MOV ] { } make ] unit-test
+[ { HEX: 48 HEX: 8b HEX: 18 } ] [ [ RBX RAX [] MOV ] { } make ] unit-test
+[ { HEX: 88 HEX: 18         } ] [ [ RAX [] BL MOV ] { } make ] unit-test
+[ { HEX: 66 HEX: 89 HEX: 18 } ] [ [ RAX [] BX MOV ] { } make ] unit-test
+[ { HEX: 89 HEX: 18         } ] [ [ RAX [] EBX MOV ] { } make ] unit-test
+[ { HEX: 48 HEX: 89 HEX: 18 } ] [ [ RAX [] RBX MOV ] { } make ] unit-test
+
+[ { HEX: 0f HEX: be HEX: c3 } ] [ [ EAX BL MOVSX ] { } make ] unit-test
+[ { HEX: 0f HEX: bf HEX: c3 } ] [ [ EAX BX MOVSX ] { } make ] unit-test
+
+[ { HEX: 80 HEX: 08 HEX: 05 } ] [ [ EAX [] 5 <byte> OR ] { } make ] unit-test
+[ { HEX: c6 HEX: 00 HEX: 05 } ] [ [ EAX [] 5 <byte> MOV ] { } make ] unit-test
+
+[ { HEX: 49 HEX: 89 HEX: 04 HEX: 1a } ] [ [ R10 RBX [+] RAX MOV ] { } make ] unit-test
+[ { HEX: 49 HEX: 89 HEX: 04 HEX: 1b } ] [ [ R11 RBX [+] RAX MOV ] { } make ] unit-test
+
+[ { HEX: 49 HEX: 89 HEX: 04 HEX: 1c } ] [ [ R12 RBX [+] RAX MOV ] { } make ] unit-test
+[ { HEX: 48 HEX: 89 HEX: 04 HEX: 1c } ] [ [ RSP RBX [+] RAX MOV ] { } make ] unit-test
+
+[ { HEX: 49 HEX: 89 HEX: 44 HEX: 1d HEX: 00 } ] [ [ R13 RBX [+] RAX MOV ] { } make ] unit-test
+[ { HEX: 48 HEX: 89 HEX: 44 HEX: 1d HEX: 00 } ] [ [ RBP RBX [+] RAX MOV ] { } make ] unit-test
+
+[ { HEX: 4a HEX: 89 HEX: 04 HEX: 23 } ] [ [ RBX R12 [+] RAX MOV ] { } make ] unit-test
+[ { HEX: 4a HEX: 89 HEX: 04 HEX: 2b } ] [ [ RBX R13 [+] RAX MOV ] { } make ] unit-test
+
+[ { HEX: 4b HEX: 89 HEX: 44 HEX: 25 HEX: 00 } ] [ [ R13 R12 [+] RAX MOV ] { } make ] unit-test
+[ { HEX: 4b HEX: 89 HEX: 04 HEX: 2c } ] [ [ R12 R13 [+] RAX MOV ] { } make ] unit-test
+
+[ { HEX: 49 HEX: 89 HEX: 04 HEX: 2c } ] [ [ R12 RBP [+] RAX MOV ] { } make ] unit-test
+[ [ R12 RSP [+] RAX MOV ] { } make ] must-fail
+
+[ { HEX: 89 HEX: 1c HEX: 11 } ] [ [ ECX EDX [+] EBX MOV ] { } make ] unit-test
+[ { HEX: 89 HEX: 1c HEX: 51 } ] [ [ ECX EDX 1 0 <indirect> EBX MOV ] { } make ] unit-test
+[ { HEX: 89 HEX: 1c HEX: 91 } ] [ [ ECX EDX 2 0 <indirect> EBX MOV ] { } make ] unit-test
+[ { HEX: 89 HEX: 1c HEX: d1 } ] [ [ ECX EDX 3 0 <indirect> EBX MOV ] { } make ] unit-test
+[ { HEX: 89 HEX: 5c HEX: 11 HEX: 64 } ] [ [ ECX EDX 0 100 <indirect> EBX MOV ] { } make ] unit-test
+[ { HEX: 89 HEX: 5c HEX: 51 HEX: 64 } ] [ [ ECX EDX 1 100 <indirect> EBX MOV ] { } make ] unit-test
+[ { HEX: 89 HEX: 5c HEX: 91 HEX: 64 } ] [ [ ECX EDX 2 100 <indirect> EBX MOV ] { } make ] unit-test
+[ { HEX: 89 HEX: 5c HEX: d1 HEX: 64 } ] [ [ ECX EDX 3 100 <indirect> EBX MOV ] { } make ] unit-test
+
+[ { HEX: 48 HEX: 89 HEX: 1c HEX: 11 } ] [ [ RCX RDX [+] RBX MOV ] { } make ] unit-test
+[ { HEX: 48 HEX: 89 HEX: 1c HEX: 51 } ] [ [ RCX RDX 1 0 <indirect> RBX MOV ] { } make ] unit-test
+[ { HEX: 48 HEX: 89 HEX: 1c HEX: 91 } ] [ [ RCX RDX 2 0 <indirect> RBX MOV ] { } make ] unit-test
+[ { HEX: 48 HEX: 89 HEX: 1c HEX: d1 } ] [ [ RCX RDX 3 0 <indirect> RBX MOV ] { } make ] unit-test
+[ { HEX: 48 HEX: 89 HEX: 5c HEX: 11 HEX: 64 } ] [ [ RCX RDX 0 100 <indirect> RBX MOV ] { } make ] unit-test
+[ { HEX: 48 HEX: 89 HEX: 5c HEX: 51 HEX: 64 } ] [ [ RCX RDX 1 100 <indirect> RBX MOV ] { } make ] unit-test
+[ { HEX: 48 HEX: 89 HEX: 5c HEX: 91 HEX: 64 } ] [ [ RCX RDX 2 100 <indirect> RBX MOV ] { } make ] unit-test
+[ { HEX: 48 HEX: 89 HEX: 5c HEX: d1 HEX: 64 } ] [ [ RCX RDX 3 100 <indirect> RBX MOV ] { } make ] unit-test
+
 ! r-rm / m-r sse instruction
 [ { HEX: 0f HEX: 10 HEX: c1 } ] [ [ XMM0 XMM1 MOVUPS ] { } make ] unit-test
 [ { HEX: 0f HEX: 10 HEX: 01 } ] [ [ XMM0 ECX [] MOVUPS ] { } make ] unit-test
@@ -115,40 +167,7 @@ IN: cpu.x86.assembler.tests
 [ { HEX: f2 HEX: 0f HEX: 38 HEX: f1 HEX: c1 } ] [ [ EAX ECX CRC32 ] { } make ] unit-test
 [ { HEX: f2 HEX: 0f HEX: 38 HEX: f1 HEX: 01 } ] [ [ EAX ECX [] CRC32 ] { } make ] unit-test
 
-! memory address modes
-[ { HEX: 8a HEX: 18         } ] [ [ BL RAX [] MOV ] { } make ] unit-test
-[ { HEX: 66 HEX: 8b HEX: 18 } ] [ [ BX RAX [] MOV ] { } make ] unit-test
-[ { HEX: 8b HEX: 18         } ] [ [ EBX RAX [] MOV ] { } make ] unit-test
-[ { HEX: 48 HEX: 8b HEX: 18 } ] [ [ RBX RAX [] MOV ] { } make ] unit-test
-[ { HEX: 88 HEX: 18         } ] [ [ RAX [] BL MOV ] { } make ] unit-test
-[ { HEX: 66 HEX: 89 HEX: 18 } ] [ [ RAX [] BX MOV ] { } make ] unit-test
-[ { HEX: 89 HEX: 18         } ] [ [ RAX [] EBX MOV ] { } make ] unit-test
-[ { HEX: 48 HEX: 89 HEX: 18 } ] [ [ RAX [] RBX MOV ] { } make ] unit-test
-
-[ { HEX: 0f HEX: be HEX: c3 } ] [ [ EAX BL MOVSX ] { } make ] unit-test
-[ { HEX: 0f HEX: bf HEX: c3 } ] [ [ EAX BX MOVSX ] { } make ] unit-test
-
-[ { HEX: 80 HEX: 08 HEX: 05 } ] [ [ EAX [] 5 <byte> OR ] { } make ] unit-test
-[ { HEX: c6 HEX: 00 HEX: 05 } ] [ [ EAX [] 5 <byte> MOV ] { } make ] unit-test
-
-[ { HEX: 49 HEX: 89 HEX: 04 HEX: 1a } ] [ [ R10 RBX [+] RAX MOV ] { } make ] unit-test
-[ { HEX: 49 HEX: 89 HEX: 04 HEX: 1b } ] [ [ R11 RBX [+] RAX MOV ] { } make ] unit-test
-
-[ { HEX: 49 HEX: 89 HEX: 04 HEX: 1c } ] [ [ R12 RBX [+] RAX MOV ] { } make ] unit-test
-[ { HEX: 48 HEX: 89 HEX: 04 HEX: 1c } ] [ [ RSP RBX [+] RAX MOV ] { } make ] unit-test
-
-[ { HEX: 49 HEX: 89 HEX: 44 HEX: 1d HEX: 00 } ] [ [ R13 RBX [+] RAX MOV ] { } make ] unit-test
-[ { HEX: 48 HEX: 89 HEX: 44 HEX: 1d HEX: 00 } ] [ [ RBP RBX [+] RAX MOV ] { } make ] unit-test
-
-[ { HEX: 4a HEX: 89 HEX: 04 HEX: 23 } ] [ [ RBX R12 [+] RAX MOV ] { } make ] unit-test
-[ { HEX: 4a HEX: 89 HEX: 04 HEX: 2b } ] [ [ RBX R13 [+] RAX MOV ] { } make ] unit-test
-
-[ { HEX: 4b HEX: 89 HEX: 44 HEX: 25 HEX: 00 } ] [ [ R13 R12 [+] RAX MOV ] { } make ] unit-test
-[ { HEX: 4b HEX: 89 HEX: 04 HEX: 2c } ] [ [ R12 R13 [+] RAX MOV ] { } make ] unit-test
-
-[ { HEX: 49 HEX: 89 HEX: 04 HEX: 2c } ] [ [ R12 RBP [+] RAX MOV ] { } make ] unit-test
-[ [ R12 RSP [+] RAX MOV ] { } make ] must-fail
-
+! various oddities
 [ { HEX: 48 HEX: d3 HEX: e0 } ] [ [ RAX CL SHL ] { } make ] unit-test
 [ { HEX: 48 HEX: d3 HEX: e1 } ] [ [ RCX CL SHL ] { } make ] unit-test
 [ { HEX: 48 HEX: d3 HEX: e8 } ] [ [ RAX CL SHR ] { } make ] unit-test
