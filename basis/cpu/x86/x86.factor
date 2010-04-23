@@ -283,9 +283,7 @@ M:: x86 %box-displaced-alien ( dst displacement base temp base-class -- )
 
         dst 1 alien@ base MOV
         dst 3 alien@ displacement MOV
-        temp base MOV
-        temp byte-array-offset ADD
-        temp displacement ADD
+        temp base displacement byte-array-offset [++] MOV
         dst 4 alien@ temp MOV
 
         "end" resolve-label
@@ -336,8 +334,7 @@ M:: x86 %string-nth ( dst src index temp -- )
         ! Load the least significant 7 bits into new-dst.
         ! 8th bit indicates whether we have to load from
         ! the aux vector or not.
-        temp src index [+] LEA
-        new-dst 8-bit-version-of temp string-offset [+] MOV
+        new-dst 8-bit-version-of src index string-offset [++] MOV
         new-dst new-dst 8-bit-version-of MOVZX
         ! Do we have to look at the aux vector?
         new-dst HEX: 80 CMP
@@ -345,11 +342,8 @@ M:: x86 %string-nth ( dst src index temp -- )
         ! Yes, this is a non-ASCII character. Load aux vector
         temp src string-aux-offset [+] MOV
         new-dst temp XCHG
-        ! Compute index
-        new-dst index ADD
-        new-dst index ADD
         ! Load high 16 bits
-        new-dst 16-bit-version-of new-dst byte-array-offset [+] MOV
+        new-dst 16-bit-version-of new-dst index byte-array-offset [+*2+] MOV
         new-dst new-dst 16-bit-version-of MOVZX
         new-dst 7 SHL
         ! Compute code point
