@@ -53,6 +53,10 @@ TUPLE: indirect base index scale displacement ;
 
 M: indirect extended? base>> extended? ;
 
+: canonicalize-displacement ( indirect -- indirect )
+    dup [ base>> ] [ displacement>> 0 = ] bi and
+    [ f >>displacement ] when ;
+
 : canonicalize-EBP ( indirect -- indirect )
     #! { EBP } ==> { EBP 0 }
     dup [ base>> { EBP RBP R13 } member? ] [ displacement>> not ] bi and
@@ -66,10 +70,7 @@ ERROR: bad-index indirect ;
 : canonicalize ( indirect -- indirect )
     #! Modify the indirect to work around certain addressing mode
     #! quirks.
-    canonicalize-EBP check-ESP ;
-
-: <indirect> ( base index scale displacement -- indirect )
-    indirect boa canonicalize ;
+    canonicalize-displacement canonicalize-EBP check-ESP ;
 
 ! Utilities
 UNION: operand register indirect ;
@@ -85,7 +86,10 @@ M: object operand-64? drop f ;
 
 PRIVATE>
 
-: [] ( reg/displacement -- indirect )
+: <indirect> ( base index scale displacement -- indirect )
+    indirect boa canonicalize ;
+
+: [] ( base/displacement -- indirect )
     dup integer?
     [ [ f f bootstrap-cell 8 = 0 f ? ] dip <indirect> ]
     [ f f f <indirect> ]
@@ -94,11 +98,23 @@ PRIVATE>
 : [RIP+] ( displacement -- indirect )
     [ f f f ] dip <indirect> ;
 
-: [+] ( reg displacement -- indirect )
+: [+] ( base index/displacement -- indirect )
     dup integer?
-    [ dup zero? [ drop f ] when [ f f ] dip ]
+    [ [ f f ] dip ]
     [ f f ] if
     <indirect> ;
+
+: [++] ( base index displacement -- indirect )
+    [ f ] dip <indirect> ;
+
+: [+*2+] ( base index displacement -- indirect )
+    [ 1 ] dip <indirect> ;
+
+: [+*4+] ( base index displacement -- indirect )
+    [ 2 ] dip <indirect> ;
+
+: [+*8+] ( base index displacement -- indirect )
+    [ 3 ] dip <indirect> ;
 
 TUPLE: byte value ;
 
