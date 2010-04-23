@@ -93,10 +93,6 @@ def: dst/int-rep
 use: obj/tagged-rep index/int-rep
 temp: temp/int-rep ;
 
-INSN: ##set-string-nth-fast
-use: src/int-rep obj/tagged-rep index/int-rep
-temp: temp/int-rep ;
-
 ! Register transfers
 PURE-INSN: ##copy
 def: dst
