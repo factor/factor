@@ -34,12 +34,6 @@ IN: compiler.tests.low-level-ir
     execute( -- result ) ;
 
 ! loading constants
-[ f ] [
-    V{
-        T{ ##load-constant f 0 f }
-    } compile-test-bb
-] unit-test
-
 [ "hello" ] [
     V{
         T{ ##load-reference f 0 "hello" }
@@ -50,7 +44,7 @@ IN: compiler.tests.low-level-ir
 ! one of the sources
 [ t ] [
     V{
-        T{ ##load-immediate f 1 $[ 2 cell log2 shift array type-number - ] }
+        T{ ##load-tagged f 1 $[ 2 cell log2 shift array type-number - ] }
         T{ ##load-reference f 0 { t f t } }
         T{ ##slot f 0 0 1 }
     } compile-test-bb
@@ -65,7 +59,7 @@ IN: compiler.tests.low-level-ir
 
 [ t ] [
     V{
-        T{ ##load-immediate f 1 $[ 2 cell log2 shift array type-number - ] }
+        T{ ##load-tagged f 1 $[ 2 cell log2 shift array type-number - ] }
         T{ ##load-reference f 0 { t f t } }
         T{ ##set-slot f 0 0 1 }
     } compile-test-bb
@@ -82,14 +76,14 @@ IN: compiler.tests.low-level-ir
 
 [ 4 ] [
     V{
-        T{ ##load-immediate f 0 4 }
+        T{ ##load-tagged f 0 4 }
         T{ ##shl f 0 0 0 }
     } compile-test-bb
 ] unit-test
 
 [ 4 ] [
     V{
-        T{ ##load-immediate f 0 4 }
+        T{ ##load-tagged f 0 4 }
         T{ ##shl-imm f 0 0 4 }
     } compile-test-bb
 ] unit-test
@@ -106,7 +100,7 @@ IN: compiler.tests.low-level-ir
 [ CHAR: l ] [
     V{
         T{ ##load-reference f 0 "hello world" }
-        T{ ##load-immediate f 1 3 }
+        T{ ##load-tagged f 1 3 }
         T{ ##string-nth f 0 0 1 2 }
         T{ ##shl-imm f 0 0 4 }
     } compile-test-bb
@@ -114,7 +108,7 @@ IN: compiler.tests.low-level-ir
 
 [ 1 ] [
     V{
-        T{ ##load-immediate f 0 32 }
+        T{ ##load-tagged f 0 32 }
         T{ ##add-imm f 0 0 -16 }
     } compile-test-bb
 ] unit-test
