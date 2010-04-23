@@ -1624,7 +1624,7 @@ cell 8 = [
 ] [
     {
         T{ ##load-reference f 1 f }
-        T{ ##load-integer f 2 1 }
+        T{ ##tagged>integer f 2 1 }
         T{ ##and-imm f 3 2 15 }
     } value-numbering-step
 ] unit-test

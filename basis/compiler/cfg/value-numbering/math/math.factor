@@ -15,7 +15,7 @@ IN: compiler.cfg.value-numbering.math
 M: ##tagged>integer rewrite
     [ dst>> ] [ src>> vreg>expr ] bi {
         { [ dup integer-expr? ] [ value>> tag-fixnum \ ##load-integer new-insn ] }
-        { [ dup f-expr? ] [ \ f type-number \ ##load-integer new-insn ] }
+        { [ dup f-expr? ] [ drop \ f type-number \ ##load-integer new-insn ] }
         [ 2drop f ]
     } cond ;
 
@@ -99,7 +99,7 @@ M: ##sub-imm rewrite
             temp expr src1>> vn>vreg insn src2>> mul-op execute
             insn dst>> temp imm add-op execute
         ] { } make
-    ] [ f ] if ;
+    ] [ f ] if ; inline
 
 : distribute-over-add? ( insn -- ? )
     src1>> vreg>expr add-imm-expr? ;
@@ -112,7 +112,7 @@ M: ##sub-imm rewrite
         dup src1>> vreg>expr
         2dup src2>> vn>integer swap [ src2>> ] keep binary-constant-fold*
         next-vreg
-    ] 2dip (distribute) ;
+    ] 2dip (distribute) ; inline
 
 M: ##mul-imm rewrite
     {
