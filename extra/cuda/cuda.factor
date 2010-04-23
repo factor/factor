@@ -34,7 +34,6 @@ dim-block dim-grid shared-size stream ;
     '[ cuda-context set _ call ] with-cuda-context ; inline
 
 : with-cuda ( launcher quot -- )
-    init-cuda
     [ H{ } clone cuda-memory-hashtable ] 2dip '[
         _ 
         [ cuda-launcher set ]
