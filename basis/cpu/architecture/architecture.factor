@@ -1,8 +1,9 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs generic kernel kernel.private
-math memory namespaces make sequences layouts system hashtables
-classes alien byte-arrays combinators words sets fry ;
+math math.order memory namespaces make sequences layouts system
+hashtables classes alien byte-arrays combinators words sets fry
+;
 IN: cpu.architecture
 
 ! Representations -- these are like low-level types
@@ -522,6 +523,9 @@ M: object immediate-comparand? ( n -- ? )
         { [ dup not ] [ drop t ] }
         [ drop f ]
     } cond ;
+
+: immediate-shift-count? ( n -- ? )
+    0 cell-bits 1 - between? ;
 
 ! What c-type describes the implicit struct return pointer for
 ! large structs?

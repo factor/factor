@@ -1125,6 +1125,189 @@ cpu x86.32? [
     } value-numbering-step
 ] unit-test
 
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##shl-imm f 1 0 10 }
+        T{ ##shl-imm f 2 0 21 }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##shl-imm f 1 0 10 }
+        T{ ##shl-imm f 2 1 11 }
+        T{ ##replace f 2 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##shl-imm f 1 0 10 }
+        T{ ##shl-imm f 2 1 $[ cell-bits 1 - ] }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##shl-imm f 1 0 10 }
+        T{ ##shl-imm f 2 1 $[ cell-bits 1 - ] }
+        T{ ##replace f 2 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##sar-imm f 1 0 10 }
+        T{ ##sar-imm f 2 0 21 }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##sar-imm f 1 0 10 }
+        T{ ##sar-imm f 2 1 11 }
+        T{ ##replace f 2 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##sar-imm f 1 0 10 }
+        T{ ##sar-imm f 2 1 $[ cell-bits 1 - ] }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##sar-imm f 1 0 10 }
+        T{ ##sar-imm f 2 1 $[ cell-bits 1 - ] }
+        T{ ##replace f 2 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##shr-imm f 1 0 10 }
+        T{ ##shr-imm f 2 0 21 }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##shr-imm f 1 0 10 }
+        T{ ##shr-imm f 2 1 11 }
+        T{ ##replace f 2 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##shr-imm f 1 0 10 }
+        T{ ##shr-imm f 2 1 $[ cell-bits 1 - ] }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##shr-imm f 1 0 10 }
+        T{ ##shr-imm f 2 1 $[ cell-bits 1 - ] }
+        T{ ##replace f 2 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##shr-imm f 1 0 10 }
+        T{ ##sar-imm f 2 1 11 }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##shr-imm f 1 0 10 }
+        T{ ##sar-imm f 2 1 11 }
+        T{ ##replace f 2 D 0 }
+    } value-numbering-step
+] unit-test
+
+! Distributive law
+2 \ vreg-counter set-global
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##add-imm f 1 0 10 }
+        T{ ##shl-imm f 3 0 2 }
+        T{ ##add-imm f 2 3 40 }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##add-imm f 1 0 10 }
+        T{ ##shl-imm f 2 1 2 }
+        T{ ##replace f 2 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##add-imm f 1 0 10 }
+        T{ ##mul-imm f 4 0 3 }
+        T{ ##add-imm f 2 4 30 }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##add-imm f 1 0 10 }
+        T{ ##mul-imm f 2 1 3 }
+        T{ ##replace f 2 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##add-imm f 1 0 -10 }
+        T{ ##shl-imm f 5 0 2 }
+        T{ ##add-imm f 2 5 -40 }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##sub-imm f 1 0 10 }
+        T{ ##shl-imm f 2 1 2 }
+        T{ ##replace f 2 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##add-imm f 1 0 -10 }
+        T{ ##mul-imm f 6 0 3 }
+        T{ ##add-imm f 2 6 -30 }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##sub-imm f 1 0 10 }
+        T{ ##mul-imm f 2 1 3 }
+        T{ ##replace f 2 D 0 }
+    } value-numbering-step
+] unit-test
+
 ! Simplification
 [
     {
