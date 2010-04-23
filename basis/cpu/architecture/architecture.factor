@@ -226,7 +226,6 @@ HOOK: %set-slot cpu ( src obj slot -- )
 HOOK: %set-slot-imm cpu ( src obj slot tag -- )
 
 HOOK: %string-nth cpu ( dst obj index temp -- )
-HOOK: %set-string-nth-fast cpu ( ch obj index temp -- )
 
 HOOK: %add     cpu ( dst src1 src2 -- )
 HOOK: %add-imm cpu ( dst src1 src2 -- )

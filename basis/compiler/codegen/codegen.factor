@@ -94,7 +94,6 @@ CODEGEN: ##slot-imm %slot-imm
 CODEGEN: ##set-slot %set-slot
 CODEGEN: ##set-slot-imm %set-slot-imm
 CODEGEN: ##string-nth %string-nth
-CODEGEN: ##set-string-nth-fast %set-string-nth-fast
 CODEGEN: ##add %add
 CODEGEN: ##add-imm %add-imm
 CODEGEN: ##sub %sub

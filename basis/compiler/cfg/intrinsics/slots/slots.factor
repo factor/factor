@@ -74,9 +74,3 @@ IN: compiler.cfg.intrinsics.slots
         dup third immediate-slot-offset?
         [ (emit-set-slot-imm) ] [ (emit-set-slot) ] if
     ] [ drop emit-primitive ] if ;
-
-: emit-string-nth ( -- )
-    2inputs swap ^^string-nth ds-push ;
-
-: emit-set-string-nth-fast ( -- )
-    3inputs swap next-vreg ##set-string-nth-fast ;

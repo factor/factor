@@ -160,10 +160,6 @@ M:: ppc %string-nth ( dst src index temp -- )
         "end" resolve-label
     ] with-scope ;
 
-M:: ppc %set-string-nth-fast ( ch obj index temp -- )
-    temp obj index ADD
-    ch temp string-offset STB ;
-
 M: ppc %add     ADD ;
 M: ppc %add-imm ADDI ;
 M: ppc %sub     swap SUBF ;
