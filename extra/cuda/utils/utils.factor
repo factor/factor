@@ -141,3 +141,6 @@ ERROR: no-cuda-library name ;
 : function-shared-size ( n -- )
     [ cuda-function get ] dip
     cuFuncSetSharedSize cuda-error ;
+
+: with-each-cuda-device ( quot -- )
+    [ enumerate-cuda-devices ] dip '[ <launcher> _ with-cuda ] each ; inline

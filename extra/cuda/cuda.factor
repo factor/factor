@@ -3,7 +3,7 @@
 USING: accessors alien alien.data alien.parser alien.strings
 alien.syntax arrays assocs byte-arrays classes.struct
 combinators continuations cuda.ffi cuda.memory cuda.utils
-destructors fry io io.backend io.encodings.string
+destructors fry init io io.backend io.encodings.string
 io.encodings.utf8 kernel lexer locals macros math math.parser
 namespaces nested-comments opengl.gl.extensions parser
 prettyprint quotations sequences words ;
@@ -13,6 +13,10 @@ IN: cuda
 TUPLE: launcher
 { device integer initial: 0 }
 { device-flags initial: 0 } ;
+
+: <launcher> ( device-id -- launcher )
+    launcher new
+        swap >>device ; inline
 
 TUPLE: function-launcher
 dim-block dim-grid shared-size stream ;
@@ -81,3 +85,5 @@ MACRO: cuda-arguments ( c-types -- quot: ( args... function -- ) )
     ]
     [ 2nip \ function-launcher suffix a:void function-effect ]
     3bi define-declared ;
+
+[ init-cuda ] "cuda-init" add-startup-hook
