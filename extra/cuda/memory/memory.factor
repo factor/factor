@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.data assocs byte-arrays cuda.ffi
 cuda.utils destructors io.encodings.string io.encodings.utf8
-kernel locals namespaces sequences ;
+kernel locals namespaces sequences strings ;
 QUALIFIED-WITH: alien.c-types a
 IN: cuda.memory
 
@@ -61,14 +61,15 @@ M: cuda-memory dispose ( ptr -- )
 : memcpy-array>array ( dest-array dest-index src-array src-ptr count -- )
     cuMemcpyAtoA cuda-error ;
 
-: host>device ( dest-ptr src-ptr -- )
-    [ ptr>> ] dip dup length cuMemcpyHtoD cuda-error ;
+GENERIC: host>device ( obj -- ptr )
+
+M: string host>device utf8 encode host>device ;
+
+M: byte-array host>device ( byte-array -- ptr )
+    [ length cuda-malloc ] keep
+    [ [ ptr>> ] dip dup length cuMemcpyHtoD cuda-error ]
+    [ drop ] 2bi ;
 
 :: device>host ( ptr -- seq )
     ptr byte-length <byte-array>
     [ ptr [ ptr>> ] [ byte-length ] bi cuMemcpyDtoH cuda-error ] keep ;
-
-: malloc-device-string ( string -- n )
-    utf8 encode
-    [ length cuda-malloc ] keep
-    [ host>device ] [ drop ] 2bi ;

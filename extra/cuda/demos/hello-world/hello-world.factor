@@ -10,10 +10,9 @@ CUDA-FUNCTION: helloWorld ( char* string-ptr ) ;
 
 :: cuda-hello-world ( -- )
     T{ launcher { device 0 } } [
-        "Hello World!" [ - ] map-index malloc-device-string
-        &dispose dup :> str
+        "Hello World!" [ - ] map-index host>device &dispose :> str
 
-        { 6 1 1 } { 2 1 } 1 3<<< helloWorld
+        str { 6 1 1 } { 2 1 } 2<<< helloWorld
 
         str device>host utf8 alien>string print
     ] with-cuda ;
