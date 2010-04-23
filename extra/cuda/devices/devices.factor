@@ -1,8 +1,9 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data alien.strings arrays assocs
-byte-arrays classes.struct combinators cuda.ffi cuda.utils io
-io.encodings.utf8 kernel math.parser prettyprint sequences ;
+byte-arrays classes.struct combinators cuda cuda.ffi cuda.utils
+fry io io.encodings.utf8 kernel math.parser prettyprint
+sequences ;
 IN: cuda.devices
 
 : #cuda-devices ( -- n )
@@ -13,6 +14,9 @@ IN: cuda.devices
 
 : enumerate-cuda-devices ( -- devices )
     #cuda-devices iota [ n>cuda-device ] map ;
+
+: with-each-cuda-device ( quot -- )
+    [ enumerate-cuda-devices ] dip '[ <launcher> _ with-cuda ] each ; inline
 
 : cuda-device-properties ( device -- properties )
     [ CUdevprop <c-object> ] dip
