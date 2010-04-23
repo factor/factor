@@ -1,7 +1,8 @@
 USING: accessors compiler.cfg compiler.cfg.debugger
 compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.representations.preferred cpu.architecture kernel
-namespaces tools.test sequences arrays system literals layouts ;
+namespaces tools.test sequences arrays system literals layouts
+math ;
 IN: compiler.cfg.representations
 
 [ { double-rep double-rep } ] [
@@ -178,3 +179,76 @@ cpu x86.32? [
 
     [ t ] [ 4 get instructions>> first ##phi? ] unit-test
 ] when
+
+! Peephole optimization if input to ##shl-imm is tagged
+
+3 \ vreg-counter set-global
+
+V{
+    T{ ##peek f 1 D 0 }
+    T{ ##shl-imm f 2 1 3 }
+    T{ ##replace f 2 D 0 }
+} 0 test-bb
+
+[ ] [ test-representations ] unit-test
+
+[
+    V{
+        T{ ##peek f 1 D 0 }
+        T{ ##sar-imm f 2 1 1 }
+        T{ ##shl-imm f 4 2 $[ tag-bits get ] }
+        T{ ##replace f 4 D 0 }
+    }
+] [ 0 get instructions>> ] unit-test
+
+V{
+    T{ ##peek f 1 D 0 }
+    T{ ##shl-imm f 2 1 10 }
+    T{ ##replace f 2 D 0 }
+} 0 test-bb
+
+[ ] [ test-representations ] unit-test
+
+[
+    V{
+        T{ ##peek f 1 D 0 }
+        T{ ##shl-imm f 2 1 $[ 10 tag-bits get - ] }
+        T{ ##shl-imm f 5 2 $[ tag-bits get ] }
+        T{ ##replace f 5 D 0 }
+    }
+] [ 0 get instructions>> ] unit-test
+
+V{
+    T{ ##peek f 1 D 0 }
+    T{ ##shl-imm f 2 1 $[ tag-bits get ] }
+    T{ ##replace f 2 D 0 }
+} 0 test-bb
+
+[ ] [ test-representations ] unit-test
+
+[
+    V{
+        T{ ##peek f 1 D 0 }
+        T{ ##copy f 2 1 int-rep }
+        T{ ##shl-imm f 6 2 $[ tag-bits get ] }
+        T{ ##replace f 6 D 0 }
+    }
+] [ 0 get instructions>> ] unit-test
+
+! Peephole optimization if input to ##sar-imm is tagged
+V{
+    T{ ##peek f 1 D 0 }
+    T{ ##sar-imm f 2 1 3 }
+    T{ ##replace f 2 D 0 }
+} 0 test-bb
+
+[ ] [ test-representations ] unit-test
+
+[
+    V{
+        T{ ##peek f 1 D 0 }
+        T{ ##sar-imm f 2 1 $[ 3 tag-bits get + ] }
+        T{ ##shl-imm f 7 2 $[ tag-bits get ] }
+        T{ ##replace f 7 D 0 }
+    }
+] [ 0 get instructions>> ] unit-test
