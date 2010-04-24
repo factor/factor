@@ -14,9 +14,7 @@ TUPLE: integer-expr < expr value ;
 
 C: <integer-expr> integer-expr
 
-: expr-zero? ( expr -- ? ) T{ integer-expr f 0 } = ; inline
-: expr-one? ( expr -- ? ) T{ integer-expr f 1 } = ; inline
-: expr-neg-one? ( expr -- ? ) T{ integer-expr f -1 } = ; inline
+: zero-expr? ( expr -- ? ) T{ integer-expr f 0 } = ; inline
 
 TUPLE: reference-expr < expr value ;
 
@@ -43,14 +41,6 @@ M: ##copy >expr "Fail" throw ;
 M: ##load-integer >expr val>> <integer-expr> ;
 
 M: ##load-reference >expr obj>> <reference-expr> ;
-
-GENERIC: expr>reference ( expr -- obj )
-
-M: reference-expr expr>reference value>> ;
-
-: vn>reference ( vn -- obj ) vn>expr expr>reference ;
-
-: vreg>reference ( vreg -- obj ) vreg>vn vn>reference ; inline
 
 GENERIC: expr>integer ( expr -- n )
 
@@ -92,7 +82,7 @@ M: reference-expr expr>comparand value>> ;
 <<
 
 : input-values ( slot-specs -- slot-specs' )
-    [ type>> { use literal constant } member-eq? ] filter ;
+    [ type>> { use literal } member-eq? ] filter ;
 
 : expr-class ( insn -- expr )
     name>> "##" ?head drop "-expr" append create-class-in ;
@@ -100,20 +90,13 @@ M: reference-expr expr>comparand value>> ;
 : define-expr-class ( expr slot-specs -- )
     [ expr ] dip [ name>> ] map define-tuple-class ;
 
-: constant-quot ( rep -- quot )
-    {
-        { int-rep [ [ <integer-expr> ] ] }
-        { tagged-rep [ [ <reference-expr> ] ] }
-    } case [ expr>vn ] append ;
-
 : >expr-quot ( expr slot-specs -- quot )
      [
         [ name>> reader-word 1quotation ]
         [
-            [ rep>> ] [ type>> ] bi {
-                { use [ drop [ vreg>vn ] ] }
-                { literal [ drop [ ] ] }
-                { constant [ constant-quot ] }
+            type>> {
+                { use [ [ vreg>vn ] ] }
+                { literal [ [ ] ] }
             } case
         ] bi append
     ] map cleave>quot swap suffix \ boa suffix ;
