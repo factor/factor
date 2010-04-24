@@ -73,7 +73,8 @@ temp: temp/int-rep ;
 ! Slot access
 INSN: ##slot
 def: dst/tagged-rep
-use: obj/tagged-rep slot/int-rep ;
+use: obj/tagged-rep slot/int-rep
+literal: scale tag ;
 
 INSN: ##slot-imm
 def: dst/tagged-rep
@@ -81,7 +82,8 @@ use: obj/tagged-rep
 literal: slot tag ;
 
 INSN: ##set-slot
-use: src/tagged-rep obj/tagged-rep slot/int-rep ;
+use: src/tagged-rep obj/tagged-rep slot/int-rep
+literal: scale tag ;
 
 INSN: ##set-slot-imm
 use: src/tagged-rep obj/tagged-rep
@@ -568,11 +570,12 @@ temp: temp/int-rep ;
 
 INSN: ##write-barrier
 use: src/tagged-rep slot/int-rep
+literal: scale tag
 temp: temp1/int-rep temp2/int-rep ;
 
 INSN: ##write-barrier-imm
 use: src/tagged-rep
-literal: slot
+literal: slot tag
 temp: temp1/int-rep temp2/int-rep ;
 
 INSN: ##alien-global

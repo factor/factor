@@ -1,9 +1,10 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: layouts namespaces kernel accessors sequences math
 classes.algebra classes.builtin locals combinators
-cpu.architecture compiler.tree.propagation.info
-compiler.cfg.stacks compiler.cfg.hats compiler.cfg.registers
+combinators.short-circuit cpu.architecture
+compiler.tree.propagation.info compiler.cfg.stacks
+compiler.cfg.hats compiler.cfg.registers
 compiler.cfg.instructions compiler.cfg.utilities
 compiler.cfg.builder.blocks compiler.constants ;
 IN: compiler.cfg.intrinsics.slots
@@ -13,12 +14,13 @@ IN: compiler.cfg.intrinsics.slots
 
 : value-tag ( info -- n ) class>> class-tag ;
 
-: ^^tag-offset>slot ( slot tag -- vreg' )
-    [ ^^offset>slot ] dip ^^sub-imm ;
+: slot-indexing ( slot tag -- slot scale tag )
+    complex-addressing?
+    [ [ cell log2 ] dip ] [ [ ^^offset>slot ] dip ^^sub-imm 0 0 ] if ;
 
 : (emit-slot) ( infos -- dst )
     [ 2inputs ] [ first value-tag ] bi*
-    ^^tag-offset>slot ^^slot ;
+    slot-indexing ^^slot ;
 
 : (emit-slot-imm) ( infos -- dst )
     ds-drop
@@ -28,9 +30,9 @@ IN: compiler.cfg.intrinsics.slots
 
 : immediate-slot-offset? ( value-info -- ? )
     literal>> {
-        { [ dup fixnum? ] [ tag-fixnum immediate-arithmetic? ] }
-        [ drop f ]
-    } cond ;
+        [ fixnum? ]
+        [ cell * immediate-arithmetic? ]
+    } 1&& ;
 
 : emit-slot ( node -- )
     dup node-input-infos
@@ -47,12 +49,13 @@ IN: compiler.cfg.intrinsics.slots
 :: (emit-set-slot) ( infos -- )
     3inputs :> ( src obj slot )
 
-    slot infos second value-tag ^^tag-offset>slot :> slot
+    infos second value-tag :> tag
 
-    src obj slot ##set-slot
+    slot tag slot-indexing :> ( slot scale tag )
+    src obj slot scale tag ##set-slot
 
     infos emit-write-barrier?
-    [ obj slot next-vreg next-vreg ##write-barrier ] when ;
+    [ obj slot scale tag next-vreg next-vreg ##write-barrier ] when ;
 
 :: (emit-set-slot-imm) ( infos -- )
     ds-drop
@@ -65,7 +68,7 @@ IN: compiler.cfg.intrinsics.slots
     src obj slot tag ##set-slot-imm
 
     infos emit-write-barrier?
-    [ obj slot tag slot-offset next-vreg next-vreg ##write-barrier-imm ] when ;
+    [ obj slot tag next-vreg next-vreg ##write-barrier-imm ] when ;
 
 : emit-set-slot ( node -- )
     dup node-input-infos
