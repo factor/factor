@@ -34,6 +34,7 @@ dim-block dim-grid shared-size stream ;
     '[ cuda-context set _ call ] with-cuda-context ; inline
 
 : with-cuda ( launcher quot -- )
+    init-cuda
     [ H{ } clone cuda-memory-hashtable ] 2dip '[
         _ 
         [ cuda-launcher set ]
@@ -84,5 +85,3 @@ MACRO: cuda-arguments ( c-types -- quot: ( args... function -- ) )
     ]
     [ 2nip \ function-launcher suffix a:void function-effect ]
     3bi define-declared ;
-
-[ init-cuda ] "cuda-init" add-startup-hook
