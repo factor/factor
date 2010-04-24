@@ -10,7 +10,7 @@ compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.rewrite ;
 IN: compiler.cfg.value-numbering.math
 
-: f-expr? ( expr -- ? ) T{ reference-expr f f } = ;
+: f-expr? ( expr -- ? ) T{ reference-expr f f } = ; inline
 
 M: ##tagged>integer rewrite
     [ dst>> ] [ src>> vreg>expr ] bi {
@@ -49,7 +49,7 @@ M: ##not rewrite
 : (reassociate) ( insn -- dst src1 src2' src2'' )
     {
         [ dst>> ]
-        [ src1>> vreg>expr [ src1>> vn>vreg ] [ src2>> vn>integer ] bi ]
+        [ src1>> vreg>expr [ src1>> vn>vreg ] [ src2>> ] bi ]
         [ src2>> ]
     } cleave ; inline
 
@@ -122,7 +122,7 @@ M: ##sub-imm rewrite sub-imm>add-imm ;
 : distribute ( insn add-op mul-op -- new-insns/f )
     [
         dup src1>> vreg>expr
-        2dup src2>> vn>integer swap [ src2>> ] keep binary-constant-fold*
+        2dup src2>> swap [ src2>> ] keep binary-constant-fold*
         next-vreg
     ] 2dip (distribute) ; inline
 
@@ -220,7 +220,7 @@ M: ##add rewrite
 ! =>
 ! ##neg 3 2
 : sub-to-neg? ( ##sub -- ? )
-    src1>> vn>expr expr-zero? ;
+    src1>> vreg>expr zero-expr? ;
 
 : sub-to-neg ( ##sub -- insn )
     [ dst>> ] [ src2>> ] bi \ ##neg new-insn ;

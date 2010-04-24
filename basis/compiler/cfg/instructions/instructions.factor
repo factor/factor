@@ -23,20 +23,20 @@ TUPLE: pure-insn < insn ;
 ! Constants
 INSN: ##load-integer
 def: dst/int-rep
-constant: val/int-rep ;
+literal: val ;
 
 INSN: ##load-reference
 def: dst/tagged-rep
-constant: obj/tagged-rep ;
+literal: obj ;
 
 ! These two are inserted by representation selection
 INSN: ##load-tagged
 def: dst/tagged-rep
-constant: val/tagged-rep ;
+literal: val ;
 
 INSN: ##load-double
 def: dst/double-rep
-constant: val/double-rep ;
+literal: val ;
 
 ! Stack operations
 INSN: ##peek
@@ -113,7 +113,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##add-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2/int-rep ;
+literal: src2 ;
 
 PURE-INSN: ##sub
 def: dst/int-rep
@@ -122,7 +122,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##sub-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2/int-rep ;
+literal: src2 ;
 
 PURE-INSN: ##mul
 def: dst/int-rep
@@ -131,7 +131,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##mul-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2/int-rep ;
+literal: src2 ;
 
 PURE-INSN: ##and
 def: dst/int-rep
@@ -140,7 +140,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##and-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2/int-rep ;
+literal: src2 ;
 
 PURE-INSN: ##or
 def: dst/int-rep
@@ -149,7 +149,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##or-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2/int-rep ;
+literal: src2 ;
 
 PURE-INSN: ##xor
 def: dst/int-rep
@@ -158,7 +158,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##xor-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2/int-rep ;
+literal: src2 ;
 
 PURE-INSN: ##shl
 def: dst/int-rep
@@ -167,7 +167,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##shl-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2/int-rep ;
+literal: src2 ;
 
 PURE-INSN: ##shr
 def: dst/int-rep
@@ -176,7 +176,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##shr-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2/int-rep ;
+literal: src2 ;
 
 PURE-INSN: ##sar
 def: dst/int-rep
@@ -185,7 +185,7 @@ use: src1/int-rep src2/int-rep ;
 PURE-INSN: ##sar-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2/int-rep ;
+literal: src2 ;
 
 PURE-INSN: ##min
 def: dst/int-rep
@@ -629,8 +629,7 @@ literal: cc ;
 
 INSN: ##compare-imm-branch
 use: src1/tagged-rep
-constant: src2/tagged-rep
-literal: cc ;
+literal: src2 cc ;
 
 PURE-INSN: ##compare
 def: dst/tagged-rep
@@ -641,8 +640,7 @@ temp: temp/int-rep ;
 PURE-INSN: ##compare-imm
 def: dst/tagged-rep
 use: src1/tagged-rep
-constant: src2/tagged-rep
-literal: cc
+literal: src2 cc
 temp: temp/int-rep ;
 
 ! Integer conditionals
@@ -652,8 +650,7 @@ literal: cc ;
 
 INSN: ##compare-integer-imm-branch
 use: src1/int-rep
-constant: src2/int-rep
-literal: cc ;
+literal: src2 cc ;
 
 PURE-INSN: ##compare-integer
 def: dst/tagged-rep
@@ -664,8 +661,7 @@ temp: temp/int-rep ;
 PURE-INSN: ##compare-integer-imm
 def: dst/tagged-rep
 use: src1/int-rep
-constant: src2/int-rep
-literal: cc
+literal: src2 cc
 temp: temp/int-rep ;
 
 ! Float conditionals
@@ -739,8 +735,7 @@ literal: cc ;
 INSN: _compare-imm-branch
 literal: label
 use: src1
-constant: src2
-literal: cc ;
+literal: src2 cc ;
 
 INSN: _compare-float-unordered-branch
 literal: label

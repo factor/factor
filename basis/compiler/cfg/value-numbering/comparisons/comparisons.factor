@@ -39,13 +39,13 @@ IN: compiler.cfg.value-numbering.comparisons
     [ src1>> vn>vreg ] [ src2>> vn>vreg ] [ cc>> ] tri ; inline
 
 : >compare-imm-expr< ( expr -- in1 in2 cc )
-    [ src1>> vn>vreg ] [ src2>> vn>comparand ] [ cc>> ] tri ; inline
+    [ src1>> vn>vreg ] [ src2>> ] [ cc>> ] tri ; inline
 
 : >compare-integer-expr< ( expr -- in1 in2 cc )
     [ src1>> vn>vreg ] [ src2>> vn>vreg ] [ cc>> ] tri ; inline
 
 : >compare-integer-imm-expr< ( expr -- in1 in2 cc )
-    [ src1>> vn>vreg ] [ src2>> vn>integer ] [ cc>> ] tri ; inline
+    [ src1>> vn>vreg ] [ src2>> ] [ cc>> ] tri ; inline
 
 : >test-vector-expr< ( expr -- src1 temp rep vcc )
     {
