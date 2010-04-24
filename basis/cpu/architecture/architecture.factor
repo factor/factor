@@ -435,7 +435,9 @@ HOOK: %unbox-any-c-ptr cpu ( dst src -- )
 HOOK: %box-alien cpu ( dst src temp -- )
 HOOK: %box-displaced-alien cpu ( dst displacement base temp base-class -- )
 
+HOOK: %load-memory cpu ( dst base displacement scale offset rep c-type -- )
 HOOK: %load-memory-imm cpu ( dst base offset rep c-type -- )
+HOOK: %store-memory cpu ( value base displacement scale offset rep c-type -- )
 HOOK: %store-memory-imm cpu ( value base offset rep c-type -- )
 
 HOOK: %alien-global cpu ( dst symbol library -- )

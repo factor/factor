@@ -187,7 +187,9 @@ CODEGEN: ##box-alien %box-alien
 CODEGEN: ##box-displaced-alien %box-displaced-alien
 CODEGEN: ##unbox-alien %unbox-alien
 CODEGEN: ##unbox-any-c-ptr %unbox-any-c-ptr
+CODEGEN: ##load-memory %load-memory
 CODEGEN: ##load-memory-imm %load-memory-imm
+CODEGEN: ##store-memory %store-memory
 CODEGEN: ##store-memory-imm %store-memory-imm
 CODEGEN: ##allot %allot
 CODEGEN: ##write-barrier %write-barrier

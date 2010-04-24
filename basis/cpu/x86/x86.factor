@@ -354,26 +354,32 @@ M:: x86 %string-nth ( dst src index temp -- )
         dst new-dst int-rep %copy
     ] with-small-register ;
 
-:: %alien-integer-getter ( dst base offset bits quot -- )
-    dst { base } bits [| new-dst |
-        new-dst dup bits n-bit-version-of dup base offset [+] MOV
+:: %alien-integer-getter ( dst exclude address bits quot -- )
+    dst exclude bits [| new-dst |
+        new-dst dup bits n-bit-version-of dup address MOV
         quot call
         dst new-dst int-rep %copy
     ] with-small-register ; inline
 
-: %alien-unsigned-getter ( dst base offset bits -- )
+: %alien-unsigned-getter ( dst exclude address bits -- )
     [ MOVZX ] %alien-integer-getter ; inline
 
-: %alien-signed-getter ( dst base offset bits -- )
+: %alien-signed-getter ( dst exclude address bits -- )
     [ MOVSX ] %alien-integer-getter ; inline
 
-:: %alien-integer-setter ( value base offset bits -- )
-    value { base } bits [| new-value |
+:: %alien-integer-setter ( value exclude address bits -- )
+    value exclude bits [| new-value |
         new-value value int-rep %copy
-        base offset [+] new-value bits n-bit-version-of MOV
+        address new-value bits n-bit-version-of MOV
     ] with-small-register ; inline
 
-M: x86 %load-memory-imm ( dst base offset rep c-type -- )
+: (%memory) ( base displacement scale offset rep c-type -- exclude address rep c-type )
+    [ [ [ 2array ] 2keep ] 2dip <indirect> ] 2dip ;
+
+: (%memory-imm) ( base offset rep c-type -- exclude address rep c-type )
+    [ [ drop 1array ] [ [+] ] 2bi ] 2dip ;
+
+: (%load-memory) ( dst exclude address rep c-type -- )
     [
         {
             { c:char   [ 8 %alien-signed-getter ] }
@@ -383,9 +389,15 @@ M: x86 %load-memory-imm ( dst base offset rep c-type -- )
             { c:int    [ 32 [ 2drop ] %alien-integer-getter ] }
             { c:uint   [ 32 %alien-signed-getter ] }
         } case
-    ] [ [ [+] ] dip %copy ] ?if ;
+    ] [ [ drop ] 2dip %copy ] ?if ;
 
-M: x86 %store-memory-imm ( src base offset rep c-type -- )
+M: x86 %load-memory ( dst base displacement scale offset rep c-type -- )
+    (%memory) (%load-memory) ;
+
+M: x86 %load-memory-imm ( dst base offset rep c-type -- )
+    (%memory-imm) (%load-memory) ;
+
+: (%store-memory) ( src exclude address rep c-type -- )
     [
         {
             { c:char   [ 8 %alien-integer-setter ] }
@@ -395,7 +407,13 @@ M: x86 %store-memory-imm ( src base offset rep c-type -- )
             { c:int    [ 32 %alien-integer-setter ] }
             { c:uint   [ 32 %alien-integer-setter ] }
         } case
-    ] [ [ [+] swap ] dip %copy ] ?if ;
+    ] [ [ nip swap ] dip %copy ] ?if ;
+
+M: x86 %store-memory ( src base displacement scale offset rep c-type -- )
+    (%memory) (%store-memory) ;
+
+M: x86 %store-memory-imm ( src base offset rep c-type -- )
+    (%memory-imm) (%store-memory) ;
 
 : shift-count? ( reg -- ? ) { ECX RCX } member-eq? ;
 
