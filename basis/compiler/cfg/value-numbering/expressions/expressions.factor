@@ -14,6 +14,10 @@ TUPLE: integer-expr < expr value ;
 
 C: <integer-expr> integer-expr
 
+: expr-zero? ( expr -- ? ) T{ integer-expr f 0 } = ; inline
+: expr-one? ( expr -- ? ) T{ integer-expr f 1 } = ; inline
+: expr-neg-one? ( expr -- ? ) T{ integer-expr f -1 } = ; inline
+
 TUPLE: reference-expr < expr value ;
 
 C: <reference-expr> reference-expr
@@ -33,6 +37,8 @@ UNION: literal-expr integer-expr reference-expr ;
 GENERIC: >expr ( insn -- expr )
 
 M: insn >expr drop next-input-expr ;
+
+M: ##copy >expr "Fail" throw ;
 
 M: ##load-integer >expr val>> <integer-expr> ;
 

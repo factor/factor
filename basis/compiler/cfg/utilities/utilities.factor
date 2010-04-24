@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 cpu.architecture kernel layouts locals make math namespaces sequences
@@ -79,3 +79,5 @@ SYMBOL: visited
 : predecessor ( bb -- pred )
     predecessors>> first ; inline
 
+: <copy> ( dst src -- insn )
+    any-rep \ ##copy new-insn ;

@@ -9,6 +9,7 @@ compiler.cfg.def-use
 compiler.cfg.liveness
 compiler.cfg.copy-prop
 compiler.cfg.registers
+compiler.cfg.utilities
 compiler.cfg.comparisons
 compiler.cfg.instructions
 compiler.cfg.representations.preferred ;
@@ -245,11 +246,10 @@ M: ##allocation analyze-aliases*
 M: ##read analyze-aliases*
     call-next-method
     dup [ dst>> ] [ insn-slot# ] [ insn-object ] tri
-    2dup live-slot dup [
-        2nip any-rep \ ##copy new-insn analyze-aliases* nip
-    ] [
-        drop remember-slot
-    ] if ;
+    2dup live-slot dup
+    [ 2nip <copy> analyze-aliases* nip ]
+    [ drop remember-slot ]
+    if ;
 
 : idempotent? ( value slot#/f vreg -- ? )
     #! Are we storing a value back to the same slot it was read

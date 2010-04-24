@@ -2,13 +2,19 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit fry
 kernel make math sequences
+cpu.architecture
 compiler.cfg.hats
-compiler.cfg.instructions
+compiler.cfg.utilities
 compiler.cfg.registers
+compiler.cfg.instructions
 compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.rewrite ;
 IN: compiler.cfg.value-numbering.alien
+
+M: ##box-displaced-alien rewrite
+    dup displacement>> vreg>expr expr-zero?
+    [ [ dst>> ] [ base>> ] bi <copy> ] [ drop f ] if ;
 
 ! ##box-displaced-alien f 1 2 3 <class>
 ! ##unbox-c-ptr 4 1 <class>
@@ -16,6 +22,9 @@ IN: compiler.cfg.value-numbering.alien
 ! ##box-displaced-alien f 1 2 3 <class>
 ! ##unbox-c-ptr 5 3 <class>
 ! ##add 4 5 2
+
+: rewrite-unbox-alien ( insn expr -- insn )
+    [ dst>> ] [ src>> vn>vreg ] bi* <copy> ;
 
 : rewrite-unbox-displaced-alien ( insn expr -- insns )
     [
@@ -25,9 +34,17 @@ IN: compiler.cfg.value-numbering.alien
         ##add
     ] { } make ;
 
-M: ##unbox-any-c-ptr rewrite
-    dup src>> vreg>expr dup box-displaced-alien-expr?
-    [ rewrite-unbox-displaced-alien ] [ 2drop f ] if ;
+: rewrite-unbox-any-c-ptr ( insn -- insn/f )
+    dup src>> vreg>expr
+    {
+        { [ dup box-alien-expr? ] [ rewrite-unbox-alien ] }
+        { [ dup box-displaced-alien-expr? ] [ rewrite-unbox-displaced-alien ] }
+        [ 2drop f ]
+    } cond ;
+
+M: ##unbox-any-c-ptr rewrite rewrite-unbox-any-c-ptr ;
+
+M: ##unbox-alien rewrite rewrite-unbox-any-c-ptr ;
 
 ! Fuse ##add-imm into ##load-memory(-imm) and ##store-memory(-imm)
 ! just update the offset in the instruction
