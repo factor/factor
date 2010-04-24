@@ -1,22 +1,69 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes classes.algebra classes.parser
+USING: accessors arrays classes classes.algebra classes.parser
 classes.tuple combinators combinators.short-circuit fry
 generic.parser kernel layouts math namespaces quotations
-sequences slots splitting words
+sequences slots splitting words make
 cpu.architecture
 compiler.cfg.instructions
 compiler.cfg.instructions.syntax
 compiler.cfg.value-numbering.graph ;
+FROM: sequences.private => set-array-nth ;
 IN: compiler.cfg.value-numbering.expressions
 
-TUPLE: integer-expr < expr value ;
+<<
+
+GENERIC: >expr ( insn -- expr )
+
+: input-values ( slot-specs -- slot-specs' )
+    [ type>> { use literal } member-eq? ] filter ;
+
+: slot->expr-quot ( slot-spec -- quot )
+    [ name>> reader-word 1quotation ]
+    [
+        type>> {
+            { use [ [ vreg>vn ] ] }
+            { literal [ [ ] ] }
+        } case
+    ] bi append ;
+
+: narray-quot ( length -- quot )
+    [
+        [ , [ f <array> ] % ]
+        [ 
+            dup iota [
+                - 1 - , [ swap [ set-array-nth ] keep ] %
+            ] with each
+        ] bi
+    ] [ ] make ;
+
+: >expr-quot ( insn slot-specs -- quot )
+    [
+        [ literalize , \ swap , ]
+        [
+            [ [ slot->expr-quot ] map cleave>quot % ]
+            [ length 1 + narray-quot % ]
+            bi
+        ] bi*
+    ] [ ] make ;
+
+: define->expr-method ( insn slot-specs -- )
+    [ drop \ >expr create-method-in ] [ >expr-quot ] 2bi define ;
+
+insn-classes get
+[ pure-insn class<= ] filter
+[
+    dup "insn-slots" word-prop input-values
+    define->expr-method
+] each
+
+>>
+
+TUPLE: integer-expr value ;
 
 C: <integer-expr> integer-expr
 
-: zero-expr? ( expr -- ? ) T{ integer-expr f 0 } = ; inline
-
-TUPLE: reference-expr < expr value ;
+TUPLE: reference-expr value ;
 
 C: <reference-expr> reference-expr
 
@@ -30,9 +77,11 @@ M: reference-expr equal?
 M: reference-expr hashcode*
     nip value>> dup float? [ double>bits ] [ identity-hashcode ] if ;
 
-UNION: literal-expr integer-expr reference-expr ;
+! Expressions whose values are inputs to the basic block.
+TUPLE: input-expr n ;
 
-GENERIC: >expr ( insn -- expr )
+: next-input-expr ( -- expr )
+    input-expr-counter counter input-expr boa ;
 
 M: insn >expr drop next-input-expr ;
 
@@ -42,72 +91,35 @@ M: ##load-integer >expr val>> <integer-expr> ;
 
 M: ##load-reference >expr obj>> <reference-expr> ;
 
-GENERIC: expr>integer ( expr -- n )
+GENERIC: insn>integer ( insn -- n )
 
-M: integer-expr expr>integer value>> ;
+M: ##load-integer insn>integer val>> ;
 
-: vn>integer ( vn -- n ) vn>expr expr>integer ;
-
-: vreg>integer ( vreg -- n ) vreg>vn vn>integer ; inline
+: vreg>integer ( vreg -- n ) vreg>insn insn>integer ; inline
 
 : vreg-immediate-arithmetic? ( vreg -- ? )
-    vreg>expr {
-        [ integer-expr? ]
-        [ expr>integer immediate-arithmetic? ]
+    vreg>insn {
+        [ ##load-integer? ]
+        [ val>> immediate-arithmetic? ]
     } 1&& ;
 
 : vreg-immediate-bitwise? ( vreg -- ? )
-    vreg>expr {
-        [ integer-expr? ]
-        [ expr>integer immediate-bitwise? ]
+    vreg>insn {
+        [ ##load-integer? ]
+        [ val>> immediate-bitwise? ]
     } 1&& ;
 
-GENERIC: expr>comparand ( expr -- n )
+GENERIC: insn>comparand ( expr -- n )
 
-M: integer-expr expr>comparand value>> tag-fixnum ;
+M: ##load-integer insn>comparand val>> tag-fixnum ;
 
-M: reference-expr expr>comparand value>> ;
+M: ##load-reference insn>comparand obj>> ;
 
-: vn>comparand ( vn -- n ) vn>expr expr>comparand ;
-
-: vreg>comparand ( vreg -- n ) vreg>vn vn>comparand ; inline
+: vreg>comparand ( vreg -- n ) vreg>insn insn>comparand ; inline
 
 : vreg-immediate-comparand? ( vreg -- ? )
-    vreg>expr {
-        { [ dup integer-expr? ] [ expr>integer tag-fixnum immediate-comparand? ] }
-        { [ dup reference-expr? ] [ value>> immediate-comparand? ] }
+    vreg>insn {
+        { [ dup ##load-integer? ] [ val>> tag-fixnum immediate-comparand? ] }
+        { [ dup ##load-reference? ] [ obj>> immediate-comparand? ] }
         [ drop f ]
     } cond ;
-
-<<
-
-: input-values ( slot-specs -- slot-specs' )
-    [ type>> { use literal } member-eq? ] filter ;
-
-: expr-class ( insn -- expr )
-    name>> "##" ?head drop "-expr" append create-class-in ;
-
-: define-expr-class ( expr slot-specs -- )
-    [ expr ] dip [ name>> ] map define-tuple-class ;
-
-: >expr-quot ( expr slot-specs -- quot )
-     [
-        [ name>> reader-word 1quotation ]
-        [
-            type>> {
-                { use [ [ vreg>vn ] ] }
-                { literal [ [ ] ] }
-            } case
-        ] bi append
-    ] map cleave>quot swap suffix \ boa suffix ;
-
-: define->expr-method ( insn expr slot-specs -- )
-    [ \ >expr create-method-in ] 2dip >expr-quot define ;
-
-: handle-pure-insn ( insn -- )
-    [ ] [ expr-class ] [ "insn-slots" word-prop input-values ] tri
-    [ define-expr-class drop ] [ define->expr-method ] 3bi ;
-
-insn-classes get [ pure-insn class<= ] filter [ handle-pure-insn ] each
-
->>

@@ -10,12 +10,12 @@ IN: compiler.cfg.value-numbering.slots
 
 : simplify-slot-addressing? ( insn -- ? )
     complex-addressing?
-    [ slot>> vreg>expr add-imm-expr? ] [ drop f ] if ;
+    [ slot>> vreg>insn ##add-imm? ] [ drop f ] if ;
 
 : simplify-slot-addressing ( insn -- insn/f )
     dup simplify-slot-addressing? [
-        dup slot>> vreg>expr
-        [ src1>> vn>vreg >>slot ]
+        dup slot>> vreg>insn
+        [ src1>> >>slot ]
         [ src2>> over scale>> '[ _ _ shift - ] change-tag ]
         bi
     ] [ drop f ] if ;

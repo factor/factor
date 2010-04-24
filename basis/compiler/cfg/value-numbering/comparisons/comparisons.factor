@@ -18,8 +18,10 @@ IN: compiler.cfg.value-numbering.comparisons
 ! 3) Folding comparisons where both inputs are congruent
 ! 4) Converting compare instructions into compare-imm instructions
 
+UNION: literal-insn ##load-integer ##load-reference ;
+
 : fold-compare-imm? ( insn -- ? )
-    src1>> vreg>expr literal-expr? ;
+    src1>> vreg>insn literal-insn? ;
 
 : evaluate-compare-imm ( insn -- ? )
     [ src1>> vreg>comparand ] [ src2>> ] [ cc>> ] tri
@@ -29,64 +31,49 @@ IN: compiler.cfg.value-numbering.comparisons
     } case ;
 
 : fold-compare-integer-imm? ( insn -- ? )
-    src1>> vreg>expr integer-expr? ;
+    src1>> vreg>insn ##load-integer? ;
 
 : evaluate-compare-integer-imm ( insn -- ? )
     [ src1>> vreg>integer ] [ src2>> ] [ cc>> ] tri
     [ <=> ] dip evaluate-cc ;
 
-: >compare-expr< ( expr -- in1 in2 cc )
-    [ src1>> vn>vreg ] [ src2>> vn>vreg ] [ cc>> ] tri ; inline
+: >compare< ( insn -- in1 in2 cc )
+    [ src1>> ] [ src2>> ] [ cc>> ] tri ; inline
 
-: >compare-imm-expr< ( expr -- in1 in2 cc )
-    [ src1>> vn>vreg ] [ src2>> ] [ cc>> ] tri ; inline
-
-: >compare-integer-expr< ( expr -- in1 in2 cc )
-    [ src1>> vn>vreg ] [ src2>> vn>vreg ] [ cc>> ] tri ; inline
-
-: >compare-integer-imm-expr< ( expr -- in1 in2 cc )
-    [ src1>> vn>vreg ] [ src2>> ] [ cc>> ] tri ; inline
-
-: >test-vector-expr< ( expr -- src1 temp rep vcc )
+: >test-vector< ( insn -- src1 temp rep vcc )
     {
-        [ src1>> vn>vreg ]
+        [ src1>> ]
         [ drop next-vreg ]
         [ rep>> ]
         [ vcc>> ]
     } cleave ; inline
 
-: scalar-compare-expr? ( insn -- ? )
-    {
-        [ compare-expr? ]
-        [ compare-imm-expr? ]
-        [ compare-integer-expr? ]
-        [ compare-integer-imm-expr? ]
-        [ compare-float-unordered-expr? ]
-        [ compare-float-ordered-expr? ]
-    } 1|| ;
+UNION: scalar-compare-insn
+    ##compare
+    ##compare-imm
+    ##compare-integer
+    ##compare-integer-imm
+    ##compare-float-unordered
+    ##compare-float-ordered ;
 
-: general-compare-expr? ( insn -- ? )
-    {
-        [ scalar-compare-expr? ]
-        [ test-vector-expr? ]
-    } 1|| ;
+UNION: general-compare-insn scalar-compare-insn ##test-vector ;
 
 : rewrite-boolean-comparison? ( insn -- ? )
     {
-        [ src1>> vreg>expr general-compare-expr? ]
+        [ src1>> vreg>insn general-compare-insn? ]
         [ src2>> not ]
         [ cc>> cc/= eq? ]
     } 1&& ; inline
 
-: rewrite-boolean-comparison ( expr -- insn )
-    src1>> vreg>expr {
-        { [ dup compare-expr? ] [ >compare-expr< \ ##compare-branch new-insn ] }
-        { [ dup compare-imm-expr? ] [ >compare-imm-expr< \ ##compare-imm-branch new-insn ] }
-        { [ dup compare-integer-expr? ] [ >compare-integer-expr< \ ##compare-integer-branch new-insn ] }
-        { [ dup compare-integer-imm-expr? ] [ >compare-integer-imm-expr< \ ##compare-integer-imm-branch new-insn ] }
-        { [ dup compare-float-unordered-expr? ] [ >compare-expr< \ ##compare-float-unordered-branch new-insn ] }
-        { [ dup compare-float-ordered-expr? ] [ >compare-expr< \ ##compare-float-ordered-branch new-insn ] }
-        { [ dup test-vector-expr? ] [ >test-vector-expr< \ ##test-vector-branch new-insn ] }
+: rewrite-boolean-comparison ( insn -- insn )
+    src1>> vreg>insn {
+        { [ dup ##compare? ] [ >compare< \ ##compare-branch new-insn ] }
+        { [ dup ##compare-imm? ] [ >compare< \ ##compare-imm-branch new-insn ] }
+        { [ dup ##compare-integer? ] [ >compare< \ ##compare-integer-branch new-insn ] }
+        { [ dup ##compare-integer-imm? ] [ >compare< \ ##compare-integer-imm-branch new-insn ] }
+        { [ dup ##compare-float-unordered? ] [ >compare< \ ##compare-float-unordered-branch new-insn ] }
+        { [ dup ##compare-float-ordered? ] [ >compare< \ ##compare-float-ordered-branch new-insn ] }
+        { [ dup ##test-vector? ] [ >test-vector< \ ##test-vector-branch new-insn ] }
     } cond ;
 
 : fold-branch ( ? -- insn )
@@ -189,19 +176,19 @@ M: ##compare-integer rewrite
 
 : rewrite-redundant-comparison? ( insn -- ? )
     {
-        [ src1>> vreg>expr scalar-compare-expr? ]
+        [ src1>> vreg>insn scalar-compare-insn? ]
         [ src2>> not ]
         [ cc>> { cc= cc/= } member? ]
     } 1&& ; inline
 
 : rewrite-redundant-comparison ( insn -- insn' )
-    [ cc>> ] [ dst>> ] [ src1>> vreg>expr ] tri {
-        { [ dup compare-expr? ] [ >compare-expr< next-vreg \ ##compare new-insn ] }
-        { [ dup compare-imm-expr? ] [ >compare-imm-expr< next-vreg \ ##compare-imm new-insn ] }
-        { [ dup compare-integer-expr? ] [ >compare-integer-expr< next-vreg \ ##compare-integer new-insn ] }
-        { [ dup compare-integer-imm-expr? ] [ >compare-integer-imm-expr< next-vreg \ ##compare-integer-imm new-insn ] }
-        { [ dup compare-float-unordered-expr? ] [ >compare-expr< next-vreg \ ##compare-float-unordered new-insn ] }
-        { [ dup compare-float-ordered-expr? ] [ >compare-expr< next-vreg \ ##compare-float-ordered new-insn ] }
+    [ cc>> ] [ dst>> ] [ src1>> vreg>insn ] tri {
+        { [ dup ##compare? ] [ >compare< next-vreg \ ##compare new-insn ] }
+        { [ dup ##compare-imm? ] [ >compare< next-vreg \ ##compare-imm new-insn ] }
+        { [ dup ##compare-integer? ] [ >compare< next-vreg \ ##compare-integer new-insn ] }
+        { [ dup ##compare-integer-imm? ] [ >compare< next-vreg \ ##compare-integer-imm new-insn ] }
+        { [ dup ##compare-float-unordered? ] [ >compare< next-vreg \ ##compare-float-unordered new-insn ] }
+        { [ dup ##compare-float-ordered? ] [ >compare< next-vreg \ ##compare-float-ordered new-insn ] }
     } cond
     swap cc= eq? [ [ negate-cc ] change-cc ] when ;
 
