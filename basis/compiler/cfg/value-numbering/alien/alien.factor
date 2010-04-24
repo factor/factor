@@ -13,7 +13,7 @@ compiler.cfg.value-numbering.rewrite ;
 IN: compiler.cfg.value-numbering.alien
 
 M: ##box-displaced-alien rewrite
-    dup displacement>> vreg>expr expr-zero?
+    dup displacement>> vreg>expr zero-expr?
     [ [ dst>> ] [ base>> ] bi <copy> ] [ drop f ] if ;
 
 ! ##box-displaced-alien f 1 2 3 <class>
@@ -53,7 +53,7 @@ M: ##unbox-alien rewrite rewrite-unbox-any-c-ptr ;
 
 : fuse-base-offset ( insn -- insn' )
     dup base>> vreg>expr
-    [ src1>> vn>vreg ] [ src2>> vn>integer ] bi
+    [ src1>> vn>vreg ] [ src2>> ] bi
     [ >>base ] [ '[ _ + ] change-offset ] bi* ;
 
 ! Fuse ##add-imm into ##load-memory and ##store-memory
@@ -63,7 +63,7 @@ M: ##unbox-alien rewrite rewrite-unbox-any-c-ptr ;
 
 : fuse-displacement-offset ( insn -- insn' )
     dup displacement>> vreg>expr
-    [ src1>> vn>vreg ] [ src2>> vn>integer ] bi
+    [ src1>> vn>vreg ] [ src2>> ] bi
     [ >>displacement ] [ '[ _ + ] change-offset ] bi* ;
 
 ! Fuse ##add into ##load-memory-imm and ##store-memory-imm
@@ -95,14 +95,14 @@ M: ##store-memory-imm new-alien-insn drop \ ##store-memory new-insn ;
 
 ! Fuse ##shl-imm into ##load-memory or ##store-memory
 : scale-expr? ( expr -- ? )
-    { [ shl-imm-expr? ] [ src2>> vn>integer { 1 2 3 } member? ] } 1&& ;
+    { [ shl-imm-expr? ] [ src2>> { 1 2 3 } member? ] } 1&& ;
 
 : fuse-scale? ( insn -- ? )
     { [ scale>> 0 = ] [ displacement>> vreg>expr scale-expr? ] } 1&& ;
 
 : fuse-scale ( insn -- insn' )
     dup displacement>> vreg>expr
-    [ src1>> vn>vreg ] [ src2>> vn>integer ] bi
+    [ src1>> vn>vreg ] [ src2>> ] bi
     [ >>displacement ] [ >>scale ] bi* ;
 
 : rewrite-memory-op ( insn -- insn/f )

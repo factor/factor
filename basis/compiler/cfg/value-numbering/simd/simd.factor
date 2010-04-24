@@ -59,7 +59,7 @@ M: ##shuffle-vector-imm rewrite
 M: ##scalar>vector rewrite
     dup src>> vreg>expr {
         { [ dup reference-expr? ] [ fold-scalar>vector ] }
-        { [ dup vector>scalar-expr? ] [ [ dst>> ] [ src>> ] bi* <copy> ] }
+        { [ dup vector>scalar-expr? ] [ [ dst>> ] [ src>> vn>vreg ] bi* <copy> ] }
         [ 2drop f ]
     } cond ;
 

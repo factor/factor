@@ -5,7 +5,7 @@ make fry sequences parser accessors effects namespaces
 combinators splitting classes.parser lexer quotations ;
 IN: compiler.cfg.instructions.syntax
 
-SYMBOLS: def use temp literal constant ;
+SYMBOLS: def use temp literal ;
 
 SYMBOL: scalar-rep
 
@@ -31,7 +31,6 @@ TUPLE: insn-slot-spec type name rep ;
                 { "use:" [ drop use ] }
                 { "temp:" [ drop temp ] }
                 { "literal:" [ drop literal ] }
-                { "constant:" [ drop constant ] }
                 [ dupd parse-insn-slot-spec , ]
             } case
         ] reduce drop

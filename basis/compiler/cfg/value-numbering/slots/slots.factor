@@ -16,7 +16,7 @@ IN: compiler.cfg.value-numbering.slots
     dup simplify-slot-addressing? [
         dup slot>> vreg>expr
         [ src1>> vn>vreg >>slot ]
-        [ src2>> vn>integer over scale>> '[ _ _ shift - ] change-tag ]
+        [ src2>> over scale>> '[ _ _ shift - ] change-tag ]
         bi
     ] [ drop f ] if ;
 

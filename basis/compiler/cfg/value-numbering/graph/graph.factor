@@ -3,9 +3,10 @@
 USING: accessors kernel math namespaces assocs biassocs ;
 IN: compiler.cfg.value-numbering.graph
 
+! Value numbers are negative, to catch confusion with vregs
 SYMBOL: vn-counter
 
-: next-vn ( -- vn ) vn-counter [ dup 1 + ] change ;
+: next-vn ( -- vn ) vn-counter [ 1 - dup ] change ;
 
 ! biassoc mapping expressions to value numbers
 SYMBOL: exprs>vns
