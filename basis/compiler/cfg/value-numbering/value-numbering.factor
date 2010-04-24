@@ -11,11 +11,11 @@ compiler.cfg.utilities
 compiler.cfg.instructions
 compiler.cfg.value-numbering.alien
 compiler.cfg.value-numbering.comparisons
-compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.math
 compiler.cfg.value-numbering.rewrite
-compiler.cfg.value-numbering.slots ;
+compiler.cfg.value-numbering.slots
+compiler.cfg.value-numbering.expressions ;
 IN: compiler.cfg.value-numbering
 
 GENERIC: process-instruction ( insn -- insn' )

@@ -5,7 +5,6 @@ cpu.architecture fry kernel layouts locals make math sequences
 compiler.cfg.instructions
 compiler.cfg.registers
 compiler.cfg.utilities
-compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.folding
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.rewrite ;
