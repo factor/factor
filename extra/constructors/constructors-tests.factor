@@ -43,7 +43,17 @@ CONSTRUCTOR: ct4 ( a b c d -- obj )
 [ 4 ] [ 0 0 0 0 <ct4> a>> ] unit-test
 
 [
-    """IN: constructors.tests
+    """USE: constructors
+IN: constructors.tests
+TUPLE: foo a b ;
+CONSTRUCTOR: foo ( a a -- obj ) ;""" eval( -- )
+] [
+    error>> repeated-constructor-parameters?
+] must-fail-with
+
+[
+    """USE: constructors
+IN: constructors.tests
 TUPLE: foo a b ;
 CONSTRUCTOR: foo ( a c -- obj ) ;""" eval( -- )
 ] [
