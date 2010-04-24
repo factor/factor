@@ -2209,6 +2209,25 @@ V{
 
 [ f ] [ 1 get instructions>> [ ##peek? ] any? ] unit-test
 
+! Slot addressing optimization
+cpu x86? [
+    [
+        V{
+            T{ ##peek f 0 D 0 }
+            T{ ##peek f 1 D 1 }
+            T{ ##add-imm f 2 1 2 }
+            T{ ##slot f 3 0 1 2 $[ 7 2 cells - ] }
+        }
+    ] [
+        V{
+            T{ ##peek f 0 D 0 }
+            T{ ##peek f 1 D 1 }
+            T{ ##add-imm f 2 1 2 }
+            T{ ##slot f 3 0 2 2 7 }
+        } value-numbering-step
+    ] unit-test
+] when
+
 ! Alien addressing optimization
 [
     V{

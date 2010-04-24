@@ -14,7 +14,8 @@ compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.math
 compiler.cfg.value-numbering.rewrite
-compiler.cfg.value-numbering.simplify ;
+compiler.cfg.value-numbering.simplify
+compiler.cfg.value-numbering.slots ;
 IN: compiler.cfg.value-numbering
 
 ! Local value numbering.
