@@ -553,10 +553,19 @@ def: dst/int-rep
 use: src/tagged-rep ;
 
 ! Raw memory accessors
+INSN: ##load-memory
+def: dst
+use: base/int-rep displacement/int-rep
+literal: scale offset rep c-type ;
+
 INSN: ##load-memory-imm
 def: dst
 use: base/int-rep
 literal: offset rep c-type ;
+
+INSN: ##store-memory
+use: src base/int-rep displacement/int-rep
+literal: scale offset rep c-type ;
 
 INSN: ##store-memory-imm
 use: src base/int-rep
