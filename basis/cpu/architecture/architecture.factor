@@ -203,6 +203,11 @@ M: ulonglong-2-rep scalar-rep-of drop ulonglong-scalar-rep ;
 ! Mapping from register class to machine registers
 HOOK: machine-registers cpu ( -- assoc )
 
+! Specifies if %slot, %set-slot and %write-barrier accept the
+! 'scale' and 'tag' parameters, and if %load-memory and
+! %store-memory work
+HOOK: complex-addressing? cpu ( -- ? )
+
 HOOK: %load-immediate cpu ( reg val -- )
 HOOK: %load-reference cpu ( reg obj -- )
 HOOK: %load-double cpu ( reg val -- )
@@ -220,9 +225,9 @@ HOOK: %return cpu ( -- )
 
 HOOK: %dispatch cpu ( src temp -- )
 
-HOOK: %slot cpu ( dst obj slot -- )
+HOOK: %slot cpu ( dst obj slot scale tag -- )
 HOOK: %slot-imm cpu ( dst obj slot tag -- )
-HOOK: %set-slot cpu ( src obj slot -- )
+HOOK: %set-slot cpu ( src obj slot scale tag -- )
 HOOK: %set-slot-imm cpu ( src obj slot tag -- )
 
 HOOK: %string-nth cpu ( dst obj index temp -- )
@@ -440,8 +445,8 @@ HOOK: %set-vm-field cpu ( src offset -- )
 : %context ( dst -- ) 0 %vm-field ;
 
 HOOK: %allot cpu ( dst size class temp -- )
-HOOK: %write-barrier cpu ( src slot temp1 temp2 -- )
-HOOK: %write-barrier-imm cpu ( src slot temp1 temp2 -- )
+HOOK: %write-barrier cpu ( src slot scale tag temp1 temp2 -- )
+HOOK: %write-barrier-imm cpu ( src slot tag temp1 temp2 -- )
 
 ! GC checks
 HOOK: %check-nursery cpu ( label size temp1 temp2 -- )

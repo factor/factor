@@ -46,7 +46,7 @@ IN: compiler.tests.low-level-ir
     V{
         T{ ##load-tagged f 1 $[ 2 cell log2 shift array type-number - ] }
         T{ ##load-reference f 0 { t f t } }
-        T{ ##slot f 0 0 1 }
+        T{ ##slot f 0 0 1 0 0 }
     } compile-test-bb
 ] unit-test
 
@@ -61,7 +61,7 @@ IN: compiler.tests.low-level-ir
     V{
         T{ ##load-tagged f 1 $[ 2 cell log2 shift array type-number - ] }
         T{ ##load-reference f 0 { t f t } }
-        T{ ##set-slot f 0 0 1 }
+        T{ ##set-slot f 0 0 1 0 0 }
     } compile-test-bb
     dup first eq?
 ] unit-test
