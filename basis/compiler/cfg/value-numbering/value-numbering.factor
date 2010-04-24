@@ -21,11 +21,11 @@ IN: compiler.cfg.value-numbering
 GENERIC: process-instruction ( insn -- insn' )
 
 : redundant-instruction ( insn vn -- insn' )
-    [ dst>> ] dip [ swap set-vn ] [ vn>vreg <copy> ] 2bi ;
+    [ dst>> ] dip [ swap set-vn ] [ <copy> ] 2bi ;
 
 :: useful-instruction ( insn expr -- insn' )
-    next-vn :> vn
-    vn insn dst>> vregs>vns get set-at
+    insn dst>> :> vn
+    vn vn vregs>vns get set-at
     vn expr exprs>vns get set-at
     insn vn vns>insns get set-at
     insn ;
