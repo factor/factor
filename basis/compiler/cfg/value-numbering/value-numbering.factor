@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs kernel accessors
-sorting sets sequences arrays
+USING: namespaces arrays assocs kernel accessors
+sorting sets sequences locals
 cpu.architecture
 sequences.deep
 compiler.cfg
@@ -18,22 +18,26 @@ compiler.cfg.value-numbering.rewrite
 compiler.cfg.value-numbering.slots ;
 IN: compiler.cfg.value-numbering
 
-: >copy ( insn vn dst -- insn/##copy )
-    swap vn>vreg 2dup eq? [ 2drop ] [ <copy> nip ] if ;
-
 GENERIC: process-instruction ( insn -- insn' )
+
+: redundant-instruction ( insn vn -- insn' )
+    [ dst>> ] dip [ swap set-vn ] [ vn>vreg <copy> ] 2bi ;
+
+:: useful-instruction ( insn expr -- insn' )
+    next-vn :> vn
+    vn insn dst>> vregs>vns get set-at
+    vn expr exprs>vns get set-at
+    insn vn vns>insns get set-at
+    insn ;
+
+: check-redundancy ( insn -- insn' )
+    dup >expr dup exprs>vns get at
+    [ redundant-instruction ] [ useful-instruction ] ?if ;
 
 M: insn process-instruction
     dup rewrite
     [ process-instruction ]
-    [
-        dup defs-vreg [
-            dup [ >expr expr>vn ] [ dst>> ] bi
-            [ set-vn drop ]
-            [ >copy ]
-            3bi
-        ] when
-    ] ?if ;
+    [ dup defs-vreg [ check-redundancy ] when ] ?if ;
 
 M: ##copy process-instruction
     dup [ src>> vreg>vn ] [ dst>> ] bi set-vn ;

@@ -7,7 +7,7 @@ compiler.cfg.value-numbering.graph ;
 IN: compiler.cfg.value-numbering.folding
 
 : binary-constant-fold? ( insn -- ? )
-    src1>> vreg>expr integer-expr? ; inline
+    src1>> vreg>insn ##load-integer? ; inline
 
 GENERIC: binary-constant-fold* ( x y insn -- z )
 
@@ -27,7 +27,7 @@ M: ##shl-imm binary-constant-fold* drop shift ;
     \ ##load-integer new-insn ; inline
 
 : unary-constant-fold? ( insn -- ? )
-    src>> vreg>expr integer-expr? ; inline
+    src>> vreg>insn ##load-integer? ; inline
 
 GENERIC: unary-constant-fold* ( x insn -- y )
 
