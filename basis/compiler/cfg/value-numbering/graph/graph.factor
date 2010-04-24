@@ -1,14 +1,13 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math namespaces assocs biassocs ;
+USING: accessors kernel math namespaces assocs ;
 IN: compiler.cfg.value-numbering.graph
-
-! Value numbers are negative, to catch confusion with vregs
-SYMBOL: vn-counter
 
 SYMBOL: input-expr-counter
 
-: next-vn ( -- vn ) vn-counter [ 1 - dup ] change ;
+! assoc mapping vregs to value numbers
+! this is the identity on canonical representatives
+SYMBOL: vregs>vns
 
 ! assoc mapping expressions to value numbers
 SYMBOL: exprs>vns
@@ -18,21 +17,14 @@ SYMBOL: vns>insns
 
 : vn>insn ( vn -- insn ) vns>insns get at ;
 
-! biassocs mapping vregs to value numbers, and value numbers to
-! their primary vregs
-SYMBOL: vregs>vns
-
-: vreg>vn ( vreg -- vn ) vregs>vns get [ drop next-vn ] cache ;
-
-: vn>vreg ( vn -- vreg ) vregs>vns get value-at ;
+: vreg>vn ( vreg -- vn ) vregs>vns get [ ] cache ;
 
 : set-vn ( vn vreg -- ) vregs>vns get set-at ;
 
-: vreg>insn ( vreg -- insn ) vreg>vn vn>insn ; inline
+: vreg>insn ( vreg -- insn ) vreg>vn vn>insn ;
 
 : init-value-graph ( -- )
-    0 vn-counter set
     0 input-expr-counter set
-    <bihash> vregs>vns set
+    H{ } clone vregs>vns set
     H{ } clone exprs>vns set
     H{ } clone vns>insns set ;

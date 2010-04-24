@@ -77,13 +77,7 @@ M: reference-expr equal?
 M: reference-expr hashcode*
     nip value>> dup float? [ double>bits ] [ identity-hashcode ] if ;
 
-! Expressions whose values are inputs to the basic block.
-TUPLE: input-expr n ;
-
-: next-input-expr ( -- expr )
-    input-expr-counter counter input-expr boa ;
-
-M: insn >expr drop next-input-expr ;
+M: insn >expr drop input-expr-counter counter neg ;
 
 M: ##copy >expr "Fail" throw ;
 
