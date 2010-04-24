@@ -20,7 +20,8 @@ IN: cuda.devices
 : with-each-cuda-device ( quot -- )
     [ enumerate-cuda-devices ] dip '[ <launcher> _ with-cuda ] each ; inline
 
-: cuda-device-properties ( device -- properties )
+: cuda-device-properties ( n -- properties )
+    init-cuda
     [ CUdevprop <c-object> ] dip
     [ cuDeviceGetProperties cuda-error ] 2keep drop
     CUdevprop memory>struct ;
@@ -46,7 +47,8 @@ IN: cuda.devices
     [ cuDeviceTotalMem cuda-error ]
     [ drop *uint ] 2bi ;
 
-: cuda-device-attribute ( attribute dev -- n )
+: cuda-device-attribute ( attribute n -- n )
+    init-cuda
     [ int <c-object> ] 2dip
     [ cuDeviceGetAttribute cuda-error ]
     [ 2drop *int ] 3bi ;
