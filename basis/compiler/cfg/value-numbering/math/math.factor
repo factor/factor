@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators cpu.architecture fry kernel layouts
-locals make math sequences compiler.cfg.instructions
+USING: accessors combinators combinators.short-circuit
+cpu.architecture fry kernel layouts locals make math sequences
+compiler.cfg.instructions
 compiler.cfg.registers
 compiler.cfg.utilities
 compiler.cfg.value-numbering.expressions
@@ -10,31 +11,35 @@ compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.rewrite ;
 IN: compiler.cfg.value-numbering.math
 
-: f-expr? ( expr -- ? ) T{ reference-expr f f } = ; inline
+: f-insn? ( insn -- ? )
+    { [ ##load-reference? ] [ obj>> not ] } 1&& ; inline
+
+: zero-insn? ( insn -- ? )
+    { [ ##load-integer? ] [ val>> 0 = ] } 1&& ; inline
 
 M: ##tagged>integer rewrite
-    [ dst>> ] [ src>> vreg>expr ] bi {
-        { [ dup integer-expr? ] [ value>> tag-fixnum \ ##load-integer new-insn ] }
-        { [ dup f-expr? ] [ drop \ f type-number \ ##load-integer new-insn ] }
+    [ dst>> ] [ src>> vreg>insn ] bi {
+        { [ dup ##load-integer? ] [ val>> tag-fixnum \ ##load-integer new-insn ] }
+        { [ dup f-insn? ] [ drop \ f type-number \ ##load-integer new-insn ] }
         [ 2drop f ]
     } cond ;
 
 : self-inverse ( insn -- insn' )
-    [ dst>> ] [ src>> vreg>expr src>> vn>vreg ] bi <copy> ;
+    [ dst>> ] [ src>> vreg>insn src>> ] bi <copy> ;
 
 : identity ( insn -- insn' )
     [ dst>> ] [ src1>> ] bi <copy> ;
 
 M: ##neg rewrite
     {
-        { [ dup src>> vreg>expr neg-expr? ] [ self-inverse ] }
+        { [ dup src>> vreg>insn ##neg? ] [ self-inverse ] }
         { [ dup unary-constant-fold? ] [ unary-constant-fold ] }
         [ drop f ]
     } cond ;
 
 M: ##not rewrite
     {
-        { [ dup src>> vreg>expr not-expr? ] [ self-inverse ] }
+        { [ dup src>> vreg>insn ##not? ] [ self-inverse ] }
         { [ dup unary-constant-fold? ] [ unary-constant-fold ] }
         [ drop f ]
     } cond ;
@@ -49,7 +54,7 @@ M: ##not rewrite
 : (reassociate) ( insn -- dst src1 src2' src2'' )
     {
         [ dst>> ]
-        [ src1>> vreg>expr [ src1>> vn>vreg ] [ src2>> ] bi ]
+        [ src1>> vreg>insn [ src1>> ] [ src2>> ] bi ]
         [ src2>> ]
     } cleave ; inline
 
@@ -72,7 +77,7 @@ M: ##add-imm rewrite
     {
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>expr add-imm-expr? ] [ \ ##add-imm reassociate-arithmetic ] }
+        { [ dup src1>> vreg>insn ##add-imm? ] [ \ ##add-imm reassociate-arithmetic ] }
         [ drop f ]
     } cond ;
 
@@ -105,23 +110,23 @@ M: ##sub-imm rewrite sub-imm>add-imm ;
 ! ##+-imm 3 4 X*Y
 ! Where * is mul or shl, + is add or sub
 ! Have to make sure that X*Y fits in an immediate
-:: (distribute) ( insn expr imm temp add-op mul-op -- new-insns/f )
+:: (distribute) ( outer inner imm temp add-op mul-op -- new-outers/f )
     imm immediate-arithmetic? [
         [
-            temp expr src1>> vn>vreg insn src2>> mul-op execute
-            insn dst>> temp imm add-op execute
+            temp inner src1>> outer src2>> mul-op execute
+            outer dst>> temp imm add-op execute
         ] { } make
     ] [ f ] if ; inline
 
 : distribute-over-add? ( insn -- ? )
-    src1>> vreg>expr add-imm-expr? ;
+    src1>> vreg>insn ##add-imm? ;
 
 : distribute-over-sub? ( insn -- ? )
-    src1>> vreg>expr sub-imm-expr? ;
+    src1>> vreg>insn ##sub-imm? ;
 
 : distribute ( insn add-op mul-op -- new-insns/f )
     [
-        dup src1>> vreg>expr
+        dup src1>> vreg>insn
         2dup src2>> swap [ src2>> ] keep binary-constant-fold*
         next-vreg
     ] 2dip (distribute) ; inline
@@ -131,7 +136,7 @@ M: ##mul-imm rewrite
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
         { [ dup mul-to-neg? ] [ mul-to-neg ] }
         { [ dup mul-to-shl? ] [ mul-to-shl ] }
-        { [ dup src1>> vreg>expr mul-imm-expr? ] [ \ ##mul-imm reassociate-arithmetic ] }
+        { [ dup src1>> vreg>insn ##mul-imm? ] [ \ ##mul-imm reassociate-arithmetic ] }
         { [ dup distribute-over-add? ] [ \ ##add-imm \ ##mul-imm distribute ] }
         { [ dup distribute-over-sub? ] [ \ ##sub-imm \ ##mul-imm distribute ] }
         [ drop f ]
@@ -140,7 +145,7 @@ M: ##mul-imm rewrite
 M: ##and-imm rewrite
     {
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>expr and-imm-expr? ] [ \ ##and-imm reassociate-bitwise ] }
+        { [ dup src1>> vreg>insn ##and-imm? ] [ \ ##and-imm reassociate-bitwise ] }
         { [ dup src2>> 0 = ] [ dst>> 0 \ ##load-integer new-insn ] }
         { [ dup src2>> -1 = ] [ identity ] }
         [ drop f ]
@@ -151,7 +156,7 @@ M: ##or-imm rewrite
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup src2>> -1 = ] [ dst>> -1 \ ##load-integer new-insn ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>expr or-imm-expr? ] [ \ ##or-imm reassociate-bitwise ] }
+        { [ dup src1>> vreg>insn ##or-imm? ] [ \ ##or-imm reassociate-bitwise ] }
         [ drop f ]
     } cond ;
 
@@ -160,7 +165,7 @@ M: ##xor-imm rewrite
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup src2>> -1 = ] [ [ dst>> ] [ src1>> ] bi \ ##not new-insn ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>expr xor-imm-expr? ] [ \ ##xor-imm reassociate-bitwise ] }
+        { [ dup src1>> vreg>insn ##xor-imm? ] [ \ ##xor-imm reassociate-bitwise ] }
         [ drop f ]
     } cond ;
 
@@ -168,7 +173,7 @@ M: ##shl-imm rewrite
     {
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>expr shl-imm-expr? ] [ \ ##shl-imm reassociate-shift ] }
+        { [ dup src1>> vreg>insn ##shl-imm? ] [ \ ##shl-imm reassociate-shift ] }
         { [ dup distribute-over-add? ] [ \ ##add-imm \ ##shl-imm distribute ] }
         { [ dup distribute-over-sub? ] [ \ ##sub-imm \ ##shl-imm distribute ] }
         [ drop f ]
@@ -178,7 +183,7 @@ M: ##shr-imm rewrite
     {
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>expr shr-imm-expr? ] [ \ ##shr-imm reassociate-shift ] }
+        { [ dup src1>> vreg>insn ##shr-imm? ] [ \ ##shr-imm reassociate-shift ] }
         [ drop f ]
     } cond ;
 
@@ -186,7 +191,7 @@ M: ##sar-imm rewrite
     {
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>expr sar-imm-expr? ] [ \ ##sar-imm reassociate-shift ] }
+        { [ dup src1>> vreg>insn ##sar-imm? ] [ \ ##sar-imm reassociate-shift ] }
         [ drop f ]
     } cond ;
 
@@ -220,7 +225,7 @@ M: ##add rewrite
 ! =>
 ! ##neg 3 2
 : sub-to-neg? ( ##sub -- ? )
-    src1>> vreg>expr zero-expr? ;
+    src1>> vreg>insn zero-insn? ;
 
 : sub-to-neg ( ##sub -- insn )
     [ dst>> ] [ src2>> ] bi \ ##neg new-insn ;

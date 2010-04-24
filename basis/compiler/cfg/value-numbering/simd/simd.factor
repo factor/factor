@@ -10,9 +10,9 @@ compiler.cfg.registers
 compiler.cfg.utilities
 compiler.cfg.comparisons
 compiler.cfg.instructions
-compiler.cfg.value-numbering.alien
-compiler.cfg.value-numbering.expressions
+compiler.cfg.value-numbering.math
 compiler.cfg.value-numbering.graph
+compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.rewrite ;
 IN: compiler.cfg.value-numbering.simd
 
@@ -22,9 +22,9 @@ IN: compiler.cfg.value-numbering.simd
 : useless-shuffle-vector-imm? ( insn -- ? )
     [ shuffle>> ] [ rep>> rep-length iota ] bi sequence= ;
 
-: compose-shuffle-vector-imm ( insn expr -- insn' )
+: compose-shuffle-vector-imm ( outer inner -- insn' )
     2dup [ rep>> ] bi@ eq? [
-        [ [ dst>> ] [ src>> vn>vreg ] bi* ]
+        [ [ dst>> ] [ src>> ] bi* ]
         [ [ shuffle>> ] bi@ nths ]
         [ drop rep>> ]
         2tri \ ##shuffle-vector-imm new-insn
@@ -33,15 +33,15 @@ IN: compiler.cfg.value-numbering.simd
 : (fold-shuffle-vector-imm) ( shuffle bytes -- bytes' )
     2dup length swap length /i group nths concat ;
 
-: fold-shuffle-vector-imm ( insn expr -- insn' )
-    [ [ dst>> ] [ shuffle>> ] bi ] dip value>>
+: fold-shuffle-vector-imm ( outer inner -- insn' )
+    [ [ dst>> ] [ shuffle>> ] bi ] [ obj>> ] bi*
     (fold-shuffle-vector-imm) \ ##load-reference new-insn ;
 
 M: ##shuffle-vector-imm rewrite
-    dup src>> vreg>expr {
+    dup src>> vreg>insn {
         { [ over useless-shuffle-vector-imm? ] [ drop [ dst>> ] [ src>> ] bi <copy> ] }
-        { [ dup shuffle-vector-imm-expr? ] [ compose-shuffle-vector-imm ] }
-        { [ dup reference-expr? ] [ fold-shuffle-vector-imm ] }
+        { [ dup ##shuffle-vector-imm? ] [ compose-shuffle-vector-imm ] }
+        { [ dup ##load-reference? ] [ fold-shuffle-vector-imm ] }
         [ 2drop f ]
     } cond ;
 
@@ -49,52 +49,55 @@ M: ##shuffle-vector-imm rewrite
     [ [ dst>> ] [ rep>> rep-length ] bi ] dip <repetition> concat
     \ ##load-reference new-insn ;
 
-: fold-scalar>vector ( insn expr -- insn' )
-    value>> over rep>> {
+: fold-scalar>vector ( outer inner -- insn' )
+    obj>> over rep>> {
         { float-4-rep [ float>bits 4 >le (fold-scalar>vector) ] }
         { double-2-rep [ double>bits 8 >le (fold-scalar>vector) ] }
         [ [ untag-fixnum ] dip rep-component-type heap-size >le (fold-scalar>vector) ]
     } case ;
 
 M: ##scalar>vector rewrite
-    dup src>> vreg>expr {
-        { [ dup reference-expr? ] [ fold-scalar>vector ] }
-        { [ dup vector>scalar-expr? ] [ [ dst>> ] [ src>> vn>vreg ] bi* <copy> ] }
+    dup src>> vreg>insn {
+        { [ dup ##load-reference? ] [ fold-scalar>vector ] }
+        { [ dup ##vector>scalar? ] [ [ dst>> ] [ src>> ] bi* <copy> ] }
         [ 2drop f ]
     } cond ;
 
 M: ##xor-vector rewrite
-    dup [ src1>> vreg>vn ] [ src2>> vreg>vn ] bi eq?
+    dup diagonal?
     [ [ dst>> ] [ rep>> ] bi \ ##zero-vector new-insn ] [ drop f ] if ;
 
-: vector-not? ( expr -- ? )
+: vector-not? ( insn -- ? )
     {
-        [ not-vector-expr? ]
+        [ ##not-vector? ]
         [ {
-            [ xor-vector-expr? ]
-            [ [ src1>> ] [ src2>> ] bi [ vn>expr fill-vector-expr? ] either? ]
+            [ ##xor-vector? ]
+            [ [ src1>> ] [ src2>> ] bi [ vreg>insn ##fill-vector? ] either? ]
         } 1&& ]
     } 1|| ;
 
-GENERIC: vector-not-src ( expr -- vreg )
-M: not-vector-expr vector-not-src src>> vn>vreg ;
-M: xor-vector-expr vector-not-src
-    dup src1>> vn>expr fill-vector-expr? [ src2>> ] [ src1>> ] if vn>vreg ;
+GENERIC: vector-not-src ( insn -- vreg )
+
+M: ##not-vector vector-not-src
+    src>> ;
+
+M: ##xor-vector vector-not-src
+    dup src1>> vreg>insn ##fill-vector? [ src2>> ] [ src1>> ] if ;
 
 M: ##and-vector rewrite 
     {
-        { [ dup src1>> vreg>expr vector-not? ] [
+        { [ dup src1>> vreg>insn vector-not? ] [
             {
                 [ dst>> ]
-                [ src1>> vreg>expr vector-not-src ]
+                [ src1>> vreg>insn vector-not-src ]
                 [ src2>> ]
                 [ rep>> ]
             } cleave \ ##andn-vector new-insn
         ] }
-        { [ dup src2>> vreg>expr vector-not? ] [
+        { [ dup src2>> vreg>insn vector-not? ] [
             {
                 [ dst>> ]
-                [ src2>> vreg>expr vector-not-src ]
+                [ src2>> vreg>insn vector-not-src ]
                 [ src1>> ]
                 [ rep>> ]
             } cleave \ ##andn-vector new-insn
@@ -103,10 +106,10 @@ M: ##and-vector rewrite
     } cond ;
 
 M: ##andn-vector rewrite
-    dup src1>> vreg>expr vector-not? [
+    dup src1>> vreg>insn vector-not? [
         {
             [ dst>> ]
-            [ src1>> vreg>expr vector-not-src ]
+            [ src1>> vreg>insn vector-not-src ]
             [ src2>> ]
             [ rep>> ]
         } cleave \ ##and-vector new-insn

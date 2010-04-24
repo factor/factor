@@ -6,38 +6,33 @@ IN: compiler.cfg.value-numbering.graph
 ! Value numbers are negative, to catch confusion with vregs
 SYMBOL: vn-counter
 
-: next-vn ( -- vn ) vn-counter [ 1 - dup ] change ;
-
-! biassoc mapping expressions to value numbers
-SYMBOL: exprs>vns
-
-TUPLE: expr ;
-
-: expr>vn ( expr -- vn ) exprs>vns get [ drop next-vn ] cache ;
-
-: vn>expr ( vn -- expr ) exprs>vns get value-at ;
-
-! Expressions whose values are inputs to the basic block.
-TUPLE: input-expr < expr n ;
-
 SYMBOL: input-expr-counter
 
-: next-input-expr ( -- expr )
-    input-expr-counter counter input-expr boa ;
+: next-vn ( -- vn ) vn-counter [ 1 - dup ] change ;
 
+! assoc mapping expressions to value numbers
+SYMBOL: exprs>vns
+
+! assoc mapping value numbers to instructions
+SYMBOL: vns>insns
+
+: vn>insn ( vn -- insn ) vns>insns get at ;
+
+! biassocs mapping vregs to value numbers, and value numbers to
+! their primary vregs
 SYMBOL: vregs>vns
 
-: vreg>vn ( vreg -- vn )
-    vregs>vns get [ drop next-input-expr expr>vn ] cache ;
+: vreg>vn ( vreg -- vn ) vregs>vns get [ drop next-vn ] cache ;
 
 : vn>vreg ( vn -- vreg ) vregs>vns get value-at ;
 
 : set-vn ( vn vreg -- ) vregs>vns get set-at ;
 
-: vreg>expr ( vreg -- expr ) vreg>vn vn>expr ; inline
+: vreg>insn ( vreg -- insn ) vreg>vn vn>insn ; inline
 
 : init-value-graph ( -- )
     0 vn-counter set
     0 input-expr-counter set
-    <bihash> exprs>vns set
-    <bihash> vregs>vns set ;
+    <bihash> vregs>vns set
+    H{ } clone exprs>vns set
+    H{ } clone vns>insns set ;
