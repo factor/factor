@@ -460,4 +460,3 @@ FUNCTION: CUresult cuGraphicsMapResources ( uint count, CUgraphicsResource* reso
 FUNCTION: CUresult cuGraphicsUnmapResources ( uint count, CUgraphicsResource* resources, CUstream hStream ) ;
 
 FUNCTION: CUresult cuGetExportTable ( void** ppExportTable, CUuuid* pExportTableId ) ;
-

@@ -7,9 +7,11 @@ sequences ;
 IN: cuda.devices
 
 : #cuda-devices ( -- n )
+    init-cuda
     int <c-object> [ cuDeviceGetCount cuda-error ] keep *int ;
 
 : n>cuda-device ( n -- device )
+    init-cuda
     [ CUdevice <c-object> ] dip [ cuDeviceGet cuda-error ] 2keep drop *int ;
 
 : enumerate-cuda-devices ( -- devices )
@@ -27,16 +29,19 @@ IN: cuda.devices
     enumerate-cuda-devices [ dup cuda-device-properties ] { } map>assoc ;
 
 : cuda-device-name ( n -- string )
+    init-cuda
     [ 256 [ <byte-array> ] keep ] dip
     [ cuDeviceGetName cuda-error ]
     [ 2drop utf8 alien>string ] 3bi ;
 
 : cuda-device-capability ( n -- pair )
+    init-cuda
     [ int <c-object> int <c-object> ] dip
     [ cuDeviceComputeCapability cuda-error ]
     [ drop [ *int ] bi@ ] 3bi 2array ;
 
 : cuda-device-memory ( n -- bytes )
+    init-cuda
     [ uint <c-object> ] dip
     [ cuDeviceTotalMem cuda-error ]
     [ drop *uint ] 2bi ;
@@ -47,6 +52,7 @@ IN: cuda.devices
     [ 2drop *int ] 3bi ;
 
 : cuda-device. ( n -- )
+    init-cuda
     {
         [ "Device: " write number>string print ]
         [ "Name: " write cuda-device-name print ]
@@ -64,6 +70,7 @@ IN: cuda.devices
     } cleave ;
 
 : cuda. ( -- )
+    init-cuda
     "CUDA Version: " write cuda-version number>string print nl
     #cuda-devices iota [ nl ] [ cuda-device. ] interleave ;
 
