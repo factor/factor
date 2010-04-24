@@ -488,7 +488,6 @@ get_config_info() {
 copy_fresh_image() {
     $ECHO "Copying $FACTOR_IMAGE to $FACTOR_IMAGE_FRESH..."
     $COPY $FACTOR_IMAGE $FACTOR_IMAGE_FRESH
-    $ECHO "done."
 }
 
 bootstrap() {
