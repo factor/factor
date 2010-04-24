@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel layouts math math.bitwise
 compiler.cfg.instructions
-compiler.cfg.value-numbering.expressions
-compiler.cfg.value-numbering.graph ;
+compiler.cfg.value-numbering.graph
+compiler.cfg.value-numbering.rewrite ;
 IN: compiler.cfg.value-numbering.folding
 
 : binary-constant-fold? ( insn -- ? )
