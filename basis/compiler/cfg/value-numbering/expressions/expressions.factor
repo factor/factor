@@ -1,10 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes classes.algebra classes.parser
-classes.tuple combinators combinators.short-circuit fry
-generic.parser kernel layouts math namespaces quotations
-sequences slots splitting words make
-cpu.architecture
+USING: accessors arrays classes classes.algebra combinators fry
+generic.parser kernel math namespaces quotations sequences slots
+words make
 compiler.cfg.instructions
 compiler.cfg.instructions.syntax
 compiler.cfg.value-numbering.graph ;
@@ -84,36 +82,3 @@ M: ##copy >expr "Fail" throw ;
 M: ##load-integer >expr val>> <integer-expr> ;
 
 M: ##load-reference >expr obj>> <reference-expr> ;
-
-GENERIC: insn>integer ( insn -- n )
-
-M: ##load-integer insn>integer val>> ;
-
-: vreg>integer ( vreg -- n ) vreg>insn insn>integer ; inline
-
-: vreg-immediate-arithmetic? ( vreg -- ? )
-    vreg>insn {
-        [ ##load-integer? ]
-        [ val>> immediate-arithmetic? ]
-    } 1&& ;
-
-: vreg-immediate-bitwise? ( vreg -- ? )
-    vreg>insn {
-        [ ##load-integer? ]
-        [ val>> immediate-bitwise? ]
-    } 1&& ;
-
-GENERIC: insn>comparand ( expr -- n )
-
-M: ##load-integer insn>comparand val>> tag-fixnum ;
-
-M: ##load-reference insn>comparand obj>> ;
-
-: vreg>comparand ( vreg -- n ) vreg>insn insn>comparand ; inline
-
-: vreg-immediate-comparand? ( vreg -- ? )
-    vreg>insn {
-        { [ dup ##load-integer? ] [ val>> tag-fixnum immediate-comparand? ] }
-        { [ dup ##load-reference? ] [ obj>> immediate-comparand? ] }
-        [ drop f ]
-    } cond ;

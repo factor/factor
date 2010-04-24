@@ -12,7 +12,6 @@ compiler.cfg.comparisons
 compiler.cfg.instructions
 compiler.cfg.value-numbering.math
 compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.rewrite ;
 IN: compiler.cfg.value-numbering.simd
 
