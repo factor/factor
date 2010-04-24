@@ -65,6 +65,8 @@ HOOK: temp-reg cpu ( -- reg )
 
 HOOK: pic-tail-reg cpu ( -- reg )
 
+M: x86 complex-addressing? t ;
+
 M: x86 %load-immediate dup 0 = [ drop dup XOR ] [ MOV ] if ;
 
 M: x86 %load-reference
@@ -110,12 +112,12 @@ M: x86 %return ( -- ) 0 RET ;
 : align-code ( n -- )
     0 <repetition> % ;
 
-:: (%slot-imm) ( obj slot tag -- op )
-    obj slot tag slot-offset [+] ; inline
+: (%slot) ( obj slot scale tag -- op ) neg <indirect> ; inline
+: (%slot-imm) ( obj slot tag -- op ) slot-offset [+] ; inline
 
-M: x86 %slot ( dst obj slot -- ) [+] MOV ;
+M: x86 %slot ( dst obj slot scale tag -- ) (%slot) MOV ;
 M: x86 %slot-imm ( dst obj slot tag -- ) (%slot-imm) MOV ;
-M: x86 %set-slot ( src obj slot -- ) [+] swap MOV ;
+M: x86 %set-slot ( src obj slot scale tag -- ) (%slot) swap MOV ;
 M: x86 %set-slot-imm ( src obj slot tag -- ) (%slot-imm) swap MOV ;
 
 :: two-operand ( dst src1 src2 rep -- dst src )
@@ -283,7 +285,7 @@ M:: x86 %box-displaced-alien ( dst displacement base temp base-class -- )
 
         dst 1 alien@ base MOV
         dst 3 alien@ displacement MOV
-        temp base displacement byte-array-offset [++] MOV
+        temp base displacement byte-array-offset [++] LEA
         dst 4 alien@ temp MOV
 
         "end" resolve-label
@@ -445,16 +447,19 @@ M:: x86 %allot ( dst size class nursery-ptr -- )
 HOOK: %mark-card cpu ( card temp -- )
 HOOK: %mark-deck cpu ( card temp -- )
 
-:: (%write-barrier) ( src slot temp1 temp2 -- )
-    temp1 src slot [+] LEA
+:: (%write-barrier) ( temp1 temp2 -- )
     temp1 card-bits SHR
     temp1 temp2 %mark-card
     temp1 deck-bits card-bits - SHR
     temp1 temp2 %mark-deck ;
 
-M: x86 %write-barrier ( src slot temp1 temp2 -- ) (%write-barrier) ;
+M:: x86 %write-barrier ( src slot scale tag temp1 temp2 -- )
+    temp1 src slot scale tag (%slot) LEA
+    temp1 temp2 (%write-barrier) ;
 
-M: x86 %write-barrier-imm ( src slot temp1 temp2 -- ) (%write-barrier) ;
+M:: x86 %write-barrier-imm ( src slot tag temp1 temp2 -- )
+    temp1 src slot tag (%slot-imm) LEA
+    temp1 temp2 (%write-barrier) ;
 
 M:: x86 %check-nursery ( label size temp1 temp2 -- )
     temp1 load-zone-offset
