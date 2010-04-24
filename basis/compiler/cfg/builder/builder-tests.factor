@@ -172,29 +172,29 @@ IN: compiler.cfg.builder.tests
 
 [ t ] [
     [ { fixnum byte-array fixnum } declare set-alien-unsigned-1 ]
-    [ ##store-memory-imm? ] contains-insn?
+    [ [ ##store-memory? ] [ ##store-memory-imm? ] bi or ] contains-insn?
 ] unit-test
 
 [ t ] [
     [ { fixnum byte-array fixnum } declare [ dup * dup * ] 2dip set-alien-unsigned-1 ]
-    [ ##store-memory-imm? ] contains-insn?
+    [ [ ##store-memory? ] [ ##store-memory-imm? ] bi or ] contains-insn?
 ] unit-test
 
 [ f ] [
     [ { byte-array fixnum } declare set-alien-unsigned-1 ]
-    [ ##store-memory-imm? ] contains-insn?
+    [ [ ##store-memory? ] [ ##store-memory-imm? ] bi or ] contains-insn?
 ] unit-test
 
 [ t t ] [
     [ { byte-array fixnum } declare alien-cell ]
-    [ [ ##load-memory-imm? ] contains-insn? ]
+    [ [ [ ##load-memory? ] [ ##load-memory-imm? ] bi or ] contains-insn? ]
     [ [ ##box-alien? ] contains-insn? ]
     bi
 ] unit-test
 
 [ f ] [
     [ { byte-array integer } declare alien-cell ]
-    [ ##load-memory-imm? ] contains-insn?
+    [ [ ##load-memory? ] [ ##load-memory-imm? ] bi or ] contains-insn?
 ] unit-test
 
 [ f ] [
