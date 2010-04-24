@@ -96,7 +96,7 @@ use: obj/tagged-rep index/int-rep
 temp: temp/int-rep ;
 
 ! Register transfers
-PURE-INSN: ##copy
+INSN: ##copy
 def: dst
 use: src
 literal: rep ;

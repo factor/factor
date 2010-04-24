@@ -395,6 +395,20 @@ cpu x86.32? [
 [
     {
         T{ ##peek f 0 D 0 }
+        T{ ##neg f 1 0 }
+        T{ ##copy f 2 0 any-rep }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##neg f 1 0 }
+        T{ ##neg f 2 1 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
         T{ ##not f 1 0 }
         T{ ##copy f 2 0 any-rep }
     }
@@ -724,6 +738,20 @@ cpu x86.32? [
     {
         T{ ##peek f 0 D 0 }
         T{ ##compare-integer f 1 0 0 cc< }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##copy f 1 0 any-rep }
+        T{ ##load-reference f 2 f }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##copy f 1 0 any-rep }
+        T{ ##compare-integer f 2 0 1 cc< }
     } value-numbering-step
 ] unit-test
 
@@ -1314,7 +1342,6 @@ cpu x86.32? [
     {
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
-        T{ ##load-integer f 2 0 }
         T{ ##copy f 3 0 any-rep }
         T{ ##replace f 3 D 0 }
     }
@@ -1322,8 +1349,7 @@ cpu x86.32? [
     {
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
-        T{ ##sub f 2 1 1 }
-        T{ ##add f 3 0 2 }
+        T{ ##add-imm f 3 0 0 }
         T{ ##replace f 3 D 0 }
     } value-numbering-step
 ] unit-test
@@ -1332,7 +1358,6 @@ cpu x86.32? [
     {
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
-        T{ ##load-integer f 2 0 }
         T{ ##copy f 3 0 any-rep }
         T{ ##replace f 3 D 0 }
     }
@@ -1340,8 +1365,7 @@ cpu x86.32? [
     {
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
-        T{ ##sub f 2 1 1 }
-        T{ ##sub f 3 0 2 }
+        T{ ##or-imm f 3 0 0 }
         T{ ##replace f 3 D 0 }
     } value-numbering-step
 ] unit-test
@@ -1350,7 +1374,6 @@ cpu x86.32? [
     {
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
-        T{ ##load-integer f 2 0 }
         T{ ##copy f 3 0 any-rep }
         T{ ##replace f 3 D 0 }
     }
@@ -1358,8 +1381,7 @@ cpu x86.32? [
     {
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
-        T{ ##sub f 2 1 1 }
-        T{ ##or f 3 0 2 }
+        T{ ##xor-imm f 3 0 0 }
         T{ ##replace f 3 D 0 }
     } value-numbering-step
 ] unit-test
@@ -1367,33 +1389,181 @@ cpu x86.32? [
 [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##load-integer f 2 0 }
-        T{ ##copy f 3 0 any-rep }
-        T{ ##replace f 3 D 0 }
+        T{ ##load-integer f 1 0 }
+        T{ ##replace f 1 D 0 }
     }
 ] [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##sub f 2 1 1 }
-        T{ ##xor f 3 0 2 }
-        T{ ##replace f 3 D 0 }
+        T{ ##and-imm f 1 0 0 }
+        T{ ##replace f 1 D 0 }
     } value-numbering-step
 ] unit-test
 
 [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##load-integer f 1 1 }
+        T{ ##copy f 1 0 any-rep }
+        T{ ##replace f 1 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##and-imm f 1 0 -1 }
+        T{ ##replace f 1 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##copy f 1 0 any-rep }
+        T{ ##replace f 1 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##and f 1 0 0 }
+        T{ ##replace f 1 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##copy f 1 0 any-rep }
+        T{ ##replace f 1 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##or-imm f 1 0 0 }
+        T{ ##replace f 1 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 1 -1 }
+        T{ ##replace f 1 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##or-imm f 1 0 -1 }
+        T{ ##replace f 1 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##copy f 1 0 any-rep }
+        T{ ##replace f 1 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##or f 1 0 0 }
+        T{ ##replace f 1 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##copy f 1 0 any-rep }
+        T{ ##replace f 1 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##xor-imm f 1 0 0 }
+        T{ ##replace f 1 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##not f 1 0 }
+        T{ ##replace f 1 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##xor-imm f 1 0 -1 }
+        T{ ##replace f 1 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 1 0 }
+        T{ ##replace f 1 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##xor f 1 0 0 }
+        T{ ##replace f 1 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
         T{ ##copy f 2 0 any-rep }
         T{ ##replace f 2 D 0 }
     }
 ] [
     {
         T{ ##peek f 0 D 0 }
-        T{ ##load-integer f 1 1 }
-        T{ ##mul f 2 0 1 }
+        T{ ##mul-imm f 2 0 1 }
+        T{ ##replace f 2 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##copy f 2 0 any-rep }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##shl-imm f 2 0 0 }
+        T{ ##replace f 2 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##copy f 2 0 any-rep }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##shr-imm f 2 0 0 }
+        T{ ##replace f 2 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##copy f 2 0 any-rep }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##sar-imm f 2 0 0 }
         T{ ##replace f 2 D 0 }
     } value-numbering-step
 ] unit-test
@@ -1644,7 +1814,55 @@ cell 8 = [
     } value-numbering-step
 ] unit-test
 
-! Displaced alien optimizations
+! Alien boxing and unboxing
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##box-alien f 1 0 }
+        T{ ##copy f 2 0 any-rep }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##box-alien f 1 0 }
+        T{ ##unbox-alien f 2 1 }
+        T{ ##replace f 2 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##box-alien f 1 0 }
+        T{ ##copy f 2 0 any-rep }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##box-alien f 1 0 }
+        T{ ##unbox-any-c-ptr f 2 1 }
+        T{ ##replace f 2 D 0 }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 2 0 }
+        T{ ##copy f 1 0 any-rep }
+        T{ ##replace f 1 D 0 }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 2 0 }
+        T{ ##box-displaced-alien f 1 2 0 c-ptr }
+        T{ ##replace f 1 D 0 }
+    } value-numbering-step
+] unit-test
+
 3 vreg-counter set-global
 
 [
@@ -1701,6 +1919,7 @@ cell 8 = [
     } value-numbering-step
 ] unit-test
 
+! Various SIMD simplifications
 [
     {
         T{ ##vector>scalar f 1 0 float-4-rep }

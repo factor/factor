@@ -7,19 +7,22 @@ vectors locals make alien.c-types io.binary grouping
 math.vectors.simd.intrinsics
 compiler.cfg
 compiler.cfg.registers
+compiler.cfg.utilities
 compiler.cfg.comparisons
 compiler.cfg.instructions
 compiler.cfg.value-numbering.alien
 compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.rewrite
-compiler.cfg.value-numbering.simplify ;
+compiler.cfg.value-numbering.rewrite ;
 IN: compiler.cfg.value-numbering.simd
 
 ! Some lame constant folding for SIMD intrinsics. Eventually this
 ! should be redone completely.
 
-: rewrite-shuffle-vector-imm ( insn expr -- insn' )
+: useless-shuffle-vector-imm? ( insn -- ? )
+    [ shuffle>> ] [ rep>> rep-length iota ] bi sequence= ;
+
+: compose-shuffle-vector-imm ( insn expr -- insn' )
     2dup [ rep>> ] bi@ eq? [
         [ [ dst>> ] [ src>> vn>vreg ] bi* ]
         [ [ shuffle>> ] bi@ nths ]
@@ -36,7 +39,8 @@ IN: compiler.cfg.value-numbering.simd
 
 M: ##shuffle-vector-imm rewrite
     dup src>> vreg>expr {
-        { [ dup shuffle-vector-imm-expr? ] [ rewrite-shuffle-vector-imm ] }
+        { [ over useless-shuffle-vector-imm? ] [ drop [ dst>> ] [ src>> ] bi <copy> ] }
+        { [ dup shuffle-vector-imm-expr? ] [ compose-shuffle-vector-imm ] }
         { [ dup reference-expr? ] [ fold-shuffle-vector-imm ] }
         [ 2drop f ]
     } cond ;
@@ -53,8 +57,11 @@ M: ##shuffle-vector-imm rewrite
     } case ;
 
 M: ##scalar>vector rewrite
-    dup src>> vreg>expr dup reference-expr?
-    [ fold-scalar>vector ] [ 2drop f ] if ;
+    dup src>> vreg>expr {
+        { [ dup reference-expr? ] [ fold-scalar>vector ] }
+        { [ dup vector>scalar-expr? ] [ [ dst>> ] [ src>> ] bi* <copy> ] }
+        [ 2drop f ]
+    } cond ;
 
 M: ##xor-vector rewrite
     dup [ src1>> vreg>vn ] [ src2>> vreg>vn ] bi eq?
@@ -104,13 +111,3 @@ M: ##andn-vector rewrite
             [ rep>> ]
         } cleave \ ##and-vector new-insn
     ] [ drop f ] if ;
-
-M: scalar>vector-expr simplify*
-    src>> vn>expr {
-        { [ dup vector>scalar-expr? ] [ src>> ] }
-        [ drop f ]
-    } cond ;
-
-M: shuffle-vector-imm-expr simplify*
-    [ src>> ] [ shuffle>> ] [ rep>> rep-length iota ] tri
-    sequence= [ drop f ] unless ;

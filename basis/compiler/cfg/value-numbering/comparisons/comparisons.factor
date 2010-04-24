@@ -3,9 +3,11 @@
 USING: accessors combinators kernel math math.order namespaces
 sequences vectors combinators.short-circuit compiler.cfg
 compiler.cfg.comparisons compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.value-numbering.expressions
+compiler.cfg.registers
+compiler.cfg.value-numbering.math
 compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.rewrite ;
+compiler.cfg.value-numbering.rewrite
+compiler.cfg.value-numbering.expressions ;
 IN: compiler.cfg.value-numbering.comparisons
 
 ! Optimizations performed here:
@@ -127,9 +129,6 @@ M: ##compare-integer-imm-branch rewrite
     [ vreg>integer ] dip
     \ ##compare-integer-imm-branch new-insn ; inline
 
-: self-compare? ( insn -- ? )
-    [ src1>> ] [ src2>> ] bi [ vreg>vn ] bi@ = ; inline
-
 : evaluate-self-compare ( insn -- ? )
     cc>> { cc= cc<= cc>= } member-eq? ;
 
@@ -140,7 +139,7 @@ M: ##compare-branch rewrite
     {
         { [ dup src1>> vreg-immediate-comparand? ] [ t >compare-imm-branch ] }
         { [ dup src2>> vreg-immediate-comparand? ] [ f >compare-imm-branch ] }
-        { [ dup self-compare? ] [ rewrite-self-compare-branch ] }
+        { [ dup diagonal? ] [ rewrite-self-compare-branch ] }
         [ drop f ]
     } cond ;
 
@@ -148,7 +147,7 @@ M: ##compare-integer-branch rewrite
     {
         { [ dup src1>> vreg-immediate-arithmetic? ] [ t >compare-integer-imm-branch ] }
         { [ dup src2>> vreg-immediate-arithmetic? ] [ f >compare-integer-imm-branch ] }
-        { [ dup self-compare? ] [ rewrite-self-compare-branch ] }
+        { [ dup diagonal? ] [ rewrite-self-compare-branch ] }
         [ drop f ]
     } cond ;
 
@@ -176,7 +175,7 @@ M: ##compare rewrite
     {
         { [ dup src1>> vreg-immediate-comparand? ] [ t >compare-imm ] }
         { [ dup src2>> vreg-immediate-comparand? ] [ f >compare-imm ] }
-        { [ dup self-compare? ] [ rewrite-self-compare ] }
+        { [ dup diagonal? ] [ rewrite-self-compare ] }
         [ drop f ]
     } cond ;
 
@@ -184,7 +183,7 @@ M: ##compare-integer rewrite
     {
         { [ dup src1>> vreg-immediate-arithmetic? ] [ t >compare-integer-imm ] }
         { [ dup src2>> vreg-immediate-arithmetic? ] [ f >compare-integer-imm ] }
-        { [ dup self-compare? ] [ rewrite-self-compare ] }
+        { [ dup diagonal? ] [ rewrite-self-compare ] }
         [ drop f ]
     } cond ;
 
