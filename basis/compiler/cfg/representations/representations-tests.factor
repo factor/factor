@@ -605,6 +605,51 @@ cpu x86.32? [
     } test-peephole
 ] unit-test
 
+! Tag/untag elimination for ##compare-integer
+[
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##compare-integer f 2 0 1 cc= }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##compare-integer f 2 0 1 cc= }
+        T{ ##replace f 2 D 0 }
+    } test-peephole
+] unit-test
+
+[
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##compare-integer-branch f 0 1 cc= }
+    }
+] [
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##compare-integer-branch f 0 1 cc= }
+    } test-peephole
+] unit-test
+
+[
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##compare-integer-imm-branch f 0 $[ 10 tag-fixnum ] cc= }
+    }
+] [
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##compare-integer-imm-branch f 0 10 cc= }
+    } test-peephole
+] unit-test
+
 ! Tag/untag elimination for ##neg
 [
     V{
