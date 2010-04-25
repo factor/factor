@@ -15,57 +15,52 @@ cpu.architecture ;
 FROM: namespaces => set ;
 IN: compiler.cfg.representations.selection
 
-SYMBOL: scc-infos
+! vregs which must be tagged at the definition site because
+! there is at least one usage that is not int-rep. If all usages
+! are int-rep it is safe to untag at the definition site.
+SYMBOL: tagged-vregs
 
-TUPLE: scc-info reps all-uses-untagged? ;
-
-: <scc-info> ( -- reps )
-    V{ } clone t \ scc-info boa ;
-
-: scc-info ( vreg -- info )
-    vreg>scc scc-infos get [ drop <scc-info> ] cache ;
+SYMBOL: vreg-reps
 
 : handle-def ( vreg rep -- )
-    swap scc-info reps>> push ;
+    swap vreg>scc vreg-reps get
+    [ [ intersect ] when* ] change-at ;
 
 : handle-use ( vreg rep -- )
-    int-rep eq? [ scc-info f >>all-uses-untagged? ] unless drop ;
+    int-rep eq? [ drop ] [ vreg>scc tagged-vregs get adjoin ] if ;
 
-GENERIC: collect-scc-info ( insn -- )
+GENERIC: (collect-vreg-reps) ( insn -- )
 
-M: ##load-reference collect-scc-info
+M: ##load-reference (collect-vreg-reps)
     [ dst>> ] [ obj>> ] bi {
         { [ dup float? ] [ drop { float-rep double-rep } ] }
         { [ dup byte-array? ] [ drop vector-reps ] }
         [ drop { } ]
     } cond handle-def ;
 
-M: vreg-insn collect-scc-info
+M: vreg-insn (collect-vreg-reps)
     [ [ handle-use ] each-use-rep ]
     [ [ 1array handle-def ] each-def-rep ]
     [ [ 1array handle-def ] each-temp-rep ]
     tri ;
 
-M: insn collect-scc-info drop ;
+M: insn (collect-vreg-reps) drop ;
 
-: collect-scc-infos ( cfg -- )
-    H{ } clone scc-infos set
-    [ [ collect-scc-info ] each-non-phi ] each-basic-block ;
+: collect-vreg-reps ( cfg -- )
+    H{ } clone vreg-reps set
+    HS{ } clone tagged-vregs set
+    [ [ (collect-vreg-reps) ] each-non-phi ] each-basic-block ;
 
 SYMBOL: possibilities
 
-: permitted-reps ( scc-info -- seq )
-    reps>> [ ] [ intersect ] map-reduce
-    tagged-rep over member-eq? [ tagged-rep suffix ] unless ;
-
-: scc-reps ( scc-info -- seq )
-    dup permitted-reps
-    2dup [ all-uses-untagged?>> ] [ { tagged-rep } = ] bi* and
-    [ 2drop { tagged-rep int-rep } ] [ nip ] if ;
+: possible-reps ( vreg reps -- vreg reps )
+    { tagged-rep } union
+    2dup [ tagged-vregs get in? not ] [ { tagged-rep } = ] bi* and
+    [ drop { tagged-rep int-rep } ] [ ] if ;
 
 : compute-possibilities ( cfg -- )
-    collect-scc-infos
-    scc-infos get [ scc-reps ] assoc-map possibilities set ;
+    collect-vreg-reps
+    vreg-reps get [ possible-reps ] assoc-map possibilities set ;
 
 ! For every vreg, compute the cost of keeping it in every possible
 ! representation.
@@ -86,12 +81,9 @@ SYMBOL: costs
     [ costs get at 2dup key? ] dip
     '[ [ current-loop-nesting 10^ _ * + ] change-at ] [ 2drop ] if ;
 
-: possible-reps ( scc -- reps )
-    possibilities get at ;
-
 :: increase-costs ( vreg preferred factor -- )
     vreg vreg>scc :> scc
-    scc possible-reps [
+    scc possibilities get at [
         dup preferred eq? [ drop ] [ scc factor increase-cost ] if
     ] each ; inline
 
