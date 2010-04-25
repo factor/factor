@@ -25,7 +25,8 @@ test_program_installed() {
 
 exit_script() {
     if [[ $FIND_MAKE_TARGET -eq true ]] ; then
-        $ECHO $MAKE_TARGET;
+		# Must be echo not $ECHO
+        echo $MAKE_TARGET;
     fi
     exit $1
 }
