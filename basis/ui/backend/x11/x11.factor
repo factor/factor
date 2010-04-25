@@ -332,7 +332,7 @@ M: x11-ui-backend beep ( -- )
     [ dup CHAR: ' = [ drop "'\\''" ] [ 1string ] if ] { } map-as concat ;
 
 : xmessage ( string -- )
-    escape-' "/usr/X11R6/bin/xmessage '" "'" surround system drop ;
+    escape-' "/usr/bin/env xmessage '" "'" surround system drop ;
 PRIVATE>
 
 M: x11-ui-backend system-alert
