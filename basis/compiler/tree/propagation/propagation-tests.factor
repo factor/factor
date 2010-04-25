@@ -9,7 +9,7 @@ compiler.tree.debugger compiler.tree.checker slots.private words
 hashtables classes assocs locals specialized-arrays system
 sorting math.libm math.floats.private math.integers.private
 math.intervals quotations effects alien alien.data sets
-strings.private classes.tuple ;
+strings.private classes.tuple eval ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
 SPECIALIZED-ARRAY: void*
@@ -999,3 +999,19 @@ UNION: ?fixnum fixnum POSTPONE: f ;
 [ f ] [ [ { integer } declare >fixnum ] { >fixnum } inlined? ] unit-test
 
 [ f ] [ [ { word } declare parent-word ] { parent-word } inlined? ] unit-test
+
+! Make sure guarded method inlining installs the right dependencies
+
+[ ] [
+    "IN: compiler.tree.propagation.tests
+    USING: kernel.private accessors ;
+    TUPLE: foo bar ;
+    UNION: ?foo foo POSTPONE: f ;
+    : baz ( ?foo -- bar ) { ?foo } declare bar>> ;" eval( -- )
+] unit-test
+
+[ 3 ] [ "USE: kernel IN: compiler.tree.propagation.tests 3 foo boa baz" eval( -- x ) ] unit-test
+
+[ ] [ "IN: compiler.tree.propagation.tests TUPLE: foo baz bar ;" eval( -- ) ] unit-test
+
+[ 3 ] [ "USE: kernel IN: compiler.tree.propagation.tests 2 3 foo boa baz" eval( -- x ) ] unit-test

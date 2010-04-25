@@ -145,11 +145,11 @@ TUPLE: depends-on-final class ;
 M: depends-on-final satisfied?
     class>> { [ class? ] [ final-class? ] } 1&& ;
 
-TUPLE: depends-on-single-method class generic ;
+TUPLE: depends-on-single-method method-class object-class generic ;
 
-: depends-on-single-method ( class generic -- )
-    [ nip depends-on-conditionally ]
-    [ \ depends-on-single-method add-conditional-dependency ] 2bi ;
+: depends-on-single-method ( method-class object-class generic -- )
+    [ nip [ depends-on-conditionally ] bi@ ]
+    [ \ depends-on-single-method add-conditional-dependency ] 3bi ;
 
 :: subclass-with-only-method ( class generic -- subclass/f )
     generic method-classes [ f ] [
@@ -161,7 +161,17 @@ TUPLE: depends-on-single-method class generic ;
     ] if-empty ;
 
 M: depends-on-single-method satisfied?
-    [ class>> ] [ generic>> ] bi subclass-with-only-method >boolean ;
+    [ method-class>> ] [ object-class>> ] [ generic>> ] tri
+    subclass-with-only-method = ;
+
+TUPLE: depends-on-method-is class generic method ;
+
+: depends-on-method-is ( class generic method -- )
+    [ [ depends-on-conditionally ] tri@ ]
+    [ \ depends-on-method-is add-conditional-dependency ] 3bi ;
+
+M: depends-on-method-is satisfied?
+    [ class>> ] [ generic>> method ] [ method>> ] tri = ;
 
 : init-dependencies ( -- )
     H{ } clone dependencies set

@@ -53,6 +53,7 @@ ERROR: bad-splitting class generic ;
 :: split-code ( class generic -- quot/f )
     class generic method :> my-method
     my-method [ class generic bad-splitting ] unless
+    class generic my-method depends-on-method-is
     generic dispatch# (picker) :> picker
     [
         picker call class instance?
@@ -62,8 +63,8 @@ ERROR: bad-splitting class generic ;
 
 :: split-method-call ( class generic -- quot/f )
     class generic subclass-with-only-method [
-        class generic depends-on-single-method
-        generic split-code
+        [ class generic depends-on-single-method ]
+        [ generic split-code ] bi
     ] [ f ] if* ;
 
 : inlining-standard-method ( #call word -- class/f method/f )
