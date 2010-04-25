@@ -9,7 +9,7 @@ compiler.tree.debugger compiler.tree.checker slots.private words
 hashtables classes assocs locals specialized-arrays system
 sorting math.libm math.floats.private math.integers.private
 math.intervals quotations effects alien alien.data sets
-strings.private ;
+strings.private classes.tuple ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
 SPECIALIZED-ARRAY: void*
@@ -863,11 +863,11 @@ TUPLE: foo bar ;
 GENERIC: whatever ( x -- y )
 M: number whatever drop foo ; inline
 
-[ t ] [ [ 1 whatever new ] { new } inlined? ] unit-test
+[ t ] [ [ 1 whatever new ] { new } M\ tuple-class new suffix inlined? ] unit-test
 
 : that-thing ( -- class ) foo ;
 
-[ f ] [ [ that-thing new ] { new } inlined? ] unit-test
+[ f ] [ [ that-thing new ] { new } M\ tuple-class new suffix inlined? ] unit-test
 
 GENERIC: whatever2 ( x -- y )
 M: number whatever2 drop H{ { 1 1 } { 2 2 } { 3 3 } { 4 4 } { 5 6 } } ; inline

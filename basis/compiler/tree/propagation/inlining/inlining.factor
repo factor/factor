@@ -5,6 +5,7 @@ math.partial-dispatch generic generic.standard generic.single generic.math
 classes.algebra classes.union sets quotations assocs combinators
 combinators.short-circuit words namespaces continuations classes
 fry hints locals
+stack-checker.dependencies
 compiler.tree
 compiler.tree.builder
 compiler.tree.recursive
@@ -50,26 +51,20 @@ M: callable splicing-nodes splicing-body ;
 ERROR: bad-splitting class generic ;
 
 :: split-code ( class generic -- quot/f )
-    class generic method-for-class
-    [ class generic bad-splitting ] unless
+    class generic method-for-class :> method
+    method [ class generic bad-splitting ] unless
+    generic dispatch# (picker) :> picker
     [
-        dup class instance?
-        [ generic execute ]
+        picker call class instance?
+        [ method execute ]
         [ generic no-method ] if
     ] ;
 
-:: find-method-call ( class generic -- subclass/f )
-    generic method-classes [ f ] [
-        f swap [| last-class new-class |
-            class new-class classes-intersect? [
-                last-class [ f f ] [ new-class t ] if
-            ] [ last-class t ] if
-        ] all? swap and
-    ] if-empty ;
-
 :: split-method-call ( class generic -- quot/f )
-    class generic find-method-call
-    [ generic split-code ] [ f ] if* ;
+    class generic subclass-with-only-method [
+        class generic depends-on-single-method
+        generic split-code
+    ] [ f ] if* ;
 
 : inlining-standard-method ( #call word -- class/f method/f )
     dup "methods" word-prop assoc-empty? [ 2drop f f ] [
