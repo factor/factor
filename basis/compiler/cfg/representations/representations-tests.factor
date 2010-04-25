@@ -3,7 +3,9 @@ compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.representations.preferred cpu.architecture kernel
 namespaces tools.test sequences arrays system literals layouts
 math compiler.constants compiler.cfg.representations.conversion
-compiler.cfg.representations.rewrite make ;
+compiler.cfg.representations.rewrite
+compiler.cfg.comparisons
+make ;
 IN: compiler.cfg.representations
 
 [ { double-rep double-rep } ] [
@@ -116,8 +118,51 @@ V{
     }
 ] [ 1 get instructions>> ] unit-test
 
-! But its ok to untag-fixnum the result of a peek if there are
-! no usages of it as a tagged-rep
+! We cannot untag-fixnum the result of a peek if there are usages
+! of it as a tagged-rep
+V{
+    T{ ##prologue }
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##peek f 1 D 0 }
+    T{ ##branch }
+} 1 test-bb
+
+V{
+    T{ ##replace f 1 R 0 }
+    T{ ##epilogue }
+    T{ ##return }
+} 2 test-bb
+
+V{
+    T{ ##mul f 2 1 1 }
+    T{ ##replace f 2 D 0 }
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##epilogue }
+    T{ ##return }
+} 4 test-bb
+
+0 1 edge
+1 { 2 3 } edges
+3 { 3 4 } edges
+2 4 edge
+
+[ ] [ test-representations ] unit-test
+
+[
+    V{
+        T{ ##peek f 1 D 0 }
+        T{ ##branch }
+    }
+] [ 1 get instructions>> ] unit-test
+
+! But its ok to untag-fixnum the result of a peek if all usages use
+! it as int-rep
 V{
     T{ ##prologue }
     T{ ##branch }
@@ -135,7 +180,9 @@ V{
 
 V{
     T{ ##add f 2 1 1 }
+    T{ ##mul f 3 1 1 }
     T{ ##replace f 2 D 0 }
+    T{ ##replace f 3 D 1 }
     T{ ##branch }
 } 3 test-bb
 
@@ -187,6 +234,93 @@ V{
 
 [ t ] [ 1 get instructions>> 4 swap nth ##scalar>integer? ] unit-test
 
+! Test phi node behavior
+V{
+    T{ ##prologue }
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##load-integer f 1 1 }
+    T{ ##branch }
+} 1 test-bb
+
+V{
+    T{ ##load-integer f 2 2 }
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##phi f 3 }
+    T{ ##replace f 3 D 0 }
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##epilogue }
+    T{ ##return }
+} 4 test-bb
+
+1 get 1 2array
+2 get 2 2array 2array 3 get instructions>> first (>>inputs)
+
+0 { 1 2 } edges
+1 3 edge
+2 3 edge
+3 4 edge
+
+[ ] [ test-representations ] unit-test
+
+[ T{ ##load-tagged f 1 $[ 1 tag-fixnum ] } ]
+[ 1 get instructions>> first ]
+unit-test
+
+[ T{ ##load-tagged f 2 $[ 2 tag-fixnum ] } ]
+[ 2 get instructions>> first ]
+unit-test
+
+! ##load-reference corner case
+V{
+    T{ ##prologue }
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##peek f 0 D 0 }
+    T{ ##peek f 1 D 1 }
+    T{ ##add f 2 0 1 }
+    T{ ##branch }
+} 1 test-bb
+
+V{
+    T{ ##load-reference f 3 f }
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##phi f 4 }
+    T{ ##replace f 4 D 0 }
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##epilogue }
+    T{ ##return }
+} 4 test-bb
+
+1 get 2 2array
+2 get 3 2array 2array 3 get instructions>> first (>>inputs)
+
+0 { 1 2 } edges
+1 3 edge
+2 3 edge
+3 4 edge
+
+[ ] [ test-representations ] unit-test
+
+! Don't untag the f!
+[ 2 ] [ 2 get instructions>> length ] unit-test
+
 cpu x86.32? [
 
     ! Make sure load-constant is converted into load-double
@@ -223,7 +357,7 @@ cpu x86.32? [
 
     V{
         T{ ##peek f 1 D 0 }
-        T{ ##compare-imm-branch f 1 2 }
+        T{ ##compare-imm-branch f 1 2 cc= }
     } 1 test-bb
 
     V{
@@ -268,12 +402,25 @@ cpu x86.32? [
     test-representations
     0 get instructions>> ;
 
-! Converting a ##load-integer into a ##load-tagged
-V{
-    T{ ##prologue }
-    T{ ##branch }
-} 0 test-bb
+! Don't convert the def site into anything but tagged-rep since
+! we might lose precision
+5 \ vreg-counter set-global
 
+[ f ] [
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##tagged>integer f 2 1 }
+        T{ ##add-float f 3 0 0 }
+        T{ ##store-memory-imm f 3 2 0 float-rep f }
+        T{ ##store-memory-imm f 3 2 4 float-rep f }
+        T{ ##mul-float f 4 0 0 }
+        T{ ##replace f 4 D 0 }
+    } test-peephole
+    [ ##single>double-float? ] any?
+] unit-test
+
+! Converting a ##load-integer into a ##load-tagged
 [
     V{
         T{ ##load-tagged f 1 $[ 100 tag-fixnum ] }
