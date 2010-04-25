@@ -51,12 +51,12 @@ M: callable splicing-nodes splicing-body ;
 ERROR: bad-splitting class generic ;
 
 :: split-code ( class generic -- quot/f )
-    class generic method-for-class :> method
-    method [ class generic bad-splitting ] unless
+    class generic method :> my-method
+    my-method [ class generic bad-splitting ] unless
     generic dispatch# (picker) :> picker
     [
         picker call class instance?
-        [ method execute ]
+        [ my-method execute ]
         [ generic no-method ] if
     ] ;
 
