@@ -60,8 +60,14 @@ SYMBOLS: renaming-set needs-renaming? ;
 : emit-use-conversion ( insn -- )
     [ [ (emit-use-conversion) ] (compute-renaming-set) ] each-use-rep ;
 
+: no-use-conversion ( insn -- )
+    [ drop no-renaming ] each-use-rep ;
+
 : emit-def-conversion ( insn -- )
     [ [ (emit-def-conversion) ] (compute-renaming-set) ] each-def-rep ;
+
+: no-def-conversion ( insn -- )
+    [ drop no-renaming ] each-def-rep ;
 
 : converted-value ( vreg -- vreg' )
     renaming-set get pop first2 [ assert= ] dip ;
@@ -75,20 +81,9 @@ RENAMING: convert [ converted-value ] [ converted-value ] [ ]
         renaming-set get length 0 assert=
     ] [ drop ] if ;
 
-: with-conversions ( insn -- quot )
-    init-renaming-set [ perform-renaming ] bi ; inline
-
 GENERIC: conversions-for-insn ( insn -- )
 
 M: ##phi conversions-for-insn , ;
-
-M: vreg-insn conversions-for-insn
-    [
-        [ emit-use-conversion ]
-        [ , ]
-        [ emit-def-conversion ]
-        tri
-    ] with-conversions ;
 
 M: insn conversions-for-insn , ;
 
