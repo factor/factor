@@ -312,12 +312,6 @@ M\ set intersect [ intersect-quot ] 1 define-partial-eval
     [ \ push def>> ] [ f ] if
 ] "custom-inlining" set-word-prop
 
-! Speeds up fasta benchmark
-\ >fixnum [
-    in-d>> first value-info class>> fixnum \ f class-or class<=
-    [ [ dup [ \ >fixnum no-method ] unless ] ] [ f ] if
-] "custom-inlining" set-word-prop
-
 ! We want to constant-fold calls to heap-size, and recompile those
 ! calls when a C type is redefined
 \ heap-size [
