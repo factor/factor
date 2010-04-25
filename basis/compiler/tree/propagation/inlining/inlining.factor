@@ -47,36 +47,29 @@ M: callable splicing-nodes splicing-body ;
         ] if
     ] [ 2drop undo-inlining ] if ;
 
+ERROR: bad-splitting class generic ;
+
 :: split-code ( class generic -- quot/f )
-    class generic method-for-class :> method
-    method [
+    class generic method-for-class
+    [ class generic bad-splitting ] unless
+    [
         dup class instance?
-        [ method execute ]
+        [ generic execute ]
         [ generic no-method ] if
-    ] and ;
+    ] ;
 
-: class-min ( class1 class2 -- class/f ? )
-    2dup class<= [ drop t ] [
-        2dup swap class<=
-        [ nip t ] [ 2drop f f ] if
-    ] if ;
-
-:: find-method-call ( class generic -- subclass/f ? )
-    object generic method-classes 
-    [| last-class new-class |
-        class new-class classes-intersect? [
-            class new-class class<=
-            [ object f ] [
-                last-class new-class class-min
-            ] if
-        ] [ last-class t ] if
-    ] all? ;
+:: find-method-call ( class generic -- subclass/f )
+    generic method-classes [ f ] [
+        f swap [| last-class new-class |
+            class new-class classes-intersect? [
+                last-class [ f f ] [ new-class t ] if
+            ] [ last-class t ] if
+        ] all? swap and
+    ] if-empty ;
 
 :: split-method-call ( class generic -- quot/f )
-    class object = [ f ] [
-        class generic find-method-call
-        [ generic split-code ] [ drop f ] if
-    ] if ;
+    class generic find-method-call
+    [ generic split-code ] [ f ] if* ;
 
 : inlining-standard-method ( #call word -- class/f method/f )
     dup "methods" word-prop assoc-empty? [ 2drop f f ] [
