@@ -142,14 +142,18 @@ IN: compiler.tree.propagation.transforms
 ] "custom-inlining" set-word-prop
 
 :: inline-instance ( node -- quot/f )
-    node in-d>> first2 [ value-info ] bi@ literal>> :> ( obj klass )
-    klass class? [
+    node in-d>> first2 [ value-info ] bi@ literal>> :> ( obj class )
+    class class? [
         {
-            [ klass \ f = not ]
-            [ obj class>> \ f class-not class-and klass class<= ]
-        } 0&&
-        [ [ drop >boolean ] ]
-        [ klass "predicate" word-prop '[ drop @ ] ] if
+            [ class \ f = not ]
+            [ obj class>> \ f class-not class-and class class<= ]
+        } 0&& [
+            ! TODO: replace this with an implicit null check when
+            ! profitable, once Factor gets OSR implemented
+            [ drop >boolean ]
+        ] [
+            class "predicate" word-prop '[ drop @ ]
+        ] if
     ] [ f ] if ;
 
 \ instance? [ inline-instance ] "custom-inlining" set-word-prop
