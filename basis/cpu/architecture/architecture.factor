@@ -87,6 +87,20 @@ UNION: vector-rep
 int-vector-rep
 float-vector-rep ;
 
+CONSTANT: vector-reps
+    {
+        char-16-rep
+        uchar-16-rep
+        short-8-rep
+        ushort-8-rep
+        int-4-rep
+        uint-4-rep
+        longlong-2-rep
+        ulonglong-2-rep
+        float-4-rep
+        double-2-rep
+    }
+
 UNION: representation
 any-rep
 tagged-rep

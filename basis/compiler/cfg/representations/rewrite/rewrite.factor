@@ -85,6 +85,8 @@ GENERIC: conversions-for-insn ( insn -- )
 
 M: ##phi conversions-for-insn , ;
 
+M: ##copy conversions-for-insn , ;
+
 M: insn conversions-for-insn , ;
 
 : conversions-for-block ( bb -- )
