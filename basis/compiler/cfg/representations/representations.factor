@@ -19,6 +19,7 @@ IN: compiler.cfg.representations
 
     {
         [ compute-possibilities ]
+        [ compute-restrictions ]
         [ compute-representations ]
         [ compute-phi-representations ]
         [ insert-conversions ]

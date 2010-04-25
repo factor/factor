@@ -17,23 +17,21 @@ SYMBOL: possibilities
     H{ } clone [ '[ swap _ adjoin-at ] with-vreg-reps ] keep
     [ members ] assoc-map possibilities set ;
 
-! Compute vregs which must remain tagged for their lifetime.
-SYMBOL: always-boxed
-
-:: (compute-always-boxed) ( vreg rep assoc -- )
+! Compute vregs for which dereferencing cannot be hoisted past
+! conditionals, because they might be immediate.
+:: check-restriction ( vreg rep -- )
     rep tagged-rep eq? [
-        tagged-rep vreg assoc set-at
+        vreg possibilities get
+        [ { tagged-rep int-rep } intersect ] change-at
     ] when ;
 
-: compute-always-boxed ( cfg -- assoc )
-    H{ } clone [
-        '[
-            [
-                dup ##load-reference?
-                [ drop ] [ [ _ (compute-always-boxed) ] each-def-rep ] if
-            ] each-non-phi
-        ] each-basic-block
-    ] keep ;
+: compute-restrictions ( cfg -- )
+    [
+        [
+            dup ##load-reference?
+            [ drop ] [ [ check-restriction ] each-def-rep ] if
+        ] each-non-phi
+    ] each-basic-block ;
 
 ! For every vreg, compute the cost of keeping it in every possible
 ! representation.
@@ -42,36 +40,61 @@ SYMBOL: always-boxed
 SYMBOL: costs
 
 : init-costs ( -- )
-    possibilities get [ drop H{ } clone ] assoc-map costs set ;
+    ! Initialize cost as 0 for each possibility.
+    possibilities get [ [ 0 ] H{ } map>assoc ] assoc-map costs set ;
 
-: record-possibility ( rep vreg -- )
-    costs get at [ 0 or ] change-at ;
+: 10^ ( n -- x ) 10 <repetition> product ;
 
-: increase-cost ( rep vreg -- )
+: increase-cost ( rep vreg factor -- )
     ! Increase cost of keeping vreg in rep, making a choice of rep less
-    ! likely.
-    costs get at [ 0 or basic-block get loop-nesting-at 1 + + ] change-at ;
+    ! likely. If the rep is not in the cost alist, it means this
+    ! representation is prohibited.
+    [ costs get at 2dup key? ] dip
+    '[ [ current-loop-nesting 10^ _ * + ] change-at ] [ 2drop ] if ;
 
-: maybe-increase-cost ( possible vreg preferred -- )
-    pick eq? [ record-possibility ] [ increase-cost ] if ;
+:: increase-costs ( vreg preferred factor -- )
+    vreg possible [
+        dup preferred eq? [ drop ] [ vreg factor increase-cost ] if
+    ] each ; inline
 
-: representation-cost ( vreg preferred -- )
-    ! 'preferred' is a representation that the instruction can accept with no cost.
-    ! So, for each representation that's not preferred, increase the cost of keeping
-    ! the vreg in that representation.
-    [ drop possible ]
-    [ '[ _ _ maybe-increase-cost ] ]
-    2bi each ;
+UNION: inert-tag-untag-insn
+##add
+##sub
+##and
+##or
+##xor
+##min
+##max ;
+
+UNION: inert-tag-untag-imm-insn
+##add-imm
+##sub-imm
+##and-imm
+##or-imm
+##xor-imm ;
+
+GENERIC: has-peephole-opts? ( insn -- ? )
+
+M: insn                     has-peephole-opts? drop f ;
+M: ##load-integer           has-peephole-opts? drop t ;
+M: ##load-reference         has-peephole-opts? drop t ;
+M: inert-tag-untag-insn     has-peephole-opts? drop t ;
+M: inert-tag-untag-imm-insn has-peephole-opts? drop t ;
+M: ##mul-imm                has-peephole-opts? drop t ;
+M: ##shl-imm                has-peephole-opts? drop t ;
+M: ##shr-imm                has-peephole-opts? drop t ;
+M: ##sar-imm                has-peephole-opts? drop t ;
+M: ##neg                    has-peephole-opts? drop t ;
+M: ##not                    has-peephole-opts? drop t ;
 
 GENERIC: compute-insn-costs ( insn -- )
 
-! There's no cost to converting a constant's representation
-M: ##load-integer compute-insn-costs drop ;
-M: ##load-reference compute-insn-costs drop ;
+M: insn compute-insn-costs drop ;
 
-M: insn compute-insn-costs [ representation-cost ] each-rep ;
+M: vreg-insn compute-insn-costs
+    dup has-peephole-opts? 2 5 ? '[ _ increase-costs ] each-rep ;
 
-: compute-costs ( cfg -- costs )
+: compute-costs ( cfg -- )
     init-costs
     [
         [ basic-block set ]
@@ -80,8 +103,7 @@ M: insn compute-insn-costs [ representation-cost ] each-rep ;
                 compute-insn-costs
             ] each-non-phi
         ] bi
-    ] each-basic-block
-    costs get ;
+    ] each-basic-block ;
 
 ! For every vreg, compute preferred representation, that minimizes costs.
 : minimize-costs ( costs -- representations )
@@ -89,10 +111,7 @@ M: insn compute-insn-costs [ representation-cost ] each-rep ;
     [ >alist alist-min first ] assoc-map ;
 
 : compute-representations ( cfg -- )
-    [ compute-costs minimize-costs ]
-    [ compute-always-boxed ]
-    bi assoc-union
-    representations set ;
+    compute-costs costs get minimize-costs representations set ;
 
 ! PHI nodes require special treatment
 ! If the output of a phi instruction is only used as the input to another
