@@ -2302,10 +2302,13 @@ V{
 } 3 test-bb
 
 V{
-    T{ ##phi f 3 H{ { 2 1 } { 3 2 } } }
+    T{ ##phi f 3 }
     T{ ##replace f 3 D 0 }
     T{ ##return }
 } 4 test-bb
+
+2 get 1 2array
+3 get 2 2array 2array 4 get instructions>> first (>>inputs)
 
 test-diamond
 

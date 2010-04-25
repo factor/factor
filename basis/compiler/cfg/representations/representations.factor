@@ -3,10 +3,12 @@
 USING: accessors combinators namespaces
 compiler.cfg
 compiler.cfg.registers
+compiler.cfg.predecessors
 compiler.cfg.loop-detection
 compiler.cfg.representations.rewrite
 compiler.cfg.representations.peephole
-compiler.cfg.representations.selection ;
+compiler.cfg.representations.selection
+compiler.cfg.representations.coalescing ;
 IN: compiler.cfg.representations
 
 ! Virtual register representation selection. This is where
@@ -16,12 +18,12 @@ IN: compiler.cfg.representations
 
 : select-representations ( cfg -- cfg' )
     needs-loops
+    needs-predecessors
 
     {
+        [ compute-components ]
         [ compute-possibilities ]
-        [ compute-restrictions ]
         [ compute-representations ]
-        [ compute-phi-representations ]
         [ insert-conversions ]
         [ ]
     } cleave
