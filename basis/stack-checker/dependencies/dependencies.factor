@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs accessors classes classes.algebra fry
 generic kernel math namespaces sequences words sets
-combinators.short-circuit classes.tuple alien.c-types ;
+combinators.short-circuit classes.tuple alien.c-types
+locals ;
 FROM: classes.tuple.private => tuple-layout ;
 FROM: assocs => change-at ;
 FROM: namespaces => set ;
@@ -143,6 +144,24 @@ TUPLE: depends-on-final class ;
 
 M: depends-on-final satisfied?
     class>> { [ class? ] [ final-class? ] } 1&& ;
+
+TUPLE: depends-on-single-method class generic ;
+
+: depends-on-single-method ( class generic -- )
+    [ nip depends-on-conditionally ]
+    [ \ depends-on-single-method add-conditional-dependency ] 2bi ;
+
+:: subclass-with-only-method ( class generic -- subclass/f )
+    generic method-classes [ f ] [
+        f swap [| last-class new-class |
+            class new-class classes-intersect? [
+                last-class [ f f ] [ new-class t ] if
+            ] [ last-class t ] if
+        ] all? swap and
+    ] if-empty ;
+
+M: depends-on-single-method satisfied?
+    [ class>> ] [ generic>> ] bi subclass-with-only-method >boolean ;
 
 : init-dependencies ( -- )
     H{ } clone dependencies set

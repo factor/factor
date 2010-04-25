@@ -182,9 +182,14 @@ M: fixnum annotate-entry-test-1 drop ;
 
 : annotate-entry-test-2 ( from to -- obj ) 0 -rot (annotate-entry-test-2) ; inline
 
-[ f ] [
+[ t ] [
     [ { bignum } declare annotate-entry-test-2 ]
     \ annotate-entry-test-1 inlined?
+] unit-test
+
+[ f ] [
+    [ { bignum } declare annotate-entry-test-2 ]
+    M\ fixnum annotate-entry-test-1 inlined?
 ] unit-test
 
 [ t ] [
