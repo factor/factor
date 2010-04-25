@@ -104,8 +104,14 @@ M: ##load-reference optimize-insn
         [ 2drop int-rep ##copy here ]
     } cond ;
 
+: inert-tag-imm? ( insn -- ? )
+    src1>> rep-of tagged-rep? ;
+
 : inert-tag/untag-imm? ( insn -- ? )
-    [ dst>> ] [ src1>> ] bi [ rep-of tagged-rep? ] both? ;
+    {
+        [ dst>> rep-of tagged-rep? ]
+        [ inert-tag-imm? ]
+    } 1&& ;
 
 M: ##shl-imm optimize-insn
     {
@@ -169,12 +175,14 @@ M: ##sar-imm optimize-insn
 !
 ! so if all inputs and outputs of ##X or ##X-imm are tagged,
 ! don't have to insert any conversions
-: inert-tag/untag? ( insn -- ? )
+: inert-tag? ( insn -- ? )
     {
-        [ dst>> rep-of tagged-rep? ]
         [ src1>> rep-of tagged-rep? ]
         [ src2>> rep-of tagged-rep? ]
     } 1&& ;
+
+: inert-tag/untag? ( insn -- ? )
+    { [ dst>> rep-of tagged-rep? ] [ inert-tag? ] } 1&& ;
 
 M: inert-tag-untag-insn optimize-insn
     {
@@ -183,16 +191,44 @@ M: inert-tag-untag-insn optimize-insn
     } cond ;
 
 ! -imm variant of above
+: >tagged-imm ( insn -- )
+    [ tag-fixnum ] change-src2 unchanged ; inline
+
 M: inert-tag-untag-imm-insn optimize-insn
     {
-        { [ dup inert-tag/untag-imm? ] [ [ tag-fixnum ] change-src2 unchanged ] }
+        { [ dup inert-tag/untag-imm? ] [ >tagged-imm ] }
         [ call-next-method ]
     } cond ;
 
 M: ##mul-imm optimize-insn
     {
         { [ dup inert-tag/untag-imm? ] [ unchanged ] }
-        { [ dup dst>> rep-of tagged-rep? ] [ [ tag-fixnum ] change-src2 unchanged ] }
+        { [ dup dst>> rep-of tagged-rep? ] [ >tagged-imm ] }
+        [ call-next-method ]
+    } cond ;
+
+! Similar optimization for comparison operators
+M: ##compare-integer-imm optimize-insn
+    {
+        { [ dup inert-tag-imm? ] [ >tagged-imm ] }
+        [ call-next-method ]
+    } cond ;
+
+M: ##compare-integer-imm-branch optimize-insn
+    {
+        { [ dup inert-tag-imm? ] [ >tagged-imm ] }
+        [ call-next-method ]
+    } cond ;
+
+M: ##compare-integer optimize-insn
+    {
+        { [ dup inert-tag? ] [ unchanged ] }
+        [ call-next-method ]
+    } cond ;
+
+M: ##compare-integer-branch optimize-insn
+    {
+        { [ dup inert-tag? ] [ unchanged ] }
         [ call-next-method ]
     } cond ;
 

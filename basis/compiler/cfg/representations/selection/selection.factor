@@ -113,17 +113,21 @@ UNION: inert-tag-untag-imm-insn
 
 GENERIC: has-peephole-opts? ( insn -- ? )
 
-M: insn                     has-peephole-opts? drop f ;
-M: ##load-integer           has-peephole-opts? drop t ;
-M: ##load-reference         has-peephole-opts? drop t ;
-M: inert-tag-untag-insn     has-peephole-opts? drop t ;
+M: insn has-peephole-opts? drop f ;
+M: ##load-integer has-peephole-opts? drop t ;
+M: ##load-reference has-peephole-opts? drop t ;
+M: ##neg has-peephole-opts? drop t ;
+M: ##not has-peephole-opts? drop t ;
+M: inert-tag-untag-insn has-peephole-opts? drop t ;
 M: inert-tag-untag-imm-insn has-peephole-opts? drop t ;
-M: ##mul-imm                has-peephole-opts? drop t ;
-M: ##shl-imm                has-peephole-opts? drop t ;
-M: ##shr-imm                has-peephole-opts? drop t ;
-M: ##sar-imm                has-peephole-opts? drop t ;
-M: ##neg                    has-peephole-opts? drop t ;
-M: ##not                    has-peephole-opts? drop t ;
+M: ##mul-imm has-peephole-opts? drop t ;
+M: ##shl-imm has-peephole-opts? drop t ;
+M: ##shr-imm has-peephole-opts? drop t ;
+M: ##sar-imm has-peephole-opts? drop t ;
+M: ##compare-integer-imm has-peephole-opts? drop t ;
+M: ##compare-integer has-peephole-opts? drop t ;
+M: ##compare-integer-imm-branch has-peephole-opts? drop t ;
+M: ##compare-integer-branch has-peephole-opts? drop t ;
 
 GENERIC: compute-insn-costs ( insn -- )
 
