@@ -1,7 +1,7 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math assocs namespaces sequences heaps
-fry make combinators sets locals arrays
+fry make combinators combinators.short-circuit sets locals arrays
 cpu.architecture layouts
 compiler.cfg
 compiler.cfg.def-use
@@ -91,8 +91,16 @@ SYMBOL: register-live-outs
 : insert-reload ( live-interval -- )
     [ reg>> ] [ vreg>> rep-of ] [ reload-from>> ] tri _reload ;
 
+: insert-reload? ( live-interval -- ? )
+    ! Don't insert a reload if the register will be written to
+    ! before being read again.
+    {
+        [ reload-from>> ]
+        [ uses>> first type>> +use+ eq? ]
+    } 1&& ;
+
 : handle-reload ( live-interval -- )
-    dup reload-from>> [ insert-reload ] [ drop ] if ;
+    dup insert-reload? [ insert-reload ] [ drop ] if ;
 
 : activate-interval ( live-interval -- )
     [ add-pending ] [ handle-reload ] bi ;
