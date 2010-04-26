@@ -202,6 +202,7 @@ CODEGEN: ##compare-float-unordered %compare-float-unordered
 CODEGEN: ##save-context %save-context
 CODEGEN: ##vm-field %vm-field
 CODEGEN: ##set-vm-field %set-vm-field
+CODEGEN: ##alien-global %alien-global
 
 CODEGEN: _fixnum-add %fixnum-add
 CODEGEN: _fixnum-sub %fixnum-sub
@@ -216,6 +217,7 @@ CODEGEN: _test-vector-branch %test-vector-branch
 CODEGEN: _dispatch %dispatch
 CODEGEN: _spill %spill
 CODEGEN: _reload %reload
+CODEGEN: _loop-entry %loop-entry
 
 ! ##gc
 : wipe-locs ( locs temp -- )
@@ -262,12 +264,6 @@ M: ##gc generate-insn
         [ data-values>> load-data-regs ]
     } cleave
     "no-gc" resolve-label ;
-
-M: _loop-entry generate-insn drop %loop-entry ;
-
-M: ##alien-global generate-insn
-    [ dst>> ] [ symbol>> ] [ library>> ] tri
-    %alien-global ;
 
 ! ##alien-invoke
 GENERIC: next-fastcall-param ( rep -- )
