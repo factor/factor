@@ -8,7 +8,8 @@ layouts compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker slots.private words
 hashtables classes assocs locals specialized-arrays system
 sorting math.libm math.floats.private math.integers.private
-math.intervals quotations effects alien alien.data sets ;
+math.intervals quotations effects alien alien.data sets
+strings.private ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
 SPECIALIZED-ARRAY: void*
