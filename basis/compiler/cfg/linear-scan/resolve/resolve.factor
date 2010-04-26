@@ -1,8 +1,9 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit fry kernel locals namespaces
 make math sequences hashtables
+cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.liveness
@@ -15,13 +16,29 @@ compiler.cfg.linear-scan.assignment
 compiler.cfg.linear-scan.allocation.state ;
 IN: compiler.cfg.linear-scan.resolve
 
+TUPLE: location
+{ reg read-only }
+{ rep read-only }
+{ reg-class read-only } ;
+
+: <location> ( reg rep -- location )
+    dup reg-class-of location boa ;
+
+M: location equal?
+    over location? [
+        { [ [ reg>> ] bi@ = ] [ [ reg-class>> ] bi@ = ] } 2&&
+    ] [ 2drop f ] if ;
+
+M: location hashcode*
+    reg>> hashcode* ;
+
 SYMBOL: spill-temps
 
 : spill-temp ( rep -- n )
     spill-temps get [ next-spill-slot ] cache ;
 
 : add-mapping ( from to rep -- )
-    '[ _ 2array ] bi@ 2array , ;
+    '[ _ <location> ] bi@ 2array , ;
 
 :: resolve-value-data-flow ( bb to vreg -- )
     vreg bb vreg-at-end
@@ -34,19 +51,19 @@ SYMBOL: spill-temps
     ] if ;
 
 : memory->register ( from to -- )
-    swap [ first2 ] [ first ] bi* _reload ;
+    swap [ reg>> ] [ [ rep>> ] [ reg>> ] bi ] bi* _reload ;
 
 : register->memory ( from to -- )
-    [ first2 ] [ first ] bi* _spill ;
+    [ [ reg>> ] [ rep>> ] bi ] [ reg>> ] bi* _spill ;
 
 : temp->register ( from to -- )
-    nip [ first ] [ second ] [ second spill-temp ] tri _reload ;
+    nip [ reg>> ] [ rep>> ] [ rep>> spill-temp ] tri _reload ;
 
 : register->temp ( from to -- )
-    drop [ first2 ] [ second spill-temp ] bi _spill ;
+    drop [ [ reg>> ] [ rep>> ] bi ] [ rep>> spill-temp ] bi _spill ;
 
 : register->register ( from to -- )
-    swap [ first ] [ first2 ] bi* ##copy ;
+    swap [ reg>> ] [ [ reg>> ] [ rep>> ] bi ] bi* ##copy ;
 
 SYMBOL: temp
 
@@ -54,8 +71,8 @@ SYMBOL: temp
     {
         { [ over temp eq? ] [ temp->register ] }
         { [ dup temp eq? ] [ register->temp ] }
-        { [ over first spill-slot? ] [ memory->register ] }
-        { [ dup first spill-slot? ] [ register->memory ] }
+        { [ over reg>> spill-slot? ] [ memory->register ] }
+        { [ dup reg>> spill-slot? ] [ register->memory ] }
         [ register->register ]
     } cond ;
 
