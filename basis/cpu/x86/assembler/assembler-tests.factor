@@ -2,6 +2,13 @@ USING: cpu.x86.assembler cpu.x86.assembler.operands
 kernel tools.test namespaces make layouts ;
 IN: cpu.x86.assembler.tests
 
+! immediate operands
+[ { HEX: b9 HEX: 01 HEX: 00 HEX: 00 HEX: 00 } ] [ [ ECX 1 MOV ] { } make ] unit-test
+[ { HEX: 83 HEX: c1 HEX: 01 } ] [ [ ECX 1 ADD ] { } make ] unit-test
+[ { HEX: 81 HEX: c1 HEX: 96 HEX: 00 HEX: 00 HEX: 00 } ] [ [ ECX 150 ADD ] { } make ] unit-test
+[ { HEX: f7 HEX: c1 HEX: d2 HEX: 04 HEX: 00 HEX: 00 } ] [ [ ECX 1234 TEST ] { } make ] unit-test
+
+! 64-bit registers
 [ { HEX: 40 HEX: 8a HEX: 2a } ] [ [ BPL RDX [] MOV ] { } make ] unit-test
 
 [ { HEX: 49 HEX: 89 HEX: 04 HEX: 24 } ] [ [ R12 [] RAX MOV ] { } make ] unit-test
@@ -100,13 +107,6 @@ IN: cpu.x86.assembler.tests
 [ { HEX: f2 HEX: 48 HEX: 0f HEX: 2a HEX: c0 } ] [ [ XMM0 RAX CVTSI2SD ] { } make ] unit-test
 [ { HEX: f2 HEX: 49 HEX: 0f HEX: 2a HEX: c4 } ] [ [ XMM0 R12 CVTSI2SD ] { } make ] unit-test
 
-! [ { HEX: f2 HEX: 49 HEX: 0f HEX: 2c HEX: c1 } ] [ [ XMM9 RAX CVTSI2SD ] { } make ] unit-test
-
-! [ { HEX: f2 HEX: 0f HEX: 10 HEX: 00 } ] [ [ XMM0 RAX [] MOVSD ] { } make ] unit-test
-! [ { HEX: f2 HEX: 41 HEX: 0f HEX: 10 HEX: 04 HEX: 24 } ] [ [ XMM0 R12 [] MOVSD ] { } make ] unit-test
-! [ { HEX: f2 HEX: 0f HEX: 11 HEX: 00 } ] [ [ RAX [] XMM0 MOVSD ] { } make ] unit-test
-! [ { HEX: f2 HEX: 41 HEX: 0f HEX: 11 HEX: 04 HEX: 24 } ] [ [ R12 [] XMM0 MOVSD ] { } make ] unit-test
-
 ! 3-operand r-rm-imm sse instructions
 [ { HEX: 66 HEX: 0f HEX: 70 HEX: c1 HEX: 02 } ]
 [ [ XMM0 XMM1 2 PSHUFD ] { } make ] unit-test
@@ -167,14 +167,18 @@ IN: cpu.x86.assembler.tests
 [ { HEX: f2 HEX: 0f HEX: 38 HEX: f1 HEX: c1 } ] [ [ EAX ECX CRC32 ] { } make ] unit-test
 [ { HEX: f2 HEX: 0f HEX: 38 HEX: f1 HEX: 01 } ] [ [ EAX ECX [] CRC32 ] { } make ] unit-test
 
-! various oddities
+! shifts
 [ { HEX: 48 HEX: d3 HEX: e0 } ] [ [ RAX CL SHL ] { } make ] unit-test
 [ { HEX: 48 HEX: d3 HEX: e1 } ] [ [ RCX CL SHL ] { } make ] unit-test
 [ { HEX: 48 HEX: d3 HEX: e8 } ] [ [ RAX CL SHR ] { } make ] unit-test
 [ { HEX: 48 HEX: d3 HEX: e9 } ] [ [ RCX CL SHR ] { } make ] unit-test
 
-[ { HEX: f7 HEX: c1 HEX: d2 HEX: 04 HEX: 00 HEX: 00 } ] [ [ ECX 1234 TEST ] { } make ] unit-test
+[ { HEX: c1 HEX: e0 HEX: 05 } ] [ [ EAX 5 SHL ] { } make ] unit-test
+[ { HEX: c1 HEX: e1 HEX: 05 } ] [ [ ECX 5 SHL ] { } make ] unit-test
+[ { HEX: c1 HEX: e8 HEX: 05 } ] [ [ EAX 5 SHR ] { } make ] unit-test
+[ { HEX: c1 HEX: e9 HEX: 05 } ] [ [ ECX 5 SHR ] { } make ] unit-test
 
+! multiplication
 [ { HEX: 4d HEX: 6b HEX: c0 HEX: 03 } ] [ [ R8 R8 3 IMUL3 ] { } make ] unit-test
 [ { HEX: 49 HEX: 6b HEX: c0 HEX: 03 } ] [ [ RAX R8 3 IMUL3 ] { } make ] unit-test
 [ { HEX: 4c HEX: 6b HEX: c0 HEX: 03 } ] [ [ R8 RAX 3 IMUL3 ] { } make ] unit-test
