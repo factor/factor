@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs accessors sequences math math.order fry
 combinators binary-search compiler.cfg.instructions compiler.cfg.registers
@@ -9,6 +9,12 @@ IN: compiler.cfg.linear-scan.live-intervals
 TUPLE: live-range from to ;
 
 C: <live-range> live-range
+
+SYMBOLS: +def+ +use+ +memory+ ;
+
+TUPLE: vreg-use n type ;
+
+C: <vreg-use> vreg-use
 
 TUPLE: live-interval
 vreg
@@ -50,18 +56,11 @@ M: live-interval covers? ( insn# live-interval -- ? )
     2dup extend-range?
     [ extend-range ] [ add-new-range ] if ;
 
-GENERIC: operands-in-registers? ( insn -- ? )
-
-M: vreg-insn operands-in-registers? drop t ;
-
-M: partial-sync-insn operands-in-registers? drop f ;
-
-: add-def ( insn live-interval -- )
-    [ insn#>> ] [ uses>> ] bi* push ;
-
-: add-use ( insn live-interval -- )
-    ! Every use is a potential def, no SSA here baby!
-    over operands-in-registers? [ add-def ] [ 2drop ] if ;
+: add-use ( insn live-interval type -- )
+    dup +memory+ eq? [ 3drop ] [
+        swap [ [ insn#>> ] dip <vreg-use> ] dip
+        uses>> push
+    ] if ;
 
 : <live-interval> ( vreg -- live-interval )
     \ live-interval new
@@ -73,9 +72,6 @@ M: partial-sync-insn operands-in-registers? drop f ;
 
 : block-to ( bb -- n ) instructions>> last insn#>> ;
 
-M: live-interval hashcode*
-    nip [ start>> ] [ end>> 1000 * ] bi + ;
-
 ! Mapping from vreg to live-interval
 SYMBOL: live-intervals
 
@@ -86,21 +82,29 @@ GENERIC: compute-live-intervals* ( insn -- )
 
 M: insn compute-live-intervals* drop ;
 
-: handle-output ( insn vreg -- )
-    live-interval
-    [ [ insn#>> ] dip shorten-range ] [ add-def ] 2bi ;
+: handle-output ( insn vreg type -- )
+    [ live-interval ] dip
+    [ drop [ insn#>> ] dip shorten-range ] [ add-use ] 3bi ;
 
-: handle-input ( insn vreg -- )
-    live-interval
-    [ [ [ basic-block get block-from ] dip insn#>> ] dip add-range ] [ add-use ] 2bi ;
+: handle-input ( insn vreg type -- )
+    [ live-interval ] dip
+    [ drop [ [ basic-block get block-from ] dip insn#>> ] dip add-range ]
+    [ add-use ]
+    3bi ;
 
 : handle-temp ( insn vreg -- )
     live-interval
-    [ [ insn#>> dup ] dip add-range ] [ add-use ] 2bi ;
+    [ [ insn#>> dup ] dip add-range ] [ +def+ add-use ] 2bi ;
 
 M: vreg-insn compute-live-intervals*
-    [ dup defs-vreg [ handle-output ] with when* ]
-    [ dup uses-vregs [ handle-input ] with each ]
+    [ dup defs-vreg [ +def+ handle-output ] with when* ]
+    [ dup uses-vregs [ +use+ handle-input ] with each ]
+    [ dup temp-vregs [ handle-temp ] with each ]
+    tri ;
+
+M: partial-sync-insn compute-live-intervals*
+    [ dup defs-vreg [ +use+ handle-output ] with when* ]
+    [ dup uses-vregs [ +memory+ handle-input ] with each ]
     [ dup temp-vregs [ handle-temp ] with each ]
     tri ;
 

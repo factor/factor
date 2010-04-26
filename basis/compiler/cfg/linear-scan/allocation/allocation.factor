@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs heaps kernel namespaces sequences fry math
 math.order combinators arrays sorting compiler.utilities locals
@@ -38,7 +38,8 @@ IN: compiler.cfg.linear-scan.allocation
     ! If the live interval has a usage at 'n', don't spill it,
     ! since this means its being defined by the sync point
     ! instruction. Output t if this is the case.
-    2dup [ uses>> ] dip swap member? [ 2drop t ] [ spill f ] if ;
+    2dup [ uses>> ] dip '[ n>> _ = ] any?
+    [ 2drop t ] [ spill f ] if ;
 
 : handle-sync-point ( n -- )
     [ active-intervals get values ] dip

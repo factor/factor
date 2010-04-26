@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators fry hints kernel locals
 math sequences sets sorting splitting namespaces
@@ -25,7 +25,7 @@ IN: compiler.cfg.linear-scan.allocation.splitting
     ] bi ;
 
 : split-uses ( uses n -- before after )
-    '[ _ <= ] partition ;
+    '[ n>> _ <= ] partition ;
 
 ERROR: splitting-too-early ;
 

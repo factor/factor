@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators fry hints kernel locals
 math sequences sets sorting splitting namespaces linked-assocs
@@ -17,13 +17,13 @@ ERROR: bad-live-ranges interval ;
     ] [ drop ] if ;
 
 : trim-before-ranges ( live-interval -- )
-    [ ranges>> ] [ uses>> last 1 + ] bi
+    [ ranges>> ] [ uses>> last n>> 1 + ] bi
     [ '[ from>> _ <= ] filter! drop ]
     [ swap last (>>to) ]
     2bi ;
 
 : trim-after-ranges ( live-interval -- )
-    [ ranges>> ] [ uses>> first ] bi
+    [ ranges>> ] [ uses>> first n>> ] bi
     [ '[ to>> _ >= ] filter! drop ]
     [ swap first (>>from) ]
     2bi ;
@@ -66,7 +66,8 @@ ERROR: bad-live-ranges interval ;
     split-interval [ spill-before ] [ spill-after ] bi* ;
 
 : find-use-position ( live-interval new -- n )
-    [ uses>> ] [ start>> '[ _ >= ] ] bi* find nip 1/0. or ;
+    [ uses>> ] [ start>> '[ n>> _ >= ] ] bi* find nip
+    [ n>> ] [ 1/0. ] if* ;
 
 : find-use-positions ( live-intervals new assoc -- )
     '[ [ _ find-use-position ] [ reg>> ] bi _ add-use-position ] each ;
@@ -88,7 +89,7 @@ ERROR: bad-live-ranges interval ;
     >alist alist-max ;
 
 : spill-new? ( new pair -- ? )
-    [ uses>> first ] [ second ] bi* > ;
+    [ uses>> first n>> ] [ second ] bi* > ;
 
 : spill-new ( new pair -- )
     drop spill-after add-unhandled ;
