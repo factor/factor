@@ -91,7 +91,7 @@ H{
        { vreg 1 }
        { start 0 }
        { end 2 }
-       { uses V{ 0 1 } }
+       { uses V{ T{ vreg-use f 0 } T{ vreg-use f 1 } } }
        { ranges V{ T{ live-range f 0 2 } } }
        { spill-to T{ spill-slot f 0 } }
     }
@@ -99,7 +99,7 @@ H{
        { vreg 1 }
        { start 5 }
        { end 5 }
-       { uses V{ 5 } }
+       { uses V{ T{ vreg-use f 5 } } }
        { ranges V{ T{ live-range f 5 5 } } }
        { reload-from T{ spill-slot f 0 } }
     }
@@ -108,7 +108,7 @@ H{
        { vreg 1 }
        { start 0 }
        { end 5 }
-       { uses V{ 0 1 5 } }
+       { uses V{ T{ vreg-use f 0 } T{ vreg-use f 1 } T{ vreg-use f 5 } } }
        { ranges V{ T{ live-range f 0 5 } } }
     } 2 split-for-spill
 ] unit-test
@@ -118,7 +118,7 @@ H{
        { vreg 2 }
        { start 0 }
        { end 1 }
-       { uses V{ 0 } }
+       { uses V{ T{ vreg-use f 0 } } }
        { ranges V{ T{ live-range f 0 1 } } }
        { spill-to T{ spill-slot f 4 } }
     }
@@ -126,7 +126,7 @@ H{
        { vreg 2 }
        { start 1 }
        { end 5 }
-       { uses V{ 1 5 } }
+       { uses V{ T{ vreg-use f 1 } T{ vreg-use f 5 } } }
        { ranges V{ T{ live-range f 1 5 } } }
        { reload-from T{ spill-slot f 4 } }
     }
@@ -135,7 +135,7 @@ H{
        { vreg 2 }
        { start 0 }
        { end 5 }
-       { uses V{ 0 1 5 } }
+       { uses V{ T{ vreg-use f 0 } T{ vreg-use f 1 } T{ vreg-use f 5 } } }
        { ranges V{ T{ live-range f 0 5 } } }
     } 0 split-for-spill
 ] unit-test
@@ -145,7 +145,7 @@ H{
        { vreg 3 }
        { start 0 }
        { end 1 }
-       { uses V{ 0 } }
+       { uses V{ T{ vreg-use f 0 } } }
        { ranges V{ T{ live-range f 0 1 } } }
        { spill-to T{ spill-slot f 8 } }
     }
@@ -153,7 +153,7 @@ H{
        { vreg 3 }
        { start 20 }
        { end 30 }
-       { uses V{ 20 30 } }
+       { uses V{ T{ vreg-use f 20 } T{ vreg-use f 30 } } }
        { ranges V{ T{ live-range f 20 30 } } }
        { reload-from T{ spill-slot f 8 } }
     }
@@ -162,7 +162,7 @@ H{
        { vreg 3 }
        { start 0 }
        { end 30 }
-       { uses V{ 0 20 30 } }
+       { uses V{ T{ vreg-use f 0 } T{ vreg-use f 20 } T{ vreg-use f 30 } } }
        { ranges V{ T{ live-range f 0 8 } T{ live-range f 10 18 } T{ live-range f 20 30 } } }
     } 10 split-for-spill
 ] unit-test
@@ -187,21 +187,21 @@ H{
                  { reg 1 }
                  { start 1 }
                  { end 15 }
-                 { uses V{ 1 3 7 10 15 } }
+                 { uses V{ T{ vreg-use f 1 } T{ vreg-use f 3 } T{ vreg-use f 7 } T{ vreg-use f 10 } T{ vreg-use f 15 } } }
               }
               T{ live-interval
                  { vreg 2 }
                  { reg 2 }
                  { start 3 }
                  { end 8 }
-                 { uses V{ 3 4 8 } }
+                 { uses V{ T{ vreg-use f 3 } T{ vreg-use f 4 } T{ vreg-use f 8 } } }
               }
               T{ live-interval
                  { vreg 3 }
                  { reg 3 }
                  { start 3 }
                  { end 10 }
-                 { uses V{ 3 10 } }
+                 { uses V{ T{ vreg-use f 3 } T{ vreg-use f 10 } } }
               }
           }
         }
@@ -211,7 +211,7 @@ H{
         { vreg 1 }
         { start 5 }
         { end 5 }
-        { uses V{ 5 } }
+        { uses V{ T{ vreg-use f 5 } } }
     }
     spill-status
 ] unit-test
@@ -230,14 +230,14 @@ H{
                  { reg 1 }
                  { start 1 }
                  { end 15 }
-                 { uses V{ 1 } }
+                 { uses V{ T{ vreg-use f 1 } } }
               }
               T{ live-interval
                  { vreg 2 }
                  { reg 2 }
                  { start 3 }
                  { end 8 }
-                 { uses V{ 3 8 } }
+                 { uses V{ T{ vreg-use f 3 } T{ vreg-use f 8 } } }
               }
           }
         }
@@ -247,7 +247,7 @@ H{
         { vreg 3 }
         { start 5 }
         { end 5 }
-        { uses V{ 5 } }
+        { uses V{ T{ vreg-use f 5 } } }
     }
     spill-status
 ] unit-test
@@ -260,7 +260,7 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
            { vreg 1 }
            { start 0 }
            { end 100 }
-           { uses V{ 0 100 } }
+           { uses V{ T{ vreg-use f 0 } T{ vreg-use f 100 } } }
            { ranges V{ T{ live-range f 0 100 } } }
         }
     }
@@ -274,14 +274,14 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
            { vreg 1 }
            { start 0 }
            { end 10 }
-           { uses V{ 0 10 } }
+           { uses V{ T{ vreg-use f 0 } T{ vreg-use f 10 } } }
            { ranges V{ T{ live-range f 0 10 } } }
         }
         T{ live-interval
            { vreg 2 }
            { start 11 }
            { end 20 }
-           { uses V{ 11 20 } }
+           { uses V{ T{ vreg-use f 11 } T{ vreg-use f 20 } } }
            { ranges V{ T{ live-range f 11 20 } } }
         }
     }
@@ -295,14 +295,14 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
            { vreg 1 }
            { start 0 }
            { end 100 }
-           { uses V{ 0 100 } }
+           { uses V{ T{ vreg-use f 0 } T{ vreg-use f 100 } } }
            { ranges V{ T{ live-range f 0 100 } } }
         }
         T{ live-interval
            { vreg 2 }
            { start 30 }
            { end 60 }
-           { uses V{ 30 60 } }
+           { uses V{ T{ vreg-use f 30 } T{ vreg-use f 60 } } }
            { ranges V{ T{ live-range f 30 60 } } }
         }
     }
@@ -316,14 +316,14 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
            { vreg 1 }
            { start 0 }
            { end 100 }
-           { uses V{ 0 100 } }
+           { uses V{ T{ vreg-use f 0 } T{ vreg-use f 100 } } }
            { ranges V{ T{ live-range f 0 100 } } }
         }
         T{ live-interval
            { vreg 2 }
            { start 30 }
            { end 200 }
-           { uses V{ 30 200 } }
+           { uses V{ T{ vreg-use f 30 } T{ vreg-use f 200 } } }
            { ranges V{ T{ live-range f 30 200 } } }
         }
     }
@@ -337,14 +337,14 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
            { vreg 1 }
            { start 0 }
            { end 100 }
-           { uses V{ 0 100 } }
+           { uses V{ T{ vreg-use f 0 } T{ vreg-use f 100 } } }
            { ranges V{ T{ live-range f 0 100 } } }
         }
         T{ live-interval
            { vreg 2 }
            { start 30 }
            { end 100 }
-           { uses V{ 30 100 } }
+           { uses V{ T{ vreg-use f 30 } T{ vreg-use f 100 } } }
            { ranges V{ T{ live-range f 30 100 } } }
         }
     }
@@ -367,28 +367,28 @@ H{
            { vreg 1 }
            { start 0 }
            { end 20 }
-           { uses V{ 0 10 20 } }
+           { uses V{ T{ vreg-use f 0 } T{ vreg-use f 10 } T{ vreg-use f 20 } } }
            { ranges V{ T{ live-range f 0 2 } T{ live-range f 10 20 } } }
         }
         T{ live-interval
            { vreg 2 }
            { start 0 }
            { end 20 }
-           { uses V{ 0 10 20 } }
+           { uses V{ T{ vreg-use f 0 } T{ vreg-use f 10 } T{ vreg-use f 20 } } }
            { ranges V{ T{ live-range f 0 2 } T{ live-range f 10 20 } } }
         }
         T{ live-interval
            { vreg 3 }
            { start 4 }
            { end 8 }
-           { uses V{ 6 } }
+           { uses V{ T{ vreg-use f 6 } } }
            { ranges V{ T{ live-range f 4 8 } } }
         }
         T{ live-interval
            { vreg 4 }
            { start 4 }
            { end 8 }
-           { uses V{ 8 } }
+           { uses V{ T{ vreg-use f 8 } } }
            { ranges V{ T{ live-range f 4 8 } } }
         }
 
@@ -397,7 +397,7 @@ H{
            { vreg 5 }
            { start 4 }
            { end 8 }
-           { uses V{ 8 } }
+           { uses V{ T{ vreg-use f 8 } } }
            { ranges V{ T{ live-range f 4 8 } } }
         }
     }
@@ -413,7 +413,7 @@ H{
            { vreg 1 }
            { start 0 }
            { end 10 }
-           { uses V{ 0 6 10 } }
+           { uses V{ T{ vreg-use f 0 } T{ vreg-use f 6 } T{ vreg-use f 10 } } }
            { ranges V{ T{ live-range f 0 10 } } }
         }
 
@@ -422,7 +422,7 @@ H{
            { vreg 5 }
            { start 2 }
            { end 8 }
-           { uses V{ 8 } }
+           { uses V{ T{ vreg-use f 8 } } }
            { ranges V{ T{ live-range f 2 8 } } }
         }
     }
@@ -558,7 +558,7 @@ H{
         { start 8 }
         { end 10 }
         { ranges V{ T{ live-range f 8 10 } } }
-        { uses V{ 8 10 } }
+        { uses V{ T{ vreg-use f 8 } T{ vreg-use f 10 } } }
     }
     register-status
 ] unit-test
