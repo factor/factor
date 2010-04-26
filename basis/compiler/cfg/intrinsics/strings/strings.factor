@@ -5,9 +5,11 @@ compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.stacks cpu.architecture ;
 IN: compiler.cfg.intrinsics.strings
 
-: emit-string-nth ( -- )
-    2inputs swap ^^string-nth ds-push ;
+: (string-nth) ( n string -- base offset rep c-type )
+    ^^tagged>integer swap ^^add string-offset int-rep uchar ; inline
+
+: emit-string-nth-fast ( -- )
+    2inputs (string-nth) ^^load-memory-imm ds-push ;
 
 : emit-set-string-nth-fast ( -- )
-    3inputs ^^tagged>integer ^^add string-offset
-    int-rep uchar ##store-memory-imm ;
+    3inputs (string-nth) ##store-memory-imm ;

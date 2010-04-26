@@ -454,11 +454,10 @@ M: bad-executable summary
 \ set-slot { object object fixnum } { } define-primitive
 \ set-special-object { object fixnum } { } define-primitive
 \ set-string-nth-fast { fixnum fixnum string } { } define-primitive
-\ set-string-nth-slow { fixnum fixnum string } { } define-primitive
 \ size { object } { fixnum } define-primitive \ size make-flushable
 \ slot { object fixnum } { object } define-primitive \ slot make-flushable
 \ special-object { fixnum } { object } define-primitive \ special-object make-flushable
-\ string-nth { fixnum string } { fixnum } define-primitive \ string-nth make-flushable
+\ string-nth-fast { fixnum string } { fixnum } define-primitive \ string-nth-fast make-flushable
 \ strip-stack-traces { } { } define-primitive
 \ system-micros { } { integer } define-primitive \ system-micros make-flushable
 \ tag { object } { fixnum } define-primitive \ tag make-foldable

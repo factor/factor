@@ -381,10 +381,6 @@ struct factor_vm
 	cell std_vector_to_array(std::vector<cell> &elements);
 
 	// strings
-	cell string_nth(const string *str, cell index);
-	void set_string_nth_fast(string *str, cell index, cell ch);
-	void set_string_nth_slow(string *str_, cell index, cell ch);
-	void set_string_nth(string *str, cell index, cell ch);
 	string *allot_string_internal(cell capacity);
 	void fill_string(string *str_, cell start, cell capacity, cell fill);
 	string *allot_string(cell capacity, cell fill);
@@ -392,9 +388,7 @@ struct factor_vm
 	bool reallot_string_in_place_p(string *str, cell capacity);
 	string* reallot_string(string *str_, cell capacity);
 	void primitive_resize_string();
-	void primitive_string_nth();
 	void primitive_set_string_nth_fast();
-	void primitive_set_string_nth_slow();
 
 	// booleans
 	cell tag_boolean(cell untagged)

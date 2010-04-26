@@ -328,32 +328,6 @@ M: x86.64 has-small-reg? 2drop t ;
         [ quot call ] with-save/restore
     ] if ; inline
 
-M:: x86 %string-nth ( dst src index temp -- )
-    ! We request a small-reg of size 8 since those of size 16 are
-    ! a superset.
-    "end" define-label
-    dst { src index temp } 8 [| new-dst |
-        ! Load the least significant 7 bits into new-dst.
-        ! 8th bit indicates whether we have to load from
-        ! the aux vector or not.
-        new-dst 8-bit-version-of src index string-offset [++] MOV
-        new-dst new-dst 8-bit-version-of MOVZX
-        ! Do we have to look at the aux vector?
-        new-dst HEX: 80 CMP
-        "end" get JL
-        ! Yes, this is a non-ASCII character. Load aux vector
-        temp src string-aux-offset [+] MOV
-        new-dst temp XCHG
-        ! Load high 16 bits
-        new-dst 16-bit-version-of new-dst index byte-array-offset [+*2+] MOV
-        new-dst new-dst 16-bit-version-of MOVZX
-        new-dst 7 SHL
-        ! Compute code point
-        new-dst temp XOR
-        "end" resolve-label
-        dst new-dst int-rep %copy
-    ] with-small-register ;
-
 :: %alien-integer-getter ( dst exclude address bits quot -- )
     dst exclude bits [| new-dst |
         new-dst dup bits n-bit-version-of dup address MOV

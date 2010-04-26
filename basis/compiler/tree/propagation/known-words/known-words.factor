@@ -254,8 +254,8 @@ generic-comparison-ops [
     ] "outputs" set-word-prop
 ] each
 
-\ string-nth [
-    2drop fixnum 0 23 2^ [a,b] <class/interval-info>
+\ string-nth-fast [
+    2drop fixnum 0 255 [a,b] <class/interval-info>
 ] "outputs" set-word-prop
 
 {

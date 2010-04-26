@@ -205,8 +205,6 @@ struct string : public object {
 	cell hashcode;
 
 	u8 *data() const { return (u8 *)(this + 1); }
-
-	cell nth(cell i) const;
 };
 
 struct code_block;
