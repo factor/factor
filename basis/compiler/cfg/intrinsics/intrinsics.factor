@@ -56,7 +56,7 @@ IN: compiler.cfg.intrinsics
     { kernel:eq? [ emit-eq ] }
     { slots.private:slot [ emit-slot ] }
     { slots.private:set-slot [ emit-set-slot ] }
-    { strings.private:string-nth [ drop emit-string-nth ] }
+    { strings.private:string-nth-fast [ drop emit-string-nth-fast ] }
     { strings.private:set-string-nth-fast [ drop emit-set-string-nth-fast ] }
     { classes.tuple.private:<tuple-boa> [ emit-<tuple-boa> ] }
     { arrays:<array> [ emit-<array> ] }

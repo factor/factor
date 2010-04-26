@@ -97,15 +97,6 @@ IN: compiler.tests.low-level-ir
     } compile-test-bb
 ] unit-test
 
-[ CHAR: l ] [
-    V{
-        T{ ##load-reference f 0 "hello world" }
-        T{ ##load-tagged f 1 3 }
-        T{ ##string-nth f 0 0 1 2 }
-        T{ ##shl-imm f 0 0 4 }
-    } compile-test-bb
-] unit-test
-
 [ 1 ] [
     V{
         T{ ##load-tagged f 0 32 }

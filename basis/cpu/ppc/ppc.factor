@@ -144,22 +144,6 @@ M: ppc %slot-imm ( dst obj slot tag -- ) slot-offset LWZ ;
 M: ppc %set-slot ( src obj slot -- ) swapd STWX ;
 M: ppc %set-slot-imm ( src obj slot tag -- ) slot-offset STW ;
 
-M:: ppc %string-nth ( dst src index temp -- )
-    [
-        "end" define-label
-        temp src index ADD
-        dst temp string-offset LBZ
-        0 dst HEX: 80 CMPI
-        "end" get BLT
-        temp src string-aux-offset LWZ
-        temp temp index ADD
-        temp temp index ADD
-        temp temp byte-array-offset LHZ
-        temp temp 7 SLWI
-        dst dst temp XOR
-        "end" resolve-label
-    ] with-scope ;
-
 M: ppc %add     ADD ;
 M: ppc %add-imm ADDI ;
 M: ppc %sub     swap SUBF ;

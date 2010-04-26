@@ -89,12 +89,6 @@ INSN: ##set-slot-imm
 use: src/tagged-rep obj/tagged-rep
 literal: slot tag ;
 
-! String element access
-INSN: ##string-nth
-def: dst/int-rep
-use: obj/tagged-rep index/int-rep
-temp: temp/int-rep ;
-
 ! Register transfers
 INSN: ##copy
 def: dst
@@ -806,7 +800,6 @@ UNION: kill-vreg-insn
 UNION: def-is-use-insn
 ##box-alien
 ##box-displaced-alien
-##string-nth
 ##unbox-any-c-ptr ;
 
 SYMBOL: vreg-insn

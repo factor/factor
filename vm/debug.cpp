@@ -6,7 +6,7 @@ namespace factor
 std::ostream &operator<<(std::ostream &out, const string *str)
 {
 	for(cell i = 0; i < string_capacity(str); i++)
-		out << (char)str->nth(i);
+		out << (char)str->data()[i];
 	return out;
 }
 
