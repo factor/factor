@@ -370,6 +370,7 @@ tuple
     { "fixnum<=" "math.private" (( x y -- z )) }
     { "fixnum>" "math.private" (( x y -- ? )) }
     { "fixnum>=" "math.private" (( x y -- ? )) }
+    { "string-nth-fast" "strings.private" (( n string -- ch )) }
     { "(set-context)" "threads.private" (( obj context -- obj' )) }
     { "(set-context-and-delete)" "threads.private" (( obj context -- * )) }
     { "(start-context)" "threads.private" (( obj quot -- obj' )) }
@@ -533,8 +534,6 @@ tuple
     { "<string>" "strings" "primitive_string" (( n ch -- string )) }
     { "resize-string" "strings" "primitive_resize_string" (( n str -- newstr )) }
     { "set-string-nth-fast" "strings.private" "primitive_set_string_nth_fast" (( ch n string -- )) }
-    { "set-string-nth-slow" "strings.private" "primitive_set_string_nth_slow" (( ch n string -- )) }
-    { "string-nth" "strings.private" "primitive_string_nth" (( n string -- ch )) }
     { "(exit)" "system" "primitive_exit" (( n -- * )) }
     { "nano-count" "system" "primitive_nano_count" (( -- ns )) }
     { "system-micros" "system" "primitive_system_micros" (( -- us )) }

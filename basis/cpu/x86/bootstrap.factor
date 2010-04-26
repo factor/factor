@@ -3,7 +3,8 @@
 USING: bootstrap.image.private compiler.constants
 compiler.units cpu.x86.assembler cpu.x86.assembler.operands
 kernel kernel.private layouts locals.backend make math
-math.private namespaces sequences slots.private vocabs ;
+math.private namespaces sequences slots.private strings.private
+vocabs ;
 IN: bootstrap.x86
 
 big-endian off
@@ -293,6 +294,21 @@ big-endian off
     ! push to stack
     ds-reg [] temp0 MOV
 ] \ slot define-sub-primitive
+
+[
+    ! load string index from stack
+    temp0 ds-reg bootstrap-cell neg [+] MOV
+    temp0 tag-bits get SHR
+    ! load string from stack
+    temp1 ds-reg [] MOV
+    ! load character
+    temp0 8-bit-version-of temp0 temp1 string-offset [++] MOV
+    temp0 temp0 8-bit-version-of MOVZX
+    temp0 tag-bits get SHL
+    ! store character to stack
+    ds-reg bootstrap-cell SUB
+    ds-reg [] temp0 MOV
+] \ string-nth-fast define-sub-primitive
 
 ! Shufflers
 [

@@ -93,7 +93,6 @@ CODEGEN: ##slot %slot
 CODEGEN: ##slot-imm %slot-imm
 CODEGEN: ##set-slot %set-slot
 CODEGEN: ##set-slot-imm %set-slot-imm
-CODEGEN: ##string-nth %string-nth
 CODEGEN: ##add %add
 CODEGEN: ##add-imm %add-imm
 CODEGEN: ##sub %sub

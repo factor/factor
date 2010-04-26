@@ -968,3 +968,10 @@ M: tuple-with-read-only-slot clone
 
 [ t ] [ [ { 1 } diff ] { diff } inlined? ] unit-test
 [ f ] [ [ { 1 } swap diff ] { diff } inlined? ] unit-test ! We could do this
+
+! Output range for string-nth now that string-nth is a library word and
+! not a primitive
+[ t ] [
+    ! Should actually be 0 23 2^ 1 - [a,b]
+    [ string-nth ] final-info first interval>> 0 23 2^ [a,b] =
+] unit-test
