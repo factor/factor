@@ -272,9 +272,9 @@ HOOK: %copy cpu ( dst src rep -- )
 
 : %tagged>integer ( dst src -- ) int-rep %copy ;
 
-HOOK: %fixnum-add cpu ( label dst src1 src2 -- )
-HOOK: %fixnum-sub cpu ( label dst src1 src2 -- )
-HOOK: %fixnum-mul cpu ( label dst src1 src2 -- )
+HOOK: %fixnum-add cpu ( label dst src1 src2 cc -- )
+HOOK: %fixnum-sub cpu ( label dst src1 src2 cc -- )
+HOOK: %fixnum-mul cpu ( label dst src1 src2 cc -- )
 
 HOOK: %add-float cpu ( dst src1 src2 -- )
 HOOK: %sub-float cpu ( dst src1 src2 -- )
@@ -463,10 +463,8 @@ HOOK: %write-barrier cpu ( src slot scale tag temp1 temp2 -- )
 HOOK: %write-barrier-imm cpu ( src slot tag temp1 temp2 -- )
 
 ! GC checks
-HOOK: %check-nursery cpu ( label size temp1 temp2 -- )
-HOOK: %save-gc-root cpu ( gc-root register -- )
-HOOK: %load-gc-root cpu ( gc-root register -- )
-HOOK: %call-gc cpu ( gc-root-count temp1 -- )
+HOOK: %check-nursery-branch cpu ( label size cc temp1 temp2 -- )
+HOOK: %call-gc cpu ( gc-roots -- )
 
 HOOK: %prologue cpu ( n -- )
 HOOK: %epilogue cpu ( n -- )

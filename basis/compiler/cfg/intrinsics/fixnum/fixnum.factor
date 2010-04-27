@@ -4,6 +4,7 @@ USING: sequences accessors layouts kernel math math.intervals
 namespaces combinators fry arrays
 cpu.architecture
 compiler.tree.propagation.info
+compiler.cfg
 compiler.cfg.hats
 compiler.cfg.stacks
 compiler.cfg.instructions
@@ -55,7 +56,7 @@ IN: compiler.cfg.intrinsics.fixnum
 : emit-fixnum-overflow-op ( quot word -- )
     ! Inputs to the final instruction need to be copied because
     ! of loc>vreg sync
-    [ [ (2inputs) [ any-rep ^^copy ] bi@ ] dip call ] dip
+    [ [ (2inputs) [ any-rep ^^copy ] bi@ cc/o ] dip call ] dip
     [ emit-no-overflow-case ] [ emit-overflow-case ] bi* 2array
     emit-conditional ; inline
 

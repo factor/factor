@@ -465,7 +465,7 @@ big-endian off
     ! multiply
     temp0 temp1 IMUL2
     ! push result
-    ds-reg [] temp1 MOV
+    ds-reg [] temp0 MOV
 ] \ fixnum*fast define-sub-primitive
 
 [ \ AND jit-math ] \ fixnum-bitand define-sub-primitive

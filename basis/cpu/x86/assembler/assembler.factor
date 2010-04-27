@@ -334,7 +334,7 @@ PRIVATE>
 : SAR ( dst n -- ) BIN: 111 (SHIFT) ;
 
 : IMUL2 ( dst src -- )
-    swap OCT: 257 extended-opcode (2-operand) ;
+    OCT: 257 extended-opcode (2-operand) ;
 
 : IMUL3 ( dst src imm -- )
     dup fits-in-byte? [

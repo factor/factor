@@ -30,6 +30,9 @@ GENERIC: generate-insn ( insn -- )
 ! Mapping _label IDs to label instances
 SYMBOL: labels
 
+: lookup-label ( id -- label )
+    labels get [ drop <label> ] cache ;
+
 : generate ( mr -- code )
     dup label>> [
         H{ } clone labels set
@@ -40,16 +43,8 @@ SYMBOL: labels
         ] each
     ] with-fixup ;
 
-: lookup-label ( id -- label )
-    labels get [ drop <label> ] cache ;
-
 ! Special cases
 M: ##no-tco generate-insn drop ;
-
-M: _dispatch-label generate-insn
-    label>> lookup-label
-    cell 0 <repetition> %
-    rc-absolute-cell label-fixup ;
 
 M: _prologue generate-insn
     stack-frame>> [ stack-frame set ] [ total-size>> %prologue ] bi ;
@@ -76,6 +71,7 @@ M: _spill-area-size generate-insn drop ;
 SYNTAX: CODEGEN:
     scan-word [ \ generate-insn create-method-in ] keep scan-word
     codegen-method-body define ;
+
 >>
 
 CODEGEN: ##load-integer %load-immediate
@@ -203,67 +199,45 @@ CODEGEN: ##save-context %save-context
 CODEGEN: ##vm-field %vm-field
 CODEGEN: ##set-vm-field %set-vm-field
 CODEGEN: ##alien-global %alien-global
+CODEGEN: ##call-gc %call-gc
 
-CODEGEN: _fixnum-add %fixnum-add
-CODEGEN: _fixnum-sub %fixnum-sub
-CODEGEN: _fixnum-mul %fixnum-mul
+CODEGEN: ##dispatch %dispatch
+
+: %dispatch-label ( label -- )
+    cell 0 <repetition> %
+    rc-absolute-cell label-fixup ;
+
 CODEGEN: _label resolve-label
+CODEGEN: _dispatch-label %dispatch-label
 CODEGEN: _branch %jump-label
-CODEGEN: _compare-branch %compare-branch
-CODEGEN: _compare-imm-branch %compare-imm-branch
-CODEGEN: _compare-float-ordered-branch %compare-float-ordered-branch
-CODEGEN: _compare-float-unordered-branch %compare-float-unordered-branch
-CODEGEN: _test-vector-branch %test-vector-branch
-CODEGEN: _dispatch %dispatch
 CODEGEN: _spill %spill
 CODEGEN: _reload %reload
 CODEGEN: _loop-entry %loop-entry
 
-! ##gc
-: wipe-locs ( locs temp -- )
-    '[
-        _
-        [ 0 %load-immediate ]
-        [ swap [ %replace ] with each ] bi
-    ] unless-empty ;
+GENERIC: generate-conditional-insn ( label insn -- )
 
-GENERIC# save-gc-root 1 ( gc-root operand temp -- )
+<<
 
-M:: spill-slot save-gc-root ( gc-root operand temp -- )
-    temp int-rep operand %reload
-    gc-root temp %save-gc-root ;
+SYNTAX: CONDITIONAL:
+    scan-word [ \ generate-conditional-insn create-method-in ] keep scan-word
+    codegen-method-body define ;
 
-M: object save-gc-root drop %save-gc-root ;
+>>
 
-: save-gc-roots ( gc-roots temp -- ) '[ _ save-gc-root ] assoc-each ;
+CONDITIONAL: ##compare-branch %compare-branch
+CONDITIONAL: ##compare-imm-branch %compare-imm-branch
+CONDITIONAL: ##compare-integer-branch %compare-branch
+CONDITIONAL: ##compare-integer-imm-branch %compare-imm-branch
+CONDITIONAL: ##compare-float-ordered-branch %compare-float-ordered-branch
+CONDITIONAL: ##compare-float-unordered-branch %compare-float-unordered-branch
+CONDITIONAL: ##test-vector-branch %test-vector-branch
+CONDITIONAL: ##check-nursery-branch %check-nursery-branch
+CONDITIONAL: ##fixnum-add %fixnum-add
+CONDITIONAL: ##fixnum-sub %fixnum-sub
+CONDITIONAL: ##fixnum-mul %fixnum-mul
 
-: save-data-regs ( data-regs -- ) [ first3 %spill ] each ;
-
-GENERIC# load-gc-root 1 ( gc-root operand temp -- )
-
-M:: spill-slot load-gc-root ( gc-root operand temp -- )
-    gc-root temp %load-gc-root
-    temp int-rep operand %spill ;
-
-M: object load-gc-root drop %load-gc-root ;
-
-: load-gc-roots ( gc-roots temp -- ) '[ _ load-gc-root ] assoc-each ;
-
-: load-data-regs ( data-regs -- ) [ first3 %reload ] each ;
-
-M: ##gc generate-insn
-    "no-gc" define-label
-    {
-        [ [ "no-gc" get ] dip [ size>> ] [ temp1>> ] [ temp2>> ] tri %check-nursery ]
-        [ [ uninitialized-locs>> ] [ temp1>> ] bi wipe-locs ]
-        [ data-values>> save-data-regs ]
-        [ [ tagged-values>> ] [ temp1>> ] bi save-gc-roots ]
-        [ [ temp1>> ] [ temp2>> ] bi %save-context ]
-        [ [ tagged-values>> length ] [ temp1>> ] bi %call-gc ]
-        [ [ tagged-values>> ] [ temp1>> ] bi load-gc-roots ]
-        [ data-values>> load-data-regs ]
-    } cleave
-    "no-gc" resolve-label ;
+M: _conditional-branch generate-insn
+    [ label>> lookup-label ] [ insn>> ] bi generate-conditional-insn ;
 
 ! ##alien-invoke
 GENERIC: next-fastcall-param ( rep -- )

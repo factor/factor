@@ -78,11 +78,11 @@ SYMBOL: temp
 
 : mapping-instructions ( alist -- insns )
     [ swap ] H{ } assoc-map-as
-    [ temp [ swap >insn ] parallel-mapping ] { } make ;
+    [ temp [ swap >insn ] parallel-mapping ##branch ] { } make ;
 
 : perform-mappings ( bb to mappings -- )
     dup empty? [ 3drop ] [
-        mapping-instructions insert-simple-basic-block
+        mapping-instructions insert-basic-block
         cfg get cfg-changed drop
     ] if ;
 

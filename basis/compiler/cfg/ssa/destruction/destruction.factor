@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs fry kernel namespaces
 sequences sequences.deep
@@ -93,25 +93,32 @@ M: ##phi prepare-insn
         [ 2drop ] [ eliminate-copy ] if
     ] assoc-each ;
 
-: useless-copy? ( ##copy -- ? )
-    dup ##copy? [ [ dst>> ] [ src>> ] bi eq? ] [ drop f ] if ;
+GENERIC: rename-insn ( insn -- keep? )
+
+M: vreg-insn rename-insn
+    [ rename-insn-defs ] [ rename-insn-uses ] bi t ;
+
+M: ##copy rename-insn
+    [ call-next-method drop ]
+    [ [ dst>> ] [ src>> ] bi eq? not ] bi ;
+
+M: ##phi rename-insn drop f ;
+
+M: ##call-gc rename-insn
+    [ renamings get '[ _ at ] map members ] change-gc-roots drop t ;
+
+M: insn rename-insn drop t ;
 
 : perform-renaming ( cfg -- )
     leader-map get keys [ dup leader ] H{ } map>assoc renamings set
-    [
-        instructions>> [
-            [ rename-insn-defs ]
-            [ rename-insn-uses ]
-            [ [ useless-copy? ] [ ##phi? ] bi or not ] tri
-        ] filter! drop
-    ] each-basic-block ;
+    [ instructions>> [ rename-insn ] filter! drop ] each-basic-block ;
 
 : destruct-ssa ( cfg -- cfg' )
     needs-dominance
 
     dup construct-cssa
     dup compute-defs
-    compute-ssa-live-sets
+    dup compute-ssa-live-sets
     dup compute-live-ranges
     dup prepare-coalescing
     process-copies

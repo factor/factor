@@ -102,7 +102,7 @@ M: vreg-insn compute-live-intervals*
     [ dup temp-vregs [ handle-temp ] with each ]
     tri ;
 
-M: partial-sync-insn compute-live-intervals*
+M: clobber-insn compute-live-intervals*
     [ dup defs-vreg [ +use+ handle-output ] with when* ]
     [ dup uses-vregs [ +memory+ handle-input ] with each ]
     [ dup temp-vregs [ handle-temp ] with each ]
@@ -122,7 +122,7 @@ SYMBOL: sync-points
 
 GENERIC: compute-sync-points* ( insn -- )
 
-M: partial-sync-insn compute-sync-points*
+M: clobber-insn compute-sync-points*
     insn#>> <sync-point> sync-points get push ;
 
 M: insn compute-sync-points* drop ;
