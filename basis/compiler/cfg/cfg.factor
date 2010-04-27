@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math vectors arrays accessors namespaces ;
 IN: compiler.cfg
@@ -8,7 +8,8 @@ TUPLE: basic-block < identity-tuple
 number
 { instructions vector }
 { successors vector }
-{ predecessors vector } ;
+{ predecessors vector }
+{ unlikely? boolean } ;
 
 : <basic-block> ( -- bb )
     basic-block new

@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs arrays classes combinators
 compiler.units fry generalizations generic kernel locals
@@ -18,6 +18,10 @@ M: insn temp-vregs drop { } ;
 M: insn uses-vregs drop { } ;
 
 M: ##phi uses-vregs inputs>> values ;
+
+M: _conditional-branch defs-vreg insn>> defs-vreg ;
+
+M: _conditional-branch uses-vregs insn>> uses-vregs ;
 
 <PRIVATE
 
@@ -55,7 +59,7 @@ PRIVATE>
 [
     insn-classes get
     [ [ define-defs-vreg-method ] each ]
-    [ { ##phi } diff [ define-uses-vregs-method ] each ]
+    [ { ##phi _conditional-branch } diff [ define-uses-vregs-method ] each ]
     [ [ define-temp-vregs-method ] each ]
     tri
 ] with-compilation-unit

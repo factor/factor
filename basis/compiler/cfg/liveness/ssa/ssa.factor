@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces deques accessors sets sequences assocs fry
 hashtables dlists compiler.cfg.def-use compiler.cfg.instructions
@@ -48,14 +48,14 @@ SYMBOL: work-list
         [ predecessors>> add-to-work-list ] [ drop ] if
     ] [ drop ] if ;
 
-: compute-ssa-live-sets ( cfg -- cfg' )
+: compute-ssa-live-sets ( cfg -- )
     needs-predecessors
 
     <hashed-dlist> work-list set
     H{ } clone live-ins set
     H{ } clone phi-live-ins set
     H{ } clone live-outs set
-    dup post-order add-to-work-list
+    post-order add-to-work-list
     work-list get [ liveness-step ] slurp-deque ;
 
 : live-in? ( vreg bb -- ? ) live-in key? ;

@@ -37,11 +37,24 @@ SYMBOL: visited
 : skip-empty-blocks ( bb -- bb' )
     H{ } clone visited [ (skip-empty-blocks) ] with-variable ;
 
-:: insert-basic-block ( froms to bb -- )
-    bb froms V{ } like >>predecessors drop
-    bb to 1vector >>successors drop
-    to predecessors>> [ dup froms member-eq? [ drop bb ] when ] map! drop
-    froms [ successors>> [ dup to eq? [ drop bb ] when ] map! drop ] each ;
+:: update-predecessors ( from to bb -- )
+    ! Update 'to' predecessors for insertion of 'bb' between
+    ! 'from' and 'to'.
+    to predecessors>> [ dup from eq? [ drop bb ] when ] map! drop ;
+
+:: update-successors ( from to bb -- )
+    ! Update 'from' successors for insertion of 'bb' between
+    ! 'from' and 'to'.
+    from successors>> [ dup to eq? [ drop bb ] when ] map! drop ;
+
+:: insert-basic-block ( from to insns -- )
+    ! Insert basic block on the edge between 'from' and 'to'.
+    <basic-block> :> bb
+    insns V{ } like bb (>>instructions)
+    V{ from } bb (>>predecessors)
+    V{ to } bb (>>successors)
+    from to bb update-predecessors
+    from to bb update-successors ;
 
 : add-instructions ( bb quot -- )
     [ instructions>> building ] dip '[
@@ -49,15 +62,6 @@ SYMBOL: visited
         [ @ ] dip
         ,
     ] with-variable ; inline
-
-: <simple-block> ( insns -- bb )
-    <basic-block>
-    swap >vector
-    \ ##branch new-insn over push
-    >>instructions ;
-
-: insert-simple-basic-block ( from to insns -- )
-    [ 1vector ] 2dip <simple-block> insert-basic-block ;
 
 : has-phis? ( bb -- ? )
     instructions>> first ##phi? ;

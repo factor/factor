@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors combinators namespaces
 compiler.cfg.tco
@@ -12,6 +12,8 @@ compiler.cfg.copy-prop
 compiler.cfg.dce
 compiler.cfg.write-barrier
 compiler.cfg.representations
+compiler.cfg.gc-checks
+compiler.cfg.save-contexts
 compiler.cfg.ssa.destruction
 compiler.cfg.empty-blocks
 compiler.cfg.checker ;
@@ -36,6 +38,8 @@ SYMBOL: check-optimizer?
     eliminate-dead-code
     eliminate-write-barriers
     select-representations
+    insert-gc-checks
+    insert-save-contexts
     destruct-ssa
     delete-empty-blocks
     ?check ;

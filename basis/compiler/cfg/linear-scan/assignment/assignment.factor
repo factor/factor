@@ -126,39 +126,9 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 M: vreg-insn assign-registers-in-insn
     [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ;
 
-: trace-on-gc ( assoc -- assoc' )
-    ! When a GC occurs, virtual registers which contain tagged data
-    ! are traced by the GC. Outputs a sequence physical registers.
-    [ drop rep-of tagged-rep eq? ] { } assoc-filter-as values ;
-
-: spill-on-gc? ( vreg reg -- ? )
-    [ rep-of tagged-rep? not ] [ spill-slot? not ] bi* and ;
-
-: spill-on-gc ( assoc -- assoc' )
-    ! When a GC occurs, virtual registers which contain untagged data,
-    ! and are stored in physical registers, are saved to their spill
-    ! slots. Outputs sequence of triples:
-    ! - physical register
-    ! - spill slot
-    ! - representation
-    [
-        [
-            2dup spill-on-gc?
-            [ swap [ rep-of ] [ vreg-spill-slot ] bi 3array , ] [ 2drop ] if
-        ] assoc-each
-    ] { } make ;
-
-: gc-root-offsets ( registers -- alist )
-    ! Outputs a sequence of { offset register/spill-slot } pairs
-    [ length iota [ cell * ] map ] keep zip ;
-
-M: ##gc assign-registers-in-insn
-    ! Since ##gc is always the first instruction in a block, the set of
-    ! values live at the ##gc is just live-in.
+M: ##call-gc assign-registers-in-insn
     dup call-next-method
-    basic-block get register-live-ins get at
-    [ trace-on-gc gc-root-offsets >>tagged-values ] [ spill-on-gc >>data-values ] bi
-    drop ;
+    [ [ vreg>reg ] map ] change-gc-roots drop ;
 
 M: insn assign-registers-in-insn drop ;
 
