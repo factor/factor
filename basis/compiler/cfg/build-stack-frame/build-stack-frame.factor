@@ -25,12 +25,10 @@ M: stack-frame-insn compute-stack-frame*
 
 M: ##call compute-stack-frame* drop frame-required? on ;
 
-M: ##gc compute-stack-frame*
+M: ##call-gc compute-stack-frame*
+    drop
     frame-required? on
-    stack-frame new
-        swap tagged-values>> length cells >>gc-root-size
-        t >>calls-vm?
-    request-stack-frame ;
+    stack-frame new t >>calls-vm? request-stack-frame ;
 
 M: _spill-area-size compute-stack-frame*
     n>> stack-frame get (>>spill-area-size) ;
@@ -40,6 +38,7 @@ M: insn compute-stack-frame*
         frame-required? on
     ] when ;
 
+! PowerPC backend sets frame-required? for ##integer>float!
 \ _spill t frame-required? set-word-prop
 \ ##unary-float-function t frame-required? set-word-prop
 \ ##binary-float-function t frame-required? set-word-prop

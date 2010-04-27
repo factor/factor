@@ -63,18 +63,19 @@ M: sync-point handle ( sync-point -- )
 
 : smallest-heap ( heap1 heap2 -- heap )
     ! If heap1 and heap2 have the same key, favors heap1.
-    [ [ heap-peek nip ] bi@ <= ] most ;
+    {
+        { [ dup heap-empty? ] [ drop ] }
+        { [ over heap-empty? ] [ nip ] }
+        [ [ [ heap-peek nip ] bi@ <= ] most ]
+    } cond ;
 
 : (allocate-registers) ( -- )
-    {
-        { [ unhandled-intervals get heap-empty? ] [ unhandled-sync-points get ] }
-        { [ unhandled-sync-points get heap-empty? ] [ unhandled-intervals get ] }
-        ! If a live interval begins at the same location as a sync point,
-        ! process the sync point before the live interval. This ensures that the
-        ! return value of C function calls doesn't get spilled and reloaded
-        ! unnecessarily.
-        [ unhandled-sync-points get unhandled-intervals get smallest-heap ]
-    } cond dup heap-empty? [ drop ] [ heap-pop drop handle (allocate-registers) ] if ;
+    ! If a live interval begins at the same location as a sync point,
+    ! process the sync point before the live interval. This ensures that the
+    ! return value of C function calls doesn't get spilled and reloaded
+    ! unnecessarily.
+    unhandled-sync-points get unhandled-intervals get smallest-heap
+    dup heap-empty? [ drop ] [ heap-pop drop handle (allocate-registers) ] if ;
 
 : finish-allocation ( -- )
     active-intervals inactive-intervals

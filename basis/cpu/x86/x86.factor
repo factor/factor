@@ -33,16 +33,18 @@ HOOK: extra-stack-space cpu ( stack-frame -- n )
 
 : stack@ ( n -- op ) stack-reg swap [+] ;
 
-: special@ ( n -- op )
+: special-offset ( m -- n )
     stack-frame get extra-stack-space +
-    reserved-stack-space +
-    stack@ ;
+    reserved-stack-space + ;
+
+: special@ ( n -- op ) special-offset stack@ ;
 
 : spill@ ( n -- op ) spill-offset special@ ;
 
-: gc-root@ ( n -- op ) gc-root-offset special@ ;
-
 : param@ ( n -- op ) reserved-stack-space + stack@ ;
+
+: gc-root-offsets ( seq -- seq' )
+    [ n>> special-offset ] map f like ;
 
 : decr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap SUB ] if ;
@@ -133,7 +135,7 @@ M: x86 %add     2over eq? [ nip ADD ] [ [+] LEA ] if ;
 M: x86 %add-imm 2over eq? [ nip ADD ] [ [+] LEA ] if ;
 M: x86 %sub     int-rep two-operand SUB ;
 M: x86 %sub-imm 2over eq? [ nip SUB ] [ neg [+] LEA ] if ;
-M: x86 %mul     int-rep two-operand swap IMUL2 ;
+M: x86 %mul     int-rep two-operand IMUL2 ;
 M: x86 %mul-imm IMUL3 ;
 M: x86 %and     int-rep two-operand AND ;
 M: x86 %and-imm int-rep two-operand AND ;
@@ -175,14 +177,21 @@ M: x86 %copy ( dst src rep -- )
         2over [ register? ] both? [ copy-register* ] [ copy-memory* ] if
     ] if ;
 
-M: x86 %fixnum-add ( label dst src1 src2 -- )
-    int-rep two-operand ADD JO ;
+: fixnum-overflow ( label dst src1 src2 cc quot -- )
+    swap [ [ int-rep two-operand ] dip call ] dip
+    {
+        { cc-o [ JO ] }
+        { cc/o [ JNO ] }
+    } case ; inline
 
-M: x86 %fixnum-sub ( label dst src1 src2 -- )
-    int-rep two-operand SUB JO ;
+M: x86 %fixnum-add ( label dst src1 src2 cc -- )
+    [ ADD ] fixnum-overflow ;
 
-M: x86 %fixnum-mul ( label dst src1 src2 -- )
-    int-rep two-operand swap IMUL2 JO ;
+M: x86 %fixnum-sub ( label dst src1 src2 cc -- )
+    [ SUB ] fixnum-overflow ;
+
+M: x86 %fixnum-mul ( label dst src1 src2 cc -- )
+    [ IMUL2 ] fixnum-overflow ;
 
 M: x86 %unbox-alien ( dst src -- )
     alien-offset [+] MOV ;
@@ -453,19 +462,15 @@ M:: x86 %write-barrier-imm ( src slot tag temp1 temp2 -- )
     temp1 src slot tag (%slot-imm) LEA
     temp1 temp2 (%write-barrier) ;
 
-M:: x86 %check-nursery ( label size temp1 temp2 -- )
+M:: x86 %check-nursery-branch ( label size cc temp1 temp2 -- )
     temp1 load-zone-offset
-    ! Load 'here' into temp2
     temp2 temp1 [] MOV
     temp2 size ADD
-    ! Load 'end' into temp1
-    temp1 temp1 2 cells [+] MOV
-    temp2 temp1 CMP
-    label JLE ;
-
-M: x86 %save-gc-root ( gc-root register -- ) [ gc-root@ ] dip MOV ;
-
-M: x86 %load-gc-root ( gc-root register -- ) swap gc-root@ MOV ;
+    temp2 temp1 2 cells [+] CMP
+    cc {
+        { cc<= [ label JLE ] }
+        { cc/<= [ label JG ] }
+    } case ;
 
 M: x86 %alien-global ( dst symbol library -- )
     [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;    

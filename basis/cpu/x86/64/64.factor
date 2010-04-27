@@ -267,14 +267,9 @@ M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
     func "libm" load-library %alien-invoke
     dst float-function-return ;
 
-M:: x86.64 %call-gc ( gc-root-count temp -- )
-    ! Pass pointer to start of GC roots as first parameter
-    param-reg-0 gc-root-base param@ LEA
-    ! Pass number of roots as second parameter
-    param-reg-1 gc-root-count MOV
-    ! Pass VM ptr as third parameter
-    param-reg-2 %mov-vm-ptr
-    ! Call GC
+M:: x86.64 %call-gc ( gc-roots -- )
+    param-reg-0 gc-roots gc-root-offsets %load-reference
+    param-reg-1 %mov-vm-ptr
     "inline_gc" f %alien-invoke ;
 
 M: x86.64 struct-return-pointer-type void* ;

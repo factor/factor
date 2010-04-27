@@ -344,11 +344,10 @@ M: x86.32 stack-cleanup ( params -- n )
 M: x86.32 %cleanup ( params -- )
     stack-cleanup [ ESP swap SUB ] unless-zero ;
 
-M:: x86.32 %call-gc ( gc-root-count temp -- )
-    temp gc-root-base special@ LEA
-    8 save-vm-ptr
-    4 stack@ gc-root-count MOV
-    0 stack@ temp MOV
+M:: x86.32 %call-gc ( gc-roots -- )
+    4 save-vm-ptr
+    EAX gc-roots gc-root-offsets %load-reference
+    0 stack@ EAX MOV
     "inline_gc" f %alien-invoke ;
 
 M: x86.32 dummy-stack-params? f ;

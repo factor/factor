@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs deques dlists kernel make sorting
 namespaces sequences combinators combinators.short-circuit
@@ -8,7 +8,8 @@ sets hash-sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.linearization.order
 
-! This is RPO except loops are rotated. Based on SBCL's src/compiler/control.lisp
+! This is RPO except loops are rotated and unlikely blocks go
+! at the end. Based on SBCL's src/compiler/control.lisp
 
 <PRIVATE
 
@@ -68,7 +69,9 @@ SYMBOLS: work-list loop-heads visited ;
 : (linearization-order) ( cfg -- bbs )
     init-linearization-order
 
-    [ work-list get [ process-block ] slurp-deque ] { } make ;
+    [ work-list get [ process-block ] slurp-deque ] { } make
+    ! [ unlikely?>> not ] partition append
+    ;
 
 PRIVATE>
 

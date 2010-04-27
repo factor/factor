@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math accessors sequences namespaces make
 combinators assocs arrays locals layouts hashtables
@@ -19,13 +19,7 @@ SYMBOL: numbers
 
 : number-blocks ( bbs -- ) [ 2array ] map-index >hashtable numbers set ;
 
-! Convert CFG IR to machine IR.
 GENERIC: linearize-insn ( basic-block insn -- )
-
-: linearize-basic-block ( bb -- )
-    [ block-number _label ]
-    [ dup instructions>> [ linearize-insn ] with each ]
-    bi ;
 
 M: insn linearize-insn , drop ;
 
@@ -40,68 +34,29 @@ M: insn linearize-insn , drop ;
 M: ##branch linearize-insn
     drop dup successors>> first emit-branch ;
 
-: successors ( bb -- first second ) successors>> first2 ; inline
+GENERIC: negate-insn-cc ( insn -- )
 
-:: conditional ( bb insn n conditional-quot negate-cc-quot -- bb successor label etc... )
-    bb insn
-    conditional-quot
-    [ drop dup successors>> second useless-branch? ] 2bi
-    [ [ swap block-number ] n ndip ]
-    [ [ block-number ] n ndip negate-cc-quot call ] if ; inline
+M: conditional-branch-insn negate-insn-cc
+    [ negate-cc ] change-cc drop ;
 
-: (binary-conditional) ( bb insn -- bb successor1 successor2 src1 src2 cc )
-    [ dup successors ]
-    [ [ src1>> ] [ src2>> ] [ cc>> ] tri ] bi* ; inline
+M: ##test-vector-branch negate-insn-cc
+    [ negate-vcc ] change-vcc drop ;
 
-: binary-conditional ( bb insn -- bb successor label2 src1 src2 cc )
-    3 [ (binary-conditional) ] [ negate-cc ] conditional ;
-
-: (test-vector-conditional) ( bb insn -- bb successor1 successor2 src1 temp rep vcc )
-    [ dup successors ]
-    [ { [ src1>> ] [ temp>> ] [ rep>> ] [ vcc>> ] } cleave ] bi* ; inline
-
-: test-vector-conditional ( bb insn -- bb successor label src1 temp rep vcc )
-    4 [ (test-vector-conditional) ] [ negate-vcc ] conditional ;
-
-M: ##compare-branch linearize-insn
-    binary-conditional _compare-branch emit-branch ;
-
-M: ##compare-imm-branch linearize-insn
-    binary-conditional _compare-imm-branch emit-branch ;
-
-M: ##compare-integer-branch linearize-insn
-    binary-conditional _compare-branch emit-branch ;
-
-M: ##compare-integer-imm-branch linearize-insn
-    binary-conditional _compare-imm-branch emit-branch ;
-
-M: ##compare-float-ordered-branch linearize-insn
-    binary-conditional _compare-float-ordered-branch emit-branch ;
-
-M: ##compare-float-unordered-branch linearize-insn
-    binary-conditional _compare-float-unordered-branch emit-branch ;
-
-M: ##test-vector-branch linearize-insn
-    test-vector-conditional _test-vector-branch emit-branch ;
-
-: overflow-conditional ( bb insn -- bb successor label2 dst src1 src2 )
-    [ dup successors block-number ]
-    [ [ dst>> ] [ src1>> ] [ src2>> ] tri ] bi* ; inline
-
-M: ##fixnum-add linearize-insn
-    overflow-conditional _fixnum-add emit-branch ;
-
-M: ##fixnum-sub linearize-insn
-    overflow-conditional _fixnum-sub emit-branch ;
-
-M: ##fixnum-mul linearize-insn
-    overflow-conditional _fixnum-mul emit-branch ;
+M:: conditional-branch-insn linearize-insn ( bb insn -- )
+    bb successors>> first2 :> ( first second )
+    bb second useless-branch?
+    [ bb second first ]
+    [ bb first second insn negate-insn-cc ] if
+    block-number insn _conditional-branch
+    emit-branch ;
 
 M: ##dispatch linearize-insn
-    swap
-    [ [ src>> ] [ temp>> ] bi _dispatch ]
-    [ successors>> [ block-number _dispatch-label ] each ]
-    bi* ;
+    , successors>> [ block-number _dispatch-label ] each ;
+
+: linearize-basic-block ( bb -- )
+    [ block-number _label ]
+    [ dup instructions>> [ linearize-insn ] with each ]
+    bi ;
 
 : linearize-basic-blocks ( cfg -- insns )
     [
@@ -113,7 +68,7 @@ M: ##dispatch linearize-insn
     ] { } make ;
 
 PRIVATE>
-        
+
 : flatten-cfg ( cfg -- mr )
     [ linearize-basic-blocks ] [ word>> ] [ label>> ] tri
     <mr> ;

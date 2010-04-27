@@ -682,22 +682,29 @@ temp: temp/int-rep ;
 ! Overflowing arithmetic
 INSN: ##fixnum-add
 def: dst/tagged-rep
-use: src1/tagged-rep src2/tagged-rep ;
+use: src1/tagged-rep src2/tagged-rep
+literal: cc ;
 
 INSN: ##fixnum-sub
 def: dst/tagged-rep
-use: src1/tagged-rep src2/tagged-rep ;
+use: src1/tagged-rep src2/tagged-rep
+literal: cc ;
 
 INSN: ##fixnum-mul
 def: dst/tagged-rep
-use: src1/tagged-rep src2/int-rep ;
-
-INSN: ##gc
-temp: temp1/int-rep temp2/int-rep
-literal: size data-values tagged-values uninitialized-locs ;
+use: src1/tagged-rep src2/int-rep
+literal: cc ;
 
 INSN: ##save-context
 temp: temp1/int-rep temp2/int-rep ;
+
+! GC checks
+INSN: ##check-nursery-branch
+literal: size cc
+temp: temp1/int-rep temp2/int-rep ;
+
+INSN: ##call-gc
+literal: gc-roots ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue
@@ -714,48 +721,11 @@ literal: label ;
 
 INSN: _loop-entry ;
 
-INSN: _dispatch
-use: src
-temp: temp ;
-
 INSN: _dispatch-label
 literal: label ;
 
-INSN: _compare-branch
-literal: label
-use: src1 src2
-literal: cc ;
-
-INSN: _compare-imm-branch
-literal: label
-use: src1
-literal: src2 cc ;
-
-INSN: _compare-float-unordered-branch
-literal: label
-use: src1 src2
-literal: cc ;
-
-INSN: _compare-float-ordered-branch
-literal: label
-use: src1 src2
-literal: cc ;
-
-! Overflowing arithmetic
-INSN: _fixnum-add
-literal: label
-def: dst
-use: src1 src2 ;
-
-INSN: _fixnum-sub
-literal: label
-def: dst
-use: src1 src2 ;
-
-INSN: _fixnum-mul
-literal: label
-def: dst
-use: src1 src2 ;
+INSN: _conditional-branch
+literal: label insn ;
 
 TUPLE: spill-slot { n integer } ;
 C: <spill-slot> spill-slot
@@ -771,18 +741,31 @@ literal: rep src ;
 INSN: _spill-area-size
 literal: n ;
 
-! For GC check insertion
 UNION: ##allocation
 ##allot
 ##box-alien
 ##box-displaced-alien ;
 
+UNION: conditional-branch-insn
+##compare-branch
+##compare-imm-branch
+##compare-integer-branch
+##compare-integer-imm-branch
+##compare-float-ordered-branch
+##compare-float-unordered-branch
+##test-vector-branch
+##check-nursery-branch
+##fixnum-add
+##fixnum-sub
+##fixnum-mul ;
+
 ! For alias analysis
 UNION: ##read ##slot ##slot-imm ##vm-field ##alien-global ;
 UNION: ##write ##set-slot ##set-slot-imm ##set-vm-field ;
 
-! Instructions that kill all live vregs but cannot trigger GC
-UNION: partial-sync-insn
+! Instructions that clobber registers
+UNION: clobber-insn
+##call-gc
 ##unary-float-function
 ##binary-float-function ;
 
