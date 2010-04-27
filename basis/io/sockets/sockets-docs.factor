@@ -192,12 +192,13 @@ HELP: <datagram>
     }
 }
 { $notes
-    "To accept UDP/IP packets from any host, use an address specifier returned by the following code, where 1234 is the desired port number:"
-    { $code "f 1234 <inet> resolve-host" }
-    "To accept UDP/IP packets from the loopback interface only, use an address specifier returned by the following code, where 1234 is the desired port number:"
-    { $code "\"localhost\" 1234 <inet> resolve-host" }
+    "To accept UDP/IP packets from any host, use an address specifier where the host name is set to " { $link f } ":"
+    { $code "f 1234 <inet4> <datagram>" }
+    "To create a datagram socket bound to a randomly-assigned port, set the port number in the address specifier to 0, and then read the " { $snippet "addr" } " slot of the datagram instance to obtain the actual port number it is bound to:"
+    { $code "f 0 <inet4> <datagram>" }
+    "To accept UDP/IP packets from the loopback interface only, use an address specifier like the following:"
+    { $code "\"127.0.0.1\" 1234 <inet4> <datagram>s" }
     "Since " { $link resolve-host } " can return multiple address specifiers, your code must create a datagram socket for each one and co-ordinate packet sending accordingly."
-    "Datagrams are low-level binary ports that don't map onto streams, so the constructor does not use an encoding"
 }
 { $errors "Throws an error if the port is already in use, or if the OS forbids access." } ;
 
