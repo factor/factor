@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators cpu.architecture fry heaps
-kernel math math.order namespaces sequences vectors
+USING: arrays accessors assocs combinators cpu.architecture fry
+heaps kernel math math.order namespaces sequences vectors
 linked-assocs compiler.cfg compiler.cfg.registers
-compiler.cfg.instructions compiler.cfg.linear-scan.live-intervals ;
+compiler.cfg.instructions
+compiler.cfg.linear-scan.live-intervals ;
 IN: compiler.cfg.linear-scan.allocation.state
 
 ! Start index of current live interval. We ensure that all
@@ -127,8 +128,11 @@ SYMBOL: unhandled-sync-points
 ! Mapping from vregs to spill slots
 SYMBOL: spill-slots
 
-: vreg-spill-slot ( vreg -- spill-slot )
-    spill-slots get [ rep-of next-spill-slot ] cache ;
+: assign-spill-slot ( coalesced-vreg rep -- spill-slot )
+    spill-slots get [ nip next-spill-slot ] 2cache ;
+
+: lookup-spill-slot ( coalesced-vreg rep -- spill-slot )
+    2array spill-slots get ?at [ ] [ bad-vreg ] if ;
 
 : init-allocator ( registers -- )
     registers set

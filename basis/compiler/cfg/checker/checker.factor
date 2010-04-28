@@ -3,7 +3,8 @@
 USING: kernel combinators.short-circuit accessors math sequences
 sets assocs compiler.cfg.instructions compiler.cfg.rpo
 compiler.cfg.def-use compiler.cfg.linearization
-compiler.cfg.utilities compiler.cfg.mr compiler.utilities ;
+compiler.cfg.utilities compiler.cfg.finalization compiler.cfg.mr
+compiler.utilities ;
 IN: compiler.cfg.checker
 
 ! Check invariants
@@ -64,5 +65,5 @@ ERROR: undefined-values uses defs ;
 
 : check-cfg ( cfg -- )
     [ [ check-basic-block ] each-basic-block ]
-    [ build-mr check-mr ]
+    [ finalize-cfg build-mr check-mr ]
     bi ;

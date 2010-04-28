@@ -1,7 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences accessors combinators namespaces
-compiler.cfg.tco
+USING: compiler.cfg.tco
 compiler.cfg.useless-conditionals
 compiler.cfg.branch-splitting
 compiler.cfg.block-joining
@@ -19,13 +18,6 @@ compiler.cfg.empty-blocks
 compiler.cfg.checker ;
 IN: compiler.cfg.optimizer
 
-SYMBOL: check-optimizer?
-
-: ?check ( cfg -- cfg' )
-    check-optimizer? get [
-        dup check-cfg
-    ] when ;
-
 : optimize-cfg ( cfg -- cfg' )
     optimize-tail-calls
     delete-useless-conditionals
@@ -36,10 +28,4 @@ SYMBOL: check-optimizer?
     value-numbering
     copy-propagation
     eliminate-dead-code
-    eliminate-write-barriers
-    select-representations
-    insert-gc-checks
-    insert-save-contexts
-    destruct-ssa
-    delete-empty-blocks
-    ?check ;
+    eliminate-write-barriers ;

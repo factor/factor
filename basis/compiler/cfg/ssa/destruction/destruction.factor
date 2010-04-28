@@ -23,6 +23,11 @@ SYMBOL: leader-map
 
 : leader ( vreg -- vreg' ) leader-map get compress-path ;
 
+! Maps basic blocks to ##phi instruction outputs
+SYMBOL: phi-sets
+
+: phi-set ( bb -- vregs ) phi-sets get at ;
+
 ! Maps leaders to equivalence class elements.
 SYMBOL: class-element-map
 
@@ -102,16 +107,25 @@ M: ##copy rename-insn
     [ call-next-method drop ]
     [ [ dst>> ] [ src>> ] bi eq? not ] bi ;
 
-M: ##phi rename-insn drop f ;
+SYMBOL: current-phi-set
+
+M: ##phi rename-insn dst>> current-phi-set get push f ;
 
 M: ##call-gc rename-insn
     [ renamings get '[ _ at ] map members ] change-gc-roots drop t ;
 
 M: insn rename-insn drop t ;
 
+: renaming-in-block ( bb -- )
+    V{ } clone current-phi-set set
+    [ [ current-phi-set ] dip phi-sets get set-at ]
+    [ instructions>> [ rename-insn ] filter! drop ]
+    bi ;
+
 : perform-renaming ( cfg -- )
+    H{ } clone phi-sets set
     leader-map get keys [ dup leader ] H{ } map>assoc renamings set
-    [ instructions>> [ rename-insn ] filter! drop ] each-basic-block ;
+    [ renaming-in-block ] each-basic-block ;
 
 : destruct-ssa ( cfg -- cfg' )
     needs-dominance
