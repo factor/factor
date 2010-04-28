@@ -36,11 +36,17 @@ IN: compiler.cfg.gc-checks
 !   \      /
 !      bb
 
-: <gc-check> ( size -- bb )
-    [ <basic-block> ] dip
+! Any ##phi instructions at the start of bb are transplanted
+! into the gc-check block.
+
+: <gc-check> ( phis size -- bb )
+    [ <basic-block> ] 2dip
     [
-        cc<= int-rep next-vreg-rep int-rep next-vreg-rep
-        ##check-nursery-branch
+        [ % ]
+        [
+            cc<= int-rep next-vreg-rep int-rep next-vreg-rep
+            ##check-nursery-branch
+        ] bi*
     ] V{ } make >>instructions ;
 
 : wipe-locs ( uninitialized-locs -- )
@@ -55,7 +61,7 @@ IN: compiler.cfg.gc-checks
     [ [ wipe-locs ] [ ##call-gc ] bi* ##branch ] V{ } make
     >>instructions t >>unlikely? ;
 
-:: insert-guard ( check body bb -- )
+:: insert-guard ( body check bb -- )
     bb predecessors>> check (>>predecessors)
     V{ bb body }      check (>>successors)
 
@@ -66,8 +72,8 @@ IN: compiler.cfg.gc-checks
 
     check predecessors>> [ bb check update-successors ] each ;
 
-: (insert-gc-check) ( size uninitialized-locs gc-roots bb -- )
-    [ [ <gc-check> ] 2dip <gc-call> ] dip insert-guard ;
+: (insert-gc-check) ( uninitialized-locs gc-roots phis size bb -- )
+    [ [ <gc-call> ] 2dip <gc-check> ] dip insert-guard ;
 
 GENERIC: allocation-size* ( insn -- n )
 
@@ -82,14 +88,22 @@ M: ##box-displaced-alien allocation-size* drop 5 cells ;
     [ ##allocation? ] filter
     [ allocation-size* data-alignment get align ] map-sum ;
 
+: gc-live-in ( bb -- vregs )
+    [ live-in keys ] [ instructions>> [ ##phi? ] filter [ dst>> ] map ] bi
+    append ;
+
 : live-tagged ( bb -- vregs )
-    live-in keys [ rep-of tagged-rep? ] filter ;
+    gc-live-in [ rep-of tagged-rep? ] filter ;
+
+: remove-phis ( bb -- phis )
+    [ [ ##phi? ] partition ] change-instructions drop ;
 
 : insert-gc-check ( bb -- )
     {
-        [ allocation-size ]
         [ uninitialized-locs ]
         [ live-tagged ]
+        [ remove-phis ]
+        [ allocation-size ]
         [ ]
     } cleave
     (insert-gc-check) ;

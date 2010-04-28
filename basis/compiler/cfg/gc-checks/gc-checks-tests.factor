@@ -44,13 +44,12 @@ V{
         [ first ##check-nursery-branch? ]
     } 1&& ;
 
-[ t ] [ 100 <gc-check> gc-check? ] unit-test
+[ t ] [ V{ } 100 <gc-check> gc-check? ] unit-test
 
-2 \ vreg-counter set-global
+4 \ vreg-counter set-global
 
 [
     V{
-        T{ ##save-context f 3 4 }
         T{ ##load-tagged f 5 0 }
         T{ ##replace f 5 D 0 }
         T{ ##replace f 5 R 3 }
@@ -93,7 +92,7 @@ V{
 
 [ ] [ cfg get needs-predecessors drop ] unit-test
 
-[ ] [ 31337 { D 1 R 2 } { 10 20 } 3 get (insert-gc-check) ] unit-test
+[ ] [ { D 1 R 2 } { 10 20 } V{ } 31337 3 get (insert-gc-check) ] unit-test
 
 [ t ] [ 1 get successors>> first gc-check? ] unit-test
 
@@ -157,11 +156,10 @@ H{
 
 [
     V{
-        T{ ##save-context f 33 34 }
-        T{ ##load-tagged f 35 0 }
-        T{ ##replace f 35 D 0 }
-        T{ ##replace f 35 D 1 }
-        T{ ##replace f 35 D 2 }
+        T{ ##load-tagged f 31 0 }
+        T{ ##replace f 31 D 0 }
+        T{ ##replace f 31 D 1 }
+        T{ ##replace f 31 D 2 }
         T{ ##call-gc f { 2 } }
         T{ ##branch }
     }
@@ -169,3 +167,43 @@ H{
 
 ! Don't forget to invalidate RPO after inserting basic blocks!
 [ 8 ] [ cfg get reverse-post-order length ] unit-test
+
+! Do the right thing with ##phi instructions
+V{
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##load-reference f 1 "hi" }
+    T{ ##branch }
+} 1 test-bb
+
+V{
+    T{ ##load-reference f 2 "bye" }
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##phi f 3 }
+    T{ ##allot f 1 64 byte-array }
+    T{ ##branch }
+} 3 test-bb
+
+1 get 1 2array
+2 get 2 2array 2array 3 get instructions>> first (>>inputs)
+
+0 { 1 2 } edges
+1 3 edge
+2 3 edge
+
+[ ] [ test-gc-checks ] unit-test
+
+H{
+    { 1 tagged-rep }
+    { 2 tagged-rep }
+    { 3 tagged-rep }
+} representations set
+
+[ ] [ cfg get insert-gc-checks drop ] unit-test
+[ t ] [ 2 get successors>> first instructions>> first ##phi? ] unit-test
+[ 2 ] [ 3 get instructions>> length ] unit-test
