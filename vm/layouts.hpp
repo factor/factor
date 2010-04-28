@@ -91,8 +91,6 @@ inline static cell tag_fixnum(fixnum untagged)
 	return RETAG(untagged << TAG_BITS,FIXNUM_TYPE);
 }
 
-struct object;
-
 #define NO_TYPE_CHECK static const cell type_number = TYPE_COUNT
 
 struct object {
