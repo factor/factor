@@ -12,6 +12,7 @@ compiler.cfg.utilities
 compiler.cfg.instructions
 compiler.cfg.predecessors
 compiler.cfg.parallel-copy
+compiler.cfg.ssa.destruction
 compiler.cfg.linear-scan.assignment
 compiler.cfg.linear-scan.allocation.state ;
 IN: compiler.cfg.linear-scan.resolve
@@ -40,14 +41,22 @@ SYMBOL: spill-temps
 : add-mapping ( from to rep -- )
     '[ _ <location> ] bi@ 2array , ;
 
-:: resolve-value-data-flow ( bb to vreg -- )
-    vreg bb vreg-at-end
-    vreg to vreg-at-start
+:: resolve-value-data-flow ( vreg live-out live-in edge-live-in -- )
+    vreg live-out ?at [ bad-vreg ] unless
+    vreg live-in ?at [ edge-live-in ?at [ bad-vreg ] unless ] unless
     2dup = [ 2drop ] [ vreg rep-of add-mapping ] if ;
 
-: compute-mappings ( bb to -- mappings )
-    dup live-in dup assoc-empty? [ 3drop f ] [
-        [ keys [ resolve-value-data-flow ] with with each ] { } make
+:: compute-mappings ( bb to -- mappings )
+    bb machine-live-out :> live-out
+    to machine-live-in :> live-in
+    bb to machine-edge-live-in :> edge-live-in
+    live-out assoc-empty? [ f ] [
+        [
+            live-in keys edge-live-in keys append [
+                live-out live-in edge-live-in
+                resolve-value-data-flow
+            ] each
+        ] { } make
     ] if ;
 
 : memory->register ( from to -- )
