@@ -26,14 +26,14 @@ SYMBOL: registers
 ! Vector of active live intervals
 SYMBOL: active-intervals
 
-: active-intervals-for ( vreg -- seq )
-    rep-of reg-class-of active-intervals get at ;
+: active-intervals-for ( live-interval -- seq )
+    reg-class>> active-intervals get at ;
 
 : add-active ( live-interval -- )
-    dup vreg>> active-intervals-for push ;
+    dup active-intervals-for push ;
 
 : delete-active ( live-interval -- )
-    dup vreg>> active-intervals-for remove-eq! drop ;
+    dup active-intervals-for remove-eq! drop ;
 
 : assign-free-register ( new registers -- )
     pop >>reg add-active ;
@@ -41,14 +41,14 @@ SYMBOL: active-intervals
 ! Vector of inactive live intervals
 SYMBOL: inactive-intervals
 
-: inactive-intervals-for ( vreg -- seq )
-    rep-of reg-class-of inactive-intervals get at ;
+: inactive-intervals-for ( live-interval -- seq )
+    reg-class>> inactive-intervals get at ;
 
 : add-inactive ( live-interval -- )
-    dup vreg>> inactive-intervals-for push ;
+    dup inactive-intervals-for push ;
 
 : delete-inactive ( live-interval -- )
-    dup vreg>> inactive-intervals-for remove-eq! drop ;
+    dup inactive-intervals-for remove-eq! drop ;
 
 ! Vector of handled live intervals
 SYMBOL: handled-intervals
@@ -67,7 +67,7 @@ ERROR: register-already-used live-interval ;
 
 : check-activate ( live-interval -- )
     check-allocation? get [
-        dup [ reg>> ] [ vreg>> active-intervals-for [ reg>> ] map ] bi member?
+        dup [ reg>> ] [ active-intervals-for [ reg>> ] map ] bi member?
         [ register-already-used ] [ drop ] if
     ] [ drop ] if ;
 
@@ -148,7 +148,7 @@ SYMBOL: spill-slots
 
 ! A utility used by register-status and spill-status words
 : free-positions ( new -- assoc )
-    vreg>> rep-of reg-class-of registers get at
+    reg-class>> registers get at
     [ 1/0. ] H{ } <linked-assoc> map>assoc ;
 
 : add-use-position ( n reg assoc -- ) [ [ min ] when* ] change-at ;

@@ -68,8 +68,10 @@ SYMBOL: register-live-outs
     H{ } clone register-live-outs set
     init-unhandled ;
 
+: spill-rep ( live-interval -- rep ) vreg>> rep-of ;
+
 : insert-spill ( live-interval -- )
-    [ reg>> ] [ vreg>> rep-of ] [ spill-to>> ] tri _spill ;
+    [ reg>> ] [ spill-rep ] [ spill-to>> ] tri ##spill ;
 
 : handle-spill ( live-interval -- )
     dup spill-to>> [ insert-spill ] [ drop ] if ;
@@ -88,15 +90,17 @@ SYMBOL: register-live-outs
 : expire-old-intervals ( n -- )
     pending-interval-heap get (expire-old-intervals) ;
 
+: reload-rep ( live-interval -- rep ) vreg>> rep-of ;
+
 : insert-reload ( live-interval -- )
-    [ reg>> ] [ vreg>> rep-of ] [ reload-from>> ] tri _reload ;
+    [ reg>> ] [ reload-rep ] [ reload-from>> ] tri ##reload ;
 
 : insert-reload? ( live-interval -- ? )
     ! Don't insert a reload if the register will be written to
     ! before being read again.
     {
         [ reload-from>> ]
-        [ uses>> first type>> +use+ eq? ]
+        [ first-use type>> +use+ eq? ]
     } 1&& ;
 
 : handle-reload ( live-interval -- )

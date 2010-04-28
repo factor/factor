@@ -20,7 +20,7 @@ IN: compiler.cfg.linear-scan.resolve.tests
 
 [
     {
-        T{ _reload { dst 1 } { rep int-rep } { src T{ spill-slot f 0 } } }
+        T{ ##reload { dst 1 } { rep int-rep } { src T{ spill-slot f 0 } } }
     }
 ] [
     [
@@ -32,7 +32,7 @@ IN: compiler.cfg.linear-scan.resolve.tests
 
 [
     {
-        T{ _spill { src 1 } { rep int-rep } { dst T{ spill-slot f 0 } } }
+        T{ ##spill { src 1 } { rep int-rep } { dst T{ spill-slot f 0 } } }
     }
 ] [
     [
@@ -66,8 +66,8 @@ IN: compiler.cfg.linear-scan.resolve.tests
 
 [
     {
-        T{ _spill { src 0 } { rep int-rep } { dst T{ spill-slot f 0 } } }
-        T{ _reload { dst 0 } { rep tagged-rep } { src T{ spill-slot f 1 } } }
+        T{ ##spill { src 0 } { rep int-rep } { dst T{ spill-slot f 0 } } }
+        T{ ##reload { dst 0 } { rep tagged-rep } { src T{ spill-slot f 1 } } }
         T{ ##branch }
     }
 ] [
@@ -80,8 +80,8 @@ IN: compiler.cfg.linear-scan.resolve.tests
 
 [
     {
-        T{ _spill { src 0 } { rep int-rep } { dst T{ spill-slot f 1 } } }
-        T{ _reload { dst 0 } { rep tagged-rep } { src T{ spill-slot f 0 } } }
+        T{ ##spill { src 0 } { rep int-rep } { dst T{ spill-slot f 1 } } }
+        T{ ##reload { dst 0 } { rep tagged-rep } { src T{ spill-slot f 0 } } }
         T{ ##branch }
     }
 ] [
@@ -94,8 +94,8 @@ IN: compiler.cfg.linear-scan.resolve.tests
 
 [
     {
-        T{ _spill { src 0 } { rep int-rep } { dst T{ spill-slot f 1 } } }
-        T{ _reload { dst 0 } { rep tagged-rep } { src T{ spill-slot f 0 } } }
+        T{ ##spill { src 0 } { rep int-rep } { dst T{ spill-slot f 1 } } }
+        T{ ##reload { dst 0 } { rep tagged-rep } { src T{ spill-slot f 0 } } }
         T{ ##branch }
     }
 ] [
@@ -116,15 +116,15 @@ H{ } clone spill-temps set
     }
     mapping-instructions {
         {
-            T{ _spill { src 0 } { rep int-rep } { dst T{ spill-slot f 8 } } }
+            T{ ##spill { src 0 } { rep int-rep } { dst T{ spill-slot f 8 } } }
             T{ ##copy { dst 0 } { src 1 } { rep int-rep } }
-            T{ _reload { dst 1 } { rep int-rep } { src T{ spill-slot f 8 } } }
+            T{ ##reload { dst 1 } { rep int-rep } { src T{ spill-slot f 8 } } }
             T{ ##branch }
         }
         {
-            T{ _spill { src 1 } { rep int-rep } { dst T{ spill-slot f 8 } } }
+            T{ ##spill { src 1 } { rep int-rep } { dst T{ spill-slot f 8 } } }
             T{ ##copy { dst 1 } { src 0 } { rep int-rep } }
-            T{ _reload { dst 0 } { rep int-rep } { src T{ spill-slot f 8 } } }
+            T{ ##reload { dst 0 } { rep int-rep } { src T{ spill-slot f 8 } } }
             T{ ##branch }
         }
     } member?
