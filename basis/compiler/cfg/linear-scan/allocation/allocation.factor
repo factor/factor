@@ -9,11 +9,11 @@ compiler.cfg.linear-scan.allocation.state ;
 IN: compiler.cfg.linear-scan.allocation
 
 : active-positions ( new assoc -- )
-    [ vreg>> active-intervals-for ] dip
+    [ active-intervals-for ] dip
     '[ [ 0 ] dip reg>> _ add-use-position ] each ;
 
 : inactive-positions ( new assoc -- )
-    [ [ vreg>> inactive-intervals-for ] keep ] dip
+    [ [ inactive-intervals-for ] keep ] dip
     '[
         [ _ relevant-ranges intersect-live-ranges 1/0. or ] [ reg>> ] bi
         _ add-use-position
