@@ -346,8 +346,7 @@ M: x86.32 %cleanup ( params -- )
 
 M:: x86.32 %call-gc ( gc-roots -- )
     4 save-vm-ptr
-    EAX gc-roots gc-root-offsets %load-reference
-    0 stack@ EAX MOV
+    0 stack@ gc-roots gc-root-offsets %load-reference
     "inline_gc" f %alien-invoke ;
 
 M: x86.32 dummy-stack-params? f ;

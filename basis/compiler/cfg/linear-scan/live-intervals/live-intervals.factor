@@ -2,9 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs accessors locals sequences math
 math.order fry combinators binary-search
-compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.def-use compiler.cfg.liveness
+compiler.cfg.instructions
+compiler.cfg.registers
+compiler.cfg.def-use
+compiler.cfg.liveness
 compiler.cfg.linearization.order
+compiler.cfg.ssa.destruction
 compiler.cfg
 cpu.architecture ;
 IN: compiler.cfg.linear-scan.live-intervals
@@ -43,7 +46,7 @@ M: live-interval covers? ( insn# live-interval -- ? )
         [ drop ] [ [ from>> <=> ] with search nip ] 2bi
         covers?
     ] if ;
-        
+
 : add-new-range ( from to live-interval -- )
     [ <live-range> ] dip ranges>> push ;
 
@@ -87,27 +90,28 @@ SYMBOLS: from to ;
 SYMBOL: live-intervals
 
 : live-interval ( vreg -- live-interval )
-    live-intervals get [ dup rep-of reg-class-of <live-interval> ] cache ;
+    leader live-intervals get
+    [ dup rep-of reg-class-of <live-interval> ] cache ;
 
 GENERIC: compute-live-intervals* ( insn -- )
 
 M: insn compute-live-intervals* drop ;
 
-:: handle-output ( vreg n type -- )
+:: record-def ( vreg n type -- )
     vreg rep-of :> rep
     vreg live-interval :> live-interval
 
     n live-interval shorten-range
     rep n type live-interval add-use ;
 
-:: handle-input ( vreg n type -- )
+:: record-use ( vreg n type -- )
     vreg rep-of :> rep
     vreg live-interval :> live-interval
 
     from get n live-interval add-range
     rep n type live-interval add-use ;
 
-:: handle-temp ( vreg n -- )
+:: record-temp ( vreg n -- )
     vreg rep-of :> rep
     vreg live-interval :> live-interval
 
@@ -117,16 +121,16 @@ M: insn compute-live-intervals* drop ;
 M:: vreg-insn compute-live-intervals* ( insn -- )
     insn insn#>> :> n
 
-    insn defs-vreg [ n +def+ handle-output ] when*
-    insn uses-vregs [ n +use+ handle-input ] each
-    insn temp-vregs [ n handle-temp ] each ;
+    insn defs-vreg [ n +def+ record-def ] when*
+    insn uses-vregs [ n +use+ record-use ] each
+    insn temp-vregs [ n record-temp ] each ;
 
 M:: clobber-insn compute-live-intervals* ( insn -- )
     insn insn#>> :> n
 
-    insn defs-vreg [ n +use+ handle-output ] when*
-    insn uses-vregs [ n +memory+ handle-input ] each
-    insn temp-vregs [ n handle-temp ] each ;
+    insn defs-vreg [ n +use+ record-def ] when*
+    insn uses-vregs [ n +memory+ record-use ] each
+    insn temp-vregs [ n record-temp ] each ;
 
 : handle-live-out ( bb -- )
     live-out dup assoc-empty? [ drop ] [

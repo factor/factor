@@ -129,9 +129,11 @@ SYMBOL: unhandled-sync-points
 SYMBOL: spill-slots
 
 : assign-spill-slot ( coalesced-vreg rep -- spill-slot )
+    dup tagged-rep? [ drop int-rep ] when
     spill-slots get [ nip next-spill-slot ] 2cache ;
 
 : lookup-spill-slot ( coalesced-vreg rep -- spill-slot )
+    dup tagged-rep? [ drop int-rep ] when
     2array spill-slots get ?at [ ] [ bad-vreg ] if ;
 
 : init-allocator ( registers -- )

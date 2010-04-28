@@ -6,8 +6,10 @@ cpu.architecture layouts
 compiler.cfg
 compiler.cfg.def-use
 compiler.cfg.liveness
+compiler.cfg.liveness.ssa
 compiler.cfg.registers
 compiler.cfg.instructions
+compiler.cfg.ssa.destruction
 compiler.cfg.renaming.functor
 compiler.cfg.linearization.order
 compiler.cfg.linear-scan.allocation
@@ -29,23 +31,16 @@ SYMBOL: pending-interval-assoc
 : remove-pending ( live-interval -- )
     vreg>> pending-interval-assoc get delete-at ;
 
-ERROR: bad-vreg vreg ;
-
-:: (vreg>reg) ( vreg pending -- reg )
+:: vreg>reg ( vreg -- reg )
     ! If a live vreg is not in the pending set, then it must
     ! have been spilled.
-    vreg pending at* [
-        drop vreg vreg rep-of lookup-spill-slot
+    vreg leader :> leader
+    leader pending-interval-assoc get at* [
+        drop leader vreg rep-of lookup-spill-slot
     ] unless ;
-
-: vreg>reg ( vreg -- reg )
-    pending-interval-assoc get (vreg>reg) ;
 
 : vregs>regs ( vregs -- assoc )
-    dup assoc-empty? [
-        pending-interval-assoc get
-        '[ _ (vreg>reg) ] assoc-map
-    ] unless ;
+    [ f ] [ [ dup vreg>reg ] H{ } map>assoc ] if-empty ;
 
 ! Minheap of live intervals which still need a register allocation
 SYMBOL: unhandled-intervals
@@ -56,18 +51,45 @@ SYMBOL: unhandled-intervals
 : init-unhandled ( live-intervals -- )
     [ add-unhandled ] each ;
 
+! Liveness info is used by resolve pass
+
 ! Mapping from basic blocks to values which are live at the start
-SYMBOL: register-live-ins
+! on all incoming CFG edges
+SYMBOL: machine-live-ins
+
+: machine-live-in ( bb -- assoc )
+    machine-live-ins get at ;
+
+: compute-live-in ( bb -- )
+    [ live-in keys vregs>regs ] keep machine-live-ins get set-at ;
+
+! Mapping from basic blocks to predecessors to values which are
+! live on a particular incoming edge
+SYMBOL: machine-edge-live-ins
+
+: machine-edge-live-in ( predecessor bb -- assoc )
+    machine-edge-live-ins get at at ;
+
+: compute-edge-live-in ( bb -- )
+    [ edge-live-ins get at [ keys vregs>regs ] assoc-map ] keep
+    machine-edge-live-ins get set-at ;
 
 ! Mapping from basic blocks to values which are live at the end
-SYMBOL: register-live-outs
+SYMBOL: machine-live-outs
+
+: machine-live-out ( bb -- assoc )
+    machine-live-outs get at ;
+
+: compute-live-out ( bb -- )
+    [ live-out keys vregs>regs ] keep machine-live-outs get set-at ;
 
 : init-assignment ( live-intervals -- )
     <min-heap> pending-interval-heap set
     H{ } clone pending-interval-assoc set
     <min-heap> unhandled-intervals set
-    H{ } clone register-live-ins set
-    H{ } clone register-live-outs set
+    H{ } clone machine-live-ins set
+    H{ } clone machine-edge-live-ins set
+    H{ } clone machine-live-outs set
     init-unhandled ;
 
 : insert-spill ( live-interval -- )
@@ -135,18 +157,12 @@ M: ##call-gc assign-registers-in-insn
 M: insn assign-registers-in-insn drop ;
 
 : begin-block ( bb -- )
-    dup basic-block set
-    dup block-from activate-new-intervals
-    [ live-in vregs>regs ] keep register-live-ins get set-at ;
-
-: end-block ( bb -- )
-    [ live-out vregs>regs ] keep register-live-outs get set-at ;
-
-: vreg-at-start ( vreg bb -- state )
-    register-live-ins get at ?at [ bad-vreg ] unless ;
-
-: vreg-at-end ( vreg bb -- state )
-    register-live-outs get at ?at [ bad-vreg ] unless ;
+    {
+        [ basic-block set ]
+        [ block-from activate-new-intervals ]
+        [ compute-edge-live-in ]
+        [ compute-live-in ]
+    } cleave ;
 
 :: assign-registers-in-block ( bb -- )
     bb [
@@ -160,7 +176,7 @@ M: insn assign-registers-in-insn drop ;
                     [ , ]
                 } cleave
             ] each
-            bb end-block
+            bb compute-live-out
         ] V{ } make
     ] change-instructions drop ;
 
