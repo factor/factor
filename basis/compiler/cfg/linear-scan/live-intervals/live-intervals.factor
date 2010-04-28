@@ -3,7 +3,7 @@
 USING: namespaces kernel assocs accessors sequences math math.order fry
 combinators binary-search compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.def-use compiler.cfg.liveness compiler.cfg.linearization.order
-compiler.cfg ;
+compiler.cfg cpu.architecture ;
 IN: compiler.cfg.linear-scan.live-intervals
 
 TUPLE: live-range from to ;
@@ -19,7 +19,12 @@ C: <vreg-use> vreg-use
 TUPLE: live-interval
 vreg
 reg spill-to reload-from
-start end ranges uses ;
+start end ranges uses
+reg-class ;
+
+: first-use ( live-interval -- use ) uses>> first ; inline
+
+: last-use ( live-interval -- use ) uses>> last ; inline
 
 GENERIC: covers? ( insn# obj -- ? )
 
@@ -66,6 +71,7 @@ M: live-interval covers? ( insn# live-interval -- ? )
     \ live-interval new
         V{ } clone >>uses
         V{ } clone >>ranges
+        over rep-of reg-class-of >>reg-class
         swap >>vreg ;
 
 : block-from ( bb -- n ) instructions>> first insn#>> 1 - ;

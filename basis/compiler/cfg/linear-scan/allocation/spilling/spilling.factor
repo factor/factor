@@ -17,13 +17,13 @@ ERROR: bad-live-ranges interval ;
     ] [ drop ] if ;
 
 : trim-before-ranges ( live-interval -- )
-    [ ranges>> ] [ uses>> last n>> 1 + ] bi
+    [ ranges>> ] [ last-use n>> 1 + ] bi
     [ '[ from>> _ <= ] filter! drop ]
     [ swap last (>>to) ]
     2bi ;
 
 : trim-after-ranges ( live-interval -- )
-    [ ranges>> ] [ uses>> first n>> ] bi
+    [ ranges>> ] [ first-use n>> ] bi
     [ '[ to>> _ >= ] filter! drop ]
     [ swap first (>>from) ]
     2bi ;
@@ -73,12 +73,12 @@ ERROR: bad-live-ranges interval ;
     '[ [ _ find-use-position ] [ reg>> ] bi _ add-use-position ] each ;
 
 : active-positions ( new assoc -- )
-    [ [ vreg>> active-intervals-for ] keep ] dip
+    [ [ active-intervals-for ] keep ] dip
     find-use-positions ;
 
 : inactive-positions ( new assoc -- )
     [
-        [ vreg>> inactive-intervals-for ] keep
+        [ inactive-intervals-for ] keep
         [ '[ _ intervals-intersect? ] filter ] keep
     ] dip
     find-use-positions ;
@@ -89,7 +89,7 @@ ERROR: bad-live-ranges interval ;
     >alist alist-max ;
 
 : spill-new? ( new pair -- ? )
-    [ uses>> first n>> ] [ second ] bi* > ;
+    [ first-use n>> ] [ second ] bi* > ;
 
 : spill-new ( new pair -- )
     drop spill-after add-unhandled ;
@@ -103,13 +103,13 @@ ERROR: bad-live-ranges interval ;
     ! If there is an active interval using 'reg' (there should be at
     ! most one) are split and spilled and removed from the inactive
     ! set.
-    new vreg>> active-intervals-for [ [ reg>> reg = ] find swap dup ] keep
+    new active-intervals-for [ [ reg>> reg = ] find swap dup ] keep
     '[ _ remove-nth! drop  new start>> spill ] [ 2drop ] if ;
 
 :: spill-intersecting-inactive ( new reg -- )
     ! Any inactive intervals using 'reg' are split and spilled
     ! and removed from the inactive set.
-    new vreg>> inactive-intervals-for [
+    new inactive-intervals-for [
         dup reg>> reg = [
             dup new intervals-intersect? [
                 new start>> spill f

@@ -51,16 +51,16 @@ SYMBOL: spill-temps
     ] if ;
 
 : memory->register ( from to -- )
-    swap [ reg>> ] [ [ rep>> ] [ reg>> ] bi ] bi* _reload ;
+    swap [ reg>> ] [ [ rep>> ] [ reg>> ] bi ] bi* ##reload ;
 
 : register->memory ( from to -- )
-    [ [ reg>> ] [ rep>> ] bi ] [ reg>> ] bi* _spill ;
+    [ [ reg>> ] [ rep>> ] bi ] [ reg>> ] bi* ##spill ;
 
 : temp->register ( from to -- )
-    nip [ reg>> ] [ rep>> ] [ rep>> spill-temp ] tri _reload ;
+    nip [ reg>> ] [ rep>> ] [ rep>> spill-temp ] tri ##reload ;
 
 : register->temp ( from to -- )
-    drop [ [ reg>> ] [ rep>> ] bi ] [ rep>> spill-temp ] bi _spill ;
+    drop [ [ reg>> ] [ rep>> ] bi ] [ rep>> spill-temp ] bi ##spill ;
 
 : register->register ( from to -- )
     swap [ reg>> ] [ [ reg>> ] [ rep>> ] bi ] bi* ##copy ;

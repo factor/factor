@@ -39,7 +39,7 @@ M: insn compute-stack-frame*
     ] when ;
 
 ! PowerPC backend sets frame-required? for ##integer>float!
-\ _spill t frame-required? set-word-prop
+\ ##spill t frame-required? set-word-prop
 \ ##unary-float-function t frame-required? set-word-prop
 \ ##binary-float-function t frame-required? set-word-prop
 

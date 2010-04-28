@@ -89,6 +89,7 @@ H{
 [
     T{ live-interval
        { vreg 1 }
+       { reg-class float-regs }
        { start 0 }
        { end 2 }
        { uses V{ T{ vreg-use f 0 } T{ vreg-use f 1 } } }
@@ -97,6 +98,7 @@ H{
     }
     T{ live-interval
        { vreg 1 }
+       { reg-class float-regs }
        { start 5 }
        { end 5 }
        { uses V{ T{ vreg-use f 5 } } }
@@ -106,6 +108,7 @@ H{
 ] [
     T{ live-interval
        { vreg 1 }
+       { reg-class float-regs }
        { start 0 }
        { end 5 }
        { uses V{ T{ vreg-use f 0 } T{ vreg-use f 1 } T{ vreg-use f 5 } } }
@@ -116,6 +119,7 @@ H{
 [
     T{ live-interval
        { vreg 2 }
+       { reg-class float-regs }
        { start 0 }
        { end 1 }
        { uses V{ T{ vreg-use f 0 } } }
@@ -124,6 +128,7 @@ H{
     }
     T{ live-interval
        { vreg 2 }
+       { reg-class float-regs }
        { start 1 }
        { end 5 }
        { uses V{ T{ vreg-use f 1 } T{ vreg-use f 5 } } }
@@ -133,6 +138,7 @@ H{
 ] [
     T{ live-interval
        { vreg 2 }
+       { reg-class float-regs }
        { start 0 }
        { end 5 }
        { uses V{ T{ vreg-use f 0 } T{ vreg-use f 1 } T{ vreg-use f 5 } } }
@@ -143,6 +149,7 @@ H{
 [
     T{ live-interval
        { vreg 3 }
+       { reg-class float-regs }
        { start 0 }
        { end 1 }
        { uses V{ T{ vreg-use f 0 } } }
@@ -151,6 +158,7 @@ H{
     }
     T{ live-interval
        { vreg 3 }
+       { reg-class float-regs }
        { start 20 }
        { end 30 }
        { uses V{ T{ vreg-use f 20 } T{ vreg-use f 30 } } }
@@ -160,6 +168,7 @@ H{
 ] [
     T{ live-interval
        { vreg 3 }
+       { reg-class float-regs }
        { start 0 }
        { end 30 }
        { uses V{ T{ vreg-use f 0 } T{ vreg-use f 20 } T{ vreg-use f 30 } } }
@@ -184,6 +193,7 @@ H{
           V{
               T{ live-interval
                  { vreg 1 }
+                 { reg-class int-regs }
                  { reg 1 }
                  { start 1 }
                  { end 15 }
@@ -191,6 +201,7 @@ H{
               }
               T{ live-interval
                  { vreg 2 }
+                 { reg-class int-regs }
                  { reg 2 }
                  { start 3 }
                  { end 8 }
@@ -198,6 +209,7 @@ H{
               }
               T{ live-interval
                  { vreg 3 }
+                 { reg-class int-regs }
                  { reg 3 }
                  { start 3 }
                  { end 10 }
@@ -209,6 +221,7 @@ H{
     H{ } inactive-intervals set
     T{ live-interval
         { vreg 1 }
+        { reg-class int-regs }
         { start 5 }
         { end 5 }
         { uses V{ T{ vreg-use f 5 } } }
@@ -227,6 +240,7 @@ H{
           V{
               T{ live-interval
                  { vreg 1 }
+                 { reg-class int-regs }
                  { reg 1 }
                  { start 1 }
                  { end 15 }
@@ -234,6 +248,7 @@ H{
               }
               T{ live-interval
                  { vreg 2 }
+                 { reg-class int-regs }
                  { reg 2 }
                  { start 3 }
                  { end 8 }
@@ -245,6 +260,7 @@ H{
     H{ } inactive-intervals set
     T{ live-interval
         { vreg 3 }
+        { reg-class int-regs }
         { start 5 }
         { end 5 }
         { uses V{ T{ vreg-use f 5 } } }
@@ -258,6 +274,7 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
     {
         T{ live-interval
            { vreg 1 }
+           { reg-class int-regs }
            { start 0 }
            { end 100 }
            { uses V{ T{ vreg-use f 0 } T{ vreg-use f 100 } } }
@@ -272,6 +289,7 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
     {
         T{ live-interval
            { vreg 1 }
+           { reg-class int-regs }
            { start 0 }
            { end 10 }
            { uses V{ T{ vreg-use f 0 } T{ vreg-use f 10 } } }
@@ -279,6 +297,7 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
         }
         T{ live-interval
            { vreg 2 }
+           { reg-class int-regs }
            { start 11 }
            { end 20 }
            { uses V{ T{ vreg-use f 11 } T{ vreg-use f 20 } } }
@@ -293,6 +312,7 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
     {
         T{ live-interval
            { vreg 1 }
+           { reg-class int-regs }
            { start 0 }
            { end 100 }
            { uses V{ T{ vreg-use f 0 } T{ vreg-use f 100 } } }
@@ -300,6 +320,7 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
         }
         T{ live-interval
            { vreg 2 }
+           { reg-class int-regs }
            { start 30 }
            { end 60 }
            { uses V{ T{ vreg-use f 30 } T{ vreg-use f 60 } } }
@@ -314,6 +335,7 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
     {
         T{ live-interval
            { vreg 1 }
+           { reg-class int-regs }
            { start 0 }
            { end 100 }
            { uses V{ T{ vreg-use f 0 } T{ vreg-use f 100 } } }
@@ -321,6 +343,7 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
         }
         T{ live-interval
            { vreg 2 }
+           { reg-class int-regs }
            { start 30 }
            { end 200 }
            { uses V{ T{ vreg-use f 30 } T{ vreg-use f 200 } } }
@@ -335,6 +358,7 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
     {
         T{ live-interval
            { vreg 1 }
+           { reg-class int-regs }
            { start 0 }
            { end 100 }
            { uses V{ T{ vreg-use f 0 } T{ vreg-use f 100 } } }
@@ -342,6 +366,7 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
         }
         T{ live-interval
            { vreg 2 }
+           { reg-class int-regs }
            { start 30 }
            { end 100 }
            { uses V{ T{ vreg-use f 30 } T{ vreg-use f 100 } } }
@@ -365,6 +390,7 @@ H{
     {
         T{ live-interval
            { vreg 1 }
+           { reg-class int-regs }
            { start 0 }
            { end 20 }
            { uses V{ T{ vreg-use f 0 } T{ vreg-use f 10 } T{ vreg-use f 20 } } }
@@ -372,6 +398,7 @@ H{
         }
         T{ live-interval
            { vreg 2 }
+           { reg-class int-regs }
            { start 0 }
            { end 20 }
            { uses V{ T{ vreg-use f 0 } T{ vreg-use f 10 } T{ vreg-use f 20 } } }
@@ -379,6 +406,7 @@ H{
         }
         T{ live-interval
            { vreg 3 }
+           { reg-class int-regs }
            { start 4 }
            { end 8 }
            { uses V{ T{ vreg-use f 6 } } }
@@ -386,6 +414,7 @@ H{
         }
         T{ live-interval
            { vreg 4 }
+           { reg-class int-regs }
            { start 4 }
            { end 8 }
            { uses V{ T{ vreg-use f 8 } } }
@@ -395,6 +424,7 @@ H{
         ! This guy will invoke the 'spill partially available' code path
         T{ live-interval
            { vreg 5 }
+           { reg-class int-regs }
            { start 4 }
            { end 8 }
            { uses V{ T{ vreg-use f 8 } } }
@@ -411,6 +441,7 @@ H{
     {
         T{ live-interval
            { vreg 1 }
+           { reg-class int-regs }
            { start 0 }
            { end 10 }
            { uses V{ T{ vreg-use f 0 } T{ vreg-use f 6 } T{ vreg-use f 10 } } }
@@ -420,6 +451,7 @@ H{
         ! This guy will invoke the 'spill new' code path
         T{ live-interval
            { vreg 5 }
+           { reg-class int-regs }
            { start 2 }
            { end 8 }
            { uses V{ T{ vreg-use f 8 } } }
@@ -491,12 +523,14 @@ H{
 [ 5 ] [
     T{ live-interval
        { start 0 }
+       { reg-class int-regs }
        { end 10 }
        { uses { 0 10 } }
        { ranges V{ T{ live-range f 0 10 } } }
     }
     T{ live-interval
        { start 5 }
+       { reg-class int-regs }
        { end 10 }
        { uses { 5 10 } }
        { ranges V{ T{ live-range f 5 10 } } }
@@ -520,6 +554,7 @@ H{
           {
               T{ live-interval
                  { vreg 1 }
+                 { reg-class int-regs }
                  { start 0 }
                  { end 20 }
                  { reg 0 }
@@ -529,6 +564,7 @@ H{
 
               T{ live-interval
                  { vreg 2 }
+                 { reg-class int-regs }
                  { start 4 }
                  { end 40 }
                  { reg 0 }
@@ -543,6 +579,7 @@ H{
           {
               T{ live-interval
                  { vreg 3 }
+                 { reg-class int-regs }
                  { start 0 }
                  { end 40 }
                  { reg 1 }
@@ -554,7 +591,8 @@ H{
     } active-intervals set
 
     T{ live-interval
-       { vreg 4 }
+        { vreg 4 }
+        { reg-class int-regs }
         { start 8 }
         { end 10 }
         { ranges V{ T{ live-range f 8 10 } } }
@@ -924,13 +962,13 @@ test-diamond
 
 [ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
 
-[ _spill ] [ 2 get successors>> first instructions>> first class ] unit-test
+[ ##spill ] [ 2 get successors>> first instructions>> first class ] unit-test
 
-[ _spill ] [ 3 get instructions>> second class ] unit-test
+[ ##spill ] [ 3 get instructions>> second class ] unit-test
 
-[ f ] [ 3 get instructions>> [ _reload? ] any? ] unit-test
+[ f ] [ 3 get instructions>> [ ##reload? ] any? ] unit-test
 
-[ _reload ] [ 4 get instructions>> first class ] unit-test
+[ ##reload ] [ 4 get instructions>> first class ] unit-test
 
 ! Resolve pass
 V{
@@ -978,11 +1016,11 @@ V{
 
 [ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
 
-[ t ] [ 2 get instructions>> [ _spill? ] any? ] unit-test
+[ t ] [ 2 get instructions>> [ ##spill? ] any? ] unit-test
 
-[ t ] [ 3 get predecessors>> first instructions>> [ _spill? ] any? ] unit-test
+[ t ] [ 3 get predecessors>> first instructions>> [ ##spill? ] any? ] unit-test
 
-[ t ] [ 5 get instructions>> [ _reload? ] any? ] unit-test
+[ t ] [ 5 get instructions>> [ ##reload? ] any? ] unit-test
 
 ! A more complicated failure case with resolve that came up after the above
 ! got fixed
@@ -1041,13 +1079,13 @@ V{
 
 [ ] [ { 1 2 3 4 } test-linear-scan-on-cfg ] unit-test
 
-[ _spill ] [ 1 get instructions>> second class ] unit-test
-[ _reload ] [ 4 get instructions>> 4 swap nth class ] unit-test
-[ V{ 3 2 1 } ] [ 8 get instructions>> [ _spill? ] filter [ dst>> n>> cell / ] map ] unit-test
-[ V{ 3 2 1 } ] [ 9 get instructions>> [ _reload? ] filter [ src>> n>> cell / ] map ] unit-test
+[ ##spill ] [ 1 get instructions>> second class ] unit-test
+[ ##reload ] [ 4 get instructions>> 4 swap nth class ] unit-test
+[ V{ 3 2 1 } ] [ 8 get instructions>> [ ##spill? ] filter [ dst>> n>> cell / ] map ] unit-test
+[ V{ 3 2 1 } ] [ 9 get instructions>> [ ##reload? ] filter [ src>> n>> cell / ] map ] unit-test
 
 ! Resolve pass should insert this
-[ _reload ] [ 5 get predecessors>> first instructions>> first class ] unit-test
+[ ##reload ] [ 5 get predecessors>> first instructions>> first class ] unit-test
 
 ! Some random bug
 V{
@@ -1397,13 +1435,13 @@ test-diamond
 
 [ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
 
-[ 0 ] [ 1 get instructions>> [ _spill? ] count ] unit-test
+[ 0 ] [ 1 get instructions>> [ ##spill? ] count ] unit-test
 
-[ 1 ] [ 2 get instructions>> [ _spill? ] count ] unit-test
+[ 1 ] [ 2 get instructions>> [ ##spill? ] count ] unit-test
 
-[ 1 ] [ 3 get predecessors>> first instructions>> [ _spill? ] count ] unit-test
+[ 1 ] [ 3 get predecessors>> first instructions>> [ ##spill? ] count ] unit-test
 
-[ 1 ] [ 4 get instructions>> [ _reload? ] count ] unit-test
+[ 1 ] [ 4 get instructions>> [ ##reload? ] count ] unit-test
 
 ! Another test case for fencepost error in assignment pass
 V{ T{ ##branch } } 0 test-bb
@@ -1435,12 +1473,12 @@ test-diamond
 
 [ ] [ { 1 2 } test-linear-scan-on-cfg ] unit-test
 
-[ 0 ] [ 1 get instructions>> [ _spill? ] count ] unit-test
+[ 0 ] [ 1 get instructions>> [ ##spill? ] count ] unit-test
 
-[ 1 ] [ 2 get instructions>> [ _spill? ] count ] unit-test
+[ 1 ] [ 2 get instructions>> [ ##spill? ] count ] unit-test
 
-[ 1 ] [ 2 get instructions>> [ _reload? ] count ] unit-test
+[ 1 ] [ 2 get instructions>> [ ##reload? ] count ] unit-test
 
-[ 0 ] [ 3 get instructions>> [ _spill? ] count ] unit-test
+[ 0 ] [ 3 get instructions>> [ ##spill? ] count ] unit-test
 
-[ 0 ] [ 4 get instructions>> [ _reload? ] count ] unit-test
+[ 0 ] [ 4 get instructions>> [ ##reload? ] count ] unit-test

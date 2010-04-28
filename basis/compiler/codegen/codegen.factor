@@ -200,7 +200,8 @@ CODEGEN: ##vm-field %vm-field
 CODEGEN: ##set-vm-field %set-vm-field
 CODEGEN: ##alien-global %alien-global
 CODEGEN: ##call-gc %call-gc
-
+CODEGEN: ##spill %spill
+CODEGEN: ##reload %reload
 CODEGEN: ##dispatch %dispatch
 
 : %dispatch-label ( label -- )
@@ -210,8 +211,6 @@ CODEGEN: ##dispatch %dispatch
 CODEGEN: _label resolve-label
 CODEGEN: _dispatch-label %dispatch-label
 CODEGEN: _branch %jump-label
-CODEGEN: _spill %spill
-CODEGEN: _reload %reload
 CODEGEN: _loop-entry %loop-entry
 
 GENERIC: generate-conditional-insn ( label insn -- )

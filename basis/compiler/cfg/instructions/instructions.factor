@@ -706,7 +706,22 @@ temp: temp1/int-rep temp2/int-rep ;
 INSN: ##call-gc
 literal: gc-roots ;
 
+! Spills and reloads, inserted by register allocator
+TUPLE: spill-slot { n integer } ;
+C: <spill-slot> spill-slot
+
+INSN: ##spill
+use: src
+literal: rep dst ;
+
+INSN: ##reload
+def: dst
+literal: rep src ;
+
 ! Instructions used by machine IR only.
+INSN: _spill-area-size
+literal: n ;
+
 INSN: _prologue
 literal: stack-frame ;
 
@@ -726,20 +741,6 @@ literal: label ;
 
 INSN: _conditional-branch
 literal: label insn ;
-
-TUPLE: spill-slot { n integer } ;
-C: <spill-slot> spill-slot
-
-INSN: _spill
-use: src
-literal: rep dst ;
-
-INSN: _reload
-def: dst
-literal: rep src ;
-
-INSN: _spill-area-size
-literal: n ;
 
 UNION: ##allocation
 ##allot
