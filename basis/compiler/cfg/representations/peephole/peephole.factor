@@ -94,9 +94,6 @@ M: ##load-reference optimize-insn
 ! Into either
 ! ##shl-imm by X - tag-bits, or
 ! ##sar-imm by tag-bits - X.
-: combine-shl-imm-input? ( insn -- ? )
-     ;
-
 : combine-shl-imm-input ( insn -- )
     [ dst>> ] [ src1>> ] [ src2>> ] tri tag-bits get {
         { [ 2dup < ] [ swap - ##sar-imm here ] }
@@ -232,6 +229,9 @@ M: ##compare-integer-branch optimize-insn
         [ call-next-method ]
     } cond ;
 
+! Identities:
+! tag(neg(untag(x))) = x
+! tag(neg(x)) = x * -2^tag-bits
 : inert-tag/untag-unary? ( insn -- ? )
     [ dst>> ] [ src>> ] bi [ rep-of tagged-rep? ] both? ;
 
@@ -252,6 +252,8 @@ M: ##neg optimize-insn
         [ call-next-method ]
     } cond ;
 
+! Identity:
+! tag(not(untag(x))) = not(x) xor tag-mask
 :: emit-tagged-not ( insn -- )
     tagged-rep next-vreg-rep :> temp
     temp insn src>> ##not
