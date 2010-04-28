@@ -21,7 +21,7 @@ number
 M: basic-block hashcode* nip id>> ;
 
 TUPLE: cfg { entry basic-block } word label
-spill-area-size reps
+spill-area-size
 post-order linear-order
 predecessors-valid? dominance-valid? loops-valid? ;
 

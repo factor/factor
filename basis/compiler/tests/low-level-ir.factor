@@ -1,20 +1,20 @@
 USING: accessors assocs compiler compiler.cfg
 compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.mr
-compiler.cfg.registers compiler.codegen compiler.units
-cpu.architecture hashtables kernel namespaces sequences
-tools.test vectors words layouts literals math arrays
+compiler.cfg.registers compiler.cfg.linear-scan compiler.codegen
+compiler.units cpu.architecture hashtables kernel namespaces
+sequences tools.test vectors words layouts literals math arrays
 alien.c-types alien.syntax math.private ;
 IN: compiler.tests.low-level-ir
 
 : compile-cfg ( cfg -- word )
     gensym
-    [ build-mr generate ] dip
+    [ linear-scan build-mr generate ] dip
     [ associate >alist t t modify-code-heap ] keep ;
 
 : compile-test-cfg ( -- word )
     cfg new 0 get >>entry
     dup cfg set
-    dup fake-representations representations get >>reps
+    dup fake-representations
     compile-cfg ;
 
 : compile-test-bb ( insns -- result )

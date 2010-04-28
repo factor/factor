@@ -5,7 +5,8 @@ compiler.cfg.optimizer compiler.cfg.predecessors compiler.cfg.checker
 compiler.cfg arrays locals byte-arrays kernel.private math
 slots.private vectors sbufs strings math.partial-dispatch
 hashtables assocs combinators.short-circuit
-strings.private accessors compiler.cfg.instructions ;
+strings.private accessors compiler.cfg.instructions
+compiler.cfg.representations ;
 FROM: alien.c-types => int ;
 IN: compiler.cfg.builder.tests
 

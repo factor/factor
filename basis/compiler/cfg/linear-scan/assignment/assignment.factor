@@ -31,10 +31,12 @@ SYMBOL: pending-interval-assoc
 
 ERROR: bad-vreg vreg ;
 
-: (vreg>reg) ( vreg pending -- reg )
+:: (vreg>reg) ( vreg pending -- reg )
     ! If a live vreg is not in the pending set, then it must
     ! have been spilled.
-    ?at [ spill-slots get ?at [ ] [ bad-vreg ] if ] unless ;
+    vreg pending at* [
+        drop vreg vreg rep-of lookup-spill-slot
+    ] unless ;
 
 : vreg>reg ( vreg -- reg )
     pending-interval-assoc get (vreg>reg) ;
@@ -68,10 +70,8 @@ SYMBOL: register-live-outs
     H{ } clone register-live-outs set
     init-unhandled ;
 
-: spill-rep ( live-interval -- rep ) vreg>> rep-of ;
-
 : insert-spill ( live-interval -- )
-    [ reg>> ] [ spill-rep ] [ spill-to>> ] tri ##spill ;
+    [ reg>> ] [ first-use rep>> ] [ spill-to>> ] tri ##spill ;
 
 : handle-spill ( live-interval -- )
     dup spill-to>> [ insert-spill ] [ drop ] if ;
@@ -90,10 +90,8 @@ SYMBOL: register-live-outs
 : expire-old-intervals ( n -- )
     pending-interval-heap get (expire-old-intervals) ;
 
-: reload-rep ( live-interval -- rep ) vreg>> rep-of ;
-
 : insert-reload ( live-interval -- )
-    [ reg>> ] [ reload-rep ] [ reload-from>> ] tri ##reload ;
+    [ reg>> ] [ first-use rep>> ] [ reload-from>> ] tri ##reload ;
 
 : insert-reload? ( live-interval -- ? )
     ! Don't insert a reload if the register will be written to

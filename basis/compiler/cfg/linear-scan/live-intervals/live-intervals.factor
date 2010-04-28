@@ -1,9 +1,12 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces kernel assocs accessors sequences math math.order fry
-combinators binary-search compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.def-use compiler.cfg.liveness compiler.cfg.linearization.order
-compiler.cfg cpu.architecture ;
+USING: namespaces kernel assocs accessors locals sequences math
+math.order fry combinators binary-search
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.def-use compiler.cfg.liveness
+compiler.cfg.linearization.order
+compiler.cfg
+cpu.architecture ;
 IN: compiler.cfg.linear-scan.live-intervals
 
 TUPLE: live-range from to ;
@@ -12,7 +15,7 @@ C: <live-range> live-range
 
 SYMBOLS: +def+ +use+ +memory+ ;
 
-TUPLE: vreg-use n type ;
+TUPLE: vreg-use rep n type ;
 
 C: <vreg-use> vreg-use
 
@@ -61,62 +64,75 @@ M: live-interval covers? ( insn# live-interval -- ? )
     2dup extend-range?
     [ extend-range ] [ add-new-range ] if ;
 
-: add-use ( insn live-interval type -- )
-    dup +memory+ eq? [ 3drop ] [
-        swap [ [ insn#>> ] dip <vreg-use> ] dip
-        uses>> push
-    ] if ;
+:: add-use ( rep n type live-interval -- )
+    type +memory+ eq? [
+        rep n type <vreg-use>
+        live-interval uses>> push
+    ] unless ;
 
-: <live-interval> ( vreg -- live-interval )
+: <live-interval> ( vreg reg-class -- live-interval )
     \ live-interval new
         V{ } clone >>uses
         V{ } clone >>ranges
-        over rep-of reg-class-of >>reg-class
+        swap >>reg-class
         swap >>vreg ;
 
 : block-from ( bb -- n ) instructions>> first insn#>> 1 - ;
 
 : block-to ( bb -- n ) instructions>> last insn#>> ;
 
+SYMBOLS: from to ;
+
 ! Mapping from vreg to live-interval
 SYMBOL: live-intervals
 
 : live-interval ( vreg -- live-interval )
-    live-intervals get [ <live-interval> ] cache ;
+    live-intervals get [ dup rep-of reg-class-of <live-interval> ] cache ;
 
 GENERIC: compute-live-intervals* ( insn -- )
 
 M: insn compute-live-intervals* drop ;
 
-: handle-output ( insn vreg type -- )
-    [ live-interval ] dip
-    [ drop [ insn#>> ] dip shorten-range ] [ add-use ] 3bi ;
+:: handle-output ( vreg n type -- )
+    vreg rep-of :> rep
+    vreg live-interval :> live-interval
 
-: handle-input ( insn vreg type -- )
-    [ live-interval ] dip
-    [ drop [ [ basic-block get block-from ] dip insn#>> ] dip add-range ]
-    [ add-use ]
-    3bi ;
+    n live-interval shorten-range
+    rep n type live-interval add-use ;
 
-: handle-temp ( insn vreg -- )
-    live-interval
-    [ [ insn#>> dup ] dip add-range ] [ +def+ add-use ] 2bi ;
+:: handle-input ( vreg n type -- )
+    vreg rep-of :> rep
+    vreg live-interval :> live-interval
 
-M: vreg-insn compute-live-intervals*
-    [ dup defs-vreg [ +def+ handle-output ] with when* ]
-    [ dup uses-vregs [ +use+ handle-input ] with each ]
-    [ dup temp-vregs [ handle-temp ] with each ]
-    tri ;
+    from get n live-interval add-range
+    rep n type live-interval add-use ;
 
-M: clobber-insn compute-live-intervals*
-    [ dup defs-vreg [ +use+ handle-output ] with when* ]
-    [ dup uses-vregs [ +memory+ handle-input ] with each ]
-    [ dup temp-vregs [ handle-temp ] with each ]
-    tri ;
+:: handle-temp ( vreg n -- )
+    vreg rep-of :> rep
+    vreg live-interval :> live-interval
+
+    n n live-interval add-range
+    rep n +def+ live-interval add-use ;
+
+M:: vreg-insn compute-live-intervals* ( insn -- )
+    insn insn#>> :> n
+
+    insn defs-vreg [ n +def+ handle-output ] when*
+    insn uses-vregs [ n +use+ handle-input ] each
+    insn temp-vregs [ n handle-temp ] each ;
+
+M:: clobber-insn compute-live-intervals* ( insn -- )
+    insn insn#>> :> n
+
+    insn defs-vreg [ n +use+ handle-output ] when*
+    insn uses-vregs [ n +memory+ handle-input ] each
+    insn temp-vregs [ n handle-temp ] each ;
 
 : handle-live-out ( bb -- )
-    [ block-from ] [ block-to ] [ live-out keys ] tri
-    [ live-interval add-range ] with with each ;
+    live-out dup assoc-empty? [ drop ] [
+        [ from get to get ] dip keys
+        [ live-interval add-range ] with with each
+    ] if ;
 
 ! A location where all registers have to be spilled
 TUPLE: sync-point n ;
@@ -134,15 +150,18 @@ M: clobber-insn compute-sync-points*
 M: insn compute-sync-points* drop ;
 
 : compute-live-intervals-step ( bb -- )
-    [ basic-block set ]
-    [ handle-live-out ]
-    [
-        instructions>> <reversed> [
-            [ compute-live-intervals* ]
-            [ compute-sync-points* ]
-            bi
-        ] each
-    ] tri ;
+    {
+        [ block-from from set ]
+        [ block-to to set ]
+        [ handle-live-out ]
+        [
+            instructions>> <reversed> [
+                [ compute-live-intervals* ]
+                [ compute-sync-points* ]
+                bi
+            ] each
+        ]
+    } cleave ;
 
 : init-live-intervals ( -- )
     H{ } clone live-intervals set
