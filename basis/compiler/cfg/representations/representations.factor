@@ -1,6 +1,6 @@
 ! Copyright (C) 2009, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators namespaces
+USING: combinators
 compiler.cfg
 compiler.cfg.registers
 compiler.cfg.predecessors
@@ -26,5 +26,4 @@ IN: compiler.cfg.representations
         [ compute-representations ]
         [ insert-conversions ]
         [ ]
-    } cleave
-    representations get cfg get (>>reps) ;
+    } cleave ;

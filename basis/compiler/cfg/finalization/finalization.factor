@@ -1,0 +1,14 @@
+! Copyright (C) 2010 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: compiler.cfg.empty-blocks compiler.cfg.gc-checks
+compiler.cfg.linear-scan compiler.cfg.representations
+compiler.cfg.save-contexts compiler.cfg.ssa.destruction ;
+IN: compiler.cfg.finalization
+
+: finalize-cfg ( cfg -- cfg' )
+    select-representations
+    insert-gc-checks
+    insert-save-contexts
+    destruct-ssa
+    delete-empty-blocks
+    linear-scan ;
