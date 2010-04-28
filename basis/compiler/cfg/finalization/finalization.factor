@@ -10,5 +10,4 @@ IN: compiler.cfg.finalization
     insert-gc-checks
     insert-save-contexts
     destruct-ssa
-    delete-empty-blocks
     linear-scan ;

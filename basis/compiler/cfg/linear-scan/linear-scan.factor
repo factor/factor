@@ -1,10 +1,9 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors namespaces make locals
 cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
-compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.linear-scan.numbering
@@ -29,8 +28,9 @@ IN: compiler.cfg.linear-scan
 ! by Omri Traub, Glenn Holloway, Michael D. Smith
 ! http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.34.8435
 
+! SSA liveness must have been computed already
+
 :: (linear-scan) ( cfg machine-registers -- )
-    cfg compute-live-sets
     cfg number-instructions
     cfg compute-live-intervals machine-registers allocate-registers
     cfg assign-registers
