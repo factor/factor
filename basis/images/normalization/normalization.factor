@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types byte-arrays combinators fry
 grouping images kernel locals math math.vectors
-sequences specialized-arrays half-floats ;
+sequences specialized-arrays math.floats.half ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: half
 SPECIALIZED-ARRAY: float
