@@ -135,8 +135,7 @@ M: object (vmerge-head) over length 2 /i '[ _ head-slice ] bi@ [ zip ] keep conc
 GENERIC: (vmerge-tail) ( u v -- t )
 M: object (vmerge-tail) over length 2 /i '[ _ tail-slice ] bi@ [ zip ] keep concat-as ; inline
 
-GENERIC: (vmerge) ( u v -- h t )
-M: object (vmerge)
+: (vmerge) ( u v -- h t )
     [ (vmerge-head) ] [ (vmerge-tail) ] 2bi ; inline
 
 GENERIC: vmerge ( u v -- w )
