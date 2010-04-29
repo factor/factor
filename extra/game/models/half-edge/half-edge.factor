@@ -37,6 +37,9 @@ TUPLE: edge < identity-tuple face vertex opposite-edge next-edge ;
 : vertex-neighbors ( edge -- edges )
     [ opposite-edge>> vertex>> ] [ each-vertex-edge ] (collect) ;
 
+: vertex-diagonals ( edge -- edges )
+    [ next-edge>> opposite-edge>> vertex>> ] [ each-vertex-edge ] (collect) ;
+
 : vertex-valence ( edge -- count )
     [ each-vertex-edge ] (count) ;
 
