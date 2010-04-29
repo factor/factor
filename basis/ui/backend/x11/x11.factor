@@ -149,7 +149,7 @@ M: world button-up-event
         { 7 { 1 0 } }
     } at ;
 
-M: world wheel-event
+M: world scroll-event
     [ [ mouse-event>scroll-direction ] [ event-loc ] bi ] dip
     send-scroll ;
 
