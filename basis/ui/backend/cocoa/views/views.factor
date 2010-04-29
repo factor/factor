@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2008 Slava Pestov
+! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs cocoa kernel math cocoa.messages cocoa.subclassing
@@ -90,11 +90,11 @@ CONSTANT: key-codes
     [ drop window ]
     2tri send-button-up ;
 
-: send-wheel$ ( view event -- )
-    [ nip [ -> deltaX ] [ -> deltaY ] bi [ sgn neg ] bi@ 2array ]
+: send-scroll$ ( view event -- )
+    [ nip [ -> deltaX ] [ -> deltaY ] bi [ neg ] bi@ 2array ]
     [ mouse-location ]
     [ drop window ]
-    2tri send-wheel ;
+    2tri send-scroll ;
 
 : send-action$ ( view event gesture -- junk )
     [ drop window ] dip send-action f ;
@@ -206,7 +206,7 @@ CLASS: {
 }
 
 { "scrollWheel:" void { id SEL id }
-    [ nip send-wheel$ ]
+    [ nip send-scroll$ ]
 }
 
 { "keyDown:" void { id SEL id }

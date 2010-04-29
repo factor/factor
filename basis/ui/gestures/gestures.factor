@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel math math.order models
 namespaces make sequences words strings system hashtables math.parser
@@ -304,7 +304,7 @@ SYMBOL: drag-timer
     stop-drag-timer
     button-gesture ;
 
-: send-wheel ( direction loc world -- )
+: send-scroll ( direction loc world -- )
     move-hand
     scroll-direction set-global
     mouse-scroll hand-gadget get-global propagate-gesture ;
