@@ -62,5 +62,8 @@ connect-cube-edges
 [ { 1 4 2 } ]
 [ cube-edges first vertex-neighbors ] unit-test
 
+[ { 3 5 6 } ]
+[ cube-edges first vertex-diagonals ] unit-test
+
 [ { 1 4 3 5 } ]
 [ cube-edges first face-neighbors ] unit-test
