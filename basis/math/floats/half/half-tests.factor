@@ -1,7 +1,7 @@
-USING: accessors alien.c-types alien.syntax half-floats kernel
+USING: accessors alien.c-types alien.syntax math.floats.half kernel
 math tools.test specialized-arrays alien.data classes.struct ;
 SPECIALIZED-ARRAY: half
-IN: half-floats.tests
+IN: math.floats.half.tests
 
 [ HEX: 0000 ] [  0.0  half>bits ] unit-test
 [ HEX: 8000 ] [ -0.0  half>bits ] unit-test
