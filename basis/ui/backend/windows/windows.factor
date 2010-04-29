@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
-! Portions copyright (C) 2007, 2009 Slava Pestov.
+! Portions copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings arrays assocs ui
 ui.private ui.gadgets ui.gadgets.private ui.backend
@@ -475,7 +475,8 @@ SYMBOL: nc-buttons
     message>button nc-buttons get
     swap [ push ] [ remove! drop ] if ;
 
-: mouse-wheel ( wParam -- array ) >lo-hi [ sgn neg ] map ;
+: mouse-wheel ( wParam -- array )
+    >lo-hi [ -120 /f ] map ;
 
 : mouse-event>gesture ( uMsg -- button )
     key-modifiers swap message>button
@@ -534,7 +535,7 @@ SYMBOL: nc-buttons
     >lo-hi swap window move-hand fire-motion ;
 
 :: handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
-    wParam mouse-wheel hand-loc get hWnd window send-wheel ;
+    wParam mouse-scroll hand-loc get hWnd window send-scroll ;
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
     #! message sent if windows needs application to stop dragging
