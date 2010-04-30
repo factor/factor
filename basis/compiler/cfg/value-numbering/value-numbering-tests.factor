@@ -2302,13 +2302,10 @@ V{
 } 3 test-bb
 
 V{
-    T{ ##phi f 3 }
+    T{ ##phi f 3 H{ { 2 1 } { 3 2 } } }
     T{ ##replace f 3 D 0 }
     T{ ##return }
 } 4 test-bb
-
-2 get 1 2array
-3 get 2 2array 2array 4 get instructions>> first (>>inputs)
 
 test-diamond
 
@@ -2341,7 +2338,7 @@ V{
 } 2 test-bb
 
 V{
-    T{ ##phi f 3 V{ } }
+    T{ ##phi f 3 H{ { 1 1 } { 2 0 } } }
     T{ ##branch }
 } 3 test-bb
 
@@ -2349,9 +2346,6 @@ V{
     T{ ##replace f 3 D 0 }
     T{ ##return }
 } 4 test-bb
-
-1 get 1 2array
-2 get 0 2array 2array 3 get instructions>> first (>>inputs)
 
 test-diamond
 
