@@ -7,7 +7,6 @@ compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.def-use
 compiler.cfg.liveness
-compiler.cfg.copy-prop
 compiler.cfg.registers
 compiler.cfg.utilities
 compiler.cfg.comparisons
@@ -69,6 +68,14 @@ IN: compiler.cfg.alias-analysis
 ! e = c
 ! x[1] = c
 
+! Local copy propagation
+SYMBOL: copies
+
+: resolve ( vreg -- vreg ) copies get ?at drop ;
+
+: record-copy ( ##copy -- )
+    [ src>> resolve ] [ dst>> ] bi copies get set-at ; inline
+
 ! Map vregs -> alias classes
 SYMBOL: vregs>acs
 
@@ -86,14 +93,9 @@ SYMBOL: acs>vregs
 
 : ac>vregs ( ac -- vregs ) acs>vregs get at ;
 
-GENERIC: aliases ( vreg -- vregs )
-
-M: integer aliases
+: aliases ( vreg -- vregs )
     #! All vregs which may contain the same value as vreg.
     vreg>ac ac>vregs ;
-
-M: word aliases
-    1array ;
 
 : each-alias ( vreg quot -- )
     [ aliases ] dip each ; inline
@@ -259,7 +261,9 @@ M: ##read analyze-aliases*
 M: ##write analyze-aliases*
     dup
     [ src>> resolve ] [ insn-slot# ] [ insn-object ] tri
-    [ remember-set-slot drop ] [ load-slot ] 3bi ;
+    3dup idempotent? [ 3drop ] [
+        [ remember-set-slot drop ] [ load-slot ] 3bi
+    ] if ;
 
 M: ##copy analyze-aliases*
     #! The output vreg gets the same alias class as the input
