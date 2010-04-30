@@ -50,7 +50,7 @@ MACRO: nullary ( quot -- quot' )
     dup outputs '[ @ _ ndrop ] ;
 
 MACRO: dropping ( quot -- quot' )
-    outputs '[ [ _ ndrop ] ] ;
+    inputs '[ [ _ ndrop ] ] ;
 
 MACRO: balancing ( quot -- quot' )
     '[ _ [ preserving ] [ dropping ] bi ] ;
