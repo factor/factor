@@ -49,7 +49,7 @@ M: array process-instruction
     init-value-graph
     [ process-instruction ] map flatten ;
 
-: value-numbering ( cfg -- cfg' )
-    [ value-numbering-step ] local-optimization
+: value-numbering ( cfg -- cfg )
+    dup [ value-numbering-step ] simple-optimization
 
     cfg-changed predecessors-changed ;

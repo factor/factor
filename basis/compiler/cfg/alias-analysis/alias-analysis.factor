@@ -319,5 +319,5 @@ M: insn eliminate-dead-stores* ;
     compute-live-stores
     eliminate-dead-stores ;
 
-: alias-analysis ( cfg -- cfg' )
-    [ alias-analysis-step ] local-optimization ;
+: alias-analysis ( cfg -- cfg )
+    dup [ alias-analysis-step ] simple-optimization ;
