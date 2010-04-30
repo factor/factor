@@ -24,13 +24,9 @@ V{
 } 3 test-bb
 
 V{
-    T{ ##phi f 2 }
+    T{ ##phi f 2 H{ { 2 0 } { 3 1 } } }
     T{ ##branch }
 } 4 test-bb
-
-2 get 0 2array
-3 get 1 2array 2array
-4 get instructions>> first (>>inputs)
 
 V{
     T{ ##branch }
