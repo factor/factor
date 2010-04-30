@@ -36,7 +36,7 @@ M: location hashcode*
 SYMBOL: spill-temps
 
 : spill-temp ( rep -- n )
-    spill-temps get [ next-spill-slot ] cache ;
+    rep-size spill-temps get [ next-spill-slot ] cache ;
 
 : add-mapping ( from to rep -- )
     '[ _ <location> ] bi@ 2array , ;
