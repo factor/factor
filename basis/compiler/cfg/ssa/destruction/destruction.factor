@@ -123,11 +123,8 @@ M: ##phi useful-insn? drop f ;
 
 M: insn useful-insn? drop t ;
 
-: cleanup-block ( bb -- )
-    instructions>> [ useful-insn? ] filter! drop ;
-
 : cleanup-cfg ( cfg -- )
-    [ cleanup-block ] each-basic-block ;
+    [ [ useful-insn? ] filter! ] simple-optimization ;
 
 PRIVATE>
 
