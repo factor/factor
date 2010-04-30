@@ -10,21 +10,45 @@ compiler.cfg.stack-frame compiler.cfg.linear-scan
 compiler.cfg.optimizer compiler.cfg.finalization
 compiler.cfg.instructions compiler.cfg.utilities
 compiler.cfg.def-use compiler.cfg.rpo compiler.cfg.mr
-compiler.cfg.representations.preferred compiler.cfg ;
+compiler.cfg.representations
+compiler.cfg.representations.preferred
+compiler.cfg.gc-checks compiler.cfg.save-contexts compiler.cfg ;
 IN: compiler.cfg.debugger
 
-GENERIC: test-cfg ( quot -- cfgs )
+GENERIC: test-builder ( quot -- cfgs )
 
-M: callable test-cfg
+M: callable test-builder
     0 vreg-counter set-global
     build-tree optimize-tree gensym build-cfg ;
 
-M: word test-cfg
+M: word test-builder
     0 vreg-counter set-global
     [ build-tree optimize-tree ] keep build-cfg ;
 
-: test-mr ( quot -- mrs )
-    test-cfg [
+: test-optimizer ( quot -- cfgs )
+    test-builder [ [ optimize-cfg ] with-cfg ] map ;
+
+: test-ssa ( quot -- mrs )
+    test-builder [
+        [
+            optimize-cfg
+            flatten-cfg
+        ] with-cfg
+    ] map ;
+
+: test-flat ( quot -- mrs )
+    test-builder [
+        [
+            optimize-cfg
+            select-representations
+            insert-gc-checks
+            insert-save-contexts
+            flatten-cfg
+        ] with-cfg
+    ] map ;
+
+: test-regs ( quot -- mrs )
+    test-builder [
         [
             optimize-cfg
             finalize-cfg
@@ -32,21 +56,26 @@ M: word test-cfg
         ] with-cfg
     ] map ;
 
-: insn. ( insn -- )
-    tuple>array but-last [ pprint bl ] each nl ;
+GENERIC: insn. ( insn -- )
 
-: mr. ( mrs -- )
-    [
-        "=== word: " write
-        dup word>> pprint
-        ", label: " write
-        dup label>> pprint nl nl
-        instructions>> [ insn. ] each
-        nl
-    ] each ;
+M: ##phi insn.
+    clone [ [ [ number>> ] dip ] assoc-map ] change-inputs
+    call-next-method ;
 
-: test-mr. ( quot -- )
-    test-mr mr. ; inline
+M: insn insn. tuple>array but-last [ bl ] [ pprint ] interleave nl ;
+
+: mr. ( mr -- )
+    "=== word: " write
+    dup word>> pprint
+    ", label: " write
+    dup label>> pprint nl nl
+    instructions>> [ insn. ] each ;
+
+: mrs. ( mrs -- )
+    [ nl ] [ mr. ] interleave ;
+
+: flat. ( quot -- ) test-flat mrs. ; inline
+: regs. ( quot -- ) test-regs mrs. ; inline
 
 ! Prettyprinting
 : pprint-loc ( loc word -- ) <block pprint-word n>> pprint* block> ;
