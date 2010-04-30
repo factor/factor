@@ -812,7 +812,7 @@ M: windows-ui-backend (ungrab-input) ( handle -- )
     f ClipCursor drop
     1 ShowCursor drop ;
 
-CONSTANT: fullscreen-flags { WS_CAPTION WS_BORDER WS_THICKFRAME }
+CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
 
 : enter-fullscreen ( world -- )
     handle>> hWnd>>
