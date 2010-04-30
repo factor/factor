@@ -73,3 +73,6 @@ IN: combinators.smart.tests
 [ ] [ 3 [ even? ] [ 2 + ] smart-when* ] unit-test
 [ 3 ] [ 2 [ odd? ] [ 3 ] smart-unless* ] unit-test
 [ 3 ] [ 3 [ odd? ] [ 5 ] smart-unless* ] unit-test
+
+[ -1 ] [ 1 2 [ + odd? ] [ - ] smart-when* ] unit-test
+[ ] [ 2 2 [ + odd? ] [ ] smart-unless* ] unit-test
