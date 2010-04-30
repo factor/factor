@@ -118,7 +118,7 @@ SYMBOL: unhandled-intervals
     [ reg-classes ] dip { } map>assoc ; inline
 
 : next-spill-slot ( rep -- n )
-    rep-size cfg get
+    cfg get
     [ swap [ align dup ] [ + ] bi ] change-spill-area-size drop
     <spill-slot> ;
 
@@ -129,12 +129,10 @@ SYMBOL: unhandled-sync-points
 SYMBOL: spill-slots
 
 : assign-spill-slot ( coalesced-vreg rep -- spill-slot )
-    dup tagged-rep? [ drop int-rep ] when
-    spill-slots get [ nip next-spill-slot ] 2cache ;
+    rep-size spill-slots get [ nip next-spill-slot ] 2cache ;
 
 : lookup-spill-slot ( coalesced-vreg rep -- spill-slot )
-    dup tagged-rep? [ drop int-rep ] when
-    2array spill-slots get ?at [ ] [ bad-vreg ] if ;
+    rep-size 2array spill-slots get ?at [ ] [ bad-vreg ] if ;
 
 : init-allocator ( registers -- )
     registers set
