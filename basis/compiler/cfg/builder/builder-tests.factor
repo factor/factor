@@ -11,8 +11,8 @@ FROM: alien.c-types => int ;
 IN: compiler.cfg.builder.tests
 
 ! Just ensure that various CFGs build correctly.
-: unit-test-cfg ( quot -- )
-    '[ _ test-cfg [ [ optimize-cfg check-cfg ] with-cfg ] each ] [ ] swap unit-test ;
+: unit-test-builder ( quot -- )
+    '[ _ test-builder [ [ optimize-cfg check-cfg ] with-cfg ] each ] [ ] swap unit-test ;
 
 : blahblah ( nodes -- ? )
     { fixnum } declare [
@@ -105,7 +105,7 @@ IN: compiler.cfg.builder.tests
         set-string-nth-fast
     ]
 } [
-    unit-test-cfg
+    unit-test-builder
 ] each
 
 : test-1 ( -- ) test-1 ;
@@ -116,7 +116,7 @@ IN: compiler.cfg.builder.tests
     test-1
     test-2
     test-3
-} [ unit-test-cfg ] each
+} [ unit-test-builder ] each
 
 {
     byte-array
@@ -134,8 +134,8 @@ IN: compiler.cfg.builder.tests
         alien-float
         alien-double
     } [| word |
-        { class } word '[ _ declare 10 _ execute ] unit-test-cfg
-        { class fixnum } word '[ _ declare _ execute ] unit-test-cfg
+        { class } word '[ _ declare 10 _ execute ] unit-test-builder
+        { class fixnum } word '[ _ declare _ execute ] unit-test-builder
     ] each
     
     {
@@ -146,22 +146,22 @@ IN: compiler.cfg.builder.tests
         set-alien-unsigned-2
         set-alien-unsigned-4
     } [| word |
-        { fixnum class } word '[ _ declare 10 _ execute ] unit-test-cfg
-        { fixnum class fixnum } word '[ _ declare _ execute ] unit-test-cfg
+        { fixnum class } word '[ _ declare 10 _ execute ] unit-test-builder
+        { fixnum class fixnum } word '[ _ declare _ execute ] unit-test-builder
     ] each
     
-    { float class } \ set-alien-float '[ _ declare 10 _ execute ] unit-test-cfg
-    { float class fixnum } \ set-alien-float '[ _ declare _ execute ] unit-test-cfg
+    { float class } \ set-alien-float '[ _ declare 10 _ execute ] unit-test-builder
+    { float class fixnum } \ set-alien-float '[ _ declare _ execute ] unit-test-builder
     
-    { float class } \ set-alien-double '[ _ declare 10 _ execute ] unit-test-cfg
-    { float class fixnum } \ set-alien-double '[ _ declare _ execute ] unit-test-cfg
+    { float class } \ set-alien-double '[ _ declare 10 _ execute ] unit-test-builder
+    { float class fixnum } \ set-alien-double '[ _ declare _ execute ] unit-test-builder
     
-    { pinned-c-ptr class } \ set-alien-cell '[ _ declare 10 _ execute ] unit-test-cfg
-    { pinned-c-ptr class fixnum } \ set-alien-cell '[ _ declare _ execute ] unit-test-cfg
+    { pinned-c-ptr class } \ set-alien-cell '[ _ declare 10 _ execute ] unit-test-builder
+    { pinned-c-ptr class fixnum } \ set-alien-cell '[ _ declare _ execute ] unit-test-builder
 ] each
 
 : count-insns ( quot insn-check -- ? )
-    [ test-mr [ instructions>> ] map ] dip
+    [ test-regs [ instructions>> ] map ] dip
     '[ _ count ] map-sum ; inline
 
 : contains-insn? ( quot insn-check -- ? )

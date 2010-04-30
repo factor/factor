@@ -251,7 +251,7 @@ V{
 } 2 test-bb
 
 V{
-    T{ ##phi f 3 }
+    T{ ##phi f 3 H{ { 1 1 } { 2 2 } } }
     T{ ##replace f 3 D 0 }
     T{ ##branch }
 } 3 test-bb
@@ -260,9 +260,6 @@ V{
     T{ ##epilogue }
     T{ ##return }
 } 4 test-bb
-
-1 get 1 2array
-2 get 2 2array 2array 3 get instructions>> first (>>inputs)
 
 0 { 1 2 } edges
 1 3 edge
@@ -298,7 +295,7 @@ V{
 } 2 test-bb
 
 V{
-    T{ ##phi f 4 }
+    T{ ##phi f 4 H{ { 1 2 } { 2 3 } } }
     T{ ##replace f 4 D 0 }
     T{ ##branch }
 } 3 test-bb
@@ -307,9 +304,6 @@ V{
     T{ ##epilogue }
     T{ ##return }
 } 4 test-bb
-
-1 get 2 2array
-2 get 3 2array 2array 3 get instructions>> first (>>inputs)
 
 0 { 1 2 } edges
 1 3 edge
@@ -371,7 +365,7 @@ cpu x86.32? [
     } 3 test-bb
 
     V{
-        T{ ##phi f 4 }
+        T{ ##phi f 4 H{ { 2 2 } { 3 3 } } }
         T{ ##peek f 5 D 0 }
         T{ ##add-float f 6 4 5 }
         T{ ##replace f 6 D 0 }
@@ -384,9 +378,6 @@ cpu x86.32? [
 
     test-diamond
     4 5 edge
-
-    2 get 2 2array
-    3 get 3 2array 2array 4 get instructions>> first (>>inputs)
 
     [ ] [ test-representations ] unit-test
 

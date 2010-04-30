@@ -26,15 +26,12 @@ V{
 } 2 test-bb
 
 V{
-    T{ ##phi f 3 }
+    T{ ##phi f 3 H{ { 1 0 } { 2 1 } } }
 } 3 test-bb
 
 0 { 1 2 } edges
 1 3 edge
 2 3 edge
-
-1 get 0 2array
-2 get 1 2array 2array 3 get instructions>> first (>>inputs)
 
 [ ] [ test-scc ] unit-test
 

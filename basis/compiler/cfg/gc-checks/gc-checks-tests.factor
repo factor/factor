@@ -184,13 +184,10 @@ V{
 } 2 test-bb
 
 V{
-    T{ ##phi f 3 }
+    T{ ##phi f 3 H{ { 1 1 } { 2 2 } } }
     T{ ##allot f 1 64 byte-array }
     T{ ##branch }
 } 3 test-bb
-
-1 get 1 2array
-2 get 2 2array 2array 3 get instructions>> first (>>inputs)
 
 0 { 1 2 } edges
 1 3 edge
