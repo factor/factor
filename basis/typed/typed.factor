@@ -167,3 +167,4 @@ SYNTAX: TYPED::
 USE: vocabs.loader
 
 { "typed" "prettyprint" } "typed.prettyprint" require-when
+{ "typed" "compiler.cfg.debugger" } "typed.debugger" require-when
