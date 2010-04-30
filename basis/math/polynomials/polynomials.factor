@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel make math math.order math.vectors sequences
-splitting vectors macros combinators math.bits ;
+USING: arrays combinators fry kernel macros make math math.bits
+math.order math.vectors sequences splitting vectors ;
 IN: math.polynomials
 
 <PRIVATE
@@ -26,17 +26,19 @@ PRIVATE>
 : 2ptrim ( p q -- p' q' ) [ ptrim ] bi@ ;
 : p+ ( p q -- r ) pextend v+ ;
 : p- ( p q -- r ) pextend v- ;
-: n*p ( n p -- n*p ) n*v ;
+ALIAS: n*p n*v
 
 : pextend-conv ( p q -- p' q' )
-    2dup [ length ] bi@ + 1 - 2pad-tail [ >vector ] bi@ ;
+    2dup [ length ] bi@ + 1 - 2pad-tail ;
 
 : p* ( p q -- r )
-    2unempty pextend-conv <reversed> dup length iota
-    [ over length pick <slice> pick [ * ] 2map sum ] map 2nip reverse ;
+    2unempty pextend-conv 
+    [ drop length [ iota ] keep ]
+    [ nip <reversed> ]
+    [ drop ] 2tri
+    '[ _ _ <slice> _ v* sum ] map reverse ;
 
-: p-sq ( p -- p^2 )
-    dup p* ;
+: p-sq ( p -- p^2 ) dup p* ; inline
 
 ERROR: negative-power-polynomial p n ;
 
@@ -56,9 +58,7 @@ ERROR: negative-power-polynomial p n ;
     dup 1 < [ drop 1 ] when
     [ over length + 0 pad-head pextend ] keep 1 + ;
 
-: /-last ( seq seq -- a )
-    #! divide the last two numbers in the sequences
-    [ last ] bi@ / ;
+: /-last ( seq1 seq2 -- x ) [ last ] bi@ / ;
 
 : (p/mod) ( p p -- p p )
     2dup /-last
@@ -75,7 +75,7 @@ PRIVATE>
 <PRIVATE
 
 : (pgcd) ( b a y x -- a d )
-    dup V{ 0 } clone p= [
+    dup V{ 0 } p= [
         drop nip
     ] [
         [ nip ] [ p/mod ] 2bi
