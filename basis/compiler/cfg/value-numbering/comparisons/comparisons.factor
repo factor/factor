@@ -17,13 +17,11 @@ IN: compiler.cfg.value-numbering.comparisons
 ! 3) Folding comparisons where both inputs are congruent
 ! 4) Converting compare instructions into compare-imm instructions
 
-UNION: literal-insn ##load-integer ##load-reference ;
-
 : fold-compare-imm? ( insn -- ? )
     src1>> vreg>insn literal-insn? ;
 
 : evaluate-compare-imm ( insn -- ? )
-    [ src1>> vreg>comparand ] [ src2>> ] [ cc>> ] tri
+    [ src1>> vreg>literal ] [ src2>> ] [ cc>> ] tri
     {
         { cc= [ eq? ] }
         { cc/= [ eq? not ] }
@@ -107,7 +105,7 @@ M: ##compare-integer-imm-branch rewrite
 
 : >compare-imm-branch ( insn swap? -- insn' )
     (>compare-imm-branch)
-    [ vreg>comparand ] dip
+    [ vreg>literal ] dip
     \ ##compare-imm-branch new-insn ; inline
 
 : >compare-integer-imm-branch ( insn swap? -- insn' )
@@ -143,7 +141,7 @@ M: ##compare-integer-branch rewrite
 
 : >compare-imm ( insn swap? -- insn' )
     (>compare-imm)
-    [ vreg>comparand ] dip
+    [ vreg>literal ] dip
     next-vreg \ ##compare-imm new-insn ; inline
 
 : >compare-integer-imm ( insn swap? -- insn' )

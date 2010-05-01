@@ -24,10 +24,17 @@ M: x86.32 stack-reg ESP ;
 M: x86.32 frame-reg EBP ;
 M: x86.32 temp-reg ECX ;
 
-M: x86.32 immediate-comparand? ( n -- ? )
-    [ call-next-method ] [ word? ] bi or ;
-
 M: x86.32 object-immediates? ( -- ? ) t ;
+
+M: x86.32 immediate-comparand? ( obj -- ? ) drop t ;
+
+M: x86.32 %replace-imm ( src loc -- )
+    loc>operand swap
+    {
+        { [ dup not ] [ drop \ f type-number MOV ] }
+        { [ dup fixnum? ] [ tag-fixnum MOV ] }
+        [ [ HEX: ffffffff MOV ] dip rc-absolute rel-literal ]
+    } cond ;
 
 M: x86.32 %load-double ( dst val -- )
     [ 0 [] MOVSD ] dip rc-absolute rel-float ;

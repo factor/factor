@@ -51,6 +51,9 @@ INSN: ##replace
 use: src/tagged-rep
 literal: loc ;
 
+INSN: ##replace-imm
+literal: src loc ;
+
 INSN: ##inc-d
 literal: n ;
 

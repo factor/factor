@@ -15,6 +15,7 @@ compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.math
 compiler.cfg.value-numbering.rewrite
 compiler.cfg.value-numbering.slots
+compiler.cfg.value-numbering.misc
 compiler.cfg.value-numbering.expressions ;
 IN: compiler.cfg.value-numbering
 
