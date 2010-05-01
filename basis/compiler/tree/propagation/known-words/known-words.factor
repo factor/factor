@@ -221,12 +221,14 @@ generic-comparison-ops [
 ] "outputs" set-word-prop
 
 \ both-fixnums? [
-    [ class>> ] bi@ {
-        { [ 2dup [ fixnum classes-intersect? not ] either? ] [ f <literal-info> ] }
-        { [ 2dup [ fixnum class<= ] both? ] [ t <literal-info> ] }
-        [ object-info ]
+    node-input-infos first2 [ class>> ] bi@ {
+        { [ 2dup [ fixnum classes-intersect? not ] either? ] [ [ 2drop f ] ] }
+        { [ 2dup [ fixnum class<= ] both? ] [ [ 2drop t ] ] }
+        { [ dup fixnum class<= ] [ [ drop fixnum? ] ] }
+        { [ over fixnum class<= ] [ [ nip fixnum? ] ] }
+        [ f ]
     } cond 2nip
-] "outputs" set-word-prop
+] "custom-inlining" set-word-prop
 
 {
     { >fixnum fixnum }
