@@ -229,6 +229,7 @@ HOOK: %load-vector cpu ( reg val rep -- )
 
 HOOK: %peek cpu ( vreg loc -- )
 HOOK: %replace cpu ( vreg loc -- )
+HOOK: %replace-imm cpu ( src loc -- )
 HOOK: %inc-d cpu ( n -- )
 HOOK: %inc-r cpu ( n -- )
 
@@ -472,11 +473,13 @@ HOOK: %epilogue cpu ( n -- )
 
 HOOK: %compare cpu ( dst temp cc src1 src2 -- )
 HOOK: %compare-imm cpu ( dst temp cc src1 src2 -- )
+HOOK: %compare-integer-imm cpu ( dst temp cc src1 src2 -- )
 HOOK: %compare-float-ordered cpu ( dst temp cc src1 src2 -- )
 HOOK: %compare-float-unordered cpu ( dst temp cc src1 src2 -- )
 
 HOOK: %compare-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-imm-branch cpu ( label cc src1 src2 -- )
+HOOK: %compare-integer-imm-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-float-ordered-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-float-unordered-branch cpu ( label cc src1 src2 -- )
 

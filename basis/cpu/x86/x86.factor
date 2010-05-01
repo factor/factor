@@ -531,12 +531,18 @@ M:: x86 %compare ( dst src1 src2 cc temp -- )
 : (%compare-tagged) ( src1 src2 -- )
     [ HEX: ffffffff CMP ] dip rc-absolute rel-literal ;
 
+: (%compare-integer-imm) ( src1 src2 cc -- )
+    3dup use-test? [ 2drop dup TEST ] [ drop CMP ] if ;
+
+M:: x86 %compare-integer-imm ( dst src1 src2 cc temp -- )
+    src1 src2 cc (%compare-integer-imm)
+    dst cc temp %boolean ;
+
 : (%compare-imm) ( src1 src2 cc -- )
     {
-        { [ 3dup use-test? ] [ 2drop dup TEST ] }
-        { [ over integer? ] [ drop CMP ] }
-        { [ over word? ] [ drop (%compare-tagged) ] }
+        { [ over fixnum? ] [ [ tag-fixnum ] dip (%compare-integer-imm) ] }
         { [ over not ] [ 2drop \ f type-number CMP ] }
+        [ drop (%compare-tagged) ]
     } cond ;
 
 M:: x86 %compare-imm ( dst src1 src2 cc temp -- )
@@ -555,6 +561,10 @@ M:: x86 %compare-imm ( dst src1 src2 cc temp -- )
 
 M:: x86 %compare-branch ( label src1 src2 cc -- )
     src1 src2 CMP
+    label cc %branch ;
+
+M:: x86 %compare-integer-imm-branch ( label src1 src2 cc -- )
+    src1 src2 cc (%compare-integer-imm)
     label cc %branch ;
 
 M:: x86 %compare-imm-branch ( label src1 src2 cc -- )

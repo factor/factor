@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.short-circuit kernel layouts
-cpu.architecture
+USING: accessors combinators combinators.short-circuit kernel
+layouts math cpu.architecture
 compiler.cfg.instructions
 compiler.cfg.value-numbering.graph ;
 IN: compiler.cfg.value-numbering.rewrite
@@ -30,13 +30,15 @@ M: ##load-integer insn>integer val>> ;
         [ val>> immediate-bitwise? ]
     } 1&& ;
 
-GENERIC: insn>comparand ( expr -- n )
+UNION: literal-insn ##load-integer ##load-reference ;
 
-M: ##load-integer insn>comparand val>> tag-fixnum ;
+GENERIC: insn>literal ( insn -- n )
 
-M: ##load-reference insn>comparand obj>> ;
+M: ##load-integer insn>literal val>> >fixnum ;
 
-: vreg>comparand ( vreg -- n ) vreg>insn insn>comparand ; inline
+M: ##load-reference insn>literal obj>> ;
+
+: vreg>literal ( vreg -- n ) vreg>insn insn>literal ; inline
 
 : vreg-immediate-comparand? ( vreg -- ? )
     vreg>insn {
