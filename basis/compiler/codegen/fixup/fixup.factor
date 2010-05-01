@@ -76,6 +76,9 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 : rel-float ( literal class -- )
     [ add-literal ] dip rt-float rel-fixup ;
 
+: rel-byte-array ( literal class -- )
+    [ add-literal ] dip rt-byte-array rel-fixup ;
+
 : rel-this ( class -- )
     rt-this rel-fixup ;
 

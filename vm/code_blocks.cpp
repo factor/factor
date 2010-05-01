@@ -231,7 +231,7 @@ void factor_vm::store_external_address(instruction_operand op)
 		break;
 #endif
 	default:
-		critical_error("Bad rel type",op.rel_type());
+		critical_error("Bad rel type in store_external_address()",op.rel_type());
 		break;
 	}
 }
@@ -267,6 +267,9 @@ struct initial_code_block_visitor {
 			break;
 		case RT_FLOAT:
 			op.store_float(next_literal());
+			break;
+		case RT_BYTE_ARRAY:
+			op.store_byte_array(next_literal());
 			break;
 		case RT_ENTRY_POINT:
 			op.store_value(parent->compute_entry_point_address(next_literal()));

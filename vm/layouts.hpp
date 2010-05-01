@@ -178,6 +178,8 @@ struct bignum : public object {
 	cell *data() const { return (cell *)(this + 1); }
 };
 
+const cell byte_array_offset = 16 - BYTE_ARRAY_TYPE;
+
 struct byte_array : public object {
 	static const cell type_number = BYTE_ARRAY_TYPE;
 	static const cell element_size = 1;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.short-circuit kernel
-layouts locals make math namespaces sequences cpu.architecture
-compiler.cfg.registers
+USING: accessors byte-arrays combinators
+combinators.short-circuit kernel layouts locals make math
+namespaces sequences cpu.architecture compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.representations.rewrite
 compiler.cfg.representations.selection ;
@@ -46,9 +46,16 @@ M: ##load-integer optimize-insn
 ! if the architecture supports it
 : convert-to-load-double? ( insn -- ? )
     {
-        [ drop load-double? ]
+        [ drop object-immediates? ]
         [ dst>> rep-of double-rep? ]
         [ obj>> float? ]
+    } 1&& ;
+
+: convert-to-load-vector? ( insn -- ? )
+    {
+        [ drop object-immediates? ]
+        [ dst>> rep-of vector-rep? ]
+        [ obj>> byte-array? ]
     } 1&& ;
 
 ! When a literal zeroes/ones vector is unboxed, we replace the ##load-reference
@@ -65,25 +72,23 @@ M: ##load-integer optimize-insn
         [ obj>> B{ 255 255 255 255  255 255 255 255  255 255 255 255  255 255 255 255 } = ]
     } 1&& ;
 
-: (convert-to-load-double) ( insn -- dst val )
-    [ dst>> ] [ obj>> ] bi ; inline
-
-: (convert-to-zero/fill-vector) ( insn -- dst rep )
-    dst>> dup rep-of ; inline
-
 M: ##load-reference optimize-insn
     {
         {
             [ dup convert-to-load-double? ]
-            [ (convert-to-load-double) ##load-double here ]
+            [ [ dst>> ] [ obj>> ] bi ##load-double here ]
         }
         {
             [ dup convert-to-zero-vector? ]
-            [ (convert-to-zero/fill-vector) ##zero-vector here ]
+            [ dst>> dup rep-of ##zero-vector here ]
         }
         {
             [ dup convert-to-fill-vector? ]
-            [ (convert-to-zero/fill-vector) ##fill-vector here ]
+            [ dst>> dup rep-of ##fill-vector here ]
+        }
+        {
+            [ dup convert-to-load-vector? ]
+            [ [ dst>> ] [ obj>> ] [ dst>> rep-of ] tri ##load-vector here ]
         }
         [ call-next-method ]
     } cond ;
