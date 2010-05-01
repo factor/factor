@@ -25,15 +25,21 @@ CONSTANT: fill-value 255
         dup 4 >= [ drop fill-value ] [ _ nth ] if
     ] B{ } map-as ;
 
-:: permute ( bytes src-order dst-order -- new-bytes )
+:: permute ( bytes width stride src-order dst-order -- new-bytes )
     src-order name>> :> src
     dst-order name>> :> dst
-    bytes src length group
-    [ pad4 src dst permutation shuffle dst length head ]
-    map concat ;
+    bytes stride group
+    [
+        src length group width head
+        [ pad4 src dst permutation shuffle dst length head ] map concat
+    ] map concat ;
+
+: stride ( image -- n )
+    [ bitmap>> length ] [ dim>> second ] bi / ;
 
 : (reorder-components) ( image src-order dest-order -- image )
-    [ permute ] 2curry change-bitmap ;
+    [ [ ] [ dim>> first ] [ stride ] tri ] 2dip
+    '[ _ _ _ _ permute ] change-bitmap ;
 
 GENERIC: normalize-component-type* ( image component-type -- image )
 
