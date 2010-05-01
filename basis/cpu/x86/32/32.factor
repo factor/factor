@@ -27,10 +27,13 @@ M: x86.32 temp-reg ECX ;
 M: x86.32 immediate-comparand? ( n -- ? )
     [ call-next-method ] [ word? ] bi or ;
 
-M: x86.32 load-double? ( -- ? ) t ;
+M: x86.32 object-immediates? ( -- ? ) t ;
 
 M: x86.32 %load-double ( dst val -- )
     [ 0 [] MOVSD ] dip rc-absolute rel-float ;
+
+M:: x86.32 %load-vector ( dst val rep -- )
+    dst 0 [] rep copy-memory* val rc-absolute rel-byte-array ;
 
 M: x86.32 %mov-vm-ptr ( reg -- )
     0 MOV 0 rc-absolute-cell rel-vm ;

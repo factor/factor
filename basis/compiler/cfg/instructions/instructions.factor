@@ -29,7 +29,7 @@ INSN: ##load-reference
 def: dst/tagged-rep
 literal: obj ;
 
-! These two are inserted by representation selection
+! These three are inserted by representation selection
 INSN: ##load-tagged
 def: dst/tagged-rep
 literal: val ;
@@ -37,6 +37,10 @@ literal: val ;
 INSN: ##load-double
 def: dst/double-rep
 literal: val ;
+
+INSN: ##load-vector
+def: dst
+literal: val rep ;
 
 ! Stack operations
 INSN: ##peek

@@ -200,6 +200,9 @@ struct literal_references_visitor {
 		case RT_FLOAT:
 			op.store_float(visitor->visit_pointer(op.load_float()));
 			break;
+		case RT_BYTE_ARRAY:
+			op.store_byte_array(visitor->visit_pointer(op.load_byte_array()));
+			break;
 		default:
 			break;
 		}

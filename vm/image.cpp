@@ -188,6 +188,9 @@ struct code_block_fixup_relocation_visitor {
 		case RT_FLOAT:
 			op.store_float(data_visitor.visit_pointer(op.load_float(old_offset)));
 			break;
+		case RT_BYTE_ARRAY:
+			op.store_byte_array(data_visitor.visit_pointer(op.load_byte_array(old_offset)));
+			break;
 		case RT_ENTRY_POINT:
 		case RT_ENTRY_POINT_PIC:
 		case RT_ENTRY_POINT_PIC_TAIL:

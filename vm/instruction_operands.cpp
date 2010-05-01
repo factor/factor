@@ -72,6 +72,16 @@ cell instruction_operand::load_float(cell pointer)
 	return (cell)load_value(pointer) - boxed_float_offset;
 }
 
+cell instruction_operand::load_byte_array()
+{
+	return (cell)load_value() - byte_array_offset;
+}
+
+cell instruction_operand::load_byte_array(cell pointer)
+{
+	return (cell)load_value(pointer) - byte_array_offset;
+}
+
 code_block *instruction_operand::load_code_block(cell relative_to)
 {
 	return ((code_block *)load_value(relative_to) - 1);
@@ -148,6 +158,11 @@ void instruction_operand::store_value(fixnum absolute_value)
 void instruction_operand::store_float(cell value)
 {
 	store_value((fixnum)value + boxed_float_offset);
+}
+
+void instruction_operand::store_byte_array(cell value)
+{
+	store_value((fixnum)value + byte_array_offset);
 }
 
 void instruction_operand::store_code_block(code_block *compiled)

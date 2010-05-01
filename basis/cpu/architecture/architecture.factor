@@ -225,6 +225,7 @@ HOOK: complex-addressing? cpu ( -- ? )
 HOOK: %load-immediate cpu ( reg val -- )
 HOOK: %load-reference cpu ( reg obj -- )
 HOOK: %load-double cpu ( reg val -- )
+HOOK: %load-vector cpu ( reg val rep -- )
 
 HOOK: %peek cpu ( vreg loc -- )
 HOOK: %replace cpu ( vreg loc -- )
@@ -500,10 +501,11 @@ M: reg-class param-reg param-regs nth ;
 
 M: stack-params param-reg 2drop ;
 
-! Does this architecture support %load-double?
-HOOK: load-double? cpu ( -- ? )
+! Does this architecture support %load-double, %load-vector and
+! objects in %compare-imm?
+HOOK: object-immediates? cpu ( -- ? )
 
-M: object load-double? f ;
+M: object object-immediates? f ;
 
 ! Can this value be an immediate operand for %add-imm, %sub-imm,
 ! or %mul-imm?
