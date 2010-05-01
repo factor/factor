@@ -5,7 +5,8 @@ cpu.x86.assembler cpu.x86.assembler.private cpu.x86.assembler.operands
 cpu.x86.features cpu.x86.features.private cpu.architecture kernel
 kernel.private math memory namespaces make sequences words system
 layouts combinators math.order math.vectors fry locals compiler.constants
-byte-arrays io macros quotations compiler compiler.units init vm
+byte-arrays io macros quotations classes.algebra compiler
+compiler.units init vm
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.intrinsics
@@ -232,12 +233,68 @@ M:: x86 %box-alien ( dst src temp -- )
         "end" resolve-label
     ] with-scope ;
 
+:: %box-displaced-alien/f ( dst displacement -- )
+    dst 1 alien@ \ f type-number MOV
+    dst 3 alien@ displacement MOV
+    dst 4 alien@ displacement MOV ;
+
+:: %box-displaced-alien/alien ( dst displacement base temp -- )
+    ! Set new alien's base to base.base
+    temp base 1 alien@ MOV
+    dst 1 alien@ temp MOV
+
+    ! Compute displacement
+    temp base 3 alien@ MOV
+    temp displacement ADD
+    dst 3 alien@ temp MOV
+
+    ! Compute address
+    temp base 4 alien@ MOV
+    temp displacement ADD
+    dst 4 alien@ temp MOV ;
+
+:: %box-displaced-alien/byte-array ( dst displacement base temp -- )
+    dst 1 alien@ base MOV
+    dst 3 alien@ displacement MOV
+    temp base displacement byte-array-offset [++] LEA
+    dst 4 alien@ temp MOV ;
+
+:: %box-displaced-alien/dynamic ( dst displacement base temp -- )
+    "not-f" define-label
+    "not-alien" define-label
+
+    ! Check base type
+    temp base MOV
+    temp tag-mask get AND
+
+    ! Is base f?
+    temp \ f type-number CMP
+    "not-f" get JNE
+
+    ! Yes, it is f. Fill in new object
+    dst displacement %box-displaced-alien/f
+
+    "end" get JMP
+
+    "not-f" resolve-label
+
+    ! Is base an alien?
+    temp alien type-number CMP
+    "not-alien" get JNE
+
+    dst displacement base temp %box-displaced-alien/alien
+
+    ! We are done
+    "end" get JMP
+
+    ! Is base a byte array? It has to be, by now...
+    "not-alien" resolve-label
+
+    dst displacement base temp %box-displaced-alien/byte-array ;
+
 M:: x86 %box-displaced-alien ( dst displacement base temp base-class -- )
-    ! This is ridiculous
     [
         "end" define-label
-        "not-f" define-label
-        "not-alien" define-label
 
         ! If displacement is zero, return the base
         dst base MOV
@@ -251,51 +308,13 @@ M:: x86 %box-displaced-alien ( dst displacement base temp base-class -- )
         ! Set expired to f
         dst 2 alien@ \ f type-number MOV
 
-        ! Is base f?
-        base \ f type-number CMP
-        "not-f" get JNE
-
-        ! Yes, it is f. Fill in new object
-        dst 1 alien@ base MOV
-        dst 3 alien@ displacement MOV
-        dst 4 alien@ displacement MOV
-
-        "end" get JMP
-
-        "not-f" resolve-label
-
-        ! Check base type
-        temp base MOV
-        temp tag-mask get AND
-
-        ! Is base an alien?
-        temp alien type-number CMP
-        "not-alien" get JNE
-
-        ! Yes, it is an alien. Set new alien's base to base.base
-        temp base 1 alien@ MOV
-        dst 1 alien@ temp MOV
-
-        ! Compute displacement
-        temp base 3 alien@ MOV
-        temp displacement ADD
-        dst 3 alien@ temp MOV
-
-        ! Compute address
-        temp base 4 alien@ MOV
-        temp displacement ADD
-        dst 4 alien@ temp MOV
-
-        ! We are done
-        "end" get JMP
-
-        ! Is base a byte array? It has to be, by now...
-        "not-alien" resolve-label
-
-        dst 1 alien@ base MOV
-        dst 3 alien@ displacement MOV
-        temp base displacement byte-array-offset [++] LEA
-        dst 4 alien@ temp MOV
+        dst displacement base temp
+        {
+            { [ base-class \ f class<= ] [ 2drop %box-displaced-alien/f ] }
+            { [ base-class \ alien class<= ] [ %box-displaced-alien/alien ] }
+            { [ base-class \ byte-array class<= ] [ %box-displaced-alien/byte-array ] }
+            [ %box-displaced-alien/dynamic ]
+        } cond
 
         "end" resolve-label
     ] with-scope ;
