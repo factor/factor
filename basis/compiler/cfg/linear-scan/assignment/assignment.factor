@@ -93,7 +93,7 @@ SYMBOL: machine-live-outs
     init-unhandled ;
 
 : insert-spill ( live-interval -- )
-    [ reg>> ] [ first-use rep>> ] [ spill-to>> ] tri ##spill ;
+    [ reg>> ] [ last-use rep>> ] [ spill-to>> ] tri ##spill ;
 
 : handle-spill ( live-interval -- )
     dup spill-to>> [ insert-spill ] [ drop ] if ;
