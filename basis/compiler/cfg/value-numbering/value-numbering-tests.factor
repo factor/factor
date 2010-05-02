@@ -28,15 +28,11 @@ IN: compiler.cfg.value-numbering.tests
     {
         T{ ##load-reference f 0 0.0 }
         T{ ##load-reference f 1 -0.0 }
-        T{ ##replace f 0 D 0 }
-        T{ ##replace f 1 D 1 }
     }
 ] [
     {
         T{ ##load-reference f 0 0.0 }
         T{ ##load-reference f 1 -0.0 }
-        T{ ##replace f 0 D 0 }
-        T{ ##replace f 1 D 1 }
     } value-numbering-step
 ] unit-test
 
@@ -44,15 +40,11 @@ IN: compiler.cfg.value-numbering.tests
     {
         T{ ##load-reference f 0 0.0 }
         T{ ##copy f 1 0 any-rep }
-        T{ ##replace f 0 D 0 }
-        T{ ##replace f 1 D 1 }
     }
 ] [
     {
         T{ ##load-reference f 0 0.0 }
         T{ ##load-reference f 1 0.0 }
-        T{ ##replace f 0 D 0 }
-        T{ ##replace f 1 D 1 }
     } value-numbering-step
 ] unit-test
 
@@ -60,15 +52,11 @@ IN: compiler.cfg.value-numbering.tests
     {
         T{ ##load-reference f 0 t }
         T{ ##copy f 1 0 any-rep }
-        T{ ##replace f 0 D 0 }
-        T{ ##replace f 1 D 1 }
     }
 ] [
     {
         T{ ##load-reference f 0 t }
         T{ ##load-reference f 1 t }
-        T{ ##replace f 0 D 0 }
-        T{ ##replace f 1 D 1 }
     } value-numbering-step
 ] unit-test
 
@@ -508,7 +496,7 @@ cpu x86.32? [
     {
         T{ ##peek f 0 D 0 }
         T{ ##load-integer f 1 100 }
-        T{ ##compare-imm f 2 0 $[ 100 tag-fixnum ] cc= }
+        T{ ##compare-imm f 2 0 100 cc= }
     }
 ] [
     {
@@ -562,33 +550,35 @@ cpu x86.32? [
     ] unit-test
 ] when
 
-[
-    {
-        T{ ##peek f 0 D 0 }
-        T{ ##load-reference f 1 3.5 }
-        T{ ##compare f 2 0 1 cc= }
-    }
-] [
-    {
-        T{ ##peek f 0 D 0 }
-        T{ ##load-reference f 1 3.5 }
-        T{ ##compare f 2 0 1 cc= }
-    } value-numbering-step trim-temps
-] unit-test
+cpu x86.32? [
+    [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##load-reference f 1 3.5 }
+            T{ ##compare f 2 0 1 cc= }
+        }
+    ] [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##load-reference f 1 3.5 }
+            T{ ##compare f 2 0 1 cc= }
+        } value-numbering-step trim-temps
+    ] unit-test
 
-[
-    {
-        T{ ##peek f 0 D 0 }
-        T{ ##load-reference f 1 3.5 }
-        T{ ##compare-branch f 0 1 cc= }
-    }
-] [
-    {
-        T{ ##peek f 0 D 0 }
-        T{ ##load-reference f 1 3.5 }
-        T{ ##compare-branch f 0 1 cc= }
-    } value-numbering-step trim-temps
-] unit-test
+    [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##load-reference f 1 3.5 }
+            T{ ##compare-branch f 0 1 cc= }
+        }
+    ] [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##load-reference f 1 3.5 }
+            T{ ##compare-branch f 0 1 cc= }
+        } value-numbering-step trim-temps
+    ] unit-test
+] unless
 
 [
     {
@@ -818,7 +808,7 @@ cpu x86.32? [
 [
     {
         T{ ##load-integer f 1 10 }
-        T{ ##load-reference f 2 f }
+        T{ ##load-reference f 2 t }
     }
 ] [
     {
@@ -830,12 +820,12 @@ cpu x86.32? [
 [
     {
         T{ ##load-integer f 1 10 }
-        T{ ##load-reference f 2 t }
+        T{ ##load-reference f 2 f }
     }
 ] [
     {
         T{ ##load-integer f 1 10 }
-        T{ ##compare-imm f 2 1 $[ 10 tag-fixnum ] cc= }
+        T{ ##compare-imm f 2 1 20 cc= }
     } value-numbering-step
 ] unit-test
 
@@ -847,7 +837,7 @@ cpu x86.32? [
 ] [
     {
         T{ ##load-integer f 1 10 }
-        T{ ##compare-imm f 2 1 10 cc/= }
+        T{ ##compare-imm f 2 1 100 cc/= }
     } value-numbering-step
 ] unit-test
 
@@ -859,7 +849,7 @@ cpu x86.32? [
 ] [
     {
         T{ ##load-integer f 1 10 }
-        T{ ##compare-imm f 2 1 $[ 10 tag-fixnum ] cc/= }
+        T{ ##compare-imm f 2 1 10 cc/= }
     } value-numbering-step
 ] unit-test
 
@@ -1390,13 +1380,11 @@ cpu x86.32? [
     {
         T{ ##peek f 0 D 0 }
         T{ ##load-integer f 1 0 }
-        T{ ##replace f 1 D 0 }
     }
 ] [
     {
         T{ ##peek f 0 D 0 }
         T{ ##and-imm f 1 0 0 }
-        T{ ##replace f 1 D 0 }
     } value-numbering-step
 ] unit-test
 
@@ -1446,13 +1434,11 @@ cpu x86.32? [
     {
         T{ ##peek f 0 D 0 }
         T{ ##load-integer f 1 -1 }
-        T{ ##replace f 1 D 0 }
     }
 ] [
     {
         T{ ##peek f 0 D 0 }
         T{ ##or-imm f 1 0 -1 }
-        T{ ##replace f 1 D 0 }
     } value-numbering-step
 ] unit-test
 
@@ -1502,13 +1488,11 @@ cpu x86.32? [
     {
         T{ ##peek f 0 D 0 }
         T{ ##load-integer f 1 0 }
-        T{ ##replace f 1 D 0 }
     }
 ] [
     {
         T{ ##peek f 0 D 0 }
         T{ ##xor f 1 0 0 }
-        T{ ##replace f 1 D 0 }
     } value-numbering-step
 ] unit-test
 

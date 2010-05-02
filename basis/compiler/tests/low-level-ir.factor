@@ -1,8 +1,9 @@
 USING: accessors assocs compiler compiler.cfg
 compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.mr
-compiler.cfg.registers compiler.cfg.linear-scan compiler.codegen
-compiler.units cpu.architecture hashtables kernel namespaces
-sequences tools.test vectors words layouts literals math arrays
+compiler.cfg.registers compiler.cfg.linear-scan
+compiler.cfg.ssa.destruction compiler.codegen compiler.units
+cpu.architecture hashtables kernel namespaces sequences
+tools.test vectors words layouts literals math arrays
 alien.c-types alien.syntax math.private ;
 IN: compiler.tests.low-level-ir
 
@@ -15,6 +16,7 @@ IN: compiler.tests.low-level-ir
     cfg new 0 get >>entry
     dup cfg set
     dup fake-representations
+    destruct-ssa
     compile-cfg ;
 
 : compile-test-bb ( insns -- result )
