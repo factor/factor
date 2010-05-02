@@ -313,3 +313,14 @@ M\ set intersect [ intersect-quot ] 1 define-partial-eval
         [ depends-on-definition ] [ heap-size '[ _ ] ] bi
     ] [ drop f ] if
 ] 1 define-partial-eval
+
+! Eliminates a few redundant checks here and there
+\ both-fixnums? [
+    in-d>> first2 [ value-info class>> ] bi@ {
+        { [ 2dup [ fixnum classes-intersect? not ] either? ] [ [ 2drop f ] ] }
+        { [ 2dup [ fixnum class<= ] both? ] [ [ 2drop t ] ] }
+        { [ dup fixnum class<= ] [ [ drop fixnum? ] ] }
+        { [ over fixnum class<= ] [ [ nip fixnum? ] ] }
+        [ f ]
+    } cond 2nip
+] "custom-inlining" set-word-prop
