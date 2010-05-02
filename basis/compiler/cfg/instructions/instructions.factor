@@ -67,6 +67,10 @@ literal: word ;
 INSN: ##jump
 literal: word ;
 
+INSN: ##prologue ;
+
+INSN: ##epilogue ;
+
 INSN: ##return ;
 
 ! Dummy instruction that simply inhibits TCO
@@ -613,15 +617,12 @@ literal: params stack-frame ;
 INSN: ##alien-callback
 literal: params stack-frame ;
 
-! Instructions used by CFG IR only.
-INSN: ##prologue ;
-INSN: ##epilogue ;
-
-INSN: ##branch ;
-
+! Control flow
 INSN: ##phi
 def: dst
 literal: inputs ;
+
+INSN: ##branch ;
 
 ! Tagged conditionals
 INSN: ##compare-branch
@@ -724,30 +725,6 @@ literal: rep dst ;
 INSN: ##reload
 def: dst
 literal: rep src ;
-
-! Instructions used by machine IR only.
-INSN: _spill-area-size
-literal: n ;
-
-INSN: _prologue
-literal: stack-frame ;
-
-INSN: _epilogue
-literal: stack-frame ;
-
-INSN: _label
-literal: label ;
-
-INSN: _branch
-literal: label ;
-
-INSN: _loop-entry ;
-
-INSN: _dispatch-label
-literal: label ;
-
-INSN: _conditional-branch
-literal: label insn ;
 
 UNION: ##allocation
 ##allot

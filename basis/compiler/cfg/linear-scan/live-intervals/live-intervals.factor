@@ -6,7 +6,7 @@ compiler.cfg.instructions
 compiler.cfg.registers
 compiler.cfg.def-use
 compiler.cfg.liveness
-compiler.cfg.linearization.order
+compiler.cfg.linearization
 compiler.cfg.ssa.destruction
 compiler.cfg
 cpu.architecture ;

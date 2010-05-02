@@ -8,7 +8,6 @@ compiler.cfg.instructions
 compiler.cfg.registers
 compiler.cfg.predecessors
 compiler.cfg.rpo
-compiler.cfg.linearization
 compiler.cfg.debugger
 compiler.cfg.def-use
 compiler.cfg.comparisons

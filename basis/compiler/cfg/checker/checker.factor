@@ -3,7 +3,7 @@
 USING: kernel combinators.short-circuit accessors math sequences
 sets assocs compiler.cfg.instructions compiler.cfg.rpo
 compiler.cfg.def-use compiler.cfg.linearization
-compiler.cfg.utilities compiler.cfg.finalization compiler.cfg.mr
+compiler.cfg.utilities compiler.cfg.finalization
 compiler.utilities ;
 IN: compiler.cfg.checker
 
@@ -52,18 +52,5 @@ ERROR: bad-successors ;
     [ check-successors ]
     bi ;
 
-ERROR: bad-live-in ;
-
-ERROR: undefined-values uses defs ;
-
-: check-mr ( mr -- )
-    ! Check that every used register has a definition
-    instructions>>
-    [ [ uses-vregs ] map concat ]
-    [ [ [ temp-vregs ] [ defs-vreg ] bi [ suffix ] when* ] map concat ] bi
-    2dup subset? [ 2drop ] [ undefined-values ] if ;
-
 : check-cfg ( cfg -- )
-    [ [ check-basic-block ] each-basic-block ]
-    [ finalize-cfg build-mr check-mr ]
-    bi ;
+    [ check-basic-block ] each-basic-block ;
