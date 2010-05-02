@@ -220,16 +220,6 @@ generic-comparison-ops [
     2bi and maybe-or-never
 ] "outputs" set-word-prop
 
-\ both-fixnums? [
-    node-input-infos first2 [ class>> ] bi@ {
-        { [ 2dup [ fixnum classes-intersect? not ] either? ] [ [ 2drop f ] ] }
-        { [ 2dup [ fixnum class<= ] both? ] [ [ 2drop t ] ] }
-        { [ dup fixnum class<= ] [ [ drop fixnum? ] ] }
-        { [ over fixnum class<= ] [ [ nip fixnum? ] ] }
-        [ f ]
-    } cond 2nip
-] "custom-inlining" set-word-prop
-
 {
     { >fixnum fixnum }
     { bignum>fixnum fixnum }
