@@ -106,7 +106,7 @@ SYMBOLS: pressed released ;
     { } buttons-delta-as ; inline
 
 {
-    { [ os windows? ] [ "game.input.xinput" require ] }
+    { [ os windows? ] [ "game.input.dinput" require ] }
     { [ os macosx? ] [ "game.input.iokit" require ] }
     { [ os linux? ] [ "game.input.x11" require ] }
     [ ]
