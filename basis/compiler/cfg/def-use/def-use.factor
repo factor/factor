@@ -19,10 +19,6 @@ M: insn uses-vregs drop { } ;
 
 M: ##phi uses-vregs inputs>> values ;
 
-M: _conditional-branch defs-vreg insn>> defs-vreg ;
-
-M: _conditional-branch uses-vregs insn>> uses-vregs ;
-
 <PRIVATE
 
 : slot-array-quot ( slots -- quot )
@@ -59,7 +55,7 @@ PRIVATE>
 [
     insn-classes get
     [ [ define-defs-vreg-method ] each ]
-    [ { ##phi _conditional-branch } diff [ define-uses-vregs-method ] each ]
+    [ { ##phi } diff [ define-uses-vregs-method ] each ]
     [ [ define-temp-vregs-method ] each ]
     tri
 ] with-compilation-unit

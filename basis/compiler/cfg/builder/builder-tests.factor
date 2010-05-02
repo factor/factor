@@ -1,12 +1,13 @@
 USING: tools.test kernel sequences words sequences.private fry
-prettyprint alien alien.accessors math.private compiler.tree.builder
-compiler.tree.optimizer compiler.cfg.builder compiler.cfg.debugger
-compiler.cfg.optimizer compiler.cfg.predecessors compiler.cfg.checker
-compiler.cfg arrays locals byte-arrays kernel.private math
-slots.private vectors sbufs strings math.partial-dispatch
-hashtables assocs combinators.short-circuit
-strings.private accessors compiler.cfg.instructions
-compiler.cfg.representations ;
+prettyprint alien alien.accessors math.private
+compiler.tree.builder compiler.tree.optimizer
+compiler.cfg.builder compiler.cfg.debugger
+compiler.cfg.optimizer compiler.cfg.rpo
+compiler.cfg.predecessors compiler.cfg.checker compiler.cfg
+arrays locals byte-arrays kernel.private math slots.private
+vectors sbufs strings math.partial-dispatch hashtables assocs
+combinators.short-circuit strings.private accessors
+compiler.cfg.instructions compiler.cfg.representations ;
 FROM: alien.c-types => int ;
 IN: compiler.cfg.builder.tests
 
@@ -161,8 +162,8 @@ IN: compiler.cfg.builder.tests
 ] each
 
 : count-insns ( quot insn-check -- ? )
-    [ test-regs [ instructions>> ] map ] dip
-    '[ _ count ] map-sum ; inline
+    [ test-regs [ post-order [ instructions>> ] map concat ] map concat ] dip
+    count ; inline
 
 : contains-insn? ( quot insn-check -- ? )
     count-insns 0 > ; inline

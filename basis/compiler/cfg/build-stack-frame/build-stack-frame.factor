@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces accessors math.order assocs kernel sequences
-combinators make classes words cpu.architecture layouts
-compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.stack-frame ;
+combinators classes words cpu.architecture layouts compiler.cfg
+compiler.cfg.rpo compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.stack-frame ;
 IN: compiler.cfg.build-stack-frame
 
 SYMBOL: frame-required?
@@ -30,43 +30,24 @@ M: ##call-gc compute-stack-frame*
     frame-required? on
     stack-frame new t >>calls-vm? request-stack-frame ;
 
-M: _spill-area-size compute-stack-frame*
-    n>> stack-frame get (>>spill-area-size) ;
-
 M: insn compute-stack-frame*
-    class frame-required? word-prop [
-        frame-required? on
-    ] when ;
+    class "frame-required?" word-prop
+    [ frame-required? on ] when ;
 
-! PowerPC backend sets frame-required? for ##integer>float!
-\ ##spill t frame-required? set-word-prop
-\ ##unary-float-function t frame-required? set-word-prop
-\ ##binary-float-function t frame-required? set-word-prop
+: initial-stack-frame ( -- stack-frame )
+    stack-frame new cfg get spill-area-size>> >>spill-area-size ;
 
 : compute-stack-frame ( insns -- )
     frame-required? off
-    stack-frame new stack-frame set
-    [ compute-stack-frame* ] each
+    initial-stack-frame stack-frame set
+    [ instructions>> [ compute-stack-frame* ] each ] each-basic-block
     stack-frame get dup stack-frame-size >>total-size drop ;
 
-GENERIC: insert-pro/epilogues* ( insn -- )
-
-M: ##prologue insert-pro/epilogues*
-    drop frame-required? get [ stack-frame get _prologue ] when ;
-
-M: ##epilogue insert-pro/epilogues*
-    drop frame-required? get [ stack-frame get _epilogue ] when ;
-
-M: insn insert-pro/epilogues* , ;
-
-: insert-pro/epilogues ( insns -- insns )
-    [ [ insert-pro/epilogues* ] each ] { } make ;
-
-: build-stack-frame ( mr -- mr )
+: build-stack-frame ( cfg -- cfg )
     [
+        [ compute-stack-frame ]
         [
-            [ compute-stack-frame ]
-            [ insert-pro/epilogues ]
-            bi
-        ] change-instructions
+            frame-required? get stack-frame get f ?
+            >>stack-frame
+        ] bi
     ] with-scope ;

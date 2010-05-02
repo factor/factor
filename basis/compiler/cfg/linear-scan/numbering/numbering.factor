@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors math sequences grouping namespaces
-compiler.cfg.linearization.order ;
+compiler.cfg.linearization ;
 IN: compiler.cfg.linear-scan.numbering
 
 ERROR: already-numbered insn ;
