@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel words sequences quotations namespaces io vectors
 arrays hashtables classes.tuple accessors prettyprint
@@ -9,10 +9,11 @@ compiler.cfg.linearization compiler.cfg.registers
 compiler.cfg.stack-frame compiler.cfg.linear-scan
 compiler.cfg.optimizer compiler.cfg.finalization
 compiler.cfg.instructions compiler.cfg.utilities
-compiler.cfg.def-use compiler.cfg.rpo compiler.cfg.mr
-compiler.cfg.representations
-compiler.cfg.representations.preferred
-compiler.cfg.gc-checks compiler.cfg.save-contexts compiler.cfg ;
+compiler.cfg.def-use compiler.cfg.rpo
+compiler.cfg.representations compiler.cfg.gc-checks
+compiler.cfg.save-contexts compiler.cfg
+compiler.cfg.representations.preferred ;
+FROM: compiler.cfg.linearization => number-blocks ;
 IN: compiler.cfg.debugger
 
 GENERIC: test-builder ( quot -- cfgs )
@@ -28,31 +29,28 @@ M: word test-builder
 : test-optimizer ( quot -- cfgs )
     test-builder [ [ optimize-cfg ] with-cfg ] map ;
 
-: test-ssa ( quot -- mrs )
+: test-ssa ( quot -- cfgs )
     test-builder [
         [
             optimize-cfg
-            flatten-cfg
         ] with-cfg
     ] map ;
 
-: test-flat ( quot -- mrs )
+: test-flat ( quot -- cfgs )
     test-builder [
         [
             optimize-cfg
             select-representations
             insert-gc-checks
             insert-save-contexts
-            flatten-cfg
         ] with-cfg
     ] map ;
 
-: test-regs ( quot -- mrs )
+: test-regs ( quot -- cfgs )
     test-builder [
         [
             optimize-cfg
             finalize-cfg
-            build-mr
         ] with-cfg
     ] map ;
 
@@ -64,19 +62,32 @@ M: ##phi insn.
 
 M: insn insn. tuple>array but-last [ bl ] [ pprint ] interleave nl ;
 
-: mr. ( mr -- )
-    "=== word: " write
-    dup word>> pprint
-    ", label: " write
-    dup label>> pprint nl nl
-    instructions>> [ insn. ] each ;
+: block. ( bb -- )
+    "=== Basic block #" write dup block-number . nl
+    dup instructions>> [ insn. ] each nl
+    successors>> [
+        "Successors: " write
+        [ block-number unparse ] map ", " join print nl
+    ] unless-empty ;
 
-: mrs. ( mrs -- )
-    [ nl ] [ mr. ] interleave ;
+: cfg. ( cfg -- )
+    [
+        dup linearization-order number-blocks
+        "=== word: " write
+        dup word>> pprint
+        ", label: " write
+        dup label>> pprint nl nl
+        dup linearization-order [ block. ] each
+        "=== stack frame: " write
+        stack-frame>> .
+    ] with-scope ;
 
-: ssa. ( quot -- ) test-ssa mrs. ;
-: flat. ( quot -- ) test-flat mrs. ;
-: regs. ( quot -- ) test-regs mrs. ;
+: cfgs. ( cfgs -- )
+    [ nl ] [ cfg. ] interleave ;
+
+: ssa. ( quot -- ) test-ssa cfgs. ;
+: flat. ( quot -- ) test-flat cfgs. ;
+: regs. ( quot -- ) test-regs cfgs. ;
 
 ! Prettyprinting
 : pprint-loc ( loc word -- ) <block pprint-word n>> pprint* block> ;

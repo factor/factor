@@ -22,6 +22,7 @@ M: basic-block hashcode* nip id>> ;
 
 TUPLE: cfg { entry basic-block } word label
 spill-area-size
+stack-frame
 post-order linear-order
 predecessors-valid? dominance-valid? loops-valid? ;
 
@@ -42,11 +43,3 @@ predecessors-valid? dominance-valid? loops-valid? ;
 
 : with-cfg ( ..a cfg quot: ( ..a cfg -- ..b ) -- ..b )
     [ dup cfg ] dip with-variable ; inline
-
-TUPLE: mr { instructions array } word label ;
-
-: <mr> ( instructions word label -- mr )
-    mr new
-        swap >>label
-        swap >>word
-        swap >>instructions ;

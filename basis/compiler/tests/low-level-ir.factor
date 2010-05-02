@@ -1,15 +1,15 @@
 USING: accessors assocs compiler compiler.cfg
-compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.mr
+compiler.cfg.debugger compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.linear-scan
-compiler.cfg.ssa.destruction compiler.codegen compiler.units
-cpu.architecture hashtables kernel namespaces sequences
-tools.test vectors words layouts literals math arrays
-alien.c-types alien.syntax math.private ;
+compiler.cfg.ssa.destruction compiler.cfg.build-stack-frame
+compiler.codegen compiler.units cpu.architecture hashtables
+kernel namespaces sequences tools.test vectors words layouts
+literals math arrays alien.c-types alien.syntax math.private ;
 IN: compiler.tests.low-level-ir
 
 : compile-cfg ( cfg -- word )
     gensym
-    [ linear-scan build-mr generate ] dip
+    [ linear-scan build-stack-frame generate ] dip
     [ associate >alist t t modify-code-heap ] keep ;
 
 : compile-test-cfg ( -- word )
