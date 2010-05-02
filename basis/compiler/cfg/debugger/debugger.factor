@@ -74,8 +74,9 @@ M: insn insn. tuple>array but-last [ bl ] [ pprint ] interleave nl ;
 : mrs. ( mrs -- )
     [ nl ] [ mr. ] interleave ;
 
-: flat. ( quot -- ) test-flat mrs. ; inline
-: regs. ( quot -- ) test-regs mrs. ; inline
+: ssa. ( quot -- ) test-ssa mrs. ;
+: flat. ( quot -- ) test-flat mrs. ;
+: regs. ( quot -- ) test-regs mrs. ;
 
 ! Prettyprinting
 : pprint-loc ( loc word -- ) <block pprint-word n>> pprint* block> ;
