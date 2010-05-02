@@ -188,5 +188,6 @@ SPECIALIZED-ARRAY: struct-resize-test
 [ ] [
     [
         struct-resize-test specialized-array-vocab forget-vocab
+        \ struct-resize-test-usage forget
     ] with-compilation-unit
 ] unit-test
