@@ -67,8 +67,6 @@ CONSTANT: rt-vm 9
 CONSTANT: rt-cards-offset 10
 CONSTANT: rt-decks-offset 11
 CONSTANT: rt-exception-handler 12
-CONSTANT: rt-float 13
-CONSTANT: rt-byte-array 14
 
 : rc-absolute? ( n -- ? )
     ${

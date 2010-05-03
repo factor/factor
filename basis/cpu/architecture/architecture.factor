@@ -506,9 +506,9 @@ M: stack-params param-reg 2drop ;
 
 ! Does this architecture support %load-double, %load-vector and
 ! objects in %compare-imm?
-HOOK: object-immediates? cpu ( -- ? )
+HOOK: fused-unboxing? cpu ( -- ? )
 
-M: object object-immediates? f ;
+M: object fused-unboxing? f ;
 
 ! Can this value be an immediate operand for %add-imm, %sub-imm,
 ! or %mul-imm?
@@ -522,9 +522,12 @@ HOOK: immediate-bitwise? cpu ( n -- ? )
 ! %compare-imm-branch?
 HOOK: immediate-comparand? cpu ( n -- ? )
 
+! Can this value be an immediate operand for %replace-imm?
+HOOK: immediate-store? cpu ( obj -- ? )
+
 M: object immediate-comparand? ( n -- ? )
     {
-        { [ dup integer? ] [ immediate-arithmetic? ] }
+        { [ dup fixnum? ] [ tag-fixnum immediate-arithmetic? ] }
         { [ dup not ] [ drop t ] }
         [ drop f ]
     } cond ;

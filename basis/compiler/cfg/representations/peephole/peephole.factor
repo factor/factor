@@ -46,14 +46,14 @@ M: ##load-integer optimize-insn
 ! if the architecture supports it
 : convert-to-load-double? ( insn -- ? )
     {
-        [ drop object-immediates? ]
+        [ drop fused-unboxing? ]
         [ dst>> rep-of double-rep? ]
         [ obj>> float? ]
     } 1&& ;
 
 : convert-to-load-vector? ( insn -- ? )
     {
-        [ drop object-immediates? ]
+        [ drop fused-unboxing? ]
         [ dst>> rep-of vector-rep? ]
         [ obj>> byte-array? ]
     } 1&& ;
