@@ -14,7 +14,6 @@ compiler.cfg.representations
 compiler.cfg.gc-checks
 compiler.cfg.save-contexts
 compiler.cfg.ssa.destruction
-compiler.cfg.empty-blocks
 compiler.cfg.checker ;
 IN: compiler.cfg.optimizer
 
