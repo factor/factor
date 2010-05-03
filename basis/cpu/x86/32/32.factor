@@ -25,23 +25,13 @@ M: x86.32 stack-reg ESP ;
 M: x86.32 frame-reg EBP ;
 M: x86.32 temp-reg ECX ;
 
-M: x86.32 object-immediates? ( -- ? ) t ;
-
 M: x86.32 immediate-comparand? ( obj -- ? ) drop t ;
 
-M: x86.32 %replace-imm ( src loc -- )
-    loc>operand swap
-    {
-        { [ dup not ] [ drop \ f type-number MOV ] }
-        { [ dup fixnum? ] [ tag-fixnum MOV ] }
-        [ [ HEX: ffffffff MOV ] dip rc-absolute rel-literal ]
-    } cond ;
-
 M: x86.32 %load-double ( dst val -- )
-    [ 0 [] MOVSD ] dip rc-absolute rel-float ;
+    [ 0 [] MOVSD ] dip rc-absolute rel-binary-literal ;
 
 M:: x86.32 %load-vector ( dst val rep -- )
-    dst 0 [] rep copy-memory* val rc-absolute rel-byte-array ;
+    dst 0 [] rep copy-memory* val rc-absolute rel-binary-literal ;
 
 M: x86.32 %mov-vm-ptr ( reg -- )
     0 MOV 0 rc-absolute-cell rel-vm ;
@@ -81,9 +71,9 @@ M:: x86.32 %dispatch ( src temp -- )
     temp HEX: 7f [+] JMP
     building get length :> end
     ! Fix up the displacement above
-    cell code-alignment
+    cell alignment
     [ end start - + building get dup pop* push ]
-    [ align-code ]
+    [ (align-code) ]
     bi ;
 
 M: x86.32 pic-tail-reg EDX ;

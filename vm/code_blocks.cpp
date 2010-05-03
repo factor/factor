@@ -265,12 +265,6 @@ struct initial_code_block_visitor {
 		case RT_LITERAL:
 			op.store_value(next_literal());
 			break;
-		case RT_FLOAT:
-			op.store_float(next_literal());
-			break;
-		case RT_BYTE_ARRAY:
-			op.store_byte_array(next_literal());
-			break;
 		case RT_ENTRY_POINT:
 			op.store_value(parent->compute_entry_point_address(next_literal()));
 			break;

@@ -70,6 +70,10 @@ HOOK: pic-tail-reg cpu ( -- reg )
 
 M: x86 complex-addressing? t ;
 
+M: x86 fused-unboxing? ( -- ? ) t ;
+
+M: x86 immediate-store? ( obj -- ? ) immediate-comparand? ;
+
 M: x86 %load-immediate dup 0 = [ drop dup XOR ] [ MOV ] if ;
 
 M: x86 %load-reference
@@ -88,7 +92,17 @@ M: ds-loc loc>operand n>> ds-reg reg-stack ;
 M: rs-loc loc>operand n>> rs-reg reg-stack ;
 
 M: x86 %peek loc>operand MOV ;
+
 M: x86 %replace loc>operand swap MOV ;
+
+M: x86 %replace-imm
+    loc>operand swap
+    {
+        { [ dup not ] [ drop \ f type-number MOV ] }
+        { [ dup fixnum? ] [ tag-fixnum MOV ] }
+        [ [ HEX: ffffffff MOV ] dip rc-absolute rel-literal ]
+    } cond ;
+
 : (%inc) ( n reg -- ) swap cells dup 0 > [ ADD ] [ neg SUB ] if ; inline
 M: x86 %inc-d ( n -- ) ds-reg (%inc) ;
 M: x86 %inc-r ( n -- ) rs-reg (%inc) ;
@@ -108,12 +122,6 @@ M: x86 %jump ( word -- )
 M: x86 %jump-label ( label -- ) 0 JMP rc-relative label-fixup ;
 
 M: x86 %return ( -- ) 0 RET ;
-
-: code-alignment ( align -- n )
-    [ building get length dup ] dip align swap - ;
-
-: align-code ( n -- )
-    0 <repetition> % ;
 
 : (%slot) ( obj slot scale tag -- op ) neg <indirect> ; inline
 : (%slot-imm) ( obj slot tag -- op ) slot-offset [+] ; inline
@@ -388,8 +396,8 @@ M: x86.64 has-small-reg? 2drop t ;
             { c:uchar  [ 8 %alien-unsigned-getter ] }
             { c:short  [ 16 %alien-signed-getter ] }
             { c:ushort [ 16 %alien-unsigned-getter ] }
-            { c:int    [ 32 [ 2drop ] %alien-integer-getter ] }
-            { c:uint   [ 32 %alien-signed-getter ] }
+            { c:int    [ 32 %alien-signed-getter ] }
+            { c:uint   [ 32 [ 2drop ] %alien-integer-getter ] }
         } case
     ] [ [ drop ] 2dip %copy ] ?if ;
 
@@ -1448,7 +1456,7 @@ M: x86 %scalar>vector %copy ;
 M:: x86 %spill ( src rep dst -- ) dst src rep %copy ;
 M:: x86 %reload ( dst rep src -- ) dst src rep %copy ;
 
-M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
+M: x86 %loop-entry 16 alignment [ NOP ] times ;
 
 M:: x86 %restore-context ( temp1 temp2 -- )
     #! Load Factor stack pointers on entry from C to Factor.
