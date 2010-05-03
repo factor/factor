@@ -47,7 +47,7 @@ CONSTANT: fp-scratch-reg 30
 M: ppc %load-immediate ( reg n -- ) swap LOAD ;
 
 M: ppc %load-reference ( reg obj -- )
-    [ 0 swap LOAD32 ] [ rc-absolute-ppc-2/2 rel-immediate ] bi* ;
+    [ 0 swap LOAD32 ] [ rc-absolute-ppc-2/2 rel-literal ] bi* ;
 
 M: ppc %alien-global ( register symbol dll -- )
     [ 0 swap LOAD32 ] 2dip rc-absolute-ppc-2/2 rel-dlsym ;
@@ -144,26 +144,6 @@ M: ppc %slot-imm ( dst obj slot tag -- ) slot-offset LWZ ;
 M: ppc %set-slot ( src obj slot -- ) swapd STWX ;
 M: ppc %set-slot-imm ( src obj slot tag -- ) slot-offset STW ;
 
-M:: ppc %string-nth ( dst src index temp -- )
-    [
-        "end" define-label
-        temp src index ADD
-        dst temp string-offset LBZ
-        0 dst HEX: 80 CMPI
-        "end" get BLT
-        temp src string-aux-offset LWZ
-        temp temp index ADD
-        temp temp index ADD
-        temp temp byte-array-offset LHZ
-        temp temp 7 SLWI
-        dst dst temp XOR
-        "end" resolve-label
-    ] with-scope ;
-
-M:: ppc %set-string-nth-fast ( ch obj index temp -- )
-    temp obj index ADD
-    ch temp string-offset STB ;
-
 M: ppc %add     ADD ;
 M: ppc %add-imm ADDI ;
 M: ppc %sub     swap SUBF ;
@@ -224,6 +204,7 @@ M:: ppc %float>integer ( dst src -- )
 M: ppc %copy ( dst src rep -- )
     2over eq? [ 3drop ] [
         {
+            { tagged-rep [ MR ] }
             { int-rep [ MR ] }
             { double-rep [ FMR ] }
         } case
@@ -492,7 +473,7 @@ M: ppc %epilogue ( n -- )
     } case ;
 
 : (%compare) ( src1 src2 -- ) [ 0 ] dip CMP ; inline
-: (%compare-imm) ( src1 src2 -- ) [ 0 ] 2dip CMPI ; inline
+: (%compare-imm) ( src1 src2 -- ) [ 0 ] [ ] [ \ f type-number or ] tri* CMPI ; inline
 : (%compare-float-unordered) ( src1 src2 -- ) [ 0 ] dip FCMPU ; inline
 : (%compare-float-ordered) ( src1 src2 -- ) [ 0 ] dip FCMPO ; inline
 

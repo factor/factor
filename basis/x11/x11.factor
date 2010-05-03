@@ -33,4 +33,4 @@ SYMBOL: root
 : with-x ( display-string quot -- )
     [ init-x ] dip [ close-x ] [ ] cleanup ; inline
 
-"io.backend.unix" "x11.io.unix" require-when
+{ "x11" "io.backend.unix" } "x11.io.unix" require-when

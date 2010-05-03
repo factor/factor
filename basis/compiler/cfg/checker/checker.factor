@@ -3,7 +3,8 @@
 USING: kernel combinators.short-circuit accessors math sequences
 sets assocs compiler.cfg.instructions compiler.cfg.rpo
 compiler.cfg.def-use compiler.cfg.linearization
-compiler.cfg.utilities compiler.cfg.mr compiler.utilities ;
+compiler.cfg.utilities compiler.cfg.finalization
+compiler.utilities ;
 IN: compiler.cfg.checker
 
 ! Check invariants
@@ -25,13 +26,7 @@ ERROR: last-insn-not-a-jump bb ;
     dup instructions>> last {
         [ ##branch? ]
         [ ##dispatch? ]
-        [ ##compare-branch? ]
-        [ ##compare-imm-branch? ]
-        [ ##compare-float-ordered-branch? ]
-        [ ##compare-float-unordered-branch? ]
-        [ ##fixnum-add? ]
-        [ ##fixnum-sub? ]
-        [ ##fixnum-mul? ]
+        [ conditional-branch-insn? ]
         [ ##no-tco? ]
     } 1|| [ drop ] [ last-insn-not-a-jump ] if ;
 
@@ -57,18 +52,5 @@ ERROR: bad-successors ;
     [ check-successors ]
     bi ;
 
-ERROR: bad-live-in ;
-
-ERROR: undefined-values uses defs ;
-
-: check-mr ( mr -- )
-    ! Check that every used register has a definition
-    instructions>>
-    [ [ uses-vregs ] map concat ]
-    [ [ [ temp-vregs ] [ defs-vreg ] bi [ suffix ] when* ] map concat ] bi
-    2dup subset? [ 2drop ] [ undefined-values ] if ;
-
 : check-cfg ( cfg -- )
-    [ [ check-basic-block ] each-basic-block ]
-    [ build-mr check-mr ]
-    bi ;
+    [ check-basic-block ] each-basic-block ;

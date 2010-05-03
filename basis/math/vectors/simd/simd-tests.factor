@@ -128,7 +128,7 @@ CONSTANT: vector-words
         @
         [ dup [ class ] { } map-as ] dip '[ _ declare @ ]
         {
-            [ "print-mr" get [ nip test-mr mr. ] [ 2drop ] if ]
+            [ "print-mr" get [ nip regs. ] [ 2drop ] if ]
             [ "print-checks" get [ [ . ] bi@ ] [ 2drop ] if ]
             [ [ [ call ] dip call ] call( quot quot -- result ) ]
             [ [ [ call ] dip compile-call ] call( quot quot -- result ) ]

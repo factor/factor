@@ -5,7 +5,7 @@ make fry sequences parser accessors effects namespaces
 combinators splitting classes.parser lexer quotations ;
 IN: compiler.cfg.instructions.syntax
 
-SYMBOLS: def use temp literal constant ;
+SYMBOLS: def use temp literal ;
 
 SYMBOL: scalar-rep
 
@@ -31,23 +31,22 @@ TUPLE: insn-slot-spec type name rep ;
                 { "use:" [ drop use ] }
                 { "temp:" [ drop temp ] }
                 { "literal:" [ drop literal ] }
-                { "constant:" [ drop constant ] }
                 [ dupd parse-insn-slot-spec , ]
             } case
         ] reduce drop
     ] { } make ;
 
-: insn-def-slot ( class -- slot/f )
-    "insn-slots" word-prop
+: find-def-slot ( slots -- slot/f )
     [ type>> def eq? ] find nip ;
 
+: insn-def-slot ( class -- slot/f )
+    "insn-slots" word-prop find-def-slot ;
+
 : insn-use-slots ( class -- slots )
-    "insn-slots" word-prop
-    [ type>> use eq? ] filter ;
+    "insn-slots" word-prop [ type>> use eq? ] filter ;
 
 : insn-temp-slots ( class -- slots )
-    "insn-slots" word-prop
-    [ type>> temp eq? ] filter ;
+    "insn-slots" word-prop [ type>> temp eq? ] filter ;
 
 ! We cannot reference words in compiler.cfg.instructions directly
 ! since that would create circularity.

@@ -1,15 +1,17 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math assocs namespaces sequences heaps
-fry make combinators sets locals arrays
+fry make combinators combinators.short-circuit sets locals arrays
 cpu.architecture layouts
 compiler.cfg
 compiler.cfg.def-use
 compiler.cfg.liveness
+compiler.cfg.liveness.ssa
 compiler.cfg.registers
 compiler.cfg.instructions
+compiler.cfg.linearization
+compiler.cfg.ssa.destruction
 compiler.cfg.renaming.functor
-compiler.cfg.linearization.order
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals ;
@@ -29,21 +31,16 @@ SYMBOL: pending-interval-assoc
 : remove-pending ( live-interval -- )
     vreg>> pending-interval-assoc get delete-at ;
 
-ERROR: bad-vreg vreg ;
-
-: (vreg>reg) ( vreg pending -- reg )
+:: vreg>reg ( vreg -- reg )
     ! If a live vreg is not in the pending set, then it must
     ! have been spilled.
-    ?at [ spill-slots get ?at [ ] [ bad-vreg ] if ] unless ;
-
-: vreg>reg ( vreg -- reg )
-    pending-interval-assoc get (vreg>reg) ;
+    vreg leader :> leader
+    leader pending-interval-assoc get at* [
+        drop leader vreg rep-of lookup-spill-slot
+    ] unless ;
 
 : vregs>regs ( vregs -- assoc )
-    dup assoc-empty? [
-        pending-interval-assoc get
-        '[ _ (vreg>reg) ] assoc-map
-    ] unless ;
+    [ f ] [ [ dup vreg>reg ] H{ } map>assoc ] if-empty ;
 
 ! Minheap of live intervals which still need a register allocation
 SYMBOL: unhandled-intervals
@@ -54,22 +51,49 @@ SYMBOL: unhandled-intervals
 : init-unhandled ( live-intervals -- )
     [ add-unhandled ] each ;
 
+! Liveness info is used by resolve pass
+
 ! Mapping from basic blocks to values which are live at the start
-SYMBOL: register-live-ins
+! on all incoming CFG edges
+SYMBOL: machine-live-ins
+
+: machine-live-in ( bb -- assoc )
+    machine-live-ins get at ;
+
+: compute-live-in ( bb -- )
+    [ live-in keys vregs>regs ] keep machine-live-ins get set-at ;
+
+! Mapping from basic blocks to predecessors to values which are
+! live on a particular incoming edge
+SYMBOL: machine-edge-live-ins
+
+: machine-edge-live-in ( predecessor bb -- assoc )
+    machine-edge-live-ins get at at ;
+
+: compute-edge-live-in ( bb -- )
+    [ edge-live-ins get at [ keys vregs>regs ] assoc-map ] keep
+    machine-edge-live-ins get set-at ;
 
 ! Mapping from basic blocks to values which are live at the end
-SYMBOL: register-live-outs
+SYMBOL: machine-live-outs
+
+: machine-live-out ( bb -- assoc )
+    machine-live-outs get at ;
+
+: compute-live-out ( bb -- )
+    [ live-out keys vregs>regs ] keep machine-live-outs get set-at ;
 
 : init-assignment ( live-intervals -- )
     <min-heap> pending-interval-heap set
     H{ } clone pending-interval-assoc set
     <min-heap> unhandled-intervals set
-    H{ } clone register-live-ins set
-    H{ } clone register-live-outs set
+    H{ } clone machine-live-ins set
+    H{ } clone machine-edge-live-ins set
+    H{ } clone machine-live-outs set
     init-unhandled ;
 
 : insert-spill ( live-interval -- )
-    [ reg>> ] [ vreg>> rep-of ] [ spill-to>> ] tri _spill ;
+    [ reg>> ] [ last-use rep>> ] [ spill-to>> ] tri ##spill ;
 
 : handle-spill ( live-interval -- )
     dup spill-to>> [ insert-spill ] [ drop ] if ;
@@ -89,10 +113,18 @@ SYMBOL: register-live-outs
     pending-interval-heap get (expire-old-intervals) ;
 
 : insert-reload ( live-interval -- )
-    [ reg>> ] [ vreg>> rep-of ] [ reload-from>> ] tri _reload ;
+    [ reg>> ] [ first-use rep>> ] [ reload-from>> ] tri ##reload ;
+
+: insert-reload? ( live-interval -- ? )
+    ! Don't insert a reload if the register will be written to
+    ! before being read again.
+    {
+        [ reload-from>> ]
+        [ first-use type>> +use+ eq? ]
+    } 1&& ;
 
 : handle-reload ( live-interval -- )
-    dup reload-from>> [ insert-reload ] [ drop ] if ;
+    dup insert-reload? [ insert-reload ] [ drop ] if ;
 
 : activate-interval ( live-interval -- )
     [ add-pending ] [ handle-reload ] bi ;
@@ -118,55 +150,19 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 M: vreg-insn assign-registers-in-insn
     [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ;
 
-: trace-on-gc ( assoc -- assoc' )
-    ! When a GC occurs, virtual registers which contain tagged data
-    ! are traced by the GC. Outputs a sequence physical registers.
-    [ drop rep-of int-rep eq? ] { } assoc-filter-as values ;
-
-: spill-on-gc? ( vreg reg -- ? )
-    [ rep-of int-rep? not ] [ spill-slot? not ] bi* and ;
-
-: spill-on-gc ( assoc -- assoc' )
-    ! When a GC occurs, virtual registers which contain untagged data,
-    ! and are stored in physical registers, are saved to their spill
-    ! slots. Outputs sequence of triples:
-    ! - physical register
-    ! - spill slot
-    ! - representation
-    [
-        [
-            2dup spill-on-gc?
-            [ swap [ rep-of ] [ vreg-spill-slot ] bi 3array , ] [ 2drop ] if
-        ] assoc-each
-    ] { } make ;
-
-: gc-root-offsets ( registers -- alist )
-    ! Outputs a sequence of { offset register/spill-slot } pairs
-    [ length iota [ cell * ] map ] keep zip ;
-
-M: ##gc assign-registers-in-insn
-    ! Since ##gc is always the first instruction in a block, the set of
-    ! values live at the ##gc is just live-in.
+M: ##call-gc assign-registers-in-insn
     dup call-next-method
-    basic-block get register-live-ins get at
-    [ trace-on-gc gc-root-offsets >>tagged-values ] [ spill-on-gc >>data-values ] bi
-    drop ;
+    [ [ vreg>reg ] map ] change-gc-roots drop ;
 
 M: insn assign-registers-in-insn drop ;
 
 : begin-block ( bb -- )
-    dup basic-block set
-    dup block-from activate-new-intervals
-    [ live-in vregs>regs ] keep register-live-ins get set-at ;
-
-: end-block ( bb -- )
-    [ live-out vregs>regs ] keep register-live-outs get set-at ;
-
-: vreg-at-start ( vreg bb -- state )
-    register-live-ins get at ?at [ bad-vreg ] unless ;
-
-: vreg-at-end ( vreg bb -- state )
-    register-live-outs get at ?at [ bad-vreg ] unless ;
+    {
+        [ basic-block set ]
+        [ block-from activate-new-intervals ]
+        [ compute-edge-live-in ]
+        [ compute-live-in ]
+    } cleave ;
 
 :: assign-registers-in-block ( bb -- )
     bb [
@@ -180,7 +176,7 @@ M: insn assign-registers-in-insn drop ;
                     [ , ]
                 } cleave
             ] each
-            bb end-block
+            bb compute-live-out
         ] V{ } make
     ] change-instructions drop ;
 

@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel combinators alien alien.strings alien.c-types
-alien.parser alien.syntax arrays assocs effects math.parser
-prettyprint.backend prettyprint.custom prettyprint.sections
-definitions see see.private sequences strings words ;
+USING: accessors kernel combinators alien alien.enums
+alien.strings alien.c-types alien.parser alien.syntax arrays
+assocs effects math.parser prettyprint.backend prettyprint.custom
+prettyprint.sections definitions see see.private sequences
+strings words ;
 IN: alien.prettyprint
 
 M: alien pprint*
@@ -110,3 +111,15 @@ M: alien-callback-type-word synopsis*
             ")" text block>
         ]
     } cleave ;
+
+M: enum-c-type-word definer
+    drop \ ENUM: \ ; ;
+M: enum-c-type-word synopsis*
+    {
+        [ seeing-word ]
+        [ definer. ]
+        [ pprint-word ]
+        [ c-type base-type>> dup int eq? [ drop ] [ "<" text pprint-word ] if ]
+    } cleave ;
+M: enum-c-type-word definition
+    c-type members>> ;

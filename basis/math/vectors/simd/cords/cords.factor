@@ -35,10 +35,10 @@ WHERE
 BOA-EFFECT define-inline
 
 : A-with ( n -- v )
-    [ A/2-with ] [ A/2-with ] bi cord-append ;
+    [ A/2-with ] [ A/2-with ] bi cord-append ; inline
 
 : A-cast ( v -- v' )
-    [ A/2-cast ] cord-map ;
+    [ A/2-cast ] cord-map ; inline
 
 M: A >pprint-sequence ;
 M: A pprint* pprint-object ;
