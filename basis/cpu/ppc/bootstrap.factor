@@ -491,6 +491,21 @@ CONSTANT: nv-reg 17
     3 ds-reg 0 STW
 ] \ slot define-sub-primitive
 
+[
+    ! load string index from stack
+    3 ds-reg -4 LWZ
+    3 3 tag-bits get SRAWI
+    ! load string from stack
+    4 ds-reg 0 LWZ
+    ! load character
+    4 4 string-offset ADDI
+    3 3 4 LBZX
+    3 3 tag-bits get SLWI
+    ! store character to stack
+    ds-reg ds-reg 4 SUB
+    3 ds-reg 0 STW
+] \ string-nth-fast define-sub-primitive
+
 ! Shufflers
 [
     ds-reg dup 4 SUBI
