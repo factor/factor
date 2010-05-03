@@ -2416,14 +2416,14 @@ cpu x86? [
             T{ ##peek f 0 D 0 }
             T{ ##peek f 1 D 1 }
             T{ ##add-imm f 2 1 2 }
-            T{ ##slot f 3 0 1 2 $[ 7 2 cells - ] }
+            T{ ##slot f 3 0 1 $[ cell log2 ] $[ 7 2 cells - ] }
         }
     ] [
         V{
             T{ ##peek f 0 D 0 }
             T{ ##peek f 1 D 1 }
             T{ ##add-imm f 2 1 2 }
-            T{ ##slot f 3 0 2 2 7 }
+            T{ ##slot f 3 0 2 $[ cell log2 ] 7 }
         } value-numbering-step
     ] unit-test
 ] when
