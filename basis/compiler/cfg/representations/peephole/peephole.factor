@@ -106,38 +106,29 @@ M: ##load-reference optimize-insn
         [ 2drop int-rep ##copy here ]
     } cond ;
 
-: inert-tag-imm? ( insn -- ? )
-    src1>> rep-of tagged-rep? ;
+: dst-tagged? ( insn -- ? ) dst>> rep-of tagged-rep? ;
+: src1-tagged? ( insn -- ? ) src1>> rep-of tagged-rep? ;
+: src2-tagged? ( insn -- ? ) src2>> rep-of tagged-rep? ;
 
-: inert-tag/untag-imm? ( insn -- ? )
-    {
-        [ dst>> rep-of tagged-rep? ]
-        [ inert-tag-imm? ]
-    } 1&& ;
+: src2-tagged-arithmetic? ( insn -- ? ) src2>> tag-fixnum immediate-arithmetic? ;
+: src2-tagged-bitwise? ( insn -- ? ) src2>> tag-fixnum immediate-bitwise? ;
+: src2-tagged-shift-count? ( insn -- ? ) src2>> tag-bits get + immediate-shift-count? ;
+
+: >tagged-shift ( insn -- ) [ tag-bits get + ] change-src2 finish ; inline
 
 M: ##shl-imm optimize-insn
     {
         {
-            [ dup inert-tag/untag-imm? ]
+            [ dup { [ dst-tagged? ] [ src1-tagged? ] } 1&& ]
             [ unchanged ]
         }
         {
-            [ dup dst>> rep-of tagged-rep? ]
-            [
-                [ emit-use-conversion ]
-                [ [ tag-bits get + ] change-src2 finish ]
-                [ no-def-conversion ]
-                tri
-            ]
+            [ dup { [ dst-tagged? ] [ src2-tagged-shift-count? ] } 1&& ]
+            [ [ emit-use-conversion ] [ >tagged-shift ] [ no-def-conversion ] tri ]
         }
         {
-            [ dup src1>> rep-of tagged-rep? ]
-            [
-                [ no-use-conversion ]
-                [ combine-shl-imm-input ]
-                [ emit-def-conversion ]
-                tri
-            ]
+            [ dup src1-tagged? ]
+            [ [ no-use-conversion ] [ combine-shl-imm-input ] [ emit-def-conversion ] tri ]
         }
         [ call-next-method ]
     } cond ;
@@ -148,25 +139,11 @@ M: ##shl-imm optimize-insn
 ! Into
 ! ##sar-imm by X + tag-bits
 ! assuming X + tag-bits is a valid shift count.
-: combine-sar-imm? ( insn -- ? )
-    {
-        [ src1>> rep-of tagged-rep? ]
-        [ src2>> tag-bits get + immediate-shift-count? ]
-    } 1&& ;
-
-: combine-sar-imm ( insn -- )
-    [ dst>> ] [ src1>> ] [ src2>> tag-bits get + ] tri ##sar-imm here ;
-
 M: ##sar-imm optimize-insn
     {
         {
-            [ dup combine-sar-imm? ]
-            [
-                [ no-use-conversion ]
-                [ combine-sar-imm ]
-                [ emit-def-conversion ]
-                tri
-            ]
+            [ dup { [ src1-tagged? ] [ src2-tagged-shift-count? ] } 1&& ]
+            [ [ no-use-conversion ] [ >tagged-shift ] [ emit-def-conversion ] tri ]
         }
         [ call-next-method ]
     } cond ;
@@ -177,18 +154,12 @@ M: ##sar-imm optimize-insn
 !
 ! so if all inputs and outputs of ##X or ##X-imm are tagged,
 ! don't have to insert any conversions
-: inert-tag? ( insn -- ? )
-    {
-        [ src1>> rep-of tagged-rep? ]
-        [ src2>> rep-of tagged-rep? ]
-    } 1&& ;
-
-: inert-tag/untag? ( insn -- ? )
-    { [ dst>> rep-of tagged-rep? ] [ inert-tag? ] } 1&& ;
-
 M: inert-tag-untag-insn optimize-insn
     {
-        { [ dup inert-tag/untag? ] [ unchanged ] }
+        {
+            [ dup { [ dst-tagged? ] [ src1-tagged? ] [ src2-tagged? ] } 1&& ]
+            [ unchanged ]
+        }
         [ call-next-method ]
     } cond ;
 
@@ -196,41 +167,53 @@ M: inert-tag-untag-insn optimize-insn
 : >tagged-imm ( insn -- )
     [ tag-fixnum ] change-src2 unchanged ; inline
 
-M: inert-tag-untag-imm-insn optimize-insn
+M: inert-arithmetic-tag-untag-insn optimize-insn
     {
-        { [ dup inert-tag/untag-imm? ] [ >tagged-imm ] }
+        {
+            [ dup { [ dst-tagged? ] [ src1-tagged? ] [ src2-tagged-arithmetic? ] } 1&& ]
+            [ >tagged-imm ]
+        }
+        [ call-next-method ]
+    } cond ;
+
+M: inert-bitwise-tag-untag-insn optimize-insn
+    {
+        {
+            [ dup { [ dst-tagged? ] [ src1-tagged? ] [ src2-tagged-bitwise? ] } 1&& ]
+            [ >tagged-imm ]
+        }
         [ call-next-method ]
     } cond ;
 
 M: ##mul-imm optimize-insn
     {
-        { [ dup inert-tag/untag-imm? ] [ unchanged ] }
-        { [ dup dst>> rep-of tagged-rep? ] [ >tagged-imm ] }
+        { [ dup { [ dst-tagged? ] [ src1-tagged? ] } 1&& ] [ unchanged ] }
+        { [ dup { [ dst-tagged? ] [ src2-tagged-arithmetic? ] } 1&& ] [ >tagged-imm ] }
         [ call-next-method ]
     } cond ;
 
 ! Similar optimization for comparison operators
 M: ##compare-integer-imm optimize-insn
     {
-        { [ dup inert-tag-imm? ] [ >tagged-imm ] }
+        { [ dup { [ src1-tagged? ] [ src2-tagged-arithmetic? ] } 1&& ] [ >tagged-imm ] }
         [ call-next-method ]
     } cond ;
 
 M: ##compare-integer-imm-branch optimize-insn
     {
-        { [ dup inert-tag-imm? ] [ >tagged-imm ] }
+        { [ dup { [ src1-tagged? ] [ src2-tagged-arithmetic? ] } 1&& ] [ >tagged-imm ] }
         [ call-next-method ]
     } cond ;
 
 M: ##compare-integer optimize-insn
     {
-        { [ dup inert-tag? ] [ unchanged ] }
+        { [ dup { [ src1-tagged? ] [ src2-tagged? ] } 1&& ] [ unchanged ] }
         [ call-next-method ]
     } cond ;
 
 M: ##compare-integer-branch optimize-insn
     {
-        { [ dup inert-tag? ] [ unchanged ] }
+        { [ dup { [ src1-tagged? ] [ src2-tagged? ] } 1&& ] [ unchanged ] }
         [ call-next-method ]
     } cond ;
 
@@ -248,11 +231,7 @@ M: ##neg optimize-insn
         { [ dup inert-tag/untag-unary? ] [ unchanged ] }
         {
             [ dup dst>> rep-of tagged-rep? ]
-            [
-                [ emit-use-conversion ]
-                [ combine-neg-tag ]
-                [ no-def-conversion ] tri
-            ]
+            [ [ emit-use-conversion ] [ combine-neg-tag ] [ no-def-conversion ] tri ]
         }
         [ call-next-method ]
     } cond ;
@@ -268,12 +247,7 @@ M: ##not optimize-insn
     {
         {
             [ dup inert-tag/untag-unary? ]
-            [
-                [ no-use-conversion ]
-                [ emit-tagged-not ]
-                [ no-def-conversion ]
-                tri
-            ]
+            [ [ no-use-conversion ] [ emit-tagged-not ] [ no-def-conversion ] tri ]
         }
         [ call-next-method ]
     } cond ;
