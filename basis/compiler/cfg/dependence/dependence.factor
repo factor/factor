@@ -49,25 +49,14 @@ M: node hashcode* nip number>> ;
         node insn>> uses-vregs [ definers at [ node +data+ precedes ] when* ] each
     ] each ;
 
-UNION: stack-read-write ##peek ##replace ;
+UNION: stack-insn ##peek ##replace ##replace-imm ;
 
-UNION: ##alien-read
-    ##alien-double ##alien-float ##alien-cell ##alien-vector
-    ##alien-signed-1 ##alien-signed-2 ##alien-signed-4
-    ##alien-unsigned-1 ##alien-unsigned-2 ##alien-unsigned-4 ;
-
-UNION: ##alien-write
-    ##set-alien-double ##set-alien-float ##set-alien-cell ##set-alien-vector
-    ##set-alien-integer-1 ##set-alien-integer-2 ##set-alien-integer-4 ;
-
-UNION: slot-memory-insn
+UNION: slot-insn
     ##read ##write ;
 
-UNION: alien-memory-insn
-    ##alien-read ##alien-write ;
-
-UNION: string-memory-insn
-    ##string-nth ##set-string-nth-fast ;
+UNION: memory-insn
+    ##load-memory ##load-memory-imm
+    ##store-memory ##store-memory-imm ;
 
 UNION: alien-call-insn
     ##save-context
@@ -82,17 +71,14 @@ UNION: alien-call-insn
 
 GENERIC: add-control-edge ( node insn -- )
 
-M: stack-read-write add-control-edge
+M: stack-insn add-control-edge
     loc>> chain ;
 
-M: alien-memory-insn add-control-edge
-    drop alien-memory-insn chain ;
+M: memory-insn add-control-edge
+    drop memory-insn chain ;
 
-M: slot-memory-insn add-control-edge
-    drop slot-memory-insn chain ;
-
-M: string-memory-insn add-control-edge
-    drop string-memory-insn chain ;
+M: slot-insn add-control-edge
+    drop slot-insn chain ;
 
 M: alien-call-insn add-control-edge
     drop alien-call-insn chain ;
