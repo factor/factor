@@ -560,6 +560,42 @@ cpu x86.32? [
     } test-peephole
 ] unit-test
 
+! Make sure we don't exceed immediate bounds
+cpu x86.64? [
+    4 \ vreg-counter set-global
+
+    [
+        V{
+            T{ ##peek f 0 D 0 }
+            T{ ##sar-imm f 5 0 $[ tag-bits get ] }
+            T{ ##add-imm f 6 5 $[ 30 2^ ] }
+            T{ ##shl-imm f 2 6 $[ tag-bits get ] }
+            T{ ##replace f 2 D 0 }
+        }
+    ] [
+        V{
+            T{ ##peek f 0 D 0 }
+            T{ ##add-imm f 2 0 $[ 30 2^ ] }
+            T{ ##replace f 2 D 0 }
+        } test-peephole
+    ] unit-test
+
+    [
+        V{
+            T{ ##load-integer f 0 100 }
+            T{ ##mul-imm f 7 0 $[ 30 2^ ] }
+            T{ ##shl-imm f 1 7 $[ tag-bits get ] }
+            T{ ##replace f 1 D 0 }
+        }
+    ] [
+        V{
+            T{ ##load-integer f 0 100 }
+            T{ ##mul-imm f 1 0 $[ 30 2^ ] }
+            T{ ##replace f 1 D 0 }
+        } test-peephole
+    ] unit-test
+] when
+
 ! Tag/untag elimination for ##mul-imm
 [
     V{

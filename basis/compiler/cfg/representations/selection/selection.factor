@@ -96,9 +96,11 @@ UNION: inert-tag-untag-insn
 ##min
 ##max ;
 
-UNION: inert-tag-untag-imm-insn
+UNION: inert-arithmetic-tag-untag-insn
 ##add-imm
-##sub-imm
+##sub-imm ;
+
+UNION: inert-bitwise-tag-untag-insn
 ##and-imm
 ##or-imm
 ##xor-imm ;
@@ -111,7 +113,8 @@ M: ##load-reference has-peephole-opts? drop t ;
 M: ##neg has-peephole-opts? drop t ;
 M: ##not has-peephole-opts? drop t ;
 M: inert-tag-untag-insn has-peephole-opts? drop t ;
-M: inert-tag-untag-imm-insn has-peephole-opts? drop t ;
+M: inert-arithmetic-tag-untag-insn has-peephole-opts? drop t ;
+M: inert-bitwise-tag-untag-insn has-peephole-opts? drop t ;
 M: ##mul-imm has-peephole-opts? drop t ;
 M: ##shl-imm has-peephole-opts? drop t ;
 M: ##shr-imm has-peephole-opts? drop t ;
