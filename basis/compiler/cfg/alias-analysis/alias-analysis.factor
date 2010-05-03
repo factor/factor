@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces assocs hashtables sequences arrays
 accessors words vectors combinators combinators.short-circuit
-sets classes layouts cpu.architecture
+sets classes layouts fry cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.def-use
@@ -100,6 +100,15 @@ SYMBOL: acs>vregs
 : each-alias ( vreg quot -- )
     [ aliases ] dip each ; inline
 
+: merge-acs ( vreg into -- )
+    [ vreg>ac ] dip
+    2dup eq? [ 2drop ] [
+        [ ac>vregs ] dip
+        [ vregs>acs get '[ [ _ ] dip _ set-at ] each ]
+        [ acs>vregs get at push-all ]
+        2bi
+    ] if ;
+
 ! Map vregs -> slot# -> vreg
 SYMBOL: live-slots
 
@@ -187,7 +196,8 @@ SYMBOL: heap-ac
 : remember-set-slot ( slot#/f vreg -- )
     over [
         [ record-constant-set-slot ]
-        [ kill-constant-set-slot ] 2bi
+        [ kill-constant-set-slot ]
+        2bi
     ] [ nip kill-computed-set-slot ] if ;
 
 GENERIC: insn-slot# ( insn -- slot#/f )
@@ -262,7 +272,10 @@ M: ##write analyze-aliases*
     dup
     [ src>> resolve ] [ insn-slot# ] [ insn-object ] tri
     3dup idempotent? [ 3drop ] [
-        [ remember-set-slot drop ] [ load-slot ] 3bi
+        [ 2drop heap-ac get merge-acs ]
+        [ remember-set-slot drop ]
+        [ load-slot ]
+        3tri
     ] if ;
 
 M: ##copy analyze-aliases*
