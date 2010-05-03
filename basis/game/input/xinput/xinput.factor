@@ -30,7 +30,7 @@ MACRO: map-index-compose ( seq quot -- seq )
       XINPUT_GAMEPAD_B
       XINPUT_GAMEPAD_X
       XINPUT_GAMEPAD_Y }
-      [ [ bitand ] dip swap 0 = [ 2drop ] [ 1.0 -rot swap set-nth ] if ]
+      [ [ bitand ] dip swap 0 = [ 2drop ] [ [ 1.0 ] 2dip swap set-nth ] if ]
       map-index-compose 2cleave ;
 
  : >pov ( byte -- symbol )
