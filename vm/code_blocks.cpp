@@ -231,7 +231,7 @@ void factor_vm::store_external_address(instruction_operand op)
 		break;
 #endif
 	default:
-		critical_error("Bad rel type",op.rel_type());
+		critical_error("Bad rel type in store_external_address()",op.rel_type());
 		break;
 	}
 }

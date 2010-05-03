@@ -114,10 +114,10 @@ HELP: require
 { $notes "To unconditionally reload a vocabulary, use " { $link reload } ". To reload changed source files only, use the words in " { $link "vocabs.refresh" } "." } ;
 
 HELP: require-when
-{ $values { "if" "a vocabulary specifier" } { "then" "a vocabulary specifier" } }
-{ $description "Loads the " { $snippet "then" } " vocabulary if it is not loaded and the " { $snippet "if" } " vocabulary is. If the " { $snippet "if" } " vocabulary is not loaded now, but it is later, then the " { $snippet "then" } " vocabulary will be loaded along with it at that time." }
-{ $notes "This is used to express a joint dependency of vocabularies. If vocabularies " { $snippet "a" } " and " { $snippet "b" } " use code in vocabulary " { $snippet "c" } " to interact, then the following line can be placed in " { $snippet "a" } " in order express the dependency."
-{ $code "\"b\" \"c\" require-when" } } ;
+{ $values { "if" "a sequence of vocabulary specifiers" } { "then" "a vocabulary specifier" } }
+{ $description "Loads the " { $snippet "then" } " vocabulary if it is not loaded and all of the " { $snippet "if" } " vocabulary is. If some of the " { $snippet "if" } " vocabularies are not loaded now, but they are later, then the " { $snippet "then" } " vocabulary will be loaded along with the final one." }
+{ $notes "This is used to express a joint dependency of vocabularies. If vocabularies " { $snippet "a" } " and " { $snippet "b" } " use code in vocabulary " { $snippet "c" } " to interact, then the following line, which can be placed in " { $snippet "a" } " or " { $snippet "b" } ", expresses the dependency."
+{ $code "{ \"a\" \"b\" } \"c\" require-when" } } ;
 
 HELP: run
 { $values { "vocab" "a vocabulary specifier" } }

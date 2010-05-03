@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators.short-circuit
 compiler.cfg.instructions compiler.cfg.rpo kernel namespaces
@@ -35,10 +35,10 @@ M: ##copy eliminate-write-barrier
 
 M: insn eliminate-write-barrier drop t ;
 
-: write-barriers-step ( bb -- )
+: write-barriers-step ( insns -- insns' )
     H{ } clone fresh-allocations set
     H{ } clone mutated-objects set
-    instructions>> [ eliminate-write-barrier ] filter! drop ;
+    [ eliminate-write-barrier ] filter! ;
 
-: eliminate-write-barriers ( cfg -- cfg' )
-    dup [ write-barriers-step ] each-basic-block ;
+: eliminate-write-barriers ( cfg -- cfg )
+    dup [ write-barriers-step ] simple-optimization ;

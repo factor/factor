@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: locals alien alien.c-types alien.libraries alien.syntax
 arrays kernel fry math namespaces sequences system layouts io
-vocabs.loader accessors init classes.struct combinators command-line
-make compiler compiler.units compiler.constants compiler.alien
-compiler.codegen compiler.codegen.fixup
+vocabs.loader accessors init classes.struct combinators
+command-line make words compiler compiler.units
+compiler.constants compiler.alien compiler.codegen
+compiler.codegen.alien compiler.codegen.fixup
 compiler.cfg.instructions compiler.cfg.builder
 compiler.cfg.intrinsics compiler.cfg.stack-frame
 cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
@@ -23,6 +24,14 @@ M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
 M: x86.32 frame-reg EBP ;
 M: x86.32 temp-reg ECX ;
+
+M: x86.32 immediate-comparand? ( obj -- ? ) drop t ;
+
+M: x86.32 %load-double ( dst val -- )
+    [ 0 [] MOVSD ] dip rc-absolute rel-binary-literal ;
+
+M:: x86.32 %load-vector ( dst val rep -- )
+    dst 0 [] rep copy-memory* val rc-absolute rel-binary-literal ;
 
 M: x86.32 %mov-vm-ptr ( reg -- )
     0 MOV 0 rc-absolute-cell rel-vm ;
@@ -62,9 +71,9 @@ M:: x86.32 %dispatch ( src temp -- )
     temp HEX: 7f [+] JMP
     building get length :> end
     ! Fix up the displacement above
-    cell code-alignment
+    cell alignment
     [ end start - + building get dup pop* push ]
-    [ align-code ]
+    [ (align-code) ]
     bi ;
 
 M: x86.32 pic-tail-reg EDX ;
@@ -336,11 +345,9 @@ M: x86.32 stack-cleanup ( params -- n )
 M: x86.32 %cleanup ( params -- )
     stack-cleanup [ ESP swap SUB ] unless-zero ;
 
-M:: x86.32 %call-gc ( gc-root-count temp -- )
-    temp gc-root-base special@ LEA
-    8 save-vm-ptr
-    4 stack@ gc-root-count MOV
-    0 stack@ temp MOV
+M:: x86.32 %call-gc ( gc-roots -- )
+    4 save-vm-ptr
+    0 stack@ gc-roots gc-root-offsets %load-reference
     "inline_gc" f %alien-invoke ;
 
 M: x86.32 dummy-stack-params? f ;

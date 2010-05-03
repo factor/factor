@@ -8,10 +8,9 @@ IN: cocoa.application
 
 : <NSString> ( str -- alien ) <CFString> -> autorelease ;
 
-C-ENUM: f
-NSApplicationDelegateReplySuccess
-NSApplicationDelegateReplyCancel
-NSApplicationDelegateReplyFailure ;
+CONSTANT: NSApplicationDelegateReplySuccess 0
+CONSTANT: NSApplicationDelegateReplyCancel  1
+CONSTANT: NSApplicationDelegateReplyFailure 2
 
 : with-autorelease-pool ( quot -- )
     NSAutoreleasePool -> new [ call ] [ -> release ] bi* ; inline

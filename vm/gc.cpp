@@ -215,16 +215,34 @@ void factor_vm::primitive_compact_gc()
 		true /* trace contexts? */);
 }
 
-void factor_vm::inline_gc(cell *data_roots_base, cell data_roots_size)
+void factor_vm::inline_gc(cell gc_roots_)
 {
-	data_roots.push_back(data_root_range(data_roots_base,data_roots_size));
-	primitive_minor_gc();
-	data_roots.pop_back();
+	cell stack_pointer = (cell)ctx->callstack_top + sizeof(cell);
+
+	if(to_boolean(gc_roots_))
+	{
+		tagged<array> gc_roots(gc_roots_);
+
+		cell capacity = array_capacity(gc_roots.untagged());
+		for(cell i = 0; i < capacity; i++)
+		{
+			cell spill_slot = untag_fixnum(array_nth(gc_roots.untagged(),i));
+			cell *address = (cell *)(spill_slot + stack_pointer);
+			data_roots.push_back(data_root_range(address,1));
+		}
+
+		primitive_minor_gc();
+
+		for(cell i = 0; i < capacity; i++)
+			data_roots.pop_back();
+	}
+	else
+		primitive_minor_gc();
 }
 
-VM_C_API void inline_gc(cell *data_roots_base, cell data_roots_size, factor_vm *parent)
+VM_C_API void inline_gc(cell gc_roots, factor_vm *parent)
 {
-	parent->inline_gc(data_roots_base,data_roots_size);
+	parent->inline_gc(gc_roots);
 }
 
 /*

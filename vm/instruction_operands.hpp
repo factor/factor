@@ -30,6 +30,7 @@ enum relocation_type {
 	type since its used in a situation where relocation arguments cannot
 	be passed in, and so RT_DLSYM is inappropriate (Windows only) */
 	RT_EXCEPTION_HANDLER,
+
 };
 
 enum relocation_class {
@@ -114,7 +115,7 @@ struct relocation_entry {
 		case RT_EXCEPTION_HANDLER:
 			return 0;
 		default:
-			critical_error("Bad rel type",rel_type());
+			critical_error("Bad rel type in number_of_parameters()",rel_type());
 			return -1; /* Can't happen */
 		}
 	}

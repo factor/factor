@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math vectors arrays accessors namespaces ;
 IN: compiler.cfg
@@ -8,7 +8,8 @@ TUPLE: basic-block < identity-tuple
 number
 { instructions vector }
 { successors vector }
-{ predecessors vector } ;
+{ predecessors vector }
+{ unlikely? boolean } ;
 
 : <basic-block> ( -- bb )
     basic-block new
@@ -20,7 +21,8 @@ number
 M: basic-block hashcode* nip id>> ;
 
 TUPLE: cfg { entry basic-block } word label
-spill-area-size reps
+spill-area-size
+stack-frame
 post-order linear-order
 predecessors-valid? dominance-valid? loops-valid? ;
 
@@ -41,11 +43,3 @@ predecessors-valid? dominance-valid? loops-valid? ;
 
 : with-cfg ( ..a cfg quot: ( ..a cfg -- ..b ) -- ..b )
     [ dup cfg ] dip with-variable ; inline
-
-TUPLE: mr { instructions array } word label ;
-
-: <mr> ( instructions word label -- mr )
-    mr new
-        swap >>label
-        swap >>word
-        swap >>instructions ;

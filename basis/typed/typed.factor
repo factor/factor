@@ -164,6 +164,7 @@ SYNTAX: TYPED:
 SYNTAX: TYPED::
     (::) define-typed ;
 
-USING: vocabs vocabs.loader ;
+USE: vocabs.loader
 
-"prettyprint" "typed.prettyprint" require-when
+{ "typed" "prettyprint" } "typed.prettyprint" require-when
+{ "typed" "compiler.cfg.debugger" } "typed.debugger" require-when

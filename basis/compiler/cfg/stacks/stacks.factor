@@ -68,9 +68,14 @@ IN: compiler.cfg.stacks
 : 3inputs ( -- vreg1 vreg2 vreg3 )
     (3inputs) -3 inc-d ;
 
+: binary-op ( quot -- )
+    [ 2inputs ] dip call ds-push ; inline
+
+: unary-op ( quot -- )
+    [ ds-pop ] dip call ds-push ; inline
+
 ! adjust-d/adjust-r: these are called when other instructions which
 ! internally adjust the stack height are emitted, such as ##call and
 ! ##alien-invoke
 : adjust-d ( n -- ) current-height get [ + ] change-d drop ;
 : adjust-r ( n -- ) current-height get [ + ] change-r drop ;
-

@@ -78,8 +78,8 @@ IN: compiler.graphviz
 : optimized-cfg ( quot -- cfgs )
     {
         { [ dup cfg? ] [ 1array ] }
-        { [ dup quotation? ] [ test-cfg [ dup cfg set optimize-cfg ] map ] }
-        { [ dup word? ] [ test-cfg [ dup cfg set optimize-cfg ] map ] }
+        { [ dup quotation? ] [ test-optimizer ] }
+        { [ dup word? ] [ test-optimizer ] }
         [ ]
     } cond ;
 

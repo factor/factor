@@ -25,6 +25,7 @@ test_program_installed() {
 
 exit_script() {
     if [[ $FIND_MAKE_TARGET -eq true ]] ; then
+		# Must be echo not $ECHO
         echo $MAKE_TARGET;
     fi
     exit $1
@@ -37,7 +38,7 @@ ensure_program_installed() {
         $ECHO -n "Checking for $i..."
         test_program_installed $i
         if [[ $? -eq 0 ]]; then
-            echo -n "not "
+            $ECHO -n "not "
         else    
             installed=$(( $installed + 1 ))
         fi
@@ -194,6 +195,7 @@ find_architecture() {
 }
 
 write_test_program() {
+    #! Must be 'echo'
     echo "#include <stdio.h>" > $C_WORD.c
     echo "int main(){printf(\"%ld\", (long)(8*sizeof(void*))); return 0; }" >> $C_WORD.c
 }
@@ -247,6 +249,7 @@ set_factor_library() {
 
 set_factor_image() {
     FACTOR_IMAGE=factor.image
+    FACTOR_IMAGE_FRESH=factor.image.fresh
 }
 
 echo_build_info() {
@@ -275,7 +278,7 @@ check_os_arch_word() {
         $ECHO "WORD: $WORD"
         $ECHO "OS, ARCH, or WORD is empty.  Please report this."
 
-        echo $MAKE_TARGET
+        $ECHO $MAKE_TARGET
         exit_script 5
     fi
 }
@@ -344,22 +347,22 @@ invoke_git() {
 }
 
 git_clone() {
-    echo "Downloading the git repository from factorcode.org..."
+    $ECHO "Downloading the git repository from factorcode.org..."
     invoke_git clone $GIT_URL
 }
 
 update_script_name() {
-    echo `dirname $0`/_update.sh
+    $ECHO `dirname $0`/_update.sh
 }
 
 update_script() {
     update_script=`update_script_name`
     bash_path=`which bash`
-    echo "#!$bash_path" >"$update_script"
-    echo "git pull \"$GIT_URL\" master" >>"$update_script"
-    echo "if [[ \$? -eq 0 ]]; then exec \"$0\" $SCRIPT_ARGS; else echo \"git pull failed\"; exit 2; fi" \
+    $ECHO "#!$bash_path" >"$update_script"
+    $ECHO "git pull \"$GIT_URL\" master" >>"$update_script"
+    $ECHO "if [[ \$? -eq 0 ]]; then exec \"$0\" $SCRIPT_ARGS; else echo \"git pull failed\"; exit 2; fi" \
         >>"$update_script"
-    echo "exit 0" >>"$update_script"
+    $ECHO "exit 0" >>"$update_script"
 
     chmod 755 "$update_script"
     exec "$update_script"
@@ -370,16 +373,16 @@ update_script_changed() {
 }
 
 git_fetch_factorcode() {
-    echo "Fetching the git repository from factorcode.org..."
+    $ECHO "Fetching the git repository from factorcode.org..."
 
     rm -f `update_script_name`
     invoke_git fetch "$GIT_URL" master
 
     if update_script_changed; then
-        echo "Updating and restarting the factor.sh script..."
+        $ECHO "Updating and restarting the factor.sh script..."
         update_script
     else
-        echo "Updating the working tree..."
+        $ECHO "Updating the working tree..."
         invoke_git pull "$GIT_URL" master
     fi
 }
@@ -414,11 +417,11 @@ backup_factor() {
 
 check_makefile_exists() {
     if [[ ! -e "GNUmakefile" ]] ; then
-        echo ""
-        echo "***GNUmakefile not found***"
-        echo "You are likely in the wrong directory."
-        echo "Run this script from your factor directory:"
-        echo "     ./build-support/factor.sh"
+        $ECHO ""
+        $ECHO "***GNUmakefile not found***"
+        $ECHO "You are likely in the wrong directory."
+        $ECHO "Run this script from your factor directory:"
+        $ECHO "     ./build-support/factor.sh"
         exit_script 6
     fi
 }
@@ -438,7 +441,7 @@ make_factor() {
 }
 
 update_boot_images() {
-    echo "Deleting old images..."
+    $ECHO "Deleting old images..."
     $DELETE checksums.txt* > /dev/null 2>&1
     # delete boot images with one or two characters after the dot
     $DELETE $BOOT_IMAGE.{?,??} > /dev/null 2>&1
@@ -451,10 +454,10 @@ update_boot_images() {
              netbsd) disk_md5=`md5 $BOOT_IMAGE | cut -f4 -d' '`;;
              *) disk_md5=`$MD5SUM $BOOT_IMAGE|cut -f1 -d' '` ;;
         esac
-        echo "Factorcode md5: $factorcode_md5";
-        echo "Disk md5: $disk_md5";
+        $ECHO "Factorcode md5: $factorcode_md5";
+        $ECHO "Disk md5: $disk_md5";
         if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
-            echo "Your disk boot image matches the one on factorcode.org."
+            $ECHO "Your disk boot image matches the one on factorcode.org."
         else
             $DELETE $BOOT_IMAGE > /dev/null 2>&1
             get_boot_image;
@@ -465,7 +468,7 @@ update_boot_images() {
 }
 
 get_boot_image() {
-    echo "Downloading boot image $BOOT_IMAGE."
+    $ECHO "Downloading boot image $BOOT_IMAGE."
     get_url http://factorcode.org/images/latest/$BOOT_IMAGE
 }
 
@@ -473,7 +476,7 @@ get_url() {
     if [[ $DOWNLOADER -eq "" ]] ; then
         set_downloader;
     fi
-    echo $DOWNLOADER $1 ;
+    $ECHO $DOWNLOADER $1 ;
     $DOWNLOADER $1
     check_ret $DOWNLOADER
 }
@@ -484,8 +487,14 @@ get_config_info() {
     check_libraries
 }
 
+copy_fresh_image() {
+    $ECHO "Copying $FACTOR_IMAGE to $FACTOR_IMAGE_FRESH..."
+    $COPY $FACTOR_IMAGE $FACTOR_IMAGE_FRESH
+}
+
 bootstrap() {
     ./$FACTOR_BINARY -i=$BOOT_IMAGE
+	copy_fresh_image
 }
 
 install() {
@@ -532,22 +541,22 @@ install_build_system_port() {
     test_program_installed git
     if [[ $? -ne 1 ]] ; then
         ensure_program_installed yes
-        echo "git not found."
-        echo "This script requires either git-core or port."
-        echo "If it fails, install git-core or port and try again."
+        $ECHO "git not found."
+        $ECHO "This script requires either git-core or port."
+        $ECHO "If it fails, install git-core or port and try again."
         ensure_program_installed port
-        echo "Installing git-core with port...this will take awhile."
+        $ECHO "Installing git-core with port...this will take awhile."
         yes | sudo port install git-core
     fi
 }
 
 usage() {
-    echo "usage: $0 install|install-x11|install-macosx|self-update|quick-update|update|bootstrap|dlls|net-bootstrap|make-target|report [optional-target]"
-    echo "If you are behind a firewall, invoke as:"
-    echo "env GIT_PROTOCOL=http $0 <command>"
-    echo ""
-    echo "Example for overriding the default target:"
-    echo "    $0 update macosx-x86-32"
+    $ECHO "usage: $0 install|install-x11|install-macosx|self-update|quick-update|update|bootstrap|dlls|net-bootstrap|make-target|report [optional-target]"
+    $ECHO "If you are behind a firewall, invoke as:"
+    $ECHO "env GIT_PROTOCOL=http $0 <command>"
+    $ECHO ""
+    $ECHO "Example for overriding the default target:"
+    $ECHO "    $0 update macosx-x86-32"
 }
 
 MAKE_TARGET=unknown

@@ -106,61 +106,63 @@ help:
 	@echo "NO_UI=1  don't link with X11 libraries (ignored on Mac OS X)"
 	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 
+ALL = factor factor-ffi-test factor-lib
+
 openbsd-x86-32:
-	$(MAKE) factor factor-ffi-test CONFIG=vm/Config.openbsd.x86.32
+	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.x86.32
 
 openbsd-x86-64:
-	$(MAKE) factor factor-ffi-test CONFIG=vm/Config.openbsd.x86.64
+	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.x86.64
 
 freebsd-x86-32:
-	$(MAKE) factor factor-ffi-test CONFIG=vm/Config.freebsd.x86.32
+	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.32
 
 freebsd-x86-64:
-	$(MAKE) factor factor-ffi-test CONFIG=vm/Config.freebsd.x86.64
+	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.64
 
 netbsd-x86-32:
-	$(MAKE) factor factor-ffi-test CONFIG=vm/Config.netbsd.x86.32
+	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.x86.32
 
 netbsd-x86-64:
-	$(MAKE) factor factor-ffi-test CONFIG=vm/Config.netbsd.x86.64
+	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.x86.64
 
 macosx-ppc:
-	$(MAKE) factor factor-ffi-test macosx.app CONFIG=vm/Config.macosx.ppc
+	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.ppc
 
 macosx-x86-32:
-	$(MAKE) factor factor-ffi-test macosx.app CONFIG=vm/Config.macosx.x86.32
+	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.32
 
 macosx-x86-64:
-	$(MAKE) factor factor-ffi-test macosx.app CONFIG=vm/Config.macosx.x86.64
+	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.64
 
 linux-x86-32:
-	$(MAKE) factor factor-ffi-test CONFIG=vm/Config.linux.x86.32
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.32
 
 linux-x86-64:
-	$(MAKE) factor factor-ffi-test CONFIG=vm/Config.linux.x86.64
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.64
 
 linux-ppc:
-	$(MAKE) factor factor-ffi-test CONFIG=vm/Config.linux.ppc
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc
 
 linux-arm:
-	$(MAKE) factor factor-ffi-test CONFIG=vm/Config.linux.arm
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm
 
 solaris-x86-32:
-	$(MAKE) factor factor-ffi-test CONFIG=vm/Config.solaris.x86.32
+	$(MAKE) $(ALL) CONFIG=vm/Config.solaris.x86.32
 
 solaris-x86-64:
-	$(MAKE) factor factor-ffi-test CONFIG=vm/Config.solaris.x86.64
+	$(MAKE) $(ALL) CONFIG=vm/Config.solaris.x86.64
 
 winnt-x86-32:
-	$(MAKE) factor factor-ffi-test CONFIG=vm/Config.windows.nt.x86.32
+	$(MAKE) $(ALL) CONFIG=vm/Config.windows.nt.x86.32
 	$(MAKE) factor-console CONFIG=vm/Config.windows.nt.x86.32
 
 winnt-x86-64:
-	$(MAKE) factor factor-ffi-test CONFIG=vm/Config.windows.nt.x86.64
+	$(MAKE) $(ALL) CONFIG=vm/Config.windows.nt.x86.64
 	$(MAKE) factor-console CONFIG=vm/Config.windows.nt.x86.64
 
 wince-arm:
-	$(MAKE) factor factor-ffi-test CONFIG=vm/Config.windows.ce.arm
+	$(MAKE) $(ALL) CONFIG=vm/Config.windows.ce.arm
 
 ifdef CONFIG
 
@@ -172,6 +174,8 @@ macosx.app: factor
 
 $(ENGINE): $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
+
+factor-lib: $(ENGINE)
 
 factor: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBS) $(LIBPATH) -L. $(DLL_OBJS) \
@@ -217,4 +221,4 @@ clean:
 tags:
 	etags vm/*.{cpp,hpp,mm,S,c}
 
-.PHONY: factor factor-console factor-ffi-test tags clean macosx.app
+.PHONY: factor factor-lib factor-console factor-ffi-test tags clean macosx.app

@@ -49,8 +49,29 @@ MACRO: preserving ( quot -- )
 MACRO: nullary ( quot -- quot' )
     dup outputs '[ @ _ ndrop ] ;
 
-MACRO: smart-if ( pred true false -- )
+MACRO: dropping ( quot -- quot' )
+    inputs '[ [ _ ndrop ] ] ;
+
+MACRO: balancing ( quot -- quot' )
+    '[ _ [ preserving ] [ dropping ] bi ] ;
+
+MACRO: smart-if ( pred true false -- quot )
     '[ _ preserving _ _ if ] ;
 
-MACRO: smart-apply ( quot n -- )
+MACRO: smart-when ( pred true -- quot )
+    '[ _ _ [ ] smart-if ] ;
+
+MACRO: smart-unless ( pred false -- quot )
+    '[ _ [ ] _ smart-if ] ;
+
+MACRO: smart-if* ( pred true false -- quot )
+    '[ _ balancing _ swap _ compose if ] ;
+
+MACRO: smart-when* ( pred true -- quot )
+    '[ _ _ [ ] smart-if* ] ;
+
+MACRO: smart-unless* ( pred false -- quot )
+    '[ _ [ ] _ smart-if* ] ;
+
+MACRO: smart-apply ( quot n -- quot )
     [ dup inputs ] dip '[ _ _ _ mnapply ] ;

@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel words sequences quotations namespaces io vectors
 arrays hashtables classes.tuple accessors prettyprint
@@ -7,45 +7,87 @@ prettyprint.sections parser compiler.tree.builder
 compiler.tree.optimizer cpu.architecture compiler.cfg.builder
 compiler.cfg.linearization compiler.cfg.registers
 compiler.cfg.stack-frame compiler.cfg.linear-scan
-compiler.cfg.optimizer compiler.cfg.instructions
-compiler.cfg.utilities compiler.cfg.def-use compiler.cfg.rpo
-compiler.cfg.mr compiler.cfg.representations.preferred
-compiler.cfg ;
+compiler.cfg.optimizer compiler.cfg.finalization
+compiler.cfg.instructions compiler.cfg.utilities
+compiler.cfg.def-use compiler.cfg.rpo
+compiler.cfg.representations compiler.cfg.gc-checks
+compiler.cfg.save-contexts compiler.cfg
+compiler.cfg.representations.preferred ;
+FROM: compiler.cfg.linearization => number-blocks ;
 IN: compiler.cfg.debugger
 
-GENERIC: test-cfg ( quot -- cfgs )
+GENERIC: test-builder ( quot -- cfgs )
 
-M: callable test-cfg
+M: callable test-builder
     0 vreg-counter set-global
     build-tree optimize-tree gensym build-cfg ;
 
-M: word test-cfg
+M: word test-builder
     0 vreg-counter set-global
     [ build-tree optimize-tree ] keep build-cfg ;
 
-: test-mr ( quot -- mrs )
-    test-cfg [
+: test-optimizer ( quot -- cfgs )
+    test-builder [ [ optimize-cfg ] with-cfg ] map ;
+
+: test-ssa ( quot -- cfgs )
+    test-builder [
         [
             optimize-cfg
-            build-mr
         ] with-cfg
     ] map ;
 
-: insn. ( insn -- )
-    tuple>array but-last [ pprint bl ] each nl ;
+: test-flat ( quot -- cfgs )
+    test-builder [
+        [
+            optimize-cfg
+            select-representations
+            insert-gc-checks
+            insert-save-contexts
+        ] with-cfg
+    ] map ;
 
-: mr. ( mrs -- )
+: test-regs ( quot -- cfgs )
+    test-builder [
+        [
+            optimize-cfg
+            finalize-cfg
+        ] with-cfg
+    ] map ;
+
+GENERIC: insn. ( insn -- )
+
+M: ##phi insn.
+    clone [ [ [ number>> ] dip ] assoc-map ] change-inputs
+    call-next-method ;
+
+M: insn insn. tuple>array but-last [ bl ] [ pprint ] interleave nl ;
+
+: block. ( bb -- )
+    "=== Basic block #" write dup block-number . nl
+    dup instructions>> [ insn. ] each nl
+    successors>> [
+        "Successors: " write
+        [ block-number unparse ] map ", " join print nl
+    ] unless-empty ;
+
+: cfg. ( cfg -- )
     [
+        dup linearization-order number-blocks
         "=== word: " write
         dup word>> pprint
         ", label: " write
         dup label>> pprint nl nl
-        instructions>> [ insn. ] each
-        nl
-    ] each ;
+        dup linearization-order [ block. ] each
+        "=== stack frame: " write
+        stack-frame>> .
+    ] with-scope ;
 
-: test-mr. ( quot -- )
-    test-mr mr. ; inline
+: cfgs. ( cfgs -- )
+    [ nl ] [ cfg. ] interleave ;
+
+: ssa. ( quot -- ) test-ssa cfgs. ;
+: flat. ( quot -- ) test-flat cfgs. ;
+: regs. ( quot -- ) test-regs cfgs. ;
 
 ! Prettyprinting
 : pprint-loc ( loc word -- ) <block pprint-word n>> pprint* block> ;

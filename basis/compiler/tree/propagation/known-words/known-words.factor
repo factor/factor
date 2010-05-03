@@ -220,14 +220,6 @@ generic-comparison-ops [
     2bi and maybe-or-never
 ] "outputs" set-word-prop
 
-\ both-fixnums? [
-    [ class>> ] bi@ {
-        { [ 2dup [ fixnum classes-intersect? not ] either? ] [ f <literal-info> ] }
-        { [ 2dup [ fixnum class<= ] both? ] [ t <literal-info> ] }
-        [ object-info ]
-    } cond 2nip
-] "outputs" set-word-prop
-
 {
     { >fixnum fixnum }
     { bignum>fixnum fixnum }
@@ -254,8 +246,8 @@ generic-comparison-ops [
     ] "outputs" set-word-prop
 ] each
 
-\ string-nth [
-    2drop fixnum 0 23 2^ [a,b] <class/interval-info>
+\ string-nth-fast [
+    2drop fixnum 0 255 [a,b] <class/interval-info>
 ] "outputs" set-word-prop
 
 {

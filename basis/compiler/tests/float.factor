@@ -1,6 +1,8 @@
 USING: compiler.units compiler.test kernel kernel.private memory
 math math.private tools.test math.floats.private math.order fry
-;
+specialized-arrays sequences ;
+QUALIFIED-WITH: alien.c-types c
+SPECIALIZED-ARRAY: c:float
 IN: compiler.tests.float
 
 [ 5.0 ] [ [ 5.0 ] compile-call gc gc gc ] unit-test
@@ -116,3 +118,19 @@ IN: compiler.tests.float
 [ t ] [ 3.0 0/0. \ min check-compiled-binary-op ] unit-test
 [ t ] [ 0/0. 3.0 \ max check-compiled-binary-op ] unit-test
 [ t ] [ 3.0 0/0. \ max check-compiled-binary-op ] unit-test
+
+! Test vector ops
+[ 30.0 ] [
+    float-array{ 1 2 3 4 } float-array{ 1 2 3 4 }
+    [ { float-array float-array } declare [ * ] [ + ] 2map-reduce ] compile-call
+] unit-test
+
+[ 30.0 ] [
+    float-array{ 1 2 3 4 }
+    [ { float-array } declare dup [ * ] [ + ] 2map-reduce ] compile-call
+] unit-test
+
+[ 30.0 ] [
+    float-array{ 1 2 3 4 }
+    [ { float-array } declare [ dup * ] [ + ] map-reduce ] compile-call
+] unit-test
