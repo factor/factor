@@ -10,13 +10,7 @@ compiler.cfg.alias-analysis
 compiler.cfg.value-numbering
 compiler.cfg.copy-prop
 compiler.cfg.dce
-compiler.cfg.write-barrier
-compiler.cfg.representations
-compiler.cfg.gc-checks
-compiler.cfg.save-contexts
-compiler.cfg.ssa.destruction
-compiler.cfg.empty-blocks
-compiler.cfg.checker ;
+compiler.cfg.write-barrier ;
 IN: compiler.cfg.optimizer
 
 : optimize-cfg ( cfg -- cfg' )

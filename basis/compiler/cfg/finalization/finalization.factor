@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler.cfg.empty-blocks compiler.cfg.gc-checks
-compiler.cfg.representations compiler.cfg.save-contexts
-compiler.cfg.ssa.destruction compiler.cfg.build-stack-frame
-compiler.cfg.linear-scan compiler.cfg.scheduling ;
+USING: compiler.cfg.gc-checks compiler.cfg.representations
+compiler.cfg.save-contexts compiler.cfg.ssa.destruction
+compiler.cfg.build-stack-frame compiler.cfg.linear-scan
+compiler.cfg.scheduling ;
 IN: compiler.cfg.finalization
 
 : finalize-cfg ( cfg -- cfg' )
