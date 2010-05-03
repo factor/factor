@@ -48,13 +48,15 @@ M: array array-base-type first ;
 
 : <DIOBJECTDATAFORMAT>-quot ( struct {pguid-var,field,index,dwType-flags,dwFlags} -- quot )
     {
-        [ first dup word? [ '[ _ get ] ] [ drop [ f ] ] if ]
+        [ drop f ]
         [ second rot [ (offsetof) ] [ (sizeof) ] 2bi ]
         [ third * + ]
         [ fourth (flags) ]
         [ 4 swap nth (flag) ]
+        [ first dup word? [ '[ _ get ] ] [ drop [ f ] ] if ]
     } cleave
-    '[ @ _ _ _ DIOBJECTDATAFORMAT <struct-boa> ] ;
+    [ DIOBJECTDATAFORMAT <struct-boa> ] dip
+    '[ _ clone @ >>pguid ] ;
 
 :: make-DIOBJECTDATAFORMAT-array-quot ( struct array -- quot )
     array length '[ _ malloc-DIOBJECTDATAFORMAT-array ]
