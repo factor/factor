@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs heaps kernel namespaces sequences fry math
 math.order combinators arrays sorting compiler.utilities locals
@@ -9,11 +9,11 @@ compiler.cfg.linear-scan.allocation.state ;
 IN: compiler.cfg.linear-scan.allocation
 
 : active-positions ( new assoc -- )
-    [ vreg>> active-intervals-for ] dip
+    [ active-intervals-for ] dip
     '[ [ 0 ] dip reg>> _ add-use-position ] each ;
 
 : inactive-positions ( new assoc -- )
-    [ [ vreg>> inactive-intervals-for ] keep ] dip
+    [ [ inactive-intervals-for ] keep ] dip
     '[
         [ _ relevant-ranges intersect-live-ranges 1/0. or ] [ reg>> ] bi
         _ add-use-position
@@ -38,7 +38,8 @@ IN: compiler.cfg.linear-scan.allocation
     ! If the live interval has a usage at 'n', don't spill it,
     ! since this means its being defined by the sync point
     ! instruction. Output t if this is the case.
-    2dup [ uses>> ] dip swap member? [ 2drop t ] [ spill f ] if ;
+    2dup [ uses>> ] dip '[ n>> _ = ] any?
+    [ 2drop t ] [ spill f ] if ;
 
 : handle-sync-point ( n -- )
     [ active-intervals get values ] dip
@@ -62,18 +63,19 @@ M: sync-point handle ( sync-point -- )
 
 : smallest-heap ( heap1 heap2 -- heap )
     ! If heap1 and heap2 have the same key, favors heap1.
-    [ [ heap-peek nip ] bi@ <= ] most ;
+    {
+        { [ dup heap-empty? ] [ drop ] }
+        { [ over heap-empty? ] [ nip ] }
+        [ [ [ heap-peek nip ] bi@ <= ] most ]
+    } cond ;
 
 : (allocate-registers) ( -- )
-    {
-        { [ unhandled-intervals get heap-empty? ] [ unhandled-sync-points get ] }
-        { [ unhandled-sync-points get heap-empty? ] [ unhandled-intervals get ] }
-        ! If a live interval begins at the same location as a sync point,
-        ! process the sync point before the live interval. This ensures that the
-        ! return value of C function calls doesn't get spilled and reloaded
-        ! unnecessarily.
-        [ unhandled-sync-points get unhandled-intervals get smallest-heap ]
-    } cond dup heap-empty? [ drop ] [ heap-pop drop handle (allocate-registers) ] if ;
+    ! If a live interval begins at the same location as a sync point,
+    ! process the sync point before the live interval. This ensures that the
+    ! return value of C function calls doesn't get spilled and reloaded
+    ! unnecessarily.
+    unhandled-sync-points get unhandled-intervals get smallest-heap
+    dup heap-empty? [ drop ] [ heap-pop drop handle (allocate-registers) ] if ;
 
 : finish-allocation ( -- )
     active-intervals inactive-intervals

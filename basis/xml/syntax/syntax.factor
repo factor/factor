@@ -177,4 +177,4 @@ SYNTAX: [XML
 
 USE: vocabs.loader
 
-"inverse" "xml.syntax.inverse" require-when
+{ "xml.syntax" "inverse" } "xml.syntax.inverse" require-when

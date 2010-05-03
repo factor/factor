@@ -3,7 +3,7 @@
 USING: accessors arrays kernel math namespaces make sequences
 system layouts alien alien.c-types alien.accessors alien.libraries
 slots splitting assocs combinators locals compiler.constants
-compiler.codegen compiler.codegen.fixup
+compiler.codegen compiler.codegen.alien compiler.codegen.fixup
 compiler.cfg.instructions compiler.cfg.builder
 compiler.cfg.intrinsics compiler.cfg.stack-frame
 cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
@@ -46,6 +46,12 @@ M: x86.64 %mov-vm-ptr ( reg -- )
 M: x86.64 %vm-field ( dst offset -- )
     [ vm-reg ] dip [+] MOV ;
 
+M: x86.64 %load-double ( dst val -- )
+    [ 0 [RIP+] MOVSD ] dip rc-relative rel-binary-literal ;
+
+M:: x86.64 %load-vector ( dst val rep -- )
+    dst 0 [RIP+] rep copy-memory* val rc-relative rel-binary-literal ;
+
 M: x86.64 %set-vm-field ( src offset -- )
     [ vm-reg ] dip [+] swap MOV ;
 
@@ -85,9 +91,9 @@ M:: x86.64 %dispatch ( src temp -- )
     temp HEX: 7f [+] JMP
     building get length :> end
     ! Fix up the displacement above
-    cell code-alignment
+    cell alignment
     [ end start - + building get dup pop* push ]
-    [ align-code ]
+    [ (align-code) ]
     bi ;
 
 M: stack-params copy-register*
@@ -168,9 +174,7 @@ M:: x86.64 %box ( n rep func -- )
     ] [
         rep load-return-value
     ] if
-    rep int-rep?
-    cpu x86.64? os windows? and or
-    param-reg-1 param-reg-0 ? %mov-vm-ptr
+    rep int-rep? os windows? or param-reg-1 param-reg-0 ? %mov-vm-ptr
     func f %alien-invoke ;
 
 : box-struct-field@ ( i -- operand ) 1 + cells param@ ;
@@ -269,14 +273,9 @@ M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
     func "libm" load-library %alien-invoke
     dst float-function-return ;
 
-M:: x86.64 %call-gc ( gc-root-count temp -- )
-    ! Pass pointer to start of GC roots as first parameter
-    param-reg-0 gc-root-base param@ LEA
-    ! Pass number of roots as second parameter
-    param-reg-1 gc-root-count MOV
-    ! Pass VM ptr as third parameter
-    param-reg-2 %mov-vm-ptr
-    ! Call GC
+M:: x86.64 %call-gc ( gc-roots -- )
+    param-reg-0 gc-roots gc-root-offsets %load-reference
+    param-reg-1 %mov-vm-ptr
     "inline_gc" f %alien-invoke ;
 
 M: x86.64 struct-return-pointer-type void* ;

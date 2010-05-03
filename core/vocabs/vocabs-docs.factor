@@ -39,7 +39,7 @@ $nl
 }
 "Removing a vocabulary:"
 { $subsections forget-vocab }
-{ $see-also "words" "vocabs.loader" } ;
+{ $see-also "words" "vocabs.loader" "word-search" } ;
 
 ABOUT: "vocabularies"
 

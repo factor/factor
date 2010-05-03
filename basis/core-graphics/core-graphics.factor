@@ -6,14 +6,14 @@ images images.memory core-graphics.types core-foundation.utilities
 opengl.gl literals ;
 IN: core-graphics
 
-C-ENUM: CGImageAlphaInfo
-kCGImageAlphaNone
-kCGImageAlphaPremultipliedLast
-kCGImageAlphaPremultipliedFirst
-kCGImageAlphaLast
-kCGImageAlphaFirst
-kCGImageAlphaNoneSkipLast
-kCGImageAlphaNoneSkipFirst ;
+TYPEDEF: int CGImageAlphaInfo
+CONSTANT: kCGImageAlphaNone 0
+CONSTANT: kCGImageAlphaPremultipliedLast 1
+CONSTANT: kCGImageAlphaPremultipliedFirst 2
+CONSTANT: kCGImageAlphaLast 3
+CONSTANT: kCGImageAlphaFirst 4
+CONSTANT: kCGImageAlphaNoneSkipLast 5
+CONSTANT: kCGImageAlphaNoneSkipFirst 6
 
 CONSTANT: kCGBitmapAlphaInfoMask HEX: 1f
 CONSTANT: kCGBitmapFloatComponents 256

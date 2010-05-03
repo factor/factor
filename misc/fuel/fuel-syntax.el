@@ -1,3 +1,4 @@
+
 ;;; fuel-syntax.el --- auxiliar definitions for factor code navigation.
 
 ;; Copyright (C) 2008, 2009  Jose Antonio Ortega Ruiz
@@ -46,7 +47,7 @@
   '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
     "ABOUT:" "AFTER:" "ALIAS:" "ALIEN:" "ARTICLE:"
     "B" "BEFORE:" "BIN:"
-    "C:" "CALLBACK:" "C-ENUM:" "C-STRUCT:" "C-TYPE:" "C-UNION:" "CHAR:" "COM-INTERFACE:" "CONSTANT:" "call-next-method"
+    "C:" "CALLBACK:" "ENUM:" "C-TYPE:" "CHAR:" "COM-INTERFACE:" "CONSTANT:" "CONSULT:" "call-next-method"
     "DEFER:"
     "EBNF:" ";EBNF" "ERROR:" "EXCLUDE:"
     "f" "FORGET:" "FROM:" "FUNCTION:"
@@ -59,7 +60,7 @@
     "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
     "NAN:"
     "OCT:"
-    "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROVIDE:"
+    "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROTOCOL:" "PROVIDE:"
     "QUALIFIED-WITH:" "QUALIFIED:"
     "read-only" "RENAME:" "REQUIRE:"  "REQUIRES:"
     "SINGLETON:" "SINGLETONS:" "SLOT:" "SPECIALIZED-ARRAY:" "SPECIALIZED-ARRAYS:" "STRING:" "STRUCT:" "SYMBOL:" "SYMBOLS:" "SYNTAX:"
@@ -164,13 +165,13 @@
 
 (defconst fuel-syntax--indent-def-starts '("" ":"
                                            "AFTER" "BEFORE"
-                                           "C-ENUM" "C-STRUCT" "C-UNION" "COM-INTERFACE"
+                                           "ENUM" "COM-INTERFACE" "CONSULT"
                                            "FROM" "FUNCTION:"
                                            "INTERSECTION:"
                                            "M" "M:" "MACRO" "MACRO:"
                                            "MEMO" "MEMO:" "METHOD"
                                            "SYNTAX"
-                                           "PREDICATE" "PRIMITIVE"
+                                           "PREDICATE" "PRIMITIVE" "PROTOCOL"
                                            "SINGLETONS"
                                            "STRUCT" "SYMBOLS" "TAG" "TUPLE"
                                            "TYPED" "TYPED:"
@@ -279,7 +280,7 @@
     ("\\_<\\(U\\)SING: \\(;\\)" (1 "<b") (2 ">b"))
     ("\\_<USING:\\( \\)" (1 "<b"))
     ("\\_<\\(C\\)-ENUM: \\(;\\)" (1 "<b") (2 ">b"))
-    ("\\_<C-ENUM:\\( \\|\n\\)" (1 "<b"))
+    ("\\_<ENUM:\\( \\|\n\\)" (1 "<b"))
     ("\\_<TUPLE: +\\w+? +< +\\w+? *\\( \\|\n\\)\\([^;]\\|$\\)" (1 "<b"))
     ("\\_<TUPLE: +\\w+? *\\( \\|\n\\)\\([^;<\n]\\|\\_>\\)" (1 "<b"))
     ("\\_<\\(SYMBOLS\\|SPECIALIZED-ARRAYS\\|SINGLETONS\\|VARIANT\\): *?\\( \\|\n\\)\\([^;\n]\\|\\_>\\)"

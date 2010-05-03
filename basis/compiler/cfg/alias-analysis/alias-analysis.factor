@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces assocs hashtables sequences arrays
 accessors words vectors combinators combinators.short-circuit
@@ -7,8 +7,8 @@ compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.def-use
 compiler.cfg.liveness
-compiler.cfg.copy-prop
 compiler.cfg.registers
+compiler.cfg.utilities
 compiler.cfg.comparisons
 compiler.cfg.instructions
 compiler.cfg.representations.preferred ;
@@ -68,6 +68,14 @@ IN: compiler.cfg.alias-analysis
 ! e = c
 ! x[1] = c
 
+! Local copy propagation
+SYMBOL: copies
+
+: resolve ( vreg -- vreg ) copies get ?at drop ;
+
+: record-copy ( ##copy -- )
+    [ src>> resolve ] [ dst>> ] bi copies get set-at ; inline
+
 ! Map vregs -> alias classes
 SYMBOL: vregs>acs
 
@@ -85,14 +93,9 @@ SYMBOL: acs>vregs
 
 : ac>vregs ( ac -- vregs ) acs>vregs get at ;
 
-GENERIC: aliases ( vreg -- vregs )
-
-M: integer aliases
+: aliases ( vreg -- vregs )
     #! All vregs which may contain the same value as vreg.
     vreg>ac ac>vregs ;
-
-M: word aliases
-    1array ;
 
 : each-alias ( vreg quot -- )
     [ aliases ] dip each ; inline
@@ -187,19 +190,12 @@ SYMBOL: heap-ac
         [ kill-constant-set-slot ] 2bi
     ] [ nip kill-computed-set-slot ] if ;
 
-SYMBOL: constants
-
-: constant ( vreg -- n/f )
-    #! Return a ##load-immediate value, or f if the vreg was not
-    #! assigned by an ##load-immediate.
-    resolve constants get at ;
-
 GENERIC: insn-slot# ( insn -- slot#/f )
 GENERIC: insn-object ( insn -- vreg )
 
-M: ##slot insn-slot# slot>> constant ;
+M: ##slot insn-slot# drop f ;
 M: ##slot-imm insn-slot# slot>> ;
-M: ##set-slot insn-slot# slot>> constant ;
+M: ##set-slot insn-slot# drop f ;
 M: ##set-slot-imm insn-slot# slot>> ;
 M: ##alien-global insn-slot# [ library>> ] [ symbol>> ] bi 2array ;
 M: ##vm-field insn-slot# offset>> ;
@@ -218,7 +214,6 @@ M: ##set-vm-field insn-object drop \ ##vm-field ;
     H{ } clone vregs>acs set
     H{ } clone acs>vregs set
     H{ } clone live-slots set
-    H{ } clone constants set
     H{ } clone copies set
 
     0 ac-counter set
@@ -238,16 +233,12 @@ M: insn analyze-aliases*
     ! a new value, except boxing instructions haven't been
     ! inserted yet.
     dup defs-vreg [
-        over defs-vreg-rep int-rep eq?
+        over defs-vreg-rep { int-rep tagged-rep } member?
         [ set-heap-ac ] [ set-new-ac ] if
     ] when* ;
 
 M: ##phi analyze-aliases*
     dup defs-vreg set-heap-ac ;
-
-M: ##load-immediate analyze-aliases*
-    call-next-method
-    dup [ val>> ] [ dst>> ] bi constants get set-at ;
 
 M: ##allocation analyze-aliases*
     #! A freshly allocated object is distinct from any other
@@ -257,11 +248,10 @@ M: ##allocation analyze-aliases*
 M: ##read analyze-aliases*
     call-next-method
     dup [ dst>> ] [ insn-slot# ] [ insn-object ] tri
-    2dup live-slot dup [
-        2nip any-rep \ ##copy new-insn analyze-aliases* nip
-    ] [
-        drop remember-slot
-    ] if ;
+    2dup live-slot dup
+    [ 2nip <copy> analyze-aliases* nip ]
+    [ drop remember-slot ]
+    if ;
 
 : idempotent? ( value slot#/f vreg -- ? )
     #! Are we storing a value back to the same slot it was read
@@ -271,7 +261,9 @@ M: ##read analyze-aliases*
 M: ##write analyze-aliases*
     dup
     [ src>> resolve ] [ insn-slot# ] [ insn-object ] tri
-    [ remember-set-slot drop ] [ load-slot ] 3bi ;
+    3dup idempotent? [ 3drop ] [
+        [ remember-set-slot drop ] [ load-slot ] 3bi
+    ] if ;
 
 M: ##copy analyze-aliases*
     #! The output vreg gets the same alias class as the input
@@ -287,7 +279,7 @@ M: ##copy analyze-aliases*
 M: ##compare analyze-aliases*
     call-next-method
     dup useless-compare? [
-        dst>> \ f type-number \ ##load-immediate new-insn
+        dst>> f \ ##load-reference new-insn
         analyze-aliases*
     ] when ;
 
@@ -327,5 +319,5 @@ M: insn eliminate-dead-stores* ;
     compute-live-stores
     eliminate-dead-stores ;
 
-: alias-analysis ( cfg -- cfg' )
-    [ alias-analysis-step ] local-optimization ;
+: alias-analysis ( cfg -- cfg )
+    dup [ alias-analysis-step ] simple-optimization ;

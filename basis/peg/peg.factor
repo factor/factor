@@ -628,6 +628,6 @@ SYNTAX: PEG:
         ] append!
     ] ;
 
-USING: vocabs vocabs.loader ;
+USE: vocabs.loader
 
-"debugger" "peg.debugger" require-when
+{ "debugger" "peg" } "peg.debugger" require-when

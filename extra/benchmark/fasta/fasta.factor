@@ -91,10 +91,13 @@ TYPED:: make-repeat-fasta ( k: fixnum len: fixnum alu: string -- k': fixnum )
             n 2 * ALU "Homo sapiens alu" "ONE" write-repeat-fasta
 
             initial-seed
+
             n 3 * homo-sapiens-chars homo-sapiens-floats
             "IUB ambiguity codes" "TWO" write-random-fasta
+
             n 5 * IUB-chars IUB-floats
             "Homo sapiens frequency" "THREE" write-random-fasta
+
             drop
         ] with-file-writer
     ] ;

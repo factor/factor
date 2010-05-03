@@ -88,7 +88,7 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
     <axis-gadget> [ >>raxis ] [ add-gadget-with-border ] bi-curry bi* ;
 
 :: (add-button-gadgets) ( gadget shelf -- )
-    gadget controller>> read-controller buttons>> length [
+    gadget controller>> read-controller buttons>> length iota [
         number>string [ drop ] <border-button>
         shelf over add-gadget drop
     ] map gadget (>>buttons) ;

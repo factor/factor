@@ -135,6 +135,6 @@ concurrency.promises threads unix.process calendar unix ;
         ] in-thread
 
         p 1 seconds ?promise-timeout handle>> kill-process*
-        s ?promise 0 =
+        s 3 seconds ?promise-timeout 0 =
     ]
 ] unit-test

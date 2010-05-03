@@ -6,7 +6,7 @@ parser.notes lexer strings.parser vocabs sequences sequences.deep
 sequences.private words memory kernel.private continuations io
 vocabs.loader system strings sets vectors quotations byte-arrays
 sorting compiler.units definitions generic generic.standard
-generic.single tools.deploy.config combinators classes
+generic.single tools.deploy.config combinators classes vocabs.loader.private
 classes.builtin slots.private grouping command-line io.pathnames ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes.private
@@ -349,6 +349,8 @@ IN: tools.deploy.shaker
                 lexer-factory
                 print-use-hook
                 root-cache
+                require-when-vocabs
+                require-when-table
                 source-files.errors:error-types
                 source-files.errors:error-observers
                 vocabs:dictionary

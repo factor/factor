@@ -16,7 +16,7 @@ GENERIC: enter-event ( event window -- )
 
 GENERIC: leave-event ( event window -- )
 
-GENERIC: wheel-event ( event window -- )
+GENERIC: scroll-event ( event window -- )
 
 GENERIC: motion-event ( event window -- )
 
@@ -42,13 +42,13 @@ GENERIC: client-event ( event window -- )
 
 : events-queued ( mode -- n ) [ dpy get ] dip XEventsQueued ;
 
-: wheel? ( event -- ? ) button>> 4 7 between? ;
+: mouse-scroll? ( event -- ? ) button>> 4 7 between? ;
 
 : button-down-event$ ( event window -- )
-    over wheel? [ wheel-event ] [ button-down-event ] if ;
+    over mouse-scroll? [ scroll-event ] [ button-down-event ] if ;
 
 : button-up-event$ ( event window -- )
-    over wheel? [ 2drop ] [ button-up-event ] if ;
+    over mouse-scroll? [ 2drop ] [ button-up-event ] if ;
 
 : handle-event ( event window -- )
     swap dup XAnyEvent>> type>> {

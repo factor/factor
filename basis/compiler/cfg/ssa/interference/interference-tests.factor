@@ -9,7 +9,7 @@ IN: compiler.cfg.ssa.interference.tests
 
 : test-interference ( -- )
     cfg new 0 get >>entry
-    compute-ssa-live-sets
+    dup compute-ssa-live-sets
     dup compute-defs
     compute-live-ranges ;
 
