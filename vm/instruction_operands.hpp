@@ -30,10 +30,6 @@ enum relocation_type {
 	type since its used in a situation where relocation arguments cannot
 	be passed in, and so RT_DLSYM is inappropriate (Windows only) */
 	RT_EXCEPTION_HANDLER,
-	/* pointer to a float's payload */
-	RT_FLOAT,
-	/* pointer to a byte array's payload */
-	RT_BYTE_ARRAY,
 
 };
 
@@ -117,8 +113,6 @@ struct relocation_entry {
 		case RT_CARDS_OFFSET:
 		case RT_DECKS_OFFSET:
 		case RT_EXCEPTION_HANDLER:
-		case RT_FLOAT:
-		case RT_BYTE_ARRAY:
 			return 0;
 		default:
 			critical_error("Bad rel type in number_of_parameters()",rel_type());
@@ -159,18 +153,12 @@ struct instruction_operand {
 	fixnum load_value_masked(cell mask, cell bits, cell shift);
 	fixnum load_value(cell relative_to);
 	fixnum load_value();
-	cell load_float(cell relative_to);
-	cell load_float();
-	cell load_byte_array(cell relative_to);
-	cell load_byte_array();
 	code_block *load_code_block(cell relative_to);
 	code_block *load_code_block();
 
 	void store_value_2_2(fixnum value);
 	void store_value_masked(fixnum value, cell mask, cell shift);
 	void store_value(fixnum value);
-	void store_float(cell value);
-	void store_byte_array(cell value);
 	void store_code_block(code_block *compiled);
 };
 

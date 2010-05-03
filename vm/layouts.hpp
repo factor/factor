@@ -178,8 +178,6 @@ struct bignum : public object {
 	cell *data() const { return (cell *)(this + 1); }
 };
 
-const cell byte_array_offset = 16 - BYTE_ARRAY_TYPE;
-
 struct byte_array : public object {
 	static const cell type_number = BYTE_ARRAY_TYPE;
 	static const cell element_size = 1;
@@ -243,8 +241,6 @@ struct wrapper : public object {
 	static const cell type_number = WRAPPER_TYPE;
 	cell object;
 };
-
-const fixnum boxed_float_offset = 8 - FLOAT_TYPE;
 
 /* Assembly code makes assumptions about the layout of this struct */
 struct boxed_float : object {

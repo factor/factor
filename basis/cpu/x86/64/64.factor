@@ -3,7 +3,7 @@
 USING: accessors arrays kernel math namespaces make sequences
 system layouts alien alien.c-types alien.accessors alien.libraries
 slots splitting assocs combinators locals compiler.constants
-compiler.codegen compiler.codegen.fixup
+compiler.codegen compiler.codegen.alien compiler.codegen.fixup
 compiler.cfg.instructions compiler.cfg.builder
 compiler.cfg.intrinsics compiler.cfg.stack-frame
 cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
@@ -46,6 +46,12 @@ M: x86.64 %mov-vm-ptr ( reg -- )
 M: x86.64 %vm-field ( dst offset -- )
     [ vm-reg ] dip [+] MOV ;
 
+M: x86.64 %load-double ( dst val -- )
+    [ 0 [RIP+] MOVSD ] dip rc-relative rel-binary-literal ;
+
+M:: x86.64 %load-vector ( dst val rep -- )
+    dst 0 [RIP+] rep copy-memory* val rc-relative rel-binary-literal ;
+
 M: x86.64 %set-vm-field ( src offset -- )
     [ vm-reg ] dip [+] swap MOV ;
 
@@ -85,9 +91,9 @@ M:: x86.64 %dispatch ( src temp -- )
     temp HEX: 7f [+] JMP
     building get length :> end
     ! Fix up the displacement above
-    cell code-alignment
+    cell alignment
     [ end start - + building get dup pop* push ]
-    [ align-code ]
+    [ (align-code) ]
     bi ;
 
 M: stack-params copy-register*

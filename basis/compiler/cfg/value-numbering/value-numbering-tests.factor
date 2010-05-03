@@ -60,6 +60,74 @@ IN: compiler.cfg.value-numbering.tests
     } value-numbering-step
 ] unit-test
 
+! ##load-reference/##replace fusion
+cpu x86? [
+    [
+        {
+            T{ ##load-integer f 0 10 }
+            T{ ##replace-imm f 10 D 0 }
+        }
+    ] [
+        {
+            T{ ##load-integer f 0 10 }
+            T{ ##replace f 0 D 0 }
+        } value-numbering-step
+    ] unit-test
+
+    [
+        {
+            T{ ##load-reference f 0 f }
+            T{ ##replace-imm f f D 0 }
+        }
+    ] [
+        {
+            T{ ##load-reference f 0 f }
+            T{ ##replace f 0 D 0 }
+        } value-numbering-step
+    ] unit-test
+] when
+
+cpu x86.32? [
+    [
+        {
+            T{ ##load-reference f 0 + }
+            T{ ##replace-imm f 10 D + }
+        }
+    ] [
+        {
+            T{ ##load-reference f 0 + }
+            T{ ##replace f 0 D 0 }
+        } value-numbering-step
+    ] unit-test
+] when
+
+cpu x86.64? [
+    [
+        {
+            T{ ##load-integer f 0 10,000,000,000 }
+            T{ ##replace f 0 D 0 }
+        }
+    ] [
+        {
+            T{ ##load-integer f 0 10,000,000,000 }
+            T{ ##replace f 0 D 0 }
+        } value-numbering-step
+    ] unit-test
+
+    ! Boundary case
+    [
+        {
+            T{ ##load-integer f 0 HEX: 7fffffff }
+            T{ ##replace f 0 D 0 }
+        }
+    ] [
+        {
+            T{ ##load-integer f 0 HEX: 7fffffff }
+            T{ ##replace f 0 D 0 }
+        } value-numbering-step
+    ] unit-test
+] when
+
 ! Double compare elimination
 [
     {
