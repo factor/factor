@@ -72,6 +72,14 @@ HEX{ 7c 41 1a 2e } [ 1 2 3 LHZX ] test-assembler
 HEX{ 7c 41 1a 6e } [ 1 2 3 LHZUX ] test-assembler
 HEX{ 7c 41 18 2e } [ 1 2 3 LWZX ] test-assembler
 HEX{ 7c 41 18 6e } [ 1 2 3 LWZUX ] test-assembler
+HEX{ 7c 41 1c 2e } [ 1 2 3 LFSX ] test-assembler
+HEX{ 7c 41 1c 6e } [ 1 2 3 LFSUX ] test-assembler
+HEX{ 7c 41 1c ae } [ 1 2 3 LFDX ] test-assembler
+HEX{ 7c 41 1c ee } [ 1 2 3 LFDUX ] test-assembler
+HEX{ 7c 41 1d 2e } [ 1 2 3 STFSX ] test-assembler
+HEX{ 7c 41 1d 6e } [ 1 2 3 STFSUX ] test-assembler
+HEX{ 7c 41 1d ae } [ 1 2 3 STFDX ] test-assembler
+HEX{ 7c 41 1d ee } [ 1 2 3 STFDUX ] test-assembler
 HEX{ 48 00 00 01 } [ 1 B ] test-assembler
 HEX{ 48 00 00 01 } [ 1 BL ] test-assembler
 HEX{ 41 80 00 04 } [ 1 BLT ] test-assembler
