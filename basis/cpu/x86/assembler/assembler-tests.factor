@@ -3,7 +3,12 @@ kernel tools.test namespaces make layouts ;
 IN: cpu.x86.assembler.tests
 
 ! immediate operands
-[ { HEX: b9 HEX: 01 HEX: 00 HEX: 00 HEX: 00 } ] [ [ ECX 1 MOV ] { } make ] unit-test
+cell 4 = [
+    [ { HEX: b9 HEX: 01 HEX: 00 HEX: 00 HEX: 00 } ] [ [ ECX 1 MOV ] { } make ] unit-test
+] [
+    [ { HEX: b9 HEX: 01 HEX: 00 HEX: 00 HEX: 00 HEX: 00 HEX: 00 HEX: 00 HEX: 00 } ] [ [ ECX 1 MOV ] { } make ] unit-test
+] if
+
 [ { HEX: 83 HEX: c1 HEX: 01 } ] [ [ ECX 1 ADD ] { } make ] unit-test
 [ { HEX: 81 HEX: c1 HEX: 96 HEX: 00 HEX: 00 HEX: 00 } ] [ [ ECX 150 ADD ] { } make ] unit-test
 [ { HEX: f7 HEX: c1 HEX: d2 HEX: 04 HEX: 00 HEX: 00 } ] [ [ ECX 1234 TEST ] { } make ] unit-test

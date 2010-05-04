@@ -91,7 +91,7 @@ cpu x86.32? [
     [
         {
             T{ ##load-reference f 0 + }
-            T{ ##replace-imm f 10 D + }
+            T{ ##replace-imm f + D 0 }
         }
     ] [
         {
@@ -2576,7 +2576,8 @@ cpu x86? [
     } value-numbering-step
 ] unit-test
 
-! Base offset fusion on ##load/store-memory
+! Base offset fusion on ##load/store-memory -- only on x86
+cpu x86?
 [
     V{
         T{ ##peek f 0 D 0 }
@@ -2586,7 +2587,18 @@ cpu x86? [
         T{ ##add-imm f 4 2 31337 }
         T{ ##load-memory f 5 2 3 0 31337 int-rep c:uchar }
     }
-] [
+]
+[
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##tagged>integer f 2 0 }
+        T{ ##tagged>integer f 3 1 }
+        T{ ##add-imm f 4 2 31337 }
+        T{ ##load-memory f 5 4 3 0 0 int-rep c:uchar }
+    }
+] ?
+[
     V{
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
@@ -2597,7 +2609,8 @@ cpu x86? [
     } value-numbering-step
 ] unit-test
 
-! Displacement offset fusion on ##load/store-memory
+! Displacement offset fusion on ##load/store-memory -- only on x86
+cpu x86?
 [
     V{
         T{ ##peek f 0 D 0 }
@@ -2607,7 +2620,18 @@ cpu x86? [
         T{ ##add-imm f 4 3 31337 }
         T{ ##load-memory f 5 2 3 0 31338 int-rep c:uchar }
     }
-] [
+]
+[
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##tagged>integer f 2 0 }
+        T{ ##tagged>integer f 3 1 }
+        T{ ##add-imm f 4 3 31337 }
+        T{ ##load-memory f 5 2 4 0 1 int-rep c:uchar }
+    }
+] ?
+[
     V{
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
@@ -2632,6 +2656,7 @@ cpu x86? [
 ] unit-test
 
 ! Scale fusion on ##load/store-memory
+cpu x86?
 [
     V{
         T{ ##peek f 0 D 0 }
@@ -2641,7 +2666,18 @@ cpu x86? [
         T{ ##shl-imm f 4 3 2 }
         T{ ##load-memory f 5 2 3 2 0 int-rep c:uchar }
     }
-] [
+]
+[
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##tagged>integer f 2 0 }
+        T{ ##tagged>integer f 3 1 }
+        T{ ##shl-imm f 4 3 2 }
+        T{ ##load-memory f 5 2 4 0 0 int-rep c:uchar }
+    }
+] ?
+[
     V{
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
@@ -2652,26 +2688,28 @@ cpu x86? [
     } value-numbering-step
 ] unit-test
 
-! Don't do scale fusion if there's already a scale
-[ ] [
-    V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##tagged>integer f 2 0 }
-        T{ ##tagged>integer f 3 1 }
-        T{ ##shl-imm f 4 3 2 }
-        T{ ##load-memory f 5 2 4 1 0 int-rep c:uchar }
-    } dup value-numbering-step assert=
-] unit-test
+cpu x86? [
+    ! Don't do scale fusion if there's already a scale
+    [ ] [
+        V{
+            T{ ##peek f 0 D 0 }
+            T{ ##peek f 1 D 1 }
+            T{ ##tagged>integer f 2 0 }
+            T{ ##tagged>integer f 3 1 }
+            T{ ##shl-imm f 4 3 2 }
+            T{ ##load-memory f 5 2 4 1 0 int-rep c:uchar }
+        } dup value-numbering-step assert=
+    ] unit-test
 
-! Don't do scale fusion if the scale factor is out of range
-[ ] [
-    V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##tagged>integer f 2 0 }
-        T{ ##tagged>integer f 3 1 }
-        T{ ##shl-imm f 4 3 4 }
-        T{ ##load-memory f 5 2 4 0 0 int-rep c:uchar }
-    } dup value-numbering-step assert=
-] unit-test
+    ! Don't do scale fusion if the scale factor is out of range
+    [ ] [
+        V{
+            T{ ##peek f 0 D 0 }
+            T{ ##peek f 1 D 1 }
+            T{ ##tagged>integer f 2 0 }
+            T{ ##tagged>integer f 3 1 }
+            T{ ##shl-imm f 4 3 4 }
+            T{ ##load-memory f 5 2 4 0 0 int-rep c:uchar }
+        } dup value-numbering-step assert=
+    ] unit-test
+] when

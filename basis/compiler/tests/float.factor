@@ -99,9 +99,6 @@ IN: compiler.tests.float
 [ 2 ] [ 3.0 1.0 [ float-unordered? [ 1 ] [ 2 ] if ] compile-call ] unit-test
 [ 2 ] [ 1.0 3.0 [ float-unordered? [ 1 ] [ 2 ] if ] compile-call ] unit-test
 
-! Ensure that float-min and min, and float-max and max, have
-! consistent behavior with respect to NaNs
-
 : two-floats ( a b -- a b ) { float float } declare ; inline
 
 [ -11.3 ] [ -11.3 17.5 [ two-floats min ] compile-call ] unit-test
@@ -109,17 +106,7 @@ IN: compiler.tests.float
 [ 17.5 ] [ -11.3 17.5 [ two-floats max ] compile-call ] unit-test
 [ 17.5 ] [ 17.5 -11.3 [ two-floats max ] compile-call ] unit-test
 
-: check-compiled-binary-op ( a b word -- )
-    [ '[ [ [ two-floats _ execute ] compile-call ] call( a b -- c ) ] ]
-    [ '[ _ execute ] ]
-    bi 2bi fp-bitwise= ; inline
-
-[ t ] [ 0/0. 3.0 \ min check-compiled-binary-op ] unit-test
-[ t ] [ 3.0 0/0. \ min check-compiled-binary-op ] unit-test
-[ t ] [ 0/0. 3.0 \ max check-compiled-binary-op ] unit-test
-[ t ] [ 3.0 0/0. \ max check-compiled-binary-op ] unit-test
-
-! Test vector ops
+! Test loops
 [ 30.0 ] [
     float-array{ 1 2 3 4 } float-array{ 1 2 3 4 }
     [ { float-array float-array } declare [ * ] [ + ] 2map-reduce ] compile-call
@@ -133,4 +120,14 @@ IN: compiler.tests.float
 [ 30.0 ] [
     float-array{ 1 2 3 4 }
     [ { float-array } declare [ dup * ] [ + ] map-reduce ] compile-call
+] unit-test
+
+[ 4.5 ] [
+    float-array{ 1.0 3.5 }
+    [ { float-array } declare 0.0 [ + ] reduce ] compile-call
+] unit-test
+
+[ float-array{ 2.0 4.5 } ] [
+    float-array{ 1.0 3.5 }
+    [ { float-array } declare [ 1 + ] map ] compile-call
 ] unit-test
