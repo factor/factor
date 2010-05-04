@@ -34,21 +34,18 @@ dim-block dim-grid shared-size stream ;
     '[ cuda-context set _ call ] with-cuda-context ; inline
 
 : with-cuda ( launcher quot -- )
-    init-cuda
-    [ H{ } clone cuda-memory-hashtable ] 2dip '[
-        _ 
+    init-cuda [
         [ cuda-launcher set ]
         [ [ device>> ] [ device-flags>> ] bi ] bi
-        _ with-cuda-program
-    ] with-variable ; inline
+    ] [ with-cuda-program ] bi* ; inline
 
 : c-type>cuda-setter ( c-type -- n cuda-type )
     {
         { [ dup a:int = ] [ drop 4 [ cuda-int* ] ] }
         { [ dup a:uint = ] [ drop 4 [ cuda-int* ] ] }
         { [ dup a:float = ] [ drop 4 [ cuda-float* ] ] }
-        { [ dup a:pointer? ] [ drop 4 [ ptr>> cuda-int* ] ] }
-        { [ dup a:void* = ] [ drop 4 [ ptr>> cuda-int* ] ] }
+        { [ dup a:pointer? ] [ drop 4 [ cuda-int* ] ] }
+        { [ dup a:void* = ] [ drop 4 [ cuda-int* ] ] }
     } cond ;
 
 : run-function-launcher ( function-launcher function -- )
