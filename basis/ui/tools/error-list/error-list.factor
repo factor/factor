@@ -49,6 +49,8 @@ M: source-file-renderer prototype-row
 M: source-file-renderer row-value
     drop dup [ first [ <pathname> ] [ f ] if* ] when ;
 
+M: source-file-renderer row-value? row-value = ;
+
 M: source-file-renderer column-titles
     drop { "" "File" "Errors" } ;
 
