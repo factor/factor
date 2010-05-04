@@ -91,8 +91,6 @@ inline static cell tag_fixnum(fixnum untagged)
 	return RETAG(untagged << TAG_BITS,FIXNUM_TYPE);
 }
 
-struct object;
-
 #define NO_TYPE_CHECK static const cell type_number = TYPE_COUNT
 
 struct object {
@@ -205,8 +203,6 @@ struct string : public object {
 	cell hashcode;
 
 	u8 *data() const { return (u8 *)(this + 1); }
-
-	cell nth(cell i) const;
 };
 
 struct code_block;
@@ -245,8 +241,6 @@ struct wrapper : public object {
 	static const cell type_number = WRAPPER_TYPE;
 	cell object;
 };
-
-const fixnum boxed_float_offset = 8 - FLOAT_TYPE;
 
 /* Assembly code makes assumptions about the layout of this struct */
 struct boxed_float : object {

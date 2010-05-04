@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors ascii combinators images images.loader io
 io.encodings.ascii io.encodings.string kernel locals make math
-math.parser prettyprint sequences ;
+math.parser sequences ;
 IN: images.ppm
 
 SINGLETON: ppm-image
