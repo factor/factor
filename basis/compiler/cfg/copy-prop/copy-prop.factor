@@ -1,78 +1,90 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces assocs accessors sequences grouping
-combinators compiler.cfg.rpo compiler.cfg.renaming
-compiler.cfg.instructions compiler.cfg.predecessors ;
+USING: sets kernel namespaces assocs accessors sequences grouping
+combinators fry compiler.cfg.def-use compiler.cfg.rpo
+compiler.cfg.renaming compiler.cfg.instructions
+compiler.cfg.predecessors ;
+FROM: namespaces => set ;
 IN: compiler.cfg.copy-prop
-
-! The first three definitions are also used in compiler.cfg.alias-analysis.
-SYMBOL: copies
-
-! Initialized per-basic-block; a mapping from inputs to dst for eliminating
-! redundant phi instructions
-SYMBOL: phis
-
-: resolve ( vreg -- vreg )
-    copies get ?at drop ;
-
-: (record-copy) ( dst src -- )
-    swap copies get set-at ; inline
-
-: record-copy ( ##copy -- )
-    [ dst>> ] [ src>> resolve ] bi (record-copy) ; inline
 
 <PRIVATE
 
+SYMBOL: changed?
+
+SYMBOL: copies
+
+! Initialized per-basic-block; a mapping from inputs to dst for
+! eliminating redundant ##phi instructions
+SYMBOL: phis
+
+: resolve ( vreg -- vreg )
+    copies get at ;
+
+: record-copy ( dst src -- )
+    swap copies get maybe-set-at [ changed? on ] when ; inline
+
 GENERIC: visit-insn ( insn -- )
 
-M: ##copy visit-insn record-copy ;
+M: ##copy visit-insn
+    [ dst>> ] [ src>> resolve ] bi
+    dup [ record-copy ] [ 2drop ] if ;
 
-: useless-phi ( dst inputs -- ) first (record-copy) ;
+: useless-phi ( dst inputs -- ) first record-copy ;
 
-: redundant-phi ( dst inputs -- ) phis get at (record-copy) ;
+: redundant-phi ( dst inputs -- ) phis get at record-copy ;
 
-: record-phi ( dst inputs -- ) phis get set-at ;
+: record-phi ( dst inputs -- )
+    [ phis get set-at ] [ drop dup record-copy ] 2bi ;
 
 M: ##phi visit-insn
     [ dst>> ] [ inputs>> values [ resolve ] map ] bi
-    {
-        { [ dup all-equal? ] [ useless-phi ] }
-        { [ dup phis get key? ] [ redundant-phi ] }
-        [ record-phi ]
-    } cond ;
+    dup phis get key? [ redundant-phi ] [
+        dup sift
+        dup all-equal?
+        [ nip useless-phi ]
+        [ drop record-phi ] if
+    ] if ;
+
+M: vreg-insn visit-insn
+    defs-vreg [ dup record-copy ] when* ;
 
 M: insn visit-insn drop ;
 
-: collect-copies ( cfg -- )
-    H{ } clone copies set
+: (collect-copies) ( cfg -- )
     [
-        H{ } clone phis set
+        phis get clear-assoc
         instructions>> [ visit-insn ] each
     ] each-basic-block ;
+
+: collect-copies ( cfg -- )
+    H{ } clone copies set
+    H{ } clone phis set
+    '[
+        changed? off
+        _ (collect-copies)
+        changed? get
+    ] loop ;
 
 GENERIC: update-insn ( insn -- keep? )
 
 M: ##copy update-insn drop f ;
 
 M: ##phi update-insn
-    dup dst>> copies get key? [ drop f ] [ call-next-method ] if ;
+    dup call-next-method drop
+    [ dst>> ] [ inputs>> values ] bi [ = not ] with any? ;
 
-M: insn update-insn rename-insn-uses t ;
+M: vreg-insn update-insn rename-insn-uses t ;
+
+M: insn update-insn drop t ;
 
 : rename-copies ( cfg -- )
-    copies get dup assoc-empty? [ 2drop ] [
-        renamings set
-        [
-            instructions>> [ update-insn ] filter! drop
-        ] each-basic-block
-    ] if ;
+    copies get renamings set
+    [ [ update-insn ] filter! ] simple-optimization ;
 
 PRIVATE>
 
 : copy-propagation ( cfg -- cfg' )
     needs-predecessors
 
-    [ collect-copies ]
-    [ rename-copies ]
-    [ ]
-    tri ;
+    dup collect-copies
+    dup rename-copies ;

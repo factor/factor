@@ -85,6 +85,9 @@ unit-test
     "s" get >array
 ] unit-test
 
+! Make sure string initialization works
+[ HEX: 123456 ] [ 100 HEX: 123456 <string> first ] unit-test
+
 ! Make sure we clear aux vector when storing octets
 [ "\u123456hi" ] [ "ih\u123456" clone reverse! ] unit-test
 

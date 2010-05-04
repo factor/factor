@@ -5,13 +5,15 @@ cpu.x86.assembler cpu.x86.assembler.private cpu.x86.assembler.operands
 cpu.x86.features cpu.x86.features.private cpu.architecture kernel
 kernel.private math memory namespaces make sequences words system
 layouts combinators math.order math.vectors fry locals compiler.constants
-byte-arrays io macros quotations compiler compiler.units init vm
+byte-arrays io macros quotations classes.algebra compiler
+compiler.units init vm
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.intrinsics
 compiler.cfg.comparisons
 compiler.cfg.stack-frame
 compiler.codegen.fixup ;
+QUALIFIED-WITH: alien.c-types c
 FROM: layouts => cell ;
 FROM: math => float ;
 IN: cpu.x86
@@ -32,16 +34,18 @@ HOOK: extra-stack-space cpu ( stack-frame -- n )
 
 : stack@ ( n -- op ) stack-reg swap [+] ;
 
-: special@ ( n -- op )
+: special-offset ( m -- n )
     stack-frame get extra-stack-space +
-    reserved-stack-space +
-    stack@ ;
+    reserved-stack-space + ;
+
+: special@ ( n -- op ) special-offset stack@ ;
 
 : spill@ ( n -- op ) spill-offset special@ ;
 
-: gc-root@ ( n -- op ) gc-root-offset special@ ;
-
 : param@ ( n -- op ) reserved-stack-space + stack@ ;
+
+: gc-root-offsets ( seq -- seq' )
+    [ n>> spill-offset special-offset cell + ] map f like ;
 
 : decr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap SUB ] if ;
@@ -64,9 +68,18 @@ HOOK: temp-reg cpu ( -- reg )
 
 HOOK: pic-tail-reg cpu ( -- reg )
 
+M: x86 complex-addressing? t ;
+
+M: x86 fused-unboxing? t ;
+
+M: x86 immediate-store? immediate-comparand? ;
+
 M: x86 %load-immediate dup 0 = [ drop dup XOR ] [ MOV ] if ;
 
-M: x86 %load-reference swap 0 MOV rc-absolute-cell rel-literal ;
+M: x86 %load-reference
+    [ swap 0 MOV rc-absolute-cell rel-literal ]
+    [ \ f type-number MOV ]
+    if* ;
 
 HOOK: ds-reg cpu ( -- reg )
 HOOK: rs-reg cpu ( -- reg )
@@ -79,7 +92,17 @@ M: ds-loc loc>operand n>> ds-reg reg-stack ;
 M: rs-loc loc>operand n>> rs-reg reg-stack ;
 
 M: x86 %peek loc>operand MOV ;
+
 M: x86 %replace loc>operand swap MOV ;
+
+M: x86 %replace-imm
+    loc>operand swap
+    {
+        { [ dup not ] [ drop \ f type-number MOV ] }
+        { [ dup fixnum? ] [ tag-fixnum MOV ] }
+        [ [ HEX: ffffffff MOV ] dip rc-absolute rel-literal ]
+    } cond ;
+
 : (%inc) ( n reg -- ) swap cells dup 0 > [ ADD ] [ neg SUB ] if ; inline
 M: x86 %inc-d ( n -- ) ds-reg (%inc) ;
 M: x86 %inc-r ( n -- ) rs-reg (%inc) ;
@@ -100,18 +123,12 @@ M: x86 %jump-label ( label -- ) 0 JMP rc-relative label-fixup ;
 
 M: x86 %return ( -- ) 0 RET ;
 
-: code-alignment ( align -- n )
-    [ building get length dup ] dip align swap - ;
+: (%slot) ( obj slot scale tag -- op ) neg <indirect> ; inline
+: (%slot-imm) ( obj slot tag -- op ) slot-offset [+] ; inline
 
-: align-code ( n -- )
-    0 <repetition> % ;
-
-:: (%slot-imm) ( obj slot tag -- op )
-    obj slot tag slot-offset [+] ; inline
-
-M: x86 %slot ( dst obj slot -- ) [+] MOV ;
+M: x86 %slot ( dst obj slot scale tag -- ) (%slot) MOV ;
 M: x86 %slot-imm ( dst obj slot tag -- ) (%slot-imm) MOV ;
-M: x86 %set-slot ( src obj slot -- ) [+] swap MOV ;
+M: x86 %set-slot ( src obj slot scale tag -- ) (%slot) swap MOV ;
 M: x86 %set-slot-imm ( src obj slot tag -- ) (%slot-imm) swap MOV ;
 
 :: two-operand ( dst src1 src2 rep -- dst src )
@@ -127,7 +144,7 @@ M: x86 %add     2over eq? [ nip ADD ] [ [+] LEA ] if ;
 M: x86 %add-imm 2over eq? [ nip ADD ] [ [+] LEA ] if ;
 M: x86 %sub     int-rep two-operand SUB ;
 M: x86 %sub-imm 2over eq? [ nip SUB ] [ neg [+] LEA ] if ;
-M: x86 %mul     int-rep two-operand swap IMUL2 ;
+M: x86 %mul     int-rep two-operand IMUL2 ;
 M: x86 %mul-imm IMUL3 ;
 M: x86 %and     int-rep two-operand AND ;
 M: x86 %and-imm int-rep two-operand AND ;
@@ -169,14 +186,21 @@ M: x86 %copy ( dst src rep -- )
         2over [ register? ] both? [ copy-register* ] [ copy-memory* ] if
     ] if ;
 
-M: x86 %fixnum-add ( label dst src1 src2 -- )
-    int-rep two-operand ADD JO ;
+: fixnum-overflow ( label dst src1 src2 cc quot -- )
+    swap [ [ int-rep two-operand ] dip call ] dip
+    {
+        { cc-o [ JO ] }
+        { cc/o [ JNO ] }
+    } case ; inline
 
-M: x86 %fixnum-sub ( label dst src1 src2 -- )
-    int-rep two-operand SUB JO ;
+M: x86 %fixnum-add ( label dst src1 src2 cc -- )
+    [ ADD ] fixnum-overflow ;
 
-M: x86 %fixnum-mul ( label dst src1 src2 -- )
-    int-rep two-operand swap IMUL2 JO ;
+M: x86 %fixnum-sub ( label dst src1 src2 cc -- )
+    [ SUB ] fixnum-overflow ;
+
+M: x86 %fixnum-mul ( label dst src1 src2 cc -- )
+    [ IMUL2 ] fixnum-overflow ;
 
 M: x86 %unbox-alien ( dst src -- )
     alien-offset [+] MOV ;
@@ -217,12 +241,68 @@ M:: x86 %box-alien ( dst src temp -- )
         "end" resolve-label
     ] with-scope ;
 
+:: %box-displaced-alien/f ( dst displacement -- )
+    dst 1 alien@ \ f type-number MOV
+    dst 3 alien@ displacement MOV
+    dst 4 alien@ displacement MOV ;
+
+:: %box-displaced-alien/alien ( dst displacement base temp -- )
+    ! Set new alien's base to base.base
+    temp base 1 alien@ MOV
+    dst 1 alien@ temp MOV
+
+    ! Compute displacement
+    temp base 3 alien@ MOV
+    temp displacement ADD
+    dst 3 alien@ temp MOV
+
+    ! Compute address
+    temp base 4 alien@ MOV
+    temp displacement ADD
+    dst 4 alien@ temp MOV ;
+
+:: %box-displaced-alien/byte-array ( dst displacement base temp -- )
+    dst 1 alien@ base MOV
+    dst 3 alien@ displacement MOV
+    temp base displacement byte-array-offset [++] LEA
+    dst 4 alien@ temp MOV ;
+
+:: %box-displaced-alien/dynamic ( dst displacement base temp -- )
+    "not-f" define-label
+    "not-alien" define-label
+
+    ! Check base type
+    temp base MOV
+    temp tag-mask get AND
+
+    ! Is base f?
+    temp \ f type-number CMP
+    "not-f" get JNE
+
+    ! Yes, it is f. Fill in new object
+    dst displacement %box-displaced-alien/f
+
+    "end" get JMP
+
+    "not-f" resolve-label
+
+    ! Is base an alien?
+    temp alien type-number CMP
+    "not-alien" get JNE
+
+    dst displacement base temp %box-displaced-alien/alien
+
+    ! We are done
+    "end" get JMP
+
+    ! Is base a byte array? It has to be, by now...
+    "not-alien" resolve-label
+
+    dst displacement base temp %box-displaced-alien/byte-array ;
+
 M:: x86 %box-displaced-alien ( dst displacement base temp base-class -- )
-    ! This is ridiculous
     [
         "end" define-label
-        "not-f" define-label
-        "not-alien" define-label
 
         ! If displacement is zero, return the base
         dst base MOV
@@ -236,53 +316,13 @@ M:: x86 %box-displaced-alien ( dst displacement base temp base-class -- )
         ! Set expired to f
         dst 2 alien@ \ f type-number MOV
 
-        ! Is base f?
-        base \ f type-number CMP
-        "not-f" get JNE
-
-        ! Yes, it is f. Fill in new object
-        dst 1 alien@ base MOV
-        dst 3 alien@ displacement MOV
-        dst 4 alien@ displacement MOV
-
-        "end" get JMP
-
-        "not-f" resolve-label
-
-        ! Check base type
-        temp base MOV
-        temp tag-mask get AND
-
-        ! Is base an alien?
-        temp alien type-number CMP
-        "not-alien" get JNE
-
-        ! Yes, it is an alien. Set new alien's base to base.base
-        temp base 1 alien@ MOV
-        dst 1 alien@ temp MOV
-
-        ! Compute displacement
-        temp base 3 alien@ MOV
-        temp displacement ADD
-        dst 3 alien@ temp MOV
-
-        ! Compute address
-        temp base 4 alien@ MOV
-        temp displacement ADD
-        dst 4 alien@ temp MOV
-
-        ! We are done
-        "end" get JMP
-
-        ! Is base a byte array? It has to be, by now...
-        "not-alien" resolve-label
-
-        dst 1 alien@ base MOV
-        dst 3 alien@ displacement MOV
-        temp base MOV
-        temp byte-array-offset ADD
-        temp displacement ADD
-        dst 4 alien@ temp MOV
+        dst displacement base temp
+        {
+            { [ base-class \ f class<= ] [ 2drop %box-displaced-alien/f ] }
+            { [ base-class \ alien class<= ] [ %box-displaced-alien/alien ] }
+            { [ base-class \ byte-array class<= ] [ %box-displaced-alien/byte-array ] }
+            [ %box-displaced-alien/dynamic ]
+        } cond
 
         "end" resolve-label
     ] with-scope ;
@@ -324,82 +364,66 @@ M: x86.64 has-small-reg? 2drop t ;
         [ quot call ] with-save/restore
     ] if ; inline
 
-M:: x86 %string-nth ( dst src index temp -- )
-    ! We request a small-reg of size 8 since those of size 16 are
-    ! a superset.
-    "end" define-label
-    dst { src index temp } 8 [| new-dst |
-        ! Load the least significant 7 bits into new-dst.
-        ! 8th bit indicates whether we have to load from
-        ! the aux vector or not.
-        temp src index [+] LEA
-        new-dst 8-bit-version-of temp string-offset [+] MOV
-        new-dst new-dst 8-bit-version-of MOVZX
-        ! Do we have to look at the aux vector?
-        new-dst HEX: 80 CMP
-        "end" get JL
-        ! Yes, this is a non-ASCII character. Load aux vector
-        temp src string-aux-offset [+] MOV
-        new-dst temp XCHG
-        ! Compute index
-        new-dst index ADD
-        new-dst index ADD
-        ! Load high 16 bits
-        new-dst 16-bit-version-of new-dst byte-array-offset [+] MOV
-        new-dst new-dst 16-bit-version-of MOVZX
-        new-dst 7 SHL
-        ! Compute code point
-        new-dst temp XOR
-        "end" resolve-label
-        dst new-dst int-rep %copy
-    ] with-small-register ;
-
-M:: x86 %set-string-nth-fast ( ch str index temp -- )
-    ch { index str temp } 8 [| new-ch |
-        new-ch ch int-rep %copy
-        temp str index [+] LEA
-        temp string-offset [+] new-ch 8-bit-version-of MOV
-    ] with-small-register ;
-
-:: %alien-integer-getter ( dst src offset size quot -- )
-    dst { src } size [| new-dst |
-        new-dst dup size n-bit-version-of dup src offset [+] MOV
+:: %alien-integer-getter ( dst exclude address bits quot -- )
+    dst exclude bits [| new-dst |
+        new-dst dup bits n-bit-version-of dup address MOV
         quot call
         dst new-dst int-rep %copy
     ] with-small-register ; inline
 
-: %alien-unsigned-getter ( dst src offset size -- )
+: %alien-unsigned-getter ( dst exclude address bits -- )
     [ MOVZX ] %alien-integer-getter ; inline
 
-: %alien-signed-getter ( dst src offset size -- )
+: %alien-signed-getter ( dst exclude address bits -- )
     [ MOVSX ] %alien-integer-getter ; inline
 
-:: %alien-integer-setter ( ptr offset value size -- )
-    value { ptr } size [| new-value |
+:: %alien-integer-setter ( value exclude address bits -- )
+    value exclude bits [| new-value |
         new-value value int-rep %copy
-        ptr offset [+] new-value size n-bit-version-of MOV
+        address new-value bits n-bit-version-of MOV
     ] with-small-register ; inline
 
-M: x86 %alien-unsigned-1 8 %alien-unsigned-getter ;
-M: x86 %alien-unsigned-2 16 %alien-unsigned-getter ;
-M: x86 %alien-unsigned-4 32 [ 2drop ] %alien-integer-getter ;
+: (%memory) ( base displacement scale offset rep c-type -- exclude address rep c-type )
+    [ [ [ 2array ] 2keep ] 2dip <indirect> ] 2dip ;
 
-M: x86 %alien-signed-1 8 %alien-signed-getter ;
-M: x86 %alien-signed-2 16 %alien-signed-getter ;
-M: x86 %alien-signed-4 32 %alien-signed-getter ;
+: (%memory-imm) ( base offset rep c-type -- exclude address rep c-type )
+    [ [ drop 1array ] [ [+] ] 2bi ] 2dip ;
 
-M: x86 %alien-cell [+] MOV ;
-M: x86 %alien-float [+] MOVSS ;
-M: x86 %alien-double [+] MOVSD ;
-M: x86 %alien-vector [ [+] ] dip %copy ;
+: (%load-memory) ( dst exclude address rep c-type -- )
+    [
+        {
+            { c:char   [ 8 %alien-signed-getter ] }
+            { c:uchar  [ 8 %alien-unsigned-getter ] }
+            { c:short  [ 16 %alien-signed-getter ] }
+            { c:ushort [ 16 %alien-unsigned-getter ] }
+            { c:int    [ 32 %alien-signed-getter ] }
+            { c:uint   [ 32 [ 2drop ] %alien-integer-getter ] }
+        } case
+    ] [ [ drop ] 2dip %copy ] ?if ;
 
-M: x86 %set-alien-integer-1 8 %alien-integer-setter ;
-M: x86 %set-alien-integer-2 16 %alien-integer-setter ;
-M: x86 %set-alien-integer-4 32 %alien-integer-setter ;
-M: x86 %set-alien-cell [ [+] ] dip MOV ;
-M: x86 %set-alien-float [ [+] ] dip MOVSS ;
-M: x86 %set-alien-double [ [+] ] dip MOVSD ;
-M: x86 %set-alien-vector [ [+] ] 2dip %copy ;
+M: x86 %load-memory ( dst base displacement scale offset rep c-type -- )
+    (%memory) (%load-memory) ;
+
+M: x86 %load-memory-imm ( dst base offset rep c-type -- )
+    (%memory-imm) (%load-memory) ;
+
+: (%store-memory) ( src exclude address rep c-type -- )
+    [
+        {
+            { c:char   [ 8 %alien-integer-setter ] }
+            { c:uchar  [ 8 %alien-integer-setter ] }
+            { c:short  [ 16 %alien-integer-setter ] }
+            { c:ushort [ 16 %alien-integer-setter ] }
+            { c:int    [ 32 %alien-integer-setter ] }
+            { c:uint   [ 32 %alien-integer-setter ] }
+        } case
+    ] [ [ nip swap ] dip %copy ] ?if ;
+
+M: x86 %store-memory ( src base displacement scale offset rep c-type -- )
+    (%memory) (%store-memory) ;
+
+M: x86 %store-memory-imm ( src base offset rep c-type -- )
+    (%memory-imm) (%store-memory) ;
 
 : shift-count? ( reg -- ? ) { ECX RCX } member-eq? ;
 
@@ -451,30 +475,29 @@ M:: x86 %allot ( dst size class nursery-ptr -- )
 HOOK: %mark-card cpu ( card temp -- )
 HOOK: %mark-deck cpu ( card temp -- )
 
-:: (%write-barrier) ( src slot temp1 temp2 -- )
-    temp1 src slot [+] LEA
+:: (%write-barrier) ( temp1 temp2 -- )
     temp1 card-bits SHR
     temp1 temp2 %mark-card
     temp1 deck-bits card-bits - SHR
     temp1 temp2 %mark-deck ;
 
-M: x86 %write-barrier ( src slot temp1 temp2 -- ) (%write-barrier) ;
+M:: x86 %write-barrier ( src slot scale tag temp1 temp2 -- )
+    temp1 src slot scale tag (%slot) LEA
+    temp1 temp2 (%write-barrier) ;
 
-M: x86 %write-barrier-imm ( src slot temp1 temp2 -- ) (%write-barrier) ;
+M:: x86 %write-barrier-imm ( src slot tag temp1 temp2 -- )
+    temp1 src slot tag (%slot-imm) LEA
+    temp1 temp2 (%write-barrier) ;
 
-M:: x86 %check-nursery ( label size temp1 temp2 -- )
+M:: x86 %check-nursery-branch ( label size cc temp1 temp2 -- )
     temp1 load-zone-offset
-    ! Load 'here' into temp2
     temp2 temp1 [] MOV
     temp2 size ADD
-    ! Load 'end' into temp1
-    temp1 temp1 2 cells [+] MOV
-    temp2 temp1 CMP
-    label JLE ;
-
-M: x86 %save-gc-root ( gc-root register -- ) [ gc-root@ ] dip MOV ;
-
-M: x86 %load-gc-root ( gc-root register -- ) swap gc-root@ MOV ;
+    temp2 temp1 2 cells [+] CMP
+    cc {
+        { cc<= [ label JLE ] }
+        { cc/<= [ label JG ] }
+    } case ;
 
 M: x86 %alien-global ( dst symbol library -- )
     [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;    
@@ -516,12 +539,18 @@ M:: x86 %compare ( dst src1 src2 cc temp -- )
 : (%compare-tagged) ( src1 src2 -- )
     [ HEX: ffffffff CMP ] dip rc-absolute rel-literal ;
 
+: (%compare-integer-imm) ( src1 src2 cc -- )
+    3dup use-test? [ 2drop dup TEST ] [ drop CMP ] if ;
+
+M:: x86 %compare-integer-imm ( dst src1 src2 cc temp -- )
+    src1 src2 cc (%compare-integer-imm)
+    dst cc temp %boolean ;
+
 : (%compare-imm) ( src1 src2 cc -- )
     {
-        { [ 3dup use-test? ] [ 2drop dup TEST ] }
-        { [ over integer? ] [ drop CMP ] }
-        { [ over word? ] [ drop (%compare-tagged) ] }
+        { [ over fixnum? ] [ [ tag-fixnum ] dip (%compare-integer-imm) ] }
         { [ over not ] [ 2drop \ f type-number CMP ] }
+        [ drop (%compare-tagged) ]
     } cond ;
 
 M:: x86 %compare-imm ( dst src1 src2 cc temp -- )
@@ -540,6 +569,10 @@ M:: x86 %compare-imm ( dst src1 src2 cc temp -- )
 
 M:: x86 %compare-branch ( label src1 src2 cc -- )
     src1 src2 CMP
+    label cc %branch ;
+
+M:: x86 %compare-integer-imm-branch ( label src1 src2 cc -- )
+    src1 src2 cc (%compare-integer-imm)
     label cc %branch ;
 
 M:: x86 %compare-imm-branch ( label src1 src2 cc -- )
@@ -1423,7 +1456,7 @@ M: x86 %scalar>vector %copy ;
 M:: x86 %spill ( src rep dst -- ) dst src rep %copy ;
 M:: x86 %reload ( dst rep src -- ) dst src rep %copy ;
 
-M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
+M: x86 %loop-entry 16 alignment [ NOP ] times ;
 
 M:: x86 %restore-context ( temp1 temp2 -- )
     #! Load Factor stack pointers on entry from C to Factor.
@@ -1457,7 +1490,7 @@ M: x86 immediate-bitwise? ( n -- ? )
     frame-reg swap 2 cells + [+] ;
 
 enable-min/max
-enable-fixnum-log2
+enable-log2
 
 :: install-sse2-check ( -- )
     [

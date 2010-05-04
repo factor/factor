@@ -7,6 +7,15 @@ system combinators math.bitwise math.order generalizations
 accessors growable fry compiler.constants memoize ;
 IN: compiler.codegen.fixup
 
+! Utilities
+: push-uint ( value vector -- )
+    [ length ] [ B{ 0 0 0 0 } swap push-all ] [ underlying>> ] tri
+    swap set-alien-unsigned-4 ;
+
+: push-double ( value vector -- )
+    [ length ] [ B{ 0 0 0 0 0 0 0 0 } swap push-all ] [ underlying>> ] tri
+    swap set-alien-double ;
+
 ! Owner
 SYMBOL: compiling-word
 
@@ -42,15 +51,17 @@ TUPLE: label-fixup { label label } { class integer } { offset integer } ;
 ! Relocation table
 SYMBOL: relocation-table
 
-: push-4 ( value vector -- )
-    [ length ] [ B{ 0 0 0 0 } swap push-all ] [ underlying>> ] tri
-    swap set-alien-unsigned-4 ;
-
 : add-relocation-entry ( type class offset -- )
-    { 0 24 28 } bitfield relocation-table get push-4 ;
+    { 0 24 28 } bitfield relocation-table get push-uint ;
 
 : rel-fixup ( class type -- )
     swap compiled-offset add-relocation-entry ;
+
+! Binary literal table
+SYMBOL: binary-literal-table
+
+: add-binary-literal ( obj -- label )
+    <label> [ 2array binary-literal-table get push ] keep ;
 
 ! Caching common symbol names reduces image size a bit
 MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
@@ -73,8 +84,8 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 : rel-literal ( literal class -- )
     [ add-literal ] dip rt-literal rel-fixup ;
 
-: rel-float ( literal class -- )
-    [ add-literal ] dip rt-float rel-fixup ;
+: rel-binary-literal ( literal class -- )
+    [ add-binary-literal ] dip label-fixup ;
 
 : rel-this ( class -- )
     rt-this rel-fixup ;
@@ -92,20 +103,20 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
     rt-decks-offset rel-fixup ;
 
 ! And the rest
-: resolve-offset ( label-fixup -- offset )
+: compute-target ( label-fixup -- offset )
     label>> offset>> [ "Unresolved label" throw ] unless* ;
 
-: resolve-absolute-label ( label-fixup -- )
-    dup resolve-offset neg add-literal
-    [ rt-here ] dip [ class>> ] [ offset>> ] bi add-relocation-entry ;
+: compute-relative-label ( label-fixup -- label )
+    [ class>> ] [ offset>> ] [ compute-target ] tri 3array ;
 
-: resolve-relative-label ( label-fixup -- label )
-    [ class>> ] [ offset>> ] [ resolve-offset ] tri 3array ;
+: compute-absolute-label ( label-fixup -- )
+    [ compute-target neg add-literal ]
+    [ [ rt-here ] dip [ class>> ] [ offset>> ] bi add-relocation-entry ] bi ;
 
-: resolve-labels ( label-fixups -- labels' )
+: compute-labels ( label-fixups -- labels' )
     [ class>> rc-absolute? ] partition
-    [ [ resolve-absolute-label ] each ]
-    [ [ resolve-relative-label ] map concat ]
+    [ [ compute-absolute-label ] each ]
+    [ [ compute-relative-label ] map concat ]
     bi* ;
 
 : init-fixup ( word -- )
@@ -113,13 +124,39 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
     V{ } clone parameter-table set
     V{ } clone literal-table set
     V{ } clone label-table set
-    BV{ } clone relocation-table set ;
+    BV{ } clone relocation-table set
+    V{ } clone binary-literal-table set ;
+
+: alignment ( align -- n )
+    [ compiled-offset dup ] dip align swap - ;
+
+: (align-code) ( n -- )
+    0 <repetition> % ;
+
+: align-code ( n -- )
+    alignment (align-code) ;
+
+GENERIC# emit-data 1 ( obj label -- )
+
+M: float emit-data
+    8 align-code
+    resolve-label
+    building get push-double ;
+
+M: byte-array emit-data
+    16 align-code
+    resolve-label
+    building get push-all ;
+
+: emit-binary-literals ( -- )
+    binary-literal-table get [ emit-data ] assoc-each ;
 
 : with-fixup ( word quot -- code )
     '[
         init-fixup
         @
-        label-table [ resolve-labels ] change
+        emit-binary-literals
+        label-table [ compute-labels ] change
         parameter-table get >array
         literal-table get >array
         relocation-table get >byte-array
