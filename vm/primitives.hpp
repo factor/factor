@@ -120,12 +120,10 @@ namespace factor
 	_(set_slot) \
 	_(set_special_object) \
 	_(set_string_nth_fast) \
-	_(set_string_nth_slow) \
 	_(size) \
 	_(sleep) \
 	_(special_object) \
 	_(string) \
-	_(string_nth) \
 	_(strip_stack_traces) \
 	_(system_micros) \
 	_(tuple) \

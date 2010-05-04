@@ -1,6 +1,6 @@
-USING: compiler.cfg.debugger compiler.cfg compiler.cfg.linearization.order
+USING: compiler.cfg.debugger compiler.cfg compiler.cfg.linearization
 kernel accessors sequences sets tools.test namespaces ;
-IN: compiler.cfg.linearization.order.tests
+IN: compiler.cfg.linearization.tests
 
 V{ } 0 test-bb
 

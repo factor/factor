@@ -4,7 +4,7 @@ USING: accessors arrays assocs byte-arrays classes combinators
 compression.lzw endian fry grouping images io
 io.binary io.encodings.ascii io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files kernel math
-math.bitwise math.order math.parser pack prettyprint sequences
+math.bitwise math.order math.parser pack sequences
 strings math.vectors specialized-arrays locals
 images.loader ;
 FROM: alien.c-types => float ;

@@ -1,15 +1,24 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces layouts sequences kernel math accessors
-compiler.tree.propagation.info compiler.cfg.stacks
-compiler.cfg.hats compiler.cfg.instructions
+USING: accessors classes.algebra layouts kernel math namespaces
+sequences cpu.architecture
+compiler.tree.propagation.info
+compiler.cfg.stacks
+compiler.cfg.hats
+compiler.cfg.comparisons
+compiler.cfg.instructions
 compiler.cfg.builder.blocks
 compiler.cfg.utilities ;
 FROM: vm => context-field-offset vm-field-offset ;
+QUALIFIED-WITH: alien.c-types c
 IN: compiler.cfg.intrinsics.misc
 
 : emit-tag ( -- )
-    ds-pop tag-mask get ^^and-imm ^^tag-fixnum ds-push ;
+    [ ^^tagged>integer tag-mask get ^^and-imm ] unary-op ;
+
+: emit-eq ( node -- )
+    node-input-infos first2 [ class>> fixnum class<= ] both?
+    [ [ cc= ^^compare-integer ] binary-op ] [ [ cc= ^^compare ] binary-op ] if ;
 
 : special-object-offset ( n -- offset )
     cells "special-objects" vm-field-offset + ;
@@ -37,7 +46,9 @@ IN: compiler.cfg.intrinsics.misc
     ] [ emit-primitive ] ?if ;
 
 : emit-identity-hashcode ( -- )
-    ds-pop tag-mask get bitnot ^^load-immediate ^^and 0 0 ^^slot-imm
-    hashcode-shift ^^shr-imm
-    ^^tag-fixnum
-    ds-push ;
+    [
+        ^^tagged>integer
+        tag-mask get bitnot ^^load-integer ^^and
+        0 int-rep f ^^load-memory-imm
+        hashcode-shift ^^shr-imm
+    ] unary-op ;

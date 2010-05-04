@@ -1,14 +1,16 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs sequences kernel combinators make math
-math.order math.ranges system namespaces locals layouts words
-alien alien.accessors alien.c-types alien.complex alien.data
-literals cpu.architecture cpu.ppc.assembler
-cpu.ppc.assembler.backend compiler.cfg.registers
-compiler.cfg.instructions compiler.cfg.comparisons
-compiler.codegen.fixup compiler.cfg.intrinsics
-compiler.cfg.stack-frame compiler.cfg.build-stack-frame
-compiler.units compiler.constants compiler.codegen vm ;
+USING: accessors assocs sequences kernel combinators
+classes.algebra byte-arrays make math math.order math.ranges
+system namespaces locals layouts words alien alien.accessors
+alien.c-types alien.complex alien.data literals cpu.architecture
+cpu.ppc.assembler cpu.ppc.assembler.backend
+compiler.cfg.registers compiler.cfg.instructions
+compiler.cfg.comparisons compiler.codegen.fixup
+compiler.cfg.intrinsics compiler.cfg.stack-frame
+compiler.cfg.build-stack-frame compiler.units compiler.constants
+compiler.codegen vm ;
+QUALIFIED-WITH: alien.c-types c
 FROM: cpu.ppc.assembler => B ;
 FROM: layouts => cell ;
 FROM: math => float ;
@@ -31,8 +33,8 @@ M: label BC [ 0 BC ] dip rc-relative-ppc-2 label-fixup ;
 enable-float-intrinsics
 
 <<
-\ ##integer>float t frame-required? set-word-prop
-\ ##float>integer t frame-required? set-word-prop
+\ ##integer>float t "frame-required?" set-word-prop
+\ ##float>integer t "frame-required?" set-word-prop
 >>
 
 M: ppc machine-registers
@@ -44,10 +46,16 @@ M: ppc machine-registers
 CONSTANT: scratch-reg 30
 CONSTANT: fp-scratch-reg 30
 
+M: ppc complex-addressing? f ;
+
+M: ppc fused-unboxing? f ;
+
 M: ppc %load-immediate ( reg n -- ) swap LOAD ;
 
 M: ppc %load-reference ( reg obj -- )
-    [ 0 swap LOAD32 ] [ rc-absolute-ppc-2/2 rel-literal ] bi* ;
+    [ [ 0 swap LOAD32 ] [ rc-absolute-ppc-2/2 rel-literal ] bi* ]
+    [ \ f type-number swap LI ]
+    if* ;
 
 M: ppc %alien-global ( register symbol dll -- )
     [ 0 swap LOAD32 ] 2dip rc-absolute-ppc-2/2 rel-dlsym ;
@@ -109,10 +117,6 @@ HOOK: reserved-area-size os ( -- n )
 : scratch@ ( n -- offset )
     factor-area-size + ;
 
-! GC root area
-: gc-root@ ( n -- offset )
-    gc-root-offset local@ ;
-
 ! Finally we have the linkage area
 HOOK: lr-save os ( -- n )
 
@@ -139,30 +143,13 @@ M:: ppc %dispatch ( src temp -- )
     temp MTCTR
     BCTR ;
 
-M: ppc %slot ( dst obj slot -- ) swapd LWZX ;
+: (%slot) ( dst obj slot scale tag -- obj dst slot )
+    [ 0 assert= ] bi@ swapd ;
+
+M: ppc %slot ( dst obj slot scale tag -- ) (%slot) LWZX ;
 M: ppc %slot-imm ( dst obj slot tag -- ) slot-offset LWZ ;
-M: ppc %set-slot ( src obj slot -- ) swapd STWX ;
+M: ppc %set-slot ( src obj slot scale tag -- ) (%slot) STWX ;
 M: ppc %set-slot-imm ( src obj slot tag -- ) slot-offset STW ;
-
-M:: ppc %string-nth ( dst src index temp -- )
-    [
-        "end" define-label
-        temp src index ADD
-        dst temp string-offset LBZ
-        0 dst HEX: 80 CMPI
-        "end" get BLT
-        temp src string-aux-offset LWZ
-        temp temp index ADD
-        temp temp index ADD
-        temp temp byte-array-offset LHZ
-        temp temp 7 SLWI
-        dst dst temp XOR
-        "end" resolve-label
-    ] with-scope ;
-
-M:: ppc %set-string-nth-fast ( ch obj index temp -- )
-    temp obj index ADD
-    ch temp string-offset STB ;
 
 M: ppc %add     ADD ;
 M: ppc %add-imm ADDI ;
@@ -185,19 +172,22 @@ M: ppc %sar-imm SRAWI ;
 M: ppc %not     NOT ;
 M: ppc %neg     NEG ;
 
-:: overflow-template ( label dst src1 src2 insn -- )
+:: overflow-template ( label dst src1 src2 cc insn -- )
     0 0 LI
     0 MTXER
     dst src2 src1 insn call
-    label BO ; inline
+    cc {
+        { cc-o [ label BO ] }
+        { cc/o [ label BNO ] }
+    } case ; inline
 
-M: ppc %fixnum-add ( label dst src1 src2 -- )
+M: ppc %fixnum-add ( label dst src1 src2 cc -- )
     [ ADDO. ] overflow-template ;
 
-M: ppc %fixnum-sub ( label dst src1 src2 -- )
+M: ppc %fixnum-sub ( label dst src1 src2 cc -- )
     [ SUBFO. ] overflow-template ;
 
-M: ppc %fixnum-mul ( label dst src1 src2 -- )
+M: ppc %fixnum-mul ( label dst src1 src2 cc -- )
     [ MULLWO. ] overflow-template ;
 
 M: ppc %add-float FADD ;
@@ -224,6 +214,7 @@ M:: ppc %float>integer ( dst src -- )
 M: ppc %copy ( dst src rep -- )
     2over eq? [ 3drop ] [
         {
+            { tagged-rep [ MR ] }
             { int-rep [ MR ] }
             { double-rep [ FMR ] }
         } case
@@ -294,12 +285,69 @@ M:: ppc %box-alien ( dst src temp -- )
         "f" resolve-label
     ] with-scope ;
 
+:: %box-displaced-alien/f ( dst displacement base -- )
+    base dst 1 alien@ STW
+    displacement dst 3 alien@ STW
+    displacement dst 4 alien@ STW ;
+
+:: %box-displaced-alien/alien ( dst displacement base temp -- )
+    ! Set new alien's base to base.base
+    temp base 1 alien@ LWZ
+    temp dst 1 alien@ STW
+
+    ! Compute displacement
+    temp base 3 alien@ LWZ
+    temp temp displacement ADD
+    temp dst 3 alien@ STW
+
+    ! Compute address
+    temp base 4 alien@ LWZ
+    temp temp displacement ADD
+    temp dst 4 alien@ STW ;
+
+:: %box-displaced-alien/byte-array ( dst displacement base temp -- )
+    base dst 1 alien@ STW
+    displacement dst 3 alien@ STW
+    temp base byte-array-offset ADDI
+    temp temp displacement ADD
+    temp dst 4 alien@ STW ;
+
+:: %box-displaced-alien/dynamic ( dst displacement base temp -- )
+    "not-f" define-label
+    "not-alien" define-label
+
+    ! Is base f?
+    0 base \ f type-number CMPI
+    "not-f" get BNE
+
+    ! Yes, it is f. Fill in new object
+    dst displacement base %box-displaced-alien/f
+
+    "end" get B
+
+    "not-f" resolve-label
+
+    ! Check base type
+    temp base tag-mask get ANDI
+
+    ! Is base an alien?
+    0 temp alien type-number CMPI
+    "not-alien" get BNE
+
+    dst displacement base temp %box-displaced-alien/alien
+
+    ! We are done
+    "end" get B
+
+    ! Is base a byte array? It has to be, by now...
+    "not-alien" resolve-label
+
+    dst displacement base temp %box-displaced-alien/byte-array ;
+
 M:: ppc %box-displaced-alien ( dst displacement base temp base-class -- )
     ! This is ridiculous
     [
         "end" define-label
-        "not-f" define-label
-        "not-alien" define-label
 
         ! If displacement is zero, return the base
         dst base MR
@@ -314,73 +362,83 @@ M:: ppc %box-displaced-alien ( dst displacement base temp base-class -- )
         temp \ f type-number %load-immediate
         temp dst 2 alien@ STW
 
-        ! Is base f?
-        0 base \ f type-number CMPI
-        "not-f" get BNE
-
-        ! Yes, it is f. Fill in new object
-        base dst 1 alien@ STW
-        displacement dst 3 alien@ STW
-        displacement dst 4 alien@ STW
-
-        "end" get B
-
-        "not-f" resolve-label
-
-        ! Check base type
-        temp base tag-mask get ANDI
-
-        ! Is base an alien?
-        0 temp alien type-number CMPI
-        "not-alien" get BNE
-
-        ! Yes, it is an alien. Set new alien's base to base.base
-        temp base 1 alien@ LWZ
-        temp dst 1 alien@ STW
-
-        ! Compute displacement
-        temp base 3 alien@ LWZ
-        temp temp displacement ADD
-        temp dst 3 alien@ STW
-
-        ! Compute address
-        temp base 4 alien@ LWZ
-        temp temp displacement ADD
-        temp dst 4 alien@ STW
-
-        ! We are done
-        "end" get B
-
-        ! Is base a byte array? It has to be, by now...
-        "not-alien" resolve-label
-
-        base dst 1 alien@ STW
-        displacement dst 3 alien@ STW
-        temp base byte-array-offset ADDI
-        temp temp displacement ADD
-        temp dst 4 alien@ STW
+        dst displacement base temp
+        {
+            { [ base-class \ f class<= ] [ drop %box-displaced-alien/f ] }
+            { [ base-class \ alien class<= ] [ %box-displaced-alien/alien ] }
+            { [ base-class \ byte-array class<= ] [ %box-displaced-alien/byte-array ] }
+            [ %box-displaced-alien/dynamic ]
+        } cond
 
         "end" resolve-label
     ] with-scope ;
 
-M: ppc %alien-unsigned-1 LBZ ;
-M: ppc %alien-unsigned-2 LHZ ;
+M: ppc %load-memory-imm ( dst base offset rep c-type -- )
+    [
+        {
+            { c:char   [ [ dup ] 2dip LBZ dup EXTSB ] }
+            { c:uchar  [ LBZ ] }
+            { c:short  [ LHA ] }
+            { c:ushort [ LHZ ] }
+        } case
+    ] [
+        {
+            { int-rep [ LWZ ] }
+            { float-rep [ LFS ] }
+            { double-rep [ LFD ] }
+        } case
+    ] ?if ;
 
-M: ppc %alien-signed-1 [ dup ] 2dip LBZ dup EXTSB ;
-M: ppc %alien-signed-2 LHA ;
+: (%memory) ( val base displacement scale offset rep c-type -- base val displacement rep c-type )
+    [ [ 0 assert= ] bi@ swapd ] 2dip ; inline
 
-M: ppc %alien-cell LWZ ;
+M: ppc %load-memory ( dst base displacement scale offset rep c-type -- )
+    (%memory) [
+        {
+            { c:char   [ [ LBZX ] [ drop dup EXTSB ] 2bi ] }
+            { c:uchar  [ LBZX ] }
+            { c:short  [ LHAX ] }
+            { c:ushort [ LHZX ] }
+        } case
+    ] [
+        {
+            { int-rep [ LWZX ] }
+            { float-rep [ LFSX ] }
+            { double-rep [ LFDX ] }
+        } case
+    ] ?if ;
 
-M: ppc %alien-float LFS ;
-M: ppc %alien-double LFD ;
+M: ppc %store-memory-imm ( src base offset rep c-type -- )
+    [
+        {
+            { c:char   [ STB ] }
+            { c:uchar  [ STB ] }
+            { c:short  [ STH ] }
+            { c:ushort [ STH ] }
+        } case
+    ] [
+        {
+            { int-rep [ STW ] }
+            { float-rep [ STFS ] }
+            { double-rep [ STFD ] }
+        } case
+    ] ?if ;
 
-M: ppc %set-alien-integer-1 -rot STB ;
-M: ppc %set-alien-integer-2 -rot STH ;
-
-M: ppc %set-alien-cell -rot STW ;
-
-M: ppc %set-alien-float -rot STFS ;
-M: ppc %set-alien-double -rot STFD ;
+M: ppc %store-memory ( src base displacement scale offset rep c-type -- )
+    (%memory) [
+        {
+            { c:char   [ STBX ] }
+            { c:uchar  [ STBX ] }
+            { c:short  [ STHX ] }
+            { c:ushort [ STHX ] }
+        } case
+    ] [
+        {
+            { int-rep [ STWX ] }
+            { float-rep [ STFSX ] }
+            { double-rep [ STFDX ] }
+        } case
+    ] ?if ;
 
 : load-zone-ptr ( reg -- )
     vm-reg "nursery" vm-field-offset ADDI ;
@@ -424,33 +482,32 @@ M:: ppc %allot ( dst size class nursery-ptr -- )
     temp2 load-decks-offset
     temp1 scratch-reg temp2 STBX ;
 
-M:: ppc %write-barrier ( src slot temp1 temp2 -- )
+M:: ppc %write-barrier ( src slot scale tag temp1 temp2 -- )
+    scale 0 assert= tag 0 assert=
     temp1 src slot ADD
     temp1 temp2 (%write-barrier) ;
 
-M:: ppc %write-barrier-imm ( src slot temp1 temp2 -- )
-    temp1 src slot ADDI
+M:: ppc %write-barrier-imm ( src slot tag temp1 temp2 -- )
+    temp1 src slot tag slot-offset ADDI
     temp1 temp2 (%write-barrier) ;
 
-M:: ppc %check-nursery ( label size temp1 temp2 -- )
-    temp2 load-zone-ptr
-    temp1 temp2 0 LWZ
-    temp2 temp2 2 cells LWZ
+M:: ppc %check-nursery-branch ( label size cc temp1 temp2 -- )
+    temp1 vm-reg "nursery" vm-field-offset LWZ
+    temp2 vm-reg "nursery" vm-field-offset 2 cells + LWZ
     temp1 temp1 size ADDI
     ! is here >= end?
     temp1 0 temp2 CMP
-    label BLE ;
+    cc {
+        { cc<= [ label BLE ] }
+        { cc/<= [ label BGT ] }
+    } case ;
 
-M:: ppc %save-gc-root ( gc-root register -- )
-    register 1 gc-root gc-root@ STW ;
+: gc-root-offsets ( seq -- seq' )
+    [ n>> spill@ ] map f like ;
 
-M:: ppc %load-gc-root ( gc-root register -- )
-    register 1 gc-root gc-root@ LWZ ;
-
-M:: ppc %call-gc ( gc-root-count temp -- )
-    3 1 gc-root-base local@ ADDI
-    gc-root-count 4 LI
-    5 %load-vm-addr
+M: ppc %call-gc ( gc-roots -- )
+    3 swap gc-root-offsets %load-reference
+    4 %load-vm-addr
     "inline_gc" f %alien-invoke ;
 
 M: ppc %prologue ( n -- )
@@ -492,9 +549,18 @@ M: ppc %epilogue ( n -- )
     } case ;
 
 : (%compare) ( src1 src2 -- ) [ 0 ] dip CMP ; inline
-: (%compare-imm) ( src1 src2 -- ) [ 0 ] [ ] [ \ f type-number or ] tri* CMPI ; inline
-: (%compare-float-unordered) ( src1 src2 -- ) [ 0 ] dip FCMPU ; inline
-: (%compare-float-ordered) ( src1 src2 -- ) [ 0 ] dip FCMPO ; inline
+
+: (%compare-integer-imm) ( src1 src2 -- )
+    [ 0 ] 2dip CMPI ; inline
+
+: (%compare-imm) ( src1 src2 -- )
+    [ tag-fixnum ] [ \ f type-number ] if* (%compare-integer-imm) ; inline
+
+: (%compare-float-unordered) ( src1 src2 -- )
+    [ 0 ] dip FCMPU ; inline
+
+: (%compare-float-ordered) ( src1 src2 -- )
+    [ 0 ] dip FCMPO ; inline
 
 :: (%compare-float) ( src1 src2 cc compare -- branch1 branch2 )
     cc {
@@ -517,6 +583,8 @@ M: ppc %epilogue ( n -- )
 M: ppc %compare [ (%compare) ] 2dip %boolean ;
 
 M: ppc %compare-imm [ (%compare-imm) ] 2dip %boolean ;
+
+M: ppc %compare-integer-imm [ (%compare-integer-imm) ] 2dip %boolean ;
 
 M:: ppc %compare-float-ordered ( dst src1 src2 cc temp -- )
     src1 src2 cc negate-cc \ (%compare-float-ordered) (%compare-float) :> ( branch1 branch2 )
@@ -544,6 +612,10 @@ M:: ppc %compare-imm-branch ( label src1 src2 cc -- )
     src1 src2 (%compare-imm)
     label cc %branch ;
 
+M:: ppc %compare-integer-imm-branch ( label src1 src2 cc -- )
+    src1 src2 (%compare-integer-imm)
+    label cc %branch ;
+
 :: (%branch) ( label branch1 branch2 -- )
     label branch1 execute( label -- )
     branch2 [ label branch2 execute( label -- ) ] when ; inline
@@ -559,6 +631,7 @@ M:: ppc %compare-float-unordered-branch ( label src1 src2 cc -- )
 : load-from-frame ( dst n rep -- )
     {
         { int-rep [ [ 1 ] dip LWZ ] }
+        { tagged-rep [ [ 1 ] dip LWZ ] }
         { float-rep [ [ 1 ] dip LFS ] }
         { double-rep [ [ 1 ] dip LFD ] }
         { stack-params [ [ 0 1 ] dip LWZ [ 0 1 ] dip param@ STW ] }
@@ -570,6 +643,7 @@ M:: ppc %compare-float-unordered-branch ( label src1 src2 cc -- )
 : store-to-frame ( src n rep -- )
     {
         { int-rep [ [ 1 ] dip STW ] }
+        { tagged-rep [ [ 1 ] dip STW ] }
         { float-rep [ [ 1 ] dip STFS ] }
         { double-rep [ [ 1 ] dip STFD ] }
         { stack-params [ [ [ 0 ] dip next-param@ LWZ 0 1 ] dip STW ] }
@@ -584,7 +658,9 @@ M: ppc %reload ( dst rep src -- )
 M: ppc %loop-entry ;
 
 M: int-regs return-reg drop 3 ;
+
 M: int-regs param-regs 2drop { 3 4 5 6 7 8 9 10 } ;
+
 M: float-regs return-reg drop 1 ;
 
 M:: ppc %save-param-reg ( stack reg rep -- )
@@ -700,6 +776,8 @@ M: ppc %alien-indirect ( -- )
 M: ppc immediate-arithmetic? ( n -- ? ) -32768 32767 between? ;
 
 M: ppc immediate-bitwise? ( n -- ? ) 0 65535 between? ;
+
+M: ppc immediate-store? drop f ;
 
 M: ppc struct-return-pointer-type void* ;
 

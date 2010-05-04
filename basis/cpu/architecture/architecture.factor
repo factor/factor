@@ -1,8 +1,9 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs generic kernel kernel.private
-math memory namespaces make sequences layouts system hashtables
-classes alien byte-arrays combinators words sets fry ;
+math math.order memory namespaces make sequences layouts system
+hashtables classes alien byte-arrays combinators words sets fry
+;
 IN: cpu.architecture
 
 ! Representations -- these are like low-level types
@@ -85,6 +86,20 @@ double-2-rep ;
 UNION: vector-rep
 int-vector-rep
 float-vector-rep ;
+
+CONSTANT: vector-reps
+    {
+        char-16-rep
+        uchar-16-rep
+        short-8-rep
+        ushort-8-rep
+        int-4-rep
+        uint-4-rep
+        longlong-2-rep
+        ulonglong-2-rep
+        float-4-rep
+        double-2-rep
+    }
 
 UNION: representation
 any-rep
@@ -202,12 +217,19 @@ M: ulonglong-2-rep scalar-rep-of drop ulonglong-scalar-rep ;
 ! Mapping from register class to machine registers
 HOOK: machine-registers cpu ( -- assoc )
 
+! Specifies if %slot, %set-slot and %write-barrier accept the
+! 'scale' and 'tag' parameters, and if %load-memory and
+! %store-memory work
+HOOK: complex-addressing? cpu ( -- ? )
+
 HOOK: %load-immediate cpu ( reg val -- )
 HOOK: %load-reference cpu ( reg obj -- )
 HOOK: %load-double cpu ( reg val -- )
+HOOK: %load-vector cpu ( reg val rep -- )
 
 HOOK: %peek cpu ( vreg loc -- )
 HOOK: %replace cpu ( vreg loc -- )
+HOOK: %replace-imm cpu ( src loc -- )
 HOOK: %inc-d cpu ( n -- )
 HOOK: %inc-r cpu ( n -- )
 
@@ -219,13 +241,10 @@ HOOK: %return cpu ( -- )
 
 HOOK: %dispatch cpu ( src temp -- )
 
-HOOK: %slot cpu ( dst obj slot -- )
+HOOK: %slot cpu ( dst obj slot scale tag -- )
 HOOK: %slot-imm cpu ( dst obj slot tag -- )
-HOOK: %set-slot cpu ( src obj slot -- )
+HOOK: %set-slot cpu ( src obj slot scale tag -- )
 HOOK: %set-slot-imm cpu ( src obj slot tag -- )
-
-HOOK: %string-nth cpu ( dst obj index temp -- )
-HOOK: %set-string-nth-fast cpu ( ch obj index temp -- )
 
 HOOK: %add     cpu ( dst src1 src2 -- )
 HOOK: %add-imm cpu ( dst src1 src2 -- )
@@ -253,9 +272,11 @@ HOOK: %log2    cpu ( dst src -- )
 
 HOOK: %copy cpu ( dst src rep -- )
 
-HOOK: %fixnum-add cpu ( label dst src1 src2 -- )
-HOOK: %fixnum-sub cpu ( label dst src1 src2 -- )
-HOOK: %fixnum-mul cpu ( label dst src1 src2 -- )
+: %tagged>integer ( dst src -- ) int-rep %copy ;
+
+HOOK: %fixnum-add cpu ( label dst src1 src2 cc -- )
+HOOK: %fixnum-sub cpu ( label dst src1 src2 cc -- )
+HOOK: %fixnum-mul cpu ( label dst src1 src2 cc -- )
 
 HOOK: %add-float cpu ( dst src1 src2 -- )
 HOOK: %sub-float cpu ( dst src1 src2 -- )
@@ -428,24 +449,10 @@ HOOK: %unbox-any-c-ptr cpu ( dst src -- )
 HOOK: %box-alien cpu ( dst src temp -- )
 HOOK: %box-displaced-alien cpu ( dst displacement base temp base-class -- )
 
-HOOK: %alien-unsigned-1 cpu ( dst src offset -- )
-HOOK: %alien-unsigned-2 cpu ( dst src offset -- )
-HOOK: %alien-unsigned-4 cpu ( dst src offset -- )
-HOOK: %alien-signed-1   cpu ( dst src offset -- )
-HOOK: %alien-signed-2   cpu ( dst src offset -- )
-HOOK: %alien-signed-4   cpu ( dst src offset -- )
-HOOK: %alien-cell       cpu ( dst src offset -- )
-HOOK: %alien-float      cpu ( dst src offset -- )
-HOOK: %alien-double     cpu ( dst src offset -- )
-HOOK: %alien-vector     cpu ( dst src offset rep -- )
-
-HOOK: %set-alien-integer-1 cpu ( ptr offset value -- )
-HOOK: %set-alien-integer-2 cpu ( ptr offset value -- )
-HOOK: %set-alien-integer-4 cpu ( ptr offset value -- )
-HOOK: %set-alien-cell      cpu ( ptr offset value -- )
-HOOK: %set-alien-float     cpu ( ptr offset value -- )
-HOOK: %set-alien-double    cpu ( ptr offset value -- )
-HOOK: %set-alien-vector    cpu ( ptr offset value rep -- )
+HOOK: %load-memory cpu ( dst base displacement scale offset rep c-type -- )
+HOOK: %load-memory-imm cpu ( dst base offset rep c-type -- )
+HOOK: %store-memory cpu ( value base displacement scale offset rep c-type -- )
+HOOK: %store-memory-imm cpu ( value base offset rep c-type -- )
 
 HOOK: %alien-global cpu ( dst symbol library -- )
 HOOK: %vm-field cpu ( dst offset -- )
@@ -454,25 +461,25 @@ HOOK: %set-vm-field cpu ( src offset -- )
 : %context ( dst -- ) 0 %vm-field ;
 
 HOOK: %allot cpu ( dst size class temp -- )
-HOOK: %write-barrier cpu ( src slot temp1 temp2 -- )
-HOOK: %write-barrier-imm cpu ( src slot temp1 temp2 -- )
+HOOK: %write-barrier cpu ( src slot scale tag temp1 temp2 -- )
+HOOK: %write-barrier-imm cpu ( src slot tag temp1 temp2 -- )
 
 ! GC checks
-HOOK: %check-nursery cpu ( label size temp1 temp2 -- )
-HOOK: %save-gc-root cpu ( gc-root register -- )
-HOOK: %load-gc-root cpu ( gc-root register -- )
-HOOK: %call-gc cpu ( gc-root-count temp1 -- )
+HOOK: %check-nursery-branch cpu ( label size cc temp1 temp2 -- )
+HOOK: %call-gc cpu ( gc-roots -- )
 
 HOOK: %prologue cpu ( n -- )
 HOOK: %epilogue cpu ( n -- )
 
 HOOK: %compare cpu ( dst temp cc src1 src2 -- )
 HOOK: %compare-imm cpu ( dst temp cc src1 src2 -- )
+HOOK: %compare-integer-imm cpu ( dst temp cc src1 src2 -- )
 HOOK: %compare-float-ordered cpu ( dst temp cc src1 src2 -- )
 HOOK: %compare-float-unordered cpu ( dst temp cc src1 src2 -- )
 
 HOOK: %compare-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-imm-branch cpu ( label cc src1 src2 -- )
+HOOK: %compare-integer-imm-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-float-ordered-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-float-unordered-branch cpu ( label cc src1 src2 -- )
 
@@ -497,10 +504,9 @@ M: reg-class param-reg param-regs nth ;
 
 M: stack-params param-reg 2drop ;
 
-! Does this architecture support %load-double?
-HOOK: load-double? cpu ( -- ? )
-
-M: object load-double? f ;
+! Does this architecture support %load-double, %load-vector and
+! objects in %compare-imm?
+HOOK: fused-unboxing? cpu ( -- ? )
 
 ! Can this value be an immediate operand for %add-imm, %sub-imm,
 ! or %mul-imm?
@@ -514,12 +520,18 @@ HOOK: immediate-bitwise? cpu ( n -- ? )
 ! %compare-imm-branch?
 HOOK: immediate-comparand? cpu ( n -- ? )
 
+! Can this value be an immediate operand for %replace-imm?
+HOOK: immediate-store? cpu ( obj -- ? )
+
 M: object immediate-comparand? ( n -- ? )
     {
-        { [ dup integer? ] [ immediate-arithmetic? ] }
+        { [ dup fixnum? ] [ tag-fixnum immediate-arithmetic? ] }
         { [ dup not ] [ drop t ] }
         [ drop f ]
     } cond ;
+
+: immediate-shift-count? ( n -- ? )
+    0 cell-bits 1 - between? ;
 
 ! What c-type describes the implicit struct return pointer for
 ! large structs?

@@ -1,7 +1,7 @@
-! Copyright (C) 2003, 2008 Slava Pestov.
+! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math.private sequences kernel.private
-math sequences.private slots.private alien.accessors ;
+USING: accessors alien.accessors byte-arrays kernel math.private
+sequences kernel.private math sequences.private slots.private ;
 IN: strings
 
 <PRIVATE
@@ -16,8 +16,31 @@ IN: strings
 : rehash-string ( str -- )
     1 over sequence-hashcode swap set-string-hashcode ; inline
 
+: (aux) ( n string -- byte-array m )
+    aux>> { byte-array } declare swap 1 fixnum-shift-fast ; inline
+
+: small-char? ( ch -- ? ) HEX: 7f fixnum<= ; inline
+
+: string-nth ( n string -- ch )
+    2dup string-nth-fast dup small-char?
+    [ 2nip ] [
+        [ (aux) alien-unsigned-2 7 fixnum-shift-fast ] dip
+        fixnum-bitxor
+    ] if ; inline
+
+: ensure-aux ( string -- string )
+    dup aux>> [ dup length 2 * (byte-array) >>aux ] unless ; inline
+
+: set-string-nth-slow ( ch n string -- )
+    [ [ HEX: 80 fixnum-bitor ] 2dip set-string-nth-fast ]
+    [
+        ensure-aux
+        [ -7 fixnum-shift-fast 1 fixnum-bitxor ] 2dip
+        (aux) set-alien-unsigned-2
+    ] 3bi ;
+
 : set-string-nth ( ch n string -- )
-    pick HEX: 7f fixnum<=
+    pick small-char?
     [ set-string-nth-fast ] [ set-string-nth-slow ] if ; inline
 
 PRIVATE>

@@ -35,8 +35,8 @@ VM_C_API char *pinned_alien_offset(cell obj, factor_vm *parent)
 /* make an alien */
 cell factor_vm::allot_alien(cell delegate_, cell displacement)
 {
-	if(delegate_ == false_object && displacement == 0)
-		return false_object;
+	if(displacement == 0)
+		return delegate_;
 
 	data_root<object> delegate(delegate_,this);
 	data_root<alien> new_alien(allot<alien>(sizeof(alien)),this);

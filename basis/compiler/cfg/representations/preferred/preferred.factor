@@ -80,7 +80,7 @@ PRIVATE>
 : each-rep ( insn vreg-quot: ( vreg rep -- ) -- )
     [ each-def-rep ] [ each-use-rep ] [ each-temp-rep ] 2tri ; inline
 
-: with-vreg-reps ( ..a cfg vreg-quot: ( ..a vreg rep -- ..b ) -- ..b )
+: with-vreg-reps ( cfg vreg-quot: ( vreg rep -- ) -- )
     '[
         [ basic-block set ] [
             [
