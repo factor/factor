@@ -528,3 +528,24 @@ Tok                = Spaces (Number | Special )
 ] [
     error>> [ redefined-rule? ] [ name>> "lol" = ] bi and
 ] must-fail-with
+
+[
+    { "a" "a" }
+] [
+    EBNF: foo   Bar = "a":a1 "a":a2 => [[ a1 a2 2array ]] ;EBNF
+    "aa" foo
+] unit-test
+
+[
+    { "a" "a" }
+] [
+    EBNF: foo2   Bar = "a":1a "a":2a => [[ 1a 2a 2array ]] ;EBNF
+    "aa" foo2
+] unit-test
+
+[
+    { "a" "a" }
+] [
+    EBNF: foo3   Bar = "a":11 "a":22 => [[ 11 22 2array ]] ;EBNF
+    "aa" foo3
+] unit-test
