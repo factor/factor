@@ -4,7 +4,7 @@ USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.ppc.assembler compiler.units compiler.constants math
 math.private math.ranges layouts words vocabs slots.private
 locals locals.backend generic.single.private fry sequences
-threads.private ;
+threads.private strings.private ;
 FROM: cpu.ppc.assembler => B ;
 IN: bootstrap.ppc
 
@@ -502,7 +502,7 @@ CONSTANT: nv-reg 17
     3 3 4 LBZX
     3 3 tag-bits get SLWI
     ! store character to stack
-    ds-reg ds-reg 4 SUB
+    ds-reg ds-reg 4 SUBI
     3 ds-reg 0 STW
 ] \ string-nth-fast define-sub-primitive
 
