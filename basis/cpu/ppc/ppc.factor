@@ -46,6 +46,10 @@ M: ppc machine-registers
 CONSTANT: scratch-reg 30
 CONSTANT: fp-scratch-reg 30
 
+M: ppc complex-addressing? f ;
+
+M: ppc fused-unboxing? f ;
+
 M: ppc %load-immediate ( reg n -- ) swap LOAD ;
 
 M: ppc %load-reference ( reg obj -- )
@@ -139,9 +143,12 @@ M:: ppc %dispatch ( src temp -- )
     temp MTCTR
     BCTR ;
 
-M: ppc %slot ( dst obj slot -- ) swapd LWZX ;
+: (%slot) ( dst obj slot scale tag -- obj dst slot )
+    [ 0 assert= ] bi@ swapd ;
+
+M: ppc %slot ( dst obj slot scale tag -- ) (%slot) LWZX ;
 M: ppc %slot-imm ( dst obj slot tag -- ) slot-offset LWZ ;
-M: ppc %set-slot ( src obj slot -- ) swapd STWX ;
+M: ppc %set-slot ( src obj slot scale tag -- ) (%slot) STWX ;
 M: ppc %set-slot-imm ( src obj slot tag -- ) slot-offset STW ;
 
 M: ppc %add     ADD ;
@@ -357,7 +364,7 @@ M:: ppc %box-displaced-alien ( dst displacement base temp base-class -- )
 
         dst displacement base temp
         {
-            { [ base-class \ f class<= ] [ 2drop %box-displaced-alien/f ] }
+            { [ base-class \ f class<= ] [ drop %box-displaced-alien/f ] }
             { [ base-class \ alien class<= ] [ %box-displaced-alien/alien ] }
             { [ base-class \ byte-array class<= ] [ %box-displaced-alien/byte-array ] }
             [ %box-displaced-alien/dynamic ]
@@ -366,7 +373,7 @@ M:: ppc %box-displaced-alien ( dst displacement base temp base-class -- )
         "end" resolve-label
     ] with-scope ;
 
-M:: ppc %load-memory-imm ( dst base offset rep c-type -- )
+M: ppc %load-memory-imm ( dst base offset rep c-type -- )
     [
         {
             { c:char   [ [ dup ] 2dip LBZ dup EXTSB ] }
@@ -382,7 +389,26 @@ M:: ppc %load-memory-imm ( dst base offset rep c-type -- )
         } case
     ] ?if ;
 
-M:: ppc %store-memory-imm ( src base offset rep c-type -- )
+: (%memory) ( val base displacement scale offset rep c-type -- base val displacement rep c-type )
+    [ [ 0 assert= ] bi@ swapd ] 2dip ; inline
+
+M: ppc %load-memory ( dst base displacement scale offset rep c-type -- )
+    (%memory) [
+        {
+            { c:char   [ [ LBZX ] [ drop dup EXTSB ] 2bi ] }
+            { c:uchar  [ LBZX ] }
+            { c:short  [ LHAX ] }
+            { c:ushort [ LHZX ] }
+        } case
+    ] [
+        {
+            { int-rep [ LWZX ] }
+            { float-rep [ LFSX ] }
+            { double-rep [ LFDX ] }
+        } case
+    ] ?if ;
+
+M: ppc %store-memory-imm ( src base offset rep c-type -- )
     [
         {
             { c:char   [ STB ] }
@@ -395,6 +421,22 @@ M:: ppc %store-memory-imm ( src base offset rep c-type -- )
             { int-rep [ STW ] }
             { float-rep [ STFS ] }
             { double-rep [ STFD ] }
+        } case
+    ] ?if ;
+
+M: ppc %store-memory ( src base displacement scale offset rep c-type -- )
+    (%memory) [
+        {
+            { c:char   [ STBX ] }
+            { c:uchar  [ STBX ] }
+            { c:short  [ STHX ] }
+            { c:ushort [ STHX ] }
+        } case
+    ] [
+        {
+            { int-rep [ STWX ] }
+            { float-rep [ STFSX ] }
+            { double-rep [ STFDX ] }
         } case
     ] ?if ;
 
@@ -440,18 +482,18 @@ M:: ppc %allot ( dst size class nursery-ptr -- )
     temp2 load-decks-offset
     temp1 scratch-reg temp2 STBX ;
 
-M:: ppc %write-barrier ( src slot temp1 temp2 -- )
+M:: ppc %write-barrier ( src slot scale tag temp1 temp2 -- )
+    scale 0 assert= tag 0 assert=
     temp1 src slot ADD
     temp1 temp2 (%write-barrier) ;
 
-M:: ppc %write-barrier-imm ( src slot temp1 temp2 -- )
-    temp1 src slot ADDI
+M:: ppc %write-barrier-imm ( src slot tag temp1 temp2 -- )
+    temp1 src slot tag slot-offset ADDI
     temp1 temp2 (%write-barrier) ;
 
 M:: ppc %check-nursery-branch ( label size cc temp1 temp2 -- )
-    temp2 load-zone-ptr
-    temp1 temp2 0 LWZ
-    temp2 temp2 2 cells LWZ
+    temp1 vm-reg "nursery" vm-field-offset LWZ
+    temp2 vm-reg "nursery" vm-field-offset 2 cells + LWZ
     temp1 temp1 size ADDI
     ! is here >= end?
     temp1 0 temp2 CMP
@@ -460,8 +502,11 @@ M:: ppc %check-nursery-branch ( label size cc temp1 temp2 -- )
         { cc/<= [ label BGT ] }
     } case ;
 
+: gc-root-offsets ( seq -- seq' )
+    [ n>> spill@ ] map f like ;
+
 M: ppc %call-gc ( gc-roots -- )
-    3 swap %load-reference
+    3 swap gc-root-offsets %load-reference
     4 %load-vm-addr
     "inline_gc" f %alien-invoke ;
 
@@ -586,6 +631,7 @@ M:: ppc %compare-float-unordered-branch ( label src1 src2 cc -- )
 : load-from-frame ( dst n rep -- )
     {
         { int-rep [ [ 1 ] dip LWZ ] }
+        { tagged-rep [ [ 1 ] dip LWZ ] }
         { float-rep [ [ 1 ] dip LFS ] }
         { double-rep [ [ 1 ] dip LFD ] }
         { stack-params [ [ 0 1 ] dip LWZ [ 0 1 ] dip param@ STW ] }
@@ -597,6 +643,7 @@ M:: ppc %compare-float-unordered-branch ( label src1 src2 cc -- )
 : store-to-frame ( src n rep -- )
     {
         { int-rep [ [ 1 ] dip STW ] }
+        { tagged-rep [ [ 1 ] dip STW ] }
         { float-rep [ [ 1 ] dip STFS ] }
         { double-rep [ [ 1 ] dip STFD ] }
         { stack-params [ [ [ 0 ] dip next-param@ LWZ 0 1 ] dip STW ] }
