@@ -217,7 +217,7 @@ void factor_vm::primitive_compact_gc()
 
 void factor_vm::inline_gc(cell gc_roots_)
 {
-	cell stack_pointer = (cell)ctx->callstack_top + sizeof(cell);
+	cell stack_pointer = (cell)ctx->callstack_top;
 
 	if(to_boolean(gc_roots_))
 	{

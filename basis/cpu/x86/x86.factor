@@ -45,7 +45,7 @@ HOOK: extra-stack-space cpu ( stack-frame -- n )
 : param@ ( n -- op ) reserved-stack-space + stack@ ;
 
 : gc-root-offsets ( seq -- seq' )
-    [ n>> special-offset ] map f like ;
+    [ n>> spill-offset special-offset cell + ] map f like ;
 
 : decr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap SUB ] if ;
@@ -70,9 +70,9 @@ HOOK: pic-tail-reg cpu ( -- reg )
 
 M: x86 complex-addressing? t ;
 
-M: x86 fused-unboxing? ( -- ? ) t ;
+M: x86 fused-unboxing? t ;
 
-M: x86 immediate-store? ( obj -- ? ) immediate-comparand? ;
+M: x86 immediate-store? immediate-comparand? ;
 
 M: x86 %load-immediate dup 0 = [ drop dup XOR ] [ MOV ] if ;
 

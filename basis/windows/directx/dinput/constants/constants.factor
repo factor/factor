@@ -1,8 +1,8 @@
-USING: windows.directx.dinput windows.kernel32 windows.ole32 windows.com
-windows.com.syntax alien alien.c-types alien.data alien.syntax
-kernel system namespaces combinators sequences fry math accessors
-macros words quotations libc continuations generalizations
-splitting locals assocs init specialized-arrays memoize
+USING: windows.directx.dinput windows.kernel32 windows.ole32
+windows.com windows.com.syntax alien alien.c-types alien.data
+alien.syntax kernel system namespaces combinators sequences fry
+math accessors macros words quotations libc continuations
+generalizations splitting locals assocs init specialized-arrays
 classes.struct strings arrays literals ;
 SPECIALIZED-ARRAY: DIOBJECTDATAFORMAT
 IN: windows.directx.dinput.constants
@@ -20,21 +20,21 @@ SYMBOLS:
 
 <PRIVATE
 
-<<
+: initialize ( variable quot -- )
+    call swap set-global ; inline
 
-MEMO: c-type* ( name -- c-type ) c-type ;
-MEMO: heap-size* ( c-type -- n ) heap-size ;
+<<
 
 GENERIC: array-base-type ( c-type -- c-type' )
 M: object array-base-type ;
 M: array array-base-type first ;
 
 : (field-spec-of) ( field struct -- field-spec )
-    c-type* fields>> [ name>> = ] with find nip ;
+    c-type fields>> [ name>> = ] with find nip ;
 : (offsetof) ( field struct -- offset )
     [ (field-spec-of) offset>> ] [ drop 0 ] if* ;
 : (sizeof) ( field struct -- size )
-    [ (field-spec-of) type>> array-base-type heap-size* ] [ drop 1 ] if* ;
+    [ (field-spec-of) type>> array-base-type heap-size ] [ drop 1 ] if* ;
 
 : (flag) ( thing -- integer )
     {
@@ -56,14 +56,17 @@ M: array array-base-type first ;
         [ first dup word? [ '[ _ get ] ] [ drop [ f ] ] if ]
     } cleave
     [ DIOBJECTDATAFORMAT <struct-boa> ] dip
-    '[ _ clone @ >>pguid ] ;
+    curry ;
+
+: set-DIOBJECTDATAFORMAT ( array struct pguid n -- array )
+    [ [ clone ] dip >>pguid ] dip pick set-nth ;
 
 :: make-DIOBJECTDATAFORMAT-array-quot ( struct array -- quot )
     array length '[ _ malloc-DIOBJECTDATAFORMAT-array ]
     array [| args i |
         struct args <DIOBJECTDATAFORMAT>-quot
-        i '[ _ pick set-nth ] compose compose
-    ] each-index ;
+        i '[ @ _ set-DIOBJECTDATAFORMAT ]
+    ] map-index [ ] join compose ;
 
 >>
 
@@ -832,8 +835,7 @@ MACRO: <DIDATAFORMAT> ( dwFlags dwDataSize struct rgodf-array -- alien )
 [ define-constants ] "windows.directx.dinput.constants" add-startup-hook
 
 : uninitialize ( variable quot -- )
-    [ '[ _ when* f ] change-global ]
-    [ drop global delete-at ] 2bi ; inline
+    [ [ get-global ] dip when* ] [ drop global delete-at ] 2bi ; inline
 
 : free-dinput-constants ( -- )
     {
