@@ -2,13 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel generic math math.functions
 math.parser namespaces io sequences trees shuffle
-assocs parser accessors math.order prettyprint.custom ;
+assocs parser accessors math.order prettyprint.custom
+trees.private ;
 IN: trees.avl
 
 TUPLE: avl < tree ;
 
 : <avl> ( -- tree )
     avl new-tree ;
+
+<PRIVATE
 
 TUPLE: avl-node < node balance ;
 
@@ -20,11 +23,14 @@ TUPLE: avl-node < node balance ;
     swap [ + ] change-balance drop ;
 
 : rotate ( node -- node )
-    dup node+link dup node-link pick set-node+link
-    tuck set-node-link ;    
+    dup node+link
+    dup node-link
+    pick set-node+link
+    [ set-node-link ] keep ;    
 
 : single-rotate ( node -- node )
-    0 over (>>balance) 0 over node+link 
+    0 >>balance
+    0 over node+link 
     (>>balance) rotate ;
 
 : pick-balances ( a node -- balance balance )
@@ -61,7 +67,7 @@ DEFER: avl-set
 : avl-insert ( value key node -- node taller? )
     2dup key>> before? left right ? [
         [ node-link avl-set ] keep swap
-        [ tuck set-node-link ] dip
+        [ [ set-node-link ] keep ] dip
         [ dup current-side get increase-balance balance-insert ]
         [ f ] if
     ] with-side ;
@@ -145,6 +151,8 @@ M: avl delete-at ( key node -- )
     [ avl-delete 2drop ] change-root drop ;
 
 M: avl new-assoc 2drop <avl> ;
+
+PRIVATE>
 
 : >avl ( assoc -- avl )
     T{ avl f f 0 } assoc-clone-like ;
