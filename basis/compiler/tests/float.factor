@@ -121,3 +121,13 @@ IN: compiler.tests.float
     float-array{ 1 2 3 4 }
     [ { float-array } declare [ dup * ] [ + ] map-reduce ] compile-call
 ] unit-test
+
+[ 4.5 ] [
+    float-array{ 1.0 3.5 }
+    [ { float-array } declare 0.0 [ + ] reduce ] compile-call
+] unit-test
+
+[ float-array{ 2.0 4.5 } ] [
+    float-array{ 1.0 3.5 }
+    [ { float-array } declare [ 1 + ] map ] compile-call
+] unit-test
