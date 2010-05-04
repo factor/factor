@@ -508,8 +508,6 @@ M: stack-params param-reg 2drop ;
 ! objects in %compare-imm?
 HOOK: fused-unboxing? cpu ( -- ? )
 
-M: object fused-unboxing? f ;
-
 ! Can this value be an immediate operand for %add-imm, %sub-imm,
 ! or %mul-imm?
 HOOK: immediate-arithmetic? cpu ( n -- ? )
