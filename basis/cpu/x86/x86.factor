@@ -45,7 +45,7 @@ HOOK: extra-stack-space cpu ( stack-frame -- n )
 : param@ ( n -- op ) reserved-stack-space + stack@ ;
 
 : gc-root-offsets ( seq -- seq' )
-    [ n>> special-offset ] map f like ;
+    [ n>> spill-offset special-offset ] map f like ;
 
 : decr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap SUB ] if ;
