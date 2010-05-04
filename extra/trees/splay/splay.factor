@@ -1,13 +1,16 @@
 ! Copyright (c) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math namespaces sequences assocs parser
-trees generic math.order accessors prettyprint.custom shuffle ;
+trees generic math.order accessors prettyprint.custom
+trees.private combinators ;
 IN: trees.splay
 
 TUPLE: splay < tree ;
 
 : <splay> ( -- tree )
     \ splay new-tree ;
+
+<PRIVATE
 
 : rotate-right ( node -- node )
     dup left>>
@@ -27,32 +30,35 @@ TUPLE: splay < tree ;
     swap [ rot [ (>>right) ] 2keep
     drop dup right>> swapd ] dip swap ;
 
-: cmp ( key node -- obj node -1/0/1 )
-    2dup key>> key-side ;
+: cmp ( key node -- obj node <=> )
+    2dup key>> <=> ;
 
-: lcmp ( key node -- obj node -1/0/1 ) 
-    2dup left>> key>> key-side ;
+: lcmp ( key node -- obj node <=> ) 
+    2dup left>> key>> <=> ;
 
-: rcmp ( key node -- obj node -1/0/1 ) 
-    2dup right>> key>> key-side ;
+: rcmp ( key node -- obj node <=> ) 
+    2dup right>> key>> <=> ;
 
 DEFER: (splay)
 
 : splay-left ( left right key node -- left right key node )
     dup left>> [
-        lcmp 0 < [ rotate-right ] when
+        lcmp +lt+ = [ rotate-right ] when
         dup left>> [ link-right (splay) ] when
     ] when ;
 
 : splay-right ( left right key node -- left right key node )
     dup right>> [
-        rcmp 0 > [ rotate-left ] when
+        rcmp +gt+ = [ rotate-left ] when
         dup right>> [ link-left (splay) ] when
     ] when ;
 
 : (splay) ( left right key node -- left right key node )
-    cmp dup 0 <
-    [ drop splay-left ] [ 0 > [ splay-right ] when ] if ;
+    cmp {
+        { +lt+ [ splay-left ] }
+        { +gt+ [ splay-right ] }
+        { +eq+ [ ] }
+    } case ;
 
 : assemble ( head left right node -- root )
     [ right>> swap (>>left) ] keep
@@ -64,18 +70,18 @@ DEFER: (splay)
     [ T{ node } clone dup dup ] 2dip
     (splay) nip assemble ;
 
-: splay ( key tree -- )
+: do-splay ( key tree -- )
     [ root>> splay-at ] keep (>>root) ;
 
 : splay-split ( key tree -- node node )
-    2dup splay root>> cmp 0 < [
+    2dup do-splay root>> cmp +lt+ = [
         nip dup left>> swap f over (>>left)
     ] [
         nip dup right>> swap f over (>>right) swap
     ] if ;
 
 : get-splay ( key tree -- node ? )
-    2dup splay root>> cmp 0 = [
+    2dup do-splay root>> cmp +eq+ = [
         nip t
     ] [
         2drop f f
@@ -95,7 +101,7 @@ DEFER: (splay)
     ] if* ;
 
 : remove-splay ( key tree -- )
-    tuck get-splay nip [
+    [ get-splay nip ] keep [
         dup dec-count
         dup right>> swap left>> splay-join
         swap (>>root)
@@ -127,6 +133,8 @@ M: splay delete-at ( key tree -- )
 
 M: splay new-assoc
     2drop <splay> ;
+
+PRIVATE>
 
 : >splay ( assoc -- tree )
     T{ splay f f 0 } assoc-clone-like ;
