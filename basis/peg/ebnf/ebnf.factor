@@ -230,7 +230,7 @@ DEFER: 'action'
 
 : 'element' ( -- parser )
   [
-    [ ('element') , ":" syntax , "(a-zA-Z0-9_)+" range-pattern repeat1 [ >string ] action , ] seq* [ first2 <ebnf-var> ] action ,
+    [ ('element') , ":" syntax , "(a-zA-Z0-9_-)+" range-pattern repeat1 [ >string ] action , ] seq* [ first2 <ebnf-var> ] action ,
     ('element') ,
   ] choice* ;
 

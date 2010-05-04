@@ -549,3 +549,10 @@ Tok                = Spaces (Number | Special )
     EBNF: foo3   Bar = "a":11 "a":22 => [[ 11 22 2array ]] ;EBNF
     "aa" foo3
 ] unit-test
+
+[
+    { "a" "a" }
+] [
+    EBNF: foo4   Bar = "a":a-1 "a":a-2 => [[ a-1 a-2 2array ]] ;EBNF
+    "aa" foo4
+] unit-test
