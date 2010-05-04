@@ -70,9 +70,9 @@ HOOK: pic-tail-reg cpu ( -- reg )
 
 M: x86 complex-addressing? t ;
 
-M: x86 fused-unboxing? ( -- ? ) t ;
+M: x86 fused-unboxing? t ;
 
-M: x86 immediate-store? ( obj -- ? ) immediate-comparand? ;
+M: x86 immediate-store? immediate-comparand? ;
 
 M: x86 %load-immediate dup 0 = [ drop dup XOR ] [ MOV ] if ;
 
