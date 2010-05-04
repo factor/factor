@@ -1,4 +1,5 @@
-USING: compiler.units words vocabs kernel threads.private ;
+USING: compiler.units continuations kernel namespaces
+threads.private words vocabs tools.deploy.shaker ;
 IN: debugger
 
 : error. ( error -- ) original-error get die-with2 ;
