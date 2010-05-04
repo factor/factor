@@ -56,14 +56,17 @@ M: array array-base-type first ;
         [ first dup word? [ '[ _ get ] ] [ drop [ f ] ] if ]
     } cleave
     [ DIOBJECTDATAFORMAT <struct-boa> ] dip
-    '[ _ clone @ >>pguid ] ;
+    curry ;
+
+: set-DIOBJECTDATAFORMAT ( array struct pguid n -- array )
+    [ [ clone ] dip >>pguid ] dip pick set-nth ;
 
 :: make-DIOBJECTDATAFORMAT-array-quot ( struct array -- quot )
     array length '[ _ malloc-DIOBJECTDATAFORMAT-array ]
     array [| args i |
         struct args <DIOBJECTDATAFORMAT>-quot
-        i '[ _ pick set-nth ] compose compose
-    ] each-index ;
+        i '[ @ _ set-DIOBJECTDATAFORMAT ]
+    ] map-index [ ] join compose ;
 
 >>
 
