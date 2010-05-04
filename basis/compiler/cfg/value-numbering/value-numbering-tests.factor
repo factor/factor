@@ -91,7 +91,7 @@ cpu x86.32? [
     [
         {
             T{ ##load-reference f 0 + }
-            T{ ##replace-imm f 10 D + }
+            T{ ##replace-imm f + D 0 }
         }
     ] [
         {
