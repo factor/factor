@@ -52,4 +52,4 @@ M: insn normalize-height* ;
     rs-height get dup 0 = [ drop ] [ \ ##inc-r new-insn prefix ] if ;
 
 : normalize-height ( cfg -- cfg' )
-    [ height-step ] simple-optimization ;
+    dup [ height-step ] simple-optimization ;

@@ -8,7 +8,7 @@ IN: compiler.cfg.finalization
 
 : finalize-cfg ( cfg -- cfg' )
     select-representations
-    ! schedule-instructions
+    schedule-instructions
     insert-gc-checks
     insert-save-contexts
     destruct-ssa
