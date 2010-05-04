@@ -70,7 +70,10 @@ M: ##unbox-alien rewrite rewrite-unbox-any-c-ptr ;
 ! construct a new ##load-memory or ##store-memory with the
 ! ##add's operand as the displacement
 : fuse-displacement? ( insn -- ? )
-    base>> vreg>insn ##add? ;
+    {
+        [ offset>> 0 = complex-addressing? or ]
+        [ base>> vreg>insn ##add? ]
+    } 1&& ;
 
 GENERIC: alien-insn-value ( insn -- value )
 
@@ -106,12 +109,14 @@ M: ##store-memory-imm new-alien-insn drop \ ##store-memory new-insn ;
     [ >>displacement ] [ >>scale ] bi* ;
 
 : rewrite-memory-op ( insn -- insn/f )
-    {
-        { [ dup fuse-base-offset? ] [ fuse-base-offset ] }
-        { [ dup fuse-displacement-offset? ] [ fuse-displacement-offset ] }
-        { [ dup fuse-scale? ] [ fuse-scale ] }
-        [ drop f ]
-    } cond ;
+    complex-addressing? [
+        {
+            { [ dup fuse-base-offset? ] [ fuse-base-offset ] }
+            { [ dup fuse-displacement-offset? ] [ fuse-displacement-offset ] }
+            { [ dup fuse-scale? ] [ fuse-scale ] }
+            [ drop f ]
+        } cond
+    ] [ drop f ] if ;
 
 : rewrite-memory-imm-op ( insn -- insn/f )
     {
