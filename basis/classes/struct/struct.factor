@@ -9,7 +9,7 @@ locals macros make math math.order parser quotations sequences
 slots slots.private specialized-arrays vectors words summary
 namespaces assocs vocabs.parser math.functions
 classes.struct.bit-accessors bit-arrays
-stack-checker.dependencies ;
+stack-checker.dependencies system layouts ;
 QUALIFIED: math
 IN: classes.struct
 
@@ -166,8 +166,6 @@ INSTANCE: struct-c-type value-type
 
 M: struct-c-type c-type ;
 
-M: struct-c-type c-type-stack-align? drop f ;
-
 : if-value-struct ( ctype true false -- )
     [ dup value-struct? ] 2dip '[ drop void* @ ] if ; inline
 
@@ -187,7 +185,13 @@ M: struct-c-type box-return
     [ %box-small-struct ] [ %box-large-struct ] if-small-struct ;
 
 M: struct-c-type stack-size
-    [ heap-size ] [ stack-size ] if-value-struct ;
+    [ heap-size cell align ] [ stack-size ] if-value-struct ;
+
+HOOK: flatten-struct-type cpu ( type -- reps )
+
+M: object flatten-struct-type int-rep (flatten-c-type) ;
+
+M: struct-c-type flatten-c-type flatten-struct-type ;
 
 M: struct-c-type c-struct? drop t ;
 
