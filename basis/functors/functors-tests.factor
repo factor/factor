@@ -159,7 +159,7 @@ T-class DEFINES-CLASS ${T}
 WHERE
 
 STRUCT: T-class
-    { NAME c:int }
+    { NAME c:longlong }
     { x { TYPE 4 } }
     { y { c:short N } }
     { z TYPE initial: 5 }
@@ -178,32 +178,32 @@ STRUCT: T-class
             { offset 0 }
             { class integer }
             { initial 0 } 
-            { type c:int }
+            { type c:longlong }
         }
         T{ struct-slot-spec
             { name "x" }
-            { offset 4 }
+            { offset 8 }
             { class object }
             { initial f } 
             { type { c:char 4 } }
         }
         T{ struct-slot-spec
             { name "y" }
-            { offset 8 }
+            { offset 12 }
             { class object }
             { initial f } 
             { type { c:short 2 } }
         }
         T{ struct-slot-spec
             { name "z" }
-            { offset 12 }
+            { offset 16 }
             { class fixnum }
             { initial 5 } 
             { type c:char }
         }
         T{ struct-slot-spec
             { name "float" }
-            { offset 16 }
+            { offset 20 }
             { class object }
             { initial f } 
             { type { c:float 2 } }
