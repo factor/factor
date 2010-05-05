@@ -373,6 +373,9 @@ M:: ppc %box-displaced-alien ( dst displacement base temp base-class -- )
         "end" resolve-label
     ] with-scope ;
 
+: (%memory) ( val base displacement scale offset rep c-type -- base val displacement rep c-type )
+    [ [ 0 assert= ] bi@ swapd ] 2dip ; inline
+
 M: ppc %load-memory-imm ( dst base offset rep c-type -- )
     [
         {
@@ -380,6 +383,8 @@ M: ppc %load-memory-imm ( dst base offset rep c-type -- )
             { c:uchar  [ LBZ ] }
             { c:short  [ LHA ] }
             { c:ushort [ LHZ ] }
+            { c:int    [ LWZ ] }
+            { c:uint   [ LWZ ] }
         } case
     ] [
         {
@@ -389,9 +394,6 @@ M: ppc %load-memory-imm ( dst base offset rep c-type -- )
         } case
     ] ?if ;
 
-: (%memory) ( val base displacement scale offset rep c-type -- base val displacement rep c-type )
-    [ [ 0 assert= ] bi@ swapd ] 2dip ; inline
-
 M: ppc %load-memory ( dst base displacement scale offset rep c-type -- )
     (%memory) [
         {
@@ -399,6 +401,8 @@ M: ppc %load-memory ( dst base displacement scale offset rep c-type -- )
             { c:uchar  [ LBZX ] }
             { c:short  [ LHAX ] }
             { c:ushort [ LHZX ] }
+            { c:int    [ LWZX ] }
+            { c:uint   [ LWZX ] }
         } case
     ] [
         {
@@ -415,6 +419,8 @@ M: ppc %store-memory-imm ( src base offset rep c-type -- )
             { c:uchar  [ STB ] }
             { c:short  [ STH ] }
             { c:ushort [ STH ] }
+            { c:int    [ STW ] }
+            { c:uint   [ STW ] }
         } case
     ] [
         {
@@ -431,6 +437,8 @@ M: ppc %store-memory ( src base displacement scale offset rep c-type -- )
             { c:uchar  [ STBX ] }
             { c:short  [ STHX ] }
             { c:ushort [ STHX ] }
+            { c:int    [ STWX ] }
+            { c:uint   [ STWX ] }
         } case
     ] [
         {
