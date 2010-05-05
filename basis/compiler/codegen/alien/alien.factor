@@ -6,7 +6,8 @@ classes.struct combinators compiler.alien
 compiler.cfg.instructions compiler.codegen
 compiler.codegen.fixup compiler.errors compiler.utilities
 cpu.architecture fry kernel layouts libc locals make math
-math.order math.parser namespaces quotations sequences strings ;
+math.order math.parser namespaces quotations sequences strings
+system ;
 FROM: compiler.errors => no-such-symbol ;
 IN: compiler.codegen.alien
 
@@ -46,43 +47,10 @@ M: reg-class reg-class-full?
 : alloc-fastcall-param ( rep -- n reg-class rep )
     [ [ reg-class-of get ] [ reg-class-of ] [ next-fastcall-param ] tri ] keep ;
 
-:: alloc-parameter ( parameter abi -- reg rep )
-    parameter c-type-rep dup reg-class-of abi reg-class-full?
+:: alloc-parameter ( rep abi -- reg rep )
+    rep dup reg-class-of abi reg-class-full?
     [ alloc-stack-param ] [ alloc-fastcall-param ] if
     [ abi param-reg ] dip ;
-
-SYMBOL: (stack-value)
-<< void* c-type clone \ (stack-value) define-primitive-type
-stack-params \ (stack-value) c-type (>>rep) >>
-
-: ((flatten-type)) ( type to-type -- seq )
-    [ stack-size cell align cell /i ] dip c-type <repetition> ; inline
-
-: (flatten-int-type) ( type -- seq )
-    void* ((flatten-type)) ;
-: (flatten-stack-type) ( type -- seq )
-    (stack-value) ((flatten-type)) ;
-
-GENERIC: flatten-value-type ( type -- types )
-
-M: object flatten-value-type 1array ;
-M: struct-c-type flatten-value-type (flatten-int-type) ;
-M: long-long-type flatten-value-type (flatten-int-type) ;
-M: c-type-name flatten-value-type c-type flatten-value-type ;
-
-: flatten-value-types ( params -- params )
-    #! Convert value type structs to consecutive void*s.
-    [
-        0 [
-            c-type
-            [ parameter-align cell /i void* c-type <repetition> % ] keep
-            [ stack-size cell align + ] keep
-            flatten-value-type %
-        ] reduce drop
-    ] { } make ;
-
-: each-parameter ( parameters quot -- )
-    [ [ parameter-offsets nip ] keep ] dip 2each ; inline
 
 : reset-fastcall-counts ( -- )
     { int-regs float-regs stack-params } [ 0 swap set ] each ;
@@ -91,19 +59,27 @@ M: c-type-name flatten-value-type c-type flatten-value-type ;
     #! In quot you can call alloc-parameter
     [ reset-fastcall-counts call ] with-scope ; inline
 
-: move-parameters ( node word -- )
+:: move-parameters ( params word -- )
     #! Moves values from C stack to registers (if word is
     #! %load-param-reg) and registers to C stack (if word is
     #! %save-param-reg).
-    [ [ alien-parameters flatten-value-types ] [ abi>> ] bi ]
-    [ '[ _ alloc-parameter _ execute ] ]
-    bi* each-parameter ; inline
+    0 params alien-parameters flatten-c-types [
+        [ params abi>> alloc-parameter word execute( offset reg rep -- ) ]
+        [ rep-size cell align + ]
+        2bi
+    ] each drop ; inline
+
+: parameter-offsets ( types -- offsets )
+    0 [ stack-size + ] accumulate nip ;
+
+: each-parameter ( parameters quot -- )
+    [ [ parameter-offsets ] keep ] dip 2each ; inline
 
 : reverse-each-parameter ( parameters quot -- )
-    [ [ parameter-offsets nip ] keep ] dip 2reverse-each ; inline
+    [ [ parameter-offsets ] keep ] dip 2reverse-each ; inline
 
 : prepare-unbox-parameters ( parameters -- offsets types indices )
-    [ parameter-offsets nip ] [ ] [ length iota <reversed> ] tri ;
+    [ parameter-offsets ] [ ] [ length iota <reversed> ] tri ;
 
 : unbox-parameters ( offset node -- )
     parameters>> swap
@@ -147,7 +123,7 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
     ] if ;
 
 : decorated-symbol ( params -- symbols )
-    [ function>> ] [ parameters>> parameter-offsets drop number>string ] bi
+    [ function>> ] [ parameters>> [ stack-size ] map-sum number>string ] bi
     {
         [ drop ]
         [ "@" glue ]

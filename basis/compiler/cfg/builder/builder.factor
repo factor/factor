@@ -218,7 +218,7 @@ M: #terminate emit-node drop ##no-tco end-basic-block ;
     stack-frame new
         swap
         [ return>> return-size >>return ]
-        [ alien-parameters parameter-offsets drop >>params ] bi
+        [ alien-parameters [ stack-size ] map-sum >>params ] bi
         t >>calls-vm? ;
 
 : alien-node-height ( params -- )
