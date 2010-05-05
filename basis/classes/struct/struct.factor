@@ -101,7 +101,7 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
 GENERIC: (reader-quot) ( slot -- quot )
 
 M: struct-slot-spec (reader-quot)
-    [ type>> c-type-getter-boxer ]
+    [ type>> c-getter ]
     [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
 
 M: struct-bit-slot-spec (reader-quot)
