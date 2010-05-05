@@ -78,5 +78,5 @@ IN: compiler.cfg.intrinsics.allot
         :> len
         0 ^^load-literal :> elt
         len emit-allot-byte-array :> reg
-        len reg elt byte-array store-initial-element
+        len cell align cell /i reg elt byte-array store-initial-element
     ] [ drop node emit-primitive ] if ;
