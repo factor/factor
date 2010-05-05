@@ -31,7 +31,7 @@ TUPLE: avl-node < node balance ;
 : single-rotate ( node -- node )
     0 >>balance
     0 over node+link 
-    (>>balance) rotate ;
+    balance<< rotate ;
 
 : pick-balances ( a node -- balance balance )
     balance>> {
@@ -44,8 +44,8 @@ TUPLE: avl-node < node balance ;
     [
         node+link [
             node-link current-side get neg
-            over pick-balances rot 0 swap (>>balance)
-        ] keep (>>balance)
+            over pick-balances rot 0 swap balance<<
+        ] keep balance<<
     ] keep swap >>balance
     dup node+link [ rotate ] with-other-side
     over set-node+link rotate ;
@@ -74,7 +74,7 @@ DEFER: avl-set
 
 : (avl-set) ( value key node -- node taller? )
     2dup key>> = [
-        -rot pick (>>key) over (>>value) f
+        -rot pick key<< over value<< f
     ] [ avl-insert ] if ;
 
 : avl-set ( value key node -- node taller? )
@@ -85,8 +85,8 @@ M: avl set-at ( value key node -- node )
 
 : delete-select-rotate ( node -- node shorter? )
     dup node+link balance>> zero? [
-        current-side get neg over (>>balance)
-        current-side get over node+link (>>balance) rotate f
+        current-side get neg over balance<<
+        current-side get over node+link balance<< rotate f
     ] [
         select-rotate t
     ] if ;
@@ -100,7 +100,7 @@ M: avl set-at ( value key node -- node )
 
 : balance-delete ( node -- node shorter? )
     current-side get over balance>> {
-        { [ dup zero? ] [ drop neg over (>>balance) f ] }
+        { [ dup zero? ] [ drop neg over balance<< f ] }
         { [ dupd = ] [ drop 0 >>balance t ] }
         [ dupd neg increase-balance rebalance-delete ]
     } cond ;

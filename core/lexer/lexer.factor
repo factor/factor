@@ -49,7 +49,7 @@ ERROR: unexpected want got ;
 
 : change-lexer-column ( lexer quot -- )
     [ [ column>> ] [ line-text>> ] bi ] prepose keep
-    (>>column) ; inline
+    column<< ; inline
 
 GENERIC: skip-blank ( lexer -- )
 

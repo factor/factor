@@ -54,22 +54,22 @@ TUPLE: material
                 [ material new swap >>name current-material set ]
                 [ cm swap md set-at ] bi
             ] }
-            { "Ka"       [ 3 head strings>numbers cm (>>ambient-reflectivity)  ] }
-            { "Kd"       [ 3 head strings>numbers cm (>>diffuse-reflectivity)  ] }
-            { "Ks"       [ 3 head strings>numbers cm (>>specular-reflectivity) ] }
-            { "Tf"       [ 3 head strings>numbers cm (>>transmission-filter)   ] }
-            { "d"        [ first string>number cm    (>>dissolve)              ] }
-            { "Ns"       [ first string>number cm    (>>specular-exponent)     ] }
-            { "Ni"       [ first string>number cm    (>>refraction-index)      ] }
-            { "map_Ka"   [ first cm                  (>>ambient-map)           ] }
-            { "map_Kd"   [ first cm                  (>>diffuse-map)           ] }
-            { "map_Ks"   [ first cm                  (>>specular-map)          ] }
-            { "map_Ns"   [ first cm                  (>>specular-exponent-map) ] }
-            { "map_d"    [ first cm                  (>>dissolve-map)          ] }
-            { "map_bump" [ first cm                  (>>bump-map)              ] }
-            { "bump"     [ first cm                  (>>bump-map)              ] }
-            { "disp"     [ first cm                  (>>displacement-map)      ] }
-            { "refl"     [ first cm                  (>>reflection-map)        ] }
+            { "Ka"       [ 3 head strings>numbers cm ambient-reflectivity<<  ] }
+            { "Kd"       [ 3 head strings>numbers cm diffuse-reflectivity<<  ] }
+            { "Ks"       [ 3 head strings>numbers cm specular-reflectivity<< ] }
+            { "Tf"       [ 3 head strings>numbers cm transmission-filter<<   ] }
+            { "d"        [ first string>number cm    dissolve<<              ] }
+            { "Ns"       [ first string>number cm    specular-exponent<<     ] }
+            { "Ni"       [ first string>number cm    refraction-index<<      ] }
+            { "map_Ka"   [ first cm                  ambient-map<<           ] }
+            { "map_Kd"   [ first cm                  diffuse-map<<           ] }
+            { "map_Ks"   [ first cm                  specular-map<<          ] }
+            { "map_Ns"   [ first cm                  specular-exponent-map<< ] }
+            { "map_d"    [ first cm                  dissolve-map<<          ] }
+            { "map_bump" [ first cm                  bump-map<<              ] }
+            { "bump"     [ first cm                  bump-map<<              ] }
+            { "disp"     [ first cm                  displacement-map<<      ] }
+            { "refl"     [ first cm                  reflection-map<<        ] }
             [ 2drop ]
         } case
     ] unless-empty ;

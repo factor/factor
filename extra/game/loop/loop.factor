@@ -95,7 +95,7 @@ PRIVATE>
     t >>running?
     [ reset-loop-benchmark ]
     [ [ run-loop ] curry "game loop" spawn ]
-    [ (>>thread) ] tri ;
+    [ thread<< ] tri ;
 
 : stop-loop ( loop -- )
     f >>running?

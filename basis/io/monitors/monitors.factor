@@ -24,7 +24,7 @@ TUPLE: monitor < disposable path queue timeout ;
 
 M: monitor timeout timeout>> ;
 
-M: monitor set-timeout (>>timeout) ;
+M: monitor set-timeout timeout<< ;
 
 <PRIVATE
 

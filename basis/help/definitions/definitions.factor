@@ -11,7 +11,7 @@ M: link definer drop \ ARTICLE: \ ; ;
 
 M: link where name>> article loc>> ;
 
-M: link set-where name>> article (>>loc) ;
+M: link set-where name>> article loc<< ;
 
 M: link forget* name>> remove-article ;
 

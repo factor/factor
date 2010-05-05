@@ -47,7 +47,7 @@ M: attrs set-at
         2nip set-second
     ] [
         [ assure-name swap 2array ] dip
-        [ alist>> ?push ] keep (>>alist)
+        [ alist>> ?push ] keep alist<<
     ] if* ;
 
 M: attrs assoc-size alist>> length ;

@@ -26,14 +26,14 @@ PRIVATE>
 
 ERROR: not-a-string object ;
 
-M: label (>>string) ( string label -- )
+M: label string<< ( string label -- )
     [
         {
             { [ dup string-array? ] [ ] }
             { [ dup string? ] [ ?string-lines ] }
             [ not-a-string ]
         } cond
-    ] dip (>>text) ; inline
+    ] dip text<< ; inline
 
 : label-theme ( gadget -- gadget )
     sans-serif-font >>font ; inline

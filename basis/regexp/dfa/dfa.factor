@@ -73,7 +73,7 @@ IN: regexp.dfa
         [ transitions>> keys ] bi*
         [ intersects? ] with filter
         fast-set
-    ] keep (>>final-states) ;
+    ] keep final-states<< ;
 
 : initialize-dfa ( nfa -- dfa )
     <transition-table>

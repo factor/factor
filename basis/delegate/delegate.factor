@@ -112,7 +112,7 @@ SYNTAX: BROADCAST:
 
 M: consultation where loc>> ;
 
-M: consultation set-where (>>loc) ;
+M: consultation set-where loc<< ;
 
 M: consultation forget*
     [ unconsult-methods ] [ unregister-consult ] bi ;

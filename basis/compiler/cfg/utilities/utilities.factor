@@ -50,9 +50,9 @@ SYMBOL: visited
 :: insert-basic-block ( from to insns -- )
     ! Insert basic block on the edge between 'from' and 'to'.
     <basic-block> :> bb
-    insns V{ } like bb (>>instructions)
-    V{ from } bb (>>predecessors)
-    V{ to } bb (>>successors)
+    insns V{ } like bb instructions<<
+    V{ from } bb predecessors<<
+    V{ to } bb successors<<
     from to bb update-predecessors
     from to bb update-successors ;
 
