@@ -13,16 +13,3 @@ IN: compiler.alien
 
 : alien-return ( params -- type )
     return>> dup large-struct? [ drop void ] when ;
-
-: c-type-stack-align ( type -- align )
-    dup c-type-stack-align? [ c-type-align ] [ drop cell ] if ;
-
-: parameter-align ( n type -- n delta )
-    [ c-type-stack-align align dup ] [ drop ] 2bi - ;
-
-: parameter-offsets ( types -- total offsets )
-    [
-        0 [
-            [ parameter-align drop dup , ] keep stack-size +
-        ] reduce cell align
-    ] { } make ;
