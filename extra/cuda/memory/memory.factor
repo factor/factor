@@ -9,10 +9,13 @@ IN: cuda.memory
 : cuda-malloc ( n -- ptr )
     [ CUdeviceptr <c-object> ] dip
     '[ _ cuMemAlloc cuda-error ] keep
-    c:*int ;
+    c:*int ; inline
+
+: cuda-malloc-type ( n type -- ptr )
+    heap-size * cuda-malloc ; inline
 
 : cuda-free ( ptr -- )
-    cuMemFree cuda-error ;
+    cuMemFree cuda-error ; inline
 
 DESTRUCTOR: cuda-free
 
