@@ -4,7 +4,8 @@ USING: kernel math math.order sequences accessors arrays
 byte-arrays layouts classes.tuple.private fry locals
 compiler.tree.propagation.info compiler.cfg.hats
 compiler.cfg.instructions compiler.cfg.stacks
-compiler.cfg.utilities compiler.cfg.builder.blocks ;
+compiler.cfg.utilities compiler.cfg.builder.blocks
+compiler.constants cpu.architecture alien.c-types ;
 IN: compiler.cfg.intrinsics.allot
 
 : ##set-slots ( regs obj class -- )
@@ -73,10 +74,16 @@ IN: compiler.cfg.intrinsics.allot
     dup node-input-infos first literal>> dup expand-(byte-array)?
     [ nip emit-allot-byte-array drop ] [ drop emit-primitive ] if ;
 
+:: zero-byte-array ( len reg -- )
+    0 ^^load-literal :> elt
+    reg ^^tagged>integer :> reg
+    len cell align cell /i iota [
+        [ elt reg ] dip cells byte-array-offset + int-rep f ##store-memory-imm
+    ] each ;
+
 :: emit-<byte-array> ( node -- )
     node node-input-infos first literal>> dup expand-<byte-array>? [
         :> len
-        0 ^^load-literal :> elt
         len emit-allot-byte-array :> reg
-        len reg elt byte-array store-initial-element
+        len reg zero-byte-array
     ] [ drop node emit-primitive ] if ;

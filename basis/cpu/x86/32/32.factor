@@ -5,10 +5,11 @@ arrays kernel fry math namespaces sequences system layouts io
 vocabs.loader accessors init classes.struct combinators
 command-line make words compiler compiler.units
 compiler.constants compiler.alien compiler.codegen
-compiler.codegen.fixup compiler.cfg.instructions
-compiler.cfg.builder compiler.cfg.intrinsics
-compiler.cfg.stack-frame cpu.x86.assembler
-cpu.x86.assembler.operands cpu.x86 cpu.architecture vm ;
+compiler.codegen.alien compiler.codegen.fixup
+compiler.cfg.instructions compiler.cfg.builder
+compiler.cfg.intrinsics compiler.cfg.stack-frame
+cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
+cpu.architecture vm ;
 FROM: layouts => cell ;
 IN: cpu.x86.32
 
@@ -358,7 +359,7 @@ M: x86.32 dummy-fp-params? f ;
 ! Dreadful
 M: struct-c-type flatten-c-type stack-params (flatten-c-type) ;
 M: long-long-type flatten-c-type stack-params (flatten-c-type) ;
-M: c-type flatten-c-type dup rep>> int-rep? int-rep stack-params ? (flatten-c-type)) ;
+M: c-type flatten-c-type dup rep>> int-rep? int-rep stack-params ? (flatten-c-type) ;
 
 M: x86.32 struct-return-pointer-type
     os linux? void* (stack-value) ? ;
