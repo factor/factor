@@ -22,8 +22,6 @@ M: array c-type-align first c-type-align ;
 
 M: array c-type-align-first first c-type-align-first ;
 
-M: array c-type-stack-align? drop f ;
-
 M: array unbox-parameter drop void* unbox-parameter ;
 
 M: array unbox-return drop void* unbox-return ;
@@ -33,6 +31,8 @@ M: array box-parameter drop void* box-parameter ;
 M: array box-return drop void* box-return ;
 
 M: array stack-size drop void* stack-size ;
+
+M: array flatten-c-type drop { int-rep } ;
 
 PREDICATE: string-type < pair
     first2 [ c-string = ] [ word? ] bi* and ;
@@ -52,9 +52,6 @@ M: string-type c-type-align
 M: string-type c-type-align-first
     drop void* c-type-align-first ;
 
-M: string-type c-type-stack-align?
-    drop void* c-type-stack-align? ;
-
 M: string-type unbox-parameter
     drop void* unbox-parameter ;
 
@@ -73,11 +70,8 @@ M: string-type stack-size
 M: string-type c-type-rep
     drop int-rep ;
 
-M: string-type c-type-boxer
-    drop void* c-type-boxer ;
-
-M: string-type c-type-unboxer
-    drop void* c-type-unboxer ;
+M: string-type flatten-c-type
+    drop { int-rep } ;
 
 M: string-type c-type-boxer-quot
     second dup binary =
