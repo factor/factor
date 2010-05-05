@@ -45,7 +45,7 @@ TUPLE: raw-source top headers content ;
 : get-ok-and-total ( -- total )
     stream [
         readln dup "+OK" head? [
-            " " split second string>number dup account (>>count)
+            " " split second string>number dup account count<<
         ] [ throw ] if
     ] with-stream* ;
 
@@ -78,13 +78,13 @@ TUPLE: raw-source top headers content ;
 : (list) ( -- )
     stream [
         "LIST" command
-        readlns account (>>list)
+        readlns account list<<
     ] with-stream* ;
 
 : (uidls) ( -- )
     stream [
         "UIDL" command
-        readlns account (>>uidls)
+        readlns account uidls<<
     ] with-stream* ;
 
 PRIVATE>
@@ -115,7 +115,7 @@ PRIVATE>
 : capa ( -- array )
     stream [
         "CAPA" command
-        readlns dup account (>>capa)
+        readlns dup account capa<<
     ] with-stream* ;
 
 : count ( -- n )
@@ -140,7 +140,7 @@ PRIVATE>
         "TOP " _ number>string append " "
         append _ number>string append
         command
-        readlns dup raw (>>top)
+        readlns dup raw top<<
     ] with-stream* ;
 
 : headers ( -- assoc )
@@ -168,7 +168,7 @@ PRIVATE>
 : retrieve ( message# -- seq )
     [ stream ] dip '[
         "RETR " _ number>string append command
-        readlns dup raw (>>content)
+        readlns dup raw content<<
     ] with-stream* ;
 
 : delete ( message# -- )

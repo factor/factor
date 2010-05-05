@@ -45,13 +45,13 @@ MACRO: (vectored-element>) ( struct-class -- quot: ( elt -- struct ) )
 SLOT: (n)
 SLOT: (vectored)
 
-FUNCTOR: define-vectored-accessors ( S>> (>>S) T -- )
+FUNCTOR: define-vectored-accessors ( S>> S<< T -- )
 
 WHERE
 
 M: T S>>
     [ (n)>> ] [ (vectored)>> S>> ] bi nth-unsafe ; inline
-M: T (>>S)
+M: T S<<
     [ (n)>> ] [ (vectored)>> S>> ] bi set-nth-unsafe ; inline
 
 ;FUNCTOR

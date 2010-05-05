@@ -7,4 +7,4 @@ IN: tokyo.remotedb
 
 : <tokyo-remotedb> ( host port -- tokyo-remotedb )
     [ tcrdbnew dup ] 2dip tcrdbopen drop
-    tokyo-remotedb new [ (>>handle) ] keep ;
+    tokyo-remotedb new [ handle<< ] keep ;

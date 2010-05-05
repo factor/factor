@@ -19,13 +19,13 @@ ERROR: bad-live-ranges interval ;
 : trim-before-ranges ( live-interval -- )
     [ ranges>> ] [ last-use n>> 1 + ] bi
     [ '[ from>> _ <= ] filter! drop ]
-    [ swap last (>>to) ]
+    [ swap last to<< ]
     2bi ;
 
 : trim-after-ranges ( live-interval -- )
     [ ranges>> ] [ first-use n>> ] bi
     [ '[ to>> _ >= ] filter! drop ]
-    [ swap first (>>from) ]
+    [ swap first from<< ]
     2bi ;
 
 : assign-spill ( live-interval -- )

@@ -52,7 +52,7 @@ M: live-interval covers? ( insn# live-interval -- ? )
 
 : shorten-range ( n live-interval -- )
     dup ranges>> empty?
-    [ dupd add-new-range ] [ ranges>> last (>>from) ] if ;
+    [ dupd add-new-range ] [ ranges>> last from<< ] if ;
 
 : extend-range ( from to live-range -- )
     ranges>> last

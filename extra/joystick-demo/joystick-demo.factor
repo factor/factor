@@ -52,8 +52,8 @@ CONSTANT: pov-polygons
 
 :: move-axis ( gadget x y z -- )
     x y z (xyz>loc) :> ( xy z )
-    xy gadget   indicator>> (>>loc)
-    z  gadget z-indicator>> (>>loc) ;
+    xy gadget   indicator>> loc<<
+    z  gadget z-indicator>> loc<< ;
 
 : move-pov ( gadget pov -- )
     swap pov>> [ interior>> -rot = COLOR: gray COLOR: white ? >>color drop ]
@@ -91,7 +91,7 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
     gadget controller>> read-controller buttons>> length iota [
         number>string [ drop ] <border-button>
         shelf over add-gadget drop
-    ] map gadget (>>buttons) ;
+    ] map gadget buttons<< ;
 
 : add-button-gadgets ( gadget shelf -- gadget shelf )
     [ (add-button-gadgets) ] 2keep ;

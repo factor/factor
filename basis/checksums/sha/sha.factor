@@ -395,7 +395,7 @@ M: sha-256 checksum-stream ( stream checksum -- byte-array )
     state [ H [ w+ ] 2map ] change-H drop ; inline
 
 M:: sha1-state checksum-block ( bytes state -- )
-    bytes prepare-sha1-message-schedule state (>>W)
+    bytes prepare-sha1-message-schedule state W<<
 
     bytes
     state [ H>> clone ] [ W>> ] [ K>> ] tri state process-sha1-chunk ;

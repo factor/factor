@@ -8,7 +8,7 @@ ERROR: already-numbered insn ;
 
 : number-instruction ( n insn -- n' )
     [ nip dup insn#>> [ already-numbered ] [ drop ] if ]
-    [ (>>insn#) ]
+    [ insn#<< ]
     [ drop 2 + ]
     2tri ;
 

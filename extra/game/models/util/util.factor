@@ -37,8 +37,8 @@ M:: indexed-seq set-nth ( elt n seq -- )
 M: indexed-seq new-resizable
     [ dseq>> ] [ iseq>> ] [ rassoc>> ] tri <indexed-seq>
     dup -rot
-    [ [ dseq>> new-resizable ] keep (>>dseq) ]
-    [ [ iseq>> new-resizable ] keep (>>iseq) ]
-    [ [ rassoc>> clone nip ] keep (>>rassoc) ]
+    [ [ dseq>> new-resizable ] keep dseq<< ]
+    [ [ iseq>> new-resizable ] keep iseq<< ]
+    [ [ rassoc>> clone nip ] keep rassoc<< ]
     2tri ;
 

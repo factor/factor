@@ -233,7 +233,7 @@ IN: bootstrap.syntax
         "))" parse-effect suffix!
     ] define-core-syntax
 
-    "MAIN:" [ scan-word current-vocab (>>main) ] define-core-syntax
+    "MAIN:" [ scan-word current-vocab main<< ] define-core-syntax
 
     "<<" [
         [

@@ -11,9 +11,9 @@ TAGS: parse-mode-tag ( modes tag -- )
 TAG: MODE parse-mode-tag
     dup "NAME" attr [
         mode new {
-            { "FILE" f (>>file) }
-            { "FILE_NAME_GLOB" f (>>file-name-glob) }
-            { "FIRST_LINE_GLOB" f (>>first-line-glob) }
+            { "FILE" f file<< }
+            { "FILE_NAME_GLOB" f file-name-glob<< }
+            { "FIRST_LINE_GLOB" f first-line-glob<< }
         } init-from-tag
     ] dip
     rot set-at ;
@@ -70,7 +70,7 @@ DEFER: finalize-rule-set
     over [ assoc-union! ] [ nip clone ] if ;
 
 : import-keywords ( parent child -- )
-    over [ [ keywords>> ] bi@ ?update ] dip (>>keywords) ;
+    over [ [ keywords>> ] bi@ ?update ] dip keywords<< ;
 
 : import-rules ( parent child -- )
     swap [ add-rule ] curry each-rule ;

@@ -60,8 +60,8 @@ GENERIC: generate ( sfmt -- )
 M:: sfmt generate ( sfmt -- )
     sfmt state>> :> state
     sfmt uint-4-array>> :> array
-    state n>> 2 - array nth state (>>r1)
-    state n>> 1 - array nth state (>>r2)
+    state n>> 2 - array nth state r1<<
+    state n>> 1 - array nth state r2<<
     state m>> :> m
     state n>> :> n
     state mask>> :> mask
@@ -72,8 +72,8 @@ M:: sfmt generate ( sfmt -- )
         mask state r1>> state r2>> formula :> r
 
         r i array set-nth-unsafe
-        state r2>> state (>>r1)
-        r state (>>r2)
+        state r2>> state r1<<
+        r state r2<<
     ] each
 
     ! n m - 1 + n [a,b) [
@@ -84,11 +84,11 @@ M:: sfmt generate ( sfmt -- )
         mask state r1>> state r2>> formula :> r
 
         r i array set-nth-unsafe
-        state r2>> state (>>r1)
-        r state (>>r2)
+        state r2>> state r1<<
+        r state r2<<
     ] each
 
-    0 state (>>index) ;
+    0 state index<< ;
 
 : period-certified? ( sfmt -- ? )
     [ uint-4-array>> first ]

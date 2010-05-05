@@ -143,6 +143,6 @@ CHLOE: button
     {
         [ [ attrs>> chloe-attrs-only ] dip add-tag-attrs ]
         [ [ attrs>> non-chloe-attrs-only ] dip "button" deep-tag-named add-tag-attrs ]
-        [ [ children>> ] dip "button" deep-tag-named (>>children) ]
+        [ [ children>> ] dip "button" deep-tag-named children<< ]
         [ nip ]
     } 2cleave compile-chloe-tag ;

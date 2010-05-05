@@ -21,7 +21,7 @@ IN: compiler.cfg.block-joining
     [ instructions>> ] bi@ dup pop* push-all ;
 
 : update-successors ( bb pred -- )
-    [ successors>> ] dip (>>successors) ;
+    [ successors>> ] dip successors<< ;
 
 : join-block ( bb pred -- )
     [ join-instructions ] [ update-successors ] 2bi ;

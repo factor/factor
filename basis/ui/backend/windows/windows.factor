@@ -285,12 +285,12 @@ CONSTANT: window-control>ex-style
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     2nip
     [ lo-word ] keep hi-word 2array
-    dup { 0 0 } = [ 2drop ] [ swap window [ (>>dim) ] [ drop ] if* ] if ;
+    dup { 0 0 } = [ 2drop ] [ swap window [ dim<< ] [ drop ] if* ] if ;
 
 : handle-wm-move ( hWnd uMsg wParam lParam -- )
     2nip
     [ lo-word ] keep hi-word 2array
-    swap window [ (>>window-loc) ] [ drop ] if* ;
+    swap window [ window-loc<< ] [ drop ] if* ;
 
 CONSTANT: wm-keydown-codes
     H{
@@ -415,7 +415,7 @@ CONSTANT: exclude-keys-wm-char
     ] unless ;
 
 :: set-window-active ( hwnd uMsg wParam lParam ? -- n )
-    ? hwnd window (>>active?)
+    ? hwnd window active?<<
     hwnd uMsg wParam lParam DefWindowProc ;
 
 : handle-wm-syscommand ( hWnd uMsg wParam lParam -- n )

@@ -232,10 +232,10 @@ GENERIC: compute-slot-offset ( offset class -- offset' )
 
 M: struct-slot-spec compute-slot-offset
     [ type>> over c-type-align-at 8 * align ] keep
-    [ [ 8 /i ] dip (>>offset) ] [ type>> heap-size 8 * + ] 2bi ;
+    [ [ 8 /i ] dip offset<< ] [ type>> heap-size 8 * + ] 2bi ;
 
 M: struct-bit-slot-spec compute-slot-offset
-    [ (>>offset) ] [ bits>> + ] 2bi ;
+    [ offset<< ] [ bits>> + ] 2bi ;
 
 : compute-struct-offsets ( slots -- size )
     0 [ compute-slot-offset ] reduce 8 align 8 /i ;
