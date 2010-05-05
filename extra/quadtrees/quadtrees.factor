@@ -80,7 +80,7 @@ DEFER: in-rect*
 
 : leaf-insert ( value point leaf -- )
     2dup leaf-replaceable?
-    [ [ (>>point) ] [ (>>value) ] bi ]
+    [ [ point<< ] [ value<< ] bi ]
     [ split-leaf ] if ;
 
 : node-insert ( value point node -- )

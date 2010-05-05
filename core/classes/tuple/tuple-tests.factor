@@ -588,7 +588,7 @@ T{ reshape-test f "hi" } "tuple" set
 
 [ ] [ "IN: classes.tuple.tests TUPLE: reshape-test { x read-only } ;" eval( -- ) ] unit-test
 
-[ f ] [ \ reshape-test \ (>>x) method ] unit-test
+[ f ] [ \ reshape-test \ x<< method ] unit-test
 
 [ "tuple" get 5 >>x ] must-fail
 

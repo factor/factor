@@ -193,7 +193,7 @@ M: model-world wasd-far-plane drop 1024.0 ;
 M: model-world begin-game-world
     init-gpu
     { 0.0 0.0 2.0 } 0 0 set-wasd-view
-    [ <model-state> [ fill-model-state ] keep ] [ (>>model-state) ] bi ;
+    [ <model-state> [ fill-model-state ] keep ] [ model-state<< ] bi ;
 M: model-world apply-world-attributes
     {
         [ model-path>> >>model-path ]

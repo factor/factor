@@ -94,7 +94,7 @@ M: model update-model drop ;
     ((change-model)) set-model ; inline
 
 : (change-model) ( model quot -- )
-    ((change-model)) (>>value) ; inline
+    ((change-model)) value<< ; inline
 
 GENERIC: range-value ( model -- value )
 GENERIC: range-page-value ( model -- value )

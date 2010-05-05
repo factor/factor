@@ -16,7 +16,7 @@ MEMO: single-sine-wave ( samples/wave -- seq )
     [ sample-freq>> -rot sine-wave ] keep swap >>data ;
 
 : >silent-buffer ( seconds buffer -- buffer )
-    [ sample-freq>> * >integer 0 <repetition> ] [ (>>data) ] [ ] tri ;
+    [ sample-freq>> * >integer 0 <repetition> ] [ data<< ] [ ] tri ;
 
 TUPLE: harmonic n amplitude ;
 C: <harmonic> harmonic
@@ -32,5 +32,5 @@ C: <note> note
     harmonic amplitude>> <scaled> ;
 
 : >note ( harmonics note buffer -- buffer )
-    [ [ note-harmonic-data ] 2curry map <summed> ] [ (>>data) ] [ ] tri ;
+    [ [ note-harmonic-data ] 2curry map <summed> ] [ data<< ] [ ] tri ;
 

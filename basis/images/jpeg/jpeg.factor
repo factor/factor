@@ -80,7 +80,7 @@ TUPLE: jpeg-color-info
 : jpeg> ( -- jpeg-image ) jpeg-image get ;
 
 : apply-diff ( dc color -- dc' )
-    [ diff>> + dup ] [ (>>diff) ] bi ;
+    [ diff>> + dup ] [ diff<< ] bi ;
 
 : fetch-tables ( component -- )
     [ [ jpeg> quant-tables>> nth ] change-quant-table drop ]
@@ -98,7 +98,7 @@ TUPLE: jpeg-color-info
         read1 8 assert=
         2 read be>
         2 read be>
-        swap 2array jpeg> (>>dim)
+        swap 2array jpeg> dim<<
         read1
         [
             read1 read4/4 read1 <jpeg-color-info>
@@ -141,7 +141,7 @@ TUPLE: jpeg-color-info
         [   drop
             read1 jpeg> color-info>> nth clone
             read1 16 /mod [ >>dc-huff-table ] [ >>ac-huff-table ] bi*
-        ] map jpeg> (>>components)
+        ] map jpeg> components<<
         read1 0 assert=
         read1 63 assert=
         read1 16 /mod [ 0 assert= ] bi@
@@ -346,7 +346,7 @@ SINGLETONS: YUV420 YUV444 Y MAGIC! ;
 
 : baseline-decompress ( -- )
     jpeg> bitstream>> cleanup-bitstream { 255 255 255 255 } append
-    >byte-array bs:<msb0-bit-reader> jpeg> (>>bitstream)
+    >byte-array bs:<msb0-bit-reader> jpeg> bitstream<<
     jpeg> 
     [ bitstream>> ] 
     [ [ [ <huffman-decoder> ] with map ] change-huff-tables drop ] bi

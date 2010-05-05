@@ -28,9 +28,9 @@ $nl
 "The following uses writers, and requires some stack shuffling:"
 { $code
     "<email>"
-    "    \"Happy birthday\" over (>>subject)"
-    "    { \"bob@bigcorp.com\" } over (>>to)"
-    "    \"alice@bigcorp.com\" over (>>from)"
+    "    \"Happy birthday\" over subject<<"
+    "    { \"bob@bigcorp.com\" } over to<<"
+    "    \"alice@bigcorp.com\" over from<<"
     "send-email"
 }
 "Even if some of the slot values come from the stack underneath the tuple being constructed, setters win:"
@@ -44,9 +44,9 @@ $nl
 "The above has less shuffling than the writer version:"
 { $code
     "<email>"
-    "    [ (>>subject) ] keep"
-    "    [ (>>to) ] keep"
-    "    \"alice@bigcorp.com\" over (>>from)"
+    "    [ subject<< ] keep"
+    "    [ to<< ] keep"
+    "    \"alice@bigcorp.com\" over from<<"
     "send-email"
 }
 "The changer word abstracts a common pattern where a slot value is read then stored again; so the following is not idiomatic code:"

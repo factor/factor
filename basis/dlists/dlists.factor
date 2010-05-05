@@ -34,10 +34,10 @@ M: dlist deque-empty? front>> not ; inline
 M: dlist-node node-value obj>> ;
 
 : set-prev-when ( dlist-node dlist-node/f -- )
-    [ (>>prev) ] [ drop ] if* ; inline
+    [ prev<< ] [ drop ] if* ; inline
 
 : set-next-when ( dlist-node dlist-node/f -- )
-    [ (>>next) ] [ drop ] if* ; inline
+    [ next<< ] [ drop ] if* ; inline
 
 : set-next-prev ( dlist-node -- )
     dup next>> set-prev-when ; inline
@@ -74,13 +74,13 @@ PRIVATE>
 
 M: dlist push-front* ( obj dlist -- dlist-node )
     [ front>> f swap <dlist-node> dup dup set-next-prev ] keep
-    [ (>>front) ] keep
+    [ front<< ] keep
     set-back-to-front ;
 
 M: dlist push-back* ( obj dlist -- dlist-node )
     [ back>> f <dlist-node> ] keep
     [ back>> set-next-when ] 2keep
-    [ (>>back) ] 2keep
+    [ back<< ] 2keep
     set-front-to-back ;
 
 ERROR: empty-dlist ;

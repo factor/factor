@@ -76,14 +76,14 @@ TUPLE: world-attributes
 : show-status ( string/f gadget -- )
     dup find-world dup [
         dup status>> [
-            [ (>>status-owner) ] [ status>> set-model ] bi
+            [ status-owner<< ] [ status>> set-model ] bi
         ] [ 3drop ] if
     ] [ 3drop ] if ;
 
 : hide-status ( gadget -- )
     dup find-world dup [
         [ status-owner>> eq? ] keep
-        '[ f _ [ (>>status-owner) ] [ status>> set-model ] 2bi ] when
+        '[ f _ [ status-owner<< ] [ status>> set-model ] 2bi ] when
     ] [ 2drop ] if ;
 
 : window-resource ( resource -- resource )
@@ -174,7 +174,7 @@ M: world end-world
 M: world resize-world
     drop ;
 
-M: world (>>dim)
+M: world dim<<
     [ call-next-method ]
     [
         dup active?>> [

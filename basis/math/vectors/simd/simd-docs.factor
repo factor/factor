@@ -138,11 +138,11 @@ GENERIC: advance ( dt object -- )
 
 : update-velocity ( dt actor -- )
     [ acceleration>> n*v ] [ velocity>> v+ ] [ ] tri
-    (>>velocity) ; inline
+    velocity<< ; inline
 
 : update-position ( dt actor -- )
     [ velocity>> n*v ] [ position>> v+ ] [ ] tri
-    (>>position) ; inline
+    position<< ; inline
 
 M: actor advance ( dt actor -- )
     [ >float ] dip

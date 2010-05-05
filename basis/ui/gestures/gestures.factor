@@ -227,11 +227,11 @@ SYMBOL: drag-timer
             dup send-lose-focus
             f swap t focus-child
         ] when*
-        dupd (>>focus) [
+        dupd focus<< [
             send-gain-focus
         ] when*
     ] [
-        (>>focus)
+        focus<<
     ] if ;
 
 : modifier ( mod modifiers -- seq )

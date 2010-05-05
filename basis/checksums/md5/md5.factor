@@ -29,7 +29,7 @@ M: md5 initialize-checksum-state drop <md5-state> ;
 
 : update-md5 ( md5 -- )
     [ state>> ] [ old-state>> v-w+ dup clone ] [ ] tri
-    [ (>>old-state) ] [ (>>state) ] bi ;
+    [ old-state<< ] [ state<< ] bi ;
 
 CONSTANT: T
     $[

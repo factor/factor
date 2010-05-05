@@ -46,8 +46,8 @@ PRIVATE>
 
 : pack-layout ( pack sizes -- )
     [ round-dims packed-dims ] [ drop ] 2bi
-    [ children>> [ (>>dim) ] 2each ]
-    [ [ packed-locs ] [ children>> ] bi [ (>>loc) ] 2each ] 2bi ;
+    [ children>> [ dim<< ] 2each ]
+    [ [ packed-locs ] [ children>> ] bi [ loc<< ] 2each ] 2bi ;
 
 : <pack> ( orientation -- pack )
     pack new

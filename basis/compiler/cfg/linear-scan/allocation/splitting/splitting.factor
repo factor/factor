@@ -51,8 +51,8 @@ ERROR: splitting-atomic-interval ;
     live-interval n check-split
     live-interval clone :> before
     live-interval clone :> after
-    live-interval uses>> n split-uses before after [ (>>uses) ] bi-curry@ bi*
-    live-interval ranges>> n split-ranges before after [ (>>ranges) ] bi-curry@ bi*
+    live-interval uses>> n split-uses before after [ uses<< ] bi-curry@ bi*
+    live-interval ranges>> n split-ranges before after [ ranges<< ] bi-curry@ bi*
     before split-before
     after split-after ;
 

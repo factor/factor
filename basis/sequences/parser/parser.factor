@@ -15,7 +15,7 @@ TUPLE: sequence-parser sequence n ;
 :: with-sequence-parser ( sequence-parser quot -- seq/f )
     sequence-parser n>> :> n
     sequence-parser quot call [
-        n sequence-parser (>>n) f
+        n sequence-parser n<< f
     ] unless* ; inline
 
 : offset  ( sequence-parser offset -- char/f )
@@ -92,7 +92,7 @@ TUPLE: sequence-parser sequence n ;
         sequence-parser [ growing length - 1 + ] change-n drop
         ! sequence-parser advance drop
     ] [
-        saved sequence-parser (>>n)
+        saved sequence-parser n<<
         f
     ] if ;
 

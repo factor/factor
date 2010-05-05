@@ -54,7 +54,7 @@ IN: c.lexer
     sequence-parser current quote-char = [
         sequence-parser advance* string
     ] [
-        start-n sequence-parser (>>n) f
+        start-n sequence-parser n<< f
     ] if ;
 
 : (take-token) ( sequence-parser -- string )
