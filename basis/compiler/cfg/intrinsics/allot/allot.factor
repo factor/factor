@@ -77,8 +77,8 @@ IN: compiler.cfg.intrinsics.allot
 :: zero-byte-array ( len reg -- )
     0 ^^load-literal :> elt
     reg ^^tagged>integer :> reg
-    len 3 + 4 /i iota [
-        [ elt reg ] dip 4 * byte-array-offset + int-rep uint ##store-memory-imm
+    len cell align cell /i iota [
+        [ elt reg ] dip cells byte-array-offset + int-rep f ##store-memory-imm
     ] each ;
 
 :: emit-<byte-array> ( node -- )
