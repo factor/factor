@@ -14,10 +14,10 @@ SYNTAX: CUDA-FUNCTION:
     ";" scan-c-args drop define-cuda-word ;
 
 : 2<<< ( dim-block dim-grid -- function-launcher )
-    0 f function-launcher boa ;
+    0 f function-launcher boa ; inline
 
 : 3<<< ( dim-block dim-grid shared-size -- function-launcher )
-    f function-launcher boa ;
+    f function-launcher boa ; inline
 
 : 4<<< ( dim-block dim-grid shared-size stream -- function-launcher )
-    function-launcher boa ;
+    function-launcher boa ; inline
