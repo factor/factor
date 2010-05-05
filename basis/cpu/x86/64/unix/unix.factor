@@ -27,21 +27,16 @@ M: x86.64 reserved-stack-space 0 ;
 : flatten-small-struct ( c-type -- seq )
     struct-types&offset split-struct [
         [ c-type c-type-rep reg-class-of ] map
-        int-regs swap member? void* double ? c-type
+        int-regs swap member? int-rep double-rep ?
     ] map ;
 
 : flatten-large-struct ( c-type -- seq )
-    (flatten-stack-type) ;
+    stack-params (flatten-c-type) ;
 
-: flatten-struct ( c-type -- seq )
-    dup heap-size 16 > [
-        flatten-large-struct
-    ] [
-        flatten-small-struct
-    ] if ;
-
-M: struct-c-type flatten-value-type ( type -- seq )
-    flatten-struct ;
+M: x86.64 flatten-struct-type ( c-type -- seq )
+    dup heap-size 16 >
+    [ flatten-large-struct ]
+    [ flatten-small-struct ] if ;
 
 M: x86.64 return-struct-in-registers? ( c-type -- ? )
     heap-size 2 cells <= ;

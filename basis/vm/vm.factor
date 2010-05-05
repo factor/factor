@@ -19,10 +19,10 @@ STRUCT: context
 : context-field-offset ( field -- offset ) context offset-of ; inline
 
 STRUCT: zone
-{ start cell }
 { here cell }
-{ size cell }
-{ end cell } ;
+{ start cell }
+{ end cell }
+{ size cell } ;
 
 STRUCT: vm
 { ctx context* }
