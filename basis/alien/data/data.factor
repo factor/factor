@@ -68,8 +68,7 @@ M: value-type c-type-getter
     drop [ swap <displaced-alien> ] ;
 
 M: value-type c-type-setter ( type -- quot )
-    [ c-type-getter ] [ c-type-unboxer-quot ] [ heap-size ] tri
-    '[ @ swap @ _ memcpy ] ;
+    [ c-type-getter ] [ heap-size ] bi '[ @ swap _ memcpy ] ;
 
 M: array c-type-boxer-quot
     unclip [ array-length ] dip [ <c-direct-array> ] 2curry ;
