@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays arrays assocs delegate kernel kernel.private math
 math.order math.parser namespaces make parser sequences strings
@@ -17,7 +17,8 @@ SYMBOLS:
     long ulong
     longlong ulonglong
     float double
-    void* bool ;
+    void* bool
+    (stack-value) ;
 
 SINGLETON: void
 
@@ -38,8 +39,7 @@ TUPLE: abstract-c-type
 TUPLE: c-type < abstract-c-type
 boxer
 unboxer
-{ rep initial: int-rep }
-stack-align? ;
+{ rep initial: int-rep } ;
 
 : <c-type> ( -- c-type )
     \ c-type new ; inline
@@ -83,17 +83,9 @@ GENERIC: c-type-boxed-class ( name -- class )
 
 M: abstract-c-type c-type-boxed-class boxed-class>> ;
 
-GENERIC: c-type-boxer ( name -- boxer )
-
-M: c-type c-type-boxer boxer>> ;
-
 GENERIC: c-type-boxer-quot ( name -- quot )
 
 M: abstract-c-type c-type-boxer-quot boxer-quot>> ;
-
-GENERIC: c-type-unboxer ( name -- boxer )
-
-M: c-type c-type-unboxer unboxer>> ;
 
 GENERIC: c-type-unboxer-quot ( name -- quot )
 
@@ -119,17 +111,11 @@ GENERIC: c-type-align-first ( name -- n )
 
 M: abstract-c-type c-type-align-first align-first>> ;
 
-GENERIC: c-type-stack-align? ( name -- ? )
-
-M: c-type c-type-stack-align? stack-align?>> ;
-
 : c-type-box ( n c-type -- )
-    [ c-type-rep ] [ c-type-boxer [ "No boxer" throw ] unless* ] bi
-    %box ;
+    [ rep>> ] [ boxer>> ] bi %box ;
 
 : c-type-unbox ( n c-type -- )
-    [ c-type-rep ] [ c-type-unboxer [ "No unboxer" throw ] unless* ] bi
-    %unbox ;
+    [ rep>> ] [ unboxer>> ] bi %unbox ;
 
 GENERIC: box-parameter ( n c-type -- )
 
@@ -157,24 +143,26 @@ GENERIC: stack-size ( name -- size )
 
 M: c-type stack-size size>> cell align ;
 
-: >c-bool ( ? -- int ) 1 0 ? ; inline
+: (flatten-c-type) ( type rep -- seq )
+    [ stack-size cell /i ] dip <repetition> ; inline
 
-: c-bool> ( int -- ? ) 0 = not ; inline
+GENERIC: flatten-c-type ( type -- reps )
+
+M: c-type flatten-c-type rep>> 1array ;
+M: c-type-name flatten-c-type c-type flatten-c-type ;
+
+: flatten-c-types ( types -- reps )
+    [ flatten-c-type ] map concat ;
 
 MIXIN: value-type
 
 : c-getter ( name -- quot )
-    c-type-getter [
-        [ "Cannot read struct fields with this type" throw ]
-    ] unless* ;
-
-: c-type-getter-boxer ( name -- quot )
-    [ c-getter ] [ c-type-boxer-quot ] bi append ;
+    [ c-type-getter ] [ c-type-boxer-quot ] bi append ;
 
 : c-setter ( name -- quot )
-    c-type-setter [
-        [ "Cannot write struct fields with this type" throw ]
-    ] unless* ;
+    [ c-type-unboxer-quot [ [ ] ] [ '[ _ 2dip ] ] if-empty ]
+    [ c-type-setter ]
+    bi append ;
 
 : array-accessor ( c-type quot -- def )
     [
@@ -184,22 +172,20 @@ MIXIN: value-type
 PROTOCOL: c-type-protocol 
     c-type-class
     c-type-boxed-class
-    c-type-boxer
     c-type-boxer-quot
-    c-type-unboxer
     c-type-unboxer-quot
     c-type-rep
     c-type-getter
     c-type-setter
     c-type-align
     c-type-align-first
-    c-type-stack-align?
     box-parameter
     box-return
     unbox-parameter
     unbox-return
     heap-size
-    stack-size ;
+    stack-size
+    flatten-c-type ;
 
 CONSULT: c-type-protocol c-type-name
     c-type ;
@@ -219,16 +205,19 @@ TUPLE: long-long-type < c-type ;
     long-long-type new ;
 
 M: long-long-type unbox-parameter ( n c-type -- )
-    c-type-unboxer %unbox-long-long ;
+    unboxer>> %unbox-long-long ;
 
 M: long-long-type unbox-return ( c-type -- )
     f swap unbox-parameter ;
 
 M: long-long-type box-parameter ( n c-type -- )
-    c-type-boxer %box-long-long ;
+    boxer>> %box-long-long ;
 
 M: long-long-type box-return ( c-type -- )
     f swap box-parameter ;
+
+M: long-long-type flatten-c-type
+    int-rep (flatten-c-type) ;
 
 : define-deref ( c-type -- )
     [ name>> CHAR: * prefix "alien.c-types" create ] [ c-getter 0 prefix ] bi
@@ -264,6 +253,10 @@ CONSTANT: primitive-types
 : (pointer-c-type) ( void* type -- void*' )
     [ clone ] dip c-type-boxer-quot '[ _ [ f ] if* ] >>boxer-quot ;
 
+: >c-bool ( ? -- int ) 1 0 ? ; inline
+
+: c-bool> ( int -- ? ) 0 = not ; inline
+
 <PRIVATE
 
 : resolve-pointer-typedef ( type -- base-type )
@@ -295,7 +288,7 @@ M: pointer c-type
         c-ptr >>class
         c-ptr >>boxed-class
         [ alien-cell ] >>getter
-        [ [ >c-ptr ] 2dip set-alien-cell ] >>setter
+        [ set-alien-cell ] >>setter
         bootstrap-cell >>size
         bootstrap-cell >>align
         bootstrap-cell >>align-first
@@ -303,30 +296,6 @@ M: pointer c-type
         "allot_alien" >>boxer
         "alien_offset" >>unboxer
     \ void* define-primitive-type
-
-    <c-type>
-        integer >>class
-        integer >>boxed-class
-        [ alien-signed-4 ] >>getter
-        [ set-alien-signed-4 ] >>setter
-        4 >>size
-        4 >>align
-        4 >>align-first
-        "from_signed_4" >>boxer
-        "to_fixnum" >>unboxer
-    \ int define-primitive-type
-
-    <c-type>
-        integer >>class
-        integer >>boxed-class
-        [ alien-unsigned-4 ] >>getter
-        [ set-alien-unsigned-4 ] >>setter
-        4 >>size
-        4 >>align
-        4 >>align-first
-        "from_unsigned_4" >>boxer
-        "to_cell" >>unboxer
-    \ uint define-primitive-type
 
     <c-type>
         fixnum >>class
@@ -338,6 +307,7 @@ M: pointer c-type
         2 >>align-first
         "from_signed_2" >>boxer
         "to_fixnum" >>unboxer
+        [ >fixnum ] >>unboxer-quot
     \ short define-primitive-type
 
     <c-type>
@@ -350,6 +320,7 @@ M: pointer c-type
         2 >>align-first
         "from_unsigned_2" >>boxer
         "to_cell" >>unboxer
+        [ >fixnum ] >>unboxer-quot
     \ ushort define-primitive-type
 
     <c-type>
@@ -362,6 +333,7 @@ M: pointer c-type
         1 >>align-first
         "from_signed_1" >>boxer
         "to_fixnum" >>unboxer
+        [ >fixnum ] >>unboxer-quot
     \ char define-primitive-type
 
     <c-type>
@@ -374,34 +346,14 @@ M: pointer c-type
         1 >>align-first
         "from_unsigned_1" >>boxer
         "to_cell" >>unboxer
+        [ >fixnum ] >>unboxer-quot
     \ uchar define-primitive-type
-
-    cpu ppc? [
-        <c-type>
-            [ alien-unsigned-4 c-bool> ] >>getter
-            [ [ >c-bool ] 2dip set-alien-unsigned-4 ] >>setter
-            4 >>size
-            4 >>align
-            4 >>align-first
-            "from_boolean" >>boxer
-            "to_boolean" >>unboxer
-    ] [
-        <c-type>
-            [ alien-unsigned-1 c-bool> ] >>getter
-            [ [ >c-bool ] 2dip set-alien-unsigned-1 ] >>setter
-            1 >>size
-            1 >>align
-            1 >>align-first
-            "from_boolean" >>boxer
-            "to_boolean" >>unboxer
-    ] if
-    \ bool define-primitive-type
 
     <c-type>
         math:float >>class
         math:float >>boxed-class
         [ alien-float ] >>getter
-        [ [ >float ] 2dip set-alien-float ] >>setter
+        [ set-alien-float ] >>setter
         4 >>size
         4 >>align
         4 >>align-first
@@ -415,7 +367,7 @@ M: pointer c-type
         math:float >>class
         math:float >>boxed-class
         [ alien-double ] >>getter
-        [ [ >float ] 2dip set-alien-double ] >>setter
+        [ set-alien-double ] >>setter
         8 >>size
         8-byte-alignment
         "from_double" >>boxer
@@ -426,13 +378,39 @@ M: pointer c-type
 
     cell 8 = [
         <c-type>
+            fixnum >>class
+            fixnum >>boxed-class
+            [ alien-signed-4 ] >>getter
+            [ set-alien-signed-4 ] >>setter
+            4 >>size
+            4 >>align
+            4 >>align-first
+            "from_signed_4" >>boxer
+            "to_fixnum" >>unboxer
+            [ >fixnum ] >>unboxer-quot
+        \ int define-primitive-type
+    
+        <c-type>
+            fixnum >>class
+            fixnum >>boxed-class
+            [ alien-unsigned-4 ] >>getter
+            [ set-alien-unsigned-4 ] >>setter
+            4 >>size
+            4 >>align
+            4 >>align-first
+            "from_unsigned_4" >>boxer
+            "to_cell" >>unboxer
+            [ >fixnum ] >>unboxer-quot
+        \ uint define-primitive-type
+
+        <c-type>
             integer >>class
             integer >>boxed-class
             [ alien-signed-cell ] >>getter
             [ set-alien-signed-cell ] >>setter
-            bootstrap-cell >>size
-            bootstrap-cell >>align
-            bootstrap-cell >>align-first
+            8 >>size
+            8 >>align
+            8 >>align-first
             "from_signed_cell" >>boxer
             "to_fixnum" >>unboxer
         \ longlong define-primitive-type
@@ -442,9 +420,9 @@ M: pointer c-type
             integer >>boxed-class
             [ alien-unsigned-cell ] >>getter
             [ set-alien-unsigned-cell ] >>setter
-            bootstrap-cell >>size
-            bootstrap-cell >>align
-            bootstrap-cell >>align-first
+            8 >>size
+            8 >>align
+            8 >>align-first
             "from_unsigned_cell" >>boxer
             "to_cell" >>unboxer
         \ ulonglong define-primitive-type
@@ -463,6 +441,30 @@ M: pointer c-type
         \ ulonglong c-type \ uintptr_t typedef
         \ ulonglong c-type \ size_t typedef
     ] [
+        <c-type>
+            integer >>class
+            integer >>boxed-class
+            [ alien-signed-cell ] >>getter
+            [ set-alien-signed-cell ] >>setter
+            4 >>size
+            4 >>align
+            4 >>align-first
+            "from_signed_cell" >>boxer
+            "to_fixnum" >>unboxer
+        \ int define-primitive-type
+    
+        <c-type>
+            integer >>class
+            integer >>boxed-class
+            [ alien-unsigned-cell ] >>getter
+            [ set-alien-unsigned-cell ] >>setter
+            4 >>size
+            4 >>align
+            4 >>align-first
+            "from_unsigned_cell" >>boxer
+            "to_cell" >>unboxer
+        \ uint define-primitive-type
+
         <long-long-type>
             integer >>class
             integer >>boxed-class
@@ -494,6 +496,15 @@ M: pointer c-type
         \ uint c-type \ uintptr_t typedef
         \ uint c-type \ size_t typedef
     ] if
+
+    cpu ppc? \ uint \ uchar ? c-type clone
+        [ >c-bool ] >>unboxer-quot
+        [ c-bool> ] >>boxer-quot
+        object >>boxed-class
+    \ bool define-primitive-type
+
+    \ void* c-type clone stack-params >>rep
+    \ (stack-value) define-primitive-type
 
 ] with-compilation-unit
 

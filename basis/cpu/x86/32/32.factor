@@ -326,7 +326,7 @@ M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
 
 : stack-arg-size ( params -- n )
     dup abi>> '[
-        alien-parameters flatten-value-types
+        alien-parameters flatten-c-types
         [ _ alloc-parameter 2drop ] each
         stack-params get
     ] with-param-regs ;
@@ -357,11 +357,9 @@ M: x86.32 dummy-int-params? f ;
 M: x86.32 dummy-fp-params? f ;
 
 ! Dreadful
-M: object flatten-value-type (flatten-stack-type) ;
-M: struct-c-type flatten-value-type (flatten-stack-type) ;
-M: long-long-type flatten-value-type (flatten-stack-type) ;
-M: c-type flatten-value-type
-    dup rep>> int-rep? [ (flatten-int-type) ] [ (flatten-stack-type) ] if ;
+M: struct-c-type flatten-c-type stack-params (flatten-c-type) ;
+M: long-long-type flatten-c-type stack-params (flatten-c-type) ;
+M: c-type flatten-c-type dup rep>> int-rep? int-rep stack-params ? (flatten-c-type) ;
 
 M: x86.32 struct-return-pointer-type
     os linux? void* (stack-value) ? ;

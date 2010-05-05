@@ -3,7 +3,7 @@
 USING: accessors arrays kernel math namespaces make sequences
 system layouts alien alien.c-types alien.accessors alien.libraries
 slots splitting assocs combinators locals compiler.constants
-compiler.codegen compiler.codegen.alien compiler.codegen.fixup
+classes.struct compiler.codegen compiler.codegen.fixup
 compiler.cfg.instructions compiler.cfg.builder
 compiler.cfg.intrinsics compiler.cfg.stack-frame
 cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
@@ -132,9 +132,9 @@ M:: x86.64 %unbox ( n rep func -- )
     ! this is the end of alien-callback
     n [ n rep reg-class-of return-reg rep %save-param-reg ] when ;
 
-: %unbox-struct-field ( c-type i -- )
+: %unbox-struct-field ( rep i -- )
     ! Alien must be in param-reg-0.
-    R11 swap cells [+] swap rep>> reg-class-of {
+    R11 swap cells [+] swap reg-class-of {
         { int-regs [ int-regs get pop swap MOV ] }
         { float-regs [ float-regs get pop swap MOVSD ] }
     } case ;
@@ -147,7 +147,7 @@ M: x86.64 %unbox-small-struct ( c-type -- )
     ! clobber it.
     R11 RAX MOV
     [
-        flatten-value-type [ %unbox-struct-field ] each-index
+        flatten-struct-type [ %unbox-struct-field ] each-index
     ] with-return-regs ;
 
 M:: x86.64 %unbox-large-struct ( n c-type -- )
@@ -179,8 +179,8 @@ M:: x86.64 %box ( n rep func -- )
 
 : box-struct-field@ ( i -- operand ) 1 + cells param@ ;
 
-: %box-struct-field ( c-type i -- )
-    box-struct-field@ swap c-type-rep reg-class-of {
+: %box-struct-field ( rep i -- )
+    box-struct-field@ swap reg-class-of {
         { int-regs [ int-regs get pop MOV ] }
         { float-regs [ float-regs get pop MOVSD ] }
     } case ;
@@ -188,7 +188,7 @@ M:: x86.64 %box ( n rep func -- )
 M: x86.64 %box-small-struct ( c-type -- )
     #! Box a <= 16-byte struct.
     [
-        [ flatten-value-type [ %box-struct-field ] each-index ]
+        [ flatten-struct-type [ %box-struct-field ] each-index ]
         [ param-reg-2 swap heap-size MOV ] bi
         param-reg-0 0 box-struct-field@ MOV
         param-reg-1 1 box-struct-field@ MOV
