@@ -6,17 +6,14 @@ kernel mason.common namespaces sequences ;
 FROM: mason.config => target-os ;
 IN: mason.release.tidy
 
-: common-files ( -- seq )
+: useless-files ( -- seq )
     "build-support/cleanup" ascii file-lines
-    images [ boot-image-name ] map
-    append ;
-
-: remove-common-files ( -- )
-    common-files [ really-delete-tree ] each ;
-
-: remove-factor-app ( -- )
-    target-os get "macosx" =
-    [ "Factor.app" really-delete-tree ] unless ;
+    images [ boot-image-name ] map append
+    target-os get "macosx" = [ "Factor.app" suffix ] unless ;
 
 : tidy ( -- )
-    "factor" [ remove-factor-app remove-common-files ] with-directory ;
+    "factor" [
+        useless-files
+        [ exists? ] filter
+        [ really-delete-tree ] each
+    ] with-directory ;
