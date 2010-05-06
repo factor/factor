@@ -330,7 +330,7 @@ bignum *factor_vm::bignum_remainder(bignum * numerator, bignum * denominator)
 }
 
 /* allocates memory */
-#define FOO_TO_BIGNUM(name,type,utype)					\
+#define FOO_TO_BIGNUM(name,type,stype,utype)				\
 bignum * factor_vm::name##_to_bignum(type n)				\
 {									\
 	int negative_p;							\
@@ -341,7 +341,7 @@ bignum * factor_vm::name##_to_bignum(type n)				\
 	if (n == 1) return (BIGNUM_ONE (0));				\
 	if (n < (type)0 && n == (type)-1) return (BIGNUM_ONE (1));	\
 	{								\
-		utype accumulator = ((negative_p = (n < (type)0)) ? (-n) : n); \
+		utype accumulator = ((negative_p = (n < (type)0)) ? ((type)(-(stype)n)) : n); \
 		do							\
 		{							\
 			(*end_digits++) = (accumulator & BIGNUM_DIGIT_MASK); \
@@ -360,13 +360,13 @@ bignum * factor_vm::name##_to_bignum(type n)				\
 	}								\
 }
 
-FOO_TO_BIGNUM(cell,cell,cell)
-FOO_TO_BIGNUM(fixnum,fixnum,cell)
-FOO_TO_BIGNUM(long_long,s64,u64)
-FOO_TO_BIGNUM(ulong_long,u64,u64)
+FOO_TO_BIGNUM(cell,cell,fixnum,cell)
+FOO_TO_BIGNUM(fixnum,fixnum,fixnum,cell)
+FOO_TO_BIGNUM(long_long,s64,s64,u64)
+FOO_TO_BIGNUM(ulong_long,u64,s64,u64)
 
 /* cannot allocate memory */
-#define BIGNUM_TO_FOO(name,type,utype)					\
+#define BIGNUM_TO_FOO(name,type,stype,utype)				\
 	type factor_vm::bignum_to_##name(bignum * bignum)		\
 	{								\
 		if (BIGNUM_ZERO_P (bignum))				\
@@ -377,14 +377,14 @@ FOO_TO_BIGNUM(ulong_long,u64,u64)
 			bignum_digit_type * scan = (start + (BIGNUM_LENGTH (bignum))); \
 			while (start < scan)				\
 				accumulator = ((accumulator << BIGNUM_DIGIT_LENGTH) + (*--scan)); \
-			return ((BIGNUM_NEGATIVE_P (bignum)) ? (-((type)accumulator)) : accumulator); \
+			return ((BIGNUM_NEGATIVE_P (bignum)) ? ((type)(-(stype)accumulator)) : accumulator); \
 		}							\
 	}
 
-BIGNUM_TO_FOO(cell,cell,cell);
-BIGNUM_TO_FOO(fixnum,fixnum,cell);
-BIGNUM_TO_FOO(long_long,s64,u64)
-BIGNUM_TO_FOO(ulong_long,u64,u64)
+BIGNUM_TO_FOO(cell,cell,fixnum,cell);
+BIGNUM_TO_FOO(fixnum,fixnum,fixnum,cell);
+BIGNUM_TO_FOO(long_long,s64,s64,u64)
+BIGNUM_TO_FOO(ulong_long,u64,s64,u64)
 
 double factor_vm::bignum_to_double(bignum * bignum)
 {
