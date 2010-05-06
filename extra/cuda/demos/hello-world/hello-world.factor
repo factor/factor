@@ -17,7 +17,7 @@ CUDA-FUNCTION: helloWorld ( char* string-ptr ) ;
             "CUDA device " ": " surround write
             "Hello World!" >byte-array [ - ] map-index host>device &cuda-free
 
-            [ { 6 1 1 } { 2 1 } 2<<< helloWorld ]
+            [ { 2 1 } { 6 1 1 } 2<<< helloWorld ]
             [ 12 device>host >string print ] bi
         ] with-destructors
     ] with-each-cuda-device ;
