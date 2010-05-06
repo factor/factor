@@ -19,7 +19,7 @@ TUPLE: launcher
         swap >>device ; inline
 
 TUPLE: function-launcher
-dim-block dim-grid shared-size stream ;
+dim-grid dim-block shared-size stream ;
 
 : with-cuda-context ( flags device quot -- )
     H{ } clone cuda-modules set-global
@@ -48,16 +48,23 @@ dim-block dim-grid shared-size stream ;
         { [ dup a:void* = ] [ drop 4 [ cuda-int* ] ] }
     } cond ;
 
+<PRIVATE
+: block-dim ( block -- x y z )
+    dup sequence? [ 3 1 pad-tail first3 ] [ 1 1 ] if ; inline
+: grid-dim ( block -- x y )
+    dup sequence? [ 2 1 pad-tail first2 ] [ 1 ] if ; inline
+PRIVATE>
+
 : run-function-launcher ( function-launcher function -- )
     swap
     {
-        [ dim-block>> first3 function-block-shape* ]
+        [ dim-block>> block-dim function-block-shape* ]
         [ shared-size>> function-shared-size* ]
         [
             dim-grid>> [
                 launch-function*
             ] [
-                first2 launch-function-grid*
+                grid-dim launch-function-grid*
             ] if-empty
         ]
     } 2cleave ;
