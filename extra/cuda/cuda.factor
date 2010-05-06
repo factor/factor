@@ -61,11 +61,9 @@ PRIVATE>
         [ dim-block>> block-dim function-block-shape* ]
         [ shared-size>> function-shared-size* ]
         [
-            dim-grid>> [
-                launch-function*
-            ] [
-                grid-dim launch-function-grid*
-            ] if-empty
+            dim-grid>>
+            [ grid-dim launch-function-grid* ]
+            [ launch-function* ] if*
         ]
     } 2cleave ;
 
