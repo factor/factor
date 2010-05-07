@@ -46,11 +46,14 @@ M: x86.64 %mov-vm-ptr ( reg -- )
 M: x86.64 %vm-field ( dst offset -- )
     [ vm-reg ] dip [+] MOV ;
 
-M: x86.64 %load-double ( dst val -- )
-    [ 0 [RIP+] MOVSD ] dip rc-relative rel-binary-literal ;
-
 M:: x86.64 %load-vector ( dst val rep -- )
     dst 0 [RIP+] rep copy-memory* val rc-relative rel-binary-literal ;
+
+M: x86.64 %load-float ( dst val -- )
+    <float> float-rep %load-vector ;
+
+M: x86.64 %load-double ( dst val -- )
+    <double> double-rep %load-vector ;
 
 M: x86.64 %set-vm-field ( src offset -- )
     [ vm-reg ] dip [+] swap MOV ;
