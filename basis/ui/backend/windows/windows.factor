@@ -476,7 +476,7 @@ SYMBOL: nc-buttons
     swap [ push ] [ remove! drop ] if ;
 
 : mouse-scroll ( wParam -- array )
-    >lo-hi [ -120 /f ] map ;
+    >lo-hi [ -80 /f ] map ;
 
 : mouse-event>gesture ( uMsg -- button )
     key-modifiers swap message>button
