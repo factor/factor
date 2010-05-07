@@ -28,14 +28,20 @@ ERROR: bad-live-ranges interval ;
     [ swap first from<< ]
     2bi ;
 
+: last-use-rep ( live-interval -- rep/f )
+    last-use [ def-rep>> ] [ use-rep>> ] bi or ; inline
+
 : assign-spill ( live-interval -- )
-    dup [ vreg>> ] [ last-use rep>> ] bi
-    assign-spill-slot >>spill-to drop ;
+    dup last-use-rep dup [
+        >>spill-rep
+        dup [ vreg>> ] [ spill-rep>> ] bi
+        assign-spill-slot >>spill-to drop
+    ] [ 2drop ] if ;
 
 : spill-before ( before -- before/f )
     ! If the interval does not have any usages before the spill location,
     ! then it is the second child of an interval that was split. We reload
-    ! the value and let the resolve pass insert a split later.
+    ! the value and let the resolve pass insert a spill later.
     dup uses>> empty? [ drop f ] [
         {
             [ ]
@@ -46,9 +52,15 @@ ERROR: bad-live-ranges interval ;
         } cleave
     ] if ;
 
+: first-use-rep ( live-interval -- rep/f )
+    first-use use-rep>> ; inline
+
 : assign-reload ( live-interval -- )
-    dup [ vreg>> ] [ first-use rep>> ] bi
-    assign-spill-slot >>reload-from drop ;
+    dup first-use-rep dup [
+        >>reload-rep
+        dup [ vreg>> ] [ reload-rep>> ] bi
+        assign-spill-slot >>reload-from drop
+    ] [ 2drop ] if ;
 
 : spill-after ( after -- after/f )
     ! If the interval has no more usages after the spill location,
