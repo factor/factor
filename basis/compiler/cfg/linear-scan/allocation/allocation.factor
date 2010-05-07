@@ -35,10 +35,9 @@ IN: compiler.cfg.linear-scan.allocation
     } cond ;
 
 : spill-at-sync-point ( live-interval n -- ? )
-    ! If the live interval has a usage at 'n', don't spill it,
-    ! since this means its being defined by the sync point
-    ! instruction. Output t if this is the case.
-    2dup [ uses>> ] dip '[ n>> _ = ] any?
+    ! If the live interval has a definition at 'n', don't spill
+    2dup [ uses>> ] dip
+    '[ [ def-rep>> ] [ n>> _ = ] bi and ] any?
     [ 2drop t ] [ spill f ] if ;
 
 : handle-sync-point ( n -- )
