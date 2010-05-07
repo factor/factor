@@ -27,11 +27,14 @@ M: x86.32 temp-reg ECX ;
 
 M: x86.32 immediate-comparand? ( obj -- ? ) drop t ;
 
-M: x86.32 %load-double ( dst val -- )
-    [ 0 [] MOVSD ] dip rc-absolute rel-binary-literal ;
-
 M:: x86.32 %load-vector ( dst val rep -- )
     dst 0 [] rep copy-memory* val rc-absolute rel-binary-literal ;
+
+M: x86.32 %load-float ( dst val -- )
+    <float> float-rep %load-vector ;
+
+M: x86.32 %load-double ( dst val -- )
+    <double> double-rep %load-vector ;
 
 M: x86.32 %mov-vm-ptr ( reg -- )
     0 MOV 0 rc-absolute-cell rel-vm ;

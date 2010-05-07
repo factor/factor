@@ -122,6 +122,7 @@ SYNTAX: CODEGEN:
 CODEGEN: ##load-integer %load-immediate
 CODEGEN: ##load-tagged %load-immediate
 CODEGEN: ##load-reference %load-reference
+CODEGEN: ##load-float %load-float
 CODEGEN: ##load-double %load-double
 CODEGEN: ##load-vector %load-vector
 CODEGEN: ##peek %peek

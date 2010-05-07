@@ -34,6 +34,10 @@ INSN: ##load-tagged
 def: dst/tagged-rep
 literal: val ;
 
+INSN: ##load-float
+def: dst/float-rep
+literal: val ;
+
 INSN: ##load-double
 def: dst/double-rep
 literal: val ;
