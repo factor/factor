@@ -12,10 +12,6 @@ IN: compiler.codegen.fixup
     [ length ] [ B{ 0 0 0 0 } swap push-all ] [ underlying>> ] tri
     swap set-alien-unsigned-4 ;
 
-: push-double ( value vector -- )
-    [ length ] [ B{ 0 0 0 0 0 0 0 0 } swap push-all ] [ underlying>> ] tri
-    swap set-alien-double ;
-
 ! Owner
 SYMBOL: compiling-word
 
@@ -136,15 +132,8 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 : align-code ( n -- )
     alignment (align-code) ;
 
-GENERIC# emit-data 1 ( obj label -- )
-
-M: float emit-data
-    8 align-code
-    resolve-label
-    building get push-double ;
-
-M: byte-array emit-data
-    16 align-code
+: emit-data ( obj label -- )
+    over length align-code
     resolve-label
     building get push-all ;
 
