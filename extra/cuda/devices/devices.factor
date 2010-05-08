@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.data alien.strings arrays assocs
-byte-arrays classes.struct combinators cuda cuda.ffi cuda.utils
-fry io io.encodings.utf8 kernel math.parser prettyprint
-sequences ;
+USING: accessors alien.c-types alien.data alien.strings arrays
+assocs byte-arrays classes.struct combinators cuda cuda.ffi
+cuda.utils fry io io.encodings.utf8 kernel locals math
+math.order math.parser namespaces prettyprint sequences ;
 IN: cuda.devices
 
 : #cuda-devices ( -- n )
@@ -19,9 +19,8 @@ IN: cuda.devices
     [ enumerate-cuda-devices ] dip '[ <launcher> _ with-cuda ] each ; inline
 
 : cuda-device-properties ( n -- properties )
-    [ CUdevprop <c-object> ] dip
-    [ cuDeviceGetProperties cuda-error ] 2keep drop
-    CUdevprop memory>struct ;
+    [ CUdevprop <struct> ] dip
+    [ cuDeviceGetProperties cuda-error ] 2keep drop ;
 
 : cuda-devices ( -- assoc )
     enumerate-cuda-devices [ dup cuda-device-properties ] { } map>assoc ;
@@ -68,3 +67,20 @@ IN: cuda.devices
     "CUDA Version: " write cuda-version number>string print nl
     #cuda-devices iota [ nl ] [ cuda-device. ] interleave ;
 
+: up/i ( x y -- z )
+    [ 1 - + ] keep /i ; inline
+
+:: (distribute-jobs) ( job-count per-job-shared max-shared-size max-block-size
+                       -- grid-size block-size per-block-shared )
+    per-job-shared [ max-block-size ] [ max-shared-size swap /i max-block-size min ] if-zero
+        job-count min :> job-max-block-size
+    job-count job-max-block-size up/i :> grid-size
+    job-count grid-size up/i          :> block-size
+    block-size per-job-shared *       :> per-block-shared
+
+    grid-size block-size per-block-shared ; inline
+
+: distribute-jobs ( job-count per-job-shared -- grid-size block-size per-block-shared )
+    cuda-device get cuda-device-properties 
+    [ sharedMemPerBlock>> ] [ maxThreadsDim>> ] bi
+    (distribute-jobs) ; inline
