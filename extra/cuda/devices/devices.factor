@@ -82,5 +82,5 @@ IN: cuda.devices
 
 : distribute-jobs ( job-count per-job-shared -- launcher )
     cuda-device get cuda-device-properties 
-    [ sharedMemPerBlock>> ] [ maxThreadsDim>> ] bi
+    [ sharedMemPerBlock>> ] [ maxThreadsDim>> first ] bi
     (distribute-jobs) 3<<< ; inline
