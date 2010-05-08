@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays
-assocs byte-arrays classes.struct combinators cuda.ffi io
-io.backend io.encodings.utf8 kernel math.parser namespaces
+assocs byte-arrays classes.struct combinators cuda.devices cuda.ffi
+io io.backend io.encodings.utf8 kernel math.parser namespaces
 prettyprint sequences ;
 IN: cuda.utils
 
@@ -92,5 +92,3 @@ ERROR: throw-cuda-error n ;
 : function-shared-size ( n -- )
     [ cuda-function get ] dip
     cuFuncSetSharedSize cuda-error ;
-
-: distribute-jobs ( job-count per-job-shared -- grid-size block-size per-block-shared )
