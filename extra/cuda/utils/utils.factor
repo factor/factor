@@ -92,3 +92,5 @@ ERROR: throw-cuda-error n ;
 : function-shared-size ( n -- )
     [ cuda-function get ] dip
     cuFuncSetSharedSize cuda-error ;
+
+: distribute-jobs ( job-count per-job-shared -- grid-size block-size per-block-shared )
