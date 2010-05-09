@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs cache kernel math math.vectors
-namespaces pango.cairo pango.layouts ui.text ui.text.private
-pango sequences ;
+namespaces pango pango.cairo ui.text ui.text.private
+sequences ;
 IN: ui.text.pango
 
 SINGLETON: pango-renderer
