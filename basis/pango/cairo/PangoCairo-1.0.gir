@@ -1,0 +1,203 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.0"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GLib" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Pango" version="1.0"/>
+  <include name="PangoFT2" version="1.0"/>
+  <include name="cairo" version="1.0"/>
+  <include name="fontconfig" version="2.0"/>
+  <include name="freetype2" version="2.0"/>
+  <package name="cairo"/>
+  <package name="gobject-2.0"/>
+  <namespace name="PangoCairo"
+             version="1.0"
+             shared-library="libpangocairo-1.0.so.0"
+             c:prefix="PangoCairo">
+    <record name="FcFontMap" c:type="PangoCairoFcFontMap">
+    </record>
+    <record name="Font"
+            c:type="PangoCairoFont"
+            doc="#PangoCairoFont is an interface exported by fonts for
+use with Cairo. The actual type of the font will depend
+on the particular font technology Cairo was compiled to use."
+            version="1.18">
+    </record>
+    <record name="FontGlyphExtentsCacheEntry"
+            c:type="PangoCairoFontGlyphExtentsCacheEntry">
+    </record>
+    <record name="FontHexBoxInfo" c:type="PangoCairoFontHexBoxInfo">
+      <field name="font" writable="1">
+        <type name="Font" c:type="PangoCairoFont*"/>
+      </field>
+      <field name="rows" writable="1">
+        <type name="int" c:type="int"/>
+      </field>
+      <field name="digit_width" writable="1">
+        <type name="double" c:type="double"/>
+      </field>
+      <field name="digit_height" writable="1">
+        <type name="double" c:type="double"/>
+      </field>
+      <field name="pad_x" writable="1">
+        <type name="double" c:type="double"/>
+      </field>
+      <field name="pad_y" writable="1">
+        <type name="double" c:type="double"/>
+      </field>
+      <field name="line_width" writable="1">
+        <type name="double" c:type="double"/>
+      </field>
+      <field name="box_descent" writable="1">
+        <type name="double" c:type="double"/>
+      </field>
+      <field name="box_height" writable="1">
+        <type name="double" c:type="double"/>
+      </field>
+    </record>
+    <record name="FontIface" c:type="PangoCairoFontIface">
+    </record>
+    <record name="FontMap"
+            c:type="PangoCairoFontMap"
+            doc="#PangoCairoFontMap is an interface exported by font maps for
+use with Cairo. The actual type of the font map will depend
+on the particular font technology Cairo was compiled to use."
+            version="1.10">
+      <constructor name="new"
+                   c:identifier="pango_cairo_font_map_new"
+                   doc="Creates a new #PangoCairoFontMap object; a fontmap is used
+to cache information about available fonts, and holds
+certain global parameters such as the resolution.
+In most cases, you can use pango_cairo_font_map_get_default()
+instead.
+Note that the type of the returned object will depend
+on the particular font backend Cairo was compiled to use;
+You generally should only use the #PangoFontMap and
+#PangoCairoFontMap interfaces on the returned object.
+be freed with g_object_unref()."
+                   version="1.10">
+        <return-value transfer-ownership="full">
+          <type name="FontMap" c:type="PangoFontMap*"/>
+        </return-value>
+      </constructor>
+      <method name="set_default"
+              c:identifier="pango_cairo_font_map_set_default"
+              doc="Sets a default #PangoCairoFontMap to use with Cairo.
+This can be used to change the Cairo font backend that the
+default fontmap uses for example.  The old default font map
+is unreffed and the new font map referenced.
+A value of %NULL for @fontmap will cause the current default
+font map to be released and a new default font
+map to be created on demand, using pango_cairo_font_map_new()."
+              version="1.22">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="set_resolution"
+              c:identifier="pango_cairo_font_map_set_resolution"
+              doc="involved; the terminology is conventional.)
+Sets the resolution for the fontmap. This is a scale factor between
+points specified in a #PangoFontDescription and Cairo units. The
+default value is 96, meaning that a 10 point font will be 13
+units high. (10 * 96. / 72. = 13.3)."
+              version="1.10">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="dpi" transfer-ownership="none">
+            <type name="double" c:type="double"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_resolution"
+              c:identifier="pango_cairo_font_map_get_resolution"
+              doc="Gets the resolution for the fontmap. See pango_cairo_font_map_set_resolution()"
+              version="1.10">
+        <return-value transfer-ownership="none">
+          <type name="double" c:type="double"/>
+        </return-value>
+      </method>
+      <method name="create_context"
+              c:identifier="pango_cairo_font_map_create_context"
+              doc="Create a #PangoContext for the given fontmap."
+              version="1.10"
+              deprecated="Use pango_font_map_create_context() instead."
+              deprecated-version="1.22">
+        <return-value transfer-ownership="full">
+          <type name="Pango.Context" c:type="PangoContext*"/>
+        </return-value>
+      </method>
+    </record>
+    <record name="FontMapIface" c:type="PangoCairoFontMapIface">
+    </record>
+    <record name="FontPrivate" c:type="PangoCairoFontPrivate">
+    </record>
+    <record name="FontPrivateScaledFontData"
+            c:type="PangoCairoFontPrivateScaledFontData">
+    </record>
+    <constant name="HEIGHT_SQUARES" value="2.5">
+      <type name="double"/>
+    </constant>
+    <record name="Renderer" c:type="PangoCairoRenderer">
+    </record>
+    <function name="context_get_resolution"
+              c:identifier="pango_cairo_context_get_resolution"
+              doc="Gets the resolution for the context. See pango_cairo_context_set_resolution()
+be returned if no resolution has previously been set."
+              version="1.10">
+      <return-value transfer-ownership="none">
+        <type name="double" c:type="double"/>
+      </return-value>
+      <parameters>
+        <parameter name="context" transfer-ownership="none">
+          <type name="Pango.Context" c:type="PangoContext*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="context_set_resolution"
+              c:identifier="pango_cairo_context_set_resolution"
+              doc="involved; the terminology is conventional.) A 0 or negative value
+means to use the resolution from the font map.
+Sets the resolution for the context. This is a scale factor between
+points specified in a #PangoFontDescription and Cairo units. The
+default value is 96, meaning that a 10 point font will be 13
+units high. (10 * 96. / 72. = 13.3)."
+              version="1.10">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="context" transfer-ownership="none">
+          <type name="Pango.Context" c:type="PangoContext*"/>
+        </parameter>
+        <parameter name="dpi" transfer-ownership="none">
+          <type name="double" c:type="double"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="font_map_get_default"
+              c:identifier="pango_cairo_font_map_get_default"
+              doc="Gets a default #PangoCairoFontMap to use with Cairo.
+Note that the type of the returned object will depend
+on the particular font backend Cairo was compiled to use;
+You generally should only use the #PangoFontMap and
+#PangoCairoFontMap interfaces on the returned object.
+The default Cairo fontmap can be changed by using
+pango_cairo_font_map_set_default().  This can be used to
+change the Cairo font backend that the default fontmap
+uses for example.
+object is owned by Pango and must not be freed."
+              version="1.10">
+      <return-value transfer-ownership="full">
+        <type name="Pango.FontMap" c:type="PangoFontMap*"/>
+      </return-value>
+    </function>
+  </namespace>
+</repository>
