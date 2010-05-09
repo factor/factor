@@ -7,6 +7,7 @@ math.parser io.streams.string ui.tools.operations quotations
 strings arrays prettyprint words vocabs sorting sets classes
 math alien urls splitting ascii combinators.short-circuit timers
 words.symbol system summary ;
+FROM: sets => members ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -170,6 +171,7 @@ M: bad-developer-name summary
         2dup [ empty? ] bi@ and [
             2drop
         ] [
+            [ members ] dip over diff
             "{ $values" print
             [ 4bl ($values.) ]
             [ [ nl 4bl ($values.) ] unless-empty ] bi*
