@@ -1,36 +1,64 @@
-! Copyright (C) 2008 Matthew Willis.
-! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license
-USING: alien alien.c-types alien.syntax alien.destructors
-combinators system alien.libraries ;
-IN: glib
+! Copyright (C) 2009 Anton Gorenko.
+! See http://factorcode.org/license.txt for BSD license.
+USING: alien.c-types alien.libraries alien.syntax combinators gir
+kernel system vocabs.parser words ;
 
 <<
-
-{
-    { [ os winnt? ] [ "glib" "libglib-2.0-0.dll" cdecl add-library ] }
-    { [ os macosx? ] [ "glib" "/opt/local/lib/libglib-2.0.0.dylib" cdecl add-library ] }
-    { [ os unix? ] [ ] }
+"glib" {
+    { [ os winnt? ] [ "libglib-2.0-0.dll" "cdecl" add-library ] }
+    { [ os macosx? ] [ "/opt/local/lib/libglib-2.0.0.dylib" "cdecl" add-library ] }
+    { [ os unix? ] [ drop ] }
 } cond
-
-{
-    { [ os winnt? ] [ "gobject" "libgobject-2.0-0.dll" cdecl add-library ] }
-    { [ os macosx? ] [ "gobject" "/opt/local/lib/libgobject-2.0.0.dylib" cdecl add-library ] }
-    { [ os unix? ] [ ] }
-} cond
-
 >>
 
-LIBRARY: glib
+IN: glib.ffi
+
+<< double "long double" current-vocab create typedef >>
+
+TYPEDEF: char gchar
+TYPEDEF: uchar guchar
+TYPEDEF: short gshort
+TYPEDEF: ushort gushort
+TYPEDEF: long glong
+TYPEDEF: ulong gulong
+TYPEDEF: int gint
+TYPEDEF: uint guint
+TYPEDEF: gint gboolean
+
+TYPEDEF: char gint8
+TYPEDEF: uchar guint8
+TYPEDEF: short gint16
+TYPEDEF: ushort guint16
+TYPEDEF: int gint32
+TYPEDEF: uint guint32
+TYPEDEF: longlong gint64
+TYPEDEF: ulonglong guint64
+
+TYPEDEF: float gfloat
+TYPEDEF: double gdouble
+
+TYPEDEF: long ssize_t
+TYPEDEF: long time_t
+TYPEDEF: size_t gsize
+TYPEDEF: ssize_t gssize
+TYPEDEF: size_t GType
 
 TYPEDEF: void* gpointer
-TYPEDEF: int gint
-TYPEDEF: bool gboolean
+TYPEDEF: void* gconstpointer
 
-FUNCTION: void g_free ( gpointer mem ) ;
+TYPEDEF: guint8 GDateDay
+TYPEDEF: guint16 GDateYear
+TYPEDEF: gint GPid
+TYPEDEF: guint32 GQuark
+TYPEDEF: gint32 GTime
+TYPEDEF: glong gintptr
+TYPEDEF: gint64 goffset
+TYPEDEF: gulong guintptr
+TYPEDEF: guint32 gunichar
+TYPEDEF: guint16 gunichar2
 
-LIBRARY: gobject
+! Разобраться, почему в .gir есть такие типы
+TYPEDEF: void any
 
-FUNCTION: void g_object_unref ( gpointer object ) ;
+IN-GIR: glib vocab:glib/GLib-2.0.gir
 
-DESTRUCTOR: g_object_unref
