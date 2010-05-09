@@ -1,0 +1,50 @@
+! Copyright (C) 2009 Anton Gorenko.
+! See http://factorcode.org/license.txt for BSD license.
+USING: alien.syntax alien.c-types alien.destructors 
+alien.libraries combinators kernel literals math system
+gir glib glib.ffi ;
+
+IN: gobject.ffi
+
+TYPEDEF: void* GSignalCMarshaller
+TYPEDEF: void GStrv
+! есть alias
+TYPEDEF: gchar* gchararray
+
+IN-GIR: gobject vocab:gobject/GObject-2.0.gir
+
+IN: gobject.ffi
+
+FORGET: GIOCondition
+
+FUNCTION: void g_object_unref ( GObject* self ) ;
+
+DESTRUCTOR: g_object_unref
+
+! Исправление неправильного типа параметра для GtkWidget-child-notify
+! (разобраться)
+TYPEDEF: GParamSpec GParam
+
+<< CONSTANT: G_TYPE_FUNDAMENTAL_SHIFT 2 >>
+CONSTANT: G_TYPE_INVALID $[ 0 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_NONE $[ 1 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_INTERFACE $[ 2 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_CHAR $[ 3 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_UCHAR $[ 4 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_BOOLEAN $[ 5 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_INT $[ 6 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_UINT $[ 7 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_LONG $[ 8 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_ULONG $[ 9 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_INT64 $[ 10 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_UINT64 $[ 11 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_ENUM $[ 12 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_FLAGS $[ 13 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_FLOAT $[ 14 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_DOUBLE $[ 15 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_STRING $[ 16 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_POINTER $[ 17 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_BOXED $[ 18 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_PARAM $[ 19 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+CONSTANT: G_TYPE_OBJECT $[ 20 G_TYPE_FUNDAMENTAL_SHIFT shift ]
+

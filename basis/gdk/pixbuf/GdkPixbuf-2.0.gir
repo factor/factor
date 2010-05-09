@@ -1,0 +1,2523 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.0"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GLib" version="2.0"/>
+  <include name="GModule" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Gio" version="2.0"/>
+  <namespace name="GdkPixbuf"
+             version="2.0"
+             shared-library="libgdk_pixbuf-2.0.so.0"
+             c:prefix="Gdk">
+    <enumeration name="Colorspace"
+                 glib:type-name="GdkColorspace"
+                 glib:get-type="gdk_colorspace_get_type"
+                 c:type="GdkColorspace">
+      <member name="rgb"
+              value="0"
+              c:identifier="GDK_COLORSPACE_RGB"
+              glib:nick="rgb"/>
+    </enumeration>
+    <constant name="FEATURES_H" value="1">
+      <type name="int"/>
+    </constant>
+    <enumeration name="InterpType"
+                 glib:type-name="GdkInterpType"
+                 glib:get-type="gdk_interp_type_get_type"
+                 c:type="GdkInterpType">
+      <member name="nearest"
+              value="0"
+              c:identifier="GDK_INTERP_NEAREST"
+              glib:nick="nearest"/>
+      <member name="tiles"
+              value="1"
+              c:identifier="GDK_INTERP_TILES"
+              glib:nick="tiles"/>
+      <member name="bilinear"
+              value="2"
+              c:identifier="GDK_INTERP_BILINEAR"
+              glib:nick="bilinear"/>
+      <member name="hyper"
+              value="3"
+              c:identifier="GDK_INTERP_HYPER"
+              glib:nick="hyper"/>
+    </enumeration>
+    <constant name="MAGIC_NUMBER" value="1197763408">
+      <type name="int"/>
+    </constant>
+    <constant name="MAJOR" value="2">
+      <type name="int"/>
+    </constant>
+    <constant name="MICRO" value="1">
+      <type name="int"/>
+    </constant>
+    <constant name="MINOR" value="20">
+      <type name="int"/>
+    </constant>
+    <constant name="PIXDATA_HEADER_LENGTH" value="24">
+      <type name="int"/>
+    </constant>
+    <class name="Pixbuf"
+           c:type="GdkPixbuf"
+           parent="GObject.Object"
+           glib:type-name="GdkPixbuf"
+           glib:get-type="gdk_pixbuf_get_type">
+      <constructor name="new"
+                   c:identifier="gdk_pixbuf_new"
+                   doc="Creates a new #GdkPixbuf structure and allocates a buffer for it.  The
+buffer has an optimal rowstride.  Note that the buffer is not cleared;
+you will have to fill it completely yourself.
+%NULL if not enough memory could be allocated for the image buffer.">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+        <parameters>
+          <parameter name="colorspace" transfer-ownership="none">
+            <type name="Colorspace" c:type="GdkColorspace"/>
+          </parameter>
+          <parameter name="has_alpha" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+          <parameter name="bits_per_sample" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="width" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="height" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_subpixbuf"
+                   c:identifier="gdk_pixbuf_new_subpixbuf"
+                   doc="Creates a new pixbuf which represents a sub-region of
+original pixbuf, so writing to one affects both.
+The new pixbuf holds a reference to @src_pixbuf, so
+is finalized.">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+        <parameters>
+          <parameter name="src_pixbuf" transfer-ownership="none">
+            <type name="Pixbuf" c:type="GdkPixbuf*"/>
+          </parameter>
+          <parameter name="src_x" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="src_y" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="width" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="height" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_from_file"
+                   c:identifier="gdk_pixbuf_new_from_file"
+                   doc="Creates a new pixbuf by loading an image from a file.  The file format is
+detected automatically. If %NULL is returned, then @error will be set.
+Possible errors are in the #GDK_PIXBUF_ERROR and #G_FILE_ERROR domains.
+there was no loader for the file&apos;s format, there was not enough memory to
+allocate the image buffer, or the image file contained invalid data."
+                   throws="1">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+        <parameters>
+          <parameter name="filename" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_from_file_at_size"
+                   c:identifier="gdk_pixbuf_new_from_file_at_size"
+                   doc="Creates a new pixbuf by loading an image from a file.
+The file format is detected automatically. If %NULL is returned, then
+#G_FILE_ERROR domains.
+The image will be scaled to fit in the requested size, preserving
+the image&apos;s aspect ratio. Note that the returned pixbuf may be smaller
+than @width x @height, if the aspect ratio requires it. To load
+and image at the requested size, regardless of aspect ratio, use
+gdk_pixbuf_new_from_file_at_scale().
+be opened, there was no loader for the file&apos;s format, there was not
+enough memory to allocate the image buffer, or the image file contained
+invalid data."
+                   version="2.4"
+                   throws="1">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+        <parameters>
+          <parameter name="filename" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="width" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="height" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_from_file_at_scale"
+                   c:identifier="gdk_pixbuf_new_from_file_at_scale"
+                   doc="Creates a new pixbuf by loading an image from a file.  The file format is
+detected automatically. If %NULL is returned, then @error will be set.
+Possible errors are in the #GDK_PIXBUF_ERROR and #G_FILE_ERROR domains.
+The image will be scaled to fit in the requested size, optionally preserving
+the image&apos;s aspect ratio.
+When preserving the aspect ratio, a @width of -1 will cause the image
+to be scaled to the exact given height, and a @height of -1 will cause
+the image to be scaled to the exact given width. When not preserving
+aspect ratio, a @width or @height of -1 means to not scale the image
+at all in that dimension. Negative values for @width and @height are
+allowed since 2.8.
+there was no loader for the file&apos;s format, there was not enough memory to
+allocate the image buffer, or the image file contained invalid data."
+                   version="2.6"
+                   throws="1">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+        <parameters>
+          <parameter name="filename" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="width" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="height" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="preserve_aspect_ratio" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_from_data"
+                   c:identifier="gdk_pixbuf_new_from_data"
+                   doc="drops to zero, or %NULL if the data should not be freed
+Creates a new #GdkPixbuf out of in-memory image data.  Currently only RGB
+images with 8 bits per sample are supported.">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+        <parameters>
+          <parameter name="data" transfer-ownership="none">
+            <array c:type="guchar*">
+              <type name="uint8"/>
+            </array>
+          </parameter>
+          <parameter name="colorspace" transfer-ownership="none">
+            <type name="Colorspace" c:type="GdkColorspace"/>
+          </parameter>
+          <parameter name="has_alpha" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+          <parameter name="bits_per_sample" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="width" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="height" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="rowstride" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="destroy_fn"
+                     transfer-ownership="none"
+                     scope="call"
+                     closure="8">
+            <type name="PixbufDestroyNotify" c:type="GdkPixbufDestroyNotify"/>
+          </parameter>
+          <parameter name="destroy_fn_data" transfer-ownership="none">
+            <type name="any" c:type="gpointer"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_from_xpm_data"
+                   c:identifier="gdk_pixbuf_new_from_xpm_data"
+                   doc="Creates a new pixbuf by parsing XPM data in memory.  This data is commonly
+the result of including an XPM file into a program&apos;s C source.">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+        <parameters>
+          <parameter name="data" transfer-ownership="none">
+            <array c:type="char**">
+              <type name="utf8"/>
+            </array>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_from_inline"
+                   c:identifier="gdk_pixbuf_new_from_inline"
+                   doc="disable length checks
+Create a #GdkPixbuf from a flat representation that is suitable for
+storing as inline data in a program. This is useful if you want to
+ship a program with images, but don&apos;t want to depend on any
+external files.
+GTK+ ships with a program called &lt;command&gt;gdk-pixbuf-csource&lt;/command&gt;
+which allows for conversion of #GdkPixbufs into such a inline representation.
+In almost all cases, you should pass the &lt;option&gt;--raw&lt;/option&gt; flag to
+&lt;command&gt;gdk-pixbuf-csource&lt;/command&gt;. A sample invocation would be:
+&lt;informalexample&gt;&lt;programlisting&gt;
+gdk-pixbuf-csource --raw --name=myimage_inline myimage.png
+&lt;/programlisting&gt;&lt;/informalexample&gt;
+For the typical case where the inline pixbuf is read-only static data,
+you don&apos;t need to copy the pixel data unless you intend to write to
+it, so you can pass %FALSE for @copy_pixels.  (If you pass
+&lt;option&gt;--rle&lt;/option&gt; to &lt;command&gt;gdk-pixbuf-csource&lt;/command&gt;, a copy
+will be made even if @copy_pixels is %FALSE, so using this option is
+generally a bad idea.)
+If you create a pixbuf from const inline data compiled into your
+program, it&apos;s probably safe to ignore errors and disable length checks,
+since things will always succeed:
+&lt;informalexample&gt;&lt;programlisting&gt;
+pixbuf = gdk_pixbuf_new_from_inline (-1, myimage_inline, FALSE, NULL);
+&lt;/programlisting&gt;&lt;/informalexample&gt;
+For non-const inline data, you could get out of memory. For untrusted
+inline data located at runtime, you could have corrupt inline data in
+addition.
+count of 1, or %NULL if an error occurred."
+                   throws="1">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+        <parameters>
+          <parameter name="data_length" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+          <parameter name="data" transfer-ownership="none">
+            <array c:type="guint8*">
+              <type name="uint8"/>
+            </array>
+          </parameter>
+          <parameter name="copy_pixels" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_from_stream"
+                   c:identifier="gdk_pixbuf_new_from_stream"
+                   doc="Creates a new pixbuf by loading an image from an input stream.
+The file format is detected automatically. If %NULL is returned, then
+from another thread. If the operation was cancelled, the error
+%GIO_ERROR_CANCELLED will be returned. Other possible errors are in
+the #GDK_PIXBUF_ERROR and %G_IO_ERROR domains.
+The stream is not closed.
+not supported, there was not enough memory to allocate the image buffer,
+the stream contained invalid data, or the operation was cancelled."
+                   version="2.14"
+                   throws="1">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+        <parameters>
+          <parameter name="stream" transfer-ownership="none">
+            <type name="Gio.InputStream" c:type="GInputStream*"/>
+          </parameter>
+          <parameter name="cancellable"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <type name="Gio.Cancellable" c:type="GCancellable*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_from_stream_at_scale"
+                   c:identifier="gdk_pixbuf_new_from_stream_at_scale"
+                   doc="Creates a new pixbuf by loading an image from an input stream.
+The file format is detected automatically. If %NULL is returned, then
+from another thread. If the operation was cancelled, the error
+%GIO_ERROR_CANCELLED will be returned. Other possible errors are in
+the #GDK_PIXBUF_ERROR and %G_IO_ERROR domains.
+The image will be scaled to fit in the requested size, optionally
+preserving the image&apos;s aspect ratio. When preserving the aspect ratio,
+a @width of -1 will cause the image to be scaled to the exact given
+height, and a @height of -1 will cause the image to be scaled to the
+exact given width. When not preserving aspect ratio, a @width or
+The stream is not closed.
+not supported, there was not enough memory to allocate the image buffer,
+the stream contained invalid data, or the operation was cancelled."
+                   version="2.14"
+                   throws="1">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+        <parameters>
+          <parameter name="stream" transfer-ownership="none">
+            <type name="Gio.InputStream" c:type="GInputStream*"/>
+          </parameter>
+          <parameter name="width" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+          <parameter name="height" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+          <parameter name="preserve_aspect_ratio" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+          <parameter name="cancellable"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <type name="Gio.Cancellable" c:type="GCancellable*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <function name="get_formats"
+                c:identifier="gdk_pixbuf_get_formats"
+                doc="Obtains the available information about the image formats supported
+by GdkPixbuf.
+image formats.  The list should be freed when it is no longer needed,
+but the structures themselves are owned by #GdkPixbuf and should not be
+freed."
+                version="2.2">
+        <return-value transfer-ownership="full">
+          <type name="GLib.SList" c:type="GSList*"/>
+        </return-value>
+      </function>
+      <function name="get_file_info"
+                c:identifier="gdk_pixbuf_get_file_info"
+                doc="Parses an image file far enough to determine its format and size.
+or %NULL if the image format wasn&apos;t recognized. The return value
+is owned by GdkPixbuf and should not be freed."
+                version="2.4">
+        <return-value transfer-ownership="full">
+          <type name="PixbufFormat" c:type="GdkPixbufFormat*"/>
+        </return-value>
+        <parameters>
+          <parameter name="filename" transfer-ownership="none">
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="width" direction="out" transfer-ownership="full">
+            <type name="int" c:type="gint*"/>
+          </parameter>
+          <parameter name="height" direction="out" transfer-ownership="full">
+            <type name="int" c:type="gint*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="from_pixdata"
+                c:identifier="gdk_pixbuf_from_pixdata"
+                doc="pixel data is always copied.
+Converts a #GdkPixdata to a #GdkPixbuf. If @copy_pixels is %TRUE or
+if the pixel data is run-length-encoded, the pixel data is copied into
+newly-allocated memory; otherwise it is reused."
+                throws="1">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+        <parameters>
+          <parameter name="pixdata" transfer-ownership="none">
+            <type name="Pixdata" c:type="GdkPixdata*"/>
+          </parameter>
+          <parameter name="copy_pixels" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </function>
+      <method name="ref"
+              c:identifier="gdk_pixbuf_ref"
+              doc="Adds a reference to a pixbuf."
+              deprecated="Use g_object_ref()."
+              deprecated-version="2.0">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+      </method>
+      <method name="unref"
+              c:identifier="gdk_pixbuf_unref"
+              doc="Removes a reference from a pixbuf."
+              deprecated="Use g_object_unref()."
+              deprecated-version="2.0">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="get_colorspace"
+              c:identifier="gdk_pixbuf_get_colorspace"
+              doc="Queries the color space of a pixbuf.">
+        <return-value transfer-ownership="full">
+          <type name="Colorspace" c:type="GdkColorspace"/>
+        </return-value>
+      </method>
+      <method name="get_n_channels"
+              c:identifier="gdk_pixbuf_get_n_channels"
+              doc="Queries the number of channels of a pixbuf.">
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </return-value>
+      </method>
+      <method name="get_has_alpha"
+              c:identifier="gdk_pixbuf_get_has_alpha"
+              doc="Queries whether a pixbuf has an alpha channel (opacity information).">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="get_bits_per_sample"
+              c:identifier="gdk_pixbuf_get_bits_per_sample"
+              doc="Queries the number of bits per color sample in a pixbuf.">
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </return-value>
+      </method>
+      <method name="get_pixels"
+              c:identifier="gdk_pixbuf_get_pixels"
+              doc="Queries a pointer to the pixel data of a pixbuf.
+for information about how the pixel data is stored in
+memory.">
+        <return-value transfer-ownership="full">
+          <array c:type="guchar*">
+            <type name="uint8"/>
+          </array>
+        </return-value>
+      </method>
+      <method name="get_width"
+              c:identifier="gdk_pixbuf_get_width"
+              doc="Queries the width of a pixbuf.">
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </return-value>
+      </method>
+      <method name="get_height"
+              c:identifier="gdk_pixbuf_get_height"
+              doc="Queries the height of a pixbuf.">
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </return-value>
+      </method>
+      <method name="get_rowstride"
+              c:identifier="gdk_pixbuf_get_rowstride"
+              doc="Queries the rowstride of a pixbuf, which is the number of bytes between the start of a row
+and the start of the next row.">
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </return-value>
+      </method>
+      <method name="copy"
+              c:identifier="gdk_pixbuf_copy"
+              doc="Creates a new #GdkPixbuf with a copy of the information in the specified
+not enough memory could be allocated.">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+      </method>
+      <method name="fill"
+              c:identifier="gdk_pixbuf_fill"
+              doc="(0xffffffff is opaque white, 0x00000000 transparent black)
+Clears a pixbuf to the given RGBA value, converting the RGBA value into
+the pixbuf&apos;s pixel format. The alpha will be ignored if the pixbuf
+doesn&apos;t have an alpha channel.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="pixel" transfer-ownership="none">
+            <type name="uint32" c:type="guint32"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="save"
+              c:identifier="gdk_pixbuf_save"
+              doc="Saves pixbuf to a file in format @type. By default, &quot;jpeg&quot;, &quot;png&quot;, &quot;ico&quot;
+and &quot;bmp&quot; are possible file formats to save in, but more formats may be
+installed. The list of all writable formats can be determined in the
+following way:
+|[
+void add_if_writable (GdkPixbufFormat *data, GSList **list)
+{
+if (gdk_pixbuf_format_is_writable (data))
+*list = g_slist_prepend (*list, data);
+}
+GSList *formats = gdk_pixbuf_get_formats ();
+GSList *writable_formats = NULL;
+g_slist_foreach (formats, add_if_writable, &amp;writable_formats);
+g_slist_free (formats);
+]|
+If @error is set, %FALSE will be returned. Possible errors include
+those in the #GDK_PIXBUF_ERROR domain and those in the #G_FILE_ERROR domain.
+The variable argument list should be %NULL-terminated; if not empty,
+it should contain pairs of strings that modify the save
+parameters. For example:
+&lt;informalexample&gt;&lt;programlisting&gt;
+gdk_pixbuf_save (pixbuf, handle, &quot;jpeg&quot;, &amp;amp;error,
+&quot;quality&quot;, &quot;100&quot;, NULL);
+&lt;/programlisting&gt;&lt;/informalexample&gt;
+Currently only few parameters exist. JPEG images can be saved with a
+&quot;quality&quot; parameter; its value should be in the range [0,100].
+Text chunks can be attached to PNG images by specifying parameters of
+the form &quot;tEXt::key&quot;, where key is an ASCII string of length 1-79.
+The values are UTF-8 encoded strings. The PNG compression level can
+be specified using the &quot;compression&quot; parameter; it&apos;s value is in an
+integer in the range of [0,9].
+ICC color profiles can also be embedded into PNG and TIFF images.
+The &quot;icc-profile&quot; value should be the complete ICC profile encoded
+into base64.
+&lt;informalexample&gt;&lt;programlisting&gt;
+gchar *contents;
+gchar *contents_encode;
+gsize length;
+g_file_get_contents (&quot;/home/hughsie/.color/icc/L225W.icm&quot;, &amp;contents, &amp;length, NULL);
+contents_encode = g_base64_encode ((const guchar *) contents, length);
+gdk_pixbuf_save (pixbuf, handle, &quot;png&quot;, &amp;amp;error,
+&quot;icc-profile&quot;, contents_encode,
+NULL);
+&lt;/programlisting&gt;&lt;/informalexample&gt;
+TIFF images recognize a &quot;compression&quot; option which acceps an integer value.
+Among the codecs are 1 None, 2 Huffman, 5 LZW, 7 JPEG and 8 Deflate, see
+the libtiff documentation and tiff.h for all supported codec values.
+ICO images can be saved in depth 16, 24, or 32, by using the &quot;depth&quot;
+parameter. When the ICO saver is given &quot;x_hot&quot; and &quot;y_hot&quot; parameters,
+it produces a CUR instead of an ICO.">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="filename" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="type" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="error"
+                     transfer-ownership="none"
+                     allow-none="1"
+                     doc="return location for error, or %NULL">
+            <type name="GLib.Error" c:type="GError**"/>
+          </parameter>
+          <parameter transfer-ownership="none">
+            <varargs>
+            </varargs>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="savev"
+              c:identifier="gdk_pixbuf_savev"
+              doc="Saves pixbuf to a file in @type, which is currently &quot;jpeg&quot;, &quot;png&quot;, &quot;tiff&quot;, &quot;ico&quot; or &quot;bmp&quot;.
+If @error is set, %FALSE will be returned.
+See gdk_pixbuf_save () for more details."
+              throws="1">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="filename" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="type" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="option_keys" transfer-ownership="none">
+            <array c:type="char**">
+              <type name="utf8"/>
+            </array>
+          </parameter>
+          <parameter name="option_values" transfer-ownership="none">
+            <array c:type="char**">
+              <type name="utf8"/>
+            </array>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="save_to_callback"
+              c:identifier="gdk_pixbuf_save_to_callback"
+              doc="the save routine generates.
+Saves pixbuf in format @type by feeding the produced data to a
+callback. Can be used when you want to store the image to something
+other than a file, such as an in-memory buffer or a socket.
+If @error is set, %FALSE will be returned. Possible errors
+include those in the #GDK_PIXBUF_ERROR domain and whatever the save
+function generates.
+See gdk_pixbuf_save() for more details."
+              version="2.4">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="save_func"
+                     transfer-ownership="none"
+                     scope="call"
+                     closure="2">
+            <type name="PixbufSaveFunc" c:type="GdkPixbufSaveFunc"/>
+          </parameter>
+          <parameter name="user_data" transfer-ownership="none">
+            <type name="any" c:type="gpointer"/>
+          </parameter>
+          <parameter name="type" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="error"
+                     transfer-ownership="none"
+                     allow-none="1"
+                     doc="return location for error, or %NULL">
+            <type name="GLib.Error" c:type="GError**"/>
+          </parameter>
+          <parameter transfer-ownership="none">
+            <varargs>
+            </varargs>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="save_to_callbackv"
+              c:identifier="gdk_pixbuf_save_to_callbackv"
+              doc="the save routine generates.
+Saves pixbuf to a callback in format @type, which is currently &quot;jpeg&quot;,
+&quot;png&quot;, &quot;tiff&quot;, &quot;ico&quot; or &quot;bmp&quot;.  If @error is set, %FALSE will be returned. See
+gdk_pixbuf_save_to_callback () for more details."
+              version="2.4"
+              throws="1">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="save_func"
+                     transfer-ownership="none"
+                     scope="call"
+                     closure="2">
+            <type name="PixbufSaveFunc" c:type="GdkPixbufSaveFunc"/>
+          </parameter>
+          <parameter name="user_data" transfer-ownership="none">
+            <type name="any" c:type="gpointer"/>
+          </parameter>
+          <parameter name="type" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="option_keys" transfer-ownership="none">
+            <array c:type="char**">
+              <type name="utf8"/>
+            </array>
+          </parameter>
+          <parameter name="option_values" transfer-ownership="none">
+            <array c:type="char**">
+              <type name="utf8"/>
+            </array>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="save_to_buffer"
+              c:identifier="gdk_pixbuf_save_to_buffer"
+              doc="Saves pixbuf to a new buffer in format @type, which is currently &quot;jpeg&quot;,
+&quot;png&quot;, &quot;tiff&quot;, &quot;ico&quot; or &quot;bmp&quot;.  This is a convenience function that uses
+gdk_pixbuf_save_to_callback() to do the real work. Note that the buffer
+is not nul-terminated and may contain embedded  nuls.
+If @error is set, %FALSE will be returned and @buffer will be set to
+%NULL. Possible errors include those in the #GDK_PIXBUF_ERROR
+domain.
+See gdk_pixbuf_save() for more details."
+              version="2.4">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="buffer" transfer-ownership="none">
+            <array c:type="gchar**">
+              <type name="utf8"/>
+            </array>
+          </parameter>
+          <parameter name="buffer_size"
+                     direction="out"
+                     transfer-ownership="full">
+            <type name="size_t" c:type="gsize*"/>
+          </parameter>
+          <parameter name="type" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="error"
+                     transfer-ownership="none"
+                     allow-none="1"
+                     doc="return location for error, or %NULL">
+            <type name="GLib.Error" c:type="GError**"/>
+          </parameter>
+          <parameter transfer-ownership="none">
+            <varargs>
+            </varargs>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="save_to_bufferv"
+              c:identifier="gdk_pixbuf_save_to_bufferv"
+              doc="Saves pixbuf to a new buffer in format @type, which is currently &quot;jpeg&quot;,
+&quot;tiff&quot;, &quot;png&quot;, &quot;ico&quot; or &quot;bmp&quot;.  See gdk_pixbuf_save_to_buffer()
+for more details."
+              version="2.4"
+              throws="1">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="buffer" transfer-ownership="none">
+            <array c:type="gchar**">
+              <type name="utf8"/>
+            </array>
+          </parameter>
+          <parameter name="buffer_size"
+                     direction="out"
+                     transfer-ownership="full">
+            <type name="size_t" c:type="gsize*"/>
+          </parameter>
+          <parameter name="type" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="option_keys" transfer-ownership="none">
+            <array c:type="char**">
+              <type name="utf8"/>
+            </array>
+          </parameter>
+          <parameter name="option_values" transfer-ownership="none">
+            <array c:type="char**">
+              <type name="utf8"/>
+            </array>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="save_to_stream" c:identifier="gdk_pixbuf_save_to_stream">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="stream" transfer-ownership="none">
+            <type name="Gio.OutputStream" c:type="GOutputStream*"/>
+          </parameter>
+          <parameter name="type" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="cancellable"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <type name="Gio.Cancellable" c:type="GCancellable*"/>
+          </parameter>
+          <parameter name="error" transfer-ownership="none">
+            <type name="GLib.Error" c:type="GError**"/>
+          </parameter>
+          <parameter transfer-ownership="none">
+            <varargs>
+            </varargs>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_alpha"
+              c:identifier="gdk_pixbuf_add_alpha"
+              doc="is %FALSE, then the (@r, @g, @b) arguments will be ignored.
+Takes an existing pixbuf and adds an alpha channel to it.
+If the existing pixbuf already had an alpha channel, the channel
+values are copied from the original; otherwise, the alpha channel
+is initialized to 255 (full opacity).
+If @substitute_color is %TRUE, then the color specified by (@r, @g, @b) will be
+assigned zero opacity. That is, if you pass (255, 255, 255) for the
+substitute color, all white pixels will become fully transparent.">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+        <parameters>
+          <parameter name="substitute_color" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+          <parameter name="r" transfer-ownership="none">
+            <type name="uint8" c:type="guchar"/>
+          </parameter>
+          <parameter name="g" transfer-ownership="none">
+            <type name="uint8" c:type="guchar"/>
+          </parameter>
+          <parameter name="b" transfer-ownership="none">
+            <type name="uint8" c:type="guchar"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="copy_area"
+              c:identifier="gdk_pixbuf_copy_area"
+              doc="Copies a rectangular area from @src_pixbuf to @dest_pixbuf.  Conversion of
+pixbuf formats is done automatically.
+If the source rectangle overlaps the destination rectangle on the
+same pixbuf, it will be overwritten during the copy operation.
+Therefore, you can not use this function to scroll a pixbuf.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="src_x" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="src_y" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="width" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="height" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="dest_pixbuf" transfer-ownership="none">
+            <type name="Pixbuf" c:type="GdkPixbuf*"/>
+          </parameter>
+          <parameter name="dest_x" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="dest_y" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="saturate_and_pixelate"
+              c:identifier="gdk_pixbuf_saturate_and_pixelate"
+              doc="Modifies saturation and optionally pixelates @src, placing the result in
+saturation is reduced (the image turns toward grayscale); if greater than
+1.0, saturation is increased (the image gets more vivid colors). If @pixelate
+is %TRUE, then pixels are faded in a checkerboard pattern to create a
+pixelated image. @src and @dest must have the same image format, size, and
+rowstride.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="dest" transfer-ownership="none">
+            <type name="Pixbuf" c:type="GdkPixbuf*"/>
+          </parameter>
+          <parameter name="saturation" transfer-ownership="none">
+            <type name="float" c:type="gfloat"/>
+          </parameter>
+          <parameter name="pixelate" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="apply_embedded_orientation"
+              c:identifier="gdk_pixbuf_apply_embedded_orientation"
+              doc="Takes an existing pixbuf and checks for the presence of an
+associated &quot;orientation&quot; option, which may be provided by the
+jpeg loader (which reads the exif orientation tag) or the
+tiff loader (which reads the tiff orientation tag, and
+compensates it for the partial transforms performed by
+libtiff). If an orientation option/tag is present, the
+appropriate transform will be performed so that the pixbuf
+is oriented correctly.
+input pixbuf (with an increased reference count)."
+              version="2.12">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+      </method>
+      <method name="get_option"
+              c:identifier="gdk_pixbuf_get_option"
+              doc="Looks up @key in the list of options that may have been attached to the
+function using gdk_pixbuf_set_option().
+For instance, the ANI loader provides &quot;Title&quot; and &quot;Artist&quot; options.
+The ICO, XBM, and XPM loaders provide &quot;x_hot&quot; and &quot;y_hot&quot; hot-spot
+options for cursor definitions. The PNG loader provides the tEXt ancillary
+chunk key/value pairs as options. Since 2.12, the TIFF and JPEG loaders
+return an &quot;orientation&quot; option string that corresponds to the embedded
+TIFF/Exif orientation tag (if present).
+string that should not be freed or %NULL if @key was not found.">
+        <return-value transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <parameter name="key" transfer-ownership="none">
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="scale"
+              c:identifier="gdk_pixbuf_scale"
+              doc="Creates a transformation of the source image @src by scaling by
+then renders the rectangle (@dest_x, @dest_y, @dest_width,
+replacing the previous contents.
+Try to use gdk_pixbuf_scale_simple() first, this function is
+the industrial-strength power tool you can fall back to if
+gdk_pixbuf_scale_simple() isn&apos;t powerful enough.
+If the source rectangle overlaps the destination rectangle on the
+same pixbuf, it will be overwritten during the scaling which
+results in rendering artifacts.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="dest" transfer-ownership="none">
+            <type name="Pixbuf" c:type="GdkPixbuf*"/>
+          </parameter>
+          <parameter name="dest_x" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="dest_y" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="dest_width" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="dest_height" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="offset_x" transfer-ownership="none">
+            <type name="double" c:type="double"/>
+          </parameter>
+          <parameter name="offset_y" transfer-ownership="none">
+            <type name="double" c:type="double"/>
+          </parameter>
+          <parameter name="scale_x" transfer-ownership="none">
+            <type name="double" c:type="double"/>
+          </parameter>
+          <parameter name="scale_y" transfer-ownership="none">
+            <type name="double" c:type="double"/>
+          </parameter>
+          <parameter name="interp_type" transfer-ownership="none">
+            <type name="InterpType" c:type="GdkInterpType"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="composite"
+              c:identifier="gdk_pixbuf_composite"
+              doc="Creates a transformation of the source image @src by scaling by
+This gives an image in the coordinates of the destination pixbuf.
+The rectangle (@dest_x, @dest_y, @dest_width, @dest_height)
+is then composited onto the corresponding rectangle of the
+original destination image.
+When the destination rectangle contains parts not in the source
+image, the data at the edges of the source image is replicated
+to infinity.
+&lt;figure id=&quot;pixbuf-composite-diagram&quot;&gt;
+&lt;title&gt;Compositing of pixbufs&lt;/title&gt;
+&lt;graphic fileref=&quot;composite.png&quot; format=&quot;PNG&quot;/&gt;
+&lt;/figure&gt;">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="dest" transfer-ownership="none">
+            <type name="Pixbuf" c:type="GdkPixbuf*"/>
+          </parameter>
+          <parameter name="dest_x" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="dest_y" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="dest_width" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="dest_height" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="offset_x" transfer-ownership="none">
+            <type name="double" c:type="double"/>
+          </parameter>
+          <parameter name="offset_y" transfer-ownership="none">
+            <type name="double" c:type="double"/>
+          </parameter>
+          <parameter name="scale_x" transfer-ownership="none">
+            <type name="double" c:type="double"/>
+          </parameter>
+          <parameter name="scale_y" transfer-ownership="none">
+            <type name="double" c:type="double"/>
+          </parameter>
+          <parameter name="interp_type" transfer-ownership="none">
+            <type name="InterpType" c:type="GdkInterpType"/>
+          </parameter>
+          <parameter name="overall_alpha" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="composite_color"
+              c:identifier="gdk_pixbuf_composite_color"
+              doc="Creates a transformation of the source image @src by scaling by
+then composites the rectangle (@dest_x ,@dest_y, @dest_width,
+colors @color1 and @color2 and renders it onto the destination
+image.
+See gdk_pixbuf_composite_color_simple() for a simpler variant of this
+function suitable for many tasks.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="dest" transfer-ownership="none">
+            <type name="Pixbuf" c:type="GdkPixbuf*"/>
+          </parameter>
+          <parameter name="dest_x" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="dest_y" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="dest_width" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="dest_height" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="offset_x" transfer-ownership="none">
+            <type name="double" c:type="double"/>
+          </parameter>
+          <parameter name="offset_y" transfer-ownership="none">
+            <type name="double" c:type="double"/>
+          </parameter>
+          <parameter name="scale_x" transfer-ownership="none">
+            <type name="double" c:type="double"/>
+          </parameter>
+          <parameter name="scale_y" transfer-ownership="none">
+            <type name="double" c:type="double"/>
+          </parameter>
+          <parameter name="interp_type" transfer-ownership="none">
+            <type name="InterpType" c:type="GdkInterpType"/>
+          </parameter>
+          <parameter name="overall_alpha" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="check_x" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="check_y" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="check_size" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="color1" transfer-ownership="none">
+            <type name="uint32" c:type="guint32"/>
+          </parameter>
+          <parameter name="color2" transfer-ownership="none">
+            <type name="uint32" c:type="guint32"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="scale_simple"
+              c:identifier="gdk_pixbuf_scale_simple"
+              doc="Create a new #GdkPixbuf containing a copy of @src scaled to
+should be #GDK_INTERP_NEAREST if you want maximum speed (but when
+scaling down #GDK_INTERP_NEAREST is usually unusably ugly).  The
+default @interp_type should be #GDK_INTERP_BILINEAR which offers
+reasonable quality and speed.
+You can scale a sub-portion of @src by creating a sub-pixbuf
+pointing into @src; see gdk_pixbuf_new_subpixbuf().
+For more complicated scaling/compositing see gdk_pixbuf_scale()
+and gdk_pixbuf_composite().
+allocated for it.">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+        <parameters>
+          <parameter name="dest_width" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="dest_height" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="interp_type" transfer-ownership="none">
+            <type name="InterpType" c:type="GdkInterpType"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="composite_color_simple"
+              c:identifier="gdk_pixbuf_composite_color_simple"
+              doc="Creates a new #GdkPixbuf by scaling @src to @dest_width x
+allocated for it.">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+        <parameters>
+          <parameter name="dest_width" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="dest_height" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="interp_type" transfer-ownership="none">
+            <type name="InterpType" c:type="GdkInterpType"/>
+          </parameter>
+          <parameter name="overall_alpha" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="check_size" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="color1" transfer-ownership="none">
+            <type name="uint32" c:type="guint32"/>
+          </parameter>
+          <parameter name="color2" transfer-ownership="none">
+            <type name="uint32" c:type="guint32"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="rotate_simple"
+              c:identifier="gdk_pixbuf_rotate_simple"
+              doc="Rotates a pixbuf by a multiple of 90 degrees, and returns the
+result in a new pixbuf.
+allocated for it."
+              version="2.6">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+        <parameters>
+          <parameter name="angle" transfer-ownership="none">
+            <type name="PixbufRotation" c:type="GdkPixbufRotation"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="flip"
+              c:identifier="gdk_pixbuf_flip"
+              doc="Flips a pixbuf horizontally or vertically and returns the
+result in a new pixbuf.
+allocated for it."
+              version="2.6">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+        <parameters>
+          <parameter name="horizontal" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_option"
+              c:identifier="gdk_pixbuf_set_option"
+              doc="Attaches a key/value pair as an option to a #GdkPixbuf. If %key already
+exists in the list of options attached to @pixbuf, the new value is
+ignored and %FALSE is returned."
+              version="2.2">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="key" transfer-ownership="none">
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <property name="bits-per-sample"
+                writable="1"
+                construct-only="1"
+                doc="The number of bits per sample.
+Currently only 8 bit per sample are supported.">
+        <type name="int" c:type="gint"/>
+      </property>
+      <property name="colorspace" writable="1" construct-only="1">
+        <type name="Colorspace" c:type="GdkColorspace"/>
+      </property>
+      <property name="has-alpha" writable="1" construct-only="1">
+        <type name="boolean" c:type="gboolean"/>
+      </property>
+      <property name="height" writable="1" construct-only="1">
+        <type name="int" c:type="gint"/>
+      </property>
+      <property name="n-channels"
+                writable="1"
+                construct-only="1"
+                doc="The number of samples per pixel.
+Currently, only 3 or 4 samples per pixel are supported.">
+        <type name="int" c:type="gint"/>
+      </property>
+      <property name="pixels" writable="1" construct-only="1">
+        <type name="any" c:type="gpointer"/>
+      </property>
+      <property name="rowstride"
+                writable="1"
+                construct-only="1"
+                doc="The number of bytes between the start of a row and
+the start of the next row. This number must (obviously)
+be at least as large as the width of the pixbuf.">
+        <type name="int" c:type="gint"/>
+      </property>
+      <property name="width" writable="1" construct-only="1">
+        <type name="int" c:type="gint"/>
+      </property>
+    </class>
+    <enumeration name="PixbufAlphaMode"
+                 glib:type-name="GdkPixbufAlphaMode"
+                 glib:get-type="gdk_pixbuf_alpha_mode_get_type"
+                 c:type="GdkPixbufAlphaMode">
+      <member name="bilevel"
+              value="0"
+              c:identifier="GDK_PIXBUF_ALPHA_BILEVEL"
+              glib:nick="bilevel"/>
+      <member name="full"
+              value="1"
+              c:identifier="GDK_PIXBUF_ALPHA_FULL"
+              glib:nick="full"/>
+    </enumeration>
+    <class name="PixbufAnimation"
+           c:type="GdkPixbufAnimation"
+           parent="GObject.Object"
+           glib:type-name="GdkPixbufAnimation"
+           glib:get-type="gdk_pixbuf_animation_get_type"
+           glib:type-struct="PixbufAnimationClass">
+      <constructor name="new_from_file"
+                   c:identifier="gdk_pixbuf_animation_new_from_file"
+                   doc="Creates a new animation by loading it from a file.  The file format is
+detected automatically.  If the file&apos;s format does not support multi-frame
+images, then an animation with a single frame will be created. Possible errors
+are in the #GDK_PIXBUF_ERROR and #G_FILE_ERROR domains.
+there was no loader for the file&apos;s format, there was not enough memory to
+allocate the image buffer, or the image file contained invalid data."
+                   throws="1">
+        <return-value transfer-ownership="full">
+          <type name="PixbufAnimation" c:type="GdkPixbufAnimation*"/>
+        </return-value>
+        <parameters>
+          <parameter name="filename" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <virtual-method name="is_static_image" invoker="is_static_image">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+      </virtual-method>
+      <virtual-method name="get_static_image" invoker="get_static_image">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+      </virtual-method>
+      <virtual-method name="get_size">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="width" direction="out" transfer-ownership="full">
+            <type name="int" c:type="int*"/>
+          </parameter>
+          <parameter name="height" direction="out" transfer-ownership="full">
+            <type name="int" c:type="int*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="get_iter" invoker="get_iter">
+        <return-value transfer-ownership="full">
+          <type name="PixbufAnimationIter" c:type="GdkPixbufAnimationIter*"/>
+        </return-value>
+        <parameters>
+          <parameter name="start_time" transfer-ownership="none">
+            <type name="GLib.TimeVal" c:type="GTimeVal*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="ref"
+              c:identifier="gdk_pixbuf_animation_ref"
+              doc="Adds a reference to an animation."
+              deprecated="Use g_object_ref()."
+              deprecated-version="2.0">
+        <return-value transfer-ownership="full">
+          <type name="PixbufAnimation" c:type="GdkPixbufAnimation*"/>
+        </return-value>
+      </method>
+      <method name="unref"
+              c:identifier="gdk_pixbuf_animation_unref"
+              doc="Removes a reference from an animation."
+              deprecated="Use g_object_unref()."
+              deprecated-version="2.0">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="get_width"
+              c:identifier="gdk_pixbuf_animation_get_width"
+              doc="Queries the width of the bounding box of a pixbuf animation.">
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </return-value>
+      </method>
+      <method name="get_height"
+              c:identifier="gdk_pixbuf_animation_get_height"
+              doc="Queries the height of the bounding box of a pixbuf animation.">
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </return-value>
+      </method>
+      <method name="is_static_image"
+              c:identifier="gdk_pixbuf_animation_is_static_image"
+              doc="If you load a file with gdk_pixbuf_animation_new_from_file() and it turns
+out to be a plain, unanimated image, then this function will return
+%TRUE. Use gdk_pixbuf_animation_get_static_image() to retrieve
+the image.">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="get_static_image"
+              c:identifier="gdk_pixbuf_animation_get_static_image"
+              doc="If an animation is really just a plain image (has only one frame),
+this function returns that image. If the animation is an animation,
+this function returns a reasonable thing to display as a static
+unanimated image, which might be the first frame, or something more
+sophisticated. If an animation hasn&apos;t loaded any frames yet, this
+function will return %NULL.">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+      </method>
+      <method name="get_iter"
+              c:identifier="gdk_pixbuf_animation_get_iter"
+              doc="Get an iterator for displaying an animation. The iterator provides
+the frames that should be displayed at a given time.
+It should be freed after use with g_object_unref().
+marks the beginning of animation playback. After creating an
+iterator, you should immediately display the pixbuf returned by
+gdk_pixbuf_animation_iter_get_pixbuf(). Then, you should install a
+timeout (with g_timeout_add()) or by some other mechanism ensure
+that you&apos;ll update the image after
+gdk_pixbuf_animation_iter_get_delay_time() milliseconds. Each time
+the image is updated, you should reinstall the timeout with the new,
+possibly-changed delay time.
+As a shortcut, if @start_time is %NULL, the result of
+g_get_current_time() will be used automatically.
+To update the image (i.e. possibly change the result of
+gdk_pixbuf_animation_iter_get_pixbuf() to a new frame of the animation),
+call gdk_pixbuf_animation_iter_advance().
+If you&apos;re using #GdkPixbufLoader, in addition to updating the image
+after the delay time, you should also update it whenever you
+receive the area_updated signal and
+gdk_pixbuf_animation_iter_on_currently_loading_frame() returns
+%TRUE. In this case, the frame currently being fed into the loader
+has received new data, so needs to be refreshed. The delay time for
+a frame may also be modified after an area_updated signal, for
+example if the delay time for a frame is encoded in the data after
+the frame itself. So your timeout should be reinstalled after any
+area_updated signal.
+A delay time of -1 is possible, indicating &quot;infinite.&quot;">
+        <return-value transfer-ownership="full">
+          <type name="PixbufAnimationIter" c:type="GdkPixbufAnimationIter*"/>
+        </return-value>
+        <parameters>
+          <parameter name="start_time" transfer-ownership="none">
+            <type name="GLib.TimeVal" c:type="GTimeVal*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <field name="parent_instance">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+    </class>
+    <record name="PixbufAnimationClass"
+            c:type="GdkPixbufAnimationClass"
+            glib:is-gtype-struct-for="PixbufAnimation">
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="is_static_image">
+        <callback name="is_static_image" c:type="is_static_image">
+          <return-value transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="anim" transfer-ownership="none">
+              <type name="PixbufAnimation" c:type="GdkPixbufAnimation*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_static_image">
+        <callback name="get_static_image" c:type="get_static_image">
+          <return-value transfer-ownership="full">
+            <type name="Pixbuf" c:type="GdkPixbuf*"/>
+          </return-value>
+          <parameters>
+            <parameter name="anim" transfer-ownership="none">
+              <type name="PixbufAnimation" c:type="GdkPixbufAnimation*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_size">
+        <callback name="get_size" c:type="get_size">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="anim" transfer-ownership="none">
+              <type name="PixbufAnimation" c:type="GdkPixbufAnimation*"/>
+            </parameter>
+            <parameter name="width" direction="out" transfer-ownership="full">
+              <type name="int" c:type="int*"/>
+            </parameter>
+            <parameter name="height" direction="out" transfer-ownership="full">
+              <type name="int" c:type="int*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_iter">
+        <callback name="get_iter" c:type="get_iter">
+          <return-value transfer-ownership="full">
+            <type name="PixbufAnimationIter" c:type="GdkPixbufAnimationIter*"/>
+          </return-value>
+          <parameters>
+            <parameter name="anim" transfer-ownership="none">
+              <type name="PixbufAnimation" c:type="GdkPixbufAnimation*"/>
+            </parameter>
+            <parameter name="start_time" transfer-ownership="none">
+              <type name="GLib.TimeVal" c:type="GTimeVal*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+    </record>
+    <class name="PixbufAnimationIter"
+           c:type="GdkPixbufAnimationIter"
+           parent="GObject.Object"
+           glib:type-name="GdkPixbufAnimationIter"
+           glib:get-type="gdk_pixbuf_animation_iter_get_type"
+           glib:type-struct="PixbufAnimationIterClass">
+      <virtual-method name="get_delay_time" invoker="get_delay_time">
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </return-value>
+      </virtual-method>
+      <virtual-method name="get_pixbuf" invoker="get_pixbuf">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+      </virtual-method>
+      <virtual-method name="on_currently_loading_frame"
+                      invoker="on_currently_loading_frame">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+      </virtual-method>
+      <virtual-method name="advance" invoker="advance">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="current_time" transfer-ownership="none">
+            <type name="GLib.TimeVal" c:type="GTimeVal*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="get_delay_time"
+              c:identifier="gdk_pixbuf_animation_iter_get_delay_time"
+              doc="Gets the number of milliseconds the current pixbuf should be displayed,
+or -1 if the current pixbuf should be displayed forever. g_timeout_add()
+conveniently takes a timeout in milliseconds, so you can use a timeout
+to schedule the next update.">
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </return-value>
+      </method>
+      <method name="get_pixbuf"
+              c:identifier="gdk_pixbuf_animation_iter_get_pixbuf"
+              doc="Gets the current pixbuf which should be displayed; the pixbuf will
+be the same size as the animation itself
+(gdk_pixbuf_animation_get_width(), gdk_pixbuf_animation_get_height()).
+This pixbuf should be displayed for
+gdk_pixbuf_animation_iter_get_delay_time() milliseconds.  The caller
+of this function does not own a reference to the returned pixbuf;
+the returned pixbuf will become invalid when the iterator advances
+to the next frame, which may happen anytime you call
+gdk_pixbuf_animation_iter_advance(). Copy the pixbuf to keep it
+(don&apos;t just add a reference), as it may get recycled as you advance
+the iterator.">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+      </method>
+      <method name="on_currently_loading_frame"
+              c:identifier="gdk_pixbuf_animation_iter_on_currently_loading_frame"
+              doc="Used to determine how to respond to the area_updated signal on
+#GdkPixbufLoader when loading an animation. area_updated is emitted
+for an area of the frame currently streaming in to the loader. So if
+you&apos;re on the currently loading frame, you need to redraw the screen for
+the updated area.">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="advance"
+              c:identifier="gdk_pixbuf_animation_iter_advance"
+              doc="Possibly advances an animation to a new frame. Chooses the frame based
+on the start time passed to gdk_pixbuf_animation_get_iter().
+must be greater than or equal to the time passed to
+gdk_pixbuf_animation_get_iter(), and must increase or remain
+unchanged each time gdk_pixbuf_animation_iter_get_pixbuf() is
+called. That is, you can&apos;t go backward in time; animations only
+play forward.
+As a shortcut, pass %NULL for the current time and g_get_current_time()
+will be invoked on your behalf. So you only need to explicitly pass
+at double speed.
+If this function returns %FALSE, there&apos;s no need to update the animation
+display, assuming the display had been rendered prior to advancing;
+if %TRUE, you need to call gdk_animation_iter_get_pixbuf() and update the
+display with the new pixbuf.">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="current_time" transfer-ownership="none">
+            <type name="GLib.TimeVal" c:type="GTimeVal*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <field name="parent_instance">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+    </class>
+    <record name="PixbufAnimationIterClass"
+            c:type="GdkPixbufAnimationIterClass"
+            glib:is-gtype-struct-for="PixbufAnimationIter">
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="get_delay_time">
+        <callback name="get_delay_time" c:type="get_delay_time">
+          <return-value transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </return-value>
+          <parameters>
+            <parameter name="iter" transfer-ownership="none">
+              <type name="PixbufAnimationIter"
+                    c:type="GdkPixbufAnimationIter*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_pixbuf">
+        <callback name="get_pixbuf" c:type="get_pixbuf">
+          <return-value transfer-ownership="full">
+            <type name="Pixbuf" c:type="GdkPixbuf*"/>
+          </return-value>
+          <parameters>
+            <parameter name="iter" transfer-ownership="none">
+              <type name="PixbufAnimationIter"
+                    c:type="GdkPixbufAnimationIter*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="on_currently_loading_frame">
+        <callback name="on_currently_loading_frame"
+                  c:type="on_currently_loading_frame">
+          <return-value transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="iter" transfer-ownership="none">
+              <type name="PixbufAnimationIter"
+                    c:type="GdkPixbufAnimationIter*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="advance">
+        <callback name="advance" c:type="advance">
+          <return-value transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="iter" transfer-ownership="none">
+              <type name="PixbufAnimationIter"
+                    c:type="GdkPixbufAnimationIter*"/>
+            </parameter>
+            <parameter name="current_time" transfer-ownership="none">
+              <type name="GLib.TimeVal" c:type="GTimeVal*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+    </record>
+    <callback name="PixbufDestroyNotify" c:type="GdkPixbufDestroyNotify">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="pixels" transfer-ownership="none">
+          <array c:type="guchar*">
+            <type name="uint8"/>
+          </array>
+        </parameter>
+        <parameter name="data" transfer-ownership="none">
+          <type name="any" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <enumeration name="PixbufError"
+                 glib:type-name="GdkPixbufError"
+                 glib:get-type="gdk_pixbuf_error_get_type"
+                 c:type="GdkPixbufError"
+                 glib:error-quark="gdk_pixbuf_error_quark">
+      <member name="corrupt_image"
+              value="0"
+              c:identifier="GDK_PIXBUF_ERROR_CORRUPT_IMAGE"
+              glib:nick="corrupt-image"/>
+      <member name="insufficient_memory"
+              value="1"
+              c:identifier="GDK_PIXBUF_ERROR_INSUFFICIENT_MEMORY"
+              glib:nick="insufficient-memory"/>
+      <member name="bad_option"
+              value="2"
+              c:identifier="GDK_PIXBUF_ERROR_BAD_OPTION"
+              glib:nick="bad-option"/>
+      <member name="unknown_type"
+              value="3"
+              c:identifier="GDK_PIXBUF_ERROR_UNKNOWN_TYPE"
+              glib:nick="unknown-type"/>
+      <member name="unsupported_operation"
+              value="4"
+              c:identifier="GDK_PIXBUF_ERROR_UNSUPPORTED_OPERATION"
+              glib:nick="unsupported-operation"/>
+      <member name="failed"
+              value="5"
+              c:identifier="GDK_PIXBUF_ERROR_FAILED"
+              glib:nick="failed"/>
+    </enumeration>
+    <record name="PixbufFormat" c:type="GdkPixbufFormat">
+      <field name="name" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="signature" writable="1">
+        <type name="PixbufModulePattern" c:type="GdkPixbufModulePattern*"/>
+      </field>
+      <field name="domain" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="description" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="mime_types" writable="1">
+        <type name="utf8" c:type="gchar**"/>
+      </field>
+      <field name="extensions" writable="1">
+        <type name="utf8" c:type="gchar**"/>
+      </field>
+      <field name="flags" writable="1">
+        <type name="uint32" c:type="guint32"/>
+      </field>
+      <field name="disabled" writable="1">
+        <type name="boolean" c:type="gboolean"/>
+      </field>
+      <field name="license" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <method name="get_name"
+              c:identifier="gdk_pixbuf_format_get_name"
+              doc="Returns the name of the format."
+              version="2.2">
+        <return-value transfer-ownership="full">
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_description"
+              c:identifier="gdk_pixbuf_format_get_description"
+              doc="Returns a description of the format."
+              version="2.2">
+        <return-value transfer-ownership="full">
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_mime_types"
+              c:identifier="gdk_pixbuf_format_get_mime_types"
+              doc="Returns the mime types supported by the format.
+g_strfreev() when it is no longer needed."
+              version="2.2">
+        <return-value transfer-ownership="full">
+          <array c:type="gchar**">
+            <type name="utf8"/>
+          </array>
+        </return-value>
+      </method>
+      <method name="get_extensions"
+              c:identifier="gdk_pixbuf_format_get_extensions"
+              doc="Returns the filename extensions typically used for files in the
+given format.
+freed with g_strfreev() when it is no longer needed."
+              version="2.2">
+        <return-value transfer-ownership="full">
+          <array c:type="gchar**">
+            <type name="utf8"/>
+          </array>
+        </return-value>
+      </method>
+      <method name="is_writable"
+              c:identifier="gdk_pixbuf_format_is_writable"
+              doc="Returns whether pixbufs can be saved in the given format."
+              version="2.2">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="is_scalable"
+              c:identifier="gdk_pixbuf_format_is_scalable"
+              doc="Returns whether this image format is scalable. If a file is in a
+scalable format, it is preferable to load it at the desired size,
+rather than loading it at the default size and scaling the
+resulting pixbuf to the desired size."
+              version="2.6">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="is_disabled"
+              c:identifier="gdk_pixbuf_format_is_disabled"
+              doc="Returns whether this image format is disabled. See
+gdk_pixbuf_format_set_disabled()."
+              version="2.6">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="set_disabled"
+              c:identifier="gdk_pixbuf_format_set_disabled"
+              doc="Disables or enables an image format. If a format is disabled,
+gdk-pixbuf won&apos;t use the image loader for this format to load
+images. Applications can use this to avoid using image loaders
+with an inappropriate license, see gdk_pixbuf_format_get_license()."
+              version="2.6">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="disabled" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_license"
+              c:identifier="gdk_pixbuf_format_get_license"
+              doc="Returns information about the license of the image loader for the format. The
+returned string should be a shorthand for a wellknown license, e.g. &quot;LGPL&quot;,
+&quot;GPL&quot;, &quot;QPL&quot;, &quot;GPL/QPL&quot;, or &quot;other&quot; to indicate some other license.  This
+string should be freed with g_free() when it&apos;s no longer needed."
+              version="2.6">
+        <return-value transfer-ownership="full">
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+    </record>
+    <bitfield name="PixbufFormatFlags" c:type="GdkPixbufFormatFlags">
+      <member name="writable"
+              value="1"
+              c:identifier="GDK_PIXBUF_FORMAT_WRITABLE"/>
+      <member name="scalable"
+              value="2"
+              c:identifier="GDK_PIXBUF_FORMAT_SCALABLE"/>
+      <member name="threadsafe"
+              value="4"
+              c:identifier="GDK_PIXBUF_FORMAT_THREADSAFE"/>
+    </bitfield>
+    <class name="PixbufLoader"
+           c:type="GdkPixbufLoader"
+           parent="GObject.Object"
+           glib:type-name="GdkPixbufLoader"
+           glib:get-type="gdk_pixbuf_loader_get_type"
+           glib:type-struct="PixbufLoaderClass">
+      <constructor name="new"
+                   c:identifier="gdk_pixbuf_loader_new"
+                   doc="Creates a new pixbuf loader object.">
+        <return-value transfer-ownership="full">
+          <type name="PixbufLoader" c:type="GdkPixbufLoader*"/>
+        </return-value>
+      </constructor>
+      <constructor name="new_with_type"
+                   c:identifier="gdk_pixbuf_loader_new_with_type"
+                   doc="Creates a new pixbuf loader object that always attempts to parse
+image data as if it were an image of type @image_type, instead of
+identifying the type automatically. Useful if you want an error if
+the image isn&apos;t the expected type, for loading image formats
+that can&apos;t be reliably identified by looking at the data, or if
+the user manually forces a specific type.
+The list of supported image formats depends on what image loaders
+are installed, but typically &quot;png&quot;, &quot;jpeg&quot;, &quot;gif&quot;, &quot;tiff&quot; and
+&quot;xpm&quot; are among the supported formats. To obtain the full list of
+supported image formats, call gdk_pixbuf_format_get_name() on each
+of the #GdkPixbufFormat structs returned by gdk_pixbuf_get_formats()."
+                   throws="1">
+        <return-value transfer-ownership="full">
+          <type name="PixbufLoader" c:type="GdkPixbufLoader*"/>
+        </return-value>
+        <parameters>
+          <parameter name="image_type" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_with_mime_type"
+                   c:identifier="gdk_pixbuf_loader_new_with_mime_type"
+                   doc="Creates a new pixbuf loader object that always attempts to parse
+image data as if it were an image of mime type @mime_type, instead of
+identifying the type automatically. Useful if you want an error if
+the image isn&apos;t the expected mime type, for loading image formats
+that can&apos;t be reliably identified by looking at the data, or if
+the user manually forces a specific mime type.
+The list of supported mime types depends on what image loaders
+are installed, but typically &quot;image/png&quot;, &quot;image/jpeg&quot;, &quot;image/gif&quot;,
+&quot;image/tiff&quot; and &quot;image/x-xpixmap&quot; are among the supported mime types.
+To obtain the full list of supported mime types, call
+gdk_pixbuf_format_get_mime_types() on each of the #GdkPixbufFormat
+structs returned by gdk_pixbuf_get_formats()."
+                   version="2.4"
+                   throws="1">
+        <return-value transfer-ownership="full">
+          <type name="PixbufLoader" c:type="GdkPixbufLoader*"/>
+        </return-value>
+        <parameters>
+          <parameter name="mime_type" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <method name="set_size"
+              c:identifier="gdk_pixbuf_loader_set_size"
+              doc="Causes the image to be scaled while it is loaded. The desired
+image size can be determined relative to the original size of
+the image by calling gdk_pixbuf_loader_set_size() from a
+signal handler for the ::size-prepared signal.
+Attempts to set the desired image size  are ignored after the
+emission of the ::size-prepared signal."
+              version="2.2">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="width" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="height" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="write"
+              c:identifier="gdk_pixbuf_loader_write"
+              doc="This will cause a pixbuf loader to parse the next @count bytes of
+an image.  It will return %TRUE if the data was loaded successfully,
+and %FALSE if an error occurred.  In the latter case, the loader
+will be closed, and will not accept further writes. If %FALSE is
+returned, @error will be set to an error from the #GDK_PIXBUF_ERROR
+or #G_FILE_ERROR domains.
+cannot parse the buffer."
+              throws="1">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="buf" transfer-ownership="none">
+            <array c:type="guchar*">
+              <type name="uint8"/>
+            </array>
+          </parameter>
+          <parameter name="count" transfer-ownership="none">
+            <type name="size_t" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_pixbuf"
+              c:identifier="gdk_pixbuf_loader_get_pixbuf"
+              doc="Queries the #GdkPixbuf that a pixbuf loader is currently creating.
+In general it only makes sense to call this function after the
+&quot;area-prepared&quot; signal has been emitted by the loader; this means
+that enough data has been read to know the size of the image that
+will be allocated.  If the loader has not received enough data via
+gdk_pixbuf_loader_write(), then this function returns %NULL.  The
+returned pixbuf will be the same in all future calls to the loader,
+so simply calling g_object_ref() should be sufficient to continue
+using it.  Additionally, if the loader is an animation, it will
+return the &quot;static image&quot; of the animation
+(see gdk_pixbuf_animation_get_static_image()).
+enough data has been read to determine how to create the image buffer.">
+        <return-value transfer-ownership="full">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </return-value>
+      </method>
+      <method name="get_animation"
+              c:identifier="gdk_pixbuf_loader_get_animation"
+              doc="Queries the #GdkPixbufAnimation that a pixbuf loader is currently creating.
+In general it only makes sense to call this function after the &quot;area-prepared&quot;
+signal has been emitted by the loader. If the loader doesn&apos;t have enough
+bytes yet (hasn&apos;t emitted the &quot;area-prepared&quot; signal) this function will
+return %NULL.
+t enough data has been read to determine the information.">
+        <return-value transfer-ownership="full">
+          <type name="PixbufAnimation" c:type="GdkPixbufAnimation*"/>
+        </return-value>
+      </method>
+      <method name="close"
+              c:identifier="gdk_pixbuf_loader_close"
+              doc="Informs a pixbuf loader that no further writes with
+gdk_pixbuf_loader_write() will occur, so that it can free its
+internal loading structures. Also, tries to parse any data that
+hasn&apos;t yet been parsed; if the remaining data is partial or
+corrupt, an error will be returned.  If %FALSE is returned, @error
+will be set to an error from the #GDK_PIXBUF_ERROR or #G_FILE_ERROR
+domains. If you&apos;re just cancelling a load rather than expecting it
+to be finished, passing %NULL for @error to ignore it is
+reasonable.
+ssed out via the update_area signal"
+              throws="1">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="get_format"
+              c:identifier="gdk_pixbuf_loader_get_format"
+              doc="Obtains the available information about the format of the
+currently loading image file.
+by GdkPixbuf and should not be freed."
+              version="2.2">
+        <return-value transfer-ownership="full">
+          <type name="PixbufFormat" c:type="GdkPixbufFormat*"/>
+        </return-value>
+      </method>
+      <field name="parent_instance">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="priv">
+        <type name="any" c:type="gpointer"/>
+      </field>
+      <glib:signal name="area-prepared"
+                   doc="This signal is emitted when the pixbuf loader has allocated the
+pixbuf in the desired size.  After this signal is emitted,
+applications can call gdk_pixbuf_loader_get_pixbuf() to fetch
+the partially-loaded pixbuf.">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </glib:signal>
+      <glib:signal name="area-updated"
+                   doc="This signal is emitted when a significant area of the image being
+loaded has been updated.  Normally it means that a complete
+scanline has been read in, but it could be a different area as
+well.  Applications can use this signal to know when to repaint
+areas of an image that is being loaded.">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="x" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+          <parameter name="y" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+          <parameter name="width" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+          <parameter name="height" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+      <glib:signal name="closed"
+                   doc="This signal is emitted when gdk_pixbuf_loader_close() is called.
+It can be used by different parts of an application to receive
+notification when an image loader is closed by the code that
+drives it.">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </glib:signal>
+      <glib:signal name="size-prepared"
+                   doc="This signal is emitted when the pixbuf loader has been fed the
+initial amount of data that is required to figure out the size
+of the image that it will create.  Applications can call
+gdk_pixbuf_loader_set_size() in response to this signal to set
+the desired size to which the image should be scaled.">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="width" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+          <parameter name="height" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+    </class>
+    <record name="PixbufLoaderClass"
+            c:type="GdkPixbufLoaderClass"
+            glib:is-gtype-struct-for="PixbufLoader">
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="size_prepared">
+        <callback name="size_prepared" c:type="size_prepared">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="loader" transfer-ownership="none">
+              <type name="PixbufLoader" c:type="GdkPixbufLoader*"/>
+            </parameter>
+            <parameter name="width" transfer-ownership="none">
+              <type name="int" c:type="int"/>
+            </parameter>
+            <parameter name="height" transfer-ownership="none">
+              <type name="int" c:type="int"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="area_prepared">
+        <callback name="area_prepared" c:type="area_prepared">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="loader" transfer-ownership="none">
+              <type name="PixbufLoader" c:type="GdkPixbufLoader*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="area_updated">
+        <callback name="area_updated" c:type="area_updated">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="loader" transfer-ownership="none">
+              <type name="PixbufLoader" c:type="GdkPixbufLoader*"/>
+            </parameter>
+            <parameter name="x" transfer-ownership="none">
+              <type name="int" c:type="int"/>
+            </parameter>
+            <parameter name="y" transfer-ownership="none">
+              <type name="int" c:type="int"/>
+            </parameter>
+            <parameter name="width" transfer-ownership="none">
+              <type name="int" c:type="int"/>
+            </parameter>
+            <parameter name="height" transfer-ownership="none">
+              <type name="int" c:type="int"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="closed">
+        <callback name="closed" c:type="closed">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="loader" transfer-ownership="none">
+              <type name="PixbufLoader" c:type="GdkPixbufLoader*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+    </record>
+    <record name="PixbufModule" c:type="GdkPixbufModule">
+      <field name="module_name" writable="1">
+        <type name="utf8" c:type="char*"/>
+      </field>
+      <field name="module_path" writable="1">
+        <type name="utf8" c:type="char*"/>
+      </field>
+      <field name="module" writable="1">
+        <type name="GModule.Module" c:type="GModule*"/>
+      </field>
+      <field name="info" writable="1">
+        <type name="PixbufFormat" c:type="GdkPixbufFormat*"/>
+      </field>
+    </record>
+    <callback name="PixbufModuleFillInfoFunc"
+              c:type="GdkPixbufModuleFillInfoFunc">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="info" transfer-ownership="none">
+          <type name="PixbufFormat" c:type="GdkPixbufFormat*"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <callback name="PixbufModuleFillVtableFunc"
+              c:type="GdkPixbufModuleFillVtableFunc">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="module" transfer-ownership="none">
+          <type name="PixbufModule" c:type="GdkPixbufModule*"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <record name="PixbufModulePattern" c:type="GdkPixbufModulePattern">
+      <field name="prefix" writable="1">
+        <type name="utf8" c:type="char*"/>
+      </field>
+      <field name="mask" writable="1">
+        <type name="utf8" c:type="char*"/>
+      </field>
+      <field name="relevance" writable="1">
+        <type name="int" c:type="int"/>
+      </field>
+    </record>
+    <callback name="PixbufModulePreparedFunc"
+              c:type="GdkPixbufModulePreparedFunc">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="pixbuf" transfer-ownership="none">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </parameter>
+        <parameter name="anim" transfer-ownership="none">
+          <type name="PixbufAnimation" c:type="GdkPixbufAnimation*"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none" closure="2">
+          <type name="any" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <callback name="PixbufModuleSizeFunc" c:type="GdkPixbufModuleSizeFunc">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="width" direction="out" transfer-ownership="full">
+          <type name="int" c:type="gint*"/>
+        </parameter>
+        <parameter name="height" direction="out" transfer-ownership="full">
+          <type name="int" c:type="gint*"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none" closure="2">
+          <type name="any" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <callback name="PixbufModuleUpdatedFunc"
+              c:type="GdkPixbufModuleUpdatedFunc">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="pixbuf" transfer-ownership="none">
+          <type name="Pixbuf" c:type="GdkPixbuf*"/>
+        </parameter>
+        <parameter name="x" transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </parameter>
+        <parameter name="y" transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </parameter>
+        <parameter name="width" transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </parameter>
+        <parameter name="height" transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none" closure="5">
+          <type name="any" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <class name="PixbufNonAnim"
+           c:type="GdkPixbufNonAnim"
+           parent="PixbufAnimation"
+           glib:type-name="GdkPixbufNonAnim"
+           glib:get-type="gdk_pixbuf_non_anim_get_type">
+      <constructor name="new" c:identifier="gdk_pixbuf_non_anim_new">
+        <return-value transfer-ownership="full">
+          <type name="PixbufNonAnim" c:type="GdkPixbufAnimation*"/>
+        </return-value>
+        <parameters>
+          <parameter name="pixbuf" transfer-ownership="none">
+            <type name="Pixbuf" c:type="GdkPixbuf*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+    </class>
+    <enumeration name="PixbufRotation"
+                 glib:type-name="GdkPixbufRotation"
+                 glib:get-type="gdk_pixbuf_rotation_get_type"
+                 c:type="GdkPixbufRotation">
+      <member name="none"
+              value="0"
+              c:identifier="GDK_PIXBUF_ROTATE_NONE"
+              glib:nick="none"/>
+      <member name="counterclockwise"
+              value="90"
+              c:identifier="GDK_PIXBUF_ROTATE_COUNTERCLOCKWISE"
+              glib:nick="counterclockwise"/>
+      <member name="upsidedown"
+              value="180"
+              c:identifier="GDK_PIXBUF_ROTATE_UPSIDEDOWN"
+              glib:nick="upsidedown"/>
+      <member name="clockwise"
+              value="270"
+              c:identifier="GDK_PIXBUF_ROTATE_CLOCKWISE"
+              glib:nick="clockwise"/>
+    </enumeration>
+    <callback name="PixbufSaveFunc" c:type="GdkPixbufSaveFunc">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="buf" transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+        <parameter name="count" transfer-ownership="none">
+          <type name="size_t" c:type="gsize"/>
+        </parameter>
+        <parameter name="error" transfer-ownership="none">
+          <type name="GLib.Error" c:type="GError**"/>
+        </parameter>
+        <parameter name="data" transfer-ownership="none">
+          <type name="any" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <class name="PixbufSimpleAnim"
+           c:type="GdkPixbufSimpleAnim"
+           parent="PixbufAnimation"
+           glib:type-name="GdkPixbufSimpleAnim"
+           glib:get-type="gdk_pixbuf_simple_anim_get_type"
+           glib:type-struct="PixbufSimpleAnimClass">
+      <constructor name="new"
+                   c:identifier="gdk_pixbuf_simple_anim_new"
+                   doc="Creates a new, empty animation."
+                   version="2.8">
+        <return-value transfer-ownership="full">
+          <type name="PixbufSimpleAnim" c:type="GdkPixbufSimpleAnim*"/>
+        </return-value>
+        <parameters>
+          <parameter name="width" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+          <parameter name="height" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+          <parameter name="rate" transfer-ownership="none">
+            <type name="float" c:type="gfloat"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <method name="add_frame"
+              c:identifier="gdk_pixbuf_simple_anim_add_frame"
+              doc="Adds a new frame to @animation. The @pixbuf must
+have the dimensions specified when the animation
+was constructed."
+              version="2.8">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="pixbuf" transfer-ownership="none">
+            <type name="Pixbuf" c:type="GdkPixbuf*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_loop"
+              c:identifier="gdk_pixbuf_simple_anim_set_loop"
+              doc="Sets whether @animation should loop indefinitely when it reaches the end."
+              version="2.18">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="loop" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_loop"
+              c:identifier="gdk_pixbuf_simple_anim_get_loop"
+              doc="Gets whether @animation should loop indefinitely when it reaches the end."
+              version="2.18">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <property name="loop"
+                version="2.18"
+                writable="1"
+                doc="Whether the animation should loop when it reaches the end.">
+        <type name="boolean" c:type="gboolean"/>
+      </property>
+    </class>
+    <record name="PixbufSimpleAnimClass"
+            c:type="GdkPixbufSimpleAnimClass"
+            glib:is-gtype-struct-for="PixbufSimpleAnim">
+    </record>
+    <class name="PixbufSimpleAnimIter"
+           c:type="GdkPixbufSimpleAnimIter"
+           parent="PixbufAnimationIter"
+           glib:type-name="GdkPixbufSimpleAnimIter"
+           glib:get-type="gdk_pixbuf_simple_anim_iter_get_type">
+    </class>
+    <record name="Pixdata"
+            c:type="GdkPixdata"
+            doc="#GDK_PIXBUF_MAGIC_NUMBER here.
+#GDK_PIXDATA_HEADER_LENGTH + length of @pixel_data.
+encoding, in a #GdkPixdataType.
+and @rowstride.
+A #GdkPixdata contains pixbuf information in a form suitable for
+serialization and streaming.">
+      <field name="magic" writable="1">
+        <type name="uint32" c:type="guint32"/>
+      </field>
+      <field name="length" writable="1">
+        <type name="int32" c:type="gint32"/>
+      </field>
+      <field name="pixdata_type" writable="1">
+        <type name="uint32" c:type="guint32"/>
+      </field>
+      <field name="rowstride" writable="1">
+        <type name="uint32" c:type="guint32"/>
+      </field>
+      <field name="width" writable="1">
+        <type name="uint32" c:type="guint32"/>
+      </field>
+      <field name="height" writable="1">
+        <type name="uint32" c:type="guint32"/>
+      </field>
+      <field name="pixel_data" writable="1">
+        <type name="any" c:type="guint8*"/>
+      </field>
+      <method name="serialize"
+              c:identifier="gdk_pixdata_serialize"
+              doc="Serializes a #GdkPixdata structure into a byte stream.
+The byte stream consists of a straightforward writeout of the
+#GdkPixdata fields in network byte order, plus the @pixel_data
+bytes the structure points to.
+#GdkPixdata structure.">
+        <return-value transfer-ownership="full">
+          <array c:type="guint8*">
+            <type name="uint8"/>
+          </array>
+        </return-value>
+        <parameters>
+          <parameter name="stream_length_p"
+                     direction="out"
+                     transfer-ownership="full">
+            <type name="uint" c:type="guint*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="deserialize"
+              c:identifier="gdk_pixdata_deserialize"
+              doc="Deserializes (reconstruct) a #GdkPixdata structure from a byte stream.
+The byte stream consists of a straightforward writeout of the
+#GdkPixdata fields in network byte order, plus the @pixel_data
+bytes the structure points to.
+The @pixdata contents are reconstructed byte by byte and are checked
+for validity. This function may fail with %GDK_PIXBUF_CORRUPT_IMAGE
+or %GDK_PIXBUF_ERROR_UNKNOWN_TYPE.
+%FALSE otherwise."
+              throws="1">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="stream_length" transfer-ownership="none">
+            <type name="uint" c:type="guint"/>
+          </parameter>
+          <parameter name="stream" transfer-ownership="none">
+            <array c:type="guint8*">
+              <type name="uint8"/>
+            </array>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="from_pixbuf"
+              c:identifier="gdk_pixdata_from_pixbuf"
+              doc="Converts a #GdkPixbuf to a #GdkPixdata. If @use_rle is %TRUE, the
+pixel data is run-length encoded into newly-allocated memory and a
+pointer to that memory is returned.
+for the run-length encoded pixel data, otherwise %NULL.">
+        <return-value transfer-ownership="none">
+          <type name="any" c:type="gpointer"/>
+        </return-value>
+        <parameters>
+          <parameter name="pixbuf" transfer-ownership="none">
+            <type name="Pixbuf" c:type="GdkPixbuf*"/>
+          </parameter>
+          <parameter name="use_rle" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="to_csource"
+              c:identifier="gdk_pixdata_to_csource"
+              doc="source to be generated.
+Generates C source code suitable for compiling images directly
+into programs.
+GTK+ ships with a program called &lt;command&gt;gdk-pixbuf-csource&lt;/command&gt;
+which offers a command line interface to this function.
+of @pixdata.">
+        <return-value transfer-ownership="full">
+          <type name="GLib.String" c:type="GString*"/>
+        </return-value>
+        <parameters>
+          <parameter name="name" transfer-ownership="none">
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="dump_type" transfer-ownership="none">
+            <type name="PixdataDumpType" c:type="GdkPixdataDumpType"/>
+          </parameter>
+        </parameters>
+      </method>
+    </record>
+    <bitfield name="PixdataDumpType" c:type="GdkPixdataDumpType">
+      <member name="pixdata_stream"
+              value="0"
+              c:identifier="GDK_PIXDATA_DUMP_PIXDATA_STREAM"/>
+      <member name="pixdata_struct"
+              value="1"
+              c:identifier="GDK_PIXDATA_DUMP_PIXDATA_STRUCT"/>
+      <member name="macros" value="2" c:identifier="GDK_PIXDATA_DUMP_MACROS"/>
+      <member name="gtypes" value="0" c:identifier="GDK_PIXDATA_DUMP_GTYPES"/>
+      <member name="ctypes"
+              value="256"
+              c:identifier="GDK_PIXDATA_DUMP_CTYPES"/>
+      <member name="static"
+              value="512"
+              c:identifier="GDK_PIXDATA_DUMP_STATIC"/>
+      <member name="const" value="1024" c:identifier="GDK_PIXDATA_DUMP_CONST"/>
+      <member name="rle_decoder"
+              value="65536"
+              c:identifier="GDK_PIXDATA_DUMP_RLE_DECODER"/>
+    </bitfield>
+    <bitfield name="PixdataType"
+              doc="and an alpha value.
+be up to 127 bytes long; their length is stored in a single byte
+preceding the pixel data for the run. If a run is constant, its length
+byte has the high bit set and the pixel data consists of a single pixel
+which must be repeated.
+An enumeration containing three sets of flags for a #GdkPixdata struct:
+one for the used colorspace, one for the width of the samples and one
+for the encoding of the pixel data."
+              c:type="GdkPixdataType">
+      <member name="color_type_rgb"
+              value="1"
+              c:identifier="GDK_PIXDATA_COLOR_TYPE_RGB"/>
+      <member name="color_type_rgba"
+              value="2"
+              c:identifier="GDK_PIXDATA_COLOR_TYPE_RGBA"/>
+      <member name="color_type_mask"
+              value="255"
+              c:identifier="GDK_PIXDATA_COLOR_TYPE_MASK"/>
+      <member name="sample_width_8"
+              value="65536"
+              c:identifier="GDK_PIXDATA_SAMPLE_WIDTH_8"/>
+      <member name="sample_width_mask"
+              value="983040"
+              c:identifier="GDK_PIXDATA_SAMPLE_WIDTH_MASK"/>
+      <member name="encoding_raw"
+              value="16777216"
+              c:identifier="GDK_PIXDATA_ENCODING_RAW"/>
+      <member name="encoding_rle"
+              value="33554432"
+              c:identifier="GDK_PIXDATA_ENCODING_RLE"/>
+      <member name="encoding_mask"
+              value="251658240"
+              c:identifier="GDK_PIXDATA_ENCODING_MASK"/>
+    </bitfield>
+    <constant name="VERSION" value="2.20.1">
+      <type name="utf8"/>
+    </constant>
+  </namespace>
+</repository>
