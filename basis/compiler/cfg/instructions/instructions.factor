@@ -609,17 +609,73 @@ use: src/tagged-rep
 literal: offset ;
 
 ! FFI
-INSN: ##alien-invoke
-literal: params stack-frame ;
+INSN: ##stack-frame
+literal: stack-frame ;
 
-INSN: ##alien-indirect
-literal: params stack-frame ;
+INSN: ##box
+literal: n rep boxer ;
+
+INSN: ##box-long-long
+literal: n boxer ;
+
+INSN: ##box-small-struct
+literal: c-type ;
+
+INSN: ##box-large-struct
+literal: n c-type ;
+
+INSN: ##unbox
+literal: n rep unboxer ;
+
+INSN: ##unbox-long-long
+literal: n unboxer ;
+
+INSN: ##unbox-large-struct
+literal: n c-type ;
+
+INSN: ##unbox-small-struct
+literal: c-type ;
+
+INSN: ##pop-stack
+literal: n ;
+
+INSN: ##pop-context-stack ;
+
+INSN: ##prepare-box-struct ;
+
+INSN: ##load-param-reg
+literal: offset reg rep ;
+
+INSN: ##push-stack ;
+
+INSN: ##alien-invoke
+literal: symbols dll ;
+
+INSN: ##cleanup
+literal: params ;
+
+INSN: ##prepare-alien-indirect ;
+
+INSN: ##alien-indirect ;
 
 INSN: ##alien-assembly
-literal: params stack-frame ;
+literal: quot ;
+
+INSN: ##push-context-stack ;
+
+INSN: ##save-param-reg
+literal: offset reg rep ;
+
+INSN: ##begin-callback ;
 
 INSN: ##alien-callback
-literal: params stack-frame ;
+literal: quot ;
+
+INSN: ##end-callback ;
+
+INSN: ##to-nv ;
+
+INSN: ##from-nv ;
 
 ! Control flow
 INSN: ##phi
@@ -757,15 +813,6 @@ UNION: clobber-insn
 ##call-gc
 ##unary-float-function
 ##binary-float-function ;
-
-! Instructions that kill all live vregs
-UNION: kill-vreg-insn
-##call
-##prologue
-##epilogue
-##alien-invoke
-##alien-indirect
-##alien-callback ;
 
 ! Instructions that have complex expansions and require that the
 ! output registers are not equal to any of the input registers

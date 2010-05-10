@@ -249,13 +249,9 @@ M: x86.64 %end-callback ( -- )
     param-reg-0 %mov-vm-ptr
     "end_callback" f %alien-invoke ;
 
-M: x86.64 %end-callback-value ( ctype -- )
-    %pop-context-stack
-    nv-reg param-reg-0 MOV
-    %end-callback
-    param-reg-0 nv-reg MOV
-    ! Unbox former top of data stack to return registers
-    unbox-return ;
+M: x86.64 %to-nv ( -- ) nv-reg param-reg-0 MOV ;
+
+M: x86.64 %from-nv ( -- ) param-reg-0 nv-reg MOV ;
 
 : float-function-param ( i src -- )
     [ float-regs cdecl param-regs nth ] dip double-rep %copy ;

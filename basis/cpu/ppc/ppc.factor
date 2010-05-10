@@ -836,14 +836,9 @@ M: ppc %end-callback ( -- )
     3 %load-vm-addr
     "end_callback" f %alien-invoke ;
 
-M: ppc %end-callback-value ( ctype -- )
-    ! Save top of data stack
-    16 ds-reg 0 LWZ
-    %end-callback
-    ! Restore top of data stack
-    3 16 MR
-    ! Unbox former top of data stack to return registers
-    unbox-return ;
+M: ppc %to-nv ( -- ) 16 3 MR ;
+
+M: ppc %from-nv ( -- ) 3 16 MR ;
 
 M: ppc %unbox-small-struct ( size -- )
     heap-size cell align cell /i {

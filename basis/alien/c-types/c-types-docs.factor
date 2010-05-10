@@ -43,21 +43,6 @@ HELP: c-setter
 { $description "Outputs a quotation which writes values of this C type to a C structure." }
 { $errors "Throws an error if the type does not exist." } ;
 
-HELP: box-parameter
-{ $values { "n" math:integer } { "c-type" "a C type" } }
-{ $description "Generates code for converting a C value stored at  offset " { $snippet "n" } " from the top of the stack into a Factor object to be pushed on the data stack." }
-{ $notes "This is an internal word used by the compiler when compiling callbacks." } ;
-
-HELP: box-return
-{ $values { "c-type" "a C type" } }
-{ $description "Generates code for converting a C value stored in return registers into a Factor object to be pushed on the data stack." }
-{ $notes "This is an internal word used by the compiler when compiling alien calls." } ;
-
-HELP: unbox-return
-{ $values { "c-type" "a C type" } }
-{ $description "Generates code for converting a Factor value on the data stack into a C value to be stored in the return registers." }
-{ $notes "This is an internal word used by the compiler when compiling callbacks." } ;
-
 HELP: define-deref
 { $values { "c-type" "a C type" } }
 { $description "Defines a word " { $snippet "*name" } " with stack effect " { $snippet "( c-ptr -- value )" } " for reading a value with C type " { $snippet "name" } " stored at an alien pointer." }
