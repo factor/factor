@@ -504,12 +504,6 @@ M:: x86 %check-nursery-branch ( label size cc temp1 temp2 -- )
 M: x86 %alien-global ( dst symbol library -- )
     [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;    
 
-M:: x86 %push-context-stack ( src temp -- )
-    temp %context
-    temp "datastack" context-field-offset [+] bootstrap-cell ADD
-    temp temp "datastack" context-field-offset [+] MOV
-    temp [] src MOV ;
-
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
 :: (%boolean) ( dst temp insn -- )
