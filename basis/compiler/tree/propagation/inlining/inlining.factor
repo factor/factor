@@ -90,7 +90,7 @@ SYMBOL: history
     word already-inlined? [ f ] [
         #call word splicing-body [
             word add-to-history
-            #call (>>body)
+            #call body<<
             #call propagate-body
         ] [ f ] if*
     ] if ;

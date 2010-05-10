@@ -16,11 +16,11 @@ checksum
 definitions ;
 
 : record-top-level-form ( quot file -- )
-    (>>top-level-form)
+    top-level-form<<
     [ ] [ H{ } notify-definition-observers ] if-bootstrapping ;
 
 : record-checksum ( lines source-file -- )
-    [ crc32 checksum-lines ] dip (>>checksum) ;
+    [ crc32 checksum-lines ] dip checksum<< ;
 
 : record-definitions ( file -- )
     new-definitions get >>definitions drop ;

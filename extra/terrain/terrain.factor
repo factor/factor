@@ -120,7 +120,7 @@ terrain-world H{
     read-keyboard keys>> :> keys
 
     key-left-shift keys nth
-    VELOCITY-MODIFIER-FAST VELOCITY-MODIFIER-NORMAL ? player (>>velocity-modifier)
+    VELOCITY-MODIFIER-FAST VELOCITY-MODIFIER-NORMAL ? player velocity-modifier<<
 
     {
         [ key-1 keys nth 1  f ? ]
@@ -128,7 +128,7 @@ terrain-world H{
         [ key-3 keys nth 3  f ? ]
         [ key-4 keys nth 4  f ? ]
         [ key-5 keys nth 10000 f ? ]
-    } 0|| player (>>reverse-time)
+    } 0|| player reverse-time<<
 
     key-w keys nth [ player walk-forward ] when 
     key-s keys nth [ player walk-backward ] when 
@@ -203,7 +203,7 @@ TYPED:: collide ( world: terrain-world player: player -- )
     world history>> :> history
     history length 0 > [
         history length reverse-time 1 - - 1 max history set-length
-        history pop world (>>player)
+        history pop world player<<
     ] when ;
 
 : tick-player-forward ( world player -- )

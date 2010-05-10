@@ -41,7 +41,7 @@ M: value-word definer drop \ VALUE: f ;
 M: value-word definition drop f ;
 
 : set-value ( value word -- )
-    def>> first (>>obj) ;
+    def>> first obj<< ;
 
 SYNTAX: to:
     scan-word literalize suffix!

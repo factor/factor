@@ -82,7 +82,7 @@ M: ##dispatch generate-insn
     ] tri ;
 
 : generate ( cfg -- code )
-    dup label>> [
+    [
         H{ } clone labels set
         linearization-order
         [ number-blocks ] [ [ generate-block ] each ] bi
@@ -90,6 +90,8 @@ M: ##dispatch generate-insn
 
 ! Special cases
 M: ##no-tco generate-insn drop ;
+
+M: ##stack-frame generate-insn drop ;
 
 M: ##prologue generate-insn
     drop
@@ -122,6 +124,7 @@ SYNTAX: CODEGEN:
 CODEGEN: ##load-integer %load-immediate
 CODEGEN: ##load-tagged %load-immediate
 CODEGEN: ##load-reference %load-reference
+CODEGEN: ##load-float %load-float
 CODEGEN: ##load-double %load-double
 CODEGEN: ##load-vector %load-vector
 CODEGEN: ##peek %peek
@@ -243,6 +246,7 @@ CODEGEN: ##compare-integer-imm %compare-integer-imm
 CODEGEN: ##compare-float-ordered %compare-float-ordered
 CODEGEN: ##compare-float-unordered %compare-float-unordered
 CODEGEN: ##save-context %save-context
+CODEGEN: ##restore-context %restore-context
 CODEGEN: ##vm-field %vm-field
 CODEGEN: ##set-vm-field %set-vm-field
 CODEGEN: ##alien-global %alien-global
@@ -250,6 +254,7 @@ CODEGEN: ##call-gc %call-gc
 CODEGEN: ##spill %spill
 CODEGEN: ##reload %reload
 
+! Conditional branches
 <<
 
 SYNTAX: CONDITIONAL:
@@ -269,3 +274,24 @@ CONDITIONAL: ##check-nursery-branch %check-nursery-branch
 CONDITIONAL: ##fixnum-add %fixnum-add
 CONDITIONAL: ##fixnum-sub %fixnum-sub
 CONDITIONAL: ##fixnum-mul %fixnum-mul
+
+! FFI
+CODEGEN: ##box %box
+CODEGEN: ##box-long-long %box-long-long
+CODEGEN: ##box-large-struct %box-large-struct
+CODEGEN: ##box-small-struct %box-small-struct
+CODEGEN: ##unbox %unbox
+CODEGEN: ##unbox-long-long %unbox-long-long
+CODEGEN: ##unbox-large-struct %unbox-large-struct
+CODEGEN: ##unbox-small-struct %unbox-small-struct
+CODEGEN: ##prepare-box-struct %prepare-box-struct
+CODEGEN: ##load-param-reg %load-param-reg
+CODEGEN: ##alien-invoke %alien-invoke
+CODEGEN: ##cleanup %cleanup
+CODEGEN: ##alien-indirect %alien-indirect
+CODEGEN: ##save-param-reg %save-param-reg
+CODEGEN: ##begin-callback %begin-callback
+CODEGEN: ##alien-callback %alien-callback
+CODEGEN: ##end-callback %end-callback
+
+M: ##alien-assembly generate-insn quot>> call( -- ) ;

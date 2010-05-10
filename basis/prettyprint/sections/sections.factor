@@ -41,7 +41,7 @@ TUPLE: pprinter last-newline line-count indent ;
     dup pprinter get last-newline>> = [
         drop
     ] [
-        pprinter get (>>last-newline)
+        pprinter get last-newline<<
         line-limit? [
             "..." write pprinter get return
         ] when
@@ -338,8 +338,8 @@ M: block long-section ( block -- )
 
 : pprinter-manifest ( -- manifest )
     <manifest>
-    [ [ pprinter-use get keys >vector ] dip (>>search-vocabs) ]
-    [ [ pprinter-in get ] dip (>>current-vocab) ]
+    [ [ pprinter-use get keys >vector ] dip search-vocabs<< ]
+    [ [ pprinter-in get ] dip current-vocab<< ]
     [ ]
     tri ;
 

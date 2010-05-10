@@ -114,7 +114,7 @@ MACRO: size-case-type ( cases -- )
     [ append-dimensions ] bi ;
 
 : new-fortran-type ( out? dims size class -- type )
-    new [ [ (>>size) ] [ (>>dims) ] [ (>>out?) ] tri ] keep ;
+    new [ [ size<< ] [ dims<< ] [ out?<< ] tri ] keep ;
 
 GENERIC: (fortran-type>c-type) ( type -- c-type )
 

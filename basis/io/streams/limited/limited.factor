@@ -128,9 +128,9 @@ M: limited-stream stream-read-partial
 
 :: limited-stream-seek ( n seek-type stream -- )
     seek-type {
-        { seek-absolute [ n stream (>>current) ] }
+        { seek-absolute [ n stream current<< ] }
         { seek-relative [ stream [ n + ] change-current drop ] }
-        { seek-end [ stream stop>> n - stream (>>current) ] }
+        { seek-end [ stream stop>> n - stream current<< ] }
         [ bad-seek-type ]
     } case ;
 

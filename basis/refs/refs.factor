@@ -30,7 +30,7 @@ M: ref delete-ref ref-off ;
 TUPLE: obj-ref obj ;
 C: <obj-ref> obj-ref
 M: obj-ref get-ref obj>> ;
-M: obj-ref set-ref (>>obj) ;
+M: obj-ref set-ref obj<< ;
 INSTANCE: obj-ref ref
 
 TUPLE: var-ref var ;

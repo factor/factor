@@ -3,7 +3,7 @@ windows.com windows.com.syntax alien alien.c-types alien.data
 alien.syntax kernel system namespaces combinators sequences fry
 math accessors macros words quotations libc continuations
 generalizations splitting locals assocs init specialized-arrays
-classes.struct strings arrays literals ;
+classes.struct strings arrays literals sequences.generalizations ;
 SPECIALIZED-ARRAY: DIOBJECTDATAFORMAT
 IN: windows.directx.dinput.constants
 
@@ -46,27 +46,27 @@ M: array array-base-type first ;
 : (flags) ( array -- n )
     0 [ (flag) bitor ] reduce ;
 
-: <DIOBJECTDATAFORMAT>-quot ( struct {pguid-var,field,index,dwType-flags,dwFlags} -- quot )
+: <DIOBJECTDATAFORMAT> ( struct {pguid-var,field,index,dwType-flags,dwFlags} -- object )
     {
         [ drop f ]
         [ second rot [ (offsetof) ] [ (sizeof) ] 2bi ]
         [ third * + ]
         [ fourth (flags) ]
         [ 4 swap nth (flag) ]
-        [ first dup word? [ '[ _ get ] ] [ drop [ f ] ] if ]
     } cleave
-    [ DIOBJECTDATAFORMAT <struct-boa> ] dip
-    curry ;
+    DIOBJECTDATAFORMAT <struct-boa> ;
 
-: set-DIOBJECTDATAFORMAT ( array struct pguid n -- array )
-    [ [ clone ] dip >>pguid ] dip pick set-nth ;
+: make-DIOBJECTDATAFORMAT-arrays ( struct array -- values vars )
+    [ [ <DIOBJECTDATAFORMAT> ] [ first ] bi ] with
+    DIOBJECTDATAFORMAT-array{ } { } 1 2 mnmap-as ;
 
-:: make-DIOBJECTDATAFORMAT-array-quot ( struct array -- quot )
-    array length '[ _ malloc-DIOBJECTDATAFORMAT-array ]
-    array [| args i |
-        struct args <DIOBJECTDATAFORMAT>-quot
-        i '[ @ _ set-DIOBJECTDATAFORMAT ]
-    ] map-index [ ] join compose ;
+: make-DIOBJECTDATAFORMAT-array-quot ( struct arr -- quot )
+    [ nip length ] [ make-DIOBJECTDATAFORMAT-arrays ] 2bi '[
+        _ malloc-DIOBJECTDATAFORMAT-array
+        [ _ dup byte-length memcpy ]
+        [ _ [ get >>pguid drop ] 2each ]
+        [ ] tri
+    ] ;
 
 >>
 
