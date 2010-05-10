@@ -644,10 +644,6 @@ INSN: ##unbox-small-struct
 use: src/tagged-rep
 literal: c-type ;
 
-INSN: ##pop-context-stack
-def: dst/tagged-rep
-temp: temp/int-rep ;
-
 INSN: ##prepare-box-struct ;
 
 INSN: ##load-param-reg
@@ -664,10 +660,6 @@ use: src/int-rep ;
 
 INSN: ##alien-assembly
 literal: quot ;
-
-INSN: ##push-context-stack
-use: src/tagged-rep
-temp: temp/int-rep ;
 
 INSN: ##save-param-reg
 literal: offset reg rep ;
@@ -766,6 +758,9 @@ use: src1/tagged-rep src2/int-rep
 literal: cc ;
 
 INSN: ##save-context
+temp: temp1/int-rep temp2/int-rep ;
+
+INSN: ##restore-context
 temp: temp1/int-rep temp2/int-rep ;
 
 ! GC checks

@@ -72,13 +72,7 @@ M: reg-class reg-class-full?
 : parameter-offsets ( types -- offsets )
     0 [ stack-size + ] accumulate nip ;
 
-: each-parameter ( parameters quot -- )
-    [ [ parameter-offsets ] keep ] dip 2each ; inline
-
-: reverse-each-parameter ( parameters quot -- )
-    [ [ parameter-offsets ] keep ] dip 2reverse-each ; inline
-
-: prepare-unbox-parameters ( parameters -- offsets types indices )
+: prepare-parameters ( parameters -- offsets types indices )
     [ length iota <reversed> ] [ parameter-offsets ] [ ] tri ;
 
 GENERIC: unbox-parameter ( src n c-type -- )
@@ -95,7 +89,7 @@ M: struct-c-type unbox-parameter
 : unbox-parameters ( offset node -- )
     parameters>> swap
     '[
-        prepare-unbox-parameters
+        prepare-parameters
         [
             [ <ds-loc> ^^peek ] [ _ + ] [ base-type ] tri*
             unbox-parameter
@@ -234,13 +228,21 @@ M: struct-c-type box-parameter
 
 : box-parameters ( params -- )
     alien-parameters
-    [ base-type box-parameter next-vreg ##push-context-stack ] each-parameter ;
+    [ length ##inc-d ]
+    [
+        prepare-parameters
+        [
+            next-vreg next-vreg ##save-context
+            base-type box-parameter swap <ds-loc> ##replace
+        ] 3each
+    ] bi ;
 
 : registers>objects ( node -- )
     ! Generate code for boxing input parameters in a callback.
     [
         dup \ ##save-param-reg move-parameters
         ##begin-callback
+        next-vreg next-vreg ##restore-context
         box-parameters
     ] with-param-regs ;
 
@@ -280,7 +282,7 @@ M: #alien-callback emit-node
             [ wrap-callback-quot ##alien-callback ]
             [
                 alien-return [ ##end-callback ] [
-                    [ ^^pop-context-stack ] dip
+                    [ D 0 ^^peek ] dip
                     ##end-callback
                     base-type unbox-return
                 ] if-void
