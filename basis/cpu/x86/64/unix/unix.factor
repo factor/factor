@@ -3,7 +3,7 @@
 USING: accessors arrays sequences math splitting make assocs
 kernel layouts system alien.c-types classes.struct
 cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
-cpu.x86 compiler.codegen.alien compiler.cfg.registers ;
+cpu.x86 compiler.cfg.builder.alien compiler.cfg.registers ;
 IN: cpu.x86.64.unix
 
 M: int-regs param-regs

@@ -117,6 +117,8 @@ gc
 
     " done" print flush
 
+    "alien.syntax" require
+    "alien.complex" require
     "io.streams.byte-array.fast" require
 
 ] unless
