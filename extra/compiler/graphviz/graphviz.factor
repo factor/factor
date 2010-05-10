@@ -58,7 +58,7 @@ IN: compiler.graphviz
 
 : cfg-vertex, ( bb -- )
     [ number>> number>string ]
-    [ kill-block? { "color=grey" "style=filled" } { } ? ]
+    [ kill-block?>> { "color=grey" "style=filled" } { } ? ]
     bi node-style, ;
 
 : cfgs ( cfgs -- )
