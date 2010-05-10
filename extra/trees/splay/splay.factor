@@ -14,20 +14,20 @@ TUPLE: splay < tree ;
 
 : rotate-right ( node -- node )
     dup left>>
-    [ right>> swap (>>left) ] 2keep
-    [ (>>right) ] keep ;
+    [ right>> swap left<< ] 2keep
+    [ right<< ] keep ;
                                                         
 : rotate-left ( node -- node )
     dup right>>
-    [ left>> swap (>>right) ] 2keep
-    [ (>>left) ] keep ;
+    [ left>> swap right<< ] 2keep
+    [ left<< ] keep ;
 
 : link-right ( left right key node -- left right key node )
-    swap [ [ swap (>>left) ] 2keep
+    swap [ [ swap left<< ] 2keep
     nip dup left>> ] dip swap ;
 
 : link-left ( left right key node -- left right key node )
-    swap [ rot [ (>>right) ] 2keep
+    swap [ rot [ right<< ] 2keep
     drop dup right>> swapd ] dip swap ;
 
 : cmp ( key node -- obj node <=> )
@@ -61,23 +61,23 @@ DEFER: (splay)
     } case ;
 
 : assemble ( head left right node -- root )
-    [ right>> swap (>>left) ] keep
-    [ left>> swap (>>right) ] keep
-    [ swap left>> swap (>>right) ] 2keep
-    [ swap right>> swap (>>left) ] keep ;
+    [ right>> swap left<< ] keep
+    [ left>> swap right<< ] keep
+    [ swap left>> swap right<< ] 2keep
+    [ swap right>> swap left<< ] keep ;
 
 : splay-at ( key node -- node )
     [ T{ node } clone dup dup ] 2dip
     (splay) nip assemble ;
 
 : do-splay ( key tree -- )
-    [ root>> splay-at ] keep (>>root) ;
+    [ root>> splay-at ] keep root<< ;
 
 : splay-split ( key tree -- node node )
     2dup do-splay root>> cmp +lt+ = [
-        nip dup left>> swap f over (>>left)
+        nip dup left>> swap f over left<<
     ] [
-        nip dup right>> swap f over (>>right) swap
+        nip dup right>> swap f over right<< swap
     ] if ;
 
 : get-splay ( key tree -- node ? )
@@ -95,7 +95,7 @@ DEFER: (splay)
 
 : splay-join ( n2 n1 -- node )
     splay-largest [
-        [ (>>right) ] keep
+        [ right<< ] keep
     ] [
         drop f
     ] if* ;
@@ -104,19 +104,19 @@ DEFER: (splay)
     [ get-splay nip ] keep [
         dup dec-count
         dup right>> swap left>> splay-join
-        swap (>>root)
+        swap root<<
     ] [ drop ] if* ;
 
 : set-splay ( value key tree -- )
-    2dup get-splay [ 2nip (>>value) ] [
+    2dup get-splay [ 2nip value<< ] [
        drop dup inc-count
        2dup splay-split rot
-       [ [ swapd ] dip node boa ] dip (>>root)
+       [ [ swapd ] dip node boa ] dip root<<
     ] if ;
 
 : new-root ( value key tree -- )
     1 >>count
-    [ swap <node> ] dip (>>root) ;
+    [ swap <node> ] dip root<< ;
 
 M: splay set-at ( value key tree -- )
     dup root>> [ set-splay ] [ new-root ] if ;

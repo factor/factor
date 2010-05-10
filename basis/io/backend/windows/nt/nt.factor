@@ -90,7 +90,7 @@ ERROR: invalid-file-size n ;
 ERROR: seek-before-start n ;
 
 : set-seek-ptr ( n handle -- )
-    [ dup 0 < [ seek-before-start ] when ] dip (>>ptr) ;
+    [ dup 0 < [ seek-before-start ] when ] dip ptr<< ;
 
 M: winnt tell-handle ( handle -- n ) ptr>> ;
 

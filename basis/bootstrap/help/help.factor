@@ -6,12 +6,10 @@ IN: bootstrap.help
 : load-help ( -- )
     "help.lint" require
     "help.vocabs" require
-    "alien.syntax" require
-    "compiler" require
 
     t load-help? set-global
 
-    [ vocab ] load-vocab-hook [
+    [ dup vocab [ ] [ no-vocab ] ?if ] load-vocab-hook [
         dictionary get values
         [ docs-loaded?>> not ] filter
         [ load-docs ] each

@@ -55,7 +55,7 @@ CONSTANT: right 1
     go-left? xor [ left>> ] [ right>> ] if ;
 
 : set-node-link@ ( left parent ? -- ) 
-    go-left? xor [ (>>left) ] [ (>>right) ] if ;
+    go-left? xor [ left<< ] [ right<< ] if ;
 
 : node-link ( node -- child ) f node-link@  ;
 

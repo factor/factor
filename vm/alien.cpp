@@ -187,17 +187,6 @@ VM_C_API char *alien_offset(cell obj, factor_vm *parent)
 	return parent->alien_offset(obj);
 }
 
-/* For FFI calls passing structs by value. Cannot allocate */
-void factor_vm::to_value_struct(cell src, void *dest, cell size)
-{
-	memcpy(dest,alien_offset(src),size);
-}
-
-VM_C_API void to_value_struct(cell src, void *dest, cell size, factor_vm *parent)
-{
-	return parent->to_value_struct(src,dest,size);
-}
-
 /* For FFI callbacks receiving structs by value */
 cell factor_vm::from_value_struct(void *src, cell size)
 {

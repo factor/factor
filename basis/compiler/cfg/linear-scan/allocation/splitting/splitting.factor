@@ -1,6 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators fry hints kernel locals
+USING: accessors arrays assocs combinators
+combinators.short-circuit fry hints kernel locals
 math sequences sets sorting splitting namespaces
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals ;
@@ -25,7 +26,9 @@ IN: compiler.cfg.linear-scan.allocation.splitting
     ] bi ;
 
 : split-uses ( uses n -- before after )
-    '[ n>> _ <= ] partition ;
+    [ '[ n>> _ < ] filter ]
+    [ '[ n>> _ > ] filter ]
+    2bi ;
 
 ERROR: splitting-too-early ;
 
@@ -51,8 +54,8 @@ ERROR: splitting-atomic-interval ;
     live-interval n check-split
     live-interval clone :> before
     live-interval clone :> after
-    live-interval uses>> n split-uses before after [ (>>uses) ] bi-curry@ bi*
-    live-interval ranges>> n split-ranges before after [ (>>ranges) ] bi-curry@ bi*
+    live-interval uses>> n split-uses before after [ uses<< ] bi-curry@ bi*
+    live-interval ranges>> n split-ranges before after [ ranges<< ] bi-curry@ bi*
     before split-before
     after split-after ;
 

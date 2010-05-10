@@ -180,9 +180,11 @@ M: object copy-memory* copy-register* ;
 M: float-rep copy-memory* drop MOVSS ;
 M: double-rep copy-memory* drop MOVSD ;
 
+: ?spill-slot ( obj -- obj ) dup spill-slot? [ n>> spill@ ] when ;
+
 M: x86 %copy ( dst src rep -- )
     2over eq? [ 3drop ] [
-        [ [ dup spill-slot? [ n>> spill@ ] when ] bi@ ] dip
+        [ [ ?spill-slot ] bi@ ] dip
         2over [ register? ] both? [ copy-register* ] [ copy-memory* ] if
     ] if ;
 
@@ -501,16 +503,6 @@ M:: x86 %check-nursery-branch ( label size cc temp1 temp2 -- )
 
 M: x86 %alien-global ( dst symbol library -- )
     [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;    
-
-M: x86 %push-stack ( -- )
-    ds-reg cell ADD
-    ds-reg [] int-regs return-reg MOV ;
-
-M: x86 %push-context-stack ( -- )
-    temp-reg %context
-    temp-reg "datastack" context-field-offset [+] bootstrap-cell ADD
-    temp-reg temp-reg "datastack" context-field-offset [+] MOV
-    temp-reg [] int-regs return-reg MOV ;
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 

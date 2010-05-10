@@ -32,9 +32,9 @@ SLOT: i
 
 : (stream-seek) ( n seek-type stream -- )
     swap {
-        { seek-absolute [ (>>i) ] }
+        { seek-absolute [ i<< ] }
         { seek-relative [ [ + ] change-i drop ] }
-        { seek-end [ [ underlying>> length + ] [ (>>i) ] bi ] }
+        { seek-end [ [ underlying>> length + ] [ i<< ] bi ] }
         [ bad-seek-type ]
     } case ;
 

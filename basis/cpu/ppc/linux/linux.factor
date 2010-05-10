@@ -5,8 +5,8 @@ alien.c-types cpu.architecture cpu.ppc ;
 IN: cpu.ppc.linux
 
 <<
-t "longlong" c-type (>>stack-align?)
-t "ulonglong" c-type (>>stack-align?)
+t "longlong" c-type stack-align?<<
+t "ulonglong" c-type stack-align?<<
 >>
 
 M: linux reserved-area-size 2 cells ;

@@ -615,7 +615,6 @@ struct factor_vm
 	void primitive_dlclose();
 	void primitive_dll_validp();
 	char *alien_offset(cell obj);
-	void to_value_struct(cell src, void *dest, cell size);
 	cell from_value_struct(void *src, cell size);
 	cell from_small_struct(cell x, cell y, cell size);
 	cell from_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size);
