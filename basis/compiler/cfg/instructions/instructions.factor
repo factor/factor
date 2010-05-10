@@ -637,11 +637,11 @@ use: src/tagged-rep
 literal: n unboxer ;
 
 INSN: ##unbox-large-struct
-use: src/tagged-rep
+use: src/int-rep
 literal: n c-type ;
 
 INSN: ##unbox-small-struct
-use: src/tagged-rep
+use: src/int-rep
 literal: c-type ;
 
 INSN: ##prepare-box-struct ;
