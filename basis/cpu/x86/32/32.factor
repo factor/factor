@@ -218,32 +218,30 @@ M:: x86.32 %unbox-long-long ( src n func -- )
     ] when* ;
 
 M: x86 %unbox-small-struct ( src size -- )
-    [ "alien_offset" call-unbox-func ]
+    [ [ EAX ] dip int-rep %copy ]
     [
         heap-size 4 > [ EDX EAX 4 [+] MOV ] when
         EAX EAX [] MOV
     ] bi* ;
 
 M:: x86.32 %unbox-large-struct ( src n c-type -- )
-    EAX src tagged-rep %copy
-    ! Compute destination address
+    EAX src int-rep %copy
     EDX n local@ LEA
-    12 save-vm-ptr
     8 stack@ c-type heap-size MOV
-    4 stack@ EDX MOV
-    0 stack@ EAX MOV
-    "to_value_struct" f %alien-invoke ;
+    4 stack@ EAX MOV
+    0 stack@ EDX MOV
+    "memcpy" "libc" load-library %alien-invoke ;
 
 M: x86.32 %alien-indirect ( src -- )
     ?spill-slot CALL ;
 
 M: x86.32 %begin-callback ( -- )
     0 save-vm-ptr
-    ESP 4 [+] 0 MOV
+    4 stack@ 0 MOV
     "begin_callback" f %alien-invoke ;
 
 M: x86.32 %alien-callback ( quot -- )
-    EAX swap %load-reference
+    [ EAX ] dip %load-reference
     EAX quot-entry-point-offset [+] CALL ;
 
 M: x86.32 %end-callback ( -- )

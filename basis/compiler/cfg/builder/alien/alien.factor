@@ -84,7 +84,9 @@ M: long-long-type unbox-parameter
     unboxer>> ##unbox-long-long ;
 
 M: struct-c-type unbox-parameter
-    [ ##unbox-large-struct ] [ base-type unbox-parameter ] if-value-struct ;
+    [ [ ^^unbox-any-c-ptr ] 2dip ##unbox-large-struct ]
+    [ base-type unbox-parameter ]
+    if-value-struct ;
 
 : unbox-parameters ( offset node -- )
     parameters>> swap
@@ -271,6 +273,7 @@ M: long-long-type unbox-return
     [ f ] dip unboxer>> ##unbox-long-long ;
 
 M: struct-c-type unbox-return
+    [ ^^unbox-any-c-ptr ] dip
     [ ##unbox-small-struct ] [ ##unbox-large-struct ] if-small-struct ;
 
 M: #alien-callback emit-node
