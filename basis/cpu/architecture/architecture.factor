@@ -624,7 +624,9 @@ HOOK: %alien-callback cpu ( quot -- )
 
 HOOK: %end-callback cpu ( -- )
 
-HOOK: %end-callback-value cpu ( c-type -- )
+HOOK: %to-nv cpu ( -- )
+
+HOOK: %from-nv cpu ( -- )
 
 HOOK: stack-cleanup cpu ( params -- n )
 

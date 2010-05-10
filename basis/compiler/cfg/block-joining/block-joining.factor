@@ -10,9 +10,9 @@ IN: compiler.cfg.block-joining
 ! before stack analysis.
 : join-block? ( bb -- ? )
     {
-        [ kill-block? not ]
+        [ kill-block?>> not ]
         [ predecessors>> length 1 = ]
-        [ predecessor kill-block? not ]
+        [ predecessor kill-block?>> not ]
         [ predecessor successors>> length 1 = ]
         [ [ predecessor ] keep back-edge? not ]
     } 1&& ;

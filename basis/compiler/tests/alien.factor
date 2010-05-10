@@ -610,11 +610,6 @@ FUNCTION: short ffi_test_48 ( bool-field-test x ) ;
 [ 200 ] [ thread-callback-2 thread-callback-invoker ] unit-test
 [ 100 ] [ "p" get ?promise ] unit-test
 
-! Regression: calling an undefined function would raise a protection fault
-FUNCTION: void this_does_not_exist ( ) ;
-
-[ this_does_not_exist ] [ { "kernel-error" 9 f f } = ] must-fail-with
-
 ! More alien-assembly tests are in cpu.* vocabs
 : assembly-test-1 ( -- ) void { } cdecl [ ] alien-assembly ;
 

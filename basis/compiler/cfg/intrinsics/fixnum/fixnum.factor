@@ -51,7 +51,11 @@ IN: compiler.cfg.intrinsics.fixnum
     [ ds-drop ds-drop ds-push ] with-branch ;
 
 : emit-overflow-case ( word -- final-bb )
-    [ ##call -1 adjust-d ] with-branch ;
+    [
+        ##call
+        -1 adjust-d
+        make-kill-block
+    ] with-branch ;
 
 : emit-fixnum-overflow-op ( quot word -- )
     ! Inputs to the final instruction need to be copied because
