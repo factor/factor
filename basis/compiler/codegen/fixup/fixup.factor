@@ -12,9 +12,6 @@ IN: compiler.codegen.fixup
     [ length ] [ B{ 0 0 0 0 } swap push-all ] [ underlying>> ] tri
     swap set-alien-unsigned-4 ;
 
-! Owner
-SYMBOL: compiling-word
-
 ! Parameter table
 SYMBOL: parameter-table
 
@@ -115,8 +112,7 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
     [ [ compute-relative-label ] map concat ]
     bi* ;
 
-: init-fixup ( word -- )
-    compiling-word set
+: init-fixup ( -- )
     V{ } clone parameter-table set
     V{ } clone literal-table set
     V{ } clone label-table set
@@ -140,7 +136,7 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 : emit-binary-literals ( -- )
     binary-literal-table get [ emit-data ] assoc-each ;
 
-: with-fixup ( word quot -- code )
+: with-fixup ( quot -- code )
     '[
         init-fixup
         @
