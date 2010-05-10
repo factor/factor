@@ -5,8 +5,8 @@ arrays kernel fry math namespaces sequences system layouts io
 vocabs.loader accessors init classes.struct combinators
 command-line make words compiler compiler.units
 compiler.constants compiler.alien compiler.codegen
-compiler.codegen.alien compiler.codegen.fixup
-compiler.cfg.instructions compiler.cfg.builder
+compiler.codegen.fixup compiler.cfg.instructions
+compiler.cfg.builder compiler.cfg.builder.alien
 compiler.cfg.intrinsics compiler.cfg.stack-frame
 cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
 cpu.architecture vm ;
