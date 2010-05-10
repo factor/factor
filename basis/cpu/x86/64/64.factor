@@ -134,26 +134,18 @@ M:: x86.64 %unbox ( src n rep func -- )
     } case ;
 
 M:: x86.64 %unbox-small-struct ( src c-type -- )
-    param-reg-0 src tagged-rep %copy
-    param-reg-1 %mov-vm-ptr
-    "alien_offset" f %alien-invoke
-    ! Move alien_offset() return value to R11 so that we don't
-    ! clobber it.
-    R11 RAX MOV
+    ! Move src to R11 so that we don't clobber it.
+    R11 src int-rep %copy
     [
         c-type flatten-struct-type
         [ %unbox-struct-field ] each-index
     ] with-return-regs ;
 
 M:: x86.64 %unbox-large-struct ( src n c-type -- )
-    param-reg-0 src tagged-rep %copy
-    ! Load destination address into param-reg-1
-    param-reg-1 n param@ LEA
-    ! Load structure size into param-reg-2
+    param-reg-1 src int-rep %copy
+    param-reg-0 n param@ LEA
     param-reg-2 c-type heap-size MOV
-    param-reg-3 %mov-vm-ptr
-    ! Copy the struct to the C stack
-    "to_value_struct" f %alien-invoke ;
+    "memcpy" "libc" load-library %alien-invoke ;
 
 : load-return-value ( rep -- )
     [ [ 0 ] dip reg-class-of cdecl param-reg ]
@@ -226,7 +218,7 @@ M: x86.64 %begin-callback ( -- )
     "begin_callback" f %alien-invoke ;
 
 M: x86.64 %alien-callback ( quot -- )
-    param-reg-0 swap %load-reference
+    [ param-reg-0 ] dip %load-reference
     param-reg-0 quot-entry-point-offset [+] CALL ;
 
 M: x86.64 %end-callback ( -- )
