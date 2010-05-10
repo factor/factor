@@ -36,8 +36,10 @@ SYMBOL: visited
     [ reverse-post-order ] dip each ; inline
 
 : optimize-basic-block ( bb quot -- )
-    [ drop basic-block set ]
-    [ change-instructions drop ] 2bi ; inline
+    over kill-block?>> [ 2drop ] [
+        over basic-block set
+        change-instructions drop
+    ] if ; inline
 
 : simple-optimization ( ... cfg quot: ( ... insns -- ... insns' ) -- ... )
     '[ _ optimize-basic-block ] each-basic-block ; inline

@@ -224,6 +224,7 @@ HOOK: complex-addressing? cpu ( -- ? )
 
 HOOK: %load-immediate cpu ( reg val -- )
 HOOK: %load-reference cpu ( reg obj -- )
+HOOK: %load-float cpu ( reg val -- )
 HOOK: %load-double cpu ( reg val -- )
 HOOK: %load-vector cpu ( reg val rep -- )
 
@@ -504,8 +505,8 @@ M: reg-class param-reg param-regs nth ;
 
 M: stack-params param-reg 2drop ;
 
-! Does this architecture support %load-double, %load-vector and
-! objects in %compare-imm?
+! Does this architecture support %load-float, %load-double,
+! and %load-vector?
 HOOK: fused-unboxing? cpu ( -- ? )
 
 ! Can this value be an immediate operand for %add-imm, %sub-imm,
@@ -552,48 +553,28 @@ HOOK: dummy-int-params? cpu ( -- ? )
 ! If t, all int parameters are shadowed by dummy FP parameters
 HOOK: dummy-fp-params? cpu ( -- ? )
 
-! Load a value (from the data stack in the ds register).
-! The value is then passed as a parameter to a VM to_*() function
-HOOK: %pop-stack cpu ( n -- )
+! Call a function to convert a tagged pointer into a value that
+! can be passed to a C function, or returned from a callback
+HOOK: %unbox cpu ( src n rep func -- )
 
-! Store a value (to the data stack in the VM's current context)
-! The value is passed to a VM to_*() function -- used for
-! callback returns
-HOOK: %pop-context-stack cpu ( -- )
+HOOK: %unbox-long-long cpu ( src n func -- )
 
-! Store a value (to the data stack in the ds register).
-! The value was returned from a VM from_*() function
-HOOK: %push-stack cpu ( -- )
+HOOK: %unbox-small-struct cpu ( src c-type -- )
 
-! Store a value (to the data stack in the VM's current context)
-! The value is returned from a VM from_*() function -- used for
-! callback parameters
-HOOK: %push-context-stack cpu ( -- )
-
-! Call a function to convert a tagged pointer returned by
-! %pop-stack or %pop-context-stack into a value that can be
-! passed to a C function, or returned from a callback
-HOOK: %unbox cpu ( n rep func -- )
-
-HOOK: %unbox-long-long cpu ( n func -- )
-
-HOOK: %unbox-small-struct cpu ( c-type -- )
-
-HOOK: %unbox-large-struct cpu ( n c-type -- )
+HOOK: %unbox-large-struct cpu ( src n c-type -- )
 
 ! Call a function to convert a value into a tagged pointer,
 ! possibly allocating a bignum, float, or alien instance,
-! which is then pushed on the data stack by %push-stack or
-! %push-context-stack
-HOOK: %box cpu ( n rep func -- )
+! which is then pushed on the data stack
+HOOK: %box cpu ( dst n rep func -- )
 
-HOOK: %box-long-long cpu ( n func -- )
+HOOK: %box-long-long cpu ( dst n func -- )
 
 HOOK: %prepare-box-struct cpu ( -- )
 
-HOOK: %box-small-struct cpu ( c-type -- )
+HOOK: %box-small-struct cpu ( dst c-type -- )
 
-HOOK: %box-large-struct cpu ( n c-type -- )
+HOOK: %box-large-struct cpu ( dst n c-type -- )
 
 HOOK: %save-param-reg cpu ( stack reg rep -- )
 
@@ -603,27 +584,19 @@ HOOK: %restore-context cpu ( temp1 temp2 -- )
 
 HOOK: %save-context cpu ( temp1 temp2 -- )
 
-HOOK: %prepare-var-args cpu ( -- )
-
-M: object %prepare-var-args ;
-
 HOOK: %alien-invoke cpu ( function library -- )
 
 HOOK: %cleanup cpu ( params -- )
 
 M: object %cleanup ( params -- ) drop ;
 
-HOOK: %prepare-alien-indirect cpu ( -- )
-
-HOOK: %alien-indirect cpu ( -- )
+HOOK: %alien-indirect cpu ( src -- )
 
 HOOK: %begin-callback cpu ( -- )
 
 HOOK: %alien-callback cpu ( quot -- )
 
 HOOK: %end-callback cpu ( -- )
-
-HOOK: %end-callback-value cpu ( c-type -- )
 
 HOOK: stack-cleanup cpu ( params -- n )
 

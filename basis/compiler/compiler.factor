@@ -15,11 +15,11 @@ compiler.tree.optimizer
 
 compiler.cfg
 compiler.cfg.builder
+compiler.cfg.builder.alien
 compiler.cfg.optimizer
 compiler.cfg.finalization
 
-compiler.codegen
-compiler.codegen.alien ;
+compiler.codegen ;
 IN: compiler
 
 SYMBOL: compiled
