@@ -83,7 +83,7 @@ C: <ftp-disconnect> ftp-disconnect
 
 : handle-USER ( ftp-command -- )
     [
-        tokenized>> second client get (>>user)
+        tokenized>> second client get user<<
         "Please specify the password." 331 server-response
     ] [
         2drop "bad USER" ftp-error
@@ -91,7 +91,7 @@ C: <ftp-disconnect> ftp-disconnect
 
 : handle-PASS ( ftp-command -- )
     [
-        tokenized>> second client get (>>password)
+        tokenized>> second client get password<<
         "Login successful" 230 server-response
     ] [
         2drop "PASS error" ftp-error
@@ -241,7 +241,7 @@ M: ftp-disconnect handle-passive-command ( stream obj -- )
     ] if ;
 
 : expect-connection ( -- port )
-    <promise> client get (>>extra-connection)
+    <promise> client get extra-connection<<
     random-local-server
     [ [ passive-loop ] curry in-thread ]
     [ addr>> port>> ] bi ;

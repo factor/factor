@@ -131,11 +131,11 @@ ERROR: unsupported-resolution triple ;
         triple
         world handle>> hWnd>>
         fullscreen? [
-            enable-fullscreen world (>>saved-position)
+            enable-fullscreen world saved-position<<
         ] [
             [ world saved-position>> ] 2dip disable-fullscreen
         ] if
-        fullscreen? world (>>fullscreen?)
+        fullscreen? world fullscreen?<<
     ] when ;
 
 : set-fullscreen ( gadget triple fullscreen? -- )

@@ -15,7 +15,7 @@ TUPLE: port < disposable handle timeout ;
 
 M: port timeout timeout>> ;
 
-M: port set-timeout (>>timeout) ;
+M: port set-timeout timeout<< ;
 
 : <port> ( handle class -- port )
     new-disposable swap >>handle ; inline

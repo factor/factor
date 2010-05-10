@@ -111,27 +111,11 @@ GENERIC: c-type-align-first ( name -- n )
 
 M: abstract-c-type c-type-align-first align-first>> ;
 
-: c-type-box ( n c-type -- )
-    [ rep>> ] [ boxer>> ] bi %box ;
+GENERIC: base-type ( c-type -- c-type )
 
-: c-type-unbox ( n c-type -- )
-    [ rep>> ] [ unboxer>> ] bi %unbox ;
+M: c-type-name base-type c-type ;
 
-GENERIC: box-parameter ( n c-type -- )
-
-M: c-type box-parameter c-type-box ;
-
-GENERIC: box-return ( c-type -- )
-
-M: c-type box-return f swap c-type-box ;
-
-GENERIC: unbox-parameter ( n c-type -- )
-
-M: c-type unbox-parameter c-type-unbox ;
-
-GENERIC: unbox-return ( c-type -- )
-
-M: c-type unbox-return f swap c-type-unbox ;
+M: c-type base-type ;
 
 : little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
 
@@ -179,10 +163,7 @@ PROTOCOL: c-type-protocol
     c-type-setter
     c-type-align
     c-type-align-first
-    box-parameter
-    box-return
-    unbox-parameter
-    unbox-return
+    base-type
     heap-size
     stack-size
     flatten-c-type ;
@@ -203,18 +184,6 @@ TUPLE: long-long-type < c-type ;
 
 : <long-long-type> ( -- c-type )
     long-long-type new ;
-
-M: long-long-type unbox-parameter ( n c-type -- )
-    unboxer>> %unbox-long-long ;
-
-M: long-long-type unbox-return ( c-type -- )
-    f swap unbox-parameter ;
-
-M: long-long-type box-parameter ( n c-type -- )
-    boxer>> %box-long-long ;
-
-M: long-long-type box-return ( c-type -- )
-    f swap box-parameter ;
 
 M: long-long-type flatten-c-type
     int-rep (flatten-c-type) ;

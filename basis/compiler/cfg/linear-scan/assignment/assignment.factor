@@ -93,7 +93,7 @@ SYMBOL: machine-live-outs
     init-unhandled ;
 
 : insert-spill ( live-interval -- )
-    [ reg>> ] [ last-use rep>> ] [ spill-to>> ] tri ##spill ;
+    [ reg>> ] [ spill-rep>> ] [ spill-to>> ] tri ##spill ;
 
 : handle-spill ( live-interval -- )
     dup spill-to>> [ insert-spill ] [ drop ] if ;
@@ -113,18 +113,10 @@ SYMBOL: machine-live-outs
     pending-interval-heap get (expire-old-intervals) ;
 
 : insert-reload ( live-interval -- )
-    [ reg>> ] [ first-use rep>> ] [ reload-from>> ] tri ##reload ;
-
-: insert-reload? ( live-interval -- ? )
-    ! Don't insert a reload if the register will be written to
-    ! before being read again.
-    {
-        [ reload-from>> ]
-        [ first-use type>> +use+ eq? ]
-    } 1&& ;
+    [ reg>> ] [ reload-rep>> ] [ reload-from>> ] tri ##reload ;
 
 : handle-reload ( live-interval -- )
-    dup insert-reload? [ insert-reload ] [ drop ] if ;
+    dup reload-from>> [ insert-reload ] [ drop ] if ;
 
 : activate-interval ( live-interval -- )
     [ add-pending ] [ handle-reload ] bi ;

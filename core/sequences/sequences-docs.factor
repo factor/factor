@@ -1200,15 +1200,6 @@ HELP: 2selector
      { "selector" quotation } { "accum1" vector } { "accum2" vector } }
 { $description "Creates two new vectors to accumultate values based on a predicate. The first vector accumulates values for which the predicate yields true; the second for false." } ;
 
-HELP: 2reverse-each
-{ $values
-     { "seq1" sequence } { "seq2" sequence } { "quot" quotation } }
-{ $description "Reverse the sequences using the " { $link <reversed> } " word and calls " { $link 2each } " on the reversed sequences." }
-{ $examples { $example "USING: sequences math prettyprint ;"
-    "{ 10 20 30 } { 1 2 3 } [ + . ] 2reverse-each"
-    "33\n22\n11"
-} } ;
-
 HELP: 2unclip-slice
 { $values
      { "seq1" sequence } { "seq2" sequence }

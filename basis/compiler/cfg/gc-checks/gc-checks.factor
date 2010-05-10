@@ -62,13 +62,13 @@ IN: compiler.cfg.gc-checks
     >>instructions t >>unlikely? ;
 
 :: insert-guard ( body check bb -- )
-    bb predecessors>> check (>>predecessors)
-    V{ bb body }      check (>>successors)
+    bb predecessors>> check predecessors<<
+    V{ bb body }      check successors<<
 
-    V{ check }        body (>>predecessors)
-    V{ bb }           body (>>successors)
+    V{ check }        body predecessors<<
+    V{ bb }           body successors<<
 
-    V{ check body }   bb (>>predecessors)
+    V{ check body }   bb predecessors<<
 
     check predecessors>> [ bb check update-successors ] each ;
 

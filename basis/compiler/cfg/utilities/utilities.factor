@@ -6,12 +6,6 @@ sets vectors fry arrays compiler.cfg compiler.cfg.instructions
 compiler.cfg.rpo compiler.utilities ;
 IN: compiler.cfg.utilities
 
-PREDICATE: kill-block < basic-block
-    instructions>> {
-        [ length 2 >= ]
-        [ penultimate kill-vreg-insn? ]
-    } 1&& ;
-
 : back-edge? ( from to -- ? )
     [ number>> ] bi@ >= ;
 
@@ -50,9 +44,9 @@ SYMBOL: visited
 :: insert-basic-block ( from to insns -- )
     ! Insert basic block on the edge between 'from' and 'to'.
     <basic-block> :> bb
-    insns V{ } like bb (>>instructions)
-    V{ from } bb (>>predecessors)
-    V{ to } bb (>>successors)
+    insns V{ } like bb instructions<<
+    V{ from } bb predecessors<<
+    V{ to } bb successors<<
     from to bb update-predecessors
     from to bb update-successors ;
 

@@ -20,9 +20,6 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
 : param-prep-quot ( params -- quot )
     parameters>> [ c-type c-type-unboxer-quot ] map spread>quot ;
 
-: infer-params ( params -- )
-    param-prep-quot infer-quot-here ;
-
 : alien-stack ( params extra -- )
     over parameters>> length + consume-d >>in-d
     dup return>> void? 0 1 ? produce-d >>out-d
@@ -62,7 +59,7 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
     ! Set ABI
     dup library>> library-abi >>abi
     ! Quotation which coerces parameters to required types
-    dup infer-params
+    dup param-prep-quot infer-quot-here
     ! Magic #: consume exactly the number of inputs
     dup 0 alien-stack
     ! Add node to IR
@@ -76,10 +73,8 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
     pop-abi
     pop-params
     pop-return
-    ! Quotation which coerces parameters to required types
-    1 infer->r
-    dup infer-params
-    1 infer-r>
+    ! Coerce parameters to required types
+    dup param-prep-quot '[ _ [ >c-ptr ] bi* ] infer-quot-here
     ! Magic #: consume the function pointer, too
     dup 1 alien-stack
     ! Add node to IR
@@ -95,7 +90,7 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
     pop-params
     pop-return
     ! Quotation which coerces parameters to required types
-    dup infer-params
+    dup param-prep-quot infer-quot-here
     ! Magic #: consume exactly the number of inputs
     dup 0 alien-stack
     ! Add node to IR

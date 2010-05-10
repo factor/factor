@@ -20,7 +20,7 @@ IN: cpu.8080.test
   over get-cycles over inc-cycles
   [ swap instructions nth call( cpu -- ) ] keep
   [ pc>> HEX: FFFF bitand ] keep 
-  [ (>>pc) ] keep 
+  [ pc<< ] keep 
   process-interrupts ;
 
 : test-step ( cpu -- cpu )

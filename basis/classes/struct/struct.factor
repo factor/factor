@@ -169,20 +169,10 @@ M: struct-c-type c-type ;
 : if-value-struct ( ctype true false -- )
     [ dup value-struct? ] 2dip '[ drop void* @ ] if ; inline
 
-M: struct-c-type unbox-parameter
-    [ %unbox-large-struct ] [ unbox-parameter ] if-value-struct ;
-
-M: struct-c-type box-parameter
-    [ %box-large-struct ] [ box-parameter ] if-value-struct ;
-
 : if-small-struct ( c-type true false -- ? )
     [ dup return-struct-in-registers? ] 2dip '[ f swap @ ] if ; inline
 
-M: struct-c-type unbox-return
-    [ %unbox-small-struct ] [ %unbox-large-struct ] if-small-struct ;
-
-M: struct-c-type box-return
-    [ %box-small-struct ] [ %box-large-struct ] if-small-struct ;
+M: struct-c-type base-type ;
 
 M: struct-c-type stack-size
     [ heap-size cell align ] [ stack-size ] if-value-struct ;
@@ -232,10 +222,10 @@ GENERIC: compute-slot-offset ( offset class -- offset' )
 
 M: struct-slot-spec compute-slot-offset
     [ type>> over c-type-align-at 8 * align ] keep
-    [ [ 8 /i ] dip (>>offset) ] [ type>> heap-size 8 * + ] 2bi ;
+    [ [ 8 /i ] dip offset<< ] [ type>> heap-size 8 * + ] 2bi ;
 
 M: struct-bit-slot-spec compute-slot-offset
-    [ (>>offset) ] [ bits>> + ] 2bi ;
+    [ offset<< ] [ bits>> + ] 2bi ;
 
 : compute-struct-offsets ( slots -- size )
     0 [ compute-slot-offset ] reduce 8 align 8 /i ;

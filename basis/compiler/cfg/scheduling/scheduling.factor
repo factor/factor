@@ -1,9 +1,10 @@
 ! Copyright (C) 2009, 2010 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs compiler.cfg.def-use
-compiler.cfg.dependence compiler.cfg.instructions
-compiler.cfg.liveness compiler.cfg.rpo cpu.architecture fry
-kernel locals make math namespaces sequences sets ;
+USING: accessors arrays assocs fry kernel locals make math
+namespaces sequences sets combinators.short-circuit
+compiler.cfg.def-use compiler.cfg.dependence
+compiler.cfg.instructions compiler.cfg.liveness compiler.cfg.rpo
+cpu.architecture ;
 IN: compiler.cfg.scheduling
 
 ! Instruction scheduling to reduce register pressure, from:
@@ -128,7 +129,6 @@ ERROR: definition-after-usage vreg old-bb new-bb ;
 
 : schedule-instructions ( cfg -- cfg' )
     dup [
-        dup might-spill?
-        [ schedule-block ]
-        [ drop ] if
+        dup { [ kill-block?>> not ] [ might-spill? ] } 1&&
+        [ schedule-block ] [ drop ] if
     ] each-basic-block ;
