@@ -82,7 +82,7 @@ M: ##dispatch generate-insn
     ] tri ;
 
 : generate ( cfg -- code )
-    dup label>> [
+    [
         H{ } clone labels set
         linearization-order
         [ number-blocks ] [ [ generate-block ] each ] bi
