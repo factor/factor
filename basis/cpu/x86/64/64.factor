@@ -117,12 +117,6 @@ M: x86.64 %load-param-reg [ swap param@ ] dip %copy ;
         call
     ] with-scope ; inline
 
-M:: x86.64 %pop-context-stack ( dst temp -- )
-    temp %context
-    dst temp "datastack" context-field-offset [+] MOV
-    dst dst [] MOV
-    temp "datastack" context-field-offset [+] bootstrap-cell SUB ;
-
 M:: x86.64 %unbox ( src n rep func -- )
     param-reg-0 src tagged-rep %copy
     param-reg-1 %mov-vm-ptr
@@ -232,10 +226,8 @@ M: x86.64 %begin-callback ( -- )
     "begin_callback" f %alien-invoke ;
 
 M: x86.64 %alien-callback ( quot -- )
-    param-reg-0 param-reg-1 %restore-context
     param-reg-0 swap %load-reference
-    param-reg-0 quot-entry-point-offset [+] CALL
-    param-reg-0 param-reg-1 %save-context ;
+    param-reg-0 quot-entry-point-offset [+] CALL ;
 
 M: x86.64 %end-callback ( -- )
     param-reg-0 %mov-vm-ptr

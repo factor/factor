@@ -195,12 +195,6 @@ M:: x86.32 %box-small-struct ( dst c-type -- )
     "from_small_struct" f %alien-invoke
     dst EAX tagged-rep %copy ;
 
-M:: x86.32 %pop-context-stack ( dst temp -- )
-    temp %context
-    dst temp "datastack" context-field-offset [+] MOV
-    dst dst [] MOV
-    temp "datastack" context-field-offset [+] bootstrap-cell SUB ;
-
 :: call-unbox-func ( src func -- )
     EAX src tagged-rep %copy
     4 save-vm-ptr
@@ -249,10 +243,8 @@ M: x86.32 %begin-callback ( -- )
     "begin_callback" f %alien-invoke ;
 
 M: x86.32 %alien-callback ( quot -- )
-    EAX EDX %restore-context
     EAX swap %load-reference
-    EAX quot-entry-point-offset [+] CALL
-    EAX EDX %save-context ;
+    EAX quot-entry-point-offset [+] CALL ;
 
 M: x86.32 %end-callback ( -- )
     0 save-vm-ptr
