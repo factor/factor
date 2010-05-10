@@ -7,7 +7,8 @@ namespaces kernel strings libc quotations cpu.architecture
 compiler.alien compiler.utilities compiler.tree compiler.cfg
 compiler.cfg.builder compiler.cfg.builder.blocks
 compiler.cfg.instructions compiler.cfg.stack-frame
-compiler.cfg.stacks ;
+compiler.cfg.stacks compiler.cfg.registers
+compiler.cfg.hats ;
 FROM: compiler.errors => no-such-symbol no-such-library ;
 IN: compiler.cfg.builder.alien
 
@@ -78,9 +79,9 @@ M: reg-class reg-class-full?
     [ [ parameter-offsets ] keep ] dip 2reverse-each ; inline
 
 : prepare-unbox-parameters ( parameters -- offsets types indices )
-    [ parameter-offsets ] [ ] [ length iota <reversed> ] tri ;
+    [ length iota <reversed> ] [ parameter-offsets ] [ ] tri ;
 
-GENERIC: unbox-parameter ( n c-type -- )
+GENERIC: unbox-parameter ( src n c-type -- )
 
 M: c-type unbox-parameter
     [ rep>> ] [ unboxer>> ] bi ##unbox ;
@@ -95,7 +96,10 @@ M: struct-c-type unbox-parameter
     parameters>> swap
     '[
         prepare-unbox-parameters
-        [ ##pop-stack [ _ + ] dip base-type unbox-parameter ] 3each
+        [
+            [ <ds-loc> ^^peek ] [ _ + ] [ base-type ] tri*
+            unbox-parameter
+        ] 3each
     ]
     [ length neg ##inc-d ]
     bi ;
@@ -118,19 +122,19 @@ M: struct-c-type unbox-parameter
         \ ##load-param-reg move-parameters
     ] with-param-regs ;
 
-GENERIC: box-return ( c-type -- )
+GENERIC: box-return ( c-type -- dst )
 
 M: c-type box-return
-    [ f ] dip [ rep>> ] [ boxer>> ] bi ##box ;
+    [ f ] dip [ rep>> ] [ boxer>> ] bi ^^box ;
 
 M: long-long-type box-return
-    [ f ] dip boxer>> ##box-long-long ;
+    [ f ] dip boxer>> ^^box-long-long ;
 
 M: struct-c-type box-return
-    [ ##box-small-struct ] [ ##box-large-struct ] if-small-struct ;
+    [ ^^box-small-struct ] [ ^^box-large-struct ] if-small-struct ;
 
 : box-return* ( node -- )
-    return>> [ ] [ base-type box-return ##push-stack ] if-void ;
+    return>> [ ] [ base-type box-return 1 ##inc-d D 0 ##replace ] if-void ;
 
 GENERIC# dlsym-valid? 1 ( symbols dll -- ? )
 
@@ -200,41 +204,37 @@ M: #alien-invoke emit-node
 
 M: #alien-indirect emit-node
     [
-        ! Save alien at top of stack to temporary storage
-        ##prepare-alien-indirect
-        ! Unbox parameters
-        dup objects>registers
-        ! Call alien in temporary storage
-        ##alien-indirect
-        ! Box return value
-        dup ##cleanup
-        box-return*
+        D 0 ^^peek -1 ##inc-d ^^unbox-any-c-ptr
+        {
+            [ drop objects>registers ]
+            [ nip ##alien-indirect ]
+            [ drop ##cleanup ]
+            [ drop box-return* ]
+        } 2cleave
     ] emit-alien-node ;
 
 M: #alien-assembly emit-node
     [
-        ! Unbox parameters
-        dup objects>registers
-        ! Generate assembly
-        dup quot>> ##alien-assembly
-        ! Box return value
-        box-return*
+        [ objects>registers ]
+        [ quot>> ##alien-assembly ]
+        [ box-return* ]
+        tri
     ] emit-alien-node ;
 
-GENERIC: box-parameter ( n c-type -- )
+GENERIC: box-parameter ( n c-type -- dst )
 
 M: c-type box-parameter
-    [ rep>> ] [ boxer>> ] bi ##box ;
+    [ rep>> ] [ boxer>> ] bi ^^box ;
 
 M: long-long-type box-parameter
-    boxer>> ##box-long-long ;
+    boxer>> ^^box-long-long ;
 
 M: struct-c-type box-parameter
-    [ ##box-large-struct ] [ base-type box-parameter ] if-value-struct ;
+    [ ^^box-large-struct ] [ base-type box-parameter ] if-value-struct ;
 
 : box-parameters ( params -- )
     alien-parameters
-    [ base-type box-parameter ##push-context-stack ] each-parameter ;
+    [ base-type box-parameter next-vreg ##push-context-stack ] each-parameter ;
 
 : registers>objects ( node -- )
     ! Generate code for boxing input parameters in a callback.
@@ -260,7 +260,7 @@ M: struct-c-type box-parameter
      '[ _ _ do-callback ]
      >quotation ;
 
-GENERIC: unbox-return ( c-type -- )
+GENERIC: unbox-return ( src c-type -- )
 
 M: c-type unbox-return
     [ f ] dip [ rep>> ] [ unboxer>> ] bi ##unbox ;
@@ -280,10 +280,8 @@ M: #alien-callback emit-node
             [ wrap-callback-quot ##alien-callback ]
             [
                 alien-return [ ##end-callback ] [
-                    ##pop-context-stack
-                    ##to-nv
+                    [ ^^pop-context-stack ] dip
                     ##end-callback
-                    ##from-nv
                     base-type unbox-return
                 ] if-void
             ] tri
