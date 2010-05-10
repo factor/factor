@@ -160,8 +160,8 @@ M:: x86.32 %box ( dst n rep func -- )
 
 : (%box-long-long) ( n -- )
     [
-        EDX over next-stack@ MOV
-        EAX swap cell - next-stack@ MOV 
+        [ EDX swap next-stack@ MOV ]
+        [ EAX swap cell - next-stack@ MOV ] bi
     ] when* ;
 
 M:: x86.32 %box-long-long ( dst n func -- )
@@ -186,10 +186,10 @@ M: x86.32 %prepare-box-struct ( -- )
     ! Store it as the first parameter
     0 local@ EAX MOV ;
 
-M: x86.32 %box-small-struct ( dst c-type -- )
+M:: x86.32 %box-small-struct ( dst c-type -- )
     #! Box a <= 8-byte struct returned in EAX:EDX. OS X only.
     12 save-vm-ptr
-    8 stack@ swap heap-size MOV
+    8 stack@ c-type heap-size MOV
     4 stack@ EDX MOV
     0 stack@ EAX MOV
     "from_small_struct" f %alien-invoke
@@ -201,11 +201,11 @@ M:: x86.32 %pop-context-stack ( dst temp -- )
     dst dst [] MOV
     temp "datastack" context-field-offset [+] bootstrap-cell SUB ;
 
-: call-unbox-func ( src func -- )
+:: call-unbox-func ( src func -- )
     EAX src tagged-rep %copy
     4 save-vm-ptr
     0 stack@ EAX MOV
-    f %alien-invoke ;
+    func f %alien-invoke ;
 
 M:: x86.32 %unbox ( src n rep func -- )
     ! If n is f, we're unboxing a return value about to be
@@ -216,9 +216,9 @@ M:: x86.32 %unbox ( src n rep func -- )
     n [ n local@ rep store-return-reg ] when ;
 
 M:: x86.32 %unbox-long-long ( src n func -- )
-    call-unbox-func
+    src func call-unbox-func
     ! Store the return value on the C stack
-    [
+    n [
         [ local@ EAX MOV ]
         [ 4 + local@ EDX MOV ] bi
     ] when* ;
