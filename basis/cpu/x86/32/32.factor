@@ -283,14 +283,9 @@ M: x86.32 %end-callback ( -- )
     0 save-vm-ptr
     "end_callback" f %alien-invoke ;
 
-M: x86.32 %end-callback-value ( ctype -- )
-    %pop-context-stack
-    4 stack@ EAX MOV
-    %end-callback
-    ! Place former top of data stack back in EAX
-    EAX 4 stack@ MOV
-    ! Unbox EAX
-    unbox-return ;
+M: x86.32 %to-nv ( -- ) 4 stack@ EAX MOV ;
+
+M: x86.32 %from-nv ( -- ) EAX 4 stack@ MOV ;
 
 GENERIC: float-function-param ( stack-slot dst src -- )
 

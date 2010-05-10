@@ -91,6 +91,8 @@ M: ##dispatch generate-insn
 ! Special cases
 M: ##no-tco generate-insn drop ;
 
+M: ##stack-frame generate-insn drop ;
+
 M: ##prologue generate-insn
     drop
     cfg get stack-frame>>
@@ -251,6 +253,7 @@ CODEGEN: ##call-gc %call-gc
 CODEGEN: ##spill %spill
 CODEGEN: ##reload %reload
 
+! Conditional branches
 <<
 
 SYNTAX: CONDITIONAL:
@@ -270,3 +273,31 @@ CONDITIONAL: ##check-nursery-branch %check-nursery-branch
 CONDITIONAL: ##fixnum-add %fixnum-add
 CONDITIONAL: ##fixnum-sub %fixnum-sub
 CONDITIONAL: ##fixnum-mul %fixnum-mul
+
+! FFI
+CODEGEN: ##box %box
+CODEGEN: ##box-long-long %box-long-long
+CODEGEN: ##box-large-struct %box-large-struct
+CODEGEN: ##box-small-struct %box-small-struct
+CODEGEN: ##unbox %unbox
+CODEGEN: ##unbox-long-long %unbox-long-long
+CODEGEN: ##unbox-large-struct %unbox-large-struct
+CODEGEN: ##unbox-small-struct %unbox-small-struct
+CODEGEN: ##pop-stack %pop-stack
+CODEGEN: ##pop-context-stack %pop-context-stack
+CODEGEN: ##prepare-box-struct %prepare-box-struct
+CODEGEN: ##load-param-reg %load-param-reg
+CODEGEN: ##push-stack %push-stack
+CODEGEN: ##alien-invoke %alien-invoke
+CODEGEN: ##cleanup %cleanup
+CODEGEN: ##prepare-alien-indirect %prepare-alien-indirect
+CODEGEN: ##alien-indirect %alien-indirect
+CODEGEN: ##push-context-stack %push-context-stack
+CODEGEN: ##save-param-reg %save-param-reg
+CODEGEN: ##begin-callback %begin-callback
+CODEGEN: ##alien-callback %alien-callback
+CODEGEN: ##end-callback %end-callback
+CODEGEN: ##to-nv %to-nv
+CODEGEN: ##from-nv %from-nv
+
+M: ##alien-assembly generate-insn quot>> call( -- ) ;
