@@ -6,12 +6,6 @@ sets vectors fry arrays compiler.cfg compiler.cfg.instructions
 compiler.cfg.rpo compiler.utilities ;
 IN: compiler.cfg.utilities
 
-PREDICATE: kill-block < basic-block
-    instructions>> {
-        [ length 2 >= ]
-        [ penultimate kill-vreg-insn? ]
-    } 1&& ;
-
 : back-edge? ( from to -- ? )
     [ number>> ] bi@ >= ;
 

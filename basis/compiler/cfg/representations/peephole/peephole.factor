@@ -42,8 +42,16 @@ M: ##load-integer optimize-insn
         [ call-next-method ]
     } cond ;
 
-! When a float is unboxed, we replace the ##load-reference with a ##load-double
-! if the architecture supports it
+! When a constant float is unboxed, we replace the
+! ##load-reference with a ##load-float or ##load-double if the
+! architecture supports it
+: convert-to-load-float? ( insn -- ? )
+    {
+        [ drop fused-unboxing? ]
+        [ dst>> rep-of float-rep? ]
+        [ obj>> float? ]
+    } 1&& ;
+
 : convert-to-load-double? ( insn -- ? )
     {
         [ drop fused-unboxing? ]
@@ -74,6 +82,10 @@ M: ##load-integer optimize-insn
 
 M: ##load-reference optimize-insn
     {
+        {
+            [ dup convert-to-load-float? ]
+            [ [ dst>> ] [ obj>> ] bi ##load-float here ]
+        }
         {
             [ dup convert-to-load-double? ]
             [ [ dst>> ] [ obj>> ] bi ##load-double here ]

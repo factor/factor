@@ -5,8 +5,8 @@ arrays kernel fry math namespaces sequences system layouts io
 vocabs.loader accessors init classes.struct combinators
 command-line make words compiler compiler.units
 compiler.constants compiler.alien compiler.codegen
-compiler.codegen.alien compiler.codegen.fixup
-compiler.cfg.instructions compiler.cfg.builder
+compiler.codegen.fixup compiler.cfg.instructions
+compiler.cfg.builder compiler.cfg.builder.alien
 compiler.cfg.intrinsics compiler.cfg.stack-frame
 cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
 cpu.architecture vm ;
@@ -27,11 +27,14 @@ M: x86.32 temp-reg ECX ;
 
 M: x86.32 immediate-comparand? ( obj -- ? ) drop t ;
 
-M: x86.32 %load-double ( dst val -- )
-    [ 0 [] MOVSD ] dip rc-absolute rel-binary-literal ;
-
 M:: x86.32 %load-vector ( dst val rep -- )
     dst 0 [] rep copy-memory* val rc-absolute rel-binary-literal ;
+
+M: x86.32 %load-float ( dst val -- )
+    <float> float-rep %load-vector ;
+
+M: x86.32 %load-double ( dst val -- )
+    <double> double-rep %load-vector ;
 
 M: x86.32 %mov-vm-ptr ( reg -- )
     0 MOV 0 rc-absolute-cell rel-vm ;
@@ -148,31 +151,34 @@ M: x86.32 %load-param-reg [ swap local@ ] dip %copy ;
     #! parameter being passed to a callback from C.
     over [ [ local@ ] dip load-return-reg ] [ 2drop ] if ;
 
-M:: x86.32 %box ( n rep func -- )
+M:: x86.32 %box ( dst n rep func -- )
     n rep (%box)
     rep rep-size save-vm-ptr
     0 stack@ rep store-return-reg
-    func f %alien-invoke ;
+    func f %alien-invoke
+    dst EAX tagged-rep %copy ;
 
 : (%box-long-long) ( n -- )
     [
-        EDX over next-stack@ MOV
-        EAX swap cell - next-stack@ MOV 
+        [ EDX swap next-stack@ MOV ]
+        [ EAX swap cell - next-stack@ MOV ] bi
     ] when* ;
 
-M: x86.32 %box-long-long ( n func -- )
-    [ (%box-long-long) ] dip
+M:: x86.32 %box-long-long ( dst n func -- )
+    n (%box-long-long)
     8 save-vm-ptr
     4 stack@ EDX MOV
     0 stack@ EAX MOV
-    f %alien-invoke ;
+    func f %alien-invoke
+    dst EAX tagged-rep %copy ;
 
-M:: x86.32 %box-large-struct ( n c-type -- )
+M:: x86.32 %box-large-struct ( dst n c-type -- )
     EDX n struct-return@ LEA
     8 save-vm-ptr
     4 stack@ c-type heap-size MOV
     0 stack@ EDX MOV
-    "from_value_struct" f %alien-invoke ;
+    "from_value_struct" f %alien-invoke
+    dst EAX tagged-rep %copy ;
 
 M: x86.32 %prepare-box-struct ( -- )
     ! Compute target address for value struct return
@@ -180,114 +186,67 @@ M: x86.32 %prepare-box-struct ( -- )
     ! Store it as the first parameter
     0 local@ EAX MOV ;
 
-M: x86.32 %box-small-struct ( c-type -- )
+M:: x86.32 %box-small-struct ( dst c-type -- )
     #! Box a <= 8-byte struct returned in EAX:EDX. OS X only.
-    12 save-vm-ptr
-    8 stack@ swap heap-size MOV
-    4 stack@ EDX MOV
-    0 stack@ EAX MOV
-    "from_small_struct" f %alien-invoke ;
-
-M: x86.32 %pop-stack ( n -- )
-    EAX swap ds-reg reg-stack MOV ;
-
-M: x86.32 %pop-context-stack ( -- )
-    temp-reg %context
-    EAX temp-reg "datastack" context-field-offset [+] MOV
-    EAX EAX [] MOV
-    temp-reg "datastack" context-field-offset [+] bootstrap-cell SUB ;
-
-: call-unbox-func ( func -- )
-    4 save-vm-ptr
-    0 stack@ EAX MOV
-    f %alien-invoke ;
-
-M: x86.32 %unbox ( n rep func -- )
-    #! The value being unboxed must already be in EAX.
-    #! If n is f, we're unboxing a return value about to be
-    #! returned by the callback. Otherwise, we're unboxing
-    #! a parameter to a C function about to be called.
-    call-unbox-func
-    ! Store the return value on the C stack
-    over [ [ local@ ] dip store-return-reg ] [ 2drop ] if ;
-
-M: x86.32 %unbox-long-long ( n func -- )
-    call-unbox-func
-    ! Store the return value on the C stack
-    [
-        [ local@ EAX MOV ]
-        [ 4 + local@ EDX MOV ] bi
-    ] when* ;
-
-: %unbox-struct-1 ( -- )
-    #! Alien must be in EAX.
-    4 save-vm-ptr
-    0 stack@ EAX MOV
-    "alien_offset" f %alien-invoke
-    ! Load first cell
-    EAX EAX [] MOV ;
-
-: %unbox-struct-2 ( -- )
-    #! Alien must be in EAX.
-    4 save-vm-ptr
-    0 stack@ EAX MOV
-    "alien_offset" f %alien-invoke
-    ! Load second cell
-    EDX EAX 4 [+] MOV
-    ! Load first cell
-    EAX EAX [] MOV ;
-
-M: x86 %unbox-small-struct ( size -- )
-    #! Alien must be in EAX.
-    heap-size cell align cell /i {
-        { 1 [ %unbox-struct-1 ] }
-        { 2 [ %unbox-struct-2 ] }
-    } case ;
-
-M:: x86.32 %unbox-large-struct ( n c-type -- )
-    ! Alien must be in EAX.
-    ! Compute destination address
-    EDX n local@ LEA
     12 save-vm-ptr
     8 stack@ c-type heap-size MOV
     4 stack@ EDX MOV
     0 stack@ EAX MOV
-    "to_value_struct" f %alien-invoke ;
+    "from_small_struct" f %alien-invoke
+    dst EAX tagged-rep %copy ;
 
-M: x86.32 %prepare-alien-indirect ( -- )
-    EAX ds-reg [] MOV
-    ds-reg 4 SUB
+:: call-unbox-func ( src func -- )
+    EAX src tagged-rep %copy
     4 save-vm-ptr
     0 stack@ EAX MOV
-    "pinned_alien_offset" f %alien-invoke
-    EBP EAX MOV ;
+    func f %alien-invoke ;
 
-M: x86.32 %alien-indirect ( -- )
-    EBP CALL ;
+M:: x86.32 %unbox ( src n rep func -- )
+    ! If n is f, we're unboxing a return value about to be
+    ! returned by the callback. Otherwise, we're unboxing
+    ! a parameter to a C function about to be called.
+    src func call-unbox-func
+    ! Store the return value on the C stack
+    n [ n local@ rep store-return-reg ] when ;
+
+M:: x86.32 %unbox-long-long ( src n func -- )
+    src func call-unbox-func
+    ! Store the return value on the C stack
+    n [
+        [ local@ EAX MOV ]
+        [ 4 + local@ EDX MOV ] bi
+    ] when* ;
+
+M: x86 %unbox-small-struct ( src size -- )
+    [ [ EAX ] dip int-rep %copy ]
+    [
+        heap-size 4 > [ EDX EAX 4 [+] MOV ] when
+        EAX EAX [] MOV
+    ] bi* ;
+
+M:: x86.32 %unbox-large-struct ( src n c-type -- )
+    EAX src int-rep %copy
+    EDX n local@ LEA
+    8 stack@ c-type heap-size MOV
+    4 stack@ EAX MOV
+    0 stack@ EDX MOV
+    "memcpy" "libc" load-library %alien-invoke ;
+
+M: x86.32 %alien-indirect ( src -- )
+    ?spill-slot CALL ;
 
 M: x86.32 %begin-callback ( -- )
     0 save-vm-ptr
-    ESP 4 [+] 0 MOV
+    4 stack@ 0 MOV
     "begin_callback" f %alien-invoke ;
 
 M: x86.32 %alien-callback ( quot -- )
-    EAX EDX %restore-context
-    EAX swap %load-reference
-    EAX quot-entry-point-offset [+] CALL
-    EAX EDX %save-context ;
+    [ EAX ] dip %load-reference
+    EAX quot-entry-point-offset [+] CALL ;
 
 M: x86.32 %end-callback ( -- )
     0 save-vm-ptr
     "end_callback" f %alien-invoke ;
-
-M: x86.32 %end-callback-value ( ctype -- )
-    %pop-context-stack
-    4 stack@ EAX MOV
-    %end-callback
-    ! Place former top of data stack back in EAX
-    EAX 4 stack@ MOV
-    ! Unbox EAX
-    unbox-return ;
 
 GENERIC: float-function-param ( stack-slot dst src -- )
 

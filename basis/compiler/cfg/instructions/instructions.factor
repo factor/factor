@@ -34,6 +34,10 @@ INSN: ##load-tagged
 def: dst/tagged-rep
 literal: val ;
 
+INSN: ##load-float
+def: dst/float-rep
+literal: val ;
+
 INSN: ##load-double
 def: dst/double-rep
 literal: val ;
@@ -605,17 +609,67 @@ use: src/tagged-rep
 literal: offset ;
 
 ! FFI
+INSN: ##stack-frame
+literal: stack-frame ;
+
+INSN: ##box
+def: dst/tagged-rep
+literal: n rep boxer ;
+
+INSN: ##box-long-long
+def: dst/tagged-rep
+literal: n boxer ;
+
+INSN: ##box-small-struct
+def: dst/tagged-rep
+literal: c-type ;
+
+INSN: ##box-large-struct
+def: dst/tagged-rep
+literal: n c-type ;
+
+INSN: ##unbox
+use: src/tagged-rep
+literal: n rep unboxer ;
+
+INSN: ##unbox-long-long
+use: src/tagged-rep
+literal: n unboxer ;
+
+INSN: ##unbox-large-struct
+use: src/int-rep
+literal: n c-type ;
+
+INSN: ##unbox-small-struct
+use: src/int-rep
+literal: c-type ;
+
+INSN: ##prepare-box-struct ;
+
+INSN: ##load-param-reg
+literal: offset reg rep ;
+
 INSN: ##alien-invoke
-literal: params stack-frame ;
+literal: symbols dll ;
+
+INSN: ##cleanup
+literal: params ;
 
 INSN: ##alien-indirect
-literal: params stack-frame ;
+use: src/int-rep ;
 
 INSN: ##alien-assembly
-literal: params stack-frame ;
+literal: quot ;
+
+INSN: ##save-param-reg
+literal: offset reg rep ;
+
+INSN: ##begin-callback ;
 
 INSN: ##alien-callback
-literal: params stack-frame ;
+literal: quot ;
+
+INSN: ##end-callback ;
 
 ! Control flow
 INSN: ##phi
@@ -706,6 +760,9 @@ literal: cc ;
 INSN: ##save-context
 temp: temp1/int-rep temp2/int-rep ;
 
+INSN: ##restore-context
+temp: temp1/int-rep temp2/int-rep ;
+
 ! GC checks
 INSN: ##check-nursery-branch
 literal: size cc
@@ -752,16 +809,23 @@ UNION: ##write ##set-slot ##set-slot-imm ##set-vm-field ;
 UNION: clobber-insn
 ##call-gc
 ##unary-float-function
-##binary-float-function ;
-
-! Instructions that kill all live vregs
-UNION: kill-vreg-insn
-##call
-##prologue
-##epilogue
+##binary-float-function
+##box
+##box-long-long
+##box-small-struct
+##box-large-struct
+##unbox
+##unbox-long-long
+##unbox-large-struct
+##unbox-small-struct
+##prepare-box-struct
+##load-param-reg
 ##alien-invoke
 ##alien-indirect
-##alien-callback ;
+##alien-assembly
+##save-param-reg
+##begin-callback
+##end-callback ;
 
 ! Instructions that have complex expansions and require that the
 ! output registers are not equal to any of the input registers
