@@ -276,20 +276,21 @@ CONDITIONAL: ##fixnum-sub %fixnum-sub
 CONDITIONAL: ##fixnum-mul %fixnum-mul
 
 ! FFI
+CODEGEN: ##unbox %unbox
+CODEGEN: ##store-reg-param %store-reg-param
+CODEGEN: ##store-stack-param %store-stack-param
+CODEGEN: ##store-return %store-return
+CODEGEN: ##store-struct-return %store-struct-return
+CODEGEN: ##store-long-long-return %store-long-long-return
+CODEGEN: ##prepare-struct-area %prepare-struct-area
 CODEGEN: ##box %box
 CODEGEN: ##box-long-long %box-long-long
 CODEGEN: ##box-large-struct %box-large-struct
 CODEGEN: ##box-small-struct %box-small-struct
-CODEGEN: ##unbox %unbox
-CODEGEN: ##unbox-long-long %unbox-long-long
-CODEGEN: ##unbox-large-struct %unbox-large-struct
-CODEGEN: ##unbox-small-struct %unbox-small-struct
-CODEGEN: ##prepare-box-struct %prepare-box-struct
-CODEGEN: ##load-param-reg %load-param-reg
+CODEGEN: ##save-param-reg %save-param-reg
 CODEGEN: ##alien-invoke %alien-invoke
 CODEGEN: ##cleanup %cleanup
 CODEGEN: ##alien-indirect %alien-indirect
-CODEGEN: ##save-param-reg %save-param-reg
 CODEGEN: ##begin-callback %begin-callback
 CODEGEN: ##alien-callback %alien-callback
 CODEGEN: ##end-callback %end-callback
