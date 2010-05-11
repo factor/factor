@@ -3,6 +3,7 @@
 USING: alien.syntax alien.libraries cairo.ffi combinators 
 kernel system
 gir glib glib.ffi gobject gio gmodule gdk.pixbuf gdk atk ;
+EXCLUDE: alien.c-types => pointer ;
 
 <<
 "gtk" {

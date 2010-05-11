@@ -16,5 +16,7 @@ type-infos [ H{ } ] initialize
 SYMBOL: aliases
 aliases [ H{ } ] initialize
 
+SYMBOL: implement-structs
+
 : get-lib-alias ( lib -- alias )
     lib-aliases get-global at ;

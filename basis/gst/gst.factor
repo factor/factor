@@ -3,6 +3,7 @@
 USING: alien.syntax alien.libraries combinators 
 kernel system
 gir glib glib.ffi gobject gmodule ;
+EXCLUDE: alien.c-types => pointer ;
 
 <<
 "gst" {
