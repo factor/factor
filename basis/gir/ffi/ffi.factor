@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.parser assocs combinators
-combinators.short-circuit effects fry generalizations
+USING: accessors alien alien.c-types alien.enums alien.parser arrays assocs classes.parser
+classes.struct combinators combinators.short-circuit compiler.units effects definitions fry generalizations
 gir.common gir.types kernel locals math math.parser namespaces
 parser prettyprint quotations sequences vocabs.parser words
 words.constant ;
@@ -52,10 +52,10 @@ IN: gir.ffi
 : signal-ffi-effect ( signal -- effect )
     [ parameters>> [ name>> ] map ]
     [ return>> type>> none-type? { } { "result" } ? ] bi
-    <effect> dup . ;
+    <effect> ;
 
 :: define-ffi-signal ( signal class -- word ) ! сделать попонятнее
-    signal dup .
+    signal
     [
         name>> class c-type>> swap ":" glue create-in
         [ void* swap typedef ] keep dup
@@ -75,12 +75,13 @@ IN: gir.ffi
     } case ;
 
 : define-ffi-enum ( enum -- word )
+    [ c-type>> (CREATE-C-TYPE) dup ]
     [
        members>> [
            [ c-identifier>> create-in ]
-           [ value>> ] bi define-constant
-       ] each 
-    ] [ c-type>> create-in [ int swap typedef ] keep ] bi ;
+           [ value>> ] bi 2array
+       ] map 
+    ] bi int swap define-enum ;
 
 : define-ffi-enums ( enums -- )
     [ define-ffi-enum ] define-each ;
@@ -88,9 +89,33 @@ IN: gir.ffi
 : define-ffi-bitfields ( bitfields -- )
     [ define-ffi-enum ] define-each ;
 
+: fields>struct-slots ( fields -- slots )
+    [
+        [ name>> ] [ c-type>> string>c-type ]
+        [ drop { } ] tri <struct-slot-spec>
+    ] map ;
+
+! Сделать для всех типов создание DEFER:
+: define-ffi-record-defer ( record -- word )
+    c-type>> create-in void* swap [ typedef ] keep ;
+
+: define-ffi-records-defer ( records -- )
+    [ define-ffi-record-defer ] define-each ;
+
 : define-ffi-record ( record -- word )
-    [ disguised?>> void* void ? ]
-    [ c-type>> create-in ] bi [ typedef ] keep ;
+    dup ffi>> forget
+    dup {
+        [ fields>> empty? not ]
+        [ c-type>> implement-structs get-global member? ]
+    } 1&&
+    [
+        dup .
+        [ c-type>> create-class-in dup ]
+        [ fields>> fields>struct-slots ] bi define-struct-class        
+    ] [
+        [ disguised?>> void* void ? ]
+        [ c-type>> create-in ] bi [ typedef ] keep
+    ] if ;
 
 : define-ffi-records ( records -- )
     [ define-ffi-record ] define-each ;
@@ -185,7 +210,7 @@ IN: gir.ffi
 : prepare-vocab ( repository -- )
     includes>> lib-aliases get '[ _ at ] map sift
     [ ffi-vocab "." glue ] map
-    { "alien.c-types" } append
+    ! { "alien.c-types" } append
     [ dup using-vocab? [ drop ] [ use-vocab ] if ] each ;
 
 : define-ffi-namespace ( namespace -- )
@@ -194,11 +219,15 @@ IN: gir.ffi
         [ consts>> define-ffi-consts ]
         [ enums>> define-ffi-enums ]
         [ bitfields>> define-ffi-bitfields ]
-        [ records>> define-ffi-records ]
+        
+        [ records>> define-ffi-records-defer ]
+
         [ unions>> define-ffi-unions ]
         [ interfaces>> define-ffi-interfaces ]
         [ classes>> define-ffi-classes ]
         [ callbacks>> define-ffi-callbacks ]
+        [ records>> define-ffi-records ]
+                
         [ records>> define-ffi-records-content ]
         [ classes>> define-ffi-classes-content ]
         [ interfaces>> define-ffi-interfaces-content ]

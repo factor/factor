@@ -58,7 +58,8 @@ TYPEDEF: guint32 gunichar
 TYPEDEF: guint16 gunichar2
 
 ! Разобраться, почему в .gir есть такие типы
-TYPEDEF: void any
+TYPEDEF: gpointer pointer
+TYPEDEF: gpointer any
 
 IN-GIR: glib vocab:glib/GLib-2.0.gir
 

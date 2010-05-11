@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.syntax alien.c-types alien.destructors 
+USING: accessors alien alien.syntax alien.c-types alien.destructors 
 alien.strings alien.libraries arrays classes.struct combinators 
 destructors fonts init kernel math math.rectangles memoize 
 io.encodings.utf8 system
