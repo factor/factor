@@ -166,16 +166,10 @@ INSTANCE: struct-c-type value-type
 
 M: struct-c-type c-type ;
 
-: if-value-struct ( ctype true false -- )
-    [ dup value-struct? ] 2dip '[ drop void* @ ] if ; inline
-
-: if-small-struct ( c-type true false -- ? )
-    [ dup return-struct-in-registers? ] 2dip '[ f swap @ ] if ; inline
-
 M: struct-c-type base-type ;
 
 M: struct-c-type stack-size
-    [ heap-size cell align ] [ stack-size ] if-value-struct ;
+    dup value-struct? [ heap-size cell align ] [ drop cell ] if ;
 
 HOOK: flatten-struct-type cpu ( type -- reps )
 

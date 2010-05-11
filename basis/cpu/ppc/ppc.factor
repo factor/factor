@@ -769,8 +769,6 @@ M: ppc immediate-bitwise? ( n -- ? ) 0 65535 between? ;
 
 M: ppc immediate-store? drop f ;
 
-M: ppc struct-return-pointer-type void* ;
-
 M: ppc return-struct-in-registers? ( c-type -- ? )
     c-type return-in-registers?>> ;
 

@@ -1,121 +1,89 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays layouts math math.order math.parser
-combinators fry sequences locals alien alien.private
+combinators fry make sequences locals alien alien.private
 alien.strings alien.c-types alien.libraries classes.struct
 namespaces kernel strings libc quotations cpu.architecture
 compiler.alien compiler.utilities compiler.tree compiler.cfg
-compiler.cfg.builder compiler.cfg.builder.blocks
-compiler.cfg.instructions compiler.cfg.stack-frame
-compiler.cfg.stacks compiler.cfg.registers
-compiler.cfg.hats ;
+compiler.cfg.builder compiler.cfg.builder.alien.params
+compiler.cfg.builder.blocks compiler.cfg.instructions
+compiler.cfg.stack-frame compiler.cfg.stacks
+compiler.cfg.registers compiler.cfg.hats ;
 FROM: compiler.errors => no-such-symbol no-such-library ;
 IN: compiler.cfg.builder.alien
 
-GENERIC: next-fastcall-param ( rep -- )
+! output is triples with shape { vreg rep on-stack? }
+GENERIC: unbox ( src c-type -- vregs )
 
-: ?dummy-stack-params ( rep -- )
-    dummy-stack-params? [ rep-size cell align stack-params +@ ] [ drop ] if ;
+M: c-type unbox
+    [ [ unboxer>> ] [ rep>> ] bi ^^unbox ] [ rep>> ] bi
+    f 3array 1array ;
 
-: ?dummy-int-params ( rep -- )
-    dummy-int-params? [ rep-size cell /i 1 max int-regs +@ ] [ drop ] if ;
+M: long-long-type unbox
+    unboxer>> int-rep ^^unbox
+    0 cell
+    [
+        int-rep f ^^load-memory-imm
+        int-rep long-long-on-stack? 3array
+    ] bi-curry@ bi 2array ;
 
-: ?dummy-fp-params ( rep -- )
-    drop dummy-fp-params? [ float-regs inc ] when ;
+GENERIC: unbox-parameter ( src c-type -- vregs )
 
-M: int-rep next-fastcall-param
-    int-regs inc [ ?dummy-stack-params ] [ ?dummy-fp-params ] bi ;
+M: c-type unbox-parameter unbox ;
 
-M: float-rep next-fastcall-param
-    float-regs inc [ ?dummy-stack-params ] [ ?dummy-int-params ] bi ;
+M: long-long-type unbox-parameter unbox ;
 
-M: double-rep next-fastcall-param
-    float-regs inc [ ?dummy-stack-params ] [ ?dummy-int-params ] bi ;
+M:: struct-c-type unbox-parameter ( src c-type -- )
+    src ^^unbox-any-c-ptr :> src
+    c-type value-struct? [
+        c-type flatten-struct-type
+        [| rep i |
+            src i cells rep f ^^load-memory-imm
+            rep struct-on-stack? 3array
+        ] map-index
+    ] [ { { src int-rep f } } ] if ;
 
-GENERIC# reg-class-full? 1 ( reg-class abi -- ? )
-
-M: stack-params reg-class-full? 2drop t ;
-
-M: reg-class reg-class-full?
-    [ get ] swap '[ _ param-regs length ] bi >= ;
-
-: alloc-stack-param ( rep -- n reg-class rep )
-    stack-params get
-    [ rep-size cell align stack-params +@ ] dip
-    stack-params dup ;
-
-: alloc-fastcall-param ( rep -- n reg-class rep )
-    [ [ reg-class-of get ] [ reg-class-of ] [ next-fastcall-param ] tri ] keep ;
-
-:: alloc-parameter ( rep abi -- reg rep )
-    rep dup reg-class-of abi reg-class-full?
-    [ alloc-stack-param ] [ alloc-fastcall-param ] if
-    [ abi param-reg ] dip ;
-
-: reset-fastcall-counts ( -- )
-    { int-regs float-regs stack-params } [ 0 swap set ] each ;
-
-: with-param-regs ( quot -- )
-    #! In quot you can call alloc-parameter
-    [ reset-fastcall-counts call ] with-scope ; inline
-
-:: move-parameters ( params word -- )
-    #! Moves values from C stack to registers (if word is
-    #! ##load-param-reg) and registers to C stack (if word is
-    #! ##save-param-reg).
-    0 params alien-parameters flatten-c-types [
-        [ params abi>> alloc-parameter word execute( offset reg rep -- ) ]
-        [ rep-size cell align + ]
-        2bi
-    ] each drop ; inline
-
-: parameter-offsets ( types -- offsets )
-    0 [ stack-size + ] accumulate nip ;
-
-: prepare-parameters ( parameters -- offsets types indices )
-    [ length iota <reversed> ] [ parameter-offsets ] [ ] tri ;
-
-GENERIC: unbox-parameter ( src n c-type -- )
-
-M: c-type unbox-parameter
-    [ rep>> ] [ unboxer>> ] bi ##unbox ;
-
-M: long-long-type unbox-parameter
-    unboxer>> ##unbox-long-long ;
-
-M: struct-c-type unbox-parameter
-    [ [ ^^unbox-any-c-ptr ] 2dip ##unbox-large-struct ]
-    [ base-type unbox-parameter ]
-    if-value-struct ;
-
-: unbox-parameters ( offset node -- )
-    parameters>> swap
-    '[
-        prepare-parameters
+: unbox-parameters ( parameters -- vregs )
+    [
+        [ length iota <reversed> ] keep
         [
-            [ <ds-loc> ^^peek ] [ _ + ] [ base-type ] tri*
+            [ <ds-loc> ^^peek ] [ base-type ] bi*
             unbox-parameter
-        ] 3each
+        ] 2map concat
     ]
-    [ length neg ##inc-d ]
-    bi ;
+    [ length neg ##inc-d ] bi ;
 
-: prepare-box-struct ( node -- offset )
+: prepare-struct-area ( vregs return -- vregs )
     #! Return offset on C stack where to store unboxed
     #! parameters. If the C function is returning a structure,
     #! the first parameter is an implicit target area pointer,
     #! so we need to use a different offset.
-    return>> large-struct?
-    [ ##prepare-box-struct cell ] [ 0 ] if ;
+    large-struct? [
+        ^^prepare-struct-area int-rep struct-return-on-stack?
+        3array prefix
+    ] when ;
+
+: (objects>registers) ( vregs -- )
+    ! Place instructions in reverse order, so that the
+    ! ##store-stack-param instructions come first. This is
+    ! because they are not clobber-insns and so we avoid some
+    ! spills that way.
+    [
+        first3 [ dup reg-class-of reg-class-full? ] dip or
+        [ [ alloc-stack-param ] keep \ ##store-stack-param new-insn ]
+        [ [ next-reg-param ] keep \ ##store-reg-param new-insn ]
+        if
+    ] map reverse % ;
 
 : objects>registers ( params -- )
     #! Generate code for unboxing a list of C types, then
     #! generate code for moving these parameters to registers on
     #! architectures where parameters are passed in registers.
-    [
-        [ prepare-box-struct ] keep
-        [ unbox-parameters ] keep
-        \ ##load-param-reg move-parameters
+    [ abi>> ] [ parameters>> ] [ return>> ] tri
+    '[ 
+        _ unbox-parameters
+        _ prepare-struct-area
+        (objects>registers)
     ] with-param-regs ;
 
 GENERIC: box-return ( c-type -- dst )
@@ -125,6 +93,9 @@ M: c-type box-return
 
 M: long-long-type box-return
     [ f ] dip boxer>> ^^box-long-long ;
+
+: if-small-struct ( c-type true false -- ? )
+    [ dup return-struct-in-registers? ] 2dip '[ f swap @ ] if ; inline
 
 M: struct-c-type box-return
     [ ^^box-small-struct ] [ ^^box-large-struct ] if-small-struct ;
@@ -189,13 +160,12 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
 
 M: #alien-invoke emit-node
     [
-        ! Unbox parameters
-        dup objects>registers
-        ! Call function
-        dup alien-invoke-dlsym ##alien-invoke
-        ! Box return value
-        dup ##cleanup
-        box-return*
+        {
+            [ objects>registers ]
+            [ alien-invoke-dlsym ##alien-invoke ]
+            [ stack-cleanup ##cleanup ]
+            [ box-return* ]
+        } cleave
     ] emit-alien-node ;
 
 M: #alien-indirect emit-node
@@ -204,7 +174,7 @@ M: #alien-indirect emit-node
         {
             [ drop objects>registers ]
             [ nip ##alien-indirect ]
-            [ drop ##cleanup ]
+            [ drop stack-cleanup ##cleanup ]
             [ drop box-return* ]
         } 2cleave
     ] emit-alien-node ;
@@ -225,8 +195,17 @@ M: c-type box-parameter
 M: long-long-type box-parameter
     boxer>> ^^box-long-long ;
 
+: if-value-struct ( ctype true false -- )
+    [ dup value-struct? ] 2dip '[ drop void* @ ] if ; inline
+
 M: struct-c-type box-parameter
     [ ^^box-large-struct ] [ base-type box-parameter ] if-value-struct ;
+
+: parameter-offsets ( types -- offsets )
+    0 [ stack-size + ] accumulate nip ;
+
+: prepare-parameters ( parameters -- offsets types indices )
+    [ length iota <reversed> ] [ parameter-offsets ] [ ] tri ;
 
 : box-parameters ( params -- )
     alien-parameters
@@ -239,10 +218,21 @@ M: struct-c-type box-parameter
         ] 3each
     ] bi ;
 
-: registers>objects ( node -- )
+:: alloc-parameter ( rep -- reg rep )
+    rep dup reg-class-of reg-class-full?
+    [ alloc-stack-param stack-params ] [ [ next-reg-param ] keep ] if ;
+
+: (registers>objects) ( params -- )
+    [ 0 ] dip alien-parameters flatten-c-types [
+        [ alloc-parameter ##save-param-reg ]
+        [ rep-size cell align + ]
+        2bi
+    ] each drop ; inline
+
+: registers>objects ( params -- )
     ! Generate code for boxing input parameters in a callback.
-    [
-        dup \ ##save-param-reg move-parameters
+    dup abi>> [
+        dup (registers>objects)
         ##begin-callback
         next-vreg next-vreg ##restore-context
         box-parameters
@@ -267,14 +257,13 @@ M: struct-c-type box-parameter
 GENERIC: unbox-return ( src c-type -- )
 
 M: c-type unbox-return
-    [ f ] dip [ rep>> ] [ unboxer>> ] bi ##unbox ;
+    unbox first first2 ##store-return ;
 
 M: long-long-type unbox-return
-    [ f ] dip unboxer>> ##unbox-long-long ;
+    unbox first2 [ first ] bi@ ##store-long-long-return ;
 
 M: struct-c-type unbox-return
-    [ ^^unbox-any-c-ptr ] dip
-    [ ##unbox-small-struct ] [ ##unbox-large-struct ] if-small-struct ;
+    [ ^^unbox-any-c-ptr ] dip ##store-struct-return ;
 
 M: #alien-callback emit-node
     dup params>> xt>> dup
@@ -284,11 +273,15 @@ M: #alien-callback emit-node
             [ registers>objects ]
             [ wrap-callback-quot ##alien-callback ]
             [
-                alien-return [ ##end-callback ] [
-                    [ D 0 ^^peek ] dip
-                    ##end-callback
-                    base-type unbox-return
-                ] if-void
+                return>> {
+                    { [ dup void eq? ] [ drop ##end-callback ] }
+                    { [ dup large-struct? ] [ drop ##end-callback ] }
+                    [
+                        [ D 0 ^^peek ] dip
+                        ##end-callback
+                        base-type unbox-return
+                    ]
+                } cond
             ] tri
         ] emit-alien-node
         ##epilogue

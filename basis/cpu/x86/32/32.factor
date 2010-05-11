@@ -95,17 +95,14 @@ M: x86.32 return-struct-in-registers? ( c-type -- ? )
     os { linux netbsd solaris } member? not
     and or ;
 
-: struct-return@ ( n -- operand )
-    [ next-stack@ ] [ stack-frame get params>> local@ ] if* ;
-
-! On x86, parameters are usually never passed in registers, except with Microsoft's
-! "thiscall" and "fastcall" abis
+! On x86, parameters are usually never passed in registers,
+! except with Microsoft's "thiscall" and "fastcall" abis
 M: int-regs return-reg drop EAX ;
 M: float-regs param-regs 2drop { } ;
 
 M: int-regs param-regs
     nip {
-        { thiscall [ { ECX     } ] }
+        { thiscall [ { ECX } ] }
         { fastcall [ { ECX EDX } ] }
         [ drop { } ]
     } case ;
@@ -133,6 +130,26 @@ M: x86.32 %prologue ( n -- )
 M: x86.32 %prepare-jump
     pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here ;
 
+:: call-unbox-func ( src func -- )
+    EAX src tagged-rep %copy
+    4 save-vm-ptr
+    0 stack@ EAX MOV
+    func f %alien-invoke ;
+
+M:: x86.32 %unbox ( dst src func rep -- )
+    src func call-unbox-func
+    dst rep reg-class-of return-reg rep %copy ;
+
+M:: x86.32 %store-long-long-return ( src1 src2 n func -- )
+    src2 EAX = [ src1 src2 XCHG src2 src1 ] [ src1 src2 ] if :> ( src1 src2 )
+    EAX src1 int-rep %copy
+    EDX src2 int-rep %copy ;
+
+M:: x86.32 %store-struct-return ( src c-type -- )
+    EAX src int-rep %copy
+    EDX EAX 4 [+] MOV
+    EAX EAX [] MOV ;
+
 M: stack-params copy-register*
     drop
     {
@@ -141,8 +158,6 @@ M: stack-params copy-register*
     } cond ;
 
 M: x86.32 %save-param-reg [ local@ ] 2dip %copy ;
-
-M: x86.32 %load-param-reg [ swap local@ ] dip %copy ;
 
 : (%box) ( n rep -- )
     #! If n is f, push the return register onto the stack; we
@@ -172,6 +187,9 @@ M:: x86.32 %box-long-long ( dst n func -- )
     func f %alien-invoke
     dst EAX tagged-rep %copy ;
 
+M: x86.32 struct-return@ ( n -- operand )
+    [ next-stack@ ] [ stack-frame get params>> local@ ] if* ;
+
 M:: x86.32 %box-large-struct ( dst n c-type -- )
     EDX n struct-return@ LEA
     8 save-vm-ptr
@@ -179,12 +197,6 @@ M:: x86.32 %box-large-struct ( dst n c-type -- )
     0 stack@ EDX MOV
     "from_value_struct" f %alien-invoke
     dst EAX tagged-rep %copy ;
-
-M: x86.32 %prepare-box-struct ( -- )
-    ! Compute target address for value struct return
-    EAX f struct-return@ LEA
-    ! Store it as the first parameter
-    0 local@ EAX MOV ;
 
 M:: x86.32 %box-small-struct ( dst c-type -- )
     #! Box a <= 8-byte struct returned in EAX:EDX. OS X only.
@@ -194,46 +206,6 @@ M:: x86.32 %box-small-struct ( dst c-type -- )
     0 stack@ EAX MOV
     "from_small_struct" f %alien-invoke
     dst EAX tagged-rep %copy ;
-
-:: call-unbox-func ( src func -- )
-    EAX src tagged-rep %copy
-    4 save-vm-ptr
-    0 stack@ EAX MOV
-    func f %alien-invoke ;
-
-M:: x86.32 %unbox ( src n rep func -- )
-    ! If n is f, we're unboxing a return value about to be
-    ! returned by the callback. Otherwise, we're unboxing
-    ! a parameter to a C function about to be called.
-    src func call-unbox-func
-    ! Store the return value on the C stack
-    n [ n local@ rep store-return-reg ] when ;
-
-M:: x86.32 %unbox-long-long ( src n func -- )
-    src func call-unbox-func
-    ! Store the return value on the C stack
-    n [
-        [ local@ EAX MOV ]
-        [ 4 + local@ EDX MOV ] bi
-    ] when* ;
-
-M: x86 %unbox-small-struct ( src size -- )
-    [ [ EAX ] dip int-rep %copy ]
-    [
-        heap-size 4 > [ EDX EAX 4 [+] MOV ] when
-        EAX EAX [] MOV
-    ] bi* ;
-
-M:: x86.32 %unbox-large-struct ( src n c-type -- )
-    EAX src int-rep %copy
-    EDX n local@ LEA
-    8 stack@ c-type heap-size MOV
-    4 stack@ EAX MOV
-    0 stack@ EDX MOV
-    "memcpy" "libc" load-library %alien-invoke ;
-
-M: x86.32 %alien-indirect ( src -- )
-    ?spill-slot CALL ;
 
 M: x86.32 %begin-callback ( -- )
     0 save-vm-ptr
@@ -280,7 +252,7 @@ M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
 : funny-large-struct-return? ( params -- ? )
     #! MINGW ABI incompatibility disaster
     [ return>> large-struct? ]
-    [ abi>> mingw = os windows? not or ]
+    [ abi>> mingw eq? os windows? not or ]
     bi and ;
 
 : stack-arg-size ( params -- n )
@@ -301,8 +273,8 @@ M: x86.32 stack-cleanup ( params -- n )
         [ drop 0 ]
     } cond ;
 
-M: x86.32 %cleanup ( params -- )
-    stack-cleanup [ ESP swap SUB ] unless-zero ;
+M: x86.32 %cleanup ( n -- )
+    [ ESP swap SUB ] unless-zero ;
 
 M:: x86.32 %call-gc ( gc-roots -- )
     4 save-vm-ptr
@@ -315,12 +287,10 @@ M: x86.32 dummy-int-params? f ;
 
 M: x86.32 dummy-fp-params? f ;
 
-! Dreadful
-M: struct-c-type flatten-c-type stack-params (flatten-c-type) ;
-M: long-long-type flatten-c-type stack-params (flatten-c-type) ;
-M: c-type flatten-c-type dup rep>> int-rep? int-rep stack-params ? (flatten-c-type) ;
+M: x86.32 long-long-on-stack? t ;
 
-M: x86.32 struct-return-pointer-type
-    os linux? void* (stack-value) ? ;
+M: x86.32 structs-on-stack? t ;
+
+M: x86.32 struct-return-on-stack? os linux? not ;
 
 check-sse
