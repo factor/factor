@@ -53,26 +53,21 @@ IN: gir.samples.lowlevel.opengl
     [ 200 200 gtk_window_set_default_size ]
     [ GTK_WIN_POS_CENTER gtk_window_set_position ] tri
 
-    window 1 gtk_container_set_reallocate_redraws
+    ! window 1 gtk_container_set_reallocate_redraws
 
     GDK_GL_MODE_RGBA GDK_GL_MODE_DOUBLE bitor
     gdk_gl_config_new_by_mode :> gl-config
     
-    gtk_drawing_area_new :> drawing-area
-    drawing-area 200 200 gtk_widget_set_size_request
+    window gl-config f 1 GDK_GL_RGBA_TYPE
+    gtk_widget_set_gl_capability drop
 
-    drawing-area gl-config f 1 GDK_GL_RGBA_TYPE
-    gtk_widget_set_gl_capability .
-
-    drawing-area "configure-event" utf8 string>alien
+    window "configure-event" utf8 string>alien
     [ on-configure ] GtkWidget:configure-event
     f f 0 g_signal_connect_data drop
 
-    drawing-area "expose-event" utf8 string>alien
+    window "expose-event" utf8 string>alien
     [ on-expose ] GtkWidget:expose-event
-    f f 0 g_signal_connect_data drop    
-
-    window drawing-area gtk_container_add    
+    f f 0 g_signal_connect_data drop
 
     window ;
 

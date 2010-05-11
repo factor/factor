@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.syntax alien.libraries combinators kernel system
 gir glib gobject gio gmodule gdk.pixbuf gdk gdk.gl gtk gtk.ffi ;
+EXCLUDE: alien.c-types => pointer ;
 
 <<
 "gtk.gl" {

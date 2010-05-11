@@ -42,6 +42,7 @@ IN: gir.loader
         }
         { "type" [ node>type f swap ] }
         { "varargs" [ drop f f ] }
+        { "callback" [ drop f "any" f type boa ] }
     } case ;
     
 : load-parameter ( param xml -- param )
@@ -188,10 +189,27 @@ IN: gir.loader
         [ "member" tags-named [ xml>member ] map >>members ]
     } cleave ;
 
+: xml>field ( xml -- field )
+    [ field new ] dip {
+        [ "name" attr >>name ]
+        [ "writable" attr "1" = >>writable? ]
+        ! Для некоторых field  есть callback в качестве типа, решить, как лучше сделать
+        [
+            first-child-tag dup name>> main>> "callback" =
+            [ drop "gpointer" ] [ "type" attr ] if
+            >>c-type
+        ]
+        [
+            first-child-tag xml>type
+            [ [ >>array-info ] [ >>type ] bi* ] [ 2drop f ] if*
+        ]
+    } cleave ;
+
 : xml>record ( xml -- record )
     [ record new ] dip {
         [ load-type ]
         [ "disguised" attr "1" = >>disguised? ]
+        [ "field" tags-named [ xml>field ] map >>fields ]
         [ "constructor" load-functions >>constructors ]
         [ "function" load-functions >>functions ]
         [

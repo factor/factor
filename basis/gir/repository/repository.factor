@@ -20,8 +20,11 @@ TUPLE: const < typed value ffi ;
 TUPLE: type-node < node
     type c-type type-name get-type ffi ;
 
+TUPLE: field < typed
+    writable? length? array-info ;
+
 TUPLE: record < type-node
-    constructors methods functions disguised? ;
+    fields constructors methods functions disguised? ;
 
 TUPLE: union < type-node ;
 
