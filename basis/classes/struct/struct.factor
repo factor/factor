@@ -176,7 +176,12 @@ HOOK: flatten-struct-type cpu ( type -- pairs )
 M: object flatten-struct-type
     stack-size cell /i { int-rep f } <repetition> ;
 
-M: struct-c-type c-struct? drop t ;
+: large-struct? ( type -- ? )
+    {
+        { [ dup void? ] [ drop f ] }
+        { [ dup base-type struct-c-type? not ] [ drop f ] }
+        [ return-struct-in-registers? not ]
+    } cond ;
 
 <PRIVATE
 : struct-slot-values-quot ( class -- quot )
