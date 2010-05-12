@@ -534,10 +534,6 @@ M: object immediate-comparand? ( n -- ? )
 : immediate-shift-count? ( n -- ? )
     0 cell-bits 1 - between? ;
 
-! What c-type describes the implicit struct return pointer for
-! large structs?
-HOOK: struct-return-pointer-type cpu ( -- c-type )
-
 ! Is this structure small enough to be returned in registers?
 HOOK: return-struct-in-registers? cpu ( c-type -- ? )
 
@@ -553,15 +549,30 @@ HOOK: dummy-int-params? cpu ( -- ? )
 ! If t, all int parameters are shadowed by dummy FP parameters
 HOOK: dummy-fp-params? cpu ( -- ? )
 
+! If t, long longs are never passed in param regs
+HOOK: long-long-on-stack? cpu ( -- ? )
+
+! If t, floats are never passed in param regs
+HOOK: float-on-stack? cpu ( -- ? )
+
+! If t, the struct return pointer is never passed in a param reg
+HOOK: struct-return-on-stack? cpu ( -- ? )
+
 ! Call a function to convert a tagged pointer into a value that
 ! can be passed to a C function, or returned from a callback
-HOOK: %unbox cpu ( src n rep func -- )
+HOOK: %unbox cpu ( dst src func rep -- )
 
-HOOK: %unbox-long-long cpu ( src n func -- )
+HOOK: %store-reg-param cpu ( src reg rep -- )
 
-HOOK: %unbox-small-struct cpu ( src c-type -- )
+HOOK: %store-stack-param cpu ( src n rep -- )
 
-HOOK: %unbox-large-struct cpu ( src n c-type -- )
+HOOK: %store-return cpu ( src rep -- )
+
+HOOK: %store-struct-return cpu ( src reps -- )
+
+HOOK: %store-long-long-return cpu ( src1 src2 -- )
+
+HOOK: %prepare-struct-area cpu ( dst -- )
 
 ! Call a function to convert a value into a tagged pointer,
 ! possibly allocating a bignum, float, or alien instance,
@@ -570,15 +581,11 @@ HOOK: %box cpu ( dst n rep func -- )
 
 HOOK: %box-long-long cpu ( dst n func -- )
 
-HOOK: %prepare-box-struct cpu ( -- )
-
 HOOK: %box-small-struct cpu ( dst c-type -- )
 
 HOOK: %box-large-struct cpu ( dst n c-type -- )
 
 HOOK: %save-param-reg cpu ( stack reg rep -- )
-
-HOOK: %load-param-reg cpu ( stack reg rep -- )
 
 HOOK: %restore-context cpu ( temp1 temp2 -- )
 
@@ -586,9 +593,9 @@ HOOK: %save-context cpu ( temp1 temp2 -- )
 
 HOOK: %alien-invoke cpu ( function library -- )
 
-HOOK: %cleanup cpu ( params -- )
+HOOK: %cleanup cpu ( n -- )
 
-M: object %cleanup ( params -- ) drop ;
+M: object %cleanup ( n -- ) drop ;
 
 HOOK: %alien-indirect cpu ( src -- )
 
@@ -598,6 +605,6 @@ HOOK: %alien-callback cpu ( quot -- )
 
 HOOK: %end-callback cpu ( -- )
 
-HOOK: stack-cleanup cpu ( params -- n )
+HOOK: stack-cleanup cpu ( stack-size return abi -- n )
 
-M: object stack-cleanup drop 0 ;
+M: object stack-cleanup 3drop 0 ;

@@ -119,10 +119,6 @@ HELP: typedef
 
 { POSTPONE: TYPEDEF: typedef } related-words
 
-HELP: c-struct?
-{ $values { "c-type" "a C type" } { "?" "a boolean" } }
-{ $description "Tests if a C type is a structure defined by " { $link POSTPONE: STRUCT: } "." } ;
-
 HELP: C-GLOBAL:
 { $syntax "C-GLOBAL: type name" }
 { $values { "type" "a C type" } { "name" "a C global variable name" } }
