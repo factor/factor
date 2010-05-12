@@ -3,14 +3,10 @@
 USING: locals alien alien.c-types alien.libraries alien.syntax
 arrays kernel fry math namespaces sequences system layouts io
 vocabs.loader accessors init classes.struct combinators
-command-line make words compiler compiler.units
-compiler.constants compiler.alien compiler.codegen
-compiler.codegen.fixup compiler.cfg.instructions
-compiler.cfg.builder compiler.cfg.builder.alien
-compiler.cfg.builder.alien.params
-compiler.cfg.intrinsics compiler.cfg.stack-frame
-cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
-cpu.architecture vm ;
+make words compiler.constants compiler.codegen.fixup
+compiler.cfg.instructions compiler.cfg.builder compiler.cfg.intrinsics
+compiler.cfg.stack-frame cpu.x86.assembler cpu.x86.assembler.operands
+cpu.x86 cpu.architecture vm ;
 FROM: layouts => cell ;
 IN: cpu.x86.32
 
@@ -279,28 +275,19 @@ M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
     func "libm" load-library %alien-invoke
     dst float-function-return ;
 
-: funny-large-struct-return? ( params -- ? )
+: funny-large-struct-return? ( return abi -- ? )
     #! MINGW ABI incompatibility disaster
-    [ return>> large-struct? ]
-    [ abi>> mingw eq? os windows? not or ]
-    bi and ;
+    [ large-struct? ] [ mingw eq? os windows? not or ] bi* and ;
 
-: stack-arg-size ( params -- n )
-    dup abi>> [
-        alien-parameters flatten-c-types
-        [ alloc-parameter 2drop ] each
-        stack-params get
-    ] with-param-regs ;
-
-M: x86.32 stack-cleanup ( params -- n )
+M:: x86.32 stack-cleanup ( stack-size return abi -- n )
     #! a) Functions which are stdcall/fastcall/thiscall have to
     #! clean up the caller's stack frame.
     #! b) Functions returning large structs on MINGW have to
     #! fix ESP.
     {
-        { [ dup abi>> callee-cleanup? ] [ stack-arg-size ] }
-        { [ dup funny-large-struct-return? ] [ drop 4 ] }
-        [ drop 0 ]
+        { [ abi callee-cleanup? ] [ stack-size ] }
+        { [ return abi funny-large-struct-return? ] [ 4 ] }
+        [ 0 ]
     } cond ;
 
 M: x86.32 %cleanup ( n -- )
