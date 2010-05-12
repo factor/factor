@@ -19,8 +19,7 @@ compiler.cfg.instructions
 compiler.cfg.predecessors
 compiler.cfg.builder.blocks
 compiler.cfg.stacks
-compiler.cfg.stacks.local
-compiler.alien ;
+compiler.cfg.stacks.local ;
 IN: compiler.cfg.builder
 
 ! Convert tree SSA IR to CFG IR. The result is not in SSA form; this is

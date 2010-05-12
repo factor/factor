@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.strings arrays assocs
-classes.struct continuations combinators compiler compiler.alien
+classes.struct continuations combinators compiler
 core-graphics.types stack-checker kernel math namespaces make
 quotations sequences strings words cocoa.runtime cocoa.types io
 macros memoize io.encodings.utf8 effects layouts libc

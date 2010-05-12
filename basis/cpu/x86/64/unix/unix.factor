@@ -28,10 +28,11 @@ M: x86.64 reserved-stack-space 0 ;
     struct-types&offset split-struct [
         [ c-type c-type-rep reg-class-of ] map
         int-regs swap member? int-rep double-rep ?
+        f 2array
     ] map ;
 
 : flatten-large-struct ( c-type -- seq )
-    stack-params (flatten-c-type) ;
+    stack-size cell /i { int-rep t } <repetition> ;
 
 M: x86.64 flatten-struct-type ( c-type -- seq )
     dup heap-size 16 >
