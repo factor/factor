@@ -3,7 +3,7 @@
 USING: accessors arrays layouts math math.order math.parser
 combinators combinators.short-circuit fry make sequences locals
 alien alien.private alien.strings alien.c-types alien.libraries
-classes.struct namespaces kernel strings libc quotations
+classes.struct namespaces kernel strings libc quotations words
 cpu.architecture compiler.utilities compiler.tree compiler.cfg
 compiler.cfg.builder compiler.cfg.builder.alien.params
 compiler.cfg.builder.blocks compiler.cfg.instructions
@@ -151,9 +151,9 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
         t >>calls-vm? ;
 
 : emit-stack-frame ( stack-size params -- )
-    return>>
+    [ return>> ] [ abi>> ] bi
     [ stack-cleanup ##cleanup ]
-    [ <alien-stack-frame> ##stack-frame ] bi ;
+    [ drop <alien-stack-frame> ##stack-frame ] 3bi ;
 
 M: #alien-invoke emit-node
     [
@@ -295,6 +295,17 @@ M: struct-c-type unbox-return
     [ alien-parameters [ stack-size ] map-sum ] [ return>> ] bi
     <alien-stack-frame> ##stack-frame ;
 
+: stack-args-size ( params -- n )
+    dup abi>> [
+        alien-parameters flatten-c-types
+        [ alloc-parameter 2drop ] each
+        stack-params get
+    ] with-param-regs ;
+
+: callback-stack-cleanup ( params -- )
+    [ xt>> ] [ [ stack-args-size ] [ return>> ] [ abi>> ] tri stack-cleanup ] bi
+    "stack-cleanup" set-word-prop ;
+
 M: #alien-callback emit-node
     dup params>> xt>> dup
     [
@@ -303,6 +314,7 @@ M: #alien-callback emit-node
             {
                 [ registers>objects ]
                 [ emit-callback-stack-frame ]
+                [ callback-stack-cleanup ]
                 [ wrap-callback-quot ##alien-callback ]
                 [
                     return>> {

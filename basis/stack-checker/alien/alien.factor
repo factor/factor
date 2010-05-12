@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors combinators math namespaces
 init sets words assocs alien.libraries alien alien.private
-alien.c-types cpu.architecture fry stack-checker.backend
+alien.c-types fry stack-checker.backend
 stack-checker.errors stack-checker.visitor
 stack-checker.dependencies ;
 IN: stack-checker.alien
@@ -98,11 +98,11 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
     ! Quotation which coerces return value to required type
     infer-return ;
 
-: callback-xt ( word return-rewind -- alien )
-    [ callbacks get ] dip '[ _ <callback> ] cache ;
+: callback-xt ( word -- alien )
+    callbacks get [ dup "stack-cleanup" word-prop <callback> ] cache ;
 
 : callback-bottom ( params -- )
-    [ xt>> ] [ stack-cleanup ] bi '[ _ _ callback-xt ] infer-quot-here ;
+    xt>> '[ _ callback-xt ] infer-quot-here ;
 
 : infer-alien-callback ( -- )
     alien-callback-params new
