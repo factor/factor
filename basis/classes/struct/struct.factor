@@ -171,11 +171,10 @@ M: struct-c-type base-type ;
 M: struct-c-type stack-size
     dup value-struct? [ heap-size cell align ] [ drop cell ] if ;
 
-HOOK: flatten-struct-type cpu ( type -- reps )
+HOOK: flatten-struct-type cpu ( type -- pairs )
 
-M: object flatten-struct-type int-rep (flatten-c-type) ;
-
-M: struct-c-type flatten-c-type flatten-struct-type ;
+M: object flatten-struct-type
+    stack-size cell /i { int-rep f } <repetition> ;
 
 M: struct-c-type c-struct? drop t ;
 

@@ -552,9 +552,6 @@ HOOK: dummy-fp-params? cpu ( -- ? )
 ! If t, long longs are never passed in param regs
 HOOK: long-long-on-stack? cpu ( -- ? )
 
-! If t, structs are never passed in param regs
-HOOK: struct-on-stack? cpu ( -- ? )
-
 ! If t, the struct return pointer is never passed in a param reg
 HOOK: struct-return-on-stack? cpu ( -- ? )
 
