@@ -66,15 +66,6 @@ M: word c-type
     dup "c-type" word-prop resolve-typedef
     [ ] [ no-c-type ] ?if ;
 
-GENERIC: c-struct? ( c-type -- ? )
-
-M: object c-struct? drop f ;
-
-M: c-type-name c-struct? dup void? [ drop f ] [ c-type c-struct? ] if ;
-
-! These words being foldable means that words need to be
-! recompiled if a C type is redefined. Even so, folding the
-! size facilitates some optimizations.
 GENERIC: c-type-class ( name -- class )
 
 M: abstract-c-type c-type-class class>> ;
