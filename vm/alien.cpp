@@ -104,12 +104,12 @@ void *factor_vm::alien_pointer()
 #define DEFINE_ALIEN_ACCESSOR(name,type,from,to) \
 	VM_C_API void primitive_alien_##name(factor_vm *parent) \
 	{ \
-		parent->ctx->push(from(*(type*)(parent->alien_pointer()),parent)); \
+		parent->ctx->push(parent->from(*(type*)(parent->alien_pointer()))); \
 	} \
 	VM_C_API void primitive_set_alien_##name(factor_vm *parent) \
 	{ \
 		type *ptr = (type *)parent->alien_pointer(); \
-		type value = (type)to(parent->ctx->pop(),parent); \
+		type value = (type)parent->to(parent->ctx->pop()); \
 		*ptr = value; \
 	}
 
