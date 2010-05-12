@@ -37,9 +37,9 @@ M:: struct-c-type unbox-parameter ( src c-type -- )
     src ^^unbox-any-c-ptr :> src
     c-type value-struct? [
         c-type flatten-struct-type
-        [| rep i |
-            src i cells rep f ^^load-memory-imm
-            rep struct-on-stack? 3array
+        [| pair i |
+            src i cells pair first f ^^load-memory-imm
+            pair first2 3array
         ] map-index
     ] [ { { src int-rep f } } ] if ;
 
@@ -221,6 +221,17 @@ M: struct-c-type box-parameter
 :: alloc-parameter ( rep -- reg rep )
     rep dup reg-class-of reg-class-full?
     [ alloc-stack-param stack-params ] [ [ next-reg-param ] keep ] if ;
+
+GENERIC: flatten-c-type ( type -- reps )
+
+M: struct-c-type flatten-c-type
+    flatten-struct-type [ first2 [ drop stack-params ] when ] map ;
+M: long-long-type flatten-c-type drop { int-rep int-rep } ;
+M: c-type flatten-c-type rep>> 1array ;
+M: object flatten-c-type base-type flatten-c-type ;
+
+: flatten-c-types ( types -- reps )
+    [ flatten-c-type ] map concat ;
 
 : (registers>objects) ( params -- )
     [ 0 ] dip alien-parameters flatten-c-types [
