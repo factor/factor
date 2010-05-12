@@ -241,6 +241,7 @@ M: c-type flatten-c-type
             cell 4 = { stack-params stack-params } { stack-params } ?
             { double-rep } ?
         ] }
+        { stack-params [ { stack-params } ] }
     } case ;
     
 M: object flatten-c-type base-type flatten-c-type ;
