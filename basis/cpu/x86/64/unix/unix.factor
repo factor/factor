@@ -32,7 +32,7 @@ M: x86.64 reserved-stack-space 0 ;
     ] map ;
 
 : flatten-large-struct ( c-type -- seq )
-    stack-size cell /i { int-rep t } <repetition> ; ;
+    stack-size cell /i { int-rep t } <repetition> ;
 
 M: x86.64 flatten-struct-type ( c-type -- seq )
     dup heap-size 16 >
