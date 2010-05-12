@@ -605,6 +605,6 @@ HOOK: %alien-callback cpu ( quot -- )
 
 HOOK: %end-callback cpu ( -- )
 
-HOOK: stack-cleanup cpu ( params -- n )
+HOOK: stack-cleanup cpu ( stack-size return abi -- n )
 
-M: object stack-cleanup drop 0 ;
+M: object stack-cleanup 3drop 0 ;
