@@ -1458,9 +1458,6 @@ M:: x86 %store-reg-param ( src reg rep -- )
 M:: x86 %store-stack-param ( src n rep -- )
     n param@ src rep %copy ;
 
-M:: x86 %store-return ( src rep -- )
-    rep reg-class-of return-reg src rep %copy ;
-
 HOOK: struct-return@ cpu ( n -- operand )
 
 M: x86 %prepare-struct-area ( dst -- )
