@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays layouts math math.order math.parser
-combinators fry make sequences locals alien alien.private
-alien.strings alien.c-types alien.libraries classes.struct
-namespaces kernel strings libc quotations cpu.architecture
-compiler.alien compiler.utilities compiler.tree compiler.cfg
+combinators combinators.short-circuit fry make sequences locals
+alien alien.private alien.strings alien.c-types alien.libraries
+classes.struct namespaces kernel strings libc quotations
+cpu.architecture compiler.utilities compiler.tree compiler.cfg
 compiler.cfg.builder compiler.cfg.builder.alien.params
 compiler.cfg.builder.blocks compiler.cfg.instructions
 compiler.cfg.stack-frame compiler.cfg.stacks
@@ -65,9 +65,9 @@ M:: struct-c-type unbox-parameter ( src c-type -- )
 
 : (objects>registers) ( vregs -- )
     ! Place instructions in reverse order, so that the
-    ! ##store-stack-param instructions come first. This is
-    ! because they are not clobber-insns and so we avoid some
-    ! spills that way.
+    ! ##store-stack-param instructions come first. This ensures
+    ! that no registers are used after the ##store-reg-param
+    ! instructions.
     [
         first3 [ dup reg-class-of reg-class-full? ] dip or
         [ [ alloc-stack-param ] keep \ ##store-stack-param new-insn ]
@@ -75,15 +75,13 @@ M:: struct-c-type unbox-parameter ( src c-type -- )
         if
     ] map reverse % ;
 
-: objects>registers ( params -- )
-    #! Generate code for unboxing a list of C types, then
-    #! generate code for moving these parameters to registers on
-    #! architectures where parameters are passed in registers.
+: objects>registers ( params -- stack-size )
     [ abi>> ] [ parameters>> ] [ return>> ] tri
     '[ 
         _ unbox-parameters
         _ prepare-struct-area
         (objects>registers)
+        stack-params get
     ] with-param-regs ;
 
 GENERIC: box-return ( c-type -- dst )
@@ -94,11 +92,9 @@ M: c-type box-return
 M: long-long-type box-return
     [ f ] dip boxer>> ^^box-long-long ;
 
-: if-small-struct ( c-type true false -- ? )
-    [ dup return-struct-in-registers? ] 2dip '[ f swap @ ] if ; inline
-
 M: struct-c-type box-return
-    [ ^^box-small-struct ] [ ^^box-large-struct ] if-small-struct ;
+    dup return-struct-in-registers?
+    [ ^^box-small-struct ] [ [ f ] dip ^^box-large-struct ] if ;
 
 : box-return* ( node -- )
     return>> [ ] [ base-type box-return 1 ##inc-d D 0 ##replace ] if-void ;
@@ -130,62 +126,66 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
     [ library>> load-library ]
     bi 2dup check-dlsym ;
 
-: return-size ( ctype -- n )
+: return-size ( c-type -- n )
     #! Amount of space we reserve for a return value.
     {
-        { [ dup c-struct? not ] [ drop 0 ] }
+        { [ dup void? ] [ drop 0 ] }
+        { [ dup base-type struct-c-type? not ] [ drop 0 ] }
         { [ dup large-struct? not ] [ drop 2 cells ] }
         [ heap-size ]
     } cond ;
 
-: <alien-stack-frame> ( params -- stack-frame )
-    stack-frame new
-        swap
-        [ return>> return-size >>return ]
-        [ alien-parameters [ stack-size ] map-sum >>params ] bi
-        t >>calls-vm? ;
-
 : alien-node-height ( params -- )
     [ out-d>> length ] [ in-d>> length ] bi - adjust-d ;
 
-: emit-alien-node ( node quot -- )
+: emit-alien-block ( node quot: ( params -- ) -- )
     '[
         make-kill-block
         params>>
-        [ <alien-stack-frame> ##stack-frame ]
-        _
-        [ alien-node-height ]
-        tri
+        _ [ alien-node-height ] bi
     ] emit-trivial-block ; inline
+
+: <alien-stack-frame> ( stack-size return -- stack-frame )
+    stack-frame new
+        swap return-size >>return
+        swap >>params
+        t >>calls-vm? ;
+
+: emit-stack-frame ( stack-size params -- )
+    return>>
+    [ stack-cleanup ##cleanup ]
+    [ <alien-stack-frame> ##stack-frame ] bi ;
 
 M: #alien-invoke emit-node
     [
         {
             [ objects>registers ]
             [ alien-invoke-dlsym ##alien-invoke ]
-            [ stack-cleanup ##cleanup ]
+            [ emit-stack-frame ]
             [ box-return* ]
         } cleave
-    ] emit-alien-node ;
+    ] emit-alien-block ;
 
-M: #alien-indirect emit-node
-    [
-        D 0 ^^peek -1 ##inc-d ^^unbox-any-c-ptr
+M:: #alien-indirect emit-node ( node -- )
+    node [
+        D 0 ^^peek -1 ##inc-d ^^unbox-any-c-ptr :> src
         {
-            [ drop objects>registers ]
-            [ nip ##alien-indirect ]
-            [ drop stack-cleanup ##cleanup ]
-            [ drop box-return* ]
-        } 2cleave
-    ] emit-alien-node ;
+            [ objects>registers ]
+            [ drop src ##alien-indirect ]
+            [ emit-stack-frame ]
+            [ box-return* ]
+        } cleave
+    ] emit-alien-block ;
 
 M: #alien-assembly emit-node
     [
-        [ objects>registers ]
-        [ quot>> ##alien-assembly ]
-        [ box-return* ]
-        tri
-    ] emit-alien-node ;
+        {
+            [ objects>registers ]
+            [ quot>> ##alien-assembly ]
+            [ emit-stack-frame ]
+            [ box-return* ]
+        } cleave
+    ] emit-alien-block ;
 
 GENERIC: box-parameter ( n c-type -- dst )
 
@@ -206,6 +206,10 @@ M: struct-c-type box-parameter
 
 : prepare-parameters ( parameters -- offsets types indices )
     [ length iota <reversed> ] [ parameter-offsets ] [ ] tri ;
+
+: alien-parameters ( params -- seq )
+    [ parameters>> ] [ return>> large-struct? ] bi
+    [ struct-return-on-stack? (stack-value) void* ? prefix ] when ;
 
 : box-parameters ( params -- )
     alien-parameters
@@ -276,25 +280,32 @@ M: long-long-type unbox-return
 M: struct-c-type unbox-return
     [ ^^unbox-any-c-ptr ] dip ##store-struct-return ;
 
+: emit-callback-stack-frame ( params -- )
+    [ alien-parameters [ stack-size ] map-sum ] [ return>> ] bi
+    <alien-stack-frame> ##stack-frame ;
+
 M: #alien-callback emit-node
     dup params>> xt>> dup
     [
         ##prologue
         [
-            [ registers>objects ]
-            [ wrap-callback-quot ##alien-callback ]
-            [
-                return>> {
-                    { [ dup void eq? ] [ drop ##end-callback ] }
-                    { [ dup large-struct? ] [ drop ##end-callback ] }
-                    [
-                        [ D 0 ^^peek ] dip
-                        ##end-callback
-                        base-type unbox-return
-                    ]
-                } cond
-            ] tri
-        ] emit-alien-node
+            {
+                [ registers>objects ]
+                [ emit-callback-stack-frame ]
+                [ wrap-callback-quot ##alien-callback ]
+                [
+                    return>> {
+                        { [ dup void? ] [ drop ##end-callback ] }
+                        { [ dup large-struct? ] [ drop ##end-callback ] }
+                        [
+                            [ D 0 ^^peek ] dip
+                            ##end-callback
+                            base-type unbox-return
+                        ]
+                    } cond
+                ]
+            } cleave
+        ] emit-alien-block
         ##epilogue
         ##return
     ] with-cfg-builder ;
