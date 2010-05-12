@@ -66,15 +66,6 @@ M: word c-type
     dup "c-type" word-prop resolve-typedef
     [ ] [ no-c-type ] ?if ;
 
-GENERIC: c-struct? ( c-type -- ? )
-
-M: object c-struct? drop f ;
-
-M: c-type-name c-struct? dup void? [ drop f ] [ c-type c-struct? ] if ;
-
-! These words being foldable means that words need to be
-! recompiled if a C type is redefined. Even so, folding the
-! size facilitates some optimizations.
 GENERIC: c-type-class ( name -- class )
 
 M: abstract-c-type c-type-class class>> ;
@@ -127,17 +118,6 @@ GENERIC: stack-size ( name -- size )
 
 M: c-type stack-size size>> cell align ;
 
-: (flatten-c-type) ( type rep -- seq )
-    [ stack-size cell /i ] dip <repetition> ; inline
-
-GENERIC: flatten-c-type ( type -- reps )
-
-M: c-type flatten-c-type rep>> 1array ;
-M: c-type-name flatten-c-type c-type flatten-c-type ;
-
-: flatten-c-types ( types -- reps )
-    [ flatten-c-type ] map concat ;
-
 MIXIN: value-type
 
 : c-getter ( name -- quot )
@@ -165,8 +145,7 @@ PROTOCOL: c-type-protocol
     c-type-align-first
     base-type
     heap-size
-    stack-size
-    flatten-c-type ;
+    stack-size ;
 
 CONSULT: c-type-protocol c-type-name
     c-type ;
@@ -184,9 +163,6 @@ TUPLE: long-long-type < c-type ;
 
 : <long-long-type> ( -- c-type )
     long-long-type new ;
-
-M: long-long-type flatten-c-type
-    int-rep (flatten-c-type) ;
 
 : define-deref ( c-type -- )
     [ name>> CHAR: * prefix "alien.c-types" create ] [ c-getter 0 prefix ] bi
