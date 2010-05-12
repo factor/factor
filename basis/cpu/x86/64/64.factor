@@ -124,6 +124,9 @@ M:: x86.64 %unbox ( dst src func rep -- )
         { float-regs [ float-regs get pop swap MOVSD ] }
     } case ;
 
+M:: x86.64 %store-return ( src rep -- )
+    rep reg-class-of return-reg src rep %copy ;
+
 M:: x86.64 %store-struct-return ( src c-type -- )
     ! Move src to R11 so that we don't clobber it.
     R11 src int-rep %copy
@@ -219,6 +222,8 @@ M:: x86.64 %call-gc ( gc-roots -- )
     "inline_gc" f %alien-invoke ;
 
 M: x86.64 long-long-on-stack? f ;
+
+M: x86.64 float-on-stack? f ;
 
 M: x86.64 struct-return-on-stack? f ;
 

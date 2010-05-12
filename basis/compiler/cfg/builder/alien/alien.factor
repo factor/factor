@@ -64,8 +64,7 @@ M:: struct-c-type unbox-parameter ( src c-type -- )
     ] when ;
 
 : (objects>registers) ( vregs -- )
-    ! Place instructions in reverse order, so that the
-    ! ##store-stack-param instructions come first. This ensures
+    ! Place ##store-stack-param instructions first. This ensures
     ! that no registers are used after the ##store-reg-param
     ! instructions.
     [
@@ -73,7 +72,7 @@ M:: struct-c-type unbox-parameter ( src c-type -- )
         [ [ alloc-stack-param ] keep \ ##store-stack-param new-insn ]
         [ [ next-reg-param ] keep \ ##store-reg-param new-insn ]
         if
-    ] map reverse % ;
+    ] map [ ##store-stack-param? ] partition [ % ] bi@ ;
 
 : objects>registers ( params -- stack-size )
     [ abi>> ] [ parameters>> ] [ return>> ] tri
@@ -230,8 +229,20 @@ GENERIC: flatten-c-type ( type -- reps )
 
 M: struct-c-type flatten-c-type
     flatten-struct-type [ first2 [ drop stack-params ] when ] map ;
+    
 M: long-long-type flatten-c-type drop { int-rep int-rep } ;
-M: c-type flatten-c-type rep>> 1array ;
+
+M: c-type flatten-c-type
+    rep>> {
+        { int-rep [ { int-rep } ] }
+        { float-rep [ float-on-stack? { stack-params } { float-rep } ? ] }
+        { double-rep [
+            float-on-stack?
+            cell 4 = { stack-params stack-params } { stack-params } ?
+            { double-rep } ?
+        ] }
+    } case ;
+    
 M: object flatten-c-type base-type flatten-c-type ;
 
 : flatten-c-types ( types -- reps )

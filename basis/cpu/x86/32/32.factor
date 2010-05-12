@@ -7,6 +7,7 @@ command-line make words compiler compiler.units
 compiler.constants compiler.alien compiler.codegen
 compiler.codegen.fixup compiler.cfg.instructions
 compiler.cfg.builder compiler.cfg.builder.alien
+compiler.cfg.builder.alien.params
 compiler.cfg.intrinsics compiler.cfg.stack-frame
 cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
 cpu.architecture vm ;
@@ -116,11 +117,37 @@ M: stack-params store-return-reg drop EAX MOV ;
 M: int-rep load-return-reg drop EAX swap MOV ;
 M: int-rep store-return-reg drop EAX MOV ;
 
-M: float-rep load-return-reg drop FLDS ;
-M: float-rep store-return-reg drop FSTPS ;
+:: load-float-return ( src x87-insn sse-insn -- )
+    src register? [
+        ESP 4 SUB
+        ESP [] src sse-insn execute
+        ESP [] x87-insn execute
+        ESP 4 ADD
+    ] [
+        src x87-insn execute
+    ] if ; inline
 
-M: double-rep load-return-reg drop FLDL ;
-M: double-rep store-return-reg drop FSTPL ;
+:: store-float-return ( dst x87-insn sse-insn -- )
+    dst register? [
+        ESP 4 SUB
+        ESP [] x87-insn execute
+        dst ESP [] sse-insn execute
+        ESP 4 ADD
+    ] [
+        dst x87-insn execute
+    ] if ; inline
+
+M: float-rep load-return-reg
+    drop \ FLDS \ MOVSS load-float-return ;
+
+M: float-rep store-return-reg
+    drop \ FSTPS \ MOVSS store-float-return ;
+
+M: double-rep load-return-reg
+    drop \ FLDL \ MOVSD load-float-return ;
+
+M: double-rep store-return-reg
+    drop \ FSTPL \ MOVSD store-float-return ;
 
 M: x86.32 %prologue ( n -- )
     dup PUSH
@@ -138,9 +165,12 @@ M: x86.32 %prepare-jump
 
 M:: x86.32 %unbox ( dst src func rep -- )
     src func call-unbox-func
-    dst rep reg-class-of return-reg rep %copy ;
+    dst ?spill-slot rep store-return-reg ;
 
-M:: x86.32 %store-long-long-return ( src1 src2 n func -- )
+M:: x86.32 %store-return ( src rep -- )
+    src ?spill-slot rep load-return-reg ;
+
+M:: x86.32 %store-long-long-return ( src1 src2 -- )
     src2 EAX = [ src1 src2 XCHG src2 src1 ] [ src1 src2 ] if :> ( src1 src2 )
     EAX src1 int-rep %copy
     EDX src2 int-rep %copy ;
@@ -256,9 +286,9 @@ M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
     bi and ;
 
 : stack-arg-size ( params -- n )
-    dup abi>> '[
+    dup abi>> [
         alien-parameters flatten-c-types
-        [ _ alloc-parameter 2drop ] each
+        [ alloc-parameter 2drop ] each
         stack-params get
     ] with-param-regs ;
 
@@ -289,7 +319,10 @@ M: x86.32 dummy-fp-params? f ;
 
 M: x86.32 long-long-on-stack? t ;
 
-M: x86.32 structs-on-stack? t ;
+M: x86.32 float-on-stack? t ;
+
+M: x86.32 flatten-struct-type
+    stack-size cell /i { int-rep t } <repetition> ;
 
 M: x86.32 struct-return-on-stack? os linux? not ;
 
