@@ -1,6 +1,6 @@
 USING: arrays compiler.cfg.alias-analysis compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.debugger compiler.cfg.comparisons
-cpu.architecture tools.test ;
+cpu.architecture tools.test byte-arrays layouts literals alien ;
 IN: compiler.cfg.alias-analysis.tests
 
 ! Redundant load elimination
@@ -240,5 +240,24 @@ IN: compiler.cfg.alias-analysis.tests
         T{ ##peek f 0 D 0 }
         T{ ##allot f 1 16 array }
         T{ ##compare f 2 0 1 cc= }
+    } alias-analysis-step
+] unit-test
+
+! Make sure that input to ##box-displaced-alien becomes heap-ac
+[
+    V{
+        T{ ##allot f 1 16 byte-array }
+        T{ ##load-reference f 2 10 }
+        T{ ##box-displaced-alien f 3 2 1 4 byte-array }
+        T{ ##slot-imm f 5 3 1 $[ alien type-number ] }
+        T{ ##compare f 6 5 1 cc= }
+    }
+] [
+    V{
+        T{ ##allot f 1 16 byte-array }
+        T{ ##load-reference f 2 10 }
+        T{ ##box-displaced-alien f 3 2 1 4 byte-array }
+        T{ ##slot-imm f 5 3 1 $[ alien type-number ] }
+        T{ ##compare f 6 5 1 cc= }
     } alias-analysis-step
 ] unit-test
