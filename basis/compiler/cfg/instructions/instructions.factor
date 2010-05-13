@@ -13,7 +13,7 @@ V{ } clone insn-classes set-global
 
 : new-insn ( ... class -- insn ) f swap boa ; inline
 
-! Virtual CPU instructions, used by CFG and machine IRs
+! Virtual CPU instructions, used by CFG IR
 TUPLE: insn ;
 
 ! Instructions which are referentially transparent; used for
@@ -364,12 +364,6 @@ use: src1
 temp: temp/int-rep
 literal: rep vcc ;
 
-INSN: _test-vector-branch
-literal: label
-use: src1
-temp: temp/int-rep
-literal: rep vcc ;
-
 PURE-INSN: ##add-vector
 def: dst
 use: src1 src2
@@ -612,6 +606,33 @@ literal: offset ;
 INSN: ##stack-frame
 literal: stack-frame ;
 
+INSN: ##unbox
+def: dst
+use: src/tagged-rep
+literal: unboxer rep ;
+
+INSN: ##store-reg-param
+use: src
+literal: reg rep ;
+
+INSN: ##store-stack-param
+use: src
+literal: n rep ;
+
+INSN: ##store-return
+use: src
+literal: rep ;
+
+INSN: ##store-struct-return
+use: src/int-rep
+literal: c-type ;
+
+INSN: ##store-long-long-return
+use: src1/int-rep src2/int-rep ;
+
+INSN: ##prepare-struct-area
+def: dst/int-rep ;
+
 INSN: ##box
 def: dst/tagged-rep
 literal: n rep boxer ;
@@ -628,32 +649,11 @@ INSN: ##box-large-struct
 def: dst/tagged-rep
 literal: n c-type ;
 
-INSN: ##unbox
-use: src/tagged-rep
-literal: n rep unboxer ;
-
-INSN: ##unbox-long-long
-use: src/tagged-rep
-literal: n unboxer ;
-
-INSN: ##unbox-large-struct
-use: src/int-rep
-literal: n c-type ;
-
-INSN: ##unbox-small-struct
-use: src/int-rep
-literal: c-type ;
-
-INSN: ##prepare-box-struct ;
-
-INSN: ##load-param-reg
-literal: offset reg rep ;
-
 INSN: ##alien-invoke
 literal: symbols dll ;
 
 INSN: ##cleanup
-literal: params ;
+literal: n ;
 
 INSN: ##alien-indirect
 use: src/int-rep ;
@@ -815,11 +815,10 @@ UNION: clobber-insn
 ##box-small-struct
 ##box-large-struct
 ##unbox
-##unbox-long-long
-##unbox-large-struct
-##unbox-small-struct
-##prepare-box-struct
-##load-param-reg
+##store-reg-param
+##store-return
+##store-struct-return
+##store-long-long-return
 ##alien-invoke
 ##alien-indirect
 ##alien-assembly

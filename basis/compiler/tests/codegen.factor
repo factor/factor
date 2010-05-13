@@ -472,3 +472,10 @@ TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-
     ] when ;
 
 [ ] [ 2000 [ "hello" clone dup gc-root-messup first eq? t assert= ] times ] unit-test
+
+! Alias analysis bug
+[ t ] [
+    [
+        10 10 <byte-array> [ <displaced-alien> underlying>> ] keep eq?
+    ] compile-call
+] unit-test
