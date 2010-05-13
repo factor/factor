@@ -1502,26 +1502,15 @@ M: x86 immediate-bitwise? ( n -- ? )
 enable-min/max
 enable-log2
 
-:: install-sse2-check ( -- )
-    [
-        sse-version 20 < [
-            "This image was built to use SSE2 but your CPU does not support it." print
-            "You will need to bootstrap Factor again." print
-            flush
-            1 exit
-        ] when
-    ] "cpu.x86" add-startup-hook ;
-
-: enable-sse2 ( version -- )
-    20 >= [
-        enable-float-intrinsics
-        enable-float-functions
-        enable-float-min/max
-        enable-fsqrt
-        install-sse2-check
-    ] when ;
+enable-float-intrinsics
+enable-float-functions
+enable-float-min/max
+enable-fsqrt
 
 : check-sse ( -- )
     [ { (sse-version) } compile ] with-optimizer
-    "Checking for multimedia extensions: " write sse-version
-    [ sse-string write " detected" print ] [ enable-sse2 ] bi ;
+    sse-version 20 < [
+        "Factor requires SSE2, which your CPU does not support." print
+        flush
+        1 exit
+    ] when ;
