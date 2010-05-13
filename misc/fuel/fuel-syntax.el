@@ -50,7 +50,7 @@
     "C:" "CALLBACK:" "C-GLOBAL:" "C-TYPE:" "CHAR:" "COM-INTERFACE:" "CONSTANT:" "CONSULT:" "call-next-method"
     "DEFER:" "DESTRUCTOR:"
     "EBNF:" ";EBNF" "ENUM:" "ERROR:" "EXCLUDE:"
-    "f" "FORGET:" "FROM:" "FUNCTION:"
+    "f" "FORGET:" "FROM:" "FUNCTION:" "FUNCTION-ALIAS:"
     "GAME:" "GENERIC#" "GENERIC:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
     "HELP:" "HEX:" "HOOK:"
@@ -158,15 +158,18 @@
 (defconst fuel-syntax--sub-vocab-regex "^<\\([^ \n]+\\) *$")
 
 (defconst fuel-syntax--alien-function-regex
-  "\\_<FUNCTION: \\(\\w+\\) \\(\\w+\\)")
+  "\\_<FUNCTION: +\\(\\w+\\)[\n ]+\\(\\w+\\)")
+
+(defconst fuel-syntax--alien-function-alias-regex
+  "\\_<FUNCTION-ALIAS: +\\(\\w+\\)[\n ]+\\(\\w+\\)[\n ]+\\(\\w+\\)")
 
 (defconst fuel-syntax--alien-callback-regex
-  "\\_<CALLBACK: \\(\\w+\\) \\(\\w+\\)")
+  "\\_<CALLBACK: +\\(\\w+\\) +\\(\\w+\\)")
 
 (defconst fuel-syntax--indent-def-starts '("" ":"
                                            "AFTER" "BEFORE"
                                            "ENUM" "COM-INTERFACE" "CONSULT"
-                                           "FROM" "FUNCTION:"
+                                           "FROM" "FUNCTION:" "FUNCTION-ALIAS:"
                                            "INTERSECTION:"
                                            "M" "M:" "MACRO" "MACRO:"
                                            "MEMO" "MEMO:" "METHOD"
@@ -244,6 +247,9 @@
 
 (defconst fuel-syntax--c-global-regex
   "\\_<C-GLOBAL: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
+
+(defconst fuel-syntax--c-type-regex
+  "\\_<C-TYPE: +\\(\\w+\\)\\( .*\\)?$")
 
 (defconst fuel-syntax--rename-regex
   "\\_<RENAME: +\\(\\w+\\) +\\(\\w+\\) +=> +\\(\\w+\\)\\( .*\\)?$")
