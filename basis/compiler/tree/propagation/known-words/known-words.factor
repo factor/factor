@@ -272,6 +272,11 @@ generic-comparison-ops [
     2drop alien \ f class-or <class-info>
 ] "outputs" set-word-prop
 
+\ <displaced-alien> [
+    [ interval>> 0 swap interval-contains? ] dip
+    class>> alien class-or alien ? <class-info>
+] "outputs" set-word-prop
+
 { <tuple> <tuple-boa> } [
     [
         literal>> dup array? [ first ] [ drop tuple ] if <class-info>

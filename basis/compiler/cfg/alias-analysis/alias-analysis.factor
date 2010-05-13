@@ -255,6 +255,10 @@ M: ##allocation analyze-aliases*
     #! object.
     dup dst>> set-new-ac ;
 
+M: ##box-displaced-alien analyze-aliases*
+    [ call-next-method ]
+    [ base>> heap-ac get merge-acs ] bi ;
+
 M: ##read analyze-aliases*
     call-next-method
     dup [ dst>> ] [ insn-slot# ] [ insn-object ] tri

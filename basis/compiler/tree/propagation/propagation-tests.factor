@@ -976,3 +976,22 @@ M: tuple-with-read-only-slot clone
     ! Should actually be 0 23 2^ 1 - [a,b]
     [ string-nth ] final-info first interval>> 0 23 2^ [a,b] =
 ] unit-test
+
+! Non-zero displacement for <displaced-alien> restricts the output type
+[ t ] [
+    [ { byte-array } declare <displaced-alien> ] final-classes
+    first byte-array alien class-or class=
+] unit-test
+
+[ V{ alien } ] [
+    [ { alien } declare <displaced-alien> ] final-classes
+] unit-test
+
+[ t ] [
+    [ { POSTPONE: f } declare <displaced-alien> ] final-classes
+    first \ f alien class-or class=
+] unit-test
+
+[ V{ alien } ] [
+    [ { byte-array } declare [ 10 bitand 2 + ] dip <displaced-alien> ] final-classes
+] unit-test
