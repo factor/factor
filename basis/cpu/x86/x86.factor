@@ -1443,10 +1443,28 @@ M: x86.64 %scalar>integer ( dst src rep -- )
     } case ;
 
 M: x86 %vector>scalar %copy ;
+
 M: x86 %scalar>vector %copy ;
 
-M:: x86 %spill ( src rep dst -- ) dst src rep %copy ;
-M:: x86 %reload ( dst rep src -- ) dst src rep %copy ;
+M:: x86 %spill ( src rep dst -- )
+    dst src rep %copy ;
+
+M:: x86 %reload ( dst rep src -- )
+    dst src rep %copy ;
+
+M:: x86 %store-reg-param ( src reg rep -- )
+    reg src rep %copy ;
+
+M:: x86 %store-stack-param ( src n rep -- )
+    n param@ src rep %copy ;
+
+HOOK: struct-return@ cpu ( n -- operand )
+
+M: x86 %prepare-struct-area ( dst -- )
+    f struct-return@ LEA ;
+
+M: x86 %alien-indirect ( src -- )
+    ?spill-slot CALL ;
 
 M: x86 %loop-entry 16 alignment [ NOP ] times ;
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math namespaces make sequences
 system layouts alien alien.c-types alien.accessors alien.libraries
-slots splitting assocs combinators locals compiler.constants
+slots splitting assocs combinators fry locals compiler.constants
 classes.struct compiler.codegen compiler.codegen.fixup
 compiler.cfg.instructions compiler.cfg.builder
 compiler.cfg.intrinsics compiler.cfg.stack-frame
@@ -99,6 +99,39 @@ M:: x86.64 %dispatch ( src temp -- )
     [ (align-code) ]
     bi ;
 
+M:: x86.64 %unbox ( dst src func rep -- )
+    param-reg-0 src tagged-rep %copy
+    param-reg-1 %mov-vm-ptr
+    func f %alien-invoke
+    dst rep reg-class-of return-reg rep %copy ;
+
+: with-return-regs ( quot -- )
+    [
+        V{ RDX RAX } clone int-regs set
+        V{ XMM1 XMM0 } clone float-regs set
+        call
+    ] with-scope ; inline
+
+: each-struct-component ( c-type quot -- )
+    '[
+        flatten-struct-type
+        [ [ first ] dip @ ] each-index
+    ] with-return-regs ; inline
+
+: %unbox-struct-component ( rep i -- )
+    R11 swap cells [+] swap reg-class-of {
+        { int-regs [ int-regs get pop swap MOV ] }
+        { float-regs [ float-regs get pop swap MOVSD ] }
+    } case ;
+
+M:: x86.64 %store-return ( src rep -- )
+    rep reg-class-of return-reg src rep %copy ;
+
+M:: x86.64 %store-struct-return ( src c-type -- )
+    ! Move src to R11 so that we don't clobber it.
+    R11 src int-rep %copy
+    c-type [ %unbox-struct-component ] each-struct-component ;
+
 M: stack-params copy-register*
     drop
     {
@@ -108,84 +141,32 @@ M: stack-params copy-register*
 
 M: x86.64 %save-param-reg [ param@ ] 2dip %copy ;
 
-M: x86.64 %load-param-reg [ swap param@ ] dip %copy ;
-
-: with-return-regs ( quot -- )
-    [
-        V{ RDX RAX } clone int-regs set
-        V{ XMM1 XMM0 } clone float-regs set
-        call
-    ] with-scope ; inline
-
-M:: x86.64 %unbox ( src n rep func -- )
-    param-reg-0 src tagged-rep %copy
-    param-reg-1 %mov-vm-ptr
-    ! Call the unboxer
-    func f %alien-invoke
-    ! Store the return value on the C stack if this is an
-    ! alien-invoke, otherwise leave it the return register if
-    ! this is the end of alien-callback
-    n [ n rep reg-class-of return-reg rep %save-param-reg ] when ;
-
-: %unbox-struct-field ( rep i -- )
-    R11 swap cells [+] swap reg-class-of {
-        { int-regs [ int-regs get pop swap MOV ] }
-        { float-regs [ float-regs get pop swap MOVSD ] }
-    } case ;
-
-M:: x86.64 %unbox-small-struct ( src c-type -- )
-    ! Move src to R11 so that we don't clobber it.
-    R11 src int-rep %copy
-    [
-        c-type flatten-struct-type
-        [ %unbox-struct-field ] each-index
-    ] with-return-regs ;
-
-M:: x86.64 %unbox-large-struct ( src n c-type -- )
-    param-reg-1 src int-rep %copy
-    param-reg-0 n param@ LEA
-    param-reg-2 c-type heap-size MOV
-    "memcpy" "libc" load-library %alien-invoke ;
-
-: load-return-value ( rep -- )
-    [ [ 0 ] dip reg-class-of cdecl param-reg ]
-    [ reg-class-of return-reg ]
-    [ ]
-    tri %copy ;
-
 M:: x86.64 %box ( dst n rep func -- )
-    n [
-        n
-        0 rep reg-class-of cdecl param-reg
-        rep %load-param-reg
-    ] [
-        rep load-return-value
-    ] if
+    0 rep reg-class-of cdecl param-reg
+    n [ n param@ ] [ rep reg-class-of return-reg ] if rep %copy
     rep int-rep? os windows? or param-reg-1 param-reg-0 ? %mov-vm-ptr
     func f %alien-invoke
     dst RAX tagged-rep %copy ;
 
-: box-struct-field@ ( i -- operand ) 1 + cells param@ ;
+: box-struct-component@ ( i -- operand ) 1 + cells param@ ;
 
-: %box-struct-field ( rep i -- )
-    box-struct-field@ swap reg-class-of {
+: %box-struct-component ( rep i -- )
+    box-struct-component@ swap reg-class-of {
         { int-regs [ int-regs get pop MOV ] }
         { float-regs [ float-regs get pop MOVSD ] }
     } case ;
 
 M:: x86.64 %box-small-struct ( dst c-type -- )
     #! Box a <= 16-byte struct.
-    [
-        c-type flatten-struct-type [ %box-struct-field ] each-index
-        param-reg-2 c-type heap-size MOV
-        param-reg-0 0 box-struct-field@ MOV
-        param-reg-1 1 box-struct-field@ MOV
-        param-reg-3 %mov-vm-ptr
-        "from_small_struct" f %alien-invoke
-        dst RAX tagged-rep %copy
-    ] with-return-regs ;
+    c-type [ %box-struct-component ] each-struct-component
+    param-reg-2 c-type heap-size MOV
+    param-reg-0 0 box-struct-component@ MOV
+    param-reg-1 1 box-struct-component@ MOV
+    param-reg-3 %mov-vm-ptr
+    "from_small_struct" f %alien-invoke
+    dst RAX tagged-rep %copy ;
 
-: struct-return@ ( n -- operand )
+M: x86.64 struct-return@ ( n -- operand )
     [ stack-frame get params>> ] unless* param@ ;
 
 M:: x86.64 %box-large-struct ( dst n c-type -- )
@@ -198,19 +179,10 @@ M:: x86.64 %box-large-struct ( dst n c-type -- )
     "from_value_struct" f %alien-invoke
     dst RAX tagged-rep %copy ;
 
-M: x86.64 %prepare-box-struct ( -- )
-    ! Compute target address for value struct return
-    RAX f struct-return@ LEA
-    ! Store it as the first parameter
-    0 param@ RAX MOV ;
-
 M: x86.64 %alien-invoke
     R11 0 MOV
     rc-absolute-cell rel-dlsym
     R11 CALL ;
-
-M: x86.64 %alien-indirect ( src -- )
-    ?spill-slot CALL ;
 
 M: x86.64 %begin-callback ( -- )
     param-reg-0 %mov-vm-ptr
@@ -249,7 +221,11 @@ M:: x86.64 %call-gc ( gc-roots -- )
     param-reg-1 %mov-vm-ptr
     "inline_gc" f %alien-invoke ;
 
-M: x86.64 struct-return-pointer-type void* ;
+M: x86.64 long-long-on-stack? f ;
+
+M: x86.64 float-on-stack? f ;
+
+M: x86.64 struct-return-on-stack? f ;
 
 ! The result of reading 4 bytes from memory is a fixnum on
 ! x86-64.

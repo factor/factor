@@ -166,24 +166,22 @@ INSTANCE: struct-c-type value-type
 
 M: struct-c-type c-type ;
 
-: if-value-struct ( ctype true false -- )
-    [ dup value-struct? ] 2dip '[ drop void* @ ] if ; inline
-
-: if-small-struct ( c-type true false -- ? )
-    [ dup return-struct-in-registers? ] 2dip '[ f swap @ ] if ; inline
-
 M: struct-c-type base-type ;
 
 M: struct-c-type stack-size
-    [ heap-size cell align ] [ stack-size ] if-value-struct ;
+    dup value-struct? [ heap-size cell align ] [ drop cell ] if ;
 
-HOOK: flatten-struct-type cpu ( type -- reps )
+HOOK: flatten-struct-type cpu ( type -- pairs )
 
-M: object flatten-struct-type int-rep (flatten-c-type) ;
+M: object flatten-struct-type
+    stack-size cell /i { int-rep f } <repetition> ;
 
-M: struct-c-type flatten-c-type flatten-struct-type ;
-
-M: struct-c-type c-struct? drop t ;
+: large-struct? ( type -- ? )
+    {
+        { [ dup void? ] [ drop f ] }
+        { [ dup base-type struct-c-type? not ] [ drop f ] }
+        [ return-struct-in-registers? not ]
+    } cond ;
 
 <PRIVATE
 : struct-slot-values-quot ( class -- quot )

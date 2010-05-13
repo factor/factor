@@ -5,9 +5,9 @@ alien.syntax arrays assocs byte-arrays classes.struct
 combinators continuations cuda.ffi cuda.memory cuda.utils
 destructors fry init io io.backend io.encodings.string
 io.encodings.utf8 kernel lexer locals macros math math.parser
-namespaces nested-comments opengl.gl.extensions parser
-prettyprint quotations sequences words cuda.libraries ;
-QUALIFIED-WITH: alien.c-types a
+namespaces opengl.gl.extensions parser prettyprint quotations
+sequences words cuda.libraries ;
+QUALIFIED-WITH: alien.c-types c
 IN: cuda
 
 TUPLE: launcher
@@ -41,11 +41,11 @@ dim-grid dim-block shared-size stream ;
 
 : c-type>cuda-setter ( c-type -- n cuda-type )
     {
-        { [ dup a:int = ] [ drop 4 [ cuda-int* ] ] }
-        { [ dup a:uint = ] [ drop 4 [ cuda-int* ] ] }
-        { [ dup a:float = ] [ drop 4 [ cuda-float* ] ] }
-        { [ dup a:pointer? ] [ drop 4 [ cuda-int* ] ] }
-        { [ dup a:void* = ] [ drop 4 [ cuda-int* ] ] }
+        { [ dup c:int = ] [ drop 4 [ cuda-int* ] ] }
+        { [ dup c:uint = ] [ drop 4 [ cuda-int* ] ] }
+        { [ dup c:float = ] [ drop 4 [ cuda-float* ] ] }
+        { [ dup c:pointer? ] [ drop 4 [ cuda-int* ] ] }
+        { [ dup c:void* = ] [ drop 4 [ cuda-int* ] ] }
     } cond ;
 
 <PRIVATE
@@ -85,5 +85,5 @@ MACRO: cuda-arguments ( c-types -- quot: ( args... function -- ) )
             [ run-function-launcher ] 2bi
         ]
     ]
-    [ 2nip \ function-launcher suffix a:void function-effect ]
+    [ 2nip \ function-launcher suffix c:void function-effect ]
     3bi define-declared ;
