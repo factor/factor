@@ -13,7 +13,7 @@ V{ } clone insn-classes set-global
 
 : new-insn ( ... class -- insn ) f swap boa ; inline
 
-! Virtual CPU instructions, used by CFG and machine IRs
+! Virtual CPU instructions, used by CFG IR
 TUPLE: insn ;
 
 ! Instructions which are referentially transparent; used for
@@ -360,12 +360,6 @@ temp: temp/int-rep
 literal: rep vcc ;
 
 INSN: ##test-vector-branch
-use: src1
-temp: temp/int-rep
-literal: rep vcc ;
-
-INSN: _test-vector-branch
-literal: label
 use: src1
 temp: temp/int-rep
 literal: rep vcc ;
