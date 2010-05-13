@@ -3,8 +3,8 @@
 USING: accessors assocs sequences kernel combinators
 classes.algebra byte-arrays make math math.order math.ranges
 system namespaces locals layouts words alien alien.accessors
-alien.c-types alien.complex alien.data literals cpu.architecture
-cpu.ppc.assembler cpu.ppc.assembler.backend
+alien.c-types alien.complex alien.data alien.libraries
+literals cpu.architecture cpu.ppc.assembler cpu.ppc.assembler.backend
 compiler.cfg.registers compiler.cfg.instructions
 compiler.cfg.comparisons compiler.codegen.fixup
 compiler.cfg.intrinsics compiler.cfg.stack-frame
@@ -681,13 +681,13 @@ GENERIC: load-param ( reg src -- )
 
 M: integer load-param int-rep %copy ;
 
-M: spill-slot load-param n>> spill@ LWZ ;
+M: spill-slot load-param [ 1 ] dip n>> spill@ LWZ ;
 
 GENERIC: store-param ( reg dst -- )
 
 M: integer store-param swap int-rep %copy ;
 
-M: spill-slot store-param n>> spill@ STW ;
+M: spill-slot store-param [ 1 ] dip n>> spill@ STW ;
 
 :: call-unbox-func ( src func -- )
     3 src load-param
@@ -710,7 +710,7 @@ M:: ppc %unbox-long-long ( src n func -- )
 M:: ppc %unbox-large-struct ( src n c-type -- )
     4 src load-param
     3 1 n local@ ADDI
-    heap-size 5 LI
+    c-type heap-size 5 LI
     "memcpy" "libc" load-library %alien-invoke ;
 
 M:: ppc %box ( dst n rep func -- )
@@ -724,6 +724,7 @@ M:: ppc %box-long-long ( dst n func -- )
         3 1 n local@ LWZ
         4 1 n cell + local@ LWZ
     ] when
+    5 %load-vm-addr
     func f %alien-invoke
     3 dst store-param ;
 
@@ -767,8 +768,6 @@ M: ppc immediate-arithmetic? ( n -- ? ) -32768 32767 between? ;
 M: ppc immediate-bitwise? ( n -- ? ) 0 65535 between? ;
 
 M: ppc immediate-store? drop f ;
-
-M: ppc struct-return-pointer-type void* ;
 
 M: ppc return-struct-in-registers? ( c-type -- ? )
     c-type return-in-registers?>> ;
