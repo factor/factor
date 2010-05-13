@@ -47,9 +47,9 @@
   '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
     "ABOUT:" "AFTER:" "ALIAS:" "ALIEN:" "ARTICLE:"
     "B" "BEFORE:" "BIN:"
-    "C:" "CALLBACK:" "ENUM:" "C-TYPE:" "CHAR:" "COM-INTERFACE:" "CONSTANT:" "CONSULT:" "call-next-method"
-    "DEFER:"
-    "EBNF:" ";EBNF" "ERROR:" "EXCLUDE:"
+    "C:" "CALLBACK:" "C-GLOBAL:" "C-TYPE:" "CHAR:" "COM-INTERFACE:" "CONSTANT:" "CONSULT:" "call-next-method"
+    "DEFER:" "DESTRUCTOR:"
+    "EBNF:" ";EBNF" "ENUM:" "ERROR:" "EXCLUDE:"
     "f" "FORGET:" "FROM:" "FUNCTION:"
     "GAME:" "GENERIC#" "GENERIC:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
@@ -197,10 +197,10 @@
 (defconst fuel-syntax--single-liner-regex
   (regexp-opt '("ABOUT:"
                 "ALIAS:"
-                "CONSTANT:" "C:" "C-TYPE:"
-                "DEFER:"
+                "CONSTANT:" "C:" "C-GLOBAL:" "C-TYPE:"
+                "DEFER:" "DESTRUCTOR:"
                 "FORGET:"
-                "GAME:" "GENERIC:" "GENERIC#" "GLSL-PROGRAM:" 
+                "GAME:" "GENERIC:" "GENERIC#" "GLSL-PROGRAM:"
                 "HEX:" "HOOK:"
                 "IN:" "INSTANCE:"
                 "LIBRARY:"
@@ -241,6 +241,9 @@
 
 (defconst fuel-syntax--typedef-regex
   "\\_<TYPEDEF: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
+
+(defconst fuel-syntax--c-global-regex
+  "\\_<C-GLOBAL: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
 
 (defconst fuel-syntax--rename-regex
   "\\_<RENAME: +\\(\\w+\\) +\\(\\w+\\) +=> +\\(\\w+\\)\\( .*\\)?$")
