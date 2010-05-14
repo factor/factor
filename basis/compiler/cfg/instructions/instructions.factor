@@ -16,9 +16,12 @@ V{ } clone insn-classes set-global
 ! Virtual CPU instructions, used by CFG IR
 TUPLE: insn ;
 
+! Instructions which use vregs
+TUPLE: vreg-insn < insn ;
+
 ! Instructions which are referentially transparent; used for
 ! value numbering
-TUPLE: pure-insn < insn ;
+TUPLE: pure-insn < vreg-insn ;
 
 ! Constants
 INSN: ##load-integer
@@ -859,13 +862,3 @@ UNION: def-is-use-insn
 ##box-alien
 ##box-displaced-alien
 ##unbox-any-c-ptr ;
-
-SYMBOL: vreg-insn
-
-[
-    vreg-insn
-    insn-classes get [
-        "insn-slots" word-prop [ type>> { def use temp } member-eq? ] any?
-    ] filter
-    define-union-class
-] with-compilation-unit
