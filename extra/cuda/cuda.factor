@@ -21,13 +21,18 @@ TUPLE: launcher
 TUPLE: function-launcher
 dim-grid dim-block shared-size stream ;
 
-: with-cuda-context ( flags device quot -- )
+: (set-up-cuda-context) ( flags device create-quot -- )
     H{ } clone cuda-modules set-global
     H{ } clone cuda-functions set
-    [ create-context ] dip 
+    call ; inline
+
+: (with-cuda-context) ( context quot -- )
     [ '[ _ @ ] ]
     [ drop '[ [ sync-context ] ignore-errors _ destroy-context ] ] 2bi
     [ ] cleanup ; inline
+
+: with-cuda-context ( flags device quot -- )
+    [ [ create-context ] (set-up-cuda-context) ] dip (with-cuda-context) ; inline
 
 : with-cuda-program ( flags device quot -- )
     [ dup cuda-device set ] 2dip
