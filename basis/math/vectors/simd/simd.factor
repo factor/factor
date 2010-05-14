@@ -1,6 +1,6 @@
 USING: accessors alien arrays byte-arrays classes combinators
 cpu.architecture effects fry functors generalizations generic
-generic.parser kernel lexer literals macros math math.functions
+generic.parser kernel lexer literals locals macros math math.functions
 math.vectors math.vectors.private math.vectors.simd.intrinsics
 namespaces parser prettyprint.custom quotations sequences
 sequences.private vocabs vocabs.loader words ;
@@ -85,12 +85,18 @@ DEFER: simd-construct-op
 
 : (vv->v-op) ( a b rep quot: ( (a) (b) rep -- (c) ) -- c )
     [ [ simd-unbox ] [ underlying>> ] bi* ] 2dip 3curry make-underlying ; inline
-
 : (vv->n-op) ( a b rep quot: ( (a) (b) rep -- n ) -- n )
     [ [ underlying>> ] bi@ ] 2dip 3curry call ; inline
+: (vvn->v-op) ( a b n rep quot: ( (a) (b) n rep -- (c) ) -- c )
+    [ [ simd-unbox ] [ underlying>> ] bi* ] 3dip 2curry 2curry make-underlying ; inline
     
 : vv->v-op ( a b rep quot: ( (a) (b) rep -- (c) ) fallback-quot -- c )
     [ '[ _ (vv->v-op) ] ] [ '[ drop @ ] ] bi* if-both-vectors-match ; inline
+
+:: vvn->v-op ( a b n rep quot: ( (a) (b) n rep -- (c) ) fallback-quot -- c )
+    a b rep
+    [ n swap quot (vvn->v-op) ]
+    [ drop n fallback-quot call ] if-both-vectors-match ; inline
 
 : vv'->v-op ( a b rep quot: ( (a) (b) rep -- (c) ) fallback-quot -- c )
     [ '[ _ (vv->v-op) ] ] [ '[ drop @ ] ] bi* if-both-vectors ; inline
@@ -185,6 +191,8 @@ M: simd-128 hrshift
     over simd-rep [ (simd-hrshift)           ] [ call-next-method ] vn->v-op ; inline
 M: simd-128 vshuffle-elements
     over simd-rep [ (simd-vshuffle-elements) ] [ call-next-method ] vn->v-op ; inline
+M: simd-128 vshuffle2-elements
+    over simd-rep [ (simd-vshuffle2-elements) ] [ call-next-method ] vvn->v-op ; inline
 M: simd-128 vshuffle-bytes
     dup simd-rep [ (simd-vshuffle-bytes)    ] [ call-next-method ] vv'->v-op ; inline
 M: simd-128 (vmerge-head)
