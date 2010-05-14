@@ -85,6 +85,9 @@ H{
     { 3 float-rep }
 } representations set
 
+: clean-up-split ( a b -- a b )
+    [ dup [ [ >vector ] change-uses [ >vector ] change-ranges ] when ] bi@ ;
+
 [
     T{ live-interval
        { vreg 1 }
@@ -115,6 +118,7 @@ H{
        { uses V{ T{ vreg-use f 0 float-rep f } T{ vreg-use f 1 f float-rep } T{ vreg-use f 5 f float-rep } } }
        { ranges V{ T{ live-range f 0 5 } } }
     } 2 split-for-spill
+    clean-up-split
 ] unit-test
 
 [
@@ -138,6 +142,7 @@ H{
        { uses V{ T{ vreg-use f 0 float-rep f } T{ vreg-use f 1 f float-rep } T{ vreg-use f 5 f float-rep } } }
        { ranges V{ T{ live-range f 0 5 } } }
     } 0 split-for-spill
+    clean-up-split
 ] unit-test
 
 [
@@ -161,6 +166,7 @@ H{
        { uses V{ T{ vreg-use f 0 float-rep f } T{ vreg-use f 1 f float-rep } T{ vreg-use f 5 f float-rep } } }
        { ranges V{ T{ live-range f 0 5 } } }
     } 5 split-for-spill
+    clean-up-split
 ] unit-test
 
 [
@@ -193,6 +199,7 @@ H{
        { uses V{ T{ vreg-use f 0 float-rep f } T{ vreg-use f 20 f float-rep } T{ vreg-use f 30 f float-rep } } }
        { ranges V{ T{ live-range f 0 8 } T{ live-range f 10 18 } T{ live-range f 20 30 } } }
     } 10 split-for-spill
+    clean-up-split
 ] unit-test
 
 ! Don't insert reload if first usage is a def
@@ -224,6 +231,7 @@ H{
        { uses V{ T{ vreg-use f 0 float-rep f } T{ vreg-use f 20 float-rep f } T{ vreg-use f 30 f float-rep } } }
        { ranges V{ T{ live-range f 0 8 } T{ live-range f 10 18 } T{ live-range f 20 30 } } }
     } 10 split-for-spill
+    clean-up-split
 ] unit-test
 
 ! Multiple representations
@@ -257,6 +265,63 @@ H{
        { uses V{ T{ vreg-use f 0 float-rep f } T{ vreg-use f 10 double-rep float-rep } T{ vreg-use f 20 f double-rep } } }
        { ranges V{ T{ live-range f 0 20 } } }
     } 15 split-for-spill
+    clean-up-split
+] unit-test
+
+[
+    f
+    T{ live-interval
+        { vreg 7 }
+        { start 8 }
+        { end 8 }
+        { ranges V{ T{ live-range f 8 8 } } }
+        { uses V{ T{ vreg-use f 8 int-rep } } }
+        { reg-class int-regs }
+    }
+] [
+    T{ live-interval
+        { vreg 7 }
+        { start 4 }
+        { end 8 }
+        { ranges V{ T{ live-range f 4 8 } } }
+        { uses V{ T{ vreg-use f 8 int-rep } } }
+        { reg-class int-regs }
+    } 4 split-for-spill
+    clean-up-split
+] unit-test
+
+! trim-before-ranges, trim-after-ranges
+[
+    T{ live-interval
+        { vreg 8 }
+        { start 0 }
+        { end 3 }
+        { ranges V{ T{ live-range f 0 3 } } }
+        { uses V{ T{ vreg-use f 0 f int-rep } T{ vreg-use f 2 f int-rep } } }
+        { reg-class int-regs }
+        { spill-to T{ spill-slot f 32 } }
+        { spill-rep int-rep }
+    }
+    T{ live-interval
+        { vreg 8 }
+        { start 14 }
+        { end 16 }
+        { ranges V{ T{ live-range f 14 16 } } }
+        { uses V{ T{ vreg-use f 14 f int-rep } } }
+        { reg-class int-regs }
+        { reload-from T{ spill-slot f 32 } }
+        { reload-rep int-rep }
+    }
+] [
+    T{ live-interval
+        { vreg 8 }
+        { start 0 }
+        { end 16 }
+        { ranges V{ T{ live-range f 0 4 } T{ live-range f 6 10 } T{ live-range f 12 16 } } }
+        { uses V{ T{ vreg-use f 0 f int-rep } T{ vreg-use f 2 f int-rep } T{ vreg-use f 14 f int-rep } } }
+        { reg-class int-regs }
+    } 8 split-for-spill
+    clean-up-split
 ] unit-test
 
 H{
