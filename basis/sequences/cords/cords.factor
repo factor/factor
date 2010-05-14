@@ -58,6 +58,11 @@ M: T cord-append
     [ [ [ head>> ] bi@ ] dip call ]
     [ [ [ tail>> ] bi@ ] dip call ] 3bi ; inline
 
+<PRIVATE
+: split-shuffle ( shuf -- sh uf )
+    dup length 2 /i cut* ; foldable
+PRIVATE>
+
 M: cord v+                [ v+                ] cord-2map ; inline
 M: cord v-                [ v-                ] cord-2map ; inline
 M: cord vneg              [ vneg              ] cord-map  ; inline
@@ -96,6 +101,9 @@ M: cord vunordered?       [ vunordered?       ] cord-2map ; inline
 M: cord vany?             [ vany?             ] cord-both or  ; inline
 M: cord vall?             [ vall?             ] cord-both and ; inline
 M: cord vnone?            [ vnone?            ] cord-both and ; inline
+M: cord vshuffle-elements 
+    [ [ head>> ] [ tail>> ] bi ] [ split-shuffle ] bi*
+    [ vshuffle2-elements ] bi-curry@ 2bi cord-append ; inline
 
 M: cord n+v [ n+v ] with cord-map ; inline
 M: cord n-v [ n-v ] with cord-map ; inline
