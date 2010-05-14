@@ -182,6 +182,7 @@ CODEGEN: ##fill-vector %fill-vector
 CODEGEN: ##gather-vector-2 %gather-vector-2
 CODEGEN: ##gather-vector-4 %gather-vector-4
 CODEGEN: ##shuffle-vector-imm %shuffle-vector-imm
+CODEGEN: ##shuffle-vector-halves-imm %shuffle-vector-halves-imm
 CODEGEN: ##shuffle-vector %shuffle-vector
 CODEGEN: ##tail>head-vector %tail>head-vector
 CODEGEN: ##merge-vector-head %merge-vector-head

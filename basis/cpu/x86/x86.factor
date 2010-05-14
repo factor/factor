@@ -798,6 +798,19 @@ M: x86 %shuffle-vector-imm-reps
         { sse2? { double-2-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
+M:: x86 %shuffle-vector-halves-imm ( dst src1 src2 shuffle rep -- )
+    dst src1 src2 rep two-operand
+    shuffle rep {
+        { double-2-rep [ >float-4-shuffle SHUFPS ] }
+        { float-4-rep [ SHUFPS ] }
+    } case ;
+
+M: x86 %shuffle-vector-halves-imm-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep } }
+    } available-reps ;
+
 M: x86 %shuffle-vector ( dst src shuffle rep -- )
     two-operand PSHUFB ;
 
