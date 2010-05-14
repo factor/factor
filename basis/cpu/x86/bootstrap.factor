@@ -548,7 +548,7 @@ big-endian off
     temp0 ds-reg [] MOV
     ds-reg bootstrap-cell SUB
     temp0 ds-reg [] OR
-    temp0 tag-mask get AND
+    temp0 tag-mask get TEST
     temp0 \ f type-number MOV
     temp1 1 tag-fixnum MOV
     temp0 temp1 CMOVE

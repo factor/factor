@@ -119,6 +119,18 @@ IN: math.vectors.simd.intrinsics
     ] each-index
     c' underlying>> ; inline
 
+:: (vshuffle2) ( a b elts rep -- c )
+    a rep >rep-array :> a'
+    b rep >rep-array :> b'
+    a' b' cord-append :> ab'
+    rep <rep-array> :> c'
+    elts [| from to |
+        from rep rep-length dup + 1 - bitand
+           ab' nth-unsafe
+        to c' set-nth-unsafe
+    ] each-index
+    c' underlying>> ; inline
+
 PRIVATE>
 
 : (simd-v+)                ( a b rep -- c ) [ + ] components-2map ;
@@ -186,6 +198,7 @@ PRIVATE>
 : (simd-hrshift)           ( a n rep -- c )
     drop tail-slice 16 0 pad-tail ;
 : (simd-vshuffle-elements) ( a n rep -- c ) [ rep-length 0 pad-tail ] keep (vshuffle) ;
+: (simd-vshuffle2-elements) ( a b n rep -- c ) [ rep-length 0 pad-tail ] keep (vshuffle2) ;
 : (simd-vshuffle-bytes)    ( a b rep -- c ) drop uchar-16-rep (vshuffle) ;
 :: (simd-vmerge-head)      ( a b rep -- c )
     a b rep 2>rep-array :> ( a' b' )
@@ -252,4 +265,3 @@ PRIVATE>
 "compiler.cfg.intrinsics.simd" require
 "compiler.tree.propagation.simd" require
 "compiler.cfg.value-numbering.simd" require
-

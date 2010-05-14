@@ -251,7 +251,7 @@ HOOK: system-alert ui-backend ( caption text -- )
 : define-main-window ( word attributes quot -- )
     [
         '[ [ f _ clone @ open-window ] with-ui ] (( -- )) define-declared
-    ] [ 2drop current-vocab (>>main) ] 3bi ;
+    ] [ 2drop current-vocab main<< ] 3bi ;
 
 SYNTAX: MAIN-WINDOW:
     CREATE

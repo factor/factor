@@ -66,15 +66,6 @@ M: word c-type
     dup "c-type" word-prop resolve-typedef
     [ ] [ no-c-type ] ?if ;
 
-GENERIC: c-struct? ( c-type -- ? )
-
-M: object c-struct? drop f ;
-
-M: c-type-name c-struct? dup void? [ drop f ] [ c-type c-struct? ] if ;
-
-! These words being foldable means that words need to be
-! recompiled if a C type is redefined. Even so, folding the
-! size facilitates some optimizations.
 GENERIC: c-type-class ( name -- class )
 
 M: abstract-c-type c-type-class class>> ;
@@ -111,27 +102,11 @@ GENERIC: c-type-align-first ( name -- n )
 
 M: abstract-c-type c-type-align-first align-first>> ;
 
-: c-type-box ( n c-type -- )
-    [ rep>> ] [ boxer>> ] bi %box ;
+GENERIC: base-type ( c-type -- c-type )
 
-: c-type-unbox ( n c-type -- )
-    [ rep>> ] [ unboxer>> ] bi %unbox ;
+M: c-type-name base-type c-type ;
 
-GENERIC: box-parameter ( n c-type -- )
-
-M: c-type box-parameter c-type-box ;
-
-GENERIC: box-return ( c-type -- )
-
-M: c-type box-return f swap c-type-box ;
-
-GENERIC: unbox-parameter ( n c-type -- )
-
-M: c-type unbox-parameter c-type-unbox ;
-
-GENERIC: unbox-return ( c-type -- )
-
-M: c-type unbox-return f swap c-type-unbox ;
+M: c-type base-type ;
 
 : little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
 
@@ -142,17 +117,6 @@ M: abstract-c-type heap-size size>> ;
 GENERIC: stack-size ( name -- size )
 
 M: c-type stack-size size>> cell align ;
-
-: (flatten-c-type) ( type rep -- seq )
-    [ stack-size cell /i ] dip <repetition> ; inline
-
-GENERIC: flatten-c-type ( type -- reps )
-
-M: c-type flatten-c-type rep>> 1array ;
-M: c-type-name flatten-c-type c-type flatten-c-type ;
-
-: flatten-c-types ( types -- reps )
-    [ flatten-c-type ] map concat ;
 
 MIXIN: value-type
 
@@ -179,13 +143,9 @@ PROTOCOL: c-type-protocol
     c-type-setter
     c-type-align
     c-type-align-first
-    box-parameter
-    box-return
-    unbox-parameter
-    unbox-return
+    base-type
     heap-size
-    stack-size
-    flatten-c-type ;
+    stack-size ;
 
 CONSULT: c-type-protocol c-type-name
     c-type ;
@@ -203,21 +163,6 @@ TUPLE: long-long-type < c-type ;
 
 : <long-long-type> ( -- c-type )
     long-long-type new ;
-
-M: long-long-type unbox-parameter ( n c-type -- )
-    unboxer>> %unbox-long-long ;
-
-M: long-long-type unbox-return ( c-type -- )
-    f swap unbox-parameter ;
-
-M: long-long-type box-parameter ( n c-type -- )
-    boxer>> %box-long-long ;
-
-M: long-long-type box-return ( c-type -- )
-    f swap box-parameter ;
-
-M: long-long-type flatten-c-type
-    int-rep (flatten-c-type) ;
 
 : define-deref ( c-type -- )
     [ name>> CHAR: * prefix "alien.c-types" create ] [ c-getter 0 prefix ] bi

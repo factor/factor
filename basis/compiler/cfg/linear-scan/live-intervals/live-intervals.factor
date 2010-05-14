@@ -16,21 +16,28 @@ TUPLE: live-range from to ;
 
 C: <live-range> live-range
 
-SYMBOLS: +def+ +use+ +memory+ ;
+TUPLE: vreg-use n def-rep use-rep ;
 
-TUPLE: vreg-use rep n type ;
-
-C: <vreg-use> vreg-use
+: <vreg-use> ( n -- vreg-use ) vreg-use new swap >>n ;
 
 TUPLE: live-interval
 vreg
-reg spill-to reload-from
+reg spill-to spill-rep reload-from reload-rep
 start end ranges uses
 reg-class ;
 
 : first-use ( live-interval -- use ) uses>> first ; inline
 
 : last-use ( live-interval -- use ) uses>> last ; inline
+
+: new-use ( insn# uses -- use )
+    [ <vreg-use> dup ] dip push ;
+
+: last-use? ( insn# uses -- use/f )
+    [ drop f ] [ last [ n>> = ] keep and ] if-empty ;
+
+: (add-use) ( insn# live-interval -- use )
+    uses>> 2dup last-use? dup [ 2nip ] [ drop new-use ] if ;
 
 GENERIC: covers? ( insn# obj -- ? )
 
@@ -47,12 +54,16 @@ M: live-interval covers? ( insn# live-interval -- ? )
         covers?
     ] if ;
 
+:: find-use ( insn# live-interval -- vreg-use )
+    insn# live-interval uses>> [ n>> <=> ] with search nip
+    dup [ dup n>> insn# = [ drop f ] unless ] when ;
+
 : add-new-range ( from to live-interval -- )
     [ <live-range> ] dip ranges>> push ;
 
 : shorten-range ( n live-interval -- )
     dup ranges>> empty?
-    [ dupd add-new-range ] [ ranges>> last (>>from) ] if ;
+    [ dupd add-new-range ] [ ranges>> last from<< ] if ;
 
 : extend-range ( from to live-range -- )
     ranges>> last
@@ -66,12 +77,6 @@ M: live-interval covers? ( insn# live-interval -- ? )
 : add-range ( from to live-interval -- )
     2dup extend-range?
     [ extend-range ] [ add-new-range ] if ;
-
-:: add-use ( rep n type live-interval -- )
-    type +memory+ eq? [
-        rep n type <vreg-use>
-        live-interval uses>> push
-    ] unless ;
 
 : <live-interval> ( vreg reg-class -- live-interval )
     \ live-interval new
@@ -97,40 +102,30 @@ GENERIC: compute-live-intervals* ( insn -- )
 
 M: insn compute-live-intervals* drop ;
 
-:: record-def ( vreg n type -- )
-    vreg rep-of :> rep
+:: record-def ( vreg n -- )
     vreg live-interval :> live-interval
 
     n live-interval shorten-range
-    rep n type live-interval add-use ;
+    n live-interval (add-use) vreg rep-of >>def-rep drop ;
 
-:: record-use ( vreg n type -- )
-    vreg rep-of :> rep
+:: record-use ( vreg n -- )
     vreg live-interval :> live-interval
 
     from get n live-interval add-range
-    rep n type live-interval add-use ;
+    n live-interval (add-use) vreg rep-of >>use-rep drop ;
 
 :: record-temp ( vreg n -- )
-    vreg rep-of :> rep
     vreg live-interval :> live-interval
 
     n n live-interval add-range
-    rep n +def+ live-interval add-use ;
+    n live-interval (add-use) vreg rep-of >>def-rep drop ;
 
-M:: vreg-insn compute-live-intervals* ( insn -- )
-    insn insn#>> :> n
-
-    insn defs-vreg [ n +def+ record-def ] when*
-    insn uses-vregs [ n +use+ record-use ] each
-    insn temp-vregs [ n record-temp ] each ;
-
-M:: clobber-insn compute-live-intervals* ( insn -- )
-    insn insn#>> :> n
-
-    insn defs-vreg [ n +use+ record-def ] when*
-    insn uses-vregs [ n +memory+ record-use ] each
-    insn temp-vregs [ n record-temp ] each ;
+M: vreg-insn compute-live-intervals* ( insn -- )
+    dup insn#>>
+    [ [ defs-vreg ] dip '[ _ record-def ] when* ]
+    [ [ uses-vregs ] dip '[ _ record-use ] each ]
+    [ [ temp-vregs ] dip '[ _ record-temp ] each ]
+    2tri ;
 
 : handle-live-out ( bb -- )
     live-out dup assoc-empty? [ drop ] [
@@ -170,7 +165,7 @@ M: insn compute-sync-points* drop ;
 : init-live-intervals ( -- )
     H{ } clone live-intervals set
     V{ } clone sync-points set ;
-    
+
 : compute-start/end ( live-interval -- )
     dup ranges>> [ first from>> ] [ last to>> ] bi
     [ >>start ] [ >>end ] bi* drop ;
@@ -185,8 +180,8 @@ ERROR: bad-live-interval live-interval ;
     ! to reverse some sequences, and compute the start and end.
     values dup [
         {
-            [ ranges>> reverse! drop ]
-            [ uses>> reverse! drop ]
+            [ [ { } like reverse! ] change-ranges drop ]
+            [ [ { } like reverse! ] change-uses drop ]
             [ compute-start/end ]
             [ check-start ]
         } cleave

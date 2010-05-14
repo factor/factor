@@ -275,6 +275,26 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         [ [ ^load-immediate-shuffle ] [ ^^shuffle-vector ] bi ]
     } vl-vector-op ;
 
+: ^shuffle-2-vectors-imm ( src1 src2 shuffle rep -- dst )
+    [ rep-length 0 pad-tail ] keep {
+        { double-2-rep [| src1 src2 shuffle rep |
+            shuffle first2 [ 4 mod ] bi@ :> ( i j )
+            {
+                { [ i j [ 2 < ] both? ] [
+                    src1 shuffle rep ^shuffle-vector-imm
+                ] }
+                { [ i j [ 2 >= ] both? ] [
+                    src2 shuffle [ 2 - ] map rep ^shuffle-vector-imm
+                ] }
+                { [ i 2 < ] [
+                    src1 src2 i j 2 - 2array rep ^^shuffle-vector-halves-imm
+                ] }
+                ! [ j 2 < ]
+                [ src2 src1 i 2 - j 2array rep ^^shuffle-vector-halves-imm ]
+            } cond
+        ] }
+    } vvl-vector-op ;
+
 : ^broadcast-vector ( src n rep -- dst )
     [ rep-length swap <array> ] keep
     ^shuffle-vector-imm ;
@@ -475,6 +495,11 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         [ ^shuffle-vector-imm ]
     } [ shuffle? ] emit-vl-vector-op ;
 
+: emit-simd-vshuffle2-elements ( node -- )
+    {
+        [ ^shuffle-2-vectors-imm ]
+    } [ shuffle? ] emit-vvl-vector-op ;
+
 : emit-simd-vshuffle-bytes ( node -- )
     {
         [ ^^shuffle-vector ]
@@ -605,65 +630,66 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 
 : enable-simd ( -- )
     {
-        { (simd-v+)                [ emit-simd-v+                  ] }
-        { (simd-v-)                [ emit-simd-v-                  ] }
-        { (simd-vneg)              [ emit-simd-vneg                ] }
-        { (simd-v+-)               [ emit-simd-v+-                 ] }
-        { (simd-vs+)               [ emit-simd-vs+                 ] }
-        { (simd-vs-)               [ emit-simd-vs-                 ] }
-        { (simd-vs*)               [ emit-simd-vs*                 ] }
-        { (simd-v*)                [ emit-simd-v*                  ] }
-        { (simd-v*high)            [ emit-simd-v*high              ] }
-        { (simd-v*hs+)             [ emit-simd-v*hs+               ] }
-        { (simd-v/)                [ emit-simd-v/                  ] }
-        { (simd-vmin)              [ emit-simd-vmin                ] }
-        { (simd-vmax)              [ emit-simd-vmax                ] }
-        { (simd-vavg)              [ emit-simd-vavg                ] }
-        { (simd-v.)                [ emit-simd-v.                  ] }
-        { (simd-vsad)              [ emit-simd-vsad                ] }
-        { (simd-vsqrt)             [ emit-simd-vsqrt               ] }
-        { (simd-sum)               [ emit-simd-sum                 ] }
-        { (simd-vabs)              [ emit-simd-vabs                ] }
-        { (simd-vbitand)           [ emit-simd-vand                ] }
-        { (simd-vbitandn)          [ emit-simd-vandn               ] }
-        { (simd-vbitor)            [ emit-simd-vor                 ] }
-        { (simd-vbitxor)           [ emit-simd-vxor                ] }
-        { (simd-vbitnot)           [ emit-simd-vnot                ] }
-        { (simd-vand)              [ emit-simd-vand                ] }
-        { (simd-vandn)             [ emit-simd-vandn               ] }
-        { (simd-vor)               [ emit-simd-vor                 ] }
-        { (simd-vxor)              [ emit-simd-vxor                ] }
-        { (simd-vnot)              [ emit-simd-vnot                ] }
-        { (simd-vlshift)           [ emit-simd-vlshift             ] }
-        { (simd-vrshift)           [ emit-simd-vrshift             ] }
-        { (simd-hlshift)           [ emit-simd-hlshift             ] }
-        { (simd-hrshift)           [ emit-simd-hrshift             ] }
-        { (simd-vshuffle-elements) [ emit-simd-vshuffle-elements   ] }
-        { (simd-vshuffle-bytes)    [ emit-simd-vshuffle-bytes      ] }
-        { (simd-vmerge-head)       [ emit-simd-vmerge-head         ] }
-        { (simd-vmerge-tail)       [ emit-simd-vmerge-tail         ] }
-        { (simd-v<=)               [ emit-simd-v<=                 ] }
-        { (simd-v<)                [ emit-simd-v<                  ] }
-        { (simd-v=)                [ emit-simd-v=                  ] }
-        { (simd-v>)                [ emit-simd-v>                  ] }
-        { (simd-v>=)               [ emit-simd-v>=                 ] }
-        { (simd-vunordered?)       [ emit-simd-vunordered?         ] }
-        { (simd-vany?)             [ emit-simd-vany?               ] }
-        { (simd-vall?)             [ emit-simd-vall?               ] }
-        { (simd-vnone?)            [ emit-simd-vnone?              ] }
-        { (simd-v>float)           [ emit-simd-v>float             ] }
-        { (simd-v>integer)         [ emit-simd-v>integer           ] }
-        { (simd-vpack-signed)      [ emit-simd-vpack-signed        ] }
-        { (simd-vpack-unsigned)    [ emit-simd-vpack-unsigned      ] }
-        { (simd-vunpack-head)      [ emit-simd-vunpack-head        ] }
-        { (simd-vunpack-tail)      [ emit-simd-vunpack-tail        ] }
-        { (simd-with)              [ emit-simd-with                ] }
-        { (simd-gather-2)          [ emit-simd-gather-2            ] }
-        { (simd-gather-4)          [ emit-simd-gather-4            ] }
-        { (simd-select)            [ emit-simd-select              ] }
-        { alien-vector             [ emit-alien-vector             ] }
-        { set-alien-vector         [ emit-set-alien-vector         ] }
-        { assert-positive          [ drop                          ] }
+        { (simd-v+)                 [ emit-simd-v+                  ] }
+        { (simd-v-)                 [ emit-simd-v-                  ] }
+        { (simd-vneg)               [ emit-simd-vneg                ] }
+        { (simd-v+-)                [ emit-simd-v+-                 ] }
+        { (simd-vs+)                [ emit-simd-vs+                 ] }
+        { (simd-vs-)                [ emit-simd-vs-                 ] }
+        { (simd-vs*)                [ emit-simd-vs*                 ] }
+        { (simd-v*)                 [ emit-simd-v*                  ] }
+        { (simd-v*high)             [ emit-simd-v*high              ] }
+        { (simd-v*hs+)              [ emit-simd-v*hs+               ] }
+        { (simd-v/)                 [ emit-simd-v/                  ] }
+        { (simd-vmin)               [ emit-simd-vmin                ] }
+        { (simd-vmax)               [ emit-simd-vmax                ] }
+        { (simd-vavg)               [ emit-simd-vavg                ] }
+        { (simd-v.)                 [ emit-simd-v.                  ] }
+        { (simd-vsad)               [ emit-simd-vsad                ] }
+        { (simd-vsqrt)              [ emit-simd-vsqrt               ] }
+        { (simd-sum)                [ emit-simd-sum                 ] }
+        { (simd-vabs)               [ emit-simd-vabs                ] }
+        { (simd-vbitand)            [ emit-simd-vand                ] }
+        { (simd-vbitandn)           [ emit-simd-vandn               ] }
+        { (simd-vbitor)             [ emit-simd-vor                 ] }
+        { (simd-vbitxor)            [ emit-simd-vxor                ] }
+        { (simd-vbitnot)            [ emit-simd-vnot                ] }
+        { (simd-vand)               [ emit-simd-vand                ] }
+        { (simd-vandn)              [ emit-simd-vandn               ] }
+        { (simd-vor)                [ emit-simd-vor                 ] }
+        { (simd-vxor)               [ emit-simd-vxor                ] }
+        { (simd-vnot)               [ emit-simd-vnot                ] }
+        { (simd-vlshift)            [ emit-simd-vlshift             ] }
+        { (simd-vrshift)            [ emit-simd-vrshift             ] }
+        { (simd-hlshift)            [ emit-simd-hlshift             ] }
+        { (simd-hrshift)            [ emit-simd-hrshift             ] }
+        { (simd-vshuffle-elements)  [ emit-simd-vshuffle-elements   ] }
+        { (simd-vshuffle2-elements) [ emit-simd-vshuffle2-elements  ] }
+        { (simd-vshuffle-bytes)     [ emit-simd-vshuffle-bytes      ] }
+        { (simd-vmerge-head)        [ emit-simd-vmerge-head         ] }
+        { (simd-vmerge-tail)        [ emit-simd-vmerge-tail         ] }
+        { (simd-v<=)                [ emit-simd-v<=                 ] }
+        { (simd-v<)                 [ emit-simd-v<                  ] }
+        { (simd-v=)                 [ emit-simd-v=                  ] }
+        { (simd-v>)                 [ emit-simd-v>                  ] }
+        { (simd-v>=)                [ emit-simd-v>=                 ] }
+        { (simd-vunordered?)        [ emit-simd-vunordered?         ] }
+        { (simd-vany?)              [ emit-simd-vany?               ] }
+        { (simd-vall?)              [ emit-simd-vall?               ] }
+        { (simd-vnone?)             [ emit-simd-vnone?              ] }
+        { (simd-v>float)            [ emit-simd-v>float             ] }
+        { (simd-v>integer)          [ emit-simd-v>integer           ] }
+        { (simd-vpack-signed)       [ emit-simd-vpack-signed        ] }
+        { (simd-vpack-unsigned)     [ emit-simd-vpack-unsigned      ] }
+        { (simd-vunpack-head)       [ emit-simd-vunpack-head        ] }
+        { (simd-vunpack-tail)       [ emit-simd-vunpack-tail        ] }
+        { (simd-with)               [ emit-simd-with                ] }
+        { (simd-gather-2)           [ emit-simd-gather-2            ] }
+        { (simd-gather-4)           [ emit-simd-gather-4            ] }
+        { (simd-select)             [ emit-simd-select              ] }
+        { alien-vector              [ emit-alien-vector             ] }
+        { set-alien-vector          [ emit-set-alien-vector         ] }
+        { assert-positive           [ drop                          ] }
     } enable-intrinsics ;
 
 enable-simd

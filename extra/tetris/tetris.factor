@@ -52,7 +52,7 @@ tetris-gadget H{
     [ tetris>> ?update ] [ relayout-1 ] bi ;
 
 M: tetris-gadget graft* ( gadget -- )
-    [ [ tick ] curry 100 milliseconds every ] keep (>>alarm) ;
+    [ [ tick ] curry 100 milliseconds every ] keep alarm<< ;
 
 M: tetris-gadget ungraft* ( gadget -- )
     [ cancel-alarm f ] change-alarm drop ;

@@ -14,13 +14,7 @@ GENERIC: compute-stack-frame* ( insn -- )
     frame-required? on
     stack-frame [ max-stack-frame ] change ;
 
-UNION: stack-frame-insn
-    ##alien-invoke
-    ##alien-indirect
-    ##alien-assembly
-    ##alien-callback ;
-
-M: stack-frame-insn compute-stack-frame*
+M: ##stack-frame compute-stack-frame*
     stack-frame>> request-stack-frame ;
 
 M: ##call compute-stack-frame* drop frame-required? on ;

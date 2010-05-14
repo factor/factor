@@ -23,7 +23,7 @@ M: pair at*
     ] if-key ; inline
 
 M: pair set-at
-    [ (>>value) ] [
+    [ value<< ] [
         [ set-at ]
         [ [ associate ] dip swap >>hash drop ] if-hash
     ] if-key ; inline

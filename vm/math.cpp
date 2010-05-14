@@ -491,9 +491,10 @@ s64 factor_vm::to_signed_8(cell obj)
 	}
 }
 
-VM_C_API s64 to_signed_8(cell obj, factor_vm *parent)
+VM_C_API s64 *to_signed_8(cell obj, factor_vm *parent)
 {
-	return parent->to_signed_8(obj);
+	parent->ctx->long_long_return = parent->to_signed_8(obj);
+	return &parent->ctx->long_long_return;
 }
 
 cell factor_vm::from_unsigned_8(u64 n)
@@ -524,9 +525,10 @@ u64 factor_vm::to_unsigned_8(cell obj)
 	}
 }
 
-VM_C_API u64 to_unsigned_8(cell obj, factor_vm *parent)
+VM_C_API s64 *to_unsigned_8(cell obj, factor_vm *parent)
 {
-	return parent->to_unsigned_8(obj);
+	parent->ctx->long_long_return = parent->to_unsigned_8(obj);
+	return &parent->ctx->long_long_return;
 }
  
 VM_C_API cell from_float(float flo, factor_vm *parent)

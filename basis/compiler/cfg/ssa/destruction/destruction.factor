@@ -76,7 +76,9 @@ GENERIC: prepare-insn ( insn -- )
 
 : try-to-coalesce ( dst src -- ) 2array copies get push ;
 
-M: insn prepare-insn
+M: insn prepare-insn drop ;
+
+M: vreg-insn prepare-insn
     [ temp-vregs [ leader-map get conjoin ] each ]
     [
         [ defs-vreg ] [ uses-vregs ] bi

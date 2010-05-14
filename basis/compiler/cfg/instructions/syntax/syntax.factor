@@ -56,21 +56,32 @@ TUPLE: insn-slot-spec type name rep ;
 : insn-word ( -- word )
     "insn" "compiler.cfg.instructions" lookup ;
 
+: vreg-insn-word ( -- word )
+    "vreg-insn" "compiler.cfg.instructions" lookup ;
+
 : pure-insn-word ( -- word )
     "pure-insn" "compiler.cfg.instructions" lookup ;
 
 : insn-effect ( word -- effect )
     boa-effect in>> but-last { } <effect> ;
 
-: define-insn-tuple ( class superclass specs -- )
+: uses-vregs? ( specs -- ? )
+    [ type>> { def use temp } member-eq? ] any? ;
+
+: insn-superclass ( pure? specs -- superclass )
+    pure-insn-word swap uses-vregs? vreg-insn-word insn-word ? ? ;
+
+: define-insn-tuple ( class pure? specs -- )
+    [ insn-superclass ] keep
     [ name>> ] map "insn#" suffix define-tuple-class ;
 
 : define-insn-ctor ( class specs -- )
     [ dup '[ _ ] [ f ] [ boa , ] surround ] dip
     [ name>> ] map { } <effect> define-declared ;
 
-: define-insn ( class superclass specs -- )
-    parse-insn-slot-specs {
+: define-insn ( class pure? specs -- )
+    parse-insn-slot-specs
+    {
         [ nip "insn-slots" set-word-prop ]
         [ 2drop insn-classes-word get push ]
         [ define-insn-tuple ]
@@ -78,6 +89,6 @@ TUPLE: insn-slot-spec type name rep ;
         [ nip define-insn-ctor ]
     } 3cleave ;
 
-SYNTAX: INSN: CREATE-CLASS insn-word ";" parse-tokens define-insn ;
+SYNTAX: INSN: CREATE-CLASS f ";" parse-tokens define-insn ;
 
-SYNTAX: PURE-INSN: CREATE-CLASS pure-insn-word ";" parse-tokens define-insn ;
+SYNTAX: PURE-INSN: CREATE-CLASS t ";" parse-tokens define-insn ;

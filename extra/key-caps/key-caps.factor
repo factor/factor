@@ -158,7 +158,7 @@ M: key-caps-gadget pref-dim* drop KEYBOARD-SIZE ;
 
 : update-key-caps-state ( gadget -- )
     read-keyboard keys>> over keys>> 
-    [ [ (>>selected?) ] [ drop ] if* ] 2each 
+    [ [ selected?<< ] [ drop ] if* ] 2each 
     relayout-1 ;
 
 M: key-caps-gadget graft*
