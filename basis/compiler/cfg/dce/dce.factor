@@ -49,8 +49,10 @@ M: ##write-barrier-imm build-liveness-graph
 M: ##allot build-liveness-graph
     [ dst>> allocations get adjoin ] [ call-next-method ] bi ;
 
-M: insn build-liveness-graph
+M: vreg-insn build-liveness-graph
     dup defs-vreg dup [ add-edges ] [ 2drop ] if ;
+
+M: insn build-liveness-graph drop ;
 
 GENERIC: compute-live-vregs ( insn -- )
 
@@ -87,8 +89,10 @@ M: ##fixnum-sub compute-live-vregs record-live ;
 
 M: ##fixnum-mul compute-live-vregs record-live ;
 
-M: insn compute-live-vregs
+M: vreg-insn compute-live-vregs
     dup defs-vreg [ drop ] [ record-live ] if ;
+
+M: insn compute-live-vregs drop ;
 
 GENERIC: live-insn? ( insn -- ? )
 
@@ -106,7 +110,9 @@ M: ##fixnum-sub live-insn? drop t ;
 
 M: ##fixnum-mul live-insn? drop t ;
 
-M: insn live-insn? defs-vreg [ live-vreg? ] [ t ] if* ;
+M: vreg-insn live-insn? defs-vreg [ live-vreg? ] [ t ] if* ;
+
+M: insn live-insn? defs-vreg drop t ;
 
 : eliminate-dead-code ( cfg -- cfg' )
     ! Even though we don't use predecessors directly, we depend
@@ -116,7 +122,7 @@ M: insn live-insn? defs-vreg [ live-vreg? ] [ t ] if* ;
 
     init-dead-code
     dup
-    [ [ instructions>> [ build-liveness-graph ] each ] each-basic-block ]
-    [ [ instructions>> [ compute-live-vregs ] each ] each-basic-block ]
-    [ [ instructions>> [ live-insn? ] filter! drop ] each-basic-block ]
+    [ [ [ build-liveness-graph ] each ] simple-analysis ]
+    [ [ [ compute-live-vregs ] each ] simple-analysis ]
+    [ [ [ live-insn? ] filter! ] simple-optimization ]
     tri ;
