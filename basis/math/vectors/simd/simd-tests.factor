@@ -1,6 +1,6 @@
 USING: accessors arrays classes compiler.test compiler.tree.debugger
 effects fry io kernel kernel.private math math.functions
-math.private math.vectors math.vectors.simd
+math.private math.vectors math.vectors.simd math.ranges
 math.vectors.simd.private prettyprint random sequences system
 tools.test vocabs assocs compiler.cfg.debugger words
 locals combinators cpu.architecture namespaces byte-arrays alien
@@ -376,11 +376,56 @@ simd-classes&reps [
         [ dup '[ _ random ] replicate 1array ]
     } case ;
 
+: 2shuffles-for ( n -- shuffles )
+    {
+        { 2 [
+            {
+                { 0 1 }
+                { 0 3 }
+                { 2 3 }
+                { 2 0 }
+            }
+        ] }
+        { 4 [
+            {
+                { 0 1 2 3 }
+                { 4 1 2 3 }
+                { 0 5 2 3 }
+                { 0 1 6 3 }
+                { 0 1 2 7 }
+                { 4 5 2 3 }
+                { 0 1 6 7 }
+                { 4 5 6 7 }
+                { 0 5 2 7 }
+            }
+        ] }
+        { 8 [
+            4 2shuffles-for
+            4 2shuffles-for
+            [ [ 8 + ] map ] map
+            [ append ] 2map
+        ] }
+        [ dup 2 * '[ _ random ] replicate 1array ]
+    } case ;
+
 simd-classes [
     [ [ { } ] ] dip
     [ new length shuffles-for ] keep
     '[
         _ [ [ _ new [ length iota ] keep like 1quotation ] dip '[ _ vshuffle ] ]
+        [ = ] check-optimizer
+    ] unit-test
+] each
+
+simd-classes [
+    [ [ { } ] ] dip
+    [ new length 2shuffles-for ] keep
+    '[
+        _ [ [
+            _ new
+            [ [ length iota ] keep like ]
+            [ [ length dup dup + [a,b) ] keep like ] bi [ ] 2sequence
+        ] dip '[ _ vshuffle2-elements ] ]
         [ = ] check-optimizer
     ] unit-test
 ] each
