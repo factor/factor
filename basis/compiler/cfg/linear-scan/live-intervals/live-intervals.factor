@@ -165,7 +165,7 @@ M: insn compute-sync-points* drop ;
 : init-live-intervals ( -- )
     H{ } clone live-intervals set
     V{ } clone sync-points set ;
-    
+
 : compute-start/end ( live-interval -- )
     dup ranges>> [ first from>> ] [ last to>> ] bi
     [ >>start ] [ >>end ] bi* drop ;
@@ -180,8 +180,8 @@ ERROR: bad-live-interval live-interval ;
     ! to reverse some sequences, and compute the start and end.
     values dup [
         {
-            [ ranges>> reverse! drop ]
-            [ uses>> reverse! drop ]
+            [ [ { } like reverse! ] change-ranges drop ]
+            [ [ { } like reverse! ] change-uses drop ]
             [ compute-start/end ]
             [ check-start ]
         } cleave
