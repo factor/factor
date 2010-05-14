@@ -1,8 +1,11 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel math math.order namespaces
-sequences vectors combinators.short-circuit compiler.cfg
-compiler.cfg.comparisons compiler.cfg.instructions
+sequences vectors combinators.short-circuit
+cpu.architecture
+compiler.cfg
+compiler.cfg.comparisons
+compiler.cfg.instructions
 compiler.cfg.registers
 compiler.cfg.value-numbering.math
 compiler.cfg.value-numbering.graph
@@ -34,6 +37,23 @@ IN: compiler.cfg.value-numbering.comparisons
     [ src1>> vreg>integer ] [ src2>> ] [ cc>> ] tri
     [ <=> ] dip evaluate-cc ;
 
+: fold-test-imm? ( insn -- ? )
+    src1>> vreg>insn ##load-integer? ;
+
+: evaluate-test-imm ( insn -- ? )
+    [ src1>> vreg>integer ] [ src2>> ] [ cc>> ] tri
+    [ bitand ] dip {
+        { cc= [ 0 = ] }
+        { cc/= [ 0 = not ] }
+    } case ;
+
+: rewrite-into-test? ( insn -- ? )
+    {
+        [ drop test-instruction? ]
+        [ cc>> { cc= cc/= } member-eq? ]
+        [ src2>> 0 = ]
+    } 1&& ;
+
 : >compare< ( insn -- in1 in2 cc )
     [ src1>> ] [ src2>> ] [ cc>> ] tri ; inline
 
@@ -50,6 +70,8 @@ UNION: scalar-compare-insn
     ##compare-imm
     ##compare-integer
     ##compare-integer-imm
+    ##test
+    ##test-imm
     ##compare-float-unordered
     ##compare-float-ordered ;
 
@@ -68,6 +90,8 @@ UNION: general-compare-insn scalar-compare-insn ##test-vector ;
         { [ dup ##compare-imm? ] [ >compare< \ ##compare-imm-branch new-insn ] }
         { [ dup ##compare-integer? ] [ >compare< \ ##compare-integer-branch new-insn ] }
         { [ dup ##compare-integer-imm? ] [ >compare< \ ##compare-integer-imm-branch new-insn ] }
+        { [ dup ##test? ] [ >compare< \ ##test-branch new-insn ] }
+        { [ dup ##test-imm? ] [ >compare< \ ##test-imm-branch new-insn ] }
         { [ dup ##compare-float-unordered? ] [ >compare< \ ##compare-float-unordered-branch new-insn ] }
         { [ dup ##compare-float-ordered? ] [ >compare< \ ##compare-float-ordered-branch new-insn ] }
         { [ dup ##test-vector? ] [ >test-vector< \ ##test-vector-branch new-insn ] }
@@ -80,6 +104,9 @@ UNION: general-compare-insn scalar-compare-insn ##test-vector ;
 
 : fold-compare-imm-branch ( insn -- insn/f )
     evaluate-compare-imm fold-branch ;
+
+: >test-branch ( insn -- insn )
+    [ src1>> ] [ src1>> ] [ cc>> ] tri \ ##test-branch new-insn ;
 
 M: ##compare-imm-branch rewrite
     {
@@ -94,6 +121,16 @@ M: ##compare-imm-branch rewrite
 M: ##compare-integer-imm-branch rewrite
     {
         { [ dup fold-compare-integer-imm? ] [ fold-compare-integer-imm-branch ] }
+        { [ dup rewrite-into-test? ] [ >test-branch ] }
+        [ drop f ]
+    } cond ;
+
+: fold-test-imm-branch ( insn -- insn/f )
+    evaluate-test-imm fold-branch ;
+
+M: ##test-imm-branch rewrite
+    {
+        { [ dup fold-test-imm? ] [ fold-test-imm-branch ] }
         [ drop f ]
     } cond ;
 
@@ -184,6 +221,8 @@ M: ##compare-integer rewrite
         { [ dup ##compare-imm? ] [ >compare< next-vreg \ ##compare-imm new-insn ] }
         { [ dup ##compare-integer? ] [ >compare< next-vreg \ ##compare-integer new-insn ] }
         { [ dup ##compare-integer-imm? ] [ >compare< next-vreg \ ##compare-integer-imm new-insn ] }
+        { [ dup ##test? ] [ >compare< next-vreg \ ##test new-insn ] }
+        { [ dup ##test-imm? ] [ >compare< next-vreg \ ##test-imm new-insn ] }
         { [ dup ##compare-float-unordered? ] [ >compare< next-vreg \ ##compare-float-unordered new-insn ] }
         { [ dup ##compare-float-ordered? ] [ >compare< next-vreg \ ##compare-float-ordered new-insn ] }
     } cond
@@ -202,8 +241,68 @@ M: ##compare-imm rewrite
 : fold-compare-integer-imm ( insn -- insn' )
     dup evaluate-compare-integer-imm >boolean-insn ;
 
+: >test ( insn -- insn' )
+    { [ dst>> ] [ src1>> ] [ src1>> ] [ cc>> ] [ temp>> ] } cleave
+    \ ##test new-insn ;
+
 M: ##compare-integer-imm rewrite
     {
         { [ dup fold-compare-integer-imm? ] [ fold-compare-integer-imm ] }
+        { [ dup rewrite-into-test? ] [ >test ] }
+        [ drop f ]
+    } cond ;
+
+: (simplify-test) ( insn -- src1 src2 cc )
+    [ src1>> vreg>insn [ src1>> ] [ src2>> ] bi ] [ cc>> ] bi ; inline
+
+: simplify-test ( insn -- insn )
+    dup (simplify-test) drop [ >>src1 ] [ >>src2 ] bi* ; inline
+
+: simplify-test-branch ( insn -- insn )
+    dup (simplify-test) drop [ >>src1 ] [ >>src2 ] bi* ; inline
+
+: (simplify-test-imm) ( insn -- src1 src2 cc )
+    [ src1>> vreg>insn [ src1>> ] [ src2>> ] bi ] [ cc>> ] bi ; inline
+
+: simplify-test-imm ( insn -- insn )
+    [ dst>> ] [ (simplify-test-imm) ] [ temp>> ] tri \ ##test-imm new-insn ; inline
+
+: simplify-test-imm-branch ( insn -- insn )
+    (simplify-test-imm) \ ##test-imm-branch new-insn ; inline
+
+: >test-imm ( insn ? -- insn' )
+    (>compare-imm) [ vreg>integer ] dip next-vreg
+    \ ##test-imm new-insn ; inline
+
+: >test-imm-branch ( insn ? -- insn' )
+    (>compare-imm-branch) [ vreg>integer ] dip
+    \ ##test-imm-branch new-insn ; inline
+
+M: ##test rewrite
+    {
+        { [ dup src1>> vreg>insn ##load-integer? ] [ t >test-imm ] }
+        { [ dup src2>> vreg>insn ##load-integer? ] [ f >test-imm ] }
+        { [ dup diagonal? not ] [ drop f ] }
+        { [ dup src1>> vreg>insn ##and? ] [ simplify-test ] }
+        { [ dup src1>> vreg>insn ##and-imm? ] [ simplify-test-imm ] }
+        [ drop f ]
+    } cond ;
+
+M: ##test-branch rewrite
+    {
+        { [ dup src1>> vreg>insn ##load-integer? ] [ t >test-imm-branch ] }
+        { [ dup src2>> vreg>insn ##load-integer? ] [ f >test-imm-branch ] }
+        { [ dup diagonal? not ] [ drop f ] }
+        { [ dup src1>> vreg>insn ##and? ] [ simplify-test-branch ] }
+        { [ dup src1>> vreg>insn ##and-imm? ] [ simplify-test-imm-branch ] }
+        [ drop f ]
+    } cond ;
+
+: fold-test-imm ( insn -- insn' )
+    dup evaluate-test-imm >boolean-insn ;
+
+M: ##test-imm rewrite
+    {
+        { [ dup fold-test-imm? ] [ fold-test-imm ] }
         [ drop f ]
     } cond ;

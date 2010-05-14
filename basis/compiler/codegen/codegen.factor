@@ -242,6 +242,8 @@ CODEGEN: ##write-barrier %write-barrier
 CODEGEN: ##write-barrier-imm %write-barrier-imm
 CODEGEN: ##compare %compare
 CODEGEN: ##compare-imm %compare-imm
+CODEGEN: ##test %test
+CODEGEN: ##test-imm %test-imm
 CODEGEN: ##compare-integer %compare
 CODEGEN: ##compare-integer-imm %compare-integer-imm
 CODEGEN: ##compare-float-ordered %compare-float-ordered
@@ -268,6 +270,8 @@ CONDITIONAL: ##compare-branch %compare-branch
 CONDITIONAL: ##compare-imm-branch %compare-imm-branch
 CONDITIONAL: ##compare-integer-branch %compare-branch
 CONDITIONAL: ##compare-integer-imm-branch %compare-integer-imm-branch
+CONDITIONAL: ##test-branch %test-branch
+CONDITIONAL: ##test-imm-branch %test-imm-branch
 CONDITIONAL: ##compare-float-ordered-branch %compare-float-ordered-branch
 CONDITIONAL: ##compare-float-unordered-branch %compare-float-unordered-branch
 CONDITIONAL: ##test-vector-branch %test-vector-branch
