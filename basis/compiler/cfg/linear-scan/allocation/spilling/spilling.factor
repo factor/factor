@@ -17,15 +17,15 @@ ERROR: bad-live-ranges interval ;
     ] [ drop ] if ;
 
 : trim-before-ranges ( live-interval -- )
-    [ ranges>> ] [ last-use n>> 1 + ] bi
-    [ '[ from>> _ <= ] filter! drop ]
-    [ swap last to<< ]
+    dup last-use n>> 1 +
+    [ '[ [ from>> _ >= ] trim-tail-slice ] change-ranges drop ]
+    [ swap ranges>> last to<< ]
     2bi ;
 
 : trim-after-ranges ( live-interval -- )
-    [ ranges>> ] [ first-use n>> ] bi
-    [ '[ to>> _ >= ] filter! drop ]
-    [ swap first from<< ]
+    dup first-use n>>
+    [ '[ [ to>> _ < ] trim-head-slice ] change-ranges drop ]
+    [ swap ranges>> first from<< ]
     2bi ;
 
 : last-use-rep ( live-interval -- rep/f )

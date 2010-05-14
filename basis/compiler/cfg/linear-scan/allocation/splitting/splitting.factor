@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators
+USING: accessors arrays assocs binary-search combinators
 combinators.short-circuit fry hints kernel locals
-math sequences sets sorting splitting namespaces
+math math.order sequences sets sorting splitting namespaces
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals ;
 IN: compiler.cfg.linear-scan.allocation.splitting
@@ -25,10 +25,13 @@ IN: compiler.cfg.linear-scan.allocation.splitting
         [ split-last-range ] [ 2drop ] if
     ] bi ;
 
-: split-uses ( uses n -- before after )
-    [ '[ n>> _ < ] filter ]
-    [ '[ n>> _ > ] filter ]
-    2bi ;
+:: split-uses ( uses n -- before after )
+    uses n uses [ n>> <=> ] with search
+    n>> n <=> {
+        { +eq+ [ [ head-slice ] [ 1 + tail-slice ] 2bi ] }
+        { +lt+ [ 1 + cut-slice ] }
+        { +gt+ [ cut-slice ] }
+    } case ;
 
 ERROR: splitting-too-early ;
 
