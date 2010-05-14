@@ -22,7 +22,8 @@ IN: compiler.cfg.gc-checks
 ! can contain tagged pointers.
 
 : insert-gc-check? ( bb -- ? )
-    instructions>> [ ##allocation? ] any? ;
+    dup kill-block?>>
+    [ drop f ] [ instructions>> [ ##allocation? ] any? ] if ;
 
 : blocks-with-gc ( cfg -- bbs )
     post-order [ insert-gc-check? ] filter ;
