@@ -186,6 +186,8 @@ PRIVATE>
 : (simd-hrshift)           ( a n rep -- c )
     drop tail-slice 16 0 pad-tail ;
 : (simd-vshuffle-elements) ( a n rep -- c ) [ rep-length 0 pad-tail ] keep (vshuffle) ;
+: (simd-vshuffle2-elements) ( a b n rep -- c )
+    [ cord-append ] 2dip [ rep-length 0 pad-tail ] keep (vshuffle) ;
 : (simd-vshuffle-bytes)    ( a b rep -- c ) drop uchar-16-rep (vshuffle) ;
 :: (simd-vmerge-head)      ( a b rep -- c )
     a b rep 2>rep-array :> ( a' b' )
@@ -252,4 +254,3 @@ PRIVATE>
 "compiler.cfg.intrinsics.simd" require
 "compiler.tree.propagation.simd" require
 "compiler.cfg.value-numbering.simd" require
-
