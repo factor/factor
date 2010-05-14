@@ -298,6 +298,11 @@ def: dst
 use: src shuffle
 literal: rep ;
 
+PURE-INSN: ##shuffle-vector-halves-imm
+def: dst
+use: src1 src2
+literal: shuffle rep ;
+
 PURE-INSN: ##shuffle-vector-imm
 def: dst
 use: src
