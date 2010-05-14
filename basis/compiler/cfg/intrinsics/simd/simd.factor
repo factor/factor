@@ -278,7 +278,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 : ^shuffle-2-vectors-imm ( src1 src2 shuffle rep -- dst )
     [ rep-length 0 pad-tail ] keep {
         { double-2-rep [| src1 src2 shuffle rep |
-            shuffle first2 :> ( i j )
+            shuffle first2 [ 4 mod ] bi@ :> ( i j )
             {
                 { [ i j [ 2 < ] both? ] [
                     src1 shuffle rep ^shuffle-vector-imm
