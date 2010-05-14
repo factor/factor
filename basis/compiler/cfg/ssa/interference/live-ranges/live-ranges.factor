@@ -1,8 +1,9 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry kernel namespaces sequences math
 arrays compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.liveness.ssa compiler.cfg.rpo compiler.cfg.dominance ;
+compiler.cfg.liveness.ssa compiler.cfg.rpo
+compiler.cfg.dominance compiler.cfg ;
 IN: compiler.cfg.ssa.interference.live-ranges
 
 ! Live ranges for interference testing
@@ -12,18 +13,14 @@ IN: compiler.cfg.ssa.interference.live-ranges
 SYMBOLS: local-def-indices local-kill-indices ;
 
 : record-def ( n insn -- )
-    ! We allow multiple defs of a vreg as long as they're
-    ! all in the same basic block
-    defs-vreg dup [
-        local-def-indices get 2dup key?
-        [ 3drop ] [ set-at ] if
-    ] [ 2drop ] if ;
+    defs-vreg dup [ local-def-indices get set-at ] [ 2drop ] if ;
 
 : record-uses ( n insn -- )
     ! Record live intervals so that all but the first input interfere
     ! with the output. This lets us coalesce the output with the
     ! first input.
-    [ uses-vregs ] [ def-is-use-insn? ] bi over empty? [ 3drop ] [
+    dup uses-vregs dup empty? [ 3drop ] [
+        swap def-is-use-insn?
         [ [ first local-kill-indices get set-at ] [ rest-slice ] 2bi ] unless
         [ 1 + ] dip [ local-kill-indices get set-at ] with each
     ] if ;
