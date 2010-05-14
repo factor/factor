@@ -26,7 +26,7 @@ dim-grid dim-block shared-size stream ;
     H{ } clone cuda-functions set
     [ create-context ] dip 
     [ '[ _ @ ] ]
-    [ drop '[ _ destroy-context ] ] 2bi
+    [ drop '[ [ sync-context ] ignore-errors _ destroy-context ] ] 2bi
     [ ] cleanup ; inline
 
 : with-cuda-program ( flags device quot -- )
