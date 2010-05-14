@@ -89,16 +89,13 @@ M: ##copy conversions-for-insn , ;
 
 M: insn conversions-for-insn , ;
 
-: conversions-for-block ( bb -- )
-    dup kill-block? [ drop ] [
-        [
-            [
-                H{ } clone alternatives set
-                [ conversions-for-insn ] each
-            ] V{ } make
-        ] change-instructions drop
-    ] if ;
+: conversions-for-block ( insns -- insns )
+    [
+        alternatives get clear-assoc
+        [ conversions-for-insn ] each
+    ] V{ } make ;
 
 : insert-conversions ( cfg -- )
+    H{ } clone alternatives set
     V{ } clone renaming-set set
-    [ conversions-for-block ] each-basic-block ;
+    [ conversions-for-block ] simple-optimization ;

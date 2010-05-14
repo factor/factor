@@ -53,13 +53,13 @@ STRUCT: CGRect
     size>> h>> ; inline
 
 : set-CGRect-x ( x CGRect -- )
-    origin>> (>>x) ; inline
+    origin>> x<< ; inline
 : set-CGRect-y ( y CGRect -- )
-    origin>> (>>y) ; inline
+    origin>> y<< ; inline
 : set-CGRect-w ( w CGRect -- )
-    size>> (>>w) ; inline
+    size>> w<< ; inline
 : set-CGRect-h ( h CGRect -- )
-    size>> (>>h) ; inline
+    size>> h<< ; inline
 
 : <CGRect> ( x y w h -- rect )
     [ CGPoint <struct-boa> ] [ CGSize <struct-boa> ] 2bi*

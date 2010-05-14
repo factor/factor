@@ -13,12 +13,15 @@ V{ } clone insn-classes set-global
 
 : new-insn ( ... class -- insn ) f swap boa ; inline
 
-! Virtual CPU instructions, used by CFG and machine IRs
+! Virtual CPU instructions, used by CFG IR
 TUPLE: insn ;
+
+! Instructions which use vregs
+TUPLE: vreg-insn < insn ;
 
 ! Instructions which are referentially transparent; used for
 ! value numbering
-TUPLE: pure-insn < insn ;
+TUPLE: pure-insn < vreg-insn ;
 
 ! Constants
 INSN: ##load-integer
@@ -32,6 +35,10 @@ literal: obj ;
 ! These three are inserted by representation selection
 INSN: ##load-tagged
 def: dst/tagged-rep
+literal: val ;
+
+INSN: ##load-float
+def: dst/float-rep
 literal: val ;
 
 INSN: ##load-double
@@ -294,6 +301,11 @@ def: dst
 use: src shuffle
 literal: rep ;
 
+PURE-INSN: ##shuffle-vector-halves-imm
+def: dst
+use: src1 src2
+literal: shuffle rep ;
+
 PURE-INSN: ##shuffle-vector-imm
 def: dst
 use: src
@@ -356,12 +368,6 @@ temp: temp/int-rep
 literal: rep vcc ;
 
 INSN: ##test-vector-branch
-use: src1
-temp: temp/int-rep
-literal: rep vcc ;
-
-INSN: _test-vector-branch
-literal: label
 use: src1
 temp: temp/int-rep
 literal: rep vcc ;
@@ -605,17 +611,73 @@ use: src/tagged-rep
 literal: offset ;
 
 ! FFI
+INSN: ##stack-frame
+literal: stack-frame ;
+
+INSN: ##unbox
+def: dst
+use: src/tagged-rep
+literal: unboxer rep ;
+
+INSN: ##store-reg-param
+use: src
+literal: reg rep ;
+
+INSN: ##store-stack-param
+use: src
+literal: n rep ;
+
+INSN: ##store-return
+use: src
+literal: rep ;
+
+INSN: ##store-struct-return
+use: src/int-rep
+literal: c-type ;
+
+INSN: ##store-long-long-return
+use: src1/int-rep src2/int-rep ;
+
+INSN: ##prepare-struct-area
+def: dst/int-rep ;
+
+INSN: ##box
+def: dst/tagged-rep
+literal: n rep boxer ;
+
+INSN: ##box-long-long
+def: dst/tagged-rep
+literal: n boxer ;
+
+INSN: ##box-small-struct
+def: dst/tagged-rep
+literal: c-type ;
+
+INSN: ##box-large-struct
+def: dst/tagged-rep
+literal: n c-type ;
+
 INSN: ##alien-invoke
-literal: params stack-frame ;
+literal: symbols dll ;
+
+INSN: ##cleanup
+literal: n ;
 
 INSN: ##alien-indirect
-literal: params stack-frame ;
+use: src/int-rep ;
 
 INSN: ##alien-assembly
-literal: params stack-frame ;
+literal: quot ;
+
+INSN: ##save-param-reg
+literal: offset reg rep ;
+
+INSN: ##begin-callback ;
 
 INSN: ##alien-callback
-literal: params stack-frame ;
+literal: quot ;
+
+INSN: ##end-callback ;
 
 ! Control flow
 INSN: ##phi
@@ -654,6 +716,14 @@ INSN: ##compare-integer-imm-branch
 use: src1/int-rep
 literal: src2 cc ;
 
+INSN: ##test-branch
+use: src1/int-rep src2/int-rep
+literal: cc ;
+
+INSN: ##test-imm-branch
+use: src1/int-rep
+literal: src2 cc ;
+
 PURE-INSN: ##compare-integer
 def: dst/tagged-rep
 use: src1/int-rep src2/int-rep
@@ -661,6 +731,18 @@ literal: cc
 temp: temp/int-rep ;
 
 PURE-INSN: ##compare-integer-imm
+def: dst/tagged-rep
+use: src1/int-rep
+literal: src2 cc
+temp: temp/int-rep ;
+
+PURE-INSN: ##test
+def: dst/tagged-rep
+use: src1/int-rep src2/int-rep
+literal: cc
+temp: temp/int-rep ;
+
+PURE-INSN: ##test-imm
 def: dst/tagged-rep
 use: src1/int-rep
 literal: src2 cc
@@ -706,6 +788,9 @@ literal: cc ;
 INSN: ##save-context
 temp: temp1/int-rep temp2/int-rep ;
 
+INSN: ##restore-context
+temp: temp1/int-rep temp2/int-rep ;
+
 ! GC checks
 INSN: ##check-nursery-branch
 literal: size cc
@@ -736,6 +821,8 @@ UNION: conditional-branch-insn
 ##compare-imm-branch
 ##compare-integer-branch
 ##compare-integer-imm-branch
+##test-branch
+##test-imm-branch
 ##compare-float-ordered-branch
 ##compare-float-unordered-branch
 ##test-vector-branch
@@ -752,16 +839,22 @@ UNION: ##write ##set-slot ##set-slot-imm ##set-vm-field ;
 UNION: clobber-insn
 ##call-gc
 ##unary-float-function
-##binary-float-function ;
-
-! Instructions that kill all live vregs
-UNION: kill-vreg-insn
-##call
-##prologue
-##epilogue
+##binary-float-function
+##box
+##box-long-long
+##box-small-struct
+##box-large-struct
+##unbox
+##store-reg-param
+##store-return
+##store-struct-return
+##store-long-long-return
 ##alien-invoke
 ##alien-indirect
-##alien-callback ;
+##alien-assembly
+##save-param-reg
+##begin-callback
+##end-callback ;
 
 ! Instructions that have complex expansions and require that the
 ! output registers are not equal to any of the input registers
@@ -769,13 +862,3 @@ UNION: def-is-use-insn
 ##box-alien
 ##box-displaced-alien
 ##unbox-any-c-ptr ;
-
-SYMBOL: vreg-insn
-
-[
-    vreg-insn
-    insn-classes get [
-        "insn-slots" word-prop [ type>> { def use temp } member-eq? ] any?
-    ] filter
-    define-union-class
-] with-compilation-unit

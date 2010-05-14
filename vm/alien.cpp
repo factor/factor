@@ -104,12 +104,12 @@ void *factor_vm::alien_pointer()
 #define DEFINE_ALIEN_ACCESSOR(name,type,from,to) \
 	VM_C_API void primitive_alien_##name(factor_vm *parent) \
 	{ \
-		parent->ctx->push(from(*(type*)(parent->alien_pointer()),parent)); \
+		parent->ctx->push(parent->from(*(type*)(parent->alien_pointer()))); \
 	} \
 	VM_C_API void primitive_set_alien_##name(factor_vm *parent) \
 	{ \
 		type *ptr = (type *)parent->alien_pointer(); \
-		type value = (type)to(parent->ctx->pop(),parent); \
+		type value = (type)parent->to(parent->ctx->pop()); \
 		*ptr = value; \
 	}
 
@@ -185,17 +185,6 @@ char *factor_vm::alien_offset(cell obj)
 VM_C_API char *alien_offset(cell obj, factor_vm *parent)
 {
 	return parent->alien_offset(obj);
-}
-
-/* For FFI calls passing structs by value. Cannot allocate */
-void factor_vm::to_value_struct(cell src, void *dest, cell size)
-{
-	memcpy(dest,alien_offset(src),size);
-}
-
-VM_C_API void to_value_struct(cell src, void *dest, cell size, factor_vm *parent)
-{
-	return parent->to_value_struct(src,dest,size);
 }
 
 /* For FFI callbacks receiving structs by value */

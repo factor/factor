@@ -1015,3 +1015,22 @@ UNION: ?fixnum fixnum POSTPONE: f ;
 [ ] [ "IN: compiler.tree.propagation.tests TUPLE: foo baz bar ;" eval( -- ) ] unit-test
 
 [ 3 ] [ "USE: kernel IN: compiler.tree.propagation.tests 2 3 foo boa baz" eval( -- x ) ] unit-test
+
+! Non-zero displacement for <displaced-alien> restricts the output type
+[ t ] [
+    [ { byte-array } declare <displaced-alien> ] final-classes
+    first byte-array alien class-or class=
+] unit-test
+
+[ V{ alien } ] [
+    [ { alien } declare <displaced-alien> ] final-classes
+] unit-test
+
+[ t ] [
+    [ { POSTPONE: f } declare <displaced-alien> ] final-classes
+    first \ f alien class-or class=
+] unit-test
+
+[ V{ alien } ] [
+    [ { byte-array } declare [ 10 bitand 2 + ] dip <displaced-alien> ] final-classes
+] unit-test

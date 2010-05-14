@@ -13,7 +13,7 @@ M: conditional model-changed
             [ [ value>> ] dip set-model f ]
             [ 2drop t ] if 100 milliseconds sleep 
         ] 2curry "models.conditional" spawn-server
-    ] keep (>>thread) ;
+    ] keep thread<< ;
 
 : <conditional> ( condition -- model )
     f conditional new-model swap >>condition ;

@@ -214,9 +214,9 @@ ARTICLE: "tuple-examples" "Tuple examples"
 "This defines a class word named " { $snippet "employee" } ", a predicate " { $snippet "employee?" } ", and the following slot accessors:"
 { $table
     { "Reader" "Writer" "Setter" "Changer" }
-    { { $snippet "name>>" }    { $snippet "(>>name)" }    { $snippet ">>name" }    { $snippet "change-name" }    }
-    { { $snippet "salary>>" } { $snippet "(>>salary)" } { $snippet ">>salary" } { $snippet "change-salary" } }
-    { { $snippet "position>>" }   { $snippet "(>>position)" }   { $snippet ">>position" }   { $snippet "change-position" }   }
+    { { $snippet "name>>" } { $snippet "name<<" } { $snippet ">>name" } { $snippet "change-name" } }
+    { { $snippet "salary>>" } { $snippet "salary<<" } { $snippet ">>salary" } { $snippet "change-salary" } }
+    { { $snippet "position>>" } { $snippet "position<<" } { $snippet ">>position" } { $snippet "change-position" }   }
 }
 "We can define a constructor which makes an empty employee:"
 { $code ": <employee> ( -- employee )"

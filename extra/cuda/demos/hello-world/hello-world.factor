@@ -3,7 +3,7 @@
 USING: accessors alien.c-types alien.strings cuda cuda.devices
 cuda.memory cuda.syntax cuda.utils destructors io
 io.encodings.string io.encodings.utf8 kernel locals math
-math.parser namespaces sequences ;
+math.parser namespaces sequences byte-arrays strings ;
 IN: cuda.demos.hello-world
 
 CUDA-LIBRARY: hello vocab:cuda/demos/hello-world/hello.ptx
@@ -12,12 +12,14 @@ CUDA-FUNCTION: helloWorld ( char* string-ptr ) ;
 
 : cuda-hello-world ( -- )
     [
-        cuda-launcher get device>> number>string
-        "CUDA device " ": " surround write
-        "Hello World!" [ - ] map-index host>device
+        [
+            cuda-launcher get device>> number>string
+            "CUDA device " ": " surround write
+            "Hello World!" >byte-array [ - ] map-index host>device &cuda-free
 
-        [ { 6 1 1 } { 2 1 } 2<<< helloWorld ]
-        [ device>host utf8 decode print ] bi
+            [ { 2 1 } { 6 1 1 } 2<<< helloWorld ]
+            [ 12 device>host >string print ] bi
+        ] with-destructors
     ] with-each-cuda-device ;
 
 MAIN: cuda-hello-world

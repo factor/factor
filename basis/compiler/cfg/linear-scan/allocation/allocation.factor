@@ -1,7 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs heaps kernel namespaces sequences fry math
-math.order combinators arrays sorting compiler.utilities locals
+USING: accessors assocs binary-search combinators
+combinators.short-circuit heaps kernel namespaces
+sequences fry locals math math.order arrays sorting
+compiler.utilities
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.allocation.splitting
@@ -34,16 +36,15 @@ IN: compiler.cfg.linear-scan.allocation
         [ drop assign-blocked-register ]
     } cond ;
 
-: spill-at-sync-point ( live-interval n -- ? )
-    ! If the live interval has a usage at 'n', don't spill it,
-    ! since this means its being defined by the sync point
-    ! instruction. Output t if this is the case.
-    2dup [ uses>> ] dip '[ n>> _ = ] any?
-    [ 2drop t ] [ spill f ] if ;
+: spill-at-sync-point ( n live-interval -- ? )
+    ! If the live interval has a definition at 'n', don't spill
+    2dup find-use
+    { [ ] [ def-rep>> ] } 1&&
+    [ 2drop t ] [ swap spill f ] if ;
 
 : handle-sync-point ( n -- )
-    [ active-intervals get values ] dip
-    '[ [ _ spill-at-sync-point ] filter! drop ] each ;
+    active-intervals get values
+    [ [ spill-at-sync-point ] with filter! drop ] with each ;
 
 :: handle-progress ( n sync? -- )
     n {
@@ -70,11 +71,7 @@ M: sync-point handle ( sync-point -- )
     } cond ;
 
 : (allocate-registers) ( -- )
-    ! If a live interval begins at the same location as a sync point,
-    ! process the sync point before the live interval. This ensures that the
-    ! return value of C function calls doesn't get spilled and reloaded
-    ! unnecessarily.
-    unhandled-sync-points get unhandled-intervals get smallest-heap
+    unhandled-intervals get unhandled-sync-points get smallest-heap
     dup heap-empty? [ drop ] [ heap-pop drop handle (allocate-registers) ] if ;
 
 : finish-allocation ( -- )

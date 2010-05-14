@@ -165,7 +165,7 @@ M: irc-chat (attach-chat)
     2bi ;
 
 M: irc-server-chat (attach-chat)
-    irc> [ (>>client) ] [ chats>> +server-chat+ set-at ] 2bi ;
+    irc> [ client<< ] [ chats>> +server-chat+ set-at ] 2bi ;
 
 GENERIC: remove-chat ( irc-chat -- )
 M: irc-nick-chat remove-chat name>> unregister-chat ;

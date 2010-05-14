@@ -117,7 +117,7 @@ M: object add-control-edge 2drop ;
         bi v+ supremum
     ] if-empty
     node insn>> temp-vregs length +
-    dup node (>>registers) ;
+    dup node registers<< ;
 
 ! Constructing fan-in trees
 

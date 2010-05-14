@@ -82,7 +82,7 @@ M: ##dispatch generate-insn
     ] tri ;
 
 : generate ( cfg -- code )
-    dup label>> [
+    [
         H{ } clone labels set
         linearization-order
         [ number-blocks ] [ [ generate-block ] each ] bi
@@ -90,6 +90,8 @@ M: ##dispatch generate-insn
 
 ! Special cases
 M: ##no-tco generate-insn drop ;
+
+M: ##stack-frame generate-insn drop ;
 
 M: ##prologue generate-insn
     drop
@@ -122,6 +124,7 @@ SYNTAX: CODEGEN:
 CODEGEN: ##load-integer %load-immediate
 CODEGEN: ##load-tagged %load-immediate
 CODEGEN: ##load-reference %load-reference
+CODEGEN: ##load-float %load-float
 CODEGEN: ##load-double %load-double
 CODEGEN: ##load-vector %load-vector
 CODEGEN: ##peek %peek
@@ -179,6 +182,7 @@ CODEGEN: ##fill-vector %fill-vector
 CODEGEN: ##gather-vector-2 %gather-vector-2
 CODEGEN: ##gather-vector-4 %gather-vector-4
 CODEGEN: ##shuffle-vector-imm %shuffle-vector-imm
+CODEGEN: ##shuffle-vector-halves-imm %shuffle-vector-halves-imm
 CODEGEN: ##shuffle-vector %shuffle-vector
 CODEGEN: ##tail>head-vector %tail>head-vector
 CODEGEN: ##merge-vector-head %merge-vector-head
@@ -238,11 +242,14 @@ CODEGEN: ##write-barrier %write-barrier
 CODEGEN: ##write-barrier-imm %write-barrier-imm
 CODEGEN: ##compare %compare
 CODEGEN: ##compare-imm %compare-imm
+CODEGEN: ##test %test
+CODEGEN: ##test-imm %test-imm
 CODEGEN: ##compare-integer %compare
 CODEGEN: ##compare-integer-imm %compare-integer-imm
 CODEGEN: ##compare-float-ordered %compare-float-ordered
 CODEGEN: ##compare-float-unordered %compare-float-unordered
 CODEGEN: ##save-context %save-context
+CODEGEN: ##restore-context %restore-context
 CODEGEN: ##vm-field %vm-field
 CODEGEN: ##set-vm-field %set-vm-field
 CODEGEN: ##alien-global %alien-global
@@ -250,6 +257,7 @@ CODEGEN: ##call-gc %call-gc
 CODEGEN: ##spill %spill
 CODEGEN: ##reload %reload
 
+! Conditional branches
 <<
 
 SYNTAX: CONDITIONAL:
@@ -262,6 +270,8 @@ CONDITIONAL: ##compare-branch %compare-branch
 CONDITIONAL: ##compare-imm-branch %compare-imm-branch
 CONDITIONAL: ##compare-integer-branch %compare-branch
 CONDITIONAL: ##compare-integer-imm-branch %compare-integer-imm-branch
+CONDITIONAL: ##test-branch %test-branch
+CONDITIONAL: ##test-imm-branch %test-imm-branch
 CONDITIONAL: ##compare-float-ordered-branch %compare-float-ordered-branch
 CONDITIONAL: ##compare-float-unordered-branch %compare-float-unordered-branch
 CONDITIONAL: ##test-vector-branch %test-vector-branch
@@ -269,3 +279,25 @@ CONDITIONAL: ##check-nursery-branch %check-nursery-branch
 CONDITIONAL: ##fixnum-add %fixnum-add
 CONDITIONAL: ##fixnum-sub %fixnum-sub
 CONDITIONAL: ##fixnum-mul %fixnum-mul
+
+! FFI
+CODEGEN: ##unbox %unbox
+CODEGEN: ##store-reg-param %store-reg-param
+CODEGEN: ##store-stack-param %store-stack-param
+CODEGEN: ##store-return %store-return
+CODEGEN: ##store-struct-return %store-struct-return
+CODEGEN: ##store-long-long-return %store-long-long-return
+CODEGEN: ##prepare-struct-area %prepare-struct-area
+CODEGEN: ##box %box
+CODEGEN: ##box-long-long %box-long-long
+CODEGEN: ##box-large-struct %box-large-struct
+CODEGEN: ##box-small-struct %box-small-struct
+CODEGEN: ##save-param-reg %save-param-reg
+CODEGEN: ##alien-invoke %alien-invoke
+CODEGEN: ##cleanup %cleanup
+CODEGEN: ##alien-indirect %alien-indirect
+CODEGEN: ##begin-callback %begin-callback
+CODEGEN: ##alien-callback %alien-callback
+CODEGEN: ##end-callback %end-callback
+
+M: ##alien-assembly generate-insn quot>> call( -- ) ;

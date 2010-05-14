@@ -11,10 +11,7 @@ specialized-arrays strings ui.gadgets.worlds variants
 vocabs.parser words math.vectors.simd ;
 FROM: math => float ;
 QUALIFIED-WITH: alien.c-types c
-SPECIALIZED-ARRAY: c:float
-SPECIALIZED-ARRAY: int
-SPECIALIZED-ARRAY: uint
-SPECIALIZED-ARRAY: void*
+SPECIALIZED-ARRAYS: c:float c:int c:uchar c:ushort c:uint c:void* ;
 IN: gpu.render
 
 UNION: ?integer integer POSTPONE: f ;
@@ -98,7 +95,10 @@ UNION: vertex-indexes
     index-range
     multi-index-range
     index-elements
-    multi-index-elements ;
+    multi-index-elements
+    uchar-array
+    ushort-array
+    uint-array ;
 
 VARIANT: primitive-mode
     points-mode
@@ -145,6 +145,11 @@ GENERIC: render-vertex-indexes ( primitive-mode vertex-indexes -- )
 
 GENERIC# render-vertex-indexes-instanced 1 ( primitive-mode vertex-indexes instances -- )
 
+GENERIC: gl-array-element-type ( array -- type )
+M: uchar-array  gl-array-element-type drop GL_UNSIGNED_BYTE  ; inline
+M: ushort-array gl-array-element-type drop GL_UNSIGNED_SHORT ; inline
+M: uint-array   gl-array-element-type drop GL_UNSIGNED_INT   ; inline
+
 M: index-range render-vertex-indexes
     [ gl-primitive-mode ] [ [ start>> ] [ count>> ] bi ] bi* glDrawArrays ;
 
@@ -166,6 +171,18 @@ M: index-elements render-vertex-indexes-instanced
     [ [ count>> ] [ index-type>> gl-index-type ] [ ptr>> ] tri ]
     [ ] tri*
     swap index-buffer [ swap glDrawElementsInstanced ] with-gpu-data-ptr ;
+
+M: specialized-array render-vertex-indexes
+    GL_ELEMENT_ARRAY_BUFFER 0 glBindBuffer
+    [ gl-primitive-mode ]
+    [ [ length ] [ gl-array-element-type ] [ >c-ptr ] tri ] bi*
+    glDrawElements ;
+
+M: specialized-array render-vertex-indexes-instanced
+    GL_ELEMENT_ARRAY_BUFFER 0 glBindBuffer
+    [ gl-primitive-mode ]
+    [ [ length ] [ gl-array-element-type ] [ >c-ptr ] tri ]
+    [ ] tri* glDrawElementsInstanced ;
 
 M: multi-index-elements render-vertex-indexes
     [ gl-primitive-mode ]
