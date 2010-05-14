@@ -5,7 +5,8 @@ math.vectors.simd.private prettyprint random sequences system
 tools.test vocabs assocs compiler.cfg.debugger words
 locals combinators cpu.architecture namespaces byte-arrays alien
 specialized-arrays classes.struct eval classes.algebra sets
-quotations math.constants compiler.units splitting ;
+quotations math.constants compiler.units splitting math.matrices
+math.vectors.simd.cords ;
 FROM: math.vectors.simd.intrinsics => alien-vector set-alien-vector ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
@@ -603,3 +604,14 @@ STRUCT: simd-struct
 
 [ float-4{ 0 0 0 0 } ]
 [ 5.0 float-4{ 1 2 3 4 } float-4{ 4 5 6 7 } 0.0 simd-spill-test-2 ] unit-test
+
+! Test some sequence protocol stuff
+[ t ] [ 4 double-4{ 1 2 3 4 } new-sequence double-4? ] unit-test
+[ double-4{ 2 3 4 5 } ] [ double-4{ 1 2 3 4 } [ 1 + ] map ] unit-test
+
+! Test cross product
+[ float-4{ 0.0 0.0 1.0 0.0 } ] [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 1.0 0.0 0.0 } cross ] unit-test
+[ float-4{ 0.0 -1.0 0.0 0.0 } ] [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 0.0 1.0 0.0 } cross ] unit-test
+
+[ double-4{ 0.0 0.0 1.0 0.0 } ] [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 1.0 0.0 0.0 } cross ] unit-test
+[ double-4{ 0.0 -1.0 0.0 0.0 } ] [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 0.0 1.0 0.0 } cross ] unit-test

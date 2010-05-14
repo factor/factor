@@ -1,7 +1,8 @@
 USING: accessors alien.c-types arrays byte-arrays
 cpu.architecture effects functors generalizations kernel lexer
 math math.vectors.simd math.vectors.simd.intrinsics parser
-prettyprint.custom quotations sequences sequences.cords words ;
+prettyprint.custom quotations sequences sequences.cords words
+classes ;
 IN: math.vectors.simd.cords
 
 <<
@@ -39,6 +40,15 @@ BOA-EFFECT define-inline
 
 : A-cast ( v -- v' )
     [ A/2-cast ] cord-map ; inline
+
+M: A new-sequence
+    2drop
+    N A/2 new new-sequence
+    N A/2 new new-sequence
+    \ A boa ;
+
+M: A like
+    over \ A instance? [ drop ] [ call-next-method ] if ;
 
 M: A >pprint-sequence ;
 M: A pprint* pprint-object ;
