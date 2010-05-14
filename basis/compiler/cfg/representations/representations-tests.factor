@@ -632,7 +632,23 @@ cpu x86.64? [
     } test-peephole
 ] unit-test
 
-! Tag/untag elimination for ##compare-integer
+! Tag/untag elimination for ##compare-integer and ##test
+[
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##test f 2 0 1 cc= }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##test f 2 0 1 cc= }
+        T{ ##replace f 2 D 0 }
+    } test-peephole
+] unit-test
+
 [
     V{
         T{ ##peek f 0 D 0 }
@@ -660,6 +676,20 @@ cpu x86.64? [
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
         T{ ##compare-integer-branch f 0 1 cc= }
+    } test-peephole
+] unit-test
+
+[
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##test-branch f 0 1 cc= }
+    }
+] [
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##test-branch f 0 1 cc= }
     } test-peephole
 ] unit-test
 
@@ -674,6 +704,20 @@ cpu x86.64? [
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
         T{ ##compare-integer-imm-branch f 0 10 cc= }
+    } test-peephole
+] unit-test
+
+[
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##test-imm-branch f 0 $[ 10 tag-fixnum ] cc= }
+    }
+] [
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##test-imm-branch f 0 10 cc= }
     } test-peephole
 ] unit-test
 
