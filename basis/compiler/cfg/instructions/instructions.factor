@@ -713,6 +713,14 @@ INSN: ##compare-integer-imm-branch
 use: src1/int-rep
 literal: src2 cc ;
 
+INSN: ##test-branch
+use: src1/int-rep src2/int-rep
+literal: cc ;
+
+INSN: ##test-imm-branch
+use: src1/int-rep
+literal: src2 cc ;
+
 PURE-INSN: ##compare-integer
 def: dst/tagged-rep
 use: src1/int-rep src2/int-rep
@@ -720,6 +728,18 @@ literal: cc
 temp: temp/int-rep ;
 
 PURE-INSN: ##compare-integer-imm
+def: dst/tagged-rep
+use: src1/int-rep
+literal: src2 cc
+temp: temp/int-rep ;
+
+PURE-INSN: ##test
+def: dst/tagged-rep
+use: src1/int-rep src2/int-rep
+literal: cc
+temp: temp/int-rep ;
+
+PURE-INSN: ##test-imm
 def: dst/tagged-rep
 use: src1/int-rep
 literal: src2 cc
@@ -798,6 +818,8 @@ UNION: conditional-branch-insn
 ##compare-imm-branch
 ##compare-integer-branch
 ##compare-integer-imm-branch
+##test-branch
+##test-imm-branch
 ##compare-float-ordered-branch
 ##compare-float-unordered-branch
 ##test-vector-branch

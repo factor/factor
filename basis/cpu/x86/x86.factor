@@ -72,6 +72,8 @@ M: x86 complex-addressing? t ;
 
 M: x86 fused-unboxing? t ;
 
+M: x86 test-instruction? t ;
+
 M: x86 immediate-store? immediate-comparand? ;
 
 M: x86 %load-immediate dup 0 = [ drop dup XOR ] [ MOV ] if ;
@@ -525,28 +527,30 @@ M:: x86 %compare ( dst src1 src2 cc temp -- )
     src1 src2 CMP
     dst cc temp %boolean ;
 
-: use-test? ( src1 src2 cc -- ? )
-    [ register? ] [ 0 = ] [ { cc= cc/= } member? ] tri* and and ;
+M:: x86 %test ( dst src1 src2 cc temp -- )
+    src1 src2 TEST
+    dst cc temp %boolean ;
 
 : (%compare-tagged) ( src1 src2 -- )
     [ HEX: ffffffff CMP ] dip rc-absolute rel-literal ;
 
-: (%compare-integer-imm) ( src1 src2 cc -- )
-    3dup use-test? [ 2drop dup TEST ] [ drop CMP ] if ;
-
 M:: x86 %compare-integer-imm ( dst src1 src2 cc temp -- )
-    src1 src2 cc (%compare-integer-imm)
+    src1 src2 CMP
     dst cc temp %boolean ;
 
-: (%compare-imm) ( src1 src2 cc -- )
+M:: x86 %test-imm ( dst src1 src2 cc temp -- )
+    src1 src2 TEST
+    dst cc temp %boolean ;
+
+: (%compare-imm) ( src1 src2 -- )
     {
-        { [ over fixnum? ] [ [ tag-fixnum ] dip (%compare-integer-imm) ] }
-        { [ over not ] [ 2drop \ f type-number CMP ] }
-        [ drop (%compare-tagged) ]
+        { [ dup fixnum? ] [ tag-fixnum CMP ] }
+        { [ dup not ] [ drop \ f type-number CMP ] }
+        [ (%compare-tagged) ]
     } cond ;
 
 M:: x86 %compare-imm ( dst src1 src2 cc temp -- )
-    src1 src2 cc (%compare-imm)
+    src1 src2 (%compare-imm)
     dst cc temp %boolean ;
 
 : %branch ( label cc -- )
@@ -564,11 +568,19 @@ M:: x86 %compare-branch ( label src1 src2 cc -- )
     label cc %branch ;
 
 M:: x86 %compare-integer-imm-branch ( label src1 src2 cc -- )
-    src1 src2 cc (%compare-integer-imm)
+    src1 src2 CMP
+    label cc %branch ;
+
+M:: x86 %test-branch ( label src1 src2 cc -- )
+    src1 src2 TEST
+    label cc %branch ;
+
+M:: x86 %test-imm-branch ( label src1 src2 cc -- )
+    src1 src2 TEST
     label cc %branch ;
 
 M:: x86 %compare-imm-branch ( label src1 src2 cc -- )
-    src1 src2 cc (%compare-imm)
+    src1 src2 (%compare-imm)
     label cc %branch ;
 
 M: x86 %add-float double-rep two-operand ADDSD ;
