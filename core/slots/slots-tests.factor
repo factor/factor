@@ -24,7 +24,7 @@ SLOT: my-protocol-slot-test
 TUPLE: protocol-slot-test-tuple x ;
 
 M: protocol-slot-test-tuple my-protocol-slot-test>> x>> sq ;
-M: protocol-slot-test-tuple (>>my-protocol-slot-test) [ sqrt ] dip (>>x) ;
+M: protocol-slot-test-tuple my-protocol-slot-test<< [ sqrt ] dip x<< ;
 
 [ 9 ] [ T{ protocol-slot-test-tuple { x 3 } } my-protocol-slot-test>> ] unit-test
 

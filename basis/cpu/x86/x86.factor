@@ -72,6 +72,8 @@ M: x86 complex-addressing? t ;
 
 M: x86 fused-unboxing? t ;
 
+M: x86 test-instruction? t ;
+
 M: x86 immediate-store? immediate-comparand? ;
 
 M: x86 %load-immediate dup 0 = [ drop dup XOR ] [ MOV ] if ;
@@ -180,9 +182,11 @@ M: object copy-memory* copy-register* ;
 M: float-rep copy-memory* drop MOVSS ;
 M: double-rep copy-memory* drop MOVSD ;
 
+: ?spill-slot ( obj -- obj ) dup spill-slot? [ n>> spill@ ] when ;
+
 M: x86 %copy ( dst src rep -- )
     2over eq? [ 3drop ] [
-        [ [ dup spill-slot? [ n>> spill@ ] when ] bi@ ] dip
+        [ [ ?spill-slot ] bi@ ] dip
         2over [ register? ] both? [ copy-register* ] [ copy-memory* ] if
     ] if ;
 
@@ -502,16 +506,6 @@ M:: x86 %check-nursery-branch ( label size cc temp1 temp2 -- )
 M: x86 %alien-global ( dst symbol library -- )
     [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;    
 
-M: x86 %push-stack ( -- )
-    ds-reg cell ADD
-    ds-reg [] int-regs return-reg MOV ;
-
-M: x86 %push-context-stack ( -- )
-    temp-reg %context
-    temp-reg "datastack" context-field-offset [+] bootstrap-cell ADD
-    temp-reg temp-reg "datastack" context-field-offset [+] MOV
-    temp-reg [] int-regs return-reg MOV ;
-
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
 :: (%boolean) ( dst temp insn -- )
@@ -533,28 +527,30 @@ M:: x86 %compare ( dst src1 src2 cc temp -- )
     src1 src2 CMP
     dst cc temp %boolean ;
 
-: use-test? ( src1 src2 cc -- ? )
-    [ register? ] [ 0 = ] [ { cc= cc/= } member? ] tri* and and ;
+M:: x86 %test ( dst src1 src2 cc temp -- )
+    src1 src2 TEST
+    dst cc temp %boolean ;
 
 : (%compare-tagged) ( src1 src2 -- )
     [ HEX: ffffffff CMP ] dip rc-absolute rel-literal ;
 
-: (%compare-integer-imm) ( src1 src2 cc -- )
-    3dup use-test? [ 2drop dup TEST ] [ drop CMP ] if ;
-
 M:: x86 %compare-integer-imm ( dst src1 src2 cc temp -- )
-    src1 src2 cc (%compare-integer-imm)
+    src1 src2 CMP
     dst cc temp %boolean ;
 
-: (%compare-imm) ( src1 src2 cc -- )
+M:: x86 %test-imm ( dst src1 src2 cc temp -- )
+    src1 src2 TEST
+    dst cc temp %boolean ;
+
+: (%compare-imm) ( src1 src2 -- )
     {
-        { [ over fixnum? ] [ [ tag-fixnum ] dip (%compare-integer-imm) ] }
-        { [ over not ] [ 2drop \ f type-number CMP ] }
-        [ drop (%compare-tagged) ]
+        { [ dup fixnum? ] [ tag-fixnum CMP ] }
+        { [ dup not ] [ drop \ f type-number CMP ] }
+        [ (%compare-tagged) ]
     } cond ;
 
 M:: x86 %compare-imm ( dst src1 src2 cc temp -- )
-    src1 src2 cc (%compare-imm)
+    src1 src2 (%compare-imm)
     dst cc temp %boolean ;
 
 : %branch ( label cc -- )
@@ -572,11 +568,19 @@ M:: x86 %compare-branch ( label src1 src2 cc -- )
     label cc %branch ;
 
 M:: x86 %compare-integer-imm-branch ( label src1 src2 cc -- )
-    src1 src2 cc (%compare-integer-imm)
+    src1 src2 CMP
+    label cc %branch ;
+
+M:: x86 %test-branch ( label src1 src2 cc -- )
+    src1 src2 TEST
+    label cc %branch ;
+
+M:: x86 %test-imm-branch ( label src1 src2 cc -- )
+    src1 src2 TEST
     label cc %branch ;
 
 M:: x86 %compare-imm-branch ( label src1 src2 cc -- )
-    src1 src2 cc (%compare-imm)
+    src1 src2 (%compare-imm)
     label cc %branch ;
 
 M: x86 %add-float double-rep two-operand ADDSD ;
@@ -804,6 +808,19 @@ M: x86 %shuffle-vector-imm-reps
     {
         { sse? { float-4-rep } }
         { sse2? { double-2-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+M:: x86 %shuffle-vector-halves-imm ( dst src1 src2 shuffle rep -- )
+    dst src1 src2 rep two-operand
+    shuffle rep {
+        { double-2-rep [ >float-4-shuffle SHUFPS ] }
+        { float-4-rep [ SHUFPS ] }
+    } case ;
+
+M: x86 %shuffle-vector-halves-imm-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep } }
     } available-reps ;
 
 M: x86 %shuffle-vector ( dst src shuffle rep -- )
@@ -1451,10 +1468,28 @@ M: x86.64 %scalar>integer ( dst src rep -- )
     } case ;
 
 M: x86 %vector>scalar %copy ;
+
 M: x86 %scalar>vector %copy ;
 
-M:: x86 %spill ( src rep dst -- ) dst src rep %copy ;
-M:: x86 %reload ( dst rep src -- ) dst src rep %copy ;
+M:: x86 %spill ( src rep dst -- )
+    dst src rep %copy ;
+
+M:: x86 %reload ( dst rep src -- )
+    dst src rep %copy ;
+
+M:: x86 %store-reg-param ( src reg rep -- )
+    reg src rep %copy ;
+
+M:: x86 %store-stack-param ( src n rep -- )
+    n param@ src rep %copy ;
+
+HOOK: struct-return@ cpu ( n -- operand )
+
+M: x86 %prepare-struct-area ( dst -- )
+    f struct-return@ LEA ;
+
+M: x86 %alien-indirect ( src -- )
+    ?spill-slot CALL ;
 
 M: x86 %loop-entry 16 alignment [ NOP ] times ;
 
@@ -1492,26 +1527,15 @@ M: x86 immediate-bitwise? ( n -- ? )
 enable-min/max
 enable-log2
 
-:: install-sse2-check ( -- )
-    [
-        sse-version 20 < [
-            "This image was built to use SSE2 but your CPU does not support it." print
-            "You will need to bootstrap Factor again." print
-            flush
-            1 exit
-        ] when
-    ] "cpu.x86" add-startup-hook ;
-
-: enable-sse2 ( version -- )
-    20 >= [
-        enable-float-intrinsics
-        enable-float-functions
-        enable-float-min/max
-        enable-fsqrt
-        install-sse2-check
-    ] when ;
+enable-float-intrinsics
+enable-float-functions
+enable-float-min/max
+enable-fsqrt
 
 : check-sse ( -- )
     [ { (sse-version) } compile ] with-optimizer
-    "Checking for multimedia extensions: " write sse-version
-    [ sse-string write " detected" print ] [ enable-sse2 ] bi ;
+    sse-version 20 < [
+        "Factor requires SSE2, which your CPU does not support." print
+        flush
+        1 exit
+    ] when ;

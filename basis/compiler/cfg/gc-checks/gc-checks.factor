@@ -22,7 +22,8 @@ IN: compiler.cfg.gc-checks
 ! can contain tagged pointers.
 
 : insert-gc-check? ( bb -- ? )
-    instructions>> [ ##allocation? ] any? ;
+    dup kill-block?>>
+    [ drop f ] [ instructions>> [ ##allocation? ] any? ] if ;
 
 : blocks-with-gc ( cfg -- bbs )
     post-order [ insert-gc-check? ] filter ;
@@ -62,13 +63,13 @@ IN: compiler.cfg.gc-checks
     >>instructions t >>unlikely? ;
 
 :: insert-guard ( body check bb -- )
-    bb predecessors>> check (>>predecessors)
-    V{ bb body }      check (>>successors)
+    bb predecessors>> check predecessors<<
+    V{ bb body }      check successors<<
 
-    V{ check }        body (>>predecessors)
-    V{ bb }           body (>>successors)
+    V{ check }        body predecessors<<
+    V{ bb }           body successors<<
 
-    V{ check body }   bb (>>predecessors)
+    V{ check body }   bb predecessors<<
 
     check predecessors>> [ bb check update-successors ] each ;
 

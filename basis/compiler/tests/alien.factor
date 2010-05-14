@@ -99,8 +99,6 @@ FUNCTION: TINY ffi_test_17 int x ;
 
 { 1 1 } [ indirect-test-1 ] must-infer-as
 
-[ B{ } indirect-test-1 ] [ { "kernel-error" 3 6 B{ } } = ] must-fail-with
-
 [ 3 ] [ &: ffi_test_1 indirect-test-1 ] unit-test
 
 : indirect-test-1' ( ptr -- )
@@ -609,11 +607,6 @@ FUNCTION: short ffi_test_48 ( bool-field-test x ) ;
 [ thread-callback-1 thread-callback-invoker "p" get fulfill ] in-thread
 [ 200 ] [ thread-callback-2 thread-callback-invoker ] unit-test
 [ 100 ] [ "p" get ?promise ] unit-test
-
-! Regression: calling an undefined function would raise a protection fault
-FUNCTION: void this_does_not_exist ( ) ;
-
-[ this_does_not_exist ] [ { "kernel-error" 9 f f } = ] must-fail-with
 
 ! More alien-assembly tests are in cpu.* vocabs
 : assembly-test-1 ( -- ) void { } cdecl [ ] alien-assembly ;

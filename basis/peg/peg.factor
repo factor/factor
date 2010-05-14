@@ -160,7 +160,7 @@ TUPLE: peg-head rule-id involved-set eval-set ;
   s [ 
     s left-recursion? [ s throw ] unless
     s head>> l head>> eq? [
-      l head>> s (>>head)
+      l head>> s head<<
       l head>> [ s rule-id>> suffix ] change-involved-set drop
       l s next>> (setup-lr)
     ] unless 
@@ -168,14 +168,14 @@ TUPLE: peg-head rule-id involved-set eval-set ;
 
 :: setup-lr ( r l -- )
   l head>> [
-    r rule-id V{ } clone V{ } clone peg-head boa l (>>head)
+    r rule-id V{ } clone V{ } clone peg-head boa l head<<
   ] unless
   l lrstack get (setup-lr) ;
 
 :: lr-answer ( r p m -- ast )
     m ans>> head>> :> h
     h rule-id>> r rule-id eq? [
-      m ans>> seed>> m (>>ans)
+      m ans>> seed>> m ans<<
       m ans>> failed? [
         fail
       ] [
@@ -210,14 +210,14 @@ TUPLE: peg-head rule-id involved-set eval-set ;
     lr lrstack set lr p memo-entry boa dup p r rule-id set-memo :> m
     r eval-rule :> ans
     lrstack get next>> lrstack set
-    pos get m (>>pos)
+    pos get m pos<<
     lr head>> [
       m ans>> left-recursion? [
-        ans lr (>>seed)
+        ans lr seed<<
         r p m lr-answer
      ] [ ans ] if 
     ] [
-      ans m (>>ans)
+      ans m ans<<
       ans
     ] if ; inline
 
@@ -387,7 +387,7 @@ TUPLE: seq-parser parsers ;
 
 : calc-seq-result ( prev-result current-result -- next-result )
   [
-    [ remaining>> swap (>>remaining) ] 2keep
+    [ remaining>> swap remaining<< ] 2keep
     ast>> dup ignore? [  
       drop
     ] [
@@ -427,7 +427,7 @@ TUPLE: repeat0-parser p1 ;
 
 : (repeat) ( quot: ( -- result ) result -- result )
   over call [
-    [ remaining>> swap (>>remaining) ] 2keep 
+    [ remaining>> swap remaining<< ] 2keep 
     ast>> swap [ ast>> push ] keep
     (repeat) 
   ] [

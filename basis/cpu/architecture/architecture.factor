@@ -224,6 +224,7 @@ HOOK: complex-addressing? cpu ( -- ? )
 
 HOOK: %load-immediate cpu ( reg val -- )
 HOOK: %load-reference cpu ( reg obj -- )
+HOOK: %load-float cpu ( reg val -- )
 HOOK: %load-double cpu ( reg val -- )
 HOOK: %load-vector cpu ( reg val rep -- )
 
@@ -300,6 +301,7 @@ HOOK: %gather-vector-2 cpu ( dst src1 src2 rep -- )
 HOOK: %gather-vector-4 cpu ( dst src1 src2 src3 src4 rep -- )
 HOOK: %shuffle-vector cpu ( dst src shuffle rep -- )
 HOOK: %shuffle-vector-imm cpu ( dst src shuffle rep -- )
+HOOK: %shuffle-vector-halves-imm cpu ( dst src1 src2 shuffle rep -- )
 HOOK: %tail>head-vector cpu ( dst src rep -- )
 HOOK: %merge-vector-head cpu ( dst src1 src2 rep -- )
 HOOK: %merge-vector-tail cpu ( dst src1 src2 rep -- )
@@ -355,6 +357,7 @@ HOOK: %gather-vector-4-reps cpu ( -- reps )
 HOOK: %alien-vector-reps cpu ( -- reps )
 HOOK: %shuffle-vector-reps cpu ( -- reps )
 HOOK: %shuffle-vector-imm-reps cpu ( -- reps )
+HOOK: %shuffle-vector-halves-imm-reps cpu ( -- reps )
 HOOK: %merge-vector-reps cpu ( -- reps )
 HOOK: %signed-pack-vector-reps cpu ( -- reps )
 HOOK: %unsigned-pack-vector-reps cpu ( -- reps )
@@ -403,6 +406,7 @@ M: object %gather-vector-4-reps { } ;
 M: object %alien-vector-reps { } ;
 M: object %shuffle-vector-reps { } ;
 M: object %shuffle-vector-imm-reps { } ;
+M: object %shuffle-vector-halves-imm-reps { } ;
 M: object %merge-vector-reps { } ;
 M: object %signed-pack-vector-reps { } ;
 M: object %unsigned-pack-vector-reps { } ;
@@ -471,15 +475,23 @@ HOOK: %call-gc cpu ( gc-roots -- )
 HOOK: %prologue cpu ( n -- )
 HOOK: %epilogue cpu ( n -- )
 
-HOOK: %compare cpu ( dst temp cc src1 src2 -- )
-HOOK: %compare-imm cpu ( dst temp cc src1 src2 -- )
-HOOK: %compare-integer-imm cpu ( dst temp cc src1 src2 -- )
-HOOK: %compare-float-ordered cpu ( dst temp cc src1 src2 -- )
-HOOK: %compare-float-unordered cpu ( dst temp cc src1 src2 -- )
+HOOK: test-instruction? cpu ( -- ? )
+
+M: object test-instruction? f ;
+
+HOOK: %compare cpu ( dst src1 src2 cc temp -- )
+HOOK: %compare-imm cpu ( dst src1 src2 cc temp -- )
+HOOK: %compare-integer-imm cpu ( dst src1 src2 cc temp -- )
+HOOK: %test cpu ( dst src1 src2 cc temp -- )
+HOOK: %test-imm cpu ( dst src1 src2 cc temp -- )
+HOOK: %compare-float-ordered cpu ( dst src1 src2 cc temp -- )
+HOOK: %compare-float-unordered cpu ( dst src1 src2 cc temp -- )
 
 HOOK: %compare-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-imm-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-integer-imm-branch cpu ( label cc src1 src2 -- )
+HOOK: %test-branch cpu ( label cc src1 src2 -- )
+HOOK: %test-imm-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-float-ordered-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-float-unordered-branch cpu ( label cc src1 src2 -- )
 
@@ -504,8 +516,8 @@ M: reg-class param-reg param-regs nth ;
 
 M: stack-params param-reg 2drop ;
 
-! Does this architecture support %load-double, %load-vector and
-! objects in %compare-imm?
+! Does this architecture support %load-float, %load-double,
+! and %load-vector?
 HOOK: fused-unboxing? cpu ( -- ? )
 
 ! Can this value be an immediate operand for %add-imm, %sub-imm,
@@ -533,10 +545,6 @@ M: object immediate-comparand? ( n -- ? )
 : immediate-shift-count? ( n -- ? )
     0 cell-bits 1 - between? ;
 
-! What c-type describes the implicit struct return pointer for
-! large structs?
-HOOK: struct-return-pointer-type cpu ( -- c-type )
-
 ! Is this structure small enough to be returned in registers?
 HOOK: return-struct-in-registers? cpu ( c-type -- ? )
 
@@ -552,70 +560,55 @@ HOOK: dummy-int-params? cpu ( -- ? )
 ! If t, all int parameters are shadowed by dummy FP parameters
 HOOK: dummy-fp-params? cpu ( -- ? )
 
-! Load a value (from the data stack in the ds register).
-! The value is then passed as a parameter to a VM to_*() function
-HOOK: %pop-stack cpu ( n -- )
+! If t, long longs are never passed in param regs
+HOOK: long-long-on-stack? cpu ( -- ? )
 
-! Store a value (to the data stack in the VM's current context)
-! The value is passed to a VM to_*() function -- used for
-! callback returns
-HOOK: %pop-context-stack cpu ( -- )
+! If t, floats are never passed in param regs
+HOOK: float-on-stack? cpu ( -- ? )
 
-! Store a value (to the data stack in the ds register).
-! The value was returned from a VM from_*() function
-HOOK: %push-stack cpu ( -- )
+! If t, the struct return pointer is never passed in a param reg
+HOOK: struct-return-on-stack? cpu ( -- ? )
 
-! Store a value (to the data stack in the VM's current context)
-! The value is returned from a VM from_*() function -- used for
-! callback parameters
-HOOK: %push-context-stack cpu ( -- )
+! Call a function to convert a tagged pointer into a value that
+! can be passed to a C function, or returned from a callback
+HOOK: %unbox cpu ( dst src func rep -- )
 
-! Call a function to convert a tagged pointer returned by
-! %pop-stack or %pop-context-stack into a value that can be
-! passed to a C function, or returned from a callback
-HOOK: %unbox cpu ( n rep func -- )
+HOOK: %store-reg-param cpu ( src reg rep -- )
 
-HOOK: %unbox-long-long cpu ( n func -- )
+HOOK: %store-stack-param cpu ( src n rep -- )
 
-HOOK: %unbox-small-struct cpu ( c-type -- )
+HOOK: %store-return cpu ( src rep -- )
 
-HOOK: %unbox-large-struct cpu ( n c-type -- )
+HOOK: %store-struct-return cpu ( src reps -- )
+
+HOOK: %store-long-long-return cpu ( src1 src2 -- )
+
+HOOK: %prepare-struct-area cpu ( dst -- )
 
 ! Call a function to convert a value into a tagged pointer,
 ! possibly allocating a bignum, float, or alien instance,
-! which is then pushed on the data stack by %push-stack or
-! %push-context-stack
-HOOK: %box cpu ( n rep func -- )
+! which is then pushed on the data stack
+HOOK: %box cpu ( dst n rep func -- )
 
-HOOK: %box-long-long cpu ( n func -- )
+HOOK: %box-long-long cpu ( dst n func -- )
 
-HOOK: %prepare-box-struct cpu ( -- )
+HOOK: %box-small-struct cpu ( dst c-type -- )
 
-HOOK: %box-small-struct cpu ( c-type -- )
-
-HOOK: %box-large-struct cpu ( n c-type -- )
+HOOK: %box-large-struct cpu ( dst n c-type -- )
 
 HOOK: %save-param-reg cpu ( stack reg rep -- )
-
-HOOK: %load-param-reg cpu ( stack reg rep -- )
 
 HOOK: %restore-context cpu ( temp1 temp2 -- )
 
 HOOK: %save-context cpu ( temp1 temp2 -- )
 
-HOOK: %prepare-var-args cpu ( -- )
-
-M: object %prepare-var-args ;
-
 HOOK: %alien-invoke cpu ( function library -- )
 
-HOOK: %cleanup cpu ( params -- )
+HOOK: %cleanup cpu ( n -- )
 
-M: object %cleanup ( params -- ) drop ;
+M: object %cleanup ( n -- ) drop ;
 
-HOOK: %prepare-alien-indirect cpu ( -- )
-
-HOOK: %alien-indirect cpu ( -- )
+HOOK: %alien-indirect cpu ( src -- )
 
 HOOK: %begin-callback cpu ( -- )
 
@@ -623,8 +616,6 @@ HOOK: %alien-callback cpu ( quot -- )
 
 HOOK: %end-callback cpu ( -- )
 
-HOOK: %end-callback-value cpu ( c-type -- )
+HOOK: stack-cleanup cpu ( stack-size return abi -- n )
 
-HOOK: stack-cleanup cpu ( params -- n )
-
-M: object stack-cleanup drop 0 ;
+M: object stack-cleanup 3drop 0 ;

@@ -180,7 +180,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 
 			break;
 		}
-		catch(const must_start_gc_again e)
+		catch(const must_start_gc_again &)
 		{
 			/* We come back here if a generation is full */
 			start_gc_again();

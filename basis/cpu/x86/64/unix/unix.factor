@@ -3,7 +3,7 @@
 USING: accessors arrays sequences math splitting make assocs
 kernel layouts system alien.c-types classes.struct
 cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
-cpu.x86 compiler.codegen.alien compiler.cfg.registers ;
+cpu.x86 compiler.cfg.builder.alien compiler.cfg.registers ;
 IN: cpu.x86.64.unix
 
 M: int-regs param-regs
@@ -28,10 +28,11 @@ M: x86.64 reserved-stack-space 0 ;
     struct-types&offset split-struct [
         [ c-type c-type-rep reg-class-of ] map
         int-regs swap member? int-rep double-rep ?
+        f 2array
     ] map ;
 
 : flatten-large-struct ( c-type -- seq )
-    stack-params (flatten-c-type) ;
+    stack-size cell /i { int-rep t } <repetition> ;
 
 M: x86.64 flatten-struct-type ( c-type -- seq )
     dup heap-size 16 >

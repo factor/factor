@@ -74,7 +74,7 @@ M: irc-message set-irc-trailing
 
 GENERIC: set-irc-command ( irc-message -- )
 M: irc-message set-irc-command
-    [ irc-command-string ] [ (>>command) ] bi ;
+    [ irc-command-string ] [ command<< ] bi ;
 
 : irc-message>string ( irc-message -- string )
     {

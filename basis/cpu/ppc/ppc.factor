@@ -3,8 +3,8 @@
 USING: accessors assocs sequences kernel combinators
 classes.algebra byte-arrays make math math.order math.ranges
 system namespaces locals layouts words alien alien.accessors
-alien.c-types alien.complex alien.data literals cpu.architecture
-cpu.ppc.assembler cpu.ppc.assembler.backend
+alien.c-types alien.complex alien.data alien.libraries
+literals cpu.architecture cpu.ppc.assembler cpu.ppc.assembler.backend
 compiler.cfg.registers compiler.cfg.instructions
 compiler.cfg.comparisons compiler.codegen.fixup
 compiler.cfg.intrinsics compiler.cfg.stack-frame
@@ -373,6 +373,9 @@ M:: ppc %box-displaced-alien ( dst displacement base temp base-class -- )
         "end" resolve-label
     ] with-scope ;
 
+: (%memory) ( val base displacement scale offset rep c-type -- base val displacement rep c-type )
+    [ [ 0 assert= ] bi@ swapd ] 2dip ; inline
+
 M: ppc %load-memory-imm ( dst base offset rep c-type -- )
     [
         {
@@ -380,6 +383,8 @@ M: ppc %load-memory-imm ( dst base offset rep c-type -- )
             { c:uchar  [ LBZ ] }
             { c:short  [ LHA ] }
             { c:ushort [ LHZ ] }
+            { c:int    [ LWZ ] }
+            { c:uint   [ LWZ ] }
         } case
     ] [
         {
@@ -389,9 +394,6 @@ M: ppc %load-memory-imm ( dst base offset rep c-type -- )
         } case
     ] ?if ;
 
-: (%memory) ( val base displacement scale offset rep c-type -- base val displacement rep c-type )
-    [ [ 0 assert= ] bi@ swapd ] 2dip ; inline
-
 M: ppc %load-memory ( dst base displacement scale offset rep c-type -- )
     (%memory) [
         {
@@ -399,6 +401,8 @@ M: ppc %load-memory ( dst base displacement scale offset rep c-type -- )
             { c:uchar  [ LBZX ] }
             { c:short  [ LHAX ] }
             { c:ushort [ LHZX ] }
+            { c:int    [ LWZX ] }
+            { c:uint   [ LWZX ] }
         } case
     ] [
         {
@@ -415,6 +419,8 @@ M: ppc %store-memory-imm ( src base offset rep c-type -- )
             { c:uchar  [ STB ] }
             { c:short  [ STH ] }
             { c:ushort [ STH ] }
+            { c:int    [ STW ] }
+            { c:uint   [ STW ] }
         } case
     ] [
         {
@@ -431,6 +437,8 @@ M: ppc %store-memory ( src base displacement scale offset rep c-type -- )
             { c:uchar  [ STBX ] }
             { c:short  [ STHX ] }
             { c:ushort [ STHX ] }
+            { c:int    [ STWX ] }
+            { c:uint   [ STWX ] }
         } case
     ] [
         {
@@ -669,69 +677,56 @@ M:: ppc %save-param-reg ( stack reg rep -- )
 M:: ppc %load-param-reg ( stack reg rep -- )
     reg stack local@ rep load-from-frame ;
 
-M: ppc %pop-stack ( n -- )
-    [ 3 ] dip <ds-loc> loc>operand LWZ ;
+GENERIC: load-param ( reg src -- )
 
-M: ppc %push-stack ( -- )
-    ds-reg ds-reg 4 ADDI
-    int-regs return-reg ds-reg 0 STW ;
+M: integer load-param int-rep %copy ;
 
-M: ppc %push-context-stack ( -- )
-    11 %context
-    12 11 "datastack" context-field-offset LWZ
-    12 12 4 ADDI
-    12 11 "datastack" context-field-offset STW
-    int-regs return-reg 12 0 STW ;
+M: spill-slot load-param [ 1 ] dip n>> spill@ LWZ ;
 
-M: ppc %pop-context-stack ( -- )
-    11 %context
-    12 11 "datastack" context-field-offset LWZ
-    int-regs return-reg 12 0 LWZ
-    12 12 4 SUBI
-    12 11 "datastack" context-field-offset STW ;
+GENERIC: store-param ( reg dst -- )
 
-M: ppc %unbox ( n rep func -- )
-    ! Value must be in r3
+M: integer store-param swap int-rep %copy ;
+
+M: spill-slot store-param [ 1 ] dip n>> spill@ STW ;
+
+:: call-unbox-func ( src func -- )
+    3 src load-param
     4 %load-vm-addr
-    ! Call the unboxer
-    f %alien-invoke
-    ! Store the return value on the C stack
-    over [ [ reg-class-of return-reg ] keep %save-param-reg ] [ 2drop ] if ;
-
-M: ppc %unbox-long-long ( n func -- )
-    4 %load-vm-addr
-    ! Call the unboxer
-    f %alien-invoke
-    ! Store the return value on the C stack
-    [
-        [ [ 3 1 ] dip local@ STW ]
-        [ [ 4 1 ] dip cell + local@ STW ] bi
-    ] when* ;
-
-M: ppc %unbox-large-struct ( n c-type -- )
-    ! Value must be in r3
-    ! Compute destination address and load struct size
-    [ [ 4 1 ] dip local@ ADDI ] [ heap-size 5 LI ] bi*
-    6 %load-vm-addr
-    ! Call the function
-    "to_value_struct" f %alien-invoke ;
-
-M:: ppc %box ( n rep func -- )
-    ! If the source is a stack location, load it into freg #0.
-    ! If the source is f, then we assume the value is already in
-    ! freg #0.
-    n [ 0 rep reg-class-of cdecl param-reg rep %load-param-reg ] when*
-    rep double-rep? 5 4 ? %load-vm-addr
     func f %alien-invoke ;
 
-M: ppc %box-long-long ( n func -- )
-    [
-        [
-            [ [ 3 1 ] dip local@ LWZ ]
-            [ [ 4 1 ] dip cell + local@ LWZ ] bi
-        ] when*
-        5 %load-vm-addr
-    ] dip f %alien-invoke ;
+M:: ppc %unbox ( src n rep func -- )
+    src func call-unbox-func
+    ! Store the return value on the C stack
+    n [ rep reg-class-of return-reg rep %save-param-reg ] when* ;
+
+M:: ppc %unbox-long-long ( src n func -- )
+    src func call-unbox-func
+    ! Store the return value on the C stack
+    n [
+        3 1 n local@ STW
+        4 1 n cell + local@ STW
+    ] when ;
+
+M:: ppc %unbox-large-struct ( src n c-type -- )
+    4 src load-param
+    3 1 n local@ ADDI
+    c-type heap-size 5 LI
+    "memcpy" "libc" load-library %alien-invoke ;
+
+M:: ppc %box ( dst n rep func -- )
+    n [ 0 rep reg-class-of cdecl param-reg rep %load-param-reg ] when*
+    rep double-rep? 5 4 ? %load-vm-addr
+    func f %alien-invoke
+    3 dst store-param ;
+
+M:: ppc %box-long-long ( dst n func -- )
+    n [
+        3 1 n local@ LWZ
+        4 1 n cell + local@ LWZ
+    ] when
+    5 %load-vm-addr
+    func f %alien-invoke
+    3 dst store-param ;
 
 : struct-return@ ( n -- n )
     [ stack-frame get params>> ] unless* local@ ;
@@ -741,13 +736,15 @@ M: ppc %prepare-box-struct ( -- )
     3 1 f struct-return@ ADDI
     3 1 0 local@ STW ;
 
-M: ppc %box-large-struct ( n c-type -- )
+M:: ppc %box-large-struct ( dst n c-type -- )
     ! If n = f, then we're boxing a returned struct
     ! Compute destination address and load struct size
-    [ [ 3 1 ] dip struct-return@ ADDI ] [ heap-size 4 LI ] bi*
+    3 1 n struct-return@ ADDI
+    c-type heap-size 4 LI
     5 %load-vm-addr
     ! Call the function
-    "from_value_struct" f %alien-invoke ;
+    "from_value_struct" f %alien-invoke
+    3 dst store-param ;
 
 M:: ppc %restore-context ( temp1 temp2 -- )
     temp1 %context
@@ -763,15 +760,8 @@ M:: ppc %save-context ( temp1 temp2 -- )
 M: ppc %alien-invoke ( symbol dll -- )
     [ 11 ] 2dip %alien-global 11 MTLR BLRL ;
 
-M: ppc %prepare-alien-indirect ( -- )
-    3 ds-reg 0 LWZ
-    ds-reg ds-reg 4 SUBI
-    4 %load-vm-addr
-    "pinned_alien_offset" f %alien-invoke
-    16 3 MR ;
-
-M: ppc %alien-indirect ( -- )
-    16 MTLR BLRL ;
+M: ppc %alien-indirect ( src -- )
+    [ 11 ] dip load-param 11 MTLR BLRL ;
 
 M: ppc immediate-arithmetic? ( n -- ? ) -32768 32767 between? ;
 
@@ -779,70 +769,53 @@ M: ppc immediate-bitwise? ( n -- ? ) 0 65535 between? ;
 
 M: ppc immediate-store? drop f ;
 
-M: ppc struct-return-pointer-type void* ;
-
 M: ppc return-struct-in-registers? ( c-type -- ? )
     c-type return-in-registers?>> ;
 
-M: ppc %box-small-struct ( c-type -- )
+M:: ppc %box-small-struct ( dst c-type -- )
     #! Box a <= 16-byte struct returned in r3:r4:r5:r6
-    heap-size 7 LI
+    c-type heap-size 7 LI
     8 %load-vm-addr
-    "from_medium_struct" f %alien-invoke ;
+    "from_medium_struct" f %alien-invoke
+    3 dst store-param ;
 
 : %unbox-struct-1 ( -- )
     ! Alien must be in r3.
-    4 %load-vm-addr
-    "alien_offset" f %alien-invoke
     3 3 0 LWZ ;
 
 : %unbox-struct-2 ( -- )
     ! Alien must be in r3.
-    4 %load-vm-addr
-    "alien_offset" f %alien-invoke
     4 3 4 LWZ
     3 3 0 LWZ ;
 
 : %unbox-struct-4 ( -- )
     ! Alien must be in r3.
-    4 %load-vm-addr
-    "alien_offset" f %alien-invoke
     6 3 12 LWZ
     5 3 8 LWZ
     4 3 4 LWZ
     3 3 0 LWZ ;
+
+M:: ppc %unbox-small-struct ( src c-type -- )
+    src 3 load-param
+    c-type heap-size {
+        { [ dup 4 <= ] [ drop %unbox-struct-1 ] }
+        { [ dup 8 <= ] [ drop %unbox-struct-2 ] }
+        { [ dup 16 <= ] [ drop %unbox-struct-4 ] }
+    } cond ;
 
 M: ppc %begin-callback ( -- )
     3 %load-vm-addr
     "begin_callback" f %alien-invoke ;
 
 M: ppc %alien-callback ( quot -- )
-    3 4 %restore-context
     3 swap %load-reference
     4 3 quot-entry-point-offset LWZ
     4 MTLR
-    BLRL
-    3 4 %save-context ;
+    BLRL ;
 
 M: ppc %end-callback ( -- )
     3 %load-vm-addr
     "end_callback" f %alien-invoke ;
-
-M: ppc %end-callback-value ( ctype -- )
-    ! Save top of data stack
-    16 ds-reg 0 LWZ
-    %end-callback
-    ! Restore top of data stack
-    3 16 MR
-    ! Unbox former top of data stack to return registers
-    unbox-return ;
-
-M: ppc %unbox-small-struct ( size -- )
-    heap-size cell align cell /i {
-        { 1 [ %unbox-struct-1 ] }
-        { 2 [ %unbox-struct-2 ] }
-        { 4 [ %unbox-struct-4 ] }
-    } case ;
 
 enable-float-functions
 

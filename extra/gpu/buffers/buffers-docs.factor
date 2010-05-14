@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff bsd license
-USING: alien byte-arrays destructors help.markup help.syntax kernel math
-quotations ;
+USING: alien alien.data byte-arrays destructors help.markup help.syntax
+kernel math quotations ;
 IN: gpu.buffers
 
 HELP: <buffer-ptr>
@@ -207,6 +207,13 @@ HELP: with-mapped-buffer
 }
 { $description "Maps " { $snippet "buffer" } " into CPU address space with " { $snippet "access" } " for the dynamic extent of " { $snippet "quot" } ". " { $snippet "quot" } " is called with a pointer to the mapped memory on top of the stack." } ;
 
+HELP: with-mapped-buffer-array
+{ $values
+    { "buffer" buffer } { "access" buffer-access-mode } { "c-type" "a C type" } { "quot" { $quotation "( ..a array -- ..b )" } }
+}
+{ $description "Maps " { $snippet "buffer" } " into CPU address space with " { $snippet "access" } " for the dynamic extent of " { $snippet "quot" } ". " { $snippet "quot" } " is called with the pointer to the mapped memory wrapped in a specialized array of " { $snippet "c-type" } "." }
+{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. The vocabulary can be loaded with the " { $link require-c-array } " word. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." } ;
+
 { allocate-buffer allocate-byte-array buffer-size update-buffer read-buffer copy-buffer with-mapped-buffer } related-words
 
 HELP: write-access
@@ -240,7 +247,7 @@ ARTICLE: "gpu.buffers" "Buffer objects"
     read-buffer
     copy-buffer
     with-mapped-buffer
-}
-;
+    with-mapped-buffer-array
+} ;
 
 ABOUT: "gpu.buffers"

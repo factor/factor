@@ -233,7 +233,7 @@ M: x11-ui-backend do-events
 
 M: x-clipboard copy-clipboard
     [ x-clipboard@ own-selection ] keep
-    (>>contents) ;
+    contents<< ;
 
 M: x-clipboard paste-clipboard
     [ find-world handle>> window>> ] dip atom>> convert-selection ;

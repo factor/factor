@@ -47,14 +47,14 @@ M: unix open-serial ( serial -- serial' )
 : configure-termios ( serial -- )
     dup termios>>
     {
-        [ [ iflag>> ] dip over [ (>>iflag) ] [ 2drop ] if ]
-        [ [ oflag>> ] dip over [ (>>oflag) ] [ 2drop ] if ]
+        [ [ iflag>> ] dip over [ iflag<< ] [ 2drop ] if ]
+        [ [ oflag>> ] dip over [ oflag<< ] [ 2drop ] if ]
         [
             [
                 [ cflag>> 0 or ] [ baud>> lookup-baud ] bi bitor
-            ] dip (>>cflag)
+            ] dip cflag<<
         ]
-        [ [ lflag>> ] dip over [ (>>lflag) ] [ 2drop ] if ]
+        [ [ lflag>> ] dip over [ lflag<< ] [ 2drop ] if ]
     } 2cleave ;
 
 : tciflush ( serial -- )
