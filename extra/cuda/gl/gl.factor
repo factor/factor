@@ -1,7 +1,7 @@
 ! (c)2010 Joe Groff bsd license
 USING: accessors alien.c-types alien.data alien.destructors
-continuations cuda cuda.ffi cuda.gl.ffi cuda.utils destructors
-fry gpu.buffers kernel ;
+alien.enums continuations cuda cuda.ffi cuda.gl.ffi cuda.utils
+destructors fry gpu.buffers kernel ;
 IN: cuda.gl
 
 : create-gl-cuda-context ( device flags -- context )
@@ -13,6 +13,7 @@ IN: cuda.gl
     [ [ create-gl-cuda-context ] (set-up-cuda-context) ] dip (with-cuda-context) ; inline 
 
 : gl-buffer>resource ( gl-buffer flags -- resource )
+    enum>number
     [ CUgraphicsResource <c-object> ] 2dip
     [ cuGraphicsGLRegisterBuffer cuda-error ] 3keep 2drop *void* ; inline
 
