@@ -241,6 +241,9 @@ M: operand CALL { BIN: 010 t HEX: ff } 1-operand ;
 GENERIC# JUMPcc 1 ( addr opcode -- )
 M: integer JUMPcc extended-opcode, 4, ;
 
+: SETcc ( dst opcode -- )
+    { BIN: 000 t } swap suffix 1-operand ;
+
 PRIVATE>
 
 : JO  ( dst -- ) HEX: 80 JUMPcc ;
@@ -259,6 +262,23 @@ PRIVATE>
 : JGE ( dst -- ) HEX: 8d JUMPcc ;
 : JLE ( dst -- ) HEX: 8e JUMPcc ;
 : JG  ( dst -- ) HEX: 8f JUMPcc ;
+
+: SETO  ( dst -- ) { HEX: 0f HEX: 90 } SETcc ;
+: SETNO ( dst -- ) { HEX: 0f HEX: 91 } SETcc ;
+: SETB  ( dst -- ) { HEX: 0f HEX: 92 } SETcc ;
+: SETAE ( dst -- ) { HEX: 0f HEX: 93 } SETcc ;
+: SETE  ( dst -- ) { HEX: 0f HEX: 94 } SETcc ;
+: SETNE ( dst -- ) { HEX: 0f HEX: 95 } SETcc ;
+: SETBE ( dst -- ) { HEX: 0f HEX: 96 } SETcc ;
+: SETA  ( dst -- ) { HEX: 0f HEX: 97 } SETcc ;
+: SETS  ( dst -- ) { HEX: 0f HEX: 98 } SETcc ;
+: SETNS ( dst -- ) { HEX: 0f HEX: 99 } SETcc ;
+: SETP  ( dst -- ) { HEX: 0f HEX: 9a } SETcc ;
+: SETNP ( dst -- ) { HEX: 0f HEX: 9b } SETcc ;
+: SETL  ( dst -- ) { HEX: 0f HEX: 9c } SETcc ;
+: SETGE ( dst -- ) { HEX: 0f HEX: 9d } SETcc ;
+: SETLE ( dst -- ) { HEX: 0f HEX: 9e } SETcc ;
+: SETG  ( dst -- ) { HEX: 0f HEX: 9f } SETcc ;
 
 : LEAVE ( -- ) HEX: c9 , ;
 
