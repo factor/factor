@@ -9,7 +9,7 @@ compiler.tree.debugger compiler.tree.checker slots.private words
 hashtables classes assocs locals specialized-arrays system
 sorting math.libm math.floats.private math.integers.private
 math.intervals quotations effects alien alien.data sets
-strings.private classes.tuple eval ;
+strings.private classes.tuple eval generic.single ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
 SPECIALIZED-ARRAY: void*
@@ -878,7 +878,8 @@ M: f whatever2 ; inline
 
 SYMBOL: not-an-assoc
 
-[ f ] [ [ not-an-assoc at ] { at* } inlined? ] unit-test
+[ t ] [ [ not-an-assoc at ] { at* } inlined? ] unit-test
+[ f ] [ [ not-an-assoc at ] { no-method } inlined? ] unit-test
 
 [ t ] [ [ { 1 2 3 } member? ] { member? } inlined? ] unit-test
 [ f ] [ [ { 1 2 3 } swap member? ] { member? } inlined? ] unit-test
@@ -890,7 +891,8 @@ SYMBOL: not-an-assoc
 [ f ] [ [ { } clone ] { clone (clone) } inlined? ] unit-test
 
 [ f ] [ [ instance? ] { instance? } inlined? ] unit-test
-[ f ] [ [ 5 instance? ] { instance? } inlined? ] unit-test
+[ t ] [ [ 5 instance? ] { instance? } inlined? ] unit-test
+[ f ] [ [ 5 instance? ] { no-method } inlined? ] unit-test
 [ t ] [ [ array instance? ] { instance? } inlined? ] unit-test
 
 [ t ] [ [ (( a b c -- c b a )) shuffle ] { shuffle } inlined? ] unit-test
@@ -1034,3 +1036,9 @@ UNION: ?fixnum fixnum POSTPONE: f ;
 [ V{ alien } ] [
     [ { byte-array } declare [ 10 bitand 2 + ] dip <displaced-alien> ] final-classes
 ] unit-test
+
+! Ensuring that calling a generic word on a class where it's undefined inlines no-method
+GENERIC: undefined-generic-test ( x -- y )
+
+[ t ] [ [ 1 undefined-generic-test ] { undefined-generic-test } inlined? ] unit-test
+[ f ] [ [ 1 undefined-generic-test ] { no-method } inlined? ] unit-test
