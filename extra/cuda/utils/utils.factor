@@ -17,9 +17,6 @@ ERROR: throw-cuda-error n ;
 : cuda-error ( n -- )
     dup CUDA_SUCCESS = [ drop ] [ throw-cuda-error ] if ;
 
-: init-cuda ( -- )
-    0 cuInit cuda-error ; inline
-
 : cuda-version ( -- n )
     int <c-object> [ cuDriverGetVersion cuda-error ] keep *int ;
 
