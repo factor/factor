@@ -164,6 +164,7 @@ M: x86 %max     int-rep two-operand [ CMP ] [ CMOVL ] 2bi ;
 M: x86 %not     int-rep one-operand NOT ;
 M: x86 %neg     int-rep one-operand NEG ;
 M: x86 %log2    BSR ;
+M: x86 %bit-count POPCNT ;
 
 ! A bit of logic to avoid using MOVSS/MOVSD for reg-reg moves
 ! since this induces partial register stalls
