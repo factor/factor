@@ -10,6 +10,9 @@ sequences words cuda.libraries ;
 QUALIFIED-WITH: alien.c-types c
 IN: cuda
 
+: init-cuda ( -- )
+    0 cuInit cuda-error ; inline
+
 TUPLE: function-launcher
 dim-grid dim-block shared-size stream ;
 
