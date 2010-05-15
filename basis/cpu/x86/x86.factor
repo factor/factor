@@ -1539,5 +1539,4 @@ enable-fsqrt
         "Factor requires SSE2, which your CPU does not support." print
         flush
         1 exit
-    ] when
-    popcnt? [ enable-bit-count ] when ;
+    ] when ;
