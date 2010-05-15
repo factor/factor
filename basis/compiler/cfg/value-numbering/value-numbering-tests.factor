@@ -1163,6 +1163,51 @@ cpu x86.32? [
     } value-numbering-step
 ] unit-test
 
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 1 10 }
+        T{ ##test-imm-branch f 0 10 cc= }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 1 10 }
+        T{ ##test-branch f 1 0 cc= }
+    } value-numbering-step
+] unit-test
+
+! Make sure the immediate fits
+cpu x86.64? [
+    [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##load-integer f 1 100000000000 }
+            T{ ##test f 2 1 0 cc= }
+        }
+    ] [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##load-integer f 1 100000000000 }
+            T{ ##test f 2 1 0 cc= }
+        } value-numbering-step
+    ] unit-test
+
+    [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##load-integer f 1 100000000000 }
+            T{ ##test-branch f 1 0 cc= }
+        }
+    ] [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##load-integer f 1 100000000000 }
+            T{ ##test-branch f 1 0 cc= }
+        } value-numbering-step
+    ] unit-test
+] when
+
 ! Rewriting ##compare into ##test
 cpu x86? [
     [
