@@ -16,7 +16,7 @@ IN: cuda.devices
     #cuda-devices iota [ n>cuda-device ] map ;
 
 : with-each-cuda-device ( quot -- )
-    [ enumerate-cuda-devices ] dip '[ <launcher> _ with-cuda ] each ; inline
+    [ enumerate-cuda-devices ] dip '[ 0 _ with-cuda-context ] each ; inline
 
 : cuda-device-properties ( n -- properties )
     [ CUdevprop <struct> ] dip
@@ -81,6 +81,6 @@ IN: cuda.devices
     grid-size block-size per-block-shared ; inline
 
 : distribute-jobs ( job-count per-job-shared -- launcher )
-    cuda-device get cuda-device-properties 
+    context-device cuda-device-properties 
     [ sharedMemPerBlock>> ] [ maxThreadsDim>> first ] bi
     (distribute-jobs) 3<<< ; inline

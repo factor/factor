@@ -11,9 +11,10 @@ CUDA-LIBRARY: hello vocab:cuda/demos/hello-world/hello.ptx
 CUDA-FUNCTION: helloWorld ( char* string-ptr ) ;
 
 : cuda-hello-world ( -- )
+    init-cuda
     [
         [
-            cuda-launcher get device>> number>string
+            context-device number>string
             "CUDA device " ": " surround write
             "Hello World!" >byte-array [ - ] map-index host>device &cuda-free
 
