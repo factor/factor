@@ -270,6 +270,7 @@ HOOK: %max     cpu ( dst src1 src2 -- )
 HOOK: %not     cpu ( dst src -- )
 HOOK: %neg     cpu ( dst src -- )
 HOOK: %log2    cpu ( dst src -- )
+HOOK: %bit-count cpu ( dst src -- )
 
 HOOK: %copy cpu ( dst src rep -- )
 

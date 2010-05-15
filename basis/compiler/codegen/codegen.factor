@@ -162,6 +162,7 @@ CODEGEN: ##max %max
 CODEGEN: ##not %not
 CODEGEN: ##neg %neg
 CODEGEN: ##log2 %log2
+CODEGEN: ##bit-count %bit-count
 CODEGEN: ##copy %copy
 CODEGEN: ##tagged>integer %tagged>integer
 CODEGEN: ##add-float %add-float

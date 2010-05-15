@@ -219,6 +219,10 @@ PURE-INSN: ##log2
 def: dst/int-rep
 use: src/int-rep ;
 
+PURE-INSN: ##bit-count
+def: dst/int-rep
+use: src/int-rep ;
+
 ! Float arithmetic
 PURE-INSN: ##add-float
 def: dst/double-rep
