@@ -69,15 +69,6 @@ IN: cpu.x86.features
         "end" resolve-label
     ] alien-assembly ;
 
-: (popcnt?) ( -- n )
-    int { } cdecl [
-        int-regs return-reg 1 MOV
-        CPUID
-        ECX 23 BT
-        int-regs return-reg dup XOR
-        int-regs return-reg SETB
-    ] alien-assembly ;
-
 PRIVATE>
 
 MEMO: sse-version ( -- n )
@@ -92,7 +83,14 @@ MEMO: sse-version ( -- n )
 : sse4.1? ( -- ? ) sse-version 41 >= ;
 : sse4.2? ( -- ? ) sse-version 42 >= ;
 
-: popcnt? ( -- ? ) (popcnt?) c-bool> ;
+: popcnt? ( -- ? )
+    bool { } cdecl [
+        int-regs return-reg 1 MOV
+        CPUID
+        ECX 23 BT
+        int-regs return-reg dup XOR
+        int-regs return-reg SETB
+    ] alien-assembly ;
 
 : sse-string ( version -- string )
     {
