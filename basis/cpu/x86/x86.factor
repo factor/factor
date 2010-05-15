@@ -1534,7 +1534,7 @@ enable-float-min/max
 enable-fsqrt
 
 : check-sse ( -- )
-    [ { (sse-version) (popcnt?) } compile ] with-optimizer
+    [ { (sse-version) popcnt? } compile ] with-optimizer
     sse-version 20 < [
         "Factor requires SSE2, which your CPU does not support." print
         flush
