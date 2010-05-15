@@ -10,39 +10,19 @@ sequences words cuda.libraries ;
 QUALIFIED-WITH: alien.c-types c
 IN: cuda
 
-TUPLE: launcher
-{ device integer initial: 0 }
-{ device-flags initial: 0 } ;
-
-: <launcher> ( device-id -- launcher )
-    launcher new
-        swap >>device ; inline
-
 TUPLE: function-launcher
 dim-grid dim-block shared-size stream ;
 
-: (set-up-cuda-context) ( flags device create-quot -- )
+: (set-up-cuda-context) ( device flags create-quot -- )
     H{ } clone cuda-modules set-global
     H{ } clone cuda-functions set
     call ; inline
 
 : (with-cuda-context) ( context quot -- )
-    [ '[ _ @ ] ]
-    [ drop '[ [ sync-context ] ignore-errors _ destroy-context ] ] 2bi
-    [ ] cleanup ; inline
+    swap '[ [ sync-context ] ignore-errors _ destroy-context ] [ ] cleanup ; inline
 
-: with-cuda-context ( flags device quot -- )
+: with-cuda-context ( device flags quot -- )
     [ [ create-context ] (set-up-cuda-context) ] dip (with-cuda-context) ; inline
-
-: with-cuda-program ( flags device quot -- )
-    [ dup cuda-device set ] 2dip
-    '[ cuda-context set _ call ] with-cuda-context ; inline
-
-: with-cuda ( launcher quot -- )
-    init-cuda [
-        [ cuda-launcher set ]
-        [ [ device>> ] [ device-flags>> ] bi ] bi
-    ] [ with-cuda-program ] bi* ; inline
 
 : c-type>cuda-setter ( c-type -- n cuda-type )
     {

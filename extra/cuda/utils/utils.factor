@@ -6,11 +6,8 @@ io io.backend io.encodings.utf8 kernel math.parser namespaces
 prettyprint sequences ;
 IN: cuda.utils
 
-SYMBOL: cuda-device
-SYMBOL: cuda-context
 SYMBOL: cuda-module
 SYMBOL: cuda-function
-SYMBOL: cuda-launcher
 
 SYMBOL: cuda-modules
 SYMBOL: cuda-functions
@@ -38,12 +35,16 @@ ERROR: throw-cuda-error n ;
         get-function-ptr* cuda-function set
     ] dip call ; inline
 
-: create-context ( flags device -- context )
+: create-context ( device flags -- context )
+    swap
     [ CUcontext <c-object> ] 2dip
     [ cuCtxCreate cuda-error ] 3keep 2drop *void* ; inline
 
 : sync-context ( -- )
     cuCtxSynchronize cuda-error ; inline
+
+: context-device ( -- n )
+    CUdevice <c-object> [ cuCtxGetDevice cuda-error ] keep *int ; inline
 
 : destroy-context ( context -- ) cuCtxDestroy cuda-error ; inline
 
@@ -95,3 +96,4 @@ ERROR: throw-cuda-error n ;
 : function-shared-size ( n -- )
     [ cuda-function get ] dip
     cuFuncSetSharedSize cuda-error ; inline
+
