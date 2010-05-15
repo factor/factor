@@ -5,7 +5,6 @@ models namespaces opengl opengl.gl opengl.textures sequences
 strings ui ui.gadgets ui.gadgets.panes ui.images ui.render
 constructors locals combinators.short-circuit 
 literals ;
-FROM: gpu.textures.private => get-texture-int ;
 IN: images.viewer
 
 TUPLE: image-gadget < gadget image texture ;
