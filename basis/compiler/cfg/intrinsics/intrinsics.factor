@@ -23,6 +23,7 @@ QUALIFIED: slots.private
 QUALIFIED: strings.private
 QUALIFIED: classes.tuple.private
 QUALIFIED: math.private
+QUALIFIED: math.bitwise.private
 QUALIFIED: math.integers.private
 QUALIFIED: math.floats.private
 QUALIFIED: math.libm
@@ -153,6 +154,11 @@ IN: compiler.cfg.intrinsics
 : enable-log2 ( -- )
     {
         { math.integers.private:fixnum-log2 [ drop [ ^^log2 ] unary-op ] }
+    } enable-intrinsics ;
+
+: enable-bit-count ( -- )
+    {
+        { math.bitwise.private:fixnum-bit-count [ drop [ ^^bit-count ] unary-op ] }
     } enable-intrinsics ;
 
 : emit-intrinsic ( node word -- )
