@@ -152,8 +152,11 @@ M: register displacement, drop ;
 : immediate-operand-size-bit ( dst imm reg,rex.w,opcode -- imm dst reg,rex.w,opcode )
     over integer? [ first3 BIN: 1 opcode-or 3array ] when ;
 
+: immediate-1* ( dst imm reg,rex.w,opcode -- )
+    swap [ 1-operand ] dip 1, ;
+
 : immediate-1 ( dst imm reg,rex.w,opcode -- )
-    immediate-operand-size-bit swap [ 1-operand ] dip 1, ;
+    immediate-operand-size-bit immediate-1* ;
 
 : immediate-4 ( dst imm reg,rex.w,opcode -- )
     immediate-operand-size-bit swap [ 1-operand ] dip 4, ;
@@ -303,6 +306,22 @@ M: operand TEST OCT: 204 2-operand ;
 : XCHG ( dst src -- ) OCT: 207 2-operand ;
 
 : BSR ( dst src -- ) { HEX: 0f HEX: bd } (2-operand) ;
+
+GENERIC: BT ( value n -- )
+M: immediate BT ( value n -- ) { BIN: 100 t { HEX: 0f HEX: ba } } immediate-1* ;
+M: operand   BT ( value n -- ) swap { HEX: 0f HEX: a3 } (2-operand) ;
+
+GENERIC: BTC ( value n -- )
+M: immediate BTC ( value n -- ) { BIN: 111 t { HEX: 0f HEX: ba } } immediate-1* ;
+M: operand   BTC ( value n -- ) swap { HEX: 0f HEX: bb } (2-operand) ;
+
+GENERIC: BTR ( value n -- )
+M: immediate BTR ( value n -- ) { BIN: 110 t { HEX: 0f HEX: ba } } immediate-1* ;
+M: operand   BTR ( value n -- ) swap { HEX: 0f HEX: b3 } (2-operand) ;
+
+GENERIC: BTS ( value n -- )
+M: immediate BTS ( value n -- ) { BIN: 101 t { HEX: 0f HEX: ba } } immediate-1* ;
+M: operand   BTS ( value n -- ) swap { HEX: 0f HEX: ab } (2-operand) ;
 
 : NOT  ( dst -- ) { BIN: 010 t HEX: f7 } 1-operand ;
 : NEG  ( dst -- ) { BIN: 011 t HEX: f7 } 1-operand ;

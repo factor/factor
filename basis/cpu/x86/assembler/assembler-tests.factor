@@ -190,6 +190,21 @@ cell 4 = [
 [ { HEX: 48 HEX: 6b HEX: c1 HEX: 03 } ] [ [ RAX RCX 3 IMUL3 ] { } make ] unit-test
 [ { HEX: 48 HEX: 69 HEX: c1 HEX: 44 HEX: 03 HEX: 00 HEX: 00 } ] [ [ RAX RCX HEX: 344 IMUL3 ] { } make ] unit-test
 
+! BT family instructions
+[ { HEX: 0f HEX: ba HEX: e0 HEX: 01 } ] [ [ EAX 1 BT ] { } make ] unit-test
+[ { HEX: 0f HEX: ba HEX: f8 HEX: 01 } ] [ [ EAX 1 BTC ] { } make ] unit-test
+[ { HEX: 0f HEX: ba HEX: e8 HEX: 01 } ] [ [ EAX 1 BTS ] { } make ] unit-test
+[ { HEX: 0f HEX: ba HEX: f0 HEX: 01 } ] [ [ EAX 1 BTR ] { } make ] unit-test
+[ { HEX: 48 HEX: 0f HEX: ba HEX: e0 HEX: 01 } ] [ [ RAX 1 BT ] { } make ] unit-test
+[ { HEX: 0f HEX: ba HEX: 20 HEX: 01 } ] [ [ EAX [] 1 BT ] { } make ] unit-test
+
+[ { HEX: 0f HEX: a3 HEX: d8 } ] [ [ EAX EBX BT ] { } make ] unit-test
+[ { HEX: 0f HEX: bb HEX: d8 } ] [ [ EAX EBX BTC ] { } make ] unit-test
+[ { HEX: 0f HEX: ab HEX: d8 } ] [ [ EAX EBX BTS ] { } make ] unit-test
+[ { HEX: 0f HEX: b3 HEX: d8 } ] [ [ EAX EBX BTR ] { } make ] unit-test
+[ { HEX: 0f HEX: a3 HEX: 18 } ] [ [ EAX [] EBX BT ] { } make ] unit-test
+
+
 [ { 15 183 195 } ] [ [ EAX BX MOVZX ] { } make ] unit-test
 
 bootstrap-cell 4 = [
