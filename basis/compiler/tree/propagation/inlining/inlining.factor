@@ -48,12 +48,12 @@ M: callable splicing-nodes splicing-body ;
         ] if
     ] [ 2drop undo-inlining ] if ;
 
-ERROR: bad-splitting class generic ;
+ERROR: bad-guarded-method-call class generic ;
 
-:: split-code ( class generic -- quot/f )
+:: guard-code ( class generic -- quot/f )
     class generic method :> my-method
-    my-method [ class generic bad-splitting ] unless
-    class generic my-method depends-on-method-is
+    my-method [ class generic bad-guarded-method-call ] unless
+    class generic my-method depends-on-method-identity
     generic dispatch# (picker) :> picker
     [
         picker call class instance?
@@ -61,19 +61,20 @@ ERROR: bad-splitting class generic ;
         [ generic no-method ] if
     ] ;
 
-:: split-method-call ( class generic -- quot/f )
+:: guarded-method-call ( class generic -- quot/f )
     class generic subclass-with-only-method [
-        [ class generic depends-on-single-method ]
-        [ generic split-code ] bi
+        [ class generic depends-on-single-method ] [
+            dup +no-method+ =
+            [ drop [ generic no-method ] ]
+            [ generic guard-code ] if
+        ] bi
     ] [ f ] if* ;
 
 : inlining-standard-method ( #call word -- class/f method/f )
-    dup "methods" word-prop assoc-empty? [ 2drop f f ] [
-        2dup [ in-d>> length ] [ dispatch# ] bi* <= [ 2drop f f ] [
-            [ in-d>> <reversed> ] [ [ dispatch# ] keep ] bi*
-            [ swap nth value-info class>> dup ] dip
-            { [ method-for-class ] [ split-method-call ] } 2||
-        ] if
+    2dup [ in-d>> length ] [ dispatch# ] bi* <= [ 2drop f f ] [
+        [ in-d>> <reversed> ] [ [ dispatch# ] keep ] bi*
+        [ swap nth value-info class>> dup ] dip
+        { [ method-for-class ] [ guarded-method-call ] } 2||
     ] if ;
 
 : inline-standard-method ( #call word -- ? )

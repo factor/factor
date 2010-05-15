@@ -151,26 +151,28 @@ TUPLE: depends-on-single-method method-class object-class generic ;
     [ nip [ depends-on-conditionally ] bi@ ]
     [ \ depends-on-single-method add-conditional-dependency ] 3bi ;
 
-:: subclass-with-only-method ( class generic -- subclass/f )
-    generic method-classes [ f ] [
-        f swap [| last-class new-class |
-            class new-class classes-intersect? [
-                last-class [ f f ] [ new-class t ] if
-            ] [ last-class t ] if
-        ] all? swap and
-    ] if-empty ;
+SYMBOL: +no-method+
+
+:: subclass-with-only-method ( class generic -- subclass/f/+no-method+ ) ! make it return +no-method+ sometimes
+    f generic method-classes
+    [| last-class new-class |
+        class new-class classes-intersect? [
+            last-class [ f f ] [ new-class t ] if
+        ] [ last-class t ] if
+    ] all?
+    [ +no-method+ or ] [ drop f ] if ;
 
 M: depends-on-single-method satisfied?
     [ method-class>> ] [ object-class>> ] [ generic>> ] tri
     subclass-with-only-method = ;
 
-TUPLE: depends-on-method-is class generic method ;
+TUPLE: depends-on-method-identity class generic method ;
 
-: depends-on-method-is ( class generic method -- )
+: depends-on-method-identity ( class generic method -- )
     [ [ depends-on-conditionally ] tri@ ]
-    [ \ depends-on-method-is add-conditional-dependency ] 3bi ;
+    [ \ depends-on-method-identity add-conditional-dependency ] 3bi ;
 
-M: depends-on-method-is satisfied?
+M: depends-on-method-identity satisfied?
     [ class>> ] [ generic>> method ] [ method>> ] tri = ;
 
 : init-dependencies ( -- )
