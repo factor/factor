@@ -589,6 +589,10 @@ HOOK: %restore-context cpu ( temp1 temp2 -- )
 
 HOOK: %save-context cpu ( temp1 temp2 -- )
 
+HOOK: %prepare-var-args cpu ( -- )
+
+M: object %prepare-var-args ;
+
 HOOK: %alien-invoke cpu ( function library -- )
 
 HOOK: %cleanup cpu ( n -- )
