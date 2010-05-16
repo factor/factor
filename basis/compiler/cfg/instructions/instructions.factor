@@ -671,6 +671,8 @@ INSN: ##allot-byte-array
 def: dst/tagged-rep
 literal: size ;
 
+INSN: ##prepare-var-args ;
+
 INSN: ##alien-invoke
 literal: symbols dll ;
 

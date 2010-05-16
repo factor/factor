@@ -108,7 +108,7 @@ M: #alien-invoke emit-node
     [
         {
             [ caller-parameters ]
-            [ alien-invoke-dlsym ##alien-invoke ]
+            [ ##prepare-var-args alien-invoke-dlsym ##alien-invoke ]
             [ emit-stack-frame ]
             [ box-return* ]
         } cleave
