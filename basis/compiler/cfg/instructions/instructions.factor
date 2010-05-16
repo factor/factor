@@ -295,9 +295,19 @@ def: dst
 use: src1/scalar-rep src2/scalar-rep
 literal: rep ;
 
+PURE-INSN: ##gather-int-vector-2
+def: dst
+use: src1/int-rep src2/int-rep
+literal: rep ;
+
 PURE-INSN: ##gather-vector-4
 def: dst
 use: src1/scalar-rep src2/scalar-rep src3/scalar-rep src4/scalar-rep
+literal: rep ;
+
+PURE-INSN: ##gather-int-vector-4
+def: dst
+use: src1/int-rep src2/int-rep src3/int-rep src4/int-rep
 literal: rep ;
 
 PURE-INSN: ##shuffle-vector

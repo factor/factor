@@ -744,6 +744,18 @@ M: x86 %gather-vector-4-reps
         { sse2? { float-4-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
+M:: x86 %gather-int-vector-4 ( dst src1 src2 src3 src4 rep -- )
+    dst rep %zero-vector
+    dst src1 32-bit-version-of 0 PINSRD
+    dst src2 32-bit-version-of 1 PINSRD
+    dst src3 32-bit-version-of 2 PINSRD
+    dst src4 32-bit-version-of 3 PINSRD ;
+
+M: x86 %gather-int-vector-4-reps
+    {
+        { sse4.1? { int-4-rep uint-4-rep } }
+    } available-reps ;
+
 M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
     rep signed-rep {
         { double-2-rep [
@@ -759,6 +771,16 @@ M:: x86 %gather-vector-2 ( dst src1 src2 rep -- )
 M: x86 %gather-vector-2-reps
     {
         { sse2? { double-2-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
+M:: x86.64 %gather-int-vector-2 ( dst src1 src2 rep -- )
+    dst rep %zero-vector
+    dst src1 0 PINSRQ
+    dst src2 1 PINSRQ ;
+
+M: x86.64 %gather-int-vector-2-reps
+    {
+        { sse4.1? { longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
 : sse1-float-4-shuffle ( dst shuffle -- )
