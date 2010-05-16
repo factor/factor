@@ -21,6 +21,7 @@ M: ##gather-vector-2 insn-available? rep>> %gather-vector-2-reps member? ;
 M: ##gather-vector-4 insn-available? rep>> %gather-vector-4-reps member? ;
 M: ##gather-int-vector-2 insn-available? rep>> %gather-int-vector-2-reps member? ;
 M: ##gather-int-vector-4 insn-available? rep>> %gather-int-vector-4-reps member? ;
+M: ##select-vector insn-available? rep>> %select-vector-reps member? ;
 M: ##store-memory-imm insn-available? rep>> %alien-vector-reps member? ;
 M: ##shuffle-vector insn-available? rep>> %shuffle-vector-reps member? ;
 M: ##shuffle-vector-imm insn-available? rep>> %shuffle-vector-imm-reps member? ;
