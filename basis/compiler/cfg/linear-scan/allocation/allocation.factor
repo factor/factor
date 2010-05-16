@@ -36,31 +36,39 @@ IN: compiler.cfg.linear-scan.allocation
         [ drop assign-blocked-register ]
     } cond ;
 
-: spill-at-sync-point ( n live-interval -- ? )
-    ! If the live interval has a definition at 'n', don't spill
-    2dup find-use
-    { [ ] [ def-rep>> ] } 1&&
-    [ 2drop t ] [ swap spill f ] if ;
+: spill-at-sync-point? ( sync-point live-interval -- ? )
+    ! If the live interval has a definition at a keep-dst?
+    ! sync-point, don't spill.
+    {
+        [ drop keep-dst?>> not ]
+        [ [ n>> ] dip find-use dup [ def-rep>> ] when not ]
+    } 2|| ;
 
-: handle-sync-point ( n -- )
+: spill-at-sync-point ( sync-point live-interval -- ? )
+    2dup spill-at-sync-point?
+    [ swap n>> spill f ] [ 2drop t ] if ;
+
+GENERIC: handle-progress* ( obj -- )
+
+M: live-interval handle-progress* drop ;
+
+M: sync-point handle-progress*
     active-intervals get values
     [ [ spill-at-sync-point ] with filter! drop ] with each ;
 
-:: handle-progress ( n sync? -- )
-    n {
-        [ progress set ]
-        [ deactivate-intervals ]
-        [ sync? [ handle-sync-point ] [ drop ] if ]
-        [ activate-intervals ]
-    } cleave ;
+:: handle-progress ( n obj -- )
+    n progress set
+    n deactivate-intervals
+    obj handle-progress*
+    n activate-intervals ;
 
 GENERIC: handle ( obj -- )
 
 M: live-interval handle ( live-interval -- )
-    [ start>> f handle-progress ] [ assign-register ] bi ;
+    [ [ start>> ] keep handle-progress ] [ assign-register ] bi ;
 
 M: sync-point handle ( sync-point -- )
-    n>> t handle-progress ;
+    [ n>> ] keep handle-progress ;
 
 : smallest-heap ( heap1 heap2 -- heap )
     ! If heap1 and heap2 have the same key, favors heap1.

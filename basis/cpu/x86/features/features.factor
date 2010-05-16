@@ -1,12 +1,15 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types combinators compiler
-compiler.codegen.fixup compiler.units cpu.architecture
-cpu.x86.assembler cpu.x86.assembler.operands init io kernel
-locals math math.order math.parser memoize namespaces system ;
+USING: accessors assocs sequences alien alien.c-types
+combinators compiler compiler.codegen.fixup compiler.units
+cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
+init io kernel locals math math.order math.parser memoize
+namespaces system ;
 IN: cpu.x86.features
 
 <PRIVATE
+
+: return-reg ( -- reg ) int-regs return-regs at first ;
 
 : (sse-version) ( -- n )
     int { } cdecl [
@@ -18,7 +21,7 @@ IN: cpu.x86.features
         "sse-1" define-label
         "end" define-label
 
-        int-regs return-reg 1 MOV
+        return-reg 1 MOV
 
         CPUID
 
@@ -40,31 +43,31 @@ IN: cpu.x86.features
         EDX 25 BT
         "sse-1" get JB
 
-        int-regs return-reg 0 MOV
+        return-reg 0 MOV
         "end" get JMP
 
         "sse-42" resolve-label
-        int-regs return-reg 42 MOV
+        return-reg 42 MOV
         "end" get JMP
 
         "sse-41" resolve-label
-        int-regs return-reg 41 MOV
+        return-reg 41 MOV
         "end" get JMP
 
         "ssse-3" resolve-label
-        int-regs return-reg 33 MOV
+        return-reg 33 MOV
         "end" get JMP
 
         "sse-3" resolve-label
-        int-regs return-reg 30 MOV
+        return-reg 30 MOV
         "end" get JMP
 
         "sse-2" resolve-label
-        int-regs return-reg 20 MOV
+        return-reg 20 MOV
         "end" get JMP
 
         "sse-1" resolve-label
-        int-regs return-reg 10 MOV
+        return-reg 10 MOV
 
         "end" resolve-label
     ] alien-assembly ;

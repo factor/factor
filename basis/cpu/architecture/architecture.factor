@@ -150,9 +150,6 @@ SINGLETONS: int-regs float-regs ;
 UNION: reg-class int-regs float-regs ;
 CONSTANT: reg-classes { int-regs float-regs }
 
-! A pseudo-register class for parameters spilled on the stack
-SINGLETON: stack-params
-
 ! On x86, vectors and floats are stored in the same register bank
 ! On PowerPC they are distinct
 HOOK: vector-regs cpu ( -- reg-class )
@@ -165,7 +162,6 @@ M: float-rep reg-class-of drop float-regs ;
 M: double-rep reg-class-of drop float-regs ;
 M: vector-rep reg-class-of drop vector-regs ;
 M: scalar-rep reg-class-of drop vector-regs ;
-M: stack-params reg-class-of drop stack-params ;
 
 GENERIC: rep-size ( rep -- n ) foldable
 
@@ -173,7 +169,6 @@ M: tagged-rep rep-size drop cell ;
 M: int-rep rep-size drop cell ;
 M: float-rep rep-size drop 4 ;
 M: double-rep rep-size drop 8 ;
-M: stack-params rep-size drop cell ;
 M: vector-rep rep-size drop 16 ;
 M: char-scalar-rep rep-size drop 1 ;
 M: uchar-scalar-rep rep-size drop 1 ;
@@ -507,22 +502,6 @@ HOOK: %reload cpu ( dst rep src -- )
 
 HOOK: %loop-entry cpu ( -- )
 
-! FFI stuff
-
-! Return values of this class go here
-GENERIC: return-reg ( reg-class -- reg )
-
-! Sequence of registers used for parameter passing in class
-GENERIC# param-regs 1 ( reg-class abi -- regs )
-
-M: stack-params param-regs 2drop f ;
-
-GENERIC# param-reg 1 ( n reg-class abi -- reg )
-
-M: reg-class param-reg param-regs nth ;
-
-M: stack-params param-reg 2drop ;
-
 ! Does this architecture support %load-float, %load-double,
 ! and %load-vector?
 HOOK: fused-unboxing? cpu ( -- ? )
@@ -551,6 +530,14 @@ M: object immediate-comparand? ( n -- ? )
 
 : immediate-shift-count? ( n -- ? )
     0 cell-bits 1 - between? ;
+
+! FFI stuff
+
+! Return values of this class go here
+HOOK: return-regs cpu ( -- regs )
+
+! Registers used for parameter passing
+HOOK: param-regs cpu ( abi -- regs )
 
 ! Is this structure small enough to be returned in registers?
 HOOK: return-struct-in-registers? cpu ( c-type -- ? )
@@ -584,26 +571,16 @@ HOOK: %store-reg-param cpu ( src reg rep -- )
 
 HOOK: %store-stack-param cpu ( src n rep -- )
 
-HOOK: %store-return cpu ( src rep -- )
-
-HOOK: %store-struct-return cpu ( src reps -- )
-
-HOOK: %store-long-long-return cpu ( src1 src2 -- )
-
-HOOK: %prepare-struct-area cpu ( dst -- )
+HOOK: %prepare-struct-caller cpu ( dst -- )
 
 ! Call a function to convert a value into a tagged pointer,
 ! possibly allocating a bignum, float, or alien instance,
 ! which is then pushed on the data stack
-HOOK: %box cpu ( dst n rep func -- )
+HOOK: %box cpu ( dst src func rep -- )
 
-HOOK: %box-long-long cpu ( dst n func -- )
+HOOK: %box-long-long cpu ( dst src1 src2 func -- )
 
-HOOK: %box-small-struct cpu ( dst c-type -- )
-
-HOOK: %box-large-struct cpu ( dst n c-type -- )
-
-HOOK: %save-param-reg cpu ( stack reg rep -- )
+HOOK: %allot-byte-array cpu ( dst size -- )
 
 HOOK: %restore-context cpu ( temp1 temp2 -- )
 
@@ -616,6 +593,10 @@ HOOK: %cleanup cpu ( n -- )
 M: object %cleanup ( n -- ) drop ;
 
 HOOK: %alien-indirect cpu ( src -- )
+
+HOOK: %load-reg-param cpu ( dst reg rep -- )
+
+HOOK: %load-stack-param cpu ( dst n rep -- )
 
 HOOK: %begin-callback cpu ( -- )
 

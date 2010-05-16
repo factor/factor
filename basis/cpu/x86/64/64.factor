@@ -11,15 +11,20 @@ cpu.architecture vm ;
 FROM: layouts => cell cells ;
 IN: cpu.x86.64
 
-: param-reg-0 ( -- reg ) 0 int-regs cdecl param-reg ; inline
-: param-reg-1 ( -- reg ) 1 int-regs cdecl param-reg ; inline
-: param-reg-2 ( -- reg ) 2 int-regs cdecl param-reg ; inline
-: param-reg-3 ( -- reg ) 3 int-regs cdecl param-reg ; inline
+: param-reg ( n -- reg ) int-regs cdecl param-regs at nth ;
+
+: param-reg-0 ( -- reg ) 0 param-reg ; inline
+: param-reg-1 ( -- reg ) 1 param-reg ; inline
+: param-reg-2 ( -- reg ) 2 param-reg ; inline
+: param-reg-3 ( -- reg ) 3 param-reg ; inline
 
 M: x86.64 pic-tail-reg RBX ;
 
-M: int-regs return-reg drop RAX ;
-M: float-regs return-reg drop XMM0 ;
+M: x86.64 return-regs
+    {
+        { int-regs { RAX EDX } }
+        { float-regs { XMM0 XMM1 } }
+    } ;
 
 M: x86.64 ds-reg R14 ;
 M: x86.64 rs-reg R15 ;
@@ -49,17 +54,15 @@ M: x86.64 %vm-field ( dst offset -- )
 M:: x86.64 %load-vector ( dst val rep -- )
     dst 0 [RIP+] rep copy-memory* val rc-relative rel-binary-literal ;
 
-M: x86.64 %load-float ( dst val -- )
-    <float> float-rep %load-vector ;
-
-M: x86.64 %load-double ( dst val -- )
-    <double> double-rep %load-vector ;
-
 M: x86.64 %set-vm-field ( src offset -- )
     [ vm-reg ] dip [+] swap MOV ;
 
 M: x86.64 %vm-field-ptr ( dst offset -- )
     [ vm-reg ] dip [+] LEA ;
+
+! Must be a volatile register not used for parameter passing or
+! integer return
+HOOK: temp-reg cpu ( -- reg )
 
 M: x86.64 %prologue ( n -- )
     temp-reg -7 [RIP+] LEA
@@ -99,85 +102,29 @@ M:: x86.64 %dispatch ( src temp -- )
     [ (align-code) ]
     bi ;
 
+M:: x86.64 %load-reg-param ( dst reg rep -- )
+    dst reg rep %copy ;
+
+M:: x86.64 %store-reg-param ( src reg rep -- )
+    reg src rep %copy ;
+
 M:: x86.64 %unbox ( dst src func rep -- )
     param-reg-0 src tagged-rep %copy
     param-reg-1 %mov-vm-ptr
     func f %alien-invoke
-    dst rep reg-class-of return-reg rep %copy ;
+    dst rep %load-return ;
 
-: with-return-regs ( quot -- )
-    [
-        V{ RDX RAX } clone int-regs set
-        V{ XMM1 XMM0 } clone float-regs set
-        call
-    ] with-scope ; inline
-
-: each-struct-component ( c-type quot -- )
-    '[
-        flatten-struct-type
-        [ [ first ] dip @ ] each-index
-    ] with-return-regs ; inline
-
-: %unbox-struct-component ( rep i -- )
-    R11 swap cells [+] swap reg-class-of {
-        { int-regs [ int-regs get pop swap MOV ] }
-        { float-regs [ float-regs get pop swap MOVSD ] }
-    } case ;
-
-M:: x86.64 %store-return ( src rep -- )
-    rep reg-class-of return-reg src rep %copy ;
-
-M:: x86.64 %store-struct-return ( src c-type -- )
-    ! Move src to R11 so that we don't clobber it.
-    R11 src int-rep %copy
-    c-type [ %unbox-struct-component ] each-struct-component ;
-
-M: stack-params copy-register*
-    drop
-    {
-        { [ dup  integer? ] [ R11 swap next-stack@ MOV  R11 MOV ] }
-        { [ over integer? ] [ R11 swap MOV              param@ R11 MOV ] }
-    } cond ;
-
-M: x86.64 %save-param-reg [ param@ ] 2dip %copy ;
-
-M:: x86.64 %box ( dst n rep func -- )
-    0 rep reg-class-of cdecl param-reg
-    n [ n param@ ] [ rep reg-class-of return-reg ] if rep %copy
+M:: x86.64 %box ( dst src func rep -- )
+    0 rep reg-class-of cdecl param-regs at nth src rep %copy
     rep int-rep? os windows? or param-reg-1 param-reg-0 ? %mov-vm-ptr
     func f %alien-invoke
-    dst RAX tagged-rep %copy ;
+    dst int-rep %load-return ;
 
-: box-struct-component@ ( i -- operand ) 1 + cells param@ ;
-
-: %box-struct-component ( rep i -- )
-    box-struct-component@ swap reg-class-of {
-        { int-regs [ int-regs get pop MOV ] }
-        { float-regs [ float-regs get pop MOVSD ] }
-    } case ;
-
-M:: x86.64 %box-small-struct ( dst c-type -- )
-    #! Box a <= 16-byte struct.
-    c-type [ %box-struct-component ] each-struct-component
-    param-reg-2 c-type heap-size MOV
-    param-reg-0 0 box-struct-component@ MOV
-    param-reg-1 1 box-struct-component@ MOV
-    param-reg-3 %mov-vm-ptr
-    "from_small_struct" f %alien-invoke
-    dst RAX tagged-rep %copy ;
-
-M: x86.64 struct-return@ ( n -- operand )
-    [ stack-frame get params>> ] unless* param@ ;
-
-M:: x86.64 %box-large-struct ( dst n c-type -- )
-    ! Struct size is parameter 2
-    param-reg-1 c-type heap-size MOV
-    ! Compute destination address
-    param-reg-0 n struct-return@ LEA
-    param-reg-2 %mov-vm-ptr
-    ! Copy the struct from the C stack
-    "from_value_struct" f %alien-invoke
-    dst RAX tagged-rep %copy ;
+M:: x86.64 %allot-byte-array ( dst size -- )
+    param-reg-0 size MOV
+    param-reg-1 %mov-vm-ptr
+    "allot_byte_array" f %alien-invoke
+    dst int-rep %load-return ;
 
 M: x86.64 %alien-invoke
     R11 0 MOV
@@ -198,15 +145,12 @@ M: x86.64 %end-callback ( -- )
     "end_callback" f %alien-invoke ;
 
 : float-function-param ( i src -- )
-    [ float-regs cdecl param-regs nth ] dip double-rep %copy ;
-
-: float-function-return ( reg -- )
-    float-regs return-reg double-rep %copy ;
+    [ float-regs cdecl param-regs at nth ] dip double-rep %copy ;
 
 M:: x86.64 %unary-float-function ( dst src func -- )
     0 src float-function-param
     func "libm" load-library %alien-invoke
-    dst float-function-return ;
+    dst double-rep %load-return ;
 
 M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
     ! src1 might equal dst; otherwise it will be a spill slot
@@ -214,7 +158,7 @@ M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
     0 src1 float-function-param
     1 src2 float-function-param
     func "libm" load-library %alien-invoke
-    dst float-function-return ;
+    dst double-rep %load-return ;
 
 M:: x86.64 %call-gc ( gc-roots -- )
     param-reg-0 gc-roots gc-root-offsets %load-reference
