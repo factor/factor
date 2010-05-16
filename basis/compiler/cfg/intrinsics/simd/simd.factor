@@ -303,7 +303,10 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
     [ ^^scalar>vector ] keep [ 0 ] dip ^broadcast-vector ;
 
 : ^select-vector ( src n rep -- dst )
-    [ ^broadcast-vector ] keep ^^vector>scalar ;
+    {
+        [ ^^select-vector ]
+        [ [ ^broadcast-vector ] keep ^^vector>scalar ]
+    } vl-vector-op ;
 
 ! intrinsic emitters
 
