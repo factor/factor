@@ -593,12 +593,14 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 
 : emit-simd-gather-2 ( node -- )
     {
+        { fixnum-vector-rep [ ^^gather-int-vector-2 ] }
         { fixnum-vector-rep [ ^^gather-vector-2 ] }
         { float-vector-rep  [ ^^gather-vector-2 ] }
     } emit-vv-vector-op ;
 
 : emit-simd-gather-4 ( node -- )
     {
+        { fixnum-vector-rep [ ^^gather-int-vector-4 ] }
         { fixnum-vector-rep [ ^^gather-vector-4 ] }
         { float-vector-rep  [ ^^gather-vector-4 ] }
     } emit-vvvv-vector-op ;
