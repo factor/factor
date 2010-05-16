@@ -1,15 +1,16 @@
 ! Copyright (C) 2007, 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors images images.loader io.pathnames kernel
-models namespaces opengl opengl.gl opengl.textures sequences
+models namespaces opengl opengl.gl opengl.textures opengl.textures.private
+sequences math arrays
 strings ui ui.gadgets ui.gadgets.panes ui.images ui.render
 constructors locals combinators.short-circuit 
-literals ;
+literals destructors ui.gadgets.worlds continuations ;
 IN: images.viewer
 
 TUPLE: image-gadget < gadget image texture ;
 <PRIVATE
-M: image-gadget pref-dim* image>> dim>> ;
+M: image-gadget pref-dim* image>> [ dim>> ] [ { 640 480 } ] if* ;
 
 : (image-gadget-texture) ( gadget -- texture )
     dup image>> { 0 0 } <texture> >>texture texture>> ;
@@ -24,42 +25,42 @@ M: image-gadget draw-gadget* ( gadget -- )
     ] if ;
 
 : delete-current-texture ( image-gadget -- )
-    [ texture>> [ texture>> [ delete-texture ] when* ] when* ]
+    [ texture>> [ dispose ] when* ]
     [ f >>texture drop ] bi ;
 
-M: image-gadget ungraft* delete-current-texture ;
+! In unit tests, find-gl-context throws no-world-found when using with-grafted-gadget.
+M: image-gadget ungraft* [ dup find-gl-context delete-current-texture ] [ 2drop ] recover ;
 PRIVATE>
 TUPLE: image-control < image-gadget image-updated? ;
 <PRIVATE
 
 : (bind-2d-texture) ( texture-id -- )
     [ GL_TEXTURE_2D ] dip glBindTexture ;
-: bind-2d-texture ( texture -- )
+: bind-2d-texture ( single-texture -- )
     texture>> (bind-2d-texture) ;
-: (update-texture) ( image texture -- ) 
-    bind-2d-texture
-    [ GL_TEXTURE_2D 0 0 0 ] dip
-    [ dim>> first2 ]
-    [ [ component-order>> ] [ component-type>> ] bi image-data-format ]
-    [ bitmap>> ] tri
-    glTexSubImage2D ;
+: (update-texture) ( image single-texture -- ) 
+    bind-2d-texture tex-sub-image ;
+! works only for single-texture
 : update-texture ( image-gadget -- )
     [ image>> ] [ texture>> ] bi
     (update-texture) ;
-: (texture-size) ( texture-id -- size )
-    (bind-2d-texture) GL_TEXTURE_2D 0 
-    ${ GL_TEXTURE_WIDTH GL_TEXTURE_HEIGHT } [ get-texture-int ] with with map ;
-: texture-size ( image-gadget -- size/f )
-    texture>> [
-        texture>> [
-            (texture-size)
-        ] [ { 0 0 } ] if*
-    ] [ f ] if* ;
+GENERIC: texture-size ( texture -- dim )
+M: single-texture texture-size dim>> ;
+
+:: grid-width ( grid element-quot -- width )
+    grid [ 0 ] [
+        first element-quot [ + ] map-reduce
+    ] if-empty ; inline
+: grid-dim ( grid -- dim )
+    [ [ dim>> first ] grid-width ] [ flip [ dim>> second ] grid-width ] bi 2array ;
+M: multi-texture texture-size 
+    grid>> grid-dim ;
 : same-size? ( image-gadget -- ? )
-    [ texture-size ] [ image>> dim>> ] bi = ;
+    [ texture>> texture-size ] [ image>> dim>> ] bi = ;
 : (texture-format) ( texture-id -- format )
     (bind-2d-texture) GL_TEXTURE_2D 0
     GL_TEXTURE_INTERNAL_FORMAT get-texture-int ;
+! works only for single-texture
 : texture-format ( image-gadget -- format/f )
     texture>> [
         texture>> [
@@ -68,15 +69,18 @@ TUPLE: image-control < image-gadget image-updated? ;
     ] [ f ] if* ;
 : same-internal-format? ( image-gadget -- ? ) 
    [ texture-format ] [ image>> image-format 2drop ] bi = ;
+
+! TODO: also keep multitextures if possible ?
 : keep-same-texture? ( image-gadget -- ? )
-    { [ same-size? ] [ same-internal-format? ] } 1&& ;
+    { [ texture>> single-texture? ]
+      [ same-size? ]
+      [ same-internal-format? ] } 1&& ;
 : ?update-texture ( image-gadget -- )
     dup image-updated?>> [
         f >>image-updated?
         dup keep-same-texture? [ update-texture ] [ delete-current-texture ] if
     ] [ drop ] if ;
 
-M: image-control pref-dim* image>> [ dim>> ] [ { 640 480 } ] if* ;
 M: image-control model-changed
     swap value>> >>image t >>image-updated? relayout ;
 M: image-control draw-gadget* [ ?update-texture ] [ call-next-method ] bi ;
