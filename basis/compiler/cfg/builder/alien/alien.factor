@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays layouts math math.order math.parser
+USING: accessors assocs arrays layouts math math.order math.parser
 combinators combinators.short-circuit fry make sequences
 sequences.generalizations alien alien.private alien.strings
 alien.c-types alien.libraries classes.struct namespaces kernel
@@ -151,7 +151,9 @@ M: #alien-assembly emit-node
     [
         [ [ first2 callee-parameter ] 1 2 mnmap ] 1 2 mnmap
         concat [ ##load-reg-param? ] partition [ % ] bi@
-    ] keep ;
+    ]
+    [ [ keys ] map ]
+    bi ;
 
 : box-parameters ( vregs reps params -- )
     ##begin-callback
