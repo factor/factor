@@ -20,4 +20,6 @@ template<typename Type> byte_array *factor_vm::byte_array_from_value(Type *value
 	return data;
 }
 
+VM_C_API cell allot_byte_array(cell size, factor_vm *parent);
+
 }

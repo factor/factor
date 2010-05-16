@@ -38,11 +38,7 @@ HOOK: extra-stack-space cpu ( stack-frame -- n )
     stack-frame get extra-stack-space +
     reserved-stack-space + ;
 
-: special@ ( n -- op ) special-offset stack@ ;
-
-: spill@ ( n -- op ) spill-offset special@ ;
-
-: param@ ( n -- op ) reserved-stack-space + stack@ ;
+: spill@ ( n -- op ) spill-offset special-offset stack@ ;
 
 : gc-root-offsets ( seq -- seq' )
     [ n>> spill-offset special-offset cell + ] map f like ;
@@ -62,10 +58,6 @@ M: x86 stack-frame-size ( stack-frame -- i )
     3 cells +
     align-stack ;
 
-! Must be a volatile register not used for parameter passing or
-! integer return
-HOOK: temp-reg cpu ( -- reg )
-
 HOOK: pic-tail-reg cpu ( -- reg )
 
 M: x86 complex-addressing? t ;
@@ -82,6 +74,12 @@ M: x86 %load-reference
     [ swap 0 MOV rc-absolute-cell rel-literal ]
     [ \ f type-number MOV ]
     if* ;
+
+M: x86 %load-float ( dst val -- )
+    <float> float-rep %load-vector ;
+
+M: x86 %load-double ( dst val -- )
+    <double> double-rep %load-vector ;
 
 HOOK: ds-reg cpu ( -- reg )
 HOOK: rs-reg cpu ( -- reg )
@@ -1500,16 +1498,27 @@ M:: x86 %spill ( src rep dst -- )
 M:: x86 %reload ( dst rep src -- )
     dst src rep %copy ;
 
-M:: x86 %store-reg-param ( src reg rep -- )
-    reg src rep %copy ;
-
 M:: x86 %store-stack-param ( src n rep -- )
-    n param@ src rep %copy ;
+    n reserved-stack-space + stack@ src rep %copy ;
 
-HOOK: struct-return@ cpu ( n -- operand )
+: %load-return ( dst rep -- )
+    [ reg-class-of return-regs at first ] keep %load-reg-param ;
 
-M: x86 %prepare-struct-area ( dst -- )
-    f struct-return@ LEA ;
+: %store-return ( dst rep -- )
+    [ reg-class-of return-regs at first ] keep %store-reg-param ;
+
+: next-stack@ ( n -- operand )
+    #! nth parameter from the next stack frame. Used to box
+    #! input values to callbacks; the callback has its own
+    #! stack frame set up, and we want to read the frame
+    #! set up by the caller.
+    frame-reg swap 2 cells + [+] ;
+
+M:: x86 %load-stack-param ( dst n rep -- )
+    dst n next-stack@ rep %copy ;
+
+M: x86 %prepare-struct-caller ( dst -- )
+    return-offset special-offset stack@ LEA ;
 
 M: x86 %alien-indirect ( src -- )
     ?spill-slot CALL ;
@@ -1539,13 +1548,6 @@ M: x86 immediate-arithmetic? ( n -- ? )
 
 M: x86 immediate-bitwise? ( n -- ? )
     HEX: -80000000 HEX: 7fffffff between? ;
-
-: next-stack@ ( n -- operand )
-    #! nth parameter from the next stack frame. Used to box
-    #! input values to callbacks; the callback has its own
-    #! stack frame set up, and we want to read the frame
-    #! set up by the caller.
-    frame-reg swap 2 cells + [+] ;
 
 enable-min/max
 enable-log2
