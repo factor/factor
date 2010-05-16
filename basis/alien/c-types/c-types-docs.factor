@@ -14,11 +14,6 @@ HELP: heap-size
 }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
-HELP: stack-size
-{ $values { "name" "a C type name" } { "size" math:integer } }
-{ $description "Outputs the number of bytes to reserve on the C stack by a value of this C type. In most cases this is equal to " { $link heap-size } ", except on some platforms where C structs are passed by invisible reference, in which case a C struct type only uses as much space as a pointer on the C stack." }
-{ $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
-
 HELP: <c-type>
 { $values { "c-type" c-type } }
 { $description "Creates a prototypical C type. User code should use higher-level facilities to define C types; see " { $link "c-data" } "." } ;

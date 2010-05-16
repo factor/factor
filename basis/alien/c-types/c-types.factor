@@ -17,8 +17,7 @@ SYMBOLS:
     long ulong
     longlong ulonglong
     float double
-    void* bool
-    (stack-value) ;
+    void* bool ;
 
 SINGLETON: void
 
@@ -114,10 +113,6 @@ GENERIC: heap-size ( name -- size )
 
 M: abstract-c-type heap-size size>> ;
 
-GENERIC: stack-size ( name -- size )
-
-M: c-type stack-size size>> cell align ;
-
 MIXIN: value-type
 
 : c-getter ( name -- quot )
@@ -144,8 +139,7 @@ PROTOCOL: c-type-protocol
     c-type-align
     c-type-align-first
     base-type
-    heap-size
-    stack-size ;
+    heap-size ;
 
 CONSULT: c-type-protocol c-type-name
     c-type ;
@@ -447,9 +441,6 @@ M: pointer c-type
         [ c-bool> ] >>boxer-quot
         object >>boxed-class
     \ bool define-primitive-type
-
-    \ void* c-type clone stack-params >>rep
-    \ (stack-value) define-primitive-type
 
 ] with-compilation-unit
 

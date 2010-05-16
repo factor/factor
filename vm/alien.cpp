@@ -187,47 +187,4 @@ VM_C_API char *alien_offset(cell obj, factor_vm *parent)
 	return parent->alien_offset(obj);
 }
 
-/* For FFI callbacks receiving structs by value */
-cell factor_vm::from_value_struct(void *src, cell size)
-{
-	byte_array *bytes = allot_byte_array(size);
-	memcpy(bytes->data<void>(),src,size);
-	return tag<byte_array>(bytes);
-}
-
-VM_C_API cell from_value_struct(void *src, cell size, factor_vm *parent)
-{
-	return parent->from_value_struct(src,size);
-}
-
-/* On some x86 OSes, structs <= 8 bytes are returned in registers. */
-cell factor_vm::from_small_struct(cell x, cell y, cell size)
-{
-	cell data[2];
-	data[0] = x;
-	data[1] = y;
-	return from_value_struct(data,size);
-}
-
-VM_C_API cell from_small_struct(cell x, cell y, cell size, factor_vm *parent)
-{
-	return parent->from_small_struct(x,y,size);
-}
-
-/* On OS X/PPC, complex numbers are returned in registers. */
-cell factor_vm::from_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size)
-{
-	cell data[4];
-	data[0] = x1;
-	data[1] = x2;
-	data[2] = x3;
-	data[3] = x4;
-	return from_value_struct(data,size);
-}
-
-VM_C_API cell from_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size, factor_vm *parent)
-{
-	return parent->from_medium_struct(x1, x2, x3, x4, size);
-}
-
 }

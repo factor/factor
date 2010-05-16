@@ -24,8 +24,6 @@ M: array c-type-align-first first c-type-align-first ;
 
 M: array base-type drop void* base-type ;
 
-M: array stack-size drop void* stack-size ;
-
 PREDICATE: string-type < pair
     first2 [ c-string = ] [ word? ] bi* and ;
 
@@ -42,8 +40,6 @@ M: string-type c-type-align drop void* c-type-align ;
 M: string-type c-type-align-first drop void* c-type-align-first ;
 
 M: string-type base-type drop void* base-type ;
-
-M: string-type stack-size drop void* stack-size ;
 
 M: string-type c-type-rep drop int-rep ;
 
