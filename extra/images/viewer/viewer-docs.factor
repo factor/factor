@@ -88,7 +88,11 @@ $nl
 " This means images can be set even after the gadget has been grafted. Grafted gadgets without an image will display a blank screen."
 
 { $notes "The image can be set after the gadget has been grafted. However, for " { $instance image-gadget } ", this can "
-" be done only once. If your image is changing, you should be using " { $instance image-control } " and " { $instance model } "." }
+" be done only once. If your image is changing, you should be using " { $instance image-control } " and " { $instance model } "." 
+$nl
+" Performance will be greatly reduced if you are using images that have more than 512 pixels on one of their"
+" axis." }
+
 
 $nl
 "Utility words for displaying images :"
