@@ -294,6 +294,7 @@ CODEGEN: ##prepare-struct-caller %prepare-struct-caller
 CODEGEN: ##box %box
 CODEGEN: ##box-long-long %box-long-long
 CODEGEN: ##allot-byte-array %allot-byte-array
+CODEGEN: ##prepare-var-args %prepare-var-args
 CODEGEN: ##alien-invoke %alien-invoke
 CODEGEN: ##cleanup %cleanup
 CODEGEN: ##alien-indirect %alien-indirect
