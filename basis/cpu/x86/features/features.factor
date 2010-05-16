@@ -88,11 +88,11 @@ MEMO: sse-version ( -- n )
 
 : popcnt? ( -- ? )
     bool { } cdecl [
-        int-regs return-reg 1 MOV
+        return-reg 1 MOV
         CPUID
         ECX 23 BT
-        int-regs return-reg dup XOR
-        int-regs return-reg SETB
+        return-reg dup XOR
+        return-reg SETB
     ] alien-assembly ;
 
 : sse-string ( version -- string )

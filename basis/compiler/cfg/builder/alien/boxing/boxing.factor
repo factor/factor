@@ -85,7 +85,7 @@ M: long-long-type unbox-return (unbox-return) store-return ;
 
 M: struct-c-type unbox-return
     dup return-struct-in-registers?
-    [ unbox keys store-return ]
+    [ (unbox-return) store-return ]
     [ [ struct-return-area get ] 2dip (unbox-return) implode-struct ] if ;
 
 GENERIC: flatten-parameter-type ( c-type -- reps )
@@ -121,8 +121,7 @@ GENERIC: box-return ( c-type -- dst )
 : load-return ( c-type -- vregs reps )
     [
         flatten-c-type keys
-        [ [ [ next-return-reg ] keep ^^load-reg-param ] keep ]
-        1 2 mnmap
+        [ [ [ next-return-reg ] keep ^^load-reg-param ] map ] keep
     ] with-return-regs ;
 
 M: c-type box-return [ load-return ] keep box ;
