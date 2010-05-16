@@ -184,6 +184,7 @@ CODEGEN: ##gather-vector-2 %gather-vector-2
 CODEGEN: ##gather-vector-4 %gather-vector-4
 CODEGEN: ##gather-int-vector-2 %gather-int-vector-2
 CODEGEN: ##gather-int-vector-4 %gather-int-vector-4
+CODEGEN: ##select-vector %select-vector
 CODEGEN: ##shuffle-vector-imm %shuffle-vector-imm
 CODEGEN: ##shuffle-vector-halves-imm %shuffle-vector-halves-imm
 CODEGEN: ##shuffle-vector %shuffle-vector
