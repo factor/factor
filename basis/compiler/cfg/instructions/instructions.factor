@@ -310,6 +310,11 @@ def: dst
 use: src1/int-rep src2/int-rep src3/int-rep src4/int-rep
 literal: rep ;
 
+PURE-INSN: ##select-vector
+def: dst/int-rep
+use: src
+literal: n rep ;
+
 PURE-INSN: ##shuffle-vector
 def: dst
 use: src shuffle
