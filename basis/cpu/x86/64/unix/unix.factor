@@ -7,9 +7,6 @@ cpu.x86 cpu.x86.64 compiler.cfg.builder.alien
 compiler.cfg.builder.alien.boxing compiler.cfg.registers ;
 IN: cpu.x86.64.unix
 
-M: int-regs param-regs
-    2drop { RDI RSI RDX RCX R8 R9 } ;
-
 M: x86.64 param-regs
     drop {
         { int-regs { RDI RSI RDX RCX R8 R9 } }
