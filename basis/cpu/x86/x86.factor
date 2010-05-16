@@ -781,6 +781,51 @@ M: x86.64 %gather-int-vector-2-reps
         { sse4.1? { longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
+:: %select-vector-32 ( dst src n rep -- )
+    rep {
+        { char-16-rep [
+            dst 32-bit-version-of src n PEXTRB
+            dst dst 8-bit-version-of MOVSX
+        ] }
+        { uchar-16-rep [
+            dst 32-bit-version-of src n PEXTRB
+        ] }
+        { short-8-rep [
+            dst 32-bit-version-of src n PEXTRW
+            dst dst 16-bit-version-of MOVSX
+        ] }
+        { ushort-8-rep [
+            dst 32-bit-version-of src n PEXTRW
+        ] }
+        { int-4-rep [
+            dst 32-bit-version-of src n PEXTRD
+            dst dst 32-bit-version-of 2dup = [ 2drop ] [ MOVSX ] if
+        ] }
+        { uint-4-rep [
+            dst 32-bit-version-of src n PEXTRD
+        ] }
+    } case ;
+
+M: x86.32 %select-vector
+    %select-vector-32 ;
+
+M: x86.32 %select-vector-reps
+    {
+        { sse4.1? { uchar-16-rep char-16-rep ushort-8-rep short-8-rep uint-4-rep int-4-rep } }
+    } available-reps ;
+
+M: x86.64 %select-vector
+    {
+        { longlong-2-rep  [ PEXTRQ ] }
+        { ulonglong-2-rep [ PEXTRQ ] }
+        [ %select-vector-32 ]
+    } case ;
+
+M: x86.64 %select-vector-reps
+    {
+        { sse4.1? { uchar-16-rep char-16-rep ushort-8-rep short-8-rep uint-4-rep int-4-rep ulonglong-2-rep longlong-2-rep } }
+    } available-reps ;
+
 : sse1-float-4-shuffle ( dst shuffle -- )
     {
         { { 0 1 2 3 } [ drop ] }
