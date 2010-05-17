@@ -439,6 +439,97 @@ PRIVATE>
 : FNCLEX ( -- ) HEX: db , HEX: e2 , ;
 : FNINIT ( -- ) HEX: db , HEX: e3 , ;
 
+ERROR: bad-x87-operands ;
+
+<PRIVATE
+
+:: (x87-op) ( operand opcode reg -- )
+    opcode ,
+    BIN: 1100,0000 reg
+    3 shift bitor
+    operand reg-code bitor , ;
+
+:: x87-st0-op ( dst src opcode reg -- )
+    dst ST0 = src register? and
+    [ src opcode reg (x87-op) ]
+    [ bad-x87-operands ] if ;
+
+:: x87-m-st0/n-op ( dst src opcode reg -- )
+    {
+        { [ dst ST0 = src indirect? and ] [
+            src { reg f opcode } 1-operand
+        ] }
+        { [ dst ST0 = src register? and ] [
+            src opcode reg (x87-op)
+        ] }
+        { [ src ST0 = dst register? and ] [
+            dst opcode 4 + reg (x87-op)
+        ] }
+        [ bad-x87-operands ]
+    } cond ;
+
+PRIVATE>
+
+: F2XM1 ( -- ) { HEX: D9 HEX: F0 } % ;
+: FABS ( -- ) { HEX: D9 HEX: E1 } % ;
+: FADD ( dst src -- ) HEX: D8 0 x87-m-st0/n-op ;
+: FCHS ( -- ) { HEX: D9 HEX: E0 } % ;
+
+: FCMOVB   ( dst src -- ) HEX: DA 0 x87-st0-op ;
+: FCMOVE   ( dst src -- ) HEX: DA 1 x87-st0-op ;
+: FCMOVBE  ( dst src -- ) HEX: DA 2 x87-st0-op ;
+: FCMOVU   ( dst src -- ) HEX: DA 3 x87-st0-op ;
+: FCMOVNB  ( dst src -- ) HEX: DB 0 x87-st0-op ;
+: FCMOVNE  ( dst src -- ) HEX: DB 1 x87-st0-op ;
+: FCMOVNBE ( dst src -- ) HEX: DB 2 x87-st0-op ;
+: FCMOVNU  ( dst src -- ) HEX: DB 3 x87-st0-op ;
+
+: FCOMI ( a b -- ) HEX: DB 6 x87-st0-op ;
+: FUCOMI ( a b -- ) HEX: DB 5 x87-st0-op ;
+: FCOS ( -- ) { HEX: D9 HEX: FF } % ;
+: FDECSTP ( -- ) { HEX: D9 HEX: F6 } % ;
+: FINCSTP ( -- ) { HEX: D9 HEX: F7 } % ;
+: FDIV  ( dst src -- ) HEX: D8 6 x87-m-st0/n-op ;
+: FDIVR ( dst src -- ) HEX: D8 7 x87-m-st0/n-op ;
+
+: FILDD ( src -- )  { BIN: 000 f HEX: DB } 1-operand ;
+: FILDQ ( src -- )  { BIN: 101 f HEX: DF } 1-operand ;
+: FISTPD ( dst -- ) { BIN: 011 f HEX: DB } 1-operand ;
+: FISTPQ ( dst -- ) { BIN: 111 f HEX: DF } 1-operand ;
+
+: FLD    ( dst src -- ) HEX: D9 0 x87-st0-op ;
+: FLD1   ( -- ) { HEX: D9 HEX: E8 } % ;
+: FLDL2T ( -- ) { HEX: D9 HEX: E9 } % ;
+: FLDL2E ( -- ) { HEX: D9 HEX: EA } % ;
+: FLDPI  ( -- ) { HEX: D9 HEX: EB } % ;
+: FLDLG2 ( -- ) { HEX: D9 HEX: EC } % ;
+: FLDLN2 ( -- ) { HEX: D9 HEX: ED } % ;
+: FLDZ   ( -- ) { HEX: D9 HEX: EE } % ;
+
+: FMUL ( dst src -- ) HEX: D8 1 x87-m-st0/n-op ;
+: FNOP ( -- ) { HEX: D9 HEX: D0 } % ;
+: FPATAN ( -- ) { HEX: D9 HEX: F3 } % ;
+: FPREM  ( -- ) { HEX: D9 HEX: F8 } % ;
+: FPREM1 ( -- ) { HEX: D9 HEX: F5 } % ;
+: FRNDINT ( -- ) { HEX: D9 HEX: FC } % ;
+: FSCALE ( -- ) { HEX: D9 HEX: FD } % ;
+: FSIN ( -- ) { HEX: D9 HEX: FE } % ;
+: FSINCOS ( -- ) { HEX: D9 HEX: FB } % ;
+: FSQRT ( -- ) { HEX: D9 HEX: FA } % ;
+
+: FSUB  ( dst src -- ) HEX: D8 HEX: 4 x87-m-st0/n-op ;
+: FSUBR ( dst src -- ) HEX: D8 HEX: 5 x87-m-st0/n-op ;
+
+: FST  ( dst src -- ) swap HEX: DD 2 x87-st0-op ;
+: FSTP ( dst src -- ) swap HEX: DD 3 x87-st0-op ;
+
+: FXAM ( -- ) { HEX: D9 HEX: E5 } % ;
+: FXCH ( dst src -- ) HEX: D9 1 x87-st0-op ;
+
+: FXTRACT ( -- ) { HEX: D9 HEX: F4 } % ;
+: FYL2X ( -- ) { HEX: D9 HEX: F1 } % ;
+: FYL2XP1 ( -- ) { HEX: D9 HEX: F1 } % ;
+
 ! SSE multimedia instructions
 
 <PRIVATE
