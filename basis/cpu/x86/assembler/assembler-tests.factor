@@ -204,6 +204,15 @@ cell 4 = [
 [ { HEX: 0f HEX: b3 HEX: d8 } ] [ [ EAX EBX BTR ] { } make ] unit-test
 [ { HEX: 0f HEX: a3 HEX: 18 } ] [ [ EAX [] EBX BT ] { } make ] unit-test
 
+! x87 instructions
+
+[ { HEX: D8 HEX: C5 } ] [ [ ST0 ST5 FADD ] { } make ] unit-test
+[ { HEX: DC HEX: C5 } ] [ [ ST5 ST0 FADD ] { } make ] unit-test
+[ { HEX: D8 HEX: 00 } ] [ [ ST0 EAX [] FADD ] { } make ] unit-test
+
+[ { HEX: D9 HEX: C2 } ] [ [ ST0 ST2 FLD  ] { } make ] unit-test
+[ { HEX: DD HEX: D2 } ] [ [ ST2 ST0 FST  ] { } make ] unit-test
+[ { HEX: DD HEX: DA } ] [ [ ST2 ST0 FSTP ] { } make ] unit-test
 
 [ { 15 183 195 } ] [ [ EAX BX MOVZX ] { } make ] unit-test
 
