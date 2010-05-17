@@ -70,6 +70,9 @@ IN: cuda.devices
 : up/i ( x y -- z )
     [ 1 - + ] keep /i ; inline
 
+: context-device-properties ( -- props )
+    context-device cuda-device-properties ; inline
+
 :: (distribute-jobs) ( job-count per-job-shared max-shared-size max-block-size
                        -- grid-size block-size per-block-shared )
     per-job-shared [ max-block-size ] [ max-shared-size swap /i max-block-size min ] if-zero
@@ -81,6 +84,6 @@ IN: cuda.devices
     grid-size block-size per-block-shared ; inline
 
 : distribute-jobs ( job-count per-job-shared -- launcher )
-    context-device cuda-device-properties 
-    [ sharedMemPerBlock>> ] [ maxThreadsDim>> first ] bi
+    context-device-properties
+    [ sharedMemPerBlock>> ] [ maxThreadsPerBlock>> ] bi
     (distribute-jobs) 3<<< ; inline
