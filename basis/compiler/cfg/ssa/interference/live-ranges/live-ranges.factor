@@ -25,15 +25,23 @@ SYMBOLS: local-def-indices local-kill-indices ;
         [ 1 + ] dip [ local-kill-indices get set-at ] with each
     ] if ;
 
-: visit-insn ( insn n -- )
-    2 * swap [ record-def ] [ record-uses ] 2bi ;
+GENERIC: record-insn ( n insn -- )
+
+M: ##phi record-insn
+    record-def ;
+
+M: vreg-insn record-insn
+    [ 2 * ] dip [ record-def ] [ record-uses ] 2bi ;
+
+M: insn record-insn
+    2drop ;
 
 SYMBOLS: def-indices kill-indices ;
 
 : compute-local-live-ranges ( bb -- )
     H{ } clone local-def-indices set
     H{ } clone local-kill-indices set
-    [ instructions>> [ visit-insn ] each-index ]
+    [ instructions>> [ swap record-insn ] each-index ]
     [ [ local-def-indices get ] dip def-indices get set-at ]
     [ [ local-kill-indices get ] dip kill-indices get set-at ]
     tri ;
