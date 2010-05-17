@@ -31,8 +31,6 @@ M: x86.64 rs-reg R15 ;
 M: x86.64 stack-reg RSP ;
 M: x86.64 frame-reg RBP ;
 
-M: x86.64 extra-stack-space drop 0 ;
-
 M: x86.64 machine-registers
     {
         { int-regs { RAX RCX RDX RBX RBP RSI RDI R8 R9 R10 R11 R12 } }

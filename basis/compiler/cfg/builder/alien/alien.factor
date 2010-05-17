@@ -96,8 +96,7 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
 : <alien-stack-frame> ( stack-size return -- stack-frame )
     stack-frame new
         swap return-size >>return
-        swap >>params
-        t >>calls-vm? ;
+        swap >>params ;
 
 : emit-stack-frame ( stack-size params -- )
     [ return>> ] [ abi>> ] bi

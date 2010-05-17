@@ -9,8 +9,7 @@ TUPLE: stack-frame
 { params integer }
 { return integer }
 { spill-area-size integer }
-{ total-size integer }
-{ calls-vm? boolean } ;
+{ total-size integer } ;
 
 ! Stack frame utilities
 : return-offset ( -- offset )
@@ -28,5 +27,4 @@ TUPLE: stack-frame
         [ [ params>> ] bi@ max >>params ]
         [ [ return>> ] bi@ max >>return ]
         [ [ spill-area-size>> ] bi@ max >>spill-area-size ]
-        [ [ calls-vm?>> ] bi@ or >>calls-vm? ]
     } 2cleave ;
