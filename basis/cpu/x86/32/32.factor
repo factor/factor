@@ -39,8 +39,6 @@ M: x86.32 %set-vm-field ( dst field -- )
 M: x86.32 %vm-field-ptr ( dst field -- )
     [ 0 MOV ] dip rc-absolute-cell rel-vm ;
 
-M: x86.32 extra-stack-space calls-vm?>> 16 0 ? ;
-
 M: x86.32 %mark-card
     drop HEX: ffffffff [+] card-mark <byte> MOV
     building get pop
@@ -70,6 +68,8 @@ M:: x86.32 %dispatch ( src temp -- )
 M: x86.32 pic-tail-reg EDX ;
 
 M: x86.32 reserved-stack-space 0 ;
+
+M: x86.32 vm-stack-space 16 ;
 
 : save-vm-ptr ( n -- )
     stack@ 0 MOV 0 rc-absolute-cell rel-vm ;

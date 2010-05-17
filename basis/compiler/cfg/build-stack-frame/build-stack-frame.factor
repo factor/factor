@@ -21,7 +21,7 @@ M: ##stack-frame compute-stack-frame*
 
 : vm-frame-required ( -- )
     frame-required
-    stack-frame new t >>calls-vm? request-stack-frame ;
+    stack-frame new vm-stack-space >>params request-stack-frame ;
 
 M: ##call-gc compute-stack-frame* drop vm-frame-required ;
 M: ##box compute-stack-frame* drop vm-frame-required ;

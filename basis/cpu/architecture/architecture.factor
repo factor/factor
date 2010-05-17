@@ -215,6 +215,11 @@ HOOK: machine-registers cpu ( -- assoc )
 ! Callbacks are not allowed to clobber this
 HOOK: frame-reg cpu ( -- reg )
 
+! Parameter space to reserve in anything making VM calls
+HOOK: vm-stack-space cpu ( -- n )
+
+M: object vm-stack-space 0 ;
+
 ! Specifies if %slot, %set-slot and %write-barrier accept the
 ! 'scale' and 'tag' parameters, and if %load-memory and
 ! %store-memory work
