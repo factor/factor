@@ -28,12 +28,9 @@ HOOK: stack-reg cpu ( -- reg )
 
 HOOK: reserved-stack-space cpu ( -- n )
 
-HOOK: extra-stack-space cpu ( stack-frame -- n )
-
 : stack@ ( n -- op ) stack-reg swap [+] ;
 
 : special-offset ( m -- n )
-    stack-frame get extra-stack-space +
     reserved-stack-space + ;
 
 : spill@ ( n -- op ) spill-offset special-offset stack@ ;
@@ -50,8 +47,7 @@ HOOK: extra-stack-space cpu ( stack-frame -- n )
 : align-stack ( n -- n' ) 16 align ;
 
 M: x86 stack-frame-size ( stack-frame -- i )
-    [ (stack-frame-size) ]
-    [ extra-stack-space ] bi +
+    (stack-frame-size)
     reserved-stack-space +
     3 cells +
     align-stack ;
