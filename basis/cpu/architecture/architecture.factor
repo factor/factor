@@ -296,6 +296,8 @@ HOOK: %binary-float-function cpu ( dst src1 src2 func -- )
 HOOK: %single>double-float cpu ( dst src -- )
 HOOK: %double>single-float cpu ( dst src -- )
 
+HOOK: integer-float-needs-stack-frame? cpu ( -- ? )
+
 HOOK: %integer>float cpu ( dst src -- )
 HOOK: %float>integer cpu ( dst src -- )
 
