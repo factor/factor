@@ -699,7 +699,7 @@ enable-fsqrt
 
 : check-sse ( -- )
     "Checking for multimedia extensions... " write flush
-    [ { (sse-version) popcnt? } compile ] with-optimizer
+    [ { (sse-version) } compile ] with-optimizer
     sse-version
     [ sse-string " detected" append print ]
     [ 20 < "cpu.x86.x87" "cpu.x86.sse" ? require ] bi ;
