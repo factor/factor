@@ -30,8 +30,3 @@ TUPLE: stack-frame
         [ [ spill-area-size>> ] bi@ max >>spill-area-size ]
         [ [ calls-vm?>> ] bi@ or >>calls-vm? ]
     } 2cleave ;
-
-! PowerPC backend sets frame-required? for ##integer>float too
-\ ##spill t "frame-required?" set-word-prop
-\ ##unary-float-function t "frame-required?" set-word-prop
-\ ##binary-float-function t "frame-required?" set-word-prop

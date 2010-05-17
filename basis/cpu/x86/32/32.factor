@@ -112,12 +112,12 @@ M: x86.32 %prepare-jump
         dst ESP [] sse-insn execute
         ESP 4 ADD
     ] [
-        dst x87-insn execute
+        dst ?spill-slot x87-insn execute
     ] if ; inline
 
 M: x86.32 %load-reg-param ( dst reg rep -- )
-    [ ?spill-slot ] dip {
-        { int-rep [ MOV ] }
+    {
+        { int-rep [ int-rep %copy ] }
         { float-rep [ drop \ FSTPS \ MOVSS load-float-return ] }
         { double-rep [ drop \ FSTPL \ MOVSD load-float-return ] }
     } case ;
@@ -129,14 +129,14 @@ M: x86.32 %load-reg-param ( dst reg rep -- )
         ESP [] x87-insn execute
         ESP 4 ADD
     ] [
-        src x87-insn execute
+        src ?spill-slot x87-insn execute
     ] if ; inline
 
 M: x86.32 %store-reg-param ( src reg rep -- )
-    [ ?spill-slot ] dip {
-        { int-rep [ swap MOV ] }
-        { float-rep [ \ FLDS \ MOVSS store-float-return ] }
-        { double-rep [ \ FLDL \ MOVSD store-float-return ] }
+    {
+        { int-rep [ swap int-rep %copy ] }
+        { float-rep [ drop \ FLDS \ MOVSS store-float-return ] }
+        { double-rep [ drop \ FLDL \ MOVSD store-float-return ] }
     } case ;
 
 :: call-unbox-func ( src func -- )
@@ -158,8 +158,10 @@ M:: x86.32 %box ( dst src func rep -- )
 
 M:: x86.32 %box-long-long ( dst src1 src2 func -- )
     8 save-vm-ptr
-    4 stack@ src1 int-rep %copy
-    0 stack@ src2 int-rep %copy
+    EAX src1 int-rep %copy
+    0 stack@ EAX int-rep %copy
+    EAX src2 int-rep %copy
+    4 stack@ EAX int-rep %copy
     func f %alien-invoke
     dst EAX tagged-rep %copy ;
 

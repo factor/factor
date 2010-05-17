@@ -178,9 +178,14 @@ M: #alien-assembly emit-node
     [ nip xt>> ] [ [ return>> ] [ abi>> ] bi stack-cleanup ] 2bi
     "stack-cleanup" set-word-prop ;
 
+: needs-frame-pointer ( -- )
+    cfg get t >>frame-pointer? drop ;
+
 M: #alien-callback emit-node
     dup params>> xt>> dup
     [
+        needs-frame-pointer
+
         ##prologue
         [
             {
