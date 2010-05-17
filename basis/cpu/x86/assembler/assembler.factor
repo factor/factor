@@ -496,6 +496,8 @@ PRIVATE>
 : FILDQ ( src -- )  { BIN: 101 f HEX: DF } 1-operand ;
 : FISTPD ( dst -- ) { BIN: 011 f HEX: DB } 1-operand ;
 : FISTPQ ( dst -- ) { BIN: 111 f HEX: DF } 1-operand ;
+: FISTTPD ( dst -- ) { BIN: 001 f HEX: DB } 1-operand ;
+: FISTTPQ ( dst -- ) { BIN: 001 f HEX: DF } 1-operand ;
 
 : FLD    ( dst src -- ) HEX: D9 0 x87-st0-op ;
 : FLD1   ( -- ) { HEX: D9 HEX: E8 } % ;

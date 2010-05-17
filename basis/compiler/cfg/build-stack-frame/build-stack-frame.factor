@@ -38,10 +38,10 @@ M: ##spill compute-stack-frame* drop frame-required ;
 M: ##reload compute-stack-frame* drop frame-required ;
 
 M: ##float>integer compute-stack-frame*
-    drop cpu ppc? [ frame-required ] when ;
+    drop integer-float-needs-stack-frame? [ frame-required ] when ;
 
 M: ##integer>float compute-stack-frame*
-    drop cpu ppc? [ frame-required ] when ;
+    drop integer-float-needs-stack-frame? [ frame-required ] when ;
 
 M: insn compute-stack-frame* drop ;
 

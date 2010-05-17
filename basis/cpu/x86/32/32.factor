@@ -7,15 +7,20 @@ words compiler.constants compiler.codegen.fixup
 compiler.cfg.instructions compiler.cfg.builder
 compiler.cfg.builder.alien.boxing compiler.cfg.intrinsics
 compiler.cfg.stack-frame cpu.x86.assembler
-cpu.x86.assembler.operands cpu.x86 cpu.architecture vm ;
+cpu.x86.assembler.operands cpu.x86 cpu.architecture vm vocabs ;
 FROM: layouts => cell ;
 IN: cpu.x86.32
 
+: x86-float-regs ( -- seq )
+    "cpu.x86.sse" vocab
+    { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 }
+    { ST0 ST1 ST2 ST3 ST4 ST5 ST6 }
+    ? ;
+
 M: x86.32 machine-registers
-    {
-        { int-regs { EAX ECX EDX EBP EBX } }
-        { float-regs { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } }
-    } ;
+    { int-regs { EAX ECX EDX EBP EBX } }
+    float-regs x86-float-regs 2array
+    2array ;
 
 M: x86.32 ds-reg ESI ;
 M: x86.32 rs-reg EDI ;
@@ -94,7 +99,7 @@ M: x86.32 param-regs
 M: x86.32 return-regs
     {
         { int-regs { EAX EDX } }
-        { float-regs { f } }
+        { float-regs { ST0 } }
     } ;
 
 M: x86.32 %prologue ( n -- )
@@ -105,11 +110,11 @@ M: x86.32 %prologue ( n -- )
 M: x86.32 %prepare-jump
     pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here ;
 
-:: load-float-return ( dst x87-insn sse-insn -- )
+:: load-float-return ( dst x87-insn rep -- )
     dst register? [
         ESP 4 SUB
         ESP [] x87-insn execute
-        dst ESP [] sse-insn execute
+        dst ESP [] rep %copy
         ESP 4 ADD
     ] [
         dst ?spill-slot x87-insn execute
@@ -118,14 +123,14 @@ M: x86.32 %prepare-jump
 M: x86.32 %load-reg-param ( dst reg rep -- )
     {
         { int-rep [ int-rep %copy ] }
-        { float-rep [ drop \ FSTPS \ MOVSS load-float-return ] }
-        { double-rep [ drop \ FSTPL \ MOVSD load-float-return ] }
+        { float-rep [ drop \ FSTPS float-rep load-float-return ] }
+        { double-rep [ drop \ FSTPL double-rep load-float-return ] }
     } case ;
 
-:: store-float-return ( src x87-insn sse-insn -- )
+:: store-float-return ( src x87-insn rep -- )
     src register? [
         ESP 4 SUB
-        ESP [] src sse-insn execute
+        ESP [] src rep %copy
         ESP [] x87-insn execute
         ESP 4 ADD
     ] [
@@ -135,8 +140,8 @@ M: x86.32 %load-reg-param ( dst reg rep -- )
 M: x86.32 %store-reg-param ( src reg rep -- )
     {
         { int-rep [ swap int-rep %copy ] }
-        { float-rep [ drop \ FLDS \ MOVSS store-float-return ] }
-        { double-rep [ drop \ FLDL \ MOVSD store-float-return ] }
+        { float-rep [ drop \ FLDS float-rep store-float-return ] }
+        { double-rep [ drop \ FLDL double-rep store-float-return ] }
     } case ;
 
 :: call-unbox-func ( src func -- )
