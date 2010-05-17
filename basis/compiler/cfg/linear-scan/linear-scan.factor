@@ -40,9 +40,9 @@ IN: compiler.cfg.linear-scan
 : admissible-registers ( cfg -- regs )
     [ machine-registers ] dip
     frame-pointer?>> [
-        [ int-regs ] dip clone
+        [ int-regs ] dip [ clone ] map
         [ [ [ frame-reg ] dip remove ] change-at ] keep
-    ] unless ;
+    ] when ;
 
 : linear-scan ( cfg -- cfg' )
     dup dup admissible-registers (linear-scan) ;
