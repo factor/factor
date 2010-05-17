@@ -186,34 +186,27 @@ M: x86.32 %end-callback ( -- )
     0 save-vm-ptr
     "end_callback" f %alien-invoke ;
 
-GENERIC: float-function-param ( stack-slot dst src -- )
+GENERIC: float-function-param ( n dst src -- )
 
-M:: spill-slot float-function-param ( stack-slot dst src -- )
+M:: spill-slot float-function-param ( n dst src -- )
     ! We can clobber dst here since its going to contain the
     ! final result
     dst src double-rep %copy
-    stack-slot dst double-rep %copy ;
+    dst n double-rep %store-stack-param ;
 
-M: register float-function-param
-    nip double-rep %copy ;
-
-: float-function-return ( reg -- )
-    ESP [] FSTPL
-    ESP [] MOVSD
-    ESP 16 ADD ;
+M:: register float-function-param ( n dst src -- )
+    src n double-rep %store-stack-param ;
 
 M:: x86.32 %unary-float-function ( dst src func -- )
-    ESP -16 [+] dst src float-function-param
-    ESP 16 SUB
+    0 dst src float-function-param
     func "libm" load-library %alien-invoke
-    dst float-function-return ;
+    dst double-rep %load-return ;
 
 M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
-    ESP -16 [+] dst src1 float-function-param
-    ESP  -8 [+] dst src2 float-function-param
-    ESP 16 SUB
+    0 dst src1 float-function-param
+    8 dst src2 float-function-param
     func "libm" load-library %alien-invoke
-    dst float-function-return ;
+    dst double-rep %load-return ;
 
 : funny-large-struct-return? ( return abi -- ? )
     #! MINGW ABI incompatibility disaster
