@@ -32,11 +32,6 @@ M: label BC [ 0 BC ] dip rc-relative-ppc-2 label-fixup ;
 
 enable-float-intrinsics
 
-<<
-\ ##integer>float t "frame-required?" set-word-prop
-\ ##float>integer t "frame-required?" set-word-prop
->>
-
 M: ppc machine-registers
     {
         { int-regs $[ 2 12 [a,b] 16 29 [a,b] append ] }

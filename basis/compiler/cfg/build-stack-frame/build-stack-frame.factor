@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces accessors math math.order assocs kernel sequences
-combinators classes words cpu.architecture layouts compiler.cfg
+combinators classes words system cpu.architecture layouts compiler.cfg
 compiler.cfg.rpo compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.stack-frame ;
 IN: compiler.cfg.build-stack-frame
@@ -17,18 +17,33 @@ GENERIC: compute-stack-frame* ( insn -- )
 M: ##stack-frame compute-stack-frame*
     stack-frame>> request-stack-frame ;
 
-M: ##call-gc compute-stack-frame*
-    drop
-    frame-required? on
+: frame-required ( -- ) frame-required? on ;
+
+: vm-frame-required ( -- )
+    frame-required
     stack-frame new t >>calls-vm? request-stack-frame ;
 
-M: ##call compute-stack-frame* drop frame-required? on ;
+M: ##call-gc compute-stack-frame* drop vm-frame-required ;
+M: ##box compute-stack-frame* drop vm-frame-required ;
+M: ##unbox compute-stack-frame* drop vm-frame-required ;
+M: ##box-long-long compute-stack-frame* drop vm-frame-required ;
+M: ##begin-callback compute-stack-frame* drop vm-frame-required ;
+M: ##end-callback compute-stack-frame* drop vm-frame-required ;
+M: ##unary-float-function compute-stack-frame* drop vm-frame-required ;
+M: ##binary-float-function compute-stack-frame* drop vm-frame-required ;
 
-M: ##alien-callback compute-stack-frame* drop frame-required? on ;
+M: ##call compute-stack-frame* drop frame-required ;
+M: ##alien-callback compute-stack-frame* drop frame-required ;
+M: ##spill compute-stack-frame* drop frame-required ;
+M: ##reload compute-stack-frame* drop frame-required ;
 
-M: insn compute-stack-frame*
-    class "frame-required?" word-prop
-    [ frame-required? on ] when ;
+M: ##float>integer compute-stack-frame*
+    drop cpu ppc? [ frame-required ] when ;
+
+M: ##integer>float compute-stack-frame*
+    drop cpu ppc? [ frame-required ] when ;
+
+M: insn compute-stack-frame* drop ;
 
 : initial-stack-frame ( -- stack-frame )
     stack-frame new cfg get spill-area-size>> >>spill-area-size ;
