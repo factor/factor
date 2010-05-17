@@ -85,6 +85,9 @@ IN: compiler.tests.float
 [ t ] [ -0.0 [ dup 0.0 float= swap -0.0 float= or ] compile-call ] unit-test
 [ f ] [ 3.0 [ dup 0.0 float= swap -0.0 float= or ] compile-call ] unit-test
 
+[ 313.0 ] [ 313 [ fixnum>float ] compile-call ] unit-test
+[ -313 ] [ -313.5 [ float>fixnum ] compile-call ] unit-test
+[ 313 ] [ 313.5 [ float>fixnum ] compile-call ] unit-test
 [ 315 315.0 ] [ 313 [ 2 fixnum+fast dup fixnum>float ] compile-call ] unit-test
 
 [ t ] [ 0/0. 0/0. [ float-unordered? ] compile-call ] unit-test

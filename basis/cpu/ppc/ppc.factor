@@ -190,6 +190,8 @@ M: ppc %sub-float FSUB ;
 M: ppc %mul-float FMUL ;
 M: ppc %div-float FDIV ;
 
+M: ppc integer-float-needs-stack-frame? t ;
+
 M:: ppc %integer>float ( dst src -- )
     HEX: 4330 scratch-reg LIS
     scratch-reg 1 0 scratch@ STW
