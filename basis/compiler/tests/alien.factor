@@ -11,6 +11,13 @@ SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: char
 IN: compiler.tests.alien
 
+! Make sure that invalid inputs don't pass the stack checker
+[ [ void { } "cdecl" alien-indirect ] infer ] must-fail
+[ [ "void" { } cdecl alien-indirect ] infer ] must-fail
+[ [ void* 3 cdecl alien-indirect ] infer ] must-fail
+[ [ void* { "int" } cdecl alien-indirect ] infer ] must-fail
+[ [ void* { int } cdecl { } alien-callback ] infer ] must-fail
+
 <<
 : libfactor-ffi-tests-path ( -- string )
     "resource:" absolute-path
