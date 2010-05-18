@@ -455,8 +455,8 @@ ERROR: bad-x87-operands ;
     3 shift bitor
     operand reg-code bitor , ;
 
-:: x87-st0-op ( dst src opcode reg -- )
-    dst ST0 = src register? and
+:: x87-st0-op ( src opcode reg -- )
+    src register?
     [ src opcode reg (x87-op) ]
     [ bad-x87-operands ] if ;
 
@@ -481,17 +481,17 @@ PRIVATE>
 : FADD ( dst src -- ) HEX: D8 0 x87-m-st0/n-op ;
 : FCHS ( -- ) { HEX: D9 HEX: E0 } % ;
 
-: FCMOVB   ( dst src -- ) HEX: DA 0 x87-st0-op ;
-: FCMOVE   ( dst src -- ) HEX: DA 1 x87-st0-op ;
-: FCMOVBE  ( dst src -- ) HEX: DA 2 x87-st0-op ;
-: FCMOVU   ( dst src -- ) HEX: DA 3 x87-st0-op ;
-: FCMOVNB  ( dst src -- ) HEX: DB 0 x87-st0-op ;
-: FCMOVNE  ( dst src -- ) HEX: DB 1 x87-st0-op ;
-: FCMOVNBE ( dst src -- ) HEX: DB 2 x87-st0-op ;
-: FCMOVNU  ( dst src -- ) HEX: DB 3 x87-st0-op ;
+: FCMOVB   ( src -- ) HEX: DA 0 x87-st0-op ;
+: FCMOVE   ( src -- ) HEX: DA 1 x87-st0-op ;
+: FCMOVBE  ( src -- ) HEX: DA 2 x87-st0-op ;
+: FCMOVU   ( src -- ) HEX: DA 3 x87-st0-op ;
+: FCMOVNB  ( src -- ) HEX: DB 0 x87-st0-op ;
+: FCMOVNE  ( src -- ) HEX: DB 1 x87-st0-op ;
+: FCMOVNBE ( src -- ) HEX: DB 2 x87-st0-op ;
+: FCMOVNU  ( src -- ) HEX: DB 3 x87-st0-op ;
 
-: FCOMI ( a b -- ) HEX: DB 6 x87-st0-op ;
-: FUCOMI ( a b -- ) HEX: DB 5 x87-st0-op ;
+: FCOMI ( src -- ) HEX: DB 6 x87-st0-op ;
+: FUCOMI ( src -- ) HEX: DB 5 x87-st0-op ;
 : FCOS ( -- ) { HEX: D9 HEX: FF } % ;
 : FDECSTP ( -- ) { HEX: D9 HEX: F6 } % ;
 : FINCSTP ( -- ) { HEX: D9 HEX: F7 } % ;
@@ -505,7 +505,7 @@ PRIVATE>
 : FISTTPD ( dst -- ) { BIN: 001 f HEX: DB } 1-operand ;
 : FISTTPQ ( dst -- ) { BIN: 001 f HEX: DF } 1-operand ;
 
-: FLD    ( dst src -- ) HEX: D9 0 x87-st0-op ;
+: FLD    ( src -- ) HEX: D9 0 x87-st0-op ;
 : FLD1   ( -- ) { HEX: D9 HEX: E8 } % ;
 : FLDL2T ( -- ) { HEX: D9 HEX: E9 } % ;
 : FLDL2E ( -- ) { HEX: D9 HEX: EA } % ;
@@ -528,11 +528,11 @@ PRIVATE>
 : FSUB  ( dst src -- ) HEX: D8 HEX: 4 x87-m-st0/n-op ;
 : FSUBR ( dst src -- ) HEX: D8 HEX: 5 x87-m-st0/n-op ;
 
-: FST  ( dst src -- ) swap HEX: DD 2 x87-st0-op ;
-: FSTP ( dst src -- ) swap HEX: DD 3 x87-st0-op ;
+: FST  ( src -- ) HEX: DD 2 x87-st0-op ;
+: FSTP ( src -- ) HEX: DD 3 x87-st0-op ;
 
 : FXAM ( -- ) { HEX: D9 HEX: E5 } % ;
-: FXCH ( dst src -- ) HEX: D9 1 x87-st0-op ;
+: FXCH ( src -- ) HEX: D9 1 x87-st0-op ;
 
 : FXTRACT ( -- ) { HEX: D9 HEX: F4 } % ;
 : FYL2X ( -- ) { HEX: D9 HEX: F1 } % ;
