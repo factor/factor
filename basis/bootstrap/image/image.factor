@@ -3,11 +3,11 @@
 USING: alien alien.strings arrays byte-arrays generic hashtables
 hashtables.private io io.binary io.files io.encodings.binary
 io.pathnames kernel kernel.private math namespaces make parser
-prettyprint sequences strings sbufs vectors words quotations
-assocs system layouts splitting grouping growable classes
-classes.private classes.builtin classes.tuple
-classes.tuple.private vocabs vocabs.loader source-files
-definitions debugger quotations.private combinators
+prettyprint sequences sequences.generalizations strings sbufs
+vectors words quotations assocs system layouts splitting
+grouping growable classes classes.private classes.builtin
+classes.tuple classes.tuple.private vocabs vocabs.loader
+source-files definitions debugger quotations.private combinators
 combinators.short-circuit math.order math.private accessors
 slots.private generic.single.private compiler.units
 compiler.constants fry locals bootstrap.image.syntax

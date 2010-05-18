@@ -6,8 +6,8 @@ USING: alien alien.c-types ascii calendar combinators.short-circuit
 continuations kernel libc math macros namespaces math.vectors
 math.parser opengl.gl combinators combinators.smart arrays
 sequences splitting words byte-arrays assocs vocabs
-colors colors.constants accessors generalizations locals fry
-specialized-arrays ;
+colors colors.constants accessors generalizations
+sequences.generalizations locals fry specialized-arrays ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: uint

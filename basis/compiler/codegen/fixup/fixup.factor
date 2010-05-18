@@ -3,7 +3,7 @@
 USING: arrays byte-arrays byte-vectors generic assocs hashtables
 io.binary kernel kernel.private math namespaces make sequences
 words quotations strings alien.accessors alien.strings layouts
-system combinators math.bitwise math.order generalizations
+system combinators math.bitwise math.order combinators.smart
 accessors growable fry compiler.constants memoize ;
 IN: compiler.codegen.fixup
 
@@ -138,12 +138,14 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 
 : with-fixup ( quot -- code )
     '[
-        init-fixup
-        @
-        emit-binary-literals
-        label-table [ compute-labels ] change
-        parameter-table get >array
-        literal-table get >array
-        relocation-table get >byte-array
-        label-table get
-    ] B{ } make 5 narray ; inline
+        [
+            init-fixup
+            @
+            emit-binary-literals
+            label-table [ compute-labels ] change
+            parameter-table get >array
+            literal-table get >array
+            relocation-table get >byte-array
+            label-table get
+        ] B{ } make
+    ] output>array ; inline

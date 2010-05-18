@@ -6,7 +6,7 @@ compiler.cfg.stacks.local compiler.tree.propagation.info
 compiler.cfg.instructions
 cpu.architecture effects fry generalizations
 kernel locals macros make math namespaces quotations sequences
-splitting stack-checker words ;
+sequences.generalizations splitting stack-checker words ;
 IN: compiler.cfg.intrinsics.simd.backend
 
 ! Selection of implementation based on available CPU instructions

@@ -5,8 +5,8 @@ USING: accessors alien alien.c-types alien.libraries
 alien.syntax byte-arrays classes.struct combinators
 combinators.short-circuit combinators.smart continuations
 generalizations io kernel libc locals macros math namespaces
-sequences stack-checker strings system unix.time unix.types
-vocabs vocabs.loader unix.ffi ;
+sequences sequences.generalizations stack-checker strings system
+unix.time unix.types vocabs vocabs.loader unix.ffi ;
 IN: unix
 
 ERROR: unix-error errno message ;
