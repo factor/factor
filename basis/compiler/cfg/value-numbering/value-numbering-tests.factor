@@ -2350,6 +2350,22 @@ cell 8 = [
 
 [
     {
+        T{ ##load-integer f 0 55 }
+        T{ ##load-reference f 1 B{ 55 0 55 0 55 0 55 0 55 0 55 0 55 0 55 0 } }
+        T{ ##load-reference f 2 B{ 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 } }
+        T{ ##load-reference f 3 B{ 0 55 0 55 0 55 0 55 0 55 0 55 0 55 0 55 } }
+    }
+] [
+    {
+        T{ ##load-integer f 0 55 }
+        T{ ##scalar>vector f 1 0 short-8-rep }
+        T{ ##load-reference f 2 B{ 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 } }
+        T{ ##shuffle-vector f 3 1 2 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
         T{ ##load-reference f 0 1.25 }
         T{ ##load-reference f 2 3.75 }
         T{ ##load-reference f 4 B{ 0 0 0 0 0 0 244 63 0 0 0 0 0 0 14 64 } }
