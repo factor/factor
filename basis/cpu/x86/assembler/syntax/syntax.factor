@@ -20,7 +20,7 @@ registers [ H{ } clone ] initialize
     '[ _ + _ define-register ] map-index ;
 
 : define-registers ( names size -- )
-    [ [ 0 ] dip (define-registers) ] [ drop ] 2bi registers get set-at ;
+    [ [ 0 ] dip (define-registers) ] keep registers get set-at ;
 
 SYNTAX: REGISTERS:
     scan-word [ ";" parse-tokens ] dip define-registers ;
