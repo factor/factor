@@ -2,6 +2,15 @@ USING: cpu.x86.assembler cpu.x86.assembler.operands
 kernel tools.test namespaces make layouts ;
 IN: cpu.x86.assembler.tests
 
+! small registers
+[ { 128 192 12 } ] [ [ AL 12 <byte> ADD ] { } make ] unit-test
+[ { 128 196 12 } ] [ [ AH 12 <byte> ADD ] { } make ] unit-test
+[ { 176 12 } ] [ [ AL 12 <byte> MOV ] { } make ] unit-test
+[ { 180 12 } ] [ [ AH 12 <byte> MOV ] { } make ] unit-test
+[ { 198 0 12 } ] [ [ EAX [] 12 <byte> MOV ] { } make ] unit-test
+[ { 0 235 } ] [ [ BL CH ADD ] { } make ] unit-test
+[ { 136 235 } ] [ [ BL CH MOV ] { } make ] unit-test
+
 ! immediate operands
 cell 4 = [
     [ { HEX: b9 HEX: 01 HEX: 00 HEX: 00 HEX: 00 } ] [ [ ECX 1 MOV ] { } make ] unit-test
@@ -205,7 +214,6 @@ cell 4 = [
 [ { HEX: 0f HEX: a3 HEX: 18 } ] [ [ EAX [] EBX BT ] { } make ] unit-test
 
 ! x87 instructions
-
 [ { HEX: D8 HEX: C5 } ] [ [ ST0 ST5 FADD ] { } make ] unit-test
 [ { HEX: DC HEX: C5 } ] [ [ ST5 ST0 FADD ] { } make ] unit-test
 [ { HEX: D8 HEX: 00 } ] [ [ ST0 EAX [] FADD ] { } make ] unit-test
