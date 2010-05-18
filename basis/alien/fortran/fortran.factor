@@ -1,11 +1,12 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: accessors alien alien.c-types alien.complex alien.data alien.parser
-grouping alien.strings alien.syntax arrays ascii assocs
-byte-arrays combinators combinators.short-circuit fry generalizations
-kernel lexer macros math math.parser namespaces parser sequences
-splitting stack-checker vectors vocabs.parser words locals
-io.encodings.ascii io.encodings.string shuffle effects math.ranges
-math.order sorting strings system alien.libraries ;
+USING: accessors alien alien.c-types alien.complex alien.data
+alien.parser grouping alien.strings alien.syntax arrays ascii
+assocs byte-arrays combinators combinators.short-circuit fry
+generalizations kernel lexer macros math math.parser namespaces
+parser sequences sequences.generalizations splitting
+stack-checker vectors vocabs.parser words locals
+io.encodings.ascii io.encodings.string shuffle effects
+math.ranges math.order sorting strings system alien.libraries ;
 QUALIFIED-WITH: alien.c-types c
 IN: alien.fortran
 

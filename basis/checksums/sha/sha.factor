@@ -4,7 +4,7 @@ USING: accessors checksums checksums.common checksums.stream
 combinators combinators.smart fry generalizations grouping
 io.binary kernel literals locals make math math.bitwise
 math.ranges multiline namespaces sbufs sequences
-sequences.private splitting strings ;
+sequences.generalizations sequences.private splitting strings ;
 IN: checksums.sha
 
 SINGLETON: sha1

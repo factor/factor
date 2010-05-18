@@ -6,9 +6,10 @@ definitions stack-checker.dependencies quotations
 classes.tuple.private math math.partial-dispatch math.private
 math.intervals sets.private math.floats.private
 math.integers.private layouts math.order vectors hashtables
-combinators effects generalizations assocs sets
-combinators.short-circuit sequences.private locals growable
-stack-checker namespaces compiler.tree.propagation.info ;
+combinators effects generalizations sequences.generalizations
+assocs sets combinators.short-circuit sequences.private locals
+growable stack-checker namespaces compiler.tree.propagation.info
+;
 FROM: math => float ;
 FROM: sets => set ;
 IN: compiler.tree.propagation.transforms
