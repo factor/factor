@@ -99,6 +99,17 @@ M: ##gather-vector-4 rewrite rewrite-gather-vector-4 ;
 
 M: ##gather-int-vector-4 rewrite rewrite-gather-vector-4 ;
 
+: fold-shuffle-vector ( insn src1 src2 -- insn )
+    [ dst>> ] [ obj>> ] [ obj>> ] tri*
+    swap nths \ ##load-reference new-insn ;
+
+M: ##shuffle-vector rewrite
+    dup [ src>> vreg>insn ] [ shuffle>> vreg>insn ] bi
+    {
+        { [ 2dup [ ##load-reference? ] both? ] [ fold-shuffle-vector ] }
+        [ 3drop f ]
+    } cond ;
+
 M: ##xor-vector rewrite
     dup diagonal?
     [ [ dst>> ] [ rep>> ] bi \ ##zero-vector new-insn ] [ drop f ] if ;
