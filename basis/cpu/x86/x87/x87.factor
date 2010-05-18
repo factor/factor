@@ -83,8 +83,10 @@ M:: x86 %float>integer ( dst src -- )
     EAX 8 stack@ MOV
     dst 4 stack@ MOV ;
 
-: compare-op ( src1 src2 quot -- )
-    [ ST0 ] 3dip binary-op ; inline
+:: compare-op ( src1 src2 quot -- )
+    src1 FLD*
+    ST0 src2 shuffle-down quot call
+    ST0 FSTP* ; inline
 
 M: x86 %compare-float-ordered ( dst src1 src2 cc temp -- )
     [ [ FCOMI ] compare-op ] (%compare-float) ;

@@ -1,18 +1,14 @@
 USING: compiler.units compiler.test kernel kernel.private memory
 math math.private tools.test math.floats.private math.order fry
-specialized-arrays sequences ;
+specialized-arrays sequences math.functions layouts literals ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
+SPECIALIZED-ARRAY: c:double
 IN: compiler.tests.float
-
-[ 5.0 ] [ [ 5.0 ] compile-call gc gc gc ] unit-test
-[ 2.0 3.0 ] [ 3.0 [ 2.0 swap ] compile-call ] unit-test
-
-[ 1 2 3 4.0 ] [ [ 1 2 3 4.0 ] compile-call ] unit-test
 
 [ 3.0 1 2 3 ] [ 1.0 2.0 [ float+ 1 2 3 ] compile-call ] unit-test
 
-[ 3 ] [ 1.0 [ 2.0 float+ tag ] compile-call ] unit-test
+[ $[ float type-number ] ] [ 1.0 [ 2.0 float+ tag ] compile-call ] unit-test
 
 [ 3.0 ] [ 1.0 [ 2.0 float+ ] compile-call ] unit-test
 [ 3.0 ] [ 1.0 [ 2.0 swap float+ ] compile-call ] unit-test
@@ -133,4 +129,16 @@ IN: compiler.tests.float
 [ float-array{ 2.0 4.5 } ] [
     float-array{ 1.0 3.5 }
     [ { float-array } declare [ 1 + ] map ] compile-call
+] unit-test
+
+[ t ] [
+    [ double-array{ 1.0 2.0 3.0 } 0.0 [ + ] reduce sqrt ] compile-call
+    2.44948 0.0001 ~
+] unit-test
+
+[ 7.5 3 ] [
+    [
+        double-array{ 1.0 2.0 3.0 }
+        1.5 [ + ] reduce dup 0.0 < [ 2 ] [ 3 ] if
+    ] compile-call
 ] unit-test
