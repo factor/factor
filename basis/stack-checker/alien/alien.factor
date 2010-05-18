@@ -1,21 +1,25 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences accessors combinators math namespaces
-init sets words assocs alien.libraries alien alien.private
-alien.c-types fry quotations stack-checker.backend
-stack-checker.errors stack-checker.visitor
+USING: kernel arrays sequences accessors combinators math
+namespaces init sets words assocs alien.libraries alien
+alien.private alien.c-types fry quotations strings
+stack-checker.backend stack-checker.errors stack-checker.visitor
 stack-checker.dependencies compiler.utilities ;
 IN: stack-checker.alien
 
-TUPLE: alien-node-params return parameters abi in-d out-d ;
+TUPLE: alien-node-params
+return parameters
+{ abi abi initial: cdecl }
+in-d
+out-d ;
 
-TUPLE: alien-invoke-params < alien-node-params library function ;
+TUPLE: alien-invoke-params < alien-node-params library { function string } ;
 
 TUPLE: alien-indirect-params < alien-node-params ;
 
-TUPLE: alien-assembly-params < alien-node-params quot ;
+TUPLE: alien-assembly-params < alien-node-params { quot quotation } ;
 
-TUPLE: alien-callback-params < alien-node-params quot xt ;
+TUPLE: alien-callback-params < alien-node-params { quot quotation } xt ;
 
 : param-prep-quot ( params -- quot )
     parameters>> [ c-type c-type-unboxer-quot ] map spread>quot ;
