@@ -552,7 +552,7 @@ SYNTAX: UNIFORM-TUPLE:
     [ [ length ] [ >int-array ] bi glDrawBuffers ] if ;
 
 : bind-named-output-attachments ( program-instance framebuffer attachments -- )
-    rot '[ first _ swap output-index ] sort-with [ second ] map
+    rot '[ first _ swap output-index ] sort-with values
     bind-unnamed-output-attachments ;
 
 : bind-output-attachments ( program-instance framebuffer attachments -- )

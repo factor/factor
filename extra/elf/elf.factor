@@ -499,7 +499,7 @@ TYPED:: elf-segment-sections ( segment: Elf32/64_Phdr sections: Elf32/64_Shdr-ar
     segment [ p_offset>> dup ] [ p_filesz>> + ] bi [a,b)                            :> segment-interval
     sections [ dup [ sh_offset>> dup ] [ sh_size>> + ] bi [a,b) 2array ] { } map-as :> section-intervals
     section-intervals [ second segment-interval interval-intersect empty-interval = not ]
-    filter [ first ] map ;
+    filter keys ;
 
 TYPED:: virtual-address-segment ( elf: Elf32/64_Ehdr address -- program-header/f )
     elf elf-program-headers elf-loadable-segments [

@@ -40,7 +40,7 @@ MEMO: ip-db ( -- seq )
 : filter-overlaps ( alist -- alist' )
     2 clump
     [ first2 [ first second ] [ first first ] bi* < ] filter
-    [ first ] map ;
+    keys ;
 
 MEMO: ip-intervals ( -- interval-map )
     ip-db [ [ [ from>> ] [ to>> ] bi 2array ] keep ] { } map>assoc
