@@ -214,7 +214,13 @@ M: operand POP { BIN: 000 f HEX: 8f } 1-operand ;
 <PRIVATE
 
 GENERIC# (MOV-I) 1 ( dst src -- )
-M: register (MOV-I) [ t HEX: b8 short-operand ] [ cell, ] bi* ;
+
+M: register (MOV-I)
+    dup byte?
+    [ [ t HEX: b0 short-operand ] [ 1, ] bi* ]
+    [ [ t HEX: b8 short-operand ] [ cell, ] bi* ]
+    if ;
+
 M: operand (MOV-I)
     { BIN: 000 t HEX: c6 }
     over byte? [ immediate-1 ] [ immediate-4 ] if ;
