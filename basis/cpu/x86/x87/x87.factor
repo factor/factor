@@ -72,7 +72,15 @@ M:: x86 %integer>float ( dst src -- )
 
 M:: x86 %float>integer ( dst src -- )
     src FLD*
-    4 stack@ FISTTPD
+    8 stack@ EAX MOV
+    0 stack@ FNSTCW
+    AX 0 stack@ MOV
+    AH 12 <byte> MOV
+    2 stack@ AX MOV
+    2 stack@ FLDCW
+    4 stack@ FISTPD
+    0 stack@ FLDCW
+    EAX 8 stack@ MOV
     dst 4 stack@ MOV ;
 
 : compare-op ( src1 src2 quot -- )
