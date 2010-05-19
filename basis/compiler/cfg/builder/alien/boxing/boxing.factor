@@ -49,7 +49,7 @@ M: c-type unbox
     [ ^^unbox 1array ] [ nip f 2array 1array ] 2bi ;
 
 M: long-long-type unbox
-    unboxer>> int-rep ^^unbox
+    [ 8 f ^^local-allot ] dip '[ _ unboxer>> ##unbox-long-long ] keep
     0 cell [ int-rep f ^^load-memory-imm ] bi-curry@ bi 2array
     int-rep long-long-on-stack? 2array dup 2array ;
 
