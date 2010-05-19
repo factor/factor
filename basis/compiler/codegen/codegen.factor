@@ -286,6 +286,7 @@ CONDITIONAL: ##fixnum-mul %fixnum-mul
 
 ! FFI
 CODEGEN: ##unbox %unbox
+CODEGEN: ##unbox-long-long %unbox-long-long
 CODEGEN: ##store-reg-param %store-reg-param
 CODEGEN: ##store-stack-param %store-stack-param
 CODEGEN: ##load-reg-param %load-reg-param

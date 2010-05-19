@@ -154,6 +154,14 @@ M:: x86.32 %unbox ( dst src func rep -- )
     src func call-unbox-func
     dst rep %load-return ;
 
+M:: x86.32 %unbox-long-long cpu ( src out func -- )
+    EAX src int-rep %copy
+    0 stack@ EAX MOV
+    EAX out int-rep %copy
+    4 stack@ EAX MOV
+    8 save-vm-ptr
+    func f %alien-invoke ;
+
 M:: x86.32 %box ( dst src func rep -- )
     rep rep-size save-vm-ptr
     src rep %store-return
