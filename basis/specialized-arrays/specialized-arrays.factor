@@ -67,7 +67,7 @@ TUPLE: A
 
 : A-cast ( byte-array -- specialized-array )
     binary-object \ T heap-size /mod 0 =
-    [ <direct-A> ] [ drop \ T bad-byte-array-length ] bi ; inline
+    [ <direct-A> ] [ drop \ T bad-byte-array-length ] if ; inline
 
 M: A clone [ underlying>> clone ] [ length>> ] bi <direct-A> ; inline
 
