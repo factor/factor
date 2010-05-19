@@ -36,9 +36,6 @@ struct context {
 	set-context-object primitives */
 	cell context_objects[context_object_count];
 
-	/* temporary area used by FFI code generation */
-	s64 long_long_return;
-
 	context(cell datastack_size, cell retainstack_size, cell callstack_size);
 	~context();
 

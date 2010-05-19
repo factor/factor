@@ -114,12 +114,10 @@ M: #alien-invoke emit-node
 M:: #alien-indirect emit-node ( node -- )
     node [
         D 0 ^^peek -1 ##inc-d ^^unbox-any-c-ptr :> src
-        {
-            [ caller-parameters ]
-            [ drop src ##alien-indirect ]
-            [ emit-stack-frame ]
-            [ box-return* ]
-        } cleave
+        [ caller-parameters src ##alien-indirect ]
+        [ emit-stack-frame ]
+        [ box-return* ]
+        tri
     ] emit-alien-block ;
 
 M: #alien-assembly emit-node

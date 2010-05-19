@@ -638,6 +638,10 @@ def: dst
 use: src/tagged-rep
 literal: unboxer rep ;
 
+INSN: ##unbox-long-long
+use: src/tagged-rep out/int-rep
+literal: unboxer ;
+
 INSN: ##store-reg-param
 use: src
 literal: reg rep ;
@@ -870,6 +874,7 @@ hairy-clobber-insn
 ##unary-float-function
 ##binary-float-function
 ##unbox
+##unbox-long-long
 ##box
 ##box-long-long
 ##allot-byte-array ;
