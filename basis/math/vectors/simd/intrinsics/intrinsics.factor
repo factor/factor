@@ -45,16 +45,16 @@ IN: math.vectors.simd.intrinsics
 
 : [byte>rep-array] ( rep -- class )
     {
-        { char-16-rep      [ [ byte-array>char-array      ] ] }
-        { uchar-16-rep     [ [ byte-array>uchar-array     ] ] }
-        { short-8-rep      [ [ byte-array>short-array     ] ] }
-        { ushort-8-rep     [ [ byte-array>ushort-array    ] ] }
-        { int-4-rep        [ [ byte-array>int-array       ] ] }
-        { uint-4-rep       [ [ byte-array>uint-array      ] ] }
-        { longlong-2-rep   [ [ byte-array>longlong-array  ] ] }
-        { ulonglong-2-rep  [ [ byte-array>ulonglong-array ] ] }
-        { float-4-rep      [ [ byte-array>float-array     ] ] }
-        { double-2-rep     [ [ byte-array>double-array    ] ] }
+        { char-16-rep      [ [ char-array-cast      ] ] }
+        { uchar-16-rep     [ [ uchar-array-cast     ] ] }
+        { short-8-rep      [ [ short-array-cast     ] ] }
+        { ushort-8-rep     [ [ ushort-array-cast    ] ] }
+        { int-4-rep        [ [ int-array-cast       ] ] }
+        { uint-4-rep       [ [ uint-array-cast      ] ] }
+        { longlong-2-rep   [ [ longlong-array-cast  ] ] }
+        { ulonglong-2-rep  [ [ ulonglong-array-cast ] ] }
+        { float-4-rep      [ [ float-array-cast     ] ] }
+        { double-2-rep     [ [ double-array-cast    ] ] }
     } case ; foldable
 
 : [>rep-array] ( rep -- class )
