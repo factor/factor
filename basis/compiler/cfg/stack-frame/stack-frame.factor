@@ -7,24 +7,24 @@ IN: compiler.cfg.stack-frame
 
 TUPLE: stack-frame
 { params integer }
-{ return integer }
+{ local-allot integer }
 { spill-area-size integer }
 { total-size integer } ;
 
 ! Stack frame utilities
-: return-offset ( -- offset )
-    stack-frame get params>> ;
+: local-allot-offset ( n -- offset )
+    stack-frame get params>> + ;
 
 : spill-offset ( n -- offset )
-    stack-frame get [ params>> ] [ return>> ] bi + + ;
+    stack-frame get [ params>> ] [ local-allot>> ] bi + + ;
 
 : (stack-frame-size) ( stack-frame -- n )
-    [ params>> ] [ return>> ] [ spill-area-size>> ] tri + + ;
+    [ params>> ] [ local-allot>> ] [ spill-area-size>> ] tri + + ;
 
 : max-stack-frame ( frame1 frame2 -- frame3 )
     [ stack-frame new ] 2dip
     {
         [ [ params>> ] bi@ max >>params ]
-        [ [ return>> ] bi@ max >>return ]
+        [ [ local-allot>> ] bi@ max >>local-allot ]
         [ [ spill-area-size>> ] bi@ max >>spill-area-size ]
     } 2cleave ;

@@ -654,8 +654,9 @@ INSN: ##load-stack-param
 def: dst
 literal: n rep ;
 
-INSN: ##prepare-struct-caller
-def: dst/int-rep ;
+INSN: ##local-allot
+def: dst/int-rep
+literal: size offset ;
 
 INSN: ##box
 def: dst/tagged-rep

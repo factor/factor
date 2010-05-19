@@ -6,18 +6,24 @@ compiler.cfg.rpo compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.stack-frame ;
 IN: compiler.cfg.build-stack-frame
 
+SYMBOL: local-allot
+
 SYMBOL: frame-required?
 
 GENERIC: compute-stack-frame* ( insn -- )
 
+: frame-required ( -- ) frame-required? on ;
+
 : request-stack-frame ( stack-frame -- )
-    frame-required? on
+    frame-required
     stack-frame [ max-stack-frame ] change ;
+
+M: ##local-allot compute-stack-frame*
+    local-allot get >>offset
+    size>> local-allot +@ ;
 
 M: ##stack-frame compute-stack-frame*
     stack-frame>> request-stack-frame ;
-
-: frame-required ( -- ) frame-required? on ;
 
 : vm-frame-required ( -- )
     frame-required
@@ -45,13 +51,18 @@ M: ##integer>float compute-stack-frame*
 
 M: insn compute-stack-frame* drop ;
 
-: initial-stack-frame ( -- stack-frame )
-    stack-frame new cfg get spill-area-size>> >>spill-area-size ;
+: request-spill-area ( n -- )
+    stack-frame new swap >>spill-area-size request-stack-frame ;
+
+: request-local-allot ( n -- )
+    stack-frame new swap >>local-allot request-stack-frame ;
 
 : compute-stack-frame ( cfg -- )
-    initial-stack-frame stack-frame set
-    [ spill-area-size>> 0 > frame-required? set ]
+    0 local-allot set
+    stack-frame new stack-frame set
+    [ spill-area-size>> [ request-spill-area ] unless-zero ]
     [ [ instructions>> [ compute-stack-frame* ] each ] each-basic-block ] bi
+    local-allot get [ request-local-allot ] unless-zero
     stack-frame get dup stack-frame-size >>total-size drop ;
 
 : build-stack-frame ( cfg -- cfg )

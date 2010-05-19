@@ -588,8 +588,8 @@ M:: x86 %store-stack-param ( src n rep -- )
 M:: x86 %load-stack-param ( dst n rep -- )
     dst n next-stack@ rep %copy ;
 
-M: x86 %prepare-struct-caller ( dst -- )
-    return-offset special-offset stack@ LEA ;
+M: x86 %local-allot ( dst size offset -- )
+    nip local-allot-offset special-offset stack@ LEA ;
 
 M: x86 %alien-indirect ( src -- )
     ?spill-slot CALL ;
@@ -692,10 +692,6 @@ M: x86 immediate-bitwise? ( n -- ? )
 
 enable-min/max
 enable-log2
-
-enable-float-intrinsics
-enable-float-functions
-enable-fsqrt
 
 : check-sse ( -- )
     "Checking for multimedia extensions... " write flush
