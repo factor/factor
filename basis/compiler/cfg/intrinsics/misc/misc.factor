@@ -52,3 +52,9 @@ IN: compiler.cfg.intrinsics.misc
         0 int-rep f ^^load-memory-imm
         hashcode-shift ^^shr-imm
     ] unary-op ;
+
+: emit-local-allot ( node -- )
+    dup node-input-infos first literal>> dup integer?
+    [ nip ds-drop f ^^local-allot ^^box-alien ds-push ]
+    [ drop emit-primitive ]
+    if ;

@@ -14,6 +14,7 @@ compiler.cfg.intrinsics.misc
 compiler.cfg.comparisons ;
 QUALIFIED: alien
 QUALIFIED: alien.accessors
+QUALIFIED: alien.data.private
 QUALIFIED: alien.c-types
 QUALIFIED: kernel
 QUALIFIED: arrays
@@ -64,6 +65,7 @@ IN: compiler.cfg.intrinsics
     { byte-arrays:<byte-array> [ emit-<byte-array> ] }
     { byte-arrays:(byte-array) [ emit-(byte-array) ] }
     { kernel:<wrapper> [ emit-simple-allot ] }
+    { alien.data.private:(local-allot) [ emit-local-allot ] }
     { alien:<displaced-alien> [ emit-<displaced-alien> ] }
     { alien.accessors:alien-unsigned-1 [ int-rep alien.c-types:uchar emit-load-memory ] }
     { alien.accessors:set-alien-unsigned-1 [ int-rep alien.c-types:uchar emit-store-memory ] }
