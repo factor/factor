@@ -80,7 +80,7 @@ IN: io.files.tests
     "test.txt" temp-file binary [
         3 4 * read
     ] with-file-reader
-    byte-array>int-array
+    int-array-cast
 ] unit-test
 
 [ ] [
