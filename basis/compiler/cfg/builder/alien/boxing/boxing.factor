@@ -65,7 +65,13 @@ M: c-type unbox-parameter unbox ;
 
 M: long-long-type unbox-parameter unbox ;
 
-M: struct-c-type unbox-parameter frob-struct unbox ;
+M: struct-c-type unbox-parameter
+    dup value-struct? [ unbox ] [
+        [ nip heap-size f ^^local-allot dup ]
+        [ [ ^^unbox-any-c-ptr ] dip explode-struct keys ] 2bi
+        implode-struct
+        1array { { int-rep f } }
+    ] if ;
 
 GENERIC: unbox-return ( src c-type -- )
 
@@ -114,7 +120,10 @@ M: c-type box-parameter box ;
 
 M: long-long-type box-parameter box ;
 
-M: struct-c-type box-parameter frob-struct box ;
+M: struct-c-type box-parameter
+    dup value-struct?
+    [ [ [ drop first ] dip explode-struct keys ] keep ] unless
+    box ;
 
 GENERIC: box-return ( c-type -- dst )
 
