@@ -154,7 +154,7 @@ M:: x86.32 %unbox ( dst src func rep -- )
     src func call-unbox-func
     dst rep %load-return ;
 
-M:: x86.32 %unbox-long-long cpu ( src out func -- )
+M:: x86.32 %unbox-long-long ( src out func -- )
     EAX src int-rep %copy
     0 stack@ EAX MOV
     EAX out int-rep %copy
