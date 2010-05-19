@@ -290,7 +290,7 @@ CODEGEN: ##store-reg-param %store-reg-param
 CODEGEN: ##store-stack-param %store-stack-param
 CODEGEN: ##load-reg-param %load-reg-param
 CODEGEN: ##load-stack-param %load-stack-param
-CODEGEN: ##prepare-struct-caller %prepare-struct-caller
+CODEGEN: ##local-allot %local-allot
 CODEGEN: ##box %box
 CODEGEN: ##box-long-long %box-long-long
 CODEGEN: ##allot-byte-array %allot-byte-array
