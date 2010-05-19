@@ -10,7 +10,7 @@ HELP: nsequence
 "that constructs a sequence from the top " { $snippet "n" } " elements of the stack."
 }
 { $examples
-    { $example "USING: generalizations prettyprint ;" "CHAR: f CHAR: i CHAR: s CHAR: h 4 \"\" nsequence ." "\"fish\"" }
+    { $example "USING: prettyprint sequences.generalizations ;" "CHAR: f CHAR: i CHAR: s CHAR: h 4 \"\" nsequence ." "\"fish\"" }
 } ;
 
 HELP: narray
@@ -60,7 +60,7 @@ HELP: nappend
 { $description "Outputs a new sequence consisting of the elements of the top " { $snippet "n" } " sequences from the datastack in turn." }
 { $errors "Throws an error if any of the sequences contain elements that are not permitted in the sequence type of the first sequence." }
 { $examples
-    { $example "USING: generalizations prettyprint math ;"
+    { $example "USING: math prettyprint sequences.generalizations ;"
                "{ 1 2 } { 3 4 } { 5 6 } { 7 8 } 4 nappend ."
                "{ 1 2 3 4 5 6 7 8 }"
     }
@@ -74,7 +74,7 @@ HELP: nappend-as
 { $description "Outputs a new sequence of type " { $snippet "exemplar" } " consisting of the elements of the top " { $snippet "n" } " sequences from the datastack in turn." }
 { $errors "Throws an error if any of the sequences contain elements that are not permitted in the sequence type of the first sequence." }
 { $examples
-    { $example "USING: generalizations prettyprint math ;"
+    { $example "USING: math prettyprint sequences.generalizations ;"
                "{ 1 2 } { 3 4 } { 5 6 } { 7 8 } 4 V{ } nappend-as ."
                "V{ 1 2 3 4 5 6 7 8 }"
     }

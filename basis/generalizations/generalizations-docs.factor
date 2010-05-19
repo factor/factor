@@ -14,7 +14,13 @@ HELP: npick
 "placed on the top of the stack."
 }
 { $examples
-  { $example "USING: kernel prettyprint generalizations ;" "1 2 3 4 4 npick 5 narray ." "{ 1 2 3 4 1 }" }
+  { $example
+      "USING: kernel generalizations prettyprint"
+      "sequences.generalizations ;"
+      ""
+      "1 2 3 4 4 npick 5 narray ."
+      "{ 1 2 3 4 1 }"
+  }
   "Some core words expressed in terms of " { $link npick } ":"
     { $table
         { { $link dup } { $snippet "1 npick" } }
@@ -31,7 +37,13 @@ HELP: ndup
 "placed on the top of the stack."
 }
 { $examples
-  { $example "USING: prettyprint generalizations kernel ;" "1 2 3 4 4 ndup 8 narray ." "{ 1 2 3 4 1 2 3 4 }" }
+  { $example
+      "USING: prettyprint generalizations kernel"
+      "sequences.generalizations ;"
+      ""
+      "1 2 3 4 4 ndup 8 narray ."
+      "{ 1 2 3 4 1 2 3 4 }"
+  }
   "Some core words expressed in terms of " { $link ndup } ":"
     { $table
         { { $link dup } { $snippet "1 ndup" } }
@@ -129,7 +141,13 @@ HELP: nkeep
 "saved, the quotation called, and the items restored."
 } 
 { $examples
-  { $example "USING: generalizations kernel prettyprint ;" "1 2 3 4 5 [ drop drop drop drop drop 99 ] 5 nkeep 6 narray ." "{ 99 1 2 3 4 5 }" }
+  { $example
+      "USING: generalizations kernel prettyprint"
+      "sequences.generalizations ;"
+      ""
+      "1 2 3 4 5 [ drop drop drop drop drop 99 ] 5 nkeep 6 narray ."
+      "{ 99 1 2 3 4 5 }"
+  }
   "Some core words expressed in terms of " { $link nkeep } ":"
     { $table
         { { $link keep } { $snippet "1 nkeep" } }
