@@ -34,19 +34,19 @@ M: not-a-byte-array summary
 
 FUNCTOR: define-array ( T -- )
 
-A            DEFINES-CLASS ${T}-array
-<A>          DEFINES <${A}>
-(A)          DEFINES (${A})
-<direct-A>   DEFINES <direct-${A}>
-malloc-A     DEFINES malloc-${A}
->A           DEFINES >${A}
-byte-array>A DEFINES byte-array>${A}
-
-A{           DEFINES ${A}{
-A@           DEFINES ${A}@
-
-NTH          [ T dup c-getter array-accessor ]
-SET-NTH      [ T dup c-setter array-accessor ]
+A          DEFINES-CLASS ${T}-array
+<A>        DEFINES <${A}>
+(A)        DEFINES (${A})
+<direct-A> DEFINES <direct-${A}>
+malloc-A   DEFINES malloc-${A}
+>A         DEFINES >${A}
+A-cast     DEFINES ${A}-cast
+           
+A{         DEFINES ${A}{
+A@         DEFINES ${A}@
+           
+NTH        [ T dup c-getter array-accessor ]
+SET-NTH    [ T dup c-setter array-accessor ]
 
 WHERE
 
@@ -65,12 +65,9 @@ TUPLE: A
 : malloc-A ( len -- specialized-array )
     [ \ T heap-size calloc ] keep <direct-A> ; inline
 
-: byte-array>A ( byte-array -- specialized-array )
-    >c-ptr dup byte-array? [
-        dup length \ T heap-size /mod 0 =
-        [ <direct-A> ]
-        [ drop \ T bad-byte-array-length ] if
-    ] [ not-a-byte-array ] if ; inline
+: A-cast ( byte-array -- specialized-array )
+    binary-object \ T heap-size /mod 0 =
+    [ <direct-A> ] [ drop \ T bad-byte-array-length ] bi ; inline
 
 M: A clone [ underlying>> clone ] [ length>> ] bi <direct-A> ; inline
 
