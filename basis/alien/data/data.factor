@@ -1,7 +1,8 @@
 ! (c)2009, 2010 Slava Pestov, Joe Groff bsd license
 USING: accessors alien alien.c-types alien.arrays alien.strings
 arrays byte-arrays cpu.architecture fry io io.encodings.binary
-io.files io.streams.memory kernel libc math sequences words ;
+io.files io.streams.memory kernel libc math sequences words
+macros ;
 IN: alien.data
 
 GENERIC: require-c-array ( c-type -- )
@@ -74,3 +75,17 @@ M: array c-type-boxer-quot
     unclip [ array-length ] dip [ <c-direct-array> ] 2curry ;
 
 M: array c-type-unboxer-quot drop [ >c-ptr ] ;
+
+ERROR: local-allocation-error ;
+
+<PRIVATE
+
+: (local-allot) ( size -- alien ) local-allocation-error ;
+
+MACRO: (local-allots) ( c-types -- quot )
+    [ dup c-type-boxer-quot '[ _ heap-size (local-allot) @ ] ] map [ ] join ;
+
+PRIVATE>
+
+: with-scoped-allocation ( c-types quot -- )
+    [ (local-allots) ] dip call ; inline
