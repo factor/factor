@@ -17,9 +17,9 @@ TUPLE: alien-invoke-params < alien-node-params library { function string } ;
 
 TUPLE: alien-indirect-params < alien-node-params ;
 
-TUPLE: alien-assembly-params < alien-node-params { quot quotation } ;
+TUPLE: alien-assembly-params < alien-node-params { quot callable } ;
 
-TUPLE: alien-callback-params < alien-node-params { quot quotation } xt ;
+TUPLE: alien-callback-params < alien-node-params { quot callable } xt ;
 
 : param-prep-quot ( params -- quot )
     parameters>> [ c-type c-type-unboxer-quot ] map spread>quot ;
