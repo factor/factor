@@ -189,14 +189,18 @@ CONSTANT: primitive-types
         c-string
     }
 
-: (pointer-c-type) ( void* type -- void*' )
-    [ clone ] dip c-type-boxer-quot '[ _ [ f ] if* ] >>boxer-quot ;
-
 : >c-bool ( ? -- int ) 1 0 ? ; inline
 
 : c-bool> ( int -- ? ) 0 = not ; inline
 
 <PRIVATE
+
+: 8-byte-alignment ( c-type -- c-type )
+    {
+        { [ cpu ppc? os macosx? and ] [ 4 >>align 8 >>align-first ] }
+        { [ cpu x86.32? os windows? not and ] [ 4 >>align 4 >>align-first ] }
+        [ 8 >>align 8 >>align-first ]
+    } cond ;
 
 : resolve-pointer-typedef ( type -- base-type )
     dup "c-type" word-prop dup word?
@@ -209,18 +213,14 @@ CONSTANT: primitive-types
         resolve-pointer-typedef [ void? ] [ primitive-types member? ] bi or
     ] [ drop t ] if ;
 
+: (pointer-c-type) ( void* type -- void*' )
+    [ clone ] dip c-type-boxer-quot '[ _ [ f ] if* ] >>boxer-quot ;
+
 PRIVATE>
 
 M: pointer c-type
     [ \ void* c-type ] dip
     to>> dup primitive-pointer-type? [ drop ] [ (pointer-c-type) ] if ;
-
-: 8-byte-alignment ( c-type -- c-type )
-    {
-        { [ cpu ppc? os macosx? and ] [ 4 >>align 8 >>align-first ] }
-        { [ cpu x86.32? os windows? not and ] [ 4 >>align 4 >>align-first ] }
-        [ 8 >>align 8 >>align-first ]
-    } cond ;
 
 [
     <c-type>
