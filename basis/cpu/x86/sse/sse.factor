@@ -910,4 +910,7 @@ M: x86 %vector>scalar %copy ;
 
 M: x86 %scalar>vector %copy ;
 
+enable-float-intrinsics
+enable-float-functions
 enable-float-min/max
+enable-fsqrt

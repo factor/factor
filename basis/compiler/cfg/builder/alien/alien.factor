@@ -21,11 +21,13 @@ IN: compiler.cfg.builder.alien
     ]
     [ length neg ##inc-d ] bi ;
 
-: prepare-struct-caller ( vregs reps return -- vregs' reps' )
-    large-struct? [
-        [ ^^prepare-struct-caller prefix ]
-        [ int-rep struct-return-on-stack? 2array prefix ] bi*
-    ] when ;
+: prepare-struct-caller ( vregs reps return -- vregs' reps' return-vreg/f )
+    dup large-struct? [
+        heap-size f ^^local-allot [
+            '[ _ prefix ]
+            [ int-rep struct-return-on-stack? 2array prefix ] bi*
+        ] keep
+    ] [ drop f ] if ;
 
 : caller-parameter ( vreg rep on-stack? -- insn )
     [ dup reg-class-of reg-class-full? ] dip or
@@ -44,10 +46,12 @@ IN: compiler.cfg.builder.alien
     [ abi>> ] [ parameters>> ] [ return>> ] tri
     '[ 
         _ unbox-parameters
-        _ prepare-struct-caller
+        _ prepare-struct-caller struct-return-area set
         (caller-parameters)
         stack-params get
-    ] with-param-regs ;
+        struct-return-area get
+    ] with-param-regs
+    struct-return-area set ;
 
 : box-return* ( node -- )
     return>> [ ] [ base-type box-return 1 ##inc-d D 0 ##replace ] if-void ;
@@ -79,10 +83,6 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
     [ library>> load-library ]
     bi 2dup check-dlsym ;
 
-: return-size ( c-type -- n )
-    ! Amount of space we reserve for a return value.
-    dup large-struct? [ heap-size ] [ drop 0 ] if ;
-
 : alien-node-height ( params -- )
     [ out-d>> length ] [ in-d>> length ] bi - adjust-d ;
 
@@ -93,15 +93,13 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
         _ [ alien-node-height ] bi
     ] emit-trivial-block ; inline
 
-: <alien-stack-frame> ( stack-size return -- stack-frame )
-    stack-frame new
-        swap return-size >>return
-        swap >>params ;
+: <alien-stack-frame> ( stack-size -- stack-frame )
+    stack-frame new swap >>params ;
 
 : emit-stack-frame ( stack-size params -- )
-    [ return>> ] [ abi>> ] bi
-    [ stack-cleanup ##cleanup ]
-    [ drop <alien-stack-frame> ##stack-frame ] 3bi ;
+    [ [ return>> ] [ abi>> ] bi stack-cleanup ##cleanup ]
+    [ drop <alien-stack-frame> ##stack-frame ]
+    2bi ;
 
 M: #alien-invoke emit-node
     [

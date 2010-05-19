@@ -132,5 +132,5 @@ M: struct-c-type box-return
     [
         dup return-struct-in-registers?
         [ load-return ]
-        [ [ ^^prepare-struct-caller ] dip explode-struct keys ] if
+        [ [ struct-return-area get ] dip explode-struct keys ] if
     ] keep box ;
