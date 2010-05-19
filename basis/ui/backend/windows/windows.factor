@@ -797,7 +797,7 @@ M: windows-ui-backend system-alert
 : client-area>RECT ( hwnd -- RECT )
     RECT <struct>
     [ GetClientRect win32-error=0/f ]
-    [ >c-ptr byte-array>POINT-array [ ClientToScreen drop ] with each ]
+    [ >c-ptr POINT-array-cast [ ClientToScreen drop ] with each ]
     [ nip ] 2tri ;
 
 : hwnd>RECT ( hwnd -- RECT )
