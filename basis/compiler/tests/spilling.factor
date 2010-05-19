@@ -1,6 +1,8 @@
 USING: math.private kernel combinators accessors arrays
-generalizations tools.test words ;
+generalizations sequences.generalizations tools.test words ;
 IN: compiler.tests.spilling
+
+! These tests are stupid and don't trigger spilling anymore
 
 : float-spill-bug ( a -- b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b )
     {
@@ -163,7 +165,6 @@ IN: compiler.tests.spilling
 
 [ 4 ] [ 1 1 resolve-spill-bug ] unit-test
 
-! The above don't really test spilling...
 : spill-test-1 ( a -- b )
     dup 1 fixnum+fast
     dup 1 fixnum+fast
