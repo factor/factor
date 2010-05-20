@@ -117,7 +117,7 @@ CONSTANT: pt-array-1
 
 [ t ] [
     "test.txt" temp-file binary file-contents
-    byte-array>pt-array
+    pt-array-cast
     pt-array-1 rest-slice sequence=
 ] unit-test
 
