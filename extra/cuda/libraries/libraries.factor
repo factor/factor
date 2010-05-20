@@ -6,9 +6,6 @@ math namespaces sequences words ;
 QUALIFIED-WITH: alien.c-types c
 IN: cuda.libraries
 
-SYMBOL: cuda-module
-SYMBOL: cuda-function
-
 SYMBOL: cuda-modules
 SYMBOL: cuda-functions
 
@@ -20,49 +17,25 @@ SYMBOL: current-cuda-library
 : ?delete-at ( key assoc -- old/key ? )
     2dup delete-at* [ 2nip t ] [ 2drop f ] if ; inline
 
-: cuda-int* ( function offset value -- )
+: cuda-int ( function offset value -- )
     cuParamSeti cuda-error ; inline
 
-: cuda-int ( offset value -- )
-    [ cuda-function get ] 2dip cuda-int* ; inline
-
-: cuda-float* ( function offset value -- )
+: cuda-float ( function offset value -- )
     cuParamSetf cuda-error ; inline
 
-: cuda-float ( offset value -- )
-    [ cuda-function get ] 2dip cuda-float* ; inline
-
-: cuda-vector* ( function offset ptr n -- )
+: cuda-vector ( function offset ptr n -- )
     cuParamSetv cuda-error ; inline
 
-: cuda-vector ( offset ptr n -- )
-    [ cuda-function get ] 3dip cuda-vector* ; inline
-
-: param-size* ( function n -- )
+: param-size ( function n -- )
     cuParamSetSize cuda-error ; inline
 
-: param-size ( n -- )
-    [ cuda-function get ] dip param-size* ; inline
-
-: launch-function-grid* ( function width height -- )
+: launch-function-grid ( function width height -- )
     cuLaunchGrid cuda-error ; inline
 
-: launch-function-grid ( width height -- )
-    [ cuda-function get ] 2dip
-    cuLaunchGrid cuda-error ; inline
-
-: function-block-shape* ( function x y z -- )
+: function-block-shape ( function x y z -- )
     cuFuncSetBlockShape cuda-error ; inline
 
-: function-block-shape ( x y z -- )
-    [ cuda-function get ] 3dip
-    cuFuncSetBlockShape cuda-error ; inline
-
-: function-shared-size* ( function n -- )
-    cuFuncSetSharedSize cuda-error ; inline
-
-: function-shared-size ( n -- )
-    [ cuda-function get ] dip
+: function-shared-size ( function n -- )
     cuFuncSetSharedSize cuda-error ; inline
 
 TUPLE: grid
@@ -79,11 +52,11 @@ dim-grid dim-block shared-size stream ;
 
 : c-type>cuda-setter ( c-type -- n cuda-type )
     {
-        { [ dup c:int = ] [ drop 4 [ cuda-int* ] ] }
-        { [ dup c:uint = ] [ drop 4 [ cuda-int* ] ] }
-        { [ dup c:float = ] [ drop 4 [ cuda-float* ] ] }
-        { [ dup c:pointer? ] [ drop 4 [ cuda-int* ] ] }
-        { [ dup c:void* = ] [ drop 4 [ cuda-int* ] ] }
+        { [ dup c:int = ] [ drop 4 [ cuda-int ] ] }
+        { [ dup c:uint = ] [ drop 4 [ cuda-int ] ] }
+        { [ dup c:float = ] [ drop 4 [ cuda-float ] ] }
+        { [ dup c:pointer? ] [ drop 4 [ cuda-int ] ] }
+        { [ dup c:void* = ] [ drop 4 [ cuda-int ] ] }
     } cond ;
 
 <PRIVATE
@@ -114,19 +87,17 @@ ERROR: no-cuda-library name ;
 : unload-cuda-library ( name -- )
     remove-cuda-library handle>> unload-module ;
 
-: launch-function* ( function -- ) cuLaunch cuda-error ; inline
-
-: launch-function ( -- ) cuda-function get cuLaunch cuda-error ; inline
+: launch-function ( function -- ) cuLaunch cuda-error ; inline
 
 : run-grid ( grid function -- )
     swap
     {
-        [ dim-block>> block-dim function-block-shape* ]
-        [ shared-size>> function-shared-size* ]
+        [ dim-block>> block-dim function-block-shape ]
+        [ shared-size>> function-shared-size ]
         [
             dim-grid>>
-            [ grid-dim launch-function-grid* ]
-            [ launch-function* ] if*
+            [ grid-dim launch-function-grid ]
+            [ launch-function ] if*
         ]
     } 2cleave ;
 
@@ -137,15 +108,12 @@ ERROR: no-cuda-library name ;
 
 MACRO: cuda-arguments ( c-types -- quot: ( args... function -- ) )
     [ 0 ] dip [ cuda-argument-setter ] map reverse
-    swap '[ _ param-size* ] suffix
+    swap '[ _ param-size ] suffix
     '[ _ cleave ] ;
 
-: get-function-ptr* ( module string -- function )
+: get-function-ptr ( module string -- function )
     [ CUfunction <c-object> ] 2dip
     [ cuModuleGetFunction cuda-error ] 3keep 2drop c:*void* ;
-
-: get-function-ptr ( string -- function )
-    [ cuda-module get ] dip get-function-ptr* ;
 
 : cached-module ( module-name -- alien )
     lookup-cuda-library
@@ -153,7 +121,7 @@ MACRO: cuda-arguments ( c-types -- quot: ( args... function -- ) )
 
 : cached-function ( module-name function-name -- alien )
     [ cached-module ] dip
-    2array cuda-functions get [ first2 get-function-ptr* ] cache ;
+    2array cuda-functions get [ first2 get-function-ptr ] cache ;
 
 MACRO: cuda-invoke ( module-name function-name arguments -- )
     '[
