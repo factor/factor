@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.strings cuda cuda.devices
-cuda.memory cuda.syntax cuda.utils destructors io
-io.encodings.string io.encodings.utf8 kernel locals math
-math.parser namespaces sequences byte-arrays strings ;
+USING: accessors alien.c-types alien.strings byte-arrays cuda
+cuda.contexts cuda.devices cuda.memory cuda.syntax destructors
+io io.encodings.string io.encodings.utf8 kernel locals math
+math.parser namespaces sequences strings ;
 IN: cuda.demos.hello-world
 
 CUDA-LIBRARY: hello vocab:cuda/demos/hello-world/hello.ptx
