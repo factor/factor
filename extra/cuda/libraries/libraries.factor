@@ -155,16 +155,28 @@ MACRO: cuda-arguments ( c-types -- quot: ( args... function -- ) )
     [ cached-module ] dip
     2array cuda-functions get [ first2 get-function-ptr* ] cache ;
 
-: define-cuda-word ( word module-name function-name arguments -- )
-    [
-        '[
-            _ _ cached-function
-            [ nip _ cuda-arguments ]
-            [ run-grid ] 2bi
-        ]
-    ]
+MACRO: cuda-invoke ( module-name function-name arguments -- )
+    '[
+        _ _ cached-function
+        [ nip _ cuda-arguments ]
+        [ run-grid ] 2bi
+    ] ;
+
+: cuda-global* ( module-name symbol-name -- device-ptr size )
+    [ CUdeviceptr <c-object> c:uint <c-object> ] 2dip
+    [ cached-module ] dip 
+    '[ _ _ cuModuleGetGlobal cuda-error ] 2keep [ c:*uint ] bi@ ; inline
+
+: cuda-global ( module-name symbol-name -- device-ptr )
+    cuda-global* drop ; inline
+
+: define-cuda-function ( word module-name function-name arguments -- )
+    [ '[ _ _ _ cuda-invoke ] ]
     [ 2nip \ grid suffix c:void function-effect ]
     3bi define-declared ;
+
+: define-cuda-global ( word module-name symbol-name -- )
+    '[ _ _ cuda-global ] (( -- device-ptr )) define-declared ;
 
 TUPLE: cuda-library name path handle ;
 
