@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays
 assocs byte-arrays classes.struct combinators cuda
-cuda.contexts cuda.ffi cuda.syntax fry io io.encodings.utf8
+cuda.contexts cuda.ffi cuda.libraries fry io io.encodings.utf8
 kernel locals math math.order math.parser namespaces
 prettyprint sequences ;
 IN: cuda.devices
@@ -87,4 +87,4 @@ IN: cuda.devices
 : distribute-jobs ( job-count per-job-shared -- launcher )
     context-device-properties
     [ sharedMemPerBlock>> ] [ maxThreadsPerBlock>> ] bi
-    (distribute-jobs) 3<<< ; inline
+    (distribute-jobs) <grid-shared> ; inline
