@@ -65,8 +65,17 @@ SYMBOL: current-cuda-library
     [ cuda-function get ] dip
     cuFuncSetSharedSize cuda-error ; inline
 
-TUPLE: function-launcher
+TUPLE: grid
 dim-grid dim-block shared-size stream ;
+
+: <grid> ( dim-grid dim-block -- grid )
+    0 f grid boa ; inline
+
+: <grid-shared> ( dim-grid dim-block shared-size -- grid )
+    f grid boa ; inline
+
+: <grid-shared-stream> ( dim-grid dim-block shared-size stream -- grid )
+    grid boa ; inline
 
 : c-type>cuda-setter ( c-type -- n cuda-type )
     {
@@ -109,7 +118,7 @@ ERROR: no-cuda-library name ;
 
 : launch-function ( -- ) cuda-function get cuLaunch cuda-error ; inline
 
-: run-function-launcher ( function-launcher function -- )
+: run-grid ( grid function -- )
     swap
     {
         [ dim-block>> block-dim function-block-shape* ]
@@ -151,10 +160,10 @@ MACRO: cuda-arguments ( c-types -- quot: ( args... function -- ) )
         '[
             _ _ cached-function
             [ nip _ cuda-arguments ]
-            [ run-function-launcher ] 2bi
+            [ run-grid ] 2bi
         ]
     ]
-    [ 2nip \ function-launcher suffix c:void function-effect ]
+    [ 2nip \ grid suffix c:void function-effect ]
     3bi define-declared ;
 
 TUPLE: cuda-library name path handle ;

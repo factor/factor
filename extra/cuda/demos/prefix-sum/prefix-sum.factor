@@ -10,7 +10,7 @@ CUDA-FUNCTION: prefix_sum_block ( uint* in, uint* out, uint n ) ;
 :: cuda-prefix-sum ( -- )
     init-cuda
     0 0 [
-        ! { 1 1 1 } { 2 1 } 0 3<<< prefix_sum_block
+        ! { 1 1 1 } { 2 1 } 0 <grid-shared> prefix_sum_block
     ] with-cuda-context ;
 
 MAIN: cuda-prefix-sum
