@@ -13,11 +13,3 @@ SYNTAX: CUDA-FUNCTION:
     scan [ create-in current-cuda-library get ] [ ] bi
     ";" scan-c-args drop define-cuda-word ;
 
-: 2<<< ( dim-grid dim-block -- function-launcher )
-    0 f function-launcher boa ; inline
-
-: 3<<< ( dim-grid dim-block shared-size -- function-launcher )
-    f function-launcher boa ; inline
-
-: 4<<< ( dim-grid dim-block shared-size stream -- function-launcher )
-    function-launcher boa ; inline
