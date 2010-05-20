@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors calendar continuations destructors kernel math
-math.order namespaces system threads ui ui.gadgets.worlds
-sequences ;
+USING: accessors alarms calendar continuations destructors fry
+kernel math math.order namespaces system ui ui.gadgets.worlds
+vocabs.loader ;
 IN: game.loop
 
 TUPLE: game-loop
@@ -15,7 +15,8 @@ TUPLE: game-loop
     { frame-number integer }
     { benchmark-time integer }
     { benchmark-tick-number integer }
-    { benchmark-frame-number integer } ;
+    { benchmark-frame-number integer }
+    alarm ;
 
 GENERIC: tick* ( delegate -- )
 GENERIC: draw* ( tick-slice delegate -- )
@@ -64,16 +65,6 @@ TUPLE: game-loop-error game-loop error ;
         [ 2drop ] if
     ] if-zero ;
 
-: (run-loop) ( loop -- )
-    dup running?>>
-    [ [ MAX-FRAMES-TO-SKIP ?tick ] [ redraw ] [ yield (run-loop) ] tri ]
-    [ drop ] if ;
-
-: run-loop ( loop -- )
-    dup game-loop
-    [ [ (run-loop) ] [ game-loop-error ] recover ]
-    with-variable ;
-
 : benchmark-micros ( loop -- micros )
     system-micros swap benchmark-time>> - ;
 
@@ -90,11 +81,22 @@ PRIVATE>
 : benchmark-frames-per-second ( loop -- n )
     [ frame-number>> ] [ benchmark-frame-number>> - ] [ benchmark-micros ] tri /f ;
 
+: (game-tick) ( loop -- )
+    dup running?>>
+    [ [ MAX-FRAMES-TO-SKIP ?tick ] [ redraw ] bi ]
+    [ drop ] if ;
+    
+: game-tick ( alarm loop -- )
+    [ alarm<< ] keep
+    dup game-loop [
+        [ (game-tick) ] [ game-loop-error ] recover
+    ] with-variable ;
+
 : start-loop ( loop -- )
     system-micros >>last-tick
     t >>running?
     [ reset-loop-benchmark ]
-    [ [ run-loop ] curry "game loop" spawn ]
+    [ [ '[ _ game-tick ] ] keep tick-interval-micros>> microseconds every* ]
     [ thread<< ] tri ;
 
 : stop-loop ( loop -- )
@@ -103,7 +105,7 @@ PRIVATE>
     drop ;
 
 : <game-loop*> ( tick-interval-micros tick-delegate draw-delegate -- loop )
-    system-micros f f 0 0 system-micros 0 0
+    system-micros f f 0 0 system-micros 0 0 f
     game-loop boa ;
 
 : <game-loop> ( tick-interval-micros delegate -- loop )
