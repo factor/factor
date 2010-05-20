@@ -10,6 +10,9 @@ SYNTAX: CUDA-LIBRARY:
     [ drop current-cuda-library set-global ] 2bi ;
 
 SYNTAX: CUDA-FUNCTION:
-    scan [ create-in current-cuda-library get ] [ ] bi
-    ";" scan-c-args drop define-cuda-word ;
+    scan [ create-in current-cuda-library get ] keep
+    ";" scan-c-args drop define-cuda-function ;
 
+SYNTAX: CUDA-GLOBAL:
+    scan [ create-in current-cuda-library get ] keep
+    define-cuda-global ;
