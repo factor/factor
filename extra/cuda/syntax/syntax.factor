@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.parser cuda cuda.libraries cuda.utils io.backend
+USING: alien.parser cuda cuda.libraries io.backend
 kernel lexer namespaces parser ;
 IN: cuda.syntax
 

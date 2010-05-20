@@ -1,7 +1,7 @@
 ! (c)2010 Joe Groff bsd license
 USING: accessors alien.c-types alien.data alien.destructors
-alien.enums continuations cuda cuda.ffi cuda.gl.ffi cuda.utils
-destructors fry gpu.buffers kernel ;
+alien.enums continuations cuda cuda.contexts cuda.ffi
+cuda.gl.ffi destructors fry gpu.buffers kernel ;
 IN: cuda.gl
 
 : create-gl-cuda-context ( device flags -- context )
