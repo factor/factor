@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Erik Charlebois, William Schlieper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays kernel game.input namespaces math
-classes bit-arrays system sequences vectors x11 x11.xlib ;
+USING: accessors alien.c-types arrays kernel game.input
+namespaces math classes bit-arrays system sequences vectors
+x11 x11.xlib assocs ;
 IN: game.input.x11
 
 SINGLETON: x11-game-input-backend

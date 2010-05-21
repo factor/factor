@@ -55,7 +55,7 @@ IN: xml.elements
     ">" expect ;
 
 : assure-no-extra ( seq -- )
-    keys {
+    [ first ] map {
         T{ name f "" "version" f }
         T{ name f "" "encoding" f }
         T{ name f "" "standalone" f }
