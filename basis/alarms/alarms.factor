@@ -9,8 +9,7 @@ TUPLE: alarm
     { quot callable initial: [ ] }
     { start integer }
     interval
-    { previous-iteration-begin integer }
-    { iteration-begin integer }
+    { iteration-scheduled integer }
     { stop? boolean } ;
 
 SYMBOL: alarms
@@ -31,8 +30,9 @@ M: duration >nanoseconds duration>nanoseconds >integer ;
 : <alarm> ( quot start interval -- alarm )
     alarm new
         swap >nanoseconds >>interval
-        swap >nanoseconds nano-count + >>start
-        swap >>quot ;
+        swap >nanoseconds nano-count +
+            [ >>start ] [ >>iteration-scheduled ] bi
+        swap >>quot ; inline
 
 : register-alarm ( alarm -- )
     dup start>> alarms get-global heap-push* drop
@@ -41,21 +41,22 @@ M: duration >nanoseconds duration>nanoseconds >integer ;
 : alarm-expired? ( alarm n -- ? )
     [ start>> ] dip <= ;
 
-: next-alarm-time ( alarm -- n )
+: set-next-alarm-time ( alarm -- alarm )
     ! start + ceiling((now - start) / interval) * interval
     nano-count 
     over start>> -
     over interval>> / ceiling
     over interval>> *
-    swap start>> + ; inline
+    over start>> + >>iteration-scheduled ; inline
 
 DEFER: call-alarm-loop
 
 : loop-alarm ( alarm -- )
     nano-count over
-    [ iteration-begin>> - ] [ interval>> ] bi < [
-        [ next-alarm-time sleep-until ] keep
-        call-alarm-loop
+    [ iteration-scheduled>> - ] [ interval>> ] bi <
+    [ set-next-alarm-time ] dip [
+        [ iteration-scheduled>> sleep-until ]
+        [ call-alarm-loop ] bi
     ] [
         0 sleep-until call-alarm-loop
     ] if ;
@@ -69,8 +70,6 @@ DEFER: call-alarm-loop
         drop
     ] [
         [
-            dup iteration-begin>> >>previous-iteration-begin
-            nano-count >>iteration-begin
             [ ] [ quot>> ] bi call( obj -- )
         ] keep maybe-loop-alarm
     ] if ;
@@ -116,19 +115,6 @@ DEFER: call-alarm-loop
     [ [ drop ] prepose ] dip ; inline
 
 PRIVATE>
-
-: alarm-overdue ( alarm -- n/f )
-    dup { [ interval>> not ] [ previous-iteration-begin>> 0 = ] } 1|| [
-        drop f
-    ] [
-        [ iteration-begin>> ]
-        [ previous-iteration-begin>> - ]
-        [ interval>> ] tri 2dup >= [
-            nip
-        ] [
-            2drop f
-        ] if
-    ] if ;
 
 : add-alarm ( quot start interval -- alarm )
     <alarm> [ register-alarm ] keep ;
