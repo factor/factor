@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.strings alien.syntax arrays
 classes.struct fry io.encodings.ascii io.mmap kernel locals math
-math.intervals sequences specialized-arrays strings typed ;
+math.intervals sequences specialized-arrays strings typed assocs ;
 IN: elf
 
 ! FFI data

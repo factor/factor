@@ -1,7 +1,6 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alarms calendar continuations destructors fry
-kernel math math.order namespaces system ui ui.gadgets.worlds
-vocabs.loader ;
+kernel math math.order namespaces system ui ui.gadgets.worlds ;
 IN: game.loop
 
 TUPLE: game-loop
