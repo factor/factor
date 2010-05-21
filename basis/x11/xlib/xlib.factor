@@ -565,7 +565,8 @@ CONSTANT: SelectionNotify       31
 CONSTANT: ColormapNotify        32
 CONSTANT: ClientMessage         33
 CONSTANT: MappingNotify         34
-CONSTANT: LASTEvent             35
+CONSTANT: GenericEvent          35
+CONSTANT: LASTEvent             36
 
 STRUCT: XAnyEvent
 { type int }
