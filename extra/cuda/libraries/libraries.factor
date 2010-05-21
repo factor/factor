@@ -3,10 +3,13 @@
 USING: accessors alien.data alien.parser arrays assocs
 byte-arrays classes.struct combinators combinators.short-circuit
 cuda cuda.ffi fry generalizations io.backend kernel macros math
-namespaces sequences words ;
+namespaces sequences variants words ;
 FROM: classes.struct.private => compute-struct-offsets write-struct-slot ;
 QUALIFIED-WITH: alien.c-types c
 IN: cuda.libraries
+
+VARIANT: cuda-abi
+    cuda32 cuda64 ;
 
 SYMBOL: cuda-modules
 SYMBOL: cuda-functions
@@ -95,14 +98,29 @@ ERROR: no-cuda-library name ;
 : fill-param-buffer ( values... buffer quots... n -- )
     [ cleave-curry ] [ spread* ] bi ; inline
 
-: >argument-type ( c-type -- c-type' )
-    dup { [ c:void* = ] [ c:pointer? ] } 1|| [ drop CUdeviceptr ] when ;
+: pointer-argument-type? ( c-type -- ? )
+    { [ c:void* = ] [ CUdeviceptr = ] [ c:pointer? ] } 1|| ;
 
-: >argument-struct-slot ( type -- slot )
-    "cuda-arg" swap >argument-type { } <struct-slot-spec> ;
+: abi-pointer-type ( abi -- type )
+    {
+        { cuda32 [ c:uint ] }
+        { cuda64 [ CUulonglong ] }
+    } case ;
 
-: [cuda-arguments] ( c-types -- quot )
-    [ >argument-struct-slot ] map
+: >argument-type ( c-type abi -- c-type' )
+    swap {
+        { [ dup pointer-argument-type? ] [ drop abi-pointer-type ] }
+        { [ dup c:double    = ] [ 2drop CUdouble ] }
+        { [ dup c:longlong  = ] [ 2drop CUlonglong ] }
+        { [ dup c:ulonglong = ] [ 2drop CUulonglong ] }
+        [ nip ]
+    } cond ;
+
+: >argument-struct-slot ( c-type abi -- slot )
+    >argument-type "cuda-arg" swap { } <struct-slot-spec> ;
+
+: [cuda-arguments] ( c-types abi -- quot )
+    '[ _ >argument-struct-slot ] map
     [ compute-struct-offsets ]
     [ [ '[ _ write-struct-slot ] ] [ ] map-as ]
     [ length ] tri
@@ -112,8 +130,8 @@ ERROR: no-cuda-library name ;
     ] ;
 PRIVATE>
 
-MACRO: cuda-arguments ( c-types -- quot: ( args... function -- ) )
-    [ [ 0 cuda-param-size ] ] [ [cuda-arguments] ] if-empty ;
+MACRO: cuda-arguments ( c-types abi -- quot: ( args... function -- ) )
+    [ [ 0 cuda-param-size ] ] swap '[ _ [cuda-arguments] ] if-empty ;
 
 : get-function-ptr ( module string -- function )
     [ CUfunction <c-object> ] 2dip
@@ -128,9 +146,9 @@ MACRO: cuda-arguments ( c-types -- quot: ( args... function -- ) )
     2array cuda-functions get [ first2 get-function-ptr ] cache ;
 
 MACRO: cuda-invoke ( module-name function-name arguments -- )
-    '[
+    pick lookup-cuda-library abi>> '[
         _ _ cached-function
-        [ nip _ cuda-arguments ]
+        [ nip _ _ cuda-arguments ]
         [ run-grid ] 2bi
     ] ;
 
@@ -150,14 +168,19 @@ MACRO: cuda-invoke ( module-name function-name arguments -- )
 : define-cuda-global ( word module-name symbol-name -- )
     '[ _ _ cuda-global ] (( -- device-ptr )) define-declared ;
 
-TUPLE: cuda-library name path handle ;
+TUPLE: cuda-library name abi path handle ;
+ERROR: bad-cuda-abi abi ;
 
-: <cuda-library> ( name path -- obj )
+: check-cuda-abi ( abi -- abi )
+    dup cuda-abi? [ bad-cuda-abi ] unless ; inline
+
+: <cuda-library> ( name abi path -- obj )
     \ cuda-library new
         swap >>path
-        swap >>name ;
+        swap check-cuda-abi >>abi
+        swap >>name ; inline
 
-: add-cuda-library ( name path -- )
+: add-cuda-library ( name abi path -- )
     normalize-path <cuda-library>
     dup name>> cuda-libraries get-global set-at ;
 
