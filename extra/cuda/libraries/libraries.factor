@@ -1,8 +1,10 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.data alien.parser arrays
-assocs combinators cuda cuda.ffi fry io.backend kernel macros
-math namespaces sequences words ;
+USING: accessors alien.data alien.parser arrays assocs
+byte-arrays classes.struct combinators combinators.short-circuit
+cuda cuda.ffi fry generalizations io.backend kernel macros math
+namespaces sequences words ;
+FROM: classes.struct.private => compute-struct-offsets write-struct-slot ;
 QUALIFIED-WITH: alien.c-types c
 IN: cuda.libraries
 
@@ -17,17 +19,11 @@ SYMBOL: current-cuda-library
 : ?delete-at ( key assoc -- old/key ? )
     2dup delete-at* [ 2nip t ] [ 2drop f ] if ; inline
 
-: cuda-int ( function offset value -- )
-    cuParamSeti cuda-error ; inline
-
-: cuda-float ( function offset value -- )
-    cuParamSetf cuda-error ; inline
+: cuda-param-size ( function n -- )
+    cuParamSetSize cuda-error ; inline
 
 : cuda-vector ( function offset ptr n -- )
     cuParamSetv cuda-error ; inline
-
-: param-size ( function n -- )
-    cuParamSetSize cuda-error ; inline
 
 : launch-function-grid ( function width height -- )
     cuLaunchGrid cuda-error ; inline
@@ -49,15 +45,6 @@ dim-grid dim-block shared-size stream ;
 
 : <grid-shared-stream> ( dim-grid dim-block shared-size stream -- grid )
     grid boa ; inline
-
-: c-type>cuda-setter ( c-type -- n cuda-type )
-    {
-        { [ dup c:int = ] [ drop 4 [ cuda-int ] ] }
-        { [ dup c:uint = ] [ drop 4 [ cuda-int ] ] }
-        { [ dup c:float = ] [ drop 4 [ cuda-float ] ] }
-        { [ dup c:pointer? ] [ drop 4 [ cuda-int ] ] }
-        { [ dup c:void* = ] [ drop 4 [ cuda-int ] ] }
-    } cond ;
 
 <PRIVATE
 : block-dim ( block -- x y z )
@@ -101,15 +88,32 @@ ERROR: no-cuda-library name ;
         ]
     } 2cleave ;
 
-: cuda-argument-setter ( offset c-type -- offset' quot )
-    c-type>cuda-setter
-    [ over [ + ] dip ] dip
-    '[ swap _ swap _ call ] ;
+<PRIVATE
+: make-param-buffer ( function size -- buffer size )
+    [ cuda-param-size ] [ (byte-array) ] [ ] tri ; inline
+
+: fill-param-buffer ( values... buffer quots... n -- )
+    [ cleave-curry ] [ spread* ] bi ; inline
+
+: >argument-type ( c-type -- c-type' )
+    dup { [ c:void* = ] [ c:pointer? ] } 1|| [ drop CUdeviceptr ] when ;
+
+: >argument-struct-slot ( type -- slot )
+    "cuda-arg" swap >argument-type { } <struct-slot-spec> ;
+
+: [cuda-arguments] ( c-types -- quot )
+    [ >argument-struct-slot ] map
+    [ compute-struct-offsets ]
+    [ [ '[ _ write-struct-slot ] ] [ ] map-as ]
+    [ length ] tri
+    '[
+        [ _ make-param-buffer [ drop @ _ fill-param-buffer ] 2keep ]
+        [ '[ _ 0 ] 2dip cuda-vector ] bi
+    ] ;
+PRIVATE>
 
 MACRO: cuda-arguments ( c-types -- quot: ( args... function -- ) )
-    [ 0 ] dip [ cuda-argument-setter ] map reverse
-    swap '[ _ param-size ] suffix
-    '[ _ cleave ] ;
+    [ [ 0 cuda-param-size ] ] [ [cuda-arguments] ] if-empty ;
 
 : get-function-ptr ( module string -- function )
     [ CUfunction <c-object> ] 2dip
