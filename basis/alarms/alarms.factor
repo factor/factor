@@ -30,12 +30,12 @@ M: duration >nanoseconds duration>nanoseconds >integer ;
 : <alarm> ( quot start interval -- alarm )
     alarm new
         swap >nanoseconds >>interval
-        swap >nanoseconds nano-count +
-            [ >>start ] [ >>iteration-scheduled ] bi
+        nano-count >>start
+        swap >nanoseconds over start>> + >>iteration-scheduled
         swap >>quot ; inline
 
 : register-alarm ( alarm -- )
-    dup start>> alarms get-global heap-push* drop
+    dup iteration-scheduled>> alarms get-global heap-push* drop
     notify-alarm-thread ;
 
 : alarm-expired? ( alarm n -- ? )
