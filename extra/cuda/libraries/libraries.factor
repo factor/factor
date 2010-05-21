@@ -38,7 +38,10 @@ SYMBOL: current-cuda-library
     cuFuncSetSharedSize cuda-error ; inline
 
 TUPLE: grid
-dim-grid dim-block shared-size stream ;
+    { dim-grid read-only }
+    { dim-block read-only }
+    { shared-size read-only initial: 0 }
+    { stream read-only } ;
 
 : <grid> ( dim-grid dim-block -- grid )
     0 f grid boa ; inline
@@ -50,10 +53,24 @@ dim-grid dim-block shared-size stream ;
     grid boa ; inline
 
 <PRIVATE
-: block-dim ( block -- x y z )
-    dup sequence? [ 3 1 pad-tail first3 ] [ 1 1 ] if ; inline
-: grid-dim ( block -- x y )
-    dup sequence? [ 2 1 pad-tail first2 ] [ 1 ] if ; inline
+GENERIC: block-dim ( block-size -- x y z ) foldable
+M: integer block-dim 1 1 ; inline
+M: sequence block-dim
+    dup length {
+        { 0 [ drop 1 1 1 ] }
+        { 1 [ first 1 1 ] }
+        { 2 [ first2 1 ] }
+        [ drop first3 ]
+    } case ; inline
+
+GENERIC: grid-dim ( grid-size -- x y ) foldable
+M: integer grid-dim 1 ; inline
+M: sequence grid-dim
+    dup length {
+        { 0 [ drop 1 1 ] }
+        { 1 [ first 1 ] }
+        [ drop first2 ]
+    } case ; inline
 PRIVATE>
 
 : load-module ( path -- module )
@@ -89,7 +106,7 @@ ERROR: no-cuda-library name ;
             [ grid-dim launch-function-grid ]
             [ launch-function ] if*
         ]
-    } 2cleave ;
+    } 2cleave ; inline
 
 <PRIVATE
 : make-param-buffer ( function size -- buffer size )
@@ -163,10 +180,10 @@ MACRO: cuda-invoke ( module-name function-name arguments -- )
 : define-cuda-function ( word module-name function-name arguments -- )
     [ '[ _ _ _ cuda-invoke ] ]
     [ 2nip \ grid suffix c:void function-effect ]
-    3bi define-declared ;
+    3bi define-inline ;
 
 : define-cuda-global ( word module-name symbol-name -- )
-    '[ _ _ cuda-global ] (( -- device-ptr )) define-declared ;
+    '[ _ _ cuda-global ] (( -- device-ptr )) define-inline ;
 
 TUPLE: cuda-library name abi path handle ;
 ERROR: bad-cuda-abi abi ;
