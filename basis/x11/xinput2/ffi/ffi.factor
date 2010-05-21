@@ -13,22 +13,24 @@ LIBRARY: xinput2
 ! *********
 ! * XI2.h *
 ! *********
+<PRIVATE
+: mask-index   ( event -- n ) -3 shift ;
+: bitmask ( event -- n ) 7 bitand 2^ ;
+PRIVATE>
+
 :: XISetMask ( mask event -- )
-    event -3 shift    :> index
-    event 7 bitand 2^ :> bit-mask
-    bit-mask index mask nth bitor
+    event mask-index :> index
+    event bitmask index mask nth bitor
     index mask set-nth ; inline
 
 :: XIClearMask ( mask event -- )
-    event -3 shift           :> index
-    event 7 bitand 2^ bitnot :> bit-mask
-    bit-mask index mask nth bitand
+    event mask-index :> index
+    event bitmask bitnot index mask nth bitand
     index mask set-nth ; inline
 
 :: XIMaskIsSet ( mask event -- n )
-    event -3 shift    :> index
-    event 7 bitand 2^ :> bit-mask
-    bit-mask index mask nth bitand ;
+    event mask-index :> index
+    event bitmask index mask nth bitand ;
 
 : XIMaskLen ( event -- n ) 7 + -3 shift ;
 
