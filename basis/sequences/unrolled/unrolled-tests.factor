@@ -1,5 +1,6 @@
 ! (c)2010 Joe Groff bsd license
-USING: compiler.test math.parser sequences.unrolled tools.test ;
+USING: compiler.test make math.parser sequences
+sequences.unrolled tools.test ;
 IN: sequences.unrolled.tests
 
 [ { "0" "1" "2" } ] [ { 0 1 2 } 3 [ number>string ] unrolled-map ] unit-test

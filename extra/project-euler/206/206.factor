@@ -30,8 +30,8 @@ CONSTANT: lo 1010101030
 CONSTANT: hi 1389026570
 
 : form-fitting? ( n -- ? )
-    number>digits 2 group keys
-    { 1 2 3 4 5 6 7 8 9 0 } = ;
+    number>digits 2 group [ first ] map
+    { 1 2 3 4 5 6 7 8 9 0 } sequence= ;
 
 : candidates ( -- seq )
     lo lo 40 + [ hi 100 <range> ] bi@ cord-append ;
