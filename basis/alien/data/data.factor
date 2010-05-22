@@ -2,7 +2,7 @@
 USING: accessors alien alien.c-types alien.arrays alien.strings
 arrays byte-arrays cpu.architecture fry io io.encodings.binary
 io.files io.streams.memory kernel libc math sequences words
-macros ;
+macros combinators generalizations ;
 IN: alien.data
 
 GENERIC: require-c-array ( c-type -- )
@@ -80,12 +80,29 @@ ERROR: local-allocation-error ;
 
 <PRIVATE
 
-: (local-allot) ( size -- alien ) local-allocation-error ;
+: (local-allot) ( size align -- alien ) local-allocation-error ;
+
+: (cleanup-allot) ( -- )
+    ! Inhibit TCO in order for the last word in the quotation
+    ! to still be abl to access scope-allocated data.
+    ;
 
 MACRO: (local-allots) ( c-types -- quot )
-    [ dup c-type-boxer-quot '[ _ heap-size (local-allot) @ ] ] map [ ] join ;
+    [ '[ _ [ heap-size ] [ c-type-align ] bi (local-allot) ] ] map [ ] join ;
+
+MACRO: box-values ( c-types -- quot )
+    [ c-type-boxer-quot ] map '[ _ spread ] ;
+
+MACRO: out-parameters ( c-types -- quot )
+    [ length ] [ [ '[ 0 _ alien-value ] ] map ] bi
+    '[ _ nkeep _ spread ] ;
 
 PRIVATE>
 
 : with-scoped-allocation ( c-types quot -- )
-    [ (local-allots) ] dip call ; inline
+    [ [ (local-allots) ] [ box-values ] bi ] dip call
+    (cleanup-allot) ; inline
+
+: with-out-parameters ( c-types quot finish -- values )
+    [ [ drop (local-allots) ] [ swap out-parameters ] 2bi ] dip call
+    (cleanup-allot) ; inline

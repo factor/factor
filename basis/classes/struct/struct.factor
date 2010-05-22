@@ -101,8 +101,7 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
 GENERIC: (reader-quot) ( slot -- quot )
 
 M: struct-slot-spec (reader-quot)
-    [ type>> c-getter ]
-    [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
+    [ offset>> ] [ type>> ] bi '[ >c-ptr _ _ alien-value ] ;
 
 M: struct-bit-slot-spec (reader-quot)
     [ [ offset>> ] [ bits>> ] bi bit-reader ]
@@ -113,12 +112,10 @@ M: struct-bit-slot-spec (reader-quot)
 GENERIC: (writer-quot) ( slot -- quot )
 
 M: struct-slot-spec (writer-quot)
-    [ type>> c-setter ]
-    [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
+    [ offset>> ] [ type>> ] bi '[ >c-ptr _ _ set-alien-value ] ;
 
 M: struct-bit-slot-spec (writer-quot)
-    [ offset>> ] [ bits>> ] bi bit-writer
-    [ >c-ptr ] prepose ;
+    [ offset>> ] [ bits>> ] bi bit-writer [ >c-ptr ] prepose ;
 
 : (boxer-quot) ( class -- quot )
     '[ _ memory>struct ] ;

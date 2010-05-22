@@ -23,7 +23,7 @@ IN: compiler.cfg.builder.alien
 
 : prepare-struct-caller ( vregs reps return -- vregs' reps' return-vreg/f )
     dup large-struct? [
-        heap-size f ^^local-allot [
+        heap-size cell f ^^local-allot [
             '[ _ prefix ]
             [ int-rep struct-return-on-stack? 2array prefix ] bi*
         ] keep
@@ -93,12 +93,9 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
         _ [ alien-node-height ] bi
     ] emit-trivial-block ; inline
 
-: <alien-stack-frame> ( stack-size -- stack-frame )
-    stack-frame new swap >>params ;
-
 : emit-stack-frame ( stack-size params -- )
     [ [ return>> ] [ abi>> ] bi stack-cleanup ##cleanup ]
-    [ drop <alien-stack-frame> ##stack-frame ]
+    [ drop ##stack-frame ]
     2bi ;
 
 M: #alien-invoke emit-node

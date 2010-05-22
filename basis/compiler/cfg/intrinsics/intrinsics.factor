@@ -66,6 +66,7 @@ IN: compiler.cfg.intrinsics
     { byte-arrays:(byte-array) [ emit-(byte-array) ] }
     { kernel:<wrapper> [ emit-simple-allot ] }
     { alien.data.private:(local-allot) [ emit-local-allot ] }
+    { alien.data.private:(cleanup-allot) [ drop emit-cleanup-allot ] }
     { alien:<displaced-alien> [ emit-<displaced-alien> ] }
     { alien.accessors:alien-unsigned-1 [ int-rep alien.c-types:uchar emit-load-memory ] }
     { alien.accessors:set-alien-unsigned-1 [ int-rep alien.c-types:uchar emit-store-memory ] }
