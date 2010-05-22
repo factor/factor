@@ -108,7 +108,7 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
 
 : kill-update-axes ( gadget -- )
     COLOR: gray <solid> >>interior
-    [ [ cancel-alarm ] when* f ] change-alarm
+    [ [ stop-alarm ] when* f ] change-alarm
     relayout-1 ;
 
 : (update-axes) ( gadget controller-state -- )
@@ -129,7 +129,7 @@ M: joystick-demo-gadget graft*
     drop ;
 
 M: joystick-demo-gadget ungraft*
-    alarm>> [ cancel-alarm ] when* ;
+    alarm>> [ stop-alarm ] when* ;
 
 : joystick-window ( controller -- )
     [ <joystick-demo-gadget> ] [ product-string ] bi

@@ -233,7 +233,7 @@ DEFER: update-audio
     dup al-sources>> [
         {
             [ make-engine-current ]
-            [ update-alarm>> [ cancel-alarm ] when* ]
+            [ update-alarm>> [ stop-alarm ] when* ]
             [ clips>> clone [ dispose ] each ]
             [ al-sources>> free-sources ]
             [
