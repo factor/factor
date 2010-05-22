@@ -54,7 +54,7 @@ M: game-world end-world
     [ use-game-input?>> [ close-game-input ] when ] tri ;
 
 TUPLE: game-attributes < world-attributes
-    { tick-interval-nanos fixnum }
+    { tick-interval-nanos integer }
     { use-game-input? boolean initial: f }
     { use-audio-engine? boolean initial: f }
     { audio-engine-device initial: f }
