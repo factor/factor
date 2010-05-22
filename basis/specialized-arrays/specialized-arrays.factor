@@ -41,12 +41,8 @@ A          DEFINES-CLASS ${T}-array
 malloc-A   DEFINES malloc-${A}
 >A         DEFINES >${A}
 A-cast     DEFINES ${A}-cast
-           
 A{         DEFINES ${A}{
 A@         DEFINES ${A}@
-           
-NTH        [ T dup c-getter array-accessor ]
-SET-NTH    [ T dup c-setter array-accessor ]
 
 WHERE
 
@@ -73,9 +69,9 @@ M: A clone [ underlying>> clone ] [ length>> ] bi <direct-A> ; inline
 
 M: A length length>> ; inline
 
-M: A nth-unsafe underlying>> NTH call ; inline
+M: A nth-unsafe underlying>> \ T alien-element ; inline
 
-M: A set-nth-unsafe underlying>> SET-NTH call ; inline
+M: A set-nth-unsafe underlying>> \ T set-alien-element ; inline
 
 : >A ( seq -- specialized-array ) A new clone-like ;
 

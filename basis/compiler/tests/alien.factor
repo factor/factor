@@ -767,3 +767,20 @@ mingw? [
 : blah ( -- x ) { RECT } [ 1.5 >>x 2.0 >>y [ x>> ] [ y>> ] bi * >fixnum ] with-scoped-allocation ;
 
 [ 3 ] [ blah ] unit-test
+
+: out-param-test ( -- b )
+    { int } [ [ 12 ] dip 0 int set-alien-value ] [ ] with-out-parameters ;
+
+[ 12 ] [ out-param-test ] unit-test
+
+: out-param-callback ( -- a )
+    void { int pointer: int } cdecl
+    [ [ 2 * ] dip 0 int set-alien-value ] alien-callback ;
+
+: out-param-indirect ( a a -- b )
+    { int } [
+        swap void { int pointer: int } cdecl
+        alien-indirect
+    ] [ ] with-out-parameters ;
+
+[ 12 ] [ 6 out-param-callback out-param-indirect ] unit-test

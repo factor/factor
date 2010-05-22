@@ -254,8 +254,6 @@ ELT     [ A-rep rep-component-type ]
 N       [ A-rep rep-length ]
 COERCER [ ELT c:c-type-class "coercer" word-prop [ ] or ]
 
-SET-NTH [ ELT dup c:c-setter c:array-accessor ]
-
 BOA-EFFECT [ N "n" <array> { "v" } <effect> ]
 
 WHERE
@@ -271,7 +269,7 @@ M: A nth-unsafe
     swap \ A-rep [ (simd-select) ] [ call-next-method ] vn->n-op ; inline
 M: A set-nth-unsafe
     [ ELT boolean>element ] 2dip
-    underlying>> SET-NTH call ; inline
+    underlying>> ELT c:set-alien-element ; inline
 
 : >A ( seq -- simd ) \ A new clone-like ; inline
 

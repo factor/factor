@@ -588,8 +588,8 @@ M:: x86 %store-stack-param ( src n rep -- )
 M:: x86 %load-stack-param ( dst n rep -- )
     dst n next-stack@ rep %copy ;
 
-M: x86 %local-allot ( dst size offset -- )
-    nip local-allot-offset special-offset stack@ LEA ;
+M:: x86 %local-allot ( dst size align offset -- )
+    dst offset local-allot-offset special-offset stack@ LEA ;
 
 M: x86 %alien-indirect ( src -- )
     ?spill-slot CALL ;

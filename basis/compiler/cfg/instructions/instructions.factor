@@ -660,7 +660,7 @@ literal: n rep ;
 
 INSN: ##local-allot
 def: dst/int-rep
-literal: size offset ;
+literal: size align offset ;
 
 INSN: ##box
 def: dst/tagged-rep

@@ -1,33 +1,33 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces accessors math math.order assocs kernel sequences
-combinators classes words system cpu.architecture layouts compiler.cfg
-compiler.cfg.rpo compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.stack-frame ;
+USING: namespaces accessors math math.order assocs kernel
+sequences combinators classes words system fry locals
+cpu.architecture layouts compiler.cfg compiler.cfg.rpo
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.stack-frame ;
 IN: compiler.cfg.build-stack-frame
 
-SYMBOL: local-allot
-
-SYMBOL: frame-required?
-
-GENERIC: compute-stack-frame* ( insn -- )
+SYMBOLS: param-area-size allot-area-size allot-area-align
+frame-required? ;
 
 : frame-required ( -- ) frame-required? on ;
 
-: request-stack-frame ( stack-frame -- )
-    frame-required
-    stack-frame [ max-stack-frame ] change ;
+GENERIC: compute-stack-frame* ( insn -- )
 
-M: ##local-allot compute-stack-frame*
-    local-allot get >>offset
-    size>> local-allot +@ ;
+M:: ##local-allot compute-stack-frame* ( insn -- )
+    frame-required
+    insn size>> :> s
+    insn align>> :> a
+    allot-area-align [ a max ] change
+    allot-area-size [ a align [ insn offset<< ] [ s + ] bi ] change ;
 
 M: ##stack-frame compute-stack-frame*
-    stack-frame>> request-stack-frame ;
+    frame-required
+    stack-frame>> param-area-size [ max ] change ;
 
 : vm-frame-required ( -- )
     frame-required
-    stack-frame new vm-stack-space >>params request-stack-frame ;
+    vm-stack-space param-area-size [ max ] change ;
 
 M: ##call-gc compute-stack-frame* drop vm-frame-required ;
 M: ##box compute-stack-frame* drop vm-frame-required ;
@@ -51,25 +51,27 @@ M: ##integer>float compute-stack-frame*
 
 M: insn compute-stack-frame* drop ;
 
-: request-spill-area ( n -- )
-    stack-frame new swap >>spill-area-size request-stack-frame ;
+: finalize-stack-frame ( stack-frame -- )
+    dup [ params>> ] [ allot-area-align>> ] bi align >>allot-area-base
+    dup [ [ allot-area-base>> ] [ allot-area-size>> ] bi + ] [ spill-area-align>> ] bi align >>spill-area-base
+    dup stack-frame-size >>total-size drop ;
 
-: request-local-allot ( n -- )
-    stack-frame new swap >>local-allot request-stack-frame ;
+: <stack-frame> ( cfg -- stack-frame )
+    [ stack-frame new ] dip
+    [ spill-area-size>> >>spill-area-size ]
+    [ spill-area-align>> >>spill-area-align ] bi
+    allot-area-size get >>allot-area-size
+    allot-area-align get >>allot-area-align
+    param-area-size get >>params
+    dup finalize-stack-frame ;
 
-: compute-stack-frame ( cfg -- )
-    0 local-allot set
-    stack-frame new stack-frame set
-    [ spill-area-size>> [ request-spill-area ] unless-zero ]
-    [ [ instructions>> [ compute-stack-frame* ] each ] each-basic-block ] bi
-    local-allot get [ request-local-allot ] unless-zero
-    stack-frame get dup stack-frame-size >>total-size drop ;
+: compute-stack-frame ( cfg -- stack-frame/f )
+    [ [ instructions>> [ compute-stack-frame* ] each ] each-basic-block ]
+    [ frame-required? get [ <stack-frame> ] [ drop f ] if ]
+    bi ;
 
 : build-stack-frame ( cfg -- cfg )
-    [
-        [ compute-stack-frame ]
-        [
-            frame-required? get stack-frame get f ?
-            >>stack-frame
-        ] bi
-    ] with-scope ;
+    0 param-area-size set
+    0 allot-area-size set
+    cell allot-area-align set
+    dup compute-stack-frame >>stack-frame ;

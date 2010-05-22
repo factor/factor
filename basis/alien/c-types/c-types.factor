@@ -6,7 +6,7 @@ words splitting cpu.architecture alien alien.accessors
 alien.strings quotations layouts system compiler.units io
 io.files io.encodings.binary io.streams.memory accessors
 combinators effects continuations fry classes vocabs
-vocabs.loader words.symbol ;
+vocabs.loader words.symbol macros ;
 QUALIFIED: math
 IN: alien.c-types
 
@@ -93,7 +93,7 @@ GENERIC: c-type-setter ( name -- quot )
 
 M: c-type c-type-setter setter>> ;
 
-GENERIC: c-type-align ( name -- n )
+GENERIC: c-type-align ( name -- n ) foldable
 
 M: abstract-c-type c-type-align align>> ;
 
@@ -115,18 +115,22 @@ M: abstract-c-type heap-size size>> ;
 
 MIXIN: value-type
 
-: c-getter ( name -- quot )
+MACRO: alien-value ( c-type -- quot: ( c-ptr offset -- value ) )
     [ c-type-getter ] [ c-type-boxer-quot ] bi append ;
 
-: c-setter ( name -- quot )
+MACRO: set-alien-value ( c-type -- quot: ( value c-ptr offset -- ) )
     [ c-type-unboxer-quot [ [ ] ] [ '[ _ 2dip ] ] if-empty ]
     [ c-type-setter ]
     bi append ;
 
-: array-accessor ( c-type quot -- def )
-    [
-        \ swap , [ heap-size , [ * >fixnum ] % ] [ % ] bi*
-    ] [ ] make ;
+: array-accessor ( n c-ptr c-type -- c-ptr offset c-type )
+    [ swapd heap-size * >fixnum ] keep ; inline
+
+: alien-element ( n c-ptr c-type -- value )
+    array-accessor alien-value ; inline
+
+: set-alien-element ( value n c-ptr c-type -- )
+    array-accessor set-alien-value ; inline
 
 PROTOCOL: c-type-protocol 
     c-type-class
@@ -159,12 +163,13 @@ TUPLE: long-long-type < c-type ;
     long-long-type new ;
 
 : define-deref ( c-type -- )
-    [ name>> CHAR: * prefix "alien.c-types" create ] [ c-getter 0 prefix ] bi
-    (( c-ptr -- value )) define-inline ;
+    [ name>> CHAR: * prefix "alien.c-types" create ]
+    [ '[ 0 _ alien-value ] ]
+    bi (( c-ptr -- value )) define-inline ;
 
 : define-out ( c-type -- )
     [ name>> "alien.c-types" constructor-word ]
-    [ dup c-setter '[ _ heap-size (byte-array) [ 0 @ ] keep ] ] bi
+    [ dup '[ _ heap-size (byte-array) [ 0 _ set-alien-value ] keep ] ] bi
     (( value -- c-ptr )) define-inline ;
 
 : define-primitive-type ( c-type name -- )
