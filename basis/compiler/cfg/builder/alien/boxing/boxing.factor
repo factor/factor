@@ -49,7 +49,7 @@ M: c-type unbox
     [ ^^unbox 1array ] [ nip f 2array 1array ] 2bi ;
 
 M: long-long-type unbox
-    [ 8 f ^^local-allot ] dip '[ _ unboxer>> ##unbox-long-long ] keep
+    [ 8 cell f ^^local-allot ] dip '[ _ unboxer>> ##unbox-long-long ] keep
     0 cell [ int-rep f ^^load-memory-imm ] bi-curry@ bi 2array
     int-rep long-long-on-stack? 2array dup 2array ;
 
@@ -67,7 +67,7 @@ M: long-long-type unbox-parameter unbox ;
 
 M: struct-c-type unbox-parameter
     dup value-struct? [ unbox ] [
-        [ nip heap-size f ^^local-allot dup ]
+        [ nip heap-size cell f ^^local-allot dup ]
         [ [ ^^unbox-any-c-ptr ] dip explode-struct keys ] 2bi
         implode-struct
         1array { { int-rep f } }

@@ -22,7 +22,7 @@ number
 M: basic-block hashcode* nip id>> ;
 
 TUPLE: cfg { entry basic-block } word label
-spill-area-size
+spill-area-size spill-area-align
 stack-frame
 frame-pointer?
 post-order linear-order

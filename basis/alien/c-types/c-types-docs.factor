@@ -1,13 +1,13 @@
 USING: alien alien.complex help.syntax help.markup libc kernel.private
 byte-arrays strings hashtables alien.syntax alien.strings sequences
 io.encodings.string debugger destructors vocabs.loader
-classes.struct ;
+classes.struct math kernel ;
 QUALIFIED: math
 QUALIFIED: sequences
 IN: alien.c-types
 
 HELP: heap-size
-{ $values { "name" "a C type name" } { "size" math:integer } }
+{ $values { "name" c-type-name } { "size" math:integer } }
 { $description "Outputs the number of bytes needed for a heap-allocated value of this C type." }
 { $examples
     { $example "USING: alien alien.c-types prettyprint ;\nint heap-size ." "4" }
@@ -19,24 +19,24 @@ HELP: <c-type>
 { $description "Creates a prototypical C type. User code should use higher-level facilities to define C types; see " { $link "c-data" } "." } ;
 
 HELP: no-c-type
-{ $values { "name" "a C type name" } }
+{ $values { "name" c-type-name } }
 { $description "Throws a " { $link no-c-type } " error." }
 { $error-description "Thrown by " { $link c-type } " if a given string does not name a C type. When thrown during compile time, indicates a typo in an " { $link alien-invoke } " or " { $link alien-callback } " form." } ;
 
 HELP: c-type
-{ $values { "name" "a C type" } { "c-type" c-type } }
+{ $values { "name" c-type-name } { "c-type" c-type } }
 { $description "Looks up a C type by name." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist, or the word is not a C type." } ;
 
-HELP: c-getter
-{ $values { "name" "a C type" } { "quot" { $quotation "( c-ptr n -- obj )" } } }
-{ $description "Outputs a quotation which reads values of this C type from a C structure." }
+HELP: alien-value
+{ $values { "c-ptr" c-ptr } { "offset" integer } { "c-type" c-type-name } { "value" object } }
+{ $description "Loads a value at a byte offset from a base C pointer." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
-HELP: c-setter
-{ $values { "name" "a C type" } { "quot" { $quotation "( obj c-ptr n -- )" } } }
-{ $description "Outputs a quotation which writes values of this C type to a C structure." }
-{ $errors "Throws an error if the type does not exist." } ;
+HELP: set-alien-value
+{ $values { "value" object } { "c-ptr" c-ptr } { "offset" integer } { "c-type" c-type-name } }
+{ $description "Stores a value at a byte offset from a base C pointer." }
+{ $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
 HELP: define-deref
 { $values { "c-type" "a C type" } }
