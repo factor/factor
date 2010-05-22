@@ -144,7 +144,7 @@ M: chipmunk-world end-game-world
              { windowed double-buffered }
            }
            { pref-dim { 640 480 } }
-           { tick-interval-micros 16666 }
+           { tick-interval-nanos $[ 60 fps ] }
         }
         clone
         open-window
