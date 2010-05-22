@@ -66,7 +66,7 @@ TUPLE: fluids-world < game-world
 SYMBOL: fluid
 
 : integrate ( world -- )
-    particles>> $[ 60 fps 1,000,000,000 /f ] integrate-particles! drop ;
+    particles>> 1/60 integrate-particles! drop ;
 
 : pause ( -- )
     fluid get [ not ] change-paused drop ;
