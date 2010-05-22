@@ -14,14 +14,14 @@ TUPLE: delay < model model timeout alarm ;
         over >>model
         [ add-dependency ] keep ;
 
-: cancel-delay ( delay -- )
-    alarm>> [ cancel-alarm ] when* ;
+: stop-delay ( delay -- )
+    alarm>> [ stop-alarm ] when* ;
 
 : start-delay ( delay -- )
     dup
     [ [ f >>alarm update-delay-model ] curry ] [ timeout>> ] bi later
     >>alarm drop ;
 
-M: delay model-changed nip dup cancel-delay start-delay ;
+M: delay model-changed nip dup stop-delay start-delay ;
 
 M: delay model-activated update-delay-model ;
