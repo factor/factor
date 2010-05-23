@@ -60,7 +60,7 @@ M: x11-ui-backend (pixel-format-attribute)
     [ handle>> ] [ >glx-visual ] bi*
     [ 2drop f ] [
         first
-        0 <int> [ glXGetConfig drop ] keep *int
+        { int } [ glXGetConfig drop ] with-out-parameters
     ] if-empty ;
 
 CONSTANT: modifiers

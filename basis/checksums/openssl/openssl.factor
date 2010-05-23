@@ -1,4 +1,4 @@
-! copyright (C) 2008 Slava Pestov
+! Copyright (C) 2008, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays alien.c-types alien.data kernel
 continuations destructors sequences io openssl openssl.libcrypto
@@ -47,9 +47,10 @@ M: evp-md-context dispose*
 
 : digest-value ( ctx -- value )
     handle>>
-    EVP_MAX_MD_SIZE <byte-array> 0 <int>
-    [ EVP_DigestFinal_ex ssl-error ] 2keep
-    *int memory>byte-array ;
+    { { int EVP_MAX_MD_SIZE } int }
+    [ EVP_DigestFinal_ex ssl-error ]
+    [ memory>byte-array ]
+    with-out-parameters ;
 
 PRIVATE>
 

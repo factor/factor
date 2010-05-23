@@ -12,7 +12,7 @@ M: winnt cpus ( -- n )
 
 : memory-status ( -- MEMORYSTATUSEX )
     MEMORYSTATUSEX <struct>
-    dup class heap-size >>dwLength
+    MEMORYSTATUSEX heap-size >>dwLength
     dup GlobalMemoryStatusEx win32-error=0/f ;
 
 M: winnt memory-load ( -- n )

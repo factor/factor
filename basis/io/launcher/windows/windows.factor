@@ -159,7 +159,7 @@ M: windows kill-process* ( handle -- )
 
 : exit-code ( process -- n )
     hProcess>>
-    0 <ulong> [ GetExitCodeProcess ] keep *ulong
+    { DWORD } [ GetExitCodeProcess ] [ ] with-out-parameters
     swap win32-error=0/f ;
 
 : process-exited ( process -- )
