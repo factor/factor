@@ -1,14 +1,14 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax alien.libraries combinators kernel system
+USING: alien alien.libraries combinators kernel system
 gir glib gobject gio gmodule gdk.pixbuf gdk gdk.gl gtk gtk.ffi ;
 EXCLUDE: alien.c-types => pointer ;
 
 <<
 "gtk.gl" {
-    { [ os winnt? ] [ "" "cdecl" add-library ] }
+    { [ os winnt? ] [ drop ] }
     { [ os macosx? ] [ drop ] }
-    { [ os unix? ] [ "libgtkglext-x11-1.0.so" "cdecl" add-library ] }
+    { [ os unix? ] [ "libgtkglext-x11-1.0.so" cdecl add-library ] }
 } cond
 >>
 

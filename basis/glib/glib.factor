@@ -1,13 +1,13 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.libraries alien.syntax combinators gir
+USING: alien alien.c-types alien.libraries alien.syntax combinators gir
 kernel system vocabs.parser words ;
 
 <<
 "glib" {
-    { [ os winnt? ] [ "libglib-2.0-0.dll" "cdecl" add-library ] }
-    { [ os macosx? ] [ "/opt/local/lib/libglib-2.0.0.dylib" "cdecl" add-library ] }
-    { [ os unix? ] [ drop ] }
+    { [ os winnt? ] [ "libglib-2.0-0.dll" cdecl add-library ] }
+    { [ os macosx? ] [ "/opt/local/lib/libglib-2.0.0.dylib" cdecl add-library ] }
+    { [ os unix? ] [ "libglib-2.0.so" cdecl add-library ] }
 } cond
 >>
 
@@ -23,7 +23,7 @@ TYPEDEF: long glong
 TYPEDEF: ulong gulong
 TYPEDEF: int gint
 TYPEDEF: uint guint
-TYPEDEF: gint gboolean
+TYPEDEF: bool gboolean
 
 TYPEDEF: char gint8
 TYPEDEF: uchar guint8
