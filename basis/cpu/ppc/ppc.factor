@@ -32,11 +32,6 @@ M: label BC [ 0 BC ] dip rc-relative-ppc-2 label-fixup ;
 
 enable-float-intrinsics
 
-<<
-\ ##integer>float t "frame-required?" set-word-prop
-\ ##float>integer t "frame-required?" set-word-prop
->>
-
 M: ppc machine-registers
     {
         { int-regs $[ 2 12 [a,b] 16 29 [a,b] append ] }
@@ -195,6 +190,8 @@ M: ppc %sub-float FSUB ;
 M: ppc %mul-float FMUL ;
 M: ppc %div-float FDIV ;
 
+M: ppc integer-float-needs-stack-frame? t ;
+
 M:: ppc %integer>float ( dst src -- )
     HEX: 4330 scratch-reg LIS
     scratch-reg 1 0 scratch@ STW
@@ -226,10 +223,10 @@ M: spill-slot float-function-param* [ 1 ] dip n>> spill@ LFD ;
 M: integer float-function-param* FMR ;
 
 : float-function-param ( i src -- )
-    [ float-regs cdecl param-regs nth ] dip float-function-param* ;
+    [ float-regs cdecl param-regs at nth ] dip float-function-param* ;
 
 : float-function-return ( reg -- )
-    float-regs return-reg double-rep %copy ;
+    float-regs return-regs at first double-rep %copy ;
 
 M:: ppc %unary-float-function ( dst src func -- )
     0 src float-function-param
@@ -665,11 +662,11 @@ M: ppc %reload ( dst rep src -- )
 
 M: ppc %loop-entry ;
 
-M: int-regs return-reg drop 3 ;
-
-M: int-regs param-regs 2drop { 3 4 5 6 7 8 9 10 } ;
-
-M: float-regs return-reg drop 1 ;
+M: ppc return-regs
+    {
+        { int-regs { 3 4 5 6 } }
+        { float-regs { 1 } }
+    } ;
 
 M:: ppc %save-param-reg ( stack reg rep -- )
     reg stack local@ rep store-to-frame ;
@@ -697,7 +694,7 @@ M: spill-slot store-param [ 1 ] dip n>> spill@ STW ;
 M:: ppc %unbox ( src n rep func -- )
     src func call-unbox-func
     ! Store the return value on the C stack
-    n [ rep reg-class-of return-reg rep %save-param-reg ] when* ;
+    n [ rep reg-class-of return-regs at first rep %save-param-reg ] when* ;
 
 M:: ppc %unbox-long-long ( src n func -- )
     src func call-unbox-func

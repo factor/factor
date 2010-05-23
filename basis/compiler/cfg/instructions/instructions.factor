@@ -16,9 +16,12 @@ V{ } clone insn-classes set-global
 ! Virtual CPU instructions, used by CFG IR
 TUPLE: insn ;
 
+! Instructions which use vregs
+TUPLE: vreg-insn < insn ;
+
 ! Instructions which are referentially transparent; used for
 ! value numbering
-TUPLE: pure-insn < insn ;
+TUPLE: pure-insn < vreg-insn ;
 
 ! Constants
 INSN: ##load-integer
@@ -216,6 +219,10 @@ PURE-INSN: ##log2
 def: dst/int-rep
 use: src/int-rep ;
 
+PURE-INSN: ##bit-count
+def: dst/int-rep
+use: src/int-rep ;
+
 ! Float arithmetic
 PURE-INSN: ##add-float
 def: dst/double-rep
@@ -288,15 +295,35 @@ def: dst
 use: src1/scalar-rep src2/scalar-rep
 literal: rep ;
 
+PURE-INSN: ##gather-int-vector-2
+def: dst
+use: src1/int-rep src2/int-rep
+literal: rep ;
+
 PURE-INSN: ##gather-vector-4
 def: dst
 use: src1/scalar-rep src2/scalar-rep src3/scalar-rep src4/scalar-rep
 literal: rep ;
 
+PURE-INSN: ##gather-int-vector-4
+def: dst
+use: src1/int-rep src2/int-rep src3/int-rep src4/int-rep
+literal: rep ;
+
+PURE-INSN: ##select-vector
+def: dst/int-rep
+use: src
+literal: n rep ;
+
 PURE-INSN: ##shuffle-vector
 def: dst
 use: src shuffle
 literal: rep ;
+
+PURE-INSN: ##shuffle-vector-halves-imm
+def: dst
+use: src1 src2
+literal: shuffle rep ;
 
 PURE-INSN: ##shuffle-vector-imm
 def: dst
@@ -611,6 +638,10 @@ def: dst
 use: src/tagged-rep
 literal: unboxer rep ;
 
+INSN: ##unbox-long-long
+use: src/tagged-rep out/int-rep
+literal: unboxer ;
+
 INSN: ##store-reg-param
 use: src
 literal: reg rep ;
@@ -619,35 +650,33 @@ INSN: ##store-stack-param
 use: src
 literal: n rep ;
 
-INSN: ##store-return
-use: src
-literal: rep ;
+INSN: ##load-reg-param
+def: dst
+literal: reg rep ;
 
-INSN: ##store-struct-return
-use: src/int-rep
-literal: c-type ;
+INSN: ##load-stack-param
+def: dst
+literal: n rep ;
 
-INSN: ##store-long-long-return
-use: src1/int-rep src2/int-rep ;
-
-INSN: ##prepare-struct-area
-def: dst/int-rep ;
+INSN: ##local-allot
+def: dst/int-rep
+literal: size align offset ;
 
 INSN: ##box
 def: dst/tagged-rep
-literal: n rep boxer ;
+use: src
+literal: boxer rep ;
 
 INSN: ##box-long-long
 def: dst/tagged-rep
-literal: n boxer ;
+use: src1/int-rep src2/int-rep
+literal: boxer ;
 
-INSN: ##box-small-struct
+INSN: ##allot-byte-array
 def: dst/tagged-rep
-literal: c-type ;
+literal: size ;
 
-INSN: ##box-large-struct
-def: dst/tagged-rep
-literal: n c-type ;
+INSN: ##prepare-var-args ;
 
 INSN: ##alien-invoke
 literal: symbols dll ;
@@ -660,9 +689,6 @@ use: src/int-rep ;
 
 INSN: ##alien-assembly
 literal: quot ;
-
-INSN: ##save-param-reg
-literal: offset reg rep ;
 
 INSN: ##begin-callback ;
 
@@ -708,6 +734,14 @@ INSN: ##compare-integer-imm-branch
 use: src1/int-rep
 literal: src2 cc ;
 
+INSN: ##test-branch
+use: src1/int-rep src2/int-rep
+literal: cc ;
+
+INSN: ##test-imm-branch
+use: src1/int-rep
+literal: src2 cc ;
+
 PURE-INSN: ##compare-integer
 def: dst/tagged-rep
 use: src1/int-rep src2/int-rep
@@ -715,6 +749,18 @@ literal: cc
 temp: temp/int-rep ;
 
 PURE-INSN: ##compare-integer-imm
+def: dst/tagged-rep
+use: src1/int-rep
+literal: src2 cc
+temp: temp/int-rep ;
+
+PURE-INSN: ##test
+def: dst/tagged-rep
+use: src1/int-rep src2/int-rep
+literal: cc
+temp: temp/int-rep ;
+
+PURE-INSN: ##test-imm
 def: dst/tagged-rep
 use: src1/int-rep
 literal: src2 cc
@@ -793,6 +839,8 @@ UNION: conditional-branch-insn
 ##compare-imm-branch
 ##compare-integer-branch
 ##compare-integer-imm-branch
+##test-branch
+##test-imm-branch
 ##compare-float-ordered-branch
 ##compare-float-unordered-branch
 ##test-vector-branch
@@ -805,26 +853,31 @@ UNION: conditional-branch-insn
 UNION: ##read ##slot ##slot-imm ##vm-field ##alien-global ;
 UNION: ##write ##set-slot ##set-slot-imm ##set-vm-field ;
 
-! Instructions that clobber registers
-UNION: clobber-insn
-##call-gc
-##unary-float-function
-##binary-float-function
-##box
-##box-long-long
-##box-small-struct
-##box-large-struct
-##unbox
+! Instructions that clobber registers. They receive inputs and
+! produce outputs in spill slots.
+UNION: hairy-clobber-insn
+##load-reg-param
 ##store-reg-param
-##store-return
-##store-struct-return
-##store-long-long-return
+##call-gc
 ##alien-invoke
 ##alien-indirect
 ##alien-assembly
-##save-param-reg
 ##begin-callback
 ##end-callback ;
+
+! Instructions that clobber registers but are allowed to produce
+! outputs in registers. Inputs are in spill slots, except for
+! inputs coalesced with the output, in which case that input
+! will be in a register.
+UNION: clobber-insn
+hairy-clobber-insn
+##unary-float-function
+##binary-float-function
+##unbox
+##unbox-long-long
+##box
+##box-long-long
+##allot-byte-array ;
 
 ! Instructions that have complex expansions and require that the
 ! output registers are not equal to any of the input registers
@@ -832,13 +885,3 @@ UNION: def-is-use-insn
 ##box-alien
 ##box-displaced-alien
 ##unbox-any-c-ptr ;
-
-SYMBOL: vreg-insn
-
-[
-    vreg-insn
-    insn-classes get [
-        "insn-slots" word-prop [ type>> { def use temp } member-eq? ] any?
-    ] filter
-    define-union-class
-] with-compilation-unit

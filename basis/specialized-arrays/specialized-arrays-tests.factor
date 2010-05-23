@@ -27,10 +27,10 @@ SPECIALIZED-ARRAYS: bool ushort char uint float ulonglong ;
 ] unit-test
 
 [ ushort-array{ 1234 } ] [
-    little-endian? B{ 210 4 } B{ 4 210 } ? byte-array>ushort-array
+    little-endian? B{ 210 4 } B{ 4 210 } ? ushort-array-cast
 ] unit-test
 
-[ B{ 210 4 1 } byte-array>ushort-array ] must-fail
+[ B{ 210 4 1 } ushort-array-cast ] must-fail
 
 [ { 3 1 3 3 7 } ] [
     int-array{ 3 1 3 3 7 } malloc-byte-array 5 <direct-int-array> >array

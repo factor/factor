@@ -1,104 +1,89 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs boxes calendar combinators.short-circuit
-continuations fry heaps init kernel math.order
-namespaces quotations threads math system ;
+USING: accessors assocs calendar combinators.short-circuit fry
+heaps init kernel math math.functions math.parser namespaces
+quotations sequences system threads ;
 IN: alarms
 
 TUPLE: alarm
     { quot callable initial: [ ] }
-    { start integer }
-    interval
-    { entry box } ;
-
-SYMBOL: alarms
-SYMBOL: alarm-thread
-SYMBOL: current-alarm
-
-: cancel-alarm ( alarm -- )
-    entry>> [ alarms get-global heap-delete ] if-box? ;
+    start-nanos 
+    delay-nanos
+    interval-nanos integer
+    { next-iteration-nanos integer }
+    { stop? boolean } ;
 
 <PRIVATE
-
-: notify-alarm-thread ( -- )
-    alarm-thread get-global interrupt ;
 
 GENERIC: >nanoseconds ( obj -- duration/f )
 M: f >nanoseconds ;
 M: real >nanoseconds >integer ;
 M: duration >nanoseconds duration>nanoseconds >integer ;
 
-: <alarm> ( quot start interval -- alarm )
-    alarm new
-        swap >nanoseconds >>interval
-        swap >nanoseconds nano-count + >>start
-        swap >>quot
-        <box> >>entry ;
+: set-next-alarm-time ( alarm -- alarm )
+    ! start + delay + ceiling((now - start) / interval) * interval
+    nano-count 
+    over start-nanos>> -
+    over delay-nanos>> [ + ] when*
+    over interval-nanos>> / ceiling
+    over interval-nanos>> *
+    over start-nanos>> + >>next-iteration-nanos ; inline
 
-: register-alarm ( alarm -- )
-    [ dup start>> alarms get-global heap-push* ]
-    [ entry>> >box ] bi
-    notify-alarm-thread ;
+DEFER: call-alarm-loop
 
-: alarm-expired? ( alarm n -- ? )
-    [ start>> ] dip <= ;
+: loop-alarm ( alarm -- )
+    nano-count over
+    [ next-iteration-nanos>> - ] [ interval-nanos>> ] bi <
+    [ set-next-alarm-time ] dip
+    [ dup next-iteration-nanos>> ] [ 0 ] if
+    sleep-until call-alarm-loop ;
 
-: reschedule-alarm ( alarm -- )
-    dup interval>> nano-count + >>start register-alarm ;
+: maybe-loop-alarm ( alarm -- )
+    dup { [ stop?>> ] [ interval-nanos>> not ] } 1||
+    [ drop ] [ loop-alarm ] if ;
 
-: call-alarm ( alarm -- )
-    [ entry>> box> drop ]
-    [ dup interval>> [ reschedule-alarm ] [ drop ] if ]
-    [
-        [ ] [ quot>> ] [ ] tri
-        '[
-            _ current-alarm
-            [
-                _ [ _ dup interval>> [ cancel-alarm ] [ drop ] if rethrow ]
-                recover
-            ] with-variable
-        ] "Alarm execution" spawn drop
-    ] tri ;
-
-: (trigger-alarms) ( alarms n -- )
-    over heap-empty? [
-        2drop
+: call-alarm-loop ( alarm -- )
+    dup stop?>> [
+        drop
     ] [
-        over heap-peek drop over alarm-expired? [
-            over heap-pop drop call-alarm (trigger-alarms)
-        ] [
-            2drop
-        ] if
+        [ quot>> call( -- ) ] keep
+        maybe-loop-alarm
     ] if ;
 
-: trigger-alarms ( alarms -- )
-    nano-count (trigger-alarms) ;
-
-: next-alarm ( alarms -- nanos/f )
-    dup heap-empty? [ drop f ] [ heap-peek drop start>> ] if ;
-
-: alarm-thread-loop ( -- )
-    alarms get-global
-    dup next-alarm sleep-until
-    trigger-alarms ;
-
-: cancel-alarms ( alarms -- )
-    [
-        heap-pop-all [ nip entry>> box> drop ] assoc-each
-    ] when* ;
-
-: init-alarms ( -- )
-    alarms [ cancel-alarms <min-heap> ] change-global
-    [ alarm-thread-loop t ] "Alarms" spawn-server
-    alarm-thread set-global ;
-
-[ init-alarms ] "alarms" add-startup-hook
+: call-alarm ( alarm -- )
+    [ delay-nanos>> ] [ ] bi
+    '[ _ [ sleep ] when* _ call-alarm-loop ] "Alarm execution" spawn drop ;
 
 PRIVATE>
 
-: add-alarm ( quot start interval -- alarm )
-    <alarm> [ register-alarm ] keep ;
+: <alarm> ( quot delay-duration/f interval-duration/f -- alarm )
+    alarm new
+        swap >nanoseconds >>interval-nanos
+        swap >nanoseconds >>delay-nanos
+        swap >>quot ; inline
 
-: later ( quot duration -- alarm ) f add-alarm ;
+: start-alarm ( alarm -- )
+    f >>stop?
+    nano-count >>start-nanos
+    call-alarm ;
 
-: every ( quot duration -- alarm ) dup add-alarm ;
+: stop-alarm ( alarm -- )
+    t >>stop?
+    f >>start-nanos
+    drop ;
+
+<PRIVATE
+
+: (start-alarm) ( quot start-duration interval-duration -- alarm )
+    <alarm> [ start-alarm ] keep ;
+
+PRIVATE>
+
+: every ( quot interval-duration -- alarm )
+    [ f ] dip (start-alarm) ;
+
+: later ( quot delay-duration -- alarm )
+    f (start-alarm) ;
+
+: delayed-every ( quot duration -- alarm )
+    dup (start-alarm) ;

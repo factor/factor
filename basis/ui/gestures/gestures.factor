@@ -188,13 +188,15 @@ SYMBOL: drag-timer
         [ drag-gesture ]
         300 milliseconds
         100 milliseconds
-        add-alarm drag-timer get-global >box
+        <alarm>
+        [ drag-timer get-global >box ]
+        [ start-alarm ] bi
     ] when ;
 
 : stop-drag-timer ( -- )
     hand-buttons get-global empty? [
         drag-timer get-global ?box
-        [ cancel-alarm ] [ drop ] if
+        [ stop-alarm ] [ drop ] if
     ] when ;
 
 : fire-motion ( -- )

@@ -2,8 +2,8 @@
 USING: accessors alien alien.c-types alien.data combinators
 sequences.cords cpu.architecture fry generalizations grouping
 kernel libc locals math math.libm math.order math.ranges
-math.vectors sequences sequences.private specialized-arrays
-vocabs.loader ;
+math.vectors sequences sequences.generalizations
+sequences.private specialized-arrays vocabs.loader ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAYS:
     c:char c:short c:int c:longlong
@@ -45,16 +45,16 @@ IN: math.vectors.simd.intrinsics
 
 : [byte>rep-array] ( rep -- class )
     {
-        { char-16-rep      [ [ byte-array>char-array      ] ] }
-        { uchar-16-rep     [ [ byte-array>uchar-array     ] ] }
-        { short-8-rep      [ [ byte-array>short-array     ] ] }
-        { ushort-8-rep     [ [ byte-array>ushort-array    ] ] }
-        { int-4-rep        [ [ byte-array>int-array       ] ] }
-        { uint-4-rep       [ [ byte-array>uint-array      ] ] }
-        { longlong-2-rep   [ [ byte-array>longlong-array  ] ] }
-        { ulonglong-2-rep  [ [ byte-array>ulonglong-array ] ] }
-        { float-4-rep      [ [ byte-array>float-array     ] ] }
-        { double-2-rep     [ [ byte-array>double-array    ] ] }
+        { char-16-rep      [ [ char-array-cast      ] ] }
+        { uchar-16-rep     [ [ uchar-array-cast     ] ] }
+        { short-8-rep      [ [ short-array-cast     ] ] }
+        { ushort-8-rep     [ [ ushort-array-cast    ] ] }
+        { int-4-rep        [ [ int-array-cast       ] ] }
+        { uint-4-rep       [ [ uint-array-cast      ] ] }
+        { longlong-2-rep   [ [ longlong-array-cast  ] ] }
+        { ulonglong-2-rep  [ [ ulonglong-array-cast ] ] }
+        { float-4-rep      [ [ float-array-cast     ] ] }
+        { double-2-rep     [ [ double-array-cast    ] ] }
     } case ; foldable
 
 : [>rep-array] ( rep -- class )
@@ -115,6 +115,18 @@ IN: math.vectors.simd.intrinsics
     elts [| from to |
         from rep rep-length 1 - bitand
            a' nth-unsafe
+        to c' set-nth-unsafe
+    ] each-index
+    c' underlying>> ; inline
+
+:: (vshuffle2) ( a b elts rep -- c )
+    a rep >rep-array :> a'
+    b rep >rep-array :> b'
+    a' b' cord-append :> ab'
+    rep <rep-array> :> c'
+    elts [| from to |
+        from rep rep-length dup + 1 - bitand
+           ab' nth-unsafe
         to c' set-nth-unsafe
     ] each-index
     c' underlying>> ; inline
@@ -186,6 +198,7 @@ PRIVATE>
 : (simd-hrshift)           ( a n rep -- c )
     drop tail-slice 16 0 pad-tail ;
 : (simd-vshuffle-elements) ( a n rep -- c ) [ rep-length 0 pad-tail ] keep (vshuffle) ;
+: (simd-vshuffle2-elements) ( a b n rep -- c ) [ rep-length 0 pad-tail ] keep (vshuffle2) ;
 : (simd-vshuffle-bytes)    ( a b rep -- c ) drop uchar-16-rep (vshuffle) ;
 :: (simd-vmerge-head)      ( a b rep -- c )
     a b rep 2>rep-array :> ( a' b' )
@@ -252,4 +265,3 @@ PRIVATE>
 "compiler.cfg.intrinsics.simd" require
 "compiler.tree.propagation.simd" require
 "compiler.cfg.value-numbering.simd" require
-

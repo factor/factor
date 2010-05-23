@@ -75,7 +75,7 @@ PRIVATE>
 ERROR: no-slots-named class seq ;
 : check-columns ( class columns -- )
     [ nip ] [
-        [ [ first ] map ]
+        [ keys ]
         [ all-slots [ name>> ] map ] bi* diff
     ] 2bi
     [ drop ] [ no-slots-named ] if-empty ;

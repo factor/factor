@@ -5,7 +5,7 @@ kernel opengl opengl.gl opengl.capabilities combinators images
 images.tesselation grouping sequences math math.vectors
 generalizations fry arrays namespaces system
 locals literals specialized-arrays ;
-FROM: alien.c-types => float ;
+FROM: alien.c-types => float <float> <int> *float *int ;
 SPECIALIZED-ARRAY: float
 IN: opengl.textures
 
@@ -404,3 +404,9 @@ PRIVATE>
     over dim>> max-texture-size [ <= ] 2all?
     [ <single-texture> ]
     [ [ max-texture-size tesselate ] dip <multi-texture> ] if ;
+
+: get-texture-float ( target level enum -- value )
+    0 <float> [ glGetTexLevelParameterfv ] keep *float ; inline
+: get-texture-int ( target level enum -- value )
+    0 <int> [ glGetTexLevelParameteriv ] keep *int ; inline
+

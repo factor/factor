@@ -123,6 +123,10 @@ M: ##compare-integer-imm has-peephole-opts? drop t ;
 M: ##compare-integer has-peephole-opts? drop t ;
 M: ##compare-integer-imm-branch has-peephole-opts? drop t ;
 M: ##compare-integer-branch has-peephole-opts? drop t ;
+M: ##test-imm has-peephole-opts? drop t ;
+M: ##test has-peephole-opts? drop t ;
+M: ##test-imm-branch has-peephole-opts? drop t ;
+M: ##test-branch has-peephole-opts? drop t ;
 
 GENERIC: compute-insn-costs ( insn -- )
 

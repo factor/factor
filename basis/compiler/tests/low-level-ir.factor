@@ -93,9 +93,9 @@ IN: compiler.tests.low-level-ir
 [ 31 ] [
     V{
         T{ ##load-reference f 1 B{ 31 67 52 } }
-        T{ ##unbox-any-c-ptr f 0 1 }
-        T{ ##load-memory-imm f 0 0 0 int-rep uchar }
-        T{ ##shl-imm f 0 0 4 }
+        T{ ##unbox-any-c-ptr f 2 1 }
+        T{ ##load-memory-imm f 3 2 0 int-rep uchar }
+        T{ ##shl-imm f 0 3 4 }
     } compile-test-bb
 ] unit-test
 
