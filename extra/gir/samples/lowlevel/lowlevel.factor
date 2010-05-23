@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.strings byte-arrays
+USING: alien.c-types alien.strings byte-arrays classes.struct
 gtk glib.ffi gobject.ffi gtk.ffi io.encodings.utf8 kernel
 literals locals make math prettyprint sequences specialized-arrays
 gir.samples.lowlevel.hello-world
@@ -31,12 +31,12 @@ CONSTANT: samples {
     [ GTK_WIN_POS_CENTER gtk_window_set_position ] tri
   
     gtk_tree_view_new :> list
-    list 0 gtk_tree_view_set_headers_visible
+    list f gtk_tree_view_set_headers_visible
 
     gtk_cell_renderer_text_new :> renderer
     gtk_tree_view_column_new :> column
     column "Sample" utf8 string>alien gtk_tree_view_column_set_title
-    column renderer 1 gtk_tree_view_column_pack_start
+    column renderer t gtk_tree_view_column_pack_start
     column renderer "markup" utf8 string>alien 0 gtk_tree_view_column_add_attribute
     list column gtk_tree_view_append_column drop
 
@@ -47,11 +47,8 @@ CONSTANT: samples {
 
     store g_object_unref
 
-    ! Временный фикс, нужно придумать что-то другое, так как нет
-    ! конструктора для создания GtkTreeIter
-    gint gpointer [ heap-size ] bi@ 3 * + <byte-array> :> iter
-
-    GType gint64 [ heap-size ] bi@ 2 * + <byte-array> :> value
+    GtkTreeIter <struct> :> iter
+    GValue <struct> :> value
     value G_TYPE_STRING g_value_init drop
     samples [
         first2 swap [ "<big><b>" % % "</b></big>\n" % % ] "" make
@@ -66,8 +63,8 @@ CONSTANT: samples {
 
     list "row-activated"
     utf8 string>alien
-    [ list-on-row-activited ] GtkTreeView:row-activated dup .
-    f f 0 g_signal_connect_data .
+    [ list-on-row-activited ] GtkTreeView:row-activated
+    f f 0 g_signal_connect_data drop
 
     window "destroy" utf8 string>alien
     [ 2drop gtk_main_quit ] GtkObject:destroy
