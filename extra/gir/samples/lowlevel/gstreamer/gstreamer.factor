@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.strings fry byte-arrays 
+USING: alien.c-types alien.strings fry byte-arrays classes.struct
 io.encodings.utf8 kernel locals math prettyprint 
 gst gst.ffi glib.ffi gobject.ffi gtk gtk.ffi ;
 IN: gir.samples.lowlevel.gstreamer
@@ -12,7 +12,7 @@ CONSTANT: uri "http://tinyvid.tv/file/3gocxnjott7wr.ogg"
     f f gst_init
     "playbin" "player" [ utf8 string>alien ] bi@ gst_element_factory_make :> pipeline
 
-    GType gint64 [ heap-size ] bi@ 2 * + <byte-array> :> value
+    GValue <struct> :> value
     value G_TYPE_STRING g_value_init drop
     value uri utf8 string>alien g_value_set_string
     

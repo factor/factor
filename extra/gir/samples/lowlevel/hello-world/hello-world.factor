@@ -23,7 +23,7 @@ IN: gir.samples.lowlevel.hello-world
     frame label 120 110 gtk_fixed_put
 
     button "clicked" utf8 string>alien
-    [ nip "Hello! :)" utf8 string>alien gtk_label_set_text 1 ] GtkButton:clicked
+    [ nip "Hello! :)" utf8 string>alien gtk_label_set_text t ] GtkButton:clicked
     label f 0 g_signal_connect_data drop
     
     window ;
