@@ -39,6 +39,7 @@ CONSTANT: vector>vector-intrinsics
         (simd-hlshift)
         (simd-hrshift)
         (simd-vshuffle-elements)
+        (simd-vshuffle2-elements)
         (simd-vshuffle-bytes)
         (simd-vmerge-head)
         (simd-vmerge-tail)

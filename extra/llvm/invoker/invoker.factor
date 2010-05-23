@@ -32,7 +32,7 @@ TUPLE: function name alien return params ;
     LLVMGetFirstFunction [ (functions) ] { } make [ <function> ] map ;
 
 : function-effect ( function -- effect )
-    [ params>> [ first ] map ] [ return>> void? 0 1 ? ] bi <effect> ;
+    [ params>> keys ] [ return>> void? 0 1 ? ] bi <effect> ;
 
 : install-function ( function -- )
     dup name>> "alien.llvm" create-vocab drop

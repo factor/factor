@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors namespaces make locals
+USING: kernel accessors assocs sequences namespaces make locals
 cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
@@ -37,5 +37,12 @@ IN: compiler.cfg.linear-scan
     cfg resolve-data-flow
     cfg check-numbering ;
 
+: admissible-registers ( cfg -- regs )
+    [ machine-registers ] dip
+    frame-pointer?>> [
+        [ int-regs ] dip [ clone ] map
+        [ [ [ frame-reg ] dip remove ] change-at ] keep
+    ] when ;
+
 : linear-scan ( cfg -- cfg' )
-    dup machine-registers (linear-scan) ;
+    dup dup admissible-registers (linear-scan) ;

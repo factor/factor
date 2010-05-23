@@ -1,9 +1,10 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math sorting words parser io summary
-quotations sequences prettyprint continuations effects
-definitions compiler.units namespaces assocs tools.time generic
-inspector fry locals generalizations macros ;
+quotations sequences sequences.generalizations prettyprint
+continuations effects definitions compiler.units namespaces
+assocs tools.time generic inspector fry locals generalizations
+macros ;
 IN: tools.annotations
 
 <PRIVATE

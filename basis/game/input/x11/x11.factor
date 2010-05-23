@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Erik Charlebois, William Schlieper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays kernel game.input namespaces math
-classes bit-arrays system sequences vectors x11 x11.xlib ;
+USING: accessors alien.c-types arrays kernel game.input
+namespaces math classes bit-arrays system sequences vectors
+x11 x11.xlib assocs ;
 IN: game.input.x11
 
 SINGLETON: x11-game-input-backend
@@ -77,7 +78,7 @@ M: linux x>hid-bit-order
     } ; inline
      
 : x-bits>hid-bits ( bit-array -- bit-array )
-    256 iota [ 2array ] { } 2map-as [ first ] filter [ second ] map
+    256 iota [ 2array ] { } 2map-as [ first ] filter values
     x>hid-bit-order [ nth ] curry map
     256 <bit-array> swap [ t swap pick set-nth ] each ;
         

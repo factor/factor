@@ -167,7 +167,7 @@ M: key-caps-gadget graft*
     drop ;
 
 M: key-caps-gadget ungraft*
-    alarm>> [ cancel-alarm ] when*
+    alarm>> [ stop-alarm ] when*
     close-game-input ;
 
 M: key-caps-gadget handle-gesture

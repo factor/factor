@@ -1,5 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alien alien.c-types arrays byte-arrays
+USING: accessors alien alien.c-types alien.data arrays byte-arrays
 combinators destructors gpu kernel locals math opengl opengl.gl
 typed ui.gadgets.worlds variants ;
 IN: gpu.buffers
@@ -139,6 +139,10 @@ TYPED:: copy-buffer ( to-buffer-ptr: buffer-ptr from-buffer-ptr: buffer-ptr size
     quot call
 
     target glUnmapBuffer drop ; inline
+
+:: with-mapped-buffer-array ( ..a buffer access c-type quot: ( ..a array -- ..b ) -- ..b )
+    buffer buffer-size c-type heap-size /i :> len
+    buffer access [ len c-type <c-direct-array> quot call ] with-mapped-buffer ; inline
 
 :: with-bound-buffer ( ..a buffer target quot: ( ..a -- ..b ) -- ..b )
     target gl-target buffer glBindBuffer

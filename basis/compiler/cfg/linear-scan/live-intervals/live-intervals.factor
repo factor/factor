@@ -134,7 +134,7 @@ M: vreg-insn compute-live-intervals* ( insn -- )
     ] if ;
 
 ! A location where all registers have to be spilled
-TUPLE: sync-point n ;
+TUPLE: sync-point n keep-dst? ;
 
 C: <sync-point> sync-point
 
@@ -143,8 +143,11 @@ SYMBOL: sync-points
 
 GENERIC: compute-sync-points* ( insn -- )
 
+M: hairy-clobber-insn compute-sync-points*
+    insn#>> f <sync-point> sync-points get push ;
+
 M: clobber-insn compute-sync-points*
-    insn#>> <sync-point> sync-points get push ;
+    insn#>> t <sync-point> sync-points get push ;
 
 M: insn compute-sync-points* drop ;
 
@@ -165,7 +168,7 @@ M: insn compute-sync-points* drop ;
 : init-live-intervals ( -- )
     H{ } clone live-intervals set
     V{ } clone sync-points set ;
-    
+
 : compute-start/end ( live-interval -- )
     dup ranges>> [ first from>> ] [ last to>> ] bi
     [ >>start ] [ >>end ] bi* drop ;
@@ -180,8 +183,8 @@ ERROR: bad-live-interval live-interval ;
     ! to reverse some sequences, and compute the start and end.
     values dup [
         {
-            [ ranges>> reverse! drop ]
-            [ uses>> reverse! drop ]
+            [ [ { } like reverse! ] change-ranges drop ]
+            [ [ { } like reverse! ] change-uses drop ]
             [ compute-start/end ]
             [ check-start ]
         } cleave

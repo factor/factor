@@ -1,11 +1,11 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words assocs kernel accessors parser vocabs.parser effects.parser
-sequences summary lexer splitting combinators locals
-memoize sequences.deep xml.data xml.state xml namespaces present
-arrays generalizations strings make math macros multiline
-combinators.short-circuit sorting fry unicode.categories
-effects ;
+USING: words assocs kernel accessors parser vocabs.parser
+effects.parser sequences summary lexer splitting combinators
+locals memoize sequences.deep xml.data xml.state xml namespaces
+present arrays generalizations sequences.generalizations strings
+make math macros multiline combinators.short-circuit sorting fry
+unicode.categories effects ;
 IN: xml.syntax
 
 <PRIVATE

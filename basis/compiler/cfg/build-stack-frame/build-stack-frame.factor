@@ -1,47 +1,77 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces accessors math.order assocs kernel sequences
-combinators classes words cpu.architecture layouts compiler.cfg
-compiler.cfg.rpo compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.stack-frame ;
+USING: namespaces accessors math math.order assocs kernel
+sequences combinators classes words system fry locals
+cpu.architecture layouts compiler.cfg compiler.cfg.rpo
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.stack-frame ;
 IN: compiler.cfg.build-stack-frame
 
-SYMBOL: frame-required?
+SYMBOLS: param-area-size allot-area-size allot-area-align
+frame-required? ;
+
+: frame-required ( -- ) frame-required? on ;
 
 GENERIC: compute-stack-frame* ( insn -- )
 
-: request-stack-frame ( stack-frame -- )
-    frame-required? on
-    stack-frame [ max-stack-frame ] change ;
+M:: ##local-allot compute-stack-frame* ( insn -- )
+    frame-required
+    insn size>> :> s
+    insn align>> :> a
+    allot-area-align [ a max ] change
+    allot-area-size [ a align [ insn offset<< ] [ s + ] bi ] change ;
 
 M: ##stack-frame compute-stack-frame*
-    stack-frame>> request-stack-frame ;
+    frame-required
+    stack-frame>> param-area-size [ max ] change ;
 
-M: ##call compute-stack-frame* drop frame-required? on ;
+: vm-frame-required ( -- )
+    frame-required
+    vm-stack-space param-area-size [ max ] change ;
 
-M: ##call-gc compute-stack-frame*
-    drop
-    frame-required? on
-    stack-frame new t >>calls-vm? request-stack-frame ;
+M: ##call-gc compute-stack-frame* drop vm-frame-required ;
+M: ##box compute-stack-frame* drop vm-frame-required ;
+M: ##unbox compute-stack-frame* drop vm-frame-required ;
+M: ##box-long-long compute-stack-frame* drop vm-frame-required ;
+M: ##begin-callback compute-stack-frame* drop vm-frame-required ;
+M: ##end-callback compute-stack-frame* drop vm-frame-required ;
+M: ##unary-float-function compute-stack-frame* drop vm-frame-required ;
+M: ##binary-float-function compute-stack-frame* drop vm-frame-required ;
 
-M: insn compute-stack-frame*
-    class "frame-required?" word-prop
-    [ frame-required? on ] when ;
+M: ##call compute-stack-frame* drop frame-required ;
+M: ##alien-callback compute-stack-frame* drop frame-required ;
+M: ##spill compute-stack-frame* drop frame-required ;
+M: ##reload compute-stack-frame* drop frame-required ;
 
-: initial-stack-frame ( -- stack-frame )
-    stack-frame new cfg get spill-area-size>> >>spill-area-size ;
+M: ##float>integer compute-stack-frame*
+    drop integer-float-needs-stack-frame? [ frame-required ] when ;
 
-: compute-stack-frame ( insns -- )
-    frame-required? off
-    initial-stack-frame stack-frame set
-    [ instructions>> [ compute-stack-frame* ] each ] each-basic-block
-    stack-frame get dup stack-frame-size >>total-size drop ;
+M: ##integer>float compute-stack-frame*
+    drop integer-float-needs-stack-frame? [ frame-required ] when ;
+
+M: insn compute-stack-frame* drop ;
+
+: finalize-stack-frame ( stack-frame -- )
+    dup [ params>> ] [ allot-area-align>> ] bi align >>allot-area-base
+    dup [ [ allot-area-base>> ] [ allot-area-size>> ] bi + ] [ spill-area-align>> ] bi align >>spill-area-base
+    dup stack-frame-size >>total-size drop ;
+
+: <stack-frame> ( cfg -- stack-frame )
+    [ stack-frame new ] dip
+    [ spill-area-size>> >>spill-area-size ]
+    [ spill-area-align>> >>spill-area-align ] bi
+    allot-area-size get >>allot-area-size
+    allot-area-align get >>allot-area-align
+    param-area-size get >>params
+    dup finalize-stack-frame ;
+
+: compute-stack-frame ( cfg -- stack-frame/f )
+    [ [ instructions>> [ compute-stack-frame* ] each ] each-basic-block ]
+    [ frame-required? get [ <stack-frame> ] [ drop f ] if ]
+    bi ;
 
 : build-stack-frame ( cfg -- cfg )
-    [
-        [ compute-stack-frame ]
-        [
-            frame-required? get stack-frame get f ?
-            >>stack-frame
-        ] bi
-    ] with-scope ;
+    0 param-area-size set
+    0 allot-area-size set
+    cell allot-area-align set
+    dup compute-stack-frame >>stack-frame ;

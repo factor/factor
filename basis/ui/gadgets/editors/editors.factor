@@ -60,7 +60,7 @@ SYMBOL: blink-interval
 750 milliseconds blink-interval set-global
 
 : stop-blinking ( editor -- )
-    [ [ cancel-alarm ] when* f ] change-blink-alarm drop ;
+    [ [ stop-alarm ] when* f ] change-blink-alarm drop ;
 
 : start-blinking ( editor -- )
     [ stop-blinking ] [

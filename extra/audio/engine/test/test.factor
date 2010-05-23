@@ -44,7 +44,7 @@ M: noise-generator dispose
     ] 20 milliseconds every :> alarm
     "Press Enter to stop the test." print
     readln drop
-    alarm cancel-alarm
+    alarm stop-alarm
     engine dispose ;
 
 MAIN: audio-engine-test

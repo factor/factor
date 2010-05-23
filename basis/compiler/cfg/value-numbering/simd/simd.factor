@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit arrays
 fry kernel layouts math namespaces sequences cpu.architecture
-math.bitwise math.order classes
-vectors locals make alien.c-types io.binary grouping
+math.bitwise math.order classes generalizations
+combinators.smart locals make alien.c-types io.binary grouping
 math.vectors.simd.intrinsics
 compiler.cfg
 compiler.cfg.registers
@@ -44,22 +44,70 @@ M: ##shuffle-vector-imm rewrite
         [ 2drop f ]
     } cond ;
 
+: scalar-value ( literal-insn rep -- byte-array )
+    {
+        { float-4-rep [ obj>> float>bits 4 >le ] }
+        { double-2-rep [ obj>> double>bits 8 >le ] }
+        [ [ val>> ] [ rep-component-type heap-size ] bi* >le ]
+    } case ;
+
 : (fold-scalar>vector) ( insn bytes -- insn' )
     [ [ dst>> ] [ rep>> rep-length ] bi ] dip <repetition> concat
     \ ##load-reference new-insn ;
 
 : fold-scalar>vector ( outer inner -- insn' )
-    obj>> over rep>> {
-        { float-4-rep [ float>bits 4 >le (fold-scalar>vector) ] }
-        { double-2-rep [ double>bits 8 >le (fold-scalar>vector) ] }
-        [ [ untag-fixnum ] dip rep-component-type heap-size >le (fold-scalar>vector) ]
-    } case ;
+    over rep>> scalar-value (fold-scalar>vector) ;
 
 M: ##scalar>vector rewrite
     dup src>> vreg>insn {
-        { [ dup ##load-reference? ] [ fold-scalar>vector ] }
+        { [ dup literal-insn? ] [ fold-scalar>vector ] }
         { [ dup ##vector>scalar? ] [ [ dst>> ] [ src>> ] bi* <copy> ] }
         [ 2drop f ]
+    } cond ;
+
+:: fold-gather-vector-2 ( insn src1 src2 -- insn )
+    insn dst>>
+    src1 src2 [ insn rep>> scalar-value ] bi@ append
+    \ ##load-reference new-insn ;
+
+: rewrite-gather-vector-2 ( insn -- insn/f )
+    dup [ src1>> vreg>insn ] [ src2>> vreg>insn ] bi {
+        { [ 2dup [ literal-insn? ] both? ] [ fold-gather-vector-2 ] }
+        [ 3drop f ]
+    } cond ;
+
+M: ##gather-vector-2 rewrite rewrite-gather-vector-2 ;
+
+M: ##gather-int-vector-2 rewrite rewrite-gather-vector-2 ;
+
+:: fold-gather-vector-4 ( insn src1 src2 src3 src4 -- insn )
+    insn dst>>
+    [
+        src1 src2 src3 src4
+        [ insn rep>> scalar-value ] 4 napply
+    ] B{ } append-outputs-as
+    \ ##load-reference new-insn ;
+
+: rewrite-gather-vector-4 ( insn -- insn/f )
+    dup { [ src1>> ] [ src2>> ] [ src3>> ] [ src4>> ] } cleave [ vreg>insn ] 4 napply
+    {
+        { [ 4 ndup [ literal-insn? ] 4 napply and and and ] [ fold-gather-vector-4 ] }
+        [ 5 ndrop f ]
+    } cond ;
+
+M: ##gather-vector-4 rewrite rewrite-gather-vector-4 ;
+
+M: ##gather-int-vector-4 rewrite rewrite-gather-vector-4 ;
+
+: fold-shuffle-vector ( insn src1 src2 -- insn )
+    [ dst>> ] [ obj>> ] [ obj>> ] tri*
+    swap nths \ ##load-reference new-insn ;
+
+M: ##shuffle-vector rewrite
+    dup [ src>> vreg>insn ] [ shuffle>> vreg>insn ] bi
+    {
+        { [ 2dup [ ##load-reference? ] both? ] [ fold-shuffle-vector ] }
+        [ 3drop f ]
     } cond ;
 
 M: ##xor-vector rewrite
