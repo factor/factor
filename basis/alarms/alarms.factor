@@ -9,9 +9,10 @@ TUPLE: alarm
     { quot callable initial: [ ] }
     start-nanos 
     delay-nanos
-    interval-nanos integer
-    { next-iteration-nanos integer }
-    { stop? boolean } ;
+    interval-nanos
+    iteration-start-nanos
+    { stop? boolean }
+    thread ;
 
 <PRIVATE
 
@@ -21,21 +22,23 @@ M: real >nanoseconds >integer ;
 M: duration >nanoseconds duration>nanoseconds >integer ;
 
 : set-next-alarm-time ( alarm -- alarm )
-    ! start + delay + ceiling((now - start) / interval) * interval
+    ! start + delay + ceiling((now - (start + delay)) / interval) * interval
     nano-count 
     over start-nanos>> -
-    over delay-nanos>> [ + ] when*
+    over delay-nanos>> [ - ] when*
     over interval-nanos>> / ceiling
     over interval-nanos>> *
-    over start-nanos>> + >>next-iteration-nanos ; inline
+    over start-nanos>> +
+    over delay-nanos>> [ + ] when*
+    >>iteration-start-nanos ; inline
 
 DEFER: call-alarm-loop
 
 : loop-alarm ( alarm -- )
     nano-count over
-    [ next-iteration-nanos>> - ] [ interval-nanos>> ] bi <
+    [ iteration-start-nanos>> - ] [ interval-nanos>> ] bi <
     [ set-next-alarm-time ] dip
-    [ dup next-iteration-nanos>> ] [ 0 ] if
+    [ dup iteration-start-nanos>> ] [ 0 ] if
     sleep-until call-alarm-loop ;
 
 : maybe-loop-alarm ( alarm -- )
@@ -51,8 +54,11 @@ DEFER: call-alarm-loop
     ] if ;
 
 : call-alarm ( alarm -- )
-    [ delay-nanos>> ] [ ] bi
-    '[ _ [ sleep ] when* _ call-alarm-loop ] "Alarm execution" spawn drop ;
+    '[
+        _ self >>thread
+        [ delay-nanos>> [ sleep ] when* ]
+        [ nano-count >>iteration-start-nanos call-alarm-loop ] bi
+    ] "Alarm execution" spawn drop ;
 
 PRIVATE>
 
