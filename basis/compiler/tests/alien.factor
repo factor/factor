@@ -763,6 +763,14 @@ mingw? [
 [ S{ test-struct-11 f 7 -3 } ]
 [ 3 4 7 fastcall-struct-return-iii-callback fastcall-struct-return-iii-indirect ] unit-test
 
+: x64-regression-1 ( -- c )
+    int { int int int int int } cdecl [ + + + + ] alien-callback ;
+
+: x64-regression-2 ( x x x x x c -- y )
+    int { int int int int int } cdecl alien-indirect ; inline
+
+[ 661 ] [ 100 500 50 10 1 x64-regression-1 x64-regression-2 ] unit-test
+
 ! Stack allocation
 : blah ( -- x ) { RECT } [ 1.5 >>x 2.0 >>y [ x>> ] [ y>> ] bi * >fixnum ] with-scoped-allocation ;
 
