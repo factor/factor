@@ -1,9 +1,11 @@
-USING: alien alien.c-types arrays assocs combinators continuations
-destructors io io.backend io.ports io.timeouts io.backend.windows
-io.files.windows io.files.windows.nt io.files io.pathnames io.buffers
-io.streams.c io.streams.null libc kernel math namespaces sequences
-threads windows windows.errors windows.kernel32 strings splitting
-ascii system accessors locals classes.struct combinators.short-circuit ;
+USING: alien alien.c-types alien.data alien.syntax arrays assocs
+combinators continuations destructors io io.backend io.ports
+io.timeouts io.backend.windows io.files.windows
+io.files.windows.nt io.files io.pathnames io.buffers
+io.streams.c io.streams.null libc kernel math namespaces
+sequences threads windows windows.errors windows.kernel32
+strings splitting ascii system accessors locals classes.struct
+combinators.short-circuit ;
 IN: io.backend.windows.nt
 
 ! Global variable with assoc mapping overlapped to threads

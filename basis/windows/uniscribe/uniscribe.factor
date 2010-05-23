@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel assocs math sequences fry io.encodings.string
 io.encodings.utf16n accessors arrays combinators destructors
-cache namespaces init fonts alien.c-types windows.usp10
-windows.offscreen windows.gdi32 windows.ole32 windows.types
-windows.fonts opengl.textures locals windows.errors
-classes.struct ;
+cache namespaces init fonts alien.c-types alien.data
+windows.usp10 windows.offscreen windows.gdi32 windows.ole32
+windows.types windows.fonts opengl.textures locals
+windows.errors classes.struct ;
 IN: windows.uniscribe
 
 TUPLE: script-string < disposable font string metrics ssa size image ;

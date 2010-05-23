@@ -6,7 +6,7 @@ windows.time windows.types windows accessors alien.c-types
 combinators generalizations system alien.strings
 io.encodings.utf16n sequences splitting windows.errors fry
 continuations destructors calendar ascii
-combinators.short-circuit locals classes.struct
+combinators.short-circuit literals locals classes.struct
 specialized-arrays alien.data ;
 SPECIALIZED-ARRAY: ushort
 IN: io.files.info.windows
