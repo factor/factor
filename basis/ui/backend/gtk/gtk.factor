@@ -38,7 +38,7 @@ CONSTANT: modifiers
     {
         { S+ $[ GDK_SHIFT_MASK enum>number ] }
         { C+ $[ GDK_CONTROL_MASK enum>number ] }
-        { A+ $[ GDK_META_MASK enum>number ] }
+        { A+ $[ GDK_MOD1_MASK enum>number ] }
     }
 
 CONSTANT: action-key-codes
