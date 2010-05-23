@@ -7,7 +7,7 @@ layouts words sequences sequences.private arrays assocs classes
 classes.algebra combinators generic.math splitting fry locals
 classes.tuple alien.accessors classes.tuple.private
 slots.private definitions strings.private vectors hashtables
-generic quotations alien
+generic quotations alien alien.data alien.data.private
 stack-checker.dependencies
 compiler.tree.comparisons
 compiler.tree.propagation.info
@@ -338,3 +338,5 @@ flog fpow fsqrt facosh fasinh fatanh } [
 
 \ fixnum-max { fixnum fixnum } "input-classes" set-word-prop
 \ fixnum-max [ interval-max ] [ fixnum-valued ] binary-op
+
+\ (local-allot) { alien } "default-output-classes" set-word-prop

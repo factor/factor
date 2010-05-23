@@ -150,9 +150,6 @@ SINGLETONS: int-regs float-regs ;
 UNION: reg-class int-regs float-regs ;
 CONSTANT: reg-classes { int-regs float-regs }
 
-! A pseudo-register class for parameters spilled on the stack
-SINGLETON: stack-params
-
 ! On x86, vectors and floats are stored in the same register bank
 ! On PowerPC they are distinct
 HOOK: vector-regs cpu ( -- reg-class )
@@ -165,7 +162,6 @@ M: float-rep reg-class-of drop float-regs ;
 M: double-rep reg-class-of drop float-regs ;
 M: vector-rep reg-class-of drop vector-regs ;
 M: scalar-rep reg-class-of drop vector-regs ;
-M: stack-params reg-class-of drop stack-params ;
 
 GENERIC: rep-size ( rep -- n ) foldable
 
@@ -173,7 +169,6 @@ M: tagged-rep rep-size drop cell ;
 M: int-rep rep-size drop cell ;
 M: float-rep rep-size drop 4 ;
 M: double-rep rep-size drop 8 ;
-M: stack-params rep-size drop cell ;
 M: vector-rep rep-size drop 16 ;
 M: char-scalar-rep rep-size drop 1 ;
 M: uchar-scalar-rep rep-size drop 1 ;
@@ -216,6 +211,14 @@ M: ulonglong-2-rep scalar-rep-of drop ulonglong-scalar-rep ;
 
 ! Mapping from register class to machine registers
 HOOK: machine-registers cpu ( -- assoc )
+
+! Callbacks are not allowed to clobber this
+HOOK: frame-reg cpu ( -- reg )
+
+! Parameter space to reserve in anything making VM calls
+HOOK: vm-stack-space cpu ( -- n )
+
+M: object vm-stack-space 0 ;
 
 ! Specifies if %slot, %set-slot and %write-barrier accept the
 ! 'scale' and 'tag' parameters, and if %load-memory and
@@ -270,6 +273,7 @@ HOOK: %max     cpu ( dst src1 src2 -- )
 HOOK: %not     cpu ( dst src -- )
 HOOK: %neg     cpu ( dst src -- )
 HOOK: %log2    cpu ( dst src -- )
+HOOK: %bit-count cpu ( dst src -- )
 
 HOOK: %copy cpu ( dst src rep -- )
 
@@ -292,15 +296,21 @@ HOOK: %binary-float-function cpu ( dst src1 src2 func -- )
 HOOK: %single>double-float cpu ( dst src -- )
 HOOK: %double>single-float cpu ( dst src -- )
 
+HOOK: integer-float-needs-stack-frame? cpu ( -- ? )
+
 HOOK: %integer>float cpu ( dst src -- )
 HOOK: %float>integer cpu ( dst src -- )
 
 HOOK: %zero-vector cpu ( dst rep -- )
 HOOK: %fill-vector cpu ( dst rep -- )
 HOOK: %gather-vector-2 cpu ( dst src1 src2 rep -- )
+HOOK: %gather-int-vector-2 cpu ( dst src1 src2 rep -- )
 HOOK: %gather-vector-4 cpu ( dst src1 src2 src3 src4 rep -- )
+HOOK: %gather-int-vector-4 cpu ( dst src1 src2 src3 src4 rep -- )
+HOOK: %select-vector cpu ( dst src n rep -- )
 HOOK: %shuffle-vector cpu ( dst src shuffle rep -- )
 HOOK: %shuffle-vector-imm cpu ( dst src shuffle rep -- )
+HOOK: %shuffle-vector-halves-imm cpu ( dst src1 src2 shuffle rep -- )
 HOOK: %tail>head-vector cpu ( dst src rep -- )
 HOOK: %merge-vector-head cpu ( dst src1 src2 rep -- )
 HOOK: %merge-vector-tail cpu ( dst src1 src2 rep -- )
@@ -352,10 +362,14 @@ HOOK: %scalar>vector cpu ( dst src rep -- )
 HOOK: %zero-vector-reps cpu ( -- reps )
 HOOK: %fill-vector-reps cpu ( -- reps )
 HOOK: %gather-vector-2-reps cpu ( -- reps )
+HOOK: %gather-int-vector-2-reps cpu ( -- reps )
 HOOK: %gather-vector-4-reps cpu ( -- reps )
+HOOK: %gather-int-vector-4-reps cpu ( -- reps )
+HOOK: %select-vector-reps cpu ( -- reps )
 HOOK: %alien-vector-reps cpu ( -- reps )
 HOOK: %shuffle-vector-reps cpu ( -- reps )
 HOOK: %shuffle-vector-imm-reps cpu ( -- reps )
+HOOK: %shuffle-vector-halves-imm-reps cpu ( -- reps )
 HOOK: %merge-vector-reps cpu ( -- reps )
 HOOK: %signed-pack-vector-reps cpu ( -- reps )
 HOOK: %unsigned-pack-vector-reps cpu ( -- reps )
@@ -400,10 +414,14 @@ HOOK: %horizontal-shr-vector-imm-reps cpu ( -- reps )
 M: object %zero-vector-reps { } ;
 M: object %fill-vector-reps { } ;
 M: object %gather-vector-2-reps { } ;
+M: object %gather-int-vector-2-reps { } ;
 M: object %gather-vector-4-reps { } ;
+M: object %gather-int-vector-4-reps { } ;
+M: object %select-vector-reps { } ;
 M: object %alien-vector-reps { } ;
 M: object %shuffle-vector-reps { } ;
 M: object %shuffle-vector-imm-reps { } ;
+M: object %shuffle-vector-halves-imm-reps { } ;
 M: object %merge-vector-reps { } ;
 M: object %signed-pack-vector-reps { } ;
 M: object %unsigned-pack-vector-reps { } ;
@@ -472,15 +490,23 @@ HOOK: %call-gc cpu ( gc-roots -- )
 HOOK: %prologue cpu ( n -- )
 HOOK: %epilogue cpu ( n -- )
 
-HOOK: %compare cpu ( dst temp cc src1 src2 -- )
-HOOK: %compare-imm cpu ( dst temp cc src1 src2 -- )
-HOOK: %compare-integer-imm cpu ( dst temp cc src1 src2 -- )
-HOOK: %compare-float-ordered cpu ( dst temp cc src1 src2 -- )
-HOOK: %compare-float-unordered cpu ( dst temp cc src1 src2 -- )
+HOOK: test-instruction? cpu ( -- ? )
+
+M: object test-instruction? f ;
+
+HOOK: %compare cpu ( dst src1 src2 cc temp -- )
+HOOK: %compare-imm cpu ( dst src1 src2 cc temp -- )
+HOOK: %compare-integer-imm cpu ( dst src1 src2 cc temp -- )
+HOOK: %test cpu ( dst src1 src2 cc temp -- )
+HOOK: %test-imm cpu ( dst src1 src2 cc temp -- )
+HOOK: %compare-float-ordered cpu ( dst src1 src2 cc temp -- )
+HOOK: %compare-float-unordered cpu ( dst src1 src2 cc temp -- )
 
 HOOK: %compare-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-imm-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-integer-imm-branch cpu ( label cc src1 src2 -- )
+HOOK: %test-branch cpu ( label cc src1 src2 -- )
+HOOK: %test-imm-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-float-ordered-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-float-unordered-branch cpu ( label cc src1 src2 -- )
 
@@ -488,22 +514,6 @@ HOOK: %spill cpu ( src rep dst -- )
 HOOK: %reload cpu ( dst rep src -- )
 
 HOOK: %loop-entry cpu ( -- )
-
-! FFI stuff
-
-! Return values of this class go here
-GENERIC: return-reg ( reg-class -- reg )
-
-! Sequence of registers used for parameter passing in class
-GENERIC# param-regs 1 ( reg-class abi -- regs )
-
-M: stack-params param-regs 2drop f ;
-
-GENERIC# param-reg 1 ( n reg-class abi -- reg )
-
-M: reg-class param-reg param-regs nth ;
-
-M: stack-params param-reg 2drop ;
 
 ! Does this architecture support %load-float, %load-double,
 ! and %load-vector?
@@ -534,6 +544,14 @@ M: object immediate-comparand? ( n -- ? )
 : immediate-shift-count? ( n -- ? )
     0 cell-bits 1 - between? ;
 
+! FFI stuff
+
+! Return values of this class go here
+HOOK: return-regs cpu ( -- regs )
+
+! Registers used for parameter passing
+HOOK: param-regs cpu ( abi -- regs )
+
 ! Is this structure small enough to be returned in registers?
 HOOK: return-struct-in-registers? cpu ( c-type -- ? )
 
@@ -562,34 +580,30 @@ HOOK: struct-return-on-stack? cpu ( -- ? )
 ! can be passed to a C function, or returned from a callback
 HOOK: %unbox cpu ( dst src func rep -- )
 
+HOOK: %unbox-long-long cpu ( src out func -- )
+
 HOOK: %store-reg-param cpu ( src reg rep -- )
 
 HOOK: %store-stack-param cpu ( src n rep -- )
 
-HOOK: %store-return cpu ( src rep -- )
-
-HOOK: %store-struct-return cpu ( src reps -- )
-
-HOOK: %store-long-long-return cpu ( src1 src2 -- )
-
-HOOK: %prepare-struct-area cpu ( dst -- )
+HOOK: %local-allot cpu ( dst size align offset -- )
 
 ! Call a function to convert a value into a tagged pointer,
 ! possibly allocating a bignum, float, or alien instance,
 ! which is then pushed on the data stack
-HOOK: %box cpu ( dst n rep func -- )
+HOOK: %box cpu ( dst src func rep -- )
 
-HOOK: %box-long-long cpu ( dst n func -- )
+HOOK: %box-long-long cpu ( dst src1 src2 func -- )
 
-HOOK: %box-small-struct cpu ( dst c-type -- )
-
-HOOK: %box-large-struct cpu ( dst n c-type -- )
-
-HOOK: %save-param-reg cpu ( stack reg rep -- )
+HOOK: %allot-byte-array cpu ( dst size -- )
 
 HOOK: %restore-context cpu ( temp1 temp2 -- )
 
 HOOK: %save-context cpu ( temp1 temp2 -- )
+
+HOOK: %prepare-var-args cpu ( -- )
+
+M: object %prepare-var-args ;
 
 HOOK: %alien-invoke cpu ( function library -- )
 
@@ -598,6 +612,10 @@ HOOK: %cleanup cpu ( n -- )
 M: object %cleanup ( n -- ) drop ;
 
 HOOK: %alien-indirect cpu ( src -- )
+
+HOOK: %load-reg-param cpu ( dst reg rep -- )
+
+HOOK: %load-stack-param cpu ( dst n rep -- )
 
 HOOK: %begin-callback cpu ( -- )
 

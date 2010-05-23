@@ -28,7 +28,7 @@ ERROR: wait-timeout ;
 : wait ( queue timeout status -- )
     over [
         [ queue-timeout ] dip suspend
-        [ wait-timeout ] [ cancel-alarm ] if
+        [ wait-timeout ] [ stop-alarm ] if
     ] [
         [ drop queue ] dip suspend drop
     ] if ; inline

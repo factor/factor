@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs arrays classes combinators
-compiler.units fry generalizations generic kernel locals
-namespaces quotations sequences sets slots words
-compiler.cfg.instructions compiler.cfg.instructions.syntax
+compiler.units fry generalizations sequences.generalizations
+generic kernel locals namespaces quotations sequences sets slots
+words compiler.cfg.instructions compiler.cfg.instructions.syntax
 compiler.cfg.rpo ;
 FROM: namespaces => set ;
 FROM: sets => members ;

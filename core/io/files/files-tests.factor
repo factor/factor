@@ -80,7 +80,7 @@ IN: io.files.tests
     "test.txt" temp-file binary [
         3 4 * read
     ] with-file-reader
-    byte-array>int-array
+    int-array-cast
 ] unit-test
 
 [ ] [
@@ -117,7 +117,7 @@ CONSTANT: pt-array-1
 
 [ t ] [
     "test.txt" temp-file binary file-contents
-    byte-array>pt-array
+    pt-array-cast
     pt-array-1 rest-slice sequence=
 ] unit-test
 

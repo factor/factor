@@ -8,6 +8,8 @@ QUALIFIED: compiler.cfg.finalization
 QUALIFIED: compiler.codegen
 QUALIFIED: compiler.tree.builder
 QUALIFIED: compiler.tree.optimizer
+QUALIFIED: compiler.cfg.liveness
+QUALIFIED: compiler.cfg.liveness.ssa
 IN: bootstrap.compiler.timing
 
 : passes ( word -- seq )
@@ -33,6 +35,8 @@ IN: bootstrap.compiler.timing
         machine-passes %
         linear-scan-passes %
         \ compiler.codegen:generate ,
+        \ compiler.cfg.liveness:compute-live-sets ,
+        \ compiler.cfg.liveness.ssa:compute-ssa-live-sets ,
     ] { } make ;
 
 all-passes [ [ reset ] [ add-timing ] bi ] each

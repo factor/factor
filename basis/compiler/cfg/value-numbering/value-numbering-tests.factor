@@ -18,6 +18,8 @@ IN: compiler.cfg.value-numbering.tests
             [ ##compare-integer-imm? ]
             [ ##compare-float-unordered? ]
             [ ##compare-float-ordered? ]
+            [ ##test? ]
+            [ ##test-imm? ]
             [ ##test-vector? ]
             [ ##test-vector-branch? ]
         } 1|| [ f >>temp ] when
@@ -261,6 +263,36 @@ cpu x86.64? [
         T{ ##peek f 29 D -1 }
         T{ ##peek f 30 D -2 }
         T{ ##compare-integer f 33 29 30 cc<= }
+        T{ ##compare-imm-branch f 33 f cc/= }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##peek f 29 D -1 }
+        T{ ##peek f 30 D -2 }
+        T{ ##test f 33 29 30 cc= }
+        T{ ##test-branch f 29 30 cc= }
+    }
+] [
+    {
+        T{ ##peek f 29 D -1 }
+        T{ ##peek f 30 D -2 }
+        T{ ##test f 33 29 30 cc= }
+        T{ ##compare-imm-branch f 33 f cc/= }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##peek f 29 D -1 }
+        T{ ##test-imm f 33 29 30 cc= }
+        T{ ##test-imm-branch f 29 30 cc= }
+    }
+] [
+    {
+        T{ ##peek f 29 D -1 }
+        T{ ##test-imm f 33 29 30 cc= }
         T{ ##compare-imm-branch f 33 f cc/= }
     } value-numbering-step trim-temps
 ] unit-test
@@ -994,6 +1026,262 @@ cpu x86.32? [
         T{ ##compare f 1 0 0 cc/= }
     } value-numbering-step
 ] unit-test
+
+[
+    {
+        T{ ##load-integer f 1 12 }
+        T{ ##load-reference f 3 t }
+    }
+] [
+    {
+        T{ ##load-integer f 1 12 }
+        T{ ##test-imm f 3 1 13 cc/= }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-integer f 1 15 }
+        T{ ##load-reference f 3 f }
+    }
+] [
+    {
+        T{ ##load-integer f 1 15 }
+        T{ ##test-imm f 3 1 16 cc/= }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-integer f 1 12 }
+        T{ ##load-reference f 3 f }
+    }
+] [
+    {
+        T{ ##load-integer f 1 12 }
+        T{ ##test-imm f 3 1 13 cc= }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-integer f 1 15 }
+        T{ ##load-reference f 3 t }
+    }
+] [
+    {
+        T{ ##load-integer f 1 15 }
+        T{ ##test-imm f 3 1 16 cc= }
+    } value-numbering-step
+] unit-test
+
+! Rewriting a ##test of an ##and into a ##test
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##and f 2 0 1 }
+        T{ ##test f 3 0 1 cc= }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##and f 2 0 1 }
+        T{ ##test f 3 2 2 cc= }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##and-imm f 2 0 12 }
+        T{ ##test-imm f 3 0 12 cc= }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##and-imm f 2 0 12 }
+        T{ ##test f 3 2 2 cc= }
+    } value-numbering-step
+] unit-test
+
+! Rewriting ##test into ##test-imm
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 1 10 }
+        T{ ##test-imm f 2 0 10 cc= }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 1 10 }
+        T{ ##test f 2 0 1 cc= }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 1 10 }
+        T{ ##test-imm f 2 0 10 cc= }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 1 10 }
+        T{ ##test f 2 1 0 cc= }
+    } value-numbering-step trim-temps
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 1 10 }
+        T{ ##test-imm-branch f 0 10 cc= }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 1 10 }
+        T{ ##test-branch f 0 1 cc= }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 1 10 }
+        T{ ##test-imm-branch f 0 10 cc= }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 1 10 }
+        T{ ##test-branch f 1 0 cc= }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 1 10 }
+        T{ ##test-imm-branch f 0 10 cc= }
+    }
+] [
+    {
+        T{ ##peek f 0 D 0 }
+        T{ ##load-integer f 1 10 }
+        T{ ##test-branch f 1 0 cc= }
+    } value-numbering-step
+] unit-test
+
+! Make sure the immediate fits
+cpu x86.64? [
+    [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##load-integer f 1 100000000000 }
+            T{ ##test f 2 1 0 cc= }
+        }
+    ] [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##load-integer f 1 100000000000 }
+            T{ ##test f 2 1 0 cc= }
+        } value-numbering-step
+    ] unit-test
+
+    [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##load-integer f 1 100000000000 }
+            T{ ##test-branch f 1 0 cc= }
+        }
+    ] [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##load-integer f 1 100000000000 }
+            T{ ##test-branch f 1 0 cc= }
+        } value-numbering-step
+    ] unit-test
+] when
+
+! Rewriting ##compare into ##test
+cpu x86? [
+    [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##test f 1 0 0 cc= }
+        }
+    ] [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##compare-integer-imm f 1 0 0 cc= }
+        } value-numbering-step
+    ] unit-test
+
+    [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##test f 1 0 0 cc/= }
+        }
+    ] [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##compare-integer-imm f 1 0 0 cc/= }
+        } value-numbering-step
+    ] unit-test
+
+    [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##compare-integer-imm f 1 0 0 cc<= }
+        }
+    ] [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##compare-integer-imm f 1 0 0 cc<= }
+        } value-numbering-step
+    ] unit-test
+    
+    [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##test-branch f 0 0 cc= }
+        }
+    ] [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##compare-integer-imm-branch f 0 0 cc= }
+        } value-numbering-step
+    ] unit-test
+
+    [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##test-branch f 0 0 cc/= }
+        }
+    ] [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##compare-integer-imm-branch f 0 0 cc/= }
+        } value-numbering-step
+    ] unit-test
+
+    [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##compare-integer-imm-branch f 0 0 cc<= }
+        }
+    ] [
+        {
+            T{ ##peek f 0 D 0 }
+            T{ ##compare-integer-imm-branch f 0 0 cc<= }
+        } value-numbering-step
+    ] unit-test
+] when
 
 ! Reassociation
 [
@@ -2020,13 +2308,13 @@ cell 8 = [
 
 [
     {
-        T{ ##load-reference f 0 $[ 55 tag-fixnum ] }
+        T{ ##load-integer f 0 55 }
         T{ ##load-reference f 1 B{ 55 0 0 0  55 0 0 0  55 0 0 0  55 0 0 0 } }
         T{ ##load-reference f 2 B{ 55 0 0 0  55 0 0 0  55 0 0 0  55 0 0 0 } }
     }
 ] [
     {
-        T{ ##load-reference f 0 $[ 55 tag-fixnum ] }
+        T{ ##load-integer f 0 55 }
         T{ ##scalar>vector f 1 0 int-4-rep }
         T{ ##shuffle-vector-imm f 2 1 { 0 0 0 0 } float-4-rep }
     } value-numbering-step
@@ -2043,6 +2331,100 @@ cell 8 = [
         T{ ##load-reference f 0 1.25 }
         T{ ##scalar>vector f 1 0 float-4-rep }
         T{ ##shuffle-vector-imm f 2 1 { 0 0 0 0 } float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-reference f 0 1.25 }
+        T{ ##load-reference f 1 B{ 0 0 160 63 0 0 160 63 0 0 160 63 0 0 160 63 } }
+        T{ ##load-reference f 2 B{ 0 0 160 63 0 0 160 63 0 0 160 63 0 0 160 63 } }
+    }
+] [
+    {
+        T{ ##load-reference f 0 1.25 }
+        T{ ##scalar>vector f 1 0 float-4-rep }
+        T{ ##shuffle-vector-imm f 2 1 { 0 0 0 0 } float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-integer f 0 55 }
+        T{ ##load-reference f 1 B{ 55 0 55 0 55 0 55 0 55 0 55 0 55 0 55 0 } }
+        T{ ##load-reference f 2 B{ 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 } }
+        T{ ##load-reference f 3 B{ 0 55 0 55 0 55 0 55 0 55 0 55 0 55 0 55 } }
+    }
+] [
+    {
+        T{ ##load-integer f 0 55 }
+        T{ ##scalar>vector f 1 0 short-8-rep }
+        T{ ##load-reference f 2 B{ 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 } }
+        T{ ##shuffle-vector f 3 1 2 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-reference f 0 1.25 }
+        T{ ##load-reference f 2 3.75 }
+        T{ ##load-reference f 4 B{ 0 0 0 0 0 0 244 63 0 0 0 0 0 0 14 64 } }
+    }
+] [
+    {
+        T{ ##load-reference f 0 1.25 }
+        T{ ##load-reference f 2 3.75 }
+        T{ ##gather-vector-2 f 4 0 2 double-2-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-integer f 0 125 }
+        T{ ##load-integer f 2 375 }
+        T{ ##load-reference f 4 B{ 125 0 0 0 0 0 0 0 119 1 0 0 0 0 0 0 } }
+    }
+] [
+    {
+        T{ ##load-integer f 0 125 }
+        T{ ##load-integer f 2 375 }
+        T{ ##gather-vector-2 f 4 0 2 longlong-2-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-reference f 0 1.25 }
+        T{ ##load-reference f 1 2.50 }
+        T{ ##load-reference f 2 3.75 }
+        T{ ##load-reference f 3 5.00 }
+        T{ ##load-reference f 4 B{ 0 0 160 63 0 0 32 64 0 0 112 64 0 0 160 64 } }
+    }
+] [
+    {
+        T{ ##load-reference f 0 1.25 }
+        T{ ##load-reference f 1 2.50 }
+        T{ ##load-reference f 2 3.75 }
+        T{ ##load-reference f 3 5.00 }
+        T{ ##gather-vector-4 f 4 0 1 2 3 float-4-rep }
+    } value-numbering-step
+] unit-test
+
+[
+    {
+        T{ ##load-integer f 0 125 }
+        T{ ##load-integer f 1 250 }
+        T{ ##load-integer f 2 375 }
+        T{ ##load-integer f 3 500 }
+        T{ ##load-reference f 4 B{ 125 0 0 0 250 0 0 0 119 1 0 0 244 1 0 0 } }
+    }
+] [
+    {
+        T{ ##load-integer f 0 125 }
+        T{ ##load-integer f 1 250 }
+        T{ ##load-integer f 2 375 }
+        T{ ##load-integer f 3 500 }
+        T{ ##gather-vector-4 f 4 0 1 2 3 int-4-rep }
     } value-numbering-step
 ] unit-test
 

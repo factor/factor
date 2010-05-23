@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fry generalizations kernel macros math.order
-stack-checker math sequences ;
+USING: accessors fry generalizations sequences.generalizations
+kernel macros math.order stack-checker math sequences ;
 IN: combinators.smart
 
 MACRO: drop-outputs ( quot -- quot' )

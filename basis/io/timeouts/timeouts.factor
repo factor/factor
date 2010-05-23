@@ -17,7 +17,7 @@ GENERIC: cancel-operation ( obj -- )
     [ '[ _ cancel-operation ] ] dip later ;
 
 : with-timeout* ( obj timeout quot -- )
-    3dup drop queue-timeout [ nip call ] dip cancel-alarm ;
+    3dup drop queue-timeout [ nip call ] dip stop-alarm ;
     inline
 
 : with-timeout ( obj quot -- )

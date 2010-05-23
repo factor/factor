@@ -116,6 +116,10 @@ M: object vshuffle-elements
     over length 0 pad-tail
     swap [ '[ _ nth ] ] keep map-as ; inline
 
+GENERIC# vshuffle2-elements 1 ( u v perm -- w )
+M: object vshuffle2-elements
+    [ append ] dip vshuffle-elements ; inline
+
 GENERIC# vshuffle-bytes 1 ( u perm -- v )
 
 GENERIC: vshuffle ( u perm -- v )

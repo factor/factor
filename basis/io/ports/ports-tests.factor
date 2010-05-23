@@ -18,7 +18,7 @@ IN: io.ports.tests
 
 [ t ] [
     "test.txt" temp-file binary [
-        100,000 4 * read byte-array>int-array 100,000 iota sequence=
+        100,000 4 * read int-array-cast 100,000 iota sequence=
     ] with-file-reader
 ] unit-test
 

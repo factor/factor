@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces assocs hashtables sequences arrays
 accessors words vectors combinators combinators.short-circuit
-sets classes layouts fry cpu.architecture
+sets classes layouts fry locals cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.def-use
@@ -112,29 +112,20 @@ SYMBOL: acs>vregs
 ! Map vregs -> slot# -> vreg
 SYMBOL: live-slots
 
-! Current instruction number
-SYMBOL: insn#
+! Maps vreg -> slot# -> insn# of last store or f
+SYMBOL: recent-stores
 
-! Load/store history, for dead store elimination
-TUPLE: load insn# ;
-TUPLE: store insn# ;
+! A set of insn#s of dead stores
+SYMBOL: dead-stores
 
-: new-action ( class -- action )
-    insn# get swap boa ; inline
+: dead-store ( insn# -- ) dead-stores get adjoin ;
 
-! Maps vreg -> slot# -> sequence of loads/stores
-SYMBOL: histories
-
-: history ( vreg -- history ) histories get at ;
-
-: set-ac ( vreg ac -- )
+:: set-ac ( vreg ac -- )
     #! Set alias class of newly-seen vreg.
-    {
-        [ drop H{ } clone swap histories get set-at ]
-        [ drop H{ } clone swap live-slots get set-at ]
-        [ swap vregs>acs get set-at ]
-        [ acs>vregs get push-at ]
-    } 2cleave ;
+    H{ } clone vreg recent-stores get set-at
+    H{ } clone vreg live-slots get set-at
+    ac vreg vregs>acs get set-at
+    vreg ac acs>vregs get push-at ;
 
 : live-slot ( slot#/f vreg -- vreg' )
     #! If the slot number is unknown, we never reuse a previous
@@ -152,20 +143,17 @@ ERROR: vreg-has-no-slots vreg ;
 : record-constant-slot ( slot# vreg -- )
     #! A load can potentially read every store of this slot#
     #! in that alias class.
-    [
-        history [ load new-action swap ?push ] change-at
-    ] with each-alias ;
+    [ recent-stores get at delete-at ] with each-alias ;
 
 : record-computed-slot ( vreg -- )
     #! Computed load is like a load of every slot touched so far
-    [
-        history values [ load new-action swap push ] each
-    ] each-alias ;
+    [ recent-stores get at clear-assoc ] each-alias ;
 
-: remember-slot ( value slot#/f vreg -- )
-    over
-    [ [ record-constant-slot ] [ load-constant-slot ] 2bi ]
-    [ 2nip record-computed-slot ] if ;
+:: remember-slot ( value slot# vreg -- )
+    slot# [
+        slot# vreg record-constant-slot
+        value slot# vreg load-constant-slot
+    ] [ vreg record-computed-slot ] if ;
 
 SYMBOL: ac-counter
 
@@ -184,21 +172,19 @@ SYMBOL: heap-ac
 : kill-constant-set-slot ( slot# vreg -- )
     [ live-slots get at delete-at ] with each-alias ;
 
-: record-constant-set-slot ( slot# vreg -- )
-    history [
-        dup empty? [ dup last store? [ dup pop* ] when ] unless
-        store new-action swap ?push
-    ] change-at ;
+:: record-constant-set-slot ( insn# slot# vreg -- )
+    vreg recent-stores get at :> recent-stores
+    slot# recent-stores at [ dead-store ] when*
+    insn# slot# recent-stores set-at ;
 
-: kill-computed-set-slot ( ac -- )
+: kill-computed-set-slot ( vreg -- )
     [ live-slots get at clear-assoc ] each-alias ;
 
-: remember-set-slot ( slot#/f vreg -- )
-    over [
-        [ record-constant-set-slot ]
-        [ kill-constant-set-slot ]
-        2bi
-    ] [ nip kill-computed-set-slot ] if ;
+:: remember-set-slot ( insn# slot# vreg -- )
+    slot# [
+        insn# slot# vreg record-constant-set-slot
+        slot# vreg kill-constant-set-slot
+    ] [ vreg kill-computed-set-slot ] if ;
 
 GENERIC: insn-slot# ( insn -- slot#/f )
 GENERIC: insn-object ( insn -- vreg )
@@ -219,24 +205,11 @@ M: ##alien-global insn-object drop \ ##alien-global ;
 M: ##vm-field insn-object drop \ ##vm-field ;
 M: ##set-vm-field insn-object drop \ ##vm-field ;
 
-: init-alias-analysis ( insns -- insns' )
-    H{ } clone histories set
-    H{ } clone vregs>acs set
-    H{ } clone acs>vregs set
-    H{ } clone live-slots set
-    H{ } clone copies set
+GENERIC: analyze-aliases ( insn -- insn' )
 
-    0 ac-counter set
-    next-ac heap-ac set
+M: insn analyze-aliases ;
 
-    \ ##vm-field set-new-ac
-    \ ##alien-global set-new-ac
-
-    dup local-live-in [ set-heap-ac ] each ;
-
-GENERIC: analyze-aliases* ( insn -- insn' )
-
-M: insn analyze-aliases*
+M: vreg-insn analyze-aliases
     ! If an instruction defines a value with a non-integer
     ! representation it means that the value will be boxed
     ! anywhere its used as a tagged pointer. Boxing allocates
@@ -247,23 +220,23 @@ M: insn analyze-aliases*
         [ set-heap-ac ] [ set-new-ac ] if
     ] when* ;
 
-M: ##phi analyze-aliases*
+M: ##phi analyze-aliases
     dup defs-vreg set-heap-ac ;
 
-M: ##allocation analyze-aliases*
+M: ##allocation analyze-aliases
     #! A freshly allocated object is distinct from any other
     #! object.
     dup dst>> set-new-ac ;
 
-M: ##box-displaced-alien analyze-aliases*
+M: ##box-displaced-alien analyze-aliases
     [ call-next-method ]
     [ base>> heap-ac get merge-acs ] bi ;
 
-M: ##read analyze-aliases*
+M: ##read analyze-aliases
     call-next-method
     dup [ dst>> ] [ insn-slot# ] [ insn-object ] tri
     2dup live-slot dup
-    [ 2nip <copy> analyze-aliases* nip ]
+    [ 2nip <copy> analyze-aliases nip ]
     [ drop remember-slot ]
     if ;
 
@@ -272,17 +245,21 @@ M: ##read analyze-aliases*
     #! from?
     live-slot = ;
 
-M: ##write analyze-aliases*
-    dup
-    [ src>> resolve ] [ insn-slot# ] [ insn-object ] tri
-    3dup idempotent? [ 3drop ] [
-        [ 2drop heap-ac get merge-acs ]
-        [ remember-set-slot drop ]
-        [ load-slot ]
-        3tri
-    ] if ;
+M:: ##write analyze-aliases ( insn -- insn )
+    insn src>> resolve :> src
+    insn insn-slot# :> slot#
+    insn insn-object :> vreg
+    insn insn#>> :> insn#
 
-M: ##copy analyze-aliases*
+    src slot# vreg idempotent? [ insn# dead-store ] [
+        src heap-ac get merge-acs
+        insn insn#>> slot# vreg remember-set-slot
+        src slot# vreg load-slot
+    ] if
+
+    insn ;
+
+M: ##copy analyze-aliases
     #! The output vreg gets the same alias class as the input
     #! vreg, since they both contain the same value.
     dup record-copy ;
@@ -293,48 +270,47 @@ M: ##copy analyze-aliases*
         [ [ src1>> ] [ src2>> ] bi [ resolve vreg>ac ] bi@ = not ]
     } 1&& ; inline
 
-M: ##compare analyze-aliases*
+M: ##compare analyze-aliases
     call-next-method
     dup useless-compare? [
         dst>> f \ ##load-reference new-insn
-        analyze-aliases*
+        analyze-aliases
     ] when ;
 
-: analyze-aliases ( insns -- insns' )
-    [ insn# set analyze-aliases* ] map-index sift ;
+GENERIC: eliminate-dead-stores ( insn -- ? )
 
-SYMBOL: live-stores
+M: ##set-slot-imm eliminate-dead-stores
+    insn#>> dead-stores get in? not ;
 
-: compute-live-stores ( -- )
-    histories get
-    values [
-        values [ [ store? ] filter [ insn#>> ] map ] map concat
-    ] map concat fast-set
-    live-stores set ;
+M: insn eliminate-dead-stores drop t ;
 
-GENERIC: eliminate-dead-stores* ( insn -- insn' )
+: init-alias-analysis ( -- )
+    H{ } clone vregs>acs set
+    H{ } clone acs>vregs set
+    H{ } clone live-slots set
+    H{ } clone copies set
+    H{ } clone recent-stores set
+    HS{ } clone dead-stores set
+    0 ac-counter set ;
 
-: (eliminate-dead-stores) ( insn -- insn' )
-    dup insn-slot# [
-        insn# get live-stores get in? [
-            drop f
-        ] unless
-    ] when ;
+: reset-alias-analysis ( -- )
+    recent-stores get clear-assoc
+    vregs>acs get clear-assoc
+    acs>vregs get clear-assoc
+    live-slots get clear-assoc
+    copies get clear-assoc
+    dead-stores get table>> clear-assoc
 
-M: ##set-slot eliminate-dead-stores* (eliminate-dead-stores) ;
-
-M: ##set-slot-imm eliminate-dead-stores* (eliminate-dead-stores) ;
-
-M: insn eliminate-dead-stores* ;
-
-: eliminate-dead-stores ( insns -- insns' )
-    [ insn# set eliminate-dead-stores* ] map-index sift ;
+    next-ac heap-ac set
+    \ ##vm-field set-new-ac
+    \ ##alien-global set-new-ac ;
 
 : alias-analysis-step ( insns -- insns' )
-    init-alias-analysis
-    analyze-aliases
-    compute-live-stores
-    eliminate-dead-stores ;
+    reset-alias-analysis
+    [ local-live-in [ set-heap-ac ] each ]
+    [ 0 [ [ insn#<< ] [ drop 1 + ] 2bi ] reduce drop ]
+    [ [ analyze-aliases ] map! [ eliminate-dead-stores ] filter! ] tri ;
 
 : alias-analysis ( cfg -- cfg )
+    init-alias-analysis
     dup [ alias-analysis-step ] simple-optimization ;

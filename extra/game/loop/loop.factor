@@ -1,32 +1,31 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors calendar continuations destructors kernel math
-math.order namespaces system threads ui ui.gadgets.worlds
-sequences ;
+USING: accessors alarms calendar continuations destructors fry
+kernel math math.order namespaces system ui ui.gadgets.worlds ;
 IN: game.loop
 
 TUPLE: game-loop
-    { tick-interval-micros integer read-only }
+    { tick-interval-nanos integer read-only }
     tick-delegate
     draw-delegate
     { last-tick integer }
-    thread 
     { running? boolean }
     { tick-number integer }
     { frame-number integer }
     { benchmark-time integer }
     { benchmark-tick-number integer }
-    { benchmark-frame-number integer } ;
+    { benchmark-frame-number integer }
+    alarm ;
 
 GENERIC: tick* ( delegate -- )
 GENERIC: draw* ( tick-slice delegate -- )
 
 SYMBOL: game-loop
 
-: since-last-tick ( loop -- microseconds )
-    last-tick>> system-micros swap - ;
+: since-last-tick ( loop -- nanos )
+    last-tick>> nano-count swap - ;
 
 : tick-slice ( loop -- slice )
-    [ since-last-tick ] [ tick-interval-micros>> ] bi /f 1.0 min ;
+    [ since-last-tick ] [ tick-interval-nanos>> ] bi /f 1.0 min ;
 
 CONSTANT: MAX-FRAMES-TO-SKIP 5
 
@@ -40,8 +39,8 @@ TUPLE: game-loop-error game-loop error ;
 : game-loop-error ( game-loop error -- )
     [ drop stop-loop ] [ \ game-loop-error boa ?ui-error ] 2bi ;
 
-: fps ( fps -- micros )
-    1,000,000 swap /i ; inline
+: fps ( fps -- nanos )
+    1,000,000,000 swap /i ; inline
 
 <PRIVATE
 
@@ -54,59 +53,60 @@ TUPLE: game-loop-error game-loop error ;
 
 : increment-tick ( loop -- )
     [ 1 + ] change-tick-number
-    dup tick-interval-micros>> [ + ] curry change-last-tick
+    dup tick-interval-nanos>> [ + ] curry change-last-tick
     drop ;
 
 : ?tick ( loop count -- )
-    [ system-micros >>last-tick drop ] [
-        over [ since-last-tick ] [ tick-interval-micros>> ] bi >=
+    [ nano-count >>last-tick drop ] [
+        over [ since-last-tick ] [ tick-interval-nanos>> ] bi >=
         [ [ drop increment-tick ] [ drop tick ] [ 1 - ?tick ] 2tri ]
         [ 2drop ] if
     ] if-zero ;
 
-: (run-loop) ( loop -- )
-    dup running?>>
-    [ [ MAX-FRAMES-TO-SKIP ?tick ] [ redraw ] [ yield (run-loop) ] tri ]
-    [ drop ] if ;
-
-: run-loop ( loop -- )
-    dup game-loop
-    [ [ (run-loop) ] [ game-loop-error ] recover ]
-    with-variable ;
-
-: benchmark-micros ( loop -- micros )
-    system-micros swap benchmark-time>> - ;
+: benchmark-nanos ( loop -- nanos )
+    nano-count swap benchmark-time>> - ;
 
 PRIVATE>
 
-: reset-loop-benchmark ( loop -- )
-    system-micros >>benchmark-time
+: reset-loop-benchmark ( loop -- loop )
+    nano-count >>benchmark-time
     dup tick-number>> >>benchmark-tick-number
-    dup frame-number>> >>benchmark-frame-number
-    drop ;
+    dup frame-number>> >>benchmark-frame-number ;
 
 : benchmark-ticks-per-second ( loop -- n )
-    [ tick-number>> ] [ benchmark-tick-number>> - ] [ benchmark-micros ] tri /f ;
+    [ tick-number>> ] [ benchmark-tick-number>> - ] [ benchmark-nanos ] tri /f ;
 : benchmark-frames-per-second ( loop -- n )
-    [ frame-number>> ] [ benchmark-frame-number>> - ] [ benchmark-micros ] tri /f ;
+    [ frame-number>> ] [ benchmark-frame-number>> - ] [ benchmark-nanos ] tri /f ;
+
+: (game-tick) ( loop -- )
+    dup running?>>
+    [ [ MAX-FRAMES-TO-SKIP ?tick ] [ redraw ] bi ]
+    [ drop ] if ;
+    
+: game-tick ( loop -- )
+    dup game-loop [
+        [ (game-tick) ] [ game-loop-error ] recover
+    ] with-variable ;
 
 : start-loop ( loop -- )
-    system-micros >>last-tick
+    nano-count >>last-tick
     t >>running?
-    [ reset-loop-benchmark ]
-    [ [ run-loop ] curry "game loop" spawn ]
-    [ thread<< ] tri ;
+    reset-loop-benchmark
+    [
+        [ '[ _ game-tick ] f ]
+        [ tick-interval-nanos>> nanoseconds ] bi
+        <alarm>
+    ] keep [ alarm<< ] [ drop start-alarm ] 2bi ;
 
 : stop-loop ( loop -- )
     f >>running?
-    f >>thread
-    drop ;
+    alarm>> stop-alarm ;
 
-: <game-loop*> ( tick-interval-micros tick-delegate draw-delegate -- loop )
-    system-micros f f 0 0 system-micros 0 0
+: <game-loop*> ( tick-interval-nanos tick-delegate draw-delegate -- loop )
+    nano-count f 0 0 nano-count 0 0 f
     game-loop boa ;
 
-: <game-loop> ( tick-interval-micros delegate -- loop )
+: <game-loop> ( tick-interval-nanos delegate -- loop )
     dup <game-loop*> ; inline
 
 M: game-loop dispose

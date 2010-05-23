@@ -211,9 +211,21 @@ M: ##compare-integer-imm optimize-insn
         [ call-next-method ]
     } cond ;
 
+M: ##test-imm optimize-insn
+    {
+        { [ dup { [ src1-tagged? ] [ src2-tagged-bitwise? ] } 1&& ] [ >tagged-imm ] }
+        [ call-next-method ]
+    } cond ;
+
 M: ##compare-integer-imm-branch optimize-insn
     {
         { [ dup { [ src1-tagged? ] [ src2-tagged-arithmetic? ] } 1&& ] [ >tagged-imm ] }
+        [ call-next-method ]
+    } cond ;
+
+M: ##test-imm-branch optimize-insn
+    {
+        { [ dup { [ src1-tagged? ] [ src2-tagged-bitwise? ] } 1&& ] [ >tagged-imm ] }
         [ call-next-method ]
     } cond ;
 
@@ -223,7 +235,19 @@ M: ##compare-integer optimize-insn
         [ call-next-method ]
     } cond ;
 
+M: ##test optimize-insn
+    {
+        { [ dup { [ src1-tagged? ] [ src2-tagged? ] } 1&& ] [ unchanged ] }
+        [ call-next-method ]
+    } cond ;
+
 M: ##compare-integer-branch optimize-insn
+    {
+        { [ dup { [ src1-tagged? ] [ src2-tagged? ] } 1&& ] [ unchanged ] }
+        [ call-next-method ]
+    } cond ;
+
+M: ##test-branch optimize-insn
     {
         { [ dup { [ src1-tagged? ] [ src2-tagged? ] } 1&& ] [ unchanged ] }
         [ call-next-method ]

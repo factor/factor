@@ -198,8 +198,8 @@ DEFER: (d)
 
 : bigraded-betti ( u-generators z-generators -- seq )
     [ basis graded ] bi@ tensor bigraded-ker/im-d
-    [ [ [ first ] map ] map ] keep
-    [ [ second ] map 2 head* { 0 0 } prepend ] map
+    [ [ keys ] map ] keep
+    [ values 2 head* { 0 0 } prepend ] map
     rest dup first length 0 <array> suffix
     [ v- ] 2map ;
 

@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.tuple
-effects.parser fry generalizations generic.standard kernel
-lexer locals macros parser sequences sets slots vocabs words ;
+effects.parser fry generalizations sequences.generalizations
+generic.standard kernel lexer locals macros parser sequences
+sets slots vocabs words ;
 IN: constructors
 
 ! An experiment
