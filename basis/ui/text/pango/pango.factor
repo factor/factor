@@ -69,7 +69,7 @@ SYMBOL: dpi
 : line-offset>x ( layout n -- x )
     #! n is an index into the UTF8 encoding of the text
     [ drop first-line ] [ swap string>> >utf8-index ] 2bi
-    0 0 <int> [ pango_layout_line_index_to_x ] keep
+    f 0 <int> [ pango_layout_line_index_to_x ] keep
     *int pango>float ;
 
 : x>line-offset ( layout x -- n )
