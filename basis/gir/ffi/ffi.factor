@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.enums alien.parser arrays assocs classes.parser
-classes.struct combinators combinators.short-circuit compiler.units effects definitions fry generalizations
-gir.common gir.types kernel locals math math.parser namespaces
-parser prettyprint quotations sequences vocabs.parser words
-words.constant ;
+USING: accessors alien alien.c-types alien.enums alien.parser arrays
+assocs classes.parser classes.struct combinators
+combinators.short-circuit definitions effects fry gir.common gir.types
+kernel locals math.parser namespaces parser quotations sequences
+sequences.generalizations vocabs.parser words words.constant ;
 IN: gir.ffi
 
 : string>c-type ( str -- c-type )
@@ -47,7 +47,7 @@ IN: gir.ffi
 : signal-ffi-invoker ( signal -- quot )
     [ return>> signal-param-c-type string>c-type ]
     [ parameters>> [ signal-param-c-type string>c-type ] map ] bi
-    "cdecl" [ [ ] 3curry dip alien-callback ] 3curry ;
+    cdecl [ [ ] 3curry dip alien-callback ] 3curry ;
 
 : signal-ffi-effect ( signal -- effect )
     [ parameters>> [ name>> ] map ]
@@ -91,7 +91,11 @@ IN: gir.ffi
 
 : fields>struct-slots ( fields -- slots )
     [
-        [ name>> ] [ c-type>> string>c-type ]
+        [ name>> ]
+        [
+            [ c-type>> string>c-type ] [ array-info>> ] bi
+            [ fixed-size>> [ 2array ] when* ] when*
+        ]
         [ drop { } ] tri <struct-slot-spec>
     ] map ;
 
@@ -109,7 +113,6 @@ IN: gir.ffi
         [ c-type>> implement-structs get-global member? ]
     } 1&&
     [
-        dup .
         [ c-type>> create-class-in dup ]
         [ fields>> fields>struct-slots ] bi define-struct-class        
     ] [
@@ -196,7 +199,8 @@ IN: gir.ffi
     } cleave ;
 
 : define-ffi-const ( const -- word )
-    [ name>> create-in dup ] [ const-value ] bi define-constant ;
+    [ c-identifier>> create-in dup ] [ const-value ] bi
+    define-constant ;
 
 : define-ffi-consts ( consts -- )
     [ define-ffi-const ] define-each ;
@@ -210,7 +214,6 @@ IN: gir.ffi
 : prepare-vocab ( repository -- )
     includes>> lib-aliases get '[ _ at ] map sift
     [ ffi-vocab "." glue ] map
-    ! { "alien.c-types" } append
     [ dup using-vocab? [ drop ] [ use-vocab ] if ] each ;
 
 : define-ffi-namespace ( namespace -- )

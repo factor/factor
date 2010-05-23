@@ -8,14 +8,15 @@ TUPLE: node name ;
 TUPLE: repository includes namespace ;
 
 TUPLE: namespace < node
-    aliases consts classes interfaces records unions callbacks
+    prefix aliases consts classes interfaces records unions callbacks
     enums bitfields functions ;
 
 TUPLE: alias < node target ;
 
 TUPLE: typed < node type c-type ;
 
-TUPLE: const < typed value ffi ;
+TUPLE: const < typed
+    value c-identifier ffi ;
 
 TUPLE: type-node < node
     type c-type type-name get-type ffi ;
