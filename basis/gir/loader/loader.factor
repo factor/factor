@@ -1,13 +1,25 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors ascii combinators fry gir.common gir.repository
-gir.types kernel math math.parser sequences splitting xml.data
+gir.types kernel math.parser sequences splitting xml.data
 xml.traversal ;
 FROM: namespaces => set get ;
 IN: gir.loader
 
+SYMBOL: namespace-prefix
+SYMBOL: namespace-PREFIX
+
 : word-started? ( word letter -- ? )
     [ last letter? ] [ LETTER? ] bi* and ;
+
+: camel>PREFIX ( name -- name' )
+    dup 1 head
+    [ 2dup word-started? [ [ CHAR: _ suffix ] dip ] when suffix ]
+    reduce rest >upper ;
+
+: set-prefix ( prefix -- )
+    [ namespace-prefix set ]
+    [ camel>PREFIX namespace-PREFIX set ] bi ;
 
 : camel>factor ( name -- name' )
     dup 1 head
@@ -231,6 +243,10 @@ IN: gir.loader
 : xml>const ( xml -- const )
     [ const new ] dip {
         [ "name" attr >>name ]
+        [
+            "name" attr namespace-PREFIX get swap "_" glue
+            >>c-identifier
+        ]
         [ "value" attr >>value ]
         [ first-child-tag "type" attr >>c-type ]
         [ first-child-tag xml>type nip >>type ]
@@ -239,6 +255,7 @@ IN: gir.loader
 : xml>namespace ( xml -- namespace )
     [ namespace new ] dip {
         [ "name" attr camel>factor dup current-lib set >>name ]
+        [ "prefix" attr [ set-prefix ] keep >>prefix ]
         [ "alias" tags-named [ xml>alias ] map >>aliases ]
         [ "record" tags-named [ xml>record ] map >>records ]
         [ "union" tags-named [ xml>union ] map >>unions ]
