@@ -139,15 +139,14 @@ M: postgresql-malloc-destructor dispose ( obj -- )
         [ 3drop ] dip
         [
             memory>byte-array >string
-            0 <uint>
+            { uint }
             [
                 PQunescapeBytea dup zero? [
                     postgresql-result-error-message throw
                 ] [
                     &postgresql-free
                 ] if
-            ] keep
-            *uint memory>byte-array
+            ] [ ] with-out-parameters memory>byte-array
         ] with-destructors 
     ] [
         drop pq-get-is-null nip [ f ] [ B{ } clone ] if

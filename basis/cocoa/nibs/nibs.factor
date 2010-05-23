@@ -1,8 +1,8 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cocoa.application cocoa.messages cocoa.classes
-cocoa.runtime kernel cocoa alien.c-types core-foundation
-core-foundation.arrays ;
+USING: alien.c-types alien.data cocoa.application cocoa.messages
+cocoa.classes cocoa.runtime cocoa core-foundation
+core-foundation.arrays kernel ;
 IN: cocoa.nibs
 
 : load-nib ( name -- )
@@ -15,5 +15,7 @@ IN: cocoa.nibs
     dup [ -> autorelease ] when ;
 
 : nib-objects ( anNSNib -- objects/f )
-    f f <void*> [ -> instantiateNibWithOwner:topLevelObjects: ] keep
-    swap [ *void* CF>array ] [ drop f ] if ;
+    f
+    { void* } [ -> instantiateNibWithOwner:topLevelObjects: ] [ ]
+    with-out-parameters
+    swap [ CF>array ] [ drop f ] if ;
