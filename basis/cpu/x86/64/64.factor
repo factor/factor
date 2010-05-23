@@ -58,14 +58,10 @@ M: x86.64 %set-vm-field ( src offset -- )
 M: x86.64 %vm-field-ptr ( dst offset -- )
     [ vm-reg ] dip [+] LEA ;
 
-! Must be a volatile register not used for parameter passing or
-! integer return
-HOOK: temp-reg cpu ( -- reg )
-
 M: x86.64 %prologue ( n -- )
-    temp-reg -7 [RIP+] LEA
+    R11 -7 [RIP+] LEA
     dup PUSH
-    temp-reg PUSH
+    R11 PUSH
     stack-reg swap 3 cells - SUB ;
 
 M: x86.64 %prepare-jump
