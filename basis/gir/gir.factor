@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators gir.common gir.ffi gir.loader
-kernel lexer locals namespaces prettyprint sequences vocabs.parser xml ;
+kernel lexer locals namespaces sequences vocabs.parser xml ;
 IN: gir
 
 : with-child-vocab ( name quot -- )
@@ -12,7 +12,6 @@ IN: gir
 :: define-gir-vocab ( vocab-name file-name -- )
     file-name file>xml xml>repository
 
-    implement-structs get-global .
     vocab-name [ set-current-vocab ] [ current-lib set ] bi
     {
         [
