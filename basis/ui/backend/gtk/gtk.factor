@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.enums alien.strings arrays ascii assocs
 classes.struct combinators.short-circuit command-line destructors
-io.encodings.utf8 kernel literals locals math namespaces
-sequences strings ui ui.backend ui.clipboards ui.event-loop
-ui.gadgets ui.gadgets.private ui.gestures ui.private
+io.encodings.utf8 kernel literals locals math math.bitwise
+namespaces sequences strings ui ui.backend ui.clipboards ui.event-loop
+ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures ui.private
 glib glib.ffi gobject gobject.ffi gtk gtk.ffi gdk gdk.ffi
 gdk.gl gtk.gl gdk.gl.ffi gtk.gl.ffi ;
 IN: ui.backend.gtk
@@ -235,14 +235,54 @@ M: gtk-ui-backend (with-ui)
     gdk_gl_config_new_by_mode
     f t GDK_GL_RGBA_TYPE enum>number gtk_widget_set_gl_capability ;
 
+CONSTANT: window-controls>decor-flags
+    H{
+        { close-button 0 }
+        { minimize-button $[ GDK_DECOR_MINIMIZE enum>number ] }
+        { maximize-button $[ GDK_DECOR_MAXIMIZE enum>number ] }
+        { resize-handles $[ GDK_DECOR_RESIZEH enum>number ] }
+        { small-title-bar $[ GDK_DECOR_TITLE enum>number ] }
+        { normal-title-bar $[ GDK_DECOR_TITLE enum>number ] }
+        { textured-background 0 }
+    }
+    
+CONSTANT: window-controls>func-flags
+    H{
+        { close-button $[ GDK_FUNC_CLOSE enum>number ] }
+        { minimize-button $[ GDK_FUNC_MINIMIZE enum>number ] }
+        { maximize-button $[ GDK_FUNC_MAXIMIZE enum>number ] }
+        { resize-handles $[ GDK_FUNC_RESIZE enum>number ] }
+        { small-title-bar 0 }
+        { normal-title-bar 0 }
+        { textured-background 0 }
+    }
+
+: configure-window-controls ( win controls -- )
+    [
+        small-title-bar swap member-eq?
+        GDK_WINDOW_TYPE_HINT_UTILITY GDK_WINDOW_TYPE_HINT_NORMAL ?
+        gtk_window_set_type_hint
+    ] [
+        [ gtk_widget_get_window ] dip
+        window-controls>decor-flags symbols>flags
+        GDK_DECOR_BORDER enum>number bitor gdk_window_set_decorations
+    ] [
+        [ gtk_widget_get_window ] dip
+        window-controls>func-flags symbols>flags
+        GDK_FUNC_MOVE enum>number bitor gdk_window_set_functions
+    ] 2tri ;
+
 M:: gtk-ui-backend (open-window) ( world -- )
     GTK_WINDOW_TOPLEVEL gtk_window_new :> win
     world [ window-loc>> win swap first2 gtk_window_move ]
     [ dim>> win swap first2 gtk_window_set_default_size ] bi
 
     win enable-gl drop ! сделать проверку на доступность OpenGL
-    
+  
     win connect-signals
+    
+    win gtk_widget_realize
+    win world window-controls>> configure-window-controls
 
     win <window-handle> world handle<<
     world win register-window
