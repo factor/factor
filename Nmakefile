@@ -1,3 +1,7 @@
+!IF !DEFINED(BOOTIMAGE_VERSION)
+BOOTIMAGE_VERSION = latest
+!ENDIF
+
 !IF DEFINED(PLATFORM)
 
 LINK_FLAGS = /nologo shell32.lib
@@ -115,6 +119,12 @@ clean:
 	del factor.dll
 	del factor.dll.lib
 
-.PHONY: all default x86-32 x86-64 clean
+bootimage-x86-32:
+	cscript /nologo build-support\http-get.vbs http://factorcode.org/images/$(BOOTIMAGE_VERSION)/boot.winnt-x86.32.image boot.winnt-x86.32.image
+
+bootimage-x86-64:
+	cscript /nologo build-support\http-get.vbs http://factorcode.org/images/$(BOOTIMAGE_VERSION)/boot.winnt-x86.64.image boot.winnt.x86.64.image
+
+.PHONY: all bootimage-x86-32 bootimage-x86-64 default x86-32 x86-64 clean
 
 .SUFFIXES: .rs
