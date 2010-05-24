@@ -20,7 +20,6 @@ CONSTANT: default-world-pixel-format-attributes
     {
         windowed
         double-buffered
-        T{ depth-bits { value 16 } }
     }
 
 CONSTANT: default-world-window-controls

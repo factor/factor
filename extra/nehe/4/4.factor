@@ -68,5 +68,14 @@ M: nehe4-gadget graft* ( gadget -- )
 M: nehe4-gadget ungraft* ( gadget -- )
   t >>quit? drop ;
 
-MAIN-WINDOW: run4 { { title "NeHe Tutorial 4" } { pref-dim { $ width $ height } } }
-  <nehe4-gadget> >>gadgets ;
+MAIN-WINDOW: run4
+    {
+        { title "NeHe Tutorial 4" }
+        { pref-dim { $ width $ height } }
+        { pixel-format-attributes {
+            windowed
+            double-buffered
+            T{ depth-bits { value 16 } }
+        } }
+    }
+    <nehe4-gadget> >>gadgets ;
