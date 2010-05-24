@@ -1,7 +1,7 @@
 ! (c)2010 Joe Groff bsd license
 USING: combinators combinators.short-circuit fry generalizations kernel
 locals macros math quotations sequences compiler.tree.propagation.transforms ;
-FROM: sequences.private => (each) (each-index) (collect) (2each) ;
+FROM: sequences.private => (each) (each-index) (2each) nth-unsafe set-nth-unsafe ;
 IN: sequences.unrolled
 
 <PRIVATE
@@ -11,13 +11,17 @@ IN: sequences.unrolled
 << \ (unrolled-each-integer) [
     iota [ '[ _ swap call( i -- ) ] ] [ ] map-as '[ _ cleave ]
 ] 1 define-partial-eval >>
+
+: (unrolled-collect) ( quot into -- quot' )
+    '[ dup @ swap _ set-nth-unsafe ] ; inline
+
 PRIVATE>
 
 : unrolled-each-integer ( n quot: ( i -- ) -- )
     swap (unrolled-each-integer) ; inline
 
 : unrolled-collect ( n quot: ( n -- value ) into -- )
-    (collect) unrolled-each-integer ; inline
+    (unrolled-collect) unrolled-each-integer ; inline
 
 : unrolled-map-integers ( n quot: ( n -- value ) exemplar -- newseq )
     [ over ] dip [ [ unrolled-collect ] keep ] new-like ; inline
@@ -38,10 +42,10 @@ ERROR: unrolled-2bounds-error
     [ xseq yseq len quot ] if ; inline
 
 : (unrolled-each) ( seq len quot -- len quot )
-    swapd (each) nip ; inline
+    swapd '[ _ nth-unsafe @ ] ; inline
 
 : (unrolled-each-index) ( seq len quot -- len quot )
-    swapd (each-index) nip ; inline
+    swapd '[ dup _ nth-unsafe swap @ ] ; inline
 
 : (unrolled-2each) ( xseq yseq len quot -- len quot )
     [ '[ _ ] 2dip ] dip (2each) nip ; inline
