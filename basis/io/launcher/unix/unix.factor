@@ -1,10 +1,11 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays assocs combinators
-continuations environment io io.backend io.backend.unix
-io.files io.files.private io.files.unix io.launcher io.pathnames
-io.ports kernel math namespaces sequences strings system threads
-unix unix.process unix.ffi simple-tokenizer ;
+USING: accessors alien.c-types alien.data arrays assocs
+combinators continuations environment io io.backend
+io.backend.unix io.files io.files.private io.files.unix
+io.launcher io.pathnames io.ports kernel math namespaces
+sequences strings system threads unix unix.process unix.ffi
+simple-tokenizer ;
 IN: io.launcher.unix
 
 : get-arguments ( process -- seq )
@@ -94,10 +95,10 @@ TUPLE: signal n ;
     dup WIFSIGNALED [ WTERMSIG signal boa ] [ WEXITSTATUS ] if ;
 
 M: unix wait-for-processes ( -- ? )
-    0 <int> -1 over WNOHANG waitpid
-    dup 0 <= [
+    { int } [ -1 swap WNOHANG waitpid ] [ ] with-out-parameters
+    swap dup 0 <= [
         2drop t
     ] [
         find-process dup
-        [ swap *int code>status notify-exit f ] [ 2drop f ] if
+        [ swap code>status notify-exit f ] [ 2drop f ] if
     ] if ;
