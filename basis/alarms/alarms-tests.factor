@@ -37,3 +37,10 @@ IN: alarms.tests
     [ stop-alarm ] [ start-alarm ] bi
     4 seconds sleep
 ] unit-test
+
+[ { 0 } ] [
+    { 0 }
+    dup '[ 3 seconds sleep 1 _ set-first ] 1 seconds later
+    2 seconds sleep stop-alarm
+    1/2 seconds sleep
+] unit-test
