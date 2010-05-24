@@ -1,5 +1,5 @@
 ! (c)2010 Joe Groff bsd license
-USING: compiler.test make math.parser sequences
+USING: compiler.test compiler.tree.debugger kernel make math.parser sequences
 sequences.unrolled tools.test ;
 IN: sequences.unrolled.tests
 
@@ -32,3 +32,21 @@ IN: sequences.unrolled.tests
 
 [ { 0 1 2 } 4 [ number>string ] unrolled-map ] [ unrolled-bounds-error? ] must-fail-with
 [ { 0 1 2 3 } { 0 1 2 } 4 [ number>string append ] unrolled-2map ] [ unrolled-2bounds-error? ] must-fail-with
+
+[ t ]
+[ [ 3 [ number>string ] unrolled-map ] { call } inlined? ] unit-test
+
+[ t ]
+[ [ 3 [ number>string , ] unrolled-each ] { call } inlined? ] unit-test
+
+[ t ]
+[ [ 3 [ number>string append , ] unrolled-each-index ] { call } inlined? ] unit-test
+
+[ t ]
+[ [ 3 [ append , ] unrolled-2each ] { call } inlined? ] unit-test
+
+[ t ]
+[ [ 3 [ append ] unrolled-2map ] { call } inlined? ] unit-test
+
+[ t ]
+[ [ 3 [ number>string append ] unrolled-map-index ] { call } inlined? ] unit-test
