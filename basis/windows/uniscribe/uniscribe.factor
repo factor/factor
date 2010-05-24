@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel assocs math sequences fry io.encodings.string
 io.encodings.utf16n accessors arrays combinators destructors
-cache namespaces init fonts alien.c-types windows.usp10
-windows.offscreen windows.gdi32 windows.ole32 windows.types
-windows.fonts opengl.textures locals windows.errors
-classes.struct ;
+cache namespaces init fonts alien.c-types alien.data
+windows.usp10 windows.offscreen windows.gdi32 windows.ole32
+windows.types windows.fonts opengl.textures locals
+windows.errors classes.struct ;
 IN: windows.uniscribe
 
 TUPLE: script-string < disposable font string metrics ssa size image ;
@@ -20,14 +20,12 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
         swap ! icp
         FALSE ! fTrailing
     ] if
-    0 <int> [ ScriptStringCPtoX ole32-error ] keep *int ;
+    { int } [ ScriptStringCPtoX ole32-error ] [ ] with-out-parameters ;
 
 : x>line-offset ( x script-string -- n trailing )
     ssa>> ! ssa
     swap ! iX
-    0 <int> ! pCh
-    0 <int> ! piTrailing
-    [ ScriptStringXtoCP ole32-error ] 2keep [ *int ] bi@ ;
+    { int int } [ ScriptStringXtoCP ole32-error ] [ ] with-out-parameters ;
 
 <PRIVATE
 
