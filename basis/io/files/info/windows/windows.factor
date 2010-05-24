@@ -6,7 +6,7 @@ windows.time windows.types windows accessors alien.c-types
 combinators generalizations system alien.strings
 io.encodings.utf16n sequences splitting windows.errors fry
 continuations destructors calendar ascii
-combinators.short-circuit locals classes.struct
+combinators.short-circuit literals locals classes.struct
 specialized-arrays alien.data ;
 SPECIALIZED-ARRAY: ushort
 IN: io.files.info.windows
@@ -21,12 +21,8 @@ IN: io.files.info.windows
 TUPLE: windows-file-info < file-info attributes ;
 
 : get-compressed-file-size ( path -- n )
-    DWORD <c-object> [ GetCompressedFileSize ] keep
-    over INVALID_FILE_SIZE = [
-        win32-error-string throw
-    ] [
-        *uint >64bit
-    ] if ;
+    { DWORD } [ GetCompressedFileSize ] [ ] with-out-parameters
+    over INVALID_FILE_SIZE = [ win32-error-string throw ] [ >64bit ] if ;
 
 : set-windows-size-on-disk ( file-info path -- file-info )
     over attributes>> +compressed+ swap member? [
@@ -99,22 +95,18 @@ M: windows file-info ( path -- info )
 M: windows link-info ( path -- info )
     file-info ;
 
+CONSTANT: path-length $[ MAX_PATH 1 + ]
+
 : volume-information ( normalized-path -- volume-name volume-serial max-component flags type )
-    MAX_PATH 1 + [ <ushort-array> ] keep
-    DWORD <c-object>
-    DWORD <c-object>
-    DWORD <c-object>
-    MAX_PATH 1 + [ <ushort-array> ] keep
-    [ GetVolumeInformation win32-error=0/f ] 7 nkeep
-    drop 5 nrot drop
-    [ utf16n alien>string ] 4 ndip
-    utf16n alien>string ;
+    { { ushort path-length } DWORD DWORD DWORD { ushort path-length } }
+    [ [ path-length ] 4dip path-length GetVolumeInformation win32-error=0/f ]
+    [ [ utf16n alien>string ] 4dip utf16n alien>string ]
+    with-out-parameters ;
 
 : file-system-space ( normalized-path -- available-space total-space free-space )
-    ULARGE_INTEGER <c-object>
-    ULARGE_INTEGER <c-object>
-    ULARGE_INTEGER <c-object>
-    [ GetDiskFreeSpaceEx win32-error=0/f ] 3keep ;
+    { ULARGE_INTEGER ULARGE_INTEGER ULARGE_INTEGER }
+    [ GetDiskFreeSpaceEx win32-error=0/f ] [ ]
+    with-out-parameters ;
 
 : calculate-file-system-info ( file-system-info -- file-system-info' )
     [ dup [ total-space>> ] [ free-space>> ] bi - >>used-space drop ] keep ;
@@ -136,13 +128,13 @@ ERROR: not-absolute-path ;
 : (file-system-info) ( path -- file-system-info )
     dup [ volume-information ] [ file-system-space ] bi
     \ win32-file-system-info new
-        swap *ulonglong >>free-space
-        swap *ulonglong >>total-space
-        swap *ulonglong >>available-space
+        swap >>free-space
+        swap >>total-space
+        swap >>available-space
         swap >>type
-        swap *uint >>flags
-        swap *uint >>max-component
-        swap *uint >>device-serial
+        swap >>flags
+        swap >>max-component
+        swap >>device-serial
         swap >>device-name
         swap >>mount-point
     calculate-file-system-info ;
@@ -152,36 +144,29 @@ PRIVATE>
 M: winnt file-system-info ( path -- file-system-info )
     normalize-path root-directory (file-system-info) ;
 
-:: volume>paths ( string -- array )
-    16384 :> names-buf-length
-    names-buf-length <ushort-array> :> names
-    0 <uint> :> names-length
+CONSTANT: names-buf-length 16384
 
-    string names names-buf-length names-length GetVolumePathNamesForVolumeName :> ret
-    ret 0 = [
-        ret win32-error-string throw
-    ] [
-        names names-length *uint ushort heap-size * head
-        utf16n alien>string { CHAR: \0 } split
-    ] if ;
+: volume>paths ( string -- array )
+    { { ushort names-buf-length } uint }
+    [ [ names-buf-length ] dip GetVolumePathNamesForVolumeName win32-error=0/f ]
+    [ head utf16n alien>string { CHAR: \0 } split ]
+    with-out-parameters ;
 
 : find-first-volume ( -- string handle )
-    MAX_PATH 1 + [ <ushort-array> ] keep
-    dupd
-    FindFirstVolume dup win32-error=0/f
-    [ utf16n alien>string ] dip ;
+    { { ushort path-length } }
+    [ path-length FindFirstVolume dup win32-error=0/f ]
+    [ utf16n alien>string ]
+    with-out-parameters swap ;
 
-:: find-next-volume ( handle -- string/f )
-    MAX_PATH 1 + :> buf-length
-    buf-length <ushort-array> :> buf
-
-    handle buf buf-length FindNextVolume :> ret
-    ret 0 = [
-        GetLastError ERROR_NO_MORE_FILES =
-        [ f ] [ win32-error-string throw ] if
-    ] [
-        buf utf16n alien>string
-    ] if ;
+: find-next-volume ( handle -- string/f )
+    { { ushort path-length } }
+    [ path-length FindNextVolume ]
+    [
+        swap 0 = [
+            GetLastError ERROR_NO_MORE_FILES =
+            [ drop f ] [ win32-error-string throw ] if
+        ] [ utf16n alien>string ] if
+    ] with-out-parameters ;
 
 : find-volumes ( -- array )
     find-first-volume
@@ -202,11 +187,10 @@ M: winnt file-systems ( -- array )
 : file-times ( path -- timestamp timestamp timestamp )
     [
         normalize-path open-read &dispose handle>>
-        FILETIME <struct>
-        FILETIME <struct>
-        FILETIME <struct>
-        [ GetFileTime win32-error=0/f ] 3keep
-        [ FILETIME>timestamp >local-time ] tri@
+        { FILETIME FILETIME FILETIME }
+        [ GetFileTime win32-error=0/f ]
+        [ [ FILETIME>timestamp >local-time ] tri@ ]
+        with-out-parameters
     ] with-destructors ;
 
 : set-file-times ( path timestamp/f timestamp/f timestamp/f -- )

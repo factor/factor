@@ -59,16 +59,16 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
     drop f ;
 
 : arb-make-pixel-format ( world attributes -- pf )
-    [ handle>> hDC>> ] dip >WGL_ARB-int-array f 1 0 <int> 0 <int>
-    [ wglChoosePixelFormatARB win32-error=0/f ] 2keep drop *int ;
+    [ handle>> hDC>> ] dip >WGL_ARB-int-array f 1 { int int }
+    [ wglChoosePixelFormatARB win32-error=0/f ] [ ] with-out-parameters drop ;
 
 : arb-pixel-format-attribute ( pixel-format attribute -- value )
     >WGL_ARB
     [ drop f ] [
         [ [ world>> handle>> hDC>> ] [ handle>> ] bi 0 1 ] dip
-        first <int> 0 <int>
-        [ wglGetPixelFormatAttribivARB win32-error=0/f ]
-        keep *int
+        first <int> { int }
+        [ wglGetPixelFormatAttribivARB win32-error=0/f ] [ ]
+        with-out-parameters
     ] if-empty ;
 
 CONSTANT: pfd-flag-map H{

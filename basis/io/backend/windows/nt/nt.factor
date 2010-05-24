@@ -1,9 +1,11 @@
-USING: alien alien.c-types arrays assocs combinators continuations
-destructors io io.backend io.ports io.timeouts io.backend.windows
-io.files.windows io.files.windows.nt io.files io.pathnames io.buffers
-io.streams.c io.streams.null libc kernel math namespaces sequences
-threads windows windows.errors windows.kernel32 strings splitting
-ascii system accessors locals classes.struct combinators.short-circuit ;
+USING: alien alien.c-types alien.data alien.syntax arrays assocs
+combinators continuations destructors io io.backend io.ports
+io.timeouts io.backend.windows io.files.windows
+io.files.windows.nt io.files io.pathnames io.buffers
+io.streams.c io.streams.null libc kernel math namespaces
+sequences threads windows windows.errors windows.kernel32
+strings splitting ascii system accessors locals classes.struct
+combinators.short-circuit ;
 IN: io.backend.windows.nt
 
 ! Global variable with assoc mapping overlapped to threads
@@ -51,16 +53,12 @@ M: winnt add-completion ( win32-handle -- )
     ] with-timeout ;
 
 :: wait-for-overlapped ( nanos -- bytes-transferred overlapped error? )
-    master-completion-port get-global
-    0 <int> :> bytes
-    f <void*> :> key
-    f <void*> :> overlapped
     nanos [ 1,000,000 /i ] [ INFINITE ] if* :> timeout
-    bytes key overlapped timeout GetQueuedCompletionStatus zero? :> error?
-
-    bytes *int
-    overlapped *void* dup [ OVERLAPPED memory>struct ] when
-    error? ;
+    master-completion-port get-global
+    { int void* pointer: OVERLAPPED }
+    [ timeout GetQueuedCompletionStatus zero? ] [ ] with-out-parameters
+    :> ( error? bytes key overlapped )
+    bytes overlapped error? ;
 
 : resume-callback ( result overlapped -- )
     >c-ptr pending-overlapped get-global delete-at* drop resume-with ;

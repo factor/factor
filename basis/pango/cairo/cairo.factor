@@ -3,12 +3,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! pangocairo bindings, from pango/pangocairo.h
-USING: arrays sequences alien alien.c-types alien.destructors
-alien.libraries alien.syntax math math.functions math.vectors
-destructors combinators colors fonts accessors assocs namespaces
-kernel pango pango.fonts pango.layouts glib unicode.data images
-cache init system math.rectangles fry memoize io.encodings.utf8
-classes.struct cairo cairo.ffi ;
+USING: arrays sequences alien alien.c-types alien.data
+alien.destructors alien.libraries alien.syntax math
+math.functions math.vectors destructors combinators colors fonts
+accessors assocs namespaces kernel pango pango.fonts
+pango.layouts glib unicode.data images cache init system
+math.rectangles fry memoize io.encodings.utf8 classes.struct
+cairo cairo.ffi ;
 IN: pango.cairo
 
 << {
@@ -136,16 +137,17 @@ SYMBOL: dpi
 : line-offset>x ( layout n -- x )
     #! n is an index into the UTF8 encoding of the text
     [ drop first-line ] [ swap string>> >utf8-index ] 2bi
-    0 0 <int> [ pango_layout_line_index_to_x ] keep
-    *int pango>float ;
+    0 { int } [ pango_layout_line_index_to_x ] [ ] with-out-parameters
+    pango>float ;
 
 : x>line-offset ( layout x -- n )
     #! n is an index into the UTF8 encoding of the text
     [
         [ first-line ] dip
-        float>pango 0 <int> 0 <int>
-        [ pango_layout_line_x_to_index drop ] 2keep
-        [ *int ] bi@ swap
+        float>pango
+        { int int }
+        [ pango_layout_line_x_to_index drop ] [ ] with-out-parameters
+        swap
     ] [ drop string>> ] 2bi utf8-index> + ;
 
 : selection-start/end ( selection -- start end )
