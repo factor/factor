@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.libraries alien.syntax combinators gir
-kernel system vocabs.parser words ;
+USING: accessors alien alien.c-types alien.libraries alien.syntax
+combinators compiler.units gir kernel system vocabs.parser words ;
 
 <<
 "glib" {
@@ -23,7 +23,15 @@ TYPEDEF: long glong
 TYPEDEF: ulong gulong
 TYPEDEF: int gint
 TYPEDEF: uint guint
-TYPEDEF: bool gboolean
+
+SYMBOL: gboolean
+<<
+gint c-type clone
+    [ >c-bool ] >>unboxer-quot
+    [ c-bool> ] >>boxer-quot
+    object >>boxed-class
+gboolean typedef
+>>
 
 TYPEDEF: char gint8
 TYPEDEF: uchar guint8
