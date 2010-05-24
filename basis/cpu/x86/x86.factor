@@ -583,7 +583,7 @@ M:: x86 %store-stack-param ( src n rep -- )
     #! input values to callbacks; the callback has its own
     #! stack frame set up, and we want to read the frame
     #! set up by the caller.
-    frame-reg swap 2 cells + [+] ;
+    [ frame-reg ] dip 2 cells + reserved-stack-space + [+] ;
 
 M:: x86 %load-stack-param ( dst n rep -- )
     dst n next-stack@ rep %copy ;
