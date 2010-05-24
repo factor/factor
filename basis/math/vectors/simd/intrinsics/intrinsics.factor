@@ -59,16 +59,16 @@ SYNTAX: SIMD-INTRINSIC::
 
 : [byte>rep-array] ( rep -- class )
     {
-        { char-16-rep      [ [ char-array-cast      ] ] }
-        { uchar-16-rep     [ [ uchar-array-cast     ] ] }
-        { short-8-rep      [ [ short-array-cast     ] ] }
-        { ushort-8-rep     [ [ ushort-array-cast    ] ] }
-        { int-4-rep        [ [ int-array-cast       ] ] }
-        { uint-4-rep       [ [ uint-array-cast      ] ] }
-        { longlong-2-rep   [ [ longlong-array-cast  ] ] }
-        { ulonglong-2-rep  [ [ ulonglong-array-cast ] ] }
-        { float-4-rep      [ [ float-array-cast     ] ] }
-        { double-2-rep     [ [ double-array-cast    ] ] }
+        { char-16-rep      [ [ 16 <direct-char-array>      ] ] }
+        { uchar-16-rep     [ [ 16 <direct-uchar-array>     ] ] }
+        { short-8-rep      [ [  8 <direct-short-array>     ] ] }
+        { ushort-8-rep     [ [  8 <direct-ushort-array>    ] ] }
+        { int-4-rep        [ [  4 <direct-int-array>       ] ] }
+        { uint-4-rep       [ [  4 <direct-uint-array>      ] ] }
+        { longlong-2-rep   [ [  2 <direct-longlong-array>  ] ] }
+        { ulonglong-2-rep  [ [  2 <direct-ulonglong-array> ] ] }
+        { float-4-rep      [ [  4 <direct-float-array>     ] ] }
+        { double-2-rep     [ [  2 <direct-double-array>    ] ] }
     } case ; foldable
 
 : [>rep-array] ( rep -- class )
