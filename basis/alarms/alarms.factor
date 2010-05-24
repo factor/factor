@@ -9,9 +9,10 @@ TUPLE: alarm
     { quot callable initial: [ ] }
     start-nanos 
     delay-nanos
-    interval-nanos integer
-    { next-iteration-nanos integer }
-    { stop? boolean } ;
+    interval-nanos
+    iteration-start-nanos
+    quotation-running?
+    thread ;
 
 <PRIVATE
 
@@ -21,38 +22,43 @@ M: real >nanoseconds >integer ;
 M: duration >nanoseconds duration>nanoseconds >integer ;
 
 : set-next-alarm-time ( alarm -- alarm )
-    ! start + delay + ceiling((now - start) / interval) * interval
+    ! start + delay + ceiling((now - (start + delay)) / interval) * interval
     nano-count 
     over start-nanos>> -
-    over delay-nanos>> [ + ] when*
+    over delay-nanos>> [ - ] when*
     over interval-nanos>> / ceiling
     over interval-nanos>> *
-    over start-nanos>> + >>next-iteration-nanos ; inline
+    over start-nanos>> +
+    over delay-nanos>> [ + ] when*
+    >>iteration-start-nanos ;
+
+: stop-alarm? ( alarm -- ? )
+    thread>> self eq? not ;
 
 DEFER: call-alarm-loop
 
 : loop-alarm ( alarm -- )
     nano-count over
-    [ next-iteration-nanos>> - ] [ interval-nanos>> ] bi <
+    [ iteration-start-nanos>> - ] [ interval-nanos>> ] bi <
     [ set-next-alarm-time ] dip
-    [ dup next-iteration-nanos>> ] [ 0 ] if
-    sleep-until call-alarm-loop ;
+    [ dup iteration-start-nanos>> ] [ 0 ] if
+    0 or sleep-until call-alarm-loop ;
 
 : maybe-loop-alarm ( alarm -- )
-    dup { [ stop?>> ] [ interval-nanos>> not ] } 1||
+    dup { [ stop-alarm? ] [ interval-nanos>> not ] } 1||
     [ drop ] [ loop-alarm ] if ;
 
 : call-alarm-loop ( alarm -- )
-    dup stop?>> [
+    dup stop-alarm? [
         drop
     ] [
-        [ quot>> call( -- ) ] keep
+        [
+            [ t >>quotation-running? drop ]
+            [ quot>> call( -- ) ]
+            [ f >>quotation-running? drop ] tri
+        ] keep
         maybe-loop-alarm
     ] if ;
-
-: call-alarm ( alarm -- )
-    [ delay-nanos>> ] [ ] bi
-    '[ _ [ sleep ] when* _ call-alarm-loop ] "Alarm execution" spawn drop ;
 
 PRIVATE>
 
@@ -63,14 +69,20 @@ PRIVATE>
         swap >>quot ; inline
 
 : start-alarm ( alarm -- )
-    f >>stop?
-    nano-count >>start-nanos
-    call-alarm ;
+    [
+        '[
+            _ nano-count >>start-nanos
+            [ delay-nanos>> [ sleep ] when* ]
+            [ nano-count >>iteration-start-nanos call-alarm-loop ] bi
+        ] "Alarm execution" spawn
+    ] keep thread<< ;
 
 : stop-alarm ( alarm -- )
-    t >>stop?
-    f >>start-nanos
-    drop ;
+    dup quotation-running?>> [
+        f >>thread drop
+    ] [
+        [ [ interrupt ] when* f ] change-thread drop
+    ] if ;
 
 <PRIVATE
 
