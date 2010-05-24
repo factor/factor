@@ -11,7 +11,7 @@ TUPLE: alarm
     delay-nanos
     interval-nanos
     iteration-start-nanos
-    { stop? boolean }
+    quotation-running?
     thread ;
 
 <PRIVATE
@@ -30,7 +30,10 @@ M: duration >nanoseconds duration>nanoseconds >integer ;
     over interval-nanos>> *
     over start-nanos>> +
     over delay-nanos>> [ + ] when*
-    >>iteration-start-nanos ; inline
+    >>iteration-start-nanos ;
+
+: stop-alarm? ( alarm -- ? )
+    thread>> self eq? not ;
 
 DEFER: call-alarm-loop
 
@@ -39,26 +42,23 @@ DEFER: call-alarm-loop
     [ iteration-start-nanos>> - ] [ interval-nanos>> ] bi <
     [ set-next-alarm-time ] dip
     [ dup iteration-start-nanos>> ] [ 0 ] if
-    sleep-until call-alarm-loop ;
+    0 or sleep-until call-alarm-loop ;
 
 : maybe-loop-alarm ( alarm -- )
-    dup { [ stop?>> ] [ interval-nanos>> not ] } 1||
+    dup { [ stop-alarm? ] [ interval-nanos>> not ] } 1||
     [ drop ] [ loop-alarm ] if ;
 
 : call-alarm-loop ( alarm -- )
-    dup stop?>> [
+    dup stop-alarm? [
         drop
     ] [
-        [ quot>> call( -- ) ] keep
+        [
+            [ t >>quotation-running? drop ]
+            [ quot>> call( -- ) ]
+            [ f >>quotation-running? drop ] tri
+        ] keep
         maybe-loop-alarm
     ] if ;
-
-: call-alarm ( alarm -- )
-    '[
-        _ self >>thread
-        [ delay-nanos>> [ sleep ] when* ]
-        [ nano-count >>iteration-start-nanos call-alarm-loop ] bi
-    ] "Alarm execution" spawn drop ;
 
 PRIVATE>
 
@@ -69,14 +69,20 @@ PRIVATE>
         swap >>quot ; inline
 
 : start-alarm ( alarm -- )
-    f >>stop?
-    nano-count >>start-nanos
-    call-alarm ;
+    [
+        '[
+            _ nano-count >>start-nanos
+            [ delay-nanos>> [ sleep ] when* ]
+            [ nano-count >>iteration-start-nanos call-alarm-loop ] bi
+        ] "Alarm execution" spawn
+    ] keep thread<< ;
 
 : stop-alarm ( alarm -- )
-    t >>stop?
-    f >>start-nanos
-    drop ;
+    dup quotation-running?>> [
+        f >>thread drop
+    ] [
+        [ [ interrupt ] when* f ] change-thread drop
+    ] if ;
 
 <PRIVATE
 
