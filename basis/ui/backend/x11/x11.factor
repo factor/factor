@@ -1,14 +1,15 @@
 ! Copyright (C) 2005, 2010 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types ascii assocs classes.struct combinators
-combinators.short-circuit command-line environment io.encodings.ascii
-io.encodings.string io.encodings.utf8 kernel literals locals math
-namespaces sequences specialized-arrays.instances.alien.c-types.uchar
+USING: accessors alien.c-types alien.data ascii assocs classes.struct
+combinators combinators.short-circuit command-line environment
+io.encodings.ascii io.encodings.string io.encodings.utf8 kernel
+literals locals math namespaces sequences specialized-arrays
 strings ui ui.backend ui.clipboards ui.event-loop ui.gadgets
 ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
 ui.pixel-formats.private ui.private x11 x11.clipboard x11.constants
 x11.events x11.glx x11.io x11.windows x11.xim x11.xlib ;
 FROM: unix.ffi => system ;
+SPECIALIZED-ARRAY: uchar
 IN: ui.backend.x11
 
 SINGLETON: x11-ui-backend
@@ -60,7 +61,7 @@ M: x11-ui-backend (pixel-format-attribute)
     [ handle>> ] [ >glx-visual ] bi*
     [ 2drop f ] [
         first
-        { int } [ glXGetConfig drop ] with-out-parameters
+        { int } [ glXGetConfig drop ] [ ] with-out-parameters
     ] if-empty ;
 
 CONSTANT: modifiers
