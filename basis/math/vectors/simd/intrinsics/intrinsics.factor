@@ -3,13 +3,27 @@ USING: accessors alien alien.c-types alien.data combinators
 sequences.cords cpu.architecture fry generalizations grouping
 kernel libc locals math math.libm math.order math.ranges
 math.vectors sequences sequences.generalizations
-sequences.private specialized-arrays vocabs.loader ;
+sequences.private sequences.unrolled specialized-arrays
+vocabs.loader words effects.parser locals.parser ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAYS:
     c:char c:short c:int c:longlong
     c:uchar c:ushort c:uint c:ulonglong
     c:float c:double ;
 IN: math.vectors.simd.intrinsics
+
+<<
+: simd-intrinsic-body ( def effect -- def' )
+    '[ _ _ call-effect ] ;
+
+: define-simd-intrinsic ( word def effect -- )
+    [ simd-intrinsic-body ] keep define-declared ;
+
+SYNTAX: SIMD-INTRINSIC:
+    (:) define-simd-intrinsic ;
+SYNTAX: SIMD-INTRINSIC::
+    (::) define-simd-intrinsic ;
+>>
 
 : assert-positive ( x -- y ) ;
 
@@ -133,10 +147,10 @@ IN: math.vectors.simd.intrinsics
 
 PRIVATE>
 
-: (simd-v+)                ( a b rep -- c ) [ + ] components-2map ;
-: (simd-v-)                ( a b rep -- c ) [ - ] components-2map ;
-: (simd-vneg)              ( a   rep -- c ) [ neg ] components-map ;
-:: (simd-v+-)              ( a b rep -- c ) 
+SIMD-INTRINSIC: (simd-v+)                ( a b rep -- c ) [ + ] components-2map ;
+SIMD-INTRINSIC: (simd-v-)                ( a b rep -- c ) [ - ] components-2map ;
+SIMD-INTRINSIC: (simd-vneg)              ( a   rep -- c ) [ neg ] components-map ;
+SIMD-INTRINSIC:: (simd-v+-)              ( a b rep -- c ) 
     a b rep 2>rep-array :> ( a' b' )
     rep <rep-array> :> c'
     0  rep rep-length 1 -  2 <range> [| n |
@@ -147,16 +161,16 @@ PRIVATE>
         n 1 + c' set-nth-unsafe
     ] each
     c' underlying>> ;
-: (simd-vs+)               ( a b rep -- c )
+SIMD-INTRINSIC: (simd-vs+)               ( a b rep -- c )
     dup rep-component-type '[ + _ c-type-clamp ] components-2map ;
-: (simd-vs-)               ( a b rep -- c )
+SIMD-INTRINSIC: (simd-vs-)               ( a b rep -- c )
     dup rep-component-type '[ - _ c-type-clamp ] components-2map ;
-: (simd-vs*)               ( a b rep -- c )
+SIMD-INTRINSIC: (simd-vs*)               ( a b rep -- c )
     dup rep-component-type '[ * _ c-type-clamp ] components-2map ;
-: (simd-v*)                ( a b rep -- c ) [ * ] components-2map ;
-: (simd-v*high)            ( a b rep -- c )
+SIMD-INTRINSIC: (simd-v*)                ( a b rep -- c ) [ * ] components-2map ;
+SIMD-INTRINSIC: (simd-v*high)            ( a b rep -- c )
     dup rep-component-type heap-size -8 * '[ * _ shift ] components-2map ;
-:: (simd-v*hs+)            ( a b rep -- c )
+SIMD-INTRINSIC:: (simd-v*hs+)            ( a b rep -- c )
     rep { char-16-rep uchar-16-rep } member-eq?
     [ uchar-16-rep char-16-rep ]
     [ rep rep ] if :> ( a-rep b-rep )
@@ -169,38 +183,38 @@ PRIVATE>
         [ [ second ] bi@ * ] 2bi +
         wide-type c-type-clamp
     ] wide-rep <rep-array> 2map-as underlying>> ;
-: (simd-v/)                ( a b rep -- c ) [ / ] components-2map ;
-: (simd-vavg)              ( a b rep -- c )
+SIMD-INTRINSIC: (simd-v/)                ( a b rep -- c ) [ / ] components-2map ;
+SIMD-INTRINSIC: (simd-vavg)              ( a b rep -- c )
     [ + dup integer? [ 1 + -1 shift ] [ 0.5 * ] if ] components-2map ;
-: (simd-vmin)              ( a b rep -- c ) [ min ] components-2map ;
-: (simd-vmax)              ( a b rep -- c ) [ max ] components-2map ;
-: (simd-v.)                ( a b rep -- n )
+SIMD-INTRINSIC: (simd-vmin)              ( a b rep -- c ) [ min ] components-2map ;
+SIMD-INTRINSIC: (simd-vmax)              ( a b rep -- c ) [ max ] components-2map ;
+SIMD-INTRINSIC: (simd-v.)                ( a b rep -- n )
     [ 2>rep-array [ [ first ] bi@ * ] 2keep ] keep
     1 swap rep-length [a,b) [ '[ _ swap nth-unsafe ] bi@ * + ] with with each ;
-: (simd-vsqrt)             ( a   rep -- c ) [ fsqrt ] components-map ;
-: (simd-vsad)              ( a b rep -- c ) 2>rep-array [ - abs ] [ + ] 2map-reduce ;
-: (simd-sum)               ( a   rep -- n ) [ + ] components-reduce ;
-: (simd-vabs)              ( a   rep -- c ) [ abs ] components-map ;
-: (simd-vbitand)           ( a b rep -- c ) [ bitand ] bitwise-components-2map ;
-: (simd-vbitandn)          ( a b rep -- c ) [ [ bitnot ] dip bitand ] bitwise-components-2map ;
-: (simd-vbitor)            ( a b rep -- c ) [ bitor ] bitwise-components-2map ;
-: (simd-vbitxor)           ( a b rep -- c ) [ bitxor ] bitwise-components-2map ;
-: (simd-vbitnot)           ( a   rep -- c ) [ bitnot ] bitwise-components-map ;
-: (simd-vand)              ( a b rep -- c ) [ bitand ] bitwise-components-2map ;
-: (simd-vandn)             ( a b rep -- c ) [ [ bitnot ] dip bitand ] bitwise-components-2map ;
-: (simd-vor)               ( a b rep -- c ) [ bitor ] bitwise-components-2map ;
-: (simd-vxor)              ( a b rep -- c ) [ bitxor ] bitwise-components-2map ;
-: (simd-vnot)              ( a   rep -- c ) [ bitnot ] bitwise-components-map ;
-: (simd-vlshift)           ( a n rep -- c ) swap '[ _ shift ] bitwise-components-map ;
-: (simd-vrshift)           ( a n rep -- c ) swap '[ _ neg shift ] bitwise-components-map ;
-: (simd-hlshift)           ( a n rep -- c )
+SIMD-INTRINSIC: (simd-vsqrt)             ( a   rep -- c ) [ fsqrt ] components-map ;
+SIMD-INTRINSIC: (simd-vsad)              ( a b rep -- c ) 2>rep-array [ - abs ] [ + ] 2map-reduce ;
+SIMD-INTRINSIC: (simd-sum)               ( a   rep -- n ) [ + ] components-reduce ;
+SIMD-INTRINSIC: (simd-vabs)              ( a   rep -- c ) [ abs ] components-map ;
+SIMD-INTRINSIC: (simd-vbitand)           ( a b rep -- c ) [ bitand ] bitwise-components-2map ;
+SIMD-INTRINSIC: (simd-vbitandn)          ( a b rep -- c ) [ [ bitnot ] dip bitand ] bitwise-components-2map ;
+SIMD-INTRINSIC: (simd-vbitor)            ( a b rep -- c ) [ bitor ] bitwise-components-2map ;
+SIMD-INTRINSIC: (simd-vbitxor)           ( a b rep -- c ) [ bitxor ] bitwise-components-2map ;
+SIMD-INTRINSIC: (simd-vbitnot)           ( a   rep -- c ) [ bitnot ] bitwise-components-map ;
+SIMD-INTRINSIC: (simd-vand)              ( a b rep -- c ) [ bitand ] bitwise-components-2map ;
+SIMD-INTRINSIC: (simd-vandn)             ( a b rep -- c ) [ [ bitnot ] dip bitand ] bitwise-components-2map ;
+SIMD-INTRINSIC: (simd-vor)               ( a b rep -- c ) [ bitor ] bitwise-components-2map ;
+SIMD-INTRINSIC: (simd-vxor)              ( a b rep -- c ) [ bitxor ] bitwise-components-2map ;
+SIMD-INTRINSIC: (simd-vnot)              ( a   rep -- c ) [ bitnot ] bitwise-components-map ;
+SIMD-INTRINSIC: (simd-vlshift)           ( a n rep -- c ) swap '[ _ shift ] bitwise-components-map ;
+SIMD-INTRINSIC: (simd-vrshift)           ( a n rep -- c ) swap '[ _ neg shift ] bitwise-components-map ;
+SIMD-INTRINSIC: (simd-hlshift)           ( a n rep -- c )
     drop head-slice* 16 0 pad-head ;
-: (simd-hrshift)           ( a n rep -- c )
+SIMD-INTRINSIC: (simd-hrshift)           ( a n rep -- c )
     drop tail-slice 16 0 pad-tail ;
-: (simd-vshuffle-elements) ( a n rep -- c ) [ rep-length 0 pad-tail ] keep (vshuffle) ;
-: (simd-vshuffle2-elements) ( a b n rep -- c ) [ rep-length 0 pad-tail ] keep (vshuffle2) ;
-: (simd-vshuffle-bytes)    ( a b rep -- c ) drop uchar-16-rep (vshuffle) ;
-:: (simd-vmerge-head)      ( a b rep -- c )
+SIMD-INTRINSIC: (simd-vshuffle-elements) ( a n rep -- c ) [ rep-length 0 pad-tail ] keep (vshuffle) ;
+SIMD-INTRINSIC: (simd-vshuffle2-elements) ( a b n rep -- c ) [ rep-length 0 pad-tail ] keep (vshuffle2) ;
+SIMD-INTRINSIC: (simd-vshuffle-bytes)    ( a b rep -- c ) drop uchar-16-rep (vshuffle) ;
+SIMD-INTRINSIC:: (simd-vmerge-head)      ( a b rep -- c )
     a b rep 2>rep-array :> ( a' b' )
     rep <rep-array> :> c'
     rep rep-length 2 /i iota [| n |
@@ -208,7 +222,7 @@ PRIVATE>
         n b' nth-unsafe n 2 * 1 + c' set-nth-unsafe
     ] each
     c' underlying>> ;
-:: (simd-vmerge-tail)      ( a b rep -- c )
+SIMD-INTRINSIC:: (simd-vmerge-tail)      ( a b rep -- c )
     a b rep 2>rep-array :> ( a' b' )
     rep <rep-array> :> c'
     rep rep-length 2 /i :> len
@@ -217,49 +231,49 @@ PRIVATE>
         n len + b' nth-unsafe n 2 * 1 + c' set-nth-unsafe
     ] each
     c' underlying>> ;
-: (simd-v<=)               ( a b rep -- c )
+SIMD-INTRINSIC: (simd-v<=)               ( a b rep -- c )
     dup rep-tf-values '[ <= _ _ ? ] components-2map ; 
-: (simd-v<)                ( a b rep -- c )
+SIMD-INTRINSIC: (simd-v<)                ( a b rep -- c )
     dup rep-tf-values '[ <  _ _ ? ] components-2map ;
-: (simd-v=)                ( a b rep -- c )
+SIMD-INTRINSIC: (simd-v=)                ( a b rep -- c )
     dup rep-tf-values '[ =  _ _ ? ] components-2map ;
-: (simd-v>)                ( a b rep -- c )
+SIMD-INTRINSIC: (simd-v>)                ( a b rep -- c )
     dup rep-tf-values '[ >  _ _ ? ] components-2map ;
-: (simd-v>=)               ( a b rep -- c )
+SIMD-INTRINSIC: (simd-v>=)               ( a b rep -- c )
     dup rep-tf-values '[ >= _ _ ? ] components-2map ;
-: (simd-vunordered?)       ( a b rep -- c )
+SIMD-INTRINSIC: (simd-vunordered?)       ( a b rep -- c )
     dup rep-tf-values '[ unordered? _ _ ? ] components-2map ;
-: (simd-vany?)             ( a   rep -- ? ) [ bitor  ] bitwise-components-reduce zero? not ;
-: (simd-vall?)             ( a   rep -- ? ) [ bitand ] bitwise-components-reduce zero? not ;
-: (simd-vnone?)            ( a   rep -- ? ) [ bitor  ] bitwise-components-reduce zero?     ;
-: (simd-v>float)           ( a   rep -- c )
+SIMD-INTRINSIC: (simd-vany?)             ( a   rep -- ? ) [ bitor  ] bitwise-components-reduce zero? not ;
+SIMD-INTRINSIC: (simd-vall?)             ( a   rep -- ? ) [ bitand ] bitwise-components-reduce zero? not ;
+SIMD-INTRINSIC: (simd-vnone?)            ( a   rep -- ? ) [ bitor  ] bitwise-components-reduce zero?     ;
+SIMD-INTRINSIC: (simd-v>float)           ( a   rep -- c )
     [ >rep-array [ >float ] ] [ >float-vector-rep <rep-array> ] bi map-as underlying>> ;
-: (simd-v>integer)         ( a   rep -- c )
+SIMD-INTRINSIC: (simd-v>integer)         ( a   rep -- c )
     [ >rep-array [ >integer ] ] [ >int-vector-rep <rep-array> ] bi map-as underlying>> ;
-: (simd-vpack-signed)      ( a b rep -- c )
+SIMD-INTRINSIC: (simd-vpack-signed)      ( a b rep -- c )
     [ 2>rep-array cord-append ]
     [ narrow-vector-rep [ <rep-array> ] [ rep-component-type ] bi ] bi
     '[ _ c-type-clamp ] swap map-as underlying>> ;
-: (simd-vpack-unsigned)    ( a b rep -- c )
+SIMD-INTRINSIC: (simd-vpack-unsigned)    ( a b rep -- c )
     [ 2>rep-array cord-append ]
     [ narrow-vector-rep >uint-vector-rep [ <rep-array> ] [ rep-component-type ] bi ] bi
     '[ _ c-type-clamp ] swap map-as underlying>> ;
-: (simd-vunpack-head)      ( a   rep -- c ) 
+SIMD-INTRINSIC: (simd-vunpack-head)      ( a   rep -- c ) 
     [ >rep-array ] [ widen-vector-rep [ rep-length ] [ [>rep-array] ] bi ] bi
     [ head-slice ] dip call( a' -- c' ) underlying>> ;
-: (simd-vunpack-tail)      ( a   rep -- c )
+SIMD-INTRINSIC: (simd-vunpack-tail)      ( a   rep -- c )
     [ >rep-array ] [ widen-vector-rep [ rep-length ] [ [>rep-array] ] bi ] bi
     [ tail-slice ] dip call( a' -- c' ) underlying>> ;
-: (simd-with)              (   n rep -- v )
+SIMD-INTRINSIC: (simd-with)              (   n rep -- v )
     [ rep-length swap '[ _ ] ] [ <rep-array> ] bi replicate-as 
     underlying>> ;
-: (simd-gather-2)          ( m n rep -- v ) <rep-array> [ 2 set-firstn ] keep underlying>> ;
-: (simd-gather-4)          ( m n o p rep -- v ) <rep-array> [ 4 set-firstn ] keep underlying>> ;
-: (simd-select)            ( a n rep -- x ) [ swap ] dip >rep-array nth-unsafe ;
+SIMD-INTRINSIC: (simd-gather-2)          ( m n rep -- v ) <rep-array> [ 2 set-firstn ] keep underlying>> ;
+SIMD-INTRINSIC: (simd-gather-4)          ( m n o p rep -- v ) <rep-array> [ 4 set-firstn ] keep underlying>> ;
+SIMD-INTRINSIC: (simd-select)            ( a n rep -- x ) [ swap ] dip >rep-array nth-unsafe ;
 
-: alien-vector     (       c-ptr n rep -- value )
+SIMD-INTRINSIC: alien-vector     (       c-ptr n rep -- value )
     [ swap <displaced-alien> ] dip rep-size memory>byte-array ;
-: set-alien-vector ( value c-ptr n rep --       )
+SIMD-INTRINSIC: set-alien-vector ( value c-ptr n rep --       )
     [ swap <displaced-alien> swap ] dip rep-size memcpy ;
 
 "compiler.cfg.intrinsics.simd" require
