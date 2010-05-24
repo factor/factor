@@ -1,8 +1,8 @@
 ! (c)2009 Slava Pestov, Joe Groff bsd license
 USING: accessors alien alien.c-types alien.data combinators
 sequences.cords cpu.architecture fry generalizations grouping
-kernel libc locals math math.libm math.order math.ranges
-math.vectors sequences sequences.generalizations
+kernel libc locals macros math math.libm math.order
+math.ranges math.vectors sequences sequences.generalizations
 sequences.private sequences.unrolled specialized-arrays
 vocabs.loader words effects.parser locals.parser ;
 QUALIFIED-WITH: alien.c-types c
@@ -20,9 +20,10 @@ IN: math.vectors.simd.intrinsics
     [ simd-intrinsic-body ] keep define-declared ;
 
 SYNTAX: SIMD-INTRINSIC:
-    (:) define-simd-intrinsic ;
+    (:) define-declared ;
 SYNTAX: SIMD-INTRINSIC::
-    (::) define-simd-intrinsic ;
+    (::) define-declared ;
+
 >>
 
 : assert-positive ( x -- y ) ;
