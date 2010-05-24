@@ -65,7 +65,7 @@ SYMBOL: blink-interval
 : start-blinking ( editor -- )
     [ stop-blinking ] [
         t >>blink
-        dup '[ _ blink-caret ] blink-interval get every
+        dup '[ _ blink-caret ] blink-interval get delayed-every
         >>blink-alarm drop
     ] bi ;
 
