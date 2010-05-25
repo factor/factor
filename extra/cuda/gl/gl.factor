@@ -50,3 +50,6 @@ TUPLE: cuda-buffer
 M: cuda-buffer dispose
     [ [ free-resource ] when* f ] change-resource
     buffer>> dispose ; inline
+
+: with-mapped-cuda-buffer ( ..a cuda-buffer quot: ( ..a device-ptr size -- ..b ) -- ..b )
+    [ resource>> ] dip with-mapped-resource ; inline
