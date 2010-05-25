@@ -30,7 +30,7 @@ M: world configure-event
     ! In case dimensions didn't change
     relayout-1 ;
 
-PIXEL-FORMAT-ATTRIBUTE-TABLE: glx-visual { $ GLX_USE_GL $ GLX_RGBA } H{
+PIXEL-FORMAT-ATTRIBUTE-TABLE: glx-visual { $ GLX_RGBA } H{
     { double-buffered { $ GLX_DOUBLEBUFFER } }
     { stereo { $ GLX_STEREO } }
     { color-bits { $ GLX_BUFFER_SIZE } }
