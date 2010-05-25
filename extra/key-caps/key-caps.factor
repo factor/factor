@@ -1,7 +1,7 @@
 USING: game.input game.input.scancodes
 kernel ui.gadgets ui.gadgets.buttons sequences accessors
 words arrays assocs math calendar fry alarms ui
-ui.gadgets.borders ui.gestures ;
+ui.gadgets.borders ui.gestures literals ;
 IN: key-caps
 
 CONSTANT: key-locations H{
@@ -132,7 +132,7 @@ CONSTANT: key-locations H{
 }
 
 CONSTANT: KEYBOARD-SIZE { 230 65 }
-: FREQUENCY ( -- f ) 30 recip seconds ;
+CONSTANT: FREQUENCY $[ 1/30 seconds ]
 
 TUPLE: key-caps-gadget < gadget keys alarm ;
 
