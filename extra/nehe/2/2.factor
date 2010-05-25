@@ -39,5 +39,14 @@ M: nehe2-gadget draw-gadget* ( gadget -- )
     -1.0 -1.0 0.0 glVertex3f
   ] do-state ;
 
-MAIN-WINDOW: run2 { { title "NeHe Tutorial 2" } { pref-dim { $ width $ height } } }
+MAIN-WINDOW: run2
+    {
+        { title "NeHe Tutorial 2" }
+        { pref-dim { $ width $ height } }
+        { pixel-format-attributes {
+            windowed
+            double-buffered
+            T{ depth-bits { value 16 } }
+        } }
+    }
   <nehe2-gadget> >>gadgets ;
