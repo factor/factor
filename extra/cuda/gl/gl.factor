@@ -1,5 +1,5 @@
 ! (c)2010 Joe Groff bsd license
-USING: accessors alien.c-types alien.data alien.destructors
+USING: accessors alien alien.c-types alien.data alien.destructors
 alien.enums continuations cuda cuda.contexts cuda.ffi
 cuda.gl.ffi destructors fry gpu.buffers kernel ;
 IN: cuda.gl
@@ -39,3 +39,14 @@ DESTRUCTOR: free-resource
 
 : with-mapped-resource ( ..a resource quot: ( ..a device-ptr size -- ..b ) -- ..b )
     over [ map-resource ] 2dip '[ _ unmap-resource ] [ ] cleanup ; inline
+
+TUPLE: cuda-buffer
+    { buffer buffer }
+    { resource pinned-c-ptr } ;
+
+: <cuda-buffer> ( upload usage kind size initial-data flags -- buffer )
+    [ <buffer> dup ] dip buffer>resource cuda-buffer boa ; inline
+
+M: cuda-buffer dispose
+    [ [ free-resource ] when* f ] change-resource
+    buffer>> dispose ; inline
