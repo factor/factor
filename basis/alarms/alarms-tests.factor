@@ -44,3 +44,24 @@ IN: alarms.tests
     2 seconds sleep stop-alarm
     1/2 seconds sleep
 ] unit-test
+
+[ { 0 } ] [
+    { 0 }
+    dup '[ 1 _ set-first ] 300 milliseconds later
+    150 milliseconds sleep
+    [ restart-alarm ] [ 200 milliseconds sleep stop-alarm ] bi
+] unit-test
+
+[ { 1 } ] [
+    { 0 }
+    dup '[ 0 _ [ 1 + ] change-nth ] 200 milliseconds later
+    100 milliseconds sleep restart-alarm 300 milliseconds sleep
+] unit-test
+
+[ { 4 } ] [
+    { 0 }
+    dup '[ 0 _ [ 1 + ] change-nth ] 300 milliseconds 300 milliseconds
+    <alarm> dup start-alarm
+    700 milliseconds sleep dup restart-alarm
+    700 milliseconds sleep stop-alarm 500 milliseconds sleep
+] unit-test
