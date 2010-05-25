@@ -62,8 +62,12 @@ DEFER: call-alarm-loop
     ] if ;
 
 : sleep-delay ( alarm -- )
-    nano-count >>start-nanos
-    delay-nanos>> [ sleep ] when* ;
+    dup stop-alarm? [
+        drop
+    ] [
+        nano-count >>start-nanos
+        delay-nanos>> [ sleep ] when*
+    ] if ;
 
 : alarm-loop ( alarm -- )
     [ sleep-delay ]
@@ -91,7 +95,12 @@ PRIVATE>
     ] if ;
 
 : restart-alarm ( alarm -- )
-    t >>restart? [ stop-alarm ] [ start-alarm ] bi ;
+    t >>restart?
+    dup quotation-running?>> [
+        drop
+    ] [
+        dup thread>> [ nip interrupt ] [ start-alarm ] if*
+    ] if ;
 
 <PRIVATE
 
