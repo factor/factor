@@ -65,6 +65,12 @@ ERROR: unrolled-2bounds-error
 : unrolled-2map-as-unsafe ( xseq yseq len quot: ( x y -- newx ) exemplar -- newseq )
     [ (unrolled-2each) ] dip unrolled-map-integers ; inline
 
+: unrolled-map-unsafe ( seq len quot: ( x -- newx ) -- newseq )
+    pick unrolled-map-as-unsafe ; inline
+
+: unrolled-2map-unsafe ( xseq yseq len quot: ( x y -- newx ) -- newseq )
+    4 npick unrolled-2map-as-unsafe ; inline
+
 PRIVATE>
 
 : unrolled-each ( seq len quot: ( x -- ) -- )
