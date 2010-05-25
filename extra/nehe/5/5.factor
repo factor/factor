@@ -120,5 +120,14 @@ M: nehe5-gadget graft* ( gadget -- )
 M: nehe5-gadget ungraft* ( gadget -- )
   t >>quit? drop ;
 
-MAIN-WINDOW: run5 { { title "NeHe Tutorial 5" } { pref-dim { $ width $ height } } }
-  <nehe5-gadget> >>gadgets ;
+MAIN-WINDOW: run4
+    {
+        { title "NeHe Tutorial 5" }
+        { pref-dim { $ width $ height } }
+        { pixel-format-attributes {
+            windowed
+            double-buffered
+            T{ depth-bits { value 16 } }
+        } }
+    }
+    <nehe5-gadget> >>gadgets ;
