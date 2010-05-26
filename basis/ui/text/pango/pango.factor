@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.strings arrays assocs cache cairo
 cairo.ffi classes.struct combinators destructors fonts fry
 init io.encodings.utf8 kernel math math.rectangles math.vectors
 memoize namespaces sequences ui.text ui.text.private
-gobject gobject.ffi pango pango.ffi pango.cairo pango.cairo.ffi ;
+gobject.ffi pango.ffi pango.cairo.ffi ;
 IN: ui.text.pango
 
 : pango>float ( n -- x ) PANGO_SCALE /f ; inline

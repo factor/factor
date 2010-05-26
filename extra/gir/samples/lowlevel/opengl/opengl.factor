@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.enums alien.strings gtk gobject.ffi gtk.ffi gdk.gl gtk.gl gdk.gl.ffi
+USING: alien.enums alien.strings gobject.ffi gtk.ffi gdk.gl.ffi
 gtk.gl.ffi io.encodings.utf8 kernel locals math opengl.gl prettyprint ;
 IN: gir.samples.lowlevel.opengl
 
