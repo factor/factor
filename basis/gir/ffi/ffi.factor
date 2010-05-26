@@ -16,7 +16,7 @@ IN: gir.ffi
 : ffi-invoker ( func -- quot )
     {
         [ return>> c-type>> string>c-type ]
-        [ drop current-lib get ]
+        [ drop current-lib get-global ]
         [ identifier>> ]
         [ parameters>> [ c-type>> string>c-type ] map ]
         [ varargs?>> [ void* suffix ] when ]
@@ -61,7 +61,7 @@ IN: gir.ffi
         [ void* swap typedef ] keep dup
     ] keep
     [ signal-ffi-effect "callback-effect" set-word-prop ]
-    [ drop current-lib get "callback-library" set-word-prop ] 
+    [ drop current-lib get-global "callback-library" set-word-prop ] 
     [ signal-ffi-invoker (( quot -- alien )) define-inline ] 2tri ;
 
 : define-ffi-signals ( signals class -- )
@@ -161,7 +161,7 @@ IN: gir.ffi
     [ define-ffi-interface-content ] each ;
 
 : get-type-invoker ( name -- quot )
-    [ "GType" current-lib get ] dip
+    [ "GType" current-lib get-global ] dip
     { } \ alien-invoke 5 narray >quotation ;
     
 : define-ffi-class ( class -- word )
@@ -211,11 +211,6 @@ IN: gir.ffi
 : define-ffi-aliases ( aliases -- )
     [ define-ffi-alias ] each ;
 
-: prepare-vocab ( repository -- )
-    includes>> lib-aliases get '[ _ at ] map sift
-    [ ffi-vocab "." glue ] map
-    [ dup using-vocab? [ drop ] [ use-vocab ] if ] each ;
-
 : define-ffi-namespace ( namespace -- )
     {
         [ aliases>> define-ffi-aliases ]
@@ -238,6 +233,5 @@ IN: gir.ffi
     } cleave ;
 
 : define-ffi-repository ( repository -- )
-    [ prepare-vocab ]    
-    [ namespace>> define-ffi-namespace ] bi ;
+    namespace>> define-ffi-namespace ;
      

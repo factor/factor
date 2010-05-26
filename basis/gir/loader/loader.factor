@@ -32,7 +32,7 @@ SYMBOL: namespace-PREFIX
 : full-type-name>type ( name -- type )
     [ type new ] dip
     camel>factor "." split1 dup [ swap ] unless
-    [ get-lib-alias >>namespace ] [ >>name ] bi* absolute-type ;
+    [ >>namespace ] [ >>name ] bi* absolute-type ;
 
 : node>type ( xml -- type )
     "name" attr full-type-name>type ;
@@ -254,7 +254,7 @@ SYMBOL: namespace-PREFIX
 
 : xml>namespace ( xml -- namespace )
     [ namespace new ] dip {
-        [ "name" attr camel>factor dup current-lib set >>name ]
+        [ "name" attr camel>factor >>name ]
         [ "prefix" attr [ set-prefix ] keep >>prefix ]
         [ "alias" tags-named [ xml>alias ] map >>aliases ]
         [ "record" tags-named [ xml>record ] map >>records ]
@@ -265,8 +265,7 @@ SYMBOL: namespace-PREFIX
         [ "constant" tags-named [ xml>const ] map >>consts ]
         [ "enumeration" tags-named [ xml>enum ] map >>enums ]
         [ "bitfield" tags-named [ xml>enum ] map >>bitfields ]
-        [ "function" load-functions >>functions
-        ]
+        [ "function" load-functions >>functions ]
     } cleave ;
 
 : xml>repository ( xml -- repository )
