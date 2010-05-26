@@ -7,9 +7,6 @@ CONSTANT: ffi-vocab "ffi"
 
 SYMBOL: current-lib
 
-SYMBOL: lib-aliases
-lib-aliases [ H{ } ] initialize
-
 SYMBOL: type-infos
 type-infos [ H{ } ] initialize
 
@@ -17,7 +14,4 @@ SYMBOL: aliases
 aliases [ H{ } ] initialize
 
 SYMBOL: implement-structs
-
-: get-lib-alias ( lib -- alias )
-    lib-aliases get-global at ;
 

@@ -132,5 +132,5 @@ PREDICATE: interface-type < type get-type-info interface-info? ;
     dup {
         [ namespace>> ] [ simple-type? ]
         [ utf8-type? ] [ none-type? ]
-    } 1|| [ current-lib get >>namespace ] unless ;
+    } 1|| [ current-lib get-global >>namespace ] unless ;
 

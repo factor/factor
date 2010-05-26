@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.strings io.encodings.ascii
-gdk.gl gdk.gl.ffi ;
+gdk.gl.ffi ;
 IN: opengl.gl.gtk
 
 : gl-function-context ( -- context )

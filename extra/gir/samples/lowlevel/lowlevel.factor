@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.strings byte-arrays classes.struct
-gtk glib.ffi gobject.ffi gtk.ffi io.encodings.utf8 kernel
+glib.ffi gobject.ffi gtk.ffi io.encodings.utf8 kernel
 literals locals make math prettyprint sequences specialized-arrays
 gir.samples.lowlevel.hello-world
 gir.samples.lowlevel.opengl

@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.strings gtk gobject.ffi gtk.ffi io.encodings.utf8
+USING: alien.strings gobject.ffi gtk.ffi io.encodings.utf8
 kernel locals ;
 IN: gir.samples.lowlevel.hello-world
 
