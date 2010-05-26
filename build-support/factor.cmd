@@ -1,10 +1,10 @@
 @echo off
 if not exist Nmakefile goto wrongdir
 
-cl 2>&1 | find "x86" >nul
+call cl 2>&1 | find "x86" >nul
 if not errorlevel 1 goto cl32
 
-cl 2>&1 | find "x64" >nul
+call cl 2>&1 | find "x64" >nul
 if not errorlevel 1 goto cl64
 
 goto nocl
@@ -22,8 +22,9 @@ set _bootimage="boot.winnt-x86.64.image"
 goto platformdefined
 
 :nocl
-echo "Unable to detect cl.exe target platform."
-goto fail
+echo Unable to detect cl.exe target platform.
+echo Make sure you're running within the Visual Studio or Windows SDK environment.
+goto cleanup
 
 :platformdefined
 
