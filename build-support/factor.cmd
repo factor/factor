@@ -62,11 +62,12 @@ echo Bootstrapping...
 .\factor.com -i=%_bootimage%
 if errorlevel 1 goto fail
 
+echo Copying fresh factor.image to factor.image.fresh
+copy factor.image factor.image.fresh
+if errorlevel 1 goto fail
+
 echo Build complete.
 goto cleanup
-
-:nocl
-echo 
 
 :fail
 echo Build failed.
