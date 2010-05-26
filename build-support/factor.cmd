@@ -1,13 +1,31 @@
 @echo off
-if not exist Nmakefile goto wrong_dir
+if not exist Nmakefile goto wrongdir
 
-if /i %PROCESSOR_ARCHITECTURE%==AMD64 (
-    set _target="x86-64"
-    set _bootimage="boot.winnt-x86.64.image"
-) else (
-    set _target="x86-32"
-    set _bootimage="boot.winnt-x86.32.image"
-)
+cl 2>&1 | find "x86" >nul
+if not errorlevel 1 goto cl32
+
+cl 2>&1 | find "x64" >nul
+if not errorlevel 1 goto cl64
+
+goto nocl
+
+:cl32
+echo x86-32 cl.exe detected.
+set _target="x86-32"
+set _bootimage="boot.winnt-x86.32.image"
+goto platformdefined
+
+:cl64
+echo x86-64 cl.exe detected.
+set _target="x86-64"
+set _bootimage="boot.winnt-x86.64.image"
+goto platformdefined
+
+:nocl
+echo "Unable to detect cl.exe target platform."
+goto fail
+
+:platformdefined
 
 if "%1"=="/?" goto usage
 
@@ -27,31 +45,34 @@ if "%1"=="clean" (
 if not defined _bootimage_version goto usage
 
 echo Updating working copy...
-cmd /c "git pull http://factorcode.org/git/factor.git %_git_branch%"
-if not errorlevel 0 goto fail
+call git pull http://factorcode.org/git/factor.git %_git_branch%
+if errorlevel 1 goto fail
 
 echo Building vm...
 nmake /nologo /f Nmakefile clean
-if not errorlevel 0 goto fail
+if errorlevel 1 goto fail
 nmake /nologo /f Nmakefile %_target%
-if not errorlevel 0 goto fail
+if errorlevel 1 goto fail
 
 echo Fetching %_bootimage_version% boot image...
 cscript /nologo build-support\http-get.vbs http://factorcode.org/images/%_bootimage_version%/%_bootimage% %_bootimage%
-if not errorlevel 0 goto fail
+if errorlevel 1 goto fail
 
 echo Bootstrapping...
 .\factor.com -i=%_bootimage%
-if not errorlevel 0 goto fail
+if errorlevel 1 goto fail
 
 echo Build complete.
 goto cleanup
+
+:nocl
+echo 
 
 :fail
 echo Build failed.
 goto cleanup
 
-:wrong_dir
+:wrongdir
 echo build-support\factor.cmd must be run from the root of the Factor source tree.
 goto cleanup
 
