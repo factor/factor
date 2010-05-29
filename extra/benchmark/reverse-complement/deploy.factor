@@ -11,5 +11,5 @@ H{
     { deploy-console? t }
     { deploy-word-props? f }
     { deploy-c-types? f }
-    { deploy-name "benchmark.regex-dna" }
+    { deploy-name "benchmark.reverse-complement" }
 }
