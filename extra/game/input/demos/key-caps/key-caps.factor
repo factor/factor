@@ -2,7 +2,7 @@ USING: game.input game.input.scancodes
 kernel ui.gadgets ui.gadgets.buttons sequences accessors
 words arrays assocs math calendar fry alarms ui
 ui.gadgets.borders ui.gestures literals ;
-IN: key-caps
+IN: game.input.demos.key-caps
 
 CONSTANT: key-locations H{
     { key-escape        { {   0   0 } {  10  10 } } }
