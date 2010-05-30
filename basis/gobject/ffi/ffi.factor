@@ -25,6 +25,12 @@ GIR: vocab:gobject/GObject-2.0.gir
 IN: gobject.ffi
 
 FORGET: GIOCondition
+FORGET: G_IO_IN
+FORGET: G_IO_OUT
+FORGET: G_IO_PRI
+FORGET: G_IO_ERR
+FORGET: G_IO_HUP
+FORGET: G_IO_NVAL
 
 FUNCTION: void g_object_unref ( GObject* self ) ;
 

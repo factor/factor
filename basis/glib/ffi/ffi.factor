@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.libraries alien.syntax
-combinators compiler.units gir kernel system vocabs.parser words ;
+USING: accessors alien alien.c-types alien.destructors
+alien.libraries alien.syntax combinators compiler.units gir
+kernel system vocabs.parser words ;
 IN: glib.ffi
 
 <<
@@ -66,5 +67,13 @@ TYPEDEF: guint16 gunichar2
 TYPEDEF: gpointer pointer
 TYPEDEF: gpointer any
 
+IMPLEMENT-STRUCTS: GPollFD GSource GSourceFuncs ;
+
 GIR: vocab:glib/GLib-2.0.gir
+
+DESTRUCTOR: g_source_unref
+
+CALLBACK: gboolean GSourceFuncsPrepareFunc ( GSource* source, gint* timeout_ ) ;
+CALLBACK: gboolean GSourceFuncsCheckFunc ( GSource* source ) ;
+CALLBACK: gboolean GSourceFuncsDispatchFunc ( GSource* source, GSourceFunc callback, gpointer user_data ) ;
 
