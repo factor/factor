@@ -1,10 +1,12 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.enums alien.strings arrays ascii assocs
-classes.struct combinators.short-circuit command-line destructors
-io.encodings.utf8 kernel literals locals math math.bitwise
-namespaces sequences strings ui ui.backend ui.clipboards ui.event-loop
-ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures ui.private
+USING: accessors alien.c-types alien.enums alien.strings arrays
+ascii assocs classes.struct combinators.short-circuit
+command-line destructors io.backend.unix.multiplexers
+io.encodings.utf8 io.thread kernel libc literals locals math
+math.bitwise namespaces sequences strings threads ui ui.backend
+ui.clipboards ui.event-loop ui.gadgets ui.gadgets.private
+ui.gadgets.worlds ui.gestures ui.private
 glib.ffi gobject.ffi gtk.ffi gdk.ffi gdk.gl.ffi gtk.gl.ffi ;
 IN: ui.backend.gtk
 
@@ -177,8 +179,48 @@ CONSTANT: action-key-codes
         gtk_clipboard_get <gtk-clipboard> swap set-global
     ] 2bi@ ;
 
-M: gtk-ui-backend do-events
-    f gtk_main_iteration_do drop ui-wait ;
+: io-source-prepare ( source timeout -- result )
+    2drop f ;
+
+: io-source-check ( source -- result )
+    poll_fds>> 0 g_slist_nth_data GPollFD memory>struct
+    revents>> 0 = not ;
+
+: io-source-dispatch ( source callback user_data -- result )
+     3drop
+     0 mx get wait-for-events
+     yield t ;
+
+: timeout-func ( -- func )
+    [ drop yield t ] GSourceFunc ;
+
+: init-timeout ( interval -- )
+    G_PRIORITY_DEFAULT swap timeout-func f f
+    g_timeout_add_full drop ;
+
+CONSTANT: poll-fd-events
+    {
+        G_IO_IN
+        G_IO_OUT
+        G_IO_PRI
+        G_IO_ERR
+        G_IO_HUP
+        G_IO_NVAL
+    }
+
+: create-poll-fd ( -- poll-fd )
+    GPollFD malloc-struct &free
+        mx get fd>> >>fd
+        poll-fd-events [ enum>number ] [ bitor ] map-reduce >>events ;
+
+: init-io-event-source ( -- )
+    GSourceFuncs malloc-struct &free
+        [ io-source-prepare ] GSourceFuncsPrepareFunc >>prepare
+        [ io-source-check ] GSourceFuncsCheckFunc >>check
+        [ io-source-dispatch ] GSourceFuncsDispatchFunc >>dispatch
+    GSource heap-size g_source_new &g_source_unref
+    [ create-poll-fd g_source_add_poll ]
+    [ f g_source_attach drop ] bi ;
 
 M: gtk-ui-backend (with-ui)
     [
@@ -186,7 +228,13 @@ M: gtk-ui-backend (with-ui)
         f f gtk_gl_init
         init-clipboard
         start-ui
-        event-loop
+        f io-thread-running? set-global
+        [
+            init-io-event-source
+            ! is it correct to use timeouts with 'yield'?
+            10 init-timeout
+            gtk_main
+        ] with-destructors
     ] ui-running ;
 
 : connect-signal ( object signal-name callback -- )
@@ -289,7 +337,8 @@ M:: gtk-ui-backend (open-window) ( world -- )
     win gtk_widget_show_all ;
 
 M: gtk-ui-backend (close-window) ( handle -- )
-    window>> [ unregister-window ] [ gtk_widget_destroy ] bi ;
+    window>> [ unregister-window ] [ gtk_widget_destroy ] bi
+    event-loop? [ gtk_main_quit ] unless ;
 
 M: gtk-ui-backend set-title
     swap [ handle>> window>> ] [ utf8 string>alien ] bi*
