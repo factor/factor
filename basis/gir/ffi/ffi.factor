@@ -13,16 +13,16 @@ IN: gir.ffi
 : define-each ( nodes quot -- )
     '[ dup @ >>ffi drop ] each ; inline
 
-: ffi-invoker ( func -- quot )
+: function-ffi-invoker ( func -- quot )
     {
         [ return>> c-type>> string>c-type ]
         [ drop current-lib get-global ]
         [ identifier>> ]
         [ parameters>> [ c-type>> string>c-type ] map ]
         [ varargs?>> [ void* suffix ] when ]
-    } cleave \ alien-invoke 5 narray >quotation ;
+    } cleave function-quot ;
 
-: ffi-effect ( func -- effect )
+: function-ffi-effect ( func -- effect )
     [ parameters>> [ name>> ] map ]
     [ varargs?>> [ "varargs" suffix ] when ]
     [ return>> type>> none-type? { } { "result" } ? ] tri
@@ -30,42 +30,45 @@ IN: gir.ffi
 
 : define-ffi-function ( func -- word )
     [ identifier>> create-in dup ]
-    [ ffi-invoker ] [ ffi-effect ] tri define-declared ;
+    [ function-ffi-invoker ] [ function-ffi-effect ] tri
+    define-declared ;
 
 : define-ffi-functions ( functions -- )
     [ define-ffi-function ] define-each ;
 
-: signal-param-c-type ( param -- c-type )
-    [ c-type>> ] [ type>> ] bi
+: callback-ffi-invoker ( callback -- quot )
+    [ return>> c-type>> string>c-type ]
+    [ parameters>> [ c-type>> string>c-type ] map ] bi
+    cdecl callback-quot ;
+
+: callback-ffi-effect ( callback -- effect )
+    [ parameters>> [ name>> ] map ]
+    [ return>> type>> none-type? { } { "result" } ? ] bi
+    <effect> ;
+
+: define-ffi-callback ( callback -- word )
+    [ c-type>> create-in [ void* swap typedef ] keep dup ] keep
+    [ callback-ffi-effect "callback-effect" set-word-prop ]
+    [ drop current-lib get-global "callback-library" set-word-prop ] 
+    [ callback-ffi-invoker (( quot -- alien )) define-inline ] 2tri ;
+
+: fix-signal-param-c-type ( param -- )
+    dup [ c-type>> ] [ type>> ] bi
     {
         [ none-type? ]
         [ simple-type? ]
         [ enum-type? ]
         [ bitfield-type? ]
-    } 1|| [ dup "*" tail? [ CHAR: * suffix ] unless ] unless ;
+    } 1|| [ dup "*" tail? [ CHAR: * suffix ] unless ] unless
+    >>c-type drop ;
 
-: signal-ffi-invoker ( signal -- quot )
-    [ return>> signal-param-c-type string>c-type ]
-    [ parameters>> [ signal-param-c-type string>c-type ] map ] bi
-    cdecl [ [ ] 3curry dip alien-callback ] 3curry ;
-
-: signal-ffi-effect ( signal -- effect )
-    [ parameters>> [ name>> ] map ]
-    [ return>> type>> none-type? { } { "result" } ? ] bi
-    <effect> ;
-
-:: define-ffi-signal ( signal class -- word ) ! сделать попонятнее
-    signal
-    [
-        name>> class c-type>> swap ":" glue create-in
-        [ void* swap typedef ] keep dup
-    ] keep
-    [ signal-ffi-effect "callback-effect" set-word-prop ]
-    [ drop current-lib get-global "callback-library" set-word-prop ] 
-    [ signal-ffi-invoker (( quot -- alien )) define-inline ] 2tri ;
-
-: define-ffi-signals ( signals class -- )
-    '[ _ define-ffi-signal ] define-each ;
+: define-ffi-signal ( signal -- word )
+    [ return>> fix-signal-param-c-type ]
+    [ parameters>> [ fix-signal-param-c-type ] each ]
+    [ define-ffi-callback ] tri ;
+    
+: define-ffi-signals ( signals -- )
+    [ define-ffi-signal ] define-each ;
 
 : const-value ( const -- value )
     [ value>> ] [ type>> name>> ] bi {
@@ -138,9 +141,6 @@ IN: gir.ffi
 
 : define-ffi-unions ( unions -- )
     [ define-ffi-union ] define-each ;
-
-: define-ffi-callback ( callback -- word )
-    c-type>> create-in [ void* swap typedef ] keep ;
 
 : define-ffi-callbacks ( callbacks -- )
     [ define-ffi-callback ] define-each ;

@@ -174,6 +174,8 @@ SYMBOL: namespace-PREFIX
             "signal" tags-named [ xml>signal ] map
             over type>sender-param
             '[ [ _ prefix ] change-parameters ] map
+            over c-type>> CHAR: : suffix
+            '[ dup name>> _ prepend >>c-type ] map
             >>signals
         ]
     } cleave ;
