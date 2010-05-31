@@ -175,7 +175,7 @@ IN: gir.ffi
         [ constructors>> define-ffi-functions ]
         [ functions>> define-ffi-functions ]
         [ methods>> define-ffi-functions ]
-        [ [ signals>> ] keep define-ffi-signals ]
+        [ signals>> define-ffi-signals ]
     } cleave ;
 
 : define-ffi-classes-content ( class -- )

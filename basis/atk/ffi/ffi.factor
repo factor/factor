@@ -16,5 +16,8 @@ IN: atk.ffi
 TYPEDEF: guint64 AtkState
 TYPEDEF: GSList AtkAttributeSet
 
+! gir: error
+C-TYPE: AtkPropertyValues
+
 GIR: vocab:atk/Atk-1.0.gir
 

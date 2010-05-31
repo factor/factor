@@ -16,6 +16,7 @@ IN: gdk.ffi
 
 TYPEDEF: guint32 GdkNativeWindow
 TYPEDEF: guint32 GdkWChar
+C-TYPE: GdkXEvent
 
 IMPLEMENT-STRUCTS: GdkEventAny GdkEventKey GdkEventButton
 GdkEventScroll GdkEventMotion GdkEventExpose GdkEventVisibility
