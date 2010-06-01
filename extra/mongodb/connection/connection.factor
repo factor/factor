@@ -26,7 +26,7 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
 
 : check-ok ( result -- errmsg ? )
     [ [ "errmsg" ] dip at ] 
-    [ [ "ok" ] dip at >integer 1 = ] bi ; inline 
+    [ [ "ok" ] dip at ] bi ; inline 
 
 : <mdb-db> ( name nodes -- mdb-db )
     mdb-db new swap >>nodes swap >>name H{ } clone >>collections ;
