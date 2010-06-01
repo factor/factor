@@ -28,6 +28,7 @@ M: ##shuffle-vector-imm insn-available? rep>> %shuffle-vector-imm-reps member? ;
 M: ##shuffle-vector-halves-imm insn-available? rep>> %shuffle-vector-halves-imm-reps member? ;
 M: ##merge-vector-head insn-available? rep>> %merge-vector-reps member? ;
 M: ##merge-vector-tail insn-available? rep>> %merge-vector-reps member? ;
+M: ##float-pack-vector insn-available? rep>> %float-pack-vector-reps member? ;
 M: ##signed-pack-vector insn-available? rep>> %signed-pack-vector-reps member? ;
 M: ##unsigned-pack-vector insn-available? rep>> %unsigned-pack-vector-reps member? ;
 M: ##unpack-vector-head insn-available? rep>> %unpack-vector-head-reps member? ;

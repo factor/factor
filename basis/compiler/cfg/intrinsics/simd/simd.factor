@@ -570,7 +570,12 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 
 : emit-simd-vpack-signed ( node -- )
     {
-        [ ^^signed-pack-vector ]
+        { double-2-rep [| src1 src2 rep |
+            src1 double-2-rep ^^float-pack-vector :> dst-head
+            src2 double-2-rep ^^float-pack-vector :> dst-tail
+            dst-head dst-tail { 0 1 0 1 } float-4-rep ^^shuffle-vector-halves-imm
+        ] }
+        { int-vector-rep [ ^^signed-pack-vector ] }
     } emit-vv-vector-op ;
 
 : emit-simd-vpack-unsigned ( node -- )
