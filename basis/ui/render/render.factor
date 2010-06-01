@@ -35,6 +35,8 @@ SLOT: background-color
     GL_BLEND glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
     GL_VERTEX_ARRAY glEnableClientState
+    GL_PACK_ALIGNMENT 1 glPixelStorei
+    GL_UNPACK_ALIGNMENT 1 glPixelStorei
     init-matrices
     [ init-clip ]
     [
