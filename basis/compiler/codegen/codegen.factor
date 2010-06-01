@@ -191,6 +191,7 @@ CODEGEN: ##shuffle-vector %shuffle-vector
 CODEGEN: ##tail>head-vector %tail>head-vector
 CODEGEN: ##merge-vector-head %merge-vector-head
 CODEGEN: ##merge-vector-tail %merge-vector-tail
+CODEGEN: ##float-pack-vector %float-pack-vector
 CODEGEN: ##signed-pack-vector %signed-pack-vector
 CODEGEN: ##unsigned-pack-vector %unsigned-pack-vector
 CODEGEN: ##unpack-vector-head %unpack-vector-head
