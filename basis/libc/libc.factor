@@ -100,5 +100,7 @@ FUNCTION: int memcmp ( void* a, void* b, ulong size ) ;
 
 FUNCTION: size_t strlen ( c-string alien ) ;
 
+FUNCTION: int system ( c-string command ) ;
+
 DESTRUCTOR: free
 DESTRUCTOR: (free)
