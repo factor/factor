@@ -41,7 +41,8 @@ PRIVATE>
 : pprint-c-type ( c-type -- )
     [ c-type-string ] keep present-text ;
 
-M: pointer pprint* \ pointer: pprint-word to>> pprint-c-type ;
+M: pointer pprint*
+    <flow \ pointer: pprint-word to>> pprint* block> ;
 
 M: typedef-word definer drop \ TYPEDEF: f ;
 
