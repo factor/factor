@@ -40,7 +40,7 @@ SINGLETON: x11-ui-backend
         Success assert=
     ]
     [| type format n-atoms bytes-after atoms |
-        atoms ulong-array-cast >array
+        atoms n-atoms <direct-ulong-array> >array
         atoms XFree
     ]
     with-out-parameters ;
