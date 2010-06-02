@@ -1,12 +1,13 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.enums alien.strings arrays
-ascii assocs classes.struct combinators.short-circuit
-command-line destructors io.backend.unix.multiplexers
-io.encodings.utf8 io.thread kernel libc literals locals math
-math.bitwise namespaces sequences strings threads ui ui.backend
-ui.clipboards ui.event-loop ui.gadgets ui.gadgets.private
-ui.gadgets.worlds ui.gestures ui.private
+USING: accessors alien.c-types alien.data alien.enums
+alien.strings arrays ascii assocs classes.struct
+combinators.short-circuit command-line destructors
+io.backend.unix.multiplexers io.encodings.utf8 io.thread kernel
+libc literals locals math math.bitwise namespaces sequences
+strings threads ui ui.backend ui.clipboards ui.event-loop
+ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
+ui.pixel-formats ui.pixel-formats.private ui.private
 glib.ffi gobject.ffi gtk.ffi gdk.ffi gdk.gl.ffi gtk.gl.ffi ;
 IN: ui.backend.gtk
 
@@ -21,6 +22,39 @@ TUPLE: window-handle < handle window fullscreen? ;
 TUPLE: gtk-clipboard handle ;
 
 C: <gtk-clipboard> gtk-clipboard
+
+PIXEL-FORMAT-ATTRIBUTE-TABLE: gl-config-attribs { $[ GDK_GL_USE_GL enum>number GDK_GL_RGBA enum>number ] } H{
+    { double-buffered { $[ GDK_GL_DOUBLEBUFFER enum>number ] } }
+    { stereo { $[ GDK_GL_STEREO enum>number ] } }
+    ! { offscreen { $[ GDK_GL_DRAWABLE_TYPE enum>number ] 2 } }
+    ! { fullscreen { $[ GDK_GL_DRAWABLE_TYPE enum>number ] 1 } }
+    ! { windowed { $[ GDK_GL_DRAWABLE_TYPE enum>number ] 1 } }
+    { color-bits { $[ GDK_GL_BUFFER_SIZE enum>number ] } }
+    { red-bits { $[ GDK_GL_RED_SIZE enum>number ] } }
+    { green-bits { $[ GDK_GL_GREEN_SIZE enum>number ] } }
+    { blue-bits { $[ GDK_GL_BLUE_SIZE enum>number ] } }
+    { alpha-bits { $[ GDK_GL_ALPHA_SIZE enum>number ] } }
+    { accum-red-bits { $[ GDK_GL_ACCUM_RED_SIZE enum>number ] } }
+    { accum-green-bits { $[ GDK_GL_ACCUM_GREEN_SIZE enum>number ] } }
+    { accum-blue-bits { $[ GDK_GL_ACCUM_BLUE_SIZE enum>number ] } }
+    { accum-alpha-bits { $[ GDK_GL_ACCUM_ALPHA_SIZE enum>number ] } }
+    { depth-bits { $[ GDK_GL_DEPTH_SIZE enum>number ] } }
+    { stencil-bits { $[ GDK_GL_STENCIL_SIZE enum>number ] } }
+    { aux-buffers { $[ GDK_GL_AUX_BUFFERS enum>number ] } }
+    { sample-buffers { $[ GDK_GL_SAMPLE_BUFFERS enum>number ] } }
+    { samples { $[ GDK_GL_SAMPLES enum>number ] } }
+}
+
+M: gtk-ui-backend (make-pixel-format)
+    nip >gl-config-attribs-int-array gdk_gl_config_new ;
+
+M: gtk-ui-backend (free-pixel-format)
+    handle>> g_object_unref ;
+
+M: gtk-ui-backend (pixel-format-attribute)
+    [ handle>> ] [ >gl-config-attribs ] bi*
+    { int } [ gdk_gl_config_get_attrib drop ] [ ]
+    with-out-parameters ;
 
 CONSTANT: events-mask
     {
@@ -271,17 +305,6 @@ M: gtk-ui-backend (with-ui)
     win "delete-event" [ on-delete ]
     GtkWidget:delete-event connect-signal ;
 
-: enable-gl ( win -- ? )
-    ${
-        GDK_GL_MODE_RGBA
-        GDK_GL_MODE_DOUBLE
-        GDK_GL_MODE_DEPTH
-        GDK_GL_MODE_STENCIL
-        GDK_GL_MODE_ALPHA
-    } [ enum>number ] [ bitor ] map-reduce
-    gdk_gl_config_new_by_mode
-    f t GDK_GL_RGBA_TYPE enum>number gtk_widget_set_gl_capability ;
-
 CONSTANT: window-controls>decor-flags
     H{
         { close-button 0 }
@@ -319,19 +342,25 @@ CONSTANT: window-controls>func-flags
         GDK_FUNC_MOVE enum>number bitor gdk_window_set_functions
     ] 2tri ;
 
+: setup-gl ( world -- ? )
+    [
+        [ handle>> window>> ] [ handle>> ] bi*
+        f t GDK_GL_RGBA_TYPE enum>number gtk_widget_set_gl_capability
+    ] with-world-pixel-format ;
+
 M:: gtk-ui-backend (open-window) ( world -- )
     GTK_WINDOW_TOPLEVEL gtk_window_new :> win
+    win <window-handle> world handle<<
     world [ window-loc>> win swap first2 gtk_window_move ]
     [ dim>> win swap first2 gtk_window_set_default_size ] bi
-    
-    win enable-gl drop ! сделать проверку на доступность OpenGL
 
+    world setup-gl drop
+    
     win connect-signals
     
     win gtk_widget_realize
     win world window-controls>> configure-window-controls
     
-    win <window-handle> world handle<<
     world win register-window
     
     win gtk_widget_show_all ;
