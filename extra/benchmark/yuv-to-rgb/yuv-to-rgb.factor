@@ -1,11 +1,12 @@
 ! Copyright (C) Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.accessors alien.c-types alien.syntax byte-arrays
-destructors generalizations hints kernel libc locals math math.order
-sequences sequences.private classes.struct accessors alien.data ;
+destructors generalizations kernel libc locals math math.order
+sequences sequences.private classes.struct accessors alien.data
+typed ;
 IN: benchmark.yuv-to-rgb
 
-STRUCT: yuv_buffer
+STRUCT: yuv-buffer
     { y_width int }
     { y_height int }
     { y_stride int }
@@ -19,7 +20,7 @@ STRUCT: yuv_buffer
 :: fake-data ( -- rgb yuv )
     1600 :> w
     1200 :> h
-    yuv_buffer <struct> :> buffer
+    yuv-buffer <struct> :> buffer
     w h * 3 * <byte-array> :> rgb
     rgb buffer
         w >>y_width
@@ -79,13 +80,11 @@ STRUCT: yuv_buffer
     pick y_width>> iota
     [ yuv>rgb-pixel ] with with with with each ; inline
 
-: yuv>rgb ( rgb yuv -- )
+TYPED: yuv>rgb ( rgb: byte-array yuv: yuv-buffer -- )
     [ 0 ] 2dip
     dup y_height>> iota
     [ yuv>rgb-row ] with with each
     drop ;
-
-HINTS: yuv>rgb byte-array yuv_buffer ;
 
 : yuv>rgb-benchmark ( -- )
     [ fake-data yuv>rgb ] with-destructors ;

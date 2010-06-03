@@ -27,11 +27,11 @@ HELP: time
 { benchmark system-micros time } related-words
 
 HELP: collect-gc-events
-{ $values { "quot" quotation } }
-{ $description "Calls the quotation, storing an array of " { $link gc-event } " instances in the " { $link gc-events } " variable." }
+{ $values { "quot" quotation } { "gc-events" "a sequence of " { $link gc-event } " instances" } }
+{ $description "Calls the quotation and outputs a sequence of " { $link gc-event } " instances." }
 { $notes "The " { $link time } " combinator automatically calls this combinator." } ;
 
 HELP: collect-dispatch-stats
-{ $values { "quot" quotation } }
-{ $description "Calls the quotation, collecting method dispatch statistics and storing them in the " { $link last-dispatch-stats } " variable. " }
+{ $values { "quot" quotation } { "dispatch-statistics" dispatch-statistics } }
+{ $description "Calls the quotation and outputs a " { $link dispatch-statistics } " instance." }
 { $notes "The " { $link time } " combinator automatically calls this combinator." } ;

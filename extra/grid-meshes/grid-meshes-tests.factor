@@ -18,4 +18,4 @@ SPECIALIZED-ARRAY: float
         1.0 0.0 0.5 1.0
         1.0 0.0 1.0 1.0
     }
-] [ { 2 2 } vertex-array byte-array>float-array ] unit-test
+] [ { 2 2 } vertex-array float-array-cast ] unit-test

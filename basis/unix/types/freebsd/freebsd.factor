@@ -21,6 +21,6 @@ TYPEDEF: __uint32_t     blksize_t
 TYPEDEF: __uint32_t     fflags_t
 TYPEDEF: long           ssize_t
 TYPEDEF: int            pid_t
-TYPEDEF: int            time_t
+TYPEDEF: long           time_t
 
-ALIAS: <time_t> <int>
+ALIAS: <time_t> <long>

@@ -105,6 +105,6 @@ IN: io.launcher.windows.nt
 
 M: winnt fill-redirection ( process args -- )
     dup lpStartupInfo>>
-    [ [ redirect-stdout ] dip (>>hStdOutput) ]
-    [ [ redirect-stderr ] dip (>>hStdError) ]
-    [ [ redirect-stdin ] dip (>>hStdInput) ] 3tri ;
+    [ [ redirect-stdout ] dip hStdOutput<< ]
+    [ [ redirect-stderr ] dip hStdError<< ]
+    [ [ redirect-stdin ] dip hStdInput<< ] 3tri ;

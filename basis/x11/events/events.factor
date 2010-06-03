@@ -1,7 +1,8 @@
-! Copyright (C) 2005, 2006 Eduardo Cavazos and Slava Pestov
+! Copyright (C) 2005, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes.struct combinators kernel
-math.order namespaces x11 x11.xlib ;
+USING: accessors arrays classes.struct combinators
+combinators.short-circuit kernel math.order namespaces
+x11 x11.xlib ;
 IN: x11.events
 
 GENERIC: expose-event ( event window -- )
@@ -16,7 +17,7 @@ GENERIC: enter-event ( event window -- )
 
 GENERIC: leave-event ( event window -- )
 
-GENERIC: wheel-event ( event window -- )
+GENERIC: scroll-event ( event window -- )
 
 GENERIC: motion-event ( event window -- )
 
@@ -42,13 +43,13 @@ GENERIC: client-event ( event window -- )
 
 : events-queued ( mode -- n ) [ dpy get ] dip XEventsQueued ;
 
-: wheel? ( event -- ? ) button>> 4 7 between? ;
+: mouse-scroll? ( event -- ? ) button>> 4 7 between? ;
 
 : button-down-event$ ( event window -- )
-    over wheel? [ wheel-event ] [ button-down-event ] if ;
+    over mouse-scroll? [ scroll-event ] [ button-down-event ] if ;
 
 : button-up-event$ ( event window -- )
-    over wheel? [ 2drop ] [ button-up-event ] if ;
+    over mouse-scroll? [ 2drop ] [ button-up-event ] if ;
 
 : handle-event ( event window -- )
     swap dup XAnyEvent>> type>> {
@@ -75,7 +76,11 @@ GENERIC: client-event ( event window -- )
 : event-dim ( event -- dim )
     [ width>> ] [ height>> ] bi 2array ;
 
+: XA_WM_PROTOCOLS ( -- atom ) "WM_PROTOCOLS" x-atom ;
+: XA_WM_DELETE_WINDOW ( -- atom ) "WM_DELETE_WINDOW" x-atom ;
+
 : close-box? ( event -- ? )
-    [ message_type>> "WM_PROTOCOLS" x-atom = ]
-    [ data0>> "WM_DELETE_WINDOW" x-atom = ]
-    bi and ;
+    {
+        [ message_type>> XA_WM_PROTOCOLS = ]
+        [ data0>> XA_WM_DELETE_WINDOW = ]
+    } 1&& ;

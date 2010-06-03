@@ -9,8 +9,6 @@ IN: compiler.tree.propagation.slots
 
 ! Propagation of immutable slots and array lengths
 
-UNION: fixed-length-sequence array byte-array string ;
-
 : sequence-constructor? ( word -- ? )
     { <array> <byte-array> (byte-array) <string> } member-eq? ;
 
@@ -23,9 +21,9 @@ UNION: fixed-length-sequence array byte-array string ;
     } at ;
 
 : propagate-sequence-constructor ( #call word -- infos )
-    [ in-d>> first <sequence-info> ]
-    [ constructor-output-class <class-info> ]
-    bi* value-info-intersect 1array ;
+    [ in-d>> first value-info ]
+    [ constructor-output-class ] bi*
+    <sequence-info> 1array ;
 
 : fold-<tuple-boa> ( values class -- info )
     [ [ literal>> ] map ] dip prefix >tuple
@@ -36,17 +34,18 @@ UNION: fixed-length-sequence array byte-array string ;
     [ read-only>> [ value-info ] [ drop f ] if ] 2map
     f prefix ;
 
-: (propagate-tuple-constructor) ( values class -- info )
-    [ read-only-slots ] keep
-    over rest-slice [ dup [ literal?>> ] when ] all? [
-        [ rest-slice ] dip fold-<tuple-boa>
-    ] [
-        <tuple-info>
-    ] if ;
+: fold-<tuple-boa>? ( values class -- ? )
+    [ rest-slice [ dup [ literal?>> ] when ] all? ]
+    [ identity-tuple class<= not ]
+    bi* and ;
+
+: (propagate-<tuple-boa>) ( values class -- info )
+    [ read-only-slots ] keep 2dup fold-<tuple-boa>?
+    [ [ rest-slice ] dip fold-<tuple-boa> ] [ <tuple-info> ] if ;
 
 : propagate-<tuple-boa> ( #call -- infos )
     in-d>> unclip-last
-    value-info literal>> first (propagate-tuple-constructor) 1array ;
+    value-info literal>> first (propagate-<tuple-boa>) 1array ;
 
 : read-only-slot? ( n class -- ? )
     all-slots [ offset>> = ] with find nip
@@ -72,7 +71,6 @@ UNION: fixed-length-sequence array byte-array string ;
 : value-info-slot ( slot info -- info' )
     {
         { [ over 0 = ] [ 2drop fixnum <class-info> ] }
-        { [ 2dup length-accessor? ] [ nip length>> ] }
         { [ dup literal?>> ] [ literal>> literal-info-slot ] }
         [ [ 1 - ] [ slots>> ] bi* ?nth ]
     } cond [ object-info ] unless* ;

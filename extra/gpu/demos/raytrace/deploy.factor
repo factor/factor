@@ -3,6 +3,7 @@ H{
     { deploy-name "Raytrace" }
     { deploy-ui? t }
     { deploy-c-types? f }
+    { deploy-console? f }
     { deploy-unicode? f }
     { "stop-after-last-window?" t }
     { deploy-io 2 }

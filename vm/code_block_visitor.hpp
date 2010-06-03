@@ -114,7 +114,7 @@ template<typename Visitor>
 void code_block_visitor<Visitor>::visit_context_code_blocks()
 {
 	call_frame_code_block_visitor<Visitor> call_frame_visitor(parent,visitor);
-	parent->iterate_active_frames(call_frame_visitor);
+	parent->iterate_active_callstacks(call_frame_visitor);
 }
 
 template<typename Visitor>

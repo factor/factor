@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel threads boxes accessors fry ;
 IN: concurrency.exchangers
@@ -17,5 +17,6 @@ TUPLE: exchanger thread object ;
         [ thread>> box> resume-with ] dip
     ] [
         [ object>> >box ] keep
-        '[ _ thread>> >box ] "exchange" suspend
+        [ self ] dip thread>> >box
+        "exchange" suspend
     ] if ;

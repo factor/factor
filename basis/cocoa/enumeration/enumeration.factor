@@ -15,7 +15,7 @@ CONSTANT: NS-EACH-BUFFER-SIZE 16
         @
     ] with-destructors ; inline
 
-:: (NSFastEnumeration-each) ( object quot: ( elt -- ) state stackbuf count -- )
+:: (NSFastEnumeration-each) ( ... object quot: ( ... elt -- ) state stackbuf count -- ... )
     object state stackbuf count -> countByEnumeratingWithState:objects:count: :> items-count
     items-count 0 = [
         state itemsPtr>> [ items-count id <c-direct-array> ] [ stackbuf ] if* :> items
@@ -23,10 +23,10 @@ CONSTANT: NS-EACH-BUFFER-SIZE 16
         object quot state stackbuf count (NSFastEnumeration-each)
     ] unless ; inline recursive
 
-: NSFastEnumeration-each ( object quot -- )
+: NSFastEnumeration-each ( ... object quot: ( ... elt -- ... ) -- ... )
     [ (NSFastEnumeration-each) ] with-enumeration-buffers ; inline
 
-: NSFastEnumeration-map ( object quot -- vector )
+: NSFastEnumeration-map ( ... object quot: ( ... elt -- ... newelt ) -- ... vector )
     NS-EACH-BUFFER-SIZE <vector>
     [ '[ @ _ push ] NSFastEnumeration-each ] keep ; inline
 

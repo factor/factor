@@ -40,7 +40,7 @@ load-help? off
             run-file
         ] [
             "Cannot find " write write "." print
-            "Please move " write image write " to the same directory as the Factor sources," print
+            "Please move " write image write " into the same directory as the Factor sources," print
             "and try again." print
             1 (exit)
         ] if

@@ -47,7 +47,7 @@ SYMBOL: interned
     ] { } make <interval-map> ;
 
 : process-interval-file ( ranges -- table )
-    dup values prune interned
+    dup values members interned
     [ expand-ranges ] with-variable ;
 
 : load-interval-file ( filename -- table )

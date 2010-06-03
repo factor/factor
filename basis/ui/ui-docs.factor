@@ -81,6 +81,11 @@ HELP: with-ui
 HELP: beep
 { $description "Plays the system beep sound." } ;
 
+HELP: system-alert
+{ $values { "caption" string } { "text" string } }
+{ $description "Displays an application-modal alert dialog box with the given caption and text." }
+{ $notes "Since the window raised by this word is modal, all processing in all Factor threads will halt until the dialog is dismissed. In an application that makes full use of the UI framework, it would be more appropriate to display a pane gadget in a Factor window. This word is meant primarily to be used to display errors in deployed applications with minimal dependencies on the UI library, such as games." } ;
+
 HELP: topmost-window
 { $values { "world" world } }
 { $description "Returns the " { $link world } " representing the currently focused window." } ;

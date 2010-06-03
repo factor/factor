@@ -15,7 +15,7 @@ TUPLE: sequence-parser sequence n ;
 :: with-sequence-parser ( sequence-parser quot -- seq/f )
     sequence-parser n>> :> n
     sequence-parser quot call [
-        n sequence-parser (>>n) f
+        n sequence-parser n<< f
     ] unless* ; inline
 
 : offset  ( sequence-parser offset -- char/f )
@@ -39,7 +39,7 @@ TUPLE: sequence-parser sequence n ;
 : get+increment ( sequence-parser -- char/f )
     [ current ] [ advance drop ] bi ; inline
 
-:: skip-until ( sequence-parser quot: ( obj -- ? ) -- )
+:: skip-until ( ... sequence-parser quot: ( ... obj -- ... ? ) -- ... )
     sequence-parser current [
         sequence-parser quot call
         [ sequence-parser advance quot skip-until ] unless
@@ -47,7 +47,7 @@ TUPLE: sequence-parser sequence n ;
 
 : sequence-parse-end? ( sequence-parser -- ? ) current not ;
 
-: take-until ( sequence-parser quot: ( obj -- ? ) -- sequence/f )
+: take-until ( ... sequence-parser quot: ( ... obj -- ... ? ) -- ... sequence/f )
     over sequence-parse-end? [
         2drop f
     ] [
@@ -56,7 +56,7 @@ TUPLE: sequence-parser sequence n ;
         [ drop [ n>> ] [ sequence>> ] bi ] 2tri subseq f like
     ] if ; inline
 
-: take-while ( sequence-parser quot: ( obj -- ? ) -- sequence/f )
+: take-while ( ... sequence-parser quot: ( ... obj -- ... ? ) -- ... sequence/f )
     [ not ] compose take-until ; inline
 
 : <safe-slice> ( from to seq -- slice/f )
@@ -92,7 +92,7 @@ TUPLE: sequence-parser sequence n ;
         sequence-parser [ growing length - 1 + ] change-n drop
         ! sequence-parser advance drop
     ] [
-        saved sequence-parser (>>n)
+        saved sequence-parser n<<
         f
     ] if ;
 

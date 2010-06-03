@@ -3,7 +3,9 @@
 USING: accessors arrays assocs calendar combinators fry kernel
 generalizations io io.streams.string macros math math.functions
 math.parser peg.ebnf quotations sequences splitting strings
-unicode.categories unicode.case vectors combinators.smart ;
+unicode.categories unicode.case vectors combinators.smart
+present ;
+FROM: math.parser.private => format-float ;
 IN: formatting
 
 <PRIVATE
@@ -12,45 +14,29 @@ IN: formatting
     [ ] [ compose ] reduce ;
 
 : fix-sign ( string -- string )
-    dup CHAR: 0 swap index 0 = 
+    dup CHAR: 0 swap index 0 =
       [ dup 0 swap [ [ CHAR: 0 = not ] keep digit? and ] find-from
          [ dup 1 - rot dup [ nth ] dip swap
             {
                { CHAR: - [ [ 1 - ] dip remove-nth "-" prepend ] }
                { CHAR: + [ [ 1 - ] dip remove-nth "+" prepend ] }
-               [ drop swap drop ] 
-            } case 
+               [ drop swap drop ]
+            } case
          ] [ drop ] if
       ] when ;
 
-: >digits ( string -- digits ) 
+: >digits ( string -- digits )
     [ 0 ] [ string>number ] if-empty ;
 
-: pad-digits ( string digits -- string' )
-    [ "." split1 ] dip [ CHAR: 0 pad-tail ] [ head-slice ] bi "." glue ;
+: format-simple ( x digits string -- string )
+    [ [ >float ] [ number>string ] bi* "%." ] dip
+    surround format-float ;
 
-: max-digits ( n digits -- n' )
-    10^ [ * round ] keep / ; inline
+: format-scientific ( x digits -- string ) "e" format-simple ;
 
-: >exp ( x -- exp base )
-    [ 
-        abs 0 swap
-        [ dup [ 10.0 >= ] [ 1.0 < ] bi or ]
-        [ dup 10.0 >=
-          [ 10.0 / [ 1 + ] dip ]
-          [ 10.0 * [ 1 - ] dip ] if
-        ] while 
-     ] keep 0 < [ neg ] when ;
+: format-decimal ( x digits -- string ) "f" format-simple ;
 
-: exp>string ( exp base digits -- string )
-    [ max-digits ] keep -rot
-    [
-        [ 0 < "-" "+" ? ]
-        [ abs number>string 2 CHAR: 0 pad-head ] bi 
-        "e" -rot 3append
-    ]
-    [ number>string ] bi*
-    rot pad-digits prepend ;
+ERROR: unknown-printf-directive ;
 
 EBNF: parse-printf
 
@@ -58,30 +44,30 @@ zero      = "0"                  => [[ CHAR: 0 ]]
 char      = "'" (.)              => [[ second ]]
 
 pad-char  = (zero|char)?         => [[ CHAR: \s or ]]
-pad-align = ("-")?               => [[ \ pad-tail \ pad-head ? ]] 
+pad-align = ("-")?               => [[ \ pad-tail \ pad-head ? ]]
 pad-width = ([0-9])*             => [[ >digits ]]
 pad       = pad-align pad-char pad-width => [[ reverse >quotation dup first 0 = [ drop [ ] ] when ]]
 
 sign      = ("+")?               => [[ [ dup CHAR: - swap index [ "+" prepend ] unless ] [ ] ? ]]
 
 width_    = "." ([0-9])*         => [[ second >digits '[ _ short head ] ]]
-width     = (width_)?            => [[ [ ] or ]] 
+width     = (width_)?            => [[ [ ] or ]]
 
 digits_   = "." ([0-9])*         => [[ second >digits ]]
 digits    = (digits_)?           => [[ 6 or ]]
 
-fmt-%     = "%"                  => [[ [ "%" ] ]] 
+fmt-%     = "%"                  => [[ [ "%" ] ]]
 fmt-c     = "c"                  => [[ [ 1string ] ]]
 fmt-C     = "C"                  => [[ [ 1string >upper ] ]]
-fmt-s     = "s"                  => [[ [ dup number? [ number>string ] when ] ]]
-fmt-S     = "S"                  => [[ [ dup number? [ number>string ] when >upper ] ]]
-fmt-d     = "d"                  => [[ [ >fixnum number>string ] ]]
-fmt-e     = digits "e"           => [[ first '[ >exp _ exp>string ] ]]
-fmt-E     = digits "E"           => [[ first '[ >exp _ exp>string >upper ] ]]
-fmt-f     = digits "f"           => [[ first dup '[ >float _ max-digits number>string _ pad-digits ] ]] 
+fmt-s     = "s"                  => [[ [ present ] ]]
+fmt-S     = "S"                  => [[ [ present >upper ] ]]
+fmt-d     = "d"                  => [[ [ >integer number>string ] ]]
+fmt-e     = digits "e"           => [[ first '[ _ format-scientific ] ]]
+fmt-E     = digits "E"           => [[ first '[ _ format-scientific >upper ] ]]
+fmt-f     = digits "f"           => [[ first '[ _ format-decimal ] ]]
 fmt-x     = "x"                  => [[ [ >hex ] ]]
 fmt-X     = "X"                  => [[ [ >hex >upper ] ]]
-unknown   = (.)*                 => [[ "Unknown directive" throw ]]
+unknown   = (.)*                 => [[ unknown-printf-directive ]]
 
 strings_  = fmt-c|fmt-C|fmt-s|fmt-S
 strings   = pad width strings_   => [[ reverse compose-all ]]
@@ -89,9 +75,9 @@ strings   = pad width strings_   => [[ reverse compose-all ]]
 numbers_  = fmt-d|fmt-e|fmt-E|fmt-f|fmt-x|fmt-X
 numbers   = sign pad numbers_    => [[ unclip-last prefix compose-all [ fix-sign ] append ]]
 
-types     = strings|numbers 
+types     = strings|numbers
 
-lists     = "[%" types ", %]"    => [[ second '[ _ map ", " join "{ " prepend " }" append ] ]] 
+lists     = "[%" types ", %]"    => [[ second '[ _ map ", " join "{ " prepend " }" append ] ]]
 
 assocs    = "[%" types ": %" types " %]" => [[ [ second ] [ fourth ] bi '[ unzip [ _ map ] dip _ map zip [ ":" join ] map ", " join "{ " prepend " }" append ] ]]
 

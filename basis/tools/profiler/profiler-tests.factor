@@ -21,9 +21,9 @@ IN: tools.profiler.tests
 
 [ ] [ \ + usage-profile. ] unit-test
 
-: callback-test ( -- callback ) void { } "cdecl" [ ] alien-callback ;
+: callback-test ( -- callback ) void { } cdecl [ ] alien-callback ;
 
-: indirect-test ( callback -- ) void { } "cdecl" alien-indirect ;
+: indirect-test ( callback -- ) void { } cdecl alien-indirect ;
 
 : foobar ( -- ) ;
 

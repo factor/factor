@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators io io.binary io.encodings.binary
 io.streams.byte-array kernel math namespaces
-sequences strings io.crlf ;
+sequences strings ;
 IN: base64
 
 ERROR: malformed-base64 ;
@@ -35,7 +35,7 @@ SYMBOL: column
 : write1-lines ( ch -- )
     write1
     column get [
-        1 + [ 76 = [ crlf ] when ]
+        1 + [ 76 = [ B{ CHAR: \r CHAR: \n } write ] when ]
         [ 76 mod column set ] bi
     ] when* ;
 

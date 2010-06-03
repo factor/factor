@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types byte-arrays combinators fry
 grouping images kernel locals math math.vectors
-sequences specialized-arrays half-floats ;
+sequences specialized-arrays math.floats.half ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: half
 SPECIALIZED-ARRAY: float
@@ -25,15 +25,21 @@ CONSTANT: fill-value 255
         dup 4 >= [ drop fill-value ] [ _ nth ] if
     ] B{ } map-as ;
 
-:: permute ( bytes src-order dst-order -- new-bytes )
+:: permute ( bytes width stride src-order dst-order -- new-bytes )
     src-order name>> :> src
     dst-order name>> :> dst
-    bytes src length group
-    [ pad4 src dst permutation shuffle dst length head ]
-    map concat ;
+    bytes stride group
+    [
+        src length group width head
+        [ pad4 src dst permutation shuffle dst length head ] map concat
+    ] map concat ;
+
+: stride ( image -- n )
+    [ bitmap>> length ] [ dim>> second ] bi / ;
 
 : (reorder-components) ( image src-order dest-order -- image )
-    [ permute ] 2curry change-bitmap ;
+    [ [ ] [ dim>> first ] [ stride ] tri ] 2dip
+    '[ _ _ _ _ permute ] change-bitmap ;
 
 GENERIC: normalize-component-type* ( image component-type -- image )
 
@@ -41,13 +47,13 @@ GENERIC: normalize-component-type* ( image component-type -- image )
     [ 255.0 * >integer ] B{ } map-as ;
 
 M: float-components normalize-component-type*
-    drop byte-array>float-array normalize-floats ;
+    drop float-array-cast normalize-floats ;
 
 M: half-components normalize-component-type*
-    drop byte-array>half-array normalize-floats ;
+    drop half-array-cast normalize-floats ;
 
 : ushorts>ubytes ( bitmap -- bitmap' )
-    byte-array>ushort-array [ -8 shift ] B{ } map-as ; inline
+    ushort-array-cast [ -8 shift ] B{ } map-as ; inline
 
 M: ushort-components normalize-component-type*
     drop ushorts>ubytes ;

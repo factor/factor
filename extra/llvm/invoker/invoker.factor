@@ -32,7 +32,7 @@ TUPLE: function name alien return params ;
     LLVMGetFirstFunction [ (functions) ] { } make [ <function> ] map ;
 
 : function-effect ( function -- effect )
-    [ params>> [ first ] map ] [ return>> void? 0 1 ? ] bi <effect> ;
+    [ params>> keys ] [ return>> void? 0 1 ? ] bi <effect> ;
 
 : install-function ( function -- )
     dup name>> "alien.llvm" create-vocab drop
@@ -41,11 +41,11 @@ TUPLE: function name alien return params ;
         dup name>> function-pointer ,
         dup return>> c-type ,
         dup params>> [ second c-type ] map ,
-        "cdecl" , \ alien-indirect ,
+        cdecl , \ alien-indirect ,
     ] [ ] make swap function-effect [ define-declared ] with-compilation-unit ;
 
 : install-module ( name -- )
-    thejit get mps>> at [
+    current-jit mps>> at [
         module>> functions [ install-function ] each
     ] [ "no such module" throw ] if* ;
 

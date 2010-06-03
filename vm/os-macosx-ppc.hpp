@@ -62,11 +62,6 @@ inline static unsigned int uap_fpu_status(void *uap)
 	return mach_fpu_status(UAP_FS(uap));
 }
 
-template<typename Type> Type align_stack_pointer(Type sp)
-{
-	return sp;
-}
-
 inline static void mach_clear_fpu_status(ppc_float_state_t *float_state)
 {
 	FPSCR(float_state) &= 0x0007f8ff;

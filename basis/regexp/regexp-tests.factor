@@ -530,3 +530,8 @@ IN: regexp-tests
 [ f ] [ "π" R/ [\p{script=latin}--\p{lower}]/ matches? ] unit-test
 [ t ] [ "A" R/ [\p{script=latin}--\p{lower}]/ matches? ] unit-test
 [ f ] [ "3" R/ [\p{script=latin}--\p{lower}]/ matches? ] unit-test
+
+[ t ] [ " " R/ \P{alpha}/ matches? ] unit-test
+[ f ] [ "" R/ \P{alpha}/ matches? ] unit-test
+[ f ] [ "a " R/ \P{alpha}/ matches? ] unit-test
+[ f ] [ "a" R/ \P{alpha}/ matches? ] unit-test

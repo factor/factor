@@ -1,6 +1,7 @@
 ! (c)2009 Joe Groff bsd license
-USING: alien.c-types alien.data alien.libraries alien.syntax
-classes.struct kernel math system-info.windows windows.types ;
+USING: alien alien.c-types alien.data alien.libraries
+alien.syntax classes.struct kernel math system-info.windows
+windows.types ;
 IN: windows.dwmapi
 
 STRUCT: MARGINS
@@ -21,7 +22,7 @@ STRUCT: DWM_BLURBEHIND
 : full-window-margins ( -- MARGINS )
     -1 -1 -1 -1 <MARGINS> ; inline
 
-<< "dwmapi" "dwmapi.dll" "stdcall" add-library >>
+<< "dwmapi" "dwmapi.dll" stdcall add-library >>
 
 LIBRARY: dwmapi
 
@@ -33,5 +34,5 @@ CONSTANT: WM_DWMCOMPOSITIONCHANGED HEX: 31E
 
 : composition-enabled? ( -- ? )
     windows-major 6 >=
-    [ 0 <int> [ DwmIsCompositionEnabled drop ] keep *int c-bool> ]
+    [ { bool } [ DwmIsCompositionEnabled drop ] [ ] with-out-parameters ]
     [ f ] if ;

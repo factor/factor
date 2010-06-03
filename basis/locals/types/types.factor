@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2009 Slava Pestov, Eduardo Cavazos.
+! Copyright (C) 2007, 2010 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel sequences words
 quotations ;
@@ -35,11 +35,6 @@ PREDICATE: local < word "local?" word-prop ;
 
 M: local literalize ;
 
-PREDICATE: local-word < word "local-word?" word-prop ;
-
-: <local-word> ( name -- word )
-    f <word> dup t "local-word?" set-word-prop ;
-
 PREDICATE: local-reader < word "local-reader?" word-prop ;
 
 : <local-reader> ( name -- word )
@@ -58,5 +53,5 @@ PREDICATE: local-writer < word "local-writer?" word-prop ;
         [ nip ]
     } 2cleave ;
 
-UNION: lexical local local-reader local-writer local-word ;
+UNION: lexical local local-reader local-writer ;
 UNION: special lexical quote def ;

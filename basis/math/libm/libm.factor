@@ -1,62 +1,64 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types ;
+USING: alien alien.c-types alien.syntax ;
 IN: math.libm
 
-: facos ( x -- y )
-    double "libm" "acos" { double } alien-invoke ;
+LIBRARY: libm
 
-: fasin ( x -- y )
-    double "libm" "asin" { double } alien-invoke ;
+FUNCTION-ALIAS: facos
+    double acos ( double x ) ;
 
-: fatan ( x -- y )
-    double "libm" "atan" { double } alien-invoke ;
+FUNCTION-ALIAS: fasin
+    double asin ( double x ) ;
 
-: fatan2 ( x y -- z )
-    double "libm" "atan2" { double double } alien-invoke ;
+FUNCTION-ALIAS: fatan
+    double atan ( double x ) ;
 
-: fcos ( x -- y )
-    double "libm" "cos" { double } alien-invoke ;
+FUNCTION-ALIAS: fatan2
+    double atan2 ( double x, double y ) ;
 
-: fsin ( x -- y )
-    double "libm" "sin" { double } alien-invoke ;
+FUNCTION-ALIAS: fcos
+    double cos ( double x ) ;
 
-: ftan ( x -- y )
-    double "libm" "tan" { double } alien-invoke ;
+FUNCTION-ALIAS: fsin
+    double sin ( double x ) ;
 
-: fcosh ( x -- y )
-    double "libm" "cosh" { double } alien-invoke ;
+FUNCTION-ALIAS: ftan
+    double tan ( double x ) ;
 
-: fsinh ( x -- y )
-    double "libm" "sinh" { double } alien-invoke ;
+FUNCTION-ALIAS: fcosh
+    double cosh ( double x ) ;
 
-: ftanh ( x -- y )
-    double "libm" "tanh" { double } alien-invoke ;
+FUNCTION-ALIAS: fsinh
+    double sinh ( double x ) ;
 
-: fexp ( x -- y )
-    double "libm" "exp" { double } alien-invoke ;
+FUNCTION-ALIAS: ftanh
+    double tanh ( double x ) ;
 
-: flog ( x -- y )
-    double "libm" "log" { double } alien-invoke ;
+FUNCTION-ALIAS: fexp
+    double exp ( double x ) ;
 
-: flog10 ( x -- y )
-    double "libm" "log10" { double } alien-invoke ;
+FUNCTION-ALIAS: flog
+    double log ( double x ) ;
 
-: fpow ( x y -- z )
-    double "libm" "pow" { double double } alien-invoke ;
+FUNCTION-ALIAS: flog10
+    double log10 ( double x ) ;
 
-: fsqrt ( x -- y )
-    double "libm" "sqrt" { double } alien-invoke ;
+FUNCTION-ALIAS: fpow
+    double pow ( double x, double y ) ;
+
+FUNCTION-ALIAS: fsqrt
+    double sqrt ( double x ) ;
     
 ! Windows doesn't have these...
-: flog1+ ( x -- y )
-    double "libm" "log1p" { double } alien-invoke ;
+FUNCTION-ALIAS: flog1+
+    double log1p ( double x ) ;
 
-: facosh ( x -- y )
-    double "libm" "acosh" { double } alien-invoke ;
+FUNCTION-ALIAS: facosh
+    double acosh ( double x ) ;
 
-: fasinh ( x -- y )
-    double "libm" "asinh" { double } alien-invoke ;
+FUNCTION-ALIAS: fasinh
+    double asinh ( double x ) ;
 
-: fatanh ( x -- y )
-    double "libm" "atanh" { double } alien-invoke ;
+FUNCTION-ALIAS: fatanh
+    double atanh ( double x ) ;

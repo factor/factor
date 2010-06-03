@@ -14,25 +14,8 @@ ALIAS: n*quot (n*quot)
 
 >>
 
-MACRO: nsequence ( n seq -- )
-    [ [nsequence] ] keep
-    '[ @ _ like ] ;
-
-MACRO: narray ( n -- )
-    '[ _ { } nsequence ] ;
-
 MACRO: nsum ( n -- )
     1 - [ + ] n*quot ;
-
-MACRO: firstn-unsafe ( n -- )
-    [firstn] ;
-
-MACRO: firstn ( n -- )
-    dup zero? [ drop [ drop ] ] [
-        [ 1 - swap bounds-check 2drop ]
-        [ firstn-unsafe ]
-        bi-curry '[ _ _ bi ]
-    ] if ;
 
 MACRO: npick ( n -- )
     1 - [ dup ] [ '[ _ dip swap ] ] repeat ;
@@ -52,18 +35,6 @@ MACRO: nrot ( n -- )
 
 MACRO: -nrot ( n -- )
     1 - [ ] [ '[ swap _ dip ] ] repeat ;
-
-MACRO: set-firstn-unsafe ( n -- )
-    [ 1 + ]
-    [ iota [ '[ _ rot [ set-nth-unsafe ] keep ] ] map ] bi
-    '[ _ -nrot _ spread drop ] ;
-
-MACRO: set-firstn ( n -- )
-    dup zero? [ drop [ drop ] ] [
-        [ 1 - swap bounds-check 2drop ]
-        [ set-firstn-unsafe ]
-        bi-curry '[ _ _ bi ]
-    ] if ;
 
 MACRO: ndrop ( n -- )
     [ drop ] n*quot ;
@@ -125,13 +96,13 @@ MACRO: cleave* ( n -- )
 : mnapply ( quot m n -- )
     [ nip dupn ] [ nspread* ] 2bi ; inline
 
-: apply-curry ( ...a quot n -- )
+: apply-curry ( a... quot n -- )
     [ [curry] ] dip napply ; inline
 
-: cleave-curry ( a ...quot n -- )
+: cleave-curry ( a quot... n -- )
     [ [curry] ] swap [ napply ] [ cleave* ] bi ; inline
 
-: spread-curry ( ...a ...quot n -- )
+: spread-curry ( a... quot... n -- )
     [ [curry] ] swap [ napply ] [ spread* ] bi ; inline
 
 MACRO: mnswap ( m n -- )
@@ -143,9 +114,3 @@ MACRO: nweave ( n -- )
 
 MACRO: nbi-curry ( n -- )
     [ bi-curry ] n*quot ;
-
-: nappend-as ( n exemplar -- seq )
-    [ narray concat ] dip like ; inline
-
-: nappend ( n -- seq ) narray concat ; inline
-

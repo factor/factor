@@ -6,7 +6,7 @@ IN: game.worlds
 HELP: game-attributes
 { $class-description "Extends the " { $link world-attributes } " tuple class with extra attributes for " { $link game-world } "s:" }
 { $list
-{ { $snippet "tick-interval-micros" } " specifies the number of microseconds between consecutive calls to the world's " { $link tick-game-world } " method by the game loop. An integer greater than zero must be provided." }
+{ { $snippet "tick-interval-nanos" } " specifies the number of nanoseconds between consecutive calls to the world's " { $link tick-game-world } " method by the game loop. An integer greater than zero must be provided." }
 { { $snippet "use-game-input?" } " specifies whether the game world should initialize the " { $vocab-link "game.input" } " library for use by the game. False by default." }
 { { $snippet "use-audio-engine?" } " specifies whether the game world should manage an " { $link audio-engine } " instance. False by default." }
 { { $snippet "audio-engine-device" } " specifies the string name of the OpenAL device the audio engine, if any, should try to open. The default value of " { $link POSTPONE: f } " attempts to open the default OpenAL device." }

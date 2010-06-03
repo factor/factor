@@ -15,8 +15,9 @@ compiler.tree.optimizer
 
 compiler.cfg
 compiler.cfg.builder
+compiler.cfg.builder.alien
 compiler.cfg.optimizer
-compiler.cfg.mr
+compiler.cfg.finalization
 
 compiler.codegen ;
 IN: compiler
@@ -125,8 +126,10 @@ M: word combinator? inline? ;
 
 : backend ( tree word -- )
     build-cfg [
-        [ optimize-cfg build-mr ] with-cfg
-        [ generate ] [ label>> ] bi compiled get set-at
+        [
+            optimize-cfg finalize-cfg
+            [ generate ] [ label>> ] bi compiled get set-at
+        ] with-cfg
     ] each ;
 
 : compile-word ( word -- )

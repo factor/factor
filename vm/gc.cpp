@@ -135,49 +135,57 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 
 	/* Keep trying to GC higher and higher generations until we don't run out
 	of space */
-	if(setjmp(current_gc->gc_unwind))
+	for(;;)
 	{
-		/* We come back here if a generation is full */
-		start_gc_again();
-	}
-
-	current_gc->event->op = current_gc->op;
-
-	switch(current_gc->op)
-	{
-	case collect_nursery_op:
-		collect_nursery();
-		break;
-	case collect_aging_op:
-		collect_aging();
-		if(data->high_fragmentation_p())
+		try
 		{
-			current_gc->op = collect_full_op;
-			current_gc->event->op = collect_full_op;
-			collect_full(trace_contexts_p);
+			current_gc->event->op = current_gc->op;
+
+			switch(current_gc->op)
+			{
+			case collect_nursery_op:
+				collect_nursery();
+				break;
+			case collect_aging_op:
+				collect_aging();
+				if(data->high_fragmentation_p())
+				{
+					current_gc->op = collect_full_op;
+					current_gc->event->op = collect_full_op;
+					collect_full(trace_contexts_p);
+				}
+				break;
+			case collect_to_tenured_op:
+				collect_to_tenured();
+				if(data->high_fragmentation_p())
+				{
+					current_gc->op = collect_full_op;
+					current_gc->event->op = collect_full_op;
+					collect_full(trace_contexts_p);
+				}
+				break;
+			case collect_full_op:
+				collect_full(trace_contexts_p);
+				break;
+			case collect_compact_op:
+				collect_compact(trace_contexts_p);
+				break;
+			case collect_growing_heap_op:
+				collect_growing_heap(requested_bytes,trace_contexts_p);
+				break;
+			default:
+				critical_error("Bad GC op",current_gc->op);
+				break;
+			}
+
+			break;
 		}
-		break;
-	case collect_to_tenured_op:
-		collect_to_tenured();
-		if(data->high_fragmentation_p())
+		catch(const must_start_gc_again &)
 		{
-			current_gc->op = collect_full_op;
-			current_gc->event->op = collect_full_op;
-			collect_full(trace_contexts_p);
+			/* We come back here if a generation is full */
+			start_gc_again();
+			continue;
 		}
-		break;
-	case collect_full_op:
-		collect_full(trace_contexts_p);
-		break;
-	case collect_compact_op:
-		collect_compact(trace_contexts_p);
-		break;
-	case collect_growing_heap_op:
-		collect_growing_heap(requested_bytes,trace_contexts_p);
-		break;
-	default:
-		critical_error("Bad GC op",current_gc->op);
-		break;
 	}
 
 	end_gc();
@@ -207,16 +215,34 @@ void factor_vm::primitive_compact_gc()
 		true /* trace contexts? */);
 }
 
-void factor_vm::inline_gc(cell *data_roots_base, cell data_roots_size)
+void factor_vm::inline_gc(cell gc_roots_)
 {
-	data_roots.push_back(data_root_range(data_roots_base,data_roots_size));
-	primitive_minor_gc();
-	data_roots.pop_back();
+	cell stack_pointer = (cell)ctx->callstack_top;
+
+	if(to_boolean(gc_roots_))
+	{
+		tagged<array> gc_roots(gc_roots_);
+
+		cell capacity = array_capacity(gc_roots.untagged());
+		for(cell i = 0; i < capacity; i++)
+		{
+			cell spill_slot = untag_fixnum(array_nth(gc_roots.untagged(),i));
+			cell *address = (cell *)(spill_slot + stack_pointer);
+			data_roots.push_back(data_root_range(address,1));
+		}
+
+		primitive_minor_gc();
+
+		for(cell i = 0; i < capacity; i++)
+			data_roots.pop_back();
+	}
+	else
+		primitive_minor_gc();
 }
 
-VM_C_API void inline_gc(cell *data_roots_base, cell data_roots_size, factor_vm *parent)
+VM_C_API void inline_gc(cell gc_roots, factor_vm *parent)
 {
-	parent->inline_gc(data_roots_base,data_roots_size);
+	parent->inline_gc(gc_roots);
 }
 
 /*

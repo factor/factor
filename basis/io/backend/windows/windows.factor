@@ -5,7 +5,7 @@ io.buffers io.files io.ports io.binary io.timeouts system
 strings kernel math namespaces sequences windows.errors
 windows.kernel32 windows.shell32 windows.types splitting
 continuations math.bitwise accessors init sets assocs
-classes.struct classes ;
+classes.struct classes literals ;
 IN: io.backend.windows
 
 TUPLE: win32-handle < disposable handle ;
@@ -43,12 +43,12 @@ HOOK: add-completion io-backend ( port -- )
     <win32-file> |dispose
     dup add-completion ;
 
-: share-mode ( -- n )
-    {
+CONSTANT: share-mode
+    flags{
         FILE_SHARE_READ
         FILE_SHARE_WRITE
         FILE_SHARE_DELETE
-    } flags ; foldable
+    }
 
 : default-security-attributes ( -- obj )
     SECURITY_ATTRIBUTES <struct>

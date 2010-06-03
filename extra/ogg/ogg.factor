@@ -18,7 +18,7 @@ IN: ogg
     { [ os winnt? ]  [ "ogg.dll" ] }
     { [ os macosx? ] [ "libogg.0.dylib" ] }
     { [ os unix? ]   [ "libogg.so" ] }
-} cond "cdecl" add-library
+} cond cdecl add-library
 
 "ogg" deploy-library
 >>

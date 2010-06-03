@@ -70,10 +70,17 @@ PRIVATE>
 : unique-file ( prefix -- path )
     "" make-unique-file ;
 
-: move-file-unique ( path directory -- path' )
-    [
-        "" unique-file [ move-file ] keep
-    ] with-temporary-directory ;
+: move-file-unique ( path prefix suffix -- path' )
+    make-unique-file [ move-file ] keep ;
+
+: copy-file-unique ( path prefix suffix -- path' )
+    make-unique-file [ copy-file ] keep ;
+
+: temporary-file ( -- path ) "" unique-file ;
+
+: with-working-directory ( path quot -- )
+    over make-directories
+    dupd '[ _ _ with-temporary-directory ] with-directory ; inline
 
 {
     { [ os unix? ] [ "io.files.unique.unix" ] }

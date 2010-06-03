@@ -199,7 +199,7 @@ CONSTANT: THREAD_PRIORITY_LOWEST -2
 CONSTANT: THREAD_PRIORITY_NORMAL 0
 CONSTANT: THREAD_PRIORITY_TIME_CRITICAL 15
 
-C-ENUM:
+ENUM: COMPUTER_NAME_FORMAT
     ComputerNameNetBIOS
     ComputerNameDnsHostname
     ComputerNameDnsDomain
@@ -209,8 +209,6 @@ C-ENUM:
     ComputerNamePhysicalDnsDomain
     ComputerNamePhysicalDnsFullyQualified
     ComputerNameMax ;
-
-TYPEDEF: uint COMPUTER_NAME_FORMAT
 
 STRUCT: OVERLAPPED
     { internal UINT_PTR }
@@ -1352,7 +1350,7 @@ FUNCTION: DWORD GetPriorityClass ( HANDLE hProcess ) ;
 ! FUNCTION: GetPrivateProfileStringW
 ! FUNCTION: GetPrivateProfileStructA
 ! FUNCTION: GetPrivateProfileStructW
-FUNCTION: LPVOID GetProcAddress ( HMODULE hModule, char* lpProcName ) ;
+FUNCTION: LPVOID GetProcAddress ( HMODULE hModule, c-string lpProcName ) ;
 ! FUNCTION: GetProcessAffinityMask
 ! FUNCTION: GetProcessHandleCount
 ! FUNCTION: GetProcessHeap

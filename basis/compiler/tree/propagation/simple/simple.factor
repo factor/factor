@@ -72,7 +72,7 @@ M: #declare propagate-before
 
 : foldable-call? ( #call word -- ? )
     {
-        [ nip "foldable" word-prop ]
+        [ nip foldable? ]
         [ drop literal-inputs? ]
         [ input-classes-match? ]
     } 2&& ;

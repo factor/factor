@@ -2,46 +2,49 @@ USING: help.markup help.syntax calendar quotations system ;
 IN: alarms
 
 HELP: alarm
-{ $class-description "An alarm. Can be passed to " { $link cancel-alarm } "." } ;
+{ $class-description "An alarm. Can be passed to " { $link stop-alarm } "." } ;
 
-HELP: current-alarm
-{ $description "A symbol that contains the currently executing alarm, availble only to the alarm quotation. One use for this symbol is if a repeated alarm wishes to cancel itself from executing in the future."
-}
-{ $examples
-    { $unchecked-example
-        """USING: alarms calendar io threads ;"""
-        """["""
-        """    "Hi, this should only get printed once..." print flush"""
-        """    current-alarm get cancel-alarm"""
-        """] 1 seconds every"""
-        ""
-    }
-} ;
-
-HELP: add-alarm
-{ $values { "quot" quotation } { "start" duration } { "interval" { $maybe "duration/f" } } { "alarm" alarm } }
-{ $description "Creates and registers an alarm to start at " { $snippet "start" } " offset from the current time. If " { $snippet "interval" } " is " { $link f } ", this will be a one-time alarm, otherwise it will fire with the given frequency, with scheduling happening before the quotation is called in order to ensure that the next event will happen on time. The quotation will be called from a new thread spawned by the alarm thread. If a repeated alarm's quotation throws an exception, the alarm will not be rescheduled." } ;
-
-HELP: later
-{ $values { "quot" quotation } { "duration" duration } { "alarm" alarm } }
-{ $description "Creates and registers an alarm which calls the quotation once at " { $snippet "duration" } " offset from now." }
-{ $examples
-    { $unchecked-example
-        "USING: alarms io calendar ;"
-        """[ "Break's over!" print flush ] 15 minutes drop"""
-        ""
-    }
-} ;
-
-HELP: cancel-alarm
+HELP: start-alarm
 { $values { "alarm" alarm } }
-{ $description "Cancels an alarm. Does nothing if the alarm is not active." } ;
+{ $description "Starts an alarm." } ;
+
+HELP: restart-alarm
+{ $values { "alarm" alarm } }
+{ $description "Starts or restarts an alarm. Restarting an alarm causes the a sleep of initial delay nanoseconds before looping. An alarm's parameters may be modified and restarted with this word." } ;
+
+HELP: stop-alarm
+{ $values { "alarm" alarm } }
+{ $description "Prevents an alarm from calling its quotation again. Has no effect on alarms that are not currently running." } ;
 
 HELP: every
 { $values
+     { "quot" quotation } { "interval-duration" duration }
+     { "alarm" alarm } }
+{ $description "Creates an alarm that calls the quotation repeatedly, using " { $snippet "duration" } " as the frequency. The first call of " { $snippet "quot" } " will happen immediately. If the quotation throws an exception, the alarm will stop." }
+{ $examples
+    { $unchecked-example
+        "USING: alarms io calendar ;"
+        """[ "Hi Buddy." print flush ] 10 seconds every drop"""
+        ""
+    }
+} ;
+
+HELP: later
+{ $values { "quot" quotation } { "delay-duration" duration } { "alarm" alarm } }
+{ $description "Sleeps for " { $snippet "duration" } " and then calls a " { $snippet "quot" } ". The user may cancel the alarm before " { $snippet "quot" } " runs. This alarm is not repeated." }
+{ $examples
+    { $unchecked-example
+        "USING: alarms io calendar ;"
+        """[ "Break's over!" print flush ] 15 minutes later drop"""
+        ""
+    }
+} ;
+
+HELP: delayed-every
+{ $values
      { "quot" quotation } { "duration" duration }
      { "alarm" alarm } }
-{ $description "Creates and registers an alarm which calls the quotation repeatedly, using " { $snippet "dt" } " as the frequency. If the quotation throws an exception that is not caught inside it, the alarm scheduler will cancel the alarm and will not reschedule it again." }
+{ $description "Creates an alarm that calls " { $snippet "quot" } " repeatedly, waiting " { $snippet "duration" } " before calling " { $snippet "quot" } " the first time and then waiting " { $snippet "duration" } " between further calls. If the quotation throws an exception, the alarm will stop." }
 { $examples
     { $unchecked-example
         "USING: alarms io calendar ;"
@@ -51,19 +54,21 @@ HELP: every
 } ;
 
 ARTICLE: "alarms" "Alarms"
-"The " { $vocab-link "alarms" } " vocabulary provides a lightweight way to schedule one-time and recurring tasks without spawning a new thread. Alarms use " { $link nano-count } ", so they continue to work across system clock changes." $nl
+"The " { $vocab-link "alarms" } " vocabulary provides a lightweight way to schedule one-time and recurring tasks. Alarms run in a single green thread per alarm and consist of a quotation, a delay duration, and an interval duration. After starting an alarm, the alarm thread sleeps for the delay duration and calls the quotation. Then it waits out the interval duration and calls the quotation again until something stops the alarm. If a recurring alarm's quotation would be scheduled to run again before the previous quotation has finished processing, the alarm will be run again immediately afterwards. This may result in the alarm falling behind indefinitely, in which case the it will run as often as possible while still allowing other green threads to run. Recurring alarms that execute 'on time' or 'catch up' will always be scheduled for an exact multiple of the interval from the original starting time to prevent the alarm from drifting over time. Alarms use " { $link nano-count } " as the timing primitive, so they will continue to work across system clock changes." $nl
 "The alarm class:"
 { $subsections alarm }
-"Register a recurring alarm:"
+"Create an alarm before starting it:"
+{ $subsections <alarm> }
+"Starting an alarm:"
+{ $subsections start-alarm restart-alarm }
+"Stopping an alarm:"
+{ $subsections stop-alarm }
+
+"A recurring alarm without an initial delay:"
 { $subsections every }
-"Register a one-time alarm:"
+"A one-time alarm with an initial delay:"
 { $subsections later }
-"The currently executing alarm:"
-{ $subsections current-alarm }
-"Low-level interface to add alarms:"
-{ $subsections add-alarm }
-"Cancelling an alarm:"
-{ $subsections cancel-alarm }
-"Alarms do not persist across image saves. Saving and restoring an image has the effect of calling " { $link cancel-alarm } " on all " { $link alarm } " instances." ;
+"A recurring alarm with an initial delay:"
+{ $subsections delayed-every } ;
 
 ABOUT: "alarms"

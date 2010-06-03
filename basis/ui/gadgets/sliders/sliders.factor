@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel math namespaces sequences
 vectors models models.range math.vectors math.functions quotations
@@ -234,7 +234,7 @@ PRIVATE>
 : <slider> ( range orientation -- slider )
     slider new-track
         swap >>model
-        32 >>line
+        16 >>line
         dup orientation>> {
             [ <slider-pen> >>interior ]
             [ <thumb> >>thumb ]

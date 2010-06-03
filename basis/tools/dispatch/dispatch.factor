@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces prettyprint classes.struct
 vm tools.dispatch.private ;
@@ -17,8 +17,7 @@ SYMBOL: last-dispatch-stats
         { "Tuple check count" [ pic-tuple-count>> ] }
     } object-table. ;
 
-: collect-dispatch-stats ( quot -- )
+: collect-dispatch-stats ( quot -- dispatch-statistics )
     reset-dispatch-stats
     call
-    dispatch-stats dispatch-statistics memory>struct
-    last-dispatch-stats set ; inline
+    dispatch-stats dispatch-statistics memory>struct ; inline

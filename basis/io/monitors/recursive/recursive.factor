@@ -1,9 +1,10 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors sequences assocs arrays continuations
 destructors combinators kernel threads concurrency.messaging
 concurrency.mailboxes concurrency.promises io.files io.files.info
-io.directories io.pathnames io.monitors debugger fry ;
+io.directories io.pathnames io.monitors io.monitors.private
+debugger fry ;
 IN: io.monitors.recursive
 
 ! Simulate recursive monitors on platforms that don't have them
@@ -71,12 +72,14 @@ M: recursive-monitor dispose*
     ] with with each ;
 
 : pump-loop ( -- )
-    receive dup +stop+ eq? [
-        drop stop-pump
-    ] [
-        [ '[ _ update-hierarchy ] ignore-errors ] [ pump-step ] bi
-        pump-loop
-    ] if ;
+    receive {
+        { [ dup +stop+ eq? ] [ drop stop-pump ] }
+        { [ dup monitor-disposed eq? ] [ drop ] }
+        [
+            [ '[ _ update-hierarchy ] ignore-errors ] [ pump-step ] bi
+            pump-loop
+        ]
+    } cond ;
 
 : monitor-ready ( error/t -- )
     monitor tget ready>> fulfill ;

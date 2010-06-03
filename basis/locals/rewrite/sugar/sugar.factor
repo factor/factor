@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.tuple fry
-generalizations hashtables kernel locals locals.backend
+sequences.generalizations hashtables kernel locals locals.backend
 locals.errors locals.types make quotations sequences vectors
 words ;
 IN: locals.rewrite.sugar
@@ -81,9 +81,6 @@ M: local-reader rewrite-element , ;
 
 M: local-writer rewrite-element
     local-writer-in-literal-error ;
-
-M: local-word rewrite-element
-    local-word-in-literal-error ;
 
 M: word rewrite-element <wrapper> , ;
 

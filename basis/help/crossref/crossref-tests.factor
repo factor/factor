@@ -62,4 +62,4 @@ ARTICLE: "crossref-test-1" "Crossref test 1"
 ARTICLE: "crossref-test-2" "Crossref test 2"
 { $markup-example { $subsection "crossref-test-1" } } ;
 
-[ V{ } ] [ "crossref-test-2" >link article-children ] unit-test
+[ { } ] [ "crossref-test-2" >link article-children ] unit-test

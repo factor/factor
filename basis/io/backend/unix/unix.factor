@@ -67,12 +67,11 @@ M: io-timeout summary drop "I/O operation timed out" ;
 
 : wait-for-fd ( handle event -- )
     dup +retry+ eq? [ 2drop ] [
-        '[
-            swap handle-fd mx get-global _ {
-                { +input+ [ add-input-callback ] }
-                { +output+ [ add-output-callback ] }
-            } case
-        ] "I/O" suspend nip [ io-timeout ] when
+        [ [ self ] dip handle-fd mx get-global ] dip {
+            { +input+ [ add-input-callback ] }
+            { +output+ [ add-output-callback ] }
+        } case
+        "I/O" suspend [ io-timeout ] when
     ] if ;
 
 : wait-for-port ( port event -- )
@@ -145,7 +144,7 @@ M: stdin dispose*
         tri
     ] with-destructors ;
 
-: wait-for-stdin ( stdin -- n )
+: wait-for-stdin ( stdin -- size )
     [ control>> CHAR: X over io:stream-write1 io:stream-flush ]
     [ size>> ssize_t heap-size swap io:stream-read *int ]
     bi ;
@@ -161,7 +160,12 @@ M: stdin dispose*
     ] if ;
 
 M: stdin refill
-    [ buffer>> ] [ dup wait-for-stdin ] bi* refill-stdin f ;
+    '[
+        buffer>> _ dup wait-for-stdin refill-stdin f
+    ] with-timeout ;
+
+M: stdin cancel-operation
+    [ size>> ] [ control>> ] bi [ cancel-operation ] bi@ ;
 
 : control-write-fd ( -- fd ) &: control_write *uint ;
 

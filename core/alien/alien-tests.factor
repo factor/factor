@@ -1,6 +1,7 @@
 USING: accessors alien alien.accessors alien.syntax byte-arrays arrays
 kernel kernel.private namespaces tools.test sequences libc math
 system prettyprint layouts alien.libraries sets ;
+FROM: namespaces => set ;
 IN: alien.tests
 
 [ t ] [ -1 <alien> alien-address 0 > ] unit-test
@@ -63,13 +64,13 @@ cell 8 = [
 
 [ 1 1 <displaced-alien> ] must-fail
 
-[ f ] [ 0 B{ 1 2 3 } <displaced-alien> pinned-c-ptr? ] unit-test
+[ f ] [ 1 B{ 1 2 3 } <displaced-alien> pinned-c-ptr? ] unit-test
 
-[ f ] [ 0 B{ 1 2 3 } <displaced-alien> 1 swap <displaced-alien> pinned-c-ptr? ] unit-test
+[ f ] [ 2 B{ 1 2 3 } <displaced-alien> 1 swap <displaced-alien> pinned-c-ptr? ] unit-test
 
 [ t ] [ 0 B{ 1 2 3 } <displaced-alien> 1 swap <displaced-alien> underlying>> byte-array? ] unit-test
 
-[ "( displaced alien )" ] [ 0 B{ 1 2 3 } <displaced-alien> unparse ] unit-test
+[ "( displaced alien )" ] [ 1 B{ 1 2 3 } <displaced-alien> unparse ] unit-test
 
 SYMBOL: initialize-test
 
@@ -83,4 +84,4 @@ f initialize-test set-global
 
 [ 7575 ] [ initialize-test [ 7575 ] initialize-alien ] unit-test
 
-[ V{ BAD-ALIEN } ] [ { BAD-ALIEN BAD-ALIEN BAD-ALIEN } prune ] unit-test
+[ { BAD-ALIEN } ] [ { BAD-ALIEN BAD-ALIEN BAD-ALIEN } members ] unit-test

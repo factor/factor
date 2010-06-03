@@ -33,18 +33,17 @@ CONSTANT: WS_MINIMIZEBOX      HEX: 00020000
 CONSTANT: WS_MAXIMIZEBOX      HEX: 00010000
 
 ! Common window styles
-: WS_OVERLAPPEDWINDOW ( -- n )
-    {
+CONSTANT: WS_OVERLAPPEDWINDOW
+    flags{
         WS_OVERLAPPED
         WS_CAPTION
         WS_SYSMENU
         WS_THICKFRAME
         WS_MINIMIZEBOX
         WS_MAXIMIZEBOX
-    } flags ; foldable
+    }
 
-: WS_POPUPWINDOW ( -- n )
-    { WS_POPUP WS_BORDER WS_SYSMENU } flags ; foldable
+CONSTANT: WS_POPUPWINDOW flags{ WS_POPUP WS_BORDER WS_SYSMENU }
 
 ALIAS: WS_CHILDWINDOW      WS_CHILD
 
@@ -76,11 +75,11 @@ CONSTANT: WS_EX_CONTROLPARENT     HEX: 00010000
 CONSTANT: WS_EX_STATICEDGE        HEX: 00020000
 CONSTANT: WS_EX_APPWINDOW         HEX: 00040000
 
-: WS_EX_OVERLAPPEDWINDOW ( -- n )
-    WS_EX_WINDOWEDGE WS_EX_CLIENTEDGE bitor ; foldable
+CONSTANT: WS_EX_OVERLAPPEDWINDOW
+    flags{ WS_EX_WINDOWEDGE WS_EX_CLIENTEDGE }
 
-: WS_EX_PALETTEWINDOW ( -- n )
-    { WS_EX_WINDOWEDGE WS_EX_TOOLWINDOW WS_EX_TOPMOST } flags ; foldable
+CONSTANT: WS_EX_PALETTEWINDOW 
+    flags{ WS_EX_WINDOWEDGE WS_EX_TOOLWINDOW WS_EX_TOPMOST }
 
 CONSTANT: CS_VREDRAW          HEX: 0001
 CONSTANT: CS_HREDRAW          HEX: 0002
@@ -580,8 +579,8 @@ CONSTANT: SWP_HIDEWINDOW 128
 CONSTANT: SWP_NOCOPYBITS 256
 CONSTANT: SWP_NOOWNERZORDER 512
 CONSTANT: SWP_NOSENDCHANGING 1024
-CONSTANT: SWP_DRAWFRAME SWP_FRAMECHANGED
-CONSTANT: SWP_NOREPOSITION SWP_NOOWNERZORDER
+ALIAS: SWP_DRAWFRAME SWP_FRAMECHANGED
+ALIAS: SWP_NOREPOSITION SWP_NOOWNERZORDER
 CONSTANT: SWP_DEFERERASE 8192
 CONSTANT: SWP_ASYNCWINDOWPOS 16384
 
@@ -927,6 +926,87 @@ STRUCT: RAWINPUTDEVICELIST
     { dwType  DWORD  } ;
 TYPEDEF: RAWINPUTDEVICELIST* PRAWINPUTDEVICELIST
 
+CONSTANT: CCHFORMNAME 32
+
+CONSTANT: CDS_UPDATEREGISTRY      HEX: 00000001
+CONSTANT: CDS_TEST                HEX: 00000002
+CONSTANT: CDS_FULLSCREEN          HEX: 00000004
+CONSTANT: CDS_GLOBAL              HEX: 00000008
+CONSTANT: CDS_SET_PRIMARY         HEX: 00000010
+CONSTANT: CDS_RESET               HEX: 40000000
+CONSTANT: CDS_SETRECT             HEX: 20000000
+CONSTANT: CDS_NORESET             HEX: 10000000
+
+CONSTANT: DISP_CHANGE_SUCCESSFUL 0
+CONSTANT: DISP_CHANGE_RESTART 1
+CONSTANT: DISP_CHANGE_FAILED     -1
+CONSTANT: DISP_CHANGE_BADMODE    -2
+CONSTANT: DISP_CHANGE_NOTUPDATED -3
+CONSTANT: DISP_CHANGE_BADFLAGS   -4
+CONSTANT: DISP_CHANGE_BADPARAM   -5
+
+
+
+STRUCT: DEVMODE
+    { dmDeviceName TCHAR[CCHDEVICENAME] }
+    { dmSpecVersion WORD }
+    { dmDriverVersion WORD }
+    { dmSize WORD }
+    { dmDriverExtra WORD }
+    { dmFields DWORD }
+
+    { dmOrientation short }
+    { dmPaperSize short }
+    { dmPaperLength short }
+    { dmPaperWidth short }
+    { dmScale short }
+    { dmCopies short }
+    { dmDefaultSource short }
+    { dmPrintQuality short }
+
+    { dmColor short }
+    { dmDuplex short }
+    { dmYResolution short }
+    { dmTTOption short }
+    { dmCollate short }
+    { dmFormName TCHAR[CCHFORMNAME] }
+    { dmLogPixels WORD }
+    { dmBitsPerPel DWORD }
+    { dmPelsWidth DWORD }
+    { dmPelsHeight DWORD }
+    { dmDisplayFlags DWORD }
+    { dmDisplayFrequency DWORD }
+    { dmiCMMethod DWORD }
+    { dmICMIntent DWORD }
+
+    { dmMediaType DWORD }
+    { dmDitherType DWORD }
+    { dmReserved1 DWORD }
+    { dmReserved2 DWORD }
+    { dmPanningWidth DWORD } ;
+
+! union { DWORD dmDisplayFlags; DWORD dmNup; } ;
+  ! union {
+    ! struct {
+      ! short dmOrientation;
+      ! short dmPaperSize;
+      ! short dmPaperLength;
+      ! short dmPaperWidth;
+      ! short dmScale;
+      ! short dmCopies;
+      ! short dmDefaultSource;
+      ! short dmPrintQuality;
+    ! } ;
+    ! struct {
+      ! POINTL dmPosition;
+      ! DWORD dmDisplayOrientation;
+      ! DWORD dmDisplayFixedOutput;
+    ! } ;
+  ! } ;
+
+TYPEDEF: DEVMODE* PDEVMODE
+TYPEDEF: DEVMODE* LPDEVMODE
+
 LIBRARY: user32
 
 FUNCTION: HKL ActivateKeyboardLayout ( HKL hkl, UINT Flags ) ;
@@ -965,10 +1045,10 @@ FUNCTION: HDC BeginPaint ( HWND hwnd, LPPAINTSTRUCT lpPaint ) ;
 ! FUNCTION: CascadeChildWindows
 ! FUNCTION: CascadeWindows
 ! FUNCTION: ChangeClipboardChain
-! FUNCTION: ChangeDisplaySettingsA
-! FUNCTION: ChangeDisplaySettingsExA
-! FUNCTION: ChangeDisplaySettingsExW
-! FUNCTION: ChangeDisplaySettingsW
+FUNCTION: LONG ChangeDisplaySettingsExW ( LPCTSTR lpszDeviceName, DEVMODE *lpDevMode, HWND hwnd, DWORD dwFlags, LPVOID lParam ) ;
+FUNCTION: LONG ChangeDisplaySettingsW ( DEVMODE *lpDevMode, DWORD dwFlags ) ;
+ALIAS: ChangeDisplaySettingsEx ChangeDisplaySettingsExW
+ALIAS: ChangeDisplaySettings ChangeDisplaySettingsW
 ! FUNCTION: ChangeMenuA
 ! FUNCTION: ChangeMenuW
 ! FUNCTION: CharLowerA
@@ -1169,11 +1249,12 @@ FUNCTION: UINT EnumClipboardFormats ( UINT format ) ;
 ! FUNCTION: EnumDesktopWindows
 ! FUNCTION: EnumDisplayDevicesA
 ! FUNCTION: EnumDisplayDevicesW
-! FUNCTION: EnumDisplayMonitors
+! FUNCTION: BOOL EnumDisplayMonitors ( HDC hdc, LPCRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData ) ;
 ! FUNCTION: EnumDisplaySettingsA
 ! FUNCTION: EnumDisplaySettingsExA
 ! FUNCTION: EnumDisplaySettingsExW
-! FUNCTION: EnumDisplaySettingsW
+FUNCTION: BOOL EnumDisplaySettingsW ( LPCTSTR lpszDeviceName, DWORD iModeNum, DEVMODE *lpDevMode ) ;
+ALIAS: EnumDisplaySettings EnumDisplaySettingsW
 ! FUNCTION: EnumPropsA
 ! FUNCTION: EnumPropsExA
 ! FUNCTION: EnumPropsExW
@@ -1186,8 +1267,8 @@ FUNCTION: UINT EnumClipboardFormats ( UINT format ) ;
 ! FUNCTION: ExcludeUpdateRgn
 ! FUNCTION: ExitWindowsEx
 FUNCTION: int FillRect ( HDC hDC, RECT* lprc, HBRUSH hbr ) ;
-FUNCTION: HWND FindWindowA ( char* lpClassName, char* lpWindowName ) ;
-FUNCTION: HWND FindWindowExA ( HWND hwndParent, HWND childAfter, char* lpClassName, char* lpWindowName ) ;
+FUNCTION: HWND FindWindowA ( c-string lpClassName, c-string lpWindowName ) ;
+FUNCTION: HWND FindWindowExA ( HWND hwndParent, HWND childAfter, c-string lpClassName, c-string lpWindowName ) ;
 ! FUNCTION: FindWindowExW
 ! FUNCTION: FindWindowW
 ! FUNCTION: FlashWindow
@@ -1236,7 +1317,7 @@ FUNCTION: DWORD GetClipboardSequenceNumber ( ) ;
 ! FUNCTION: GetCursorPos
 FUNCTION: HDC GetDC ( HWND hWnd ) ;
 FUNCTION: HDC GetDCEx ( HWND hWnd, HRGN hrgnClip, DWORD flags ) ;
-! FUNCTION: GetDesktopWindow
+FUNCTION: HWND GetDesktopWindow ( ) ;
 ! FUNCTION: GetDialogBaseUnits
 ! FUNCTION: GetDlgCtrlID
 ! FUNCTION: GetDlgItem
@@ -1245,7 +1326,7 @@ FUNCTION: HDC GetDCEx ( HWND hWnd, HRGN hrgnClip, DWORD flags ) ;
 ! FUNCTION: GetDlgItemTextW
 FUNCTION: uint GetDoubleClickTime ( ) ;
 FUNCTION: HWND GetFocus ( ) ;
-! FUNCTION: GetForegroundWindow
+FUNCTION: HWND GetForegroundWindow ( ) ;
 ! FUNCTION: GetGuiResources
 ! FUNCTION: GetGUIThreadInfo
 ! FUNCTION: GetIconInfo
@@ -1345,6 +1426,9 @@ FUNCTION: HWND GetWindow ( HWND hWnd, UINT uCmd ) ;
 ! FUNCTION: GetWindowLongW
 FUNCTION: LONG_PTR GetWindowLongW ( HANDLE hWnd, int index ) ;
 ALIAS: GetWindowLong GetWindowLongW
+
+FUNCTION: LONG_PTR GetWindowLongPtrW ( HWND hWnd, int nIndex ) ;
+ALIAS: GetWindowLongPtr GetWindowLongPtrW
 ! FUNCTION: GetWindowModuleFileName
 ! FUNCTION: GetWindowModuleFileNameA
 ! FUNCTION: GetWindowModuleFileNameW
@@ -1691,6 +1775,9 @@ FUNCTION: LONG_PTR SetWindowLongW ( HANDLE hWnd, int index, LONG_PTR dwNewLong )
 ALIAS: SetWindowLong SetWindowLongW
 ! FUNCTION: SetWindowPlacement
 FUNCTION: BOOL SetWindowPos ( HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags ) ;
+
+FUNCTION: LONG_PTR SetWindowLongPtrW ( HWND hWnd, int nIndex, LONG_PTR dwNewLong ) ;
+ALIAS: SetWindowLongPtr SetWindowLongPtrW
 
 : HWND_BOTTOM ( -- alien ) 1 <alien> ;
 : HWND_NOTOPMOST ( -- alien ) -2 <alien> ;

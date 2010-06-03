@@ -17,7 +17,7 @@ $nl
 
 ARTICLE: "tools.deploy.usage" "Deploy tool usage"
 "Once the necessary deployment flags have been set, the application can be deployed:"
-{ $subsections deploy }
+{ $subsections deploy deploy-image-only }
 "For example, you can deploy the " { $vocab-link "hello-ui" } " demo which comes with Factor. Note that this demo already has a deployment configuration, so nothing needs to be configured:"
 { $code "\"hello-ui\" deploy" }
 { $list
@@ -61,4 +61,10 @@ ABOUT: "tools.deploy"
 
 HELP: deploy
 { $values { "vocab" "a vocabulary specifier" } }
-{ $description "Deploys " { $snippet "vocab" } ", saving the deployed image as " { $snippet { $emphasis "vocab" } ".image" } "." } ;
+{ $description "Deploys " { $snippet "vocab" } " into a packaged application. This will create a directory containing the Factor VM, a deployed image set up to run the " { $link POSTPONE: MAIN: } " entry point of " { $snippet "vocab" } " at startup, and any " { $link "deploy-resources" } " and shared libraries the application depends on. On Mac OS X, the deployment directory will be a standard " { $snippet ".app" } " bundle executable from Finder. To only generate the Factor image, use " { $link deploy-image-only } "." } ;
+
+HELP: deploy-image-only
+{ $values { "vocab" "a vocabulary specifier" } { "image" "a pathname" } }
+{ $description "Deploys " { $snippet "vocab" } ", saving the deployed image to the location specified by " { $snippet "image" } ". This only builds the Factor image for the vocabulary; to create a complete packaged application, use " { $link deploy } "." } ;
+
+{ deploy deploy-image-only } related-words

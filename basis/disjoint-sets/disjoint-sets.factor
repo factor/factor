@@ -74,6 +74,10 @@ GENERIC: disjoint-set-member? ( a disjoint-set -- ? )
 
 M: disjoint-set disjoint-set-member? parents>> key? ;
 
+GENERIC: disjoint-set-members ( disjoint-set -- seq )
+
+M: disjoint-set disjoint-set-members parents>> keys ;
+
 GENERIC: equiv-set-size ( a disjoint-set -- n )
 
 M: disjoint-set equiv-set-size [ representative ] keep count ;

@@ -1,10 +1,18 @@
-! Copyright (C) 2003, 2009 Slava Pestov.
+! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays vectors kernel kernel.private sequences
 namespaces make math splitting sorting quotations assocs
 combinators combinators.private accessors words ;
 IN: continuations
 
+: with-datastack ( stack quot -- new-stack )
+    [
+        [ [ datastack ] dip swap [ { } like set-datastack ] dip ] dip
+        swap [ call datastack ] dip
+        swap [ set-datastack ] dip
+    ] (( stack quot -- new-stack )) call-effect-unsafe ;
+
+SYMBOL: original-error
 SYMBOL: error
 SYMBOL: error-continuation
 SYMBOL: error-thread
@@ -13,7 +21,7 @@ SYMBOL: restarts
 <PRIVATE
 
 : catchstack* ( -- catchstack )
-    1 special-object { vector } declare ; inline
+    1 context-object { vector } declare ; inline
 
 : >c ( continuation -- ) catchstack* push ;
 
@@ -23,13 +31,14 @@ SYMBOL: restarts
 : dummy-1 ( -- obj ) f ;
 : dummy-2 ( obj -- obj ) dup drop ;
 
-: init-catchstack ( -- ) V{ } clone 1 set-special-object ;
-
-PRIVATE>
-
 : catchstack ( -- catchstack ) catchstack* clone ; inline
 
-: set-catchstack ( catchstack -- ) >vector 1 set-special-object ; inline
+: set-catchstack ( catchstack -- )
+    >vector 1 set-context-object ; inline
+
+: init-catchstack ( -- ) f set-catchstack ;
+
+PRIVATE>
 
 TUPLE: continuation data call retain name catch ;
 
@@ -39,14 +48,12 @@ C: <continuation> continuation
     datastack callstack retainstack namestack catchstack
     <continuation> ;
 
+<PRIVATE
+
 : >continuation< ( continuation -- data call retain name catch )
-    {
-        [ data>>   ]
-        [ call>>   ]
-        [ retain>> ]
-        [ name>>   ]
-        [ catch>>  ]
-    } cleave ;
+    { [ data>> ] [ call>> ] [ retain>> ] [ name>> ] [ catch>> ] } cleave ;
+
+PRIVATE>
 
 : ifcc ( capture restore -- )
     [ dummy-1 continuation ] 2dip [ dummy-2 ] prepose ?if ; inline
@@ -91,21 +98,13 @@ SYMBOL: return-continuation
 : return ( -- * )
     return-continuation get continue ;
 
-: with-datastack ( stack quot -- newstack )
-    [
-        [
-            [ [ { } like set-datastack ] dip call datastack ] dip
-            continue-with
-        ] (( stack quot continuation -- * )) call-effect-unsafe
-    ] callcc1 2nip ;
-
 GENERIC: compute-restarts ( error -- seq )
 
 <PRIVATE
 
 : save-error ( error -- )
-    dup error set-global
-    compute-restarts restarts set-global ;
+    [ error set-global ]
+    [ compute-restarts restarts set-global ] bi ;
 
 PRIVATE>
 
@@ -115,11 +114,12 @@ SYMBOL: thread-error-hook
     dup save-error
     catchstack* empty? [
         thread-error-hook get-global
-        [ (( error -- * )) call-effect-unsafe ] [ die ] if*
+        [ original-error get-global die ] or
+        (( error -- * )) call-effect-unsafe
     ] when
     c> continue-with ;
 
-: recover ( try recovery -- )
+: recover ( ..a try: ( ..a -- ..b ) recovery: ( ..a error -- ..b ) -- ..b )
     [ [ swap >c call c> drop ] curry ] dip ifcc ; inline
 
 : ignore-errors ( quot -- )
@@ -130,7 +130,7 @@ SYMBOL: thread-error-hook
 
 ERROR: attempt-all-error ;
 
-: attempt-all ( seq quot -- obj )
+: attempt-all ( ... seq quot: ( ... elt -- ... obj ) -- ... obj )
     over empty? [
         attempt-all-error
     ] [
@@ -172,13 +172,13 @@ M: condition compute-restarts
 <PRIVATE
 
 : init-error-handler ( -- )
-    V{ } clone set-catchstack
+    init-catchstack
     ! VM calls on error
     [
         ! 63 = self
         63 special-object error-thread set-global
         continuation error-continuation set-global
-        rethrow
+        [ original-error set-global ] [ rethrow ] bi
     ] 5 set-special-object
     ! VM adds this to kernel errors, so that user-space
     ! can identify them

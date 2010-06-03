@@ -47,7 +47,7 @@ IN: project-euler.027
 
 : source-027 ( -- seq )
     1000 iota [ prime? ] filter [ dup [ neg ] map append ] keep
-    cartesian-product [ first2 < ] filter ;
+    cartesian-product concat [ first2 < ] filter ;
 
 : quadratic ( b a n -- m )
     dup sq -rot * + + ;

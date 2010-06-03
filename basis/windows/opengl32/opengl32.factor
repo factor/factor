@@ -57,7 +57,7 @@ FUNCTION: BOOL wglMakeCurrent ( HDC hDC, HGLRC hglrc ) ;
 
 ! WGL_ARB_extensions_string extension
 
-GL-FUNCTION: char* wglGetExtensionsStringARB { } ( HDC hDC ) ;
+GL-FUNCTION: c-string wglGetExtensionsStringARB { } ( HDC hDC ) ;
 
 ! WGL_ARB_pixel_format extension
 

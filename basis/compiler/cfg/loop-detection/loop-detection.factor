@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators deques dlists fry kernel
 namespaces sequences sets compiler.cfg compiler.cfg.predecessors ;
+FROM: namespaces => set ;
 IN: compiler.cfg.loop-detection
 
 TUPLE: natural-loop header index ends blocks ;
@@ -77,6 +78,8 @@ SYMBOL: loop-nesting
 PRIVATE>
 
 : loop-nesting-at ( bb -- n ) loop-nesting get at 0 or ;
+
+: current-loop-nesting ( -- n ) basic-block get loop-nesting-at ;
 
 : needs-loops ( cfg -- cfg' )
     needs-predecessors

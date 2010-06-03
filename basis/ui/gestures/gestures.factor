@@ -1,10 +1,12 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel math math.order models
 namespaces make sequences words strings system hashtables math.parser
 math.vectors classes.tuple classes boxes calendar alarms combinators
 sets columns fry deques ui.gadgets ui.gadgets.private ascii
 combinators.short-circuit ;
+FROM: namespaces => set ;
+FROM: sets => members ;
 IN: ui.gestures
 
 : get-gesture-handler ( gesture gadget -- quot )
@@ -186,13 +188,15 @@ SYMBOL: drag-timer
         [ drag-gesture ]
         300 milliseconds
         100 milliseconds
-        add-alarm drag-timer get-global >box
+        <alarm>
+        [ drag-timer get-global >box ]
+        [ start-alarm ] bi
     ] when ;
 
 : stop-drag-timer ( -- )
     hand-buttons get-global empty? [
         drag-timer get-global ?box
-        [ cancel-alarm ] [ drop ] if
+        [ stop-alarm ] [ drop ] if
     ] when ;
 
 : fire-motion ( -- )
@@ -225,16 +229,16 @@ SYMBOL: drag-timer
             dup send-lose-focus
             f swap t focus-child
         ] when*
-        dupd (>>focus) [
+        dupd focus<< [
             send-gain-focus
         ] when*
     ] [
-        (>>focus)
+        focus<<
     ] if ;
 
 : modifier ( mod modifiers -- seq )
     [ second swap bitand 0 > ] with filter
-    0 <column> prune [ f ] [ >array ] if-empty ;
+    0 <column> members [ f ] [ >array ] if-empty ;
 
 : drag-loc ( -- loc )
     hand-loc get-global hand-click-loc get-global v- ;
@@ -302,7 +306,7 @@ SYMBOL: drag-timer
     stop-drag-timer
     button-gesture ;
 
-: send-wheel ( direction loc world -- )
+: send-scroll ( direction loc world -- )
     move-hand
     scroll-direction set-global
     mouse-scroll hand-gadget get-global propagate-gesture ;

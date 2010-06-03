@@ -1,12 +1,11 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.strings arrays assocs
-classes.struct continuations combinators compiler compiler.alien
+USING: accessors alien alien.c-types alien.data alien.strings
+arrays assocs classes.struct continuations combinators compiler
 core-graphics.types stack-checker kernel math namespaces make
 quotations sequences strings words cocoa.runtime cocoa.types io
-macros memoize io.encodings.utf8 effects layouts libc
-libc.private lexer init core-foundation fry generalizations
-specialized-arrays ;
+macros memoize io.encodings.utf8 effects layouts libc lexer init
+core-foundation fry generalizations specialized-arrays ;
 QUALIFIED-WITH: alien.c-types c
 IN: cocoa.messages
 
@@ -110,7 +109,7 @@ H{
     { "d" c:double }
     { "B" c:bool }
     { "v" c:void }
-    { "*" c:char* }
+    { "*" c:c-string }
     { "?" unknown_type }
     { "@" id }
     { "#" Class }
@@ -217,7 +216,7 @@ ERROR: no-objc-type name ;
     objc-methods get set-at ;
 
 : each-method-in-class ( class quot -- )
-    [ 0 <uint> [ class_copyMethodList ] keep *uint ] dip
+    [ { uint } [ class_copyMethodList ] [ ] with-out-parameters ] dip
     over 0 = [ 3drop ] [
         [ <direct-void*-array> ] dip
         [ each ] [ drop (free) ] 2bi
@@ -237,8 +236,8 @@ ERROR: no-objc-type name ;
 
 : import-objc-class ( name quot -- )
     2dup swap define-objc-class-word
-    over objc_getClass [ drop ] [ call( -- ) ] if
-    dup objc_getClass [
+    over class-exists? [ drop ] [ call( -- ) ] if
+    dup class-exists? [
         [ objc_getClass register-objc-methods ]
         [ objc_getMetaClass register-objc-methods ] bi
     ] [ drop ] if ;

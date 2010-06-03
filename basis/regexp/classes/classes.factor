@@ -5,6 +5,7 @@ unicode.categories combinators.short-circuit sequences
 fry macros arrays assocs sets classes mirrors unicode.script
 unicode.data ;
 FROM: ascii => ascii? ;
+FROM: sets => members ;
 IN: regexp.classes
 
 SINGLETONS: dot letter-class LETTER-class Letter-class digit-class
@@ -157,7 +158,7 @@ DEFER: substitute
 TUPLE: class-partition integers not-integers simples not-simples and or other ;
 
 : partition-classes ( seq -- class-partition )
-    prune
+    members
     [ integer? ] partition
     [ not-integer? ] partition
     [ simple-class? ] partition
@@ -194,7 +195,7 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
     [ t swap remove ] change-other
     dup contradiction?
     [ drop f ]
-    [ filter-not-integers class-partition>seq prune t and-class seq>instance ] if ;
+    [ filter-not-integers class-partition>seq members t and-class seq>instance ] if ;
 
 : <and-class> ( seq -- class )
     dup and-class flatten partition-classes
@@ -225,7 +226,7 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
     [ f swap remove ] change-other
     dup tautology?
     [ drop t ]
-    [ filter-integers class-partition>seq prune f or-class seq>instance ] if ;
+    [ filter-integers class-partition>seq members f or-class seq>instance ] if ;
 
 : <or-class> ( seq -- class )
     dup or-class flatten partition-classes
@@ -329,7 +330,7 @@ M: object class>questions 1array ;
 : condition-states ( condition -- states )
     dup condition? [
         [ yes>> ] [ no>> ] bi
-        [ condition-states ] bi@ append prune
+        [ condition-states ] bi@ union
     ] [ 1array ] if ;
 
 : condition-at ( condition assoc -- new-condition )

@@ -170,3 +170,21 @@ forget-junk
 ] with-compilation-unit
 
 [ ] [ [ "vocabs.loader.test.j" require ] [ drop :1 ] recover ] unit-test
+
+[ ] [ "vocabs.loader.test.m" require ] unit-test
+[ f ] [ "vocabs.loader.test.n" vocab ] unit-test
+[ ] [ "vocabs.loader.test.o" require ] unit-test
+[ t ] [ "vocabs.loader.test.n" vocab >boolean ] unit-test
+
+[
+    "mno" [ "vocabs.loader.test." swap suffix forget-vocab ] each
+] with-compilation-unit
+
+[ ] [ "vocabs.loader.test.o" require ] unit-test
+[ f ] [ "vocabs.loader.test.n" vocab ] unit-test
+[ ] [ "vocabs.loader.test.m" require ] unit-test
+[ t ] [ "vocabs.loader.test.n" vocab >boolean ] unit-test
+
+[
+    "mno" [ "vocabs.loader.test." swap suffix forget-vocab ] each
+] with-compilation-unit

@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg
+! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces io math.parser assocs classes
 classes.tuple words arrays sequences splitting mirrors
@@ -116,6 +116,13 @@ M: string link-href ;
 
 M: url link-title ;
 M: url link-href ;
+
+TUPLE: simple-link title href ;
+
+C: <simple-link> simple-link
+
+M: simple-link link-title title>> ;
+M: simple-link link-href href>> ;
 
 TUPLE: link target ;
 

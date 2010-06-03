@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math.bitwise io.serial io.serial.unix ;
+USING: accessors kernel math.bitwise io.serial io.serial.unix
+literals ;
 IN: io.serial.unix
 
 : serial-obj ( -- obj )
@@ -10,10 +11,10 @@ IN: io.serial.unix
     ! "/dev/ttyd0" >>path ! freebsd
     ! "/dev/ttyU0" >>path ! openbsd
     19200 >>baud
-    { IGNPAR ICRNL } flags >>iflag
-    { } flags >>oflag
-    { CS8 CLOCAL CREAD } flags >>cflag
-    { ICANON } flags >>lflag ;
+    flags{ IGNPAR ICRNL } >>iflag
+    flags{ } >>oflag
+    flags{ CS8 CLOCAL CREAD } >>cflag
+    flags{ ICANON } >>lflag ;
 
 : serial-test ( -- serial )
     serial-obj

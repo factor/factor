@@ -52,8 +52,12 @@ ARTICLE: "parsing-tokens" "Parsing raw tokens"
 $nl
 "One example is the " { $link POSTPONE: USING: } " parsing word."
 { $see POSTPONE: USING: } 
-"It reads a list of vocabularies terminated by " { $link POSTPONE: ; } ". However, the vocabulary names do not name words, except by coincidence; so " { $link parse-until } " cannot be used here. Instead, a lower-level word is called:"
-{ $subsections parse-tokens } ;
+"It reads a list of vocabularies terminated by " { $link POSTPONE: ; } ". However, the vocabulary names do not name words, except by coincidence; so " { $link parse-until } " cannot be used here. Instead, a set of lower-level combinators can be used:"
+{ $subsections
+    each-token
+    map-tokens
+    parse-tokens
+} ;
 
 ARTICLE: "parsing-words" "Parsing words"
 "The Factor parser follows a simple recursive-descent design. The parser reads successive tokens from the input; if the token identifies a number or an ordinary word, it is added to an accumulator vector. Otherwise if the token identifies a parsing word, the parsing word is executed immediately."
@@ -164,7 +168,7 @@ HELP: parse-until
 { $examples "This word is used to implement " { $link POSTPONE: ARTICLE: } "." }
 $parsing-note ;
 
-{ parse-tokens (parse-until) parse-until } related-words
+{ parse-tokens each-token map-tokens (parse-until) parse-until } related-words
 
 HELP: (parse-lines)
 { $values { "lexer" lexer } { "quot" "a new " { $link quotation } } }

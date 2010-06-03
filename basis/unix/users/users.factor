@@ -37,7 +37,7 @@ PRIVATE>
 
 : all-users ( -- seq )
     [
-        [ unix.ffi:getpwent dup ] [ unix.ffi:passwd memory>struct passwd>new-passwd ] produce nip
+        [ unix.ffi:getpwent dup ] [ passwd>new-passwd ] produce nip
     ] with-pwent ;
 
 SYMBOL: user-cache
@@ -52,10 +52,10 @@ GENERIC: user-passwd ( obj -- passwd/f )
 
 M: integer user-passwd ( id -- passwd/f )
     user-cache get
-    [ at ] [ unix.ffi:getpwuid [ unix.ffi:passwd memory>struct passwd>new-passwd ] [ f ] if* ] if* ;
+    [ at ] [ unix.ffi:getpwuid [ passwd>new-passwd ] [ f ] if* ] if* ;
 
 M: string user-passwd ( string -- passwd/f )
-    unix.ffi:getpwnam dup [ unix.ffi:passwd memory>struct passwd>new-passwd ] when ;
+    unix.ffi:getpwnam dup [ passwd>new-passwd ] when ;
 
 : user-name ( id -- string )
     dup user-passwd

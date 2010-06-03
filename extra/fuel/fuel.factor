@@ -55,14 +55,14 @@ SYMBOL: :uses-suggestions
 
 PRIVATE>
 
-: fuel-use-suggested-vocabs ( suggestions quot -- ... )
+: fuel-use-suggested-vocabs ( ..a suggestions quot: ( ..a -- ..b ) -- ..b )
     [ :uses-suggestions set ] dip
     [ try-suggested-restarts rethrow ] recover ; inline
 
 : fuel-run-file ( path -- )
     [ fuel-set-use-hook run-file ] curry with-scope ; inline
 
-: fuel-with-autouse ( ... quot: ( ... -- ... ) -- ... )
+: fuel-with-autouse ( ..a quot: ( ..a -- ..b ) -- ..b )
     [ auto-use? on fuel-set-use-hook call ] curry with-scope ; inline
 
 : fuel-get-uses ( lines -- )
@@ -161,6 +161,10 @@ PRIVATE>
 : fuel-scaffold-summary ( name summary -- )
     [ scaffold-summary ]
     [ drop [ vocab-summary-path ] keep swap vocab-append-path absolute-path fuel-eval-set-result ] 2bi ;
+
+: fuel-scaffold-platforms ( name platforms -- )
+    [ scaffold-platforms ]
+    [ drop [ vocab-platforms-path ] keep swap vocab-append-path absolute-path fuel-eval-set-result ] 2bi ;
 
 : fuel-scaffold-get-root ( name -- ) find-vocab-root fuel-eval-set-result ;
 
