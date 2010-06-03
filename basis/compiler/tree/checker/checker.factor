@@ -7,6 +7,7 @@ compiler.tree
 compiler.tree.def-use
 compiler.tree.recursive
 compiler.tree.combinators ;
+FROM: namespaces => set ;
 IN: compiler.tree.checker
 
 ! Check some invariants; this can help catch compiler bugs.

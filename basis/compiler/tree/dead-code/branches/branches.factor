@@ -4,6 +4,7 @@ USING: sequences namespaces kernel accessors assocs sets fry
 arrays combinators columns stack-checker.backend
 stack-checker.branches compiler.tree compiler.tree.combinators
 compiler.tree.dead-code.liveness compiler.tree.dead-code.simple ;
+FROM: namespaces => set ;
 IN: compiler.tree.dead-code.branches
 
 M: #if mark-live-values* look-at-inputs ;

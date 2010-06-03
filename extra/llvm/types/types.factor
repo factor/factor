@@ -99,7 +99,7 @@ TUPLE: pointer < enclosing type ;
 M: pointer (>tref)* type>> (>tref) 0 LLVMPointerType ;
 M: pointer clean* type>> clean ;
 M: pointer (tref>)* swap LLVMGetElementType (tref>) >>type ;
-M: pointer c-type type>> 8 <integer> = "char*" "void*" ? ;
+M: pointer c-type type>> 8 <integer> = "c-string" "void*" ? ;
 
 TUPLE: vector < enclosing size type ;
 : <vector> ( s t -- o )
@@ -229,7 +229,7 @@ NoFunctionParams = "(" WhiteSpace ")" => [[ drop { } ]]
 VarArgs = WhiteSpace "..." WhiteSpace => [[ drop ... ]]
 ParamListContinued = "," (Type | VarArgs):t => [[ t ]]
 ParamList = "(" Type:t (ParamListContinued*):ts ")" => [[ ts t prefix ]]
-Function = T:t WhiteSpace ( ParamList | NoFunctionParams ):ts => [[ ... ts member? dup [ ... ts delete ] when t ts >array rot <function> ]]
+Function = T:t WhiteSpace ( ParamList | NoFunctionParams ):ts => [[ ... ts member? dup [ ... ts remove! drop ] when t ts >array rot <function> ]]
 PackedStructure = "<" WhiteSpace "{" Type:ty (StructureTypesList)*:ts "}" WhiteSpace ">" => [[ ts ty prefix >array t <struct> ]]
 UpReference = "\\" Number:n => [[ n <up-ref> ]]
 Name = '%' ([a-zA-Z][a-zA-Z0-9]*):id => [[ id flatten >string ]]

@@ -4,8 +4,9 @@ kernel.private libc sequences tools.test namespaces byte-arrays
 strings accessors destructors ;
 
 : buffer-set ( string buffer -- )
-    over >byte-array over ptr>> byte-array>memory
-    [ length ] dip buffer-reset ;
+    [ ptr>> swap >byte-array binary-object memcpy ]
+    [ [ length ] dip buffer-reset ]
+    2bi ;
 
 : string>buffer ( string -- buffer )
     dup length <buffer> [ buffer-set ] keep ;

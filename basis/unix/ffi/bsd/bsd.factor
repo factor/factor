@@ -48,15 +48,15 @@ STRUCT: sockaddr-un
     { path char[104] } ;
 
 STRUCT: passwd
-    { pw_name char* }
-    { pw_passwd char* }
+    { pw_name c-string }
+    { pw_passwd c-string }
     { pw_uid uid_t }
     { pw_gid gid_t }
     { pw_change time_t }
-    { pw_class char* }
-    { pw_gecos char* }
-    { pw_dir char* }
-    { pw_shell char* }
+    { pw_class c-string }
+    { pw_gecos c-string }
+    { pw_dir c-string }
+    { pw_shell c-string }
     { pw_expire time_t }
     { pw_fields int } ;
 

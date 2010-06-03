@@ -35,7 +35,8 @@ $nl
     { { $slot "header" } { "An assoc of HTTP header values. See " { $link "http.headers" } } }
     { { $slot "cookies" } { "A sequence of HTTP cookies. See " { $link "http.cookies" } } }
     { { $slot "content-type" } { "an HTTP content type" } }
-    { { $slot "content-charset" } { "an encoding descriptor. See " { $link "io.encodings" } } }
+    { { $slot "content-charset" } { "an encoding name" } }
+    { { $slot "content-encoding" } { "an encoding descriptor. See " { $link "io.encodings" } } }
     { { $slot "body" } { "an HTTP response body" } }
 } } ;
 

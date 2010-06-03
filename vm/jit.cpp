@@ -103,12 +103,6 @@ bool jit::emit_subprimitive(cell word_, bool tail_call_p, bool stack_frame_p)
 	return false;
 }
 	
-void jit::emit_class_lookup(fixnum index, cell type)
-{
-	emit_with_literal(parent->special_objects[PIC_LOAD],tag_fixnum(-index * sizeof(cell)));
-	emit(parent->special_objects[type]);
-}
-
 /* Facility to convert compiled code offsets to quotation offsets.
 Call jit_compute_offset() with the compiled code offset, then emit
 code, and at the end jit->position is the quotation position. */

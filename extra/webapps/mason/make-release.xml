@@ -11,8 +11,12 @@
   </head>
   <body>
     <t:form t:action="$mason-app/make-release">
-    	Version: <t:field t:name="version" />
-	<button type="submit">Go</button>
+    	<table>
+		<tr><td>Version:</td><td><t:field t:name="version" /></td></tr>
+		<tr><td>Announcement URL:</td><td><t:field t:name="announcement-url" /></td></tr>
+	</table>
+
+	<p><button type="submit">Go</button></p>
     </t:form>
   </body>
 </html>

@@ -1,4 +1,4 @@
-USING: alien.syntax alien.c-types core-foundation
+USING: alien.syntax alien.c-types alien.data core-foundation
 core-foundation.bundles core-foundation.dictionaries system
 combinators kernel sequences io accessors unix.types ;
 IN: iokit
@@ -104,9 +104,9 @@ CONSTANT: KERN_SUCCESS 0
 
 FUNCTION: IOReturn IOMasterPort ( mach_port_t bootstrap, mach_port_t* master ) ;
 
-FUNCTION: CFDictionaryRef IOServiceMatching ( char* name ) ;
-FUNCTION: CFDictionaryRef IOServiceNameMatching ( char* name ) ;
-FUNCTION: CFDictionaryRef IOBSDNameMatching ( char* name ) ;
+FUNCTION: CFDictionaryRef IOServiceMatching ( c-string name ) ;
+FUNCTION: CFDictionaryRef IOServiceNameMatching ( c-string name ) ;
+FUNCTION: CFDictionaryRef IOBSDNameMatching ( c-string name ) ;
 
 FUNCTION: IOReturn IOObjectRetain ( io_object_t o ) ;
 FUNCTION: IOReturn IOObjectRelease ( io_object_t o ) ;
@@ -121,7 +121,7 @@ FUNCTION: IOReturn IORegistryEntryGetPath ( io_registry_entry_t entry, io_name_t
 
 FUNCTION: IOReturn IORegistryEntryCreateCFProperties ( io_registry_entry_t entry, CFMutableDictionaryRef properties, CFAllocatorRef allocator, IOOptionBits options ) ;
 
-FUNCTION: char* mach_error_string ( IOReturn error ) ;
+FUNCTION: c-string mach_error_string ( IOReturn error ) ;
 
 TUPLE: mach-error error-code error-string ;
 : <mach-error> ( code -- error )
@@ -131,12 +131,11 @@ TUPLE: mach-error error-code error-string ;
     dup KERN_SUCCESS = [ drop ] [ <mach-error> throw ] if ;
 
 : master-port ( -- port )
-    MACH_PORT_NULL 0 <uint> [ IOMasterPort mach-error ] keep *uint ;
+    MACH_PORT_NULL { uint } [ IOMasterPort mach-error ] [ ] with-out-parameters ;
 
 : io-services-matching-dictionary ( nsdictionary -- iterator )
-    master-port swap 0 <uint>
-    [ IOServiceGetMatchingServices mach-error ] keep
-    *uint ;
+    master-port swap
+    { uint } [ IOServiceGetMatchingServices mach-error ] [ ] with-out-parameters ;
 
 : io-services-matching-service ( service -- iterator )
     IOServiceMatching io-services-matching-dictionary ;

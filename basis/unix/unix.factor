@@ -5,8 +5,8 @@ USING: accessors alien alien.c-types alien.libraries
 alien.syntax byte-arrays classes.struct combinators
 combinators.short-circuit combinators.smart continuations
 generalizations io kernel libc locals macros math namespaces
-sequences stack-checker strings system unix.time unix.types
-vocabs vocabs.loader unix.ffi ;
+sequences sequences.generalizations stack-checker strings system
+unix.time unix.types vocabs vocabs.loader unix.ffi ;
 IN: unix
 
 ERROR: unix-error errno message ;
@@ -50,9 +50,7 @@ HOOK: open-file os ( path flags mode -- fd )
 
 : close-file ( fd -- ) [ close ] unix-system-call drop ;
 
-: _exit ( status -- * )
-    #! We throw to give this a terminating stack effect.
-    int f "_exit" { int } alien-invoke "Exit failed" throw ;
+FUNCTION: int _exit ( int status ) ;
 
 M: unix open-file [ open ] unix-system-call ;
 
@@ -74,8 +72,6 @@ M: unix open-file [ open ] unix-system-call ;
 
 <<
 
-"debugger" vocab [
-    "unix.debugger" require
-] when
+{ "unix" "debugger" } "unix.debugger" require-when
 
 >>

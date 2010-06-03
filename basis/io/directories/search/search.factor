@@ -41,7 +41,7 @@ TUPLE: directory-iterator path bfs queue ;
         [ nip ] if
     ] if ;
 
-:: iterate-directory-entries ( iter quot: ( obj -- obj ) -- directory-entry/f )
+:: iterate-directory-entries ( ... iter quot: ( ... obj -- ... obj ) -- ... directory-entry/f )
     iter next-directory-entry [
         quot call
         [ iter quot iterate-directory-entries ] unless*

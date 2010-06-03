@@ -5,7 +5,7 @@ sequences strings vectors words words.symbol quotations io
 combinators sorting splitting math.parser effects continuations
 io.files vocabs io.encodings.utf8 source-files classes
 hashtables compiler.units accessors sets lexer vocabs.parser
-effects.parser slots parser.notes ;
+ slots parser.notes ;
 IN: parser
 
 : location ( -- loc )
@@ -58,9 +58,14 @@ SYMBOL: auto-use?
 
 ERROR: staging-violation word ;
 
+: (execute-parsing) ( accum word -- accum )
+    dup push-parsing-word
+    execute( accum -- accum )
+    pop-parsing-word ; inline
+
 : execute-parsing ( accum word -- accum )
     dup changed-definitions get key? [ staging-violation ] when
-    execute( accum -- accum ) ;
+    (execute-parsing) ;
 
 : scan-object ( -- object )
     scan-word {
@@ -101,11 +106,6 @@ M: f parse-quotation \ ] parse-until >quotation ;
 
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
-
-: (:) ( -- word def effect )
-    CREATE-WORD
-    complete-effect
-    parse-definition swap ;
 
 ERROR: bad-number ;
 
@@ -207,3 +207,5 @@ print-use-hook [ [ ] ] initialize
 
 : ?run-file ( path -- )
     dup exists? [ run-file ] [ drop ] if ;
+
+ERROR: version-control-merge-conflict ;

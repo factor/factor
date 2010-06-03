@@ -94,7 +94,7 @@ M: bad-developer-name summary
     ] with-string-writer ;
 
 : set-scaffold-main-file ( vocab path -- )
-    [ main-file-string ] dip utf8 set-file-contents ;
+    [ main-file-string 1array ] dip utf8 set-file-lines ;
 
 : scaffold-main ( vocab-root vocab -- )
     [ ".factor" vocab-root/vocab/suffix>path ] keep swap scaffolding? [
@@ -106,8 +106,8 @@ M: bad-developer-name summary
 : scaffold-metadata ( vocab file contents -- )
     [ ensure-vocab-exists ] 2dip
     [
-        [ vocab/file>path ] dip swap scaffolding? [
-            utf8 set-file-contents
+        [ vocab/file>path ] dip 1array swap scaffolding? [
+            utf8 set-file-lines
         ] [
             2drop
         ] if
@@ -266,6 +266,9 @@ PRIVATE>
 
 : scaffold-summary ( vocab summary -- )
     [ "summary.txt" ] dip scaffold-metadata ;
+
+: scaffold-platforms ( vocab platforms -- )
+    [ "platforms.txt" ] dip scaffold-metadata ;
 
 : scaffold-vocab ( vocab-root string -- )
     {

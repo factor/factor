@@ -15,6 +15,11 @@ HOOK: disassemble* disassembler-backend ( from to -- lines )
 
 TR: tabs>spaces "\t" "\s" ;
 
+GENERIC: (>address) ( object -- n )
+
+M: integer (>address) ;
+M: alien (>address) alien-address ;
+
 PRIVATE>
 
 M: byte-array disassemble 
@@ -24,7 +29,7 @@ M: byte-array disassemble
         2array disassemble
     ] with-destructors ;
 
-M: pair disassemble first2 disassemble* [ tabs>spaces print ] each ;
+M: pair disassemble first2 [ (>address) ] bi@ disassemble* [ tabs>spaces print ] each ;
 
 M: word disassemble word-code 2array disassemble ;
 

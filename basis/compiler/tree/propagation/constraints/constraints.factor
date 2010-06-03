@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs math math.intervals kernel accessors
 sequences namespaces classes classes.algebra
@@ -87,8 +87,11 @@ TUPLE: implication p q ;
 
 C: --> implication
 
+: maybe-add ( elt seq -- seq' )
+    2dup member? [ nip ] [ swap suffix ] if ;
+
 : assume-implication ( q p -- )
-    [ constraints get [ assoc-stack swap suffix ] 2keep last set-at ]
+    [ constraints get [ assoc-stack maybe-add ] 2keep last set-at ]
     [ satisfied? [ assume ] [ drop ] if ] 2bi ;
 
 M: implication assume*

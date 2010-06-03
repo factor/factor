@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel assocs arrays namespaces accessors sequences deques fry
 search-deques dlists combinators.short-circuit make sets compiler.tree ;
+FROM: namespaces => set ;
 IN: compiler.tree.recursive
 
 TUPLE: call-site tail? node label ;
@@ -43,7 +44,7 @@ GENERIC: node-call-graph ( tail? node -- )
     ] with-scope ;
 
 M: #return-recursive node-call-graph
-    nip dup label>> (>>return) ;
+    nip dup label>> return<< ;
 
 M: #call-recursive node-call-graph
     [ dup label>> call-site boa ] keep
@@ -102,7 +103,7 @@ SYMBOL: changed?
         recursive-nesting get pop*
     ] each ;
 
-: while-changing ( quot: ( -- ) -- )
+: while-changing ( ... quot: ( ... -- ... ) -- ... )
     changed? off
     [ call ] [ changed? get [ while-changing ] [ drop ] if ] bi ;
     inline recursive

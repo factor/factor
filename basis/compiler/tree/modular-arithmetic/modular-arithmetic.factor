@@ -9,6 +9,7 @@ compiler.tree.propagation.info
 compiler.tree.def-use
 compiler.tree.def-use.simplified
 compiler.tree.late-optimizations ;
+FROM: namespaces => set ;
 IN: compiler.tree.modular-arithmetic
 
 ! This is a late-stage optimization.

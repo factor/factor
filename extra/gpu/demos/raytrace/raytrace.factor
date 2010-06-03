@@ -10,7 +10,7 @@ GLSL-SHADER-FILE: raytrace-vertex-shader vertex-shader "raytrace.v.glsl"
 GLSL-SHADER-FILE: raytrace-fragment-shader fragment-shader "raytrace.f.glsl"
 GLSL-PROGRAM: raytrace-program
     raytrace-vertex-shader raytrace-fragment-shader
-    window-vertex ;
+    window-vertex-format ;
 
 UNIFORM-TUPLE: sphere-uniforms
     { "center" vec3-uniform  f }
@@ -126,5 +126,5 @@ GAME: raytrace-game {
         { use-game-input? t }
         { use-audio-engine? t }
         { pref-dim { 1024 768 } }
-        { tick-interval-micros $[ 60 fps ] }
+        { tick-interval-nanos $[ 60 fps ] }
     } ;

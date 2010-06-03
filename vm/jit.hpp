@@ -47,8 +47,6 @@ struct jit {
 
 	bool emit_subprimitive(cell word_, bool tail_call_p, bool stack_frame_p);
 
-	void emit_class_lookup(fixnum index, cell type);
-
 	fixnum get_position()
 	{
 		if(computing_offset_p)

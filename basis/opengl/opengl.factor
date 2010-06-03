@@ -2,12 +2,12 @@
 ! Portions copyright (C) 2007 Eduardo Cavazos.
 ! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types ascii calendar combinators.short-circuit
-continuations kernel libc math macros namespaces math.vectors
-math.parser opengl.gl combinators combinators.smart arrays
-sequences splitting words byte-arrays assocs vocabs
-colors colors.constants accessors generalizations locals fry
-specialized-arrays ;
+USING: alien alien.c-types alien.data ascii calendar
+combinators.short-circuit continuations kernel libc math macros
+namespaces math.vectors math.parser opengl.gl combinators
+combinators.smart arrays sequences splitting words byte-arrays
+assocs vocabs colors colors.constants accessors generalizations
+sequences.generalizations locals fry specialized-arrays ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: uint
@@ -139,7 +139,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     swap glPushAttrib call glPopAttrib ; inline
 
 : (gen-gl-object) ( quot -- id )
-    [ 1 0 <uint> ] dip keep *uint ; inline
+    [ 1 { uint } ] dip [ ] with-out-parameters ; inline
 
 : (delete-gl-object) ( id quot -- )
     [ 1 swap <uint> ] dip call ; inline

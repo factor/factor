@@ -4,7 +4,8 @@ USING: logging.server sequences namespaces concurrency.messaging
 words kernel arrays shuffle tools.annotations
 prettyprint.config prettyprint debugger io.streams.string
 splitting continuations effects generalizations parser strings
-quotations fry accessors math assocs math.order ;
+quotations fry accessors math assocs math.order
+sequences.generalizations ;
 IN: logging
 
 SYMBOLS: DEBUG NOTICE WARNING ERROR CRITICAL ;

@@ -27,7 +27,7 @@ IN: compiler.cfg.stacks.finalize
     to dead-in to live-in to anticip-in assoc-diff assoc-diff
     assoc-diff ;
 
-: each-insertion ( assoc bb quot: ( vreg loc -- ) -- )
+: each-insertion ( ... assoc bb quot: ( ... vreg loc -- ... ) -- ... )
     '[ drop [ loc>vreg ] [ _ untranslate-loc ] bi @ ] assoc-each ; inline
 
 ERROR: bad-peek dst loc ;
@@ -43,9 +43,9 @@ ERROR: bad-peek dst loc ;
 : visit-edge ( from to -- )
     ! If both blocks are subroutine calls, don't bother
     ! computing anything.
-    2dup [ kill-block? ] both? [ 2drop ] [
-        2dup [ [ insert-replaces ] [ insert-peeks ] 2bi ] V{ } make
-        [ 2drop ] [ insert-simple-basic-block ] if-empty
+    2dup [ kill-block?>> ] both? [ 2drop ] [
+        2dup [ [ insert-replaces ] [ insert-peeks ] 2bi ##branch ] V{ } make
+        [ 2drop ] [ insert-basic-block ] if-empty
     ] if ;
 
 : visit-block ( bb -- )

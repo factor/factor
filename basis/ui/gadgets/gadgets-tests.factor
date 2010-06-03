@@ -2,6 +2,7 @@ USING: accessors ui.gadgets ui.gadgets.packs ui.gadgets.worlds
 tools.test namespaces models kernel dlists deques math
 math.parser ui sequences hashtables assocs io arrays prettyprint
 io.streams.string math.rectangles ui.gadgets.private sets generic ;
+FROM: namespaces => set ;
 IN: ui.gadgets.tests
 
 [ { 300 300 } ]
@@ -126,16 +127,16 @@ M: mock-gadget ungraft*
         ] each-integer ;
 
     : status-flags ( -- seq )
-        { "g" "1" "2" "3" } [ get graft-state>> ] map prune ;
+        { "g" "1" "2" "3" } [ get graft-state>> ] map members ;
 
     : notify-combo ( ? ? -- )
         nl "===== Combo: " write 2dup 2array . nl
         <dlist> \ graft-queue [
             <mock-gadget> "g" set
             [ ] [ add-some-children ] unit-test
-            [ V{ { f f } } ] [ status-flags ] unit-test
+            [ { { f f } } ] [ status-flags ] unit-test
             [ ] [ "g" get graft ] unit-test
-            [ V{ { f t } } ] [ status-flags ] unit-test
+            [ { { f t } } ] [ status-flags ] unit-test
             dup [ [ ] [ notify-queued ] unit-test ] when
             [ ] [ "g" get clear-gadget ] unit-test
             [ [ t ] [ graft-queue [ front>> ] [ back>> ] bi eq? ] unit-test ] unless
@@ -146,7 +147,7 @@ M: mock-gadget ungraft*
             [ { f t } ] [ "3" get graft-state>> ] unit-test
             [ ] [ graft-queue [ "x" print notify ] slurp-deque ] unit-test
             [ ] [ notify-queued ] unit-test
-            [ V{ { t t } } ] [ status-flags ] unit-test
+            [ { { t t } } ] [ status-flags ] unit-test
         ] with-variable ;
 
     { { f f } { f t } { t f } { t t } } [ notify-combo ] assoc-each

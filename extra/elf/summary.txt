@@ -1,0 +1,1 @@
+Constants and structs related to the ELF object format.

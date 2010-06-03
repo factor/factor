@@ -1,9 +1,10 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http:// factorcode.org/license.txt for BSD license.
-USING: accessors chipmunk classes.struct game.worlds kernel locals
-math method-chains opengl.gl random sequences specialized-arrays
-specialized-arrays.instances.alien.c-types.void* ui ui.gadgets.worlds
+USING: accessors alien chipmunk.ffi classes.struct game.loop
+game.worlds kernel literals locals math method-chains opengl.gl
+random sequences specialized-arrays ui ui.gadgets.worlds
 ui.pixel-formats ;
+SPECIALIZED-ARRAY: void*
 IN: chipmunk.demo
 
 CONSTANT: image-width      188
@@ -50,10 +51,13 @@ CONSTANT: image-bitmap B{
     x bitnot 7 bitand neg shift 1 bitand 1 = ;
 
 :: make-ball ( x y -- shape )
-    cpBodyAlloc 1.0 NAN: 0 cpBodyInit cpBody memory>struct
+    cpBodyAlloc 1.0 NAN: 0 cpBodyInit
     x y cpv >>p :> body
-    cpCircleShapeAlloc body 0.95 0 0 cpv cpCircleShapeInit cpCircleShape memory>struct
-    [ shape>> 0 >>e ] [ shape>> 0 >>u ] bi drop ;
+    cpCircleShapeAlloc body 0.95 0 0 cpv cpCircleShapeInit
+    dup shape>>
+        0 >>e
+        0 >>u
+        drop ;
 
 TUPLE: chipmunk-world < game-world
     space ;
@@ -76,7 +80,7 @@ M:: chipmunk-world draw-world* ( world -- )
     3 glPointSize
     0 0 0 glColor3f
     GL_POINTS glBegin
-    space bodies>> cpArray memory>struct
+    space bodies>>
     [ num>> ] [ arr>> swap <direct-void*-array> ] bi [
         cpBody memory>struct p>> [ x>> ] [ y>> ] bi glVertex2f
     ] each
@@ -85,10 +89,10 @@ M:: chipmunk-world draw-world* ( world -- )
     2 glPointSize
     1 0 0 glColor3f
     GL_POINTS glBegin
-    space arbiters>> cpArray memory>struct
+    space arbiters>>
     [ num>> ] [ arr>> swap <direct-void*-array> ] bi [
         cpArbiter memory>struct
-        [ numContacts>> ] [ contacts>> swap <direct-cpContact-array> ] bi [
+        [ numContacts>> ] [ contacts>> >c-ptr swap <direct-cpContact-array> ] bi [
             p>> [ x>> ] [ y>> ] bi glVertex2f
         ] each
     ] each
@@ -97,7 +101,7 @@ M:: chipmunk-world draw-world* ( world -- )
 M:: chipmunk-world begin-game-world ( world -- )
     cpInitChipmunk
 
-    cpSpaceAlloc cpSpaceInit cpSpace memory>struct :> space
+    cpSpaceAlloc cpSpaceInit :> space
 
     world space >>space drop
     space 2.0 10000 cpSpaceResizeActiveHash
@@ -109,20 +113,22 @@ M:: chipmunk-world begin-game-world ( world -- )
                 x image-width 2 / - 0.05 0.0 1.0 uniform-random-float * + 2 *
                 image-height 2 / y - 0.05 0.0 1.0 uniform-random-float * + 2 *
                 make-ball :> shape
-                space shape body>> cpSpaceAddBody drop
+                space shape shape>> body>> cpSpaceAddBody drop
                 space shape cpSpaceAddShape drop
             ] when
         ] each
     ] each
     
-    space cpBodyAlloc NAN: 0 dup cpBodyInit cpSpaceAddBody cpBody memory>struct :> body
+    space cpBodyAlloc NAN: 0 dup cpBodyInit cpSpaceAddBody :> body
     body -1000 -10 cpv >>p drop
     body 400 0 cpv >>v drop
 
-    space cpCircleShapeAlloc body 8 0 0 cpv cpCircleShapeInit cpSpaceAddShape cpCircleShape memory>struct :> shape
-    shape
-    [ shape>> 0 >>e drop ]
-    [ shape>> 0 >>u drop ] bi ;
+    space cpCircleShapeAlloc [ body 8 0 0 cpv cpCircleShapeInit cpSpaceAddShape drop ] keep
+        :> shape
+    shape shape>>
+        0 >>e
+        0 >>u
+        drop ;
 
 M: chipmunk-world end-game-world
     space>>
@@ -139,9 +145,10 @@ M: chipmunk-world end-game-world
              { windowed double-buffered }
            }
            { pref-dim { 640 480 } }
-           { tick-interval-micros 16666 }
+           { tick-interval-nanos $[ 60 fps ] }
         }
         clone
         open-window
     ] with-ui ;
 
+MAIN: chipmunk-demo

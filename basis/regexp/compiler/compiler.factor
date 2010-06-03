@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: regexp.classes kernel sequences regexp.negation
-quotations assocs fry math locals combinators
+quotations assocs fry math locals combinators sets
 accessors words compiler.units kernel.private strings
 sequences.private arrays namespaces unicode.breaks
 regexp.transition-tables combinators.short-circuit ;
@@ -106,7 +106,7 @@ C: <box> box
 
 : word>quot ( word dfa -- quot )
     [ transitions>> at ]
-    [ final-states>> key? ] 2bi
+    [ final-states>> in? ] 2bi
     transitions>quot ;
 
 : states>code ( words dfa -- )

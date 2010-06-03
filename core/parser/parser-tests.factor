@@ -7,332 +7,334 @@ vocabs.parser words.symbol multiline source-files.errors
 tools.crossref grouping ;
 IN: parser.tests
 
+[ 1 [ 2 [ 3 ] 4 ] 5 ]
+[ "1\n[\n2\n[\n3\n]\n4\n]\n5" eval( -- a b c ) ]
+unit-test
+
+[ t t f f ]
+[ "t t f f" eval( -- ? ? ? ? ) ]
+unit-test
+
+[ "hello world" ]
+[ "\"hello world\"" eval( -- string ) ]
+unit-test
+
+[ "\n\r\t\\" ]
+[ "\"\\n\\r\\t\\\\\"" eval( -- string ) ]
+unit-test
+
+[ "hello world" ]
 [
-    [ 1 [ 2 [ 3 ] 4 ] 5 ]
-    [ "1\n[\n2\n[\n3\n]\n4\n]\n5" eval( -- a b c ) ]
-    unit-test
+    "IN: parser.tests : hello ( -- str ) \"hello world\" ;"
+    eval( -- ) "USE: parser.tests hello" eval( -- string )
+] unit-test
 
-    [ t t f f ]
-    [ "t t f f" eval( -- ? ? ? ? ) ]
-    unit-test
+[ ]
+[ "! This is a comment, people." eval( -- ) ]
+unit-test
 
-    [ "hello world" ]
-    [ "\"hello world\"" eval( -- string ) ]
-    unit-test
+! Test escapes
 
-    [ "\n\r\t\\" ]
-    [ "\"\\n\\r\\t\\\\\"" eval( -- string ) ]
-    unit-test
+[ " " ]
+[ "\"\\u000020\"" eval( -- string ) ]
+unit-test
 
-    [ "hello world" ]
-    [
-        "IN: parser.tests : hello ( -- str ) \"hello world\" ;"
-        eval( -- ) "USE: parser.tests hello" eval( -- string )
-    ] unit-test
+[ "'" ]
+[ "\"\\u000027\"" eval( -- string ) ]
+unit-test
 
-    [ ]
-    [ "! This is a comment, people." eval( -- ) ]
-    unit-test
+! Test EOL comments in multiline strings.
+[ "Hello" ] [ "#! This calls until-eol.\n\"Hello\"" eval( -- string ) ] unit-test
 
-    ! Test escapes
+[ word ] [ \ f class ] unit-test
 
-    [ " " ]
-    [ "\"\\u000020\"" eval( -- string ) ]
-    unit-test
+! Test stack effect parsing
 
-    [ "'" ]
-    [ "\"\\u000027\"" eval( -- string ) ]
-    unit-test
+: effect-parsing-test ( a b -- c ) + ;
 
-    ! Test EOL comments in multiline strings.
-    [ "Hello" ] [ "#! This calls until-eol.\n\"Hello\"" eval( -- string ) ] unit-test
+[ t ] [
+    "effect-parsing-test" "parser.tests" lookup
+    \ effect-parsing-test eq?
+] unit-test
 
-    [ word ] [ \ f class ] unit-test
+[ T{ effect f { "a" "b" } { "c" } f } ]
+[ \ effect-parsing-test "declared-effect" word-prop ] unit-test
 
-    ! Test stack effect parsing
+: baz ( a b -- * ) 2array throw ;
 
-    : effect-parsing-test ( a b -- c ) + ;
+[ t ]
+[ \ baz "declared-effect" word-prop terminated?>> ]
+unit-test
 
-    [ t ] [
-        "effect-parsing-test" "parser.tests" lookup
-        \ effect-parsing-test eq?
-    ] unit-test
+[ ] [ "IN: parser.tests USE: math : effect-parsing-test ( a b -- d ) - ;" eval( -- ) ] unit-test
 
-    [ T{ effect f { "a" "b" } { "c" } f } ]
-    [ \ effect-parsing-test "declared-effect" word-prop ] unit-test
+[ t ] [
+    "effect-parsing-test" "parser.tests" lookup
+    \ effect-parsing-test eq?
+] unit-test
 
-    : baz ( a b -- * ) 2array throw ;
+[ T{ effect f { "a" "b" } { "d" } f } ]
+[ \ effect-parsing-test "declared-effect" word-prop ] unit-test
 
-    [ t ]
-    [ \ baz "declared-effect" word-prop terminated?>> ]
-    unit-test
+[ "IN: parser.tests : missing-- ( a b ) ;" eval( -- ) ] must-fail
 
-    [ ] [ "IN: parser.tests USE: math : effect-parsing-test ( a b -- d ) - ;" eval( -- ) ] unit-test
+! Funny bug
+[ 2 ] [ "IN: parser.tests : \0. ( -- x ) 2 ; \0." eval( -- n ) ] unit-test
 
-    [ t ] [
-        "effect-parsing-test" "parser.tests" lookup
-        \ effect-parsing-test eq?
-    ] unit-test
+! These should throw errors
+[ "HEX: zzz" eval( -- obj ) ] must-fail
+[ "OCT: 999" eval( -- obj ) ] must-fail
+[ "BIN: --0" eval( -- obj ) ] must-fail
 
-    [ T{ effect f { "a" "b" } { "d" } f } ]
-    [ \ effect-parsing-test "declared-effect" word-prop ] unit-test
+DEFER: foo
 
-    ! Funny bug
-    [ 2 ] [ "IN: parser.tests : \0. ( -- x ) 2 ; \0." eval( -- n ) ] unit-test
+"IN: parser.tests USING: math prettyprint ; SYNTAX: foo 2 2 + . ;" eval( -- )
 
-    [ "IN: parser.tests : missing-- ( a b ) ;" eval( -- ) ] must-fail
+[ ] [ "USE: parser.tests foo" eval( -- ) ] unit-test
 
-    ! These should throw errors
-    [ "HEX: zzz" eval( -- obj ) ] must-fail
-    [ "OCT: 999" eval( -- obj ) ] must-fail
-    [ "BIN: --0" eval( -- obj ) ] must-fail
+"IN: parser.tests USING: math prettyprint ; : foo ( -- ) 2 2 + . ;" eval( -- )
 
-    DEFER: foo
+[ t ] [
+    "USE: parser.tests \\ foo" eval( -- word )
+    "foo" "parser.tests" lookup eq?
+] unit-test
 
-    "IN: parser.tests USING: math prettyprint ; SYNTAX: foo 2 2 + . ;" eval( -- )
+! parse-tokens should do the right thing on EOF
+[ "USING: kernel" eval( -- ) ]
+[ error>> T{ unexpected { want ";" } } = ] must-fail-with
 
-    [ ] [ "USE: parser.tests foo" eval( -- ) ] unit-test
+! Test smudging
 
-    "IN: parser.tests USING: math prettyprint ; : foo ( -- ) 2 2 + . ;" eval( -- )
+[ 1 ] [
+    "IN: parser.tests : smudge-me ( -- ) ;" <string-reader> "foo"
+    parse-stream drop
 
-    [ t ] [
-        "USE: parser.tests \\ foo" eval( -- word )
-        "foo" "parser.tests" lookup eq?
-    ] unit-test
+    "foo" source-file definitions>> first assoc-size
+] unit-test
 
-    ! Test smudging
+[ t ] [ "smudge-me" "parser.tests" lookup >boolean ] unit-test
 
-    [ 1 ] [
-        "IN: parser.tests : smudge-me ( -- ) ;" <string-reader> "foo"
-        parse-stream drop
+[ ] [
+    "IN: parser.tests : smudge-me-more ( -- ) ;" <string-reader> "foo"
+    parse-stream drop
+] unit-test
 
-        "foo" source-file definitions>> first assoc-size
-    ] unit-test
+[ t ] [ "smudge-me-more" "parser.tests" lookup >boolean ] unit-test
+[ f ] [ "smudge-me" "parser.tests" lookup >boolean ] unit-test
 
-    [ t ] [ "smudge-me" "parser.tests" lookup >boolean ] unit-test
+[ 3 ] [
+    "IN: parser.tests USING: math strings ; GENERIC: smudge-me ( a -- b ) M: integer smudge-me ; M: string smudge-me ;" <string-reader> "foo"
+    parse-stream drop
 
-    [ ] [
-        "IN: parser.tests : smudge-me-more ( -- ) ;" <string-reader> "foo"
-        parse-stream drop
-    ] unit-test
+    "foo" source-file definitions>> first assoc-size
+] unit-test
 
-    [ t ] [ "smudge-me-more" "parser.tests" lookup >boolean ] unit-test
-    [ f ] [ "smudge-me" "parser.tests" lookup >boolean ] unit-test
+[ 1 ] [
+    "IN: parser.tests USING: arrays ; M: array smudge-me ;" <string-reader> "bar"
+    parse-stream drop
 
-    [ 3 ] [
-        "IN: parser.tests USING: math strings ; GENERIC: smudge-me ( a -- b ) M: integer smudge-me ; M: string smudge-me ;" <string-reader> "foo"
-        parse-stream drop
+    "bar" source-file definitions>> first assoc-size
+] unit-test
 
-        "foo" source-file definitions>> first assoc-size
-    ] unit-test
+[ 2 ] [
+    "IN: parser.tests USING: math strings ; GENERIC: smudge-me ( a -- b ) M: integer smudge-me ;" <string-reader> "foo"
+    parse-stream drop
 
-    [ 1 ] [
-        "IN: parser.tests USING: arrays ; M: array smudge-me ;" <string-reader> "bar"
-        parse-stream drop
+    "foo" source-file definitions>> first assoc-size
+] unit-test
 
-        "bar" source-file definitions>> first assoc-size
-    ] unit-test
+[ t ] [
+    array "smudge-me" "parser.tests" lookup order member-eq?
+] unit-test
 
-    [ 2 ] [
-        "IN: parser.tests USING: math strings ; GENERIC: smudge-me ( a -- b ) M: integer smudge-me ;" <string-reader> "foo"
-        parse-stream drop
+[ t ] [
+    integer "smudge-me" "parser.tests" lookup order member-eq?
+] unit-test
 
-        "foo" source-file definitions>> first assoc-size
-    ] unit-test
-    
-    [ t ] [
-        array "smudge-me" "parser.tests" lookup order member-eq?
-    ] unit-test
-    
-    [ t ] [
-        integer "smudge-me" "parser.tests" lookup order member-eq?
-    ] unit-test
-    
-    [ f ] [
-        string "smudge-me" "parser.tests" lookup order member-eq?
-    ] unit-test
+[ f ] [
+    string "smudge-me" "parser.tests" lookup order member-eq?
+] unit-test
 
-    [ ] [
-        "IN: parser.tests USE: math 2 2 +" <string-reader> "a"
-        parse-stream drop
-    ] unit-test
-    
-    [ t ] [
-        "a" <pathname> \ + usage member?
-    ] unit-test
+[ ] [
+    "IN: parser.tests USE: math 2 2 +" <string-reader> "a"
+    parse-stream drop
+] unit-test
 
-    [ ] [
-        "IN: parser.tests USE: math 2 2 -" <string-reader> "a"
-        parse-stream drop
-    ] unit-test
-    
-    [ f ] [
-        "a" <pathname> \ + usage member?
-    ] unit-test
-    
-    [ ] [
-        "a" source-files get delete-at
-        2 [
-            "IN: parser.tests DEFER: x : y ( -- ) x ; : x ( -- ) y ;"
-            <string-reader> "a" parse-stream drop
-        ] times
-    ] unit-test
-    
+[ t ] [
+    "a" <pathname> \ + usage member?
+] unit-test
+
+[ ] [
+    "IN: parser.tests USE: math 2 2 -" <string-reader> "a"
+    parse-stream drop
+] unit-test
+
+[ f ] [
+    "a" <pathname> \ + usage member?
+] unit-test
+
+[ ] [
     "a" source-files get delete-at
-
-    [
-        "IN: parser.tests : x ( -- ) ; : y ( -- * ) 3 throw ; this is an error"
-        <string-reader> "a" parse-stream
-    ] [ source-file-error? ] must-fail-with
-
-    [ t ] [
-        "y" "parser.tests" lookup >boolean
-    ] unit-test
-
-    [ f ] [
-        "IN: parser.tests : x ( -- ) ;"
+    2 [
+        "IN: parser.tests DEFER: x : y ( -- ) x ; : x ( -- ) y ;"
         <string-reader> "a" parse-stream drop
-        
-        "y" "parser.tests" lookup
-    ] unit-test
+    ] times
+] unit-test
 
-    ! Test new forward definition logic
-    [ ] [
-        "IN: axx : axx ( -- ) ;"
-        <string-reader> "axx" parse-stream drop
-    ] unit-test
+"a" source-files get delete-at
 
-    [ ] [
-        "USE: axx IN: bxx : bxx ( -- ) ; : cxx ( -- ) axx bxx ;"
-        <string-reader> "bxx" parse-stream drop
-    ] unit-test
+[
+    "IN: parser.tests : x ( -- ) ; : y ( -- * ) 3 throw ; this is an error"
+    <string-reader> "a" parse-stream
+] [ source-file-error? ] must-fail-with
 
-    ! So we move the bxx word to axx...
-    [ ] [
-        "IN: axx : axx ( -- ) ; : bxx ( -- ) ;"
-        <string-reader> "axx" parse-stream drop
-    ] unit-test
+[ t ] [
+    "y" "parser.tests" lookup >boolean
+] unit-test
 
-    [ t ] [ "bxx" "axx" lookup >boolean ] unit-test
-
-    ! And reload the file that uses it...
-    [ ] [
-        "USE: axx IN: bxx ( -- ) : cxx ( -- ) axx bxx ;"
-        <string-reader> "bxx" parse-stream drop
-    ] unit-test
+[ f ] [
+    "IN: parser.tests : x ( -- ) ;"
+    <string-reader> "a" parse-stream drop
     
-    ! And hope not to get a forward-error!
+    "y" "parser.tests" lookup
+] unit-test
 
-    ! Turning a generic into a non-generic could cause all
-    ! kinds of funnyness
-    [ ] [
-        "IN: ayy USE: kernel GENERIC: ayy ( a -- b ) M: object ayy ;"
-        <string-reader> "ayy" parse-stream drop
-    ] unit-test
+! Test new forward definition logic
+[ ] [
+    "IN: axx : axx ( -- ) ;"
+    <string-reader> "axx" parse-stream drop
+] unit-test
 
-    [ ] [
-        "IN: ayy USE: kernel : ayy ( -- ) ;"
-        <string-reader> "ayy" parse-stream drop
-    ] unit-test
+[ ] [
+    "USE: axx IN: bxx : bxx ( -- ) ; : cxx ( -- ) axx bxx ;"
+    <string-reader> "bxx" parse-stream drop
+] unit-test
 
-    [ ] [
-        "IN: azz TUPLE: my-class ; GENERIC: a-generic ( a -- b )"
-        <string-reader> "azz" parse-stream drop
-    ] unit-test
+! So we move the bxx word to axx...
+[ ] [
+    "IN: axx : axx ( -- ) ; : bxx ( -- ) ;"
+    <string-reader> "axx" parse-stream drop
+] unit-test
 
-    [ ] [
-        "USE: azz M: my-class a-generic ;"
-        <string-reader> "azz-2" parse-stream drop
-    ] unit-test
+[ t ] [ "bxx" "axx" lookup >boolean ] unit-test
 
-    [ ] [
-        "IN: azz GENERIC: a-generic ( a -- b )"
-        <string-reader> "azz" parse-stream drop
-    ] unit-test
+! And reload the file that uses it...
+[ ] [
+    "USE: axx IN: bxx ( -- ) : cxx ( -- ) axx bxx ;"
+    <string-reader> "bxx" parse-stream drop
+] unit-test
 
-    [ ] [
-        "USE: azz USE: math M: integer a-generic ;"
-        <string-reader> "azz-2" parse-stream drop
-    ] unit-test
+! And hope not to get a forward-error!
 
-    [ ] [
-        "IN: parser.tests : <bogus-error> ( -- ) ; : bogus ( -- error ) <bogus-error> ;"
-        <string-reader> "bogus-error" parse-stream drop
-    ] unit-test
+! Turning a generic into a non-generic could cause all
+! kinds of funnyness
+[ ] [
+    "IN: ayy USE: kernel GENERIC: ayy ( a -- b ) M: object ayy ;"
+    <string-reader> "ayy" parse-stream drop
+] unit-test
 
-    [ ] [
-        "IN: parser.tests TUPLE: bogus-error ; C: <bogus-error> bogus-error : bogus ( -- error ) <bogus-error> ;"
-        <string-reader> "bogus-error" parse-stream drop
-    ] unit-test
+[ ] [
+    "IN: ayy USE: kernel : ayy ( -- ) ;"
+    <string-reader> "ayy" parse-stream drop
+] unit-test
 
-    ! Problems with class predicates -vs- ordinary words
-    [ ] [
-        "IN: parser.tests TUPLE: killer ;"
-        <string-reader> "removing-the-predicate" parse-stream drop
-    ] unit-test
+[ ] [
+    "IN: azz TUPLE: my-class ; GENERIC: a-generic ( a -- b )"
+    <string-reader> "azz" parse-stream drop
+] unit-test
 
-    [ ] [
-        "IN: parser.tests GENERIC: killer? ( a -- b )"
-        <string-reader> "removing-the-predicate" parse-stream drop
-    ] unit-test
-    
-    [ t ] [
-        "killer?" "parser.tests" lookup >boolean
-    ] unit-test
+[ ] [
+    "USE: azz M: my-class a-generic ;"
+    <string-reader> "azz-2" parse-stream drop
+] unit-test
 
-    [
-        "IN: parser.tests TUPLE: another-pred-test ; GENERIC: another-pred-test? ( a -- b )"
-        <string-reader> "removing-the-predicate" parse-stream
-    ] [ error>> error>> error>> redefine-error? ] must-fail-with
+[ ] [
+    "IN: azz GENERIC: a-generic ( a -- b )"
+    <string-reader> "azz" parse-stream drop
+] unit-test
 
-    [
-        "IN: parser.tests TUPLE: class-redef-test ; TUPLE: class-redef-test ;"
-        <string-reader> "redefining-a-class-1" parse-stream
-    ] [ error>> error>> error>> redefine-error? ] must-fail-with
+[ ] [
+    "USE: azz USE: math M: integer a-generic ;"
+    <string-reader> "azz-2" parse-stream drop
+] unit-test
 
-    [ ] [
-        "IN: parser.tests TUPLE: class-redef-test ; SYMBOL: class-redef-test"
-        <string-reader> "redefining-a-class-2" parse-stream drop
-    ] unit-test
+[ ] [
+    "IN: parser.tests : <bogus-error> ( -- ) ; : bogus ( -- error ) <bogus-error> ;"
+    <string-reader> "bogus-error" parse-stream drop
+] unit-test
 
-    [
-        "IN: parser.tests TUPLE: class-redef-test ; SYMBOL: class-redef-test : class-redef-test ( -- ) ;"
-        <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ error>> error>> error>> redefine-error? ] must-fail-with
+[ ] [
+    "IN: parser.tests TUPLE: bogus-error ; C: <bogus-error> bogus-error : bogus ( -- error ) <bogus-error> ;"
+    <string-reader> "bogus-error" parse-stream drop
+] unit-test
 
-    [ ] [
-        "IN: parser.tests TUPLE: class-fwd-test ;"
-        <string-reader> "redefining-a-class-3" parse-stream drop
-    ] unit-test
+! Problems with class predicates -vs- ordinary words
+[ ] [
+    "IN: parser.tests TUPLE: killer ;"
+    <string-reader> "removing-the-predicate" parse-stream drop
+] unit-test
 
-    [
-        "IN: parser.tests \\ class-fwd-test"
-        <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ error>> error>> error>> no-word-error? ] must-fail-with
+[ ] [
+    "IN: parser.tests GENERIC: killer? ( a -- b )"
+    <string-reader> "removing-the-predicate" parse-stream drop
+] unit-test
 
-    [ ] [
-        "IN: parser.tests TUPLE: class-fwd-test ; SYMBOL: class-fwd-test"
-        <string-reader> "redefining-a-class-3" parse-stream drop
-    ] unit-test
+[ t ] [
+    "killer?" "parser.tests" lookup >boolean
+] unit-test
 
-    [
-        "IN: parser.tests \\ class-fwd-test"
-        <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ error>> error>> error>> no-word-error? ] must-fail-with
+[
+    "IN: parser.tests TUPLE: another-pred-test ; GENERIC: another-pred-test? ( a -- b )"
+    <string-reader> "removing-the-predicate" parse-stream
+] [ error>> error>> error>> redefine-error? ] must-fail-with
 
-    [
-        "IN: parser.tests : foo ( -- ) ; TUPLE: foo ;"
-        <string-reader> "redefining-a-class-4" parse-stream drop
-    ] [ error>> error>> error>> redefine-error? ] must-fail-with
+[
+    "IN: parser.tests TUPLE: class-redef-test ; TUPLE: class-redef-test ;"
+    <string-reader> "redefining-a-class-1" parse-stream
+] [ error>> error>> error>> redefine-error? ] must-fail-with
 
-    [ ] [
-        "IN: parser.tests : foo ( x y -- z ) 1 2 ; : bar ( a -- b ) ;" eval( -- )
-    ] unit-test
+[ ] [
+    "IN: parser.tests TUPLE: class-redef-test ; SYMBOL: class-redef-test"
+    <string-reader> "redefining-a-class-2" parse-stream drop
+] unit-test
 
-    [
-        "IN: parser.tests : foo ( x y -- z) 1 2 ; : bar ( a -- b ) ;" eval( -- )
-    ] must-fail
-] with-file-vocabs
+[
+    "IN: parser.tests TUPLE: class-redef-test ; SYMBOL: class-redef-test : class-redef-test ( -- ) ;"
+    <string-reader> "redefining-a-class-3" parse-stream drop
+] [ error>> error>> error>> redefine-error? ] must-fail-with
+
+[ ] [
+    "IN: parser.tests TUPLE: class-fwd-test ;"
+    <string-reader> "redefining-a-class-3" parse-stream drop
+] unit-test
+
+[
+    "IN: parser.tests \\ class-fwd-test"
+    <string-reader> "redefining-a-class-3" parse-stream drop
+] [ error>> error>> error>> no-word-error? ] must-fail-with
+
+[ ] [
+    "IN: parser.tests TUPLE: class-fwd-test ; SYMBOL: class-fwd-test"
+    <string-reader> "redefining-a-class-3" parse-stream drop
+] unit-test
+
+[
+    "IN: parser.tests \\ class-fwd-test"
+    <string-reader> "redefining-a-class-3" parse-stream drop
+] [ error>> error>> error>> no-word-error? ] must-fail-with
+
+[
+    "IN: parser.tests : foo ( -- ) ; TUPLE: foo ;"
+    <string-reader> "redefining-a-class-4" parse-stream drop
+] [ error>> error>> error>> redefine-error? ] must-fail-with
+
+[ ] [
+    "IN: parser.tests : foo ( x y -- z ) 1 2 ; : bar ( a -- b ) ;" eval( -- )
+] unit-test
+
+[
+    "IN: parser.tests : foo ( x y -- z) 1 2 ; : bar ( a -- b ) ;" eval( -- )
+] must-fail
 
 [ ] [
     "IN: parser.tests USE: kernel PREDICATE: foo < object ( x -- y ) ;" eval( -- )

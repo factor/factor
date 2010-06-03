@@ -35,6 +35,24 @@ IN: combinators.tests
 [ 7 ] [ 1 3 [ 2 * ] [ + ] compose compile-call(-test-1 ] unit-test
 [ 4 ] [ 1 3 [ { + } [ ] like call ] compile-call(-test-1 ] unit-test
 
+[ [ ] call( -- * ) ] must-fail
+
+: compile-call(-test-2 ( -- ) [ ] call( -- * ) ;
+
+[ compile-call(-test-2 ] [ wrong-values? ] must-fail-with
+
+: compile-call(-test-3 ( quot -- ) call( -- * ) ;
+
+[ [ ] compile-call(-test-3 ] [ wrong-values? ] must-fail-with
+
+: compile-execute(-test-3 ( a -- ) \ . execute( value -- * ) ;
+
+[ 10 compile-execute(-test-3 ] [ wrong-values? ] must-fail-with
+
+: compile-execute(-test-4 ( a word -- ) execute( value -- * ) ;
+
+[ 10 \ . compile-execute(-test-4 ] [ wrong-values? ] must-fail-with
+
 ! Compiled
 : cond-test-1 ( obj -- str )
     {

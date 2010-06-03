@@ -62,10 +62,7 @@ IN: ui.tools.operations
 
 ! Thread
 : com-thread-traceback-window ( thread -- )
-    continuation>> dup occupied>>
-    [ value>> traceback-window ]
-    [ drop beep ]
-    if ;
+    thread-continuation traceback-window ;
 
 [ thread? ] \ com-thread-traceback-window H{
     { +primary+ t }

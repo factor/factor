@@ -25,7 +25,7 @@ M: circular virtual-exemplar seq>> ; inline
 
 : change-circular-start ( n circular -- )
     #! change start to (start + n) mod length
-    circular-wrap (>>start) ; inline
+    circular-wrap start<< ; inline
 
 : rotate-circular ( circular -- )
     [ 1 ] dip change-circular-start ; inline
@@ -64,7 +64,7 @@ TUPLE: circular-iterator
 
 <PRIVATE
 
-: (circular-while) ( iterator quot: ( obj -- ? ) -- )
+: (circular-while) ( ... iterator quot: ( ... obj -- ... ? ) -- ... )
     [ [ [ n>> ] [ circular>> ] bi nth ] dip call ] 2keep
     rot [ [ dup n>> >>last-start ] dip ] when
     over [ n>> ] [ [ last-start>> ] [ circular>> length ] bi + 1 - ] bi = [
@@ -75,5 +75,5 @@ TUPLE: circular-iterator
 
 PRIVATE>
 
-: circular-while ( circular quot: ( obj -- ? ) -- )
+: circular-while ( ... circular quot: ( ... obj -- ... ? ) -- ... )
     [ clone ] dip [ <circular-iterator> ] dip (circular-while) ; inline

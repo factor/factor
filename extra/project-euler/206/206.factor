@@ -1,7 +1,8 @@
 ! Copyright (c) 2010 Aaron Schaefer. All rights reserved.
 ! The contents of this file are licensed under the Simplified BSD License
 ! A copy of the license is available at http://factorcode.org/license.txt
-USING: grouping kernel math math.ranges project-euler.common sequences ;
+USING: grouping kernel math math.ranges project-euler.common
+sequences sequences.cords assocs ;
 IN: project-euler.206
 
 ! http://projecteuler.net/index.php?section=problems&id=206
@@ -30,10 +31,10 @@ CONSTANT: hi 1389026570
 
 : form-fitting? ( n -- ? )
     number>digits 2 group [ first ] map
-    { 1 2 3 4 5 6 7 8 9 0 } = ;
+    { 1 2 3 4 5 6 7 8 9 0 } sequence= ;
 
 : candidates ( -- seq )
-    lo lo 40 + [ hi 100 <range> ] bi@ append ;
+    lo lo 40 + [ hi 100 <range> ] bi@ cord-append ;
 
 PRIVATE>
 

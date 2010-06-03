@@ -1,10 +1,12 @@
-! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs arrays classes combinators
-compiler.units fry generalizations generic kernel locals
-namespaces quotations sequences sets slots words
-compiler.cfg.instructions compiler.cfg.instructions.syntax
+compiler.units fry generalizations sequences.generalizations
+generic kernel locals namespaces quotations sequences sets slots
+words compiler.cfg.instructions compiler.cfg.instructions.syntax
 compiler.cfg.rpo ;
+FROM: namespaces => set ;
+FROM: sets => members ;
 IN: compiler.cfg.def-use
 
 GENERIC: defs-vreg ( insn -- vreg/f )
@@ -94,9 +96,9 @@ SYMBOLS: defs insns uses ;
     cfg [| block |
         block instructions>> [
             dup ##phi?
-            [ inputs>> [ use conjoin-at ] assoc-each ]
-            [ uses-vregs [ block swap use conjoin-at ] each ]
+            [ inputs>> [ use adjoin-at ] assoc-each ]
+            [ uses-vregs [ block swap use adjoin-at ] each ]
             if
         ] each
     ] each-basic-block
-    use [ keys ] assoc-map uses set ;
+    use [ members ] assoc-map uses set ;

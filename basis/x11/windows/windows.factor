@@ -1,19 +1,20 @@
-! Copyright (C) 2005, 2006 Eduardo Cavazos and Slava Pestov
+! Copyright (C) 2005, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math math.bitwise math.vectors
-namespaces sequences x11 x11.xlib x11.constants x11.glx arrays
-fry classes.struct ;
+namespaces sequences arrays fry classes.struct literals
+x11 x11.xlib x11.constants x11.events
+x11.glx ;
 IN: x11.windows
 
-: create-window-mask ( -- n )
-    { CWBackPixel CWBorderPixel CWColormap CWEventMask } flags ;
+CONSTANT: create-window-mask
+    flags{ CWBackPixel CWBorderPixel CWColormap CWEventMask }
 
 : create-colormap ( visinfo -- colormap )
     [ dpy get root get ] dip visual>> AllocNone
     XCreateColormap ;
 
-: event-mask ( -- n )
-    {
+CONSTANT: event-mask
+    flags{
         ExposureMask
         StructureNotifyMask
         KeyPressMask
@@ -25,7 +26,7 @@ IN: x11.windows
         EnterWindowMask
         LeaveWindowMask
         PropertyChangeMask
-    } flags ;
+    }
 
 : window-attributes ( visinfo -- attributes )
     XSetWindowAttributes <struct>
@@ -78,7 +79,7 @@ IN: x11.windows
     dpy get swap XDestroyWindow drop ;
 
 : set-closable ( win -- )
-    dpy get swap "WM_DELETE_WINDOW" x-atom <Atom> 1
+    dpy get swap XA_WM_DELETE_WINDOW <Atom> 1
     XSetWMProtocols drop ;
 
 : map-window ( win -- ) dpy get swap XMapWindow drop ;

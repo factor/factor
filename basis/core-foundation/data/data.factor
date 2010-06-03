@@ -12,7 +12,7 @@ CONSTANT: kCFPropertyListImmutable 0
 CONSTANT: kCFPropertyListMutableContainers 1
 CONSTANT: kCFPropertyListMutableContainersAndLeaves 2
 
-FUNCTION: CFDataRef CFDataCreate ( CFAllocatorRef allocator, uchar* bytes, CFIndex length ) ;
+FUNCTION: CFDataRef CFDataCreate ( CFAllocatorRef allocator, UInt8* bytes, CFIndex length ) ;
 
 FUNCTION: CFTypeID CFGetTypeID ( CFTypeRef cf ) ;
 

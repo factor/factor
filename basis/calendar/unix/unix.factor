@@ -21,7 +21,7 @@ IN: calendar.unix
     timespec>seconds since-1970 ;
 
 : get-time ( -- alien )
-    f time <time_t> localtime tm memory>struct ;
+    f time <time_t> localtime ;
 
 : timezone-name ( -- string )
     get-time zone>> ;

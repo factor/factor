@@ -3,6 +3,7 @@
 USING: accessors kernel sequences sets arrays math strings fry
 namespaces prettyprint compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation compiler.cfg assocs ;
+FROM: namespaces => set ;
 IN: compiler.cfg.linear-scan.debugger
 
 : check-linear-scan ( live-intervals machine-registers -- )

@@ -1,12 +1,12 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays alien alien.c-types alien.syntax kernel destructors
-accessors fry words hashtables strings sequences memoize assocs math
-math.order math.vectors math.rectangles math.functions locals init
-namespaces combinators fonts colors cache core-foundation
-core-foundation.strings core-foundation.attributed-strings
-core-foundation.utilities core-graphics core-graphics.types
-core-text.fonts ;
+USING: arrays alien alien.c-types alien.data alien.syntax kernel
+destructors accessors fry words hashtables strings sequences
+memoize assocs math math.order math.vectors math.rectangles
+math.functions locals init namespaces combinators fonts colors
+cache core-foundation core-foundation.strings
+core-foundation.attributed-strings core-foundation.utilities
+core-graphics core-graphics.types core-text.fonts ;
 IN: core-text
 
 TYPEDEF: void* CTLineRef
@@ -50,8 +50,8 @@ ERROR: not-a-string object ;
 TUPLE: line < disposable line metrics image loc dim ;
 
 : typographic-bounds ( line -- width ascent descent leading )
-    0 <CGFloat> 0 <CGFloat> 0 <CGFloat>
-    [ CTLineGetTypographicBounds ] 3keep [ *CGFloat ] tri@ ; inline
+    { CGFloat CGFloat CGFloat }
+    [ CTLineGetTypographicBounds ] [ ] with-out-parameters ; inline
 
 : store-typographic-bounds ( metrics width ascent descent leading -- metrics )
     {

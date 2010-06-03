@@ -28,10 +28,16 @@ CONSTANT: deck-bits 18
 : callstack-length-offset ( -- n ) 1 \ callstack type-number slot-offset ; inline
 : callstack-top-offset ( -- n ) 2 \ callstack type-number slot-offset ; inline
 : vm-context-offset ( -- n ) 0 bootstrap-cells ; inline
+: vm-spare-context-offset ( -- n ) 1 bootstrap-cells ; inline
 : context-callstack-top-offset ( -- n ) 0 bootstrap-cells ; inline
 : context-callstack-bottom-offset ( -- n ) 1 bootstrap-cells ; inline
 : context-datastack-offset ( -- n ) 2 bootstrap-cells ; inline
 : context-retainstack-offset ( -- n ) 3 bootstrap-cells ; inline
+: context-callstack-save-offset ( -- n ) 4 bootstrap-cells ; inline
+: context-callstack-seg-offset ( -- n ) 7 bootstrap-cells ; inline
+: segment-start-offset ( -- n ) 0 bootstrap-cells ; inline
+: segment-size-offset ( -- n ) 1 bootstrap-cells ; inline
+: segment-end-offset ( -- n ) 2 bootstrap-cells ; inline
 
 ! Relocation classes
 CONSTANT: rc-absolute-cell 0
@@ -45,6 +51,7 @@ CONSTANT: rc-relative-arm-3 7
 CONSTANT: rc-indirect-arm 8
 CONSTANT: rc-indirect-arm-pc 9
 CONSTANT: rc-absolute-2 10
+CONSTANT: rc-absolute-1 11
 
 ! Relocation types
 CONSTANT: rt-dlsym 0
@@ -59,6 +66,13 @@ CONSTANT: rt-megamorphic-cache-hits 8
 CONSTANT: rt-vm 9
 CONSTANT: rt-cards-offset 10
 CONSTANT: rt-decks-offset 11
+CONSTANT: rt-exception-handler 12
 
 : rc-absolute? ( n -- ? )
-    ${ rc-absolute-ppc-2/2 rc-absolute-cell rc-absolute } member? ;
+    ${
+        $ rc-absolute-ppc-2/2
+        $ rc-absolute-cell
+        $ rc-absolute
+        $ rc-absolute-2
+        $ rc-absolute-1
+    } member? ;

@@ -63,14 +63,15 @@ HELP: bad-macro-input
 } ;
 
 HELP: unbalanced-branches-error
-{ $values { "in" "a sequence of integers" } { "out" "a sequence of integers" } }
-{ $description "Throws an " { $link unbalanced-branches-error } "." }
-{ $error-description "Thrown when inference encounters an " { $link if } " or " { $link dispatch } " where the branches do not all exit with the same stack height. See " { $link "inference-branches" } " for details." }
-{ $notes "If this error comes up when inferring the stack effect of a recursive word, check the word's stack effect declaration; it might be wrong." }
+{ $error-description "Thrown when inference encounters an inline combinator whose input quotations do not match their declared effects, or when it encounters an " { $link if } " or " { $link dispatch } " whose branches do not all exit with the same stack height. See " { $link "inference-combinators" } " and " { $link "inference-branches" } " for details." }
 { $examples
     { $code
-        ": unbalanced-branches-example ( a b c -- )"
+        ": if-unbalanced-branches-example ( a b c -- )"
         "    [ + ] [ dup ] if ;"
+    }
+    { $code
+        ": each-unbalanced-branches-example ( x seq -- x' )"
+        "    [ 3append ] each ;"
     }
 } ;
 

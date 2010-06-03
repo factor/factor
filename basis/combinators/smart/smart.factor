@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fry generalizations kernel macros math.order
-stack-checker math sequences ;
+USING: accessors fry generalizations sequences.generalizations
+kernel macros math.order stack-checker math sequences ;
 IN: combinators.smart
 
 MACRO: drop-outputs ( quot -- quot' )
@@ -49,8 +49,29 @@ MACRO: preserving ( quot -- )
 MACRO: nullary ( quot -- quot' )
     dup outputs '[ @ _ ndrop ] ;
 
-MACRO: smart-if ( pred true false -- )
+MACRO: dropping ( quot -- quot' )
+    inputs '[ [ _ ndrop ] ] ;
+
+MACRO: balancing ( quot -- quot' )
+    '[ _ [ preserving ] [ dropping ] bi ] ;
+
+MACRO: smart-if ( pred true false -- quot )
     '[ _ preserving _ _ if ] ;
 
-MACRO: smart-apply ( quot n -- )
+MACRO: smart-when ( pred true -- quot )
+    '[ _ _ [ ] smart-if ] ;
+
+MACRO: smart-unless ( pred false -- quot )
+    '[ _ [ ] _ smart-if ] ;
+
+MACRO: smart-if* ( pred true false -- quot )
+    '[ _ balancing _ swap _ compose if ] ;
+
+MACRO: smart-when* ( pred true -- quot )
+    '[ _ _ [ ] smart-if* ] ;
+
+MACRO: smart-unless* ( pred false -- quot )
+    '[ _ [ ] _ smart-if* ] ;
+
+MACRO: smart-apply ( quot n -- quot )
     [ dup inputs ] dip '[ _ _ _ mnapply ] ;

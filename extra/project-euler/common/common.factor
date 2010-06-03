@@ -68,9 +68,6 @@ PRIVATE>
 : alpha-value ( str -- n )
     >lower [ CHAR: a - 1 + ] map-sum ;
 
-: cartesian-product ( seq1 seq2 -- seq1xseq2 )
-    [ [ 2array ] with map ] curry map concat ;
-
 : mediant ( a/c b/d -- (a+b)/(c+d) )
     2>fraction [ + ] 2bi@ / ;
 
@@ -160,6 +157,6 @@ PRIVATE>
 SYNTAX: SOLUTION:
     scan-word
     [ name>> "-main" append create-in ] keep
-    [ drop current-vocab (>>main) ]
+    [ drop current-vocab main<< ]
     [ [ . ] swap prefix (( -- )) define-declared ]
     2bi ;

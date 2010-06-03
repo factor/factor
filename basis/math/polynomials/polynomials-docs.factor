@@ -56,14 +56,14 @@ HELP: p-
 { $examples { $example "USING: math.polynomials prettyprint ;" "{ 1 1 1 } { 0 1 } p- ." "{ 1 0 1 }" } } ;
 
 HELP: n*p
-{ $values { "n" number } { "p" "a polynomial" } { "n*p" "a polynomial" } }
+{ $values { "n" number } { "v" "a polynomial" } { "w" "a polynomial" } }
 { $description "Multiplies each element of " { $snippet "p" } " by " { $snippet "n" } "." }
 { $examples { $example "USING: math.polynomials prettyprint ;" "4 { 3 0 1 } n*p ." "{ 12 0 4 }" } } ;
 
 HELP: pextend-conv
 { $values { "p" "a polynomial" } { "q" "a polynomial" } { "p'" "a polynomial" } { "q'" "a polynomial" } }
 { $description "Convulution, extending to " { $snippet "p_m + q_n - 1" } "." }
-{ $examples { $example "USING: kernel math.polynomials prettyprint ;" "{ 1 0 1 } { 0 1 } pextend-conv [ . ] bi@" "V{ 1 0 1 0 }\nV{ 0 1 0 0 }" } } ;
+{ $examples { $example "USING: kernel math.polynomials prettyprint ;" "{ 1 0 1 } { 0 1 } pextend-conv [ . ] bi@" "{ 1 0 1 0 }\n{ 0 1 0 0 }" } } ;
 
 HELP: p*
 { $values { "p" "a polynomial" } { "q" "a polynomial" } { "r" "a polynomial" } }

@@ -44,10 +44,6 @@ IN: math.bitwise
 : W- ( x y -- z ) - 64 bits ; inline
 : W* ( x y -- z ) * 64 bits ; inline
 
-! flags
-MACRO: flags ( values -- )
-    [ 0 ] [ [ ?execute bitor ] curry compose ] reduce ;
-
 : symbols>flags ( symbols assoc -- flag-bits )
     [ at ] curry map
     0 [ bitor ] reduce ;
@@ -88,13 +84,16 @@ DEFER: byte-bit-count
 
 GENERIC: (bit-count) ( x -- n )
 
-M: fixnum (bit-count)
+: fixnum-bit-count ( x -- n )
     0 swap [
         dup 0 >
     ] [
         [ 8 bits byte-bit-count ] [ -8 shift ] bi
         [ + ] dip
     ] while drop ;
+
+M: fixnum (bit-count)
+    fixnum-bit-count ; inline
 
 M: bignum (bit-count)
     dup 0 = [ drop 0 ] [
@@ -117,8 +116,7 @@ M: byte-array bit-count
     byte-array-bit-count ;
 
 M: object bit-count
-    [ >c-ptr ] [ byte-length ] bi <direct-uchar-array>
-    byte-array-bit-count ;
+    binary-object <direct-uchar-array> byte-array-bit-count ;
 
 : even-parity? ( obj -- ? ) bit-count even? ;
 

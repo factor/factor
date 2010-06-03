@@ -12,6 +12,7 @@ Factor/factor
 *.res
 *.RES
 *.image
+factor.image.fresh
 *.dylib
 factor
 factor.com

@@ -68,31 +68,34 @@ ERROR: invalid-slot-name name ;
 
 ERROR: bad-literal-tuple ;
 
-: parse-slot-value ( -- )
-    scan scan-object 2array , scan {
+ERROR: bad-slot-name class slot ;
+
+: check-slot-name ( class slots name -- name )
+    2dup swap slot-named* nip [ 2nip ] [ nip bad-slot-name ] if ;
+
+: parse-slot-value ( class slots -- )
+    scan check-slot-name scan-object 2array , scan {
         { f [ \ } unexpected-eof ] }
         { "}" [ ] }
         [ bad-literal-tuple ]
     } case ;
 
-: (parse-slot-values) ( -- )
-    parse-slot-value
+: (parse-slot-values) ( class slots -- )
+    2dup parse-slot-value
     scan {
-        { f [ \ } unexpected-eof ] }
+        { f [ 2drop \ } unexpected-eof ] }
         { "{" [ (parse-slot-values) ] }
-        { "}" [ ] }
-        [ bad-literal-tuple ]
+        { "}" [ 2drop ] }
+        [ 2nip bad-literal-tuple ]
     } case ;
 
-: parse-slot-values ( -- values )
+: parse-slot-values ( class slots -- values )
     [ (parse-slot-values) ] { } make ;
 
 GENERIC# boa>object 1 ( class slots -- tuple )
 
 M: tuple-class boa>object
     swap prefix >tuple ;
-
-ERROR: bad-slot-name class slot ;
 
 : check-slot-exists ( class initials slot-spec/f index/f name -- class initials slot-spec index )
     over [ drop ] [ nip nip nip bad-slot-name ] if ;
@@ -109,7 +112,7 @@ ERROR: bad-slot-name class slot ;
     scan {
         { f [ unexpected-eof ] }
         { "f" [ drop \ } parse-until boa>object ] }
-        { "{" [ parse-slot-values assoc>object ] }
+        { "{" [ 2dup parse-slot-values assoc>object ] }
         { "}" [ drop new ] }
         [ bad-literal-tuple ]
     } case ;

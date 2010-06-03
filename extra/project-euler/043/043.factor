@@ -86,7 +86,8 @@ PRIVATE>
 
 : interesting-pandigitals ( -- seq )
     17 candidates { 13 11 7 5 3 2 } [
-        candidates swap cartesian-product [ overlap? ] filter clean
+        candidates swap cartesian-product concat
+        [ overlap? ] filter clean
     ] each [ add-missing-digit ] map ;
 
 PRIVATE>

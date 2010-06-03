@@ -1,5 +1,6 @@
 USING: accessors effects eval kernel layouts math namespaces
-quotations tools.test typed words ;
+quotations tools.test typed words words.symbol
+compiler.tree.debugger prettyprint definitions compiler.units ;
 IN: typed.tests
 
 TYPED: f+ ( a: float b: float -- c: float )
@@ -122,3 +123,38 @@ TYPED: recompile-fail ( a: subclass -- ? ) buh get eq? ;
 [ ] [ "IN: typed.tests TUPLE: subclass < superclass { y read-only } ;" eval( -- ) ] unit-test
 
 [ t ] [ subclass new [ buh set ] [ recompile-fail ] bi ] unit-test
+
+! Make sure that foldable and flushable work on typed words
+TYPED: add ( a: integer b: integer -- c: integer ) + ; foldable
+
+[ [ 3 ] ] [ [ 1 2 add ] cleaned-up-tree nodes>quot ] unit-test
+
+TYPED: flush-test ( s: symbol -- ? ) on t ; flushable
+
+: flush-print-1 ( symbol -- ) flush-test drop ;
+: flush-print-2 ( symbol -- ) flush-test . ;
+
+SYMBOL: a-symbol
+
+[ f ] [
+    f a-symbol [
+        a-symbol flush-print-1
+        a-symbol get
+    ] with-variable
+] unit-test
+
+[ t ] [
+    f a-symbol [
+        a-symbol flush-print-2
+        a-symbol get
+    ] with-variable
+] unit-test
+
+! Forgetting an unboxed final class should work
+TUPLE: forget-class { x read-only } ; final
+
+TYPED: forget-fail ( a: forget-class -- ) drop ;
+
+[ ] [ [ \ forget-class forget ] with-compilation-unit ] unit-test
+
+[ ] [ [ \ forget-fail forget ] with-compilation-unit ] unit-test

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test constructors calendar kernel accessors
-combinators.short-circuit initializers math ;
+USING: accessors calendar combinators.short-circuit
+constructors eval initializers kernel math tools.test ;
 IN: constructors.tests
 
 TUPLE: stock-spread stock spread timestamp ;
@@ -41,3 +41,21 @@ CONSTRUCTOR: ct4 ( a b c d -- obj )
 [ 2 ] [ 0 0 <ct2> a>> ] unit-test
 [ 3 ] [ 0 0 0 <ct3> a>> ] unit-test
 [ 4 ] [ 0 0 0 0 <ct4> a>> ] unit-test
+
+[
+    """USE: constructors
+IN: constructors.tests
+TUPLE: foo a b ;
+CONSTRUCTOR: foo ( a a -- obj ) ;""" eval( -- )
+] [
+    error>> repeated-constructor-parameters?
+] must-fail-with
+
+[
+    """USE: constructors
+IN: constructors.tests
+TUPLE: foo a b ;
+CONSTRUCTOR: foo ( a c -- obj ) ;""" eval( -- )
+] [
+    error>> unknown-constructor-parameters?
+] must-fail-with

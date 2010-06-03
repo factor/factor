@@ -137,7 +137,7 @@ M: blas-matrix-base clone
 : <empty-matrix> ( rows cols exemplar -- matrix )
     [ element-type heap-size * * <byte-array> ]
     [ 2drop ]
-    [ f swap (blas-matrix-like) ] 3tri ;
+    [ [ f ] dip (blas-matrix-like) ] 3tri ;
 
 : n*M.V+n*V ( alpha A x beta y -- alpha*A.x+b*y )
     clone n*M.V+n*V! ;
@@ -153,7 +153,7 @@ M: blas-matrix-base clone
     n*M.V+n*V! ; inline
 
 : M.V ( A x -- A.x )
-    1.0 -rot n*M.V ; inline
+    [ 1.0 ] 2dip n*M.V ; inline
 
 : n*V(*)V ( alpha x y -- alpha*x(*)y )
     2dup [ length>> ] bi@ pick <empty-matrix>
@@ -163,16 +163,16 @@ M: blas-matrix-base clone
     n*V(*)Vconj+M! ;
 
 : V(*) ( x y -- x(*)y )
-    1.0 -rot n*V(*)V ; inline
+    [ 1.0 ] 2dip n*V(*)V ; inline
 : V(*)conj ( x y -- x(*)yconj )
-    1.0 -rot n*V(*)Vconj ; inline
+    [ 1.0 ] 2dip n*V(*)Vconj ; inline
 
 : n*M.M ( alpha A B -- alpha*A.B )
     2dup [ Mheight ] [ Mwidth ] bi* pick <empty-matrix> 
-    1.0 swap n*M.M+n*M! ;
+    [ 1.0 ] dip n*M.M+n*M! ;
 
 : M. ( A B -- A.B )
-    1.0 -rot n*M.M ; inline
+    [ 1.0 ] 2dip n*M.M ; inline
 
 :: (Msub) ( matrix row col height width -- data ld rows cols )
     matrix ld>> col * row + matrix element-type heap-size *

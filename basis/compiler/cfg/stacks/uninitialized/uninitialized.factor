@@ -33,13 +33,18 @@ M: ##inc-r visit-insn n>> rs-loc handle-inc ;
 
 ERROR: uninitialized-peek insn ;
 
-M: ##peek visit-insn
+: visit-peek ( ##peek -- )
     dup loc>> [ n>> ] [ class get ] bi ?nth 0 =
-    [ uninitialized-peek ] [ drop ] if ;
+    [ uninitialized-peek ] [ drop ] if ; inline
 
-M: ##replace visit-insn
+M: ##peek visit-insn visit-peek ;
+
+: visit-replace ( ##replace -- )
     loc>> [ n>> ] [ class get ] bi
     2dup length < [ [ 1 ] 2dip set-nth ] [ 2drop ] if ;
+
+M: ##replace visit-insn visit-replace ;
+M: ##replace-imm visit-insn visit-replace ;
 
 M: insn visit-insn drop ;
 

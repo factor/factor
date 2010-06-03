@@ -7,12 +7,12 @@ TYPEDEF: alien.c-types:int type-1
 TYPEDEF: alien.c-types:int type-3
 
 : callback ( -- ptr )
-    type-3 { type-1 type-1 } "cdecl" [ + >integer ] alien-callback ;
+    type-3 { type-1 type-1 } cdecl [ + >integer ] alien-callback ;
 
 TYPEDEF: alien.c-types:float type-2
 
 : indirect ( x y ptr -- z  )
-    type-3 { type-2 type-2 } "cdecl" alien-indirect ;
+    type-3 { type-2 type-2 } cdecl alien-indirect ;
 
 [ ] [
     "USING: alien.c-types alien.syntax ;

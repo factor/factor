@@ -33,7 +33,7 @@ TUPLE: inline-cache value counter ;
 
 : update-inline-cache ( word/quot ic -- )
     [ effect-counter ] dip
-    [ (>>value) ] [ (>>counter) ] bi-curry bi* ; inline
+    [ value<< ] [ counter<< ] bi-curry bi* ; inline
 
 SINGLETON: +unknown+
 
@@ -48,7 +48,7 @@ M: +unknown+ curry-effect ;
 M: effect curry-effect
     [ in>> length ] [ out>> length ] [ terminated?>> ] tri
     pick 0 = [ [ 1 + ] dip ] [ [ 1 - ] 2dip ] if
-    [ [ "x" <array> ] bi@ ] dip effect boa ;
+    [ [ "x" <array> ] bi@ ] dip <terminated-effect> ;
 
 M: curry cached-effect
     quot>> cached-effect curry-effect ;
@@ -74,7 +74,7 @@ M: compose cached-effect
 
 : save-effect ( effect quot -- )
     [ effect-counter ] dip
-    [ (>>cached-effect) ] [ (>>cache-counter) ] bi-curry bi* ;
+    [ cached-effect<< ] [ cache-counter<< ] bi-curry bi* ;
 
 M: quotation cached-effect
     dup cached-effect-valid?

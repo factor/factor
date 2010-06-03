@@ -36,7 +36,7 @@ IN: regexp.classes.tests
 
 ! Making classes into nested conditionals
 
-[ V{ 1 2 3 4 } ] [ T{ and-class f { 1 T{ not-class f 2 } T{ or-class f { 3 4 } } 2 } } class>questions ] unit-test
+[ { 1 2 3 4 } ] [ T{ and-class f { 1 T{ not-class f 2 } T{ or-class f { 3 4 } } 2 } } class>questions ] unit-test
 [ { 3 } ] [ { { 3 t } } table>condition ] unit-test
 [ { T{ primitive-class } } ] [ { { 1 t } { 2 T{ primitive-class } } } table>questions ] unit-test
 [ { { 1 t } { 2 t } } ] [ { { 1 t } { 2 T{ primitive-class } } } T{ primitive-class } t assoc-answer ] unit-test

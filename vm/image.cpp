@@ -258,7 +258,7 @@ void factor_vm::load_image(vm_parameters *p)
 	init_objects(&h);
 
 	cell data_offset = data->tenured->start - h.data_relocation_base;
-	cell code_offset = code->seg->start - h.code_relocation_base;
+	cell code_offset = code->allocator->start - h.code_relocation_base;
 
 	fixup_data(data_offset,code_offset);
 	fixup_code(data_offset,code_offset);
@@ -285,7 +285,7 @@ bool factor_vm::save_image(const vm_char *saving_filename, const vm_char *filena
 	h.version = image_version;
 	h.data_relocation_base = data->tenured->start;
 	h.data_size = data->tenured->occupied_space();
-	h.code_relocation_base = code->seg->start;
+	h.code_relocation_base = code->allocator->start;
 	h.code_size = code->allocator->occupied_space();
 
 	h.true_object = true_object;

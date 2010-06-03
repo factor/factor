@@ -1,9 +1,16 @@
 USING: alien.data kernel locals math math.bitwise
 windows.kernel32 sequences byte-arrays unicode.categories
 io.encodings.string io.encodings.utf16n alien.strings
-arrays literals windows.types specialized-arrays ;
+arrays literals windows.types specialized-arrays
+math.parser ;
 SPECIALIZED-ARRAY: TCHAR
 IN: windows.errors
+
+CONSTANT: APPLICATION_ERROR_MASK       HEX: 20000000
+CONSTANT: ERROR_SEVERITY_SUCCESS       HEX: 00000000
+CONSTANT: ERROR_SEVERITY_INFORMATIONAL HEX: 40000000
+CONSTANT: ERROR_SEVERITY_WARNING       HEX: 80000000
+CONSTANT: ERROR_SEVERITY_ERROR         HEX: C0000000
 
 CONSTANT: ERROR_SUCCESS                               0
 CONSTANT: ERROR_INVALID_FUNCTION                      1
@@ -697,24 +704,27 @@ CONSTANT: FORMAT_MESSAGE_MAX_WIDTH_MASK   HEX: 000000FF
 : make-lang-id ( lang1 lang2 -- n )
     10 shift bitor ; inline
 
-ERROR: error-message-failed id ;
 :: n>win32-error-string ( id -- string )
-    {
+    flags{
         FORMAT_MESSAGE_FROM_SYSTEM
         FORMAT_MESSAGE_ARGUMENT_ARRAY
-    } flags
+    }
     f
     id
     LANG_NEUTRAL SUBLANG_DEFAULT make-lang-id
     32768 [ TCHAR <c-array> ] [ ] bi
-    f pick [ FormatMessage 0 = [ id error-message-failed ] when ] dip
-    utf16n alien>string [ blank? ] trim ;
+    f pick [ FormatMessage ] dip
+    swap zero?
+    [ drop "Unknown error 0x" id HEX: ffff,ffff bitand >hex append ]
+    [ utf16n alien>string [ blank? ] trim ] if ;
 
 : win32-error-string ( -- str )
     GetLastError n>win32-error-string ;
 
+ERROR: windows-error n string ;
+
 : (win32-error) ( n -- )
-    [ win32-error-string throw ] unless-zero ;
+    [ dup win32-error-string windows-error ] unless-zero ;
 
 : win32-error ( -- )
     GetLastError (win32-error) ;

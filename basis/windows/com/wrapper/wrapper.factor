@@ -49,8 +49,7 @@ unless
 : (make-query-interface) ( interfaces -- quot )
     (query-interface-cases) 
     '[
-        swap GUID memory>struct
-        _ case
+        swap _ case
         [
             void* heap-size * rot <displaced-alien> com-add-ref
             swap 0 set-alien-cell S_OK
@@ -111,19 +110,15 @@ unless
     keep (next-vtbl-counter) '[
         swap [
             [ name>> _ _ (callback-word) ]
-            [ return>> ] [
-                parameters>>
-                [ [ first ] map ]
-                [ length ] bi
-            ] tri
+            [ return>> ] [ parameter-types>> dup length ] tri
         ] [
             first2 (finish-thunk)
         ] bi*
-        "stdcall" swap compile-alien-callback
+        stdcall swap compile-alien-callback
     ] 2map ;
 
 : (make-callbacks) ( implementations -- sequence )
-    dup [ first ] map (make-iunknown-methods)
+    dup keys (make-iunknown-methods)
     [ [ first2 ] 2dip swap (make-interface-callbacks) ]
     curry map-index ;
 

@@ -2,10 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit
 continuations fry kernel namespaces quotations sequences sets
-generalizations slots locals.types splitting math
-locals.rewrite.closures generic words combinators locals smalltalk.ast
-smalltalk.compiler.lexenv smalltalk.compiler.assignment
-smalltalk.compiler.return smalltalk.selectors smalltalk.classes ;
+generalizations sequences.generalizations slots locals.types
+splitting math locals.rewrite.closures generic words combinators
+locals smalltalk.ast smalltalk.compiler.lexenv
+smalltalk.compiler.assignment smalltalk.compiler.return
+smalltalk.selectors smalltalk.classes ;
 IN: smalltalk.compiler
 
 GENERIC: compile-ast ( lexenv ast -- quot )

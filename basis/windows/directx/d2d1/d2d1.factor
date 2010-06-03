@@ -303,6 +303,9 @@ TYPEDEF: int D2D1_FACTORY_TYPE
 STRUCT: D2D1_FACTORY_OPTIONS
     { debugLevel D2D1_DEBUG_LEVEL } ;
 
+C-TYPE: ID2D1Factory
+C-TYPE: ID2D1BitmapRenderTarget 
+
 COM-INTERFACE: ID2D1Resource IUnknown {2cd90691-12e2-11dc-9fed-001143a055f9}
     void GetFactory ( ID2D1Factory** factory ) ;
 

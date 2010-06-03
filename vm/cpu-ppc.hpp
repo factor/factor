@@ -3,6 +3,8 @@ namespace factor
 
 #define FACTOR_CPU_STRING "ppc"
 
+#define CALLSTACK_BOTTOM(ctx) (stack_frame *)(ctx->callstack_seg->end - 32)
+
 /* In the instruction sequence:
 
    LOAD32 r3,...

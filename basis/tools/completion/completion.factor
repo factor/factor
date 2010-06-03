@@ -54,7 +54,7 @@ IN: tools.completion
     sort-keys <reversed>
     [ 0 [ first max ] reduce 3 /f ] keep
     [ first < ] with filter
-    [ second ] map ;
+    values ;
 
 : complete ( full short -- score )
     [ dupd fuzzy score ] 2keep

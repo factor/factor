@@ -13,7 +13,7 @@ $nl
         "ui.gadgets.labels ui.gadgets.packs ui.gadgets.panes"
         "ui.gadgets.sliders ;"
         ""
-        ": <funny-model> ( -- model ) 0 10 0 100 <range> ;"
+        ": <funny-model> ( -- model ) 0 10 0 100 1 <range> ;"
         ": <funny-slider> ( model -- slider ) horizontal <slider> ;"
         ""
         "<funny-model> <funny-model> 2array"

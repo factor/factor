@@ -29,7 +29,7 @@ IN: fuel.xref
     [ word? ] filter [ word>xref ] map ;
 
 : filter-prefix ( seq prefix -- seq )
-    [ drop-prefix nip length 0 = ] curry filter prune ;
+    [ drop-prefix nip length 0 = ] curry filter members ;
 
 MEMO: (vocab-words) ( name -- seq )
     >vocab-link words [ name>> ] map ;
@@ -40,7 +40,7 @@ MEMO: (vocab-words) ( name -- seq )
     append H{ } [ assoc-union ] reduce keys ;
 
 : vocabs-words ( names -- seq )
-    prune [ (vocab-words) ] map concat ;
+    members [ (vocab-words) ] map concat ;
 
 PRIVATE>
 

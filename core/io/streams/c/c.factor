@@ -1,9 +1,9 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private namespaces make io io.encodings sequences
-math generic threads.private classes io.backend io.files
-io.encodings.utf8 alien.strings continuations destructors byte-arrays
-accessors combinators ;
+USING: alien alien.strings kernel kernel.private namespaces make
+io io.encodings sequences math generic threads.private classes
+io.backend io.files io.encodings.utf8 continuations destructors
+byte-arrays accessors combinators ;
 IN: io.streams.c
 
 TUPLE: c-stream < disposable handle ;
@@ -16,12 +16,14 @@ M: c-stream dispose* handle>> fclose ;
 M: c-stream stream-tell handle>> ftell ;
 
 M: c-stream stream-seek
-    handle>> swap {
-        { seek-absolute [ 0 ] }
-        { seek-relative [ 1 ] }
-        { seek-end [ 2 ] }
-        [ bad-seek-type ]
-    } case fseek ;
+    [
+        {
+            { seek-absolute [ 0 ] }
+            { seek-relative [ 1 ] }
+            { seek-end [ 2 ] }
+            [ bad-seek-type ]
+        } case
+    ] [ handle>> ] bi* fseek ;
 
 TUPLE: c-writer < c-stream ;
 
@@ -31,7 +33,9 @@ M: c-writer stream-element-type drop +byte+ ;
 
 M: c-writer stream-write1 dup check-disposed handle>> fputc ;
 
-M: c-writer stream-write dup check-disposed handle>> fwrite ;
+M: c-writer stream-write
+    dup check-disposed
+    [ [ >c-ptr ] [ byte-length ] bi ] [ handle>> ] bi* fwrite ;
 
 M: c-writer stream-flush dup check-disposed handle>> fflush ;
 
@@ -93,6 +97,6 @@ M: c-io-backend (file-appender)
     #! print stuff from contexts where the I/O system would
     #! otherwise not work (tools.deploy.shaker, the I/O
     #! multiplexer thread).
-    "\n" append >byte-array
+    "\n" append >byte-array dup length
     stdout-handle fwrite
     stdout-handle fflush ;

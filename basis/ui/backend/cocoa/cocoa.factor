@@ -1,14 +1,14 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays assocs classes cocoa
-cocoa.application cocoa.classes cocoa.messages cocoa.nibs
+USING: accessors alien.c-types alien.data arrays assocs classes
+cocoa cocoa.application cocoa.classes cocoa.messages cocoa.nibs
 cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.types
 cocoa.views cocoa.windows combinators command-line
 core-foundation core-foundation.run-loop core-graphics
 core-graphics.types destructors fry generalizations io.thread
-kernel libc literals locals math math.bitwise math.rectangles memory
-namespaces sequences threads ui colors
-ui.backend ui.backend.cocoa.views ui.clipboards ui.gadgets
+kernel libc literals locals math math.bitwise math.rectangles
+memory namespaces sequences threads ui colors ui.backend
+ui.backend.cocoa.views ui.clipboards ui.gadgets
 ui.gadgets.worlds ui.pixel-formats ui.pixel-formats.private
 ui.private words.symbol ;
 IN: ui.backend.cocoa
@@ -55,8 +55,11 @@ M: cocoa-ui-backend (free-pixel-format)
 M: cocoa-ui-backend (pixel-format-attribute)
     [ handle>> ] [ >NSOpenGLPFA ] bi*
     [ drop f ]
-    [ first 0 <int> [ swap 0 -> getValues:forAttribute:forVirtualScreen: ] keep *int ]
-    if-empty ;
+    [
+        first
+        { int } [ swap 0 -> getValues:forAttribute:forVirtualScreen: ] [ ]
+        with-out-parameters
+    ] if-empty ;
 
 TUPLE: pasteboard handle ;
 
@@ -138,7 +141,7 @@ M:: cocoa-ui-backend (open-window) ( world -- )
     window world window-loc>> auto-position
     world window save-position
     window install-window-delegate
-    view window <window-handle> world (>>handle)
+    view window <window-handle> world handle<<
     window f -> makeKeyAndOrderFront: ;
 
 M: cocoa-ui-backend (close-window) ( handle -- )
@@ -213,6 +216,18 @@ M: cocoa-ui-backend offscreen-pixels ( world -- alien w h )
 M: cocoa-ui-backend beep ( -- )
     NSBeep ;
 
+M: cocoa-ui-backend system-alert
+    invalidate-run-loop-timers
+    NSAlert -> alloc -> init -> autorelease [
+        {
+            [ swap <NSString> -> setInformativeText: ]
+            [ swap <NSString> -> setMessageText: ]
+            [ "OK" <NSString> -> addButtonWithTitle: drop ]
+            [ -> runModal drop ]
+        } cleave
+    ] [ 2drop ] if*
+    init-thread-timer ;
+
 CLASS: {
     { +superclass+ "NSObject" }
     { +name+ "FactorApplicationDelegate" }
@@ -237,7 +252,7 @@ M: cocoa-ui-backend (with-ui)
             init-clipboard
             cocoa-startup-hook get call( -- )
             start-ui
-            f io-thread-running? set-global
+            stop-io-thread
             init-thread-timer
             reset-run-loop
             NSApp -> run

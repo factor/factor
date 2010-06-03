@@ -1,10 +1,10 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien.c-types arrays assocs classes combinators
-combinators.short-circuit fry kernel locals math
-math.vectors math.vectors.simd math.vectors.simd.intrinsics sequences ;
+USING: accessors alien arrays assocs classes combinators
+combinators.short-circuit fry kernel locals math math.vectors
+math.vectors.simd math.vectors.simd.intrinsics sequences ;
 FROM: alien.c-types =>
     char uchar short ushort int uint longlong ulonglong
-    float double ;
+    float double heap-size ;
 IN: math.vectors.conversion
 
 ERROR: bad-vconvert from-type to-type ;

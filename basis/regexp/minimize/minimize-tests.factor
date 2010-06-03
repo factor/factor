@@ -34,7 +34,7 @@ IN: regexp.minimize.tests
             { 3 H{ } }
         } }
         { start-state 0 }
-        { final-states H{ { 3 3 } } }
+        { final-states HS{ 3 } }
     }
 ] [ 
     T{ transition-table
@@ -48,7 +48,7 @@ IN: regexp.minimize.tests
             { 6 H{ } }
         } }
         { start-state 0 }
-        { final-states H{ { 3 3 } { 6 6 } } }
+        { final-states HS{ 3 6 } }
     } combine-states
 ] unit-test
 

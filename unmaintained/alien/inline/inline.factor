@@ -76,7 +76,7 @@ PRIVATE>
 
 : compile-c-library ( -- )
     compile-library? [ compile-library ] when
-    c-library get dup library-path "cdecl" add-library ;
+    c-library get dup library-path cdecl add-library ;
 
 : define-c-function ( function types effect body -- )
     [

@@ -42,7 +42,7 @@ M:: cmwc random-32* ( cmwc -- n )
     [ [ i>> ] [ Q>> ] bi nth-unsafe * ]
     [ c>> + ] tri
 
-    [ >fixnum -32 shift cmwc (>>c) ]
+    [ >fixnum -32 shift cmwc c<< ]
     [ cmwc [ b>> bitand ] [ c>> + ] bi 32 bits ] bi
 
     dup cmwc r>> > [

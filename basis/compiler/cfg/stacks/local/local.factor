@@ -8,6 +8,7 @@ compiler.cfg.instructions
 compiler.cfg.registers
 compiler.cfg.stacks.height
 compiler.cfg.parallel-copy ;
+FROM: namespaces => set ;
 IN: compiler.cfg.stacks.local
 
 ! Local stack analysis. We build three sets for every basic block

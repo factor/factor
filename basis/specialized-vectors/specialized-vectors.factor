@@ -1,8 +1,8 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.parser assocs
-compiler.units functors growable kernel lexer math namespaces parser
-prettyprint.custom sequences specialized-arrays
+USING: accessors alien alien.c-types alien.parser assocs
+compiler.units functors growable kernel lexer math namespaces
+parser prettyprint.custom sequences specialized-arrays
 specialized-arrays.private strings vocabs vocabs.parser
 vocabs.generated fry make ;
 QUALIFIED: vectors.functor
@@ -26,7 +26,7 @@ V A <A> vectors.functor:define-vector
 
 M: V contract 2drop ; inline
 
-M: V byte-length length \ T heap-size * ; inline
+M: V element-size drop \ T heap-size ; inline
 
 M: V pprint-delims drop \ V{ \ } ;
 
@@ -56,11 +56,11 @@ PRIVATE>
     generate-vocab ;
 
 SYNTAX: SPECIALIZED-VECTORS:
-    ";" parse-tokens [
+    ";" [
         parse-c-type
         [ define-array-vocab use-vocab ]
         [ define-vector-vocab use-vocab ] bi
-    ] each ;
+    ] each-token ;
 
 SYNTAX: SPECIALIZED-VECTOR:
     scan-c-type

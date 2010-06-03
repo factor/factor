@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math.parser http accessors kernel xml.syntax xml.writer
 io io.streams.string io.encodings.utf8 ;
@@ -8,7 +8,7 @@ IN: http.server.responses
     <response>
         200 >>code
         "Document follows" >>message
-        utf8 >>content-charset
+        utf8 >>content-encoding
         swap >>content-type
         swap >>body ;
     

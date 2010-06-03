@@ -31,4 +31,4 @@ STRUCT: statfs
     { f_mntfromname { char MNAMELEN } }
     { mount_info char[160] } ;
 
-FUNCTION: int statfs ( char* path, statfs* buf ) ;
+FUNCTION: int statfs ( c-string path, statfs* buf ) ;

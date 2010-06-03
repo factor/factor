@@ -48,4 +48,4 @@ PRIVATE>
     ] unless ;
 
 : stop-site-watcher ( -- )
-    running-site-watcher get [ cancel-alarm ] when* ;
+    running-site-watcher get [ stop-alarm ] when* ;

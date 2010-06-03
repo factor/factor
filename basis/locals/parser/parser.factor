@@ -21,9 +21,8 @@ SYMBOL: in-lambda?
 : make-locals ( seq -- words assoc )
     [ [ make-local ] map ] H{ } make-assoc ;
 
-: make-local-word ( name def -- word )
-    [ <local-word> [ dup name>> set ] [ ] [ ] tri ] dip
-    "local-word-def" set-word-prop ;
+: parse-local-defs ( -- words assoc )
+    [ "|" [ make-local ] map-tokens ] H{ } make-assoc ;
 
 SINGLETON: lambda-parser
 
@@ -42,12 +41,12 @@ SYMBOL: locals
     [ \ ] parse-until >quotation ] ((parse-lambda)) ;
 
 : parse-lambda ( -- lambda )
-    "|" parse-tokens make-locals
+    parse-local-defs
     (parse-lambda) <lambda>
     ?rewrite-closures ;
 
 : parse-multi-def ( locals -- multi-def )
-    ")" parse-tokens swap [ [ make-local ] map ] bind <multi-def> ;
+    [ ")" [ make-local ] map-tokens ] bind <multi-def> ;
 
 : parse-def ( name/paren locals -- def )
     over "(" = [ nip parse-multi-def ] [ [ make-local ] bind <def> ] if ;
