@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.libraries alien.syntax llvm.core ;
+USING: alien.c-types alien.libraries alien.syntax llvm.core ;
 IN: llvm.engine
 
 <<
@@ -34,10 +34,10 @@ FUNCTION: ulonglong LLVMGenericValueToInt
 ( LLVMGenericValueRef GenVal, int IsSigned ) ;
 
 FUNCTION: int LLVMCreateExecutionEngine
-( LLVMExecutionEngineRef *OutEE, LLVMModuleProviderRef MP, char** OutError ) ;
+( LLVMExecutionEngineRef *OutEE, LLVMModuleProviderRef MP, c-string* OutError ) ;
 
 FUNCTION: int LLVMCreateJITCompiler
-( LLVMExecutionEngineRef* OutJIT, LLVMModuleProviderRef MP, unsigned OptLevel, char** OutError ) ;
+( LLVMExecutionEngineRef* OutJIT, LLVMModuleProviderRef MP, unsigned OptLevel, c-string* OutError ) ;
 
 FUNCTION: void LLVMDisposeExecutionEngine ( LLVMExecutionEngineRef EE ) ;
 
@@ -46,10 +46,10 @@ FUNCTION: void LLVMFreeMachineCodeForFunction ( LLVMExecutionEngineRef EE, LLVMV
 FUNCTION: void LLVMAddModuleProvider ( LLVMExecutionEngineRef EE, LLVMModuleProviderRef MP ) ;
 
 FUNCTION: int LLVMRemoveModuleProvider
-( LLVMExecutionEngineRef EE, LLVMModuleProviderRef MP, LLVMModuleRef* OutMod, char** OutError ) ;
+( LLVMExecutionEngineRef EE, LLVMModuleProviderRef MP, LLVMModuleRef* OutMod, c-string* OutError ) ;
 
 FUNCTION: int LLVMFindFunction
-( LLVMExecutionEngineRef EE, char* Name, LLVMValueRef* OutFn ) ;
+( LLVMExecutionEngineRef EE, c-string Name, LLVMValueRef* OutFn ) ;
 
 FUNCTION: void* LLVMGetPointerToGlobal ( LLVMExecutionEngineRef EE, LLVMValueRef Global ) ;
 

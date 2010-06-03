@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs math.order sequences ;
 IN: compiler.cfg.comparisons
@@ -11,6 +11,8 @@ SYMBOLS:
 
 SYMBOLS:
     vcc-all vcc-notall vcc-any vcc-none ;
+
+SYMBOLS: cc-o cc/o ;
 
 : negate-cc ( cc -- cc' )
     H{
@@ -28,6 +30,8 @@ SYMBOLS:
         { cc/=   cc=    } 
         { cc/<>  cc<>   } 
         { cc/<>= cc<>=  }
+        { cc-o   cc/o   }
+        { cc/o   cc-o   }
     } at ;
 
 : negate-vcc ( cc -- cc' )

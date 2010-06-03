@@ -45,7 +45,6 @@ struct gc_event {
 struct gc_state {
 	gc_op op;
 	u64 start_time;
-	jmp_buf gc_unwind;
 	gc_event *event;
 
 	explicit gc_state(gc_op op_, factor_vm *parent);
@@ -53,6 +52,6 @@ struct gc_state {
 	void start_again(gc_op op_, factor_vm *parent);
 };
 
-VM_C_API void inline_gc(cell *data_roots_base, cell data_roots_size, factor_vm *parent);
+VM_C_API void inline_gc(cell gc_roots, factor_vm *parent);
 
 }

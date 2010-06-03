@@ -182,7 +182,7 @@ HELP: cleanup
 { $description "Calls the " { $snippet "try" } " quotation. If no error is thrown, calls " { $snippet "cleanup-always" } " without restoring the data stack. If an error is thrown, restores the data stack, calls " { $snippet "cleanup-always" } " followed by " { $snippet "cleanup-error" } ", and rethrows the error." } ;
 
 HELP: recover
-{ $values { "try" quotation } { "recovery" { $quotation "( error -- )" } } }
+{ $values { "try" { $quotation "( ..a -- ..b )" } } { "recovery" { $quotation "( ..a error -- ..b )" } } }
 { $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the data stack and calls the " { $snippet "recovery" } " quotation to handle the error." } ;
 
 HELP: ignore-errors
@@ -235,7 +235,7 @@ HELP: save-error
 $low-level-note ;
 
 HELP: with-datastack
-{ $values { "stack" sequence } { "quot" quotation } { "newstack" sequence } }
+{ $values { "stack" sequence } { "quot" quotation } { "new-stack" sequence } }
 { $description "Executes the quotation with the given data stack contents, and outputs the new data stack after the word returns. The input sequence is not modified; a new sequence is produced. Does not affect the data stack in surrounding code, other than consuming the two inputs and pushing the output." }
 { $examples
     { $example "USING: continuations math prettyprint ;" "{ 3 7 } [ + ] with-datastack ." "{ 10 }" }

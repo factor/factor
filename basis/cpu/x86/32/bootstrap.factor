@@ -3,7 +3,7 @@
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.x86.assembler cpu.x86.assembler.operands layouts
 vocabs parser compiler.constants sequences math math.private
-generic.single.private ;
+generic.single.private threads.private ;
 IN: bootstrap.x86
 
 4 \ cell set
@@ -13,19 +13,23 @@ IN: bootstrap.x86
 : div-arg ( -- reg ) EAX ;
 : mod-arg ( -- reg ) EDX ;
 : temp0 ( -- reg ) EAX ;
-: temp1 ( -- reg ) EDX ;
-: temp2 ( -- reg ) ECX ;
-: temp3 ( -- reg ) EBX ;
-: safe-reg ( -- reg ) EAX ;
+: temp1 ( -- reg ) ECX ;
+: temp2 ( -- reg ) EBX ;
+: temp3 ( -- reg ) EDX ;
+: pic-tail-reg ( -- reg ) EDX ;
 : stack-reg ( -- reg ) ESP ;
 : frame-reg ( -- reg ) EBP ;
-: vm-reg ( -- reg ) ECX ;
+: vm-reg ( -- reg ) EBX ;
 : ctx-reg ( -- reg ) EBP ;
 : nv-regs ( -- seq ) { ESI EDI EBX } ;
+: nv-reg ( -- reg ) ESI ;
 : ds-reg ( -- reg ) ESI ;
 : rs-reg ( -- reg ) EDI ;
 : fixnum>slot@ ( -- ) temp0 2 SAR ;
 : rex-length ( -- n ) 0 ;
+
+: jit-call ( name -- )
+    0 CALL rc-relative jit-dlsym ;
 
 [
     ! save stack frame size
@@ -37,7 +41,7 @@ IN: bootstrap.x86
 ] jit-prolog jit-define
 
 [
-    temp3 0 MOV rc-absolute-cell rt-here jit-rel
+    pic-tail-reg 0 MOV rc-absolute-cell rt-here jit-rel
     0 JMP rc-relative rt-entry-point-pic-tail jit-rel
 ] jit-word-jump jit-define
 
@@ -49,8 +53,9 @@ IN: bootstrap.x86
     ctx-reg vm-reg vm-context-offset [+] MOV ;
 
 : jit-save-context ( -- )
-    EDX RSP -4 [+] LEA
-    ctx-reg context-callstack-top-offset [+] EDX MOV
+    jit-load-context
+    ECX ESP -4 [+] LEA
+    ctx-reg context-callstack-top-offset [+] ECX MOV
     ctx-reg context-datastack-offset [+] ds-reg MOV
     ctx-reg context-retainstack-offset [+] rs-reg MOV ;
 
@@ -59,40 +64,59 @@ IN: bootstrap.x86
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
 [
+    ! ctx-reg is preserved across the call because it is non-volatile
+    ! in the C ABI
     jit-load-vm
-    jit-load-context
     jit-save-context
     ! call the primitive
     ESP [] vm-reg MOV
     0 CALL rc-relative rt-dlsym jit-rel
-    ! restore ds, rs registers
     jit-restore-context
 ] jit-primitive jit-define
 
+: jit-jump-quot ( -- )
+    EAX quot-entry-point-offset [+] JMP ;
+
+: jit-call-quot ( -- )
+    EAX quot-entry-point-offset [+] CALL ;
+
 [
-    ! Load quotation
+    jit-load-vm
+    ESP [] vm-reg MOV
     EAX EBP 8 [+] MOV
-    ! save ctx->callstack_bottom, load ds, rs registers
+    ESP 4 [+] EAX MOV
+    "begin_callback" jit-call
+
     jit-load-vm
     jit-load-context
     jit-restore-context
-    EDX stack-reg stack-frame-size 4 - [+] LEA
-    ctx-reg context-callstack-bottom-offset [+] EDX MOV
-    ! call the quotation
-    EAX quot-entry-point-offset [+] CALL
-    ! save ds, rs registers
+
+    jit-call-quot
+
+    jit-load-vm
     jit-save-context
+
+    ESP [] vm-reg MOV
+    "end_callback" jit-call
 ] \ c-to-factor define-sub-primitive
 
 [
     EAX ds-reg [] MOV
     ds-reg bootstrap-cell SUB
 ]
-[ EAX quot-entry-point-offset [+] CALL ]
-[ EAX quot-entry-point-offset [+] JMP ]
+[ jit-call-quot ]
+[ jit-jump-quot ]
 \ (call) define-combinator-primitive
 
 [
+    ! Load ds and rs registers
+    jit-load-vm
+    jit-load-context
+    jit-restore-context
+
+    ! Windows-specific setup
+    ctx-reg jit-update-seh
+
     ! Clear x87 stack, but preserve rounding mode and exception flags
     ESP 2 SUB
     ESP [] FNSTCW
@@ -107,37 +131,31 @@ IN: bootstrap.x86
     ! Unwind stack frames
     ESP EDX MOV
 
-    ! Load ds and rs registers
-    jit-load-vm
-    jit-load-context
-    jit-restore-context
-
-    ! Call quotation
-    EAX quot-entry-point-offset [+] JMP
+    jit-jump-quot
 ] \ unwind-native-frames define-sub-primitive
 
 [
     ! Load callstack object
-    EBX ds-reg [] MOV
+    temp3 ds-reg [] MOV
     ds-reg bootstrap-cell SUB
     ! Get ctx->callstack_bottom
     jit-load-vm
     jit-load-context
-    EAX ctx-reg context-callstack-bottom-offset [+] MOV
+    temp0 ctx-reg context-callstack-bottom-offset [+] MOV
     ! Get top of callstack object -- 'src' for memcpy
-    EBP EBX callstack-top-offset [+] LEA
+    temp1 temp3 callstack-top-offset [+] LEA
     ! Get callstack length, in bytes --- 'len' for memcpy
-    EDX EBX callstack-length-offset [+] MOV
-    EDX tag-bits get SHR
+    temp2 temp3 callstack-length-offset [+] MOV
+    temp2 tag-bits get SHR
     ! Compute new stack pointer -- 'dst' for memcpy
-    EAX EDX SUB
+    temp0 temp2 SUB
     ! Install new stack pointer
-    ESP EAX MOV
+    ESP temp0 MOV
     ! Call memcpy
-    EDX PUSH
-    EBP PUSH
-    EAX PUSH
-    0 CALL "factor_memcpy" f rc-relative jit-dlsym
+    temp2 PUSH
+    temp1 PUSH
+    temp0 PUSH
+    "factor_memcpy" jit-call
     ESP 12 ADD
     ! Return with new callstack
     0 RET
@@ -145,7 +163,6 @@ IN: bootstrap.x86
 
 [
     jit-load-vm
-    jit-load-context
     jit-save-context
 
     ! Store arguments
@@ -153,25 +170,28 @@ IN: bootstrap.x86
     ESP 4 [+] vm-reg MOV
 
     ! Call VM
-    0 CALL "lazy_jit_compile" f rc-relative jit-dlsym
+    "lazy_jit_compile" jit-call
 ]
-[ EAX quot-entry-point-offset [+] CALL ]
-[ EAX quot-entry-point-offset [+] JMP ]
+[ jit-call-quot ]
+[ jit-jump-quot ]
 \ lazy-jit-compile define-combinator-primitive
+
+[
+    temp1 HEX: ffffffff CMP rc-absolute-cell rt-literal jit-rel
+] pic-check-tuple jit-define
 
 ! Inline cache miss entry points
 : jit-load-return-address ( -- )
-    EBX ESP stack-frame-size bootstrap-cell - [+] MOV ;
+    pic-tail-reg ESP stack-frame-size bootstrap-cell - [+] MOV ;
 
 ! These are always in tail position with an existing stack
 ! frame, and the stack. The frame setup takes this into account.
 : jit-inline-cache-miss ( -- )
     jit-load-vm
-    jit-load-context
     jit-save-context
     ESP 4 [+] vm-reg MOV
-    ESP [] EBX MOV
-    0 CALL "inline_cache_miss" f rc-relative jit-dlsym
+    ESP [] pic-tail-reg MOV
+    "inline_cache_miss" jit-call
     jit-restore-context ;
 
 [ jit-load-return-address jit-inline-cache-miss ]
@@ -188,7 +208,6 @@ IN: bootstrap.x86
 : jit-overflow ( insn func -- )
     ds-reg 4 SUB
     jit-load-vm
-    jit-load-context
     jit-save-context
     EAX ds-reg [] MOV
     EDX ds-reg 4 [+] MOV
@@ -199,8 +218,9 @@ IN: bootstrap.x86
     [
         ESP [] EAX MOV
         ESP 4 [+] EDX MOV
+        jit-load-vm
         ESP 8 [+] vm-reg MOV
-        [ 0 CALL ] dip f rc-relative jit-dlsym
+        jit-call
     ]
     jit-conditional ;
 
@@ -211,7 +231,6 @@ IN: bootstrap.x86
 [
     ds-reg 4 SUB
     jit-load-vm
-    jit-load-context
     jit-save-context
     EBX ds-reg [] MOV
     EAX EBX MOV
@@ -224,11 +243,97 @@ IN: bootstrap.x86
         EBX tag-bits get SAR
         ESP [] EBX MOV
         ESP 4 [+] EBP MOV
+        jit-load-vm
         ESP 8 [+] vm-reg MOV
-        0 CALL "overflow_fixnum_multiply" f rc-relative jit-dlsym
+        "overflow_fixnum_multiply" jit-call
     ]
     jit-conditional
 ] \ fixnum* define-sub-primitive
 
-<< "vocab:cpu/x86/bootstrap.factor" parse-file suffix! >>
-call
+! Contexts
+: jit-switch-context ( reg -- )
+    ! Save ds, rs registers
+    jit-load-vm
+    jit-save-context
+
+    ! Make the new context the current one
+    ctx-reg swap MOV
+    vm-reg vm-context-offset [+] ctx-reg MOV
+
+    ! Load new stack pointer
+    ESP ctx-reg context-callstack-top-offset [+] MOV
+
+    ! Windows-specific setup
+    ctx-reg jit-update-tib
+
+    ! Load new ds, rs registers
+    jit-restore-context ;
+
+: jit-set-context ( -- )
+    ! Load context and parameter from datastack
+    EAX ds-reg [] MOV
+    EAX EAX alien-offset [+] MOV
+    EDX ds-reg -4 [+] MOV
+    ds-reg 8 SUB
+
+    ! Make the new context active
+    EAX jit-switch-context
+
+    ! Windows-specific setup
+    ctx-reg jit-update-seh
+
+    ! Twiddle stack for return
+    ESP 4 ADD
+
+    ! Store parameter to datastack
+    ds-reg 4 ADD
+    ds-reg [] EDX MOV ;
+
+[ jit-set-context ] \ (set-context) define-sub-primitive
+
+: jit-start-context ( -- )
+    ! Create the new context in return-reg
+    jit-load-vm
+    ESP [] vm-reg MOV
+    "new_context" jit-call
+
+    ! Save pointer to quotation and parameter
+    EDX ds-reg MOV
+    ds-reg 8 SUB
+
+    ! Make the new context active
+    EAX jit-switch-context
+
+    ! Push parameter
+    EAX EDX -4 [+] MOV
+    ds-reg 4 ADD
+    ds-reg [] EAX MOV
+
+    ! Windows-specific setup
+    jit-install-seh
+
+    ! Push a fake return address
+    0 PUSH
+
+    ! Jump to initial quotation
+    EAX EDX [] MOV
+    jit-jump-quot ;
+
+[ jit-start-context ] \ (start-context) define-sub-primitive
+
+: jit-delete-current-context ( -- )
+    jit-load-vm
+    jit-load-context
+    ESP [] vm-reg MOV
+    ESP 4 [+] ctx-reg MOV
+    "delete_context" jit-call ;
+
+[
+    jit-delete-current-context
+    jit-set-context
+] \ (set-context-and-delete) define-sub-primitive
+
+[
+    jit-delete-current-context
+    jit-start-context
+] \ (start-context-and-delete) define-sub-primitive

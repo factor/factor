@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors generic kernel math sequences arrays assocs
-alarms calendar math.order continuations fry ;
+calendar math.order continuations fry ;
 IN: models
 
 TUPLE: model < identity-tuple
@@ -94,7 +94,7 @@ M: model update-model drop ;
     ((change-model)) set-model ; inline
 
 : (change-model) ( model quot -- )
-    ((change-model)) (>>value) ; inline
+    ((change-model)) value<< ; inline
 
 GENERIC: range-value ( model -- value )
 GENERIC: range-page-value ( model -- value )

@@ -15,7 +15,7 @@ GENERIC: set-clipboard-contents ( string clipboard -- )
 
 M: clipboard clipboard-contents contents>> ;
 
-M: clipboard set-clipboard-contents (>>contents) ;
+M: clipboard set-clipboard-contents contents<< ;
 
 : <clipboard> ( -- clipboard ) "" clipboard boa ;
 

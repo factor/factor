@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel accessors sequences fry assocs
 sets math combinators
@@ -12,6 +12,7 @@ compiler.cfg.instructions
 compiler.cfg.renaming
 compiler.cfg.renaming.functor
 compiler.cfg.ssa.construction.tdmsc ;
+FROM: namespaces => set ;
 IN: compiler.cfg.ssa.construction
 
 ! The phi placement algorithm is implemented in
@@ -41,10 +42,9 @@ SYMBOL: defs-multi
     H{ } clone defs set
     H{ } clone defs-multi set
     [
-        dup instructions>> [
-            compute-insn-defs
-        ] with each
-    ] each-basic-block ;
+        [ basic-block get ] dip
+        [ compute-insn-defs ] with each
+    ] simple-analysis ;
 
 ! Maps basic blocks to sequences of vregs
 SYMBOL: inserting-phi-nodes
@@ -56,7 +56,7 @@ SYMBOL: inserting-phi-nodes
     ] [ 2drop ] if ;
 
 : compute-phi-nodes-for ( vreg bbs -- )
-    keys [ insert-phi-node-later ] with merge-set-each ;
+    keys merge-set [ insert-phi-node-later ] with each ;
 
 : compute-phi-nodes ( -- )
     H{ } clone inserting-phi-nodes set
@@ -87,7 +87,9 @@ RENAMING: ssa-rename [ gen-name ] [ top-name ] [ ]
 
 GENERIC: rename-insn ( insn -- )
 
-M: insn rename-insn
+M: insn rename-insn drop ;
+
+M: vreg-insn rename-insn
     [ ssa-rename-insn-uses ]
     [ ssa-rename-insn-defs ]
     bi ;

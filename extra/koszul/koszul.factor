@@ -4,6 +4,7 @@ USING: accessors arrays hashtables assocs io kernel locals math
 math.vectors math.matrices math.matrices.elimination namespaces
 parser prettyprint sequences words combinators math.parser
 splitting sorting shuffle sets math.order ;
+FROM: namespaces => set ;
 IN: koszul
 
 ! Utilities
@@ -78,11 +79,8 @@ SYMBOL: terms
         [ nth ] 2keep swap 1 + tail-slice (inversions) +
     ] curry each ;
 
-: duplicates? ( seq -- ? )
-    dup prune [ length ] bi@ > ;
-
 : (wedge) ( n basis1 basis2 -- n basis )
-    append dup duplicates? [
+    append dup all-unique? not [
         2drop 0 { }
     ] [
         dup permutation inversions -1^ rot *
@@ -200,8 +198,8 @@ DEFER: (d)
 
 : bigraded-betti ( u-generators z-generators -- seq )
     [ basis graded ] bi@ tensor bigraded-ker/im-d
-    [ [ [ first ] map ] map ] keep
-    [ [ second ] map 2 head* { 0 0 } prepend ] map
+    [ [ keys ] map ] keep
+    [ values 2 head* { 0 0 } prepend ] map
     rest dup first length 0 <array> suffix
     [ v- ] 2map ;
 

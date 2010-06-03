@@ -9,6 +9,7 @@ sequences.private generalizations stack-checker.backend
 stack-checker.state stack-checker.visitor stack-checker.errors
 stack-checker.values stack-checker.recursive-state
 stack-checker.dependencies ;
+FROM: namespaces => set ;
 IN: stack-checker.transforms
 
 : call-transformer ( stack quot -- newquot )
@@ -18,7 +19,7 @@ IN: stack-checker.transforms
 
 :: ((apply-transform)) ( quot values stack rstate -- )
     rstate recursive-state [ stack quot call-transformer ] with-variable
-    values [ length meta-d shorten-by ] [ #drop, ] bi
+    values [ length shorten-d ] [ #drop, ] bi
     rstate infer-quot ;
 
 : literal-values? ( values -- ? ) [ literal-value? ] all? ;

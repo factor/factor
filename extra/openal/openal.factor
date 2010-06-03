@@ -14,7 +14,7 @@ IN: openal
             "/System/Library/Frameworks/OpenAL.framework/OpenAL"
         ] }
         { [ os unix?  ]  [ "libopenal.so" ] }
-    } cond "cdecl" add-library >>
+    } cond cdecl add-library >>
 
 << os macosx? [ "openal" deploy-library ] unless >>
 

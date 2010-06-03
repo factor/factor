@@ -66,6 +66,7 @@ M: string string>symbol string>symbol* ;
 M: sequence string>symbol [ string>symbol* ] map ;
 
 [
-    8 special-object utf8 alien>string string>cpu \ cpu set-global
-    9 special-object utf8 alien>string string>os \ os set-global
+     8 special-object utf8 alien>string string>cpu \ cpu set-global
+     9 special-object utf8 alien>string string>os \ os set-global
+    67 special-object utf8 alien>string \ vm-compiler set-global
 ] "alien.strings" add-startup-hook

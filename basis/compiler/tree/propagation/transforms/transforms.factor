@@ -1,14 +1,17 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types kernel sequences words fry generic accessors
-classes.tuple classes classes.algebra definitions
-stack-checker.dependencies quotations classes.tuple.private math
-math.partial-dispatch math.private math.intervals sets.private
-math.floats.private math.integers.private layouts math.order
-vectors hashtables combinators effects generalizations assocs
-sets combinators.short-circuit sequences.private locals growable
-stack-checker namespaces compiler.tree.propagation.info ;
+USING: alien.c-types kernel sequences words fry generic
+generic.single accessors classes.tuple classes classes.algebra
+definitions stack-checker.dependencies quotations
+classes.tuple.private math math.partial-dispatch math.private
+math.intervals sets.private math.floats.private
+math.integers.private layouts math.order vectors hashtables
+combinators effects generalizations sequences.generalizations
+assocs sets combinators.short-circuit sequences.private locals
+growable stack-checker namespaces compiler.tree.propagation.info
+;
 FROM: math => float ;
+FROM: sets => set ;
 IN: compiler.tree.propagation.transforms
 
 \ equal? [
@@ -134,6 +137,7 @@ IN: compiler.tree.propagation.transforms
     in-d>> first value-info literal>> {
         { V{ } [ [ drop { } 0 vector boa ] ] }
         { H{ } [ [ drop 0 <hashtable> ] ] }
+        { HS{ } [ [ drop f fast-set ] ] }
         [ drop f ]
     } case
 ] "custom-inlining" set-word-prop
@@ -207,7 +211,7 @@ ERROR: bad-partial-eval quot word ;
         [ drop f ] swap
         [ literalize [ t ] ] { } map>assoc linear-case-quot
     ] [
-        unique [ key? ] curry
+        tester
     ] if ;
 
 \ member? [
@@ -272,14 +276,14 @@ CONSTANT: lookup-table-at-max 256
 \ at* [ at-quot ] 1 define-partial-eval
 
 : diff-quot ( seq -- quot: ( seq' -- seq'' ) )
-    tester '[ [ @ not ] filter ] ;
+    tester '[ [ [ @ not ] filter ] keep set-like ] ;
 
-\ diff [ diff-quot ] 1 define-partial-eval
+M\ set diff [ diff-quot ] 1 define-partial-eval
 
 : intersect-quot ( seq -- quot: ( seq' -- seq'' ) )
-    tester '[ _ filter ] ;
+    tester '[ [ _ filter ] keep set-like ] ;
 
-\ intersect [ intersect-quot ] 1 define-partial-eval
+M\ set intersect [ intersect-quot ] 1 define-partial-eval
 
 : fixnum-bits ( -- n )
     cell-bits tag-bits get - ;
@@ -297,10 +301,25 @@ CONSTANT: lookup-table-at-max 256
     [ \ push def>> ] [ f ] if
 ] "custom-inlining" set-word-prop
 
+! Speeds up fasta benchmark
+\ >fixnum [
+    in-d>> first value-info class>> fixnum \ f class-or class<=
+    [ [ dup [ \ >fixnum no-method ] unless ] ] [ f ] if
+] "custom-inlining" set-word-prop
+
 ! We want to constant-fold calls to heap-size, and recompile those
 ! calls when a C type is redefined
 \ heap-size [
-    dup word? [
-        [ depends-on-definition ] [ heap-size '[ _ ] ] bi
-    ] [ drop f ] if
+    [ depends-on-c-type ] [ heap-size '[ _ ] ] bi
 ] 1 define-partial-eval
+
+! Eliminates a few redundant checks here and there
+\ both-fixnums? [
+    in-d>> first2 [ value-info class>> ] bi@ {
+        { [ 2dup [ fixnum classes-intersect? not ] either? ] [ [ 2drop f ] ] }
+        { [ 2dup [ fixnum class<= ] both? ] [ [ 2drop t ] ] }
+        { [ dup fixnum class<= ] [ [ drop fixnum? ] ] }
+        { [ over fixnum class<= ] [ [ nip fixnum? ] ] }
+        [ f ]
+    } cond 2nip
+] "custom-inlining" set-word-prop

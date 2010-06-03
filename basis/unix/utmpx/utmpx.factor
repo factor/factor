@@ -41,7 +41,7 @@ M: unix new-utmpx-record
     utmpx-record new ;
     
 M: unix utmpx>utmpx-record ( utmpx -- utmpx-record )
-    [ new-utmpx-record ] dip \ utmpx memory>struct
+    [ new-utmpx-record ] dip
     {
         [ ut_user>> _UTX_USERSIZE memory>string >>user ]
         [ ut_id>>   _UTX_IDSIZE memory>string >>id ]

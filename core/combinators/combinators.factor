@@ -26,15 +26,17 @@ ERROR: wrong-values quot call-site ;
 ! We can't USE: effects here so we forward reference slots instead
 SLOT: in
 SLOT: out
+SLOT: terminated?
 
 : call-effect ( quot effect -- )
     ! Don't use fancy combinators here, since this word always
     ! runs unoptimized
-    [ datastack ] 2dip
     2dup [
-        [ dip ] dip
-        dup in>> length swap out>> length
-        check-datastack
+        [ [ datastack ] dip dip ] dip
+        dup terminated?>> [ 2drop f ] [
+            dup in>> length swap out>> length
+            check-datastack
+        ] if
     ] 2dip rot
     [ 2drop ] [ wrong-values ] if ;
 
@@ -147,7 +149,7 @@ ERROR: no-case object ;
 : contiguous-range? ( keys -- ? )
     dup [ fixnum? ] all? [
         dup all-unique? [
-            [ prune length ]
+            [ length ]
             [ [ supremum ] [ infimum ] bi - ]
             bi - 1 =
         ] [ drop f ] if
@@ -193,5 +195,5 @@ M: hashtable hashcode*
         [ assoc-hashcode ] [ nip assoc-size ] if
     ] recursive-hashcode ;
 
-: to-fixed-point ( object quot: ( object(n) -- object(n+1) ) -- object(n) )
+: to-fixed-point ( ... object quot: ( ... object(n) -- ... object(n+1) ) -- ... object(n) )
     [ keep over = ] keep [ to-fixed-point ] curry unless ; inline recursive

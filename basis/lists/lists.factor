@@ -55,16 +55,16 @@ M: object nil? drop f ;
 
 PRIVATE>
 
-: leach ( list quot: ( elt -- ) -- )
+: leach ( ... list quot: ( ... elt -- ... ) -- ... )
     over nil? [ 2drop ] [ (leach) leach ] if ; inline recursive
 
-: lmap ( list quot: ( elt -- ) -- result )
+: lmap ( ... list quot: ( ... elt -- ... newelt ) -- ... result )
     over nil? [ drop ] [ (leach) lmap cons ] if ; inline recursive
 
-: foldl ( list identity quot: ( obj1 obj2 -- obj ) -- result )
+: foldl ( ... list identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd leach ; inline
 
-:: foldr ( list identity quot: ( obj1 obj2 -- obj ) -- result )
+:: foldr ( ... list identity quot: ( ... prev elt -- ... next ) -- ... result )
     list nil? [ identity ] [
         list cdr identity quot foldr
         list car quot call
@@ -87,7 +87,7 @@ PRIVATE>
 : sequence>list ( sequence -- list )    
     <reversed> nil [ swons ] reduce ;
 
-: lmap>array ( list quot -- array )
+: lmap>array ( ... list quot: ( ... elt -- ... newelt ) -- ... array )
     collector [ leach ] dip { } like ; inline
 
 : list>array ( list -- array )  

@@ -1,22 +1,27 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.encodings kernel math io.encodings.private ;
+USING: accessors byte-arrays io io.encodings
+io.encodings.private kernel math sequences ;
 IN: io.encodings.ascii
-
-<PRIVATE
-: encode-if< ( char stream encoding max -- )
-    nip 1 - pick < [ encode-error ] [ stream-write1 ] if ; inline
-
-: decode-if< ( stream encoding max -- character )
-    nip swap stream-read1 dup
-    [ [ nip ] [ > ] 2bi [ >fixnum ] [ drop replacement-char ] if ]
-    [ 2drop f ] if ; inline
-PRIVATE>
 
 SINGLETON: ascii
 
 M: ascii encode-char
-    128 encode-if< ; inline
+    drop
+    over 127 <= [ stream-write1 ] [ encode-error ] if ; inline
+
+M: ascii encode-string
+    drop
+    [
+        dup aux>>
+        [ [ dup 127 <= [ encode-error ] unless ] B{ } map-as ]
+        [ >byte-array ]
+        if
+    ] dip
+    stream-write ;
 
 M: ascii decode-char
-    128 decode-if< ; inline
+    drop
+    stream-read1 dup [
+        dup 127 <= [ >fixnum ] [ drop replacement-char ] if
+    ] when ; inline

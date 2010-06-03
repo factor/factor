@@ -24,6 +24,9 @@ IN: sequences.tests
 [ 5040 { 1 1 2 6 24 120 720 } ]
 [ { 1 2 3 4 5 6 7 } 1 [ * ] accumulate ] unit-test
 
+[ 64 B{ 1 2 4 16 } ]
+[ B{ 2 2 4 4 } 1 [ * ] accumulate ] unit-test
+
 [ 5040 { 1 1 2 6 24 120 720 } ]
 [ { 1 2 3 4 5 6 7 } 1 [ * ] accumulate! ] unit-test
 
@@ -309,3 +312,6 @@ USE: make
 [ +gt+ ] [ { 0 0 0 0 } { 0 0 0 } <=> ] unit-test
 [ +eq+ ] [ { } { } <=> ] unit-test
 [ +eq+ ] [ { 1 2 3 } { 1 2 3 } <=> ] unit-test
+
+[ { { { 1 "a" } { 1 "b" } } { { 2 "a" } { 2 "b" } } } ]
+[ { 1 2 } { "a" "b" } cartesian-product ] unit-test

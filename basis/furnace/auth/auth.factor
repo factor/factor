@@ -14,6 +14,8 @@ furnace.redirection
 furnace.boilerplate
 furnace.auth.providers
 furnace.auth.providers.db ;
+FROM: assocs => change-at ;
+FROM: namespaces => set ;
 IN: furnace.auth
 
 SYMBOL: logged-in-user

@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.combinatorics math.parser math.primes
-    project-euler.common sequences sets ;
+    project-euler.common sequences ;
 IN: project-euler.035
 
 ! http://projecteuler.net/index.php?section=problems&id=35
@@ -28,7 +28,7 @@ IN: project-euler.035
 
 : possible? ( seq -- ? )
     dup length 1 > [
-        dup { 0 2 4 5 6 8 } diff =
+        [ even? ] any? not
     ] [
         drop t
     ] if ;

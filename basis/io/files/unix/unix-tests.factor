@@ -2,7 +2,7 @@ USING: tools.test io.files io.files.temp io.pathnames
 io.directories io.files.info io.files.info.unix continuations
 kernel io.files.unix math.bitwise calendar accessors
 math.functions math unix.users unix.groups arrays sequences
-grouping io.pathnames.private ;
+grouping io.pathnames.private literals ;
 IN: io.files.unix.tests
 
 [ "/usr/libexec/" ] [ "/usr/libexec/awk/" parent-directory ] unit-test
@@ -45,7 +45,7 @@ IN: io.files.unix.tests
 prepare-test-file
 
 [ t ]
-[ test-file { USER-ALL GROUP-ALL OTHER-ALL } flags set-file-permissions perms OCT: 777 = ] unit-test
+[ test-file flags{ USER-ALL GROUP-ALL OTHER-ALL } set-file-permissions perms OCT: 777 = ] unit-test
 
 [ t ] [ test-file user-read? ] unit-test
 [ t ] [ test-file user-write? ] unit-test
@@ -85,7 +85,7 @@ prepare-test-file
 [ f ] [ test-file file-info other-read? ] unit-test
 
 [ t ]
-[ test-file { USER-ALL GROUP-ALL OTHER-EXECUTE } flags set-file-permissions perms OCT: 771 = ] unit-test
+[ test-file flags{ USER-ALL GROUP-ALL OTHER-EXECUTE } set-file-permissions perms OCT: 771 = ] unit-test
 
 prepare-test-file
 

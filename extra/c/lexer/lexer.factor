@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit
 generalizations kernel locals math.order math.ranges
-sequences.parser sequences sorting.functor sorting.slots
-unicode.categories ;
+sequences.parser sequences sequences.generalizations
+sorting.functor sorting.slots unicode.categories ;
 IN: c.lexer
 
 : take-c-comment ( sequence-parser -- seq/f )
@@ -54,7 +54,7 @@ IN: c.lexer
     sequence-parser current quote-char = [
         sequence-parser advance* string
     ] [
-        start-n sequence-parser (>>n) f
+        start-n sequence-parser n<< f
     ] if ;
 
 : (take-token) ( sequence-parser -- string )

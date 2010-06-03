@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov
+! Copyright (C) 2008, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.syntax kernel math
 namespaces sequences destructors combinators threads heaps
@@ -91,24 +91,26 @@ TUPLE: run-loop fds sources timers ;
         CFRunLoopAddTimer
     ] bi ;
 
+: invalidate-run-loop-timers ( -- )
+    run-loop [
+        [ [ CFRunLoopTimerInvalidate ] [ CFRelease ] bi ] each
+        V{ } clone
+    ] change-timers drop ;
+
 <PRIVATE
 
-: ((reset-timer)) ( timer counter timestamp -- )
-    nip >CFAbsoluteTime CFRunLoopTimerSetNextFireDate ;
+: (reset-timer) ( timer timestamp -- )
+    >CFAbsoluteTime CFRunLoopTimerSetNextFireDate ;
 
-: nano-count>timestamp ( x -- timestamp )
-    nano-count - nanoseconds now time+ ;
-
-: (reset-timer) ( timer counter -- )
-    yield {
-        { [ dup 0 = ] [ now ((reset-timer)) ] }
-        { [ run-queue deque-empty? not ] [ 1 - (reset-timer) ] }
-        { [ sleep-queue heap-empty? ] [ 5 minutes hence ((reset-timer)) ] }
-        [ sleep-queue heap-peek nip nano-count>timestamp ((reset-timer)) ]
-    } cond ;
+: nano-count>micros ( x -- n )
+    nano-count - 1,000 /f system-micros + ;
 
 : reset-timer ( timer -- )
-    10 (reset-timer) ;
+    {
+        { [ run-queue deque-empty? not ] [ system-micros ] }
+        { [ sleep-queue heap-empty? not ] [ sleep-queue heap-peek nip nano-count>micros ] }
+        [ system-micros 1,000,000 + ]
+    } cond (reset-timer) ;
 
 PRIVATE>
 
@@ -118,7 +120,7 @@ PRIVATE>
     [ fds>> [ enable-all-callbacks ] each ] bi ;
 
 : timer-callback ( -- callback )
-    void { CFRunLoopTimerRef void* } "cdecl"
+    void { CFRunLoopTimerRef void* } cdecl
     [ 2drop reset-run-loop yield ] alien-callback ;
 
 : init-thread-timer ( -- )

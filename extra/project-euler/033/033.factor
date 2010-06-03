@@ -30,7 +30,7 @@ IN: project-euler.033
 <PRIVATE
 
 : source-033 ( -- seq )
-    10 99 [a,b] dup cartesian-product [ first2 < ] filter ;
+    10 99 [a,b] dup cartesian-product concat [ first2 < ] filter ;
 
 : safe? ( ax xb -- ? )
     [ 10 /mod ] bi@ [ = ] dip zero? not and nip ;

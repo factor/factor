@@ -5,6 +5,7 @@ destructors fry io io.encodings.utf8 kernel managed-server
 namespaces parser sequences sorting splitting strings.parser
 unicode.case unicode.categories calendar calendar.format
 locals io.encodings.binary io.encodings.string prettyprint ;
+FROM: namespaces => set ;
 IN: managed-server.chat
 
 TUPLE: chat-server < managed-server ;
@@ -26,7 +27,7 @@ CONSTANT: line-beginning "-!- "
     ] "" append-outputs-as send-everyone ;
 
 : handle-quit ( string -- )
-    client [ (>>object) ] [ t >>quit? drop ] bi ;
+    client [ object<< ] [ t >>quit? drop ] bi ;
 
 : handle-help ( string -- )
     [
@@ -59,7 +60,7 @@ CONSTANT: line-beginning "-!- "
         ] [
             [ username swap warn-name-changed ]
             [ username clients rename-at ]
-            [ client (>>username) ] tri
+            [ client username<< ] tri
         ] if
     ] if-empty ;
 
@@ -126,10 +127,10 @@ M: chat-server handle-client-disconnect
 
 M: chat-server handle-already-logged-in
     username username-taken-string send-line
-    t client (>>quit?) ;
+    t client quit?<< ;
 
 M: chat-server handle-managed-client*
-    readln dup f = [ t client (>>quit?) ] when
+    readln dup f = [ t client quit?<< ] when
     [
         "/" ?head [ handle-command ] [ handle-chat ] if
     ] unless-empty ;

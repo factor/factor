@@ -26,8 +26,8 @@ IN: windows.offscreen
 : make-bitmap ( dim dc -- hBitmap bits )
     [ nip ]
     [
-        swap (bitmap-info) DIB_RGB_COLORS f <void*>
-        [ f 0 CreateDIBSection ] keep *void*
+        swap (bitmap-info) DIB_RGB_COLORS { void* }
+        [ f 0 CreateDIBSection ] [ ] with-out-parameters
     ] 2bi
     [ [ SelectObject drop ] keep ] dip ;
 
@@ -46,7 +46,7 @@ IN: windows.offscreen
         ubyte-components >>component-type
         t >>upside-down? ;
 
-: with-memory-dc ( quot: ( hDC -- ) -- )
+: with-memory-dc ( ..a quot: ( ..a hDC -- ..b ) -- ..b )
     [ [ f CreateCompatibleDC &DeleteDC ] dip call ] with-destructors ; inline
 
 :: make-bitmap-image ( dim dc quot -- image )

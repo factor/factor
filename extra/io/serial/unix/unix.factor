@@ -3,7 +3,8 @@
 USING: accessors alien.c-types alien.syntax alien.data 
 classes.struct combinators io.ports io.streams.duplex
 system kernel math math.bitwise vocabs.loader io.serial
-io.serial.unix.termios io.backend.unix unix unix.ffi ;
+io.serial.unix.termios io.backend.unix unix unix.ffi
+literals ;
 IN: io.serial.unix
 
 << {
@@ -33,7 +34,7 @@ FUNCTION: int cfsetspeed ( termios* t, speed_t s ) ;
 
 M: unix open-serial ( serial -- serial' )
     dup
-    path>> { O_RDWR O_NOCTTY O_NDELAY } flags file-mode open-file
+    path>> flags{ O_RDWR O_NOCTTY O_NDELAY } file-mode open-file
     fd>duplex-stream >>stream ;
 
 : serial-fd ( serial -- fd )
@@ -46,14 +47,14 @@ M: unix open-serial ( serial -- serial' )
 : configure-termios ( serial -- )
     dup termios>>
     {
-        [ [ iflag>> ] dip over [ (>>iflag) ] [ 2drop ] if ]
-        [ [ oflag>> ] dip over [ (>>oflag) ] [ 2drop ] if ]
+        [ [ iflag>> ] dip over [ iflag<< ] [ 2drop ] if ]
+        [ [ oflag>> ] dip over [ oflag<< ] [ 2drop ] if ]
         [
             [
                 [ cflag>> 0 or ] [ baud>> lookup-baud ] bi bitor
-            ] dip (>>cflag)
+            ] dip cflag<<
         ]
-        [ [ lflag>> ] dip over [ (>>lflag) ] [ 2drop ] if ]
+        [ [ lflag>> ] dip over [ lflag<< ] [ 2drop ] if ]
     } 2cleave ;
 
 : tciflush ( serial -- )

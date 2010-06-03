@@ -10,6 +10,7 @@ IN: compiler.cfg.save-contexts
 : needs-save-context? ( insns -- ? )
     [
         {
+            [ ##call-gc? ]
             [ ##unary-float-function? ]
             [ ##binary-float-function? ]
             [ ##alien-invoke? ]
@@ -20,8 +21,8 @@ IN: compiler.cfg.save-contexts
 
 : insert-save-context ( bb -- )
     dup instructions>> dup needs-save-context? [
-        int-rep next-vreg-rep
-        int-rep next-vreg-rep
+        tagged-rep next-vreg-rep
+        tagged-rep next-vreg-rep
         \ ##save-context new-insn prefix
         >>instructions drop
     ] [ 2drop ] if ;

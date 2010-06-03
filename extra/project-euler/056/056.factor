@@ -23,7 +23,7 @@ IN: project-euler.056
 ! Through analysis, you only need to check when a and b > 90
 
 : euler056 ( -- answer )
-    90 100 [a,b) dup cartesian-product
+    90 100 [a,b) dup cartesian-product concat
     [ first2 ^ number>digits sum ] [ max ] map-reduce ;
 
 ! [ euler056 ] 100 ave-time

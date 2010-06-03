@@ -34,4 +34,4 @@ SYMBOL: insomniac-recipients
 
 : schedule-insomniac ( service word-names -- )
     [ [ email-log-report ] assoc-each rotate-logs ] 2curry
-    1 days every drop ;
+    1 days delayed-every drop ;

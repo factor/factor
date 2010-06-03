@@ -8,7 +8,7 @@ IN: compression.zlib.ffi
     { [ os winnt? ] [ "zlib1.dll" ] }
     { [ os macosx? ] [ "libz.dylib" ] }
     { [ os unix? ] [ "libz.so" ] }
-} cond "cdecl" add-library >>
+} cond cdecl add-library >>
 
 LIBRARY: zlib
 

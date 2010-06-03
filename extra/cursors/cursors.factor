@@ -1,153 +1,531 @@
-! Copyright (C) 2009 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays generalizations kernel math sequences
-sequences.private fry ;
+! (c)2010 Joe Groff bsd license
+USING: accessors arrays assocs combinators.short-circuit fry
+hashtables kernel locals macros math math.functions math.order
+generalizations sequences ;
+FROM: sequences.private => nth-unsafe set-nth-unsafe ;
+FROM: hashtables.private => tombstone? ;
 IN: cursors
 
-GENERIC: cursor-done? ( cursor -- ? )
-GENERIC: cursor-get-unsafe ( cursor -- obj )
-GENERIC: cursor-advance ( cursor -- )
+!
+! basic cursor protocol
+!
+
+MIXIN: cursor
+
+GENERIC: cursor-compatible? ( cursor cursor -- ? )
 GENERIC: cursor-valid? ( cursor -- ? )
-GENERIC: cursor-write ( obj cursor -- )
+GENERIC: cursor= ( cursor cursor -- ? )
+GENERIC: cursor<= ( cursor cursor -- ? )
+GENERIC: cursor>= ( cursor cursor -- ? )
+GENERIC: cursor-distance-hint ( cursor cursor -- n )
 
-ERROR: cursor-ended cursor ;
+M: cursor cursor<= cursor= ; inline
+M: cursor cursor>= cursor= ; inline
+M: cursor cursor-distance-hint 2drop 0 ; inline
 
-: cursor-get ( cursor -- obj )
-    dup cursor-done?
-    [ cursor-ended ] [ cursor-get-unsafe ] if ; inline
+!
+! cursor iteration
+!
 
-: find-done? ( cursor quot -- ? )
-    over cursor-done?
-    [ 2drop t ] [ [ cursor-get-unsafe ] dip call ] if ; inline
+MIXIN: forward-cursor
+INSTANCE: forward-cursor cursor
 
-: cursor-until ( cursor quot -- )
-    [ find-done? not ]
-    [ drop cursor-advance ] bi-curry bi-curry while ; inline
- 
-: cursor-each ( cursor quot -- )
-    [ f ] compose cursor-until ; inline
+GENERIC: inc-cursor ( cursor -- cursor' )
 
-: cursor-find ( cursor quot -- obj ? )
-    [ cursor-until ] [ drop ] 2bi
-    dup cursor-done? [ drop f f ] [ cursor-get t ] if ; inline
+MIXIN: bidirectional-cursor
+INSTANCE: bidirectional-cursor forward-cursor
 
-: cursor-any? ( cursor quot -- ? )
-    cursor-find nip ; inline
+GENERIC: dec-cursor ( cursor -- cursor' )
 
-: cursor-all? ( cursor quot -- ? )
-    [ not ] compose cursor-any? not ; inline
+MIXIN: random-access-cursor
+INSTANCE: random-access-cursor bidirectional-cursor
 
-: cursor-map-quot ( quot to -- quot' )
-    [ [ call ] dip cursor-write ] 2curry ; inline
+GENERIC# cursor+ 1 ( cursor n -- cursor' )
+GENERIC# cursor- 1 ( cursor n -- cursor' )
+GENERIC: cursor-distance ( cursor cursor -- n )
+GENERIC: cursor<  ( cursor cursor -- ? )
+GENERIC: cursor>  ( cursor cursor -- ? )
 
-: cursor-map ( from to quot -- )
-    swap cursor-map-quot cursor-each ; inline
+M: random-access-cursor inc-cursor  1 cursor+ ; inline
+M: random-access-cursor dec-cursor -1 cursor+ ; inline
+M: random-access-cursor cursor- neg cursor+ ; inline
+M: random-access-cursor cursor<= { [ cursor= ] [ cursor< ] } 2|| ; inline
+M: random-access-cursor cursor>= { [ cursor= ] [ cursor> ] } 2|| ; inline
+M: random-access-cursor cursor-distance-hint cursor-distance ; inline
 
-: cursor-write-if ( obj quot to -- )
-    [ over [ call ] dip ] dip
-    [ cursor-write ] 2curry when ; inline
+!
+! input cursors
+!
 
-: cursor-filter-quot ( quot to -- quot' )
-    [ cursor-write-if ] 2curry ; inline
+ERROR: invalid-cursor cursor ;
 
-: cursor-filter ( from to quot -- )
-    swap cursor-filter-quot cursor-each ; inline
+MIXIN: input-cursor
 
-TUPLE: from-sequence { seq sequence } { n integer } ;
+GENERIC: cursor-key-value ( cursor -- key value )
+<PRIVATE
+GENERIC: cursor-key-value-unsafe ( cursor -- key value )
+PRIVATE>
+M: input-cursor cursor-key-value-unsafe cursor-key-value ; inline
+M: input-cursor cursor-key-value
+    dup cursor-valid? [ cursor-key-value-unsafe ] [ invalid-cursor ] if ; inline
 
-: >from-sequence< ( from-sequence -- n seq )
-    [ n>> ] [ seq>> ] bi ; inline
+: cursor-key ( cursor -- key ) cursor-key-value drop ;
+: cursor-value ( cursor -- key ) cursor-key-value nip ;
 
-M: from-sequence cursor-done? ( cursor -- ? )
-    >from-sequence< length >= ;
+: cursor-key-unsafe ( cursor -- key ) cursor-key-value-unsafe drop ;
+: cursor-value-unsafe ( cursor -- key ) cursor-key-value-unsafe nip ;
 
-M: from-sequence cursor-valid?
-    >from-sequence< bounds-check? not ;
+!
+! output cursors
+!
 
-M: from-sequence cursor-get-unsafe
-    >from-sequence< nth-unsafe ;
+MIXIN: output-cursor
 
-M: from-sequence cursor-advance
-    [ 1 + ] change-n drop ;
+GENERIC: set-cursor-value ( value cursor -- )
+<PRIVATE
+GENERIC: set-cursor-value-unsafe ( value cursor -- )
+PRIVATE>
+M: output-cursor set-cursor-value-unsafe set-cursor-value ; inline
+M: output-cursor set-cursor-value
+    dup cursor-valid? [ set-cursor-value-unsafe ] [ invalid-cursor ] if ; inline
 
-: >input ( seq -- cursor )
-    0 from-sequence boa ; inline
+!
+! stream cursors
+!
 
-: iterate ( seq quot iterator -- )
-    [ >input ] 2dip call ; inline
+MIXIN: stream-cursor
+INSTANCE: stream-cursor forward-cursor
 
-: each ( seq quot -- ) [ cursor-each ] iterate ; inline
-: find ( seq quot -- ? ) [ cursor-find ] iterate ; inline
-: any? ( seq quot -- ? ) [ cursor-any? ] iterate ; inline
-: all? ( seq quot -- ? ) [ cursor-all? ] iterate ; inline
+M: stream-cursor cursor-compatible? 2drop f ; inline
+M: stream-cursor cursor-valid? drop t ; inline
+M: stream-cursor cursor= 2drop f ; inline
 
-TUPLE: to-sequence { seq sequence } { exemplar sequence } ;
+MIXIN: infinite-stream-cursor
+INSTANCE: infinite-stream-cursor stream-cursor
 
-M: to-sequence cursor-write
-    seq>> push ;
+M: infinite-stream-cursor inc-cursor ; inline
 
-: freeze ( cursor -- seq )
-    [ seq>> ] [ exemplar>> ] bi like ; inline
+MIXIN: finite-stream-cursor
+INSTANCE: finite-stream-cursor stream-cursor
 
-: >output ( seq -- cursor )
-    [ [ length ] keep new-resizable ] keep
-    to-sequence boa ; inline
+SINGLETON: end-of-stream
 
-: transform ( seq quot transformer -- newseq )
-    [ [ >input ] [ >output ] bi ] 2dip
-    [ call ]
-    [ 2drop freeze ] 3bi ; inline
+GENERIC: cursor-stream-ended? ( cursor -- ? )
 
-: map ( seq quot -- ) [ cursor-map ] transform ; inline
-: filter ( seq quot -- newseq ) [ cursor-filter ] transform ; inline
+M: finite-stream-cursor inc-cursor
+    dup cursor-stream-ended? [ drop end-of-stream ] when ; inline
 
-: find-done2? ( cursor cursor quot -- ? )
-    2over [ cursor-done? ] either?
-    [ 3drop t ] [ [ [ cursor-get-unsafe ] bi@ ] dip call ] if ; inline
+INSTANCE: end-of-stream finite-stream-cursor
 
-: cursor-until2 ( cursor cursor quot -- )
-    [ find-done2? not ]
-    [ drop [ cursor-advance ] bi@ ] bi-curry bi-curry bi-curry while ; inline
+M: end-of-stream cursor-compatible? drop finite-stream-cursor? ; inline
+M: end-of-stream cursor-valid? drop f ; inline
+M: end-of-stream cursor= eq? ; inline
+M: end-of-stream inc-cursor ; inline
+M: end-of-stream cursor-stream-ended? drop t ; inline
 
-: cursor-each2 ( cursor cursor quot -- )
-    [ f ] compose cursor-until2 ; inline
+!
+! basic iterators
+!
 
-: cursor-map2 ( from to quot -- )
-    swap cursor-map-quot cursor-each2 ; inline
+: -each ( ... begin end quot: ( ... cursor -- ... ) -- ... )
+    [ '[ dup _ cursor>= ] ]
+    [ '[ _ keep inc-cursor ] ] bi* until drop ; inline
 
-: iterate2 ( seq1 seq2 quot iterator -- )
-    [ [ >input ] bi@ ] 2dip call ; inline
+: -find ( ... begin end quot: ( ... cursor -- ... ? ) -- ... cursor )
+    '[ dup _ cursor>= [ t ] [ dup @ ] if ] [ inc-cursor ] until ; inline
 
-: transform2 ( seq1 seq2 quot transformer -- newseq )
-    [ over >output [ [ >input ] [ >input ] bi* ] dip ] 2dip
-    [ call ]
-    [ 2drop nip freeze ] 4 nbi ; inline
+: -in- ( quot -- quot' )
+    '[ cursor-value-unsafe @ ] ; inline
 
-: 2each ( seq1 seq2 quot -- ) [ cursor-each2 ] iterate2 ; inline
-: 2map ( seq1 seq2 quot -- ) [ cursor-map2 ] transform2 ; inline
+: -out- ( quot -- quot' )
+    '[ _ keep set-cursor-value-unsafe ] ; inline
 
-: find-done3? ( cursor1 cursor2 cursor3 quot -- ? )
-    [ 3 ndrop t ] swap '[ [ cursor-get-unsafe ] tri@ @ ]
-    [ 3 ndup 3 narray [ cursor-done? ] any? ] 2dip if ; inline
+: -out ( ... begin end quot: ( ... cursor -- ... value ) -- ... )
+    -out- -each ; inline
 
-: cursor-until3 ( cursor cursor quot -- )
-    [ find-done3? not ]
-    [ drop [ cursor-advance ] tri@ ]
-    bi-curry bi-curry bi-curry bi-curry while ; inline
+!
+! numeric cursors
+!
 
-: cursor-each3 ( cursor cursor quot -- )
-    [ f ] compose cursor-until3 ; inline
+TUPLE: numeric-cursor
+    { value read-only } ;
 
-: cursor-map3 ( from to quot -- )
-    swap cursor-map-quot cursor-each3 ; inline
+M: numeric-cursor cursor-valid? drop t ; inline
 
-: iterate3 ( seq1 seq2 seq3 quot iterator -- )
-    [ [ >input ] tri@ ] 2dip call ; inline
+M: numeric-cursor cursor=  [ value>> ] bi@ =  ; inline
 
-: transform3 ( seq1 seq2 seq3 quot transformer -- newseq )
-    [ pick >output [ [ >input ] [ >input ] [ >input ] tri* ] dip ] 2dip
-    [ call ]
-    [ 2drop 2nip freeze ] 5 nbi ; inline
+M: numeric-cursor cursor<= [ value>> ] bi@ <= ; inline
+M: numeric-cursor cursor<  [ value>> ] bi@ <  ; inline
+M: numeric-cursor cursor>  [ value>> ] bi@ >  ; inline
+M: numeric-cursor cursor>= [ value>> ] bi@ >= ; inline
 
-: 3each ( seq1 seq2 seq3 quot -- ) [ cursor-each3 ] iterate3 ; inline
-: 3map ( seq1 seq2 seq3 quot -- ) [ cursor-map3 ] transform3 ; inline
+INSTANCE: numeric-cursor input-cursor
+
+M: numeric-cursor cursor-key-value value>> dup ; inline
+
+!
+! linear cursor
+!
+
+TUPLE: linear-cursor < numeric-cursor
+    { delta read-only } ;
+C: <linear-cursor> linear-cursor
+
+INSTANCE: linear-cursor random-access-cursor
+
+M: linear-cursor cursor-compatible?
+    [ linear-cursor? ] both? ; inline
+
+M: linear-cursor inc-cursor
+    [ value>> ] [ delta>> ] bi [ + ] keep <linear-cursor> ; inline
+M: linear-cursor dec-cursor
+    [ value>> ] [ delta>> ] bi [ - ] keep <linear-cursor> ; inline
+M: linear-cursor cursor+
+    [ [ value>> ] [ delta>> ] bi ] dip [ * + ] keep <linear-cursor> ; inline
+M: linear-cursor cursor-
+    [ [ value>> ] [ delta>> ] bi ] dip [ * - ] keep <linear-cursor> ; inline
+
+GENERIC: up/i ( distance delta -- distance' )
+M: integer up/i [ 1 - + ] keep /i ; inline
+M: real up/i / ceiling >integer ; inline
+
+M: linear-cursor cursor-distance
+    [ [ value>> ] bi@ - ] [ nip delta>> ] 2bi up/i ; inline
+
+!
+! quadratic cursor
+!
+
+TUPLE: quadratic-cursor < numeric-cursor
+    { delta read-only }
+    { delta2 read-only } ;
+
+C: <quadratic-cursor> quadratic-cursor
+
+INSTANCE: quadratic-cursor bidirectional-cursor
+
+M: quadratic-cursor cursor-compatible?
+    [ linear-cursor? ] both? ; inline
+
+M: quadratic-cursor inc-cursor
+    [ value>> ] [ delta>> [ + ] keep ] [ delta2>> [ + ] keep ] tri <quadratic-cursor> ; inline
+
+M: quadratic-cursor dec-cursor
+    [ value>> ] [ delta>> ] [ delta2>> ] tri [ - [ - ] keep ] keep <quadratic-cursor> ; inline
+
+!
+! collections
+!
+
+MIXIN: collection
+
+GENERIC: begin-cursor ( collection -- cursor )
+GENERIC: end-cursor ( collection -- cursor )
+
+: all ( collection -- begin end )
+    [ begin-cursor ] [ end-cursor ] bi ; inline
+
+: all- ( collection quot -- begin end quot )
+    [ all ] dip ; inline
+
+!
+! containers
+!
+
+MIXIN: container
+INSTANCE: container collection
+
+: in- ( container quot -- begin end quot' )
+    all- -in- ; inline
+
+: each ( ... container quot: ( ... x -- ... ) -- ... ) in- -each ; inline
+
+INSTANCE: finite-stream-cursor container
+
+M: finite-stream-cursor begin-cursor ; inline
+M: finite-stream-cursor end-cursor drop end-of-stream ; inline
+
+!
+! sequence cursor
+!
+
+TUPLE: sequence-cursor
+    { seq read-only }
+    { n fixnum read-only } ;
+C: <sequence-cursor> sequence-cursor
+    
+INSTANCE: sequence container
+
+M: sequence begin-cursor 0 <sequence-cursor> ; inline
+M: sequence end-cursor dup length <sequence-cursor> ; inline
+
+INSTANCE: sequence-cursor random-access-cursor
+
+M: sequence-cursor cursor-compatible?
+    {
+        [ [ sequence-cursor? ] both? ]
+        [ [ seq>> ] bi@ eq? ]
+    } 2&& ; inline
+
+M: sequence-cursor cursor-valid?
+    [ n>> ] [ seq>> ] bi bounds-check? ; inline
+
+M: sequence-cursor cursor=  [ n>> ] bi@ =  ; inline
+M: sequence-cursor cursor<= [ n>> ] bi@ <= ; inline
+M: sequence-cursor cursor>= [ n>> ] bi@ >= ; inline
+M: sequence-cursor cursor<  [ n>> ] bi@ <  ; inline
+M: sequence-cursor cursor>  [ n>> ] bi@ >  ; inline
+M: sequence-cursor inc-cursor [ seq>> ] [ n>> ] bi 1 + <sequence-cursor> ; inline
+M: sequence-cursor dec-cursor [ seq>> ] [ n>> ] bi 1 - <sequence-cursor> ; inline
+M: sequence-cursor cursor+ [ [ seq>> ] [ n>> ] bi ] dip + <sequence-cursor> ; inline
+M: sequence-cursor cursor- [ [ seq>> ] [ n>> ] bi ] dip - <sequence-cursor> ; inline
+M: sequence-cursor cursor-distance ( cursor cursor -- n )
+    [ n>> ] bi@ - ; inline
+
+INSTANCE: sequence-cursor input-cursor
+
+M: sequence-cursor cursor-key-value-unsafe [ n>> dup ] [ seq>> ] bi nth-unsafe ; inline
+M: sequence-cursor cursor-key-value [ n>> dup ] [ seq>> ] bi nth ; inline
+
+INSTANCE: sequence-cursor output-cursor
+
+M: sequence-cursor set-cursor-value-unsafe [ n>> ] [ seq>> ] bi set-nth-unsafe ; inline
+M: sequence-cursor set-cursor-value [ n>> ] [ seq>> ] bi set-nth ; inline
+
+!
+! map cursor
+!
+
+TUPLE: map-cursor
+    { from read-only }
+    { to read-only } ;
+C: <map-cursor> map-cursor
+
+INSTANCE: map-cursor forward-cursor
+
+M: map-cursor cursor-compatible? [ from>> ] bi@ cursor-compatible? ; inline
+M: map-cursor cursor-valid? [ from>> ] [ to>> ] bi [ cursor-valid? ] both? ; inline
+M: map-cursor cursor= [ from>> ] bi@ cursor= ; inline
+M: map-cursor inc-cursor [ from>> inc-cursor ] [ to>> inc-cursor ] bi <map-cursor> ; inline
+
+INSTANCE: map-cursor output-cursor
+
+M: map-cursor set-cursor-value-unsafe to>> set-cursor-value-unsafe ; inline
+M: map-cursor set-cursor-value        to>> set-cursor-value        ; inline
+
+: -map- ( begin end quot to -- begin' end' quot' )
+    swap [ '[ _ <map-cursor> ] bi@ ] dip '[ from>> @ ] -out- ; inline
+
+: -map ( begin end quot to -- begin' end' quot' )
+    -map- -each ; inline
+
+!
+! pusher cursor
+!
+
+TUPLE: pusher-cursor
+    { growable read-only } ;
+C: <pusher-cursor> pusher-cursor
+
+INSTANCE: pusher-cursor infinite-stream-cursor
+INSTANCE: pusher-cursor output-cursor
+
+M: pusher-cursor set-cursor-value growable>> push ; inline
+
+!
+! Create cursors into new sequences
+!
+
+: new-growable-cursor ( begin end exemplar -- cursor result )
+    [ swap cursor-distance-hint ] dip new-resizable [ <pusher-cursor> ] keep ; inline
+
+GENERIC# new-sequence-cursor 1 ( begin end exemplar -- cursor result )
+
+M: random-access-cursor new-sequence-cursor
+    [ swap cursor-distance ] dip new-sequence [ begin-cursor ] keep ; inline
+M: forward-cursor new-sequence-cursor
+    new-growable-cursor ; inline
+
+: -into-sequence- ( begin end quot exemplar -- begin' end' quot' cursor result )
+    [ 2over ] dip new-sequence-cursor ; inline
+
+: -into-growable- ( begin end quot exemplar -- begin' end' quot' cursor result )
+    [ 2over ] dip new-growable-cursor ; inline
+
+!
+! map combinators
+!
+
+! XXX generalize exemplar
+: -map-as ( ... begin end quot: ( ... cursor -- ... value ) exemplar -- ... newseq )
+    [ -into-sequence- [ -map ] dip ] keep like ; inline
+
+: map! ( ... container quot: ( ... x -- ... newx ) -- ... container )
+    [ in- -out ] keep ; inline
+: map-as ( ... container quot: ( ... x -- ... newx ) exemplar -- ... newseq )
+    [ in- ] dip -map-as ; inline
+: map ( ... container quot: ( ... x -- ... newx ) -- ... newcontainer )
+    over map-as ; inline
+
+!
+! assoc combinators
+!
+
+: -assoc- ( quot -- quot' )
+    '[ cursor-key-value @ ] ; inline
+
+: assoc- ( assoc quot -- begin end quot' )
+    all- -assoc- ; inline
+
+: assoc-each ( ... assoc quot: ( ... k v -- ... ) -- ... )
+    assoc- -each ; inline
+: assoc>map ( ... assoc quot: ( ... k v -- ... newx ) exemplar -- ... newcontainer )
+    [ assoc- ] dip -map-as ; inline
+
+!
+! hashtable cursor
+!
+
+TUPLE: hashtable-cursor
+    { hashtable hashtable read-only }
+    { n fixnum read-only } ;
+<PRIVATE
+C: <hashtable-cursor> hashtable-cursor
+PRIVATE>
+
+INSTANCE: hashtable-cursor forward-cursor
+
+M: hashtable-cursor cursor-compatible?
+    {
+        [ [ hashtable-cursor? ] both? ]
+        [ [ hashtable>> ] bi@ eq? ]
+    } 2&& ; inline
+
+M: hashtable-cursor cursor-valid? ( cursor -- ? )
+    [ n>> ] [ hashtable>> array>> ] bi bounds-check? ; inline
+
+M: hashtable-cursor cursor= ( cursor cursor -- ? )
+    [ n>> ] bi@ = ; inline
+M: hashtable-cursor cursor-distance-hint ( cursor cursor -- n )
+    nip hashtable>> assoc-size ; inline
+
+<PRIVATE
+: (inc-hashtable-cursor) ( array n -- n' )
+    [ 2dup swap { [ length < ] [ nth-unsafe tombstone? ] } 2&& ] [ 2 + ] while nip ; inline
+PRIVATE>
+
+M: hashtable-cursor inc-cursor ( cursor -- cursor' )
+    [ hashtable>> dup array>> ] [ n>> 2 + ] bi
+    (inc-hashtable-cursor) <hashtable-cursor> ; inline
+
+INSTANCE: hashtable-cursor input-cursor
+
+M: hashtable-cursor cursor-key-value-unsafe
+    [ n>> ] [ hashtable>> array>> ] bi
+    [ nth-unsafe ] [ [ 1 + ] dip nth-unsafe ] 2bi ; inline
+
+INSTANCE: hashtable container
+
+M: hashtable begin-cursor
+    dup array>> 0 (inc-hashtable-cursor) <hashtable-cursor> ; inline
+M: hashtable end-cursor
+    dup array>> length <hashtable-cursor> ; inline
+
+!
+! zip cursor
+!
+
+TUPLE: zip-cursor
+    { keys   read-only }
+    { values read-only } ;
+C: <zip-cursor> zip-cursor
+
+INSTANCE: zip-cursor forward-cursor
+
+M: zip-cursor cursor-compatible? ( cursor cursor -- ? )
+    {
+        [ [ zip-cursor? ] both? ]
+        [ [ keys>> ] bi@ cursor-compatible? ]
+        [ [ values>> ] bi@ cursor-compatible? ]
+    } 2&& ; inline
+
+M: zip-cursor cursor-valid? ( cursor -- ? )
+    [ keys>> ] [ values>> ] bi [ cursor-valid? ] both? ; inline
+M: zip-cursor cursor= ( cursor cursor -- ? )
+    {
+        [ [ keys>> ] bi@ cursor= ]
+        [ [ values>> ] bi@ cursor= ]
+    } 2|| ; inline
+
+M: zip-cursor cursor-distance-hint ( cursor cursor -- n )
+    [ [ keys>> ] bi@ cursor-distance-hint ]
+    [ [ values>> ] bi@ cursor-distance-hint ] 2bi max ; inline
+
+M: zip-cursor inc-cursor ( cursor -- cursor' )
+    [ keys>> inc-cursor ] [ values>> inc-cursor ] bi <zip-cursor> ; inline
+    
+INSTANCE: zip-cursor input-cursor
+
+M: zip-cursor cursor-key-value
+    [ keys>> cursor-value-unsafe ] [ values>> cursor-value-unsafe ] bi ; inline
+
+: zip-cursors ( a-begin a-end b-begin b-end -- begin end )
+    [ <zip-cursor> ] bi-curry@ bi* ; inline
+
+: 2all ( a b -- begin end )
+    [ all ] bi@ zip-cursors ; inline
+
+: 2all- ( a b quot -- begin end quot )
+    [ 2all ] dip ; inline
+
+ALIAS: -2in- -assoc-
+
+: 2in- ( a b quot -- begin end quot' )
+    2all- -2in- ; inline
+
+: 2each ( ... a b quot: ( ... x y -- ... ) -- ... )
+    2in- -each ; inline
+
+: 2map-as ( ... a b quot: ( ... x y -- ... z ) exemplar -- ... c )
+    [ 2in- ] dip -map-as ; inline
+
+: 2map ( ... a b quot: ( ... x y -- ... z ) -- ... c )
+    pick 2map-as ; inline 
+
+!
+! generalized zips
+!
+
+: -unzip- ( quot -- quot' )
+    '[ [ keys>> cursor-value-unsafe ] [ values>> ] bi @ ] ; inline
+
+MACRO: nzip-cursors ( n -- ) 1 - [ zip-cursors ] n*quot ;
+
+: nall ( seqs... n -- begin end ) [ [ all ] swap napply ] [ nzip-cursors ] bi ; inline
+
+: nall- ( seqs... quot n -- begin end quot ) swap [ nall ] dip ; inline
+
+MACRO: -nin- ( n -- )
+    1 - [ -unzip- ] n*quot [ -in- ] prepend ;
+
+: nin- ( seqs... quot n -- begin end quot ) [ nall- ] [ -nin- ] bi ; inline
+
+: neach ( seqs... quot n -- ) nin- -each ; inline
+: nmap-as ( seqs... quot exemplar n -- newseq )
+    swap [ nin- ] dip -map-as ; inline
+: nmap ( seqs... quot n -- newseq )
+    dup [ npick ] curry [ dip swap ] curry dip nmap-as ; inline
+
+!
+! utilities
+!
+
+: -with- ( invariant begin end quot -- begin end quot' )
+    [ rot ] dip '[ [ _ ] dip @ ] ; inline
+
+: -2with- ( invariant invariant begin end quot -- begin end quot' )
+    -with- -with- ; inline
+
+MACRO: -nwith- ( n -- )
+    [ -with- ] n*quot ;
+

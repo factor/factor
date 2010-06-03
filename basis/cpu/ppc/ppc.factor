@@ -1,14 +1,16 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs sequences kernel combinators make math
-math.order math.ranges system namespaces locals layouts words
-alien alien.accessors alien.c-types alien.complex alien.data
-literals cpu.architecture cpu.ppc.assembler
-cpu.ppc.assembler.backend compiler.cfg.registers
-compiler.cfg.instructions compiler.cfg.comparisons
-compiler.codegen.fixup compiler.cfg.intrinsics
-compiler.cfg.stack-frame compiler.cfg.build-stack-frame
-compiler.units compiler.constants compiler.codegen vm ;
+USING: accessors assocs sequences kernel combinators
+classes.algebra byte-arrays make math math.order math.ranges
+system namespaces locals layouts words alien alien.accessors
+alien.c-types alien.complex alien.data alien.libraries
+literals cpu.architecture cpu.ppc.assembler cpu.ppc.assembler.backend
+compiler.cfg.registers compiler.cfg.instructions
+compiler.cfg.comparisons compiler.codegen.fixup
+compiler.cfg.intrinsics compiler.cfg.stack-frame
+compiler.cfg.build-stack-frame compiler.units compiler.constants
+compiler.codegen vm ;
+QUALIFIED-WITH: alien.c-types c
 FROM: cpu.ppc.assembler => B ;
 FROM: layouts => cell ;
 FROM: math => float ;
@@ -30,11 +32,6 @@ M: label BC [ 0 BC ] dip rc-relative-ppc-2 label-fixup ;
 
 enable-float-intrinsics
 
-<<
-\ ##integer>float t frame-required? set-word-prop
-\ ##float>integer t frame-required? set-word-prop
->>
-
 M: ppc machine-registers
     {
         { int-regs $[ 2 12 [a,b] 16 29 [a,b] append ] }
@@ -44,10 +41,16 @@ M: ppc machine-registers
 CONSTANT: scratch-reg 30
 CONSTANT: fp-scratch-reg 30
 
+M: ppc complex-addressing? f ;
+
+M: ppc fused-unboxing? f ;
+
 M: ppc %load-immediate ( reg n -- ) swap LOAD ;
 
 M: ppc %load-reference ( reg obj -- )
-    [ 0 swap LOAD32 ] [ rc-absolute-ppc-2/2 rel-immediate ] bi* ;
+    [ [ 0 swap LOAD32 ] [ rc-absolute-ppc-2/2 rel-literal ] bi* ]
+    [ \ f type-number swap LI ]
+    if* ;
 
 M: ppc %alien-global ( register symbol dll -- )
     [ 0 swap LOAD32 ] 2dip rc-absolute-ppc-2/2 rel-dlsym ;
@@ -58,11 +61,9 @@ CONSTANT: vm-reg 15
 
 : %load-vm-addr ( reg -- ) vm-reg MR ;
 
-M: ppc %vm-field ( dst field -- )
-    [ vm-reg ] dip vm-field-offset LWZ ;
+M: ppc %vm-field ( dst field -- ) [ vm-reg ] dip LWZ ;
 
-M: ppc %vm-field-ptr ( dst field -- )
-    [ vm-reg ] dip vm-field-offset ADDI ;
+M: ppc %set-vm-field ( src field -- ) [ vm-reg ] dip STW ;
 
 GENERIC: loc-reg ( loc -- reg )
 
@@ -111,10 +112,6 @@ HOOK: reserved-area-size os ( -- n )
 : scratch@ ( n -- offset )
     factor-area-size + ;
 
-! GC root area
-: gc-root@ ( n -- offset )
-    gc-root-offset local@ ;
-
 ! Finally we have the linkage area
 HOOK: lr-save os ( -- n )
 
@@ -141,30 +138,13 @@ M:: ppc %dispatch ( src temp -- )
     temp MTCTR
     BCTR ;
 
-M: ppc %slot ( dst obj slot -- ) swapd LWZX ;
+: (%slot) ( dst obj slot scale tag -- obj dst slot )
+    [ 0 assert= ] bi@ swapd ;
+
+M: ppc %slot ( dst obj slot scale tag -- ) (%slot) LWZX ;
 M: ppc %slot-imm ( dst obj slot tag -- ) slot-offset LWZ ;
-M: ppc %set-slot ( src obj slot -- ) swapd STWX ;
+M: ppc %set-slot ( src obj slot scale tag -- ) (%slot) STWX ;
 M: ppc %set-slot-imm ( src obj slot tag -- ) slot-offset STW ;
-
-M:: ppc %string-nth ( dst src index temp -- )
-    [
-        "end" define-label
-        temp src index ADD
-        dst temp string-offset LBZ
-        0 dst HEX: 80 CMPI
-        "end" get BLT
-        temp src string-aux-offset LWZ
-        temp temp index ADD
-        temp temp index ADD
-        temp temp byte-array-offset LHZ
-        temp temp 7 SLWI
-        dst dst temp XOR
-        "end" resolve-label
-    ] with-scope ;
-
-M:: ppc %set-string-nth-fast ( ch obj index temp -- )
-    temp obj index ADD
-    ch temp string-offset STB ;
 
 M: ppc %add     ADD ;
 M: ppc %add-imm ADDI ;
@@ -187,25 +167,30 @@ M: ppc %sar-imm SRAWI ;
 M: ppc %not     NOT ;
 M: ppc %neg     NEG ;
 
-:: overflow-template ( label dst src1 src2 insn -- )
+:: overflow-template ( label dst src1 src2 cc insn -- )
     0 0 LI
     0 MTXER
     dst src2 src1 insn call
-    label BO ; inline
+    cc {
+        { cc-o [ label BO ] }
+        { cc/o [ label BNO ] }
+    } case ; inline
 
-M: ppc %fixnum-add ( label dst src1 src2 -- )
+M: ppc %fixnum-add ( label dst src1 src2 cc -- )
     [ ADDO. ] overflow-template ;
 
-M: ppc %fixnum-sub ( label dst src1 src2 -- )
+M: ppc %fixnum-sub ( label dst src1 src2 cc -- )
     [ SUBFO. ] overflow-template ;
 
-M: ppc %fixnum-mul ( label dst src1 src2 -- )
+M: ppc %fixnum-mul ( label dst src1 src2 cc -- )
     [ MULLWO. ] overflow-template ;
 
 M: ppc %add-float FADD ;
 M: ppc %sub-float FSUB ;
 M: ppc %mul-float FMUL ;
 M: ppc %div-float FDIV ;
+
+M: ppc integer-float-needs-stack-frame? t ;
 
 M:: ppc %integer>float ( dst src -- )
     HEX: 4330 scratch-reg LIS
@@ -226,6 +211,7 @@ M:: ppc %float>integer ( dst src -- )
 M: ppc %copy ( dst src rep -- )
     2over eq? [ 3drop ] [
         {
+            { tagged-rep [ MR ] }
             { int-rep [ MR ] }
             { double-rep [ FMR ] }
         } case
@@ -237,10 +223,10 @@ M: spill-slot float-function-param* [ 1 ] dip n>> spill@ LFD ;
 M: integer float-function-param* FMR ;
 
 : float-function-param ( i src -- )
-    [ float-regs param-regs nth ] dip float-function-param* ;
+    [ float-regs cdecl param-regs at nth ] dip float-function-param* ;
 
 : float-function-return ( reg -- )
-    float-regs return-reg double-rep %copy ;
+    float-regs return-regs at first double-rep %copy ;
 
 M:: ppc %unary-float-function ( dst src func -- )
     0 src float-function-param
@@ -296,12 +282,69 @@ M:: ppc %box-alien ( dst src temp -- )
         "f" resolve-label
     ] with-scope ;
 
+:: %box-displaced-alien/f ( dst displacement base -- )
+    base dst 1 alien@ STW
+    displacement dst 3 alien@ STW
+    displacement dst 4 alien@ STW ;
+
+:: %box-displaced-alien/alien ( dst displacement base temp -- )
+    ! Set new alien's base to base.base
+    temp base 1 alien@ LWZ
+    temp dst 1 alien@ STW
+
+    ! Compute displacement
+    temp base 3 alien@ LWZ
+    temp temp displacement ADD
+    temp dst 3 alien@ STW
+
+    ! Compute address
+    temp base 4 alien@ LWZ
+    temp temp displacement ADD
+    temp dst 4 alien@ STW ;
+
+:: %box-displaced-alien/byte-array ( dst displacement base temp -- )
+    base dst 1 alien@ STW
+    displacement dst 3 alien@ STW
+    temp base byte-array-offset ADDI
+    temp temp displacement ADD
+    temp dst 4 alien@ STW ;
+
+:: %box-displaced-alien/dynamic ( dst displacement base temp -- )
+    "not-f" define-label
+    "not-alien" define-label
+
+    ! Is base f?
+    0 base \ f type-number CMPI
+    "not-f" get BNE
+
+    ! Yes, it is f. Fill in new object
+    dst displacement base %box-displaced-alien/f
+
+    "end" get B
+
+    "not-f" resolve-label
+
+    ! Check base type
+    temp base tag-mask get ANDI
+
+    ! Is base an alien?
+    0 temp alien type-number CMPI
+    "not-alien" get BNE
+
+    dst displacement base temp %box-displaced-alien/alien
+
+    ! We are done
+    "end" get B
+
+    ! Is base a byte array? It has to be, by now...
+    "not-alien" resolve-label
+
+    dst displacement base temp %box-displaced-alien/byte-array ;
+
 M:: ppc %box-displaced-alien ( dst displacement base temp base-class -- )
     ! This is ridiculous
     [
         "end" define-label
-        "not-f" define-label
-        "not-alien" define-label
 
         ! If displacement is zero, return the base
         dst base MR
@@ -316,76 +359,94 @@ M:: ppc %box-displaced-alien ( dst displacement base temp base-class -- )
         temp \ f type-number %load-immediate
         temp dst 2 alien@ STW
 
-        ! Is base f?
-        0 base \ f type-number CMPI
-        "not-f" get BNE
-
-        ! Yes, it is f. Fill in new object
-        base dst 1 alien@ STW
-        displacement dst 3 alien@ STW
-        displacement dst 4 alien@ STW
-
-        "end" get B
-
-        "not-f" resolve-label
-
-        ! Check base type
-        temp base tag-mask get ANDI
-
-        ! Is base an alien?
-        0 temp alien type-number CMPI
-        "not-alien" get BNE
-
-        ! Yes, it is an alien. Set new alien's base to base.base
-        temp base 1 alien@ LWZ
-        temp dst 1 alien@ STW
-
-        ! Compute displacement
-        temp base 3 alien@ LWZ
-        temp temp displacement ADD
-        temp dst 3 alien@ STW
-
-        ! Compute address
-        temp base 4 alien@ LWZ
-        temp temp displacement ADD
-        temp dst 4 alien@ STW
-
-        ! We are done
-        "end" get B
-
-        ! Is base a byte array? It has to be, by now...
-        "not-alien" resolve-label
-
-        base dst 1 alien@ STW
-        displacement dst 3 alien@ STW
-        temp base byte-array-offset ADDI
-        temp temp displacement ADD
-        temp dst 4 alien@ STW
+        dst displacement base temp
+        {
+            { [ base-class \ f class<= ] [ drop %box-displaced-alien/f ] }
+            { [ base-class \ alien class<= ] [ %box-displaced-alien/alien ] }
+            { [ base-class \ byte-array class<= ] [ %box-displaced-alien/byte-array ] }
+            [ %box-displaced-alien/dynamic ]
+        } cond
 
         "end" resolve-label
     ] with-scope ;
 
-M: ppc %alien-unsigned-1 LBZ ;
-M: ppc %alien-unsigned-2 LHZ ;
+: (%memory) ( val base displacement scale offset rep c-type -- base val displacement rep c-type )
+    [ [ 0 assert= ] bi@ swapd ] 2dip ; inline
 
-M: ppc %alien-signed-1 [ dup ] 2dip LBZ dup EXTSB ;
-M: ppc %alien-signed-2 LHA ;
+M: ppc %load-memory-imm ( dst base offset rep c-type -- )
+    [
+        {
+            { c:char   [ [ dup ] 2dip LBZ dup EXTSB ] }
+            { c:uchar  [ LBZ ] }
+            { c:short  [ LHA ] }
+            { c:ushort [ LHZ ] }
+            { c:int    [ LWZ ] }
+            { c:uint   [ LWZ ] }
+        } case
+    ] [
+        {
+            { int-rep [ LWZ ] }
+            { float-rep [ LFS ] }
+            { double-rep [ LFD ] }
+        } case
+    ] ?if ;
 
-M: ppc %alien-cell LWZ ;
+M: ppc %load-memory ( dst base displacement scale offset rep c-type -- )
+    (%memory) [
+        {
+            { c:char   [ [ LBZX ] [ drop dup EXTSB ] 2bi ] }
+            { c:uchar  [ LBZX ] }
+            { c:short  [ LHAX ] }
+            { c:ushort [ LHZX ] }
+            { c:int    [ LWZX ] }
+            { c:uint   [ LWZX ] }
+        } case
+    ] [
+        {
+            { int-rep [ LWZX ] }
+            { float-rep [ LFSX ] }
+            { double-rep [ LFDX ] }
+        } case
+    ] ?if ;
 
-M: ppc %alien-float LFS ;
-M: ppc %alien-double LFD ;
+M: ppc %store-memory-imm ( src base offset rep c-type -- )
+    [
+        {
+            { c:char   [ STB ] }
+            { c:uchar  [ STB ] }
+            { c:short  [ STH ] }
+            { c:ushort [ STH ] }
+            { c:int    [ STW ] }
+            { c:uint   [ STW ] }
+        } case
+    ] [
+        {
+            { int-rep [ STW ] }
+            { float-rep [ STFS ] }
+            { double-rep [ STFD ] }
+        } case
+    ] ?if ;
 
-M: ppc %set-alien-integer-1 -rot STB ;
-M: ppc %set-alien-integer-2 -rot STH ;
-
-M: ppc %set-alien-cell -rot STW ;
-
-M: ppc %set-alien-float -rot STFS ;
-M: ppc %set-alien-double -rot STFD ;
+M: ppc %store-memory ( src base displacement scale offset rep c-type -- )
+    (%memory) [
+        {
+            { c:char   [ STBX ] }
+            { c:uchar  [ STBX ] }
+            { c:short  [ STHX ] }
+            { c:ushort [ STHX ] }
+            { c:int    [ STWX ] }
+            { c:uint   [ STWX ] }
+        } case
+    ] [
+        {
+            { int-rep [ STWX ] }
+            { float-rep [ STFSX ] }
+            { double-rep [ STFDX ] }
+        } case
+    ] ?if ;
 
 : load-zone-ptr ( reg -- )
-    "nursery" %vm-field-ptr ;
+    vm-reg "nursery" vm-field-offset ADDI ;
 
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
     [ drop load-zone-ptr ] [ swap 0 LWZ ] 2bi ;
@@ -426,33 +487,32 @@ M:: ppc %allot ( dst size class nursery-ptr -- )
     temp2 load-decks-offset
     temp1 scratch-reg temp2 STBX ;
 
-M:: ppc %write-barrier ( src slot temp1 temp2 -- )
+M:: ppc %write-barrier ( src slot scale tag temp1 temp2 -- )
+    scale 0 assert= tag 0 assert=
     temp1 src slot ADD
     temp1 temp2 (%write-barrier) ;
 
-M:: ppc %write-barrier-imm ( src slot temp1 temp2 -- )
-    temp1 src slot ADDI
+M:: ppc %write-barrier-imm ( src slot tag temp1 temp2 -- )
+    temp1 src slot tag slot-offset ADDI
     temp1 temp2 (%write-barrier) ;
 
-M:: ppc %check-nursery ( label size temp1 temp2 -- )
-    temp2 load-zone-ptr
-    temp1 temp2 0 LWZ
-    temp2 temp2 2 cells LWZ
+M:: ppc %check-nursery-branch ( label size cc temp1 temp2 -- )
+    temp1 vm-reg "nursery" vm-field-offset LWZ
+    temp2 vm-reg "nursery" vm-field-offset 2 cells + LWZ
     temp1 temp1 size ADDI
     ! is here >= end?
     temp1 0 temp2 CMP
-    label BLE ;
+    cc {
+        { cc<= [ label BLE ] }
+        { cc/<= [ label BGT ] }
+    } case ;
 
-M:: ppc %save-gc-root ( gc-root register -- )
-    register 1 gc-root gc-root@ STW ;
+: gc-root-offsets ( seq -- seq' )
+    [ n>> spill@ ] map f like ;
 
-M:: ppc %load-gc-root ( gc-root register -- )
-    register 1 gc-root gc-root@ LWZ ;
-
-M:: ppc %call-gc ( gc-root-count temp -- )
-    3 1 gc-root-base local@ ADDI
-    gc-root-count 4 LI
-    5 %load-vm-addr
+M: ppc %call-gc ( gc-roots -- )
+    3 swap gc-root-offsets %load-reference
+    4 %load-vm-addr
     "inline_gc" f %alien-invoke ;
 
 M: ppc %prologue ( n -- )
@@ -494,9 +554,18 @@ M: ppc %epilogue ( n -- )
     } case ;
 
 : (%compare) ( src1 src2 -- ) [ 0 ] dip CMP ; inline
-: (%compare-imm) ( src1 src2 -- ) [ 0 ] 2dip CMPI ; inline
-: (%compare-float-unordered) ( src1 src2 -- ) [ 0 ] dip FCMPU ; inline
-: (%compare-float-ordered) ( src1 src2 -- ) [ 0 ] dip FCMPO ; inline
+
+: (%compare-integer-imm) ( src1 src2 -- )
+    [ 0 ] 2dip CMPI ; inline
+
+: (%compare-imm) ( src1 src2 -- )
+    [ tag-fixnum ] [ \ f type-number ] if* (%compare-integer-imm) ; inline
+
+: (%compare-float-unordered) ( src1 src2 -- )
+    [ 0 ] dip FCMPU ; inline
+
+: (%compare-float-ordered) ( src1 src2 -- )
+    [ 0 ] dip FCMPO ; inline
 
 :: (%compare-float) ( src1 src2 cc compare -- branch1 branch2 )
     cc {
@@ -519,6 +588,8 @@ M: ppc %epilogue ( n -- )
 M: ppc %compare [ (%compare) ] 2dip %boolean ;
 
 M: ppc %compare-imm [ (%compare-imm) ] 2dip %boolean ;
+
+M: ppc %compare-integer-imm [ (%compare-integer-imm) ] 2dip %boolean ;
 
 M:: ppc %compare-float-ordered ( dst src1 src2 cc temp -- )
     src1 src2 cc negate-cc \ (%compare-float-ordered) (%compare-float) :> ( branch1 branch2 )
@@ -546,6 +617,10 @@ M:: ppc %compare-imm-branch ( label src1 src2 cc -- )
     src1 src2 (%compare-imm)
     label cc %branch ;
 
+M:: ppc %compare-integer-imm-branch ( label src1 src2 cc -- )
+    src1 src2 (%compare-integer-imm)
+    label cc %branch ;
+
 :: (%branch) ( label branch1 branch2 -- )
     label branch1 execute( label -- )
     branch2 [ label branch2 execute( label -- ) ] when ; inline
@@ -561,18 +636,19 @@ M:: ppc %compare-float-unordered-branch ( label src1 src2 cc -- )
 : load-from-frame ( dst n rep -- )
     {
         { int-rep [ [ 1 ] dip LWZ ] }
+        { tagged-rep [ [ 1 ] dip LWZ ] }
         { float-rep [ [ 1 ] dip LFS ] }
         { double-rep [ [ 1 ] dip LFD ] }
         { stack-params [ [ 0 1 ] dip LWZ [ 0 1 ] dip param@ STW ] }
     } case ;
 
 : next-param@ ( n -- reg x )
-    2 1 stack-frame get total-size>> LWZ
-    [ 2 ] dip param@ ;
+    [ 17 ] dip param@ ;
 
 : store-to-frame ( src n rep -- )
     {
         { int-rep [ [ 1 ] dip STW ] }
+        { tagged-rep [ [ 1 ] dip STW ] }
         { float-rep [ [ 1 ] dip STFS ] }
         { double-rep [ [ 1 ] dip STFD ] }
         { stack-params [ [ [ 0 ] dip next-param@ LWZ 0 1 ] dip STW ] }
@@ -586,9 +662,11 @@ M: ppc %reload ( dst rep src -- )
 
 M: ppc %loop-entry ;
 
-M: int-regs return-reg drop 3 ;
-M: int-regs param-regs drop { 3 4 5 6 7 8 9 10 } ;
-M: float-regs return-reg drop 1 ;
+M: ppc return-regs
+    {
+        { int-regs { 3 4 5 6 } }
+        { float-regs { 1 } }
+    } ;
 
 M:: ppc %save-param-reg ( stack reg rep -- )
     reg stack local@ rep store-to-frame ;
@@ -596,69 +674,56 @@ M:: ppc %save-param-reg ( stack reg rep -- )
 M:: ppc %load-param-reg ( stack reg rep -- )
     reg stack local@ rep load-from-frame ;
 
-M: ppc %pop-stack ( n -- )
-    [ 3 ] dip <ds-loc> loc>operand LWZ ;
+GENERIC: load-param ( reg src -- )
 
-M: ppc %push-stack ( -- )
-    ds-reg ds-reg 4 ADDI
-    int-regs return-reg ds-reg 0 STW ;
+M: integer load-param int-rep %copy ;
 
-M: ppc %push-context-stack ( -- )
-    11 "ctx" %vm-field
-    12 11 "datastack" context-field-offset LWZ
-    12 12 4 ADDI
-    12 11 "datastack" context-field-offset STW
-    int-regs return-reg 12 0 STW ;
+M: spill-slot load-param [ 1 ] dip n>> spill@ LWZ ;
 
-M: ppc %pop-context-stack ( -- )
-    11 "ctx" %vm-field
-    12 11 "datastack" context-field-offset LWZ
-    int-regs return-reg 12 0 LWZ
-    12 12 4 SUBI
-    12 11 "datastack" context-field-offset STW ;
+GENERIC: store-param ( reg dst -- )
 
-M: ppc %unbox ( n rep func -- )
-    ! Value must be in r3
+M: integer store-param swap int-rep %copy ;
+
+M: spill-slot store-param [ 1 ] dip n>> spill@ STW ;
+
+:: call-unbox-func ( src func -- )
+    3 src load-param
     4 %load-vm-addr
-    ! Call the unboxer
-    f %alien-invoke
-    ! Store the return value on the C stack
-    over [ [ reg-class-of return-reg ] keep %save-param-reg ] [ 2drop ] if ;
-
-M: ppc %unbox-long-long ( n func -- )
-    4 %load-vm-addr
-    ! Call the unboxer
-    f %alien-invoke
-    ! Store the return value on the C stack
-    [
-        [ [ 3 1 ] dip local@ STW ]
-        [ [ 4 1 ] dip cell + local@ STW ] bi
-    ] when* ;
-
-M: ppc %unbox-large-struct ( n c-type -- )
-    ! Value must be in r3
-    ! Compute destination address and load struct size
-    [ [ 4 1 ] dip local@ ADDI ] [ heap-size 5 LI ] bi*
-    6 %load-vm-addr
-    ! Call the function
-    "to_value_struct" f %alien-invoke ;
-
-M:: ppc %box ( n rep func -- )
-    ! If the source is a stack location, load it into freg #0.
-    ! If the source is f, then we assume the value is already in
-    ! freg #0.
-    n [ 0 rep reg-class-of param-reg rep %load-param-reg ] when*
-    rep double-rep? 5 4 ? %load-vm-addr
     func f %alien-invoke ;
 
-M: ppc %box-long-long ( n func -- )
-    [
-        [
-            [ [ 3 1 ] dip local@ LWZ ]
-            [ [ 4 1 ] dip cell + local@ LWZ ] bi
-        ] when*
-        5 %load-vm-addr
-    ] dip f %alien-invoke ;
+M:: ppc %unbox ( src n rep func -- )
+    src func call-unbox-func
+    ! Store the return value on the C stack
+    n [ rep reg-class-of return-regs at first rep %save-param-reg ] when* ;
+
+M:: ppc %unbox-long-long ( src n func -- )
+    src func call-unbox-func
+    ! Store the return value on the C stack
+    n [
+        3 1 n local@ STW
+        4 1 n cell + local@ STW
+    ] when ;
+
+M:: ppc %unbox-large-struct ( src n c-type -- )
+    4 src load-param
+    3 1 n local@ ADDI
+    c-type heap-size 5 LI
+    "memcpy" "libc" load-library %alien-invoke ;
+
+M:: ppc %box ( dst n rep func -- )
+    n [ 0 rep reg-class-of cdecl param-reg rep %load-param-reg ] when*
+    rep double-rep? 5 4 ? %load-vm-addr
+    func f %alien-invoke
+    3 dst store-param ;
+
+M:: ppc %box-long-long ( dst n func -- )
+    n [
+        3 1 n local@ LWZ
+        4 1 n cell + local@ LWZ
+    ] when
+    5 %load-vm-addr
+    func f %alien-invoke
+    3 dst store-param ;
 
 : struct-return@ ( n -- n )
     [ stack-frame get params>> ] unless* local@ ;
@@ -668,23 +733,23 @@ M: ppc %prepare-box-struct ( -- )
     3 1 f struct-return@ ADDI
     3 1 0 local@ STW ;
 
-M: ppc %box-large-struct ( n c-type -- )
+M:: ppc %box-large-struct ( dst n c-type -- )
     ! If n = f, then we're boxing a returned struct
     ! Compute destination address and load struct size
-    [ [ 3 1 ] dip struct-return@ ADDI ] [ heap-size 4 LI ] bi*
+    3 1 n struct-return@ ADDI
+    c-type heap-size 4 LI
     5 %load-vm-addr
     ! Call the function
-    "from_value_struct" f %alien-invoke ;
+    "from_value_struct" f %alien-invoke
+    3 dst store-param ;
 
 M:: ppc %restore-context ( temp1 temp2 -- )
-    temp1 "ctx" %vm-field
-    temp2 1 stack-frame get total-size>> ADDI
-    temp2 temp1 "callstack-bottom" context-field-offset STW
+    temp1 %context
     ds-reg temp1 "datastack" context-field-offset LWZ
     rs-reg temp1 "retainstack" context-field-offset LWZ ;
 
 M:: ppc %save-context ( temp1 temp2 -- )
-    temp1 "ctx" %vm-field
+    temp1 %context
     1 temp1 "callstack-top" context-field-offset STW
     ds-reg temp1 "datastack" context-field-offset STW
     rs-reg temp1 "retainstack" context-field-offset STW ;
@@ -692,85 +757,62 @@ M:: ppc %save-context ( temp1 temp2 -- )
 M: ppc %alien-invoke ( symbol dll -- )
     [ 11 ] 2dip %alien-global 11 MTLR BLRL ;
 
-M: ppc %alien-callback ( quot -- )
-    3 4 %restore-context
-    3 swap %load-reference
-    4 3 quot-entry-point-offset LWZ
-    4 MTLR
-    BLRL
-    3 4 %save-context ;
-
-M: ppc %prepare-alien-indirect ( -- )
-    3 ds-reg 0 LWZ
-    ds-reg ds-reg 4 SUBI
-    4 %load-vm-addr
-    "pinned_alien_offset" f %alien-invoke
-    16 3 MR ;
-
-M: ppc %alien-indirect ( -- )
-    16 MTLR BLRL ;
-
-M: ppc %callback-value ( ctype -- )
-    ! Save top of data stack
-    3 ds-reg 0 LWZ
-    3 1 0 local@ STW
-    3 %load-vm-addr
-    ! Restore data/call/retain stacks
-    "unnest_stacks" f %alien-invoke
-    ! Restore top of data stack
-    3 1 0 local@ LWZ
-    ! Unbox former top of data stack to return registers
-    unbox-return ;
+M: ppc %alien-indirect ( src -- )
+    [ 11 ] dip load-param 11 MTLR BLRL ;
 
 M: ppc immediate-arithmetic? ( n -- ? ) -32768 32767 between? ;
 
 M: ppc immediate-bitwise? ( n -- ? ) 0 65535 between? ;
 
+M: ppc immediate-store? drop f ;
+
 M: ppc return-struct-in-registers? ( c-type -- ? )
     c-type return-in-registers?>> ;
 
-M: ppc %box-small-struct ( c-type -- )
+M:: ppc %box-small-struct ( dst c-type -- )
     #! Box a <= 16-byte struct returned in r3:r4:r5:r6
-    heap-size 7 LI
+    c-type heap-size 7 LI
     8 %load-vm-addr
-    "from_medium_struct" f %alien-invoke ;
+    "from_medium_struct" f %alien-invoke
+    3 dst store-param ;
 
 : %unbox-struct-1 ( -- )
     ! Alien must be in r3.
-    4 %load-vm-addr
-    "alien_offset" f %alien-invoke
     3 3 0 LWZ ;
 
 : %unbox-struct-2 ( -- )
     ! Alien must be in r3.
-    4 %load-vm-addr
-    "alien_offset" f %alien-invoke
     4 3 4 LWZ
     3 3 0 LWZ ;
 
 : %unbox-struct-4 ( -- )
     ! Alien must be in r3.
-    4 %load-vm-addr
-    "alien_offset" f %alien-invoke
     6 3 12 LWZ
     5 3 8 LWZ
     4 3 4 LWZ
     3 3 0 LWZ ;
 
-M: ppc %nest-stacks ( -- )
-    3 %load-vm-addr
-    "nest_stacks" f %alien-invoke ;
+M:: ppc %unbox-small-struct ( src c-type -- )
+    src 3 load-param
+    c-type heap-size {
+        { [ dup 4 <= ] [ drop %unbox-struct-1 ] }
+        { [ dup 8 <= ] [ drop %unbox-struct-2 ] }
+        { [ dup 16 <= ] [ drop %unbox-struct-4 ] }
+    } cond ;
 
-M: ppc %unnest-stacks ( -- )
+M: ppc %begin-callback ( -- )
     3 %load-vm-addr
-    "unnest_stacks" f %alien-invoke ;
+    "begin_callback" f %alien-invoke ;
 
-M: ppc %unbox-small-struct ( size -- )
-    heap-size cell align cell /i {
-        { 1 [ %unbox-struct-1 ] }
-        { 2 [ %unbox-struct-2 ] }
-        { 4 [ %unbox-struct-4 ] }
-    } case ;
+M: ppc %alien-callback ( quot -- )
+    3 swap %load-reference
+    4 3 quot-entry-point-offset LWZ
+    4 MTLR
+    BLRL ;
+
+M: ppc %end-callback ( -- )
+    3 %load-vm-addr
+    "end_callback" f %alien-invoke ;
 
 enable-float-functions
 

@@ -96,6 +96,10 @@ IN: %s
   (let ((cmd `(:fuel* (,vocab ,summary fuel-scaffold-summary) "fuel")))
     (fuel-eval--send/wait cmd)))
 
+(defsubst fuel-scaffold--create-platforms (vocab platforms)
+  (let ((cmd `(:fuel* (,vocab ,platforms fuel-scaffold-platforms) "fuel")))
+    (fuel-eval--send/wait cmd)))
+
 (defun fuel-scaffold--help (parent)
   (when (and parent (fuel-scaffold--check-auto fuel-scaffold-help-autoinsert-p))
     (let* ((ret (fuel-scaffold--create-docs (fuel-scaffold--vocab parent)))
@@ -131,6 +135,7 @@ You can configure `fuel-scaffold-developer-name' (set by default to
                                 nil t (or root-hint "resource:")))
          (summary (read-string "Vocab summary (empty for none): "))
          (tags (read-string "Vocab tags (empty for none): "))
+         (platforms (read-string "Vocab platforms (empty for all): "))
          (help (y-or-n-p "Scaffold help? "))
          (tests (y-or-n-p "Scaffold tests? "))
          (cmd `(:fuel* ((,root ,name ,fuel-scaffold-developer-name)
@@ -143,6 +148,8 @@ You can configure `fuel-scaffold-developer-name' (set by default to
       (fuel-scaffold--create-summary name summary))
     (when (not (equal "" tags))
       (fuel-scaffold--create-tags name tags))
+    (when (not (equal "" platforms))
+      (fuel-scaffold--create-platforms name platforms))
     (when help
          (fuel-scaffold--create-docs name))
     (when tests
@@ -219,6 +226,18 @@ You can configure `fuel-scaffold-developer-name' (set by default to
          (file (fuel-eval--retort-result ret)))
         (unless file
           (error "Error creating summary file" (car (fuel-eval--retort-error ret))))
+        (find-file file)))
+
+(defun fuel-scaffold-platforms (&optional arg)
+  "Creates, if it does not already exist, a platforms file for the current vocabulary."
+  (interactive "P")
+  (let* ((vocab (or (and (not arg ) (fuel-syntax--current-vocab))
+                    (fuel-completion--read-vocab nil)))
+         (platforms (read-string "Platforms: "))
+         (ret (fuel-scaffold--create-platforms vocab platforms))
+         (file (fuel-eval--retort-result ret)))
+        (unless file
+          (error "Error creating platforms file" (car (fuel-eval--retort-error ret))))
         (find-file file)))
 
 

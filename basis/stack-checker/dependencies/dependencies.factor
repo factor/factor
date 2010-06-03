@@ -5,6 +5,7 @@ generic kernel math namespaces sequences words sets
 combinators.short-circuit classes.tuple alien.c-types ;
 FROM: classes.tuple.private => tuple-layout ;
 FROM: assocs => change-at ;
+FROM: namespaces => set ;
 IN: stack-checker.dependencies
 
 ! Words that the current quotation depends on
@@ -46,6 +47,9 @@ M: c-type-word depends-on-c-type depends-on-definition ;
 
 M: array depends-on-c-type
     [ word? ] filter [ depends-on-definition ] each ;
+
+M: pointer depends-on-c-type
+    to>> depends-on-c-type ;
 
 ! Generic words that the current quotation depends on
 SYMBOL: generic-dependencies
@@ -138,7 +142,7 @@ TUPLE: depends-on-final class ;
     [ \ depends-on-final add-conditional-dependency ] bi ;
 
 M: depends-on-final satisfied?
-    class>> final-class? ;
+    class>> { [ class? ] [ final-class? ] } 1&& ;
 
 : init-dependencies ( -- )
     H{ } clone dependencies set

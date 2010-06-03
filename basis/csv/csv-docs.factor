@@ -1,5 +1,5 @@
 USING: help.syntax help.markup kernel prettyprint sequences
-io.pathnames ;
+io.pathnames strings ;
 IN: csv
 
 HELP: csv
@@ -20,6 +20,20 @@ HELP: csv>file
     { "path" pathname } { "encoding" "an encoding descriptor" }
 }
 { $description "Writes a comma-separated-value structure to a file." } ;
+
+HELP: string>csv
+{ $values
+    { "string" string }
+    { "csv" "csv" }
+}
+{ $description "Parses a string into a sequence of comma-separated-value fields." } ;
+
+HELP: csv>string
+{ $values
+    { "csv" "csv" }
+    { "string" string }
+}
+{ $description "Writes a comma-separated-value structure to a string." } ;
 
 HELP: csv-row
 { $values { "stream" "an input stream" }
@@ -42,6 +56,10 @@ ARTICLE: "csv" "Comma-separated-values parsing and writing"
 { $subsections file>csv }
 "Writing a csv file:"
 { $subsections csv>file }
+"Reading a string to csv:"
+{ $subsections string>csv }
+"Writing csv to a string:"
+{ $subsections csv>string }
 "Changing the delimiter from a comma:"
 { $subsections with-delimiter }
 "Reading from a stream:"

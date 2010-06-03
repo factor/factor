@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: system io.files io.pathnames namespaces kernel accessors
 assocs ;
@@ -39,11 +39,11 @@ target-os get-global [
 ! Keep test-log around?
 SYMBOL: builder-debug
 
-! Host to send status notifications to.
-SYMBOL: status-host
+! URL for status notifications.
+SYMBOL: status-url
 
-! Username to log in.
-SYMBOL: status-username
+! Password for status notifications.
+SYMBOL: status-secret
 
 SYMBOL: upload-help?
 

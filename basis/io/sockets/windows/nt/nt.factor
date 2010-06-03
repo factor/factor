@@ -17,7 +17,7 @@ M: winnt WSASocket-flags ( -- DWORD )
     SIO_GET_EXTENSION_FUNCTION_POINTER
     WSAID_CONNECTEX
     GUID heap-size
-    void* <c-object>
+    { void* }
     [
         void* heap-size
         DWORD <c-object>
@@ -26,7 +26,7 @@ M: winnt WSASocket-flags ( -- DWORD )
         WSAIoctl SOCKET_ERROR = [
             winsock-error-string throw
         ] when
-    ] keep *void* ;
+    ] [ ] with-out-parameters ;
 
 TUPLE: ConnectEx-args port
     s name namelen lpSendBuffer dwSendDataLength
@@ -57,7 +57,7 @@ TUPLE: ConnectEx-args port
     } cleave
     int
     { SOCKET void* int PVOID DWORD LPDWORD void* }
-    "stdcall" alien-indirect drop
+    stdcall alien-indirect drop
     winsock-error-string [ throw ] when* ; inline
 
 M: object establish-connection ( client-out remote -- )

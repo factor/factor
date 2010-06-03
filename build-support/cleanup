@@ -8,3 +8,9 @@ Nmakefile
 unmaintained
 build-support
 images
+factor.dll.exp
+factor.dll.lib
+factor.exp
+factor.lib
+libfactor-ffi-test.exp
+libfactor-ffi-test.lib

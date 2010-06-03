@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax system math kernel calendar
 core-foundation core-foundation.time ;
@@ -19,7 +19,7 @@ FUNCTION: CFRunLoopTimerRef CFRunLoopTimerCreate (
 ) ;
 
 : <CFTimer> ( callback -- timer )
-    [ f now >CFAbsoluteTime 60 0 0 ] dip f CFRunLoopTimerCreate ;
+    [ f system-micros >CFAbsoluteTime 60 0 0 ] dip f CFRunLoopTimerCreate ;
 
 FUNCTION: void CFRunLoopTimerInvalidate (
    CFRunLoopTimerRef timer

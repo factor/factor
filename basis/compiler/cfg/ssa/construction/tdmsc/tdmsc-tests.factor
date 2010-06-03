@@ -2,6 +2,7 @@ USING: accessors arrays compiler.cfg compiler.cfg.debugger
 compiler.cfg.dominance compiler.cfg.predecessors
 compiler.cfg.ssa.construction.tdmsc kernel namespaces sequences
 tools.test vectors sets ;
+FROM: namespaces => set ;
 IN: compiler.cfg.ssa.construction.tdmsc.tests
 
 : test-tdmsc ( -- )

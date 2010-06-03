@@ -15,7 +15,7 @@ GENERIC: stream-read-partial ( n stream -- seq )
 GENERIC: stream-readln ( stream -- str/f )
 
 GENERIC: stream-write1 ( elt stream -- )
-GENERIC: stream-write ( seq stream -- )
+GENERIC: stream-write ( data stream -- )
 GENERIC: stream-flush ( stream -- )
 GENERIC: stream-nl ( stream -- )
 
@@ -32,9 +32,9 @@ SLOT: i
 
 : (stream-seek) ( n seek-type stream -- )
     swap {
-        { seek-absolute [ (>>i) ] }
+        { seek-absolute [ i<< ] }
         { seek-relative [ [ + ] change-i drop ] }
-        { seek-end [ [ underlying>> length + ] [ (>>i) ] bi ] }
+        { seek-end [ [ underlying>> length + ] [ i<< ] bi ] }
         [ bad-seek-type ]
     } case ;
 
@@ -87,7 +87,7 @@ SYMBOL: error-stream
 
 : bl ( -- ) " " write ;
 
-: each-morsel ( handler: ( data -- ) reader: ( -- data ) -- )
+: each-morsel ( ..a handler: ( ..a data -- ..b ) reader: ( ..b -- ..a data ) -- ..a )
     [ dup ] compose swap while drop ; inline
 
 <PRIVATE

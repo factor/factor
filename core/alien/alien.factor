@@ -1,20 +1,42 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel math namespaces sequences system
-kernel.private byte-arrays arrays init ;
+kernel.private byte-arrays byte-vectors arrays init
+continuations.private ;
 IN: alien
 
 PREDICATE: pinned-alien < alien underlying>> not ;
 
 UNION: pinned-c-ptr pinned-alien POSTPONE: f ;
 
-GENERIC: >c-ptr ( obj -- c-ptr )
+GENERIC: element-size ( seq -- n ) flushable
+
+M: byte-array element-size drop 1 ; inline
+
+M: byte-vector element-size drop 1 ; inline
+
+M: slice element-size seq>> element-size ; inline
+
+M: f element-size drop 1 ; inline
+
+GENERIC: byte-length ( obj -- n ) flushable
+
+M: object byte-length [ length ] [ element-size ] bi * ; inline
+
+GENERIC: >c-ptr ( obj -- c-ptr ) flushable
 
 M: c-ptr >c-ptr ; inline
+
+M: slice >c-ptr
+    [ [ from>> ] [ element-size ] bi * ] [ seq>> >c-ptr ] bi
+    <displaced-alien> ; inline
 
 SLOT: underlying
 
 M: object >c-ptr underlying>> ; inline
+
+: binary-object ( obj -- c-ptr n )
+    [ >c-ptr ] [ byte-length ] bi ; inline
 
 GENERIC: expired? ( c-ptr -- ? ) flushable
 
@@ -42,6 +64,13 @@ M: alien equal?
 M: pinned-alien hashcode*
     nip dup expired>> [ drop 1234 ] [ alien-address ] if ;
 
+SINGLETONS: stdcall thiscall fastcall cdecl mingw ;
+
+UNION: abi stdcall thiscall fastcall cdecl mingw ;
+
+: callee-cleanup? ( abi -- ? )
+    { stdcall fastcall thiscall } member? ;
+
 ERROR: alien-callback-error ;
 
 : alien-callback ( return parameters abi quot -- alien )
@@ -49,18 +78,20 @@ ERROR: alien-callback-error ;
 
 ERROR: alien-indirect-error ;
 
-: alien-indirect ( ... funcptr return parameters abi -- ... )
+: alien-indirect ( args... funcptr return parameters abi -- return... )
     alien-indirect-error ;
 
 ERROR: alien-invoke-error library symbol ;
 
-: alien-invoke ( ... return library function parameters -- ... )
+: alien-invoke ( args... return library function parameters -- return... )
     2over alien-invoke-error ;
 
 ERROR: alien-assembly-error code ;
 
-: alien-assembly ( ... return parameters abi quot -- ... )
+: alien-assembly ( args... return parameters abi quot -- return... )
     dup alien-assembly-error ;
+
+<PRIVATE
 
 ! Callbacks are registered in a global hashtable. Note that they
 ! are also pinned in a special callback area, so clearing this
@@ -70,8 +101,24 @@ SYMBOL: callbacks
 
 [ H{ } clone callbacks set-global ] "alien" add-startup-hook
 
-<PRIVATE
+! Every callback invocation has a unique identifier in the VM.
+! We make sure that the current callback is the right one before
+! returning from it, to avoid a bad interaction between threads
+! and callbacks. See basis/compiler/tests/alien.factor for a
+! test case.
+: wait-to-return ( yield-quot callback-id -- )
+    dup current-callback eq?
+    [ 2drop ] [ over call( -- ) wait-to-return ] if ;
 
+! Used by compiler.codegen to wrap callback bodies
+: do-callback ( callback-quot yield-quot -- )
+    init-namespaces
+    init-catchstack
+    current-callback
+    [ 2drop call ] [ wait-to-return drop ] 3bi ; inline
+
+! A utility for defining global variables that are recompiled in
+! every session
 TUPLE: expiry-check object alien ;
 
 : recompute-value? ( check -- ? )

@@ -23,5 +23,5 @@ IN: math.ranges.tests
 [ { 0 1/3 2/3 1 } ] [ 1 0 -1/3 <range> >array reverse ] unit-test
 
 [ 100 ] [
-    1 100 [a,b] [ 2^ [1,b] ] map prune length
+    1 100 [a,b] [ 2^ [1,b] ] map members length
 ] unit-test

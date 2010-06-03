@@ -10,7 +10,7 @@ GENERIC: escape-analysis* ( node -- )
 
 SYMBOL: next-node
 
-: each-with-next ( seq quot: ( elt -- ) -- )
+: each-with-next ( ... seq quot: ( ... elt -- ... ) -- ... )
     dupd '[ 1 + _ ?nth next-node set @ ] each-index ; inline
 
 : (escape-analysis) ( node -- )

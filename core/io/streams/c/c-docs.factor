@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io io.files threads
-strings byte-arrays io.streams.plain ;
+strings byte-arrays io.streams.plain alien math ;
 IN: io.streams.c
 
 ARTICLE: "io.streams.c" "ANSI C streams"
@@ -42,9 +42,9 @@ HELP: fopen
 { $errors "Throws an error if the file could not be opened." }
 { $notes "User code should call " { $link <file-reader> } " or " { $link <file-writer> } " to get a high level stream." } ;
 
-HELP: fwrite ( string alien -- )
-{ $values { "string" "a string" } { "alien" "a C FILE* handle" } }
-{ $description "Writes a string of text to a C FILE* handle." }
+HELP: fwrite
+{ $values { "data" c-ptr } { "length" integer } { "alien" "a C FILE* handle" } }
+{ $description "Writes some bytes to a C FILE* handle." }
 { $errors "Throws an error if the output operation failed." } ;
 
 HELP: fflush ( alien -- )
@@ -62,7 +62,7 @@ HELP: fgetc ( alien -- ch/f )
 { $errors "Throws an error if the input operation failed." } ;
 
 HELP: fread ( n alien -- str/f )
-{ $values { "n" "a positive integer" } { "alien" "a C FILE* handle" } { "str/f" "a string or " { $link f } } }
+{ $values { "n" "a positive integer" } { "alien" "a C FILE* handle" } { "str/f" { $maybe string } } }
 { $description "Reads a sequence of characters from a C FILE* handle, and outputs " { $link f } " on end of file." }
 { $errors "Throws an error if the input operation failed." } ;
 

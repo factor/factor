@@ -1,13 +1,15 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays alien.libraries accessors io.backend io.encodings.utf8 io.files
-io.streams.c init fry namespaces math make assocs kernel parser
-parser.notes lexer strings.parser vocabs sequences sequences.deep
-sequences.private words memory kernel.private continuations io
-vocabs.loader system strings sets vectors quotations byte-arrays
-sorting compiler.units definitions generic generic.standard
-generic.single tools.deploy.config combinators classes
-classes.builtin slots.private grouping command-line io.pathnames ;
+USING: arrays alien.libraries accessors io.backend
+io.encodings.utf8 io.files io.streams.c init fry namespaces math
+make assocs kernel parser parser.notes lexer strings.parser
+vocabs sequences sequences.deep sequences.private words memory
+kernel.private continuations io vocabs.loader system strings
+sets vectors quotations byte-arrays sorting compiler.units
+definitions generic generic.standard generic.single
+tools.deploy.config combinators combinators.private classes
+vocabs.loader.private classes.builtin slots.private grouping
+command-line io.pathnames ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes.private
 QUALIFIED: compiler.crossref
@@ -20,6 +22,8 @@ QUALIFIED: source-files
 QUALIFIED: source-files.errors
 QUALIFIED: vocabs
 FROM: alien.libraries.private => >deployed-library-path ;
+FROM: namespaces => set ;
+FROM: sets => members ;
 IN: tools.deploy.shaker
 
 ! This file is some hairy shit.
@@ -40,12 +44,8 @@ IN: tools.deploy.shaker
     deploy-threads? get [
         "threads" startup-hooks get delete-at
     ] unless
-    native-io? [
-        "io.thread" startup-hooks get delete-at
-    ] unless
     strip-io? [
         "io.backend" startup-hooks get delete-at
-        "io.thread" startup-hooks get delete-at
     ] when
     strip-dictionary? [
         {
@@ -59,6 +59,13 @@ IN: tools.deploy.shaker
     strip-debugger? "debugger" vocab and [
         "Stripping debugger" show
         "vocab:tools/deploy/shaker/strip-debugger.factor"
+        run-file
+    ] when ;
+
+: strip-ui-error-hook ( -- )
+    strip-debugger? deploy-ui? get and "ui" vocab and [
+        "Installing generic UI error hook" show
+        "vocab:tools/deploy/shaker/strip-ui-error-hook.factor"
         run-file
     ] when ;
 
@@ -166,7 +173,6 @@ IN: tools.deploy.shaker
                 "predicate"
                 "predicate-definition"
                 "predicating"
-                "primitive"
                 "reader"
                 "reading"
                 "recursive"
@@ -345,6 +351,8 @@ IN: tools.deploy.shaker
                 lexer-factory
                 print-use-hook
                 root-cache
+                require-when-vocabs
+                require-when-table
                 source-files.errors:error-types
                 source-files.errors:error-observers
                 vocabs:dictionary
@@ -372,10 +380,6 @@ IN: tools.deploy.shaker
                 compiler.errors:compiler-errors
                 continuations:thread-error-hook
             } %
-            
-            deploy-ui? get [
-                "ui-error-hook" "ui.gadgets.worlds" lookup ,
-            ] when
         ] when
 
         "windows-messages" "windows.messages" lookup [ , ] when*
@@ -392,16 +396,15 @@ IN: tools.deploy.shaker
     ] [ drop ] if ;
 
 : strip-c-io ( -- )
+    ! On all platforms, if deploy-io is 1, we strip out C streams.
+    ! On Unix, if deploy-io is 3, we strip out C streams as well.
+    ! On Windows, even if deploy-io is 3, C streams are still used
+    ! for the console, so don't strip it there.
     strip-io?
     deploy-io get 3 = os windows? not and
     or [
-        [
-            c-io-backend forget
-            "io.streams.c" forget-vocab
-            "io-thread-running?" "io.thread" lookup [
-                global delete-at
-            ] when*
-        ] with-compilation-unit
+        "Stripping C I/O" show
+        "vocab:tools/deploy/shaker/strip-c-io.factor" run-file
     ] when ;
 
 : compress ( pred post-process string -- )
@@ -503,7 +506,7 @@ SYMBOL: deploy-vocab
 : write-vocab-manifest ( vocab-manifest-out -- )
     "Writing vocabulary manifest to " write dup print flush
     vocabs "VOCABS:" prefix
-    deploy-libraries get [ libraries get at path>> ] map prune "LIBRARIES:" prefix append
+    deploy-libraries get [ libraries get at path>> ] map members "LIBRARIES:" prefix append
     swap utf8 set-file-lines ;
 
 : prepare-deploy-libraries ( -- )
@@ -529,6 +532,7 @@ SYMBOL: deploy-vocab
     strip-call
     strip-cocoa
     strip-debugger
+    strip-ui-error-hook
     strip-specialized-arrays
     compute-next-methods
     strip-startup-hooks
@@ -546,10 +550,18 @@ SYMBOL: deploy-vocab
     strip-words
     clear-megamorphic-caches ;
 
+: die-with ( error original-error -- * )
+    #! We don't want DCE to drop the error before the die call!
+    [ die 1 exit ] (( a -- * )) call-effect-unsafe ;
+
+: die-with2 ( error original-error -- * )
+    #! We don't want DCE to drop the error before the die call!
+    [ die 1 exit ] (( a b -- * )) call-effect-unsafe ;
+
 : deploy-error-handler ( quot -- )
     [
         strip-debugger?
-        [ error-continuation get call>> callstack>array die 1 exit ]
+        [ original-error get die-with2 ]
         ! Don't reference these words literally, if we're stripping the
         ! debugger out we don't want to load the prettyprinter at all
         [ [:c] execute( -- ) nl [print-error] execute( error -- ) flush ] if

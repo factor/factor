@@ -19,4 +19,4 @@ STRUCT: statvfs
 CONSTANT: ST_RDONLY       1
 CONSTANT: ST_NOSUID       2
 
-FUNCTION: int statvfs ( char* path, statvfs* buf ) ;
+FUNCTION: int statvfs ( c-string path, statvfs* buf ) ;

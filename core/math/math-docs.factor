@@ -385,14 +385,14 @@ HELP: prev-float
 HELP: real-part
 { $values { "z" number } { "x" real } }
 { $description "Outputs the real part of a complex number. This acts as the identity on real numbers." }
-{ $examples { $example "USING: math prettyprint ; C{ 1 2 } real-part ." "1" } } ;
+{ $examples { $example "USING: math prettyprint ;" "C{ 1 2 } real-part ." "1" } } ;
 
 HELP: imaginary-part
 { $values { "z" number } { "y" real } }
 { $description "Outputs the imaginary part of a complex number. This outputs zero for real numbers." }
 { $examples
-    { $example "USING: math prettyprint ; C{ 1 2 } imaginary-part ." "2" }
-    { $example "USING: math prettyprint ; 3 imaginary-part ." "0" }
+    { $example "USING: math prettyprint ;" "C{ 1 2 } imaginary-part ." "2" }
+    { $example "USING: math prettyprint ;" "3 imaginary-part ." "0" }
 } ;
 
 HELP: real
@@ -410,22 +410,22 @@ HELP: power-of-2?
 { $description "Tests if " { $snippet "n" } " is a power of 2." } ;
 
 HELP: each-integer
-{ $values { "n" integer } { "quot" { $quotation "( i -- )" } } }
+{ $values { "n" integer } { "quot" { $quotation "( ... i -- ... )" } } }
 { $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } "." }
 { $notes "This word is used to implement " { $link each } "." } ;
 
 HELP: all-integers?
-{ $values { "n" integer } { "quot" { $quotation "( i -- ? )" } } { "?" "a boolean" } }
+{ $values { "n" integer } { "quot" { $quotation "( ... i -- ... ? )" } } { "?" "a boolean" } }
 { $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iteration stops when the quotation outputs " { $link f } " or the end is reached. If the quotation yields a false value for some integer, this word outputs " { $link f } ". Otherwise, this word outputs " { $link t } "." }
 { $notes "This word is used to implement " { $link all? } "." } ;
 
 HELP: find-integer
-{ $values { "n" integer } { "quot" { $quotation "( i -- ? )" } } { "i" "an integer or " { $link f } } }
+{ $values { "n" integer } { "quot" { $quotation "( ... i -- ... ? )" } } { "i" "an integer or " { $link f } } }
 { $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iterationi stops when the quotation outputs a true value or the end is reached. If the quotation yields a true value for some integer, this word outputs that integer. Otherwise, this word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find } "." } ;
 
 HELP: find-last-integer
-{ $values { "n" integer } { "quot" { $quotation "( i -- ? )" } } { "i" "an integer or " { $link f } } }
+{ $values { "n" integer } { "quot" { $quotation "( ... i -- ... ? )" } } { "i" "an integer or " { $link f } } }
 { $description "Applies the quotation to each integer from " { $snippet "n" } " down to 0, inclusive. Iteration stops when the quotation outputs a true value or 0 is reached. If the quotation yields a true value for some integer, the word outputs that integer. Otherwise, the word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find-last } "." } ;
 

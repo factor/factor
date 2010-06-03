@@ -1,7 +1,8 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien audio classes.struct fry calendar alarms
 combinators combinators.short-circuit destructors generalizations
-kernel literals locals math openal sequences specialized-arrays strings ;
+kernel literals locals math openal sequences
+sequences.generalizations specialized-arrays strings ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAYS: c:float c:uchar c:uint ;
 IN: audio.engine
@@ -232,7 +233,7 @@ DEFER: update-audio
     dup al-sources>> [
         {
             [ make-engine-current ]
-            [ update-alarm>> [ cancel-alarm ] when* ]
+            [ update-alarm>> [ stop-alarm ] when* ]
             [ clips>> clone [ dispose ] each ]
             [ al-sources>> free-sources ]
             [

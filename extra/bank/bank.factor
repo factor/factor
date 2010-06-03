@@ -54,7 +54,7 @@ C: <transaction> transaction
 : process-day ( account date -- )
     2dup accumulate-interest ?pay-interest ;
 
-: each-day ( quot: ( -- ) start end -- )
+: each-day ( ... quot: ( ... day -- ... ) start end -- ... )
     2dup before? [
         [ dup [ over [ swap call ] dip ] dip 1 days time+ ] dip each-day
     ] [

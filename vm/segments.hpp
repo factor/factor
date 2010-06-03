@@ -15,6 +15,16 @@ struct segment {
 
 	explicit segment(cell size, bool executable_p);
 	~segment();
+
+	bool underflow_p(cell addr)
+	{
+		return (addr >= start - getpagesize() && addr < start);
+	}
+
+	bool overflow_p(cell addr)
+	{
+		return (addr >= end && addr < end + getpagesize());
+	}
 };
 
 }

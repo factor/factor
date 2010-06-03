@@ -34,7 +34,7 @@ M: win32-socket dispose ( stream -- )
     handle>> closesocket drop ;
 
 : unspecific-sockaddr/size ( addrspec -- sockaddr len )
-    [ empty-sockaddr/size ] [ protocol-family ] bi pick (>>family) ;
+    [ empty-sockaddr/size ] [ protocol-family ] bi pick family<< ;
 
 : opened-socket ( handle -- win32-socket )
     <win32-socket> |dispose dup add-completion ;

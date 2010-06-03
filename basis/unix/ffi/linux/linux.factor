@@ -38,7 +38,7 @@ STRUCT: addrinfo
     { protocol int }
     { addrlen socklen_t }
     { addr void* }
-    { canonname char* }
+    { canonname c-string }
     { next addrinfo* } ;
 
 STRUCT: sockaddr-in
@@ -83,13 +83,13 @@ CONSTANT: SEEK_CUR 1
 CONSTANT: SEEK_END 2
 
 STRUCT: passwd
-    { pw_name char* }
-    { pw_passwd char* }
+    { pw_name c-string }
+    { pw_passwd c-string }
     { pw_uid uid_t }
     { pw_gid gid_t }
-    { pw_gecos char* }
-    { pw_dir char* }
-    { pw_shell char* } ;
+    { pw_gecos c-string }
+    { pw_dir c-string }
+    { pw_shell c-string } ;
 
 ! dirent64
 STRUCT: dirent
@@ -99,7 +99,7 @@ STRUCT: dirent
     { d_type uchar }
     { d_name char[256] } ;
 
-FUNCTION: int open64 ( char* path, int flags, int prot ) ;
+FUNCTION: int open64 ( c-string path, int flags, int prot ) ;
 FUNCTION: dirent* readdir64 ( DIR* dirp ) ;
 FUNCTION: int readdir64_r ( void* dirp, dirent* entry, dirent** result ) ;
 

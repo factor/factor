@@ -23,8 +23,8 @@ STRUCT: stat
     { st_gen uint32_t }
     { st_qspare uint32_t[2] } ;
 
-FUNCTION: int __stat30  ( char* pathname, stat* buf ) ;
-FUNCTION: int __lstat30 ( char* pathname, stat* buf ) ;
+FUNCTION: int __stat30  ( c-string pathname, stat* buf ) ;
+FUNCTION: int __lstat30 ( c-string pathname, stat* buf ) ;
 
 : stat ( pathname buf -- n ) __stat30 ;
 : lstat ( pathname buf -- n ) __lstat30 ;

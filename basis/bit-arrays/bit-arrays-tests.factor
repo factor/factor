@@ -1,4 +1,4 @@
-USING: sequences sequences.private arrays bit-arrays kernel
+USING: alien sequences sequences.private arrays bit-arrays kernel
 tools.test math random ;
 IN: bit-arrays.tests
 
@@ -78,5 +78,9 @@ IN: bit-arrays.tests
 } bit-array>integer ] unit-test
 
 [ 49 ] [ 49 <bit-array> dup set-bits [ ] count ] unit-test
+
+[ 1 ] [ ?{ f t f t } byte-length ] unit-test
+
+[ HEX: a ] [ ?{ f t f t } bit-array>integer ] unit-test
 
 [ HEX: 100 ] [ ?{ f f f f f f f f t } bit-array>integer ] unit-test

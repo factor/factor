@@ -11,11 +11,6 @@ TYPEDEF: uchar               UCHAR
 TYPEDEF: uchar               BYTE
 
 TYPEDEF: ushort              wchar_t
-SYMBOL: wchar_t*
-<<
-{ char* utf16n } \ wchar_t* typedef
-\ wchar_t \ wchar_t* "pointer-c-type" set-word-prop
->>
 
 TYPEDEF: wchar_t             WCHAR
 
@@ -74,8 +69,8 @@ TYPEDEF: ULARGE_INTEGER* PULARGE_INTEGER
 TYPEDEF: size_t SIZE_T
 TYPEDEF: ptrdiff_t SSIZE_T
 
-TYPEDEF: wchar_t*  LPCSTR
-TYPEDEF: wchar_t*  LPWSTR
+TYPEDEF: { c-string utf16n } LPCSTR
+TYPEDEF: { c-string utf16n } LPWSTR
 TYPEDEF: WCHAR       TCHAR
 TYPEDEF: LPWSTR      LPTCH
 TYPEDEF: LPWSTR      PTCH
@@ -129,14 +124,14 @@ TYPEDEF: DWORD               LGRPID
 TYPEDEF: LONG_PTR            LPARAM
 TYPEDEF: BOOL*               LPBOOL
 TYPEDEF: BYTE*               LPBYTE
-TYPEDEF: WCHAR*              LPCWSTR
+TYPEDEF: { c-string utf16n } LPCWSTR
 ! TYPEDEF: WCHAR*              LPWSTR
 
-TYPEDEF: WCHAR*               LPSTR
-TYPEDEF: wchar_t* LPCTSTR
-TYPEDEF: wchar_t* LPWTSTR
+TYPEDEF: { c-string utf16n } LPSTR
+TYPEDEF: { c-string utf16n } LPCTSTR
+TYPEDEF: { c-string utf16n } LPWTSTR
 
-TYPEDEF: wchar_t*       LPTSTR
+TYPEDEF: { c-string utf16n } LPTSTR
 TYPEDEF: LPCSTR      PCTSTR
 TYPEDEF: LPSTR       PTSTR
 
@@ -149,7 +144,7 @@ TYPEDEF: BOOLEAN*            PBOOLEAN
 TYPEDEF: BYTE*               PBYTE
 TYPEDEF: CHAR*               PCHAR
 TYPEDEF: CHAR*               PCSTR
-TYPEDEF: WCHAR*              PCWSTR
+TYPEDEF: { c-string utf16n } PCWSTR
 TYPEDEF: DWORD*              PDWORD
 TYPEDEF: DWORDLONG*          PDWORDLONG
 TYPEDEF: DWORD_PTR*          PDWORD_PTR
@@ -186,9 +181,9 @@ TYPEDEF: ULONG_PTR*          PULONG_PTR
 TYPEDEF: ULONG32*            PULONG32
 TYPEDEF: ULONG64*            PULONG64
 TYPEDEF: USHORT*             PUSHORT
-TYPEDEF: WCHAR*              PWCHAR
+TYPEDEF: { c-string utf16n } PWCHAR
 TYPEDEF: WORD*               PWORD
-TYPEDEF: WCHAR*              PWSTR
+TYPEDEF: { c-string utf16n } PWSTR
 TYPEDEF: HANDLE              SC_HANDLE
 TYPEDEF: LPVOID              SC_LOCK
 TYPEDEF: HANDLE              SERVICE_STATUS_HANDLE
@@ -354,7 +349,7 @@ STRUCT: LVITEM
 
 STRUCT: LVFINDINFO
     { flags uint }
-    { psz char* }
+    { psz c-string }
     { lParam long }
     { pt POINT }
     { vkDirection uint } ;

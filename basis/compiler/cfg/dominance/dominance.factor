@@ -3,6 +3,7 @@
 USING: accessors assocs combinators sets math fry kernel math.order
 dlists deques vectors namespaces sequences sorting locals
 compiler.cfg.rpo compiler.cfg.predecessors ;
+FROM: namespaces => set ;
 IN: compiler.cfg.dominance
 
 ! Reference:

@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2008 Slava Pestov.
+! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel vectors sequences hashtables
 arrays kernel.private math strings assocs ;
@@ -6,7 +6,7 @@ IN: namespaces
 
 <PRIVATE
 
-: namestack* ( -- namestack ) 0 special-object { vector } declare ; inline
+: namestack* ( -- namestack ) 0 context-object { vector } declare ; inline
 : >n ( namespace -- ) namestack* push ;
 : ndrop ( -- ) namestack* pop* ;
 
@@ -14,7 +14,7 @@ PRIVATE>
 
 : namespace ( -- namespace ) namestack* last ; inline
 : namestack ( -- namestack ) namestack* clone ;
-: set-namestack ( namestack -- ) >vector 0 set-special-object ;
+: set-namestack ( namestack -- ) >vector 0 set-context-object ;
 : global ( -- g ) 21 special-object { hashtable } declare ; inline
 : init-namespaces ( -- ) global 1array set-namestack ;
 : get ( variable -- value ) namestack* assoc-stack ; inline

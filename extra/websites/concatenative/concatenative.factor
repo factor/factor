@@ -19,6 +19,7 @@ furnace.auth.features.registration
 furnace.auth.features.deactivate-user
 furnace.boilerplate
 furnace.redirection
+furnace.recaptcha
 webapps.pastebin
 webapps.planet
 webapps.wiki
@@ -54,6 +55,12 @@ TUPLE: factor-website < dispatcher ;
         allow-edit-profile
         allow-deactivation ;
 
+: <factor-recaptcha> ( responder -- responder' )
+    <recaptcha>
+        "concatenative.org" >>domain
+        "6LeJWQgAAAAAAFlYV7SuBClE9uSpGtV_ZS-qVON7" >>public-key
+        "6LeJWQgAAAAAALh-XJgSSQ6xKygRgJ8-029Ip2Xv" >>private-key ;
+
 : <factor-website> ( -- responder )
     factor-website new-dispatcher
         URL" /wiki/view/Front Page" <redirect-responder> "" add-responder ;
@@ -77,7 +84,7 @@ SYMBOL: dh-file
     <factor-website>
         <wiki> <login-config> <factor-boilerplate> "wiki" add-responder
         <user-admin> <login-config> <factor-boilerplate> "user-admin" add-responder
-        <pastebin> <login-config> <factor-boilerplate> "pastebin" add-responder
+        <pastebin> <factor-recaptcha> <login-config> <factor-boilerplate> "pastebin" add-responder
         <planet> <login-config> <factor-boilerplate> "planet" add-responder
         <mason-app> <login-config> "mason" add-responder
         "/tmp/docs/" <help-webapp> "docs" add-responder
@@ -96,7 +103,7 @@ SYMBOL: dh-file
             <wiki> "wiki" add-responder
             <user-admin> "user-admin" add-responder
         <login-config> <factor-boilerplate> test-db <alloy> "concatenative.org" add-responder
-        <pastebin> <login-config> <factor-boilerplate> test-db <alloy> "paste.factorcode.org" add-responder
+        <pastebin> <factor-recaptcha> <login-config> <factor-boilerplate> test-db <alloy> "paste.factorcode.org" add-responder
         <planet> <login-config> <factor-boilerplate> test-db <alloy> "planet.factorcode.org" add-responder
         <mason-app> <login-config> test-db <alloy> "builds.factorcode.org" add-responder
         home "docs" append-path <help-webapp> "docs.factorcode.org" add-responder

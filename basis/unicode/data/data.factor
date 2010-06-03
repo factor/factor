@@ -6,6 +6,7 @@ math.parser hash2 math.order byte-arrays namespaces
 compiler.units parser io.encodings.ascii values interval-maps
 ascii sets combinators locals math.ranges sorting make
 strings.parser io.encodings.utf8 memoize simple-flat-file ;
+FROM: namespaces => set ;
 IN: unicode.data
 
 <PRIVATE
@@ -183,7 +184,7 @@ C: <code-point> code-point
     ] assoc-map ;
 
 : properties>intervals ( properties -- assoc[str,interval] )
-    dup values prune [ f ] H{ } map>assoc
+    dup values members [ f ] H{ } map>assoc
     [ [ push-at ] curry assoc-each ] keep
     [ <interval-set> ] assoc-map ;
 
@@ -208,7 +209,7 @@ load-data {
 } cleave
 
 : postprocess-class ( -- )
-    combine-map [ [ second ] map ] map concat
+    combine-map [ values ] map concat
     [ combining-class not ] filter
     [ 0 swap class-map set-at ] each ;
 

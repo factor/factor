@@ -14,7 +14,7 @@ SYMBOL: current-irc-client
 : chats> ( -- seq ) irc> chats>> values ;
 : me? ( string -- ? ) irc> nick>> = ;
 
-: with-irc ( irc-client quot: ( -- ) -- )
+: with-irc ( ..a irc-client quot: ( ..a -- ..b ) -- ..b )
     \ current-irc-client swap with-variable ; inline
 
 UNION: to-target privmsg notice ;

@@ -12,7 +12,8 @@
 ! and note the section.
 USING: accessors kernel arrays alien alien.c-types alien.data
 alien.strings alien.syntax classes.struct math math.bitwise words
-sequences namespaces continuations io io.encodings.ascii x11.syntax ;
+sequences namespaces continuations io io.encodings.ascii x11.syntax
+literals ;
 FROM: alien.c-types => short ;
 IN: x11.xlib
 
@@ -30,7 +31,7 @@ TYPEDEF: XID KeySym
 
 TYPEDEF: ulong Atom
 
-TYPEDEF: char* XPointer
+TYPEDEF: c-string XPointer
 C-TYPE: Screen
 TYPEDEF: void* GC
 C-TYPE: Visual
@@ -256,13 +257,13 @@ X-FUNCTION: Bool XQueryPointer ( Display* display, Window w, Window* root_return
 
 ! 4.3 - Properties and Atoms
 
-X-FUNCTION: Atom XInternAtom ( Display* display, char* atom_name, Bool only_if_exists ) ;
+X-FUNCTION: Atom XInternAtom ( Display* display, c-string atom_name, Bool only_if_exists ) ;
 
-X-FUNCTION: char* XGetAtomName ( Display* display, Atom atom ) ;
+X-FUNCTION: c-string XGetAtomName ( Display* display, Atom atom ) ;
 
 ! 4.4 - Obtaining and Changing Window Properties
 
-X-FUNCTION: int XGetWindowProperty ( Display* display, Window w, Atom property, long long_offset, long long_length, Bool delete, Atom req_type, Atom* actual_type_return, int* actual_format_return, ulong* nitems_return, ulong* bytes_after_return, char** prop_return ) ;
+X-FUNCTION: int XGetWindowProperty ( Display* display, Window w, Atom property, long long_offset, long long_length, Bool delete, Atom req_type, Atom* actual_type_return, int* actual_format_return, ulong* nitems_return, ulong* bytes_after_return, c-string* prop_return ) ;
 
 X-FUNCTION: int XChangeProperty ( Display* display, Window w, Atom property, Atom type, int format, int mode, void* data, int nelements ) ;
 
@@ -302,7 +303,7 @@ STRUCT: XColor
 { flags char }
 { pad char } ;
 
-X-FUNCTION: Status XLookupColor ( Display* display, Colormap colormap, char* color_name, XColor* exact_def_return, XColor* screen_def_return ) ;
+X-FUNCTION: Status XLookupColor ( Display* display, Colormap colormap, c-string color_name, XColor* exact_def_return, XColor* screen_def_return ) ;
 X-FUNCTION: Status XAllocColor ( Display* display, Colormap colormap, XColor* screen_in_out ) ;
 X-FUNCTION: Status XQueryColor ( Display* display, Colormap colormap, XColor* def_in_out ) ;
 
@@ -430,11 +431,11 @@ STRUCT: XFontStruct
 { ascent int }
 { descent int } ;
 
-X-FUNCTION: Font XLoadFont ( Display* display, char* name ) ;
+X-FUNCTION: Font XLoadFont ( Display* display, c-string name ) ;
 X-FUNCTION: XFontStruct* XQueryFont ( Display* display, XID font_ID ) ;
-X-FUNCTION: XFontStruct* XLoadQueryFont ( Display* display, char* name ) ;
+X-FUNCTION: XFontStruct* XLoadQueryFont ( Display* display, c-string name ) ;
 
-X-FUNCTION: int XTextWidth ( XFontStruct* font_struct, char* string, int count ) ;
+X-FUNCTION: int XTextWidth ( XFontStruct* font_struct, c-string string, int count ) ;
 
 ! 8.6 - Drawing Text
 
@@ -444,7 +445,7 @@ X-FUNCTION: Status XDrawString (
         GC gc,
         int x,
         int y,
-        char* string,
+        c-string string,
         int length ) ;
 
 ! 8.7 - Transferring Images between Client and Server
@@ -464,7 +465,7 @@ STRUCT: XImage
 { height int }
 { xoffset int }
 { format int }
-{ data char* }
+{ data uchar* }
 { byte_order int }
 { bitmap_unit int }
 { bitmap_bit_order int }
@@ -564,7 +565,8 @@ CONSTANT: SelectionNotify       31
 CONSTANT: ColormapNotify        32
 CONSTANT: ClientMessage         33
 CONSTANT: MappingNotify         34
-CONSTANT: LASTEvent             35
+CONSTANT: GenericEvent          35
+CONSTANT: LASTEvent             36
 
 STRUCT: XAnyEvent
 { type int }
@@ -1010,14 +1012,35 @@ STRUCT: XKeymapEvent
 { send_event Bool }
 { display Display* }
 { window Window }
-{ pad int }
-{ pad int }
-{ pad int }
-{ pad int }
-{ pad int }
-{ pad int }
-{ pad int }
-{ pad int } ;
+{ pad int[8] } ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Newer things, needed for XInput2 support. Not in the book.
+
+! GenericEvent is the standard event for all newer extensions.
+STRUCT: XGenericEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ extension int }
+{ evtype int } ;
+
+STRUCT: XGenericEventCookie
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ extension int }
+{ evtype int }
+{ cookie uint }
+{ data void* } ;
+
+X-FUNCTION: Bool XGetEventData ( Display* dpy, XGenericEventCookie* cookie ) ;
+X-FUNCTION: void XFreeEventData ( Display* dpy, XGenericEventCookie* cookie ) ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 UNION-STRUCT: XEvent
 { int int }
@@ -1052,6 +1075,8 @@ UNION-STRUCT: XEvent
 { XMappingEvent XMappingEvent }
 { XErrorEvent XErrorEvent }
 { XKeymapEvent XKeymapEvent }
+{ XGenericEvent XGenericEvent }
+{ XGenericEventCookie XGenericEventCookie }
 { padding long[24] } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1116,7 +1141,7 @@ X-FUNCTION: Status XWarpPointer ( Display* display, Window src_w, Window dest_w,
 
 ! 14.1 Client to Window Manager Communication
 
-X-FUNCTION: Status XFetchName ( Display* display, Window w, char** window_name_return ) ;
+X-FUNCTION: Status XFetchName ( Display* display, Window w, c-string* window_name_return ) ;
 X-FUNCTION: Status XGetTransientForHint ( Display* display, Window w, Window* prop_window_return ) ;
 
 ! 14.1.1.  Manipulating Top-Level Windows
@@ -1141,8 +1166,8 @@ X-FUNCTION: Status XWithdrawWindow (
 : PAspect      ( -- n ) 7 2^ ; inline
 : PBaseSize    ( -- n ) 8 2^ ; inline
 : PWinGravity  ( -- n ) 9 2^ ; inline
-: PAllHints    ( -- n )
-    { PPosition PSize PMinSize PMaxSize PResizeInc PAspect } flags ; foldable
+CONSTANT: PAllHints
+    flags{ PPosition PSize PMinSize PMaxSize PResizeInc PAspect }
 
 STRUCT: XSizeHints
     { flags long }
@@ -1220,9 +1245,19 @@ STRUCT: XVisualInfo
 X-FUNCTION: Pixmap XCreateBitmapFromData (
     Display* display,
     Drawable d,
-    char* data,
+    c-string data,
     uint width,
     uint height ) ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Appendix C - Extensions
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+X-FUNCTION: Bool XQueryExtension (
+        Display* display,
+        c-string name,
+        int* major_opcode_return,
+        int* first_event_return,
+        int* first_error_return ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Appendix D - Compatibility Functions
@@ -1231,10 +1266,10 @@ X-FUNCTION: Pixmap XCreateBitmapFromData (
 X-FUNCTION: Status XSetStandardProperties (
         Display* display,
         Window w,
-        char* window_name,
-        char* icon_name,
+        c-string window_name,
+        c-string icon_name,
         Pixmap icon_pixmap,
-        char** argv,
+        c-string* argv,
         int argc,
         XSizeHints* hints ) ;
 
@@ -1316,7 +1351,7 @@ CONSTANT: XA_LAST_PREDEFINED 68
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 X-FUNCTION: void XFree ( void* data ) ;
-X-FUNCTION: int XStoreName ( Display* display, Window w, char* window_name ) ;
+X-FUNCTION: int XStoreName ( Display* display, Window w, c-string window_name ) ;
 X-FUNCTION: void XSetWMNormalHints ( Display* display, Window w, XSizeHints* hints ) ;
 X-FUNCTION: int XBell ( Display* display, int percent ) ;
 
@@ -1384,11 +1419,11 @@ CONSTANT: XLookupBoth      4
 
 X-FUNCTION: Bool XFilterEvent ( XEvent* event, Window w ) ;
 
-X-FUNCTION: XIM XOpenIM ( Display* dpy, void* rdb, char* res_name, char* res_class ) ;
+X-FUNCTION: XIM XOpenIM ( Display* dpy, void* rdb, c-string res_name, c-string res_class ) ;
 
 X-FUNCTION: Status XCloseIM ( XIM im ) ;
 
-X-FUNCTION: XIC XCreateIC ( XIM im, char* key1, Window value1, char* key2, Window value2, char* key3, int value3, char* key4, char* value4, char* key5, char* value5, int key6 ) ;
+X-FUNCTION: XIC XCreateIC ( XIM im, c-string key1, Window value1, c-string key2, Window value2, c-string key3, int value3, c-string key4, c-string value4, c-string key5, c-string value5, int key6 ) ;
 
 X-FUNCTION: void XDestroyIC ( XIC ic ) ;
 
@@ -1398,7 +1433,7 @@ X-FUNCTION: void XUnsetICFocus ( XIC ic ) ;
 
 X-FUNCTION: int XwcLookupString ( XIC ic, XKeyPressedEvent* event, ulong* buffer_return, int bytes_buffer, KeySym* keysym_return, Status* status_return ) ;
 
-X-FUNCTION: int Xutf8LookupString ( XIC ic, XKeyPressedEvent* event, char* buffer_return, int bytes_buffer, KeySym* keysym_return, Status* status_return ) ;
+X-FUNCTION: int Xutf8LookupString ( XIC ic, XKeyPressedEvent* event, c-string buffer_return, int bytes_buffer, KeySym* keysym_return, Status* status_return ) ;
 
 ! !!! category of setlocale
 CONSTANT: LC_ALL      0
@@ -1408,8 +1443,13 @@ CONSTANT: LC_MONETARY 3
 CONSTANT: LC_NUMERIC  4
 CONSTANT: LC_TIME     5
 
-X-FUNCTION: char* setlocale ( int category, char* name ) ;
+X-FUNCTION: c-string setlocale ( int category, c-string name ) ;
 
 X-FUNCTION: Bool XSupportsLocale ( ) ;
 
-X-FUNCTION: char* XSetLocaleModifiers ( char* modifier_list ) ;
+X-FUNCTION: c-string XSetLocaleModifiers ( c-string modifier_list ) ;
+
+! uncategorized xlib bindings
+
+X-FUNCTION: int XQueryKeymap ( Display* display, char[32] keys_return ) ;
+

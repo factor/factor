@@ -1,6 +1,7 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.pathnames io.files io.encodings.ascii assocs sequences
+USING: io.pathnames io.files io.encodings.ascii
+io.encodings.binary io.encodings.utf8 assocs sequences
 splitting kernel namespaces fry memoize ;
 IN: mime.types
 
@@ -23,3 +24,7 @@ MEMO: mime-types ( -- assoc )
 
 : mime-type ( filename -- mime-type )
     file-extension mime-types at "application/octet-stream" or ;
+
+: mime-type-encoding ( mime-type -- encoding )
+    "text/" head? utf8 binary ? ;
+

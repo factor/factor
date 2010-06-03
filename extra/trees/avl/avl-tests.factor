@@ -1,5 +1,5 @@
 USING: kernel tools.test trees trees.avl math random sequences
-assocs accessors ;
+assocs accessors trees.avl.private trees.private ;
 IN: trees.avl.tests
 
 [ "key1" 0 "key2" 0 ] [

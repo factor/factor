@@ -29,7 +29,7 @@ HELP: textarea
 { $class-description "Text area components display a multi-line editor for a string value. The " { $slot "rows" } " and " { $slot "cols" } " properties determine the size of the text area." } ;
 
 HELP: link
-{ $description "Link components render a link to an object stored at a value, with the link title and URL determined by the " { $link link-title } " and " { $link link-href } " generic words. The optional " { $slot "target" } " slot is a target frame to open the link in." } ;
+{ $description "Link components render a value responding to the " { $link link-title } " and " { $link link-href } " generic words. The optional " { $slot "target" } " slot is a target frame to open the link in." } ;
 
 HELP: link-title
 { $values { "obj" object } { "string" string } }

@@ -27,6 +27,8 @@ ARTICLE: "inference-combinators" "Combinator stack effects"
   { "If the word is declared " { $link POSTPONE: inline } ", the combinator may additionally be called on one of the word's input parameters or with quotations built from the word's input parameters, literal quotations, " { $link curry } ", and " { $link compose } ". When inline, a word is itself considered to be a combinator, and its callers must in turn satisfy these conditions." }
 }
 "If neither condition holds, the stack checker throws a " { $link unknown-macro-input } " or " { $link bad-macro-input } " error. To make the code compile, a runtime checking combinator such as " { $link POSTPONE: call( } " must be used instead. See " { $link "inference-escape" } " for details. An inline combinator can be called with an unknown quotation by " { $link curry } "ing the quotation onto a literal quotation that uses " { $link POSTPONE: call( } "."
+{ $heading "Input stack effects" }
+"Inline combinators will verify the stack effect of their input quotations if they are declared in the combinator's stack effect. See " { $link "effects-variables" } " for details."
 { $heading "Examples" }
 { $subheading "Calling a combinator" }
 "The following usage of " { $link map } " passes the stack checker, because the quotation is the result of " { $link curry } ":"

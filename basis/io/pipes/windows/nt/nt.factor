@@ -3,14 +3,14 @@
 USING: alien alien.c-types arrays destructors io io.backend.windows libc
 windows.types math.bitwise windows.kernel32 windows namespaces
 make kernel sequences windows.errors assocs math.parser system
-random combinators accessors io.pipes io.ports ;
+random combinators accessors io.pipes io.ports literals ;
 IN: io.pipes.windows.nt
 
 ! This code is based on
 ! http://twistedmatrix.com/trac/browser/trunk/twisted/internet/iocpreactor/process.py
 
 : create-named-pipe ( name -- handle )
-    { PIPE_ACCESS_INBOUND FILE_FLAG_OVERLAPPED } flags
+    flags{ PIPE_ACCESS_INBOUND FILE_FLAG_OVERLAPPED }
     PIPE_TYPE_BYTE
     1
     4096
@@ -21,7 +21,7 @@ IN: io.pipes.windows.nt
 
 : open-other-end ( name -- handle )
     GENERIC_WRITE
-    { FILE_SHARE_READ FILE_SHARE_WRITE } flags
+    flags{ FILE_SHARE_READ FILE_SHARE_WRITE }
     default-security-attributes
     OPEN_EXISTING
     FILE_FLAG_OVERLAPPED

@@ -8,7 +8,8 @@ layouts compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker slots.private words
 hashtables classes assocs locals specialized-arrays system
 sorting math.libm math.floats.private math.integers.private
-math.intervals quotations effects alien alien.data sets ;
+math.intervals quotations effects alien alien.data sets
+strings.private ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
 SPECIALIZED-ARRAY: void*
@@ -465,6 +466,12 @@ TUPLE: fold-boa-test-tuple { x read-only } { y read-only } { z read-only } ;
 
 [ V{ T{ fold-boa-test-tuple f 1 2 3 } } ]
 [ [ 1 2 3 fold-boa-test-tuple boa ] final-literals ]
+unit-test
+
+TUPLE: don't-fold-boa-test-tuple < identity-tuple ;
+
+[ V{ f } ]
+[ [ don't-fold-boa-test-tuple boa ] final-literals ]
 unit-test
 
 TUPLE: immutable-prop-test-tuple { x sequence read-only } ;
@@ -962,3 +969,29 @@ M: tuple-with-read-only-slot clone
 
 [ t ] [ [ { 1 } diff ] { diff } inlined? ] unit-test
 [ f ] [ [ { 1 } swap diff ] { diff } inlined? ] unit-test ! We could do this
+
+! Output range for string-nth now that string-nth is a library word and
+! not a primitive
+[ t ] [
+    ! Should actually be 0 23 2^ 1 - [a,b]
+    [ string-nth ] final-info first interval>> 0 23 2^ [a,b] =
+] unit-test
+
+! Non-zero displacement for <displaced-alien> restricts the output type
+[ t ] [
+    [ { byte-array } declare <displaced-alien> ] final-classes
+    first byte-array alien class-or class=
+] unit-test
+
+[ V{ alien } ] [
+    [ { alien } declare <displaced-alien> ] final-classes
+] unit-test
+
+[ t ] [
+    [ { POSTPONE: f } declare <displaced-alien> ] final-classes
+    first \ f alien class-or class=
+] unit-test
+
+[ V{ alien } ] [
+    [ { byte-array } declare [ 10 bitand 2 + ] dip <displaced-alien> ] final-classes
+] unit-test

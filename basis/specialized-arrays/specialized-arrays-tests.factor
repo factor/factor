@@ -1,12 +1,13 @@
+USING: tools.test alien.syntax specialized-arrays sequences
+alien accessors kernel arrays combinators compiler
+compiler.units classes.struct combinators.smart
+compiler.tree.debugger math libc destructors sequences.private
+multiline eval words vocabs namespaces assocs prettyprint
+alien.data math.vectors definitions compiler.test ;
+FROM: specialized-arrays.private => specialized-array-vocab ;
+FROM: alien.c-types => int float bool char float ulonglong ushort uint
+heap-size little-endian? ;
 IN: specialized-arrays.tests
-USING: tools.test alien.syntax specialized-arrays
-specialized-arrays.private sequences alien.c-types accessors
-kernel arrays combinators compiler compiler.units classes.struct
-combinators.smart compiler.tree.debugger math libc destructors
-sequences.private multiline eval words vocabs namespaces
-assocs prettyprint alien.data math.vectors definitions
-compiler.test ;
-FROM: alien.c-types => float ;
 
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAYS: bool ushort char uint float ulonglong ;
@@ -26,10 +27,10 @@ SPECIALIZED-ARRAYS: bool ushort char uint float ulonglong ;
 ] unit-test
 
 [ ushort-array{ 1234 } ] [
-    little-endian? B{ 210 4 } B{ 4 210 } ? byte-array>ushort-array
+    little-endian? B{ 210 4 } B{ 4 210 } ? ushort-array-cast
 ] unit-test
 
-[ B{ 210 4 1 } byte-array>ushort-array ] must-fail
+[ B{ 210 4 1 } ushort-array-cast ] must-fail
 
 [ { 3 1 3 3 7 } ] [
     int-array{ 3 1 3 3 7 } malloc-byte-array 5 <direct-int-array> >array
@@ -100,6 +101,12 @@ SPECIALIZED-ARRAY: test-struct
     } second
 ] unit-test
 
+[ ] [
+    [
+        test-struct specialized-array-vocab forget-vocab
+    ] with-compilation-unit
+] unit-test
+
 ! Regression
 STRUCT: fixed-string { text char[64] } ;
 
@@ -112,6 +119,12 @@ SPECIALIZED-ARRAY: fixed-string
 ! Ensure that byte-length works with direct arrays
 [ 400 ] [
     ALIEN: 123 100 <direct-int-array> byte-length
+] unit-test
+
+[ ] [
+    [
+        fixed-string specialized-array-vocab forget-vocab
+    ] with-compilation-unit
 ] unit-test
 
 ! Test prettyprinting
@@ -171,3 +184,10 @@ SPECIALIZED-ARRAY: struct-resize-test
 [ 80 ] [ 10 <struct-resize-test-array> byte-length ] unit-test
 
 [ { 10 20 30 } ] [ { 10 20 30 } struct-resize-test-usage ] unit-test
+
+[ ] [
+    [
+        struct-resize-test specialized-array-vocab forget-vocab
+        \ struct-resize-test-usage forget
+    ] with-compilation-unit
+] unit-test

@@ -3,6 +3,7 @@
 USING: accessors assocs checksums checksums.crc32
 io.encodings.utf8 io.files kernel namespaces sequences sets
 source-files vocabs vocabs.errors vocabs.loader ;
+FROM: namespaces => set ;
 IN: vocabs.refresh
 
 : source-modified? ( path -- ? )
@@ -81,7 +82,7 @@ SYMBOL: modified-docs
         [ [ vocab f >>docs-loaded? drop ] each ] bi*
     ]
     [
-        append prune
+        union
         [ unchanged-vocabs ]
         [ require-all load-failures. ] bi
     ] 2bi ;

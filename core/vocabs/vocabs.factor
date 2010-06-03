@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs strings kernel sorting namespaces
-sequences definitions ;
+sequences definitions sets combinators ;
 IN: vocabs
 
 SYMBOL: dictionary
@@ -118,8 +118,8 @@ M: vocab-spec >vocab-link ;
 M: string >vocab-link dup vocab [ ] [ <vocab-link> ] ?if ;
 
 : forget-vocab ( vocab -- )
-    dup words forget-all
-    vocab-name dictionary get delete-at
+    [ words forget-all ]
+    [ vocab-name dictionary get delete-at ] bi
     notify-vocab-observers ;
 
 M: vocab-spec forget* forget-vocab ;
