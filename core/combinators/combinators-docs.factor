@@ -65,9 +65,9 @@ ARTICLE: "apply-combinators" "Apply combinators"
 "All of the apply combinators are equivalent to using the corresponding " { $link "spread-combinators" } " with the same quotation supplied for every value." ;
 
 ARTICLE: "dip-keep-combinators" "Preserving combinators"
-"Sometimes it is necessary to temporarily hide values on the datastack. The " { $snippet "dip" } " combinators invoke the quotation at the top of the stack, hiding some number of values underneath:"
+"Sometimes it is necessary to temporarily hide values on the datastack. The " { $snippet "dip" } " combinators invoke the quotation at the top of the stack, hiding some number of values:"
 { $subsections dip 2dip 3dip 4dip }
-"The " { $snippet "keep" } " combinators invoke a quotation and restore some number of values to the top of the stack when it completes:"
+"The " { $snippet "keep" } " combinators invoke a quotation and restore some number of values to the top of the stack:"
 { $subsections keep 2keep 3keep } ;
 
 ARTICLE: "curried-dataflow" "Curried dataflow combinators"

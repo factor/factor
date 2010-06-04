@@ -248,7 +248,7 @@ CONSTANT: window-control>ex-style
         { minimize-button 0 }
         { maximize-button 0 }
         { resize-handles $ WS_EX_WINDOWEDGE }
-        { small-title-bar $ WS_EX_TOOLWINDOW }
+        { small-title-bar $[ WS_EX_TOOLWINDOW WS_EX_TOPMOST bitor ] }
         { normal-title-bar $ WS_EX_APPWINDOW }
     }
 
