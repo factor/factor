@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Sascha Matzke.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs bson.constants calendar combinators
-combinators.short-circuit io io.binary kernel math
+combinators.short-circuit io io.binary kernel math locals
 namespaces sequences serialize strings vectors byte-arrays ;
 
 FROM: io.encodings.binary => binary ;
@@ -68,8 +68,7 @@ TYPED: peek-scope ( state: state -- ht )
 
 : bson-object-data-read ( -- object )
     read-int32 drop get-state 
-    [ exemplar>> clone ] [ scope>> ] bi
-    [ push ] keep ; inline
+    [ exemplar>> clone dup ] [ scope>> ] bi push ; inline
 
 : bson-binary-read ( -- binary )
    read-int32 read-byte 
@@ -136,9 +135,9 @@ TYPED: (prepare-result) ( scope: vector element: element -- result )
 TYPED: (prepare-object) ( type: integer -- object )
     [ element-data-read ] [ end-element ] bi ; inline
 
-TYPED: (read-object) ( type: integer name: string state: state -- )
-    [ (prepare-object) ] 2dip
-    peek-scope set-at ; inline
+:: (read-object) ( type name state -- )
+    state peek-scope :> scope
+    type (prepare-object) name scope set-at ; inline
 
 TYPED: bson-not-eoo-element-read ( type: integer -- cont?: boolean )
     read-cstring get-state

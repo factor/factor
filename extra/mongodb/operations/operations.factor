@@ -52,7 +52,7 @@ SYMBOL: msg-bytes-read
     read-longlong >>cursor
     read-int32 >>start#
     read-int32 [ >>returned# ] keep
-    [ H{ } stream>assoc ] collector [ times ] dip >>objects ;    
+    [ H{ } clone stream>assoc ] collector [ times ] dip >>objects ;    
 
 : (read-message) ( message opcode -- message )
     OP_Reply = 
