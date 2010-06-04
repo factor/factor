@@ -42,7 +42,7 @@ DEFER: assoc>tuple
    swap set-at ; inline
 
 : write-field? ( tuple key value -- ? )
-   pick mdb-persistent? [ 
+   pick mdb-persistent? [
       { [ [ 2drop ] dip not ]
         [ drop transient-slot? ] } 3|| not ] [ 3drop t ] if ; inline
 

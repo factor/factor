@@ -63,7 +63,7 @@ PRIVATE>
     [ tuple-collection name>> ]
     [ id-selector ]
     [ tuple>assoc ] tri
-    <update> update ;
+    <update> >upsert update ;
 
 : save-tuple ( tuple -- )
     update-tuple ;
