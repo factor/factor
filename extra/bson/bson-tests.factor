@@ -4,7 +4,7 @@ io.streams.byte-array tools.test literals calendar kernel math ;
 IN: bson.tests
 
 : turnaround ( value -- value )
-    assoc>bv >byte-array binary [ H{ } stream>assoc ] with-byte-reader ;
+    assoc>bv >byte-array binary [ H{ } clone stream>assoc ] with-byte-reader ;
 
 [ H{ { "a" "a string" } } ] [ H{ { "a" "a string" } } turnaround ] unit-test
 
