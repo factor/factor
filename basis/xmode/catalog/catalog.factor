@@ -113,8 +113,11 @@ ERROR: mutually-recursive-rulesets ruleset ;
     [ nip ] 2keep first-line-glob>> ?glob-matches
     [ 2drop t ] [ file-name-glob>> ?glob-matches ] if ;
 
-: find-mode ( file-name first-line -- mode )
+: ?find-mode ( file-name first-line -- mode/f )
     [ file-name ] dip
     modes
     [ nip [ 2dup ] dip suitable-mode? ] assoc-find
-    2drop [ 2drop ] dip [ "text" ] unless* ;
+    2drop [ 2drop ] dip ;
+
+: find-mode ( file-name first-line -- mode )
+    ?find-mode "text" or ; inline
