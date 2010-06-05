@@ -114,6 +114,7 @@ x86-64:
 clean:
 	del vm\*.obj
 	if exist factor.lib del factor.lib
+	if exist factor.res del factor.res
 	if exist factor.com del factor.com
 	if exist factor.exe del factor.exe
 	if exist factor.dll del factor.dll
