@@ -61,7 +61,7 @@ PRIVATE>
  
 : update-tuple ( tuple -- )
     [ tuple-collection name>> ]
-    [ id-selector ]
+    [ ensure-oid id-selector ]
     [ tuple>assoc ] tri
     <update> >upsert update ;
 

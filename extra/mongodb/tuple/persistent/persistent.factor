@@ -78,9 +78,6 @@ CONSTRUCTOR: cond-value ( value quot -- cond-value ) ;
 : prepare-assoc ( tuple -- assoc mirror tuple assoc )
    H{ } clone swap [ <mirror> ] keep pick ; inline
 
-: ensure-mdb-info ( tuple -- tuple )    
-   dup id>> [ <oid> >>id ] unless ; inline
-
 : with-object-map ( quot: ( -- ) -- store-assoc )
    [ H{ } clone dup object-map ] dip with-variable ; inline
 
@@ -92,11 +89,14 @@ PRIVATE>
 
 GENERIC: tuple>storable ( tuple -- storable )
 
+: ensure-oid ( tuple -- tuple )
+   dup id>> [ <oid> >>id ] unless ; inline
+
 M: mdb-persistent tuple>storable ( mdb-persistent -- object-map )
    '[ _ [ tuple>assoc ] write-mdb-persistent drop ] with-object-map ; inline
 
 M: mdb-persistent tuple>assoc ( tuple -- assoc )
-   ensure-mdb-info (tuple>assoc) ;
+   ensure-oid (tuple>assoc) ;
 
 M: tuple tuple>assoc ( tuple -- assoc )
    (tuple>assoc) ;
