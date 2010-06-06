@@ -1,7 +1,8 @@
 USING: xmode.loader xmode.utilities xmode.rules namespaces
 strings splitting assocs sequences kernel io.files xml memoize
 words globs combinators io.encodings.utf8 io.pathnames sorting
-accessors xml.data xml.traversal xml.syntax ;
+accessors regexp unicode.case xml.data xml.traversal
+xml.syntax ;
 IN: xmode.catalog
 
 TUPLE: mode file file-name-glob first-line-glob ;
@@ -15,6 +16,8 @@ TAG: MODE parse-mode-tag
             { "FILE_NAME_GLOB" f file-name-glob<< }
             { "FIRST_LINE_GLOB" f first-line-glob<< }
         } init-from-tag
+        [ [ >case-fold <glob> ] [ f ] if* ] change-file-name-glob
+        [ [ >case-fold <glob> ] [ f ] if* ] change-first-line-glob
     ] dip
     rot set-at ;
 
@@ -106,12 +109,12 @@ ERROR: mutually-recursive-rulesets ruleset ;
 : reset-modes ( -- )
     \ (load-mode) reset-memoized ;
 
-: ?glob-matches ( string glob/f -- ? )
-    dup [ glob-matches? ] [ 2drop f ] if ;
+: ?matches ( string glob/f -- ? )
+    [ >case-fold ] dip dup [ matches? ] [ 2drop f ] if ;
 
 : suitable-mode? ( file-name first-line mode -- ? )
-    [ nip ] 2keep first-line-glob>> ?glob-matches
-    [ 2drop t ] [ file-name-glob>> ?glob-matches ] if ;
+    [ nip ] 2keep first-line-glob>> ?matches
+    [ 2drop t ] [ file-name-glob>> ?matches ] if ;
 
 : ?find-mode ( file-name first-line -- mode/f )
     [ file-name ] dip
