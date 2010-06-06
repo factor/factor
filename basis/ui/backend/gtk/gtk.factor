@@ -1,13 +1,13 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.enums
-alien.strings arrays ascii assocs classes.struct
+USING: accessors alien.accessors alien.c-types alien.data
+alien.enums alien.strings arrays ascii assocs classes.struct
 combinators.short-circuit command-line destructors
 io.backend.unix.multiplexers io.encodings.utf8 io.thread kernel
-libc literals locals math math.bitwise namespaces sequences
-strings threads ui ui.backend ui.clipboards ui.event-loop
-ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
-ui.pixel-formats ui.pixel-formats.private ui.private
+libc literals locals math math.bitwise math.order namespaces
+sequences strings system threads ui ui.backend ui.clipboards
+ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gestures ui.pixel-formats ui.pixel-formats.private ui.private
 glib.ffi gobject.ffi gtk.ffi gdk.ffi gdk.gl.ffi gtk.gl.ffi ;
 IN: ui.backend.gtk
 
@@ -225,13 +225,6 @@ CONSTANT: action-key-codes
      0 mx get wait-for-events
      yield t ;
 
-: timeout-func ( -- func )
-    [ drop yield t ] GSourceFunc ;
-
-: init-timeout ( interval -- )
-    G_PRIORITY_DEFAULT swap timeout-func f f
-    g_timeout_add_full drop ;
-
 CONSTANT: poll-fd-events
     {
         G_IO_IN
@@ -256,6 +249,32 @@ CONSTANT: poll-fd-events
     [ create-poll-fd g_source_add_poll ]
     [ f g_source_attach drop ] bi ;
 
+SYMBOL: next-timeout
+
+: set-timeout*-value ( alien value -- )
+    swap 0 set-alien-signed-4 ; inline
+
+: timeout-prepare ( source timeout* -- result )
+    nip next-timeout get-global nano-count [-]
+    [ 1,000,000 /i set-timeout*-value ] keep 0 = ;
+
+: timeout-check ( source -- result )
+    drop next-timeout get-global nano-count [-] 0 = ;
+
+: timeout-dispatch ( source callback user_data -- result )
+    3drop sleep-time [ 1,000,000,000 ] unless* nano-count +
+    next-timeout set-global
+    yield t ;
+
+: init-timeout ( -- )
+    GSourceFuncs malloc-struct &free
+        [ timeout-prepare ] GSourceFuncsPrepareFunc >>prepare
+        [ timeout-check ] GSourceFuncsCheckFunc >>check
+        [ timeout-dispatch ] GSourceFuncsDispatchFunc >>dispatch
+    GSource heap-size g_source_new &g_source_unref
+    f g_source_attach drop
+    nano-count next-timeout set-global ;
+
 M: gtk-ui-backend (with-ui)
     [
         f f gtk_init
@@ -265,8 +284,7 @@ M: gtk-ui-backend (with-ui)
         f io-thread-running? set-global
         [
             init-io-event-source
-            ! is it correct to use timeouts with 'yield'?
-            10 init-timeout
+            init-timeout
             gtk_main
         ] with-destructors
     ] ui-running ;
@@ -278,31 +296,31 @@ M: gtk-ui-backend (with-ui)
     win events-mask [ enum>number ] [ bitor ] map-reduce
     gtk_widget_add_events
     
-    win "expose-event" [ on-expose ]
+    win "expose-event" [ on-expose yield ]
     GtkWidget:expose-event connect-signal
-    win "configure-event" [ on-configure ]
+    win "configure-event" [ on-configure yield ]
     GtkWidget:configure-event connect-signal
-    win "motion-notify-event" [ on-motion ]
+    win "motion-notify-event" [ on-motion yield ]
     GtkWidget:motion-notify-event connect-signal
-    win "leave-notify-event" [ on-leave ]
+    win "leave-notify-event" [ on-leave yield ]
     GtkWidget:leave-notify-event connect-signal
-    win "enter-notify-event" [ on-enter ]
+    win "enter-notify-event" [ on-enter yield ]
     GtkWidget:enter-notify-event connect-signal
-    win "button-press-event" [ on-button-press ]
+    win "button-press-event" [ on-button-press yield ]
     GtkWidget:button-press-event connect-signal
-    win "button-release-event" [ on-button-release ]
+    win "button-release-event" [ on-button-release yield ]
     GtkWidget:button-release-event connect-signal
-    win "scroll-event" [ on-scroll ]
+    win "scroll-event" [ on-scroll yield ]
     GtkWidget:scroll-event connect-signal
-    win "key-press-event" [ on-key-press ]
+    win "key-press-event" [ on-key-press yield ]
     GtkWidget:key-press-event connect-signal
-    win "key-release-event" [ on-key-release ]
+    win "key-release-event" [ on-key-release yield ]
     GtkWidget:key-release-event connect-signal
-    win "focus-in-event" [ on-focus-in ]
+    win "focus-in-event" [ on-focus-in yield ]
     GtkWidget:focus-in-event connect-signal
-    win "focus-out-event" [ on-focus-out ]
+    win "focus-out-event" [ on-focus-out yield ]
     GtkWidget:focus-out-event connect-signal
-    win "delete-event" [ on-delete ]
+    win "delete-event" [ on-delete yield ]
     GtkWidget:delete-event connect-signal ;
 
 CONSTANT: window-controls>decor-flags
