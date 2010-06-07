@@ -248,7 +248,7 @@ CONSTANT: window-control>ex-style
         { minimize-button 0 }
         { maximize-button 0 }
         { resize-handles $ WS_EX_WINDOWEDGE }
-        { small-title-bar $ WS_EX_TOOLWINDOW }
+        { small-title-bar $[ WS_EX_TOOLWINDOW WS_EX_TOPMOST bitor ] }
         { normal-title-bar $ WS_EX_APPWINDOW }
     }
 
@@ -832,24 +832,25 @@ CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
     } cleave ;
 
 : exit-fullscreen ( world -- )
-    dup handle>> hWnd>>
+    [ handle>> hWnd>> ] [ world>style ] bi
     {
-        [ GWL_STYLE rot world>style SetWindowLong win32-error=0/f ]
+        [ [ GWL_STYLE ] dip SetWindowLong win32-error=0/f ]
         [
+            drop
             f
             over hwnd>RECT get-RECT-dimensions
             flags{ SWP_NOMOVE SWP_NOSIZE SWP_NOZORDER SWP_FRAMECHANGED }
             SetWindowPos win32-error=0/f
         ]
-        [ SW_RESTORE ShowWindow win32-error=0/f ]
-    } cleave ;
+        [ drop SW_RESTORE ShowWindow win32-error=0/f ]
+    } 2cleave ;
 
 M: windows-ui-backend (set-fullscreen) ( ? world -- )
     [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
 M: windows-ui-backend (fullscreen?) ( world -- ? )
-    [ handle>> hWnd>> hwnd>RECT ]
-    [ handle>> hWnd>> fullscreen-RECT ] bi
+    handle>> hWnd>>
+    [ hwnd>RECT ] [ fullscreen-RECT ] bi
     [ get-RECT-dimensions 2array 2nip ] bi@ = ;
 
 windows-ui-backend ui-backend set-global

@@ -8,15 +8,22 @@ IN: vocabs.loader
 
 SYMBOL: vocab-roots
 
-V{
-    "resource:core"
-    "resource:basis"
-    "resource:extra"
-    "resource:work"
-} clone vocab-roots set-global
+SYMBOL: add-vocab-root-hook
+
+[
+    V{
+        "resource:core"
+        "resource:basis"
+        "resource:extra"
+        "resource:work"
+    } clone vocab-roots set-global
+
+    [ drop ] add-vocab-root-hook set-global
+] "vocabs.loader" add-startup-hook
 
 : add-vocab-root ( root -- )
-    vocab-roots get adjoin ;
+    [ vocab-roots get adjoin ]
+    [ add-vocab-root-hook get-global call( root -- ) ] bi ;
 
 SYMBOL: root-cache
 

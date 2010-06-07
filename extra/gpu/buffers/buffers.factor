@@ -132,6 +132,13 @@ TYPED:: copy-buffer ( to-buffer-ptr: buffer-ptr from-buffer-ptr: buffer-ptr size
     from-buffer-ptr offset>> to-buffer-ptr offset>>
     size glCopyBufferSubData ;
 
+: (grow-buffer-size) ( target-size old-size -- new-size )
+    [ 2dup > ] [ 2 * ] while nip ; inline
+
+TYPED: grow-buffer ( buffer: buffer target-size: integer -- )
+    over buffer-size 2dup >
+    [ (grow-buffer-size) f allocate-buffer ] [ 3drop ] if ; inline
+
 :: with-mapped-buffer ( ..a buffer access quot: ( ..a alien -- ..b ) -- ..b )
     buffer bind-buffer :> target
     target access gl-access glMapBuffer
