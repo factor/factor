@@ -252,7 +252,7 @@ M: cocoa-ui-backend (with-ui)
             init-clipboard
             cocoa-startup-hook get call( -- )
             start-ui
-            f io-thread-running? set-global
+            stop-io-thread
             init-thread-timer
             reset-run-loop
             NSApp -> run

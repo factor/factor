@@ -345,6 +345,11 @@ def: dst
 use: src1 src2
 literal: rep ;
 
+PURE-INSN: ##float-pack-vector
+def: dst
+use: src
+literal: rep ;
+
 PURE-INSN: ##signed-pack-vector
 def: dst
 use: src1 src2

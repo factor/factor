@@ -8,6 +8,10 @@ HELP: start-alarm
 { $values { "alarm" alarm } }
 { $description "Starts an alarm." } ;
 
+HELP: restart-alarm
+{ $values { "alarm" alarm } }
+{ $description "Starts or restarts an alarm. Restarting an alarm causes the a sleep of initial delay nanoseconds before looping. An alarm's parameters may be modified and restarted with this word." } ;
+
 HELP: stop-alarm
 { $values { "alarm" alarm } }
 { $description "Prevents an alarm from calling its quotation again. Has no effect on alarms that are not currently running." } ;
@@ -56,7 +60,7 @@ ARTICLE: "alarms" "Alarms"
 "Create an alarm before starting it:"
 { $subsections <alarm> }
 "Starting an alarm:"
-{ $subsections start-alarm }
+{ $subsections start-alarm restart-alarm }
 "Stopping an alarm:"
 { $subsections stop-alarm }
 

@@ -298,6 +298,14 @@ M: x86 %merge-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
+M: x86 %float-pack-vector
+    drop CVTPD2PS ;
+
+M: x86 %float-pack-vector-reps
+    {
+        { sse2? { double-2-rep } }
+    } available-reps ;
+
 M: x86 %signed-pack-vector
     [ two-operand ] keep
     {

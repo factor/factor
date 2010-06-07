@@ -12,6 +12,7 @@ TUPLE: alarm
     interval-nanos
     iteration-start-nanos
     quotation-running?
+    restart?
     thread ;
 
 <PRIVATE
@@ -33,7 +34,7 @@ M: duration >nanoseconds duration>nanoseconds >integer ;
     >>iteration-start-nanos ;
 
 : stop-alarm? ( alarm -- ? )
-    thread>> self eq? not ;
+    { [ thread>> self eq? not ] [ restart?>> ] } 1|| ;
 
 DEFER: call-alarm-loop
 
@@ -60,6 +61,19 @@ DEFER: call-alarm-loop
         maybe-loop-alarm
     ] if ;
 
+: sleep-delay ( alarm -- )
+    dup stop-alarm? [
+        drop
+    ] [
+        nano-count >>start-nanos
+        delay-nanos>> [ sleep ] when*
+    ] if ;
+
+: alarm-loop ( alarm -- )
+    [ sleep-delay ]
+    [ nano-count >>iteration-start-nanos call-alarm-loop ]
+    [ dup restart?>> [ f >>restart? alarm-loop ] [ drop ] if ] tri ;
+
 PRIVATE>
 
 : <alarm> ( quot delay-duration/f interval-duration/f -- alarm )
@@ -70,11 +84,7 @@ PRIVATE>
 
 : start-alarm ( alarm -- )
     [
-        '[
-            _ nano-count >>start-nanos
-            [ delay-nanos>> [ sleep ] when* ]
-            [ nano-count >>iteration-start-nanos call-alarm-loop ] bi
-        ] "Alarm execution" spawn
+        '[ _ alarm-loop ] "Alarm execution" spawn
     ] keep thread<< ;
 
 : stop-alarm ( alarm -- )
@@ -82,6 +92,14 @@ PRIVATE>
         f >>thread drop
     ] [
         [ [ interrupt ] when* f ] change-thread drop
+    ] if ;
+
+: restart-alarm ( alarm -- )
+    t >>restart?
+    dup quotation-running?>> [
+        drop
+    ] [
+        dup thread>> [ nip interrupt ] [ start-alarm ] if*
     ] if ;
 
 <PRIVATE

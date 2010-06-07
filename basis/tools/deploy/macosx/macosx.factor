@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2009 Slava Pestov.
+! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.files io.files.info.unix io.pathnames
 io.directories io.directories.hierarchy kernel namespaces make
@@ -10,7 +10,10 @@ combinators vocabs.metadata vocabs.loader ;
 IN: tools.deploy.macosx
 
 : bundle-dir ( -- dir )
-    vm parent-directory parent-directory ;
+    running.app?
+    [ vm parent-directory parent-directory ]
+    [ "resource:Factor.app" ]
+    if ;
 
 : copy-bundle-dir ( bundle-name dir -- )
     [ bundle-dir prepend-path swap ] keep
@@ -70,7 +73,6 @@ IN: tools.deploy.macosx
     -> selectFile:inFileViewerRootedAtPath: drop ;
 
 M: macosx deploy* ( vocab -- )
-    ".app deploy tool" assert.app
     "resource:" [
         dup deploy-config [
             bundle-name dup exists? [ delete-tree ] [ drop ] if

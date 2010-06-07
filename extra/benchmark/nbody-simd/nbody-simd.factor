@@ -1,9 +1,9 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types fry kernel locals math
 math.constants math.functions math.vectors math.vectors.simd
-math.vectors.simd.cords prettyprint combinators.smart sequences
-hints classes.struct specialized-arrays ;
+math.vectors.simd.cords math.parser combinators.smart sequences
+hints classes.struct specialized-arrays io ;
 IN: benchmark.nbody-simd
 
 : solar-mass ( -- x ) 4 pi sq * ; inline
@@ -94,7 +94,9 @@ SPECIALIZED-ARRAY: body
 : nbody ( n -- )
     >fixnum
     <nbody-system>
-    [ energy . ] [ '[ _ 0.01 advance ] times ] [ energy . ] tri ;
+    [ energy number>string print ]
+    [ '[ _ 0.01 advance ] times ]
+    [ energy number>string print ] tri ;
 
 : nbody-main ( -- ) 1000000 nbody ;
 

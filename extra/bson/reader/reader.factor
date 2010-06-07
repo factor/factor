@@ -1,185 +1,161 @@
-USING: accessors assocs bson.constants calendar fry io io.binary
-io.encodings io.encodings.utf8 kernel math math.bitwise namespaces
-sequences serialize locals ;
+! Copyright (C) 2010 Sascha Matzke.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors assocs bson.constants calendar combinators
+combinators.short-circuit io io.binary kernel math locals
+namespaces sequences serialize strings vectors byte-arrays ;
 
-FROM: kernel.private => declare ;
-FROM: io.encodings.private => (read-until) ;
+FROM: io.encodings.binary => binary ;
+FROM: io.streams.byte-array => with-byte-reader ;
+FROM: typed => TYPED: ;
 
 IN: bson.reader
 
 <PRIVATE
 
 TUPLE: element { type integer } name ;
+
 TUPLE: state
-    { size initial: -1 } exemplar
-    result scope element ;
+    { size initial: -1 }
+    { exemplar assoc }
+    result
+    { scope vector }
+    { elements vector } ;
+
+TYPED: (prepare-elements) ( -- elements-vector: vector )
+    V{ } clone [ T_Object "" element boa swap push ] [ ] bi ; inline
 
 : <state> ( exemplar -- state )
     [ state new ] dip
-    [ clone >>exemplar ] keep
-    clone [ >>result ] [ V{ } clone [ push ] keep >>scope ] bi
-    V{ } clone [ T_Object "" element boa swap push ] keep >>element ; 
+    {
+        [ clone >>exemplar ]
+        [ clone >>result ]
+        [ V{ } clone [ push ] keep >>scope ]
+    } cleave
+    (prepare-elements) >>elements ;
 
-PREDICATE: bson-not-eoo < integer T_EOO > ;
-PREDICATE: bson-eoo     < integer T_EOO = ;
-
-PREDICATE: bson-string  < integer T_String = ;
-PREDICATE: bson-object  < integer T_Object = ;
-PREDICATE: bson-oid     < integer T_OID = ;
-PREDICATE: bson-array   < integer T_Array = ;
-PREDICATE: bson-integer < integer T_Integer = ;
-PREDICATE: bson-double  < integer T_Double = ;
-PREDICATE: bson-date    < integer T_Date = ;
-PREDICATE: bson-binary  < integer T_Binary = ;
-PREDICATE: bson-boolean < integer T_Boolean = ;
-PREDICATE: bson-regexp  < integer T_Regexp = ;
-PREDICATE: bson-null    < integer T_NULL = ;
-PREDICATE: bson-ref     < integer T_DBRef = ;
-PREDICATE: bson-binary-bytes < integer T_Binary_Bytes = ;
-PREDICATE: bson-binary-function < integer T_Binary_Function = ;
-PREDICATE: bson-binary-uuid < integer T_Binary_UUID = ;
-PREDICATE: bson-binary-custom < integer T_Binary_Custom = ;
-
-GENERIC: element-read ( type -- cont? )
-GENERIC: element-data-read ( type -- object )
-GENERIC: element-binary-read ( length type -- object )
-
-: get-state ( -- state )
+TYPED: get-state ( -- state: state )
     state get ; inline
 
-: read-int32 ( -- int32 )
+TYPED: read-int32 ( -- int32: integer )
     4 read signed-le> ; inline
 
-: read-longlong ( -- longlong )
+TYPED: read-longlong ( -- longlong: integer )
     8 read signed-le> ; inline
 
-: read-double ( -- double )
+TYPED: read-double ( -- double: float )
     8 read le> bits>double ; inline
 
-: read-byte-raw ( -- byte-raw )
+TYPED: read-byte-raw ( -- byte-raw: byte-array )
     1 read ; inline
 
-: read-byte ( -- byte )
+TYPED: read-byte ( -- byte: integer )
     read-byte-raw first ; inline
 
-: read-cstring ( -- string )
-    "\0" read-until drop "" like ; inline
+TYPED: read-cstring ( -- string: string )
+    "\0" read-until drop >string ; inline
 
-: read-sized-string ( length -- string )
-    read 1 head-slice* "" like ; inline
+TYPED: read-sized-string ( length: integer -- string: string )
+    read 1 head-slice* >string ; inline
 
-: read-element-type ( -- type )
-    read-byte ; inline
+TYPED: push-element ( type: integer name: string state: state -- )
+    [ element boa ] dip elements>> push ; inline
 
-: push-element ( type name -- )
-    element boa get-state element>> push ; inline
+TYPED: pop-element ( state: state -- element: element )
+    elements>> pop ; inline
 
-: pop-element ( -- element )
-    get-state element>> pop ; inline
+TYPED: peek-scope ( state: state -- ht )
+    scope>> last ; inline
 
-: peek-scope ( -- ht )
-    get-state scope>> last ; inline
+: bson-object-data-read ( -- object )
+    read-int32 drop get-state 
+    [ exemplar>> clone dup ] [ scope>> ] bi push ; inline
+
+: bson-binary-read ( -- binary )
+   read-int32 read-byte 
+   {
+        { T_Binary_Bytes [ read ] }
+        { T_Binary_Custom [ read bytes>object ] }
+        { T_Binary_Function [ read ] }
+        [ drop read >string ]
+   } case ; inline
+
+TYPED: bson-regexp-read ( -- mdbregexp: mdbregexp )
+   mdbregexp new
+   read-cstring >>regexp read-cstring >>options ; inline
+
+TYPED: bson-oid-read ( -- oid: oid )
+    read-longlong read-int32 oid boa ; inline
+
+TYPED: element-data-read ( type: integer -- object )
+    {
+        { T_OID [ bson-oid-read ] }
+        { T_String [ read-int32 read-sized-string ] }
+        { T_Integer [ read-int32 ] }
+        { T_Binary [ bson-binary-read ] }
+        { T_Object [ bson-object-data-read ] }
+        { T_Array [ bson-object-data-read ] }
+        { T_Double [ read-double ] }
+        { T_Boolean [ read-byte 1 = ] }
+        { T_Date [ read-longlong millis>timestamp ] }
+        { T_Regexp [ bson-regexp-read ] }
+        { T_NULL [ f ] }
+    } case ; inline
+
+TYPED: bson-array? ( type: integer -- ?: boolean )
+    T_Array = ; inline
+
+TYPED: bson-object? ( type: integer -- ?: boolean )
+    T_Object = ; inline
+
+: check-object ( assoc -- object )
+    dup dbref-assoc? [ assoc>dbref ] when ; inline
+
+TYPED: fix-result ( assoc type: integer -- result )
+    {
+        { T_Array [ values ] }
+        { T_Object [ check-object ] }
+    } case ; inline
+
+TYPED: end-element ( type: integer -- )
+    { [ bson-object? ] [ bson-array? ] } 1||
+    [ get-state pop-element drop ] unless ; inline
+
+TYPED: (>state<) ( -- state: state scope: vector element: element )
+    get-state [  ] [ scope>> ] [ pop-element ] tri ; inline
+
+TYPED: (prepare-result) ( scope: vector element: element -- result )
+    [ pop ] [ type>> ] bi* fix-result ; inline
+
+: bson-eoo-element-read ( -- cont?: boolean )
+    (>state<)
+    [ (prepare-result) ] [  ] [ drop empty? ] 2tri
+    [ 2drop >>result drop f ]
+    [ swap [ name>> ] [ last ] bi* set-at drop t ] if ; inline
+
+TYPED: (prepare-object) ( type: integer -- object )
+    [ element-data-read ] [ end-element ] bi ; inline
+
+:: (read-object) ( type name state -- )
+    state peek-scope :> scope
+    type (prepare-object) name scope set-at ; inline
+
+TYPED: bson-not-eoo-element-read ( type: integer -- cont?: boolean )
+    read-cstring get-state
+    [ push-element ]
+    [ (read-object) t ] 3bi ; inline
+
+TYPED: (element-read) ( type: integer -- cont?: boolean )
+    dup T_EOO > 
+    [ bson-not-eoo-element-read ]
+    [ drop bson-eoo-element-read ] if ; inline
 
 : read-elements ( -- )
-    read-element-type
-    element-read 
+    read-byte (element-read)
     [ read-elements ] when ; inline recursive
-
-GENERIC: fix-result ( assoc type -- result )
-
-M: bson-object fix-result ( assoc type -- result )
-    drop ;
-
-M: bson-array fix-result ( assoc type -- result )
-    drop values ;
-
-GENERIC: end-element ( type -- )
-
-M: bson-object end-element ( type -- )
-    drop ;
-
-M: bson-array end-element ( type -- )
-    drop ;
-
-M: object end-element ( type -- )
-    pop-element 2drop ;
-
-M:: bson-eoo element-read ( type -- cont? )
-    pop-element :> element
-    get-state scope>>
-    [ pop element type>> fix-result ] [ empty? ] bi
-    [ [ get-state ] dip >>result drop f ]
-    [ element name>> peek-scope set-at t ] if ;
-
-M:: bson-not-eoo element-read ( type -- cont? )
-    peek-scope :> scope
-    type read-cstring [ push-element ] 2keep
-    [ [ element-data-read ] [ end-element ] bi ]
-    [ scope set-at t ] bi* ;
-
-: [scope-changer] ( state -- state quot )
-    dup exemplar>> '[ [ [ _ clone ] dip push ] keep ] ; inline
-
-: (object-data-read) ( type -- object )
-    drop
-    read-int32 drop
-    get-state
-    [scope-changer] change-scope
-    scope>> last ; inline
-    
-M: bson-object element-data-read ( type -- object )
-    (object-data-read) ;
-
-M: bson-string element-data-read ( type -- object )
-    drop
-    read-int32 read-sized-string ;
-
-M: bson-array element-data-read ( type -- object )
-    (object-data-read) ;
-    
-M: bson-integer element-data-read ( type -- object )
-    drop
-    read-int32 ;
-
-M: bson-double element-data-read ( type -- double )
-    drop
-    read-double ;
-
-M: bson-boolean element-data-read ( type -- boolean )
-   drop
-   read-byte 1 = ;
-
-M: bson-date element-data-read ( type -- timestamp )
-   drop
-   read-longlong millis>timestamp ;
-
-M: bson-binary element-data-read ( type -- binary )
-   drop
-   read-int32 read-byte element-binary-read ;
-
-M: bson-regexp element-data-read ( type -- mdbregexp )
-   drop mdbregexp new
-   read-cstring >>regexp read-cstring >>options ;
- 
-M: bson-null element-data-read ( type -- bf  )
-    drop f ;
-
-M: bson-oid element-data-read ( type -- oid )
-    drop
-    read-longlong
-    read-int32 oid boa ;
-
-M: bson-binary-bytes element-binary-read ( size type -- bytes )
-    drop read ;
-
-M: bson-binary-custom element-binary-read ( size type -- quot )
-    drop read bytes>object ;
 
 PRIVATE>
 
-USE: tools.continuations
-
 : stream>assoc ( exemplar -- assoc )
-    <state> dup state
-    [ read-int32 >>size read-elements ] with-variable 
-    result>> ; 
+    <state> read-int32 >>size
+    [ state [ read-elements ] with-variable ]
+    [ result>> ] bi ;

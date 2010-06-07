@@ -3,7 +3,7 @@ colors.constants ui.render ui.pens.polygon ui.pens.solid math.vectors
 accessors fry ui.gadgets.packs game.input ui.gadgets.labels
 ui.gadgets.borders alarms calendar locals strings ui.gadgets.buttons
 combinators math.parser assocs threads ;
-IN: joystick-demo
+IN: game.input.demos.joysticks
 
 CONSTANT: SIZE { 151 151 }
 CONSTANT: INDICATOR-SIZE { 4 4 }
