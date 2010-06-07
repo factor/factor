@@ -200,7 +200,7 @@ CONSTANT: action-key-codes
 : on-configure ( sender event user-data -- result )
     drop [ window ] dip GdkEventConfigure memory>struct
     [ event-loc >>window-loc ] [ event-dim >>dim  ] bi
-    relayout-1 t ;
+    relayout-1 f ;
 
 : on-delete ( sender event user-data -- result )
     2drop window ungraft t ;
