@@ -18,20 +18,19 @@ CONSTANT: url URL" http://factorcode.org/images/latest/"
         bi = not
     ] [ drop t ] if ;
 
-: download-image ( arch -- )
-    url swap boot-image-name >url derive-url download ;
+: verify-image ( image -- )
+    need-new-image? [ "Boot image corrupt" throw ] when ;
 
-: maybe-download-image ( arch -- )
-    dup boot-image-name need-new-image? [
-         dup download-image
-         need-new-image? [
-             "Boot image corrupt, or checksums.txt on server out of date" throw
-         ] when
-    ] [
-        "Boot image up to date" print
-        drop
-    ] if ;
+: download-image ( image -- )
+    [ url swap >url derive-url download ]
+    [ verify-image ]
+    bi ;
 
-: download-my-image ( -- ) my-arch maybe-download-image ;
+: maybe-download-image ( image -- ? )
+    dup need-new-image?
+    [ download-image t ] [ drop f ] if ;
+
+: download-my-image ( -- )
+    my-arch boot-image-name maybe-download-image drop ;
 
 MAIN: download-my-image

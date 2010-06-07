@@ -247,7 +247,8 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 : [bench-quot] ( feat-seq op-word -- quot: ( doc-word -- ) )
     '[ _ swap _
        '[ [ [ _ execute( -- quot ) ] dip
-          [ execute( -- ) ] each _ execute( quot -- quot ) gc benchmark ] with-result ] each
+          [ execute( -- ) ] each _ execute( quot -- quot ) gc
+            benchmark ] with-result ] each
        print-separator ] ; 
 
 : run-serialization-bench ( doc-word-seq feat-seq -- )
@@ -282,7 +283,7 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 
     
 : run-benchmarks ( -- )
-    "db" "db" get* "host" "127.0.0.1" get* "port" 27020 get* ensure-number <mdb>
+    "db" "db" get* "host" "127.0.0.1" get* "port" 27017 get* ensure-number <mdb>
     [ print-header
       ! serialization
       { small-doc-prepare medium-doc-prepare

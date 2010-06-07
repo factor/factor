@@ -1,155 +1,160 @@
-! Copyright (C) 2008 Sascha Matzke.
+! Copyright (C) 2010 Sascha Matzke.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs bson.constants byte-arrays byte-vectors
-calendar fry io io.binary io.encodings io.encodings.binary
-io.encodings.utf8 io.streams.byte-array kernel math math.parser
-namespaces quotations sequences sequences.private serialize strings
-words combinators.short-circuit literals ;
-
-FROM: io.encodings.utf8.private => char>utf8 ;
-FROM: kernel.private => declare ;
-
+USING: accessors arrays assocs bson.constants byte-arrays
+calendar combinators.short-circuit fry hashtables io io.binary
+kernel linked-assocs literals math math.parser namespaces byte-vectors
+quotations sequences serialize strings vectors dlists alien.accessors ;
+FROM: words => word? word ;
+FROM: typed => TYPED: ;
+FROM: combinators => cond ;
 IN: bson.writer
 
 <PRIVATE
 
-SYMBOL: shared-buffer 
+CONSTANT: INT32-SIZE { 0 1 2 3 }
+CONSTANT: INT64-SIZE { 0 1 2 3 4 5 6 7 }
 
-CONSTANT: CHAR-SIZE  1
-CONSTANT: INT32-SIZE 4
-CONSTANT: INT64-SIZE 8
-
-: (buffer) ( -- buffer )
-    shared-buffer get
-    [ BV{ } clone [ shared-buffer set ] keep ] unless*
-    { byte-vector } declare ; inline 
-    
 PRIVATE>
 
-: reset-buffer ( buffer -- )
-    0 >>length drop ; inline
+TYPED: get-output ( -- stream: byte-vector )
+    output-stream get ; inline
 
-: ensure-buffer ( -- )
-    (buffer) drop ; inline
-
-: with-buffer ( ..a quot: ( ..a -- ..b ) -- ..b byte-vector )
-    [ (buffer) [ reset-buffer ] keep dup ] dip
-    with-output-stream* ; inline
-
-: with-length ( ..a quot: ( ..a -- ..b ) -- ..b bytes-written start-index )
-    [ (buffer) [ length ] keep ] dip
+TYPED: with-length ( quot -- bytes-written: integer start-index: integer )
+    [ get-output [ length ] [ ] bi ] dip
     call length swap [ - ] keep ; inline
 
-: (with-length-prefix) ( ..a quot: ( ..a -- ..b ) length-quot: ( bytes-written -- length ) -- ..b )
+: (with-length-prefix) ( quot: ( .. -- .. ) length-quot: ( bytes-written -- length ) -- )
     [ [ B{ 0 0 0 0 } write ] prepose with-length ] dip swap
-    [ call ] dip (buffer) copy ; inline
+    [ call( written -- length ) get-output underlying>> ] dip set-alien-unsigned-4 ; inline
 
-: with-length-prefix ( ..a quot: ( ..a -- ..b ) -- ..b )
-    [ INT32-SIZE >le ] (with-length-prefix) ; inline
+: with-length-prefix ( quot: ( .. -- .. ) -- )
+    [ ] (with-length-prefix) ; inline
     
-: with-length-prefix-excl ( ..a quot: ( ..a -- ..b ) -- ..b )
-    [ INT32-SIZE [ - ] keep >le ] (with-length-prefix) ; inline
+: with-length-prefix-excl ( quot: ( .. -- .. ) -- )
+    [ 4 - ] (with-length-prefix) ; inline
+
+: (>le) ( x n -- )
+    [ nth-byte write1 ] with each ; inline
     
 <PRIVATE
 
-GENERIC: bson-type? ( obj -- type ) 
-GENERIC: bson-write ( obj -- ) 
+TYPED: write-int32 ( int: integer -- ) INT32-SIZE (>le) ; inline
 
-M: t bson-type? ( boolean -- type ) drop T_Boolean ; 
-M: f bson-type? ( boolean -- type ) drop T_Boolean ; 
+TYPED: write-double ( real: float -- ) double>bits INT64-SIZE (>le) ; inline
 
-M: string bson-type? ( string -- type ) drop T_String ; 
-M: integer bson-type? ( integer -- type ) drop T_Integer ; 
-M: assoc bson-type? ( assoc -- type ) drop T_Object ;
-M: real bson-type? ( real -- type ) drop T_Double ; 
-M: tuple bson-type? ( tuple -- type ) drop T_Object ;  
-M: sequence bson-type? ( seq -- type ) drop T_Array ;
-M: timestamp bson-type? ( timestamp -- type ) drop T_Date ;
-M: mdbregexp bson-type? ( regexp -- type ) drop T_Regexp ;
+TYPED: write-cstring ( string: string -- )
+    get-output [ length ] [  ] bi copy 0 write1 ; inline
 
-M: oid bson-type? ( word -- type ) drop T_OID ;
-M: objref bson-type? ( objref -- type ) drop T_Binary ;
-M: word bson-type? ( word -- type ) drop T_Binary ;
-M: quotation bson-type? ( quotation -- type ) drop T_Binary ; 
-M: byte-array bson-type? ( byte-array -- type ) drop T_Binary ; 
-
-: write-int32 ( int -- ) INT32-SIZE >le write ; inline
-: write-double ( real -- ) double>bits INT64-SIZE >le write ; inline
-: write-cstring ( string -- ) B{ } like write 0 write1 ; inline
-: write-longlong ( object -- ) INT64-SIZE >le write ; inline
+: write-longlong ( object -- ) INT64-SIZE (>le) ; inline
 
 : write-eoo ( -- ) T_EOO write1 ; inline
-: write-type ( obj -- obj ) [ bson-type? write1 ] keep ; inline
-: write-pair ( name object -- ) write-type [ write-cstring ] dip bson-write ; inline
 
-M: string bson-write ( obj -- )
-    '[ _ write-cstring ] with-length-prefix-excl ;
+TYPED: write-header ( name: string object type: integer -- object )
+    write1 [ write-cstring ] dip ; inline
 
-M: f bson-write ( f -- )
-    drop 0 write1 ; 
+DEFER: write-pair
 
-M: t bson-write ( t -- )
-    drop 1 write1 ;
+TYPED: write-byte-array ( binary: byte-array -- )
+    [ length write-int32 ]
+    [ T_Binary_Bytes write1 write ] bi ; inline
 
-M: integer bson-write ( num -- )
-    write-int32 ;
-
-M: real bson-write ( num -- )
-    >float write-double ;
-
-M: timestamp bson-write ( timestamp -- )
-    timestamp>millis write-longlong ;
-
-M: byte-array bson-write ( binary -- )
-    [ length write-int32 ] keep
-    T_Binary_Bytes write1
-    write ; 
-
-M: oid bson-write ( oid -- )
-    [ a>> write-longlong ] [ b>> write-int32 ] bi ;
-       
-M: mdbregexp bson-write ( regexp -- )
+TYPED: write-mdbregexp ( regexp: mdbregexp -- )
    [ regexp>> write-cstring ]
-   [ options>> write-cstring ] bi ; 
-    
-M: sequence bson-write ( array -- )
-    '[ _ [ [ write-type ] dip number>string
-           write-cstring bson-write ] each-index
-       write-eoo ] with-length-prefix ;
+   [ options>> write-cstring ] bi ; inline
 
-: write-oid ( assoc -- )
-    [ MDB_OID_FIELD ] dip at
-    [ [ MDB_OID_FIELD ] dip write-pair ] when* ; inline
-
-: skip-field? ( name -- boolean )
-   { $[ MDB_OID_FIELD MDB_META_FIELD ] } member? ; inline
-
-M: assoc bson-write ( assoc -- )
-    '[
-        _  [ write-oid ] keep
-        [ over skip-field? [ 2drop ] [ write-pair ] if ] assoc-each
+TYPED: write-sequence ( array: sequence -- )
+   '[
+        _ [ number>string swap write-pair ] each-index
         write-eoo
-    ] with-length-prefix ;
+    ] with-length-prefix ; inline recursive
 
-: (serialize-code) ( code -- )
-    object>bytes [ length write-int32 ] keep
-    T_Binary_Custom write1
-    write ;
+TYPED: write-oid ( oid: oid -- )
+    [ a>> write-longlong ] [ b>> write-int32 ] bi ; inline
 
-M: quotation bson-write ( quotation -- )
-    (serialize-code) ;
-    
-M: word bson-write ( word -- )
-    (serialize-code) ;
+: write-oid-field ( assoc -- )
+    [ MDB_OID_FIELD dup ] dip at
+    [ dup oid? [ T_OID write-header write-oid ] [ write-pair ] if ] 
+    [ drop ] if* ; inline
+
+: skip-field? ( name value -- name value boolean )
+    over { [ MDB_OID_FIELD = ] [ MDB_META_FIELD = ] } 1|| ; inline
+
+UNION: hashtables hashtable linked-assoc ;
+
+TYPED: write-assoc ( assoc: hashtables -- )
+    '[ _ [ write-oid-field ] [
+            [ skip-field? [ 2drop ] [ write-pair ] if ] assoc-each 
+         ] bi write-eoo
+    ] with-length-prefix ; inline recursive
+
+UNION: code word quotation ;
+
+TYPED: (serialize-code) ( code: code -- )
+  object>bytes
+  [ length write-int32 ]
+  [ T_Binary_Custom write1 write ] bi ; inline
+
+TYPED: write-string ( string: string -- )
+    '[ _ write-cstring ] with-length-prefix-excl ; inline
+
+TYPED: write-boolean ( bool: boolean -- )
+    [ 1 write1 ] [ 0 write1 ] if ; inline
+
+TYPED: write-pair ( name: string obj -- )
+    {
+        {
+            [ dup { [ hashtable? ] [ linked-assoc? ] } 1|| ]
+            [ T_Object write-header write-assoc ]
+        } {
+            [ dup { [ array? ] [ vector? ] [ dlist? ] } 1|| ]
+            [ T_Array write-header write-sequence ]
+        } {
+            [ dup byte-array? ]
+            [ T_Binary write-header write-byte-array ]
+        } {
+            [ dup string? ]
+            [ T_String write-header write-string ]
+        } {
+            [ dup oid? ]
+            [ T_OID write-header write-oid ]
+        } {
+            [ dup integer? ]
+            [ T_Integer write-header write-int32 ]
+        } {
+            [ dup boolean? ] 
+            [ T_Boolean write-header write-boolean ]
+        } {
+            [ dup real? ]
+            [ T_Double write-header >float write-double ]
+        } {
+            [ dup timestamp? ]
+            [ T_Date write-header timestamp>millis write-longlong ]
+        } {
+            [ dup mdbregexp? ]
+            [ T_Regexp write-header write-mdbregexp ]
+        } {
+            [ dup quotation? ]
+            [ T_Binary write-header (serialize-code) ]
+        } {
+            [ dup word? ]
+            [ T_Binary write-header (serialize-code) ]
+        } {
+            [ dup dbref? ]
+            [ T_Object write-header dbref>assoc write-assoc ]
+        } {
+            [ dup f = ]
+            [ T_NULL write-header drop ]
+        }
+    } cond ;
 
 PRIVATE>
 
-: assoc>bv ( assoc -- byte-vector )
-    [ '[ _ bson-write ] with-buffer ] with-scope ; inline
+TYPED: assoc>bv ( assoc: hashtables -- byte-vector: byte-vector )
+    [ BV{ } clone dup ] dip '[ _ write-assoc ] with-output-stream* ; inline
 
-: assoc>stream ( assoc -- )
-    { assoc } declare bson-write ; inline
+TYPED: assoc>stream ( assoc: hashtables -- )
+    write-assoc ; inline
 
-: mdb-special-value? ( value -- ? )
+TYPED: mdb-special-value? ( value -- ?: boolean )
    { [ timestamp? ] [ quotation? ] [ mdbregexp? ]
      [ oid? ] [ byte-array? ] } 1|| ; inline

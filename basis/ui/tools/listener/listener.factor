@@ -195,6 +195,7 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
         H{ { table-gap { 3 3 } } } [
             [ [ [ icon>> write-image ] with-cell ] each ] with-row
         ] tabular-output
+        last-element off
         { "Press " { $command tool "common" show-error-list } " to view errors." }
         print-element
     ] unless-empty ;
