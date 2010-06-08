@@ -411,12 +411,12 @@ M: gtk-ui-backend raise-window*
     ] with-destructors ;
 
 M: gtk-ui-backend (grab-input)
-    handle>> window>>
+    window>>
     [ gtk_grab_add ] [ GDK_BLANK_CURSOR set-cursor ] bi ;
 
 M: gtk-ui-backend (ungrab-input)
-    handle>> window>>
-    [ gtk_grab_remove ] [ GDK_ARROW set-cursor ] bi ;
+    window>>
+    [ gtk_grab_remove ] [ GDK_LEFT_PTR set-cursor ] bi ;
 
 M: window-handle select-gl-context ( handle -- )
     window>>
