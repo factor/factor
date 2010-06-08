@@ -35,6 +35,9 @@ M: V >pprint-sequence ;
 
 M: V pprint* pprint-object ;
 
+M: V >c-ptr underlying>> underlying>> ; inline
+M: V byte-length [ length ] [ element-size ] bi * ; inline
+
 SYNTAX: V{ \ } [ >V ] parse-literal ;
 
 INSTANCE: V growable
