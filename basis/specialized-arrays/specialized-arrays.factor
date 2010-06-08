@@ -32,6 +32,9 @@ M: not-a-byte-array summary
 
 <PRIVATE
 
+GENERIC: nth-c-ptr ( n seq -- displaced-alien )
+GENERIC: direct-like ( alien len exemplar -- seq )
+
 FUNCTOR: define-array ( T -- )
 
 A          DEFINES-CLASS ${T}-array
@@ -52,6 +55,8 @@ TUPLE: A
 
 : <direct-A> ( alien len -- specialized-array ) A boa ; inline
 
+M: A direct-like drop <direct-A> ; inline
+
 : <A> ( n -- specialized-array )
     [ \ T <underlying> ] keep <direct-A> ; inline
 
@@ -70,6 +75,8 @@ M: A clone [ underlying>> clone ] [ length>> ] bi <direct-A> ; inline
 M: A length length>> ; inline
 
 M: A nth-unsafe underlying>> \ T alien-element ; inline
+
+M: A nth-c-ptr underlying>> \ T array-accessor drop swap <displaced-alien> ; inline
 
 M: A set-nth-unsafe underlying>> \ T set-alien-element ; inline
 
@@ -131,6 +138,17 @@ M: pointer underlying-type
     ] "" make ;
 
 PRIVATE>
+
+: direct-slice ( from to seq -- seq' )
+    check-slice
+    [ nip nth-c-ptr ]
+    [ drop swap - ]
+    [ 2nip ] 3tri direct-like ; inline
+
+: direct-head ( seq n -- seq' ) (head) direct-slice ; inline
+: direct-tail ( seq n -- seq' ) (tail) direct-slice ; inline
+: direct-head* ( seq n -- seq' ) from-end direct-head ; inline
+: direct-tail* ( seq n -- seq' ) from-end direct-tail ; inline
 
 : define-array-vocab ( type -- vocab )
     underlying-type
