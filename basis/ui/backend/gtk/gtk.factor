@@ -366,20 +366,28 @@ CONSTANT: window-controls>func-flags
         f t GDK_GL_RGBA_TYPE enum>number gtk_widget_set_gl_capability
     ] with-world-pixel-format ;
 
+: auto-position ( window loc -- )
+    dup { 0 0 } = [
+        drop dup window topmost-window =
+        GTK_WIN_POS_CENTER GTK_WIN_POS_NONE ?
+        gtk_window_set_position
+    ] [ first2 gtk_window_move ] if ;
+
 M:: gtk-ui-backend (open-window) ( world -- )
     GTK_WINDOW_TOPLEVEL gtk_window_new :> win
-    win <window-handle> world handle<<
-    world [ window-loc>> win swap first2 gtk_window_move ]
-    [ dim>> win swap first2 gtk_window_set_default_size ] bi
-
+    
+    world win [ <window-handle> >>handle drop ]
+    [ register-window ] 2bi
+    
+    win world [ window-loc>> auto-position ]
+    [ dim>> first2 gtk_window_set_default_size ] 2bi
+    
     world setup-gl drop
     
     win connect-signals
     
     win gtk_widget_realize
     win world window-controls>> configure-window-controls
-    
-    world win register-window
     
     win gtk_widget_show_all ;
 
