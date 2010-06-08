@@ -5,6 +5,7 @@ compiler.units functors growable kernel lexer math namespaces
 parser prettyprint.custom sequences specialized-arrays
 specialized-arrays.private strings vocabs vocabs.parser
 vocabs.generated fry make ;
+FROM: sequences.private => nth-unsafe ;
 QUALIFIED: vectors.functor
 IN: specialized-vectors
 
@@ -49,6 +50,9 @@ INSTANCE: V growable
     ] "" make ;
 
 PRIVATE>
+
+: push-new ( vector -- new )
+    [ length ] keep ensure nth-unsafe ; inline
 
 : define-vector-vocab ( type -- vocab )
     underlying-type
