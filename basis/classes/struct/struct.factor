@@ -10,6 +10,7 @@ slots slots.private specialized-arrays vectors words summary
 namespaces assocs vocabs.parser math.functions
 classes.struct.bit-accessors bit-arrays
 stack-checker.dependencies system layouts ;
+FROM: delegate.private => group-words slot-group-words ;
 QUALIFIED: math
 IN: classes.struct
 
@@ -37,6 +38,9 @@ SLOT: fields
 
 : struct-slots ( struct-class -- slots )
     "c-type" word-prop fields>> ;
+
+M: struct-class group-words
+    struct-slots slot-group-words ;
 
 ! struct allocation
 
