@@ -145,7 +145,7 @@ MACRO: interpolate-xml ( xml -- quot )
     ] each-interpolated drop ;
 
 : >search-hash ( seq -- hash )
-    [ dup search ] H{ } map>assoc ;
+    [ dup parse-word ] H{ } map>assoc ;
 
 : extract-variables ( xml -- seq )
     [ [ var>> , ] each-interpolated ] { } make ;
