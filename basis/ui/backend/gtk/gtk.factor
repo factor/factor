@@ -9,12 +9,13 @@ sequences strings system threads ui ui.backend ui.clipboards
 ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
 ui.gestures ui.pixel-formats ui.pixel-formats.private ui.private
 glib.ffi gobject.ffi gtk.ffi gdk.ffi gdk.gl.ffi gtk.gl.ffi ;
+RENAME: windows ui.private => ui:windows
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
 
 TUPLE: handle ;
-TUPLE: window-handle < handle window fullscreen? ;
+TUPLE: window-handle < handle window fullscreen? im-context ;
 
 : <window-handle> ( window -- window-handle )
     [ window-handle new ] dip >>window ;
@@ -174,25 +175,36 @@ CONSTANT: action-key-codes
 
 :: on-key-press ( sender event user-data -- result )
     sender window :> world
-    event GdkEventKey memory>struct :> ev
-    ev key-event>gesture <key-down> :> gesture
-    gesture world propagate-key-gesture
-    ev keyval>> gdk_keyval_to_unicode 1string dup
-    gesture valid-input?
-    [ world user-input ] [ drop ] if
+    world handle>> im-context>> :> im-context
+    im-context event gtk_im_context_filter_keypress
+    [
+        event GdkEventKey memory>struct :> ev
+        ev key-event>gesture <key-down> :> gesture
+        gesture world propagate-key-gesture
+        ev keyval>> gdk_keyval_to_unicode 1string dup
+        gesture valid-input?
+        [ world user-input ] [ drop ] if
+    ] unless
     t ;
 
-: on-key-release ( sender event user-data -- result )
-    drop swap [
-        GdkEventKey memory>struct
+:: on-key-release ( sender event user-data -- result )
+    sender window :> world
+    world handle>> im-context>> event gtk_im_context_filter_keypress
+    [
+        event GdkEventKey memory>struct
         key-event>gesture <key-up>
-    ] dip window propagate-key-gesture t ;
+        world propagate-key-gesture
+    ] unless t ;
 
 : on-focus-in ( sender event user-data -- result )
-    2drop window focus-world t ;
+    2drop window [ focus-world ]
+    [ handle>> im-context>> gtk_im_context_focus_in ] bi
+    f ;
 
 : on-focus-out ( sender event user-data -- result )
-    2drop window unfocus-world t ;
+    2drop window [ unfocus-world ]
+    [ handle>> im-context>> gtk_im_context_focus_out ] bi
+    f ;
 
 : on-expose ( sender event user-data -- result )
     2drop window relayout t ;
@@ -289,6 +301,17 @@ M: gtk-ui-backend (with-ui)
         ] with-destructors
     ] ui-running ;
 
+: im-context>window ( im-context -- world )
+    ui:windows get-global
+    [ second handle>> im-context>> = ] with find nip second ;
+
+:: on-commit ( im-context string' user-data -- )
+    im-context im-context>window :> world
+    string' utf8 alien>string :> string
+    f string f <key-down> :> gesture
+    gesture world propagate-key-gesture
+    string world user-input ;
+
 : connect-signal ( object signal-name callback -- )
     [ utf8 string>alien ] dip f f 0 g_signal_connect_data drop ;
 
@@ -322,6 +345,10 @@ M: gtk-ui-backend (with-ui)
     GtkWidget:focus-out-event connect-signal
     win "delete-event" [ on-delete yield ]
     GtkWidget:delete-event connect-signal ;
+
+:: connect-im-signals ( im-context -- )
+    im-context "commit" [ on-commit yield ]
+    GtkIMContext:commit connect-signal ;
 
 CONSTANT: window-controls>decor-flags
     H{
@@ -375,9 +402,14 @@ CONSTANT: window-controls>func-flags
 
 M:: gtk-ui-backend (open-window) ( world -- )
     GTK_WINDOW_TOPLEVEL gtk_window_new :> win
+    gtk_im_multicontext_new :> im-context
+
+    im-context f gtk_im_context_set_use_preedit
     
-    world win [ <window-handle> >>handle drop ]
-    [ register-window ] 2bi
+    win <window-handle> im-context >>im-context
+    world handle<<
+
+    world win register-window
     
     win world [ window-loc>> auto-position ]
     [ dim>> first2 gtk_window_set_default_size ] 2bi
@@ -385,14 +417,15 @@ M:: gtk-ui-backend (open-window) ( world -- )
     world setup-gl drop
     
     win connect-signals
+    im-context connect-im-signals
     
     win gtk_widget_realize
     win world window-controls>> configure-window-controls
-    
+
     win gtk_widget_show_all ;
 
 M: gtk-ui-backend (close-window) ( handle -- )
-    window>> [ unregister-window ] [ gtk_widget_destroy ] bi
+    window>> [ gtk_widget_destroy ] [ unregister-window ] bi
     event-loop? [ gtk_main_quit ] unless ;
 
 M: gtk-ui-backend set-title
