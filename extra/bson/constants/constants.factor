@@ -19,6 +19,16 @@ TUPLE: oid { a initial: 0 } { b initial: 0 } ;
 
 TUPLE: dbref ref id db ;
 
+TUPLE: mongo-timestamp incr seconds ;
+
+: <mongo-timestamp> ( incr seconds -- mongo-timestamp )
+    mongo-timestamp boa ;
+
+TUPLE: mongo-scoped-code code object ;
+
+: <mongo-scoped-code> ( code object -- mongo-scoped-code )
+    mongo-scoped-code boa ;
+
 CONSTRUCTOR: dbref ( ref id -- dbref ) ;
 
 : dbref>assoc ( dbref -- assoc )
@@ -47,30 +57,31 @@ TUPLE: mdbregexp { regexp string } { options string } ;
 CONSTANT: MDB_OID_FIELD "_id"
 CONSTANT: MDB_META_FIELD "_mfd"
 
-CONSTANT: T_EOO  0  
-CONSTANT: T_Double  1  
-CONSTANT: T_Integer  16  
-CONSTANT: T_Boolean  8  
-CONSTANT: T_String  2  
-CONSTANT: T_Object  3  
-CONSTANT: T_Array  4  
-CONSTANT: T_Binary  5  
-CONSTANT: T_Undefined  6  
-CONSTANT: T_OID  7  
-CONSTANT: T_Date  9  
-CONSTANT: T_NULL  10  
-CONSTANT: T_Regexp  11  
-CONSTANT: T_DBRef  12  
-CONSTANT: T_Code  13  
-CONSTANT: T_ScopedCode  17  
-CONSTANT: T_Symbol  14  
-CONSTANT: T_JSTypeMax  16  
-CONSTANT: T_MaxKey  127  
+CONSTANT: T_EOO     0
+CONSTANT: T_Double  HEX: 1
+CONSTANT: T_String  HEX: 2
+CONSTANT: T_Object  HEX: 3
+CONSTANT: T_Array   HEX: 4
+CONSTANT: T_Binary  HEX: 5
+CONSTANT: T_Undefined  HEX: 6
+CONSTANT: T_OID     HEX: 7
+CONSTANT: T_Boolean HEX: 8
+CONSTANT: T_Date    HEX: 9
+CONSTANT: T_NULL    HEX: A
+CONSTANT: T_Regexp  HEX: B
+CONSTANT: T_DBRef   HEX: C
+CONSTANT: T_Code    HEX: D
+CONSTANT: T_Symbol  HEX: E
+CONSTANT: T_ScopedCode HEX: F
+CONSTANT: T_Integer HEX: 10
+CONSTANT: T_Timestamp HEX: 11
+CONSTANT: T_Integer64 HEX: 12
+CONSTANT: T_MinKey  HEX: FF
+CONSTANT: T_MaxKey  HEX: 7F
 
-CONSTANT: T_Binary_Function 1   
-CONSTANT: T_Binary_Bytes 2
-CONSTANT: T_Binary_UUID 3
-CONSTANT: T_Binary_MD5 5
-CONSTANT: T_Binary_Custom 128
-
+CONSTANT: T_Binary_Function     HEX: 1
+CONSTANT: T_Binary_Bytes        HEX: 2
+CONSTANT: T_Binary_UUID         HEX: 3
+CONSTANT: T_Binary_MD5          HEX: 5
+CONSTANT: T_Binary_Custom       HEX: 80
 
