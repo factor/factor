@@ -10,6 +10,8 @@ FROM: typed => TYPED: ;
 
 IN: bson.reader
 
+DEFER: stream>assoc
+
 <PRIVATE
 
 TUPLE: element { type integer } name ;
@@ -57,6 +59,9 @@ TYPED: read-cstring ( -- string: string )
 TYPED: read-sized-string ( length: integer -- string: string )
     read 1 head-slice* >string ; inline
 
+TYPED: read-timestamp ( -- timestamp )
+    8 read [ 4 head signed-le> ] [ 4 tail signed-le> ] bi <mongo-timestamp> ;
+
 TYPED: push-element ( type: integer name: string state: state -- )
     [ element boa ] dip elements>> push ; inline
 
@@ -91,6 +96,7 @@ TYPED: element-data-read ( type: integer -- object )
         { T_OID [ bson-oid-read ] }
         { T_String [ read-int32 read-sized-string ] }
         { T_Integer [ read-int32 ] }
+        { T_Integer64 [ read-longlong ] }
         { T_Binary [ bson-binary-read ] }
         { T_Object [ bson-object-data-read ] }
         { T_Array [ bson-object-data-read ] }
@@ -98,6 +104,9 @@ TYPED: element-data-read ( type: integer -- object )
         { T_Boolean [ read-byte 1 = ] }
         { T_Date [ read-longlong millis>timestamp ] }
         { T_Regexp [ bson-regexp-read ] }
+        { T_Timestamp [ read-timestamp ] }
+        { T_Code [ read-int32 read-sized-string ] }
+        { T_ScopedCode [ read-int32 drop read-cstring H{ } clone stream>assoc <mongo-scoped-code> ] }
         { T_NULL [ f ] }
     } case ; inline
 
@@ -135,9 +144,12 @@ TYPED: (prepare-result) ( scope: vector element: element -- result )
 TYPED: (prepare-object) ( type: integer -- object )
     [ element-data-read ] [ end-element ] bi ; inline
 
-:: (read-object) ( type name state -- )
-    state peek-scope :> scope
-    type (prepare-object) name scope set-at ; inline
+! :: (read-object) ( type name state -- )
+!    state peek-scope :> scope
+!    type (prepare-object) name scope set-at ; inline
+
+: (read-object) ( type name state -- )
+    peek-scope [ (prepare-object) ] 2dip set-at ; inline
 
 TYPED: bson-not-eoo-element-read ( type: integer -- cont?: boolean )
     read-cstring get-state
