@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alarms bit-arrays calendar game.input io
+USING: accessors timers bit-arrays calendar game.input io
 io.binary io.encodings.binary io.files kernel literals math
 namespaces system threads ;
 IN: key-logger
@@ -28,7 +28,7 @@ SYMBOL: key-logger
     ] unless ;
 
 : stop-key-logger ( -- )
-    key-logger get-global [ stop-alarm ] when*
+    key-logger get-global [ stop-timer ] when*
     f key-logger set-global
     close-game-input ;
 

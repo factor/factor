@@ -317,7 +317,7 @@ IN: tools.deploy.shaker
         strip-io? [ io-backend , ] when
 
         { } {
-            "alarms"
+            "timers"
             "tools"
             "io.launcher"
             "random"
