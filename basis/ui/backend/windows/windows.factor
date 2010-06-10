@@ -569,6 +569,9 @@ H{ } clone wm-handlers set-global
     [ [ execute( -- wm ) add-wm-handler ] with each ]
     [ wm-handlers get-global set-at ] if ;
 
+: remove-wm-handler ( wm -- )
+    wm-handlers get-global delete-at ;
+
 [ handle-wm-close 0                  ] WM_CLOSE add-wm-handler
 [ 4dup handle-wm-paint DefWindowProc ] WM_PAINT add-wm-handler
 
