@@ -11,6 +11,7 @@ namespaces assocs vocabs.parser math.functions
 classes.struct.bit-accessors bit-arrays
 stack-checker.dependencies system layouts ;
 FROM: delegate.private => group-words slot-group-words ;
+FROM: math => float ;
 QUALIFIED: math
 IN: classes.struct
 
@@ -237,10 +238,12 @@ M: struct byte-length class "struct-size" word-prop ; foldable
 <PRIVATE
 GENERIC: binary-zero? ( value -- ? )
 
-M: object binary-zero? drop f ;
-M: f binary-zero? drop t ;
-M: number binary-zero? 0 = ;
-M: struct binary-zero? >c-ptr [ 0 = ] all? ;
+M: object binary-zero? drop f ; inline
+M: f binary-zero? drop t ; inline
+M: integer binary-zero? zero? ; inline
+M: float binary-zero? double>bits zero? ; inline
+M: complex binary-zero? >rect [ binary-zero? ] both? ; inline
+M: struct binary-zero? binary-object <direct-uchar-array> [ 0 = ] all? ; inline
 
 : struct-needs-prototype? ( class -- ? )
     struct-slots [ initial>> binary-zero? ] all? not ;
