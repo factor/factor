@@ -1,7 +1,7 @@
 USING: ui ui.gadgets sequences kernel arrays math colors
 colors.constants ui.render ui.pens.polygon ui.pens.solid math.vectors
 accessors fry ui.gadgets.packs game.input ui.gadgets.labels
-ui.gadgets.borders alarms calendar locals strings ui.gadgets.buttons
+ui.gadgets.borders timers calendar locals strings ui.gadgets.buttons
 combinators math.parser assocs threads ;
 IN: game.input.demos.joysticks
 
@@ -73,7 +73,7 @@ CONSTANT: pov-polygons
     COLOR: red   <indicator-gadget> [ >>indicator   ] [ add-gadget ] bi
     dup [ 0.0 0.0 0.0 move-axis ] [ f move-pov ] bi ;
 
-TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
+TUPLE: joystick-demo-gadget < pack axis raxis controller buttons timer ;
 
 : add-gadget-with-border ( parent child -- parent )
     { 2 2 } <border> COLOR: gray <solid> >>boundary add-gadget ;
@@ -108,7 +108,7 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
 
 : kill-update-axes ( gadget -- )
     COLOR: gray <solid> >>interior
-    [ [ stop-alarm ] when* f ] change-alarm
+    [ [ stop-timer ] when* f ] change-timer
     relayout-1 ;
 
 : (update-axes) ( gadget controller-state -- )
@@ -125,11 +125,11 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
     [ (update-axes) ] [ kill-update-axes ] if* ;
 
 M: joystick-demo-gadget graft*
-    dup '[ _ update-axes ] FREQUENCY every >>alarm
+    dup '[ _ update-axes ] FREQUENCY every >>timer
     drop ;
 
 M: joystick-demo-gadget ungraft*
-    alarm>> [ stop-alarm ] when* ;
+    timer>> [ stop-timer ] when* ;
 
 : joystick-window ( controller -- )
     [ <joystick-demo-gadget> ] [ product-string ] bi

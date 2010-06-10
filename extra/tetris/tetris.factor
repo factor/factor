@@ -1,10 +1,13 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alarms arrays calendar kernel make math math.rectangles math.parser namespaces sequences system tetris.game tetris.gl ui.gadgets ui.gadgets.labels ui.gadgets.worlds ui.gadgets.status-bar ui.gestures ui.render ui ;
+USING: accessors timers arrays calendar kernel make math math.rectangles
+math.parser namespaces sequences system tetris.game tetris.gl ui.gadgets
+ui.gadgets.labels ui.gadgets.worlds ui.gadgets.status-bar ui.gestures
+ui.render ui ;
 FROM: tetris.game => level>> ;
 IN: tetris
 
-TUPLE: tetris-gadget < gadget { tetris tetris } { alarm } ;
+TUPLE: tetris-gadget < gadget { tetris tetris } { timer } ;
 
 : <tetris-gadget> ( tetris -- gadget )
     tetris-gadget new swap >>tetris ;
@@ -52,10 +55,10 @@ tetris-gadget H{
     [ tetris>> ?update ] [ relayout-1 ] bi ;
 
 M: tetris-gadget graft* ( gadget -- )
-    [ [ tick ] curry 100 milliseconds every ] keep alarm<< ;
+    [ [ tick ] curry 100 milliseconds every ] keep timer<< ;
 
 M: tetris-gadget ungraft* ( gadget -- )
-    [ stop-alarm f ] change-alarm drop ;
+    [ stop-timer f ] change-timer drop ;
 
 : tetris-window ( -- ) 
     [

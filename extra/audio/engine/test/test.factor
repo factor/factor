@@ -1,5 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alarms audio audio.engine audio.loader calendar
+USING: accessors timers audio audio.engine audio.loader calendar
 destructors io kernel locals math math.functions math.ranges specialized-arrays
 sequences random math.vectors ;
 FROM: alien.c-types => short ;
@@ -41,10 +41,10 @@ M: noise-generator dispose
         ] when
 
         engine update-audio
-    ] 20 milliseconds every :> alarm
+    ] 20 milliseconds every :> timer
     "Press Enter to stop the test." print
     readln drop
-    alarm stop-alarm
+    timer stop-timer
     engine dispose ;
 
 MAIN: audio-engine-test

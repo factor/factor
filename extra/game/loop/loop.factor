@@ -1,5 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alarms alien.c-types calendar classes.struct
+USING: accessors timers alien.c-types calendar classes.struct
 continuations destructors fry kernel math math.order memory
 namespaces sequences specialized-vectors system
 tools.memory ui ui.gadgets.worlds vm vocabs.loader arrays
@@ -14,7 +14,7 @@ TUPLE: game-loop
     { running? boolean }
     { tick# integer }
     { frame# integer }
-    alarm
+    timer
     benchmark-data ;
 
 STRUCT: game-loop-benchmark
@@ -110,12 +110,12 @@ PRIVATE>
     [
         [ '[ _ game-tick ] f ]
         [ tick-interval-nanos>> nanoseconds ] bi
-        <alarm>
-    ] keep [ alarm<< ] [ drop start-alarm ] 2bi ;
+        <timer>
+    ] keep [ timer<< ] [ drop start-timer ] 2bi ;
 
 : stop-loop ( loop -- )
     f >>running?
-    alarm>> stop-alarm ;
+    timer>> stop-timer ;
 
 : <game-loop*> ( tick-interval-nanos tick-delegate draw-delegate -- loop )
     nano-count f 0 0 f
