@@ -137,13 +137,15 @@ M: pointer underlying-type
         bi
     ] "" make ;
 
-PRIVATE>
-
-: direct-slice ( from to seq -- seq' )
-    check-slice
+: direct-slice-unsafe ( from to seq -- seq' )
     [ nip nth-c-ptr ]
     [ drop swap - ]
     [ 2nip ] 3tri direct-like ; inline
+
+PRIVATE>
+
+: direct-slice ( from to seq -- seq' )
+    check-slice direct-slice-unsafe ; inline
 
 : direct-head ( seq n -- seq' ) (head) direct-slice ; inline
 : direct-tail ( seq n -- seq' ) (tail) direct-slice ; inline
