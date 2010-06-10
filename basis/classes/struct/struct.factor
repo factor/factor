@@ -11,6 +11,7 @@ namespaces assocs vocabs.parser math.functions
 classes.struct.bit-accessors bit-arrays
 stack-checker.dependencies system layouts ;
 FROM: delegate.private => group-words slot-group-words ;
+FROM: math => float ;
 QUALIFIED: math
 IN: classes.struct
 
