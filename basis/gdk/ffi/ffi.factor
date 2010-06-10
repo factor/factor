@@ -23,7 +23,7 @@ GdkEventScroll GdkEventMotion GdkEventExpose GdkEventVisibility
 GdkEventCrossing GdkEventFocus GdkEventConfigure GdkEventProperty
 GdkEventSelection GdkEventDND GdkEventProximity GdkEventClient
 GdkEventNoExpose GdkEventWindowState GdkEventSetting
-GdkEventOwnerChange GdkEventGrabBroken ;
+GdkEventOwnerChange GdkEventGrabBroken GdkRectangle ;
 
 GIR: vocab:gdk/Gdk-2.0.gir
 
