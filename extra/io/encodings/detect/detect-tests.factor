@@ -1,5 +1,8 @@
 ! (c)2010 Joe Groff bsd license
-USING: byte-arrays.hex io.encodings.8-bit.koi8-r io.encodings.detect tools.test ;
+USING: byte-arrays byte-arrays.hex io.encodings.8-bit.koi8-r
+io.encodings.8-bit.latin1 io.encodings.binary
+io.encodings.detect io.encodings.utf16 io.encodings.utf32
+io.encodings.utf8 namespaces tools.test ;
 IN: io.encodings.detect.tests
 
 ! UTF encodings with BOMs
