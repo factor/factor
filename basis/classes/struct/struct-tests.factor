@@ -9,6 +9,7 @@ system tools.test parser lexer eval layouts generic.single classes
 vocabs ;
 FROM: math => float ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
+FROM: classes.struct.private => binary-zero? ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: char
 SPECIALIZED-ARRAY: int
@@ -474,4 +475,3 @@ CONSULT: struct-test-delegate struct-test-delegator del>> ;
         7 >>a
         8 >>b
 ] unit-test
-
