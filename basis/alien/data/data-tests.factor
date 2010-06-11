@@ -1,6 +1,6 @@
 USING: alien alien.c-types alien.data alien.syntax
 classes.struct kernel sequences specialized-arrays
-tools.test ;
+specialized-arrays.private tools.test compiler.units vocabs ;
 IN: alien.data.tests
 
 STRUCT: foo { a int } { b void* } { c bool } ;
@@ -32,4 +32,10 @@ SPECIALIZED-ARRAY: foo
         S{ foo f 0 f f }
         S{ foo f 1 f f }
     } [ first binary-zero? ] [ second binary-zero? ] [ third binary-zero? ] tri
+] unit-test
+
+[ ] [
+    [
+        foo specialized-array-vocab forget-vocab
+    ] with-compilation-unit
 ] unit-test
