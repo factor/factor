@@ -38,6 +38,7 @@ PRIVATE>
         { [ dup HEX{ EF BB BF } head? ] [ drop utf8 ] }
         { [ dup $[ "<?xml" >byte-array ] head? ] [ detect-xml-prolog ] }
         { [ 0 over member? ] [ drop binary ] }
+        { [ dup empty? ] [ drop utf8 ] }
         { [ dup valid-utf8? ] [ drop utf8 ] }
         [ drop default-8bit-encoding get ]
     } cond ;
