@@ -3,4 +3,4 @@
 USING: specialized-vectors mirrors ;
 IN: specialized-vectors.mirrors
 
-INSTANCE: specialized-vector enumerated-sequence
+INSTANCE: specialized-vector inspected-sequence
