@@ -156,37 +156,24 @@ CONSTANT: action-key-codes
         [ scroll-direction ] [ event-loc ] bi
     ] dip window send-scroll t ;
 
-: key-sym ( event -- sym action? )
-    keyval>> dup action-key-codes at
-    [ t ] [ gdk_keyval_to_unicode 1string f ] ?if ;
+: key-sym ( event -- sym/f action? )
+    keyval>> dup action-key-codes at [ t ]
+    [ gdk_keyval_to_unicode [ f ] [ 1string ] if-zero f ] ?if ;
 
-: key-event>gesture ( event -- modifiers sym action? )
+: key-event>gesture ( event -- mods sym/f action? )
+    GdkEventKey memory>struct
     [ event-modifiers ] [ key-sym ] bi ;
 
-: valid-input? ( string gesture -- ? )
-    over empty? [ 2drop f ] [
-        mods>> { f { S+ } } member? [
-            [ { [ 127 = not ] [ CHAR: \s >= ] } 1&& ] all?
-        ] [
-            [ { [ 127 = not ] [ CHAR: \s >= ] [ alpha? not ] } 1&& ] all?
-        ] if
-    ] if ;
-
-:: on-key-press ( sender event user-data -- result )
-    sender window :> world
-    event GdkEventKey memory>struct :> ev
-    ev key-event>gesture <key-down> :> gesture
-    gesture world propagate-key-gesture
-    ev keyval>> gdk_keyval_to_unicode 1string dup
-    gesture valid-input?
-    [ world user-input ] [ drop ] if
-    t ;
+: send-key-gesture ( win gesture -- )
+    swap window propagate-key-gesture ;
+   
+: on-key-press ( sender event user-data -- result )
+    drop key-event>gesture over
+    [ <key-down> send-key-gesture ] [ 3drop drop ] if t ;
 
 : on-key-release ( sender event user-data -- result )
-    drop swap [
-        GdkEventKey memory>struct
-        key-event>gesture <key-up>
-    ] dip window propagate-key-gesture t ;
+    drop key-event>gesture over
+    [ <key-up> send-key-gesture ] [ 3drop drop ] if t ;
 
 : on-focus-in ( sender event user-data -- result )
     2drop window focus-world t ;
@@ -289,8 +276,11 @@ M: gtk-ui-backend (with-ui)
         ] with-destructors
     ] ui-running ;
 
+: connect-signal-with-data ( object signal-name callback data -- )
+    [ utf8 string>alien ] 2dip f 0 g_signal_connect_data drop ;
+
 : connect-signal ( object signal-name callback -- )
-    [ utf8 string>alien ] dip f f 0 g_signal_connect_data drop ;
+    f connect-signal-with-data ;
 
 :: connect-signals ( win -- )
     win events-mask [ enum>number ] [ bitor ] map-reduce
@@ -322,6 +312,34 @@ M: gtk-ui-backend (with-ui)
     GtkWidget:focus-out-event connect-signal
     win "delete-event" [ on-delete yield ]
     GtkWidget:delete-event connect-signal ;
+
+: on-key-event-for-im ( sender event user-data -- result )
+    swap gtk_im_context_filter_keypress 2drop f ;
+
+: on-focus-out-for-im ( sender event user-data -- result )
+    2nip gtk_im_context_reset f ;
+
+: on-destroy-for-im ( sender user-data -- result )
+    nip g_object_unref f ;
+
+: on-im-commit ( sender str user_data -- )
+    [ drop ] [ utf8 alien>string ] [ window ] tri* user-input ;
+
+:: configure-im ( win -- )
+    gtk_im_context_simple_new :> im
+    im win gtk_im_context_set_client_window
+    
+    im "commit" [ on-im-commit yield ]
+    GtkIMContext:commit win connect-signal-with-data
+
+    win "key-press-event" [ on-key-event-for-im ]
+    GtkWidget:key-press-event im connect-signal-with-data
+    win "key-release-event" [ on-key-event-for-im ]
+    GtkWidget:key-release-event im connect-signal-with-data
+    win "focus-out-event" [ on-focus-out-for-im ]
+    GtkWidget:focus-out-event im connect-signal-with-data
+    win "destroy" [ on-destroy-for-im ]
+    GtkObject:destroy im connect-signal-with-data ;
 
 CONSTANT: window-controls>decor-flags
     H{
@@ -366,7 +384,7 @@ CONSTANT: window-controls>func-flags
         f t GDK_GL_RGBA_TYPE enum>number gtk_widget_set_gl_capability
     ] with-world-pixel-format ;
 
-: auto-position ( window loc -- )
+: auto-position ( win loc -- )
     dup { 0 0 } = [
         drop dup window topmost-window =
         GTK_WIN_POS_CENTER GTK_WIN_POS_NONE ?
@@ -383,6 +401,8 @@ M:: gtk-ui-backend (open-window) ( world -- )
     [ dim>> first2 gtk_window_set_default_size ] 2bi
     
     world setup-gl drop
+
+    win configure-im
     
     win connect-signals
     
