@@ -9,7 +9,6 @@ system tools.test parser lexer eval layouts generic.single classes
 vocabs ;
 FROM: math => float ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
-FROM: classes.struct.private => binary-zero? ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: char
 SPECIALIZED-ARRAY: int
@@ -476,31 +475,3 @@ CONSULT: struct-test-delegate struct-test-delegator del>> ;
         8 >>b
 ] unit-test
 
-SPECIALIZED-ARRAY: struct-test-foo
-
-[ t ] [ 0 binary-zero? ] unit-test
-[ f ] [ 1 binary-zero? ] unit-test
-[ f ] [ -1 binary-zero? ] unit-test
-[ t ] [ 0.0 binary-zero? ] unit-test
-[ f ] [ 1.0 binary-zero? ] unit-test
-[ f ] [ -0.0 binary-zero? ] unit-test
-[ t ] [ C{ 0.0 0.0 } binary-zero? ] unit-test
-[ f ] [ C{ 1.0 0.0 } binary-zero? ] unit-test
-[ f ] [ C{ -0.0 0.0 } binary-zero? ] unit-test
-[ f ] [ C{ 0.0 1.0 } binary-zero? ] unit-test
-[ f ] [ C{ 0.0 -0.0 } binary-zero? ] unit-test
-[ t ] [ f binary-zero? ] unit-test
-[ t ] [ 0 <alien> binary-zero? ] unit-test
-[ f ] [ 1 <alien> binary-zero? ] unit-test
-[ f ] [ B{ } binary-zero? ] unit-test
-[ t ] [ S{ struct-test-foo f 0 0 f } binary-zero? ] unit-test
-[ f ] [ S{ struct-test-foo f 1 0 f } binary-zero? ] unit-test
-[ f ] [ S{ struct-test-foo f 0 1 f } binary-zero? ] unit-test
-[ f ] [ S{ struct-test-foo f 0 0 t } binary-zero? ] unit-test
-[ t t f ] [
-    struct-test-foo-array{
-        S{ struct-test-foo f 0 0 f }
-        S{ struct-test-foo f 0 0 f }
-        S{ struct-test-foo f 1 0 f }
-    } [ first binary-zero? ] [ second binary-zero? ] [ third binary-zero? ] tri
-] unit-test
