@@ -30,6 +30,7 @@ unit-test
 unit-test
 
 ! Default to utf8 if decoding succeeds and there are no nulls
+[ utf8 ] [ HEX{ } detect-byte-array ] unit-test
 [ utf8 ] [ HEX{ 31 32 33 } detect-byte-array ] unit-test
 [ utf8 ] [ HEX{ 31 32 C2 A0 33 } detect-byte-array ] unit-test
 [ latin1 ] [ HEX{ 31 32 A0 33 } detect-byte-array ] unit-test
@@ -41,3 +42,4 @@ unit-test
 
 [ binary ] [ HEX{ 31 32 33 C2 A0 00 } detect-byte-array ] unit-test
 [ binary ] [ HEX{ 31 32 33 C2 A0 00 30 } detect-byte-array ] unit-test
+
