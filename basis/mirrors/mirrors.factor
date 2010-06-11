@@ -48,14 +48,14 @@ M: mirror assoc-size object>> layout-of second ;
 
 INSTANCE: mirror assoc
 
-MIXIN: enumerated-sequence
-INSTANCE: array             enumerated-sequence
-INSTANCE: vector            enumerated-sequence
-INSTANCE: callable          enumerated-sequence
-INSTANCE: byte-array        enumerated-sequence
+MIXIN: inspected-sequence
+INSTANCE: array             inspected-sequence
+INSTANCE: vector            inspected-sequence
+INSTANCE: callable          inspected-sequence
+INSTANCE: byte-array        inspected-sequence
 
 GENERIC: make-mirror ( obj -- assoc )
 M: hashtable make-mirror ;
 M: integer make-mirror drop f ;
-M: enumerated-sequence make-mirror <enum> ;
+M: inspected-sequence make-mirror <enum> ;
 M: object make-mirror <mirror> ;
