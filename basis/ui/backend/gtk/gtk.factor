@@ -2,15 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
 alien.enums alien.strings arrays ascii assocs classes.struct
-combinators.short-circuit command-line destructors gdk.ffi
-gdk.gl.ffi glib.ffi gobject.ffi gtk.ffi gtk.gl.ffi
-io.backend.unix.multiplexers io.encodings.utf8 io.thread kernel
-libc literals locals math math.bitwise math.order math.vectors
-namespaces sequences strings system threads ui ui.backend
-ui.clipboards ui.event-loop ui.gadgets ui.gadgets.editors
-ui.gadgets.line-support ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.pixel-formats ui.pixel-formats.private
-ui.private ;
+combinators combinators.short-circuit command-line destructors
+documents gdk.ffi gdk.gl.ffi glib.ffi gobject.ffi gtk.ffi
+gtk.gl.ffi io.backend.unix.multiplexers io.encodings.utf8
+io.thread kernel libc literals locals math math.bitwise
+math.order math.vectors namespaces sequences strings system
+threads ui ui.backend ui.clipboards ui.event-loop ui.gadgets
+ui.gadgets.editors ui.gadgets.line-support ui.gadgets.private
+ui.gadgets.worlds ui.gestures ui.pixel-formats
+ui.pixel-formats.private ui.private ;
 RENAME: windows ui.private => ui:windows
 IN: ui.backend.gtk
 
@@ -328,17 +328,37 @@ M: gtk-ui-backend (with-ui)
         ] with-destructors
     ] ui-running ;
 
-: im-context>window ( im-context -- world )
+: im-context>world ( im-context -- world )
     ui:windows get-global
     [ second handle>> im-context>> = ] with find nip second ;
 
 :: on-commit ( im-context string' user-data -- )
-    im-context im-context>window :> world
+    im-context im-context>world :> world
     string' utf8 alien>string :> string
     f string f <key-down> :> gesture
     gesture world propagate-key-gesture
     string world user-input
     world update-im-cursor-location ;
+
+:: on-retrieve-surrounding ( im-context user-data -- ? )
+    im-context im-context>world focusable-editor
+    [| editor |
+        editor editor-caret first2 :> ( x y )
+        im-context
+        y editor editor-line utf8 string>alien
+        -1 x
+        gtk_im_context_set_surrounding t
+    ] [ f ] if* ;
+
+:: on-delete-surrounding ( im-context offset n user-data -- ? )
+    im-context im-context>world :> world
+    world focusable-editor [| editor |
+        editor editor-caret first2 :> ( x y )
+        x offset + y [ 2array ] [ [ n + ] dip 2array ] 2bi
+        editor remove-doc-range
+        world update-im-cursor-location
+        t
+    ] [ f ] if* ;
 
 : connect-signal ( object signal-name callback -- )
     [ utf8 string>alien ] dip f f 0 g_signal_connect_data drop ;
@@ -374,9 +394,19 @@ M: gtk-ui-backend (with-ui)
     win "delete-event" [ on-delete yield ]
     GtkWidget:delete-event connect-signal ;
 
-:: connect-im-signals ( im-context -- )
-    im-context "commit" [ on-commit yield ]
-    GtkIMContext:commit connect-signal ;
+: connect-im-signals ( im-context -- )
+    {
+        [
+            "commit" [ on-commit yield ]
+            GtkIMContext:commit connect-signal
+        ] [
+            "retrieve-surrounding" [ on-retrieve-surrounding yield ]
+            GtkIMContext:retrieve-surrounding connect-signal
+        ] [
+            "delete-surrounding" [ on-delete-surrounding yield ]
+            GtkIMContext:delete-surrounding connect-signal
+        ]
+    } cleave ;
 
 CONSTANT: window-controls>decor-flags
     H{
