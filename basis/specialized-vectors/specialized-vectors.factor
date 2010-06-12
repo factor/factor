@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.parser assocs
-compiler.units functors growable kernel lexer math namespaces
-parser prettyprint.custom sequences specialized-arrays
-specialized-arrays.private strings vocabs vocabs.loader
-vocabs.parser vocabs.generated fry make ;
+classes compiler.units functors growable kernel lexer math
+namespaces parser prettyprint.custom sequences
+specialized-arrays specialized-arrays.private strings
+vocabs vocabs.loader vocabs.parser vocabs.generated fry make ;
 FROM: sequences.private => nth-unsafe ;
 FROM: specialized-arrays.private => nth-c-ptr direct-like ;
 QUALIFIED: vectors.functor
@@ -19,6 +19,7 @@ FUNCTOR: define-vector ( T -- )
 V DEFINES-CLASS ${T}-vector
 
 A          IS ${T}-array
+>A         IS >${A}
 <A>        IS <${A}>
 <direct-A> IS <direct-${A}>
 
@@ -44,6 +45,11 @@ M: V byte-length [ length ] [ element-size ] bi * ; inline
 
 M: V direct-like drop <direct-A> ; inline
 M: V nth-c-ptr underlying>> nth-c-ptr ; inline
+
+M: A like
+    drop dup A instance? [
+        dup V instance? [ [ >c-ptr ] [ length>> ] bi <direct-A> ] [ >A ] if
+    ] unless ; inline
 
 SYNTAX: V{ \ } [ >V ] parse-literal ;
 
