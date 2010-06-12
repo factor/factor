@@ -81,21 +81,6 @@ M: x86.64 %mark-deck
     dup load-decks-offset
     [+] card-mark <byte> MOV ;
 
-M:: x86.64 %dispatch ( src temp -- )
-    ! Load jump table base.
-    temp HEX: ffffffff MOV
-    building get length :> start
-    0 rc-absolute-cell rel-here
-    ! Add jump table base
-    temp src ADD
-    temp HEX: 7f [+] JMP
-    building get length :> end
-    ! Fix up the displacement above
-    cell alignment
-    [ end start - + building get dup pop* push ]
-    [ (align-code) ]
-    bi ;
-
 M:: x86.64 %load-reg-param ( dst reg rep -- )
     dst reg rep %copy ;
 

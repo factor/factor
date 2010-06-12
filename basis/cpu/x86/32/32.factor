@@ -56,20 +56,6 @@ M: x86.32 %mark-deck
     rc-absolute-cell rel-decks-offset
     building get push ;
 
-M:: x86.32 %dispatch ( src temp -- )
-    ! Load jump table base.
-    temp src HEX: ffffffff [+] LEA
-    building get length :> start
-    0 rc-absolute-cell rel-here
-    ! Go
-    temp HEX: 7f [+] JMP
-    building get length :> end
-    ! Fix up the displacement above
-    cell alignment
-    [ end start - + building get dup pop* push ]
-    [ (align-code) ]
-    bi ;
-
 M: x86.32 pic-tail-reg EDX ;
 
 M: x86.32 reserved-stack-space 0 ;
