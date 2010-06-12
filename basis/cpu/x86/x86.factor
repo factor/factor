@@ -570,6 +570,20 @@ M:: x86 %compare-imm-branch ( label src1 src2 cc -- )
     src1 src2 (%compare-imm)
     label cc %branch ;
 
+M:: x86 %dispatch ( src temp -- )
+    ! Load jump table base.
+    temp HEX: ffffffff MOV
+    building get length :> start
+    0 rc-absolute-cell rel-here
+    ! Add jump table base
+    temp src HEX: 7f [++] JMP
+    building get length :> end
+    ! Fix up the displacement above
+    cell alignment
+    [ end start - + building get dup pop* push ]
+    [ (align-code) ]
+    bi ;
+
 M:: x86 %spill ( src rep dst -- )
     dst src rep %copy ;
 
