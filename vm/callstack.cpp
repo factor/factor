@@ -138,6 +138,11 @@ cell factor_vm::frame_scan(stack_frame *frame)
 	}
 }
 
+cell factor_vm::frame_offset(stack_frame *frame)
+{
+	return (cell)FRAME_RETURN_ADDRESS(frame,this) - (cell)frame_code(frame)->entry_point();
+}
+
 struct stack_frame_accumulator {
 	factor_vm *parent;
 	growable_array frames;
