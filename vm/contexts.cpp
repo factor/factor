@@ -75,7 +75,7 @@ void context::scrub_stacks(gc_info *info, cell index)
 		for(cell loc = 0; loc < info->scrub_r_count; loc++)
 		{
 			if(bitmap_p(bitmap,base + loc))
-				printf("scrub retainstack %ld\n",loc);
+				((cell *)retainstack)[-loc] = 0;
 		}
 	}
 }
