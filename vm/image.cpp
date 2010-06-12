@@ -180,8 +180,9 @@ struct startup_code_block_relocation_visitor {
 		case RT_HERE:
 			{
 				cell value = op.load_value(old_offset);
-				cell offset = value & (data_alignment - 1);
-				op.store_value((cell)fixup.fixup_code((code_block *)value) + offset);
+				cell offset = TAG(value);
+				code_block *compiled = (code_block *)UNTAG(value);
+				op.store_value((cell)fixup.fixup_code(compiled) + offset);
 				break;
 			}
 		case RT_UNTAGGED:
