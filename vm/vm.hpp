@@ -596,6 +596,7 @@ struct factor_vm
 	cell frame_executing_quot(stack_frame *frame);
 	stack_frame *frame_successor(stack_frame *frame);
 	cell frame_scan(stack_frame *frame);
+	cell frame_offset(stack_frame *frame);
 	void primitive_callstack_to_array();
 	stack_frame *innermost_stack_frame(callstack *stack);
 	void primitive_innermost_stack_frame_executing();

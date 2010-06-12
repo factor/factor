@@ -3,7 +3,7 @@
 namespace factor
 {
 
-int gc_info::return_address_index(u32 return_address)
+int gc_info::return_address_index(cell return_address)
 {
 	u32 *return_address_array = return_addresses();
 
