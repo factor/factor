@@ -252,6 +252,10 @@ IN: bootstrap.x86
 
 ! Contexts
 : jit-switch-context ( reg -- )
+    ! Dummy return address -- it never gets returned to but it
+    ! must point to inside the current code block
+    ESP -4 [+] HEX: ffffffff MOV rc-absolute-cell rt-this jit-rel
+
     ! Save ds, rs registers
     jit-load-vm
     jit-save-context

@@ -45,7 +45,7 @@ struct gc_info {
 			+ index * gc_root_count;
 	}
 
-	int return_address_index(u32 return_address);
+	int return_address_index(cell return_address);
 };
 
 }

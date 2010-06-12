@@ -210,7 +210,8 @@ struct call_frame_scrubber {
 		const code_block *compiled = parent->frame_code(frame);
 		gc_info *info = compiled->block_gc_info();
 
-		u32 return_address = (cell)FRAME_RETURN_ADDRESS(frame,parent) - (cell)compiled->entry_point();
+		cell return_address = parent->frame_offset(frame);
+		assert(return_address < compiled->size());
 		int index = info->return_address_index(return_address);
 
 		if(index != -1)
