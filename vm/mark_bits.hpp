@@ -40,7 +40,7 @@ template<typename Block> struct mark_bits {
 		forwarding = NULL;
 	}
 
-	cell block_line(Block *address)
+	cell block_line(const Block *address)
 	{
 		return (((cell)address - start) / data_alignment);
 	}
@@ -50,7 +50,7 @@ template<typename Block> struct mark_bits {
 		return (Block *)(line * data_alignment + start);
 	}
 
-	std::pair<cell,cell> bitmap_deref(Block *address)
+	std::pair<cell,cell> bitmap_deref(const Block *address)
 	{
 		cell line_number = block_line(address);
 		cell word_index = (line_number / mark_bits_granularity);
@@ -58,18 +58,18 @@ template<typename Block> struct mark_bits {
 		return std::make_pair(word_index,word_shift);
 	}
 
-	bool bitmap_elt(cell *bits, Block *address)
+	bool bitmap_elt(cell *bits, const Block *address)
 	{
 		std::pair<cell,cell> position = bitmap_deref(address);
 		return (bits[position.first] & ((cell)1 << position.second)) != 0;
 	}
 
-	Block *next_block_after(Block *block)
+	Block *next_block_after(const Block *block)
 	{
 		return (Block *)((cell)block + block->size());
 	}
 
-	void set_bitmap_range(cell *bits, Block *address)
+	void set_bitmap_range(cell *bits, const Block *address)
 	{
 		std::pair<cell,cell> start = bitmap_deref(address);
 		std::pair<cell,cell> end = bitmap_deref(next_block_after(address));
@@ -99,12 +99,12 @@ template<typename Block> struct mark_bits {
 		}
 	}
 
-	bool marked_p(Block *address)
+	bool marked_p(const Block *address)
 	{
 		return bitmap_elt(marked,address);
 	}
 
-	void set_marked_p(Block *address)
+	void set_marked_p(const Block *address)
 	{
 		set_bitmap_range(marked,address);
 	}
@@ -123,7 +123,7 @@ template<typename Block> struct mark_bits {
 
 	/* We have the popcount for every mark_bits_granularity entries; look
 	up and compute the rest */
-	Block *forward_block(Block *original)
+	Block *forward_block(const Block *original)
 	{
 #ifdef FACTOR_DEBUG
 		assert(marked_p(original));
@@ -141,7 +141,7 @@ template<typename Block> struct mark_bits {
 		return new_block;
 	}
 
-	Block *next_unmarked_block_after(Block *original)
+	Block *next_unmarked_block_after(const Block *original)
 	{
 		std::pair<cell,cell> position = bitmap_deref(original);
 		cell bit_index = position.second;
@@ -168,7 +168,7 @@ template<typename Block> struct mark_bits {
 		return (Block *)(this->start + this->size);
 	}
 
-	Block *next_marked_block_after(Block *original)
+	Block *next_marked_block_after(const Block *original)
 	{
 		std::pair<cell,cell> position = bitmap_deref(original);
 		cell bit_index = position.second;

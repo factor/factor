@@ -317,10 +317,11 @@ struct factor_vm
 	void collect_compact(bool trace_contexts_p);
 	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p);
 	void gc(gc_op op, cell requested_bytes, bool trace_contexts_p);
+	void scrub_context(context *ctx);
+	void scrub_contexts();
 	void primitive_minor_gc();
 	void primitive_full_gc();
 	void primitive_compact_gc();
-	void inline_gc(cell gc_roots);
 	void primitive_enable_gc_events();
 	void primitive_disable_gc_events();
 	object *allot_object(cell type, cell size);

@@ -1,10 +1,11 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays byte-arrays byte-vectors generic assocs hashtables
-io.binary kernel kernel.private math namespaces make sequences
-words quotations strings alien.accessors alien.strings layouts
-system combinators math.bitwise math.order combinators.smart
-accessors growable fry compiler.constants memoize ;
+USING: arrays bit-arrays byte-arrays byte-vectors generic assocs
+hashtables io.binary kernel kernel.private math namespaces make
+sequences words quotations strings alien.accessors alien.strings
+layouts system combinators math.bitwise math.order
+combinators.smart accessors growable fry compiler.constants
+memoize boxes ;
 IN: compiler.codegen.fixup
 
 ! Utilities
@@ -95,7 +96,7 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 : rel-decks-offset ( class -- )
     rt-decks-offset rel-fixup ;
 
-! And the rest
+! Labels
 : compute-target ( label-fixup -- offset )
     label>> offset>> [ "Unresolved label" throw ] unless* ;
 
@@ -112,13 +113,7 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
     [ [ compute-relative-label ] map concat ]
     bi* ;
 
-: init-fixup ( -- )
-    V{ } clone parameter-table set
-    V{ } clone literal-table set
-    V{ } clone label-table set
-    BV{ } clone relocation-table set
-    V{ } clone binary-literal-table set ;
-
+! Binary literals
 : alignment ( align -- n )
     [ compiled-offset dup ] dip align swap - ;
 
@@ -136,16 +131,102 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 : emit-binary-literals ( -- )
     binary-literal-table get [ emit-data ] assoc-each ;
 
+! GC info
+
+! Every code block either ends with
+!
+! uint 0
+!
+! or
+!
+! bitmap, byte aligned, three subsequences:
+! - <scrubbed data stack locations>
+! - <scrubbed retain stack locations>
+! - <GC root spill slots>
+! uint[] <return addresses>
+! uint <largest scrubbed data stack location>
+! uint <largest scrubbed retain stack location>
+! uint <largest GC root spill slot>
+! uint <number of return addresses>
+
+SYMBOLS: next-gc-map return-addresses gc-maps ;
+
+: gc-map? ( triple -- ? )
+    ! If there are no stack locations to scrub and no GC roots,
+    ! there's no point storing the GC map.
+    [ empty? not ] any? ;
+
+: gc-map-here ( -- )
+    next-gc-map get box> dup gc-map? [
+        gc-maps get push
+        compiled-offset return-addresses get push
+    ] [ drop ] if ;
+
+: set-next-gc-map ( gc-map -- ) next-gc-map get >box ;
+
+: integers>bits ( seq n -- bit-array )
+    <bit-array> [ '[ [ t ] dip _ set-nth ] each ] keep ;
+
+: emit-bitmap ( seqs -- n )
+    ! seqs is a sequence of sequences of integers 0..n-1
+    [ 0 ] [
+        dup [ [ 0 ] [ supremum 1 + ] if-empty ] [ max ] map-reduce
+        [ '[ _ integers>bits % ] each ] keep
+    ] if-empty ;
+
+: emit-uint ( n -- )
+    building get push-uint ;
+
+: gc-info ( -- byte-array )
+    [
+        return-addresses get empty? [ 0 emit-uint ] [
+            gc-maps get
+            [
+                [ [ first ] map emit-bitmap ]
+                [ [ second ] map emit-bitmap ]
+                [ [ third ] map emit-bitmap ] tri
+            ] ?{ } make underlying>> %
+            return-addresses get [ emit-uint ] each
+            [ emit-uint ] tri@
+            return-addresses get length emit-uint
+        ] if
+    ] B{ } make ;
+
+: emit-gc-info ( -- )
+    ! We want to place the GC info so that the end is aligned
+    ! on a 16-byte boundary.
+    gc-info [
+        length compiled-offset +
+        [ data-alignment get align ] keep -
+        (align-code)
+    ] [ % ] bi ;
+
+: init-fixup ( -- )
+    V{ } clone parameter-table set
+    V{ } clone literal-table set
+    V{ } clone label-table set
+    BV{ } clone relocation-table set
+    V{ } clone binary-literal-table set
+    V{ } clone return-addresses set
+    V{ } clone gc-maps set
+    <box> next-gc-map set ;
+
+: check-fixup ( seq -- )
+    length data-alignment get mod 0 assert=
+    next-gc-map get occupied>> f assert= ;
+
 : with-fixup ( quot -- code )
     '[
+        init-fixup
         [
-            init-fixup
             @
             emit-binary-literals
+            emit-gc-info
             label-table [ compute-labels ] change
             parameter-table get >array
             literal-table get >array
             relocation-table get >byte-array
             label-table get
         ] B{ } make
+        dup check-fixup
     ] output>array ; inline

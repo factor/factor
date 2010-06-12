@@ -142,8 +142,7 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 M: vreg-insn assign-registers-in-insn
     [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ;
 
-M: ##call-gc assign-registers-in-insn
-    dup call-next-method
+M: ##gc-map assign-registers-in-insn
     [ [ vreg>reg ] map ] change-gc-roots drop ;
 
 M: insn assign-registers-in-insn drop ;
