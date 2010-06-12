@@ -239,11 +239,6 @@ M:: x86.32 stack-cleanup ( stack-size return abi -- n )
 M: x86.32 %cleanup ( n -- )
     [ ESP swap SUB ] unless-zero ;
 
-M:: x86.32 %call-gc ( gc-roots -- )
-    4 save-vm-ptr
-    0 stack@ gc-roots gc-root-offsets %load-reference
-    "inline_gc" f %alien-invoke ;
-
 M: x86.32 dummy-stack-params? f ;
 
 M: x86.32 dummy-int-params? f ;

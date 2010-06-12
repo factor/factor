@@ -35,9 +35,6 @@ HOOK: reserved-stack-space cpu ( -- n )
 
 : spill@ ( n -- op ) spill-offset special-offset stack@ ;
 
-: gc-root-offsets ( seq -- seq' )
-    [ n>> spill-offset special-offset cell + ] map f like ;
-
 : decr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap SUB ] if ;
 
@@ -483,8 +480,18 @@ M:: x86 %check-nursery-branch ( label size cc temp1 temp2 -- )
         { cc/<= [ label JG ] }
     } case ;
 
+: gc-root-offsets ( seq -- seq' )
+    [ n>> spill-offset special-offset cell + cell /i ] map f like ;
+
+M: x86 %gc-map ( scrub-d scrub-r gc-roots -- )
+    gc-root-offsets 3array set-next-gc-map ;
+
+M: x86 %call-gc
+    \ minor-gc %call
+    gc-map-here ;
+
 M: x86 %alien-global ( dst symbol library -- )
-    [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;    
+    [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 

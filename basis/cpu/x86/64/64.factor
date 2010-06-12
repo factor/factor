@@ -154,11 +154,6 @@ M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
     func "libm" load-library %alien-invoke
     dst double-rep %load-return ;
 
-M:: x86.64 %call-gc ( gc-roots -- )
-    param-reg-0 gc-roots gc-root-offsets %load-reference
-    param-reg-1 %mov-vm-ptr
-    "inline_gc" f %alien-invoke ;
-
 M: x86.64 long-long-on-stack? f ;
 
 M: x86.64 float-on-stack? f ;

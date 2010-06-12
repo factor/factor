@@ -77,5 +77,5 @@ M: uninitialized-analysis join-sets ( sets analysis -- pair )
         first2
         [ [ <ds-loc> ] (uninitialized-locs) ]
         [ [ <rs-loc> ] (uninitialized-locs) ]
-        bi* append
+        bi* append f like
     ] when ;

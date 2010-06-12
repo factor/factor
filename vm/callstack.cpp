@@ -138,9 +138,6 @@ cell factor_vm::frame_scan(stack_frame *frame)
 	}
 }
 
-namespace
-{
-
 struct stack_frame_accumulator {
 	factor_vm *parent;
 	growable_array frames;
@@ -158,8 +155,6 @@ struct stack_frame_accumulator {
 		frames.add(scan.value());
 	}
 };
-
-}
 
 void factor_vm::primitive_callstack_to_array()
 {
