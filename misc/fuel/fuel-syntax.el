@@ -135,6 +135,9 @@
   (fuel-syntax--second-word-regex
    '("C-STRUCT:" "C-UNION:" "COM-INTERFACE:" "MIXIN:" "TUPLE:" "SINGLETON:" "SPECIALIZED-ARRAY:" "STRUCT:" "UNION:" "UNION-STRUCT:")))
 
+(defconst fuel-syntax--error-regex
+  (fuel-syntax--second-word-regex '("ERROR:")))
+
 (defconst fuel-syntax--tuple-decl-regex
   "^TUPLE: +\\([^ \n]+\\) +< +\\([^ \n]+\\)\\_>")
 
@@ -168,7 +171,8 @@
 
 (defconst fuel-syntax--indent-def-starts '("" ":"
                                            "AFTER" "BEFORE"
-                                           "ENUM" "COM-INTERFACE" "CONSULT"
+                                           "COM-INTERFACE" "CONSULT"
+                                           "ENUM" "ERROR"
                                            "FROM" "FUNCTION:" "FUNCTION-ALIAS:"
                                            "INTERSECTION:"
                                            "M" "M:" "MACRO" "MACRO:"
