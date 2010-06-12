@@ -133,9 +133,7 @@ CONSTANT: action-key-codes
     [ event-modifiers ] [ button>> ] [ event-loc ] tri ;
 
 : gadget-location ( gadget -- loc )
-    [ loc>> ] [
-        parent>> [ gadget-location ] [ { 0 0 } ] if*
-    ] bi v+ ;
+    [ loc>> ] [ parent>> [ gadget-location v+ ] when* ] bi ;
 
 : focusable-editor ( world -- editor/f )
     focusable-child dup editor? [ drop f ] unless ;
@@ -151,10 +149,9 @@ CONSTANT: action-key-codes
     ] [ drop ] if* ;
 
 : on-motion ( sender event user-data -- result )
-    drop swap [
-        [ GdkEventMotion memory>struct event-loc ] dip window
-        move-hand fire-motion
-    ] [ window update-im-cursor-location ] bi t ;
+    drop swap
+    [ GdkEventMotion memory>struct event-loc ] dip window
+    move-hand fire-motion t ;
 
 : on-enter ( sender event user-data -- result )
     on-motion ;
@@ -178,60 +175,33 @@ CONSTANT: action-key-codes
     drop swap [
         GdkEventScroll memory>struct
         [ scroll-direction ] [ event-loc ] bi
-    ] dip window
-    [ send-scroll ] [ update-im-cursor-location ] bi t ;
+    ] dip window send-scroll t ;
 
-: key-sym ( event -- sym action? )
-    keyval>> dup action-key-codes at
-    [ t ] [ gdk_keyval_to_unicode 1string f ] ?if ;
+: key-sym ( event -- sym/f action? )
+    keyval>> dup action-key-codes at [ t ]
+    [ gdk_keyval_to_unicode [ f ] [ 1string ] if-zero f ] ?if ;
 
-: key-event>gesture ( event -- modifiers sym action? )
+: key-event>gesture ( event -- mods sym/f action? )
+    GdkEventKey memory>struct
     [ event-modifiers ] [ key-sym ] bi ;
 
-: valid-input? ( string gesture -- ? )
-    over empty? [ 2drop f ] [
-        mods>> { f { S+ } } member? [
-            [ { [ 127 = not ] [ CHAR: \s >= ] } 1&& ] all?
-        ] [
-            [ { [ 127 = not ] [ CHAR: \s >= ] [ alpha? not ] } 1&& ] all?
-        ] if
-    ] if ;
+: handle-key-gesture ( key-gesture world -- )
+    [ propagate-key-gesture ]
+    [ update-im-cursor-location ] bi ;
+   
+: on-key-press ( sender event user-data -- result )
+    drop swap [ key-event>gesture <key-down> ] [ window ] bi*
+    handle-key-gesture t ;
 
-:: on-key-press ( sender event user-data -- result )
-    sender window :> world
-    world handle>> im-context>> :> im-context
-    im-context event gtk_im_context_filter_keypress
-    [
-        event GdkEventKey memory>struct :> ev
-        ev key-event>gesture <key-down> :> gesture
-        gesture world propagate-key-gesture
-        ev keyval>> gdk_keyval_to_unicode 1string dup
-        gesture valid-input?
-        [ world user-input ] [ drop ] if
-    ] unless
-    world update-im-cursor-location t ;
-
-:: on-key-release ( sender event user-data -- result )
-    sender window :> world
-    world handle>> im-context>> event gtk_im_context_filter_keypress
-    [
-        event GdkEventKey memory>struct
-        key-event>gesture <key-up>
-        world propagate-key-gesture
-    ] unless
-    world update-im-cursor-location t ;
+: on-key-release ( sender event user-data -- result )
+    drop swap [ key-event>gesture <key-up> ] [ window ] bi*
+    handle-key-gesture t ;
 
 : on-focus-in ( sender event user-data -- result )
-    2drop window [ focus-world ]
-    [ handle>> im-context>> gtk_im_context_focus_in ]
-    [ update-im-cursor-location ] tri
-    f ;
+    2drop window focus-world t ;
 
 : on-focus-out ( sender event user-data -- result )
-    2drop window [ unfocus-world ]
-    [ handle>> im-context>> gtk_im_context_focus_out ]
-    [ update-im-cursor-location ] tri
-    f ;
+    2drop window unfocus-world t ;
 
 : on-expose ( sender event user-data -- result )
     2drop window relayout t ;
@@ -328,40 +298,11 @@ M: gtk-ui-backend (with-ui)
         ] with-destructors
     ] ui-running ;
 
-: im-context>world ( im-context -- world )
-    ui:windows get-global
-    [ second handle>> im-context>> = ] with find nip second ;
-
-:: on-commit ( im-context string' user-data -- )
-    im-context im-context>world :> world
-    string' utf8 alien>string :> string
-    f string f <key-down> :> gesture
-    gesture world propagate-key-gesture
-    string world user-input
-    world update-im-cursor-location ;
-
-:: on-retrieve-surrounding ( im-context user-data -- ? )
-    im-context im-context>world focusable-editor
-    [| editor |
-        editor editor-caret first2 :> ( x y )
-        im-context
-        y editor editor-line utf8 string>alien
-        -1 x
-        gtk_im_context_set_surrounding t
-    ] [ f ] if* ;
-
-:: on-delete-surrounding ( im-context offset n user-data -- ? )
-    im-context im-context>world :> world
-    world focusable-editor [| editor |
-        editor editor-caret first2 :> ( x y )
-        x offset + y [ 2array ] [ [ n + ] dip 2array ] 2bi
-        editor remove-doc-range
-        world update-im-cursor-location
-        t
-    ] [ f ] if* ;
+: connect-signal-with-data ( object signal-name callback data -- )
+    [ utf8 string>alien ] 2dip f 0 g_signal_connect_data drop ;
 
 : connect-signal ( object signal-name callback -- )
-    [ utf8 string>alien ] dip f f 0 g_signal_connect_data drop ;
+    f connect-signal-with-data ;
 
 :: connect-signals ( win -- )
     win events-mask [ enum>number ] [ bitor ] map-reduce
@@ -394,19 +335,78 @@ M: gtk-ui-backend (with-ui)
     win "delete-event" [ on-delete yield ]
     GtkWidget:delete-event connect-signal ;
 
-: connect-im-signals ( im-context -- )
-    {
-        [
-            "commit" [ on-commit yield ]
-            GtkIMContext:commit connect-signal
-        ] [
-            "retrieve-surrounding" [ on-retrieve-surrounding yield ]
-            GtkIMContext:retrieve-surrounding connect-signal
-        ] [
-            "delete-surrounding" [ on-delete-surrounding yield ]
-            GtkIMContext:delete-surrounding connect-signal
-        ]
-    } cleave ;
+: on-retrieve-surrounding ( im-context user-data -- ? )
+    window focusable-editor [| im-context editor |
+        editor editor-caret first2 :> ( x y )
+        im-context
+        y editor editor-line utf8 string>alien
+        -1 x
+        gtk_im_context_set_surrounding t
+    ] [ drop f ] if* ;
+
+:: on-delete-surrounding ( im-context offset n user-data -- ? )
+    user-data window :> world
+    world focusable-editor [| editor |
+        editor editor-caret first2 :> ( x y )
+        x offset + y [ 2array ] [ [ n + ] dip 2array ] 2bi
+        editor remove-doc-range
+        world update-im-cursor-location
+        t
+    ] [ f ] if* ;
+
+: on-commit ( sender str user_data -- )
+    [ drop ] [ utf8 alien>string ] [ window ] tri*
+    [ user-input ]
+    [ [ f swap key-down boa ] dip handle-key-gesture ] 2bi ;
+
+! has to be called before the window signal handler
+: im-on-key-event ( sender event user-data -- result )
+    [ drop ] 2dip swap gtk_im_context_filter_keypress ;
+
+: im-on-focus-in ( sender event user-data -- result )
+    2drop window
+    [ handle>> im-context>> gtk_im_context_focus_in ]
+    [ update-im-cursor-location ] bi f ;
+
+: im-on-focus-out ( sender event user-data -- result )
+    2drop window
+    [ handle>> im-context>> gtk_im_context_focus_out ]
+    [ update-im-cursor-location ] bi f ;
+
+: im-on-motion ( sender event user-data -- result )
+    2drop window update-im-cursor-location f ;
+
+: im-on-destroy ( sender user-data -- result )
+    nip [ f gtk_im_context_set_client_window ]
+    [ g_object_unref ] bi f ;
+
+:: configure-im ( win im -- )
+    im win gtk_widget_get_window gtk_im_context_set_client_window
+    im f gtk_im_context_set_use_preedit
+    
+    im "commit" [ on-commit yield ]
+    GtkIMContext:commit win connect-signal-with-data
+    im "retrieve-surrounding" [ on-retrieve-surrounding yield ]
+    GtkIMContext:retrieve-surrounding win connect-signal-with-data
+    im "delete-surrounding" [ on-delete-surrounding yield ]
+    GtkIMContext:delete-surrounding win connect-signal-with-data
+
+    win "key-press-event" [ im-on-key-event yield ]
+    GtkWidget:key-press-event im connect-signal-with-data
+    win "key-release-event" [ im-on-key-event yield ]
+    GtkWidget:key-release-event im connect-signal-with-data
+    win "focus-in-event" [ im-on-focus-in yield ]
+    GtkWidget:focus-out-event im connect-signal-with-data
+    win "focus-out-event" [ im-on-focus-out yield ]
+    GtkWidget:focus-out-event im connect-signal-with-data
+    win "motion-notify-event" [ im-on-motion yield ]
+    GtkWidget:motion-notify-event connect-signal
+    win "enter-notify-event" [ im-on-motion yield ]
+    GtkWidget:enter-notify-event connect-signal
+    win "scroll-event" [ im-on-motion yield ]
+    GtkWidget:scroll-event connect-signal
+    win "destroy" [ im-on-destroy yield ]
+    GtkObject:destroy im connect-signal-with-data ;
 
 CONSTANT: window-controls>decor-flags
     H{
@@ -451,7 +451,7 @@ CONSTANT: window-controls>func-flags
         f t GDK_GL_RGBA_TYPE enum>number gtk_widget_set_gl_capability
     ] with-world-pixel-format ;
 
-: auto-position ( window loc -- )
+: auto-position ( win loc -- )
     dup { 0 0 } = [
         drop dup window topmost-window =
         GTK_WIN_POS_CENTER GTK_WIN_POS_NONE ?
@@ -460,11 +460,9 @@ CONSTANT: window-controls>func-flags
 
 M:: gtk-ui-backend (open-window) ( world -- )
     GTK_WINDOW_TOPLEVEL gtk_window_new :> win
-    gtk_im_multicontext_new :> im-context
-
-    im-context f gtk_im_context_set_use_preedit
+    gtk_im_multicontext_new :> im
     
-    win im-context <window-handle> world handle<<
+    win im <window-handle> world handle<<
 
     world win register-window
     
@@ -472,21 +470,17 @@ M:: gtk-ui-backend (open-window) ( world -- )
     [ dim>> first2 gtk_window_set_default_size ] 2bi
     
     world setup-gl drop
-    
-    win connect-signals
-    im-context connect-im-signals
-    
+
     win gtk_widget_realize
     win world window-controls>> configure-window-controls
-
-    im-context win gtk_widget_get_window
-    gtk_im_context_set_client_window
+    
+    win im configure-im
+    win connect-signals
 
     win gtk_widget_show_all ;
 
 M: gtk-ui-backend (close-window) ( handle -- )
-    [ im-context>> f gtk_im_context_set_client_window ]
-    [ window>> [ gtk_widget_destroy ] [ unregister-window ] bi ] bi
+    window>> [ gtk_widget_destroy ] [ unregister-window ] bi
     event-loop? [ gtk_main_quit ] unless ;
 
 M: gtk-ui-backend set-title
