@@ -1,6 +1,7 @@
 USING: namespaces byte-arrays make compiler.codegen.fixup
 bit-arrays accessors classes.struct tools.test kernel math
-sequences alien.c-types specialized-arrays boxes ;
+sequences alien.c-types specialized-arrays boxes
+compiler.cfg.instructions system cpu.architecture ;
 SPECIALIZED-ARRAY: uint
 IN: compiler.codegen.fixup.tests
 
@@ -10,19 +11,23 @@ STRUCT: gc-info
 { gc-root-count uint }
 { return-address-count uint } ;
 
+SINGLETON: fake-cpu
+
+fake-cpu \ cpu set
+
+M: fake-cpu gc-root-offsets ;
+
 [ ] [
     [
         init-fixup
 
         50 <byte-array> %
 
-        { { } { } { } } set-next-gc-map
-        gc-map-here
+        T{ gc-map f B{ } B{ } V{ } } gc-map-here
 
         50 <byte-array> %
 
-        { { 0 4 } { 1 } { 1 3 } } set-next-gc-map
-        gc-map-here
+        T{ gc-map f B{ 0 1 1 1 0 } B{ 1 0 } V{ 1 3 } } gc-map-here
 
         emit-gc-info
     ] B{ } make
