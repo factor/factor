@@ -43,6 +43,8 @@ template<typename TargetGeneration, typename Policy> struct gc_workhorse : no_fi
 
 	object *fixup_data(object *obj)
 	{
+		parent->check_data_pointer(obj);
+
 		if(!policy.should_copy_p(obj))
 		{
 			policy.visited_object(obj);
