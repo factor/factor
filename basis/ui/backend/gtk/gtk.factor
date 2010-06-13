@@ -466,7 +466,10 @@ M:: gtk-ui-backend system-alert ( caption text -- )
     [ gtk_widget_destroy ] tri ;
 
 M: gtk-clipboard clipboard-contents
-    handle>> gtk_clipboard_wait_for_text utf8 alien>string ;
+    [
+        handle>> gtk_clipboard_wait_for_text
+        [ &g_free utf8 alien>string ] [ f ] if*
+    ] with-destructors ;
 
 M: gtk-clipboard set-clipboard-contents
     swap [ handle>> ] [ utf8 string>alien ] bi*
