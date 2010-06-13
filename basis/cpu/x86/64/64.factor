@@ -81,21 +81,6 @@ M: x86.64 %mark-deck
     dup load-decks-offset
     [+] card-mark <byte> MOV ;
 
-M:: x86.64 %dispatch ( src temp -- )
-    ! Load jump table base.
-    temp HEX: ffffffff MOV
-    building get length :> start
-    0 rc-absolute-cell rel-here
-    ! Add jump table base
-    temp src ADD
-    temp HEX: 7f [+] JMP
-    building get length :> end
-    ! Fix up the displacement above
-    cell alignment
-    [ end start - + building get dup pop* push ]
-    [ (align-code) ]
-    bi ;
-
 M:: x86.64 %load-reg-param ( dst reg rep -- )
     dst reg rep %copy ;
 
@@ -153,11 +138,6 @@ M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
     1 src2 float-function-param
     func "libm" load-library %alien-invoke
     dst double-rep %load-return ;
-
-M:: x86.64 %call-gc ( gc-roots -- )
-    param-reg-0 gc-roots gc-root-offsets %load-reference
-    param-reg-1 %mov-vm-ptr
-    "inline_gc" f %alien-invoke ;
 
 M: x86.64 long-long-on-stack? f ;
 

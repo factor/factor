@@ -35,9 +35,6 @@ HOOK: reserved-stack-space cpu ( -- n )
 
 : spill@ ( n -- op ) spill-offset special-offset stack@ ;
 
-: gc-root-offsets ( seq -- seq' )
-    [ n>> spill-offset special-offset cell + ] map f like ;
-
 : decr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap SUB ] if ;
 
@@ -483,8 +480,18 @@ M:: x86 %check-nursery-branch ( label size cc temp1 temp2 -- )
         { cc/<= [ label JG ] }
     } case ;
 
+: gc-root-offsets ( seq -- seq' )
+    [ n>> spill-offset special-offset cell + cell /i ] map f like ;
+
+M: x86 %gc-map ( scrub-d scrub-r gc-roots -- )
+    gc-root-offsets 3array set-next-gc-map ;
+
+M: x86 %call-gc
+    \ minor-gc %call
+    gc-map-here ;
+
 M: x86 %alien-global ( dst symbol library -- )
-    [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;    
+    [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
@@ -562,6 +569,20 @@ M:: x86 %test-imm-branch ( label src1 src2 cc -- )
 M:: x86 %compare-imm-branch ( label src1 src2 cc -- )
     src1 src2 (%compare-imm)
     label cc %branch ;
+
+M:: x86 %dispatch ( src temp -- )
+    ! Load jump table base.
+    temp HEX: ffffffff MOV
+    building get length :> start
+    0 rc-absolute-cell rel-here
+    ! Add jump table base
+    temp src HEX: 7f [++] JMP
+    building get length :> end
+    ! Fix up the displacement above
+    cell alignment
+    [ end start - + building get dup pop* push ]
+    [ (align-code) ]
+    bi ;
 
 M:: x86 %spill ( src rep dst -- )
     dst src rep %copy ;

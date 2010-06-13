@@ -191,3 +191,16 @@ SPECIALIZED-ARRAY: struct-resize-test
         \ struct-resize-test-usage forget
     ] with-compilation-unit
 ] unit-test
+
+[ int-array{ 4 5 6 } ] [ 3 6 int-array{ 1 2 3 4 5 6 7 8 } direct-slice ] unit-test
+[ int-array{ 1 2 3 } ] [ int-array{ 1 2 3 4 5 6 7 8 } 3 direct-head ] unit-test
+[ int-array{ 1 2 3 4 5 } ] [ int-array{ 1 2 3 4 5 6 7 8 } 3 direct-head* ] unit-test
+[ int-array{ 4 5 6 7 8 } ] [ int-array{ 1 2 3 4 5 6 7 8 } 3 direct-tail ] unit-test
+[ int-array{ 6 7 8 } ] [ int-array{ 1 2 3 4 5 6 7 8 } 3 direct-tail* ] unit-test
+
+
+[ int-array{ 1 2 3 4 55555 6 7 8 } ] [
+    int-array{ 1 2 3 4 5 6 7 8 }
+    3 6 pick direct-slice [ 55555 1 ] dip set-nth
+] unit-test
+

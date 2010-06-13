@@ -55,6 +55,31 @@ void context::fix_stacks()
 		reset_retainstack();
 }
 
+void context::scrub_stacks(gc_info *info, cell index)
+{
+	u8 *bitmap = info->gc_info_bitmap();
+
+	{
+		cell base = info->scrub_d_base(index);
+
+		for(cell loc = 0; loc < info->scrub_d_count; loc++)
+		{
+			if(bitmap_p(bitmap,base + loc))
+				((cell *)datastack)[-loc] = 0;
+		}
+	}
+
+	{
+		cell base = info->scrub_r_base(index);
+
+		for(cell loc = 0; loc < info->scrub_r_count; loc++)
+		{
+			if(bitmap_p(bitmap,base + loc))
+				((cell *)retainstack)[-loc] = 0;
+		}
+	}
+}
+
 context::~context()
 {
 	delete datastack_seg;
