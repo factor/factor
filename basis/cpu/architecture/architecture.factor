@@ -225,6 +225,8 @@ M: object vm-stack-space 0 ;
 ! %store-memory work
 HOOK: complex-addressing? cpu ( -- ? )
 
+HOOK: gc-root-offsets cpu ( seq -- seq' )
+
 HOOK: %load-immediate cpu ( reg val -- )
 HOOK: %load-reference cpu ( reg obj -- )
 HOOK: %load-float cpu ( reg val -- )
@@ -488,8 +490,7 @@ HOOK: %write-barrier-imm cpu ( src slot tag temp1 temp2 -- )
 
 ! GC checks
 HOOK: %check-nursery-branch cpu ( label size cc temp1 temp2 -- )
-HOOK: %gc-map cpu ( scrub-d scrub-r gc-roots -- )
-HOOK: %call-gc cpu ( -- )
+HOOK: %call-gc cpu ( gc-map -- )
 
 HOOK: %prologue cpu ( n -- )
 HOOK: %epilogue cpu ( n -- )
@@ -595,11 +596,11 @@ HOOK: %local-allot cpu ( dst size align offset -- )
 ! Call a function to convert a value into a tagged pointer,
 ! possibly allocating a bignum, float, or alien instance,
 ! which is then pushed on the data stack
-HOOK: %box cpu ( dst src func rep -- )
+HOOK: %box cpu ( dst src func rep gc-map -- )
 
-HOOK: %box-long-long cpu ( dst src1 src2 func -- )
+HOOK: %box-long-long cpu ( dst src1 src2 func gc-map -- )
 
-HOOK: %allot-byte-array cpu ( dst size -- )
+HOOK: %allot-byte-array cpu ( dst size gc-map -- )
 
 HOOK: %restore-context cpu ( temp1 temp2 -- )
 
@@ -609,13 +610,13 @@ HOOK: %prepare-var-args cpu ( -- )
 
 M: object %prepare-var-args ;
 
-HOOK: %alien-invoke cpu ( function library -- )
+HOOK: %alien-invoke cpu ( function library gc-map -- )
 
 HOOK: %cleanup cpu ( n -- )
 
 M: object %cleanup ( n -- ) drop ;
 
-HOOK: %alien-indirect cpu ( src -- )
+HOOK: %alien-indirect cpu ( src gc-map -- )
 
 HOOK: %load-reg-param cpu ( dst reg rep -- )
 

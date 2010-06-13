@@ -4,8 +4,9 @@ USING: arrays bit-arrays byte-arrays byte-vectors generic assocs
 hashtables io.binary kernel kernel.private math namespaces make
 sequences words quotations strings alien.accessors alien.strings
 layouts system combinators math.bitwise math.order
-combinators.smart accessors growable fry compiler.constants
-memoize boxes ;
+combinators.short-circuit combinators.smart accessors growable
+fry memoize compiler.constants compiler.cfg.instructions
+cpu.architecture ;
 IN: compiler.codegen.fixup
 
 ! Utilities
@@ -149,30 +150,37 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 ! uint <largest GC root spill slot>
 ! uint <number of return addresses>
 
-SYMBOLS: next-gc-map return-addresses gc-maps ;
+SYMBOLS: return-addresses gc-maps ;
 
-: gc-map? ( triple -- ? )
+: gc-map-needed? ( gc-map -- ? )
     ! If there are no stack locations to scrub and no GC roots,
     ! there's no point storing the GC map.
-    [ empty? not ] any? ;
+    dup [
+        {
+            [ scrub-d>> empty? ]
+            [ scrub-r>> empty? ]
+            [ gc-roots>> empty? ]
+        } 1&& not
+    ] when ;
 
-: gc-map-here ( -- )
-    next-gc-map get box> dup gc-map? [
+: gc-map-here ( gc-map -- )
+    dup gc-map-needed? [
         gc-maps get push
         compiled-offset return-addresses get push
     ] [ drop ] if ;
 
-: set-next-gc-map ( gc-map -- ) next-gc-map get >box ;
+: emit-scrub ( seqs -- n )
+    ! seqs is a sequence of sequences of 0/1
+    dup [ length ] [ max ] map-reduce
+    [ '[ [ 0 = ] ?{ } map-as _ f pad-tail % ] each ] keep ;
 
 : integers>bits ( seq n -- bit-array )
     <bit-array> [ '[ [ t ] dip _ set-nth ] each ] keep ;
 
-: emit-bitmap ( seqs -- n )
+: emit-gc-roots ( seqs -- n )
     ! seqs is a sequence of sequences of integers 0..n-1
-    [ 0 ] [
-        dup [ [ 0 ] [ supremum 1 + ] if-empty ] [ max ] map-reduce
-        [ '[ _ integers>bits % ] each ] keep
-    ] if-empty ;
+    dup [ [ 0 ] [ supremum 1 + ] if-empty ] [ max ] map-reduce
+    [ '[ _ integers>bits % ] each ] keep ;
 
 : emit-uint ( n -- )
     building get push-uint ;
@@ -182,9 +190,9 @@ SYMBOLS: next-gc-map return-addresses gc-maps ;
         return-addresses get empty? [ 0 emit-uint ] [
             gc-maps get
             [
-                [ [ first ] map emit-bitmap ]
-                [ [ second ] map emit-bitmap ]
-                [ [ third ] map emit-bitmap ] tri
+                [ [ scrub-d>> ] map emit-scrub ]
+                [ [ scrub-r>> ] map emit-scrub ]
+                [ [ gc-roots>> gc-root-offsets ] map emit-gc-roots ] tri
             ] ?{ } make underlying>> %
             return-addresses get [ emit-uint ] each
             [ emit-uint ] tri@
@@ -208,12 +216,10 @@ SYMBOLS: next-gc-map return-addresses gc-maps ;
     BV{ } clone relocation-table set
     V{ } clone binary-literal-table set
     V{ } clone return-addresses set
-    V{ } clone gc-maps set
-    <box> next-gc-map set ;
+    V{ } clone gc-maps set ;
 
 : check-fixup ( seq -- )
-    length data-alignment get mod 0 assert=
-    next-gc-map get occupied>> f assert= ;
+    length data-alignment get mod 0 assert= ;
 
 : with-fixup ( quot -- code )
     '[

@@ -480,13 +480,10 @@ M:: x86 %check-nursery-branch ( label size cc temp1 temp2 -- )
         { cc/<= [ label JG ] }
     } case ;
 
-: gc-root-offsets ( seq -- seq' )
+M: x86 gc-root-offsets
     [ n>> spill-offset special-offset cell + cell /i ] map f like ;
 
-M: x86 %gc-map ( scrub-d scrub-r gc-roots -- )
-    gc-root-offsets 3array set-next-gc-map ;
-
-M: x86 %call-gc
+M: x86 %call-gc ( gc-map -- )
     \ minor-gc %call
     gc-map-here ;
 
@@ -612,8 +609,8 @@ M:: x86 %load-stack-param ( dst n rep -- )
 M:: x86 %local-allot ( dst size align offset -- )
     dst offset local-allot-offset special-offset stack@ LEA ;
 
-M: x86 %alien-indirect ( src -- )
-    ?spill-slot CALL ;
+M: x86 %alien-indirect ( src gc-map -- )
+    [ ?spill-slot CALL ] [ gc-map-here ] bi* ;
 
 M: x86 %loop-entry 16 alignment [ NOP ] times ;
 
