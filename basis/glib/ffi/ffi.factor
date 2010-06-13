@@ -72,6 +72,7 @@ IMPLEMENT-STRUCTS: GPollFD GSource GSourceFuncs ;
 GIR: vocab:glib/GLib-2.0.gir
 
 DESTRUCTOR: g_source_unref
+DESTRUCTOR: g_free
 
 CALLBACK: gboolean GSourceFuncsPrepareFunc ( GSource* source, gint* timeout_ ) ;
 CALLBACK: gboolean GSourceFuncsCheckFunc ( GSource* source ) ;
