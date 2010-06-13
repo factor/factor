@@ -819,8 +819,10 @@ INSN: ##check-nursery-branch
 literal: size cc
 temp: temp1/int-rep temp2/int-rep ;
 
-INSN: ##call-gc
-literal: gc-roots ;
+INSN: ##call-gc ;
+
+INSN: ##gc-map
+literal: scrub-d scrub-r gc-roots ;
 
 ! Spills and reloads, inserted by register allocator
 TUPLE: spill-slot { n integer } ;

@@ -23,8 +23,8 @@ template<typename Block> struct free_list_allocator {
 	cell largest_free_block();
 	cell free_block_count();
 	void sweep();
-	template<typename Iterator, typename Sizer> void compact(Iterator &iter, Sizer &sizer);
-	template<typename Iterator, typename Sizer> void iterate(Iterator &iter, Sizer &sizer);
+	template<typename Iterator, typename Fixup> void compact(Iterator &iter, Fixup fixup, const Block **finger);
+	template<typename Iterator, typename Fixup> void iterate(Iterator &iter, Fixup fixup);
 	template<typename Iterator> void iterate(Iterator &iter);
 };
 
@@ -155,14 +155,17 @@ template<typename Block, typename Iterator> struct heap_compactor {
 	mark_bits<Block> *state;
 	char *address;
 	Iterator &iter;
+	const Block **finger;
 
-	explicit heap_compactor(mark_bits<Block> *state_, Block *address_, Iterator &iter_) :
-		state(state_), address((char *)address_), iter(iter_) {}
+	explicit heap_compactor(mark_bits<Block> *state_, Block *address_, Iterator &iter_, const Block **finger_) :
+		state(state_), address((char *)address_), iter(iter_), finger(finger_) {}
 
 	void operator()(Block *block, cell size)
 	{
 		if(this->state->marked_p(block))
 		{
+			*finger = block;
+			memmove((Block *)address,block,size);
 			iter(block,(Block *)address,size);
 			address += size;
 		}
@@ -172,11 +175,11 @@ template<typename Block, typename Iterator> struct heap_compactor {
 /* The forwarding map must be computed first by calling
 state.compute_forwarding(). */
 template<typename Block>
-template<typename Iterator, typename Sizer>
-void free_list_allocator<Block>::compact(Iterator &iter, Sizer &sizer)
+template<typename Iterator, typename Fixup>
+void free_list_allocator<Block>::compact(Iterator &iter, Fixup fixup, const Block **finger)
 {
-	heap_compactor<Block,Iterator> compactor(&state,first_block(),iter);
-	iterate(compactor,sizer);
+	heap_compactor<Block,Iterator> compactor(&state,first_block(),iter,finger);
+	iterate(compactor,fixup);
 
 	/* Now update the free list; there will be a single free block at
 	the end */
@@ -185,34 +188,26 @@ void free_list_allocator<Block>::compact(Iterator &iter, Sizer &sizer)
 
 /* During compaction we have to be careful and measure object sizes differently */
 template<typename Block>
-template<typename Iterator, typename Sizer>
-void free_list_allocator<Block>::iterate(Iterator &iter, Sizer &sizer)
+template<typename Iterator, typename Fixup>
+void free_list_allocator<Block>::iterate(Iterator &iter, Fixup fixup)
 {
 	Block *scan = first_block();
 	Block *end = last_block();
 
 	while(scan != end)
 	{
-		cell size = sizer(scan);
+		cell size = fixup.size(scan);
 		Block *next = (Block *)((cell)scan + size);
 		if(!scan->free_p()) iter(scan,size);
 		scan = next;
 	}
 }
 
-template<typename Block> struct standard_sizer {
-	cell operator()(Block *block)
-	{
-		return block->size();
-	}
-};
-
 template<typename Block>
 template<typename Iterator>
 void free_list_allocator<Block>::iterate(Iterator &iter)
 {
-	standard_sizer<Block> sizer;
-	iterate(iter,sizer);
+	iterate(iter,no_fixup());
 }
 
 }

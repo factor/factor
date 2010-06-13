@@ -46,6 +46,7 @@ ifdef CONFIG
 		vm/free_list.o \
 		vm/full_collector.o \
 		vm/gc.o \
+		vm/gc_info.o \
 		vm/image.o \
 		vm/inline_cache.o \
 		vm/instruction_operands.o \

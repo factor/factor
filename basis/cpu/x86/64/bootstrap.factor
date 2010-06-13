@@ -228,6 +228,11 @@ IN: bootstrap.x86
 
 ! Contexts
 : jit-switch-context ( reg -- )
+    ! Dummy return address -- it never gets returned to but it
+    ! must point to inside the current code block
+    R11 0 [RIP+] LEA
+    RSP -8 [+] R11 MOV
+
     ! Save ds, rs registers
     jit-save-context
 
