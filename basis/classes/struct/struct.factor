@@ -10,6 +10,7 @@ slots slots.private specialized-arrays vectors words summary
 namespaces assocs vocabs.parser math.functions
 classes.struct.bit-accessors bit-arrays
 stack-checker.dependencies system layouts ;
+FROM: delegate.private => group-words slot-group-words ;
 QUALIFIED: math
 IN: classes.struct
 
@@ -37,6 +38,9 @@ SLOT: fields
 
 : struct-slots ( struct-class -- slots )
     "c-type" word-prop fields>> ;
+
+M: struct-class group-words
+    struct-slots slot-group-words ;
 
 ! struct allocation
 
@@ -227,17 +231,11 @@ M: struct-bit-slot-spec compute-slot-offset
 PRIVATE>
 
 M: struct byte-length class "struct-size" word-prop ; foldable
+M: struct binary-zero? binary-object <direct-uchar-array> [ 0 = ] all? ; inline
 
 ! class definition
 
 <PRIVATE
-GENERIC: binary-zero? ( value -- ? )
-
-M: object binary-zero? drop f ;
-M: f binary-zero? drop t ;
-M: number binary-zero? 0 = ;
-M: struct binary-zero? >c-ptr [ 0 = ] all? ;
-
 : struct-needs-prototype? ( class -- ? )
     struct-slots [ initial>> binary-zero? ] all? not ;
 

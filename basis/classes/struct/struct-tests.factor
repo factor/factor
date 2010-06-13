@@ -2,7 +2,7 @@
 USING: accessors alien alien.c-types alien.data alien.syntax ascii
 assocs byte-arrays classes.struct classes.tuple.parser
 classes.tuple.private classes.tuple combinators compiler.tree.debugger
-compiler.units destructors io.encodings.utf8 io.pathnames
+compiler.units delegate destructors io.encodings.utf8 io.pathnames
 io.streams.string kernel libc literals math mirrors namespaces
 prettyprint prettyprint.config see sequences specialized-arrays
 system tools.test parser lexer eval layouts generic.single classes
@@ -461,3 +461,17 @@ cpu ppc? [
     [ 12 ] [ ppc-align-test-2 heap-size ] unit-test
     [ 4 ] [ "x" ppc-align-test-2 offset-of ] unit-test
 ] when
+
+STRUCT: struct-test-delegate
+    { a int } ;
+STRUCT: struct-test-delegator
+    { del struct-test-delegate }
+    { b int } ;
+CONSULT: struct-test-delegate struct-test-delegator del>> ;
+
+[ S{ struct-test-delegator f S{ struct-test-delegate f 7 } 8 } ] [
+    struct-test-delegator <struct>
+        7 >>a
+        8 >>b
+] unit-test
+
