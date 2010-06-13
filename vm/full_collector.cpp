@@ -3,17 +3,9 @@
 namespace factor
 {
 
-inline static code_block_visitor<code_workhorse> make_code_visitor(factor_vm *parent)
-{
-	return code_block_visitor<code_workhorse>(parent,code_workhorse(parent));
-}
-
 full_collector::full_collector(factor_vm *parent_) :
-	collector<tenured_space,full_policy>(
-		parent_,
-		parent_->data->tenured,
-		full_policy(parent_)),
-	code_visitor(make_code_visitor(parent_)) {}
+	collector<tenured_space,full_policy>(parent_,parent_->data->tenured,full_policy(parent_)),
+	code_visitor(parent,workhorse) {}
 
 void full_collector::trace_code_block(code_block *compiled)
 {

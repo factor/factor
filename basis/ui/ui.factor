@@ -207,7 +207,7 @@ M: object close-window
     <flag> ui-notify-flag set-global
 ] "ui" add-startup-hook
 
-: with-ui ( quot -- )
+: with-ui ( quot: ( -- ) -- )
     ui-running? [ call( -- ) ] [ '[ init-ui @ ] (with-ui) ] if ;
 
 HOOK: beep ui-backend ( -- )
