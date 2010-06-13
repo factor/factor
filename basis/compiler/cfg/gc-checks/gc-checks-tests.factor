@@ -29,14 +29,6 @@ V{
 
 2 \ vreg-counter set-global
 
-[
-    V{
-        T{ ##load-tagged f 3 0 }
-        T{ ##replace f 3 D 0 }
-        T{ ##replace f 3 R 3 }
-    }
-] [ [ { D 0 R 3 } wipe-locs ] V{ } make ] unit-test
-
 : gc-check? ( bb -- ? )
     instructions>>
     {
@@ -50,15 +42,13 @@ V{
 
 [
     V{
-        T{ ##load-tagged f 5 0 }
-        T{ ##replace f 5 D 0 }
-        T{ ##replace f 5 R 3 }
-        T{ ##call-gc f { 0 1 2 } }
+        T{ ##gc-map f V{ 0 } V{ 3 } { 0 1 2 } }
+        T{ ##call-gc }
         T{ ##branch }
     }
 ]
 [
-    { D 0 R 3 } { 0 1 2 } <gc-call> instructions>>
+    V{ D 0 R 3 } { 0 1 2 } <gc-call> instructions>>
 ] unit-test
 
 30 \ vreg-counter set-global
@@ -156,11 +146,8 @@ H{
 
 [
     V{
-        T{ ##load-tagged f 31 0 }
-        T{ ##replace f 31 D 0 }
-        T{ ##replace f 31 D 1 }
-        T{ ##replace f 31 D 2 }
-        T{ ##call-gc f { 2 } }
+        T{ ##gc-map f V{ 0 1 2 } V{ } { 2 } }
+        T{ ##call-gc }
         T{ ##branch }
     }
 ] [ 2 get predecessors>> second instructions>> ] unit-test
