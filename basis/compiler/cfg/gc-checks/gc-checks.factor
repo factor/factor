@@ -9,10 +9,7 @@ compiler.cfg.registers
 compiler.cfg.utilities
 compiler.cfg.comparisons
 compiler.cfg.instructions
-compiler.cfg.predecessors
-compiler.cfg.liveness
-compiler.cfg.liveness.ssa
-compiler.cfg.stacks.uninitialized ;
+compiler.cfg.predecessors ;
 IN: compiler.cfg.gc-checks
 
 <PRIVATE
@@ -50,12 +47,9 @@ IN: compiler.cfg.gc-checks
         ] bi*
     ] V{ } make >>instructions ;
 
-: scrubbed ( uninitialized-locs -- scrub-d scrub-r )
-    [ ds-loc? ] partition [ [ n>> ] map ] bi@ ;
-
-: <gc-call> ( uninitialized-locs gc-roots -- bb )
-    [ <basic-block> ] 2dip
-    [ [ scrubbed ] dip ##gc-map ##call-gc ##branch ] V{ } make
+: <gc-call> ( -- bb )
+    <basic-block>
+    [ <gc-map> ##call-gc ##branch ] V{ } make
     >>instructions t >>unlikely? ;
 
 :: insert-guard ( body check bb -- )
@@ -69,7 +63,7 @@ IN: compiler.cfg.gc-checks
 
     check predecessors>> [ bb check update-successors ] each ;
 
-: (insert-gc-check) ( uninitialized-locs gc-roots phis size bb -- )
+: (insert-gc-check) ( phis size bb -- )
     [ [ <gc-call> ] 2dip <gc-check> ] dip insert-guard ;
 
 GENERIC: allocation-size* ( insn -- n )
@@ -85,35 +79,17 @@ M: ##box-displaced-alien allocation-size* drop 5 cells ;
     [ ##allocation? ] filter
     [ allocation-size* data-alignment get align ] map-sum ;
 
-: gc-live-in ( bb -- vregs )
-    [ live-in keys ] [ instructions>> [ ##phi? ] filter [ dst>> ] map ] bi
-    append ;
-
-: live-tagged ( bb -- vregs )
-    gc-live-in [ rep-of tagged-rep? ] filter ;
-
 : remove-phis ( bb -- phis )
     [ [ ##phi? ] partition ] change-instructions drop ;
 
 : insert-gc-check ( bb -- )
-    {
-        [ uninitialized-locs ]
-        [ live-tagged ]
-        [ remove-phis ]
-        [ allocation-size ]
-        [ ]
-    } cleave
-    (insert-gc-check) ;
+    [ remove-phis ] [ allocation-size ] [ ] tri (insert-gc-check) ;
 
 PRIVATE>
 
 : insert-gc-checks ( cfg -- cfg' )
     dup blocks-with-gc [
-        [
-            needs-predecessors
-            dup compute-ssa-live-sets
-            dup compute-uninitialized-sets
-        ] dip
+        [ needs-predecessors ] dip
         [ insert-gc-check ] each
         cfg-changed
     ] unless-empty ;
