@@ -38,7 +38,7 @@ TYPEDEF: _GDBM_FILE* GDBM_FILE
 
 CALLBACK: void fatal_func_cb ;
 FUNCTION: GDBM_FILE gdbm_open ( c-string name, int block_size, int read_write, int mode, fatal_func_cb fatal_func ) ;
-FUNCTION: void gdbm_close ( GDBM_FILE dbf ) ;
+FUNCTION-ALIAS: gdbm-close void gdbm_close ( GDBM_FILE dbf ) ;
 FUNCTION: int gdbm_store ( GDBM_FILE dbf, datum key, datum content, int flag ) ;
 FUNCTION: datum gdbm_fetch ( GDBM_FILE dbf, datum key ) ;
 FUNCTION: int gdbm_delete ( GDBM_FILE dbf, datum key ) ;
@@ -74,3 +74,5 @@ CONSTANT: GDBM_OPT_ILLEGAL            20
 
 TYPEDEF: int gdbm_error
 C-GLOBAL: gdbm_error gdbm_errno
+
+FUNCTION: c-string gdbm_strerror ( gdbm_error errno ) ;
