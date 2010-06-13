@@ -3,15 +3,17 @@ namespace factor
 
 struct must_start_gc_again {};
 
-template<typename TargetGeneration, typename Policy> struct data_workhorse {
+template<typename TargetGeneration, typename Policy> struct gc_workhorse : no_fixup {
 	factor_vm *parent;
 	TargetGeneration *target;
 	Policy policy;
+	code_heap *code;
 
-	explicit data_workhorse(factor_vm *parent_, TargetGeneration *target_, Policy policy_) :
+	explicit gc_workhorse(factor_vm *parent_, TargetGeneration *target_, Policy policy_) :
 		parent(parent_),
 		target(target_),
-		policy(policy_) {}
+		policy(policy_),
+		code(parent->code) {}
 
 	object *resolve_forwarding(object *untagged)
 	{
@@ -39,7 +41,7 @@ template<typename TargetGeneration, typename Policy> struct data_workhorse {
 		return newpointer;
 	}
 
-	object *operator()(object *obj)
+	object *fixup_data(object *obj)
 	{
 		if(!policy.should_copy_p(obj))
 		{
@@ -59,17 +61,18 @@ template<typename TargetGeneration, typename Policy> struct data_workhorse {
 			return forwarding;
 		}
 	}
-};
 
-template<typename TargetGeneration, typename Policy>
-inline static slot_visitor<data_workhorse<TargetGeneration,Policy> > make_data_visitor(
-	factor_vm *parent,
-	TargetGeneration *target,
-	Policy policy)
-{
-	return slot_visitor<data_workhorse<TargetGeneration,Policy> >(parent,
-		data_workhorse<TargetGeneration,Policy>(parent,target,policy));
-}
+	code_block *fixup_code(code_block *compiled)
+	{
+		if(!code->marked_p(compiled))
+		{
+			code->set_marked_p(compiled);
+			parent->mark_stack.push_back((cell)compiled + 1);
+		}
+
+		return compiled;
+	}
+};
 
 struct dummy_unmarker {
 	void operator()(card *ptr) {}
@@ -92,7 +95,8 @@ struct collector {
 	data_heap *data;
 	code_heap *code;
 	TargetGeneration *target;
-	slot_visitor<data_workhorse<TargetGeneration,Policy> > data_visitor;
+	gc_workhorse<TargetGeneration,Policy> workhorse;
+	slot_visitor<gc_workhorse<TargetGeneration,Policy> > data_visitor;
 	cell cards_scanned;
 	cell decks_scanned;
 	cell code_blocks_scanned;
@@ -102,7 +106,8 @@ struct collector {
 		data(parent_->data),
 		code(parent_->code),
 		target(target_),
-		data_visitor(make_data_visitor(parent_,target_,policy_)),
+		workhorse(parent,target,policy_),
+		data_visitor(parent,workhorse),
 		cards_scanned(0),
 		decks_scanned(0),
 		code_blocks_scanned(0) {}

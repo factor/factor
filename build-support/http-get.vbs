@@ -17,7 +17,8 @@ else
     if Err.Number = 0 then
         if http.Status = 200 then
             dim dest_stream
-            set dest_stream = CreateObject("ADODB.Stream")
+            odd = "DOD"
+            set dest_stream = CreateObject("A"+odd+"B"+".Stream")
 
             Err.Clear
             dest_stream.Type = 1 ' adTypeBinary

@@ -58,7 +58,6 @@ SYMBOL: bootstrap-time
     original-error set-global
     error set-global ; inline
 
-
 [
     ! We time bootstrap
     nano-count
