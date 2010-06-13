@@ -296,6 +296,9 @@ struct call_frame_slot_visitor {
 		if(index == -1)
 			return;
 
+#ifdef DEBUG_GC_MAPS
+		std::cout << "call frame code block " << compiled << " with offset " << return_address << std::endl;
+#endif
 		u8 *bitmap = info->gc_info_bitmap();
 		cell base = info->spill_slot_base(index);
 		cell *stack_pointer = (cell *)(parent->frame_successor(frame) + 1);
@@ -303,7 +306,12 @@ struct call_frame_slot_visitor {
 		for(cell spill_slot = 0; spill_slot < info->gc_root_count; spill_slot++)
 		{
 			if(bitmap_p(bitmap,base + spill_slot))
+			{
+#ifdef DEBUG_GC_MAPS
+				std::cout << "visiting spill slot " << spill_slot << std::endl;
+#endif
 				visitor->visit_handle(&stack_pointer[spill_slot]);
+			}
 		}
 	}
 };
