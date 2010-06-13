@@ -1,4 +1,4 @@
-! Copyright (C) 2010 Anton Gorenko.
+! Copyright (C) 2010 Anton Gorenko, Philipp Brüschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
 alien.enums alien.strings arrays ascii assocs classes.struct
