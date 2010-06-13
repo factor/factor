@@ -5,11 +5,11 @@ kernel math unix unix.time unix.types namespaces system
 accessors classes.struct ;
 IN: calendar.unix
 
-: timeval>seconds ( timeval -- seconds )
+: timeval>duration ( timeval -- duration )
     [ sec>> seconds ] [ usec>> microseconds ] bi time+ ;
 
 : timeval>unix-time ( timeval -- timestamp )
-    timeval>seconds since-1970 ;
+    timeval>duration since-1970 ;
 
 : timespec>seconds ( timespec -- seconds )
     [ sec>> seconds ] [ nsec>> nanoseconds ] bi time+ ;
