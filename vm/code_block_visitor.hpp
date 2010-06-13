@@ -42,13 +42,10 @@ struct call_frame_code_block_visitor {
 
 	void operator()(stack_frame *frame)
 	{
-		code_block *old_block = parent->frame_code(frame);
-		cell offset = (char *)FRAME_RETURN_ADDRESS(frame,parent) - (char *)old_block;
-
-		const code_block *new_block = fixup.fixup_code(old_block);
-		frame->entry_point = new_block->entry_point();
-
-		FRAME_RETURN_ADDRESS(frame,parent) = (char *)new_block + offset;
+		cell offset = parent->frame_offset(frame);
+		code_block *compiled = fixup.fixup_code(parent->frame_code(frame));
+		frame->entry_point = compiled->entry_point();
+		parent->set_frame_offset(frame,offset);
 	}
 };
 

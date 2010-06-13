@@ -63,6 +63,9 @@ IN: bootstrap.x86
     ds-reg ctx-reg context-datastack-offset [+] MOV
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
+: jit-scrub-return ( n -- )
+    ESP swap [+] 0 MOV ;
+
 [
     ! ctx-reg is preserved across the call because it is non-volatile
     ! in the C ABI
@@ -130,6 +133,7 @@ IN: bootstrap.x86
 
     ! Unwind stack frames
     ESP EDX MOV
+    0 jit-scrub-return
 
     jit-jump-quot
 ] \ unwind-native-frames define-sub-primitive
@@ -252,9 +256,7 @@ IN: bootstrap.x86
 
 ! Contexts
 : jit-switch-context ( reg -- )
-    ! Dummy return address -- it never gets returned to but it
-    ! must point to inside the current code block
-    ESP -4 [+] HEX: ffffffff MOV rc-absolute-cell rt-this jit-rel
+    -4 jit-scrub-return
 
     ! Save ds, rs registers
     jit-load-vm
