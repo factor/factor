@@ -1,25 +1,40 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors assocs sequences sets
 compiler.cfg.def-use compiler.cfg.dataflow-analysis
-compiler.cfg.instructions ;
+compiler.cfg.instructions compiler.cfg.registers
+cpu.architecture ;
 IN: compiler.cfg.liveness
 
 ! See http://en.wikipedia.org/wiki/Liveness_analysis
-! Do not run after SSA construction
+! Do not run after SSA construction; compiler.cfg.liveness.ssa
+! should be used instead. The transfer-liveness word is used
+! by SSA liveness too, so it handles ##phi instructions.
 
 BACKWARD-ANALYSIS: live
 
-GENERIC: insn-liveness ( live-set insn -- )
+GENERIC: visit-insn ( live-set insn -- live-set )
 
 : kill-defs ( live-set insn -- live-set )
-    defs-vreg [ over delete-at ] when* ;
+    defs-vreg [ over delete-at ] when* ; inline
 
 : gen-uses ( live-set insn -- live-set )
-    dup ##phi? [ drop ] [ uses-vregs [ over conjoin ] each ] if ;
+    uses-vregs [ over conjoin ] each ; inline
+
+M: vreg-insn visit-insn [ kill-defs ] [ gen-uses ] bi ;
+
+: fill-gc-map ( live-set insn -- live-set )
+    gc-map>> over keys [ rep-of tagged-rep? ] filter >>gc-roots drop ;
+
+M: gc-map-insn visit-insn
+    [ kill-defs ] [ fill-gc-map ] [ gen-uses ] tri ;
+
+M: ##phi visit-insn kill-defs ;
+
+M: insn visit-insn drop ;
 
 : transfer-liveness ( live-set instructions -- live-set' )
-    [ clone ] [ <reversed> ] bi* [ [ kill-defs ] [ gen-uses ] bi ] each ;
+    [ clone ] [ <reversed> ] bi* [ visit-insn ] each ;
 
 : local-live-in ( instructions -- live-set )
     [ H{ } ] dip transfer-liveness keys ;

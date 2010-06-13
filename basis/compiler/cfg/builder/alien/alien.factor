@@ -102,7 +102,7 @@ M: #alien-invoke emit-node
     [
         {
             [ caller-parameters ]
-            [ ##prepare-var-args alien-invoke-dlsym ##alien-invoke ]
+            [ ##prepare-var-args alien-invoke-dlsym <gc-map> ##alien-invoke ]
             [ emit-stack-frame ]
             [ box-return* ]
         } cleave
@@ -111,7 +111,7 @@ M: #alien-invoke emit-node
 M:: #alien-indirect emit-node ( node -- )
     node [
         D 0 ^^peek -1 ##inc-d ^^unbox-any-c-ptr :> src
-        [ caller-parameters src ##alien-indirect ]
+        [ caller-parameters src <gc-map> ##alien-indirect ]
         [ emit-stack-frame ]
         [ box-return* ]
         tri

@@ -65,7 +65,12 @@ void context::scrub_stacks(gc_info *info, cell index)
 		for(cell loc = 0; loc < info->scrub_d_count; loc++)
 		{
 			if(bitmap_p(bitmap,base + loc))
+			{
+#ifdef DEBUG_GC_MAPS
+				std::cout << "scrubbing datastack location " << loc << std::endl;
+#endif
 				((cell *)datastack)[-loc] = 0;
+			}
 		}
 	}
 
@@ -75,7 +80,12 @@ void context::scrub_stacks(gc_info *info, cell index)
 		for(cell loc = 0; loc < info->scrub_r_count; loc++)
 		{
 			if(bitmap_p(bitmap,base + loc))
+			{
+#ifdef DEBUG_GC_MAPS
+				std::cout << "scrubbing retainstack location " << loc << std::endl;
+#endif
 				((cell *)retainstack)[-loc] = 0;
+			}
 		}
 	}
 }
