@@ -6,9 +6,8 @@
 ! Adapted from cairo.h, version 1.5.14
 ! License: http://factorcode.org/license.txt
 
-USING: system combinators alien alien.syntax alien.c-types
-alien.destructors kernel accessors sequences arrays ui.gadgets
-alien.libraries classes.struct ;
+USING: alien alien.c-types alien.destructors alien.libraries
+alien.syntax classes.struct combinators kernel system ;
 
 IN: cairo.ffi
 << {
