@@ -5,6 +5,33 @@ classes.struct combinators destructors gdbm.ffi io.backend kernel libc
 literals math namespaces sequences serialize strings ;
 IN: gdbm
 
+TUPLE: gdbm
+    { name       string  }
+    { block-size integer }
+    { flags      integer initial: $ GDBM_WRCREAT }
+    { mode       integer initial: OCT: 644 } ;
+
+ERROR: gdbm-error errno msg ;
+
+
+<PRIVATE
+
+: gdbm-throw ( -- * ) gdbm_errno dup gdbm_strerror gdbm-error ;
+
+: check-error ( ret -- ) 0 = [ gdbm-throw ] unless ;
+
+SYMBOL: current-dbf
+
+: dbf ( -- dbf ) current-dbf get ;
+
+: gdbm-open ( gdbm -- dbf )
+    {
+        [ name>> normalize-path ]
+        [ block-size>> ] [ flags>> ] [ mode>> ]
+    } cleave f gdbm_open [ gdbm-throw ] unless* ;
+
+DESTRUCTOR: gdbm-close
+
 : object>datum ( obj -- datum )
     object>bytes [ malloc-byte-array &free ] [ length ] bi
     datum <struct-boa> ;
@@ -13,60 +40,36 @@ IN: gdbm
     [ dptr>> ] [ dsize>> ] bi over
     [ memory>byte-array bytes>object t ] [ drop f ] if ;
 
-SYMBOL: current-dbf
-
-: dbf ( -- dbf ) current-dbf get ;
-
-TUPLE: gdbm
-    { name       string  }
-    { block-size integer }
-    { flags      integer initial: $ GDBM_WRCREAT }
-    { mode       integer initial: OCT: 644 } ;
-
-DESTRUCTOR: gdbm-close
-
-ERROR: gdbm-error errno msg ;
-
-: gdbm-throw ( -- * ) gdbm_errno dup gdbm_strerror gdbm-error ;
-
-: check-error ( ret -- ) 0 = [ gdbm-throw ] unless ;
-
-: gdbm-open ( gdbm -- dbf )
-    {
-        [ name>> normalize-path ]
-        [ block-size>> ] [ flags>> ] [ mode>> ]
-    } cleave f gdbm_open [ gdbm-throw ] unless* ;
-
 : gdbm-store ( key content flag -- )
     [
         { [ dbf ] [ object>datum ] [ object>datum ] [ ] } spread
         gdbm_store check-error
     ] with-destructors ;
 
+PRIVATE>
+
+
 : gdbm-replace ( key content -- ) GDBM_REPLACE gdbm-store ;
-
 : gdbm-insert ( key content -- ) GDBM_INSERT gdbm-store ;
-
-: gdbm-fetch* ( key -- content ? )
-    [ dbf swap object>datum gdbm_fetch datum>object* ]
-    with-destructors ;
-
-: gdbm-fetch ( key -- content/f ) gdbm-fetch* drop ;
 
 : gdbm-delete ( key -- )
     [ dbf swap object>datum gdbm_delete check-error ]
     with-destructors ;
 
-: gdbm-firstkey* ( -- key ? )
+: gdbm-fetch* ( key -- content ? )
+    [ dbf swap object>datum gdbm_fetch datum>object* ]
+    with-destructors ;
+
+: gdbm-first-key* ( -- key ? )
     [ dbf gdbm_firstkey datum>object* ] with-destructors ;
 
-: gdbm-firstkey ( -- key/f ) gdbm-firstkey* drop ;
-
-: gdbm-nextkey* ( key -- key ? )
+: gdbm-next-key* ( key -- key ? )
     [ dbf swap object>datum gdbm_nextkey datum>object* ]
     with-destructors ;
 
-: gdbm-nextkey ( key -- key/f ) gdbm-nextkey* drop ;
+: gdbm-fetch ( key -- content/f ) gdbm-fetch* drop ;
+: gdbm-first-key ( -- key/f ) gdbm-first-key* drop ;
+: gdbm-next-key ( key -- key/f ) gdbm-next-key* drop ;
 
 : gdbm-reorganize ( -- ) dbf gdbm_reorganize check-error ;
 
