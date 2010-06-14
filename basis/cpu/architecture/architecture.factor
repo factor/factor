@@ -488,7 +488,8 @@ HOOK: %write-barrier-imm cpu ( src slot tag temp1 temp2 -- )
 
 ! GC checks
 HOOK: %check-nursery-branch cpu ( label size cc temp1 temp2 -- )
-HOOK: %call-gc cpu ( gc-roots -- )
+HOOK: %gc-map cpu ( scrub-d scrub-r gc-roots -- )
+HOOK: %call-gc cpu ( -- )
 
 HOOK: %prologue cpu ( n -- )
 HOOK: %epilogue cpu ( n -- )

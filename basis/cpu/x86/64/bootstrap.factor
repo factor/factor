@@ -61,6 +61,9 @@ IN: bootstrap.x86
     ds-reg ctx-reg context-datastack-offset [+] MOV
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
+: jit-scrub-return ( n -- )
+    RSP swap [+] 0 MOV ;
+
 [
     ! ctx-reg is preserved across the call because it is non-volatile
     ! in the C ABI
@@ -111,6 +114,7 @@ IN: bootstrap.x86
 
     ! Unwind stack frames
     RSP arg2 MOV
+    0 jit-scrub-return
 
     ! Load VM pointer into vm-reg, since we're entering from
     ! C code
@@ -228,6 +232,8 @@ IN: bootstrap.x86
 
 ! Contexts
 : jit-switch-context ( reg -- )
+    -8 jit-scrub-return
+
     ! Save ds, rs registers
     jit-save-context
 

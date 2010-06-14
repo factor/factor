@@ -194,8 +194,54 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 	current_gc = NULL;
 }
 
+/* primitive_minor_gc() is invoked by inline GC checks, and it needs to fill in
+uninitialized stack locations before actually calling the GC. See the comment
+in compiler.cfg.stacks.uninitialized for details. */
+
+struct call_frame_scrubber {
+	factor_vm *parent;
+	context *ctx;
+
+	explicit call_frame_scrubber(factor_vm *parent_, context *ctx_) :
+		parent(parent_), ctx(ctx_) {}
+
+	void operator()(stack_frame *frame)
+	{
+		cell return_address = parent->frame_offset(frame);
+		if(return_address == (cell)-1)
+			return;
+
+		code_block *compiled = parent->frame_code(frame);
+		gc_info *info = compiled->block_gc_info();
+
+		assert(return_address < compiled->size());
+		int index = info->return_address_index(return_address);
+		if(index != -1)
+			ctx->scrub_stacks(info,index);
+	}
+};
+
+void factor_vm::scrub_context(context *ctx)
+{
+	call_frame_scrubber scrubber(this,ctx);
+	iterate_callstack(ctx,scrubber);
+}
+
+void factor_vm::scrub_contexts()
+{
+	std::set<context *>::const_iterator begin = active_contexts.begin();
+	std::set<context *>::const_iterator end = active_contexts.end();
+	while(begin != end)
+	{
+		scrub_context(*begin);
+		begin++;
+	}
+}
+
 void factor_vm::primitive_minor_gc()
 {
+	scrub_contexts();
+
 	gc(collect_nursery_op,
 		0, /* requested size */
 		true /* trace contexts? */);
@@ -213,36 +259,6 @@ void factor_vm::primitive_compact_gc()
 	gc(collect_compact_op,
 		0, /* requested size */
 		true /* trace contexts? */);
-}
-
-void factor_vm::inline_gc(cell gc_roots_)
-{
-	cell stack_pointer = (cell)ctx->callstack_top;
-
-	if(to_boolean(gc_roots_))
-	{
-		tagged<array> gc_roots(gc_roots_);
-
-		cell capacity = array_capacity(gc_roots.untagged());
-		for(cell i = 0; i < capacity; i++)
-		{
-			cell spill_slot = untag_fixnum(array_nth(gc_roots.untagged(),i));
-			cell *address = (cell *)(spill_slot + stack_pointer);
-			data_roots.push_back(data_root_range(address,1));
-		}
-
-		primitive_minor_gc();
-
-		for(cell i = 0; i < capacity; i++)
-			data_roots.pop_back();
-	}
-	else
-		primitive_minor_gc();
-}
-
-VM_C_API void inline_gc(cell gc_roots, factor_vm *parent)
-{
-	parent->inline_gc(gc_roots);
 }
 
 /*

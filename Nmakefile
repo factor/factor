@@ -48,6 +48,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\free_list.obj \
 	vm\full_collector.obj \
 	vm\gc.obj \
+	vm/gc_info.obj \
 	vm\image.obj \
 	vm\inline_cache.obj \
 	vm\instruction_operands.obj \
