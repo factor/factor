@@ -50,16 +50,12 @@ IN: compiler.cfg.gc-checks
         ] bi*
     ] V{ } make >>instructions ;
 
-: wipe-locs ( uninitialized-locs -- )
-    '[
-        int-rep next-vreg-rep
-        [ 0 ##load-tagged ]
-        [ '[ [ _ ] dip ##replace ] each ] bi
-    ] unless-empty ;
+: scrubbed ( uninitialized-locs -- scrub-d scrub-r )
+    [ ds-loc? ] partition [ [ n>> ] map ] bi@ ;
 
 : <gc-call> ( uninitialized-locs gc-roots -- bb )
     [ <basic-block> ] 2dip
-    [ [ wipe-locs ] [ ##call-gc ] bi* ##branch ] V{ } make
+    [ [ scrubbed ] dip ##gc-map ##call-gc ##branch ] V{ } make
     >>instructions t >>unlikely? ;
 
 :: insert-guard ( body check bb -- )
