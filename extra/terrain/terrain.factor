@@ -229,9 +229,9 @@ M: terrain-world tick-game-world
     GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP_TO_EDGE glTexParameteri ;
 
 : sky-gradient ( world -- t )
-    game-loop>> tick-number>> SKY-PERIOD mod SKY-PERIOD /f ;
+    game-loop>> tick#>> SKY-PERIOD mod SKY-PERIOD /f ;
 : sky-theta ( world -- theta )
-    game-loop>> tick-number>> SKY-SPEED * ;
+    game-loop>> tick#>> SKY-SPEED * ;
 
 M: terrain-world begin-game-world
     "2.0" { "GL_ARB_vertex_buffer_object" "GL_ARB_shader_objects" }

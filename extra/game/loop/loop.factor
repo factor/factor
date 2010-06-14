@@ -1,6 +1,9 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alarms calendar continuations destructors fry
-kernel math math.order namespaces system ui ui.gadgets.worlds ;
+USING: accessors timers alien.c-types calendar classes.struct
+continuations destructors fry kernel math math.order memory
+namespaces sequences specialized-vectors system
+tools.memory ui ui.gadgets.worlds vm vocabs.loader arrays
+benchmark.struct ;
 IN: game.loop
 
 TUPLE: game-loop
@@ -9,12 +12,23 @@ TUPLE: game-loop
     draw-delegate
     { last-tick integer }
     { running? boolean }
-    { tick-number integer }
-    { frame-number integer }
-    { benchmark-time integer }
-    { benchmark-tick-number integer }
-    { benchmark-frame-number integer }
-    alarm ;
+    { tick# integer }
+    { frame# integer }
+    timer
+    benchmark-data ;
+
+STRUCT: game-loop-benchmark
+    { benchmark-data-pair benchmark-data-pair }
+    { tick# ulonglong }
+    { frame# ulonglong } ;
+
+SPECIALIZED-VECTOR: game-loop-benchmark
+
+: <game-loop-benchmark> ( benchmark-data-pair tick frame -- obj )
+    \ game-loop-benchmark <struct>
+        swap >>frame#
+        swap >>tick#
+        swap >>benchmark-data-pair ; inline
 
 GENERIC: tick* ( delegate -- )
 GENERIC: draw* ( tick-slice delegate -- )
@@ -44,16 +58,25 @@ TUPLE: game-loop-error game-loop error ;
 
 <PRIVATE
 
+: record-benchmarking ( benchark-data-pair loop -- )
+    [ tick#>> ]
+    [ frame#>> <game-loop-benchmark> ]
+    [ benchmark-data>> ] tri push ;
+
 : redraw ( loop -- )
-    [ 1 + ] change-frame-number
-    [ tick-slice ] [ draw-delegate>> ] bi draw* ;
+    [ 1 + ] change-frame#
+    [
+        [ tick-slice ] [ draw-delegate>> ] bi [ draw* ] with-benchmarking
+    ] keep record-benchmarking ;
 
 : tick ( loop -- )
-    tick-delegate>> tick* ;
+    [
+        [ tick-delegate>> tick* ] with-benchmarking
+    ] keep record-benchmarking ;
 
 : increment-tick ( loop -- )
-    [ 1 + ] change-tick-number
-    dup tick-interval-nanos>> [ + ] curry change-last-tick
+    [ 1 + ] change-tick#
+    dup tick-interval-nanos>> '[ _ + ] change-last-tick
     drop ;
 
 : ?tick ( loop count -- )
@@ -63,20 +86,13 @@ TUPLE: game-loop-error game-loop error ;
         [ 2drop ] if
     ] if-zero ;
 
-: benchmark-nanos ( loop -- nanos )
-    nano-count swap benchmark-time>> - ;
-
 PRIVATE>
 
-: reset-loop-benchmark ( loop -- loop )
-    nano-count >>benchmark-time
-    dup tick-number>> >>benchmark-tick-number
-    dup frame-number>> >>benchmark-frame-number ;
+! : benchmark-ticks-per-second ( loop -- n )
+    ! [ tick#>> ] [ benchmark-tick#>> - ] [ benchmark-nanos ] tri /f ;
 
-: benchmark-ticks-per-second ( loop -- n )
-    [ tick-number>> ] [ benchmark-tick-number>> - ] [ benchmark-nanos ] tri /f ;
-: benchmark-frames-per-second ( loop -- n )
-    [ frame-number>> ] [ benchmark-frame-number>> - ] [ benchmark-nanos ] tri /f ;
+! : benchmark-frames-per-second ( loop -- n )
+    ! [ frame#>> ] [ benchmark-frame#>> - ] [ benchmark-nanos ] tri /f ;
 
 : (game-tick) ( loop -- )
     dup running?>>
@@ -91,19 +107,19 @@ PRIVATE>
 : start-loop ( loop -- )
     nano-count >>last-tick
     t >>running?
-    reset-loop-benchmark
     [
         [ '[ _ game-tick ] f ]
         [ tick-interval-nanos>> nanoseconds ] bi
-        <alarm>
-    ] keep [ alarm<< ] [ drop start-alarm ] 2bi ;
+        <timer>
+    ] keep [ timer<< ] [ drop start-timer ] 2bi ;
 
 : stop-loop ( loop -- )
     f >>running?
-    alarm>> stop-alarm ;
+    timer>> stop-timer ;
 
 : <game-loop*> ( tick-interval-nanos tick-delegate draw-delegate -- loop )
-    nano-count f 0 0 nano-count 0 0 f
+    nano-count f 0 0 f
+    game-loop-benchmark-vector{ } clone
     game-loop boa ;
 
 : <game-loop> ( tick-interval-nanos delegate -- loop )
@@ -112,6 +128,5 @@ PRIVATE>
 M: game-loop dispose
     stop-loop ;
 
-USE: vocabs.loader
-
 { "game.loop" "prettyprint" } "game.loop.prettyprint" require-when
+
