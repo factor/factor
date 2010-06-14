@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sequences sorting binary-search fry math
-math.order arrays classes combinators kernel functors math.functions
-math.vectors ;
+math.order arrays classes combinators kernel functors locals
+math.functions math.vectors ;
 IN: sequences.cords
 
 MIXIN: cord
@@ -47,57 +47,62 @@ M: T cord-append
     [ [ head>> ] dip call ]
     [ [ tail>> ] dip call ] 2bi cord-append ; inline
 
-: cord-2map ( cord cord quot -- cord' )
-    [ [ [ head>> ] bi@ ] dip call ]
-    [ [ [ tail>> ] bi@ ] dip call ] 3bi cord-append ; inline
+:: cord-2map ( cord-a cord-b quot fallback -- cord' )
+    cord-a cord-b 2dup [ cord? ] both? [
+        [ [ head>> ] bi@ quot call ]
+        [ [ tail>> ] bi@ quot call ] 2bi cord-append
+    ] [ fallback call ] if ; inline
 
 : cord-both ( cord quot -- h t )
     [ [ head>> ] [ tail>> ] bi ] dip bi@ ; inline
 
-: cord-2both ( cord cord quot -- h t )
-    [ [ [ head>> ] bi@ ] dip call ]
-    [ [ [ tail>> ] bi@ ] dip call ] 3bi ; inline
+:: cord-2both ( cord-a cord-b quot combine fallback -- result )
+    cord-a cord-b 2dup [ cord? ] both? [
+        [ [ head>> ] bi@ quot call ]
+        [ [ tail>> ] bi@ quot call ] 2bi combine call
+    ] [ fallback call ] if ; inline
 
 <PRIVATE
 : split-shuffle ( shuf -- sh uf )
     dup length 2 /i cut* ; foldable
 PRIVATE>
 
-M: cord v+                [ v+                ] cord-2map ; inline
-M: cord v-                [ v-                ] cord-2map ; inline
+M: cord v+                [ v+                ] [ call-next-method ] cord-2map ; inline
+M: cord v-                [ v-                ] [ call-next-method ] cord-2map ; inline
 M: cord vneg              [ vneg              ] cord-map  ; inline
-M: cord v+-               [ v+-               ] cord-2map ; inline
-M: cord vs+               [ vs+               ] cord-2map ; inline
-M: cord vs-               [ vs-               ] cord-2map ; inline
-M: cord vs*               [ vs*               ] cord-2map ; inline
-M: cord v*                [ v*                ] cord-2map ; inline
-M: cord v/                [ v/                ] cord-2map ; inline
-M: cord vmin              [ vmin              ] cord-2map ; inline
-M: cord vmax              [ vmax              ] cord-2map ; inline
-M: cord v.                [ v.                ] cord-2both + ; inline
+M: cord v+-               [ v+-               ] [ call-next-method ] cord-2map ; inline
+M: cord vs+               [ vs+               ] [ call-next-method ] cord-2map ; inline
+M: cord vs-               [ vs-               ] [ call-next-method ] cord-2map ; inline
+M: cord vs*               [ vs*               ] [ call-next-method ] cord-2map ; inline
+M: cord v*                [ v*                ] [ call-next-method ] cord-2map ; inline
+M: cord v/                [ v/                ] [ call-next-method ] cord-2map ; inline
+M: cord vmin              [ vmin              ] [ call-next-method ] cord-2map ; inline
+M: cord vmax              [ vmax              ] [ call-next-method ] cord-2map ; inline
+M: cord v.
+    [ v.                ] [ + ] [ call-next-method ] cord-2both ; inline
 M: cord vsqrt             [ vsqrt             ] cord-map  ; inline
 M: cord sum               [ sum               ] cord-both + ; inline
 M: cord vabs              [ vabs              ] cord-map  ; inline
-M: cord vbitand           [ vbitand           ] cord-2map ; inline
-M: cord vbitandn          [ vbitandn          ] cord-2map ; inline
-M: cord vbitor            [ vbitor            ] cord-2map ; inline
-M: cord vbitxor           [ vbitxor           ] cord-2map ; inline
+M: cord vbitand           [ vbitand           ] [ call-next-method ] cord-2map ; inline
+M: cord vbitandn          [ vbitandn          ] [ call-next-method ] cord-2map ; inline
+M: cord vbitor            [ vbitor            ] [ call-next-method ] cord-2map ; inline
+M: cord vbitxor           [ vbitxor           ] [ call-next-method ] cord-2map ; inline
 M: cord vbitnot           [ vbitnot           ] cord-map  ; inline
-M: cord vand              [ vand              ] cord-2map ; inline
-M: cord vandn             [ vandn             ] cord-2map ; inline
-M: cord vor               [ vor               ] cord-2map ; inline
-M: cord vxor              [ vxor              ] cord-2map ; inline
+M: cord vand              [ vand              ] [ call-next-method ] cord-2map ; inline
+M: cord vandn             [ vandn             ] [ call-next-method ] cord-2map ; inline
+M: cord vor               [ vor               ] [ call-next-method ] cord-2map ; inline
+M: cord vxor              [ vxor              ] [ call-next-method ] cord-2map ; inline
 M: cord vnot              [ vnot              ] cord-map  ; inline
 M: cord vlshift           '[ _ vlshift        ] cord-map  ; inline
 M: cord vrshift           '[ _ vrshift        ] cord-map  ; inline
 M: cord (vmerge-head)     [ head>> ] bi@ (vmerge) cord-append ; inline
 M: cord (vmerge-tail)     [ tail>> ] bi@ (vmerge) cord-append ; inline
-M: cord v<=               [ v<=               ] cord-2map ; inline
-M: cord v<                [ v<                ] cord-2map ; inline
-M: cord v=                [ v=                ] cord-2map ; inline
-M: cord v>                [ v>                ] cord-2map ; inline
-M: cord v>=               [ v>=               ] cord-2map ; inline
-M: cord vunordered?       [ vunordered?       ] cord-2map ; inline
+M: cord v<=               [ v<=               ] [ call-next-method ] cord-2map ; inline
+M: cord v<                [ v<                ] [ call-next-method ] cord-2map ; inline
+M: cord v=                [ v=                ] [ call-next-method ] cord-2map ; inline
+M: cord v>                [ v>                ] [ call-next-method ] cord-2map ; inline
+M: cord v>=               [ v>=               ] [ call-next-method ] cord-2map ; inline
+M: cord vunordered?       [ vunordered?       ] [ call-next-method ] cord-2map ; inline
 M: cord vany?             [ vany?             ] cord-both or  ; inline
 M: cord vall?             [ vall?             ] cord-both and ; inline
 M: cord vnone?            [ vnone?            ] cord-both and ; inline
