@@ -226,7 +226,9 @@ M: object pprint-object ( obj -- )
 M: object pprint* pprint-object ;
 M: vector pprint* pprint-object ;
 M: byte-vector pprint* pprint-object ;
-M: hashtable pprint* pprint-object ;
+M: hashtable pprint*
+    nesting-limit inc
+    [ pprint-object ] [ nesting-limit dec ] [ ] cleanup ;
 M: curry pprint* pprint-object ;
 M: compose pprint* pprint-object ;
 M: hash-set pprint* pprint-object ;
