@@ -34,5 +34,5 @@ CONSTANT: WM_DWMCOMPOSITIONCHANGED HEX: 31E
 
 : composition-enabled? ( -- ? )
     windows-major 6 >=
-    [ 0 <int> [ DwmIsCompositionEnabled drop ] keep *int c-bool> ]
+    [ { bool } [ DwmIsCompositionEnabled drop ] [ ] with-out-parameters ]
     [ f ] if ;

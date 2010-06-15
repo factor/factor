@@ -1,7 +1,7 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sequences.private byte-arrays
-alien prettyprint.custom parser accessors ;
+alien prettyprint.custom parser accessors locals ;
 IN: nibble-arrays
 
 TUPLE: nibble-array
@@ -20,8 +20,10 @@ CONSTANT: nibble BIN: 1111
 : get-nibble ( n byte -- nibble )
     swap neg shift nibble bitand ; inline
 
-: set-nibble ( value n byte -- byte' )
-    nibble pick shift bitnot bitand -rot shift bitor ; inline
+:: set-nibble ( value n byte -- byte' )
+    byte nibble n shift bitnot bitand
+    value n shift
+    bitor ; inline
 
 : nibble@ ( n nibble-array -- shift n' byte-array )
     [ >fixnum byte/nibble ] [ underlying>> ] bi* ; inline

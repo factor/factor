@@ -10,7 +10,6 @@ IN: compiler.cfg.save-contexts
 : needs-save-context? ( insns -- ? )
     [
         {
-            [ ##call-gc? ]
             [ ##unary-float-function? ]
             [ ##binary-float-function? ]
             [ ##alien-invoke? ]

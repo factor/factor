@@ -280,21 +280,29 @@ M: ##compare-integer-imm rewrite
 
 M: ##test rewrite
     {
-        { [ dup src1>> vreg>insn ##load-integer? ] [ t >test-imm ] }
-        { [ dup src2>> vreg>insn ##load-integer? ] [ f >test-imm ] }
-        { [ dup diagonal? not ] [ drop f ] }
-        { [ dup src1>> vreg>insn ##and? ] [ simplify-test ] }
-        { [ dup src1>> vreg>insn ##and-imm? ] [ simplify-test-imm ] }
+        { [ dup src1>> vreg-immediate-comparand? ] [ t >test-imm ] }
+        { [ dup src2>> vreg-immediate-comparand? ] [ f >test-imm ] }
+        { [ dup diagonal? ] [
+            {
+                { [ dup src1>> vreg>insn ##and? ] [ simplify-test ] }
+                { [ dup src1>> vreg>insn ##and-imm? ] [ simplify-test-imm ] }
+                [ drop f ]
+            } cond
+        ] }
         [ drop f ]
     } cond ;
 
 M: ##test-branch rewrite
     {
-        { [ dup src1>> vreg>insn ##load-integer? ] [ t >test-imm-branch ] }
-        { [ dup src2>> vreg>insn ##load-integer? ] [ f >test-imm-branch ] }
-        { [ dup diagonal? not ] [ drop f ] }
-        { [ dup src1>> vreg>insn ##and? ] [ simplify-test-branch ] }
-        { [ dup src1>> vreg>insn ##and-imm? ] [ simplify-test-imm-branch ] }
+        { [ dup src1>> vreg-immediate-comparand? ] [ t >test-imm-branch ] }
+        { [ dup src2>> vreg-immediate-comparand? ] [ f >test-imm-branch ] }
+        { [ dup diagonal? ] [
+            {
+                { [ dup src1>> vreg>insn ##and? ] [ simplify-test-branch ] }
+                { [ dup src1>> vreg>insn ##and-imm? ] [ simplify-test-imm-branch ] }
+                [ drop f ]
+            } cond
+        ] }
         [ drop f ]
     } cond ;
 

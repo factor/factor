@@ -6,7 +6,7 @@ words splitting cpu.architecture alien alien.accessors
 alien.strings quotations layouts system compiler.units io
 io.files io.encodings.binary io.streams.memory accessors
 combinators effects continuations fry classes vocabs
-vocabs.loader words.symbol ;
+vocabs.loader words.symbol macros ;
 QUALIFIED: math
 IN: alien.c-types
 
@@ -17,8 +17,7 @@ SYMBOLS:
     long ulong
     longlong ulonglong
     float double
-    void* bool
-    (stack-value) ;
+    void* bool ;
 
 SINGLETON: void
 
@@ -94,7 +93,7 @@ GENERIC: c-type-setter ( name -- quot )
 
 M: c-type c-type-setter setter>> ;
 
-GENERIC: c-type-align ( name -- n )
+GENERIC: c-type-align ( name -- n ) foldable
 
 M: abstract-c-type c-type-align align>> ;
 
@@ -114,24 +113,24 @@ GENERIC: heap-size ( name -- size )
 
 M: abstract-c-type heap-size size>> ;
 
-GENERIC: stack-size ( name -- size )
-
-M: c-type stack-size size>> cell align ;
-
 MIXIN: value-type
 
-: c-getter ( name -- quot )
+MACRO: alien-value ( c-type -- quot: ( c-ptr offset -- value ) )
     [ c-type-getter ] [ c-type-boxer-quot ] bi append ;
 
-: c-setter ( name -- quot )
+MACRO: set-alien-value ( c-type -- quot: ( value c-ptr offset -- ) )
     [ c-type-unboxer-quot [ [ ] ] [ '[ _ 2dip ] ] if-empty ]
     [ c-type-setter ]
     bi append ;
 
-: array-accessor ( c-type quot -- def )
-    [
-        \ swap , [ heap-size , [ * >fixnum ] % ] [ % ] bi*
-    ] [ ] make ;
+: array-accessor ( n c-ptr c-type -- c-ptr offset c-type )
+    [ swapd heap-size * >fixnum ] keep ; inline
+
+: alien-element ( n c-ptr c-type -- value )
+    array-accessor alien-value ; inline
+
+: set-alien-element ( value n c-ptr c-type -- )
+    array-accessor set-alien-value ; inline
 
 PROTOCOL: c-type-protocol 
     c-type-class
@@ -144,8 +143,7 @@ PROTOCOL: c-type-protocol
     c-type-align
     c-type-align-first
     base-type
-    heap-size
-    stack-size ;
+    heap-size ;
 
 CONSULT: c-type-protocol c-type-name
     c-type ;
@@ -165,12 +163,13 @@ TUPLE: long-long-type < c-type ;
     long-long-type new ;
 
 : define-deref ( c-type -- )
-    [ name>> CHAR: * prefix "alien.c-types" create ] [ c-getter 0 prefix ] bi
-    (( c-ptr -- value )) define-inline ;
+    [ name>> CHAR: * prefix "alien.c-types" create ]
+    [ '[ 0 _ alien-value ] ]
+    bi (( c-ptr -- value )) define-inline ;
 
 : define-out ( c-type -- )
     [ name>> "alien.c-types" constructor-word ]
-    [ dup c-setter '[ _ heap-size (byte-array) [ 0 @ ] keep ] ] bi
+    [ dup '[ _ heap-size (byte-array) [ 0 _ set-alien-value ] keep ] ] bi
     (( value -- c-ptr )) define-inline ;
 
 : define-primitive-type ( c-type name -- )
@@ -195,14 +194,18 @@ CONSTANT: primitive-types
         c-string
     }
 
-: (pointer-c-type) ( void* type -- void*' )
-    [ clone ] dip c-type-boxer-quot '[ _ [ f ] if* ] >>boxer-quot ;
-
 : >c-bool ( ? -- int ) 1 0 ? ; inline
 
 : c-bool> ( int -- ? ) 0 = not ; inline
 
 <PRIVATE
+
+: 8-byte-alignment ( c-type -- c-type )
+    {
+        { [ cpu ppc? os macosx? and ] [ 4 >>align 8 >>align-first ] }
+        { [ cpu x86.32? os windows? not and ] [ 4 >>align 4 >>align-first ] }
+        [ 8 >>align 8 >>align-first ]
+    } cond ;
 
 : resolve-pointer-typedef ( type -- base-type )
     dup "c-type" word-prop dup word?
@@ -215,18 +218,14 @@ CONSTANT: primitive-types
         resolve-pointer-typedef [ void? ] [ primitive-types member? ] bi or
     ] [ drop t ] if ;
 
+: (pointer-c-type) ( void* type -- void*' )
+    [ clone ] dip c-type-boxer-quot '[ _ [ f ] if* ] >>boxer-quot ;
+
 PRIVATE>
 
 M: pointer c-type
     [ \ void* c-type ] dip
     to>> dup primitive-pointer-type? [ drop ] [ (pointer-c-type) ] if ;
-
-: 8-byte-alignment ( c-type -- c-type )
-    {
-        { [ cpu ppc? os macosx? and ] [ 4 >>align 8 >>align-first ] }
-        { [ cpu x86.32? os windows? not and ] [ 4 >>align 4 >>align-first ] }
-        [ 8 >>align 8 >>align-first ]
-    } cond ;
 
 [
     <c-type>
@@ -447,9 +446,6 @@ M: pointer c-type
         [ c-bool> ] >>boxer-quot
         object >>boxed-class
     \ bool define-primitive-type
-
-    \ void* c-type clone stack-params >>rep
-    \ (stack-value) define-primitive-type
 
 ] with-compilation-unit
 

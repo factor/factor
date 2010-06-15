@@ -281,7 +281,7 @@ ERROR: bmp-not-supported n ;
         { 24 [ color-index>> ] }
         { 16 [
             [
-                ! byte-array>ushort-array
+                ! ushort-array-cast
                 2 group [ le> ] map
                 ! 5 6 5
                 ! { HEX: f800 HEX: 7e0 HEX: 1f } uncompress-bitfield
@@ -312,7 +312,7 @@ M: unsupported-bitfield-widths summary
     dup header>> bit-count>> {
         { 16 [
             dup bitfields>> '[
-                byte-array>ushort-array _ uncompress-bitfield
+                ushort-array-cast _ uncompress-bitfield
             ] change-color-index
         ] }
         { 32 [ ] }

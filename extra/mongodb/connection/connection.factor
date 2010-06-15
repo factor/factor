@@ -1,9 +1,9 @@
-USING: accessors assocs fry io.encodings.binary io.sockets kernel math
-math.parser mongodb.msg mongodb.operations namespaces destructors
-constructors sequences splitting checksums checksums.md5 
-io.streams.duplex io.encodings.utf8 io.encodings.string combinators.smart
-arrays hashtables sequences.deep vectors locals ;
-
+USING: accessors arrays assocs byte-vectors checksums
+checksums.md5 constructors destructors fry hashtables
+io.encodings.binary io.encodings.string io.encodings.utf8
+io.sockets io.streams.duplex kernel locals math math.parser
+mongodb.cmd mongodb.msg namespaces sequences
+splitting ;
 IN: mongodb.connection
 
 : md5-checksum ( string -- digest )
@@ -15,13 +15,18 @@ TUPLE: mdb-node master? { address inet } remote ;
 
 CONSTRUCTOR: mdb-node ( address master? -- mdb-node ) ;
 
-TUPLE: mdb-connection instance node handle remote local ;
+TUPLE: mdb-connection instance node handle remote local buffer ;
+
+: connection-buffer ( -- buffer )
+    mdb-connection get buffer>> 0 >>length ; inline
+
+USE: mongodb.operations
 
 CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
 
 : check-ok ( result -- errmsg ? )
     [ [ "errmsg" ] dip at ] 
-    [ [ "ok" ] dip at >integer 1 = ] bi ; inline 
+    [ [ "ok" ] dip at ] bi ; inline 
 
 : <mdb-db> ( name nodes -- mdb-db )
     mdb-db new swap >>nodes swap >>name H{ } clone >>collections ;
@@ -33,7 +38,7 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
     nodes>> f swap at ;
 
 : with-connection ( connection quot -- * )
-    [ mdb-connection set ] prepose with-scope ; inline
+    [ mdb-connection ] dip with-variable ; inline
     
 : mdb-instance ( -- mdb )
     mdb-connection get instance>> ; inline
@@ -44,8 +49,9 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
 : namespaces-collection ( -- ns )
     mdb-instance name>> "system.namespaces" "." glue ; inline
 
-: cmd-collection ( -- ns )
-    mdb-instance name>> "$cmd" "." glue ; inline
+: cmd-collection ( cmd -- ns )
+    admin?>> [ "admin"  ] [ mdb-instance name>> ] if
+    "$cmd" "." glue ; inline
 
 : index-ns ( colname -- index-ns )
     [ mdb-instance name>> ] dip "." glue ; inline
@@ -58,15 +64,16 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
     '[ _ write-message read-message ] with-stream* ;
 
 : send-query-1result ( collection assoc -- result )
-    <mdb-query-msg>
-        1 >>return#
-    send-query-plain objects>>
-    [ f ] [ first ] if-empty ;
+    <mdb-query-msg> -1 >>return# send-query-plain
+    objects>> [ f ] [ first ] if-empty ;
+
+: send-cmd ( cmd -- result )
+    [ cmd-collection ] [ assoc>> ] bi send-query-1result ; inline
 
 <PRIVATE
 
 : get-nonce ( -- nonce )
-    cmd-collection H{ { "getnonce" 1 } } send-query-1result 
+    getnonce-cmd make-cmd send-cmd
     [ "nonce" swap at ] [ f ] if* ;
 
 : auth? ( mdb -- ? )
@@ -78,16 +85,14 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
     [ pwd-digest>> ] bi
     3array concat md5-checksum ; inline
 
-: build-auth-query ( -- query-assoc )
-    { "authenticate" 1 }
-    "user"  mdb-instance username>> 2array
-    "nonce" get-nonce 2array
-    3array >hashtable
-    [ [ "nonce" ] dip at calculate-key-digest "key" ] keep
-    [ set-at ] keep ; 
+: build-auth-cmd ( cmd -- cmd )
+    mdb-instance username>> "user" set-cmd-opt
+    get-nonce [ "nonce" set-cmd-opt ] [ ] bi
+    calculate-key-digest "key" set-cmd-opt ; inline
     
 : perform-authentication ( --  )
-    cmd-collection build-auth-query send-query-1result
+    authenticate-cmd make-cmd
+    build-auth-cmd send-cmd
     check-ok [ drop ] [ throw ] if ; inline
 
 : authenticate-connection ( mdb-connection -- )
@@ -98,7 +103,7 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
 : open-connection ( mdb-connection node -- mdb-connection )
    [ >>node ] [ address>> ] bi
    [ >>remote ] keep binary <client>
-   [ >>handle ] dip >>local ;
+   [ >>handle ] dip >>local 4096 <byte-vector> >>buffer ;
 
 : get-ismaster ( -- result )
     "admin.$cmd" H{ { "ismaster" 1 } } send-query-1result ; 
@@ -119,7 +124,7 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
 
 : nodelist>table ( seq -- assoc )
    [ [ master?>> ] keep 2array ] map >hashtable ;
-   
+
 PRIVATE>
 
 :: verify-nodes ( mdb -- )

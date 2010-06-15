@@ -1,7 +1,7 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays accessors assocs combinators cpu.architecture fry
-heaps kernel math math.order namespaces sequences vectors
+heaps kernel math math.order namespaces layouts sequences vectors
 linked-assocs compiler.cfg compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.linear-scan.live-intervals ;
@@ -122,6 +122,9 @@ SYMBOL: unhandled-intervals
     [ swap [ align dup ] [ + ] bi ] change-spill-area-size drop
     <spill-slot> ;
 
+: align-spill-area ( align -- )
+    cfg get [ max ] change-spill-area-align drop ;
+
 ! Minheap of sync points which still need to be processed
 SYMBOL: unhandled-sync-points
 
@@ -129,7 +132,10 @@ SYMBOL: unhandled-sync-points
 SYMBOL: spill-slots
 
 : assign-spill-slot ( coalesced-vreg rep -- spill-slot )
-    rep-size spill-slots get [ nip next-spill-slot ] 2cache ;
+    rep-size
+    [ align-spill-area ]
+    [ spill-slots get [ nip next-spill-slot ] 2cache ]
+    bi ;
 
 : lookup-spill-slot ( coalesced-vreg rep -- spill-slot )
     rep-size 2array spill-slots get ?at [ ] [ bad-vreg ] if ;
@@ -141,7 +147,7 @@ SYMBOL: spill-slots
     [ V{ } clone ] reg-class-assoc active-intervals set
     [ V{ } clone ] reg-class-assoc inactive-intervals set
     V{ } clone handled-intervals set
-    cfg get 0 >>spill-area-size drop
+    cfg get 0 >>spill-area-size cell >>spill-area-align drop
     H{ } clone spill-slots set
     -1 progress set ;
 

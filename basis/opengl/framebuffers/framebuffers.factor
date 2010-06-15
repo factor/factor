@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: opengl opengl.gl combinators continuations kernel
-alien.c-types ;
+alien.c-types alien.data ;
 IN: opengl.framebuffers
 
 : gen-framebuffer ( -- id )
@@ -51,4 +51,4 @@ IN: opengl.framebuffers
 
 : framebuffer-attachment ( attachment -- id )
     GL_FRAMEBUFFER swap GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME
-    0 <uint> [ glGetFramebufferAttachmentParameteriv ] keep *uint ;
+    { uint } [ glGetFramebufferAttachmentParameteriv ] [ ] with-out-parameters ;

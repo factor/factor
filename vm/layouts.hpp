@@ -23,6 +23,11 @@ inline static cell align(cell a, cell b)
 	return (a + (b-1)) & ~(b-1);
 }
 
+inline static cell alignment_for(cell a, cell b)
+{
+	return align(a,b) - a;
+}
+
 static const cell data_alignment = 16;
 
 #define WORD_SIZE (signed)(sizeof(cell)*8)
@@ -98,7 +103,10 @@ struct object {
 	cell header;
 
 	cell size() const;
+	template<typename Fixup> cell size(Fixup fixup) const;
+
 	cell binary_payload_start() const;
+	template<typename Fixup> cell binary_payload_start(Fixup fixup) const;
 
 	cell *slots() const { return (cell *)this; }
 

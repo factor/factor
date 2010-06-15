@@ -15,7 +15,7 @@ ABOUT: "sets"
 
 ARTICLE: "set-operations" "Operations on sets"
 "To test if an object is a member of a set:"
-{ $subsections member? }
+{ $subsections in? }
 "All sets can be represented as a sequence, without duplicates, of their members:"
 { $subsections members }
 "Sets can have members added or removed destructively:"

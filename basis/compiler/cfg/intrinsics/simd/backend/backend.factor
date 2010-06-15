@@ -6,7 +6,7 @@ compiler.cfg.stacks.local compiler.tree.propagation.info
 compiler.cfg.instructions
 cpu.architecture effects fry generalizations
 kernel locals macros make math namespaces quotations sequences
-splitting stack-checker words ;
+sequences.generalizations splitting stack-checker words ;
 IN: compiler.cfg.intrinsics.simd.backend
 
 ! Selection of implementation based on available CPU instructions
@@ -19,12 +19,16 @@ M: ##zero-vector insn-available? rep>> %zero-vector-reps member? ;
 M: ##fill-vector insn-available? rep>> %fill-vector-reps member? ;
 M: ##gather-vector-2 insn-available? rep>> %gather-vector-2-reps member? ;
 M: ##gather-vector-4 insn-available? rep>> %gather-vector-4-reps member? ;
+M: ##gather-int-vector-2 insn-available? rep>> %gather-int-vector-2-reps member? ;
+M: ##gather-int-vector-4 insn-available? rep>> %gather-int-vector-4-reps member? ;
+M: ##select-vector insn-available? rep>> %select-vector-reps member? ;
 M: ##store-memory-imm insn-available? rep>> %alien-vector-reps member? ;
 M: ##shuffle-vector insn-available? rep>> %shuffle-vector-reps member? ;
 M: ##shuffle-vector-imm insn-available? rep>> %shuffle-vector-imm-reps member? ;
 M: ##shuffle-vector-halves-imm insn-available? rep>> %shuffle-vector-halves-imm-reps member? ;
 M: ##merge-vector-head insn-available? rep>> %merge-vector-reps member? ;
 M: ##merge-vector-tail insn-available? rep>> %merge-vector-reps member? ;
+M: ##float-pack-vector insn-available? rep>> %float-pack-vector-reps member? ;
 M: ##signed-pack-vector insn-available? rep>> %signed-pack-vector-reps member? ;
 M: ##unsigned-pack-vector insn-available? rep>> %unsigned-pack-vector-reps member? ;
 M: ##unpack-vector-head insn-available? rep>> %unpack-vector-head-reps member? ;

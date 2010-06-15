@@ -3,7 +3,7 @@ colors.constants ui.render ui.pens.polygon ui.pens.solid math.vectors
 accessors fry ui.gadgets.packs game.input ui.gadgets.labels
 ui.gadgets.borders alarms calendar locals strings ui.gadgets.buttons
 combinators math.parser assocs threads ;
-IN: joystick-demo
+IN: game.input.demos.joysticks
 
 CONSTANT: SIZE { 151 151 }
 CONSTANT: INDICATOR-SIZE { 4 4 }
@@ -108,7 +108,7 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
 
 : kill-update-axes ( gadget -- )
     COLOR: gray <solid> >>interior
-    [ [ cancel-alarm ] when* f ] change-alarm
+    [ [ stop-alarm ] when* f ] change-alarm
     relayout-1 ;
 
 : (update-axes) ( gadget controller-state -- )
@@ -129,7 +129,7 @@ M: joystick-demo-gadget graft*
     drop ;
 
 M: joystick-demo-gadget ungraft*
-    alarm>> [ cancel-alarm ] when* ;
+    alarm>> [ stop-alarm ] when* ;
 
 : joystick-window ( controller -- )
     [ <joystick-demo-gadget> ] [ product-string ] bi

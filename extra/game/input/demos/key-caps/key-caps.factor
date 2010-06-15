@@ -1,8 +1,8 @@
 USING: game.input game.input.scancodes
 kernel ui.gadgets ui.gadgets.buttons sequences accessors
 words arrays assocs math calendar fry alarms ui
-ui.gadgets.borders ui.gestures ;
-IN: key-caps
+ui.gadgets.borders ui.gestures literals ;
+IN: game.input.demos.key-caps
 
 CONSTANT: key-locations H{
     { key-escape        { {   0   0 } {  10  10 } } }
@@ -132,7 +132,7 @@ CONSTANT: key-locations H{
 }
 
 CONSTANT: KEYBOARD-SIZE { 230 65 }
-: FREQUENCY ( -- f ) 30 recip seconds ;
+CONSTANT: FREQUENCY $[ 1/30 seconds ]
 
 TUPLE: key-caps-gadget < gadget keys alarm ;
 
@@ -167,7 +167,7 @@ M: key-caps-gadget graft*
     drop ;
 
 M: key-caps-gadget ungraft*
-    alarm>> [ cancel-alarm ] when*
+    alarm>> [ stop-alarm ] when*
     close-game-input ;
 
 M: key-caps-gadget handle-gesture

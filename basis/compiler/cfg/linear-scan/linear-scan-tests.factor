@@ -76,7 +76,7 @@ check-numbering? on
     { T{ live-range f 0 5 } } 0 split-ranges
 ] unit-test
 
-cfg new 0 >>spill-area-size cfg set
+cfg new 0 >>spill-area-size 4 >>spill-area-align cfg set
 H{ } spill-slots set
 
 H{

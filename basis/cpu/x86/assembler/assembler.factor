@@ -152,8 +152,11 @@ M: register displacement, drop ;
 : immediate-operand-size-bit ( dst imm reg,rex.w,opcode -- imm dst reg,rex.w,opcode )
     over integer? [ first3 BIN: 1 opcode-or 3array ] when ;
 
+: immediate-1* ( dst imm reg,rex.w,opcode -- )
+    swap [ 1-operand ] dip 1, ;
+
 : immediate-1 ( dst imm reg,rex.w,opcode -- )
-    immediate-operand-size-bit swap [ 1-operand ] dip 1, ;
+    immediate-operand-size-bit immediate-1* ;
 
 : immediate-4 ( dst imm reg,rex.w,opcode -- )
     immediate-operand-size-bit swap [ 1-operand ] dip 4, ;
@@ -211,7 +214,13 @@ M: operand POP { BIN: 000 f HEX: 8f } 1-operand ;
 <PRIVATE
 
 GENERIC# (MOV-I) 1 ( dst src -- )
-M: register (MOV-I) [ t HEX: b8 short-operand ] [ cell, ] bi* ;
+
+M: register (MOV-I)
+    dup byte?
+    [ [ t HEX: b0 short-operand ] [ 1, ] bi* ]
+    [ [ t HEX: b8 short-operand ] [ cell, ] bi* ]
+    if ;
+
 M: operand (MOV-I)
     { BIN: 000 t HEX: c6 }
     over byte? [ immediate-1 ] [ immediate-4 ] if ;
@@ -238,6 +247,9 @@ M: operand CALL { BIN: 010 t HEX: ff } 1-operand ;
 GENERIC# JUMPcc 1 ( addr opcode -- )
 M: integer JUMPcc extended-opcode, 4, ;
 
+: SETcc ( dst opcode -- )
+    { BIN: 000 t } swap suffix 1-operand ;
+
 PRIVATE>
 
 : JO  ( dst -- ) HEX: 80 JUMPcc ;
@@ -256,6 +268,23 @@ PRIVATE>
 : JGE ( dst -- ) HEX: 8d JUMPcc ;
 : JLE ( dst -- ) HEX: 8e JUMPcc ;
 : JG  ( dst -- ) HEX: 8f JUMPcc ;
+
+: SETO  ( dst -- ) { HEX: 0f HEX: 90 } SETcc ;
+: SETNO ( dst -- ) { HEX: 0f HEX: 91 } SETcc ;
+: SETB  ( dst -- ) { HEX: 0f HEX: 92 } SETcc ;
+: SETAE ( dst -- ) { HEX: 0f HEX: 93 } SETcc ;
+: SETE  ( dst -- ) { HEX: 0f HEX: 94 } SETcc ;
+: SETNE ( dst -- ) { HEX: 0f HEX: 95 } SETcc ;
+: SETBE ( dst -- ) { HEX: 0f HEX: 96 } SETcc ;
+: SETA  ( dst -- ) { HEX: 0f HEX: 97 } SETcc ;
+: SETS  ( dst -- ) { HEX: 0f HEX: 98 } SETcc ;
+: SETNS ( dst -- ) { HEX: 0f HEX: 99 } SETcc ;
+: SETP  ( dst -- ) { HEX: 0f HEX: 9a } SETcc ;
+: SETNP ( dst -- ) { HEX: 0f HEX: 9b } SETcc ;
+: SETL  ( dst -- ) { HEX: 0f HEX: 9c } SETcc ;
+: SETGE ( dst -- ) { HEX: 0f HEX: 9d } SETcc ;
+: SETLE ( dst -- ) { HEX: 0f HEX: 9e } SETcc ;
+: SETG  ( dst -- ) { HEX: 0f HEX: 9f } SETcc ;
 
 : LEAVE ( -- ) HEX: c9 , ;
 
@@ -303,6 +332,22 @@ M: operand TEST OCT: 204 2-operand ;
 : XCHG ( dst src -- ) OCT: 207 2-operand ;
 
 : BSR ( dst src -- ) { HEX: 0f HEX: bd } (2-operand) ;
+
+GENERIC: BT ( value n -- )
+M: immediate BT ( value n -- ) { BIN: 100 t { HEX: 0f HEX: ba } } immediate-1* ;
+M: operand   BT ( value n -- ) swap { HEX: 0f HEX: a3 } (2-operand) ;
+
+GENERIC: BTC ( value n -- )
+M: immediate BTC ( value n -- ) { BIN: 111 t { HEX: 0f HEX: ba } } immediate-1* ;
+M: operand   BTC ( value n -- ) swap { HEX: 0f HEX: bb } (2-operand) ;
+
+GENERIC: BTR ( value n -- )
+M: immediate BTR ( value n -- ) { BIN: 110 t { HEX: 0f HEX: ba } } immediate-1* ;
+M: operand   BTR ( value n -- ) swap { HEX: 0f HEX: b3 } (2-operand) ;
+
+GENERIC: BTS ( value n -- )
+M: immediate BTS ( value n -- ) { BIN: 101 t { HEX: 0f HEX: ba } } immediate-1* ;
+M: operand   BTS ( value n -- ) swap { HEX: 0f HEX: ab } (2-operand) ;
 
 : NOT  ( dst -- ) { BIN: 010 t HEX: f7 } 1-operand ;
 : NEG  ( dst -- ) { BIN: 011 t HEX: f7 } 1-operand ;
@@ -399,6 +444,99 @@ PRIVATE>
 
 : FNCLEX ( -- ) HEX: db , HEX: e2 , ;
 : FNINIT ( -- ) HEX: db , HEX: e3 , ;
+
+ERROR: bad-x87-operands ;
+
+<PRIVATE
+
+:: (x87-op) ( operand opcode reg -- )
+    opcode ,
+    BIN: 1100,0000 reg
+    3 shift bitor
+    operand reg-code bitor , ;
+
+:: x87-st0-op ( src opcode reg -- )
+    src register?
+    [ src opcode reg (x87-op) ]
+    [ bad-x87-operands ] if ;
+
+:: x87-m-st0/n-op ( dst src opcode reg -- )
+    {
+        { [ dst ST0 = src indirect? and ] [
+            src { reg f opcode } 1-operand
+        ] }
+        { [ dst ST0 = src register? and ] [
+            src opcode reg (x87-op)
+        ] }
+        { [ src ST0 = dst register? and ] [
+            dst opcode 4 + reg (x87-op)
+        ] }
+        [ bad-x87-operands ]
+    } cond ;
+
+PRIVATE>
+
+: F2XM1 ( -- ) { HEX: D9 HEX: F0 } % ;
+: FABS ( -- ) { HEX: D9 HEX: E1 } % ;
+: FADD ( dst src -- ) HEX: D8 0 x87-m-st0/n-op ;
+: FCHS ( -- ) { HEX: D9 HEX: E0 } % ;
+
+: FCMOVB   ( src -- ) HEX: DA 0 x87-st0-op ;
+: FCMOVE   ( src -- ) HEX: DA 1 x87-st0-op ;
+: FCMOVBE  ( src -- ) HEX: DA 2 x87-st0-op ;
+: FCMOVU   ( src -- ) HEX: DA 3 x87-st0-op ;
+: FCMOVNB  ( src -- ) HEX: DB 0 x87-st0-op ;
+: FCMOVNE  ( src -- ) HEX: DB 1 x87-st0-op ;
+: FCMOVNBE ( src -- ) HEX: DB 2 x87-st0-op ;
+: FCMOVNU  ( src -- ) HEX: DB 3 x87-st0-op ;
+
+: FCOMI ( src -- ) HEX: DB 6 x87-st0-op ;
+: FUCOMI ( src -- ) HEX: DB 5 x87-st0-op ;
+: FCOS ( -- ) { HEX: D9 HEX: FF } % ;
+: FDECSTP ( -- ) { HEX: D9 HEX: F6 } % ;
+: FINCSTP ( -- ) { HEX: D9 HEX: F7 } % ;
+: FDIV  ( dst src -- ) HEX: D8 6 x87-m-st0/n-op ;
+: FDIVR ( dst src -- ) HEX: D8 7 x87-m-st0/n-op ;
+
+: FILDD ( src -- )  { BIN: 000 f HEX: DB } 1-operand ;
+: FILDQ ( src -- )  { BIN: 101 f HEX: DF } 1-operand ;
+: FISTPD ( dst -- ) { BIN: 011 f HEX: DB } 1-operand ;
+: FISTPQ ( dst -- ) { BIN: 111 f HEX: DF } 1-operand ;
+: FISTTPD ( dst -- ) { BIN: 001 f HEX: DB } 1-operand ;
+: FISTTPQ ( dst -- ) { BIN: 001 f HEX: DF } 1-operand ;
+
+: FLD    ( src -- ) HEX: D9 0 x87-st0-op ;
+: FLD1   ( -- ) { HEX: D9 HEX: E8 } % ;
+: FLDL2T ( -- ) { HEX: D9 HEX: E9 } % ;
+: FLDL2E ( -- ) { HEX: D9 HEX: EA } % ;
+: FLDPI  ( -- ) { HEX: D9 HEX: EB } % ;
+: FLDLG2 ( -- ) { HEX: D9 HEX: EC } % ;
+: FLDLN2 ( -- ) { HEX: D9 HEX: ED } % ;
+: FLDZ   ( -- ) { HEX: D9 HEX: EE } % ;
+
+: FMUL ( dst src -- ) HEX: D8 1 x87-m-st0/n-op ;
+: FNOP ( -- ) { HEX: D9 HEX: D0 } % ;
+: FPATAN ( -- ) { HEX: D9 HEX: F3 } % ;
+: FPREM  ( -- ) { HEX: D9 HEX: F8 } % ;
+: FPREM1 ( -- ) { HEX: D9 HEX: F5 } % ;
+: FRNDINT ( -- ) { HEX: D9 HEX: FC } % ;
+: FSCALE ( -- ) { HEX: D9 HEX: FD } % ;
+: FSIN ( -- ) { HEX: D9 HEX: FE } % ;
+: FSINCOS ( -- ) { HEX: D9 HEX: FB } % ;
+: FSQRT ( -- ) { HEX: D9 HEX: FA } % ;
+
+: FSUB  ( dst src -- ) HEX: D8 HEX: 4 x87-m-st0/n-op ;
+: FSUBR ( dst src -- ) HEX: D8 HEX: 5 x87-m-st0/n-op ;
+
+: FST  ( src -- ) HEX: DD 2 x87-st0-op ;
+: FSTP ( src -- ) HEX: DD 3 x87-st0-op ;
+
+: FXAM ( -- ) { HEX: D9 HEX: E5 } % ;
+: FXCH ( src -- ) HEX: D9 1 x87-st0-op ;
+
+: FXTRACT ( -- ) { HEX: D9 HEX: F4 } % ;
+: FYL2X ( -- ) { HEX: D9 HEX: F1 } % ;
+: FYL2XP1 ( -- ) { HEX: D9 HEX: F1 } % ;
 
 ! SSE multimedia instructions
 

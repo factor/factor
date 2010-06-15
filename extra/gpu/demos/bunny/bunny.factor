@@ -311,5 +311,5 @@ GAME: bunny-game {
         { grab-input? t }
         { use-game-input? t }
         { pref-dim { 1024 768 } }
-        { tick-interval-micros $[ 60 fps ] }
+        { tick-interval-nanos $[ 60 fps ] }
     } ;

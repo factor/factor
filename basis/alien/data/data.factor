@@ -1,7 +1,9 @@
 ! (c)2009, 2010 Slava Pestov, Joe Groff bsd license
 USING: accessors alien alien.c-types alien.arrays alien.strings
 arrays byte-arrays cpu.architecture fry io io.encodings.binary
-io.files io.streams.memory kernel libc math sequences words ;
+io.files io.streams.memory kernel libc math math.functions 
+sequences words macros combinators generalizations ;
+QUALIFIED: math
 IN: alien.data
 
 GENERIC: require-c-array ( c-type -- )
@@ -74,3 +76,43 @@ M: array c-type-boxer-quot
     unclip [ array-length ] dip [ <c-direct-array> ] 2curry ;
 
 M: array c-type-unboxer-quot drop [ >c-ptr ] ;
+
+ERROR: local-allocation-error ;
+
+<PRIVATE
+
+: (local-allot) ( size align -- alien ) local-allocation-error ;
+
+: (cleanup-allot) ( -- )
+    ! Inhibit TCO in order for the last word in the quotation
+    ! to still be abl to access scope-allocated data.
+    ;
+
+MACRO: (local-allots) ( c-types -- quot )
+    [ '[ _ [ heap-size ] [ c-type-align ] bi (local-allot) ] ] map [ ] join ;
+
+MACRO: box-values ( c-types -- quot )
+    [ c-type-boxer-quot ] map '[ _ spread ] ;
+
+MACRO: out-parameters ( c-types -- quot )
+    [ length ] [ [ '[ 0 _ alien-value ] ] map ] bi
+    '[ _ nkeep _ spread ] ;
+
+PRIVATE>
+
+: with-scoped-allocation ( c-types quot -- )
+    [ [ (local-allots) ] [ box-values ] bi ] dip call
+    (cleanup-allot) ; inline
+
+: with-out-parameters ( c-types quot finish -- values )
+    [ [ drop (local-allots) ] [ swap out-parameters ] 2bi ] dip call
+    (cleanup-allot) ; inline
+
+GENERIC: binary-zero? ( value -- ? )
+
+M: object binary-zero? drop f ; inline
+M: f binary-zero? drop t ; inline
+M: integer binary-zero? zero? ; inline
+M: math:float binary-zero? double>bits zero? ; inline
+M: complex binary-zero? >rect [ binary-zero? ] both? ; inline
+

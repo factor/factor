@@ -1,5 +1,5 @@
 USING: assocs arrays json.reader kernel strings tools.test
-hashtables json ;
+hashtables json io.streams.string ;
 IN: json.reader.tests
 
 { f } [ "false" json> ] unit-test
@@ -58,6 +58,9 @@ IN: json.reader.tests
 { 0 } [ "      0" json> ] unit-test
 { 0 } [ "0      " json> ] unit-test
 { 0 } [ "   0   " json> ] unit-test
+
+{ V{ H{ { "a" "b" } } H{ { "c" "d" } } } }
+[ """{"a": "b"} {"c": "d"}""" [ read-jsons ] with-string-reader ] unit-test
 
 ! empty objects are allowed as values in objects
 { H{ { "foo" H{ } } } } [ "{ \"foo\" : {}}" json> ] unit-test

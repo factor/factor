@@ -59,16 +59,16 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
     drop f ;
 
 : arb-make-pixel-format ( world attributes -- pf )
-    [ handle>> hDC>> ] dip >WGL_ARB-int-array f 1 0 <int> 0 <int>
-    [ wglChoosePixelFormatARB win32-error=0/f ] 2keep drop *int ;
+    [ handle>> hDC>> ] dip >WGL_ARB-int-array f 1 { int int }
+    [ wglChoosePixelFormatARB win32-error=0/f ] [ ] with-out-parameters drop ;
 
 : arb-pixel-format-attribute ( pixel-format attribute -- value )
     >WGL_ARB
     [ drop f ] [
         [ [ world>> handle>> hDC>> ] [ handle>> ] bi 0 1 ] dip
-        first <int> 0 <int>
-        [ wglGetPixelFormatAttribivARB win32-error=0/f ]
-        keep *int
+        first <int> { int }
+        [ wglGetPixelFormatAttribivARB win32-error=0/f ] [ ]
+        with-out-parameters
     ] if-empty ;
 
 CONSTANT: pfd-flag-map H{
@@ -248,7 +248,7 @@ CONSTANT: window-control>ex-style
         { minimize-button 0 }
         { maximize-button 0 }
         { resize-handles $ WS_EX_WINDOWEDGE }
-        { small-title-bar $ WS_EX_TOOLWINDOW }
+        { small-title-bar $[ WS_EX_TOOLWINDOW WS_EX_TOPMOST bitor ] }
         { normal-title-bar $ WS_EX_APPWINDOW }
     }
 
@@ -797,7 +797,7 @@ M: windows-ui-backend system-alert
 : client-area>RECT ( hwnd -- RECT )
     RECT <struct>
     [ GetClientRect win32-error=0/f ]
-    [ >c-ptr byte-array>POINT-array [ ClientToScreen drop ] with each ]
+    [ >c-ptr POINT-array-cast [ ClientToScreen drop ] with each ]
     [ nip ] 2tri ;
 
 : hwnd>RECT ( hwnd -- RECT )
@@ -832,24 +832,25 @@ CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
     } cleave ;
 
 : exit-fullscreen ( world -- )
-    dup handle>> hWnd>>
+    [ handle>> hWnd>> ] [ world>style ] bi
     {
-        [ GWL_STYLE rot world>style SetWindowLong win32-error=0/f ]
+        [ [ GWL_STYLE ] dip SetWindowLong win32-error=0/f ]
         [
+            drop
             f
             over hwnd>RECT get-RECT-dimensions
             flags{ SWP_NOMOVE SWP_NOSIZE SWP_NOZORDER SWP_FRAMECHANGED }
             SetWindowPos win32-error=0/f
         ]
-        [ SW_RESTORE ShowWindow win32-error=0/f ]
-    } cleave ;
+        [ drop SW_RESTORE ShowWindow win32-error=0/f ]
+    } 2cleave ;
 
 M: windows-ui-backend (set-fullscreen) ( ? world -- )
     [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
 M: windows-ui-backend (fullscreen?) ( world -- ? )
-    [ handle>> hWnd>> hwnd>RECT ]
-    [ handle>> hWnd>> fullscreen-RECT ] bi
+    handle>> hWnd>>
+    [ hwnd>RECT ] [ fullscreen-RECT ] bi
     [ get-RECT-dimensions 2array 2nip ] bi@ = ;
 
 windows-ui-backend ui-backend set-global
