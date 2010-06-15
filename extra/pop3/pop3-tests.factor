@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Elie Chaftari.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: concurrency.promises namespaces kernel pop3 pop3.server
-sequences tools.test accessors ;
+sequences tools.test accessors calendar ;
 IN: pop3.tests
 
 FROM: pop3 => count delete ;
@@ -12,7 +12,7 @@ FROM: pop3 => count delete ;
 [ ] [
         <pop3-account>
             "127.0.0.1" >>host
-            "p1" get ?promise >>port
+            "p1" get 5 seconds ?promise-timeout >>port
         connect
 ] unit-test
 [ ] [ "username@host.com" >user ] unit-test
@@ -59,7 +59,7 @@ FROM: pop3 => count delete ;
 [ ] [
         <pop3-account>
             "127.0.0.1" >>host
-            "p2" get ?promise >>port
+            "p2" get 5 seconds ?promise-timeout >>port
             "username@host.com" >>user
             "password" >>pwd
         connect
