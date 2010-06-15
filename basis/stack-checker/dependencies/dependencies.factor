@@ -153,14 +153,15 @@ TUPLE: depends-on-single-method method-class object-class generic ;
 
 SYMBOL: +no-method+
 
-:: subclass-with-only-method ( class generic -- subclass/f/+no-method+ ) ! make it return +no-method+ sometimes
+:: subclass-with-only-method ( class generic -- subclass/f/+no-method+ )
     f generic method-classes
     [| last-class new-class |
         class new-class classes-intersect? [
             last-class [ f f ] [ new-class t ] if
         ] [ last-class t ] if
     ] all?
-    [ +no-method+ or ] [ drop f ] if ;
+    [ +no-method+ or class null class<= not swap and ]
+    [ drop f ] if ;
 
 M: depends-on-single-method satisfied?
     [ method-class>> ] [ object-class>> ] [ generic>> ] tri
