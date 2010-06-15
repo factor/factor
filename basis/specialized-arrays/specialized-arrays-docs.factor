@@ -1,4 +1,4 @@
-USING: help.markup help.syntax byte-arrays alien ;
+USING: help.markup help.syntax byte-arrays alien math sequences ;
 IN: specialized-arrays
 
 HELP: SPECIALIZED-ARRAY:
@@ -13,6 +13,28 @@ HELP: SPECIALIZED-ARRAYS:
 
 { POSTPONE: SPECIALIZED-ARRAY: POSTPONE: SPECIALIZED-ARRAYS: } related-words
 
+HELP: direct-slice
+{ $values { "from" integer } { "to" integer } { "seq" "a specialized array" } { "seq'" "a new specialized array" } }
+{ $description "Constructs a new specialized array of the same type as " { $snippet "seq" } " sharing the same underlying memory as the subsequence of " { $snippet "seq" } " from elements " { $snippet "from" } " up to but not including " { $snippet "to" } ". Like " { $link slice } ", raises an error if " { $snippet "from" } " or " { $snippet "to" } " is out of bounds." } ;
+
+HELP: direct-head
+{ $values { "seq" "a specialized array" } { "n" integer } { "seq'" "a new specialized array" } }
+{ $description "Constructs a new specialized array of the same type as " { $snippet "seq" } " sharing the same underlying memory as the first " { $snippet "n" } " elements of " { $snippet "seq" } ". Like " { $link head } ", raises an error if " { $snippet "n" } " is out of bounds." } ;
+
+HELP: direct-tail
+{ $values { "seq" "a specialized array" } { "n" integer } { "seq'" "a new specialized array" } }
+{ $description "Constructs a new specialized array of the same type as " { $snippet "seq" } " sharing the same underlying memory as " { $snippet "seq" } " without the first " { $snippet "n" } " elements. Like " { $link tail } ", raises an error if " { $snippet "n" } " is out of bounds." } ;
+
+HELP: direct-head*
+{ $values { "seq" "a specialized array" } { "n" integer } { "seq'" "a new specialized array" } }
+{ $description "Constructs a new specialized array of the same type as " { $snippet "seq" } " sharing the same underlying memory as " { $snippet "seq" } " without the last " { $snippet "n" } " elements. Like " { $link head* } ", raises an error if " { $snippet "n" } " is out of bounds." } ;
+
+HELP: direct-tail*
+{ $values { "seq" "a specialized array" } { "n" integer } { "seq'" "a new specialized array" } }
+{ $description "Constructs a new specialized array of the same type as " { $snippet "seq" } " sharing the same underlying memory as the last " { $snippet "n" } " elements of " { $snippet "seq" } ". Like " { $link tail* } ", raises an error if " { $snippet "n" } " is out of bounds." } ;
+
+{ direct-slice direct-head direct-tail direct-head* direct-tail* } related-words
+
 ARTICLE: "specialized-array-words" "Specialized array words"
 "The " { $link POSTPONE: SPECIALIZED-ARRAY: } " and " { $link POSTPONE: SPECIALIZED-ARRAYS: } " parsing words generate specialized array types if they haven't been generated already and add the following words to the vocabulary search path, where " { $snippet "T" } " is the C type in question:"
 { $table
@@ -21,11 +43,20 @@ ARTICLE: "specialized-array-words" "Specialized array words"
     { { $snippet "(T-array)" } { "Constructor for arrays with elements of type " { $snippet "T" } ", where the initial contents are uninitialized; stack effect " { $snippet "( len -- array )" } } }
     { { $snippet "malloc-T-array" } { "Constructor for arrays with elements of type " { $snippet "T" } " backed by newly-allocated unmanaged memory; stack effect " { $snippet "( alien len -- array )" } } }
     { { $snippet "<direct-T-array>" } { "Constructor for arrays with elements of type " { $snippet "T" } " backed by raw memory; stack effect " { $snippet "( alien len -- array )" } } }
-    { { $snippet "byte-array>T-array" } { "Converts a byte array into a specialized array by interpreting the bytes in as machine-specific values. Code which uses this word is unportable" } }
+    { { $snippet "T-array-cast" } { "Converts a byte array into a specialized array by interpreting the bytes in as machine-specific values. Code which uses this word is unportable" } }
     { { $snippet ">T-array" } { "Converts a sequence into a specialized array of type " { $snippet "T" } "; stack effect " { $snippet "( seq -- array )" } } }
     { { $snippet "T-array{" } { "Literal syntax, consists of a series of values terminated by " { $snippet "}" } } }
 }
-"Behind the scenes, these words are placed in a vocabulary named " { $snippet "specialized-arrays.instances.T" } ", however this vocabulary should not be placed in a " { $link POSTPONE: USING: } " form directly. Instead, always use " { $link POSTPONE: SPECIALIZED-ARRAY: } " or " { $link POSTPONE: SPECIALIZED-ARRAYS: } ". This ensures that the vocabulary can get generated the first time it is needed." ;
+"Behind the scenes, these words are placed in a vocabulary named " { $snippet "specialized-arrays.instances.T" } ", however this vocabulary should not be placed in a " { $link POSTPONE: USING: } " form directly. Instead, always use " { $link POSTPONE: SPECIALIZED-ARRAY: } " or " { $link POSTPONE: SPECIALIZED-ARRAYS: } ". This ensures that the vocabulary can get generated the first time it is needed."
+$nl
+"Additionally, special versions of the standard " { $link <slice> } ", " { $link head } ", and " { $link tail } " sequence operations are provided for specialized arrays to create a new specialized array object sharing storage with a subsequence of an existing array:"
+{ $subsections
+    direct-slice
+    direct-head
+    direct-tail
+    direct-head*
+    direct-tail*
+} ;
 
 ARTICLE: "specialized-array-c" "Passing specialized arrays to C functions"
 "If a C function is declared as taking a parameter with a pointer or an array type (for example, " { $snippet "float*" } " or " { $snippet "int[3]" } "), instances of the relevant specialized array can be passed in."

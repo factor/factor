@@ -27,10 +27,10 @@ SPECIALIZED-ARRAYS: bool ushort char uint float ulonglong ;
 ] unit-test
 
 [ ushort-array{ 1234 } ] [
-    little-endian? B{ 210 4 } B{ 4 210 } ? byte-array>ushort-array
+    little-endian? B{ 210 4 } B{ 4 210 } ? ushort-array-cast
 ] unit-test
 
-[ B{ 210 4 1 } byte-array>ushort-array ] must-fail
+[ B{ 210 4 1 } ushort-array-cast ] must-fail
 
 [ { 3 1 3 3 7 } ] [
     int-array{ 3 1 3 3 7 } malloc-byte-array 5 <direct-int-array> >array
@@ -191,3 +191,16 @@ SPECIALIZED-ARRAY: struct-resize-test
         \ struct-resize-test-usage forget
     ] with-compilation-unit
 ] unit-test
+
+[ int-array{ 4 5 6 } ] [ 3 6 int-array{ 1 2 3 4 5 6 7 8 } direct-slice ] unit-test
+[ int-array{ 1 2 3 } ] [ int-array{ 1 2 3 4 5 6 7 8 } 3 direct-head ] unit-test
+[ int-array{ 1 2 3 4 5 } ] [ int-array{ 1 2 3 4 5 6 7 8 } 3 direct-head* ] unit-test
+[ int-array{ 4 5 6 7 8 } ] [ int-array{ 1 2 3 4 5 6 7 8 } 3 direct-tail ] unit-test
+[ int-array{ 6 7 8 } ] [ int-array{ 1 2 3 4 5 6 7 8 } 3 direct-tail* ] unit-test
+
+
+[ int-array{ 1 2 3 4 55555 6 7 8 } ] [
+    int-array{ 1 2 3 4 5 6 7 8 }
+    3 6 pick direct-slice [ 55555 1 ] dip set-nth
+] unit-test
+

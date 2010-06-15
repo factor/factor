@@ -36,9 +36,11 @@ DEFER: plist>
     NSFastEnumeration-map >hashtable ;
 
 : (read-plist) ( NSData -- id )
-    NSPropertyListSerialization swap kCFPropertyListImmutable f f <void*>
-    [ -> propertyListFromData:mutabilityOption:format:errorDescription: ] keep
-    *void* [ -> release "read-plist failed" throw ] when* ;
+    NSPropertyListSerialization swap kCFPropertyListImmutable f
+    { void* }
+    [ -> propertyListFromData:mutabilityOption:format:errorDescription: ] [ ]
+    with-out-parameters
+    [ -> release "read-plist failed" throw ] when* ;
 
 MACRO: objc-class-case ( alist -- quot )
     [

@@ -7,7 +7,7 @@ IN: game.worlds
 TUPLE: game-world < world
     game-loop
     audio-engine
-    { tick-interval-micros fixnum }
+    { tick-interval-nanos integer }
     { use-game-input? boolean }
     { use-audio-engine? boolean }
     { audio-engine-device initial: f }
@@ -44,7 +44,7 @@ PRIVATE>
 M: game-world begin-world
     dup use-game-input?>> [ open-game-input ] when
     dup use-audio-engine?>> [ dup open-game-audio-engine >>audio-engine ] when
-    dup [ tick-interval-micros>> ] [ ] bi <game-loop>
+    dup [ tick-interval-nanos>> ] [ ] bi <game-loop>
     [ >>game-loop begin-game-world ] keep start-loop ;
 
 M: game-world end-world
@@ -54,7 +54,7 @@ M: game-world end-world
     [ use-game-input?>> [ close-game-input ] when ] tri ;
 
 TUPLE: game-attributes < world-attributes
-    { tick-interval-micros fixnum }
+    { tick-interval-nanos integer }
     { use-game-input? boolean initial: f }
     { use-audio-engine? boolean initial: f }
     { audio-engine-device initial: f }
@@ -62,7 +62,7 @@ TUPLE: game-attributes < world-attributes
 
 M: game-world apply-world-attributes
     {
-        [ tick-interval-micros>> >>tick-interval-micros ]
+        [ tick-interval-nanos>> >>tick-interval-nanos ]
         [ use-game-input?>> >>use-game-input? ]
         [ use-audio-engine?>> >>use-audio-engine? ]
         [ audio-engine-device>> >>audio-engine-device ]

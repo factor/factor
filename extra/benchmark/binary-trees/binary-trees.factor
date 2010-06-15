@@ -1,5 +1,7 @@
-USING: kernel math accessors prettyprint io locals sequences
-math.ranges math.order ;
+! Copyright (C) 2008, 2010 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors kernel math math.ranges math.order math.parser
+io locals sequences ;
 IN: benchmark.binary-trees
 
 TUPLE: tree-node item left right ;
@@ -27,8 +29,8 @@ CONSTANT: min-depth 4
 
 : stretch-tree ( max-depth -- )
     1 + 0 over bottom-up-tree item-check
-    [ "stretch tree of depth " write pprint ]
-    [ "\t check: " write . ] bi* ; inline
+    [ "stretch tree of depth " write number>string write ]
+    [ "\t check: " write number>string print ] bi* ; inline
 
 :: long-lived-tree ( max-depth -- )
     0 max-depth bottom-up-tree
@@ -40,13 +42,13 @@ CONSTANT: min-depth 4
                 [ depth bottom-up-tree item-check + ] bi@
             ] reduce
         ]
-        [ 2 * ] bi
-        pprint "\t trees of depth " write depth pprint
-        "\t check: " write .
+        [ 2 * number>string write ] bi
+        "\t trees of depth " write depth number>string write
+        "\t check: " write number>string print
     ] each
 
-    "long lived tree of depth " write max-depth pprint
-    "\t check: " write item-check . ; inline
+    "long lived tree of depth " write max-depth number>string write
+    "\t check: " write item-check number>string print ; inline
 
 : binary-trees ( n -- )
     min-depth 2 + max [ stretch-tree ] [ long-lived-tree ] bi ; inline

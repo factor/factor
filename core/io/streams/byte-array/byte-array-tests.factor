@@ -45,5 +45,5 @@ IN: io.streams.byte-array.tests
 ! Writing specialized arrays to byte writers
 [ int-array{ 1 2 3 } ] [
     binary [ int-array{ 1 2 3 } write ] with-byte-writer
-    byte-array>int-array
+    int-array-cast
 ] unit-test

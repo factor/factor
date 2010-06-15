@@ -1,6 +1,6 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs fry kernel namespaces
+USING: accessors arrays assocs fry locals kernel namespaces
 sequences sequences.deep
 sets vectors
 cpu.architecture
@@ -46,35 +46,39 @@ SYMBOL: class-element-map
 ! Sequence of vreg pairs
 SYMBOL: copies
 
+: value-of ( vreg -- value )
+    insn-of dup ##tagged>integer? [ src>> ] [ dst>> ] if ;
+
 : init-coalescing ( -- )
-    defs get keys
-    [ [ dup ] H{ } map>assoc leader-map set ]
-    [ [ dup 1vector ] H{ } map>assoc class-element-map set ] bi
+    defs get
+    [ [ drop dup ] assoc-map leader-map set ]
+    [ [ [ dup dup value-of ] dip <vreg-info> 1array ] assoc-map class-element-map set ] bi
     V{ } clone copies set ;
 
-: classes-interfere? ( vreg1 vreg2 -- ? )
-    [ leader ] bi@ 2dup eq? [ 2drop f ] [
-        [ class-elements flatten ] bi@ sets-interfere?
-    ] if ;
-
-: update-leaders ( vreg1 vreg2 -- )
+: coalesce-leaders ( vreg1 vreg2 -- )
+    ! leader2 becomes the leader.
     swap leader-map get set-at ;
 
-: merge-classes ( vreg1 vreg2 -- )
-    [ [ class-elements ] bi@ push ]
-    [ drop class-element-map get delete-at ] 2bi ;
+: coalesce-elements ( merged vreg1 vreg2 -- )
+    ! delete leader1's class, and set leader2's class to merged.
+    class-element-map get [ delete-at ] [ set-at ] bi-curry bi* ;
 
-: eliminate-copy ( vreg1 vreg2 -- )
-    [ leader ] bi@
-    2dup eq? [ 2drop ] [
-        [ update-leaders ]
-        [ merge-classes ]
-        2bi
-    ] if ;
+: coalesce-vregs ( merged leader1 leader2 -- )
+    [ coalesce-leaders ] [ coalesce-elements ] 2bi ;
+
+:: maybe-eliminate-copy ( vreg1 vreg2 -- )
+    ! Eliminate a copy of possible.
+    vreg1 leader :> vreg1
+    vreg2 leader :> vreg2
+    vreg1 vreg2 eq? [
+        vreg1 class-elements vreg2 class-elements sets-interfere?
+        [ drop ] [ vreg1 vreg2 coalesce-vregs ] if
+    ] unless ;
 
 GENERIC: prepare-insn ( insn -- )
 
-: try-to-coalesce ( dst src -- ) 2array copies get push ;
+: maybe-eliminate-copy-later ( dst src -- )
+    2array copies get push ;
 
 M: insn prepare-insn drop ;
 
@@ -85,19 +89,19 @@ M: vreg-insn prepare-insn
         2dup empty? not and [
             first
             2dup [ rep-of reg-class-of ] bi@ eq?
-            [ try-to-coalesce ] [ 2drop ] if
+            [ maybe-eliminate-copy-later ] [ 2drop ] if
         ] [ 2drop ] if
     ] bi ;
 
 M: ##copy prepare-insn
-    [ dst>> ] [ src>> ] bi try-to-coalesce ;
+    [ dst>> ] [ src>> ] bi maybe-eliminate-copy-later ;
 
 M: ##tagged>integer prepare-insn
-    [ dst>> ] [ src>> ] bi eliminate-copy ;
+    [ dst>> ] [ src>> ] bi maybe-eliminate-copy ;
 
 M: ##phi prepare-insn
     [ dst>> ] [ inputs>> values ] bi
-    [ eliminate-copy ] with each ;
+    [ maybe-eliminate-copy ] with each ;
 
 : prepare-block ( bb -- )
     instructions>> [ prepare-insn ] each ;
@@ -107,10 +111,7 @@ M: ##phi prepare-insn
     [ prepare-block ] each-basic-block ;
 
 : process-copies ( -- )
-    copies get [
-        2dup classes-interfere?
-        [ 2drop ] [ eliminate-copy ] if
-    ] assoc-each ;
+    copies get [ maybe-eliminate-copy ] assoc-each ;
 
 GENERIC: useful-insn? ( insn -- ? )
 
@@ -135,6 +136,7 @@ PRIVATE>
 
     dup construct-cssa
     dup compute-defs
+    dup compute-insns
     dup compute-ssa-live-sets
     dup compute-live-ranges
     dup prepare-coalescing

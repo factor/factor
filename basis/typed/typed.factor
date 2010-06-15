@@ -7,7 +7,7 @@ locals.parser macros stack-checker.dependencies ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: typed
 
-ERROR: type-mismatch-error word expected-types ;
+ERROR: type-mismatch-error value expected-type word expected-types ;
 ERROR: input-mismatch-error < type-mismatch-error ;
 ERROR: output-mismatch-error < type-mismatch-error ;
 
@@ -28,9 +28,6 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
 : typed-stack-effect? ( effect -- ? )
     [ object = ] all? not ;
 
-: input-mismatch-quot ( word types -- quot )
-    [ input-mismatch-error ] 2curry ;
-
 : depends-on-unboxing ( class -- )
     [ dup tuple-layout depends-on-tuple-layout ]
     [ depends-on-final ]
@@ -47,7 +44,7 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
 
 :: unboxer ( error-quot word types type -- quot )
     type "coercer" word-prop [ ] or
-    [ dup type instance? [ word types error-quot call ] unless ]
+    type type word types error-quot '[ dup _ instance? [ _ _ _ @ ] unless ]
     type (unboxer)
     compose compose ;
 

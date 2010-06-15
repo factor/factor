@@ -6,7 +6,7 @@ classes.tuple namespaces make vectors bit-arrays byte-arrays
 strings sbufs math.functions macros sequences.private
 combinators mirrors splitting combinators.smart
 combinators.short-circuit fry words.symbol generalizations
-classes ;
+sequences.generalizations classes ;
 IN: inverse
 
 ERROR: fail ;

@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays continuations io
+USING: alien alien.c-types alien.data arrays continuations io
 io.backend.windows io.pipes.windows.nt io.pathnames libc
 io.ports windows.types math windows.kernel32 namespaces make
 io.launcher kernel sequences windows.errors splitting system
@@ -159,7 +159,7 @@ M: windows kill-process* ( handle -- )
 
 : exit-code ( process -- n )
     hProcess>>
-    0 <ulong> [ GetExitCodeProcess ] keep *ulong
+    { DWORD } [ GetExitCodeProcess ] [ ] with-out-parameters
     swap win32-error=0/f ;
 
 : process-exited ( process -- )

@@ -6,9 +6,10 @@ definitions stack-checker.dependencies quotations
 classes.tuple.private math math.partial-dispatch math.private
 math.intervals sets.private math.floats.private
 math.integers.private layouts math.order vectors hashtables
-combinators effects generalizations assocs sets
-combinators.short-circuit sequences.private locals growable
-stack-checker namespaces compiler.tree.propagation.info ;
+combinators effects generalizations sequences.generalizations
+assocs sets combinators.short-circuit sequences.private locals
+growable stack-checker namespaces compiler.tree.propagation.info
+;
 FROM: math => float ;
 FROM: sets => set ;
 IN: compiler.tree.propagation.transforms
@@ -315,9 +316,7 @@ M\ set intersect [ intersect-quot ] 1 define-partial-eval
 ! We want to constant-fold calls to heap-size, and recompile those
 ! calls when a C type is redefined
 \ heap-size [
-    dup word? [
-        [ depends-on-definition ] [ heap-size '[ _ ] ] bi
-    ] [ drop f ] if
+    [ depends-on-c-type ] [ heap-size '[ _ ] ] bi
 ] 1 define-partial-eval
 
 ! Eliminates a few redundant checks here and there

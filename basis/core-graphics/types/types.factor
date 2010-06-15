@@ -8,12 +8,6 @@ IN: core-graphics.types
 SYMBOL: CGFloat
 << cell 4 = float double ? \ CGFloat typedef >>
 
-: <CGFloat> ( x -- alien )
-    cell 4 = [ <float> ] [ <double> ] if ; inline
-
-: *CGFloat ( alien -- x )
-    cell 4 = [ *float ] [ *double ] if ; inline
-
 STRUCT: CGPoint
     { x CGFloat }
     { y CGFloat } ;
@@ -30,7 +24,7 @@ STRUCT: CGSize
 
 STRUCT: CGRect
     { origin CGPoint }
-    { size   CGSize  } ;
+    { size CGSize } ;
 
 : CGPoint>loc ( CGPoint -- loc )
     [ x>> ] [ y>> ] bi 2array ;
@@ -40,7 +34,7 @@ STRUCT: CGRect
 
 : CGRect>rect ( CGRect -- rect )
     [ origin>> CGPoint>loc ]
-    [ size>>   CGSize>dim ]
+    [ size>> CGSize>dim ]
     bi <rect> ; inline
 
 : CGRect-x ( CGRect -- x )

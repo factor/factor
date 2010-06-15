@@ -1,21 +1,25 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences accessors combinators math namespaces
-init sets words assocs alien.libraries alien alien.private
-alien.c-types fry stack-checker.backend
-stack-checker.errors stack-checker.visitor
-stack-checker.dependencies ;
+USING: kernel arrays sequences accessors combinators math
+namespaces init sets words assocs alien.libraries alien
+alien.private alien.c-types fry quotations strings
+stack-checker.backend stack-checker.errors stack-checker.visitor
+stack-checker.dependencies compiler.utilities ;
 IN: stack-checker.alien
 
-TUPLE: alien-node-params return parameters abi in-d out-d ;
+TUPLE: alien-node-params
+return parameters
+{ abi abi initial: cdecl }
+in-d
+out-d ;
 
-TUPLE: alien-invoke-params < alien-node-params library function ;
+TUPLE: alien-invoke-params < alien-node-params library { function string } ;
 
 TUPLE: alien-indirect-params < alien-node-params ;
 
-TUPLE: alien-assembly-params < alien-node-params quot ;
+TUPLE: alien-assembly-params < alien-node-params { quot callable } ;
 
-TUPLE: alien-callback-params < alien-node-params quot xt ;
+TUPLE: alien-callback-params < alien-node-params { quot callable } xt ;
 
 : param-prep-quot ( params -- quot )
     parameters>> [ c-type c-type-unboxer-quot ] map spread>quot ;
@@ -104,6 +108,18 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
 : callback-bottom ( params -- )
     xt>> '[ _ callback-xt ] infer-quot-here ;
 
+: callback-return-quot ( ctype -- quot )
+    return>> [ [ ] ] [ c-type c-type-unboxer-quot ] if-void ;
+
+: callback-prep-quot ( params -- quot )
+    parameters>> [ c-type c-type-boxer-quot ] map spread>quot ;
+
+: wrap-callback-quot ( params -- quot )
+    [ callback-prep-quot ] [ quot>> ] [ callback-return-quot ] tri 3append
+     yield-hook get
+     '[ _ _ do-callback ]
+     >quotation ;
+
 : infer-alien-callback ( -- )
     alien-callback-params new
     pop-quot
@@ -111,5 +127,6 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
     pop-params
     pop-return
     "( callback )" <uninterned-word> >>xt
+    dup wrap-callback-quot >>quot
     dup callback-bottom
     #alien-callback, ;

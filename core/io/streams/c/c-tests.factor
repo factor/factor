@@ -31,7 +31,7 @@ IN: io.streams.c.tests
     "test.txt" temp-file "rb" fopen <c-reader> [
         3 4 * read
     ] with-input-stream
-    byte-array>int-array
+    int-array-cast
 ] unit-test
 
 ! Writing strings to binary streams should fail

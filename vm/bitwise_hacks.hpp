@@ -60,4 +60,11 @@ inline cell popcount(cell x)
 	return x;
 }
 
+inline bool bitmap_p(u8 *bitmap, cell index)
+{
+	cell byte = index >> 3;
+	cell bit = index & 7;
+	return (bitmap[byte] & (1 << bit)) != 0;
+}
+
 }

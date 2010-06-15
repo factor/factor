@@ -1,19 +1,52 @@
-! Copyright (C) 2005, 2010 Eduardo Cavazos and Slava Pestov
+! Copyright (C) 2005, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types ascii assocs classes.struct combinators
-combinators.short-circuit command-line environment io.encodings.ascii
-io.encodings.string io.encodings.utf8 kernel literals locals math
-namespaces sequences specialized-arrays.instances.alien.c-types.uchar
-strings ui ui.backend ui.clipboards ui.event-loop ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.pixel-formats.private ui.private x11 x11.clipboard x11.constants
-x11.events x11.glx x11.io x11.windows x11.xim x11.xlib ;
-FROM: unix.ffi => system ;
+USING: accessors arrays alien.c-types alien.data alien.syntax ascii
+assocs classes.struct combinators combinators.short-circuit
+command-line environment io.encodings.ascii io.encodings.string
+io.encodings.utf8 kernel literals locals math namespaces
+sequences specialized-arrays strings ui ui.backend ui.clipboards
+ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gestures ui.pixel-formats ui.pixel-formats.private ui.private
+x11 x11.clipboard x11.constants x11.events x11.glx x11.io
+x11.windows x11.xim x11.xlib ;
+FROM: libc => system ;
+SPECIALIZED-ARRAYS: uchar ulong ;
 IN: ui.backend.x11
 
 SINGLETON: x11-ui-backend
 
+: XA_NET_SUPPORTED ( -- atom ) "_NET_SUPPORTED" x-atom ;
 : XA_NET_WM_NAME ( -- atom ) "_NET_WM_NAME" x-atom ;
+: XA_NET_WM_STATE ( -- atom ) "_NET_WM_STATE" x-atom ;
+: XA_NET_WM_STATE_FULLSCREEN ( -- atom ) "_NET_WM_STATE_FULLSCREEN" x-atom ;
+: XA_NET_ACTIVE_WINDOW ( -- atom ) "_NET_ACTIVE_WINDOW" x-atom ;
+
+: supported-net-wm-hints ( -- seq )
+    { Atom int ulong ulong pointer: Atom }
+    [| type format n-atoms bytes-after atoms |
+        dpy get
+        root get
+        XA_NET_SUPPORTED
+        0
+        ulong c-type-interval nip
+        0
+        XA_ATOM
+        type
+        format
+        n-atoms
+        bytes-after
+        atoms
+        XGetWindowProperty
+        Success assert=
+    ]
+    [| type format n-atoms bytes-after atoms |
+        atoms n-atoms <direct-ulong-array> >array
+        atoms XFree
+    ]
+    with-out-parameters ;
+
+: net-wm-hint-supported? ( atom -- ? )
+    supported-net-wm-hints member? ;
 
 TUPLE: x11-handle-base glx ;
 TUPLE: x11-handle < x11-handle-base window xic ;
@@ -29,7 +62,7 @@ M: world configure-event
     ! In case dimensions didn't change
     relayout-1 ;
 
-PIXEL-FORMAT-ATTRIBUTE-TABLE: glx-visual { $ GLX_USE_GL $ GLX_RGBA } H{
+PIXEL-FORMAT-ATTRIBUTE-TABLE: glx-visual { $ GLX_RGBA } H{
     { double-buffered { $ GLX_DOUBLEBUFFER } }
     { stereo { $ GLX_STEREO } }
     { color-bits { $ GLX_BUFFER_SIZE } }
@@ -60,7 +93,7 @@ M: x11-ui-backend (pixel-format-attribute)
     [ handle>> ] [ >glx-visual ] bi*
     [ 2drop f ] [
         first
-        0 <int> [ glXGetConfig drop ] keep *int
+        { int } [ glXGetConfig drop ] [ ] with-out-parameters
     ] if-empty ;
 
 CONSTANT: modifiers
@@ -171,8 +204,7 @@ M: world selection-notify-event
     user-input ;
 
 : supported-type? ( atom -- ? )
-    { "UTF8_STRING" "STRING" "TEXT" }
-    [ x-atom = ] with any? ;
+    XA_UTF8_STRING XA_STRING XA_TEXT 3array member? ;
 
 : clipboard-for-atom ( atom -- clipboard )
     {
@@ -195,8 +227,8 @@ M: world selection-notify-event
 M: world selection-request-event
     drop dup target>> {
         { [ dup supported-type? ] [ drop dup set-selection-prop send-notify-success ] }
-        { [ dup "TARGETS" x-atom = ] [ drop dup set-targets-prop send-notify-success ] }
-        { [ dup "TIMESTAMP" x-atom = ] [ drop dup set-timestamp-prop send-notify-success ] }
+        { [ dup XA_TARGETS = ] [ drop dup set-targets-prop send-notify-success ] }
+        { [ dup XA_TIMESTAMP = ] [ drop dup set-timestamp-prop send-notify-success ] }
         [ drop send-notify-failure ]
     } cond ;
 
@@ -257,31 +289,57 @@ M: x11-ui-backend set-title ( string world -- )
     handle>> window>> swap
     [ dpy get ] 2dip [ set-title-old ] [ set-title-new ] 3bi ;
 
-: make-fullscreen-msg ( world ? -- msg )
+: make-fullscreen-msg ( window ? -- msg )
     XClientMessageEvent <struct>
-    ClientMessage >>type
-    dpy get >>display
-    "_NET_WM_STATE" x-atom >>message_type
-    swap _NET_WM_STATE_ADD _NET_WM_STATE_REMOVE ? >>data0
-    swap handle>> window>> >>window
-    32 >>format
-    "_NET_WM_STATE_FULLSCREEN" x-atom >>data1 ;
+        ClientMessage >>type
+        dpy get >>display
+        XA_NET_WM_STATE >>message_type
+        swap _NET_WM_STATE_ADD _NET_WM_STATE_REMOVE ? >>data0
+        swap >>window
+        32 >>format
+        XA_NET_WM_STATE_FULLSCREEN >>data1 ;
+
+: send-event ( event -- )
+    [
+        dpy get
+        root get
+        0
+        SubstructureNotifyMask SubstructureRedirectMask bitor
+    ] dip XSendEvent drop ;
 
 M: x11-ui-backend (set-fullscreen) ( world ? -- )
-    [ dpy get root get 0 SubstructureNotifyMask ] 2dip
-    make-fullscreen-msg XSendEvent drop ;
+    [ handle>> window>> ] dip make-fullscreen-msg send-event ;
 
 M: x11-ui-backend (open-window) ( world -- )
-    dup gadget-window
-    handle>> window>>
-    [ set-closable ] [ dpy get swap set-class ] [ map-window ] tri ;
+    dup gadget-window handle>> window>>
+    [ set-closable ]
+    [ [ dpy get ] dip set-class ]
+    [ map-window ]
+    tri ;
+
+: make-raise-window-msg ( window -- msg )
+    XClientMessageEvent <struct>
+        ClientMessage >>type
+        1 >>send_event
+        dpy get >>display
+        swap >>window
+        XA_NET_ACTIVE_WINDOW >>message_type
+        32 >>format ;
+
+: raise-window-new ( window -- )
+    make-raise-window-msg send-event ;
+
+: raise-window-old ( window -- )
+    [ dpy get ] dip
+    [ RevertToPointerRoot CurrentTime XSetInputFocus drop ]
+    [ XRaiseWindow drop ]
+    2bi ;
 
 M: x11-ui-backend raise-window* ( world -- )
     handle>> [
-        dpy get swap window>>
-        [ RevertToPointerRoot CurrentTime XSetInputFocus drop ]
-        [ XRaiseWindow drop ]
-        2bi
+        window>>
+        XA_NET_ACTIVE_WINDOW net-wm-hint-supported?
+        [ raise-window-new ] [ raise-window-old ] if
     ] when* ;
 
 M: x11-handle select-gl-context ( handle -- )

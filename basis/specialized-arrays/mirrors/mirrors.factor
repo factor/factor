@@ -3,4 +3,4 @@
 USING: mirrors specialized-arrays math.vectors ;
 IN: specialized-arrays.mirrors
 
-INSTANCE: specialized-array enumerated-sequence
+INSTANCE: specialized-array inspected-sequence

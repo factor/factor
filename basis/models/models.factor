@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors generic kernel math sequences arrays assocs
-alarms calendar math.order continuations fry ;
+calendar math.order continuations fry ;
 IN: models
 
 TUPLE: model < identity-tuple

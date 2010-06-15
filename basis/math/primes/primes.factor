@@ -46,10 +46,23 @@ PRIVATE>
         next-odd [ dup prime? ] [ 2 + ] until
     ] if ; foldable
 
-: primes-between ( low high -- seq )
+<PRIVATE
+
+: (primes-between) ( low high -- seq )
     [ [ 3 max dup even? [ 1 + ] when ] dip 2 <range> ]
     [ <primes-vector> ] 2bi
     [ '[ [ prime? ] _ push-if ] each ] keep clone ;
+
+PRIVATE>
+
+: primes-between ( low high -- seq )
+    [ ceiling >integer ] [ floor >integer ] bi*
+    {
+        { [ 2dup > ] [ 2drop V{ } clone ] }
+        { [ dup 2 = ] [ 2drop V{ 2 } clone ] }
+        { [ dup 2 < ] [ 2drop V{ } clone ] }
+        [ (primes-between) ]
+    } cond ;
 
 : primes-upto ( n -- seq ) 2 swap primes-between ;
 

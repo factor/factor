@@ -1,11 +1,11 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs cache colors.constants destructors
-kernel opengl opengl.gl opengl.capabilities combinators images
-images.tesselation grouping sequences math math.vectors
-generalizations fry arrays namespaces system
-locals literals specialized-arrays ;
-FROM: alien.c-types => float ;
+USING: accessors alien.data assocs cache colors.constants
+destructors kernel opengl opengl.gl opengl.capabilities
+combinators images images.tesselation grouping sequences math
+math.vectors generalizations fry arrays namespaces system locals
+literals specialized-arrays ;
+FROM: alien.c-types => int float ;
 SPECIALIZED-ARRAY: float
 IN: opengl.textures
 
@@ -404,3 +404,9 @@ PRIVATE>
     over dim>> max-texture-size [ <= ] 2all?
     [ <single-texture> ]
     [ [ max-texture-size tesselate ] dip <multi-texture> ] if ;
+
+: get-texture-float ( target level enum -- value )
+    { float } [ glGetTexLevelParameterfv ] [ ] with-out-parameters ; inline
+
+: get-texture-int ( target level enum -- value )
+    { int } [ glGetTexLevelParameteriv ] [ ] with-out-parameters ; inline

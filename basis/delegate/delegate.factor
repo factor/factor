@@ -22,13 +22,16 @@ GENERIC: group-words ( group -- words )
 M: standard-generic group-words
     dup "combination" word-prop #>> 2array 1array ;
 
-M: tuple-class group-words
-    all-slots [
+: slot-group-words ( slots -- words )
+    [
         name>>
         [ reader-word 0 2array ]
         [ writer-word 0 2array ] bi
         2array
     ] map concat ;
+
+M: tuple-class group-words
+    all-slots slot-group-words ;
 
 : check-broadcast-group ( group -- group )
     dup group-words [ first stack-effect out>> empty? ] all?
