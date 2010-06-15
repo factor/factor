@@ -1,11 +1,12 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs io kernel math models namespaces make dlists
-deques sequences threads words continuations init
-combinators combinators.short-circuit hashtables concurrency.flags
-sets accessors calendar fry destructors ui.gadgets ui.gadgets.private
-ui.gadgets.worlds ui.gadgets.tracks ui.gestures ui.backend ui.render
-strings classes.tuple classes.tuple.parser lexer vocabs.parser parser ;
+USING: arrays assocs boxes io kernel math models namespaces make
+dlists deques sequences threads words continuations init
+combinators combinators.short-circuit hashtables
+concurrency.flags sets accessors calendar fry destructors
+ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gadgets.tracks ui.gestures ui.backend ui.render strings
+classes.tuple classes.tuple.parser lexer vocabs.parser parser ;
 IN: ui
 
 <PRIVATE
@@ -82,12 +83,7 @@ M: world graft*
         [ [ clean-up-broken-window ] [ ui-error ] bi* ] recover
     ] bi ;
 
-: reset-world ( world -- )
-    #! This is used when a window is being closed, but also
-    #! when restoring saved worlds on image startup.
-    f >>handle unfocus-world ;
-
-: (ungraft-world) ( world -- )
+M: world ungraft*
     {
         [ set-gl-context ]
         [ text-handle>> [ dispose ] when* ]
@@ -96,37 +92,20 @@ M: world graft*
         [ hand-gadget close-global ]
         [ end-world ]
         [ [ <reversed> [ [ dispose ] when* ] each V{ } clone ] change-window-resources drop ]
+        [ [ (close-window) f ] change-handle drop ]
+        [ unfocus-world ]
     } cleave ;
 
-M: world ungraft*
-    [ (ungraft-world) ]
-    [ handle>> (close-window) ]
-    [ reset-world ] tri ;
-
 : init-ui ( -- )
+    <box> drag-timer set-global
+    f hand-gadget set-global
+    f hand-clicked set-global
+    f hand-world set-global
+    f world set-global
     <dlist> \ graft-queue set-global
     <dlist> \ layout-queue set-global
     <dlist> \ gesture-queue set-global
     V{ } clone windows set-global ;
-
-: restore-gadget-later ( gadget -- )
-    dup graft-state>> {
-        { { f f } [ ] }
-        { { f t } [ ] }
-        { { t t } [ { f f } >>graft-state ] }
-        { { t f } [ dup unqueue-graft { f f } >>graft-state ] }
-    } case graft-later ;
-
-: restore-gadget ( gadget -- )
-    dup restore-gadget-later
-    children>> [ restore-gadget ] each ;
-
-: restore-world ( world -- )
-    {
-        [ reset-world ]
-        [ f >>text-handle f >>images drop ]
-        [ restore-gadget ]
-    } cleave ;
 
 : update-hand ( world -- )
     dup hand-world get-global eq?
@@ -188,16 +167,6 @@ PRIVATE>
 : start-ui ( quot -- )
     call( -- ) notify-ui-thread start-ui-thread ;
 
-: restore-windows ( -- )
-    [
-        windows get [ values ] [ delete-all ] bi
-        [ restore-world ] each
-        forget-rollover
-    ] (with-ui) ;
-
-: restore-windows? ( -- ? )
-    windows get empty? not ;
-
 : ?attributes ( gadget title/attributes -- attributes )
     dup string? [ world-attributes new swap >>title ] [ clone ] if
     swap [ [ [ 1array ] [ f ] if* ] curry unless* ] curry change-gadgets ;
@@ -238,7 +207,7 @@ M: object close-window
     <flag> ui-notify-flag set-global
 ] "ui" add-startup-hook
 
-: with-ui ( quot -- )
+: with-ui ( quot: ( -- ) -- )
     ui-running? [ call( -- ) ] [ '[ init-ui @ ] (with-ui) ] if ;
 
 HOOK: beep ui-backend ( -- )

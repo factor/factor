@@ -162,6 +162,7 @@ CODEGEN: ##max %max
 CODEGEN: ##not %not
 CODEGEN: ##neg %neg
 CODEGEN: ##log2 %log2
+CODEGEN: ##bit-count %bit-count
 CODEGEN: ##copy %copy
 CODEGEN: ##tagged>integer %tagged>integer
 CODEGEN: ##add-float %add-float
@@ -181,12 +182,16 @@ CODEGEN: ##zero-vector %zero-vector
 CODEGEN: ##fill-vector %fill-vector
 CODEGEN: ##gather-vector-2 %gather-vector-2
 CODEGEN: ##gather-vector-4 %gather-vector-4
+CODEGEN: ##gather-int-vector-2 %gather-int-vector-2
+CODEGEN: ##gather-int-vector-4 %gather-int-vector-4
+CODEGEN: ##select-vector %select-vector
 CODEGEN: ##shuffle-vector-imm %shuffle-vector-imm
 CODEGEN: ##shuffle-vector-halves-imm %shuffle-vector-halves-imm
 CODEGEN: ##shuffle-vector %shuffle-vector
 CODEGEN: ##tail>head-vector %tail>head-vector
 CODEGEN: ##merge-vector-head %merge-vector-head
 CODEGEN: ##merge-vector-tail %merge-vector-tail
+CODEGEN: ##float-pack-vector %float-pack-vector
 CODEGEN: ##signed-pack-vector %signed-pack-vector
 CODEGEN: ##unsigned-pack-vector %unsigned-pack-vector
 CODEGEN: ##unpack-vector-head %unpack-vector-head
@@ -282,17 +287,16 @@ CONDITIONAL: ##fixnum-mul %fixnum-mul
 
 ! FFI
 CODEGEN: ##unbox %unbox
+CODEGEN: ##unbox-long-long %unbox-long-long
 CODEGEN: ##store-reg-param %store-reg-param
 CODEGEN: ##store-stack-param %store-stack-param
-CODEGEN: ##store-return %store-return
-CODEGEN: ##store-struct-return %store-struct-return
-CODEGEN: ##store-long-long-return %store-long-long-return
-CODEGEN: ##prepare-struct-area %prepare-struct-area
+CODEGEN: ##load-reg-param %load-reg-param
+CODEGEN: ##load-stack-param %load-stack-param
+CODEGEN: ##local-allot %local-allot
 CODEGEN: ##box %box
 CODEGEN: ##box-long-long %box-long-long
-CODEGEN: ##box-large-struct %box-large-struct
-CODEGEN: ##box-small-struct %box-small-struct
-CODEGEN: ##save-param-reg %save-param-reg
+CODEGEN: ##allot-byte-array %allot-byte-array
+CODEGEN: ##prepare-var-args %prepare-var-args
 CODEGEN: ##alien-invoke %alien-invoke
 CODEGEN: ##cleanup %cleanup
 CODEGEN: ##alien-indirect %alien-indirect

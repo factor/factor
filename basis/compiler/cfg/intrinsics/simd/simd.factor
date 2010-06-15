@@ -303,7 +303,10 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
     [ ^^scalar>vector ] keep [ 0 ] dip ^broadcast-vector ;
 
 : ^select-vector ( src n rep -- dst )
-    [ ^broadcast-vector ] keep ^^vector>scalar ;
+    {
+        [ ^^select-vector ]
+        [ [ ^broadcast-vector ] keep ^^vector>scalar ]
+    } vl-vector-op ;
 
 ! intrinsic emitters
 
@@ -567,7 +570,12 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 
 : emit-simd-vpack-signed ( node -- )
     {
-        [ ^^signed-pack-vector ]
+        { double-2-rep [| src1 src2 rep |
+            src1 double-2-rep ^^float-pack-vector :> dst-head
+            src2 double-2-rep ^^float-pack-vector :> dst-tail
+            dst-head dst-tail { 0 1 0 1 } float-4-rep ^^shuffle-vector-halves-imm
+        ] }
+        { int-vector-rep [ ^^signed-pack-vector ] }
     } emit-vv-vector-op ;
 
 : emit-simd-vpack-unsigned ( node -- )
@@ -593,12 +601,14 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 
 : emit-simd-gather-2 ( node -- )
     {
+        { fixnum-vector-rep [ ^^gather-int-vector-2 ] }
         { fixnum-vector-rep [ ^^gather-vector-2 ] }
         { float-vector-rep  [ ^^gather-vector-2 ] }
     } emit-vv-vector-op ;
 
 : emit-simd-gather-4 ( node -- )
     {
+        { fixnum-vector-rep [ ^^gather-int-vector-4 ] }
         { fixnum-vector-rep [ ^^gather-vector-4 ] }
         { float-vector-rep  [ ^^gather-vector-4 ] }
     } emit-vvvv-vector-op ;

@@ -78,7 +78,7 @@ DEFER: j-string
             { CHAR: {  [ 2 [ V{ } clone over push ] times ] }
             { CHAR: :  [ v-pick-push ] }
             { CHAR: }  [ (close-hash) ] }
-            { CHAR: \u000020 [ ] }
+            { CHAR: \s [ ] }
             { CHAR: \t [ ] }
             { CHAR: \r [ ] }
             { CHAR: \n [ ] }
@@ -89,10 +89,10 @@ DEFER: j-string
         } case
     ] when* ;
 
-: (json-parser>) ( string -- object )
-    [ V{ } clone [ read1 dup ] [ scan ] while drop first ] with-string-reader ;
-
 PRIVATE>
 
+: read-jsons ( -- objects )
+    V{ } clone [ read1 dup ] [ scan ] while drop ;
+
 : json> ( string -- object )
-    (json-parser>) ;
+    [ read-jsons first ] with-string-reader ;

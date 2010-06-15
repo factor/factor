@@ -28,15 +28,6 @@ TYPEDEF: void* CUgraphicsResource
 
 SYMBOLS: CUdouble CUlonglong CUulonglong ;
 
-: >cuda-param-type ( c-type -- c-type' )
-    {
-        { CUdeviceptr [ void* ] }
-        { double      [ CUdouble ] }
-        { longlong    [ CUlonglong ] }
-        { ulonglong   [ CUulonglong ] }
-        [ ]
-    } case ;
-
 <<
 : always-8-byte-align ( c-type -- c-type )
     8 >>align 8 >>align-first ;

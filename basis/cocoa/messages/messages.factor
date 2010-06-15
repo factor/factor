@@ -1,11 +1,11 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.strings arrays assocs
-classes.struct continuations combinators compiler
+USING: accessors alien alien.c-types alien.data alien.strings
+arrays assocs classes.struct continuations combinators compiler
 core-graphics.types stack-checker kernel math namespaces make
 quotations sequences strings words cocoa.runtime cocoa.types io
-macros memoize io.encodings.utf8 effects layouts libc
-lexer init core-foundation fry generalizations specialized-arrays ;
+macros memoize io.encodings.utf8 effects layouts libc lexer init
+core-foundation fry generalizations specialized-arrays ;
 QUALIFIED-WITH: alien.c-types c
 IN: cocoa.messages
 
@@ -216,7 +216,7 @@ ERROR: no-objc-type name ;
     objc-methods get set-at ;
 
 : each-method-in-class ( class quot -- )
-    [ 0 <uint> [ class_copyMethodList ] keep *uint ] dip
+    [ { uint } [ class_copyMethodList ] [ ] with-out-parameters ] dip
     over 0 = [ 3drop ] [
         [ <direct-void*-array> ] dip
         [ each ] [ drop (free) ] 2bi

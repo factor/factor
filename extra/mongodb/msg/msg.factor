@@ -17,52 +17,52 @@ CONSTANT: ResultFlag_ErrSet  2 ! /* { $err : ... } is being returned */
 CONSTANT: ResultFlag_ShardConfigStale 4 !  /* have to update config from the server,  usually $err is also set */
             
 TUPLE: mdb-msg
-{ opcode integer } 
-{ req-id integer initial: 0 }
-{ resp-id integer initial: 0 }
-{ length integer initial: 0 }     
-{ flags integer initial: 0 } ;
+    { opcode integer } 
+    { req-id integer initial: 0 }
+    { resp-id integer initial: 0 }
+    { length integer initial: 0 }     
+    { flags integer initial: 0 } ;
 
 TUPLE: mdb-query-msg < mdb-msg
-{ collection string }
-{ skip# integer initial: 0 }
-{ return# integer initial: 0 }
-{ query assoc }
-{ returnfields assoc }
-{ orderby assoc }
-explain hint ;
+    { collection string }
+    { skip# integer initial: 0 }
+    { return# integer initial: 0 }
+    { query assoc }
+    { returnfields assoc }
+    { orderby assoc }
+    explain hint ;
 
 TUPLE: mdb-insert-msg < mdb-msg
-{ collection string }
-{ objects sequence } ;
+    { collection string }
+    { objects sequence } ;
 
 TUPLE: mdb-update-msg < mdb-msg
-{ collection string }
-{ upsert? integer initial: 0 }
-{ selector assoc }
-{ object assoc } ;
+    { collection string }
+    { upsert? integer initial: 0 }
+    { selector assoc }
+    { object assoc } ;
 
 TUPLE: mdb-delete-msg < mdb-msg
-{ collection string }
-{ selector assoc } ;
+    { collection string }
+    { selector assoc } ;
 
 TUPLE: mdb-getmore-msg < mdb-msg
-{ collection string }
-{ return# integer initial: 0 }
-{ cursor integer initial: 0 }
-{ query mdb-query-msg } ;
+    { collection string }
+    { return# integer initial: 0 }
+    { cursor integer initial: 0 }
+    { query mdb-query-msg } ;
 
 TUPLE: mdb-killcursors-msg < mdb-msg
-{ cursors# integer initial: 0 }
-{ cursors sequence } ;
+    { cursors# integer initial: 0 }
+    { cursors sequence } ;
 
 TUPLE: mdb-reply-msg < mdb-msg
-{ collection string }
-{ cursor integer initial: 0 }
-{ start# integer initial: 0 }
-{ requested# integer initial: 0 }
-{ returned# integer initial: 0 }
-{ objects sequence } ;
+    { collection string }
+    { cursor integer initial: 0 }
+    { start# integer initial: 0 }
+    { requested# integer initial: 0 }
+    { returned# integer initial: 0 }
+    { objects sequence } ;
 
 
 CONSTRUCTOR: mdb-getmore-msg ( collection return# cursor -- mdb-getmore-msg )

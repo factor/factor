@@ -1,8 +1,9 @@
-! Copyright (C) 2005, 2006 Eduardo Cavazos and Slava Pestov
+! Copyright (C) 2005, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math math.bitwise math.vectors
-namespaces sequences x11 x11.xlib x11.constants x11.glx arrays
-fry classes.struct literals ;
+namespaces sequences arrays fry classes.struct literals
+x11 x11.xlib x11.constants x11.events
+x11.glx ;
 IN: x11.windows
 
 CONSTANT: create-window-mask
@@ -78,7 +79,7 @@ CONSTANT: event-mask
     dpy get swap XDestroyWindow drop ;
 
 : set-closable ( win -- )
-    dpy get swap "WM_DELETE_WINDOW" x-atom <Atom> 1
+    dpy get swap XA_WM_DELETE_WINDOW <Atom> 1
     XSetWMProtocols drop ;
 
 : map-window ( win -- ) dpy get swap XMapWindow drop ;

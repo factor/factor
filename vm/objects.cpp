@@ -82,13 +82,13 @@ void factor_vm::primitive_size()
 	ctx->push(allot_cell(object_size(ctx->pop())));
 }
 
-struct slot_become_visitor {
+struct slot_become_fixup : no_fixup {
 	std::map<object *,object *> *become_map;
 
-	explicit slot_become_visitor(std::map<object *,object *> *become_map_) :
+	explicit slot_become_fixup(std::map<object *,object *> *become_map_) :
 		become_map(become_map_) {}
 
-	object *operator()(object *old)
+	object *fixup_data(object *old)
 	{
 		std::map<object *,object *>::const_iterator iter = become_map->find(old);
 		if(iter != become_map->end())
@@ -99,9 +99,9 @@ struct slot_become_visitor {
 };
 
 struct object_become_visitor {
-	slot_visitor<slot_become_visitor> *workhorse;
+	slot_visitor<slot_become_fixup> *workhorse;
 
-	explicit object_become_visitor(slot_visitor<slot_become_visitor> *workhorse_) :
+	explicit object_become_visitor(slot_visitor<slot_become_fixup> *workhorse_) :
 		workhorse(workhorse_) {}
 
 	void operator()(object *obj)
@@ -111,9 +111,9 @@ struct object_become_visitor {
 };
 
 struct code_block_become_visitor {
-	slot_visitor<slot_become_visitor> *workhorse;
+	slot_visitor<slot_become_fixup> *workhorse;
 
-	explicit code_block_become_visitor(slot_visitor<slot_become_visitor> *workhorse_) :
+	explicit code_block_become_visitor(slot_visitor<slot_become_fixup> *workhorse_) :
 		workhorse(workhorse_) {}
 
 	void operator()(code_block *compiled, cell size)
@@ -160,7 +160,7 @@ void factor_vm::primitive_become()
 
 	/* Update all references to old objects to point to new objects */
 	{
-		slot_visitor<slot_become_visitor> workhorse(this,slot_become_visitor(&become_map));
+		slot_visitor<slot_become_fixup> workhorse(this,slot_become_fixup(&become_map));
 		workhorse.visit_roots();
 		workhorse.visit_contexts();
 

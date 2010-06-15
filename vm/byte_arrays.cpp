@@ -10,6 +10,11 @@ byte_array *factor_vm::allot_byte_array(cell size)
 	return array;
 }
 
+VM_C_API cell allot_byte_array(cell size, factor_vm *parent)
+{
+	return tag<byte_array>(parent->allot_byte_array(size));
+}
+
 void factor_vm::primitive_byte_array()
 {
 	cell size = unbox_array_size();
@@ -30,16 +35,18 @@ void factor_vm::primitive_resize_byte_array()
 	ctx->push(tag<byte_array>(reallot_array(array.untagged(),capacity)));
 }
 
+void growable_byte_array::grow_bytes(cell len)
+{
+	count += len;
+	if(count >= array_capacity(elements.untagged()))
+		elements = elements.parent->reallot_array(elements.untagged(),count * 2);
+}
+
 void growable_byte_array::append_bytes(void *elts, cell len)
 {
-	cell new_size = count + len;
-	factor_vm *parent = elements.parent;
-	if(new_size >= array_capacity(elements.untagged()))
-		elements = parent->reallot_array(elements.untagged(),new_size * 2);
-
-	memcpy(&elements->data<u8>()[count],elts,len);
-
-	count += len;
+	cell old_count = count;
+	grow_bytes(len);
+	memcpy(&elements->data<u8>()[old_count],elts,len);
 }
 
 void growable_byte_array::append_byte_array(cell byte_array_)

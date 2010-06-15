@@ -1,9 +1,10 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays
-assocs byte-arrays classes.struct combinators cuda cuda.ffi
-cuda.syntax cuda.utils fry io io.encodings.utf8 kernel locals
-math math.order math.parser namespaces prettyprint sequences ;
+assocs byte-arrays classes.struct combinators cuda
+cuda.contexts cuda.ffi cuda.libraries fry io io.encodings.utf8
+kernel locals math math.order math.parser namespaces
+prettyprint sequences ;
 IN: cuda.devices
 
 : #cuda-devices ( -- n )
@@ -16,7 +17,7 @@ IN: cuda.devices
     #cuda-devices iota [ n>cuda-device ] map ;
 
 : with-each-cuda-device ( quot -- )
-    [ enumerate-cuda-devices ] dip '[ <launcher> _ with-cuda ] each ; inline
+    [ enumerate-cuda-devices ] dip '[ 0 _ with-cuda-context ] each ; inline
 
 : cuda-device-properties ( n -- properties )
     [ CUdevprop <struct> ] dip
@@ -70,6 +71,9 @@ IN: cuda.devices
 : up/i ( x y -- z )
     [ 1 - + ] keep /i ; inline
 
+: context-device-properties ( -- props )
+    context-device cuda-device-properties ; inline
+
 :: (distribute-jobs) ( job-count per-job-shared max-shared-size max-block-size
                        -- grid-size block-size per-block-shared )
     per-job-shared [ max-block-size ] [ max-shared-size swap /i max-block-size min ] if-zero
@@ -81,6 +85,6 @@ IN: cuda.devices
     grid-size block-size per-block-shared ; inline
 
 : distribute-jobs ( job-count per-job-shared -- launcher )
-    cuda-device get cuda-device-properties 
-    [ sharedMemPerBlock>> ] [ maxThreadsDim>> first ] bi
-    (distribute-jobs) 3<<< ; inline
+    context-device-properties
+    [ sharedMemPerBlock>> ] [ maxThreadsPerBlock>> ] bi
+    (distribute-jobs) <grid-shared> ; inline

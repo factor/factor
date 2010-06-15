@@ -1,10 +1,10 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel combinators alien alien.enums
 alien.strings alien.c-types alien.parser alien.syntax arrays
-assocs effects math.parser prettyprint.backend prettyprint.custom
-prettyprint.sections definitions see see.private sequences
-strings words ;
+assocs effects math.parser prettyprint prettyprint.backend
+prettyprint.custom prettyprint.sections definitions see
+see.private sequences strings words ;
 IN: alien.prettyprint
 
 M: alien pprint*
@@ -23,21 +23,26 @@ M: c-type-word declarations. drop ;
 <PRIVATE
 GENERIC: pointer-string ( pointer -- string/f )
 M: object pointer-string drop f ;
-M: word pointer-string name>> ;
+M: word pointer-string [ record-vocab ] [ name>> ] bi ;
 M: pointer pointer-string to>> pointer-string [ CHAR: * suffix ] [ f ] if* ;
+
+GENERIC: c-type-string ( c-type -- string )
+
+M: word c-type-string [ record-vocab ] [ name>> ] bi ;
+M: pointer c-type-string dup pointer-string [ ] [ unparse ] ?if ;
+M: wrapper c-type-string wrapped>> c-type-string ;
+M: array c-type-string
+    unclip
+    [ [ unparse "[" "]" surround ] map ]
+    [ c-type-string ] bi*
+    prefix "" join ;
 PRIVATE>
 
-GENERIC: pprint-c-type ( c-type -- )
-M: word pprint-c-type pprint-word ;
-M: pointer pprint-c-type
-    dup pointer-string
-    [ swap present-text ]
-    [ pprint* ] if* ;
-M: wrapper pprint-c-type wrapped>> pprint-word ;
-M: string pprint-c-type text ;
-M: array pprint-c-type pprint* ;
+: pprint-c-type ( c-type -- )
+    [ c-type-string ] keep present-text ;
 
-M: pointer pprint* \ pointer: pprint-word to>> pprint-c-type ;
+M: pointer pprint*
+    <flow \ pointer: pprint-word to>> pprint* block> ;
 
 M: typedef-word definer drop \ TYPEDEF: f ;
 
@@ -102,11 +107,11 @@ M: alien-callback-type-word synopsis*
         [ seeing-word ]
         [ "callback-library" word-prop pprint-library ]
         [ definer. ]
-        [ def>> first pprint-c-type ]
+        [ def>> first first pprint-c-type ]
         [ pprint-word ]
         [
             <block "(" text 
-            [ def>> second ] [ "callback-effect" word-prop in>> ] bi
+            [ def>> first second ] [ "callback-effect" word-prop in>> ] bi
             pprint-function-args
             ")" text block>
         ]

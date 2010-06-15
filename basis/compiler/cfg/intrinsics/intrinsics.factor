@@ -14,6 +14,7 @@ compiler.cfg.intrinsics.misc
 compiler.cfg.comparisons ;
 QUALIFIED: alien
 QUALIFIED: alien.accessors
+QUALIFIED: alien.data.private
 QUALIFIED: alien.c-types
 QUALIFIED: kernel
 QUALIFIED: arrays
@@ -23,6 +24,7 @@ QUALIFIED: slots.private
 QUALIFIED: strings.private
 QUALIFIED: classes.tuple.private
 QUALIFIED: math.private
+QUALIFIED: math.bitwise.private
 QUALIFIED: math.integers.private
 QUALIFIED: math.floats.private
 QUALIFIED: math.libm
@@ -63,6 +65,8 @@ IN: compiler.cfg.intrinsics
     { byte-arrays:<byte-array> [ emit-<byte-array> ] }
     { byte-arrays:(byte-array) [ emit-(byte-array) ] }
     { kernel:<wrapper> [ emit-simple-allot ] }
+    { alien.data.private:(local-allot) [ emit-local-allot ] }
+    { alien.data.private:(cleanup-allot) [ drop emit-cleanup-allot ] }
     { alien:<displaced-alien> [ emit-<displaced-alien> ] }
     { alien.accessors:alien-unsigned-1 [ int-rep alien.c-types:uchar emit-load-memory ] }
     { alien.accessors:set-alien-unsigned-1 [ int-rep alien.c-types:uchar emit-store-memory ] }
@@ -153,6 +157,11 @@ IN: compiler.cfg.intrinsics
 : enable-log2 ( -- )
     {
         { math.integers.private:fixnum-log2 [ drop [ ^^log2 ] unary-op ] }
+    } enable-intrinsics ;
+
+: enable-bit-count ( -- )
+    {
+        { math.bitwise.private:fixnum-bit-count [ drop [ ^^bit-count ] unary-op ] }
     } enable-intrinsics ;
 
 : emit-intrinsic ( node word -- )

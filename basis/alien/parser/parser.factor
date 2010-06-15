@@ -168,8 +168,8 @@ PREDICATE: alien-callback-type-word < typedef-word
     "callback-effect" word-prop ;
 
 : global-quot ( type word -- quot )
-    name>> current-library get '[ _ _ address-of 0 ]
-    swap c-getter append ;
+    swap [ name>> current-library get ] dip
+    '[ _ _ address-of 0 _ alien-value ] ;
 
 : define-global ( type word -- )
     [ nip ] [ global-quot ] 2bi (( -- value )) define-declared ;

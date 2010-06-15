@@ -134,7 +134,7 @@ M: vreg-insn compute-live-intervals* ( insn -- )
     ] if ;
 
 ! A location where all registers have to be spilled
-TUPLE: sync-point n ;
+TUPLE: sync-point n keep-dst? ;
 
 C: <sync-point> sync-point
 
@@ -143,8 +143,11 @@ SYMBOL: sync-points
 
 GENERIC: compute-sync-points* ( insn -- )
 
+M: hairy-clobber-insn compute-sync-points*
+    insn#>> f <sync-point> sync-points get push ;
+
 M: clobber-insn compute-sync-points*
-    insn#>> <sync-point> sync-points get push ;
+    insn#>> t <sync-point> sync-points get push ;
 
 M: insn compute-sync-points* drop ;
 
