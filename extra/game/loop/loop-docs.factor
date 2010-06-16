@@ -26,22 +26,6 @@ $nl
 
 { <game-loop> <game-loop*> } related-words
 
-HELP: benchmark-frames-per-second
-{ $values
-    { "loop" game-loop }
-    { "n" float }
-}
-{ $description "Returns the average number of times per second the game loop has called " { $link draw* } " on its delegate since the game loop was started with " { $link start-loop } "." } ;
-
-HELP: benchmark-ticks-per-second
-{ $values
-    { "loop" game-loop }
-    { "n" float }
-}
-{ $description "Returns the average number of times per second the game loop has called " { $link tick* } " on its tick delegate since the game loop was started." } ;
-
-{ benchmark-frames-per-second benchmark-ticks-per-second } related-words
-
 HELP: draw*
 { $values
     { "tick-slice" float } { "delegate" "a " { $link "game.loop-delegates" } }
@@ -102,11 +86,6 @@ ARTICLE: "game.loop" "Game loops"
 { $subsections
     start-loop
     stop-loop
-}
-"The game loop maintains performance counters:"
-{ $subsections
-    benchmark-frames-per-second
-    benchmark-ticks-per-second
 }
 "The game loop catches errors that occur in the delegate's methods during the course of the game loop:"
 { $subsections

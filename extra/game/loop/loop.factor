@@ -88,12 +88,6 @@ TUPLE: game-loop-error game-loop error ;
 
 PRIVATE>
 
-! : benchmark-ticks-per-second ( loop -- n )
-    ! [ tick#>> ] [ benchmark-tick#>> - ] [ benchmark-nanos ] tri /f ;
-
-! : benchmark-frames-per-second ( loop -- n )
-    ! [ frame#>> ] [ benchmark-frame#>> - ] [ benchmark-nanos ] tri /f ;
-
 : (game-tick) ( loop -- )
     dup running?>>
     [ [ MAX-FRAMES-TO-SKIP ?tick ] [ redraw ] bi ]
