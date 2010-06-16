@@ -164,7 +164,7 @@ template<typename Block, typename Iterator> struct heap_compactor {
 	{
 		if(this->state->marked_p(block))
 		{
-			*finger = block;
+			*finger = (Block *)((char *)block + size);
 			memmove((Block *)address,block,size);
 			iter(block,(Block *)address,size);
 			address += size;
