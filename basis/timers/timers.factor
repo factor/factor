@@ -117,3 +117,6 @@ PRIVATE>
 
 : delayed-every ( quot duration -- timer )
     dup (start-timer) ;
+
+: nanos-since ( nano-count -- nanos )
+    [ nano-count ] dip - ;
