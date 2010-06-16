@@ -74,6 +74,9 @@ M: game-world apply-world-attributes
 : start-game ( attributes -- game-world )
     f swap open-window* ;
 
+: wait-game ( attributes -- game-world )
+    f swap open-window* dup promise>> ?promise drop ;
+
 : define-attributes-word ( word tuple -- )
     [ name>> "-attributes" append create-in ] dip define-constant ;
 
