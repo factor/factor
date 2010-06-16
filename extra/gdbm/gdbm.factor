@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Dmitry Shubin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.destructors
-classes.struct combinators destructors gdbm.ffi io.backend kernel libc
-literals math namespaces sequences serialize strings ;
+USING: accessors alien.c-types alien.data alien.destructors assocs
+biassocs classes.struct combinators destructors gdbm.ffi io.backend
+kernel libc literals math namespaces sequences serialize strings ;
 IN: gdbm
 
 TUPLE: gdbm
@@ -11,14 +11,58 @@ TUPLE: gdbm
     { flags      integer initial: $ GDBM_WRCREAT }
     { mode       integer initial: OCT: 644 } ;
 
-ERROR: gdbm-error errno msg ;
+SINGLETONS:
+    gdbm-no-error             gdbm-malloc-error
+    gdbm-block-size-error     gdbm-file-open-error
+    gdbm-file-write-error     gdbm-file-seek-error
+    gdbm-file-read-error      gdbm-bad-magic-number
+    gdbm-empty-database       gdbm-cant-be-reader
+    gdbm-cant-be-writer       gdbm-reader-cant-delete
+    gdbm-reader-cant-store    gdbm-reader-cant-reorganize
+    gdbm-unknown-update       gdbm-item-not-found
+    gdbm-reorganize-failed    gdbm-cannot-replace
+    gdbm-illegal-data         gdbm-option-already-set
+    gdbm-illegal-option ;
+
+ERROR: gdbm-unknown-error error ;
 
 
 <PRIVATE
 
-: gdbm-throw ( -- * ) gdbm_errno dup gdbm_strerror gdbm-error ;
+: error-table ( -- table )
+    {
+        {  0 gdbm-no-error               }
+        {  1 gdbm-malloc-error           }
+        {  2 gdbm-block-size-error       }
+        {  3 gdbm-file-open-error        }
+        {  4 gdbm-file-write-error       }
+        {  5 gdbm-file-seek-error        }
+        {  6 gdbm-file-read-error        }
+        {  7 gdbm-bad-magic-number       }
+        {  8 gdbm-empty-database         }
+        {  9 gdbm-cant-be-reader         }
+        { 10 gdbm-cant-be-writer         }
+        { 11 gdbm-reader-cant-delete     }
+        { 12 gdbm-reader-cant-store      }
+        { 13 gdbm-reader-cant-reorganize }
+        { 14 gdbm-unknown-update         }
+        { 15 gdbm-item-not-found         }
+        { 16 gdbm-reorganize-failed      }
+        { 17 gdbm-cannot-replace         }
+        { 18 gdbm-illegal-data           }
+        { 19 gdbm-option-already-set     }
+        { 20 gdbm-illegal-option         }
+    } >biassoc ;
+
+: error>code ( error -- code )
+    dup error-table value-at [ ] [ gdbm-unknown-error ] ?if ;
+
+: code>error ( code -- error ) error-table at ;
+
+: gdbm-throw ( -- * ) gdbm_errno code>error throw ;
 
 : check-error ( ret -- ) 0 = [ gdbm-throw ] unless ;
+
 
 SYMBOL: current-dbf
 
@@ -48,6 +92,8 @@ DESTRUCTOR: gdbm-close
 
 PRIVATE>
 
+
+: gdbm-error-message ( error -- msg ) error>code gdbm_strerror ;
 
 : gdbm-replace ( key content -- ) GDBM_REPLACE gdbm-store ;
 : gdbm-insert ( key content -- ) GDBM_INSERT gdbm-store ;
