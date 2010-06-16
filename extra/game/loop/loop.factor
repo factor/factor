@@ -3,18 +3,18 @@ USING: accessors timers alien.c-types calendar classes.struct
 continuations destructors fry kernel math math.order memory
 namespaces sequences specialized-vectors system
 tools.memory ui ui.gadgets.worlds vm vocabs.loader arrays
-benchmark.struct ;
+benchmark.struct locals ;
 IN: game.loop
 
 TUPLE: game-loop
     { tick-interval-nanos integer read-only }
     tick-delegate
     draw-delegate
-    { last-tick integer }
     { running? boolean }
     { tick# integer }
     { frame# integer }
-    timer
+    tick-timer
+    draw-timer
     benchmark-data ;
 
 STRUCT: game-loop-benchmark
@@ -33,16 +33,6 @@ SPECIALIZED-VECTOR: game-loop-benchmark
 GENERIC: tick* ( delegate -- )
 GENERIC: draw* ( tick-slice delegate -- )
 
-SYMBOL: game-loop
-
-: since-last-tick ( loop -- nanos )
-    last-tick>> nano-count swap - ;
-
-: tick-slice ( loop -- slice )
-    [ since-last-tick ] [ tick-interval-nanos>> ] bi /f 1.0 min ;
-
-CONSTANT: MAX-FRAMES-TO-SKIP 5
-
 DEFER: stop-loop
 
 TUPLE: game-loop-error game-loop error ;
@@ -54,7 +44,7 @@ TUPLE: game-loop-error game-loop error ;
     [ drop stop-loop ] [ \ game-loop-error boa ?ui-error ] 2bi ;
 
 : fps ( fps -- nanos )
-    1,000,000,000 swap /i ; inline
+    [ 1,000,000,000 ] dip /i ; inline
 
 <PRIVATE
 
@@ -63,10 +53,15 @@ TUPLE: game-loop-error game-loop error ;
     [ frame#>> <game-loop-benchmark> ]
     [ benchmark-data>> ] tri push ;
 
+: last-tick-percent-offset ( loop -- float )
+    [ draw-timer>> iteration-start-nanos>> nano-count swap - ]
+    [ tick-interval-nanos>> ] bi /f 1.0 min ;
+
 : redraw ( loop -- )
     [ 1 + ] change-frame#
     [
-        [ tick-slice ] [ draw-delegate>> ] bi [ draw* ] with-benchmarking
+        [ last-tick-percent-offset ] [ draw-delegate>> ] bi
+        [ draw* ] with-benchmarking
     ] keep record-benchmarking ;
 
 : tick ( loop -- )
@@ -76,43 +71,41 @@ TUPLE: game-loop-error game-loop error ;
 
 : increment-tick ( loop -- )
     [ 1 + ] change-tick#
-    dup tick-interval-nanos>> '[ _ + ] change-last-tick
     drop ;
-
-: ?tick ( loop count -- )
-    [ nano-count >>last-tick drop ] [
-        over [ since-last-tick ] [ tick-interval-nanos>> ] bi >=
-        [ [ drop increment-tick ] [ drop tick ] [ 1 - ?tick ] 2tri ]
-        [ 2drop ] if
-    ] if-zero ;
 
 PRIVATE>
 
-: (game-tick) ( loop -- )
-    dup running?>>
-    [ [ MAX-FRAMES-TO-SKIP ?tick ] [ redraw ] bi ]
-    [ drop ] if ;
-    
-: game-tick ( loop -- )
-    dup game-loop [
-        [ (game-tick) ] [ game-loop-error ] recover
-    ] with-variable ;
+:: when-running ( loop quot -- )
+    [
+        loop
+        dup running?>> quot [ drop ] if
+    ] [
+        loop game-loop-error
+    ] recover ; inline
+
+: tick-iteration ( loop -- )
+    [ [ tick ] [ increment-tick ] bi ] when-running ;
+
+: frame-iteration ( loop -- )
+    [ redraw ] when-running ;
 
 : start-loop ( loop -- )
-    nano-count >>last-tick
     t >>running?
-    [
-        [ '[ _ game-tick ] f ]
-        [ tick-interval-nanos>> nanoseconds ] bi
-        <timer>
-    ] keep [ timer<< ] [ drop start-timer ] 2bi ;
+
+    dup
+    [ '[ _ tick-iteration ] f ]
+    [ tick-interval-nanos>> nanoseconds ] bi <timer> >>tick-timer
+
+    dup '[ _ frame-iteration ] f 1 milliseconds <timer> >>draw-timer
+
+    [ tick-timer>> ] [ draw-timer>> ] bi [ start-timer ] bi@ ;
 
 : stop-loop ( loop -- )
     f >>running?
-    timer>> stop-timer ;
+    [ tick-timer>> ] [ draw-timer>> ] bi [ stop-timer ] bi@ ;
 
 : <game-loop*> ( tick-interval-nanos tick-delegate draw-delegate -- loop )
-    nano-count f 0 0 f
+    f 0 0 f f
     game-loop-benchmark-vector{ } clone
     game-loop boa ;
 
@@ -123,4 +116,3 @@ M: game-loop dispose
     stop-loop ;
 
 { "game.loop" "prettyprint" } "game.loop.prettyprint" require-when
-
