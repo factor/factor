@@ -28,8 +28,8 @@ BOA-EFFECT [ N 2 * "n" <array> { "v" } <effect> ]
 WHERE
 
 : >A ( seq -- A )
-    [ N head >A/2 ]
-    [ N tail >A/2 ] bi cord-append ;
+    [ N head-slice >A/2 ]
+    [ N tail-slice >A/2 ] bi cord-append ;
 
 \ A-boa
 { N ndip A/2-boa cord-append } { A/2-boa } >quotation prefix >quotation
