@@ -60,3 +60,14 @@ CONSTANT: G_TYPE_BOXED $[ 18 2 shift ]
 CONSTANT: G_TYPE_PARAM $[ 19 2 shift ]
 CONSTANT: G_TYPE_OBJECT $[ 20 2 shift ]
 
+! Macros
+
+: g_signal_connect ( instance detailed_signal c_handler data -- result )
+    f 0 g_signal_connect_data ;
+
+: g_signal_connect_after ( instance detailed_signal c_handler data -- result )
+    f G_CONNECT_AFTER g_signal_connect_data ;
+
+: g_signal_connect_swapped ( instance detailed_signal c_handler data -- result )
+    f G_CONNECT_SWAPPED g_signal_connect_data ;
+
