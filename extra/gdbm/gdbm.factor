@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.destructors assocs
 biassocs classes.struct combinators destructors gdbm.ffi io.backend
-kernel libc literals math namespaces sequences serialize strings ;
+kernel libc literals locals math namespaces sequences serialize
+strings ;
 IN: gdbm
 
 TUPLE: gdbm
@@ -125,7 +126,19 @@ PRIVATE>
     [ dbf swap object>datum gdbm_exists c-bool> ]
     with-destructors ;
 
-! : gdbm-setopt ( option value size -- ret ) ;
+<PRIVATE
+
+:: (gdbm-setopt) ( option value -- )
+    [
+        int heap-size dup malloc &free :> ( size ptr )
+        value ptr 0 int set-alien-value
+        dbf option ptr size gdbm_setopt check-error
+    ] with-destructors ;
+
+PRIVATE>
+
+: gdbm-setopt ( option value -- )
+    over GDBM_CACHESIZE = [ >c-bool ] unless (gdbm-setopt) ;
 
 : gdbm-fdesc ( -- desc ) dbf gdbm_fdesc ;
 
