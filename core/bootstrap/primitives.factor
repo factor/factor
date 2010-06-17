@@ -536,7 +536,6 @@ tuple
     { "set-string-nth-fast" "strings.private" "primitive_set_string_nth_fast" (( ch n string -- )) }
     { "(exit)" "system" "primitive_exit" (( n -- * )) }
     { "nano-count" "system" "primitive_nano_count" (( -- ns )) }
-    { "system-micros" "system" "primitive_system_micros" (( -- us )) }
     { "(sleep)" "threads.private" "primitive_sleep" (( nanos -- )) }
     { "callstack-for" "threads.private" "primitive_callstack_for" (( context -- array )) }
     { "context-object-for" "threads.private" "primitive_context_object_for" (( n context -- obj )) }
