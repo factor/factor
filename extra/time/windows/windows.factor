@@ -4,9 +4,6 @@ USING: calendar.windows system time windows.errors
 windows.kernel32 kernel classes.struct calendar ;
 IN: time.windows
 
-: windows-system-time ( -- SYSTEMTIME )
-    SYSTEMTIME <struct> [ GetSystemTime ] keep ;
-
 M: windows set-time
     >gmt
     timestamp>SYSTEMTIME SetSystemTime win32-error=0/f ;
