@@ -19,13 +19,6 @@ THREADHANDLE start_thread(void *(*start_routine)(void *),void *args)
 
 static void *null_dll;
 
-u64 system_micros()
-{
-	struct timeval t;
-	gettimeofday(&t,NULL);
-	return (u64)t.tv_sec * 1000000 + t.tv_usec;
-}
-
 void sleep_nanos(u64 nsec)
 {
 	timespec ts;
