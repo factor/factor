@@ -27,3 +27,4 @@ IN: unix.users.tests
 [ f ] [ 89898989898989898989898989898 user-passwd ] unit-test
 
 [ f ] [ "thisusershouldnotexistabcdefg12345asdfasdfasdfasdfasdfasdfasdf" user-id ] unit-test
+[ "thisusershouldnotexistabcdefg12345asdfasdfasdfasdfasdfasdfasdf" ?user-id ] must-fail
