@@ -5,11 +5,11 @@ kernel math unix unix.time unix.types namespaces system
 accessors classes.struct ;
 IN: calendar.unix
 
-: timeval>seconds ( timeval -- seconds )
+: timeval>duration ( timeval -- duration )
     [ sec>> seconds ] [ usec>> microseconds ] bi time+ ;
 
 : timeval>unix-time ( timeval -- timestamp )
-    timeval>seconds since-1970 ;
+    timeval>duration since-1970 ;
 
 : timespec>seconds ( timespec -- seconds )
     [ sec>> seconds ] [ nsec>> nanoseconds ] bi time+ ;
@@ -28,3 +28,7 @@ IN: calendar.unix
 
 M: unix gmt-offset ( -- hours minutes seconds )
     get-time gmtoff>> 3600 /mod 60 /mod ;
+
+M: unix gmt
+    timeval <struct> f [ gettimeofday io-error ] 2keep drop
+    timeval>unix-time ;

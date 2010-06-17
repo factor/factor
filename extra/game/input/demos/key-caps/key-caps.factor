@@ -1,6 +1,6 @@
 USING: game.input game.input.scancodes
 kernel ui.gadgets ui.gadgets.buttons sequences accessors
-words arrays assocs math calendar fry alarms ui
+words arrays assocs math calendar fry timers ui
 ui.gadgets.borders ui.gestures literals ;
 IN: game.input.demos.key-caps
 
@@ -134,7 +134,7 @@ CONSTANT: key-locations H{
 CONSTANT: KEYBOARD-SIZE { 230 65 }
 CONSTANT: FREQUENCY $[ 1/30 seconds ]
 
-TUPLE: key-caps-gadget < gadget keys alarm ;
+TUPLE: key-caps-gadget < gadget keys timer ;
 
 : make-key-gadget ( scancode dim array -- )
     [ 
@@ -163,11 +163,11 @@ M: key-caps-gadget pref-dim* drop KEYBOARD-SIZE ;
 
 M: key-caps-gadget graft*
     open-game-input
-    dup '[ _ update-key-caps-state ] FREQUENCY every >>alarm
+    dup '[ _ update-key-caps-state ] FREQUENCY every >>timer
     drop ;
 
 M: key-caps-gadget ungraft*
-    alarm>> [ stop-alarm ] when*
+    timer>> [ stop-timer ] when*
     close-game-input ;
 
 M: key-caps-gadget handle-gesture

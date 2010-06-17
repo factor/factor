@@ -125,7 +125,6 @@ namespace factor
 	_(special_object) \
 	_(string) \
 	_(strip_stack_traces) \
-	_(system_micros) \
 	_(tuple) \
 	_(tuple_boa) \
 	_(unimplemented) \
